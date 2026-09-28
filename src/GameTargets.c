@@ -305,15 +305,15 @@ s32 fn_800F2534(s32 arg0) {
 s32 fn_800F2578(void) {
     int i;
     for (i = 0; i < 20; i++) {
-        if (lbl_80200538.aMini[i].nId == 999) {
+        if (gEarningsTable.aMini[i].nId == 999) {
             if (Game_GetMode() == 0xD) {
-                return lbl_80200538.aMini[i].n4;
+                return gEarningsTable.aMini[i].n4;
             }
             if (Game_GetMode() == 0x10) {
-                return lbl_80200538.aMini[i].n8;
+                return gEarningsTable.aMini[i].n8;
             }
             if (Game_GetMode() == 0x11) {
-                return lbl_80200538.aMini[i].nC;
+                return gEarningsTable.aMini[i].nC;
             }
         }
     }

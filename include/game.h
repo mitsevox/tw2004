@@ -257,10 +257,10 @@ u8   HighScoreRecords_CheckRecordGameSetting(int nKind);            // Earnings.
 void fn_800D477C(int nPlayer, Ball* pBall, u8 b);   // Earnings.c: the shot's check
 void fn_800D4F14(int nPlayer, u8 b);                // the putt's
 void fn_800D588C(int nPlayer, u8 a, u8 bRoundOver); // the hole's
-s32  Earnings_GetNumAwards(void);                 // lbl_80282250: the entries in the three lists below
-s32  Earnings_GetShotAwardId(s32 i);                // lbl_802002B8[i]
-s32  Earnings_GetPuttAwardId(s32 i);                // lbl_80200290[i]
-s32  Earnings_GetHoleAwardId(s32 i);                // lbl_80200268[i]
+s32  Earnings_GetNumAwards(void);                 // gNumAwards: the entries in the three lists below
+s32  Earnings_GetShotAwardId(s32 i);                // gShotAwards[i]
+s32  Earnings_GetPuttAwardId(s32 i);                // gPuttAwards[i]
+s32  Earnings_GetHoleAwardId(s32 i);                // gHoleAwards[i]
 int  HighScoreRecords_GetEndOfShotRecord(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll);
 int  HighScoreRecords_GetEndOfHoleRecord(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll);   // the putt record check
 s32  fn_8008AB40(void);                 // GameUICommands.c

@@ -1,4 +1,4 @@
-// earnings.h (our name): the prize table (lbl_80200538, 0x22F0 bytes, loaded from the 'ERN '
+// earnings.h (our name): the prize table (gEarningsTable, 0x22F0 bytes, loaded from the 'ERN '
 // stream by Earnings.c) and the Earnings.c functions the game modes call. Multipliers are
 // percentages (100 = x1). Prizes that depend on a golfer are indexed by earnings rating
 // (GM_Earnings_RateGolfer, 0..25).
@@ -60,7 +60,7 @@ typedef struct ShotGoal {
     s32  nValue;                // 0x24  the prize (award 0x27), else what ranks goals with the same id
     u8   unk28;                 // 0x28
     s8   nAward;                // 0x29  the award it gives (GM_Earnings_AwardThisTrophyBallToUser), 0x27 a money prize
-    s8   n2A;                   // 0x2A  kept with a money prize (lbl_80200420)
+    s8   n2A;                   // 0x2A  kept with a money prize (gShotPrizeMsgs)
     u8   unk2B;                 // 0x2B
     u8   bEnabled;              // 0x2C
     u8   unk2D[3];              // 0x2D
@@ -86,7 +86,7 @@ typedef struct PuttGoal {
     u8   uMults;                // 0x17  the multipliers a prize takes: bit 0 course, 1 tee, 2 pin set, 3 TOUR card
     s32  nValue;                // 0x18  the prize (award 0x27), else what ranks goals with the same id
     s8   nAward;                // 0x1C  the award it gives (GM_Earnings_AwardThisTrophyBallToUser), 0x27 a money prize
-    s8   n1D;                   // 0x1D  kept with a money prize (lbl_802003F8)
+    s8   n1D;                   // 0x1D  kept with a money prize (gPuttPrizeMsgs)
     u8   unk1E;                 // 0x1E
     u8   bEnabled;              // 0x1F
     s32  nBio;                  // 0x20  the EA Sports Bio accomplishment it posts (aBio), -1 none
@@ -117,7 +117,7 @@ typedef struct HoleGoal {
     u8   unk1D[3];              // 0x1D
     s32  nValue;                // 0x20  the prize (award 0x27), else what ranks goals with the same id
     s8   nAward;                // 0x24  the award it gives (GM_Earnings_AwardThisTrophyBallToUser), 0x27 a money prize
-    s8   n25;                   // 0x25  kept with a money prize (lbl_802003D0)
+    s8   n25;                   // 0x25  kept with a money prize (gHolePrizeMsgs)
     u8   unk26;                 // 0x26
     u8   bEnabled;              // 0x27
     s32  nBio;                  // 0x28  the EA Sports Bio accomplishment it posts (aBio), -1 none
@@ -188,18 +188,18 @@ typedef struct EarningsTable {
 } EarningsTable;
 LAYOUT_ASSERT(EarningsTable, 0x22F0);
 
-extern EarningsTable lbl_80200538;
-extern s32 lbl_801FFD68[10];    // the courses fn_800D3A20 unlocked, for their messages
-extern s32 lbl_80200448[10];    // a working table: fn_800D439C messages the entries of kind 2 or 4
-extern s32 lbl_802004C0[10];    // with these ids
-extern s32 lbl_802004E8[10];    // the putt record ids (2)
-extern s32 lbl_80200470[10];    // the putt record results (HighScoreRecords_GetEndOfHoleRecord)
-extern s32 lbl_80200498[10];    // a working table: fn_800D3DDC messages the entries of kind 2 or 4
-extern s32 lbl_80200510[10];    // with these ids
-extern s32 lbl_80282258;        // their count
-extern s32 lbl_80200330[10];    // the money prizes fn_800D477C finds, before the multipliers
-extern s32 lbl_80200308[10];    // the money prizes fn_800D4F14 finds, before the multipliers
-extern s32 lbl_802002E0[10];    // and those fn_800D588C finds
+extern EarningsTable gEarningsTable;
+extern s32 gUnlockedCourses[10];    // the courses fn_800D3A20 unlocked, for their messages
+extern s32 gRoundRecordResults[10];    // a working table: fn_800D439C messages the entries of kind 2 or 4
+extern s32 gRoundRecordKinds[10];    // with these ids
+extern s32 gPuttRecordKinds[10];    // the putt record ids (2)
+extern s32 gPuttRecordResults[10];    // the putt record results (HighScoreRecords_GetEndOfHoleRecord)
+extern s32 gShotRecordResults[10];    // a working table: fn_800D3DDC messages the entries of kind 2 or 4
+extern s32 gShotRecordKinds[10];    // with these ids
+extern s32 gNumRecordHits;        // their count
+extern s32 gShotPrizeBases[10];    // the money prizes fn_800D477C finds, before the multipliers
+extern s32 gPuttPrizeBases[10];    // the money prizes fn_800D4F14 finds, before the multipliers
+extern s32 gHolePrizeBases[10];    // and those fn_800D588C finds
 
 // Earnings.c
 int  fn_800D38F0(int nWinner, int nLoser, int nMargin, s32* pPrize);   // a ladder event's winnings

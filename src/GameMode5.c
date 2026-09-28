@@ -607,14 +607,14 @@ void fn_800EC1E0(void) {
                 GM_Earnings_AwardMoney(0, nMoney, (CourseMoneyTracking*)aOut);
                 if (fn_800ED6F0() && Earnings_IsTourAwardEarned(0, 0x1C)
                     && GM_Earnings_AwardTrophyBall(0, 0x1C)) {
-                    GUI_QueueMessage(6, 0x1C, lbl_80200538.nA24, nProfile);
-                    GM_Earnings_AwardMoney(0, lbl_80200538.nA24, 0);
-                    gPlayers[0].money.n8 += lbl_80200538.nA24;
+                    GUI_QueueMessage(6, 0x1C, gEarningsTable.nA24, nProfile);
+                    GM_Earnings_AwardMoney(0, gEarningsTable.nA24, 0);
+                    gPlayers[0].money.n8 += gEarningsTable.nA24;
                 }
                 if (fn_800EC4F0(nProfile) && GM_Earnings_AwardTrophyBall(0, 0xC)) {
-                    GUI_QueueMessage(2, 0xC, lbl_80200538.n9E4, nProfile);
-                    GM_Earnings_AwardMoney(0, lbl_80200538.n9E4, 0);
-                    gPlayers[0].money.n8 += lbl_80200538.n9E4;
+                    GUI_QueueMessage(2, 0xC, gEarningsTable.n9E4, nProfile);
+                    GM_Earnings_AwardMoney(0, gEarningsTable.n9E4, 0);
+                    gPlayers[0].money.n8 += gEarningsTable.n9E4;
                 }
             }
         }

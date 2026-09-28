@@ -15,60 +15,60 @@
 #include "game/modes/pgatoursim.h"
 
 // .bss, reverse address order (the ones not declared here are in game/earnings.h)
-EarningsTable lbl_80200538;
-s32 lbl_80200510[10];
-s32 lbl_802004E8[10];
-s32 lbl_802004C0[10];
-s32 lbl_80200498[10];
-s32 lbl_80200470[10];
-s32 lbl_80200448[10];
+EarningsTable gEarningsTable;
+s32 gShotRecordKinds[10];
+s32 gPuttRecordKinds[10];
+s32 gRoundRecordKinds[10];
+s32 gShotRecordResults[10];
+s32 gPuttRecordResults[10];
+s32 gRoundRecordResults[10];
 // The working tables and their saved copies, ten entries each.
-s32 lbl_80200420[10];
-s32 lbl_802003F8[10];
-s32 lbl_802003D0[10];
-s32 lbl_802003A8[10];
-s32 lbl_80200380[10];
-s32 lbl_80200358[10];
-s32 lbl_80200330[10];
-s32 lbl_80200308[10];
-s32 lbl_802002E0[10];
-s32 lbl_802002B8[10];
-s32 lbl_80200290[10];
-s32 lbl_80200268[10];
-s32 lbl_80200240[10];
-s32 lbl_80200218[10];
-s32 lbl_802001F0[10];
-s32 lbl_802001C8[10];
-s32 lbl_802001A0[10];
-s32 lbl_80200178[10];
-s32 lbl_80200150[10];
-s32 lbl_80200128[10];
-s32 lbl_80200100[10];
-s32 lbl_802000D8[10];
-s32 lbl_802000B0[10];
-s32 lbl_80200088[10];
-s32 lbl_80200060[10];
-s32 lbl_80200038[10];
-s32 lbl_80200010[10];
-CourseMoneyTracking lbl_801FFD90[10];     // the breakdown of each lbl_80200150 payout
-s32 lbl_801FFD68[10];
-CourseMoneyTracking lbl_801FFAE8[10];
+s32 gShotPrizeMsgs[10];
+s32 gPuttPrizeMsgs[10];
+s32 gHolePrizeMsgs[10];
+s32 gShotPrizes[10];
+s32 gPuttPrizes[10];
+s32 gHolePrizes[10];
+s32 gShotPrizeBases[10];
+s32 gPuttPrizeBases[10];
+s32 gHolePrizeBases[10];
+s32 gShotAwards[10];
+s32 gPuttAwards[10];
+s32 gHoleAwards[10];
+s32 gShotAwardMoney[10];
+s32 gPuttAwardMoney[10];
+s32 gHoleAwardMoney[10];
+s32 gPayShotPrizeMsgs[10];
+s32 gPayPuttPrizeMsgs[10];
+s32 gPayHolePrizeMsgs[10];
+s32 gPayShotPrizes[10];
+s32 gPayPuttPrizes[10];
+s32 gPayHolePrizes[10];
+s32 gPayShotAwards[10];
+s32 gPayPuttAwards[10];
+s32 gPayHoleAwards[10];
+s32 gPayShotAwardMoney[10];
+s32 gPayPuttAwardMoney[10];
+s32 gPayHoleAwardMoney[10];
+CourseMoneyTracking gPayPrizeBreakdowns[10];     // the breakdown of each gPayShotPrizes payout
+s32 gUnlockedCourses[10];
+CourseMoneyTracking gPrizeBreakdowns[10];
 
-// .sbss, reverse address order (lbl_80282258 is in game/earnings.h)
-s32 lbl_80282258;
-s32 lbl_80282254;
-s32 lbl_80282250;
-s32 lbl_8028224C;
-s32 lbl_80282248;
+// .sbss, reverse address order (gNumRecordHits is in game/earnings.h)
+s32 gNumRecordHits;
+s32 gNumPrizes;
+s32 gNumAwards;
+s32 gPayNumPrizes;
+s32 gPayNumAwards;
 
-s32 lbl_80191A08[39] = {
+s32 gAwardMessageIds[39] = {
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
     12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 0,
     10, 3, 11, 12, 5, 13, 6, 14, 4, 15, 8, 16,
     9, 17, 2,
 };
 
-f32 lbl_80191AA4[70] = {
+f32 gTournamentPayoutShares[70] = {
     0.18f, 0.108f, 0.068f, 0.048f, 0.04f, 0.036f, 0.0335f, 0.031f, 0.029f, 0.027f,
     0.025f, 0.023f, 0.021f, 0.019f, 0.018f, 0.017f, 0.016f, 0.015f, 0.014f, 0.013f,
     0.012f, 0.0112f, 0.0104f, 0.0096f, 0.0088f, 0.008f, 0.0077f, 0.0074f, 0.0071f, 0.0068f,
@@ -109,21 +109,21 @@ s32   Earnings_GetAwardMessageId(s32 i);
 
 // Copy the working tables and their two counts into the second set, which the payouts then read.
 void fn_800D3244(void) {
-    lbl_8028224C = lbl_80282254;
-    lbl_80282248 = lbl_80282250;
-    memcpy(lbl_802001C8, lbl_80200420, sizeof(lbl_802001C8));
-    memcpy(lbl_802001A0, lbl_802003F8, sizeof(lbl_802001A0));
-    memcpy(lbl_80200178, lbl_802003D0, sizeof(lbl_80200178));
-    memcpy(lbl_80200150, lbl_802003A8, sizeof(lbl_80200150));
-    memcpy(lbl_80200128, lbl_80200380, sizeof(lbl_80200128));
-    memcpy(lbl_80200100, lbl_80200358, sizeof(lbl_80200100));
-    memcpy(lbl_802000D8, lbl_802002B8, sizeof(lbl_802000D8));
-    memcpy(lbl_802000B0, lbl_80200290, sizeof(lbl_802000B0));
-    memcpy(lbl_80200088, lbl_80200268, sizeof(lbl_80200088));
-    memcpy(lbl_80200060, lbl_80200240, sizeof(lbl_80200060));
-    memcpy(lbl_80200038, lbl_80200218, sizeof(lbl_80200038));
-    memcpy(lbl_80200010, lbl_802001F0, sizeof(lbl_80200010));
-    memcpy(lbl_801FFD90, lbl_801FFAE8, sizeof(lbl_801FFD90));
+    gPayNumPrizes = gNumPrizes;
+    gPayNumAwards = gNumAwards;
+    memcpy(gPayShotPrizeMsgs, gShotPrizeMsgs, sizeof(gPayShotPrizeMsgs));
+    memcpy(gPayPuttPrizeMsgs, gPuttPrizeMsgs, sizeof(gPayPuttPrizeMsgs));
+    memcpy(gPayHolePrizeMsgs, gHolePrizeMsgs, sizeof(gPayHolePrizeMsgs));
+    memcpy(gPayShotPrizes, gShotPrizes, sizeof(gPayShotPrizes));
+    memcpy(gPayPuttPrizes, gPuttPrizes, sizeof(gPayPuttPrizes));
+    memcpy(gPayHolePrizes, gHolePrizes, sizeof(gPayHolePrizes));
+    memcpy(gPayShotAwards, gShotAwards, sizeof(gPayShotAwards));
+    memcpy(gPayPuttAwards, gPuttAwards, sizeof(gPayPuttAwards));
+    memcpy(gPayHoleAwards, gHoleAwards, sizeof(gPayHoleAwards));
+    memcpy(gPayShotAwardMoney, gShotAwardMoney, sizeof(gPayShotAwardMoney));
+    memcpy(gPayPuttAwardMoney, gPuttAwardMoney, sizeof(gPayPuttAwardMoney));
+    memcpy(gPayHoleAwardMoney, gHoleAwardMoney, sizeof(gPayHoleAwardMoney));
+    memcpy(gPayPrizeBreakdowns, gPrizeBreakdowns, sizeof(gPayPrizeBreakdowns));
 }
 
 // fake match: stands in for a function EA's linker stripped; it puts 1.0f first in .sdata2
@@ -154,7 +154,7 @@ void fn_800D344C(UStreamObject* pObject) {
     // port: the 'ERN ' object is copied straight into the prize table (EarningsTable); it is
     //       big-endian on disc, so a little-endian port converts it field by field here
     //       (docs/format-byteorder.md)
-    Stream_StreamLoadFixedSize(pObject, sizeof(lbl_80200538), &lbl_80200538);
+    Stream_StreamLoadFixedSize(pObject, sizeof(gEarningsTable), &gEarningsTable);
 }
 
 // fake match: stands in for a function EA's linker stripped; it puts 0.5f before 0.1f in .sdata2
@@ -162,8 +162,8 @@ static f32 Earnings_StrippedFn2(f32 x) {
     return x + 0.5f;
 }
 
-// Row 0 gets n as it is; any other row gets nTotal * lbl_80191AA4[nRow] scaled by
-// (1 - n / nTotal) / (1 - lbl_80191AA4[0]), rounded to $10.
+// Row 0 gets n as it is; any other row gets nTotal * gTournamentPayoutShares[nRow] scaled by
+// (1 - n / nTotal) / (1 - gTournamentPayoutShares[0]), rounded to $10.
 // TW06: GM_Earnings_TournamentPayout (by position).
 s32 GM_Earnings_TournamentPayout(int nTotal, int n, int nRow) {
     f32 f;
@@ -173,8 +173,8 @@ s32 GM_Earnings_TournamentPayout(int nTotal, int n, int nRow) {
     if (nRow == 0) {
         nRet = n;
     } else {
-        f = 0.1f * (((1.0f - (f32)n / (f32)nTotal) / (1.0f - lbl_80191AA4[0])) *
-                    ((f32)nTotal * lbl_80191AA4[nRow]));
+        f = 0.1f * (((1.0f - (f32)n / (f32)nTotal) / (1.0f - gTournamentPayoutShares[0])) *
+                    ((f32)nTotal * gTournamentPayoutShares[nRow]));
         if (f > 0.0f) {
             nRounded = (s32)(0.5f + f);
         } else {
@@ -228,9 +228,10 @@ int GM_Earnings_GetStrokeWinnings(int nWinner, int nLoser, int nMargin, int* pPr
         nMargin = 5;
     }
     if (pPrize != NULL) {
-        *pPrize = lbl_80200538.aStrokePrize[nRating].nBase;
+        *pPrize = gEarningsTable.aStrokePrize[nRating].nBase;
     }
-    return lbl_80200538.aStrokePrize[nRating].nBase + lbl_80200538.aStrokePrize[nRating].nPerStroke * nMargin;
+    return gEarningsTable.aStrokePrize[nRating].nBase + gEarningsTable.aStrokePrize[nRating].nPerStroke
+            * nMargin;
 }
 
 // The same for a team (0: players 0 and 1, 1: players 2 and
@@ -259,15 +260,15 @@ int GM_Earnings_GetStrokeWinningsTeam(int nWinner, int nLoser, int nMargin, int*
     if (nMargin > 5) {
         nMargin = 5;
     }
-    nBase1 = lbl_80200538.aStrokePrize[nRating1].nBase;
-    nBase2 = lbl_80200538.aStrokePrize[nRating2].nBase;
+    nBase1 = gEarningsTable.aStrokePrize[nRating1].nBase;
+    nBase2 = gEarningsTable.aStrokePrize[nRating2].nBase;
     if (pPrize != NULL) {
         *pPrize = (nBase1 + nBase2) / 2;
     }
-    nTotal = lbl_80200538.aStrokePrize[nRating1].nBase +
-             lbl_80200538.aStrokePrize[nRating1].nPerStroke * nMargin;
-    nTotal += lbl_80200538.aStrokePrize[nRating2].nBase +
-              lbl_80200538.aStrokePrize[nRating2].nPerStroke * nMargin;
+    nTotal = gEarningsTable.aStrokePrize[nRating1].nBase +
+             gEarningsTable.aStrokePrize[nRating1].nPerStroke * nMargin;
+    nTotal += gEarningsTable.aStrokePrize[nRating2].nBase +
+              gEarningsTable.aStrokePrize[nRating2].nPerStroke * nMargin;
     return nTotal / 2;
 }
 
@@ -283,12 +284,13 @@ int fn_800D38F0(int nWinner, int nLoser, int nMargin, s32* pPrize) {
         nMargin = 5;
     }
     if (pPrize != NULL) {
-        *pPrize = lbl_80200538.aLadderPrize[nEvent].nBase;
+        *pPrize = gEarningsTable.aLadderPrize[nEvent].nBase;
     }
-    nMoney = lbl_80200538.aLadderPrize[nEvent].nBase + lbl_80200538.aLadderPrize[nEvent].nPerHole * nMargin;
-    if (lbl_80200538.aLadderPrize[nEvent].nBio != -1) {
-        EASBio_SetAccomplishment(lbl_80200538.aBio[lbl_80200538.aLadderPrize[nEvent].nBio].szName,
-                                 lbl_80200538.aBio[lbl_80200538.aLadderPrize[nEvent].nBio].nValue);
+    nMoney = gEarningsTable.aLadderPrize[nEvent].nBase + gEarningsTable.aLadderPrize[nEvent].nPerHole
+            * nMargin;
+    if (gEarningsTable.aLadderPrize[nEvent].nBio != -1) {
+        EASBio_SetAccomplishment(gEarningsTable.aBio[gEarningsTable.aLadderPrize[nEvent].nBio].szName,
+                                 gEarningsTable.aBio[gEarningsTable.aLadderPrize[nEvent].nBio].nValue);
     }
     return nMoney;
 }
@@ -317,39 +319,39 @@ int fn_800D3A20(int nProfile, u8 bMessage) {
 
     n = 0;
     for (i = 0; i < 21; i++) {
-        if (gpSaveData[nProfile].n64 >= lbl_80200538.aCoursePrice[i].nPrice && !fn_800583FC(nProfile, i)) {
+        if (gpSaveData[nProfile].n64 >= gEarningsTable.aCoursePrice[i].nPrice && !fn_800583FC(nProfile, i)) {
             fn_800583B0(nProfile, i);
             if (i != 4) {
                 // EA bug: the list holds 10, and up to 20 courses could be bought at once
-                lbl_801FFD68[n] = i;
+                gUnlockedCourses[n] = i;
                 n++;
-                if (lbl_80200538.aCoursePrice[i].nBio != -1) {
-                    EASBio_SetAccomplishment(lbl_80200538.aBio[lbl_80200538.aCoursePrice[i].nBio].szName,
-                                             lbl_80200538.aBio[lbl_80200538.aCoursePrice[i].nBio].nValue);
+                if (gEarningsTable.aCoursePrice[i].nBio != -1) {
+                    EASBio_SetAccomplishment(gEarningsTable.aBio[gEarningsTable.aCoursePrice[i].nBio].szName,
+                                             gEarningsTable.aBio[gEarningsTable.aCoursePrice[i].nBio].nValue);
                 }
             }
         }
     }
-    if (gpSaveData[nProfile].n64 >= lbl_80200538.aCoursePrice[21].nPrice && !fn_800584B4(nProfile)) {
+    if (gpSaveData[nProfile].n64 >= gEarningsTable.aCoursePrice[21].nPrice && !fn_800584B4(nProfile)) {
         fn_80058494(nProfile);
         GUI_QueueMessage(3, 7, 2, nProfile);
-        if (lbl_80200538.aCoursePrice[21].nBio != -1) {
-            EASBio_SetAccomplishment(lbl_80200538.aBio[lbl_80200538.aCoursePrice[21].nBio].szName,
-                                     lbl_80200538.aBio[lbl_80200538.aCoursePrice[21].nBio].nValue);
+        if (gEarningsTable.aCoursePrice[21].nBio != -1) {
+            EASBio_SetAccomplishment(gEarningsTable.aBio[gEarningsTable.aCoursePrice[21].nBio].szName,
+                                     gEarningsTable.aBio[gEarningsTable.aCoursePrice[21].nBio].nValue);
         }
     }
-    if (gpSaveData[nProfile].n64 >= lbl_80200538.aCoursePrice[23].nPrice && !fn_8005846C(nProfile)) {
+    if (gpSaveData[nProfile].n64 >= gEarningsTable.aCoursePrice[23].nPrice && !fn_8005846C(nProfile)) {
         fn_8005844C(nProfile);
         GUI_QueueMessage(3, 7, 3, nProfile);
-        if (lbl_80200538.aCoursePrice[23].nBio != -1) {
-            EASBio_SetAccomplishment(lbl_80200538.aBio[lbl_80200538.aCoursePrice[23].nBio].szName,
-                                     lbl_80200538.aBio[lbl_80200538.aCoursePrice[23].nBio].nValue);
+        if (gEarningsTable.aCoursePrice[23].nBio != -1) {
+            EASBio_SetAccomplishment(gEarningsTable.aBio[gEarningsTable.aCoursePrice[23].nBio].szName,
+                                     gEarningsTable.aBio[gEarningsTable.aCoursePrice[23].nBio].nValue);
         }
     }
     if (bMessage) {
         for (i = 0; i < n; i++) {
             // fake match: the cast gives the original's copy of nProfile for this loop
-            GUI_QueueMessage(3, lbl_801FFD68[i], 0, (u32)nProfile);
+            GUI_QueueMessage(3, gUnlockedCourses[i], 0, (u32)nProfile);
         }
     }
     return n;
@@ -407,16 +409,16 @@ int fn_800D3D10(int nGolfer) {
 
 // What a skin on hole nHole (0..17) is worth. TW06: GM_Earnings_GetSkinsHoleValue (by position).
 s32 GM_Earnings_GetSkinsHoleValue(int nRating, int nHole) {
-    if (nHole < 6) return lbl_80200538.aSkins[nRating].aValue[0];
-    if (nHole < 12) return lbl_80200538.aSkins[nRating].aValue[1];
-    if (nHole < 17) return lbl_80200538.aSkins[nRating].aValue[2];
-    return lbl_80200538.aSkins[nRating].aValue[3];
+    if (nHole < 6) return gEarningsTable.aSkins[nRating].aValue[0];
+    if (nHole < 12) return gEarningsTable.aSkins[nRating].aValue[1];
+    if (nHole < 17) return gEarningsTable.aSkins[nRating].aValue[2];
+    return gEarningsTable.aSkins[nRating].aValue[3];
 }
 
 // After a shot that stayed in bounds (GM_PlayerTookShot), for a human player with a profile (not in
 // game mode 10): the shot is checked (HighScoreRecords_GetEndOfShotRecord, fn_800D477C) and what it
 // earned is paid out from the copies fn_800D3244 makes of the working tables, each with its
-// message: the lbl_80200498 entries of kind 2 or 4, the shot's bonuses with their breakdowns, and
+// message: the gShotRecordResults entries of kind 2 or 4, the shot's bonuses with their breakdowns, and
 // the awards won with their money (booked as bonuses, money.n8).
 void fn_800D3DDC(int nPlayer) {
     int nProfile;
@@ -430,29 +432,30 @@ void fn_800D3DDC(int nPlayer) {
     if (gpSaveData[nProfile].bActive == 0) return;
     if (Player_IsCPU(nPlayer)) return;
     HighScoreRecords_GetEndOfShotRecord(nPlayer, &gPlayers[nPlayer].ball, 1, 0, 0);
-    for (i = 0; i < lbl_80282258; i++) {
-        nKind = lbl_80200498[i];
+    for (i = 0; i < gNumRecordHits; i++) {
+        nKind = gShotRecordResults[i];
         if (nKind == 2 || nKind == 4) {
-            GUI_QueueMessage(1, lbl_80200510[i], nKind, nProfile);
+            GUI_QueueMessage(1, gShotRecordKinds[i], nKind, nProfile);
         }
     }
     fn_800D477C(nPlayer, &gPlayers[nPlayer].ball, 0);
     fn_800D3244();
-    for (i = 0; i < lbl_8028224C; i++) {
-        if (lbl_80200150[i] != 0) {
-            GUI_QueueMessage(0, lbl_802001C8[i], lbl_80200150[i], nProfile);
-            GM_Earnings_AwardMoney(nPlayer, lbl_80200150[i], &lbl_801FFD90[i]);
+    for (i = 0; i < gPayNumPrizes; i++) {
+        if (gPayShotPrizes[i] != 0) {
+            GUI_QueueMessage(0, gPayShotPrizeMsgs[i], gPayShotPrizes[i], nProfile);
+            GM_Earnings_AwardMoney(nPlayer, gPayShotPrizes[i], &gPayPrizeBreakdowns[i]);
         }
     }
-    for (i = 0; i < lbl_80282248; i++) {
-        if (GM_Earnings_AwardTrophyBall(nPlayer, lbl_802000D8[i])) {
-            if (fn_800D4010(lbl_802000D8[i])) {
-                GUI_QueueMessage(6, Earnings_GetAwardMessageId(lbl_802000D8[i]), 0, nProfile);
+    for (i = 0; i < gPayNumAwards; i++) {
+        if (GM_Earnings_AwardTrophyBall(nPlayer, gPayShotAwards[i])) {
+            if (fn_800D4010(gPayShotAwards[i])) {
+                GUI_QueueMessage(6, Earnings_GetAwardMessageId(gPayShotAwards[i]), 0, nProfile);
             } else {
-                GUI_QueueMessage(2, Earnings_GetAwardMessageId(lbl_802000D8[i]), lbl_80200060[i], nProfile);
+                GUI_QueueMessage(2, Earnings_GetAwardMessageId(gPayShotAwards[i]), gPayShotAwardMoney[i],
+                                 nProfile);
             }
-            GM_Earnings_AwardMoney(nPlayer, lbl_80200060[i], NULL);
-            gPlayers[nPlayer].money.n8 += lbl_80200060[i];
+            GM_Earnings_AwardMoney(nPlayer, gPayShotAwardMoney[i], NULL);
+            gPlayers[nPlayer].money.n8 += gPayShotAwardMoney[i];
         }
     }
 }
@@ -483,53 +486,55 @@ void fn_800D4030(int nPlayer) {
     if (gpSaveData[nProfile].bActive == 0) return;
     if (Player_IsCPU(nPlayer)) return;
     HighScoreRecords_GetEndOfHoleRecord(nPlayer, &gPlayers[nPlayer].ball, 1, 0, 0);
-    for (i = 0; i < lbl_80282258; i++) {
-        nKind = lbl_80200470[i];
+    for (i = 0; i < gNumRecordHits; i++) {
+        nKind = gPuttRecordResults[i];
         if (nKind == 2 || nKind == 4) {
-            GUI_QueueMessage(1, lbl_802004E8[i], nKind, nProfile);
+            GUI_QueueMessage(1, gPuttRecordKinds[i], nKind, nProfile);
         }
     }
     fn_800D4F14(nPlayer, 0);
     fn_800D3244();
-    for (i = 0; i < lbl_8028224C; i++) {
-        if (lbl_80200128[i] != 0) {
-            GUI_QueueMessage(0, lbl_802001A0[i], lbl_80200128[i], nProfile);
-            GM_Earnings_AwardMoney(nPlayer, lbl_80200128[i], &lbl_801FFD90[i]);
+    for (i = 0; i < gPayNumPrizes; i++) {
+        if (gPayPuttPrizes[i] != 0) {
+            GUI_QueueMessage(0, gPayPuttPrizeMsgs[i], gPayPuttPrizes[i], nProfile);
+            GM_Earnings_AwardMoney(nPlayer, gPayPuttPrizes[i], &gPayPrizeBreakdowns[i]);
         }
     }
-    for (i = 0; i < lbl_80282248; i++) {
-        if (GM_Earnings_AwardTrophyBall(nPlayer, lbl_802000B0[i])) {
-            if (fn_800D4010(lbl_802000B0[i])) {
-                GUI_QueueMessage(6, Earnings_GetAwardMessageId(lbl_802000B0[i]), 0, nProfile);
+    for (i = 0; i < gPayNumAwards; i++) {
+        if (GM_Earnings_AwardTrophyBall(nPlayer, gPayPuttAwards[i])) {
+            if (fn_800D4010(gPayPuttAwards[i])) {
+                GUI_QueueMessage(6, Earnings_GetAwardMessageId(gPayPuttAwards[i]), 0, nProfile);
             } else {
-                GUI_QueueMessage(2, Earnings_GetAwardMessageId(lbl_802000B0[i]), lbl_80200038[i], nProfile);
+                GUI_QueueMessage(2, Earnings_GetAwardMessageId(gPayPuttAwards[i]), gPayPuttAwardMoney[i],
+                                 nProfile);
             }
-            GM_Earnings_AwardMoney(nPlayer, lbl_80200038[i], NULL);
-            gPlayers[nPlayer].money.n8 += lbl_80200038[i];
+            GM_Earnings_AwardMoney(nPlayer, gPayPuttAwardMoney[i], NULL);
+            gPlayers[nPlayer].money.n8 += gPayPuttAwardMoney[i];
         }
     }
     if (!gpGame->bD4) {
         fn_800D588C(nPlayer, 0, 0);
     } else {
-        lbl_80282254 = 0;
-        lbl_80282250 = 0;
+        gNumPrizes = 0;
+        gNumAwards = 0;
     }
     fn_800D3244();
-    for (i = 0; i < lbl_8028224C; i++) {
-        if (lbl_80200100[i] != 0) {
-            GUI_QueueMessage(0, lbl_80200178[i], lbl_80200100[i], nProfile);
-            GM_Earnings_AwardMoney(nPlayer, lbl_80200100[i], &lbl_801FFD90[i]);
+    for (i = 0; i < gPayNumPrizes; i++) {
+        if (gPayHolePrizes[i] != 0) {
+            GUI_QueueMessage(0, gPayHolePrizeMsgs[i], gPayHolePrizes[i], nProfile);
+            GM_Earnings_AwardMoney(nPlayer, gPayHolePrizes[i], &gPayPrizeBreakdowns[i]);
         }
     }
-    for (i = 0; i < lbl_80282248; i++) {
-        if (GM_Earnings_AwardTrophyBall(nPlayer, lbl_80200268[i])) {
-            if (fn_800D4010(lbl_80200088[i])) {
-                GUI_QueueMessage(6, Earnings_GetAwardMessageId(lbl_80200088[i]), 0, nProfile);
+    for (i = 0; i < gPayNumAwards; i++) {
+        if (GM_Earnings_AwardTrophyBall(nPlayer, gHoleAwards[i])) {
+            if (fn_800D4010(gPayHoleAwards[i])) {
+                GUI_QueueMessage(6, Earnings_GetAwardMessageId(gPayHoleAwards[i]), 0, nProfile);
             } else {
-                GUI_QueueMessage(2, Earnings_GetAwardMessageId(lbl_80200088[i]), lbl_80200010[i], nProfile);
+                GUI_QueueMessage(2, Earnings_GetAwardMessageId(gPayHoleAwards[i]), gPayHoleAwardMoney[i],
+                                 nProfile);
             }
-            GM_Earnings_AwardMoney(nPlayer, lbl_80200010[i], NULL);
-            gPlayers[nPlayer].money.n8 += lbl_80200010[i];
+            GM_Earnings_AwardMoney(nPlayer, gPayHoleAwardMoney[i], NULL);
+            gPlayers[nPlayer].money.n8 += gPayHoleAwardMoney[i];
         }
     }
 }
@@ -555,30 +560,31 @@ void fn_800D439C(int nPlayer, u8 bRoundOver) {
     if (Player_IsCPU(nPlayer)) return;
     if (!bRoundOver) {
         HighScoreRecords_GetEndOfGameRecord(nPlayer, 1, 0, 0);
-        for (i = 0; i < lbl_80282258; i++) {
-            nKind = lbl_80200448[i];
+        for (i = 0; i < gNumRecordHits; i++) {
+            nKind = gRoundRecordResults[i];
             if (nKind == 2 || nKind == 4) {
-                GUI_QueueMessage(1, lbl_802004C0[i], nKind, nProfile);
+                GUI_QueueMessage(1, gRoundRecordKinds[i], nKind, nProfile);
             }
         }
     }
     fn_800D588C(nPlayer, 0, bRoundOver);
     fn_800D3244();
-    for (i = 0; i < lbl_8028224C; i++) {
-        if (lbl_80200358[i] != 0) {
-            GUI_QueueMessage(0, lbl_802003D0[i], lbl_80200358[i], nProfile);
-            GM_Earnings_AwardMoney(nPlayer, lbl_80200358[i], &lbl_801FFD90[i]);
+    for (i = 0; i < gPayNumPrizes; i++) {
+        if (gHolePrizes[i] != 0) {
+            GUI_QueueMessage(0, gHolePrizeMsgs[i], gHolePrizes[i], nProfile);
+            GM_Earnings_AwardMoney(nPlayer, gHolePrizes[i], &gPayPrizeBreakdowns[i]);
         }
     }
-    for (i = 0; i < lbl_80282248; i++) {
-        if (GM_Earnings_AwardTrophyBall(nPlayer, lbl_80200268[i])) {
-            if (fn_800D4010(lbl_80200088[i])) {
-                GUI_QueueMessage(6, Earnings_GetAwardMessageId(lbl_80200088[i]), 0, nProfile);
+    for (i = 0; i < gPayNumAwards; i++) {
+        if (GM_Earnings_AwardTrophyBall(nPlayer, gHoleAwards[i])) {
+            if (fn_800D4010(gPayHoleAwards[i])) {
+                GUI_QueueMessage(6, Earnings_GetAwardMessageId(gPayHoleAwards[i]), 0, nProfile);
             } else {
-                GUI_QueueMessage(2, Earnings_GetAwardMessageId(lbl_80200088[i]), lbl_80200010[i], nProfile);
+                GUI_QueueMessage(2, Earnings_GetAwardMessageId(gPayHoleAwards[i]), gPayHoleAwardMoney[i],
+                                 nProfile);
             }
-            GM_Earnings_AwardMoney(nPlayer, lbl_802001F0[i], NULL);
-            gPlayers[nPlayer].money.n8 += lbl_802001F0[i];
+            GM_Earnings_AwardMoney(nPlayer, gHoleAwardMoney[i], NULL);
+            gPlayers[nPlayer].money.n8 += gHoleAwardMoney[i];
         }
     }
     fProgress = GM_GetGameProgress(&gpSaveData[nProfile]);
@@ -624,7 +630,7 @@ s32 fn_800D46E8(int n) {
 }
 
 // After a shot: check the shot goals and fill the working tables with what they give, awards
-// (lbl_80282250 of them) and money prizes (lbl_80282254), as fn_800D4F14 does for putts. With
+// (gNumAwards of them) and money prizes (gNumPrizes), as fn_800D4F14 does for putts. With
 // pBall the check runs on that ball in place of the player's own. With bPreview the shot is not
 // counted yet (one stroke fewer), and no EA Sports Bio accomplishment is posted; without a ball
 // too, the tests on the ball are skipped.
@@ -642,8 +648,8 @@ void fn_800D477C(int nPlayer, Ball* pBall, u8 bPreview) {
     u8 bNoBall;
     int nHoles;
 
-    lbl_80282254 = 0;
-    lbl_80282250 = 0;
+    gNumPrizes = 0;
+    gNumAwards = 0;
     if (gSession.uFlags & 0x4000) return;
     if (Player_IsCPU(nPlayer)) return;
     if (!GM_Earnings_AwardShotBonusToUser(nPlayer)) return;
@@ -666,60 +672,60 @@ void fn_800D477C(int nPlayer, Ball* pBall, u8 bPreview) {
     }
 
     for (i = 0; i < NUM_SHOT_GOALS; i++) {
-        if (!lbl_80200538.aShotGoal[i].bEnabled) continue;
-        if (!Earnings_TestBit(lbl_80200538.aShotGoal[i].uModes, Game_GetMode())) continue;
+        if (!gEarningsTable.aShotGoal[i].bEnabled) continue;
+        if (!Earnings_TestBit(gEarningsTable.aShotGoal[i].uModes, Game_GetMode())) continue;
         if (GM5_IsChallengeRunning() && !fn_801025F4()
-            && !Earnings_TestBit(lbl_80200538.aShotGoal[i].uModes, 5)) continue;
-        if (!Earnings_TestBit(lbl_80200538.aShotGoal[i].uPars, 0) && Course_GetCurHolePar() == 3) continue;
-        if (!Earnings_TestBit(lbl_80200538.aShotGoal[i].uPars, 1) && Course_GetCurHolePar() == 4) continue;
-        if (!Earnings_TestBit(lbl_80200538.aShotGoal[i].uPars, 2) && Course_GetCurHolePar() == 5) continue;
-        if (!Earnings_TestBit(lbl_80200538.aShotGoal[i].uLies, fn_800D4694(fn_800D0BAC(nPlayer)))) continue;
-        if (lbl_80200538.aShotGoal[i].f0C > fn_800D04AC(nPlayer)) continue;
-        if (!bNoBall && !Earnings_TestBit(lbl_80200538.aShotGoal[i].uBallLies,
+            && !Earnings_TestBit(gEarningsTable.aShotGoal[i].uModes, 5)) continue;
+        if (!Earnings_TestBit(gEarningsTable.aShotGoal[i].uPars, 0) && Course_GetCurHolePar() == 3) continue;
+        if (!Earnings_TestBit(gEarningsTable.aShotGoal[i].uPars, 1) && Course_GetCurHolePar() == 4) continue;
+        if (!Earnings_TestBit(gEarningsTable.aShotGoal[i].uPars, 2) && Course_GetCurHolePar() == 5) continue;
+        if (!Earnings_TestBit(gEarningsTable.aShotGoal[i].uLies, fn_800D4694(fn_800D0BAC(nPlayer)))) continue;
+        if (gEarningsTable.aShotGoal[i].f0C > fn_800D04AC(nPlayer)) continue;
+        if (!bNoBall && !Earnings_TestBit(gEarningsTable.aShotGoal[i].uBallLies,
                                      fn_800D46E8(gPlayers[nPlayer].ball.nLie))) continue;
-        if (!bNoBall && lbl_80200538.aShotGoal[i].f14 > fn_800D0550(nPlayer)) continue;
-        if (!bNoBall && lbl_80200538.aShotGoal[i].f18 &&
-            lbl_80200538.aShotGoal[i].f18 < fn_800D0478(nPlayer)) continue;
-        if (!Earnings_TestBit(lbl_80200538.aShotGoal[i].uShotKinds, gPlayers[nPlayer].nShotKind)) continue;
-        if (!Earnings_TestBit(lbl_80200538.aShotGoal[i].uClubs, gPlayers[nPlayer].nClub)) continue;
-        if (Earnings_TestBit(lbl_80200538.aShotGoal[i].uFlags, 0)
+        if (!bNoBall && gEarningsTable.aShotGoal[i].f14 > fn_800D0550(nPlayer)) continue;
+        if (!bNoBall && gEarningsTable.aShotGoal[i].f18 &&
+            gEarningsTable.aShotGoal[i].f18 < fn_800D0478(nPlayer)) continue;
+        if (!Earnings_TestBit(gEarningsTable.aShotGoal[i].uShotKinds, gPlayers[nPlayer].nShotKind)) continue;
+        if (!Earnings_TestBit(gEarningsTable.aShotGoal[i].uClubs, gPlayers[nPlayer].nClub)) continue;
+        if (Earnings_TestBit(gEarningsTable.aShotGoal[i].uFlags, 0)
             && !fn_800D0BF8(nPlayer, 1, bPreview)) continue;
-        if (Earnings_TestBit(lbl_80200538.aShotGoal[i].uFlags, 1)
+        if (Earnings_TestBit(gEarningsTable.aShotGoal[i].uFlags, 1)
             && !fn_800D0BF8(nPlayer, 0, bPreview)) continue;
-        if (!bNoBall && Earnings_TestBit(lbl_80200538.aShotGoal[i].uFlags, 2)
+        if (!bNoBall && Earnings_TestBit(gEarningsTable.aShotGoal[i].uFlags, 2)
             && !fn_800D0D54(nPlayer)) continue;
-        if (Earnings_TestBit(lbl_80200538.aShotGoal[i].uFlags, 3) && gPlayers[nPlayer].b312) continue;
-        if (!bNoBall && Earnings_TestBit(lbl_80200538.aShotGoal[i].uFlags, 4)
+        if (Earnings_TestBit(gEarningsTable.aShotGoal[i].uFlags, 3) && gPlayers[nPlayer].b312) continue;
+        if (!bNoBall && Earnings_TestBit(gEarningsTable.aShotGoal[i].uFlags, 4)
             && !gPlayers[nPlayer].b30C) continue;
-        if (!bNoBall && Earnings_TestBit(lbl_80200538.aShotGoal[i].uFlags, 5)
+        if (!bNoBall && Earnings_TestBit(gEarningsTable.aShotGoal[i].uFlags, 5)
             && !gPlayers[nPlayer].b30D) continue;
         // Flag 6: the hole's first stroke.
-        if (Earnings_TestBit(lbl_80200538.aShotGoal[i].uFlags, 6) &&
+        if (Earnings_TestBit(gEarningsTable.aShotGoal[i].uFlags, 6) &&
             nAdj + 1 != gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()]) continue;
-        if (Earnings_TestBit(lbl_80200538.aShotGoal[i].uFlags, 7) && fn_800D1170(nPlayer, 0) < nAdj
+        if (Earnings_TestBit(gEarningsTable.aShotGoal[i].uFlags, 7) && fn_800D1170(nPlayer, 0) < nAdj
             + 18) continue;
-        if (Earnings_TestBit(lbl_80200538.aShotGoal[i].uFlags, 8)) {
+        if (Earnings_TestBit(gEarningsTable.aShotGoal[i].uFlags, 8)) {
             nHoles = fn_800D3208();
             if (nHoles < 10) continue;
             if (nHoles + nAdj > fn_800D0FBC(nPlayer)) continue;
         }
-        if (lbl_80200538.aShotGoal[i].nAward >= 23 && lbl_80200538.aShotGoal[i].nAward <= 38 &&
-            (bPreview || !Earnings_IsTourAwardEarned(nPlayer, lbl_80200538.aShotGoal[i].nAward))) continue;
-        if (lbl_80200538.aShotGoal[i].nAward == 22 &&
+        if (gEarningsTable.aShotGoal[i].nAward >= 23 && gEarningsTable.aShotGoal[i].nAward <= 38 &&
+            (bPreview || !Earnings_IsTourAwardEarned(nPlayer, gEarningsTable.aShotGoal[i].nAward))) continue;
+        if (gEarningsTable.aShotGoal[i].nAward == 22 &&
             GM_GetGameProgress(&gpSaveData[nPlayer]) < 100.0f) continue;
 
-        if (lbl_80200538.aShotGoal[i].nAward != 39) {
+        if (gEarningsTable.aShotGoal[i].nAward != 39) {
             int nSlot;  // fake match: shadows the function-level nSlot (register order; TW07 keeps
                         // one function-level index per table, this one awaits its own name)
 
-            if (!GM_Earnings_AwardThisTrophyBallToUser(nPlayer, lbl_80200538.aShotGoal[i].nAward)) continue;
+            if (!GM_Earnings_AwardThisTrophyBallToUser(nPlayer, gEarningsTable.aShotGoal[i].nAward)) continue;
             bReplace = 0;
             bLost = 0;
-            nSlot = lbl_80282250;
-            if (lbl_80200538.aShotGoal[i].nId != 0) {
-                for (j = 0; j < lbl_80282250; j++) {
-                    if (lbl_80200538.aShotGoal[i].nId == aAwardIds[j]) {
-                        if (lbl_80200538.aShotGoal[i].nValue > lbl_80200240[j]) {
+            nSlot = gNumAwards;
+            if (gEarningsTable.aShotGoal[i].nId != 0) {
+                for (j = 0; j < gNumAwards; j++) {
+                    if (gEarningsTable.aShotGoal[i].nId == aAwardIds[j]) {
+                        if (gEarningsTable.aShotGoal[i].nValue > gShotAwardMoney[j]) {
                             nSlot = j;
                             bReplace = 1;
                         } else {
@@ -729,26 +735,26 @@ void fn_800D477C(int nPlayer, Ball* pBall, u8 bPreview) {
                 }
             }
             if (bLost) continue;
-            lbl_802002B8[nSlot] = lbl_80200538.aShotGoal[i].nAward;
-            lbl_80200240[nSlot] = lbl_80200538.aShotGoal[i].nValue;
-            aAwardIds[nSlot] = lbl_80200538.aShotGoal[i].nId;
+            gShotAwards[nSlot] = gEarningsTable.aShotGoal[i].nAward;
+            gShotAwardMoney[nSlot] = gEarningsTable.aShotGoal[i].nValue;
+            aAwardIds[nSlot] = gEarningsTable.aShotGoal[i].nId;
             if (!bReplace) {
-                lbl_80282250++;
+                gNumAwards++;
             }
-            if (!bPreview && lbl_80200538.aShotGoal[i].nBio != -1) {
-                EASBio_SetAccomplishment(lbl_80200538.aBio[lbl_80200538.aShotGoal[i].nBio].szName,
-                                         lbl_80200538.aBio[lbl_80200538.aShotGoal[i].nBio].nValue);
+            if (!bPreview && gEarningsTable.aShotGoal[i].nBio != -1) {
+                EASBio_SetAccomplishment(gEarningsTable.aBio[gEarningsTable.aShotGoal[i].nBio].szName,
+                                         gEarningsTable.aBio[gEarningsTable.aShotGoal[i].nBio].nValue);
             }
         } else {
-            nValue = lbl_80200538.aShotGoal[i].nValue;
+            nValue = gEarningsTable.aShotGoal[i].nValue;
             if (nValue == 0) continue;
             bReplace = 0;
             bLost = 0;
-            nSlot = lbl_80282254;
-            if (lbl_80200538.aShotGoal[i].nId != 0) {
-                for (j = 0; j < lbl_80282254; j++) {
-                    if (lbl_80200538.aShotGoal[i].nId == aPrizeIds[j]) {
-                        if (lbl_80200538.aShotGoal[i].nValue > lbl_80200330[j]) {
+            nSlot = gNumPrizes;
+            if (gEarningsTable.aShotGoal[i].nId != 0) {
+                for (j = 0; j < gNumPrizes; j++) {
+                    if (gEarningsTable.aShotGoal[i].nId == aPrizeIds[j]) {
+                        if (gEarningsTable.aShotGoal[i].nValue > gShotPrizeBases[j]) {
                             nSlot = j;
                             bReplace = 1;
                         } else {
@@ -758,23 +764,24 @@ void fn_800D477C(int nPlayer, Ball* pBall, u8 bPreview) {
                 }
             }
             if (bLost) continue;
-            lbl_80200330[nSlot] = nValue;
-            aPrizeIds[nSlot] = lbl_80200538.aShotGoal[i].nId;
-            lbl_802003A8[nSlot] = GM_Earnings_ComputeBonusModifiers(lbl_80200330[nSlot], nPlayer,
-                                              Earnings_TestBit(lbl_80200538.aShotGoal[i].uMults, 0),
-                                              Earnings_TestBit(lbl_80200538.aShotGoal[i].uMults, 1),
-                                              Earnings_TestBit(lbl_80200538.aShotGoal[i].uMults, 2),
-                                              &lbl_801FFAE8[nSlot]);
-            if (Earnings_TestBit(lbl_80200538.aShotGoal[i].uMults, 3)) {
-                lbl_802003A8[nSlot] = GM_Earnings_ComputeTOURCardModifiers(lbl_802003A8[nSlot], nPlayer, &lbl_801FFAE8[nSlot]);
+            gShotPrizeBases[nSlot] = nValue;
+            aPrizeIds[nSlot] = gEarningsTable.aShotGoal[i].nId;
+            gShotPrizes[nSlot] = GM_Earnings_ComputeBonusModifiers(gShotPrizeBases[nSlot], nPlayer,
+                                              Earnings_TestBit(gEarningsTable.aShotGoal[i].uMults, 0),
+                                              Earnings_TestBit(gEarningsTable.aShotGoal[i].uMults, 1),
+                                              Earnings_TestBit(gEarningsTable.aShotGoal[i].uMults, 2),
+                                              &gPrizeBreakdowns[nSlot]);
+            if (Earnings_TestBit(gEarningsTable.aShotGoal[i].uMults, 3)) {
+                gShotPrizes[nSlot] = GM_Earnings_ComputeTOURCardModifiers(gShotPrizes[nSlot], nPlayer,
+                        &gPrizeBreakdowns[nSlot]);
             }
-            lbl_80200420[nSlot] = lbl_80200538.aShotGoal[i].n2A;
+            gShotPrizeMsgs[nSlot] = gEarningsTable.aShotGoal[i].n2A;
             if (!bReplace) {
-                lbl_80282254++;
+                gNumPrizes++;
             }
-            if (!bPreview && lbl_80200538.aShotGoal[i].nBio != -1) {
-                EASBio_SetAccomplishment(lbl_80200538.aBio[lbl_80200538.aShotGoal[i].nBio].szName,
-                                         lbl_80200538.aBio[lbl_80200538.aShotGoal[i].nBio].nValue);
+            if (!bPreview && gEarningsTable.aShotGoal[i].nBio != -1) {
+                EASBio_SetAccomplishment(gEarningsTable.aBio[gEarningsTable.aShotGoal[i].nBio].szName,
+                                         gEarningsTable.aBio[gEarningsTable.aShotGoal[i].nBio].nValue);
             }
         }
     }
@@ -790,7 +797,7 @@ u8 Earnings_TestBit(u32 uMask, int nBit) {
 }
 
 // After a putt: check the putt goals and fill the working tables with what they give, awards
-// (lbl_80282250 of them) and money prizes (lbl_80282254). Of goals with the same id only the one
+// (gNumAwards of them) and money prizes (gNumPrizes). Of goals with the same id only the one
 // with the biggest nValue is kept. The holes still to come count 999 strokes and putts meanwhile
 // (and 0 afterwards). With bPreview the hole counts one more stroke and putt (the ball dropping
 // now), a few tests are skipped and no EA Sports Bio accomplishment is posted.
@@ -803,8 +810,8 @@ void fn_800D4F14(int nPlayer, u8 bPreview) {
     int j;
     s32 nValue;
 
-    lbl_80282254 = 0;
-    lbl_80282250 = 0;
+    gNumPrizes = 0;
+    gNumAwards = 0;
     if (gSession.uFlags & 0x4000) return;
     if (Player_IsCPU(nPlayer)) return;
     if (!GM_Earnings_AwardShotBonusToUser(nPlayer)) return;
@@ -821,66 +828,66 @@ void fn_800D4F14(int nPlayer, u8 bPreview) {
     }
 
     for (i = 0; i < NUM_PUTT_GOALS; i++) {
-        if (!lbl_80200538.aPuttGoal[i].bEnabled) continue;
-        if (!Earnings_TestBit(lbl_80200538.aPuttGoal[i].uModes, Game_GetMode())) continue;
+        if (!gEarningsTable.aPuttGoal[i].bEnabled) continue;
+        if (!Earnings_TestBit(gEarningsTable.aPuttGoal[i].uModes, Game_GetMode())) continue;
         if (GM5_IsChallengeRunning() && !fn_801025F4()
-            && !Earnings_TestBit(lbl_80200538.aPuttGoal[i].uModes, 5)) continue;
-        if (!Earnings_TestBit(lbl_80200538.aPuttGoal[i].uPars, 0) && Course_GetCurHolePar() == 3) continue;
-        if (!Earnings_TestBit(lbl_80200538.aPuttGoal[i].uPars, 1) && Course_GetCurHolePar() == 4) continue;
-        if (!Earnings_TestBit(lbl_80200538.aPuttGoal[i].uPars, 2) && Course_GetCurHolePar() == 5) continue;
-        if (!Earnings_TestBit(lbl_80200538.aPuttGoal[i].uLies, fn_800D4694(fn_800D0BAC(nPlayer)))) continue;
-        if (lbl_80200538.aPuttGoal[i].f0C > fn_800D04AC(nPlayer)) continue;
-        if (!Earnings_TestBit(lbl_80200538.aPuttGoal[i].uShotKinds, gPlayers[nPlayer].nShotKind)) continue;
-        if (!Earnings_TestBit(lbl_80200538.aPuttGoal[i].uClubs, gPlayers[nPlayer].nClub)) continue;
-        if (Earnings_TestBit(lbl_80200538.aPuttGoal[i].uFlags, 0) && !fn_800D0BF8(nPlayer, 1, 0)) continue;
-        if (Earnings_TestBit(lbl_80200538.aPuttGoal[i].uFlags, 1) && !fn_800D0BF8(nPlayer, 0, 0)) continue;
-        if (!bPreview && Earnings_TestBit(lbl_80200538.aPuttGoal[i].uFlags, 2)
+            && !Earnings_TestBit(gEarningsTable.aPuttGoal[i].uModes, 5)) continue;
+        if (!Earnings_TestBit(gEarningsTable.aPuttGoal[i].uPars, 0) && Course_GetCurHolePar() == 3) continue;
+        if (!Earnings_TestBit(gEarningsTable.aPuttGoal[i].uPars, 1) && Course_GetCurHolePar() == 4) continue;
+        if (!Earnings_TestBit(gEarningsTable.aPuttGoal[i].uPars, 2) && Course_GetCurHolePar() == 5) continue;
+        if (!Earnings_TestBit(gEarningsTable.aPuttGoal[i].uLies, fn_800D4694(fn_800D0BAC(nPlayer)))) continue;
+        if (gEarningsTable.aPuttGoal[i].f0C > fn_800D04AC(nPlayer)) continue;
+        if (!Earnings_TestBit(gEarningsTable.aPuttGoal[i].uShotKinds, gPlayers[nPlayer].nShotKind)) continue;
+        if (!Earnings_TestBit(gEarningsTable.aPuttGoal[i].uClubs, gPlayers[nPlayer].nClub)) continue;
+        if (Earnings_TestBit(gEarningsTable.aPuttGoal[i].uFlags, 0) && !fn_800D0BF8(nPlayer, 1, 0)) continue;
+        if (Earnings_TestBit(gEarningsTable.aPuttGoal[i].uFlags, 1) && !fn_800D0BF8(nPlayer, 0, 0)) continue;
+        if (!bPreview && Earnings_TestBit(gEarningsTable.aPuttGoal[i].uFlags, 2)
             && !fn_800D0D54(nPlayer)) continue;
-        if (Earnings_TestBit(lbl_80200538.aPuttGoal[i].uFlags, 4) &&
+        if (Earnings_TestBit(gEarningsTable.aPuttGoal[i].uFlags, 4) &&
             !gPlayers[nPlayer].b310 && !gPlayers[nPlayer].b311) continue;
-        if (!bPreview && Earnings_TestBit(lbl_80200538.aPuttGoal[i].uFlags, 5) &&
+        if (!bPreview && Earnings_TestBit(gEarningsTable.aPuttGoal[i].uFlags, 5) &&
             !gPlayers[nPlayer].b30D) continue;
-        if (lbl_80200538.aPuttGoal[i].nMaxPutts != 0 &&
-            lbl_80200538.aPuttGoal[i].nMaxPutts < gPlayers[nPlayer].nPutts[Game_CurHoleIndex()]) continue;
+        if (gEarningsTable.aPuttGoal[i].nMaxPutts != 0 &&
+            gEarningsTable.aPuttGoal[i].nMaxPutts < gPlayers[nPlayer].nPutts[Game_CurHoleIndex()]) continue;
         // The score on the hole: 2 triple bogey or better, 3 double bogey, 4 bogey, 5 par or better,
         // 6 birdie, 7 eagle and 8 albatross (not with a hole in one), 9 a hole in one.
-        if (lbl_80200538.aPuttGoal[i].nScore == 2 &&
+        if (gEarningsTable.aPuttGoal[i].nScore == 2 &&
             gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] > Course_GetCurHolePar() + 3) continue;
-        if (lbl_80200538.aPuttGoal[i].nScore == 3 &&
+        if (gEarningsTable.aPuttGoal[i].nScore == 3 &&
             gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] != Course_GetCurHolePar() + 2) continue;
-        if (lbl_80200538.aPuttGoal[i].nScore == 4 &&
+        if (gEarningsTable.aPuttGoal[i].nScore == 4 &&
             gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] != Course_GetCurHolePar() + 1) continue;
-        if (lbl_80200538.aPuttGoal[i].nScore == 5 &&
+        if (gEarningsTable.aPuttGoal[i].nScore == 5 &&
             gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] > Course_GetCurHolePar()) continue;
-        if (lbl_80200538.aPuttGoal[i].nScore == 6 &&
+        if (gEarningsTable.aPuttGoal[i].nScore == 6 &&
             gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] != Course_GetCurHolePar() - 1) continue;
-        if (lbl_80200538.aPuttGoal[i].nScore == 7 &&
+        if (gEarningsTable.aPuttGoal[i].nScore == 7 &&
             (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == 1 ||
              gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] != Course_GetCurHolePar() - 2)) continue;
-        if (lbl_80200538.aPuttGoal[i].nScore == 8 &&
+        if (gEarningsTable.aPuttGoal[i].nScore == 8 &&
             (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == 1 ||
              gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] != Course_GetCurHolePar() - 3)) continue;
-        if (lbl_80200538.aPuttGoal[i].nScore == 9 &&
+        if (gEarningsTable.aPuttGoal[i].nScore == 9 &&
             gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] > 1) continue;
         // Flag 6: a hole in one, and the round's second (fn_800D0DC8 below -3 counts holes in one).
-        if (Earnings_TestBit(lbl_80200538.aPuttGoal[i].uFlags, 6) &&
+        if (Earnings_TestBit(gEarningsTable.aPuttGoal[i].uFlags, 6) &&
             (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] > 1 || fn_800D0DC8(nPlayer, -5) < 2)) continue;
-        if (lbl_80200538.aPuttGoal[i].nAward >= 23 && lbl_80200538.aPuttGoal[i].nAward <= 38 &&
-            (bPreview || !Earnings_IsTourAwardEarned(nPlayer, lbl_80200538.aPuttGoal[i].nAward))) continue;
-        if (lbl_80200538.aPuttGoal[i].nAward == 22 &&
+        if (gEarningsTable.aPuttGoal[i].nAward >= 23 && gEarningsTable.aPuttGoal[i].nAward <= 38 &&
+            (bPreview || !Earnings_IsTourAwardEarned(nPlayer, gEarningsTable.aPuttGoal[i].nAward))) continue;
+        if (gEarningsTable.aPuttGoal[i].nAward == 22 &&
             GM_GetGameProgress(&gpSaveData[nPlayer]) < 100.0f) continue;
 
-        if (lbl_80200538.aPuttGoal[i].nAward != 39) {
+        if (gEarningsTable.aPuttGoal[i].nAward != 39) {
             int nSlot;
 
-            if (!GM_Earnings_AwardThisTrophyBallToUser(nPlayer, lbl_80200538.aPuttGoal[i].nAward)) continue;
+            if (!GM_Earnings_AwardThisTrophyBallToUser(nPlayer, gEarningsTable.aPuttGoal[i].nAward)) continue;
             bReplace = 0;
             bLost = 0;
-            nSlot = lbl_80282250;
-            if (lbl_80200538.aPuttGoal[i].nId != 0) {
-                for (j = 0; j < lbl_80282250; j++) {
-                    if (lbl_80200538.aPuttGoal[i].nId == aAwardIds[j]) {
-                        if (lbl_80200538.aPuttGoal[i].nValue > lbl_80200218[j]) {
+            nSlot = gNumAwards;
+            if (gEarningsTable.aPuttGoal[i].nId != 0) {
+                for (j = 0; j < gNumAwards; j++) {
+                    if (gEarningsTable.aPuttGoal[i].nId == aAwardIds[j]) {
+                        if (gEarningsTable.aPuttGoal[i].nValue > gPuttAwardMoney[j]) {
                             nSlot = j;
                             bReplace = 1;
                         } else {
@@ -890,28 +897,28 @@ void fn_800D4F14(int nPlayer, u8 bPreview) {
                 }
             }
             if (bLost) continue;
-            lbl_80200290[nSlot] = lbl_80200538.aPuttGoal[i].nAward;
-            lbl_80200218[nSlot] = lbl_80200538.aPuttGoal[i].nValue;
-            aAwardIds[nSlot] = lbl_80200538.aPuttGoal[i].nId;
+            gPuttAwards[nSlot] = gEarningsTable.aPuttGoal[i].nAward;
+            gPuttAwardMoney[nSlot] = gEarningsTable.aPuttGoal[i].nValue;
+            aAwardIds[nSlot] = gEarningsTable.aPuttGoal[i].nId;
             if (!bReplace) {
-                lbl_80282250++;
+                gNumAwards++;
             }
-            if (!bPreview && lbl_80200538.aPuttGoal[i].nBio != -1) {
-                EASBio_SetAccomplishment(lbl_80200538.aBio[lbl_80200538.aPuttGoal[i].nBio].szName,
-                                         lbl_80200538.aBio[lbl_80200538.aPuttGoal[i].nBio].nValue);
+            if (!bPreview && gEarningsTable.aPuttGoal[i].nBio != -1) {
+                EASBio_SetAccomplishment(gEarningsTable.aBio[gEarningsTable.aPuttGoal[i].nBio].szName,
+                                         gEarningsTable.aBio[gEarningsTable.aPuttGoal[i].nBio].nValue);
             }
         } else {
             int nSlot;
 
-            nValue = lbl_80200538.aPuttGoal[i].nValue;
+            nValue = gEarningsTable.aPuttGoal[i].nValue;
             if (nValue == 0) continue;
             bReplace = 0;
             bLost = 0;
-            nSlot = lbl_80282254;
-            if (lbl_80200538.aPuttGoal[i].nId != 0) {
-                for (j = 0; j < lbl_80282254; j++) {
-                    if (lbl_80200538.aPuttGoal[i].nId == aPrizeIds[j]) {
-                        if (lbl_80200538.aPuttGoal[i].nValue > lbl_80200308[j]) {
+            nSlot = gNumPrizes;
+            if (gEarningsTable.aPuttGoal[i].nId != 0) {
+                for (j = 0; j < gNumPrizes; j++) {
+                    if (gEarningsTable.aPuttGoal[i].nId == aPrizeIds[j]) {
+                        if (gEarningsTable.aPuttGoal[i].nValue > gPuttPrizeBases[j]) {
                             nSlot = j;
                             bReplace = 1;
                         } else {
@@ -921,23 +928,24 @@ void fn_800D4F14(int nPlayer, u8 bPreview) {
                 }
             }
             if (bLost) continue;
-            lbl_80200308[nSlot] = lbl_80200538.aPuttGoal[i].nValue;
-            aPrizeIds[nSlot] = lbl_80200538.aPuttGoal[i].nId;
-            lbl_80200380[nSlot] = GM_Earnings_ComputeBonusModifiers(lbl_80200308[nSlot], nPlayer,
-                                              Earnings_TestBit(lbl_80200538.aPuttGoal[i].uMults, 0),
-                                              Earnings_TestBit(lbl_80200538.aPuttGoal[i].uMults, 1),
-                                              Earnings_TestBit(lbl_80200538.aPuttGoal[i].uMults, 2),
-                                              &lbl_801FFAE8[nSlot]);
-            if (Earnings_TestBit(lbl_80200538.aPuttGoal[i].uMults, 3)) {
-                lbl_80200380[nSlot] = GM_Earnings_ComputeTOURCardModifiers(lbl_80200380[nSlot], nPlayer, &lbl_801FFAE8[nSlot]);
+            gPuttPrizeBases[nSlot] = gEarningsTable.aPuttGoal[i].nValue;
+            aPrizeIds[nSlot] = gEarningsTable.aPuttGoal[i].nId;
+            gPuttPrizes[nSlot] = GM_Earnings_ComputeBonusModifiers(gPuttPrizeBases[nSlot], nPlayer,
+                                              Earnings_TestBit(gEarningsTable.aPuttGoal[i].uMults, 0),
+                                              Earnings_TestBit(gEarningsTable.aPuttGoal[i].uMults, 1),
+                                              Earnings_TestBit(gEarningsTable.aPuttGoal[i].uMults, 2),
+                                              &gPrizeBreakdowns[nSlot]);
+            if (Earnings_TestBit(gEarningsTable.aPuttGoal[i].uMults, 3)) {
+                gPuttPrizes[nSlot] = GM_Earnings_ComputeTOURCardModifiers(gPuttPrizes[nSlot], nPlayer,
+                        &gPrizeBreakdowns[nSlot]);
             }
-            lbl_802003F8[nSlot] = lbl_80200538.aPuttGoal[i].n1D;
+            gPuttPrizeMsgs[nSlot] = gEarningsTable.aPuttGoal[i].n1D;
             if (!bReplace) {
-                lbl_80282254++;
+                gNumPrizes++;
             }
-            if (!bPreview && lbl_80200538.aPuttGoal[i].nBio != -1) {
-                EASBio_SetAccomplishment(lbl_80200538.aBio[lbl_80200538.aPuttGoal[i].nBio].szName,
-                                         lbl_80200538.aBio[lbl_80200538.aPuttGoal[i].nBio].nValue);
+            if (!bPreview && gEarningsTable.aPuttGoal[i].nBio != -1) {
+                EASBio_SetAccomplishment(gEarningsTable.aBio[gEarningsTable.aPuttGoal[i].nBio].szName,
+                                         gEarningsTable.aBio[gEarningsTable.aPuttGoal[i].nBio].nValue);
             }
         }
     }
@@ -953,8 +961,8 @@ void fn_800D4F14(int nPlayer, u8 bPreview) {
 }
 
 // After a hole (bRoundOver: after the round), as fn_800D4F14 does for the putt goals: check the
-// hole goals against the round so far and fill the working tables (lbl_80200268 awards,
-// lbl_802002E0 money prizes).
+// hole goals against the round so far and fill the working tables (gHoleAwards awards,
+// gHolePrizeBases money prizes).
 void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
     s32 aPrizeIds[10];
     s32 aAwardIds[10];
@@ -967,8 +975,8 @@ void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
     int nNeed;
     u8 bMore;
 
-    lbl_80282254 = 0;
-    lbl_80282250 = 0;
+    gNumPrizes = 0;
+    gNumAwards = 0;
     if (gSession.uFlags & 0x4000) return;
     if (!GM_Earnings_AwardShotBonusToUser(nPlayer)) return;
     if (Game_GetMulliganRule() != 0) return;
@@ -988,35 +996,35 @@ void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
     bMore = nNeed;
 
     for (i = 0; i < NUM_HOLE_GOALS; i++) {
-        if (lbl_80200538.aHoleGoal[i].bEachHole && bRoundOver) continue;
-        if (!lbl_80200538.aHoleGoal[i].bEachHole && !bRoundOver) continue;
-        if (!lbl_80200538.aHoleGoal[i].bEnabled) continue;
-        if (!Earnings_TestBit(lbl_80200538.aHoleGoal[i].uModes, Game_GetMode())) continue;
+        if (gEarningsTable.aHoleGoal[i].bEachHole && bRoundOver) continue;
+        if (!gEarningsTable.aHoleGoal[i].bEachHole && !bRoundOver) continue;
+        if (!gEarningsTable.aHoleGoal[i].bEnabled) continue;
+        if (!Earnings_TestBit(gEarningsTable.aHoleGoal[i].uModes, Game_GetMode())) continue;
         if (GM5_IsChallengeRunning() && !fn_801025F4()
-            && !Earnings_TestBit(lbl_80200538.aHoleGoal[i].uModes, 5)) continue;
-        if (!lbl_80200538.aHoleGoal[i].b19 && bMore) continue;
-        if (lbl_80200538.aHoleGoal[i].aToPar[0] != 0 &&
-            lbl_80200538.aHoleGoal[i].aToPar[0] > fn_800D0DC8(nPlayer, 0)) continue;
-        if (lbl_80200538.aHoleGoal[i].aToPar[1] != 0 &&
-            lbl_80200538.aHoleGoal[i].aToPar[1] > fn_800D0DC8(nPlayer, -1)) continue;
-        if (lbl_80200538.aHoleGoal[i].aToPar[2] != 0 &&
-            lbl_80200538.aHoleGoal[i].aToPar[2] > fn_800D0DC8(nPlayer, -2)) continue;
-        if (lbl_80200538.aHoleGoal[i].aToPar[3] != 0 &&
-            lbl_80200538.aHoleGoal[i].aToPar[3] > fn_800D0DC8(nPlayer, -3)) continue;
-        if (lbl_80200538.aHoleGoal[i].aToPar[4] != 0 &&
-            lbl_80200538.aHoleGoal[i].aToPar[4] > fn_800D0DC8(nPlayer, -5)) continue;
-        if (lbl_80200538.aHoleGoal[i].aRun[0] != 0 &&
-            lbl_80200538.aHoleGoal[i].aRun[0] > fn_800D0F04(nPlayer, 0)) continue;
-        if (lbl_80200538.aHoleGoal[i].aRun[1] != 0 &&
-            lbl_80200538.aHoleGoal[i].aRun[1] > fn_800D0F04(nPlayer, -1)) continue;
-        if (lbl_80200538.aHoleGoal[i].aRun[2] != 0 &&
-            lbl_80200538.aHoleGoal[i].aRun[2] > fn_800D0F04(nPlayer, -2)) continue;
-        if (lbl_80200538.aHoleGoal[i].aRun[3] != 0 &&
-            lbl_80200538.aHoleGoal[i].aRun[3] > fn_800D0F04(nPlayer, -3)) continue;
-        if (lbl_80200538.aHoleGoal[i].aRun[4] != 0 &&
-            lbl_80200538.aHoleGoal[i].aRun[4] > fn_800D0F04(nPlayer, -5)) continue;
-        if (lbl_80200538.aHoleGoal[i].n13 != 0) {
-            nNeed = lbl_80200538.aHoleGoal[i].n13;
+            && !Earnings_TestBit(gEarningsTable.aHoleGoal[i].uModes, 5)) continue;
+        if (!gEarningsTable.aHoleGoal[i].b19 && bMore) continue;
+        if (gEarningsTable.aHoleGoal[i].aToPar[0] != 0 &&
+            gEarningsTable.aHoleGoal[i].aToPar[0] > fn_800D0DC8(nPlayer, 0)) continue;
+        if (gEarningsTable.aHoleGoal[i].aToPar[1] != 0 &&
+            gEarningsTable.aHoleGoal[i].aToPar[1] > fn_800D0DC8(nPlayer, -1)) continue;
+        if (gEarningsTable.aHoleGoal[i].aToPar[2] != 0 &&
+            gEarningsTable.aHoleGoal[i].aToPar[2] > fn_800D0DC8(nPlayer, -2)) continue;
+        if (gEarningsTable.aHoleGoal[i].aToPar[3] != 0 &&
+            gEarningsTable.aHoleGoal[i].aToPar[3] > fn_800D0DC8(nPlayer, -3)) continue;
+        if (gEarningsTable.aHoleGoal[i].aToPar[4] != 0 &&
+            gEarningsTable.aHoleGoal[i].aToPar[4] > fn_800D0DC8(nPlayer, -5)) continue;
+        if (gEarningsTable.aHoleGoal[i].aRun[0] != 0 &&
+            gEarningsTable.aHoleGoal[i].aRun[0] > fn_800D0F04(nPlayer, 0)) continue;
+        if (gEarningsTable.aHoleGoal[i].aRun[1] != 0 &&
+            gEarningsTable.aHoleGoal[i].aRun[1] > fn_800D0F04(nPlayer, -1)) continue;
+        if (gEarningsTable.aHoleGoal[i].aRun[2] != 0 &&
+            gEarningsTable.aHoleGoal[i].aRun[2] > fn_800D0F04(nPlayer, -2)) continue;
+        if (gEarningsTable.aHoleGoal[i].aRun[3] != 0 &&
+            gEarningsTable.aHoleGoal[i].aRun[3] > fn_800D0F04(nPlayer, -3)) continue;
+        if (gEarningsTable.aHoleGoal[i].aRun[4] != 0 &&
+            gEarningsTable.aHoleGoal[i].aRun[4] > fn_800D0F04(nPlayer, -5)) continue;
+        if (gEarningsTable.aHoleGoal[i].n13 != 0) {
+            nNeed = gEarningsTable.aHoleGoal[i].n13;
             nHoles = fn_800D3208();
             if (nHoles < 10) continue;
             if (nNeed > nHoles) {
@@ -1024,41 +1032,41 @@ void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
             }
             if (nNeed > fn_800D0FBC(nPlayer)) continue;
         }
-        if (lbl_80200538.aHoleGoal[i].n14 != 0 &&
-            lbl_80200538.aHoleGoal[i].n14 > fn_800D1170(nPlayer, 0)) continue;
-        if (lbl_80200538.aHoleGoal[i].n15 != 0 &&
-            lbl_80200538.aHoleGoal[i].n15 > fn_800D10B0(nPlayer)) continue;
-        if (lbl_80200538.aHoleGoal[i].n16 != 0 &&
-            lbl_80200538.aHoleGoal[i].n16 > fn_800D1250(nPlayer)) continue;
-        if (lbl_80200538.aHoleGoal[i].n17 != 0 &&
-            lbl_80200538.aHoleGoal[i].n17 > fn_800D1330(nPlayer)) continue;
-        if (lbl_80200538.aHoleGoal[i].nMaxStrokes != 0 &&
-            lbl_80200538.aHoleGoal[i].nMaxStrokes < GM_GetPlayerRoundStrokes(nPlayer)) continue;
-        if (lbl_80200538.aHoleGoal[i].nKind != 0) {
-            if (lbl_80200538.aHoleGoal[i].nKind == 1 && !fn_800D61E4(nPlayer, bPreview)) continue;
-            if (lbl_80200538.aHoleGoal[i].nKind == 2 && !fn_800D68CC(nPlayer, bPreview)) continue;
-            if (lbl_80200538.aHoleGoal[i].nKind == 3) continue;
-            if (lbl_80200538.aHoleGoal[i].nKind == 4 && !fn_800D69B8(nPlayer, bPreview)) continue;
-            if (lbl_80200538.aHoleGoal[i].nKind == 5 && fn_800D0E74(nPlayer) != 0) continue;
-            if (lbl_80200538.aHoleGoal[i].nKind == 6 && fn_800D2FB4(0)
+        if (gEarningsTable.aHoleGoal[i].n14 != 0 &&
+            gEarningsTable.aHoleGoal[i].n14 > fn_800D1170(nPlayer, 0)) continue;
+        if (gEarningsTable.aHoleGoal[i].n15 != 0 &&
+            gEarningsTable.aHoleGoal[i].n15 > fn_800D10B0(nPlayer)) continue;
+        if (gEarningsTable.aHoleGoal[i].n16 != 0 &&
+            gEarningsTable.aHoleGoal[i].n16 > fn_800D1250(nPlayer)) continue;
+        if (gEarningsTable.aHoleGoal[i].n17 != 0 &&
+            gEarningsTable.aHoleGoal[i].n17 > fn_800D1330(nPlayer)) continue;
+        if (gEarningsTable.aHoleGoal[i].nMaxStrokes != 0 &&
+            gEarningsTable.aHoleGoal[i].nMaxStrokes < GM_GetPlayerRoundStrokes(nPlayer)) continue;
+        if (gEarningsTable.aHoleGoal[i].nKind != 0) {
+            if (gEarningsTable.aHoleGoal[i].nKind == 1 && !fn_800D61E4(nPlayer, bPreview)) continue;
+            if (gEarningsTable.aHoleGoal[i].nKind == 2 && !fn_800D68CC(nPlayer, bPreview)) continue;
+            if (gEarningsTable.aHoleGoal[i].nKind == 3) continue;
+            if (gEarningsTable.aHoleGoal[i].nKind == 4 && !fn_800D69B8(nPlayer, bPreview)) continue;
+            if (gEarningsTable.aHoleGoal[i].nKind == 5 && fn_800D0E74(nPlayer) != 0) continue;
+            if (gEarningsTable.aHoleGoal[i].nKind == 6 && fn_800D2FB4(0)
                 <= GM_GetPlayerRoundStrokes(nPlayer)) continue;
         }
-        if (lbl_80200538.aHoleGoal[i].nAward >= 23 && lbl_80200538.aHoleGoal[i].nAward <= 38 &&
-            (bPreview || !Earnings_IsTourAwardEarned(nPlayer, lbl_80200538.aHoleGoal[i].nAward))) continue;
-        if (lbl_80200538.aHoleGoal[i].nAward == 22 &&
+        if (gEarningsTable.aHoleGoal[i].nAward >= 23 && gEarningsTable.aHoleGoal[i].nAward <= 38 &&
+            (bPreview || !Earnings_IsTourAwardEarned(nPlayer, gEarningsTable.aHoleGoal[i].nAward))) continue;
+        if (gEarningsTable.aHoleGoal[i].nAward == 22 &&
             GM_GetGameProgress(&gpSaveData[nPlayer]) < 100.0f) continue;
 
-        if (lbl_80200538.aHoleGoal[i].nAward != 39) {
+        if (gEarningsTable.aHoleGoal[i].nAward != 39) {
             int nSlot;
 
-            if (!GM_Earnings_AwardThisTrophyBallToUser(nPlayer, lbl_80200538.aHoleGoal[i].nAward)) continue;
+            if (!GM_Earnings_AwardThisTrophyBallToUser(nPlayer, gEarningsTable.aHoleGoal[i].nAward)) continue;
             bReplace = 0;
             bLost = 0;
-            nSlot = lbl_80282250;
-            if (lbl_80200538.aHoleGoal[i].nId != 0) {
-                for (j = 0; j < lbl_80282250; j++) {
-                    if (lbl_80200538.aHoleGoal[i].nId == aAwardIds[j]) {
-                        if (lbl_80200538.aHoleGoal[i].nValue > lbl_802001F0[j]) {
+            nSlot = gNumAwards;
+            if (gEarningsTable.aHoleGoal[i].nId != 0) {
+                for (j = 0; j < gNumAwards; j++) {
+                    if (gEarningsTable.aHoleGoal[i].nId == aAwardIds[j]) {
+                        if (gEarningsTable.aHoleGoal[i].nValue > gHoleAwardMoney[j]) {
                             nSlot = j;
                             bReplace = 1;
                         } else {
@@ -1068,28 +1076,28 @@ void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
                 }
             }
             if (bLost) continue;
-            lbl_80200268[nSlot] = lbl_80200538.aHoleGoal[i].nAward;
-            lbl_802001F0[nSlot] = lbl_80200538.aHoleGoal[i].nValue;
-            aAwardIds[nSlot] = lbl_80200538.aHoleGoal[i].nId;
+            gHoleAwards[nSlot] = gEarningsTable.aHoleGoal[i].nAward;
+            gHoleAwardMoney[nSlot] = gEarningsTable.aHoleGoal[i].nValue;
+            aAwardIds[nSlot] = gEarningsTable.aHoleGoal[i].nId;
             if (!bReplace) {
-                lbl_80282250++;
+                gNumAwards++;
             }
-            if (!bPreview && lbl_80200538.aHoleGoal[i].nBio != -1) {
-                EASBio_SetAccomplishment(lbl_80200538.aBio[lbl_80200538.aHoleGoal[i].nBio].szName,
-                                         lbl_80200538.aBio[lbl_80200538.aHoleGoal[i].nBio].nValue);
+            if (!bPreview && gEarningsTable.aHoleGoal[i].nBio != -1) {
+                EASBio_SetAccomplishment(gEarningsTable.aBio[gEarningsTable.aHoleGoal[i].nBio].szName,
+                                         gEarningsTable.aBio[gEarningsTable.aHoleGoal[i].nBio].nValue);
             }
         } else {
             int nSlot;
 
-            nValue = lbl_80200538.aHoleGoal[i].nValue;
+            nValue = gEarningsTable.aHoleGoal[i].nValue;
             if (nValue == 0) continue;
             bReplace = 0;
             bLost = 0;
-            nSlot = lbl_80282254;
-            if (lbl_80200538.aHoleGoal[i].nId != 0) {
-                for (j = 0; j < lbl_80282254; j++) {
-                    if (lbl_80200538.aHoleGoal[i].nId == aPrizeIds[j]) {
-                        if (lbl_80200538.aHoleGoal[i].nValue > lbl_802002E0[j]) {
+            nSlot = gNumPrizes;
+            if (gEarningsTable.aHoleGoal[i].nId != 0) {
+                for (j = 0; j < gNumPrizes; j++) {
+                    if (gEarningsTable.aHoleGoal[i].nId == aPrizeIds[j]) {
+                        if (gEarningsTable.aHoleGoal[i].nValue > gHolePrizeBases[j]) {
                             nSlot = j;
                             bReplace = 1;
                         } else {
@@ -1099,23 +1107,24 @@ void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
                 }
             }
             if (bLost) continue;
-            lbl_802002E0[nSlot] = nValue;
-            aPrizeIds[nSlot] = lbl_80200538.aHoleGoal[i].nId;
-            lbl_80200358[nSlot] = GM_Earnings_ComputeBonusModifiers(lbl_802002E0[nSlot], nPlayer,
-                                              Earnings_TestBit(lbl_80200538.aHoleGoal[i].uMults, 0),
-                                              Earnings_TestBit(lbl_80200538.aHoleGoal[i].uMults, 1),
-                                              Earnings_TestBit(lbl_80200538.aHoleGoal[i].uMults, 2),
-                                              &lbl_801FFAE8[nSlot]);
-            if (Earnings_TestBit(lbl_80200538.aHoleGoal[i].uMults, 3)) {
-                lbl_80200358[nSlot] = GM_Earnings_ComputeTOURCardModifiers(lbl_80200358[nSlot], nPlayer, &lbl_801FFAE8[nSlot]);
+            gHolePrizeBases[nSlot] = nValue;
+            aPrizeIds[nSlot] = gEarningsTable.aHoleGoal[i].nId;
+            gHolePrizes[nSlot] = GM_Earnings_ComputeBonusModifiers(gHolePrizeBases[nSlot], nPlayer,
+                                              Earnings_TestBit(gEarningsTable.aHoleGoal[i].uMults, 0),
+                                              Earnings_TestBit(gEarningsTable.aHoleGoal[i].uMults, 1),
+                                              Earnings_TestBit(gEarningsTable.aHoleGoal[i].uMults, 2),
+                                              &gPrizeBreakdowns[nSlot]);
+            if (Earnings_TestBit(gEarningsTable.aHoleGoal[i].uMults, 3)) {
+                gHolePrizes[nSlot] = GM_Earnings_ComputeTOURCardModifiers(gHolePrizes[nSlot], nPlayer,
+                        &gPrizeBreakdowns[nSlot]);
             }
-            lbl_802003D0[nSlot] = lbl_80200538.aHoleGoal[i].n25;
+            gHolePrizeMsgs[nSlot] = gEarningsTable.aHoleGoal[i].n25;
             if (!bReplace) {
-                lbl_80282254++;
+                gNumPrizes++;
             }
-            if (!bPreview && lbl_80200538.aHoleGoal[i].nBio != -1) {
-                EASBio_SetAccomplishment(lbl_80200538.aBio[lbl_80200538.aHoleGoal[i].nBio].szName,
-                                         lbl_80200538.aBio[lbl_80200538.aHoleGoal[i].nBio].nValue);
+            if (!bPreview && gEarningsTable.aHoleGoal[i].nBio != -1) {
+                EASBio_SetAccomplishment(gEarningsTable.aBio[gEarningsTable.aHoleGoal[i].nBio].szName,
+                                         gEarningsTable.aBio[gEarningsTable.aHoleGoal[i].nBio].nValue);
             }
         }
     }
@@ -1395,13 +1404,13 @@ s32 GM_Earnings_ComputeBonusModifiers(s32 nPoints, int nPlayer, u8 bCourse, u8 b
     fCourse = GM_Earnings_GetCourseModifier();
     switch (gSession.nTeeSet[nPlayer]) {
     case 0:
-        fTee = (f32)lbl_80200538.aMult[EARN_MULT_TEE +2] / 100.0f;
+        fTee = (f32)gEarningsTable.aMult[EARN_MULT_TEE +2] / 100.0f;
         break;
     case 1:
-        fTee = (f32)lbl_80200538.aMult[EARN_MULT_TEE +1] / 100.0f;
+        fTee = (f32)gEarningsTable.aMult[EARN_MULT_TEE +1] / 100.0f;
         break;
     case 2:
-        fTee = (f32)lbl_80200538.aMult[EARN_MULT_TEE +0] / 100.0f;
+        fTee = (f32)gEarningsTable.aMult[EARN_MULT_TEE +0] / 100.0f;
         break;
     case 3:
         fTee = 1.0f;
@@ -1409,16 +1418,16 @@ s32 GM_Earnings_ComputeBonusModifiers(s32 nPoints, int nPlayer, u8 bCourse, u8 b
     }
     switch (gpGame->nPinSet[Game_CurHoleIndex()]) {
     case 0:
-        fHole = (f32)lbl_80200538.aMult[EARN_MULT_PINSET +0] / 100.0f;
+        fHole = (f32)gEarningsTable.aMult[EARN_MULT_PINSET +0] / 100.0f;
         break;
     case 1:
-        fHole = (f32)lbl_80200538.aMult[EARN_MULT_PINSET +1] / 100.0f;
+        fHole = (f32)gEarningsTable.aMult[EARN_MULT_PINSET +1] / 100.0f;
         break;
     case 2:
-        fHole = (f32)lbl_80200538.aMult[EARN_MULT_PINSET +2] / 100.0f;
+        fHole = (f32)gEarningsTable.aMult[EARN_MULT_PINSET +2] / 100.0f;
         break;
     case 3:
-        fHole = (f32)lbl_80200538.aMult[EARN_MULT_PINSET +3] / 100.0f;
+        fHole = (f32)gEarningsTable.aMult[EARN_MULT_PINSET +3] / 100.0f;
         break;
     }
     nBase = fn_800D33A8(nPoints);
@@ -1466,53 +1475,53 @@ f32 GM_Earnings_GetCourseModifier(void) {
     fMult = 1.0f;
     switch (gpGame->nCurCourse) {
     case 0:
-        fMult = lbl_80200538.aMult[EARN_MULT_COURSE +0];
+        fMult = gEarningsTable.aMult[EARN_MULT_COURSE +0];
         break;
     case 2:
-        fMult = lbl_80200538.aMult[EARN_MULT_COURSE +1];
+        fMult = gEarningsTable.aMult[EARN_MULT_COURSE +1];
         break;
     case 1:
-        fMult = lbl_80200538.aMult[EARN_MULT_COURSE +2];
+        fMult = gEarningsTable.aMult[EARN_MULT_COURSE +2];
         break;
     case 6:
-        fMult = lbl_80200538.aMult[EARN_MULT_COURSE +3];
+        fMult = gEarningsTable.aMult[EARN_MULT_COURSE +3];
         break;
     case 10:
-        fMult = lbl_80200538.aMult[EARN_MULT_COURSE +4];
+        fMult = gEarningsTable.aMult[EARN_MULT_COURSE +4];
         break;
     case 11:
-        fMult = lbl_80200538.aMult[EARN_MULT_COURSE +5];
+        fMult = gEarningsTable.aMult[EARN_MULT_COURSE +5];
         break;
     case 13:
-        fMult = lbl_80200538.aMult[EARN_MULT_COURSE +6];
+        fMult = gEarningsTable.aMult[EARN_MULT_COURSE +6];
         break;
     case 15:
-        fMult = lbl_80200538.aMult[EARN_MULT_COURSE +7];
+        fMult = gEarningsTable.aMult[EARN_MULT_COURSE +7];
         break;
     case 14:
-        fMult = lbl_80200538.aMult[EARN_MULT_COURSE +8];
+        fMult = gEarningsTable.aMult[EARN_MULT_COURSE +8];
         break;
     case 3:
-        fMult = lbl_80200538.aMult[EARN_MULT_COURSE +9];
+        fMult = gEarningsTable.aMult[EARN_MULT_COURSE +9];
         break;
     case 12:
-        fMult = lbl_80200538.aMult[EARN_MULT_COURSE +10];
+        fMult = gEarningsTable.aMult[EARN_MULT_COURSE +10];
         break;
     case 9:
-        fMult = lbl_80200538.aMult[EARN_MULT_COURSE +11];
+        fMult = gEarningsTable.aMult[EARN_MULT_COURSE +11];
         break;
     case 22:
-        fMult = lbl_80200538.aMult[EARN_MULT_COURSE +12];
+        fMult = gEarningsTable.aMult[EARN_MULT_COURSE +12];
         break;
     case 7:
         if (Game_GetCurHoleNum() == 0) {
-            fMult = lbl_80200538.aMult[EARN_MULT_COURSE +13];
+            fMult = gEarningsTable.aMult[EARN_MULT_COURSE +13];
         }
         if (Game_GetCurHoleNum() == 1) {
-            fMult = lbl_80200538.aMult[EARN_MULT_COURSE +14];
+            fMult = gEarningsTable.aMult[EARN_MULT_COURSE +14];
         }
         if (Game_GetCurHoleNum() == 2) {
-            fMult = lbl_80200538.aMult[EARN_MULT_COURSE +15];
+            fMult = gEarningsTable.aMult[EARN_MULT_COURSE +15];
         }
         break;
     }
@@ -1533,22 +1542,22 @@ int GM_Earnings_ComputeTOURCardModifiers(int nReward, int nPlayer, CourseMoneyTr
         switch (gpSaveData[gPlayers[nPlayer].nIndex].nTourCardLevel) {
         case 0:
         case 1:
-            fMult = (f32)lbl_80200538.aMult[EARN_MULT_TOUR +0] / 100.0f;
+            fMult = (f32)gEarningsTable.aMult[EARN_MULT_TOUR +0] / 100.0f;
             break;
         case 2:
-            fMult = (f32)lbl_80200538.aMult[EARN_MULT_TOUR +1] / 100.0f;
+            fMult = (f32)gEarningsTable.aMult[EARN_MULT_TOUR +1] / 100.0f;
             break;
         case 3:
-            fMult = (f32)lbl_80200538.aMult[EARN_MULT_TOUR +2] / 100.0f;
+            fMult = (f32)gEarningsTable.aMult[EARN_MULT_TOUR +2] / 100.0f;
             break;
         case 4:
-            fMult = (f32)lbl_80200538.aMult[EARN_MULT_TOUR +3] / 100.0f;
+            fMult = (f32)gEarningsTable.aMult[EARN_MULT_TOUR +3] / 100.0f;
             break;
         case 5:
-            fMult = (f32)lbl_80200538.aMult[EARN_MULT_TOUR +4] / 100.0f;
+            fMult = (f32)gEarningsTable.aMult[EARN_MULT_TOUR +4] / 100.0f;
             break;
         case 6:
-            fMult = (f32)lbl_80200538.aMult[EARN_MULT_TOUR +5] / 100.0f;
+            fMult = (f32)gEarningsTable.aMult[EARN_MULT_TOUR +5] / 100.0f;
             break;
         }
     }
@@ -1650,9 +1659,9 @@ u8 GM_Earnings_GiveAwardToUser(int nPlayer, Award* pAward) {
 // bounds is offered to record kind 1, its length in yards, while
 // HighScoreRecords_CheckRecordGameSetting(1) allows it. a (TW07: setrecord) writes a place in. With
 // bAll (TW07: firstPlaceOnly) only a new best (HighScoreRecords_CheckRecord gives 2 or 4) is
-// listed, else any place; a hit goes into lbl_80200498 (the result) and lbl_80200510 (kind 1).
+// listed, else any place; a hit goes into gShotRecordResults (the result) and gShotRecordKinds (kind 1).
 // bCountStroke (TW07: predicted) counts the shot on the hole while it checks. Returns how many were
-// listed (lbl_80282258): 0 in game modes 12, 22 and 26 and the skill-zone modes, in "Random 18",
+// listed (gNumRecordHits): 0 in game modes 12, 22 and 26 and the skill-zone modes, in "Random 18",
 // with mulligans on, with gSession.uFlags 0x4000, for a CPU player or one without a profile, or for
 // a ball off the course (no pCourse).
 int HighScoreRecords_GetEndOfShotRecord(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll) {
@@ -1665,7 +1674,7 @@ int HighScoreRecords_GetEndOfShotRecord(int nPlayer, Ball* pBall, int a, u8 bCou
     u32 nClass;
     int nResult;
 
-    lbl_80282258 = 0;
+    gNumRecordHits = 0;
     if (gSession.uFlags & 0x4000) return 0;
     if (Player_IsCPU(nPlayer)) return 0;
     if (Game_GetMode() == 12 || GM_Currently_SkillZoneMode() || Game_GetMode() == 22 || Game_GetMode()
@@ -1697,22 +1706,22 @@ int HighScoreRecords_GetEndOfShotRecord(int nPlayer, Ball* pBall, int a, u8 bCou
         && !GM_IsBallOOB(nPlayer, pBall)) {
         nResult = HighScoreRecords_CheckRecord(1, (s32)fDist, a, szName, nPlayer);
         if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
-            lbl_80200498[lbl_80282258] = nResult;
-            lbl_80200510[lbl_80282258] = 1;
-            lbl_80282258++;
+            gShotRecordResults[gNumRecordHits] = nResult;
+            gShotRecordKinds[gNumRecordHits] = 1;
+            gNumRecordHits++;
         }
     }
     if (bCountStroke) {
         gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()]--;
     }
-    return lbl_80282258;
+    return gNumRecordHits;
 }
 
 // The end-of-hole record check, made when the ball drops: a putt (the putter, club 25) is offered
 // to record kind 2, its length in feet (3 x the yards from where it was struck), while
 // HighScoreRecords_CheckRecordGameSetting(2) allows it. Parameters, exclusions and result as
 // HighScoreRecords_GetEndOfShotRecord (without its par, ground and bounds tests); a hit goes into
-// lbl_80200470 and lbl_802004E8 (kind 2).
+// gPuttRecordResults and gPuttRecordKinds (kind 2).
 int HighScoreRecords_GetEndOfHoleRecord(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll) {
     char szName[32];
     int nProfile;
@@ -1721,7 +1730,7 @@ int HighScoreRecords_GetEndOfHoleRecord(int nPlayer, Ball* pBall, int a, u8 bCou
     f32 fDz;
     int nResult;
 
-    lbl_80282258 = 0;
+    gNumRecordHits = 0;
     if (gSession.uFlags & 0x4000) return 0;
     if (Player_IsCPU(nPlayer)) return 0;
     if (Game_GetMode() == 12 || GM_Currently_SkillZoneMode() || Game_GetMode() == 22 || Game_GetMode()
@@ -1744,15 +1753,15 @@ int HighScoreRecords_GetEndOfHoleRecord(int nPlayer, Ball* pBall, int a, u8 bCou
     if (HighScoreRecords_CheckRecordGameSetting(2) && gPlayers[nPlayer].nClub == 25) {
         nResult = HighScoreRecords_CheckRecord(2, (s32)(3.0f * fDist), a, szName, nPlayer);
         if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
-            lbl_80200470[lbl_80282258] = nResult;
-            lbl_802004E8[lbl_80282258] = 2;
-            lbl_80282258++;
+            gPuttRecordResults[gNumRecordHits] = nResult;
+            gPuttRecordKinds[gNumRecordHits] = 2;
+            gNumRecordHits++;
         }
     }
     if (bCountStroke) {
         gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()]--;
     }
-    return lbl_80282258;
+    return gNumRecordHits;
 }
 
 // The end-of-round record checks (after the last hole, fn_800D439C). In game mode 22 (the
@@ -1761,8 +1770,8 @@ int HighScoreRecords_GetEndOfHoleRecord(int nPlayer, Ball* pBall, int a, u8 bCou
 // regulation (3, fn_800D1170), fairways hit (5, fn_800D0FBC), birdies or better (7), eagles or
 // better (6) and putts (4). Each kind only while HighScoreRecords_CheckRecordGameSetting allows it.
 // bSave writes a place in; with bAll only a new best (2 or 4) is listed, else any place; a hit goes
-// into lbl_80200448 (the result) and lbl_802004C0 (the kind). bCountStroke counts the hole one
-// stroke more while it checks. Returns how many were listed (lbl_80282258): 0 in game mode 12, with
+// into gRoundRecordResults (the result) and gRoundRecordKinds (the kind). bCountStroke counts the hole one
+// stroke more while it checks. Returns how many were listed (gNumRecordHits): 0 in game mode 12, with
 // mulligans on, with gSession.uFlags 0x4000, for a CPU player or one without a profile.
 int HighScoreRecords_GetEndOfGameRecord(int nPlayer, int bSave, u8 bCountStroke, u8 bAll) {
     char szName[32];
@@ -1773,7 +1782,7 @@ int HighScoreRecords_GetEndOfGameRecord(int nPlayer, int bSave, u8 bCountStroke,
     int nEagles;
     int nPutts;
 
-    lbl_80282258 = 0;
+    gNumRecordHits = 0;
     if (gSession.uFlags & 0x4000) return 0;
     if (Player_IsCPU(nPlayer)) return 0;
     if (Game_GetMode() == 12) return 0;
@@ -1789,23 +1798,23 @@ int HighScoreRecords_GetEndOfGameRecord(int nPlayer, int bSave, u8 bCountStroke,
         if (HighScoreRecords_CheckRecordGameSetting(9)) {
             nResult = HighScoreRecords_CheckRecord(9, gPlayers[nPlayer].nEBC, bSave, szName, nPlayer);
             if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
-                lbl_80200448[lbl_80282258] = nResult;
-                lbl_802004C0[lbl_80282258] = 9;
-                lbl_80282258++;
+                gRoundRecordResults[gNumRecordHits] = nResult;
+                gRoundRecordKinds[gNumRecordHits] = 9;
+                gNumRecordHits++;
             }
         }
-        return lbl_80282258;
+        return gNumRecordHits;
     }
     if (GM_Currently_SkillZoneMode()) {
         if (HighScoreRecords_CheckRecordGameSetting(8)) {
             nResult = HighScoreRecords_CheckRecord(8, gPlayers[nPlayer].nDD8, bSave, szName, nPlayer);
             if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
-                lbl_80200448[lbl_80282258] = nResult;
-                lbl_802004C0[lbl_80282258] = 8;
-                lbl_80282258++;
+                gRoundRecordResults[gNumRecordHits] = nResult;
+                gRoundRecordKinds[gNumRecordHits] = 8;
+                gNumRecordHits++;
             }
         }
-        return lbl_80282258;
+        return gNumRecordHits;
     }
     if (gpGame->b137) return 0;
     if (bCountStroke) {
@@ -1815,25 +1824,25 @@ int HighScoreRecords_GetEndOfGameRecord(int nPlayer, int bSave, u8 bCountStroke,
     if (HighScoreRecords_CheckRecordGameSetting(0)) {
         nResult = HighScoreRecords_CheckRecord(0, nValue, bSave, szName, nPlayer);
         if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
-            lbl_80200448[lbl_80282258] = nResult;
-            lbl_802004C0[lbl_80282258] = 0;
-            lbl_80282258++;
+            gRoundRecordResults[gNumRecordHits] = nResult;
+            gRoundRecordKinds[gNumRecordHits] = 0;
+            gNumRecordHits++;
         }
     }
     if (HighScoreRecords_CheckRecordGameSetting(3)) {
         nResult = HighScoreRecords_CheckRecord(3, fn_800D1170(nPlayer, 0), bSave, szName, nPlayer);
         if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
-            lbl_80200448[lbl_80282258] = nResult;
-            lbl_802004C0[lbl_80282258] = 3;
-            lbl_80282258++;
+            gRoundRecordResults[gNumRecordHits] = nResult;
+            gRoundRecordKinds[gNumRecordHits] = 3;
+            gNumRecordHits++;
         }
     }
     if (HighScoreRecords_CheckRecordGameSetting(5)) {
         nResult = HighScoreRecords_CheckRecord(5, fn_800D0FBC(nPlayer), bSave, szName, nPlayer);
         if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
-            lbl_80200448[lbl_80282258] = nResult;
-            lbl_802004C0[lbl_80282258] = 5;
-            lbl_80282258++;
+            gRoundRecordResults[gNumRecordHits] = nResult;
+            gRoundRecordKinds[gNumRecordHits] = 5;
+            gNumRecordHits++;
         }
     }
     nValue = 0;
@@ -1845,9 +1854,9 @@ int HighScoreRecords_GetEndOfGameRecord(int nPlayer, int bSave, u8 bCountStroke,
     if (HighScoreRecords_CheckRecordGameSetting(7)) {
         nResult = HighScoreRecords_CheckRecord(7, nValue, bSave, szName, nPlayer);
         if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
-            lbl_80200448[lbl_80282258] = nResult;
-            lbl_802004C0[lbl_80282258] = 7;
-            lbl_80282258++;
+            gRoundRecordResults[gNumRecordHits] = nResult;
+            gRoundRecordKinds[gNumRecordHits] = 7;
+            gNumRecordHits++;
         }
     }
     nEagles = 0;
@@ -1859,9 +1868,9 @@ int HighScoreRecords_GetEndOfGameRecord(int nPlayer, int bSave, u8 bCountStroke,
     if (HighScoreRecords_CheckRecordGameSetting(6)) {
         nResult = HighScoreRecords_CheckRecord(6, nEagles, bSave, szName, nPlayer);
         if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
-            lbl_80200448[lbl_80282258] = nResult;
-            lbl_802004C0[lbl_80282258] = 6;
-            lbl_80282258++;
+            gRoundRecordResults[gNumRecordHits] = nResult;
+            gRoundRecordKinds[gNumRecordHits] = 6;
+            gNumRecordHits++;
         }
     }
     nPutts = 0;
@@ -1871,15 +1880,15 @@ int HighScoreRecords_GetEndOfGameRecord(int nPlayer, int bSave, u8 bCountStroke,
     if (HighScoreRecords_CheckRecordGameSetting(4)) {
         nResult = HighScoreRecords_CheckRecord(4, nPutts, bSave, szName, nPlayer);
         if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
-            lbl_80200448[lbl_80282258] = nResult;
-            lbl_802004C0[lbl_80282258] = 4;
-            lbl_80282258++;
+            gRoundRecordResults[gNumRecordHits] = nResult;
+            gRoundRecordKinds[gNumRecordHits] = 4;
+            gNumRecordHits++;
         }
     }
     if (bCountStroke) {
         gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()]--;
     }
-    return lbl_80282258;
+    return gNumRecordHits;
 }
 
 // Whether nValue and szName are already among the top five of course k's record kind i
@@ -2436,24 +2445,24 @@ void GM_RecordIndividualRoundStats(int nPlayer) {
     }
 }
 
-// How many awards the last shot, putt or hole goal check listed (lbl_80282250).
+// How many awards the last shot, putt or hole goal check listed (gNumAwards).
 s32 Earnings_GetNumAwards(void) {
-    return lbl_80282250;
+    return gNumAwards;
 }
 
-// Award i of those the shot goal check listed (lbl_802002B8).
+// Award i of those the shot goal check listed (gShotAwards).
 s32 Earnings_GetShotAwardId(s32 i) {
-    return lbl_802002B8[i];
+    return gShotAwards[i];
 }
 
-// Award i of those the putt goal check listed (lbl_80200290).
+// Award i of those the putt goal check listed (gPuttAwards).
 s32 Earnings_GetPuttAwardId(s32 i) {
-    return lbl_80200290[i];
+    return gPuttAwards[i];
 }
 
-// Award i of those the hole goal check listed (lbl_80200268).
+// Award i of those the hole goal check listed (gHoleAwards).
 s32 Earnings_GetHoleAwardId(s32 i) {
-    return lbl_80200268[i];
+    return gHoleAwards[i];
 }
 
 // Whether the player has earned PGA TOUR award nAward (23..38; any other gives 0), with mulligans
@@ -2575,8 +2584,8 @@ u8 Earnings_IsTourAwardEarned(int nPlayer, int nAward) {
     return 0;
 }
 
-// The message index of award i (lbl_80191A08): awards 0..22 are their own; the PGA TOUR awards
+// The message index of award i (gAwardMessageIds): awards 0..22 are their own; the PGA TOUR awards
 // 23..38 index the tour awards' message list (GUI_QueueMessage kind 6).
 s32 Earnings_GetAwardMessageId(s32 i) {
-    return lbl_80191A08[i];
+    return gAwardMessageIds[i];
 }

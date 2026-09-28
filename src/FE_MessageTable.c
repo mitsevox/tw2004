@@ -2155,8 +2155,8 @@ void fn_8007D708(MsgArg* pArgs, MsgArg* pResult) {
     nValue = pArgs[0].i;
     n = -1;
     for (i = 0; i < NUM_EARNINGS_RANGES; i++) {
-        if (nValue >= lbl_80200538.aRange[i].n0 - 1 && nValue <= lbl_80200538.aRange[i].n4) {
-            n = lbl_80200538.aRange[i].n8;
+        if (nValue >= gEarningsTable.aRange[i].n0 - 1 && nValue <= gEarningsTable.aRange[i].n4) {
+            n = gEarningsTable.aRange[i].n8;
             break;
         }
     }
@@ -2441,7 +2441,7 @@ void fn_8007E128(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8007E174(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = lbl_80200538.a9B4[pArgs[0].i];
+    pResult->i = gEarningsTable.a9B4[pArgs[0].i];
 }
 
 // The mulligan rule: none in game mode 7, any number in mode 9, else the one picked.
@@ -3285,7 +3285,7 @@ void fn_8007FF4C(MsgArg* pArgs, MsgArg* pResult) {
 
 // What unlocks a course.
 void fn_8007FF6C(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = lbl_80200538.aCoursePrice[pArgs[0].i].nPrice;
+    pResult->i = gEarningsTable.aCoursePrice[pArgs[0].i].nPrice;
 }
 
 // Make the profile being worked on a new one named "USER<n>" and save it into slot pArgs[0]. A
@@ -3356,17 +3356,17 @@ void fn_80080208(MsgArg* pArgs, MsgArg* pResult) {
     switch (Game_GetMode()) {
     case 4:
         if (nEvent >= 25) {
-            pResult->i = lbl_80200538.aLadderPrize[24].nBase;
+            pResult->i = gEarningsTable.aLadderPrize[24].nBase;
             return;
         }
-        pResult->i = lbl_80200538.aLadderPrize[lbl_80260CB8.nEvent].nBase;
+        pResult->i = gEarningsTable.aLadderPrize[lbl_80260CB8.nEvent].nBase;
         return;
     case 0:
     case 1:
-        pResult->i = lbl_80200538.aStrokePrize[fn_800D3D10(pArgs[0].i)].nBase;
+        pResult->i = gEarningsTable.aStrokePrize[fn_800D3D10(pArgs[0].i)].nBase;
         return;
     case 2:
-        pResult->i = lbl_80200538.aSkins[fn_800D3D10(pArgs[0].i)].n10;
+        pResult->i = gEarningsTable.aSkins[fn_800D3D10(pArgs[0].i)].n10;
         return;
     case 3:
         return;
@@ -4602,27 +4602,27 @@ void fn_8008311C(MsgArg* pArgs, MsgArg* pResult) {
         nSum = 0;
         for (h = 0; h < 6; h++) {
             if (nHoles == 2 || nHoles == 1) {
-                nSum += lbl_80200538.aSkins[fn_800D3D10(nGolfer)].aValue[0];
+                nSum += gEarningsTable.aSkins[fn_800D3D10(nGolfer)].aValue[0];
             }
         }
         for (h = 6; h < 9; h++) {
             if (nHoles == 2 || nHoles == 1) {
-                nSum += lbl_80200538.aSkins[fn_800D3D10(nGolfer)].aValue[1];
+                nSum += gEarningsTable.aSkins[fn_800D3D10(nGolfer)].aValue[1];
             }
         }
         for (h = 9; h < 12; h++) {
             if (nHoles == 3 || nHoles == 1) {
-                nSum += lbl_80200538.aSkins[fn_800D3D10(nGolfer)].aValue[1];
+                nSum += gEarningsTable.aSkins[fn_800D3D10(nGolfer)].aValue[1];
             }
         }
         for (h = 12; h < 17; h++) {
             if (nHoles == 3 || nHoles == 1) {
-                nSum += lbl_80200538.aSkins[fn_800D3D10(nGolfer)].aValue[2];
+                nSum += gEarningsTable.aSkins[fn_800D3D10(nGolfer)].aValue[2];
             }
         }
         for (h = 17; h < 18; h++) {
             if (nHoles == 3 || nHoles == 1) {
-                nSum += lbl_80200538.aSkins[fn_800D3D10(nGolfer)].aValue[3];
+                nSum += gEarningsTable.aSkins[fn_800D3D10(nGolfer)].aValue[3];
             }
         }
         nMax = (nSum > nMax) ? nSum : nMax;

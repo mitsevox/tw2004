@@ -258,8 +258,8 @@ void GameMode4_EndGame(void) {
             GUI_QueueMessage(0, 0x6E, nPrize, nProfile);
             GM_Earnings_AwardMoney(0, nMoney, NULL);
             nEvent = fn_801021FC();
-            gPlayers[0].money.nC += lbl_80200538.aLadderPrize[nEvent].nBase;
-            gPlayers[0].money.n10 += lbl_80200538.aLadderPrize[nEvent].nPerHole * nMargin;
+            gPlayers[0].money.nC += gEarningsTable.aLadderPrize[nEvent].nBase;
+            gPlayers[0].money.n10 += gEarningsTable.aLadderPrize[nEvent].nPerHole * nMargin;
             GameMode4_WinEvent();
         }
     }
@@ -336,9 +336,9 @@ void GameMode4_WinEvent(void) {
             if (bLast == 1) {
                 GUI_QueueMessage(5, 0x1A, 0, nProfile);
                 if (GM_Earnings_AwardTrophyBall(0, 15)) {
-                    GUI_QueueMessage(2, 15, lbl_80200538.nLadderDone, nProfile);
-                    GM_Earnings_AwardMoney(0, lbl_80200538.nLadderDone, NULL);
-                    gPlayers[0].money.n8 += lbl_80200538.nLadderDone;
+                    GUI_QueueMessage(2, 15, gEarningsTable.nLadderDone, nProfile);
+                    GM_Earnings_AwardMoney(0, gEarningsTable.nLadderDone, NULL);
+                    gPlayers[0].money.n8 += gEarningsTable.nLadderDone;
                 }
             } else if ((nEvent + 1) % 4 == 0) {
                 GUI_QueueMessage(5, nEvent / 4 + 20, 0, nProfile);

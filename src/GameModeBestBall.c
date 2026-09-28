@@ -323,10 +323,10 @@ void fn_800E8A68(void) {
                         }
                         nRating1 = GM_Earnings_RateGolfer(nOther);
                         nRating2 = GM_Earnings_RateGolfer(nOther2);
-                        nSum = lbl_80200538.aStrokePrize[nRating1].nBase;
-                        nSum += lbl_80200538.aStrokePrize[nRating2].nBase;
-                        nMoney = nSum + lbl_80200538.aStrokePrize[nRating1].nPerStroke * nMargin;
-                        nMoney += lbl_80200538.aStrokePrize[nRating2].nPerStroke * nMargin;
+                        nSum = gEarningsTable.aStrokePrize[nRating1].nBase;
+                        nSum += gEarningsTable.aStrokePrize[nRating2].nBase;
+                        nMoney = nSum + gEarningsTable.aStrokePrize[nRating1].nPerStroke * nMargin;
+                        nMoney += gEarningsTable.aStrokePrize[nRating2].nPerStroke * nMargin;
                         // fake match: nOurs (dead here) holds the base prize; TW07 has its own
                         // baseearned local, but a separate local puts it in another register
                         nOurs = nSum / 2;

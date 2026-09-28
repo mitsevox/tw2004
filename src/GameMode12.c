@@ -1,5 +1,5 @@
 // GameMode12.c (our name): game mode 12, stroke play with points. Each time the ball lands on a
-// special surface (a row of the prize table at lbl_80200538 + 0x710) it scores points, times the
+// special surface (a row of the prize table at gEarningsTable + 0x710) it scores points, times the
 // shot's multiplier; each hole's points (nD28) are then scaled by the score against par, and a
 // human player is paid the round's total. The honors, hole-finished and game-finished callbacks
 // are mode 0's.
@@ -137,10 +137,10 @@ void fn_800FEF00(s32 nSurface, s32* pPoints, s32* pMeter, s32* pMult) {
     *pMeter = 0;
     *pMult = 0;
     for (i = 0; i < 20; i++) {
-        if (nSurface == lbl_80200538.aMini[i].nId) {
-            *pPoints = lbl_80200538.aMini[i].n4;
-            *pMeter = lbl_80200538.aMini[i].n14;
-            *pMult = lbl_80200538.aMini[i].n18;
+        if (nSurface == gEarningsTable.aMini[i].nId) {
+            *pPoints = gEarningsTable.aMini[i].n4;
+            *pMeter = gEarningsTable.aMini[i].n14;
+            *pMult = gEarningsTable.aMini[i].n18;
         }
     }
 }
@@ -312,9 +312,9 @@ void fn_800FF634(int nPlayer) {
     s32 n;
     lbl_802823D8 = 0;
     for (i = 0; i < 20; i++) {
-        n = fn_800FEFF8(nPlayer, lbl_80200538.aMini[i].nId);
+        n = fn_800FEFF8(nPlayer, gEarningsTable.aMini[i].nId);
         if (n != 0) {
-            lbl_80212468[lbl_802823D8] = lbl_80200538.aMini[i].nId;
+            lbl_80212468[lbl_802823D8] = gEarningsTable.aMini[i].nId;
             lbl_80212418[lbl_802823D8] = n;
             lbl_802823D8++;
         }

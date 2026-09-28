@@ -415,10 +415,10 @@ void fn_800F7A4C(s32 nSurface, s32* pPoints, s32* pTime, s32* pBalls) {
     *pTime = 0;
     *pBalls = 0;
     for (i = 0; i < 20; i++) {
-        if (nSurface == lbl_80200538.aMini[i].nId) {
-            *pPoints = lbl_80200538.aMini[i].n4;
-            *pTime = lbl_80200538.aMini[i].n14;
-            *pBalls = lbl_80200538.aMini[i].n18;
+        if (nSurface == gEarningsTable.aMini[i].nId) {
+            *pPoints = gEarningsTable.aMini[i].n4;
+            *pTime = gEarningsTable.aMini[i].n14;
+            *pBalls = gEarningsTable.aMini[i].n18;
         }
     }
 }

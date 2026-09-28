@@ -253,9 +253,9 @@ void GameModeStableford_EndGame(void) {
                     if (nMargin > 5) {
                         nMargin = 5;
                     }
-                    nBase = lbl_80200538.aStrokePrize[nBest].nBase;
+                    nBase = gEarningsTable.aStrokePrize[nBest].nBase;
                     nProfile = PLAYER(i)->nIndex;
-                    nMoney = nBase + lbl_80200538.aStrokePrize[nBest].nPerStroke * nMargin;
+                    nMoney = nBase + gEarningsTable.aStrokePrize[nBest].nPerStroke * nMargin;
                     if (gpSaveData[nProfile].bActive) {
                         if (bFirst) {
                             EASBio_IncrementGamesWon(1);

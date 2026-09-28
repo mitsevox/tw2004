@@ -214,8 +214,8 @@ void GameModeStroke_EndGame(void) {
                     if (nMargin > 5) {
                         nMargin = 5;
                     }
-                    nBase = lbl_80200538.aStrokePrize[nBest].nBase;
-                    nMoney = nBase + lbl_80200538.aStrokePrize[nBest].nPerStroke * nMargin;
+                    nBase = gEarningsTable.aStrokePrize[nBest].nBase;
+                    nMoney = nBase + gEarningsTable.aStrokePrize[nBest].nPerStroke * nMargin;
                     nProfile = PLAYER(i)->nIndex;
                     if (gpSaveData[nProfile].bActive) {
                         if (bFirst) {

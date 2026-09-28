@@ -376,8 +376,8 @@ void fn_800F58B4(s32 nSurface, s32* pPoints) {
     int i;
     *pPoints = 0;
     for (i = 0; i < 20; i++) {
-        if (nSurface == lbl_80200538.aMini[i].nId) {
-            *pPoints = lbl_80200538.aMini[i].n8;
+        if (nSurface == gEarningsTable.aMini[i].nId) {
+            *pPoints = gEarningsTable.aMini[i].n8;
         }
     }
 }

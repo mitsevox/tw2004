@@ -411,9 +411,9 @@ void fn_800F68C4(s32 nSurface, s32* pPoints, s32* pBalls) {
     *pPoints = 0;
     *pBalls = 0;
     for (i = 0; i < 20; i++) {
-        if (nSurface == lbl_80200538.aMini[i].nId) {
-            *pPoints = lbl_80200538.aMini[i].nC;
-            *pBalls = lbl_80200538.aMini[i].n18;
+        if (nSurface == gEarningsTable.aMini[i].nId) {
+            *pPoints = gEarningsTable.aMini[i].nC;
+            *pBalls = gEarningsTable.aMini[i].n18;
         }
     }
 }
