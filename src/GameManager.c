@@ -1,7 +1,12 @@
-// GameManager.c (our name; TW06's functions here are GM_*): the round's bookkeeping - turns,
-// strokes, mulligans, the post-shot reaction, walking to the ball, the in-the-hole display.
-// TW06's copy of the file keeps the same function order, which gives most of the names below
-// (docs/tw06-names.md); each one is checked against what our code does.
+// GameManager.c (our name; EA's file is GameMode.c: GM_vInitModuleONCE to GM_GetBonusProgress
+// come in the order and with the names of TW07's GameMode.c): the round's flow - the game
+// manager's setup and teardown, the start of each hole, the end of a golfer's turn, of the hole
+// and of the game (payouts, scorecards, CPU concessions), strokes and penalties after a shot,
+// mulligans, drops, the pre- and post-shot animations, walking to the ball, the in-the-hole
+// display, the aiming buttons and the profile's completion score. The eight functions before
+// GM_vInitModuleONCE and the four after GM_GetBonusProgress include TW07 header inlines
+// (GameEffects.h, GameModeCore.h, GameUI.h), most likely header functions kept out of line here;
+// the GameEffects ones serve only GameEffects.c.
 
 #include "golfer.h"
 #include "ball.h"
@@ -1358,11 +1363,9 @@ u8 GM_bIsElevatorCamButtonPressed(int nPlayer) {
     return 0;
 }
 
-// TW06: GM_vGetAllTimeRecordsHeld (by position). How many all-time records the profile's golfer
-// holds: in the first table a top-5 entry with the same value as the record; in the other two,
-// an entry that is at least the record of any of the first three blocks of that kind.
-// The original compares a record three times over (the three branches are in the binary): most
-// likely a macro written for a record of several fields, all of which are the one value here.
+// GM_vGetAllTimeRecordsHeld's test that a place's value reaches a record. The original compares
+// three times over (the three branches are in the binary): most likely a macro written for a
+// record of several fields, all of which are the one value here.
 #define RECORD_AT_LEAST(a, b) ((a) >= (b) && (a) >= (b) && (a) >= (b))
 
 // How many all-time records the profile's golfer holds, matched by name: in the first table
