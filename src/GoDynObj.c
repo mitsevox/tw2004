@@ -50,7 +50,7 @@ void fn_80045FC8(UStreamObject* pObject);   // the 'BALL' stream handler
 void fn_80046FDC(s32 nView);
 void fn_800470B0(s32 nView);
 void fn_80047208(u8* aState);
-int  GameModeSkillZoneBase_GetCupCount(void);                 // GameModeReplay.c: how many targets the target games have
+int  GameModeSkillZoneBase_GetCupCount(void);                 // GameModeReplay.c: the target count
 void GameModeSkillZoneBase_GetCupPosition(int i, f32* pOut);     // GameModeReplay.c: target i's position
 void fn_80093DB8(Ball* pBall, int nPlayer);    // GoObjShadow.c
 void BFX_vRender(Ball* pBall, int nPlayer);    // GoObjShadow.c

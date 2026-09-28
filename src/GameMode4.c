@@ -1,8 +1,13 @@
-// GameMode4.c (our name): game mode 4, the matches of the 25-event ladder loaded from the 'TCM '
-// stream (gLadderEvents, 0x44 bytes an event; names from 'TCMS'). An event is a one-on-one match
-// against a pro (mode 4, match play with GameModeMatch's callbacks) or a mode 5 challenge (neither
-// is set up for an event with n1C set; GameModeSkins_EndGame also scores the current event).
-// Winning one sets its flag in the save profile, pays its prize and unlocks the pro and a reward.
+// GameMode4.c (our name): game mode 4, the ladder of 25 events loaded from the 'TCM ' stream chunk
+// (gLadderEvents, 0x44 bytes an event; their names from 'TCMS'). Its counterpart in TW07 is
+// GameModeDriver_TigerChallenge.cpp (its own 'TGRC' events, with SelectEvent, StartEvent and
+// GetNumEventsWon). An event is a one-on-one match against a pro (mode 4: GameModeMatch's
+// match-play callbacks with this file's shutdown and end of game) or a Play Now challenge (mode 5);
+// an event with n1C set is neither. A match is scored by GameMode4_EndGame, a challenge only when it
+// is played as Skins (GameModeSkins_EndGame; PlayNow_EndGame skips a ladder event). Winning one
+// marks its award in the save profile, pays its prize and unlocks the pro and a reward; the region
+// finals and the World final queue messages of their own. The map screen that picks the events is
+// LadderMap.c and GameMode4Menu.c.
 
 #include "golfer.h"
 #include "game.h"
@@ -17,15 +22,15 @@ typedef struct LadderEvent {
     s32 nCourse;                // 0x08
     s32 nTeeSet;                // 0x0C
     s32 nPins;                  // 0x10  the pin set plus 1 (0 = leave it)
-    s32 nHoles;                 // 0x14  the hole-selection preset
+    s32 nHoles;                 // 0x14  the hole set: 1 all, 2 the front nine, 3 the back nine
     s32 nChallenge;             // 0x18  a mode 5 challenge plus 1 (0 = a match)
     s32 n1C;                    // 0x1C  nonzero: not played here
     s32 nReward;                // 0x20  the reward unlocked plus 1 (0 = none)
     s32 aNeeded[6];             // 0x24  events that must be won first, plus 1 (0 = none)
     s32 nName;                  // 0x3C  the name's offset in the 'TCMS' text
-    s32 n40;                    // 0x40
+    s32 nTourStop;              // 0x40  the tour stop number the map shows
 } LadderEvent;
-LadderEvent gLadderEvents[25];
+LadderEvent gLadderEvents[25];          // the 'TCM ' chunk, copied as it is
 
 // The 'TCMS' text: the events' names.
 typedef struct LadderNames {
@@ -33,15 +38,15 @@ typedef struct LadderNames {
     u32   uSize;
 } LadderNames;
 
-s32 gLadderSavedWeather = 4;                    // the options' unkC, saved while a match is played
-void (*gLadderChallengeShutdown)(void);          // the challenge's own end-of-mode callback
-s32 gLadderEventBonus;                    // money to add to the course tracking when the event ends
-s32 gLadderOpponent;                    // the event's opponent
-s32 gLadderReward;                    // the event's reward plus 1
-LadderNames gLadderNames;
-s32 gLadderCurrentEvent;                    // the current event
-u8  gLadderEventRunning;                    // a ladder event is being played
-s32 gLadderSavedWind;                    // the wind option, saved
+s32 gLadderSavedWeather = 4;            // the weather option, saved while an event is played
+void (*gLadderChallengeShutdown)(void); // a challenge event's own mode 5 shutdown (NULL for a match)
+s32 gLadderEventBonus;                  // paid twice by GameMode4_WinEvent (front-end message 66)
+s32 gLadderOpponent;                    // the current event's opponent (34 = none)
+s32 gLadderReward;                      // the current event's reward plus 1 (0 = none)
+LadderNames gLadderNames;               // the 'TCMS' text
+s32 gLadderCurrentEvent;                // the current event, 0..24
+u8  gLadderEventRunning;                // a ladder event is being played
+s32 gLadderSavedWind;                   // the wind option, saved while an event is played
 
 void  GM_Earnings_AwardDoubleMoney(int nPlayer, int nMoney);
 
@@ -406,7 +411,7 @@ void GameMode4_GetEventName(int nEvent, char* szOut) {
 // Event nEvent's tour stop number, which the map's panel prints as "<region> / Tour Stop <n>"
 // (LadderMenu_GetEventText).
 int GameMode4_GetEventTourStop(int nEvent) {
-    return gLadderEvents[nEvent].n40;
+    return gLadderEvents[nEvent].nTourStop;
 }
 
 // Empty in this build; called last when a game started from the menus is set up (fn_80079AD4,

@@ -1,6 +1,9 @@
-// GameModeMatch.c (TW06's GameModeMatch): game mode 1, one-against-one match play, with a
-// sudden-death playoff when the match is tied after the last hole. GameModeBattle.c reuses most of
-// these callbacks.
+// GameModeMatch.c (TW06's GameModeMatch, TW07's GameMode_Match.cpp): game mode 1, one-against-one
+// match play. A hole goes to the player who holes out in fewer strokes; the match ends once one
+// player leads by more holes than are left, with a sudden-death playoff when it is tied after the
+// last hole. GameMode4.c (the ladder's matches), GameModeBattle.c and GameModeDriverRTE.c reuse
+// most of these callbacks. The file ends with two Play Now helpers on GameMode5.c's challenge list
+// (PlayNow_GetCurrentGroup, PlayNow_GetGroupFirstChallenge).
 
 #include "golfer.h"
 #include "ball.h"
@@ -9,7 +12,7 @@
 #include "game/modes/challenge.h"
 #include "game/save.h"
 
-s32 gMatchPlayoffHonors = 5;                    // who has the honor in the playoff (5 = nobody yet)
+s32 gMatchPlayoffHonors = 5;            // who has the honor in the playoff (5 = nobody yet)
 
 int  GameModeMatch_GetTeeHonors(int nPlayer);
 void GameModeMatch_EndGame(void);

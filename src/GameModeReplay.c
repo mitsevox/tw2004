@@ -1,7 +1,11 @@
 // GameModeReplay.c (TW06's GameModeReplay): game mode 10, playing back a saved shot (gReplayData):
-// the saved course, hole, wind and player are put back and the shot starts again. Also the target
-// games' target list (gSkillZoneCups, gSkillZoneNumCups points); the rest of their shared code is
-// GameTargets.c.
+// the saved course, hole, pins, tees, wind, weather and player are put back and the shot starts
+// again.
+// The file ends with the target games' target list (gSkillZoneCups, gSkillZoneNumCups points):
+// GameModeSkillZoneBase_GetCupCount, GetCupPosition and AddCup are TW07's
+// GameMode_SkillZoneBase.cpp methods of those names, which TW07's source order puts right before
+// SortCupsByDistanceFromTee, GameTargets.c's first function. They belong to GameTargets.c's EA file;
+// they stay here because the bytes cannot prove where the split falls (see GameTargets.c).
 
 #include "golfer.h"
 #include "ball.h"
@@ -9,7 +13,7 @@
 #include "engine.h"
 
 // This file's .sbss (game.h).
-s8 gSkillZoneNumCups;
+s8 gSkillZoneNumCups;                   // how many targets gSkillZoneCups holds
 
 void GameModeReplay_LoadHole(void);
 void GameModeReplay_RestartHole(void);
@@ -20,7 +24,7 @@ u8   GameModeReplay_HoleFinished(int nPlayer, u8 bCheck);
 u8   GameModeReplay_GameFinished(u8 bCheck);
 void GameModeReplay_EndGame(void);
 
-f32 gSkillZoneCups[40][4];
+f32 gSkillZoneCups[40][4];              // the target games' targets (x, y, z, w = 1)
 
 // Mode 10's setup (GM_SetModeType): this file's callbacks; the flags b273, b276 (re-plan as the
 // swing begins), b27B, b27C, b27D, b27F, b280 (the mid-hole flyover) and b281 (tutorial tips)

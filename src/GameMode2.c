@@ -1,6 +1,10 @@
-// GameMode2.c (our name): game mode 2, Skins. The lowest score on a hole wins its skin (n22C, its
-// money); a tie carries the skin over to the next hole. Tied skins at the end go to a sudden-death
-// playoff on random holes.
+// GameMode2.c (our name; EA's is TW06's and TW07's GameMode_Skins.cpp, class GameModeSkins): game
+// mode 2, Skins. The lowest score on a hole, alone, wins its skin: the hole's money with everything
+// carried over (n22C, totalled in n274); a tie carries the skin over to the next hole. When the
+// last hole's skin is carried over, a sudden-death playoff follows on random holes until one is
+// won. Humans are paid their skins at the end; a ladder event (GameMode4.c) played as Skins is won
+// by the most skins money. The file ends with three selected-hole helpers that only speed golf
+// (GameMode8.c, which follows it) calls.
 
 #include "golfer.h"
 #include "ball.h"
@@ -11,8 +15,8 @@
 
 void  GameMode4_WinSkinsEvent(void);
 void  GameMode4_WinEvent(void);
-s32 gSkinsCarryOver;                    // the money carried over
-s32 gSkinsNumCarryOver;                    // skins carried over
+s32 gSkinsCarryOver;                    // the money carried over by tied holes
+s32 gSkinsNumCarryOver;                 // the skins carried over by tied holes
 
 void GameModeSkins_StartGamePreData(void);
 void GameModeSkins_SetupNextGolfer(void);
