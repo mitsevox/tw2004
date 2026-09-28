@@ -129,36 +129,36 @@ void GM_vLessonsQuit(MsgArg* pArgs, MsgArg* pResult);
 void GM_vLessonsContinue(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetGolferController(MsgArg* pArgs, MsgArg* pResult);
 void GM_vTimerOut(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008823C(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008828C(MsgArg* pArgs, MsgArg* pResult);
-void fn_800882C0(MsgArg* pArgs, MsgArg* pResult);
-void fn_800882F4(MsgArg* pArgs, MsgArg* pResult);
-void fn_80088324(MsgArg* pArgs, MsgArg* pResult);
-void fn_80088354(MsgArg* pArgs, MsgArg* pResult);
-void fn_80088358(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008835C(MsgArg* pArgs, MsgArg* pResult);
-void fn_800883FC(MsgArg* pArgs, MsgArg* pResult);
-void fn_80088428(MsgArg* pArgs, MsgArg* pResult);
-void fn_80088474(MsgArg* pArgs, MsgArg* pResult);
-void fn_800884F0(MsgArg* pArgs, MsgArg* pResult);
-void fn_80088538(MsgArg* pArgs, MsgArg* pResult);
-void fn_80088570(MsgArg* pArgs, MsgArg* pResult);
-void fn_800885A0(MsgArg* pArgs, MsgArg* pResult);
-void fn_800885F8(MsgArg* pArgs, MsgArg* pResult);
-void fn_80088634(MsgArg* pArgs, MsgArg* pResult);
-void fn_80088654(MsgArg* pArgs, MsgArg* pResult);
-void fn_80088660(MsgArg* pArgs, MsgArg* pResult);
-void fn_80088730(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008879C(MsgArg* pArgs, MsgArg* pResult);
-void fn_800887C4(MsgArg* pArgs, MsgArg* pResult);
-void fn_80088804(MsgArg* pArgs, MsgArg* pResult);
-void fn_80088830(MsgArg* pArgs, MsgArg* pResult);
-void fn_80088834(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008886C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80088AD4(MsgArg* pArgs, MsgArg* pResult);
-void fn_80088CC4(MsgArg* pArgs, MsgArg* pResult);
-void fn_80088CF0(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089324(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetPlayerUIElevator(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetSpeedGolfWinner(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFullRound(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetSpeedGolfPrizeScores(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetChallengeHolesLeft(MsgArg* pArgs, MsgArg* pResult);
+void GM_vCommand103_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vCommand104_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetEventNameAndText(MsgArg* pArgs, MsgArg* pResult);
+void GM_vPlayUISound(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetSpeedGolfPoints(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGM_NextHoleDetails(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetSpeedGolfRoundScore(MsgArg* pArgs, MsgArg* pResult);
+void GM_vCanControllerUseMenu(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIG_MCLookAtCard(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIG_ReplaySpaceNeeded(MsgArg* pArgs, MsgArg* pResult);
+void GM_vPauseMenuClosed(MsgArg* pArgs, MsgArg* pResult);
+void GM_vQuickCheer(MsgArg* pArgs, MsgArg* pResult);
+void GM_vCommand115_Returns0(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetTargetShotInfo(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetTargetHoleStat(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIsDemoSetup(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIsPausedForController(MsgArg* pArgs, MsgArg* pResult);
+void GM_vShotClockOut(MsgArg* pArgs, MsgArg* pResult);
+void GM_vCommand122_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetStringLength(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetRecordName(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetRecordScore(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFormatWithCommas(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetWrapupData(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetRecordHolderName(MsgArg* pArgs, MsgArg* pResult);
 void fn_80089414(MsgArg* pArgs, MsgArg* pResult);
 void fn_800894B4(MsgArg* pArgs, MsgArg* pResult);
 void fn_800894E8(MsgArg* pArgs, MsgArg* pResult);
@@ -467,36 +467,36 @@ void IG_InitGameMessages(void) {
     gIGMessageHandlers[95] = GM_vLessonsContinue;
     gIGMessageHandlers[96] = GM_vGetGolferController;
     gIGMessageHandlers[97] = GM_vTimerOut;
-    gIGMessageHandlers[98] = fn_8008823C;
-    gIGMessageHandlers[99] = fn_8008828C;
-    gIGMessageHandlers[100] = fn_800882C0;
-    gIGMessageHandlers[101] = fn_800882F4;
-    gIGMessageHandlers[102] = fn_80088324;
-    gIGMessageHandlers[103] = fn_80088354;
-    gIGMessageHandlers[104] = fn_80088358;
-    gIGMessageHandlers[105] = fn_8008835C;
-    gIGMessageHandlers[106] = fn_800883FC;
-    gIGMessageHandlers[107] = fn_80088428;
-    gIGMessageHandlers[108] = fn_80088474;
-    gIGMessageHandlers[109] = fn_800884F0;
-    gIGMessageHandlers[110] = fn_80088538;
-    gIGMessageHandlers[111] = fn_80088570;
-    gIGMessageHandlers[112] = fn_800885A0;
-    gIGMessageHandlers[113] = fn_800885F8;
-    gIGMessageHandlers[114] = fn_80088634;
-    gIGMessageHandlers[115] = fn_80088654;
+    gIGMessageHandlers[98] = GM_vGetPlayerUIElevator;
+    gIGMessageHandlers[99] = GM_vGetSpeedGolfWinner;
+    gIGMessageHandlers[100] = GM_vFullRound;
+    gIGMessageHandlers[101] = GM_vGetSpeedGolfPrizeScores;
+    gIGMessageHandlers[102] = GM_vGetChallengeHolesLeft;
+    gIGMessageHandlers[103] = GM_vCommand103_Empty;
+    gIGMessageHandlers[104] = GM_vCommand104_Empty;
+    gIGMessageHandlers[105] = GM_vGetEventNameAndText;
+    gIGMessageHandlers[106] = GM_vPlayUISound;
+    gIGMessageHandlers[107] = GM_vGetSpeedGolfPoints;
+    gIGMessageHandlers[108] = GM_vGM_NextHoleDetails;
+    gIGMessageHandlers[109] = GM_vGetSpeedGolfRoundScore;
+    gIGMessageHandlers[110] = GM_vCanControllerUseMenu;
+    gIGMessageHandlers[111] = GM_vIG_MCLookAtCard;
+    gIGMessageHandlers[112] = GM_vIG_ReplaySpaceNeeded;
+    gIGMessageHandlers[113] = GM_vPauseMenuClosed;
+    gIGMessageHandlers[114] = GM_vQuickCheer;
+    gIGMessageHandlers[115] = GM_vCommand115_Returns0;
     gIGMessageHandlers[116] = GM_vGetModeValue;
-    gIGMessageHandlers[117] = fn_80088660;
-    gIGMessageHandlers[118] = fn_80088730;
-    gIGMessageHandlers[120] = fn_800887C4;
-    gIGMessageHandlers[121] = fn_80088804;
-    gIGMessageHandlers[122] = fn_80088830;
-    gIGMessageHandlers[123] = fn_80088834;
-    gIGMessageHandlers[124] = fn_8008886C;
-    gIGMessageHandlers[125] = fn_80088AD4;
-    gIGMessageHandlers[126] = fn_80088CC4;
-    gIGMessageHandlers[127] = fn_80088CF0;
-    gIGMessageHandlers[128] = fn_80089324;
+    gIGMessageHandlers[117] = GM_vGetTargetShotInfo;
+    gIGMessageHandlers[118] = GM_vGetTargetHoleStat;
+    gIGMessageHandlers[120] = GM_vIsPausedForController;
+    gIGMessageHandlers[121] = GM_vShotClockOut;
+    gIGMessageHandlers[122] = GM_vCommand122_Empty;
+    gIGMessageHandlers[123] = GM_vGetStringLength;
+    gIGMessageHandlers[124] = GM_vGetRecordName;
+    gIGMessageHandlers[125] = GM_vGetRecordScore;
+    gIGMessageHandlers[126] = GM_vFormatWithCommas;
+    gIGMessageHandlers[127] = GM_vGetWrapupData;
+    gIGMessageHandlers[128] = GM_vGetRecordHolderName;
     gIGMessageHandlers[129] = fn_80089414;
     gIGMessageHandlers[130] = fn_800894B4;
     gIGMessageHandlers[131] = GM_vNoOp;
@@ -539,7 +539,7 @@ void IG_InitGameMessages(void) {
     gIGMessageHandlers[168] = fn_80089D98;
     gIGMessageHandlers[169] = fn_80089DB0;
     gIGMessageHandlers[170] = fn_80089E5C;
-    gIGMessageHandlers[171] = fn_8008879C;
+    gIGMessageHandlers[171] = GM_vIsDemoSetup;
     gIGMessageHandlers[172] = fn_80089E60;
     gIGMessageHandlers[173] = fn_80089E64;
     gIGMessageHandlers[174] = GM_vGetPlayerFirstName;
@@ -1720,7 +1720,7 @@ void GM_vTimerOut(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Whether the player is in the elevator camera.
-void fn_8008823C(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vGetPlayerUIElevator(MsgArg* pArgs, MsgArg* pResult) {
     if ((s8)GOLFERSTATE_GetCurrentState(pArgs[0].i) == GS_ELEVATOR) {
         pResult->i = 1;
         return;
@@ -1728,31 +1728,39 @@ void fn_8008823C(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-void fn_8008828C(MsgArg* pArgs, MsgArg* pResult) {
+// Speed golf's winner (-1 none), with the prize money into *pArgs[0] (command 99).
+// SpeedGolf_GetWinner pays the prize each time it is asked.
+void GM_vGetSpeedGolfWinner(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = SpeedGolf_GetWinner((s32*)pArgs[0].p);
 }
 
 // Whether the round plays every hole.
-void fn_800882C0(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vFullRound(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = GM_FullRoundOfGolf();
 }
 
-void fn_800882F4(MsgArg* pArgs, MsgArg* pResult) {
+// Speed golf's three prize limits for the course into *pArgs[0], *pArgs[1] and *pArgs[2]: a round
+// under them wins 1000, 2500 and 5000 (command 101; SpeedGolf_GetPrizeScores).
+void GM_vGetSpeedGolfPrizeScores(MsgArg* pArgs, MsgArg* pResult) {
     SpeedGolf_GetPrizeScores((s32*)pArgs[0].p, (s32*)pArgs[1].p, (s32*)pArgs[2].p);
 }
 
-void fn_80088324(MsgArg* pArgs, MsgArg* pResult) {
+// The holes left in the Play Now challenge group being played (command 102; PlayNow_GetHolesLeft).
+void GM_vGetChallengeHolesLeft(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = PlayNow_GetHolesLeft();
 }
 
-void fn_80088354(MsgArg* pArgs, MsgArg* pResult) {
+// Empty in this build: the UI's command 103.
+void GM_vCommand103_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80088358(MsgArg* pArgs, MsgArg* pResult) {
+// Empty in this build: the UI's command 104.
+void GM_vCommand104_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// The event's name and description: a real-time event's, else the challenge's.
-void fn_8008835C(MsgArg* pArgs, MsgArg* pResult) {
+// The event being played, its name into pArgs[0] and its description into pArgs[1] (command 105):
+// the real-time event's while one runs, else the Play Now challenge group's.
+void GM_vGetEventNameAndText(MsgArg* pArgs, MsgArg* pResult) {
     s32 nRound;
 
     if (GM_Currently_RealtimeMode()) {
@@ -1766,18 +1774,22 @@ void fn_8008835C(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[1].p)->pStr, PlayNow_GetGroupDescription(fn_800EAC7C()));
 }
 
-void fn_800883FC(MsgArg* pArgs, MsgArg* pResult) {
+// Plays UI sound pArgs[1] (command 106; Gaud_PlayGameUISound, which does not use pArgs[0]).
+void GM_vPlayUISound(MsgArg* pArgs, MsgArg* pResult) {
     Gaud_PlayGameUISound(pArgs[0].i, pArgs[1].i);
 }
 
-void fn_80088428(MsgArg* pArgs, MsgArg* pResult) {
+// Two-player speed golf: the players' names into pArgs[0] and pArgs[2], their points into *pArgs[1]
+// and *pArgs[3]; answers who gained points on the current hole, 0, 1 or -1 for neither (command
+// 107; SpeedGolfPoints_GetNamesAndPoints).
+void GM_vGetSpeedGolfPoints(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = SpeedGolfPoints_GetNamesAndPoints(((MsgString*)pArgs[0].p)->pStr, (s32*)pArgs[1].p,
                              ((MsgString*)pArgs[2].p)->pStr, (s32*)pArgs[3].p);
 }
 
 // The round's next hole after the current one: its number (-1: none), and into pArgs its par and
 // its length from player 0's tees.
-void fn_80088474(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vGM_NextHoleDetails(MsgArg* pArgs, MsgArg* pResult) {
     int nHole;
     s32 nPar = 0;
     s32 nLength = 0;
@@ -1793,22 +1805,29 @@ void fn_80088474(MsgArg* pArgs, MsgArg* pResult) {
     *(s32*)pArgs[1].p = nLength;
 }
 
-void fn_800884F0(MsgArg* pArgs, MsgArg* pResult) {
+// Speed golf's round score so far; the current hole's seconds, strokes and score into *pArgs[1],
+// *pArgs[2] and *pArgs[3] (command 109; SpeedGolf_GetRoundScore). pArgs[0]'s string goes in as its
+// first argument, which it does not read: the score is player 0's.
+void GM_vGetSpeedGolfRoundScore(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = SpeedGolf_GetRoundScore(((MsgString*)pArgs[0].p)->pStr, (s32*)pArgs[1].p, (s32*)pArgs[2].p,
                              (s32*)pArgs[3].p);
 }
 
-void fn_80088538(MsgArg* pArgs, MsgArg* pResult) {
+// Whether a player with controller pArgs[0] may use the menu now (command 110; fn_80085BC0).
+void GM_vCanControllerUseMenu(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = IG_IsControllerInPlay(pArgs[0].i);
 }
 
-void fn_80088570(MsgArg* pArgs, MsgArg* pResult) {
+// Looks at the card in port pArgs[0], slot pArgs[1] once, so its noted state is fresh
+// (MC_ConnectCard), and ends the card work (command 111).
+void GM_vIG_MCLookAtCard(MsgArg* pArgs, MsgArg* pResult) {
     MC_ConnectCard(pArgs[0].i, pArgs[1].i);
     MC_Disconnect();
 }
 
-// The same as GM_vIG_MCMemforReplay.
-void fn_800885A0(MsgArg* pArgs, MsgArg* pResult) {
+// The same as GM_vIG_MCMemforReplay (command 76), under command 112: the space a replay save still
+// needs on the card in port pArgs[0], slot pArgs[1].
+void GM_vIG_ReplaySpaceNeeded(MsgArg* pArgs, MsgArg* pResult) {
     CardPos pos;
 
     pos.nPort = pArgs[0].i;
@@ -1819,7 +1838,10 @@ void fn_800885A0(MsgArg* pArgs, MsgArg* pResult) {
     MC_Disconnect();
 }
 
-void fn_800885F8(MsgArg* pArgs, MsgArg* pResult) {
+// The pause menu closed (command 113): the game's sound resumes (Gaud_Pause(0)),
+// GUI_PauseMenuClosed runs, and, unless the fade to black is running, the lesson starts over
+// (Lessons_RestartLesson: in the lessons only).
+void GM_vPauseMenuClosed(MsgArg* pArgs, MsgArg* pResult) {
     Gaud_Pause(0);
     GUI_PauseMenuClosed();
     if (lbl_801D87C0.bFadeToBlack == 0) {
@@ -1827,16 +1849,21 @@ void fn_800885F8(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_80088634(MsgArg* pArgs, MsgArg* pResult) {
+// A quick cheer from the crowd (command 114; Gaud_FireQuickCheer).
+void GM_vQuickCheer(MsgArg* pArgs, MsgArg* pResult) {
     Gaud_FireQuickCheer();
 }
 
-void fn_80088654(MsgArg* pArgs, MsgArg* pResult) {
+// The UI's command 115: always answers 0 in this build.
+void GM_vCommand115_Returns0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-// The modes' questions, picked by pArgs[2].
-void fn_80088660(MsgArg* pArgs, MsgArg* pResult) {
+// The target modes' HUD numbers for player pArgs[0], picked by pArgs[2] (command 117): 0 make mode
+// 12's list of the surfaces scored on this shot, 1 its length, 2 entry pArgs[1] of it, 3 that
+// entry's hits; 4 the points, 5 the seconds and 6 the balls the last shot earned, 7 the bonus
+// multiplier. Another pArgs[2] leaves *pResult alone.
+void GM_vGetTargetShotInfo(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[2].i) {
     case 0:
         GameMode12_ListScoredSurfaces(pArgs[0].i);
@@ -1865,7 +1892,10 @@ void fn_80088660(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_80088730(MsgArg* pArgs, MsgArg* pResult) {
+// A player's number for the target modes, picked by pArgs[1] (command 118): 0 his scoring shots on
+// the current hole (Player.nD70, counted by modes 12, 13, 14 and 17). Another pArgs[1] leaves
+// *pResult alone.
+void GM_vGetTargetHoleStat(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[1].i) {
     case 0:
         pResult->i = gPlayers[pArgs[0].i].nD70[Game_CurHoleIndex()];
@@ -1873,7 +1903,8 @@ void fn_80088730(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_8008879C(MsgArg* pArgs, MsgArg* pResult) {
+// Whether the session runs the demo set-up (gSession.uFlags 0x4000) (command 171).
+void GM_vIsDemoSetup(MsgArg* pArgs, MsgArg* pResult) {
     if (gSession.uFlags & 0x4000) {
         pResult->i = 1;
         return;
@@ -1881,7 +1912,9 @@ void fn_8008879C(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-void fn_800887C4(MsgArg* pArgs, MsgArg* pResult) {
+// Whether the round (game type 6) is paused for a pulled controller (gSession.nPaused 2, or 3,
+// which nothing in this build sets) (command 120).
+void GM_vIsPausedForController(MsgArg* pArgs, MsgArg* pResult) {
     if (gSession.nGameType == 6 && (gSession.nPaused == 2 || gSession.nPaused == 3)) {
         pResult->i = 1;
         return;
@@ -1889,23 +1922,28 @@ void fn_800887C4(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-void fn_80088804(MsgArg* pArgs, MsgArg* pResult) {
+// The shot clock ran out (command 121): in a target mode, GameModeSkillZoneBase_ShotClockOut; else
+// nothing.
+void GM_vShotClockOut(MsgArg* pArgs, MsgArg* pResult) {
     if (GM_Currently_SkillZoneMode()) {
         GameModeSkillZoneBase_ShotClockOut();
     }
 }
 
-void fn_80088830(MsgArg* pArgs, MsgArg* pResult) {
+// Empty in this build: the UI's command 122.
+void GM_vCommand122_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // A string's length.
-void fn_80088834(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vGetStringLength(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = strlen(((MsgString*)pArgs[0].p)->pStr);
 }
 
-// A record holder's name: pArgs[0] 3 is the contest's, 0 the all-time records' (kind pArgs[1]),
-// else the mode's records or the course's; pArgs[2] is the place.
-void fn_8008886C(MsgArg* pArgs, MsgArg* pResult) {
+// A record holder's name into pArgs[3]; pArgs[2] is the place (0..4) (command 124). pArgs[0] 3: the
+// hole contest's result table; 0: the all-time records of kind pArgs[1] (recA); else by mode: 16,
+// 17 and 13 the current hole's records (recB kinds 0, 1, 2), 22 the long-drive hole's (recC, by the
+// mode's variant 0 or 1), any other the course's records of kind pArgs[1].
+void GM_vGetRecordName(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[0].i == 3) {
         sprintf(((MsgString*)pArgs[3].p)->pStr, "%s", HoleContest_GetPlaceName(pArgs[2].i));
         return;
@@ -1940,8 +1978,9 @@ void fn_8008886C(MsgArg* pArgs, MsgArg* pResult) {
             gSession.aCourseRecord[Game_GetCourse()].aRecord[pArgs[1].i][pArgs[2].i].szName);
 }
 
-// The same records' values.
-void fn_80088AD4(MsgArg* pArgs, MsgArg* pResult) {
+// The value of the record GM_vGetRecordName names, with the same arguments (command 125); for the
+// hole contest (pArgs[0] 3) the place's drive length or distance from the pin in feet, -1 for none.
+void GM_vGetRecordScore(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[0].i == 3) {
         pResult->i = HoleContest_GetPlaceDistance(pArgs[2].i);
         return;
@@ -1973,13 +2012,20 @@ void fn_80088AD4(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gSession.aCourseRecord[Game_GetCourse()].aRecord[pArgs[1].i][pArgs[2].i].nValue;
 }
 
-// Print a number with commas.
-void fn_80088CC4(MsgArg* pArgs, MsgArg* pResult) {
+// pArgs[0] printed into pArgs[1] with thousands commas, "12,345" (command 126; fn_800907AC).
+void GM_vFormatWithCommas(MsgArg* pArgs, MsgArg* pResult) {
     fn_800907AC(pArgs[0].i, ((MsgString*)pArgs[1].p)->pStr);
 }
 
-// A player's money for the round by kind, and the multipliers that made it, picked by pArgs[1].
-void fn_80088CF0(MsgArg* pArgs, MsgArg* pResult) {
+// The end-of-round money screen's numbers for player pArgs[0], picked by pArgs[1] (command 127): 0
+// the points, 1 the payout, 2..5 what the course, pin set, tee and TOUR card multipliers added, 6
+// money.n38, 7 money.n3C, 8..15 money.n0 to n1C (8 the payout, 9 a tournament's prize, 10 bonuses,
+// 11 a ladder prize, 12 to 15 money.n10 to n1C, the match, skins and speed golf money); 16 his
+// profile's money less this payout; 100 the course multiplier less 1; 101 the hole's pin set; 102
+// the tee set's rank (tee sets 0..3 give 2, 1, 0, 1); 103 the TOUR card percentage for his card
+// level; 104 that level, 1..6 (0 counts as 1); 200 2 when any of money.n4 to n1C is set, else 1.
+// 16, 103 and 104 answer 0 without a profile in use.
+void GM_vGetWrapupData(MsgArg* pArgs, MsgArg* pResult) {
     int nMult;
 
     switch (pArgs[1].i) {
@@ -2147,9 +2193,9 @@ void fn_80088CF0(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// A record holder's name, with its string's length: pArgs[0] 0 is the all-time records, else the
-// course's.
-void fn_80089324(MsgArg* pArgs, MsgArg* pResult) {
+// A record holder's name into pArgs[3], and its length into pArgs[3]'s nLen (command 128): pArgs[0]
+// 0 the all-time records (recA), else the course's; pArgs[1] is the kind, pArgs[2] the place.
+void GM_vGetRecordHolderName(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[0].i == 0) {
         sprintf(((MsgString*)pArgs[3].p)->pStr, "%s", gSession.recA[pArgs[1].i][pArgs[2].i].szName);
     } else {
@@ -2592,7 +2638,7 @@ void fn_8008A0CC(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8008A128(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800885F8(NULL, NULL);
+    GM_vPauseMenuClosed(NULL, NULL);
     if (!PlayNow_IsChallengeRunning()) {
         fn_8006F4E0();
     }

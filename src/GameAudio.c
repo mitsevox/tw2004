@@ -1787,7 +1787,7 @@ void Gaud_Pause(u8 bOn) {
 }
 
 // Plays UI sound n: step n of the UI sound emitter's track 0 (lbl_8028141B). a is unused. A UI
-// script command (GameUICommands.c fn_800883FC) and Gaud_Pause (n 1, the pause sound) call it.
+// script command (GameUICommands.c GM_vPlayUISound) and Gaud_Pause (n 1, the pause sound) call it.
 void Gaud_PlayGameUISound(u8 a, int n) {
     Aud_EmiSetTrackStep(lbl_8028141B, 0, n, 0);
 }

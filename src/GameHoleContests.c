@@ -406,13 +406,13 @@ void HoleContest_RankResults(void) {
 }
 
 // The name at place nPlace (0-based) of the contest's result table, for the UI's record list
-// (GameUICommands.c fn_8008886C, record kind 3).
+// (GameUICommands.c GM_vGetRecordName, record kind 3).
 char* HoleContest_GetPlaceName(int nPlace) {
     return gHoleContestPlaceName[nPlace];
 }
 
 // The result at place nPlace (0-based) of the contest's result table: the drive's length or the
-// distance from the pin in feet, -1 none (GameUICommands.c fn_80088AD4, record kind 3).
+// distance from the pin in feet, -1 none (GameUICommands.c GM_vGetRecordScore, record kind 3).
 s32 HoleContest_GetPlaceDistance(int nPlace) {
     return gHoleContestPlaceDistance[nPlace];
 }

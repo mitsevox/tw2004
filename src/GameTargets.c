@@ -142,7 +142,7 @@ void GameModeSkillZoneBase_TimerOut(void) {
     }
 }
 
-// The shot clock ran out (UI command fn_80088804, in a target mode): modes 14 and 15 forfeit the
+// The shot clock ran out (UI command GM_vShotClockOut, in a target mode): modes 14 and 15 forfeit the
 // shot (GameModeSkillZoneCapture_ShotClockOut, GameModeSkillZoneHorse_ShotClockOut); the other
 // target modes do nothing.
 void GameModeSkillZoneBase_ShotClockOut(void) {
@@ -299,7 +299,7 @@ u8 GameModeSkillZoneBase_FirstShot(int nPlayer) {
     return 0;
 }
 
-// The points the last shot earned, for the HUD (UI command fn_80088660, case 4): the getter of mode
+// The points the last shot earned, for the HUD (UI command GM_vGetTargetShotInfo, case 4): the getter of mode
 // 13, 14, 16 or 17 (which ignore the player), else 0.
 s32 GameModeSkillZoneBase_GetShotEarned(s32 nPlayer) {
     if (Game_GetMode() == 0xD) {
@@ -317,7 +317,7 @@ s32 GameModeSkillZoneBase_GetShotEarned(s32 nPlayer) {
     return 0;
 }
 
-// The seconds the last shot added, for the HUD (UI command fn_80088660, case 5): mode 13's only,
+// The seconds the last shot added, for the HUD (UI command GM_vGetTargetShotInfo, case 5): mode 13's only,
 // else 0.
 s32 GameModeSkillZoneBase_GetTimeEarned(s32 nPlayer) {
     if (Game_GetMode() == 0xD) {
@@ -326,7 +326,7 @@ s32 GameModeSkillZoneBase_GetTimeEarned(s32 nPlayer) {
     return 0;
 }
 
-// The bonus multiplier for the HUD (UI command fn_80088660, case 7): mode 13's or mode 16's, else
+// The bonus multiplier for the HUD (UI command GM_vGetTargetShotInfo, case 7): mode 13's or mode 16's, else
 // 0.
 s32 GameModeSkillZoneBase_GetDriveMultiplier(s32 nPlayer) {
     if (Game_GetMode() == 0xD) {
@@ -338,7 +338,7 @@ s32 GameModeSkillZoneBase_GetDriveMultiplier(s32 nPlayer) {
     return 0;
 }
 
-// The balls the last shot earned, for the HUD (UI command fn_80088660, case 6): mode 17's only,
+// The balls the last shot earned, for the HUD (UI command GM_vGetTargetShotInfo, case 6): mode 17's only,
 // else 0.
 s32 GameModeSkillZoneBase_GetExtraBallsEarned(s32 nPlayer) {
     if (Game_GetMode() == 0x11) {

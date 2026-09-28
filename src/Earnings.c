@@ -1563,7 +1563,7 @@ s32 GM_Earnings_ComputeBonusModifiers(s32 nPoints, int nPlayer, u8 bCourse, u8 b
 // The current course's payout multiplier from the prize table (EARN_MULT_COURSE), a whole number
 // (x1..x4); 1 for a course the table does not list. Course 7 has three, picked by
 // Game_GetCurHoleNum (0..2). GM_Earnings_ComputeBonusModifiers and a menu message (GameUICommands.c
-// fn_80088CF0) read it.
+// GM_vGetWrapupData) read it.
 f32 GM_Earnings_GetCourseModifier(void) {
     f32 fMult;
 

@@ -146,7 +146,7 @@ typedef struct CoursePrice {
 
 #define NUM_COURSE_PRICES 24    // the 'ERN ' data has 24 rows (0x114..0x1D4): GM_Earnings_CheckUnlockCourses reads 0..20, 21 and 23
 
-// The payout multipliers are one table of 29 (EarningsTable.aMult; GameUICommands.c's fn_80088CF0
+// The payout multipliers are one table of 29 (EarningsTable.aMult; GameUICommands.c's GM_vGetWrapupData
 // indexes it across the groups). Where each group starts:
 #define EARN_MULT_COURSE 0      // 16: the course multiplier (x1..x4) per course, in GM_Earnings_GetCourseModifier's order
 #define EARN_MULT_TEE    16     // 3: the tee percentage, as [2 - nTeeSet] (tee set 3 pays as 1)
