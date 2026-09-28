@@ -693,14 +693,15 @@ s32 Earnings_GetLieBit(int n) {
 // working tables with what they give: awards (trophy balls, GM_Earnings_AwardThisTrophyBallToUser;
 // lbl_80282250 of them, in lbl_802002B8 with their values in lbl_80200240) and money prizes
 // (lbl_80282254 of them: lbl_80200330 as found, lbl_802003A8 after
-// GM_Earnings_ComputeBonusModifiers and, with uMults bit 3, GM_Earnings_ComputeTOURCardModifiers; message ids lbl_80200420, breakdowns lbl_801FFAE8). Of
-// goals with the same nonzero id only the one with the biggest nValue is kept. Nothing is found
-// with the session's debug flag 0x4000, for a player who cannot earn
-// (GM_Earnings_AwardShotBonusToUser), in a lesson or with mulligans; during a challenge that is not
-// a ladder event only goals with mode bit 5 count. With pBall the check runs on that ball in place
-// of the player's own. With bPreview (a what-if from HoleScore or Earnings_CheckShotAwards) the shot is not counted yet (one stroke fewer), the PGA TOUR
-// awards (23..38) are left out and no EA Sports Bio accomplishment is posted; with bPreview and no
-// ball the tests on the ball are skipped too.
+// GM_Earnings_ComputeBonusModifiers and, with uMults bit 3, GM_Earnings_ComputeTOURCardModifiers;
+// message ids lbl_80200420, breakdowns lbl_801FFAE8). Of goals with the same nonzero id only the
+// one with the biggest nValue is kept. Nothing is found with the session's debug flag 0x4000, for a
+// player who cannot earn (GM_Earnings_AwardShotBonusToUser), in a lesson or with mulligans; during
+// a challenge that is not a ladder event only goals with mode bit 5 count. With pBall the check
+// runs on that ball in place of the player's own. With bPreview (a what-if from HoleScore or
+// Earnings_CheckShotAwards) the shot is not counted yet (one stroke fewer), the PGA TOUR awards
+// (23..38) are left out and no EA Sports Bio accomplishment is posted; with bPreview and no ball
+// the tests on the ball are skipped too.
 void GM_Earnings_CheckShotGoals(int nPlayer, Ball* pBall, u8 bPreview) {
     s32 aPrizeIds[10];
     s32 aAwardIds[10];
@@ -872,8 +873,8 @@ u8 Earnings_TestBit(u32 uMask, int nBit) {
 // player who cannot earn (GM_Earnings_AwardShotBonusToUser), during a challenge that is not a
 // ladder event, or with mulligans. While it runs the holes still to come count 999 strokes and
 // putts (0 afterwards). With bPreview (a what-if from HoleScore or Earnings_CheckPuttAwards) the
-// hole counts one more stroke and putt (the ball dropping now), flag tests 2 and 5 are skipped, the PGA TOUR awards (23..38)
-// are left out and no EA Sports Bio accomplishment is posted.
+// hole counts one more stroke and putt (the ball dropping now), flag tests 2 and 5 are skipped, the
+// PGA TOUR awards (23..38) are left out and no EA Sports Bio accomplishment is posted.
 void GM_Earnings_CheckPuttGoals(int nPlayer, u8 bPreview) {
     s32 aPrizeIds[10];
     s32 aAwardIds[10];
