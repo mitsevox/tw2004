@@ -3,6 +3,10 @@
     python tools/match/hotnames.py --top N         the top N
     python tools/match/hotnames.py --unit NAME     only functions defined in that unit
     python tools/match/hotnames.py --tsv           every unnamed function, tab-separated
+    python tools/match/hotnames.py --unit X --todo the file's functions not yet reviewed, in address order
+                                                   (a file larger than one batch continues where the last stopped)
+    python tools/match/hotnames.py --units --log   ... and append the totals to
+                                                   config/GW4E69/readability_progress.tsv (after every round)
     python tools/match/hotnames.py --units         per source file: named, commented, done (the
                                                    naming lanes' territory map; worst files first)
 A function is done when it has a real name and, if its body is longer than 3 lines, a comment
@@ -88,7 +92,7 @@ def reviewed_names():
     return names
 
 
-def units_report(unit_of, sites):
+def units_report(unit_of, sites, log=False):
     seen = reviewed_names()
     by_unit = collections.defaultdict(list)
     for n, u in unit_of.items():
@@ -112,6 +116,26 @@ def units_report(unit_of, sites):
           f'commented {tot[3]}/{tot[2]} that need one ({100 * tot[3] / max(tot[2], 1):.1f}%), '
           f'done {tot[4]} ({100 * tot[4] / tot[0]:.1f}%), reviewed by a naming lane {tot[5]} '
           f'({100 * tot[5] / tot[0]:.1f}%)')
+    passed = sorted(r[1] for r in rows if r[8] == r[2])
+    print(f'files through the full pass (every function reviewed): {len(passed)} of {len(rows)}'
+          + (': ' + ', '.join(passed) if passed else ''))
+    if log:
+        import datetime, subprocess
+        sha = subprocess.run(['git', 'rev-parse', '--short', 'HEAD'], cwd=ROOT, capture_output=True,
+                             text=True).stdout.strip()
+        total = sum(sites.values())
+        cov = 100 * sum(v for n, v in sites.items() if not PLACEHOLDER.match(n)) / total
+        f = ROOT / 'config/GW4E69/readability_progress.tsv'
+        new = not f.exists()
+        with open(f, 'a', encoding='utf-8') as out:
+            if new:
+                out.write('# Readability pass progress (hotnames.py --units --log, after every round)\n'
+                          'date\tcommit\tfunctions\tnamed\tcommented\tneed_comment\tdone\treviewed\t'
+                          'files_passed\tfiles\tcall_coverage%\n')
+            out.write('\t'.join(map(str, [datetime.datetime.now().strftime('%Y-%m-%d %H:%M'), sha,
+                                            tot[0], tot[1], tot[3], tot[2], tot[4], tot[5], len(passed),
+                                            len(rows), f'{cov:.2f}'])) + '\n')
+        print(f'logged to {f.relative_to(ROOT)}')
     print(f'\n{"done%":>6} {"fns":>5} {"named":>5} {"cmt":>9} {"reviewed":>8} {"unnamed calls":>13}  file')
     for d, u, n, named, need, cmt, done, calls, rev in sorted(rows):
         print(f'{100 * d:6.1f} {n:5} {named:5} {cmt:4}/{need:<4} {rev:8} {calls:13}  {u}')
@@ -142,7 +166,26 @@ def main():
     rows = sorted(((sites[n], fan_in[n], n) for n in unnamed_fns
                    if only is None or unit_of[n] == only), reverse=True)
     if '--units' in args:
-        units_report(unit_of, sites)
+        units_report(unit_of, sites, log='--log' in args)
+        return
+    if '--todo' in args:
+        if not only:
+            sys.exit('--todo needs --unit NAME')
+        seen = reviewed_names()
+        addr = {}
+        for l in (ROOT / 'config/GW4E69/symbols.txt').read_text(encoding='utf-8').splitlines():
+            m = re.match(r'^(\S+) = \.text:0x([0-9A-Fa-f]+);', l)
+            if m:
+                addr[m.group(1)] = int(m.group(2), 16)
+        state = comment_state(ROOT / 'src' / (only + '.c')) if (ROOT / 'src' / (only + '.c')).exists() else {}
+        fns = sorted((addr.get(n, 0), n) for n, u in unit_of.items() if u == only)
+        todo = [(a, n) for a, n in fns if n not in seen]
+        print(f'{only}: {len(fns)} functions, {len(fns) - len(todo)} reviewed, {len(todo)} to go '
+              f'(address order; take them from the top)')
+        for a, n in todo:
+            lines, has = state.get(n, (0, False))
+            print(f'  {a:08X}  {n:<40} {lines:4} lines  {"comment" if has else "no comment"}  '
+                  f'{sites[n]} call sites')
         return
     if '--tsv' in args:
         print('calls\tunits_calling\tname\tunit\tn1_suggestion')

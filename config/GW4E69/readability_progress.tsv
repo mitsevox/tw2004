@@ -1,0 +1,3 @@
+# Readability pass progress (hotnames.py --units --log, after every round)
+date	commit	functions	named	commented	need_comment	done	reviewed	files_passed	files	call_coverage%
+2026-09-28 00:12	2625d4c	6641	1924	3291	3987	1732	328	0	272	70.89
