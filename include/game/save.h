@@ -35,7 +35,7 @@ typedef struct SeasonEvent {
 
 // One golfer's season counts, from which each tour statistic is worked out (0x58 bytes). The
 // profile keeps one per tour golfer (PGATourSimulation.c simulates the pros'); the player's round
-// is counted in lbl_80205ED8 and added to the player's own (GameModeDriverPGATour fn_800EED0C).
+// is counted in gPgaRoundStats and added to the player's own (GameModeDriverPGATour fn_800EED0C).
 // TW06: GM_Pga_StatCounts, which has three more counts (water saves, water hits, long putts)
 // between nNonGIRPars and nEagles.
 typedef struct PgaStatCounts {

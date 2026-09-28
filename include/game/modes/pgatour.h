@@ -57,7 +57,7 @@ typedef struct PgaData {
 
 // The current round's statistics: cleared as each round of a tournament starts (fn_800EE2C8),
 // added to the player's season counts in the profile as it ends (fn_800EED0C).
-extern PgaStatCounts lbl_80205ED8;
+extern PgaStatCounts gPgaRoundStats;
 
 typedef struct Pga80205F30 {
     u8   b0;                    // 0x0

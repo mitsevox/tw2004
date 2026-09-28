@@ -11,17 +11,17 @@
 
 // PGA TOUR driver state; only this file uses it. The uninitialised ones are defined last address
 // first: the compiler lays out a file's .bss and .sbss last definition first.
-s32 lbl_80281670 = 4;           // the options' nC from before the tour (fn_800EE02C puts it back)
-s32 lbl_80281674 = 1;           // the options' n18 from before a tour round (fn_800EE0A0 keeps it)
+s32 gPgaSavedOptionsC = 4;           // the options' nC from before the tour (fn_800EE02C puts it back)
+s32 gPgaSavedOptions18 = 1;           // the options' n18 from before a tour round (fn_800EE0A0 keeps it)
 
 PgaData gPgaData;
-Pga80205F30 lbl_80205F30;
-PgaStatCounts lbl_80205ED8;
+Pga80205F30 gPgaWinInfo;
+PgaStatCounts gPgaRoundStats;
 
-s32 lbl_80282340;               // the playoff hole index: set to 16, each playoff moves it on
+s32 gPgaPlayoffHole;               // the playoff hole index: set to 16, each playoff moves it on
                                 //   (17, 15, 16, 17, ...; GameModeDriverPGATour_GoToPlayoff)
-u8  lbl_8028233C;               // 1 while the tour runs
-s32 lbl_80282338;               // the options' nWind from before the tour (fn_800EE02C puts it back)
+u8  gbPgaTourRoundActive;               // 1 while the tour runs
+s32 gPgaSavedWind;               // the options' nWind from before the tour (fn_800EE02C puts it back)
 
 // Not in a C unit yet
 void fn_800907AC(s32 nMoney, char* pDst);               // money as text
@@ -133,9 +133,9 @@ void GameModeDriverPGATour_Locale_PgaTourMode_LoadPGAnFromStream(UStreamObject* 
 void fn_800EE02C(void) {
     gpGame->nC = 1;
     gpGame->n10 = 1;
-    gSession.options.nC = lbl_80281670;
-    gSession.options.nWind = lbl_80282338;
-    lbl_8028233C = 0;
+    gSession.options.nC = gPgaSavedOptionsC;
+    gSession.options.nWind = gPgaSavedWind;
+    gbPgaTourRoundActive = 0;
 }
 
 // The current tournament's number of rounds goes into the game state.
@@ -145,7 +145,7 @@ void fn_800EE064(void) {
 }
 
 // The course of the tournament format i's current round: everyone plays its tee set, every hole its
-// pin position, and its GameOptions.n18 replaces the player's (kept in lbl_80281674).
+// pin position, and its GameOptions.n18 replaces the player's (kept in gPgaSavedOptions18).
 // The tee set is written back to the tournament unchanged; the original has that store.
 void fn_800EE0A0(s32 i) {
     PlayerNumber_t nPlayer = PLR_1_e;
@@ -163,7 +163,7 @@ void fn_800EE0A0(s32 i) {
     for (h = 0; h < 18; h++) {
         gpGame->nPinSet[h] = gPgaData.aTourEvent[i].aRound[gpSaveData[nPlayer].tour.nRound].nPinSet - 1;
     }
-    lbl_80281674 = gSession.options.n18;
+    gPgaSavedOptions18 = gSession.options.n18;
     gSession.options.n18 = (u8)gPgaData.aTourEvent[i].aRound[gpSaveData[nPlayer].tour.nRound].n8;
     fn_80055C40(gSession.options.n18);
 }
@@ -174,15 +174,15 @@ void fn_800EE0A0(s32 i) {
 void fn_800EE2C8(void) {
     PlayerNumber_t nPlayer = PLR_1_e;
     s32 nEvent = gpSaveData[nPlayer].tour.nEvent;
-    PgaStatCounts* pRec = &lbl_80205ED8;
+    PgaStatCounts* pRec = &gPgaRoundStats;
     s32 nFormat;
-    lbl_80281670 = gSession.options.nC;
-    lbl_80282338 = gSession.options.nWind;
+    gPgaSavedOptionsC = gSession.options.nC;
+    gPgaSavedWind = gSession.options.nWind;
     gSession.options.nC = 4;
     gSession.options.nWind = 0;
-    lbl_8028233C = 1;
-    lbl_80282340 = 16;
-    lbl_80205F30.b0 = 0;
+    gbPgaTourRoundActive = 1;
+    gPgaPlayoffHole = 16;
+    gPgaWinInfo.b0 = 0;
     if (gPgaData.aTournament[nEvent].nTourEvent) {
         gSession.nNumPlayers = 1;
         gpGame->nDC = gpSaveData[nPlayer].tour.nRound;
@@ -202,7 +202,7 @@ void fn_800EE2C8(void) {
 }
 
 u8 fn_800EE470(void) {
-    return lbl_8028233C;
+    return gbPgaTourRoundActive;
 }
 
 // A profile, and its current tournament. fake match: fn_800EE478 reaches the profile through these
@@ -288,7 +288,7 @@ s32 fn_800EE8B0(int nPlayer) {
 }
 
 Pga80205F30* fn_800EE8B8(void) {
-    return &lbl_80205F30;
+    return &gPgaWinInfo;
 }
 
 // The message after a tournament the player won: the first win, then either three wins of the
@@ -298,7 +298,7 @@ void fn_800EE8C4(void) {
     Tournament* p = GameModeDriverPGATour_GetEventInfo(gpSaveData[nPlayer].tour.nEvent);
     int i;
     int nWins;
-    if (lbl_80205F30.b0 == 1) {
+    if (gPgaWinInfo.b0 == 1) {
         if (GameModeDriverPGATour_GetNumEventsWon() == 0) {
             GUI_QueueMessage(5, 31, 0, 0);
         }
@@ -374,7 +374,7 @@ void fn_800EEB94(int nPlayer) {
 // The round's statistics go into the player's own season counts (golfer PGA_USER_GOLFER): most
 // are added, the longest drive and putt keep the higher value.
 void fn_800EED0C(s32 nPlayer) {
-    PgaStatCounts* pRound = &lbl_80205ED8;
+    PgaStatCounts* pRound = &gPgaRoundStats;
     PgaStatCounts* pTotal = &gpSaveData[nPlayer].tour.aStats[PGA_USER_GOLFER];
     pTotal->nEvents += pRound->nEvents;
     pTotal->nRounds += pRound->nRounds;
@@ -441,9 +441,9 @@ void fn_800EEF88(s32 nPlayer) {
 }
 
 void fn_800EF094(int a, s32 n) {
-    lbl_80205F30.b0 = 1;
-    lbl_80205F30.n4 = GM_PgaTourSim_GetScoreRankFromEntrantID(a, 0);
-    lbl_80205F30.n8 = n;
+    gPgaWinInfo.b0 = 1;
+    gPgaWinInfo.n4 = GM_PgaTourSim_GetScoreRankFromEntrantID(a, 0);
+    gPgaWinInfo.n8 = n;
 }
 
 // The player's bracket, 0..9: tournaments won x 10 / 31 (profile 0's awards; nPlayer is not read).
@@ -484,7 +484,7 @@ void fn_800EF294(void) {
 }
 
 // Called by its slot. Outside a playoff, the hole just finished goes
-// into the round's statistics (lbl_80205ED8): strokes and putts, the hole's result against par,
+// into the round's statistics (gPgaRoundStats): strokes and putts, the hole's result against par,
 // counts per par 3, 4 and 5, and the longest values; after the 18th hole the profile's tour.n4E98 run
 // goes on or ends. Then the tour simulation (fn_801198F8) is given the next hole. The u16 casts on
 // the sums are in the original (a clrlwi before each add).
@@ -502,7 +502,7 @@ void GameModeDriverPGATour_EndHole(void) {
     if (gpGame->bD4) {
         return;
     }
-    pRound = &lbl_80205ED8;
+    pRound = &gPgaRoundStats;
     nPlayer = PLR_1_e;
     p = &gPlayers[0];
     nHole = Game_CurHoleIndex();
@@ -629,12 +629,12 @@ u8 GameModeDriverPGATour_GoToPlayoff(u8 bCheck) {
                 PLAYER(i)->nModePoints[h] = 0;
             }
         }
-        lbl_80282340++;
-        if (lbl_80282340 > 17) {
-            lbl_80282340 = 15;
+        gPgaPlayoffHole++;
+        if (gPgaPlayoffHole > 17) {
+            gPgaPlayoffHole = 15;
         }
         GM_SelectHoleSet(0);
-        GM_SelectSingleHole(lbl_80282340);
+        GM_SelectSingleHole(gPgaPlayoffHole);
         gpGame->bD4 = 1;
         GUI_GolfersTiedUIMessage();
     }
@@ -1006,7 +1006,7 @@ s32 GameModeDriverPGATour_DisplayEndOfHoleMessage(char* pDst) {
     if (gpGame->bD4 && GM_PgaTourSim_EntrantIsInPlayoff(0, 0) && GM_PgaTourSim_GetNumPlayoffEntrants(0) > 1) {
         sprintf(pDst, "TOURNAMENT PLAYOFF\n\nYou're tied for first place. You must beat\n"
                       "your opponent's score of %d on the playoff\nhole to win.",
-                GM_PgaTourSim_GetBestOpponentPlayoffHoleScore(0, lbl_80282340));
+                GM_PgaTourSim_GetBestOpponentPlayoffHoleScore(0, gPgaPlayoffHole));
         return 1;
     }
     return 0;
