@@ -1930,10 +1930,10 @@ f32 Vec4_LengthSqClamped(f32* pV) {
     return f;
 }
 
-// The lesson being played in game mode 11 (lbl_802823FC: 1..11, 12 when all are done). The swing's
+// The lesson being played in game mode 11 (gLessonNum: 1..11, 12 when all are done). The swing's
 // trail and IK read it to pull a CPU demonstrator's stick hard to one side in lessons 8 and 9.
 int GM_GetCurrentLesson(void) {
-    return lbl_802823FC;
+    return gLessonNum;
 }
 
 // The texture of the next draw: entry pTex of bank pBank (gRenderState.pTexBank, pTexEntry; uFlags

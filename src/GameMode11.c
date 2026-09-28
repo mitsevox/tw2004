@@ -1,6 +1,6 @@
 // GameMode11.c (our name): game mode 11, the lessons. One player on hole 14 of course 10; eleven
-// lessons (lbl_802823FC, 1..11; 12 when all are done), each a shot from a set spot with its own
-// shot kind, club and shape (lbl_80192DF8). The mode saves some of the player's options when it
+// lessons (gLessonNum, 1..11; 12 when all are done), each a shot from a set spot with its own
+// shot kind, club and shape (gLessons). The mode saves some of the player's options when it
 // starts and puts them back when it ends. Golfer.c, Swing.c and skalib.c ask it what the lesson
 // allows.
 
@@ -20,19 +20,19 @@ typedef struct Lesson {
     s32 nShape;                 // 0x18  7 = any
 } Lesson;
 
-// Each lesson's animation (index 0 unused), picked by fn_801008A8: lbl_80192D98 from step 6 on
-// (the player's tries), lbl_80192DC8 before it (the demonstration). Only lesson 6 differs.
-char* lbl_80192D98[12] = {
+// Each lesson's animation (index 0 unused), picked by fn_801008A8: gLessonTryAnims from step 6 on
+// (the player's tries), gLessonDemoAnims before it (the demonstration). Only lesson 6 differs.
+char* gLessonTryAnims[12] = {
     "tdlpre01", "tdlpre04", "gdlpre03", "gdlpre53", "g3lpre02", "g3lpre01",
     "g3lpre03", "gplpre51", "tdlpre04", "tdlpre05", "tdlpre04", "g3lpre04",
 };
-char* lbl_80192DC8[12] = {
+char* gLessonDemoAnims[12] = {
     "tdlpre01", "tdlpre04", "gdlpre03", "gdlpre53", "g3lpre02", "g3lpre01",
     "g3lpre02", "gplpre51", "tdlpre04", "tdlpre05", "tdlpre04", "g3lpre04",
 };
 
-// The lessons, indexed by lbl_802823FC - 1.
-Lesson lbl_80192DF8[11] = {
+// The lessons, indexed by gLessonNum - 1.
+Lesson gLessons[11] = {
     {{-1.0f, -1.0f, -1.0f, 1.0f}, 8, 26, 7},
     {{-372.0f, 0.0f, 324.0f, 1.0f}, 3, 26, 7},
     {{-406.9f, 0.0f, 312.5f, 1.0f}, 5, 26, 7},
@@ -46,8 +46,8 @@ Lesson lbl_80192DF8[11] = {
     {{-407.0f, 0.0f, 340.0f, 1.0f}, 8, 26, 7},
 };
 
-// The lessons' message lists: 16 message ids per row (-1 = none); lbl_80282420 is the lesson's row.
-s16 lbl_80192F2C[12 * 16] = {
+// The lessons' message lists: 16 message ids per row (-1 = none); gLessonLineRow is the lesson's row.
+s16 gLessonLines[12 * 16] = {
     3, 4, 5, -1, -1, -1, -1, -1, 6, 7, 8, 9, 10, 11, 12, -1,
     -1, 13, 14, 15, 16, 17, -1, -1, 6, 7, 8, 18, 19, 20, 21, 12,
     -1, 22, 23, 24, 25, 26, -1, -1, 6, 7, 8, 18, -1, 20, 21, 12,
@@ -62,35 +62,35 @@ s16 lbl_80192F2C[12 * 16] = {
     60, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 };
 
-s32 lbl_802816D8 = 4;                    // the options' nC, saved while the mode runs
-s32 lbl_80282428;                    // the lesson's step
-s32 lbl_80282424;
-s32 lbl_80282420;                    // the lesson's row in lbl_80192F2C
-s32 lbl_8028241C;
-s32 lbl_80282418;
-s32 lbl_80282414;                    // frames until the two alternating hints swap
-s32 lbl_80282410;                    // frames until the next highlight
-s32 lbl_8028240C;                    // the highlighted one of four hints (4 = none yet)
-u8  lbl_8028240B;                    // options unk0[4], saved
-u8  lbl_8028240A;                    // options unk84, saved
-u8  lbl_80282409;                    // the boost option, saved
-u8  lbl_80282408;                    // the spin option, saved
-s32 lbl_80282404;                    // player 0's controller, kept while the CPU demonstrates
-f32 lbl_80282400;                    // lessons 8 and 9 test its sign
-s32 lbl_802823FC;
-u8  lbl_802823F8;
-s32 lbl_802823F4;
-u8  lbl_802823F2;                    // which of the two alternating hints is showing
-u8  lbl_802823F1;                    // the player's try has set up its hints
-u8  lbl_802823F0;
-s32 lbl_802823EC;                    // the wind option, saved while the mode runs
-u32 lbl_802823E8;                    // picks which message of a list is shown
-u8  lbl_802823E5;
-u8  lbl_802823E4;
-u8  lbl_802823E3;
-u8  lbl_802823E2;
-u8  lbl_802823E1;
-u8  lbl_802823E0;
+s32 gLessonSavedOptionC = 4;                    // the options' nC, saved while the mode runs
+s32 gLessonStep;                    // the lesson's step
+s32 gLessonNextStep;
+s32 gLessonLineRow;                    // the lesson's row in gLessonLines
+s32 gLessonBackswingHint;
+s32 gLessonDownswingHint;
+s32 gLessonHintSwapTimer;                    // frames until the two alternating hints swap
+s32 gLessonHighlightTimer;                    // frames until the next highlight
+s32 gLessonHighlight;                    // the highlighted one of four hints (4 = none yet)
+u8  gLessonSavedCommentLevel;                    // options unk0[4], saved
+u8  gLessonSavedPuttGrid;                    // options unk84, saved
+u8  gLessonSavedBoost;                    // the boost option, saved
+u8  gLessonSavedSpin;                    // the spin option, saved
+s32 gLessonController;                    // player 0's controller, kept while the CPU demonstrates
+f32 gLessonHookSlice;                    // lessons 8 and 9 test its sign
+s32 gLessonNum;
+u8  gLessonPauseClosed;
+s32 gLessonPanel;
+u8  gLessonShowBackswingHint;                    // which of the two alternating hints is showing
+u8  gLessonTryHintsSet;                    // the player's try has set up its hints
+u8  gLessonSkipPending;
+s32 gLessonSavedWind;                    // the wind option, saved while the mode runs
+u32 gLessonFailedTries;                    // picks which message of a list is shown
+u8  gLessonSwingCommitted;
+u8  gLessonQuitChosen;
+u8  gLessonContinueChosen;
+u8  gLessonWaitingForLine;
+u8  gLessonBoostUsed;
+u8  gLessonSpinUsed;
 
 void  Gaud_ExitCrowdReactionSound(void);
 void  fn_800E5200(int a);
@@ -151,10 +151,10 @@ void fn_800FFF34(void) {
     gpGame->n10 = 1;
     gpGame->b276 = 1;
     fn_80055C1C(1);
-    lbl_8028240B = gSession.options.a0[4];
-    lbl_8028240A = gSession.options.b84;
-    lbl_80282409 = gSession.options.bBoostEnabled;
-    lbl_80282408 = gSession.options.bSpinEnabled;
+    gLessonSavedCommentLevel = gSession.options.a0[4];
+    gLessonSavedPuttGrid = gSession.options.b84;
+    gLessonSavedBoost = gSession.options.bBoostEnabled;
+    gLessonSavedSpin = gSession.options.bSpinEnabled;
     gSession.options.a0[4] = 4;
     gSession.options.b84 = 0;
     gSession.options.bBoostEnabled = 1;
@@ -174,9 +174,9 @@ void fn_80100108(void) {
 
 // Back to the first lesson.
 void fn_80100128(void) {
-    lbl_80282428 = 2;
-    lbl_802823FC = 1;
-    lbl_80282420 = 0;
+    gLessonStep = 2;
+    gLessonNum = 1;
+    gLessonLineRow = 0;
     GM_FlyByMode_Init();
 }
 
@@ -191,30 +191,30 @@ void fn_80100160(void) {
     gSession.nTeeSet[1] = 0;
     gSession.nPinSet = 0;
     gpGame->nPinSet[Game_CurHoleIndex()] = 0;
-    lbl_802816D8 = gSession.options.nC;
-    lbl_802823EC = gSession.options.nWind;
+    gLessonSavedOptionC = gSession.options.nC;
+    gLessonSavedWind = gSession.options.nWind;
     gSession.options.nC = 4;
     gSession.options.nWind = 0;
     Session_SetNumPlayers(1);
     Session_SetGolfer(1, 0);
     gPlayers[0].nController = CONTROLLER_CPU;
     gpGame->nMulligans = 0;
-    lbl_802823E3 = 0;
-    lbl_802823E4 = 0;
+    gLessonContinueChosen = 0;
+    gLessonQuitChosen = 0;
 }
 
 // The mode ends: the saved options go back.
 void fn_80100230(void) {
     Session* pSession;
-    gSession.options.nC = lbl_802816D8;
-    gSession.options.nWind = lbl_802823EC;
+    gSession.options.nC = gLessonSavedOptionC;
+    gSession.options.nWind = gLessonSavedWind;
     fn_80055C1C(0);
     // fake match: &gSession re-taken inside the first store after the call, as the original
     // recomputes it
-    (pSession = &gSession)->options.a0[4] = lbl_8028240B;
-    (pSession)->options.b84 = lbl_8028240A;
-    (pSession)->options.bBoostEnabled = lbl_80282409;
-    (pSession)->options.bSpinEnabled = lbl_80282408;
+    (pSession = &gSession)->options.a0[4] = gLessonSavedCommentLevel;
+    (pSession)->options.b84 = gLessonSavedPuttGrid;
+    (pSession)->options.bBoostEnabled = gLessonSavedBoost;
+    (pSession)->options.bSpinEnabled = gLessonSavedSpin;
 }
 
 // Is a lesson running (mode 11)?
@@ -224,115 +224,115 @@ u8 fn_80100294(void) {
 
 void fn_801002C0(void) {
     if (fn_80100294()) {
-        if (lbl_802823F0) {
-            lbl_802823F0 = 0;
-            lbl_80282428 = lbl_80282424;
+        if (gLessonSkipPending) {
+            gLessonSkipPending = 0;
+            gLessonStep = gLessonNextStep;
         }
         fn_80100308();
     }
 }
 
 void fn_80100308(void) {
-    if (lbl_802823E2) {
-        lbl_802823E2 = 0;
-        lbl_80282428 = lbl_80282424;
+    if (gLessonWaitingForLine) {
+        gLessonWaitingForLine = 0;
+        gLessonStep = gLessonNextStep;
     }
 }
 
 // On to the next lesson: its row of messages and the two values fn_80101F40 later sends.
 void fn_80100328(void) {
-    switch (++lbl_802823FC) {
+    switch (++gLessonNum) {
     case 1:
-        lbl_80282420 = 0x00;
-        lbl_8028241C = 5;
-        lbl_80282418 = 2;
+        gLessonLineRow = 0x00;
+        gLessonBackswingHint = 5;
+        gLessonDownswingHint = 2;
         break;
     case 8:
-        lbl_80282420 = 0x10;
-        lbl_8028241C = 4;
-        lbl_80282418 = 3;
+        gLessonLineRow = 0x10;
+        gLessonBackswingHint = 4;
+        gLessonDownswingHint = 3;
         break;
     case 9:
-        lbl_80282420 = 0x20;
-        lbl_8028241C = 6;
-        lbl_80282418 = 1;
+        gLessonLineRow = 0x20;
+        gLessonBackswingHint = 6;
+        gLessonDownswingHint = 1;
         break;
     case 2:
-        lbl_80282420 = 0x30;
-        lbl_8028241C = 5;
-        lbl_80282418 = 2;
+        gLessonLineRow = 0x30;
+        gLessonBackswingHint = 5;
+        gLessonDownswingHint = 2;
         break;
     case 5:
-        lbl_80282420 = 0x40;
-        lbl_8028241C = 5;
-        lbl_80282418 = 2;
+        gLessonLineRow = 0x40;
+        gLessonBackswingHint = 5;
+        gLessonDownswingHint = 2;
         break;
     case 6:
-        lbl_80282420 = 0x50;
-        lbl_8028241C = 5;
-        lbl_80282418 = 2;
+        gLessonLineRow = 0x50;
+        gLessonBackswingHint = 5;
+        gLessonDownswingHint = 2;
         break;
     case 3:
-        lbl_80282420 = 0x60;
-        lbl_8028241C = 5;
-        lbl_80282418 = 2;
+        gLessonLineRow = 0x60;
+        gLessonBackswingHint = 5;
+        gLessonDownswingHint = 2;
         break;
     case 4:
-        lbl_80282420 = 0x70;
-        lbl_8028241C = 5;
-        lbl_80282418 = 2;
+        gLessonLineRow = 0x70;
+        gLessonBackswingHint = 5;
+        gLessonDownswingHint = 2;
         break;
     case 7:
         gSession.options.b84 = 1;
-        lbl_80282420 = 0x80;
-        lbl_8028241C = 5;
-        lbl_80282418 = 2;
+        gLessonLineRow = 0x80;
+        gLessonBackswingHint = 5;
+        gLessonDownswingHint = 2;
         break;
     case 10:
         gSession.options.b84 = 0;
-        lbl_80282420 = 0x90;
-        lbl_8028241C = 5;
-        lbl_80282418 = 2;
+        gLessonLineRow = 0x90;
+        gLessonBackswingHint = 5;
+        gLessonDownswingHint = 2;
         break;
     case 11:
-        lbl_80282420 = 0xA0;
-        lbl_8028241C = 5;
-        lbl_80282418 = 2;
-        lbl_802823E5 = 1;
+        gLessonLineRow = 0xA0;
+        gLessonBackswingHint = 5;
+        gLessonDownswingHint = 2;
+        gLessonSwingCommitted = 1;
         break;
     case 12:
-        lbl_80282420 = 0xB0;
+        gLessonLineRow = 0xB0;
         fn_80101F40(0, 0);
         fn_800E5200(-1);
         fn_80101F18(0);
         fn_80100798(0, 1);
         break;
     }
-    lbl_802823F4 = lbl_802823FC - 1;
+    gLessonPanel = gLessonNum - 1;
 }
 
 // Puts player 0's ball where the lesson starts (the tee when the lesson has no spot) and hands the
 // player to the CPU for the demonstration.
 void fn_80100508(void) {
-    int n = lbl_802823FC - 1;
+    int n = gLessonNum - 1;
     f32 fHeight;
     CourseInfo* pCourse;
-    if (-1.0f == lbl_80192DF8[n].vPos[0] && -1.0f == lbl_80192DF8[n].vPos[1] &&
-        -1.0f == lbl_80192DF8[n].vPos[2]) {
+    if (-1.0f == gLessons[n].vPos[0] && -1.0f == gLessons[n].vPos[1] &&
+        -1.0f == gLessons[n].vPos[2]) {
         pCourse = Ter_GetTGD();
         LLMath_CopyVec(&pCourse->tee[gSession.nTeeSet[0]].x, gPlayers[0].vBall);
     } else {
-        fHeight = CamScript_GuessBestPlayableHeight(lbl_80192DF8[n].vPos, NULL);
+        fHeight = CamScript_GuessBestPlayableHeight(gLessons[n].vPos, NULL);
         if (-65536.125f != fHeight) {
-            lbl_80192DF8[n].vPos[1] = fHeight;
+            gLessons[n].vPos[1] = fHeight;
         }
-        LLMath_CopyVec(lbl_80192DF8[n].vPos, gPlayers[0].vBall);
+        LLMath_CopyVec(gLessons[n].vPos, gPlayers[0].vBall);
     }
     LLMath_CopyVec(gPlayers[0].vBall, gPlayers[0].vPreShot);
     LLMath_CopyVec(gPlayers[0].vBall, gPlayers[0].ball.vPos);
     Physics_InitBall(&gPlayers[0].ball, gPlayers[0].vBall, 0);
     // EA bug: always true (|| where && was meant), so the ball is always dropped.
-    if (lbl_802823FC != 1 || lbl_802823FC != 8 || lbl_802823FC != 9 || lbl_802823FC != 11) {
+    if (gLessonNum != 1 || gLessonNum != 8 || gLessonNum != 9 || gLessonNum != 11) {
         Physics_DropBall(&gPlayers[0].ball, gPlayers[0].vBall);
     }
     gPlayers[0].attrMod[0] = 0;
@@ -345,43 +345,43 @@ void fn_80100508(void) {
     gPlayers[0].attrMod[11] = 0;
     gPlayers[0].swing.nState = 0;
     if (gPlayers[0].nController != CONTROLLER_CPU) {
-        lbl_80282404 = gPlayers[0].nController;
+        gLessonController = gPlayers[0].nController;
     }
     gPlayers[0].nController = CONTROLLER_CPU;
 }
 
 // The shape the lesson sets, 7 (any) outside mode 11.
 int fn_8010069C(int nPlayer) {
-    int n = lbl_802823FC - 1;
+    int n = gLessonNum - 1;
     if (Game_GetMode() != 11) {
         return 7;
     }
-    return lbl_80192DF8[n].nShape;
+    return gLessons[n].nShape;
 }
 
 // The club the lesson sets, 26 (any) outside mode 11.
 int fn_801006F0(int nPlayer) {
-    int n = lbl_802823FC - 1;
+    int n = gLessonNum - 1;
     if (Game_GetMode() != 11) {
         return 26;
     }
-    return lbl_80192DF8[n].nClub;
+    return gLessons[n].nClub;
 }
 
 // The shot kind the lesson sets, 8 (any) outside mode 11.
 int fn_80100744(void) {
-    int n = lbl_802823FC - 1;
+    int n = gLessonNum - 1;
     if (Game_GetMode() != 11) {
         return 8;
     }
-    return lbl_80192DF8[n].nShotKind;
+    return gLessons[n].nShotKind;
 }
 
 // Plays the next message of one of the lesson's lists (fn_80101FC0), skipping empty entries;
 // nonzero if there was one.
 int fn_80100798(int nList, int nCount) {
-    s16* pList = &lbl_80192F2C[lbl_80282420] + nList;
-    u32 i = lbl_802823E8 % nCount;
+    s16* pList = &gLessonLines[gLessonLineRow] + nList;
+    u32 i = gLessonFailedTries % nCount;
     int n = 0;
     while (pList[i] == -1 && n < nCount) {
         i = (i + 1) % nCount;
@@ -389,13 +389,13 @@ int fn_80100798(int nList, int nCount) {
     }
     if (pList[i] != -1) {
         fn_80101FC0((u16)pList[i], 0);
-        if (nList == 3 && lbl_802823FC == 7) {
+        if (nList == 3 && gLessonNum == 7) {
             if (i == 0) {
-                lbl_802823F4 = 12;
+                gLessonPanel = 12;
             } else if (i == 2) {
-                lbl_802823F4 = 11;
+                gLessonPanel = 11;
             } else {
-                lbl_802823F4 = 6;
+                gLessonPanel = 6;
             }
         }
     }
@@ -404,11 +404,11 @@ int fn_80100798(int nList, int nCount) {
 
 // The lesson's animation, the demonstration's before step 6 (none outside lessons 1..11).
 char* fn_801008A8(void) {
-    if (lbl_802823FC > 0 && lbl_802823FC < 12) {
-        if (lbl_80282428 >= 6) {
-            return lbl_80192D98[lbl_802823FC];
+    if (gLessonNum > 0 && gLessonNum < 12) {
+        if (gLessonStep >= 6) {
+            return gLessonTryAnims[gLessonNum];
         }
-        return lbl_80192DC8[lbl_802823FC];
+        return gLessonDemoAnims[gLessonNum];
     }
     return 0;
 }
@@ -420,12 +420,12 @@ void fn_801008F8(void) {
     fn_800E5200(-1);
     fn_80101F18(0);
     fn_80100508();
-    gPlayers[0].nController = lbl_80282404;
+    gPlayers[0].nController = gLessonController;
     GOLFERSTATE_Switch(GS_PRE_SHOT, 0);
-    if (lbl_80282428 == 8 || lbl_80282428 == 9 || lbl_80282428 == 10 || lbl_80282428 == 11) {
+    if (gLessonStep == 8 || gLessonStep == 9 || gLessonStep == 10 || gLessonStep == 11) {
         fn_800957D8(gPlayers[0].pChar);
     }
-    if (lbl_802823FC == 7) {
+    if (gLessonNum == 7) {
         AI_DefaultTarget(0);
         Shot_Prepare(0, 1);
         BreakLine_Reset(gPlayers[0].nView[0]);
@@ -433,13 +433,13 @@ void fn_801008F8(void) {
         Character_AlignShotWithTarget(0, 1, 1);
         fn_800957D8(gPlayers[0].pChar);
         SW_vInitSwing(0);
-        if (lbl_80282428 != 8 && lbl_80282428 != 9 && lbl_80282428 != 10 && lbl_80282428 != 11) {
+        if (gLessonStep != 8 && gLessonStep != 9 && gLessonStep != 10 && gLessonStep != 11) {
             fn_80095744(gPlayers[0].pChar, 1);
         }
     }
-    lbl_802823E0 = 0;
-    lbl_802823E1 = 0;
-    lbl_80282428 = 7;
+    gLessonSpinUsed = 0;
+    gLessonBoostUsed = 0;
+    gLessonStep = 7;
     fn_80047B6C(NULL, 0);
     fn_80047BC0(NULL, 0);
 }
@@ -465,7 +465,7 @@ void fn_80100A3C(int nPlayer) {
 }
 
 u8 fn_80100AF8(void) {
-    if (fn_80100294() && lbl_802823FC == 5) {
+    if (fn_80100294() && gLessonNum == 5) {
         return 1;
     }
     return 0;
@@ -473,17 +473,17 @@ u8 fn_80100AF8(void) {
 
 // Back to the lesson's start (lesson 1 if none), unless the lessons are over.
 void fn_80100B38(void) {
-    if (!fn_80100294() || lbl_802823FC == 12) {
+    if (!fn_80100294() || gLessonNum == 12) {
         return;
     }
-    if (gSession.nPaused == 0 && lbl_80282428 != 17) {
+    if (gSession.nPaused == 0 && gLessonStep != 17) {
         Gaud_StopComment();
-        if (lbl_802823FC == 0) {
-            lbl_802823FC = 1;
+        if (gLessonNum == 0) {
+            gLessonNum = 1;
         }
-        lbl_80282428 = 4;
-        lbl_802823E8 = 0;
-        lbl_802823E2 = 0;
+        gLessonStep = 4;
+        gLessonFailedTries = 0;
+        gLessonWaitingForLine = 0;
         GM_EndOfGolferTurn(0);
         fn_80062C80(gPlayers[0].nC58, 0);
         GUI_ToggleUI(0, 0);
@@ -497,70 +497,70 @@ u8 fn_80100C00(void) {
     return 0;
 }
 
-// The item (4..7) of the highlighted one of the four hints that take turns (lbl_8028240C).
+// The item (4..7) of the highlighted one of the four hints that take turns (gLessonHighlight).
 static inline int Hint(void) {
     int nHint;
-    if (lbl_8028240C == 0) {
+    if (gLessonHighlight == 0) {
         nHint = 4;
-    } else if (lbl_8028240C == 1) {
+    } else if (gLessonHighlight == 1) {
         nHint = 5;
     } else {
         nHint = 7;
-        if (lbl_8028240C == 2) {
+        if (gLessonHighlight == 2) {
             nHint = 6;
         }
     }
     return nHint;
 }
 
-// Every frame: the lesson's steps (lbl_80282428). 2..5 set up a lesson and its demonstration, 6 and
+// Every frame: the lesson's steps (gLessonStep). 2..5 set up a lesson and its demonstration, 6 and
 // 7 the player's tries with their hints, 8..11 a failed try, 12 a passed one; 0, 1 and 18 wait (a
 // button, the message, the camera), 14..16 end the turn, 13 quits, 19 follows lesson 7 (then 17:
 // continue or quit) and the last lesson.
 void fn_80100C08(void) {
     f32 v[4] = {0.0f, 0.0f, 0.0f, 0.5f};
     int nView;
-    if (lbl_802823F8) {
+    if (gLessonPauseClosed) {
         fn_800E58B4(39);
-        lbl_802823F8 = 0;
+        gLessonPauseClosed = 0;
     }
-    switch (lbl_80282428) {
+    switch (gLessonStep) {
     case 0:
         if (Input_ReadControlPad(gPlayers[0].nController) & Controller_GetButtonMask(0, 0)) {
-            lbl_80282428 = lbl_80282424;
+            gLessonStep = gLessonNextStep;
         }
         break;
     case 1:
-        lbl_802823E2 = 1;
+        gLessonWaitingForLine = 1;
         if (!Gaud_GetCommentStatus()) {
-            lbl_802823E2 = 0;
-            lbl_80282428 = lbl_80282424;
-            if (lbl_80282424 == 13) {
-                lbl_80282428 = 18;
-                lbl_80282424 = 13;
+            gLessonWaitingForLine = 0;
+            gLessonStep = gLessonNextStep;
+            if (gLessonNextStep == 13) {
+                gLessonStep = 18;
+                gLessonNextStep = 13;
                 CameraController_FadeOut(ViewController_GetCameraControl(gPlayers[0].nView[0]), 0.25f, v);
             }
         }
         break;
     case 18:
         if (fn_80063C7C(ViewController_GetCameraControl(gPlayers[0].nView[0]))) {
-            lbl_80282428 = lbl_80282424;
+            gLessonStep = gLessonNextStep;
         }
         break;
     case 2:
         Gaud_InitCrowdReactionSound(2, 1);
-        lbl_802823FC = 0;
+        gLessonNum = 0;
         fn_80100328();
         fn_80100508();
-        lbl_80282428 = 3;
+        gLessonStep = 3;
         break;
     case 3:
         fn_80101F40(0, 0);
         fn_80101F18(0);
         fn_800E5200(-1);
         fn_80100798(0, 1);
-        lbl_80282428 = 4;
-        lbl_802823E8 = 0;
+        gLessonStep = 4;
+        gLessonFailedTries = 0;
         break;
     case 4:
         if ((s8)GOLFERSTATE_GetCurrentState(0) != 20) {
@@ -570,26 +570,26 @@ void fn_80100C08(void) {
             fn_800E5200(-1);
             fn_80101F18(0);
             fn_80100798(1, 1);
-            lbl_80282428 = 5;
+            gLessonStep = 5;
         }
         break;
     case 5:
         if ((s8)GOLFERSTATE_GetCurrentState(0) != GS_PRE_SHOT) {
             if (gPlayers[0].swing.nState == 1 || gPlayers[0].swing.nState == 2) {
                 fn_80101F94(2, 0);
-                fn_80101F40(1, lbl_8028241C);
-                fn_800E5200(lbl_802823F4);
+                fn_80101F40(1, gLessonBackswingHint);
+                fn_800E5200(gLessonPanel);
                 fn_80101F18(1);
-                if (lbl_802823FC == 10) {
+                if (gLessonNum == 10) {
                     fn_80101F94(0, 1);
                 }
             } else if (gPlayers[0].swing.nState == 3 || gPlayers[0].swing.nState == 4 ||
                        gPlayers[0].swing.nState == 5) {
                 fn_80101F94(0, 0);
-                if (lbl_802823FC == 11 && gPlayers[0].swing.nState == 5) {
-                    if (lbl_802823E5) {
-                        fn_80101F40(1, lbl_8028241C);
-                        fn_800E5200(lbl_802823F4);
+                if (gLessonNum == 11 && gPlayers[0].swing.nState == 5) {
+                    if (gLessonSwingCommitted) {
+                        fn_80101F40(1, gLessonBackswingHint);
+                        fn_800E5200(gLessonPanel);
                         fn_80101F18(3);
                         fn_80101F94(2, 1);
                     } else {
@@ -598,70 +598,70 @@ void fn_80100C08(void) {
                         fn_80101F18(0);
                     }
                 } else {
-                    fn_80101F40(1, lbl_80282418);
-                    fn_800E5200(lbl_802823F4);
+                    fn_80101F40(1, gLessonDownswingHint);
+                    fn_800E5200(gLessonPanel);
                     fn_80101F18(2);
                     fn_80101F94(2, 0);
                 }
             } else {
                 fn_80101F40(1, 0);
-                fn_800E5200(lbl_802823F4);
+                fn_800E5200(gLessonPanel);
                 fn_80101F94(0, 0);
             }
         }
         break;
     case 6:
         fn_801008F8();
-        lbl_802823F1 = 0;
-        lbl_802823E5 = 0;
+        gLessonTryHintsSet = 0;
+        gLessonSwingCommitted = 0;
         // falls through
     case 7:
         if (gPlayers[0].swing.nState == 0) {
-            if (lbl_802823F1) {
-                if (--lbl_80282414 <= 0) {
-                    lbl_80282414 = 59;
-                    lbl_802823F2 = !lbl_802823F2;
+            if (gLessonTryHintsSet) {
+                if (--gLessonHintSwapTimer <= 0) {
+                    gLessonHintSwapTimer = 59;
+                    gLessonShowBackswingHint = !gLessonShowBackswingHint;
                 }
-                if (lbl_802823F2) {
-                    fn_80101F40(1, lbl_8028241C);
-                    fn_800E5200(lbl_802823F4);
+                if (gLessonShowBackswingHint) {
+                    fn_80101F40(1, gLessonBackswingHint);
+                    fn_800E5200(gLessonPanel);
                     fn_80101F18(1);
-                    if (lbl_802823FC == 10) {
+                    if (gLessonNum == 10) {
                         fn_80101F94(0, 1);
                     }
                 } else {
-                    fn_80101F40(1, lbl_80282418);
-                    fn_800E5200(lbl_802823F4);
+                    fn_80101F40(1, gLessonDownswingHint);
+                    fn_800E5200(gLessonPanel);
                     fn_80101F18(2);
-                    if (lbl_802823FC == 10) {
+                    if (gLessonNum == 10) {
                         fn_80101F94(0, 0);
                     }
                 }
-                if ((lbl_802823FC == 6 || lbl_802823FC == 7) && --lbl_80282410 <= 0) {
-                    lbl_80282410 = 83;
-                    if (lbl_8028240C == 4) {
-                        lbl_8028240C = 0;
+                if ((gLessonNum == 6 || gLessonNum == 7) && --gLessonHighlightTimer <= 0) {
+                    gLessonHighlightTimer = 83;
+                    if (gLessonHighlight == 4) {
+                        gLessonHighlight = 0;
                         fn_80101F94(4, 1);
                         fn_80101F94(5, 0);
                         fn_80101F94(6, 0);
                         fn_80101F94(7, 0);
                     } else {
                         fn_80101F94(Hint(), 0);
-                        lbl_8028240C++;
-                        lbl_8028240C %= 4;
+                        gLessonHighlight++;
+                        gLessonHighlight %= 4;
                         fn_80101F94(Hint(), 1);
                     }
                 }
             } else {
-                lbl_80282410 = 389;
-                lbl_8028240C = 4;
-                lbl_80282414 = 59;
-                fn_80101F40(1, lbl_8028241C);
-                fn_800E5200(lbl_802823F4);
+                gLessonHighlightTimer = 389;
+                gLessonHighlight = 4;
+                gLessonHintSwapTimer = 59;
+                fn_80101F40(1, gLessonBackswingHint);
+                fn_800E5200(gLessonPanel);
                 fn_80101F18(1);
-                lbl_802823F1 = 1;
-                lbl_802823F2 = 1;
-                if (lbl_802823FC == 6 || lbl_802823FC == 7) {
+                gLessonTryHintsSet = 1;
+                gLessonShowBackswingHint = 1;
+                if (gLessonNum == 6 || gLessonNum == 7) {
                     fn_80101F94(4, 1);
                     fn_80101F94(5, 1);
                     fn_80101F94(6, 1);
@@ -672,13 +672,13 @@ void fn_80100C08(void) {
                     fn_80101F94(6, 0);
                     fn_80101F94(7, 0);
                 }
-                if (lbl_802823FC == 10) {
+                if (gLessonNum == 10) {
                     fn_80101F94(0, 1);
-                } else if (lbl_802823FC == 8) {
+                } else if (gLessonNum == 8) {
                     fn_80101F94(5, 1);
-                } else if (lbl_802823FC == 9) {
+                } else if (gLessonNum == 9) {
                     fn_80101F94(4, 1);
-                } else if (lbl_802823FC == 2) {
+                } else if (gLessonNum == 2) {
                     fn_80101F94(8, 1);
                 }
             }
@@ -690,28 +690,28 @@ void fn_80100C08(void) {
             fn_80101F94(8, 0);
             if (gPlayers[0].swing.nState == 2 || gPlayers[0].swing.nState == 3 ||
                 (gPlayers[0].swing.nState == 1 &&
-                 ((lbl_802823FC == 5 && gPlayers[0].pChar->fBackswing > 0.45f) ||
-                  (lbl_802823FC != 5 && gPlayers[0].pChar->fBackswing > 0.75f)))) {
-                fn_80101F40(1, lbl_80282418);
-                fn_800E5200(lbl_802823F4);
+                 ((gLessonNum == 5 && gPlayers[0].pChar->fBackswing > 0.45f) ||
+                  (gLessonNum != 5 && gPlayers[0].pChar->fBackswing > 0.75f)))) {
+                fn_80101F40(1, gLessonDownswingHint);
+                fn_800E5200(gLessonPanel);
                 fn_80101F18(2);
-                lbl_802823E5 = 1;
-                if (lbl_802823FC == 10) {
+                gLessonSwingCommitted = 1;
+                if (gLessonNum == 10) {
                     fn_80101F94(0, 0);
-                } else if (lbl_802823FC == 11) {
+                } else if (gLessonNum == 11) {
                     fn_80101F94(2, 0);
                 }
             } else if (gPlayers[0].swing.nState == 5 || gPlayers[0].swing.nState == 4) {
-                lbl_80282400 = SW_vGetHookSlice(0);
-                if (lbl_802823FC == 11) {
+                gLessonHookSlice = SW_vGetHookSlice(0);
+                if (gLessonNum == 11) {
                     fn_80101F94(2, 1);
-                    if (!lbl_802823E5) {
+                    if (!gLessonSwingCommitted) {
                         fn_80101F40(0, 0);
                         fn_800E5200(-1);
                         fn_80101F18(0);
                     } else {
-                        fn_80101F40(1, lbl_8028241C);
-                        fn_800E5200(lbl_802823F4);
+                        fn_80101F40(1, gLessonBackswingHint);
+                        fn_800E5200(gLessonPanel);
                         fn_80101F18(3);
                     }
                 } else {
@@ -720,136 +720,136 @@ void fn_80100C08(void) {
                     fn_80101F18(0);
                 }
             } else {
-                fn_80101F40(1, lbl_8028241C);
-                fn_800E5200(lbl_802823F4);
+                fn_80101F40(1, gLessonBackswingHint);
+                fn_800E5200(gLessonPanel);
                 fn_80101F18(1);
-                if (lbl_802823FC == 10) {
+                if (gLessonNum == 10) {
                     fn_80101F94(0, 1);
                 }
             }
         }
         break;
     case 8:
-        if (lbl_802823FC == 10) {
+        if (gLessonNum == 10) {
             fn_80101F94(0, 1);
-        } else if (lbl_802823FC == 8) {
+        } else if (gLessonNum == 8) {
             fn_80101F94(5, 1);
-        } else if (lbl_802823FC == 9) {
+        } else if (gLessonNum == 9) {
             fn_80101F94(4, 1);
         }
         fn_801008F8();
         fn_80100798(3, 5);
         break;
     case 9:
-        if (lbl_802823FC == 10) {
+        if (gLessonNum == 10) {
             fn_80101F94(0, 1);
-        } else if (lbl_802823FC == 8) {
+        } else if (gLessonNum == 8) {
             fn_80101F94(5, 1);
-        } else if (lbl_802823FC == 9) {
+        } else if (gLessonNum == 9) {
             fn_80101F94(4, 1);
         }
         fn_801008F8();
         fn_80100798(11, 2);
         break;
     case 10:
-        if (lbl_802823FC == 10) {
+        if (gLessonNum == 10) {
             fn_80101F94(0, 1);
-        } else if (lbl_802823FC == 8) {
+        } else if (gLessonNum == 8) {
             fn_80101F94(5, 1);
-        } else if (lbl_802823FC == 9) {
+        } else if (gLessonNum == 9) {
             fn_80101F94(4, 1);
         }
         fn_801008F8();
         fn_80100798(8, 3);
         break;
     case 11:
-        if (lbl_802823FC == 10) {
+        if (gLessonNum == 10) {
             fn_80101F94(0, 1);
-        } else if (lbl_802823FC == 8) {
+        } else if (gLessonNum == 8) {
             fn_80101F94(5, 1);
-        } else if (lbl_802823FC == 9) {
+        } else if (gLessonNum == 9) {
             fn_80101F94(4, 1);
         }
         fn_801008F8();
         fn_80100798(13, 2);
         break;
     case 12:
-        if (lbl_802823FC == 10) {
+        if (gLessonNum == 10) {
             fn_80101F94(2, 1);
         }
         fn_80100328();
-        if (lbl_802823FC == 12) {
-            lbl_80282428 = 19;
-        } else if (lbl_802823FC == 8) {
-            lbl_80282428 = 19;
+        if (gLessonNum == 12) {
+            gLessonStep = 19;
+        } else if (gLessonNum == 8) {
+            gLessonStep = 19;
         } else {
-            lbl_80282424 = 15;
+            gLessonNextStep = 15;
             Gaud_StopComment();
-            lbl_802823E2 = 0;
-            lbl_80282428 = lbl_80282424;
-            if (lbl_80282424 == 15) {
+            gLessonWaitingForLine = 0;
+            gLessonStep = gLessonNextStep;
+            if (gLessonNextStep == 15) {
                 GM_EndOfGolferTurn(0);
-                lbl_80282428 = 3;
+                gLessonStep = 3;
             }
         }
         break;
     case 15:
         GM_EndOfGolferTurn(0);
-        lbl_80282428 = 3;
+        gLessonStep = 3;
         break;
     case 16:
         GM_EndOfGolferTurn(0);
-        lbl_80282428 = 6;
+        gLessonStep = 6;
         break;
     case 14:
-        lbl_80282424 = 15;
-        lbl_80282428 = 1;
+        gLessonNextStep = 15;
+        gLessonStep = 1;
         break;
     case 13:
         gSession.b12 = 1;
         EVENT_Trigger(0, 5, 0, -1);
         break;
     case 17:
-        if (lbl_802823E3) {
-            lbl_80282428 = lbl_80282424;
-        } else if (lbl_802823E4) {
-            lbl_80282428 = 13;
+        if (gLessonContinueChosen) {
+            gLessonStep = gLessonNextStep;
+        } else if (gLessonQuitChosen) {
+            gLessonStep = 13;
         }
         // falls through
     case 19:
         if (fn_80063C7C(ViewController_GetCameraControl(gPlayers[0].nView[0]))) {
             nView = gPlayers[0].nView[0];
             CameraController_SetCameraMode(ViewController_GetCameraControl(nView), 18, 0, nView);
-            if (lbl_802823FC == 12) {
-                lbl_80282424 = 13;
-                lbl_80282428 = 1;
-                lbl_802823E2 = 1;
+            if (gLessonNum == 12) {
+                gLessonNextStep = 13;
+                gLessonStep = 1;
+                gLessonWaitingForLine = 1;
                 break;
             }
             // Profile 0 gets its first TOUR card level (lesson 12, the end, has left above).
             if (gpSaveData->nTourCardLevel < 1) {
                 gpSaveData->nTourCardLevel = 1;
             }
-            lbl_80282424 = 14;
+            gLessonNextStep = 14;
             fn_80101F70();
-            lbl_802823E3 = 0;
-            lbl_802823E4 = 0;
-            lbl_80282428 = 17;
+            gLessonContinueChosen = 0;
+            gLessonQuitChosen = 0;
+            gLessonStep = 17;
         }
         break;
     }
 }
 
 u8 fn_80101738(void) {
-    if (Game_GetMode() == 11 && lbl_80282428 == 5 &&
-        (lbl_802823FC == 1 || lbl_802823FC == 10 || lbl_802823FC == 8 || lbl_802823FC == 9)) {
+    if (Game_GetMode() == 11 && gLessonStep == 5 &&
+        (gLessonNum == 1 || gLessonNum == 10 || gLessonNum == 8 || gLessonNum == 9)) {
         return 0;
     }
     return 1;
 }
 
 // Judges the lesson's shot: too short (step 9), off target (step 8), a lesson-specific fault
-// (step 10), several faults (step 11), or passed (step 12). A failed shot adds one to lbl_802823E8;
+// (step 10), several faults (step 11), or passed (step 12). A failed shot adds one to gLessonFailedTries;
 // the demonstration's shot (step 5) only moves on to step 16.
 void fn_8010179C(void) {
     u8 bShort = 0;
@@ -858,14 +858,14 @@ void fn_8010179C(void) {
     f32 fLength;
     int nLesson;
     int nLie;
-    if (lbl_80282428 == 5) {
+    if (gLessonStep == 5) {
         Gaud_InitCrowdReactionSound(1, 1);
         fn_80100798(2, 1);
-        lbl_80282428 = 16;
+        gLessonStep = 16;
         return;
     }
     fLength = fn_800D0550(0);
-    nLesson = lbl_802823FC;
+    nLesson = gLessonNum;
     nLie = gPlayers[0].ball.nLie;
     switch (nLesson) {
     case 1:
@@ -877,12 +877,12 @@ void fn_8010179C(void) {
         }
         break;
     case 8:
-        if (lbl_80282400 < 0.01f) {
+        if (gLessonHookSlice < 0.01f) {
             bMissed = 1;
         }
         break;
     case 9:
-        if (lbl_80282400 > -0.01f) {
+        if (gLessonHookSlice > -0.01f) {
             bMissed = 1;
         }
         break;
@@ -917,7 +917,7 @@ void fn_8010179C(void) {
         }
         break;
     case 10:
-        if (!lbl_802823E1) {
+        if (!gLessonBoostUsed) {
             bMissed = 1;
             bFault = 1;
         }
@@ -926,7 +926,7 @@ void fn_8010179C(void) {
         }
         break;
     case 11:
-        if (!lbl_802823E0) {
+        if (!gLessonSpinUsed) {
             bMissed = 1;
         }
         if (nLie != LIE_GREEN_e && nLie != 12) {
@@ -935,23 +935,23 @@ void fn_8010179C(void) {
         break;
     }
     if ((bShort & bMissed) || (bShort & bFault) || (bMissed & bFault)) {
-        lbl_80282428 = 11;
+        gLessonStep = 11;
         Gaud_InitCrowdReactionSound(5, 1);
-        lbl_802823E8++;
+        gLessonFailedTries++;
     } else if (bShort) {
-        lbl_80282428 = 9;
+        gLessonStep = 9;
         Gaud_InitCrowdReactionSound(5, 1);
-        lbl_802823E8++;
+        gLessonFailedTries++;
     } else if (bMissed) {
-        lbl_80282428 = 8;
+        gLessonStep = 8;
         Gaud_InitCrowdReactionSound(5, 1);
-        lbl_802823E8++;
+        gLessonFailedTries++;
     } else if (bFault) {
-        lbl_80282428 = 10;
+        gLessonStep = 10;
         Gaud_InitCrowdReactionSound(5, 1);
-        lbl_802823E8++;
+        gLessonFailedTries++;
     } else {
-        lbl_80282428 = 12;
+        gLessonStep = 12;
         if (nLesson == 7 || nLesson == 11) {
             Gaud_InitCrowdReactionSound(3, 1);
         } else {
@@ -967,9 +967,9 @@ u8 fn_80101AA8(int nPlayer, int nEvent) {
         return 0;
     }
     if (nEvent == 10) {
-        if (lbl_80282428 == 5) {
+        if (gLessonStep == 5) {
             Gaud_InitCrowdReactionSound(0, 0);
-        } else if (lbl_802823FC == 1 || lbl_802823FC == 8 || lbl_802823FC == 9 || lbl_802823FC == 10) {
+        } else if (gLessonNum == 1 || gLessonNum == 8 || gLessonNum == 9 || gLessonNum == 10) {
             Gaud_InitCrowdReactionSound(2, 0);
         } else {
             Gaud_InitCrowdReactionSound(0, 0);
@@ -977,13 +977,13 @@ u8 fn_80101AA8(int nPlayer, int nEvent) {
         return 0;
     }
     if (nEvent == 29) {
-        lbl_802823E5 = 0;
+        gLessonSwingCommitted = 0;
         return 0;
     }
-    if (nEvent == 28 && lbl_80282428 == 5 &&
-        (lbl_802823FC == 1 || lbl_802823FC == 10 || lbl_802823FC == 8 || lbl_802823FC == 9)) {
+    if (nEvent == 28 && gLessonStep == 5 &&
+        (gLessonNum == 1 || gLessonNum == 10 || gLessonNum == 8 || gLessonNum == 9)) {
         fn_80100798(2, 1);
-        lbl_80282428 = 16;
+        gLessonStep = 16;
         return 1;
     }
     if (nEvent == 4) {
@@ -994,17 +994,17 @@ u8 fn_80101AA8(int nPlayer, int nEvent) {
         return 1;
     }
     if (nEvent == 46) {
-        lbl_802823E0 = 1;
+        gLessonSpinUsed = 1;
         return 1;
     }
     if (nEvent == 45) {
-        lbl_802823E1 = 1;
+        gLessonBoostUsed = 1;
         return 1;
     }
-    if (lbl_802823FC == 7 && (nEvent == 20 || nEvent == 21)) {
+    if (gLessonNum == 7 && (nEvent == 20 || nEvent == 21)) {
         return 0;
     }
-    if (lbl_802823FC == 6 && (nEvent == 20 || nEvent == 21)) {
+    if (gLessonNum == 6 && (nEvent == 20 || nEvent == 21)) {
         return 0;
     }
     if (nEvent == 13 || nEvent == 14 || nEvent == 15 || nEvent == 16 || nEvent == 17 || nEvent == 20 ||
@@ -1016,7 +1016,7 @@ u8 fn_80101AA8(int nPlayer, int nEvent) {
 
 // HoleFinished: once the lessons are done (lesson 12), unless the step is 19.
 u8 fn_80101C9C(int nPlayer, u8 bCheck) {
-    if (lbl_802823FC == 12 && lbl_80282428 != 19) {
+    if (gLessonNum == 12 && gLessonStep != 19) {
         return 1;
     }
     return 0;
@@ -1024,7 +1024,7 @@ u8 fn_80101C9C(int nPlayer, u8 bCheck) {
 
 // GameFinished: once the lessons are done (lesson 12).
 u8 fn_80101CC4(u8 bCheck) {
-    return lbl_802823FC == 12;
+    return gLessonNum == 12;
 }
 
 // EndGame.
@@ -1033,30 +1033,30 @@ void fn_80101CD8(void) {
 }
 
 void fn_80101CFC(void) {
-    lbl_802823E4 = 1;
+    gLessonQuitChosen = 1;
     Gaud_ExitCrowdReactionSound();
 }
 
 void fn_80101D24(void) {
-    lbl_802823E3 = 1;
+    gLessonContinueChosen = 1;
     Gaud_ExitCrowdReactionSound();
 }
 
 // A CPU player in a lesson is always lucky, except in lessons 5, 8, 9 and 11; in lesson 7 only while
 // player 0 is the CPU.
 u8 fn_80101D4C(int nPlayer) {
-    if (lbl_802823FC == 7 && gPlayers[0].nController != CONTROLLER_CPU) {
+    if (gLessonNum == 7 && gPlayers[0].nController != CONTROLLER_CPU) {
         return 0;
     }
-    if (Game_GetMode() == 11 && lbl_802823FC != 5 && lbl_802823FC != 11 && lbl_802823FC != 8 &&
-        lbl_802823FC != 9 && gPlayers[nPlayer].nController == CONTROLLER_CPU) {
+    if (Game_GetMode() == 11 && gLessonNum != 5 && gLessonNum != 11 && gLessonNum != 8 &&
+        gLessonNum != 9 && gPlayers[nPlayer].nController == CONTROLLER_CPU) {
         return 1;
     }
     return 0;
 }
 
 u8 fn_80101DF4(void) {
-    if (Game_GetMode() == 11 && lbl_802823FC != 11) {
+    if (Game_GetMode() == 11 && gLessonNum != 11) {
         return 0;
     }
     return 1;
@@ -1069,7 +1069,7 @@ u8 fn_80101E34(char* szName) {
         return 0;
     }
     for (i = 0; i < 12; i++) {
-        if (strcmp(lbl_80192D98[i], szName) == 0 || strcmp(lbl_80192DC8[i], szName) == 0) {
+        if (strcmp(gLessonTryAnims[i], szName) == 0 || strcmp(gLessonDemoAnims[i], szName) == 0) {
             return 1;
         }
     }
@@ -1077,7 +1077,7 @@ u8 fn_80101E34(char* szName) {
 }
 
 void fn_80101EDC(void) {
-    lbl_802823F8 = 1;
+    gLessonPauseClosed = 1;
 }
 
 // Round setup (fn_80100160), then player 0 is handed to the first controller.

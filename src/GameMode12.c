@@ -10,12 +10,12 @@
 #include "game/save.h"
 #include "game/earnings.h"
 
-s32 lbl_802823DC;                    // the surface the ball last landed on (-1: none)
+s32 gGameMode12Surface;                    // the surface the ball last landed on (-1: none)
 
-// The surfaces a player has scored on, for the HUD (fn_800FF634): lbl_802823D8 entries.
-s32 lbl_802823D8;
-s32 lbl_80212468[20];                // the surface
-s32 lbl_80212418[20];                // how many times
+// The surfaces a player has scored on, for the HUD (fn_800FF634): gGameMode12NumScored entries.
+s32 gGameMode12NumScored;
+s32 gGameMode12ScoredSurfaces[20];                // the surface
+s32 gGameMode12ScoredHits[20];                // how many times
 
 u8   fn_800FEC78(u8 bCheck);
 void fn_800FEF00(s32 nSurface, s32* pPoints, s32* pMeter, s32* pMult);
@@ -54,7 +54,7 @@ void fn_800FEAFC(void) {
     gpGame->n10 = 1;
     gpGame->nDC = 0;
     GM_SetCurrentHole(0);
-    lbl_802823DC = -1;
+    gGameMode12Surface = -1;
     gSession.nSplitScreen = 0;
     gSession.options.nC = 0;
 }
@@ -87,9 +87,9 @@ void fn_800FEC80(int nPlayer) {
     s32 nMult;
     f32 x;
     f32 y;
-    if (lbl_802823DC >= 0) {
-        fn_800FEF00(lbl_802823DC, &nPoints, &nMeter, &nMult);
-        nHits = fn_800FEFF8(nPlayer, lbl_802823DC);
+    if (gGameMode12Surface >= 0) {
+        fn_800FEF00(gGameMode12Surface, &nPoints, &nMeter, &nMult);
+        nHits = fn_800FEFF8(nPlayer, gGameMode12Surface);
         if (!SurfaceUsedUp(&nPoints, nHits)) {
             fn_8006434C(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0]),
                         gPlayers[nPlayer].ball.vPrev,
@@ -100,13 +100,13 @@ void fn_800FEC80(int nPlayer) {
                 fn_800E53F0(0x35, nMult, 512.0f * x, 448.0f * y);
             }
             if (nPoints != 0) {
-                gPlayers[nPlayer].aCD4[gPlayers[nPlayer].nCD0] = lbl_802823DC;
+                gPlayers[nPlayer].aCD4[gPlayers[nPlayer].nCD0] = gGameMode12Surface;
                 gPlayers[nPlayer].nCD0++;
                 gPlayers[nPlayer].nD70[Game_CurHoleIndex()]++;
                 nScore = nPoints * (nHits + 1);
                 gPlayers[nPlayer].nDB8 += nScore * gPlayers[nPlayer].nDBC;
                 if (!gSession.bReplay) {
-                    GameMsg_Send5Ints(0x33, nScore, 512.0f * x, 448.0f * y, lbl_802823DC, nHits + 1);
+                    GameMsg_Send5Ints(0x33, nScore, 512.0f * x, 448.0f * y, gGameMode12Surface, nHits + 1);
                 }
             }
             if (nMeter != 0) {
@@ -157,7 +157,7 @@ s32 fn_800FEFF8(int nPlayer, s32 nSurface) {
     return n;
 }
 
-// Where the ball landed (lbl_802823DC). A surface with points scores up to 5 times, one that costs
+// Where the ball landed (gGameMode12Surface). A surface with points scores up to 5 times, one that costs
 // points once. Always returns 0.
 s32 fn_800FF038(int nPlayer) {
     SurfaceType* pSurface;
@@ -166,11 +166,11 @@ s32 fn_800FF038(int nPlayer) {
     s32 nMeter;
     s32 nMult;
     pSurface = PLAYER(nPlayer)->ball.pHitSurface;
-    lbl_802823DC = -1;
+    gGameMode12Surface = -1;
     if (pSurface) {
-        lbl_802823DC = pSurface - gSurfaceTypes;
-        nHits = fn_800FEFF8(nPlayer, lbl_802823DC);
-        fn_800FEF00(lbl_802823DC, &nPoints, &nMeter, &nMult);
+        gGameMode12Surface = pSurface - gSurfaceTypes;
+        nHits = fn_800FEFF8(nPlayer, gGameMode12Surface);
+        fn_800FEF00(gGameMode12Surface, &nPoints, &nMeter, &nMult);
         if (!SurfaceUsedUp(&nPoints, nHits) && nPoints != 0) {
             return 0;
         }
@@ -295,28 +295,28 @@ void fn_800FF5B4(int nPlayer) {
 }
 
 s32 fn_800FF604(void) {
-    return lbl_802823D8;
+    return gGameMode12NumScored;
 }
 
 s32 fn_800FF60C(int nPlayer, int i) {
-    return lbl_80212468[i];
+    return gGameMode12ScoredSurfaces[i];
 }
 
 s32 fn_800FF620(int nPlayer, int i) {
-    return lbl_80212418[i];
+    return gGameMode12ScoredHits[i];
 }
 
 // The HUD's list of the surfaces the player has scored on, and how many times.
 void fn_800FF634(int nPlayer) {
     int i;
     s32 n;
-    lbl_802823D8 = 0;
+    gGameMode12NumScored = 0;
     for (i = 0; i < 20; i++) {
         n = fn_800FEFF8(nPlayer, gEarningsTable.aMini[i].nId);
         if (n != 0) {
-            lbl_80212468[lbl_802823D8] = gEarningsTable.aMini[i].nId;
-            lbl_80212418[lbl_802823D8] = n;
-            lbl_802823D8++;
+            gGameMode12ScoredSurfaces[gGameMode12NumScored] = gEarningsTable.aMini[i].nId;
+            gGameMode12ScoredHits[gGameMode12NumScored] = n;
+            gGameMode12NumScored++;
         }
     }
 }
