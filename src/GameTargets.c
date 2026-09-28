@@ -1,10 +1,16 @@
-// GameTargets.c (our name): the code the target games (modes 13..17) share: the target list sorted
-// and aimed at, each player's targets hit and shot multiplier, the prize, the per-tee distance
-// check, and dispatchers into each mode's own file. Split from GameModeReplay.c (mode 10) because
-// the two halves each have their own copy of the int-to-float constant; the bytes cannot prove the
-// exact split point, which is somewhere from GameModeSkillZoneBase_SortCupsByDistanceFromTee to
-// GameModeSkillZoneBase_ScaleTargetPoints (the functions between use no float constants).
-// GameModeSkillZoneBase_SortCupsByDistanceFromTee is the first function the target modes call.
+// GameTargets.c (our name; TW07's GameMode_SkillZoneBase.cpp, the base of its five skill-zone
+// modes, which are our target games, modes 13..17): the code those modes share. The target list
+// sorted by distance from the tee and aimed at (the pin and flag move to the player's target), the
+// target nearest the ball or the aim point, which ring of a target a landing surface is, each
+// player's per-hole and per-shot target-game state, the random shot multiplier, the all-targets
+// prize, each hole's per-target points factor, the drive line, the bonus objects' index, the
+// commentary, and dispatchers into each mode's own file (TW07's virtual methods).
+// Split from GameModeReplay.c (mode 10) because the two halves each have their own copy of the
+// int-to-float constant; the bytes cannot prove the exact split point. TW07's source order puts
+// GetCupCount, GetCupPosition and AddCup right before SortCupsByDistanceFromTee, and
+// GameModeReplay.c ends with three functions that do exactly that (fn_800F1960, fn_800F196C,
+// fn_800F199C, the last the only user of the 1.0f at .sdata2 0x80284698, which could as well open
+// this file's .sdata2): the file probably starts there.
 
 #include "golfer.h"
 #include "ball.h"
@@ -12,7 +18,8 @@
 #include "engine.h"
 #include "game/earnings.h"
 
-// Score multipliers for GameModeSkillZoneBase_ScaleTargetPoints, one table per value of Game_GetCurHoleNum.
+// Each target's points factor on holes 0, 1 and 2 (Game_GetCurHoleNum), by its place in the list
+// sorted nearest the tee first (GameModeSkillZoneBase_ScaleTargetPoints).
 f32 gSkillZoneHole0TargetScale[13] = {
     1.0f, 1.0f, 1.3f, 1.1f, 1.0f, 1.1f, 1.2f, 1.3f, 1.3f, 1.4f, 1.4f, 1.3f, 1.0f,
 };
@@ -149,8 +156,8 @@ void GameModeSkillZoneBase_ShotClockOut(void) {
 // Which ring of a target a landing surface is, 0 being the bullseye: surfaces 0x85..0x87 are rings
 // 0..2, 0x88..0x8B rings 0..3 and 0x8C..0x90 rings 0..4; any other surface gives 5. The target
 // modes pick their ring comments by it.
-s32 GameModeSkillZoneBase_GetBullsEyeColor(s32 n) {
-    switch (n) {
+s32 GameModeSkillZoneBase_GetBullsEyeColor(s32 nSurface) {
+    switch (nSurface) {
     case 0x85: return 0;
     case 0x86: return 1;
     case 0x87: return 2;
@@ -293,48 +300,48 @@ u8 GameModeSkillZoneBase_FirstShot(int nPlayer) {
 
 // The points the last shot earned, for the HUD (UI command fn_80088660, case 4): the getter of mode
 // 13, 14, 16 or 17 (which ignore the player), else 0.
-s32 GameModeSkillZoneBase_GetShotEarned(s32 arg0) {
+s32 GameModeSkillZoneBase_GetShotEarned(s32 nPlayer) {
     if (Game_GetMode() == 0xD) {
-        return GameModeSkillZoneTimed_GetShotEarned(arg0);
+        return GameModeSkillZoneTimed_GetShotEarned(nPlayer);
     }
     if (Game_GetMode() == 0xE) {
-        return fn_800F37F8(arg0);
+        return fn_800F37F8(nPlayer);
     }
     if (Game_GetMode() == 0x10) {
-        return fn_800F59CC(arg0);
+        return fn_800F59CC(nPlayer);
     }
     if (Game_GetMode() == 0x11) {
-        return fn_800F6A00(arg0);
+        return fn_800F6A00(nPlayer);
     }
     return 0;
 }
 
 // The seconds the last shot added, for the HUD (UI command fn_80088660, case 5): mode 13's only,
 // else 0.
-s32 GameModeSkillZoneBase_GetTimeEarned(s32 arg0) {
+s32 GameModeSkillZoneBase_GetTimeEarned(s32 nPlayer) {
     if (Game_GetMode() == 0xD) {
-        return GameModeSkillZoneTimed_GetTimeEarned(arg0);
+        return GameModeSkillZoneTimed_GetTimeEarned(nPlayer);
     }
     return 0;
 }
 
 // The bonus multiplier for the HUD (UI command fn_80088660, case 7): mode 13's or mode 16's, else
 // 0.
-s32 GameModeSkillZoneBase_GetDriveMultiplier(s32 arg0) {
+s32 GameModeSkillZoneBase_GetDriveMultiplier(s32 nPlayer) {
     if (Game_GetMode() == 0xD) {
-        return GameModeSkillZoneTimed_GetDriveMultiplier(arg0);
+        return GameModeSkillZoneTimed_GetDriveMultiplier(nPlayer);
     }
     if (Game_GetMode() == 0x10) {
-        return fn_800F59D4(arg0);
+        return fn_800F59D4(nPlayer);
     }
     return 0;
 }
 
 // The balls the last shot earned, for the HUD (UI command fn_80088660, case 6): mode 17's only,
 // else 0.
-s32 GameModeSkillZoneBase_GetExtraBallsEarned(s32 arg0) {
+s32 GameModeSkillZoneBase_GetExtraBallsEarned(s32 nPlayer) {
     if (Game_GetMode() == 0x11) {
-        return fn_800F6A34(arg0);
+        return fn_800F6A34(nPlayer);
     }
     return 0;
 }
@@ -374,40 +381,41 @@ void GameModeSkillZoneBase_PostShotAwards1(int nPlayer) {
 void GameModeSkillZoneBase_PostShotAwards2(int nPlayer) {
 }
 
-// Scales points n by target i's factor on the current hole (Game_GetCurHoleNum 0, 1 or 2: 13, 15
-// and 15 factors from 1.0 to 1.4, per target in the sorted list); the product is truncated to an
-// int. On any other hole n comes back unchanged.
-s32 GameModeSkillZoneBase_ScaleTargetPoints(s32 n, int i) {
+// Scales nPoints by target nTarget's factor on the current hole (Game_GetCurHoleNum 0, 1 or 2: 13,
+// 15 and 15 factors from 1.0 to 1.4, per target in the sorted list); the product is truncated to an
+// int. On any other hole nPoints comes back unchanged.
+s32 GameModeSkillZoneBase_ScaleTargetPoints(s32 nPoints, int nTarget) {
     if (Game_GetCurHoleNum() == 0) {
-        return n * gSkillZoneHole0TargetScale[i];
+        return nPoints * gSkillZoneHole0TargetScale[nTarget];
     }
     if (Game_GetCurHoleNum() == 1) {
-        return n * gSkillZoneHole1TargetScale[i];
+        return nPoints * gSkillZoneHole1TargetScale[nTarget];
     }
     if (Game_GetCurHoleNum() == 2) {
-        return n * gSkillZoneHole2TargetScale[i];
+        return nPoints * gSkillZoneHole2TargetScale[nTarget];
     }
-    return n;
+    return nPoints;
 }
 
-// Whether a shot of length f (fn_800D0550) reaches the drive line of the player's tee set: 313 from
-// tee set 0, 300 from 1, 293 from 2 and 3; never from another. The target modes count a target hit
-// only short of it; modes 13, 16 and 17 score a target surface reached that far as a drive.
-u8 GameModeSkillZoneBase_IsLongDrive(int nPlayer, f32 f) {
+// Whether a shot of length fLength (fn_800D0550) reaches the drive line of the player's tee set:
+// 313 from tee set 0, 300 from 1, 293 from 2 and 3; never from another. The target modes count a
+// target hit only short of it; modes 13, 16 and 17 score a target surface reached that far as a
+// drive.
+u8 GameModeSkillZoneBase_IsLongDrive(int nPlayer, f32 fLength) {
     switch (gSession.nTeeSet[nPlayer]) {
     case 0:
-        if (f >= 313.0f) {
+        if (fLength >= 313.0f) {
             return 1;
         }
         break;
     case 1:
-        if (f >= 300.0f) {
+        if (fLength >= 300.0f) {
             return 1;
         }
         break;
     case 2:
     case 3:
-        if (f >= 293.0f) {
+        if (fLength >= 293.0f) {
             return 1;
         }
         break;
@@ -418,9 +426,9 @@ u8 GameModeSkillZoneBase_IsLongDrive(int nPlayer, f32 f) {
 // The index 0..4 of a bonus object the ball hit (the id the pfn268 hook gets, Ball.n140) on the
 // current hole: hole 0's objects 0xD7, 0xD5, 0xD4, 0xD6, 0xD8, hole 1's 0x3B..0x3F, hole 2's
 // 24..28; 4 for anything else. Modes 13 and 16 raise their multiplier by the index plus 2.
-s32 GameModeSkillZoneBase_GetBonusIndex(s32 n) {
+s32 GameModeSkillZoneBase_GetBonusIndex(s32 nId) {
     if (Game_GetCurHoleNum() == 0) {
-        switch (n) {
+        switch (nId) {
         case 0xD7: return 0;
         case 0xD5: return 1;
         case 0xD4: return 2;
@@ -428,7 +436,7 @@ s32 GameModeSkillZoneBase_GetBonusIndex(s32 n) {
         case 0xD8: return 4;
         }
     } else if (Game_GetCurHoleNum() == 1) {
-        switch (n) {
+        switch (nId) {
         case 0x3B: return 0;
         case 0x3C: return 1;
         case 0x3D: return 2;
@@ -436,7 +444,7 @@ s32 GameModeSkillZoneBase_GetBonusIndex(s32 n) {
         case 0x3F: return 4;
         }
     } else if (Game_GetCurHoleNum() == 2) {
-        switch (n) {
+        switch (nId) {
         case 24: return 0;
         case 25: return 1;
         case 26: return 2;

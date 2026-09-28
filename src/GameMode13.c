@@ -1,7 +1,11 @@
-// GameMode13.c (our name): game mode 13, the timed target game. Each player starts with 90 seconds
-// (5400 frames, in n290 for the hole). Hitting a target pays points and adds time; each earlier hit
-// on the same target scales both by 0.75, and a target pays at most 4 times. Bonuses picked up on
-// the way raise a points multiplier. The game ends when everyone's time is up.
+// GameMode13.c (our name; TW07's GameMode_SkillZoneTimed.cpp): game mode 13, the timed target
+// game, one hole. Each player starts with 90 seconds (5400 frames, in n290 for the hole) and plays
+// in turn while they have time. The first hit of a target pays 100 plus its points and adds its
+// time plus 5 seconds; each earlier hit on the same target scales both by 0.75, and a target pays
+// at most 4 times; the last target not yet hit pays the all-targets prize instead. A shot can get a
+// random x2, x3 or x5 multiplier, and bonus objects hit on the way raise a second points multiplier.
+// A target surface past the tee set's drive line counts as a drive, paying only for a new longest
+// one. The game ends when everyone's time is up. The shared target-game code is GameTargets.c.
 
 #include "golfer.h"
 #include "ball.h"
@@ -11,11 +15,15 @@
 
 // fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
 
-s32 gTimedSavedOptionsC = 4;                    // the options saved while the game runs
-s32 gTimedShotPoints;                    // the points of the last shot
-s32 gTimedShotSeconds;                    // the seconds added by the last shot
-s32 gTimedBonusMultiplier;                    // the points multiplier from bonuses
-s32 gTimedSavedWind;
+// Mode 13's state; only this file uses it. The .sbss ones are defined last address first (the
+// compiler lays a file's .sbss out last definition first).
+s32 gTimedSavedOptionsC = 4;    // options.nC from before the game (StartGamePreData; Shutdown puts it back)
+s32 gTimedShotPoints;           // the points of the last shot (GetShotEarned)
+s32 gTimedShotSeconds;          // the seconds added by the last shot (GetTimeEarned)
+s32 gTimedBonusMultiplier;      // the points multiplier from bonus objects: 1 each shot, raised by
+                                //   CollisionActor (GetDriveMultiplier)
+s32 gTimedSavedWind;            // options.nWind from before the game (StartGamePreData; Shutdown puts
+                                //   it back)
 
 void  Gaud_StartShotClock(void);
 
@@ -39,7 +47,7 @@ void  GameModeSkillZoneTimed_Mulligan(int nPlayer);
 void  GameModeSkillZoneTimed_SetTimer(int nPlayer, int nTime);
 u8    GameModeSkillZoneTimed_HoleFinished(int nPlayer, u8 bCheck);
 void  GameModeSkillZoneTimed_CollisionActor(int nPlayer, int nId);
-s32   GameModeSkillZoneTimed_GreenType(int nPlayer, int i);
+s32   GameModeSkillZoneTimed_GreenType(int nPlayer, int nTarget);
 void  GameModeSkillZoneTimed_EndGame(void);
 
 // Game mode 13's setup (pfnInit, from GM_SetModeType): its hooks (the target list ones from
@@ -172,13 +180,13 @@ void GameModeSkillZoneTimed_EndGolferTurn(int nPlayer) {
 // time. A target hit before pays its points and seconds scaled by 0.75 per earlier hit; after 4
 // hits it pays nothing (Gaud_TargetClosedOut). A target surface past the drive line is a drive: a
 // new longest one (nDDC) pays as a surface, any other nothing. Those points are multiplied by nDBC,
-// the scale, the target factor (targets only) and the bonus multiplier (gTimedBonusMultiplier), then the
-// earnings modifiers; a loss never takes the winnings (nDD8) below 0. Added seconds go to the HUD
-// clock as the player's new total (n290 plus seconds * 60 frames; n290 itself is set through
-// SetTimer, from the UI) and are summed in aDC4[4]; the ticking stops when the clock climbs past 10
-// seconds and starts when time added to an empty one is 10 seconds or less. If time ran out in
-// flight (bE9D), time earned saves the player, else comment 0x14. Target streaks (nE90, best nE8C),
-// bullseyes (nDE0) and target hits (aDC4[3]) are counted.
+// the scale, the target factor (targets only) and the bonus multiplier (gTimedBonusMultiplier),
+// then the earnings modifiers; a loss never takes the winnings (nDD8) below 0. Added seconds go to
+// the HUD clock as the player's new total (n290 plus seconds * 60 frames; n290 itself is set
+// through SetTimer, from the UI) and are summed in aDC4[4]; the ticking stops when the clock climbs
+// past 10 seconds and starts when time added to an empty one is 10 seconds or less. If time ran
+// out in flight (bE9D), time earned saves the player, else comment 0x14. Target streaks (nE90,
+// best nE8C), bullseyes (nDE0) and target hits (aDC4[3]) are counted.
 void GameModeSkillZoneTimed_CheckShotAwards(int nPlayer) {
     s32 nBalls;
     s32 nSurface;
@@ -246,7 +254,8 @@ void GameModeSkillZoneTimed_CheckShotAwards(int nPlayer) {
                 gTimedShotSeconds += 5;
                 gPlayers[nPlayer].aDC4[4] += gTimedShotSeconds * 60;
                 PlayNow_SendMessage18(nPlayer);
-                GameModeSkillZoneTimed_SetHudClock(gPlayers[nPlayer].n290[Game_CurHoleIndex()] + gTimedShotSeconds
+                GameModeSkillZoneTimed_SetHudClock(gPlayers[nPlayer].n290[Game_CurHoleIndex()]
+                                                   + gTimedShotSeconds
                                                    * 60);
                 nAdded = gTimedShotSeconds;
                 GameMsg_Send5Ints(0x33, gTimedShotPoints, 0, 0, 0xC9, 1);
@@ -344,7 +353,8 @@ void GameModeSkillZoneTimed_CheckShotAwards(int nPlayer) {
         gTimedShotSeconds = gTimedShotSeconds * fScale;
         gPlayers[nPlayer].aDC4[4] += gTimedShotSeconds * 60;
         PlayNow_SendMessage18(nPlayer);
-        GameModeSkillZoneTimed_SetHudClock(gPlayers[nPlayer].n290[Game_CurHoleIndex()] + gTimedShotSeconds * 60);
+        GameModeSkillZoneTimed_SetHudClock(gPlayers[nPlayer].n290[Game_CurHoleIndex()] + gTimedShotSeconds
+                                           * 60);
         nAdded = gTimedShotSeconds;
         if (!gSession.bReplay) {
             fn_800E53F0(0x34, gTimedShotSeconds * 60, 0, 0);
@@ -524,15 +534,13 @@ u8 GameModeSkillZoneTimed_GameFinished(u8 bCheck) {
     return 1;
 }
 
-// The points the last shot earned (gTimedShotPoints); a is not used
-// (GameModeSkillZoneBase_GetShotEarned passes the player).
-s32 GameModeSkillZoneTimed_GetShotEarned(s32 a) {
+// The points the last shot earned (gTimedShotPoints), whoever nPlayer is.
+s32 GameModeSkillZoneTimed_GetShotEarned(s32 nPlayer) {
     return gTimedShotPoints;
 }
 
-// The seconds the last shot added (gTimedShotSeconds); a is not used
-// (GameModeSkillZoneBase_GetTimeEarned passes the player).
-s32 GameModeSkillZoneTimed_GetTimeEarned(s32 a) {
+// The seconds the last shot added (gTimedShotSeconds), whoever nPlayer is.
+s32 GameModeSkillZoneTimed_GetTimeEarned(s32 nPlayer) {
     return gTimedShotSeconds;
 }
 
@@ -608,18 +616,17 @@ void GameModeSkillZoneTimed_CollisionActor(int nPlayer, int nId) {
     gTimedBonusMultiplier += n + 2;
 }
 
-// Which marker model target i shows for the player (pfn26C, GoDynObj.c): 1 once they have hit it 4
-// times (closed out, it pays no more), else 0.
-s32 GameModeSkillZoneTimed_GreenType(int nPlayer, int i) {
-    if (gPlayers[nPlayer].nDE4[i] > 3) {
+// Which marker model target nTarget shows for the player (pfn26C, GoDynObj.c): 1 once they have
+// hit it 4 times (closed out, it pays no more), else 0.
+s32 GameModeSkillZoneTimed_GreenType(int nPlayer, int nTarget) {
+    if (gPlayers[nPlayer].nDE4[nTarget] > 3) {
         return 1;
     }
     return 0;
 }
 
-// The bonus multiplier (gTimedBonusMultiplier); a is not used (GameModeSkillZoneBase_GetDriveMultiplier
-// passes the player).
-s32 GameModeSkillZoneTimed_GetDriveMultiplier(s32 a) {
+// The bonus-object multiplier (gTimedBonusMultiplier), whoever nPlayer is.
+s32 GameModeSkillZoneTimed_GetDriveMultiplier(s32 nPlayer) {
     return gTimedBonusMultiplier;
 }
 
@@ -633,6 +640,6 @@ void GameModeSkillZoneTimed_EndGame(void) {
 // Sends UI message 17, the HUD clock, with a value: mode 13 passes the player's time left in frames
 // (0 when it ran out, -1 when the hole restarts); speed golf (GameMode8.c) sends 3 as its countdown
 // starts, 2 at the go and 0 at the end.
-void GameModeSkillZoneTimed_SetHudClock(s32 p0) {
-    GameMsg_SendInt(17, p0);
+void GameModeSkillZoneTimed_SetHudClock(s32 nTime) {
+    GameMsg_SendInt(17, nTime);
 }
