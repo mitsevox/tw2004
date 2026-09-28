@@ -44757,5 +44757,21 @@
 "matched_functions": 7647,
 "total_functions": 7647,
 "exact": 7647
+},
+{
+"commit": "f2eeace",
+"sha": "f2eeace7bc8cf71a9e3ec7c0bac0156a374b8227",
+"time": 1790613322,
+"subject": "findings: EA bug register (labelled, open with what settles each, dropped with why)",
+"report": true,
+"matched_code": 1550724,
+"complete_code": 1550724,
+"matched_data": 862555,
+"complete_data": 1078855,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7647,
+"total_functions": 7647,
+"exact": 7647
 }
 ]
