@@ -20,12 +20,7 @@ matching-era records removed (in history at 6839245), docs/README.md index.
 Owner 2026-09-28: the readability plan is APPROVED; continue it. The matched-data scoring lane is ON
 HOLD (decomp.dev already shows 100%; objdiff's local "matched data" 79.95% is per-symbol scoring).
 Progress log: config/GW4E69/readability_progress.tsv (`hotnames.py --units --log` after every round);
-per-file work lists: `hotnames.py --unit X --todo`. CHECKPOINT (2026-09-28 ~01:30 UTC, pre-compact; owner usage 68%): round 5 landed and logged (588
-functions reviewed = 8.9%, 15 files through the pass; core area DONE incl. its headers). Nothing
-running. NEXT: round 6 (golfer area), 4 lanes: char.c from 0x8001A288 (120 to go), SkinPart.c from
-0x800CDAFC SkinPart_FindPart (42 to go), then CharAnim / Skin / Skeleton / FEgolferanim; the golfer
-area's header pass (leads: naming-leads.md "Round 5") runs as its own lane and is merged LAST.
-Round procedure (orchestrator): new_agent.py <lane>; prompt = plan-readability.md + brief.md +
+per-file work lists: `hotnames.py --unit X --todo`. CHECKPOINT (2026-09-28 ~02:00 UTC): round 6 landed and logged (709 functions reviewed = 10.7%, 17 files through the pass: +SkinPart, +Skin; golfer headers pass 1 done, leftovers in naming-leads.md "Round 6"). Nothing running. NEXT: round 7 (golfer area): char.c from 0x8001C5B4 Character_SelectClub (80 to go, two lanes of 40; the second finishes the file header), CharAnim (16) + Skeleton (52), FEgolferanim (93); fix name.py's `port:` continuation indent first. Round procedure (orchestrator): new_agent.py <lane>; prompt = plan-readability.md + brief.md +
 roles/naming.md, files + `hotnames.py --unit X --todo` cap ~40, deliver batch files + hand-edit list,
 never git reset; on return: replay batches with name.py in order (`--by "<lane> (replayed by
 orchestrator)"`), rename.py for globals, then hand edits by `git checkout agent/<lane> -- <files>` +
