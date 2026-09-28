@@ -2568,7 +2568,7 @@ s32 Earnings_GetHoleAwardId(s32 i) {
 // event) and 15 or more events played: 24 a top 25 in every event played, 25 leading 15 of the 28
 // tour statistics, 26 leading the par 3, 4 and 5 birdie statistics, 27 over 4.25 birdies a round,
 // 30 under par in every event played, 33 a scoring average under 68.17. The others at any time: 23
-// more than 18 holes in one (SaveProfile.nAC), 28 GameMode5's fn_800ED6F0 with the best medal
+// more than 18 holes in one (SaveProfile.nAC), 28 GameMode5's PlayNow_GetCalendarFlag with the best medal
 // (PlayNow_GetMedal 0), 29 leading the career money list, 31 tour.n4E96 over 11, 32 a round under 59
 // strokes, 34 more than 100 events (n4E94) with over 28% won, 35 n4E98 over 66, 36 n4E9A over 18,
 // 37 ten or more wins in a season, 38 more season winnings than Tiger Woods's $9,188,321 of 2000.
@@ -2637,7 +2637,7 @@ u8 Earnings_IsTourAwardEarned(int nPlayer, int nAward) {
         }
         return 0;
     case 28:
-        if (fn_800ED6F0() && PlayNow_GetMedal() == 0) return 1;
+        if (PlayNow_GetCalendarFlag() && PlayNow_GetMedal() == 0) return 1;
         return 0;
     case 29:
         return GM_PgaTourSim_IsLeaderForStat(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_CAREER_WINNINGS) != 0;

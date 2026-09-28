@@ -1624,3 +1624,16 @@ address	name	comment	by	date
 800ED280	PlayNow_GetGroupName	rewrite	rk6 (replayed by orchestrator)	2026-09-28
 800ED2C8	PlayNow_GetGroupDescription	add	rk6 (replayed by orchestrator)	2026-09-28
 800ED314	PlayNow_GetHolesLeft	rewrite	rk6 (replayed by orchestrator)	2026-09-28
+800ED508	PlayNow_CountGroupChallenges	rewrite	rk6 (replayed by orchestrator)	2026-09-28
+800ED540	PlayNow_IsIntroPending	add	rk6 (replayed by orchestrator)	2026-09-28
+800ED548	PlayNow_ClearIntroPending	none	rk6 (replayed by orchestrator)	2026-09-28
+800ED554	PlayNow_Restart	rewrite	rk6 (replayed by orchestrator)	2026-09-28
+800ED5C8	PlayNow_HoleFinished	rewrite	rk6 (replayed by orchestrator)	2026-09-28
+800ED604	PlayNow_HoleOver	rewrite	rk6 (replayed by orchestrator)	2026-09-28
+800ED650	PlayNow_GetRewards	rewrite	rk6 (replayed by orchestrator)	2026-09-28
+800ED688	PlayNow_GetNumOpponents	none	rk6 (replayed by orchestrator)	2026-09-28
+800ED69C	PlayNow_GetOpponent	add	rk6 (replayed by orchestrator)	2026-09-28
+800ED6E8	PlayNow_SetCalendarFlag	add	rk6 (replayed by orchestrator)	2026-09-28
+800ED6F0	PlayNow_GetCalendarFlag	add	rk6 (replayed by orchestrator)	2026-09-28
+800ED6F8	PlayNow_ForceWeather	add	rk6 (replayed by orchestrator)	2026-09-28
+800ED710	PlayNow_SendMessage18	add	rk6 (replayed by orchestrator)	2026-09-28

@@ -171,9 +171,9 @@ void fn_80112580(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_801125B8(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800ED6E8(pArgs[0].i);
+    PlayNow_SetCalendarFlag(pArgs[0].i);
 }
 
 void fn_801125E0(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_800ED6F0();
+    pResult->i = PlayNow_GetCalendarFlag();
 }

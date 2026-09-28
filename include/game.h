@@ -109,7 +109,7 @@ void GameMsg_Send2Ints(int nMsg, int nA, int nB);    // send message nMsg with t
 void GameMsg_SendInt(int nMsg, int nValue);        // send message nMsg with one value (GameMsg_Send1)
 
 // What lbl_802811F0 points to (its code, around 0x8006F650, is not decompiled; fn_8006F608 clears
-// it). GameMode5's fn_800ED6F8 sets f18 and flags it in b1C; SitDevFile.c tests the flags.
+// it). GameMode5's PlayNow_ForceWeather sets f18 and flags it in b1C; SitDevFile.c tests the flags.
 typedef struct Unk802811F0 {
     u32 uFlags;                 // 0x00  bit 0x2: fn_80035574
     u32 u04;                    // 0x04  bit 0x2: fn_800BCC38
@@ -589,12 +589,12 @@ void PlayNow_StartChallenge(void);
 u8   PlayNow_IsChallengeRunning(void);
 int  PlayNow_GetMedal(void);
 void PlayNow_OnPause(void);
-u8   fn_800ED540(void);
-void fn_800ED548(void);
-void fn_800ED6E8(u8 v);
-u8   fn_800ED6F0(void);
-void fn_800ED6F8(f32 x);
-void fn_800ED710(s32 a);
+u8   PlayNow_IsIntroPending(void);
+void PlayNow_ClearIntroPending(void);
+void PlayNow_SetCalendarFlag(u8 v);
+u8   PlayNow_GetCalendarFlag(void);
+void PlayNow_ForceWeather(f32 x);
+void PlayNow_SendMessage18(s32 a);
 
 void fn_800EDAE0(int nPlayer);          // GameMode9.c
 void GameModeDriverPGATour_FreeStreamMemory(void);                 // GameModeDriverPGATour.c

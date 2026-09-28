@@ -534,7 +534,7 @@ void STATEFUNC_SwingInit(int nPlayer) {
         }
     }
     if (gPlayers[nPlayer].bC2E == 0 && !Player_IsCPU(nPlayer) && PlayNow_IsChallengeRunning()
-        && fn_800ED540()) {
+        && PlayNow_IsIntroPending()) {
         if (GM_Currently_RealtimeMode()) {
             fn_800E502C(fn_800EAC7C());
         } else {
@@ -542,7 +542,7 @@ void STATEFUNC_SwingInit(int nPlayer) {
         }
         GUI_ToggleUI(nPlayer, 0);
         fn_80062C80(gPlayers[nPlayer].nC58, 0);
-        fn_800ED548();
+        PlayNow_ClearIntroPending();
     }
     Caddie_Start(nPlayer);
     fn_80062C5C();

@@ -1050,7 +1050,7 @@ void fn_800FBD2C(int nPlayer) {
                 }
             } else {
                 fn_800F80D4(0);
-                fn_800ED710(nPlayer);
+                PlayNow_SendMessage18(nPlayer);
                 GOLFERSTATE_Switch(13, nPlayer);
                 if (lbl_802823C9) {
                     lbl_802823C9 = 0;
@@ -1611,7 +1611,7 @@ void fn_800FDADC(void) {
         gPlayers[nPlayer].ball.nLie = LIE_INCUP_e;
         gPlayers[nPlayer].nC3C |= 0x4000000;
         fn_800F80D4(0);
-        fn_800ED710(nPlayer);
+        PlayNow_SendMessage18(nPlayer);
         GOLFERSTATE_Switch(13, nPlayer);
     }
 }

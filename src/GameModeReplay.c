@@ -82,7 +82,7 @@ void GameModeReplay_StartGamePreData(void) {
     // differently (96.9%)
     ((Session*)&gSession)->options.nC = gReplayData.nF12;
     if (gReplayData.nF12 == 3) {
-        fn_800ED6F8(gReplayData.nF14 / 100.0f);
+        PlayNow_ForceWeather(gReplayData.nF14 / 100.0f);
     }
     gSession.nTeeSet[0] = gReplayData.nTeeSet;
     Replay_SetPinSet();
@@ -154,7 +154,7 @@ void GameModeReplay_SetupNextGolfer(void) {
 
 void fn_800F18C8(void) {
     if (gReplayData.nF12 == 1 || gReplayData.nF12 == 2 || gReplayData.nF12 == 3) {
-        fn_800ED6F8(gReplayData.nF14 / 100.0f);
+        PlayNow_ForceWeather(gReplayData.nF14 / 100.0f);
     }
 }
 

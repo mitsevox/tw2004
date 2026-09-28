@@ -42,7 +42,7 @@ void fn_800D9E14(void) {
 }
 
 // Whether this round has hole contests: several players, a round of every hole, no mulligans,
-// gSession.a8[0] clear, neither GameMode5 test (PlayNow_IsChallengeRunning, fn_800ED6F0) and game
+// gSession.a8[0] clear, neither GameMode5 test (PlayNow_IsChallengeRunning, PlayNow_GetCalendarFlag) and game
 // mode 0, 1 or 2.
 u8 fn_800D9E5C(void) {
     if (gpGame->nMulligans != 0) return 0;
@@ -50,7 +50,7 @@ u8 fn_800D9E5C(void) {
     if (!GM_FullRoundOfGolf()) return 0;
     if (gSession.a8[0] != 0) return 0;
     if (PlayNow_IsChallengeRunning()) return 0;
-    if (fn_800ED6F0()) return 0;
+    if (PlayNow_GetCalendarFlag()) return 0;
     if (Game_GetMode() == 0 || Game_GetMode() == 1 || Game_GetMode() == 2) {
         return 1;
     }
@@ -113,7 +113,7 @@ void fn_800D9F34(void) {
 // The longest drive is played on this hole. On the round's last hole of a GameMode5 challenge the
 // contest is always on.
 u8 fn_800DA174(void) {
-    if (fn_800ED6F0() && Game_CurHoleIndex() == 17 && gpGame->bD4 == 0) {
+    if (PlayNow_GetCalendarFlag() && Game_CurHoleIndex() == 17 && gpGame->bD4 == 0) {
         return 1;
     }
     return lbl_80281568 == Game_CurHoleIndex();
@@ -121,7 +121,7 @@ u8 fn_800DA174(void) {
 
 // Closest to the pin is played on this hole (always on the 17th of a GameMode5 challenge).
 u8 fn_800DA1D4(void) {
-    if (fn_800ED6F0() && Game_CurHoleIndex() == 16 && gpGame->bD4 == 0) {
+    if (PlayNow_GetCalendarFlag() && Game_CurHoleIndex() == 16 && gpGame->bD4 == 0) {
         return 1;
     }
     return lbl_8028156C == Game_CurHoleIndex();

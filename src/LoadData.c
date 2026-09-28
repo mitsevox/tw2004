@@ -75,7 +75,7 @@ void fn_8000BA94(UStreamObject* pObject) {
 void fn_8000BAE0(void) {
     int nFile;
 
-    if (fn_800ED6F0()) {
+    if (PlayNow_GetCalendarFlag()) {
         nFile = 2;
     } else if (Game_GetMode() == 11 || Game_GetMode() == 5 || PlayNow_IsChallengeRunning()) {
         nFile = 0;

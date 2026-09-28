@@ -35,8 +35,8 @@ f32  GM_GetBonusProgress(SaveProfile* pProfile);    // GameManager.c
 void fn_801176C0(TourSeason* pTour);    // PGATourSimulation.c
 int  fn_80102134(void);                 // GameMode4.c: the current ladder event's holes
 int  fn_801021FC(void);                 // GameMode4.c: the current ladder event
-s32  fn_800ED688(int i);                // GameMode5.c: challenge i's opponent count
-s32  fn_800ED69C(int i, int k);         // GameMode5.c: its opponent k
+s32  PlayNow_GetNumOpponents(int i);                // GameMode5.c: challenge i's opponent count
+s32  PlayNow_GetOpponent(int i, int k);         // GameMode5.c: its opponent k
 u8   GM_UserHasEagledHole(int nSlot, int a, int b);      // GameRound.c
 int  GM_GetPar5EagleDate(int nSlot, int a, int b);      // GameRound.c
 int  GM_GetGolferMoneyRating(int nGolfer);          // Earnings.c: the golfer's rating
@@ -60,7 +60,7 @@ void PlayNow_SelectGroup(int nId);              // GameMode5.c
 s32  PlayNow_GetNumGroups(void);                 // GameMode5.c
 char* PlayNow_GetGroupName(int nId);             // GameMode5.c
 char* PlayNow_GetGroupDescription(int nId);             // GameMode5.c
-void fn_800ED650(int i, s32* pA, s32* pB, s32* pC);     // GameMode5.c
+void PlayNow_GetRewards(int i, s32* pA, s32* pB, s32* pC);     // GameMode5.c
 int  GameMode4_GetNumEventsWon(void);                 // GameMode4.c
 void fn_80102308(s32 n);                // GameMode4.c
 void fn_8010D334(s32 v);                // CharSliders.c
@@ -4463,7 +4463,7 @@ void fn_80082CA4(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80082CA8(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800ED650(pArgs[0].i, pArgs[1].p, pArgs[2].p, pArgs[3].p);
+    PlayNow_GetRewards(pArgs[0].i, pArgs[1].p, pArgs[2].p, pArgs[3].p);
 }
 
 void fn_80082CDC(MsgArg* pArgs, MsgArg* pResult) {
@@ -4586,7 +4586,7 @@ void fn_80083068(MsgArg* pArgs, MsgArg* pResult) {
 // and each opponent playing the player's own golfer gets the next of its four looks.
 void fn_8008311C(MsgArg* pArgs, MsgArg* pResult) {
     int  nChallenge = fn_801021FC() - 1;
-    s32  nOpponents = fn_800ED688(nChallenge);
+    s32  nOpponents = PlayNow_GetNumOpponents(nChallenge);
     s32  nMax = 0;
     s32  nHoles = fn_80102134();
     s32  nGolfer;
@@ -4598,7 +4598,7 @@ void fn_8008311C(MsgArg* pArgs, MsgArg* pResult) {
     GolferRecord* pOther;
 
     for (i = 0; i < nOpponents; i++) {
-        nGolfer = fn_800ED69C(nChallenge, i);
+        nGolfer = PlayNow_GetOpponent(nChallenge, i);
         nSum = 0;
         for (h = 0; h < 6; h++) {
             if (nHoles == 2 || nHoles == 1) {
@@ -4631,7 +4631,7 @@ void fn_8008311C(MsgArg* pArgs, MsgArg* pResult) {
 
     pRecord = fn_80077A80(gSession.nGolfer[lbl_80281ED4->nSlot]);
     for (i = 0; i < nOpponents; i++) {
-        pOther = fn_80077A80(fn_800ED69C(nChallenge, i));
+        pOther = fn_80077A80(PlayNow_GetOpponent(nChallenge, i));
         if (pRecord->nModelID == pOther->nModelID) {
             nLook = gSession.aProfile[lbl_80281ED4->nSlot].n0 + 1;
             if (nLook == 4) {

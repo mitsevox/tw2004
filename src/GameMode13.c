@@ -139,7 +139,7 @@ s32 fn_800F6D14(int nPlayer) {
 
 // End of a golfer's turn: message 18, the ball goes back to the tee; count the shots.
 void fn_800F6DFC(int nPlayer) {
-    fn_800ED710(nPlayer);
+    PlayNow_SendMessage18(nPlayer);
     if (gReplayData.bF10) {
         Mem_cpy(&gPlayers[nPlayer].ball, &gReplayData.player.ball, sizeof(Ball));
     } else {
@@ -219,7 +219,7 @@ void fn_800F6ED4(int nPlayer) {
                 gPlayers[nPlayer].nDD8 += lbl_802823BC;
                 lbl_802823B8 += 5;
                 gPlayers[nPlayer].aDC4[4] += lbl_802823B8 * 60;
-                fn_800ED710(nPlayer);
+                PlayNow_SendMessage18(nPlayer);
                 fn_800F80D4(gPlayers[nPlayer].n290[Game_CurHoleIndex()] + lbl_802823B8 * 60);
                 nAdded = lbl_802823B8;
                 GameMsg_Send5Ints(0x33, lbl_802823BC, 0, 0, 0xC9, 1);
@@ -316,7 +316,7 @@ void fn_800F6ED4(int nPlayer) {
     if (lbl_802823B8 != 0) {
         lbl_802823B8 = lbl_802823B8 * fScale;
         gPlayers[nPlayer].aDC4[4] += lbl_802823B8 * 60;
-        fn_800ED710(nPlayer);
+        PlayNow_SendMessage18(nPlayer);
         fn_800F80D4(gPlayers[nPlayer].n290[Game_CurHoleIndex()] + lbl_802823B8 * 60);
         nAdded = lbl_802823B8;
         if (!gSession.bReplay) {
@@ -508,7 +508,7 @@ void fn_800F7DE8(void) {
         gPlayers[lbl_80282278].ball.nLie = 12;
         gPlayers[lbl_80282278].nC3C |= 0x04000000;
         fn_800F80D4(0);
-        fn_800ED710(lbl_80282278);
+        PlayNow_SendMessage18(lbl_80282278);
         GOLFERSTATE_Switch(13, lbl_80282278);
         fn_800F263C(0x14);
         return;

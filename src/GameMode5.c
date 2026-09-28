@@ -46,15 +46,15 @@ void  PlayNow_ApplyChallengeSetup(void);
 void  PlayNow_Shutdown(void);
 void  PlayNow_HoleStart(void);
 void  PlayNow_EndGame(void);
-void  fn_800ED604(int nPlayer);
+void  PlayNow_HoleOver(int nPlayer);
 void  PlayNow_LoadPLYsFromStream(UStreamObject* pObject);
 int   PlayNow_GetGroupTarget(int i);
 void  PlayNow_QueueMedalMessage(int n);
 u8    PlayNow_HasAllMedals(int n);
 u8    PlayNow_GameFinished(u8 bCheck);
-int   fn_800ED508(int nGroup);
+int   PlayNow_CountGroupChallenges(int nGroup);
 u8 PlayNow_IsSpeedGolf(void);
-u8 fn_800ED5C8(int nPlayer, u8 bCheck);
+u8 PlayNow_HoleFinished(int nPlayer, u8 bCheck);
 
 // Game mode 5 (the Play Now challenges) starts, from GM_SetModeType: its own shutdown, hole-start,
 // end-game, hole-finished and hole-over callbacks go in, gpGame nC and n10 become 1, no restart is
@@ -65,8 +65,8 @@ void PlayNow_Init(void) {
     gpGame->pfnShutdown = PlayNow_Shutdown;
     gpGame->pfn1E4 = PlayNow_HoleStart;
     gpGame->pfnEndGame = PlayNow_EndGame;
-    gpGame->pfnHoleFinished = fn_800ED5C8;
-    gpGame->pfn210 = fn_800ED604;
+    gpGame->pfnHoleFinished = PlayNow_HoleFinished;
+    gpGame->pfn210 = PlayNow_HoleOver;
     gpGame->nC = 1;
     gpGame->n10 = 1;
     gPlayNowRestarting = 0;
@@ -456,8 +456,8 @@ void PlayNow_StartChallenge(void) {
     gpGame->pfnEndGame = PlayNow_EndGame;
     gpGame->pfn1E4 = PlayNow_HoleStart;
     gpGame->pfnGameFinished = PlayNow_GameFinished;
-    gpGame->pfnHoleFinished = fn_800ED5C8;
-    gpGame->pfn210 = fn_800ED604;
+    gpGame->pfnHoleFinished = PlayNow_HoleFinished;
+    gpGame->pfn210 = PlayNow_HoleOver;
 }
 
 // Mode 5's hole start (pfn1E4, from GM_InitForHole): the between-holes scorecard is turned on
@@ -588,7 +588,7 @@ void PlayNow_ApplyChallengeSetup(void) {
         }
     }
     if (gChallengeList[gCurChallenge].b4D) {
-        fn_800ED6F8(gChallengeList[gCurChallenge].f54);
+        PlayNow_ForceWeather(gChallengeList[gCurChallenge].f54);
     }
 }
 
@@ -658,7 +658,7 @@ void PlayNow_EndGame(void) {
                     }
                 }
                 GM_Earnings_AwardMoney(0, nMoney, (CourseMoneyTracking*)aOut);
-                if (fn_800ED6F0() && Earnings_IsTourAwardEarned(0, 0x1C)
+                if (PlayNow_GetCalendarFlag() && Earnings_IsTourAwardEarned(0, 0x1C)
                     && GM_Earnings_AwardTrophyBall(0, 0x1C)) {
                     GUI_QueueMessage(6, 0x1C, gEarningsTable.nA24, nProfile);
                     GM_Earnings_AwardMoney(0, gEarningsTable.nA24, 0);
@@ -779,7 +779,7 @@ int PlayNow_GetMedal(void) {
                 break;
             case 7:
                 if (gpGame->n4 == 1) {
-                    if (fn_800ED6F0()) {
+                    if (PlayNow_GetCalendarFlag()) {
                         if (gpGame->bD4) {
                             nPlayoff = 2;
                             if (gPlayers[0].nHolesWon > gPlayers[1].nHolesWon) {
@@ -939,7 +939,7 @@ s32 PlayNow_GetMedalMark(int k) {
 // 18 for player 0 (PlayNow_SendMessage18).
 void PlayNow_OnPause(void) {
     if (Game_GetMode() == 8) {
-        fn_800ED710(0);
+        PlayNow_SendMessage18(0);
     }
 }
 
@@ -1130,8 +1130,8 @@ int PlayNow_GetHolesLeft(void) {
             n++;
         }
     }
-    i = !fn_800ED5C8(0, 1);
-    if (fn_800ED508(gChallengeList[gCurChallenge].nGroup) > 1) {
+    i = !PlayNow_HoleFinished(0, 1);
+    if (PlayNow_CountGroupChallenges(gChallengeList[gCurChallenge].nGroup) > 1) {
         for (i = gCurChallenge + i; i < gNumChallenges; i++) {
             if (gChallengeList[i].nGroup == gChallengeList[gCurChallenge].nGroup) {
                 switch (gChallengeList[i].nType) {
@@ -1185,8 +1185,8 @@ int PlayNow_GetHolesLeft(void) {
     return n;
 }
 
-// How many challenges are in a group.
-int fn_800ED508(int nGroup) {
+// How many challenges of the list being played belong to group nGroup.
+int PlayNow_CountGroupChallenges(int nGroup) {
     int n = 0;
     int i;
     for (i = 0; i < gNumChallenges; i++) {
@@ -1197,16 +1197,24 @@ int fn_800ED508(int nGroup) {
     return n;
 }
 
-u8 fn_800ED540(void) {
+// Whether the challenge group's intro is still to be shown: set when the group's first challenge
+// starts (PlayNow_StartChallenge); at the first swing (STATEFUNC_SwingInit) a human player gets the
+// group's message and PlayNow_ClearIntroPending clears it.
+u8 PlayNow_IsIntroPending(void) {
     return gPlayNowIntroPending;
 }
 
-void fn_800ED548(void) {
+void PlayNow_ClearIntroPending(void) {
     gPlayNowIntroPending = 0;
 }
 
-// Restart: back to the challenge it was started on (a UI command, after GM_RestartHole).
-void fn_800ED554(void) {
+// The challenge restarts (the restart command, after GM_RestartHole): a restart is flagged
+// (gPlayNowRestarting: the hole counts as finished and the game as not, until PlayNow_HoleOver),
+// b134 is set, the current challenge goes back to the selected one (the group's first), the
+// golfer's turn is ended, the mode's hole-restart hook runs, UI message flag 2 is set, the new-game
+// data is cleared and the challenge starts again (in a real-time event through
+// GameModeDriverRTE_StartEvent, else PlayNow_StartChallenge); then Character_PreHoleInit.
+void PlayNow_Restart(void) {
     gPlayNowRestarting = 1;
     gpGame->b134 = 1;
     gCurChallenge = gPlayNowSelectedChallenge;
@@ -1222,17 +1230,19 @@ void fn_800ED554(void) {
     Character_PreHoleInit();
 }
 
-// Hole finished: always after a restart; otherwise the mode's own test.
-u8 fn_800ED5C8(int nPlayer, u8 bCheck) {
+// Mode 5's hole-finished test (pfnHoleFinished; bCheck 1 only asks): always over while a restart is
+// pending (PlayNow_Restart), otherwise the played mode's own test.
+u8 PlayNow_HoleFinished(int nPlayer, u8 bCheck) {
     if (gPlayNowRestarting) {
         return 1;
     }
     return gPlayNowModeHoleFinished(nPlayer, bCheck);
 }
 
-// The hole is over, the game is not: after a restart GUI_SetEndOfHolePending runs and the restart
-// flag and b275 are cleared; otherwise the mode's own callback runs.
-void fn_800ED604(int nPlayer) {
+// Mode 5's hook for a hole that is over while the game goes on (pfn210): after a restart the
+// end-of-hole screen is flagged pending (GUI_SetEndOfHolePending) and the restart flag and b275
+// (the between-holes scorecard) are cleared; otherwise the played mode's own hook runs.
+void PlayNow_HoleOver(int nPlayer) {
     if (gPlayNowRestarting) {
         GUI_SetEndOfHolePending();
         gPlayNowRestarting = 0;
@@ -1242,18 +1252,20 @@ void fn_800ED604(int nPlayer) {
     gPlayNowModeHoleOver(nPlayer);
 }
 
-// Challenge i's three rewards, the lowest medal's first.
-void fn_800ED650(int i, s32* pA, s32* pB, s32* pC) {
+// Challenge i's three medal rewards, the lowest medal's (aMedal[2]) first and the best's
+// (aMedal[0]) last.
+void PlayNow_GetRewards(int i, s32* pA, s32* pB, s32* pC) {
     *pA = gChallengeList[i].aMedal[2].nReward;
     *pB = gChallengeList[i].aMedal[1].nReward;
     *pC = gChallengeList[i].aMedal[0].nReward;
 }
 
-s32 fn_800ED688(int i) {
+s32 PlayNow_GetNumOpponents(int i) {
     return gChallengeList[i].nOpponents;
 }
 
-s32 fn_800ED69C(int i, int k) {
+// The golfer of challenge i's CPU opponent k (0, 1; any other k gives the third).
+s32 PlayNow_GetOpponent(int i, int k) {
     if (k == 0) {
         return gChallengeList[i].aOpponent[0];
     }
@@ -1263,19 +1275,32 @@ s32 fn_800ED69C(int i, int k) {
     return gChallengeList[i].aOpponent[2];
 }
 
-void fn_800ED6E8(u8 v) {
+// Sets the flag the calendar screen controls (FE message 694, CalendarScreen.c; see
+// PlayNow_GetCalendarFlag for what it changes).
+void PlayNow_SetCalendarFlag(u8 v) {
     gPlayNowCalendarFlag = v;
 }
 
-u8 fn_800ED6F0(void) {
+// The flag the calendar screen sets (PlayNow_SetCalendarFlag; FE message 695 reads it). While it is
+// set the loading screen uses file 2 (LoadData.c), the hole contests change (GameHoleContests.c:
+// the round counts as having none, but the long drive and closest to the pin are on holes 18 and 17
+// outside a playoff), a match-play challenge's playoff decides medal 1 or 2 (PlayNow_GetMedal), and
+// a best medal earns award 0x1C, a trophy ball PlayNow_EndGame pays.
+u8 PlayNow_GetCalendarFlag(void) {
     return gPlayNowCalendarFlag;
 }
 
-void fn_800ED6F8(f32 x0) {
+// Forces the next weather pick (fn_8006F650, at the start of a hole) to its effect bit 1 at amount
+// fAmount (kept to 0.1..1 when applied), the effect the game option nC 3 picks with a random
+// amount. A challenge with b4D passes its f54 (PlayNow_ApplyChallengeSetup); a replay passes its
+// saved amount (GameModeReplay.c).
+void PlayNow_ForceWeather(f32 x0) {
     lbl_802811F0->b1C = 1;
     lbl_802811F0->f18 = x0;
 }
 
-void fn_800ED710(s32 p0) {
+// Sends game message 18 with player nPlayer. The timed modes send it when a player's turn or time
+// ends (GameMode8.c, GameMode13.c), and PlayNow_OnPause when a speed golf challenge is paused.
+void PlayNow_SendMessage18(s32 p0) {
     GameMsg_SendInt(18, p0);
 }

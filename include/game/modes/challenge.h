@@ -37,7 +37,7 @@ typedef struct Challenge {
     s32 nHoleKind;              // 0x44  what the challenge hole adds
     s32 nHoleExtra;             // 0x48
     u8  bPlaceBall;             // 0x4C  the ball starts at the spot in gPlayNowBallSpots
-    u8  b4D;                    // 0x4D  f54 goes to fn_800ED6F8
+    u8  b4D;                    // 0x4D  f54 goes to PlayNow_ForceWeather
     u8  unk4E[2];
     s32 nWind;                  // 0x50  the wind option while it is played
     f32 f54;                    // 0x54

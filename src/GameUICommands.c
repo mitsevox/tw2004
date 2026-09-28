@@ -308,7 +308,7 @@ int   PlayNow_GetScoreToTarget(void);
 char* PlayNow_GetGroupName(int nId);
 char* PlayNow_GetGroupDescription(int nId);
 int   PlayNow_GetHolesLeft(void);
-void  fn_800ED554(void);
+void  PlayNow_Restart(void);
 void  fn_800ED974(void);
 Pga80205F30* GameModeDriverPGATour_GetWinInfo(void);
 s32   GameModeDriverPGATour_DisplayEndOfHoleMessage(char* pDst);
@@ -849,7 +849,7 @@ void fn_8008666C(MsgArg* pArgs, MsgArg* pResult) {
     EVENT_Trigger(lbl_80282278, 2, NULL, 0);
     GM_RestartHole();
     if (PlayNow_IsChallengeRunning()) {
-        fn_800ED554();
+        PlayNow_Restart();
     }
     if (Game_GetMode() == 26 || Game_GetMode() == 22) {
         Gaud_RestartMusic();
