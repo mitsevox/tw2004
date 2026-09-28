@@ -1,16 +1,22 @@
-// event.c (TW06's golf/eventmanager/event.c): the game's event handlers. EVENT_Trigger calls the
-// handler for an event number from the file's table (gEventHandlers): stepping through the clubs and
-// shot kinds, the camera and commentary for each moment of a shot, and the lessons' checks
-// (Lessons_OnEvent can block an event). Most handlers pass the moment on to SitDev_QueueEvent.
+// event.c (TW06's and TW07's golf/EventManager/event.c): the game's event handlers. EVENT_Trigger
+// calls the handler for an event number from the file's table (gEventHandlers), one EVENT_ handler
+// per moment of the round: a hole or turn starting, the club, shot-kind and aim buttons, the swing,
+// each moment of the ball's flight and landing, GameBreakers, unlocks. A handler moves the camera,
+// plays audio, tells the lessons (Lessons_OnEvent can block an event) and mostly passes the moment
+// on to the commentary scripts (SitDev_QueueEvent). The handler names are TW06's EVENTID_e and
+// TW07's event.c: the numbers match TW06's up to 59 and are one lower from 60 on (TW06 added one of
+// SpecialSwingEnded / SpecialSwingDone). The file ends with SitDev.c's first five functions
+// (SitDev_vInitModule .. SitDev_vUnregisterStreamClients, TW07's order) and SitDev's state block;
+// Code80067710.c goes on with the rest of SitDev.c.
 
 #include "game.h"
 #include "terrain.h"
 #include "sitdev.h"
 #include "core/easb.h"
 
-SitDevData gSitDevData;
-SitDevData* gpSitDevData = &gSitDevData;
-u32 gEventIdleSeconds;              // seconds counted by event 26
+SitDevData gSitDevData;                     // the commentary scripts' state (SitDev.c's)
+SitDevData* gpSitDevData = &gSitDevData;    // every SitDev file reaches it through this
+u32 gEventIdleSeconds;                      // seconds counted by EVENT_Idle (event 26) this round
 
 void Character_InitNewClubAndShotType(int nPlayer);
 void fn_80033704(u16 nPatch, u16 nObject);
@@ -183,8 +189,8 @@ void EVENT_BallBounce(int nPlayer, int nEvent, void* pData, int nArg) {
 // to the putter) to the first club Club_UsableForKind allows for the shot kind, the putter after 26
 // tries. The putter is kept only on the green or with the green within 1.5 yards toward the pin,
 // otherwise the old club comes back. Then the target is fitted to the club (not for a chip), the
-// power worked out again, the front end told (message 7 and GUI_ClubSelected), the golfer re-set for the
-// club, and the club remembered for the shot kind. Nothing when a lesson blocks it, in the
+// power worked out again, the front end told (message 7 and GUI_ClubSelected), the golfer re-set
+// for the club, and the club remembered for the shot kind. Nothing when a lesson blocks it, in the
 // long-drive modes 22 and 26, or with the putter in hand.
 void EVENT_NextClub(int nPlayer, int nEvent, void* pData, int nArg) {
     int nOldClub;
@@ -395,12 +401,12 @@ void EVENT_TopOfArc(int nPlayer, int nEvent, void* pData, int nArg) {
 // (SW_vGetCurrentSpin) goes onto the ball (fn_80051C84), saved to the replay first unless a replay
 // is playing.
 void EVENT_FirstBounce(int nPlayer, int nEvent, void* pData, int nArg) {
-    f32 fSpinY;
-    f32 fSpinX;
+    f32 fSideSpin;
+    f32 fForwardSpin;
 
     if (nArg == 1) {
-        fSpinY = 0.0f;
-        fSpinX = 0.0f;
+        fSideSpin = 0.0f;
+        fForwardSpin = 0.0f;
         if (!Lessons_OnEvent(nPlayer, 29)) {
             SitDev_QueueEvent(nPlayer, 2, 28);
         }
@@ -411,11 +417,11 @@ void EVENT_FirstBounce(int nPlayer, int nEvent, void* pData, int nArg) {
         } else {
             EVENT_FirstBounceDefault(nPlayer);
         }
-        SW_vGetCurrentSpin(nPlayer, &fSpinY, &fSpinX);
+        SW_vGetCurrentSpin(nPlayer, &fSideSpin, &fForwardSpin);
         if (!gSession.bReplay) {
-            REPLAY_SaveSpin(nPlayer, fSpinX, fSpinY);
+            REPLAY_SaveSpin(nPlayer, fForwardSpin, fSideSpin);
         }
-        fn_80051C84(&gPlayers[nPlayer].ball, fSpinY, fSpinX);
+        fn_80051C84(&gPlayers[nPlayer].ball, fSideSpin, fForwardSpin);
     }
 }
 
@@ -439,7 +445,8 @@ void EVENT_LastBounceForSpinna(int nPlayer, int nEvent, void* pData, int nArg) {
 
 // Event 32 (Ball.c: the ball comes to rest), only for the real ball (nArg 1): Gaud_BallStopped,
 // commentary situation event 8 unless a lesson takes the event (a lesson judges the shot here),
-// then EVENT_BallStopController8 for a player on controller 8, EVENT_BallStopDefault otherwise (both empty).
+// then EVENT_BallStopController8 for a player on controller 8, EVENT_BallStopDefault otherwise
+// (both empty).
 void EVENT_BallStop(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1) {
         Gaud_BallStopped(nPlayer);
@@ -758,19 +765,84 @@ void EVENT_BallHitDelayed(int nPlayer, int nEvent, void* pData, int nArg) {
     }
 }
 
-// The handlers, by event number.
+// The handlers, by event number: TW06's EVENTID_e order, one lower from 60 on (see the header).
 EventHandler gEventHandlers[76] = {
-    EVENT_BeginHole, EVENT_EndHole, EVENT_RestartHole, EVENT_BeginTurn, EVENT_EndTurn, EVENT_EndGame, EVENT_ShotSetup,
-    EVENT_PreSwing, EVENT_Delay, EVENT_PracticeSwing, EVENT_HitBall, EVENT_SwingDone, EVENT_BallBounce, EVENT_NextClub,
-    EVENT_PrevClub, EVENT_NextShotType, EVENT_PrevStance, EVENT_NextStance, EVENT_RotateLeft, EVENT_RotateRight, EVENT_MoveTargetForward,
-    EVENT_MoveTargetBack, EVENT_PlaceBallRotateLeft, EVENT_PlaceBallRotateRight, EVENT_PlaceBallMoveTargetForward, EVENT_PlaceBallMoveTargetBack, EVENT_Idle, EVENT_BallMoving,
-    EVENT_TopOfArc, EVENT_FirstBounce, EVENT_NonFirstBounce, EVENT_LastBounceForSpinna, EVENT_BallStop, EVENT_InHole, EVENT_OutOfBounds,
-    EVENT_Collision, EVENT_CollisionObject, EVENT_CollisionTree, EVENT_CollisionPin, EVENT_CollisionActor, EVENT_BreaklineDone, EVENT_BreaklinePassedCup,
-    EVENT_PlayerEmotionUpdated, EVENT_SpinWindowFinished, EVENT_BeganBackswing, EVENT_TappaTappaTappa, EVENT_SpinnaSpinnaSpinna, EVENT_BeganDownSwing, EVENT_StartCameraZoom,
-    EVENT_EndCameraZoom, EVENT_StartMatrixCam, EVENT_EndMatrixCam, EVENT_3ShotSwingStarted, EVENT_SlowMotionStart, EVENT_SlowMotionEnd, EVENT_FastMotionStart,
-    EVENT_FastMotionEnd, EVENT_StartSuperZoomCam, EVENT_EndSuperZoomCam, EVENT_SpecialSwingEnded, EVENT_BallPredictionDone, EVENT_ScriptedGameBreakerStarted, EVENT_ScriptedGameBreakerEnd,
-    EVENT_PredictedGameBreakerStarted, EVENT_PredictedGameBreakerEnd, EVENT_LeaderboardDisplay, EVENT_UnlockedNewCharacter, EVENT_UnlockedNewCourse, EVENT_SpeedgolfReady, EVENT_SpeedgolfGo,
-    EVENT_ScoreCardDone, EVENT_AnimationSkinReset, EVENT_NewAnimationPlayed, EVENT_EstimatedBallFirstBounce, EVENT_FlyByEvent, EVENT_BallHitDelayed,
+    EVENT_BeginHole,                   // 0
+    EVENT_EndHole,                     // 1
+    EVENT_RestartHole,                 // 2
+    EVENT_BeginTurn,                   // 3
+    EVENT_EndTurn,                     // 4
+    EVENT_EndGame,                     // 5
+    EVENT_ShotSetup,                   // 6
+    EVENT_PreSwing,                    // 7
+    EVENT_Delay,                       // 8
+    EVENT_PracticeSwing,               // 9
+    EVENT_HitBall,                     // 10
+    EVENT_SwingDone,                   // 11
+    EVENT_BallBounce,                  // 12
+    EVENT_NextClub,                    // 13
+    EVENT_PrevClub,                    // 14
+    EVENT_NextShotType,                // 15
+    EVENT_PrevStance,                  // 16
+    EVENT_NextStance,                  // 17
+    EVENT_RotateLeft,                  // 18
+    EVENT_RotateRight,                 // 19
+    EVENT_MoveTargetForward,           // 20
+    EVENT_MoveTargetBack,              // 21
+    EVENT_PlaceBallRotateLeft,         // 22
+    EVENT_PlaceBallRotateRight,        // 23
+    EVENT_PlaceBallMoveTargetForward,  // 24
+    EVENT_PlaceBallMoveTargetBack,     // 25
+    EVENT_Idle,                        // 26
+    EVENT_BallMoving,                  // 27
+    EVENT_TopOfArc,                    // 28
+    EVENT_FirstBounce,                 // 29
+    EVENT_NonFirstBounce,              // 30
+    EVENT_LastBounceForSpinna,         // 31
+    EVENT_BallStop,                    // 32
+    EVENT_InHole,                      // 33
+    EVENT_OutOfBounds,                 // 34
+    EVENT_Collision,                   // 35
+    EVENT_CollisionObject,             // 36
+    EVENT_CollisionTree,               // 37
+    EVENT_CollisionPin,                // 38
+    EVENT_CollisionActor,              // 39
+    EVENT_BreaklineDone,               // 40
+    EVENT_BreaklinePassedCup,          // 41
+    EVENT_PlayerEmotionUpdated,        // 42
+    EVENT_SpinWindowFinished,          // 43
+    EVENT_BeganBackswing,              // 44
+    EVENT_TappaTappaTappa,             // 45
+    EVENT_SpinnaSpinnaSpinna,          // 46
+    EVENT_BeganDownSwing,              // 47
+    EVENT_StartCameraZoom,             // 48
+    EVENT_EndCameraZoom,               // 49
+    EVENT_StartMatrixCam,              // 50
+    EVENT_EndMatrixCam,                // 51
+    EVENT_3ShotSwingStarted,           // 52
+    EVENT_SlowMotionStart,             // 53
+    EVENT_SlowMotionEnd,               // 54
+    EVENT_FastMotionStart,             // 55
+    EVENT_FastMotionEnd,               // 56
+    EVENT_StartSuperZoomCam,           // 57
+    EVENT_EndSuperZoomCam,             // 58
+    EVENT_SpecialSwingEnded,           // 59
+    EVENT_BallPredictionDone,          // 60
+    EVENT_ScriptedGameBreakerStarted,  // 61
+    EVENT_ScriptedGameBreakerEnd,      // 62
+    EVENT_PredictedGameBreakerStarted, // 63
+    EVENT_PredictedGameBreakerEnd,     // 64
+    EVENT_LeaderboardDisplay,          // 65
+    EVENT_UnlockedNewCharacter,        // 66
+    EVENT_UnlockedNewCourse,           // 67
+    EVENT_SpeedgolfReady,              // 68
+    EVENT_SpeedgolfGo,                 // 69
+    EVENT_ScoreCardDone,               // 70
+    EVENT_AnimationSkinReset,          // 71
+    EVENT_NewAnimationPlayed,          // 72
+    EVENT_EstimatedBallFirstBounce,    // 73
+    EVENT_FlyByEvent,                  // 74
+    EVENT_BallHitDelayed,              // 75
 };
 
 // Calls event nEvent's handler from the table above (0..75, not checked) with the player (0xFF from
