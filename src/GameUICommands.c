@@ -21,8 +21,8 @@
 MsgHandler gIGMessageHandlers[UI_NUM_ROUND_COMMANDS];
 
 // in reverse address order: CodeWarrior lays .sbss out last-defined-first
-s32 gSpeedGolfLogCycle;         // -1..10, one step per GM_vGetSpeedGolfLogEntry call; the event answer it writes
-                                // is always overwritten after
+s32 gSpeedGolfLogCycle;         // -1..10, one step per GM_vGetSpeedGolfLogEntry call; the event
+                                // answer it writes is always overwritten after
 u8  gAlternateGolferUp;         // mode 26: the player the next golfer-up question answers (0 / 1)
 
 // The message handlers, in address order (IG_InitGameMessages gives their numbers).
@@ -1575,7 +1575,7 @@ void GM_vIG_MCFormatted(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState card;
 
     MC_GetMC(&card, pArgs[0].i, pArgs[1].i);
-    pResult->i = (card.uFlags & 0x08) != 0;
+    pResult->i = (card.uFlags & MC_CARD_FORMATTED) != 0;
 }
 
 // The free space on the card in port pArgs[0], slot pArgs[1], in whole sectors (command 82).
@@ -1813,7 +1813,7 @@ void GM_vGetSpeedGolfRoundScore(MsgArg* pArgs, MsgArg* pResult) {
                              (s32*)pArgs[3].p);
 }
 
-// Whether a player with controller pArgs[0] may use the menu now (command 110; fn_80085BC0).
+// Whether a player with controller pArgs[0] may use the menu now (command 110; IG_IsControllerInPlay).
 void GM_vCanControllerUseMenu(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = IG_IsControllerInPlay(pArgs[0].i);
 }
