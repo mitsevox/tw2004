@@ -310,7 +310,7 @@ char* fn_800ED2C8(int nId);
 int   fn_800ED314(void);
 void  fn_800ED554(void);
 void  fn_800ED974(void);
-Pga80205F30* fn_800EE8B8(void);
+Pga80205F30* GameModeDriverPGATour_GetWinInfo(void);
 s32   GameModeDriverPGATour_DisplayEndOfHoleMessage(char* pDst);
 s32   GM_RealtimeMode_GetSelectedEvent(s32* pRound);
 int   fn_800F1960(void);
@@ -2505,7 +2505,7 @@ void fn_8008A240(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8008A294(MsgArg* pArgs, MsgArg* pResult) {
-    if (fn_800EE8B8()->b0 != 0) {
+    if (GameModeDriverPGATour_GetWinInfo()->b0 != 0) {
         pResult->i = 1;
         return;
     }
@@ -2515,7 +2515,7 @@ void fn_8008A294(MsgArg* pArgs, MsgArg* pResult) {
 // The PGA TOUR result screen: the player's name, the money won ("$1,234"), the tournament's name
 // and end date, and the place ("1st place").
 void fn_8008A2E0(MsgArg* pArgs, MsgArg* pResult) {
-    Pga80205F30* pTour = fn_800EE8B8();
+    Pga80205F30* pTour = GameModeDriverPGATour_GetWinInfo();
     int nPlace;
 
     strcpy(((MsgString*)pArgs[0].p)->pStr, gpSaveData->szName);

@@ -140,7 +140,7 @@ void fn_8010E890(MsgArg* pArgs, MsgArg* pResult) {
 
 // Build the schedule: the tournaments that have a start date. Gives how many.
 void fn_8010EA24(MsgArg* pArgs, MsgArg* pResult) {
-    s32 nEvents = fn_800EF834();
+    s32 nEvents = GM_PgaTourMode_GetNEvents();
     s32 nCount = 0;
     s32 i;
 
@@ -476,7 +476,7 @@ void fn_8010F440(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8010F4EC(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800EEF88(0);
+    GameModeDriverPGATour_CheckAdvanceTournament(0);
     if (!fn_80077148()) {
         lbl_801D87C0.fFade = 1.0f;
     }

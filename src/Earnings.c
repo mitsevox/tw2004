@@ -2515,7 +2515,7 @@ u8 Earnings_IsTourAwardEarned(int nPlayer, int nAward) {
     case 24:
         // Top 25 in every tournament played.
         if (bSeasonEnd && bFullSeason) {
-            for (i = 0; i < fn_800EF834(); i++) {
+            for (i = 0; i < GM_PgaTourMode_GetNEvents(); i++) {
                 if (pProfile->tour.aEvent[i].nUserRankType == 0) continue;
                 if (pProfile->tour.aEvent[i].nUserRankType == 2 &&
                     pProfile->tour.aEvent[i].nUserRank <= 25) continue;
@@ -2558,7 +2558,7 @@ u8 Earnings_IsTourAwardEarned(int nPlayer, int nAward) {
     case 30:
         // Under par in every tournament played.
         if (bSeasonEnd && bFullSeason) {
-            for (i = 0; i < fn_800EF834(); i++) {
+            for (i = 0; i < GM_PgaTourMode_GetNEvents(); i++) {
                 if (pProfile->tour.aEvent[i].nUserRankType == 0) continue;
                 if (pProfile->tour.aEvent[i].nUserRankType == 2 &&
                     pProfile->tour.aEvent[i].nUserScore < pProfile->tour.aEvent[i].nEventPar) continue;

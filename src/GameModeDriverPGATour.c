@@ -24,7 +24,7 @@ s32 gPgaSavedOptions18 = 1;     // the options' n18 from before a tour round (Ga
 
 PgaData gPgaData;               // the tour data, from the 'PGA' stream objects
 Pga80205F30 gPgaWinInfo;        // the player's prize in the tournament just played: set when it is
-                                //   paid (fn_800EF094), shown on the result screen.
+                                //   paid (GameModeDriverPGATour_AwardMoney), shown on the result screen.
                                 //   TW07: PgaTour_WinInfo (GetWinInfo)
 PgaStatCounts gPgaRoundStats;   // the current round's statistics (see pgatour.h)
 
@@ -49,11 +49,11 @@ u8   GameModeDriverPGATour_IsPuttForLead(int nPlayer);
 u8   GameModeDriverPGATour_IsPuttForWin(s32 nPlayer);
 s32  GameModeDriverPGATour_GetCurrentLead(int nPlayer);
 s32  GameModeDriverPGATour_GetPotentialLead(int nPlayer);
-s32  fn_800EE8B0(int nPlayer);
-void fn_800EEA3C(int nPlayer);
-s32  fn_800EF0E0(int nPlayer);
-void fn_800EF130(int nPlayer, u8 bQuick);
-void fn_800EF294(void);
+s32  GameModeDriverPGATour_GetPotentialHoleResult(int nPlayer);
+void GameModeDriverPGATour_EndTournament(int nPlayer);
+s32  GameModeDriverPGATour_GetCurrentBracket(int nPlayer);
+void GameModeDriverPGATour_SimCurrentTournament(int nPlayer, u8 bQuick);
+void GameModeDriverPGATour_PostHoleLoadInit(void);
 void GameModeDriverPGATour_EndHole(void);
 u8   GameModeDriverPGATour_GameFinished(u8 bCheck);
 u8   GameModeDriverPGATour_GoToPlayoff(u8 bCheck);
@@ -67,7 +67,7 @@ s32  GameModeDriverPGATour_GetNumEventsWon(void);
 void GameModeDriverPGATour_Init(void) {
     gpGame->pfnInit = GameModeDriverPGATour_Init;
     gpGame->pfnShutdown = GameModeDriverPGATour_Shutdown;
-    gpGame->pfn1E4 = fn_800EF294;
+    gpGame->pfn1E4 = GameModeDriverPGATour_PostHoleLoadInit;
     gpGame->pfnSetupNextGolfer = GameModeStroke_SetupNextGolfer;
     gpGame->pfnGetHonors = GameModeStroke_GetHonors;
     gpGame->pfnHoleFinished = GameModeStroke_HoleFinished;
@@ -81,7 +81,7 @@ void GameModeDriverPGATour_Init(void) {
     gpGame->pfn1FC = (u8 (*)(int))GameModeDriverPGATour_IsPuttForWin;
     gpGame->pfn200 = GameModeDriverPGATour_GetCurrentLead;
     gpGame->pfn204 = GameModeDriverPGATour_GetPotentialLead;
-    gpGame->pfn208 = fn_800EE8B0;
+    gpGame->pfn208 = GameModeDriverPGATour_GetPotentialHoleResult;
     gpGame->b274 = 0;
     gpGame->n4 = 0;
     gpGame->nMulligans = 0;
@@ -225,7 +225,7 @@ void GameModeDriverPGATour_PrepareForTeeOff(void) {
         GameModeDriverPGATour_SetTournament(gPgaData.aTournament[nEvent].nTourEvent - 1);
         fn_80117DE8(0, 0);
         GM_PgaTourSim_SimRound(0, &gpSaveData[nPlayer].tour.aEvent[gpSaveData[nPlayer].tour.nEvent],
-                    gpSaveData[nPlayer].tour.nRound, gPgaData.aTourEvent[nFormat].a40[fn_800EF0E0(0)], 5);
+                    gpSaveData[nPlayer].tour.nRound, gPgaData.aTourEvent[nFormat].a40[GameModeDriverPGATour_GetCurrentBracket(0)], 5);
         Mem_set(pRec, 0, sizeof(*pRec));
         pRec->nRounds++;
         if (gpSaveData[nPlayer].tour.nRound == 0) {
@@ -255,8 +255,9 @@ static inline SeasonEvent* Tour_CurrentEvent(PlayerNumber_t nPlayer) {
 // pfnEndGame, when a tour round ends, for profile 0: the first round counts a tournament started
 // (tour.n4E94); after the second round of a tournament of four or more rounds the cut is made
 // (fn_80117B58) and a player who missed it is marked cut; the player's total score goes into the
-// season record, and after the last round the tournament ends (fn_800EEA3C). The round number moves
-// on later (fn_800EEF88).
+// season record, and after the last round the tournament ends
+// (GameModeDriverPGATour_EndTournament). The round number moves on later
+// (GameModeDriverPGATour_CheckAdvanceTournament).
 void GameModeDriverPGATour_EndGame(void) {
     PlayerNumber_t nPlayer = PLR_1_e;
     if (gpSaveData[nPlayer].tour.nRound == 0) {
@@ -272,7 +273,7 @@ void GameModeDriverPGATour_EndGame(void) {
     gpSaveData[nPlayer].tour.aEvent[gpSaveData[nPlayer].tour.nEvent].nUserScore = GM_PgaTourSim_GetTotalScoreFromEntrantID(0, 0, 1);
     if (gpSaveData[nPlayer].tour.nRound + 1 >=
         GameModeDriverPGATour_GetRounds(gpSaveData[nPlayer].tour.nEvent)) {
-        fn_800EEA3C(0);
+        GameModeDriverPGATour_EndTournament(0);
     }
 }
 
@@ -322,18 +323,24 @@ s32 GameModeDriverPGATour_GetPotentialLead(int nPlayer) {
     return fn_80119588(nPlayer, 1) - (GM_GetGolferRelativeCumulativeScore(nPlayer, 1) + 1);
 }
 
-// The mode's pfn208 answer for every player (GameRound.c's default works it out).
-s32 fn_800EE8B0(int nPlayer) {
+// pfn208: how the hole would end for the player if the ball dropped now. The tour never says:
+// always 3, unknown (TW06 GM_HoleResult_t: 0 loses, 1 ties, 2 wins, 3 unknown); HoleScore.c's
+// default (fn_800D030C) works it out for the other modes.
+s32 GameModeDriverPGATour_GetPotentialHoleResult(int nPlayer) {
     return 3;
 }
 
-Pga80205F30* fn_800EE8B8(void) {
+// The player's result in the current tournament (TW06 PgaTour_WinInfo: placed, position, winnings):
+// cleared as a round starts, set by AwardMoney, read by the result screen (GameUICommands).
+Pga80205F30* GameModeDriverPGATour_GetWinInfo(void) {
     return &gPgaWinInfo;
 }
 
-// The message after a tournament the player won: the first win, then either three wins of the
-// tournaments marked nC, one of four random ones, or for tournaments 9 and 8 their own.
-void fn_800EE8C4(void) {
+// After a tournament the player won (called by EndTournament): the end-of-tournament movies go on
+// GUI queue 5. The first tour win gets 31; a major (Tournament.nC) gets 8 once three majors are
+// won, else one of 27..30 at random; otherwise tournaments 9 and 8 have their own (9 and 10).
+// Nothing when the win info says the player did not place.
+void GameModeDriverPGATour_PlayEndOfGameMovies(void) {
     PlayerNumber_t nPlayer = PLR_1_e;
     Tournament* p = GameModeDriverPGATour_GetEventInfo(gpSaveData[nPlayer].tour.nEvent);
     int i;
@@ -362,15 +369,18 @@ void fn_800EE8C4(void) {
     }
 }
 
-// The last round is over: a win is recorded in the profile (with its score and the tournament's
-// aPrize[bracket][1]) and its message queued, and the prize money is paid.
-void fn_800EEA3C(int nPlayer) {
-    s32 nBracket = fn_800EF0E0(nPlayer);
+// The last round is over: the winner is settled (GM_PgaTourSim_SimTournamentWinner). If the player
+// finished first, the movies are queued (PlayEndOfGameMovies) and, the first time this tournament
+// is won, the win is recorded in the profile (aC8: the date, the score and the tournament's first
+// prize aPrize[bracket][1]). The player's leaderboard winnings, if any, are paid
+// (GM_Earnings_AwardMoney) and added to gPlayers[].money.n4.
+void GameModeDriverPGATour_EndTournament(int nPlayer) {
+    s32 nBracket = GameModeDriverPGATour_GetCurrentBracket(nPlayer);
     Tournament* p = GameModeDriverPGATour_GetEventInfo(gpSaveData[nPlayer].tour.nEvent);
     s32 nMoney;
     GM_PgaTourSim_SimTournamentWinner(nPlayer);
     if (GM_PgaTourSim_GetScoreRankFromEntrantID(nPlayer, 0) == 1) {
-        fn_800EE8C4();
+        GameModeDriverPGATour_PlayEndOfGameMovies();
         if (GM_Earnings_GiveAwardToUser(nPlayer,
                                         &gpSaveData[nPlayer].aC8[gpSaveData[nPlayer].tour.nEvent].award)) {
             gpSaveData[nPlayer].aC8[gpSaveData[nPlayer].tour.nEvent].nScore = GM_PgaTourSim_GetTotalScoreFromEntrantID(nPlayer, 0, 1);
@@ -386,7 +396,7 @@ void fn_800EEA3C(int nPlayer) {
 
 // The tournament is over for the player: its champion and winning score are kept with the
 // player's result (cut, a place, or did not play), and the season moves on to the next tournament.
-void fn_800EEB94(int nPlayer) {
+void GameModeDriverPGATour_AdvanceEvent(int nPlayer) {
     SeasonEvent* p = &gpSaveData[nPlayer].tour.aEvent[gpSaveData[nPlayer].tour.nEvent];
     s32 nLeader = GM_PgaTourSim_GetEntrantIDFromScoreRow(nPlayer, 0);
     s32 nGolfer = GM_PgaTourSim_GetGolferIDFromEntrantID(nPlayer, nLeader);
@@ -414,7 +424,7 @@ void fn_800EEB94(int nPlayer) {
 
 // The round's statistics go into the player's own season counts (golfer PGA_USER_GOLFER): most
 // are added, the longest drive and putt keep the higher value.
-void fn_800EED0C(s32 nPlayer) {
+void GameModeDriverPGATour_CommitUserRoundStatCounts(s32 nPlayer) {
     PgaStatCounts* pRound = &gPgaRoundStats;
     PgaStatCounts* pTotal = &gpSaveData[nPlayer].tour.aStats[PGA_USER_GOLFER];
     pTotal->nEvents += pRound->nEvents;
@@ -457,46 +467,57 @@ void fn_800EED0C(s32 nPlayer) {
     pTotal->nCareerWins += pRound->nCareerWins;
 }
 
-// A round is over. The round count goes up and a player who missed the cut is out; after the last
-// round the tournament ends.
-void fn_800EEF88(s32 nPlayer) {
+// After a tour round (PGA TOUR menus, fn_8010F4EC). If the player quit the round (the tour
+// simulation's user-quit flag, fn_80117DE0), every entrant goes back to the first tee with no
+// strokes, and on the first round the field is emptied: the round does not count. Otherwise the
+// round is committed (the player's statistics, the CPU entrants' statistics and every entrant's
+// round score), the hole scores reset and the round number moved on; a player who missed the cut
+// has the rest of the tournament simulated (SimCurrentTournament), and after the last round the
+// tournament ends (AdvanceEvent).
+void GameModeDriverPGATour_CheckAdvanceTournament(s32 nPlayer) {
     if (fn_80117DE0()) {
         fn_80117DF0(nPlayer);
         if (gpSaveData[nPlayer].tour.nRound == 0) {
             fn_80117AF8(nPlayer);
         }
     } else {
-        fn_800EED0C(nPlayer);
+        GameModeDriverPGATour_CommitUserRoundStatCounts(nPlayer);
         fn_8011A538(nPlayer);
         fn_80117D80(nPlayer);
         fn_80117DF0(nPlayer);
         gpSaveData[nPlayer].tour.nRound++;
         if (GM_PgaTourSim_GetWasCutFromEntrantID(nPlayer, 0)) {
-            fn_800EF130(nPlayer, 0);
+            GameModeDriverPGATour_SimCurrentTournament(nPlayer, 0);
         }
         if (gpSaveData[nPlayer].tour.nRound >=
             GameModeDriverPGATour_GetRounds(gpSaveData[nPlayer].tour.nEvent)) {
-            fn_800EEB94(nPlayer);
+            GameModeDriverPGATour_AdvanceEvent(nPlayer);
         }
     }
 }
 
-void fn_800EF094(int a, s32 n) {
+// The tour simulation's payout for the player (SplitWinnings): the win info (GetWinInfo) says the
+// player placed, at entrant 0's rank on the leaderboard, winning n. No money is paid here;
+// EndTournament pays it.
+void GameModeDriverPGATour_AwardMoney(int a, s32 n) {
     gPgaWinInfo.b0 = 1;
     gPgaWinInfo.n4 = GM_PgaTourSim_GetScoreRankFromEntrantID(a, 0);
     gPgaWinInfo.n8 = n;
 }
 
-// The player's bracket, 0..9: tournaments won x 10 / 31 (profile 0's awards; nPlayer is not read).
-s32 fn_800EF0E0(int nPlayer) {
+// The player's bracket, 0..9: tournaments won (fn_800F02A8) x 10 / 31, at most 9. It picks the
+// prize column (Tournament.aPrize) and the field's strength (TourEvent.a40). Profile 0's wins;
+// nPlayer is not read.
+s32 GameModeDriverPGATour_GetCurrentBracket(int nPlayer) {
     s32 n = GameModeDriverPGATour_GetNumEventsWon() * 10 / 31;
     return n > 9 ? 9 : n;
 }
 
-// The rounds of the current tournament not played yet are played out for the player: each round's
-// course is loaded and the round simulated (k 3 when bQuick is set).
-// GameModeDriverPGATour_SkipToEvent skips ahead with it.
-void fn_800EF130(int nPlayer, u8 bQuick) {
+// The rounds of the current tournament not played yet are simulated: each round's course is set and
+// the round simulated for the field (GM_PgaTourSim_SimRound, flags 3 when bQuick is set: the
+// player's rounds simulated too, else 0), then the playoff and the winner are settled. fn_800EF9D0
+// uses it to skip ahead, CheckAdvanceTournament after the player misses the cut.
+void GameModeDriverPGATour_SimCurrentTournament(int nPlayer, u8 bQuick) {
     s32 nRounds = GameModeDriverPGATour_GetRounds(gpSaveData[nPlayer].tour.nEvent);
     Tournament* p = GameModeDriverPGATour_GetEventInfo(gpSaveData[nPlayer].tour.nEvent);
     s32 k;
@@ -512,7 +533,8 @@ void fn_800EF130(int nPlayer, u8 bQuick) {
             }
             GM_PgaTourSim_SimRound(nPlayer, &gpSaveData[nPlayer].tour.aEvent[gpSaveData[nPlayer].tour.nEvent],
                         gpSaveData[nPlayer].tour.nRound,
-                        gPgaData.aTourEvent[nTourEvent].a40[fn_800EF0E0(nPlayer)], k);
+                        gPgaData.aTourEvent[nTourEvent].a40[GameModeDriverPGATour_GetCurrentBracket(
+                                nPlayer)], k);
         }
         gpSaveData[nPlayer].tour.nRound++;
     }
@@ -520,14 +542,17 @@ void fn_800EF130(int nPlayer, u8 bQuick) {
     GM_PgaTourSim_SimTournamentWinner(nPlayer);
 }
 
-void fn_800EF294(void) {
+// pfn1E4, at the start of each hole (GM_InitForHole): the other entrants move on round the course
+// (GM_PgaTourSim_AdvanceField).
+void GameModeDriverPGATour_PostHoleLoadInit(void) {
     GM_PgaTourSim_AdvanceField(0);
 }
 
-// Called by its slot. Outside a playoff, the hole just finished goes
-// into the round's statistics (gPgaRoundStats): strokes and putts, the hole's result against par,
-// counts per par 3, 4 and 5, and the longest values; after the 18th hole the profile's tour.n4E98 run
-// goes on or ends. Then the tour simulation (fn_801198F8) is given the next hole. The u16 casts on
+// pfnEndHole. Outside a playoff, the hole just finished goes into the player's round statistics
+// (lbl_80205ED8): strokes, putts (more than 10 count as 0), bunkers and saves, fairways and greens
+// hit, the result against par, per par 3, 4 and 5, drives and the longest drive and putt. After the
+// 18th hole a round at or under par extends the profile's run of such rounds (tour.n4E98), any
+// other ends it. Then the player's hole on the leaderboard moves on (fn_801198F8). The u16 casts on
 // the sums are in the original (a clrlwi before each add).
 void GameModeDriverPGATour_EndHole(void) {
     PlayerNumber_t nPlayer;
@@ -632,8 +657,11 @@ void GameModeDriverPGATour_EndHole(void) {
     fn_801198F8(0, nHole + 1);
 }
 
-// Called by its slot. Whether the round is over: no selected
-// hole is left and, after the last round, no playoff follows (in a playoff, after every hole).
+// pfnGameFinished: whether play is over. In a playoff, the playoff standings take the hole just
+// played and play ends unless another playoff hole follows (GoToPlayoff). Otherwise 0 while a
+// selected hole is left; after the last round's last hole the playoff is set up and play ends
+// unless there is a tie to play off; after an earlier round, 1. bCheck only goes on to GoToPlayoff,
+// which does not read it.
 u8 GameModeDriverPGATour_GameFinished(u8 bCheck) {
     s32 i;
     if (gpGame->bD4) {
@@ -652,9 +680,10 @@ u8 GameModeDriverPGATour_GameFinished(u8 bCheck) {
     return 1;
 }
 
-// Called by its slot. A tie for the lead with the player in it (after the last round, or after a
-// playoff hole) goes to a playoff: the scores are cleared and the next playoff hole (16..18 of the
-// course, looping) is the only one selected. bCheck is not read.
+// Whether there is a playoff: more than one entrant in it and the player one of them. If so every
+// player's strokes and mode points are cleared, the playoff flags (gpGame bD4, bD5) set, the next
+// playoff hole (the 18th, then the 16th, 17th, 18th, ... : lbl_80282340) made the only one
+// selected, and the golfers-tied message shown. bCheck is not read.
 u8 GameModeDriverPGATour_GoToPlayoff(u8 bCheck) {
     u8 bPlayoff = 0;
     s32 i;
@@ -682,12 +711,14 @@ u8 GameModeDriverPGATour_GoToPlayoff(u8 bCheck) {
     return bPlayoff;
 }
 
-s32 fn_800EF834(void) {
+// The number of tournaments in a season (31).
+s32 GM_PgaTourMode_GetNEvents(void) {
     return 31;
 }
 
-// Which tournament (and which of its rounds) is played on a date: each tournament starts on a
-// date per season (aStartDate, seasons from 2004).
+// Which tournament is played on a date and which of its rounds: each tournament starts on its
+// aStartDate for the season (seasons 2004..2013) and has one round a day. Returns 1 with the
+// tournament (*pId) and round (*pRound, 0-based); 0 with *pId -1 and *pRound 0 when none is on.
 u8 GameModeDriverPGATour_GetEventByDate(u16 nDate, s32* pId, s32* pRound) {
     s32 nMonth;
     s32 nDay;
@@ -717,7 +748,8 @@ u8 GameModeDriverPGATour_GetEventByDate(u16 nDate, s32* pId, s32* pRound) {
     return bFound;
 }
 
-// The tournament profile 0 is on, and its round.
+// The tournament profile 0 is on (0..30, -1 once the season is over) and, in *pRound, its current
+// round (0-based).
 s32 GameModeDriverPGATour_GetSelectedEvent(s32* pRound) {
     PlayerNumber_t nPlayer = PLR_1_e;
     *pRound = gpSaveData[nPlayer].tour.nRound;
@@ -752,8 +784,8 @@ void GameModeDriverPGATour_SkipToEvent(s32 nEvent) {
         GM_PgaTourSim_CutEntrant(0, 0);
     }
     while (gpSaveData[nPlayer].tour.nEvent < nEvent) {
-        fn_800EF130(0, 0);
-        fn_800EEB94(0);
+        GameModeDriverPGATour_SimCurrentTournament(0, 0);
+        GameModeDriverPGATour_AdvanceEvent(0);
     }
 }
 
@@ -925,7 +957,7 @@ void GameModeDriverPGATour_GetPurseString(s32 i, char* pDst) {
     if (i < GameModeDriverPGATour_GetCurrentEventID()) {
         nBracket = p->nUserBracket;
     } else {
-        nBracket = fn_800EF0E0(nPlayer);
+        nBracket = GameModeDriverPGATour_GetCurrentBracket(nPlayer);
     }
     fn_800907AC(GameModeDriverPGATour_ComputePurseForBracket(i, nBracket), pDst);
 }
@@ -959,7 +991,7 @@ void GameModeDriverPGATour_GetWinnerEarningsString(s32 i, char* pDst) {
     if (i < GameModeDriverPGATour_GetCurrentEventID()) {
         nBracket = p->nUserBracket;
     } else {
-        nBracket = fn_800EF0E0(nPlayer);
+        nBracket = GameModeDriverPGATour_GetCurrentBracket(nPlayer);
     }
     fn_800907AC(GameModeDriverPGATour_ComputeFirstPrizeForBracket(i, nBracket), pDst);
 }

@@ -14,11 +14,11 @@ typedef struct Tournament {
     s32  nTourEvent;            // 0x04  1-based entry in aTourEvent (0 = one round)
     u8   unk8[4];
     s32  nC;                    // 0x0C  nonzero for some tournaments: winning three of them gets its own
-                                //       message (fn_800EE8C4)
+                                //       message (GameModeDriverPGATour_PlayEndOfGameMovies)
     s32  n10;                   // 0x10
     char szChampName[0x10];     // 0x14  the champion before the season is played. TW06: champName
     s32  nChampScore;           // 0x24  TW06: champScore
-    s16  aPrize[10][2];         // 0x28  per bracket (fn_800EF0E0): first prize and purse, in thousands
+    s16  aPrize[10][2];         // 0x28  per bracket (GameModeDriverPGATour_GetCurrentBracket): first prize and purse, in thousands
     u16  aStartDate[10];        // 0x50  per season (GameModeDriverPGATour_GetCurrentSeason). TW06: startDate
 } Tournament;
 
@@ -35,7 +35,7 @@ typedef struct TourEvent {
     TourRound aRound[4];        // 0x04
     s32  nTeeSet;               // 0x34  every player's tee set (Session.nTeeSet)
     u8   unk38[8];
-    s16  a40[10];               // 0x40  per bracket (fn_800EF0E0), passed to GM_PgaTourSim_SimRound
+    s16  a40[10];               // 0x40  per bracket (GameModeDriverPGATour_GetCurrentBracket), passed to GM_PgaTourSim_SimRound
 } TourEvent;
 
 // A 'PGAp' record.
@@ -56,7 +56,7 @@ typedef struct PgaData {
 } PgaData;
 
 // The current round's statistics: cleared as each round of a tournament starts (GameModeDriverPGATour_PrepareForTeeOff),
-// added to the player's season counts in the profile as it ends (fn_800EED0C).
+// added to the player's season counts in the profile as it ends (GameModeDriverPGATour_CommitUserRoundStatCounts).
 extern PgaStatCounts gPgaRoundStats;
 
 typedef struct Pga80205F30 {
@@ -82,7 +82,7 @@ int  GameModeDriverPGATour_GetCurrentLeaderScore(void);                 // the l
 int  GameModeDriverPGATour_GetUserScore(s32 nEvent);           // the player's own score in it (nEvent is not used)
 
 // GameModeDriverPGATour.c, as the tour simulation (PGATourSimulation.c) uses it
-void fn_800EF094(int a, s32 n);       // the player's prize: n, at the player's place
+void GameModeDriverPGATour_AwardMoney(int a, s32 n);       // the player's prize: n, at the player's place
 s32  GameModeDriverPGATour_GetNextEvent(void);  // -1 when the season is over
 s32  GameModeDriverPGATour_ComputePurseForBracket(s32 i, s32 k);
 s32  GameModeDriverPGATour_ComputeFirstPrizeForBracket(s32 i, s32 k);
@@ -101,8 +101,8 @@ s32  GameModeDriverPGATour_GetUsersCurrentEventID(s32 nPlayer);
 s32  GameModeDriverPGATour_GetSponsorshipBonusCash(s32 i);                // aTriple[i].n8
 
 // GameModeDriverPGATour.c, as the PGA TOUR menus (FE_PGATourMessages.c) use it
-void fn_800EEF88(s32 nPlayer);
-s32  fn_800EF834(void);                 // the number of tournaments (31)
+void GameModeDriverPGATour_CheckAdvanceTournament(s32 nPlayer);
+s32  GM_PgaTourMode_GetNEvents(void);                 // the number of tournaments (31)
 s32  GameModeDriverPGATour_AdvanceSeason(void);                 // the next season: 0 after the tenth
 s32  GameModeDriverPGATour_GetCurrentSeasonYear(void);                 // the current season's year
 s32  GameModeDriverPGATour_GetCurrentEventID(void);

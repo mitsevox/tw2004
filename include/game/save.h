@@ -35,7 +35,7 @@ typedef struct SeasonEvent {
 
 // One golfer's season counts, from which each tour statistic is worked out (0x58 bytes). The
 // profile keeps one per tour golfer (PGATourSimulation.c simulates the pros'); the player's round
-// is counted in gPgaRoundStats and added to the player's own (GameModeDriverPGATour fn_800EED0C).
+// is counted in gPgaRoundStats and added to the player's own (GameModeDriverPGATour GameModeDriverPGATour_CommitUserRoundStatCounts).
 // TW06: GM_Pga_StatCounts, which has three more counts (water saves, water hits, long putts)
 // between nNonGIRPars and nEagles.
 typedef struct PgaStatCounts {
@@ -138,7 +138,7 @@ typedef struct SavedRound {
 #define NUM_SAVED_ROUNDS 3      // the setup's loop count
 
 // A PGA TOUR tournament won, in a save profile (8 bytes): filled in when the player finishes first
-// (GameModeDriverPGATour fn_800EEA3C).
+// (GameModeDriverPGATour GameModeDriverPGATour_EndTournament).
 typedef struct TourWin {
     Award award;                // 0x0  won, and the day (GM_Earnings_GiveAwardToUser)
     u16  nScore;                // 0x4  the player's score (GM_PgaTourSim_GetTotalScoreFromEntrantID, as SeasonEvent.nUserScore)

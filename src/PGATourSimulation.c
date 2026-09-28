@@ -44,7 +44,7 @@ void fn_80117694(UStreamObject* pObject);
 
 char* GameModeDriverPGATour_GetInitialChampName(s32 i);               // a tournament's first champion
 s32  GameModeDriverPGATour_GetInitialChampScore(s32 i);                // and the champion's score
-s32  fn_800EF0E0(int nPlayer);          // GameModeDriverPGATour.c: the player's bracket
+s32  GameModeDriverPGATour_GetCurrentBracket(int nPlayer);          // GameModeDriverPGATour.c: the player's bracket
 
 PgaStatSort lbl_80281840 = { -1, 0 };
 #pragma explicit_zero_data on
@@ -122,7 +122,7 @@ void GM_PgaTourSim_SimRound(int nPlayer, SeasonEvent* pEvent, int nRound, int n,
     Mem_set(lbl_80224070, 0, sizeof(lbl_80224070));
     if (nRound == 0) {
         pEvent->nEventPar = 0;
-        pEvent->nUserBracket = fn_800EF0E0(nPlayer);
+        pEvent->nUserBracket = GameModeDriverPGATour_GetCurrentBracket(nPlayer);
         fn_80117AF8(nPlayer);
         fn_801187F0(gpSaveData[nPlayer].tour.field.aEntrant, &gpSaveData[nPlayer].tour.field.nEntrants,
                     uFlags & 1);
@@ -293,9 +293,10 @@ void GM_PgaTourSim_SimTournamentWinner(int nPlayer) {
         gpSaveData[nPlayer].tour.aStats[pWinner->nGolfer].nPlayerOfYearPoints += 3;
     }
     nFirstPrize = GameModeDriverPGATour_ComputePurseForBracket(gpSaveData[nPlayer].tour.nEvent,
-                                                                    fn_800EF0E0(nPlayer));
+                                                                    GameModeDriverPGATour_GetCurrentBracket(
+                                                                            nPlayer));
     nPurse = GameModeDriverPGATour_ComputeFirstPrizeForBracket(gpSaveData[nPlayer].tour.nEvent,
-                                                          fn_800EF0E0(nPlayer));
+                                                          GameModeDriverPGATour_GetCurrentBracket(nPlayer));
     GM_PgaTourSim_DistributeWinnings(nPlayer, nFirstPrize, nPurse);
     GM_PgaTourSim_CheckEndOfTournamentAward(nPlayer, bUser, bFirst);
 }
@@ -1623,7 +1624,7 @@ void SplitWinnings(int nPlayer, s32 nTotal, s32 nFirstRow, s32 nCount) {
         gpSaveData[nPlayer].tour.aStats[GM_PgaTourSim_GetGolferIDFromEntrantID(nPlayer, nEntrant)].nSeasonWinnings += nShare;
         gpSaveData[nPlayer].tour.aStats[GM_PgaTourSim_GetGolferIDFromEntrantID(nPlayer, nEntrant)].nCareerWinnings += nShare;
         if (GM_PgaTourSim_IsEntrantUser(nPlayer, nEntrant)) {
-            fn_800EF094(nPlayer, nShare);
+            GameModeDriverPGATour_AwardMoney(nPlayer, nShare);
         }
     }
 }
