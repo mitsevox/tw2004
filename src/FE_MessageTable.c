@@ -382,27 +382,27 @@ void GM_vGetNumControllersPluggedIn(MsgArg* pArgs, MsgArg* pResult);
 void GM_vIsControllerAssigned(MsgArg* pArgs, MsgArg* pResult);
 void GM_vClearControllerAssigned(MsgArg* pArgs, MsgArg* pResult);
 void GM_vFEMessage98_Empty(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007DB2C(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007DB30(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007DB34(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007DB38(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007DB3C(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007DB60(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007DBD8(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007DC50(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007DCD4(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007DD60(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007DDEC(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007DE10(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007DE34(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007DE58(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007DE7C(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007DEA0(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007DEC4(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007DEE8(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007DF0C(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007DF30(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007E0BC(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage99_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage100_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage101_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage102_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetProfileRounds(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetProfileStrokeAverage(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetProfilePuttsPerHole(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetProfileAverageDrive(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetProfileFairwayPercent(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetProfileGreenPercent(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetProfileLongestDrive(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetProfileLongestPutt(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetProfileHolesInOne(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetProfileAlbatrosses(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetProfileEagles(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetProfileBirdies(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetProfilePars(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetProfileBogeys(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetProfileDoubleBogeys(MsgArg* pArgs, MsgArg* pResult);
+void GM_vNextShirt(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetPinSet(MsgArg* pArgs, MsgArg* pResult);
 void fn_8007E0D0(MsgArg* pArgs, MsgArg* pResult);
 void fn_8007E0F8(MsgArg* pArgs, MsgArg* pResult);
 void fn_8007E128(MsgArg* pArgs, MsgArg* pResult);
@@ -828,27 +828,27 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[96] = GM_vIsControllerAssigned;
     gFEMessageHandlers[97] = GM_vClearControllerAssigned;
     gFEMessageHandlers[98] = GM_vFEMessage98_Empty;
-    gFEMessageHandlers[99] = fn_8007DB2C;
-    gFEMessageHandlers[100] = fn_8007DB30;
-    gFEMessageHandlers[101] = fn_8007DB34;
-    gFEMessageHandlers[102] = fn_8007DB38;
-    gFEMessageHandlers[103] = fn_8007DB3C;
-    gFEMessageHandlers[104] = fn_8007DB60;
-    gFEMessageHandlers[105] = fn_8007DBD8;
-    gFEMessageHandlers[106] = fn_8007DC50;
-    gFEMessageHandlers[107] = fn_8007DCD4;
-    gFEMessageHandlers[108] = fn_8007DD60;
-    gFEMessageHandlers[109] = fn_8007DDEC;
-    gFEMessageHandlers[110] = fn_8007DE10;
-    gFEMessageHandlers[111] = fn_8007DE34;
-    gFEMessageHandlers[112] = fn_8007DE58;
-    gFEMessageHandlers[113] = fn_8007DE7C;
-    gFEMessageHandlers[114] = fn_8007DEA0;
-    gFEMessageHandlers[115] = fn_8007DEC4;
-    gFEMessageHandlers[116] = fn_8007DEE8;
-    gFEMessageHandlers[117] = fn_8007DF0C;
-    gFEMessageHandlers[118] = fn_8007DF30;
-    gFEMessageHandlers[119] = fn_8007E0BC;
+    gFEMessageHandlers[99] = GM_vFEMessage99_Empty;
+    gFEMessageHandlers[100] = GM_vFEMessage100_Empty;
+    gFEMessageHandlers[101] = GM_vFEMessage101_Empty;
+    gFEMessageHandlers[102] = GM_vFEMessage102_Empty;
+    gFEMessageHandlers[103] = GM_vGetProfileRounds;
+    gFEMessageHandlers[104] = GM_vGetProfileStrokeAverage;
+    gFEMessageHandlers[105] = GM_vGetProfilePuttsPerHole;
+    gFEMessageHandlers[106] = GM_vGetProfileAverageDrive;
+    gFEMessageHandlers[107] = GM_vGetProfileFairwayPercent;
+    gFEMessageHandlers[108] = GM_vGetProfileGreenPercent;
+    gFEMessageHandlers[109] = GM_vGetProfileLongestDrive;
+    gFEMessageHandlers[110] = GM_vGetProfileLongestPutt;
+    gFEMessageHandlers[111] = GM_vGetProfileHolesInOne;
+    gFEMessageHandlers[112] = GM_vGetProfileAlbatrosses;
+    gFEMessageHandlers[113] = GM_vGetProfileEagles;
+    gFEMessageHandlers[114] = GM_vGetProfileBirdies;
+    gFEMessageHandlers[115] = GM_vGetProfilePars;
+    gFEMessageHandlers[116] = GM_vGetProfileBogeys;
+    gFEMessageHandlers[117] = GM_vGetProfileDoubleBogeys;
+    gFEMessageHandlers[118] = GM_vNextShirt;
+    gFEMessageHandlers[119] = GM_vSetPinSet;
     gFEMessageHandlers[120] = fn_8007E0D0;
     gFEMessageHandlers[121] = fn_8007E0F8;
     gFEMessageHandlers[122] = fn_8007E174;
@@ -2497,25 +2497,31 @@ void GM_vClearControllerAssigned(MsgArg* pArgs, MsgArg* pResult) {
 void GM_vFEMessage98_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007DB2C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 99: empty in this build.
+void GM_vFEMessage99_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007DB30(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 100: empty in this build.
+void GM_vFEMessage100_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007DB34(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 101: empty in this build.
+void GM_vFEMessage101_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007DB38(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 102: empty in this build.
+void GM_vFEMessage102_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// A slot's profile's numbers.
-void fn_8007DB3C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 103: the full rounds slot pArgs[0]'s profile has played (nRounds). Messages 103
+// to 117 give the stats screen a profile's statistics.
+void GM_vGetProfileRounds(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gpSaveData[pArgs[0].i].nRounds;
 }
 
-// Slot pArgs[0]'s strokes per stroke-play round.
-void fn_8007DB60(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 104: slot pArgs[0]'s profile's average strokes per stroke-play round
+// (nStrokeRoundStrokes / nStrokeRounds), as a float; 0 before its first.
+void GM_vGetProfileStrokeAverage(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = &gpSaveData[pArgs[0].i];
 
     if (pProfile->nStrokeRounds != 0) {
@@ -2525,7 +2531,9 @@ void fn_8007DB60(MsgArg* pArgs, MsgArg* pResult) {
     pResult->f = 0.0f;
 }
 
-void fn_8007DBD8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 105: slot pArgs[0]'s profile's putts per hole (nPutts / nPuttHoles; holes with
+// 10 putts or more are not counted), as a float; 0 before its first.
+void GM_vGetProfilePuttsPerHole(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = &gpSaveData[pArgs[0].i];
 
     if (pProfile->nPuttHoles != 0) {
@@ -2535,8 +2543,9 @@ void fn_8007DBD8(MsgArg* pArgs, MsgArg* pResult) {
     pResult->f = 0.0f;
 }
 
-// Slot pArgs[0]'s average drive.
-void fn_8007DC50(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 106: slot pArgs[0]'s profile's average drive in yards (nDriveDistance /
+// nDrives, cut to a whole number); 0 before its first.
+void GM_vGetProfileAverageDrive(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = &gpSaveData[pArgs[0].i];
 
     if (pProfile->nDrives != 0) {
@@ -2546,7 +2555,9 @@ void fn_8007DC50(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-void fn_8007DCD4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 107: the percentage of fairways slot pArgs[0]'s profile has hit (100 *
+// nFairwaysHit / nFairways, cut to a whole number); 0 before its first.
+void GM_vGetProfileFairwayPercent(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = &gpSaveData[pArgs[0].i];
 
     if (pProfile->nFairways != 0) {
@@ -2556,7 +2567,9 @@ void fn_8007DCD4(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-void fn_8007DD60(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 108: the percentage of greens in regulation slot pArgs[0]'s profile has hit
+// (100 * nGreensHit / nHoles, cut to a whole number); 0 before its first.
+void GM_vGetProfileGreenPercent(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = &gpSaveData[pArgs[0].i];
 
     if (pProfile->nHoles != 0) {
@@ -2566,46 +2579,51 @@ void fn_8007DD60(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-void fn_8007DDEC(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 109: slot pArgs[0]'s profile's longest drive, in yards (nLongestDrive).
+void GM_vGetProfileLongestDrive(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gpSaveData[pArgs[0].i].nLongestDrive;
 }
 
-void fn_8007DE10(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 110: slot pArgs[0]'s profile's longest putt holed, in feet (nLongestPutt).
+void GM_vGetProfileLongestPutt(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gpSaveData[pArgs[0].i].nLongestPutt;
 }
 
-void fn_8007DE34(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vGetProfileHolesInOne(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gpSaveData[pArgs[0].i].nHolesInOne;
 }
 
-void fn_8007DE58(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vGetProfileAlbatrosses(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gpSaveData[pArgs[0].i].nAlbatrosses;
 }
 
-void fn_8007DE7C(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vGetProfileEagles(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gpSaveData[pArgs[0].i].nEagles;
 }
 
-void fn_8007DEA0(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vGetProfileBirdies(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gpSaveData[pArgs[0].i].nBirdies;
 }
 
-void fn_8007DEC4(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vGetProfilePars(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gpSaveData[pArgs[0].i].nPars;
 }
 
-void fn_8007DEE8(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vGetProfileBogeys(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gpSaveData[pArgs[0].i].nBogeys;
 }
 
-void fn_8007DF0C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 117: how many holes slot pArgs[0]'s profile has played 2 or more over par
+// (nDoubleBogeys).
+void GM_vGetProfileDoubleBogeys(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gpSaveData[pArgs[0].i].nDoubleBogeys;
 }
 
-// Step the profile's player's n0 on (0..3, wrapping) to the next one that no player up to and
-// including it with the same golfer model has (GM_vCharStream), stopping if it comes round to where
-// it started; then Character_RequestClothesUpdateFE for the golfer shown.
-void fn_8007DF30(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 118: gives the player of the profile slot being worked on (lbl_80281ED4->nSlot)
+// the next shirt (PlayerProfile.n0, 0..3, wrapping) that no player 0..nSlot (itself included) whose
+// golfer has the same model wears, as GM_vCharStream does; it stops where it started when all four
+// are taken. Then the golfer shown is dressed again (Character_RequestClothesUpdateFE).
+void GM_vNextShirt(MsgArg* pArgs, MsgArg* pResult) {
     u8 abFree[4] = {1, 1, 1, 1};
     int i;
     s8 nStart;
@@ -2634,7 +2652,8 @@ void fn_8007DF30(MsgArg* pArgs, MsgArg* pResult) {
     Character_RequestClothesUpdateFE(gpCrAPState->pB4->nIndex);
 }
 
-void fn_8007E0BC(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 119: the pin position every hole uses (gSession.nPinSet, 0..3; -1 counts as 0).
+void GM_vSetPinSet(MsgArg* pArgs, MsgArg* pResult) {
     gSession.nPinSet = pArgs[0].i;
 }
 

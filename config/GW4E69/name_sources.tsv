@@ -3363,3 +3363,24 @@ address	name	previous_name	tier	codes	evidence	purpose	proposed_by	reviewed_by	d
 8007DAE8	GM_vIsControllerAssigned	fn_8007DAE8	T3	E4+E6	slot 96 answers lbl_801D87C0.a2C[pArgs[0]], which GM_vSetPlayerController sets when a real controller is given to a player and the UI setup and slot 97 clear	whether a controller has been given to a player	rp2 (replayed by orchestrator)		2026-09-28
 8007DB04	GM_vClearControllerAssigned	fn_8007DB04	T3	E4+E6	slot 97 clears lbl_801D87C0.a2C[pArgs[0]] for pArgs[0] < 4, the mark GM_vSetPlayerController sets	clears a controller's given-to-a-player mark	rp2 (replayed by orchestrator)		2026-09-28
 8007DB28	GM_vFEMessage98_Empty	fn_8007DB28	T3	E5+E6	empty body; gFEMessageHandlers[98]; no EA name known	stub for front-end message 98	rp2 (replayed by orchestrator)		2026-09-28
+8007DB2C	GM_vFEMessage99_Empty	fn_8007DB2C	T3	E5+E6	empty body; gFEMessageHandlers[99]; no EA name known	stub for front-end message 99	rp2 (replayed by orchestrator)		2026-09-28
+8007DB30	GM_vFEMessage100_Empty	fn_8007DB30	T3	E5+E6	empty body; gFEMessageHandlers[100]; no EA name known	stub for front-end message 100	rp2 (replayed by orchestrator)		2026-09-28
+8007DB34	GM_vFEMessage101_Empty	fn_8007DB34	T3	E5+E6	empty body; gFEMessageHandlers[101]; no EA name known	stub for front-end message 101	rp2 (replayed by orchestrator)		2026-09-28
+8007DB38	GM_vFEMessage102_Empty	fn_8007DB38	T3	E5+E6	empty body; gFEMessageHandlers[102]; no EA name known	stub for front-end message 102	rp2 (replayed by orchestrator)		2026-09-28
+8007DB3C	GM_vGetProfileRounds	fn_8007DB3C	T3	E4	slot 103 answers gpSaveData[pArgs[0]].nRounds; first of the profile statistics messages 103..117	a profile's full rounds played	rp2 (replayed by orchestrator)		2026-09-28
+8007DB60	GM_vGetProfileStrokeAverage	fn_8007DB60	T3	E4	slot 104: (f32)nStrokeRoundStrokes / nStrokeRounds of gpSaveData[pArgs[0]], 0 when no rounds	a profile's strokes per stroke-play round	rp2 (replayed by orchestrator)		2026-09-28
+8007DBD8	GM_vGetProfilePuttsPerHole	fn_8007DBD8	T3	E4	slot 105: (f32)nPutts / nPuttHoles of gpSaveData[pArgs[0]], 0 when none	a profile's putts per hole	rp2 (replayed by orchestrator)		2026-09-28
+8007DC50	GM_vGetProfileAverageDrive	fn_8007DC50	T3	E4	slot 106: nDriveDistance / nDrives of gpSaveData[pArgs[0]] as an int, 0 when none	a profile's average drive in yards	rp2 (replayed by orchestrator)		2026-09-28
+8007DCD4	GM_vGetProfileFairwayPercent	fn_8007DCD4	T3	E4	slot 107: 100 * nFairwaysHit / nFairways of gpSaveData[pArgs[0]] as an int, 0 when none	a profile's fairways hit, in percent	rp2 (replayed by orchestrator)		2026-09-28
+8007DD60	GM_vGetProfileGreenPercent	fn_8007DD60	T3	E4	slot 108: 100 * nGreensHit / nHoles of gpSaveData[pArgs[0]] as an int, 0 when none	a profile's greens in regulation, in percent	rp2 (replayed by orchestrator)		2026-09-28
+8007DDEC	GM_vGetProfileLongestDrive	fn_8007DDEC	T3	E4	slot 109 answers gpSaveData[pArgs[0]].nLongestDrive	a profile's longest drive	rp2 (replayed by orchestrator)		2026-09-28
+8007DE10	GM_vGetProfileLongestPutt	fn_8007DE10	T3	E4	slot 110 answers gpSaveData[pArgs[0]].nLongestPutt	a profile's longest putt holed	rp2 (replayed by orchestrator)		2026-09-28
+8007DE34	GM_vGetProfileHolesInOne	fn_8007DE34	T3	E4	slot 111 answers gpSaveData[pArgs[0]].nHolesInOne	a profile's holes in one	rp2 (replayed by orchestrator)		2026-09-28
+8007DE58	GM_vGetProfileAlbatrosses	fn_8007DE58	T3	E4	slot 112 answers gpSaveData[pArgs[0]].nAlbatrosses	a profile's albatrosses	rp2 (replayed by orchestrator)		2026-09-28
+8007DE7C	GM_vGetProfileEagles	fn_8007DE7C	T3	E4	slot 113 answers gpSaveData[pArgs[0]].nEagles	a profile's eagles	rp2 (replayed by orchestrator)		2026-09-28
+8007DEA0	GM_vGetProfileBirdies	fn_8007DEA0	T3	E4	slot 114 answers gpSaveData[pArgs[0]].nBirdies	a profile's birdies	rp2 (replayed by orchestrator)		2026-09-28
+8007DEC4	GM_vGetProfilePars	fn_8007DEC4	T3	E4	slot 115 answers gpSaveData[pArgs[0]].nPars	a profile's pars	rp2 (replayed by orchestrator)		2026-09-28
+8007DEE8	GM_vGetProfileBogeys	fn_8007DEE8	T3	E4	slot 116 answers gpSaveData[pArgs[0]].nBogeys (1 over par)	a profile's bogeys	rp2 (replayed by orchestrator)		2026-09-28
+8007DF0C	GM_vGetProfileDoubleBogeys	fn_8007DF0C	T3	E4	slot 117 answers gpSaveData[pArgs[0]].nDoubleBogeys (2 or more over par)	a profile's double bogeys or worse	rp2 (replayed by orchestrator)		2026-09-28
+8007DF30	GM_vNextShirt	fn_8007DF30	T3	E4+E6	slot 118 steps aProfile[nSlot].n0 (the shirt: Character_SetClubsAndClothes dresses "shirt<n0>"; TW07 GM_vCharStream's shirtsAvailable) to the next free of 0..3, then Character_RequestClothesUpdateFE	gives the player the next free shirt	rp2 (replayed by orchestrator)		2026-09-28
+8007E0BC	GM_vSetPinSet	fn_8007E0BC	T3	E4	slot 119 sets gSession.nPinSet = pArgs[0]	sets the pin position every hole uses	rp2 (replayed by orchestrator)		2026-09-28
