@@ -9,9 +9,11 @@
 
 u8 PasswordManager_IsPasswordEntered(int n);                  // PasswordManager.c
 
-// Grid cell pArgs[0]: its day number, the driver's text, look and button for it, and whether it
-// lies outside the month shown.
-void fn_80111F58(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 468: day cell pArgs[0] of the month grid: its day number into the text pArgs[1], and
+// the calendar driver's cell (gCalendarFillCell: its text into pArgs[2], color into *pArgs[4],
+// button state into *pArgs[5]) with the driver's icon (-1 none) into *pArgs[3]. The color starts at
+// 0 and is 1 for a day of the month before or after the one shown.
+void Calendar_FillCell(MsgArg* pArgs, MsgArg* pResult) {
     char* szDay = ((MsgString*)pArgs[1].p)->pStr;
     char* szText = ((MsgString*)pArgs[2].p)->pStr;
     s32* pCell = (s32*)pArgs[3].p;
@@ -27,12 +29,17 @@ void fn_80111F58(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_80112020(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 469: the calendar driver's header line pArgs[0] (gCalendarGetLine; for the PGA TOUR,
+// line 1 today's tournament and round) into the text pArgs[1].
+void Calendar_GetLine(MsgArg* pArgs, MsgArg* pResult) {
     gCalendarGetLine[CalendarState.nDriver](pArgs[0].i, ((MsgString*)pArgs[1].p)->pStr);
 }
 
-// Line pArgs[1] about grid cell pArgs[0]: 1 its date, 2 the driver's text.
-void fn_8011206C(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 483: line pArgs[1] under the grid about day cell pArgs[0] into the text pArgs[2]: 1
+// "Selected Day: month/day/year", 2 the calendar driver's line for that day
+// (gCalendarGetBottomLine; for the PGA TOUR its tournament and round). Other lines leave the text
+// as it is.
+void Calendar_GetBottomLine(MsgArg* pArgs, MsgArg* pResult) {
     s32 nMonth;
     s32 nDay;
     s32 nYear;
@@ -52,8 +59,8 @@ void fn_8011206C(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// The month shown.
-void fn_80112130(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 484: the month (1..12) and year the calendar shows into *pArgs[0] and *pArgs[1].
+void Calendar_GetMonthShown(MsgArg* pArgs, MsgArg* pResult) {
     s32* pMonth = (s32*)pArgs[0].p;
     s32* pYear = (s32*)pArgs[1].p;
 
@@ -61,8 +68,10 @@ void fn_80112130(MsgArg* pArgs, MsgArg* pResult) {
     *pYear = CalendarState.nYear;
 }
 
-// Show the month before (unless the driver keeps it).
-void fn_80112154(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 485: the calendar shows the month before (December of the year before after January),
+// unless the driver says it is at its earliest month (gCalendarAtEarliest); the grid layout is
+// worked out again either way (UpdateCalendarState).
+void Calendar_PrevMonth(MsgArg* pArgs, MsgArg* pResult) {
     if (!gCalendarAtEarliest[CalendarState.nDriver]()) {
         if (CalendarState.nMonth == 1) {
             CalendarState.nMonth = 12;
@@ -74,8 +83,10 @@ void fn_80112154(MsgArg* pArgs, MsgArg* pResult) {
     UpdateCalendarState();
 }
 
-// Show the month after (unless the driver keeps it).
-void fn_801121D4(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 486: the calendar shows the month after (January of the next year after December),
+// unless the driver says it is at its latest month (gCalendarAtLatest); the grid layout is worked
+// out again either way (UpdateCalendarState).
+void Calendar_NextMonth(MsgArg* pArgs, MsgArg* pResult) {
     if (!gCalendarAtLatest[CalendarState.nDriver]()) {
         if (CalendarState.nMonth == 12) {
             CalendarState.nMonth = 1;
@@ -87,12 +98,16 @@ void fn_801121D4(MsgArg* pArgs, MsgArg* pResult) {
     UpdateCalendarState();
 }
 
-void fn_80112254(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 487: the grid cell of the career's current day (CalendarState.nToday;
+// GetCellIndexFromDate).
+void Calendar_GetTodayCell(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = GetCellIndexFromDate(CalendarState.nToday);
 }
 
-// Switch the calendar to driver pArgs[0].
-void fn_80112290(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 488: switches the calendar to driver pArgs[0] (0 none, 1 the PGA TOUR season, 2 the
+// real-time events), sets the driver up (gCalendarInit) and resets the calendar to the career's
+// current day (ResetCalendarState).
+void Calendar_SetDriver(MsgArg* pArgs, MsgArg* pResult) {
     s32 nDriver = pArgs[0].i;
 
     CalendarState.nDriver = nDriver;
@@ -100,8 +115,10 @@ void fn_80112290(MsgArg* pArgs, MsgArg* pResult) {
     ResetCalendarState();
 }
 
-// Select grid cell pArgs[0]; gives the panel its day's details show (-1: no event).
-void fn_801122D8(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 496: selects day cell pArgs[0] (CalendarState.nSelected) and gives the day-details
+// popup its event shows (the driver's gCalendarGetPopupType; -1 when the day has no event), also
+// kept in CalendarState.n1C for the popup's rows.
+void Calendar_SelectCell(MsgArg* pArgs, MsgArg* pResult) {
     u16 nDate = GetDateFromCellIndex(pArgs[0].i);
     s32 nPanel;
 
@@ -115,9 +132,10 @@ void fn_801122D8(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = nPanel;
 }
 
-// The details panel's title and text: the driver's for kind pArgs[0], else "Event:" and the
-// selected day's event.
-void fn_80112384(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 497: row pArgs[0] of the day-details popup into the texts pArgs[1] (title) and
+// pArgs[2]: row 0 is "Event:" and the name of the selected day's event (gCalendarGetEventName),
+// every other row the driver's (gCalendarGetPopupRow).
+void Calendar_GetPopupRow(MsgArg* pArgs, MsgArg* pResult) {
     int nKind = pArgs[0].i;
     char* szTitle = ((MsgString*)pArgs[1].p)->pStr;
     char* szText = ((MsgString*)pArgs[2].p)->pStr;
@@ -133,19 +151,27 @@ void fn_80112384(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_80112438(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 511: does nothing (empty in this build). It sits with the calendar screen's messages,
+// between the popup row (497) and play (519).
+void Calendar_DoNothing(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8011243C(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 519: plays the selected day's event through the calendar driver (gCalendarPlay; for
+// the PGA TOUR, PGATour_Play).
+void Calendar_Play(MsgArg* pArgs, MsgArg* pResult) {
     gCalendarPlay[CalendarState.nDriver]();
 }
 
-void fn_8011247C(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 549: whether events before the selected day must be simulated before it can be played
+// (the driver's gCalendarIsSimulationNecessary).
+void Calendar_IsSimulationNecessary(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gCalendarIsSimulationNecessary[CalendarState.nDriver]();
 }
 
-// The selected real-time event's description (panel 4), else a blank.
-void fn_801124D0(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 708: into the text pArgs[0], the description of the selected day's real-time event
+// (GameModeDriverRTE_GetDescription) while the day-details popup is type 4 (CalendarState.n1C),
+// else a single space.
+void Calendar_GetRTEDescription(MsgArg* pArgs, MsgArg* pResult) {
     s32 nId;
     s32 nRound;
     char* sz = ((MsgString*)pArgs[0].p)->pStr;
@@ -161,19 +187,24 @@ void fn_801124D0(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// A square root.
-void fn_80112548(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 568: the square root of the float pArgs[0] (Math_Sqrt), as a float.
+void FE_Sqrt(MsgArg* pArgs, MsgArg* pResult) {
     pResult->f = Math_Sqrt(pArgs[0].f);
 }
 
-void fn_80112580(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 693: whether the cheat code "SHERWOOD TARGET" has been entered
+// (PasswordManager_IsPasswordEntered(6)).
+void Calendar_IsSherwoodTargetEntered(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = PasswordManager_IsPasswordEntered(6);
 }
 
-void fn_801125B8(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 694: sets GameMode5's calendar flag to pArgs[0] (PlayNow_SetCalendarFlag, which lists
+// what the flag changes).
+void Calendar_SetPlayNowFlag(MsgArg* pArgs, MsgArg* pResult) {
     PlayNow_SetCalendarFlag(pArgs[0].i);
 }
 
-void fn_801125E0(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 695: GameMode5's calendar flag (PlayNow_GetCalendarFlag).
+void Calendar_GetPlayNowFlag(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = PlayNow_GetCalendarFlag();
 }
