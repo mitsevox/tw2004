@@ -1,15 +1,22 @@
-// mtalib.c (EA's name, from its asserts; also in EA's 2002 source tree): animation helpers, and
-// the 'MAL ' banks loaded from the stream files (two slots, gMtaLibBanks): groups of items that the
-// animation code picks from at random.
+// mtalib.c (EA's name, from its asserts; TW2003 has the file too, and TW2005 puts it at
+// c:/dev/Golf_2005/Tigercode/Code/Golf/Animation/mtalib.c): the morph animation libraries
+// (MtaLib; MTA and the struct names are our reading). A library has records, each for one block of
+// a format 1 pose buffer (SkelPose1), and each record entries: tracks of a byte per frame that
+// drive one morph's weight (MtaLib_ApplyToPose), played on a character's second animation player
+// through its morph blend tree (AnimBlender.c). The libraries come in 'MAL ' banks from the
+// stream files (two slots, gMtaLibBanks), three groups each, one picked at random
+// (Character_GetRandomMtaLib); a clip can also carry its own (Clip.pF4, MtaLib_Link). The file also
+// holds EA's bone name table (gSkelBoneNames). MtaLib_SwapAndLink and ByteSwap_Records, at the end
+// of char.c right before this file, may belong here.
 
 #include "charstate.h"
 
-static MalBank* gMtaLibBanks[2];
-static int gMtaLibBytes;                // bytes the banks have allocated
-static u8 lbl_801B9668[200];
+static MalBank* gMtaLibBanks[2];        // the 'MAL ' bank of each slot (MtaLib_OnLoaded)
+static int gMtaLibBytes;                // bytes the banks have allocated (never read)
+static u8 lbl_801B9668[200];            // only MtaLib_InitModule touches it (an empty string)
 
-// The bone names by bone id (character.h): 0x15 "rwrst", 0x36-0x3A the right leg ("rhip" to "rtoe"),
-// 0x44-0x48 the left leg, 0x52 "IGdriver" (the club bone), 0x53 "clubhead".
+// The bone names by bone id (character.h): 0x15 "rwrst", 0x36-0x3A the right leg ("rhip" to
+// "rtoe"), 0x44-0x48 the left leg, 0x52 "IGdriver" (the club bone), 0x53 "clubhead".
 char* gSkelBoneNames[90] = {
     "", "root", "ctrgrav", "waist", "s1", "s2", "s3", "s4", "s5", "neck", "head", "tail1", "tail2",
     "tail3", "tail4", "skull", "rcolr", "rshld", "rbictwst", "relb", "r4rm", "rwrst", "rf1", "rf2",

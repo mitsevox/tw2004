@@ -1,8 +1,13 @@
-// animblender.c (TW06's golf/animation/animblender.c by its place in the link order; the name is
-// not proven, and TW06's SKATime_* functions sit near its end): blends the golfer's animations.
-// A character's blend tree (SKABlendNode) has blend nodes with two children and source nodes that
-// play one clip; the nodes and their pose buffers come from five pools. The animation player
-// (AnimPlayer) functions follow. All of it is in C.
+// AnimBlender.c (EA's name: TW2005's GameCube build has the path
+// c:/dev/Golf_2005/Tigercode/Code/Golf/Animation/AnimBlender.c, and TW07's AnimBlender.c has these
+// functions in the same order, as C++ classes): blends a character's animations. A character has
+// two blend trees (SKABlendNode): the skeleton's, whose channels play skeletal clips (Clip; format
+// 0 pose buffers, SkelPose), and the morphs', whose channels play morph libraries (MtaLib,
+// mtalib.c; format 1 buffers, SkelPose1). In EA's words a blender (nType 1) mixes its two children
+// with a blend callback (SKABlender_BlendLinear) and a channel (nType 0, SKASourceNode) plays one
+// clip over a time window; nodes and pose buffers come from five pools. The animation player's
+// functions (AnimPlayer, EA's TSKATime) follow: SKATime_Update moves its time through the tree's
+// window, at which SKABlender_Update then poses the tree.
 
 #include "character.h"
 #include "charstate.h"
@@ -10,7 +15,7 @@
 
 f32  SKA_GetTagTime(Clip* pBlend, u64 uEvent);   // an event's time (by its 64-bit id)
 void MtaLib_Free(void* pItem);          // mtalib.c
-void fn_800977CC(void* p);
+void fn_800977CC(void* p);              // (sweep code) frees a clip: its Clip.pC0 memory
 // Skeleton.c
 void SKEL_BlendPoses(int nBone, int nCount, SkelPose* pA, SkelPose* pB, SkelPose* pOut, f32 fT);
 
@@ -22,29 +27,30 @@ f32  SKATime_MapTime(f32 fTime, f32 fNow, f32 fStart, f32 fEnd);
 int  SKABlender_NumSKAsInBlender(SKABlendNode* pNode);
 f32  SKATime_CalcStep(AnimPlayer* pPlayer, f32 fT);
 
-// Defined here, last address first (CodeWarrior lays out .sbss in reverse).
-UMemPool* gSKAChannelPool;
-UMemPool* gSKABlenderPool;
-UMemPool* gSKABlendDataPool;
-UMemPool* gSkelPosePool;
-UMemPool* gMorphPosePool;
+// The pools (AnimBlender_InitModule), defined here last address first (CodeWarrior lays out .sbss
+// in reverse).
+UMemPool* gSKAChannelPool;      // channels (nType 0, SKASourceNode, 0x34 bytes)
+UMemPool* gSKABlenderPool;      // blenders (nType 1, SKABlendNode, 0x2C bytes)
+UMemPool* gSKABlendDataPool;    // other node types (0x20 bytes: the fields before the union)
+UMemPool* gSkelPosePool;        // format 0 pose buffers (SkelPose)
+UMemPool* gMorphPosePool;       // format 1 pose buffers (SkelPose1: morph weights and a SkelPose)
 
 // Creates the blend tree's pools, nNumEntries of each (10 in the front end, game types 10 and 3,
 // else 50): nodes by type (channels 0x34 bytes, blenders 0x2C, other nodes 0x20), then pose buffers
 // of format 0 (SkelPose) and format 1 (SkelPose1).
 void AnimBlender_InitModule(void) {
-    int nCount;
+    int nNumEntries;
 
     if (gSession.nGameType == 3 || gSession.nGameType == 10) {
-        nCount = 10;
+        nNumEntries = 10;
     } else {
-        nCount = 50;
+        nNumEntries = 50;
     }
-    gSKAChannelPool = CreateMemPool(nCount, 0x34, 2, 16);
-    gSKABlenderPool = CreateMemPool(nCount, 0x2C, 2, 16);
-    gSKABlendDataPool = CreateMemPool(nCount, 0x20, 2, 16);
-    gSkelPosePool = CreateMemPool(nCount, sizeof(SkelPose), 2, 16);
-    gMorphPosePool = CreateMemPool(nCount, 0x114C, 2, 16);
+    gSKAChannelPool = CreateMemPool(nNumEntries, 0x34, 2, 16);
+    gSKABlenderPool = CreateMemPool(nNumEntries, 0x2C, 2, 16);
+    gSKABlendDataPool = CreateMemPool(nNumEntries, 0x20, 2, 16);
+    gSkelPosePool = CreateMemPool(nNumEntries, sizeof(SkelPose), 2, 16);
+    gMorphPosePool = CreateMemPool(nNumEntries, 0x114C, 2, 16);
 }
 
 // Destroy the pools AnimBlender_InitModule made.
@@ -76,7 +82,8 @@ void AnimBlender_CloseModule(void) {
 // NULL (bPooled then 1), no times, half weight, bC (free it as soon as it has ended) from
 // bFreeASAP, and a fresh pose buffer of nFormat from its pool (no bones set; format 1's morph
 // blocks all marked, their weights 0). Gives up quietly when a pool is empty.
-void SKABlendData_Init(SKABlendNode** ppNode, int nType, int nFormat, SKABlendFn pfnBlend, int nC) {
+void SKABlendData_Init(SKABlendNode** ppNode, int nType, int nFormat, SKABlendFn pfnBlend,
+                       int bFreeASAP) {
     SKABlendNode* pNode;
     s32 i;
     s32 j;
@@ -101,7 +108,7 @@ void SKABlendData_Init(SKABlendNode** ppNode, int nType, int nFormat, SKABlendFn
     }
     (*ppNode)->nType = nType;
     (*ppNode)->nFormat = nFormat;
-    (*ppNode)->bC = nC;
+    (*ppNode)->bC = bFreeASAP;
     (*ppNode)->fStart = (*ppNode)->fEnd = 0.0f;
     (*ppNode)->fWeight = 0.5f;
     if ((*ppNode)->nFormat == 0) {
@@ -193,28 +200,28 @@ void SKABlendData_Shutdown(SKABlendNode** ppNode, u8 bFreeSources) {
 // keeps *ppNode from being so too); with both slots taken, *ppNode's contents move into a new
 // pooled blender (bFreeASAP) and that and pNew become *ppNode's two children. *ppNode's times then
 // cover its children's.
-void SKABlender_AddBlenderData(Character* pChar, SKABlendNode* pNew, SKABlendNode** ppNode, f32* pBlend,
-                 SKABlendFn pfnBlend, int b) {
+void SKABlender_AddBlenderData(Character* pChar, SKABlendNode* pNew, SKABlendNode** ppNode,
+                               f32* pInfo, SKABlendFn pfnBlend, int bFreeASAP) {
     s32 i = 0;
     u8 bFree = 0;
-    SKABlendNode* pBlendNode = NULL;
+    SKABlendNode* pNewBlend = NULL;
     s32 j;
-    f32 aBlend[6];
+    f32 aInfo[6];
     SkelPose* pPose;
 
     if (ppNode == NULL) return;
     if (*ppNode != NULL) {
         if (pNew != NULL) {
-            if (pBlend == NULL) {
+            if (pInfo == NULL) {
                 pNew->fEnd -= pNew->fStart;
                 pNew->fStart = SKABlender_GetEndTime(*ppNode);
                 pNew->fEnd += pNew->fStart;
             } else {
-                pNew->fStart = pBlend[3];
-                pNew->fEnd = pBlend[4];
+                pNew->fStart = pInfo[3];
+                pNew->fEnd = pInfo[4];
                 if (pNew->nType == 0) {
-                    pNew->u.src.fFrom = pBlend[0];
-                    pNew->u.src.fTo = pBlend[1];
+                    pNew->u.src.fFrom = pInfo[0];
+                    pNew->u.src.fTo = pInfo[1];
                 }
             }
             if (pChar != NULL && pNew->nType == 0) {
@@ -242,28 +249,28 @@ void SKABlender_AddBlenderData(Character* pChar, SKABlendNode* pNew, SKABlendNod
                 (*ppNode)->bC = 0;
             }
         } else {
-            SKABlendData_Init(&pBlendNode, 1, (*ppNode)->nFormat, pfnBlend, b);
+            SKABlendData_Init(&pNewBlend, 1, (*ppNode)->nFormat, pfnBlend, bFreeASAP);
             if ((*ppNode)->nFormat == 0) {
-                memcpy(pBlendNode->pPose, (*ppNode)->pPose, sizeof(SkelPose));
+                memcpy(pNewBlend->pPose, (*ppNode)->pPose, sizeof(SkelPose));
             } else {
-                memcpy(pBlendNode->pPose, (*ppNode)->pPose, sizeof(SkelPose1));
+                memcpy(pNewBlend->pPose, (*ppNode)->pPose, sizeof(SkelPose1));
             }
-            pPose = pBlendNode->pPose;
-            memcpy(pBlendNode, *ppNode, sizeof(SKABlendNode));
-            pBlendNode->bPooled = 1;
-            pBlendNode->pPose = pPose;
+            pPose = pNewBlend->pPose;
+            memcpy(pNewBlend, *ppNode, sizeof(SKABlendNode));
+            pNewBlend->bPooled = 1;
+            pNewBlend->pPose = pPose;
             (*ppNode)->u.blend.apChild[0] = NULL;
             (*ppNode)->u.blend.apChild[1] = NULL;
-            aBlend[3] = pBlendNode->fStart;
-            aBlend[4] = pBlendNode->fEnd;
-            aBlend[5] = 0.0f;
-            SKABlender_AddBlenderData(NULL, pBlendNode, ppNode, aBlend, pfnBlend, b);
-            SKABlender_AddBlenderData(NULL, pNew, ppNode, pBlend, pfnBlend, pNew->bC);
+            aInfo[3] = pNewBlend->fStart;
+            aInfo[4] = pNewBlend->fEnd;
+            aInfo[5] = 0.0f;
+            SKABlender_AddBlenderData(NULL, pNewBlend, ppNode, aInfo, pfnBlend, bFreeASAP);
+            SKABlender_AddBlenderData(NULL, pNew, ppNode, pInfo, pfnBlend, pNew->bC);
         }
     } else {
         // EA bug: *ppNode is NULL here, so this reads nFormat through NULL, sets up a node over
         // ppNode's own slot and stores pNew through NULL; no caller passes an empty slot.
-        SKABlendData_Init((SKABlendNode**)&ppNode, 1, (*ppNode)->nFormat, pfnBlend, b);
+        SKABlendData_Init((SKABlendNode**)&ppNode, 1, (*ppNode)->nFormat, pfnBlend, bFreeASAP);
         (*ppNode)->u.blend.apChild[0] = pNew;
     }
     (*ppNode)->fStart = SKABlender_GetStartTime(*ppNode);
@@ -345,7 +352,7 @@ void SKABlender_SetBlender(SKABlendNode* pNode, SKABlendFn pfnBlend, f32 fWeight
 // Character_UpdateClubAttachment), its grip bone takes the grip held from the root (qGripFromRoot,
 // vGripFromRoot), so the club does not jump.
 void SKABlender_Update(Character* pChar, SKABlendNode* pNode, CharModel* pModel, f32 fTime) {
-    int nPlaying;
+    int nChannel;
     s32 i;
     SKABlendNode* pA;
     SKABlendNode* pB;
@@ -361,8 +368,8 @@ void SKABlender_Update(Character* pChar, SKABlendNode* pNode, CharModel* pModel,
     if (pNode == NULL) return;
     pNode->fStart = SKABlender_GetStartTime(pNode);
     pNode->fEnd = SKABlender_GetEndTime(pNode);
-    nPlaying = SKABlender_GetCurrentChannel(pNode, fTime);
-    if (nPlaying < 0 && pNode->nFormat == 0) {
+    nChannel = SKABlender_GetCurrentChannel(pNode, fTime);
+    if (nChannel < 0 && pNode->nFormat == 0) {
         pA = pNode->u.blend.apChild[0];
         if (pA != NULL) {
             pB = pNode->u.blend.apChild[1];
@@ -389,7 +396,7 @@ void SKABlender_Update(Character* pChar, SKABlendNode* pNode, CharModel* pModel,
     for (i = 0; i < 2; i++) {
         pChild = pNode->u.blend.apChild[i];
         if (pChild != NULL && pChild->bC && pChild->fStart < fTime && pChild->fEnd < fTime &&
-            nPlaying > -1) {
+            nChannel > -1) {
             SKABlendData_Shutdown(&pNode->u.blend.apChild[i], 0);
         }
         pChild = pNode->u.blend.apChild[i];
@@ -427,22 +434,22 @@ void SKABlender_Update(Character* pChar, SKABlendNode* pNode, CharModel* pModel,
 int SKABlender_GetCurrentChannel(SKABlendNode* pNode, f32 fTime) {
     SKABlendNode* pChild;
     int i = 0;
-    int nPlaying = -1;
+    int nChannel = -1;
 
     if (pNode != NULL) {
-        while (i < 2 && nPlaying < 2) {
+        while (i < 2 && nChannel < 2) {
             pChild = pNode->u.blend.apChild[i];
             if (pChild != NULL && !(pChild->fStart > fTime) && !(pChild->fEnd < fTime)) {
-                if (nPlaying == -1) {
-                    nPlaying = i;
+                if (nChannel == -1) {
+                    nChannel = i;
                 } else {
-                    nPlaying = 2;
+                    nChannel = 2;
                 }
             }
             i++;
         }
     }
-    return nPlaying;
+    return nChannel;
 }
 
 // The earliest start of pNode's children (0 without children).
@@ -534,21 +541,21 @@ f32 SKABlender_CalcBlendWeight(SKABlendNode* pA, SKABlendNode* pB, u8 bOut, f32 
 }
 
 // The blend callback: pose pNode's buffer at fTime from its children. While both play (or neither,
-// between them) and fTime is inside their span, their weights come from SKABlender_CalcBlendWeight and the
-// poses are blended by format; while only one plays, its pose is copied (a format 1 copy then
-// has the child's three block masks cleared).
+// between them) and fTime is inside their span, their weights come from
+// SKABlender_CalcBlendWeight and the poses are blended by format; while only one plays, its pose
+// is copied (a format 1 copy then has the child's three block masks cleared).
 void SKABlender_BlendLinear(SKABlendNode* pNode, CharModel* pModel, f32 fTime) {
-    int nPlaying;
+    int nChannel;
     u8 bBetween;
     f32 fWeight;
     int i;
 
     if (pNode == NULL) return;
     if (pNode->nType != 1) return;
-    nPlaying = SKABlender_GetCurrentChannel(pNode, fTime);
-    if (nPlaying == 2 || (nPlaying == -1 && pNode->u.blend.apChild[0] != NULL &&
+    nChannel = SKABlender_GetCurrentChannel(pNode, fTime);
+    if (nChannel == 2 || (nChannel == -1 && pNode->u.blend.apChild[0] != NULL &&
                           pNode->u.blend.apChild[1] != NULL)) {
-        bBetween = nPlaying == -1;
+        bBetween = nChannel == -1;
         if (fTime >= pNode->u.blend.apChild[0]->fEnd && fTime >= pNode->u.blend.apChild[1]->fEnd) {
             return;
         }
@@ -568,13 +575,13 @@ void SKABlender_BlendLinear(SKABlendNode* pNode, CharModel* pModel, f32 fTime) {
             SKN_BlendMorphWeights((SkelPose1*)pNode->u.blend.apChild[0]->pPose,
                         (SkelPose1*)pNode->u.blend.apChild[1]->pPose, (SkelPose1*)pNode->pPose, fWeight);
         }
-    } else if (nPlaying != -1) {
-        if (pNode->u.blend.apChild[nPlaying]->nFormat == 0) {
-            memcpy(pNode->pPose, pNode->u.blend.apChild[nPlaying]->pPose, sizeof(SkelPose));
-        } else if (pNode->u.blend.apChild[nPlaying]->nFormat == 1) {
-            memcpy(pNode->pPose, pNode->u.blend.apChild[nPlaying]->pPose, sizeof(SkelPose1));
+    } else if (nChannel != -1) {
+        if (pNode->u.blend.apChild[nChannel]->nFormat == 0) {
+            memcpy(pNode->pPose, pNode->u.blend.apChild[nChannel]->pPose, sizeof(SkelPose));
+        } else if (pNode->u.blend.apChild[nChannel]->nFormat == 1) {
+            memcpy(pNode->pPose, pNode->u.blend.apChild[nChannel]->pPose, sizeof(SkelPose1));
             for (i = 0; i < 3; i++) {
-                BitArray_ClearArray(((SkelPose1*)pNode->u.blend.apChild[nPlaying]->pPose)->aBlocks[i].aBits,
+                BitArray_ClearArray(((SkelPose1*)pNode->u.blend.apChild[nChannel]->pPose)->aBlocks[i].aBits,
                                   20);
             }
         }
@@ -707,23 +714,23 @@ void SKATime_Update(AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT) {
 // by 0.3 (0.033 in clip group 9). SKATime_Update runs the player forward or backward (uFlags bit 6)
 // by the distance.
 void SKATime_Idle(Character* pChar, int nPlayer, AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT) {
-    f32 fWave;
+    f32 fSmoothRand;
     f32 fDelta;
 
     pPlayer->f34 += fT;
-    fWave = 1.0f - (3.0f + (Math_Cos(pPlayer->f34 / 5.0f) +
-                            (Math_Cos(5.0f * pPlayer->f34) + Math_Cos(7.0f * pPlayer->f34 / 3.0f)))) /
-                       6.0f;
-    if (gPlayers[nPlayer].nClub == 25) {
+    fSmoothRand = 1.0f - (3.0f + (Math_Cos(pPlayer->f34 / 5.0f) +
+                                  (Math_Cos(5.0f * pPlayer->f34) + Math_Cos(7.0f * pPlayer->f34 / 3.0f)))) /
+                             6.0f;
+    if (gPlayers[nPlayer].nClub == CLUB_PUTTER_e) {
         if (pChar->nGroup == 9) {
-            fWave *= 0.033f;
+            fSmoothRand *= 0.033f;
         } else {
-            fWave *= 0.3f;
+            fSmoothRand *= 0.3f;
         }
     } else {
-        fWave *= 0.05f;
+        fSmoothRand *= 0.05f;
     }
-    fDelta = (pPlayer->f38 - fWave) - pPlayer->fTime;
+    fDelta = (pPlayer->f38 - fSmoothRand) - pPlayer->fTime;
     if (fDelta < 0.0f) {
         fDelta = -fDelta;
         pPlayer->uFlags |= 0x40;
@@ -823,21 +830,21 @@ u8 SKABlender_IsNotSingleSKA(SKABlendNode* pNode) {
 // How many channels (clips) the tree under pNode plays.
 int SKABlender_NumSKAsInBlender(SKABlendNode* pNode) {
     int i = 0;
-    int nSources = 0;
+    int nNumBlends = 0;
     SKABlendNode* pChild;
 
     do {
         pChild = pNode->u.blend.apChild[i];
         if (pChild != NULL) {
             if (pChild->nType == 1) {
-                nSources += SKABlender_NumSKAsInBlender(pChild);
+                nNumBlends += SKABlender_NumSKAsInBlender(pChild);
             } else if (pChild->nType == 0) {
-                nSources++;
+                nNumBlends++;
             }
         }
         i++;
     } while (i < 2);
-    return nSources;
+    return nNumBlends;
 }
 
 // Whether a channel under pNode plays the clip pSrc (a format 0 channel: the format tested is its
@@ -882,11 +889,11 @@ u8 SKABlender_HasMtaLib(SKABlendNode* pNode, void* pSrc) {
 // Unmarks morph nMorph in the three blocks of pNode's format 1 pose buffer and of every channel's
 // under it (a channel's only when its parent is format 1), so the tree no longer sets that morph's
 // weight; CharSliders.c does this for a morph a slider sets.
-void SKABlender_ClearMorph(SKABlendNode* pNode, s32 nBit) {
+void SKABlender_ClearMorph(SKABlendNode* pNode, s32 nMorph) {
     SKABlendNode* pChild;
     int i;
     int j;
-    int n = nBit;   // fake match: a copy of the parameter for the pose calls
+    int n = nMorph;   // fake match: a copy of the parameter for the pose calls
 
     for (j = 0; j < 3; j++) {
         BitArray_ClearBit(((SkelPose1*)pNode->pPose)->aBlocks[j].aBits, n);
@@ -896,7 +903,7 @@ void SKABlender_ClearMorph(SKABlendNode* pNode, s32 nBit) {
         // fake match: the null test reads the array again (a test of pChild takes other registers)
         if (pNode->u.blend.apChild[i] != NULL) {
             if (pChild->nType == 1) {
-                SKABlender_ClearMorph(pChild, nBit);
+                SKABlender_ClearMorph(pChild, nMorph);
             } else if (pChild->nType == 0 && pNode->nFormat == 1) {
                 for (j = 0; j < 3; j++) {
                     BitArray_ClearBit(((SkelPose1*)pChild->pPose)->aBlocks[j].aBits, n);
