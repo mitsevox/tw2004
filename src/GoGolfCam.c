@@ -2424,7 +2424,7 @@ void GolfCamera_InitFECamera(View* pView, int nPlayer) {
 }
 
 // Camera 23's process: on the create-a-player screen, when the part being edited changes, a cut
-// to a random shot for it (by page, lbl_80281EE0->n0), other than the last one (p80) if it can.
+// to a random shot for it (by page, gpCrAPState->n0), other than the last one (p80) if it can.
 void GolfCamera_ProcessFECamera(View* pView, int nPlayer) {
     f32* pCam;
     f32* pSub;
@@ -2433,9 +2433,9 @@ void GolfCamera_ProcessFECamera(View* pView, int nPlayer) {
     pSub = CameraController_GetCameraLookPoint(pView);
     pShot = NULL;
     // The original compares script.n114 and n0, both ints, as floats.
-    if (lbl_80281EE0->pB4 != NULL && lbl_80281EE0->pB4->b18
-        && (pView->script.n110 != lbl_80281EE0->pB4->nC || (f32)pView->script.n114 != lbl_80281EE0->n0)) {
-        switch (lbl_80281EE0->n0) {
+    if (gpCrAPState->pB4 != NULL && gpCrAPState->pB4->b18
+        && (pView->script.n110 != gpCrAPState->pB4->nC || (f32)pView->script.n114 != gpCrAPState->n0)) {
+        switch (gpCrAPState->n0) {
         case 0:
             pShot = DynamicCam_ChooseScript(0, 0x23, pView->p80);
             if (pShot == NULL) {
@@ -2443,7 +2443,7 @@ void GolfCamera_ProcessFECamera(View* pView, int nPlayer) {
             }
             break;
         case 1:
-            if (Character_IsLeftHanded(lbl_80281EE0->pB4->pChar)) {
+            if (Character_IsLeftHanded(gpCrAPState->pB4->pChar)) {
                 pShot = DynamicCam_ChooseScript(0, 0x38, pView->p80);
                 if (pShot == NULL) {
                     pShot = DynamicCam_ChooseScript(0, 0x38, NULL);
@@ -2474,17 +2474,17 @@ void GolfCamera_ProcessFECamera(View* pView, int nPlayer) {
             }
             break;
         }
-        pView->script.n114 = lbl_80281EE0->n0;
+        pView->script.n114 = gpCrAPState->n0;
         if (pShot == NULL) {
             return;
         }
         CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f, 0x19,
                                        0.0f);
         pView->p80 = pShot;
-        pView->script.n110 = lbl_80281EE0->pB4->nC;
+        pView->script.n110 = gpCrAPState->pB4->nC;
     }
     // EA bug: with no golfer (pB4 NULL) this reads b18 through the NULL pointer.
-    if (lbl_80281EE0->pB4->b18) {
+    if (gpCrAPState->pB4->b18) {
         CamScript_RunFEScript(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, FRAME_TIME);
     }
 }
@@ -2505,8 +2505,8 @@ void GolfCamera_SwitchCrAPCamera(View* pView, char* szName, int nShot, u8 bBlend
     pShot = NULL;
     if (szName != NULL) {
         pShot = DynamicCam_ChooseScriptByName(szName);
-        if (pShot == NULL && lbl_80281EE0->pB4 != NULL && lbl_80281EE0->pB4->pChar != NULL
-            && lbl_80281EE0->pB4->pChar->nSlot == 1) {
+        if (pShot == NULL && gpCrAPState->pB4 != NULL && gpCrAPState->pB4->pChar != NULL
+            && gpCrAPState->pB4->pChar->nSlot == 1) {
             c = szName[0];
             szName[0] = 'f';
             pShot = DynamicCam_ChooseScriptByName(szName);
@@ -2541,9 +2541,9 @@ void GolfCamera_SwitchCrAPCamera(View* pView, char* szName, int nShot, u8 bBlend
         }
     }
     // EA bug: pB4 may be NULL (tested above for the 'f' names), but it is read here without a test.
-    pView->script.n110 = lbl_80281EE0->pB4->nC;
-    pView->script.n114 = lbl_80281EE0->n0;
-    if (lbl_80281EE0->pB4->b18) {
+    pView->script.n110 = gpCrAPState->pB4->nC;
+    pView->script.n114 = gpCrAPState->n0;
+    if (gpCrAPState->pB4->b18) {
         CamScript_RunFEScript(0, pCam, pSub, &pView->script, &pView->shot19C, 0, FRAME_TIME);
     }
 }

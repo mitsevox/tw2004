@@ -1489,9 +1489,9 @@ void fn_8007C248(MsgArg* pArgs, MsgArg* pResult) {
 void fn_8007C254(MsgArg* pArgs, MsgArg* pResult) {
     u8 bOld;
 
-    bOld = lbl_80281EE0->b86;
-    lbl_80281EE0->b86 = pArgs[0].i;
-    if (bOld != lbl_80281EE0->b86 && lbl_80281EE0->n0 == 3) {
+    bOld = gpCrAPState->b86;
+    gpCrAPState->b86 = pArgs[0].i;
+    if (bOld != gpCrAPState->b86 && gpCrAPState->n0 == 3) {
         fn_8008E354();
     }
 }
@@ -1501,15 +1501,15 @@ void fn_8007C254(MsgArg* pArgs, MsgArg* pResult) {
 void fn_8007C2A0(MsgArg* pArgs, MsgArg* pResult) {
     s32 nOld;
 
-    nOld = lbl_80281EE0->n0;
-    lbl_80281EE0->n0 = pArgs[0].i;
-    if (nOld != 0 && lbl_80281EE0->n0 == 0) {
+    nOld = gpCrAPState->n0;
+    gpCrAPState->n0 = pArgs[0].i;
+    if (nOld != 0 && gpCrAPState->n0 == 0) {
         FE_vClearGolferCache();
     }
-    if (lbl_80281EE0->n0 == 3 && nOld != 3) {
+    if (gpCrAPState->n0 == 3 && nOld != 3) {
         FE_vClearGolferCache();
     }
-    if (lbl_80281EE0->n0 == 0) {
+    if (gpCrAPState->n0 == 0) {
         FE_SetOffscreenBufferRender(1);
     } else {
         FE_SetOffscreenBufferRender(0);
@@ -2230,9 +2230,9 @@ void fn_8007D964(MsgArg* pArgs, MsgArg* pResult) {
 // profile's look.
 void fn_8007D968(MsgArg* pArgs, MsgArg* pResult) {
     lbl_80281ED4->nSlot = pArgs[0].i;
-    if (lbl_80281EE0->pB4->pChar != NULL &&
-        (lbl_80281EE0->pB4->pChar->nC == 7 || lbl_80281EE0->pB4->pChar->nC == 29)) {
-        Character_ApplyCrAPSettings(lbl_80281EE0->pB4->pChar, &FE_GetCurrentProfile()->choices);
+    if (gpCrAPState->pB4->pChar != NULL &&
+        (gpCrAPState->pB4->pChar->nC == 7 || gpCrAPState->pB4->pChar->nC == 29)) {
+        Character_ApplyCrAPSettings(gpCrAPState->pB4->pChar, &FE_GetCurrentProfile()->choices);
     }
 }
 
@@ -2419,7 +2419,7 @@ void fn_8007DF30(MsgArg* pArgs, MsgArg* pResult) {
         }
         if (gSession.aProfile[lbl_80281ED4->nSlot].n0 == nStart) break;
     }
-    Character_RequestClothesUpdateFE(lbl_80281EE0->pB4->n10);
+    Character_RequestClothesUpdateFE(gpCrAPState->pB4->n10);
 }
 
 void fn_8007E0BC(MsgArg* pArgs, MsgArg* pResult) {
@@ -2677,7 +2677,7 @@ void fn_8007E904(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8007E92C(MsgArg* pArgs, MsgArg* pResult) {
-    lbl_80281EE0->b83 = pArgs[0].i;
+    gpCrAPState->b83 = pArgs[0].i;
 }
 
 // Test the password typed in (the string pArgs[0], pArgs[1] characters of it): TRUE when it
@@ -3276,7 +3276,7 @@ void fn_8007FEEC(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8007FF3C(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = lbl_80281EE0->b86;
+    pResult->i = gpCrAPState->b86;
 }
 
 void fn_8007FF4C(MsgArg* pArgs, MsgArg* pResult) {

@@ -1609,7 +1609,7 @@ u8 fn_8003D294(CamShot* pShot) {
     int n;
 
     if (gSession.nGameType != 3) return 1;
-    pGolfer = lbl_80281EE0->pB4;
+    pGolfer = gpCrAPState->pB4;
     if (pGolfer != NULL && pGolfer->pChar != NULL) {
         n = pGolfer->nC;
         if (n <= 32) {

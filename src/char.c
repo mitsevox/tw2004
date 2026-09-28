@@ -2455,7 +2455,7 @@ void Legacy_Character_InitModule(void) {
     gClubBoneIds[4] = *(u64*)"IGiron7";
     gClubBoneIds[5] = *(u64*)"IGwedge";
     for (i = 0; i < CRAP_NUM_GOLFERS; i++) {
-        lbl_80281EE8[i] = NULL;
+        gFEGolferChars[i] = NULL;
     }
     for (i = 0; i < 5; i++) {
         gViewSlots[i].pChar = NULL;
@@ -2486,14 +2486,14 @@ void Legacy_Character_CloseModule(void) {
     fn_80071B94();
 }
 
-// Frees the front end's golfer characters (lbl_80281EE8, one per CrAP golfer slot) and clears the
+// Frees the front end's golfer characters (gFEGolferChars, one per CrAP golfer slot) and clears the
 // slots. FEgolferanim.c only ever sets them to NULL, so there is nothing to free in practice.
 void Character_FreeFEGolfers(void) {
     int i;
 
     for (i = 0; i < CRAP_NUM_GOLFERS; i++) {
-        Character_Free(lbl_80281EE8[i]);
-        lbl_80281EE8[i] = NULL;
+        Character_Free(gFEGolferChars[i]);
+        gFEGolferChars[i] = NULL;
     }
 }
 
@@ -2822,10 +2822,10 @@ void Character_RegisterGolferStreamClientIG(void) {
 }
 
 // The front end's 'CHR ' stream handler, for the golfer the create-a-player menu is loading
-// (lbl_80281EE0->pB8): the UI file is parked in ARAM so its buffer can take a copy of the object
+// (gpCrAPState->pB8): the UI file is parked in ARAM so its buffer can take a copy of the object
 // (header and data), and the object is freed; the character is made from the copy (the static heap
 // counting what it takes) and its textures loaded, then the UI file is brought back. The character
-// is placed at lbl_80189A30 facing f19C, given the profile's created-golfer look for golfers 7 and
+// is placed at gFEGolferPos facing f19C, given the profile's created-golfer look for golfers 7 and
 // 29 (Character_ApplyCrAPSettings), set to club class 5 (the wedges) and its first clip. When it
 // is still the golfer the menu wants (pB8->nC is n8C), its body and six club skins are listed on
 // it (created golfers with one texture pool entry get two) and it takes its pool entries.
@@ -2841,22 +2841,22 @@ void Character_GolferStreamCallbackFE(UStreamObject* pObject) {
     Mem_cpy(pCopy, pObject, pObject->uSize + 0x80);
     StaticMem_Free(pObject);
     pCopy->pData = (u8*)pCopy + 0x80;
-    lbl_80281EE0->pB8->pChar = Character_CreateFromMem(pCopy->pData, 0, 0, pCopy->uId, 0, NULL);
+    gpCrAPState->pB8->pChar = Character_CreateFromMem(pCopy->pData, 0, 0, pCopy->uId, 0, NULL);
     StaticMem_StopCount();
     StaticMem_GetCount();
-    Character_LoadTextures(lbl_80281EE0->pB8->pChar, NULL, 0);
+    Character_LoadTextures(gpCrAPState->pB8->pChar, NULL, 0);
     fn_8008F35C();
-    lbl_80281EE0->pB8->pChar->n16C = -1;
-    Character_SetPosition(lbl_80281EE0->pB8->pChar, lbl_80189A30, 1);
-    Character_SetOrientation(lbl_80281EE0->pB8->pChar, lbl_80281EE0->f19C);
-    if (lbl_80281EE0->pB8->pChar->nC == 7 || lbl_80281EE0->pB8->pChar->nC == 29) {
-        Character_ApplyCrAPSettings(lbl_80281EE0->pB8->pChar, &FE_GetCurrentProfile()->choices);
+    gpCrAPState->pB8->pChar->n16C = -1;
+    Character_SetPosition(gpCrAPState->pB8->pChar, gFEGolferPos, 1);
+    Character_SetOrientation(gpCrAPState->pB8->pChar, gpCrAPState->f19C);
+    if (gpCrAPState->pB8->pChar->nC == 7 || gpCrAPState->pB8->pChar->nC == 29) {
+        Character_ApplyCrAPSettings(gpCrAPState->pB8->pChar, &FE_GetCurrentProfile()->choices);
     }
-    Character_SelectClub(lbl_80281EE0->pB8->pChar, 5);
-    pClip = Char_SetClip(lbl_80281EE0->pB8->pChar, 0, 0, NULL);
-    Character_PlayClip(lbl_80281EE0->pB8->pChar, pClip, 1, 0.0f);
-    if (lbl_80281EE0->pB8->nC == lbl_80281EE0->n8C) {
-        pChar = lbl_80281EE0->pB8->pChar;
+    Character_SelectClub(gpCrAPState->pB8->pChar, 5);
+    pClip = Char_SetClip(gpCrAPState->pB8->pChar, 0, 0, NULL);
+    Character_PlayClip(gpCrAPState->pB8->pChar, pClip, 1, 0.0f);
+    if (gpCrAPState->pB8->nC == gpCrAPState->n8C) {
+        pChar = gpCrAPState->pB8->pChar;
         pChar->nSkins = 7;
         pChar->apSkins[0] = pChar->pSkin;
         pChar->apSkins[1] = pChar->pClubSet->apSkins[0];
@@ -2977,7 +2977,7 @@ void Character_RequestClothesUpdateFE(int n) {
 }
 
 // Each frame in the create-a-player mode (game type 3): for every flag
-// Character_RequestClothesUpdateFE set, once the shown golfer (lbl_80281EE0->pB4) is ready (b18),
+// Character_RequestClothesUpdateFE set, once the shown golfer (gpCrAPState->pB4) is ready (b18),
 // the menu golfer's state machine is not in state 4 and nothing holds it (FE_IsTextureSwapDone), the flag is
 // cleared and the running state aborted for state 4, which dresses the shown golfer again and swaps
 // its textures (FE_StreamFunc_SwapTexturesInit).
@@ -2985,7 +2985,7 @@ void Character_UpdateClothesFE(void) {
     int i;
 
     for (i = 0; i < 5; i++) {
-        if (gSession.aD2D[i] && lbl_80281EE0->pB4 != NULL && lbl_80281EE0->pB4->b18 &&
+        if (gSession.aD2D[i] && gpCrAPState->pB4 != NULL && gpCrAPState->pB4->b18 &&
             FE_StreamGetCurrentState() != 4 && FE_IsTextureSwapDone()) {
             gSession.aD2D[i] = 0;
             FE_StreamInterruptState();
@@ -3163,14 +3163,14 @@ u8 Character_IsHoldingBall(Character* pChar) {
 // Gives the character a created golfer's look from pChoices: its skins' choices
 // (SkinPart_ApplyBodyChoices), its 26 body sliders (a9B4) and its handedness (n113 non-zero:
 // left-handed, the model's bEE), the handedness except in the create-a-player mode (game type 3)
-// off its screens 1 and 4 (lbl_80281EE0->n0); then the skeleton is set up again from the model
+// off its screens 1 and 4 (gpCrAPState->n0); then the skeleton is set up again from the model
 // (Character_SetSkeleton).
 void Character_ApplyCrAPSettings(Character* pChar, SkinChoices* pChoices) {
     SkinPart_ApplyBodyChoices(pChar, pChoices);
     CharSlider_UpdateCharacterBasedOnSliderValues(pChar->pSliderDefs, pChar->pModel, pChar->pSkin, 26,
                                                   pChoices->a9B4,
                 &pChar->node3E0);
-    if (gSession.nGameType != 3 || lbl_80281EE0->n0 == 1 || lbl_80281EE0->n0 == 4) {
+    if (gSession.nGameType != 3 || gpCrAPState->n0 == 1 || gpCrAPState->n0 == 4) {
         if (pChoices->n113 == 0) {
             Character_SetLeftHanded(pChar, 0);
         } else {

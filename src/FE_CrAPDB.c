@@ -308,7 +308,7 @@ int FE_CrAP_GetEquippedAsset(s16 nSlot) {
 // Save the created golfer's body skin entries in the profile.
 void FE_CrAP_SaveBodySkinChoices(void) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
-    Skin* pSkin = lbl_80281EE0->pB4->pChar->pSkin;
+    Skin* pSkin = gpCrAPState->pB4->pChar->pSkin;
 
     Mem_cpy(pProfile->choices.aParts, pSkin->aParts[3], SkinPart_GetNumParts(pSkin) * sizeof(SkinChoice));
     Mem_cpy(pProfile->choices.aSets, pSkin->aSets[3], SkinPart_GetNumSets(pSkin) * sizeof(SkinChoice));
@@ -322,7 +322,7 @@ void FE_CrAP_SaveClubSkinChoices(void) {
     int i;
 
     for (i = 0; i < 6; i++) {
-        pSkin = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[i];
+        pSkin = gpCrAPState->pB4->pChar->pClubSet->apSkins[i];
         Mem_cpy(pProfile->choices.aSkinParts[i], pSkin->aParts[3], SkinPart_GetNumParts(pSkin)
                 * sizeof(SkinChoice));
         Mem_cpy(pProfile->choices.aSkinSets[i], pSkin->aSets[3], SkinPart_GetNumSets(pSkin)
@@ -351,11 +351,11 @@ void FE_CrAP_TurnOffAsset(CrAPAsset* pAsset) {
     FE_GetCurrentProfile();
     pBase = sGetLinkedAsset(pAsset);
     if (pBase->n2E != -1) {
-        pSkin = lbl_80281EE0->pB4->pChar->pSkin;
+        pSkin = gpCrAPState->pB4->pChar->pSkin;
         FE_CrAP_RemoveAssetParts(pBase, pSkin);
         FE_CrAP_RemoveAssetSets(pBase, pSkin);
         FE_SetDelayTextureSwap(0, 0.0f);
-        Character_RequestClothesUpdateFE(lbl_80281EE0->pB4->n10);
+        Character_RequestClothesUpdateFE(gpCrAPState->pB4->n10);
         FE_CrAP_SaveBodySkinChoices();
         FE_CrAP_ClearEquippedAsset(pBase);
     }
@@ -368,7 +368,7 @@ void FE_CrAP_TurnOffPart(s16 nPart, int b, int i) {
     CrAPAsset* pAsset;
 
     FE_GetCurrentProfile();
-    if (lbl_80281EE0->pB4->pChar != NULL
+    if (gpCrAPState->pB4->pChar != NULL
         && (pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i)) != NULL) {
         if (nPart == 13) {
             sTurnOffAnimation(pAsset, b);
@@ -423,7 +423,7 @@ void sTurnOnLogo(s16 nPart, int b, int i) {
     s32 nVariant;
 
     FE_SetNewTexturesFlag(1);
-    pSkin = lbl_80281EE0->pB4->pChar->pSkin;
+    pSkin = gpCrAPState->pB4->pChar->pSkin;
     FE_SetDelayTextureSwap(0, 0.0f);
     SKA_PackName(&uSetId, lbl_801937C8[b]);
     nSet = SkinPart_FindSet(pSkin, uSetId);
@@ -441,7 +441,7 @@ void sTurnOnLogo(s16 nPart, int b, int i) {
         nVariant = SkinPart_FindSetVariant(pSkin, nSet, uVariantId);
         SkinPart_ChooseSet(pSkin, nSet, nVariant, 0);
     }
-    Character_RequestClothesUpdateFE(lbl_80281EE0->pB4->n10);
+    Character_RequestClothesUpdateFE(gpCrAPState->pB4->n10);
     FE_CrAP_SaveBodySkinChoices();
 }
 
@@ -486,7 +486,7 @@ void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset) {
     fAngle = 0.0f;
     bLoop = 0;
     nPlay = 1;
-    pSkin = lbl_80281EE0->pB4->pChar->pSkin;
+    pSkin = gpCrAPState->pB4->pChar->pSkin;
     pAsset = sGetLinkedAsset(pAsset);
     lbl_802816E8 = FE_CrAP_GetEquippedAsset(pAsset->n2E);
     lbl_802816EC = FE_CrAP_GetAssetIndexFromAsset(pAsset);
@@ -497,7 +497,7 @@ void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset) {
     FE_SetNewTexturesFlag(1);
     if (FE_CrAP_TryClubSwappingAsset(pAsset)) {
         FE_SetClubStatesAllowed(0);
-        Character_RequestClothesUpdateFE(lbl_80281EE0->pB4->n10);
+        Character_RequestClothesUpdateFE(gpCrAPState->pB4->n10);
         if (stricmp(FE_CrAP_GetStringFromTable(pAsset->n112), "gdlcrp07") == 0 ||
             stricmp(FE_CrAP_GetStringFromTable(pAsset->n112), "fdlcrp07") == 0) {
             fAngle = 4.0f;
@@ -534,7 +534,7 @@ void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset) {
         }
         FE_CrAP_ApplyAssetParts(pAsset, pSkin);
         FE_CrAP_ApplyAssetSets(pAsset, pSkin);
-        Character_RequestClothesUpdateFE(lbl_80281EE0->pB4->n10);
+        Character_RequestClothesUpdateFE(gpCrAPState->pB4->n10);
         FE_CrAP_SaveBodySkinChoices();
         if (FE_GetCrapRenderState() != 0) {
             FE_SetTempCrapRenderState(0);
@@ -574,7 +574,7 @@ void FE_CrAP_TurnOnPart(s16 nPart, int b, int i) {
     CrAPAsset* pAsset = NULL;
 
     FE_GetCurrentProfile();
-    if (lbl_80281EE0->pB4->pChar == NULL) {
+    if (gpCrAPState->pB4->pChar == NULL) {
         return;
     }
     if (nPart != 17) {
@@ -1148,7 +1148,7 @@ void FE_CrAP_GetPartColorRGBA(s16 nPart, int b, int i, int n, u8* pColor) {
         pColor[3] = pAsset->aColor[n][3];
         return;
     }
-    if (lbl_80281EE0->pB4->pChar == NULL) {
+    if (gpCrAPState->pB4->pChar == NULL) {
         pColor[0] = pAsset->aColor[n][0];
         pColor[1] = pAsset->aColor[n][1];
         pColor[2] = pAsset->aColor[n][2];
@@ -1157,31 +1157,31 @@ void FE_CrAP_GetPartColorRGBA(s16 nPart, int b, int i, int n, u8* pColor) {
     }
     szCategory = FE_CrAP_GetStringFromTable(pAsset->nCategory);
     if (stricmp(szCategory, "drivers") == 0) {
-        pSkin = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[0];
+        pSkin = gpCrAPState->pB4->pChar->pClubSet->apSkins[0];
     } else if (stricmp(szCategory, "Fairway Woods") == 0) {
-        pSkin = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[1];
+        pSkin = gpCrAPState->pB4->pChar->pClubSet->apSkins[1];
     } else if (stricmp(szCategory, "Iron Sets") == 0) {
-        pSkin = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[3];
+        pSkin = gpCrAPState->pB4->pChar->pClubSet->apSkins[3];
     } else if (stricmp(szCategory, "Wedge Sets") == 0) {
-        pSkin = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[5];
+        pSkin = gpCrAPState->pB4->pChar->pClubSet->apSkins[5];
     } else if (stricmp(szCategory, "Putters") == 0) {
-        pSkin = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[2];
+        pSkin = gpCrAPState->pB4->pChar->pClubSet->apSkins[2];
     } else if (stricmp(szCategory, "shafts") == 0) {
         fn_800CB8F0(&pAsset->aSet[0], szSet);
         if (stricmp(szSet, "fwd_shaft") == 0) {
-            pSkin = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[0];
+            pSkin = gpCrAPState->pB4->pChar->pClubSet->apSkins[0];
         } else {
-            pSkin = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[3];
+            pSkin = gpCrAPState->pB4->pChar->pClubSet->apSkins[3];
         }
     } else if (stricmp(szCategory, "grips") == 0) {
         fn_800CB8F0(&pAsset->aSet[0], szSet);
         if (stricmp(szSet, "fwd_grip") == 0) {
-            pSkin = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[0];
+            pSkin = gpCrAPState->pB4->pChar->pClubSet->apSkins[0];
         } else {
-            pSkin = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[3];
+            pSkin = gpCrAPState->pB4->pChar->pClubSet->apSkins[3];
         }
     } else {
-        pSkin = lbl_80281EE0->pB4->pChar->pSkin;
+        pSkin = gpCrAPState->pB4->pChar->pSkin;
     }
     nSet = SkinPart_FindSet(pSkin, pAsset->aSet[0]);
     nVariant = SkinPart_FindSetVariant(pSkin, nSet, pAsset->aSetVariant[0]);
@@ -1342,19 +1342,19 @@ void FE_CheckSpecialCaseConnections(CrAPAsset* pAsset) {
     Skin* pSkin;
     s32 nVariant;
 
-    if (lbl_80281EE0->pB4->pChar != NULL) {
-        pSkin = lbl_80281EE0->pB4->pChar->pSkin;
+    if (gpCrAPState->pB4->pChar != NULL) {
+        pSkin = gpCrAPState->pB4->pChar->pSkin;
         if (nPart == 9) {
             nSet = SkinPart_FindSetByName(pSkin, "wire");
             nVariant = SkinPart_FindSetVariantByName(pSkin, nSet, "nowire");
             if (nSet >= 0 && nVariant >= 0) {
-                SkinPart_ChooseBodySet(lbl_80281EE0->pB4->pChar, nSet, nVariant, 0);
+                SkinPart_ChooseBodySet(gpCrAPState->pB4->pChar, nSet, nVariant, 0);
             }
         } else if (nPart == 1) {
             nSet = SkinPart_FindSetByName(pSkin, "hands");
             nVariant = SkinPart_FindSetVariantByName(pSkin, nSet, "nowire");
             if (nSet >= 0 && nVariant >= 0) {
-                SkinPart_ChooseBodySet(lbl_80281EE0->pB4->pChar, nSet, nVariant, 0);
+                SkinPart_ChooseBodySet(gpCrAPState->pB4->pChar, nSet, nVariant, 0);
             }
         }
     }
@@ -1562,8 +1562,8 @@ u8 FE_CrAP_TryClubSwappingAsset(CrAPAsset* pAsset) {
     int nSkins;
     int i;
 
-    if (lbl_80281EE0->pB4 == NULL || lbl_80281EE0->pB4->pChar == NULL ||
-        lbl_80281EE0->pB4->pChar->pClubSet == NULL) {
+    if (gpCrAPState->pB4 == NULL || gpCrAPState->pB4->pChar == NULL ||
+        gpCrAPState->pB4->pChar->pClubSet == NULL) {
         return 0;
     }
     nSkins = FE_CrAP_GetClubSkinsForAsset(pAsset, apSkins);
@@ -1574,8 +1574,8 @@ u8 FE_CrAP_TryClubSwappingAsset(CrAPAsset* pAsset) {
         // EA bug: the inner loop reuses i, so every club skin gets the asset once, whatever nSkins
         // is, and apSkins is never read
         for (i = 0; i < 6; i++) {
-            FE_CrAP_ApplyAssetParts(pAsset, lbl_80281EE0->pB4->pChar->pClubSet->apSkins[i]);
-            FE_CrAP_ApplyAssetSetsToClubSkin(pAsset, lbl_80281EE0->pB4->pChar->pClubSet->apSkins[i]);
+            FE_CrAP_ApplyAssetParts(pAsset, gpCrAPState->pB4->pChar->pClubSet->apSkins[i]);
+            FE_CrAP_ApplyAssetSetsToClubSkin(pAsset, gpCrAPState->pB4->pChar->pClubSet->apSkins[i]);
         }
     }
     return 1;
@@ -1587,38 +1587,38 @@ u8 FE_CrAP_TryClubSwappingAsset(CrAPAsset* pAsset) {
 int FE_CrAP_GetClubSkinsForAsset(CrAPAsset* pAsset, Skin** apSkins) {
     char* szCategory = FE_CrAP_GetStringFromTable(pAsset->nCategory);
 
-    if (lbl_80281EE0->pB4 == NULL || lbl_80281EE0->pB4->pChar == NULL ||
-        lbl_80281EE0->pB4->pChar->pClubSet == NULL || apSkins == NULL) {
+    if (gpCrAPState->pB4 == NULL || gpCrAPState->pB4->pChar == NULL ||
+        gpCrAPState->pB4->pChar->pClubSet == NULL || apSkins == NULL) {
         return 0;
     }
     if (stricmp(szCategory, "shafts") == 0 || stricmp(szCategory, "grips") == 0) {
-        apSkins[0] = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[0];
-        apSkins[1] = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[1];
-        apSkins[2] = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[2];
-        apSkins[3] = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[3];
-        apSkins[4] = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[4];
-        apSkins[5] = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[5];
+        apSkins[0] = gpCrAPState->pB4->pChar->pClubSet->apSkins[0];
+        apSkins[1] = gpCrAPState->pB4->pChar->pClubSet->apSkins[1];
+        apSkins[2] = gpCrAPState->pB4->pChar->pClubSet->apSkins[2];
+        apSkins[3] = gpCrAPState->pB4->pChar->pClubSet->apSkins[3];
+        apSkins[4] = gpCrAPState->pB4->pChar->pClubSet->apSkins[4];
+        apSkins[5] = gpCrAPState->pB4->pChar->pClubSet->apSkins[5];
         return 6;
     }
     if (stricmp(szCategory, "drivers") == 0) {
-        apSkins[0] = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[0];
+        apSkins[0] = gpCrAPState->pB4->pChar->pClubSet->apSkins[0];
         return 1;
     }
     if (stricmp(szCategory, "Fairway Woods") == 0) {
-        apSkins[0] = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[1];
+        apSkins[0] = gpCrAPState->pB4->pChar->pClubSet->apSkins[1];
         return 1;
     }
     if (stricmp(szCategory, "Iron Sets") == 0) {
-        apSkins[0] = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[3];
-        apSkins[1] = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[4];
+        apSkins[0] = gpCrAPState->pB4->pChar->pClubSet->apSkins[3];
+        apSkins[1] = gpCrAPState->pB4->pChar->pClubSet->apSkins[4];
         return 2;
     }
     if (stricmp(szCategory, "Wedge Sets") == 0) {
-        apSkins[0] = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[5];
+        apSkins[0] = gpCrAPState->pB4->pChar->pClubSet->apSkins[5];
         return 1;
     }
     if (stricmp(szCategory, "Putters") == 0) {
-        apSkins[0] = lbl_80281EE0->pB4->pChar->pClubSet->apSkins[2];
+        apSkins[0] = gpCrAPState->pB4->pChar->pClubSet->apSkins[2];
         return 1;
     }
     return 0;
@@ -1636,8 +1636,8 @@ u8 FE_CrAP_TryBallSwappingAsset(CrAPAsset* pAsset) {
         return 0;
     }
     szCategory = FE_CrAP_GetStringFromTable(pAsset->nCategory);
-    if (lbl_80281EE0->pB4 == NULL || lbl_80281EE0->pB4->pChar == NULL ||
-        lbl_80281EE0->pB4->pChar->pClubSet == NULL) {
+    if (gpCrAPState->pB4 == NULL || gpCrAPState->pB4->pChar == NULL ||
+        gpCrAPState->pB4->pChar->pClubSet == NULL) {
         return 0;
     }
     if (stricmp(szCategory, "balls") == 0) {
@@ -1681,7 +1681,7 @@ void FE_CrAP_ApplyAssetSets(CrAPAsset* pAsset, Skin* pSkin) {
             SkinPart_ChooseSet(pSkin, nSet, nVariant, nOption);
             if (SkinPart_GetChangeAllCopies() && nOption >= 0) {
                 SkinPart_DropSetVariantTextures(pSkin, nSet, nVariant, nOption,
-                            lbl_80281EE0->pB4->pChar->apDynTex[lbl_80281EE0->pB4->pChar->nCurDynTex]);
+                            gpCrAPState->pB4->pChar->apDynTex[gpCrAPState->pB4->pChar->nCurDynTex]);
             }
         }
     }
@@ -1708,7 +1708,7 @@ void FE_CrAP_ApplyAssetSetsToClubSkin(CrAPAsset* pAsset, Skin* pSkin) {
             SkinPart_ChooseSet(pSkin, nSet, nVariant, nOption);
             if (SkinPart_GetChangeAllCopies() && nOption >= 0) {
                 SkinPart_DropSetVariantTextures(pSkin, nSet, nVariant, nOption,
-                            lbl_80281EE0->pB4->pChar->apDynTex[lbl_80281EE0->pB4->pChar->nCurDynTex]);
+                            gpCrAPState->pB4->pChar->apDynTex[gpCrAPState->pB4->pChar->nCurDynTex]);
             }
         }
     }
@@ -1909,7 +1909,7 @@ void FE_CrAP_GetCategoryInfo(s16 nPart, s32* pLocked, s32* pB1CC, s32* pB344, s3
 void FE_CrAP_UnequipSlot(s16 nSlot) {
     int nAsset;
 
-    if (lbl_80281EE0->pB4 == NULL || lbl_80281EE0->pB4->pChar == NULL) {
+    if (gpCrAPState->pB4 == NULL || gpCrAPState->pB4->pChar == NULL) {
         return;
     }
     nAsset = FE_CrAP_GetEquippedAsset(nSlot);

@@ -79,10 +79,10 @@ void fn_8010799C(MsgArg* pArgs, MsgArg* pResult) {
     Character* pChar;
 
     pChoices->a9B4[n] = pArgs[1].i;
-    if (lbl_80281EE0->pB4 == NULL) {
+    if (gpCrAPState->pB4 == NULL) {
         return;
     }
-    pChar = lbl_80281EE0->pB4->pChar;
+    pChar = gpCrAPState->pB4->pChar;
     if (pChar == NULL) {
         return;
     }
@@ -1089,7 +1089,7 @@ void fn_80109CBC(MsgArg* pArgs, MsgArg* pResult) {
     Gaud_PlayUISound((Misc_RandFunc(0) & 7) + 11);
     FE_ResetCrAPZoom();
     FE_SetCrAPCameraIdleState(0);
-    GolfCamera_SwitchCrAPCamera(pView, "Crap Idle", lbl_80281EE0->n4, 0, 0, 0);
+    GolfCamera_SwitchCrAPCamera(pView, "Crap Idle", gpCrAPState->n4, 0, 0, 0);
     FE_CrAP_SetTriggerAnims(0);
     fn_80079664(pProfile);
     fn_8007873C(pProfile);
@@ -1101,7 +1101,7 @@ void fn_80109D5C(MsgArg* pArgs, MsgArg* pResult) {
     View* pView = ViewController_GetCameraControl(ViewController_GetCurrentViewControllerID());
     FE_ResetCrAPZoom();
     FE_SetCrAPCameraIdleState(1);
-    GolfCamera_SwitchCrAPCamera(pView, "Crap Face", lbl_80281EE0->n4, 0, 0, 0);
+    GolfCamera_SwitchCrAPCamera(pView, "Crap Face", gpCrAPState->n4, 0, 0, 0);
     FE_CrAP_SetTriggerAnims(0);
     fn_80078E34(pProfile);
 }
@@ -1232,9 +1232,9 @@ void fn_8010A2C8(MsgArg* pArgs, MsgArg* pResult) {
     int b = pArgs[1].i;
     int i = pArgs[2].i;
 
-    if (lbl_80281EE0->pB4 != NULL && nPart == 13) {
+    if (gpCrAPState->pB4 != NULL && nPart == 13) {
         FE_CrAP_GetPartVariantName(nPart, b, i, szName);
-        if (AnimLib_FindByName(lbl_80281EE0->pB4->pChar->pLib, szName) == NULL) {
+        if (AnimLib_FindByName(gpCrAPState->pB4->pChar->pLib, szName) == NULL) {
             bFound = 0;
         }
     }

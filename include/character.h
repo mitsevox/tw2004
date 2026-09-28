@@ -704,7 +704,7 @@ extern ViewSlot gViewSlots[5];          // 0x80187124  per player
 // set by Legacy_Character_InitModule; FEgolferanim compares ids against them.
 extern u64 gClubBoneIds[6];
 
-extern f32 lbl_80189A30[4];             // (0, 0, 0, 0): where Character_GolferStreamCallbackFE places the menu's golfer
+extern f32 gFEGolferPos[4];             // (0, 0, 0, 0): where Character_GolferStreamCallbackFE places the menu's golfer
 
 // char.c: the club skins' part and set names, one per club kind (0 drivers, 1 fairway woods,
 // 2 putters, 3 and 4 the 3 and 7 irons, 5 wedges), for Character_SetClubStatesForCharacter

@@ -526,7 +526,7 @@ void fn_80014DFC(s32 nChar, s32 nUnused) {   // port: FEgolferanim.c passes a se
 
     fn_80015454();
     sprintf(szName, lbl_80186CA8, nChar + 1);
-    lbl_80281EE0->pB8->n14 = -1;
+    gpCrAPState->pB8->n14 = -1;
     fn_800153CC(szName, fn_80014E74, fn_80014E8C);
 }
 

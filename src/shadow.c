@@ -422,7 +422,7 @@ void fn_800B2DB0(f32* pCentre, f32 (*pQuad)[4], f32 fHalfX, f32 fHalfZ) {
         pUV[1] = fScaleZ * (pCentre[2] - pPos[2]);
         *pColour = 0x80000000;
     }
-    RC_vSetCurrentRenderCtxTransformationMatrix(lbl_80281EE0->mC0);
+    RC_vSetCurrentRenderCtxTransformationMatrix(gpCrAPState->mC0);
     RC_UpdateCurrentScreenMatrices();
     RC_vUpdateRenderCtxTransformationMatrices(RC_spGetCurrentRenderCtx());
     RenderState_SetDrawFlags(0x70);

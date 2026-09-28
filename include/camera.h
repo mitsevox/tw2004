@@ -511,7 +511,7 @@ typedef struct GolfCamState {
 } GolfCamState;
 
 // The golfer shown on the menu screens (FEgolferanim.c): the create-a-player (CrAP) screen's
-// state at lbl_80281EE0 (0x1E0 bytes, allocated by FE_CharMgrInit). The golfers are kept in a ring
+// state at gpCrAPState (0x1E0 bytes, allocated by FE_CharMgrInit). The golfers are kept in a ring
 // of CRAP_NUM_GOLFERS slots (the code is written for more than one; the game uses one).
 #define CRAP_NUM_GOLFERS 1
 
@@ -577,7 +577,7 @@ typedef struct CrAPState {
     u8   unk18D[3];
     s32  n190;                  // 0x190  counts the golfers loaded
     s32  n194;                  // 0x194  } the next golfer to show: a column and row of
-    s32  n198;                  // 0x198  } lbl_801899E0
+    s32  n198;                  // 0x198  } gFEGolferCycle
     f32  f19C;                  // 0x19C
     f32  f1A0;                  // 0x1A0
     u8   unk1A4[0x1B0 - 0x1A4];
@@ -602,8 +602,8 @@ typedef struct CrAPState {
 } CrAPState;
 LAYOUT_ASSERT(CrAPState, 0x1E0);
 
-extern CrAPState* lbl_80281EE0;
-extern struct Character* lbl_80281EE8[CRAP_NUM_GOLFERS];   // per golfer slot: the character it starts
+extern CrAPState* gpCrAPState;
+extern struct Character* gFEGolferChars[CRAP_NUM_GOLFERS];   // per golfer slot: the character it starts
                                         // with (none); char.c's Character_FreeFEGolfers frees them
 
 // ---- the views ------------------------------------------------------------------------------

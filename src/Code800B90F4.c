@@ -430,7 +430,7 @@ void fn_800B9BF4(UObject* pObj, f32 (*mBone)[4], f32 (*mScale)[4], f32* pPos) {
     fn_8000C5A4(pObj->m0);
     LLMath_CopyVec(pPos, pObj->m80[3]);
     pObj->m80[3][3] = 1.0f;
-    LLMath_mat44fltMultiplyList(lbl_80281EE0->mC0, pObj->m80, pObj->m80, 4);
+    LLMath_mat44fltMultiplyList(gpCrAPState->mC0, pObj->m80, pObj->m80, 4);
     LLMath_IdentifyMat(pObj->m0);
     fn_80048894(pObj);
     LLMath_CopyMat44(m0, pObj->m0);
@@ -445,13 +445,13 @@ void fn_800B9CF0(u8 bTarget) {
     f32 mScale[4][4];
     f32 (*mBone)[4];
 
-    if (Character_IsHoldingBall(lbl_80281EE0->pB4->pChar)) {
+    if (Character_IsHoldingBall(gpCrAPState->pB4->pChar)) {
         vPos[0] = lbl_802821C8;
         vPos[1] = lbl_802821CC;
         vPos[2] = lbl_802814EC;
         vPos[3] = 1.0f;
-        Character_GetBonePos(lbl_80281EE0->pB4->pChar, 0x54, vPos);
-        mBone = Character_GetBoneMatrix(lbl_80281EE0->pB4->pChar, 0x54);
+        Character_GetBonePos(gpCrAPState->pB4->pChar, 0x54, vPos);
+        mBone = Character_GetBoneMatrix(gpCrAPState->pB4->pChar, 0x54);
         LLMath_IdentifyMat(mScale);
         mScale[0][0] = lbl_802814F0;
         mScale[1][1] = lbl_802814F4;
