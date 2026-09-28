@@ -225,7 +225,7 @@ int  fn_800D13F4(int nPlayer);          // HoleScore.c
 int  fn_800D1530(int nPlayer);          // HoleScore.c
 s32  GM_GetNumHolesInRound(void);                 // GameUICommands.c
 int  GM_GetGolferRelativeCurrentScore(int nPlayer, u8 bCurrent);        // GameRound.c
-s32  fn_800E81A0(int nPlayer);          // GameModeBattle.c
+s32  GameModeBattle_GetClubLostOnLastHole(int nPlayer);          // GameModeBattle.c
 s32  fn_800BCCCC(int nPlayer);          // SitDevFile.c: gpGame->pfnGetPotentialHoleResult
 s32  fn_800BCCF8(int nPlayer);          // SitDevFile.c: gpGame->pfn200's answer (TW06: GetCurrentLead)
 u8   fn_800BCD50(void);                 // SitDevFile.c: gpGame->bInPlayoff
@@ -732,7 +732,7 @@ void GameModeStroke_SetupNextGolfer(void);
 s32  GameModeStroke_GetHonors(int nPlayer);          // TW06 GetHonors: who plays next (5: nobody)
 u8   GameModeStroke_HoleFinished(int nPlayer, u8 bCheck);   // TW06 HoleFinished
 u8   GameModeStroke_GameFinished(u8 bCheck);                // TW06 GameFinished
-u8   fn_800FFDB0(u8 bCheck);            // TW06 GoToPlayoff: stroke play has none
+u8   GameModeStroke_GoToPlayoff(u8 bCheck);            // TW06 GoToPlayoff: stroke play has none
 
 // GetHonors' tee-order sort (GameModeStroke.c, GameModeStableford.c): appends nPlayer to aList
 // (*pnCount entries) if their score on hole nHole is nScore.

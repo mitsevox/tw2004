@@ -3,7 +3,7 @@
 // (bHoleSelected) are played with the ball placed by hand before every shot (player 0 goes to
 // GS_PLACE_BALL, InitCamera), any number of mulligans, and no GameBreakers, profile statistics or
 // flyover at the hole start. The player can end a hole early (FinishHole, from a UI command). It
-// borrows mode 0's GetHonors and GoToPlayoff (GameModeStroke_GetHonors, fn_800FFDB0). The pad
+// borrows mode 0's GetHonors and GoToPlayoff (GameModeStroke_GetHonors, GameModeStroke_GoToPlayoff). The pad
 // reading for placing the ball in every mode (GameModePractice_ReadPlaceBallSticks) is here too.
 
 #include "golfer.h"
@@ -25,8 +25,8 @@ void GameModePractice_EndTurnEndHoleNotGame(int nPlayer);
 void GameModePractice_InitCamera(void);
 
 // Game mode 9's (practice) setup (pfnInit, from GM_SetModeType): its hooks (stroke play's GetHonors
-// and fn_800FFDB0 as GoToPlayoff), any number of mulligans (nMulligans 1), no gimmes, no stroke
-// limit, no GameBreakers (b285), no scorecards from the game manager (b275; EndGame and
+// and GameModeStroke_GoToPlayoff as GoToPlayoff), any number of mulligans (nMulligans 1), no
+// gimmes, no stroke limit, no GameBreakers (b285), no scorecards from the game manager (b275; EndGame and
 // EndTurnEndHoleNotGame show their own), nothing counted in the profile's statistics (b27C, b27D),
 // no flyover at the hole start (b27F) but the mid-hole flyover button on (b280), one view, the
 // current hole 0 and the hole not ended early.
@@ -36,7 +36,7 @@ void GameModePractice_Init(void) {
     gpGame->pfnGetHonors = GameModeStroke_GetHonors;
     gpGame->pfnHoleFinished = GameModePractice_HoleFinished;
     gpGame->pfnGameFinished = GameModePractice_GameFinished;
-    gpGame->pfnGoToPlayoff = fn_800FFDB0;
+    gpGame->pfnGoToPlayoff = GameModeStroke_GoToPlayoff;
     gpGame->pfnEndGame = GameModePractice_EndGame;
     gpGame->pfnLoadHole = GameModePractice_LoadHole;
     gpGame->pfnRestartHole = GameModePractice_RestartHole;

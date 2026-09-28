@@ -10,14 +10,16 @@
 
 void GameModeStroke_EndGame(void);
 
-// One mulligan per player per round (nMulligans 2), one view.
+// Game mode 0's setup: installs stroke play's callbacks (no end-hole callback;
+// GameModeStroke_GoToPlayoff gives no playoff), one mulligan per player per nine (nMulligans 2),
+// the current hole set to hole index 0 (GM_SetCurrentHole) and one view.
 void GameModeStroke_Init(void) {
     gpGame->pfnInit = GameModeStroke_Init;
     gpGame->pfnSetupNextGolfer = GameModeStroke_SetupNextGolfer;
     gpGame->pfnGetHonors = GameModeStroke_GetHonors;
     gpGame->pfnHoleFinished = GameModeStroke_HoleFinished;
     gpGame->pfnGameFinished = GameModeStroke_GameFinished;
-    gpGame->pfnGoToPlayoff = fn_800FFDB0;
+    gpGame->pfnGoToPlayoff = GameModeStroke_GoToPlayoff;
     gpGame->pfnEndGame = GameModeStroke_EndGame;
     gpGame->n4 = 0;
     gpGame->nMulligans = 2;
@@ -28,8 +30,9 @@ void GameModeStroke_Init(void) {
     gSession.nSplitScreen = 0;
 }
 
-// In split screen everyone plays at once; otherwise whoever plays next (the mode's honors) gets
-// ready and the others wait.
+// pfnSetupNextGolfer: with nSplitScreen 1 every player gets ready at once (GS_PRE_SHOT); otherwise
+// the next player (the mode's pfnGetHonors, kept in lbl_80282278) gets ready and the others wait
+// (GS_WAIT).
 void GameModeStroke_SetupNextGolfer(void) {
     int i;
     if (gSession.nSplitScreen == 1) {
@@ -155,7 +158,7 @@ u8 GameModeStroke_HoleFinished(int nPlayer, u8 bCheck) {
     return 1;
 }
 
-// No selected hole is left.
+// Whether the round is over: no selected hole is left after the current one.
 u8 GameModeStroke_GameFinished(u8 bCheck) {
     int h;
     for (h = Game_CurHoleIndex() + 1; h < 18; h++) {
@@ -166,14 +169,16 @@ u8 GameModeStroke_GameFinished(u8 bCheck) {
     return 1;
 }
 
-// GoToPlayoff: stroke play has none.
-u8 fn_800FFDB0(u8 bCheck) {
+// pfnGoToPlayoff: stroke play has no playoff, always 0. Nothing in this build calls the slot.
+u8 GameModeStroke_GoToPlayoff(u8 bCheck) {
     return 0;
 }
 
-// Each human with a profile who beat CPU golfers wins the prize for
-// the best earnings rating among them: its base prize plus its per-stroke prize for up to 5 strokes
-// of margin.
+// pfnEndGame, after a full round that is not a Play Now challenge: each human with an active
+// profile whose score beat one or more CPU golfers wins the prize of the best-rated of them
+// (GM_Earnings_RateGolfer): its base prize plus its per-stroke prize for the margin, up to 5
+// strokes (gEarningsTable.aStrokePrize). The first such human has a game counted as won
+// (EASBio_IncrementGamesWon); a nonzero base prize is announced (GUI message 0x6A).
 void GameModeStroke_EndGame(void) {
     int i;
     int j;

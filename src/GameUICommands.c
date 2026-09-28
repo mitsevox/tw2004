@@ -257,7 +257,7 @@ void  GM_GolferConcede_Hole(int nPlayer);                     // GameManager.c
 void  GM_RestartHole(void);                                   // GameManager.c
 void  GameModeBattle_AddClub(int nPlayer, int nClub);         // GameModeBattle.c
 int   GameModeBattle_CanAddClub(int nPlayer, int nClub);
-s32   GameModeBattle_GetWinner(void);
+s32   GameModeBattle_GetHoleWinner(void);
 u8    GameModeBattle_ShowEndOfHole_ClubAddRemove_UI(void);
 int   GameModeBattle_NumRemovableClubsLeft(int nPlayer);
 u8    GameModeBattle_RemoveClub(int nPlayer, int nClub);
@@ -305,7 +305,7 @@ void  GUI_SetUnreadFlag(u8 b);
 void  GUI_QueueTip(int n);
 int   GameAnalysis_PickTip(void);
 f32   GameAnalysis_GetTipStat(int nPlayer, u32 nStat);
-s32   fn_800E8114(int nPlayer);
+s32   GameModeBattle_GetNumberStartingClubs(int nPlayer);
 int   GM_BestBallMode_GetTeamRelativeScore(int nPlayer, u8 bCurrent);
 u8    PlayNow_IsSpeedGolf(void);
 s32   PlayNow_GetMedalMark(int k);
@@ -2739,10 +2739,10 @@ void IG_vGetChallengeDescription(MsgArg* pArgs, MsgArg* pResult) {
 void IG_vAcceptOnlineInput(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Command 187, Battle mode: how many clubs player pArgs[0] started with (fn_800E8114: the count
-// GameModeBattle_SaveClubSetup kept).
+// Command 187, Battle mode: how many clubs player pArgs[0] started with
+// (GameModeBattle_GetNumberStartingClubs: the count GameModeBattle_SaveClubSetup kept).
 void IG_vBattle_GetNumClubsStart(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_800E8114(pArgs[0].i);
+    pResult->i = GameModeBattle_GetNumberStartingClubs(pArgs[0].i);
 }
 
 // Command 188, Battle mode: whether player pArgs[0] may take club pArgs[1]: one he started with and
@@ -2985,9 +2985,9 @@ void IG_vBattleGolf_ShowClubUI(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-// Command 205, Battle mode: the winner of the last hole (GameModeBattle_GetWinner; 5 nobody).
+// Command 205, Battle mode: the winner of the last hole (GameModeBattle_GetHoleWinner; 5 nobody).
 void IG_vBattleGolf_GetHoleWinner(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = GameModeBattle_GetWinner();
+    pResult->i = GameModeBattle_GetHoleWinner();
 }
 
 // Command 206: whether the game is paused (gSession.nPaused: the pause menu, or a pulled

@@ -194,7 +194,7 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
         SitDev_SetStateValue(pValues, 74, (s16)(s8)Golfer_GetAttribute(pPlayer, 7, 2), pSetBits);
         SitDev_SetStateValue(pValues, 77, (s16)(s8)Golfer_GetAttribute(pPlayer, 10, 2), pSetBits);
         SitDev_SetStateValue(pValues, 78, (s16)(s8)Golfer_GetAttribute(pPlayer, 11, 2), pSetBits);
-        SitDev_SetStateValue(pValues, 93, fn_800E81A0(nPlayer), pSetBits);
+        SitDev_SetStateValue(pValues, 93, GameModeBattle_GetClubLostOnLastHole(nPlayer), pSetBits);
     case 3:
     case 4:
     case 6:

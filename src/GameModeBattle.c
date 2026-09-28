@@ -14,7 +14,7 @@ s32 gBattleHoleWinner = 5;                    // the winner of the last hole (5 
 u8  gBattleShowClubAddRemove;                    // a club is to be taken
 
 void GameModeBattle_Shutdown(void);
-void fn_800E7A9C(void);
+void GameModeBattle_StartGamePostData(void);
 u8   GameModeBattle_GameFinished(u8 bCheck);
 void GameModeBattle_EndHole(void);
 void GameModeBattle_EndGame(void);
@@ -23,7 +23,9 @@ int  GameModeBattle_NumRemovableClubsLeft(int nPlayer);
 void GameModeBattle_SaveClubSetup(void);
 void GameModeBattle_RestoreClubSetup(void);
 
-// Two players; the CPU may concede.
+// Game mode 25's setup (GM_SetModeType, GameRound.c): installs the mode's callbacks (match play's
+// next golfer, honors, hole-finished and playoff; Battle's own game-finished, end-hole, end-game,
+// shutdown and round start), lets a CPU concede a hole, no mulligans (nMulligans 0) and one view.
 void GameModeBattle_Init(void) {
     gpGame->pfnInit = GameModeBattle_Init;
     gpGame->pfnShutdown = GameModeBattle_Shutdown;
@@ -34,7 +36,7 @@ void GameModeBattle_Init(void) {
     gpGame->pfnGoToPlayoff = GameModeMatch_GoToPlayoff;
     gpGame->pfnEndHole = GameModeBattle_EndHole;
     gpGame->pfnEndGame = GameModeBattle_EndGame;
-    gpGame->pfnStartGamePostData = fn_800E7A9C;
+    gpGame->pfnStartGamePostData = GameModeBattle_StartGamePostData;
     gpGame->bAIConcedes = 1;
     gpGame->n4 = 1;
     gpGame->nMulligans = 0;
@@ -44,13 +46,16 @@ void GameModeBattle_Init(void) {
     gSession.nSplitScreen = 0;
 }
 
-// The bags go back to how they were.
+// pfnShutdown: every player's bag goes back to how it was at the round's start
+// (GameModeBattle_RestoreClubSetup), so the clubs taken in the match are not lost.
 void GameModeBattle_Shutdown(void) {
     GameModeBattle_RestoreClubSetup();
 }
 
-// The round starts: the bags are saved.
-void fn_800E7A9C(void) {
+// pfnStartGamePostData, when the round starts after the players are set up: saves every player's
+// bag (GameModeBattle_SaveClubSetup) to restore it at shutdown and to know which clubs can be won
+// back.
+void GameModeBattle_StartGamePostData(void) {
     GameModeBattle_SaveClubSetup();
 }
 
@@ -67,8 +72,11 @@ u8 GameModeBattle_GameFinished(u8 bCheck) {
     return 0;
 }
 
-// The player who holed out in fewer strokes wins the hole and may
-// take a club (not when that ends the game).
+// pfnEndHole: a player who holed out in fewer strokes than the other wins the hole: 1 in their
+// nModePoints for it, one more nHolesWon, and they become the hole's winner (gBattleHoleWinner; 5
+// when the hole is halved). A won hole lets the winner take a club (gBattleShowClubAddRemove)
+// unless the match is now over. The clubs lost on the hole before are forgotten
+// (gBattleClubLostThisHole back to 26).
 void GameModeBattle_EndHole(void) {
     gBattleShowClubAddRemove = 0;
     gBattleHoleWinner = 5;
@@ -96,8 +104,12 @@ void GameModeBattle_EndHole(void) {
     gBattleClubLostThisHole[4] = 26;
 }
 
-// Prize money for a human winner with a profile (no margin when the
-// game ended on clubs).
+// pfnEndGame, after a full round that is not a Play Now challenge: the winner is the player whose
+// opponent had one club or fewer left to take and just lost a hole (margin 0), else the one with
+// more holes won (margin the difference; a tie goes to player 1, margin 0). A human winner with an
+// active profile has the game counted as won (EASBio_SetCurrentGameWon) and, when
+// GM_Earnings_GetStrokeWinnings pays anything, gets the money (GUI message 0x6B with the base
+// prize, GM_Earnings_AwardMoney, and money.n14).
 void GameModeBattle_EndGame(void) {
     int nPrize;
     int nWinner;
@@ -146,7 +158,7 @@ void GameModeBattle_EndGame(void) {
     }
 }
 
-// Clubs 13, 21 and 25 cannot be taken.
+// Whether club nClub can never be taken: the 5-iron (13), the sand wedge (21) and the putter (25).
 u8 GameModeBattle_ClubIsRequired(int nClub) {
     u8 bRequired = 0;
     if ((1 << nClub) & 0x2202000) {
@@ -155,6 +167,8 @@ u8 GameModeBattle_ClubIsRequired(int nClub) {
     return bRequired;
 }
 
+// How many clubs in nPlayer's bag can still be taken (every club in it but the three
+// GameModeBattle_ClubIsRequired keeps).
 int GameModeBattle_NumRemovableClubsLeft(int nPlayer) {
     int i;
     int n = 0;
@@ -166,6 +180,9 @@ int GameModeBattle_NumRemovableClubsLeft(int nPlayer) {
     return n;
 }
 
+// Takes club nClub out of nPlayer's bag and records it as the club they lost this hole
+// (gBattleClubLostThisHole, even when it was not in the bag); gives whether it was in the bag. A
+// required club (GameModeBattle_ClubIsRequired) is refused: 0 and nothing changes.
 u8 GameModeBattle_RemoveClub(int nPlayer, int nClub) {
     u8 bRemoved;
     if (GameModeBattle_ClubIsRequired(nClub)) {
@@ -176,10 +193,14 @@ u8 GameModeBattle_RemoveClub(int nPlayer, int nClub) {
     return bRemoved;
 }
 
+// Puts club nClub in nPlayer's bag (Bag_AddClub): the end-of-hole choice to win back a club instead
+// of taking one (GameModeBattle_CanAddClub says which).
 void GameModeBattle_AddClub(int nPlayer, int nClub) {
     Bag_AddClub(nPlayer, nClub);
 }
 
+// Saves every player's bag (golfer.uBagMask, into gBattleStartBagMask) and how many clubs it holds
+// (gBattleStartClubCount), at the round's start.
 void GameModeBattle_SaveClubSetup(void) {
     int i;
     for (i = 0; i < gSession.nNumPlayers; i++) {
@@ -188,6 +209,7 @@ void GameModeBattle_SaveClubSetup(void) {
     }
 }
 
+// Puts every player's bag back as GameModeBattle_SaveClubSetup saved it (gBattleStartBagMask).
 void GameModeBattle_RestoreClubSetup(void) {
     int i;
     for (i = 0; i < gSession.nNumPlayers; i++) {
@@ -195,11 +217,14 @@ void GameModeBattle_RestoreClubSetup(void) {
     }
 }
 
-s32 fn_800E8114(int nPlayer) {
+// How many clubs nPlayer's bag held at the round's start (gBattleStartClubCount; UI command
+// fn_80089F6C shows it).
+s32 GameModeBattle_GetNumberStartingClubs(int nPlayer) {
     return gBattleStartClubCount[nPlayer];
 }
 
-// A club the player started with and no longer has.
+// Whether club nClub may be put back in nPlayer's bag: they started the round with it
+// (gBattleStartBagMask) and no longer have it. 1 or 0.
 int GameModeBattle_CanAddClub(int nPlayer, int nClub) {
     u32 uBit = 1 << nClub;
     int bCan = 0;
@@ -212,15 +237,20 @@ int GameModeBattle_CanAddClub(int nPlayer, int nClub) {
     return bCan;
 }
 
-s32 fn_800E81A0(int nPlayer) {
+// The club taken from nPlayer after the last hole (26 = none; GameModeBattle_EndHole clears it when
+// the next hole ends). The situation state (SitDevStateVector.c, value 93) reads it.
+s32 GameModeBattle_GetClubLostOnLastHole(int nPlayer) {
     return gBattleClubLostThisHole[nPlayer];
 }
 
-// Nonzero while a club is to be taken.
+// Whether the end of the hole shows the club choice: a player won the hole outright and the match
+// goes on (gBattleShowClubAddRemove, set by GameModeBattle_EndHole).
 u8 GameModeBattle_ShowEndOfHole_ClubAddRemove_UI(void) {
     return gBattleShowClubAddRemove;
 }
 
-s32 GameModeBattle_GetWinner(void) {
+// The player who won the last hole outright (0 or 1), 5 when it was halved (gBattleHoleWinner, set
+// by GameModeBattle_EndHole).
+s32 GameModeBattle_GetHoleWinner(void) {
     return gBattleHoleWinner;
 }
