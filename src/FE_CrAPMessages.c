@@ -1089,7 +1089,7 @@ void fn_80109CBC(MsgArg* pArgs, MsgArg* pResult) {
     Gaud_PlayUISound((Misc_RandFunc(0) & 7) + 11);
     FE_ResetCrAPZoom();
     FE_SetCrAPCameraIdleState(0);
-    GolfCamera_SwitchCrAPCamera(pView, "Crap Idle", gpCrAPState->n4, 0, 0, 0);
+    GolfCamera_SwitchCrAPCamera(pView, "Crap Idle", gpCrAPState->nCamIdleState, 0, 0, 0);
     FE_CrAP_SetTriggerAnims(0);
     fn_80079664(pProfile);
     fn_8007873C(pProfile);
@@ -1101,7 +1101,7 @@ void fn_80109D5C(MsgArg* pArgs, MsgArg* pResult) {
     View* pView = ViewController_GetCameraControl(ViewController_GetCurrentViewControllerID());
     FE_ResetCrAPZoom();
     FE_SetCrAPCameraIdleState(1);
-    GolfCamera_SwitchCrAPCamera(pView, "Crap Face", gpCrAPState->n4, 0, 0, 0);
+    GolfCamera_SwitchCrAPCamera(pView, "Crap Face", gpCrAPState->nCamIdleState, 0, 0, 0);
     FE_CrAP_SetTriggerAnims(0);
     fn_80078E34(pProfile);
 }

@@ -81,7 +81,7 @@ GxTexture gFEScreenCopyTex;
 FEGolferMachine gFEStreamStateMgr;  // the loader's state machine (FE_StreamInitStateMgr)
 
 s32 gFEOffscreenBufferRender = 1;   // draw the golfer through gFEScreenCopyTex (FE_SetOffscreenBufferRender)
-f32 gFEDimAlphaMax = 0.17f;         // while b83 is set: the most the display's alpha f14C may be
+f32 gFEDimAlphaMax = 0.17f;         // while b83 is set: the most the display's alpha fAlpha may be
 f32 lbl_80281338 = 0.1f;            // while b83 is set: f140, f144 and f148 (written only)
 u8  gFEGolferEnabled = 1;           // never cleared; 0 would stop animating and drawing the golfer
 s32 gFELastDrawnGolfer = -1;        // } the golfer and profile slot last drawn (FE_RenderGolfer); -1 after
@@ -169,34 +169,34 @@ void FE_CharMgrInit(void) {
     int nNext;
 
     gpCrAPState = StaticMem_Alloc(sizeof(CrAPState), 2, 0, "FEgolferanim.c", 337);
-    gpCrAPState->n0 = 0;
-    gpCrAPState->n4 = 0;
-    gpCrAPState->n1B8 = 0;
-    gpCrAPState->n1BC = -1;
-    gpCrAPState->n1B4 = 0;
-    gpCrAPState->sz10[0] = '\0';
+    gpCrAPState->nScreenKind = 0;
+    gpCrAPState->nCamIdleState = 0;
+    gpCrAPState->nClub = 0;
+    gpCrAPState->nTempClub = -1;
+    gpCrAPState->nIdleCount = 0;
+    gpCrAPState->szCurAnim[0] = '\0';
     gpCrAPState->b85 = 1;
-    gpCrAPState->b86 = 0;
+    gpCrAPState->bHidden = 0;
     gpCrAPState->b91 = 1;
     gpCrAPState->b88 = 0;
     gpCrAPState->b89 = 0;
     gpCrAPState->b84 = 1;
     gpCrAPState->b82 = 0;
     gpCrAPState->b83 = 0;
-    gpCrAPState->f14C = 0.5f;
+    gpCrAPState->fAlpha = 0.5f;
     gpCrAPState->nBC = 0;
     gpCrAPState->b87 = 0;
-    gpCrAPState->b8A = 0;
+    gpCrAPState->bClearCache = 0;
     gpCrAPState->n8C = -1;
     gpCrAPState->n194 = 0;
     gpCrAPState->n198 = Misc_RandFunc(0) & 3;
-    gpCrAPState->f19C = 0.0f;
-    gpCrAPState->f1A0 = 0.0f;
+    gpCrAPState->fFacing = 0.0f;
+    gpCrAPState->fTargetFacing = 0.0f;
     gpCrAPState->b1B0 = 0;
     gpCrAPState->b90 = 0;
-    gpCrAPState->b1D1 = 1;
-    gpCrAPState->b1D2 = 0;
-    gpCrAPState->b1DC = 0;
+    gpCrAPState->bClubStatesAllowed = 1;
+    gpCrAPState->bTexSwapDue = 0;
+    gpCrAPState->bZoom = 0;
     gpCrAPState->aGolfer[0].nGolferId = -1;
     for (i = 0; i < CRAP_NUM_GOLFERS; i++) {
         nPrev = i - 1;
@@ -211,7 +211,7 @@ void FE_CharMgrInit(void) {
         gpCrAPState->aGolfer[i].pChar = gFEGolferChars[i];
         gpCrAPState->aGolfer[i].nIndex = i;
         gpCrAPState->aGolfer[i].nStreamedId = -1;
-        gpCrAPState->aGolfer[i].n1C = -1;
+        gpCrAPState->aGolfer[i].nSetupKind = -1;
         gpCrAPState->aGolfer[i].bFree = 0;
         gpCrAPState->aGolfer[i].pPrev = &gpCrAPState->aGolfer[nPrev];
         gpCrAPState->aGolfer[i].pNext = &gpCrAPState->aGolfer[nNext];
@@ -231,7 +231,7 @@ void FE_CharMgrInit(void) {
     gpCrAPState->pB8 = &gpCrAPState->aGolfer[0];
     gpCrAPState->n190 = 0;
     FE_StreamInitStateMgr();
-    gpCrAPState->n74 = 0;
+    gpCrAPState->nTexSwapState = 0;
 }
 
 // Stop the loader (FE_StreamStopForClose), free every golfer slot's character, and free the state.
@@ -272,12 +272,12 @@ void FE_setupStreaming(int nGolfer, int nOtherA, int nOtherB) {
         } else {
             gpCrAPState->pB4->nGolferId = nGolfer;
             gpCrAPState->pB4->bLoaded = 0;
-            gpCrAPState->pB4->n1C = -1;
+            gpCrAPState->pB4->nSetupKind = -1;
         }
     }
     gpCrAPState->b87 = 1;
     FE_vFreeUnusedCharacters();
-    if (gpCrAPState->n0 == 3) {
+    if (gpCrAPState->nScreenKind == 3) {
         FE_vLoadNextCrAPAnim(0);
     }
 }
@@ -316,8 +316,8 @@ void FE_StreamFunc_IdleClose(void) {
 // which); a slot that still holds a character is flagged to be freed first (bFree), and once the
 // memory is free (FE_StreamManageCRaPMemory) the state finishes, on to the skin state. A golfer
 // another slot already has is not loaded again (for the shown one, FE_vClearGolferCache stops the
-// loader). Nothing happens while the loader is being stopped (b8A) or slot 0 waits to be freed; an
-// interrupt finishes the state at once.
+// loader). Nothing happens while the loader is being stopped (bClearCache) or slot 0 waits to be
+// freed; an interrupt finishes the state at once.
 void FE_StreamFunc_IdleUpdate(void) {
     CrAPGolfer* pGolfer;
 
@@ -325,7 +325,7 @@ void FE_StreamFunc_IdleUpdate(void) {
         FE_StreamPopState();
         return;
     }
-    if (gpCrAPState->b8A == 1) return;
+    if (gpCrAPState->bClearCache == 1) return;
     if (gpCrAPState->aGolfer[0].bFree == 1) return;
     pGolfer = gpCrAPState->pB4;
     if (pGolfer->bLoaded == 0 && pGolfer->nGolferId != -1) {
@@ -434,7 +434,7 @@ void FE_StreamFunc_TexturesUpdate(void) {
             gpCrAPState->pB8->bLoaded = 1;
             gFELastDrawnSlot = -1;
             gFELastDrawnGolfer = -1;
-            gpCrAPState->pB8->n1C = -1;
+            gpCrAPState->pB8->nSetupKind = -1;
         }
         gpCrAPState->n8C = -1;
         FE_StreamPopState();
@@ -566,8 +566,8 @@ int FE_StreamGetCurrentState(void) {
 
 // Each front-end frame, after FE_vUpdateGolferAll: update the current view and take its camera into
 // the golfer display: an identity matrix in mC0, the camera's position and look point (View v0,
-// v10) in v100 and v110, and the screen kind's (n0) pair of vectors (lbl_80189A40, 60, 80) in v120
-// and v130.
+// v10) in v100 and v110, and the screen kind's (nScreenKind) pair of vectors (lbl_80189A40, 60, 80)
+// in v120 and v130.
 void FE_SetupCamera(void) {
     View* pView;
 
@@ -576,7 +576,7 @@ void FE_SetupCamera(void) {
     LLMath_IdentifyMat(gpCrAPState->mC0);
     LLMath_CopyVec(pView->v0, gpCrAPState->v100);
     LLMath_CopyVec(pView->v10, gpCrAPState->v110);
-    switch (gpCrAPState->n0) {
+    switch (gpCrAPState->nScreenKind) {
     case 0:
         LLMath_CopyVec(lbl_80189A40[0], gpCrAPState->v120);
         LLMath_CopyVec(lbl_80189A40[1], gpCrAPState->v130);
@@ -594,12 +594,13 @@ void FE_SetupCamera(void) {
     }
 }
 
-// Each front-end frame, before FE_SetupCamera and the render passes: fade the golfer display (f14C,
-// 0..0.5) in and out with his animation; on screen kind 3 (create-a-player) run its queued
-// animation (n1C0), and let the pad turn him (FE_RotateCrAPModel) and zoom (FE_ZoomCrAPModel); set
-// him up again for a new screen kind (FE_SetupCharState) and place him (gFEGolferPos; in the club
-// close-up raised by his club's offset); turn to the next golfer when his animation ends (b91);
-// give a golfer shown afresh his ball logo and textures; then animate, pose and light him.
+// Each front-end frame, before FE_SetupCamera and the render passes: fade the golfer display
+// (fAlpha, 0..0.5) in and out with his animation; on screen kind 3 (create-a-player) run its queued
+// animation (nQueuedState), and let the pad turn him (FE_RotateCrAPModel) and zoom
+// (FE_ZoomCrAPModel); set him up again for a new screen kind (FE_SetupCharState) and place him
+// (gFEGolferPos; in the club close-up raised by his club's offset); turn to the next golfer when
+// his animation ends (b91); give a golfer shown afresh his ball logo and textures; then animate,
+// pose and light him.
 void FE_vUpdateGolferAll(void) {
     f32 vSaved[4];
     LightParams params;
@@ -621,11 +622,11 @@ void FE_vUpdateGolferAll(void) {
     fn_8008F24C();
     SKN_BeginFrame();
     for (i = 0; i < CRAP_NUM_GOLFERS; i++) {
-        if (gpCrAPState->aGolfer[i].bFree || gpCrAPState->b8A) {
+        if (gpCrAPState->aGolfer[i].bFree || gpCrAPState->bClearCache) {
             gpCrAPState->aGolfer[i].bLoaded = 0;
         }
     }
-    if (gpCrAPState->b8A || (gpCrAPState->pB4 != NULL && gpCrAPState->pB4->bFree)) {
+    if (gpCrAPState->bClearCache || (gpCrAPState->pB4 != NULL && gpCrAPState->pB4->bFree)) {
         gpCrAPState->pB4->bLoaded = 0;
     }
     // EA bug: without a character fEnd, fTime and f180 (and fStart) are read unset below.
@@ -634,130 +635,132 @@ void FE_vUpdateGolferAll(void) {
         fTime = gpCrAPState->pB4->pChar->fAnimTime;
         f180 = gpCrAPState->pB4->pChar->fAnimStart;
     }
-    if (gpCrAPState->n0 == 0) {
+    if (gpCrAPState->nScreenKind == 0) {
         fFade = 1.0f;
         if (gpCrAPState->pB4->pChar != NULL) {
             fStart = fEnd - 1.0f;
         }
         if (fTime >= fStart) {
-            gpCrAPState->f14C = 0.5f * ((fEnd - fTime) / fFade);
-            if (gpCrAPState->f14C < 0.0f) {
-                gpCrAPState->f14C = 0.0f;
+            gpCrAPState->fAlpha = 0.5f * ((fEnd - fTime) / fFade);
+            if (gpCrAPState->fAlpha < 0.0f) {
+                gpCrAPState->fAlpha = 0.0f;
             }
         } else {
-            gpCrAPState->f14C = 0.5f * fTime / fFade;
-            if (gpCrAPState->f14C > 0.5f) {
-                gpCrAPState->f14C = 0.5f;
+            gpCrAPState->fAlpha = 0.5f * fTime / fFade;
+            if (gpCrAPState->fAlpha > 0.5f) {
+                gpCrAPState->fAlpha = 0.5f;
             }
         }
-    } else if (gpCrAPState->n0 == 3 && gpCrAPState->pB4->pChar != NULL) {
-        if (gpCrAPState->b1C8 == 1 && gpCrAPState->n1B4 != -1
-            && (gpCrAPState->n1C0 == gpCrAPState->n1C4 || gpCrAPState->n1C0 == 4)) {
-            gpCrAPState->b1C8 = 0;
+    } else if (gpCrAPState->nScreenKind == 3 && gpCrAPState->pB4->pChar != NULL) {
+        if (gpCrAPState->bPadLocked == 1 && gpCrAPState->nIdleCount != -1
+            && (gpCrAPState->nQueuedState == gpCrAPState->nUnlockState || gpCrAPState->nQueuedState == 4)) {
+            gpCrAPState->bPadLocked = 0;
         }
-        if (gpCrAPState->n1C0 == 0) {
+        if (gpCrAPState->nQueuedState == 0) {
             if (fEnd - fTime < 0.6f) {
-                gpCrAPState->n1C0 = 1;
+                gpCrAPState->nQueuedState = 1;
             }
-        } else if (gpCrAPState->n1C0 == 1 && gpCrAPState->sz20[0] != '\0') {
-            gpCrAPState->f14C = 0.5f * gpCrAPState->f1CC / 0.5f;
-            gpCrAPState->f1CC -= FRAME_TIME;
-            if (gpCrAPState->f1CC < 0.0f) {
-                if ((gpCrAPState->n8 == 2 && gpCrAPState->nC != 1) || gpCrAPState->nC == 2) {
-                    if (fn_800484F4(gpCrAPState->sz54) >= 0) {
-                        fn_800B9EB8(gpCrAPState->sz54);
+        } else if (gpCrAPState->nQueuedState == 1 && gpCrAPState->szQueuedAnim[0] != '\0') {
+            gpCrAPState->fAlpha = 0.5f * gpCrAPState->fFadeOutTime / 0.5f;
+            gpCrAPState->fFadeOutTime -= FRAME_TIME;
+            if (gpCrAPState->fFadeOutTime < 0.0f) {
+                if ((gpCrAPState->nRenderState == 2 && gpCrAPState->nTempRenderState != 1)
+                    || gpCrAPState->nTempRenderState == 2) {
+                    if (fn_800484F4(gpCrAPState->szQueuedBall) >= 0) {
+                        fn_800B9EB8(gpCrAPState->szQueuedBall);
                     } else {
                         fn_800B9EB8(NULL);
                     }
                     FE_SetCrapRotation(0, 0.0f);
                     FE_ResetCrAPZoom();
-                    gpCrAPState->n1C0 = 2;
-                    FE_vTriggerCrAPAnimAndCamera(gpCrAPState->sz20, gpCrAPState->sz30, 0);
-                    if (gpCrAPState->b80) {
-                        gpCrAPState->n8 = gpCrAPState->nC;
+                    gpCrAPState->nQueuedState = 2;
+                    FE_vTriggerCrAPAnimAndCamera(gpCrAPState->szQueuedAnim, gpCrAPState->szQueuedShot, 0);
+                    if (gpCrAPState->bTempRenderState) {
+                        gpCrAPState->nRenderState = gpCrAPState->nTempRenderState;
                         GolfCamera_SwitchCrAPCamera(pView, NULL, 4, 0, 0, 0);
                     }
-                } else if (gpCrAPState->n74 == 2 || gpCrAPState->b78 == 0) {
-                    if (gpCrAPState->f7C <= 0.0f) {
+                } else if (gpCrAPState->nTexSwapState == 2 || gpCrAPState->bDelayTexSwap == 0) {
+                    if (gpCrAPState->fTexSwapDelay <= 0.0f) {
                         Character_ExecuteTextureSwapFE(gpCrAPState->pB4->pChar);
-                        gpCrAPState->b81 = 0;
+                        gpCrAPState->bNewTextures = 0;
                     }
                     FE_SetCrapRotation(0, 0.0f);
                     FE_ResetCrAPZoom();
-                    gpCrAPState->n1C0 = 2;
-                    FE_vTriggerCrAPAnimAndCamera(gpCrAPState->sz20, gpCrAPState->sz30, 0);
-                    if (gpCrAPState->b80) {
-                        gpCrAPState->n8 = gpCrAPState->nC;
-                        if (gpCrAPState->n8 == 1) {
+                    gpCrAPState->nQueuedState = 2;
+                    FE_vTriggerCrAPAnimAndCamera(gpCrAPState->szQueuedAnim, gpCrAPState->szQueuedShot, 0);
+                    if (gpCrAPState->bTempRenderState) {
+                        gpCrAPState->nRenderState = gpCrAPState->nTempRenderState;
+                        if (gpCrAPState->nRenderState == 1) {
                             GolfCamera_SwitchCrAPCamera(pView, NULL, 3, 0, 0, 0);
-                        } else if (gpCrAPState->n8 == 2) {
+                        } else if (gpCrAPState->nRenderState == 2) {
                             GolfCamera_SwitchCrAPCamera(pView, NULL, 4, 0, 0, 0);
                         }
                     }
-                    if (gpCrAPState->n1BC >= 0) {
-                        Character_SelectClub(gpCrAPState->pB4->pChar, gpCrAPState->n1BC);
+                    if (gpCrAPState->nTempClub >= 0) {
+                        Character_SelectClub(gpCrAPState->pB4->pChar, gpCrAPState->nTempClub);
                     }
                 }
             }
-        } else if (gpCrAPState->n1C0 == 2) {
-            if (gpCrAPState->n74 == 2 && (gpCrAPState->b78 == 0 || fTime > gpCrAPState->f7C)) {
-                gpCrAPState->f7C = 0.0f;
+        } else if (gpCrAPState->nQueuedState == 2) {
+            if (gpCrAPState->nTexSwapState == 2
+                && (gpCrAPState->bDelayTexSwap == 0 || fTime > gpCrAPState->fTexSwapDelay)) {
+                gpCrAPState->fTexSwapDelay = 0.0f;
                 Character_ExecuteTextureSwapFE(gpCrAPState->pB4->pChar);
-                gpCrAPState->b81 = 0;
+                gpCrAPState->bNewTextures = 0;
             }
             if (fTime >= fEnd - 0.5f) {
                 fLeft = fEnd - fTime;
-                gpCrAPState->f14C = 0.5f * (fLeft / 0.5f);
-                if (gpCrAPState->f14C <= 0.01f || fLeft < FRAME_TIME) {
-                    gpCrAPState->f14C = 0.0f;
-                    gpCrAPState->n1C0 = 3;
-                    if (gpCrAPState->b80) {
-                        gpCrAPState->n8 = 0;
-                        gpCrAPState->b80 = 0;
+                gpCrAPState->fAlpha = 0.5f * (fLeft / 0.5f);
+                if (gpCrAPState->fAlpha <= 0.01f || fLeft < FRAME_TIME) {
+                    gpCrAPState->fAlpha = 0.0f;
+                    gpCrAPState->nQueuedState = 3;
+                    if (gpCrAPState->bTempRenderState) {
+                        gpCrAPState->nRenderState = 0;
+                        gpCrAPState->bTempRenderState = 0;
                     }
-                    if (gpCrAPState->n1BC >= 0) {
-                        Character_SelectClub(gpCrAPState->pB4->pChar, gpCrAPState->n1B8);
-                        gpCrAPState->n1BC = -1;
+                    if (gpCrAPState->nTempClub >= 0) {
+                        Character_SelectClub(gpCrAPState->pB4->pChar, gpCrAPState->nClub);
+                        gpCrAPState->nTempClub = -1;
                     }
                     FE_vLoadNextCrAPAnim(0);
                 }
-                if (gpCrAPState->n1D0 == 0) {
-                    gpCrAPState->f14C = 0.5f;
+                if (gpCrAPState->bFadeAtEnd == 0) {
+                    gpCrAPState->fAlpha = 0.5f;
                 }
             } else {
-                gpCrAPState->f14C = 0.5f * fTime / 0.5f;
-                if (gpCrAPState->f14C >= 0.5f) {
-                    gpCrAPState->f14C = 0.5f;
+                gpCrAPState->fAlpha = 0.5f * fTime / 0.5f;
+                if (gpCrAPState->fAlpha >= 0.5f) {
+                    gpCrAPState->fAlpha = 0.5f;
                 }
             }
-        } else if (gpCrAPState->n1C0 == 3) {
-            if (gpCrAPState->n74 == 2) {
+        } else if (gpCrAPState->nQueuedState == 3) {
+            if (gpCrAPState->nTexSwapState == 2) {
                 Character_ExecuteTextureSwapFE(gpCrAPState->pB4->pChar);
-                gpCrAPState->b81 = 0;
+                gpCrAPState->bNewTextures = 0;
             }
-            gpCrAPState->f14C = 0.5f * fTime / 0.5f;
-            if (gpCrAPState->f14C >= 0.5f) {
-                gpCrAPState->n1C0 = 4;
-                gpCrAPState->f14C = 0.5f;
+            gpCrAPState->fAlpha = 0.5f * fTime / 0.5f;
+            if (gpCrAPState->fAlpha >= 0.5f) {
+                gpCrAPState->nQueuedState = 4;
+                gpCrAPState->fAlpha = 0.5f;
             }
-            if (gpCrAPState->n1D0 == 0) {
-                gpCrAPState->f14C = 0.5f;
+            if (gpCrAPState->bFadeAtEnd == 0) {
+                gpCrAPState->fAlpha = 0.5f;
             }
         } else {
-            if (gpCrAPState->n74 == 2) {
+            if (gpCrAPState->nTexSwapState == 2) {
                 Character_ExecuteTextureSwapFE(gpCrAPState->pB4->pChar);
-                gpCrAPState->b81 = 0;
+                gpCrAPState->bNewTextures = 0;
             }
-            gpCrAPState->f14C = 0.5f;
+            gpCrAPState->fAlpha = 0.5f;
         }
     } else {
-        gpCrAPState->f14C = 0.5f;
+        gpCrAPState->fAlpha = 0.5f;
     }
-    gpCrAPState->f14C = (gpCrAPState->f14C < 0.0f) ? 0.0f
-                       : (gpCrAPState->f14C > 0.5f) ? 0.5f : gpCrAPState->f14C;
+    gpCrAPState->fAlpha = (gpCrAPState->fAlpha < 0.0f) ? 0.0f
+                       : (gpCrAPState->fAlpha > 0.5f) ? 0.5f : gpCrAPState->fAlpha;
     if (gpCrAPState->b83) {
-        if (gpCrAPState->f14C > gFEDimAlphaMax) {
-            gpCrAPState->f14C = gFEDimAlphaMax;
+        if (gpCrAPState->fAlpha > gFEDimAlphaMax) {
+            gpCrAPState->fAlpha = gFEDimAlphaMax;
         }
         gpCrAPState->f140 = lbl_80281338;
         gpCrAPState->f144 = lbl_80281338;
@@ -776,19 +779,19 @@ void FE_vUpdateGolferAll(void) {
         gpCrAPState->b82 = 0;
     }
     if (gpCrAPState->pB4->pChar != NULL
-        && (gpCrAPState->n0 == 2 || gpCrAPState->n0 == 1 || gpCrAPState->n0 == 4)
+        && (gpCrAPState->nScreenKind == 2 || gpCrAPState->nScreenKind == 1 || gpCrAPState->nScreenKind == 4)
         && fLeft < fHalf && gpCrAPState->b82 == 0 && gpCrAPState->pB4->pChar->nClubClass == 3) {
         gpCrAPState->b82 = 1;
         Character_PlayClip(gpCrAPState->pB4->pChar, gpCrAPState->pB4->pChar->pCurClip, 0, 0.5f);
-    } else if (gpCrAPState->pB4->pChar != NULL && gpCrAPState->n0 == 3 && fLeft < fHalf
-               && gpCrAPState->b82 == 0 && gpCrAPState->n1C0 == 4 && gpCrAPState->n8 == 0) {
+    } else if (gpCrAPState->pB4->pChar != NULL && gpCrAPState->nScreenKind == 3 && fLeft < fHalf
+               && gpCrAPState->b82 == 0 && gpCrAPState->nQueuedState == 4 && gpCrAPState->nRenderState == 0) {
         gpCrAPState->b82 = 1;
         FE_vLoadNextCrAPAnim(1);
     }
     // Screen kind 3: the pad turns the golfer (buttons 0x33 and 0x34) and button 0x35 does
     // FE_ZoomCrAPModel.
-    if (gpCrAPState->pB4->pChar != NULL && gpCrAPState->n0 == 3) {
-        if (gpCrAPState->b1C8 == 0) {
+    if (gpCrAPState->pB4->pChar != NULL && gpCrAPState->nScreenKind == 3) {
+        if (gpCrAPState->bPadLocked == 0) {
             if (Controller_AnyPadHasButtons(Controller_GetButtonMask(0x33, 0))
                 || Controller_AnyPadHasButtons(Controller_GetButtonMask(0x33, 1))) {
                 FE_RotateCrAPModel(0.05f);
@@ -801,7 +804,7 @@ void FE_vUpdateGolferAll(void) {
         } else {
             FE_RotateCrAPModel(0.0f);
         }
-        if (gpCrAPState->b1C8 == 0 && gpCrAPState->n8 == 0
+        if (gpCrAPState->bPadLocked == 0 && gpCrAPState->nRenderState == 0
             && (Controller_AnyPadHasButtons(Controller_GetButtonMask(0x35, 0))
                 || Controller_AnyPadHasButtons(Controller_GetButtonMask(0x35, 1)))) {
             FE_ZoomCrAPModel(1);
@@ -809,11 +812,11 @@ void FE_vUpdateGolferAll(void) {
             FE_ZoomCrAPModel(0);
         }
     }
-    if (gpCrAPState->pB4->bLoaded && gpCrAPState->b86 == 0) {
-        if (gpCrAPState->pB4->n1C != gpCrAPState->n0) {
+    if (gpCrAPState->pB4->bLoaded && gpCrAPState->bHidden == 0) {
+        if (gpCrAPState->pB4->nSetupKind != gpCrAPState->nScreenKind) {
             FE_SetupCharState();
         }
-        if (gpCrAPState->n8 == 1) {
+        if (gpCrAPState->nRenderState == 1) {
             // Raise him by his club class's amount while he is placed, then put the spot back.
             LLMath_CopyVec(gFEGolferPos, vSaved);
             if (gpCrAPState->pB4->pChar->nClubClass == 3) {
@@ -842,7 +845,7 @@ void FE_vUpdateGolferAll(void) {
                 gpCrAPState->pB4 = gpCrAPState->pB4->pPrev;
                 gPlayers[0].pChar = gpCrAPState->pB4->pChar;
             }
-            if (gpCrAPState->n0 == 0 || gpCrAPState->n0 == 2) {
+            if (gpCrAPState->nScreenKind == 0 || gpCrAPState->nScreenKind == 2) {
                 gSession.nGolfer[0] = gpCrAPState->pB4->nGolferId;
             }
         } else if (FE_StreamGetCurrentState() != 1) {
@@ -869,9 +872,9 @@ void FE_vUpdateGolferAll(void) {
     // Another golfer or profile slot than last drawn: give him his ball and textures.
     if ((gFELastDrawnGolfer != gpCrAPState->pB4->nGolferId || gFELastDrawnSlot != lbl_80281ED4->nSlot
          || gpCrAPState->b87)
-        && gpCrAPState->pB4->bLoaded && gpCrAPState->b86 == 0) {
+        && gpCrAPState->pB4->bLoaded && gpCrAPState->bHidden == 0) {
         pChar = gpCrAPState->pB4->pChar;
-        if (gpCrAPState->n0 == 0) {
+        if (gpCrAPState->nScreenKind == 0) {
             gSession.nGolfer[0] = gpCrAPState->pB4->nGolferId;
         }
         fn_80008380();
@@ -891,7 +894,7 @@ void FE_vUpdateGolferAll(void) {
         }
         fn_8010BC64(pChar->apDynTex[pChar->nCurDynTex]);
     }
-    if (gpCrAPState->pB4->bLoaded && gpCrAPState->b86 == 0) {
+    if (gpCrAPState->pB4->bLoaded && gpCrAPState->bHidden == 0) {
         fn_80035600();
         Character_UpdateAnimation(gpCrAPState->pB4->pChar, 1, 1.0f / 60.0f);
         if (gpCrAPState->pB4->pChar->bPosed == 0) {
@@ -902,7 +905,7 @@ void FE_vUpdateGolferAll(void) {
             // Screen kind 1 with b83 set lights him with all-zero settings; otherwise with his
             // own, which sit in p44's entry 21 (port: read as LightParams, both 0x30 bytes).
             pLight = (LightParams*)&gpCrAPState->pB4->pChar->p44[21];
-            if (gpCrAPState->n0 == 1 && gpCrAPState->b83) {
+            if (gpCrAPState->nScreenKind == 1 && gpCrAPState->b83) {
                 Mem_set(&params, 0, sizeof(params));
                 fn_80093854(&params);
             } else {
@@ -915,12 +918,12 @@ void FE_vUpdateGolferAll(void) {
 }
 
 // The golfer's first render pass, before the menu is drawn, when he is shown (bLoaded, not hidden
-// by b86) and drawn off screen (gFEOffscreenBufferRender): clear the frame (FE_ClearGolferFrame),
-// draw him and the ball he holds, set the frame's alpha (FE_DrawGolferAlphaMask), copy him into the
-// screen-copy texture (FE_CopyGolferToTexture) and clear the frame again. b18C notes that this pass
-// drew him.
+// by bHidden) and drawn off screen (gFEOffscreenBufferRender): clear the frame
+// (FE_ClearGolferFrame), draw him and the ball he holds, set the frame's alpha
+// (FE_DrawGolferAlphaMask), copy him into the screen-copy texture (FE_CopyGolferToTexture) and
+// clear the frame again. b18C notes that this pass drew him.
 void FE_vRenderGolferAllPhase1(void) {
-    if (gpCrAPState->pB4->bLoaded && gpCrAPState->b86 == 0 && gpCrAPState->b88 == 0
+    if (gpCrAPState->pB4->bLoaded && gpCrAPState->bHidden == 0 && gpCrAPState->b88 == 0
         && gFEOffscreenBufferRender != 0) {
         gpCrAPState->b18C = 1;
         FE_BeginRenderGolferPhase1();
@@ -937,7 +940,7 @@ void FE_vRenderGolferAllPhase1(void) {
 // FE_vRenderGolferAllPhase1 over the menu (FE_DrawGolferTexture) or, when he is not drawn off
 // screen (gFEOffscreenBufferRender), draw him and his ball straight into the frame.
 void FE_vRenderGolferAllPhase2(void) {
-    if (gpCrAPState->pB4->bLoaded && gpCrAPState->b86 == 0 && gpCrAPState->b88 == 0) {
+    if (gpCrAPState->pB4->bLoaded && gpCrAPState->bHidden == 0 && gpCrAPState->b88 == 0) {
         if (gFEOffscreenBufferRender != 0) {
             FE_DrawGolferTexture();
             return;
@@ -978,7 +981,7 @@ void FE_ClearGolferFrame(void) {
 }
 
 // Draw the golfer's screen copy (gFEScreenCopyTex) over the menu as a textured quad, grey with alpha
-// f14C (the display's fade, 0..0.5).
+// fAlpha (the display's fade, 0..0.5).
 void FE_DrawGolferTexture(void) {
     f32 xy[8] = { 0.25f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
     f32 colour[4] = { 0.5f, 0.5f, 0.5f, 0.5f };
@@ -992,7 +995,7 @@ void FE_DrawGolferTexture(void) {
     RenderState_SetViewport(RC_spGetCurrentRenderCtx());
     RenderState_SetDrawFlags(0x50);
     RenderView_SetUseCurrentMatrices(0);
-    colour[3] = gpCrAPState->f14C;
+    colour[3] = gpCrAPState->fAlpha;
     RenderView_SetColor(colour);
     fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
     fn_8002A608(&gFEScreenCopyTex);
@@ -1045,15 +1048,16 @@ void FE_CopyGolferToTexture(void) {
     GXInvalidateTexAll();
 }
 
-// Draw the golfer shown (loaded, bLoaded, and not hidden, b86) with the display's camera (mC0): his
-// body, or only his club in the club close-up (n8 1); on screen kind 3 the scissor keeps the top
-// lbl_80281348 of the frame. bFull: into a 384 x 528 surface instead of the 512 x 448 frame (both
-// passes pass 0). Then note which golfer and profile slot were drawn (gFELastDrawnGolfer, gFELastDrawnSlot).
+// Draw the golfer shown (loaded, bLoaded, and not hidden, bHidden) with the display's camera (mC0):
+// his body, or only his club in the club close-up (nRenderState 1); on screen kind 3 the scissor
+// keeps the top lbl_80281348 of the frame. bFull: into a 384 x 528 surface instead of the 512 x 448
+// frame (both passes pass 0). Then note which golfer and profile slot were drawn
+// (gFELastDrawnGolfer, gFELastDrawnSlot).
 void FE_RenderGolfer(u8 bFull) {
     if (gFEGolferEnabled == 0) {
         return;
     }
-    if (gpCrAPState->pB4->bLoaded && gpCrAPState->b86 == 0) {
+    if (gpCrAPState->pB4->bLoaded && gpCrAPState->bHidden == 0) {
         LI_SetObjectLights(NULL);
         RC_vSetCurrentRenderCtxTransformationMatrix(gpCrAPState->mC0);
         RC_UpdateCurrentScreenMatrices();
@@ -1071,13 +1075,13 @@ void FE_RenderGolfer(u8 bFull) {
         DS_vEnableZBufferUpdate(1);
         DS_vSetZBufferMode(3);
         RenderState_Flush();
-        if (gpCrAPState->n0 == 3) {
+        if (gpCrAPState->nScreenKind == 3) {
             fn_800760B0(0, 0, 512, 448.0f * lbl_80281348);
         }
         RenderState_Flush();
-        if (gpCrAPState->n8 == 0) {
+        if (gpCrAPState->nRenderState == 0) {
             SKN_DrawCharacterParts(gpCrAPState->pB4->pChar);
-        } else if (gpCrAPState->n8 == 1) {
+        } else if (gpCrAPState->nRenderState == 1) {
             SKN_DrawClubParts(gpCrAPState->pB4->pChar);
         }
         LI_ResetLights();
@@ -1085,34 +1089,34 @@ void FE_RenderGolfer(u8 bFull) {
         RenderState_SetViewport(RC_spGetCurrentRenderCtx());
         RenderState_Flush();
     }
-    if (gpCrAPState->pB4->bLoaded && gpCrAPState->b86 == 0) {
+    if (gpCrAPState->pB4->bLoaded && gpCrAPState->bHidden == 0) {
         gFELastDrawnGolfer = gpCrAPState->pB4->nGolferId;
         gFELastDrawnSlot = lbl_80281ED4->nSlot;
     }
 }
 
-// Set the golfer shown up for the screen kind (n0; n1C notes the kind he was set up for): facing
-// front, and on kinds 0, 1, 2 and 4 his morph state reset, a club selected (5 or 3), his first clip
-// (Char_SetClip 0) played and the club switched to the one that clip holds (its u90 in
-// gClubBoneIds; 0 if none); kinds 1 and 4 take the profile's handedness
+// Set the golfer shown up for the screen kind (nScreenKind; nSetupKind notes the kind he was set up
+// for): facing front, and on kinds 0, 1, 2 and 4 his morph state reset, a club selected (5 or 3),
+// his first clip (Char_SetClip 0) played and the club switched to the one that clip holds (its u90
+// in gClubBoneIds; 0 if none); kinds 1 and 4 take the profile's handedness
 // (FE_CRAPSetHandednessForScreen). Kind 3 (create-a-player) clears its queued animation and
 // close-up state and starts his idle animation (FE_vLoadNextCrAPAnim). The display then fades in
-// from 0 (f14C).
+// from 0 (fAlpha).
 void FE_SetupCharState(void) {
     Clip* pClip;
     int i;
 
-    gpCrAPState->pB4->n1C = gpCrAPState->n0;
-    gpCrAPState->n8 = 0;
-    gpCrAPState->b80 = 0;
-    gpCrAPState->n74 = 0;
-    gpCrAPState->b78 = 0;
-    gpCrAPState->b81 = 0;
-    gpCrAPState->b1D1 = 1;
-    switch (gpCrAPState->n0) {
+    gpCrAPState->pB4->nSetupKind = gpCrAPState->nScreenKind;
+    gpCrAPState->nRenderState = 0;
+    gpCrAPState->bTempRenderState = 0;
+    gpCrAPState->nTexSwapState = 0;
+    gpCrAPState->bDelayTexSwap = 0;
+    gpCrAPState->bNewTextures = 0;
+    gpCrAPState->bClubStatesAllowed = 1;
+    switch (gpCrAPState->nScreenKind) {
     case 0:
-        gpCrAPState->f19C = 0.0f;
-        gpCrAPState->f1A0 = 0.0f;
+        gpCrAPState->fFacing = 0.0f;
+        gpCrAPState->fTargetFacing = 0.0f;
         CharacterState_ResetMorphState(gpCrAPState->pB4->pChar, 1);
         fn_800957B0(gpCrAPState->pB4->pChar, 1);
         Character_SelectClub(gpCrAPState->pB4->pChar, 5);
@@ -1127,7 +1131,7 @@ void FE_SetupCharState(void) {
             i = 0;
         }
         Character_SelectClub(gpCrAPState->pB4->pChar, i);
-        Character_SetOrientation(gpCrAPState->pB4->pChar, gpCrAPState->f19C);
+        Character_SetOrientation(gpCrAPState->pB4->pChar, gpCrAPState->fFacing);
         gpCrAPState->b85 = 1;
         gpCrAPState->b91 = 1;
         gpCrAPState->b84 = 1;
@@ -1135,8 +1139,8 @@ void FE_SetupCharState(void) {
         break;
     case 1:
     case 4:
-        gpCrAPState->f19C = 0.0f;
-        gpCrAPState->f1A0 = 0.0f;
+        gpCrAPState->fFacing = 0.0f;
+        gpCrAPState->fTargetFacing = 0.0f;
         FE_CRAPSetHandednessForScreen(FE_GetCurrentProfile()->choices.bLeftHanded);
         CharacterState_ResetMorphState(gpCrAPState->pB4->pChar, 1);
         fn_800957B0(gpCrAPState->pB4->pChar, 1);
@@ -1152,38 +1156,38 @@ void FE_SetupCharState(void) {
             i = 0;
         }
         Character_SelectClub(gpCrAPState->pB4->pChar, i);
-        Character_SetOrientation(gpCrAPState->pB4->pChar, gpCrAPState->f19C);
+        Character_SetOrientation(gpCrAPState->pB4->pChar, gpCrAPState->fFacing);
         gpCrAPState->b85 = 0;
         gpCrAPState->b91 = 0;
         gpCrAPState->b84 = 0;
         break;
     case 3:
-        gpCrAPState->b78 = 1;
-        gpCrAPState->f7C = 0.0f;
+        gpCrAPState->bDelayTexSwap = 1;
+        gpCrAPState->fTexSwapDelay = 0.0f;
         gpCrAPState->b85 = 0;
         gpCrAPState->b91 = 0;
         gpCrAPState->b84 = 0;
-        gpCrAPState->n1B4 = 0;
-        gpCrAPState->n1B8 = 0;
-        gpCrAPState->n1BC = -1;
-        gpCrAPState->sz20[0] = '\0';
-        gpCrAPState->sz30[0] = '\0';
-        gpCrAPState->n1D0 = 0;
-        gpCrAPState->n1C0 = 4;
-        gpCrAPState->b1C8 = 0;
-        gpCrAPState->n50 = 0;
-        gpCrAPState->b1DC = 0;
+        gpCrAPState->nIdleCount = 0;
+        gpCrAPState->nClub = 0;
+        gpCrAPState->nTempClub = -1;
+        gpCrAPState->szQueuedAnim[0] = '\0';
+        gpCrAPState->szQueuedShot[0] = '\0';
+        gpCrAPState->bFadeAtEnd = 0;
+        gpCrAPState->nQueuedState = 4;
+        gpCrAPState->bPadLocked = 0;
+        gpCrAPState->nAnimRepeats = 0;
+        gpCrAPState->bZoom = 0;
         FE_SetLastCrAPAsset(-1);
         FE_SetLastCrAPCategory(-1);
         FE_CRAPSetHandednessForScreen(0);
-        gpCrAPState->f19C = 0.0f;
-        gpCrAPState->f1A0 = 0.0f;
+        gpCrAPState->fFacing = 0.0f;
+        gpCrAPState->fTargetFacing = 0.0f;
         FE_vLoadNextCrAPAnim(0);
-        Character_SetOrientation(gpCrAPState->pB4->pChar, gpCrAPState->f19C);
+        Character_SetOrientation(gpCrAPState->pB4->pChar, gpCrAPState->fFacing);
         break;
     case 2:
-        gpCrAPState->f19C = 0.0f;
-        gpCrAPState->f1A0 = 0.0f;
+        gpCrAPState->fFacing = 0.0f;
+        gpCrAPState->fTargetFacing = 0.0f;
         CharacterState_ResetMorphState(gpCrAPState->pB4->pChar, 1);
         fn_800957B0(gpCrAPState->pB4->pChar, 1);
         Character_SelectClub(gpCrAPState->pB4->pChar, 3);
@@ -1198,14 +1202,14 @@ void FE_SetupCharState(void) {
             i = 0;
         }
         Character_SelectClub(gpCrAPState->pB4->pChar, i);
-        Character_SetOrientation(gpCrAPState->pB4->pChar, gpCrAPState->f19C);
+        Character_SetOrientation(gpCrAPState->pB4->pChar, gpCrAPState->fFacing);
         gpCrAPState->b85 = 0;
         gpCrAPState->b91 = 0;
         gpCrAPState->b84 = 0;
         gpCrAPState->b83 = 0;
         break;
     }
-    gpCrAPState->f14C = 0.0f;
+    gpCrAPState->fAlpha = 0.0f;
 }
 
 // The shown golfer's pre-bones callback (pfnPreBones, set by FE_vUpdateGolferAll), with b85 set:
@@ -1316,18 +1320,18 @@ void FE_lite_vStreamCallback(UStreamObject* pObject) {
     StaticMem_Free(pObject);
 }
 
-// Drop the golfers loaded for the menus: b8A has FE_vFreeUnusedCharacters free them once the loader
-// is idle, and meanwhile the loader is interrupted and sent back to idle, the load count (n190)
-// cleared and the golfer shown marked not loaded. On screen kind 0 slot 0 gets the next golfer of
-// gFEGolferCycle to load, on kind 4 none. The menus call it when the screen kind changes to 0 or 3,
-// and before a movie.
+// Drop the golfers loaded for the menus: bClearCache has FE_vFreeUnusedCharacters free them once
+// the loader is idle, and meanwhile the loader is interrupted and sent back to idle, the load count
+// (n190) cleared and the golfer shown marked not loaded. On screen kind 0 slot 0 gets the next
+// golfer of gFEGolferCycle to load, on kind 4 none. The menus call it when the screen kind changes
+// to 0 or 3, and before a movie.
 void FE_vClearGolferCache(void) {
-    gpCrAPState->b8A = 1;
+    gpCrAPState->bClearCache = 1;
     FE_StreamInterruptState();
     FE_StreamSetNextState(1);
     gpCrAPState->n190 = 0;
     gpCrAPState->pB4->bLoaded = 0;
-    if (gpCrAPState->n0 == 0) {
+    if (gpCrAPState->nScreenKind == 0) {
         gpCrAPState->aGolfer[0].nGolferId = gFEGolferCycle[gpCrAPState->n198][gpCrAPState->n194 % 5];
         gpCrAPState->n194++;
         if (gpCrAPState->n194 >= 5) {
@@ -1337,7 +1341,7 @@ void FE_vClearGolferCache(void) {
                 gpCrAPState->n198 = 0;
             }
         }
-    } else if (gpCrAPState->n0 == 4) {
+    } else if (gpCrAPState->nScreenKind == 4) {
         gpCrAPState->aGolfer[0].nGolferId = -1;
     }
 }
@@ -1355,14 +1359,14 @@ void FE_vExecuteClearGolferCache(void) {
     }
 }
 
-// Each frame (the main loop), while the loader is idle: finish a cache clear (b8A:
+// Each frame (the main loop), while the loader is idle: finish a cache clear (bClearCache:
 // FE_vExecuteClearGolferCache), else free slot 0's character when it is flagged (bFree) and is not
 // the golfer shown and loaded, and mark the slot empty.
 void FE_vFreeUnusedCharacters(void) {
     if (FE_StreamGetCurrentState() == 1) {
-        if (gpCrAPState->b8A && FE_StreamGetCurrentState() == 1) {
+        if (gpCrAPState->bClearCache && FE_StreamGetCurrentState() == 1) {
             FE_vExecuteClearGolferCache();
-            gpCrAPState->b8A = 0;
+            gpCrAPState->bClearCache = 0;
             return;
         }
         if (gpCrAPState->aGolfer[0].bFree
@@ -1398,51 +1402,52 @@ void FE_SetProfileLeftHanded(int nProfile, s8 n) {
 }
 
 // Start the shown golfer's next animation and switch the CrAP camera to it (bNoBlend: cut instead
-// of blending). In a club or ball close-up (n8 1 or 2) that is his close-up clip (Char_SetClip 8)
-// with camera 3 or 4. Otherwise it is his current clip again while n50 repeats are left, else the
-// camera kind's idle clip (FE_CrapGetIdleAnim); n1B4 counts the idles, and after the fifth (not
-// zoomed) the clip is picked with club 2 instead of 0, the zoom is reset and on camera kinds 0 and
-// 2 he turns back to face front (b1C8 keeps the pad from turning him meanwhile). A clip with pD8
-// set takes the profile's handedness (FE_CRAPSetHandednessForScreen; he is turned to face PI when he becomes
-// left-handed), any other is played right-handed.
+// of blending). In a club or ball close-up (nRenderState 1 or 2) that is his close-up clip
+// (Char_SetClip 8) with camera 3 or 4. Otherwise it is his current clip again while nAnimRepeats
+// repeats are left, else the camera kind's idle clip (FE_CrapGetIdleAnim); nIdleCount counts the
+// idles, and after the fifth (not zoomed) the clip is picked with club 2 instead of 0, the zoom is
+// reset and on camera kinds 0 and 2 he turns back to face front (bPadLocked keeps the pad from
+// turning him meanwhile). A clip with pD8 set takes the profile's handedness
+// (FE_CRAPSetHandednessForScreen; he is turned to face PI when he becomes left-handed), any other
+// is played right-handed.
 void FE_vLoadNextCrAPAnim(u8 bNoBlend) {
     View* pView;
     Clip* pClip;
 
     pView = ViewController_GetCameraControl(ViewController_GetCurrentViewControllerID());
     if (gpCrAPState->pB4 == NULL || gpCrAPState->pB4->pChar == NULL) return;
-    if (gpCrAPState->n8 != 0) {
-        if (gpCrAPState->n8 == 1) {
+    if (gpCrAPState->nRenderState != 0) {
+        if (gpCrAPState->nRenderState == 1) {
             Character_SelectClub(gpCrAPState->pB4->pChar, 0);
         } else {
             Character_SelectClub(gpCrAPState->pB4->pChar, 2);
         }
         pClip = Char_SetClip(gpCrAPState->pB4->pChar, 8, 0, NULL);
-        gpCrAPState->sz10[0] = '\0';
+        gpCrAPState->szCurAnim[0] = '\0';
         Character_PlayClip(gpCrAPState->pB4->pChar, pClip, !bNoBlend, 0.5f);
-        Character_SelectClub(gpCrAPState->pB4->pChar, gpCrAPState->n1B8);
-        if (gpCrAPState->n8 == 1) {
+        Character_SelectClub(gpCrAPState->pB4->pChar, gpCrAPState->nClub);
+        if (gpCrAPState->nRenderState == 1) {
             GolfCamera_SwitchCrAPCamera(pView, NULL, 3, bNoBlend, 0, 0);
             return;
         }
         GolfCamera_SwitchCrAPCamera(pView, NULL, 4, bNoBlend, 0, 0);
         return;
     }
-    if (gpCrAPState->n1B4 == 5 && gpCrAPState->b1DC == 0) {
+    if (gpCrAPState->nIdleCount == 5 && gpCrAPState->bZoom == 0) {
         Character_SelectClub(gpCrAPState->pB4->pChar, 2);
-        gpCrAPState->n1B4 = -1;
-        if (gpCrAPState->n4 == 0 || gpCrAPState->n4 == 2) {
-            gpCrAPState->b1C8 = 1;
+        gpCrAPState->nIdleCount = -1;
+        if (gpCrAPState->nCamIdleState == 0 || gpCrAPState->nCamIdleState == 2) {
+            gpCrAPState->bPadLocked = 1;
             FE_SetCrapRotation(1, 0.0f);
         }
         FE_ZoomCrAPModel(0);
     } else {
         Character_SelectClub(gpCrAPState->pB4->pChar, 0);
-        gpCrAPState->n1B4++;
-        gpCrAPState->b1C8 = 0;
+        gpCrAPState->nIdleCount++;
+        gpCrAPState->bPadLocked = 0;
     }
-    if (gpCrAPState->n50 > 0 && (pClip = gpCrAPState->pB4->pChar->pCurClip) != NULL) {
-        gpCrAPState->n50--;
+    if (gpCrAPState->nAnimRepeats > 0 && (pClip = gpCrAPState->pB4->pChar->pCurClip) != NULL) {
+        gpCrAPState->nAnimRepeats--;
     } else {
         pClip = FE_CrapGetIdleAnim();
     }
@@ -1458,133 +1463,135 @@ void FE_vLoadNextCrAPAnim(u8 bNoBlend) {
         }
         FE_CRAPSetHandednessForScreen(0);
     }
-    gpCrAPState->sz10[0] = '\0';
+    gpCrAPState->szCurAnim[0] = '\0';
     Character_PlayClip(gpCrAPState->pB4->pChar, pClip, !bNoBlend, 0.5f);
-    Character_SelectClub(gpCrAPState->pB4->pChar, gpCrAPState->n1B8);
-    GolfCamera_SwitchCrAPCamera(pView, NULL, gpCrAPState->n4, bNoBlend, gpCrAPState->b1DC, 0);
+    Character_SelectClub(gpCrAPState->pB4->pChar, gpCrAPState->nClub);
+    GolfCamera_SwitchCrAPCamera(pView, NULL, gpCrAPState->nCamIdleState, bNoBlend, gpCrAPState->bZoom, 0);
 }
 
-// The shown golfer's idle clip for the CrAP camera kind (n4): clip 11 for kind 1, 7 for kind 2,
-// else 1 (Char_SetClip). TW07's FE_CrapGetIdleAnimName returns its name instead.
+// The shown golfer's idle clip for the CrAP camera kind (nCamIdleState): clip 11 for kind 1, 7 for
+// kind 2, else 1 (Char_SetClip). TW07's FE_CrapGetIdleAnimName returns its name instead.
 Clip* FE_CrapGetIdleAnim(void) {
-    if (gpCrAPState->n4 == 1) {
+    if (gpCrAPState->nCamIdleState == 1) {
         return Char_SetClip(gpCrAPState->pB4->pChar, 11, 0, NULL);
     }
-    if (gpCrAPState->n4 == 2) {
+    if (gpCrAPState->nCamIdleState == 2) {
         return Char_SetClip(gpCrAPState->pB4->pChar, 7, 0, NULL);
     }
     return Char_SetClip(gpCrAPState->pB4->pChar, 1, 0, NULL);
 }
 
-// Turn the golfer by fTurn radians: f1A0 is where he should face, f19C where he faces; f19C
-// follows it 0.05 a frame, the short way round.
+// Turn the golfer by fTurn radians: fTargetFacing is where he should face, fFacing where he faces;
+// fFacing follows it 0.05 a frame, the short way round.
 void FE_RotateCrAPModel(f32 fTurn) {
     f32 fDiff;
 
-    gpCrAPState->f19C += fTurn;
-    gpCrAPState->f1A0 += fTurn;
-    if (gpCrAPState->f19C < 0.0f) {
-        gpCrAPState->f19C = 2.0f * PI + gpCrAPState->f19C;
-    } else if (gpCrAPState->f19C > 2.0f * PI) {
-        gpCrAPState->f19C = gpCrAPState->f19C - 2.0f * PI;
+    gpCrAPState->fFacing += fTurn;
+    gpCrAPState->fTargetFacing += fTurn;
+    if (gpCrAPState->fFacing < 0.0f) {
+        gpCrAPState->fFacing = 2.0f * PI + gpCrAPState->fFacing;
+    } else if (gpCrAPState->fFacing > 2.0f * PI) {
+        gpCrAPState->fFacing = gpCrAPState->fFacing - 2.0f * PI;
     }
-    if (gpCrAPState->f1A0 < 0.0f) {
-        gpCrAPState->f1A0 = 2.0f * PI + gpCrAPState->f1A0;
-    } else if (gpCrAPState->f1A0 > 2.0f * PI) {
-        gpCrAPState->f1A0 = gpCrAPState->f1A0 - 2.0f * PI;
+    if (gpCrAPState->fTargetFacing < 0.0f) {
+        gpCrAPState->fTargetFacing = 2.0f * PI + gpCrAPState->fTargetFacing;
+    } else if (gpCrAPState->fTargetFacing > 2.0f * PI) {
+        gpCrAPState->fTargetFacing = gpCrAPState->fTargetFacing - 2.0f * PI;
     }
-    fDiff = fabsf(gpCrAPState->f1A0 - gpCrAPState->f19C);
+    fDiff = fabsf(gpCrAPState->fTargetFacing - gpCrAPState->fFacing);
     if (fDiff < 2.0f * PI - fDiff) {
-        if (gpCrAPState->f19C < gpCrAPState->f1A0 - 0.05f) {
-            gpCrAPState->f19C += 0.05f;
-        } else if (gpCrAPState->f19C > 0.05f + gpCrAPState->f1A0) {
-            gpCrAPState->f19C -= 0.05f;
+        if (gpCrAPState->fFacing < gpCrAPState->fTargetFacing - 0.05f) {
+            gpCrAPState->fFacing += 0.05f;
+        } else if (gpCrAPState->fFacing > 0.05f + gpCrAPState->fTargetFacing) {
+            gpCrAPState->fFacing -= 0.05f;
         }
-    } else if (gpCrAPState->f19C < gpCrAPState->f1A0) {
-        gpCrAPState->f19C = gpCrAPState->f19C - 0.05f;
-        if (gpCrAPState->f19C < 0.0f) {
-            gpCrAPState->f19C = 2.0f * PI + gpCrAPState->f19C;
+    } else if (gpCrAPState->fFacing < gpCrAPState->fTargetFacing) {
+        gpCrAPState->fFacing = gpCrAPState->fFacing - 0.05f;
+        if (gpCrAPState->fFacing < 0.0f) {
+            gpCrAPState->fFacing = 2.0f * PI + gpCrAPState->fFacing;
         }
-    } else if (gpCrAPState->f19C > gpCrAPState->f1A0) {
-        gpCrAPState->f19C += 0.05f;
-        if (gpCrAPState->f19C > 2.0f * PI) {
-            gpCrAPState->f19C = gpCrAPState->f19C - 2.0f * PI;
+    } else if (gpCrAPState->fFacing > gpCrAPState->fTargetFacing) {
+        gpCrAPState->fFacing += 0.05f;
+        if (gpCrAPState->fFacing > 2.0f * PI) {
+            gpCrAPState->fFacing = gpCrAPState->fFacing - 2.0f * PI;
         }
     }
     if (gpCrAPState->pB4->pChar != NULL) {
-        Character_SetOrientation(gpCrAPState->pB4->pChar, gpCrAPState->f19C);
+        Character_SetOrientation(gpCrAPState->pB4->pChar, gpCrAPState->fFacing);
     }
 }
 
-// Forget the zoom (b1DC) without switching the camera.
+// Forget the zoom (bZoom) without switching the camera.
 void FE_ResetCrAPZoom(void) {
-    gpCrAPState->b1DC = 0;
+    gpCrAPState->bZoom = 0;
 }
 
-// Zoom the CrAP camera in (bZoom) or out: on a change, b1DC follows it and the camera is switched,
+// Zoom the CrAP camera in (bZoom) or out: on a change, bZoom follows it and the camera is switched,
 // blending.
 void FE_ZoomCrAPModel(u8 bZoom) {
     View* pView = ViewController_GetCameraControl(ViewController_GetCurrentViewControllerID());
 
     if (bZoom) {
-        if (gpCrAPState->b1DC != 1) {
-            gpCrAPState->b1DC = 1;
-            GolfCamera_SwitchCrAPCamera(pView, NULL, gpCrAPState->n4, 1, gpCrAPState->b1DC, 1);
+        if (gpCrAPState->bZoom != 1) {
+            gpCrAPState->bZoom = 1;
+            GolfCamera_SwitchCrAPCamera(pView, NULL, gpCrAPState->nCamIdleState, 1, gpCrAPState->bZoom, 1);
         }
-    } else if (gpCrAPState->b1DC != 0) {
-        gpCrAPState->b1DC = 0;
-        GolfCamera_SwitchCrAPCamera(pView, NULL, gpCrAPState->n4, 1, gpCrAPState->b1DC, 1);
+    } else if (gpCrAPState->bZoom != 0) {
+        gpCrAPState->bZoom = 0;
+        GolfCamera_SwitchCrAPCamera(pView, NULL, gpCrAPState->nCamIdleState, 1, gpCrAPState->bZoom, 1);
     }
 }
 
 // Face the golfer fAngle radians round: at once, or (bTarget) over time (FE_RotateCrAPModel).
 void FE_SetCrapRotation(u8 bTarget, f32 fAngle) {
     if (bTarget) {
-        gpCrAPState->f1A0 = fAngle;
+        gpCrAPState->fTargetFacing = fAngle;
         return;
     }
-    gpCrAPState->f19C = fAngle;
-    gpCrAPState->f1A0 = fAngle;
+    gpCrAPState->fFacing = fAngle;
+    gpCrAPState->fTargetFacing = fAngle;
     if (gpCrAPState->pB4->pChar != NULL) {
-        Character_SetOrientation(gpCrAPState->pB4->pChar, gpCrAPState->f19C);
+        Character_SetOrientation(gpCrAPState->pB4->pChar, gpCrAPState->fFacing);
     }
 }
 
 // Empty in this build: the menu message FE_MessageTable.c fn_8007C254 calls it when it changes
-// gpCrAPState->b86 (the golfer is not drawn while it is set) while the CrAP screen kind n0 is 3.
+// gpCrAPState->bHidden (the golfer is not drawn while it is set) while the CrAP screen kind
+// nScreenKind is 3.
 void FE_OnGolferHiddenChanged(void) {
 }
 
 // bOn: the menu golfer is drawn off screen, copied into the screen-copy texture
-// (FE_vRenderGolferAllPhase1) and that is drawn faded by f14C (FE_vRenderGolferAllPhase2); 0 draws
-// him straight into the frame. The CrAP screen-state message turns it on for screen kind 0 only.
+// (FE_vRenderGolferAllPhase1) and that is drawn faded by fAlpha (FE_vRenderGolferAllPhase2); 0
+// draws him straight into the frame. The CrAP screen-state message turns it on for screen kind 0
+// only.
 void FE_SetOffscreenBufferRender(u8 bOn) {
     gFEOffscreenBufferRender = bOn;
 }
 
-// Set the CrAP camera's idle state (n4: 0 the "Crap Idle" shot, 1 the "Crap Face" shot, as the menu
-// messages pass it). On a change the idle clip for the new state (FE_CrapGetIdleAnim) becomes the queued
-// animation, due now with no fade at its end and the texture-swap delay off (FE_QueueCrAPAnim,
-// FE_SetDelayTextureSwap), unless a queued animation is still waiting to start, whose name it then
-// takes; the queued camera shot is dropped either way.
+// Set the CrAP camera's idle state (nCamIdleState: 0 the "Crap Idle" shot, 1 the "Crap Face" shot,
+// as the menu messages pass it). On a change the idle clip for the new state (FE_CrapGetIdleAnim)
+// becomes the queued animation, due now with no fade at its end and the texture-swap delay off
+// (FE_QueueCrAPAnim, FE_SetDelayTextureSwap), unless a queued animation is still waiting to start,
+// whose name it then takes; the queued camera shot is dropped either way.
 void FE_SetCrAPCameraIdleState(int nState) {
     Clip* pClip;
 
-    if (nState != gpCrAPState->n4) {
+    if (nState != gpCrAPState->nCamIdleState) {
         pClip = FE_CrapGetIdleAnim();
         if (pClip != NULL) {
-            if (gpCrAPState->n1C0 != 1 && gpCrAPState->n1C0 != 0) {
+            if (gpCrAPState->nQueuedState != 1 && gpCrAPState->nQueuedState != 0) {
                 FE_QueueCrAPAnim(pClip->name, NULL, 0, 0);
                 FE_SetDelayTextureSwap(0, 0.0f);
-                gpCrAPState->n1C4 = 2;
+                gpCrAPState->nUnlockState = 2;
             } else {
-                strncpy(gpCrAPState->sz20, pClip->name, sizeof(gpCrAPState->sz20));
-                gpCrAPState->n1C4 = 2;
+                strncpy(gpCrAPState->szQueuedAnim, pClip->name, sizeof(gpCrAPState->szQueuedAnim));
+                gpCrAPState->nUnlockState = 2;
             }
         }
-        gpCrAPState->sz30[0] = '\0';
+        gpCrAPState->szQueuedShot[0] = '\0';
     }
-    gpCrAPState->n4 = nState;
+    gpCrAPState->nCamIdleState = nState;
 }
 
 // 1 when the menu has a golfer slot (gpCrAPState->pB4) and that slot has its character made; 0
@@ -1604,11 +1611,11 @@ int FE_IsGolferReady(void) {
 
 // Play animation szAnim on the golfer shown and switch the CrAP camera to shot szShot, both blended
 // in when bBlend (else cut). The camera takes the club (render state 1) or ball (2) screen's shot
-// kind 3 or 4, else the idle state's (n4) with the zoom (b1DC). Golfer 29, the female created
-// golfer, falls back to the 'f' version of an animation he lacks. A clip with pD8 set plays with
-// the profile's handedness (choices.bLeftHanded; a right-hander is turned round to PI for a
+// kind 3 or 4, else the idle state's (nCamIdleState) with the zoom (bZoom). Golfer 29, the female
+// created golfer, falls back to the 'f' version of an animation he lacks. A clip with pD8 set plays
+// with the profile's handedness (choices.bLeftHanded; a right-hander is turned round to PI for a
 // left-handed profile), any other right-handed. Returns 1 when the animation started (its name is
-// kept in sz10); 0 when asset animations are off (FE_CrAP_GetTriggerAnims: the camera does not
+// kept in szCurAnim); 0 when asset animations are off (FE_CrAP_GetTriggerAnims: the camera does not
 // switch either), or without a character, szAnim or such a clip.
 u8 FE_vTriggerCrAPAnimAndCamera(char* szAnim, char* szShot, u8 bBlend) {
     char szName[0x20];
@@ -1619,12 +1626,12 @@ u8 FE_vTriggerCrAPAnimAndCamera(char* szAnim, char* szShot, u8 bBlend) {
     if (!FE_CrAP_GetTriggerAnims()) {
         return 0;
     }
-    if (gpCrAPState->n8 == 1) {
+    if (gpCrAPState->nRenderState == 1) {
         GolfCamera_SwitchCrAPCamera(pView, szShot, 3, bBlend, 0, 0);
-    } else if (gpCrAPState->n8 == 2) {
+    } else if (gpCrAPState->nRenderState == 2) {
         GolfCamera_SwitchCrAPCamera(pView, szShot, 4, bBlend, 0, 0);
     } else {
-        GolfCamera_SwitchCrAPCamera(pView, szShot, gpCrAPState->n4, bBlend, gpCrAPState->b1DC, 0);
+        GolfCamera_SwitchCrAPCamera(pView, szShot, gpCrAPState->nCamIdleState, bBlend, gpCrAPState->bZoom, 0);
     }
     if (gpCrAPState->pB4 != NULL && gpCrAPState->pB4->pChar != NULL && szAnim != NULL) {
         strncpy(szName, szAnim, sizeof(szName));
@@ -1652,35 +1659,35 @@ u8 FE_vTriggerCrAPAnimAndCamera(char* szAnim, char* szShot, u8 bBlend) {
             FE_CRAPSetHandednessForScreen(0);
         }
         Character_PlayClip(gpCrAPState->pB4->pChar, pClip, !bBlend, 0.5f);
-        strcpy(gpCrAPState->sz10, szAnim);
-        gpCrAPState->n1B4 = 0;
+        strcpy(gpCrAPState->szCurAnim, szAnim);
+        gpCrAPState->nIdleCount = 0;
         return 1;
     }
     return 0;
 }
 
-// The name of the animation FE_vTriggerCrAPAnimAndCamera last started (sz10), or NULL once the idle
-// animation has taken over (FE_vLoadNextCrAPAnim).
+// The name of the animation FE_vTriggerCrAPAnimAndCamera last started (szCurAnim), or NULL once the
+// idle animation has taken over (FE_vLoadNextCrAPAnim).
 char* FE_GetCurrentAnimName(void) {
-    if (gpCrAPState->sz10[0] == '\0') {
+    if (gpCrAPState->szCurAnim[0] == '\0') {
         return NULL;
     }
-    return gpCrAPState->sz10;
+    return gpCrAPState->szCurAnim;
 }
 
-// Give the golfer shown club nClub to hold (n1B8, a gClubPartNames class: 0 driver, 1 fairway wood,
-// 2 putter, 3 3-iron, 4 7-iron, 5 wedge) and drop any temporary club (FE_SetTempCrapClub).
+// Give the golfer shown club nClub to hold (nClub, a gClubPartNames class: 0 driver, 1 fairway
+// wood, 2 putter, 3 3-iron, 4 7-iron, 5 wedge) and drop any temporary club (FE_SetTempCrapClub).
 void FE_SetCrapClub(int nClub) {
-    gpCrAPState->n1B8 = nClub;
-    gpCrAPState->n1BC = -1;
-    Character_SelectClub(gpCrAPState->pB4->pChar, gpCrAPState->n1B8);
+    gpCrAPState->nClub = nClub;
+    gpCrAPState->nTempClub = -1;
+    Character_SelectClub(gpCrAPState->pB4->pChar, gpCrAPState->nClub);
 }
 
-// The club (a gClubPartNames class) the golfer holds while the queued animation plays (n1BC; -1:
-// his own, FE_SetCrapClub's); he gets his own back when it ends. FE_CrAP_TurnOnAsset sets it for
-// fairway woods, irons, wedges and putters.
+// The club (a gClubPartNames class) the golfer holds while the queued animation plays (nTempClub;
+// -1: his own, FE_SetCrapClub's); he gets his own back when it ends. FE_CrAP_TurnOnAsset sets it
+// for fairway woods, irons, wedges and putters.
 void FE_SetTempCrapClub(int nClub) {
-    gpCrAPState->n1BC = nClub;
+    gpCrAPState->nTempClub = nClub;
 }
 
 // Queue animation szAnim with camera shot szShot (NULL: the idle state's) for the golfer on the
@@ -1691,31 +1698,31 @@ void FE_SetTempCrapClub(int nClub) {
 // szAnim NULL drops the queued animation.
 void FE_QueueCrAPAnim(char* szAnim, char* szShot, s8 bFade, u8 bWaitForEnd) {
     if (szAnim == NULL) {
-        gpCrAPState->sz20[0] = '\0';
-        gpCrAPState->n1C0 = 4;
+        gpCrAPState->szQueuedAnim[0] = '\0';
+        gpCrAPState->nQueuedState = 4;
     } else {
-        strncpy(gpCrAPState->sz20, szAnim, sizeof(gpCrAPState->sz20));
-        gpCrAPState->f1CC = 0.5f;
+        strncpy(gpCrAPState->szQueuedAnim, szAnim, sizeof(gpCrAPState->szQueuedAnim));
+        gpCrAPState->fFadeOutTime = 0.5f;
         if (bWaitForEnd) {
-            gpCrAPState->n1C0 = 0;
+            gpCrAPState->nQueuedState = 0;
         } else {
-            gpCrAPState->n1C0 = 1;
+            gpCrAPState->nQueuedState = 1;
         }
-        gpCrAPState->b1C8 = 1;
-        gpCrAPState->n1C4 = 3;
+        gpCrAPState->bPadLocked = 1;
+        gpCrAPState->nUnlockState = 3;
     }
     if (szShot == NULL) {
-        gpCrAPState->sz30[0] = '\0';
+        gpCrAPState->szQueuedShot[0] = '\0';
     } else {
-        strncpy(gpCrAPState->sz30, szShot, sizeof(gpCrAPState->sz30));
+        strncpy(gpCrAPState->szQueuedShot, szShot, sizeof(gpCrAPState->szQueuedShot));
     }
-    gpCrAPState->n1D0 = bFade;
+    gpCrAPState->bFadeAtEnd = bFade;
 }
 
-// How many more times the golfer's current animation plays before the idle one comes back (n50;
-// FE_vLoadNextCrAPAnim counts it down).
+// How many more times the golfer's current animation plays before the idle one comes back
+// (nAnimRepeats; FE_vLoadNextCrAPAnim counts it down).
 void FE_SetAnimRepeatCount(int nCount) {
-    gpCrAPState->n50 = nCount;
+    gpCrAPState->nAnimRepeats = nCount;
 }
 
 // Start the golfer's next animation at once, cut in (FE_vLoadNextCrAPAnim: the idle one, or the
@@ -1723,23 +1730,23 @@ void FE_SetAnimRepeatCount(int nCount) {
 // the queued animation.
 void FE_RestartCrAPAnim(void) {
     FE_vLoadNextCrAPAnim(0);
-    gpCrAPState->n50 = 0;
-    gpCrAPState->n1C0 = 4;
+    gpCrAPState->nAnimRepeats = 0;
+    gpCrAPState->nQueuedState = 4;
 }
 
-// Set what the CrAP screen shows (n8: 0 the golfer, 1 his clubs, 2 the ball) and drop a temporary
-// state (FE_SetTempCrapRenderState). On a change the zoom is reset (FE_ResetCrAPZoom) and the next
-// animation starts with its camera (FE_vLoadNextCrAPAnim). Nothing while asset animations are off
-// (FE_CrAP_GetTriggerAnims).
+// Set what the CrAP screen shows (nRenderState: 0 the golfer, 1 his clubs, 2 the ball) and drop a
+// temporary state (FE_SetTempCrapRenderState). On a change the zoom is reset (FE_ResetCrAPZoom) and
+// the next animation starts with its camera (FE_vLoadNextCrAPAnim). Nothing while asset animations
+// are off (FE_CrAP_GetTriggerAnims).
 void FE_SetCrapRenderState(int nState) {
     int nOld;
 
     if (FE_CrAP_GetTriggerAnims()) {
-        nOld = gpCrAPState->n8;
-        gpCrAPState->n8 = nState;
-        gpCrAPState->nC = 0;
-        gpCrAPState->b80 = 0;
-        if (nOld != gpCrAPState->n8) {
+        nOld = gpCrAPState->nRenderState;
+        gpCrAPState->nRenderState = nState;
+        gpCrAPState->nTempRenderState = 0;
+        gpCrAPState->bTempRenderState = 0;
+        if (nOld != gpCrAPState->nRenderState) {
             FE_ResetCrAPZoom();
             FE_vLoadNextCrAPAnim(0);
         }
@@ -1751,25 +1758,25 @@ void FE_SetCrapRenderState(int nState) {
 // while asset animations are off (FE_CrAP_GetTriggerAnims).
 void FE_SetTempCrapRenderState(int nState) {
     if (FE_CrAP_GetTriggerAnims()) {
-        gpCrAPState->nC = nState;
-        gpCrAPState->b80 = 1;
+        gpCrAPState->nTempRenderState = nState;
+        gpCrAPState->bTempRenderState = 1;
     }
 }
 
-// How far the golfer's texture swap has got (n74): 1 the new textures are loading, 2 they are
-// loaded and wait to be switched in, 0 done (char.c's front-end swap callbacks set it).
+// How far the golfer's texture swap has got (nTexSwapState): 1 the new textures are loading, 2 they
+// are loaded and wait to be switched in, 0 done (char.c's front-end swap callbacks set it).
 void FE_SetTextureSwapState(int nState) {
-    gpCrAPState->n74 = nState;
+    gpCrAPState->nTexSwapState = nState;
 }
 
 u8 FE_IsTextureSwapDone(void) {
-    return gpCrAPState->n74 == 0;
+    return gpCrAPState->nTexSwapState == 0;
 }
 
 // Whether a texture swap waits for the queued animation instead of being switched in at once
 // (FE_SetDelayTextureSwap).
 u8 FE_GetDelayTextureSwap(void) {
-    return gpCrAPState->b78;
+    return gpCrAPState->bDelayTexSwap;
 }
 
 // bDelay: a texture swap that has loaded is not switched in at once
@@ -1777,10 +1784,10 @@ u8 FE_GetDelayTextureSwap(void) {
 // it starts). Returns the old setting. FE_CrAP_TurnOnAsset delays the swap for the parts that fade
 // out (FE_CrAP_IsFadeOutCategory).
 u8 FE_SetDelayTextureSwap(u8 bDelay, f32 fTime) {
-    u8 bOld = gpCrAPState->b78;
+    u8 bOld = gpCrAPState->bDelayTexSwap;
 
-    gpCrAPState->b78 = bDelay;
-    gpCrAPState->f7C = fTime;
+    gpCrAPState->bDelayTexSwap = bDelay;
+    gpCrAPState->fTexSwapDelay = fTime;
     return bOld;
 }
 
@@ -1788,18 +1795,18 @@ u8 FE_SetDelayTextureSwap(u8 bDelay, f32 fTime) {
 // none when the ball list lacks it) when the queued animation starts with the ball shown.
 void FE_QueueBallChange(char* szTex) {
     if (szTex == NULL) {
-        gpCrAPState->sz54[0] = '\0';
+        gpCrAPState->szQueuedBall[0] = '\0';
         return;
     }
-    strncpy(gpCrAPState->sz54, szTex, sizeof(gpCrAPState->sz54));
+    strncpy(gpCrAPState->szQueuedBall, szTex, sizeof(gpCrAPState->szQueuedBall));
 }
 
 int FE_GetCrapRenderState(void) {
-    return gpCrAPState->n8;
+    return gpCrAPState->nRenderState;
 }
 
 // Blend the club screen's idle clip (clip state 8, looked up with the wedge in hand) in again from
-// its start; the golfer keeps his club (n1B8, FE_SetCrapClub). FE_CrAP_TurnOnAsset uses it when a
+// its start; the golfer keeps his club (nClub, FE_SetCrapClub). FE_CrAP_TurnOnAsset uses it when a
 // club asset goes on while the clubs are shown.
 void FE_RestartClubIdleAnim(void) {
     Clip* pClip;
@@ -1809,13 +1816,13 @@ void FE_RestartClubIdleAnim(void) {
     if (pClip != NULL) {
         Character_PlayClip(gpCrAPState->pB4->pChar, pClip, 0, 0.5f);
     }
-    Character_SelectClub(gpCrAPState->pB4->pChar, gpCrAPState->n1B8);
+    Character_SelectClub(gpCrAPState->pB4->pChar, gpCrAPState->nClub);
 }
 
-// Set b81, the flag for new textures on the golfer: a texture load's end and a new asset or logo
-// set it, switching a swap in clears it. Nothing reads it in this build.
+// Set bNewTextures, the flag for new textures on the golfer: a texture load's end and a new asset
+// or logo set it, switching a swap in clears it. Nothing reads it in this build.
 void FE_SetNewTexturesFlag(u8 bNew) {
-    gpCrAPState->b81 = bNew;
+    gpCrAPState->bNewTextures = bNew;
 }
 
 // Make the golfer shown left-handed (bLefty) or right-handed and rebuild his skeleton to match;
@@ -1837,53 +1844,53 @@ void FE_CRAPSetHandednessForScreen(u8 bLefty) {
 }
 
 u8 FE_GetClubStatesAllowed(void) {
-    return gpCrAPState->b1D1;
+    return gpCrAPState->bClubStatesAllowed;
 }
 
 // 0: the next Character_SetClubStatesForCharacter in the front end leaves the golfer's clubs as
 // they are and sets it back to 1; FE_CrAP_TurnOnAsset clears it when a club asset goes on, so the
 // new club skin is kept.
 void FE_SetClubStatesAllowed(u8 bAllowed) {
-    gpCrAPState->b1D1 = bAllowed;
+    gpCrAPState->bClubStatesAllowed = bAllowed;
 }
 
 // 1 once a texture swap has loaded and waits to be switched in
 // (Character_EndSwapTexturesCallbackFE); Character_ExecuteTextureSwapFE switches only then, and
 // clears it.
 void FE_SetTextureSwapDue(u8 bDue) {
-    gpCrAPState->b1D2 = bDue;
+    gpCrAPState->bTexSwapDue = bDue;
 }
 
 u8 FE_IsTextureSwapDue(void) {
-    return gpCrAPState->b1D2;
+    return gpCrAPState->bTexSwapDue;
 }
 
 // The slider asset last shown (its n0; -1: none): sApplySlider turns the golfer to the front when
 // another comes.
 void FE_SetLastCrAPAsset(int nAsset) {
-    gpCrAPState->n1D4 = nAsset;
+    gpCrAPState->nLastAsset = nAsset;
 }
 
 int FE_GetLastCrAPAsset(void) {
-    return gpCrAPState->n1D4;
+    return gpCrAPState->nLastAsset;
 }
 
 // The part (TW07's category) of the asset last put on (-1: none): FE_CrAP_TurnOnAsset turns the
 // golfer to the front when the part changes.
 void FE_SetLastCrAPCategory(int nPart) {
-    gpCrAPState->n1D8 = nPart;
+    gpCrAPState->nLastCategory = nPart;
 }
 
 int FE_GetLastCrAPCategory(void) {
-    return gpCrAPState->n1D8;
+    return gpCrAPState->nLastCategory;
 }
 
 // Whether the menu golfer is updated and drawn this frame (gomainloop): the golfer shown is ready
-// (bLoaded) and b86, b88, lbl_80281F19, lbl_801D87C0.b0 and .b49 are all 0.
+// (bLoaded) and bHidden, b88, lbl_80281F19, lbl_801D87C0.b0 and .b49 are all 0.
 u8 FE_IsGolferRenderAllowed(void) {
     u8 bResult = 0;
 
-    if (gpCrAPState->pB4->bLoaded && gpCrAPState->b86 == 0 && gpCrAPState->b88 == 0 && lbl_80281F19 == 0
+    if (gpCrAPState->pB4->bLoaded && gpCrAPState->bHidden == 0 && gpCrAPState->b88 == 0 && lbl_80281F19 == 0
         && lbl_801D87C0.b0 == 0 && lbl_801D87C0.b49 == 0) {
         bResult = 1;
     }

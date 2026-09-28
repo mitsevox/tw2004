@@ -87,13 +87,13 @@ void SkinMorph_AddTarget(SkinMorphWork* pWork, void* pTarget, u32 nVerts, f32 fS
     }
 }
 
-// Swaps the work area's current target (p10020, the one SkinMorph_AddCurrentTarget adds) and next
-// target (p10024, the one SkinMorph_SetNextTarget sets).
+// Swaps the work area's current target (pCurTarget, the one SkinMorph_AddCurrentTarget adds) and
+// next target (pNextTarget, the one SkinMorph_SetNextTarget sets).
 void SkinMorph_SwapTargets(SkinMorphWork* pWork) {
-    void* p = pWork->p10020;
+    void* p = pWork->pCurTarget;
 
-    pWork->p10020 = pWork->p10024;
-    pWork->p10024 = p;
+    pWork->pCurTarget = pWork->pNextTarget;
+    pWork->pNextTarget = p;
 }
 
 // Makes a target mesh's data (its pBits) the work area's next target; gives how many vertices it
@@ -101,7 +101,7 @@ void SkinMorph_SwapTargets(SkinMorphWork* pWork) {
 s32 SkinMorph_SetNextTarget(SkinMorphWork* pWork, SkinMesh* pMesh) {
     s32 nVerts = pMesh->n8;
 
-    pWork->p10024 = pMesh->pBits;
+    pWork->pNextTarget = pMesh->pBits;
     return nVerts;
 }
 
@@ -111,23 +111,23 @@ void SkinMorph_LoadMesh(SkinMorphWork* pWork, SkinMesh* pMesh) {
     s32 nVerts = pMesh->n8;
     SkinMeshBit* aVerts = pMesh->pBits;
 
-    pWork->n10018 = nVerts;
+    pWork->nVerts = nVerts;
     SkinMorph_UnpackVerts(pWork, (s16*)aVerts, (s8*)(aVerts + nVerts), nVerts);
 }
 
-// Packs the work area's vertices (SkinMorph_PackVerts) into pDst: n10018 vertices of 8 bytes, then
+// Packs the work area's vertices (SkinMorph_PackVerts) into pDst: nVerts vertices of 8 bytes, then
 // their normals.
 void SkinMorph_StoreMesh(SkinMorphWork* pWork, u8* pDst) {
-    u32 nVerts = pWork->n10018;
+    u32 nVerts = pWork->nVerts;
 
     SkinMorph_PackVerts(pWork, (s16*)pDst, (s8*)(pDst + (nVerts << 3)), nVerts);  // 8 bytes a vertex
 }
 
-// Adds the work area's current target (p10020), which moves nVerts vertices, at weight fWeight:
+// Adds the work area's current target (pCurTarget), which moves nVerts vertices, at weight fWeight:
 // SkinMorph_AddTarget's scale is fWeight in 16.16 fixed point, rounded to a whole number (fWeight *
 // 65536 + 0.5).
 void SkinMorph_AddCurrentTarget(SkinMorphWork* pWork, s32 nVerts, f32 fWeight) {
-    SkinMorph_AddTarget(pWork, pWork->p10020, nVerts, (s32)(65536.0f * fWeight + 0.5f));
+    SkinMorph_AddTarget(pWork, pWork->pCurTarget, nVerts, (s32)(65536.0f * fWeight + 0.5f));
 }
 
 // The morph work area (there is one, gpSkinMorphWork), with its description and weights cleared:
@@ -360,8 +360,8 @@ void SkinMorph_SetTargetWeight(Skin* pSkin, int nMorph, f32 fWeight) {
 }
 
 // Blends the morph targets that changed for view nView into the skin's morphed meshes (that view's
-// override table and memory block, Skin.a10A0 and a1098), then clears the view's changed bits.
-// SKN_PoseCharacter calls it each frame.
+// override table and memory block, Skin.apOverride and apMemBlock), then clears the view's changed
+// bits. SKN_PoseCharacter calls it each frame.
 void SkinMorph_Update(Skin* pSkin, int nView) {
     SkinMorphWork* pWork;
     s32 i;
@@ -373,8 +373,8 @@ void SkinMorph_Update(Skin* pSkin, int nView) {
     pWork = SkinMorph_GetWork();
     SkinMorph_SetWorkDesc(pWork, pSkin->pModel->pDesc);
     SkinMorph_SetWorkWeights(pWork, pSkin->pMorph->afWeights, pSkin->pMorph->nMorphs);
-    SkinMorph_SetWorkOverrideTable(pWork, pSkin->a10A0[nView]);
-    SkinMorph_SetWorkMemBlock(pWork, pSkin->a1098[nView]);
+    SkinMorph_SetWorkOverrideTable(pWork, pSkin->apOverride[nView]);
+    SkinMorph_SetWorkMemBlock(pWork, pSkin->apMemBlock[nView]);
     nEntries = pSkin->pModel->pDesc->n40;
     for (i = 0; i < nEntries; i++) {
         if (SkinMorph_EntryNeedsBlend(pSkin, nView, i)) {
@@ -453,7 +453,7 @@ s32 SkinMorph_GetBlendSize(Skin* pSkin) {
         return 0;
     }
     nSize = 0;
-    for (i = 0; i < pDesc->n30; i++) {
+    for (i = 0; i < pDesc->nOverrideMeshes; i++) {
         pMesh = &pDesc->p34[i];
         if ((pMesh->uFlags & 0x100010) == 0x100010) {
             nSize += pMesh->nSize;

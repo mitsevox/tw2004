@@ -629,11 +629,11 @@ void SKN_BuildMatrices(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst
         return;
     }
     SkinPart_UpdateMarks(pSkin);
-    if (pSkin->p108C != pCharModel->p768) {
-        Mem_cpy(pSkin->p108C[nFirst], pCharModel->p768[nFirst + nSkip],
-                (pSkin->pModel->n14 - nFirst) * sizeof(*pSkin->p108C));
+    if (pSkin->pSkinMtx != pCharModel->p768) {
+        Mem_cpy(pSkin->pSkinMtx[nFirst], pCharModel->p768[nFirst + nSkip],
+                (pSkin->pModel->n14 - nFirst) * sizeof(*pSkin->pSkinMtx));
     }
-    aMtx = pSkin->p108C;
+    aMtx = pSkin->pSkinMtx;
     for (i = pSkin->pModel->n14; i < nMatrices; i++) {
         if (BitArray_TestBit(pSkin->aMtxBits, i)) {
             pEntry = &pSkin->pModel->p54[i];
@@ -650,20 +650,20 @@ void SKN_BuildMatrices(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst
     }
 }
 
-// Points the override (in table n, Skin.a10A0[n]) of each mesh the skin draws (bit set in aMeshBits;
-// the mesh is SkinModel44.n0) at the skin's matrices, p108C; nothing without the table or render
-// data.
+// Points the override (in table n, Skin.apOverride[n]) of each mesh the skin draws (bit set in
+// aMeshBits; the mesh is SkinModel44.n0) at the skin's matrices, pSkinMtx; nothing without the
+// table or render data.
 void SKN_SetMeshMatrices(Skin* pSkin, int n) {
     int i;
     s32 nEntries;
     HwsOverrideTable* pTable;
 
-    if (pSkin->a10A0[n] != NULL && (pSkin->uFlags & 2)) {
-        pTable = pSkin->a10A0[n];
+    if (pSkin->apOverride[n] != NULL && (pSkin->uFlags & 2)) {
+        pTable = pSkin->apOverride[n];
         nEntries = pSkin->pModel->n40;
         for (i = 0; i < nEntries; i++) {
             if (BitArray_TestBit(pSkin->aMeshBits, i)) {
-                fn_80112B18(pTable, pSkin->pModel->p44[i].n0, pSkin->p108C);
+                fn_80112B18(pTable, pSkin->pModel->p44[i].n0, pSkin->pSkinMtx);
             }
         }
     }
@@ -800,8 +800,8 @@ void SKN_SwapDesc(SkinDesc* pDesc) {
     }
 
     pData = (u8*)pDesc->p34;
-    if (pData != NULL && pDesc->n2C != 0) {
-        for (i = 0; i < pDesc->n2C; i++) {
+    if (pData != NULL && pDesc->nMeshes != 0) {
+        for (i = 0; i < pDesc->nMeshes; i++) {
             pSrc = pDst = pData;
             ByteSwap_Records(&pSrc, &pDst, aMesh, 4, 1);
             pData += sizeof(SkinMesh);
@@ -809,7 +809,7 @@ void SKN_SwapDesc(SkinDesc* pDesc) {
     }
 
     // Each mesh's bit data: its layout depends on the mesh's flags.
-    for (i = 0; i < pDesc->n2C; i++) {
+    for (i = 0; i < pDesc->nMeshes; i++) {
         if (pDesc->p34[i].pBits != NULL) {
             pDesc->p34[i].pBits = (SkinMeshBit*)((u8*)pDesc + (uptr)pDesc->p34[i].pBits);
         }
@@ -984,7 +984,7 @@ s32 SKN_AllocRenderData(Skin* pSkin, u8 b) {
     }
     pModel = pSkin->pModel;
     pDesc = pModel->pDesc;
-    pSkin->p108C = StaticMem_Alloc(pModel->n50 * sizeof(*pSkin->p108C), 2, 0x80, "Skin.c", 0x500);
+    pSkin->pSkinMtx = StaticMem_Alloc(pModel->n50 * sizeof(*pSkin->pSkinMtx), 2, 0x80, "Skin.c", 0x500);
     pSkin->aMtxBits = StaticMem_Alloc((pModel->n50 + 31) / 32 * 4, 2, 0, "Skin.c", 0x50C);
     pSkin->aMeshBits = StaticMem_Alloc((pModel->n40 + 31) / 32 * 4, 2, 0, "Skin.c", 0x50D);
     BitArray_ClearArray(pSkin->aMtxBits, pModel->n50);
@@ -993,9 +993,9 @@ s32 SKN_AllocRenderData(Skin* pSkin, u8 b) {
         SkinPart_GetMaxOptionsSize(pSkin);
         nSize = SkinMorph_GetBlendSize(pSkin);
         if (nSize != 0) {
-            pSkin->a1098[0] = fn_801128C8(pModel->pDesc, nSize);
+            pSkin->apMemBlock[0] = fn_801128C8(pModel->pDesc, nSize);
         }
-        pSkin->a10A0[0] = fn_80112A10(pModel->pDesc, 0);
+        pSkin->apOverride[0] = fn_80112A10(pModel->pDesc, 0);
         pSkin->uFlags = 1;
         if (b) {
             // port: EA passes an argument SkinPart_InitSkin ignores
@@ -1021,18 +1021,18 @@ s32 SKN_FreeRenderData(Skin* pSkin) {
     if (pModel != NULL && pModel->pDesc != NULL) {
         fn_80112910(pSkin->p1090);
         pSkin->p1090 = NULL;
-        fn_80112910(pSkin->a1098[0]);
-        pSkin->a1098[0] = NULL;
-        fn_80112A58(pSkin->a10A0[0]);
-        pSkin->a10A0[0] = NULL;
+        fn_80112910(pSkin->apMemBlock[0]);
+        pSkin->apMemBlock[0] = NULL;
+        fn_80112A58(pSkin->apOverride[0]);
+        pSkin->apOverride[0] = NULL;
         fn_80037D5C(pSkin->pModel->pDesc);
     }
     // port: EA passes an argument SkinPart_ShutdownSkin ignores
     ((void (*)(Skin*))SkinPart_ShutdownSkin)(pSkin);
-    if (pSkin->p108C != NULL) {
-        StaticMem_Free(pSkin->p108C);
+    if (pSkin->pSkinMtx != NULL) {
+        StaticMem_Free(pSkin->pSkinMtx);
     }
-    pSkin->p108C = NULL;
+    pSkin->pSkinMtx = NULL;
     if (pSkin->aMtxBits != NULL) {
         StaticMem_Free(pSkin->aMtxBits);
     }
@@ -1123,7 +1123,7 @@ Skin* SKN_Create(u8* pData, u8 b) {
         Quat_Copy(pBones[i].q0, pSkin->pose.aBones[i].q0);
         Quat_Copy(pBones[i].v10, pSkin->pose.aBones[i].v10);
     }
-    pSkin->p1088 = StaticMem_Alloc(pModel->n14 * sizeof(*pSkin->p1088), 2, 0x80, "Skin.c", 0x62A);
+    pSkin->pWorld2Bone = StaticMem_Alloc(pModel->n14 * sizeof(*pSkin->pWorld2Bone), 2, 0x80, "Skin.c", 0x62A);
     if (pDesc != NULL) {
         fn_801127A0(pDesc);
     }

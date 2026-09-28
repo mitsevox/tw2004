@@ -76,8 +76,9 @@ typedef struct SkinDesc14Old {
 } SkinDesc14Old;
 LAYOUT_ASSERT(SkinDesc14Old, 0x30);
 
+// A vertex of a mesh (SkinMesh.pBits; SkinMorph_UnpackVerts reads the four s16 as one).
 typedef struct SkinMeshBit {
-    u8   unk0[6];
+    s16  aPos[3];               // 0x0  its x, y, z
     s16  nBit;                  // 0x6  a bit of Skin.aMtxBits
 } SkinMeshBit;
 LAYOUT_ASSERT(SkinMeshBit, 8);
@@ -115,7 +116,8 @@ typedef struct SkinDesc44 {
     s32  n14;                   // 0x14  its morph targets
     s32  n18;                   // 0x18  the first one's number (SkinMorph_GetNumTargets: n14 + n18 needed)
     u8   unk1C[0x24 - 0x1C];
-    u32  u24;                   // 0x24  bit 1: has morph targets
+    u32  u24;                   // 0x24  0x2: has morph targets (n10, n14); 0x4: n10 is a p44
+                                //       entry too (HwsBurn renumbers it)
     s32  n28;                   // 0x28  its first entry in SkinDesc.pA4
     s32  n2C;                   // 0x2C  its first entry in SkinDesc.pAC
 } SkinDesc44;
@@ -149,8 +151,11 @@ LAYOUT_ASSERT(SkinDesc7C, 0x18);
 
 typedef struct SkinDesc8C {
     u64  uId;                   // 0x00  its name code
-    u8   a08[0x2C - 8];         // 0x08  SkinPart_GetSetOptionData gives its address
-    s32  n2C;                   // 0x2C
+    u8   aRecolor[0x2C - 8];    // 0x08  the option's colour matrix, three rows of three f32
+                                //       (LLDynTex.c recolours the texture with it; the CrAP
+                                //       screen reads its rows as RGB colours, 0..1);
+                                //       SkinPart_GetSetOptionData gives its address
+    s32  nRecolorMode;          // 0x2C  how LLDynTex.c applies it
 } SkinDesc8C;
 LAYOUT_ASSERT(SkinDesc8C, 0x30);
 
@@ -176,8 +181,9 @@ typedef struct SkinDesc {
     s32* p20;                   // 0x020
     s32  n24;                   // 0x024  entries in p28
     SkinDesc28* p28;            // 0x028
-    s32  n2C;                   // 0x02C  bits an HwsBurn keeps (HwsBurn_Create)
-    s32  n30;                   // 0x030  entries in p34
+    s32  nMeshes;               // 0x02C  entries in p34 (an HwsBurn keeps a bit per mesh)
+    s32  nOverrideMeshes;       // 0x030  p34's meshes up to the last one flagged 0x100000 (an
+                                //        override table has an entry each; HwsBurn_BuildDesc)
     SkinMesh* p34;              // 0x034
     s32  n38;                   // 0x038  entries in p3C
     s32* p3C;                   // 0x03C  SkinDesc.p34 entries, -1 none (SkinMorph_EntryNeedsBlend)
@@ -229,7 +235,7 @@ LAYOUT_ASSERT(SkinModel44, 0x10);
 // An entry of SkinModel.p54, one per bit of Skin.aMtxBits; SkinBurn.c moves them (SkinBurn_DropUnusedMatrices).
 typedef struct SkinModel54 {
     s16  nBones;                // 0x00  entries used in aBones and afWeights (SKN_BuildMatrices)
-    s16  aBones[3];             // 0x02  matrices of Skin.p108C its matrix is blended from
+    s16  aBones[3];             // 0x02  matrices of Skin.pSkinMtx its matrix is blended from
     f32  afWeights[3];          // 0x08  and their weights
 } SkinModel54;
 LAYOUT_ASSERT(SkinModel54, 0x14);
@@ -241,8 +247,9 @@ typedef struct SkinModel {
     s32  n08;                   // 0x08  its size with all its arrays once burnt (SkinBurn_PackModel)
     s32  n0C;                   // 0x0C  entries in p3C
     u8   unk10[4];
-    s32  n14;                   // 0x14  how many matrices Skin.p108C holds (Character_SetPreferedPos); also
-                                //       the 0x20-byte entries in p34
+    s32  n14;                   // 0x14  how many matrices Skin.pSkinMtx holds
+                                //       (Character_SetPreferedPos); also the 0x20-byte
+                                //       entries in p34
     s16  n18;                   // 0x18  } -1 in a model SKN_FixupModel makes up
     s16  n1A;                   // 0x1A  }
     s16  n1C;                   // 0x1C  }
@@ -270,7 +277,7 @@ LAYOUT_ASSERT(SkinModel, 0x140);  // SkinBurn_PackModel copies it whole
 typedef struct SkinMorphState {
     s32  nMorphs;               // 0x0
     f32* afWeights;             // 0x4  one per morph target (SkinMorph_SetTargetWeight)
-    u32* aChanged[2];           // 0x8  bit arrays of nMorphs bits, indexed like Skin.a10A0:
+    u32* aChanged[2];           // 0x8  bit arrays of nMorphs bits, indexed like Skin.apOverride:
                                 //      SkinMorph_SetTargetWeight sets a changed target's bit in both,
                                 //      SkinMorph_UpdateAllTargets sets every bit, SkinMorph_Update clears one
 } SkinMorphState;
@@ -286,10 +293,11 @@ LAYOUT_ASSERT(SkinMorphVert, 0x20);
 typedef struct SkinMorphWork {
     SkinMorphVert aVerts[0x800];    // 0x00000  the mesh being blended (SkinMorph_UnpackVerts unpacks it)
     u8   unk10000[0x18];
-    u16  n10018;               // 0x10018  vertices in the mesh being blended (SkinMorph_LoadMesh)
+    u16  nVerts;                // 0x10018  vertices in the mesh being blended (SkinMorph_LoadMesh)
     u8   pad1001A[0x10020 - 0x1001A];
-    void* p10020;               // 0x10020  } the two buffers; SkinMorph_SwapTargets swaps them
-    void* p10024;               // 0x10024  }
+    void* pCurTarget;           // 0x10020  the target SkinMorph_AddCurrentTarget adds
+    void* pNextTarget;          // 0x10024  the one SkinMorph_SetNextTarget set;
+                                //          SkinMorph_SwapTargets swaps the two
     SkinMesh* apTargets[64];    // 0x10028  the target meshes SkinMorph_PickTargets picks
     f32  afTargets[64];         // 0x10128  and their weights
     SkinDesc* pDesc;            // 0x10228
@@ -311,12 +319,15 @@ typedef struct Skin {
                                 //         toe, left toe, right ankle, left ankle), each in its bone's
                                 //         frame: through mat44flt_Invert of the bone's matrix
                                 //         (Character_SetSkin: bones 0x3A, 0x48, 0x39, 0x47)
-    f32  (*p1088)[4][4];        // 0x1088  } matrices Character_SetPreferedPos hands the model (SKEL_SetDefaultWorld2BoneMatrices,
-    f32  (*p108C)[4][4];        // 0x108C  } SKEL_SetSkinningMatrices)
-    struct HwsMemBlock* p1090;  // 0x1090  freed by SKN_FreeRenderData
+    f32  (*pWorld2Bone)[4][4];  // 0x1088  the default world-to-bone matrices, one per bone
+                                //         (SKEL_SetDefaultWorld2BoneMatrices)
+    f32  (*pSkinMtx)[4][4];     // 0x108C  the skinning matrices, one per SkinModel.p54 entry
+                                //         (SKEL_SetSkinningMatrices)
+    struct HwsMemBlock* p1090;  // 0x1090  freed by SKN_FreeRenderData; set nowhere
     u8   unk1094[0x1098 - 0x1094];
-    struct HwsMemBlock* a1098[2];   // 0x1098  indexed like a10A0 (SkinMorph_Update)
-    struct HwsOverrideTable* a10A0[2];  // 0x10A0  indexed by SkinPart_BeginDraw's argument; Skin.c sets [0]
+    struct HwsMemBlock* apMemBlock[2];  // 0x1098  per view: the memory block and override table
+    struct HwsOverrideTable* apOverride[2];  // 0x10A0  the morph blend uses (SkinMorph_Update;
+                                //         SkinPart_BeginDraw's view); Skin.c sets [0]
     SkinChoice* aParts[4];      // 0x10A8  a choice per part, four copies: a new choice goes to [3]
                                 //         (to all four while SkinPart_GetChangeAllCopies), a texture
                                 //         load passes it down to [2], [1] and [0] (SkinPart_CopyChoices);
@@ -331,8 +342,8 @@ typedef struct Skin {
                                 //         the choosers set it; SkinPart_UpdateMarks redoes the bits and
                                 //         clears it); 2: loaded (SKN_AllocRenderData sets it, SKN_FreeRenderData
                                 //         clears it)
-    f32  f10D8;                 // 0x10D8  from the CHR object's header (Character_CreateFromMem)
-    f32  f10DC;                 // 0x10DC  1 when loaded
+    f32  f10D8;                 // 0x10D8  } from the CHR object's header, and 1
+    f32  f10DC;                 // 0x10DC  }   (Character_CreateFromMem); not read
     u8   unk10E0[4];
 } Skin;
 LAYOUT_ASSERT(Skin, 0x10E4);    // SKN_Create allocates and clears one
@@ -347,7 +358,7 @@ typedef struct HwsMemBlock {
 } HwsMemBlock;
 
 // A pointer per mesh of a SkinDesc (fn_8011296C), filled from an HwsMemBlock (fn_80112A80).
-// Skin.a10A0 holds them; fn_801138D8 makes one the renderer's current table.
+// Skin.apOverride holds them; fn_801138D8 makes one the renderer's current table.
 typedef struct HwsOverrideTable {
     SkinDesc* pDesc;            // 0x0
     s32  nMeshes;               // 0x4
@@ -521,7 +532,7 @@ typedef struct HwsBurn {
     u8   unk14[4];
     s32  n18;                   // 0x18  SkinMorph_GetNumTargets(pDesc)
     s32* a1C;                   // 0x1C  n18 flags (HwsBurn_DropMorphTarget)
-    s32  n20;                   // 0x20  pDesc->n2C
+    s32  n20;                   // 0x20  pDesc->nMeshes
     s32  n24;                   // 0x24  the bits of p28 set (HwsBurn_ListMeshes)
     u32* p28;                   // 0x28  n20 bits
     s32* a2C;                   // 0x2C  } n20 each
@@ -559,8 +570,9 @@ typedef struct SkinIterArgs {
 // An entry of the lists SkinPart_ListChosenTextures and SkinPart_ListAllTextures build: each name code once.
 typedef struct SkinListEntry {
     u64  uId;                   // 0x0
-    u8*  p8;                    // 0x8  what SkinPart_ApplySetsToMaterialEntry gave for it
-    s32  nC;                    // 0xC
+    u8*  pRecolor;              // 0x8  its colour matrix (SkinDesc8C.aRecolor, from
+                                //      SkinPart_ApplySetsToMaterialEntry), or NULL
+    s32  nRecolorMode;          // 0xC  and its mode
 } SkinListEntry;
 LAYOUT_ASSERT(SkinListEntry, 0x10);
 
@@ -643,7 +655,7 @@ extern s32   gSkinFrameBufSize;
 void  SkinPart_ChooseBodySet(Character* pChar, int nSet, int nVariant, int nOption);
 void  SkinPart_ChoosePartVariant(Skin* pSkin, int nPart, int nVariant);
 void  SkinPart_ChooseSet(Skin* pSkin, int nSet, int nVariant, int nOption);
-u8*   SkinPart_GetSetOptionData(Skin* pSkin, int nSet, int nVariant, int nOption);    // SkinDesc8C.a08, or NULL
+u8*   SkinPart_GetSetOptionData(Skin* pSkin, int nSet, int nVariant, int nOption);    // SkinDesc8C.aRecolor, or NULL
 s32   SkinPart_FindPart(Skin* pSkin, u64 uId);
 s32   SkinPart_FindPartVariant(Skin* pSkin, int nPart, u64 uId);
 s32   SkinPart_FindSet(Skin* pSkin, u64 uId);

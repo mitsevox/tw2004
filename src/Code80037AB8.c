@@ -46,7 +46,7 @@ void fn_80037AB8(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst) {
         for (i = 0; i < pSkin->pModel->n14; i++) {
             Quat_QuatToMatrix(pSkin->pModel->p34[i].q0, aMtx);
             Vec4_CopyPoint(pSkin->pModel->p34[i].v10, aMtx[3]);
-            LLMath_InvertNormalized(aMtx, pSkin->p1088[i]);
+            LLMath_InvertNormalized(aMtx, pSkin->pWorld2Bone[i]);
         }
     }
 }
@@ -84,8 +84,8 @@ void fn_80037CD8(Skin* pSkin) {
         }
         StaticMem_Free(pSkin->pModel);
     }
-    if (pSkin->p1088 != NULL) {
-        StaticMem_Free(pSkin->p1088);
+    if (pSkin->pWorld2Bone != NULL) {
+        StaticMem_Free(pSkin->pWorld2Bone);
     }
     StaticMem_Free(pSkin);
 }
@@ -96,7 +96,7 @@ void fn_80037CD8(Skin* pSkin) {
 void fn_80037D5C(SkinDesc* pDesc) {
     int i;
 
-    for (i = 0; i < pDesc->n2C; i++) {
+    for (i = 0; i < pDesc->nMeshes; i++) {
         if (pDesc->p34[i].pBits != NULL && (pDesc->p34[i].uFlags & 0x400000)) {
             StaticMem_Free(pDesc->p34[i].pBits);
         }

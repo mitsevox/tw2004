@@ -13,12 +13,14 @@ typedef struct Tournament {
     s32  nName;                 // 0x00  offset into the names block. TW06: nameIdx
     s32  nTourEvent;            // 0x04  1-based entry in aTourEvent (0 = one round)
     u8   unk8[4];
-    s32  nC;                    // 0x0C  nonzero for some tournaments: winning three of them gets its own
-                                //       message (GameModeDriverPGATour_PlayEndOfGameMovies)
-    s32  n10;                   // 0x10
+    s32  bIsAMajor;             // 0x0C  a major: its winner gets 3 more Player of the Year points,
+                                //       and winning three gets its own movie
+                                //       (GameModeDriverPGATour_PlayEndOfGameMovies). TW06: isAMajor
+    s32  nTextureID;            // 0x10  its icon in the calendar. TW06: textureID
     char szChampName[0x10];     // 0x14  the champion before the season is played. TW06: champName
     s32  nChampScore;           // 0x24  TW06: champScore
-    s16  aPrize[10][2];         // 0x28  per bracket (GameModeDriverPGATour_GetCurrentBracket): first prize and purse, in thousands
+    s16  aPrize[10][2];         // 0x28  per bracket (GameModeDriverPGATour_GetCurrentBracket): the
+                                //       purse [0] and the first prize [1], in thousands
     u16  aStartDate[10];        // 0x50  per season (GameModeDriverPGATour_GetCurrentSeason). TW06: startDate
 } Tournament;
 
@@ -35,22 +37,25 @@ typedef struct TourEvent {
     TourRound aRound[4];        // 0x04
     s32  nTeeSet;               // 0x34  every player's tee set (Session.nTeeSet)
     u8   unk38[8];
-    s16  a40[10];               // 0x40  per bracket (GameModeDriverPGATour_GetCurrentBracket), passed to GM_PgaTourSim_SimRound
+    s16  aFieldLowScore[10];    // 0x40  per bracket (GameModeDriverPGATour_GetCurrentBracket): the
+                                //       simulated field's lowest four-round score, over par
+                                //       (GM_PgaTourSim_SimRound's targets: fn_80118B0C)
 } TourEvent;
 
-// A 'PGAp' record.
-typedef struct PgaTriple {
-    s32  n0;                    // 0x0
-    s32  n4;                    // 0x4
-    s32  n8;                    // 0x8
-} PgaTriple;
+// A sponsorship offer (a 'PGAp' record). TW06: GM_PgaTour_SponsorshipSlot_t.
+typedef struct PgaSponsorship {
+    s32  nProgress;             // 0x0  offered once the profile's game progress reaches it
+                                //      (GM_GetGameProgress). TW06: gameCompletion
+    s32  nStartCash;            // 0x4  paid when it is signed. TW06: startCashBonus
+    s32  nBonusCash;            // 0x8  paid for each of the sponsor's items worn
+} PgaSponsorship;
 
 // The tour's data, loaded from the 'PGA' stream objects. TW06: PGA_Master (GameModeDriverPGATour::m_PgaData).
 typedef struct PgaData {
     Tournament aTournament[31]; // 0x0000  'PGAc'
     TourEvent  aTourEvent[31];  // 0x0C1C  'PGAt'
     u8         unk1648[0x6FC8 - 0x1648];
-    PgaTriple  aTriple[11];     // 0x6FC8  'PGAp'
+    PgaSponsorship aSponsorship[11];    // 0x6FC8  'PGAp'. TW06: sponsorships
     char*      pNames;          // 0x704C  'PGAn'. TW06: pStrTable
     u8         unk7050[4];
 } PgaData;
@@ -59,12 +64,13 @@ typedef struct PgaData {
 // added to the player's season counts in the profile as it ends (GameModeDriverPGATour_CommitUserRoundStatCounts).
 extern PgaStatCounts gPgaRoundStats;
 
-typedef struct Pga80205F30 {
-    u8   b0;                    // 0x0
+// The player's prize in the tournament just played (gPgaWinInfo). EA's name (TW06, TW07).
+typedef struct PgaTour_WinInfo {
+    u8   bPlaced;               // 0x0  the player was paid (GameModeDriverPGATour_AwardMoney)
     u8   unk1[3];
-    s32  n4;                    // 0x4
-    s32  n8;                    // 0x8
-} Pga80205F30;
+    s32  nPosition;             // 0x4  the player's place
+    s32  nWinnings;             // 0x8  the money won
+} PgaTour_WinInfo;
 
 // GameModeDriverPGATour.c, as the career calendar (GameModeDriver.c) uses it
 u8   GameModeDriverPGATour_GetEventByDate(u16 nDate, s32* pId, s32* pRound);
@@ -82,7 +88,7 @@ int  GameModeDriverPGATour_GetCurrentLeaderScore(void);                 // the l
 int  GameModeDriverPGATour_GetUserScore(s32 nEvent);           // the player's own score in it (nEvent is not used)
 
 // GameModeDriverPGATour.c, as the tour simulation (PGATourSimulation.c) uses it
-void GameModeDriverPGATour_AwardMoney(int a, s32 n);       // the player's prize: n, at the player's place
+void GameModeDriverPGATour_AwardMoney(int nPlayer, s32 nCash);   // notes the player's prize
 s32  GameModeDriverPGATour_GetNextEvent(void);  // -1 when the season is over
 s32  GameModeDriverPGATour_ComputePurseForBracket(s32 i, s32 k);
 s32  GameModeDriverPGATour_ComputeFirstPrizeForBracket(s32 i, s32 k);
@@ -98,7 +104,7 @@ s32  GameModeDriverPGATour_GetChampScore(s32 i);
 s32  GameModeDriverPGATour_GetUsersCurrentEventID(s32 nPlayer);
 
 // GameModeDriverPGATour.c, as FE_CrAPDB.c uses it
-s32  GameModeDriverPGATour_GetSponsorshipBonusCash(s32 i);                // aTriple[i].n8
+s32  GameModeDriverPGATour_GetSponsorshipBonusCash(s32 i);                // aSponsorship[i].nBonusCash
 
 // GameModeDriverPGATour.c, as the PGA TOUR menus (FE_PGATourMessages.c) use it
 void GameModeDriverPGATour_CheckAdvanceTournament(s32 nPlayer);
@@ -106,7 +112,7 @@ s32  GM_PgaTourMode_GetNEvents(void);                 // the number of tournamen
 s32  GameModeDriverPGATour_AdvanceSeason(void);                 // the next season: 0 after the tenth
 s32  GameModeDriverPGATour_GetCurrentSeasonYear(void);                 // the current season's year
 s32  GameModeDriverPGATour_GetCurrentEventID(void);
-s32  GameModeDriverPGATour_GetSponsorshipProgress(s32 i);                // aTriple[i].n0
-s32  GameModeDriverPGATour_GetSponsorshipStartCash(s32 i);                // aTriple[i].n4
+s32  GameModeDriverPGATour_GetSponsorshipProgress(s32 i);                // aSponsorship[i].nProgress
+s32  GameModeDriverPGATour_GetSponsorshipStartCash(s32 i);                // aSponsorship[i].nStartCash
 
 #endif

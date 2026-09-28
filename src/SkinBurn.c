@@ -35,7 +35,7 @@ void SkinBurn_CheckSignatureFile(void) {
     fn_8000633C(hFile);
 }
 
-// Renumbers each SkinModel.p44 entry's n0 (a SkinDesc.n2C bit) to its number in the burnt
+// Renumbers each SkinModel.p44 entry's n0 (a SkinDesc.p34 mesh) to its number in the burnt
 // description (pBurn->a30) and packs the kept entries to the front, dropping those the burn dropped
 // (-1). SkinModel.n40 becomes the count kept.
 void SkinBurn_RenumberMeshEntries(Skin* pSkin, HwsBurn* pBurn) {
@@ -361,7 +361,7 @@ void SkinBurn_BurnSkin(Skin* pSkin, s32* aParts, s32* aList) {
     SkinBurn_BurnModel(pSkin, pBurn);
     HwsBurn_Destroy(pBurn);
     SkinMorph_FreeBlended(pSkin, pBlock, pTable);
-    if (pSkin->a10A0[0] != NULL) {
-        pSkin->a10A0[0]->pDesc = pDesc;
+    if (pSkin->apOverride[0] != NULL) {
+        pSkin->apOverride[0]->pDesc = pDesc;
     }
 }

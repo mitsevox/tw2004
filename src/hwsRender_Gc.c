@@ -81,7 +81,7 @@ void fn_80112C64(int bSplit) {
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_80112CEC(void);
-s32 SKN_CloseModule();
+void SKN_CloseModule(void);
 s32 fn_80037F80();
 s32 fn_8011EBF8();
 void fn_80112DA0(void);

@@ -276,7 +276,7 @@ void fn_8008F820(void) {
         ((Game_GetMode() != 7 && Game_GetMode() != 0x1A) || lbl_801D87C0.n38 >= 2 ||
          lbl_801D7148.aCPU[0] || lbl_801D7148.aCPU[1])) {
         if (lbl_80281368 != -1) {
-            gpCrAPState->b86 = lbl_80281368;
+            gpCrAPState->bHidden = lbl_80281368;
             lbl_80281368 = -1;
         }
         lbl_801D87C0.b49 = 0;
@@ -287,7 +287,7 @@ void fn_8008F820(void) {
          Game_GetMode() == 0x1A) &&
         lbl_801D87C0.n38 < 2 && gSession.nGameType == 3) {
         if (lbl_80281368 == -1) {
-            lbl_80281368 = gpCrAPState->b86;
+            lbl_80281368 = gpCrAPState->bHidden;
         }
         UISProcessHint(lbl_80281F1C->pHandler, 0x34, 1, aArgs);
         lbl_801D87C0.b40 = 1;

@@ -43,7 +43,8 @@ void fn_800955F0(int nPlayer) {
             }
             SKN_AllocRenderData(gPlayers[nPlayer].pChar->pSkin, 1);
             gPlayers[nPlayer].pChar->uCharFlags &= ~0x2000;
-            SKEL_SetSkinningMatrices(gPlayers[nPlayer].pChar->pModel, gPlayers[nPlayer].pChar->pSkin->p108C,
+            SKEL_SetSkinningMatrices(gPlayers[nPlayer].pChar->pModel,
+                                     gPlayers[nPlayer].pChar->pSkin->pSkinMtx,
                         gPlayers[nPlayer].pChar->pSkin->pModel->n14);
             SKEL_UpdateAllSkinningMatrices(gPlayers[nPlayer].pChar->pModel);
         }

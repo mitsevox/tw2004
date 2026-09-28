@@ -766,8 +766,8 @@ typedef struct Character {
     void (*pfnPreBones)(void);  // 0x17B0  called by Character_UpdateAnimation before the bones are
                                 //         transformed; cleared by Character_Create
     s8    nView;                // 0x17B4  the view Skin.c poses the skins for and picks their parts in
-                                //         (the Skin.a10A0 index, SkinPart_BeginDraw); cleared by
-                                //         Character_Create
+                                //         (the Skin.apOverride index, SkinPart_BeginDraw); cleared
+                                //         by Character_Create
     u8    unk17B5[0x17B8 - 0x17B5];
     struct SkinChoices* pChoices;   // 0x17B8  its look (Character_SetClubsAndClothes dresses it from this); Character_EndLoadTexturesCallbackIG
                                     //         puts its logos on the model (sApplyUserLogos)

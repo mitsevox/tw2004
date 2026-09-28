@@ -523,7 +523,7 @@ u8* SkinPart_GetSetOptionData(Skin* pSkin, int nSet, int nVariant, int nOption) 
     if (nVariant < 0 || nVariant >= SkinPart_GetNumSetVariants(pSkin, nSet)) return NULL;
     pVariant = &pDesc->p7C[pSet->n10 + nVariant];
     if (nOption >= 0 && nOption < SkinPart_GetNumSetOptions(pSkin, nSet, nVariant)) {
-        return pDesc->p8C[pVariant->n0C + nOption].a08;
+        return pDesc->p8C[pVariant->n0C + nOption].aRecolor;
     }
     return NULL;
 }
@@ -667,7 +667,7 @@ s32 SkinPart_GetMaxOptionsSize(Skin* pSkin) {
         nBytes += SkinPart_GetMaxPartOptionSize(pDesc, i);
     }
     nAll = 0;
-    for (j = 0; j < pDesc->n30; j++) {
+    for (j = 0; j < pDesc->nOverrideMeshes; j++) {
         if ((pDesc->p34[j].uFlags & 0x300000) == 0x300000) {
             nAll += pDesc->p34[j].nSize;
         }
@@ -930,7 +930,7 @@ void SkinPart_BeginDraw(Skin* pSkin, int nView) {
         // port: EA passes an argument fn_8011387C ignores
         ((void (*)(int))fn_8011387C)(0x400);
         fn_801138CC(pSkin->pModel->pDesc);
-        fn_801138D8(pSkin->a10A0[nView]);
+        fn_801138D8(pSkin->apOverride[nView]);
     }
 }
 
@@ -1063,8 +1063,8 @@ s32 SkinPart_ApplySetsToMaterialEntry(Skin* pSkin, SkinDesc14* pEntry, u8** ppOu
     if (ppOut != NULL && pnOut != NULL) {
         if (pEntry->n18 >= 0 && pEntry->n18 < pDesc->n88) {
             bChanged = 1;
-            *ppOut = pDesc->p8C[pEntry->n18].a08;
-            *pnOut = pDesc->p8C[pEntry->n18].n2C;
+            *ppOut = pDesc->p8C[pEntry->n18].aRecolor;
+            *pnOut = pDesc->p8C[pEntry->n18].nRecolorMode;
         } else {
             *ppOut = NULL;
         }
@@ -1072,8 +1072,9 @@ s32 SkinPart_ApplySetsToMaterialEntry(Skin* pSkin, SkinDesc14* pEntry, u8** ppOu
     return bChanged;
 }
 
-// Adds a texture name code to a texture list, with the recolouring (a set option's SkinDesc8C.a08
-// and n2C) it is to be loaded with, unless the list has that name already.
+// Adds a texture name code to a texture list, with the recolouring (a set option's
+// SkinDesc8C.aRecolor and nRecolorMode) it is to be loaded with, unless the list has that name
+// already.
 void SkinPart_AddToTexList(u64 uId, SkinListEntry* aList, s32* pnList, u8* pRecolor, s32 nMode) {
     int i;
 
@@ -1081,8 +1082,8 @@ void SkinPart_AddToTexList(u64 uId, SkinListEntry* aList, s32* pnList, u8* pReco
         if (aList[i].uId == uId) return;
     }
     aList[*pnList].uId = uId;
-    aList[*pnList].p8 = pRecolor;
-    aList[*pnList].nC = nMode;
+    aList[*pnList].pRecolor = pRecolor;
+    aList[*pnList].nRecolorMode = nMode;
     (*pnList)++;
 }
 
@@ -1252,17 +1253,18 @@ u64 SkinPart_TexListGetId(int i, SkinListEntry* aList, int nList) {
     return aList[i].uId;
 }
 
-// Entry i's recolouring data (a set option's SkinDesc8C.a08, which LLDynTex.c applies to the
+// Entry i's recolouring data (a set option's SkinDesc8C.aRecolor, which LLDynTex.c applies to the
 // texture's pixels), or NULL (also for i out of range).
 u8* SkinPart_TexListGetRecolor(int i, SkinListEntry* aList, int nList) {
     if (nList <= 0 || aList == NULL || i < 0 || i >= nList) return NULL;
-    return aList[i].p8;
+    return aList[i].pRecolor;
 }
 
-// Entry i's recolouring mode (the set option's SkinDesc8C.n2C), or 0 (also for i out of range).
+// Entry i's recolouring mode (the set option's SkinDesc8C.nRecolorMode), or 0 (also for i out of
+// range).
 s32 SkinPart_TexListGetRecolorMode(int i, SkinListEntry* aList, int nList) {
     if (nList <= 0 || aList == NULL || i < 0 || i >= nList) return 0;
-    return aList[i].nC;
+    return aList[i].nRecolorMode;
 }
 
 // Drops from the dynamic textures pTex every texture the skins' parts do not use as copy 2 chooses

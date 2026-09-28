@@ -31,7 +31,7 @@ void fn_80013E38(u8* p, s32 v);  // GoRenderCtx_Gc.c
 void UI_Obj_InitModule(void);
 void fn_800AE338(void);
 void fn_800AE380(void);
-void fn_800AE3C4(void);
+void fn_800AE3C4(int nPlayer);
 void UI_Obj_RenderBoostUI(int nObj);
 void fn_800AF0A8(CamLens* pLens);
 void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
@@ -114,7 +114,7 @@ void fn_800AE380(void) {
     }
 }
 
-void fn_800AE3C4(void) {
+void fn_800AE3C4(int nPlayer) {    // nPlayer: unused (every caller, in Swing.c, passes one)
     lbl_801F5B78[0] = lbl_801F5B98[0].a28[3];
     lbl_801F5B78[1] = lbl_801F5B98[0].a28[3];
     lbl_801F5B78[2] = lbl_801F5B98[0].a28[3];

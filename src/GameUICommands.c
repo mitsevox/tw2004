@@ -310,7 +310,7 @@ char* PlayNow_GetGroupDescription(int nId);
 int   PlayNow_GetHolesLeft(void);
 void  PlayNow_Restart(void);
 void  fn_800ED974(void);
-Pga80205F30* GameModeDriverPGATour_GetWinInfo(void);
+PgaTour_WinInfo* GameModeDriverPGATour_GetWinInfo(void);
 s32   GameModeDriverPGATour_DisplayEndOfHoleMessage(char* pDst);
 s32   GM_RealtimeMode_GetSelectedEvent(s32* pRound);
 int   fn_800F1960(void);
@@ -2505,7 +2505,7 @@ void fn_8008A240(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8008A294(MsgArg* pArgs, MsgArg* pResult) {
-    if (GameModeDriverPGATour_GetWinInfo()->b0 != 0) {
+    if (GameModeDriverPGATour_GetWinInfo()->bPlaced != 0) {
         pResult->i = 1;
         return;
     }
@@ -2515,29 +2515,29 @@ void fn_8008A294(MsgArg* pArgs, MsgArg* pResult) {
 // The PGA TOUR result screen: the player's name, the money won ("$1,234"), the tournament's name
 // and end date, and the place ("1st place").
 void fn_8008A2E0(MsgArg* pArgs, MsgArg* pResult) {
-    Pga80205F30* pTour = GameModeDriverPGATour_GetWinInfo();
+    PgaTour_WinInfo* pTour = GameModeDriverPGATour_GetWinInfo();
     int nPlace;
 
     strcpy(((MsgString*)pArgs[0].p)->pStr, gpSaveData->szName);
     ((MsgString*)pArgs[1].p)->pStr[0] = '$';
-    fn_800907AC(pTour->n8, ((MsgString*)pArgs[1].p)->pStr + 1);
+    fn_800907AC(pTour->nWinnings, ((MsgString*)pArgs[1].p)->pStr + 1);
     strcpy(((MsgString*)pArgs[2].p)->pStr, GameModeDriverPGATour_GetName(gpSaveData->tour.nEvent));
     CalDate_ToString(GameModeDriverPGATour_GetEndDate(gpSaveData->tour.nEvent), ((MsgString*)pArgs[3].p)->pStr);
-    nPlace = pTour->n4;
+    nPlace = pTour->nPosition;
     if (nPlace > 100) {
-        nPlace = pTour->n4 % 100;
+        nPlace = pTour->nPosition % 100;
     }
     if (nPlace > 20) {
         nPlace %= 10;
     }
     if (nPlace == 1) {
-        sprintf(((MsgString*)pArgs[4].p)->pStr, "%dst", pTour->n4);
+        sprintf(((MsgString*)pArgs[4].p)->pStr, "%dst", pTour->nPosition);
     } else if (nPlace == 2) {
-        sprintf(((MsgString*)pArgs[4].p)->pStr, "%dnd", pTour->n4);
+        sprintf(((MsgString*)pArgs[4].p)->pStr, "%dnd", pTour->nPosition);
     } else if (nPlace == 3) {
-        sprintf(((MsgString*)pArgs[4].p)->pStr, "%drd", pTour->n4);
+        sprintf(((MsgString*)pArgs[4].p)->pStr, "%drd", pTour->nPosition);
     } else {
-        sprintf(((MsgString*)pArgs[4].p)->pStr, "%dth", pTour->n4);
+        sprintf(((MsgString*)pArgs[4].p)->pStr, "%dth", pTour->nPosition);
     }
     strcat(((MsgString*)pArgs[4].p)->pStr, " place");
 }

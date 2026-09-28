@@ -1489,9 +1489,9 @@ void fn_8007C248(MsgArg* pArgs, MsgArg* pResult) {
 void fn_8007C254(MsgArg* pArgs, MsgArg* pResult) {
     u8 bOld;
 
-    bOld = gpCrAPState->b86;
-    gpCrAPState->b86 = pArgs[0].i;
-    if (bOld != gpCrAPState->b86 && gpCrAPState->n0 == 3) {
+    bOld = gpCrAPState->bHidden;
+    gpCrAPState->bHidden = pArgs[0].i;
+    if (bOld != gpCrAPState->bHidden && gpCrAPState->nScreenKind == 3) {
         FE_OnGolferHiddenChanged();
     }
 }
@@ -1501,15 +1501,15 @@ void fn_8007C254(MsgArg* pArgs, MsgArg* pResult) {
 void fn_8007C2A0(MsgArg* pArgs, MsgArg* pResult) {
     s32 nOld;
 
-    nOld = gpCrAPState->n0;
-    gpCrAPState->n0 = pArgs[0].i;
-    if (nOld != 0 && gpCrAPState->n0 == 0) {
+    nOld = gpCrAPState->nScreenKind;
+    gpCrAPState->nScreenKind = pArgs[0].i;
+    if (nOld != 0 && gpCrAPState->nScreenKind == 0) {
         FE_vClearGolferCache();
     }
-    if (gpCrAPState->n0 == 3 && nOld != 3) {
+    if (gpCrAPState->nScreenKind == 3 && nOld != 3) {
         FE_vClearGolferCache();
     }
-    if (gpCrAPState->n0 == 0) {
+    if (gpCrAPState->nScreenKind == 0) {
         FE_SetOffscreenBufferRender(1);
     } else {
         FE_SetOffscreenBufferRender(0);
@@ -3276,7 +3276,7 @@ void fn_8007FEEC(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8007FF3C(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = gpCrAPState->b86;
+    pResult->i = gpCrAPState->bHidden;
 }
 
 void fn_8007FF4C(MsgArg* pArgs, MsgArg* pResult) {

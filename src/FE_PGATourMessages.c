@@ -242,7 +242,7 @@ void fn_8010EBDC(MsgArg* pArgs, MsgArg* pResult) {
         pEvent = gpSaveData[nPlayer].tour.aEvent;
         for (i = 0; i < 31; i++) {
             if (pEvent[i].nUserRankType == 2 && pEvent[i].nUserRank == 1
-                && GameModeDriverPGATour_GetEventInfo(i)->nC != 0) {
+                && GameModeDriverPGATour_GetEventInfo(i)->bIsAMajor != 0) {
                 nCount++;
             }
         }

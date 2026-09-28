@@ -749,8 +749,8 @@ void Character_SetPreferedPos(Character* pChar) {
         if (pChar->pSkin->pModel != NULL) {
             fn_80037AB8(pChar->pSkin, pChar->pModel, 0, 0);
             SKEL_SetSkinBonePoses(pChar->pModel, pChar->pSkin->pModel->p34);
-            SKEL_SetDefaultWorld2BoneMatrices(pChar->pModel, pChar->pSkin->p1088);
-            SKEL_SetSkinningMatrices(pChar->pModel, pChar->pSkin->p108C, pChar->pSkin->pModel->n14);
+            SKEL_SetDefaultWorld2BoneMatrices(pChar->pModel, pChar->pSkin->pWorld2Bone);
+            SKEL_SetSkinningMatrices(pChar->pModel, pChar->pSkin->pSkinMtx, pChar->pSkin->pModel->n14);
         }
     }
 }
@@ -2855,7 +2855,7 @@ void Character_GolferStreamCallbackFE(UStreamObject* pObject) {
     fn_8008F35C();
     gpCrAPState->pB8->pChar->nPlays = -1;
     Character_SetPosition(gpCrAPState->pB8->pChar, gFEGolferPos, 1);
-    Character_SetOrientation(gpCrAPState->pB8->pChar, gpCrAPState->f19C);
+    Character_SetOrientation(gpCrAPState->pB8->pChar, gpCrAPState->fFacing);
     if (gpCrAPState->pB8->pChar->nGolferId == 7 || gpCrAPState->pB8->pChar->nGolferId == 29) {
         Character_ApplyCrAPSettings(gpCrAPState->pB8->pChar, &FE_GetCurrentProfile()->choices);
     }
@@ -3172,14 +3172,14 @@ u8 Character_IsHoldingBall(Character* pChar) {
 // Gives the character a created golfer's look from pChoices: its skins' choices
 // (SkinPart_ApplyBodyChoices), its 26 body sliders (a9B4) and its handedness (bLeftHanded non-zero:
 // left-handed, the model's bLeftHanded), the handedness except in the create-a-player mode (game
-// type 3) off its screens 1 and 4 (gpCrAPState->n0); then the skeleton is set up again from the
-// model (Character_SetSkeleton).
+// type 3) off its screens 1 and 4 (gpCrAPState->nScreenKind); then the skeleton is set up again
+// from the model (Character_SetSkeleton).
 void Character_ApplyCrAPSettings(Character* pChar, SkinChoices* pChoices) {
     SkinPart_ApplyBodyChoices(pChar, pChoices);
     CharSlider_UpdateCharacterBasedOnSliderValues(pChar->pSliderDefs, pChar->pModel, pChar->pSkin, 26,
                                                   pChoices->a9B4,
                 &pChar->morphBlend);
-    if (gSession.nGameType != 3 || gpCrAPState->n0 == 1 || gpCrAPState->n0 == 4) {
+    if (gSession.nGameType != 3 || gpCrAPState->nScreenKind == 1 || gpCrAPState->nScreenKind == 4) {
         if (pChoices->bLeftHanded == 0) {
             Character_SetLeftHanded(pChar, 0);
         } else {

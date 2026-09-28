@@ -1253,14 +1253,14 @@ void SKEL_SetSkinBonePoses(CharModel* pModel, void* pPoses) {
     pModel->p760 = pPoses;
 }
 
-// Hands the model the skin's nMatrices skinning matrices (Skin.p108C) that
+// Hands the model the skin's nMatrices skinning matrices (Skin.pSkinMtx) that
 // SKEL_UpdateSkinningMatrix fills in; NULL and 0 take them back.
 void SKEL_SetSkinningMatrices(CharModel* pModel, f32 (*pMatrices)[4][4], s32 nMatrices) {
     pModel->p768 = pMatrices;
     pModel->n76C = nMatrices;
 }
 
-// Hands the model the skin's default world-to-bone matrices (Skin.p1088), one per bone, that
+// Hands the model the skin's default world-to-bone matrices (Skin.pWorld2Bone), one per bone, that
 // SKEL_UpdateSkinningMatrix puts each bone's matrix on.
 void SKEL_SetDefaultWorld2BoneMatrices(CharModel* pModel, f32 (*pMatrices)[4][4]) {
     pModel->p764 = pMatrices;

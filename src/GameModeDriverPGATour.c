@@ -22,9 +22,9 @@ s32 gPgaSavedOptions18 = 1;     // the options' n18 from before a tour round (Se
                                 //   nothing puts it back)
 
 PgaData gPgaData;               // the tour data, from the 'PGA' stream objects
-Pga80205F30 gPgaWinInfo;        // the player's prize in the tournament just played: set when it is
-                                //   paid (GameModeDriverPGATour_AwardMoney), shown on the result screen.
-                                //   TW07: PgaTour_WinInfo (GetWinInfo)
+PgaTour_WinInfo gPgaWinInfo;    // the player's prize in the tournament just played: set when it
+                                //   is paid (GameModeDriverPGATour_AwardMoney), shown on the
+                                //   result screen. TW07: GetWinInfo
 PgaStatCounts gPgaRoundStats;   // the current round's statistics (see pgatour.h)
 
 s32 gPgaPlayoffHole;            // the playoff hole index: set to 16, each playoff moves it on
@@ -129,12 +129,12 @@ void GameModeDriverPGATour_LoadPGAtFromStream(UStreamObject* pObject) {
     Stream_StreamLoadFixedSize(pObject, sizeof(gPgaData.aTourEvent), gPgaData.aTourEvent);
 }
 
-// The 'PGAp' loader: 11 three-value records (gPgaData.aTriple).
+// The 'PGAp' loader: 11 sponsorship offers (gPgaData.aSponsorship).
 void GameModeDriverPGATour_LoadPGApFromStream(UStreamObject* pObject) {
-    // port: the 'PGAp' object is copied straight into gPgaData.aTriple (PgaTriple[11]); it is
-    //       big-endian on disc, so a little-endian port converts it field by field here
+    // port: the 'PGAp' object is copied straight into gPgaData.aSponsorship (PgaSponsorship[11]);
+    //       it is big-endian on disc, so a little-endian port converts it field by field here
     //       (docs/format-byteorder.md)
-    Stream_StreamLoadFixedSize(pObject, sizeof(gPgaData.aTriple), gPgaData.aTriple);
+    Stream_StreamLoadFixedSize(pObject, sizeof(gPgaData.aSponsorship), gPgaData.aSponsorship);
 }
 
 // The 'PGAn' loader: the tournament names block (Tournament.nName are offsets into it) is copied
@@ -214,7 +214,7 @@ void GameModeDriverPGATour_PrepareForTeeOff(void) {
     gSession.options.nWind = 0;
     gbPgaTourRoundActive = 1;
     gPgaPlayoffHole = 16;
-    gPgaWinInfo.b0 = 0;
+    gPgaWinInfo.bPlaced = 0;
     if (gPgaData.aTournament[nEvent].nTourEvent) {
         gSession.nNumPlayers = 1;
         gpGame->nDC = gpSaveData[nPlayer].tour.nRound;
@@ -224,7 +224,8 @@ void GameModeDriverPGATour_PrepareForTeeOff(void) {
         fn_80117DE8(0, 0);
         GM_PgaTourSim_SimRound(0, &gpSaveData[nPlayer].tour.aEvent[gpSaveData[nPlayer].tour.nEvent],
                     gpSaveData[nPlayer].tour.nRound,
-                    gPgaData.aTourEvent[nFormat].a40[GameModeDriverPGATour_GetCurrentBracket(0)], 5);
+                    gPgaData.aTourEvent[nFormat].aFieldLowScore[GameModeDriverPGATour_GetCurrentBracket(0)],
+                    5);
         Mem_set(pRec, 0, sizeof(*pRec));
         pRec->nRounds++;
         if (gpSaveData[nPlayer].tour.nRound == 0) {
@@ -331,27 +332,27 @@ s32 GameModeDriverPGATour_GetPotentialHoleResult(int nPlayer) {
 
 // The player's result in the current tournament (TW06 PgaTour_WinInfo: placed, position, winnings):
 // cleared as a round starts, set by AwardMoney, read by the result screen (GameUICommands).
-Pga80205F30* GameModeDriverPGATour_GetWinInfo(void) {
+PgaTour_WinInfo* GameModeDriverPGATour_GetWinInfo(void) {
     return &gPgaWinInfo;
 }
 
 // After a tournament the player won (called by EndTournament): the end-of-tournament movies go on
-// GUI queue 5. The first tour win gets 31; a major (Tournament.nC) gets 8 once three majors are
-// won, else one of 27..30 at random; otherwise tournaments 9 and 8 have their own (9 and 10).
+// GUI queue 5. The first tour win gets 31; a major (Tournament.bIsAMajor) gets 8 once three majors
+// are won, else one of 27..30 at random; otherwise tournaments 9 and 8 have their own (9 and 10).
 // Nothing when the win info says the player did not place.
 void GameModeDriverPGATour_PlayEndOfGameMovies(void) {
     PlayerNumber_t nPlayer = PLR_1_e;
     Tournament* p = GameModeDriverPGATour_GetEventInfo(gpSaveData[nPlayer].tour.nEvent);
     int i;
     int nWins;
-    if (gPgaWinInfo.b0 == 1) {
+    if (gPgaWinInfo.bPlaced == 1) {
         if (GameModeDriverPGATour_GetNumEventsWon() == 0) {
             GUI_QueueMessage(5, 31, 0, 0);
         }
-        if (p->nC) {
+        if (p->bIsAMajor) {
             nWins = 0;
             for (i = 0; i <= gpSaveData[nPlayer].tour.nEvent; i++) {
-                if (gPgaData.aTournament[i].nC && gpSaveData[nPlayer].tour.aEvent[i].nUserRank == 1) {
+                if (gPgaData.aTournament[i].bIsAMajor && gpSaveData[nPlayer].tour.aEvent[i].nUserRank == 1) {
                     nWins++;
                 }
             }
@@ -496,17 +497,17 @@ void GameModeDriverPGATour_CheckAdvanceTournament(s32 nPlayer) {
 }
 
 // The tour simulation's payout for the player (SplitWinnings): the win info (GetWinInfo) says the
-// player placed, at entrant 0's rank on the leaderboard, winning n. No money is paid here;
+// player placed, at entrant 0's rank on the leaderboard, winning nCash. No money is paid here;
 // EndTournament pays it.
-void GameModeDriverPGATour_AwardMoney(int a, s32 n) {
-    gPgaWinInfo.b0 = 1;
-    gPgaWinInfo.n4 = GM_PgaTourSim_GetScoreRankFromEntrantID(a, 0);
-    gPgaWinInfo.n8 = n;
+void GameModeDriverPGATour_AwardMoney(int nPlayer, s32 nCash) {
+    gPgaWinInfo.bPlaced = 1;
+    gPgaWinInfo.nPosition = GM_PgaTourSim_GetScoreRankFromEntrantID(nPlayer, 0);
+    gPgaWinInfo.nWinnings = nCash;
 }
 
 // The player's bracket, 0..9: tournaments won (GameModeDriverPGATour_GetNumEventsWon) x 10 / 31, at
-// most 9. It picks the prize column (Tournament.aPrize) and the field's strength (TourEvent.a40).
-// Profile 0's wins; nPlayer is not read.
+// most 9. It picks the prize column (Tournament.aPrize) and the field's strength
+// (TourEvent.aFieldLowScore). Profile 0's wins; nPlayer is not read.
 s32 GameModeDriverPGATour_GetCurrentBracket(int nPlayer) {
     s32 n = GameModeDriverPGATour_GetNumEventsWon() * 10 / 31;
     return n > 9 ? 9 : n;
@@ -533,7 +534,8 @@ void GameModeDriverPGATour_SimCurrentTournament(int nPlayer, u8 bSimUser) {
             }
             GM_PgaTourSim_SimRound(nPlayer, &gpSaveData[nPlayer].tour.aEvent[gpSaveData[nPlayer].tour.nEvent],
                         gpSaveData[nPlayer].tour.nRound,
-                        gPgaData.aTourEvent[nTourEvent].a40[GameModeDriverPGATour_GetCurrentBracket(nPlayer)],
+                        gPgaData.aTourEvent[nTourEvent]
+                            .aFieldLowScore[GameModeDriverPGATour_GetCurrentBracket(nPlayer)],
                         uFlags);
         }
         gpSaveData[nPlayer].tour.nRound++;
@@ -911,10 +913,11 @@ s32 GameModeDriverPGATour_GetCurrentEventID(void) {
     return gpSaveData[nPlayer].tour.nEvent;
 }
 
-// Tournament i's icon (Tournament.n10): drawn in the calendar on its last day (PGATour_FillCell)
-// and with a won tournament in the PGA TOUR menus. No range check: i must be a tournament.
+// Tournament i's icon (Tournament.nTextureID): drawn in the calendar on its last day
+// (PGATour_FillCell) and with a won tournament in the PGA TOUR menus. No range check: i must be a
+// tournament.
 s32 GameModeDriverPGATour_GetTextureID(s32 i) {
-    return GameModeDriverPGATour_GetEventInfo(i)->n10;
+    return GameModeDriverPGATour_GetEventInfo(i)->nTextureID;
 }
 
 // Tournament i's champion before the tour is played, from the 'PGAc' data: a new tour in a profile
@@ -1046,18 +1049,18 @@ s32 GameModeDriverPGATour_GetNumEventsWon(void) {
 // Sponsorship offer i's (0..10, the 'PGAp' data) game progress: the offer is made once the
 // profile's game progress (GM_GetGameProgress) reaches it.
 s32 GameModeDriverPGATour_GetSponsorshipProgress(s32 i) {
-    return gPgaData.aTriple[i].n0;
+    return gPgaData.aSponsorship[i].nProgress;
 }
 
 // Sponsorship offer i's signing money, paid into the profile's money when the sponsorship is
 // signed.
 s32 GameModeDriverPGATour_GetSponsorshipStartCash(s32 i) {
-    return gPgaData.aTriple[i].n4;
+    return gPgaData.aSponsorship[i].nStartCash;
 }
 
 // Sponsorship offer i's cash bonus: paid for each of the sponsor's items the player wears.
 s32 GameModeDriverPGATour_GetSponsorshipBonusCash(s32 i) {
-    return gPgaData.aTriple[i].n8;
+    return gPgaData.aSponsorship[i].nBonusCash;
 }
 
 // The tour's message after the player's hole into pDst; returns 1 when there is one, else 0. After

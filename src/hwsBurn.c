@@ -30,7 +30,7 @@ HwsBurn* HwsBurn_Create(SkinDesc* pDesc) {
     pBurn->pDesc = pDesc;
     pBurn->nParts = pDesc->nParts;
     pBurn->n18 = SkinMorph_GetNumTargets(pDesc);
-    pBurn->n20 = pDesc->n2C;
+    pBurn->n20 = pDesc->nMeshes;
     pBurn->n34 = pDesc->n40;
     pBurn->n4C = pDesc->n38;
     pBurn->n60 = pDesc->n10;
@@ -398,7 +398,7 @@ SkinDesc44* HwsBurn_CopyEntries(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAl
 s32 HwsBurn_ListMeshes(HwsBurn* pBurn, s32 nAlign) {
     SkinDesc* pDesc = pBurn->pDesc;
     int i;
-    int nBits = pDesc->n2C;
+    int nBits = pDesc->nMeshes;
     int n;
     s32 nBytes;
 
@@ -625,7 +625,7 @@ SkinDesc14* HwsBurn_CopyMaterials(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 n
 // and each table it keeps are copied into the block, renumbered for the burn. The set tables p74,
 // p7C and p84 are dropped (the callback has baked the chosen sets into the material entries). An
 // entry left with no morph targets loses its morph flag, and its meshes that have both 0x100000 and
-// 0x10 lose 0x100000; n30 ends after the last mesh still flagged 0x100000.
+// 0x10 lose 0x100000; nOverrideMeshes ends after the last mesh still flagged 0x100000.
 SkinDesc* HwsBurn_BuildDesc(HwsBurn* pBurn) {
     SkinMeshIter iterBuf;
     SkinIterArgs args;
@@ -682,7 +682,7 @@ SkinDesc* HwsBurn_BuildDesc(HwsBurn* pBurn) {
     nOffset = 0;
     pOut = HwsBurn_CopyAligned(pBlock, &nOffset, pDesc, sizeof(SkinDesc), 16);
     pOut->n08 = nBytes;
-    pOut->n2C = pBurn->n24;
+    pOut->nMeshes = pBurn->n24;
     pOut->n40 = pBurn->n38;
     pOut->n38 = pBurn->n50;
     pOut->n70 = 0;
@@ -728,12 +728,12 @@ SkinDesc* HwsBurn_BuildDesc(HwsBurn* pBurn) {
         }
     }
     nLast = 0;
-    for (j = 0; j < pOut->n2C; j++) {
+    for (j = 0; j < pOut->nMeshes; j++) {
         if (pOut->p34[j].uFlags & 0x100000) {
             nLast = j + 1;
         }
     }
-    pOut->n30 = nLast;
+    pOut->nOverrideMeshes = nLast;
     return pOut;
 }
 

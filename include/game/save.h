@@ -118,7 +118,7 @@ typedef struct TourSeason {
                                 //         reset to 0 when the player finishes elsewhere
     u16  n4E98;                 // 0x4E98  a run of tour rounds, counted on each 18th hole
                                 //         (GameModeDriverPGATour_EndHole); reset to 0 when the run breaks
-    u16  n4E9A;                 // 0x4E9A  wins of the tournaments whose Tournament.nC is set
+    u16  n4E9A;                 // 0x4E9A  wins of the tournaments whose Tournament.bIsAMajor is set
                                 //         (GM_PgaTourSim_CheckEndOfTournamentAward)
 } TourSeason;
 LAYOUT_ASSERT(TourSeason, 0x4E9C);

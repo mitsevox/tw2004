@@ -261,8 +261,8 @@ void GM_PgaTourSim_SimTournamentWinner(int nPlayer) {
     s32 nRand;
     s32 i;
     PgaEntrantMC* pWinner;
-    s32 nFirstPrize;
     s32 nPurse;
+    s32 nFirstPrize;
 
     CalcScoreRankingsIfDirty(nPlayer);
     bUser = GM_PgaTourSim_IsEntrantUser(nPlayer, 0);
@@ -289,15 +289,14 @@ void GM_PgaTourSim_SimTournamentWinner(int nPlayer) {
     gpSaveData[nPlayer].tour.aStats[pWinner->nGolfer].nSeasonWins++;
     gpSaveData[nPlayer].tour.aStats[pWinner->nGolfer].nCareerWins++;
     gpSaveData[nPlayer].tour.aStats[pWinner->nGolfer].nPlayerOfYearPoints++;
-    if (GameModeDriverPGATour_GetEventInfo(gpSaveData[nPlayer].tour.nEvent)->nC != 0) {
+    if (GameModeDriverPGATour_GetEventInfo(gpSaveData[nPlayer].tour.nEvent)->bIsAMajor != 0) {
         gpSaveData[nPlayer].tour.aStats[pWinner->nGolfer].nPlayerOfYearPoints += 3;
     }
-    nFirstPrize = GameModeDriverPGATour_ComputePurseForBracket(gpSaveData[nPlayer].tour.nEvent,
-                                                                    GameModeDriverPGATour_GetCurrentBracket(
-                                                                            nPlayer));
-    nPurse = GameModeDriverPGATour_ComputeFirstPrizeForBracket(gpSaveData[nPlayer].tour.nEvent,
+    nPurse = GameModeDriverPGATour_ComputePurseForBracket(gpSaveData[nPlayer].tour.nEvent,
                                                           GameModeDriverPGATour_GetCurrentBracket(nPlayer));
-    GM_PgaTourSim_DistributeWinnings(nPlayer, nFirstPrize, nPurse);
+    nFirstPrize = GameModeDriverPGATour_ComputeFirstPrizeForBracket(
+        gpSaveData[nPlayer].tour.nEvent, GameModeDriverPGATour_GetCurrentBracket(nPlayer));
+    GM_PgaTourSim_DistributeWinnings(nPlayer, nPurse, nFirstPrize);
     GM_PgaTourSim_CheckEndOfTournamentAward(nPlayer, bUser, bFirst);
 }
 
@@ -314,7 +313,7 @@ void GM_PgaTourSim_CheckEndOfTournamentAward(int nPlayer, u8 bUser, u8 bFirst) {
     TourSeason* pTour = &gpSaveData[nPlayer].tour;
     PgaStatCounts* pStats = &gpSaveData[nPlayer].tour.aStats[PGA_USER_GOLFER];
 
-    if (bFirst && GameModeDriverPGATour_GetEventInfo(gpSaveData[nPlayer].tour.nEvent)->nC != 0) {
+    if (bFirst && GameModeDriverPGATour_GetEventInfo(gpSaveData[nPlayer].tour.nEvent)->bIsAMajor != 0) {
         pTour->n4E9A++;
     }
     if (bUser && bFirst) {

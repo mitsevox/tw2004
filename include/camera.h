@@ -528,35 +528,52 @@ typedef struct CrAPGolfer {
                                 //       the CrAP camera script runs only then)
     u8   bFree;                 // 0x19  its character is to be freed (FE_vFreeUnusedCharacters)
     u8   unk1A[2];
-    s32  n1C;                   // 0x1C
+    s32  nSetupKind;            // 0x1C  the screen kind (CrAPState.nScreenKind) FE_SetupCharState
+                                //       set him up for; -1 none
 } CrAPGolfer;
 
 typedef struct CrAPState {
-    s32  n0;                    // 0x000  0..4: picks the shot the CrAP camera frames (GolfCamera_ProcessFECamera)
-    s32  n4;                    // 0x004  the CrAP camera's kind (GolfCamera_SwitchCrAPCamera)
-    s32  n8;                    // 0x008
-    s32  nC;                    // 0x00C
-    char sz10[0x10];            // 0x010  the animation FE_vTriggerCrAPAnimAndCamera started
-    char sz20[0x10];            // 0x020
-    char sz30[0x20];            // 0x030
-    s32  n50;                   // 0x050
-    char sz54[0x20];            // 0x054
-    s32  n74;                   // 0x074
-    u8   b78;                   // 0x078
+    s32  nScreenKind;           // 0x000  the menu screen showing the golfer (a menu message sets
+                                //        it): 0 golfers in turn (gFEGolferCycle), 3 the CrAP
+                                //        screen, 4 none; picks the shot the CrAP camera frames
+                                //        (GolfCamera_ProcessFECamera)
+    s32  nCamIdleState;         // 0x004  the CrAP camera's idle state (FE_SetCrAPCameraIdleState):
+                                //        the camera kind GolfCamera_SwitchCrAPCamera gets, and it
+                                //        picks the idle clip (FE_CrapGetIdleAnim)
+    s32  nRenderState;          // 0x008  what the CrAP screen shows: 0 the golfer, 1 his clubs, 2
+                                //        the ball (FE_SetCrapRenderState)
+    s32  nTempRenderState;      // 0x00C  a render state for the queued animation only: it takes
+                                //        over when that starts, and 0 comes back when it ends
+                                //        (FE_SetTempCrapRenderState)
+    char szCurAnim[0x10];       // 0x010  the animation FE_vTriggerCrAPAnimAndCamera started ("":
+                                //        the idle one took over)
+    char szQueuedAnim[0x10];    // 0x020  } the queued animation and its camera shot
+    char szQueuedShot[0x20];    // 0x030  } (FE_QueueCrAPAnim; "": none / the idle state's)
+    s32  nAnimRepeats;          // 0x050  times the current animation plays again before the idle
+                                //        one (FE_SetAnimRepeatCount)
+    char szQueuedBall[0x20];    // 0x054  the ball texture the queued animation puts on
+                                //        (FE_QueueBallChange)
+    s32  nTexSwapState;         // 0x074  the texture swap: 1 loading, 2 loaded and waiting, 0 done
+                                //        (FE_SetTextureSwapState)
+    u8   bDelayTexSwap;         // 0x078  a loaded swap waits for the queued animation,
+                                //        fTexSwapDelay seconds into it (FE_SetDelayTextureSwap)
     u8   unk79[3];
-    f32  f7C;                   // 0x07C
-    u8   b80;                   // 0x080
-    u8   b81;                   // 0x081
+    f32  fTexSwapDelay;         // 0x07C
+    u8   bTempRenderState;      // 0x080  nTempRenderState is set
+    u8   bNewTextures;          // 0x081  new textures are on the golfer (FE_SetNewTexturesFlag);
+                                //        not read
     u8   b82;                   // 0x082
     u8   b83;                   // 0x083  set by a menu message (FE_MessageTable.c)
     u8   b84;                   // 0x084
     u8   b85;                   // 0x085
-    u8   b86;                   // 0x086  set by a menu message; a change while n0 is 3 calls
-                                //        FE_OnGolferHiddenChanged
+    u8   bHidden;               // 0x086  the golfer is not updated or drawn (a menu message sets
+                                //        it; a change while nScreenKind is 3 calls
+                                //        FE_OnGolferHiddenChanged)
     u8   b87;                   // 0x087
     u8   b88;                   // 0x088
     u8   b89;                   // 0x089
-    u8   b8A;                   // 0x08A
+    u8   bClearCache;           // 0x08A  FE_vClearGolferCache asked for the golfers to be freed;
+                                //        FE_vFreeUnusedCharacters does it once the loader is idle
     u8   unk8B;
     s32  n8C;                   // 0x08C  the golfer id whose stream was opened last (-1: none)
     u8   b90;                   // 0x090
@@ -574,33 +591,40 @@ typedef struct CrAPState {
     f32  f140;                  // 0x140
     f32  f144;                  // 0x144
     f32  f148;                  // 0x148
-    f32  f14C;                  // 0x14C
+    f32  fAlpha;                // 0x14C  the golfer display's fade, 0..0.5 (FE_vUpdateGolferAll)
     u8   unk150[0x18C - 0x150];
     u8   b18C;                  // 0x18C
     u8   unk18D[3];
     s32  n190;                  // 0x190  counts the golfers loaded
     s32  n194;                  // 0x194  } the next golfer to show: a column and row of
     s32  n198;                  // 0x198  } gFEGolferCycle
-    f32  f19C;                  // 0x19C
-    f32  f1A0;                  // 0x1A0
+    f32  fFacing;               // 0x19C  } the way the golfer faces and the way he turns to, in
+    f32  fTargetFacing;         // 0x1A0  } radians (FE_RotateCrAPModel, FE_SetCrapRotation)
     u8   unk1A4[0x1B0 - 0x1A4];
     u8   b1B0;                  // 0x1B0
     u8   unk1B1[3];
-    s32  n1B4;                  // 0x1B4
-    s32  n1B8;                  // 0x1B8
-    s32  n1BC;                  // 0x1BC
-    s32  n1C0;                  // 0x1C0
-    s32  n1C4;                  // 0x1C4
-    u8   b1C8;                  // 0x1C8
+    s32  nIdleCount;            // 0x1B4  idle clips played in a row (FE_vLoadNextCrAPAnim: after
+                                //        the fifth he turns to the front; -1 then)
+    s32  nClub;                 // 0x1B8  the club he holds, a gClubPartNames class (FE_SetCrapClub)
+    s32  nTempClub;             // 0x1BC  the club for the queued animation only (-1: his own)
+    s32  nQueuedState;          // 0x1C0  the queued animation: 0 waits for the current one's end,
+                                //        1 fades out (fFadeOutTime) and starts, 2 plays, 3 fades
+                                //        back in, 4 none (FE_QueueCrAPAnim, FE_vUpdateGolferAll)
+    s32  nUnlockState;          // 0x1C4  } the pad cannot turn or zoom the golfer while bPadLocked;
+    u8   bPadLocked;            // 0x1C8  } it unlocks when nQueuedState reaches nUnlockState (or 4)
     u8   unk1C9[3];
-    f32  f1CC;                  // 0x1CC
-    u8   n1D0;                  // 0x1D0  0: FE_vUpdateGolferAll keeps f14C at 0.5
-    u8   b1D1;                  // 0x1D1
-    u8   b1D2;                  // 0x1D2
+    f32  fFadeOutTime;          // 0x1CC  seconds of fade left before the queued animation starts
+    u8   bFadeAtEnd;            // 0x1D0  the queued animation fades out at its end and back in (0:
+                                //        fAlpha stays 0.5)
+    u8   bClubStatesAllowed;    // 0x1D1  FE_SetClubStatesAllowed
+    u8   bTexSwapDue;           // 0x1D2  a loaded texture swap is to be switched in
+                                //        (FE_SetTextureSwapDue)
     u8   unk1D3;
-    s32  n1D4;                  // 0x1D4
-    s32  n1D8;                  // 0x1D8
-    u8   b1DC;                  // 0x1DC
+    s32  nLastAsset;            // 0x1D4  the slider asset last shown (-1: none;
+                                //        FE_SetLastCrAPAsset)
+    s32  nLastCategory;         // 0x1D8  the part of the asset last put on (-1: none;
+                                //        FE_SetLastCrAPCategory)
+    u8   bZoom;                 // 0x1DC  the CrAP camera is zoomed in (FE_ZoomCrAPModel)
     u8   unk1DD[3];
 } CrAPState;
 LAYOUT_ASSERT(CrAPState, 0x1E0);

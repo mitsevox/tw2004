@@ -13,7 +13,7 @@ s32 fn_80112804(SkinDesc* pDesc) {
     s32 nSize = 0;
     int i;
 
-    for (i = 0; i < pDesc->n30; i++) {
+    for (i = 0; i < pDesc->nOverrideMeshes; i++) {
         if (pDesc->p34[i].uFlags & 0x100000) {
             nSize += pDesc->p34[i].nSize;
         }
@@ -66,7 +66,7 @@ void* fn_80112938(HwsMemBlock* pBlock, s32 nSize) {
 }
 
 s32 fn_80112964(SkinDesc* pDesc) {
-    return pDesc->n30;
+    return pDesc->nOverrideMeshes;
 }
 
 // An override table for nMeshes meshes (0: all of pDesc's), every entry empty.

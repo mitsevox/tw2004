@@ -2424,7 +2424,8 @@ void GolfCamera_InitFECamera(View* pView, int nPlayer) {
 }
 
 // Camera 23's process: on the create-a-player screen, when the part being edited changes, a cut
-// to a random shot for it (by page, gpCrAPState->n0), other than the last one (p80) if it can.
+// to a random shot for it (by page, gpCrAPState->nScreenKind), other than the last one (p80) if it
+// can.
 void GolfCamera_ProcessFECamera(View* pView, int nPlayer) {
     f32* pCam;
     f32* pSub;
@@ -2435,8 +2436,8 @@ void GolfCamera_ProcessFECamera(View* pView, int nPlayer) {
     // The original compares script.n114 and n0, both ints, as floats.
     if (gpCrAPState->pB4 != NULL && gpCrAPState->pB4->bLoaded
         && (pView->script.n110 != gpCrAPState->pB4->nGolferId || (f32)pView->script.n114
-            != gpCrAPState->n0)) {
-        switch (gpCrAPState->n0) {
+            != gpCrAPState->nScreenKind)) {
+        switch (gpCrAPState->nScreenKind) {
         case 0:
             pShot = DynamicCam_ChooseScript(0, 0x23, pView->p80);
             if (pShot == NULL) {
@@ -2475,7 +2476,7 @@ void GolfCamera_ProcessFECamera(View* pView, int nPlayer) {
             }
             break;
         }
-        pView->script.n114 = gpCrAPState->n0;
+        pView->script.n114 = gpCrAPState->nScreenKind;
         if (pShot == NULL) {
             return;
         }
@@ -2543,7 +2544,7 @@ void GolfCamera_SwitchCrAPCamera(View* pView, char* szName, int nShot, u8 bBlend
     }
     // EA bug: pB4 may be NULL (tested above for the 'f' names), but it is read here without a test.
     pView->script.n110 = gpCrAPState->pB4->nGolferId;
-    pView->script.n114 = gpCrAPState->n0;
+    pView->script.n114 = gpCrAPState->nScreenKind;
     if (gpCrAPState->pB4->bLoaded) {
         CamScript_RunFEScript(0, pCam, pSub, &pView->script, &pView->shot19C, 0, FRAME_TIME);
     }
