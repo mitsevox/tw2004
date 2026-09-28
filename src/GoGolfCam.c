@@ -51,7 +51,7 @@ f32      fn_800C54FC(View* pView, f32* pCam, f32* pSub, int nPlayer);
 f32      fn_800C5A70(View* pView, f32* pCam, f32* pSub, int nPlayer);
 u8       fn_800C7450(void);
 u8       fn_8012022C(void);                            // (sweep code) lbl_80281900's +0x370 is nonzero
-void     fn_8001966C(Character* pChar);                 // char.c
+void     Character_AlignCharacterForShotImpact(Character* pChar);                 // char.c
 void     fn_8007325C(u8* pAnim);                        // set bit 2 of the animation player's flags
 u8       fn_800C3FC0(View* pView, int nPlayer, f32* pSub, f32* pAim, f32* pCam);
 u8       fn_800C43C0(View* pView, int nPlayer);
@@ -1934,7 +1934,7 @@ void GolfCamera_InitBallFlightCamera(View* pView, int nPlayer) {
     pView->script.pB8 = NULL;
     if (fn_800C43C0(pView, nPlayer)) {
         lbl_80282220->b54 = 1;
-        fn_8001966C(gPlayers[nPlayer].pChar);
+        Character_AlignCharacterForShotImpact(gPlayers[nPlayer].pChar);
         fn_8007325C(gPlayers[nPlayer].pChar->anim);
         fn_800C4FF0(pView, pCam, pSub, nPlayer);
         pView->script.f108 = 0.0f;

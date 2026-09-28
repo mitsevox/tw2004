@@ -702,7 +702,7 @@ Added 2026-09-27 (from the ledgers solved that night; each ledger has the full s
 - **[verified] The frontend keeps a variable's name only for its FIRST web; each later independent
   web becomes a frontend temp** (@N, numbered after the loop IVs and CSE temps, in first-def order,
   and coloured before every local). Both directions are levers: a fresh local per job stays a
-  local (char fn_80019798: k/m for the second name loop, 28 -> 0; skalib AnimLib_PlanBank `pWork`,
+  local (char Character_LoadTextures: k/m for the second name loop, 28 -> 0; skalib AnimLib_PlanBank `pWork`,
   own `n`; LLTex TX_spParseTextureGroupFromStream palette counter k); reusing a variable makes the
   later web a temp (skalib AnimLib_MergeOverlay: i also as the overlay search counter gives EA's
   `mr` IV copy, 97.36 -> 100). Giving a pointer an earlier dummy use turns its later array webs
@@ -792,7 +792,7 @@ Added 2026-09-27 (from the ledgers solved that night; each ledger has the full s
 
 - **[verified] Unity builds**: char.o's `.data` would start at 0x801870FC, which our 8-aligned
   sections cannot do; `#include "char_tex_manager.c"` into char.c (one TU, as TW07's
-  golf2_unity.cpp) links it (char fn_80019798 ledger). Suspect one when a unit's data starts
+  golf2_unity.cpp) links it (char Character_LoadTextures ledger). Suspect one when a unit's data starts
   off 8-byte alignment.
 - **[verified] 4-byte `.sbss` gaps before 8-aligned small globals**: `__attribute__((aligned(8)))`
   on the two u8s links LLTex (labelled fake; likely several EA files there, boundaries at the gaps).
@@ -869,7 +869,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
 - **[verified] EA's late parameter copy (`mr r0,r3 ... mr rN,r0`): copy the parameter into a local
   through `void*`**: `Character* pChar = (Character*)(void*)pArg;`. A plain copy or a same-type cast
   is coalesced back into the parameter; the `void*` detour survives. Where the copy is declared
-  matters. char fn_80019DE8 22 -> 0, fn_80019EF4 23 -> 0, fn_8001A14C 21 -> 0 diffs.
+  matters. char Character_BeginLoadTexturesCallbackFE 22 -> 0, Character_BeginSwapTexturesCallbackFE 23 -> 0, Character_BeginLoadTexturesCallbackIG 21 -> 0 diffs.
 - **[verified] Write index loops, not pointer walks**: EA's pointer registers come from CodeWarrior
   strength-reducing `p[i]`. LLFont fn_80011D0C 7 -> 0 (`pLine[n]` instead of a `pCut` walk),
   LLDynTex fn_8010A930 123 -> 105 (`pIndices[i]`).

@@ -380,7 +380,8 @@ void fn_8008B4C0(void) {
     Character_SetClubsAndClothes(lbl_80281EE0->pB8->pChar, lbl_80281ED4->nSlot);
     SkinPart_SetChangeAllCopies(0);
     fn_8010B098(lbl_80281EE0->pB8->pChar->a64[lbl_80281EE0->pB8->pChar->n74]);
-    Character_AddTextureLoadRequest(lbl_80281EE0->pB8->pChar, fn_80019DE8, fn_80019E80);
+    Character_AddTextureLoadRequest(lbl_80281EE0->pB8->pChar, Character_BeginLoadTexturesCallbackFE,
+                                    Character_EndLoadTexturesCallbackFE);
 }
 
 void fn_8008B570(void) {
@@ -408,7 +409,8 @@ void fn_8008B5FC(void) {
 // State 4: set up the golfer shown.
 void fn_8008B61C(void) {
     Character_SetClubsAndClothes(lbl_80281EE0->pB4->pChar, lbl_80281ED4->nSlot);
-    Character_AddTextureLoadRequest(lbl_80281EE0->pB4->pChar, fn_80019EF4, fn_8001A0FC);
+    Character_AddTextureLoadRequest(lbl_80281EE0->pB4->pChar, Character_BeginSwapTexturesCallbackFE,
+                                    Character_EndSwapTexturesCallbackFE);
 }
 
 void fn_8008B674(void) {

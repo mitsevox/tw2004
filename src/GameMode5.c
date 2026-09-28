@@ -41,7 +41,7 @@ void fn_800EAEB8(void);
 void fn_800EAEEC(UStreamObject* pObject);
 
 int   fn_800ED028(int i);
-void  fn_80019648(void);
+void  Character_PreHoleInit(void);
 void  fn_800EBEF0(void);
 void  fn_800EAD6C(void);
 void  fn_800EBD28(void);
@@ -1139,7 +1139,7 @@ void fn_800ED554(void) {
     } else {
         fn_800EAF7C();
     }
-    fn_80019648();
+    Character_PreHoleInit();
 }
 
 // Hole finished: always after a restart; otherwise the mode's own test.

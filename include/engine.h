@@ -199,7 +199,7 @@ typedef struct TexEntry {
     s8   n41;                   // 0x41  (fn_80045FC8)
     u8   unk42[0x46 - 0x42];
     s8   b46;                   // 0x46  bit 0: clamp in s, bit 1: clamp in t (else repeat)
-    u8   b47;                   // 0x47  bit 0: the next texture goes with it (char.c fn_80019798);
+    u8   b47;                   // 0x47  bit 0: the next texture goes with it (char.c Character_LoadTextures);
                                 //       bit 0x40: byte-swapped (fn_8001DD18)
     u8   unk48[0x50 - 0x48];
 } TexEntry;

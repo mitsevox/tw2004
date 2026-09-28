@@ -159,7 +159,7 @@ Functions still unnamed or named from TW06:
 | `801220D4` | `TibExtMemAlloc` | `TibExtMemAlloc` | strong | both builds: Xbox anchor(1), PS2 xbox:anchor(1) |
 | `8000C140` | `fn_8000C140` | `wn_PnPoly` | medium | PS2 nbr(r7,2) |
 | `8000C594` | `Ter_GetTGD` | `Ter_TerrainGameDataMgr::GetTGD` | medium | PS2 calls(r0,8) |
-| `8001966C` | `fn_8001966C` | `Character_AlignCharacterForShotImpact` | medium | PS2 nbr(r1,2) |
+| `8001966C` | `Character_AlignCharacterForShotImpact` | `Character_AlignCharacterForShotImpact` | medium | PS2 nbr(r1,2) |
 | `8001FCF4` | `fn_8001FCF4` | `SKA_Update` | medium | PS2 nbr(r4,2) |
 | `80026BF4` | `fn_80026BF4` | `SKEL_TransformIKChain` | medium | Xbox calls(r0,1) |
 | `80026D18` | `fn_80026D18` | `SKEL_ItterateIKChain` | medium | Xbox anchor(1)+graph |

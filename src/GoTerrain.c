@@ -15,7 +15,7 @@
 #include "dynobj.h"
 #include "unsorted/cull.h"
 
-void  fn_80019358(Character* pChar, f32* pDir, f32 f);
+void  Character_SetOrientationVec(Character* pChar, f32* pDir, f32 f);
 void  fn_800F199C(f32 x, f32 y, f32 z);
 f32   fn_8001414C(u8* p);
 f32   Math_Tan(f32 x);           // tan
@@ -2064,7 +2064,7 @@ void fn_800348DC(void) {
         const char* aClips[3] = {"flagcalm", "flagbrzy", "flagwind"};
         int n;
 
-        fn_80019358(pFlag, vWind, 0.0f);
+        Character_SetOrientationVec(pFlag, vWind, 0.0f);
         if (fSpeed < 5.0f) {
             n = 0;
         } else if (fSpeed < 13.0f) {

@@ -77,7 +77,7 @@ void  fn_8001A798(void);
 void  fn_8001A7C8(void);
 Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, SkinChoices* pChoices);
 CharSkinSet* fn_8001B208(u8* pData);
-Character* fn_8001942C(void);
+Character* Character_Create(void);
 s32   fn_800962F8(Character* pChar);                            // CharAnim.c
 void  Character_SetSkin(Character* pChar, Skin* pSkin);
 void  Character_SetPreferedPos(Character* pChar);
@@ -132,7 +132,7 @@ void  Quat_Invert(f32* pQ, f32* pOut);                          // Quaternion.c
 void  Quat_RotateVector(f32* pQ, f32* pIn, f32* pOut);                // Quaternion.c: a vector turned by pQ
 void  fn_800280E8(Character* pChar, f32* pPos, int bPlace);     // Skeleton.c
 void  fn_8001EFB4(f32* pA, f32* pB, f32* pOut);
-void  fn_8001A14C(Character* pChar);
+void  Character_BeginLoadTexturesCallbackIG(Character* pChar);
 void  fn_8001D6D8(int n);
 void  fn_8010B098(void* pModel);                                // LLDynTex.c
 void  fn_800958EC(AnimPlayer* pAnim, s32 n, f32 f);            // CharAnim.c
@@ -852,9 +852,10 @@ void Character_IKLegsToGround(Character* pChar, u8 bLegA, u8 bLegB) {
     }
 }
 
-// Bends leg nLeg (bones A, B, C and D down the leg, test points nPoint and nOther under it) so its
-// foot stands on the ground: the knee (B) and hip (A) are turned so bone C reaches the ground height
-// under nPoint, then C is tilted towards the ground's slope, more the deeper the foot sat.
+// Bends leg nLeg (0 right, 1 left; its hip, knee, ankle and toe bones, and its ankle and toe test
+// points) so its foot stands on the ground: the knee and hip are turned so the ankle reaches the
+// ground height under the ankle point, then the ankle is tilted towards the ground's slope, more
+// the deeper the foot sat.
 void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, int nBoneA, int nBoneB,
                              int nBoneC, int nBoneD, int nPoint, int nOther) {
     f32 vOld[4];
@@ -1038,8 +1039,8 @@ void Character_SetPosition(Character* pChar, f32* pPos, u8 bPlace) {
     }
 }
 
-// Turns the character's root bone to fAngle about y (half a turn more in game type 3 while the
-// model's bEE is set).
+// Turns the character's root bone to yaw fAngle (radians about y). A left-handed golfer is turned
+// half a turn more in game type 3 (a front-end type; TW07 asks GM_IsFrontEnd here).
 void Character_SetOrientation(Character* pChar, f32 fAngle) {
     if (pChar != NULL) {
         if (gSession.nGameType == 3 && Character_IsLeftHanded(pChar)) {
@@ -1049,9 +1050,9 @@ void Character_SetOrientation(Character* pChar, f32 fAngle) {
     }
 }
 
-// Turns the character to face along pDir (level: up is y), plus fAngle; a direction shorter than
-// 0.01 is ignored.
-void fn_80019358(Character* pChar, f32* pDir, f32 fAngle) {
+// Turns the character to face along pDir, levelled (up is y), plus fAngle of extra yaw; a direction
+// shorter than 0.01 is ignored.
+void Character_SetOrientationVec(Character* pChar, f32* pDir, f32 fAngle) {
     f32 fLen;
     f32 mtx[4][4];              // row 3 is left unset (mat44flt_ExtractEulerAngles reads rows 0..2)
     f32 fYaw;
@@ -1074,9 +1075,9 @@ void fn_80019358(Character* pChar, f32* pDir, f32 fAngle) {
     }
 }
 
-// Makes a character: its four data buffers, both blend trees and animation players, and every
-// field that starts at a value.
-Character* fn_8001942C(void) {
+// Allocates a character (static memory) and sets it up: its four data buffers, both blend trees and
+// animation players, its SKA tags reset, and every field that starts at a value.
+Character* Character_Create(void) {
     Character* pChar;
     SKABlendNode* pNode;
     int i;
@@ -1151,14 +1152,18 @@ Character* fn_8001942C(void) {
     return pChar;
 }
 
-void fn_80019648(void) {
+// The characters' set-up before a hole (and on a restart): with more than two players, the dynamic
+// textures go to the player with the honor (fn_8001A4BC).
+void Character_PreHoleInit(void) {
     fn_80095554();
     fn_8001A4BC();
 }
 
-// Replays the character's blend at its event 2: fAnimTime from f180, event 2's time in the blend
-// (fn_8001F02C) and v1638[1], then one animation update of no length.
-void fn_8001966C(Character* pChar) {
+// Poses the character at the moment of impact: the blend's time set to its event 2 (the ball hit;
+// fAnimTime from f180, that event's time in the blend and v1638[1]), u10 bits 0x10000, 8 and 4 set
+// (4: the update sets it up for the shot), then one animation update of no length with the
+// skeleton's clip cleared.
+void Character_AlignCharacterForShotImpact(Character* pChar) {
     if (pChar != NULL && pChar->pBlend != NULL) {
         pChar->u10 |= 0x10000;
         pChar->u10 |= 8;
@@ -1170,8 +1175,9 @@ void fn_8001966C(Character* pChar) {
     }
 }
 
-// Give back the character's pool entries and free what it holds.
-void fn_8001971C(Character* pChar) {
+// Frees the character's textures: gives back its dynamic texture pool entries, frees the texture
+// and palette tables Character_LoadTextures made, and closes its texture file.
+void Character_FreeTextures(Character* pChar) {
     fn_8001A3B0(pChar);
     if (pChar->pA8 != NULL) {
         StaticMem_Free(pChar->pA8);
@@ -1194,7 +1200,7 @@ void fn_8001971C(Character* pChar) {
 // bank78: in the front end (game types 10 and 3) all of them; otherwise, for each name the skins
 // use (fn_800CE8C0), the texture of that name (and the one after it when it goes with it) with its
 // palette, or an empty one. Then it opens the golfer's texture file.
-void fn_80019798(Character* pChar, Skin** apSkins, int nSkins) {
+void Character_LoadTextures(Character* pChar, Skin** apSkins, int nSkins) {
     TexEntry* pTexData;
     TexPalette* pPalData;
     int nTex;
@@ -1311,21 +1317,26 @@ void fn_80019798(Character* pChar, Skin** apSkins, int nSkins) {
     pChar->hFile = fn_800060E0(pChar->szE1);
 }
 
-void fn_80019C1C(Character* pChar) {
+// Copies every skin's newest choices (copy 3, see SkinPart_SetChangeAllCopies) down to copy 2, as a
+// texture load starts.
+void Character_CopySkinChoices3To2(Character* pChar) {
     int i;
     for (i = 0; i < pChar->nSkins; i++) {
         fn_800CEE04(pChar->apSkins[i], 3, 2);
     }
 }
 
-void fn_80019C84(Character* pChar) {
+// Copies every skin's choices from copy 2 down to copy 1, as a texture load ends.
+void Character_CopySkinChoices2To1(Character* pChar) {
     int i;
     for (i = 0; i < pChar->nSkins; i++) {
         fn_800CEE04(pChar->apSkins[i], 2, 1);
     }
 }
 
-void fn_80019CEC(Character* pChar) {
+// Copies every skin's choices from copy 1 down to copy 0, the one shown, and flags each skin's
+// choices changed (bit 0x1 of u10D4).
+void Character_CopySkinChoices1To0(Character* pChar) {
     int i;
     for (i = 0; i < pChar->nSkins; i++) {
         fn_800CEE04(pChar->apSkins[i], 1, 0);
@@ -1333,8 +1344,9 @@ void fn_80019CEC(Character* pChar) {
     }
 }
 
-// Queues a dynamic texture job (LLDynTex.c) for the character with its two functions; the pool's
-// last entry points at the character, or at nothing when no job is free.
+// Queues a dynamic texture load (LLDynTex.c) for the character, with the callbacks run as it begins
+// and as it ends (the Begin/End ...Callback functions). The pool's last entry points at the
+// character queued, or at nothing when no job is free.
 void Character_AddTextureLoadRequest(Character* pChar, void (*pfnA)(Character* pChar),
                                      void (*pfnB)(Character* pChar)) {
     DynTexJob* pJob = fn_8010B8EC();
@@ -1351,8 +1363,11 @@ void Character_AddTextureLoadRequest(Character* pChar, void (*pfnA)(Character* p
     }
 }
 
-// Sets up the dynamic textures (LLDynTex.c) for the character's model in use.
-void fn_80019DE8(Character* pArg) {
+// The front end's begin callback of a texture load (the golfer that came in): sets up the dynamic
+// textures of the character's model in use for the skins' newest choices
+// (Character_CopySkinChoices3To2): the name codes the choices do not use and the ones they need go
+// to its dynamic textures (fn_800CEB1C, fn_800CEBE8).
+void Character_BeginLoadTexturesCallbackFE(Character* pArg) {
     // fake match: a copy of the parameter through void* (a plain copy is merged into it)
     Character* pChar = (Character*)(void*)pArg;
     void* pModel = pChar->a64[pChar->n74];
@@ -1362,25 +1377,29 @@ void fn_80019DE8(Character* pArg) {
     fn_8010BC88(&pChar->p50);
     // port: EA passes an argument fn_8010BEC4 ignores
     ((void (*)(void*))fn_8010BEC4)(pModel);
-    fn_80019C1C(pChar);
+    Character_CopySkinChoices3To2(pChar);
     fn_800CEB1C(pChar->apSkins, pChar->nSkins, pModel);
     fn_800CEBE8(pChar->apSkins, pChar->nSkins, pModel, NULL, 0);
     // port: EA passes an argument fn_8010BED4 ignores
     ((void (*)(void*))fn_8010BED4)(pModel);
 }
 
-// Puts the profile's created golfer's logos on the character's model in use.
-void fn_80019E80(Character* pChar) {
-    fn_80019C84(pChar);
-    fn_80019CEC(pChar);
+// The front end's end callback of a texture load (the golfer that came in): passes the skins'
+// choices down to copy 0, puts the profile's logos on the model in use, and sets the menu's b81
+// (fn_8008EA38).
+void Character_EndLoadTexturesCallbackFE(Character* pChar) {
+    Character_CopySkinChoices2To1(pChar);
+    Character_CopySkinChoices1To0(pChar);
     sApplyUserLogos(pChar, pChar->a64[pChar->n74], &FE_GetCurrentProfile()->choices);
     fn_8010BA2C(pChar->a64[pChar->n74]);
     fn_8008EA38(1);
 }
 
-// Sets up the dynamic textures on the character's other model: the model in use is copied to it
-// (fn_8010A6A8) and each skin choice that differs from the skin's current one is put on it.
-void fn_80019EF4(Character* pArg) {
+// The front end's begin callback of a texture swap (the golfer shown): copies the model in use to
+// the character's other model (fn_8010A6A8), puts on it each skin choice that differs from the
+// skin's current one, and sets up its dynamic textures for the newest choices.
+// Character_ExecuteTextureSwapFE switches to it.
+void Character_BeginSwapTexturesCallbackFE(Character* pArg) {
     int i;
     int j;
     Skin* pSkin;
@@ -1403,15 +1422,16 @@ void fn_80019EF4(Character* pArg) {
             }
         }
     }
-    fn_80019C1C(pChar);
+    Character_CopySkinChoices3To2(pChar);
     fn_800CEB1C(pChar->apSkins, pChar->nSkins, pModel);
     fn_800CEBE8(pChar->apSkins, pChar->nSkins, pModel, NULL, 0);
     // port: EA passes an argument fn_8010BED4 ignores
     ((void (*)(void*))fn_8010BED4)(pModel);
 }
 
-// Once the menu golfer is flagged (fn_8008EAD4): switches the character to its other model and
-// puts the profile's logos and the skins on it.
+// Once a swap is due (fn_8008EAD4, set by Character_EndSwapTexturesCallbackFE): switches the
+// character to its other model, the one the swap loaded, passes the skins' choices down to copy 0
+// and puts the profile's logos and the skins on it.
 void Character_ExecuteTextureSwapFE(Character* pChar) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     int i;
@@ -1422,7 +1442,7 @@ void Character_ExecuteTextureSwapFE(Character* pChar) {
         fn_8008E918(0);
         pChar->n74 = 1 - pChar->n74;
         pModel = pChar->a64[pChar->n74];
-        fn_80019CEC(pChar);
+        Character_CopySkinChoices1To0(pChar);
         sApplyUserLogos(pChar, pModel, &pProfile->choices);
         fn_8010BA2C(pModel);
         fn_80008380();
@@ -1433,8 +1453,10 @@ void Character_ExecuteTextureSwapFE(Character* pChar) {
     }
 }
 
-void fn_8001A0FC(Character* pChar) {
-    fn_80019C84(pChar);
+// The front end's end callback of a texture swap: passes the skins' choices down to copy 1, flags
+// the swap due (fn_8008EAC8) and, unless the menu delays it (fn_8008E938), swaps now.
+void Character_EndSwapTexturesCallbackFE(Character* pChar) {
+    Character_CopySkinChoices2To1(pChar);
     fn_8008E918(2);
     fn_8008EAC8(1);
     if (fn_8008E938() == 0) {
@@ -1442,10 +1464,11 @@ void fn_8001A0FC(Character* pChar) {
     }
 }
 
-// Sets up the dynamic textures for the character's model in use (fn_8010B098), dresses it
-// (Character_SetClubsAndClothes) and puts its skins on the model; the last marked player (lbl_80281CAC) is
-// dressed again.
-void fn_8001A14C(Character* pArg) {
+// The in-game begin callback of a texture load: sets up the dynamic textures of the character's
+// model in use (fn_8010B098), dresses it (Character_SetClubsAndClothes) and hands its dynamic
+// textures the name codes the skins' newest choices need (fn_800CEBE8, given the "Glove" part's
+// id); the last marked player (lbl_80281CAC) is dressed again.
+void Character_BeginLoadTexturesCallbackIG(Character* pArg) {
     // fake match: a copy of the parameter through void* (a plain copy is merged into it)
     Character* pChar = (Character*)(void*)pArg;
     u64 uGlove;
@@ -1458,7 +1481,7 @@ void fn_8001A14C(Character* pArg) {
     // port: EA passes an argument fn_8010BEC4 ignores
     ((void (*)(void*))fn_8010BEC4)(pModel);
     Character_SetClubsAndClothes(pChar, pChar->nPlayer);
-    fn_80019C1C(pChar);
+    Character_CopySkinChoices3To2(pChar);
     SKA_PackName(&uGlove, "Glove");
     fn_800CEBE8(pChar->apSkins, pChar->nSkins, pModel, &uGlove, 1);
     if (lbl_80281CAC >= 0) {
@@ -1468,9 +1491,12 @@ void fn_8001A14C(Character* pArg) {
     ((void (*)(void*))fn_8010BED4)(pModel);
 }
 
-void fn_8001A20C(Character* pChar) {
-    fn_80019C84(pChar);
-    fn_80019CEC(pChar);
+// The in-game end callback of a texture load: passes the skins' choices down to copy 0, puts the
+// created golfer's logos on the model in use, marks the character's textures loaded (bE0) and
+// clears the pool's queued character.
+void Character_EndLoadTexturesCallbackIG(Character* pChar) {
+    Character_CopySkinChoices2To1(pChar);
+    Character_CopySkinChoices1To0(pChar);
     sApplyUserLogos(pChar, pChar->a64[pChar->n74], pChar->pChoices);
     fn_8010BA2C(pChar->a64[pChar->n74]);
     pChar->bE0 = 1;
@@ -1556,7 +1582,8 @@ void fn_8001A4BC(void) {
         i = gpGame->pfnGetHonors(5);
         pChar = gPlayers[i].pChar;
         fn_8001A418(pChar);
-        Character_AddTextureLoadRequest(pChar, fn_8001A14C, fn_8001A20C);
+        Character_AddTextureLoadRequest(pChar, Character_BeginLoadTexturesCallbackIG,
+                                        Character_EndLoadTexturesCallbackIG);
         fn_8010BF68();
     }
 }
@@ -1595,7 +1622,8 @@ void fn_8001A58C(int nPlayer) {
                     pQueued->u10 |= 0x40;
                 }
                 fn_8001A418(pChar);
-                Character_AddTextureLoadRequest(pChar, fn_8001A14C, fn_8001A20C);
+                Character_AddTextureLoadRequest(pChar, Character_BeginLoadTexturesCallbackIG,
+                                                Character_EndLoadTexturesCallbackIG);
                 fn_8010BF68();
             } else {
                 fn_8010BF68();
@@ -1607,7 +1635,8 @@ void fn_8001A58C(int nPlayer) {
             if (!pChar->bE0 && pChar != lbl_801B95E8.a[6].p) {
                 fn_8010BF68();
                 fn_8001A418(pChar);
-                Character_AddTextureLoadRequest(pChar, fn_8001A14C, fn_8001A20C);
+                Character_AddTextureLoadRequest(pChar, Character_BeginLoadTexturesCallbackIG,
+                                                Character_EndLoadTexturesCallbackIG);
             }
         }
     }
@@ -1684,7 +1713,8 @@ void fn_8001A920(void) {
         for (i = 0; i < gSession.nNumPlayers; i++) {
             pChar = gPlayers[i].pChar;
             fn_8001A418(pChar);
-            Character_AddTextureLoadRequest(pChar, fn_8001A14C, fn_8001A20C);
+            Character_AddTextureLoadRequest(pChar, Character_BeginLoadTexturesCallbackIG,
+                                            Character_EndLoadTexturesCallbackIG);
             fn_8010BF68();
             if (gSession.nSplitScreen) {
                 fn_8001D6D8(i);
@@ -1731,7 +1761,7 @@ Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, Skin
     u8 bGolfer;
     int bModel;
 
-    pChar = fn_8001942C();
+    pChar = Character_Create();
     if (pChar == NULL) {
         return NULL;
     }
@@ -2266,7 +2296,7 @@ void fn_8001C0E0(Character* pChar) {
             StaticMem_Free(pChar->pRecords);
         }
         if (Character_IsGolfer(pChar)) {
-            fn_8001971C(pChar);
+            Character_FreeTextures(pChar);
         }
         if (pChar->p17AC != NULL) {
             CharSlider_Free(pChar->p17AC);
@@ -2546,7 +2576,7 @@ void Character_SetupForShot(Character* pChar) {
     }
     fn_8001EFB4(pPlayer->vTarget, pBallPos, vDir);
     vDir[1] = 0.0f;
-    fn_80019358(pChar, vDir, 0.0f);
+    Character_SetOrientationVec(pChar, vDir, 0.0f);
     Quat_Copy(pModel->pBones[0].q0C, pModel->pPoses[0].q0);
     Quat_Copy(pModel->pBones[0].v1C, pModel->pPoses[0].v10);
     Quat_QuatToMatrix(pModel->pPoses[0].q0, pModel->pMatrices[0]);
@@ -2684,7 +2714,7 @@ void fn_8001CE5C(UStreamObject* pObject) {
                 pChar->apSkins[5] = pChar->p16D8->apSkins[4];
                 pChar->apSkins[6] = pChar->p16D8->apSkins[5];
                 pChar->nSkins = 7;
-                fn_80019798(pChar, pChar->apSkins, pChar->nSkins);
+                Character_LoadTextures(pChar, pChar->apSkins, pChar->nSkins);
             }
         }
     }
@@ -2718,7 +2748,7 @@ void fn_8001D020(UStreamObject* pObject) {
     lbl_80281EE0->pB8->pChar = fn_8001A9F4(pCopy->pData, 0, 0, pCopy->uId, 0, NULL);
     StaticMem_StopCount();
     StaticMem_GetCount();
-    fn_80019798(lbl_80281EE0->pB8->pChar, NULL, 0);
+    Character_LoadTextures(lbl_80281EE0->pB8->pChar, NULL, 0);
     fn_8008F35C();
     lbl_80281EE0->pB8->pChar->n16C = -1;
     Character_SetPosition(lbl_80281EE0->pB8->pChar, lbl_80189A30, 1);
@@ -2875,7 +2905,7 @@ void fn_8001D6F0(void) {
             fn_80008380();
             pChar = gPlayers[i].pChar;
             Character_SetClubsAndClothes(pChar, i);
-            fn_80019CEC(pChar);
+            Character_CopySkinChoices1To0(pChar);
             for (j = 0; j < pChar->nSkins; j++) {
                 fn_800CE170(pChar->apSkins[j], pChar->a64[pChar->n74]);
             }

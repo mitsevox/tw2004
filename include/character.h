@@ -115,7 +115,7 @@ typedef struct Skeleton {
     f32  (*p24)[4];             // 0x0024  a quaternion per bone
     f32  (*p28)[4];             // 0x0028  p20 at an IK weight of 0 or 1, otherwise p24
     struct Clip* pClip;         // 0x002C  its clip (Character_SetupForShot); cleared before and after
-                                //         fn_8001966C's animation update
+                                //         Character_AlignCharacterForShotImpact's animation update
     SkelPose pose;              // 0x0030  (Character_SetupForShot passes it to SKEL_UpdateState)
     f32  fIKWeight;             // 0x1070  SKEL_SetIKSolutionWeight
     f32  f1074;                 // 0x1074  } set by SKEL_RelaxIK and SKEL_TransitionIK
@@ -564,19 +564,19 @@ typedef struct Character {
     struct CharEntry44* p44;    // 0x044  } freed with the character (fn_8001C0E0)
     s32   n48;                  // 0x048  a texture bank slot (LLTexGrp.c), freed with it when >= 0
     u8*   p4C;                  // 0x04C  where its CHR object's data ends (fn_8001A9F4)
-    TexBank* p50;               // 0x050  its texture bank, bank78 (fn_80019798); LLDynTex.c is given
-                                //        this field's address (fn_80019DE8)
-    s32   hFile;                // 0x054  a file closed with it (fn_8001971C), -1 none
-    s32   n58;                  // 0x058  } from its CHR object's texture header (fn_80019798)
+    TexBank* p50;               // 0x050  its texture bank, bank78 (Character_LoadTextures); LLDynTex.c is given
+                                //        this field's address (Character_BeginLoadTexturesCallbackFE)
+    s32   hFile;                // 0x054  a file closed with it (Character_FreeTextures), -1 none
+    s32   n58;                  // 0x058  } from its CHR object's texture header (Character_LoadTextures)
     s32   n5C;                  // 0x05C  } 0 without palettes
-    void* p60;                  // 0x060  the entry of a64 fn_80019DE8 set up
+    void* p60;                  // 0x060  the entry of a64 Character_BeginLoadTexturesCallbackFE set up
     void* a64[2];               // 0x064  } entries taken from lbl_801B95E8 (fn_8001A418), and their
     s8    a6C[2];               // 0x06C  } indices there (-1 once given back)
     u8    unk6E[2];
     s32   n70;                  // 0x070  how many of a64 it takes
-    s32   n74;                  // 0x074  the one of a64 fn_80019E80 uses
-    TexBank bank78;             // 0x078  its textures (fn_80019798)
-    TexEntry* pA8;              // 0x0A8  } bank78's tables, freed by fn_8001971C
+    s32   n74;                  // 0x074  the one of a64 Character_EndLoadTexturesCallbackFE uses
+    TexBank bank78;             // 0x078  its textures (Character_LoadTextures)
+    TexEntry* pA8;              // 0x0A8  } bank78's tables, freed by Character_FreeTextures
     s32   nAC;                  // 0x0AC  how many textures pA8 holds
     TexPalette* pB0;            // 0x0B0  }
     s32   nB4;                  // 0x0B4  how many palettes pB0 holds
@@ -584,7 +584,7 @@ typedef struct Character {
     void* pBC;                  // 0x0BC  } a byte per palette
     struct Skin* apSkins[7];    // 0x0C0  its skins: the body's, then its attachments' (fn_8001CE5C)
     s32   nSkins;               // 0x0DC
-    u8    bE0;                  // 0x0E0  cleared by fn_8001A3B0, set by fn_8001A20C
+    u8    bE0;                  // 0x0E0  cleared by fn_8001A3B0, set by Character_EndLoadTexturesCallbackIG
     char  szE1[0x164 - 0xE1];   // 0x0E1  its texture file's name, hFile (fn_8001A870); the size is
                                 //        unknown (up to the next known field)
     u8    anim[4];              // 0x164  the animation player (+0x14 is its playback rate)
@@ -596,7 +596,7 @@ typedef struct Character {
     f32   f174;                 // 0x174  }   (CharacterState_UpdateSKAState; fn_800958EC sets both)
     u8    unk178[0x17C - 0x178];
     f32   fAnimTime;            // 0x17C
-    f32   f180;                 // 0x180  fn_8001966C: fAnimTime = f180 + the blend's time - v1638[1]
+    f32   f180;                 // 0x180  Character_AlignCharacterForShotImpact: fAnimTime = f180 + the blend's time - v1638[1]
     f32   fAnimEnd;             // 0x184  the animation's end time
     u8    unk188[0x198 - 0x188];
     f32   f198;                 // 0x198  } set to 0 and the animation time when state 8 starts
@@ -623,7 +623,7 @@ typedef struct Character {
     f32   v1638[3];             // 0x1638
     f32   f1644;                // 0x1644
     u8    unk1648[0x1650 - 0x1648];
-    s32   n1650;                // 0x1650  cleared by fn_8001942C
+    s32   n1650;                // 0x1650  cleared by Character_Create
     s32   n1654;                // 0x1654  (fn_8001EE90)
     s32   n1658;                // 0x1658
     f32   f165C;                // 0x165C  } scaled by the view's lens (fn_8001EE00, fn_8001ED44)
@@ -660,18 +660,18 @@ typedef struct Character {
     Clip* p1790;                // 0x1790  cleared by fn_80062BFC; CharacterState_AddSKABlendData plays it for
                                 //         groups 5, 6 and 10
     void* p1794;                // 0x1794  cleared by fn_80062BE8; the same for group 9
-    Clip* p1798;                // 0x1798  cleared by fn_8001942C; with n2C 6, fn_8001C650 and
+    Clip* p1798;                // 0x1798  cleared by Character_Create; with n2C 6, fn_8001C650 and
                                 //         Character_SetupForShot set n16D4 to 4 when it is 0
     f32   a179C[4];             // 0x179C  cleared by Character_PlaceFeetOnGround; Character_KeepClubOutOfGround acts only
                                 //         while a179C[1] is above 0.9
     void* p17AC;                // 0x17AC  its slider definitions (CharSlider_CreateDefinitionsFromMem,
                                 //         fn_8001A9F4); fn_8001DC64 applies them
     void (*pfn17B0)(void);      // 0x17B0  called by Character_UpdateAnimation before the bones are
-                                //         transformed; cleared by fn_8001942C
-    s8    n17B4;                // 0x17B4  cleared by fn_8001942C; Skin.c hands it to fn_800CE02C as
+                                //         transformed; cleared by Character_Create
+    s8    n17B4;                // 0x17B4  cleared by Character_Create; Skin.c hands it to fn_800CE02C as
                                 //         the a10A0 index
     u8    unk17B5[0x17B8 - 0x17B5];
-    struct SkinChoices* pChoices;   // 0x17B8  its look (Character_SetClubsAndClothes dresses it from this); fn_8001A20C
+    struct SkinChoices* pChoices;   // 0x17B8  its look (Character_SetClubsAndClothes dresses it from this); Character_EndLoadTexturesCallbackIG
                                     //         puts its logos on the model (sApplyUserLogos)
 } Character;
 
@@ -1018,10 +1018,10 @@ void* Character_GetRandomMtaLib(Character* pChar, int nGroup, int n);   // char.
 
 // char.c: turning the character, and its dynamic textures (the menu golfer, FEgolferanim.c).
 void  Character_SetOrientation(Character* pChar, f32 fAngle);void  Character_AddTextureLoadRequest(Character* pChar, void (*pfnA)(Character* pChar), void (*pfnB)(Character* pChar));
-void  fn_80019DE8(Character* pChar);
-void  fn_80019E80(Character* pChar);
-void  fn_80019EF4(Character* pChar);
-void  fn_8001A0FC(Character* pChar);
+void  Character_BeginLoadTexturesCallbackFE(Character* pChar);
+void  Character_EndLoadTexturesCallbackFE(Character* pChar);
+void  Character_BeginSwapTexturesCallbackFE(Character* pChar);
+void  Character_EndSwapTexturesCallbackFE(Character* pChar);
 s32  AnimLib_MergeOverlay(u8* pData, int nSlot);   // skalib.c; char.c's 'SAC ' handler
 void  AnimLib_FreeWorkCopies(void);
 void  AnimLib_ReloadSlot(void);
