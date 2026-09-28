@@ -21,67 +21,90 @@ void fn_8011D878(int nKind, char* szTitle, char* szText);
 void fn_8011DA44(int nKind, char* szTitle, char* szText);
 void fn_8011DC30(int nKind, char* szTitle, char* szText);
 
-void fn_80116798(int nPlace, char* sz);
+void GetRankText(int nPlace, char* sz);
 void fn_80117264(u16 nDate, char* sz);
 u8   fn_801174B8(u32 nMonth, u32 nOther);
 u8   fn_801174E4(u32 nMonth, u32 nOther);
 
 // ---- no career: nothing to show -------------------------------------------------------------
 
-void* fn_80116540(u16 nDate) {
+// The online calendar driver's entry in the event-on-a-date table: always NULL, no day has an event
+// (the online driver is a stub in this build). The PGA TOUR and real-time drivers' entries return
+// the tournament or event on the date.
+void* Online_GetEventInfoByDate(u16 nDate) {
     return NULL;
 }
 
-void fn_80116548(void) {
+// Sets the online calendar driver up when the calendar screen switches to it: empty (the online
+// driver is a stub in this build).
+void Online_Init(void) {
 }
 
-u8 fn_8011654C(void) {
+// Whether the online calendar is at its earliest month (then it cannot go back one): never, 0
+// (stub).
+u8 Online_AtEarliest(void) {
     return 0;
 }
 
-u8 fn_80116554(void) {
+// Whether the online calendar is at its latest month (then it cannot go on one): never, 0 (stub).
+u8 Online_AtLatest(void) {
     return 0;
 }
 
-s32 fn_8011655C(char* sz, u16 nDate, s32* pLook, s32* pButton) {
+// The online calendar's day cell: leaves the text, color and state as they are and returns -1, no
+// icon (stub).
+s32 Online_FillCell(char* sz, u16 nDate, s32* pLook, s32* pButton) {
     return -1;
 }
 
-void fn_80116564(int nLine, char* sz) {
+// The online calendar's header lines: leaves the text as it is (stub).
+void Online_GetLine(int nLine, char* sz) {
 }
 
-void fn_80116568(u16 nDate, int n, char* sz) {
+// The online calendar's line under "Selected Day:": leaves the text as it is (stub).
+void Online_GetBottomLine(u16 nDate, int n, char* sz) {
 }
 
-s32 fn_8011656C(u16 nDate) {
+// The online calendar's day-details popup for a date: -1, none (stub).
+s32 Online_GetPopupType(u16 nDate) {
     return -1;
 }
 
-void fn_80116574(int nKind, char* szTitle, char* szText) {
+// A row of the online calendar's day-details popup: leaves the title and text as they are (stub).
+void Online_GetPopupRow(int nKind, char* szTitle, char* szText) {
 }
 
-u16 fn_80116578(void) {
+// The online calendar's current day: today's date from the clock (CalDate_GetToday).
+u16 Online_GetCurrentDay(void) {
     return CalDate_GetToday();
 }
 
-char* fn_80116598(u16 nDate) {
+// The name of the online event on a date: always "" (stub).
+char* Online_GetEventName(u16 nDate) {
     return "";
 }
 
-void fn_801165A0(void) {
+// The online calendar's play button: empty (stub).
+void Online_Play(void) {
 }
 
-u8 fn_801165A4(void) {
+// Whether events must be simulated before the online calendar's selected day can be played: never,
+// 0 (stub).
+u8 Online_IsSimulationNecessary(void) {
     return 0;
 }
 
 // ---- the PGA TOUR season ----------------------------------------------------------------------
 
-void fn_801165AC(void) {
+// Sets the PGA TOUR calendar driver up when the calendar screen switches to it: empty in this
+// build.
+void PGATour_Init(void) {
 }
 
-// The month shown is January of the current year: the calendar cannot go back.
-u8 fn_801165B0(void) {
+// Whether the PGA TOUR calendar shows January of the year of the career's current day
+// (lbl_80223C48.nToday): the season's first month, the calendar cannot go back from it. 1 there,
+// else 0.
+u8 PGATour_AtEarliest(void) {
     s32 nMonth;
     s32 nDay;
     s32 nYear;
@@ -95,8 +118,9 @@ u8 fn_801165B0(void) {
     return b;
 }
 
-// The month shown is December of the current year: the calendar cannot go on.
-u8 fn_80116614(void) {
+// Whether the PGA TOUR calendar shows December of the year of the career's current day: the
+// season's last month, the calendar cannot go on from it. 1 there, else 0.
+u8 PGATour_AtLatest(void) {
     s32 nMonth;
     s32 nDay;
     s32 nYear;
@@ -110,19 +134,19 @@ u8 fn_80116614(void) {
     return b;
 }
 
-void  fn_80116678(int nLine, char* sz);
-void  fn_801166E8(u16 nDate, int n, char* sz);
-s32   fn_80116858(char* sz, u16 nDate, s32* pLook, s32* pButton);
-s32   fn_80116AA0(u16 nDate);
-void  fn_80116B60(int nKind, char* szTitle, char* szText);
-u16   fn_80116CAC(void);
-char* fn_80116CE8(u16 nDate);
-void  fn_80116D28(void);
-u8    fn_80116D78(void);
-void  fn_80116DD4(void);
-u8    fn_80116DD8(void);
-u8    fn_80116E3C(void);
-s32   fn_80116EA4(char* sz, u16 nDate, s32* pLook, s32* pButton);
+void  PGATour_GetLine(int nLine, char* sz);
+void  PGATour_GetBottomLine(u16 nDate, int n, char* sz);
+s32   PGATour_FillCell(char* sz, u16 nDate, s32* pLook, s32* pButton);
+s32   PGATour_GetPopupType(u16 nDate);
+void  PGATour_GetPopupRow(int nKind, char* szTitle, char* szText);
+u16   PGATour_GetCurrentDay(void);
+char* PGATour_GetEventName(u16 nDate);
+void  PGATour_Play(void);
+u8    PGATour_IsSimulationNecessary(void);
+void  RealTime_Init(void);
+u8    RealTime_AtEarliest(void);
+u8    RealTime_AtLatest(void);
+s32   RealTime_FillCell(char* sz, u16 nDate, s32* pLook, s32* pButton);
 void  fn_80116F0C(int nLine, char* sz);
 void  fn_80116F80(u16 nDate, int n, char* sz);
 s32   fn_80116FA4(u16 nDate);
@@ -134,32 +158,35 @@ u8    fn_80117180(void);
 
 // The calendar screen's tables, indexed by CareerCalendar.nDriver: no career, the PGA TOUR season,
 // the real-time events. (Defined here, before the strings below, to keep EA's data order.)
-u8 (*lbl_80193E70[3])(void) = { fn_8011654C, fn_801165B0, fn_80116DD8 };
-u8 (*lbl_80193E7C[3])(void) = { fn_80116554, fn_80116614, fn_80116E3C };
+u8 (*lbl_80193E70[3])(void) = { Online_AtEarliest, PGATour_AtEarliest, RealTime_AtEarliest };
+u8 (*lbl_80193E7C[3])(void) = { Online_AtLatest, PGATour_AtLatest, RealTime_AtLatest };
 s32 (*lbl_80193E88[3])(char* sz, u16 nDate, s32* pLook, s32* pButton) = {
-    fn_8011655C, fn_80116858, fn_80116EA4
+    Online_FillCell, PGATour_FillCell, RealTime_FillCell
 };
-void (*lbl_80193E94[3])(int nLine, char* sz) = { fn_80116564, fn_80116678, fn_80116F0C };
-void (*lbl_80193EA0[3])(u16 nDate, int n, char* sz) = { fn_80116568, fn_801166E8, fn_80116F80 };
-s32 (*lbl_80193EAC[3])(u16 nDate) = { fn_8011656C, fn_80116AA0, fn_80116FA4 };
+void (*lbl_80193E94[3])(int nLine, char* sz) = { Online_GetLine, PGATour_GetLine, fn_80116F0C };
+void (*lbl_80193EA0[3])(u16 nDate, int n,
+                        char* sz) = { Online_GetBottomLine, PGATour_GetBottomLine, fn_80116F80 };
+s32 (*lbl_80193EAC[3])(u16 nDate) = { Online_GetPopupType, PGATour_GetPopupType, fn_80116FA4 };
 void (*lbl_80193EB8[3])(int nKind, char* szTitle, char* szText) = {
-    fn_80116574, fn_80116B60, fn_80117004
+    Online_GetPopupRow, PGATour_GetPopupRow, fn_80117004
 };
-u16 (*lbl_80193EC4[3])(void) = { fn_80116578, fn_80116CAC, fn_801170EC };
-void (*lbl_80193ED0[3])(void) = { fn_80116548, fn_801165AC, fn_80116DD4 };
-char* (*lbl_80193EDC[3])(u16 nDate) = { fn_80116598, fn_80116CE8, fn_8011710C };
+u16 (*lbl_80193EC4[3])(void) = { Online_GetCurrentDay, PGATour_GetCurrentDay, fn_801170EC };
+void (*lbl_80193ED0[3])(void) = { Online_Init, PGATour_Init, RealTime_Init };
+char* (*lbl_80193EDC[3])(u16 nDate) = { Online_GetEventName, PGATour_GetEventName, fn_8011710C };
 // port: the PGA TOUR and real-time drivers return their own event types through this void* entry
 void* (*lbl_80193EE8[3])(u16 nDate) = {
-    fn_80116540, (void* (*)(u16))fn_800EFC80, (void* (*)(u16))GM_RealtimeMode_GetEventInfoByDate
+    Online_GetEventInfoByDate, (void* (*)(u16))fn_800EFC80, (void* (*)(u16))GM_RealtimeMode_GetEventInfoByDate
 };
-void (*lbl_80193EF4[3])(void) = { fn_801165A0, fn_80116D28, fn_8011714C };
-u8 (*lbl_80193F00[3])(void) = { fn_801165A4, fn_80116D78, fn_80117180 };
+void (*lbl_80193EF4[3])(void) = { Online_Play, PGATour_Play, fn_8011714C };
+u8 (*lbl_80193F00[3])(void) = { Online_IsSimulationNecessary, PGATour_IsSimulationNecessary, fn_80117180 };
 
 // The calendar grid.
 CareerCalendar lbl_80223C48;
 
-// The calendar's text lines (lbl_80193E94): 1 today's event (or "Season Complete"), 2 nothing.
-void fn_80116678(int nLine, char* sz) {
+// The PGA TOUR calendar's header lines: line 1 today's tournament and round (fn_80117264), or
+// "Season Complete" once the season has no tournament left; line 2 empty. Other lines leave the
+// text as it is.
+void PGATour_GetLine(int nLine, char* sz) {
     switch (nLine) {
     case 1:
         if (lbl_80223C48.bSeasonOver) {
@@ -174,8 +201,9 @@ void fn_80116678(int nLine, char* sz) {
     }
 }
 
-// The event on a day and its round (line 2 under "Selected Day:"), or "No Event Scheduled".
-void fn_801166E8(u16 nDate, int n, char* sz) {
+// The PGA TOUR calendar's line under "Selected Day:" for a date: "Event: <name>, Round <n>" (the
+// round the tournament plays that day), or "No Event Scheduled". The line number is not used.
+void PGATour_GetBottomLine(u16 nDate, int n, char* sz) {
     char* szName = lbl_80193EDC[lbl_80223C48.nDriver](nDate);
     s32 nId;
     s32 nRound;
@@ -188,8 +216,9 @@ void fn_801166E8(u16 nDate, int n, char* sz) {
     sprintf(sz, "Event: %s, Round %d", szName, nRound + 1);
 }
 
-// A finishing place as text: "1st", "2nd", "3rd", "4th"...
-void fn_80116798(int nPlace, char* sz) {
+// A finishing place as text: "1st", "2nd", "3rd", "4th"..., by its last digit; 0 gives "".
+// EA bug: 11, 12 and 13 come out as "11st", "12nd" and "13rd".
+void GetRankText(int nPlace, char* sz) {
     if (nPlace == 0) {
         sz[0] = 0;
         return;
@@ -210,11 +239,16 @@ void fn_80116798(int nPlace, char* sz) {
     }
 }
 
-// A day's cell: the button text (on today: START on the tour's first round, CONTINUE on a later
-// one, none once the season is over; on the day before today in the tour's event, the place
-// GM_PgaTourSim_GetScoreRankFromEntrantID gives, as an ordinal), how the cell looks (*pLook) and the button (*pButton).
-// Returns the tournament's n10 (fn_800EFE3C) on its last round's day, else -1.
-s32 fn_80116858(char* sz, u16 nDate, s32* pLook, s32* pButton) {
+// The PGA TOUR calendar's day cell for a date. On a tournament day: the text is START (today, its
+// first round), CONTINUE (today, a later round; both on a second line) or empty, and *pCellState is
+// 1 START, 2 CONTINUE, 3 the first day of a later tournament than the current one, 4 no button (any
+// other day, and today once the season is over); on the day before today in the current tournament
+// the text becomes the player's place in it (GetRankText of
+// GM_PgaTourSim_GetScoreRankFromEntrantID). *pCellColor: 4 the current tournament, 5 a past
+// tournament the profile won, 2 other past days (today too once the season is over), 3 days to
+// come. Returns the tournament's calendar icon (fn_800EFE3C, its n10) on its last day, else -1. A
+// day without a tournament gets empty text, *pCellState 0 and -1.
+s32 PGATour_FillCell(char* sz, u16 nDate, s32* pLook, s32* pButton) {
     s32 nId;
     s32 nRound;
     s32 nSelRound;
@@ -244,7 +278,7 @@ s32 fn_80116858(char* sz, u16 nDate, s32* pLook, s32* pButton) {
             strcpy(sz, "");
         }
         if (nDate == lbl_80223C48.nToday - 1 && bSelected) {
-            fn_80116798(GM_PgaTourSim_GetScoreRankFromEntrantID(fn_80077B08(), 0), sz);
+            GetRankText(GM_PgaTourSim_GetScoreRankFromEntrantID(fn_80077B08(), 0), sz);
         }
         if (bSelected) {
             *pLook = 4;
@@ -268,10 +302,12 @@ s32 fn_80116858(char* sz, u16 nDate, s32* pLook, s32* pButton) {
     return -1;
 }
 
-// The day-details panel for a day's event (CalendarScreen stores it in n1C): 1 an earlier event
-// (or profile 0 on no tournament, fn_800F0428(0) == -1), 3 today's event on its first round, 0 on
-// a later round, 2 a later event.
-s32 fn_80116AA0(u16 nDate) {
+// Which day-details popup the PGA TOUR calendar shows for a date's tournament (the calendar screen
+// keeps it in lbl_80223C48.n1C for PGATour_GetPopupRow), by its start against the current
+// tournament's: 1 results (an earlier tournament, or any while player 1 has no current tournament,
+// fn_800F0428(0) == -1), 3 the current one before it starts (today is its first round), 0 the
+// current one in progress, 2 upcoming (a later one).
+s32 PGATour_GetPopupType(u16 nDate) {
     s32 nId;
     s32 nTodayId;
     s32 nTodayRound;
@@ -300,9 +336,11 @@ s32 fn_80116AA0(u16 nDate) {
     return 2;
 }
 
-// The day-details panel: 1 empty, 2 the selected event's dates, else the panel lbl_80223C48.n1C
-// names.
-void fn_80116B60(int nKind, char* szTitle, char* szText) {
+// A row of the PGA TOUR calendar's day-details popup (row 0, "Event:", is the calendar screen's):
+// row 1 blank, row 2 "Dates:" and the selected day's tournament's first and last days ("<start> -
+// <end>"); the other rows come from the popup lbl_80223C48.n1C names (0 in progress fn_8011D280, 1
+// results fn_8011D4DC, 2 upcoming fn_8011D658, 3 before it starts fn_8011D858).
+void PGATour_GetPopupRow(int nKind, char* szTitle, char* szText) {
     s32 nId;
     s32 nRound;
     char szStart[12];
@@ -343,8 +381,10 @@ void fn_80116B60(int nKind, char* szTitle, char* szText) {
     }
 }
 
-// The career's current day: the selected event's start, plus its round.
-u16 fn_80116CAC(void) {
+// The PGA TOUR career's current day: the first day of player 1's current tournament plus the round
+// they are on. 0xFFFF once the season has no tournament left (fn_800EFD38 of none), which
+// fn_80117188 checks for.
+u16 PGATour_GetCurrentDay(void) {
     s32 nRound;
     u16 nDate;
 
@@ -353,8 +393,8 @@ u16 fn_80116CAC(void) {
     return nDate;
 }
 
-// The name of the tournament on a day.
-char* fn_80116CE8(u16 nDate) {
+// The name of the PGA TOUR tournament on a date, or "" when none is played that day.
+char* PGATour_GetEventName(u16 nDate) {
     s32 nId;
     s32 nRound;
 
@@ -364,8 +404,10 @@ char* fn_80116CE8(u16 nDate) {
     return "";
 }
 
-// Start the selected day's tournament: golfer 30 in slot 0, game mode 23.
-void fn_80116D28(void) {
+// The PGA TOUR calendar's play button: player 0 plays the first created golfer (30), the game mode
+// becomes 23 (the PGA TOUR season), and the season skips ahead to the selected day's tournament
+// (fn_800EF9D0: the tournaments before it are played out).
+void PGATour_Play(void) {
     s32 nId;
     s32 nRound;
 
@@ -375,8 +417,10 @@ void fn_80116D28(void) {
     fn_800EF9D0(nId);
 }
 
-// The selected day is not the tournament in progress.
-u8 fn_80116D78(void) {
+// Whether tournaments must be simulated before the PGA TOUR calendar's selected day can be played:
+// 1 when the selected day's tournament is not player 1's current one (PGATour_Play then plays out
+// the ones before it).
+u8 PGATour_IsSimulationNecessary(void) {
     s32 nId;
     s32 nSel;
     s32 nRound;
@@ -388,11 +432,14 @@ u8 fn_80116D78(void) {
 
 // ---- the real-time events ---------------------------------------------------------------------
 
-void fn_80116DD4(void) {
+// Sets the real-time events calendar driver up when the calendar screen switches to it: empty in
+// this build.
+void RealTime_Init(void) {
 }
 
-// The month shown is January of the current year: the calendar cannot go back.
-u8 fn_80116DD8(void) {
+// Whether the real-time events calendar shows January of the year of the current day
+// (lbl_80223C48.nToday): its first month, the calendar cannot go back from it. 1 there, else 0.
+u8 RealTime_AtEarliest(void) {
     s32 nMonth;
     s32 nDay;
     s32 nYear;
@@ -406,8 +453,9 @@ u8 fn_80116DD8(void) {
     return b;
 }
 
-// The month shown is January of next year: the calendar cannot go on.
-u8 fn_80116E3C(void) {
+// Whether the real-time events calendar shows January of the year after the current day's: its last
+// month, the calendar cannot go on from it. 1 there, else 0.
+u8 RealTime_AtLatest(void) {
     s32 nMonth;
     s32 nDay;
     s32 nYear;
@@ -421,8 +469,10 @@ u8 fn_80116E3C(void) {
     return b;
 }
 
-// A day's cell: no button text; the event's n14 (GameModeDriverRTE_UI_GetEventIconIndexOnCal), or -1.
-s32 fn_80116EA4(char* sz, u16 nDate, s32* pLook, s32* pButton) {
+// The real-time events calendar's day cell: never any text (color and state are left as they are);
+// returns the event's calendar icon (fn_800F1008, its n14), or -1 on a day without an event. The
+// event's GameModeDriverRTE_GetCalData is fetched and not used.
+s32 RealTime_FillCell(char* sz, u16 nDate, s32* pLook, s32* pButton) {
     s32 nId;
     s32 nRound;
 
