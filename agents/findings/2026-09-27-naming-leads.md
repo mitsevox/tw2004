@@ -260,3 +260,37 @@ Other:
   fake match. SwingTips.c is EA's CaddieTips.c (file rename = misfiled-units item).
 - Unnamed data: lbl_80281D18 (skalib, written only). Game type 6 still unexplained.
 - Golfer area left: Swing (65), CharSliders (12), then the golfer HEADER pass (Rounds 6-9 lists).
+
+## Round 10 (rj1-rj6) leftovers
+Golfer header pass 3 (rj3 stopped at its cap; its "left" list): character.h Clip n04 / n0A / n36 / n38 /
+pE0 / pE8 / pF4 (own MtaLib) / uFlags 0x2 / stream wording; CharBuffer comment (= SKA_Update); skalib
+structs (ClipRecord n12 1 = drop, n14 nBytes; LibOverlay n10 / n14; LibSlot n150; AnimLib n140 / n12C;
+ClipBank uId; AnimLeaf uMask); AnimStream fields (Round 9); Character nC, p178C-p1798, u10 bits 0x100 /
+0x2000 unset, Skeleton n112C / n1130; charstate.h (Round 6/8/9 lists); camera.h CrAPGolfer / CrAPState
+(Round 8); fe.h prototypes; engine.h SKA_UnpackName; game.h Session.uFlags 0x4000; save.h n113;
+prototype mismatches (SKEL_InitIKSkeleton, SKA_SwapClip, SKA_PatchMemory, AnimStream_WaitForRead);
+extern comments out of column; old lines past 100 columns in character.h. AnimPlayer -> TSKATime type
+rename (project-wide call).
+Golfer (from Swing lanes): golfer.h nStickUsed is backwards (nonzero = main stick, bytes 2/3), nRestCX/CY
+go with the main stick; Player.uFlags 0x8 = tap-in (not score display); fForwardSpin / fSideSpin also from
+the spin stick; Character f162C/f1630/f1634 written only. Prototypes: Swing.c fn_800AE3C4(int) vs (void);
+Code8006F438.c SW_vDeInitForHole s32 vs void; event.c / uiobject.c SW_vSetDisplayBoostUI(a) and
+SW_vGetCurrentSpin(pSpinY/pSpinX) -> pfSide / pfForward. docs/gameplay.md: gForgivenessTable, the
+quarter-pull and stick claims (gameplay.md rewrite item). Pairing TSV: 8010E35C not SetAnimModifiers.
+Round flow header lane (later): game.h GameEffects b10 = DoubleTime (not half speed), b11 = HalfTime;
+golfer.h Player bC2D ShotLimitExceeded, bC2E UsedMulligan, bC2F UsedMulliganThisHole, nLevel = penalty
+shots in a row (CPU +25 attribute points each), bLowIQPenalty = last shot cost a stroke; game-state hooks
+pfn1EC / pfn1F0 pre / post data stream, pfn234 CheckControllerPulled, pfn1F8 IsPuttForLead; Session a8[0]
+attract-demo flag, b12 ends the round; camera.h script.nCamera 1 / 2 / 4 colour fade out / in / held.
+game.h CareerCalendar.nDriver 0 = online driver (stub), n1C popup type (nPopupType), the "no career"
+block comment; gCalendarFillCell extern and CalendarScreen.c pLook / pButton -> pCellColor / pCellState.
+rte.h RTEvent.n14 icon index; GM_RealtimeMode_TodaysEventCompleted comment; save.h a104D0 event indexes.
+Leads: fn_800EFC80 = TW07 GM_PgaTourMode_GetEventInfoByDate; EventInfo.c fn_8011D280 / 4DC / 658 / 858 /
+878 / A44 / C30 = TW07 FE_CalendarPopups.c PGATourPopup_GetRow_* / RealtimePopup_GetRow_*;
+FE_PGATourMessages.c fn_8010EEA8 = PGADriver_ShowCalendar_AdvanceSeason. GameUI.c:349 comment stale.
+Misfiled: GameModeDriver.c is EA's FE_Calendar.c; GameManager.c is EA's GameMode.c and its first 8
+functions serve GameEffects.c; GM_Vec4Sub / GM_Vec3Sub at GameRound.c's start. RTE = "real-time events"
+(TW07 GameModeDriver_RealTimeEvents.cpp; my "Road to the Emerald" gloss in the prompt was wrong).
+Unlabelled possible EA bugs: GameModeDriverRTE_EndGame calls mode 5's end game unchecked;
+GM_ShowPostShotAnimation reads pSurf->nClass after a NULL test. GameManager hook calls through raw
+offsets pass gpGame to (void) hooks: check EA form vs fake match. GetRankText EA bug labelled.
