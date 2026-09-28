@@ -7,7 +7,7 @@
 u8  IsLeapYear(u32 nYear);
 u32 DaysInYear(u32 nYear);
 
-u8 lbl_80191798[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};    // days in each month
+u8 gMonthDays[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};    // days in each month
 
 // Whether a year is a leap year. EA bug: 1900 counts as one (it was not), which the day numbers
 // rely on (36525 days from 1900 to 2000).
@@ -133,7 +133,7 @@ s32 DaysInMonth(u32 nMonth, u32 nYear) {
     if (bLeap) {
         return 29;
     }
-    return lbl_80191798[nMonth - 1];
+    return gMonthDays[nMonth - 1];
 }
 
 // The month before.
