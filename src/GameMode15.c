@@ -10,14 +10,14 @@
 
 // fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
 
-s32 lbl_80281690 = 4;                    // the options saved while the game runs
-s32 lbl_8028238C;                    // the leader (5 = none)
-s32 lbl_80282388;                    // the leader's rank (0 best .. 4)
-s8  lbl_80282384;                    // the leader's target
-s32 lbl_80282380;                    // the points of the last shot
-u8  lbl_8028237D;                    // set by fn_800F48C4: the shot then scores nothing
-u8  lbl_8028237C;                    // a closer shot just took the lead (not set for the first leader)
-s32 lbl_80282378;
+s32 gHorseSavedOptionsC = 4;                    // the options saved while the game runs
+s32 gHorseLeader;                    // the leader (5 = none)
+s32 gHorseLeaderRing;                    // the leader's rank (0 best .. 4)
+s8  gHorseLeaderTarget;                    // the leader's target
+s32 gHorseShotPoints;                    // the points of the last shot
+u8  gHorseShotClockOut;                    // set by fn_800F48C4: the shot then scores nothing
+u8  gHorseLastShotExceeded;                    // a closer shot just took the lead (not set for the first leader)
+s32 gHorseSavedWind;
 
 void  Gaud_LetterForfeit(void);
 void  Gaud_LetterGained(void);
@@ -98,13 +98,13 @@ void fn_800F39F4(void) {
 }
 
 void fn_800F3C2C(void) {
-    gSession.options.nC = lbl_80281690;
-    gSession.options.nWind = lbl_80282378;
+    gSession.options.nC = gHorseSavedOptionsC;
+    gSession.options.nWind = gHorseSavedWind;
 }
 
 void fn_800F3C48(void) {
-    lbl_80281690 = gSession.options.nC;
-    lbl_80282378 = gSession.options.nWind;
+    gHorseSavedOptionsC = gSession.options.nC;
+    gHorseSavedWind = gSession.options.nWind;
     gSession.options.nC = 4;
     gSession.options.nWind = 0;
 }
@@ -162,24 +162,24 @@ void fn_800F3EBC(int nPlayer) {
     f32 x;
     f32 y;
     nMsg = -1;
-    if (lbl_8028237D) {
+    if (gHorseShotClockOut) {
         GameMsg_Send5Ints(0x33, 0, 0, 0, 0xD1, 1);
         nMsg = 0x14;
     } else {
         nSurface = gPlayers[nPlayer].ball.nSurface;
         fLength = fn_800D0550(nPlayer);
-        fn_800F49E8(nSurface, &lbl_80282380);
+        fn_800F49E8(nSurface, &gHorseShotPoints);
         if (nSurface >= 0x85 && nSurface <= 0x90 && !GameModeSkillZoneBase_IsLongDrive(nPlayer, fLength)) {
             nTarget = GameModeSkillZoneBase_GetGreenIndexHit(nPlayer);
             nRank = GameModeSkillZoneBase_GetBullsEyeColor(nSurface);
             gPlayers[nPlayer].nDE4[nTarget]++;
             gPlayers[nPlayer].aDC4[3]++;
-            if (lbl_80282380 != 0) {
-                if (lbl_80282380 > 0) {
-                    lbl_80282380 = GM_Earnings_ComputeBonusModifiers(lbl_80282380, nPlayer, 1, 1, 1, 0);
-                    lbl_80282380 = GM_Earnings_ComputeTOURCardModifiers(lbl_80282380, nPlayer, 0);
+            if (gHorseShotPoints != 0) {
+                if (gHorseShotPoints > 0) {
+                    gHorseShotPoints = GM_Earnings_ComputeBonusModifiers(gHorseShotPoints, nPlayer, 1, 1, 1, 0);
+                    gHorseShotPoints = GM_Earnings_ComputeTOURCardModifiers(gHorseShotPoints, nPlayer, 0);
                 }
-                gPlayers[nPlayer].nDD8 += lbl_80282380;
+                gPlayers[nPlayer].nDD8 += gHorseShotPoints;
                 if (gPlayers[nPlayer].nDD8 < 0) {
                     gPlayers[nPlayer].nDD8 = 0;
                 }
@@ -188,11 +188,11 @@ void fn_800F3EBC(int nPlayer) {
                                 gPlayers[nPlayer].ball.vPrev, &x, &y,
                                 0);
                     fn_8006A8D4(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0]), &x, &y);
-                    GameMsg_Send5Ints(0x33, lbl_80282380, 512.0f * x, 448.0f * y, nSurface, 1);
+                    GameMsg_Send5Ints(0x33, gHorseShotPoints, 512.0f * x, 448.0f * y, nSurface, 1);
                 }
             }
-            if (lbl_8028238C != 5) {
-                if (nTarget == lbl_80282384 && nRank == lbl_80282388) {
+            if (gHorseLeader != 5) {
+                if (nTarget == gHorseLeaderTarget && nRank == gHorseLeaderRing) {
                     GameMsg_Send5Ints(0x33, 0, 0, 0, nSurface, 1);
                     if (nRank == 0) {
                         Gaud_BullsEye();
@@ -211,12 +211,12 @@ void fn_800F3EBC(int nPlayer) {
                             fn_800A30E4(nMult + 7, &gPlayers[nPlayer].ball, nPlayer, 0, 0.0f);
                         }
                     }
-                } else if (nTarget == lbl_80282384 && nRank < lbl_80282388) {
-                    lbl_8028238C = nPlayer;
-                    lbl_80282388 = nRank;
-                    lbl_80282384 = nTarget;
+                } else if (nTarget == gHorseLeaderTarget && nRank < gHorseLeaderRing) {
+                    gHorseLeader = nPlayer;
+                    gHorseLeaderRing = nRank;
+                    gHorseLeaderTarget = nTarget;
                     GameMsg_Send5Ints(0x33, 0, 0, 0, 0xCF, 1);
-                    lbl_8028237C = 1;
+                    gHorseLastShotExceeded = 1;
                     if (nRank == 0) {
                         Gaud_BullsEye();
                         nMsg = 0x31;
@@ -235,11 +235,11 @@ void fn_800F3EBC(int nPlayer) {
                         }
                     }
                 } else {
-                    lbl_8028238C = 5;
+                    gHorseLeader = 5;
                     gPlayers[nPlayer].nE88++;
                     GameMsg_SendInt(0x38, gPlayers[nPlayer].nE88);
                     Gaud_LetterGained();
-                    if (nTarget == lbl_80282384) {
+                    if (nTarget == gHorseLeaderTarget) {
                         GameMsg_Send5Ints(0x33, 0, 0, 0, 0xCE, 1);
                         if (!(Misc_RandFunc(0) & 1)) {
                             nMsg = 0xE;
@@ -256,9 +256,9 @@ void fn_800F3EBC(int nPlayer) {
                     }
                 }
             } else {
-                lbl_8028238C = nPlayer;
-                lbl_80282388 = nRank;
-                lbl_80282384 = nTarget;
+                gHorseLeader = nPlayer;
+                gHorseLeaderRing = nRank;
+                gHorseLeaderTarget = nTarget;
                 GameMsg_Send5Ints(0x33, 0, 0, 0, nSurface, 1);
                 if (nRank == 0) {
                     Gaud_BullsEye();
@@ -293,8 +293,8 @@ void fn_800F3EBC(int nPlayer) {
                     break;
                 }
             }
-        } else if (lbl_8028238C != 5) {
-            lbl_8028238C = 5;
+        } else if (gHorseLeader != 5) {
+            gHorseLeader = 5;
             gPlayers[nPlayer].nE88++;
             GameMsg_Send5Ints(0x33, 0, 0, 0, 0xCE, 1);
             GameMsg_SendInt(0x38, gPlayers[nPlayer].nE88);
@@ -325,7 +325,7 @@ void fn_800F3EBC(int nPlayer) {
                 break;
             }
         } else {
-            lbl_8028238C = 5;
+            gHorseLeader = 5;
         }
     }
     if (nMsg != -1) {
@@ -333,28 +333,28 @@ void fn_800F3EBC(int nPlayer) {
     }
 }
 
-// Next golfer: lbl_8028237D clears, and a golfer ready to play (state 1) gets fn_800F39CC(900).
+// Next golfer: gHorseShotClockOut clears, and a golfer ready to play (state 1) gets fn_800F39CC(900).
 // When the turn comes back to the leader, the lead is lost. While there is a leader the golfer
 // aims at the leader's target; otherwise, on his first shot, at his own.
 void fn_800F4584(void) {
     int i;
-    lbl_8028237D = 0;
+    gHorseShotClockOut = 0;
     GameModeSkillZoneBase_ClearPerShotData();
     GameModeStroke_SetupNextGolfer();
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if ((s8)GOLFERSTATE_GetCurrentState(i) == 1) {
             fn_800F39CC(900);
-            if (lbl_8028238C == i) {
-                lbl_8028238C = 5;
+            if (gHorseLeader == i) {
+                gHorseLeader = 5;
                 if (!(Misc_RandFunc(0) & 1)) {
                     GameModeSkillZoneBase_PlayComment(0x23, 0);
                 } else {
                     GameModeSkillZoneBase_PlayComment(0x24, 0);
                 }
             }
-            if (lbl_8028238C != 5 || PLAYER(i)->nDC0 == 0) {
-                if (lbl_8028238C != 5) {
-                    PLAYER(i)->nTarget = lbl_80282384;
+            if (gHorseLeader != 5 || PLAYER(i)->nDC0 == 0) {
+                if (gHorseLeader != 5) {
+                    PLAYER(i)->nTarget = gHorseLeaderTarget;
                 }
                 GameModeSkillZoneBase_SetCup_AlignGolfer(i, (s8)PLAYER(i)->nTarget);
             }
@@ -374,10 +374,10 @@ void fn_800F46BC(void) {
 
 void fn_800F46E4(void) {
     GameModeSkillZoneBase_ClearPerHoleData();
-    lbl_8028238C = 5;
-    lbl_80282388 = 5;
-    lbl_80282384 = 0;
-    lbl_8028237C = 0;
+    gHorseLeader = 5;
+    gHorseLeaderRing = 5;
+    gHorseLeaderTarget = 0;
+    gHorseLastShotExceeded = 0;
 }
 
 void fn_800F471C(int nPlayer) {
@@ -408,7 +408,7 @@ s32 fn_800F4784(int nPlayer, u8 bCheck) {
 
 // Previous / next target: only without a leader; with one, the leader's target stays.
 u8 fn_800F47D8(int nPlayer) {
-    if (lbl_8028238C == 5) {
+    if (gHorseLeader == 5) {
         GameModeSkillZoneBase_PickPrevTarget(nPlayer);
     } else {
         GameModeSkillZoneBase_SetCup(nPlayer, (s8)gPlayers[nPlayer].nTarget);
@@ -417,7 +417,7 @@ u8 fn_800F47D8(int nPlayer) {
 }
 
 u8 fn_800F4828(int nPlayer) {
-    if (lbl_8028238C == 5) {
+    if (gHorseLeader == 5) {
         GameModeSkillZoneBase_PickTarget(nPlayer);
     } else {
         GameModeSkillZoneBase_SetCup(nPlayer, (s8)gPlayers[nPlayer].nTarget);
@@ -426,8 +426,8 @@ u8 fn_800F4828(int nPlayer) {
 }
 
 s8 fn_800F4878(void) {
-    if ((s32) lbl_8028238C != 5) {
-        return (s8) lbl_80282388;
+    if ((s32) gHorseLeader != 5) {
+        return (s8) gHorseLeaderRing;
     }
     return -1;
 }
@@ -435,19 +435,19 @@ s8 fn_800F4878(void) {
 void fn_800F4894(int nPlayer) {
     fn_800F39CC(-1);
     Gaud_StopShotClock();
-    lbl_8028237C = 0;
+    gHorseLastShotExceeded = 0;
 }
 
-// The current golfer goes to state 12 and lbl_8028237D is set, so the shot scores nothing and
+// The current golfer goes to state 12 and gHorseShotClockOut is set, so the shot scores nothing and
 // shows text 0xD1 (through GameTargets GameModeSkillZoneBase_ShotClockOut, from a UI command). With
 // a leader, a letter goes to player 1 if the leader is player 0, else to player 0.
 void fn_800F48C4(void) {
     GOLFERSTATE_Switch(12, lbl_80282278);   // GS_SIMULATE
     GUI_HideAllToggleUI();
     Gaud_StopShotClock();
-    lbl_8028237D = 1;
-    if (lbl_8028238C != 5) {
-        if (lbl_8028238C == 0) {
+    gHorseShotClockOut = 1;
+    if (gHorseLeader != 5) {
+        if (gHorseLeader == 0) {
             gPlayers[1].nE88++;
             GameMsg_SendInt(0x38, gPlayers[1].nE88);
         } else {
@@ -483,13 +483,13 @@ void fn_800F49E8(s32 nSurface, s32* pPoints) {
 }
 
 s32 fn_800F4B00(void) {
-    return ((u32)((-lbl_8028237C) | lbl_8028237C) >> 31);
+    return ((u32)((-gHorseLastShotExceeded) | gHorseLastShotExceeded) >> 31);
 }
 
 // A target's state for its marker (GoDynObj): with a leader, 1 for every target but the leader's
 // (0 for it); 0 for all without a leader.
 s32 fn_800F4B14(int a, int i) {
-    if (lbl_8028238C == 5 || i == lbl_80282384) {
+    if (gHorseLeader == 5 || i == gHorseLeaderTarget) {
         return 0;
     }
     return 1;

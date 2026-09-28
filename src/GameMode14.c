@@ -16,14 +16,14 @@ typedef struct Claim {
     s32 nRank;                  // 0x0
     s32 nOwner;                 // 0x4
 } Claim;
-Claim lbl_80211FB8[40];
+Claim gCaptureClaims[40];
 
-s32 lbl_80281688 = 4;                    // the options saved while the game runs
-s32 lbl_80282374;                    // the points of the last claim
-u8  lbl_80282370;                    // set by fn_800F3828: the shot then claims nothing
-s32 lbl_8028236C;                    // who starts: 0 or 1, at random
-s32 lbl_80282368;
-s32 lbl_801928F0[6] = {500, 400, 300, 200, 100, 0};                  // points per rank
+s32 gCaptureSavedOptionsC = 4;                    // the options saved while the game runs
+s32 gCaptureShotPoints;                    // the points of the last claim
+u8  gCaptureShotClockOut;                    // set by fn_800F3828: the shot then claims nothing
+s32 gCaptureFirstGolfer;                    // who starts: 0 or 1, at random
+s32 gCaptureSavedWind;
+s32 gCaptureRingPoints[6] = {500, 400, 300, 200, 100, 0};                  // points per rank
 
 void  fn_800F2BBC(void);
 void  fn_800F2BD8(void);
@@ -97,17 +97,17 @@ void fn_800F2984(void) {
 
 // The mode ends: the saved options go back.
 void fn_800F2BBC(void) {
-    gSession.options.nC = lbl_80281688;
-    gSession.options.nWind = lbl_80282368;
+    gSession.options.nC = gCaptureSavedOptionsC;
+    gSession.options.nWind = gCaptureSavedWind;
 }
 
 // Round setup: options saved and replaced, and a random first player.
 void fn_800F2BD8(void) {
-    lbl_80281688 = gSession.options.nC;
-    lbl_80282368 = gSession.options.nWind;
+    gCaptureSavedOptionsC = gSession.options.nC;
+    gCaptureSavedWind = gSession.options.nWind;
     gSession.options.nC = 4;
     gSession.options.nWind = 0;
-    lbl_8028236C = Misc_RandFunc(0) & 1;
+    gCaptureFirstGolfer = Misc_RandFunc(0) & 1;
 }
 
 u8 fn_800F2C2C(u8 bCheck) {
@@ -125,7 +125,7 @@ s32 fn_800F2C34(int nPlayer) {
         }
     }
     if (bFirst) {
-        return lbl_8028236C;
+        return gCaptureFirstGolfer;
     }
     n = lbl_80282278;
     for (i = 0; i < 5; i++) {
@@ -161,7 +161,7 @@ void fn_800F2E08(int nPlayer) {
     s32 nKind = 0;
     f32 fLength;
     s32 nMult;
-    if (lbl_80282370) {
+    if (gCaptureShotClockOut) {
         GameMsg_Send5Ints(0x33, 0, 0, 0, 0xD1, 1);
         nMsg = 0x14;
     } else {
@@ -170,22 +170,22 @@ void fn_800F2E08(int nPlayer) {
         if (nSurface >= 0x85 && nSurface <= 0x90 && !GameModeSkillZoneBase_IsLongDrive(nPlayer, fLength)) {
             nTarget = GameModeSkillZoneBase_GetGreenIndexHit(nPlayer);
             nRank = GameModeSkillZoneBase_GetBullsEyeColor(nSurface);
-            if (lbl_80211FB8[nTarget].nRank == 0) {
+            if (gCaptureClaims[nTarget].nRank == 0) {
                 GameMsg_Send5Ints(0x33, 0, 0, 0, 0xCD, 1);
                 Gaud_TargetClosedOut();
                 nMsg = 2;
-            } else if (nRank >= lbl_80211FB8[nTarget].nRank) {
+            } else if (nRank >= gCaptureClaims[nTarget].nRank) {
                 GameMsg_Send5Ints(0x33, 0, 0, 0, 0xCC, 1);
                 nMsg = 0x10;
             } else {
                 nText = 0;
-                if (lbl_80211FB8[nTarget].nRank == 5) {
+                if (gCaptureClaims[nTarget].nRank == 5) {
                     if (!(Misc_RandFunc(0) & 1)) {
                         nMsg = 0x1A;
                     } else {
                         nMsg = 0x52;
                     }
-                } else if (nPlayer == lbl_80211FB8[nTarget].nOwner) {
+                } else if (nPlayer == gCaptureClaims[nTarget].nOwner) {
                     nMsg = 0x42;
                 } else {
                     nText = 0xD4;
@@ -216,23 +216,23 @@ void fn_800F2E08(int nPlayer) {
                     }
                     nKind = 2;
                 }
-                lbl_80211FB8[nTarget].nRank = nRank;
-                lbl_80211FB8[nTarget].nOwner = nPlayer;
+                gCaptureClaims[nTarget].nRank = nRank;
+                gCaptureClaims[nTarget].nOwner = nPlayer;
                 gPlayers[nPlayer].aCD4[gPlayers[nPlayer].nCD0] = nSurface;
                 gPlayers[nPlayer].nCD0++;
                 gPlayers[nPlayer].nD70[Game_CurHoleIndex()]++;
-                lbl_80282374 = fn_800F3668(nTarget);
-                lbl_80282374 = GameModeSkillZoneBase_ScaleTargetPoints(lbl_80282374, nTarget);
-                lbl_80282374 = GM_Earnings_ComputeBonusModifiers(lbl_80282374, nPlayer, 1, 1, 1, 0);
-                lbl_80282374 = GM_Earnings_ComputeTOURCardModifiers(lbl_80282374, nPlayer, 0);
+                gCaptureShotPoints = fn_800F3668(nTarget);
+                gCaptureShotPoints = GameModeSkillZoneBase_ScaleTargetPoints(gCaptureShotPoints, nTarget);
+                gCaptureShotPoints = GM_Earnings_ComputeBonusModifiers(gCaptureShotPoints, nPlayer, 1, 1, 1, 0);
+                gCaptureShotPoints = GM_Earnings_ComputeTOURCardModifiers(gCaptureShotPoints, nPlayer, 0);
                 fn_800F36A4();
                 if (nText != 0) {
-                    GameMsg_Send5Ints(0x33, lbl_80282374, 0, 0, nText, 1);
+                    GameMsg_Send5Ints(0x33, gCaptureShotPoints, 0, 0, nText, 1);
                 }
                 if (!gSession.bReplay) {
-                    GameMsg_Send5Ints(0x33, lbl_80282374, 0, 0, nSurface, 1);
+                    GameMsg_Send5Ints(0x33, gCaptureShotPoints, 0, 0, nSurface, 1);
                     if (nKind == 0) {
-                        GameMsg_Send5Ints(0x33, lbl_80282374, 0, 0, 0xD3, 1);
+                        GameMsg_Send5Ints(0x33, gCaptureShotPoints, 0, 0, 0xD3, 1);
                     }
                     if (nRank == 0) {
                         Ball* pBall;
@@ -259,7 +259,7 @@ void fn_800F2E08(int nPlayer) {
     }
 }
 
-// Next golfer: lbl_80282370 and the players' per-shot state
+// Next golfer: gCaptureShotClockOut and the players' per-shot state
 // (GameModeSkillZoneBase_ClearPerShotData) clear, and a golfer ready to play (state 1) gets
 // fn_800F39CC(900). A player 3 or more targets behind gets a comment.
 void fn_800F31E0(void) {
@@ -267,7 +267,7 @@ void fn_800F31E0(void) {
     s32 n0;
     s32 n1;
     s32 nMsg = -1;
-    lbl_80282370 = 0;
+    gCaptureShotClockOut = 0;
     GameModeSkillZoneBase_ClearPerShotData();
     GameModeStroke_SetupNextGolfer();
     n0 = fn_800F354C(0);
@@ -313,8 +313,8 @@ void fn_800F3358(void) {
     int i;
     GameModeSkillZoneBase_ClearPerHoleData();
     for (i = 0; i < 40; i++) {
-        lbl_80211FB8[i].nRank = 5;
-        lbl_80211FB8[i].nOwner = 5;
+        gCaptureClaims[i].nRank = 5;
+        gCaptureClaims[i].nOwner = 5;
     }
 }
 
@@ -352,14 +352,14 @@ s32 fn_800F3490(int nPlayer) {
     if (gPlayers[nPlayer].nSurface < 0x85 || gPlayers[nPlayer].nSurface > 0x90) {
         return -1;
     }
-    return lbl_80211FB8[CurrentTarget(nPlayer)].nOwner;
+    return gCaptureClaims[CurrentTarget(nPlayer)].nOwner;
 }
 
 s32 fn_800F34F0(int nPlayer) {
     if (gPlayers[nPlayer].nSurface < 0x85 || gPlayers[nPlayer].nSurface > 0x90) {
         return -1;
     }
-    return lbl_80211FB8[GameModeSkillZoneBase_GetGreenTargetted(nPlayer)].nRank;
+    return gCaptureClaims[GameModeSkillZoneBase_GetGreenTargetted(nPlayer)].nRank;
 }
 
 // How many targets the player holds.
@@ -367,7 +367,7 @@ int fn_800F354C(int nPlayer) {
     s32 n = 0;
     int i;
     for (i = 0; i < 40; i++) {
-        if (nPlayer == lbl_80211FB8[i].nOwner) {
+        if (nPlayer == gCaptureClaims[i].nOwner) {
             n++;
         }
     }
@@ -375,17 +375,17 @@ int fn_800F354C(int nPlayer) {
 }
 
 s32 fn_800F363C(int i) {
-    return lbl_80211FB8[i].nOwner;
+    return gCaptureClaims[i].nOwner;
 }
 
 s32 fn_800F3654(s32 p0) {
-    return lbl_80211FB8[p0].nRank;
+    return gCaptureClaims[p0].nRank;
 }
 
 // A claimed target's points.
 s32 fn_800F3668(int n) {
-    if (lbl_80211FB8[n].nOwner != 5) {
-        return lbl_801928F0[lbl_80211FB8[n].nRank];
+    if (gCaptureClaims[n].nOwner != 5) {
+        return gCaptureRingPoints[gCaptureClaims[n].nRank];
     }
     return 0;
 }
@@ -398,18 +398,18 @@ void fn_800F36A4(void) {
         PLAYER(i)->nDD8 = 0;
     }
     for (i = 0; i < 40; i++) {
-        if (lbl_80211FB8[i].nOwner != 5) {
+        if (gCaptureClaims[i].nOwner != 5) {
             n = fn_800F3668(i);
             n = GameModeSkillZoneBase_ScaleTargetPoints(n, i);
-            n = GM_Earnings_ComputeBonusModifiers(n, lbl_80211FB8[i].nOwner, 1, 1, 1, 0);
-            n = GM_Earnings_ComputeTOURCardModifiers(n, lbl_80211FB8[i].nOwner, 0);
-            gPlayers[lbl_80211FB8[i].nOwner].nDD8 += n;
+            n = GM_Earnings_ComputeBonusModifiers(n, gCaptureClaims[i].nOwner, 1, 1, 1, 0);
+            n = GM_Earnings_ComputeTOURCardModifiers(n, gCaptureClaims[i].nOwner, 0);
+            gPlayers[gCaptureClaims[i].nOwner].nDD8 += n;
         }
     }
 }
 
 s32 fn_800F37F8(s32 a) {
-    return lbl_80282374;
+    return gCaptureShotPoints;
 }
 
 void fn_800F3800(int nPlayer) {
@@ -417,13 +417,13 @@ void fn_800F3800(int nPlayer) {
     Gaud_StopShotClock();
 }
 
-// The current golfer goes to state 12 and lbl_80282370 is set, so the shot claims nothing and
+// The current golfer goes to state 12 and gCaptureShotClockOut is set, so the shot claims nothing and
 // shows text 0xD1 (through GameModeSkillZoneBase_ShotClockOut, from a UI command).
 void fn_800F3828(void) {
     GOLFERSTATE_Switch(12, lbl_80282278);   // GS_SIMULATE
     GUI_HideAllToggleUI();
     Gaud_StopShotClock();
-    lbl_80282370 = 1;
+    gCaptureShotClockOut = 1;
 }
 
 // Game finished: the winner is paid their points; a loser with no targets gets a comment.
@@ -449,13 +449,13 @@ void fn_800F3860(void) {
 // A target's state (GoDynObj picks the model drawn at it by this): 1 claimed at rank 0, 2 player
 // 0's, 3 player 1's, 0 free.
 s32 fn_800F392C(int a, int i) {
-    if (lbl_80211FB8[i].nRank == 0) {
+    if (gCaptureClaims[i].nRank == 0) {
         return 1;
     }
-    if (lbl_80211FB8[i].nOwner == 0) {
+    if (gCaptureClaims[i].nOwner == 0) {
         return 2;
     }
-    return lbl_80211FB8[i].nOwner == 1 ? 3 : 0;
+    return gCaptureClaims[i].nOwner == 1 ? 3 : 0;
 }
 
 // Sends front-end message nMsg with five int values.
