@@ -1764,7 +1764,7 @@ void Character_PostInit(void) {
 // with bLook its look from pChoices. nId: the golfer id (nC). nUnused: not read. NULL when no
 // character could be made.
 // port: the object is little-endian on disc and BYTESWAP_SWAPDATA swaps each value as it reads it:
-// a little-endian port does not swap there.
+//       a little-endian port does not swap there.
 Character* Character_CreateFromMem(u8* pData, int nUnused, int nSet, int nId, u8 bLook,
                                    SkinChoices* pChoices) {
     int nSize;
@@ -1951,7 +1951,6 @@ void CharSkinRef_Init(Skin* pSkin, CharSkinRef* pRef, s32 n) {
 void CharSkinRef_Free(void* p) {
     StaticMem_Free(p);
 }
-// ---- end of sweep code ----
 
 // Makes a club skin set from a 'CLB ' object: per entry its club class, that class's afC (the club
 // head bone's height), the entry's size and, 4 bytes on, its skin (fn_800377FC) and a CharSkinRef
@@ -2089,50 +2088,51 @@ void Character_CalculateClipPoints(Character* pChar) {
 // camera; f1664 is 1 up close, fading to 0 between 6 and 15 units deep (scaled by the lens's field
 // of view).
 void Character_ClipTest(Character* pChar, int nPlayer) {
-    f32 (*pMtx)[4];
-    f32 fDepth;
+    f32 (*pMat)[4];
+    f32 fDistInViewSpace;
+    f32 fDot;
     f32 fDist;
-    f32 fLen;
-    Sphere sphere;
-    Vec4 vPos;
+    Sphere sSphereInCamSpace;
+    Vec4 xSpherePosInCamSpace;
     f32 vDir[4];
 
-    pMtx = fn_8001EE64(pChar);
+    pMat = fn_8001EE64(pChar);
     if (nPlayer != 1000 && nPlayer
         != ViewController_GetActivePlayerNumber(ViewController_GetCurrentViewControllerID())) {
         pChar->n1654 = pChar->n1658 = 2;
         return;
     }
-    Vec3Copy(pChar->v1668, &vPos.x);
-    vPos.w = 1.0f;
-    LLMath_mat44fltMultiply(((Camera*)RC_spGetCurrentRenderCtx())->viewMtx, &vPos, &vPos);
-    Vec3Copy(&vPos.x, &sphere.x);
-    sphere.radius = pChar->f1674;
-    fDepth = sphere.z;
-    pChar->n1654 = fn_80007D74(&sphere, RC_spGetCurrentRenderCtx(), 0);
-    sphere.radius = 3.0f;
-    pChar->n1658 = fn_80007D74(&sphere, RC_spGetCurrentRenderCtx(), 0);
-    fn_8001EFB4(pMtx[3], Camera_GetCurrentLens()->m4[3], vDir);
-    fDist = Vec3_Dot(Camera_GetCurrentLens()->m4[2], vDir);
-    fLen = (f32)Math_Sqrt(Vec3_LengthSqClamped(vDir));
-    if (fLen < pChar->f14) {
-        pChar->f14 = fLen;
+    Vec3Copy(pChar->v1668, &xSpherePosInCamSpace.x);
+    xSpherePosInCamSpace.w = 1.0f;
+    LLMath_mat44fltMultiply(((Camera*)RC_spGetCurrentRenderCtx())->viewMtx, &xSpherePosInCamSpace,
+                            &xSpherePosInCamSpace);
+    Vec3Copy(&xSpherePosInCamSpace.x, &sSphereInCamSpace.x);
+    sSphereInCamSpace.radius = pChar->f1674;
+    fDistInViewSpace = sSphereInCamSpace.z;
+    pChar->n1654 = fn_80007D74(&sSphereInCamSpace, RC_spGetCurrentRenderCtx(), 0);
+    sSphereInCamSpace.radius = 3.0f;
+    pChar->n1658 = fn_80007D74(&sSphereInCamSpace, RC_spGetCurrentRenderCtx(), 0);
+    fn_8001EFB4(pMat[3], Camera_GetCurrentLens()->m4[3], vDir);
+    fDot = Vec3_Dot(Camera_GetCurrentLens()->m4[2], vDir);
+    fDist = (f32)Math_Sqrt(Vec3_LengthSqClamped(vDir));
+    if (fDist < pChar->f14) {
+        pChar->f14 = fDist;
     }
-    if (fDist > fn_8001ED44(pChar, gSession.nSplitScreen)) {
+    if (fDot > fn_8001ED44(pChar, gSession.nSplitScreen)) {
         pChar->n1654 = 2;
     }
-    if (fDist > fn_8001EE00(pChar, gSession.nSplitScreen)) {
+    if (fDot > fn_8001EE00(pChar, gSession.nSplitScreen)) {
         pChar->n1658 = 2;
     }
-    fDepth *= Camera_GetLensFovScale(Camera_GetCurrentLens());
+    fDistInViewSpace *= Camera_GetLensFovScale(Camera_GetCurrentLens());
     if (pChar->n1654 == 2) {
         pChar->f1664 = 0.0f;
-    } else if (fDepth > 15.0f) {
+    } else if (fDistInViewSpace > 15.0f) {
         pChar->f1664 = 0.0f;
-    } else if (fDepth < 6.0f) {
+    } else if (fDistInViewSpace < 6.0f) {
         pChar->f1664 = 1.0f;
     } else {
-        pChar->f1664 = 1.0f - (fDepth - 6.0f) / 9.0f;
+        pChar->f1664 = 1.0f - (fDistInViewSpace - 6.0f) / 9.0f;
     }
 }
 
@@ -2143,14 +2143,14 @@ void Character_ClipTest(Character* pChar, int nPlayer) {
 // its skins posed on its model (fn_80035B40).
 void Character_PreRenderAll(void) {
     int i;
-    int nPlayer;
-    u8 bDo;
+    int iPlayer2Clip;
+    u8 bPreRender;
     int bState;
 
     fn_80035600();
     fn_800364A0();
     for (i = 0; i < lbl_80281CA8; i++) {
-        nPlayer = fn_800636EC();
+        iPlayer2Clip = fn_800636EC();
         lbl_801B9624[i]->u10 &= ~0x1000;
         if (lbl_801B9624[i]->u10 & 2) {
             if (ViewController_GetCurrentViewController()->bFlagOut) {
@@ -2160,11 +2160,12 @@ void Character_PreRenderAll(void) {
             }
         }
         bState = fn_8001EE90(lbl_801B9624[i]) != 2;
-        bDo = bState || fn_8001EE88(lbl_801B9624[i]) != 2;
-        bDo = bDo && nPlayer != lbl_801B9624[i]->nPlayer;
-        bDo = bDo && !(lbl_801B9624[i]->u10 & 0x1041);
-        bDo = bDo != 0;     // fake match: the original turns bDo into 0/1 again (neg; or; srwi)
-        if (bDo && lbl_801B9624[i]->n1698 == 0) {
+        bPreRender = bState || fn_8001EE88(lbl_801B9624[i]) != 2;
+        bPreRender = bPreRender && iPlayer2Clip != lbl_801B9624[i]->nPlayer;
+        bPreRender = bPreRender && !(lbl_801B9624[i]->u10 & 0x1041);
+        // fake match: the original turns bPreRender into 0/1 again (neg; or; srwi)
+        bPreRender = bPreRender != 0;
+        if (bPreRender && lbl_801B9624[i]->n1698 == 0) {
             fn_80035B40(lbl_801B9624[i], 0);
         }
     }
@@ -2175,13 +2176,13 @@ void Character_PreRenderAll(void) {
 // when uFlags has bit 4, is a golfer. fn_80035604 first; nothing when no character is made.
 void Character_RenderAll(u32 uFlags) {
     int i;
-    int nPlayer;
+    int iPlayer2Clip;
 
     if (lbl_80281CA8 != 0) {
         fn_80035604();
         for (i = 0; i < lbl_80281CA8; i++) {
-            nPlayer = fn_800636EC();
-            if (fn_8001EE90(lbl_801B9624[i]) != 2 && nPlayer != lbl_801B9624[i]->nPlayer &&
+            iPlayer2Clip = fn_800636EC();
+            if (fn_8001EE90(lbl_801B9624[i]) != 2 && iPlayer2Clip != lbl_801B9624[i]->nPlayer &&
                 !(lbl_801B9624[i]->u10 & 0x41) &&
                 (Character_IsGolfer(lbl_801B9624[i]) || (uFlags & 4) == 0)) {
                 fn_800358E0(lbl_801B9624[i], uFlags);
@@ -2426,7 +2427,7 @@ ViewSlot gViewSlots[5] = { 0 };
 // sets, the club names read as 64-bit ids, no characters in the front end's or the players' slots,
 // and no player marked (lbl_80281CAC).
 // port: the names are read as big-endian 64-bit words from their strings (FEgolferanim compares
-// them with ids read the same way)
+//       them with ids read the same way)
 void Legacy_Character_InitModule(void) {
     int i;
 
@@ -2759,8 +2760,9 @@ void fn_8001CE5C(UStreamObject* pObject) {
         if (nGolferModel == uModel && gViewSlots[i].pChar == NULL) {
             fn_800106AC(i);
             nSet = gSession.nSplitScreen ? i : 0;
-            gViewSlots[i].pChar = Character_Add(Character_CreateFromMem(pObject->pData, 0, nSet, uModel,
-                                                          Character_IsCrAPGolfer(i), &gpSaveData[i].choices));
+            gViewSlots[i].pChar =
+                Character_Add(Character_CreateFromMem(pObject->pData, 0, nSet, uModel,
+                                                      Character_IsCrAPGolfer(i), &gpSaveData[i].choices));
             if (gViewSlots[i].pChar->pSkin != NULL && Character_IsGolfer(gViewSlots[i].pChar)) {
                 Character_SetClubsAndClothes(gViewSlots[i].pChar, i);
             }
@@ -2881,10 +2883,11 @@ void fn_8001D384(void) {
 
 // The 'SKLO' handler: a character built from the object with no player (1000), keyed by the
 // object's id.
-// port: the skeleton is little-endian on disc and Character_CreateFromMem swaps it (BYTESWAP_SWAPDATA): a
-//       little-endian port does not swap there.
+// port: the skeleton is little-endian on disc and Character_CreateFromMem swaps it
+//       (BYTESWAP_SWAPDATA): a little-endian port does not swap there.
 void fn_8001D3EC(UStreamObject* pObject) {
-    Character* pChar = Character_Add(Character_CreateFromMem(pObject->pData, 0, 0, pObject->uId, 0, NULL));
+    Character* pChar =
+        Character_Add(Character_CreateFromMem(pObject->pData, 0, 0, pObject->uId, 0, NULL));
     pChar->nPlayer = 1000;
     pChar->uId     = pObject->uId;
     StaticMem_Free(pObject);
@@ -2899,9 +2902,9 @@ void fn_8001D47C(void) {
 }
 
 // Dresses the character of player slot nSlot: its club skins (in game type 3 golfers 7 and 29 get
-// the profile's created golfer's look; otherwise its own look when Character_IsCrAPGolfer says so), then the
-// "shirt" set (only when Character_IsCrAPGolfer says no) and the "glove" set, as "shirt<n>" / "glove<n>" with
-// n from the slot's profile (no number when it is 0 or less).
+// the profile's created golfer's look; otherwise its own look when Character_IsCrAPGolfer says
+// so), then the "shirt" set (only when Character_IsCrAPGolfer says no) and the "glove" set, as
+// "shirt<n>" / "glove<n>" with n from the slot's profile (no number when it is 0 or less).
 void Character_SetClubsAndClothes(Character* pChar, int nSlot) {
     char szName[32];            // the size is not known
 
