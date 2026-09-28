@@ -588,7 +588,7 @@ void fn_80091EE8(void) {
     if (!(gSession.uFlags & 0x4000)) {
         sprintf(szName, "tigcam%02d", (s16)((Misc_RandFunc(0) & 1) + 1));
         FE_MakeCameoMoviePath(szName, szPath);
-        LLVideo_PlayFile(szPath, fn_80076FDC, 0, 0);
+        LLVideo_PlayFile(szPath, FE_IsMovieSkipPressed, 0, 0);
     }
     pPict = fn_8002FD00(lbl_80282134, lbl_8028212C);
     fn_80091FC0(pPict, 180, 1.0f / 30.0f);

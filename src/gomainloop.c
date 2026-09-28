@@ -171,9 +171,9 @@ void fn_800763B4(void);
 void fn_800763B8(void);
 void VM_vInitModule(void);
 void VM_vCloseModule(void);
-void fn_80076E48(void);
-void fn_800773F8(void);
-void fn_80077428(void);
+void FE_vOpenONCE(void);
+void FE_vInitModule(void);
+void FE_vCloseModule(void);
 void IG_InitGameMessages(void);
 void FE_CharMgrClose(void);
 void FE_StreamUpdateState(void);
@@ -403,7 +403,7 @@ void fn_8006C6F0(void) {
 void fn_8006C720(void) {
     StaticMem_Reset();
     fn_8002E258();
-    fn_80076E48();
+    FE_vOpenONCE();
     fn_800763B4();
     fn_80055D3C();
     fn_800563C4();
@@ -552,7 +552,7 @@ void GO_vInitFE(void) {
     Aud_InitSession(0, 0, 1, 0);
     fn_8000B884();
     fn_80124B54();
-    fn_800773F8();
+    FE_vInitModule();
     fn_80014668();
     Character_InitFE();
     fn_800B9A88();
@@ -576,7 +576,7 @@ void fn_8006CB2C(void) {
     RC_vReleaseRenderCtx(lbl_80281E54);
     fn_8010F794();
     FE_CharMgrClose();
-    fn_80077428();
+    FE_vCloseModule();
     VM_vReleaseViewport(lbl_80281E58);
     FB_vReleaseFrameBuffer(lbl_80281E5C);
     CA_vReleaseCamera(lbl_80281E60);

@@ -30,7 +30,7 @@ void fn_80008380(void);
 void SkinBurn_CheckSignatureFile(void);
 void fn_800573E4(void);
 void fn_80091EE4(void);
-void fn_8007734C(void);
+void FE_PlayIntroMovies(void);
 void Gaud_StartFEMusic(int a);
 void GameMode26_StartEvent(void);                     // GameMode26.c
 void fn_80091D84(void);
@@ -105,7 +105,7 @@ void fn_800083A4(void) {
         case 3:
             fn_80091EE4();
             if (gFEState.b0F) {
-                fn_8007734C();
+                FE_PlayIntroMovies();
             }
             Gaud_StartFEMusic(gFEState.b0F);
             fn_8009005C("frontend");

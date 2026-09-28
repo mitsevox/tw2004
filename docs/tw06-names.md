@@ -214,7 +214,7 @@ Functions still unnamed or named from TW06:
 | `800E53B8` | `GUI_IsAwardUIAnimating` | `GUI_IsAwardUIAnimating` | medium | PS2 calls(r0,2) |
 | `80114540` | `fn_80114540` | `DynChain_DoBoobSimulation` | medium | Xbox anchor(1)+graph |
 | `8011E020` | `fn_8011E020` | `GetLocalTime` | medium | Xbox calls(r1,1) |
-| `8007706C` | `fn_8007706C` | - | conflict | Xbox: sfsnprintf calls(r0,1) / PS2: FE_MakeMoviePathWithSubDir anchor(1) |
+| `8007706C` | `FE_MakeMoviePathWithSubDir` | - | conflict | Xbox: sfsnprintf calls(r0,1) / PS2: FE_MakeMoviePathWithSubDir anchor(1) |
 | `800C4AB0` | `GolfCamera_ClampLookAngle` | - | conflict | Xbox: GolfCamera_ClampLookAngle nbr(r9,3) / PS2: CameraController_BallIsOnScreen nbr2(r8,2) |
 | `800BAF04` | `LLMath_Normalize3` | ~~-~~ | rejected | Xbox: vec4flt_LengthSquared3 nbr(r7,11) / PS2: GetGamePlayerCoreShotInfo nbr(r1,7); our code shows it normalises a vector |
 

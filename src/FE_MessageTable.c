@@ -44,7 +44,7 @@ void MC_ConnectCard(s32 nPort, s32 nSlot); // MC_Gc.c
 s32  MC_NumEASaveGames(s32 nPort, s32 nSlot); // MC_Gc.c
 s32  fn_800A1164(s32 nPort, s32 nSlot, char* pName, s32 n);     // MC.c
 s32  MC_GetUser(s32 nPort, s32 nSlot, s32 n, char* szOut);     // MC.c: clears szOut first
-void fn_8007739C(Replay* pReplay);      // FE_Manager.c
+void FE_PlayTrophyBallHighlight(Replay* pReplay);      // FE_Manager.c
 f32  GM_GetBonusProgress(SaveProfile* pProfile);    // GameMode.c
 void GM_PgaTourSim_ClearAllSeasons(TourSeason* pTour);    // PGATourSimulation.c
 int  GameMode4_GetCurrentEventHoles(void);                 // LadderedMode.c: the current ladder event's holes
@@ -732,7 +732,7 @@ void FE_RunGameMessage(int nMsg, MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Fills gFEMessageHandlers, the front end's messages by number (called from FE_Manager.c's
-// fn_800773F8 as the front end starts): every slot NULL, then 612 handlers of this file and the
+// FE_vInitModule as the front end starts): every slot NULL, then 612 handlers of this file and the
 // other front-end files (Create-A-Player, the logo editor, the PGA TOUR screens, the calendar, the
 // ladder, the trophy room...); the rest, message 1 among them, stay NULL.
 void FE_InitGameMessages(void) {
@@ -1635,7 +1635,7 @@ void GM_vMCDisconnect(MsgArg* pArgs, MsgArg* pResult) {
 
 // Front-end message 35: loads the profile named by the string pArgs[3] from the save on the memory
 // card in port pArgs[0], slot pArgs[1] into profile slot pArgs[2] (MC_LoadUser). Answers 1, or
-// MC_LoadUser's error. Then the slot's profile is backed up (fn_80077808) and marked loaded
+// MC_LoadUser's error. Then the slot's profile is backed up (FE_BackupProfileClaimRow) and marked loaded
 // (gFEState.aLoaded).
 // EA bug: the answer is never 0, so the backup and the loaded mark also happen when the load
 // failed.
@@ -1655,7 +1655,7 @@ void GM_vMCLoadUser(MsgArg* pArgs, MsgArg* pResult) {
     }
     pResult->i = n;
     if (pResult->i != 0) {
-        fn_80077808(pArgs[2].i);
+        FE_BackupProfileClaimRow(pArgs[2].i);
         gFEState.aLoaded[pArgs[2].i] = 1;
     }
 }
@@ -2372,14 +2372,14 @@ void GM_vSetCreatedGolferAttribute(MsgArg* pArgs, MsgArg* pResult) {
     pProfile->createdGolfer.attr[nAttr] = pArgs[2].i;
 }
 
-// Front-end message 85: queues a movie of kind 2 (fn_800770FC) and stops the music
+// Front-end message 85: queues a movie of kind 2 (FE_movieGetFreeEntry) and stops the music
 // (Gaud_StopMusic). FE_movieFade plays only kinds 1 (the credits) and 3 (a bio), so kind 2 gives
 // the fade to black, the golfers put away and set up again and the menu music restarted, with no
 // movie.
 void GM_vQueueMovieKind2(MsgArg* pArgs, MsgArg* pResult) {
     FEMovie* pMovie;
 
-    pMovie = fn_800770FC();
+    pMovie = FE_movieGetFreeEntry();
     pMovie->nKind = 2;
     Gaud_StopMusic();
 }
@@ -2943,7 +2943,7 @@ void GM_vIsProfileLoaded(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gFEState.aLoaded[pArgs[0].i];
 }
 
-// Front-end message 149: gFEState.b0F, set by the front end's setup (fn_80076E48): while it is
+// Front-end message 149: gFEState.b0F, set by the front end's setup (FE_vOpenONCE): while it is
 // set, entering the menus plays the intro movie (GoEntry.c, which also passes it to
 // Gaud_StartFEMusic, TW07's firstTime) and the front end's files load without the loading screen
 // (fn_80014718).
@@ -2992,7 +2992,7 @@ void GM_vFEMessage155_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 156: gFEState.b11, set when the menus start the demo (GM_vStartDemo) and
-// cleared when they start a game (fn_80079AD4) or the front end is set up (fn_80076E48).
+// cleared when they start a game (fn_80079AD4) or the front end is set up (FE_vOpenONCE).
 void GM_vGetDemoStarting(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gFEState.b11;
 }
@@ -3186,7 +3186,7 @@ void GM_vSetEditedGolferModelID(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 167: copies the profile being worked on (gpFEProfile) into save slot pArgs[0],
-// marks it active and the slot loaded, and backs the slot up (fn_80077808); in the demo set-up
+// marks it active and the slot loaded, and backs the slot up (FE_BackupProfileClaimRow); in the demo set-up
 // (session flag 0x4000) only into a slot with no profile loaded. A profile without a TOUR card
 // (level 0) gets level 1 unless gFEState.b18 is set (front-end message 188 sets it).
 void GM_vStoreProfileInSlot(MsgArg* pArgs, MsgArg* pResult) {
@@ -3199,7 +3199,7 @@ void GM_vStoreProfileInSlot(MsgArg* pArgs, MsgArg* pResult) {
             gpSaveData[nSlot].nTourCardLevel = 1;
         }
         gFEState.aLoaded[nSlot] = 1;
-        fn_80077808(nSlot);
+        FE_BackupProfileClaimRow(nSlot);
     }
 }
 
@@ -3459,7 +3459,7 @@ void GM_vGetTourCardLevel(MsgArg* pArgs, MsgArg* pResult) {
 // Front-end message 180: plays the replay save profile pArgs[0] kept with trophy ball pArgs[1]
 // (aReplay[0..4] for awards 0, 6, 9, 3 and 13; another award only sets the flags): gpFEProfile->b0
 // is set (fn_80079AD4 then records game mode 27 for the menus) and n1061C keeps the award;
-// fn_8007739C copies the replay into gReplayData and sets up game mode 10 with its golfer and
+// FE_PlayTrophyBallHighlight copies the replay into gReplayData and sets up game mode 10 with its golfer and
 // course. SaveProfile.aReplay is Replay[5]: copying the struct member gives the original's copy
 // order.
 void GM_vShowAwardReplay(MsgArg* pArgs, MsgArg* pResult) {
@@ -3474,23 +3474,23 @@ void GM_vShowAwardReplay(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[1].i) {
     case 0:
         replay0 = gpSaveData[pArgs[0].i].aReplay[0];
-        fn_8007739C(&replay0);
+        FE_PlayTrophyBallHighlight(&replay0);
         break;
     case 6:
         replay6 = gpSaveData[pArgs[0].i].aReplay[1];
-        fn_8007739C(&replay6);
+        FE_PlayTrophyBallHighlight(&replay6);
         break;
     case 9:
         replay9 = gpSaveData[pArgs[0].i].aReplay[2];
-        fn_8007739C(&replay9);
+        FE_PlayTrophyBallHighlight(&replay9);
         break;
     case 3:
         replay3 = gpSaveData[pArgs[0].i].aReplay[3];
-        fn_8007739C(&replay3);
+        FE_PlayTrophyBallHighlight(&replay3);
         break;
     case 13:
         replay13 = gpSaveData[pArgs[0].i].aReplay[4];
-        fn_8007739C(&replay13);
+        FE_PlayTrophyBallHighlight(&replay13);
         break;
     }
 }
@@ -3499,10 +3499,10 @@ void GM_vShowAwardReplay(MsgArg* pArgs, MsgArg* pResult) {
 // pArgs[0]: its name, its created golfer (createdGolfer and bytes 0x54C0..0x5500) and its looks,
 // dates, assets and unlock bits (0x5500 up to tour); the slot keeps its own stats, awards and
 // money. A slot with no profile loaded gets its money plus gFEState.n1C plus 25,000. The slot
-// is marked active and loaded and backed up (fn_80077808), gets TOUR card level 1 if it has none,
-// and its PGA TOUR seasons are cleared (GM_PgaTourSim_ClearAllSeasons). Its saved replays' golfer
-// and the all-time records held under its old name take the new name; the course records were meant
-// to as well (the EA bug below).
+// is marked active and loaded and backed up (FE_BackupProfileClaimRow), gets TOUR card level 1 if
+// it has none, and its PGA TOUR seasons are cleared (GM_PgaTourSim_ClearAllSeasons). Its saved
+// replays' golfer and the all-time records held under its old name take the new name; the course
+// records were meant to as well (the EA bug below).
 void GM_vSaveCreatedPlayerToSlot(MsgArg* pArgs, MsgArg* pResult) {
     char szOld[0x20];           // the size is unknown (0x20 gives the original's frame)
     int  nSlot;
@@ -3530,7 +3530,7 @@ void GM_vSaveCreatedPlayerToSlot(MsgArg* pArgs, MsgArg* pResult) {
         gpSaveData[nSlot].nTourCardLevel = 1;
     }
     gFEState.aLoaded[nSlot] = 1;
-    fn_80077808(nSlot);
+    FE_BackupProfileClaimRow(nSlot);
 
     for (k = 0; k < 5; k++) {
         strcpy(gpSaveData[pArgs[0].i].aReplay[k].player.golfer.szLast, gpSaveData[nSlot].szName);
@@ -3610,7 +3610,7 @@ void GM_vFEFormatWithCommas(MsgArg* pArgs, MsgArg* pResult) {
     fn_800907AC(pArgs[0].i, ((MsgString*)pArgs[1].p)->pStr);
 }
 
-// Front-end message 187: gFEState.b18: set by the front end's setup (fn_80076E48), cleared by
+// Front-end message 187: gFEState.b18: set by the front end's setup (FE_vOpenONCE), cleared by
 // the "THEKITCHENSINK" cheat code and by front-end message 188. While it is clear, a profile stored
 // without a TOUR card gets level 1 (GM_vStoreProfileInSlot).
 void GM_vGetTourCardWithheld(MsgArg* pArgs, MsgArg* pResult) {
@@ -3652,7 +3652,7 @@ void GM_vGetCoursePrice(MsgArg* pArgs, MsgArg* pResult) {
 // pArgs[0] + 1 (fn_80057ED0: its name and its created golfer's last name), and stores it in that
 // save slot: when the slot has no profile loaded, gFEState.n1C plus 25,000 is first added to
 // its money; it is marked active, gets TOUR card level 1 if it has none, the slot is marked loaded
-// and backed up (fn_80077808).
+// and backed up (FE_BackupProfileClaimRow).
 void GM_vSaveProfileWithDefaultName(MsgArg* pArgs, MsgArg* pResult) {
     s32 nSlot = pArgs[0].i;
     char szName[16];
@@ -3668,7 +3668,7 @@ void GM_vSaveProfileWithDefaultName(MsgArg* pArgs, MsgArg* pResult) {
     }
     gFEState.aLoaded[nSlot] = 1;
     Mem_cpy(&gpSaveData[nSlot], &gpFEProfile->profile, sizeof(SaveProfile));
-    fn_80077808(nSlot);
+    FE_BackupProfileClaimRow(nSlot);
 }
 
 // Front-end message 193: the par of hole pArgs[1] (0-based) of course pArgs[0] (fn_800D2ABC). Below
@@ -3831,12 +3831,12 @@ void GM_vGetPar5EagleDate(MsgArg* pArgs, MsgArg* pResult) {
     *pC = 0;
 }
 
-// Front-end message 205: queues the credits movie (fn_800770FC, kind FE_MOVIE_CREDITS) and stops
+// Front-end message 205: queues the credits movie (FE_movieGetFreeEntry, kind FE_MOVIE_CREDITS) and stops
 // the music (Gaud_StopMusic).
 void GM_vPlayCredits(MsgArg* pArgs, MsgArg* pResult) {
     FEMovie* pMovie;
 
-    pMovie = fn_800770FC();
+    pMovie = FE_movieGetFreeEntry();
     pMovie->nKind = FE_MOVIE_CREDITS;
     Gaud_StopMusic();
 }
@@ -4560,7 +4560,7 @@ void GM_vGetBackupProfileName(MsgArg* pArgs, MsgArg* pResult) {
 
 // Front-end message 258: player slot pArgs[1] takes the profile in backup row pArgs[0]: the slot is
 // marked loaded (gFEState.aLoaded), the two rows pArgs[0] and pArgs[1] are swapped when they
-// differ (fn_800779BC) so the profile sits in the slot's own row, that row is copied into the
+// differ (FE_SwapBackupRows) so the profile sits in the slot's own row, that row is copied into the
 // slot's profile (gpSaveData) and becomes the slot's backup row (aBackup).
 void GM_vLoadBackupProfile(MsgArg* pArgs, MsgArg* pResult) {
     s32 nRow = pArgs[0].i;
@@ -4568,22 +4568,22 @@ void GM_vLoadBackupProfile(MsgArg* pArgs, MsgArg* pResult) {
 
     gFEState.aLoaded[nSlot] = 1;
     if (nSlot != nRow) {
-        fn_800779BC(nSlot, nRow);
+        FE_SwapBackupRows(nSlot, nRow);
     }
     Mem_cpy(&gpSaveData[nSlot], &gFEState.p658[nSlot], sizeof(SaveProfile));
     gFEState.aBackup[nSlot] = nSlot;
 }
 
 // Front-end message 259: backs up every player slot's profile that is active into the slot's own
-// backup row (fn_80077780).
+// backup row (FE_BackupAllProfiles).
 void GM_vBackupAllProfiles(MsgArg* pArgs, MsgArg* pResult) {
-    fn_80077780();
+    FE_BackupAllProfiles();
 }
 
-// Front-end message 260: backs up player slot pArgs[0]'s profile (fn_80077808: into its backup row,
-// giving the slot one first when it has none).
+// Front-end message 260: backs up player slot pArgs[0]'s profile (FE_BackupProfileClaimRow: into
+// its backup row, giving the slot one first when it has none).
 void GM_vBackupProfileClaimRow(MsgArg* pArgs, MsgArg* pResult) {
-    fn_80077808(pArgs[0].i);
+    FE_BackupProfileClaimRow(pArgs[0].i);
 }
 
 // Front-end message 261: the rough option (options.n1C) from the menu's choice pArgs[0]: 1, 2, 3
@@ -4958,9 +4958,9 @@ void GM_vFEMessage291_Return4(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 294: copies player slot pArgs[0]'s profile into its backup row (FE_Manager.c
-// fn_80077968; gFEState.p658[aBackup[slot]]).
+// FE_BackupProfile; gFEState.p658[aBackup[slot]]).
 void GM_vBackupProfile(MsgArg* pArgs, MsgArg* pResult) {
-    fn_80077968(pArgs[0].i);
+    FE_BackupProfile(pArgs[0].i);
 }
 
 // Front-end message 295: always answers 0 and an empty string (into the string pArgs[0]) in this
@@ -5242,14 +5242,14 @@ void GM_vGetLadderEventMaxSkins(MsgArg* pArgs, MsgArg* pResult) {
 void GM_vFEMessage324_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Front-end message 327: queues a movie (fn_800770FC; FE_movieFade fades to black and plays it):
+// Front-end message 327: queues a movie (FE_movieGetFreeEntry; FE_movieFade fades to black and plays it):
 // the credits when pArgs[0] is -1, else a bio movie; the music stops (Gaud_StopMusic). pArgs[0] is
 // not stored as the bio's number: nothing in this build writes FEMovie.nBio, so a bio movie always
 // plays bios/bio01.
 void GM_vQueueMovie(MsgArg* pArgs, MsgArg* pResult) {
     FEMovie* pMovie;
 
-    pMovie = fn_800770FC();
+    pMovie = FE_movieGetFreeEntry();
     pMovie->nKind = FE_MOVIE_BIO;
     if (pArgs[0].i == -1) {
         pMovie->nKind = FE_MOVIE_CREDITS;
@@ -5301,7 +5301,7 @@ void GM_vIsWaveBird(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 333: the front end's flag gFEState.b10 (1 after the front end's set-up,
-// fn_80076E48; slot 334 sets it; nothing else reads it).
+// FE_vOpenONCE; slot 334 sets it; nothing else reads it).
 void GM_vGetFEStateB10(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gFEState.b10;
 }

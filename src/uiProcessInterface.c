@@ -46,9 +46,9 @@ void fn_8008EC30(void);         // uiLoadFile.c
 void fn_800B9FF0(void);
 void fn_80037FB4(u8 a, f32* pColor);    // a full-screen colour (GoPostFx.c)
 void DEMO_Start(void);                 // BootCourse.c
-void fn_80077340(void);                 // FE_Manager.c
-void fn_80077344(void);                 // FE_Manager.c
-void fn_80077348(void);                 // FE_Manager.c
+void FE_PlayPGATourMovie(void);                 // FE_Manager.c
+void FE_PlayRTEMovie(void);                 // FE_Manager.c
+void FE_PlayLadderMovie(void);                 // FE_Manager.c
 void fn_80016B6C(f32 x, f32 y);
 void FO_vSetCurrentAddMode(s32 nMode);
 void fn_80012C54_SetWordWrap(s32 v);
@@ -294,7 +294,7 @@ void fn_8008F820(void) {
         lbl_801D87C0.b49 = 1;
     }
     aArgs[0] = 0;
-    if (lbl_801D87C0.bFadeToBlack == 0 && fn_80077148() && lbl_801D87C0.b40 == 0) {
+    if (lbl_801D87C0.bFadeToBlack == 0 && FE_movieIsQueueEmpty() && lbl_801D87C0.b40 == 0) {
         for (k = 0; k < 4; k++) {
             if (lbl_801D87C0.a1[k] && lbl_801D87C0.a30[k]) {
                 if (gSession.nGameType != 6 || (gSession.nPaused != 2 && gSession.nPaused != 3)) {
@@ -592,11 +592,11 @@ void fn_8009069C(void) {
                 DEMO_Start();
             }
             if (Game_GetMode() == 0x17) {
-                fn_80077340();
+                FE_PlayPGATourMovie();
             } else if (Game_GetMode() == 0x18) {
-                fn_80077344();
+                FE_PlayRTEMovie();
             } else if (Game_GetMode() == 4) {
-                fn_80077348();
+                FE_PlayLadderMovie();
             }
         } else {
             gSession.bEndLoop = 1;

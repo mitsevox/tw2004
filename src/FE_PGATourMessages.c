@@ -296,12 +296,12 @@ void PGASeasonWrapUp_GetLine(MsgArg* pArgs, MsgArg* pResult) {
 
 // FE message 553: starts the next PGA TOUR season (GameModeDriverPGATour_AdvanceSeason; its result,
 // 0 after the tenth season, is not checked), resets the calendar to it and backs up profile slot 0
-// (fn_80077808). Defined with no parameters though the message table calls it with two.
+// (FE_BackupProfileClaimRow). Defined with no parameters though the message table calls it with two.
 void PGADriver_ShowCalendar_AdvanceSeason(void) {
     CalendarState.bSeasonOver = 0;
     GameModeDriverPGATour_AdvanceSeason();
     ResetCalendarState();
-    fn_80077808(0);
+    FE_BackupProfileClaimRow(0);
 }
 
 // FE message 559: placeholder texts for n = pArgs[0]: "S n", "I n" and "$ n00,000" into
@@ -514,11 +514,11 @@ void PGATourWins_GetDetails(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // FE message 718: after a tour round, profile 0's tournament is moved on
-// (GameModeDriverPGATour_CheckAdvanceTournament); when a movie is queued (fn_80077148 false), the
+// (GameModeDriverPGATour_CheckAdvanceTournament); when a movie is queued (FE_movieIsQueueEmpty false), the
 // front end's fade to black (lbl_801D87C0.fFade) is set to full at once.
 void PGATourMsg_CheckAdvanceTournament(MsgArg* pArgs, MsgArg* pResult) {
     GameModeDriverPGATour_CheckAdvanceTournament(0);
-    if (!fn_80077148()) {
+    if (!FE_movieIsQueueEmpty()) {
         lbl_801D87C0.fFade = 1.0f;
     }
 }

@@ -30,15 +30,15 @@ typedef struct FEState {
     u8  aCPU[5];                // 0x005  per player slot: a CPU player (fn_80079AD4 gives it
                                 //        CONTROLLER_CPU and no profile)
     s8  aBackup[5];             // 0x00A  per player slot: its row in p658 (-1: none)
-    u8  b0F;                    // 0x00F  set by fn_80076E48
-    u8  b10;                    // 0x010  set by fn_80076E48
+    u8  b0F;                    // 0x00F  set by FE_vOpenONCE
+    u8  b10;                    // 0x010  set by FE_vOpenONCE
     u8  b11;                    // 0x011  cleared by fn_80079AD4
     u8  unk12[2];
     s32 nMode;                  // 0x014  the game mode the menus start in (fn_80079AD4): the
                                 //        session's, or 4, 23, 27 or 28
-    u8  b18;                    // 0x018  set by fn_80076E48; cleared by the "THEKITCHENSINK" cheat code
+    u8  b18;                    // 0x018  set by FE_vOpenONCE; cleared by the "THEKITCHENSINK" cheat code
     u8  unk19[3];
-    s32 n1C;                    // 0x01C  cleared by fn_80076E48
+    s32 n1C;                    // 0x01C  cleared by FE_vOpenONCE
     s32 nMovieNext;             // 0x020  } the movie queue: the next to play, and where the next
     s32 nMovieFree;             // 0x024  } one is added (equal when it is empty)
     FEMovie aMovies[FE_NUM_MOVIES];     // 0x028
@@ -168,7 +168,7 @@ extern FE801D8890 lbl_801D8890[FE_NUM_801D8890];
 extern u32 lbl_801D8ED0[FE_NUM_801D8890];
 
 // The profile being worked on in the menus (gpFEProfile points to it; 0x11708 bytes, allocated
-// and cleared by fn_8007744C).
+// and cleared by FE_InitManager).
 typedef struct FEProfile {
     u8  b0;                     // 0x00000  with game mode 10, the menus start in mode 27
     s8  n1;                     // 0x00001  -1 when it is set up
@@ -223,7 +223,7 @@ LAYOUT_ASSERT(FEBio, 0x1F8);
 extern s32 gStartUnlockedGolfers[16];            // golfer ids GM_vIsGolferUnlockedByDefault counts as unlocked
 
 #define FE_NUM_BIOS 29
-extern FEBio* gpFEBios;             // a copy of the 'BIO ' stream object's data (fn_80076F80)
+extern FEBio* gpFEBios;             // a copy of the 'BIO ' stream object's data (FE_CharBios_LoadBIOfromStream)
 
 // The profile backups (FEState.p658) can be moved out to ARAM (fn_80079D30) and back (fn_80079DAC).
 #define FE_BACKUP_SIZE 0x41820          // the four slots' backups (4 x 0x10600) and 0x20 more
@@ -443,7 +443,7 @@ int  FE_CrAP_GetFirstEquippedIndexForCategoryAndSubcategory(s16 nPart, int n);
 void FE_MakeMoviePath(char* pName, char* pPath);        // "data/movies/<name>.NGC"
 void FE_MakeCameoMoviePath(char* pName, char* pPath);   // "data/movies/cameos/<name>.NGC"
 // A movie's skip test for LLVideo.c's LLVideo_PlayFile (whose arguments it ignores): any button.
-u8   fn_80076FDC(struct Video* pVideo, int nArg);
+u8   FE_IsMovieSkipPressed(struct Video* pVideo, int nArg);
 
 // fe_movies.c: the texture bank loaded from LoadData.c's 'txf2' copy (fn_80091778), its slot and its
 // first texture.
@@ -470,7 +470,7 @@ SaveProfile* FE_GetCurrentProfile(void);         // the profile being worked on
 u8   fn_80078008(s32 nAsset, SaveProfile* pProfile);  // the asset is locked (FE_Manager.c)
 int  fn_80078604(int a, int b, int c);  // a date (month, day, year from fn_8011E020) packed
 int  fn_80077B08(void);                 // its player slot
-u8   fn_80077148(void);
+u8   FE_movieIsQueueEmpty(void);
 int  fn_80077BDC(int n);                // -1, -2, -3 to 0, 1, 2; anything else to 0
 void fn_80078680(SaveProfile* pProfile);    // note which assets are locked (aAssetLocked)
 void fn_8007873C(SaveProfile* pProfile);
@@ -482,11 +482,11 @@ int  FE_CrAP_RandomizePart(SaveProfile* pProfile, s16 nPart, int nChance);    //
 int  fn_800797E0(SaveProfile* pProfile, s16 nPart, int b, int nChance);
 u8   fn_80077B18(int nGolfer);          // a yes/no list over golfers 0..28 (Golfer.c asks it)
 void fn_80077B78(void);                 // pick the day's random assets (fn_80077C1C)
-FEMovie* fn_800770FC(void);             // the next free place in the movie queue
-void fn_80077780(void);
-void fn_80077808(int nSlot);
-void fn_80077968(int nSlot);
-void fn_800779BC(int a, int b);         // swap backup rows a and b (p658)
+FEMovie* FE_movieGetFreeEntry(void);             // the next free place in the movie queue
+void FE_BackupAllProfiles(void);
+void FE_BackupProfileClaimRow(int nSlot);
+void FE_BackupProfile(int nSlot);
+void FE_SwapBackupRows(int a, int b);         // swap backup rows a and b (p658)
 GolferRecord* fn_80077A80(int nGolfer); // a golfer's record (created golfers: the profile's)
 void fn_80078620(int n, int* pA, int* pB, int* pC);     // unpack n = b * 1000000 + a * 10000 + c
 void fn_80079AD4(void);

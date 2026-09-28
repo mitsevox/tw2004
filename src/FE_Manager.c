@@ -33,27 +33,27 @@ s32  fn_801258E8(void);                 // EASportsBio.c
 void fn_8009170C(void);
 
 // This file, in address order.
-void fn_80076E48(void);
-void fn_80076EEC(void);                 // frees gpFEBios
-void fn_80076F20(void);
-void fn_80076F24(void);
-void fn_80076F54(void);
-void fn_80076F58(void);
-void fn_80076F80(UStreamObject* pObject);
-void fn_8007706C(char* pName, char* pDir, char* pPath);
-void fn_800770D4(char* pName, char* pPath);
+void FE_vOpenONCE(void);
+void FE_CharBios_FreeStreamMemory(void);                 // frees gpFEBios
+void FE_Manager_FreeStreamMemory(void);
+void FE_CharBios_RegisterStreamClients(void);
+void FE_Manager_RegisterStreamClients(void);
+void FE_CharBios_UnRegisterStreamClients(void);
+void FE_CharBios_LoadBIOfromStream(UStreamObject* pObject);
+void FE_MakeMoviePathWithSubDir(char* pName, char* pDir, char* pPath);
+void FE_MakeBioMoviePath(char* pName, char* pPath);
 void FE_movieFade(void);
-void fn_800772E0(void);
-void fn_8007731C(void);
-void fn_80077340(void);
-void fn_80077344(void);
-void fn_80077348(void);
-void fn_8007734C(void);
-void fn_8007739C(Replay* pReplay);
-void fn_800773F8(void);
-void fn_80077428(void);
-void fn_8007744C(void);
-void fn_800775BC_LoadCreatedFromSave(void);
+void FE_PreMovieSetup(void);
+void FE_PostMovieSetup(void);
+void FE_PlayPGATourMovie(void);
+void FE_PlayRTEMovie(void);
+void FE_PlayLadderMovie(void);
+void FE_PlayIntroMovies(void);
+void FE_PlayTrophyBallHighlight(Replay* pReplay);
+void FE_vInitModule(void);
+void FE_vCloseModule(void);
+void FE_InitManager(void);
+void FE_CloseManager(void);
 void fn_80077C1C(int a, int b);
 u8   FE_CrAP_IsAssetUndesirable(s16 nPart, CrAPAsset* pAsset);
 u8   FE_CrAP_IsCrazyHairColor(CrAPAsset* pAsset);
@@ -81,8 +81,11 @@ static f32 FE_Manager_StrippedFn(f32 x) {
     return x + 1.0f;
 }
 
-// Set the front end's state up: no profiles loaded, no CPU players, no backups, no movies.
-void fn_80076E48(void) {
+// Sets the front end's state up once, at start-up (gomainloop fn_8006C720): no player slot loaded
+// or CPU, no backup rows (aBackup -1), no profile backups (p658), no movie queued, the menus' start
+// mode (nMode) -1; b0F, b10 and b18 set, b11 and n1C cleared. Then the points fe_movies.c draws at
+// (fn_8009170C) and lbl_801D8858's picture.
+void FE_vOpenONCE(void) {
     int i;
     for (i = 0; i < 5; i++) {
         gFEState.aLoaded[i] = 0;
@@ -102,30 +105,39 @@ void fn_80076E48(void) {
     lbl_801D8858.p30 = NULL;
 }
 
-// Free the copy of the 'BIO ' stream object's data.
-void fn_80076EEC(void) {
+// Frees the golfers' bios (gpFEBios, the copy FE_CharBios_LoadBIOfromStream made), if there are
+// any.
+void FE_CharBios_FreeStreamMemory(void) {
     if (gpFEBios != NULL) {
         StaticMem_Free(gpFEBios);
         gpFEBios = NULL;
     }
 }
 
-void fn_80076F20(void) {
+// Empty in this build. Called only by FE_CloseManager, right after FE_CharBios_FreeStreamMemory.
+void FE_Manager_FreeStreamMemory(void) {
 }
 
-void fn_80076F24(void) {
-    Stream_RegisterLoadChunkCallback(TAG('B', 'I', 'O', ' '), fn_80076F80);
+// Has the stream loader hand 'BIO ' objects (the golfers' bios) to FE_CharBios_LoadBIOfromStream.
+// Called by the front end's stream-client registration (streammanagerhole.c fn_80014668).
+void FE_CharBios_RegisterStreamClients(void) {
+    Stream_RegisterLoadChunkCallback(TAG('B', 'I', 'O', ' '), FE_CharBios_LoadBIOfromStream);
 }
 
-void fn_80076F54(void) {
+// Empty in this build. Called by the front end's stream-client registration (streammanagerhole.c
+// fn_80014668), right after FE_CharBios_RegisterStreamClients.
+void FE_Manager_RegisterStreamClients(void) {
 }
 
-void fn_80076F58(void) {
+// Stops the stream loader handing 'BIO ' objects to FE_CharBios_LoadBIOfromStream
+// (streammanagerhole.c fn_800146C4).
+void FE_CharBios_UnRegisterStreamClients(void) {
     Stream_UnregisterLoadChunkCallback(TAG('B', 'I', 'O', ' '));
 }
 
-// The 'BIO ' stream object's handler: keep a copy of its data.
-void fn_80076F80(UStreamObject* pObject) {
+// The 'BIO ' stream object's handler: copies its data (the golfers' bios, FEBio records) into a new
+// block, gpFEBios, and frees the object.
+void FE_CharBios_LoadBIOfromStream(UStreamObject* pObject) {
     gpFEBios = StaticMem_Alloc(pObject->uSize, 2, 32, "FE_Manager.c", 285);
     Mem_cpy(gpFEBios, pObject->pData, pObject->uSize);
     StaticMem_Free(pObject);
@@ -133,7 +145,7 @@ void fn_80076F80(UStreamObject* pObject) {
 
 // A movie's skip test (LLVideo_PlayFile's pfnStop, whose arguments it ignores): any button on any
 // controller.
-u8 fn_80076FDC(Video* pVideo, int nArg) {
+u8 FE_IsMovieSkipPressed(Video* pVideo, int nArg) {
     int i;
     Input_vUpdate();
     for (i = 0; i < 4; i++) {
@@ -149,23 +161,27 @@ void FE_MakeMoviePath(char* pName, char* pPath) {
     sprintf(pPath, "data/movies/%s.%s", pName, "NGC");
 }
 
-// The same in a subfolder: "data/movies/<dir>/<name>.NGC".
-void fn_8007706C(char* pName, char* pDir, char* pPath) {
+// A movie's path in a subfolder of the movies folder: "data/movies/<dir>/<name>.NGC".
+void FE_MakeMoviePathWithSubDir(char* pName, char* pDir, char* pPath) {
     sprintf(pPath, "data/movies/%s/%s.%s", pDir, pName, "NGC");
 }
 
+// A cameo movie's path: "data/movies/cameos/<name>.NGC" (fe_movies.c).
 void FE_MakeCameoMoviePath(char* pName, char* pPath) {
-    fn_8007706C(pName, "cameos", pPath);
+    FE_MakeMoviePathWithSubDir(pName, "cameos", pPath);
 }
 
-void fn_800770D4(char* pName, char* pPath) {
-    fn_8007706C(pName, "bios", pPath);
+// A golfer's bio movie's path: "data/movies/bios/<name>.NGC" (FE_movieFade, for "bio<nn>").
+void FE_MakeBioMoviePath(char* pName, char* pPath) {
+    FE_MakeMoviePathWithSubDir(pName, "bios", pPath);
 }
 
 // ---- the movie queue: the menus queue a movie, the screen fades to black and it plays ----------
 
-// Add a movie to the queue; the caller fills it in.
-FEMovie* fn_800770FC(void) {
+// Adds an entry to the movie queue (gFEState.aMovies, a ring of FE_NUM_MOVIES) and returns it for
+// the caller to fill in (menu messages GM_vPlayCredits, GM_vQueueMovie). Nothing checks for a full
+// ring.
+FEMovie* FE_movieGetFreeEntry(void) {
     FEMovie* pMovie = &gFEState.aMovies[gFEState.nMovieFree++];
     if (gFEState.nMovieFree % FE_NUM_MOVIES == 0) {
         gFEState.nMovieFree = 0;
@@ -174,7 +190,7 @@ FEMovie* fn_800770FC(void) {
 }
 
 // The queue is empty.
-u8 fn_80077148(void) {
+u8 FE_movieIsQueueEmpty(void) {
     return gFEState.nMovieFree == gFEState.nMovieNext;
 }
 
@@ -185,7 +201,7 @@ void FE_movieFade(void) {
     char szName[32];
     f32 vColor[4];
     FEMovie* pMovie;
-    if (!fn_80077148()) {
+    if (!FE_movieIsQueueEmpty()) {
         vColor[0] = 0.0f;
         vColor[1] = 0.0f;
         vColor[2] = 0.0f;
@@ -195,21 +211,21 @@ void FE_movieFade(void) {
         pMovie = &gFEState.aMovies[gFEState.nMovieNext];
         if (lbl_801D87C0.fFade >= 1.0f) {
             Gaud_StopMusic();
-            fn_800772E0();
+            FE_PreMovieSetup();
             switch (pMovie->nKind) {
             case FE_MOVIE_CREDITS:
                 FE_MakeMoviePath("credits", szPath);
-                LLVideo_PlayFile(szPath, fn_80076FDC, 0, 0);
+                LLVideo_PlayFile(szPath, FE_IsMovieSkipPressed, 0, 0);
                 break;
             case FE_MOVIE_BIO:
                 sprintf(szName, "bio%02d", pMovie->nBio + 1);
-                fn_800770D4(szName, szPath);
-                LLVideo_PlayFile(szPath, fn_80076FDC, 0, 0);
+                FE_MakeBioMoviePath(szName, szPath);
+                LLVideo_PlayFile(szPath, FE_IsMovieSkipPressed, 0, 0);
                 break;
             case 4:                     // fake match: the original never compares with 4; this empty
                 break;                  // case only makes the dispatch test 3 before 1
             }
-            fn_8007731C();
+            FE_PostMovieSetup();
             Gaud_StartFEMusic(0);
             lbl_801D87C0.fFade = 0.0f;
             gFEState.nMovieNext++;
@@ -220,8 +236,10 @@ void FE_movieFade(void) {
     }
 }
 
-// Before a movie.
-void fn_800772E0(void) {
+// Makes room before a movie plays (FE_movieFade): the menu golfers' streaming is stopped
+// (FE_StreamSetNextState(1), interrupted, waited for), the golfer cache cleared, and the pixel data
+// of the menus' texture banks freed (fn_80092198).
+void FE_PreMovieSetup(void) {
     FE_StreamSetNextState(1);
     FE_StreamInterruptState();
     FE_StreamWaitForState(1);
@@ -230,53 +248,71 @@ void fn_800772E0(void) {
     fn_80092198();
 }
 
-// After a movie.
-void fn_8007731C(void) {
+// After a movie (FE_movieFade): fn_8009220C (empty) and the menu golfers' textures set up again
+// (FE_InitGolferTextures).
+void FE_PostMovieSetup(void) {
     fn_8009220C();
     FE_InitGolferTextures();
 }
 
-void fn_80077340(void) {
+// Empty (in TW07 too). Called when the menus' fade to black ends and game mode 23, the PGA TOUR
+// season, starts (uiProcessInterface.c fn_8009069C).
+void FE_PlayPGATourMovie(void) {
 }
 
-void fn_80077344(void) {
+// Empty in this build (TW07's plays a movie). Called when the menus' fade to black ends and game
+// mode 24, the real-time events, starts (uiProcessInterface.c fn_8009069C).
+void FE_PlayRTEMovie(void) {
 }
 
-void fn_80077348(void) {
+// Empty in this build. Called when the menus' fade to black ends and game mode 4, the ladder,
+// starts (uiProcessInterface.c fn_8009069C).
+void FE_PlayLadderMovie(void) {
 }
 
-// The intro movie, unless the session says to skip it.
-void fn_8007734C(void) {
+// Plays the intro movie at boot (GoEntry.c), unless bit 0x4000 of the session's flags is set; any
+// button skips it (FE_IsMovieSkipPressed).
+void FE_PlayIntroMovies(void) {
     char szPath[64];
     if (!(gSession.uFlags & 0x4000)) {
         FE_MakeMoviePath("intro", szPath);
-        LLVideo_PlayFile(szPath, fn_80076FDC, 0, 0);
+        LLVideo_PlayFile(szPath, FE_IsMovieSkipPressed, 0, 0);
     }
 }
 
-// Play a saved shot: game mode 10 (the replay) with its golfer on its course.
-void fn_8007739C(Replay* pReplay) {
+// Sets a trophy ball's saved shot up to be replayed (the trophy room, menu message
+// GM_vShowAwardReplay): copies it into gReplayData, then game mode 10 (the replay) with its golfer
+// as player 0's and its course.
+void FE_PlayTrophyBallHighlight(Replay* pReplay) {
     Mem_cpy(&gReplayData, pReplay, sizeof(Replay));
     GM_SetModeType(10);
     Session_SetGolfer(gReplayData.player.golfer.nIndex, 0);
     GM_SetCurrentCourse(gReplayData.nCourse);
 }
 
-void fn_800773F8(void) {
+// Starts the front end (GO_vInitFE): the 'txf ' texture-group stream client (fn_80010284), the
+// menus' message table, the manager (FE_InitManager), the menu golfers' module, and the profile
+// backups back from ARAM (fn_80079DAC).
+void FE_vInitModule(void) {
     fn_80010284();
     FE_InitGameMessages();
-    fn_8007744C();
+    FE_InitManager();
     FE_vInitFECharModule();
     fn_80079DAC();
 }
 
-void fn_80077428(void) {
-    fn_800775BC_LoadCreatedFromSave();
+// Shuts the front end down (gomainloop fn_8006CB2C): the manager (FE_CloseManager: the created
+// golfers into the golfer table, the bios and the menus' profile freed), then the profile backups
+// out to ARAM (fn_80079D30).
+void FE_vCloseModule(void) {
+    FE_CloseManager();
     fn_80079D30();
 }
 
-// Set up the profile being worked on, cleared, and the logo textures' hashes.
-void fn_8007744C(void) {
+// Allocates the profile the menus work on (gpFEProfile), cleared: slot 0, the slot's own profile
+// (not the working copy), n1 -1; clears every lbl_801D8890 entry and lbl_801D8858 (b18, its
+// picture); keeps the hashes of the logo textures "__LogoSquare" and "__LogoRect".
+void FE_InitManager(void) {
     int i;
     gpFEProfile = StaticMem_Alloc(sizeof(FEProfile), 2, 16, "FE_Manager.c", 1035);
     Mem_set(gpFEProfile, 0, sizeof(FEProfile));
@@ -298,9 +334,12 @@ void fn_8007744C(void) {
     gpFEProfile->n11704 = 0;
 }
 
-// Every player on a created golfer gets its slot's saved record in the golfer table, but keeps
-// the table's hidden attributes (fn_80079E44). Then the front end's data is freed.
-void fn_800775BC_LoadCreatedFromSave(void) {
+// Closes the manager (FE_vCloseModule). First every player on a created golfer gets its save slot's
+// created golfer (gpSaveData[i].createdGolfer) copied over its golfer-table entry, keeping the
+// table's hidden attributes (fn_80079E44: aggression, IQ, speed) in both attribute blocks; TW07 has
+// this part as FE_TransferUserStatsToGolferStats. Then the bios (FE_CharBios_FreeStreamMemory) and
+// the menus' profile (gpFEProfile) are freed.
+void FE_CloseManager(void) {
     int i;
     int j;
     int nGolfer;
@@ -323,13 +362,14 @@ void fn_800775BC_LoadCreatedFromSave(void) {
             }
         }
     }
-    fn_80076EEC();
-    fn_80076F20();
+    FE_CharBios_FreeStreamMemory();
+    FE_Manager_FreeStreamMemory();
     StaticMem_Free(gpFEProfile);
 }
 
-// Back up every slot's profile, where one is loaded.
-void fn_80077780(void) {
+// Backs up every active save slot's profile (gpSaveData[0..3]) into the row of the same number of
+// the backups (gFEState.p658; menu message GM_vBackupAllProfiles).
+void FE_BackupAllProfiles(void) {
     int i;
     for (i = 0; i < 4; i++) {
         if (gpSaveData[i].bActive) {
@@ -338,9 +378,12 @@ void fn_80077780(void) {
     }
 }
 
-// Back up one slot's profile. A slot without a backup row takes its own row, first moving the
-// backup that sat there into the first free row (a swap).
-void fn_80077808(int nSlot) {
+// Backs up save slot nSlot's profile into the backups (gFEState.p658). A slot with a backup row
+// (aBackup) overwrites it. A slot without one takes row nSlot: when some row is free (not bActive)
+// and it is not row nSlot, the two rows are swapped first (FE_SwapBackupRows), so what sat in row
+// nSlot moves to the free row (no aBackup is changed for it); with no free row, row nSlot is
+// overwritten.
+void FE_BackupProfileClaimRow(int nSlot) {
     int nFree = -1;
     int i;
     if (gFEState.aBackup[nSlot] == -1) {
@@ -357,7 +400,7 @@ void fn_80077808(int nSlot) {
             Mem_cpy(&gFEState.p658[nSlot], &gpSaveData[nSlot], sizeof(SaveProfile));
             gFEState.aBackup[nSlot] = nSlot;
         } else {
-            fn_800779BC(nFree, nSlot);
+            FE_SwapBackupRows(nFree, nSlot);
             Mem_cpy(&gFEState.p658[nSlot], &gpSaveData[nSlot], sizeof(SaveProfile));
             gFEState.aBackup[nSlot] = nSlot;
         }
@@ -366,13 +409,14 @@ void fn_80077808(int nSlot) {
     }
 }
 
-// Back up one slot's profile into its backup row.
-void fn_80077968(int nSlot) {
+// Backs up save slot nSlot's profile into its backup row (gFEState.aBackup[nSlot], menu message
+// GM_vBackupProfile). The slot must have a row: -1 is not checked.
+void FE_BackupProfile(int nSlot) {
     Mem_cpy(&gFEState.p658[gFEState.aBackup[nSlot]], &gpSaveData[nSlot], sizeof(SaveProfile));
 }
 
-// Swap two backup rows.
-void fn_800779BC(int a, int b) {
+// Swaps backup rows a and b (gFEState.p658) through a temporary block.
+void FE_SwapBackupRows(int a, int b) {
     SaveProfile* pTemp = StaticMem_Alloc(sizeof(SaveProfile), 1, 32, "FE_Manager.c", 1194);
     Mem_cpy(pTemp, &gFEState.p658[b], sizeof(SaveProfile));
     Mem_cpy(&gFEState.p658[b], &gFEState.p658[a], sizeof(SaveProfile));
