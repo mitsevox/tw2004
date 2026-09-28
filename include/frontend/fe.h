@@ -50,7 +50,7 @@ LAYOUT_ASSERT(FEState, 0x660);
 
 extern FEState lbl_801D7148;
 
-// GM_vIsGolferUnlocked and fn_80080388 set it to 0.2 for a locked golfer, else 0 (also for one that is not
+// GM_vIsGolferUnlocked and GM_vIsGolferUnlockedByDefault set it to 0.2 for a locked golfer, else 0 (also for one that is not
 // available).
 extern f32 lbl_80281374;        // .sdata 0x80281374 = 0.25f: past FE_MessageTable's .sdata, in a
                                 // later file's (not placed yet)
@@ -216,7 +216,7 @@ typedef struct FEBio {
 } FEBio;
 LAYOUT_ASSERT(FEBio, 0x1F8);
 
-extern s32 lbl_801894E8[16];            // golfer ids fn_80080388 counts as unlocked
+extern s32 lbl_801894E8[16];            // golfer ids GM_vIsGolferUnlockedByDefault counts as unlocked
 
 #define FE_NUM_BIOS 29
 extern FEBio* lbl_80281EC8;             // a copy of the 'BIO ' stream object's data (fn_80076F80)

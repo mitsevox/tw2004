@@ -482,36 +482,36 @@ void GM_vGetCoursePrice(MsgArg* pArgs, MsgArg* pResult);
 void GM_vSaveProfileWithDefaultName(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetHolePar(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetReplayCourseName(MsgArg* pArgs, MsgArg* pResult);
-void fn_800801C0(MsgArg* pArgs, MsgArg* pResult);
-void fn_800801D4(MsgArg* pArgs, MsgArg* pResult);
-void fn_80080208(MsgArg* pArgs, MsgArg* pResult);
-void fn_80080300(MsgArg* pArgs, MsgArg* pResult);
-void fn_80080304(MsgArg* pArgs, MsgArg* pResult);
-void fn_80080334(MsgArg* pArgs, MsgArg* pResult);
-void fn_80080358(MsgArg* pArgs, MsgArg* pResult);
-void fn_80080388(MsgArg* pArgs, MsgArg* pResult);
-void fn_800804D8(MsgArg* pArgs, MsgArg* pResult);
-void fn_800804E4(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008052C(MsgArg* pArgs, MsgArg* pResult);
-void fn_800805C4(MsgArg* pArgs, MsgArg* pResult);
-void fn_800805F0(MsgArg* pArgs, MsgArg* pResult);
-void fn_800805F4(MsgArg* pArgs, MsgArg* pResult);
-void fn_80080654(MsgArg* pArgs, MsgArg* pResult);
-void fn_800807D0(MsgArg* pArgs, MsgArg* pResult);
-void fn_800807DC(MsgArg* pArgs, MsgArg* pResult);
-void fn_80080828(MsgArg* pArgs, MsgArg* pResult);
-void fn_80080878(MsgArg* pArgs, MsgArg* pResult);
-void fn_800809F8(MsgArg* pArgs, MsgArg* pResult);
-void fn_80080AA0(MsgArg* pArgs, MsgArg* pResult);
-void fn_80080AD0(MsgArg* pArgs, MsgArg* pResult);
-void fn_80080AE8(MsgArg* pArgs, MsgArg* pResult);
-void fn_80080BB8(MsgArg* pArgs, MsgArg* pResult);
-void fn_80080C2C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80080C60(MsgArg* pArgs, MsgArg* pResult);
-void fn_80080C74(MsgArg* pArgs, MsgArg* pResult);
-void fn_80080C84(MsgArg* pArgs, MsgArg* pResult);
-void fn_80080C98(MsgArg* pArgs, MsgArg* pResult);
-void fn_80080CA8(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetReplayHole(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetReplayGolferLastName(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetGolferPrize(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage198_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetChallengeMedal(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetCreatedGolferModelID(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCCheckCard(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIsGolferUnlockedByDefault(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage203_Return0(MsgArg* pArgs, MsgArg* pResult);
+void GM_vUserHasEagledHole(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetPar5EagleDate(MsgArg* pArgs, MsgArg* pResult);
+void GM_vPlayCredits(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage206_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIsCourseUnlocked(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetHighestRewardUnlocked(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage209_Return0(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIsCustomRoundUsed(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetCustomRoundName(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetCustomRoundName(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetCustomRoundHole(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetCustomRoundN15(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetFirstChar(MsgArg* pArgs, MsgArg* pResult);
+void GM_vRotatePoint2D(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetCustomRoundHole(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetCustomRoundN15(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetCustomRoundIndex(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetCustomRoundIndex(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetFEProfileN5(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetFEProfileN5(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage227_Return0(MsgArg* pArgs, MsgArg* pResult);
 void fn_80080CC8(MsgArg* pArgs, MsgArg* pResult);
 void fn_800810BC(MsgArg* pArgs, MsgArg* pResult);
 void fn_800810D8(MsgArg* pArgs, MsgArg* pResult);
@@ -923,41 +923,41 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[192] = GM_vSaveProfileWithDefaultName;
     gFEMessageHandlers[193] = GM_vGetHolePar;
     gFEMessageHandlers[194] = GM_vGetReplayCourseName;
-    gFEMessageHandlers[195] = fn_800801C0;
-    gFEMessageHandlers[196] = fn_800801D4;
-    gFEMessageHandlers[197] = fn_80080208;
-    gFEMessageHandlers[198] = fn_80080300;
-    gFEMessageHandlers[199] = fn_80080304;
-    gFEMessageHandlers[200] = fn_80080334;
-    gFEMessageHandlers[201] = fn_80080358;
-    gFEMessageHandlers[202] = fn_80080388;
-    gFEMessageHandlers[203] = fn_800804D8;
-    gFEMessageHandlers[204] = fn_800804E4;
-    gFEMessageHandlers[205] = fn_800805C4;
-    gFEMessageHandlers[206] = fn_800805F0;
-    gFEMessageHandlers[207] = fn_800805F4;
-    gFEMessageHandlers[208] = fn_80080654;
-    gFEMessageHandlers[209] = fn_800807D0;
+    gFEMessageHandlers[195] = GM_vGetReplayHole;
+    gFEMessageHandlers[196] = GM_vGetReplayGolferLastName;
+    gFEMessageHandlers[197] = GM_vGetGolferPrize;
+    gFEMessageHandlers[198] = GM_vFEMessage198_Empty;
+    gFEMessageHandlers[199] = GM_vGetChallengeMedal;
+    gFEMessageHandlers[200] = GM_vGetCreatedGolferModelID;
+    gFEMessageHandlers[201] = GM_vMCCheckCard;
+    gFEMessageHandlers[202] = GM_vIsGolferUnlockedByDefault;
+    gFEMessageHandlers[203] = GM_vFEMessage203_Return0;
+    gFEMessageHandlers[204] = GM_vUserHasEagledHole;
+    gFEMessageHandlers[205] = GM_vPlayCredits;
+    gFEMessageHandlers[206] = GM_vFEMessage206_Empty;
+    gFEMessageHandlers[207] = GM_vIsCourseUnlocked;
+    gFEMessageHandlers[208] = GM_vGetHighestRewardUnlocked;
+    gFEMessageHandlers[209] = GM_vFEMessage209_Return0;
     gFEMessageHandlers[151] = GM_vFEMessage151_Return30Or60;
     gFEMessageHandlers[93] = GM_vIsProfileActive;
-    gFEMessageHandlers[210] = fn_800807DC;
-    gFEMessageHandlers[211] = fn_80080828;
-    gFEMessageHandlers[212] = fn_80080878;
-    gFEMessageHandlers[213] = fn_800809F8;
-    gFEMessageHandlers[214] = fn_80080AA0;
-    gFEMessageHandlers[215] = fn_80080AD0;
+    gFEMessageHandlers[210] = GM_vIsCustomRoundUsed;
+    gFEMessageHandlers[211] = GM_vGetCustomRoundName;
+    gFEMessageHandlers[212] = GM_vSetCustomRoundName;
+    gFEMessageHandlers[213] = GM_vSetCustomRoundHole;
+    gFEMessageHandlers[214] = GM_vSetCustomRoundN15;
+    gFEMessageHandlers[215] = GM_vGetFirstChar;
     gFEMessageHandlers[216] = GM_vFEMessage216_Empty;
     gFEMessageHandlers[217] = GM_vFEMessage217_Empty;
     gFEMessageHandlers[218] = GM_vFEMessage218_Empty;
-    gFEMessageHandlers[219] = fn_80080AE8;
-    gFEMessageHandlers[220] = fn_80080BB8;
-    gFEMessageHandlers[221] = fn_80080C2C;
+    gFEMessageHandlers[219] = GM_vRotatePoint2D;
+    gFEMessageHandlers[220] = GM_vGetCustomRoundHole;
+    gFEMessageHandlers[221] = GM_vGetCustomRoundN15;
     gFEMessageHandlers[222] = GM_vFEMessage222_Empty;
-    gFEMessageHandlers[223] = fn_80080C60;
-    gFEMessageHandlers[224] = fn_80080C74;
-    gFEMessageHandlers[225] = fn_80080C84;
-    gFEMessageHandlers[226] = fn_80080C98;
-    gFEMessageHandlers[227] = fn_80080CA8;
+    gFEMessageHandlers[223] = GM_vGetCustomRoundIndex;
+    gFEMessageHandlers[224] = GM_vSetCustomRoundIndex;
+    gFEMessageHandlers[225] = GM_vGetFEProfileN5;
+    gFEMessageHandlers[226] = GM_vSetFEProfileN5;
+    gFEMessageHandlers[227] = GM_vFEMessage227_Return0;
     gFEMessageHandlers[228] = fn_80080CC8;
     gFEMessageHandlers[229] = fn_800810BC;
     gFEMessageHandlers[230] = fn_800810D8;
@@ -1252,7 +1252,7 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[615] = fn_80084258;
     gFEMessageHandlers[616] = fn_80084288;
     gFEMessageHandlers[617] = fn_800842AC;
-    gFEMessageHandlers[620] = fn_8008052C;
+    gFEMessageHandlers[620] = GM_vGetPar5EagleDate;
     gFEMessageHandlers[621] = GM_vIsProfileLogoMade;
     gFEMessageHandlers[622] = GM_vSaveLogo;
     gFEMessageHandlers[627] = fn_800842D0;
@@ -3698,18 +3698,24 @@ void GM_vGetReplayCourseName(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[0].p)->pStr, lbl_80191990[gReplayData.nCourse]);
 }
 
-void fn_800801C0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 195: the saved replay's hole (gReplayData.nHole). Messages 194 and 196 give its
+// course's name and its golfer's last name.
+void GM_vGetReplayHole(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gReplayData.nHole;
 }
 
-void fn_800801D4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 196: the last name of the saved replay's golfer (gReplayData.player) into the
+// string pArgs[0].
+void GM_vGetReplayGolferLastName(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[0].p)->pStr, gReplayData.player.golfer.szLast);
 }
 
-// The prize for beating golfer pArgs[0] in the current game mode: the stroke prize in modes 0 and
-// 1, the skins value in mode 2, the ladder event's in mode 4 (the last event's past event 24);
-// the golfer's rating picks the row. Other modes leave pResult alone.
-void fn_80080208(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 197: the money golfer pArgs[0] is worth in the current game mode. Modes 0 and
+// 1: the stroke-play prize for beating a golfer of his money rating (GM_GetGolferMoneyRating picks
+// the aStrokePrize row); mode 2: that rating's skins row, its n10; mode 4 (the ladder): the current
+// ladder event's prize (gLadderMap.nEvent), or the last event's once all 25 are won
+// (GameMode4_GetNumEventsWon), whatever the golfer. Other modes leave pResult alone.
+void GM_vGetGolferPrize(MsgArg* pArgs, MsgArg* pResult) {
     int nEvent = GameMode4_GetNumEventsWon();
 
     switch (Game_GetMode()) {
@@ -3732,26 +3738,36 @@ void fn_80080208(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_80080300(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 198: empty in this build.
+void GM_vFEMessage198_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// A challenge group's best medal (0 best, 3 none).
-void fn_80080304(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 199: the best medal save slot pArgs[0]'s profile has won in challenge group
+// pArgs[1] (SaveProfile.aMedal: 0 the best, 3 none).
+void GM_vGetChallengeMedal(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gpSaveData[pArgs[0].i].aMedal[pArgs[1].i];
 }
 
-void fn_80080334(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 200: the model id (GolferRecord.nModelID) of save slot pArgs[0]'s created
+// golfer.
+void GM_vGetCreatedGolferModelID(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gpSaveData[pArgs[0].i].createdGolfer.nModelID;
 }
 
-void fn_80080358(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 201: looks at the memory card in port pArgs[0], slot pArgs[1] once so its noted
+// state is fresh (MC_ConnectCard), then ends the card work (MC_Disconnect, empty on the GameCube).
+void GM_vMCCheckCard(MsgArg* pArgs, MsgArg* pResult) {
     MC_ConnectCard(pArgs[0].i, pArgs[1].i);
     MC_Disconnect();
 }
 
-// Like GM_vIsGolferUnlocked (without its b11702 override), with the golfers of lbl_801894E8 unlocked
-// instead of the profiles' unlocks.
-void fn_80080388(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 202: whether golfer pArgs[1] can be picked without any profile's unlocks: -1
+// when the golfer is not available at all (gGolferTable's bAvailable is -1), else 1 when he is a
+// created golfer, one of the 16 golfers of lbl_801894E8 or unlocked by a cheat code (lbl_80281DF4),
+// 0 when locked. lbl_80281374 is set to 0.2 for a locked golfer, else 0. Message 78 makes the same
+// test with the save profiles' unlocks instead of the list (and answers 1 for any golfer while
+// lbl_80281ED4->b11702 is set).
+void GM_vIsGolferUnlockedByDefault(MsgArg* pArgs, MsgArg* pResult) {
     int i;
 
     if ((s8)gGolferTable[pArgs[1].i].bAvailable != -1) {
@@ -3777,17 +3793,22 @@ void fn_80080388(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_800804D8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 203: always answers 0 in this build.
+void GM_vFEMessage203_Return0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-void fn_800804E4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 204: whether save slot pArgs[0]'s profile has eagled hole pArgs[2] (1..18) of
+// course pArgs[1] (GM_UserHasEagledHole; 0 when that hole is not a par 5).
+void GM_vUserHasEagledHole(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = GM_UserHasEagledHole(pArgs[0].i, pArgs[1].i, pArgs[2].i - 1);
 }
 
-// For the working slot's par-5 hole pArgs[0] (course), pArgs[1] (hole, from 1): the date it was
-// eagled, unpacked into pArgs[2..4] (fn_80078620), or zeros when it has not been eagled.
-void fn_8008052C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 620: the date the profile being worked on (its slot, lbl_80281ED4->nSlot)
+// eagled hole pArgs[1] (1..18) of course pArgs[0] (GM_GetPar5EagleDate), unpacked by fn_80078620
+// into the words pArgs[2], pArgs[3] and pArgs[4] point at (month, day, year); all three 0 when it
+// has not eagled that hole or it is not a par 5.
+void GM_vGetPar5EagleDate(MsgArg* pArgs, MsgArg* pResult) {
     int nA = pArgs[0].i;
     int nB = pArgs[1].i - 1;
     int* pA = pArgs[2].p;
@@ -3803,7 +3824,9 @@ void fn_8008052C(MsgArg* pArgs, MsgArg* pResult) {
     *pC = 0;
 }
 
-void fn_800805C4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 205: queues the credits movie (fn_800770FC, kind FE_MOVIE_CREDITS) and stops
+// the music (Gaud_StopMusic).
+void GM_vPlayCredits(MsgArg* pArgs, MsgArg* pResult) {
     FEMovie* pMovie;
 
     pMovie = fn_800770FC();
@@ -3811,11 +3834,13 @@ void fn_800805C4(MsgArg* pArgs, MsgArg* pResult) {
     Gaud_StopMusic();
 }
 
-void fn_800805F0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 206: empty in this build.
+void GM_vFEMessage206_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Whether slot pArgs[0]'s profile or a cheat code has unlocked course pArgs[1].
-void fn_800805F4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 207: 1 when save slot pArgs[0]'s profile or a cheat code (lbl_80281DF4) has
+// unlocked course pArgs[1], else 0.
+void GM_vIsCourseUnlocked(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
     if (gpSaveData[pArgs[0].i].aCourseUnlocked[pArgs[1].i] != 0) {
         pResult->i = 1;
@@ -3825,9 +3850,10 @@ void fn_800805F4(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// How far the rewards go for slot pArgs[0]: the number of the last one its profile or a cheat
-// code has unlocked (0: none).
-void fn_80080654(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 208: how far the rewards go for save slot pArgs[0]: the number (1..18) of the
+// last reward its profile or a cheat code (lbl_80281DF4) has unlocked, 0 for none. Earlier rewards
+// that are still locked are not counted.
+void GM_vGetHighestRewardUnlocked(MsgArg* pArgs, MsgArg* pResult) {
     int i;
     int n = 0;
 
@@ -3844,12 +3870,14 @@ void fn_80080654(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = n;
 }
 
-void fn_800807D0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 209: always answers 0 in this build.
+void GM_vFEMessage209_Return0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-// Whether slot pArgs[0] has a loaded profile with custom round pArgs[1] in use.
-void fn_800807DC(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 210: 1 when save slot pArgs[0] holds a profile (bActive) whose custom round
+// pArgs[1] (0..2) is in use (SavedRound.n0), else 0.
+void GM_vIsCustomRoundUsed(MsgArg* pArgs, MsgArg* pResult) {
     int b = 0;
 
     if (gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].n0 != 0 && gpSaveData[pArgs[0].i].bActive != 0) {
@@ -3858,14 +3886,17 @@ void fn_800807DC(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = b;
 }
 
-// The name of slot pArgs[0]'s custom round pArgs[1].
-void fn_80080828(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 211: the name of save slot pArgs[0]'s custom round pArgs[1] into the string
+// pArgs[2].
+void GM_vGetCustomRoundName(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[2].p)->pStr, gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].szName);
 }
 
-// Name slot pArgs[0]'s custom round pArgs[1]: blank it, then copy the first pArgs[3] characters
-// of pArgs[2] (each place is blanked again first).
-void fn_80080878(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 212: names save slot pArgs[0]'s custom round pArgs[1]: its 20 characters are
+// blanked, then the first pArgs[3] characters of the string pArgs[2] are copied in (each place
+// blanked again first) and a '\0' is put after them. pArgs[3] is not checked against the name's 20
+// bytes.
+void GM_vSetCustomRoundName(MsgArg* pArgs, MsgArg* pResult) {
     int i;
 
     for (i = 0; i < 20; i++) {
@@ -3878,9 +3909,11 @@ void fn_80080878(MsgArg* pArgs, MsgArg* pResult) {
     gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].szName[i] = '\0';
 }
 
-// Set hole pArgs[2] of slot pArgs[0]'s custom round pArgs[1]: course pArgs[3] (-1 instead clears
-// the round's n0, its in-use flag) and hole number pArgs[4].
-void fn_800809F8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 213: entry pArgs[2] (0..17) of save slot pArgs[0]'s custom round pArgs[1] is
+// hole number pArgs[4] of course pArgs[3]. A course of -1 instead marks the whole round unused
+// (SavedRound.n0 cleared) and leaves the entry's course as it was; the hole number is stored either
+// way. GM_vGetCustomRoundHole reads an entry back.
+void GM_vSetCustomRoundHole(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[3].i != -1) {
         gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].nCourse[pArgs[2].i] = pArgs[3].i;
     } else {
@@ -3889,17 +3922,22 @@ void fn_800809F8(MsgArg* pArgs, MsgArg* pResult) {
     gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].nHoleNum[pArgs[2].i] = pArgs[4].i;
 }
 
-void fn_80080AA0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 214: sets byte n15 of save slot pArgs[0]'s custom round pArgs[1] to pArgs[2]
+// (the profile setup sets it to 1; message 221, GM_vGetCustomRoundN15, reads it back; nothing else
+// reads it).
+void GM_vSetCustomRoundN15(MsgArg* pArgs, MsgArg* pResult) {
     gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].n15 = pArgs[2].i;
 }
 
-// A string's first character.
-void fn_80080AD0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 215: the first character of the string pArgs[0] (0 for an empty string).
+void GM_vGetFirstChar(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = ((MsgString*)pArgs[0].p)->pStr[0];
 }
 
-// Turn the point (*pArgs[1], *pArgs[2]) by pArgs[0] degrees.
-void fn_80080AE8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 219: turns the point (x, y) held in the floats pArgs[1] and pArgs[2] point at
+// by pArgs[0] degrees about the origin (x' = x cos - y sin, y' = x sin + y cos, through
+// LLMath_mat44fltMultiply) and writes it back.
+void GM_vRotatePoint2D(MsgArg* pArgs, MsgArg* pResult) {
     Vec4 v;
     f32 mtx[4][4];              // EA bug: only the 2x2 rotation is set; the rest is left unset
                                 // (z and w are 0, so it only matters if it holds a NaN)
@@ -3922,33 +3960,47 @@ void fn_80080AE8(MsgArg* pArgs, MsgArg* pResult) {
     *(f32*)pArgs[2].p = v.y;
 }
 
-// Hole pArgs[2] of slot pArgs[0]'s custom round pArgs[1]: its course and hole number.
-void fn_80080BB8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 220: entry pArgs[2] (0..17) of save slot pArgs[0]'s custom round pArgs[1]: its
+// course into the word pArgs[3] points at, its hole number (-1: none) into the word pArgs[4] points
+// at. GM_vSetCustomRoundHole sets it.
+void GM_vGetCustomRoundHole(MsgArg* pArgs, MsgArg* pResult) {
     *(s32*)pArgs[3].p = gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].nCourse[pArgs[2].i];
     *(s32*)pArgs[4].p = gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].nHoleNum[pArgs[2].i];
 }
 
-void fn_80080C2C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 221: byte n15 of save slot pArgs[0]'s custom round pArgs[1], read signed
+// (GM_vSetCustomRoundN15 sets it).
+void GM_vGetCustomRoundN15(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gpSaveData[pArgs[0].i].aSavedRound[pArgs[1].i].n15;
 }
 
-void fn_80080C60(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 223: which custom round (0..2) of save slot lbl_80281ED4->n3 the menus are
+// working on (lbl_80281ED4->n4; message 193 reads that round's pars). Message 224 sets it.
+void GM_vGetCustomRoundIndex(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_80281ED4->n4;
 }
 
-void fn_80080C74(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 224: the menus now work on custom round pArgs[0] (0..2) of save slot
+// lbl_80281ED4->n3 (lbl_80281ED4->n4; GM_vGetCustomRoundIndex reads it).
+void GM_vSetCustomRoundIndex(MsgArg* pArgs, MsgArg* pResult) {
     lbl_80281ED4->n4 = pArgs[0].i;
 }
 
-void fn_80080C84(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 225: byte n5 of the menus' working profile (lbl_80281ED4), read signed; message
+// 226 sets it and no other code reads it.
+void GM_vGetFEProfileN5(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_80281ED4->n5;
 }
 
-void fn_80080C98(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 226: sets byte n5 of the menus' working profile (lbl_80281ED4) to pArgs[0];
+// only message 225 (GM_vGetFEProfileN5) reads it.
+void GM_vSetFEProfileN5(MsgArg* pArgs, MsgArg* pResult) {
     lbl_80281ED4->n5 = pArgs[0].i;
 }
 
-void fn_80080CA8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 227: answers 0 in the three words pArgs[2], pArgs[3] and pArgs[4] point at
+// (where message 620 puts a month, day and year), whatever it is asked.
+void GM_vFEMessage227_Return0(MsgArg* pArgs, MsgArg* pResult) {
     *(s32*)pArgs[2].p = 0;
     *(s32*)pArgs[3].p = 0;
     *(s32*)pArgs[4].p = 0;

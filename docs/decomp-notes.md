@@ -349,7 +349,7 @@ They will be sorted into the sections below.
   inline helper hands its index back by `mr`; the same loop written in the caller gets `li` (UISEvent
   fn_80165D2C, fn_80165D90).
 - **[verified] `int` and `s32` allocate differently, in both directions**: an `s32` parameter where `int`
-  fails (GoDynObj fn_80046FDC 94 -> 100), `int` locals where `s32` fails (fn_8008052C 92 -> 100).
+  fails (GoDynObj fn_80046FDC 94 -> 100), `int` locals where `s32` fails (GM_vGetPar5EagleDate 92 -> 100).
 - **[verified] Block-scoped locals per switch case** allocate differently from one function-level local
   (EventInfo PGATourPopup_GetRow_EventInProgress); case labels merged into `default` (`case 3: default:`) reshape the compare
   tree or jump table (event EVENT_PlayerEmotionUpdated, NextShotType), and extra empty cases make the tree test a value

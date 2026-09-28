@@ -131,10 +131,10 @@ LAYOUT_ASSERT(TourSeason, 0x4E9C);
 // A new profile has three, emptied by the profile setup at 0x80057C88.
 typedef struct SavedRound {
     u8   n0;                    // 0x00  cleared by the setup; set by a menu message (fn_80083860);
-                                //       read unsigned (FE_MessageTable.c fn_800807DC)
+                                //       read unsigned (FE_MessageTable.c GM_vIsCustomRoundUsed)
     char szName[0x14];          // 0x01  the round's name, shown as its course (GameUICommands.c)
     s8   n15;                   // 0x15  set to 1 by the setup; menu messages set and read it
-                                //       (read signed: fn_80080C2C)
+                                //       (read signed: GM_vGetCustomRoundN15)
     s8   nHoleNum[18];          // 0x16  -1 = none
     s32  nCourse[18];           // 0x28
 } SavedRound;
