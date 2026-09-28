@@ -173,7 +173,7 @@ LAYOUT_ASSERT(SponsorSlot, 4);
 #define LOGO_RECT   1
 
 // A saved user logo (0x1022 bytes): the profile holds five and the logo editor (FE_LogoDesign.c,
-// fn_8010FB70) edits the one its LogoEdit.n0 names.
+// FE_LogoDesign_GetCurrentLogo) edits the one its LogoEdit.n0 names.
 typedef struct LogoRecord {
     u8   aPixels[0x1000];       // 0x0000  64 x 64 or 128 x 32 colour indexes
     char szName[0x20];          // 0x1000

@@ -196,7 +196,7 @@ typedef struct FEProfile {
     u64 uSquareHash;            // 0x106D0  the hash of "__LogoSquare" (the square logo's texture)
     u64 uRectHash;              // 0x106D8  the hash of "__LogoRect"
     LogoRecord logoCopy;        // 0x106E0  the logo being made, copied into the profile's logo
-                                //          fn_8010F7D8 when kept (GM_vSaveLogo)
+                                //          FE_LogoDesign_GetCurrentLogoNumber when kept (GM_vSaveLogo)
     u8  b11702;                 // 0x11702
     u8  b11703;                 // 0x11703
     s32 n11704;                 // 0x11704
@@ -541,9 +541,9 @@ void FE_ResetCrAPGolferFromPreview(void);
 
 // A logo (LogoRecord, game/save.h) is 8-bit colour indexes into a 256-colour palette.
 
-// The logo being edited (12 bytes, allocated by fn_8010F748).
+// The logo being edited (12 bytes, allocated by FE_LogoDesign_InitModule).
 typedef struct LogoEdit {
-    s32 n0;                     // 0x0  which logo: fn_8010FB70 picks its 0x1022-byte record by it
+    s32 n0;                     // 0x0  which logo: FE_LogoDesign_GetCurrentLogo picks its 0x1022-byte record by it
     s32 nShape;                 // 0x4  LOGO_SQUARE or LOGO_RECT
     u8  bDirty;                 // 0x8  changed since it was last copied into its texture
 } LogoEdit;
@@ -554,18 +554,18 @@ extern s16* lbl_802824BC;               // the palette: 256 colours, 1-bit alpha
                                         // and 5-5-5 RGB; read signed (lha)
 extern u8 lbl_802824C0;                 // the palette has been copied from "__LogoSquare"
 
-void fn_8010F7C0(s32 n);                // pick the logo to edit (LogoEdit.n0)
-s32  fn_8010F7D8(void);                 // which logo is edited
-void fn_8010F7E4(s32 nShape);           // set its shape
-void fn_8010F7FC(int nColor, u32* pR, u32* pG, u32* pB, u32* pA);  // a palette colour, 0-255 each
-void fn_8010F880(void);                 // mark the logo changed
-void fn_8010F890(char* pName);          // load the logo from a texture
-void fn_8010F90C(int nX, int nY, int nColor);   // set a pixel
-LogoRecord* fn_8010FB70(void);          // the logo being edited
-s16* fn_8010FBC4(void);                 // the palette
-int  fn_8010FBCC(int nX, int nY, u32* pR, u32* pG, u32* pB, u32* pA);  // a pixel's colour index,
-                                        // and its colour as fn_8010F7FC gives it
-void fn_8010FC3C(u8* pDst, u8* pSrc, int bToTexture, int nWidth, int nHeight);  // copy pixels:
+void FE_LogoDesign_SetCurrentLogoNumber(s32 n);                // pick the logo to edit (LogoEdit.n0)
+s32  FE_LogoDesign_GetCurrentLogoNumber(void);                 // which logo is edited
+void FE_LogoDesign_SetCurrentLogoMode(s32 nShape);           // set its shape
+void FE_LogoDesign_GetClutEntry(int nColor, u32* pR, u32* pG, u32* pB, u32* pA);  // a palette colour, 0-255 each
+void FE_LogoDesign_RefreshLogo(void);                 // mark the logo changed
+void FE_LogoDesign_SetLogoToPremadeTexture(char* pName);          // load the logo from a texture
+void FE_LogoDesign_SetPixel(int nX, int nY, int nColor);   // set a pixel
+LogoRecord* FE_LogoDesign_GetCurrentLogo(void);          // the logo being edited
+s16* FE_LogoDesign_GetClut(void);                 // the palette
+int  FE_LogoDesign_GetPixelColor(int nX, int nY, u32* pR, u32* pG, u32* pB, u32* pA);  // a pixel's colour index,
+                                        // and its colour as FE_LogoDesign_GetClutEntry gives it
+void FE_LogoDesign_CopyLogoTexturePixels(u8* pDst, u8* pSrc, int bToTexture, int nWidth, int nHeight);  // copy pixels:
                                         // 0 from a texture into the logo, 1 from the logo into one
 u8*  fn_8010FF5C(u8* pLogo, int nWidth, int nHeight);   // the logo's pixels as a texture (in
                                         // lbl_80212B60)

@@ -745,7 +745,7 @@ Added 2026-09-27 (from the ledgers solved that night; each ledger has the full s
   counter's final value on the ctr loop's exit path (any `if (n > 0)` around a counted loop keeps
   two branches).
 - **[verified, EA form] One loop with an invariant `if` is unswitched into two copies that share
-  every temp**: LogoTexture fn_8010FC3C, the two copy loops written as one with `if (bToTexture)`
+  every temp**: LogoTexture FE_LogoDesign_CopyLogoTexturePixels, the two copy loops written as one with `if (bToTexture)`
   inside (nBase 38 -> 29 neighbours) and the tile base inline in the index (a plain nBase local is
   reassociated: `shl + (nBase + x%8)`): 144 -> 0 aligned, no fake.
 - **[verified, EA form] A small constant loop is unrolled after the first CSE**, so its copies'
@@ -977,7 +977,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   matched (FE_Manager `FE_DateToInt`).
 - **[verified] Call results as arguments.** `f(g(), p->x, p->y)` loads the other arguments first and
   keeps them in saved registers; `t = g(); f(t, p->x, p->y);` calls first (FE_LogoDesign
-  `fn_8010FAF4`, 76.2 -> 100).
+  `FE_LogoDesign_LoadClut`, 76.2 -> 100).
 - **[verified] Shift the parameter once.** `(s16)(n >> 1)` written at three uses scored 90.7;
   `n >>= 1;` then plain uses gave the original's `extsh` then `srawi`/`extsh.` (startUp `fn_800AFF9C`).
 - **[verified] A pointer local to a global struct**, `T* p = &gX; p->a++; ...`, can be what the

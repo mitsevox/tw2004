@@ -6,61 +6,71 @@
 #include "frontend/fe.h"
 
 
-void fn_8010F6C8(void);
-void fn_8010F718(void);
-void fn_8010F748(void);
-void fn_8010F794(void);
-int  fn_8010F978(int nX, int nY);
-void fn_8010FA00(void);
-void fn_8010FAF4(void);
+void FE_LogoDesign_OpenOnce(void);
+void FE_LogoDesign_CloseOnce(void);
+void FE_LogoDesign_InitModule(void);
+void FE_LogoDesign_CloseModule(void);
+int  FE_LogoDesign_GetPixelIndex(int nX, int nY);
+void FE_LogoDesign_UploadCustomLogo(void);
+void FE_LogoDesign_LoadClut(void);
 
 // Last address first: CodeWarrior lays out uninitialised globals in reverse order of definition.
 u8 lbl_802824C0;
 s16* lbl_802824BC;
 LogoEdit* lbl_802824B8;
 
-// Allocate the palette, empty. (The allocator records EA's file name and line.)
-void fn_8010F6C8(void) {
+// Allocates the logo editor's palette (256 colours, cleared) once at start-up (gomainloop's set-up
+// beside GOLFERSTATE_OpenONCE); FE_LogoDesign_LoadClut fills it later.
+void FE_LogoDesign_OpenOnce(void) {
     lbl_802824BC = StaticMem_Alloc(256 * sizeof(s16), 0, 0, "FE_LogoDesign.c", 47);
     Mem_set(lbl_802824BC, 0, 256 * sizeof(s16));
     lbl_802824C0 = 0;
 }
 
-void fn_8010F718(void) {
+// Frees the palette FE_LogoDesign_OpenOnce allocated and marks it not loaded.
+void FE_LogoDesign_CloseOnce(void) {
     StaticMem_Free(lbl_802824BC);
     lbl_802824BC = NULL;
     lbl_802824C0 = 0;
 }
 
-// Start editing: the editor state (LogoEdit) cleared, and the palette if it is not loaded yet.
-void fn_8010F748(void) {
+// Starts the logo editor when the front end starts (GO_vInitFE): its state (LogoEdit) allocated and
+// cleared (logo 0, square, unchanged), and the palette copied from "__LogoSquare" if that has not
+// been done yet (FE_LogoDesign_LoadClut).
+void FE_LogoDesign_InitModule(void) {
     lbl_802824B8 = StaticMem_Alloc(sizeof(LogoEdit), 2, 0, "FE_LogoDesign.c", 67);
     Mem_set(lbl_802824B8, 0, sizeof(LogoEdit));
-    fn_8010FAF4();
+    FE_LogoDesign_LoadClut();
 }
 
-void fn_8010F794(void) {
+// Frees the logo editor's state (FE_LogoDesign_InitModule); the palette stays.
+void FE_LogoDesign_CloseModule(void) {
     StaticMem_Free(lbl_802824B8);
     lbl_802824B8 = NULL;
 }
 
-void fn_8010F7C0(s32 n) {
+// The logo editor works on the profile's user logo n (0..4) from now on; it is marked changed so
+// its texture is redrawn (GM_vSelectLogo).
+void FE_LogoDesign_SetCurrentLogoNumber(s32 n) {
     lbl_802824B8->n0 = n;
     lbl_802824B8->bDirty = 1;
 }
 
-s32 fn_8010F7D8(void) {
+s32 FE_LogoDesign_GetCurrentLogoNumber(void) {
     return lbl_802824B8->n0;
 }
 
-void fn_8010F7E4(s32 nShape) {
+// Sets the logo editor's shape (LOGO_SQUARE: 64 x 64, LOGO_RECT: 128 x 32) and marks the logo
+// changed. Only the editor's; the logo record keeps its own nShape.
+void FE_LogoDesign_SetCurrentLogoMode(s32 nShape) {
     lbl_802824B8->nShape = nShape;
     lbl_802824B8->bDirty = 1;
 }
 
-// A palette colour as 0-255 components; alpha is 0 or 255.
-void fn_8010F7FC(int nColor, u32* pR, u32* pG, u32* pB, u32* pA) {
-    s16* pPalette = fn_8010FBC4();
+// Palette colour nColor as 0-255 components: the entry is 5-5-5 RGB (red in bits 10-14, green 5-9,
+// blue 0-4, each scaled by 8) with the top bit as alpha, given as 255 when set and 0 when clear.
+void FE_LogoDesign_GetClutEntry(int nColor, u32* pR, u32* pG, u32* pB, u32* pA) {
+    s16* pPalette = FE_LogoDesign_GetClut();
     *pR = (pPalette[nColor] >> 7) & 0xF8;
     *pB = (pPalette[nColor] << 3) & 0xF8;
     *pG = (pPalette[nColor] >> 2) & 0xF8;
@@ -70,13 +80,18 @@ void fn_8010F7FC(int nColor, u32* pR, u32* pG, u32* pB, u32* pA) {
     }
 }
 
-void fn_8010F880(void) {
+// Marks the logo being edited changed, so FE_LogoDesign_UploadCustomLogo copies it into its texture
+// on the next frame.
+void FE_LogoDesign_RefreshLogo(void) {
     lbl_802824B8->bDirty = 1;
 }
 
-// Load the logo from a texture.
-void fn_8010F890(char* pName) {
-    u8* pLogo = fn_8010FB70()->aPixels;
+// Fills the logo being edited with the pixels of the texture named pName (fn_8000BD80), taken out
+// of the texture layout at the editor's shape's size (FE_LogoDesign_CopyLogoTexturePixels). Nothing
+// when there is no such texture. It does not mark the logo changed (the menus do,
+// GM_vMarkLogoChanged).
+void FE_LogoDesign_SetLogoToPremadeTexture(char* pName) {
+    u8* pLogo = FE_LogoDesign_GetCurrentLogo()->aPixels;
     u8* pPixels;
     int nWidth;
     int nHeight;
@@ -88,22 +103,24 @@ void fn_8010F890(char* pName) {
             nWidth = 128;
             nHeight = 32;
         }
-        fn_8010FC3C(pLogo, pPixels, 0, nWidth, nHeight);
+        FE_LogoDesign_CopyLogoTexturePixels(pLogo, pPixels, 0, nWidth, nHeight);
     }
 }
 
-// EA bug: a pixel off the logo (fn_8010F978 returns -1) writes the byte before it.
-void fn_8010F90C(int nX, int nY, int nColor) {
+// Sets pixel (nX, nY) of the logo being edited to palette colour nColor and marks the logo changed.
+// EA bug: a pixel off the logo (FE_LogoDesign_GetPixelIndex returns -1) writes the byte before it.
+void FE_LogoDesign_SetPixel(int nX, int nY, int nColor) {
     u8* pLogo;
     int n;
-    pLogo = fn_8010FB70()->aPixels;
-    n = fn_8010F978(nX, nY);
+    pLogo = FE_LogoDesign_GetCurrentLogo()->aPixels;
+    n = FE_LogoDesign_GetPixelIndex(nX, nY);
     pLogo[n] = nColor;
     lbl_802824B8->bDirty = 1;
 }
 
-// A pixel's index in the logo, or -1 if it is off the logo.
-int fn_8010F978(int nX, int nY) {
+// Pixel (nX, nY)'s index in the logo's rows (LogoRecord.aPixels): nX + nY * 64 for a square logo,
+// nX + nY * 128 for a rectangular one; -1 when it is off the logo or the editor's shape is neither.
+int FE_LogoDesign_GetPixelIndex(int nX, int nY) {
     s32 nShape = lbl_802824B8->nShape;
     if (nShape == LOGO_SQUARE) {
         if (nX < 0 || nX >= 64 || nY < 0 || nY >= 64) {
@@ -120,9 +137,12 @@ int fn_8010F978(int nX, int nY) {
     return -1;
 }
 
-// Once a frame: if the logo changed, copy it into its texture and draw with that.
-void fn_8010FA00(void) {
-    u8* pLogo = fn_8010FB70()->aPixels;
+// Called once a frame (gomainloop): when the logo being edited has changed, it is copied into the
+// first level of the texture "__LogoSquare" or "__LogoRect" (by the editor's shape; found by its
+// hash, else by name) in the texture layout (FE_LogoDesign_CopyLogoTexturePixels), and that texture
+// is set for drawing (RenderState_SetBankTexture). Nothing when the texture is missing.
+void FE_LogoDesign_UploadCustomLogo(void) {
+    u8* pLogo = FE_LogoDesign_GetCurrentLogo()->aPixels;
     char* pName;
     TexBank* pBank;
     TexEntry* pTex;
@@ -149,21 +169,23 @@ void fn_8010FA00(void) {
                 nWidth = 128;
                 nHeight = 32;
             }
-            fn_8010FC3C(pPixels, pLogo, 1, nWidth, nHeight);
+            FE_LogoDesign_CopyLogoTexturePixels(pPixels, pLogo, 1, nWidth, nHeight);
             RenderState_SetBankTexture(pBank, pTex);
         }
     }
 }
 
-// Copy the palette of "__LogoSquare", once.
-void fn_8010FAF4(void) {
+// Copies the palette of the texture "__LogoSquare" (its bank's n24 bytes) into the logo editor's
+// palette, once: nothing when it is already loaded, and nothing (to be tried again at the next
+// FE_LogoDesign_InitModule) when the texture is not there.
+void FE_LogoDesign_LoadClut(void) {
     TexBank* pBank;
     TexEntry* pTex;
     s16* pPalette;
     if (lbl_802824C0 == 0) {
         fn_8000BDF8("__LogoSquare", &pBank, &pTex);
         if (pTex != NULL) {
-            pPalette = fn_8010FBC4();
+            pPalette = FE_LogoDesign_GetClut();
             Mem_cpy(pPalette, pBank->p20 + pBank->pC[pTex->nPalette].uColors, pBank->n24);
             lbl_802824C0 = 1;
         }
@@ -172,22 +194,26 @@ void fn_8010FAF4(void) {
 
 // The logo being edited: the menus' own copy while bEditingCopy is set, else the profile's user
 // logo that LogoEdit.n0 names.
-LogoRecord* fn_8010FB70(void) {
+LogoRecord* FE_LogoDesign_GetCurrentLogo(void) {
     if (gpFEProfile->bEditingCopy) {
         return &gpFEProfile->logoCopy;
     }
     return &FE_GetCurrentProfile()->choices.aLogo[lbl_802824B8->n0];
 }
 
-// The palette.
-s16* fn_8010FBC4(void) {
+// The logo palette (CLUT): 256 colours of 16 bits (see FE_LogoDesign_GetClutEntry).
+// char_tex_manager.c gives it to the golfer's five user logo textures
+// (CharacterTex_GetUserLogoPalette).
+s16* FE_LogoDesign_GetClut(void) {
     return lbl_802824BC;
 }
 
-// A pixel's colour index, and its colour as fn_8010F7FC gives it.
-int fn_8010FBCC(int nX, int nY, u32* pR, u32* pG, u32* pB, u32* pA) {
-    u8* pLogo = fn_8010FB70()->aPixels;
-    int nColor = pLogo[fn_8010F978(nX, nY)];
-    fn_8010F7FC(nColor, pR, pG, pB, pA);
+// Pixel (nX, nY) of the logo being edited: returns its palette colour index and gives that colour's
+// components as FE_LogoDesign_GetClutEntry does. A pixel off the logo reads the byte before it
+// (FE_LogoDesign_GetPixelIndex returns -1), as FE_LogoDesign_SetPixel writes it.
+int FE_LogoDesign_GetPixelColor(int nX, int nY, u32* pR, u32* pG, u32* pB, u32* pA) {
+    u8* pLogo = FE_LogoDesign_GetCurrentLogo()->aPixels;
+    int nColor = pLogo[FE_LogoDesign_GetPixelIndex(nX, nY)];
+    FE_LogoDesign_GetClutEntry(nColor, pR, pG, pB, pA);
     return nColor;
 }

@@ -1,6 +1,6 @@
 // char_tex_manager.c (TW06's golf/animation/char_tex_manager.c; sGetUserTextureIdx is TW06's
 // name): puts the user logos on a golfer's model. A texture named "_usrtextr<n>" in the model is
-// replaced by the profile's logo n (0..4) and the logo palette (fn_8010FBC4, the same for all).
+// replaced by the profile's logo n (0..4) and the logo palette (FE_LogoDesign_GetClut, the same for all).
 
 #include "frontend/fe.h"
 #include "lldyntex.h"
@@ -37,13 +37,13 @@ u8* sGetUserLogoTexturePtr(u64 uHash, SkinChoices* pChoices) {
 }
 
 // The palette for a texture named "_usrtextr<n>" (n 0..4): the logo palette every user logo shares
-// (fn_8010FBC4); NULL for any other texture.
+// (FE_LogoDesign_GetClut); NULL for any other texture.
 s16* CharacterTex_GetUserLogoPalette(u64 uHash, SkinChoices* pChoices) {
     int nLogo;
 
     nLogo = sGetUserTextureIdx(uHash);
     if (nLogo < 0 || nLogo >= 5) return NULL;
-    return fn_8010FBC4();
+    return FE_LogoDesign_GetClut();
 }
 
 // Puts the created golfer's logos into the model's dynamic textures: every texture named

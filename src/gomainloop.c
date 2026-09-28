@@ -266,11 +266,11 @@ void FE_CrAP_CloseModule(void);
 void fn_8010A448(int nSize);
 void fn_8010A4E8(void);
 void fn_8010BF68(void);
-void fn_8010F6C8(void);
-void fn_8010F718(void);
-void fn_8010F748(void);
-void fn_8010F794(void);
-void fn_8010FA00(void);
+void FE_LogoDesign_OpenOnce(void);
+void FE_LogoDesign_CloseOnce(void);
+void FE_LogoDesign_InitModule(void);
+void FE_LogoDesign_CloseModule(void);
+void FE_LogoDesign_UploadCustomLogo(void);
 void fn_80110390(void);
 void fn_8011407C(void);
 void fn_8011E170(void);
@@ -411,7 +411,7 @@ void fn_8006C720(void) {
     GOLFERSTATE_OpenONCE();
     GM_vInitModuleONCE();
     fn_800A2064();
-    fn_8010F6C8();
+    FE_LogoDesign_OpenOnce();
     EASBio_InitOnce();
     StaticMem_Checkpoint();
 }
@@ -423,7 +423,7 @@ void fn_8006C770(void) {
     fn_800763B8();
     fn_80056454();
     fn_8002E25C();
-    fn_8010F718();
+    FE_LogoDesign_CloseOnce();
 }
 
 // Starts the systems every mode needs; the session gets a new random seed.
@@ -566,7 +566,7 @@ void GO_vInitFE(void) {
     Gaud_InitFE();
     fn_800B9B48();
     fn_80037DD8();
-    fn_8010F748();
+    FE_LogoDesign_InitModule();
     fn_8006DCA0(1);
 }
 
@@ -574,7 +574,7 @@ void GO_vInitFE(void) {
 void fn_8006CB2C(void) {
     fn_8006DCA4(1);
     RC_vReleaseRenderCtx(lbl_80281E54);
-    fn_8010F794();
+    FE_LogoDesign_CloseModule();
     FE_CharMgrClose();
     FE_vCloseModule();
     VM_vReleaseViewport(lbl_80281E58);
@@ -760,14 +760,14 @@ void fn_8006CEFC(void) {
     fn_80037DD8();
     nView = gPlayers[0].nView[0];
     CameraController_SetCameraMode(ViewController_GetCameraControl(nView), 0x19, 0, nView);
-    fn_8010F748();
+    FE_LogoDesign_InitModule();
     fn_8010FF9C();
 }
 
 // Shuts the start-up screens down.
 void fn_8006CFC8(void) {
     UI_vCloseModule();
-    fn_8010F794();
+    FE_LogoDesign_CloseModule();
     RC_vReleaseRenderCtx(lbl_80281E54);
     VM_vReleaseViewport(lbl_80281E58);
     FB_vReleaseFrameBuffer(lbl_80281E5C);
@@ -1130,7 +1130,7 @@ void fn_8006D8E8(void) {
             } else {
                 Character_UpdateClothesFE();
                 FE_vFreeUnusedCharacters();
-                fn_8010FA00();
+                FE_LogoDesign_UploadCustomLogo();
             }
         }
         fn_80090A60();

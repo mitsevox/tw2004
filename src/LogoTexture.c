@@ -12,7 +12,7 @@
 // (tiles of 8 x 4 pixels, 32 bytes each, a row of tiles after another): bToTexture 1 from the
 // logo in pSrc to the texture in pDst, 0 the other way. Then flush pDst for the GPU.
 // One loop with the direction test inside: the compiler unswitches it into the two unrolled copies.
-void fn_8010FC3C(u8* pDst, u8* pSrc, int bToTexture, int nWidth, int nHeight) {
+void FE_LogoDesign_CopyLogoTexturePixels(u8* pDst, u8* pSrc, int bToTexture, int nWidth, int nHeight) {
     int nTileRow;
     int i;
     int nRow;

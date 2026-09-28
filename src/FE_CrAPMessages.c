@@ -559,45 +559,45 @@ void GM_vIsCrAPItemOnSale(MsgArg* pArgs, MsgArg* pResult) {
 
 // Menu message 489: the logo editor works on the profile's logo pArgs[0] (0..4) from now on.
 void GM_vSelectLogo(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8010F7C0(pArgs[0].i);
+    FE_LogoDesign_SetCurrentLogoNumber(pArgs[0].i);
 }
 
 // Menu message 490: the logo editor edits a square logo (pArgs[0] 0) or a rectangular one (anything
 // else). Only the editor's shape; GM_vSetLogoShape also sets the logo's.
 void GM_vSetLogoEditorShape(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[0].i == 0) {
-        fn_8010F7E4(LOGO_SQUARE);
+        FE_LogoDesign_SetCurrentLogoMode(LOGO_SQUARE);
         return;
     }
-    fn_8010F7E4(LOGO_RECT);
+    FE_LogoDesign_SetCurrentLogoMode(LOGO_RECT);
 }
 
 // Menu message 491: logo palette colour pArgs[0] (0..255) as red, green, blue and alpha into
 // *pArgs[1..4], 0..255 each (alpha 0 or 255).
 void GM_vGetLogoPaletteColor(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8010F7FC(pArgs[0].i, pArgs[1].p, pArgs[2].p, pArgs[3].p, pArgs[4].p);
+    FE_LogoDesign_GetClutEntry(pArgs[0].i, pArgs[1].p, pArgs[2].p, pArgs[3].p, pArgs[4].p);
 }
 
 // Menu message 492: fill the logo being edited with the pixels of the texture named by the string
-// pArgs[0] (copied into a 32-byte buffer first; fn_8010F890), at the editor's shape's size; nothing
-// when there is no such texture.
+// pArgs[0] (copied into a 32-byte buffer first; FE_LogoDesign_SetLogoToPremadeTexture), at the
+// editor's shape's size; nothing when there is no such texture.
 void GM_vLoadLogoFromTexture(MsgArg* pArgs, MsgArg* pResult) {
     char szName[32] = "";
 
     strcpy(szName, ((MsgString*)pArgs[0].p)->pStr);
-    fn_8010F890(szName);
+    FE_LogoDesign_SetLogoToPremadeTexture(szName);
 }
 
 // Menu message 493: mark the logo being edited changed, so it is copied into its texture on the
 // next frame.
 void GM_vMarkLogoChanged(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8010F880();
+    FE_LogoDesign_RefreshLogo();
 }
 
 // Menu message 494: set pixel pArgs[0], pArgs[1] (x, y) of the logo being edited to palette colour
-// pArgs[2]. A pixel off the logo writes the byte before it (fn_8010F90C's EA bug).
+// pArgs[2]. A pixel off the logo writes the byte before it (FE_LogoDesign_SetPixel's EA bug).
 void GM_vSetLogoPixel(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8010F90C(pArgs[0].i, pArgs[1].i, pArgs[2].i);
+    FE_LogoDesign_SetPixel(pArgs[0].i, pArgs[1].i, pArgs[2].i);
 }
 
 // Menu message 498: check every asset's lock again (FE_CrAP_SetupLockedAssets). Each asset that was
@@ -824,14 +824,14 @@ void GM_vGetRandom1To99(MsgArg* pArgs, MsgArg* pResult) {
 // Menu message 513: the name of the logo being edited into the string pArgs[1]; the result is its
 // bSaved (1 once it has been kept by GM_vSaveLogo).
 void GM_vGetLogoName(MsgArg* pArgs, MsgArg* pResult) {
-    LogoRecord* pLogo = fn_8010FB70();
+    LogoRecord* pLogo = FE_LogoDesign_GetCurrentLogo();
     strcpy(((MsgString*)pArgs[1].p)->pStr, pLogo->szName);
     pResult->i = pLogo->bSaved;
 }
 
 // Menu message 514: name the logo being edited after the string pArgs[1].
 void GM_vSetLogoName(MsgArg* pArgs, MsgArg* pResult) {
-    strcpy(fn_8010FB70()->szName, ((MsgString*)pArgs[1].p)->pStr);
+    strcpy(FE_LogoDesign_GetCurrentLogo()->szName, ((MsgString*)pArgs[1].p)->pStr);
 }
 
 // Menu message 621: the profile's logo pArgs[0] (0..4) has been made and kept (its bSaved;
@@ -842,11 +842,12 @@ void GM_vIsProfileLogoMade(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Menu message 622: keep the logo just edited: the menus' copy (FEProfile.logoCopy) is marked made
-// (bSaved) and copied over the profile's logo the editor works on (fn_8010F7D8), and the editor
-// goes back to working on the profile's logo (bEditingCopy cleared).
+// (bSaved) and copied over the profile's logo the editor works on
+// (FE_LogoDesign_GetCurrentLogoNumber), and the editor goes back to working on the profile's logo
+// (bEditingCopy cleared).
 void GM_vSaveLogo(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
-    s32 nLogo = fn_8010F7D8();
+    s32 nLogo = FE_LogoDesign_GetCurrentLogoNumber();
 
     gpFEProfile->logoCopy.bSaved = 1;
     Mem_cpy(&pProfile->choices.aLogo[nLogo], &gpFEProfile->logoCopy, sizeof(LogoRecord));
@@ -924,15 +925,16 @@ void GM_vGetUseProfileCopy(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Menu message 543: start (pArgs[0] nonzero) or stop creating the profile's logo the editor works
-// on (fn_8010F7D8). Starting copies that logo into the menus' copy (FEProfile.logoCopy), or for a
-// logo not made yet (bSaved clear) makes a blank one there: every pixel palette colour 0x1C,
-// square, named "MyLogo <n>" with n counted from 1. The editor then works on the copy (bEditingCopy
-// set) until GM_vSaveLogo keeps it; stopping goes back to the profile's logo and drops the copy.
+// on (FE_LogoDesign_GetCurrentLogoNumber). Starting copies that logo into the menus' copy
+// (FEProfile.logoCopy), or for a logo not made yet (bSaved clear) makes a blank one there: every
+// pixel palette colour 0x1C, square, named "MyLogo <n>" with n counted from 1. The editor then
+// works on the copy (bEditingCopy set) until GM_vSaveLogo keeps it; stopping goes back to the
+// profile's logo and drops the copy.
 void GM_vCRAPCreatingLogo(MsgArg* pArgs, MsgArg* pResult) {
     char szName[32];                    // TW07's logoName is char[32] too
     SaveProfile* pProfile = FE_GetCurrentProfile();
     s32 bStart = pArgs[0].i;
-    s32 nLogo = fn_8010F7D8();
+    s32 nLogo = FE_LogoDesign_GetCurrentLogoNumber();
 
     if (bStart == 0) {
         gpFEProfile->bEditingCopy = 0;
@@ -953,21 +955,22 @@ void GM_vCRAPCreatingLogo(MsgArg* pArgs, MsgArg* pResult) {
 // Menu message 583: the same as GM_vGetLogoPaletteColor (message 491): logo palette colour pArgs[0]
 // as red, green, blue and alpha into *pArgs[1..4], 0..255 each (alpha 0 or 255).
 void GM_vGetLogoPaletteEntry(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8010F7FC(pArgs[0].i, pArgs[1].p, pArgs[2].p, pArgs[3].p, pArgs[4].p);
+    FE_LogoDesign_GetClutEntry(pArgs[0].i, pArgs[1].p, pArgs[2].p, pArgs[3].p, pArgs[4].p);
 }
 
 // Menu message 584: pixel pArgs[0], pArgs[1] (x, y) of the logo being edited: the result is its
-// palette colour index, and its red, green, blue and alpha go into *pArgs[2..5] (fn_8010FBCC). A
-// pixel off the logo reads the byte before it.
+// palette colour index, and its red, green, blue and alpha go into *pArgs[2..5]
+// (FE_LogoDesign_GetPixelColor). A pixel off the logo reads the byte before it.
 void GM_vGetLogoPixel(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_8010FBCC(pArgs[0].i, pArgs[1].i, pArgs[2].p, pArgs[3].p, pArgs[4].p, pArgs[5].p);
+    pResult->i = FE_LogoDesign_GetPixelColor(pArgs[0].i, pArgs[1].i, pArgs[2].p, pArgs[3].p, pArgs[4].p,
+                                             pArgs[5].p);
 }
 
 // Menu message 587: the logo being edited becomes square or rectangular (pArgs[1], LOGO_SQUARE or
 // LOGO_RECT; another value leaves the logo's own shape alone) and the editor takes the shape too
-// (fn_8010F7E4).
+// (FE_LogoDesign_SetCurrentLogoMode).
 void GM_vSetLogoShape(MsgArg* pArgs, MsgArg* pResult) {
-    LogoRecord* pLogo = fn_8010FB70();
+    LogoRecord* pLogo = FE_LogoDesign_GetCurrentLogo();
     s32 nShape = pArgs[1].i;
     switch (nShape) {
     case LOGO_SQUARE:
@@ -977,12 +980,12 @@ void GM_vSetLogoShape(MsgArg* pArgs, MsgArg* pResult) {
         pLogo->nShape = LOGO_RECT;
         break;
     }
-    fn_8010F7E4(nShape);
+    FE_LogoDesign_SetCurrentLogoMode(nShape);
 }
 
 // Menu message 588: the shape of the logo being edited (LOGO_SQUARE or LOGO_RECT).
 void GM_vGetLogoShape(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_8010FB70()->nShape;
+    pResult->i = FE_LogoDesign_GetCurrentLogo()->nShape;
 }
 
 // Menu message 609: does nothing in this build.
