@@ -1,8 +1,13 @@
-// Swing.c (named by its file string at 0x8028118C, in SW_vInitModule's allocations): the stick
-// swing - its phases, the miss and the power, and what the golfer's attributes do to them; the
-// club trail and the boost display; the golfer state engine (GOLFERSTATE_*) and its states'
-// callbacks (STATEFUNC_*). CodeWarrior GC/2.5, -O4,p. The formulas and tables are written up in
-// docs/gameplay.md.
+// Swing.c (EA's name: its file string at 0x8028118C, in SW_vInitModule's allocations; TW07 keeps
+// it as Golf/AI/Swing.c, SW_ prefix): the stick swing. Its states (gSwingPhaseFns, by
+// SwingData.nState: waiting for the backswing, the backswing, holding at the top, the downswing,
+// after impact); the impact (SW_vImpact: clubface and stroke direction, the miss, the power, then
+// Physics_ShotImpact); what the golfer's attributes do to the miss, the power, the rumble and the
+// spin (gSwingAttributeTable); the power boost and spin inputs; the club trail and IK drawn during
+// the swing. The last functions are out-of-line copies of small header helpers
+// (Character_GetTagTime, Vec_Add, RenderState_SetBankTexture, Math_Atan ...). The golfer state
+// engine lives in StateGolfer.c and stateFunc.c. CodeWarrior GC/2.5, -O4,p. The formulas and tables
+// are written up in docs/gameplay.md.
 
 #include "golfer.h"
 #include "ball.h"
@@ -148,9 +153,11 @@ u8    SW_vStateThroughSwing(int nPlayer);
 u8    SW_vStatePostSwing(int nPlayer);
 u8    SW_vStateCancelSwing(int nPlayer);
 
+// The swing module's data; always reached through gpSwing.
 SwingState gSwingState;
 
-// 0x80183578  per club, 0..26: how much it can shape
+// 0x80183578  per club, how far its clubface can turn, out of 26: 0 puts it at gpSwing->fCurveMin,
+// 26 would put it at fCurveMax (SW_fCalculateSliceAmount)
 const s32 gClubCurve[CLUB_MAX_e] = {
     0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 16, 16, 16, 17
 };
@@ -159,7 +166,9 @@ SwingState* gpSwing = &gSwingState;               // 0x80281188
 
 s32 gBoostSteps[8] = {1, 2, 4, 6, 9, 12, 16, 20};  // 0x80188148  power boost per level: 1 2 4 6 9 12 16 20
 
-// 0x80188168  rows: value at attribute 0 / 100 / 110
+// 0x80188168  values that follow a golfer attribute, one column per ROW_ (threshold and scale
+// pairs for the miss and the power lost to it, then the power boost, rumble and spin scales); the
+// three rows are the value at attribute 0 / 100 / 110 (TABLE_AT, TABLE_PAIR interpolate)
 f32 gSwingAttributeTable[3][27] = {
     {0.1f, 0.85f, 0.125f, 0.825f, 0.13f, 0.8f, 0.135f, 0.775f, 0.1f,
      0.9f, 0.1f, 0.85f, 0.1f, 0.85f, 0.1f, 0.85f, 0.1f, 0.85f,
@@ -172,15 +181,22 @@ f32 gSwingAttributeTable[3][27] = {
      0.5235f, 0.1f, 0.5235f, 0.1f, 3.14f, 0.0f, 0.011f, 30.0f, 1.0f},
 };
 
-// 0x801882AC  per shot kind: 0.03 for a putt, 0.2 otherwise
+// 0x801882AC  per shot kind, the weight of the stick's sideways offset in a putt's clubface
+// (SW_vGetClubDirection; only the putt's 0.03 is read)
 f32 gPuttXScale[8] = {0.03f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f};
 
-// 0x801882CC  the same values again
+// 0x801882CC  per shot kind, the weight of the stick's sideways travel in the miss
+// (SW_vCalculateMishitAngle): 0.03 for a putt, 0.2 otherwise
 f32 gSwingXScale[8] = {0.03f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f};
 
-// 0x801882EC  backswing rate by shot kind: -, 0.85, 0.5, 0.8
+// 0x801882EC  per shot kind, seconds the backswing animation takes with the stick fully back
+// (SW_vStateBackSwing scales its time by the animation's backswing length over this): drive
+// 0.85, chip 0.5, pitch 0.8; other kinds are not read
 f32 gBackswingTime[8] = {0.0f, 0.85f, 0.5f, 0.8f, 0.0f, 0.0f, 0.0f, 0.0f};
 
+// 0x8018830C  the power boost display's colour per level (RGB; the fourth value is not read):
+// grey for levels 1..3, then redder, plain (half-bright) red from level 6 (uiobject.c
+// UI_Obj_RenderBoostUI)
 f32 gBoostLevelColours[8][4] = {
     {0.5f, 0.5f, 0.5f, 0.5f},
     {0.5f, 0.5f, 0.5f, 0.5f},
@@ -192,6 +208,7 @@ f32 gBoostLevelColours[8][4] = {
     {0.5f, 0.0f, 0.0f, 0.5f},
 };
 
+// The swing's states, by SwingData.nState; the swing's update runs the current one.
 u8 (*gSwingPhaseFns[7])(int nPlayer) = {
     SW_vStateIdleSwing,    SW_vStateBackSwing, SW_vStateBackSwingFigit, SW_vStateDownSwing,
     SW_vStateThroughSwing, SW_vStatePostSwing, SW_vStateCancelSwing,
@@ -1584,15 +1601,15 @@ f32 SW_fPowerBoostAdjustment(int nPlayer, f32 fPower) {
     return fPower;
 }
 
-// The spin asked for: fSideSpin into the first pointer, fForwardSpin into the second (EA's fpSide,
-// fpForward). In a replay both are first read back from the recording into the swing data
+// The spin asked for: fSideSpin into *pfSide, fForwardSpin into *pfForward (EA's parameter
+// names). In a replay both are first read back from the recording into the swing data
 // (REPLAY_GetSpin).
-void SW_vGetCurrentSpin(int nPlayer, f32* pSpinY, f32* pSpinX) {
+void SW_vGetCurrentSpin(int nPlayer, f32* pfSide, f32* pfForward) {
     if (gSession.bReplay) {
         REPLAY_GetSpin(nPlayer, &gPlayers[nPlayer].swing.fForwardSpin, &gPlayers[nPlayer].swing.fSideSpin);
     }
-    *pSpinX = gPlayers[nPlayer].swing.fForwardSpin;
-    *pSpinY = gPlayers[nPlayer].swing.fSideSpin;
+    *pfForward = gPlayers[nPlayer].swing.fForwardSpin;
+    *pfSide = gPlayers[nPlayer].swing.fSideSpin;
 }
 
 // The stick's sideways angle at the top of the backswing (fControllerSliceAngle) as a fraction of a
@@ -1619,7 +1636,7 @@ void SW_vCloseSpinWindow(int nPlayer) {
     gPlayers[nPlayer].swing.bCanSpin = 0;
 }
 
-// Spin input, every frame after impact (Swing_UpdateAfterImpact), for a human with the spin option
+// Spin input, every frame after impact (SW_vStatePostSwing), for a human with the spin option
 // on while the spin button (Controller_GetButtonMask(0x20)) is held and the window is open
 // (bCanSpin): sends event 0x2E, grows the amount (nSpinBoost) one a frame up to 20 (a third of a
 // second for full spin), and takes the stick as the direction (nSpinCtrlX/Y) whenever either axis
@@ -1821,7 +1838,7 @@ f32 Character_GetTagTime(Character* pChar, u64 uEvent) {
 }
 
 // Sets Character.f162C (nothing without a character). Its only caller, the backswing
-// (Swing_UpdateBackswing), sets it to 1.4 x Character_GetBackswing at the top of the swing;
+// (SW_vStateBackSwing), sets it to 1.4 x Character_GetBackswing at the top of the swing;
 // Character_Create starts it at 1.0. No code in this build reads it.
 void Character_Set162C(Character* pObj, f32 f) {
     if (pObj != NULL) {
@@ -1838,7 +1855,7 @@ f32 Character_GetBackswing(Character* pObj) {
 }
 
 // Sets Character.f1630 (nothing without a character). Its only caller, the backswing
-// (Swing_UpdateBackswing), sets it to 0 at the top of the swing; Character_Create starts it at 0.5.
+// (SW_vStateBackSwing), sets it to 0 at the top of the swing; Character_Create starts it at 0.5.
 // No code in this build reads it.
 void Character_Set1630(Character* pObj, f32 f) {
     if (pObj != NULL) {
@@ -1847,7 +1864,7 @@ void Character_Set1630(Character* pObj, f32 f) {
 }
 
 // Sets Character.f1634 (nothing without a character). Its only caller, the backswing
-// (Swing_UpdateBackswing), sets it to 0 at the top of the swing; Character_Create starts it at 0.2.
+// (SW_vStateBackSwing), sets it to 0 at the top of the swing; Character_Create starts it at 0.2.
 // No code in this build reads it.
 void Character_Set1634(Character* pObj, f32 f) {
     if (pObj != NULL) {

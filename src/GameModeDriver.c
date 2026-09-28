@@ -492,8 +492,8 @@ u8 RealTime_AtLatest(void) {
 }
 
 // The real-time events calendar's day cell: never any text (color and state are left as they are);
-// returns the event's calendar icon (fn_800F1008, its n14), or -1 on a day without an event. The
-// event's GameModeDriverRTE_GetCalData is fetched and not used.
+// returns the event's calendar icon (GameModeDriverRTE_UI_GetEventIconIndexOnCal, its n14), or -1
+// on a day without an event. The event's GameModeDriverRTE_GetCalData is fetched and not used.
 s32 RealTime_FillCell(char* sz, u16 nDate, s32* pCellColor, s32* pCellState) {
     s32 nId;
     s32 nRound;
@@ -532,7 +532,8 @@ void RealTime_GetBottomLine(u16 nDate, int nLine, char* sz) {
 
 // Which day-details popup the real-time events calendar shows for a date (the calendar screen keeps
 // it in CalendarState.n1C for RealTime_GetPopupRow): 5 results for a past day; 4 today's event, or 5
-// once it is completed (fn_800F102C, always 0 in this build); 6 upcoming for a day to come.
+// once it is completed (GM_RealtimeMode_TodaysEventCompleted, always 0 in this build); 6 upcoming
+// for a day to come.
 s32 RealTime_GetPopupType(u16 nDate) {
     if (nDate < CalendarState.nToday) {
         return 5;
@@ -594,7 +595,7 @@ char* RealTime_GetEventName(u16 nDate) {
 
 // The real-time events calendar's play button: player 0 plays the first created golfer (30), the
 // game mode becomes 24 (the real-time events), and today's event by the clock becomes the current
-// one (fn_800F0E3C).
+// one (GM_RealtimeMode_SelectEventToday).
 void RealTime_Play(void) {
     Session_SetGolfer(30, 0);
     GM_SetModeType(24);

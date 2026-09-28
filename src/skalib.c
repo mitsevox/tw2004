@@ -294,7 +294,7 @@ int AnimLib_WalkPair(AnimLib* pA, AnimLib* pB, AnimLibWalkFn pfn, void* pCtx) {
 // adds to the overlay's nTreeSize the bytes of the merged tree at this position (8 for a leaf when
 // either side has one, plus the level's node: 0x14 a group, 0xC a style, 0x20 a club) and marks the
 // leaves (AnimLeaf.uMask; 2 its clips go unused, 1 they are kept). Where both have a leaf: at a
-// streamed position (fn_800C9828) both are marked 2; in group 20 the overlay's is; otherwise, when
+// streamed position (AnimStream_IsStreamed) both are marked 2; in group 20 the overlay's is; otherwise, when
 // the overlay's leaf is not flagged 1, the library's clips come off the overlay's nClips, and the
 // library's leaf is marked 2 (replaced) unless either leaf is flagged 1, then 1 (both kept). A
 // library leaf alone is marked 1, or 2 at a streamed position. Always 0.
@@ -467,7 +467,7 @@ f32 Skalib_Random(void);
 // Merge walk, trim pass (AnimLib_PlanBank, before the clips are matched): cuts each leaf down to
 // the round's per-leaf limit (gClipsPerLeaf), keeping a run of that many clips from a random start
 // (Skalib_Random); every clip cut loses a user (ClipRecord.n10), and with a context one nobody uses
-// any more comes off its clip count and byte total. A streamed position (fn_800C9828) keeps
+// any more comes off its clip count and byte total. A streamed position (AnimStream_IsStreamed) keeps
 // everything; when pA's leaf is marked 2 (unused) none are kept. Clips cut from pB's leaf also come
 // off pB's nClips. Always 0.
 int AnimLib_TrimCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx, int nLevel,
@@ -1713,8 +1713,8 @@ void Skalib_PlanBanks(void) {
 // freed; when the slot has overlays its library and overlays are copied again from their pristine
 // copies (they were swapped in place, so a reload starts from the file) and set up (AnimLib_Load),
 // each overlay waiting for its sac file again (stream id golfer id + 3). Then the golfers' custom
-// animations are applied, the animation stream set up for the slot's players (fn_800CA9DC) and the
-// bank planned (AnimLib_PlanBank).
+// animations are applied, the animation stream set up for the slot's players
+// (AnimStream_SizeSlotClips) and the bank planned (AnimLib_PlanBank).
 void AnimLib_ReloadSlot(void) {
     u32         nSlot = Skalib_NextSlot();
     u32         i;
@@ -1855,8 +1855,8 @@ int   AnimLib_RandomIndex(u32 uUsed, int nCount);
 void* AnimStream_GetClip(int nPlayer, int nGroup, int nStyle, int nClub);
 
 // The clip a player plays for an animation group, style, club class and key (NULL when the group is
-// out of range or the leaf is empty). At a streamed position (fn_800C9828, the key taken as the
-// default when the leaf came from a key default) it is the animation stream's clip (fn_800CAA7C)
+// out of range or the leaf is empty). At a streamed position (AnimStream_IsStreamed, the key taken as the
+// default when the leaf came from a key default) it is the animation stream's clip (AnimStream_GetClip)
 // when there is one; with pName the library's clip of that name; otherwise one of the leaf's clips
 // at random, never the reaction the player played last (the next one instead), and, through the
 // leaf's played mask, none again until all of them have been played. A reaction's pick is recorded
