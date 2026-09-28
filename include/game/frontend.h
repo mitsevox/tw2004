@@ -81,7 +81,7 @@ extern FrontEnd* lbl_80281F1C;
 
 // uiProcessInterface.c's controller input (fn_8008F820): which UI event each button sends.
 typedef struct UIButtonEvent {
-    u32 uMask;                  // 0x0  the button's bit in Controller_GetButtons's pressed-this-frame half
+    u32 uMask;                  // 0x0  the button's bit in Input_ReadControlPad's pressed-this-frame half
     s32 nEvent;                 // 0x4  the event UISProcessEvent sends the UI
 } UIButtonEvent;
 #define UI_NUM_BUTTON_EVENTS 16

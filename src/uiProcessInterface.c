@@ -213,9 +213,9 @@ void fn_8008F820(void) {
     fOne = 1.0f;
     if (gSession.nGameType == 3 || gSession.nGameType == 1 ||
         (gSession.nGameType == 6 && GUI_IsPauseMenuOpen())) {
-        fn_800130EC(1);
+        Input_vEmulateDPad(1);
     } else {
-        fn_800130EC(0);
+        Input_vEmulateDPad(0);
     }
     if (gSession.nGameType >= 4 && gSession.nGameType <= 8 && gSession.nPaused == 0) {
         for (i = 0; i < gSession.nNumPlayers; i++) {
@@ -236,7 +236,7 @@ void fn_8008F820(void) {
     pButtons = aButtons;
     pPressed = aPressed;
     for (i = 0; i < 4; i++) {
-        if (fn_80013070(i)) {
+        if (Input_bDoesPadExist(i)) {
             lbl_801D87C0.a1[i] = 1;
             lbl_801D87C0.n34 = 0;
             lbl_801D87C0.n38++;
@@ -244,7 +244,7 @@ void fn_8008F820(void) {
             lbl_801D87C0.a1[i] = 0;
         }
         if (lbl_801D87C0.a1[i]) {
-            pButtons[i] = Controller_GetButtons(i);
+            pButtons[i] = Input_ReadControlPad(i);
             if (pButtons[i] & 0x40000) {
                 pButtons[i] |= 4;
             }
@@ -314,7 +314,7 @@ void fn_8008F820(void) {
                 }
                 if (gSession.nGameType == 6) {
                     uMask = Controller_GetButtonMask(0x20, 1);
-                    uButtons = Controller_GetButtons(k);
+                    uButtons = Input_ReadControlPad(k);
                     if (uButtons & uMask) {
                         lbl_80189B38[k]++;
                     } else {

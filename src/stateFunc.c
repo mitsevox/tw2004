@@ -320,7 +320,7 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
         Physics_DropBall(&gPlayers[nPlayer].ball, gPlayers[nPlayer].ball.vPos);
     }
     if (!Player_IsCPU(nPlayer)) {
-        if ((Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0, 0))
+        if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0, 0))
             && !fn_80100294()) {
             fn_800C70F8(pV, 1);
             if (!fn_80063C90(pV)) {
@@ -623,7 +623,7 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
     if (gSession.bReplay != 0) return;
     if (gPlayers[nPlayer].swing.nState != 0) return;
     Caddie_Update(nPlayer);
-    if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(6, 0)) {
+    if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(6, 0)) {
         if (gpGame->b284 != 0) {
             if (gpGame->pfn264(nPlayer)) {
                 AI_DefaultTarget(nPlayer);
@@ -652,7 +652,7 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
         }
         gpGame->pfn22C(nPlayer);
     } else {
-        if ((Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(5, 0)) &&
+        if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(5, 0)) &&
             gPlayers[nPlayer].nShotKind == SHOT_TYPE_PUTT_e) {
             GOLFERSTATE_Push(GS_GREEN_REVERSE_PUTT, nPlayer);
         } else {
@@ -801,30 +801,30 @@ void STATEFUNC_ZoomInit(int nPlayer) {
 // 0x67 is posted, once.
 void STATEFUNC_ZoomUpdate(int nPlayer) {
     Caddie_Update(nPlayer);
-    if (!(Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(8, 1))) {
+    if (!(Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(8, 1))) {
         GOLFERSTATE_Pop(nPlayer);
     } else {
-        if ((Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(9, 0))) {
+        if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(9, 0))) {
             EVENT_Trigger(nPlayer, 0xD, 0, -1);
         } else {
-            if ((Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xA, 0))) {
+            if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xA, 0))) {
                 EVENT_Trigger(nPlayer, 0xE, 0, -1);
             }
         }
-        if ((Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x1E, 0))) {
+        if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x1E, 0))) {
             EVENT_Trigger(nPlayer, 0xF, 0, -1);
         }
-        if ((Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xB, 1))) {
+        if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xB, 1))) {
             EVENT_Trigger(nPlayer, 0x12, 0, -1);
         } else {
-            if ((Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xC, 1))) {
+            if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xC, 1))) {
                 EVENT_Trigger(nPlayer, 0x13, 0, -1);
             }
         }
-        if ((Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xD, 1))) {
+        if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xD, 1))) {
             EVENT_Trigger(nPlayer, 0x14, 0, -1);
         } else {
-            if ((Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xE, 1))) {
+            if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xE, 1))) {
                 EVENT_Trigger(nPlayer, 0x15, 0, -1);
             }
         }
@@ -870,27 +870,27 @@ void STATEFUNC_ElevatorInit(int nPlayer) {
 // events 0xD/0xE and 0x12..0x15.
 void STATEFUNC_ElevatorUpdate(int nPlayer) {
     Caddie_Update(nPlayer);
-    if (!(Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(7, 1))) {
+    if (!(Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(7, 1))) {
         GOLFERSTATE_Pop(nPlayer);
     } else {
-        if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(9, 0)) {
+        if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(9, 0)) {
             EVENT_Trigger(nPlayer, 0xD, 0, -1);
         } else {
-            if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xA, 0)) {
+            if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xA, 0)) {
                 EVENT_Trigger(nPlayer, 0xE, 0, -1);
             }
         }
-        if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xB, 1)) {
+        if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xB, 1)) {
             EVENT_Trigger(nPlayer, 0x12, 0, -1);
         } else {
-            if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xC, 1)) {
+            if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xC, 1)) {
                 EVENT_Trigger(nPlayer, 0x13, 0, -1);
             }
         }
-        if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xD, 1)) {
+        if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xD, 1)) {
             EVENT_Trigger(nPlayer, 0x14, 0, -1);
         } else {
-            if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xE, 1)) {
+            if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xE, 1)) {
                 EVENT_Trigger(nPlayer, 0x15, 0, -1);
             }
         }
@@ -919,8 +919,8 @@ void STATEFUNC_GreenInit(int nPlayer) {
 
 // Pop the state once neither button 2 nor button 3 is held.
 void STATEFUNC_GreenUpdate(int nPlayer) {
-    if (!(Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(2, 1))) {
-        if (!(Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(3, 1))) {
+    if (!(Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(2, 1))) {
+        if (!(Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(3, 1))) {
             GOLFERSTATE_Pop(nPlayer);
         }
     }
@@ -981,7 +981,7 @@ void STATEFUNC_GreenWatchRollUpdate(int nPlayer) {
 
     Caddie_Update(nPlayer);
     if (!Player_IsCPU(nPlayer)) {
-        if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0, 0)) {
+        if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0, 0)) {
             GOLFERSTATE_Pop(nPlayer);
             return;
         }
@@ -1047,7 +1047,7 @@ void STATEFUNC_GreenReversePuttInit(int nPlayer) {
 
 void STATEFUNC_GreenReversePuttUpdate(int nPlayer) {
     if (!Player_IsCPU(nPlayer)
-        && !(Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(5, 1))) {
+        && !(Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(5, 1))) {
         GOLFERSTATE_Pop(nPlayer);
     } else {
         GUI_ToggleUI(nPlayer, 0);
@@ -1075,25 +1075,25 @@ void STATEFUNC_KneeCamInit(int nPlayer) {
 // State 8 (camera 7): pops once button 19 is released; while it is held, buttons 11/12 and 13/14
 // fire events 0x12..0x15. Button 4 held calls fn_800C6010, else fn_800C60E8.
 void STATEFUNC_KneeCamUpdate(int nPlayer) {
-    if (!(Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x13, 1))) {
+    if (!(Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x13, 1))) {
         GOLFERSTATE_Pop(nPlayer);
     } else {
-        if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xB, 1)) {
+        if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xB, 1)) {
             EVENT_Trigger(nPlayer, 0x12, 0, -1);
         } else {
-            if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xC, 1)) {
+            if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xC, 1)) {
                 EVENT_Trigger(nPlayer, 0x13, 0, -1);
             }
         }
-        if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xD, 1)) {
+        if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xD, 1)) {
             EVENT_Trigger(nPlayer, 0x14, 0, -1);
         } else {
-            if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xE, 1)) {
+            if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xE, 1)) {
                 EVENT_Trigger(nPlayer, 0x15, 0, -1);
             }
         }
     }
-    if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(4, 1)) {
+    if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(4, 1)) {
         fn_800C6010(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), nPlayer);
     } else {
         fn_800C60E8(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), nPlayer);
@@ -1123,8 +1123,8 @@ void STATEFUNC_GreenMorphInit(int nPlayer) {
 // button 6 re-plans: the game's 0x264 callback (with gpGame+0x284) or a putt aims at the pin,
 // anything else re-chooses a target; then Shot_Prepare, the break line, animation 5.
 void STATEFUNC_GreenMorphUpdate(int nPlayer) {
-    if (!(Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x2E, 1))) {
-        if (!(Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x30, 1))) {
+    if (!(Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x2E, 1))) {
+        if (!(Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x30, 1))) {
             if (1.0f == ViewController_GetCameraControl(gPlayers[nPlayer].nView[0])->f54) {
                 GOLFERSTATE_Pop(nPlayer);
                 return;
@@ -1135,7 +1135,7 @@ void STATEFUNC_GreenMorphUpdate(int nPlayer) {
     if (gSession.bReplay != 0) return;
     if (gPlayers[nPlayer].swing.nState != 0) return;
     Caddie_Update(nPlayer);
-    if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(6, 0)) {
+    if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(6, 0)) {
         if (gpGame->b284 != 0) {
             if (gpGame->pfn264(nPlayer)) {
                 AI_DefaultTarget(nPlayer);
@@ -1254,10 +1254,10 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
                 bB = 1;
             }
         } else {
-            if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x16, 1)) {
+            if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x16, 1)) {
                 bA = 1;
             } else {
-                if (Controller_GetButtons(gPlayers[nPlayer].nController)
+                if (Input_ReadControlPad(gPlayers[nPlayer].nController)
                     & Controller_GetButtonMask(0x17, 1)) {
                     bB = 1;
                 }
@@ -1274,7 +1274,7 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
     if (GUI_IsPausedOrPostShotUIAnimating(nPlayer)) return;
     if (fn_80100294()) return;
     if (gReplayData.bF10 != 0 && gpGame->b287 != 0) {
-        if ((Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x18, 0)) &&
+        if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x18, 0)) &&
             !(gPlayers[nPlayer].uFlags & 8) &&
             (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_CONCEDED && !fn_800E53B8() &&
             !(gPlayers[nPlayer].pChar->u10 & 0x40)) {
@@ -1292,7 +1292,7 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
             return;
         }
     }
-    if ((Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x19, 0)) &&
+    if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x19, 0)) &&
         !(gPlayers[nPlayer].uFlags & 8) && GM_PlayerTakeMulligan(nPlayer)) {
         REPLAY_Stop();
         if (fn_800C6D28()) {
@@ -1464,14 +1464,14 @@ void STATEFUNC_ShowYardageUpdate(int nPlayer) {
     }
     if (!Player_IsCPU(nPlayer) && gSession.nSplitScreen == 0) {
         if (gSession.bReplay == 0) {
-            if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x19, 0)) {
+            if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x19, 0)) {
                 if (!GM_PlayerTakeMulligan(nPlayer)) return;
                 fn_80062D0C(nPlayer);
                 return;
             }
         }
         if (gReplayData.bF10 != 0) {
-            if ((Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x18, 0))
+            if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x18, 0))
                 && gpGame->b287 != 0 &&
                 !(gPlayers[nPlayer].uFlags & 8) && (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_CONCEDED &&
                 !fn_800E53B8() &&
@@ -1483,11 +1483,11 @@ void STATEFUNC_ShowYardageUpdate(int nPlayer) {
                 return;
             }
         }
-        if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0, 0)) {
+        if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0, 0)) {
             GUI_AdvancePostShotUI(nPlayer);
         }
     } else if (!Player_IsCPU(nPlayer)) {
-        if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0, 0)) {
+        if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0, 0)) {
             GUI_AdvancePostShotUI(nPlayer);
         }
     } else {
@@ -1806,7 +1806,8 @@ void STATEFUNC_InitialFlyByUpdate(int nPlayer) {
     if (gSession.a8[0] == 0 || !Controller_AnyPadHasButtons(0)) {
         if (gSession.options.bSkipCameras) {
             bDone = 1;
-        } else if (fn_800172C4(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]))) {
+        } else if (
+                CameraController_IsFlybyDone(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]))) {
             bDone = 1;
         } else if (!fn_80100294()) {
             if (Controller_AnyPadHasButtons(Controller_GetButtonMask(0, 0)) || fn_80062B90()) {
@@ -1881,10 +1882,10 @@ void STATEFUNC_MidHoleFlyByUpdate(int nPlayer) {
     } else if (fn_80100294()) {
         return;
     }
-    if (fn_800172C4(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]))) {
+    if (CameraController_IsFlybyDone(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]))) {
         bDone = 1;
     } else if (!Player_IsCPU(nPlayer)) {
-        if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0, 0)) {
+        if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0, 0)) {
             bDone = 1;
             Gaud_StopComment();
         }
@@ -1979,7 +1980,7 @@ void STATEFUNC_PlaceBallInit(int nPlayer) {
 // 1 (pre-shot). Otherwise the cursor moves, buttons 26..29 fire events 0x16..0x19, and button 25
 // off the tee takes a mulligan (if allowed).
 void STATEFUNC_PlaceBallUpdate(int nPlayer) {
-    if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x23, 0)) {
+    if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x23, 0)) {
         Ball*   pBall;
         Player* p = &gPlayers[nPlayer];
         if (p->uFlagsEF0 & 1) {
@@ -1994,21 +1995,21 @@ void STATEFUNC_PlaceBallUpdate(int nPlayer) {
         }
     } else {
         fn_800EDAE0(nPlayer);
-        if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x1A, 1)) {
+        if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x1A, 1)) {
             EVENT_Trigger(nPlayer, 0x16, 0, -1);
         } else {
-            if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x1B, 1)) {
+            if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x1B, 1)) {
                 EVENT_Trigger(nPlayer, 0x17, 0, -1);
             }
         }
-        if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x1C, 1)) {
+        if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x1C, 1)) {
             EVENT_Trigger(nPlayer, 0x18, 0, -1);
         } else {
-            if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x1D, 1)) {
+            if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x1D, 1)) {
                 EVENT_Trigger(nPlayer, 0x19, 0, -1);
             }
         }
-        if ((Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x19, 0)) &&
+        if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x19, 0)) &&
             gPlayers[nPlayer].ball.nLie != 0 && GM_PlayerTakeMulligan(nPlayer)) {
             fn_8001D8DC(nPlayer);
             TARGET_SetupTarget(nPlayer);

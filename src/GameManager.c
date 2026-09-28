@@ -892,17 +892,17 @@ void GM_CheckForShotChanges(int nPlayer) {
         return;
     }
     if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_GREEN_MORPH) {
-        if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(9, 0)) {
+        if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(9, 0)) {
             if (Game_GetMode() == 0x1A || Game_GetMode() == 0x16) return;
             EVENT_Trigger(nPlayer, 0xD, 0, -1);
             GUI_ToggleUI(nPlayer, 1);
             bChanged = 1;
-        } else if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(10, 0)) {
+        } else if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(10, 0)) {
             if (Game_GetMode() == 0x1A || Game_GetMode() == 0x16) return;
             EVENT_Trigger(nPlayer, 0xE, 0, -1);
             GUI_ToggleUI(nPlayer, 1);
             bChanged = 1;
-        } else if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x1E, 0)) {
+        } else if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x1E, 0)) {
             if (Game_GetMode() == 0x1A || Game_GetMode() == 0x16) return;
             EVENT_Trigger(nPlayer, 0xF, 0, -1);
             GUI_ToggleUI(nPlayer, 1);
@@ -913,7 +913,7 @@ void GM_CheckForShotChanges(int nPlayer) {
         } else if (!gpGame->b28D && GM_bIsElevatorCamButtonPressed(nPlayer)) {
             GOLFERSTATE_Push(GS_ELEVATOR, nPlayer);
         } else if (gpGame->b28D
-                   && (Controller_GetButtons(gPlayers[nPlayer].nController)
+                   && (Input_ReadControlPad(gPlayers[nPlayer].nController)
                        & Controller_GetButtonMask(0x2F, 0))) {
             if (gpGame->pfn258(nPlayer)) {
                 AI_DefaultTarget(nPlayer);
@@ -936,17 +936,17 @@ void GM_CheckForShotChanges(int nPlayer) {
             GOLFERSTATE_Push(GS_MID_HOLE_FLY_BY, nPlayer);
         }
     }
-    if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xB, 1)) {
+    if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xB, 1)) {
         EVENT_Trigger(nPlayer, 0x12, 0, -1);
         bChanged = 1;
-    } else if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xC, 1)) {
+    } else if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xC, 1)) {
         EVENT_Trigger(nPlayer, 0x13, 0, -1);
         bChanged = 1;
     }
-    if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xD, 1)) {
+    if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xD, 1)) {
         EVENT_Trigger(nPlayer, 0x14, 0, -1);
         bChanged = 1;
-    } else if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xE, 1)) {
+    } else if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0xE, 1)) {
         EVENT_Trigger(nPlayer, 0x15, 0, -1);
         bChanged = 1;
     }
@@ -990,7 +990,7 @@ void GM_DoPostShotInHoleUI(int nPlayer) {
     }
     if (fn_8002E8B4(nPlayer) && gSession.nSplitScreen == 0) {
         if (gSession.bReplay == 0
-            && (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x19, 0)) &&
+            && (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x19, 0)) &&
             !(gPlayers[nPlayer].uFlags & 8)) {
             if (GM_PlayerTakeMulligan(nPlayer)) {
                 fn_80062D0C(nPlayer);
@@ -998,7 +998,7 @@ void GM_DoPostShotInHoleUI(int nPlayer) {
             return;
         }
         if (gReplayData.bF10
-            && (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x18, 0)) &&
+            && (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x18, 0)) &&
             gpGame->b287 && (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_CONCEDED && !fn_800E53B8() &&
             !(gPlayers[nPlayer].pChar->u10 & 0x40)) {
             fn_80062D0C(nPlayer);
@@ -1006,13 +1006,13 @@ void GM_DoPostShotInHoleUI(int nPlayer) {
             GOLFERSTATE_Switch(GS_REPLAY_SWING, nPlayer);
             return;
         }
-        if ((Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0, 0))
+        if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0, 0))
             && !fn_8008AC40()) {
             GUI_AdvancePostShotUI(nPlayer);
         }
     } else if (fn_8002E8B4(nPlayer)) {
         if (!fn_8008AC40()
-            && (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0, 0))) {
+            && (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0, 0))) {
             GUI_AdvancePostShotUI(nPlayer);
         }
     } else if (Player_IsCPU(nPlayer) && !fn_8008AC40()
@@ -1197,8 +1197,8 @@ u8 fn_800DFF0C(int nPlayer) {
     if (!gpGame->b280) {
         return 0;
     }
-    if ((Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(8, 0)) ||
-        (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(8, 1))) {
+    if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(8, 0)) ||
+        (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(8, 1))) {
         return 0;
     }
     if (gpGame->n144[nPlayer] <= 1) {
@@ -1215,11 +1215,11 @@ u8 fn_800DFF0C(int nPlayer) {
 // TW06: GM_bIsZoomButtonPressed. Button 8 held: counts frames (FRAME_RATE a second) and says yes
 // once it has been held for 6.
 u8 GM_bIsZoomButtonPressed(int nPlayer) {
-    if ((Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(8, 0))
+    if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(8, 0))
         && gpGame->n144[nPlayer] == 0) {
         gpGame->n144[nPlayer]++;
     } else if (gpGame->n144[nPlayer] > 0) {
-        if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(8, 1)) {
+        if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(8, 1)) {
             gpGame->n144[nPlayer] += (int)(FRAME_RATE * gSession.fFrameTime + 0.5f);
             if (gpGame->n144[nPlayer] >= 6) {
                 gpGame->n144[nPlayer] = 0;
@@ -1234,8 +1234,8 @@ u8 GM_bIsZoomButtonPressed(int nPlayer) {
 
 // Button 47 tapped (2 to 19 frames): the next camera shot.
 u8 fn_800E012C(int nPlayer) {
-    if ((Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x2F, 0)) ||
-        (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x2F, 1))) {
+    if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x2F, 0)) ||
+        (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x2F, 1))) {
         return 0;
     }
     if (gpGame->n158[nPlayer] <= 1) {
@@ -1251,11 +1251,11 @@ u8 fn_800E012C(int nPlayer) {
 
 // TW06: GM_bIsElevatorCamButtonPressed. Button 47 held for 20 frames.
 u8 GM_bIsElevatorCamButtonPressed(int nPlayer) {
-    if ((Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x2F, 0))
+    if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x2F, 0))
         && gpGame->n158[nPlayer] == 0) {
         gpGame->n158[nPlayer]++;
     } else if (gpGame->n158[nPlayer] > 0) {
-        if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x2F, 1)) {
+        if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x2F, 1)) {
             gpGame->n158[nPlayer] += (int)(FRAME_RATE * gSession.fFrameTime + 0.5f);
             if (gpGame->n158[nPlayer] >= 20) {
                 gpGame->n158[nPlayer] = 0;

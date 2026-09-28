@@ -12,7 +12,7 @@ void StaticMem_Init();
 void Math_InitLog2Table();
 void fn_8000B984();
 void fn_80012FA0();
-void fn_80012FA4();
+void Input_iInitModule();
 void fn_80014524();
 void fn_8002F1D4();
 void fn_80095108();
@@ -38,5 +38,5 @@ void fn_80005520(void) {
     fn_8002F1D4();
     Gaud_InitOnce();
     fn_80014524();
-    fn_80012FA4();
+    Input_iInitModule();
 }

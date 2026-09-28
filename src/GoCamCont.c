@@ -212,8 +212,8 @@ void CameraController_Idle(View* pView, int nPlayer) {
 void CameraController_SetCameraMode(View* pView, int nCamera, int nPlayer, int nView) {
     int nPrevView;
 
-    CameraController_GetPosition(pView);
-    CameraController_GetTarget(pView);
+    CameraController_GetCameraOrigin(pView);
+    CameraController_GetCameraLookPoint(pView);
     if (pView->nCurCamera == nCamera) {
         return;
     }
@@ -303,8 +303,8 @@ void CameraController_SetCameraMode(View* pView, int nCamera, int nPlayer, int n
 
 // Starts the player's shot of kind nKind on the view and runs its script from the start.
 void fn_8006351C(View* pView, int nPlayer, int nKind) {
-    f32* pPos = CameraController_GetPosition(pView);
-    f32* pAt = CameraController_GetTarget(pView);
+    f32* pPos = CameraController_GetCameraOrigin(pView);
+    f32* pAt = CameraController_GetCameraLookPoint(pView);
     CamShot* pShot = DynamicCam_ChooseScript(nPlayer, nKind, NULL);
 
     if (pShot != NULL) {
@@ -440,8 +440,8 @@ void fn_80063920(int nView, f32* pBounds) {
     if (!gpGame->b289) {
         return;
     }
-    pPos = CameraController_GetPosition(pView);
-    pAt = CameraController_GetTarget(pView);
+    pPos = CameraController_GetCameraOrigin(pView);
+    pAt = CameraController_GetCameraLookPoint(pView);
     if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_SIMULATE) {   // fake match: (s8), see game.h
         return;
     }
@@ -535,8 +535,8 @@ void fn_80063CBC(View* pView, f32* pVec) {
 // only 5, 8 and 10 replace it, 6 is never taken, 2 and 3 do not replace 7, and 7 does not replace
 // 2 or 3.
 void fn_80063CF0(View* pView, int nKind, int nPlayer) {
-    f32* pPos = CameraController_GetPosition(pView);
-    f32* pAt = CameraController_GetTarget(pView);
+    f32* pPos = CameraController_GetCameraOrigin(pView);
+    f32* pAt = CameraController_GetCameraLookPoint(pView);
     f32 vNormal[4];
     f32 vSpeed[4] = {0.1f, 0.1f, 0.1f, 0.5f};
     SurfaceType* pSurface;
@@ -670,10 +670,10 @@ u8 fn_800642B0(void) {
 
 // Blends the view's script into its current shot.
 void fn_800642D0_ReapplyCurrentShot(View* pView, int nPlayer) {
-    f32* pPos = CameraController_GetPosition(pView);
+    f32* pPos = CameraController_GetCameraOrigin(pView);
 
     CameraScript_InterpToNewScript(&pView->script, pView->script.pShot, nPlayer, pPos,
-                                   CameraController_GetTarget(pView), 5,
+                                   CameraController_GetCameraLookPoint(pView), 5,
                                    0.0f, 100.0f, 25, 0.0f);
 }
 

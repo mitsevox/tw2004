@@ -135,9 +135,9 @@ void fn_80076F80(UStreamObject* pObject) {
 // controller.
 u8 fn_80076FDC(Video* pVideo, int nArg) {
     int i;
-    fn_80013400();
+    Input_vUpdate();
     for (i = 0; i < 4; i++) {
-        if (Controller_GetButtons(i)) {
+        if (Input_ReadControlPad(i)) {
             return 1;
         }
     }

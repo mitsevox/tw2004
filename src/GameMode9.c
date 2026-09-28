@@ -133,7 +133,7 @@ void fn_800EDA74(void) {
 
 // The pad's sticks (beyond the 96..160 dead zone) scaled to -1..1 into the player's fA7C..fA84.
 void fn_800EDAE0(int nPlayer) {
-    u8* pPad = fn_800136C4(gPlayers[nPlayer].nController);
+    u8* pPad = Input_sGetStickInfo(gPlayers[nPlayer].nController);
     if (pPad) {
         if (pPad[3] < 96.0f) {
             gPlayers[nPlayer].fA84 = (96.0f - pPad[3]) / 96.0f;

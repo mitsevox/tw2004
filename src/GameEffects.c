@@ -69,7 +69,7 @@ void GameEffects_ResetGameEffectSettings(void) {
     lbl_80202898.b4A = 0;
     for (i = 0; i < gSession.nNumPlayers; i++) {
         if (fn_8002E898_IsPad(gSession.nController[i])) {
-            fn_800131C4(gSession.nController[i]);
+            Input_vStopVibration(gSession.nController[i]);
         }
     }
 }
@@ -637,7 +637,7 @@ void fn_800DC664(int nPlayer) {
         if (++lbl_80202898.nRumbleFrames == 5) {
             lbl_80202898.bRumble = 0;
             if (fn_8002E898_IsPad(nController)) {
-                fn_80013130(nController, 0);
+                Input_vVibrateWave(nController, 0);
             }
         }
     }
@@ -651,7 +651,7 @@ void fn_800DC6E8(int nPlayer) {
         nController = gPlayers[nPlayer].nController;
         if (!lbl_80202898.bRumble) {
             if (fn_8002E898_IsPad(nController)) {
-                fn_80013130(nController, 0xFF);
+                Input_vVibrateWave(nController, 0xFF);
             }
             lbl_80202898.bRumble = 1;
             lbl_80202898.nRumbleFrames = 0;

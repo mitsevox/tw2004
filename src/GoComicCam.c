@@ -32,8 +32,8 @@ void fn_800B352C(void) {
 
 // Start the comic camera for nPlayer's view with layout nKind.
 void fn_800B3550(int nKind, View* pView, int nPlayer) {
-    f32* pCam = CameraController_GetPosition(pView);
-    f32* pSub = CameraController_GetTarget(pView);
+    f32* pCam = CameraController_GetCameraOrigin(pView);
+    f32* pSub = CameraController_GetCameraLookPoint(pView);
     int i;
     int nShot;
     CamShot* pShot;
@@ -427,8 +427,8 @@ u8 fn_800B4908(void) {
 // of shots 0x2B..0x2D every 9 panels shown. Then hand Gaud_UpdtSpecialShot (GameAudio.c) the panel's column
 // (3 for layout 1's last panel).
 void fn_800B4914(View* pView, int nPlayer) {
-    f32* pCam = CameraController_GetPosition(pView);
-    f32* pSub = CameraController_GetTarget(pView);
+    f32* pCam = CameraController_GetCameraOrigin(pView);
+    f32* pSub = CameraController_GetCameraLookPoint(pView);
     int nPanel = lbl_80282178->nPanel;
     ComicPanel* pPanel = &lbl_80282178->aPanel[nPanel];
     u8 nColumn = (int)(pPanel->fLeft * 3.0f);

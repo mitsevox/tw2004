@@ -353,7 +353,7 @@ They will be sorted into the sections below.
 - **[verified] Block-scoped locals per switch case** allocate differently from one function-level local
   (EventInfo fn_8011D280); case labels merged into `default` (`case 3: default:`) reshape the compare
   tree or jump table (event fn_80066A9C, fn_80067220), and extra empty cases make the tree test a value
-  first (Controller_Gc fn_80013400: `case -2: case -3: break;`).
+  first (Controller_Gc Input_vUpdate: `case -2: case -3: break;`).
 - **[verified] Return a local instead of an expression** so the register restores come before the last
   arithmetic (LLDynTex fn_8010B6AC 90 -> 100); round up through a local written back
   (`n = a + *p; n = (n - 1) & ~(a - 1); *p = n;`, hwsBurn fn_80110E98); a round-up division only matches
@@ -991,7 +991,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
 - **[verified] `a()->arr[b()].f`** evaluates `b()` first and scales the index before calling
   `a()`; splitting `b()` into a local first moves the shift after the call.
 - **[verified] `(fn() & uMask)` operand order.** `and. r0, r3, rM` (call result first) comes from
-  the mask call inline: `if (Controller_GetButtons(x) & Controller_GetButtonMask(k, m))`. A `uMask` local assigned
+  the mask call inline: `if (Input_ReadControlPad(x) & Controller_GetButtonMask(k, m))`. A `uMask` local assigned
   first gives `and. r0, rM, r3`, and swapping the operands in the source changes nothing. Applied
   to every single-use mask in Swing.c (States 04/05/08/09/10 exact, 06/12/14/22 closer).
 - **[verified] Statement order among plain stores matters**: `a[i] = 1; x = 0; y = 0;` and

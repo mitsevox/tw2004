@@ -526,7 +526,7 @@ void fn_80100C08(void) {
     }
     switch (lbl_80282428) {
     case 0:
-        if (Controller_GetButtons(gPlayers[0].nController) & Controller_GetButtonMask(0, 0)) {
+        if (Input_ReadControlPad(gPlayers[0].nController) & Controller_GetButtonMask(0, 0)) {
             lbl_80282428 = lbl_80282424;
         }
         break;

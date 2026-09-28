@@ -294,7 +294,7 @@ u8 lbl_80281194[8] = {0x80, 0x80, 0x80, 0x80};    // a neutral pad: both sticks 
 
 // A controller's pad state; the neutral pad when there is none or fn_80100C00() is true.
 u8* Pad_State(int nPlayer, int nController) {
-    u8* pPad = fn_800136C4(nController);
+    u8* pPad = Input_sGetStickInfo(nController);
     if (pPad == NULL || fn_80100C00()) {
         return lbl_80281194;
     }
@@ -699,8 +699,8 @@ void SW_KillVibration(int nPlayer) {
         if (gPlayers[nPlayer].swing.nVibrateCount) {
         } else {
         }
-        fn_800130F8(gPlayers[nPlayer].nController, 0);
-        fn_80013130(gPlayers[nPlayer].nController, 0);
+        Input_vVibrateBuzz(gPlayers[nPlayer].nController, 0);
+        Input_vVibrateWave(gPlayers[nPlayer].nController, 0);
         gPlayers[nPlayer].swing.bVibrating = 0;
         gPlayers[nPlayer].swing.nVibrateCount = 0;
     }
@@ -1456,7 +1456,7 @@ void SW_vCheckForSwingBoost(int nPlayer) {
 
     if (Player_IsCPU(nPlayer)) return;
     if (gSession.options.bBoostEnabled == 0) return;
-    uButtons    = Controller_GetButtons(gPlayers[nPlayer].nController);
+    uButtons    = Input_ReadControlPad(gPlayers[nPlayer].nController);
     nY   = Swing_StickY(nPlayer, Pad_State(nPlayer, gPlayers[nPlayer].nController));
     nX   = Swing_StickX(nPlayer, Pad_State(nPlayer, gPlayers[nPlayer].nController));
     fMag = (f32)Math_Sqrt((nX - 128) * (nX - 128) + (nY - 128) * (nY - 128));
@@ -1539,7 +1539,7 @@ void Swing_SpinInput(int nPlayer) {
     int     nX, nY;
     if (Player_IsCPU(nPlayer)) return;
     if (gSession.options.bSpinEnabled == 0) return;
-    uButtons    = Controller_GetButtons(gPlayers[nPlayer].nController);
+    uButtons    = Input_ReadControlPad(gPlayers[nPlayer].nController);
     if (!(uButtons & Controller_GetButtonMask(0x20, 0))) return;
     if (gPlayers[nPlayer].swing.bCanSpin == 0) return;
     EVENT_Trigger(nPlayer, 0x2E, 0, 0);
@@ -1702,8 +1702,8 @@ void Swing_MisHitRumble(int nPlayer) {
     }
     if (gPlayers[nPlayer].swing.nVibrateCount > 0) {
         gPlayers[nPlayer].swing.bVibrating = 1;
-        fn_800130F8(nPad, 1);
-        fn_80013130(nPad, 0xFF);
+        Input_vVibrateBuzz(nPad, 1);
+        Input_vVibrateWave(nPad, 0xFF);
     }
 }
 

@@ -8,7 +8,7 @@ void fn_800060DC();
 void fn_8000724C();
 void StaticMem_Shutdown();
 void Math_FreeLog2Table();
-void fn_80013030();
+void Input_vCloseOnce();
 void fn_80014590();
 void fn_800B5C34();
 void GoARAM_Shutdown();
@@ -19,7 +19,7 @@ void fn_80005590(void) {
     fn_8000724C();
     UStream_FreeBuffers();
     fn_800060DC();
-    fn_80013030();
+    Input_vCloseOnce();
     StaticMem_Shutdown();
     Math_FreeLog2Table();
     GoARAM_Shutdown();

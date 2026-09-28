@@ -398,7 +398,7 @@ void RenderView_MakeQuad(f32* pXY, f32* pUV, f32 x0, f32 y0, f32 x1, f32 y1) {
 
 double tan();
 void fn_800142A4(s8 v);
-void fn_800131C4(int nController);
+void Input_vStopVibration(int nController);
 void fn_8001437C(void);
 
 // 1: RenderView_DrawPrimitive draws with the viewport and matrices already set (the camera's); 0:
@@ -457,7 +457,7 @@ u8 Controller_AnyPadHasButtons(u32 uMask) {
     int nController = 0;
 
     do {
-        if ((uMask == 0 && Controller_GetButtons(nController) != 0) || (uMask & Controller_GetButtons(nController))) {
+        if ((uMask == 0 && Input_ReadControlPad(nController) != 0) || (uMask & Input_ReadControlPad(nController))) {
             bPressed = 1;
         }
         nController++;
@@ -470,7 +470,7 @@ void fn_8001437C(void) {
 
     var_r31 = 0;
     do {
-        fn_800131C4(var_r31);
+        Input_vStopVibration(var_r31);
         var_r31 += 1;
     } while (var_r31 < 4);
 }

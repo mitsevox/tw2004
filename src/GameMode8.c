@@ -804,7 +804,7 @@ f32 fn_800FB41C(f32* pA, f32* pB) {
 // The pad's sticks (beyond the 96..160 dead zone) scaled to -1..1 into the player's fA7C..fA8C;
 // 0 inside the dead zone.
 void fn_800FB460(int nPlayer) {
-    u8* pPad = fn_800136C4(gPlayers[nPlayer].nController);
+    u8* pPad = Input_sGetStickInfo(gPlayers[nPlayer].nController);
     if (pPad) {
         if (pPad[3] < 96.0f) {
             gPlayers[nPlayer].fA84 = (96.0f - pPad[3]) / 96.0f;
@@ -844,14 +844,14 @@ void fn_800FB774(int nPlayer) {
     f32 fStep;
     if (!fn_800FA118(nPlayer, 1)) {
         fn_800FB460(nPlayer);
-        if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x1A, 1)) {
+        if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x1A, 1)) {
             EVENT_Trigger(nPlayer, 0x16, 0, -1);
-        } else if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x1B, 1)) {
+        } else if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x1B, 1)) {
             EVENT_Trigger(nPlayer, 0x17, 0, -1);
         }
-        if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x1C, 1)) {
+        if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x1C, 1)) {
             EVENT_Trigger(nPlayer, 0x18, 0, -1);
-        } else if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x1D, 1)) {
+        } else if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x1D, 1)) {
             EVENT_Trigger(nPlayer, 0x19, 0, -1);
         }
         if (gPlayers[nPlayer].nC3C & 0x200000) {
@@ -889,7 +889,7 @@ void fn_800FB774(int nPlayer) {
             }
         }
         fStep = FRAME_RATE / 60.0f * (FRAME_RATE * gSession.fFrameTime);
-        if (Controller_GetButtons(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x24, 0)) {
+        if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x24, 0)) {
             gPlayers[nPlayer].fCB4 += lbl_802816B0;
             gPlayers[nPlayer].nCB8 = 0;
         } else if (gPlayers[nPlayer].nCB8 > (s32)(FRAME_RATE * lbl_802816C4)) {
@@ -1256,7 +1256,7 @@ void fn_800FBD2C(int nPlayer) {
             }
         } else if (fDist < 5.0f) {
             if (!Player_IsCPU(nPlayer)) {
-                if (Controller_GetButtons(gPlayers[nPlayer].nController)
+                if (Input_ReadControlPad(gPlayers[nPlayer].nController)
                     & Controller_GetButtonMask(0x23, 0)) {
                     if (gPlayers[nPlayer].ball.nState != 1) {
                         Physics_DropBall(pBall, lbl_801D5888[nPlayer]);
@@ -1287,11 +1287,12 @@ u8 fn_800FCC38(int nPlayer) {
     if (nCtrl >= 8) {
         return 0;
     }
-    bDown = (Controller_GetButtons(nCtrl) & 0x1000 || Controller_GetButtons(gPlayers[nPlayer].nController) & 0x10000000) &&
-            (Controller_GetButtons(gPlayers[nPlayer].nController) & 0x400 ||
-             Controller_GetButtons(gPlayers[nPlayer].nController) & 0x4000000) &&
-            (Controller_GetButtons(gPlayers[nPlayer].nController) & 0x800 ||
-             Controller_GetButtons(gPlayers[nPlayer].nController) & 0x8000000);
+    bDown = (Input_ReadControlPad(nCtrl) & 0x1000 || Input_ReadControlPad(gPlayers[nPlayer].nController)
+             & 0x10000000) &&
+            (Input_ReadControlPad(gPlayers[nPlayer].nController) & 0x400 ||
+             Input_ReadControlPad(gPlayers[nPlayer].nController) & 0x4000000) &&
+            (Input_ReadControlPad(gPlayers[nPlayer].nController) & 0x800 ||
+             Input_ReadControlPad(gPlayers[nPlayer].nController) & 0x8000000);
     return bDown;
 }
 
@@ -1339,7 +1340,7 @@ void fn_800FCCF0(void) {
                 gPlayers[nPlayer].nCB8++;
                 if (!Player_IsCPU(nPlayer) && !fn_800FA118(nPlayer, 1) &&
                     lbl_80192908[0x27].nPoints + gPlayers[nPlayer].nC44 > 0) {
-                    if ((Controller_GetButtons(gPlayers[nPlayer].nController)
+                    if ((Input_ReadControlPad(gPlayers[nPlayer].nController)
                          & Controller_GetButtonMask(0x25, 0)) &&
                         !fn_800FCC38(nPlayer) &&
                         ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 24 ||
@@ -1371,7 +1372,7 @@ void fn_800FCCF0(void) {
             }
         } else if (Game_GetMode() == 8) {
             i = PLR_1_e;
-            if ((Controller_GetButtons(gPlayers[i].nController) & Controller_GetButtonMask(0x25, 0))
+            if ((Input_ReadControlPad(gPlayers[i].nController) & Controller_GetButtonMask(0x25, 0))
                 && !fn_800FCC38(i) &&
                 ((s8)GOLFERSTATE_GetCurrentState(i) == 24 ||
                  (gPlayers[i].ball.nLie != 0 && gPlayers[i].ball.nLie != LIE_INCUP_e &&

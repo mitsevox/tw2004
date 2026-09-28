@@ -183,8 +183,8 @@ void TARGET_RenderBallTarget(int nPlayer) {
     }
 
     pView = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
-    pCamPos = CameraController_GetPosition(pView);
-    pLook = CameraController_GetTarget(pView);
+    pCamPos = CameraController_GetCameraOrigin(pView);
+    pLook = CameraController_GetCameraLookPoint(pView);
     fCamDist = LLMath_DistanceBetween3(pCamPos, vPos);
     fn_8006A964(pLook, pCamPos, vDir);
     vDir[1] = 0.0f;
@@ -988,8 +988,8 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
 
     // the marker faces the camera: turned about y by the camera's heading
     pView = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
-    pCamPos = CameraController_GetPosition(pView);
-    pLook = CameraController_GetTarget(pView);
+    pCamPos = CameraController_GetCameraOrigin(pView);
+    pLook = CameraController_GetCameraLookPoint(pView);
     LLMath_DistanceBetween3(pCamPos, vPos);
     fn_8006A964(pLook, pCamPos, vDir);
     vDir[1] = 0.0f;

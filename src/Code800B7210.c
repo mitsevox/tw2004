@@ -112,11 +112,11 @@ u8 fn_800B7490(void) {
         lbl_802821A0 = 0;
     }
     for (;;) {
-        fn_80013400();
+        Input_vUpdate();
         nLast = nStatus;
         nStatus = DVDGetDriveStatus();
-        if ((Controller_GetButtons(0) & 0x01000000) || (Controller_GetButtons(1) & 0x01000000) ||
-            (Controller_GetButtons(2) & 0x01000000) || (Controller_GetButtons(3) & 0x01000000) || nStatus
+        if ((Input_ReadControlPad(0) & 0x01000000) || (Input_ReadControlPad(1) & 0x01000000) ||
+            (Input_ReadControlPad(2) & 0x01000000) || (Input_ReadControlPad(3) & 0x01000000) || nStatus
                     == 6 ||
             nStatus == 10) {
             if (nStatus != -1) {

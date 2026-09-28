@@ -1061,7 +1061,7 @@ void fn_8006D8E8(void) {
             gSession.fFrameTime = 4.0f * FRAME_TIME;
         }
         TI_sReadCounter(0);
-        fn_80013400();
+        Input_vUpdate();
         if (gSession.nGameType == 6) {
             fn_800DFC18();
         }

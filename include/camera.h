@@ -263,8 +263,8 @@ LAYOUT_ASSERT(CamScript, 0x118);    // CameraScript_WillGolferBeOccludedInThisVi
 // A view's camera controller (CameraController_SetCameraMode, EA's name in TW06 and TW07): the
 // camera mode, its shots and script. It sits at +4 in a ViewController; only the fields read so far.
 typedef struct View {
-    f32      v0[4];             // 0x000  what CameraController_GetPosition returns: the camera's position (inferred)
-    f32      v10[4];            // 0x010  what CameraController_GetTarget returns: where it looks (the pin, for camera 5)
+    f32      v0[4];             // 0x000  what CameraController_GetCameraOrigin returns: the camera's position (inferred)
+    f32      v10[4];            // 0x010  what CameraController_GetCameraLookPoint returns: where it looks (the pin, for camera 5)
     f32      v20[4];            // 0x020
     f32      v30[4];            // 0x030
     f32      v40[4];            // 0x040
@@ -635,9 +635,9 @@ void   ViewController_SetActivePlayerNumber(int nView, int nPlayer);   // the pl
 int    ViewController_GetActivePlayerNumber(int nView);          // the player the view follows (as set above)
 u8     ViewController_IsActive(int nView);          // the view is in use
 void   ViewController_TurnOnViewController(int nView, u8 bActive);   // sets ViewController.bActive
-f32*   CameraController_GetPosition(View* pView);        // the camera's position (v0)
-f32*   CameraController_GetTarget(View* pView);        // where it looks (v10), or a script shot's angles
-u8     fn_800172C4(View* pView);        // 0: the script's shot aims by angles (ViewController_Update)
+f32*   CameraController_GetCameraOrigin(View* pView);        // the camera's position (v0)
+f32*   CameraController_GetCameraLookPoint(View* pView);        // where it looks (v10), or a script shot's angles
+u8     CameraController_IsFlybyDone(View* pView);        // 0: the script's shot aims by angles (ViewController_Update)
 f32*   RC_spGetRenderCtxViewport(void* pCamera);      // a render camera's screen rectangle
 f32    VM_fGetViewportHeight(f32* pRect);         // the rectangle's [3]: its height
 f32    VM_fGetViewportWidth(f32* pRect);         // [2]: its width
@@ -678,7 +678,7 @@ u8     fn_800453C8(int nPlayer, CamShot* pShot);
 
 // ---- the camera scripts (gocamscripts.c, 0x8003DCE8..) ----------------------------------------
 
-// pCam and pSub are the view's camera position and where it looks (CameraController_GetPosition, CameraController_GetTarget).
+// pCam and pSub are the view's camera position and where it looks (CameraController_GetCameraOrigin, CameraController_GetCameraLookPoint).
 void     CamScript_RunScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, u8 b,
                      f32 fFrameTime);
 void     CamScript_RunFEScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, int a,

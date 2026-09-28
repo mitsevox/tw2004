@@ -48,7 +48,7 @@ void Golfer_TableSetup(void);
 
 // ---- small queries ------------------------------------------------------------------------------
 
-void fn_80013200(int nPad, u8 nValue);
+void Input_vSetVibrationStatus(int nPad, u8 nValue);
 
 // ---- setting up the players ---------------------------------------------------------------------
 
@@ -532,7 +532,7 @@ void fn_8002EBA4(u8* pObj, u8 nValue) {
     int i;
     pObj[7] = nValue;
     for (i = 0; i < 4; i++) {
-        fn_80013200(i, pObj[7]);
+        Input_vSetVibrationStatus(i, pObj[7]);
     }
 }
 

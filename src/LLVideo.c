@@ -231,7 +231,7 @@ void fn_800755F0(int nFlags) {
         DS_vSetZBufferMode(7);
         RenderState_Flush();
         RenderView_DrawPrimitive(0xA1, xy, 0, NULL, 2);
-        fn_80013400();
+        Input_vUpdate();
         fn_80006FE8();
         fn_80008380();
         if (!bBit0) {

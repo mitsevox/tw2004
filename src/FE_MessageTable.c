@@ -4687,7 +4687,7 @@ void fn_80083414(MsgArg* pArgs, MsgArg* pResult) {
 
 // The pad in port pArgs[0] is a WaveBird (its SI device type).
 void fn_80083430(MsgArg* pArgs, MsgArg* pResult) {
-    if (fn_80013050(pArgs[0].i) == 0x8B100000) {
+    if (Input_iGetPadType(pArgs[0].i) == 0x8B100000) {
         pResult->i = 1;
     } else {
         pResult->i = 0;

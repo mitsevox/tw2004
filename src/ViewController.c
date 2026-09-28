@@ -29,8 +29,8 @@ void  CA_vSetDefaultScalingVectors(CamLens* pLens);
 
 ViewController* ViewController_GetDataPtr(int nView);
 s32  RC_GetCurrentFrameBuffer(void);
-f32* fn_800172B4(View* pView);
-f32* fn_800172BC(View* pView);
+f32* CameraController_GetCameraViewScale(View* pView);
+f32* CameraController_GetCameraViewOffset(View* pView);
 
 // Only clears each of the four view controllers' active flag (bActive).
 void ViewController_ResetAll(void) {
@@ -114,23 +114,24 @@ void ViewController_Update(int nView) {
     CameraController_Idle(pCameraController, ViewController_GetActivePlayerNumber(nView));
     if (pCameraController->nCurCamera == 2) {
         CA_vSetLookAtSide(Camera_GetLens(pRenderContext),
-                          CameraController_GetPosition(pCameraController),
-                          CameraController_GetTarget(pCameraController), pCameraController->v20);
-    } else if (fn_800172C4(pCameraController)) {
+                          CameraController_GetCameraOrigin(pCameraController),
+                          CameraController_GetCameraLookPoint(pCameraController), pCameraController->v20);
+    } else if (CameraController_IsFlybyDone(pCameraController)) {
         if (pCameraController->nCurCamera == 4) {
             Camera_SetCameraPositionAndTargetWithOffsetAndScale(
-                Camera_GetLens(pRenderContext), CameraController_GetPosition(pCameraController),
-                CameraController_GetTarget(pCameraController), fn_800172BC(pCameraController),
-                fn_800172B4(pCameraController));
+                Camera_GetLens(pRenderContext), CameraController_GetCameraOrigin(pCameraController),
+                CameraController_GetCameraLookPoint(pCameraController), CameraController_GetCameraViewOffset(
+                        pCameraController),
+                CameraController_GetCameraViewScale(pCameraController));
         } else {
             CA_vSetLookAtSide(Camera_GetLens(pRenderContext),
-                              CameraController_GetPosition(pCameraController),
-                              CameraController_GetTarget(pCameraController), pCameraController->v20);
+                              CameraController_GetCameraOrigin(pCameraController),
+                              CameraController_GetCameraLookPoint(pCameraController), pCameraController->v20);
         }
     } else {
         Camera_SetCameraYawPitchRollAndPosition(Camera_GetLens(pRenderContext),
-                                                CameraController_GetPosition(pCameraController),
-                                                CameraController_GetTarget(pCameraController));
+                                                CameraController_GetCameraOrigin(pCameraController),
+                                                CameraController_GetCameraLookPoint(pCameraController));
     }
     fn_80013D68(pRenderContext);
     RC_vUpdateRenderCtxTransformationMatrices(pRenderContext);
@@ -231,27 +232,37 @@ void CA_vSetDefaultScalingVectors(CamLens* pLens) {
     pLens->m84[1][3] = 1.0f;
 }
 
-f32* fn_800172B4(View* pView) {
+// The camera's view scale (View.f50, three floats) that camera 4's look-at applies
+// (Camera_SetCameraPositionAndTargetWithOffsetAndScale).
+f32* CameraController_GetCameraViewScale(View* pView) {
     return &pView->f50;
 }
 
-f32* fn_800172BC(View* pView) {
+// The camera's view offset (View.f5C, three floats) that camera 4's look-at applies
+// (Camera_SetCameraPositionAndTargetWithOffsetAndScale).
+f32* CameraController_GetCameraViewOffset(View* pView) {
     return &pView->f5C;
 }
 
-u8 fn_800172C4(View* pView) {
+// Whether the camera is out of its fly-by: true when its script has no current shot, when that
+// shot's bAD is set, or when the shot has no next shot (p40) and the script's move is not kind 1.
+// ViewController_Update aims the lens at the look point when true and by the shot's angles when
+// false.
+u8 CameraController_IsFlybyDone(View* pView) {
     if (pView->script.pShot == NULL) return 1;
     if (pView->script.pShot->bAD) return 1;
     if (pView->script.pShot->p40 == NULL && pView->script.nCamera != 1) return 1;
     return 0;
 }
 
-// The point the camera looks at (the pin, for camera 5).
-f32* CameraController_GetTarget(View* pView) {
+// Where the camera looks (View.v10; the pin, for camera 5). During a fly-by
+// (CameraController_IsFlybyDone false) ViewController_Update reads it as the yaw, pitch and roll
+// instead.
+f32* CameraController_GetCameraLookPoint(View* pView) {
     return pView->v10;
 }
 
-// The camera's position (inferred from its uses).
-f32* CameraController_GetPosition(View* pView) {
+// The camera's position (View.v0).
+f32* CameraController_GetCameraOrigin(View* pView) {
     return pView->v0;
 }

@@ -217,7 +217,7 @@ void fn_800D1DAC(int nPlayer) {
     }
     for (nChan = 0; nChan < 4; nChan++) {
         for (i = 0; i < gSession.nNumPlayers; i++) {
-            if (!fn_80013070(nChan) && nChan == gSession.nController[i]) {
+            if (!Input_bDoesPadExist(nChan) && nChan == gSession.nController[i]) {
                 bUnplugged = 1;
             }
         }

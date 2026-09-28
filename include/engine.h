@@ -1314,7 +1314,7 @@ typedef struct PadAnalog {
 } PadAnalog;
 
 typedef struct PadRumble {
-    u8  bOn;                      // 0x00  cleared while rumble is switched off (fn_80013200)
+    u8  bOn;                      // 0x00  cleared while rumble is switched off (Input_vSetVibrationStatus)
     u8  bAllowed;                 // 0x01
     s16 nFrames;                  // 0x02  frames the motor has run; it stops after 60
 } PadRumble;
@@ -1357,21 +1357,21 @@ typedef struct TrailMeshDescEx {
     f32        af18[4];         // 0x18
 } TrailMeshDescEx;
 
-int  fn_80012FA4(void);                 // controller init
+int  Input_iInitModule(void);                 // controller init
 void RenderState_Flush(void);
 void DS_vSetZBufferMode(int nCompare);          // depth compare function (Code80012ED0.c)
 void DS_vEnableZBufferUpdate(int bEnable);      // depth-buffer writes on or off
 void DS_vSetAlphaTestMode(int bEnable, int nCompare, int nRef);   // nRef on a 0..0x80 scale
-void fn_80013030(void);
-u32  fn_80013050(int nChan);            // the pad's device type (SIProbe)
-u8   fn_80013070(int nChan);            // a controller the game takes is plugged in
-void fn_800130EC(u8 bOn);               // the main stick also presses the D-pad
-void fn_800130F8(int nController, int bOn);         // rumble on or off
-void fn_80013130(int nController, int nStrength);   // rumble strength
-void fn_800131C4(int nController);      // rumble off
-void fn_80013400(void);                 // read the controllers
-u8*  fn_800136C4(int nController);      // the pad's state: stick bytes at +0, +2, +3
-u32  Controller_GetButtons(int nController);      // buttons: held << 16 | pressed this frame
+void Input_vCloseOnce(void);
+u32  Input_iGetPadType(int nChan);            // the pad's device type (SIProbe)
+u8   Input_bDoesPadExist(int nChan);            // a controller the game takes is plugged in
+void Input_vEmulateDPad(u8 bOn);               // the main stick also presses the D-pad
+void Input_vVibrateBuzz(int nController, int bOn);         // rumble on or off
+void Input_vVibrateWave(int nController, int nStrength);   // rumble strength
+void Input_vStopVibration(int nController);      // rumble off
+void Input_vUpdate(void);                 // read the controllers
+u8*  Input_sGetStickInfo(int nController);      // the pad's state: stick bytes at +0, +2, +3
+u32  Input_ReadControlPad(int nController);      // buttons: held << 16 | pressed this frame
 void RenderState_SetDrawFlags(int a);
 // A screen quad (GameEffects' letter boxes, GxUtil.c's alpha clear): RenderView_MakeQuad fills its corners
 // (x0, y0)-(x1, y1), RenderView_SetColor sets its colour (four floats), RenderView_DrawPrimitive draws it.

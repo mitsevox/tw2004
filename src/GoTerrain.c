@@ -501,7 +501,7 @@ void fn_80031084(UObjMesh* pNode, s32 eClipMethod, s32 iRenderPass, Ter_PatchRef
 // levels of detail (in object test mode the first list's; else lists 0, and 1 and 2 past
 // iLowLODListOffset), its distance from the camera and a clip method, or is left out (clip method 3).
 // Split screen leaves out objects with bit 0x8 of word 2. Hidden are: far objects with bit 0x80;
-// crowd objects (word 3 bits 0x4, 0x10, 0x20) when fn_800172C4 is 0 for the view, beyond
+// crowd objects (word 3 bits 0x4, 0x10, 0x20) when CameraController_IsFlybyDone is 0 for the view, beyond
 // fCrowdHalfMaxDistanceFromGolfer from the ball, or beyond fCrowdFullMaxDistanceFromGolfer and
 // farther from the pin than the ball is (every other one when nearer); and of those, tee markers
 // (word 1 bits 0x1, 0x2, 0x4: tee sets 0-2) not of the player's tee set, and all of them once the
@@ -606,7 +606,8 @@ void fn_80031154(Ter_PatchReference* pPatch, s32 nFirstObject) {
                 if (fObjectToPin < 0.0f) {
                     fObjectToPin = 0.0f;
                 }
-                if (!fn_800172C4(ViewController_GetCameraControl(lbl_801D3CB0.iCurrentViewContext))) {
+                if (!CameraController_IsFlybyDone(
+                        ViewController_GetCameraControl(lbl_801D3CB0.iCurrentViewContext))) {
                     bHide = 1;
                 } else if (fBallToObject > lbl_801D3CB0.fCrowdHalfMaxDistanceFromGolfer) {
                     bHide = 1;
@@ -738,8 +739,8 @@ static f32 GoTerrain_StrippedFn4(f32 x) {
 
 // Picks each sorted object's level of detail by its distance: the first LOD plane whose end it is
 // inside. Once the 'tLOD' chunk is loaded, objects whose flags (bits 0x4, 0x10, 0x20 of the model's
-// word 3) ask for it always get level 0, and the others never get level 0 when fn_800172C4 is 0
-// for the view.
+// word 3) ask for it always get level 0, and the others never get level 0 when
+// CameraController_IsFlybyDone is 0 for the view.
 // Unless gSession.b11 is set, an object between two planes fades from one level into the next.
 void fn_80031AB4(void) {
     Ter_LODPlane* pPlanes = lbl_801D3CB0.LODPlanes;
@@ -768,7 +769,8 @@ void fn_80031AB4(void) {
                 for (nLOD = 0; nLOD < nLast; nLOD++) {
                     if (fDistanceSquared <= pPlanes[nLOD].fEnd * pPlanes[nLOD].fEnd) break;
                 }
-                if (!fn_800172C4(ViewController_GetCameraControl(lbl_801D3CB0.iCurrentViewContext))) {
+                if (!CameraController_IsFlybyDone(
+                        ViewController_GetCameraControl(lbl_801D3CB0.iCurrentViewContext))) {
                     uFlags = lbl_801D3CB0.pObjectStateList[iObject].a20[3];
                     if (!(uFlags & 4) && !(uFlags & 0x10) && !(uFlags & 0x20) && fn_80031E40() && nLOD == 0) {
                         nLOD = 1;
@@ -789,7 +791,8 @@ void fn_80031AB4(void) {
         for (nLOD = 0; nLOD < nLast; nLOD++) {
             if (fDistanceSquared <= pPlanes[nLOD].fEnd * pPlanes[nLOD].fEnd) break;
         }
-        if (!fn_800172C4(ViewController_GetCameraControl(lbl_801D3CB0.iCurrentViewContext))) {
+        if (!CameraController_IsFlybyDone(
+                ViewController_GetCameraControl(lbl_801D3CB0.iCurrentViewContext))) {
             uFlags = lbl_801D3CB0.pObjectStateList[iObject].a20[3];
             if (!(uFlags & 4) && !(uFlags & 0x10) && !(uFlags & 0x20) && fn_80031E40() && nLOD == 0) {
                 nLOD = 1;
@@ -843,7 +846,7 @@ u8 fn_80031E40(void) {
 // model's word 2) straight to pPostDrawItemsList; the others opaque when far or when they must
 // stay solid, faded in over the near range (pNearbyObjectList), and their fading level into
 // pTranslucentObjectList. Crowd objects (bit 0x20 of word 0, or 0x10 or 0x20 of word 3; not when
-// fn_800172C4 is 0 for the view) use the crowd's fade distances.
+// CameraController_IsFlybyDone is 0 for the view) use the crowd's fade distances.
 void fn_80031E58(void) {
     UObjMesh* pModel;
     s32 uFlags0;
@@ -869,7 +872,8 @@ void fn_80031E58(void) {
             uFlags2 &= ~0x80;
             uFlags0 &= ~0x40;
         }
-        if (!fn_800172C4(ViewController_GetCameraControl(lbl_801D3CB0.iCurrentViewContext))) {
+        if (!CameraController_IsFlybyDone(
+                ViewController_GetCameraControl(lbl_801D3CB0.iCurrentViewContext))) {
             uFlags0 &= ~0x20;
         }
         uCrowd = uFlags0 & 0x20;
@@ -1212,9 +1216,9 @@ void fn_80032AEC(void) {
 // bits 0x10 and 0x20 as deferred items, bit 0x40 (near enough, not in split screen) raised by
 // 0.005 without z writes. Passes 1 and 2 leave out patches beyond 100 x fFOVScale unless the
 // ground's bit 0x80 is set. A lake surface (n20 bit 0x80) uses fLakeSurfaceMipmapBias; when
-// fn_800172C4 is 0 for the view, one with ground bit 0x80 is left out. *pbFirst tracks a renderer
-// state switched by fFar; b2 keeps it, the bit 0x10 deferred mesh and the raised mesh out. b1 is
-// not read.
+// CameraController_IsFlybyDone is 0 for the view, one with ground bit 0x80 is left out. *pbFirst
+// tracks a renderer state switched by fFar; b2 keeps it, the bit 0x10 deferred mesh and the raised
+// mesh out. b1 is not read.
 void fn_80032B7C(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s32 n20, u8* pbFirst, u8 b1,
                  u8 b2, f32 fNear, f32 fFar) {
     f32 mRaise[4][4];
@@ -1244,7 +1248,7 @@ void fn_80032B7C(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s3
         nMesh |= 0x10;
     }
     if (n20 & 0x80) {
-        if (!fn_800172C4(ViewController_GetCameraControl(lbl_801D3CB0.iCurrentViewContext))
+        if (!CameraController_IsFlybyDone(ViewController_GetCameraControl(lbl_801D3CB0.iCurrentViewContext))
             && (Ter_GetMeshFlags(pGround, 0) & 0x80)) {
             return;
         }

@@ -642,7 +642,7 @@ void fn_80108CA8(MsgArg* pArgs, MsgArg* pResult) {
     int i;
 
     for (i = 0; i < 4; i++) {
-        if (fn_80013070(i) && (Controller_GetButtons(i) & 0x1000000)) {
+        if (Input_bDoesPadExist(i) && (Input_ReadControlPad(i) & 0x1000000)) {
             pResult->i = 1;
             return;
         }
@@ -659,23 +659,23 @@ void fn_80108D1C(MsgArg* pArgs, MsgArg* pResult) {
     s32* pC = pArgs[3].p;
     s32* pD = pArgs[4].p;
 
-    if (fn_80013070(nChan)) {
-        if (Controller_GetButtons(nChan) & 0x80000) {
+    if (Input_bDoesPadExist(nChan)) {
+        if (Input_ReadControlPad(nChan) & 0x80000) {
             *pA = 1;
         } else {
             *pA = 0;
         }
-        if (Controller_GetButtons(nChan) & 0x40000) {
+        if (Input_ReadControlPad(nChan) & 0x40000) {
             *pB = 1;
         } else {
             *pB = 0;
         }
-        if (Controller_GetButtons(nChan) & 0x10000) {
+        if (Input_ReadControlPad(nChan) & 0x10000) {
             *pC = 1;
         } else {
             *pC = 0;
         }
-        if (Controller_GetButtons(nChan) & 0x20000) {
+        if (Input_ReadControlPad(nChan) & 0x20000) {
             *pD = 1;
         } else {
             *pD = 0;
