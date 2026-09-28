@@ -11,7 +11,7 @@
 
 // Blends rotation pA toward pB by fT into pOut (a slerp from pA to pOut after copying pB there);
 // a non-zero result is renormalised.
-void fn_8001FB00(f32* pA, f32* pB, f32* pOut, f32 fT) {
+void SKA_BlendQuat(f32* pA, f32* pB, f32* pOut, f32 fT) {
     Quat_Copy(pB, pOut);
     Quat_Slerp(pA, pOut, fT);
     if (0.0f != pOut[0] || 0.0f != pOut[1] || 0.0f != pOut[2] || 0.0f != pOut[3]) {
@@ -19,8 +19,8 @@ void fn_8001FB00(f32* pA, f32* pB, f32* pOut, f32 fT) {
     }
 }
 
-// Blends point pA toward pB by fT into pOut; w is 0.
-void fn_8001FBA4(f32* pA, f32* pB, f32* pOut, f32 fT) {
+// Blends point pA toward pB by fT (0: pA, 1: pB) into pOut's x, y and z; pOut's w is set to 0.
+void SKA_BlendVec3(f32* pA, f32* pB, f32* pOut, f32 fT) {
     f32 fInv = 1.0f - fT;
 
     pOut[0] = pA[0] * fInv;
@@ -33,25 +33,26 @@ void fn_8001FBA4(f32* pA, f32* pB, f32* pOut, f32 fT) {
 }
 
 // Expands a point packed as three u16s back into the range aRange gives per axis (min, max pairs).
-void fn_8001FC0C(u16* pPacked, f32* aRange, f32* pOut) {
+void SKA_Expand16BitPoint(u16* pPacked, f32* aRange, f32* pOut) {
     pOut[0] = (pPacked[0] / 65535.0f) * (aRange[1] - aRange[0]) + aRange[0];
     pOut[1] = (pPacked[1] / 65535.0f) * (aRange[3] - aRange[2]) + aRange[2];
     pOut[2] = (pPacked[2] / 65535.0f) * (aRange[5] - aRange[4]) + aRange[4];
 }
 
-// Starts copying uSize bytes from ARAM address uAram to pDst; fn_8001FCD4 waits for it.
-ARAMTransfer* fn_8001FCA8(u32 uAram, void* pDst, u32 uSize) {
+// Starts copying uSize bytes from ARAM address uAram to pDst and returns the transfer;
+// SKA_WaitAramRead waits for it.
+ARAMTransfer* SKA_StartAramRead(u32 uAram, void* pDst, u32 uSize) {
     return GoARAM_CopyFromAram(pDst, uAram, uSize);
 }
 
-void fn_8001FCD4(ARAMTransfer* pTransfer) {
+void SKA_WaitAramRead(ARAMTransfer* pTransfer) {
     GoARAM_WaitTransfer(pTransfer);
 }
 
-void fn_80021134(u16* pFrame, f32* pOut, s32 nBones, u32* pBits);
+void SKAUtil_EulerAnglesToQTs16(u16* pFrame, f32* pOut, s32 nBones, u32* pBits);
 void SKAUtil_EulerAnglesToQTs8(u8* pFrame, f32* pOut, s32 nBones, u32* pBits, u16* aBase);
-u8 fn_80020328(Clip* pClip, int nFrame, f32* pPose2, f32* pPose1, u8* pExtra);
-f32 fn_80021A98(Clip* pClip, f32 fTime);
+u8 SKAUtil_ExpandSingleFrameToDest(Clip* pClip, int nFrame, f32* pPose2, f32* pPose1, u8* pExtra);
+f32 SKA_GetBlendClipFraction(Clip* pClip, f32 fTime);
 
 // This file's .sbss (character.h), in reverse address order as the compiler lays it out.
 u8* lbl_80281CD0;
@@ -60,10 +61,17 @@ u8* lbl_80281CC8;
 u8* lbl_80281CC4;
 u8  lbl_80281CC0;
 
-// Poses pPose from pClip at fTime: the two keys around it are decoded into two of the character's
-// buffers (kept while they still hold them) and blended by where fTime falls between them. A time
-// at or past the pending event n5CC is held there once.
-void fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32 fTime) {
+// Poses pPose from pClip at fTime (seconds). The keys before and after fTime (f10 apart; n0E is the
+// last) are decoded by SKAUtil_ExpandSingleFrameToDest into two of the character's four key-frame
+// buffers (Character.buffers, reused while they still hold that key of that clip), and each track
+// is blended between them by where fTime falls: its rotation (track flag 4: the clip's fixed
+// rotation, decoded from pE8 once per buffer; flag 8: the 8-bit stream's with flag 0x20, else the
+// 16-bit stream's) and, for a track with keys, its position. pPose's a0 gets a bit for each bone
+// rotated and a10 one for each bone moved; aBits, if not NULL, gets both. With the clip's data in
+// ARAM (clip flag 4) the tracks' ranges and keys are fetched first. A time at or past the
+// character's pending event n5CC is held there once (n5CC then -1); the clip's fCC is updated when
+// it has a BlendClip.
+void SKA_Update(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32 fTime) {
     // fake match: the declaration order (found by tools/match/declsearch.py) sets the registers
     u8* pKeys;
     f32* pRot;
@@ -96,7 +104,7 @@ void fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32
         }
     }
     if (pClip->pD8 != NULL) {
-        pClip->fCC = fn_80021A98(pClip, fTime);
+        pClip->fCC = SKA_GetBlendClipFraction(pClip, fTime);
     }
     BitArray_ClearArray(pPose->a0, 0x80);
     BitArray_ClearArray(pPose->a10, 0x80);
@@ -162,7 +170,8 @@ void fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32
                     pChar->buffers[aSlot[i]].p10 = pChar->buffers[aSlot[i]].pBuf + pClip->n60 * 16;
                 } else if (pClip->pE8 != NULL) {
                     BitArray_ClearArray(aTmp, 0x80);
-                    fn_80021134((u16*)pClip->pE8, (f32*)pChar->buffers[aSlot[i]].p0C, pClip->n60, aTmp);
+                    SKAUtil_EulerAnglesToQTs16((u16*)pClip->pE8, (f32*)pChar->buffers[aSlot[i]].p0C,
+                                               pClip->n60, aTmp);
                     pChar->buffers[aSlot[i]].p10 = pChar->buffers[aSlot[i]].pBuf + pClip->n60 * 16;
                 } else {
                     pChar->buffers[aSlot[i]].p10 = pChar->buffers[aSlot[i]].pBuf;
@@ -170,7 +179,7 @@ void fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32
                 pChar->buffers[aSlot[i]].p14 = pChar->buffers[aSlot[i]].p10 + pClip->n58 * 16;
                 pChar->buffers[aSlot[i]].p18 = pChar->buffers[aSlot[i]].p14 + pClip->n5C * 16;
             }
-            if (fn_80020328(pClip, aFrame[i], (f32*)pChar->buffers[aSlot[i]].p10,
+            if (SKAUtil_ExpandSingleFrameToDest(pClip, aFrame[i], (f32*)pChar->buffers[aSlot[i]].p10,
                             (f32*)pChar->buffers[aSlot[i]].p14, pChar->buffers[aSlot[i]].p18) == 0 &&
                 aBits != NULL) {
                 BitArray_ClearArray(aBits, 0x80);
@@ -191,9 +200,9 @@ void fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32
     // keys kept in ARAM: fetch the tracks' ranges and keys, and point the tracks at them
     if (pClip->n4C != 0 && (pClip->uFlags & 4)) {
         // port: pEC and pF0 hold ARAM addresses here
-        fn_8001FCD4(fn_8001FCA8((uptr)pClip->pEC, lbl_80281CCC, pClip->n50));
+        SKA_WaitAramRead(SKA_StartAramRead((uptr)pClip->pEC, lbl_80281CCC, pClip->n50));
         pRange = lbl_80281CCC;
-        fn_8001FCD4(fn_8001FCA8((uptr)pClip->pF0, lbl_80281CD0, pClip->n4C));
+        SKA_WaitAramRead(SKA_StartAramRead((uptr)pClip->pF0, lbl_80281CD0, pClip->n4C));
         pKeys = lbl_80281CD0;
         for (j = 0; j < pClip->n1C; j++) {
             pTrack = &((ClipTrack*)pClip->pD0)[j];
@@ -218,11 +227,11 @@ void fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32
             pRot += 4;
         } else if (uFlags & 8) {
             if (uFlags & 0x20) {
-                fn_8001FB00(pA10, pB10, pBone->q0, fFrac);
+                SKA_BlendQuat(pA10, pB10, pBone->q0, fFrac);
                 pA10 += 4;
                 pB10 += 4;
             } else {
-                fn_8001FB00(pA14, pB14, pBone->q0, fFrac);
+                SKA_BlendQuat(pA14, pB14, pBone->q0, fFrac);
                 pA14 += 4;
                 pB14 += 4;
             }
@@ -231,22 +240,24 @@ void fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32
         }
         BitArray_SetBit(pPose->a0, i);
         if (pTrack->pKeys != NULL) {
-            fn_8001FC0C(pTrack->pKeys + nKey * 3, pTrack->aRange, aA);
-            fn_8001FC0C(pTrack->pKeys + nNext * 3, pTrack->aRange, aB);
-            fn_8001FBA4(aA, aB, pBone->v10, fFrac);
+            SKA_Expand16BitPoint(pTrack->pKeys + nKey * 3, pTrack->aRange, aA);
+            SKA_Expand16BitPoint(pTrack->pKeys + nNext * 3, pTrack->aRange, aB);
+            SKA_BlendVec3(aA, aB, pBone->v10, fFrac);
             BitArray_SetBit(pPose->a10, i);
         }
     }
     if (aBits != NULL) {
-        fn_80021980(pPose->a0, pPose->a10, aBits, 0x80);
+        BitArray_MergeArrayWithOr(pPose->a0, pPose->a10, aBits, 0x80);
     }
 }
 
-// Decodes frame nFrame of pClip: its second-stream frame into pPose2 (SKAUtil_EulerAnglesToQTs8,
-// when n36 is not 0) and its first-stream frame into pPose1 (fn_80021134, when n0A is not 0),
-// fetching them from ARAM first when the clip's frames live there (then, when pF0 is set, n28
-// bytes at n2A of the first-stream frame are also copied to pExtra). Always returns 1.
-u8 fn_80020328(Clip* pClip, int nFrame, f32* pPose2, f32* pPose1, u8* pExtra) {
+// Decodes frame nFrame of pClip into quaternions (4 floats per bone): its 8-bit frame (n8E bytes
+// per frame at pE4, n58 bones, base angles pE0) into pPose2 with SKAUtil_EulerAnglesToQTs8 when n36
+// is not 0, and its 16-bit frame (n8C halfwords per frame at uAram, n5C bones) into pPose1 with
+// SKAUtil_EulerAnglesToQTs16 when n0A is not 0. With the clip's data in ARAM (flag 4) the frames
+// are first fetched into the staging buffers, and then, when pF0 is set, n28 bytes at offset n2A of
+// the 16-bit frame are also copied to pExtra. Always returns 1.
+u8 SKAUtil_ExpandSingleFrameToDest(Clip* pClip, int nFrame, f32* pPose2, f32* pPose1, u8* pExtra) {
     ARAMTransfer* pTransfer = NULL;
     u8* pFrame2;
     u16* pFrame1;
@@ -255,11 +266,13 @@ u8 fn_80020328(Clip* pClip, int nFrame, f32* pPose2, f32* pPose1, u8* pExtra) {
     if (pClip->n36 != 0) {
         if (pClip->uFlags & 4) {
             // port: pE4 holds an ARAM address here
-            fn_8001FCD4(fn_8001FCA8((uptr)pClip->pE4 + pClip->n8E * nFrame, lbl_80281CC4, pClip->n8E));
+            SKA_WaitAramRead(SKA_StartAramRead((uptr)pClip->pE4 + pClip->n8E * nFrame, lbl_80281CC4,
+                                               pClip->n8E));
             pTransfer = NULL;
             pFrame2 = lbl_80281CC4;
             if (pClip->n0A != 0) {
-                pTransfer = fn_8001FCA8(pClip->uAram + pClip->n8C * nFrame * 2, lbl_80281CC8, pClip->n8C * 2);
+                pTransfer = SKA_StartAramRead(pClip->uAram + pClip->n8C * nFrame * 2, lbl_80281CC8,
+                                              pClip->n8C * 2);
             }
         } else {
             pFrame2 = pClip->pE4 + pClip->n8E * nFrame;
@@ -270,9 +283,9 @@ u8 fn_80020328(Clip* pClip, int nFrame, f32* pPose2, f32* pPose1, u8* pExtra) {
         if (pClip->uFlags & 4) {
             nSize = pClip->n8C * 2;
             if (pTransfer == NULL) {
-                pTransfer = fn_8001FCA8(pClip->uAram + pClip->n8C * nFrame * 2, lbl_80281CC8, nSize);
+                pTransfer = SKA_StartAramRead(pClip->uAram + pClip->n8C * nFrame * 2, lbl_80281CC8, nSize);
             }
-            fn_8001FCD4(pTransfer);
+            SKA_WaitAramRead(pTransfer);
             pFrame1 = (u16*)lbl_80281CC8;
             if (pClip->pF0 != NULL) {
                 Mem_cpy(pExtra, lbl_80281CC8 + pClip->n2A, pClip->n28);
@@ -281,14 +294,15 @@ u8 fn_80020328(Clip* pClip, int nFrame, f32* pPose2, f32* pPose1, u8* pExtra) {
             // port: uAram holds a RAM address here
             pFrame1 = (u16*)(pClip->uAram + pClip->n8C * nFrame * 2);
         }
-        fn_80021134(pFrame1, pPose1, pClip->n5C, (u32*)pClip->pFC);
+        SKAUtil_EulerAnglesToQTs16(pFrame1, pPose1, pClip->n5C, (u32*)pClip->pFC);
     }
     return 1;
 }
 
 // Samples pClip's BlendClip at fTime (held to its key range) into pOut's six values, blending the
-// two keys around it. Returns 0 when the clip has none.
-int fn_800204A0(Clip* pClip, f32* pOut, f32 fTime) {
+// two keys around it. Returns 1, or 0 when the clip has none. Swing_UpdateBackswing samples the
+// backswing clip's at the top of the swing into Character.v1638.
+int SKA_SampleBlendClip(Clip* pClip, f32* pOut, f32 fTime) {
     BlendClip* pBlend = pClip->pD8;
     f32 fPos;
     f32 fFrac;
@@ -332,7 +346,7 @@ int fn_800204A0(Clip* pClip, f32* pOut, f32 fTime) {
 
 // The sixth value of pClip's BlendClip at fTime, blending the two keys around it (the first or
 // last key's outside the key range); 0 when the clip has none.
-f32 fn_800205F8(Clip* pClip, f32 fTime) {
+f32 SKA_SampleBlendClipProgress(Clip* pClip, f32 fTime) {
     BlendClip* pBlend = pClip->pD8;
     f32 fPos;
     f32 fFrac;
@@ -364,11 +378,13 @@ f32 fn_800205F8(Clip* pClip, f32 fTime) {
     return 0.0f;
 }
 
-// Lays out a clip's data after its tracks: the pE8 and pE0 blocks from pC8 (rounded up to 16
-// bytes), then the first frame stream, the second, and the tracks' ranges and keys (from uAram on,
-// in ARAM, when uAram is not 0). Tracks with flag 0x10 get their key pointers only when the frames
-// stay in memory.
-void fn_800206C8(Clip* pClip, u32 uAram) {
+// Points a clip's data pointers at its blocks, laid out after its tracks: the fixed rotations pE8
+// and the 8-bit stream's base angles pE0 from pC8 (rounded up to 16 bytes), then the 16-bit frame
+// stream (uAram), the 8-bit frame stream (pE4) and the tracks' ranges and keys (pEC, pF0). With
+// uAram not 0, everything from the 16-bit stream on is in ARAM from that address: flag 4 is set and
+// every track's key pointers stay NULL (SKA_Update fetches them). Otherwise tracks with flag 0x10
+// get their keys and ranges.
+void SKA_DistributePointers(Clip* pClip, u32 uAram) {
     u8* p = pClip->pC8;
     ClipTrack* pTrack;
     int i;
@@ -437,9 +453,10 @@ void fn_800206C8(Clip* pClip, u32 uAram) {
     }
 }
 
-// Byte-swaps a laid-out clip's 16-bit data in place: the first frame stream, the pE0 and pE8
-// blocks, the ranges (words) and the keys; not the byte-wide second stream.
-void fn_80020858(Clip* pClip) {
+// Byte-swaps a laid-out clip's data blocks in place (SKA_LoadFromMem): the 16-bit frame stream, the
+// base angles pE0 and fixed rotations pE8 (halfwords), the tracks' ranges (words) and keys
+// (halfwords); the 8-bit frame stream needs none.
+void SKA_SwapFrameData(Clip* pClip) {
     u8* pSrc;
 
     pSrc = (u8*)pClip->uAram;
@@ -461,7 +478,7 @@ void fn_80020858(Clip* pClip) {
 }
 
 // Byte-swaps a clip's 0x100-byte header in place.
-void fn_8002091C(Clip* pClip) {
+void SKA_SwapHeader(Clip* pClip) {
     void* pSrc = pClip;
     void* pDst = pClip;
     SwapField aHeader[57] = {
@@ -478,7 +495,7 @@ void fn_8002091C(Clip* pClip) {
 }
 
 // Byte-swaps nCount of a clip's events (four words each) in place.
-void fn_80020984(ClipEvent* pEvents, int nCount) {
+void SKA_SwapEvents(ClipEvent* pEvents, int nCount) {
     SwapField aEvent[4] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };
     void* pSrc;
     void* pDst;
@@ -489,7 +506,7 @@ void fn_80020984(ClipEvent* pEvents, int nCount) {
 }
 
 // Byte-swaps a clip's BlendClip in place: its four header words, then its 20 keys.
-void fn_80020A20(BlendClip* pBlend) {
+void SKA_SwapBlendClip(BlendClip* pBlend) {
     SwapField aHeader[4] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };
     SwapField aKey[6] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };
     void* pSrc;
@@ -501,8 +518,8 @@ void fn_80020A20(BlendClip* pBlend) {
     ByteSwap_Records(&pSrc, &pDst, aKey, 6, 20);
 }
 
-// Byte-swaps nCount 16-byte records (four words each) in place.
-void fn_80020B2C(void* pRecords, int nCount) {
+// Byte-swaps nCount of a clip's tracks (ClipTrack, four words each) in place.
+void SKA_SwapTracks(void* pRecords, int nCount) {
     SwapField aRecord[4] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };
     void* pSrc;
     void* pDst;
@@ -513,25 +530,27 @@ void fn_80020B2C(void* pRecords, int nCount) {
 }
 
 // Byte-swaps the clip read from disc at p in place: header, events, BlendClip and tracks, then the
-// data blocks after them (fn_800206C8's layout, all in memory), its pF4 library (MtaLib_SwapAndLink) and
-// two bit arrays of 2 * n1C bits. It sets pD0, pC4/pC8 and the later blocks' pointers (uAram, pE4,
-// pEC, pF0, pF4, pF8, pFC), not pEvents, pD8, pE8 or pE0.
-void fn_80020BC8(u8* p) {
+// data blocks after them (SKA_DistributePointers's layout, all in memory), its pF4 library
+// (MtaLib_SwapAndLink) and two bit arrays of 2 * n1C bits. It sets pD0, pC4/pC8 and the later
+// blocks' pointers (uAram, pE4, pEC, pF0, pF4, pF8, pFC), not pEvents, pD8, pE8 or pE0.
+// AnimLib_MergeOverlay runs it on an overlay library's clips, copies each one's header out and
+// finishes it with SKA_PatchMemory.
+void SKA_SwapClip(u8* p) {
     Clip* pClip = (Clip*)p;
     u8* pSrc;
     int nBytes;
 
-    fn_8002091C(pClip);
+    SKA_SwapHeader(pClip);
     p += sizeof(Clip);
     if (pClip->nEvents != 0) {
-        fn_80020984((ClipEvent*)p, pClip->nEvents);
+        SKA_SwapEvents((ClipEvent*)p, pClip->nEvents);
         p += pClip->nEvents * sizeof(ClipEvent);
     }
     if (pClip->uFlags & 2) {
-        fn_80020A20((BlendClip*)p);
+        SKA_SwapBlendClip((BlendClip*)p);
         p += sizeof(BlendClip);
     }
-    fn_80020B2C(p, pClip->n1C);
+    SKA_SwapTracks(p, pClip->n1C);
     pClip->pD0 = p;
     p += pClip->n2C;
     pClip->pC4 = p;
@@ -584,8 +603,10 @@ void fn_80020BC8(u8* p) {
     BYTESWAP_SWAPDATA(&pSrc, p, nBytes, 4);
 }
 
-// Takes the clip at pData rounded up to align bytes, byte-swaps it in place and lays it out with
-// its frames in memory; *iSize gets its u30 when iSize is not NULL.
+// Takes the clip at pData rounded up to align bytes (pC0 keeps pData), byte-swaps it in place and
+// lays it out with its frame data in memory (SKA_DistributePointers with no ARAM address). Returns
+// the clip; *iSize gets its u30 when iSize is not NULL. skalib.c and AnimStream.c run it on clips
+// just read from disc.
 Clip* SKA_LoadFromMem(u8* pData, u32* iSize, u32 align) {
     Clip* pSKA;
     u8* pSrc;
@@ -597,27 +618,27 @@ Clip* SKA_LoadFromMem(u8* pData, u32* iSize, u32 align) {
         iOffset = 0;
     }
     pSKA = (Clip*)(pData + iOffset);
-    fn_8002091C((Clip*)(pData + iOffset));  // fake match: the sum passed again, not pSKA (register order)
+    SKA_SwapHeader((Clip*)(pData + iOffset));  // fake match: the sum passed again, not pSKA (register order)
     pSKA->pC0 = pData;
     pData = (u8*)pSKA + sizeof(Clip);
     if (pSKA->nEvents != 0) {
         pSKA->pEvents = (ClipEvent*)pData;
-        fn_80020984((ClipEvent*)pData, pSKA->nEvents);
+        SKA_SwapEvents((ClipEvent*)pData, pSKA->nEvents);
         pData += pSKA->nEvents * sizeof(ClipEvent);
     }
     if (pSKA->uFlags & 2) {
         pSKA->pD8 = (BlendClip*)pData;
-        fn_80020A20((BlendClip*)pData);
+        SKA_SwapBlendClip((BlendClip*)pData);
         pData += sizeof(BlendClip);
     }
     pSKA->pD0 = pData;
-    fn_80020B2C(pData, pSKA->n1C);
+    SKA_SwapTracks(pData, pSKA->n1C);
     pData += pSKA->n2C;
     pSKA->pC4 = pData;
     pData += pSKA->n54;
     pSKA->pC8 = pSKA->pC4;
-    fn_800206C8(pSKA, 0);
-    fn_80020858(pSKA);
+    SKA_DistributePointers(pSKA, 0);
+    SKA_SwapFrameData(pSKA);
     if (pSKA->n64 != 0) {
         pSKA->pF4 = pData;
         MtaLib_SwapAndLink((MtaLib*)pSKA->pF4, NULL);
@@ -639,10 +660,12 @@ Clip* SKA_LoadFromMem(u8* pData, u32* iSize, u32 align) {
     return pSKA;
 }
 
-// Links a clip already in our byte order in place: its events and BlendClip follow the header,
-// then its tracks; fn_800206C8 lays out the rest (the first frame stream in ARAM at uAram when it
-// is not 0). Its pF4 library (n64 bytes) is linked too.
-Clip* fn_80020F60(Clip* pClip, u32 uAram) {
+// Sets up in place a clip already in this machine's byte order (SKA_SwapClip): points pEvents, pD8
+// and pD0 at the events, BlendClip and tracks after the header, lays out the rest with
+// SKA_DistributePointers (its frame data in ARAM from uAram when that is not 0) and links its
+// MtaLib pF4 when n64 is not 0. Returns pClip. AnimLib_MergeOverlay uses it for an overlay
+// library's clips.
+Clip* SKA_PatchMemory(Clip* pClip, u32 uAram) {
     u8* p = (u8*)pClip + sizeof(Clip);
 
     pClip->pC0 = pClip;
@@ -658,15 +681,17 @@ Clip* fn_80020F60(Clip* pClip, u32 uAram) {
     p += pClip->n2C;
     pClip->pC4 = p;
     pClip->pC8 = pClip->pC4;
-    fn_800206C8(pClip, uAram);
+    SKA_DistributePointers(pClip, uAram);
     if (pClip->n64 != 0) {
         MtaLib_Link((MtaLib*)pClip->pF4);
     }
     return pClip;
 }
 
-// The rotation quaternion (x, y, z, w) of the angles fX, fY and fZ (radians).
-void fn_80020FF8(f32* pOut, f32 fX, f32 fY, f32 fZ) {
+// Builds into pOut the rotation quaternion (x, y, z, w) of the Euler angles fX, fY and fZ
+// (radians). The frame decoders pass a bone's three stored angles last first (p[2], p[1], p[0]).
+// EA's 007 build has this step inline, as SKAUtil_EulerAnglesRPY(ex, ey, ez, Q).
+void SKAUtil_EulerAnglesRPY(f32* pOut, f32 fX, f32 fY, f32 fZ) {
     f32 fHalfX;
     f32 fHalfZ;
     f32 fHalfY;
@@ -694,11 +719,12 @@ void fn_80020FF8(f32* pOut, f32 fX, f32 fY, f32 fZ) {
     pOut[2] = fSinZ * fCosXY + fSinY * (fCosZ * fSinX);
 }
 
-// Decodes nBones bone rotations packed as u16 angles (0x10000 to a turn) from pFrame into pOut's
-// quaternions (4 floats each). Two bits per bone in pBits give its kind: one angle about z (1),
-// about x (2) or about y (3), or three angles (0). A lone x angle is always negated; lbl_80281CC0
-// (fn_80021978 sets it) negates a lone z or y angle while clear, the last two of three while set.
-void fn_80021134(u16* p, f32* pOut, s32 nBones, u32* pBits) {
+// Decodes nBones bone rotations stored as u16 angles (0x10000 to a turn) from p into pOut's
+// quaternions (4 floats each). Two bits per bone in the axis mask pBits give its kind: one angle
+// about z (1), about x (2) or about y (3), or three angles (0). The angle passed on is negated for
+// a lone x angle always, for a lone z or y angle while lbl_80281CC0 (the left-handed flag) is
+// clear, and for the second and third of three while it is set.
+void SKAUtil_EulerAnglesToQTs16(u16* p, f32* pOut, s32 nBones, u32* pBits) {
     int nBit;   // fake match: 2 * i kept in its own counter for the second bit (the first is (u32)i * 2)
     int i;
     u64 uKind;  // fake match: a 64-bit switch value (the asm compares register pairs)
@@ -735,10 +761,11 @@ void fn_80021134(u16* p, f32* pOut, s32 nBones, u32* pBits) {
         case 0:
         default:
             if (lbl_80281CC0) {
-                fn_80020FF8(pOut, TWOPI * p[2] / 65536.0f, -(TWOPI * p[1]) / 65536.0f,
+                SKAUtil_EulerAnglesRPY(pOut, TWOPI * p[2] / 65536.0f, -(TWOPI * p[1]) / 65536.0f,
                             -(TWOPI * p[0]) / 65536.0f);
             } else {
-                fn_80020FF8(pOut, TWOPI * p[2] / 65536.0f, TWOPI * p[1] / 65536.0f, TWOPI * p[0] / 65536.0f);
+                SKAUtil_EulerAnglesRPY(pOut, TWOPI * p[2] / 65536.0f, TWOPI * p[1] / 65536.0f, TWOPI * p[0]
+                                       / 65536.0f);
             }
             p += 3;
             break;
@@ -746,10 +773,10 @@ void fn_80021134(u16* p, f32* pOut, s32 nBones, u32* pBits) {
     }
 }
 
-// Like fn_80021134, for frames stored as one byte per angle: each angle is the bone's base angle
-// in aBase (three u16 angles per bone) minus the byte times 16 (same units).
+// Like SKAUtil_EulerAnglesToQTs16, for frames stored as one byte per angle: each angle is the
+// bone's base angle in aBase (three u16 angles per bone) minus the byte times 16 (same units).
 void SKAUtil_EulerAnglesToQTs8(u8* p, f32* pOut, s32 nBones, u32* pBits, u16* aBase) {
-    int nBit;   // fake match: as in fn_80021134
+    int nBit;   // fake match: as in SKAUtil_EulerAnglesToQTs16
     int i;
     u64 uKind;  // fake match: a 64-bit switch value (the asm compares register pairs)
 
@@ -785,11 +812,13 @@ void SKAUtil_EulerAnglesToQTs8(u8* p, f32* pOut, s32 nBones, u32* pBits, u16* aB
         case 0:
         default:
             if (lbl_80281CC0) {
-                fn_80020FF8(pOut, TWOPI * aBase[2] / 65536.0f - TWOPI * ((u32)(u16)p[2] << 4) / 65536.0f,
+                SKAUtil_EulerAnglesRPY(pOut, TWOPI * aBase[2] / 65536.0f - TWOPI * ((u32)(u16)p[2] << 4)
+                                       / 65536.0f,
                             -(TWOPI * aBase[1] / 65536.0f - TWOPI * ((u32)(u16)p[1] << 4) / 65536.0f),
                             -(TWOPI * aBase[0] / 65536.0f - TWOPI * ((u32)(u16)p[0] << 4) / 65536.0f));
             } else {
-                fn_80020FF8(pOut, TWOPI * aBase[2] / 65536.0f - TWOPI * ((u32)(u16)p[2] << 4) / 65536.0f,
+                SKAUtil_EulerAnglesRPY(pOut, TWOPI * aBase[2] / 65536.0f - TWOPI * ((u32)(u16)p[2] << 4)
+                                       / 65536.0f,
                             TWOPI * aBase[1] / 65536.0f - TWOPI * ((u32)(u16)p[1] << 4) / 65536.0f,
                             TWOPI * aBase[0] / 65536.0f - TWOPI * ((u32)(u16)p[0] << 4) / 65536.0f);
             }
@@ -801,12 +830,15 @@ void SKAUtil_EulerAnglesToQTs8(u8* p, f32* pOut, s32 nBones, u32* pBits, u16* aB
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_80021978(u8 v) {
+// Sets lbl_80281CC0, which makes the frame decoders (SKAUtil_EulerAnglesToQTs16 and
+// SKAUtil_EulerAnglesToQTs8) mirror the angles for a left-handed golfer. Character_UpdateAnimation
+// and Character_SetupForShot pass the model's bEE (Character_IsLeftHanded) before posing a clip.
+void SKA_SetLeftHanded(u8 v) {
     lbl_80281CC0 = v;
 }
 
-// aOut = aA | aB over bit arrays of nBits bits.
-void fn_80021980(u32* aA, u32* aB, u32* aOut, u32 nBits) {
+// Each bit of aOut is set where aA or aB has it (bit arrays of nBits bits).
+void BitArray_MergeArrayWithOr(u32* aA, u32* aB, u32* aOut, u32 nBits) {
     u32 i;
 
     for (i = 0; i < (nBits + 31) >> 5; i++) {
@@ -814,12 +846,14 @@ void fn_80021980(u32* aA, u32* aB, u32* aOut, u32 nBits) {
     }
 }
 
-// fn_800205F8's value at fTime as a fraction of the last key's.
-f32 fn_80021A98(Clip* pClip, f32 fTime) {
+// How far along pClip's BlendClip fTime is: SKA_SampleBlendClipProgress's value over the last key's
+// (0 when the clip has none). SKA_Update keeps it in the clip's fCC, which the swing reads as how
+// far along the backswing is (Character.fBackswing).
+f32 SKA_GetBlendClipFraction(Clip* pClip, f32 fTime) {
     BlendClip* pBlend = pClip->pD8;
 
     if (pBlend != NULL) {
-        return fn_800205F8(pClip, fTime) / pBlend->aKeys[19].a[5];
+        return SKA_SampleBlendClipProgress(pClip, fTime) / pBlend->aKeys[19].a[5];
     }
     return 0.0f;
 }

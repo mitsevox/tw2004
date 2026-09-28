@@ -42,13 +42,13 @@ Objects delivered by UStream
 | `Cnet` | fn_8000BF9C | asm | none seen | asm; dispatches the course's sub-chunks to the loaders registered with `Course_RegisterLoader` (below) |
 | `txf ` | fn_80010180 | asm | none seen | asm; `TXG ` texture groups, [formats/txg-textures.md](formats/txg-textures.md) |
 | `sfn ` | fn_800125BC | sweep | none seen | asm |
-| `SAC ` | Character_LoadSacFromStream | char.c (sweep block) | swapped: AnimLib_MergeOverlay > fn_80020BC8 > fn_80076158 | little-endian on disc; `port:` notes at the handler and at the swap in AnimLib_MergeOverlay (a little-endian port does not swap) |
+| `SAC ` | Character_LoadSacFromStream | char.c (sweep block) | swapped: AnimLib_MergeOverlay > SKA_SwapClip > fn_80076158 | little-endian on disc; `port:` notes at the handler and at the swap in AnimLib_MergeOverlay (a little-endian port does not swap) |
 | `CLB ` (2) | Character_ClubStreamCallbackIG, Character_ClubStreamCallbackFE | char.c (asm) | swapped: Character_CreateClubSkinSet > fn_80076158 | little-endian on disc |
 | `CHR ` (2) | Character_GolferStreamCallbackIG, Character_GolferStreamCallbackFE | char.c (asm) | swapped: Character_LoadTextures > fn_80076158 | little-endian on disc |
 | `SKLO` | SkeletalObject_StreamCallback | char.c (sweep block) | swapped: Character_CreateFromMem > fn_80076158 | little-endian on disc; a `port:` note at the handler |
 | `MAL ` | MtaLib_OnLoaded | sweep | swapped: MtaLib_LoadBank > ByteSwap_Records | little-endian on disc |
 | `SAL ` | AnimLib_OnLoaded | skalib.c | swapped: AnimLib_Load > ByteSwap_Records | little-endian on disc; swapped by field tables (`SwapField`); yes: `AnimLib`, `ClipRecord` and `Clip` are then read in place, their offsets turned into 32-bit pointers. `port:` notes at every swap call (header, clip numbers, index, records, tree nodes): a little-endian port does not swap there |
-| `BNK ` | ClipBank_OnLoaded | skalib.c | swapped later | the handler only stashes the file; `ClipBank_Install` > `ClipBank_Load` swaps it (`ClipBank_SwapHeader`, fn_80020BC8 per clip); yes: `ClipBank` is used in place, its clip offsets turned into 32-bit pointers. `port:` notes at the swap calls |
+| `BNK ` | ClipBank_OnLoaded | skalib.c | swapped later | the handler only stashes the file; `ClipBank_Install` > `ClipBank_Load` swaps it (`ClipBank_SwapHeader`, SKA_SwapClip per clip); yes: `ClipBank` is used in place, its clip offsets turned into 32-bit pointers. `port:` notes at the swap calls |
 | `stat` | Golfer_OnStatsLoaded | Golfer.c | swapped: Golfer_TableByteSwap > fn_80076158 | yes: copied over `gGolferTable[34]` (`GolferRecord`); only 0x98..0x140 of each record is swapped, in 8-byte units; the u32 at 0x90 is not. A `port:` note at the swap call |
 | `rcrd` | Session_OnRecordsLoaded | Golfer.c | none seen | yes: copied straight over `gSession.aCourseRecord`, big-endian; a `port:` note there (a little-endian port converts the records field by field) |
 | `ter ` | fn_800342B4 | GoTerrain.c | none seen | asm |

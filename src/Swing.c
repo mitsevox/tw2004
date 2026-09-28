@@ -121,7 +121,7 @@ int   Swing_StickX(int nPlayer, u8* pPad);       // 0x80058F04  main or C-stick 
 int   Swing_StickY(int nPlayer, u8* pPad);       // 0x80058F30
 f32   Swing_TopTime(SwingData* pSw);             // 0x80058E98  fTimeSwingTop - 0.0076
 f32   Swing_StartTime(SwingData* pSw);           // 0x80058EA8  fTimeSwingStart + 0.0076
-int   fn_800204A0(Clip* pBlend, f32* pOut, f32 fTime);   // samples pBlend->pD8 at fTime
+int   SKA_SampleBlendClip(Clip* pBlend, f32* pOut, f32 fTime);   // samples pBlend->pD8 at fTime
 void  Character_UpdateAnimation(Character* pObj, int a, f32 f);
 void  SW_vSetSwingStrength(int nPlayer);
 void  SW_vCheckForSwingBoost(int nPlayer);
@@ -460,7 +460,7 @@ u8 Swing_UpdateBackswing(int nPlayer) {
         if (fAnimTime >= pSw->fTimeSwingStart + fFrac * (pSw->fTimeSwingTop - pSw->fTimeSwingStart)) {
             SKATime_SetTimeScale(pObj->anim, 1.0f);
             fn_80095744(pObj, 7);
-            if (fn_800204A0(pObj->pBlend, pObj->v1638,
+            if (SKA_SampleBlendClip(pObj->pBlend, pObj->v1638,
                             pObj->pBlend->pD8->f08 + (pObj->fAnimTime - pSw->fTimeSwingStart))) {
                 pSw->fTimeBallHit = pObj->fAnimTime + (pObj->pBlend->pEvents[2].fTime - pObj->v1638[1])
                                   + pObj->f1644;
@@ -543,7 +543,7 @@ u8 Swing_UpdateBackswing(int nPlayer) {
         SW_vSetSwingStrength(nPlayer);
         SKATime_SetTimeScale(pObj->anim, 1.0f);
         fn_80095744(pObj, 7);
-        if (fn_800204A0(pObj->pBlend, pObj->v1638,
+        if (SKA_SampleBlendClip(pObj->pBlend, pObj->v1638,
                         pObj->pBlend->pD8->f08 + (pObj->fAnimTime - pSw->fTimeSwingStart))) {
             pSw->fTimeBallHit = pObj->fAnimTime + (pObj->pBlend->pEvents[2].fTime - pObj->v1638[1])
                               + pObj->f1644;

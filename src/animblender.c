@@ -419,7 +419,7 @@ void SKABlender_Update(Character* pChar, SKABlendNode* pNode, CharModel* pModel,
                 ((SKASourceNode*)pChild)->f2C = fClip;
                 if (pChild->nFormat == 0) {
                     if (bInside) {
-                        fn_8001FCF4(pChar, pChild->u.src.pSrc, pChild->pPose, 0, fClip);
+                        SKA_Update(pChar, pChild->u.src.pSrc, pChild->pPose, 0, fClip);
                     }
                 } else if (pChild->nFormat == 1) {
                     MtaLib_ApplyToPose(pChar, pChild->u.src.pSrc, (SkelPose1*)pChild->pPose, fClip);

@@ -477,7 +477,7 @@ void SKN_BlendMorphWeights(SkelPose1* pA, SkelPose1* pB, SkelPose1* pOut, f32 fW
         pBlockA = &pA->aBlocks[i];
         pBlockB = &pB->aBlocks[i];
         pBlockOut = &pOut->aBlocks[i];
-        fn_80021980(pBlockA->aBits, pBlockB->aBits, aBits, 20);
+        BitArray_MergeArrayWithOr(pBlockA->aBits, pBlockB->aBits, aBits, 20);
         BitArray_CopyArray(aBits, pBlockOut->aBits, 20);
         for (j = 0; j < 20; j++) {
             if (BitArray_TestBit(aBits, j)) {

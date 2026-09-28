@@ -26,8 +26,8 @@ void SKEL_InitIKChain(CharModel* pModel, IKChain* pChain);
 void SKEL_TransformIKChainFromBones(CharModel* pModel, IKChain* pChain);
 f32  SKEL_AdjustHipHeight(CharModel* pModel, IKChain* pChain, f32* pTarget);
 void Quat_Invert(f32* pQ, f32* pOut);                   // Quaternion.c
-void fn_8001FBA4(f32* pA, f32* pB, f32* pOut, f32 fT);  // a blend of two points by fT
-void fn_8001FB00(f32* pA, f32* pB, f32* pOut, f32 fT);  // a blend of two rotations by fT
+void SKA_BlendVec3(f32* pA, f32* pB, f32* pOut, f32 fT);  // a blend of two points by fT
+void SKA_BlendQuat(f32* pA, f32* pB, f32* pOut, f32 fT);  // a blend of two rotations by fT
 void LLMath_mat44fltMultiply(f32 mtx[4][4], Vec4* src, Vec4* dst);  // VecMath.c: a point through a matrix
 void LLMath_InvertNormalized(f32 (*pSrc)[4], f32 (*pDst)[4]);  // UMemPool.c: rotation+translation inverse
 void Quat_BuildFromMatrix(f32 (*m)[4], f32* pQ);                 // Quaternion.c: a rotation matrix's quaternion
@@ -534,7 +534,7 @@ void SKEL_PostTransformIKSkeleton(Character* pChar) {
     if (pChar->u10 & 0x4000) {
         if (pSkel->fIKWeight > 0.0f && pSkel->fIKWeight < 1.0f) {
             Quat_Slerp(qGrip, pGrip->q0, pSkel->fIKWeight);
-            fn_8001FBA4(pGrip->v10, vGrip, pGrip->v10, 1.0f - pSkel->fIKWeight);
+            SKA_BlendVec3(pGrip->v10, vGrip, pGrip->v10, 1.0f - pSkel->fIKWeight);
             Quat_QuatToMatrix(pGrip->q0, pModel->pMatrices[nGrip]);
             Vec4_CopyPoint(pGrip->v10, pModel->pMatrices[nGrip][3]);
         }
@@ -905,7 +905,7 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
         BitArray_ClearArray(aSkel, 0x80);
         pSkelRot = NULL;
     }
-    fn_80021980(pModel->a14, pModel->a24, aModel, 0x80);
+    BitArray_MergeArrayWithOr(pModel->a14, pModel->a24, aModel, 0x80);
     LLMath_IdentifyMat(mScale);
     if (BitArray_Intersects(aBits, aCur, 0x80)) {
         Quat_Copy(pModel->pBones[0].q0C, pModel->pPoses[0].q0);
@@ -990,7 +990,7 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
             LLMath_CopyMat44(mOut, pModel->pMatrices[i]);
             Vec4_CopyPoint(pPose->v10, pModel->pMatrices[i][3]);
             SKEL_UpdateSkinningMatrix(pModel, pModel->pMatrices[i], i);
-            fn_80021980(aBits, aCur, aBits, 0x80);
+            BitArray_MergeArrayWithOr(aBits, aCur, aBits, 0x80);
         }
         BitArray_ShiftUp(aCur, aCur, 0x80, 1);
     }
@@ -1056,7 +1056,7 @@ void SKEL_UpdateState(CharModel* pModel, SkelPose* pPose, u8 bTransform) {
         }
     }
     if (bTransform) {
-        fn_80021980(pPose->a10, pPose->a0, aAll, 0x80);
+        BitArray_MergeArrayWithOr(pPose->a10, pPose->a0, aAll, 0x80);
         SKEL_TransformBones(pModel, aAll);
     }
 }
@@ -1081,12 +1081,12 @@ void SKEL_BlendPoses(int nBone, int nCount, SkelPose* pA, SkelPose* pB, SkelPose
     BitArray_ClearArray(pOut->a10, 0x80);
     for (i = nBone; i <= nLast; i++) {
         if (BitArray_Intersects(aRot, aCur, 0x80)) {
-            fn_8001FB00(pA->aBones[i].q0, pB->aBones[i].q0, pOut->aBones[i].q0, fT);
-            fn_80021980(pOut->a0, aCur, pOut->a0, 0x80);
+            SKA_BlendQuat(pA->aBones[i].q0, pB->aBones[i].q0, pOut->aBones[i].q0, fT);
+            BitArray_MergeArrayWithOr(pOut->a0, aCur, pOut->a0, 0x80);
         }
         if (BitArray_Intersects(aPos, aCur, 0x80)) {
-            fn_8001FBA4(pA->aBones[i].v10, pB->aBones[i].v10, pOut->aBones[i].v10, fT);
-            fn_80021980(pOut->a10, aCur, pOut->a10, 0x80);
+            SKA_BlendVec3(pA->aBones[i].v10, pB->aBones[i].v10, pOut->aBones[i].v10, fT);
+            BitArray_MergeArrayWithOr(pOut->a10, aCur, pOut->a10, 0x80);
         }
         BitArray_ShiftUp(aCur, aCur, 0x80, 1);
     }

@@ -130,7 +130,7 @@ void  Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, i
                               int nAnkle, int nToe, int nAnklePoint, int nToePoint);
 void  Character_CalculateClipPoints(Character* pChar);
 void  Character_SetupForShot(Character* pChar);
-void  fn_80021978(u8 v);                                        // ska_shared.c
+void  SKA_SetLeftHanded(u8 v);                                        // ska_shared.c
 void  SKEL_PreTransformIKSkeleton(CharModel* pModel);                           // Skeleton.c
 void  SKEL_PostTransformIKSkeleton(Character* pChar);                            // Skeleton.c
 void  SKEL_UpdateState(CharModel* pModel, SkelPose* pPose, u8 bTransform);   // Skeleton.c
@@ -575,7 +575,7 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
             }
         }
     }
-    fn_80021978(pChar->pModel->bEE);
+    SKA_SetLeftHanded(pChar->pModel->bEE);
     if (!gSession.b11) {
         SKATime_Update(&pChar->anim29C, &pChar->node3E0, fTime);
     }
@@ -1676,7 +1676,7 @@ void CharacterTex_WaitEndOfTextureLoader(void) {
 
 // The 'SAC ' handler: an animation library merged over the one of the slot the object's id names.
 // port: the overlay library is little-endian on disc and AnimLib_MergeOverlay swaps it
-//       (fn_80020BC8 > BYTESWAP_SWAPDATA): a little-endian port does not swap there.
+//       (SKA_SwapClip > BYTESWAP_SWAPDATA): a little-endian port does not swap there.
 void Character_LoadSacFromStream(UStreamObject* pObject) {
     AnimLib_MergeOverlay(pObject->pData, pObject->uId);
     StaticMem_Free(pObject);
@@ -2682,11 +2682,11 @@ void Character_SetupForShot(Character* pChar) {
         }
         if (pSkel->pClip != pClip) {
             pSkel->pClip = pClip;
-            fn_80021978(pChar->pModel->bEE);
+            SKA_SetLeftHanded(pChar->pModel->bEE);
             if (bClipTime) {
-                fn_8001FCF4(pChar, pClip, &pSkel->pose, 0, pClip->pEvents[2].fTime);
+                SKA_Update(pChar, pClip, &pSkel->pose, 0, pClip->pEvents[2].fTime);
             } else {
-                fn_8001FCF4(pChar, pClip, &pSkel->pose, 0, 0.0f);
+                SKA_Update(pChar, pClip, &pSkel->pose, 0, 0.0f);
             }
         }
         Character_UpdateClubAttachment(pChar, pSkel->pClip);

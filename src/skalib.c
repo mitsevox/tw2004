@@ -11,8 +11,8 @@
 #include "game/save.h"
 
 ClipBank* ClipBank_Get(u32 nSlot);
-void  fn_80020BC8(void* pClip);                        // swaps a clip in place
-void  fn_80020F60(struct Clip* pClip, u32 uAram);
+void  SKA_SwapClip(void* pClip);                        // swaps a clip in place
+void  SKA_PatchMemory(struct Clip* pClip, u32 uAram);
 void  fn_800269E4(struct LibOverlay* pOv, int nSlot, s32 n);
 void  fn_80026844(LibOverlay* pOv, int nSlot, int nGroup, int nClub, int nStyle, int nKey, char* pNames,
                   int nNames);
@@ -1390,7 +1390,7 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
             pBank->ppClips[pSlot->n150] = pHdr;
             // port: a clip of an overlay library ('SAL '/'SAC '), little-endian on disc; a little-endian
             //       port does not swap here (Clip is then read in place)
-            fn_80020BC8(pData + (uptr)pSrc->pRecords[i].pClip);
+            SKA_SwapClip(pData + (uptr)pSrc->pRecords[i].pClip);
             pClipSrc = pData + (uptr)pSrc->pRecords[i].pClip;
             nHdr     = ((Clip*)pClipSrc)->pD0 - pClipSrc;
             Mem_cpy(pHdr, pClipSrc, nHdr);
@@ -1493,7 +1493,7 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
                 GoARAM_WaitTransfer(GoARAM_CopyToAram(lbl_80281CD0, uAram, n4CAl));
             }
             pHdr->n4C = n4CAl;
-            fn_80020F60(pHdr, uAramStart);
+            SKA_PatchMemory(pHdr, uAramStart);
             pBank->uId += nCopied;
             pHdr = (Clip*)((u8*)pHdr + nCopied);
             lbl_801C6008[k].n04 += nCopied;

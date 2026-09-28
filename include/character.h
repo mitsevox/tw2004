@@ -101,7 +101,7 @@ typedef struct SkelPose1 {
 LAYOUT_ASSERT(SkelPose1, 0x114C);
 
 void SKN_BlendMorphWeights(SkelPose1* pA, SkelPose1* pB, SkelPose1* pOut, f32 fWeight);  // Skin.c: blends two poses' channels
-void fn_80021980(u32* aA, u32* aB, u32* aOut, u32 nBits);   // ska_shared.c: aOut = aA | aB, bit arrays
+void BitArray_MergeArrayWithOr(u32* aA, u32* aB, u32* aOut, u32 nBits);   // ska_shared.c: aOut = aA | aB, bit arrays
 
 // A character's skeleton data (CharModel.pSkel; the SKEL_ functions take it): its IK chains and
 // how strongly their solution is applied (the IK weight, 0..1); only what the code reads.
@@ -278,20 +278,20 @@ typedef struct Clip {
     u32    uFlags;              // 0x00  4: its frame data is in ARAM
     s32    n04;                 // 0x04  bytes of the second frame stream
     u8     unk08[2];
-    s16    n0A;                 // 0x0A  non-zero: it has a first frame stream (fn_80020328)
+    s16    n0A;                 // 0x0A  non-zero: it has a first frame stream (SKAUtil_ExpandSingleFrameToDest)
     s16    nFrames;             // 0x0C
-    s16    n0E;                 // 0x0E  the last key fn_8001FCF4 reads
-    f32    f10;                 // 0x10  the time from one key to the next (fn_8001FCF4)
+    s16    n0E;                 // 0x0E  the last key SKA_Update reads
+    f32    f10;                 // 0x10  the time from one key to the next (SKA_Update)
     u8     unk14[4];
     f32    f18;                 // 0x18  Character_PlayClip blends up to it
     s32    n1C;                 // 0x1C  how many tracks (pD0)
     u8     unk20[8];
-    s16    n28;                 // 0x28  bytes fn_80020328 copies out of a frame of the first stream
+    s16    n28;                 // 0x28  bytes SKAUtil_ExpandSingleFrameToDest copies out of a frame of the first stream
     s16    n2A;                 // 0x2A  from this offset
     s32    n2C;                 // 0x2C
     u32    u30;                 // 0x30  SKA_LoadFromMem hands it back
     u8     unk34[2];
-    s16    n36;                 // 0x36  non-zero: it has a second frame stream (fn_80020328)
+    s16    n36;                 // 0x36  non-zero: it has a second frame stream (SKAUtil_ExpandSingleFrameToDest)
     s32    n38;                 // 0x38  bytes of the first frame stream
     s32    n3C;                 // 0x3C
     s32    n40;                 // 0x40
@@ -302,8 +302,8 @@ typedef struct Clip {
     s32    n50;                 // 0x50
     s32    n54;                 // 0x54  bytes from pC4 to the pF4 library (SKA_LoadFromMem)
     s32    n58;                 // 0x58  passed to SKAUtil_EulerAnglesToQTs8 with a second-stream frame
-    s32    n5C;                 // 0x5C  passed to fn_80021134 with a first-stream frame
-    s32    n60;                 // 0x60  passed to fn_80021134 with pE8
+    s32    n5C;                 // 0x5C  passed to SKAUtil_EulerAnglesToQTs16 with a first-stream frame
+    s32    n60;                 // 0x60  passed to SKAUtil_EulerAnglesToQTs16 with pE8
     s32    n64;                 // 0x64
     u8     unk68[0x80 - 0x68];
     f32    v80[3];              // 0x80  a point Character_GetEndOfAnimationPosition puts through bone 0's matrix
@@ -311,19 +311,19 @@ typedef struct Clip {
     s16    n8E;                 // 0x8E  bytes per frame, second stream
     u64    u90;                 // 0x90  looked up in gClubBoneIds (FEgolferanim.c FE_SetupCharState)
     u8     unk98[8];
-    char   name[0x20];          // 0xA0  (fn_8002091C swaps 0xA0 and 0xB0 as 16 bytes each, then words)
-    void*  pC0;                 // 0xC0  where the clip was loaded: itself (fn_80020F60), or the start
+    char   name[0x20];          // 0xA0  (SKA_SwapHeader swaps 0xA0 and 0xB0 as 16 bytes each, then words)
+    void*  pC0;                 // 0xC0  where the clip was loaded: itself (SKA_PatchMemory), or the start
                                 //       of the buffer it was aligned up in (SKA_LoadFromMem)
     u8*    pC4;                 // 0xC4  the end of pD0's tracks
-    u8*    pC8;                 // 0xC8  the same; fn_800206C8 lays out the streams from here
+    u8*    pC8;                 // 0xC8  the same; SKA_DistributePointers lays out the streams from here
     f32    fCC;                 // 0xCC  how far along the swing is, 0..1 (Character.fBackswing copies it)
     u8*    pD0;                 // 0xD0  n1C ClipTracks
     struct ClipEvent* pEvents;  // 0xD4  its timed events (SKA_GetTagTime finds one by its id)
-    struct BlendClip* pD8;      // 0xD8  fn_800204A0 samples it; set: FEgolferanim.c turns the
+    struct BlendClip* pD8;      // 0xD8  SKA_SampleBlendClip samples it; set: FEgolferanim.c turns the
                                 //       golfer round for the clip
     u32    uAram;               // 0xDC  the first frame stream: its ARAM address with flag 4, else its
-                                //       address in memory (fn_800206C8)
-    u8*    pE0;                 // 0xE0  n3C bytes (fn_80020BC8 swaps them as halfwords)
+                                //       address in memory (SKA_DistributePointers)
+    u8*    pE0;                 // 0xE0  n3C bytes (SKA_SwapClip swaps them as halfwords)
     u8*    pE4;                 // 0xE4  the second frame stream (n04 bytes)
     u8*    pE8;                 // 0xE8  n40 bytes (halfwords)
     u8*    pEC;                 // 0xEC  the tracks' ranges, 0x18 bytes each (ClipTrack.aRange)
@@ -334,8 +334,8 @@ typedef struct Clip {
 } Clip;
 LAYOUT_ASSERT(Clip, 0x100);
 
-// One of a clip's tracks (Clip.pD0, n1C of them; fn_80020B2C swaps them as four words). A track with
-// flag 0x10 has its own keys: nFrames points packed as three u16s (fn_8001FC0C expands one with aRange).
+// One of a clip's tracks (Clip.pD0, n1C of them; SKA_SwapTracks swaps them as four words). A track with
+// flag 0x10 has its own keys: nFrames points packed as three u16s (SKA_Expand16BitPoint expands one with aRange).
 typedef struct ClipTrack {
     u32  uFlags;                // 0x0  0x10: it has keys
     u32  u04;                   // 0x4
@@ -386,7 +386,7 @@ void SKABlender_ClampT1(SKABlendNode* pNode, struct AnimPlayer* pPlayer, f32 fTi
 // animblender.c: pose the tree at pNode at fTime into its buffers (each blend node's pfnBlend).
 void SKABlender_Update(struct Character* pChar, SKABlendNode* pNode, CharModel* pModel, f32 fTime);
 // ska_shared.c: pose pPose from pClip at fTime (aBits, if not NULL, gets the bones it sets).
-void fn_8001FCF4(struct Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32 fTime);
+void SKA_Update(struct Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32 fTime);
 // mtalib.c (pUnused is not read)
 int  MtaLib_ApplyToPose(void* pUnused, struct MtaLib* pLib, SkelPose1* pPose, f32 fTime);
 // animblender.c: make pNode a blend node that mixes its children with pfnBlend at fWeight.
@@ -434,17 +434,17 @@ typedef struct SKASourceNode {
 } SKASourceNode;
 LAYOUT_ASSERT(SKASourceNode, 0x34);
 
-// One of a BlendClip's keys: six values fn_800204A0 blends between neighbouring keys.
+// One of a BlendClip's keys: six values SKA_SampleBlendClip blends between neighbouring keys.
 typedef struct BlendKey {
     f32  a[6];                  // 0x00
 } BlendKey;
 
-// What Clip.pD8 points at: 20 keys evenly spaced f04 apart from time f08 to f0C (fn_800204A0,
-// fn_800205F8). A clip file holds it right after the clip's events (fn_80020F60).
+// What Clip.pD8 points at: 20 keys evenly spaced f04 apart from time f08 to f0C (SKA_SampleBlendClip,
+// SKA_SampleBlendClipProgress). A clip file holds it right after the clip's events (SKA_PatchMemory).
 typedef struct BlendClip {
     u8   unk0[4];
     f32  f04;                   // 0x04  the time between keys
-    f32  f08;                   // 0x08  the first key's time; added to the time fn_800204A0 samples
+    f32  f08;                   // 0x08  the first key's time; added to the time SKA_SampleBlendClip samples
                                 //       the clip at
     f32  f0C;                   // 0x0C  the last key's time
     BlendKey aKeys[20];         // 0x10
@@ -1005,7 +1005,7 @@ extern u8          lbl_801D9908[0xC8];
 extern s32         lbl_80281070;        // leaves this short are left alone by the drop pass
 extern s32         lbl_80281074;        // clips a leaf may keep this round
 extern u32         lbl_80281078;        // the current slot
-extern u8          lbl_80281CC0;        // ska_shared.c: fn_80021978 sets it; clear: fn_80021134 negates angles
+extern u8          lbl_80281CC0;        // ska_shared.c: SKA_SetLeftHanded sets it; clear: SKAUtil_EulerAnglesToQTs16 negates angles
 extern u8*         lbl_80281CC4;        // staging buffers (32-aligned), see Skalib_Init
 extern u8*         lbl_80281CC8;
 extern u8*         lbl_80281CCC;
