@@ -487,7 +487,7 @@ FrontEnd* fn_8009005C(char* szSet) {
         UISLoadScreen(lbl_80281F1C->pHandler, 0, 0, 2, aArgs);
     }
     if (gSession.nGameType == 3) {
-        fn_8008D8F4();
+        FE_InitGolferTextures();
     }
     UISSetScreenActive(lbl_80281F1C->pHandler, 0, 0);
     UISRegisterScreenDrawDebugFnc(lbl_80281F1C->pHandler, fn_80090894);

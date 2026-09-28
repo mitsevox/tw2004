@@ -192,7 +192,7 @@ typedef struct SkinChoices {
     char a82[8][0x10];          // 0x082
     s8   n102;                  // 0x102  1: sz103 is set
     char sz103[0x10];           // 0x103
-    s8   n113;                  // 0x113  set by fn_8008DD34; FEgolferanim.c passes it to the
+    s8   n113;                  // 0x113  set by FE_SetProfileLeftHanded; FEgolferanim.c passes it to the
                                 //        character (fn_8008EA44)
     SkinChoice aParts[40];      // 0x114  the body's, per part (-1 -1 throughout: not set yet)
     SkinChoice aSets[116];      // 0x254  the body's, per set

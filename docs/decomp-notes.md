@@ -299,7 +299,7 @@ They will be sorted into the sections below.
 - **[verified] A 64-bit id packed from u16s**: `u <<= 16; u |= p[i];` gives `slwi; or`
   (ShaderObjectsData fn_80074A24 67.7 -> 100).
 - **[verified] A call whose result EA ignores is a bare call statement**; assigning it to a later-overwritten
-  pointer keeps a dead `mulli`/`add` (FEgolferanim fn_8008D6CC).
+  pointer keeps a dead `mulli`/`add` (FEgolferanim FE_CharPositionOverwrite).
 - **[verified] A command reader returning the advanced pointer** wants the advance in its own local or as a
   post-increment in the `switch` (ShaderObjectsData fn_80074BE0, fn_80074CF4).
 - **[verified] A divide EA kept (`fdivs` by 1.0)** was a local set to 1.0f (FEgolferanim).

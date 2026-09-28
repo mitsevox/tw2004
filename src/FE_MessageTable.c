@@ -64,7 +64,7 @@ void fn_800ED650(int i, s32* pA, s32* pB, s32* pC);     // GameMode5.c
 int  GameMode4_GetNumEventsWon(void);                 // GameMode4.c
 void fn_80102308(s32 n);                // GameMode4.c
 void fn_8010D334(s32 v);                // CharSliders.c
-void fn_8008DD34(int nSlot, int n);
+void FE_SetProfileLeftHanded(int nSlot, int n);
 s32  MC_LoadOptions(MCCardPos* pPos);      // MC.c: load the save from the card
 s32  MC_SaveOptions(MCCardPos* pPos);      // } MC.c, in lbl_8018C7D8 (sets 0, 2, 1, 1)
 s32  fn_800A09EC(MCCardPos* pPos);      // }
@@ -1496,7 +1496,7 @@ void fn_8007C254(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// The CrAP screen's state: changing it to 0 or to 3 calls fn_8008DAEC; fn_8008E358 is told
+// The CrAP screen's state: changing it to 0 or to 3 calls FE_vClearGolferCache; fn_8008E358 is told
 // whether it is now 0.
 void fn_8007C2A0(MsgArg* pArgs, MsgArg* pResult) {
     s32 nOld;
@@ -1504,10 +1504,10 @@ void fn_8007C2A0(MsgArg* pArgs, MsgArg* pResult) {
     nOld = lbl_80281EE0->n0;
     lbl_80281EE0->n0 = pArgs[0].i;
     if (nOld != 0 && lbl_80281EE0->n0 == 0) {
-        fn_8008DAEC();
+        FE_vClearGolferCache();
     }
     if (lbl_80281EE0->n0 == 3 && nOld != 3) {
-        fn_8008DAEC();
+        FE_vClearGolferCache();
     }
     if (lbl_80281EE0->n0 == 0) {
         fn_8008E358(1);
@@ -4839,7 +4839,7 @@ void fn_80083930(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80083934(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8008DD34(lbl_80281ED4->nSlot, pArgs[0].i);
+    FE_SetProfileLeftHanded(lbl_80281ED4->nSlot, pArgs[0].i);
 }
 
 void fn_80083964(MsgArg* pArgs, MsgArg* pResult) {

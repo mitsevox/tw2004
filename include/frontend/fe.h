@@ -131,7 +131,7 @@ typedef union FEMsgArg {
     f32 f;
 } FEMsgArg;
 
-void fn_8008D8F4(void);                 // FEgolferanim.c (FE_Manager.c, uiProcessInterface.c call it)
+void FE_InitGolferTextures(void);                 // FEgolferanim.c (FE_Manager.c, uiProcessInterface.c call it)
 
 // fe_movies.c: the quads' message handler (the studio's handler 0, uiProcessInterface.c fn_8009005C).
 void fn_800914DC(FEQuad* pQuad, int nMsg, u32 bSplit, FEMsgArg* pArgs);
@@ -481,9 +481,9 @@ void FE_setupStreaming(int nGolfer, int a, int b);    // show golfer nGolfer
 void FE_StreamStopAllStreaming(void);
 u8   FE_PauseFECharStreaming(u8 bPaused);           // pause the menus' state machine (or not); the old setting
 int  FE_StreamGetCurrentState(void);
-void fn_8008DAEC(void);
-void fn_8008E244(void);
-void fn_8008E2F8(u8 bTarget, f32 fAngle);
+void FE_vClearGolferCache(void);
+void FE_ResetCrAPZoom(void);
+void FE_SetCrapRotation(u8 bTarget, f32 fAngle);
 void fn_8008E364(int n);
 int  fn_8008E420(void);
 int  fn_8008E44C(void);

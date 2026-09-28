@@ -96,15 +96,15 @@ void FE_DrawGolferAlphaMask(void);
 void FE_CopyGolferToTexture(void);
 void FE_RenderGolfer(u8 bFull);
 void FE_SetupCharState(void);
-void fn_8008D6CC(void);
-void fn_8008E0B0(f32 fTurn);
-void fn_8008D9DC(UStreamObject* pObject);
-void fn_8008DBE8(void);
-void fn_8008DC10(void);
-u8   fn_8008DCF0(int nGolfer, CrAPGolfer* pGolfer);
-void fn_8008DD50(u8 bNoBlend);
-Clip* fn_8008E02C(void);
-void fn_8008E254(u8 b);
+void FE_CharPositionOverwrite(void);
+void FE_RotateCrAPModel(f32 fTurn);
+void FE_lite_vStreamCallback(UStreamObject* pObject);
+void FE_vExecuteClearGolferCache(void);
+void FE_vFreeUnusedCharacters(void);
+u8   FE_IsGolferInOtherSlot(int nGolfer, CrAPGolfer* pGolfer);
+void FE_vLoadNextCrAPAnim(u8 bNoBlend);
+Clip* FE_CrapGetIdleAnim(void);
+void FE_ZoomCrAPModel(u8 b);
 void fn_8008EA44(u8 b);
 void fn_8008EBB4(void);
 void fn_8008EBE4(void);
@@ -224,8 +224,8 @@ void FE_CharMgrInit(void) {
 // Stop the loader (FE_StreamStopForClose), free every golfer slot's character, and free the state.
 void FE_CharMgrClose(void) {
     FE_StreamStopForClose();
-    fn_8008DBE8();
-    fn_8008DC10();
+    FE_vExecuteClearGolferCache();
+    FE_vFreeUnusedCharacters();
     StaticMem_Free(lbl_80281EE0);
     lbl_80281EE0 = NULL;
 }
@@ -234,7 +234,7 @@ void FE_CharMgrClose(void) {
 // and sent back to idle; if the shown slot's pNext or pPrev holds him, that becomes the shown slot,
 // else the shown slot gets his id to load. Golfers 7 and 29 (as nGolfer, nOtherA or nOtherB) set
 // b90: every slot's character is freed before the next load (FE_StreamManageCRaPMemory). On screen
-// kind 3 his animation starts again (fn_8008DD50).
+// kind 3 his animation starts again (FE_vLoadNextCrAPAnim).
 void FE_setupStreaming(int nGolfer, int nOtherA, int nOtherB) {
     FE_StreamInterruptState();
     FE_StreamSetNextState(1);
@@ -263,9 +263,9 @@ void FE_setupStreaming(int nGolfer, int nOtherA, int nOtherB) {
         }
     }
     lbl_80281EE0->b87 = 1;
-    fn_8008DC10();
+    FE_vFreeUnusedCharacters();
     if (lbl_80281EE0->n0 == 3) {
-        fn_8008DD50(0);
+        FE_vLoadNextCrAPAnim(0);
     }
 }
 
@@ -302,7 +302,7 @@ void FE_StreamFunc_IdleClose(void) {
 // pPrev, skipping one already loaded (b18) or with no id. The pick becomes pB8 (nBC says which); a
 // slot that still holds a character is flagged to be freed first (b19), and once the memory is free
 // (FE_StreamManageCRaPMemory) the state finishes, on to the skin state. A golfer another slot
-// already has is not loaded again (for the shown one, fn_8008DAEC stops the loader). Nothing
+// already has is not loaded again (for the shown one, FE_vClearGolferCache stops the loader). Nothing
 // happens while the loader is being stopped (b8A) or slot 0 waits to be freed; an interrupt
 // finishes the state at once.
 void FE_StreamFunc_IdleUpdate(void) {
@@ -316,8 +316,8 @@ void FE_StreamFunc_IdleUpdate(void) {
     if (lbl_80281EE0->aGolfer[0].b19 == 1) return;
     pGolfer = lbl_80281EE0->pB4;
     if (pGolfer->b18 == 0 && pGolfer->nC != -1) {
-        if (fn_8008DCF0(pGolfer->nC, pGolfer)) {
-            fn_8008DAEC();
+        if (FE_IsGolferInOtherSlot(pGolfer->nC, pGolfer)) {
+            FE_vClearGolferCache();
             return;
         }
         lbl_80281EE0->pB8 = lbl_80281EE0->pB4;
@@ -330,7 +330,7 @@ void FE_StreamFunc_IdleUpdate(void) {
             FE_StreamPopState();
         }
     } else if (pGolfer->pNext->b18 == 0 && pGolfer->pNext->nC != -1) {
-        if (fn_8008DCF0(pGolfer->pNext->nC, pGolfer->pNext)) return;
+        if (FE_IsGolferInOtherSlot(pGolfer->pNext->nC, pGolfer->pNext)) return;
         lbl_80281EE0->pB8 = lbl_80281EE0->pB4->pNext;
         lbl_80281EE0->nBC = 1;
         if (lbl_80281EE0->pB8->pChar != NULL) {
@@ -341,7 +341,7 @@ void FE_StreamFunc_IdleUpdate(void) {
             FE_StreamPopState();
         }
     } else if (pGolfer->pPrev->b18 == 0 && pGolfer->pPrev->nC != -1) {
-        if (fn_8008DCF0(pGolfer->pPrev->nC, pGolfer->pPrev)) return;
+        if (FE_IsGolferInOtherSlot(pGolfer->pPrev->nC, pGolfer->pPrev)) return;
         lbl_80281EE0->pB8 = lbl_80281EE0->pB4->pPrev;
         lbl_80281EE0->nBC = 2;
         if (lbl_80281EE0->pB8->pChar != NULL) {
@@ -583,8 +583,8 @@ void FE_SetupCamera(void) {
 
 // Each front-end frame, before FE_SetupCamera and the render passes: fade the golfer display (f14C,
 // 0..0.5) in and out with his animation; on screen kind 3 (create-a-player) run its queued
-// animation (n1C0), and let the pad turn him (fn_8008E0B0) and zoom (fn_8008E254); set him up again
-// for a new screen kind (FE_SetupCharState) and place him (lbl_80189A30; in the club close-up
+// animation (n1C0), and let the pad turn him (FE_RotateCrAPModel) and zoom (FE_ZoomCrAPModel); set
+// him up again for a new screen kind (FE_SetupCharState) and place him (lbl_80189A30; in the club close-up
 // raised by his club's offset); turn to the next golfer when his animation ends (b91); give a
 // golfer shown afresh his ball logo and textures; then animate, pose and light him.
 void FE_vUpdateGolferAll(void) {
@@ -656,8 +656,8 @@ void FE_vUpdateGolferAll(void) {
                     } else {
                         fn_800B9EB8(NULL);
                     }
-                    fn_8008E2F8(0, 0.0f);
-                    fn_8008E244();
+                    FE_SetCrapRotation(0, 0.0f);
+                    FE_ResetCrAPZoom();
                     lbl_80281EE0->n1C0 = 2;
                     fn_8008E468(lbl_80281EE0->sz20, lbl_80281EE0->sz30, 0);
                     if (lbl_80281EE0->b80) {
@@ -669,8 +669,8 @@ void FE_vUpdateGolferAll(void) {
                         Character_ExecuteTextureSwapFE(lbl_80281EE0->pB4->pChar);
                         lbl_80281EE0->b81 = 0;
                     }
-                    fn_8008E2F8(0, 0.0f);
-                    fn_8008E244();
+                    FE_SetCrapRotation(0, 0.0f);
+                    FE_ResetCrAPZoom();
                     lbl_80281EE0->n1C0 = 2;
                     fn_8008E468(lbl_80281EE0->sz20, lbl_80281EE0->sz30, 0);
                     if (lbl_80281EE0->b80) {
@@ -706,7 +706,7 @@ void FE_vUpdateGolferAll(void) {
                         Character_SelectClub(lbl_80281EE0->pB4->pChar, lbl_80281EE0->n1B8);
                         lbl_80281EE0->n1BC = -1;
                     }
-                    fn_8008DD50(0);
+                    FE_vLoadNextCrAPAnim(0);
                 }
                 if (lbl_80281EE0->n1D0 == 0) {
                     lbl_80281EE0->f14C = 0.5f;
@@ -770,30 +770,30 @@ void FE_vUpdateGolferAll(void) {
     } else if (lbl_80281EE0->pB4->pChar != NULL && lbl_80281EE0->n0 == 3 && fLeft < fHalf
                && lbl_80281EE0->b82 == 0 && lbl_80281EE0->n1C0 == 4 && lbl_80281EE0->n8 == 0) {
         lbl_80281EE0->b82 = 1;
-        fn_8008DD50(1);
+        FE_vLoadNextCrAPAnim(1);
     }
     // Screen kind 3: the pad turns the golfer (buttons 0x33 and 0x34) and button 0x35 does
-    // fn_8008E254.
+    // FE_ZoomCrAPModel.
     if (lbl_80281EE0->pB4->pChar != NULL && lbl_80281EE0->n0 == 3) {
         if (lbl_80281EE0->b1C8 == 0) {
             if (Controller_AnyPadHasButtons(Controller_GetButtonMask(0x33, 0))
                 || Controller_AnyPadHasButtons(Controller_GetButtonMask(0x33, 1))) {
-                fn_8008E0B0(0.05f);
+                FE_RotateCrAPModel(0.05f);
             } else if (Controller_AnyPadHasButtons(Controller_GetButtonMask(0x34, 0))
                        || Controller_AnyPadHasButtons(Controller_GetButtonMask(0x34, 1))) {
-                fn_8008E0B0(-0.05f);
+                FE_RotateCrAPModel(-0.05f);
             } else {
-                fn_8008E0B0(0.0f);
+                FE_RotateCrAPModel(0.0f);
             }
         } else {
-            fn_8008E0B0(0.0f);
+            FE_RotateCrAPModel(0.0f);
         }
         if (lbl_80281EE0->b1C8 == 0 && lbl_80281EE0->n8 == 0
             && (Controller_AnyPadHasButtons(Controller_GetButtonMask(0x35, 0))
                 || Controller_AnyPadHasButtons(Controller_GetButtonMask(0x35, 1)))) {
-            fn_8008E254(1);
+            FE_ZoomCrAPModel(1);
         } else {
-            fn_8008E254(0);
+            FE_ZoomCrAPModel(0);
         }
     }
     if (lbl_80281EE0->pB4->b18 && lbl_80281EE0->b86 == 0) {
@@ -851,7 +851,7 @@ void FE_vUpdateGolferAll(void) {
         return;
     }
     if (lbl_80281EE0->pB4->pChar != NULL) {
-        lbl_80281EE0->pB4->pChar->pfnPreBones = fn_8008D6CC;
+        lbl_80281EE0->pB4->pChar->pfnPreBones = FE_CharPositionOverwrite;
     }
     // Another golfer or profile slot than last drawn: give him his ball and textures.
     if ((lbl_80281340 != lbl_80281EE0->pB4->nC || lbl_80281344 != lbl_80281ED4->nSlot || lbl_80281EE0->b87)
@@ -1080,7 +1080,7 @@ void FE_RenderGolfer(u8 bFull) {
 // (Char_SetClip 0) played and the club switched to the one that clip holds (its u90 in
 // gClubBoneIds; 0 if none); kinds 1 and 4 take the profile's handedness (fn_8008EA44). Kind 3
 // (create-a-player) clears its queued animation and close-up state and starts his idle animation
-// (fn_8008DD50). The display then fades in from 0 (f14C).
+// (FE_vLoadNextCrAPAnim). The display then fades in from 0 (f14C).
 void FE_SetupCharState(void) {
     Clip* pClip;
     int i;
@@ -1161,7 +1161,7 @@ void FE_SetupCharState(void) {
         fn_8008EA44(0);
         lbl_80281EE0->f19C = 0.0f;
         lbl_80281EE0->f1A0 = 0.0f;
-        fn_8008DD50(0);
+        FE_vLoadNextCrAPAnim(0);
         Character_SetOrientation(lbl_80281EE0->pB4->pChar, lbl_80281EE0->f19C);
         break;
     case 2:
@@ -1191,9 +1191,11 @@ void FE_SetupCharState(void) {
     lbl_80281EE0->f14C = 0.0f;
 }
 
-// With b85 set, move bones 0x52 (when the character's bit 0x4000 is set) and 0x54 (when the clip
-// has it, Character_IsHoldingBall) to their offset from bone 1, and bone 1 to 0, in x, z and w.
-void fn_8008D6CC(void) {
+// The shown golfer's pre-bones callback (pfnPreBones, set by FE_vUpdateGolferAll), with b85 set:
+// pins him to his spot by zeroing the waist bone's (bone 1) x, z and w, and moves the club bone
+// (0x52, when the character's bit 0x4000 is set) and the ball bone (0x54, when he holds the ball:
+// Character_IsHoldingBall) with it, keeping their offsets from the waist.
+void FE_CharPositionOverwrite(void) {
     f32 v52[4];
     f32 v54[4];
     CharModel* pModel;
@@ -1245,28 +1247,32 @@ void fn_8008D6CC(void) {
     }
 }
 
-void fn_8008D8CC(void) {
+// Set up the menu golfer when the front end starts (FE_Manager): register the golfer stream client,
+// set up the golfer's state and its loader (FE_CharMgrInit) and make the display's textures
+// (FE_InitGolferTextures).
+void FE_vInitFECharModule(void) {
     Character_RegisterGolferStreamClientFE();
     FE_CharMgrInit();
-    fn_8008D8F4();
+    FE_InitGolferTextures();
 }
 
-// Make the display's textures: one of each of lbl_80281BA4's buffers and one of the screen copy,
-// all 384 x 448 RGBA8.
-void fn_8008D8F4(void) {
+// Make the golfer display's textures, all 384 x 448 RGBA8: one on each of lbl_80281BA4's two
+// buffers and the screen copy (lbl_801D8714, on fn_8002A624's pixels). Made again after a movie
+// (FE_Manager) and when the create-a-player screen loads (uiProcessInterface.c).
+void FE_InitGolferTextures(void) {
     fn_8002A528(&lbl_801D8744[0], 384, 448, lbl_80281BA4[0], NULL, 6, 0, 0, 0);
     fn_8002A528(&lbl_801D8744[1], 384, 448, lbl_80281BA4[1], NULL, 6, 0, 0, 0);
     fn_8002A528(&lbl_801D8714, 384, 448, fn_8002A624(), NULL, 6, 0, 0, 0);
 }
 
-// Register the 'LITE' stream handler.
-void fn_8008D9AC(void) {
-    Stream_RegisterLoadChunkCallback('LITE', fn_8008D9DC);
+// Register the 'LITE' stream handler (FE_lite_vStreamCallback): the golfer display's lights.
+void FE_lite_vRegisterStreamClients(void) {
+    Stream_RegisterLoadChunkCallback('LITE', FE_lite_vStreamCallback);
 }
 
 // A 'LITE' object: copy its lights (little-endian) into lbl_80281EE4, swapping each value's
 // bytes, and make them light set 0's.
-void fn_8008D9DC(UStreamObject* pObject) {
+void FE_lite_vStreamCallback(UStreamObject* pObject) {
     SwapField aHeader[] = {
         { 4, 4 },                                           // nLights
         { 12, 4 },
@@ -1291,8 +1297,12 @@ void fn_8008D9DC(UStreamObject* pObject) {
     StaticMem_Free(pObject);
 }
 
-// Stop loading, and show the next golfer of lbl_801899E0 (screen 0) or none (screen 4).
-void fn_8008DAEC(void) {
+// Drop the golfers loaded for the menus: b8A has FE_vFreeUnusedCharacters free them once the loader
+// is idle, and meanwhile the loader is interrupted and sent back to idle, the load count (n190)
+// cleared and the golfer shown marked not loaded. On screen kind 0 slot 0 gets the next golfer of
+// lbl_801899E0 to load, on kind 4 none. The menus call it when the screen kind changes to 0 or 3,
+// and before a movie.
+void FE_vClearGolferCache(void) {
     lbl_80281EE0->b8A = 1;
     FE_StreamInterruptState();
     FE_StreamSetNextState(1);
@@ -1313,8 +1323,9 @@ void fn_8008DAEC(void) {
     }
 }
 
-// Flag every golfer slot's character to be freed (b19) and clear the shown golfer's b18.
-void fn_8008DBE8(void) {
+// Flag every golfer slot's character to be freed (b19; FE_vFreeUnusedCharacters frees it) and mark
+// the golfer shown not loaded (b18).
+void FE_vExecuteClearGolferCache(void) {
     int i;
 
     for (i = 0; i < CRAP_NUM_GOLFERS; i++) {
@@ -1325,11 +1336,13 @@ void fn_8008DBE8(void) {
     }
 }
 
-// Once the loader is idle: finish a stop (b8A), or free a golfer slot's character (b19).
-void fn_8008DC10(void) {
+// Each frame (the main loop), while the loader is idle: finish a cache clear (b8A:
+// FE_vExecuteClearGolferCache), else free slot 0's character when it is flagged (b19) and is not
+// the golfer shown and loaded, and mark the slot empty.
+void FE_vFreeUnusedCharacters(void) {
     if (FE_StreamGetCurrentState() == 1) {
         if (lbl_80281EE0->b8A && FE_StreamGetCurrentState() == 1) {
-            fn_8008DBE8();
+            FE_vExecuteClearGolferCache();
             lbl_80281EE0->b8A = 0;
             return;
         }
@@ -1347,8 +1360,10 @@ void fn_8008DC10(void) {
     }
 }
 
-// Another golfer slot than pGolfer has golfer nGolfer, shown or streamed.
-u8 fn_8008DCF0(int nGolfer, CrAPGolfer* pGolfer) {
+// Whether a golfer slot other than pGolfer holds golfer nGolfer, loaded (b18) or streamed (n14).
+// Only slot 0 is looked at; with the game's one slot (CRAP_NUM_GOLFERS) every caller passes slot 0,
+// so it returns 0.
+u8 FE_IsGolferInOtherSlot(int nGolfer, CrAPGolfer* pGolfer) {
     if (&lbl_80281EE0->aGolfer[0] != pGolfer
         && ((lbl_80281EE0->aGolfer[0].nC == nGolfer && lbl_80281EE0->aGolfer[0].b18)
             || lbl_80281EE0->aGolfer[0].n14 == nGolfer)) {
@@ -1357,12 +1372,21 @@ u8 fn_8008DCF0(int nGolfer, CrAPGolfer* pGolfer) {
     return 0;
 }
 
-void fn_8008DD34(int nProfile, s8 n) {
+// Store whether profile nProfile's created golfer is left-handed (choices.n113); a create-a-player
+// menu message sets it for the current profile.
+void FE_SetProfileLeftHanded(int nProfile, s8 n) {
     gpSaveData[nProfile].choices.n113 = n;
 }
 
-// Start the golfer's idle animation (or the one n8 asks for) and point the camera at him.
-void fn_8008DD50(u8 bNoBlend) {
+// Start the shown golfer's next animation and switch the CrAP camera to it (bNoBlend: cut instead
+// of blending). In a club or ball close-up (n8 1 or 2) that is his close-up clip (Char_SetClip 8)
+// with camera 3 or 4. Otherwise it is his current clip again while n50 repeats are left, else the
+// camera kind's idle clip (FE_CrapGetIdleAnim); n1B4 counts the idles, and after the fifth (not
+// zoomed) the clip is picked with club 2 instead of 0, the zoom is reset and on camera kinds 0 and
+// 2 he turns back to face front (b1C8 keeps the pad from turning him meanwhile). A clip with pD8
+// set takes the profile's handedness (fn_8008EA44; he is turned to face PI when he becomes
+// left-handed), any other is played right-handed.
+void FE_vLoadNextCrAPAnim(u8 bNoBlend) {
     View* pView;
     Clip* pClip;
 
@@ -1390,9 +1414,9 @@ void fn_8008DD50(u8 bNoBlend) {
         lbl_80281EE0->n1B4 = -1;
         if (lbl_80281EE0->n4 == 0 || lbl_80281EE0->n4 == 2) {
             lbl_80281EE0->b1C8 = 1;
-            fn_8008E2F8(1, 0.0f);
+            FE_SetCrapRotation(1, 0.0f);
         }
-        fn_8008E254(0);
+        FE_ZoomCrAPModel(0);
     } else {
         Character_SelectClub(lbl_80281EE0->pB4->pChar, 0);
         lbl_80281EE0->n1B4++;
@@ -1401,16 +1425,16 @@ void fn_8008DD50(u8 bNoBlend) {
     if (lbl_80281EE0->n50 > 0 && (pClip = lbl_80281EE0->pB4->pChar->pCurClip) != NULL) {
         lbl_80281EE0->n50--;
     } else {
-        pClip = fn_8008E02C();
+        pClip = FE_CrapGetIdleAnim();
     }
     if (pClip->pD8 != NULL) {
         if (!Character_IsLeftHanded(lbl_80281EE0->pB4->pChar) && FE_GetCurrentProfile()->choices.n113 != 0) {
-            fn_8008E2F8(0, PI);
+            FE_SetCrapRotation(0, PI);
         }
         fn_8008EA44(FE_GetCurrentProfile()->choices.n113);
     } else {
         if (Character_IsLeftHanded(lbl_80281EE0->pB4->pChar)) {
-            fn_8008E2F8(0, 0.0f);
+            FE_SetCrapRotation(0, 0.0f);
         }
         fn_8008EA44(0);
     }
@@ -1420,8 +1444,9 @@ void fn_8008DD50(u8 bNoBlend) {
     GolfCamera_SwitchCrAPCamera(pView, NULL, lbl_80281EE0->n4, bNoBlend, lbl_80281EE0->b1DC, 0);
 }
 
-// The idle clip for the camera kind.
-Clip* fn_8008E02C(void) {
+// The shown golfer's idle clip for the CrAP camera kind (n4): clip 11 for kind 1, 7 for kind 2,
+// else 1 (Char_SetClip). TW07's FE_CrapGetIdleAnimName returns its name instead.
+Clip* FE_CrapGetIdleAnim(void) {
     if (lbl_80281EE0->n4 == 1) {
         return Char_SetClip(lbl_80281EE0->pB4->pChar, 11, 0, NULL);
     }
@@ -1433,7 +1458,7 @@ Clip* fn_8008E02C(void) {
 
 // Turn the golfer by fTurn radians: f1A0 is where he should face, f19C where he faces; f19C
 // follows it 0.05 a frame, the short way round.
-void fn_8008E0B0(f32 fTurn) {
+void FE_RotateCrAPModel(f32 fTurn) {
     f32 fDiff;
 
     lbl_80281EE0->f19C += fTurn;
@@ -1471,11 +1496,14 @@ void fn_8008E0B0(f32 fTurn) {
     }
 }
 
-void fn_8008E244(void) {
+// Forget the zoom (b1DC) without switching the camera.
+void FE_ResetCrAPZoom(void) {
     lbl_80281EE0->b1DC = 0;
 }
 
-void fn_8008E254(u8 b) {
+// Zoom the CrAP camera in (bZoom) or out: on a change, b1DC follows it and the camera is switched,
+// blending.
+void FE_ZoomCrAPModel(u8 b) {
     View* pView = ViewController_GetCameraControl(ViewController_GetCurrentViewControllerID());
 
     if (b) {
@@ -1489,8 +1517,8 @@ void fn_8008E254(u8 b) {
     }
 }
 
-// Face the golfer fAngle radians round: at once, or (bTarget) over time (fn_8008E0B0).
-void fn_8008E2F8(u8 bTarget, f32 fAngle) {
+// Face the golfer fAngle radians round: at once, or (bTarget) over time (FE_RotateCrAPModel).
+void FE_SetCrapRotation(u8 bTarget, f32 fAngle) {
     if (bTarget) {
         lbl_80281EE0->f1A0 = fAngle;
         return;
@@ -1502,6 +1530,8 @@ void fn_8008E2F8(u8 bTarget, f32 fAngle) {
     }
 }
 
+// Empty; a menu message (FE_MessageTable.c fn_8007C254) calls it when the golfer is hidden or shown
+// (b86) on screen kind 3. Nothing says what it was for, so it keeps its address name.
 void fn_8008E354(void) {
 }
 
@@ -1513,7 +1543,7 @@ void fn_8008E364(int n) {
     Clip* pClip;
 
     if (n != lbl_80281EE0->n4) {
-        pClip = fn_8008E02C();
+        pClip = FE_CrapGetIdleAnim();
         if (pClip != NULL) {
             if (lbl_80281EE0->n1C0 != 1 && lbl_80281EE0->n1C0 != 0) {
                 fn_8008E724(pClip->name, NULL, 0, 0);
@@ -1572,12 +1602,12 @@ u8 fn_8008E468(char* szAnim, char* szShot, u8 bNoBlend) {
         if (pClip->pD8 != NULL) {
             if (!Character_IsLeftHanded(lbl_80281EE0->pB4->pChar) && FE_GetCurrentProfile()->choices.n113
                 != 0) {
-                fn_8008E2F8(0, PI);
+                FE_SetCrapRotation(0, PI);
             }
             fn_8008EA44(FE_GetCurrentProfile()->choices.n113);
         } else {
             if (Character_IsLeftHanded(lbl_80281EE0->pB4->pChar)) {
-                fn_8008E2F8(0, 0.0f);
+                FE_SetCrapRotation(0, 0.0f);
             }
             fn_8008EA44(0);
         }
@@ -1635,7 +1665,7 @@ void fn_8008E818(int n) {
 }
 
 void fn_8008E824(void) {
-    fn_8008DD50(0);
+    FE_vLoadNextCrAPAnim(0);
     lbl_80281EE0->n50 = 0;
     lbl_80281EE0->n1C0 = 4;
 }
@@ -1649,8 +1679,8 @@ void fn_8008E860(int n) {
         lbl_80281EE0->nC = 0;
         lbl_80281EE0->b80 = 0;
         if (nOld != lbl_80281EE0->n8) {
-            fn_8008E244();
-            fn_8008DD50(0);
+            FE_ResetCrAPZoom();
+            FE_vLoadNextCrAPAnim(0);
         }
     }
 }
@@ -1771,7 +1801,7 @@ u8 fn_8008EB10(void) {
 
 void fn_8008EB70(void) {
     fn_8008E724(NULL, NULL, 0, 0);
-    fn_8008DD50(0);
+    FE_vLoadNextCrAPAnim(0);
     fn_8008E944(0, 0.0f);
 }
 

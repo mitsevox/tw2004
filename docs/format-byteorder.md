@@ -63,7 +63,7 @@ Objects delivered by UStream
 | `CAMC` | fn_800644F4 | GoStaticCam.c | swapped: ByteSwap_Records | little-endian on disc |
 | `sscr` | SitDev_LoadScripts | SitDevFile.c | swapped: fn_800BB52C > ByteSwap_Records | little-endian on disc |
 | `BIO ` | fn_80076F80 | FE_Manager.c | none seen | asm |
-| `LITE` | fn_8008D9DC | FEgolferanim.c | swapped: ByteSwap_Records | little-endian on disc |
+| `LITE` | FE_lite_vStreamCallback | FEgolferanim.c | swapped: ByteSwap_Records | little-endian on disc |
 | `DATS`, `TXFS`, `FONS`, `GRPS`, `MPCS` | fn_8008ED80, fn_8008EE1C, fn_8008EFFC, fn_8008EEB8 (two tags) | uiLoadFile.c | none seen | asm |
 | `MCI `, `MCB ` | fn_8009EB30, fn_8009EB38 | MC_Gc.c | none seen | the handlers only keep the object |
 | `eagm` | fn_800A1D4C | MC.c | none seen | asm |

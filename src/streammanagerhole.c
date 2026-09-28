@@ -80,7 +80,7 @@ void fn_80039520();
 void fn_80076F24();
 void fn_80076F54();
 void fn_80076F58();
-void fn_8008D9AC();
+void FE_lite_vRegisterStreamClients();
 void fn_800B9944();
 void fn_800B9988();
 void UI_vEATraxRegisterStreamClients();
@@ -260,7 +260,7 @@ void fn_80014668(void) {
     fn_8001FAA8();
     fn_8008EC68();
     fn_800394F0();
-    fn_8008D9AC();
+    FE_lite_vRegisterStreamClients();
     fn_800B9944();
     Character_RegisterGolferStreamClientFE();
     MC_RegisterStreamClients();

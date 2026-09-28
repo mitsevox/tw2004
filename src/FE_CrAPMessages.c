@@ -993,7 +993,7 @@ void fn_801097FC(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8010988C(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8008DAEC();
+    FE_vClearGolferCache();
 }
 
 void fn_801098AC(MsgArg* pArgs, MsgArg* pResult) {
@@ -1087,7 +1087,7 @@ void fn_80109CBC(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     View* pView = ViewController_GetCameraControl(ViewController_GetCurrentViewControllerID());
     Gaud_PlayUISound((Misc_RandFunc(0) & 7) + 11);
-    fn_8008E244();
+    FE_ResetCrAPZoom();
     fn_8008E364(0);
     GolfCamera_SwitchCrAPCamera(pView, "Crap Idle", lbl_80281EE0->n4, 0, 0, 0);
     FE_CrAP_SetTriggerAnims(0);
@@ -1099,7 +1099,7 @@ void fn_80109CBC(MsgArg* pArgs, MsgArg* pResult) {
 void fn_80109D5C(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     View* pView = ViewController_GetCameraControl(ViewController_GetCurrentViewControllerID());
-    fn_8008E244();
+    FE_ResetCrAPZoom();
     fn_8008E364(1);
     GolfCamera_SwitchCrAPCamera(pView, "Crap Face", lbl_80281EE0->n4, 0, 0, 0);
     FE_CrAP_SetTriggerAnims(0);

@@ -451,7 +451,7 @@ void sTurnOnLogo(s16 nPart, int b, int i) {
 void sApplySlider(CrAPAsset* pAsset) {
     fn_8008E944(0, 0.0f);
     if (pAsset->n0 != fn_8008EAEC()) {
-        fn_8008E2F8(1, 0.0f);
+        FE_SetCrapRotation(1, 0.0f);
     }
     fn_8008EAE0(pAsset->n0);
     if (fn_8008E6BC() == NULL || strcmp(fn_8008E6BC(), FE_CrAP_GetStringFromTable(pAsset->n112)) != 0) {
@@ -549,7 +549,7 @@ void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset) {
             fn_8008E818(1);
         }
         if (nPart != fn_8008EB04()) {
-            fn_8008E2F8(1, 0.0f);
+            FE_SetCrapRotation(1, 0.0f);
         }
         fn_8008EAF8(nPart);
     } else {

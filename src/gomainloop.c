@@ -180,7 +180,7 @@ void FE_StreamUpdateState(void);
 void FE_SetupCamera(void);
 void FE_vRenderGolferAllPhase1(void);
 void FE_vRenderGolferAllPhase2(void);
-void fn_8008DC10(void);
+void FE_vFreeUnusedCharacters(void);
 u8   fn_8008EB10(void);
 u8   fn_8008F39C(void);
 void fn_8008F648(int n);
@@ -1127,7 +1127,7 @@ void fn_8006D8E8(void) {
                 Character_UpdateClothesIG();
             } else {
                 Character_UpdateClothesFE();
-                fn_8008DC10();
+                FE_vFreeUnusedCharacters();
                 fn_8010FA00();
             }
         }

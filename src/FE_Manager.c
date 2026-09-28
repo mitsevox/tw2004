@@ -18,8 +18,8 @@ void fn_80010284(void);
 void FE_StreamInterruptState(void);
 void FE_StreamSetNextState(int a);
 void FE_StreamWaitForState(int a);
-void fn_8008D8CC(void);
-void fn_8008DBE8(void);
+void FE_vInitFECharModule(void);
+void FE_vExecuteClearGolferCache(void);
 void fn_80092198(void);
 void fn_8009220C(void);
 void Gaud_StartFEMusic(int a);
@@ -225,15 +225,15 @@ void fn_800772E0(void) {
     FE_StreamSetNextState(1);
     FE_StreamInterruptState();
     FE_StreamWaitForState(1);
-    fn_8008DAEC();
-    fn_8008DBE8();
+    FE_vClearGolferCache();
+    FE_vExecuteClearGolferCache();
     fn_80092198();
 }
 
 // After a movie.
 void fn_8007731C(void) {
     fn_8009220C();
-    fn_8008D8F4();
+    FE_InitGolferTextures();
 }
 
 void fn_80077340(void) {
@@ -266,7 +266,7 @@ void fn_800773F8(void) {
     fn_80010284();
     fn_80079EA8();
     fn_8007744C();
-    fn_8008D8CC();
+    FE_vInitFECharModule();
     fn_80079DAC();
 }
 
