@@ -1159,7 +1159,7 @@ void fn_800FBD2C(int nPlayer) {
             return;
         }
     } else {
-        fn_80058F5C(nPlayer);
+        SW_vUpdateSwing(nPlayer);
     }
     switch (fn_800FA518(nPlayer)) {
     case 1:

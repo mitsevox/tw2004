@@ -577,7 +577,7 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
     u8    bSwung;
 
     if (fn_800E5098()) return;
-    bSwung = fn_80058F5C(nPlayer);
+    bSwung = SW_vUpdateSwing(nPlayer);
     gPlayers[nPlayer].fC20 += gSession.fFrameTime;
     if (Controller_AnyPadHasButtons(gPlayers[nPlayer].nController) || gPlayers[nPlayer].swing.nState != 0) {
         gPlayers[nPlayer].fC20 = 0.0f;
@@ -1245,7 +1245,7 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
             return;
         }
     }
-    fn_80058F5C(nPlayer);
+    SW_vUpdateSwing(nPlayer);
     fn_8006BB5C(nPlayer);
     if (gpGame->b286 != 0 && !fn_8004560C()) {
         if (Player_IsCPU(nPlayer)) {

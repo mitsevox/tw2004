@@ -27,7 +27,7 @@ The pieces
 | `gAITargets` | `0x801C65B8` | table of authored aim points, 12 bytes each |
 | `gForgivenessTable` | `0x80188168` | 27 rows x 3 floats (value at attribute 0 / 100 / 110) |
 
-Human swing: starting it (`Swing_WaitForBackswing`, `Swing_Begin`, in C)
+Human swing: starting it (`SW_vStateIdleSwing`, `Swing_Begin`, in C)
 --------------------------------------------------------------------------
 
 Before the backswing the game polls both sticks every frame and holds their rest positions at
@@ -61,7 +61,7 @@ names for the states come from TW06's copy of the same table (`GS_*` in `include
     8   the knee cam (camera 7, TW06's KneeCam), then back to 12 or 0; gone as a state by TW06
     9   GreenMorph: the putt-line view
     10  Swing: over the ball with the HUD: starts the caddie, HUD, sounds; the swing phase
-        table below runs here (`fn_80058F5C`), and in 12 for the follow-through
+        table below runs here (`SW_vUpdateSwing`), and in 12 for the follow-through
     11  ReplaySwing: the swing animation plays; Swing_Launch at its impact frame
     12  Simulate: the ball is away
     13  InTheHole, 14 ShowYardage: the ball has come to rest (a copy is kept as "before the shot")
@@ -93,12 +93,12 @@ Human swing: the phases (`gSwingPhaseFns`, all in C)
 
 `SwingData.nPhase` drives a table of seven per-frame functions:
 
-    0  Swing_WaitForBackswing  poll both sticks; start at a quarter pull
-    1  Swing_UpdateBackswing   the backswing follows the stick
+    0  SW_vStateIdleSwing  poll both sticks; start at a quarter pull
+    1  SW_vStateBackSwing   the backswing follows the stick
     2  Swing_UpdateAtTop       holding at the top
     3  Swing_UpdateDownswing   the stick's forward reading becomes the impact sample
     4  (idle)
-    5  Swing_UpdateAfterImpact rumble countdown and spin input while the ball flies
+    5  SW_vStatePostSwing rumble countdown and spin input while the ball flies
     6  (idle)
 
 **Backswing (1).** Each frame the stick's dead-zoned magnitude (0..100) says how far along

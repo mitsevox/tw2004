@@ -114,13 +114,13 @@ void  SW_vUIBlurReset(int nPlayer);
 void  SD_FreeShaderObject(void* p);
 void  SW_vUIInit(int nPlayer);
 void  SD_InitShaderObject(void* p, int a, s32* pDesc);
-void  fn_8005A788(int nPlayer, int a);
+void  SW_vSetDisplayBoostUI(int nPlayer, int a);
 void  fn_800AE3C4(int nPlayer);
-u8*   Pad_State(int nPlayer, int nController);   // the pad's state: [1] main stick y, [3] C-stick y
-int   Swing_StickX(int nPlayer, u8* pPad);       // 0x80058F04  main or C-stick by nStickUsed
-int   Swing_StickY(int nPlayer, u8* pPad);       // 0x80058F30
-f32   Swing_TopTime(SwingData* pSw);             // 0x80058E98  fTimeSwingTop - 0.0076
-f32   Swing_StartTime(SwingData* pSw);           // 0x80058EA8  fTimeSwingStart + 0.0076
+u8*   SW_vGetStickInfo(int nPlayer, int nController);   // the pad's state: [1] main stick y, [3] C-stick y
+int   SW_vGetStickX(int nPlayer, u8* pPad);       // 0x80058F04  main or C-stick by nStickUsed
+int   SW_vGetStickY(int nPlayer, u8* pPad);       // 0x80058F30
+f32   SW_vGetControllerTopOfSwing(SwingData* pSw);             // 0x80058E98  fTimeSwingTop - 0.0076
+f32   SW_vGetControllerStartOfSwing(SwingData* pSw);           // 0x80058EA8  fTimeSwingStart + 0.0076
 int   SKA_SampleBlendClip(Clip* pBlend, f32* pOut, f32 fTime);   // samples pBlend->pD8 at fTime
 void  Character_UpdateAnimation(Character* pObj, int a, f32 f);
 void  SW_vSetSwingStrength(int nPlayer);
@@ -140,13 +140,13 @@ void  Swing_ApplySpin(int nPlayer);
 void  Swing_ApplyForgiveness(int nPlayer);
 void  Swing_MisHitRumble(int nPlayer);
 f32   fn_8005CC18(f32* pV);
-u8    Swing_WaitForBackswing(int nPlayer);
-u8    Swing_UpdateBackswing(int nPlayer);
+u8    SW_vStateIdleSwing(int nPlayer);
+u8    SW_vStateBackSwing(int nPlayer);
 u8    SW_vStateBackSwingFigit(int nPlayer);
 u8    SW_vStateDownSwing(int nPlayer);
-u8    Swing_PhaseIdle4(int nPlayer);
-u8    Swing_UpdateAfterImpact(int nPlayer);
-u8    Swing_PhaseIdle6(int nPlayer);
+u8    SW_vStateThroughSwing(int nPlayer);
+u8    SW_vStatePostSwing(int nPlayer);
+u8    SW_vStateCancelSwing(int nPlayer);
 
 SwingState lbl_801D5968;
 
@@ -193,8 +193,8 @@ f32 lbl_8018830C[8][4] = {
 };
 
 u8 (*gSwingPhaseFns[7])(int nPlayer) = {
-    Swing_WaitForBackswing, Swing_UpdateBackswing, SW_vStateBackSwingFigit, SW_vStateDownSwing,
-    Swing_PhaseIdle4,       Swing_UpdateAfterImpact, Swing_PhaseIdle6,
+    SW_vStateIdleSwing, SW_vStateBackSwing, SW_vStateBackSwingFigit, SW_vStateDownSwing,
+    SW_vStateThroughSwing,       SW_vStatePostSwing, SW_vStateCancelSwing,
 };
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
@@ -211,9 +211,11 @@ static f32 Swing_StrippedFn(f32 x) {
 
 // Free what SW_vInitModule set up: the two trail meshes and the three buffers per view.
 
-// Set the swing module up: player 1's ratings and the fixed tuning into gpSwing, the two trail
-// meshes, each player's trail textures (SW_vUIInit), cleared boosts and trail colour, and three
-// buffers per view.
+// Set the swing module up when the in-game code starts (GO_vInitIG): player 1's base ratings (as
+// floats) and the fixed tuning values into gpSwing, the two club-trail meshes (one per view), the
+// trail textures (SW_vUIInit, called per player though gpSwing keeps one set), each player's boosts
+// cleared and trail colour reset (grey, alpha 0), and per view the trail's three vertex buffers
+// (positions, colours, texture coordinates).
 void SW_vInitModule(void) {
     s32 desc[2];
     int i;
@@ -262,7 +264,9 @@ void SW_vInitModule(void) {
     }
 }
 
-void fn_80058DB4(void) {
+// Close the swing module (the in-game shutdown in gomainloop): free what SW_vInitModule made, the
+// two trail meshes and the three trail buffers per view.
+void SW_vCloseModule(void) {
     int i;
     SD_FreeShaderObject(gpSwing->mesh[0]);
     SD_FreeShaderObject(gpSwing->mesh[1]);
@@ -273,27 +277,34 @@ void fn_80058DB4(void) {
     }
 }
 
-// Clear every player's bDrawBoostUI.
-void fn_80058E40(void) {
+// At the end of each hole: hide every player's boost display (SW_vSetDisplayBoostUI(i, 0)).
+void SW_vDeInitForHole(void) {
     int i;
     for (i = 0; i < gSession.nNumPlayers; i++) {
-        fn_8005A788(i, 0);
+        SW_vSetDisplayBoostUI(i, 0);
     }
 }
 
-f32 Swing_TopTime(SwingData* pSw) {
+// The animation time a stick pulled fully back maps to: the swing animation's top-of-backswing mark
+// less 0.0076, so a full pull stops just short of the top. Used by the backswing and the hold at
+// the top.
+f32 SW_vGetControllerTopOfSwing(SwingData* pSw) {
     return pSw->fTimeSwingTop - 0.0076f;
 }
 
-// The start mark, a hair late.
-f32 Swing_StartTime(SwingData* pSw) {
+// The animation time a stick at rest maps to: the swing animation's start-of-backswing mark plus
+// 0.0076, just after the start.
+f32 SW_vGetControllerStartOfSwing(SwingData* pSw) {
     return 0.0076f + pSw->fTimeSwingStart;
 }
 
 u8 lbl_80281194[8] = {0x80, 0x80, 0x80, 0x80};    // a neutral pad: both sticks centred (0x80)
 
-// A controller's pad state; the neutral pad when there is none or fn_80100C00() is true.
-u8* Pad_State(int nPlayer, int nController) {
+// The sticks of pad nController as bytes 0..255 (Input_sGetStickInfo: [0] and [1] the C stick's x
+// and y, [2] and [3] the main stick's; y grows as the stick is pulled back), or a neutral pad (both
+// sticks centred at 128) when there is none or fn_80100C00() says so (it always returns 0 in this
+// build). nPlayer is unused.
+u8* SW_vGetStickInfo(int nPlayer, int nController) {
     u8* pPad = Input_sGetStickInfo(nController);
     if (pPad == NULL || fn_80100C00()) {
         return lbl_80281194;
@@ -301,27 +312,36 @@ u8* Pad_State(int nPlayer, int nController) {
     return pPad;
 }
 
-// The swing stick's X: the C-stick (pad byte 2) when the player swings with it, else the main stick.
-int Swing_StickX(int nPlayer, u8* pPad) {
+// The swing stick's x (0..255, 128 centre): the main stick (pad byte 2) when the swing was started
+// with it (nStickUsed), else the C stick (byte 0).
+int SW_vGetStickX(int nPlayer, u8* pPad) {
     if (gPlayers[nPlayer].swing.nStickUsed != 0) {
         return pPad[2];
     }
     return pPad[0];
 }
 
-int Swing_StickY(int nPlayer, u8* pPad) {
+// The swing stick's y (0..255, 128 centre, larger is pulled further back): the main stick (pad byte
+// 3) when the swing was started with it (nStickUsed), else the C stick (byte 1).
+int SW_vGetStickY(int nPlayer, u8* pPad) {
     if (gPlayers[nPlayer].swing.nStickUsed != 0) {
         return pPad[3];
     }
     return pPad[1];
 }
 
-// Run the swing's current phase; true once the ball is struck.
-u8 fn_80058F5C(int nPlayer) {
+// Each frame of the swing (STATEFUNC_SwingUpdate, STATEFUNC_SimulateUpdate, GameMode8): run the
+// player's current swing state, gSwingPhaseFns[nState] (0 idle, 1 backswing, 2 hold at the top, 3
+// downswing, 4 through-swing, 5 post-swing, 6 cancelled). True on the frame the ball is struck.
+u8 SW_vUpdateSwing(int nPlayer) {
     return gSwingPhaseFns[gPlayers[nPlayer].swing.nState](nPlayer);
 }
 
-// Reset a player's swing: phase 0, sticks and spin stick centred, animation 5, no rumble.
+// Reset a player's swing to state 0 (waiting for the backswing): the sticks' rest positions centred
+// (128), character animation 5 asked for, rumble stopped, boosts cleared, the spin stick centred,
+// the turn angles and the club twist smoothing (f10, f14) zeroed, and the boost display reset.
+// Called as the golfer steps up (STATEFUNC_SwingInit, STATEFUNC_ShotSetupInit) and by the lessons
+// mode.
 void SW_vInitSwing(int nPlayer) {
     gPlayers[nPlayer].swing.nState = 0;
     gPlayers[nPlayer].swing.nRestCX = gPlayers[nPlayer].swing.nRestCY = 0x80;
@@ -338,6 +358,11 @@ void SW_vInitSwing(int nPlayer) {
     fn_800AE3C4(nPlayer);
 }
 
+// Start the backswing: state 1, character animation 6 (the backswing) asked for and the animation
+// state updated, the club twist smoothing zeroed, the animation's three marks read (start of
+// backswing, top, ball hit: fTimeSwingStart, fTimeSwingTop, fTimeBallHit), the 25-sample stick
+// history filled with the centre sample (nCalibrateX/Y), spin cleared (bSpun, bSpinning), boosts
+// cleared, the spin stick centred and the turn angles zeroed.
 void SW_vStateInitBackSwing(int nPlayer) {
     Player*    p      = &gPlayers[nPlayer];
     Character* pChar  = p->pChar;
@@ -367,11 +392,14 @@ void SW_vStateInitBackSwing(int nPlayer) {
     pSw->fCurrentTurnAngle        = 0.0f;
 }
 
-// Waiting for the backswing. A CPU (or game mode 10) starts at once. A human starts the frame
-// either stick is pulled past 160 of 255 - more than a quarter of its travel - and that stick's
-// rest position becomes the centre sample; the C-stick can swing too (nStickUsed). While
-// nothing is pulled the rest positions are held at 128.
-u8 Swing_WaitForBackswing(int nPlayer) {
+// Swing state 0, waiting for the backswing; always returns false. A CPU, or any player in the
+// replay mode (10), starts at once: state 1, SW_vStateInitBackSwing, character flag 1 cleared, the
+// trail emptied. A human starts on the frame either stick's y is pulled back past 160 (of 0..255,
+// centre 128): the stick used is kept in nStickUsed (the main stick when both are pulled), its rest
+// position becomes the centre sample (nCalibrateX/Y), event 0x2C fires, the backswing starts, the
+// trail is emptied and replay recording starts. While neither is pulled every rest position is held
+// at 128.
+u8 SW_vStateIdleSwing(int nPlayer) {
     Player* p          = &gPlayers[nPlayer];
     int     nController = p->nController;
     Character* pChar   = p->pChar;
@@ -385,7 +413,7 @@ u8 Swing_WaitForBackswing(int nPlayer) {
         SW_vUIBlurReset(nPlayer);
         return 0;
     }
-    pPad    = Pad_State(nPlayer, nController);
+    pPad    = SW_vGetStickInfo(nPlayer, nController);
     bMain   = pPad[1] <= 0xFF && pPad[1] > 0xA0;
     bCStick = pPad[3] <= 0xFF && pPad[3] > 0xA0;
     if (bMain || bCStick) {
@@ -419,15 +447,20 @@ static inline int Swing_DeadZone(int v) {
     return 128;
 }
 
-// Phase 1, the backswing. A CPU (or game mode 10) plays the backswing animation to 98% of the way
-// to the top (65% when fn_80100AF8()) and then swings down. A human's backswing follows the stick:
-// the further back it is pulled (dead-zoned magnitude, capped at 100), the further along the
-// backswing the animation is asked to be; the animation chases that at a rate that grows with
-// the gap. While the stick is still back, every frame's sample goes into the 25-sample ring
-// and is provisionally the top. The moment the stick comes forward of 96 (once the backswing
-// is at least 0.1 along) the top is the furthest-back sample in the ring, the downswing
-// animation starts, and it is phase 3 with the impact sample seeded from this frame.
-u8 Swing_UpdateBackswing(int nPlayer) {
+// Swing state 1, the backswing; always returns false. A CPU (or the replay mode, 10) lets the
+// backswing animation run until it is 98% of the way from the start mark to the top (65% in lesson
+// 5 of the lessons mode) and then starts the downswing. A human's stick drives it: the stick's
+// distance from centre, dead-zoned (Swing_DeadZone) and capped at 100, says how far along the
+// backswing the animation should be, and the animation chases that at a rate that grows with the
+// gap (for shot kinds 1-3 scaled by the backswing's length over gSwingRange[kind]), playing
+// backwards when it must back down (character flag 0x40, which also starts the boost's 1/12 s die
+// timer). Within 0.05 of the target it settles into the hold at the top (state 2). Each frame the
+// stick is back, its sample goes into the 25-sample ring and is the top for now, and the power
+// (SW_vSetSwingStrength) and the boost input (SW_vCheckForSwingBoost) are updated. Once the stick
+// comes forward to 96 or less (and the backswing is at least 0.1 along), the top is the ring's
+// furthest-back sample, the downswing animation (7) starts, event 0x2F fires, and it is state 3
+// with the impact sample seeded from this frame.
+u8 SW_vStateBackSwing(int nPlayer) {
     Player*    p;
     Character*   pObj;
     SwingData* pSw;
@@ -475,11 +508,11 @@ u8 Swing_UpdateBackswing(int nPlayer) {
         }
         return 0;
     }
-    pPad   = Pad_State(nPlayer, nController);
-    nX     = Swing_StickX(nPlayer, pPad);
-    nY     = Swing_StickY(nPlayer, pPad);
-    fTop   = Swing_TopTime(pSw);
-    fStart = Swing_StartTime(pSw);
+    pPad   = SW_vGetStickInfo(nPlayer, nController);
+    nX     = SW_vGetStickX(nPlayer, pPad);
+    nY     = SW_vGetStickY(nPlayer, pPad);
+    fTop   = SW_vGetControllerTopOfSwing(pSw);
+    fStart = SW_vGetControllerStartOfSwing(pSw);
     if ((nY <= 255 && nY > 96) || (Char_GetBackswing(pObj) < 0.1f && nY < 96)) {
         if (nY < 96) {
             fMag = 0.0f;
@@ -567,8 +600,9 @@ u8 Swing_UpdateBackswing(int nPlayer) {
 
 // ---- the backswing --------------------------------------------------------------------------------
 
-// Enter the hold at the top: the animation goes to the pause time and slows to rate 0.008 (flag
-// 0x40), and the hold timers are cleared.
+// Enter the hold at the top of the backswing (state 2): the animation is set to the time it settled
+// at (fFidgetPauseTime, the waggle's first target) and runs backwards (character flag 0x40) at rate
+// 0.008; the hold timers are cleared.
 void SW_vStateInitBackSwingFigit(int nPlayer) {
     Player*    p    = &gPlayers[nPlayer];
     Character* pObj = p->pChar;
@@ -584,10 +618,13 @@ void SW_vStateInitBackSwingFigit(int nPlayer) {
 
 // ---- at the top, and the downswing ----------------------------------------------------------------
 
-// Phase 2, holding at the top. Any change in the stick's y drops back to phase 1 (backing down if it
-// came forward). While it is steady the animation waggles +-0.0076 around the top. If the
-// stick sits near centre (y at or below 160, x within 64..192) for over 0.1 s the swing is
-// abandoned: phase 0, the address animation, event 9.
+// Swing state 2, the hold at the top of the backswing; always returns false. Any change in the
+// stick's y sends it back to state 1 (the animation running backwards if the stick came forward)
+// and starts the boost's 1/12 s die timer. While the stick is steady the animation waggles 0.0076
+// either side of the pause time, kept between the start and top marks. When the stick is held near
+// centre (y at most 160, x within 64..192) for over 0.1 s the swing is abandoned: state 0,
+// animation 5, normal speed, event 9. The power (SW_vSetSwingStrength) is updated every frame, so a
+// long hold costs power.
 u8 SW_vStateBackSwingFigit(int nPlayer) {
     Player*    p;
     Character*   pObj;
@@ -604,11 +641,11 @@ u8 SW_vStateBackSwingFigit(int nPlayer) {
     if (pObj->pModel->pSkel != NULL) {
         pObj->pModel->pSkel->n10E4 = 4;
     }
-    pPad   = Pad_State(nPlayer, nController);
-    nX     = Swing_StickX(nPlayer, pPad);
-    nY     = Swing_StickY(nPlayer, pPad);
-    fTop   = Swing_TopTime(pSw);
-    fStart = Swing_StartTime(pSw);
+    pPad   = SW_vGetStickInfo(nPlayer, nController);
+    nX     = SW_vGetStickX(nPlayer, pPad);
+    nY     = SW_vGetStickY(nPlayer, pPad);
+    fTop   = SW_vGetControllerTopOfSwing(pSw);
+    fStart = SW_vGetControllerStartOfSwing(pSw);
     fAnimTime = pObj->fAnimTime;
     pSw->fFidgetTimeElapsed += gSession.fFrameTime;
     if (pSw->nFidgetPauseStickY != nY) {
@@ -638,10 +675,12 @@ u8 SW_vStateBackSwingFigit(int nPlayer) {
     return 0;
 }
 
-// Phase 3, the downswing. For a human, every frame the stick is forward of 96 and more than ~17
-// units from the centre sample, that reading becomes the impact sample - so what counts is where
-// the stick was pointing on the way through, not when. The ball goes when the animation reports
-// impact (n5CC < 0): phase 5, SW_vImpact, the mis-hit rumble, event 0x2B on a putt.
+// Swing state 3, the downswing; returns true on the frame the ball is struck. For a human (outside
+// the replay mode), each frame the stick is forward (y at most 96) and more than about 17 units
+// (squared distance over 300) from the centre sample, that reading becomes the follow-through and
+// mis-hit sample, so what counts is the last such reading before impact. When the animation reports
+// impact (n5CC < 0): IK relaxed, state 5, SW_vImpact, spin allowed for a human outside a replay,
+// the mis-hit rumble on a pad outside a replay, and event 0x2B on a putt.
 u8 SW_vStateDownSwing(int nPlayer) {
     Player*    p;
     int        nController;
@@ -660,9 +699,9 @@ u8 SW_vStateDownSwing(int nPlayer) {
     if (!Controller_IsCPU(nController) && Game_GetMode() != 10) {
         int nDX, nDY;
         f32 fDist2;
-        pPad   = Pad_State(nPlayer, nController);
-        nX     = Swing_StickX(nPlayer, pPad);
-        nY     = Swing_StickY(nPlayer, pPad);
+        pPad   = SW_vGetStickInfo(nPlayer, nController);
+        nX     = SW_vGetStickX(nPlayer, pPad);
+        nY     = SW_vGetStickY(nPlayer, pPad);
         nDX    = nX - pSw->nCalibrateX;
         nDY    = nY - pSw->nCalibrateY;
         fDist2 = nDX * nDX + nDY * nDY;
@@ -691,7 +730,8 @@ u8 SW_vStateDownSwing(int nPlayer) {
     return 0;
 }
 
-// Stop the pad rumble.
+// Stop a player's rumble: the buzz and wave motors off, bVibrating and the countdown cleared.
+// Nothing for a player without a pad (controllers 0..7).
 void SW_KillVibration(int nPlayer) {
     if (fn_8002E868_HasPad(nPlayer)) {
         // fake match: an empty test (a compiled-away assert?) makes the frontend share the
@@ -721,31 +761,39 @@ void SW_UpdateVibration(int nPlayer) {
 
 // ---- after impact ---------------------------------------------------------------------------------
 
-u8 Swing_PhaseIdle4(int nPlayer) {
+// Swing state 4, the through-swing: does nothing and returns false. Nothing in this build sets
+// state 4 (the downswing goes straight to 5).
+u8 SW_vStateThroughSwing(int nPlayer) {
     return 0;
 }
 
-// Phase 5, the ball is away: the rumble counts down and spin can be added.
-u8 Swing_UpdateAfterImpact(int nPlayer) {
+// Swing state 5, after the ball is struck; always returns false. For a human outside a replay: the
+// sticks are read (the values unused), the mis-hit rumble counts down (SW_UpdateVibration) and spin
+// can be put on the ball (Swing_SpinInput, Swing_ApplySpin).
+u8 SW_vStatePostSwing(int nPlayer) {
     int nController = gPlayers[nPlayer].nController;
     u8* pPad;
     if (Player_IsCPU(nPlayer) || gSession.bReplay != 0) {
         return 0;
     }
-    pPad = Pad_State(nPlayer, nController);
-    Swing_StickX(nPlayer, pPad);
-    Swing_StickY(nPlayer, pPad);
+    pPad = SW_vGetStickInfo(nPlayer, nController);
+    SW_vGetStickX(nPlayer, pPad);
+    SW_vGetStickY(nPlayer, pPad);
     SW_UpdateVibration(nPlayer);
     Swing_SpinInput(nPlayer);
     Swing_ApplySpin(nPlayer);
     return 0;
 }
 
-u8 Swing_PhaseIdle6(int nPlayer) {
+// Swing state 6, a cancelled swing: does nothing and returns false. Nothing in this build sets
+// state 6.
+u8 SW_vStateCancelSwing(int nPlayer) {
     return 0;
 }
 
-// Find the swing's textures by name (all three are in one bank).
+// Look up the club trail's textures by name hash, "clubback" (the backswing's), "clubdown" (the
+// downswing's) and "tball", into gpSwing (all three in one bank, gpSwing->pBank). nPlayer is
+// unused: gpSwing holds one set for everyone.
 void SW_vUIInit(int nPlayer) {
     u64 uHash;
     uHash = fn_8000BEE4("clubback");
@@ -756,15 +804,17 @@ void SW_vUIInit(int nPlayer) {
     fn_800102DC(uHash, &gpSwing->pBank, &gpSwing->pTBall);
 }
 
+// Empty a player's club trail history (nNumInBlurQueue = 0).
 void SW_vUIBlurReset(int nPlayer) {
     gPlayers[nPlayer].swing.nNumInBlurQueue = 0;
 }
 
-// Record the club for its trail: the head (bone 0x53) and grip (0x52) go on the front of the
-// 25-entry history. When the head has moved more than 0.3 since the last entry, five in-between
-// entries are added instead, each blended from the last entry to now with the shaft re-extended
-// to the club's current length.
-void fn_8005A0FC(int nPlayer) {
+// Each frame (gomainloop), record the club for its trail: the club head (bone 0x53) and grip (bone
+// 0x52) positions go on the front of the 25-entry history (prevClub), dropping the oldest. When the
+// head has moved more than 0.3 since the last entry (and the history is not empty), five in-between
+// entries are added instead, each blended from the last entry to now with the shaft re-extended to
+// the club's current length, so a fast swing still draws a smooth arc.
+void SW_vUIUpdateBlurBuffer(int nPlayer) {
     f32        vB8[4];
     f32        vA8[4];
     f32        v98[4];
@@ -837,12 +887,14 @@ void fn_8005A0FC(int nPlayer) {
     }
 }
 
-// Each frame of the backswing (animation 6) and downswing (7): the club trail's colour and alpha
-// (blue with the stick left of centre, yellow right, on the backswing; gpSwing's colours fading
-// after the ball-hit mark on the downswing) and the club twist (SW_vUIAdjustClub). A human's stick
-// is read; a CPU only does this in mode 11 (when fn_8005CC5C() is 8 or 9), with the stick hard to
-// one side.
-void fn_8005A478(int nPlayer) {
+// Each frame (gomainloop), during the backswing (animation 6) and downswing (7), set the club
+// trail's colour and alpha and twist the club with the stick (SW_vUIAdjustClub). On the backswing
+// the trail is blue with the stick left of centre and yellow right of it, more opaque the further
+// out; on the downswing it takes gpSwing's colours and fades to nothing over 1.0 of animation time
+// after the ball-hit mark, and the twist uses the stick x recorded at the top. Not for putts (shot
+// kind 0), nor when n1698 is set or the clip result is 2. A CPU only does this in lessons 8 and 9
+// of the lessons mode (11), with the stick hard left (8) or right (9).
+void SW_vUIUpdateIK(int nPlayer) {
     Character*   pObj  = gPlayers[nPlayer].pChar;
     int        nBone = CharModel_GetBoneIndex(pObj->pModel, 0x53);
     SwingData* pSw;
@@ -875,9 +927,9 @@ void fn_8005A478(int nPlayer) {
                 nStickX = 0xFF;
             }
         } else {
-            pPad    = Pad_State(nPlayer, gPlayers[nPlayer].nController);
-            nStickX = Swing_StickX(nPlayer, pPad);
-            Swing_StickY(nPlayer, pPad);
+            pPad    = SW_vGetStickInfo(nPlayer, gPlayers[nPlayer].nController);
+            nStickX = SW_vGetStickX(nPlayer, pPad);
+            SW_vGetStickY(nPlayer, pPad);
         }
         LLMath_CopyVec(pObj->pModel->pMatrices[nBone][3], vPos);
         if (pObj->nAnim == 6) {
@@ -911,11 +963,16 @@ void fn_8005A478(int nPlayer) {
     }
 }
 
-void fn_8005A788(int nPlayer, int a) {
+// Show (nonzero) or hide (0) a player's boost display (bDrawBoostUI), which SW_vUIRender2D draws.
+void SW_vSetDisplayBoostUI(int nPlayer, int a) {
     gPlayers[nPlayer].swing.bDrawBoostUI = a;
 }
 
-void fn_8005A7A0(int nPlayer) {
+// Each frame (gomainloop), draw the player's boost display (UI_Obj_RenderBoostUI in the player's
+// first view) while it has a power or spin boost, on any shot but a putt, when the display is
+// switched on (SW_vSetDisplayBoostUI), outside a replay, unpaused, and not while the golf camera's
+// fn_800C6CB0() flag is set.
+void SW_vUIRender2D(int nPlayer) {
     if ((gPlayers[nPlayer].swing.nPowerBoost > 0 || gPlayers[nPlayer].swing.nSpinBoost > 0) &&
         gPlayers[nPlayer].nShotKind != 0 && gPlayers[nPlayer].swing.bDrawBoostUI != 0 &&
         gSession.bReplay == 0 &&
@@ -924,10 +981,13 @@ void fn_8005A7A0(int nPlayer) {
     }
 }
 
-// Draw the club's trail (session option a24[7]): a ribbon from the grip through the recorded
-// club-head positions, coloured by the trail colour and fading along its length,
-// textured "clubback" on the backswing and "clubdown" on the downswing.
-void fn_8005A850(int nPlayer) {
+// Each frame (gomainloop), draw the club's trail when the trail option is on (session option
+// a24[7]): during the backswing (animation 6, texture "clubback") or downswing (7, "clubdown"),
+// with at least two recorded positions and the clip result not 2, a ribbon from the grip through
+// the recorded club-head positions (SW_vUIUpdateBlurBuffer) in the trail colour, fading along its
+// length, blended and without depth writes. A CPU's trail is drawn only in lessons 8 and 9 of the
+// lessons mode (11).
+void SW_vUIRender3D(int nPlayer) {
     s16           idx[26];
     TrailMeshDesc mesh;
     f32           vGrip[4];
@@ -1066,10 +1126,14 @@ void SW_vUIAdjustClub(Character* pObj, SwingData* pSw, int nStickX) {
 
 // ---- the hit -----------------------------------------------------------------------------------
 
-// The ball is struck. In game mode 10 the recorded seed and player 0's recorded swing data are
-// restored; otherwise a live shot runs Luck_TakePerfectShot and REPLAY_Save, a replay REPLAY_Play.
-// Then the miss (zero for a CPU or a perfect shot), the power, forgiveness, the launch blocks, and
-// the aim - the player's aim plus the face vector's angle plus the miss - go to Physics_ShotImpact.
+// The ball is struck (from the downswing, a replayed swing, a tap-in or the green-watch roll). In
+// the replay mode (10) the recorded random seed and the first player's recorded swing data are
+// restored; otherwise a live shot runs Luck_TakePerfectShot and REPLAY_Save, a replayed one
+// REPLAY_Play. Then the face vector (the first launch block), the mis-hit angle (zero for a CPU or
+// a perfect shot), the power (SW_vCalculateShotPower) and forgiveness; a putt from under 2.0
+// (fDistance) goes dead straight. The second launch block follows, and the aim (the player's aim
+// plus the face vector's angle plus the mis-hit angle, wrapped to -pi..pi) goes with the club, shot
+// kind, power and trajectory to Physics_ShotImpact.
 void SW_vImpact(int nPlayer) {
     Player* p;
     Ball*   pBall;
@@ -1131,9 +1195,10 @@ void SW_vImpact(int nPlayer) {
 
 // ---- the power meter -----------------------------------------------------------------------------
 
-// Every frame of the backswing: power is the square root of how far along the backswing is
-// (a CPU takes it straight), snapping to 1 within 3% of the top. Holding at the top of a full
-// backswing on anything but a putt costs (hold - 0.05)^2, at most 0.3.
+// Each frame of the backswing and of the hold at the top: the player's power (fPower, 0..1) is the
+// square root of how far along the backswing the animation is (a CPU takes it straight), snapping
+// to 1 within 0.03 of the top. Holding at the top of a full backswing for over 0.05 s costs (hold -
+// 0.05)^2, at most 0.3, except on a putt.
 void SW_vSetSwingStrength(int nPlayer) {
     f32  fPower = gPlayers[nPlayer].pChar->fBackswing;
     f32  fPenalty;
@@ -1159,10 +1224,16 @@ void SW_vSetSwingStrength(int nPlayer) {
     }
 }
 
-// The final power for the shot. A CPU just scales what it planned (putts +5%). A human's full
-// shot gets the boost, then loses distance to the swing error: a scaled part of it under the
-// threshold, all of it above. Putts, chips and pitches skip the error; a putt over 75% on the
-// meter counts as full power.
+// The shot's final power, for SW_vImpact. A CPU or a perfect shot takes its planned power times
+// AI_PowerScale (a putt that is not a tap-in gets 5% more, at least 0.1). For a human,
+// fNonPowerShotPower is set to the boosted power less the mis-hit angle's size; then by shot kind:
+// a putt (a meter over gpSwing->fPuttFullPower counts as full) is scaled by the putt table for its
+// distance, a chip (scaled by Physics_EstimateShotPower) or a pitch gets the boost, each at least
+// 0.1. Any other shot takes the boost (all but kinds 5-7 also AI_PowerScale and the tee sweet spot)
+// and then loses power to the mis-hit angle: a scaled part of it below a threshold, all of it above
+// (both from gForgivenessTable by the recovery rating for kinds 5-7 or a ball in the rough, lies
+// 3-4, or sand, 6-8; else by driving accuracy). The result is kept within 0.05..1.5, except on a
+// tap-in.
 f32 SW_vCalculateShotPower(int nPlayer) {
     f32     fPower, fError;
     f32*    pPower;
@@ -1458,8 +1529,8 @@ void SW_vCheckForSwingBoost(int nPlayer) {
     if (Player_IsCPU(nPlayer)) return;
     if (gSession.options.bBoostEnabled == 0) return;
     uButtons    = Input_ReadControlPad(gPlayers[nPlayer].nController);
-    nY   = Swing_StickY(nPlayer, Pad_State(nPlayer, gPlayers[nPlayer].nController));
-    nX   = Swing_StickX(nPlayer, Pad_State(nPlayer, gPlayers[nPlayer].nController));
+    nY   = SW_vGetStickY(nPlayer, SW_vGetStickInfo(nPlayer, gPlayers[nPlayer].nController));
+    nX   = SW_vGetStickX(nPlayer, SW_vGetStickInfo(nPlayer, gPlayers[nPlayer].nController));
     fMag = (f32)Math_Sqrt((nX - 128) * (nX - 128) + (nY - 128) * (nY - 128));
     if ((uButtons & Controller_GetButtonMask(0x1F, 0)) && fMag > 93.0f) {
         if (gPlayers[nPlayer].swing.nPowerBoost < 8) {
@@ -1478,12 +1549,12 @@ void SW_vCheckForSwingBoost(int nPlayer) {
     }
 }
 
-// No power boost, no spin boost, no back-down timer; the boost display flag back on (fn_8005A788).
+// No power boost, no spin boost, no back-down timer; the boost display flag back on (SW_vSetDisplayBoostUI).
 void SW_vClearBoosts(int nPlayer) {
     gPlayers[nPlayer].swing.nPowerBoost = 0;
     gPlayers[nPlayer].swing.nSpinBoost = 0;
     gPlayers[nPlayer].swing.fPowerBoostDieTime   = 0.0f;
-    fn_8005A788(nPlayer, 1);
+    SW_vSetDisplayBoostUI(nPlayer, 1);
     fn_800AE3C4(nPlayer);
 }
 
@@ -1544,8 +1615,8 @@ void Swing_SpinInput(int nPlayer) {
     if (!(uButtons & Controller_GetButtonMask(0x20, 0))) return;
     if (gPlayers[nPlayer].swing.bCanSpin == 0) return;
     EVENT_Trigger(nPlayer, 0x2E, 0, 0);
-    nX = Swing_StickX(nPlayer, Pad_State(nPlayer, gPlayers[nPlayer].nController));
-    nY = Swing_StickY(nPlayer, Pad_State(nPlayer, gPlayers[nPlayer].nController));
+    nX = SW_vGetStickX(nPlayer, SW_vGetStickInfo(nPlayer, gPlayers[nPlayer].nController));
+    nY = SW_vGetStickY(nPlayer, SW_vGetStickInfo(nPlayer, gPlayers[nPlayer].nController));
     if (gPlayers[nPlayer].swing.nSpinBoost == 0) {
         gPlayers[nPlayer].swing.nSpinCtrlX = 128;
         gPlayers[nPlayer].swing.nSpinCtrlY = 255;

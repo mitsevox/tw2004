@@ -134,11 +134,11 @@ void fn_800563C4(void);
 void fn_80056454(void);
 void GOLFERSTATE_OpenONCE(void);
 void SW_vInitModule(void);
-void fn_80058DB4(void);
-void fn_8005A0FC(int nPlayer);
-void fn_8005A478(int nPlayer);
-void fn_8005A7A0(int nPlayer);
-void fn_8005A850(int nPlayer);
+void SW_vCloseModule(void);
+void SW_vUIUpdateBlurBuffer(int nPlayer);
+void SW_vUIUpdateIK(int nPlayer);
+void SW_vUIRender2D(int nPlayer);
+void SW_vUIRender3D(int nPlayer);
 void GOLFERSTATE_CloseONCE(void);
 void fn_8005D2E4(void);
 void fn_8005D2F8(void);
@@ -718,7 +718,7 @@ void fn_8006CDC4(void) {
     fn_8006DD84();
     fn_800B2734();
     REPLAY_CloseModule();
-    fn_80058DB4();
+    SW_vCloseModule();
     fn_80090664();
     Character_CloseIG();
     fn_8001058C();
@@ -900,7 +900,7 @@ void fn_8006D27C(void) {
         }
         SkeletalObject_ClipTestAll();
         if (nView < 2) {
-            fn_8005A478(ViewController_GetActivePlayerNumber(nView));
+            SW_vUIUpdateIK(ViewController_GetActivePlayerNumber(nView));
         }
         fn_8006DEA8();
         Character_PreRenderAll();
@@ -935,8 +935,8 @@ void fn_8006D27C(void) {
         fn_800A2C08(nView);
         fn_8006DEA8();
         if (nView < 2) {
-            fn_8005A0FC(ViewController_GetActivePlayerNumber(nView));
-            fn_8005A850(ViewController_GetActivePlayerNumber(nView));
+            SW_vUIUpdateBlurBuffer(ViewController_GetActivePlayerNumber(nView));
+            SW_vUIRender3D(ViewController_GetActivePlayerNumber(nView));
         }
         if (!fn_8006D1C0(nView) || nState == GS_GREEN_MORPH) {
             gPlayers[ViewController_GetActivePlayerNumber(nView)].pChar->u10 &= ~1;
@@ -966,7 +966,7 @@ void fn_8006D27C(void) {
         }
         fn_8006DEA8();
         if (nView < 2) {
-            fn_8005A7A0(ViewController_GetActivePlayerNumber(nView));
+            SW_vUIRender2D(ViewController_GetActivePlayerNumber(nView));
         }
         fn_8006DE28();
     }

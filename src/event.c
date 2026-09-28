@@ -16,7 +16,7 @@ void Character_InitNewClubAndShotType(int nPlayer);
 void fn_80033704(u16 nPatch, u16 nObject);
 void fn_8003349C(f32 fPercentage, f32 fDuration, f32 fDelay);
 void fn_80051C84(Ball* pBall, f32 fX, f32 fY);
-void fn_8005A788(int nPlayer, int a);
+void SW_vSetDisplayBoostUI(int nPlayer, int a);
 void fn_8005C15C(int nPlayer, f32* pSpinY, f32* pSpinX);
 void fn_8005C298(int nPlayer);
 void fn_800690C0(int nPlayer);
@@ -361,7 +361,7 @@ void fn_800667C0(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1) {
         fn_80063CF0(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 31, nPlayer);
         fn_8005C298(nPlayer);
-        fn_8005A788(nPlayer, 0);
+        SW_vSetDisplayBoostUI(nPlayer, 0);
     }
 }
 

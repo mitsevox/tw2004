@@ -308,7 +308,7 @@ u8 SKAUtil_ExpandSingleFrameToDest(Clip* pClip, int nFrame, f32* pPose2, f32* pP
 }
 
 // Samples pClip's BlendClip at fTime (held to its key range) into pOut's six values, blending the
-// two keys around it. Returns 1, or 0 when the clip has none. Swing_UpdateBackswing samples the
+// two keys around it. Returns 1, or 0 when the clip has none. SW_vStateBackSwing samples the
 // backswing clip's at the top of the swing into Character.v1638.
 int SKA_SampleBlendClip(Clip* pClip, f32* pOut, f32 fTime) {
     BlendClip* pBlend = pClip->pD8;

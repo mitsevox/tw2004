@@ -176,7 +176,7 @@ typedef struct SwingData {
     struct { f32 vClubPos[4]; f32 vHandPos[4]; } prevClub[25];  // 0x050  (0x424) the club's last 25 positions, newest first (the trail)
     s32  nNumInBlurQueue;       // 0x370  (0x744) trail points in use, up to 25
     u8   bUIInit;               // 0x374  unused here
-    u8   bDrawBoostUI;          // 0x375  (0x749) set by fn_8005A788
+    u8   bDrawBoostUI;          // 0x375  (0x749) set by SW_vSetDisplayBoostUI
     u8   unk376[2];
     s32  nCalibrateX;           // 0x378  (0x74C) stick at the start of the swing
     s32  nCalibrateY;           // 0x37C  (0x750)

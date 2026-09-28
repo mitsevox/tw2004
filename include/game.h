@@ -80,7 +80,7 @@ typedef struct ModeStateDef {
 extern ModeStateDef  lbl_801883C0[2];   // stateFunc.c
 void GOLFERSTATE_Update(void);          // StateGolfer.c
 
-u8   fn_80058F5C(int nPlayer);          // the per-frame swing poll: the ball was struck
+u8   SW_vUpdateSwing(int nPlayer);          // the per-frame swing poll: the ball was struck
 void SW_vInitSwing(int nPlayer);          // reset the player's swing
 f32  SW_vGetShotPower(int nPlayer);          // the swing's shot power
 void GOLFERSTATE_Push(int nState, int nPlayer);     // push a state and run its enter callback

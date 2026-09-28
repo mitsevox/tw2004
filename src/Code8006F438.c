@@ -64,7 +64,7 @@ s32 fn_80010608(s32);
 s32 fn_8003467C();
 s32 fn_80046664();
 s32 fn_80048EF4();
-s32 fn_80058E40();
+s32 SW_vDeInitForHole();
 s32 StaticCam_Reset();
 s32 fn_8006FBF8();
 s32 fn_80098C28();
@@ -110,7 +110,7 @@ void fn_8006F568(void) {
 
     fn_8006FBF8();
     fn_800C830C();
-    fn_80058E40();
+    SW_vDeInitForHole();
     AnimStream_WaitForRead();
     if ((u8) *lbl_802811E8 != 0) {
         fn_8011E3B4();

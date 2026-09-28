@@ -927,13 +927,13 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   temporaries take the lower ones.** In GetHonors' sort all 5040 orders of 7 variables gave two
   outcomes: only the relative order of `nScore` and `nHigh` mattered.
 - **[verified] Declaration order picks the saved registers.** Register order for callee-saved
-  locals follows declaration order (first declared gets r31). Two loop counters in fn_8005A0FC
+  locals follows declaration order (first declared gets r31). Two loop counters in SW_vUIUpdateBlurBuffer
   came out swapped (r27/r28) until their declarations were swapped. Try this first on any diff
   that is only a register permutation. Parameters used as working pointers come after the
   locals; to make `pEnd` r31 and the destination r30, declare `pEnd` first and copy the
   parameters into locals declared after it. A `u8 v = (u8)value` local declared *before* the
   pointer local gets the `clrlwi` in place.
-- **[verified] Register numbering, declared-first-highest in some functions.** In fn_8005A850 the
+- **[verified] Register numbering, declared-first-highest in some functions.** In SW_vUIRender3D the
   earliest-declared local took r30 and later ones descended; one `s8` (instead of `u8`) on a
   colour byte fixed the last permutation. When the lowest-first order does not help, try the reverse.
 - **[verified] The declaration-order rule for callee-saved registers does not hold in
@@ -954,7 +954,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
 - **[verified] Stack locals go in reverse declaration order** (the last declared gets the lowest
   `r1` offset), so the order locals are declared in changes where they sit on the stack.
   Symptom: a function at ~99% where the only differences are stack offsets swapped between two
-  variables. Fix: swap the declarations. Twelve 16-byte vectors in fn_8005A0FC matched once
+  variables. Fix: swap the declarations. Twelve 16-byte vectors in SW_vUIUpdateBlurBuffer matched once
   declared highest-address first.
 - **[verified] Taking a parameter's address puts it on the stack at the parameter's slot**;
   copying it to a local first gives a different slot order (GUI_StartPostShotUI, fn_800E53F0).
@@ -1321,7 +1321,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   `switch (f()) { case 0: break; default: return; }` (fn_800E7828,
   GameModeBattle/BestBall/FourBall EndGame, a `Game_GetCourse() != 7` test), or
   `if (x == 0) { return -1; } else { return y; }` with an explicit `else` (fn_800ECA34).
-  `if (fn() != 8) { switch (fn()) { case 9: break; default: return; } }` matched fn_8005A850's
+  `if (fn() != 8) { switch (fn()) { case 9: break; default: return; } }` matched SW_vUIRender3D's
   gate exactly; `if`, `||`, `&&` and `goto` spellings all fold to a single `bne end`. A plain
   `if (x) return;` always collapses, and an `if (x == 0)` gives a single `bne`; an empty
   then-block is optimised away. The compare is `cmpwi` for a `u8` switch operand; the
@@ -1380,7 +1380,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   twice, matched as a one-line `static inline` (`Ball_SpinKeep`, `fn_800539F8`); a value scaled
   in place (`x = pBall->fSpinX; x *= k;`) matched where `pBall->fSpinX * k` did not.
 - **[observed] `mr r0, r3; ...; mr rN, r0` around a call's result** (the value passing through r0
-  before its home register) is the mark of an inlined helper's return value. Seen in fn_8005A478 with
+  before its home register) is the mark of an inlined helper's return value. Seen in SW_vUIUpdateIK with
   the unexplained `beq L; b L` pairs there; a bool or void inline helper did not reproduce them.
 - **[verified] A store whose value is forwarded, done twice, can be an inline `return a = b;`.**
   GameMode10 fn_800F1424 stores `gReplayData.nPinSet` into the session in a loop and once more at
