@@ -311,10 +311,10 @@ int fn_80007D74(Sphere* s, Camera* cam, int mode) {
         }
         return result;
     } else {
-        float top    =  Camera_GetLens(cam)->fB8 / 2.0f;
-        float bottom = -Camera_GetLens(cam)->fB8 / 2.0f;
-        float right  =  Camera_GetLens(cam)->fB4 / 2.0f;
-        float left   = -Camera_GetLens(cam)->fB4 / 2.0f;
+        float top    =  Camera_GetLens(cam)->fFlatHeight / 2.0f;
+        float bottom = -Camera_GetLens(cam)->fFlatHeight / 2.0f;
+        float right  =  Camera_GetLens(cam)->fFlatWidth / 2.0f;
+        float left   = -Camera_GetLens(cam)->fFlatWidth / 2.0f;
 
         if (s->z + s->radius > fn_80008368(cam)) return 2;
         if (s->z + s->radius < fn_80008360(cam)) return 2;

@@ -168,8 +168,8 @@ void CA_vInitCamera(CamLens* pLens) {
 }
 
 void fn_80076948(CamLens* pLens, f32 fB4, f32 fB8) {
-    pLens->fB4 = fB4;
-    pLens->fB8 = fB8;
+    pLens->fFlatWidth = fB4;
+    pLens->fFlatHeight = fB8;
 }
 
 // Sets the lens's camera-to-world matrix (pMtx, or the identity when NULL) and its inverse.

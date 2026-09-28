@@ -177,7 +177,7 @@ void RC_vUpdateRenderCtxScreenMatricesAndInfo(Camera* pCamera) {
         Mtx_Perspective(pCamera->m5C, pCamera->f228, 1.0f / fn_8001413C((u8*)pRect), f,
                     pCamera->unk1F4, pCamera->unk1F8);
     } else {
-        Mtx_OrthoScale(mFlat, pLens->fB4, pLens->fB8);
+        Mtx_OrthoScale(mFlat, pLens->fFlatWidth, pLens->fFlatHeight);
         f = pRect[2] * (1.0f / fn_80014134((u8*)pRect)) / pRect[3];
         Mtx_PerspectiveDepthOverNear(mProj, 1.0f / fn_8001413C((u8*)pRect), f, pCamera->unk1F4, pCamera->unk1F8);
         LLMath_mat44fltMultiplyList(mProj, mFlat, pCamera->m5C, 4);
