@@ -187,30 +187,30 @@ void GM_vIG_MCIsSaveCorrupt(MsgArg* pArgs, MsgArg* pResult);
 void GM_vIG_MCDeleteSave(MsgArg* pArgs, MsgArg* pResult);
 void GM_vSetUITimeFactor(MsgArg* pArgs, MsgArg* pResult);
 void IG_vPlayCheerAndComment(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089C84(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089CAC(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089CCC(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089D04(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089D28(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089D48(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089D68(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089D98(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089DA4(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089DB0(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089E5C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089E60(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089E64(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089E98(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089E9C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089ED0(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089F24(MsgArg* pArgs, MsgArg* pResult);
-void fn_80089F6C(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008A010(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008A0CC(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008A128(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008A184(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008A188(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008A1C8(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetPlayoff(MsgArg* pArgs, MsgArg* pResult);
+void IG_vPlayTextFall(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetPlayerCut(MsgArg* pArgs, MsgArg* pResult);
+void GM_vRewardDisplayStarting(MsgArg* pArgs, MsgArg* pResult);
+void IG_vMuteForScoreCard(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIG_MCGetSaveNeeds(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIG_OnlineSendChat(MsgArg* pArgs, MsgArg* pResult);
+void GM_vOnlineMode(MsgArg* pArgs, MsgArg* pResult);
+void IG_vReturnZero195(MsgArg* pArgs, MsgArg* pResult);
+void IG_vGetLongDriveStat(MsgArg* pArgs, MsgArg* pResult);
+void IG_vNoOp170(MsgArg* pArgs, MsgArg* pResult);
+void IG_vNoOp172(MsgArg* pArgs, MsgArg* pResult);
+void IG_vIsDemoSetup(MsgArg* pArgs, MsgArg* pResult);
+void IG_vNoOp175(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetNumberClubs(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetClubAvailable(MsgArg* pArgs, MsgArg* pResult);
+void GM_vAddRemoveClub(MsgArg* pArgs, MsgArg* pResult);
+void IG_vSwapDiscReloadHole(MsgArg* pArgs, MsgArg* pResult);
+void IG_vGetDiscDriveStatus(MsgArg* pArgs, MsgArg* pResult);
+void IG_vCloseMenuCheckDisc(MsgArg* pArgs, MsgArg* pResult);
+void IG_vResumeCheckDisc(MsgArg* pArgs, MsgArg* pResult);
+void IG_vNoOp183(MsgArg* pArgs, MsgArg* pResult);
+void IG_vGetChallengeName(MsgArg* pArgs, MsgArg* pResult);
+void IG_vGetChallengeDescription(MsgArg* pArgs, MsgArg* pResult);
 void fn_8008A208(MsgArg* pArgs, MsgArg* pResult);
 void fn_8008A20C(MsgArg* pArgs, MsgArg* pResult);
 void fn_8008A240(MsgArg* pArgs, MsgArg* pResult);
@@ -527,34 +527,34 @@ void IG_InitGameMessages(void) {
     gIGMessageHandlers[156] = GM_vIG_MCDeleteSave;
     gIGMessageHandlers[157] = GM_vSetUITimeFactor;
     gIGMessageHandlers[158] = IG_vPlayCheerAndComment;
-    gIGMessageHandlers[159] = fn_80089C84;
-    gIGMessageHandlers[160] = fn_80089CAC;
-    gIGMessageHandlers[161] = fn_80089CCC;
-    gIGMessageHandlers[162] = fn_80089D04;
-    gIGMessageHandlers[163] = fn_80089D28;
+    gIGMessageHandlers[159] = GM_vGetPlayoff;
+    gIGMessageHandlers[160] = IG_vPlayTextFall;
+    gIGMessageHandlers[161] = GM_vGetPlayerCut;
+    gIGMessageHandlers[162] = GM_vRewardDisplayStarting;
+    gIGMessageHandlers[163] = IG_vMuteForScoreCard;
     gIGMessageHandlers[164] = fn_800834A8;
     gIGMessageHandlers[165] = GM_vGetPlayerBackSwing;
-    gIGMessageHandlers[166] = fn_80089D48;
-    gIGMessageHandlers[167] = fn_80089D68;
-    gIGMessageHandlers[168] = fn_80089D98;
-    gIGMessageHandlers[169] = fn_80089DB0;
-    gIGMessageHandlers[170] = fn_80089E5C;
+    gIGMessageHandlers[166] = GM_vIG_MCGetSaveNeeds;
+    gIGMessageHandlers[167] = GM_vIG_OnlineSendChat;
+    gIGMessageHandlers[168] = GM_vOnlineMode;
+    gIGMessageHandlers[169] = IG_vGetLongDriveStat;
+    gIGMessageHandlers[170] = IG_vNoOp170;
     gIGMessageHandlers[171] = GM_vIsDemoSetup;
-    gIGMessageHandlers[172] = fn_80089E60;
-    gIGMessageHandlers[173] = fn_80089E64;
+    gIGMessageHandlers[172] = IG_vNoOp172;
+    gIGMessageHandlers[173] = IG_vIsDemoSetup;
     gIGMessageHandlers[174] = GM_vGetPlayerFirstName;
-    gIGMessageHandlers[175] = fn_80089E98;
-    gIGMessageHandlers[176] = fn_80089E9C;
-    gIGMessageHandlers[177] = fn_80089ED0;
-    gIGMessageHandlers[178] = fn_80089F24;
-    gIGMessageHandlers[180] = fn_80089F6C;
-    gIGMessageHandlers[179] = fn_8008A010;
-    gIGMessageHandlers[181] = fn_8008A0CC;
-    gIGMessageHandlers[197] = fn_8008A128;
+    gIGMessageHandlers[175] = IG_vNoOp175;
+    gIGMessageHandlers[176] = GM_vGetNumberClubs;
+    gIGMessageHandlers[177] = GM_vGetClubAvailable;
+    gIGMessageHandlers[178] = GM_vAddRemoveClub;
+    gIGMessageHandlers[180] = IG_vSwapDiscReloadHole;
+    gIGMessageHandlers[179] = IG_vGetDiscDriveStatus;
+    gIGMessageHandlers[181] = IG_vCloseMenuCheckDisc;
+    gIGMessageHandlers[197] = IG_vResumeCheckDisc;
     gIGMessageHandlers[182] = GM_vGetPlayerHolePoints;
-    gIGMessageHandlers[184] = fn_8008A188;
-    gIGMessageHandlers[185] = fn_8008A1C8;
-    gIGMessageHandlers[183] = fn_8008A184;
+    gIGMessageHandlers[184] = IG_vGetChallengeName;
+    gIGMessageHandlers[185] = IG_vGetChallengeDescription;
+    gIGMessageHandlers[183] = IG_vNoOp183;
     gIGMessageHandlers[186] = fn_8008A208;
     gIGMessageHandlers[187] = fn_8008A20C;
     gIGMessageHandlers[188] = fn_8008A240;
@@ -564,7 +564,7 @@ void IG_InitGameMessages(void) {
     gIGMessageHandlers[192] = fn_8008A4A8;
     gIGMessageHandlers[193] = fn_8008A690;
     gIGMessageHandlers[194] = fn_8008A758;
-    gIGMessageHandlers[195] = fn_80089DA4;
+    gIGMessageHandlers[195] = IG_vReturnZero195;
     gIGMessageHandlers[196] = fn_8008A788;
     gIGMessageHandlers[198] = fn_8008A7C8;
     gIGMessageHandlers[199] = fn_8008A7D4;
@@ -2500,7 +2500,8 @@ void IG_vPlayCheerAndComment(MsgArg* pArgs, MsgArg* pResult) {
     Gaud_StartPlaylist14Comment((u16)nMsg, 0);
 }
 
-void fn_80089C84(MsgArg* pArgs, MsgArg* pResult) {
+// Command 159: whether a playoff is being played (gpGame->bInPlayoff).
+void GM_vGetPlayoff(MsgArg* pArgs, MsgArg* pResult) {
     if (gpGame->bInPlayoff != 0) {
         pResult->i = 1;
         return;
@@ -2508,12 +2509,13 @@ void fn_80089C84(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-void fn_80089CAC(MsgArg* pArgs, MsgArg* pResult) {
+// Command 160: plays the text-fall sound (Gaud_TextFall).
+void IG_vPlayTextFall(MsgArg* pArgs, MsgArg* pResult) {
     Gaud_TextFall();
 }
 
-// Whether the player missed the cut.
-void fn_80089CCC(MsgArg* pArgs, MsgArg* pResult) {
+// Command 161: whether player pArgs[0] missed the cut (Player.bPlayerCut).
+void GM_vGetPlayerCut(MsgArg* pArgs, MsgArg* pResult) {
     if (gPlayers[pArgs[0].i].bPlayerCut != 0) {
         pResult->i = 1;
         return;
@@ -2521,33 +2523,46 @@ void fn_80089CCC(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-void fn_80089D04(MsgArg* pArgs, MsgArg* pResult) {
+// Command 162: an award is about to show: every help tip is hidden (GUI_HideAllHelpTips) and the
+// award HUD starts (GUI_StartAwardUI).
+void GM_vRewardDisplayStarting(MsgArg* pArgs, MsgArg* pResult) {
     GUI_HideAllHelpTips();
     GUI_StartAwardUI();
 }
 
-void fn_80089D28(MsgArg* pArgs, MsgArg* pResult) {
+// Command 163: the scorecard is up: the game's sounds go quiet as for the scorecard
+// (GUI_MuteForScoreCard).
+void IG_vMuteForScoreCard(MsgArg* pArgs, MsgArg* pResult) {
     GUI_MuteForScoreCard();
 }
 
-void fn_80089D48(MsgArg* pArgs, MsgArg* pResult) {
+// Command 166: for the card in port pArgs[0], slot pArgs[1], the new files and the blocks a game
+// save needs, into *pArgs[2] and *pArgs[3] (the front end's command fn_800834E8).
+void GM_vIG_MCGetSaveNeeds(MsgArg* pArgs, MsgArg* pResult) {
     fn_800834E8(pArgs, pResult);
 }
 
-void fn_80089D68(MsgArg* pArgs, MsgArg* pResult) {
+// Command 167: sends chat text pArgs[0] from the player whose turn it is (OnlineGolf_SendChatData,
+// empty in this build).
+void GM_vIG_OnlineSendChat(MsgArg* pArgs, MsgArg* pResult) {
     OnlineGolf_SendChatData(lbl_80282278, ((MsgString*)pArgs[0].p)->pStr);
 }
 
-void fn_80089D98(MsgArg* pArgs, MsgArg* pResult) {
+// Command 168: whether this is an online game: always 0 in this build.
+void GM_vOnlineMode(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-void fn_80089DA4(MsgArg* pArgs, MsgArg* pResult) {
+// Command 195: always answers 0.
+void IG_vReturnZero195(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-// A player's value of the modes' own, picked by pArgs[1] (8: the number of players).
-void fn_80089DB0(MsgArg* pArgs, MsgArg* pResult) {
+// Command 169: a long-drive contest number of player pArgs[0] (modes 22 and 26 keep them), picked
+// by pArgs[1]: 0 drives taken (nEA0), 1 the average length of the drives that count (nEC0), 2 nEA8,
+// 3..6 how many drives of kinds 1, 3, 4 and 5 (nECC, nED4, nED8, nEDC), 7 the points (nEBC), 8 the
+// number of players. Any other pArgs[1] leaves the result alone.
+void IG_vGetLongDriveStat(MsgArg* pArgs, MsgArg* pResult) {
     Player* pPlayer = &gPlayers[pArgs[0].i];
 
     switch (pArgs[1].i) {
@@ -2581,13 +2596,16 @@ void fn_80089DB0(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_80089E5C(MsgArg* pArgs, MsgArg* pResult) {
+// Command 170: does nothing (empty in this build).
+void IG_vNoOp170(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80089E60(MsgArg* pArgs, MsgArg* pResult) {
+// Command 172: does nothing (empty in this build).
+void IG_vNoOp172(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80089E64(MsgArg* pArgs, MsgArg* pResult) {
+// Command 173: whether gSession.uFlags has both 0x4000 (the demo set-up) and 0x8000.
+void IG_vIsDemoSetup(MsgArg* pArgs, MsgArg* pResult) {
     if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) {
         pResult->i = 1;
         return;
@@ -2595,16 +2613,17 @@ void fn_80089E64(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-void fn_80089E98(MsgArg* pArgs, MsgArg* pResult) {
+// Command 175: does nothing (empty in this build).
+void IG_vNoOp175(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// The clubs in a player's bag.
-void fn_80089E9C(MsgArg* pArgs, MsgArg* pResult) {
+// Command 176: how many clubs player pArgs[0] has in the bag.
+void GM_vGetNumberClubs(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = Bag_CountClubs(pArgs[0].i);
 }
 
-// Whether a club is in a player's bag.
-void fn_80089ED0(MsgArg* pArgs, MsgArg* pResult) {
+// Command 177: whether club pArgs[1] is in player pArgs[0]'s bag.
+void GM_vGetClubAvailable(MsgArg* pArgs, MsgArg* pResult) {
     if (Bag_HasClub(pArgs[0].i, pArgs[1].i)) {
         pResult->i = 1;
         return;
@@ -2612,8 +2631,9 @@ void fn_80089ED0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-// Battle mode: add a club to a player's bag (pArgs[1] set) or take it out.
-void fn_80089F24(MsgArg* pArgs, MsgArg* pResult) {
+// Command 178, Battle mode: puts club pArgs[2] into player pArgs[0]'s bag when pArgs[1] is set,
+// else takes it out (GameModeBattle_RemoveClub keeps a required club).
+void GM_vAddRemoveClub(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[1].i != 0) {
         GameModeBattle_AddClub(pArgs[0].i, pArgs[2].i);
         return;
@@ -2621,7 +2641,11 @@ void fn_80089F24(MsgArg* pArgs, MsgArg* pResult) {
     GameModeBattle_RemoveClub(pArgs[0].i, pArgs[2].i);
 }
 
-void fn_80089F6C(MsgArg* pArgs, MsgArg* pResult) {
+// Command 180: asks for the other disc and loads the hole again: player 0's view runs camera script
+// 3 (fn_80063CBC, zero vector), the golfer waits (GS_WAIT), the other disc is asked for and waited
+// on (fn_801102AC), the characters' texture files are reopened, a hole load is requested
+// (fn_8006F4B4) and the view's camera script goes back to 0. The result is always 0.
+void IG_vSwapDiscReloadHole(MsgArg* pArgs, MsgArg* pResult) {
     View* pView = ViewController_GetCameraControl(gPlayers[0].nView[0]);
     f32 vZero[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 
@@ -2636,8 +2660,10 @@ void fn_80089F6C(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// The disc drive's state for the menus (100: fn_80110450 says so).
-void fn_8008A010(MsgArg* pArgs, MsgArg* pResult) {
+// Command 179: the disc drive's state for the disc-swap screen: motor stopped 0 (disc 2 in the
+// drive) or 1 (disc 1), wrong disc 2 (disc 2) or 3 (disc 1), busy 4, anything else 5; 100 once the
+// disc change has finished (fn_80110450).
+void IG_vGetDiscDriveStatus(MsgArg* pArgs, MsgArg* pResult) {
     switch (DVDGetDriveStatus()) {
     case 7:
         if (fn_8011027C() != 0) {
@@ -2665,7 +2691,11 @@ void fn_8008A010(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_8008A0CC(MsgArg* pArgs, MsgArg* pResult) {
+// Command 181: does what command 8 does (fn_80086300: the pause menu closes; the lesson restarts,
+// or while fading to black the hole load request is dropped), then answers whether the current
+// hole's file is on the disc in the drive (fn_80110180 with fn_80110178's hole check on); if it is
+// not, the hole load request is dropped (fn_8006F4E0).
+void IG_vCloseMenuCheckDisc(MsgArg* pArgs, MsgArg* pResult) {
     GM_vClosePauseMenu(NULL, NULL);
     fn_80110178(1);
     pResult->i = fn_80110180();
@@ -2675,7 +2705,11 @@ void fn_8008A0CC(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_8008A128(MsgArg* pArgs, MsgArg* pResult) {
+// Command 197: does what command 113 does (fn_800885F8: the sounds resume, the pause menu closes,
+// the lesson restarts unless fading to black), drops the hole load request unless a Play Now
+// challenge is running (fn_8006F4E0), then answers whether the current hole's file is on the disc
+// in the drive (fn_80110180 with fn_80110178's hole check on).
+void IG_vResumeCheckDisc(MsgArg* pArgs, MsgArg* pResult) {
     GM_vPauseMenuClosed(NULL, NULL);
     if (!PlayNow_IsChallengeRunning()) {
         fn_8006F4E0();
@@ -2685,16 +2719,19 @@ void fn_8008A128(MsgArg* pArgs, MsgArg* pResult) {
     fn_80110178(0);
 }
 
-void fn_8008A184(MsgArg* pArgs, MsgArg* pResult) {
+// Command 183: does nothing (empty in this build).
+void IG_vNoOp183(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// A challenge's first line of text.
-void fn_8008A188(MsgArg* pArgs, MsgArg* pResult) {
+// Command 184: the name of Play Now challenge group pArgs[1] (PlayNow_GetGroupName), copied into
+// string pArgs[0].
+void IG_vGetChallengeName(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[0].p)->pStr, PlayNow_GetGroupName(pArgs[1].i));
 }
 
-// Its second line.
-void fn_8008A1C8(MsgArg* pArgs, MsgArg* pResult) {
+// Command 185: the description of Play Now challenge group pArgs[1] (PlayNow_GetGroupDescription),
+// copied into string pArgs[0].
+void IG_vGetChallengeDescription(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[0].p)->pStr, PlayNow_GetGroupDescription(pArgs[1].i));
 }
 

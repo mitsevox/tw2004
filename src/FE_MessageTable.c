@@ -4951,7 +4951,7 @@ void fn_80083BFC(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // The disc read's state for the menus (100: fn_80110450 says so), like GameUICommands.c's
-// fn_8008A010 for the drive.
+// IG_vGetDiscDriveStatus for the drive.
 void fn_80083D88(MsgArg* pArgs, MsgArg* pResult) {
     switch (DVDGetCommandBlockStatus(fn_801104A0())) {
     case 7:
