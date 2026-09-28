@@ -229,7 +229,8 @@ void fn_8006B0B8(int nPlayer) {
     f32 vToTarget[3];
     f32 fDist;
 
-    if ((u8)GameEffects_IsScriptedGameBreaker(nPlayer)) {     // fake match: the (u8), the caller tests only the low byte
+    // fake match: the (u8), the caller tests only the low byte
+    if ((u8)GameEffects_IsScriptedGameBreaker(nPlayer)) {
         lbl_801D5F78[nPlayer].n0 = 2;
         lbl_801D5F78[nPlayer].n4 = 2;
         return;

@@ -226,7 +226,8 @@ void GameMode22_Init(void) {
     gpGame->pfn250 = GameMode22_BallOutOfBounds;
     gpGame->pfnHoleFinished = (u8 (*)(int, u8))GameMode22_HoleFinished;
     gpGame->pfnGameFinished = (u8 (*)(u8))GameMode22_GameFinished;
-    gpGame->pfnGoToPlayoff = (u8 (*)(u8))GameMode22_GoToPlayoff;  // port: EA passes an argument GameMode22_GoToPlayoff ignores
+    // port: EA passes an argument GameMode22_GoToPlayoff ignores
+    gpGame->pfnGoToPlayoff = (u8 (*)(u8))GameMode22_GoToPlayoff;
     gpGame->pfnEndGolferTurn = GameMode22_EndGolferTurn;
     gpGame->pfnEndGame = GameMode22_EndGame;
     gpGame->pfn220 = GameMode22_UpdateFrame;
