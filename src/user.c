@@ -17,9 +17,9 @@ void fn_800563C4(void) {
     gpSaveData = StaticMem_Alloc(5 * sizeof(SaveProfile), 0, 32, "user.c", 97);
     lbl_80281DF4 = StaticMem_Alloc(sizeof(SaveProfile), 0, 32, "user.c", 98);
     for (i = 0; i < 5; i++) {
-        fn_80057364(i);
+        SaveProfile_InitSlot(i);
     }
-    fn_80056B8C();
+    PasswordManager_SetDefaults();
 }
 
 void fn_80056454(void) {

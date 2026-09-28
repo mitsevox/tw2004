@@ -28,7 +28,7 @@ void GameMode4_ExitFE(void);
 void FE_CrAP_SetTriggerAnims(u8 b);
 void FE_CrAP_UnequipSlot(s16 nSlot);            // FE_CrAPDB.c
 u8   PasswordManager_IsPasswordEntered(int a);
-u8   fn_800564AC(int n);
+u8   PasswordManager_IsSponsorshipPasswordEntered(int n);
 s32  fn_801258E8(void);                 // EASportsBio.c
 void fn_8009170C(void);
 
@@ -593,9 +593,9 @@ void FE_CrAP_UpdateSaleInfo(int a, int b) {
 // lock kind (FE_CrAP_GetPartGMLockIDByAssetNum) and a value n (FE_CrAP_GetPartGMLockValByAssetNum).
 // Unlocked by kind: 0 bit n of aAssetOwned (bought); 2 bit 1 of a10548 (fn_80058304); 6 cheat bit n
 // + 1 (codes "A".."E"); 7 award aC8[n] won; 8 n of those 31 won; 9 PGA TOUR season n reached; 10
-// sponsor n's code entered (fn_800564AC) or sponsor n signed; 11 n sponsors signed; 12 an EA Sports
-// Bio of level n or more; 14 ladder award n; 15 n of the 25; 16 game progress n
-// (GM_GetGameProgress); 17 real-time event award n; 18 n of the 75; 19 the best medal (0) in
+// sponsor n's code entered (PasswordManager_IsSponsorshipPasswordEntered) or sponsor n signed; 11 n
+// sponsors signed; 12 an EA Sports Bio of level n or more; 14 ladder award n; 15 n of the 25; 16
+// game progress n (GM_GetGameProgress); 17 real-time event award n; 18 n of the 75; 19 the best medal (0) in
 // challenge group n; 20 n challenge groups counted (EA bug there); 21 award n; 22 n of the first 23
 // awards; 23 award 23 + n (a bonus trophy ball); 24 n bonus trophy balls, but the count never runs
 // (EA bug there); 25 a1C0[12 + n]; 26 n of a1C0[12..15]; 27 TOUR card level n. Kinds 3 and 13 are
@@ -650,7 +650,7 @@ u8 FE_CrAP_IsItemLocked(s32 nAsset, SaveProfile* pProfile) {
         break;
     case 10:
         bLocked = 1;
-        if (fn_800564AC(n)) {
+        if (PasswordManager_IsSponsorshipPasswordEntered(n)) {
             bLocked = 0;
         }
         for (i = 0; i < 11; i++) {

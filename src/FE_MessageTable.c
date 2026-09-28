@@ -34,7 +34,7 @@
 
 // Outside this file.
 void fn_800142A4(s8 n);                 // sets lbl_80281C98
-void fn_80057438(SaveProfile* pProfile);
+void SaveProfile_InitNew(SaveProfile* pProfile);
 void FE_OnGolferHiddenChanged(void);                 // FEgolferanim.c
 void fn_8008F80C(s32 p0, s32 p1);       // uiProcessInterface.c
 void FE_SetOffscreenBufferRender(u8 bOn);               // FEgolferanim.c
@@ -2131,7 +2131,7 @@ void GM_vSaveGolferModel(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 70: the second string of slot pArgs[0]'s profile, the one stored at szName + 10
-// after the name's first ten bytes (the profile setup, fn_80057438, leaves it empty), into the
+// after the name's first ten bytes (the profile setup, SaveProfile_InitNew, leaves it empty), into the
 // string pArgs[1]. What the menus keep there is not known.
 void GM_vGetProfileSecondName(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[1].p)->pStr, &gpSaveData[pArgs[0].i].szName[10]);
@@ -2215,10 +2215,10 @@ void GM_vGetProfileCash(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = FE_GetCurrentProfile()->nCurrentCash;
 }
 
-// Front-end message 73: sets the current profile up as a new one (fn_80057438: cleared, named "User
+// Front-end message 73: sets the current profile up as a new one (SaveProfile_InitNew: cleared, named "User
 // <slot>", the starting golfers, courses and money).
 void GM_vResetProfile(MsgArg* pArgs, MsgArg* pResult) {
-    fn_80057438(FE_GetCurrentProfile());
+    SaveProfile_InitNew(FE_GetCurrentProfile());
 }
 
 // Front-end message 74: how many of the 25 ladder events player 0's profile has won
@@ -3649,7 +3649,7 @@ void GM_vGetCoursePrice(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 192: names the profile being worked on (gpFEProfile) "USER<n>", n being slot
-// pArgs[0] + 1 (fn_80057ED0: its name and its created golfer's last name), and stores it in that
+// pArgs[0] + 1 (SaveProfile_SetName: its name and its created golfer's last name), and stores it in that
 // save slot: when the slot has no profile loaded, gFEState.n1C plus 25,000 is first added to
 // its money; it is marked active, gets TOUR card level 1 if it has none, the slot is marked loaded
 // and backed up (FE_BackupProfileClaimRow).
@@ -3658,7 +3658,7 @@ void GM_vSaveProfileWithDefaultName(MsgArg* pArgs, MsgArg* pResult) {
     char szName[16];
 
     sprintf(szName, "USER%d", nSlot + 1);
-    fn_80057ED0(&gpFEProfile->profile, szName);
+    SaveProfile_SetName(&gpFEProfile->profile, szName);
     if (gFEState.aLoaded[nSlot] == 0) {
         gpFEProfile->profile.nCurrentCash += gFEState.n1C + 25000;
     }

@@ -12,8 +12,8 @@
 u32 gPasswordEnteredBits[8];
 u32 gSponsorPasswordBits[16];
 
-void fn_80057438(SaveProfile* pProfile);
-void fn_80057DA4(SaveProfile* pProfile);
+void SaveProfile_InitNew(SaveProfile* pProfile);
+void SaveProfile_InitCreatedGolfer(SaveProfile* pProfile);
 
 // The codes that set a bit of gSponsorPasswordBits, one each (some bits have two codes).
 char* gSponsorPasswords[16] = {
@@ -21,17 +21,25 @@ char* gSponsorPasswords[16] = {
     "lsfkajfd", "kjnMR3qv", "R453DrTe", "BRi3498Z", "CXCbr883", "cDsa2fgY", "CXCbr883", "TS345329",
 };
 
-// Bit n of gPasswordEnteredBits: the cheat that sets it has been entered.
+// Whether the cheat code for bit n of gPasswordEnteredBits was entered.
+// PasswordManager_TestPassword sets bits 1..5 (the codes "A".."E") and 6 (SHERWOOD TARGET); no code
+// sets bit 0, which a new profile's billion in cash and every Create-A-Player item unlocked test.
 u8 PasswordManager_IsPasswordEntered(int n) {
     return BitArray_TestBit(gPasswordEnteredBits, n);
 }
 
-// Bit n of gSponsorPasswordBits.
-u8 fn_800564AC(int n) {
+// Whether sponsor n's code (gSponsorPasswords[n]) was entered: bit n of gSponsorPasswordBits.
+u8 PasswordManager_IsSponsorshipPasswordEntered(int n) {
     return BitArray_TestBit(gSponsorPasswordBits, n);
 }
 
-// Tests a typed code; if it is a cheat, sets what it unlocks and returns 1.
+// Tests a code typed in the menus (menu message GM_vTestPassword); if it is a cheat, sets what it
+// unlocks, which holds for every profile (lbl_80281DF4), and returns 1 (0: not a cheat).
+// THEKITCHENSINK unlocks every golfer, course and reward and TOUR card level 1 (and clears
+// gFEState.b18); ALLTHETRACKS the courses and rewards; CANYOUPICKONE the golfers; fourteen codes
+// one golfer each; SHERWOOD TARGET sets cheat bit 6. The 16 codes of gSponsorPasswords set their
+// sponsor's bit (gSponsorPasswordBits), and "A".."E" cheat bits 1..5 (gPasswordEnteredBits).
+// ALLOFITSFREE is tested but does nothing.
 u8 PasswordManager_TestPassword(char* szCode) {
     s32 aBit[5] = {1, 2, 3, 4, 5};
     char aszCode[5][32] = {"A", "B", "C", "D", "E"};
@@ -149,12 +157,14 @@ u8 PasswordManager_TestPassword(char* szCode) {
     return 0;
 }
 
-// Resets the unlocks that hold for every profile: a new profile's, with every cheat bit cleared,
-// and no money, stats, awards or medals.
-void fn_80056B8C(void) {
+// Sets the unlocks that hold for every profile (lbl_80281DF4) to their defaults at start-up (user.c
+// fn_800563C4): a new profile's (SaveProfile_InitNew), not active, with the starting golfers and
+// courses, only reward 0, no money, stats, awards or medals, no TOUR card, and every cheat bit
+// cleared (gPasswordEnteredBits 0..6, gSponsorPasswordBits).
+void PasswordManager_SetDefaults(void) {
     int i;
 
-    fn_80057438(lbl_80281DF4);
+    SaveProfile_InitNew(lbl_80281DF4);
     BitArray_ClearArray(gPasswordEnteredBits, 7);
     BitArray_ClearArray(gSponsorPasswordBits, 16);
     lbl_80281DF4->bActive = 0;
@@ -205,7 +215,7 @@ void fn_80056B8C(void) {
     for (i = 0; i < 3; i++) {
         lbl_80281DF4->a200[i].bWon = 0;
     }
-    // EA bug: runs past the 75 awards, as in fn_80057438.
+    // EA bug: runs past the 75 awards, as in SaveProfile_InitNew.
     for (i = 0; i < 118; i++) {
         lbl_80281DF4->aRTEAward[i].bWon = 0;
     }
@@ -234,18 +244,21 @@ void fn_80056B8C(void) {
     lbl_80281DF4->nTourCardLevel = 0;
 }
 
-// Sets up save profile nSlot as a new one named "USER<n>", not loaded.
-void fn_80057364(int nSlot) {
+// Sets save slot nSlot up as a new profile (SaveProfile_InitNew) named "USER<nSlot + 1>", not
+// loaded in the menus (gFEState.aLoaded). Called for all five slots at start-up (user.c) and by
+// GM_SetupDefaultProfile.
+void SaveProfile_InitSlot(int nSlot) {
     char szName[16];
 
     gFEState.aLoaded[nSlot] = 0;
-    fn_80057438(&gpSaveData[nSlot]);
+    SaveProfile_InitNew(&gpSaveData[nSlot]);
     sprintf(szName, "USER%d", nSlot + 1);
     strcpy(gpSaveData[nSlot].szName, szName);
 }
 
-// Gives player slot 0 a profile named "Dummy" if none is loaded.
-void fn_800573E4(void) {
+// Gives player slot 0 a profile named "Dummy", active and loaded, if none is loaded (at boot,
+// GoEntry.c).
+void SaveProfile_SetupDummy(void) {
     SaveProfile* pProfile = gpSaveData;
 
     if (gFEState.aLoaded[0] == 0) {
@@ -255,10 +268,14 @@ void fn_800573E4(void) {
     }
 }
 
-// Sets up a new save profile: named "User <slot>" in game type 3 ("NoName" otherwise), the
-// starting golfers and courses unlocked, the starting money, no stats, awards or medals, three
-// empty saved rounds and the default created golfer.
-void fn_80057438(SaveProfile* pProfile) {
+// Sets a save profile up as a new one: cleared and not active; named "User <n>" after the slot the
+// menus work on in game type 3 ("NoName" otherwise); the starting golfers (gStartUnlockedGolfers)
+// and courses (all but gStartLockedCourses) unlocked, reward 0 only; 25000 in cash plus
+// gFEState.n1C (plus the first sponsor's start cash when one is signed; a billion with cheat bit
+// 0); no stats, awards, medals (aMedal 3) or TOUR card; three empty saved rounds, the default
+// created golfer (SaveProfile_InitCreatedGolfer), no PGA TOUR seasons, the Create-A-Player defaults
+// (FE_CrAP_InitCrAPInfo) and the first sponsor (lbl_80281DF0) signed when there is one.
+void SaveProfile_InitNew(SaveProfile* pProfile) {
     int i;
     int j;
 
@@ -372,7 +389,7 @@ void fn_80057438(SaveProfile* pProfile) {
         }
     }
 
-    fn_80057DA4(pProfile);
+    SaveProfile_InitCreatedGolfer(pProfile);
     pProfile->unk54C0[0] = 0;
     pProfile->unk54C0[1] = 0;
     pProfile->n54C2 = 0;
@@ -390,9 +407,9 @@ void fn_80057438(SaveProfile* pProfile) {
     }
 }
 
-// The created golfer of a new profile: "NoName", every attribute 10 (105 with bit 0x4000 of the
-// session's flags) and a set bag.
-void fn_80057DA4(SaveProfile* pProfile) {
+// The created golfer of a new profile: available, model 0, last name "NoName", nickname "NA", the
+// bag 0x02A7FC44 and every attribute 10 (105 with bit 0x4000 of the session's flags).
+void SaveProfile_InitCreatedGolfer(SaveProfile* pProfile) {
     int i;
 
     memset(&pProfile->createdGolfer, 0, sizeof(GolferRecord));
@@ -411,7 +428,7 @@ void fn_80057DA4(SaveProfile* pProfile) {
 }
 
 // Names the profile: its name and its created golfer's last name.
-void fn_80057ED0(SaveProfile* pProfile, const char* pName) {
+void SaveProfile_SetName(SaveProfile* pProfile, const char* pName) {
     strcpy(pProfile->createdGolfer.szLast, pName);
     strcpy(pProfile->szName, pName);
 }

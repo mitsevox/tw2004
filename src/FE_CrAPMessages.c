@@ -360,7 +360,7 @@ void GM_vSetCrAPGolferInfo(MsgArg* pArgs, MsgArg* pResult) {
 
     switch (pArgs[0].i) {
     case 0:
-        fn_80057ED0(pProfile, ((MsgString*)pArgs[1].p)->pStr);
+        SaveProfile_SetName(pProfile, ((MsgString*)pArgs[1].p)->pStr);
         break;
     case 1:
         pProfile->choices.nGender = pArgs[2].i;

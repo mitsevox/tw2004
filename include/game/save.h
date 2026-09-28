@@ -262,7 +262,7 @@ typedef struct SaveProfile {
                                 //          (GM_Earnings_AwardMoney), nothing taken off; a course
                                 //          unlocks when it reaches the course's price
                                 //          (GM_Earnings_CheckUnlockCourses)
-    s32  n68;                   // 0x00068  cleared by the profile setup (fn_80057438)
+    s32  n68;                   // 0x00068  cleared by the profile setup (SaveProfile_InitNew)
     s32  nCurrentCash;          // 0x0006C  the money to spend: every payout and a sponsorship's
                                 //          start cash are added, the menus set it (the pro shop)
     u8   bChanged;              // 0x00070  set when a statistic, an award or money changes or a
@@ -392,14 +392,14 @@ extern SaveProfile* lbl_80281DF4;       // unlocks that hold for every profile (
 extern SponsorSlot lbl_80281DF0;        // a new profile's first sponsor (see SponsorSlot)
 extern u32 gPasswordEnteredBits[8];             // a bit array the code at 0x80056480 keeps; FE_CrAP_IsItemLocked's lock
                                         // kind 6 tests bits 1..5 of it
-extern u32 gSponsorPasswordBits[16];            // a bit array the cheat codes of gSponsorPasswords set (fn_800564AC)
+extern u32 gSponsorPasswordBits[16];            // a bit array the cheat codes of gSponsorPasswords set (PasswordManager_IsSponsorshipPasswordEntered)
 extern s32 gStartLockedGolfers[14];            // the golfers GM_GetGameProgress counts as unlockable
 extern s32 gStartLockedCourses[6];             // the courses GM_GetGameProgress counts as unlockable
 
 // The password manager (0x80056480-0x80057F18; TW06's passwordmanager.cpp)
-void fn_80056B8C(void);
-void fn_80057364(int nSlot);    // sets up save profile nSlot
-void fn_80057ED0(SaveProfile* pProfile, const char* pName);     // PasswordManager.c: name it
+void PasswordManager_SetDefaults(void);
+void SaveProfile_InitSlot(int nSlot);    // sets up save profile nSlot
+void SaveProfile_SetName(SaveProfile* pProfile, const char* pName);     // PasswordManager.c: name it
 
 // GameMode.c: the profile's completion score (GM_Earnings_PayRoundGoals raises the TOUR card level with it)
 f32  GM_GetGameProgress(SaveProfile* pProfile);

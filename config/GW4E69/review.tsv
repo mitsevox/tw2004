@@ -3466,3 +3466,12 @@ address	name	comment	by	date
 80079D30	FE_MoveBackupsToARAM	rewrite	rq2 (replayed by orchestrator)	2026-09-28
 80079DAC	FE_RestoreBackupsFromARAM	rewrite	rq2 (replayed by orchestrator)	2026-09-28
 80079E44	FE_IsHiddenAttribute	rewrite	rq2 (replayed by orchestrator)	2026-09-28
+80056480	PasswordManager_IsPasswordEntered	rewrite	rq2 (replayed by orchestrator)	2026-09-28
+800564AC	PasswordManager_IsSponsorshipPasswordEntered	rewrite	rq2 (replayed by orchestrator)	2026-09-28
+800564D8	PasswordManager_TestPassword	rewrite	rq2 (replayed by orchestrator)	2026-09-28
+80056B8C	PasswordManager_SetDefaults	rewrite	rq2 (replayed by orchestrator)	2026-09-28
+80057364	SaveProfile_InitSlot	rewrite	rq2 (replayed by orchestrator)	2026-09-28
+800573E4	SaveProfile_SetupDummy	rewrite	rq2 (replayed by orchestrator)	2026-09-28
+80057438	SaveProfile_InitNew	rewrite	rq2 (replayed by orchestrator)	2026-09-28
+80057DA4	SaveProfile_InitCreatedGolfer	rewrite	rq2 (replayed by orchestrator)	2026-09-28
+80057ED0	SaveProfile_SetName	keep	rq2 (replayed by orchestrator)	2026-09-28

@@ -1074,7 +1074,7 @@ u8 GM_RenderBallTarget(int nPlayer) {
 }
 
 // When play starts (GO_vInitIG): if no save profile is active and player 1 is human, save profile 0
-// is set up afresh as "USER1" (fn_80057364). The loop before it does nothing (see inside).
+// is set up afresh as "USER1" (SaveProfile_InitSlot). The loop before it does nothing (see inside).
 void GM_SetupDefaultProfile(void) {
     int i;
     u8  bDead = 0;
@@ -1084,7 +1084,7 @@ void GM_SetupDefaultProfile(void) {
         // Only the empty counting loop survives compilation, so the body is unknown.
         for (i = 0; i < 18; i++) {
             if (bDead) {
-                fn_80057364(i);
+                SaveProfile_InitSlot(i);
             }
         }
     }
@@ -1095,7 +1095,7 @@ void GM_SetupDefaultProfile(void) {
         }
     }
     if (!bAny && !Player_IsCPU(0)) {
-        fn_80057364(0);
+        SaveProfile_InitSlot(0);
     }
 }
 

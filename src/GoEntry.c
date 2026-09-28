@@ -28,7 +28,7 @@ void fn_8006D8E8(void);
 void GO_vInitIG(void);
 void fn_80008380(void);
 void SkinBurn_CheckSignatureFile(void);
-void fn_800573E4(void);
+void SaveProfile_SetupDummy(void);
 void fn_80091EE4(void);
 void FE_PlayIntroMovies(void);
 void Gaud_StartFEMusic(int a);
@@ -85,7 +85,7 @@ void fn_800083A4(void) {
                 gSession.nGameType = 1;
             }
             if (gSession.uFlags & 0x20000) {
-                fn_800573E4();
+                SaveProfile_SetupDummy();
             }
             break;
         case 1:
