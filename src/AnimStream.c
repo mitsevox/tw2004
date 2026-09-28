@@ -1,7 +1,13 @@
-// AnimStream.c (EA's name, from its asserts): streams animation clips for groups 1 and 5 per
-// player, style and club class, reading them from disc into double buffers. Its set-up
-// (AnimStream_Init) turns streaming off in every case, so the reads never happen. The file also holds
-// the base-40 name codes (SKA_PackName..SKA_UnpackSwappedName). The types are in character.h.
+// AnimStream.c (EA's name, from its asserts): the golfer animation stream. Instead of keeping
+// every clip of animation groups 1 and 5 (the reactions) in memory, it keeps one clip per player,
+// style and club class in one of two buffer slots (the first two players to play hold one each)
+// and reads the next clip from disc (data\CharStrm\*.sac) in the background while the current one
+// plays, so the clips take turns. char.c sets it up (AnimStream_Init, AnimStream_SizeSlotClips,
+// AnimStream_AllocBuffers, AnimStream_ReadFirstClips), skalib.c's AnimLib_Pick plays from it
+// (AnimStream_GetClip) and the main loop drives the reads (AnimStream_Update). In this build
+// AnimStream_Init turns streaming off in every case, so no clip is streamed. The file also holds the
+// base-40 name codes (SKA_PackName, SKA_UnpackName, SKA_UnpackSwappedName). The types are in
+// character.h.
 
 #include "game.h"
 #include "endian.h"
@@ -12,10 +18,9 @@ void AnimStream_OnReadDone(int nBytes, int nError);
 void AnimStream_EndRead(u8 bForce);
 void AnimStream_OnReadNowDone(int nBytes, int nError);
 void AnimStream_SizePlayerClips(int nPlayer, AnimLib* pOverlay, AnimLib* pLib);
-void AnimStream_MarkPlayerClips(int nPlayer, u8 b);
+void AnimStream_MarkPlayerClips(int nPlayer, u8 bMark);
 void AnimStream_SizeLibClips(int nPlayer, AnimLib* pLib, int nFirst, int nLast, int nStyleFirst,
-                             int nStyleLast,
-                 int nClubFirst, int nClubLast);
+                             int nStyleLast, int nClubFirst, int nClubLast);
 void AnimStream_ReadPlayerClips(int nPlayer);
 void AnimStream_ReadSharedClips(int nSlot);
 void AnimStream_ReadNow(int hFile, u32 uFileSize, void* pDst, u32 uLen, u32 uOffset);
@@ -23,11 +28,12 @@ void AnimStream_GetFilePath(u8 bGlobal, int bFemale, int nPlayer, char* szPath);
 int AnimStream_FindSlotPlayer(int nId);
 u8 AnimStream_CanReplaceClip(int nPlayer, Clip* pClip);
 
-char gAnimStreamRoot[8] = "";              // the folder the stream files' paths start from
+char gAnimStreamRoot[8] = "";          // the folder the stream files' paths start from (empty)
 
-// This file's .sbss (character.h).
+// The stream's state (character.h), allocated by AnimStream_Init; the file's .sbss.
 AnimStream* gpAnimStream;
 
+// The animation groups the stream handles and each one's index in its tables.
 AnimStreamGroup gAnimStreamGroups[2] = {
     { 1, 0 },
     { 5, 1 },
@@ -384,10 +390,10 @@ void AnimStream_AssignSlots(void) {
     }
 }
 
-// Sets the read mark (b8) of each of a player's streamed clip sets that has buffers to b.
-// AnimStream_AssignSlots marks them all (b = 1) when a player's slot changes hands, so the new
+// Sets the read mark (b8) of each of a player's streamed clip sets that has buffers to bMark.
+// AnimStream_AssignSlots marks them all (bMark = 1) when a player's slot changes hands, so the new
 // slot's buffers get the player's clips.
-void AnimStream_MarkPlayerClips(int nPlayer, u8 b) {
+void AnimStream_MarkPlayerClips(int nPlayer, u8 bMark) {
     int i;
     int nStyle;
     int nClub;
@@ -399,7 +405,7 @@ void AnimStream_MarkPlayerClips(int nPlayer, u8 b) {
             for (nClub = 0; nClub < 6; nClub++) {
                 if (AnimStream_IsStreamed(nGroup, nStyle, nClub, -1) &&
                     gpAnimStream->bufs[0][i][nStyle][nClub].nSize > 0) {
-                    gpAnimStream->players[nPlayer].clips[i][nStyle][nClub].b8 = b;
+                    gpAnimStream->players[nPlayer].clips[i][nStyle][nClub].b8 = bMark;
                 }
             }
         }
@@ -407,9 +413,9 @@ void AnimStream_MarkPlayerClips(int nPlayer, u8 b) {
 }
 
 // Marks a player's clip set for a group, style and club class to have its next clip read (b8 = 1);
-// nothing for a group that is not streamed. The second argument (the player's slot) is not used,
-// and the club class comes before the style.
-void AnimStream_MarkClips(int nPlayer, int a, int nGroup, int nClub, int nStyle) {
+// nothing for a group that is not streamed. nSlot (the player's slot) is not used, and the club
+// class comes before the style.
+void AnimStream_MarkClips(int nPlayer, int nSlot, int nGroup, int nClub, int nStyle) {
     int nIndex = AnimStream_GetGroupIndex(nGroup);
     if (nIndex >= 0) {
         gpAnimStream->players[nPlayer].clips[nIndex][nStyle][nClub].b8 = 1;
@@ -492,8 +498,7 @@ void AnimStream_SizePlayerClips(int nPlayer, AnimLib* pOverlay, AnimLib* pLib) {
 // index), styles and club classes: marks the records of each streamed clip set's default clips
 // (flag 4) and keeps the set's largest clip size, rounded up to 0x800 bytes.
 void AnimStream_SizeLibClips(int nPlayer, AnimLib* pLib, int nFirst, int nLast, int nStyleFirst,
-                             int nStyleLast,
-                 int nClubFirst, int nClubLast) {
+                             int nStyleLast, int nClubFirst, int nClubLast) {
     int nGroup;
     int i;
     int nStyle;
@@ -928,6 +933,8 @@ void AnimStream_GetFilePath(u8 bGlobal, int bFemale, int nPlayer, char* szPath) 
             Character_GetGolferModelID(nPlayer) + 1);
 }
 
+// The base-40 digit of each character for SKA_PackName, -1 for none: '\0' 0, '+' 1, '-' 2, '0'-'9'
+// 3-12, letters 13-38 (upper and lower case alike), '_' 39.
 s32 gSKANameCodes[128] = {
     0,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -939,6 +946,7 @@ s32 gSKANameCodes[128] = {
     28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, -1, -1, -1, -1, -1,
 };
 
+// The character of each base-40 digit, for SKA_UnpackName (letters come back in lower case).
 char gSKANameChars[40] = "\0+-0123456789abcdefghijklmnopqrstuvwxyz_";
 
 // Packs up to 12 characters of pName into a base-40 code (a shorter name is padded with code 0),

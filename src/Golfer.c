@@ -1,6 +1,9 @@
-// Golfer.c: the golfers' luck: the "1 in gLuckOdds[n]" odds per player (Luck_*) and the roll
-// against them (Golfer_IsLucky). No assert names this file; "Golfer.c" is our name, kept from
-// before the split. CodeWarrior GC/2.5, -O4,p.
+// Golfer.c: the golfers' luck, the lucky (perfect) shot. Each player has odds of "1 in
+// gLuckOdds[n]" (Luck_*: 1 in 12 at the start of a round, one better after each hole down to 1 in
+// 9, back to 12 after a lucky shot), and Golfer_IsLucky rolls against them when a shot is planned;
+// a won roll lets the caddie's rehearsed shot replace the player's (Luck_TakePerfectShot,
+// Code8002DB80.c). No assert names this file; "Golfer.c" is our name, kept from before the split.
+// CodeWarrior GC/2.5, -O4,p.
 // Split 2026-09-27: the code before 0x8002D8A8 is ai_brain.c, Code8002BBB0.c and
 // Code8002C984.c; each part, compiled alone, reproduces its own .sdata2 pool byte for byte.
 // This part (0x8002D8A8-0x8002DB80) owns .sdata 0x802810B0-0x802810B8 (gLuckOdds) and .sdata2
@@ -17,7 +20,8 @@
 void Luck_ResetAllOdds(void);
 void Luck_ResetOdds(int nPlayer);
 
-s8 gLuckOdds[8] = {12, 12, 12, 12, 12}; // 0x802810B0  "1 in n" per player: 12 12 12 12
+s8 gLuckOdds[8] = {12, 12, 12, 12, 12}; // 0x802810B0  lucky-shot odds, "1 in n", per player slot
+                                        // (slot 4: the caddie's copy; 5-7 never used)
 
 // ---- luck -------------------------------------------------------------------------------------
 
@@ -103,4 +107,3 @@ u8 Golfer_IsLucky(int nPlayer) {
     }
     return bLucky;
 }
-void  fn_8005CE70(int nPlayer);

@@ -11,7 +11,7 @@
 
 // ---- golfer states: the small ones----------------------------------------------------------------
 // sGolferStateEngineTable is a table of 27 (enter, update, exit) callbacks; the current state is the
-// top of the player's SwingStack. Most of these drive the camera, HUD and events around the swing.
+// top of the player's GolferStack (gGolferStacks). Most of these drive the camera, HUD and events around the swing.
 
 typedef struct Vec4 { f32 x, y, z, w; } Vec4;
 

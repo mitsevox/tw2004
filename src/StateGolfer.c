@@ -1,17 +1,24 @@
 // StateGolfer.c (EA's name: TW07's Golf/State_Engine/StateGolfer.c holds GOLFERSTATE_OpenONCE ..
-// GOLFERSTATE_GetPreviousState in this order): split off Swing.c at 0x8005CCAC. Its .sbss
-// (gInStateCallback, padded to 8 at 0x80281E00..0x80281E08) ends before the next object's.
+// GOLFERSTATE_GetPreviousState in this order): the golfer state engine. Each player has a stack of
+// golfer states (GS_*: pre-shot, shot set-up, swing, the aiming and green cameras, ...; their
+// enter / update / exit callbacks are the STATEFUNC_* rows of stateFunc.c's
+// sGolferStateEngineTable), and these functions push, pop, switch and run them. TW07's
+// GOLFERSTATE_GetCurrentStateString (a debug name) is not in this build; GOLFERSTATE_IsFrozen, a
+// stripped switch, sits last instead.
+// Split off Swing.c at 0x8005CCAC. Its .sbss (gInStateCallback, padded to 8 at
+// 0x80281E00..0x80281E08) ends before the next object's.
 
 #include "golfer.h"
 #include "game.h"
 
-typedef struct SwingStack {
-    s8   nState[5];             // 0x00
+// One player's golfer state stack (up to 5 states; GOLFERSTATE_Push does not check).
+typedef struct GolferStack {
+    s8   nState[5];             // 0x00  GS_* ids, bottom first
     s8   nTop;                  // 0x05  index of the current state, -1 when empty
-} SwingStack;
+} GolferStack;
 
-SwingStack    gGolferStacks[5];            // 0x801D5A90
-u8            gInStateCallback;               // 0x80281E00  set while a state's enter or exit callback runs
+GolferStack   gGolferStacks[5];       // 0x801D5A90  one per player
+u8            gInStateCallback;       // 0x80281E00  set while a state's enter or exit callback runs
 
 // ---- the golfer state stack ---------------------------------------------------------------------
 // Each player has a small stack of golfer states (GS_*, rows of sGolferStateEngineTable, whose
@@ -36,7 +43,7 @@ void GOLFERSTATE_Update(void) {
     switch (GOLFERSTATE_IsFrozen()) {
     case 0:
         for (i = 0; i < 5; i++) {
-            SwingStack* pStack = &gGolferStacks[(u32)i];
+            GolferStack* pStack = &gGolferStacks[(u32)i];
             void (*pfn)(int);
             if (pStack->nTop > -1) {
                 pfn = sGolferStateEngineTable[pStack->nState[pStack->nTop]].pfnUpdate;
@@ -53,7 +60,7 @@ void GOLFERSTATE_Update(void) {
 // around it); once, when the game's modules shut down.
 void GOLFERSTATE_CloseONCE(void) {
     s8*         pTop;
-    SwingStack* pStack;
+    GolferStack* pStack;
     int         i;
     for (i = 0; i < 5; i++) {
         pStack = &gGolferStacks[(u32)i];
@@ -74,7 +81,7 @@ void GOLFERSTATE_CloseONCE(void) {
 // left empty. Players_Reset does it for every player.
 void GOLFERSTATE_Kill(int nPlayer) {
     s8*         pTop;
-    SwingStack* pStack = &gGolferStacks[nPlayer];
+    GolferStack* pStack = &gGolferStacks[nPlayer];
     pTop = &pStack->nTop;
     while (*pTop > -1) {
         if (sGolferStateEngineTable[(s8)pStack->nState[*pTop]].pfnExit != NULL) {
@@ -88,7 +95,7 @@ void GOLFERSTATE_Kill(int nPlayer) {
 
 // Push a state and run its enter callback.
 void GOLFERSTATE_Push(int nState, int nPlayer) {
-    SwingStack* pStack = &gGolferStacks[nPlayer];
+    GolferStack* pStack = &gGolferStacks[nPlayer];
     void (*pfn)(int);
     pStack->nTop++;
     pStack->nState[pStack->nTop] = nState;
@@ -156,7 +163,7 @@ void GOLFERSTATE_Switch(int nState, int nPlayer) {
 
 // The current golfer state (the top of the stack), or -1.
 int GOLFERSTATE_GetCurrentState(int nPlayer) {
-    SwingStack* pStack = &gGolferStacks[nPlayer];
+    GolferStack* pStack = &gGolferStacks[nPlayer];
     if (pStack->nTop == -1) return -1;
     return (u8)pStack->nState[pStack->nTop];
 }
@@ -164,7 +171,7 @@ int GOLFERSTATE_GetCurrentState(int nPlayer) {
 // The state under the current one on the player's stack (the one a Pop returns to), -1 when there
 // is none. The STATEFUNC_* exits ask it whether their state was pushed over GS_SWING.
 s8 GOLFERSTATE_GetPreviousState(int nPlayer) {
-    SwingStack* pStack = &gGolferStacks[nPlayer];
+    GolferStack* pStack = &gGolferStacks[nPlayer];
     if (pStack->nTop < 1) return -1;
     return pStack->nState[pStack->nTop - 1];
 }
