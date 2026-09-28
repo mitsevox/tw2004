@@ -203,7 +203,7 @@ void fn_80083D88(MsgArg* pArgs, MsgArg* pResult);  // FE_MessageTable.c; start-u
 // The round's handlers (GameUICommands.c): fn_80085120 fills the table. Entries 0 and 119 stay
 // empty.
 #define UI_NUM_ROUND_COMMANDS 214
-extern MsgHandler lbl_801D83B0[UI_NUM_ROUND_COMMANDS];
+extern MsgHandler gIGMessageHandlers[UI_NUM_ROUND_COMMANDS];
 
 // Menu handlers (FE_MessageTable.c) that the round's table also runs, or that round handlers
 // pass on to.
