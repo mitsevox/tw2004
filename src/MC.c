@@ -1316,8 +1316,8 @@ s32 fn_800A26A0(MCCardPos* pPos) {
 }
 
 // Op 4 of this file's lbl_8018C7D8, one per save kind: the blocks save kind 0 (options), 1 (user)
-// or 2 (replay) needs on the card (MC_BlocksNeededForSave's last argument); fn_80084FB4 hands it to
-// startUp.c.
+// or 2 (replay) needs on the card (MC_BlocksNeededForSave's last argument);
+// MC_CallActionFnMemoryRequired hands it to startUp.c.
 s32 MC_MemoryRequiredForOptions(MCCardPos* pPos) {
     return MC_BlocksNeededForSave(pPos->nPort, pPos->nSlot, 0, 0);
 }

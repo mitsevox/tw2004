@@ -1,6 +1,19 @@
-// gbacable.c (EA's name, from its asserts): the Game Boy Advance link cable: the four ports' link
-// state (gGbaChannels), the commands sent over the cable and the getters and setters the front end
-// uses.
+// gbacable.c (EA's name, from its OSPanic): the Game Boy Advance link through the GameCube link
+// cable, for the menus' GBA screens: cash moved from the GBA game into the profile, the four stats
+// (best round, holes in one, longest drive, longest putt) swapped with it, and the link's one-time
+// unlocks (a course and 18 rewards). From the bottom up:
+// - one word at a time over Nintendo's GBA library (core/gba.h): GbaWriteOnline, GbaReadOnline.
+//   These and GbaReadContext, GbaOpen, GbaSetport and GbaCommunication are EA's names, from its
+//   OSReport text; so are the command names (FROMGC_..., FROMGBA_...).
+// - each port's link steps (GbaChannel.n0: 0 wait for a GBA, 1 handshake and open, 2 linked, 3 send
+//   our context, 4 the contexts differ), moved on by Gba_StepPorts; Gba_ReadPads probes the ports.
+// - the link state (Gba_SetState lists it) that Gba_UpdateLinkState runs once a frame, and the
+//   getters and setters FE_MessageTable.c's GM_vGba* handlers call (menu messages 592-594, 611,
+//   612, 623, 624, 629, 633, 653, 654, 748).
+// A command is one 32-bit word: the command byte on top, a 24-bit value (cash, a stat) below.
+// Never used in this build: sending cash to the GBA, restoring the stats and the undo on a failed
+// link (their flags are never set), request 0xD1 (the GBA's unlock mask), the pads in gGbaPads.
+// TW06 (Xbox) and TW07 (PS3) have no GBA link, so no EA names beyond this file's own text.
 
 #include "game_types.h"
 #include "platform.h"
@@ -17,41 +30,42 @@ s32  GbaWriteOnline(s32 nChan, u32* pCmd);
 void GbaCommunication(s32 nChan, s32 nCmd, s32 nStat);
 void GbaSetport(s32 nChan);
 void Gba_SendContextDiffer(s32 nChan);
-void Gba_StepPorts(s32 a, s32 b);
+void Gba_StepPorts(s32 nCmd, s32 nArg);
 void Gba_ReadPads(void);
 s32  GbaReadContext(s32 nChan);
 void GbaOpen(s32 nChan);
 void Gba_SetState(s32 v);
 
+// Each port's PADReset bit (SI_CHAN_BIT: 0x80000000 >> port), for Gba_ReadPads.
 const u32 gGbaPadResetBits[GBA_NUM_CHANNELS] = { 0x80000000, 0x40000000, 0x20000000, 0x10000000 };
 
-s32 gGbaLinkState = -1;
-s32 gGbaPortInUse = -1;
+s32 gGbaLinkState = -1;    // the link state (Gba_SetState lists them); -1: never started
+s32 gGbaPortInUse = -1;    // the port a GBA answered on (Gba_StepPorts); -1: none
 
 // data order: .bss and .sbss are defined in reverse address order (CodeWarrior lays them out
 // last-defined-first)
-PadStatus gGbaPads[GBA_NUM_CHANNELS];
-GbaChannel gGbaChannels[GBA_NUM_CHANNELS];
+PadStatus gGbaPads[GBA_NUM_CHANNELS];         // Gba_ReadPads' pad buffer; nothing else reads it
+GbaChannel gGbaChannels[GBA_NUM_CHANNELS];    // each controller port's link
 
-u32 gGbaInitTick;
-DVDDiskID* gGbaDiscID;
-s32 gGbaSavedBestRound;
-s32 gGbaSavedHolesInOne;
-s32 gGbaSavedLongestDrive;
-s32 gGbaSavedLongestPutt;
-u32 gGbaSearchStartTick;
-u32 gGbaSearchDelayFrames;
-s32 gGbaResetPressed;
-s32 gGbaStatsUnsaved;
-s32 gGbaCashUnsaved;
-s32 gGbaUndoTransfer;
-s32 gGbaSaveStatsPending;
-s32 gGbaSaveCashPending;
-s32 gGbaReadPending;
-s32 gGbaRestoreStatsPending;
-s32 gGbaSendCashPending;
-s32 gGbaRewardsUnlocked;
-s32 gGbaUnlocksGranted;
+u32 gGbaInitTick;                 // OSGetTick() when Gba_Init ran; new contexts carry it (uStart)
+DVDDiskID* gGbaDiscID;            // the disc's ID: the handshake checks and sends its game code
+s32 gGbaSavedBestRound;           // } the profile's four stats as they were before the last swap
+s32 gGbaSavedHolesInOne;          // } with the GBA (link state 8; Gba_SaveProfileStat,
+s32 gGbaSavedLongestDrive;        // } Gba_GetSavedProfileStat 0-3)
+s32 gGbaSavedLongestPutt;         // }
+u32 gGbaSearchStartTick;          // OSGetTick() at link state 0; state 1 gives up 4 s after it
+u32 gGbaSearchDelayFrames;        // frames link state 1 waits before its first poll (15)
+s32 gGbaResetPressed;             // the reset button is held: Gba_PollLink resets once it is let go
+s32 gGbaStatsUnsaved;             // state 0x12 restores the saved stats; only ever 0 in this build
+s32 gGbaCashUnsaved;              // state 0x12 takes the moved cash back; only ever 0 in this build
+s32 gGbaUndoTransfer;             // GM_vGbaReadCashAndStats: state 7 / 9 -> 0xC / 0xD; only ever 0
+s32 gGbaSaveStatsPending;         // request: the GBA saves its stats (0xD3; state 0xF)
+s32 gGbaSaveCashPending;          // request: the GBA saves its cash (0x71; state 0xE)
+s32 gGbaReadPending;              // answered by GM_vGbaIsReadPending; only ever 0 in this build
+s32 gGbaRestoreStatsPending;      // request: the saved stats go back into the profile (state 0xD)
+s32 gGbaSendCashPending;          // request: the cash to move goes to the GBA (0xD0; state 0xC)
+s32 gGbaRewardsUnlocked;          // set by Gba_UnlockProfileRewards; never read
+s32 gGbaUnlocksGranted;           // set by Gba_MarkUnlocksGranted; never read
 
 // The check byte of the two bytes in the low 16 bits of uValue: a CRC-8 with the polynomial 0xCD
 // (0x1CD with its top bit), the low byte first, each byte from its top bit, then eight zero bits.
@@ -113,7 +127,7 @@ void Gba_InitChannels(void) {
         gGbaChannels[i].uKey |= (i % 2 ? 0xDF : 0) << 16;
         gGbaChannels[i].uKey |= (i / 2 ? 0x8F : 0) << 8;
         gGbaChannels[i].uKey |= Gba_CalcCheckByte(((gGbaChannels[i].uKey >> 16) & 0xFF) |
-                                            (gGbaChannels[i].uKey & 0xFF00));
+                                                  (gGbaChannels[i].uKey & 0xFF00));
     }
 }
 
@@ -617,13 +631,13 @@ void Gba_SendContextDiffer(s32 nChan) {
     }
 }
 
-// Moves each port's link on one step (GbaChannel.n0); a and b are the request a linked port runs
-// (GbaCommunication's nCmd and nStat; 0: none). A port whose last probe (u5C, Gba_ReadPads) found
-// no GBA (SI_GBA, 0x40000), or any port but gGbaPortInUse while that is set, is unlinked. Steps: 0
-// waits up to 800 ms (keeping the sound and the disc-error screen going) for the GBA to answer a
-// status call, then goes to step 1 with link state 2 and makes the port gGbaPortInUse; 1
+// Moves each port's link on one step (GbaChannel.n0); nCmd and nArg are the request a linked port
+// runs (GbaCommunication's nCmd and nStat; 0: none). A port whose last probe (u5C, Gba_ReadPads)
+// found no GBA (SI_GBA, 0x40000), or any port but gGbaPortInUse while that is set, is unlinked.
+// Steps: 0 waits up to 800 ms (keeping the sound and the disc-error screen going) for the GBA to
+// answer a status call, then goes to step 1 with link state 2 and makes the port gGbaPortInUse; 1
 // Gba_ResetAndOpen; 2 GbaCommunication; 3 GbaSetport; 4 Gba_SendContextDiffer.
-void Gba_StepPorts(s32 a, s32 b) {
+void Gba_StepPorts(s32 nCmd, s32 nArg) {
     GbaChannel* pCh;
     s32 nChan = 0;
     u32 uStart;
@@ -655,7 +669,7 @@ void Gba_StepPorts(s32 a, s32 b) {
                 Gba_ResetAndOpen(nChan);
                 break;
             case 2:
-                GbaCommunication(nChan, a, b);
+                GbaCommunication(nChan, nCmd, nArg);
                 break;
             case 3:
                 GbaSetport(nChan);
@@ -737,36 +751,10 @@ void Gba_ReadPads(void) {
     }
 }
 
-// ---- sweep code (not yet cleaned up) ----
+// ---- the link's setup, its poll and state, and the menus' getters and setters ----
 
-void Gba_InitChannels();
-void Gba_Init(void);
 s32 OSGetResetButtonState();
 s32 OSResetSystem(s32, s32, s32);
-void Gba_PollLink(void);
-void Gba_SetState(s32 v);
-s32 Gba_GetState(void);
-void Gba_MarkUnlocksGranted(void);
-void Gba_UnlockProfileRewards(void);
-void Gba_SetSendCashPending(s32 v);
-s32 Gba_IsSendCashPending(void);
-void Gba_SetRestoreStatsPending(s32 v);
-s32 Gba_IsRestoreStatsPending(void);
-s32 Gba_IsReadPending(void);
-void Gba_SetReadPending(s32 v);
-void Gba_SetSaveCashPending(s32 v);
-s32 Gba_IsSaveCashPending(void);
-void Gba_SetSaveStatsPending(s32 v);
-s32 Gba_IsSaveStatsPending(void);
-void Gba_SetCashUnsaved(s32 v);
-s32 Gba_IsCashUnsaved(void);
-void Gba_SetStatsUnsaved(s32 v);
-s32 Gba_IsStatsUnsaved(void);
-void Gba_SetUndoTransfer(s32 v);
-s32 Gba_IsUndoTransfer(void);
-void Gba_ClearPortInUse(void);
-void Gba_SaveProfileStat(s32 arg0, s32 arg1);
-s32 Gba_GetSavedProfileStat(s32 arg0);
 
 // Sets the link code up (GM_vGbaStartLink): keeps the disc's ID (gGbaDiscID) and the start tick
 // (gGbaInitTick), unlinks every port and makes its key (Gba_InitChannels), and starts the GBA
@@ -794,11 +782,12 @@ void Gba_PollLink(void) {
     }
 }
 
-// Sets the GBA link state (gGbaLinkState), which Gba_UpdateLinkState runs once a frame and the menus read
-// (GM_vGbaGetLinkState): -1 never started; 0 start (GM_vGbaStartLink); 1 looking for a GBA; 2 a GBA
-// answered; 3 its context could not be read; 4 linked; 5 linked, idle; 6 take its cash, then 7; 8
-// swap stats, then 9; 0xC-0xF raise a pending request; 0x10 the contexts differ; 0x11 no GBA
-// answered in 4 s; 0x12 a command failed, or the menus cancelled.
+// Sets the GBA link state (gGbaLinkState), which Gba_UpdateLinkState runs once a frame and the
+// menus read (GM_vGbaGetLinkState): -1 never started; 0 start (GM_vGbaStartLink); 1 looking for a
+// GBA; 2 a GBA answered; 3 its context could not be read; 4 linked; 5 linked, idle; 6 take its
+// cash, then 7; 8 swap stats, then 9; 0xC-0xF raise a pending request; 0x10 the contexts differ;
+// 0x11 no GBA answered in 4 s; 0x12 a command failed, or the menus cancelled (Gba_InitChannels also
+// sets it, just before GM_vGbaStartLink sets 0).
 void Gba_SetState(s32 v) {
     gGbaLinkState = v;
 }
@@ -963,27 +952,27 @@ void Gba_ClearPortInUse(void) {
 
 // Keeps nValue as the profile's stat nStat (0 best round, 1 holes in one, 2 longest drive, 3
 // longest putt) as it was before a stat swap with the GBA; other numbers are ignored.
-void Gba_SaveProfileStat(s32 arg0, s32 arg1) {
-    switch (arg0) {
+void Gba_SaveProfileStat(s32 nStat, s32 nValue) {
+    switch (nStat) {
     case 0:
-        gGbaSavedBestRound = arg1;
+        gGbaSavedBestRound = nValue;
         return;
     case 1:
-        gGbaSavedHolesInOne = arg1;
+        gGbaSavedHolesInOne = nValue;
         return;
     case 2:
-        gGbaSavedLongestDrive = arg1;
+        gGbaSavedLongestDrive = nValue;
         return;
     case 3:
-        gGbaSavedLongestPutt = arg1;
+        gGbaSavedLongestPutt = nValue;
         return;
     }
 }
 
 // The profile's stat nStat (0 best round, 1 holes in one, 2 longest drive, 3 longest putt) as
 // Gba_SaveProfileStat kept it; 0 for other numbers.
-s32 Gba_GetSavedProfileStat(s32 arg0) {
-    switch (arg0) {
+s32 Gba_GetSavedProfileStat(s32 nStat) {
+    switch (nStat) {
     case 0:
         return gGbaSavedBestRound;
     case 1:
@@ -996,8 +985,6 @@ s32 Gba_GetSavedProfileStat(s32 arg0) {
         return 0;
     }
 }
-
-// ---- end of sweep code ----
 
 // The GBA link's state machine, run once a frame (gomainloop.c's fn_8006D838) by the state
 // Gba_SetState sets. 0 frees the port in use, waits 15 frames and goes to 1; 1 polls (Gba_PollLink)
