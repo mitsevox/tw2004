@@ -1,15 +1,23 @@
-// PGATourSimulation.c (TW06's pgatoursimulation.c): the PGA TOUR simulation behind game mode 23
-// (GameModeDriverPGATour.c). It keeps the tour field (an entrant table in the save profile and
-// one in memory, with each entrant's hole strokes and playoff state), the entrants' score
-// ranking, and the season statistics of every tour golfer: the counts in the save profile
-// (PgaStatCounts), each statistic worked out from them (driving distance, greens in regulation,
-// scoring average, ...), each statistic's ranking, and the text fe_stats.c prints.
+// PGATourSimulation.c (TW06's pgatoursimulation.c; TW07's PGATourSimulation.c, whose
+// GM_PgaTourSim_ functions pair with these in the same order): the PGA TOUR simulation behind game
+// mode 23 (GameModeDriverPGATour.c). For each tournament it picks the field (100 to 127 of the 174
+// tour pros, and the player) and gives every entrant a four-round target score; each round it
+// simulates the CPU entrants' holes toward that target, counts their season statistics and keeps
+// the round scores; it makes the cut after the second round, and at the end settles the playoff
+// and the winner, pays out the purse and gives the player's awards. It keeps the field (an entrant
+// table in the save profile and one in memory with the hole strokes and playoff state), the
+// entrants' score order, and the season statistics of every tour golfer: the counts in the save
+// profile (PgaStatCounts), each statistic worked out from them (driving distance, greens in
+// regulation, scoring average, ...), each statistic's ranking, and the text fe_stats.c prints.
 
 #include "engine.h"
 #include "game.h"
 #include "game/save.h"
 #include "game/modes/pgatoursim.h"
 #include "game/modes/pgatour.h"
+
+// A zero-initialised global (gPgaScoreSortPlayer) stays in .sdata, as in the original.
+#pragma explicit_zero_data on
 
 PgaEntrantMC* GetEntrantMCPtr(int nPlayer, int nEntrant);
 void GM_PgaTourSim_PassEntrant(int nPlayer, int nEntrant);
@@ -46,20 +54,21 @@ char* GameModeDriverPGATour_GetInitialChampName(s32 i);               // a tourn
 s32  GameModeDriverPGATour_GetInitialChampScore(s32 i);                // and the champion's score
 s32  GameModeDriverPGATour_GetCurrentBracket(int nPlayer);             // the player's bracket, 0..9
 
+// The statistic and the player the statistic sort comparisons read, set around each ranking's qsort
+// (nStat -1 outside one).
 PgaStatSort gPgaStatSort = { -1, 0 };
-#pragma explicit_zero_data on
+// The player whose profile the score sort comparisons read, set around the score order's qsorts.
 int gPgaScoreSortPlayer = 0;
-#pragma explicit_zero_data reset
-u8 gbStatsDirty = 1;
-u8 gbScoresDirty = 1;
+u8 gbStatsDirty = 1;            // the statistics need working out again (CalcAllStatsIfDirty)
+u8 gbScoresDirty = 1;           // the score order needs sorting again (CalcScoreRankingsIfDirty)
 
-PgaPro gPgaPros[PGA_NUM_PROS];
-PgaStatRanking gPgaStatRankings[GM_PGA_STAT_COUNT];
-PgaEntrant gPgaEntrants[PGA_MAX_ENTRANTS];
-PgaScoreRanking gPgaScoreRanking;
+PgaPro gPgaPros[PGA_NUM_PROS];                          // the tour pros ('PGST' stream object)
+PgaStatRanking gPgaStatRankings[GM_PGA_STAT_COUNT];     // each statistic's values and ranking
+PgaEntrant gPgaEntrants[PGA_MAX_ENTRANTS];              // the entrants' holes, not saved
+PgaScoreRanking gPgaScoreRanking;                       // the entrants in score order, and places
 
-s32 gPgaUserPlayoffScore;
-u8  gbPgaUserQuit;
+s32 gPgaUserPlayoffScore;       // the player's strokes on the playoff hole being played
+u8  gbPgaUserQuit;              // the player quit the tour round (GM_PgaTourSim_DidUserQuit)
 
 // An entrant's record in the player's save profile (PgaEntrantMC: its golfer, target score, round
 // scores and cut), kept between sessions. TW07's also takes the caller's line number.
@@ -143,8 +152,7 @@ void GM_PgaTourSim_SimRound(int nPlayer, SeasonEvent* pEvent, int nRound, int n,
         pEvent->nUserBracket = GameModeDriverPGATour_GetCurrentBracket(nPlayer);
         GM_PgaTourSim_ResetTournament(nPlayer);
         GM_PgaTourSim_SelectEntrants(gpSaveData[nPlayer].tour.field.aEntrant,
-                                     &gpSaveData[nPlayer].tour.field.nEntrants,
-                    uFlags & 1);
+                                     &gpSaveData[nPlayer].tour.field.nEntrants, uFlags & 1);
         GM_PgaTourSim_DetermineTargetScores(nPlayer, n);
     }
     pEvent->nEventPar += (u16)fn_800D2FB4(gSession.nTeeSet[0]);
@@ -352,6 +360,9 @@ void GM_PgaTourSim_CheckEndOfTournamentAward(int nPlayer, u8 bUser, u8 bFirst) {
     TourSeason* pTour = &gpSaveData[nPlayer].tour;
     PgaStatCounts* pStats = &gpSaveData[nPlayer].tour.aStats[PGA_USER_GOLFER];
 
+    // EA bug: the test does not check bUser. A tournament the player skips
+    // (GameModeDriverPGATour_SkipToEvent) is simulated without the player, entrant 0 is then a
+    // random pro, and a major that pro wins still adds to the player's nMajorWins (award 36).
     if (bFirst && GameModeDriverPGATour_GetEventInfo(gpSaveData[nPlayer].tour.nEvent)->bIsAMajor != 0) {
         pTour->nMajorWins++;
     }
@@ -1330,7 +1341,8 @@ void CalcScoreRankings(int nPlayer) {
         gPgaScoreRanking.aEntrant[i] = -1;
     }
     gPgaScoreSortPlayer = nPlayer;
-    qsort(gPgaScoreRanking.aEntrant, nEntrants, sizeof(gPgaScoreRanking.aEntrant[0]), TournamentRankIncreasing);
+    qsort(gPgaScoreRanking.aEntrant, nEntrants, sizeof(gPgaScoreRanking.aEntrant[0]),
+          TournamentRankIncreasing);
     gPgaScoreSortPlayer = 0;
     nPrevScore = 0;
     nRank = 0;
@@ -1872,6 +1884,7 @@ void fn_8011C060(u8 bDirty) {
     gbScoresDirty = bDirty;
 }
 
+// Per simple statistic: the function that works it out from one golfer's season counts.
 u8 (*gPgaSimpleStatCalcs[GM_PGA_STAT_SIMPLE_COUNT])(PgaStatCounts* pCounts, f32* pfValue) = {
     CalcDrivingDistance, CalcAccuracy, CalcGIR, CalcPuttsPerRound, CalcPuttingAvg, CalcSandSave,
     CalcScrambling, CalcBounceBack, CalcHolesPerEagle, CalcBirdieAvg, CalcPar3BirdieAvg,
@@ -1880,6 +1893,8 @@ u8 (*gPgaSimpleStatCalcs[GM_PGA_STAT_SIMPLE_COUNT])(PgaStatCounts* pCounts, f32*
     CalcTotalEagles, CalcTotalBirdies, CalcConsecutiveCuts, CalcSeasonWinnings, CalcCareerWinnings,
     CalcRounds, CalcPlayerOfYearPoints,
 };
+// Per statistic: its ranking's sort comparison, fn_8011BCFC where higher is better, fn_8011BBD8
+// where lower is (GM_PgaTourSim_IsLeaderForStat compares the same way).
 s32 (*gPgaStatCompares[GM_PGA_STAT_COUNT])(const void* pA, const void* pB) = {
     fn_8011BCFC, fn_8011BCFC, fn_8011BCFC, fn_8011BBD8, fn_8011BBD8, fn_8011BCFC, fn_8011BCFC,
     fn_8011BCFC, fn_8011BBD8, fn_8011BCFC, fn_8011BCFC, fn_8011BCFC, fn_8011BCFC, fn_8011BCFC,
@@ -1887,9 +1902,13 @@ s32 (*gPgaStatCompares[GM_PGA_STAT_COUNT])(const void* pA, const void* pB) = {
     fn_8011BCFC, fn_8011BCFC, fn_8011BCFC, fn_8011BCFC, fn_8011BCFC, fn_8011BCFC, fn_8011BCFC,
     fn_8011BBD8, fn_8011BBD8, fn_8011BBD8,
 };
+// Per statistic: its view (GM_PgaTourSim_GetStatView). The statistics screen's played column shows
+// the golfer's tournaments for 0 and rounds for 1.
 s32 gPgaStatViews[GM_PGA_STAT_COUNT] = {
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1,
 };
+// Per statistic: the decimal places GM_PgaTourSim_GetStatValString prints (one entry more than
+// there are statistics).
 s32 gPgaStatDecimals[32] = {
     1, 1, 1, 2, 3, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2, 1, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 };

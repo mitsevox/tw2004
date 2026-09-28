@@ -152,7 +152,7 @@ typedef struct TourWin {
 
 // A sponsorship slot in a save profile (our name; the slots' terms are the tour table's
 // PgaSponsorship, TW06 GM_PgaTour_SponsorshipSlot_t). Slot i is signed once the game progress
-// reaches its level (FE_PGATourMessages.c fn_8010EF8C), with a sponsor picked at random; each worn
+// reaches its level (FE_PGATourMessages.c PGASponsor_SignNext), with a sponsor picked at random; each worn
 // Create-A-Player asset of that sponsor then pays the slot's bonus cash
 // (FE_CrAP_CollectSponsorshipItems). lbl_80281DF0 is one more, outside the profiles: the sponsor
 // a new profile starts with (user.c clears it; the profile setup at 0x80057D64 copies it into

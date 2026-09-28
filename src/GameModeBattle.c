@@ -221,7 +221,7 @@ void GameModeBattle_RestoreClubSetup(void) {
 }
 
 // How many clubs nPlayer's bag held at the round's start (gBattleStartClubCount; UI command
-// fn_80089F6C shows it).
+// IG_vSwapDiscReloadHole shows it).
 s32 GameModeBattle_GetNumberStartingClubs(int nPlayer) {
     return gBattleStartClubCount[nPlayer];
 }
