@@ -209,3 +209,30 @@ Other:
   likely stands for MSL's _half/_three: for a matching lane.
 - Tools: name.py does not find definitions returning a pointer to an array (`f32 (*Fn(...))[4]`);
   wraplong does not wrap long initializer rows.
+
+## Round 8 (rh1-rh4, golfer area) leftovers
+Golfer header pass (with Round 6/7's lists):
+- camera.h CrAPGolfer b18 = loaded/ready, b19 = to be freed. CrAPState: n4 camera idle state (0 "Crap
+  Idle", 1 "Crap Face"), n8 render state (0 golfer, 1 clubs, 2 ball) / nC + b80 its temporary one,
+  sz20 / sz30 queued animation / camera shot, sz54 queued ball texture, n50 repeats left, n74 texture
+  swap (1 loading, 2 loaded, 0 done), b78 / f7C delay swap and time, b81 new-textures flag (unread),
+  b86 hidden, b8A cache clear pending, n1B4 idle-anim count, n1B8 / n1BC club / temp club (-1),
+  n1C0 queued-anim state (0 wait end, 1 fade out, 2 playing, 3 fade in, 4 none), b1C8 / n1C4 pad lock,
+  f1CC fade-out timer, n1D0 fade at end, b1D1 club dressing allowed, b1D2 swap due, n1D4 / n1D8 last
+  asset / category, b1DC zoom (TW07 `zoom`), f14C display alpha 0..0.5, f19C / f1A0 facing now /
+  target (radians), f140..f148 written only.
+- fe.h prototypes: FE_vTriggerCrAPAnimAndCamera bBlend (not bNoBlend), FE_QueueCrAPAnim bFade /
+  bWaitForEnd, FE_SetDelayTextureSwap bDelay / fTime, others as rh2 dd92e44; FE_PauseFECharStreaming
+  comment ("the golfer loader"). FE_MessageTable.c: FE_SetOffscreenBufferRender(s32) vs u8,
+  FE_SetProfileLeftHanded(int, int) vs (int nProfile, s8). char.c: FE_SetTextureSwapState(s32).
+  rh1's FE_vLoadNextCrAPAnim param bNoBlend means bBlend. save.h n113: the created golfer is left-handed.
+- character.h: AnimPlayer = EA's TSKATime; uFlags: SKATime_Pause sets 0x2, UnPause clears 0x3 (same fix
+  in GoGolfCam.c:55's prototype comment); n08 play count. SKABlendNode.bC = bFreeASAP. Prototypes
+  SKABlendData_Init (bFreeASAP), SKABlender_AddBlenderData (pInfo, bFreeASAP), SKABlender_ClearMorph
+  (nMorph). charstate.h: SkinMorphWork p10020 / p10024 current / next target, SkinMeshBit.unk0 = x, y, z
+  s16, SkinDesc44.u24 "bit 1" means value 2, SkinMorph_SetTargetWeight param (TW07 iTarget).
+- Misfiled units: SkinBurn_CheckSignatureFile (startup signature check) likely not SkinBurn's;
+  char.c's ByteSwap_Records / MtaLib_SwapAndLink sit right before mtalib.c.
+- Pairing TSV: 8008EAB0..8008EB04 shifted by two. Unnamed on purpose: FE lbl_80189A40/60/80,
+  lbl_80281338, lbl_80281348; mtalib lbl_801B9668.
+- Tools: tools/agents/merge_lane.sh (3-way merge of a lane's hand edits) replaces taking whole files.
