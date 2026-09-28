@@ -156,9 +156,9 @@ void  Char_Vec3Sub(f32* pA, f32* pB, f32* pOut);
 void  fn_80095558(void);
 void  fn_800253E0_ApplySavedChoices(int nSlot);                         // skalib.c
 void  fn_80025478(void);                                        // skalib.c
-void  fn_800CA7E0(void);                                        // AnimStream.c
-void  fn_800CABA0(void);                                        // AnimStream.c
-void  fn_800CB078(void);                                        // AnimStream.c
+void  AnimStream_AllocBuffers(void);                                        // AnimStream.c
+void  AnimStream_RandomizeClips(void);                                        // AnimStream.c
+void  AnimStream_ReadFirstClips(void);                                        // AnimStream.c
 void  Character_SwapTexEntries(u8* pData, int nBytes);
 void  Character_SwapTexPalettes(u8* pData, int nBytes);
 s32   SkinPart_ListAllTextures(Skin** apSkins, int nSkins, SkinListEntry** ppList);   // SkinPart.c
@@ -187,9 +187,9 @@ u8    FE_IsTextureSwapDone(void);                // FEgolferanim.c
 void  FE_SetTextureSwapState(s32 v);
 u8    FE_GetDelayTextureSwap(void);
 void  FE_SetTextureSwapDue(u8 v);
-void  fn_800C937C(void);
-void  fn_800C9764(void);
-void  fn_800C9FE0(void);
+void  AnimStream_Init(void);
+void  AnimStream_Close(void);
+void  AnimStream_AssignSlots(void);
 void  SkinPart_Init(void);
 void  SkinPart_Shutdown(void);
 void  SkinPart_CopyChoices(Skin* pSkin, int nFrom, int nTo);
@@ -1703,8 +1703,8 @@ void Character_LoadSacFiles(void) {
 // Before each hole after the first, with more than one player: the animation slot's libraries are
 // rebuilt from their copies (AnimLib_ReloadSlot), its sac files are streamed in and merged
 // (fn_80014C9C, Character_LoadSacFromStream), and the current slot's work copies freed
-// (lbl_80281CE4 set). Then fn_800C9FE0 gives the first two players to play an animation stream slot
-// each.
+// (lbl_80281CE4 set). Then AnimStream_AssignSlots gives the first two players to play an animation
+// stream slot each.
 void Character_ReloadSacFiles(void) {
     if (gSession.nNumPlayers > 1) {
         lbl_80281CE4 = 1;
@@ -1715,7 +1715,7 @@ void Character_ReloadSacFiles(void) {
         Character_UnregisterSacStreamClient();
         AnimLib_FreeWorkCopies();
     }
-    fn_800C9FE0();
+    AnimStream_AssignSlots();
 }
 
 // Reopens every player's character texture file: closes them all, then opens
@@ -1738,8 +1738,8 @@ void Character_ReopenTextureFiles(void) {
 // two players or fewer, every player's character takes its pool entries and its dynamic textures
 // are loaded now (fn_8010BF68; in split screen Character_RequestClothesUpdateIG for its player
 // too). Then the saved choices of animation slots 0 and 1 are applied, the animation stream is set
-// up (fn_800CA9DC, fn_800CA7E0, fn_800CABA0, fn_800CB078), the sac files are loaded
-// (Character_LoadSacFiles) and the work copies freed.
+// up (AnimStream_SizeSlotClips, AnimStream_AllocBuffers, AnimStream_RandomizeClips,
+// AnimStream_ReadFirstClips), the sac files are loaded (Character_LoadSacFiles) and the work copies freed.
 void Character_PostInit(void) {
     int i;
     Character* pChar;
@@ -1759,13 +1759,13 @@ void Character_PostInit(void) {
     }
     fn_800253E0_ApplySavedChoices(0);
     fn_800253E0_ApplySavedChoices(1);
-    fn_800CA9DC(-1);
-    fn_800CA7E0();
+    AnimStream_SizeSlotClips(-1);
+    AnimStream_AllocBuffers();
     fn_80025478();
     Character_LoadSacFiles();
     AnimLib_FreeWorkCopies();
-    fn_800CABA0();
-    fn_800CB078();
+    AnimStream_RandomizeClips();
+    AnimStream_ReadFirstClips();
 }
 
 // Builds a character from its 'CHR ' object at pData: a header (its animation slot, a skin value, a
@@ -2388,7 +2388,7 @@ void Character_InitIG(void) {
         n = 4;
     }
     gMaxBlendClips = n;
-    fn_800C937C();
+    AnimStream_Init();
     SkinPart_Init();
     SkinPart_SetChangeAllCopies(1);
     SKN_InitTris();
@@ -2399,7 +2399,7 @@ void Character_InitIG(void) {
 void Character_CloseIG(void) {
     SKN_FreeTris();
     SkinPart_Shutdown();
-    fn_800C9764();
+    AnimStream_Close();
     fn_80095560();
     CharacterTex_Close();
 }
@@ -3216,7 +3216,7 @@ void Character_SwapTexEntries(u8* pData, int nBytes) {
             pSrc = pData;
             ByteSwap_Records(&pSrc, &pDst, aTail, 14, 1);
             if (pEntry->b40 == 0) {
-                fn_800CB868(&pEntry->u0, szName);
+                SKA_UnpackName(&pEntry->u0, szName);
                 if (i != 0 && pEntry->u0 == pEntry[-1].u0 && (pEntry[-1].b47 & 1)) {
                     pEntry->b47 |= 1;
                 }

@@ -1167,14 +1167,14 @@ void FE_CrAP_GetPartColorRGBA(s16 nPart, int b, int i, int n, u8* pColor) {
     } else if (stricmp(szCategory, "Putters") == 0) {
         pSkin = gpCrAPState->pB4->pChar->pClubSet->apSkins[2];
     } else if (stricmp(szCategory, "shafts") == 0) {
-        fn_800CB8F0(&pAsset->aSet[0], szSet);
+        SKA_UnpackSwappedName(&pAsset->aSet[0], szSet);
         if (stricmp(szSet, "fwd_shaft") == 0) {
             pSkin = gpCrAPState->pB4->pChar->pClubSet->apSkins[0];
         } else {
             pSkin = gpCrAPState->pB4->pChar->pClubSet->apSkins[3];
         }
     } else if (stricmp(szCategory, "grips") == 0) {
-        fn_800CB8F0(&pAsset->aSet[0], szSet);
+        SKA_UnpackSwappedName(&pAsset->aSet[0], szSet);
         if (stricmp(szSet, "fwd_grip") == 0) {
             pSkin = gpCrAPState->pB4->pChar->pClubSet->apSkins[0];
         } else {
@@ -1244,7 +1244,7 @@ void FE_CrAP_GetAssetVariantName(CrAPAsset* pAsset, char* pName) {
     pSrc = (u8*)pAsset->aVariant;
     BYTESWAP_SWAPDATA(&pSrc, (u8*)pAsset->aVariant, sizeof(pAsset->aVariant), sizeof(u64));
     nId = pAsset->aVariant[0];
-    fn_800CB868(&nId, pName);
+    SKA_UnpackName(&nId, pName);
     pSrc = (u8*)pAsset->aVariant;
     BYTESWAP_SWAPDATA(&pSrc, (u8*)pAsset->aVariant, sizeof(pAsset->aVariant), sizeof(u64));
 }
@@ -1641,7 +1641,7 @@ u8 FE_CrAP_TryBallSwappingAsset(CrAPAsset* pAsset) {
         return 0;
     }
     if (stricmp(szCategory, "balls") == 0) {
-        fn_800CB8F0(&pAsset->aSetVariant[0], szName);
+        SKA_UnpackSwappedName(&pAsset->aSetVariant[0], szName);
         FE_QueueBallChange(szName);
         nBall = fn_800484F4(szName);
         FE_GetCurrentProfile()->nGolferOutfit = nBall;

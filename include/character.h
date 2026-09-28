@@ -745,21 +745,21 @@ LAYOUT_ASSERT(AnimStreamBuf, 8);
 typedef struct AnimStreamClips {
     s32  nNext;                 // 0x0  the next of them to play (wraps around)
     s32  nMaxSize;              // 0x4  the largest of them, in bytes
-    u8   b8;                    // 0x8  set by fn_800CA268
+    u8   b8;                    // 0x8  set by AnimStream_MarkClips
     u8   pad9[3];
 } AnimStreamClips;
 LAYOUT_ASSERT(AnimStreamClips, 0xC);
 
 // A player's part of the stream.
 typedef struct AnimStreamPlayer {
-    s32  nId;                   // 0x000  -1 unused; fn_800CB568 finds a player's part by it
+    s32  nId;                   // 0x000  -1 unused; AnimStream_FindSlotPlayer finds a player's part by it
     AnimStreamClips clips[2][8][6];     // 0x004  [group index][style][club class]
 } AnimStreamPlayer;
 LAYOUT_ASSERT(AnimStreamPlayer, 0x484);
 
-// The stream's state (lbl_80282230, allocated by fn_800C937C).
+// The stream's state (lbl_80282230, allocated by AnimStream_Init).
 typedef struct AnimStream {
-    AnimStreamBuf*   p0;        // 0x0000  the buffer the current read fills (a clip, fn_800C9F14)
+    AnimStreamBuf*   p0;        // 0x0000  the buffer the current read fills (a clip, AnimStream_EndRead)
     AnimStreamClips* p4;        // 0x0004  the clips it is for
     AnimStreamBuf bufs[2][2][8][6];     // 0x0008  [double buffer][group index][style][club class]
     AnimStreamPlayer players[5];        // 0x0608
@@ -768,10 +768,10 @@ typedef struct AnimStream {
     s32   aPlayerBytes[5];      // 0x1CA4  bytes each player's clips need
     s32   nBytes;               // 0x1CB8  bytes the stream uses in all
     s32   hFile;                // 0x1CBC  the open file, -1 none
-    s32   nState;               // 0x1CC0  0 idle, 1 reading, 2 read (fn_800C9EFC)
+    s32   nState;               // 0x1CC0  0 idle, 1 reading, 2 read (AnimStream_OnReadDone)
     s32   nResult;              // 0x1CC4  the bytes the last read got (its callback's nBytes)
     s32   n1CC8;                // 0x1CC8
-    u8    bReadDone;            // 0x1CCC  set when a waited-for read finishes (fn_800CB550)
+    u8    bReadDone;            // 0x1CCC  set when a waited-for read finishes (AnimStream_OnReadNowDone)
     u8    bOn;                  // 0x1CCD  streaming is on (off in split screen, multiplayer and some
                                 //         modes)
     u8    pad1CCE[2];
@@ -780,8 +780,8 @@ LAYOUT_ASSERT(AnimStream, 0x1CD0);
 
 extern AnimStream* lbl_80282230;
 
-u8    fn_800C9828(int nGroup, int nStyle, int nClub, int nKey);   // the clips are streamed
-void  fn_800CA9DC(int nSlot);
+u8    AnimStream_IsStreamed(int nGroup, int nStyle, int nClub, int nKey);   // the clips are streamed
+void  AnimStream_SizeSlotClips(int nSlot);
 
 void  Character_InitBoneState(Character* pChar, SkelPose* pPose);   // a blend node's pose from the body skin
 void  Character_InitBoneStateBits(Character* pChar, SkelPose* pPose);   // only its bit arrays

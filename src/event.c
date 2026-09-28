@@ -47,7 +47,7 @@ void Gaud_ExitGameBreaker(u8 nPlayer);
 void Gaud_InitCamZoom(u8 nPlayer);
 void Gaud_ExitCamZoom(u8 nPlayer);
 void Gaud_ExitSpecialShot(u8 nPlayer);
-void fn_800C9FE0(void);
+void AnimStream_AssignSlots(void);
 void fn_800DC498(int nPlayer);
 void fn_800E5DE4(int n);
 void fn_8010D3B8(int nPlayer);
@@ -100,7 +100,7 @@ void fn_80065C6C(int nPlayer, int nEvent, void* pData, int nArg) {
     if (!fn_80101AA8(nPlayer, 3)) {
         SitDev_QueueEvent(nPlayer, 2, 2);
     }
-    fn_800C9FE0();
+    AnimStream_AssignSlots();
 }
 
 void fn_80065CB8(int nPlayer, int nEvent, void* pData, int nArg) {

@@ -113,6 +113,6 @@ Other byte-order facts
 - SharedFileIO.c:101: `gSFIODefaultDescriptor` is a big-endian BMP header (128x128, 8-bit).
 - `stwbrx` (a byte-reversed store) appears at 0x80056248 and 0x8005638C (the picture decoder after
   Ball.c) and 0x800B96C8 (rcmp_mad_codec.c): those write little-endian data (asm, not looked into).
-- Other callers of the swap routines, not reached from a handler above: AnimStream.c (fn_800CB8F0),
+- Other callers of the swap routines, not reached from a handler above: AnimStream.c (SKA_UnpackSwappedName),
   Skeleton.c (fn_80028564), Skin*.c (SKN_SwapMeshEntries ..), CharSliders.c
   (CharSlider_CreateDefinitionsFromMem), GoGrass.c (fn_8011E4D8).

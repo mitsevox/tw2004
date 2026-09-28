@@ -9,7 +9,7 @@
 int sGetUserTextureIdx(u64 uHash) {
     char szName[16];
 
-    fn_800CB8F0(&uHash, szName);
+    SKA_UnpackSwappedName(&uHash, szName);
     if (strncmp(szName, "_usrtextr", strlen("_usrtextr")) != 0) {
         return -1;
     }

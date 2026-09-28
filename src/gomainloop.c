@@ -246,7 +246,7 @@ void fn_800BAB80(int nPlayer);
 void fn_800BB0E8(void);
 void BreakLine_InitModule(void);
 void fn_800C8108(void);
-void fn_800C9970(void);
+void AnimStream_Update(void);
 u8   fn_800D3004(void);
 void fn_800DAE44(void);
 f32  fn_800DAF98(f32 fFrameTime);
@@ -1096,7 +1096,7 @@ void fn_8006D8E8(void) {
         if (gSession.nGameType != 1) {
             GM_Update();
         }
-        fn_800C9970();
+        AnimStream_Update();
         RC_vSetCurrentRenderCtx(lbl_80281E54);
         fn_800718C4();
         fn_8006C968();

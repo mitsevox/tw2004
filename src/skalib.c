@@ -300,7 +300,7 @@ int AnimLib_MergeSizeCb(AnimLib* pLibA, AnimLib* pLib, AnimLeaf* pLeaf, AnimLeaf
     }
     if (pLeaf != NULL) {
         if (pOver != NULL) {
-            if (fn_800C9828(lbl_80281CE8, lbl_80281CEC, lbl_80281CF0, lbl_80281CF4)) {
+            if (AnimStream_IsStreamed(lbl_80281CE8, lbl_80281CEC, lbl_80281CF0, lbl_80281CF4)) {
                 pOver->uMask |= 2;
                 pLeaf->uMask |= 2;
             } else if (lbl_80281CE8 == 20) {
@@ -316,7 +316,7 @@ int AnimLib_MergeSizeCb(AnimLib* pLibA, AnimLib* pLib, AnimLeaf* pLeaf, AnimLeaf
                     pLeaf->uMask |= 1;
                 }
             }
-        } else if (fn_800C9828(lbl_80281CE8, lbl_80281CEC, lbl_80281CF0, lbl_80281CF4)) {
+        } else if (AnimStream_IsStreamed(lbl_80281CE8, lbl_80281CEC, lbl_80281CF0, lbl_80281CF4)) {
             pLeaf->uMask |= 2;
         } else {
             pLeaf->uMask &= ~2;
@@ -327,7 +327,7 @@ int AnimLib_MergeSizeCb(AnimLib* pLibA, AnimLib* pLib, AnimLeaf* pLeaf, AnimLeaf
 }
 
 // Merge walk, release pass: every clip of a leaf marked 2 (replaced by the overlay's, or picked by
-// fn_800C9828) loses a user; the ones nobody uses any more come off the totals.
+// AnimStream_IsStreamed) loses a user; the ones nobody uses any more come off the totals.
 int AnimLib_MergeReleaseCb(AnimLib* pLibA, AnimLib* pLibB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx,
                            int nLevel, int nIndex) {
     ClipRecord* pRec;
@@ -429,7 +429,7 @@ void Skalib_SetBudgets(void) {
 f32 Skalib_Random(void);
 
 // Merge walk, trim pass: cuts both leaves down to the clip limit (none when the library's leaf
-// is marked 2, all of them for the ones fn_800C9828 protects), keeping a run of clips at a random
+// is marked 2, all of them for the ones AnimStream_IsStreamed protects), keeping a run of clips at a random
 // start.
 int AnimLib_TrimCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx, int nLevel,
                    int nIndex) {
@@ -440,7 +440,7 @@ int AnimLib_TrimCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB,
     int         i;
     ClipRecord* pRec;
 
-    if (fn_800C9828(lbl_80281CE8, lbl_80281CEC, lbl_80281CF0, lbl_80281CF4)) {
+    if (AnimStream_IsStreamed(lbl_80281CE8, lbl_80281CEC, lbl_80281CF0, lbl_80281CF4)) {
         nKeep = 10000;
     } else if (pLeafA != NULL && (pLeafA->uMask & 2)) {
         nKeep = 0;
@@ -837,7 +837,7 @@ int AnimLib_BuildCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB
         break;
     }
     if (pNew == NULL) return 0;
-    bKeep = fn_800C9828(lbl_80281CE8, lbl_80281CEC, lbl_80281CF0, lbl_80281CF4);
+    bKeep = AnimStream_IsStreamed(lbl_80281CE8, lbl_80281CEC, lbl_80281CF0, lbl_80281CF4);
     if (lbl_80281CE8 == 20) {
         pLeafB = NULL;
     }
@@ -1664,7 +1664,7 @@ void AnimLib_ReloadSlot(void) {
         }
     }
     fn_800253E0_ApplySavedChoices(nSlot);
-    fn_800CA9DC(nSlot);
+    AnimStream_SizeSlotClips(nSlot);
     AnimLib_PlanBank(nSlot);
 }
 
@@ -1769,10 +1769,10 @@ u8 AnimLib_WasLastPlayed(int nPlayer, const char* pName, char** ppSlot, int nGro
 }
 
 int   AnimLib_RandomIndex(u32 uUsed, int nCount);
-void* fn_800CAA7C(int nPlayer, int nGroup, int nStyle, int nClub);
+void* AnimStream_GetClip(int nPlayer, int nGroup, int nStyle, int nClub);
 
-// The clip a player plays for a group, style, club class and key: fn_800CAA7C's clip when
-// fn_800C9828 picks this position and there is one; a named clip by its name; otherwise one of the
+// The clip a player plays for a group, style, club class and key: AnimStream_GetClip's clip when
+// AnimStream_IsStreamed picks this position and there is one; a named clip by its name; otherwise one of the
 // leaf's clips at random, never the reaction played last time, and - through the leaf's played
 // mask - none again until all of them have been played.
 void* AnimLib_Pick(int nPlayer, AnimLib* pLib, int nGroup, int nStyle, int nClub, int nKey, u32* pFlags,
@@ -1788,8 +1788,8 @@ void* AnimLib_Pick(int nPlayer, AnimLib* pLib, int nGroup, int nStyle, int nClub
     void*  pClip;
 
     AnimLib_Find(pLib, nGroup, nStyle, nClub, nKey, &nCount, pFlags, &pUsed, NULL);
-    if (fn_800C9828(nGroup, nStyle, nClub, (*pFlags & 2) ? -1 : nKey)) {
-        pClip = fn_800CAA7C(nPlayer, nGroup, nStyle, nClub);
+    if (AnimStream_IsStreamed(nGroup, nStyle, nClub, (*pFlags & 2) ? -1 : nKey)) {
+        pClip = AnimStream_GetClip(nPlayer, nGroup, nStyle, nClub);
         if (pClip != NULL) return pClip;
     }
     if (nGroup >= 0 && nGroup < 21) {

@@ -456,7 +456,7 @@ void fn_8010B2A8(DynTex* pTex, int nTex, s16* pPalette) {
 // buffer is full.
 s32 fn_8010B338(DynTex* pTex, DynTexObj* pObj, DynTexPalette* pPal, u8* pPixels, u8* pPalette,
                 void* p, s32 n) {
-    char szName[16];            // the size is not known (fn_800CB8F0 writes the name)
+    char szName[16];            // the size is not known (SKA_UnpackSwappedName writes the name)
     s32 nTex;
     DynTexObj* pNew;
     DynTexPalette* pNewPal;
@@ -478,7 +478,7 @@ s32 fn_8010B338(DynTex* pTex, DynTexObj* pObj, DynTexPalette* pPal, u8* pPixels,
         memset(&pTex->p4->pC[nTex], 0, sizeof(DynTexPalette));
     }
     if ((u32)(pTex->n14 + fn_8010B0C0(pNew, pNewPal, pEntry)) > (u32)pTex->n10) {
-        fn_800CB8F0(&pObj->uId, szName);
+        SKA_UnpackSwappedName(&pObj->uId, szName);
         return 0;
     }
     nFirst = pNew->aBlocks[0].nOffset;
@@ -708,13 +708,13 @@ s32 fn_8010BC94(const void* pA, const void* pB) {
 // Note that a skin uses the bank's texture uId (and the one paired with it), with p and n; an
 // unknown name is only turned into text.
 void fn_8010BCFC(u64 uId, void* p, s32 n) {
-    char szName[16];            // the size is not known (fn_800CB868 writes the name)
+    char szName[16];            // the size is not known (SKA_UnpackName writes the name)
     int nTex = fn_8001005C(*lbl_80282488->p8, uId);
 
     if (nTex != (int)0x80000000) {
         lbl_80282488->aUses[lbl_80282488->n96C].pTex = fn_800107E4(*lbl_80282488->p8, nTex);
     } else {
-        fn_800CB868(&uId, szName);
+        SKA_UnpackName(&uId, szName);
         return;
     }
     lbl_80282488->aUses[lbl_80282488->n96C].p4 = p;

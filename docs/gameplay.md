@@ -462,7 +462,7 @@ Merging the overlays (`AnimLib_PlanBank`, `AnimLib_MergeOverlay`):
   through the overlays first and then the base library. Its first attempt keeps a random
   selection. If that cannot fit, it restores the libraries from backups and tries again,
   keeping the highest-ranked clips instead (the record's field at 0x18).
-- Some positions are protected (`fn_800C9828` true: every clip kept), and group 20 (the
+- Some positions are protected (`AnimStream_IsStreamed` true: every clip kept), and group 20 (the
   create-a-player animation playlist) is handled apart.
 - The per-frame data of each kept clip is streamed out to ARAM, 32-byte aligned. Only the
   header, keys and curves stay in main memory.

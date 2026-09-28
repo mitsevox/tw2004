@@ -88,7 +88,7 @@ void fn_800738DC(TexBank* pBank, TexEntry* pTex, u8 bFirst) {
         lbl_80281EA8 = pTex;
         if (pBank != NULL) {
             if (pTex->n3E >= pBank->n2) {
-                fn_800CB8F0(&pTex->u0, szName);
+                SKA_UnpackSwappedName(&pTex->u0, szName);
             } else {
                 pObj = &pBank->p10[pTex->n3E];
                 if (pTex->b47 & 1) {

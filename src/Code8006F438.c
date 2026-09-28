@@ -70,7 +70,7 @@ s32 fn_8006FBF8();
 s32 fn_80098C28();
 s32 fn_800A2B34(s32);
 s32 fn_800C830C();
-s32 fn_800C9CA0();
+s32 AnimStream_WaitForRead();
 s32 fn_8011E3B4();
 void fn_8006F568(void);
 
@@ -111,7 +111,7 @@ void fn_8006F568(void) {
     fn_8006FBF8();
     fn_800C830C();
     fn_80058E40();
-    fn_800C9CA0();
+    AnimStream_WaitForRead();
     if ((u8) *lbl_802811E8 != 0) {
         fn_8011E3B4();
         fn_8003467C();
