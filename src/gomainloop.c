@@ -189,9 +189,9 @@ void UI_vInitModule(void);
 void UI_SendPendingMessages(void);
 void UI_vCloseModule(void);
 void UI_ExitFade(void);
-void fn_80090A60(void);
-void fn_80091778(void);
-void fn_80091870(void);
+void UI_FreeMarkedEntryPictures(void);
+void UI_LoadLoadingBarTexture(void);
+void UI_FreeLoadingBarTexture(void);
 void fn_80093AD4(void);
 void fn_80093D14(void);
 void BS_vInit(void);
@@ -636,7 +636,7 @@ void GO_vInitIG(void) {
     fn_80048DD0();
     fn_8006DCA0(0);
     fn_80014A64();
-    fn_80091778();
+    UI_LoadLoadingBarTexture();
     fn_8001462C();
     fn_800145E0();
     fn_80045660();
@@ -688,7 +688,7 @@ void fn_8006CDC4(void) {
     VM_vReleaseViewport(lbl_80281E58);
     FB_vReleaseFrameBuffer(lbl_80281E5C);
     CA_vReleaseCamera(lbl_80281E60);
-    fn_80091870();
+    UI_FreeLoadingBarTexture();
     fn_8011E3B0();
     fn_800A2E14();
     fn_80093D14();
@@ -1133,7 +1133,7 @@ void fn_8006D8E8(void) {
                 FE_LogoDesign_UploadCustomLogo();
             }
         }
-        fn_80090A60();
+        UI_FreeMarkedEntryPictures();
         fn_8002FEAC();
         fn_80007260();
         Gaud_Monitor();

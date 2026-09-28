@@ -53,7 +53,7 @@ void fn_80037E50();
 void DynObj_InitForHole();
 void fn_8006F604(void);
 void fn_8006F650();
-void fn_80091708();
+void UI_InitForHole();
 void fn_8009B894();
 void fn_800A2E68();
 void fn_800B26DC();
@@ -98,7 +98,7 @@ void fn_8006F518(void) {
     fn_8006F650();
     GM_InitForHole();
     fn_800A2E68();
-    fn_80091708();
+    UI_InitForHole();
     fn_80037E50();
     fn_800B26DC();
     fn_800C72F0();

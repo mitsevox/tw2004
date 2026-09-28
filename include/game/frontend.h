@@ -21,7 +21,7 @@ typedef struct UIFileEntry {
 } UIFileEntry;
 
 // A movie entry's data (UIFileEntry.p4; our name): uSize bytes of a picture file at aData, which
-// fn_80090940 turns into the entry's LLPict.
+// UI_DecodeEntryPicture turns into the entry's LLPict.
 typedef struct UIMovieData {
     u8   unk0[0x1C];
     u32  uSize;                 // 0x1C
@@ -154,7 +154,7 @@ void GM_vSetupPlayers(MsgArg* pArgs, MsgArg* pResult);  // FE_MessageTable.c: FE
 // A menu UI arc (uiArc.c): nSegments pieces from fStart to fEnd degrees, shaded from colour
 // colorA to colorB. Only what the code reads so far.
 typedef struct UIArc {
-    s16  n0;                    // 0x00  } passed to fe_movies.c's fn_800913EC and fn_80091460
+    s16  n0;                    // 0x00  } passed to fe_movies.c's UI_LoadEntryPicture and UI_ReleaseEntryPicture
     s16  n2;                    // 0x02  } (-1: none)
     u8   unk4[4];
     u16  u8;                    // 0x08
@@ -218,7 +218,7 @@ extern u8 gbPausedWithoutScoreCard;         // set by the pause handler (GameUIC
 extern u8 gbUICloseRequested;         // (uiProcessInterface.c) FEgolferanim.c's FE_IsGolferRenderAllowed tests it
 
 // Four floats a UI element passes down its transform stack, copied as one struct; fe_movies.c's
-// fn_80090D28 scales its quad's colours by them / 511.
+// UIPoly_Draw scales its quad's colours by them / 511.
 typedef struct UIWords4 {
     f32 a[4];
 } UIWords4;
@@ -275,7 +275,7 @@ FrontEnd* UI_OpenInterface(char* szSet);
 int UI_GetTextureBankIndex(const char* szName);
 
 // Code80090940.c: the movie entries' pictures (fe_movies.c).
-UIFileEntry* fn_80090940(int nEntry);   // make entry nEntry's picture
-void fn_800909B4(int nEntry);           // mark entry nEntry (flag 0x10) to be freed
+UIFileEntry* UI_DecodeEntryPicture(int nEntry);   // make entry nEntry's picture
+void UI_MarkEntryPictureForFree(int nEntry);           // mark entry nEntry (flag 0x10) to be freed
 
 #endif

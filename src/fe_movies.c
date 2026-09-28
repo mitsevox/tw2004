@@ -29,21 +29,21 @@ void fn_800760D8(LLPict* pPict);        // LLVideo.c
 void fn_800760F4(f32* pUV, LLPict* pPict);  // LLVideo.c
 void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
 void LLMath_MultiplyVec(f32* pA, f32* pB, f32* pOut);     // pOut = pA * pB, element by element
-void fn_80090D28(FEQuad* pQuad);
-void fn_800912F4(FEVertex* pVtx, f32* pPos, f32* pUV, f32* pColour, f32* pScale, f32* pAdd);
-void fn_800913EC(s16 nTable, s16 nEntry);
-void fn_80091460(s16 nTable, s16 nEntry);
+void UIPoly_Draw(FEQuad* pQuad);
+void UIPoly_UnpackVertex(FEVertex* pVtx, f32* pPos, f32* pUV, f32* pColour, f32* pScale, f32* pAdd);
+void UI_LoadEntryPicture(s16 nTable, s16 nEntry);
+void UI_ReleaseEntryPicture(s16 nTable, s16 nEntry);
 f32* UITransform_GetViewParams(void);             // uiTransform.c
 void fn_8009222C(f32* pOut, LLPict* pPict);
-void fn_80091708(void);
+void UI_InitForHole(void);
 void fn_80006EDC();
 void fn_80006FE8();
 void fn_80007254();
 void fn_800083A0();
-void fn_80091BDC(int nPoint);
-void fn_80091B98(s32 p0);
-void fn_80091DB8(int nFrames);
-void fn_80091D84(void);
+void UI_DrawLoadingBarTile(int nPoint);
+void UI_ShowLoadingBarTile(s32 p0);
+void UI_FadeInLoadingScreen(int nFrames);
+void UI_ShowLoadingScreen(void);
 void fn_80091EE4(void);
 void fn_8009220C(void);
 f32 fn_80092210(void);
@@ -55,15 +55,15 @@ f32 gFELockedGolferShade = 0.25f;
 int gUILoadingBarBankSlot = -1;
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
-// 1.0f (0x80283B90), before the unsigned conversion constant fn_80090B80 uses first; its body is
+// 1.0f (0x80283B90), before the unsigned conversion constant UIPoly_TintVertex uses first; its body is
 // unknown.
 static f32 fe_movies_StrippedFn(f32 x) {
     return x + 1.0f;
 }
 
-// Copy pSrc to pDst with its colour tinted by gpUIPolyColourMul/gpUIPolyColourAdd; without bTint the colour
-// is white and only the alpha is tinted.
-void fn_80090B80(FEVertex* pSrc, FEVertex* pDst, u8 bTint) {
+// Copy pSrc to pDst with its colour tinted to gpUIPolyColourMul * (colour + gpUIPolyColourAdd);
+// without bTint the colour is white and only the alpha is tinted.
+void UIPoly_TintVertex(FEVertex* pSrc, FEVertex* pDst, u8 bTint) {
     memcpy(pDst, pSrc, sizeof(FEVertex));
     if (bTint) {
         pDst->au14[0] = gpUIPolyColourMul[0] * (pSrc->au14[0] + gpUIPolyColourAdd[0]);
@@ -78,10 +78,17 @@ void fn_80090B80(FEVertex* pSrc, FEVertex* pDst, u8 bTint) {
     }
 }
 
-// Draw pQuad: with a UI file entry, textured by it (flag 1: a texture, flag 2: its decoded
-// picture); its colours tinted, recoloured from the colour table (n4) and scaled by the transform
-// level's colour; its corners transformed and projected; nothing when every corner is transparent.
-void fn_80090D28(FEQuad* pQuad) {
+// Draw pQuad, a polygon element of the menu UI. With a UI file entry (n2 its table, n0 its entry;
+// n2 -1: none) it is textured: a texture entry (flag 1) binds its texture (in the menus, game type
+// 3, the first texture of 'txf2' bank n0; else the entry's texture in the bank its name picks,
+// fn_8008FFF0) and keeps its corner colours only with n8 bit 0 (else they are white, alpha kept); a
+// picture entry (flag 2) binds its decoded picture, and the texture coordinates are scaled to the
+// part of the texture the picture fills. Colour-table colour n4 (not -1) replaces the corners'
+// colours first. The colours are tinted by the UI studio's multiply and add, scaled by the
+// transform's colour level and offset; the corners go through the current UI transform, a
+// perspective divide by the view distance, and are put at the front end's draw depth. Nothing is
+// drawn when all four corners are transparent.
+void UIPoly_Draw(FEQuad* pQuad) {
     FEVertex aVtx[4];
     Vec4 aPos[4];
     Vec4 aOut[4];
@@ -167,14 +174,14 @@ void fn_80090D28(FEQuad* pQuad) {
         pQuad->aVtx[2].au14[0] = gpFrontEnd->p14->apEntries[nColour]->p8[3];
         pQuad->aVtx[3].au14[0] = gpFrontEnd->p14->apEntries[nColour]->p8[3];
     }
-    fn_80090B80(&pQuad->aVtx[0], &aVtx[0], bTint);
-    fn_80090B80(&pQuad->aVtx[1], &aVtx[1], bTint);
-    fn_80090B80(&pQuad->aVtx[2], &aVtx[2], bTint);
-    fn_80090B80(&pQuad->aVtx[3], &aVtx[3], bTint);
-    fn_800912F4(&aVtx[0], &aPos[0].x, aUV[0], aColour[0], vScale, vAdd);
-    fn_800912F4(&aVtx[1], &aPos[1].x, aUV[1], aColour[1], vScale, vAdd);
-    fn_800912F4(&aVtx[2], &aPos[2].x, aUV[2], aColour[2], vScale, vAdd);
-    fn_800912F4(&aVtx[3], &aPos[3].x, aUV[3], aColour[3], vScale, vAdd);
+    UIPoly_TintVertex(&pQuad->aVtx[0], &aVtx[0], bTint);
+    UIPoly_TintVertex(&pQuad->aVtx[1], &aVtx[1], bTint);
+    UIPoly_TintVertex(&pQuad->aVtx[2], &aVtx[2], bTint);
+    UIPoly_TintVertex(&pQuad->aVtx[3], &aVtx[3], bTint);
+    UIPoly_UnpackVertex(&aVtx[0], &aPos[0].x, aUV[0], aColour[0], vScale, vAdd);
+    UIPoly_UnpackVertex(&aVtx[1], &aPos[1].x, aUV[1], aColour[1], vScale, vAdd);
+    UIPoly_UnpackVertex(&aVtx[2], &aPos[2].x, aUV[2], aColour[2], vScale, vAdd);
+    UIPoly_UnpackVertex(&aVtx[3], &aPos[3].x, aUV[3], aColour[3], vScale, vAdd);
     if (pQuad->n2 != -1 && (pEntry->u0 & 2)) {
         // a picture fills only part of its texture
         fn_8009222C(vPictUV, pPict);
@@ -207,9 +214,9 @@ void fn_80090D28(FEQuad* pQuad) {
     }
 }
 
-// Unpack pVtx into four-float arrays: its position (w 1), its texture coordinates (0, 1) and its
-// colour, which is then scaled by pScale and offset by pAdd.
-void fn_800912F4(FEVertex* pVtx, f32* pPos, f32* pUV, f32* pColour, f32* pScale, f32* pAdd) {
+// Unpack pVtx into four-float arrays: its position (w 1), its texture coordinates (then 0, 1) and
+// its colour, which is then scaled by pScale and offset by pAdd.
+void UIPoly_UnpackVertex(FEVertex* pVtx, f32* pPos, f32* pUV, f32* pColour, f32* pScale, f32* pAdd) {
     pPos[0] = pVtx->f8;
     pPos[1] = pVtx->fC;
     pPos[2] = pVtx->f10;
@@ -226,53 +233,61 @@ void fn_800912F4(FEVertex* pVtx, f32* pPos, f32* pUV, f32* pColour, f32* pScale,
     fn_80092250(pColour, pAdd, pColour);
 }
 
-// When UI file entry (nTable, nEntry) has flag 2 set and 1 clear, make the picture of entry
-// nEntry of table gUIState.n3C (fn_80090940).
-void fn_800913EC(s16 nTable, s16 nEntry) {
+// When a screen loads (message -1 of the polygon and arc elements): if UI file entry (nTable,
+// nEntry) is a picture entry (flag 2 set, flag 1 clear), decode its picture (UI_DecodeEntryPicture:
+// entry nEntry of the picture table). nTable -1: no entry, nothing to do.
+void UI_LoadEntryPicture(s16 nTable, s16 nEntry) {
     u32 uFlags;
 
     if (nTable == -1) return;
     uFlags = gpFrontEnd->pFile->p8->apTables[nTable]->apEntries[nEntry]->u0;
     if (!(uFlags & 1) && (uFlags & 2)) {
-        fn_80090940(nEntry);
+        UI_DecodeEntryPicture(nEntry);
     }
 }
 
-void fn_80091454(void) {
+// Clear gbUIFirstMenuDraw (uiProcessInterface.c calls it on the first menu draw and at the menus'
+// shutdown; nothing else happens there in this build).
+void UI_ClearFirstMenuDraw(void) {
     gbUIFirstMenuDraw = 0;
 }
 
-// For UI file entry (nTable, nEntry) with flags 2 set and 1 clear: fn_80008380, then flag 0x10
-// on entry nEntry of table gUIState.n3C (fn_800909B4).
-void fn_80091460(s16 nTable, s16 nEntry) {
+// When a screen unloads (message -3 of the polygon and arc elements): if UI file entry (nTable,
+// nEntry) is a picture entry (flag 2 set, flag 1 clear), wait for the GPU (fn_80008380) and mark
+// its picture to be freed (UI_MarkEntryPictureForFree; UI_FreeMarkedEntryPictures frees it on the
+// next frame).
+void UI_ReleaseEntryPicture(s16 nTable, s16 nEntry) {
     u32 uFlags;
 
     if (nTable == -1) return;
     uFlags = gpFrontEnd->pFile->p8->apTables[nTable]->apEntries[nEntry]->u0;
     if (!(uFlags & 1) && (uFlags & 2)) {
         fn_80008380();
-        fn_800909B4(nEntry);
+        UI_MarkEntryPictureForFree(nEntry);
     }
 }
 
-// pQuad's message handler: -3/-1 act on its UI file entry, -2 draws it, 0 and 1 set a corner's
-// position and texture coordinates, 2 and 3 its colour and alpha (corner -1: all four), 5 sets the
-// index pair (by bSplit, from one packed number or two).
-void fn_800914DC(FEQuad* pQuad, int nMsg, u32 bSplit, FEMsgArg* pArgs) {
+// The polygon element's messages (the UI studio's plugin 0): -1 (its screen loads) decodes its
+// picture, -2 draws it, -3 (its screen unloads) marks the picture to be freed; 0 sets corner
+// pArgs[0]'s position (pArgs[1..3]), 1 its texture coordinates (pArgs[1..2]); 2 sets the colour
+// (pArgs[1..3], red, green, blue) and 3 the alpha (pArgs[1]) of corner pArgs[0], or of all four for
+// -1; 5 sets the UI file entry, unless pArgs[0] is -1: with bSplit 1 from one number (low 16 bits
+// the entry, high 16 the table), else table pArgs[0], entry pArgs[1]; 6 is taken and ignored.
+void UIPoly_ProcessMessage(FEQuad* pQuad, int nMsg, u32 bSplit, FEMsgArg* pArgs) {
     s16 nOld;
 
     switch (nMsg) {
     case -1:
-        // port: EA passes arguments fn_800913EC ignores
-        ((void (*)(s16, s16, s16, int, int))fn_800913EC)(pQuad->n2, pQuad->n0, pQuad->nA, 0, 0);
+        // port: EA passes arguments UI_LoadEntryPicture ignores
+        ((void (*)(s16, s16, s16, int, int))UI_LoadEntryPicture)(pQuad->n2, pQuad->n0, pQuad->nA, 0, 0);
         break;
     case -2:
-        // port: EA passes arguments fn_80090D28 ignores
-        ((void (*)(FEQuad*, int, int))fn_80090D28)(pQuad, 0, 0);
+        // port: EA passes arguments UIPoly_Draw ignores
+        ((void (*)(FEQuad*, int, int))UIPoly_Draw)(pQuad, 0, 0);
         break;
     case -3:
-        // port: EA passes arguments fn_80091460 ignores
-        ((void (*)(s16, s16, s16, int, int))fn_80091460)(pQuad->n2, pQuad->n0, pQuad->nA, 0, 0);
+        // port: EA passes arguments UI_ReleaseEntryPicture ignores
+        ((void (*)(s16, s16, s16, int, int))UI_ReleaseEntryPicture)(pQuad->n2, pQuad->n0, pQuad->nA, 0, 0);
         break;
     case 0:
         pQuad->aVtx[pArgs[0].n].f8 = pArgs[1].f;
@@ -334,18 +349,20 @@ void fn_800914DC(FEQuad* pQuad, int nMsg, u32 bSplit, FEMsgArg* pArgs) {
     }
 }
 
-void fn_80091708(void) {
+// Run with the other set-ups before each hole (Code8006F438.c fn_8006F518); empty in this build.
+void UI_InitForHole(void) {
 }
 
 // fake match: stands in for a function the original linker stripped. The pool has 512.0f and
-// 448.0f (0x80283BA8, the screen size fn_80092080 uses) before fn_8009170C's constants; its body is
-// unknown.
+// 448.0f (0x80283BA8, the screen size fn_80092080 uses) before UI_InitLoadingBarTilePos's
+// constants; its body is unknown.
 static f32 fe_movies_StrippedFn2(f32 x) {
     return x + 448.0f + 512.0f;
 }
 
-// Eight points across the screen, an eighth apart, all at height 0.839 (fn_80091BDC draws at them).
-void fn_8009170C(void) {
+// The loading bar's eight tile positions (gUILoadingBarTilePos): across the screen an eighth apart,
+// all at height 0.839 (UI_DrawLoadingBarTile draws at them).
+void UI_InitLoadingBarTilePos(void) {
     gUILoadingBarTilePos[0][0] = 0.0f;
     gUILoadingBarTilePos[0][1] = 0.839f;
     gUILoadingBarTilePos[1][0] = 0.125f;
@@ -364,23 +381,25 @@ void fn_8009170C(void) {
     gUILoadingBarTilePos[7][1] = 0.839f;
 }
 
-// Load the texture bank from LoadData.c's 'txf2' copy, unless the session has flag 4.
-void fn_80091778(void) {
+// Load the loading bar's texture bank from LoadData.c's copy of the 'txf2' object with id 10000 and
+// take its first texture, unless the session has flag 4.
+void UI_LoadLoadingBarTexture(void) {
     if (gSession.uFlags & 4) return;
     gUILoadingBarBankSlot = fn_800107C0(lbl_80281C0C, NULL, 0);
     gpUILoadingBarBank = fn_800106C4(gUILoadingBarBankSlot);
     gpUILoadingBarTexture = fn_800922A0(gpUILoadingBarBank);
 }
 
-// Decodes the picture in the 'load' object into gUILoadingScreen.p30, unless one is there.
-void fn_800917C8(void) {
+// Decode the loading screen's picture from the 'load' object's data into gUILoadingScreen.p30,
+// unless one is there.
+void UI_DecodeLoadingPicture(void) {
     if (gUILoadingScreen.p30 == NULL) {
         gUILoadingScreen.p30 = fn_8002FD00(lbl_80281C04, lbl_801A25F0.uSize);
     }
 }
 
-// Free the picture fn_800917C8 decoded, unless the session has flag 4.
-void fn_80091818(void) {
+// Free the loading screen's picture UI_DecodeLoadingPicture decoded, unless the session has flag 4.
+void UI_FreeLoadingPicture(void) {
     if (!(gSession.uFlags & 4) && gUILoadingScreen.p30 != NULL) {
         fn_8002FE70(gUILoadingScreen.p30);
         fn_8002FEAC();
@@ -388,16 +407,19 @@ void fn_80091818(void) {
     }
 }
 
-// Free the bank fn_80091778 loaded.
-void fn_80091870(void) {
+// Free the loading bar's texture bank UI_LoadLoadingBarTexture loaded, unless the session has flag
+// 4.
+void UI_FreeLoadingBarTexture(void) {
     if (gSession.uFlags & 4) return;
     fn_80010544(gUILoadingBarBankSlot);
 }
 
-// Set gUILoadingScreen up, unless the session has flag 4 or it is set up already (b18): the clock,
-// the number of players in game type 4 (else 0) and values from it, then the 'load' object's
-// picture (fn_800917C8).
-void fn_800918A4(void) {
+// Set the loading screen up (gUILoadingScreen), unless the session has flag 4 or it is running
+// already (b18): the clock now (TI_sRead), no bar tile shown yet (n1C -1), no time passed; n14 the
+// number of players when a round is being set up (game type 4), else 0; the seconds per bar tile
+// (fC, and the first tile's time f4) (4.83 * n14 + 3.1) / 8. Then decode the loading picture
+// (UI_DecodeLoadingPicture).
+void UI_InitLoadingBar(void) {
     if (!(gSession.uFlags & 4) && !gUILoadingScreen.b18) {
         gUILoadingScreen.b18 = 1;
         gUILoadingScreen.n1C = -1;
@@ -411,15 +433,18 @@ void fn_800918A4(void) {
         }
         gUILoadingScreen.fC = gUILoadingScreen.f4 = (4.83f * gUILoadingScreen.n14 + 3.1f) / 8.0f;
         gUILoadingScreen.f8 = 0.0f;
-        fn_800917C8();
+        UI_DecodeLoadingPicture();
     }
 }
 
-// Update the loading screen set up by fn_800918A4, unless the session has flag 4: add the time since
-// the last update to f10, and once it passes f4 (or f8, which steps by 2) redraw the picture and the
-// tiles shown so far, showing one more each time f10 passes f4. nMode 1 draws every tile left and
-// ends it (b18 cleared).
-void fn_8009198C(int nMode) {
+// One step of the loading screen while something streams in (streammanagerhole.c calls it between
+// stream updates), unless the session has flag 4. The seconds since the last step are added to f10.
+// Until f10 passes f4 the screen is redrawn only every 2 seconds (f8); a redraw draws the loading
+// picture over the whole screen and the bar tiles shown so far (0 to n1C, at most 8) in one frame.
+// When f10 passes f4 (or no tile is shown yet) the next tile is shown (UI_ShowLoadingBarTile) and
+// f4 moves on by fC. nMode 1 ends it: every tile not yet shown is shown, a frame each, and b18 is
+// cleared.
+void UI_DrawLoadingScreenAndProgressBar(int nMode) {
     f32 fSecs;
     int i;
 
@@ -443,7 +468,7 @@ void fn_8009198C(int nMode) {
     if (gUILoadingScreen.n1C >= 0) {
         for (i = 0; i <= gUILoadingScreen.n1C; i++) {
             if (i >= 8) break;
-            fn_80091BDC(i);
+            UI_DrawLoadingBarTile(i);
         }
     }
     fn_80006FE8();
@@ -456,7 +481,7 @@ void fn_8009198C(int nMode) {
             gUILoadingScreen.f4 += gUILoadingScreen.fC;
         }
         if (++gUILoadingScreen.n1C >= 8) return;
-        fn_80091B98(gUILoadingScreen.n1C);
+        UI_ShowLoadingBarTile(gUILoadingScreen.n1C);
     }
     if (nMode == 1) {
         if (gUILoadingScreen.n1C < 0) {
@@ -466,25 +491,27 @@ void fn_8009198C(int nMode) {
             gUILoadingScreen.n1C = 7;
         }
         for (i = gUILoadingScreen.n1C + 1; i < 8; i++) {
-            fn_80091B98(i);
+            UI_ShowLoadingBarTile(i);
         }
         gUILoadingScreen.b18 = 0;
     }
 }
 
-void fn_80091B98(s32 p0) {
+// Draw loading-bar tile nTile in a frame of its own (start the frame, draw the tile, end the frame,
+// step the audio).
+void UI_ShowLoadingBarTile(s32 p0) {
     fn_80006EDC();
-    fn_80091BDC(p0);
+    UI_DrawLoadingBarTile(p0);
     fn_80006FE8();
     fn_80007254();
     fn_800083A0();
     Gaud_Cycle();
 }
 
-// Draw tile nPoint of the texture bank fn_80091778 loaded at point nPoint of gUILoadingBarTilePos, an
-// eighth of the screen wide: tiles 0-3 come from the top half of the texture, 4-7 from the bottom
-// (their u runs past 1 and wraps).
-void fn_80091BDC(int nPoint) {
+// Draw tile nPoint of the loading bar at point nPoint of gUILoadingBarTilePos, an eighth of the
+// screen wide and 0.142 high, from the loading bar's texture: tiles 0-3 come from its top half, 4-7
+// from its bottom half (their u runs past 1 and wraps).
+void UI_DrawLoadingBarTile(int nPoint) {
     f32 afColour[4];
     f32 afXY[8];
     f32 afUV[8];
@@ -528,15 +555,18 @@ void fn_80091BDC(int nPoint) {
     RenderView_DrawPrimitive(0xA1, afXY, 0, afUV, 2);
 }
 
-void fn_80091D84(void) {
-    fn_80091DB8(30);
+// Show the loading screen's picture for 30 frames, fading in (UI_FadeInLoadingScreen), then unbind
+// the texture. GoEntry.c calls it as the menus hand over to a round and after each hole (not in the
+// demo).
+void UI_ShowLoadingScreen(void) {
+    UI_FadeInLoadingScreen(30);
     RenderState_SetBankTexture(0, 0);
     RenderState_Flush();
 }
 
-// Decode the picture in the 'load' object, show it for nFrames frames (fading in over 30), then
-// free it.
-void fn_80091DB8(int nFrames) {
+// Decode the loading screen's picture from the 'load' object's data, show it for nFrames frames
+// fading in over 30 (UI_ShowPictureFadingIn), wait for the GPU (fn_80008380), then free it.
+void UI_FadeInLoadingScreen(int nFrames) {
     LLPict* pPict;
 
     pPict = fn_8002FD00(lbl_80281C04, lbl_801A25F0.uSize);
@@ -546,9 +576,11 @@ void fn_80091DB8(int nFrames) {
     fn_8002FEAC();
 }
 
-// Show the picture of entry 0 of table gUIState.n3C (fading in over 30 frames) and free it.
-// The 600 calls to fn_80007254 after it do nothing (it is empty).
-void fn_80091E1C(void) {
+// The demo's screen between holes (GoEntry.c calls it in the demo where it otherwise calls
+// UI_ShowLoadingScreen): the picture of entry 0 of the UI file's picture table, shown for 30 frames
+// fading in, then freed. The 600 calls to fn_80007254 after it do nothing (it is empty in this
+// build). Then the texture is unbound.
+void UI_ShowDemoLoadingScreen(void) {
     int i = 0;
     LLPict* pPict;
     UIFileEntry* pEntry;

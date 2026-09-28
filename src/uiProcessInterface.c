@@ -160,8 +160,8 @@ static f32 uiProcessInterface_StrippedFn(f32 x) {
 // (UISDrawObjects) with alpha blending, no depth writes and an alpha test, in the UI's 512 x 448
 // coordinates (fn_80016B6C) and with word-wrapped text at 0.85 line spacing
 // (UI_SetTextLineSpacing), then put the render state back. In the menus it first clears
-// gbUIFirstMenuDraw (fn_80091454). Then it steps gUIDelayedHint: n0 counts 0 to 2, one a frame, and past
-// 2 goes back to -1 while n4 is sent to the UI as hint 0x23 (the menus) or 0x24 (a round).
+// gbUIFirstMenuDraw (UI_ClearFirstMenuDraw). Then it steps gUIDelayedHint: n0 counts 0 to 2, one a
+// frame, and past 2 goes back to -1 while n4 is sent to the UI as hint 0x23 (the menus) or 0x24 (a round).
 void UI_DrawInterface(s32 nTicks) {
     s32 aArgs[1];
 
@@ -172,7 +172,7 @@ void UI_DrawInterface(s32 nTicks) {
         DS_vSetAlphaTestMode(1, 6, 1);
         RenderState_Flush();
         if (gbUIFirstMenuDraw && gSession.nGameType == 3) {
-            fn_80091454();
+            UI_ClearFirstMenuDraw();
         }
         RenderView_SetColor(NULL);
         fn_80016B6C(1.0f / 512.0f, 1.0f / 448.0f);
@@ -501,7 +501,7 @@ FrontEnd* UI_OpenInterface(char* szSet) {
     gpFrontEnd->pHandler = StaticMem_Alloc(UISGetMemSize(10, 9, 256, 2, 2048, 128), 2, 16,
                                          "uiProcessInterface.c", 943);
     UISInit(gpFrontEnd->pHandler, 10, 9, 256, 2, 2048, 128, 16);
-    UISRegisterPluginFnc(gpFrontEnd->pHandler, 0, (UISPluginFncT*)fn_800914DC);
+    UISRegisterPluginFnc(gpFrontEnd->pHandler, 0, (UISPluginFncT*)UIPoly_ProcessMessage);
     UISRegisterPluginFnc(gpFrontEnd->pHandler, 1, UI_BlankProcess1);
     UISRegisterPluginFnc(gpFrontEnd->pHandler, 2, UI_BlankProcess2);
     UISRegisterPluginFnc(gpFrontEnd->pHandler, 3, UI_BlankProcess3);
@@ -536,17 +536,17 @@ FrontEnd* UI_OpenInterface(char* szSet) {
     return gpFrontEnd;
 }
 
-// Shut the UI pFE down. First the movie entries' pictures are freed (fn_80090B10); leaving start-up
-// with no nC plays the start-up movies and legal screen (fn_80091EE8); leaving the menus sets b0
-// and clears b1 of every gUITxf2BankState entry whose gUITxf2BankMarkOnExit word is set, clears gbUIFirstMenuDraw
-// (set, then cleared by fn_80091454), and brings the picture list back from ARAM and frees it
-// (UI_RestoreMenuPictures, UI_FreeMenuPictures). Then the studio is shut down, the fonts, picture
-// list, texture banks and UI file are freed, and the studio and the front end with them; gpFrontEnd
-// is NULL after.
+// Shut the UI pFE down. First the movie entries' pictures are freed (UI_FreeAllEntryPictures);
+// leaving start-up with no nC plays the start-up movies and legal screen (fn_80091EE8); leaving the
+// menus sets b0 and clears b1 of every gUITxf2BankState entry whose gUITxf2BankMarkOnExit word is
+// set, clears gbUIFirstMenuDraw (set, then cleared by UI_ClearFirstMenuDraw), and brings the
+// picture list back from ARAM and frees it (UI_RestoreMenuPictures, UI_FreeMenuPictures). Then the
+// studio is shut down, the fonts, picture list, texture banks and UI file are freed, and the studio
+// and the front end with them; gpFrontEnd is NULL after.
 void UI_CloseInterface(FrontEnd* pFE) {
     int i;
 
-    fn_80090B10();
+    UI_FreeAllEntryPictures();
     if (gSession.nGameType == 1 && gSession.nC == 0) {
         fn_80091EE8();
     } else if (gSession.nGameType == 3) {
@@ -557,7 +557,7 @@ void UI_CloseInterface(FrontEnd* pFE) {
             }
         }
         gbUIFirstMenuDraw = 1;
-        fn_80091454();
+        UI_ClearFirstMenuDraw();
         UI_RestoreMenuPictures();
         UI_FreeMenuPictures();
     }

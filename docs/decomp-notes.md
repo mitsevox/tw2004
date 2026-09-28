@@ -329,7 +329,7 @@ They will be sorted into the sections below.
 - **[verified] Keep call results in named locals** before passing them on (uiProcessInterface
   UI_FindTexture 93 -> 100), before using them as a base pointer (DynamicCam_GetLocation), and put a loop
   bound read through a pointer in a local to get the ctr loop (uiProcessInterface UI_FindColorTable 58 -> 97).
-- **[verified] `&a[i]` indexing matches where hand-walked pointers don't** (fe_movies fn_80090D28,
+- **[verified] `&a[i]` indexing matches where hand-walked pointers don't** (fe_movies UIPoly_Draw,
   ActAnimal_SetWorldMatrix, SitDevFile fn_800BCF84 74.7 -> 98.8).
 - **[verified] `const` on read-only pointer parameters changes argument-load order** (EASBStorage
   fn_80129F98 94.4 -> 100, fn_8012A050 90.2 -> 100, fn_80128580 83.8 -> 100).

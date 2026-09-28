@@ -33,10 +33,10 @@ void fn_80091EE4(void);
 void FE_PlayIntroMovies(void);
 void Gaud_StartFEMusic(int a);
 void GameMode26_StartEvent(void);                     // GameMode26.c
-void fn_80091D84(void);
-void fn_80091E1C(void);
+void UI_ShowLoadingScreen(void);
+void UI_ShowDemoLoadingScreen(void);
 void AI_TargetsClear(void);
-void fn_800918A4(void);
+void UI_InitLoadingBar(void);
 s32  Aud_InitSession(u8 a, u8 b, u8 nListeners, int nUnused);
 void Character_ReloadSacFiles(void);
 void fn_8006F438(void);
@@ -116,7 +116,7 @@ void fn_800083A4(void) {
                     GameMode26_StartEvent();
                 }
                 fn_8000BAE0();
-                fn_80091D84();
+                UI_ShowLoadingScreen();
             }
             fn_8006CB2C();
             if (gSession.nGameType == 13) {
@@ -134,7 +134,7 @@ void fn_800083A4(void) {
             break;
         case 5:
             AI_TargetsClear();
-            fn_800918A4();
+            UI_InitLoadingBar();
             // one listener per view
             Aud_InitSession(Game_GetCourse() + 1, 1, gSession.nSplitScreen ? 2 : 1, 0);
             if (!GM_OnFirstSelectedHole()) {
@@ -170,9 +170,9 @@ void fn_800083A4(void) {
             }
             if (gSession.nC == 0 || gSession.nC == 3) {
                 if ((gSession.uFlags & 0x4000) && gSession.bDemo) {
-                    fn_80091E1C();
+                    UI_ShowDemoLoadingScreen();
                 } else {
-                    fn_80091D84();
+                    UI_ShowLoadingScreen();
                 }
             }
             fn_8009554C();

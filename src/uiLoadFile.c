@@ -257,11 +257,11 @@ u8 UI_TestTextureGroupChkRef(int nKind) {
 }
 
 // Free the menus' picture data if the front end has it: the movie entries' decoded pictures
-// (fn_80090B10) and the picture list (FrontEnd.pC, NULL after); UI_RestoreMenuPictures brings it
+// (UI_FreeAllEntryPictures) and the picture list (FrontEnd.pC, NULL after); UI_RestoreMenuPictures brings it
 // back from ARAM. FEgolferanim.c's FE_vUpdateGolferAll and UI_CloseInterface call it.
 void UI_FreeMenuPictures(void) {
     if (gpFrontEnd->pC != NULL) {
-        fn_80090B10();
+        UI_FreeAllEntryPictures();
         UI_FreePictureList(gpFrontEnd->pC);
         gpFrontEnd->pC = NULL;
     }

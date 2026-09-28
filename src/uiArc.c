@@ -11,9 +11,9 @@
 #include "camera.h"
 
 // fe_movies.c
-void fn_800913EC(s16 n2, s16 n0, s16 n8, s32 a, s32 b);
-void fn_80091460(s16 n2, s16 n0, s16 n8, s32 a, s32 b);
-void fn_800912F4(FEVertex* pVtx, f32* pPos, f32* pUV, f32* pColour, f32* pScale, f32* pAdd);
+void UI_LoadEntryPicture(s16 n2, s16 n0, s16 n8, s32 a, s32 b);
+void UI_ReleaseEntryPicture(s16 n2, s16 n0, s16 n8, s32 a, s32 b);
+void UIPoly_UnpackVertex(FEVertex* pVtx, f32* pPos, f32* pUV, f32* pColour, f32* pScale, f32* pAdd);
 void fn_8009222C(f32* pOut, LLPict* pPict);
 f32  fn_80092210(void);
 f32* UITransform_GetViewParams(void);                 // uiTransform.c
@@ -277,10 +277,10 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
         aVtx[3].au14[2] = fB[0];
         aVtx[3].au14[3] = fA[0];
 
-        fn_800912F4(&aVtx[0], &aPos[0].x, aUV[0], aColour[0], vScale, vAdd);
-        fn_800912F4(&aVtx[1], &aPos[1].x, aUV[1], aColour[1], vScale, vAdd);
-        fn_800912F4(&aVtx[2], &aPos[2].x, aUV[2], aColour[2], vScale, vAdd);
-        fn_800912F4(&aVtx[3], &aPos[3].x, aUV[3], aColour[3], vScale, vAdd);
+        UIPoly_UnpackVertex(&aVtx[0], &aPos[0].x, aUV[0], aColour[0], vScale, vAdd);
+        UIPoly_UnpackVertex(&aVtx[1], &aPos[1].x, aUV[1], aColour[1], vScale, vAdd);
+        UIPoly_UnpackVertex(&aVtx[2], &aPos[2].x, aUV[2], aColour[2], vScale, vAdd);
+        UIPoly_UnpackVertex(&aVtx[3], &aPos[3].x, aUV[3], aColour[3], vScale, vAdd);
         if (pArc->n2 != -1 && (pEntry->u0 & 2)) {
             // a movie's picture fills only part of its texture
             fn_8009222C(vPictUV, pPict);
@@ -319,13 +319,13 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
 void fn_80103684(UIArc* pArc, int nMsg, s32 n, MsgArg* pArgs) {
     switch (nMsg) {
     case -1:
-        fn_800913EC(pArc->n2, pArc->n0, pArc->u8, 0, 0);
+        UI_LoadEntryPicture(pArc->n2, pArc->n0, pArc->u8, 0, 0);
         return;
     case -2:
         fn_80102AC8(pArc, 0, 0);
         return;
     case -3:
-        fn_80091460(pArc->n2, pArc->n0, pArc->u8, 0, 0);
+        UI_ReleaseEntryPicture(pArc->n2, pArc->n0, pArc->u8, 0, 0);
         return;
     case 1:
         pArc->v20[0] = pArgs[0].f;

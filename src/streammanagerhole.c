@@ -65,10 +65,10 @@ void fn_800A295C();
 void fn_800A298C();
 void fn_80014594(void);
 void fn_800145E0(void);
-void fn_800918A4(void);     // fe_movies.c: set up the loading screen
-void fn_8009198C(int nMode);    // fe_movies.c: update the loading screen
-void fn_80091818(void);     // fe_movies.c
-void fn_80091778(void);     // fe_movies.c
+void UI_InitLoadingBar(void);     // fe_movies.c: set up the loading screen
+void UI_DrawLoadingScreenAndProgressBar(int nMode);    // fe_movies.c: update the loading screen
+void UI_FreeLoadingPicture(void);     // fe_movies.c
+void UI_LoadLoadingBarTexture(void);     // fe_movies.c
 void fn_8001529C(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
 void fn_8001462C(void);
 void fn_8000B9E4();
@@ -245,10 +245,10 @@ void fn_800145E0(void) {
 }
 
 void fn_8001462C(void) {
-    fn_800918A4();
+    UI_InitLoadingBar();
     fn_800150E0();
     do {
-        fn_8009198C(0);
+        UI_DrawLoadingScreenAndProgressBar(0);
     } while ((u8)UStream_Update() != 0);   // fake match: this file tests the result as a byte
     fn_800150B8();
 }
@@ -294,21 +294,21 @@ void fn_800146C4(void) {
 // Stream list 1 (the front end's files), with the loading screen unless the front end's b0F is set.
 void fn_80014718(void) {
     if (gFEState.b0F == 0) {
-        fn_80091778();
-        fn_800918A4();
+        UI_LoadLoadingBarTexture();
+        UI_InitLoadingBar();
     }
     fn_80015134();
     do {
         if (gFEState.b0F == 0) {
-            fn_8009198C(0);
+            UI_DrawLoadingScreenAndProgressBar(0);
         }
     } while (UStream_Update() != 0);
     if (gFEState.b0F == 0) {
-        fn_8009198C(1);
+        UI_DrawLoadingScreenAndProgressBar(1);
     }
     fn_8001510C();
     if (gFEState.b0F == 0) {
-        fn_80091818();
+        UI_FreeLoadingPicture();
     }
 }
 
@@ -405,7 +405,7 @@ void StreamManagerHole_StreamFiles(void) {
     char* szCourse;
     char* szHole;
 
-    fn_800918A4();
+    UI_InitLoadingBar();
     fn_80015324();
     if (gSession.n5B34 != 0) {
         fn_8001529C(gSession.p5B30, fn_80014E7C, fn_80014E94);
@@ -419,11 +419,11 @@ void StreamManagerHole_StreamFiles(void) {
     }
     fn_8001526C();
     do {
-        fn_8009198C(0);
+        UI_DrawLoadingScreenAndProgressBar(0);
     } while (UStream_Update() != 0);
-    fn_8009198C(1);
+    UI_DrawLoadingScreenAndProgressBar(1);
     fn_80015244();
-    fn_80091818();
+    UI_FreeLoadingPicture();
 }
 
 // ---- sweep code (not yet cleaned up) ----
@@ -509,7 +509,7 @@ void fn_80014C9C(void) {
 void fn_80014DC0(void) {
     fn_800150E0();
     do {
-        fn_8009198C(0);
+        UI_DrawLoadingScreenAndProgressBar(0);
     } while ((u8)UStream_Update() != 0);   // fake match: this file tests the result as a byte
     fn_800150B8();
 }

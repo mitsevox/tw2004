@@ -41,7 +41,7 @@ void FE_CrAP_UnequipSlot(s16 nSlot);            // FE_CrAPDB.c
 u8   PasswordManager_IsPasswordEntered(int a);
 u8   PasswordManager_IsSponsorshipPasswordEntered(int n);
 s32  fn_801258E8(void);                 // EASportsBio.c
-void fn_8009170C(void);
+void UI_InitLoadingBarTilePos(void);
 
 // This file, in address order.
 void FE_vOpenONCE(void);
@@ -99,7 +99,7 @@ static f32 FE_Manager_StrippedFn(f32 x) {
 // Sets the front end's state up once, at start-up (gomainloop fn_8006C720): no player slot loaded
 // or CPU, no backup rows (aBackup -1), no profile backups (p658), no movie queued, the menus' start
 // mode (nMode) -1; b0F, b10 and b18 set, b11 and n1C cleared. Then the points fe_movies.c draws at
-// (fn_8009170C) and gUILoadingScreen's picture.
+// (UI_InitLoadingBarTilePos) and gUILoadingScreen's picture.
 void FE_vOpenONCE(void) {
     int i;
     for (i = 0; i < 5; i++) {
@@ -116,7 +116,7 @@ void FE_vOpenONCE(void) {
     gFEState.nMovieNext = 0;
     gFEState.nMovieFree = 0;
     gFEState.p658 = NULL;
-    fn_8009170C();
+    UI_InitLoadingBarTilePos();
     gUILoadingScreen.p30 = NULL;
 }
 

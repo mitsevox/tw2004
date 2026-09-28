@@ -84,25 +84,25 @@ extern FEScreen gUIState;
 
 // gUILoadingScreen (0x38 bytes), also used by the code at 0x8009170C. Only what the cleaned code reads.
 typedef struct FE801D8858 {
-    s32 n0;                     // 0x00  } fn_800918A4 sets them up
+    s32 n0;                     // 0x00  } UI_InitLoadingBar sets them up
     f32 f4;                     // 0x04  }
     f32 f8;                     // 0x08  }
     f32 fC;                     // 0x0C  }
     f32 f10;                    // 0x10  }
     s32 n14;                    // 0x14  the number of players in game type 4, else 0
-    u8  b18;                    // 0x18  set once fn_800918A4 has set it up
+    u8  b18;                    // 0x18  set once UI_InitLoadingBar has set it up
     u8  unk19[0x1C - 0x19];
     s32 n1C;                    // 0x1C
     u64 u20;                    // 0x20  TI_sRead's clock when it was set up, then at the last update
-    u64 u28;                    // 0x28  TI_sRead's clock at this update (fn_8009198C)
-    struct LLPict* p30;         // 0x30  a picture decoded from the 'load' object (fn_800917C8)
+    u64 u28;                    // 0x28  TI_sRead's clock at this update (UI_DrawLoadingScreenAndProgressBar)
+    struct LLPict* p30;         // 0x30  a picture decoded from the 'load' object (UI_DecodeLoadingPicture)
     u8  unk34[0x38 - 0x34];
 } FE801D8858;
 LAYOUT_ASSERT(FE801D8858, 0x38);
 
 extern FE801D8858 gUILoadingScreen;
 
-// A corner of a quad fe_movies.c fn_800912F4 turns into draw arrays (uiArc.c builds them too). Our
+// A corner of a quad fe_movies.c UIPoly_UnpackVertex turns into draw arrays (uiArc.c builds them too). Our
 // name: f8..f10 go out as a position, f0/f4 as texture coordinates, au14 as a colour.
 typedef struct FEVertex {
     f32 f0;                     // 0x00
@@ -114,19 +114,19 @@ typedef struct FEVertex {
 } FEVertex;
 LAYOUT_ASSERT(FEVertex, 0x18);
 
-// A textured quad of the front end that fe_movies.c fn_800914DC takes messages for. Our name; only
+// A textured quad of the front end that fe_movies.c UIPoly_ProcessMessage takes messages for. Our name; only
 // what the cleaned code reads (its size is not known).
 typedef struct FEQuad {
-    s16 n0;                     // 0x00  } with n2, an index pair into the UI file (fn_800913EC)
+    s16 n0;                     // 0x00  } with n2, an index pair into the UI file (UI_LoadEntryPicture)
     s16 n2;                     // 0x02  }
     s16 n4;                     // 0x04  its colour in the front end's colour table (-1: none)
     u8  unk6[0x8 - 0x6];
-    s16 n8;                     // 0x08  bit 0: a texture keeps its tint (fn_80090D28)
+    s16 n8;                     // 0x08  bit 0: a texture keeps its tint (UIPoly_Draw)
     s16 nA;                     // 0x0A
-    FEVertex aVtx[4];           // 0x0C  the corners (fn_80090D28 draws them)
+    FEVertex aVtx[4];           // 0x0C  the corners (UIPoly_Draw draws them)
 } FEQuad;
 
-// A message argument of fn_800914DC: a number or a float, by message. Our name.
+// A message argument of UIPoly_ProcessMessage: a number or a float, by message. Our name.
 typedef union FEMsgArg {
     s32 n;
     f32 f;
@@ -135,9 +135,9 @@ typedef union FEMsgArg {
 void FE_InitGolferTextures(void);  // FEgolferanim.c (FE_Manager.c, uiProcessInterface.c call it)
 
 // fe_movies.c: the quads' message handler (the studio's handler 0, uiProcessInterface.c UI_OpenInterface).
-void fn_800914DC(FEQuad* pQuad, int nMsg, u32 bSplit, FEMsgArg* pArgs);
+void UIPoly_ProcessMessage(FEQuad* pQuad, int nMsg, u32 bSplit, FEMsgArg* pArgs);
 
-// Four floats each, set by fe_movies.c fn_80090D28: fn_80090B80 tints a vertex colour to
+// Four floats each, set by fe_movies.c UIPoly_Draw: UIPoly_TintVertex tints a vertex colour to
 // gpUIPolyColourMul * (colour + gpUIPolyColourAdd).
 extern f32* gpUIPolyColourMul;
 extern f32* gpUIPolyColourAdd;
@@ -445,13 +445,13 @@ void FE_MakeCameoMoviePath(char* pName, char* pPath);   // "data/movies/cameos/<
 // A movie's skip test for LLVideo.c's LLVideo_PlayFile (whose arguments it ignores): any button.
 u8   FE_IsMovieSkipPressed(struct Video* pVideo, int nArg);
 
-// fe_movies.c: the texture bank loaded from LoadData.c's 'txf2' copy (fn_80091778), its slot and its
+// fe_movies.c: the texture bank loaded from LoadData.c's 'txf2' copy (UI_LoadLoadingBarTexture), its slot and its
 // first texture.
 struct TexEntry* fn_800922A0(struct TexBank* pBank);   // a bank's first texture
 extern int gUILoadingBarBankSlot;                // the bank's slot
 extern struct TexBank*  gpUILoadingBarBank;
 extern struct TexEntry* gpUILoadingBarTexture;
-extern f32 gUILoadingBarTilePos[8][2];          // eight x, y points fn_8009170C sets, fn_80091BDC reads
+extern f32 gUILoadingBarTilePos[8][2];          // eight x, y points UI_InitLoadingBarTilePos sets, UI_DrawLoadingBarTile reads
 void FE_CrAP_TurnOnPart(s16 nPart, int b, int i);    // FE_CrAPDB.c
 int  FE_CrAP_GetNumEquippedItemsWithSponsor(s16 n);  // FE_CrAPDB.c: the profile's assets whose n2C is n
 s32  FE_CrAP_CollectSponsorshipItems(void);          // FE_CrAPDB.c: fill lbl_80282470; how many records
@@ -575,10 +575,10 @@ extern u8 lbl_80212B60[64 * 64];        // a logo's pixels laid out as a texture
 
 // ---- the front end's movies (fe_movies.c) -------------------------------------------------------
 
-extern u8 gbUIFirstMenuDraw;         // fn_80091454 clears it; the front end's shutdown in game type 3
+extern u8 gbUIFirstMenuDraw;         // UI_ClearFirstMenuDraw clears it; the front end's shutdown in game type 3
                                 // sets it (uiProcessInterface.c UI_CloseInterface)
-void fn_80090B10(void);
-void fn_80091454(void);
+void UI_FreeAllEntryPictures(void);
+void UI_ClearFirstMenuDraw(void);
 void fn_80091EE8(void);
 
 #endif
