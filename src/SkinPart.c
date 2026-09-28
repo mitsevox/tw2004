@@ -127,7 +127,7 @@ void SkinPart_ApplyClubChoices(Character* pChar, SkinChoices* pChoices) {
     }
 }
 
-// Burns the body's skin down to its current look (SkinBurn fn_80127B98): each part keeps only its
+// Burns the body's skin down to its current look (SkinBurn SkinBurn_BurnSkin): each part keeps only its
 // chosen variant and option, except the parts named in gBurnAllVariantParts (the glove), which
 // keep every variant so the glove can still come off and go back on (stateFunc.c); morph targets
 // 0-9 (gBurnKeptMorphs) are kept. char.c calls it once a look is applied.
@@ -146,7 +146,7 @@ void SkinPart_BurnBodySkin(Character* pChar) {
         }
     }
     aParts[n] = -1;
-    fn_80127B98(pChar->pSkin, aParts, gBurnKeptMorphs);
+    SkinBurn_BurnSkin(pChar->pSkin, aParts, gBurnKeptMorphs);
 }
 
 void SkinPart_ChooseBodyPartVariant(Character* pChar, int nPart, int nVariant) {
@@ -740,8 +740,8 @@ void SkinPart_MarkPart(Skin* pSkin, int nPart) {
                         nOption + pDesc->pVariants[nVariant + pDesc->pParts[nPart].nFirst].nFirstOption);
 }
 
-// Marks what every option of the skin needs (each SkinDesc.p5C entry), for SkinBurn fn_801272B4,
-// which drops the matrices none of them uses.
+// Marks what every option of the skin needs (each SkinDesc.p5C entry), for SkinBurn
+// SkinBurn_DropUnusedMatrices, which drops the matrices none of them uses.
 void SkinPart_MarkAllOptions(Skin* pSkin) {
     SkinDesc* pDesc;
     int i;

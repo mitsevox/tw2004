@@ -962,3 +962,15 @@ address	name	comment	by	date
 8011CD84	SkinMorph_Destroy	rewrite	rh4 (replayed by orchestrator)	2026-09-28
 8011CDE8	SkinMorph_GetBlendSize	rewrite	rh4 (replayed by orchestrator)	2026-09-28
 8011CE58	SkinMorph_UpdateAllTargets	rewrite	rh4 (replayed by orchestrator)	2026-09-28
+801270F0	SkinBurn_CheckSignatureFile	rewrite	rh4 (replayed by orchestrator)	2026-09-28
+80127140	SkinBurn_RenumberMeshEntries	rewrite	rh4 (replayed by orchestrator)	2026-09-28
+801271E0	SkinBurn_RenumberMeshBits	rewrite	rh4 (replayed by orchestrator)	2026-09-28
+80127218	SkinBurn_RenumberOptionBits	rewrite	rh4 (replayed by orchestrator)	2026-09-28
+801272B4	SkinBurn_DropUnusedMatrices	rewrite	rh4 (replayed by orchestrator)	2026-09-28
+801275F0	SkinBurn_GetAlignedSize	keep	rh4 (replayed by orchestrator)	2026-09-28
+80127614	SkinBurn_CopyAligned	keep	rh4 (replayed by orchestrator)	2026-09-28
+801276A8	SkinBurn_TakeAligned	rewrite	rh4 (replayed by orchestrator)	2026-09-28
+801276E4	SkinBurn_PackModel	rewrite	rh4 (replayed by orchestrator)	2026-09-28
+80127B10	SkinBurn_BurnModel	add	rh4 (replayed by orchestrator)	2026-09-28
+80127B4C	SkinBurn_BakeMaterialEntry	rewrite	rh4 (replayed by orchestrator)	2026-09-28
+80127B98	SkinBurn_BurnSkin	rewrite	rh4 (replayed by orchestrator)	2026-09-28

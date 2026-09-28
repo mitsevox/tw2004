@@ -384,7 +384,7 @@ They will be sorted into the sections below.
   - graduate.py takes `.rodata`, `.bss` and `.sdata` ranges too. `.bss` definitions go in reverse address
     order, and `.bss`/`.sdata` ranges end at the last symbol's padded size (Trax).
   - lint reports `ub-no-prototype` when a trailing `// comment` sits on a function-definition line: put the
-    comment on the line above (SkinBurn fn_801271E0).
+    comment on the line above (SkinBurn SkinBurn_RenumberMeshBits).
   - **A unit whose `.sdata2` constants come out in the wrong order** (every function exact, DOL fails) had a
     function EA's linker stripped. Put an unused `static <Unit>_StrippedFn` that uses the out-of-order
     constants, in EA's order, just before their first user; check with `objdump -s -j .sdata2`. `x * 1.0f`

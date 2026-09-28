@@ -380,7 +380,7 @@ void SkinMorph_Update(Skin* pSkin, int nView) {
 
 // Blends every morph target, at its current weight, into a new override table and memory block for
 // the skin's morphed meshes (StaticMem mode 1), and gives both: NULL and NULL without a morph state
-// or morphed meshes. SkinBurn.c (fn_80127B98) burns them into the skin; SkinMorph_FreeBlended frees
+// or morphed meshes. SkinBurn.c (SkinBurn_BurnSkin) burns them into the skin; SkinMorph_FreeBlended frees
 // them.
 void SkinMorph_CreateBlended(Skin* pSkin, HwsMemBlock** ppBlock, HwsOverrideTable** ppTable) {
     HwsMemBlock* pBlock;

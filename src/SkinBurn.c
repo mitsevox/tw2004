@@ -7,15 +7,16 @@
 
 s32* lbl_802825A8;
 
-s32   fn_801275F0(const void* p, s32 nCount, s32 nSize, s32 nAlign);
-void* fn_80127614(u8* pBase, s32* pOffset, const void* pSrc, s32 nSize, s32 nAlign);
-void* fn_801276A8(u8* pBase, s32* pOffset, s32 nSize, s32 nAlign);
+s32   SkinBurn_GetAlignedSize(const void* p, s32 nCount, s32 nSize, s32 nAlign);
+void* SkinBurn_CopyAligned(u8* pBase, s32* pOffset, const void* pSrc, s32 nSize, s32 nAlign);
+void* SkinBurn_TakeAligned(u8* pBase, s32* pOffset, s32 nSize, s32 nAlign);
 
 char lbl_802819A8[8] = "";      // the folder the signature file is looked for in
 
-// Checks that the signature file "Signat.sig" is on the disc (GoEntry.c calls it at start-up);
-// without it the game stops.
-void fn_801270F0(void) {
+// Checks at start-up (GoEntry.c) that the signature file Signat.sig is on the disc, in the folder
+// lbl_802819A8 names; without it the game stops on purpose. Nothing to do with skins: it lies in
+// the margin at SkinBurn.c's start (docs/sourcefiles.md) and may belong to the file before.
+void SkinBurn_CheckSignatureFile(void) {
     char szPath[256];   // the size is not known (the frame leaves room for 256 bytes)
     int hFile;
 
@@ -29,9 +30,10 @@ void fn_801270F0(void) {
     fn_8000633C(hFile);
 }
 
-// Renumbers the model's p44 entries with pBurn->a30 and packs the kept ones to the front,
-// dropping those whose new number is -1.
-void fn_80127140(Skin* pSkin, HwsBurn* pBurn) {
+// Renumbers each SkinModel.p44 entry's n0 (a SkinDesc.n2C bit) to its number in the burnt
+// description (pBurn->a30) and packs the kept entries to the front, dropping those the burn dropped
+// (-1). SkinModel.n40 becomes the count kept.
+void SkinBurn_RenumberMeshEntries(Skin* pSkin, HwsBurn* pBurn) {
     SkinModel44* pEntries;
     SkinModel44* pSrc;
     SkinModel44* pDst;
@@ -61,8 +63,8 @@ void fn_80127140(Skin* pSkin, HwsBurn* pBurn) {
     pSkin->pModel->n40 = nKept;
 }
 
-// Renumbers a mesh's bits with lbl_802825A8 (pSkin is unused).
-void fn_801271E0(Skin* pSkin, SkinMesh* pMesh) {
+// Renumbers a mesh's matrix bits (SkinMeshBit.nBit) with lbl_802825A8 (pSkin is unused).
+void SkinBurn_RenumberMeshBits(Skin* pSkin, SkinMesh* pMesh) {
     SkinMeshBit* pBit = pMesh->pBits;
     s32 i;
 
@@ -72,8 +74,9 @@ void fn_801271E0(Skin* pSkin, SkinMesh* pMesh) {
     }
 }
 
-// Renumbers the bits of the meshes of the skin's p5C entry n that have flags 1 and 0x10.
-void fn_80127218(Skin* pSkin, s32 n) {
+// Renumbers the matrix bits (SkinBurn_RenumberMeshBits) of the meshes of option n (SkinDesc.p5C
+// entry) that have flags 1 and 0x10.
+void SkinBurn_RenumberOptionBits(Skin* pSkin, s32 n) {
     SkinIterArgs args;
     u8 aBuf[0x48];      // the iterator's buffer; its size is not known
     SkinIter* pIter;
@@ -85,17 +88,21 @@ void fn_80127218(Skin* pSkin, s32 n) {
     while (SkinIter_IsValid(pIter)) {
         pMesh = SkinIter_GetMesh(pIter);
         if ((pMesh->uFlags & 1) && (pMesh->uFlags & 0x10)) {
-            fn_801271E0(pSkin, pMesh);
+            SkinBurn_RenumberMeshBits(pSkin, pMesh);
         }
         SkinIter_Next(pIter);
     }
     fn_80113BAC(pIter);
 }
 
-// Drops the bits (Skin.aMtxBits) no option uses: keeps the first n14 and those SkinPart_MarkAllOptions marks,
-// renumbers them 0, 1, 2... (lbl_802825A8 holds the new number of each old one) and packs their
-// SkinModel.p54 entries to the front.
-void fn_801272B4(Skin* pSkin) {
+// Drops the blended matrices no option uses (SkinModel.p54, one per bit of Skin.aMtxBits). It keeps
+// the first SkinModel.n14 and those SkinPart_MarkAllOptions marks (marked into a scratch bit array
+// put in place of Skin.aMtxBits), packs their p54 entries to the front, numbered 0, 1, 2..., and
+// renumbers the bits of every option's meshes to match (lbl_802825A8: each old bit's new number, -1
+// dropped). Then each SkinModel.p44 entry's list (p4) is cut to the kept count at most and numbered
+// 0, 1, 2..., and the SkinDesc.p34 mesh of the same index gets that count (n8) and a size of 64
+// bytes each. SkinModel.n50 becomes the count kept.
+void SkinBurn_DropUnusedMatrices(Skin* pSkin) {
     SkinModel* pModel;
     u32* aBits;
     s32* aOld;
@@ -159,7 +166,7 @@ void fn_801272B4(Skin* pSkin) {
     }
 
     for (i = 0; i < pModel->pDesc->n58; i++) {
-        fn_80127218(pSkin, i);
+        SkinBurn_RenumberOptionBits(pSkin, i);
     }
 
     // n is reused for each entry's count, and this loop has its own counter.
@@ -184,7 +191,7 @@ void fn_801272B4(Skin* pSkin) {
 
 // The bytes nCount items of nSize take, rounded up to nAlign (a power of two); 0 when there is no
 // array (p is NULL).
-s32 fn_801275F0(const void* p, s32 nCount, s32 nSize, s32 nAlign) {
+s32 SkinBurn_GetAlignedSize(const void* p, s32 nCount, s32 nSize, s32 nAlign) {
     s32 n = 0;
 
     if (p != NULL) {
@@ -195,7 +202,7 @@ s32 fn_801275F0(const void* p, s32 nCount, s32 nSize, s32 nAlign) {
 
 // Copies nSize bytes of pSrc to pBase + *pOffset and moves *pOffset past them, rounded up to
 // nAlign. Gives where the copy went (NULL, and nothing done, when pSrc is NULL).
-void* fn_80127614(u8* pBase, s32* pOffset, const void* pSrc, s32 nSize, s32 nAlign) {
+void* SkinBurn_CopyAligned(u8* pBase, s32* pOffset, const void* pSrc, s32 nSize, s32 nAlign) {
     void* pDst = NULL;
 
     if (pSrc != NULL) {
@@ -207,8 +214,9 @@ void* fn_80127614(u8* pBase, s32* pOffset, const void* pSrc, s32 nSize, s32 nAli
     return pDst;
 }
 
-// Takes nSize bytes at pBase + *pOffset the same way, without copying anything.
-void* fn_801276A8(u8* pBase, s32* pOffset, s32 nSize, s32 nAlign) {
+// Takes nSize bytes at pBase + *pOffset without copying anything, moving *pOffset past them rounded
+// up to nAlign; gives where they start (NULL, and nothing done, when nSize is 0).
+void* SkinBurn_TakeAligned(u8* pBase, s32* pOffset, s32 nSize, s32 nAlign) {
     void* p = NULL;
 
     if (nSize != 0) {
@@ -219,9 +227,10 @@ void* fn_801276A8(u8* pBase, s32* pOffset, s32 nSize, s32 nAlign) {
     return p;
 }
 
-// Packs the skin's model and its arrays into one allocation and frees the old one. Each
-// SkinModel44's p4 array goes into one shared block of indexes at the end.
-void fn_801276E4(Skin* pSkin) {
+// Packs the skin's model and its arrays (p34, p38, p3C, p54, p44, each 16-byte aligned) into one
+// allocation, which becomes Skin.pModel (its n08: the allocation's size), and frees the old model.
+// The p44 entries' p4 lists go into one shared block of indexes at the end.
+void SkinBurn_PackModel(Skin* pSkin) {
     SkinModel* pOld;
     s32 nOffset;
     s32 nSize;
@@ -238,29 +247,29 @@ void fn_801276E4(Skin* pSkin) {
 
     pOld = pSkin->pModel;
     // EA passes &pOld where an array is expected: never NULL, so the model always counts
-    nSize = fn_801275F0(&pOld, 1, sizeof(SkinModel), 16);
-    nSize += fn_801275F0(pOld->p34, pOld->n14, 0x20, 16);
-    nSize += fn_801275F0(pOld->p38, 1, 0x50, 16);
-    nSize += fn_801275F0(pOld->p3C, pOld->n0C, 0x50, 16);
-    nSize += fn_801275F0(pOld->p54, pOld->n50, sizeof(SkinModel54), 16);
-    nSize += fn_801275F0(pOld->p44, pOld->n40, sizeof(SkinModel44), 16);
+    nSize = SkinBurn_GetAlignedSize(&pOld, 1, sizeof(SkinModel), 16);
+    nSize += SkinBurn_GetAlignedSize(pOld->p34, pOld->n14, 0x20, 16);
+    nSize += SkinBurn_GetAlignedSize(pOld->p38, 1, 0x50, 16);
+    nSize += SkinBurn_GetAlignedSize(pOld->p3C, pOld->n0C, 0x50, 16);
+    nSize += SkinBurn_GetAlignedSize(pOld->p54, pOld->n50, sizeof(SkinModel54), 16);
+    nSize += SkinBurn_GetAlignedSize(pOld->p44, pOld->n40, sizeof(SkinModel44), 16);
     nIndexes = 0;
     nEntries = pOld->n40;
     for (i = 0; i < nEntries; i++) {
         nIndexes += pOld->p44[i].n8;
     }
-    nSize += fn_801275F0(&pOld, nIndexes, sizeof(s32), 16);
+    nSize += SkinBurn_GetAlignedSize(&pOld, nIndexes, sizeof(s32), 16);
 
     pBase = StaticMem_Alloc(nSize, 2, 16, "SkinBurn.c", 434);
     nOffset = 0;
-    pNew = fn_80127614(pBase, &nOffset, pOld, sizeof(SkinModel), 16);
+    pNew = SkinBurn_CopyAligned(pBase, &nOffset, pOld, sizeof(SkinModel), 16);
     pNew->n08 = nSize;
-    pNew->p34 = fn_80127614(pBase, &nOffset, pOld->p34, pOld->n14 * 0x20, 16);
-    pNew->p38 = fn_80127614(pBase, &nOffset, pOld->p38, 0x50, 16);
-    pNew->p3C = fn_80127614(pBase, &nOffset, pOld->p3C, pOld->n0C * 0x50, 16);
-    pNew->p54 = fn_80127614(pBase, &nOffset, pOld->p54, pOld->n50 * sizeof(SkinModel54), 16);
-    pNew->p44 = fn_80127614(pBase, &nOffset, pOld->p44, pOld->n40 * sizeof(SkinModel44), 16);
-    aIndexes = fn_801276A8(pBase, &nOffset, nIndexes * sizeof(s32), 16);
+    pNew->p34 = SkinBurn_CopyAligned(pBase, &nOffset, pOld->p34, pOld->n14 * 0x20, 16);
+    pNew->p38 = SkinBurn_CopyAligned(pBase, &nOffset, pOld->p38, 0x50, 16);
+    pNew->p3C = SkinBurn_CopyAligned(pBase, &nOffset, pOld->p3C, pOld->n0C * 0x50, 16);
+    pNew->p54 = SkinBurn_CopyAligned(pBase, &nOffset, pOld->p54, pOld->n50 * sizeof(SkinModel54), 16);
+    pNew->p44 = SkinBurn_CopyAligned(pBase, &nOffset, pOld->p44, pOld->n40 * sizeof(SkinModel44), 16);
+    aIndexes = SkinBurn_TakeAligned(pBase, &nOffset, nIndexes * sizeof(s32), 16);
 
     nFirst = 0;
     nEntries = pNew->n40;
@@ -277,25 +286,31 @@ void fn_801276E4(Skin* pSkin) {
     StaticMem_Free(pOld);
 }
 
-void fn_80127B10(Skin* pSkin, HwsBurn* pBurn) {
-    fn_80127140(pSkin, pBurn);
-    fn_801272B4(pSkin);
-    fn_801276E4(pSkin);
+// Brings the skin's model in line with pBurn's burnt description: renumbers and packs its mesh
+// entries, drops the matrices no option uses, and packs it into one allocation.
+void SkinBurn_BurnModel(Skin* pSkin, HwsBurn* pBurn) {
+    SkinBurn_RenumberMeshEntries(pSkin, pBurn);
+    SkinBurn_DropUnusedMatrices(pSkin);
+    SkinBurn_PackModel(pSkin);
 }
 
-// The callback fn_80127B98 hands hwsBurn.c: patches an entry (SkinPart_ApplySetsToMaterialEntry),
-// clears bit 1 and n16.
-void fn_80127B4C(Skin* pSkin, SkinDesc14* pEntry) {
+// The callback SkinBurn_BurnSkin hands the burn (hwsBurn.c calls it on each material entry):
+// patches the entry for copy 0's chosen sets (SkinPart_ApplySetsToMaterialEntry), then clears flag
+// 2 and n16, so the burnt entry keeps the texture scale and offset it got and no longer looks one
+// up in SkinDesc.pB8.
+void SkinBurn_BakeMaterialEntry(Skin* pSkin, SkinDesc14* pEntry) {
     SkinPart_ApplySetsToMaterialEntry(pSkin, pEntry, NULL, NULL, 0);
     pEntry->u08 &= ~2;
     pEntry->n16 = 0;
 }
 
-// Burns the skin's description down to what it shows now. Each part keeps its current option,
-// and its current variant unless aParts lists it (then every variant is kept). Morph targets in
-// aList are kept at weight 0; the others are dropped (hwsBurn a1C). The burnt description replaces
-// the model's (the old one is freed) and the skin's first mesh table. aParts and aList end with -1.
-void fn_80127B98(Skin* pSkin, s32* aParts, s32* aList) {
+// Burns the skin down to its current look (SkinPart_BurnBodySkin). Each part keeps only its current
+// option (copy 0), and only its current variant unless aParts lists it (then every variant stays).
+// The morph targets aList lists stay, set to weight 0; every other one is blended into the meshes
+// at its current weight (SkinMorph_CreateBlended) and dropped (hwsBurn a1C). The burnt description
+// replaces the model's (the old one is freed) and the skin's first override table points at it;
+// then the model is burnt to match (SkinBurn_BurnModel). aParts and aList end with -1.
+void SkinBurn_BurnSkin(Skin* pSkin, s32* aParts, s32* aList) {
     HwsBurn* pBurn;
     s32 nCount;
     s32 i;
@@ -308,7 +323,7 @@ void fn_80127B98(Skin* pSkin, s32* aParts, s32* aList) {
     if (pSkin->pModel == NULL || pSkin->pModel->pDesc == NULL) return;
 
     pBurn = fn_801104AC(pSkin->pModel->pDesc);
-    fn_801109F0(pBurn, fn_80127B4C, pSkin);
+    fn_801109F0(pBurn, SkinBurn_BakeMaterialEntry, pSkin);
     nCount = SkinPart_GetNumParts(pSkin);
     for (i = 0; i < nCount; i++) {
         for (j = 0; aParts[j] >= 0; j++) {
@@ -338,7 +353,7 @@ void fn_80127B98(Skin* pSkin, s32* aParts, s32* aList) {
     pOld = pSkin->pModel->pDesc;
     pSkin->pModel->pDesc = pDesc;
     StaticMem_Free(pOld);
-    fn_80127B10(pSkin, pBurn);
+    SkinBurn_BurnModel(pSkin, pBurn);
     fn_801108B0(pBurn);
     SkinMorph_FreeBlended(pSkin, pBlock, pTable);
     if (pSkin->a10A0[0] != NULL) {

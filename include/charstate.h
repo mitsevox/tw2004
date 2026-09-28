@@ -217,16 +217,16 @@ typedef struct SkinDesc {
 } SkinDesc;
 LAYOUT_ASSERT(SkinDesc, 0x120);
 
-// An entry of SkinModel.p44: its first word is an index SkinBurn.c renumbers (fn_80127140).
+// An entry of SkinModel.p44: its first word is an index SkinBurn.c renumbers (SkinBurn_RenumberMeshEntries).
 typedef struct SkinModel44 {
     s32  n0;                    // 0x0
-    s32* p4;                    // 0x4  n8 of them; fn_801272B4 numbers them 0, 1, 2...
+    s32* p4;                    // 0x4  n8 of them; SkinBurn_DropUnusedMatrices numbers them 0, 1, 2...
     s16  n8;                    // 0x8
     u8   unkA[0x10 - 0xA];
 } SkinModel44;
 LAYOUT_ASSERT(SkinModel44, 0x10);
 
-// An entry of SkinModel.p54, one per bit of Skin.aMtxBits; SkinBurn.c moves them (fn_801272B4).
+// An entry of SkinModel.p54, one per bit of Skin.aMtxBits; SkinBurn.c moves them (SkinBurn_DropUnusedMatrices).
 typedef struct SkinModel54 {
     s16  nBones;                // 0x00  entries used in aBones and afWeights (SKN_BuildMatrices)
     s16  aBones[3];             // 0x02  matrices of Skin.p108C its matrix is blended from
@@ -238,7 +238,7 @@ LAYOUT_ASSERT(SkinModel54, 0x14);
 typedef struct SkinModel {
     s32  n00;                   // 0x00  4: the file carries a SkinDesc at pDesc (SKN_Create)
     s32  n04;                   // 0x04
-    s32  n08;                   // 0x08  its size with all its arrays once burnt (fn_801276E4)
+    s32  n08;                   // 0x08  its size with all its arrays once burnt (SkinBurn_PackModel)
     s32  n0C;                   // 0x0C  entries in p3C
     u8   unk10[4];
     s32  n14;                   // 0x14  how many matrices Skin.p108C holds (Character_SetPreferedPos); also
@@ -264,7 +264,7 @@ typedef struct SkinModel {
     SkinModel54* p54;           // 0x54  one per bit
     u8   unk58[0x140 - 0x58];
 } SkinModel;
-LAYOUT_ASSERT(SkinModel, 0x140);  // fn_801276E4 copies it whole
+LAYOUT_ASSERT(SkinModel, 0x140);  // SkinBurn_PackModel copies it whole
 
 // What Skin.pMorph points at (SkinMorph.c; our name): the weights of the skin's morph targets.
 typedef struct SkinMorphState {
@@ -540,7 +540,7 @@ typedef struct HwsBurn {
     s32  n60;                   // 0x60  pDesc->n10
     SkinDesc14* a64;            // 0x64  a copy of pDesc->p14 (fn_801115C4)
     void (*pfn68)(Skin* pSkin, SkinDesc14* pEntry); // 0x68  } called on each a64 entry with
-    Skin* pSkin;                // 0x6C  } pSkin (fn_801109F0; SkinBurn fn_80127B98)
+    Skin* pSkin;                // 0x6C  } pSkin (fn_801109F0; SkinBurn SkinBurn_BurnSkin)
     s32  n70;                   // 0x70  pDesc->n88
     s32  n74;                   // 0x74  the bits of p78 set (fn_80111658)
     u32* p78;                   // 0x78  n70 bits: the SkinDesc.p8C entries a64 uses
@@ -719,8 +719,8 @@ void  fn_80110A24(HwsBurn* pBurn, int n);
 SkinDesc* fn_80111EB0(HwsBurn* pBurn);
 
 // SkinBurn.c: burns a skin (aParts and aList each end with -1).
-void  fn_80127B98(Skin* pSkin, s32* aParts, s32* aList);
-extern s32* lbl_802825A8;               // the new number of each mesh bit (fn_801271E0)
+void  SkinBurn_BurnSkin(Skin* pSkin, s32* aParts, s32* aList);
+extern s32* lbl_802825A8;               // the new number of each mesh bit (SkinBurn_RenumberMeshBits)
 
 // Bit n of a bit array of 32-bit words: test, set, clear.
 void  BitArray_FillArray(u32* aBits, u32 nBits);  // sets every bit of a bit array

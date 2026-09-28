@@ -27,7 +27,7 @@ void fn_8006CFC8(void);
 void fn_8006D8E8(void);
 void GO_vInitIG(void);
 void fn_80008380(void);
-void fn_801270F0(void);
+void SkinBurn_CheckSignatureFile(void);
 void fn_800573E4(void);
 void fn_80091EE4(void);
 void fn_8007734C(void);
@@ -66,7 +66,7 @@ void fn_800083A4(void) {
 
     bQuit = 0;
     fn_8006C720();
-    fn_801270F0();
+    SkinBurn_CheckSignatureFile();
     do {
         switch (gSession.nGameType) {
         case 0:
