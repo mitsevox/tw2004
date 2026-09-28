@@ -1,8 +1,15 @@
-// GameMode11.c (our name): game mode 11, the lessons. One player on hole 14 of course 10; eleven
-// lessons (gLessonNum, 1..11; 12 when all are done), each a shot from a set spot with its own
-// shot kind, club and shape (gLessons). The mode saves some of the player's options when it
-// starts and puts them back when it ends. Golfer.c, Swing.c and skalib.c ask it what the lesson
-// allows.
+// GameMode11.c (our name): game mode 11, the lessons. One player (golfer 1) on hole 14 of course 10
+// works through eleven lessons (gLessonNum, 1..11; 12 when all are done), each a shot from a set
+// spot with its own shot kind, club and shape (gLessons): 1 a drive to the fairway, 2..6 shots to
+// the green (a pitch, shot kind 5, a 5-iron punch, a short lob-wedge swing, a sand-wedge chip), 7
+// a putt to hole, 8 and 9 a shot curved one way and then the other, 10 a drive with a power boost,
+// 11 a shot with spin. Each lesson has the coach's lines (gLessonLines), a demonstration by the
+// CPU, then the player's tries with swing hints and highlighted HUD items until one passes
+// (Lessons_JudgeShot); Lessons_Update runs it all as a sequence of steps (gLessonStep). After
+// lesson 7 the player has earned the first TOUR card level and may stop. The mode saves some of
+// the player's options when it starts and puts them back when it ends. Golfer.c, Swing.c,
+// ai_brain.c, CharAnim.c, skalib.c, stateFunc.c and the AI's club and shot choice ask it what the
+// lesson allows; event.c lets it block or react to the game's events (Lessons_OnEvent).
 
 #include "golfer.h"
 #include "game.h"
@@ -20,8 +27,9 @@ typedef struct Lesson {
     s32 nShape;                 // 0x18  7 = any
 } Lesson;
 
-// Each lesson's animation (index 0 unused), picked by Lessons_GetAnimName: gLessonTryAnims from step 6 on
-// (the player's tries), gLessonDemoAnims before it (the demonstration). Only lesson 6 differs.
+// Each lesson's golfer animation (index 0 unused), picked by Lessons_GetAnimName: gLessonTryAnims
+// from step 6 on (the player's tries), gLessonDemoAnims before it (the demonstration). Only lesson 6
+// differs. Lessons_IsLessonAnim checks a clip name against both.
 char* gLessonTryAnims[12] = {
     "tdlpre01", "tdlpre04", "gdlpre03", "gdlpre53", "g3lpre02", "g3lpre01",
     "g3lpre03", "gplpre51", "tdlpre04", "tdlpre05", "tdlpre04", "g3lpre04",
@@ -46,7 +54,10 @@ Lesson gLessons[11] = {
     {{-407.0f, 0.0f, 340.0f, 1.0f}, 8, 26, 7},
 };
 
-// The lessons' message lists: 16 message ids per row (-1 = none); gLessonLineRow is the lesson's row.
+// The coach's lines (commentary kind 9 ids, -1 = none), 16 per row: 0 the lesson's opening line, 1
+// before the demonstration, 2 after it, 3..7 a missed shot, 8..10 a fault, 11..12 a short shot,
+// 13..14 several failings (Lessons_PlayLine). gLessonLineRow is the lesson's row: lessons 1, 8, 9,
+// 2, 5, 6, 3, 4, 7, 10, 11 in that order, then the closing line.
 s16 gLessonLines[12 * 16] = {
     3, 4, 5, -1, -1, -1, -1, -1, 6, 7, 8, 9, 10, 11, 12, -1,
     -1, 13, 14, 15, 16, 17, -1, -1, 6, 7, 8, 18, 19, 20, 21, 12,
@@ -62,35 +73,35 @@ s16 gLessonLines[12 * 16] = {
     60, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 };
 
-s32 gLessonSavedOptionC = 4;                    // the options' nC, saved while the mode runs
-s32 gLessonStep;                    // the lesson's step
-s32 gLessonNextStep;
-s32 gLessonLineRow;                    // the lesson's row in gLessonLines
-s32 gLessonBackswingHint;
-s32 gLessonDownswingHint;
-s32 gLessonHintSwapTimer;                    // frames until the two alternating hints swap
-s32 gLessonHighlightTimer;                    // frames until the next highlight
-s32 gLessonHighlight;                    // the highlighted one of four hints (4 = none yet)
-u8  gLessonSavedCommentLevel;                    // options unk0[4], saved
-u8  gLessonSavedPuttGrid;                    // options unk84, saved
-u8  gLessonSavedBoost;                    // the boost option, saved
-u8  gLessonSavedSpin;                    // the spin option, saved
-s32 gLessonController;                    // player 0's controller, kept while the CPU demonstrates
-f32 gLessonHookSlice;                    // lessons 8 and 9 test its sign
-s32 gLessonNum;
-u8  gLessonPauseClosed;
-s32 gLessonPanel;
-u8  gLessonShowBackswingHint;                    // which of the two alternating hints is showing
-u8  gLessonTryHintsSet;                    // the player's try has set up its hints
-u8  gLessonSkipPending;
-s32 gLessonSavedWind;                    // the wind option, saved while the mode runs
-u32 gLessonFailedTries;                    // picks which message of a list is shown
-u8  gLessonSwingCommitted;
-u8  gLessonQuitChosen;
-u8  gLessonContinueChosen;
-u8  gLessonWaitingForLine;
-u8  gLessonBoostUsed;
-u8  gLessonSpinUsed;
+s32 gLessonSavedOptionC = 4;       // the options' nC, saved while the mode runs
+s32 gLessonStep;                    // the step Lessons_Update is at
+s32 gLessonNextStep;                // where a waiting step (0, 1, 18) goes next
+s32 gLessonLineRow;                 // the lesson's row in gLessonLines (a multiple of 16)
+s32 gLessonBackswingHint;           // the value message 15 shows with the backswing hint (5; 4, 6)
+s32 gLessonDownswingHint;           // the value message 15 shows with the downswing hint (2; 3, 1)
+s32 gLessonHintSwapTimer;           // frames until the two swing hints swap (59)
+s32 gLessonHighlightTimer;          // frames until the next HUD item is highlighted (389, then 83)
+s32 gLessonHighlight;               // lessons 6 and 7: which of HUD items 4..7 is lit (4 = none yet)
+u8  gLessonSavedCommentLevel;       // options a0[4] (the commentary level), saved
+u8  gLessonSavedPuttGrid;           // options b84 (the putting grid), saved
+u8  gLessonSavedBoost;              // the boost option, saved
+u8  gLessonSavedSpin;               // the spin option, saved
+s32 gLessonController;              // player 0's controller, kept while the CPU demonstrates
+f32 gLessonHookSlice;               // the try's hook-slice (SW_vGetHookSlice): lessons 8 and 9
+s32 gLessonNum;                     // the current lesson, 1..11 (12: all done)
+u8  gLessonPauseClosed;             // the pause menu closed: send message 39 next frame
+s32 gLessonPanel;                   // the value message 60 shows with the hints (the lesson - 1)
+u8  gLessonShowBackswingHint;       // which of the two swing hints is showing (1: backswing)
+u8  gLessonTryHintsSet;             // the player's try has set up its hints
+u8  gLessonSkipPending;             // Lessons_StopWaiting goes to gLessonNextStep; never set
+s32 gLessonSavedWind;               // the wind option, saved while the mode runs
+u32 gLessonFailedTries;             // this lesson's failed tries: picks the coach's line
+u8  gLessonSwingCommitted;          // the backswing passed its mark; lesson 11's spin hint shows
+u8  gLessonQuitChosen;              // after lesson 7: the player chose to stop
+u8  gLessonContinueChosen;          // after lesson 7: the player chose to go on
+u8  gLessonWaitingForLine;          // step 1 is waiting for the coach's line to end
+u8  gLessonBoostUsed;               // this try used a power boost (event 45): lesson 10
+u8  gLessonSpinUsed;                // this try used spin (event 46): lesson 11
 
 void  Gaud_ExitCrowdReactionSound(void);
 void  fn_800E5200(int a);
@@ -104,9 +115,9 @@ void Lessons_Shutdown(void);
 void Lessons_StopWaitingForLine(void);
 void Lessons_PlaceBall(void);
 int  Lessons_PlayLine(int nList, int nCount);
-void Lessons_SetHintPhase(int nPlayer);
-void Lessons_ShowSwingHint(u8 a, int b);
-void Lessons_StartLine(int a, int b);
+void Lessons_SetHintPhase(int nPhase);
+void Lessons_ShowSwingHint(u8 bShow, int nHint);
+void Lessons_StartLine(int nLine, int a);
 void Lessons_AfterReplan(int nPlayer);
 void Lessons_Update(void);
 u8   Lessons_HoleFinished(int nPlayer, u8 bCheck);
@@ -115,7 +126,7 @@ void Lessons_EndGame(void);
 void Lessons_JudgeShot(void);
 void Lessons_StartTry(void);
 void Lessons_AskContinue(void);
-void Lessons_HighlightHudItem(int a, int b);
+void Lessons_HighlightHudItem(int nItem, int bOn);
 
 // Mode 11 starts (pfnInit): its callbacks; the yardage, the stroke limit, gimmes, the flyovers
 // (b27F, b280), setup tips, the re-plan button, the flight-camera toggles and in-flight replays
@@ -1159,14 +1170,14 @@ void Lessons_StartFromMenu(void) {
 
 // Front-end message 43: which swing hint phase shows: 0 none, 1 the backswing, 2 the downswing, 3
 // the spin of lesson 11.
-void Lessons_SetHintPhase(int nPlayer) {
-    GameMsg_SendInt(43, nPlayer);
+void Lessons_SetHintPhase(int nPhase) {
+    GameMsg_SendInt(43, nPhase);
 }
 
 // Front-end message 15: the swing hint shown (bShow 1) with its value (gLessonBackswingHint or
 // gLessonDownswingHint; 0 in the demonstration's other swing states) or hidden (0, 0).
-void Lessons_ShowSwingHint(u8 a, int b) {
-    GameMsg_Send2Ints(15, a, b);
+void Lessons_ShowSwingHint(u8 bShow, int nHint) {
+    GameMsg_Send2Ints(15, bShow, nHint);
 }
 
 // Front-end message 40, sent after lesson 7: the question whether to go on, answered by
@@ -1178,11 +1189,11 @@ void Lessons_AskContinue(void) {
 // Front-end message 38: HUD item nItem (0..8) highlighted (bOn 1) or not. The lessons use item 0
 // (lesson 10), 2 (lessons 10 and 11), 4..7 (the four hints of lessons 6 and 7; 5 in lesson 8, 4 in
 // lesson 9) and 8 (lesson 2).
-void Lessons_HighlightHudItem(int a, int b) {
-    GameMsg_Send2Ints(38, a, b);
+void Lessons_HighlightHudItem(int nItem, int bOn) {
+    GameMsg_Send2Ints(38, nItem, bOn);
 }
 
-// Plays the coach's line nLine (commentary kind 9).
-void Lessons_StartLine(int a, int b) {
-    Gaud_StartComment(9, a, b);
+// Plays the coach's line nLine (commentary kind 9); a goes on to Gaud_StartComment (always 0 here).
+void Lessons_StartLine(int nLine, int a) {
+    Gaud_StartComment(9, nLine, a);
 }

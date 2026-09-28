@@ -1,8 +1,13 @@
 // GameMode12.c (our name): game mode 12, stroke play with points. Each time the ball lands on a
-// special surface (a row of the prize table at gEarningsTable + 0x710) it scores points, times the
-// shot's multiplier; each hole's points (nD28) are then scaled by the score against par, and a
-// human player is paid the round's total. The honors, hole-finished and game-finished callbacks
-// are mode 0's.
+// surface that has points in the mini-game prize table (gEarningsTable.aMini, at + 0x710), the
+// shot scores them times how many times it has now landed there this shot (up to 5 times; once for
+// a surface that costs points), times the shot's multiplier (the best one landed on so far this
+// shot); the row's bonus-meter points fill a meter (0..100, emptied each hole). At the end of the
+// shot its points go to the hole (nD28); when the hole ends they are scaled by the score against
+// par (32 for a hole in one down to 0 beyond 3 over), and after a full round each human player
+// with an active profile is paid the round's total as money. The HUD reads the points, the meter,
+// the multiplier and the list of surfaces scored. The honors, hole-finished and game-finished
+// callbacks are stroke play's (mode 0, GameModeStroke).
 
 #include "golfer.h"
 #include "game.h"
@@ -10,13 +15,13 @@
 #include "game/save.h"
 #include "game/earnings.h"
 
-s32 gGameMode12Surface;                    // the surface the ball last landed on (-1: none)
+s32 gGameMode12Surface;             // the surface the ball last touched, a gSurfaceTypes index (-1: none)
 
-// The surfaces a player has scored on, for the HUD (GameMode12_ListScoredSurfaces):
+// The surfaces a player has scored on this shot, for the HUD (GameMode12_ListScoredSurfaces):
 // gGameMode12NumScored entries.
 s32 gGameMode12NumScored;
-s32 gGameMode12ScoredSurfaces[20];                // the surface
-s32 gGameMode12ScoredHits[20];                // how many times
+s32 gGameMode12ScoredSurfaces[20];  // the surface (a prize-table id)
+s32 gGameMode12ScoredHits[20];      // how many times it scored
 
 u8   GameMode12_GoToPlayoff(u8 bCheck);
 void GameMode12_GetSurfacePrize(s32 nSurface, s32* pPoints, s32* pMeter, s32* pMult);
@@ -67,7 +72,8 @@ u8 GameMode12_GoToPlayoff(u8 bCheck) {
     return 0;
 }
 
-// A surface is used up once it has scored 5 times (1 time for one that costs points).
+// A surface is used up once it has scored 5 times this shot (1 time for one that costs points); one
+// with no points (0) always counts as used up, so its meter points and multiplier never count.
 static inline u8 SurfaceUsedUp(s32* pPoints, s32 nHits) {
     u8 bUsed = 1;
     s32 nPoints = *pPoints;

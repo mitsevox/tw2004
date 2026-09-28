@@ -461,13 +461,13 @@ s32 GM_Earnings_GetSkinsHoleValue(int nRating, int nHole) {
 
 // After a shot that stayed in bounds (GM_PlayerTookShot); nothing in game mode 10 or with
 // mulligans. The mode's pfn244 is told first; then, for a human player with an active profile, the
-// shot records are checked (fn_800D782C), with a message for each new best (kind 2 or 4 in
-// lbl_80200498, ids in lbl_80200510), and the shot goals (GM_Earnings_CheckShotGoals). What they
-// found is paid from the copies GM_Earnings_CopyGoalResults makes: each money prize with its
-// message and breakdown, and each award (trophy ball) the player now gets
-// (GM_Earnings_AwardTrophyBall) with its message (kind 6 for the PGA TOUR awards 23..38, else kind
-// 2 with the money; message numbers from fn_800D9E00) and its money, also booked as bonuses
-// (money.n8).
+// shot records are checked (HighScoreRecords_GetEndOfShotRecord), with a message for each new best
+// (kind 2 or 4 in lbl_80200498, ids in lbl_80200510), and the shot goals
+// (GM_Earnings_CheckShotGoals). What they found is paid from the copies GM_Earnings_CopyGoalResults
+// makes: each money prize with its message and breakdown, and each award (trophy ball) the player
+// now gets (GM_Earnings_AwardTrophyBall) with its message (kind 6 for the PGA TOUR awards 23..38,
+// else kind 2 with the money; message numbers from Earnings_GetAwardMessageId) and its money, also
+// booked as bonuses (money.n8).
 void GM_Earnings_PayShotGoals(int nPlayer) {
     int nProfile;
     int i;
@@ -508,8 +508,8 @@ void GM_Earnings_PayShotGoals(int nPlayer) {
     }
 }
 
-// Whether award nId is one of 23..38, the PGA TOUR and career awards (fn_800D9998 decides them).
-// The payers give these a message of their own kind (6), with no money in it.
+// Whether award nId is one of 23..38, the PGA TOUR and career awards (Earnings_IsTourAwardEarned
+// decides them). The payers give these a message of their own kind (6), with no money in it.
 u8 GM_Earnings_IsTourAward(int nId) {
     int b;
 
@@ -522,10 +522,10 @@ u8 GM_Earnings_IsTourAward(int nId) {
 
 // After the ball is holed (GM_PlayerTookShot, when GM_CheckForBallInHole says so), for a human
 // player with an active profile; nothing in game mode 10 or with mulligans. The putt records are
-// checked (fn_800D7B1C), with a message for each new best (kind 2 or 4 in lbl_80200470, ids in
-// lbl_802004E8). Then two rounds of payouts, made as GM_Earnings_PayShotGoals makes them: the putt
-// goals' (GM_Earnings_CheckPuttGoals), then those of the hole goals checked after each hole
-// (GM_Earnings_CheckHoleGoals; none in a playoff, gpGame->bD4).
+// checked (HighScoreRecords_GetEndOfHoleRecord), with a message for each new best (kind 2 or 4 in
+// lbl_80200470, ids in lbl_802004E8). Then two rounds of payouts, made as GM_Earnings_PayShotGoals
+// makes them: the putt goals' (GM_Earnings_CheckPuttGoals), then those of the hole goals checked
+// after each hole (GM_Earnings_CheckHoleGoals; none in a playoff, gpGame->bD4).
 void GM_Earnings_PayHoledGoals(int nPlayer) {
     int nProfile;
     int nKind;
@@ -593,8 +593,8 @@ void GM_Earnings_PayHoledGoals(int nPlayer) {
 // At the end of a round, for a human player with an active profile; nothing in speed golf
 // (GM_IsSpeedGolfMode) or with mulligans. GameManager calls it after the round's last hole outside
 // a playoff (bRoundOver 0) and, with gpGame->b273, when the game is over (bRoundOver 1). Without
-// bRoundOver the round records are checked first (fn_800D7DA0), with a message for each new best
-// (kind 2 or 4 in lbl_80200448, ids in lbl_802004C0). Then the hole goals
+// bRoundOver the round records are checked first (HighScoreRecords_GetEndOfGameRecord), with a
+// message for each new best (kind 2 or 4 in lbl_80200448, ids in lbl_802004C0). Then the hole goals
 // (GM_Earnings_CheckHoleGoals: with bRoundOver those kept for the end of the round) are paid as
 // GM_Earnings_PayShotGoals pays, and the TOUR card level rises with the profile's completion score
 // (GM_GetGameProgress): level 2 from 7.5, 3 from 15, 4 from 30, 5 from 60, 6 at 100, with message
@@ -690,15 +690,15 @@ s32 Earnings_GetLieBit(int n) {
 }
 
 // Checks the shot goals (the prize table's aShotGoal) against the shot just played and fills the
-// working tables with what they give: awards (trophy balls, fn_800D76AC; lbl_80282250 of them, in
-// lbl_802002B8 with their values in lbl_80200240) and money prizes (lbl_80282254 of them:
-// lbl_80200330 as found, lbl_802003A8 after GM_Earnings_ComputeBonusModifiers and, with uMults bit
-// 3, GM_Earnings_ComputeTOURCardModifiers; message ids lbl_80200420, breakdowns lbl_801FFAE8). Of
+// working tables with what they give: awards (trophy balls, GM_Earnings_AwardThisTrophyBallToUser;
+// lbl_80282250 of them, in lbl_802002B8 with their values in lbl_80200240) and money prizes
+// (lbl_80282254 of them: lbl_80200330 as found, lbl_802003A8 after
+// GM_Earnings_ComputeBonusModifiers and, with uMults bit 3, GM_Earnings_ComputeTOURCardModifiers; message ids lbl_80200420, breakdowns lbl_801FFAE8). Of
 // goals with the same nonzero id only the one with the biggest nValue is kept. Nothing is found
-// with the session's debug flag 0x4000, for a player who cannot earn (fn_800D748C), in a lesson or
-// with mulligans; during a challenge that is not a ladder event only goals with mode bit 5 count.
-// With pBall the check runs on that ball in place of the player's own. With bPreview (a what-if
-// from HoleScore or fn_800D7660) the shot is not counted yet (one stroke fewer), the PGA TOUR
+// with the session's debug flag 0x4000, for a player who cannot earn
+// (GM_Earnings_AwardShotBonusToUser), in a lesson or with mulligans; during a challenge that is not
+// a ladder event only goals with mode bit 5 count. With pBall the check runs on that ball in place
+// of the player's own. With bPreview (a what-if from HoleScore or Earnings_CheckShotAwards) the shot is not counted yet (one stroke fewer), the PGA TOUR
 // awards (23..38) are left out and no EA Sports Bio accomplishment is posted; with bPreview and no
 // ball the tests on the ball are skipped too.
 void GM_Earnings_CheckShotGoals(int nPlayer, Ball* pBall, u8 bPreview) {
@@ -869,11 +869,11 @@ u8 Earnings_TestBit(u32 uMask, int nBit) {
 // (awards lbl_80200290 with their values in lbl_80200218; prizes lbl_80200308 as found,
 // lbl_80200380 after the multipliers, message ids lbl_802003F8), keeping of goals with the same
 // nonzero id only the biggest nValue. Nothing is found with the session's debug flag 0x4000, for a
-// player who cannot earn (fn_800D748C), during a challenge that is not a ladder event, or with
-// mulligans. While it runs the holes still to come count 999 strokes and putts (0 afterwards). With
-// bPreview (a what-if from HoleScore or fn_800D7684) the hole counts one more stroke and putt (the
-// ball dropping now), flag tests 2 and 5 are skipped, the PGA TOUR awards (23..38) are left out and
-// no EA Sports Bio accomplishment is posted.
+// player who cannot earn (GM_Earnings_AwardShotBonusToUser), during a challenge that is not a
+// ladder event, or with mulligans. While it runs the holes still to come count 999 strokes and
+// putts (0 afterwards). With bPreview (a what-if from HoleScore or Earnings_CheckPuttAwards) the
+// hole counts one more stroke and putt (the ball dropping now), flag tests 2 and 5 are skipped, the PGA TOUR awards (23..38)
+// are left out and no EA Sports Bio accomplishment is posted.
 void GM_Earnings_CheckPuttGoals(int nPlayer, u8 bPreview) {
     s32 aPrizeIds[10];
     s32 aAwardIds[10];
@@ -1039,11 +1039,11 @@ void GM_Earnings_CheckPuttGoals(int nPlayer, u8 bPreview) {
 // lbl_802002E0 as found, lbl_80200358 after the multipliers, message ids lbl_802003D0). Without
 // bRoundOver (after a hole) only the goals marked bEachHole count, and those without b19 only on
 // the 18th hole of a full round; with bRoundOver (the game over) only the others. Nothing is found
-// with the session's debug flag 0x4000, for a player who cannot earn (fn_800D748C) or with
-// mulligans. While it runs the holes still to come count 999 strokes and putts (0 afterwards). With
-// bPreview (a what-if from HoleScore) this hole counts one more stroke and putt, the whole-round
-// tests (GM_Earnings_CheckEagleEveryPar5 and the others) predict, the PGA TOUR awards (23..38) are
-// left out and no EA Sports Bio accomplishment is posted.
+// with the session's debug flag 0x4000, for a player who cannot earn
+// (GM_Earnings_AwardShotBonusToUser) or with mulligans. While it runs the holes still to come count
+// 999 strokes and putts (0 afterwards). With bPreview (a what-if from HoleScore) this hole counts
+// one more stroke and putt, the whole-round tests (GM_Earnings_CheckEagleEveryPar5 and the others)
+// predict, the PGA TOUR awards (23..38) are left out and no EA Sports Bio accomplishment is posted.
 void GM_Earnings_CheckHoleGoals(int nPlayer, u8 bPreview, u8 bRoundOver) {
     s32 aPrizeIds[10];
     s32 aAwardIds[10];
@@ -1474,8 +1474,8 @@ u8 GM_Earnings_CheckFirstTournamentWin(int nPlayer, u8 bPreview) {
 }
 
 // Scales a money prize: nPoints rounded to $25, plus a bonus for each multiplier its flags switch
-// on: bCourse the course's (fn_800D6EEC), bTee the tees the player plays (gSession.nTeeSet 0..2
-// reads aMult[EARN_MULT_TEE + 2 - set], set 3 counts as x1), bHole the hole's pin set
+// on: bCourse the course's (GM_Earnings_GetCourseModifier), bTee the tees the player plays
+// (gSession.nTeeSet 0..2 reads aMult[EARN_MULT_TEE + 2 - set], set 3 counts as x1), bHole the hole's pin set
 // (gpGame->nPinSet, aMult[EARN_MULT_PINSET + set]); the table's multipliers are percentages. Each
 // bonus (the base times the multiplier, less the base) is rounded to $25 by itself; the total is at
 // least 0 and rounded to $25 again. pMoney, when given, gets the breakdown: the total (n0 and n24),
