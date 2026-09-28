@@ -1128,7 +1128,7 @@ void fn_80079664(SaveProfile* pProfile) {
 }
 
 // Part nPart at a random b (FE_CrAP_GetNumberOfSubcategoryIndicesForCategory counts them), then at a random choice (fn_800797E0), which
-// is returned (FE_CrAPMessages.c fn_80109FB4 uses it).
+// is returned (FE_CrAPMessages.c GM_vRandomizeCrAPBody uses it).
 int FE_CrAP_RandomizePart(SaveProfile* pProfile, s16 nPart, int nChance) {
     int nCount = FE_CrAP_GetNumberOfSubcategoryIndicesForCategory(nPart);
     int nPick;

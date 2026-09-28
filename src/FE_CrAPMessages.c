@@ -964,9 +964,12 @@ void GM_vGetUseProfileCopy(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_80281ED4->bCopy;
 }
 
-// Start (pArgs[0] set) or stop editing the profile's logo fn_8010F7D8: a logo not made yet
-// starts blank (colour 0x1C), named "MyLogo <n>".
-void fn_80109514(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 543: start (pArgs[0] nonzero) or stop creating the profile's logo the editor works
+// on (fn_8010F7D8). Starting copies that logo into the menus' copy (FEProfile.logo106E0), or for a
+// logo not made yet (b1020 clear) makes a blank one there: every pixel palette colour 0x1C, square,
+// named "MyLogo <n>" with n counted from 1. The editor then works on the copy (b10640 set) until
+// GM_vSaveLogo keeps it; stopping goes back to the profile's logo and drops the copy.
+void GM_vCRAPCreatingLogo(MsgArg* pArgs, MsgArg* pResult) {
     char szName[32];                    // the size is unknown (the frame allows up to 0x20)
     SaveProfile* pProfile = FE_GetCurrentProfile();
     s32 bStart = pArgs[0].i;
@@ -988,18 +991,23 @@ void fn_80109514(MsgArg* pArgs, MsgArg* pResult) {
     lbl_80281ED4->b10640 = 1;
 }
 
-// A palette colour's components.
-void fn_80109618(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 583: the same as GM_vGetLogoPaletteColor (message 491): logo palette colour pArgs[0]
+// as red, green, blue and alpha into *pArgs[1..4], 0..255 each (alpha 0 or 255).
+void GM_vGetLogoPaletteEntry(MsgArg* pArgs, MsgArg* pResult) {
     fn_8010F7FC(pArgs[0].i, pArgs[1].p, pArgs[2].p, pArgs[3].p, pArgs[4].p);
 }
 
-// A pixel's colour index and components.
-void fn_80109650(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 584: pixel pArgs[0], pArgs[1] (x, y) of the logo being edited: the result is its
+// palette colour index, and its red, green, blue and alpha go into *pArgs[2..5] (fn_8010FBCC). A
+// pixel off the logo reads the byte before it.
+void GM_vGetLogoPixel(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_8010FBCC(pArgs[0].i, pArgs[1].i, pArgs[2].p, pArgs[3].p, pArgs[4].p, pArgs[5].p);
 }
 
-// Set the logo's shape.
-void fn_8010969C(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 587: the logo being edited becomes square or rectangular (pArgs[1], LOGO_SQUARE or
+// LOGO_RECT; another value leaves the logo's own shape alone) and the editor takes the shape too
+// (fn_8010F7E4).
+void GM_vSetLogoShape(MsgArg* pArgs, MsgArg* pResult) {
     LogoRecord* pLogo = fn_8010FB70();
     s32 nShape = pArgs[1].i;
     switch (nShape) {
@@ -1013,24 +1021,31 @@ void fn_8010969C(MsgArg* pArgs, MsgArg* pResult) {
     fn_8010F7E4(nShape);
 }
 
-// The logo's shape.
-void fn_80109700(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 588: the shape of the logo being edited (LOGO_SQUARE or LOGO_RECT).
+void GM_vGetLogoShape(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_8010FB70()->nShape;
 }
 
-void fn_80109734(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 609: does nothing in this build.
+void GM_vCrAPMessage609_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80109738(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 657: let the menu golfer's animation and camera calls run (pArgs[0] 1) or do nothing
+// (0) (FE_CrAP_SetTriggerAnims).
+void GM_vSetCrAPTriggerAnims(MsgArg* pArgs, MsgArg* pResult) {
     FE_CrAP_SetTriggerAnims(pArgs[0].i);
 }
 
-void fn_80109760(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 663: start the menu golfer's next animation at once and drop the repeats and queued
+// animation (FE_RestartCrAPAnim).
+void GM_vRestartCrAPAnim(MsgArg* pArgs, MsgArg* pResult) {
     FE_RestartCrAPAnim();
 }
 
-// FE_SetCrapRenderState for part 12's entry n: 1 for entries 0..4, 2 for entry 6, else 0.
-void fn_80109780(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 664: what the Create-A-Player screen shows for entry pArgs[1] of part pArgs[0]
+// (FE_SetCrapRenderState): part 12's entries 0..4 show the clubs, its entry 6 the ball; anything
+// else the golfer.
+void GM_vSetCrAPRenderStateForSubcategory(MsgArg* pArgs, MsgArg* pResult) {
     s32 nPart = pArgs[0].i;
     s32 n = pArgs[1].i;
 
@@ -1055,7 +1070,9 @@ void fn_80109780(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_801097FC(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 665: the club the menu golfer holds (FE_SetCrapClub): pArgs[0] 0 a driver, 1 a
+// fairway wood, 2 a 7-iron, 3 a wedge, 4 the putter; anything else a driver.
+void GM_vSetCrAPClub(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 0:
         FE_SetCrapClub(0);
@@ -1078,18 +1095,24 @@ void fn_801097FC(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_8010988C(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 685: drop the golfers loaded for the menus (FE_vClearGolferCache).
+void GM_vClearGolferCache(MsgArg* pArgs, MsgArg* pResult) {
     FE_vClearGolferCache();
 }
 
-void fn_801098AC(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 598: does nothing in this build.
+void GM_vCrAPMessage598_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Make a random created golfer: take the assets in slots 2, 5..8 and 11..14 off, parts 4, 5 and 6
-// at their first choice, random choices for parts 0 to 8, 14, 16, 19 and 20 (no pick with a chance
-// of 80% for 0 and 4, 90% for 5 and 6, 70% for 8, 19 and 20), parts 15, 9 and 10 as fn_80109FB4
-// does, part 7 at b 1 or 2, then its equipment tiers again (fn_8007873C).
-void fn_801098B0(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 689: dress and shape the created golfer at random. The assets in slots 2, 5..8 and
+// 11..14 come off and parts 4, 5 and 6 go to their first choice. Then each part gets a random owned
+// choice (FE_CrAP_RandomizePart), except that it is left alone with the chance given: headwear (0)
+// and part 4 80%, parts 5 and 6 90%, eyewear (8), watches and jewelry (19) and miscellaneous (20)
+// 70%; hair (3), parts 15 and 16, shirts (1), pants (2), shoes (7) and part 14 always change. Part
+// 15 then takes part 14's choice 95% of the time, part 9 is one of choices 0..2 (75%), 6 (10%), 4
+// (10%) or 8 (5%), part 10 a desirable choice 95% of the time (fn_80078A2C), the shoes come from
+// entry 1 or 2, and the equipment tiers are worked out again (fn_8007873C).
+void GM_vRandomizeCrAPGolfer(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     int nRoll = Misc_RandFunc(0) % 100;
     int nChoice;
@@ -1144,7 +1167,12 @@ void fn_801098B0(MsgArg* pArgs, MsgArg* pResult) {
     fn_8007873C(pProfile);
 }
 
-void fn_80109BA4(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 690: dress the created golfer at random: the assets in slots 2, 5..8 and 11..14 come
+// off, then random owned choices go on (FE_CrAP_RandomizePart) for shirts (1), pants (2) and shoes
+// (7), and with a chance of 20% for headwear (0) and 30% each for watches and jewelry (19),
+// miscellaneous (20) and eyewear (8); the shoes come from entry 1 or 2, and the equipment tiers are
+// worked out again (fn_8007873C).
+void GM_vRandomizeCrAPOutfit(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     FE_CrAP_SetTriggerAnims(0);
     FE_CrAP_UnequipSlot(2);
@@ -1167,9 +1195,12 @@ void fn_80109BA4(MsgArg* pArgs, MsgArg* pResult) {
     fn_8007873C(pProfile);
 }
 
-// The CrAP camera to the "Crap Idle" shot; then a random created golfer (fn_80079664) and its
-// equipment tiers again (fn_8007873C).
-void fn_80109CBC(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 547: play one of UI sounds 11..18 at random, put the Create-A-Player camera back to
+// the "Crap Idle" shot (zoom reset, idle state 0), turn the menu golfer's animation calls off and
+// make a random created golfer (fn_80079664: part 12's entries 0..3 and 5..7 at their first choice,
+// a driver in hand, a random shirt, pants and shoes, then a random look, fn_80078E34), then work
+// out its equipment tiers again (fn_8007873C).
+void GM_vRandomizeCrAPGolferInIdleShot(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     View* pView = ViewController_GetCameraControl(ViewController_GetCurrentViewControllerID());
     Gaud_PlayUISound((Misc_RandFunc(0) & 7) + 11);
@@ -1181,8 +1212,11 @@ void fn_80109CBC(MsgArg* pArgs, MsgArg* pResult) {
     fn_8007873C(pProfile);
 }
 
-// The CrAP camera to the "Crap Face" shot; then fn_80078E34 dresses the created golfer at random.
-void fn_80109D5C(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 554: put the Create-A-Player camera on the "Crap Face" shot (zoom reset, idle state
+// 1), turn the menu golfer's animation calls off and give the created golfer a random look
+// (fn_80078E34: face, hair and its colours, a hat now and then, a few accessories). The equipment
+// tiers are not worked out again.
+void GM_vRandomizeCrAPLookInFaceShot(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     View* pView = ViewController_GetCameraControl(ViewController_GetCurrentViewControllerID());
     FE_ResetCrAPZoom();
@@ -1192,12 +1226,14 @@ void fn_80109D5C(MsgArg* pArgs, MsgArg* pResult) {
     fn_80078E34(pProfile);
 }
 
-void fn_80109DDC(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 566: does nothing in this build.
+void GM_vCrAPMessage566_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Sell a part's choice i back: a quarter of its price goes back into the money, and its bought
-// bit (aB1CC) is cleared.
-void fn_80109DE0(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 711: sell choice pArgs[2] under entry pArgs[1] of part pArgs[0] back: a quarter of
+// its full price (not its sale price) goes into the profile's money and it is no longer owned
+// (aB1CC). It is not taken off the golfer, and nothing checks that it was owned.
+void GM_vSellCrAPItem(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     s16 nPart = pArgs[0].i;
     int b = pArgs[1].i;
@@ -1210,14 +1246,18 @@ void fn_80109DE0(MsgArg* pArgs, MsgArg* pResult) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_80109EAC(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 712: count part pArgs[0]'s assets offered for the current gender
+// (FE_CrAP_GetCategoryInfo): all of them into *pArgs[1], the owned ones (aB1CC) into *pArgs[2], the
+// locked ones into *pArgs[3], the new ones (aB344) into *pArgs[4].
+void GM_vGetCrAPCategoryCounts(MsgArg* pArgs, MsgArg* pResult) {
     FE_CrAP_GetCategoryInfo(pArgs[0].i, pArgs[3].p, pArgs[2].p, pArgs[4].p, pArgs[1].p);
 }
 
 // ---- end of sweep code ----
 
-// How many of the five random assets of category pArgs[0] have been bought (aB1CC).
-void fn_80109EE8(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 713: how many of the day's five sale items in sale category pArgs[0] (-1, -2, -3;
+// see GM_vGetCrAPSaleItems) the profile owns (aB1CC), into *pArgs[1].
+void GM_vGetNumCrAPSaleItemsOwned(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     int i;
     s32* pnBought = pArgs[1].p;
@@ -1236,10 +1276,13 @@ void fn_80109EE8(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Dress the created golfer at random: parts 4, 5, 6 and 22 at their first choice, then random
-// choices (with the chance in percent of the first one); part 15 follows part 14's choice 95% of
-// the time, and part 9 is one of choices 0..2 (75%), 6 (10%), 4 (10%) or 8 (5%).
-void fn_80109FB4(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 714: give the created golfer a random body, hair and face, clothes left alone. Parts
+// 4, 5, 6 and 22 go to their first choice, then random owned choices go on (FE_CrAP_RandomizePart):
+// always for hair (3) and parts 11, 14, 15, 16 and 21, and for parts 4 and 22 (left alone 80% of
+// the time) and 5 and 6 (left alone 90%). Part 15 takes part 14's choice 95% of the time, part 9 is
+// one of choices 0..2 (75%), 6 (10%), 4 (10%) or 8 (5%), and part 10 gets a desirable choice 95% of
+// the time (fn_80078A2C). The equipment tiers are not worked out again.
+void GM_vRandomizeCrAPBody(MsgArg* pArgs, MsgArg* pResult) {
     int nRoll = Misc_RandFunc(0) % 100;
     int nChoice;
     SaveProfile* pProfile;
@@ -1283,15 +1326,18 @@ void fn_80109FB4(MsgArg* pArgs, MsgArg* pResult) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_8010A208(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 725: drop the menu golfer's queued animation (FE_QueueCrAPAnim with no animation).
+void GM_vClearQueuedCrAPAnim(MsgArg* pArgs, MsgArg* pResult) {
     FE_QueueCrAPAnim(NULL, NULL, 0, 0);
 }
 
 // ---- end of sweep code ----
 
-// The place of the part's first slotted asset that fits its entry n, in the list of the part's
-// offered assets (0 when there is none).
-void fn_8010A238(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 728: which choice of entry pArgs[1] of part pArgs[0] the created golfer wears: the
+// asset in the first of the profile's slots that is of the part and fits the entry, as its place in
+// the entry's list (FE_CrAP_GetEntryNumFromAssetIDCategorySubcategory); 0 when none is worn or the
+// part is not 0..23.
+void GM_vGetEquippedCrAPItemInSubcategory(MsgArg* pArgs, MsgArg* pResult) {
     s16 nPart;
     int n;
     s32 nResult = 0;
@@ -1309,9 +1355,10 @@ void fn_8010A238(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = nResult;
 }
 
-// Part 13's choice i has its animation in the shown golfer's library (always 1 for other parts,
-// or with no golfer shown).
-void fn_8010A2C8(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 730: for part 13 (custom animations), whether the animation of choice pArgs[2] under
+// entry pArgs[1] is in the menu golfer's animation library (AnimLib_FindByName); always 1 for other
+// parts, and when there is no menu golfer slot.
+void GM_vIsCrAPAnimInGolferLib(MsgArg* pArgs, MsgArg* pResult) {
     char szName[64];                    // the size is unknown (the frame allows up to 0x40)
     u8 bFound = 1;
     s16 nPart = pArgs[0].i;
@@ -1329,18 +1376,26 @@ void fn_8010A2C8(MsgArg* pArgs, MsgArg* pResult) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_8010A35C(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 739: the profile slot (0..52, -1: none) choice pArgs[2] under entry pArgs[1] of part
+// pArgs[0] goes into when worn (the asset's n2E). No range check: a missing choice reads the record
+// before the first asset.
+void GM_vGetCrAPItemSlot(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = FE_CrAP_GetAssetFromAssetIndex(FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(pArgs[0].i, pArgs[1].i, pArgs[2].i))->n2E;
 }
 
-void fn_8010A3A4(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 740: undo the last asset put on the created golfer
+// (FE_CrAP_RestoreLastRemovedAsset): the asset it replaced goes back on, or when it replaced none
+// it comes off again.
+void GM_vRestoreAfterPreview(MsgArg* pArgs, MsgArg* pResult) {
     FE_CrAP_RestoreLastRemovedAsset();
 }
 
-void fn_8010A3C4(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 741: does nothing in this build.
+void GM_vCrAPMessage741_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8010A3C8(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 756: whether year pArgs[0] is a leap year (IsLeapYear; 1900 counts as one).
+void GM_vIsLeapYear(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = IsLeapYear(pArgs[0].i);
 }
 
@@ -1348,7 +1403,10 @@ void fn_8010A3C8(MsgArg* pArgs, MsgArg* pResult) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_8010A400(MsgArg* pArgs, MsgArg* pResult) {
+// Menu message 757: whether picking choice pArgs[2] under entry pArgs[1] of part pArgs[0] again,
+// once worn, takes it off (FE_CrAP_IsAssetRemovable: animations and the assets of slots 2 and
+// 4..14).
+void GM_vIsCrAPItemRemovable(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = FE_CrAP_IsAssetRemovable(FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(pArgs[0].i, pArgs[1].i, pArgs[2].i));
 }
 
