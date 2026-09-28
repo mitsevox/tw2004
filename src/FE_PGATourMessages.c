@@ -1,6 +1,6 @@
 // FE_PGATourMessages.c (EA's name, from its asserts): the PGA TOUR mode's menu message handlers:
 // the tournament leaderboard, the season schedule, the season wrap-up, the lock entries
-// (SaveProfile.a1054C) and the player's wins. The file starts at fn_8010E58C; the slider
+// (SaveProfile.a1054C) and the player's wins. The file starts at PGALeaderboard_FormatRow; the slider
 // blending before it is CharSliders.c's.
 
 #include "golfer.h"
@@ -16,11 +16,15 @@
 
 // .sbss is laid out last-defined-first, so these are in reverse address order.
 s32 gPgaScheduleCount;                       // how many tournaments gPgaScheduleEvents holds
-s32* gPgaScheduleEvents;                      // the tournaments on the schedule (fn_8010EA24)
+s32* gPgaScheduleEvents;                      // the tournaments on the schedule (PGASchedule_Build)
 
-// One leaderboard row: the place ("CUT", "T3" for a tie, "3"), the name, the score, the round
-// scores and the money won (empty when none).
-void fn_8010E58C(char* szPlace, char* szName, char* szScore, char* szRounds, char* szMoney,
+// Fills one leaderboard row of the current profile's tournament (fn_80077B08's slot) for entrant
+// nEntrant: szPlace "CUT" when the entrant missed the cut, "T3" when another entrant holds the same
+// place (fn_80119808), else "3"; szName the golfer's name; szScore the total score
+// (GM_PgaTourSim_GetTotalScoreFromEntrantID with flag 1); szRounds the round scores so far
+// separated by spaces (a round scored 0 is left out); szMoney "$" and the money won as text
+// (fn_800907AC), empty when none.
+void PGALeaderboard_FormatRow(char* szPlace, char* szName, char* szScore, char* szRounds, char* szMoney,
                  int nEntrant) {
     int i;
     s32 nRoundScore;
@@ -59,8 +63,11 @@ void fn_8010E58C(char* szPlace, char* szName, char* szScore, char* szRounds, cha
     strcpy(szMoney, "");
 }
 
-// Leaderboard row pArgs[0] (-1: the first entrant); all empty past the last row.
-void fn_8010E748(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 458: leaderboard row pArgs[0] into the texts pArgs[1..5] (place, name, score, round
+// scores, money; PGALeaderboard_FormatRow). The row goes through
+// GM_PgaTourSim_GetEntrantIDFromScoreRow, except -1, which gives entrant 0 itself; a row past the
+// field, or -1 with an empty field, leaves all five texts empty.
+void PGALeaderboard_GetRow(MsgArg* pArgs, MsgArg* pResult) {
     int nRow = pArgs[0].i;
     char* szPlace = ((MsgString*)pArgs[1].p)->pStr;
     char* szName = ((MsgString*)pArgs[2].p)->pStr;
@@ -81,7 +88,7 @@ void fn_8010E748(MsgArg* pArgs, MsgArg* pResult) {
         bShow = 1;
     }
     if (bShow) {
-        fn_8010E58C(szPlace, szName, szScore, szRounds, szMoney, nEntrant);
+        PGALeaderboard_FormatRow(szPlace, szName, szScore, szRounds, szMoney, nEntrant);
         return;
     }
     sprintf(szPlace, "");
@@ -91,14 +98,17 @@ void fn_8010E748(MsgArg* pArgs, MsgArg* pResult) {
     sprintf(szMoney, "");
 }
 
-// The number of leaderboard rows.
-void fn_8010E85C(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 459: how many entrants the current profile's tournament field has (the leaderboard's
+// rows).
+void PGALeaderboard_GetNumRows(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = GM_PgaTourSim_GetNumEntrants(fn_80077B08());
 }
 
-// Schedule line pArgs[0]: the tournament's dates, name, courses (one when all its rounds are on
-// the same course) and defending champion.
-void fn_8010E890(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 466: schedule row pArgs[0] (an index into gPgaScheduleEvents, PGASchedule_Build) into
+// the texts pArgs[1..4]: the start and end days ("<start>\nthru\n<end>", CalDate_ToStringMD), the
+// tournament's name, its courses (one name when every round is on the same course, else one per
+// round, a line each) and its latest champion (GameModeDriverPGATour_GetChamp).
+void PGASchedule_GetRow(MsgArg* pArgs, MsgArg* pResult) {
     s32 aCourses[4];
     char szStart[8];
     char szEnd[8];
@@ -138,8 +148,11 @@ void fn_8010E890(MsgArg* pArgs, MsgArg* pResult) {
     GameModeDriverPGATour_GetChamp(nEvent, szChamp);
 }
 
-// Build the schedule: the tournaments that have a start date. Gives how many.
-void fn_8010EA24(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 467: builds the season schedule: gPgaScheduleEvents gets, in order, every tournament
+// held this season (a nonzero GameModeDriverPGATour_GetStartDate). The array is allocated from
+// static memory on first use (room for all GM_PgaTourMode_GetNEvents tournaments) and never freed.
+// Gives the count, also kept in gPgaScheduleCount.
+void PGASchedule_Build(MsgArg* pArgs, MsgArg* pResult) {
     s32 nEvents = GM_PgaTourMode_GetNEvents();
     s32 nCount = 0;
     s32 i;
@@ -156,8 +169,12 @@ void fn_8010EA24(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = nCount;
 }
 
-// Line 1: the last tournament played (its name; empty before the first); line 2 is empty.
-void fn_8010EAC4(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 520: text line pArgs[0] into pArgs[1]. Line 1 is the name of the tournament the
+// current profile's field last played: the current tournament, the one before it when the current
+// one has not started (tour.nRound 0), or the season's final tournament once no tournament is
+// current; empty while the field has no entrants. Line 2 is empty; other lines leave the text as it
+// was.
+void PGATourMsg_GetLastEventLine(MsgArg* pArgs, MsgArg* pResult) {
     int nLine = pArgs[0].i;
     char* szOut = ((MsgString*)pArgs[1].p)->pStr;
     int nPlayer = fn_80077B08();
@@ -183,17 +200,21 @@ void fn_8010EAC4(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Whether no tournament is selected.
-void fn_8010EB9C(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 551: 1 when profile 0's tour has no current tournament
+// (GameModeDriverPGATour_GetSelectedEvent gives -1: the season is over), else 0.
+void PGATourMsg_IsSeasonOver(MsgArg* pArgs, MsgArg* pResult) {
     s32 nRound;
 
     pResult->i = GameModeDriverPGATour_GetSelectedEvent(&nRound) == -1;
 }
 
-// Season wrap-up line pArgs[0]: the title, the player of the year, the money leader, the scoring
-// leader (the player only after 15 events), the player, the player's wins, first places in
-// tournaments whose nC is set, top-10 finishes, season money and career-money rank.
-void fn_8010EBDC(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 552: season wrap-up line pArgs[0] into the text pArgs[1] (empty for other lines): -1
+// the title ("2004 Season Wrap-up"); 0 the Player of the Year (the player when no golfer beats
+// their points); 1 the money leader (likewise); 2 the scoring leader (the next golfer when the
+// leader is the player with fewer than 15 tournaments started); 3 the player's name; 4 the player's
+// season wins; 5 the majors the player won (Tournament.bIsAMajor, placed first); 6 the player's
+// top-10 finishes; 7 the season's money ("$%d"); 8 the player's rank in career money.
+void PGASeasonWrapUp_GetLine(MsgArg* pArgs, MsgArg* pResult) {
     int nLine = pArgs[0].i;
     char* szOut = ((MsgString*)pArgs[1].p)->pStr;
     int nPlayer = fn_80077B08();
@@ -270,8 +291,10 @@ void fn_8010EBDC(MsgArg* pArgs, MsgArg* pResult) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-// Start the next season.
-void fn_8010EEA8(void) {
+// FE message 553: starts the next PGA TOUR season (GameModeDriverPGATour_AdvanceSeason; its result,
+// 0 after the tenth season, is not checked), resets the calendar to it and backs up profile slot 0
+// (fn_80077808). Defined with no parameters though the message table calls it with two.
+void PGADriver_ShowCalendar_AdvanceSeason(void) {
     CalendarState.bSeasonOver = 0;
     GameModeDriverPGATour_AdvanceSeason();
     ResetCalendarState();
@@ -280,8 +303,9 @@ void fn_8010EEA8(void) {
 
 // ---- end of sweep code ----
 
-// Test text for n = pArgs[0]: "S n", "I n" and "$ n00,000", and n itself.
-void fn_8010EEE4(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 559: placeholder texts for n = pArgs[0]: "S n", "I n" and "$ n00,000" into
+// pArgs[1..3], and n itself into *pArgs[4].
+void PGATourMsg_GetTestText(MsgArg* pArgs, MsgArg* pResult) {
     s32 n = pArgs[0].i;
     char* szB = ((MsgString*)pArgs[2].p)->pStr;
     char* szC = ((MsgString*)pArgs[3].p)->pStr;
@@ -293,21 +317,27 @@ void fn_8010EEE4(MsgArg* pArgs, MsgArg* pResult) {
     *pOut = n;
 }
 
-// The 11 asset kinds fn_8010EF8C and fn_8010F1B4 pick from at random.
+// The 11 asset kinds PGASponsor_SignNext and PGASponsor_PickStartingSponsor pick from at random.
 s16 gPgaSponsorChoices[11] = { 0, 1, 2, 5, 6, 9, 10, 11, 13, 14, 15 };
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_8010EF80(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 560: always gives 25. What the menus count with it is not known; its message number
+// follows the placeholder texts' (PGATourMsg_GetTestText, 559).
+void PGATourMsg_Get25(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 25;
 }
 
 // ---- end of sweep code ----
 
-// The first of the 11 lock entries not set whose progress the profile has reached is set, with a
-// kind picked at random (not one an earlier entry holds), and pays its n4. Gives whether there
-// was one.
-void fn_8010EF8C(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 563: signs the current profile's next sponsorship: the first of the 11 sponsorship
+// slots (SaveProfile.a1054C) not yet signed whose required progress
+// (GameModeDriverPGATour_GetSponsorshipProgress) the profile has reached (GM_GetGameProgress). Its
+// sponsor is drawn at random from gPgaSponsorChoices, again until no earlier signed slot has it,
+// and its start cash is paid into the profile's money (n6C). Then *pArgs[0] = 0, *pArgs[1] the
+// sponsor, *pArgs[2] its bonus cash, *pArgs[3] its start cash, and it gives 1; 0 when there is none
+// to sign.
+void PGASponsor_SignNext(MsgArg* pArgs, MsgArg* pResult) {
     s32 n8;
     s32 n4;
     int i;
@@ -356,9 +386,12 @@ void fn_8010EF8C(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-// Lock entry pArgs[0]'s value: its n8 for each of the profile's assets of its kind. Gives
-// whether there is one.
-void fn_8010F10C(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 683: what sponsorship slot pArgs[0] pays for the items the player wears: its bonus
+// cash (GameModeDriverPGATour_GetSponsorshipBonusCash) times the equipped items carrying its
+// sponsor (FE_CrAP_GetNumEquippedItemsWithSponsor) into *pArgs[1], its sponsor into *pArgs[2], and
+// gives 1; gives 0 (outputs untouched) when the slot is not signed or no worn item carries the
+// sponsor.
+void PGASponsor_GetItemBonus(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     s32 i = pArgs[0].i;
     s32* pValue = (s32*)pArgs[1].p;
@@ -378,8 +411,11 @@ void fn_8010F10C(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-// Pick a kind at random for lbl_80281DF0, and give it with lock entry 0's values.
-void fn_8010F1B4(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 697: draws the sponsor a new profile starts with from gPgaSponsorChoices and switches
+// lbl_80281DF0 on with it (fn_800588D4; a new profile's first sponsorship slot is copied from it
+// and its start cash paid, PasswordManager.c). Gives the sponsor in *pArgs[0], and sponsorship slot
+// 0's start cash in *pArgs[1] and bonus cash in *pArgs[2].
+void PGASponsor_PickStartingSponsor(MsgArg* pArgs, MsgArg* pResult) {
     s32* pKind = (s32*)pArgs[0].p;
     s32* p4 = (s32*)pArgs[1].p;
     s32* p8 = (s32*)pArgs[2].p;
@@ -392,14 +428,17 @@ void fn_8010F1B4(MsgArg* pArgs, MsgArg* pResult) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_8010F248(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 698: fills the sponsorship item records (FE_CrAP_CollectSponsorshipItems: one per worn
+// item of a signed sponsor) and gives how many there are.
+void PGASponsor_CollectItems(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = FE_CrAP_CollectSponsorshipItems();
 }
 
 // ---- end of sweep code ----
 
-// Record pArgs[0] of lbl_80282470.
-void fn_8010F278(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 699: sponsorship item record pArgs[0] (of PGASponsor_CollectItems' list): its sponsor
+// into *pArgs[1], its bonus cash into *pArgs[2] and the item's name into the text pArgs[3].
+void PGASponsor_GetItem(MsgArg* pArgs, MsgArg* pResult) {
     s16 n0;
     char* szName = ((MsgString*)pArgs[3].p)->pStr;
     s32* pN4 = (s32*)pArgs[2].p;
@@ -413,15 +452,19 @@ void fn_8010F278(MsgArg* pArgs, MsgArg* pResult) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_8010F2CC(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 700: sponsor pArgs[0]'s brand name ("adidas", "Callaway Golf"...;
+// FE_CrAP_GetSponsorName) into the text pArgs[1].
+void PGASponsor_GetName(MsgArg* pArgs, MsgArg* pResult) {
     FE_CrAP_GetSponsorName(pArgs[0].i, ((MsgString*)pArgs[1].p)->pStr);
 }
 
 // ---- end of sweep code ----
 
-// A tournament the player of slot pArgs[1] may have won: its name,
-// GameModeDriverPGATour_GetTextureID, and the day it was won. Gives whether it was.
-void fn_8010F2FC(MsgArg* pArgs, MsgArg* pResult) {
+// Trophy room, kind 0 of fn_80084B88's award messages: tournament pArgs[2] of profile slot
+// pArgs[1]: its name into the text pArgs[4], its icon (GameModeDriverPGATour_GetTextureID) into
+// *pArgs[5] and, when the profile has won it (aC8[].award), the day won (month/day/year) into the
+// text pArgs[3], else an empty text. Gives whether it was won.
+void TrophyRoom_GetTourWinStatus(MsgArg* pArgs, MsgArg* pResult) {
     int nPlayer = pArgs[1].i;
     s32 nEvent = pArgs[2].i;
     char* szDate = ((MsgString*)pArgs[3].p)->pStr;
@@ -440,8 +483,11 @@ void fn_8010F2FC(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = bWon;
 }
 
-// Player of the Month award pArgs[2] of slot pArgs[1]: the day it was won. Gives whether it was.
-void fn_8010F3A4(MsgArg* pArgs, MsgArg* pResult) {
+// Trophy room, kind 1 of fn_80084B88's award messages: Player of the Month award pArgs[2] (a month,
+// SaveProfile.a1C0) of profile slot pArgs[1]: "Player of the Month" into the text pArgs[4], icon 0
+// into *pArgs[5] and, when won, the day won into the text pArgs[3] (else empty). Gives whether it
+// was won.
+void TrophyRoom_GetPlayerOfMonthStatus(MsgArg* pArgs, MsgArg* pResult) {
     int nPlayer = pArgs[1].i;
     s32 n = pArgs[2].i;
     char* szDate = ((MsgString*)pArgs[3].p)->pStr;
@@ -459,9 +505,11 @@ void fn_8010F3A4(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = bWon;
 }
 
-// A tournament the player won: the day, the player's name, the tournament's purse, the money won
-// and the score.
-void fn_8010F440(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 701: a tournament pArgs[0] the current profile won: the day won into the text
+// pArgs[1], the profile's name into pArgs[2], the tournament's purse
+// (GameModeDriverPGATour_GetPurseString) into pArgs[3], the prize won (TourWin.n6 thousands of
+// dollars, as money text) into pArgs[4] and the profile's score there into *pArgs[5].
+void PGATourWins_GetDetails(MsgArg* pArgs, MsgArg* pResult) {
     s32 nEvent = pArgs[0].i;
     char* szName = ((MsgString*)pArgs[2].p)->pStr;
     char* szEarnings = ((MsgString*)pArgs[3].p)->pStr;
@@ -475,7 +523,10 @@ void fn_8010F440(MsgArg* pArgs, MsgArg* pResult) {
     *pScore = FE_GetCurrentProfile()->aC8[nEvent].nScore;
 }
 
-void fn_8010F4EC(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 718: after a tour round, profile 0's tournament is moved on
+// (GameModeDriverPGATour_CheckAdvanceTournament); when a movie is queued (fn_80077148 false), the
+// front end's fade to black (lbl_801D87C0.fFade) is set to full at once.
+void PGATourMsg_CheckAdvanceTournament(MsgArg* pArgs, MsgArg* pResult) {
     GameModeDriverPGATour_CheckAdvanceTournament(0);
     if (!fn_80077148()) {
         lbl_801D87C0.fFade = 1.0f;
@@ -484,23 +535,31 @@ void fn_8010F4EC(MsgArg* pArgs, MsgArg* pResult) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_8010F52C(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 742: marks the tour statistics as needing an update (fn_8011C058(1); TW06:
+// GM_PgaTourSim_SetStatsDirty).
+void PGATourMsg_SetStatsDirty(MsgArg* pArgs, MsgArg* pResult) {
     fn_8011C058(1);
 }
 
-void fn_8010F550(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 743: marks the tour scores as needing an update (fn_8011C060(1); TW06:
+// GM_PgaTourSim_SetScoresDirty).
+void PGATourMsg_SetScoresDirty(MsgArg* pArgs, MsgArg* pResult) {
     fn_8011C060(1);
 }
 
-void fn_8010F574(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 749: whether the player quit the tour round (the tour simulation's user-quit flag,
+// fn_80117DE0).
+void PGATourMsg_DidUserQuit(MsgArg* pArgs, MsgArg* pResult) {
     // port: EA passes an argument fn_80117DE0 ignores
     pResult->i = ((u8 (*)(int))fn_80117DE0)(0);
 }
 
 // ---- end of sweep code ----
 
-// Lock entry pArgs[0]: its kind (-1 when not set) and its n8.
-void fn_8010F5AC(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 754: sponsorship slot pArgs[0] of the current profile: its sponsor into *pArgs[1] and
+// its bonus cash into *pArgs[2], or -1 and 0 when the slot is not signed; *pArgs[3] is always set
+// to 0.
+void PGASponsor_GetSlot(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     s32 i = pArgs[0].i;
     s32* pKind = (s32*)pArgs[1].p;
@@ -518,8 +577,9 @@ void fn_8010F5AC(MsgArg* pArgs, MsgArg* pResult) {
     *p3 = 0;
 }
 
-// The n4 of every record of lbl_80282470 together.
-void fn_8010F63C(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 755: the bonus cash of every worn item of a signed sponsor added up (the records of
+// FE_CrAP_CollectSponsorshipItems, which it fills first).
+void PGASponsor_GetTotalItemBonus(MsgArg* pArgs, MsgArg* pResult) {
     char sz[0x34];                      // a CrAPRecord's name (0x24); size unknown, the frame fits 0x34
     s32 n4;
     s16 n0;

@@ -143,7 +143,7 @@ typedef struct TourWin {
     Award award;                // 0x0  won, and the day (GM_Earnings_GiveAwardToUser)
     u16  nScore;                // 0x4  the player's score (GM_PgaTourSim_GetTotalScoreFromEntrantID, as SeasonEvent.nUserScore)
     u16  n6;                    // 0x6  the tournament's aPrize[bracket][1] (thousands of dollars:
-                                //      fn_8010F440 reads it unsigned)
+                                //      PGATourWins_GetDetails reads it unsigned)
 } TourWin;
 
 // One entry of SaveProfile.a1054C: a switch and a value (our name). lbl_80281DF0 is one more,
@@ -274,7 +274,7 @@ typedef struct SaveProfile {
     TourWin aC8[31];           // 0x000C8  one per PGA TOUR tournament
     Award a1C0[16];            // 0x001C0  the won ones count for GM_GetBonusProgress. 0..11: Player
                                 //          of the Month, per month (the tour's month money leader,
-                                //          n44; FE_PGATourMessages.c fn_8010F3A4); 12..15: the
+                                //          n44; FE_PGATourMessages.c TrophyRoom_GetPlayerOfMonthStatus); 12..15: the
                                 //          four trophies (both awarded by PGATourSimulation
                                 //          GM_PgaTourSim_CheckEndOfTournamentAward; GameMode22 TrophyRoom_GetTourTrophy reads their days)
     Award a200[3];              // 0x00200  the player's career winnings first, in the top 5 and in the

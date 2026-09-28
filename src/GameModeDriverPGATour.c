@@ -467,8 +467,8 @@ void GameModeDriverPGATour_CommitUserRoundStatCounts(s32 nPlayer) {
     pTotal->nCareerWins += pRound->nCareerWins;
 }
 
-// After a tour round (PGA TOUR menus, fn_8010F4EC). If the player quit the round (the tour
-// simulation's user-quit flag, fn_80117DE0), every entrant goes back to the first tee with no
+// After a tour round (PGA TOUR menus, PGATourMsg_CheckAdvanceTournament). If the player quit the
+// round (the tour simulation's user-quit flag, fn_80117DE0), every entrant goes back to the first tee with no
 // strokes, and on the first round the field is emptied: the round does not count. Otherwise the
 // round is committed (the player's statistics, the CPU entrants' statistics and every entrant's
 // round score), the hole scores reset and the round number moved on; a player who missed the cut
