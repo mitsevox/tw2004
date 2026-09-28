@@ -330,12 +330,12 @@ s32   fn_800F4B00(void);
 void  GameModeSkillZoneTimed_TenSecWarning(void);
 s32   GameModeSkins_CurrentHoleNumberSkins(void);
 s32   SpeedGolf_GetTotalTimeScore(int nPlayer);
-s32   fn_800FD704(int nPlayer, int nHole, s32* pWon);
-s32   fn_800FD8D0(char* szName1, s32* pPoints1, char* szName2, s32* pPoints2);
-void  fn_800FDADC(void);
-void  fn_800FDC0C(s32* p0, s32* p1, s32* p2);
-s32   fn_800FDC5C(s32* pMoney);
-s32   fn_800FDE58(char* szName, s32* pSeconds, s32* pStrokes, s32* pScore);
+s32   SpeedGolf_GetHoleScore(int nPlayer, int nHole, s32* pWon);
+s32   SpeedGolfPoints_GetNamesAndPoints(char* szName1, s32* pPoints1, char* szName2, s32* pPoints2);
+void  SpeedGolf_TimerOut(void);
+void  SpeedGolf_GetPrizeScores(s32* p0, s32* p1, s32* p2);
+s32   SpeedGolf_GetWinner(s32* pMoney);
+s32   SpeedGolf_GetRoundScore(char* szName, s32* pSeconds, s32* pStrokes, s32* pScore);
 s32   GameMode12_GetShotMultiplier(int nPlayer);
 s32   GameMode12_GetBonusMeter(int nPlayer);
 s32   GameMode12_GetHolePoints(int nPlayer);
@@ -1148,7 +1148,7 @@ void fn_800872AC(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_800872F8(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_800FD704(pArgs[0].i, pArgs[1].i, (s32*)pArgs[2].p);
+    pResult->i = SpeedGolf_GetHoleScore(pArgs[0].i, pArgs[1].i, (s32*)pArgs[2].p);
 }
 
 // The name of a player's save profile, or "User <n>" when none is loaded.
@@ -1589,7 +1589,7 @@ void fn_80088208(MsgArg* pArgs, MsgArg* pResult) {
         GameModeSkillZoneBase_TimerOut();
         return;
     }
-    fn_800FDADC();
+    SpeedGolf_TimerOut();
 }
 
 // Whether the player is in the elevator camera.
@@ -1602,7 +1602,7 @@ void fn_8008823C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8008828C(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_800FDC5C((s32*)pArgs[0].p);
+    pResult->i = SpeedGolf_GetWinner((s32*)pArgs[0].p);
 }
 
 // Whether the round plays every hole.
@@ -1611,7 +1611,7 @@ void fn_800882C0(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_800882F4(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800FDC0C((s32*)pArgs[0].p, (s32*)pArgs[1].p, (s32*)pArgs[2].p);
+    SpeedGolf_GetPrizeScores((s32*)pArgs[0].p, (s32*)pArgs[1].p, (s32*)pArgs[2].p);
 }
 
 void fn_80088324(MsgArg* pArgs, MsgArg* pResult) {
@@ -1644,7 +1644,7 @@ void fn_800883FC(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80088428(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_800FD8D0(((MsgString*)pArgs[0].p)->pStr, (s32*)pArgs[1].p,
+    pResult->i = SpeedGolfPoints_GetNamesAndPoints(((MsgString*)pArgs[0].p)->pStr, (s32*)pArgs[1].p,
                              ((MsgString*)pArgs[2].p)->pStr, (s32*)pArgs[3].p);
 }
 
@@ -1667,7 +1667,7 @@ void fn_80088474(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_800884F0(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_800FDE58(((MsgString*)pArgs[0].p)->pStr, (s32*)pArgs[1].p, (s32*)pArgs[2].p,
+    pResult->i = SpeedGolf_GetRoundScore(((MsgString*)pArgs[0].p)->pStr, (s32*)pArgs[1].p, (s32*)pArgs[2].p,
                              (s32*)pArgs[3].p);
 }
 

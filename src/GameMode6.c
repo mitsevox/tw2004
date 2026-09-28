@@ -16,9 +16,9 @@ void fn_800F944C(void) {
     gpGame->pfnEndHole = SpeedGolfMatch_EndHole;
     gpGame->pfnEndGame = SpeedGolfMatch_EndGame;
     gpGame->pfn1E4 = fn_800F9824;
-    gpGame->pfn230 = fn_800FDF58;
-    gpGame->pfn234 = fn_800FDF60;
-    gpGame->pfn25C = fn_800FDA30;
+    gpGame->pfn230 = SpeedGolf_RenderBallTarget;
+    gpGame->pfn234 = SpeedGolf_CheckControllerPulled;
+    gpGame->pfn25C = SpeedGolf_SetHoleTime;
     gpGame->bGimmesAllowed = 0;
     gpGame->b279 = 0;
     gpGame->b27F = 0;

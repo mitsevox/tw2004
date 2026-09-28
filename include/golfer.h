@@ -319,7 +319,7 @@ typedef struct Player {
     f32  fA80;                  // 0xA80
     f32  fA84;                  // 0xA84
     f32  fA88;                  // 0xA88  an angle (speed golf: the run's heading)
-    f32  fA8C;                  // 0xA8C  pad stick y, -1..1 (GameMode8 fn_800FB460)
+    f32  fA8C;                  // 0xA8C  pad stick y, -1..1 (GameMode8 SpeedGolf_ReadSticks)
     Ball ball;                  // 0xA90  the player's ball
     f32  vOrient[4];            // 0xB4C  a quaternion, identity at setup. TW06: ballRot
     Ball ballBefore;            // 0xB5C  a copy of the ball: as it lay before the shot, then the look-ahead

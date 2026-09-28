@@ -720,10 +720,10 @@ void SpeedGolfPoints_EndHole(void);
 void SpeedGolf_EndGame(void);
 void SpeedGolf_StartHole(void);
 void SpeedGolfPoints_ClearStartFlags(int nPlayer);
-void fn_800FDA30(int nPlayer, int a);
-void fn_800FDF38(void);
-u8   fn_800FDF58(int nPlayer);
-u8   fn_800FDF60(void);
+void SpeedGolf_SetHoleTime(int nPlayer, int a);
+void SpeedGolf_Update(void);
+u8   SpeedGolf_RenderBallTarget(int nPlayer);
+u8   SpeedGolf_CheckControllerPulled(void);
 
 // GameModeStroke.c: stroke play (mode 0)
 void GameModeStroke_SetupNextGolfer(void);

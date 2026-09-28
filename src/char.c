@@ -195,7 +195,7 @@ void  SkinPart_Shutdown(void);
 void  SkinPart_CopyChoices(Skin* pSkin, int nFrom, int nTo);
 s32   SkinPart_GetNumSets(Skin* pSkin);         // SkinPart.c: how many choices aSets[3] holds
 void  SkinPart_SetChangeAllCopies(u8 b);
-u8    fn_800FCC38(int nPlayer);
+u8    SpeedGolf_IsStartXYHeld(int nPlayer);
 void  fn_8010A668(void* p);
 void  fn_80008380(void);
 void  fn_800106AC(int n);               // LLTexGrp.c
@@ -3353,12 +3353,12 @@ void Character_SetClubStatesForCharacter(Character* pChar, int nSlot, SkinChoice
 }
 
 // Every frame in game type 6 (the main loop): each player whose pad holds Start, X and Y together
-// (fn_800FCC38) gets its golfer's animation back to normal speed (time scale 1), undoing a slowed
+// (SpeedGolf_IsStartXYHeld) gets its golfer's animation back to normal speed (time scale 1), undoing a slowed
 // or held animation such as the swing's hold at the top (0.008).
 void Character_ResetTimeScalesOnCombo(void) {
     int i;
     for (i = 0; i < gSession.nNumPlayers; i++) {
-        if (fn_800FCC38(i)) {
+        if (SpeedGolf_IsStartXYHeld(i)) {
             SKATime_SetTimeScale(gPlayers[i].pChar->anim, 1.0f);
         }
     }

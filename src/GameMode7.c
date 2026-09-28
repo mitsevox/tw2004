@@ -16,11 +16,11 @@ void fn_800F9610(void) {
     gpGame->pfnEndHole = SpeedGolfPoints_EndHole;
     gpGame->pfnEndGame = SpeedGolf_EndGame;
     gpGame->pfn1E4 = fn_800F9824;
-    gpGame->pfn220 = fn_800FDF38;
+    gpGame->pfn220 = SpeedGolf_Update;
     gpGame->pfn228 = SpeedGolfPoints_ClearStartFlags;
-    gpGame->pfn230 = fn_800FDF58;
-    gpGame->pfn234 = fn_800FDF60;
-    gpGame->pfn25C = fn_800FDA30;
+    gpGame->pfn230 = SpeedGolf_RenderBallTarget;
+    gpGame->pfn234 = SpeedGolf_CheckControllerPulled;
+    gpGame->pfn25C = SpeedGolf_SetHoleTime;
     gpGame->b271 = 0;
     gpGame->bStrokeLimit = 0;
     gpGame->b273 = 0;

@@ -1,5 +1,5 @@
 // GameMode8.c (our name): speed golf. Each hole scores the time taken (n290, in seconds) plus 3
-// per stroke (fn_800FDA30, the scorecard and the prize). The golfer runs to the ball between shots
+// per stroke (SpeedGolf_SetHoleTime, the scorecard and the prize). The golfer runs to the ball between shots
 // (custom golfer states 12 and 24..26 replace the normal ones). Mode 8 is solo; mode 7
 // (GameMode7.c) is two players trading event points, mode 6 (GameMode6.c) two at match play.
 
@@ -74,7 +74,7 @@ f32 gSpeedGolfPaceIdleDecay = 0.065f;
 f32 gSpeedGolfPaceIdleTime = 0.25f;
 
 SGLog gSpeedGolfEventLog[100];
-// fake match: a one-entry array, so the compiler loads it where fn_800FBD2C compares with it
+// fake match: a one-entry array, so the compiler loads it where SpeedGolf_RunUpdate compares with it
 // instead of folding in its own 1.0f (the original has this constant first in the file's .sdata2)
 const f32 lbl_80284708[1] = {1.0f};
 
@@ -90,19 +90,19 @@ void  SpeedGolf_CountdownInit(int nPlayer);
 void  SpeedGolf_CountdownUpdate(int nPlayer);
 void  SpeedGolf_CountdownExit(int nPlayer);
 void  SpeedGolf_RunInit(int nPlayer);
-void  fn_800FB35C(int nPlayer, int nOther);
-f32   fn_800FB41C(f32* pA, f32* pB);
-void  fn_800FBD2C(int nPlayer);
-void  fn_800FCBDC(int nPlayer);
-void  fn_800FCCF0(void);
-void  fn_800FD1C0(int nPlayer);
-void  fn_800FD534(int nPlayer);
-void  fn_800FD6A0(int nPlayer);
-void  fn_800FDFC4(s32 p0, s32 p1, s32 p2);
-void  fn_800FDFFC(s32 p0, s32 p1);
-void  fn_800FE02C(void);
-void  fn_800FE054(s32 p0, s32 p1);
-void  fn_800FE080(s32 p0, s32 p1);
+void  SpeedGolfPoints_ScoreHoledShotLength(int nPlayer, int nOther);
+f32   SpeedGolf_GroundDistance(f32* pA, f32* pB);
+void  SpeedGolf_RunUpdate(int nPlayer);
+void  SpeedGolf_RunExit(int nPlayer);
+void  SpeedGolf_UpdatePlayers(void);
+void  SpeedGolf_HoleOverInit(int nPlayer);
+void  SpeedGolf_HoleOverUpdate(int nPlayer);
+void  SpeedGolf_HoleOverExit(int nPlayer);
+void  SpeedGolf_ShowPoints(s32 p0, s32 p1, s32 p2);
+void  SpeedGolf_SendMessage19(s32 p0, s32 p1);
+void  SpeedGolf_ShowReady(void);
+void  SpeedGolf_ShowStopBallPrompt(s32 p0, s32 p1);
+void  SpeedGolf_ShowRunTip(s32 p0, s32 p1);
 void  fn_800FE0AC(s32 p0, s32 p1);
 void  fn_800FE0D8(void);
 void  fn_800FE138(s32 p0, s32 p1);
@@ -126,10 +126,10 @@ void SpeedGolf_Init(void) {
     gpGame->pfnEndHole = SpeedGolf_EndHole;
     gpGame->pfnEndGame = SpeedGolf_EndGame;
     gpGame->pfn1E4 = fn_800F9824;
-    gpGame->pfn220 = fn_800FDF38;
-    gpGame->pfn230 = fn_800FDF58;
-    gpGame->pfn234 = fn_800FDF60;
-    gpGame->pfn25C = fn_800FDA30;
+    gpGame->pfn220 = SpeedGolf_Update;
+    gpGame->pfn230 = SpeedGolf_RenderBallTarget;
+    gpGame->pfn234 = SpeedGolf_CheckControllerPulled;
+    gpGame->pfn25C = SpeedGolf_SetHoleTime;
     gpGame->b271 = 0;
     gpGame->bStrokeLimit = 0;
     gpGame->b273 = 0;
@@ -177,17 +177,17 @@ void SpeedGolf_Shutdown(void) {
 // (SpeedGolf_HoleOver*). SpeedGolf_Shutdown puts the normal ones back.
 void SpeedGolf_SetGolferStates(void) {
     sGolferStateEngineTable[12].pfnEnter = SpeedGolf_RunInit;
-    sGolferStateEngineTable[12].pfnUpdate = fn_800FBD2C;
-    sGolferStateEngineTable[12].pfnExit = fn_800FCBDC;
+    sGolferStateEngineTable[12].pfnUpdate = SpeedGolf_RunUpdate;
+    sGolferStateEngineTable[12].pfnExit = SpeedGolf_RunExit;
     sGolferStateEngineTable[24].pfnEnter = SpeedGolf_RunInit;
-    sGolferStateEngineTable[24].pfnUpdate = fn_800FBD2C;
-    sGolferStateEngineTable[24].pfnExit = fn_800FCBDC;
+    sGolferStateEngineTable[24].pfnUpdate = SpeedGolf_RunUpdate;
+    sGolferStateEngineTable[24].pfnExit = SpeedGolf_RunExit;
     sGolferStateEngineTable[25].pfnEnter = SpeedGolf_CountdownInit;
     sGolferStateEngineTable[25].pfnUpdate = SpeedGolf_CountdownUpdate;
     sGolferStateEngineTable[25].pfnExit = SpeedGolf_CountdownExit;
-    sGolferStateEngineTable[26].pfnEnter = fn_800FD1C0;
-    sGolferStateEngineTable[26].pfnUpdate = fn_800FD534;
-    sGolferStateEngineTable[26].pfnExit = fn_800FD6A0;
+    sGolferStateEngineTable[26].pfnEnter = SpeedGolf_HoleOverInit;
+    sGolferStateEngineTable[26].pfnUpdate = SpeedGolf_HoleOverUpdate;
+    sGolferStateEngineTable[26].pfnExit = SpeedGolf_HoleOverExit;
 }
 
 // The pfnSetupNextGolfer of modes 6, 7 and 8 (GM_SetupGolfer_IfAllWaiting, once every golfer
@@ -516,8 +516,8 @@ void SpeedGolf_CountdownInit(int nPlayer) {
         gPlayers[nPlayer].nC58 = 3;
     }
     fn_800FE0AC(gPlayers[nPlayer].nC58, 0);
-    fn_800FE080(gPlayers[nPlayer].nC58, 0);
-    fn_800FE054(gPlayers[nPlayer].nC58, 0);
+    SpeedGolf_ShowRunTip(gPlayers[nPlayer].nC58, 0);
+    SpeedGolf_ShowStopBallPrompt(gPlayers[nPlayer].nC58, 0);
     gPlayers[nPlayer].nC3C &= ~0x02000000;
     if (gSpeedGolfFirstHoleTips) {
         gPlayers[nPlayer].nC3C |= 0x600000;
@@ -539,18 +539,18 @@ void SpeedGolf_CountdownInit(int nPlayer) {
     CameraController_SetCameraMode(ViewController_GetCameraControl(i), 12, nPlayer, i);
     gPlayers[nPlayer].nC54 = 74;
     gPlayers[nPlayer].nC3C |= 2;
-    fn_800FE02C();
+    SpeedGolf_ShowReady();
     GameModeSkillZoneTimed_SetHudClock(3);
     if (gPlayers[nPlayer].nC58 == 2) {
         GUI_ShowTogglePlayer1UI(1);
     } else {
         GUI_ShowTogglePlayer2UI(1);
     }
-    fn_800FDFFC(gPlayers[nPlayer].nC58, 1);
+    SpeedGolf_SendMessage19(gPlayers[nPlayer].nC58, 1);
     fn_80062CB0(gPlayers[nPlayer].nC58, 1);
     fn_80062C80(gPlayers[nPlayer].nC58, 0);
     gPlayers[nPlayer].nC3C &= ~0x100001;
-    fn_800FDFC4(gPlayers[nPlayer].nC58, gPlayers[nPlayer].nC44, 1);
+    SpeedGolf_ShowPoints(gPlayers[nPlayer].nC58, gPlayers[nPlayer].nC44, 1);
     gSpeedGolfEventLogCount = 0;
 }
 
@@ -661,7 +661,7 @@ void SpeedGolf_TradeEventPoints(int nPlayer, int nEvent) {
                 GOLFERSTATE_Set(26, (u8)nPlayer);
             }
         } else {
-            fn_800FDFC4(gPlayers[nPlayer].nC58, gPlayers[nPlayer].nC44, 0);
+            SpeedGolf_ShowPoints(gPlayers[nPlayer].nC58, gPlayers[nPlayer].nC44, 0);
             fn_800FE100(gPlayers[nPlayer].nC58, nEvent, nPoints);
             gSpeedGolfEventLog[gSpeedGolfEventLogCount].nEvent = nEvent;
             gSpeedGolfEventLog[gSpeedGolfEventLogCount].nPlayer = nPlayer;
@@ -671,7 +671,7 @@ void SpeedGolf_TradeEventPoints(int nPlayer, int nEvent) {
             SpeedGolf_PlayEventComment(nEvent);
             if (nPoints != 0) {
                 gPlayers[nOther].nC44 -= nPoints;
-                fn_800FDFC4(gPlayers[nOther].nC58, gPlayers[nOther].nC44, 0);
+                SpeedGolf_ShowPoints(gPlayers[nOther].nC58, gPlayers[nOther].nC44, 0);
                 if (gPlayers[nOther].nC44 <= 0) {
                     if (!(gPlayers[nOther].nC3C & 0x6000) && !(gPlayers[nOther].nC3C & 0x8000)) {
                         gPlayers[nOther].nC44 = 0;
@@ -691,12 +691,17 @@ void SpeedGolf_TradeEventPoints(int nPlayer, int nEvent) {
     }
 }
 
-// A shot has come to rest (from state 12's update): count the stroke, and after out of bounds
-// drop the ball (water) or replace it. Returns 0 when the golfer goes back to state 1 (in mode 7
-// possibly a frame later, through nC3C bit 20). In mode 7 it also scores events: the penalties
-// (4/5, or 0x1E/0x1F with nC3C bit 4), and a drive's length from the tee spot against the other
-// player's (events 1, 0x18 and 0x19).
-u8 fn_800FAD54(int nPlayer) {
+// A shot has come to rest (SpeedGolf_RunUpdate, ball state 1, or 5 out of bounds). First a return
+// to the shot state that mode 7 deferred (nC3C bit 20) happens once gSpeedGolfCanSwitchToShot
+// allows. The stroke is counted. Out of bounds (GM_CheckForBallOOB) the ball is dropped from a
+// lateral hazard (surface class 7) or replaced, the run flag, arrow, tip and prompt are cleared and
+// the golfer goes back to state 1 (in mode 7 now if gSpeedGolfCanSwitchToShot allows, else deferred
+// through bit 20), with mode 7's penalties: event 4 out of bounds, 5 in a hazard (nC3C bit 11), 30
+// and 31 on the replay. In mode 7 a tee shot (vBall at the tee spot vA44) records the drive's
+// length in fC50 (nC3C bit 5): the longer first drive on a par 4 or 5 gets event 1; the replay's
+// drive gets event 24 when longer than the other's best (taking their drive flags) or 25 when
+// longer than one's own. Returns 0 when the golfer goes back to state 1 (or waits to), else 1.
+u8 SpeedGolf_OnBallAtRest(int nPlayer) {
     int nOther;
     f32 fDist;
     SurfaceType* pSurf;
@@ -725,8 +730,8 @@ u8 fn_800FAD54(int nPlayer) {
                 GM_ReplaceOOBBall(nPlayer);
             }
             fn_800FE0AC(gPlayers[nPlayer].nC58, 0);
-            fn_800FE080(gPlayers[nPlayer].nC58, 0);
-            fn_800FE054(gPlayers[nPlayer].nC58, 0);
+            SpeedGolf_ShowRunTip(gPlayers[nPlayer].nC58, 0);
+            SpeedGolf_ShowStopBallPrompt(gPlayers[nPlayer].nC58, 0);
             GOLFERSTATE_Switch(1, nPlayer);
             return 0;
         }
@@ -757,8 +762,8 @@ u8 fn_800FAD54(int nPlayer) {
             GM_ReplaceOOBBall(nPlayer);
         }
         fn_800FE0AC(gPlayers[nPlayer].nC58, 0);
-        fn_800FE080(gPlayers[nPlayer].nC58, 0);
-        fn_800FE054(gPlayers[nPlayer].nC58, 0);
+        SpeedGolf_ShowRunTip(gPlayers[nPlayer].nC58, 0);
+        SpeedGolf_ShowStopBallPrompt(gPlayers[nPlayer].nC58, 0);
         if (gSpeedGolfCanSwitchToShot) {
             GOLFERSTATE_Switch(1, nPlayer);
             gSpeedGolfCanSwitchToShot = 0;
@@ -804,11 +809,12 @@ u8 fn_800FAD54(int nPlayer) {
     return 1;
 }
 
-// The hole is finished in nStrokes: its events. Event 23 at or under par when nC3C bits 10-11
-// are set (then cleared); a hole in one is event 12 on a par 3, 13 otherwise, plus 14 when nC3C
-// bit 9 is already set (a second one; the first sets it); otherwise par (Course_GetCurHolePar) less the
-// strokes picks events 8 to 11 (par to 3 under).
-void fn_800FB204(int nPlayer, int nStrokes) {
+// Mode 7: the events of holing out in nStrokes (on a replay, its own strokes). Event 23 at or under
+// par after sand or a hazard drop on the hole (nC3C bits 10 and 11, then cleared); a hole in one is
+// event 12 on a par 3 and 13 otherwise, plus 14 when the player already had one on this hole (the
+// first sets nC3C bit 9; the flags are cleared as each hole starts); otherwise par, birdie, eagle
+// or albatross are events 8 to 11.
+void SpeedGolfPoints_ScoreHoleResult(int nPlayer, int nStrokes) {
     int nPar;
     int nUnder;
     nPar = Course_GetCurHolePar();
@@ -846,11 +852,12 @@ void fn_800FB204(int nPlayer, int nStrokes) {
     }
 }
 
-// A shot's length (from vPreShot to the ball): a putt of 20/3 or more is event 17; any other
-// shot of 10 or more is event 18, or 19 from 60. The unit is not proven (in yards, 20/3 would be
-// 20 feet). fn_800FB41C always returns 0, so none of these fire.
-void fn_800FB35C(int nPlayer, int nOther) {
-    f32 fDist = fn_800FB41C(gPlayers[nPlayer].vPreShot, gPlayers[nPlayer].ball.vPos);
+// Mode 7: the holing shot's length (from vPreShot to the ball): a putt of 20/3 or more is event 17;
+// any other shot of 10 or more is event 18, or 19 from 60. The unit is not proven (in yards, 20/3
+// would be 20 feet). SpeedGolf_GroundDistance always returns 0, so none of these fire. nOther is
+// not read.
+void SpeedGolfPoints_ScoreHoledShotLength(int nPlayer, int nOther) {
+    f32 fDist = SpeedGolf_GroundDistance(gPlayers[nPlayer].vPreShot, gPlayers[nPlayer].ball.vPos);
     if (gPlayers[nPlayer].nClub == CLUB_PUTTER_e) {
         if (fDist >= 20.0f / 3.0f) {
             SpeedGolf_TradeEventPoints(nPlayer, 0x11);
@@ -865,15 +872,17 @@ void fn_800FB35C(int nPlayer, int nOther) {
 }
 
 // Meant as the distance from pA to pB on the ground (x and z); it is always 0 (see below).
-f32 fn_800FB41C(f32* pA, f32* pB) {
+f32 SpeedGolf_GroundDistance(f32* pA, f32* pB) {
     f32 v[4];
     fn_800FE190(pB, pB, v);     // EA bug: pB less itself, so the distance is always 0
     return Math_Sqrt(v[0] * v[0] + v[2] * v[2]);
 }
 
-// The pad's sticks (beyond the 96..160 dead zone) scaled to -1..1 into the player's fA7C..fA8C;
-// 0 inside the dead zone.
-void fn_800FB460(int nPlayer) {
+// A human's sticks for the run: the pad's stick bytes 3, 2, 0 and 1 (Input_sGetStickInfo), beyond a
+// 96..160 dead zone and scaled to about -1..1, go into fA84, fA80, fA7C and fA8C (the last two
+// negated); 0 inside the dead zone. PlaceBall_UpdateMomentums moves the runner (the placement
+// point) by fA80 and fA84 and turns its heading by fA7C.
+void SpeedGolf_ReadSticks(int nPlayer) {
     u8* pPad = Input_sGetStickInfo(gPlayers[nPlayer].nController);
     if (pPad) {
         if (pPad[3] < 96.0f) {
@@ -907,13 +916,20 @@ void fn_800FB460(int nPlayer) {
     }
 }
 
-// Every frame of the run to the ball: the sticks, four buttons that trigger events 22 to 25,
-// the stick-driven countdowns in nC54 (bits 21 to 24 of nC3C), and fCB4, which a button raises
-// and which otherwise falls at a rate scaled by the frame time.
-void fn_800FB774(int nPlayer) {
+// A human player's controls each frame of the run (SpeedGolf_RunUpdate), until both players have
+// finished the hole (SpeedGolfPoints_HoleFinished): the sticks (SpeedGolf_ReadSticks); buttons 0x1A
+// or 0x1B, and 0x1C or 0x1D, trigger events 0x16 to 0x19 (EVENT_Trigger). The run tips
+// (SpeedGolf_ShowRunTip): with nC3C bit 21 (the first hole) tip 1 at once unless the stick is
+// already moving; with bit 22 or 23, tip 2 or 3 as soon as the stick moves, shown for 239 frames
+// (bit 24); otherwise tip 1 comes back after 179 frames without the stick and goes when it moves.
+// The pace fCB4 rises by gSpeedGolfPaceBoost with button 0x24 (nCB8 back to 0), else falls a frame
+// by gSpeedGolfPaceDecay, or gSpeedGolfPaceIdleDecay once nCB8 passes gSpeedGolfPaceIdleTime
+// seconds, scaled by the frame time; nCB8 only counts up in mode 7 (SpeedGolf_UpdatePlayers), so in
+// mode 8 the pace always falls at the slow rate.
+void SpeedGolf_UpdateHumanRun(int nPlayer) {
     f32 fStep;
     if (!SpeedGolfPoints_HoleFinished(nPlayer, 1)) {
-        fn_800FB460(nPlayer);
+        SpeedGolf_ReadSticks(nPlayer);
         if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x1A, 1)) {
             EVENT_Trigger(nPlayer, 0x16, 0, -1);
         } else if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x1B, 1)) {
@@ -929,15 +945,15 @@ void fn_800FB774(int nPlayer) {
             if (gPlayers[nPlayer].fA80 != 0.0f || gPlayers[nPlayer].fA84 != 0.0f) {
                 gPlayers[nPlayer].nC54 = 179;
             } else {
-                fn_800FE080(gPlayers[nPlayer].nC58, 1);
+                SpeedGolf_ShowRunTip(gPlayers[nPlayer].nC58, 1);
             }
         } else if (gPlayers[nPlayer].nC3C & 0xC00000) {
             if (gPlayers[nPlayer].fA80 != 0.0f || gPlayers[nPlayer].fA84 != 0.0f) {
                 if (gPlayers[nPlayer].nC3C & 0x400000) {
-                    fn_800FE080(gPlayers[nPlayer].nC58, 2);
+                    SpeedGolf_ShowRunTip(gPlayers[nPlayer].nC58, 2);
                     gPlayers[nPlayer].nC3C &= ~0x400000;
                 } else {
-                    fn_800FE080(gPlayers[nPlayer].nC58, 3);
+                    SpeedGolf_ShowRunTip(gPlayers[nPlayer].nC58, 3);
                     gPlayers[nPlayer].nC3C &= ~0x800000;
                 }
                 gPlayers[nPlayer].nC3C |= 0x1000000;
@@ -946,16 +962,16 @@ void fn_800FB774(int nPlayer) {
         } else if (gPlayers[nPlayer].nC3C & 0x1000000) {
             gPlayers[nPlayer].nC54--;
             if (gPlayers[nPlayer].nC54 == 0) {
-                fn_800FE080(gPlayers[nPlayer].nC58, 0);
+                SpeedGolf_ShowRunTip(gPlayers[nPlayer].nC58, 0);
                 gPlayers[nPlayer].nC3C &= ~0x1000000;
             }
         } else if (gPlayers[nPlayer].fA80 != 0.0f || gPlayers[nPlayer].fA84 != 0.0f) {
             gPlayers[nPlayer].nC54 = 179;
-            fn_800FE080(gPlayers[nPlayer].nC58, 0);
+            SpeedGolf_ShowRunTip(gPlayers[nPlayer].nC58, 0);
         } else {
             gPlayers[nPlayer].nC54--;
             if (gPlayers[nPlayer].nC54 == 0) {
-                fn_800FE080(gPlayers[nPlayer].nC58, 1);
+                SpeedGolf_ShowRunTip(gPlayers[nPlayer].nC58, 1);
             }
         }
         fStep = FRAME_RATE / 60.0f * (FRAME_RATE * gSession.fFrameTime);
@@ -970,10 +986,13 @@ void fn_800FB774(int nPlayer) {
     }
 }
 
-// A CPU player's sticks for the run: steer from the heading fA88 towards the ball (fA80, and fA7C
-// past 2 degrees off), forward speed from how far off the heading is (fA84), both eased off near
-// the ball; fCB4 rises until it reaches a level set by the golfer's speed attribute.
-void fn_800FBB30(Player* p) {
+// A CPU player's run each frame (SpeedGolf_RunUpdate), steering from the heading fA88 towards the
+// ball: fA80 from the angle off (angle / PI; tripled between 1 and 15 degrees off), fA84 the
+// forward push, falling with the angle off (a quarter from 45 degrees), both eased off within 31.25
+// (squared distance) of the ball and again past 2 degrees off, when fA7C turns the heading too (0
+// otherwise). The pace fCB4 rises by gSpeedGolfPaceBoost while under a level between
+// gSpeedGolfPaceMin and gSpeedGolfPaceMax set by the golfer's speed attribute (half way at 100).
+void SpeedGolf_UpdateCpuRun(Player* p) {
     f32 v[4];
     f32 fAngle;
     f32 fDistSq;
@@ -1019,12 +1038,31 @@ void fn_800FBB30(Player* p) {
     }
 }
 
-// States 12 and 24, update: the ball flies and the golfer runs to it. Once the ball stops,
-// fn_800FAD54 counts the shot; a holed ball (mode 7: its events, and state 26 once both are
-// down; other modes: state 13) and, in mode 7, a ball on the green get their events; out of
-// bounds replaces the ball. Then the run: the countdown from SpeedGolf_TickRunDelay, the sticks
-// (fn_800FB774, or fn_800FBB30 for the CPU), and arriving at the ball (within 5 of it).
-void fn_800FBD2C(int nPlayer) {
+// Golfer states 12 and 24 (the shot and the run), update. Mode 7 first gives event 0 to the first
+// shot to fly on the hole and event 38 to a replay's first shot from the tee. The ball moves
+// (GM_SimulateBallMovement). When it comes to rest (ball state 1, or 5 out of bounds)
+// SpeedGolf_OnBallAtRest counts the stroke. Holed in mode 7: the shot's length and the hole's
+// result are scored (SpeedGolfPoints_ScoreHoledShotLength, SpeedGolfPoints_ScoreHoleResult), event
+// 29 for a replay holed while the other still plays, event 37 for fewer strokes than the other; the
+// first time a player holes out (nC3C bits 3 and 8, nC60 the strokes) the ball goes back to the tee
+// for a replay (event 2) unless the other has finished, when both go to state 26. Holed in modes 6
+// and 8: the clock stops (message 17, 0), game message 18 and state 13, and the run tips move on
+// (gSpeedGolfFirstHoleTips to gSpeedGolfSecondHoleTip). Not holed: in mode 7 event 37 for the other
+// when they holed out in no more strokes; outside the course the ball is replaced
+// (GM_ReplaceOOBBall); otherwise it rests (ballBefore), and in mode 7 a ball on the green scores
+// first on the green (3), green in or under regulation (21, 22), nearer the pin (7, 26, 27) and the
+// replay's green (28), and a ball in sand event 6 (32 on the replay; nC3C bit 10). While the ball
+// flies the swing still updates (SW_vUpdateSwing). Then the run: when SpeedGolf_TickRunDelay's wait
+// ends the runner (the placement point) starts at the shot's spot (nC3C bit 0, camera 9, swing HUD
+// off, pace gSpeedGolfPaceMin, heading at the ball); every frame after, the controls
+// (SpeedGolf_UpdateHumanRun or SpeedGolf_UpdateCpuRun), the pace kept within
+// gSpeedGolfPaceMin..gSpeedGolfPaceMax and scaled by the speed attribute moves the runner
+// (PlaceBall_UpdateMomentums), the arrow to the ball is updated (SpeedGolf_ShowBallDirection), and
+// the ball's distance to the runner or the camera, whichever is less, is checked: within 5 of a
+// ball at rest the golfer arrives (vBall, run flag off, swing HUD on, prompts off, state 1, in mode
+// 7 when gSpeedGolfCanSwitchToShot allows); within 5 of a moving ball a human's button 0x23 stops
+// it at the last droppable spot (the prompt shows until then).
+void SpeedGolf_RunUpdate(int nPlayer) {
     Player* p = &gPlayers[nPlayer];
     int nOther = nPlayer ? 0 : 1;
     f32 vStart[4];
@@ -1057,7 +1095,7 @@ void fn_800FBD2C(int nPlayer) {
     GM_SimulateBallMovement(nPlayer);
     if (gPlayers[nPlayer].ball.nState == 0) {
     } else if (gPlayers[nPlayer].ball.nState == 1 || gPlayers[nPlayer].ball.nState == 5) {
-        if (!fn_800FAD54(nPlayer)) {
+        if (!SpeedGolf_OnBallAtRest(nPlayer)) {
             if (Game_GetMode() == 7 && (s8)GOLFERSTATE_GetCurrentState(nOther) == 26) {
                 GOLFERSTATE_Set(26, (u8)nPlayer);
             }
@@ -1066,20 +1104,20 @@ void fn_800FBD2C(int nPlayer) {
         nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
         if (gPlayers[nPlayer].ball.nLie == LIE_INCUP_e) {
             if (Game_GetMode() == 7) {
-                fn_800FB35C(nPlayer, nOther);
+                SpeedGolfPoints_ScoreHoledShotLength(nPlayer, nOther);
                 nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
                 if (gPlayers[nPlayer].nC3C & 8) {
                     gPlayers[nPlayer].nC3C |= 0x10;
                     if (!(gPlayers[nOther].nC3C & 8)) {
                         SpeedGolf_TradeEventPoints(nPlayer, 0x1D);
                     }
-                    fn_800FB204(nPlayer, nStrokes - gPlayers[nPlayer].nC60);
+                    SpeedGolfPoints_ScoreHoleResult(nPlayer, nStrokes - gPlayers[nPlayer].nC60);
                 } else {
                     gPlayers[nPlayer].nC3C |= 8;
                     gPlayers[nPlayer].nC5C = 59;
                     gPlayers[nPlayer].nC3C |= 0x100;
                     gPlayers[nPlayer].nC60 = nStrokes;
-                    fn_800FB204(nPlayer, nStrokes);
+                    SpeedGolfPoints_ScoreHoleResult(nPlayer, nStrokes);
                     if (gPlayers[nOther].nC3C & 8) {
                         if (nStrokes < gPlayers[nOther].nC60) {
                             if (!(gPlayers[nPlayer].uC48 & 0x2000000000LL)) {
@@ -1153,8 +1191,9 @@ void fn_800FBD2C(int nPlayer) {
                 nPar = Course_GetCurHolePar();
                 if (gPlayers[nPlayer].ball.nLie == LIE_GREEN_e) {
                     if (Game_GetMode() == 7) {
-                        fDist = fn_800FB41C(p->vPreShot, pBall->vPos);
-                        if (fn_800FB41C(pBall->vPos, gpGame->p130) <= lbl_80284708[0] && fDist >= 20.0f) {
+                        fDist = SpeedGolf_GroundDistance(p->vPreShot, pBall->vPos);
+                        if (SpeedGolf_GroundDistance(pBall->vPos, gpGame->p130) <= lbl_80284708[0] && fDist
+                            >= 20.0f) {
                             SpeedGolf_TradeEventPoints(nPlayer, 0x14);
                         }
                         if (!(gPlayers[nPlayer].nC3C & 0x40)) {
@@ -1254,9 +1293,9 @@ void fn_800FBD2C(int nPlayer) {
         break;
     case -1:
         if (Player_IsCPU(nPlayer)) {
-            fn_800FBB30(p);
+            SpeedGolf_UpdateCpuRun(p);
         } else {
-            fn_800FB774(nPlayer);
+            SpeedGolf_UpdateHumanRun(nPlayer);
         }
         if (gPlayers[nPlayer].fCB4 < gSpeedGolfPaceMin) {
             gPlayers[nPlayer].fCB4 = gSpeedGolfPaceMin;
@@ -1315,8 +1354,8 @@ void fn_800FBD2C(int nPlayer) {
                 gPlayers[nPlayer].nC3C &= ~1;
                 fn_80062C80(gPlayers[nPlayer].nC58, 1);
                 fn_800FE0AC(gPlayers[nPlayer].nC58, 0);
-                fn_800FE080(gPlayers[nPlayer].nC58, 0);
-                fn_800FE054(gPlayers[nPlayer].nC58, 0);
+                SpeedGolf_ShowRunTip(gPlayers[nPlayer].nC58, 0);
+                SpeedGolf_ShowStopBallPrompt(gPlayers[nPlayer].nC58, 0);
                 if (gSpeedGolfCanSwitchToShot || Game_GetMode() != 7) {
                     GOLFERSTATE_Switch(1, nPlayer);
                     gSpeedGolfCanSwitchToShot = 0;
@@ -1333,25 +1372,26 @@ void fn_800FBD2C(int nPlayer) {
                         gPlayers[nPlayer].ball.nState = 1;
                     }
                 } else {
-                    fn_800FE054(gPlayers[nPlayer].nC58, 1);
+                    SpeedGolf_ShowStopBallPrompt(gPlayers[nPlayer].nC58, 1);
                 }
             }
         } else {
-            fn_800FE054(gPlayers[nPlayer].nC58, 0);
+            SpeedGolf_ShowStopBallPrompt(gPlayers[nPlayer].nC58, 0);
         }
         break;
     }
 }
 
-// States 12 and 24, exit: camera 25.
-void fn_800FCBDC(int nPlayer) {
+// Golfer states 12 and 24 (the shot and the run), exit: the player's first view goes to camera mode
+// 25.
+void SpeedGolf_RunExit(int nPlayer) {
     int nView = gPlayers[nPlayer].nView[0];
     CameraController_SetCameraMode(ViewController_GetCameraControl(nView), 25, nPlayer, nView);
 }
 
 // 1 when the player's pad has buttons 0x1000, 0x400 and 0x800 (Start, X and Y on a GameCube pad)
 // all down, each pressed this frame or held; 0 for the CPU and for any other controller.
-u8 fn_800FCC38(int nPlayer) {
+u8 SpeedGolf_IsStartXYHeld(int nPlayer) {
     int bDown;
     int nCtrl = gPlayers[nPlayer].nController;  // fake match: only the first read goes through nCtrl
     if (nCtrl >= 8) {
@@ -1366,10 +1406,15 @@ u8 fn_800FCC38(int nPlayer) {
     return bDown;
 }
 
-// Every frame (pfn220 through fn_800FDF38): in mode 7, a holed player takes 5 points a second
-// from one still playing, which can knock that one out; in modes 7 and 8, button 0x25 puts the
-// ball back on the tee (for the cost of event 39 in mode 7). Then gSpeedGolfCanSwitchToShot is set.
-void fn_800FCCF0(void) {
+// Every unpaused frame (SpeedGolf_Update, the pfn220 of modes 7 and 8). Mode 7, unless a player is
+// out or going out (nC3C bits 13, 14): a player who has holed out (bit 8) takes 5 points a second
+// (every 60 frames, nC5C) from one still playing, which can knock that one out (both to state 26);
+// the pace's idle count nCB8 goes up; a human who has not finished and can afford event 39 may
+// press button 0x25 (not while Start, X and Y are held, SpeedGolf_IsStartXYHeld) in state 24, or
+// with the ball off the tee, not holed and in bounds outside states 2, 3, 4, 8 and 10, to pay event
+// 39 and start the hole again from the tee (state 1). Mode 8: player 0 may do the same for free,
+// with only the tee, cup and out-of-bounds test. Last, gSpeedGolfCanSwitchToShot is set.
+void SpeedGolf_UpdatePlayers(void) {
     PlayerNumber_t i;
     PlayerNumber_t nOther;
     int nPlayer;
@@ -1389,10 +1434,10 @@ void fn_800FCCF0(void) {
                         gPlayers[nPlayer].nC5C--;
                         if (gPlayers[nPlayer].nC5C == 0) {
                             gPlayers[nPlayer].nC44 += 5;
-                            fn_800FDFC4(gPlayers[nPlayer].nC58, gPlayers[nPlayer].nC44, 0);
+                            SpeedGolf_ShowPoints(gPlayers[nPlayer].nC58, gPlayers[nPlayer].nC44, 0);
                             fn_800FE138(gPlayers[nPlayer].nC58, 5);
                             gPlayers[nOther].nC44 -= 5;
-                            fn_800FDFC4(gPlayers[nOther].nC58, gPlayers[nOther].nC44, 0);
+                            SpeedGolf_ShowPoints(gPlayers[nOther].nC58, gPlayers[nOther].nC44, 0);
                             gPlayers[nPlayer].nC5C = 59;
                             if (gPlayers[nOther].nC44 <= 0 && !(gPlayers[nOther].nC3C & 0x6000) &&
                                 !(gPlayers[nOther].nC3C & 0x8000)) {
@@ -1412,7 +1457,7 @@ void fn_800FCCF0(void) {
                     gSpeedGolfEvents[0x27].nPoints + gPlayers[nPlayer].nC44 > 0) {
                     if ((Input_ReadControlPad(gPlayers[nPlayer].nController)
                          & Controller_GetButtonMask(0x25, 0)) &&
-                        !fn_800FCC38(nPlayer) &&
+                        !SpeedGolf_IsStartXYHeld(nPlayer) &&
                         ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 24 ||
                          (gPlayers[nPlayer].ball.nLie != 0 && gPlayers[nPlayer].ball.nLie != LIE_INCUP_e &&
                           gPlayers[nPlayer].ball.nLie != 16 &&
@@ -1431,8 +1476,8 @@ void fn_800FCCF0(void) {
                                  gPlayers[nPlayer].vA44);
                         gPlayers[nPlayer].nC3C &= ~1;
                         fn_800FE0AC(gPlayers[nPlayer].nC58, 0);
-                        fn_800FE080(gPlayers[nPlayer].nC58, 0);
-                        fn_800FE054(gPlayers[nPlayer].nC58, 0);
+                        SpeedGolf_ShowRunTip(gPlayers[nPlayer].nC58, 0);
+                        SpeedGolf_ShowStopBallPrompt(gPlayers[nPlayer].nC58, 0);
                         GOLFERSTATE_Switch(1, nPlayer);
                         gSpeedGolfCanSwitchToShot = 0;
                     }
@@ -1443,7 +1488,7 @@ void fn_800FCCF0(void) {
         } else if (Game_GetMode() == 8) {
             i = PLR_1_e;
             if ((Input_ReadControlPad(gPlayers[i].nController) & Controller_GetButtonMask(0x25, 0))
-                && !fn_800FCC38(i) &&
+                && !SpeedGolf_IsStartXYHeld(i) &&
                 ((s8)GOLFERSTATE_GetCurrentState(i) == 24 ||
                  (gPlayers[i].ball.nLie != 0 && gPlayers[i].ball.nLie != LIE_INCUP_e &&
                   gPlayers[i].ball.nLie != 16))) {
@@ -1453,8 +1498,8 @@ void fn_800FCCF0(void) {
                 LLMath_CopyVec(&pHole->tee[gSession.nTeeSet[i]].x, gPlayers[i].vA44);
                 gPlayers[i].nC3C &= ~1;
                 fn_800FE0AC(gPlayers[i].nC58, 0);
-                fn_800FE080(gPlayers[i].nC58, 0);
-                fn_800FE054(gPlayers[i].nC58, 0);
+                SpeedGolf_ShowRunTip(gPlayers[i].nC58, 0);
+                SpeedGolf_ShowStopBallPrompt(gPlayers[i].nC58, 0);
                 GOLFERSTATE_Switch(1, i);
             }
         }
@@ -1462,10 +1507,14 @@ void fn_800FCCF0(void) {
     }
 }
 
-// State 26, enter: the hole is over for this player. In the two-player game each played hole is
-// scored by who gained more points on it (1 won, 0 halved, 2 lost); a run of wins up to this
-// hole is event 33 (three) or 34 (more), and one win after three or more losses is event 35.
-void fn_800FD1C0(int nPlayer) {
+// Golfer state 26 (the hole is over for this player), enter: player 0 moves the run tips on
+// (gSpeedGolfFirstHoleTips to gSpeedGolfSecondHoleTip); a wait of nC54 134 frames, the run flag,
+// arrow, tip and prompt off, the points shown. In mode 7 (nC3C bit 25, a 239-frame wait), unless
+// this is the round's first hole, the selected holes are each scored by who gained more points on
+// it (1 won, 0 halved, 2 lost; 3000 before the first): a run of wins up to this hole is event 33
+// (three) or 34 (more), one win after three or more losses event 35, each adding 119 frames to the
+// wait.
+void SpeedGolf_HoleOverInit(int nPlayer) {
     int aResult[18];
     int nHole;
     s32 nOther;
@@ -1487,9 +1536,9 @@ void fn_800FD1C0(int nPlayer) {
     gPlayers[nPlayer].nC54 = 134;
     gPlayers[nPlayer].nC3C &= ~1;
     fn_800FE0AC(gPlayers[nPlayer].nC58, 0);
-    fn_800FE080(gPlayers[nPlayer].nC58, 0);
-    fn_800FE054(gPlayers[nPlayer].nC58, 0);
-    fn_800FDFC4(gPlayers[nPlayer].nC58, gPlayers[nPlayer].nC44, 1);
+    SpeedGolf_ShowRunTip(gPlayers[nPlayer].nC58, 0);
+    SpeedGolf_ShowStopBallPrompt(gPlayers[nPlayer].nC58, 0);
+    SpeedGolf_ShowPoints(gPlayers[nPlayer].nC58, gPlayers[nPlayer].nC44, 1);
     if (Game_GetMode() == 7) {
         gPlayers[nPlayer].nC3C |= 0x2000000;
         gPlayers[nPlayer].nC54 = 239;
@@ -1552,11 +1601,13 @@ void fn_800FD1C0(int nPlayer) {
     }
 }
 
-// State 26, update: a player whose points ran out (bit 15) or who ran the other's out (bit 16)
-// gets event 40 or 41. When the countdown ends (and Gaud_GetCommentStatus is clear), bit 14 becomes bit 13
-// and the player's turn is over; if the other player is not in state 26 and their ball is at
-// rest, both get bit 3 and the turn is ended again.
-void fn_800FD534(int nPlayer) {
+// Golfer state 26, update: a player whose points ran out (nC3C bit 15) gets event 40, one who
+// knocked the other out (bit 16) event 41, each adding 119 frames to the wait. When the wait (nC54)
+// is over and no commentary line plays, a pending game over (bit 14) becomes bit 13 (out,
+// SpeedGolfPoints_GameFinished), the player has finished the hole (bit 3) and the turn ends
+// (GM_EndOfGolferTurn); if the other player is not in state 26 and their ball is at rest, both are
+// marked finished and the turn is ended again (see the EA bug below).
+void SpeedGolf_HoleOverUpdate(int nPlayer) {
     int nOther;
     if (gPlayers[nPlayer].nC3C & 0x8000) {
         SpeedGolf_TradeEventPoints(nPlayer, 0x28);
@@ -1584,20 +1635,25 @@ void fn_800FD534(int nPlayer) {
     }
 }
 
-void fn_800FD6A0(int nPlayer) {
+// Golfer state 26 (the hole is over), exit: empty in this build.
+void SpeedGolf_HoleOverExit(int nPlayer) {
 }
 
-// In speed golf (modes 7 and 8), bit 0 of nC3C: the golfer is running to the ball.
-s32 fn_800FD6A4(int nPlayer) {
+// Whether the golfer is running to the ball (nC3C bit 0), in modes 7 and 8 only (0 in mode 6 and
+// every other mode). The main loop asks it.
+s32 SpeedGolf_IsRunning(int nPlayer) {
     if (Game_GetMode() == 7 || Game_GetMode() == 8) {
         return gPlayers[nPlayer].nC3C & 1;
     }
     return 0;
 }
 
-// A hole's points (nC6C) for the scorecard; *pWon is 1 when the player gained points on it
-// (two-player games only). The current hole counts once both have finished it, from nC44.
-s32 fn_800FD704(int nPlayer, int nHole, s32* pWon) {
+// A hole's score for the scorecard (the UI's command, TW07's GM_vGetSpeedGolfHoleScore). Mode 8:
+// nC6C (seconds plus 3 a stroke), *pWon 0. Otherwise the points after the hole (nC6C), with *pWon 1
+// when the player gained points on it (3000 before the first selected hole); the current hole
+// counts from nC44 once both have finished it, and before that returns nC6C as it stands with *pWon
+// 0. A hole not selected: 0.
+s32 SpeedGolf_GetHoleScore(int nPlayer, int nHole, s32* pWon) {
     int nCur = Game_CurHoleIndex();
     int nGain;
     if (Game_GetMode() == 8) {
@@ -1631,7 +1687,7 @@ s32 fn_800FD704(int nPlayer, int nHole, s32* pWon) {
 
 // The two players' names ("User n" without a loaded profile) and points, for the UI. Returns
 // which player gained points on the current hole: 0, 1, or -1 for neither.
-s32 fn_800FD8D0(char* szName1, s32* pPoints1, char* szName2, s32* pPoints2) {
+s32 SpeedGolfPoints_GetNamesAndPoints(char* szName1, s32* pPoints1, char* szName2, s32* pPoints2) {
     s32 bWon;
     char sz[32];
     int nHole = Game_CurHoleIndex();
@@ -1652,25 +1708,28 @@ s32 fn_800FD8D0(char* szName1, s32* pPoints1, char* szName2, s32* pPoints2) {
     }
     *pPoints1 = gPlayers[0].nC44;
     *pPoints2 = gPlayers[1].nC44;
-    fn_800FD704(0, nHole, &bWon);
+    SpeedGolf_GetHoleScore(0, nHole, &bWon);
     if (bWon) {
         return 0;
     }
-    fn_800FD704(1, nHole, &bWon);
+    SpeedGolf_GetHoleScore(1, nHole, &bWon);
     return bWon ? 1 : -1;
 }
 
-// The hole's time for a player from nFrames (at 60 a second), and its points with 3 per stroke.
-void fn_800FDA30(int nPlayer, int nFrames) {
+// The pfn25C of modes 6, 7 and 8 (a UI command passes the hole's time in frames): the current
+// hole's seconds (nFrames / 60) go into n290, and seconds plus 3 a stroke into nC6C.
+void SpeedGolf_SetHoleTime(int nPlayer, int nFrames) {
     int n = nFrames / 60;
     gPlayers[nPlayer].n290[Game_CurHoleIndex()] = n;
     n += gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] * 3;
     gPlayers[nPlayer].nC6C[Game_CurHoleIndex()] = n;
 }
 
-// When both golfers are in states 1 to 4 or 10, the first player's (PLR_1_e) hole is ended: lie
-// "holed", nC3C bit 26, and state 13.
-void fn_800FDADC(void) {
+// The hole's time ran out (the UI's timer-out command, TW07's GM_vTimerOut; skill zone mode has its
+// own): when both golfers are between shots (states 1 to 4 or 10), player 0's hole ends: the ball
+// in the cup, nC3C bit 26 (which SpeedGolf_HoleFinished ends the hole on), the clock stopped
+// (message 17, 0), game message 18 and state 13.
+void SpeedGolf_TimerOut(void) {
     PlayerNumber_t nPlayer = PLR_1_e;
     if (((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 1 || (s8)GOLFERSTATE_GetCurrentState(nPlayer) == 2 ||
          (s8)GOLFERSTATE_GetCurrentState(nPlayer) == 3 || (s8)GOLFERSTATE_GetCurrentState(nPlayer) == 4 ||
@@ -1686,7 +1745,10 @@ void fn_800FDADC(void) {
     }
 }
 
-void fn_800FDC0C(s32* p0, s32* p1, s32* p2) {
+// The current course's three score limits for mode 8's prize (gSpeedGolfPrizeScores; 750, 675 and
+// 600 on the first course): under the third wins 5000, under the second 2500, under the first 1000
+// (SpeedGolf_GetWinner). A UI command shows them.
+void SpeedGolf_GetPrizeScores(s32* p0, s32* p1, s32* p2) {
     *p0 = gSpeedGolfPrizeScores[gpGame->nCurCourse].n0;
     *p1 = gSpeedGolfPrizeScores[gpGame->nCurCourse].n4;
     *p2 = gSpeedGolfPrizeScores[gpGame->nCurCourse].n8;
@@ -1697,11 +1759,13 @@ static inline s32 SG_Score(s32 nSeconds, s32 nStrokes) {
     return nStrokes * 3 + nSeconds;
 }
 
-// The prize money (for the UI). Solo (mode 8): the total of time plus 3 per stroke over the holes
-// played, under the course's three limits (fn_800FDC0C), wins 5000, 2500 or 1000. Two players:
-// the winner takes the points margin over 3000 (4500 from a margin of 3000). Returns the winner
-// (-1 for none) and the money in *pMoney.
-s32 fn_800FDC5C(s32* pMoney) {
+// The round's winner and prize (the UI's command, TW07's GM_vGetSpeedGolfWinner), paid each time it
+// is asked (GM_Earnings_AwardMoney and money.n1C). Only for a full round (else -1 and *pMoney 0).
+// Mode 8: player 0's total of time plus 3 a stroke over the selected holes before the current one
+// and the current one, under the course's limits (SpeedGolf_GetPrizeScores), wins 5000, 2500 or
+// 1000. Two players: whoever is ahead of 3000 points (by player 0's points) takes the margin, 4500
+// from 3000 up. Returns the winner (-1 for none) and the money in *pMoney.
+s32 SpeedGolf_GetWinner(s32* pMoney) {
     s32 n0;
     s32 n4;
     s32 n8;
@@ -1723,7 +1787,7 @@ s32 fn_800FDC5C(s32* pMoney) {
         }
         n += SG_Score(gPlayers[0].n290[Game_CurHoleIndex()], gPlayers[0].nStrokes[Game_CurHoleIndex()]);
         nWinner = 0;
-        fn_800FDC0C(&n0, &n4, &n8);
+        SpeedGolf_GetPrizeScores(&n0, &n4, &n8);
         if (n < n8) {
             n = 5000;
         } else if (n < n4) {
@@ -1761,9 +1825,11 @@ s32 fn_800FDC5C(s32* pMoney) {
     return nWinner;
 }
 
-// The solo scorecard: the points of the holes played so far, plus the current hole's seconds,
-// strokes and score (also returned through the pointers). nPlayer is not read: it is player 0.
-s32 fn_800FDE58(int nPlayer, s32* pSeconds, s32* pStrokes, s32* pScore) {
+// The solo total for the scorecard: nC6C (seconds plus 3 a stroke, SpeedGolf_SetHoleTime) of the
+// selected holes before the current one, plus the current hole's score (SG_Score of its seconds and
+// strokes); the current hole's seconds, strokes and score also go out through the pointers. nPlayer
+// is not read: it is player 0.
+s32 SpeedGolf_GetRoundScore(int nPlayer, s32* pSeconds, s32* pStrokes, s32* pScore) {
     int nHole;
     int n;
     int h;
@@ -1781,18 +1847,21 @@ s32 fn_800FDE58(int nPlayer, s32* pSeconds, s32* pStrokes, s32* pScore) {
     return n;
 }
 
-void fn_800FDF38(void) {
-    fn_800FCCF0();
+// The pfn220 of modes 7 and 8 (every frame of a round): SpeedGolf_UpdatePlayers.
+void SpeedGolf_Update(void) {
+    SpeedGolf_UpdatePlayers();
 }
 
-u8 fn_800FDF58(int nPlayer) {
+// The pfn230 of modes 6, 7 and 8 (GM_RenderBallTarget): the placement target is never drawn for the
+// mode's sake.
+u8 SpeedGolf_RenderBallTarget(int nPlayer) {
     return 0;
 }
 
-// The mode's pfn234, which GM_CheckControllerPulled asks (TW06's CheckControllerPulled, by
-// position): during the countdown (nC3C bit 1) once it is below 71; otherwise when player 0's
-// view is not on camera 1, 2 or 4 (fn_80063C90).
-u8 fn_800FDF60(void) {
+// The pfn234 of modes 6, 7 and 8, which GM_CheckControllerPulled asks (TW06's
+// CheckControllerPulled): 1 during the countdown (nC3C bit 1) once under 71 frames are left, and
+// otherwise unless player 0's view is in a colour fade (fn_80063C90).
+u8 SpeedGolf_CheckControllerPulled(void) {
     if (gPlayers[0].nC3C & 2) {
         if (gPlayers[0].nC54 < 71) {
             return 1;
@@ -1803,23 +1872,34 @@ u8 fn_800FDF60(void) {
     return 0;
 }
 
-void fn_800FDFC4(s32 p0, s32 p1, s32 p2) {
+// Game message 21: a player's points on the HUD, with the player's HUD slot (Player.nC58), the
+// points (nC44) and 1 as a hole starts or ends, 0 for a change.
+void SpeedGolf_ShowPoints(s32 p0, s32 p1, s32 p2) {
     GameMsg_Send3Ints(21, p0, p1, p2);
 }
 
-void fn_800FDFFC(s32 p0, s32 p1) {
+// Game message 19 with a HUD slot (Player.nC58) and a byte: sent with 1 as the countdown starts
+// (SpeedGolf_CountdownInit), after the player's panel is shown.
+void SpeedGolf_SendMessage19(s32 p0, s32 p1) {
     GameMsg_Send2Ints(19, p0, (p1 & 0xFF));
 }
 
-void fn_800FE02C(void) {
+// Game message 16 with 1: the countdown's "ready" as a hole starts (SpeedGolf_CountdownInit;
+// SpeedGolf_ShowGo sends 2 when it ends).
+void SpeedGolf_ShowReady(void) {
     GameMsg_SendInt(16, 1);
 }
 
-void fn_800FE054(s32 p0, s32 p1) {
+// Game message 44: the prompt to stop the ball (button 0x23) for a HUD slot (Player.nC58): 1 shows
+// it while the runner is within 5 of a moving ball, 0 hides it.
+void SpeedGolf_ShowStopBallPrompt(s32 p0, s32 p1) {
     GameMsg_Send2Ints(44, p0, p1);
 }
 
-void fn_800FE080(s32 p0, s32 p1) {
+// Game message 41: the run's tip for a HUD slot (Player.nC58): 0 none, 1 after 179 frames without
+// the stick, 2 and 3 the extra tips of the round's first and second hole
+// (SpeedGolf_UpdateHumanRun).
+void SpeedGolf_ShowRunTip(s32 p0, s32 p1) {
     GameMsg_Send2Ints(41, p0, p1);
 }
 

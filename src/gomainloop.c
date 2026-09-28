@@ -259,7 +259,7 @@ void GM_InitModule_PostDataStream(void);
 void GM_DeInitModule(void);
 void GM_SetupDefaultProfile(void);
 void GUI_ClearControllersPulled(void);
-s32  fn_800FD6A4(int nPlayer);
+s32  SpeedGolf_IsRunning(int nPlayer);
 void fn_801020BC(void);
 void FE_CrAP_InitModule(void);
 void FE_CrAP_CloseModule(void);
@@ -886,7 +886,7 @@ void fn_8006D27C(void) {
             fn_8006DF28();
             fn_80045848(ViewController_GetActivePlayerNumber(nView));
             if (Game_GetMode() == 7 || Game_GetMode() == 8) {
-                if ((u8)fn_800FD6A4(ViewController_GetActivePlayerNumber(nView))) {
+                if ((u8)SpeedGolf_IsRunning(ViewController_GetActivePlayerNumber(nView))) {
                     fn_800BAB80(ViewController_GetActivePlayerNumber(nView));
                     fn_800BAA50(ViewController_GetActivePlayerNumber(nView));
                 }

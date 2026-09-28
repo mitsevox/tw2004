@@ -1144,7 +1144,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
 - **[verified] The ball position is read as bytes of the Player, not through a `Ball*`.**
   `*(f32*)(gPlayers[n].ball + 0)` / `+ 8` matches; `((Ball*)gPlayers[n].ball)->vPos[0]` and
   `((f32*)gPlayers[n].ball)[0]` add an `addi r3, r3, 0xa90` pointer temp (GameMode8
-  `fn_800FAD54`, 99.66%). Same rule as the GetHonors shape above, for `gPlayers[n]`. It is the
+  `SpeedGolf_OnBallAtRest`, 99.66%). Same rule as the GetHonors shape above, for `gPlayers[n]`. It is the
   one sanctioned raw offset until `Player.ball` gets a real type that matches.
 - **[verified] `int` vs `long` changes the code.** For an `int` local CodeWarrior folds
   `n += 3` into every later use (`addi r5, rN, 3` at a call, `addi r0, rN, 3; cmpwi r0, 8`, ...),
@@ -1259,7 +1259,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   the original's `li 7; bne; li 6` is `h = 7; if (n == 2) h = 6;` (GameMode11 `Lessons_Update`).
 - **[verified] A boolean chain assigned to an `int` keeps the original's register order where
   `if (...) b = 1;` does not**: `bDown = (A || B) && (C || D) && (E || F);` (GameMode8
-  `fn_800FCC38`, 98.9% -> 100).
+  `SpeedGolf_IsStartXYHeld`, 98.9% -> 100).
 - **[verified] `n ? 0 : 1` and `n == 0` give the same instructions, different saved registers.**
   GameMode8 `SpeedGolf_TradeEventPoints`: `nOther = nPlayer ? 0 : 1;` put `nOther` in the original's register
   (91.7% -> 93.1); `nOther = nPlayer == 0;` and `!nPlayer` (89.4%) did not.
@@ -1301,10 +1301,10 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   A `(u32)` switch gives the branch shape with `cmpwi`; the or-chain gives the original's
   `cmplwi` (Golfer `Caddie_Update` 99.03% -> 100, `Caddie_Start` 97.86% -> 100).
 - **[verified] An explicit `case 1: break;` leaves a second unconditional branch after the
-  dispatch** (`b end; b end`); `default:` in any position does not (GameMode8 `fn_800FBD2C`).
+  dispatch** (`b end; b end`); `default:` in any position does not (GameMode8 `SpeedGolf_RunUpdate`).
 - **[verified] Loop early exits: `for (...) { if (a[h] != 1) break; n++; }`** gives the
   original's test-at-the-bottom layout; `&& a[h] == 1` in the loop condition does not (GameMode8
-  `fn_800FD1C0`, 92.5% -> 99.95%).
+  `SpeedGolf_HoleOverInit`, 92.5% -> 99.95%).
 - **[verified] One shared `return` means one combined condition.** Four separate
   `if (...) return 2;` lines each get their own return sequence. If the original has several
   tests all branching to a single shared return, the source was `if (a || b || c || d) return 2;`.
@@ -1403,7 +1403,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
 
 - **[verified] A MIN-style ternary whose result lands in a scratch register is its own
   variable.** `r = a <= b ? a : b;` with `r` separate matched; writing it back into `a` let the
-  compiler merge them (GameMode8 `fn_800FBD2C`).
+  compiler merge them (GameMode8 `SpeedGolf_RunUpdate`).
 - **[verified] A value the compiler CSEs into a callee-saved float register** (e.g. `100 - skill`
   used three times, first computed *after* a call) was a named local in the source, assigned
   right after the call whose result it is combined with: `r = Rand_Float(0); miss = 100 - skill;
@@ -1482,7 +1482,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   0x3F7FBE76 is `59.94f / 60.0f`; the literal `0.999f` rounds to ...77.
 - **[verified] An inline helper moves arithmetic after a call**: `n += SG_Score(t, s)` puts the
   multiply after the second call, where `n += s * 3 + t` computes it first (GameMode8
-  `fn_800FDC5C`, 89.9% -> 98.2%).
+  `SpeedGolf_GetWinner`, 89.9% -> 98.2%).
 - **[verified] An exact unit can still fail the link on function order.** objdiff scores each
   function by name, so a function defined out of address order reads 100% while the linked
   `.text` shifts. GameUI `GUI_SetEndOfGamePending` was defined after `GUI_PauseMenuClosed`; moving it fixed the DOL.
