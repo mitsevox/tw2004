@@ -47,6 +47,12 @@ your files' named / commented / done counts; report them before and after.
    purpose stays unclear after reading its callers is named for exactly what it does
    (`FE_SetB86FromScreen`-style plain description is better than `fn_`), and the doubt goes in the
    report. name.py refuses a row that keeps a `fn_XXXXXXXX` name.
+6. A possible EA bug in your own files is settled in your pass, not just reported (owner,
+   2026-09-28: "that's the exact type of workflow where things get lost in translation"). Prove it
+   from the code (the values it really gets, every caller). Proven: label it where it happens,
+   `// EA bug: <what goes wrong, for whom>` (docs/style.md), in a hand-edit commit. Not proven:
+   the report says what you checked and what would settle it. A bug in a file you do not own goes
+   in the report with its evidence; the orchestrator labels it.
 
 ## Applying (one command, all or nothing)
 Write the batch to your scratch folder, tab-separated (docs in `tools/match/name.py`):
