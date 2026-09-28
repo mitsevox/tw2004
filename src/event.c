@@ -160,7 +160,7 @@ void EVENT_PracticeSwing(int nPlayer, int nEvent, void* pData, int nArg) {
 // ball): in the demo (session flag 0x4000) of mode 26 the demo's timer restarts (fn_8009A16C); then
 // the mode's ball-hit hook (gpGame->pfn260), the lessons (their crowd sound), the swing effect at
 // the ball (fn_800A31E0), SitDev starts watching the ball (fn_800BB1A8), commentary situation event
-// 5, and GameMode26's split-screen flag (GameMode26_NoteSplitScreenShot, which takes no argument).
+// 5, and GameMode26's split-screen flag (GameMode26_NoteSplitScreenShot, which ignores the player).
 void EVENT_HitBall(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1) {
         if (Game_GetMode() == 26 && (gSession.uFlags & 0x4000)) {
@@ -511,11 +511,11 @@ void EVENT_EstimatedBallFirstBounce(int nPlayer, int nEvent, void* pData, int nA
 }
 
 // Event 39 (Ball.c: the ball hit a world object), for the real and the simulated ball alike: when
-// ball.pHitActor is set, the game mode's hook gets the object's n140 (gpGame->pfn268; GameMode16's
-// bonuses) and Gaud_BallHitMetalTarget plays.
+// ball.pHitActor is set, the game mode's hook gets the object's n140 (gpGame->pfnCollisionActor;
+// GameMode16's bonuses) and Gaud_BallHitMetalTarget plays.
 void EVENT_CollisionActor(int nPlayer, int nEvent, void* pData, int nArg) {
     if (gPlayers[nPlayer].ball.pHitActor != NULL) {
-        gpGame->pfn268(nPlayer, gPlayers[nPlayer].ball.pHitActor->n140);
+        gpGame->pfnCollisionActor(nPlayer, gPlayers[nPlayer].ball.pHitActor->n140);
         Gaud_BallHitMetalTarget(nPlayer);
     }
 }
@@ -702,10 +702,10 @@ void EVENT_PredictedGameBreakerEnd(int nPlayer, int nEvent, void* pData, int nAr
 }
 
 // Event 5 (GameManager.c, GameMode11.c: the round is over): counts a game played in the player's
-// stats (EASBio_IncrementGamesPlayed) unless the session is the demo (gSession.a8[0]), and queues
+// stats (EASBio_IncrementGamesPlayed) unless the session is the demo (gSession.bDemo), and queues
 // commentary situation event 13.
 void EVENT_EndGame(int nPlayer, int nEvent, void* pData, int nArg) {
-    if (!gSession.a8[0]) {
+    if (!gSession.bDemo) {
         EASBio_IncrementGamesPlayed(1);
     }
     SitDev_QueueEvent(nPlayer, 2, 13);
@@ -858,8 +858,9 @@ void EVENT_Trigger(int nPlayer, int nEvent, void* pData, int b) {
 // event 7 for the player's view, Gaud_BallBounce, the surface's collision effect (fn_800A3348),
 // emotion event 1; on an object that object's n1C (fn_80033704) and Player.b30C set; on the
 // flagstick Player.b30D set and Gaud_BallHitPole; commentary situation event 27 for a tree, 16 for
-// an object or a tree, 21 for the flagstick; then the game mode's landing hook (gpGame->pfn23C).
-// For the AI's simulated ball, hitting an object aborts the simulation (AI_SimAbort).
+// an object or a tree, 21 for the flagstick; then the game mode's landing hook
+// (gpGame->pfnBallCollision). For the AI's simulated ball, hitting an object aborts the simulation
+// (AI_SimAbort).
 void Collision(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1) {
         fn_80063CF0(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 7, nPlayer);
@@ -885,7 +886,7 @@ void Collision(int nPlayer, int nEvent, void* pData, int nArg) {
         } else if (nEvent == 38) {
             SitDev_QueueEvent(nPlayer, 2, 21);
         }
-        gpGame->pfn23C(nPlayer);
+        gpGame->pfnBallCollision(nPlayer);
     } else if (nEvent == 36) {
         AI_SimAbort();
     }

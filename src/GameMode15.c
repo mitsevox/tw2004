@@ -17,7 +17,7 @@
 
 // Mode 15's state; only this file uses it. The .sbss ones are defined last address first (the
 // compiler lays a file's .sbss out last definition first).
-s32 gHorseSavedOptionsC = 4;    // options.nC from before the game (StartGamePreData; Shutdown puts it back)
+s32 gHorseSavedWeather = 4;    // options.nWeather before the game (StartGamePreData; Shutdown restores it)
 s32 gHorseLeader;               // the player whose shot is to be matched (5 = no leader)
 s32 gHorseLeaderRing;           // the leader's ring (0 the bullseye .. 4), read only while there is one
 s8  gHorseLeaderTarget;         // the target the leader landed on
@@ -69,24 +69,24 @@ void GameModeSkillZoneHorse_Init(void) {
     gpGame->pfnGameFinished = GameModeSkillZoneHorse_GameFinished;
     gpGame->pfnGoToPlayoff = GameModeSkillZoneHorse_GoToPlayoff;
     gpGame->pfnEndGolferTurn = GameModeSkillZoneHorse_EndGolferTurn;
-    gpGame->pfn244 = GameModeSkillZoneHorse_CheckShotAwards;
-    gpGame->pfn1E4 = GameModeSkillZoneHorse_LoadHole;
+    gpGame->pfnCheckShotAwards = GameModeSkillZoneHorse_CheckShotAwards;
+    gpGame->pfnLoadHole = GameModeSkillZoneHorse_LoadHole;
     gpGame->pfn228 = GameModeSkillZoneHorse_UpdateSwingUI;
-    gpGame->pfn224 = GameModeSkillZoneHorse_RestartHole;
-    gpGame->pfn1EC = GameModeSkillZoneHorse_StartGamePreData;
-    gpGame->pfn250 = GameModeSkillZoneHorse_BallOOB;
-    gpGame->pfn264 = GameModeSkillZoneHorse_PickPrevTarget;
-    gpGame->pfn258 = GameModeSkillZoneHorse_PickTarget;
+    gpGame->pfnRestartHole = GameModeSkillZoneHorse_RestartHole;
+    gpGame->pfnStartGamePreData = GameModeSkillZoneHorse_StartGamePreData;
+    gpGame->pfnBallOOB = GameModeSkillZoneHorse_BallOOB;
+    gpGame->pfnPickPrevTarget = GameModeSkillZoneHorse_PickPrevTarget;
+    gpGame->pfnPickTarget = GameModeSkillZoneHorse_PickTarget;
     gpGame->pfn260 = GameModeSkillZoneHorse_HitBall;
     gpGame->pfnEndGame = GameModeSkillZoneHorse_EndGame;
-    gpGame->pfn26C = GameModeSkillZoneHorse_GreenType;
+    gpGame->pfnGreenType = GameModeSkillZoneHorse_GreenType;
     gpGame->b276 = 0;
     gpGame->bGimmesAllowed = 0;
     gpGame->b280 = 0;
     gpGame->b271 = 0;
     gpGame->b281 = 0;
     gpGame->bStrokeLimit = 0;
-    gpGame->b285 = 0;
+    gpGame->bAllowGameBreakers = 0;
     gpGame->b274 = 0;
     gpGame->b286 = 1;
     gpGame->b287 = 0;
@@ -109,18 +109,18 @@ void GameModeSkillZoneHorse_Init(void) {
     gSession.nPinSet = 0;
 }
 
-// Puts back the two options StartGamePreData changed for the game: options.nC and the wind.
+// Puts back the two options StartGamePreData changed for the game: options.nWeather and the wind.
 void GameModeSkillZoneHorse_Shutdown(void) {
-    gSession.options.nC = gHorseSavedOptionsC;
+    gSession.options.nWeather = gHorseSavedWeather;
     gSession.options.nWind = gHorseSavedWind;
 }
 
-// As a round starts (pfn1EC, GM_InitModule_PreDataStream): saves options.nC and the wind setting
-// (Shutdown puts them back) and sets them to 4 and 0, no wind.
+// As a round starts (pfn1EC, GM_InitModule_PreDataStream): saves options.nWeather and the wind
+// setting (Shutdown puts them back) and sets them to 4 and 0, no wind.
 void GameModeSkillZoneHorse_StartGamePreData(void) {
-    gHorseSavedOptionsC = gSession.options.nC;
+    gHorseSavedWeather = gSession.options.nWeather;
     gHorseSavedWind = gSession.options.nWind;
-    gSession.options.nC = 4;
+    gSession.options.nWeather = 4;
     gSession.options.nWind = 0;
 }
 

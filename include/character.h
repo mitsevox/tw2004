@@ -406,7 +406,7 @@ typedef void (*SKABlendFn)(SKABlendNode* pNode, CharModel* pModel, f32 fTime);
 void SKABlendData_Init(SKABlendNode** ppNode, int nType, int nFormat, SKABlendFn pfnBlend,
                        int bFreeASAP);
 // animblender.c: cut the tree at pNode off at fTime, or start it over (pPlayer plays it).
-void SKABlender_ClampT1(SKABlendNode* pNode, struct AnimPlayer* pPlayer, f32 fTime);
+void SKABlender_ClampT1(SKABlendNode* pNode, struct TSKATime* pPlayer, f32 fTime);
 // animblender.c: pose the tree at pNode at fTime into its buffers (each blend node's pfnBlend).
 void SKABlender_Update(struct Character* pChar, SKABlendNode* pNode, CharModel* pModel, f32 fTime);
 // ska_shared.c: pose pPose from pClip at fTime (aBits, if not NULL, gets the bones it sets).
@@ -511,7 +511,7 @@ LAYOUT_ASSERT(AnimPlayerEntry, 0x18);
 // An animation player (EA's TSKATime, 0x138 bytes; animblender.c's SKATime_ functions); only what
 // is read. Character has two: the one at 0x164, whose fields are named in Character directly, and
 // morphAnim.
-typedef struct AnimPlayer {
+typedef struct TSKATime {
     s32   n00;                  // 0x00  reset to 0 by Character_PlayClip and SKATime_Init
     s32   uFlags;               // 0x04  0x1 held (not moved), 0x2 paused (SKATime_Pause; the
                                 //       update turns it into the hold; SKATime_UnPause
@@ -541,10 +541,10 @@ typedef struct AnimPlayer {
     s32   n40;                  // 0x40  }
     struct AnimPlayerEntry* p44;    // 0x44  a48[0] after SKATime_Init
     AnimPlayerEntry a48[10];    // 0x48  chained both ways by SKATime_Init
-} AnimPlayer;
-LAYOUT_ASSERT(AnimPlayer, 0x138);
+} TSKATime;
+LAYOUT_ASSERT(TSKATime, 0x138);
 
-void SKATime_Init(AnimPlayer* pPlayer);  // animblender.c: reset a player
+void SKATime_Init(TSKATime* pPlayer);    // animblender.c: reset a player
 
 // An entry of Character.p44 (0x30 bytes), read from the CHR object by Character_CreateFromMem.
 typedef struct CharEntry44 {
@@ -652,11 +652,11 @@ typedef struct Character {
                                 //        (Character_LoadTextures); the size is unknown (up to the
                                 //        next known field)
     u8    anim[4];              // 0x164  the animation player (+0x14 is its playback rate)
-    s32   uFlags;               // 0x168  AnimPlayer.uFlags; bit 0x40: runs backward (the backswing
+    s32   uFlags;               // 0x168  TSKATime.uFlags; bit 0x40: runs backward (the backswing
                                 //        being backed down); 0x200 / 0x400: the clip lookup fell
                                 //        back (Char_SetClip). Signed: the original tests it with
                                 //        cmpwi
-    s32   nPlays;               // 0x16C  AnimPlayer.nPlays: 1 (CharacterState_AddSKABlendData), -1
+    s32   nPlays;               // 0x16C  TSKATime.nPlays: 1 (CharacterState_AddSKABlendData), -1
                                 //        (plays on) from Character_PlayClip and
                                 //        Character_GolferStreamCallbackFE
     s32   nTransitionState;     // 0x170  } the state queued for when fAnimTime reaches
@@ -664,17 +664,17 @@ typedef struct Character {
                                 //        CharacterState_SetTransition sets both)
     u8    unk178[0x17C - 0x178];
     f32   fAnimTime;            // 0x17C
-    f32   fAnimStart;           // 0x180  AnimPlayer.fStart: the tree's start
+    f32   fAnimStart;           // 0x180  TSKATime.fStart: the tree's start
                                 //        (CharacterState_AddSKABlendData);
                                 //        Character_AlignCharacterForShotImpact sets fAnimTime to it
                                 //        plus the blend's event 2 time less afSwingTop[1]
     f32   fAnimEnd;             // 0x184  the animation's end time
     u8    unk188[0x198 - 0x188];
-    f32   fIdleClock;           // 0x198  } AnimPlayer.fIdleClock and fIdleCentre: 0 and the
+    f32   fIdleClock;           // 0x198  } TSKATime.fIdleClock and fIdleCentre: 0 and the
     f32   fIdleCentre;          // 0x19C  }   animation time when state 8 starts
                                 //        (CharacterState_UpdateSKAState; SKATime_Idle then sways)
     u8    unk1A0[0x29C - 0x1A0];
-    AnimPlayer morphAnim;       // 0x29C  the second animation player: morph libraries (MtaLib)
+    TSKATime morphAnim;         // 0x29C  the second animation player: morph libraries (MtaLib)
     s32   n3D4;                 // 0x3D4  the bytes of its CHR object before the animation library
     AnimLib* pLib;              // 0x3D8  its animation library
     struct ClipRecord* pRecords;    // 0x3DC  records for its merged library (skalib)
@@ -922,8 +922,8 @@ int   fn_80048574(Character* pChar, u64 uEvent);    // the character's animation
 u8    CharacterState_IsNotFidgeting(Character* pChar);
 void  SKABlender_BlendLinear(SKABlendNode* pNode, CharModel* pModel, f32 fTime);
 f32   SKABlender_GetTagTime(SKABlendNode* pNode, u64 uEvent); // an event's time in a blend tree
-void  SKATime_Update(AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT);    // advance a player
-void  SKATime_Idle(Character* pChar, int nPlayer, AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT);
+void  SKATime_Update(TSKATime* pPlayer, SKABlendNode* pNode, f32 fT);      // advance a player
+void  SKATime_Idle(Character* pChar, int nPlayer, TSKATime* pPlayer, SKABlendNode* pNode, f32 fT);
 void  SKATime_UnPause(u8* pAnim);
 void  SKATime_SetTime(u8* pAnim, f32 fTime);           // animblender.c
 u8    SKABlender_IsNotSingleSKA(SKABlendNode* pNode);

@@ -188,7 +188,7 @@ void GameMode4_Shutdown(void) {
     }
     gpGame->nC = 1;
     gpGame->n10 = 1;
-    gSession.options.nC = lbl_802816E0;
+    gSession.options.nWeather = lbl_802816E0;
     gSession.options.nWind = lbl_80282430;
     lbl_80282434 = 0;
 }
@@ -198,9 +198,9 @@ void GameMode4_Shutdown(void) {
 void GameMode4_StartEvent(void) {
     int nEvent;
     int nPins;
-    lbl_802816E0 = gSession.options.nC;
+    lbl_802816E0 = gSession.options.nWeather;
     lbl_80282430 = gSession.options.nWind;
-    gSession.options.nC = 4;
+    gSession.options.nWeather = 4;
     gSession.options.nWind = 0;
     lbl_80282434 = 1;
     nEvent = fn_801021FC();

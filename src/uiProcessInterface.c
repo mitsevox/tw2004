@@ -294,7 +294,7 @@ void fn_8008F820(void) {
         lbl_801D87C0.b49 = 1;
     }
     aArgs[0] = 0;
-    if (lbl_801D87C0.b0 == 0 && fn_80077148() && lbl_801D87C0.b40 == 0) {
+    if (lbl_801D87C0.bFadeToBlack == 0 && fn_80077148() && lbl_801D87C0.b40 == 0) {
         for (k = 0; k < 4; k++) {
             if (lbl_801D87C0.a1[k] && lbl_801D87C0.a30[k]) {
                 if (gSession.nGameType != 6 || (gSession.nPaused != 2 && gSession.nPaused != 3)) {
@@ -450,7 +450,7 @@ FrontEnd* fn_8009005C(char* szSet) {
     lbl_801D87C0.a2C[1] = 0;
     lbl_801D87C0.a2C[2] = 0;
     lbl_801D87C0.a2C[3] = 0;
-    lbl_801D87C0.b0 = 0;
+    lbl_801D87C0.bFadeToBlack = 0;
     lbl_801D87C0.fFade = 0.0f;
     lbl_801D880C.n4 = 0;
     lbl_801D880C.n0 = -1;
@@ -566,14 +566,14 @@ void fn_80090664(void) {
     fn_800BA038();
 }
 
-// The fade to black (while lbl_801D87C0.b0 is set): draw it, 0.05 darker each frame. Once it is
-// black, unpause; start-up (1) shuts the UI down (fn_8008FD60 sees lbl_80281F19) and sets
-// gSession.b12, the menus (3) shut it down, start the demo when gSession.a8[0] is set and call
-// FE_Manager.c's function for mode 0x17, 0x18 or 4, and other game types set gSession.b12.
+// The fade to black (while lbl_801D87C0.bFadeToBlack is set): draw it, 0.05 darker each frame. Once
+// it is black, unpause; start-up (1) shuts the UI down (fn_8008FD60 sees lbl_80281F19) and sets
+// gSession.bEndLoop, the menus (3) shut it down, start the demo when gSession.bDemo is set and call
+// FE_Manager.c's function for mode 0x17, 0x18 or 4, and other game types set gSession.bEndLoop.
 void fn_8009069C(void) {
     f32 aColor[4];
 
-    if (lbl_801D87C0.b0 == 0) return;
+    if (lbl_801D87C0.bFadeToBlack == 0) return;
     aColor[0] = 0.0f;
     aColor[1] = 0.0f;
     aColor[2] = 0.0f;
@@ -585,10 +585,10 @@ void fn_8009069C(void) {
         gSession.nPaused = 0;
         if (gSession.nGameType == 1) {
             lbl_80281F19 = 1;
-            gSession.b12 = 1;
+            gSession.bEndLoop = 1;
         } else if (gSession.nGameType == 3) {
             lbl_80281F19 = 1;
-            if (gSession.a8[0] != 0) {
+            if (gSession.bDemo != 0) {
                 DEMO_Start();
             }
             if (Game_GetMode() == 0x17) {
@@ -599,7 +599,7 @@ void fn_8009069C(void) {
                 fn_80077348();
             }
         } else {
-            gSession.b12 = 1;
+            gSession.bEndLoop = 1;
         }
     }
 }

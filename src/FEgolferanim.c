@@ -1886,12 +1886,12 @@ int FE_GetLastCrAPCategory(void) {
 }
 
 // Whether the menu golfer is updated and drawn this frame (gomainloop): the golfer shown is ready
-// (bLoaded) and bHidden, b88, lbl_80281F19, lbl_801D87C0.b0 and .b49 are all 0.
+// (bLoaded) and bHidden, b88, lbl_80281F19, lbl_801D87C0.bFadeToBlack and .b49 are all 0.
 u8 FE_IsGolferRenderAllowed(void) {
     u8 bResult = 0;
 
     if (gpCrAPState->pB4->bLoaded && gpCrAPState->bHidden == 0 && gpCrAPState->b88 == 0 && lbl_80281F19 == 0
-        && lbl_801D87C0.b0 == 0 && lbl_801D87C0.b49 == 0) {
+        && lbl_801D87C0.bFadeToBlack == 0 && lbl_801D87C0.b49 == 0) {
         bResult = 1;
     }
     return bResult;

@@ -17,7 +17,7 @@
 
 // Mode 13's state; only this file uses it. The .sbss ones are defined last address first (the
 // compiler lays a file's .sbss out last definition first).
-s32 gTimedSavedOptionsC = 4;    // options.nC from before the game (StartGamePreData; Shutdown puts it back)
+s32 gTimedSavedWeather = 4;    // options.nWeather before the game (StartGamePreData; Shutdown restores it)
 s32 gTimedShotPoints;           // the points of the last shot (GetShotEarned)
 s32 gTimedShotSeconds;          // the seconds added by the last shot (GetTimeEarned)
 s32 gTimedBonusMultiplier;      // the points multiplier from bonus objects: 1 each shot, raised by
@@ -63,19 +63,19 @@ void GameModeSkillZoneTimed_Init(void) {
     gpGame->pfnGameFinished = GameModeSkillZoneTimed_GameFinished;
     gpGame->pfnGoToPlayoff = GameModeSkillZoneTimed_GoToPlayoff;
     gpGame->pfnEndGolferTurn = GameModeSkillZoneTimed_EndGolferTurn;
-    gpGame->pfn244 = GameModeSkillZoneTimed_CheckShotAwards;
-    gpGame->pfn1E4 = GameModeSkillZoneTimed_LoadHole;
+    gpGame->pfnCheckShotAwards = GameModeSkillZoneTimed_CheckShotAwards;
+    gpGame->pfnLoadHole = GameModeSkillZoneTimed_LoadHole;
     gpGame->pfn228 = GameModeSkillZoneTimed_UpdateSwingUI;
     gpGame->pfn24C = GameModeSkillZoneTimed_InitialFlyByDone;
-    gpGame->pfn224 = GameModeSkillZoneTimed_RestartHole;
-    gpGame->pfn1EC = GameModeSkillZoneTimed_StartGamePreData;
-    gpGame->pfn250 = GameModeSkillZoneTimed_BallOOB;
-    gpGame->pfn254 = GameModeSkillZoneTimed_Mulligan;
-    gpGame->pfn264 = GameModeSkillZoneBase_PickPrevTarget;
-    gpGame->pfn258 = GameModeSkillZoneBase_PickTarget;
-    gpGame->pfn25C = GameModeSkillZoneTimed_SetTimer;
-    gpGame->pfn268 = GameModeSkillZoneTimed_CollisionActor;
-    gpGame->pfn26C = GameModeSkillZoneTimed_GreenType;
+    gpGame->pfnRestartHole = GameModeSkillZoneTimed_RestartHole;
+    gpGame->pfnStartGamePreData = GameModeSkillZoneTimed_StartGamePreData;
+    gpGame->pfnBallOOB = GameModeSkillZoneTimed_BallOOB;
+    gpGame->pfnMulligan = GameModeSkillZoneTimed_Mulligan;
+    gpGame->pfnPickPrevTarget = GameModeSkillZoneBase_PickPrevTarget;
+    gpGame->pfnPickTarget = GameModeSkillZoneBase_PickTarget;
+    gpGame->pfnSetTimer = GameModeSkillZoneTimed_SetTimer;
+    gpGame->pfnCollisionActor = GameModeSkillZoneTimed_CollisionActor;
+    gpGame->pfnGreenType = GameModeSkillZoneTimed_GreenType;
     gpGame->pfnEndGame = GameModeSkillZoneTimed_EndGame;
     gpGame->b276 = 0;
     gpGame->bGimmesAllowed = 0;
@@ -83,7 +83,7 @@ void GameModeSkillZoneTimed_Init(void) {
     gpGame->b271 = 0;
     gpGame->b281 = 0;
     gpGame->bStrokeLimit = 0;
-    gpGame->b285 = 0;
+    gpGame->bAllowGameBreakers = 0;
     gpGame->b274 = 0;
     gpGame->b286 = 1;
     gpGame->b287 = 0;
@@ -106,18 +106,18 @@ void GameModeSkillZoneTimed_Init(void) {
     gSession.nPinSet = 0;
 }
 
-// Puts back the two options StartGamePreData changed for the game: options.nC and the wind.
+// Puts back the two options StartGamePreData changed for the game: options.nWeather and the wind.
 void GameModeSkillZoneTimed_Shutdown(void) {
-    gSession.options.nC = gTimedSavedOptionsC;
+    gSession.options.nWeather = gTimedSavedWeather;
     gSession.options.nWind = gTimedSavedWind;
 }
 
-// As a round starts (pfn1EC, GM_InitModule_PreDataStream): saves options.nC and the wind setting
-// (Shutdown puts them back) and sets them to 4 and 0, no wind.
+// As a round starts (pfnStartGamePreData, GM_InitModule_PreDataStream): saves options.nWeather and
+// the wind setting (Shutdown puts them back) and sets them to 4 and 0, no wind.
 void GameModeSkillZoneTimed_StartGamePreData(void) {
-    gTimedSavedOptionsC = gSession.options.nC;
+    gTimedSavedWeather = gSession.options.nWeather;
     gTimedSavedWind = gSession.options.nWind;
-    gSession.options.nC = 4;
+    gSession.options.nWeather = 4;
     gSession.options.nWind = 0;
 }
 
@@ -172,9 +172,9 @@ void GameModeSkillZoneTimed_EndGolferTurn(int nPlayer) {
     }
 }
 
-// Scores a shot once the ball stops (pfn244 from GM_Earnings_PayShotGoals; BallOOB too). The
-// landing surface's gEarningsTable.aMini row gives points and seconds (GetIDScore). On a target
-// short of the drive line (GameModeSkillZoneBase_IsLongDrive): a first hit pays 100 plus its
+// Scores a shot once the ball stops (pfnCheckShotAwards from GM_Earnings_PayShotGoals; BallOOB
+// too). The landing surface's gEarningsTable.aMini row gives points and seconds (GetIDScore). On a
+// target short of the drive line (GameModeSkillZoneBase_IsLongDrive): a first hit pays 100 plus its
 // points, times the shot multiplier (nDBC) and the hole's target factor (ScaleTargetPoints), and
 // adds its seconds plus 5; the last target not yet hit pays the all-targets prize instead, with no
 // time. A target hit before pays its points and seconds scaled by 0.75 per earlier hit; after 4
@@ -484,8 +484,8 @@ void GameModeSkillZoneTimed_SetupNextGolfer(void) {
     gTimedBonusMultiplier = 1;
 }
 
-// Hole start (pfn1E4): the targets sorted nearest the tee first (SortCupsByDistanceFromTee), then
-// ClearPerHoleData.
+// Hole start (pfnLoadHole): the targets sorted nearest the tee first (SortCupsByDistanceFromTee),
+// then ClearPerHoleData.
 void GameModeSkillZoneTimed_LoadHole(void) {
     GameModeSkillZoneBase_SortCupsByDistanceFromTee();
     GameModeSkillZoneTimed_ClearPerHoleData();
@@ -501,9 +501,9 @@ void GameModeSkillZoneTimed_InitialFlyByDone(int nPlayer) {
     }
 }
 
-// The hole restarts (pfn224, GM_RestartHole): the per-hole data cleared with everyone's time back
-// to 90 seconds (ClearPerHoleData), player 0's default aim, the HUD clock hidden (-1) and the
-// ticking stopped.
+// The hole restarts (pfnRestartHole, GM_RestartHole): the per-hole data cleared with everyone's
+// time back to 90 seconds (ClearPerHoleData), player 0's default aim, the HUD clock hidden (-1) and
+// the ticking stopped.
 void GameModeSkillZoneTimed_RestartHole(void) {
     GameModeSkillZoneTimed_ClearPerHoleData();
     AI_DefaultTarget(0);
@@ -578,19 +578,20 @@ void GameModeSkillZoneTimed_TimerOut(void) {
     gPlayers[lbl_80282278].bE9D = 1;
 }
 
-// The ball went out of bounds (pfn250): the shot is scored as usual (CheckShotAwards).
+// The ball went out of bounds (pfnBallOOB): the shot is scored as usual (CheckShotAwards).
 void GameModeSkillZoneTimed_BallOOB(int nPlayer) {
     GameModeSkillZoneTimed_CheckShotAwards(nPlayer);
 }
 
-// A mulligan was taken (pfn254): the shot's multiplier (nDBC) goes back to 1 and the target streak
-// (nE90) to 0.
+// A mulligan was taken (pfnMulligan): the shot's multiplier (nDBC) goes back to 1 and the target
+// streak (nE90) to 0.
 void GameModeSkillZoneTimed_Mulligan(int nPlayer) {
     gPlayers[nPlayer].nDBC = 1;
     gPlayers[nPlayer].nE90 = 0;
 }
 
-// Sets the player's time left on the current hole (n290), in frames (pfn25C, from a UI command).
+// Sets the player's time left on the current hole (n290), in frames (pfnSetTimer, from a UI
+// command).
 void GameModeSkillZoneTimed_SetTimer(int nPlayer, int nTime) {
     gPlayers[nPlayer].n290[Game_CurHoleIndex()] = nTime;
 }
@@ -607,8 +608,8 @@ u8 GameModeSkillZoneTimed_HoleFinished(int nPlayer, u8 bCheck) {
     return 1;
 }
 
-// The ball hit a bonus object (pfn268, with its id, Ball.n140): the bullseye ball effect plays and
-// the bonus multiplier (gTimedBonusMultiplier) goes up by 2 plus the object's index
+// The ball hit a bonus object (pfnCollisionActor, with its id, Ball.n140): the bullseye ball effect
+// plays and the bonus multiplier (gTimedBonusMultiplier) goes up by 2 plus the object's index
 // (GameModeSkillZoneBase_GetBonusIndex), so by 2 to 6.
 void GameModeSkillZoneTimed_CollisionActor(int nPlayer, int nId) {
     s32 n = GameModeSkillZoneBase_GetBonusIndex(nId);
@@ -616,8 +617,8 @@ void GameModeSkillZoneTimed_CollisionActor(int nPlayer, int nId) {
     gTimedBonusMultiplier += n + 2;
 }
 
-// Which marker model target nTarget shows for the player (pfn26C, GoDynObj.c): 1 once they have
-// hit it 4 times (closed out, it pays no more), else 0.
+// Which marker model target nTarget shows for the player (pfnGreenType, GoDynObj.c): 1 once they
+// have hit it 4 times (closed out, it pays no more), else 0.
 s32 GameModeSkillZoneTimed_GreenType(int nPlayer, int nTarget) {
     if (gPlayers[nPlayer].nDE4[nTarget] > 3) {
         return 1;

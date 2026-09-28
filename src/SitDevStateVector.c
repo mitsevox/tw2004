@@ -209,7 +209,7 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
     case 33:
     case 34:
         SitDev_SetStateValue(pValues, 95, fn_800BB0D4(), pSetBits);
-        SitDev_SetStateValue(pValues, 43, pPlayer->b310 && !pPlayer->bMulliganUsed, pSetBits);
+        SitDev_SetStateValue(pValues, 43, pPlayer->bBunkerThisHole && !pPlayer->bMulliganUsed, pSetBits);
         SitDev_SetStateValue(pValues, 44, pPlayer->b311 && !pPlayer->bMulliganUsed, pSetBits);
         SitDev_SetStateValue(pValues, 49, fn_800BCD24(nPlayer), pSetBits);
         SitDev_SetStateValue(pValues, 38, fn_800BCCF8(nPlayer), pSetBits);
@@ -225,7 +225,7 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
         SitDev_SetStateValue(pValues, 16, (s32)(36.0f * (pPlayer->vTarget[1] - pBall->vStart[1])), pSetBits);
         SitDev_SetStateValue(pValues, 66, fn_800D13F4(nPlayer), pSetBits);
         SitDev_SetStateValue(pValues, 67, fn_800D1530(nPlayer), pSetBits);
-        SitDev_SetStateValue(pValues, 80, (f32)pPlayer->n2E0 >= 10.0f / 3.0f, pSetBits);
+        SitDev_SetStateValue(pValues, 80, (f32)pPlayer->nLongestPutt >= 10.0f / 3.0f, pSetBits);
         SitDev_SetStateValue(pValues, 81, pPlayer->n308 & 2, pSetBits);
         SitDev_SetStateValue(pValues, 82, pPlayer->n308 & 1, pSetBits);
         SitDev_SetStateValue(pValues, 47, fn_800CFD58(nPlayer), pSetBits);
@@ -251,7 +251,7 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
         SitDev_SetStateValue(pValues, 8, pPlayer->nStrokes[nHole], pSetBits);
         SitDev_SetStateValue(pValues, 9, pPlayer->nPutts[nHole], pSetBits);
         SitDev_SetStateValue(pValues, 32, fn_800BCB88(), pSetBits);
-        SitDev_SetStateValue(pValues, 11, gSession.options.nC, pSetBits);
+        SitDev_SetStateValue(pValues, 11, gSession.options.nWeather, pSetBits);
         SitDev_SetStateValue(pValues, 12, (s32)Wind_Get(NULL), pSetBits);
 
         // the class of where the shot started
@@ -384,7 +384,7 @@ s32 fn_800BCCA0(int nPlayer) {
 }
 
 s32 fn_800BCCCC(int nPlayer) {
-    return gpGame->pfn208(nPlayer);
+    return gpGame->pfnGetPotentialHoleResult(nPlayer);
 }
 
 s32 fn_800BCCF8(int nPlayer) {
@@ -392,11 +392,11 @@ s32 fn_800BCCF8(int nPlayer) {
 }
 
 u8 fn_800BCD24(int nPlayer) {
-    return gpGame->pfn1FC(nPlayer);
+    return gpGame->pfnIsPuttForWin(nPlayer);
 }
 
 u8 fn_800BCD50(void) {
-    return gpGame->bD4;
+    return gpGame->bInPlayoff;
 }
 
 s32 fn_800BCD5C(void) {

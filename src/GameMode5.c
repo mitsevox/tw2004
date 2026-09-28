@@ -18,7 +18,7 @@
 #include "game/modes/challenge.h"
 #include "game/earnings.h"
 
-s32 gPlayNowSavedOptionC = 4;           // gSession.options.nC saved while a challenge runs
+s32 gPlayNowSavedOptionC = 4;           // gSession.options.nWeather saved while a challenge runs
 Challenge* gChallengeList = gPlayNowChallenges; // the list being played (mode 24 swaps in its own)
 s32 gNumChallenges = 83;                // its length
 
@@ -28,7 +28,7 @@ ChallengeSpot gPlayNowBallSpots[83];    // where each places the ball (course ob
 // The played mode's own callbacks, kept by PlayNow_StartChallenge while mode 5's stand in for them.
 void (*gPlayNowModeShutdown)(void);                             // pfnShutdown (called once)
 void (*gPlayNowModeEndGame)(void);                              // pfnEndGame
-void (*gPlayNowModeHoleStart)(void);                            // pfn1E4
+void (*gPlayNowModeHoleStart)(void);                            // pfnLoadHole
 u8  (*gPlayNowModeGameFinished)(u8 bCheck);                     // pfnGameFinished
 u8 (*gPlayNowModeHoleFinished)(int nPlayer, u8 bCheck);         // pfnHoleFinished
 void (*gPlayNowModeHoleOver)(int nPlayer);                      // pfn210
@@ -74,7 +74,7 @@ u8 PlayNow_HoleFinished(int nPlayer, u8 bCheck);
 void PlayNow_Init(void) {
     gpGame->pfnInit = PlayNow_Init;
     gpGame->pfnShutdown = PlayNow_Shutdown;
-    gpGame->pfn1E4 = PlayNow_HoleStart;
+    gpGame->pfnLoadHole = PlayNow_HoleStart;
     gpGame->pfnEndGame = PlayNow_EndGame;
     gpGame->pfnHoleFinished = PlayNow_HoleFinished;
     gpGame->pfn210 = PlayNow_HoleOver;
@@ -86,8 +86,8 @@ void PlayNow_Init(void) {
 }
 
 // Mode 5's shutdown (pfnShutdown): the played mode's own shutdown runs once (then it is forgotten),
-// gpGame nC and n10 go back to 1, the options nC and wind that PlayNow_StartChallenge saved are put
-// back, and no challenge is running any more (PlayNow_IsChallengeRunning).
+// gpGame nC and n10 go back to 1, the options nWeather and wind that PlayNow_StartChallenge saved
+// are put back, and no challenge is running any more (PlayNow_IsChallengeRunning).
 void PlayNow_Shutdown(void) {
     if (gPlayNowModeShutdown) {
         gPlayNowModeShutdown();
@@ -95,7 +95,7 @@ void PlayNow_Shutdown(void) {
     }
     gpGame->nC = 1;
     gpGame->n10 = 1;
-    gSession.options.nC = gPlayNowSavedOptionC;
+    gSession.options.nWeather = gPlayNowSavedOptionC;
     gSession.options.nWind = gPlayNowSavedWind;
     gPlayNowChallengeRunning = 0;
 }
@@ -176,7 +176,7 @@ void PlayNow_LoadPLYsFromStream(UStreamObject* pObject) {
     }
 }
 
-// The current challenge (gCurChallenge) starts. The options nC and wind are saved
+// The current challenge (gCurChallenge) starts. The options nWeather and wind are saved
 // (gPlayNowSavedOptionC, gPlayNowSavedWind), the new-game data cleared, player 0's active profile
 // gets b70 set, and the challenge's game mode is set (GM_SetModeType fills that mode's callbacks);
 // the challenge now counts as running. Then its course, hole set and hole (1-based; a one-hole
@@ -205,7 +205,7 @@ void PlayNow_StartChallenge(void) {
     int nPar;
     int nHoles;
     u8 bFound;
-    gPlayNowSavedOptionC = gSession.options.nC;
+    gPlayNowSavedOptionC = gSession.options.nWeather;
     gPlayNowSavedWind = gSession.options.nWind;
     GM_ClearDataForNewGame();
     if (gpSaveData[gPlayers[0].nIndex].bActive) {
@@ -434,9 +434,9 @@ void PlayNow_StartChallenge(void) {
         break;
     }
     if (gChallengeList[gCurChallenge].b4D) {
-        gSession.options.nC = 3;
+        gSession.options.nWeather = 3;
     } else {
-        gSession.options.nC = 0;
+        gSession.options.nWeather = 0;
     }
     gpGame->nMulligans = 0;
     gSession.options.nWind = gChallengeList[gCurChallenge].nWind;
@@ -459,19 +459,19 @@ void PlayNow_StartChallenge(void) {
     }
     gPlayNowModeShutdown = gpGame->pfnShutdown;
     gPlayNowModeEndGame = gpGame->pfnEndGame;
-    gPlayNowModeHoleStart = gpGame->pfn1E4;
+    gPlayNowModeHoleStart = gpGame->pfnLoadHole;
     gPlayNowModeGameFinished = gpGame->pfnGameFinished;
     gPlayNowModeHoleFinished = gpGame->pfnHoleFinished;
     gPlayNowModeHoleOver = gpGame->pfn210;
     gpGame->pfnShutdown = PlayNow_Shutdown;
     gpGame->pfnEndGame = PlayNow_EndGame;
-    gpGame->pfn1E4 = PlayNow_HoleStart;
+    gpGame->pfnLoadHole = PlayNow_HoleStart;
     gpGame->pfnGameFinished = PlayNow_GameFinished;
     gpGame->pfnHoleFinished = PlayNow_HoleFinished;
     gpGame->pfn210 = PlayNow_HoleOver;
 }
 
-// Mode 5's hole start (pfn1E4, from GM_InitForHole): the between-holes scorecard is turned on
+// Mode 5's hole start (pfnLoadHole, from GM_InitForHole): the between-holes scorecard is turned on
 // (b275), the played mode's own hole start runs, then the challenge's ball spot, bag and weather go
 // in (PlayNow_ApplyChallengeSetup).
 void PlayNow_HoleStart(void) {
@@ -720,10 +720,10 @@ u8 PlayNow_IsChallengeRunning(void) {
 // under the mark; 7 in match scoring (gpGame->n4 1) a margin of holes won of at least the mark
 // (with the calendar flag a playoff gives 1 if player 0 has won more holes, else 2; without it a
 // playoff counts only for mark 0 and a lead), in stroke scoring player 1's strokes minus player 0's
-// at most the mark; 8 more skins than every opponent and at most the mark in playoff holes (nD8); 9
-// in a skill zone game at least the mark in points (nDD8). With nScoring 1 this hole alone: 1
-// strokes at most the mark, 2 over par at most the mark, 3/4/5 birdie, par or bogey or better, 6 as
-// above, 7 a playoff player 0 leads gives 2, else the margin, 9 as above.
+// at most the mark; 8 more skins than every opponent and at most the mark in playoff holes
+// (nPlayoffHoles); 9 in a skill zone game at least the mark in points (nDD8). With nScoring 1 this
+// hole alone: 1 strokes at most the mark, 2 over par at most the mark, 3/4/5 birdie, par or bogey
+// or better, 6 as above, 7 a playoff player 0 leads gives 2, else the margin, 9 as above.
 int PlayNow_GetMedal(void) {
     int m;
     int nRule;
@@ -791,7 +791,7 @@ int PlayNow_GetMedal(void) {
             case 7:
                 if (gpGame->n4 == 1) {
                     if (PlayNow_GetCalendarFlag()) {
-                        if (gpGame->bD4) {
+                        if (gpGame->bInPlayoff) {
                             nPlayoff = 2;
                             if (gPlayers[0].nHolesWon > gPlayers[1].nHolesWon) {
                                 nPlayoff = 1;
@@ -801,7 +801,7 @@ int PlayNow_GetMedal(void) {
                         if (gPlayers[0].nHolesWon - gPlayers[1].nHolesWon >= nMark) {
                             return m;
                         }
-                    } else if (gpGame->bD4) {
+                    } else if (gpGame->bInPlayoff) {
                         if (nMark == 0 && gPlayers[0].nHolesWon > gPlayers[1].nHolesWon) {
                             return m;
                         }
@@ -832,7 +832,7 @@ int PlayNow_GetMedal(void) {
                         bBest = 0;
                     }
                 }
-                if (bBest && gpGame->nD8 <= nMark) {
+                if (bBest && gpGame->nPlayoffHoles <= nMark) {
                     return m;
                 }
                 break;
@@ -880,7 +880,7 @@ int PlayNow_GetMedal(void) {
                 }
                 break;
             case 7:
-                if (gpGame->bD4 && gPlayers[0].nHolesWon > gPlayers[1].nHolesWon) {
+                if (gpGame->bInPlayoff && gPlayers[0].nHolesWon > gPlayers[1].nHolesWon) {
                     return 2;
                 }
                 if (gPlayers[0].nHolesWon - gPlayers[1].nHolesWon >= nMark) {
@@ -956,10 +956,10 @@ void PlayNow_OnPause(void) {
 
 // The number shown against the challenge's target. In match play (mode 1) the margin of holes won
 // (0 in a playoff); speed golf (8) the total time (n290) of the selected holes; skins (2) the
-// playoff holes (nD8); a skill zone game the points (nDD8). Otherwise the group's strokes so far
-// (not for target kind 1) plus this round's (in stroke play, mode 0, with target kind 7 the holes
-// before the current one, and the current one once the scorecard is up; else every selected hole,
-// or all 18 for kind 1), minus the group's targets up to this challenge
+// playoff holes (nPlayoffHoles); a skill zone game the points (nDD8). Otherwise the group's strokes
+// so far (not for target kind 1) plus this round's (in stroke play, mode 0, with target kind 7 the
+// holes before the current one, and the current one once the scorecard is up; else every selected
+// hole, or all 18 for kind 1), minus the group's targets up to this challenge
 // (PlayNow_GetChallengeTarget; 0 for kind 1).
 int PlayNow_GetScoreToTarget(void) {
     int nTarget;
@@ -968,7 +968,7 @@ int PlayNow_GetScoreToTarget(void) {
     int k;
     int h;
     if (Game_GetMode() == 1) {
-        if (gpGame->bD4) {
+        if (gpGame->bInPlayoff) {
             return 0;
         }
         return gPlayers[0].nHolesWon - gPlayers[1].nHolesWon;
@@ -984,7 +984,7 @@ int PlayNow_GetScoreToTarget(void) {
     }
     i = Game_GetMode();     // i is the mode here, a challenge index below
     if (i == 2) {
-        return gpGame->nD8;
+        return gpGame->nPlayoffHoles;
     }
     if (GM_Currently_SkillZoneMode()) {
         return gPlayers[0].nDD8;
@@ -1231,7 +1231,7 @@ void PlayNow_Restart(void) {
     gpGame->b134 = 1;
     gCurChallenge = gPlayNowSelectedChallenge;
     GM_EndOfGolferTurn(0);
-    gpGame->pfn224();
+    gpGame->pfnRestartHole();
     GameMsg_SetPending(2);
     GM_ClearDataForNewGame();
     if (GM_Currently_RealtimeMode()) {
@@ -1303,7 +1303,7 @@ u8 PlayNow_GetCalendarFlag(void) {
 }
 
 // Forces the next weather pick (fn_8006F650, at the start of a hole) to its effect bit 1 at amount
-// fAmount (kept to 0.1..1 when applied), the effect the game option nC 3 picks with a random
+// fAmount (kept to 0.1..1 when applied), the effect the game option nWeather 3 picks with a random
 // amount. A challenge with b4D passes its f54 (PlayNow_ApplyChallengeSetup); a replay passes its
 // saved amount (GameModeReplay.c).
 void PlayNow_ForceWeather(f32 fAmount) {

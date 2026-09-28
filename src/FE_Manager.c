@@ -1265,8 +1265,8 @@ void fn_80079AD4(void) {
         lbl_801D7148.nMode = 28;
     }
     lbl_801D7148.b11 = 0;
-    lbl_801D87C0.b0 = 1;
-    gSession.a8[0] = 0;
+    lbl_801D87C0.bFadeToBlack = 1;
+    gSession.bDemo = 0;
     Gaud_ExitFE();
     fn_80102AC4();
 }

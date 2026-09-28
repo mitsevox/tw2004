@@ -270,7 +270,7 @@ void AI_ChooseTarget(int nPlayer) {
             nSkill = Golfer_GetAttribute(p, nAttr, ATTR_TOTAL);
             if (Player_IsCPU(nPlayer)) {
                 // Low IQ makes the golfer think it is better than it is.
-                if (p->bLowIQPenalty) {
+                if (p->bPenaltyShot) {
                     nSkill += (int)(10.0f * (powf(fDumb, 2.0f) / 100.0f) / 100.0f);
                     if ((s8)nSkill > 100) {
                         nSkill = 100;

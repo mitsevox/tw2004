@@ -215,8 +215,8 @@ u8   HighScoreRecords_LongDriveRecordExist(int i, int nValue, const char* szName
 // gpGame->nCurHoleNum pick (MC.c sets both to reach recB and recC, and passes nPlayer 5).
 // Earnings.c tests for 2 or 4, a new best.
 int  HighScoreRecords_CheckRecord(int nKind, int nValue, int bSave, const char* szName, int nPlayer);
-void GM_ClearShotBonusStats(int nPlayer);          // clear the player's flags b30C..b30F
-void GM_ClearHoleBonusStats(int nPlayer);          // clear the flags GM_RecordBonusShotStats sets (b310..b312)
+void GM_ClearShotBonusStats(int nPlayer);          // clear the player's flags b30C..bBunkerThisShot
+void GM_ClearHoleBonusStats(int nPlayer);          // clear the flags GM_RecordBonusShotStats sets (bBunkerThisHole..b312)
 void GM_ClearGameBonusStats(int nPlayer);          // clear the player's money breakdown for the round
 u8   Earnings_IsTourAwardEarned(int nPlayer, int nAward);
 

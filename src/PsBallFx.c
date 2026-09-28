@@ -446,7 +446,7 @@ void fn_800A3348(Ball* pBall, int nPlayer) {
             return;
         }
         if (pSurface->nClass == 6) {
-            gPlayers[nPlayer].b30F = 1;
+            gPlayers[nPlayer].bBunkerThisShot = 1;
         }
         if (pSurface->nClass == 7 || pSurface->nClass == 16) {
             gPlayers[nPlayer].b30E = 1;
@@ -457,7 +457,7 @@ void fn_800A3348(Ball* pBall, int nPlayer) {
             fDot *= -1.0f;
         }
         fn_800A30E4(pSurface->nCollisionEffectId, pBall, nPlayer, 1, fDot);
-        fn_800A30E4(gpGame->pfn240(nPlayer), pBall, nPlayer, 1, fDot);
+        fn_800A30E4(gpGame->pfnTriggerSplash(nPlayer), pBall, nPlayer, 1, fDot);
         PsBallFx_TriggerTrail(pBall, nPlayer);
     }
     fn_80046C34(pBall->vPos, nPlayer);

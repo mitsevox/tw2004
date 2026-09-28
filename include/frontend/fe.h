@@ -57,7 +57,8 @@ extern f32 lbl_80281374;        // .sdata 0x80281374 = 0.25f: past FE_MessageTab
 
 // The front end's screen state (lbl_801D87C0, 0x4C bytes). Only what the cleaned code reads.
 typedef struct FEScreen {
-    u8  b0;                     // 0x00  set by fn_80079AD4
+    u8  bFadeToBlack;           // 0x00  the fade to black runs (set when the round or the menus
+                                //       are left; uiProcessInterface.c draws it and clears it)
     u8  a1[4];                  // 0x01  per controller: plugged in (fn_8008F820); read by a menu
                                 //       message (fn_8007C7EC: 1 for index 9)
     u8  unk5[3];

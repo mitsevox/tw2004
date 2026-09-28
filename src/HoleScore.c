@@ -19,8 +19,8 @@ int  fn_800D1330(int nPlayer);
 void fn_800D1674(f32* pA, f32* pB, f32* pOut);
 void fn_800C8C3C(int nView, f32* pOut);   // GoBreakLine: a point kept per view
 
-// gpGame->pfn1F8: whether holing this ball would put the player in the lead (the others' balls
-// not yet holed counting one more stroke). Strokes (scoring kind 0): only when not leading
+// gpGame->pfnIsPuttForLead: whether holing this ball would put the player in the lead (the others'
+// balls not yet holed counting one more stroke). Strokes (scoring kind 0): only when not leading
 // already. Holes won (1): level on holes and beating the best other score on this hole by more
 // than a stroke. Skins (2): the same, from level or behind, when this hole's skin would lift the
 // player past the best.
@@ -124,11 +124,11 @@ u8 fn_800CF158(int nPlayer) {
     return 0;
 }
 
-// gpGame->pfn1FC: whether holing this ball would win (the others' balls not yet holed counting
-// one more stroke). Strokes (scoring kind 0): only on the round's last hole or with gpGame->bD4,
-// beating the best other total. Holes won (1): winning this hole puts the player more holes up
-// than are left, or halving it (beating the best by less than two) already does. Skins (2):
-// winning this hole's skin lifts the player past the best.
+// gpGame->pfnIsPuttForWin: whether holing this ball would win (the others' balls not yet holed
+// counting one more stroke). Strokes (scoring kind 0): only on the round's last hole or with
+// gpGame->bInPlayoff, beating the best other total. Holes won (1): winning this hole puts the
+// player more holes up than are left, or halving it (beating the best by less than two) already
+// does. Skins (2): winning this hole's skin lifts the player past the best.
 u8 fn_800CF450(int nPlayer) {
     int anTotal[4];   // one per player set up, as in fn_800CFE74
     int nMineStrokes;
@@ -281,7 +281,7 @@ u32 fn_800CF904(int nPlayer) {
     if (Player_IsCPU(nPlayer)) {
         return 0;
     }
-    if (HighScoreRecords_CheckRecordGameSetting(0) && !gpGame->bD4 && Game_CurHoleIndex() == 17) {
+    if (HighScoreRecords_CheckRecordGameSetting(0) && !gpGame->bInPlayoff && Game_CurHoleIndex() == 17) {
         if (GM_GetPlayerRoundStrokes(nPlayer) + 1
             < gSession.aCourseRecord[Game_GetCourse()].aRecord[0][0].nValue) {
             uFlags |= 0x1;
@@ -295,14 +295,14 @@ u32 fn_800CF904(int nPlayer) {
         3.0f * gPlayers[nPlayer].fA64 > gSession.aCourseRecord[Game_GetCourse()].aRecord[2][0].nValue) {
         uFlags |= 0x4;
     }
-    if (HighScoreRecords_CheckRecordGameSetting(3) && !gpGame->bD4 && pBall->nLie != LIE_GREEN_e
+    if (HighScoreRecords_CheckRecordGameSetting(3) && !gpGame->bInPlayoff && pBall->nLie != LIE_GREEN_e
         && pBall->nLie != LIE_FRINGE_e &&
         gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 <= Course_GetCurHolePar() - 2) {
         if (fn_800D1170(nPlayer, 0) + 1 > gSession.aCourseRecord[Game_GetCourse()].aRecord[3][0].nValue) {
             uFlags |= 0x8;
         }
     }
-    if (HighScoreRecords_CheckRecordGameSetting(4) && !gpGame->bD4 && Game_CurHoleIndex() == 17) {
+    if (HighScoreRecords_CheckRecordGameSetting(4) && !gpGame->bInPlayoff && Game_CurHoleIndex() == 17) {
         nPutts = 0;
         for (i = 0; i < 18; i++) {
             nPutts += pPlayer->nPutts[i];
@@ -314,19 +314,19 @@ u32 fn_800CF904(int nPlayer) {
             uFlags |= 0x10;
         }
     }
-    if (HighScoreRecords_CheckRecordGameSetting(5) && !gpGame->bD4 && pBall->nLie == LIE_TEE_e
+    if (HighScoreRecords_CheckRecordGameSetting(5) && !gpGame->bInPlayoff && pBall->nLie == LIE_TEE_e
         && Course_GetCurHolePar() >= 4) {
         if (fn_800D0FBC(nPlayer) + 1 > gSession.aCourseRecord[Game_GetCourse()].aRecord[5][0].nValue) {
             uFlags |= 0x20;
         }
     }
-    if (HighScoreRecords_CheckRecordGameSetting(6) && !gpGame->bD4 &&
+    if (HighScoreRecords_CheckRecordGameSetting(6) && !gpGame->bInPlayoff &&
         gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 <= Course_GetCurHolePar() - 2) {
         if (fn_800D06FC(nPlayer, 0, 0) + 1 > gSession.aCourseRecord[Game_GetCourse()].aRecord[6][0].nValue) {
             uFlags |= 0x40;
         }
     }
-    if (HighScoreRecords_CheckRecordGameSetting(7) && !gpGame->bD4 &&
+    if (HighScoreRecords_CheckRecordGameSetting(7) && !gpGame->bInPlayoff &&
         gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 <= Course_GetCurHolePar() - 1) {
         if (fn_800D0620(nPlayer, 0, 0) + 1 > gSession.aCourseRecord[Game_GetCourse()].aRecord[7][0].nValue) {
             uFlags |= 0x80;
@@ -356,7 +356,7 @@ u32 fn_800CFD58(int nPlayer) {
             uIds |= 1 << nId;
         }
     }
-    if (!gpGame->bD4) {
+    if (!gpGame->bInPlayoff) {
         GM_Earnings_CheckHoleGoals(nPlayer, 1, 0);
         for (i = 0; i < Earnings_GetNumAwards(); i++) {
             nId = Earnings_GetHoleAwardId(i);
@@ -528,7 +528,7 @@ u8 fn_800D024C(int nPlayer) {
     return bFinished;
 }
 
-// gpGame->pfn208.
+// gpGame->pfnGetPotentialHoleResult.
 // How the hole ends for the player if the ball drops now, against the best of the others (a
 // ball not yet holed counts one more stroke; in mode 21 the other side is player 2 or 0): 2 the
 // player wins it, 1 ties, 0 loses; 3 when playing alone or when holing would not end the hole.
@@ -877,19 +877,19 @@ int fn_800D0F04(int nPlayer, int nToPar) {
     return nBest;
 }
 
-// The round's holes with b2E4 set (by position in the score block, TW06's fairways[]).
+// The round's holes with bFairwayHit set (by position in the score block, TW06's fairways[]).
 int fn_800D0FBC(int nPlayer) {
     int nCount = 0;
     int i;
     for (i = 0; i < 18; i++) {
-        if (gpGame->bHoleSelected[i] && gPlayers[nPlayer].b2E4[i]) {
+        if (gpGame->bHoleSelected[i] && gPlayers[nPlayer].bFairwayHit[i]) {
             nCount++;
         }
     }
     return nCount;
 }
 
-// The longest run of the round's holes with b2E4 set; a par 3 does not break it.
+// The longest run of the round's holes with bFairwayHit set; a par 3 does not break it.
 int fn_800D10B0(int nPlayer) {
     int nRun;
     int nBest;
@@ -897,7 +897,7 @@ int fn_800D10B0(int nPlayer) {
     nBest = 0;
     nRun = 0;
     for (i = 0; i < 18; i++) {
-        if (gpGame->bHoleSelected[i] && gPlayers[nPlayer].b2E4[i]) {
+        if (gpGame->bHoleSelected[i] && gPlayers[nPlayer].bFairwayHit[i]) {
             nRun++;
         } else if (Course_GetHolePar(i) != 3) {
             if (nRun > nBest) {
@@ -912,13 +912,13 @@ int fn_800D10B0(int nPlayer) {
     return nBest;
 }
 
-// The round's holes with b2F6 set (TW06's gir[]); with bOnlyFlagged, only those whose
+// The round's holes with bGreenInReg set (TW06's gir[]); with bOnlyFlagged, only those whose
 // gpGame->b16C entry is 1.
 int fn_800D1170(int nPlayer, u8 bOnlyFlagged) {
     int nCount = 0;
     int i;
     for (i = 0; i < 18; i++) {
-        if (gpGame->bHoleSelected[i] && gPlayers[nPlayer].b2F6[i] &&
+        if (gpGame->bHoleSelected[i] && gPlayers[nPlayer].bGreenInReg[i] &&
             (gpGame->b16C[nPlayer][i] == 1 || !bOnlyFlagged)) {
             nCount++;
         }
@@ -926,7 +926,7 @@ int fn_800D1170(int nPlayer, u8 bOnlyFlagged) {
     return nCount;
 }
 
-// The longest run of the round's holes with b2F6 set.
+// The longest run of the round's holes with bGreenInReg set.
 int fn_800D1250(int nPlayer) {
     int nRun;
     int nBest;
@@ -934,7 +934,7 @@ int fn_800D1250(int nPlayer) {
     nBest = 0;
     nRun = 0;
     for (i = 0; i < 18; i++) {
-        if (gpGame->bHoleSelected[i] && gPlayers[nPlayer].b2F6[i]) {
+        if (gpGame->bHoleSelected[i] && gPlayers[nPlayer].bGreenInReg[i]) {
             nRun++;
         } else {
             if (nRun > nBest) {

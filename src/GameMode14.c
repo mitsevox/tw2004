@@ -25,7 +25,7 @@ typedef struct Claim {
 // Mode 14's state; only this file uses it. The .sbss ones are defined last address first (the
 // compiler lays a file's .sbss out last definition first).
 Claim gCaptureClaims[40];       // per target of the target list (lbl_80211D38)
-s32 gCaptureSavedOptionsC = 4;  // options.nC from before the game (StartGamePreData; Shutdown puts it back)
+s32 gCaptureSavedWeather = 4;  // options.nWeather before the game (StartGamePreData; Shutdown restores it)
 s32 gCaptureShotPoints;         // the points of the last claim (GetShotEarned)
 u8  gCaptureShotClockOut;       // the shot clock ran out (ShotClockOut): the shot claims nothing
 s32 gCaptureFirstGolfer;        // who plays first: player 0 or 1, at random (StartGamePreData)
@@ -66,24 +66,24 @@ void GameModeSkillZoneCapture_Init(void) {
     gpGame->pfnGameFinished = GameModeSkillZoneCapture_GameFinished;
     gpGame->pfnGoToPlayoff = GameModeSkillZoneCapture_GoToPlayoff;
     gpGame->pfnEndGolferTurn = GameModeSkillZoneCapture_EndGolferTurn;
-    gpGame->pfn244 = GameModeSkillZoneCapture_CheckShotAwards;
-    gpGame->pfn1E4 = GameModeSkillZoneCapture_LoadHole;
+    gpGame->pfnCheckShotAwards = GameModeSkillZoneCapture_CheckShotAwards;
+    gpGame->pfnLoadHole = GameModeSkillZoneCapture_LoadHole;
     gpGame->pfn228 = GameModeSkillZoneCapture_UpdateSwingUI;
-    gpGame->pfn224 = GameModeSkillZoneCapture_RestartHole;
-    gpGame->pfn1EC = GameModeSkillZoneCapture_StartGamePreData;
-    gpGame->pfn250 = GameModeSkillZoneCapture_BallOOB;
-    gpGame->pfn264 = GameModeSkillZoneBase_PickPrevTarget;
-    gpGame->pfn258 = GameModeSkillZoneBase_PickTarget;
+    gpGame->pfnRestartHole = GameModeSkillZoneCapture_RestartHole;
+    gpGame->pfnStartGamePreData = GameModeSkillZoneCapture_StartGamePreData;
+    gpGame->pfnBallOOB = GameModeSkillZoneCapture_BallOOB;
+    gpGame->pfnPickPrevTarget = GameModeSkillZoneBase_PickPrevTarget;
+    gpGame->pfnPickTarget = GameModeSkillZoneBase_PickTarget;
     gpGame->pfn260 = GameModeSkillZoneCapture_HitBall;
     gpGame->pfnEndGame = GameModeSkillZoneCapture_EndGame;
-    gpGame->pfn26C = GameModeSkillZoneCapture_GreenType;
+    gpGame->pfnGreenType = GameModeSkillZoneCapture_GreenType;
     gpGame->b276 = 0;
     gpGame->bGimmesAllowed = 0;
     gpGame->b280 = 0;
     gpGame->b271 = 0;
     gpGame->b281 = 0;
     gpGame->bStrokeLimit = 0;
-    gpGame->b285 = 0;
+    gpGame->bAllowGameBreakers = 0;
     gpGame->b274 = 0;
     gpGame->b286 = 1;
     gpGame->b287 = 0;
@@ -106,19 +106,19 @@ void GameModeSkillZoneCapture_Init(void) {
     gSession.nPinSet = 0;
 }
 
-// Puts back the two options StartGamePreData changed for the game: options.nC and the wind.
+// Puts back the two options StartGamePreData changed for the game: options.nWeather and the wind.
 void GameModeSkillZoneCapture_Shutdown(void) {
-    gSession.options.nC = gCaptureSavedOptionsC;
+    gSession.options.nWeather = gCaptureSavedWeather;
     gSession.options.nWind = gCaptureSavedWind;
 }
 
-// As a round starts (pfn1EC, GM_InitModule_PreDataStream): saves options.nC and the wind setting
-// (Shutdown puts them back), sets them to 4 and 0 (no wind), and picks the first golfer, player 0
-// or 1 at random (gCaptureFirstGolfer).
+// As a round starts (pfn1EC, GM_InitModule_PreDataStream): saves options.nWeather and the wind
+// setting (Shutdown puts them back), sets them to 4 and 0 (no wind), and picks the first golfer,
+// player 0 or 1 at random (gCaptureFirstGolfer).
 void GameModeSkillZoneCapture_StartGamePreData(void) {
-    gCaptureSavedOptionsC = gSession.options.nC;
+    gCaptureSavedWeather = gSession.options.nWeather;
     gCaptureSavedWind = gSession.options.nWind;
-    gSession.options.nC = 4;
+    gSession.options.nWeather = 4;
     gSession.options.nWind = 0;
     gCaptureFirstGolfer = Misc_RandFunc(0) & 1;
 }

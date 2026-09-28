@@ -258,8 +258,8 @@ typedef struct SaveProfile {
                                 //          ground; GM_RecordIndividualShotStats)
     s32  n8C;                   // 0x0008C  their distance together
     s32  n90;                   // 0x00090  } par 4 and 5 holes counted (GM_RecordIndividualHoleStats), and those where
-    s32  n94;                   // 0x00094  } the player's b2E4 was set
-    s32  n98;                   // 0x00098  } every hole counted, and those where the player's b2F6
+    s32  n94;                   // 0x00094  } the player's bFairwayHit was set
+    s32  n98;                   // 0x00098  } every hole counted, and those where the player's bGreenInReg
     s32  n9C;                   // 0x0009C  } was set
     s32  nA0;                   // 0x000A0  the longest of those drives
     s32  nA4;                   // 0x000A4  the longest putt, in feet (GM_RecordIndividualShotStats)

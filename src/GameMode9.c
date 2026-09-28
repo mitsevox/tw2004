@@ -38,8 +38,8 @@ void GameModePractice_Init(void) {
     gpGame->pfnGameFinished = GameModePractice_GameFinished;
     gpGame->pfnGoToPlayoff = fn_800FFDB0;
     gpGame->pfnEndGame = GameModePractice_EndGame;
-    gpGame->pfn1E4 = GameModePractice_LoadHole;
-    gpGame->pfn224 = GameModePractice_RestartHole;
+    gpGame->pfnLoadHole = GameModePractice_LoadHole;
+    gpGame->pfnRestartHole = GameModePractice_RestartHole;
     gpGame->pfn210 = GameModePractice_EndTurnEndHoleNotGame;
     gpGame->bStrokeLimit = 0;
     gpGame->b275 = 0;
@@ -48,7 +48,7 @@ void GameModePractice_Init(void) {
     gpGame->b27D = 0;
     gpGame->b27F = 0;
     gpGame->b280 = 1;
-    gpGame->b285 = 0;
+    gpGame->bAllowGameBreakers = 0;
     gpGame->n290 = 0;
     gpGame->n294 = 0;
     gpGame->n4 = 0;

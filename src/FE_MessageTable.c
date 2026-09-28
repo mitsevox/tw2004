@@ -52,8 +52,8 @@ void fn_8012409C(void);                 // gbacable.c
 void fn_801240A8(void);                 // gbacable.c
 s32  fn_801255C4(s32* pPos);            // EASportsBio.c
 u8   PasswordManager_TestPassword(char* szCode);  // PasswordManager.c
-void GameMode22_SetNumDrives(s32 n);                // GameMode22.c: sets gGameMode22.n4
-void GameMode22_SetVariant(s32 n);                // GameMode22.c: sets gGameMode22.n0
+void GameMode22_SetNumDrives(s32 n);                // GameMode22.c: sets gGameMode22.nDrives
+void GameMode22_SetVariant(s32 n);                // GameMode22.c: sets gGameMode22.nVariant
 void GM_SetupCustomHoleSelection(void); // GameManager.c
 int  GM_vGetAllTimeRecordsHeld(SaveProfile* pProfile);  // GameManager.c
 void PlayNow_SelectGroup(int nId);              // GameMode5.c
@@ -1365,8 +1365,8 @@ void fn_8007BCA4(MsgArg* pArgs, MsgArg* pResult) {
 void fn_8007BCC4(MsgArg* pArgs, MsgArg* pResult) {
     lbl_801D7148.b11 = 1;
     GM_SetModeType((u8)pArgs[0].i);
-    gSession.a8[0] = 1;
-    lbl_801D87C0.b0 = 1;
+    gSession.bDemo = 1;
+    lbl_801D87C0.bFadeToBlack = 1;
     Gaud_ExitFE();
 }
 
@@ -1615,13 +1615,13 @@ void fn_8007C5F0(MsgArg* pArgs, MsgArg* pResult) {
 void fn_8007C634(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 1:
-        gSession.options.nC = 2;
+        gSession.options.nWeather = 2;
         return;
     case 2:
-        gSession.options.nC = 3;
+        gSession.options.nWeather = 3;
         return;
     case 3:
-        gSession.options.nC = 0;
+        gSession.options.nWeather = 0;
         return;
     }
 }
@@ -2822,7 +2822,7 @@ void fn_8007ECFC(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8007ED88(MsgArg* pArgs, MsgArg* pResult) {
-    switch (gSession.options.nC) {
+    switch (gSession.options.nWeather) {
     case 2:
         pResult->i = 1;
         return;
@@ -3696,10 +3696,10 @@ void fn_800811E4(MsgArg* pArgs, MsgArg* pResult) {
 void fn_80081270(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 1:
-        gSession.options.b84 = 1;
+        gSession.options.bPuttingGrid = 1;
         return;
     case 2:
-        gSession.options.b84 = 0;
+        gSession.options.bPuttingGrid = 0;
         return;
     }
 }
@@ -3884,7 +3884,7 @@ void fn_80081688(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_800816DC(MsgArg* pArgs, MsgArg* pResult) {
-    switch (gSession.options.b84) {
+    switch (gSession.options.bPuttingGrid) {
     case 1:
         pResult->i = 1;
         return;

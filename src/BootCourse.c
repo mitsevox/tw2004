@@ -28,9 +28,9 @@ s32 lbl_80281F90;               // which of the four set-ups the next start uses
 void DEMO_Start(void) {
     int n;
     Mem_cpy(&lbl_801DB8A0, &gSession, sizeof(Session));
-    gSession.a8[0] = 1;
+    gSession.bDemo = 1;
     gSession.nSplitScreen = 0;
-    gSession.b12 = 0;
+    gSession.bEndLoop = 0;
     gSession.bReplay = 0;
     gSession.nPaused = 0;
     gSession.nNumPlayers = 2;
@@ -43,7 +43,7 @@ void DEMO_Start(void) {
     gSession.nGolfer[1] = lbl_80183AC8[lbl_80281F90];
     gSession.nTeeSet[1] = 2;
     gSession.aProfile[0].n0 = 0;
-    gSession.options.nC = 0;
+    gSession.options.nWeather = 0;
     GM_SetCurrentCourse(lbl_80183A98[lbl_80281F90]);
     GM_SelectHoleSet(0);
     GM_SelectSingleHole(lbl_80183AA8[lbl_80281F90]);
@@ -124,7 +124,7 @@ u8 fn_8009A1EC(void) {
 // Put the session back as DEMO_Start found it, all but n28.
 void DEMO_Restore(void) {
     s32 n28;
-    if (gSession.a8[0] != 0) {
+    if (gSession.bDemo != 0) {
         n28 = gSession.n28;
         Mem_cpy(&gSession, &lbl_801DB8A0, sizeof(Session));
         gSession.n28 = n28;

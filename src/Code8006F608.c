@@ -65,7 +65,7 @@ void fn_8006F64C(void) {
 
 // Picks lbl_802811F0's flags for the hole, then reseeds random stream 1 and applies them
 // (fn_8006FB10). Split screen (or session flag 0x4000) gets bit 0 only; else a wind over 6 (wind
-// option on) on courses 0, 1, 2 and 6 sets bit 4, then b1C sets bit 1, or the game option nC
+// option on) on courses 0, 1, 2 and 6 sets bit 4, then b1C sets bit 1, or the game option nWeather
 // picks (not on course 4's hole 18): a roll over the course's lbl_80188900 choices with f18 rolled
 // 0.25..1 (mode 1; mode 2 keeps a choice for a rolled number of calls while f18 rises then falls
 // by 0.3), bit 1 with f18 rolled (mode 3) or bit 0 (modes 0 and 4).
@@ -84,7 +84,7 @@ void fn_8006F650(void) {
         if (lbl_802811F0->b1C) {
             lbl_802811F0->uFlags |= 2;
         } else if (Game_GetCourse() != 4 || Game_GetCurHoleNum() != 17) {
-            switch (gSession.options.nC) {
+            switch (gSession.options.nWeather) {
             case 0:
             case 4:
                 lbl_802811F0->uFlags |= 1;

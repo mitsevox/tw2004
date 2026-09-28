@@ -574,15 +574,15 @@ void GUI_SendLongDriveVariant(int nVariant) {
 }
 
 // Mode 22's text for the UI (message 90 with a string): GameMode22_ShowDrivesLeft sends the number
-// n4 less the current player's nEA0.
+// nDrives less the current player's nEA0.
 void GUI_SendLongDriveText(char* pStr) {
     GameMsg_SendString(90, pStr);
 }
 
-// The front end's fade-to-black flag (lbl_801D87C0.b0): set when the round or the menus are left,
-// and fn_8009069C darkens the screen while it is.
+// The front end's fade-to-black flag (lbl_801D87C0.bFadeToBlack): set when the round or the menus
+// are left, and fn_8009069C darkens the screen while it is.
 u8 GUI_GetFadeToBlack(void) {
-    return lbl_801D87C0.b0;
+    return lbl_801D87C0.bFadeToBlack;
 }
 
 // Marks every statistic tip as not shown yet (gTipShown), from GUI_Init at the start or restart
@@ -606,10 +606,11 @@ void GUI_ClearShownTips(void) {
 
 // Flags tip nTip to be shown on the UI's next update (pending bit 0x20: message 0x21 with nTip).
 // Below 15 a statistic tip (GameAnalysis_PickTip's pick, through the menu's tip command): dropped during a
-// playoff (gpGame->bD4), else marked shown (tip 12 excepted) so it is not picked again this hole. 15
-// and up, a GameBreaker's tip (event.c: 15 plus the lowest effect bit set): always flagged.
+// playoff (gpGame->bInPlayoff), else marked shown (tip 12 excepted) so it is not picked again this
+// hole. 15 and up, a GameBreaker's tip (event.c: 15 plus the lowest effect bit set): always
+// flagged.
 void GUI_QueueTip(int nTip) {
-    if (!gpGame->bD4 || nTip >= 15) {
+    if (!gpGame->bInPlayoff || nTip >= 15) {
         if (nTip < 15 && nTip != 12) {
             gTipShown[nTip] = 1;
         }

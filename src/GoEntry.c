@@ -147,7 +147,7 @@ void fn_800083A4(void) {
             gSession.nGameType = 6;
             break;
         case 6:
-            if ((gSession.uFlags & 0x4000) && gSession.a8[0]) {
+            if ((gSession.uFlags & 0x4000) && gSession.bDemo) {
                 fn_8009A16C();
             }
             fn_8006D8E8();
@@ -169,7 +169,7 @@ void fn_800083A4(void) {
                 gSession.nGameType = 8;
             }
             if (gSession.nC == 0 || gSession.nC == 3) {
-                if ((gSession.uFlags & 0x4000) && gSession.a8[0]) {
+                if ((gSession.uFlags & 0x4000) && gSession.bDemo) {
                     fn_80091E1C();
                 } else {
                     fn_80091D84();

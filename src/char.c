@@ -146,7 +146,7 @@ void  Char_Vec4Sub(f32* pA, f32* pB, f32* pOut);
 void  Character_BeginLoadTexturesCallbackIG(Character* pChar);
 void  Character_RequestClothesUpdateIG(int n);
 void  fn_8010B098(void* pModel);                                // LLDynTex.c
-void  CharacterState_SetTransition(AnimPlayer* pTime, s32 nState, f32 fTime);   // CharAnim.c
+void  CharacterState_SetTransition(TSKATime* pTime, s32 nState, f32 fTime);     // CharAnim.c
 void  Quat_ExtractEulerAngles(f32* pQ, f32* pA, f32* pB, f32* pC);          // Quaternion.c: a rotation as angles
 void  SKEL_InitHalfJoints(CharModel* pModel, SkelPose* pPose);          // Skeleton.c
 void  mat44flt_Invert(f32 (*pSrc)[4], f32 (*pDst)[4]);              // UMemPool.c
@@ -565,11 +565,11 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
         bSetupForShot = 1;
     }
     if (pChar->nCurState == 8 && pChar->nTargetState == 8) {
-        SKATime_Idle(pChar, pChar->nPlayer, (AnimPlayer*)pChar->anim, &pChar->blend, fTime);
+        SKATime_Idle(pChar, pChar->nPlayer, (TSKATime*)pChar->anim, &pChar->blend, fTime);
     } else if (pChar->uCharFlags & 0x100) {
-        SKATime_Update((AnimPlayer*)pChar->anim, &pChar->blend, 5.0f * fTime);
+        SKATime_Update((TSKATime*)pChar->anim, &pChar->blend, 5.0f * fTime);
     } else {
-        SKATime_Update((AnimPlayer*)pChar->anim, &pChar->blend, fTime);
+        SKATime_Update((TSKATime*)pChar->anim, &pChar->blend, fTime);
         if (pChar->uFlags & 0x1000) {
             pChar->uFlags &= ~0x1000;
             if (pChar->pCurClip != NULL && pChar->pCurClip->pMtaLib != NULL) {
@@ -1109,7 +1109,7 @@ Character* Character_Create(void) {
         pChar->buffers[i].pBuf = StaticMem_Alloc(0x890, 2, 0x40, "char.c", 0x8AF);
     }
     pNode = &pChar->blend;
-    SKATime_Init((AnimPlayer*)pChar->anim);
+    SKATime_Init((TSKATime*)pChar->anim);
     SKABlendData_Init(&pNode, 1, 0, SKABlender_BlendLinear, 1);
     pNode = &pChar->morphBlend;
     SKATime_Init(&pChar->morphAnim);
@@ -1362,21 +1362,21 @@ void Character_CopySkinChoices1To0(Character* pChar) {
 }
 
 // Queues a dynamic texture load (LLDynTex.c) for the character, with the callbacks run as it begins
-// and as it ends (the Begin/End ...Callback functions). The pool's last entry points at the
-// character queued, or at nothing when no job is free.
+// and as it ends (the Begin/End ...Callback functions). The pool's pLoadingChar is set to the
+// character queued, or to NULL when no job is free.
 void Character_AddTextureLoadRequest(Character* pChar, void (*pfnBegin)(Character* pChar),
                                      void (*pfnEnd)(Character* pChar)) {
     DynTexJob* pJob = fn_8010B8EC();
 
     if (pJob != NULL) {
-        gCharDynTexPool.a[6].p = pChar;
+        gCharDynTexPool.pLoadingChar = pChar;
         pJob->pfnBegin = pfnBegin;
         pJob->pChar = pChar;
         pJob->pfnEnd = pfnEnd;
         pJob->ppBank = &pChar->pBank;
         fn_8010B930(pJob);
     } else {
-        gCharDynTexPool.a[6].p = NULL;
+        gCharDynTexPool.pLoadingChar = NULL;
     }
 }
 
@@ -1518,7 +1518,7 @@ void Character_EndLoadTexturesCallbackIG(Character* pChar) {
     sApplyUserLogos(pChar, pChar->apDynTex[pChar->nCurDynTex], pChar->pChoices);
     fn_8010BA2C(pChar->apDynTex[pChar->nCurDynTex]);
     pChar->bTexLoaded = 1;
-    gCharDynTexPool.a[6].p = NULL;
+    gCharDynTexPool.pLoadingChar = NULL;
 }
 
 // Fills the characters' dynamic texture pool: two entries (the game-type test gives two either
@@ -1533,7 +1533,7 @@ void CharacterTex_Init(void) {
         gCharDynTexPool.nEntries = 2;
     }
     for (i = 0; i < gCharDynTexPool.nEntries; i++) {
-        gCharDynTexPool.a[i].p = fn_8010A520(0x46, 0x87000, 0, 0x870, 4);
+        gCharDynTexPool.a[i].pDynTex = fn_8010A520(0x46, 0x87000, 0, 0x870, 4);
         gCharDynTexPool.a[i].bUsed = 0;
     }
 }
@@ -1542,7 +1542,7 @@ void CharacterTex_Init(void) {
 void CharacterTex_Close(void) {
     int i;
     for (i = 0; i < gCharDynTexPool.nEntries; i++) {
-        fn_8010A668(gCharDynTexPool.a[i].p);
+        fn_8010A668(gCharDynTexPool.a[i].pDynTex);
         gCharDynTexPool.a[i].bUsed = 0;
     }
 }
@@ -1569,7 +1569,7 @@ void CharacterTex_TakePoolEntries(Character* pChar) {
     for (i = 0; i < gCharDynTexPool.nEntries; i++) {
         if (gCharDynTexPool.a[i].bUsed == 0) {
             pChar->aDynTexSlot[n] = i;
-            pChar->apDynTex[n] = gCharDynTexPool.a[i].p;
+            pChar->apDynTex[n] = gCharDynTexPool.a[i].pDynTex;
             n++;
             gCharDynTexPool.a[i].bUsed = 1;
             if (n == pChar->nDynTex) {
@@ -1618,7 +1618,7 @@ void CharacterTex_PreHoleInit(void) {
 // With more than two players, the dynamic textures go to player nPlayer (up now) and the next to
 // play (GM_GetSecondHonors). nPlayer's character loses bit 0x40 of uCharFlags; after the display
 // finishes drawing (fn_80008380), every other character holding pool entries (except the one being
-// loaded, the pool's a[6].p) gives them back and gets bit 0x40 (not drawn). Unless nPlayer's
+// loaded, the pool's pLoadingChar) gives them back and gets bit 0x40 (not drawn). Unless nPlayer's
 // textures are loaded (bTexLoaded), it takes the entries (the character being loaded giving its
 // back first) and its textures are loaded now (fn_8010BF68); when it is the one being loaded, the
 // loader is just run to the end. The next player's character is then queued the same way, its
@@ -1634,7 +1634,7 @@ void CharacterTex_StartStreamingPlayers(int nPlayer) {
         pChar = gPlayers[nPlayer].pChar;
         for (i = 0; i < gSession.nNumPlayers; i++) {
             if (i != nPlayer && gPlayers[i].pChar->apDynTex[gPlayers[i].pChar->nCurDynTex] != NULL &&
-                gPlayers[i].pChar != gCharDynTexPool.a[6].p) {
+                gPlayers[i].pChar != gCharDynTexPool.pLoadingChar) {
                 CharacterTex_PreReleasePoolEntries(gPlayers[i].pChar);
                 CharacterTex_ReleasePoolEntries(gPlayers[i].pChar);
                 gPlayers[i].pChar->bTexLoaded = 0;
@@ -1642,7 +1642,7 @@ void CharacterTex_StartStreamingPlayers(int nPlayer) {
             }
         }
         if (!pChar->bTexLoaded) {
-            pQueued = gCharDynTexPool.a[6].p;
+            pQueued = gCharDynTexPool.pLoadingChar;
             if (pChar != pQueued) {
                 fn_8010BF68();
                 if (pQueued != NULL) {
@@ -1662,7 +1662,7 @@ void CharacterTex_StartStreamingPlayers(int nPlayer) {
         i = GM_GetSecondHonors();
         if (i < gSession.nNumPlayers) {
             pChar = gPlayers[i].pChar;
-            if (!pChar->bTexLoaded && pChar != gCharDynTexPool.a[6].p) {
+            if (!pChar->bTexLoaded && pChar != gCharDynTexPool.pLoadingChar) {
                 fn_8010BF68();
                 CharacterTex_TakePoolEntries(pChar);
                 Character_AddTextureLoadRequest(pChar, Character_BeginLoadTexturesCallbackIG,
@@ -2270,12 +2270,12 @@ void Character_PlayClip(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime) 
     f32 aBlend[6];
     SKABlendNode* pNode;
     SKABlendNode* pNew;
-    AnimPlayer* pAnim;
+    TSKATime* pAnim;
     f32 fLen;
 
     pNode = &pChar->blend;
     pNew = NULL;
-    pAnim = (AnimPlayer*)pChar->anim;
+    pAnim = (TSKATime*)pChar->anim;
     if (pClip == NULL) {
         return;
     }
@@ -2296,7 +2296,7 @@ void Character_PlayClip(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime) 
     SKABlendData_Init(&pNew, 0, 0, SKABlender_BlendLinear, 1);
     SKAChannel_SetChannel(&pChar->blend, pNew, pClip, 1.0f);
     if (!bNoBlend) {
-        SKABlender_ClampT1(&pChar->blend, (AnimPlayer*)pChar->anim, pChar->fAnimTime + fTime);
+        SKABlender_ClampT1(&pChar->blend, (TSKATime*)pChar->anim, pChar->fAnimTime + fTime);
         aBlend[5] = 0.0f;
         aBlend[0] = 0.0f;
         fLen = pClip->f18;
@@ -3059,7 +3059,7 @@ void Character_ResetBlenders(Character* pChar) {
     CharacterState_SetTransition(&pChar->morphAnim, 0, 0.0f);
     pChar->nMorphTargetState = 0;
     pChar->nMorphCurState = 0;
-    CharacterState_SetTransition((AnimPlayer*)pChar->anim, 0, 0.0f);
+    CharacterState_SetTransition((TSKATime*)pChar->anim, 0, 0.0f);
     pChar->nTargetState = 0;
     pChar->nCurState = 0;
     pChar->uSKAFlags = 0;
@@ -3727,10 +3727,10 @@ f32 SKA_GetTagTime(Clip* pBlend, u64 uEvent) {
     return 0.0f;
 }
 
-// Sets an animation player's time scale (AnimPlayer.fTimeScale): 1 plays at normal speed, the
+// Sets an animation player's time scale (TSKATime.fTimeScale): 1 plays at normal speed, the
 // swing's hold at the top uses 0.008.
 void SKATime_SetTimeScale(u8* pAnim, f32 fRate) {
-    ((AnimPlayer*)pAnim)->fTimeScale = fRate;
+    ((TSKATime*)pAnim)->fTimeScale = fRate;
 }
 
 // Byte-swaps nCount records laid out as pFormat's nFields fields from *ppSrc to *ppDst; both

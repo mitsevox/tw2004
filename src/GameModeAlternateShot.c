@@ -244,7 +244,7 @@ void GameModeAlternateShot_EndGolferTurn(int nPlayer) {
     int nPartner = GameModeAlternateShot_GetPartner(nPlayer);
     int nTeam;
     Mem_cpy(&gPlayers[nPartner].ball, &gPlayers[nPlayer].ball, sizeof(Ball));
-    gPlayers[nPartner].bLowIQPenalty = gPlayers[nPlayer].bLowIQPenalty;
+    gPlayers[nPartner].bPenaltyShot = gPlayers[nPlayer].bPenaltyShot;
     gPlayers[nPartner].ball.nPlayer = nPartner;
     gPlayers[nPartner].nStrokes[Game_CurHoleIndex()] = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
     nTeam = GetGamePlayerTeam(nPlayer);
@@ -306,30 +306,30 @@ u8 GameModeAlternateShot_HoleFinished(int nPlayer, u8 bCheck) {
             P(i)->nModePoints[h] = 0;               \
             P(i)->n22C[h] = 0;                      \
             P(i)->n290[h] = 0;                      \
-            P(i)->b2F6[h] = 0;                      \
-            P(i)->b2E4[h] = 0;                      \
+            P(i)->bGreenInReg[h] = 0;                      \
+            P(i)->bFairwayHit[h] = 0;                      \
         }                                           \
         P(i)->n2D8 = 0;                             \
-        P(i)->n2DC = 0;                             \
-        P(i)->n2E0 = 0;                             \
+        P(i)->nLongestDrive = 0;                             \
+        P(i)->nLongestPutt = 0;                             \
         P(i)->n308 = 0;                             \
     }
 
-// Whether the match is over. In a playoff (gpGame->bD4): over once one team has won more holes;
-// otherwise, unless bCheck (only asking), the next playoff hole is set up (nD8 counted, hole
-// picked, every player's scores cleared, the tied message). In the round: after the last hole it is
-// over unless a playoff starts (GameModeAlternateShot_GoToPlayoff); before, when a team leads by
-// more than the holes left.
+// Whether the match is over. In a playoff (gpGame->bInPlayoff): over once one team has won more
+// holes; otherwise, unless bCheck (only asking), the next playoff hole is set up (nPlayoffHoles
+// counted, hole picked, every player's scores cleared, the tied message). In the round: after the
+// last hole it is over unless a playoff starts (GameModeAlternateShot_GoToPlayoff); before, when a
+// team leads by more than the holes left.
 u8 GameModeAlternateShot_GameFinished(u8 bCheck) {
     int nLeft;
     int h;
     int i;
-    if (gpGame->bD4) {
+    if (gpGame->bInPlayoff) {
         if (GameModeAlternateShot_TeamMatchWins(0) != GameModeAlternateShot_TeamMatchWins(1)) {
             return 1;
         }
         if (!bCheck) {
-            gpGame->nD8++;
+            gpGame->nPlayoffHoles++;
             GM_Pick_PlayOffHole();
             CLEAR_ROUNDS(PLAYER_AT);
             GUI_GolfersTiedUIMessage();
@@ -353,9 +353,10 @@ u8 GameModeAlternateShot_GameFinished(u8 bCheck) {
 }
 
 // After the round's last hole with the match tied, a playoff starts (with bCheck set it is only
-// reported): bD5 records whether the round played all 18 holes, a playoff hole is picked, every
-// player's scores are cleared, bD4 (in a playoff) is set, nD8 counted and the tied message queued.
-// Returns 1 for a playoff, 0 while holes are left or a team is ahead.
+// reported): bPlayoffFullRound records whether the round played all 18 holes, a playoff hole is
+// picked, every player's scores are cleared, bInPlayoff (in a playoff) is set, nPlayoffHoles
+// counted and the tied message queued. Returns 1 for a playoff, 0 while holes are left or a team is
+// ahead.
 u8 GameModeAlternateShot_GoToPlayoff(u8 bCheck) {
     int h;
     int i;
@@ -368,16 +369,16 @@ u8 GameModeAlternateShot_GoToPlayoff(u8 bCheck) {
         if (bCheck) {
             return 1;
         }
-        gpGame->bD5 = 1;
+        gpGame->bPlayoffFullRound = 1;
         for (h = 0; h < 18; h++) {
             if (!gpGame->bHoleSelected[h]) {
-                gpGame->bD5 = 0;
+                gpGame->bPlayoffFullRound = 0;
             }
         }
         GM_Pick_PlayOffHole();
         CLEAR_ROUNDS(PLAYER);
-        gpGame->bD4 = 1;
-        gpGame->nD8++;
+        gpGame->bInPlayoff = 1;
+        gpGame->nPlayoffHoles++;
         GUI_GolfersTiedUIMessage();
         return 1;
     }

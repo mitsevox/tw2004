@@ -983,7 +983,7 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
         fn_8006A988(vPos, gPlayers[nPlayer].vA44, vTeeDir);
         fTeeDist = Math_Sqrt(vTeeDir[0] * vTeeDir[0] + vTeeDir[2] * vTeeDir[2]);
     }
-    fn_8006A988(vPos, gpGame->p130, vHoleDir);
+    fn_8006A988(vPos, gpGame->pPinPos, vHoleDir);
     fHoleDist = Math_Sqrt(vHoleDir[0] * vHoleDir[0] + vHoleDir[2] * vHoleDir[2]);
     bInBounds = Ter_PointInOOBNetwork(vPos);
 
@@ -1124,12 +1124,12 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
     }
 }
 
-// fA88: the heading from the game's point (gpGame->p130) to the placement point, less a quarter
+// fA88: the heading from the game's point (gpGame->pPinPos) to the placement point, less a quarter
 // turn; and the aim marker's usual settings.
 void PlaceBall_SetupTarget(int nPlayer) {
     f32 vDir[4];
 
-    fn_8006A988(gPlayers[nPlayer].vPlacement, gpGame->p130, vDir);
+    fn_8006A988(gPlayers[nPlayer].vPlacement, gpGame->pPinPos, vDir);
     vDir[1] = 0.0f;
     LLMath_Normalize(vDir, vDir);
     gPlayers[nPlayer].fA88 = atan2f(vDir[2], vDir[0]) - PI / 2.0f;

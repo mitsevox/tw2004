@@ -158,14 +158,14 @@ void fn_8009B970(int nView) {
 }
 
 // Whether the grid shows for the player: never with GM_Currently_SkillZoneMode; with the putter when
-// options.b84 is set; otherwise when the player's ground (nSurface) is of a class that
+// options.bPuttingGrid is set; otherwise when the player's ground (nSurface) is of a class that
 // fn_8009BD94 lists.
 u8 fn_8009BD24(int nPlayer) {
     if (GM_Currently_SkillZoneMode()) {
         return 0;
     }
     if (gPlayers[nPlayer].nClub == CLUB_PUTTER_e) {
-        return gSession.options.b84;
+        return gSession.options.bPuttingGrid;
     }
     return fn_8009BD94(nPlayer);
 }

@@ -8,14 +8,16 @@
 
 // Game mode 22's state (gGameMode22, 0x1C bytes in .data).
 typedef struct GameMode22State {
-    s32 n0;                     // 0x0  GameMode22_GetVariant returns it
-    s32 n4;                     // 0x4  set by GameMode22_SetNumDrives
-    s32 n8;                     // 0x8  GameMode22_RestartHole sets 5
-    u8  bC;                     // 0xC  GameMode22_GetWinner returns it
+    s32 nVariant;               // 0x0  0 the drives' points add up, 1 only the best drive counts
+                                //      (GameMode22_SetVariant, from the menu)
+    s32 nDrives;                // 0x4  drives each player gets (GameMode22_SetNumDrives)
+    s32 nWinner;                // 0x8  the winning player, 5 none yet
+    u8  bDecided;               // 0xC  a winner is decided (GameMode22_GetWinner)
     u8  unkD[3];
-    f32 f10;                    // 0x10  GameMode22_StartEvent sets 0
-    s32 n14;                    // 0x14  GameMode22_StartEvent sets 5
-    s32 n18;                    // 0x18  GameMode22_StartEvent sets 120; GameMode22_IsShowingWinner: n8 not 5 and this above 0
+    f32 fLongestDrive;          // 0x10  the longest scoring drive so far (0 none)
+    s32 nLongestDriver;         // 0x14  whose it is (5 none)
+    s32 nWinnerFrames;          // 0x18  the winner countdown: 120 frames, run down once a winner
+                                //       is decided (GameMode22_IsShowingWinner)
 } GameMode22State;
 LAYOUT_ASSERT(GameMode22State, 0x1C);
 

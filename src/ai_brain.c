@@ -40,17 +40,17 @@ void AI_SetShotModifiers(int nPlayer) {
     }
     nPar     = Course_GetCurHolePar();
     nHole    = Game_CurHoleIndex();
-    nLevel   = p->nLevel;
+    nLevel   = p->nOBCount;
     nStrokes = p->nStrokes[nHole];
     if (nLevel != 0) {
         p->attrMod[ATTR_POWER]         = nLevel * 25;
-        p->attrMod[ATTR_IQ]            = p->nLevel * 25;
-        p->attrMod[ATTR_AGGRESSION]    = p->nLevel * -25;
-        p->attrMod[ATTR_BALL_STRIKING] = p->nLevel * 25;
-        p->attrMod[ATTR_APPROACH]      = p->nLevel * 25;
-        p->attrMod[ATTR_PUTTING]       = p->nLevel * 25;
-        p->attrMod[ATTR_RECOVERY]      = p->nLevel * 25;
-        p->attrMod[ATTR_LUCK]          = p->nLevel * 25;
+        p->attrMod[ATTR_IQ]            = p->nOBCount * 25;
+        p->attrMod[ATTR_AGGRESSION]    = p->nOBCount * -25;
+        p->attrMod[ATTR_BALL_STRIKING] = p->nOBCount * 25;
+        p->attrMod[ATTR_APPROACH]      = p->nOBCount * 25;
+        p->attrMod[ATTR_PUTTING]       = p->nOBCount * 25;
+        p->attrMod[ATTR_RECOVERY]      = p->nOBCount * 25;
+        p->attrMod[ATTR_LUCK]          = p->nOBCount * 25;
     } else if (nStrokes >= nPar + 2) {
         int n = nStrokes - (nPar + 1);
         p->attrMod[ATTR_POWER]         = n * 20;

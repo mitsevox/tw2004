@@ -17,7 +17,7 @@
 
 // PGA TOUR driver state; only this file uses it. The uninitialised ones are defined last address
 // first: the compiler lays out a file's .bss and .sbss last definition first.
-s32 gPgaSavedOptionsC = 4;      // the options' nC from before a tour round (Shutdown puts it back)
+s32 gPgaSavedWeather = 4;      // the options' nWeather from before a tour round (Shutdown puts it back)
 s32 gPgaSavedOptions18 = 1;     // the options' n18 from before a tour round (SetTournament keeps it;
                                 //   nothing puts it back)
 
@@ -65,21 +65,21 @@ s32  GameModeDriverPGATour_GetNumEventsWon(void);
 void GameModeDriverPGATour_Init(void) {
     gpGame->pfnInit = GameModeDriverPGATour_Init;
     gpGame->pfnShutdown = GameModeDriverPGATour_Shutdown;
-    gpGame->pfn1E4 = GameModeDriverPGATour_PostHoleLoadInit;
+    gpGame->pfnLoadHole = GameModeDriverPGATour_PostHoleLoadInit;
     gpGame->pfnSetupNextGolfer = GameModeStroke_SetupNextGolfer;
     gpGame->pfnGetHonors = GameModeStroke_GetHonors;
     gpGame->pfnHoleFinished = GameModeStroke_HoleFinished;
     gpGame->pfnGameFinished = GameModeDriverPGATour_GameFinished;
     gpGame->pfnGoToPlayoff = GameModeDriverPGATour_GoToPlayoff;
-    gpGame->pfn1EC = GameModeDriverPGATour_StartGamePreData;
+    gpGame->pfnStartGamePreData = GameModeDriverPGATour_StartGamePreData;
     gpGame->pfnEndHole = GameModeDriverPGATour_EndHole;
     gpGame->pfnEndGame = GameModeDriverPGATour_EndGame;
-    gpGame->pfn1F8 = GameModeDriverPGATour_IsPuttForLead;
+    gpGame->pfnIsPuttForLead = GameModeDriverPGATour_IsPuttForLead;
     // IsPuttForWin's player is an s32 (long): as an int its profile index compiles differently
-    gpGame->pfn1FC = (u8 (*)(int))GameModeDriverPGATour_IsPuttForWin;
+    gpGame->pfnIsPuttForWin = (u8 (*)(int))GameModeDriverPGATour_IsPuttForWin;
     gpGame->pfn200 = GameModeDriverPGATour_GetCurrentLead;
     gpGame->pfn204 = GameModeDriverPGATour_GetPotentialLead;
-    gpGame->pfn208 = GameModeDriverPGATour_GetPotentialHoleResult;
+    gpGame->pfnGetPotentialHoleResult = GameModeDriverPGATour_GetPotentialHoleResult;
     gpGame->b274 = 0;
     gpGame->n4 = 0;
     gpGame->nMulligans = 0;
@@ -150,20 +150,20 @@ void GameModeDriverPGATour_Locale_PgaTourMode_LoadPGAnFromStream(UStreamObject* 
     }
 }
 
-// pfnShutdown, as the mode ends: gpGame's nC and n10 go back to 1, the options' nC and nWind that
-// PrepareForTeeOff replaced come back, and the tour-round flag (GM_Currently_PgaTourMode) is
+// pfnShutdown, as the mode ends: gpGame's nC and n10 go back to 1, the options' nWeather and nWind
+// that PrepareForTeeOff replaced come back, and the tour-round flag (GM_Currently_PgaTourMode) is
 // cleared. options.n18, which SetTournament replaced (keeping the old value in lbl_80281674), is
 // not put back.
 void GameModeDriverPGATour_Shutdown(void) {
     gpGame->nC = 1;
     gpGame->n10 = 1;
-    gSession.options.nC = gPgaSavedOptionsC;
+    gSession.options.nWeather = gPgaSavedWeather;
     gSession.options.nWind = gPgaSavedWind;
     gbPgaTourRoundActive = 0;
 }
 
-// pfn1EC, as a round starts (GM_InitModule_PreDataStream): the round count (gpGame->nE0) comes from
-// the current tournament's format.
+// pfnStartGamePreData, as a round starts (GM_InitModule_PreDataStream): the round count
+// (gpGame->nE0) comes from the current tournament's format.
 void GameModeDriverPGATour_StartGamePreData(void) {
     s32 nTourEvent = gPgaData.aTournament[gpSaveData->tour.nEvent].nTourEvent - 1;
     gpGame->nE0 = gPgaData.aTourEvent[nTourEvent].nRounds;
@@ -208,9 +208,9 @@ void GameModeDriverPGATour_PrepareForTeeOff(void) {
     s32 nEvent = gpSaveData[nPlayer].tour.nEvent;
     PgaStatCounts* pRec = &gPgaRoundStats;
     s32 nFormat;
-    gPgaSavedOptionsC = gSession.options.nC;
+    gPgaSavedWeather = gSession.options.nWeather;
     gPgaSavedWind = gSession.options.nWind;
-    gSession.options.nC = 4;
+    gSession.options.nWeather = 4;
     gSession.options.nWind = 0;
     gbPgaTourRoundActive = 1;
     gPgaPlayoffHole = 16;
@@ -281,7 +281,7 @@ void GameModeDriverPGATour_EndGame(void) {
 // in a playoff, beating the best score on this hole; otherwise, not ahead now and ahead with it.
 u8 GameModeDriverPGATour_IsPuttForLead(int nPlayer) {
     int bLead;
-    if (gpGame->bD4) {
+    if (gpGame->bInPlayoff) {
         return gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 <
                GM_PgaTourSim_GetBestOpponentPlayoffHoleScore(nPlayer, Game_CurHoleIndex());
     }
@@ -297,7 +297,7 @@ u8 GameModeDriverPGATour_IsPuttForLead(int nPlayer) {
 // otherwise on the last hole of the last round, a putt that would put the player strictly ahead.
 u8 GameModeDriverPGATour_IsPuttForWin(s32 nPlayer) {
     s32 nRounds;
-    if (gpGame->bD4) {
+    if (gpGame->bInPlayoff) {
         return GameModeDriverPGATour_IsPuttForLead(nPlayer);
     }
     nRounds = GameModeDriverPGATour_GetRounds(gpSaveData[nPlayer].tour.nEvent);
@@ -307,7 +307,7 @@ u8 GameModeDriverPGATour_IsPuttForWin(s32 nPlayer) {
 
 // Strokes ahead of the best other player, negative when behind (in a playoff, on this hole).
 s32 GameModeDriverPGATour_GetCurrentLead(int nPlayer) {
-    if (gpGame->bD4) {
+    if (gpGame->bInPlayoff) {
         return GM_PgaTourSim_GetBestOpponentPlayoffHoleScore(nPlayer, Game_CurHoleIndex()) - gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
     }
     return fn_80119588(nPlayer, 1) - GM_GetGolferRelativeCumulativeScore(nPlayer, 0);
@@ -316,16 +316,16 @@ s32 GameModeDriverPGATour_GetCurrentLead(int nPlayer) {
 // GetCurrentLead as it would be if the ball dropped with one more stroke: strokes ahead of the best
 // other player, negative when behind (in a playoff, on this hole).
 s32 GameModeDriverPGATour_GetPotentialLead(int nPlayer) {
-    if (gpGame->bD4) {
+    if (gpGame->bInPlayoff) {
         return GM_PgaTourSim_GetBestOpponentPlayoffHoleScore(nPlayer, Game_CurHoleIndex()) -
                (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1);
     }
     return fn_80119588(nPlayer, 1) - (GM_GetGolferRelativeCumulativeScore(nPlayer, 1) + 1);
 }
 
-// pfn208: how the hole would end for the player if the ball dropped now. The tour never says:
-// always 3, unknown (TW06 GM_HoleResult_t: 0 loses, 1 ties, 2 wins, 3 unknown); HoleScore.c's
-// default (fn_800D030C) works it out for the other modes.
+// pfnGetPotentialHoleResult: how the hole would end for the player if the ball dropped now. The
+// tour never says: always 3, unknown (TW06 GM_HoleResult_t: 0 loses, 1 ties, 2 wins, 3 unknown);
+// HoleScore.c's default (fn_800D030C) works it out for the other modes.
 s32 GameModeDriverPGATour_GetPotentialHoleResult(int nPlayer) {
     return 3;
 }
@@ -544,8 +544,8 @@ void GameModeDriverPGATour_SimCurrentTournament(int nPlayer, u8 bSimUser) {
     GM_PgaTourSim_SimTournamentWinner(nPlayer);
 }
 
-// pfn1E4, at the start of each hole (GM_InitForHole): the other entrants move on round the course
-// (GM_PgaTourSim_AdvanceField).
+// pfnLoadHole, at the start of each hole (GM_InitForHole): the other entrants move on round the
+// course (GM_PgaTourSim_AdvanceField).
 void GameModeDriverPGATour_PostHoleLoadInit(void) {
     GM_PgaTourSim_AdvanceField(0);
 }
@@ -567,7 +567,7 @@ void GameModeDriverPGATour_EndHole(void) {
     u8 bUnder;
     int nPrev;
     s32 n;
-    if (gpGame->bD4) {
+    if (gpGame->bInPlayoff) {
         return;
     }
     pRound = &gPgaRoundStats;
@@ -583,7 +583,7 @@ void GameModeDriverPGATour_EndHole(void) {
     }
     pRound->nHoles++;
     pRound->nStrokes += (u16)nStrokes;
-    if (p->b310) {
+    if (p->bBunkerThisHole) {
         pRound->nBunkers++;
         if (nStrokes <= nPar) {
             pRound->nBunkerSaves++;
@@ -591,11 +591,11 @@ void GameModeDriverPGATour_EndHole(void) {
     }
     if (nPar >= 4) {
         pRound->nFairways++;
-        if (p->b2E4[nHole]) {
+        if (p->bFairwayHit[nHole]) {
             pRound->nFairwaysHit++;
         }
     }
-    if (p->b2F6[nHole]) {
+    if (p->bGreenInReg[nHole]) {
         pRound->nGreensHit++;
         pRound->nGIRPutts += (u16)nPutts;
         if (bUnder) {
@@ -646,8 +646,10 @@ void GameModeDriverPGATour_EndHole(void) {
         pRound->nDrives++;
         pRound->nDriveDistance += p->nC24;
     }
-    pRound->nLongestDrive = pRound->nLongestDrive <= (u16)p->n2DC ? (u16)p->n2DC : pRound->nLongestDrive;
-    pRound->nLongestPutt = pRound->nLongestPutt <= (u16)p->n2E0 ? (u16)p->n2E0 : pRound->nLongestPutt;
+    pRound->nLongestDrive =
+        pRound->nLongestDrive <= (u16)p->nLongestDrive ? (u16)p->nLongestDrive : pRound->nLongestDrive;
+    pRound->nLongestPutt =
+        pRound->nLongestPutt <= (u16)p->nLongestPutt ? (u16)p->nLongestPutt : pRound->nLongestPutt;
     if (nHole == 17) {
         n = GM_PgaTourSim_GetRoundScoreFromEntrantID(0, 0, gpSaveData[nPlayer].tour.nRound);
         if (n <= fn_800D2FB4(gSession.nTeeSet[0])) {
@@ -666,7 +668,7 @@ void GameModeDriverPGATour_EndHole(void) {
 // which does not read it.
 u8 GameModeDriverPGATour_GameFinished(u8 bCheck) {
     s32 i;
-    if (gpGame->bD4) {
+    if (gpGame->bInPlayoff) {
         GM_PgaTourSim_UpdatePlayoffs(0, Game_CurHoleIndex());
         return GameModeDriverPGATour_GoToPlayoff(bCheck) == 0;
     }
@@ -683,9 +685,9 @@ u8 GameModeDriverPGATour_GameFinished(u8 bCheck) {
 }
 
 // Whether there is a playoff: more than one entrant in it and the player one of them. If so every
-// player's strokes and mode points are cleared, the playoff flags (gpGame bD4, bD5) set, the next
-// playoff hole (the 18th, then the 16th, 17th, 18th, ... : lbl_80282340) made the only one
-// selected, and the golfers-tied message shown. bCheck is not read.
+// player's strokes and mode points are cleared, the playoff flags (gpGame bInPlayoff,
+// bPlayoffFullRound) set, the next playoff hole (the 18th, then the 16th, 17th, 18th, ... :
+// lbl_80282340) made the only one selected, and the golfers-tied message shown. bCheck is not read.
 u8 GameModeDriverPGATour_GoToPlayoff(u8 bCheck) {
     u8 bPlayoff = 0;
     s32 i;
@@ -694,7 +696,7 @@ u8 GameModeDriverPGATour_GoToPlayoff(u8 bCheck) {
         bPlayoff = 1;
     }
     if (bPlayoff) {
-        gpGame->bD5 = 1;
+        gpGame->bPlayoffFullRound = 1;
         for (i = 0; i < gNumPlayersSetUp; i++) {
             for (h = 0; h < 18; h++) {
                 PLAYER(i)->nStrokes[h] = 0;
@@ -707,7 +709,7 @@ u8 GameModeDriverPGATour_GoToPlayoff(u8 bCheck) {
         }
         GM_SelectHoleSet(0);
         GM_SelectSingleHole(gPgaPlayoffHole);
-        gpGame->bD4 = 1;
+        gpGame->bInPlayoff = 1;
         GUI_GolfersTiedUIMessage();
     }
     return bPlayoff;
@@ -1065,8 +1067,8 @@ s32 GameModeDriverPGATour_GetSponsorshipBonusCash(s32 i) {
 
 // The tour's message after the player's hole into pDst; returns 1 when there is one, else 0. After
 // the 18th hole of the second round: whether the player made the cut (the top 70). In a playoff
-// (gpGame->bD4) that the player is in with at least one other: the opponent's best score on the
-// playoff hole, which the player must beat.
+// (gpGame->bInPlayoff) that the player is in with at least one other: the opponent's best score on
+// the playoff hole, which the player must beat.
 s32 GameModeDriverPGATour_DisplayEndOfHoleMessage(char* pDst) {
     PlayerNumber_t nPlayer = PLR_1_e;
     if (gpSaveData[nPlayer].tour.nRound == 1 && GM_PgaTourSim_GetCurrentHoleFromEntrantID(0, 0) == 18) {
@@ -1079,7 +1081,8 @@ s32 GameModeDriverPGATour_DisplayEndOfHoleMessage(char* pDst) {
                      "after two rounds. You made the cut!");
         return 1;
     }
-    if (gpGame->bD4 && GM_PgaTourSim_EntrantIsInPlayoff(0, 0) && GM_PgaTourSim_GetNumPlayoffEntrants(0) > 1) {
+    if (gpGame->bInPlayoff && GM_PgaTourSim_EntrantIsInPlayoff(0, 0)
+        && GM_PgaTourSim_GetNumPlayoffEntrants(0) > 1) {
         sprintf(pDst, "TOURNAMENT PLAYOFF\n\nYou're tied for first place. You must beat\n"
                       "your opponent's score of %d on the playoff\nhole to win.",
                 GM_PgaTourSim_GetBestOpponentPlayoffHoleScore(0, gPgaPlayoffHole));

@@ -249,8 +249,8 @@ void fn_800BD77C(int nSound) {
 
 // Hand GameEffects a music to play later (n4F; GameEffects_EndGameBreaker plays it as the GameBreaker ends).
 void fn_800BD7D0(u8 nMusic) {
-    gGameEffects.b4E = 1;
-    gGameEffects.n4F = nMusic;
+    gGameEffects.bCrowdReactionSet = 1;
+    gGameEffects.nCrowdReaction = nMusic;
 }
 
 // The same as fn_800BD77C with GameEffects' second slot (u4C).

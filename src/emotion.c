@@ -38,7 +38,7 @@ int fn_8006AA9C(int nPlayer) {
 // one lower; if it says so and the ball is in the cup, the outcome becomes 2.
 void fn_8006AAB4(int nPlayer, int nResult) {
     gPlayers[nPlayer].nStrokes[gpGame->nCurHole]--;
-    if (gpGame->pfn1FC(nPlayer) && gPlayers[nPlayer].ball.nLie == LIE_INCUP_e) {
+    if (gpGame->pfnIsPuttForWin(nPlayer) && gPlayers[nPlayer].ball.nLie == LIE_INCUP_e) {
         nResult = 2;
     }
     gPlayers[nPlayer].nStrokes[gpGame->nCurHole]++;
@@ -197,10 +197,10 @@ void fn_8006AE50(int nPlayer) {
         lbl_801D5F78[nPlayer].n4 = 2;
         break;
     case LIE_GREEN_e:
-        if (gpGame->pfn1FC(nPlayer)) {
+        if (gpGame->pfnIsPuttForWin(nPlayer)) {
             lbl_801D5F78[nPlayer].n0 = 2;
             lbl_801D5F78[nPlayer].n4 = 3;
-        } else if (gpGame->pfn1F8(nPlayer)) {
+        } else if (gpGame->pfnIsPuttForLead(nPlayer)) {
             lbl_801D5F78[nPlayer].n0 = 2;
             lbl_801D5F78[nPlayer].n4 = 2;
         } else {
@@ -603,7 +603,7 @@ void fn_8006BB5C(int nPlayer) {
 }
 
 // With bBefore, whether one more stroke reaches the hole's stroke limit (GM_IsShotOverLimit), unless the
-// ball is already in the cup; without it, the player's bC2D.
+// ball is already in the cup; without it, the player's bShotLimitExceeded.
 u8 fn_8006BDC8(int nPlayer, u8 bBefore) {
     if (bBefore) {
         if (gPlayers[nPlayer].ballBefore.nLie != LIE_INCUP_e) {
@@ -611,7 +611,7 @@ u8 fn_8006BDC8(int nPlayer, u8 bBefore) {
         }
         return 0;
     }
-    return gPlayers[nPlayer].bC2D != 0;
+    return gPlayers[nPlayer].bShotLimitExceeded != 0;
 }
 
 // a - b into out (three floats)

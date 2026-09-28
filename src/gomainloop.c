@@ -778,24 +778,24 @@ void fn_8006CFC8(void) {
     fn_8006C854();
 }
 
-// Whether the main loop should end this frame, by the game type's own tests: gSession's b12 and
-// nC, lbl_802811E8[1], the pads, fn_8009A180 and fn_8008F39C.
+// Whether the main loop should end this frame, by the game type's own tests: gSession's bEndLoop
+// and nC, lbl_802811E8[1], the pads, fn_8009A180 and fn_8008F39C.
 u8 fn_8006D01C(void) {
     u8 bDone = 0;
 
-    if (gSession.nGameType == 6 && (gSession.b12 || gSession.nC == 2)) {
+    if (gSession.nGameType == 6 && (gSession.bEndLoop || gSession.nC == 2)) {
         bDone = 1;
-        gSession.b12 = 0;
+        gSession.bEndLoop = 0;
     } else if (gSession.nGameType == 6 && fn_8006DC34()) {
         bDone = 1;
-    } else if (gSession.nGameType == 6 && !gSession.a8[0] && (gSession.uFlags & 0x4000)) {
+    } else if (gSession.nGameType == 6 && !gSession.bDemo && (gSession.uFlags & 0x4000)) {
         if (Controller_AnyPadHasButtons(0)) {
             fn_8009A16C();
         }
         if (fn_8009A180()) {
             bDone = 1;
         }
-    } else if (gSession.nGameType == 6 && gSession.a8[0]) {
+    } else if (gSession.nGameType == 6 && gSession.bDemo) {
         if (Controller_AnyPadHasButtons(0)) {
             bDone = 1;
         }
@@ -809,10 +809,10 @@ u8 fn_8006D01C(void) {
         if (fn_8008F39C()) {
             bDone = 1;
         }
-    } else if (gSession.nGameType == 1 && (gSession.b12 || gSession.nC == 2)) {
+    } else if (gSession.nGameType == 1 && (gSession.bEndLoop || gSession.nC == 2)) {
         fn_800BA74C(1);
         bDone = 1;
-        gSession.b12 = 0;
+        gSession.bEndLoop = 0;
     }
     return bDone;
 }
@@ -1345,11 +1345,11 @@ void fn_8006E0B8(void) {
 void fn_8006E0BC(void) {
 }
 
-// 1 when gSession.options.nC is 2 and lbl_802811F0's n10 equals its n0C, else 0.
+// 1 when gSession.options.nWeather is 2 and lbl_802811F0's n10 equals its n0C, else 0.
 u8 fn_8006E0C0(void) {
     int b = 0;
 
-    if (gSession.options.nC == 2 && lbl_802811F0->n10 == lbl_802811F0->n0C) {
+    if (gSession.options.nWeather == 2 && lbl_802811F0->n10 == lbl_802811F0->n0C) {
         b = 1;
     }
     return b;

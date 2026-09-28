@@ -1553,7 +1553,7 @@ void fn_800B1FFC(MsgArg* pArgs, MsgArg* pResult) {
 
 // Command 5.
 void fn_800B203C(MsgArg* pArgs, MsgArg* pResult) {
-    lbl_801D87C0.b0 = 1;
+    lbl_801D87C0.bFadeToBlack = 1;
 }
 
 // Command 6.

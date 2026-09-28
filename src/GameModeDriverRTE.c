@@ -11,7 +11,7 @@
 #include "game/modes/rte.h"
 
 // This file's globals, defined last address first (an object's .bss is laid out in reverse).
-s32 gRTESavedOptionC = 4;               // gSession.options.nC saved while an event runs
+s32 gRTESavedOptionC = 4;               // gSession.options.nWeather saved while an event runs
 void (*gRTEChallengeShutdown)(void);    // mode 5's pfnShutdown, called from GameModeDriverRTE_Shutdown
 void (*gRTEChallengeEndGame)(void);     // mode 5's pfnEndGame, called from GameModeDriverRTE_EndGame
 s32 gRTESelectedDay;                    // the selected event's day (1-based)
@@ -100,7 +100,7 @@ void GameModeDriverRTE_Locale_LoadRTEnFromStream(UStreamObject* pObject) {
 }
 
 // Mode 24's shutdown (also wrapped around mode 5's while an event's challenge runs): mode 5's own
-// shutdown when one was saved, gpGame nC and n10 back to 1, the options nC and wind that
+// shutdown when one was saved, gpGame nC and n10 back to 1, the options nWeather and wind that
 // GameModeDriverRTE_StartEvent changed put back, and the event is no longer running
 // (GM_Currently_RealtimeMode).
 void GameModeDriverRTE_Shutdown(void) {
@@ -109,21 +109,21 @@ void GameModeDriverRTE_Shutdown(void) {
     }
     gpGame->nC = 1;
     gpGame->n10 = 1;
-    gSession.options.nC = gRTESavedOptionC;
+    gSession.options.nWeather = gRTESavedOptionC;
     gSession.options.nWind = gRTESavedWind;
     gRTEEventRunning = 0;
 }
 
-// Starts the selected event (GM_RealtimeMode_SelectEvent): the options nC and wind are saved and
-// set to 4 and 0 (calm), and the event counts as running. If the entry is not switched off (bOff)
-// and has a challenge, one player plays it in mode 5: the RTE challenge table (gRTEs.aChallenge)
-// goes in, challenge nChallenge - 1 is selected and started, and mode 5's shutdown and end game are
-// saved and replaced by GameModeDriverRTE_Shutdown and GameModeDriverRTE_EndGame. Called from the
-// menu (FE_MessageTable.c) and on a restart (GameMode5).
+// Starts the selected event (GM_RealtimeMode_SelectEvent): the options nWeather and wind are saved
+// and set to 4 and 0 (calm), and the event counts as running. If the entry is not switched off
+// (bOff) and has a challenge, one player plays it in mode 5: the RTE challenge table
+// (gRTEs.aChallenge) goes in, challenge nChallenge - 1 is selected and started, and mode 5's
+// shutdown and end game are saved and replaced by GameModeDriverRTE_Shutdown and
+// GameModeDriverRTE_EndGame. Called from the menu (FE_MessageTable.c) and on a restart (GameMode5).
 void GameModeDriverRTE_StartEvent(void) {
-    gRTESavedOptionC = gSession.options.nC;
+    gRTESavedOptionC = gSession.options.nWeather;
     gRTESavedWind = gSession.options.nWind;
-    gSession.options.nC = 4;
+    gSession.options.nWeather = 4;
     gSession.options.nWind = 0;
     gRTEEventRunning = 1;
     if (gRTEs.aEvent[gRTESelectedEvent].bOff == 0) {

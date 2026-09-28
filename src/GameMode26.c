@@ -66,7 +66,7 @@ void GameMode26_Init(void) {
     gpGame->pfnShutdown = GameMode26_Shutdown;
     gpGame->pfnSetupNextGolfer = GameMode26_SetupNextGolfer;
     gpGame->pfnGetHonors = GameMode26_GetHonors;
-    gpGame->pfn250 = GameMode26_BallOutOfBounds;
+    gpGame->pfnBallOOB = GameMode26_BallOutOfBounds;
     gpGame->pfnHoleFinished = GameMode26_HoleFinished;
     gpGame->pfnGameFinished = GameMode26_GameFinished;
     gpGame->pfnGoToPlayoff = GameMode26_GoToPlayoff;
@@ -75,9 +75,9 @@ void GameMode26_Init(void) {
     gpGame->pfn220 = GameMode26_UpdateFrame;
     gpGame->pfn20C = GameMode26_StartSwing;
     // port: its parameter is PlayerNumber_t, pfn244's int
-    gpGame->pfn244 = (void (*)(int))GameMode26_ScoreShot;
-    gpGame->pfn1E4 = GameMode26_HoleStart;
-    gpGame->pfn224 = GameMode26_RestartHole;
+    gpGame->pfnCheckShotAwards = (void (*)(int))GameMode26_ScoreShot;
+    gpGame->pfnLoadHole = GameMode26_HoleStart;
+    gpGame->pfnRestartHole = GameMode26_RestartHole;
     gpGame->bGimmesAllowed = 0;
     gpGame->b279 = 1;
     gpGame->b27F = 0;
@@ -85,7 +85,7 @@ void GameMode26_Init(void) {
     gpGame->b271 = 0;
     gpGame->b281 = 0;
     gpGame->bStrokeLimit = 0;
-    gpGame->b285 = 0;
+    gpGame->bAllowGameBreakers = 0;
     gpGame->b274 = 0;
     gpGame->b286 = 0;
     gpGame->b287 = 0;
@@ -298,7 +298,7 @@ void GameMode26_ScoreShot(PlayerNumber_t nPlayer) {
         nKind = 4;
         break;
     default:
-        if (pPlayer->bLowIQPenalty) {
+        if (pPlayer->bPenaltyShot) {
             nKind = 5;
             break;
         }

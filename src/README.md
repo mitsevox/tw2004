@@ -47,7 +47,7 @@ see [Game modes](#game-modes).
 | EASB | EA Sports Bio, EA's cross-game player profile on the memory card |
 | `fn_8XXXXXXX`, `lbl_8XXXXXXX` | a function or global not named yet, by its address |
 | Name tiers | in `config/GW4E69/name_sources.tsv`: T1/T2 EA's own name (its text in the binary, or TW06/TW07/Madden 2003 confirmed by the code); T3 named from a careful reading of the code |
-| `n290`, `pfn1E4`, `u04`, `b0F` | struct fields not named yet: a type letter and the field's offset |
+| `n290`, `pfn20C`, `u04`, `b0F` | struct fields not named yet: a type letter and the field's offset |
 | `// fake match:` | C written a non-natural way only to reproduce EA's bytes; logic unchanged |
 | `// EA bug:` / `// port:` | a bug in EA's code (kept); a hazard for a later PC port (32-bit pointers, endianness) |
 | section / data-order notes | why globals are defined in reverse order etc. (CodeWarrior lays out `.bss`/`.sbss` last-defined-first) |
@@ -296,7 +296,7 @@ choice, and the golfer's streamed textures and clothes.
 | Skeleton.c | EA | the skeleton: IK chains and weights, per-bone factors |
 | Skin.c | EA | a skinned model: bone matrices, morph weights, drawing |
 | Code80037AB8.c | ph | split off Skin.c: bone inverse matrices, morph weights from a pose, frees description bits |
-| animblender.c | T6 *(name unproven)* | blend trees (`SKABlendNode`) and the animation player (`AnimPlayer`) |
+| animblender.c | T6 *(name unproven)* | blend trees (`SKABlendNode`) and the animation player (`TSKATime`) |
 | CharAnim.c | ours (TW06: `char_state.c`) | the golfer's animation state: clip-group blends, idle and emotion updates, queued state changes |
 | Code80095564.c | ph | with a single view, frees every golfer's body skin |
 | AnimStream.c | EA | clip streaming for groups 1 and 5 (turned off in every case); base-40 name codes |

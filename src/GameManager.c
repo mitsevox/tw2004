@@ -79,11 +79,11 @@ u8 GameEffects_IsFixedTimeStepOn(void) {
     return 0;
 }
 
-// Whether holing this ball would put the player in the lead: the mode's own answer (its pfn1F8;
-// GameModeDriverPGATour_IsPuttForLead on the PGA TOUR). The scripted GameBreaker test asks it for a
-// ball on the green.
+// Whether holing this ball would put the player in the lead: the mode's own answer (its
+// pfnIsPuttForLead; GameModeDriverPGATour_IsPuttForLead on the PGA TOUR). The scripted GameBreaker
+// test asks it for a ball on the green.
 u8 GM_IsPuttForLead(int nPlayer) {
-    return gpGame->pfn1F8(nPlayer);
+    return gpGame->pfnIsPuttForLead(nPlayer);
 }
 
 // Whether the ball moves on this frame of the half-time slow motion: yes on every n2C-th frame of
@@ -95,10 +95,10 @@ u8 GameEffects_StartOfSlowMoFrame(void) {
     return (gGameEffects.n28 % gGameEffects.n2C) == 0;
 }
 
-// Whether half-time slow motion is on (GameEffects.b11: the time step is halved and the slow frames
-// are counted). Nothing in this build turns it on.
+// Whether half-time slow motion is on (GameEffects.bHalfTime: the time step is halved and the slow
+// frames are counted). Nothing in this build turns it on.
 u8 GameEffects_IsHalfTimeOn(void) {
-    return gGameEffects.b11;
+    return gGameEffects.bHalfTime;
 }
 
 // Three floats: pOut gets pA minus pB. GameEffects' own copy of the helper (GameRound.c has
@@ -138,7 +138,7 @@ void GM_vCloseModuleONCE(void) {
 
 // A round starts (GO_vInitIG, before the course data and cameras are set up): outside a GameMode5
 // challenge the game's data is cleared and the round goes to its first selected hole; then the
-// mode's pfn1EC hook, and the playoff hole list is marked to be built.
+// mode's pfnStartGamePreData hook, and the playoff hole list is marked to be built.
 void GM_InitModule_PreDataStream(void) {
     if (PlayNow_IsChallengeRunning() == 0) {
         GM_ClearDataForNewGame();
@@ -148,9 +148,9 @@ void GM_InitModule_PreDataStream(void) {
     GM_SetNeedToBuildPlayoffHoleList(1);
 }
 
-// Late in a round's start (GO_vInitIG, after the players are set up): calls the mode's pfn1F0 hook
-// (GameModeBattle saves the golfers' bags there). TW07 has GM_CheckForAndReturnWager next; this
-// build does not.
+// Late in a round's start (GO_vInitIG, after the players are set up): calls the mode's
+// pfnStartGamePostData hook (GameModeBattle saves the golfers' bags there). TW07 has
+// GM_CheckForAndReturnWager next; this build does not.
 void GM_InitModule_PostDataStream(void) {
     (*(s32 (**)(void*))((u8*)(gpGame) + 0x1F0))(gpGame);
 }
@@ -188,17 +188,18 @@ int GM_GotoNextSelectedHole(void) {
 }
 
 // A new hole: views 2 and 3 off, the balls to the tee, new wind, the mode's hole-start hook
-// (pfn1E4), effects and HUD reset, the hole contests cleared, the flyover when the mode has one
-// (b27F), each player's flags that GM_RecordBonusShotStats carries from shot to shot cleared, the
-// player up set to the mode's first (GetHonors), event 0 (player 0xFF); then for all five players
-// the button hold counters (n144, n158) and the shot-limit and mulligan-this-hole flags (bC2D, bC2F) cleared.
+// (pfnLoadHole), effects and HUD reset, the hole contests cleared, the flyover when the mode has
+// one (b27F), each player's flags that GM_RecordBonusShotStats carries from shot to shot cleared,
+// the player up set to the mode's first (GetHonors), event 0 (player 0xFF); then for all five
+// players the button hold counters (n144, n158) and the shot-limit and mulligan-this-hole flags
+// (bShotLimitExceeded, bUsedMulliganThisHole) cleared.
 void GM_InitForHole(void) {
     int i;
     ViewController_TurnOnViewController(2, 0);
     ViewController_TurnOnViewController(3, 0);
     GM_InitBallsToTee();
     Wind_Generate();
-    gpGame->pfn1E4();
+    gpGame->pfnLoadHole();
     GameEffects_ResetGameEffectSettings();
     GUI_Init();
     HoleContest_InitForHole();
@@ -217,8 +218,8 @@ void GM_InitForHole(void) {
         j = i;
         gpGame->n158[j] = 0;
         i = j;
-        gPlayers[i].bC2F = 0;
-        gPlayers[j].bC2D = 0;
+        gPlayers[i].bUsedMulliganThisHole = 0;
+        gPlayers[j].bShotLimitExceeded = 0;
     }
 }
 
@@ -260,14 +261,14 @@ void GM_EndOfGolferTurn(int nPlayer) {
 }
 
 // The hole is over: event 1 and the mode's EndHole. On the round's last hole, outside a playoff
-// (bD4), each player's round goals are paid out (GM_Earnings_PayRoundGoals) and the round counted
-// in the profile (GM_RecordIndividualRoundStats). Then GM_EndOfGolferTurn_GameFinished when the
-// mode says the game is over (or GM_IsRoundForcedOver), else GM_HoleFinished_GameNotFinished.
+// (bInPlayoff), each player's round goals are paid out (GM_Earnings_PayRoundGoals) and the round
+// counted in the profile (GM_RecordIndividualRoundStats). Then GM_EndOfGolferTurn_GameFinished when
+// the mode says the game is over (or GM_IsRoundForcedOver), else GM_HoleFinished_GameNotFinished.
 void GM_EndOfGolferTurn_HoleFinished(int nPlayer) {
     int i;
     EVENT_Trigger(nPlayer, 1, 0, -1);
     gpGame->pfnEndHole();
-    if (GM_CurrentlyOnLastHole() && !gpGame->bD4 && !GM_IsRoundForcedOver(nPlayer)) {
+    if (GM_CurrentlyOnLastHole() && !gpGame->bInPlayoff && !GM_IsRoundForcedOver(nPlayer)) {
         for (i = 0; i < gNumPlayersSetUp; i++) {
             GM_Earnings_PayRoundGoals(i, 0);
             GM_RecordIndividualRoundStats(i);
@@ -281,12 +282,12 @@ void GM_EndOfGolferTurn_HoleFinished(int nPlayer) {
 }
 
 // The game is over: event 5, the game marked finished (b28E), the won flag cleared before the
-// mode's EndGame decides it, and a win counted in EASBio outside the demo (gSession.a8[0]). With
+// mode's EndGame decides it, and a win counted in EASBio outside the demo (gSession.bDemo). With
 // b273 every player gets the end-of-round payout (GM_Earnings_PayRoundGoals, bRoundOver 1). Outside
-// the demo and while the round is not already ending (gSession.b12), the end-of-game scorecard is
-// shown when the mode has scorecards (b275; bHuman 1 unless b274 is set outside a GameMode5
-// challenge), the golfer waits and the view goes to camera mode 17; otherwise gSession.b12 is set,
-// which ends the round.
+// the demo and while the round is not already ending (gSession.bEndLoop), the end-of-game scorecard
+// is shown when the mode has scorecards (b275; bHuman 1 unless b274 is set outside a GameMode5
+// challenge), the golfer waits and the view goes to camera mode 17; otherwise gSession.bEndLoop is
+// set, which ends the round.
 void GM_EndOfGolferTurn_GameFinished(int nPlayer) {
     int i;
     int nView;
@@ -294,7 +295,7 @@ void GM_EndOfGolferTurn_GameFinished(int nPlayer) {
     gpGame->b28E = 1;
     EASBio_SetCurrentGameWon(0);
     gpGame->pfnEndGame();
-    if (EASBio_IsCurrentGameWon() && gSession.a8[0] == 0) {
+    if (EASBio_IsCurrentGameWon() && gSession.bDemo == 0) {
         EASBio_IncrementGamesWon(1);
     }
     if (gpGame->b273) {
@@ -302,7 +303,7 @@ void GM_EndOfGolferTurn_GameFinished(int nPlayer) {
             GM_Earnings_PayRoundGoals(i, 1);
         }
     }
-    if (gSession.b12 == 0 && gSession.a8[0] == 0) {
+    if (gSession.bEndLoop == 0 && gSession.bDemo == 0) {
         if (gpGame->b275) {
             if (!gpGame->b274 || PlayNow_IsChallengeRunning()) {
                 GUI_EndOfGameScorecard(1);
@@ -315,7 +316,7 @@ void GM_EndOfGolferTurn_GameFinished(int nPlayer) {
         CameraController_SetCameraMode(ViewController_GetCameraControl(nView), 0x11, nPlayer, nView);
         return;
     }
-    gSession.b12 = 1;
+    gSession.bEndLoop = 1;
 }
 
 // The hole is over and the game goes on: the mode's pfn210 hook, the between-holes scorecard when
@@ -338,14 +339,15 @@ void GM_HoleFinished_GameNotFinished(int nPlayer) {
 }
 
 // Whether a CPU golfer concedes the hole: never once holed; yes after three or more penalty shots
-// in a row (nLevel above 2); otherwise yes when one of the players before it in the order is on the
-// green while it is not and it has already taken more than 3 strokes more than them on this hole.
+// in a row (nOBCount above 2); otherwise yes when one of the players before it in the order is on
+// the green while it is not and it has already taken more than 3 strokes more than them on this
+// hole.
 u8 GM_CheckForAIConcede(int nPlayer) {
     u8  bConcede = 0;
     int i;
     if (Player_IsCPU(nPlayer)) {
         if (gPlayers[nPlayer].ball.nLie != LIE_INCUP_e) {
-            if (gPlayers[nPlayer].nLevel > 2) {
+            if (gPlayers[nPlayer].nOBCount > 2) {
                 bConcede = 1;
             } else {
                 for (i = 0; i < gSession.nNumPlayers; i++) {
@@ -366,7 +368,7 @@ u8 GM_CheckForAIConcede(int nPlayer) {
 // The ball has just been struck (the swing state calls it): the penalty mark is cleared, UI message
 // 0x4E goes out with the player, and the player's HUD is hidden when the mode says so (b271).
 void GM_BallHit(int nPlayer) {
-    gPlayers[nPlayer].bLowIQPenalty = 0;
+    gPlayers[nPlayer].bPenaltyShot = 0;
     GameMsg_SendInt(0x4E, nPlayer);
     if (gpGame->b271) {
         GUI_ToggleUI(nPlayer, 0);
@@ -388,11 +390,11 @@ void GM_PlayerAddStroke(int nPlayer) {
 // After a shot: out of bounds (GM_IsBallOOB, or no surface under the ball) or a drop (a surface
 // without u34 bit 0, or any surface inside the free-drop network) stops the ball, and the camera
 // gets shot kind 6. Out of bounds, or a drop on a surface with u34 bit 1, costs a stroke: the
-// penalty mark (bLowIQPenalty) is set, nLevel counts penalties in a row (a CPU gets 25 points of
+// penalty mark (bPenaltyShot) is set, nOBCount counts penalties in a row (a CPU gets 25 points of
 // attributes per level, and concedes after three), the stroke is added (and reported to a PGA TOUR
 // event) and message 0xD (water, surface class 7/16) or 2 is shown; 1 is returned, but 0 once the
 // mode's 10-stroke limit is reached (modes 7 and 8 return 1 straight after the stroke). A free drop
-// returns 0; a shot with neither resets nLevel and returns 0.
+// returns 0; a shot with neither resets nOBCount and returns 0.
 u8 GM_CheckForBallOOB(int nPlayer) {
     Ball*        pBall = &gPlayers[nPlayer].ball;
     u8           bOut  = GM_IsBallOOB(nPlayer, pBall);
@@ -407,12 +409,12 @@ u8 GM_CheckForBallOOB(int nPlayer) {
     } else {
         bDrop = 1;
     }
-    gPlayers[nPlayer].bLowIQPenalty = 0;
+    gPlayers[nPlayer].bPenaltyShot = 0;
     if (bOut || bDrop) {
         gPlayers[nPlayer].ball.nState = 0;
         if (bOut || (bDrop && (pSurf->u34 & 2))) {
-            gPlayers[nPlayer].bLowIQPenalty = 1;
-            gPlayers[nPlayer].nLevel++;
+            gPlayers[nPlayer].bPenaltyShot = 1;
+            gPlayers[nPlayer].nOBCount++;
             gPlayers[nPlayer].nStrokes[gpGame->nCurHole]++;
             if (gPlayers[nPlayer].nClub == CLUB_PUTTER_e) {
                 gPlayers[nPlayer].nPutts[gpGame->nCurHole]++;
@@ -440,7 +442,7 @@ u8 GM_CheckForBallOOB(int nPlayer) {
         fn_80063CF0(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 6, nPlayer);
         return 0;
     }
-    gPlayers[nPlayer].nLevel = 0;
+    gPlayers[nPlayer].nOBCount = 0;
     return 0;
 }
 
@@ -512,10 +514,11 @@ void GM_BumpBallForObstructions(int nPlayer) {
 // penalty check (GM_CheckForBallOOB), the shot statistics and earnings when there was no penalty,
 // and the hole contests (longest drive message 10, closest to the pin 11). Without a penalty: holed
 // - the hole recorded, its payouts, the score message and the mode's pfn218; over the hole's stroke
-// limit - the ball is picked up (lie holed, bC2D, 10 strokes in a PGA TOUR event else 11, putts
-// 999), message 3, the mode's pfn218 and pfn21C; messages 0x11-0x13 when fn_8008AC40 (always 0) and
-// bEE0 allow, 0x13 giving the other of players 0 and 1 the hole; otherwise the yardage. A penalty
-// goes to the mode's pfn250. Last, the per-shot flags are carried over (GM_RecordBonusShotStats).
+// limit - the ball is picked up (lie holed, bShotLimitExceeded, 10 strokes in a PGA TOUR event else
+// 11, putts 999), message 3, the mode's pfn218 and pfn21C; messages 0x11-0x13 when fn_8008AC40
+// (always 0) and bEE0 allow, 0x13 giving the other of players 0 and 1 the hole; otherwise the
+// yardage. A penalty goes to the mode's pfnBallOOB. Last, the per-shot flags are carried over
+// (GM_RecordBonusShotStats).
 void GM_PlayerTookShot(int nPlayer) {
     u8   bOut;
     if (GM_CanPlayerTakeMulligan(nPlayer) && !(gPlayers[nPlayer].uFlags & 8)) {
@@ -549,7 +552,7 @@ void GM_PlayerTookShot(int nPlayer) {
         } else {
             if (GM_IsShotOverLimit(nPlayer, gPlayers[nPlayer].nStrokes[gpGame->nCurHole])) {
                 gPlayers[nPlayer].ball.nLie = LIE_INCUP_e;
-                gPlayers[nPlayer].bC2D = 1;
+                gPlayers[nPlayer].bShotLimitExceeded = 1;
                 if (GM_Currently_PgaTourMode()) {
                     gPlayers[nPlayer].nStrokes[gpGame->nCurHole] = 10;
                 } else {
@@ -581,7 +584,7 @@ void GM_PlayerTookShot(int nPlayer) {
             }
         }
     } else {
-        gpGame->pfn250(nPlayer);
+        gpGame->pfnBallOOB(nPlayer);
     }
     GM_RecordBonusShotStats(nPlayer);
 }
@@ -589,10 +592,11 @@ void GM_PlayerTookShot(int nPlayer) {
 // Takes a mulligan; 1 when taken. Refused when the mode has no mulligans, the golfer has conceded,
 // or the UI flag GUI_IsAwardUIAnimating reads is set; under the one-per-nine rule (2) a player who has used
 // theirs is refused, else it is marked used (bMulliganUsed). Then the crowd and commentary stop,
-// the ball and player go back to before the shot (REPLAY_Restore), the mulligan flags (bC2E, bC2F)
-// are set, the mode is told (pfn254), a playing replay stops, the camera and the golfer's animation
-// are reset, the golfer goes back to the Swing state with the HUD on, and the flag is taken out on
-// the view unless another player on that view (not cut) still lies off the green.
+// the ball and player go back to before the shot (REPLAY_Restore), the mulligan flags
+// (bUsedMulligan, bUsedMulliganThisHole) are set, the mode is told (pfnMulligan), a playing replay
+// stops, the camera and the golfer's animation are reset, the golfer goes back to the Swing state
+// with the HUD on, and the flag is taken out on the view unless another player on that view (not
+// cut) still lies off the green.
 u8 GM_PlayerTakeMulligan(int nPlayer) {
     int i;
     if (Game_GetMulliganRule() == 0) {
@@ -615,9 +619,9 @@ u8 GM_PlayerTakeMulligan(int nPlayer) {
     fn_800335F8(1);
     Gaud_StopComment();
     REPLAY_Restore(nPlayer);
-    gPlayers[nPlayer].bC2E = 1;
-    gPlayers[nPlayer].bC2F = 1;
-    gpGame->pfn254(nPlayer);
+    gPlayers[nPlayer].bUsedMulligan = 1;
+    gPlayers[nPlayer].bUsedMulliganThisHole = 1;
+    gpGame->pfnMulligan(nPlayer);
     if (gSession.bReplay) {
         REPLAY_Stop();
     }
@@ -825,8 +829,8 @@ void GM_Update(void) {
 }
 
 // Restarts the current hole, when the mode allows it (b279): all five players' records of the hole
-// cleared, the balls to the tee, the mode's pfn224, the flyover again when the mode has one (b27F),
-// the frame count in n12C, the HUD re-initialised, effects and cameras reset, each golfer's
+// cleared, the balls to the tee, the mode's pfnRestartHole, the flyover again when the mode has one
+// (b27F), the frame count in n12C, the HUD re-initialised, effects and cameras reset, each golfer's
 // animation and green morph reset, and message helper GameMsg_SetPending(2).
 void GM_RestartHole(void) {
     int i;
@@ -835,7 +839,7 @@ void GM_RestartHole(void) {
             GM_ClearPlayerHoleData(i, gpGame->nCurHole);
         }
         GM_InitBallsToTee();
-        gpGame->pfn224();
+        gpGame->pfnRestartHole();
         if (gpGame->b27F) {
             GM_FlyByMode_Init();
         }
@@ -866,7 +870,7 @@ void GM_ReplaceOOBBall(int nPlayer) {
     f32*  pPre;
     Ball* pBall;
     if ((gPlayers[nPlayer].b30E ||
-         (Ter_PointInOOBNetwork(gPlayers[nPlayer].ball.vPos) && !gPlayers[nPlayer].bLowIQPenalty)) &&
+         (Ter_PointInOOBNetwork(gPlayers[nPlayer].ball.vPos) && !gPlayers[nPlayer].bPenaltyShot)) &&
         Ter_SearchForDropLocation(nPlayer, 1, 1, v)) {
         Physics_DropBall(&gPlayers[nPlayer].ball, v);
         return;
@@ -967,9 +971,9 @@ void GM_MovePlayerToBall(int nPlayer) {
 // A human's buttons while setting up a shot. Outside the green morph: buttons 9, 10 and 30 fire
 // events 0xD-0xF and show the HUD (in modes 22 and 26 they end the check); then the zoom camera,
 // the elevator camera (modes without b28D) or, with b28D, the re-plan button 47 when the mode
-// allows it (pfn258: a fresh default target and shot), the next alternate swing camera, or the
-// mid-hole flyover (unless cameras are skipped). Held buttons 11-14 fire events 0x12-0x15; any of
-// that, or the target's momentum moving, updates the golfer's emotion.
+// allows it (pfnPickTarget: a fresh default target and shot), the next alternate swing camera, or
+// the mid-hole flyover (unless cameras are skipped). Held buttons 11-14 fire events 0x12-0x15; any
+// of that, or the target's momentum moving, updates the golfer's emotion.
 void GM_CheckForShotChanges(int nPlayer) {
     u8 bChanged = 0;
     if (Player_IsCPU(nPlayer)) {
@@ -999,7 +1003,7 @@ void GM_CheckForShotChanges(int nPlayer) {
         } else if (gpGame->b28D
                    && (Input_ReadControlPad(gPlayers[nPlayer].nController)
                        & Controller_GetButtonMask(0x2F, 0))) {
-            if (gpGame->pfn258(nPlayer)) {
+            if (gpGame->pfnPickTarget(nPlayer)) {
                 AI_DefaultTarget(nPlayer);
                 Shot_Prepare(nPlayer, 1);
                 BreakLine_Reset(gPlayers[nPlayer].nView[0]);
@@ -1111,11 +1115,11 @@ void GM_DoPostShotInHoleUI(int nPlayer) {
 
 // Whether the golfer takes the ball out of the cup with the special animation. Never with session
 // flags 0x4000 and 0x8000 both set, when GM_IsValidPostShotGameType says no, or for a ball picked
-// up at the stroke limit (bC2D). For outcome 2 the mode is asked first (pfn1FC, with the stroke
-// taken back); when it says no, only a solved tap-in (bPlanReady) goes on (yes, after fn_8006AAB4
-// records the shot again). Then yes with bPlanReady; no while animation 9 plays, beyond 5 (fA64) or
-// when the ball did not start on the green; a scripted answer in uFlags bit 1 (with bit 0);
-// otherwise one time in 10 two or more under par, else one in 4.
+// up at the stroke limit (bShotLimitExceeded). For outcome 2 the mode is asked first
+// (pfnIsPuttForWin, with the stroke taken back); when it says no, only a solved tap-in (bPlanReady)
+// goes on (yes, after fn_8006AAB4 records the shot again). Then yes with bPlanReady; no while
+// animation 9 plays, beyond 5 (fA64) or when the ball did not start on the green; a scripted answer
+// in uFlags bit 1 (with bit 0); otherwise one time in 10 two or more under par, else one in 4.
 int GM_ChooseRemoveBallState(int nPlayer) {
     if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) {
         return 0;
@@ -1123,12 +1127,12 @@ int GM_ChooseRemoveBallState(int nPlayer) {
     if (!GM_IsValidPostShotGameType()) {
         return 0;
     }
-    if (gPlayers[nPlayer].bC2D) {
+    if (gPlayers[nPlayer].bShotLimitExceeded) {
         return 0;
     }
     if (fn_8006AA9C(nPlayer) == 2) {
         gPlayers[nPlayer].nStrokes[gpGame->nCurHole]--;
-        if (!gpGame->pfn1FC(nPlayer)) {
+        if (!gpGame->pfnIsPuttForWin(nPlayer)) {
             gPlayers[nPlayer].nStrokes[gpGame->nCurHole]++;
             if (gPlayers[nPlayer].bPlanReady) {
                 fn_8006AAB4(nPlayer, 1);
@@ -1260,12 +1264,12 @@ void GM_SimulateBallMovement(int nPlayer) {
     }
 }
 
-// Every frame of a round (gomainloop): when the mode's pfn234 allows it (by default always; speed
-// golf only late in the countdown or while player 0's view is not fading) and player 0's view is
-// not fading, calls GUI_DetectControllerPull, an empty function beside the pause requests of
-// GameMessages.c: the controller-pulled check is stubbed out in this build.
+// Every frame of a round (gomainloop): when the mode's pfnCheckControllerPulled allows it (by
+// default always; speed golf only late in the countdown or while player 0's view is not fading) and
+// player 0's view is not fading, calls GUI_DetectControllerPull, an empty function beside the pause
+// requests of GameMessages.c: the controller-pulled check is stubbed out in this build.
 void GM_CheckControllerPulled(void) {
-    if (gpGame->pfn234()) {
+    if (gpGame->pfnCheckControllerPulled()) {
         if (!fn_80063C90(ViewController_GetCameraControl(gPlayers[0].nView[0]))) {
             GUI_DetectControllerPull();
         }

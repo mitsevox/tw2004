@@ -302,12 +302,12 @@ u8 GameModeFourBall_HoleFinished(int nPlayer, u8 bCheck) {
             P(i)->nModePoints[h] = 0;               \
             P(i)->n22C[h] = 0;                      \
             P(i)->n290[h] = 0;                      \
-            P(i)->b2F6[h] = 0;                      \
-            P(i)->b2E4[h] = 0;                      \
+            P(i)->bGreenInReg[h] = 0;                      \
+            P(i)->bFairwayHit[h] = 0;                      \
         }                                           \
         P(i)->n2D8 = 0;                             \
-        P(i)->n2DC = 0;                             \
-        P(i)->n2E0 = 0;                             \
+        P(i)->nLongestDrive = 0;                             \
+        P(i)->nLongestPutt = 0;                             \
         P(i)->n308 = 0;                             \
     }
 
@@ -318,12 +318,12 @@ u8 GameModeFourBall_GameFinished(u8 bCheck) {
     int nLeft;
     int h;
     int i;
-    if (gpGame->bD4) {
+    if (gpGame->bInPlayoff) {
         if (GameModeFourBall_TeamMatchWins(0) != GameModeFourBall_TeamMatchWins(1)) {
             return 1;
         }
         if (!bCheck) {
-            gpGame->nD8++;
+            gpGame->nPlayoffHoles++;
             GM_Pick_PlayOffHole();
             CLEAR_ROUNDS(PLAYER_AT);
             GUI_GolfersTiedUIMessage();
@@ -347,7 +347,7 @@ u8 GameModeFourBall_GameFinished(u8 bCheck) {
 }
 
 // After the last hole with the match tied: a playoff starts
-// (bD5 when the round played all 18 holes).
+// (bPlayoffFullRound when the round played all 18 holes).
 u8 GameModeFourBall_GoToPlayoff(u8 bCheck) {
     int h;
     int i;
@@ -360,16 +360,16 @@ u8 GameModeFourBall_GoToPlayoff(u8 bCheck) {
         if (bCheck) {
             return 1;
         }
-        gpGame->bD5 = 1;
+        gpGame->bPlayoffFullRound = 1;
         for (h = 0; h < 18; h++) {
             if (!gpGame->bHoleSelected[h]) {
-                gpGame->bD5 = 0;
+                gpGame->bPlayoffFullRound = 0;
             }
         }
         GM_Pick_PlayOffHole();
         CLEAR_ROUNDS(PLAYER);
-        gpGame->bD4 = 1;
-        gpGame->nD8++;
+        gpGame->bInPlayoff = 1;
+        gpGame->nPlayoffHoles++;
         GUI_GolfersTiedUIMessage();
         return 1;
     }

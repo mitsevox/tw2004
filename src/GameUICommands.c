@@ -724,7 +724,7 @@ void fn_8008628C(MsgArg* pArgs, MsgArg* pResult) {
     if (Game_GetMode() == 9) {
         GUI_SetEndOfGamePending();
     } else {
-        lbl_801D87C0.b0 = 1;
+        lbl_801D87C0.bFadeToBlack = 1;
     }
     if (Game_GetMode() == 23) {
         fn_80117DE8(0, 1);
@@ -737,7 +737,7 @@ void fn_8008628C(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_80086300(MsgArg* pArgs, MsgArg* pResult) {
     GUI_PauseMenuClosed();
-    if (lbl_801D87C0.b0 == 0) {
+    if (lbl_801D87C0.bFadeToBlack == 0) {
         Lessons_RestartLesson();
         return;
     }
@@ -1201,14 +1201,15 @@ void fn_800874F0(MsgArg* pArgs, MsgArg* pResult) {
     Lessons_StopWaiting();
 }
 
-// Call the mode's pfn25C with a player and a time (modes 6, 7, 8 and 13 store it for the hole).
+// Call the mode's pfnSetTimer with a player and a time (modes 6, 7, 8 and 13 store it for the
+// hole).
 void fn_80087510(MsgArg* pArgs, MsgArg* pResult) {
-    gpGame->pfn25C(pArgs[0].i, pArgs[1].i);
+    gpGame->pfnSetTimer(pArgs[0].i, pArgs[1].i);
 }
 
-// Whether gSession.a8[0] is set (with it, among other things, no GameBreaker starts).
+// Whether gSession.bDemo is set (with it, among other things, no GameBreaker starts).
 void fn_80087548(MsgArg* pArgs, MsgArg* pResult) {
-    if (gSession.a8[0] != 0) {
+    if (gSession.bDemo != 0) {
         pResult->i = 1;
         return;
     }
@@ -1240,7 +1241,7 @@ void fn_80087628(MsgArg* pArgs, MsgArg* pResult) {
 
 // The same question as fn_80087548, under a second command.
 void fn_80087658(MsgArg* pArgs, MsgArg* pResult) {
-    if (gSession.a8[0] != 0) {
+    if (gSession.bDemo != 0) {
         pResult->i = 1;
         return;
     }
@@ -1695,7 +1696,7 @@ void fn_800885A0(MsgArg* pArgs, MsgArg* pResult) {
 void fn_800885F8(MsgArg* pArgs, MsgArg* pResult) {
     Gaud_Pause(0);
     GUI_PauseMenuClosed();
-    if (lbl_801D87C0.b0 == 0) {
+    if (lbl_801D87C0.bFadeToBlack == 0) {
         Lessons_RestartLesson();
     }
 }
@@ -2290,7 +2291,7 @@ void fn_80089C4C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80089C84(MsgArg* pArgs, MsgArg* pResult) {
-    if (gpGame->bD4 != 0) {
+    if (gpGame->bInPlayoff != 0) {
         pResult->i = 1;
         return;
     }

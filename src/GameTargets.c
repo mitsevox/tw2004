@@ -81,8 +81,8 @@ void GameModeSkillZoneBase_SetCup_AlignGolfer(int nPlayer, s8 n) {
 }
 
 // Aims the player at the previous target (the last one after target 0) with SetCup; always returns
-// 1. Modes 13, 14 and 16 install it as gpGame->pfn264 (button 6 while setting up a shot); mode 15
-// calls it from its own.
+// 1. Modes 13, 14 and 16 install it as gpGame->pfnPickPrevTarget (button 6 while setting up a
+// shot); mode 15 calls it from its own.
 u8 GameModeSkillZoneBase_PickPrevTarget(int nPlayer) {
     if (gPlayers[nPlayer].nTarget == 0) {
         GameModeSkillZoneBase_SetCup(nPlayer, lbl_80282360 - 1);
@@ -93,8 +93,8 @@ u8 GameModeSkillZoneBase_PickPrevTarget(int nPlayer) {
 }
 
 // Aims the player at the next target (wrapping to 0 after the last) with SetCup; always returns 1.
-// Modes 13, 14 and 16 install it as gpGame->pfn258, so the re-plan button (47) picks the next
-// target; mode 15 calls it from its own.
+// Modes 13, 14 and 16 install it as gpGame->pfnPickTarget, so the re-plan button (47) picks the
+// next target; mode 15 calls it from its own.
 u8 GameModeSkillZoneBase_PickTarget(int nPlayer) {
     GameModeSkillZoneBase_SetCup(nPlayer, gPlayers[nPlayer].nTarget + 1);
     return 1;
@@ -424,8 +424,8 @@ u8 GameModeSkillZoneBase_IsLongDrive(int nPlayer, f32 fLength) {
     return 0;
 }
 
-// The index 0..4 of a bonus object the ball hit (the id the pfn268 hook gets, Ball.n140) on the
-// current hole: hole 0's objects 0xD7, 0xD5, 0xD4, 0xD6, 0xD8, hole 1's 0x3B..0x3F, hole 2's
+// The index 0..4 of a bonus object the ball hit (the id the pfnCollisionActor hook gets, Ball.n140)
+// on the current hole: hole 0's objects 0xD7, 0xD5, 0xD4, 0xD6, 0xD8, hole 1's 0x3B..0x3F, hole 2's
 // 24..28; 4 for anything else. Modes 13 and 16 raise their multiplier by the index plus 2.
 s32 GameModeSkillZoneBase_GetBonusIndex(s32 nId) {
     if (Game_GetCurHoleNum() == 0) {

@@ -460,9 +460,9 @@ s32 GM_Earnings_GetSkinsHoleValue(int nRating, int nHole) {
 }
 
 // After a shot that stayed in bounds (GM_PlayerTookShot); nothing in game mode 10 or with
-// mulligans. The mode's pfn244 is told first; then, for a human player with an active profile, the
-// shot records are checked (HighScoreRecords_GetEndOfShotRecord), with a message for each new best
-// (kind 2 or 4 in lbl_80200498, ids in lbl_80200510), and the shot goals
+// mulligans. The mode's pfnCheckShotAwards is told first; then, for a human player with an active
+// profile, the shot records are checked (HighScoreRecords_GetEndOfShotRecord), with a message for
+// each new best (kind 2 or 4 in lbl_80200498, ids in lbl_80200510), and the shot goals
 // (GM_Earnings_CheckShotGoals). What they found is paid from the copies GM_Earnings_CopyGoalResults
 // makes: each money prize with its message and breakdown, and each award (trophy ball) the player
 // now gets (GM_Earnings_AwardTrophyBall) with its message (kind 6 for the PGA TOUR awards 23..38,
@@ -475,7 +475,7 @@ void GM_Earnings_PayShotGoals(int nPlayer) {
 
     if (Game_GetMode() == 10) return;
     if (Game_GetMulliganRule() != 0) return;
-    gpGame->pfn244(nPlayer);
+    gpGame->pfnCheckShotAwards(nPlayer);
     nProfile = gPlayers[nPlayer].nIndex;
     if (gpSaveData[nProfile].bActive == 0) return;
     if (Player_IsCPU(nPlayer)) return;
@@ -525,7 +525,7 @@ u8 GM_Earnings_IsTourAward(int nId) {
 // checked (HighScoreRecords_GetEndOfHoleRecord), with a message for each new best (kind 2 or 4 in
 // lbl_80200470, ids in lbl_802004E8). Then two rounds of payouts, made as GM_Earnings_PayShotGoals
 // makes them: the putt goals' (GM_Earnings_CheckPuttGoals), then those of the hole goals checked
-// after each hole (GM_Earnings_CheckHoleGoals; none in a playoff, gpGame->bD4).
+// after each hole (GM_Earnings_CheckHoleGoals; none in a playoff, gpGame->bInPlayoff).
 void GM_Earnings_PayHoledGoals(int nPlayer) {
     int nProfile;
     int nKind;
@@ -563,7 +563,7 @@ void GM_Earnings_PayHoledGoals(int nPlayer) {
             gPlayers[nPlayer].money.n8 += gPayPuttAwardMoney[i];
         }
     }
-    if (!gpGame->bD4) {
+    if (!gpGame->bInPlayoff) {
         GM_Earnings_CheckHoleGoals(nPlayer, 0, 0);
     } else {
         gNumPrizes = 0;
@@ -919,7 +919,7 @@ void GM_Earnings_CheckPuttGoals(int nPlayer, u8 bPreview) {
         if (!bPreview && Earnings_TestBit(gEarningsTable.aPuttGoal[i].uFlags, 2)
             && !fn_800D0D54(nPlayer)) continue;
         if (Earnings_TestBit(gEarningsTable.aPuttGoal[i].uFlags, 4) &&
-            !gPlayers[nPlayer].b310 && !gPlayers[nPlayer].b311) continue;
+            !gPlayers[nPlayer].bBunkerThisHole && !gPlayers[nPlayer].b311) continue;
         if (!bPreview && Earnings_TestBit(gEarningsTable.aPuttGoal[i].uFlags, 5) &&
             !gPlayers[nPlayer].b30D) continue;
         if (gEarningsTable.aPuttGoal[i].nMaxPutts != 0 &&
@@ -2234,19 +2234,19 @@ int HighScoreRecords_CheckRecord(int nKind, int nValue, int bSave, const char* s
     return nResult;
 }
 
-// Clear the player's per-shot bonus flags (b30C..b30F), before each shot (the place-ball and
-// pre-shot states).
+// Clear the player's per-shot bonus flags (b30C..bBunkerThisShot), before each shot (the place-ball
+// and pre-shot states).
 void GM_ClearShotBonusStats(int nPlayer) {
     gPlayers[nPlayer].b30C = 0;
     gPlayers[nPlayer].b30D = 0;
-    gPlayers[nPlayer].b30F = 0;
+    gPlayers[nPlayer].bBunkerThisShot = 0;
     gPlayers[nPlayer].b30E = 0;
 }
 
-// Clear the flags GM_RecordBonusShotStats keeps over a hole (b310..b312), when a hole starts
-// (GM_InitForHole).
+// Clear the flags GM_RecordBonusShotStats keeps over a hole (bBunkerThisHole..b312), when a hole
+// starts (GM_InitForHole).
 void GM_ClearHoleBonusStats(int nPlayer) {
-    gPlayers[nPlayer].b310 = 0;
+    gPlayers[nPlayer].bBunkerThisHole = 0;
     gPlayers[nPlayer].b311 = 0;
     gPlayers[nPlayer].b312 = 0;
 }
@@ -2316,12 +2316,12 @@ u8 HighScoreRecords_CheckRecordGameSetting(int nKind) {
 
 // After a shot that stayed in bounds (GM_PlayerTookShot), when gpGame->b27B allows it and mulligans
 // are off: the shot's statistics. A drive (the first stroke of a par 4 or 5, off class-1 ground)
-// can be the round's longest (Player.n2DC) and the profile's (nA0), in yards, and is counted in the
-// profile (n88 drives, n8C their yards). The first stroke's length goes in nC24; b2E4 marks a
-// fairway hit (that first stroke on a par 4 or 5 finished on the fairway, the green or in the
-// hole), b2F6 a green in regulation (on the green or in the hole, not on class-3 ground, in par - 2
-// strokes or fewer). A holed putt (club 25) can be the round's and the profile's longest (n2E0,
-// nA4): 3 x Player.fA64, in feet.
+// can be the round's longest (Player.nLongestDrive) and the profile's (nA0), in yards, and is
+// counted in the profile (n88 drives, n8C their yards). The first stroke's length goes in nC24;
+// bFairwayHit marks a fairway hit (that first stroke on a par 4 or 5 finished on the fairway, the
+// green or in the hole), bGreenInReg a green in regulation (on the green or in the hole, not on
+// class-3 ground, in par - 2 strokes or fewer). A holed putt (club 25) can be the round's and the
+// profile's longest (nLongestPutt, nA4): 3 x Player.fA64, in feet.
 void GM_RecordIndividualShotStats(int nPlayer) {
     u32 nClass;
     Ball* pBall;
@@ -2348,8 +2348,8 @@ void GM_RecordIndividualShotStats(int nPlayer) {
     pSurface = Ter_GetSupportingWorldMaterial(pBall->pCourse, gPlayers[nPlayer].vBall);
     nProfile = gPlayers[nPlayer].nIndex;
     if ((nPar == 4 || nPar == 5) && nStrokes == 1 && nClass == 1) {
-        if (fDist > gPlayers[nPlayer].n2DC) {
-            gPlayers[nPlayer].n2DC = fDist;
+        if (fDist > gPlayers[nPlayer].nLongestDrive) {
+            gPlayers[nPlayer].nLongestDrive = fDist;
         }
         if (gpSaveData[nProfile].bActive && fDist > gpSaveData[nProfile].nA0) {
             gpSaveData[nProfile].nA0 = fDist;
@@ -2361,11 +2361,11 @@ void GM_RecordIndividualShotStats(int nPlayer) {
     }
     if ((nPar == 4 || nPar == 5) && nStrokes == 1 &&
         (nLie == LIE_FAIRWAY_e || nLie == LIE_GREEN_e || nLie == LIE_INCUP_e)) {
-        gPlayers[nPlayer].b2E4[Game_CurHoleIndex()] = 1;
+        gPlayers[nPlayer].bFairwayHit[Game_CurHoleIndex()] = 1;
     }
     if (pSurface != NULL && pSurface->nClass != 3 && (nLie == LIE_GREEN_e || nLie == LIE_INCUP_e) &&
         nStrokes <= nPar - 2) {
-        gPlayers[nPlayer].b2F6[Game_CurHoleIndex()] = 1;
+        gPlayers[nPlayer].bGreenInReg[Game_CurHoleIndex()] = 1;
     }
     if (gpSaveData[nProfile].bActive && (nPar == 4 || nPar == 5) && nStrokes == 1 && nClass == 1) {
         gpSaveData[nProfile].n88++;
@@ -2374,8 +2374,8 @@ void GM_RecordIndividualShotStats(int nPlayer) {
     }
     if (GM_CheckForBallInHole(nPlayer) && gPlayers[nPlayer].nClub == 25) {
         nPutt = 3.0f * gPlayers[nPlayer].fA64;
-        if (nPutt > gPlayers[nPlayer].n2E0) {
-            gPlayers[nPlayer].n2E0 = nPutt;
+        if (nPutt > gPlayers[nPlayer].nLongestPutt) {
+            gPlayers[nPlayer].nLongestPutt = nPutt;
         }
         if (gpSaveData[nProfile].bActive && nPutt > gpSaveData[nProfile].nA4) {
             gpSaveData[nProfile].nA4 = nPutt;
@@ -2384,9 +2384,9 @@ void GM_RecordIndividualShotStats(int nPlayer) {
 }
 
 // After every shot (GM_PlayerTookShot calls it last), unless mulligans are on: the shot's bonus
-// flags carry into the hole's. b30F sets b310; b30E sets b311 and bit 1 of n308; a ball on the
-// green or in the hole sets b312; bit 0 of n308 is set when that happened on the hole's first
-// stroke of a par 4 or more (the green driven).
+// flags carry into the hole's. bBunkerThisShot sets bBunkerThisHole; b30E sets b311 and bit 1 of
+// n308; a ball on the green or in the hole sets b312; bit 0 of n308 is set when that happened on
+// the hole's first stroke of a par 4 or more (the green driven).
 void GM_RecordBonusShotStats(int nPlayer) {
     int nLie;
     int nStrokes;
@@ -2394,8 +2394,8 @@ void GM_RecordBonusShotStats(int nPlayer) {
 
     if (Game_GetMulliganRule() == 0) {
         nLie = gPlayers[nPlayer].ball.nLie;
-        if (gPlayers[nPlayer].b30F) {
-            gPlayers[nPlayer].b310 = 1;
+        if (gPlayers[nPlayer].bBunkerThisShot) {
+            gPlayers[nPlayer].bBunkerThisHole = 1;
         }
         if (gPlayers[nPlayer].b30E) {
             gPlayers[nPlayer].b311 = 1;
@@ -2414,11 +2414,11 @@ void GM_RecordBonusShotStats(int nPlayer) {
 
 // The player's hole is over (holed, or picked up at the stroke limit; GM_PlayerTookShot): it is
 // marked in gpGame->b16C and, when gpGame->b27C allows it, no challenge runs and mulligans are off,
-// added to the profile's statistics: fairways (par 4 and 5 holes n90, hit n94: b2E4), greens in
-// regulation (n98, hit n9C: b2F6), putts (holes with fewer than 10: n80, their putts n84) and the
-// score against par (nAC hole in one, nB0 albatross, nB4 eagle, nB8 birdie, nBC par, nC0 bogey, nC4
-// worse). An eagle or better on a par 5 is marked, with the date, in the profile's par-5 table
-// (a5004, a504C). The profile is flagged as changed (b70).
+// added to the profile's statistics: fairways (par 4 and 5 holes n90, hit n94: bFairwayHit), greens
+// in regulation (n98, hit n9C: bGreenInReg), putts (holes with fewer than 10: n80, their putts n84)
+// and the score against par (nAC hole in one, nB0 albatross, nB4 eagle, nB8 birdie, nBC par, nC0
+// bogey, nC4 worse). An eagle or better on a par 5 is marked, with the date, in the profile's par-5
+// table (a5004, a504C). The profile is flagged as changed (b70).
 void GM_RecordIndividualHoleStats(int nPlayer) {
     int nProfile;
     int nPar;
@@ -2458,14 +2458,14 @@ void GM_RecordIndividualHoleStats(int nPlayer) {
                 return;
             }
             if (nPar == 4 || nPar == 5) {
-                if (gPlayers[nPlayer].b2E4[Game_CurHoleIndex()]) {
+                if (gPlayers[nPlayer].bFairwayHit[Game_CurHoleIndex()]) {
                     gpSaveData[nProfile].n90++;
                     gpSaveData[nProfile].n94++;
                 } else {
                     gpSaveData[nProfile].n90++;
                 }
             }
-            if (gPlayers[nPlayer].b2F6[Game_CurHoleIndex()]) {
+            if (gPlayers[nPlayer].bGreenInReg[Game_CurHoleIndex()]) {
                 gpSaveData[nProfile].n98++;
                 gpSaveData[nProfile].n9C++;
             } else {

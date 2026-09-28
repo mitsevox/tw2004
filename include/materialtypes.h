@@ -35,8 +35,8 @@ typedef struct SurfaceType {
     u32  nSoundId;              // 0x30  TW06: soundID; nothing here reads it yet
     u32  u34;                   // 0x34  TW06: flags. Bit 0x1: a ball may lie or be dropped here (without
                                 //       it GameManager takes the ball out); 0x2: taking it out sets the
-                                //       player's bLowIQPenalty; 0x10: event 0x25 on landing; 0x80 is read
-                                //       by GoTerrainCollision
+                                //       player's bPenaltyShot; 0x10: event 0x25 on landing; 0x80 is
+                                //       read by GoTerrainCollision
     u32  nCollisionEffectId;    // 0x38  TW06: uiCollisionEffectID
     u32  nSwingSoundId;         // 0x3C  TW06: uiSwingSoundID
     u32  nSwingEffectId;        // 0x40  TW06: uiSwingEffectID

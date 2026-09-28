@@ -35,11 +35,11 @@ void Session_Init(void) {
 
     pSession->uFlags      = 0;
     pSession->nGameType   = 0;
-    pSession->a8[0]     = 0;
+    pSession->bDemo     = 0;
     pSession->nC          = 0;
     pSession->nSplitScreen = 0;
     pSession->b11         = 0;
-    pSession->b12         = 0;
+    pSession->bEndLoop    = 0;
     pSession->bReplay     = 0;
     pSession->nPaused   = 0;
     pSession->uFlags     &= ~0x40;

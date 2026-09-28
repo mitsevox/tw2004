@@ -511,7 +511,7 @@ void fn_80046FDC(s32 nView) {
 
     for (i = 0; i < fn_800F1960(); i++) {
         fn_800F196C(i, vPos);
-        nKind = gpGame->pfn26C(ViewController_GetActivePlayerNumber(nView), i);
+        nKind = gpGame->pfnGreenType(ViewController_GetActivePlayerNumber(nView), i);
         if (lbl_80281DA0->apTeo10006[nKind] != NULL) {
             fn_80048584(lbl_80281DA0->apTeo10006[nKind], 0);
             LLMath_IdentifyMat(lbl_80281DA0->apTeo10006[nKind]->m80);
@@ -532,7 +532,7 @@ void fn_800470B0(s32 nView) {
     RenderState_Flush();
     for (i = 0; i < fn_800F1960(); i++) {
         fn_800F196C(i, vPos);
-        switch (gpGame->pfn26C(ViewController_GetActivePlayerNumber(nView), i)) {
+        switch (gpGame->pfnGreenType(ViewController_GetActivePlayerNumber(nView), i)) {
         case 0:
             nModel = 0;
             break;

@@ -54,13 +54,13 @@ void HoleContest_NewRound(void) {
 }
 
 // Whether this round has hole contests: no mulligans, more than one player, a full round of golf,
-// gSession.a8[0] clear, no Play Now challenge running (PlayNow_IsChallengeRunning) or calendar flag
+// gSession.bDemo clear, no Play Now challenge running (PlayNow_IsChallengeRunning) or calendar flag
 // (PlayNow_GetCalendarFlag), and game mode 0 (stroke play), 1 (match play) or 2 (skins).
 u8 HoleContest_RoundHasContests(void) {
     if (gpGame->nMulligans != 0) return 0;
     if (gSession.nNumPlayers == 1) return 0;
     if (!GM_FullRoundOfGolf()) return 0;
-    if (gSession.a8[0] != 0) return 0;
+    if (gSession.bDemo != 0) return 0;
     if (PlayNow_IsChallengeRunning()) return 0;
     if (PlayNow_GetCalendarFlag()) return 0;
     if (Game_GetMode() == 0 || Game_GetMode() == 1 || Game_GetMode() == 2) {
@@ -128,20 +128,20 @@ void HoleContest_DrawHoles(void) {
 }
 
 // Whether the current hole is the longest-drive hole. While the calendar flag is set
-// (PlayNow_GetCalendarFlag) the 18th hole (index 17) always is, outside a playoff (gpGame->bD4
-// clear).
+// (PlayNow_GetCalendarFlag) the 18th hole (index 17) always is, outside a playoff
+// (gpGame->bInPlayoff clear).
 u8 HoleContest_IsLongestDriveHole(void) {
-    if (PlayNow_GetCalendarFlag() && Game_CurHoleIndex() == 17 && gpGame->bD4 == 0) {
+    if (PlayNow_GetCalendarFlag() && Game_CurHoleIndex() == 17 && gpGame->bInPlayoff == 0) {
         return 1;
     }
     return gHoleContestLongestDriveHole == Game_CurHoleIndex();
 }
 
 // Whether the current hole is the closest-to-the-pin hole. While the calendar flag is set
-// (PlayNow_GetCalendarFlag) the 17th hole (index 16) always is, outside a playoff (gpGame->bD4
-// clear).
+// (PlayNow_GetCalendarFlag) the 17th hole (index 16) always is, outside a playoff
+// (gpGame->bInPlayoff clear).
 u8 HoleContest_IsClosestToPinHole(void) {
-    if (PlayNow_GetCalendarFlag() && Game_CurHoleIndex() == 16 && gpGame->bD4 == 0) {
+    if (PlayNow_GetCalendarFlag() && Game_CurHoleIndex() == 16 && gpGame->bInPlayoff == 0) {
         return 1;
     }
     return gHoleContestClosestToPinHole == Game_CurHoleIndex();
@@ -220,25 +220,25 @@ void HoleContest_PlayerTookShot(int nPlayer) {
 
     if (HoleContest_IsLongestDriveHole()) {
         if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == 1 && fn_800D0D54(nPlayer) &&
-            gPlayers[nPlayer].bC2F == 0) {
+            gPlayers[nPlayer].bUsedMulliganThisHole == 0) {
             gHoleContestPlayerResult[nPlayer] = fn_800D0550(nPlayer);
         }
         HoleContest_RankResults();
     }
     if (HoleContest_IsClosestToPinHole()) {
         if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == 1 && gPlayers[nPlayer].ball.nLie == 9 &&
-            gPlayers[nPlayer].bC2F == 0) {
+            gPlayers[nPlayer].bUsedMulliganThisHole == 0) {
             gHoleContestPlayerResult[nPlayer] = 3.0f * fn_800D0478(nPlayer);
         }
         if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == 1 &&
-            gPlayers[nPlayer].ball.nLie == LIE_INCUP_e && gPlayers[nPlayer].bC2F == 0) {
+            gPlayers[nPlayer].ball.nLie == LIE_INCUP_e && gPlayers[nPlayer].bUsedMulliganThisHole == 0) {
             gHoleContestPlayerResult[nPlayer] = 0.0f;
         }
         HoleContest_RankResults();
     }
     if (HoleContest_IsHoleInOneHole()) {
         if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == 1 && GM_CheckForBallInHole(nPlayer) &&
-            gPlayers[nPlayer].bC2F == 0) {
+            gPlayers[nPlayer].bUsedMulliganThisHole == 0) {
             gHoleContestWon = 1;
             gHoleContestEverWon = 1;
             Mem_set(&money, 0, sizeof(money));

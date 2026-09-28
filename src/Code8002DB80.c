@@ -336,10 +336,10 @@ void Player_SetGolfer(int nPlayer, int nGolfer, int nController, u32 uBag, int b
         }
     }
     p->swing.unk630 = 0;
-    p->bLowIQPenalty = 0;
-    p->nLevel       = 0;
+    p->bPenaltyShot = 0;
+    p->nOBCount     = 0;
     p->fC20         = 0.0f;
-    p->bC2D         = 0;
+    p->bShotLimitExceeded = 0;
     p->bPlanReady       = 0;
     p->bRehearsalDone       = 0;
     p->uFlags       = 0;
@@ -549,7 +549,7 @@ void Options_SetDefaults(GameOptions* pOpt) {
     pOpt->a7[2]    = 1;
     pOpt->bGimmes  = 1;
     pOpt->bSkipCameras = 0;
-    pOpt->nC       = 2;
+    pOpt->nWeather = 2;
     pOpt->nWind    = 0;
     pOpt->n14      = 0;
     pOpt->n18      = 1;
@@ -570,7 +570,7 @@ void Options_SetDefaults(GameOptions* pOpt) {
     pOpt->abRowOn[1] = 0;
     pOpt->abRowOn[2] = 1;
     pOpt->abRowOn[3] = 0;
-    pOpt->b84 = 0;
+    pOpt->bPuttingGrid = 0;
     fn_8002EBA4((u8*)pOpt, 1);
     if (gSession.uFlags & 0x4000) {
         for (i = 0; i < 4; i++) {

@@ -603,16 +603,21 @@ typedef struct CharSkinSet {
     CharSkinRef* a9C[6];        // 0x9C  freed with CharSkinRef_Free (Character_FreeClubSkinSets)
 } CharSkinSet;
 
-// A pool of seven entries characters take (CharacterTex_TakePoolEntries) and give back (CharacterTex_ReleasePoolEntries).
+// The characters' dynamic texture pool (gCharDynTexPool): entries characters take
+// (CharacterTex_TakePoolEntries) and give back (CharacterTex_ReleasePoolEntries), and the
+// character whose textures are being loaded.
 typedef struct CharPoolEntry {
-    void* p;                    // 0x0
-    u8    bUsed;                // 0x4
+    void* pDynTex;              // 0x0  a dynamic texture (DynTex, LLDynTex.c)
+    u8    bUsed;                // 0x4  taken by a character
     u8    pad5[3];
 } CharPoolEntry;
 
 typedef struct CharPool {
-    CharPoolEntry a[7];         // 0x00
-    s32   nEntries;             // 0x38
+    CharPoolEntry a[6];         // 0x00  the first nEntries are made (CharacterTex_Init)
+    Character* pLoadingChar;    // 0x30  the character queued for a texture load, NULL when none
+                                //       (Character_AddTextureLoadRequest; cleared at its end)
+    u8    pad34[4];
+    s32   nEntries;             // 0x38  entries of a in use (2)
 } CharPool;
 LAYOUT_ASSERT(CharPool, 0x3C);
 

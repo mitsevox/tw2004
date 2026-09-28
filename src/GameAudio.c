@@ -398,7 +398,7 @@ void UpdateCrowdBuildup(void) {
 // music volume (curve 15, option a0[1]) and the SFX level first. In the front end (game types 3 and
 // 10) the music is sound 2 on the options' row 0; in play, sound 6 on the game mode's row (1 to 3),
 // and only with two players at most and outside replays. The music plays when its volume is above 0
-// and its row is on (the row is not asked when gSession.a8[0] is set without flag 0x4000). When
+// and its row is on (the row is not asked when gSession.bDemo is set without flag 0x4000). When
 // in-game music does not play, the course ambience (sound 8, placed at (0, 0, 12)) streams instead
 // if gpGame->b288 and the SFX volume is above 0; UpdateStreaming starts it.
 void Gaud_SetStreamingContext(void) {
@@ -416,7 +416,7 @@ void Gaud_SetStreamingContext(void) {
     nMode = Game_GetMode();
     fVolume = 0.2f * (s8)gSession.options.a0[1];
     bFixed = gSession.nGameType == 3 || gSession.nGameType == 10;
-    bNoBreaker = !bFixed && gSession.a8[0];
+    bNoBreaker = !bFixed && gSession.bDemo;
     nState = 0;
     bOn = fVolume > 0.0f;
     Aud_SetSubmixAttn(15, fVolume * lbl_8018E988[15]);

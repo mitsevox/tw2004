@@ -34,7 +34,7 @@ void GameModeBattle_Init(void) {
     gpGame->pfnGoToPlayoff = GameModeMatch_GoToPlayoff;
     gpGame->pfnEndHole = GameModeBattle_EndHole;
     gpGame->pfnEndGame = GameModeBattle_EndGame;
-    gpGame->pfn1F0 = fn_800E7A9C;
+    gpGame->pfnStartGamePostData = fn_800E7A9C;
     gpGame->bAIConcedes = 1;
     gpGame->n4 = 1;
     gpGame->nMulligans = 0;

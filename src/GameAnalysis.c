@@ -130,24 +130,24 @@ int GameAnalysis_CountBogeysOrWorse(int nPlayer, int nRel) {
 }
 
 // The round's holes before the current one where the player hit the green in regulation
-// (Player.b2F6).
+// (Player.bGreenInReg).
 int GameAnalysis_CountTotalGIRsSoFarThisRound(int nPlayer) {
     int n = 0;
     int h;
     for (h = Game_CurHoleIndex() - 1; h >= 0; h--) {
-        if (gpGame->bHoleSelected[h] && gPlayers[nPlayer].b2F6[h]) {
+        if (gpGame->bHoleSelected[h] && gPlayers[nPlayer].bGreenInReg[h]) {
             n++;
         }
     }
     return n;
 }
 
-// The round's holes before the current one where the player hit the fairway (Player.b2E4).
+// The round's holes before the current one where the player hit the fairway (Player.bFairwayHit).
 int GameAnalysis_CountTotalFairwaysSoFarThisRound(int nPlayer) {
     int n = 0;
     int h;
     for (h = Game_CurHoleIndex() - 1; h >= 0; h--) {
-        if (gpGame->bHoleSelected[h] && gPlayers[nPlayer].b2E4[h]) {
+        if (gpGame->bHoleSelected[h] && gPlayers[nPlayer].bFairwayHit[h]) {
             n++;
         }
     }
@@ -181,10 +181,10 @@ int GameAnalysis_CountHolesWithPuttsSoFarThisRound(int nPlayer) {
 }
 
 // A player's statistic for tip nStat over the round's holes before the current one: 0 the longest
-// drive (Player.n2DC), 1 fairways hit as a percentage of the holes played (par 3s count in the
-// total), 2 greens in regulation as a percentage, 3 putts on greens hit in regulation, 4 putts per
-// hole, 5 the longest putt (Player.n2E0), 6 pars, 7 birdies, 8 eagles, 9 albatrosses, 10 bogeys, 11
-// double bogeys or worse; 0 for any other tip (12, 13).
+// drive (Player.nLongestDrive), 1 fairways hit as a percentage of the holes played (par 3s count in
+// the total), 2 greens in regulation as a percentage, 3 putts on greens hit in regulation, 4 putts
+// per hole, 5 the longest putt (Player.nLongestPutt), 6 pars, 7 birdies, 8 eagles, 9 albatrosses,
+// 10 bogeys, 11 double bogeys or worse; 0 for any other tip (12, 13).
 f32 GameAnalysis_GetTipStat(int nPlayer, u32 nStat) {
     f32 f = 0.0f;
     int nHoles = GameAnalysis_CountCompletedHoles();
@@ -193,7 +193,7 @@ f32 GameAnalysis_GetTipStat(int nPlayer, u32 nStat) {
     int h;
     switch (nStat) {
     case 0:
-        f = gPlayers[nPlayer].n2DC;
+        f = gPlayers[nPlayer].nLongestDrive;
         break;
     case 1:
         if (nHoles != 0) {
@@ -208,7 +208,8 @@ f32 GameAnalysis_GetTipStat(int nPlayer, u32 nStat) {
     case 3:
         n = 0;
         for (h = Game_CurHoleIndex() - 1; h >= 0; h--) {
-            if (gpGame->bHoleSelected[h] && gPlayers[nPlayer].b2F6[h] && gPlayers[nPlayer].nPutts[h] < 10) {
+            if (gpGame->bHoleSelected[h] && gPlayers[nPlayer].bGreenInReg[h] && gPlayers[nPlayer].nPutts[h]
+                < 10) {
                 n += gPlayers[nPlayer].nPutts[h];
             }
         }
@@ -220,7 +221,7 @@ f32 GameAnalysis_GetTipStat(int nPlayer, u32 nStat) {
         }
         break;
     case 5:
-        f = gPlayers[nPlayer].n2E0;
+        f = gPlayers[nPlayer].nLongestPutt;
         break;
     case 6:
         f = GameAnalysis_CountTotalHoleScores(nPlayer, 0);

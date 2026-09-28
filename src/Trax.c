@@ -83,7 +83,7 @@ void fn_800BA1A4(void) {
     TexBank* pBank;
     TexEntry* pTex;
 
-    if (lbl_801D87C0.b0 || (gSession.uFlags & 0x4000)) {
+    if (lbl_801D87C0.bFadeToBlack || (gSession.uFlags & 0x4000)) {
         return;
     }
     if (lbl_801F8458.bShow && lbl_801F8458.nFrames < 240) {

@@ -146,7 +146,7 @@ void  SpeedGolf_StartComment(s32 nLine, s32 a);
 void SpeedGolf_Init(void) {
     gpGame->pfnInit = SpeedGolf_Init;
     gpGame->pfnShutdown = SpeedGolf_Shutdown;
-    gpGame->pfn1EC = SpeedGolf_StartGamePreData;
+    gpGame->pfnStartGamePreData = SpeedGolf_StartGamePreData;
     gpGame->pfnSetupNextGolfer = SpeedGolf_SetupNextGolfer;
     gpGame->pfnGetHonors = SpeedGolf_GetHonors;
     gpGame->pfnHoleFinished = SpeedGolf_HoleFinished;
@@ -154,11 +154,11 @@ void SpeedGolf_Init(void) {
     gpGame->pfnGoToPlayoff = SpeedGolf_GoToPlayoff;
     gpGame->pfnEndHole = SpeedGolf_EndHole;
     gpGame->pfnEndGame = SpeedGolf_EndGame;
-    gpGame->pfn1E4 = SpeedGolf_LoadHole;
+    gpGame->pfnLoadHole = SpeedGolf_LoadHole;
     gpGame->pfn220 = SpeedGolf_Update;
     gpGame->pfn230 = SpeedGolf_RenderBallTarget;
-    gpGame->pfn234 = SpeedGolf_CheckControllerPulled;
-    gpGame->pfn25C = SpeedGolf_SetHoleTime;
+    gpGame->pfnCheckControllerPulled = SpeedGolf_CheckControllerPulled;
+    gpGame->pfnSetTimer = SpeedGolf_SetHoleTime;
     gpGame->b271 = 0;
     gpGame->bStrokeLimit = 0;
     gpGame->b273 = 0;
@@ -169,7 +169,7 @@ void SpeedGolf_Init(void) {
     gpGame->b280 = 0;
     gpGame->b281 = 0;
     gpGame->b283 = 0;
-    gpGame->b285 = 0;
+    gpGame->bAllowGameBreakers = 0;
     gpGame->b286 = 0;
     gpGame->b288 = 0;
     gpGame->n290 = 0;
@@ -200,10 +200,10 @@ void SpeedGolf_Shutdown(void) {
     sGolferStateEngineTable[26].pfnExit = NULL;
 }
 
-// Speed golf's golfer states go in as a round starts (mode 6's pfn1EC; modes 7 and 8 through
-// GameMode7.c's SpeedGolf_StartGamePreData): states 12 and 24 the shot and the run to the ball
-// (SpeedGolf_Run*), 25 the countdown before a hole (SpeedGolf_Countdown*), 26 the end of the player's hole
-// (SpeedGolf_HoleOver*). SpeedGolf_Shutdown puts the normal ones back.
+// Speed golf's golfer states go in as a round starts (mode 6's pfnStartGamePreData; modes 7 and 8
+// through GameMode7.c's SpeedGolf_StartGamePreData): states 12 and 24 the shot and the run to the
+// ball (SpeedGolf_Run*), 25 the countdown before a hole (SpeedGolf_Countdown*), 26 the end of the
+// player's hole (SpeedGolf_HoleOver*). SpeedGolf_Shutdown puts the normal ones back.
 void SpeedGolf_SetGolferStates(void) {
     sGolferStateEngineTable[12].pfnEnter = SpeedGolf_RunInit;
     sGolferStateEngineTable[12].pfnUpdate = SpeedGolf_RunUpdate;
@@ -271,14 +271,14 @@ void SpeedGolfMatch_EndHole(void) {
     }
 }
 
-// Mode 6's pfnGameFinished (bCheck 1 only asks). In a playoff (gpGame->bD4): over when the holes
-// won differ, else (bCheck 0) the next playoff hole is picked. Otherwise over when a player leads
-// by more than the selected holes left; with none left, over unless the players are level
+// Mode 6's pfnGameFinished (bCheck 1 only asks). In a playoff (gpGame->bInPlayoff): over when the
+// holes won differ, else (bCheck 0) the next playoff hole is picked. Otherwise over when a player
+// leads by more than the selected holes left; with none left, over unless the players are level
 // (SpeedGolfMatch_GoToPlayoff, which starts the playoff when bCheck is 0).
 u8 SpeedGolfMatch_GameFinished(u8 bCheck) {
     int nLeft;
     int h;
-    if (gpGame->bD4) {
+    if (gpGame->bInPlayoff) {
         if (gPlayers[0].nHolesWon != gPlayers[1].nHolesWon) {
             return 1;
         }
@@ -339,9 +339,10 @@ void SpeedGolfMatch_EndGame(void) {
 }
 
 // Mode 6's pfnGoToPlayoff (also from SpeedGolfMatch_GameFinished): 1 when no selected hole is left
-// and the holes won are level, else 0. Unless bCheck only asks, the playoff starts: bD5 set when
-// all 18 holes are selected, a playoff hole picked (GM_Pick_PlayOffHole), every player's strokes
-// and nModePoints cleared, bD4 (in a playoff) set and the tied message shown.
+// and the holes won are level, else 0. Unless bCheck only asks, the playoff starts:
+// bPlayoffFullRound set when all 18 holes are selected, a playoff hole picked
+// (GM_Pick_PlayOffHole), every player's strokes and nModePoints cleared, bInPlayoff (in a playoff)
+// set and the tied message shown.
 u8 SpeedGolfMatch_GoToPlayoff(u8 bCheck) {
     int h;
     int i;
@@ -354,10 +355,10 @@ u8 SpeedGolfMatch_GoToPlayoff(u8 bCheck) {
         if (bCheck) {
             return 1;
         }
-        gpGame->bD5 = 1;
+        gpGame->bPlayoffFullRound = 1;
         for (h = 0; h < 18; h++) {
             if (!gpGame->bHoleSelected[h]) {
-                gpGame->bD5 = 0;
+                gpGame->bPlayoffFullRound = 0;
             }
         }
         GM_Pick_PlayOffHole();
@@ -367,7 +368,7 @@ u8 SpeedGolfMatch_GoToPlayoff(u8 bCheck) {
                 PLAYER(i)->nModePoints[h] = 0;
             }
         }
-        gpGame->bD4 = 1;
+        gpGame->bInPlayoff = 1;
         GUI_GolfersTiedUIMessage();
         return 1;
     }
@@ -514,9 +515,9 @@ void SpeedGolf_ResetRunDelay(int nPlayer) {
     gPlayers[nPlayer].nC38 = 59;
 }
 
-// A hole starts (through GameMode7.c's SpeedGolf_LoadHole, the pfn1E4 of modes 6, 7 and 8): every player's
-// speed golf flags (nC3C) and event flags (uC48) are cleared, the golfer is turned to the target
-// (animation 1, emotion updated) and goes to state 25, the countdown.
+// A hole starts (through GameMode7.c's SpeedGolf_LoadHole, the pfnLoadHole of modes 6, 7 and 8):
+// every player's speed golf flags (nC3C) and event flags (uC48) are cleared, the golfer is turned
+// to the target (animation 1, emotion updated) and goes to state 25, the countdown.
 void SpeedGolf_StartHole(void) {
     int i;
     for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -1221,7 +1222,7 @@ void SpeedGolf_RunUpdate(int nPlayer) {
                 if (gPlayers[nPlayer].ball.nLie == LIE_GREEN_e) {
                     if (Game_GetMode() == 7) {
                         fDist = SpeedGolf_GroundDistance(p->vPreShot, pBall->vPos);
-                        if (SpeedGolf_GroundDistance(pBall->vPos, gpGame->p130) <= lbl_80284708[0] && fDist
+                        if (SpeedGolf_GroundDistance(pBall->vPos, gpGame->pPinPos) <= lbl_80284708[0] && fDist
                             >= 20.0f) {
                             SpeedGolf_TradeEventPoints(nPlayer, 0x14);
                         }
@@ -1231,7 +1232,7 @@ void SpeedGolf_RunUpdate(int nPlayer) {
                             if (!(gPlayers[nOther].nC3C & 0x40)) {
                                 SpeedGolf_TradeEventPoints(nPlayer, 3);
                             }
-                            SpeedGolf_Vec4Sub(p->ball.vPos, gpGame->p130, v);
+                            SpeedGolf_Vec4Sub(p->ball.vPos, gpGame->pPinPos, v);
                             p->fC68 = Math_Sqrt(v[0] * v[0] + v[2] * v[2]);
                             nDiff = nPar - 2 - gPlayers[nPlayer].nC64;
                             if (nDiff == 0) {
@@ -1257,7 +1258,7 @@ void SpeedGolf_RunUpdate(int nPlayer) {
                                 SpeedGolf_TradeEventPoints(nPlayer, 0x16);
                             }
                             if ((gPlayers[nOther].uC48 & 0x600000) && nDiff >= 0) {
-                                SpeedGolf_Vec4Sub(p->ball.vPos, gpGame->p130, v);
+                                SpeedGolf_Vec4Sub(p->ball.vPos, gpGame->pPinPos, v);
                                 fDist = Math_Sqrt(v[0] * v[0] + v[2] * v[2]);
                                 if (gPlayers[nPlayer].uC48 & 0x0C000080) {
                                     if (fDist < gPlayers[nPlayer].fC68) {
@@ -1745,7 +1746,7 @@ s32 SpeedGolfPoints_GetNamesAndPoints(char* szName1, s32* pPoints1, char* szName
     return bWon ? 1 : -1;
 }
 
-// The pfn25C of modes 6, 7 and 8 (a UI command passes the hole's time in frames): the current
+// The pfnSetTimer of modes 6, 7 and 8 (a UI command passes the hole's time in frames): the current
 // hole's seconds (nFrames / 60) go into n290, and seconds plus 3 a stroke into nC6C.
 void SpeedGolf_SetHoleTime(int nPlayer, int nFrames) {
     int n = nFrames / 60;
@@ -1887,7 +1888,7 @@ u8 SpeedGolf_RenderBallTarget(int nPlayer) {
     return 0;
 }
 
-// The pfn234 of modes 6, 7 and 8, which GM_CheckControllerPulled asks (TW06's
+// The pfnCheckControllerPulled of modes 6, 7 and 8, which GM_CheckControllerPulled asks (TW06's
 // CheckControllerPulled): 1 during the countdown (nC3C bit 1) once under 71 frames are left, and
 // otherwise unless player 0's view is in a colour fade (fn_80063C90).
 u8 SpeedGolf_CheckControllerPulled(void) {

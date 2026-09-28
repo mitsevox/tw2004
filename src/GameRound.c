@@ -110,8 +110,8 @@ void GM_Vec3Sub(f32* pA, f32* pB, f32* pOut) {
 void GM_SetModeType(int nMode) {
     int i;
     gpGame->nMode = nMode;
-    gpGame->bD4 = 0;
-    gpGame->nD8 = 0;
+    gpGame->bInPlayoff = 0;
+    gpGame->nPlayoffHoles = 0;
     gpGame->b136 = 0;
     gpGame->b137 = 0;
     gpGame->b138 = 0;
@@ -139,7 +139,7 @@ void GM_SetModeType(int nMode) {
     gpGame->b282 = 1;
     gpGame->b283 = 1;
     gpGame->b284 = 1;
-    gpGame->b285 = 1;
+    gpGame->bAllowGameBreakers = 1;
     gpGame->b286 = 1;
     gpGame->b287 = 1;
     gpGame->b288 = 1;
@@ -158,40 +158,40 @@ void GM_SetModeType(int nMode) {
     gpGame->pfnHoleFinished = GM_DefaultHoleFinished;
     gpGame->pfnGameFinished = GM_DefaultGameFinished;
     gpGame->pfnGoToPlayoff = GM_DefaultGoToPlayoff;
-    gpGame->pfn1E4 = GM_DefaultNoOp;
+    gpGame->pfnLoadHole = GM_DefaultNoOp;
     gpGame->pfnEndHole = GM_DefaultNoOp;
-    gpGame->pfn1EC = GM_DefaultNoOp;
-    gpGame->pfn1F0 = GM_DefaultNoOp;
+    gpGame->pfnStartGamePreData = GM_DefaultNoOp;
+    gpGame->pfnStartGamePostData = GM_DefaultNoOp;
     gpGame->pfnEndGame = GM_DefaultNoOp;
-    gpGame->pfn1F8 = fn_800CF158;
-    gpGame->pfn1FC = fn_800CF450;
+    gpGame->pfnIsPuttForLead = fn_800CF158;
+    gpGame->pfnIsPuttForWin = fn_800CF450;
     gpGame->pfn200 = fn_800CFE74;
     gpGame->pfn204 = fn_800D0098;
-    gpGame->pfn208 = fn_800D030C;
+    gpGame->pfnGetPotentialHoleResult = fn_800D030C;
     gpGame->pfn210 = GM_DefaultNoOpPlayer;
     gpGame->pfn214 = GM_DefaultNoOp;
     gpGame->pfn218 = GM_DefaultNoOpPlayer;
     gpGame->pfn21C = GM_DefaultNoOpPlayer;
     gpGame->pfn220 = GM_DefaultNoOp;
-    gpGame->pfn224 = GM_DefaultNoOp;
+    gpGame->pfnRestartHole = GM_DefaultNoOp;
     gpGame->pfn228 = GM_DefaultNoOpPlayer;
     gpGame->pfn22C = GM_DefaultNoOpPlayer;
     gpGame->pfn230 = GM_DefaultFalsePlayer;
-    gpGame->pfn234 = GM_DefaultTrue;
+    gpGame->pfnCheckControllerPulled = GM_DefaultTrue;
     gpGame->pfn238 = GM_DefaultTruePlayer;
-    gpGame->pfn23C = GM_DefaultNoOpPlayer;
-    gpGame->pfn240 = GM_DefaultZeroPlayer;
-    gpGame->pfn244 = GM_DefaultNoOpPlayer;
+    gpGame->pfnBallCollision = GM_DefaultNoOpPlayer;
+    gpGame->pfnTriggerSplash = GM_DefaultZeroPlayer;
+    gpGame->pfnCheckShotAwards = GM_DefaultNoOpPlayer;
     gpGame->pfnEndGolferTurn = GM_DefaultNoOpPlayer;
     gpGame->pfn24C = GM_DefaultNoOpPlayer;
-    gpGame->pfn250 = GM_DefaultNoOpPlayer;
-    gpGame->pfn254 = GM_DefaultNoOpPlayer;
-    gpGame->pfn258 = GM_DefaultFalsePlayer;
-    gpGame->pfn25C = GM_DefaultSetTimeLeft;
+    gpGame->pfnBallOOB = GM_DefaultNoOpPlayer;
+    gpGame->pfnMulligan = GM_DefaultNoOpPlayer;
+    gpGame->pfnPickTarget = GM_DefaultFalsePlayer;
+    gpGame->pfnSetTimer = GM_DefaultSetTimeLeft;
     gpGame->pfn260 = GM_DefaultNoOpPlayer;
-    gpGame->pfn264 = GM_DefaultFalsePlayer;
-    gpGame->pfn268 = GM_DefaultBonusCollected;
-    gpGame->pfn26C = GM_DefaultTargetState;
+    gpGame->pfnPickPrevTarget = GM_DefaultFalsePlayer;
+    gpGame->pfnCollisionActor = GM_DefaultBonusCollected;
+    gpGame->pfnGreenType = GM_DefaultTargetState;
     gpGame->pfn20C = GM_DefaultNoOpPlayer;
     lbl_80282278 = 0;
     switch (Game_GetMode()) {
@@ -286,8 +286,8 @@ void GM_ClearPlayerHoleData(int nPlayer, int nHole) {
     gPlayers[nPlayer].nModePoints[nHole] = 0;
     gPlayers[nPlayer].n22C[nHole] = 0;
     gPlayers[nPlayer].n290[nHole] = 0;
-    gPlayers[nPlayer].b2F6[nHole] = 0;
-    gPlayers[nPlayer].b2E4[nHole] = 0;
+    gPlayers[nPlayer].bGreenInReg[nHole] = 0;
+    gPlayers[nPlayer].bFairwayHit[nHole] = 0;
     gpGame->b16C[nPlayer][nHole] = 0;
     gPlayers[nPlayer].nD28[nHole] = 0;
     gPlayers[nPlayer].nD70[nHole] = 0;
@@ -311,8 +311,8 @@ void GM_ClearDataForNewGame(void) {
         p->nHolesWon = 0;
         p->n274 = 0;
         p->n2D8 = 0;
-        p->n2DC = 0;
-        p->n2E0 = 0;
+        p->nLongestDrive = 0;
+        p->nLongestPutt = 0;
         p->n308 = 0;
         p->nC44 = 3000;
         p->nC3C = 0;
@@ -334,7 +334,7 @@ void GM_ClearDataForNewGame(void) {
     }
     GM_ClearMulliganCounters();
     gpGame->nE0 = 1;
-    gpGame->bD5 = 0;
+    gpGame->bPlayoffFullRound = 0;
 }
 
 // Selects the round's holes by preset nPreset: 0 none, 1 all 18, 2 the front nine, 3 the back nine,
@@ -520,14 +520,14 @@ int GM_GetGolferRelativeCurrentScore(int nPlayer, u8 bCurrent) {
 }
 
 // The score against par shown for a player: the PGA TOUR simulation's while a tour event runs
-// (GM_Currently_PgaTourMode), n2D8 in a playoff (gpGame->bD4), else
+// (GM_Currently_PgaTourMode), n2D8 in a playoff (gpGame->bInPlayoff), else
 // GM_GetGolferRelativeCurrentScore while the event's round number (gpGame->nDC) is below its round
 // count (nE0), and 0 after the last round.
 int GM_GetGolferRelativeCumulativeScore(int nPlayer, u8 bCurrent) {
     if (GM_Currently_PgaTourMode()) {
         return GM_PgaTourSim_GetRelativeScoreFromEntrantID(nPlayer, 0, bCurrent);
     }
-    if (gpGame->bD4) {
+    if (gpGame->bInPlayoff) {
         return gPlayers[nPlayer].n2D8;
     }
     if (gpGame->nDC < gpGame->nE0) {
@@ -560,12 +560,12 @@ int GM_GetPlayerRoundScoreThroughHole(int nPlayer, int nHoles) {
     return n;
 }
 
-// Whether the round plays every hole (in a playoff, gpGame->bD4, the answer bD5 kept from
-// before the playoff narrowed the selection).
+// Whether the round plays every hole (in a playoff, gpGame->bInPlayoff, the answer
+// bPlayoffFullRound kept from before the playoff narrowed the selection).
 u8 GM_FullRoundOfGolf(void) {
     int i;
-    if (gpGame->bD4) {
-        return gpGame->bD5;
+    if (gpGame->bInPlayoff) {
+        return gpGame->bPlayoffFullRound;
     }
     for (i = 0; i < 18; i++) {
         if (!gpGame->bHoleSelected[i]) {
@@ -968,7 +968,7 @@ void GM_InitBallsToTee(void) {
         LLMath_CopyVec(&pCourse->tee[gSession.nTeeSet[i]].x, gPlayers[i].vBall);
         LLMath_CopyVec(&pCourse->tee[gSession.nTeeSet[i]].x, gPlayers[i].vA44);
         GOLFERSTATE_Set(GS_WAIT, (u8)i);
-        gPlayers[i].bLowIQPenalty = 0;
+        gPlayers[i].bPenaltyShot = 0;
     }
 }
 

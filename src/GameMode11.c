@@ -73,7 +73,7 @@ s16 gLessonLines[12 * 16] = {
     60, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 };
 
-s32 gLessonSavedOptionC = 4;       // the options' nC, saved while the mode runs
+s32 gLessonSavedOptionC = 4;       // the options' nWeather, saved while the mode runs
 s32 gLessonStep;                    // the step Lessons_Update is at
 s32 gLessonNextStep;                // where a waiting step (0, 1, 18) goes next
 s32 gLessonLineRow;                 // the lesson's row in gLessonLines (a multiple of 16)
@@ -130,9 +130,9 @@ void Lessons_HighlightHudItem(int nItem, int bOn);
 
 // Mode 11 starts (pfnInit): its callbacks; the yardage, the stroke limit, gimmes, the flyovers
 // (b27F, b280), setup tips, the re-plan button, the flight-camera toggles and in-flight replays
-// off, with b275, b27B..b27D, b285 and b28A; n290, nC, n10 and b276 (re-plan as the swing begins)
-// set to 1; the ball's random rolls off (fn_80055C1C: lies and bounces come out as in a
-// simulation). The options the lessons change are saved and set: commentary level 4, the putting
+// off, with b275, b27B..b27D, bAllowGameBreakers and b28A; n290, nC, n10 and b276 (re-plan as the
+// swing begins) set to 1; the ball's random rolls off (fn_80055C1C: lies and bounces come out as in
+// a simulation). The options the lessons change are saved and set: commentary level 4, the putting
 // grid off, power boost and spin on. Random stream 0 is seeded with 69, so the lessons play the
 // same each time.
 void Lessons_Init(void) {
@@ -140,11 +140,11 @@ void Lessons_Init(void) {
     gpGame->pfnShutdown = Lessons_Shutdown;
     gpGame->pfnHoleFinished = Lessons_HoleFinished;
     gpGame->pfnGameFinished = Lessons_GameFinished;
-    gpGame->pfn1E4 = Lessons_LoadHole;
+    gpGame->pfnLoadHole = Lessons_LoadHole;
     gpGame->pfn220 = Lessons_Update;
-    gpGame->pfn224 = Lessons_RestartHole;
+    gpGame->pfnRestartHole = Lessons_RestartHole;
     gpGame->pfn22C = Lessons_AfterReplan;
-    gpGame->pfn1EC = Lessons_StartGamePreData;
+    gpGame->pfnStartGamePreData = Lessons_StartGamePreData;
     gpGame->pfnEndGame = Lessons_EndGame;
     gpGame->bShowYardage = 0;
     gpGame->bStrokeLimit = 0;
@@ -157,7 +157,7 @@ void Lessons_Init(void) {
     gpGame->b280 = 0;
     gpGame->b281 = 0;
     gpGame->b284 = 0;
-    gpGame->b285 = 0;
+    gpGame->bAllowGameBreakers = 0;
     gpGame->b286 = 0;
     gpGame->b287 = 0;
     gpGame->b28A = 0;
@@ -167,22 +167,22 @@ void Lessons_Init(void) {
     gpGame->b276 = 1;
     fn_80055C1C(1);
     gLessonSavedCommentLevel = gSession.options.a0[4];
-    gLessonSavedPuttGrid = gSession.options.b84;
+    gLessonSavedPuttGrid = gSession.options.bPuttingGrid;
     gLessonSavedBoost = gSession.options.bBoostEnabled;
     gLessonSavedSpin = gSession.options.bSpinEnabled;
     gSession.options.a0[4] = 4;
-    gSession.options.b84 = 0;
+    gSession.options.bPuttingGrid = 0;
     gSession.options.bBoostEnabled = 1;
     gSession.options.bSpinEnabled = 1;
     Misc_SetSeedFunc(0, 69);
 }
 
-// Hole start (pfn1E4): the lessons start over (Lessons_Reset).
+// Hole start (pfnLoadHole): the lessons start over (Lessons_Reset).
 void Lessons_LoadHole(void) {
     Lessons_Reset();
 }
 
-// The hole restarts (pfn224): the lessons start over (Lessons_Reset).
+// The hole restarts (pfnRestartHole): the lessons start over (Lessons_Reset).
 void Lessons_RestartHole(void) {
     Lessons_Reset();
 }
@@ -196,10 +196,10 @@ void Lessons_Reset(void) {
     GM_FlyByMode_Init();
 }
 
-// Before the round (pfn1EC; also Lessons_StartFromMenu): course 10 with only hole 14, tee set 0 and
-// pin 0; the options' nC saved and set to 4 and the wind saved and set to calm (0); one player,
-// golfer 1, played by the CPU (who demonstrates each lesson); no mulligans; the continue / stop
-// answers cleared.
+// Before the round (pfnStartGamePreData; also Lessons_StartFromMenu): course 10 with only hole 14,
+// tee set 0 and pin 0; the options' nWeather saved and set to 4 and the wind saved and set to calm
+// (0); one player, golfer 1, played by the CPU (who demonstrates each lesson); no mulligans; the
+// continue / stop answers cleared.
 void Lessons_StartGamePreData(void) {
     GM_SetCurrentCourse(10);
     GM_SelectHoleSet(0);
@@ -209,9 +209,9 @@ void Lessons_StartGamePreData(void) {
     gSession.nTeeSet[1] = 0;
     gSession.nPinSet = 0;
     gpGame->nPinSet[Game_CurHoleIndex()] = 0;
-    gLessonSavedOptionC = gSession.options.nC;
+    gLessonSavedOptionC = gSession.options.nWeather;
     gLessonSavedWind = gSession.options.nWind;
-    gSession.options.nC = 4;
+    gSession.options.nWeather = 4;
     gSession.options.nWind = 0;
     Session_SetNumPlayers(1);
     Session_SetGolfer(1, 0);
@@ -225,13 +225,13 @@ void Lessons_StartGamePreData(void) {
 // grid, power boost, spin) and the ball's random rolls come back on.
 void Lessons_Shutdown(void) {
     Session* pSession;
-    gSession.options.nC = gLessonSavedOptionC;
+    gSession.options.nWeather = gLessonSavedOptionC;
     gSession.options.nWind = gLessonSavedWind;
     fn_80055C1C(0);
     // fake match: &gSession re-taken inside the first store after the call, as the original
     // recomputes it
     (pSession = &gSession)->options.a0[4] = gLessonSavedCommentLevel;
-    (pSession)->options.b84 = gLessonSavedPuttGrid;
+    (pSession)->options.bPuttingGrid = gLessonSavedPuttGrid;
     (pSession)->options.bBoostEnabled = gLessonSavedBoost;
     (pSession)->options.bSpinEnabled = gLessonSavedSpin;
 }
@@ -311,13 +311,13 @@ void Lessons_NextLesson(void) {
         gLessonDownswingHint = 2;
         break;
     case 7:
-        gSession.options.b84 = 1;
+        gSession.options.bPuttingGrid = 1;
         gLessonLineRow = 0x80;
         gLessonBackswingHint = 5;
         gLessonDownswingHint = 2;
         break;
     case 10:
-        gSession.options.b84 = 0;
+        gSession.options.bPuttingGrid = 0;
         gLessonLineRow = 0x90;
         gLessonBackswingHint = 5;
         gLessonDownswingHint = 2;
@@ -864,7 +864,7 @@ void Lessons_Update(void) {
         gLessonStep = 1;
         break;
     case 13:
-        gSession.b12 = 1;
+        gSession.bEndLoop = 1;
         EVENT_Trigger(0, 5, 0, -1);
         break;
     case 17:

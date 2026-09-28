@@ -6,7 +6,7 @@
 // mtalib.c; format 1 buffers, SkelPose1). In EA's words a blender (nType 1) mixes its two children
 // with a blend callback (SKABlender_BlendLinear) and a channel (nType 0, SKASourceNode) plays one
 // clip over a time window; nodes and pose buffers come from five pools. The animation player's
-// functions (AnimPlayer, EA's TSKATime) follow: SKATime_Update moves its time through the tree's
+// functions (EA's TSKATime) follow: SKATime_Update moves its time through the tree's
 // window, at which SKABlender_Update then poses the tree.
 
 #include "character.h"
@@ -25,7 +25,7 @@ f32  SKABlender_GetStartTime(SKABlendNode* pNode);
 void SKATime_Pause(u8* pAnim);
 f32  SKATime_MapTime(f32 fTime, f32 fNow, f32 fStart, f32 fEnd);
 int  SKABlender_NumSKAsInBlender(SKABlendNode* pNode);
-f32  SKATime_CalcStep(AnimPlayer* pPlayer, f32 fT);
+f32  SKATime_CalcStep(TSKATime* pPlayer, f32 fT);
 
 // The pools (AnimBlender_InitModule), defined here last address first (CodeWarrior lays out .sbss
 // in reverse).
@@ -612,7 +612,7 @@ f32 SKABlender_GetTagTime(SKABlendNode* pNode, u64 uEvent) {
 
 // Resets an animation player (EA's TSKATime): time, flags, play count and queued transition 0, time
 // scale (fTimeScale) 1, and its ten entries chained both ways from p44.
-void SKATime_Init(AnimPlayer* pPlayer) {
+void SKATime_Init(TSKATime* pPlayer) {
     int i;
     AnimPlayerEntry* pPrev;
 
@@ -640,7 +640,7 @@ void SKATime_Init(AnimPlayer* pPlayer) {
 // there with bit 2 set; going forward with bit 8 it rewinds to 0 and clears bits 0, 2 and 8
 // instead); with bit 5 it turns round (bit 6 flips, bit 2 set), else it wraps to the other end and
 // sets bit 12.
-void SKATime_Update(AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT) {
+void SKATime_Update(TSKATime* pPlayer, SKABlendNode* pNode, f32 fT) {
     f32 fStep;
     f32 fEnd;
     f32 fStart;
@@ -714,7 +714,7 @@ void SKATime_Update(AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT) {
 // wave (three cosines of the fIdleClock clock, advanced by fT) from 0 to 1, scaled by 0.05, or with
 // the putter by 0.3 (0.033 in clip group 9). SKATime_Update runs the player forward or backward
 // (uFlags bit 6) by the distance.
-void SKATime_Idle(Character* pChar, int nPlayer, AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT) {
+void SKATime_Idle(Character* pChar, int nPlayer, TSKATime* pPlayer, SKABlendNode* pNode, f32 fT) {
     f32 fSmoothRand;
     f32 fDelta;
 
@@ -746,18 +746,18 @@ void SKATime_Idle(Character* pChar, int nPlayer, AnimPlayer* pPlayer, SKABlendNo
 // the hold bit 0 once it has posed the frame. Character.anim is still declared as bytes, so this
 // and the next two take the player's address as a u8*.
 void SKATime_Pause(u8* pAnim) {
-    ((AnimPlayer*)pAnim)->uFlags |= 2;
+    ((TSKATime*)pAnim)->uFlags |= 2;
 }
 
 // Lets the player at pAnim run again: clears its pause and hold bits (uFlags bits 1 and 0).
 void SKATime_UnPause(u8* pAnim) {
-    ((AnimPlayer*)pAnim)->uFlags &= ~3;
+    ((TSKATime*)pAnim)->uFlags &= ~3;
 }
 
 // Sets the player's time to fTime, which may be a code (SKATime_MapTime: -10000 its end, -20000
 // now, -30000 its start).
 void SKATime_SetTime(u8* pAnim, f32 fTime) {
-    AnimPlayer* pPlayer = (AnimPlayer*)pAnim;
+    TSKATime* pPlayer = (TSKATime*)pAnim;
 
     pPlayer->fTime = SKATime_MapTime(fTime, pPlayer->fTime, pPlayer->fStart, pPlayer->fEnd);
 }
@@ -775,7 +775,7 @@ f32 SKATime_MapTime(f32 fTime, f32 fNow, f32 fStart, f32 fEnd) {
 // (a channel's clip end fTo in proportion), those children are marked to be freed once they have
 // ended (bFreeASAP), and so is pNode. Otherwise the player's times go back to 0, the tree is given
 // back and pNode set up again as an empty blender of the same format and callback.
-void SKABlender_ClampT1(SKABlendNode* pNode, AnimPlayer* pPlayer, f32 fTime) {
+void SKABlender_ClampT1(SKABlendNode* pNode, TSKATime* pPlayer, f32 fTime) {
     s32 nFormat;
     SKABlendFn pfnBlend;
     SKABlendNode* pChild;
@@ -919,7 +919,7 @@ void SKABlender_ClearMorph(SKABlendNode* pNode, s32 nMorph) {
 // (uFlags bit 3) or out (bit 4), the step is also scaled by fEase / fEaseTime, fEase climbing by
 // the step to fEaseTime (then bit 3 clears) or falling by it to fEaseFloor (at 0, bit 4 gives way
 // to the hold bit 0).
-f32 SKATime_CalcStep(AnimPlayer* pPlayer, f32 fT) {
+f32 SKATime_CalcStep(TSKATime* pPlayer, f32 fT) {
     f32 fStep = fT * pPlayer->fTimeScale;
 
     if (pPlayer->uFlags & 8) {

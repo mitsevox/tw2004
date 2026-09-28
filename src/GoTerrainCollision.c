@@ -213,7 +213,7 @@ void fn_8004B1EC(CourseInfo* pCourse) {
         }
         gpGame->nPinSet[Game_CurHoleIndex()] = nPinSet;
     }
-    gpGame->p130 = &lbl_801D3CB0.pCourse->pin[Game_CurrentPinSet()].x;
+    gpGame->pPinPos = &lbl_801D3CB0.pCourse->pin[Game_CurrentPinSet()].x;
     lbl_80281DC8 = 0;
     lbl_80281DC4 = 0;
     fn_80050794(lbl_801D3CB0.pCourse);

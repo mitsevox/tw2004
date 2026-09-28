@@ -15,7 +15,7 @@
 void SpeedGolfPoints_Init(void) {
     gpGame->pfnInit = SpeedGolfPoints_Init;
     gpGame->pfnShutdown = SpeedGolf_Shutdown;
-    gpGame->pfn1EC = SpeedGolf_StartGamePreData;
+    gpGame->pfnStartGamePreData = SpeedGolf_StartGamePreData;
     gpGame->pfnSetupNextGolfer = SpeedGolf_SetupNextGolfer;
     gpGame->pfnGetHonors = SpeedGolf_GetHonors;
     gpGame->pfnHoleFinished = SpeedGolfPoints_HoleFinished;
@@ -23,12 +23,12 @@ void SpeedGolfPoints_Init(void) {
     gpGame->pfnGoToPlayoff = SpeedGolf_GoToPlayoff;
     gpGame->pfnEndHole = SpeedGolfPoints_EndHole;
     gpGame->pfnEndGame = SpeedGolf_EndGame;
-    gpGame->pfn1E4 = SpeedGolf_LoadHole;
+    gpGame->pfnLoadHole = SpeedGolf_LoadHole;
     gpGame->pfn220 = SpeedGolf_Update;
     gpGame->pfn228 = SpeedGolfPoints_ClearStartFlags;
     gpGame->pfn230 = SpeedGolf_RenderBallTarget;
-    gpGame->pfn234 = SpeedGolf_CheckControllerPulled;
-    gpGame->pfn25C = SpeedGolf_SetHoleTime;
+    gpGame->pfnCheckControllerPulled = SpeedGolf_CheckControllerPulled;
+    gpGame->pfnSetTimer = SpeedGolf_SetHoleTime;
     gpGame->b271 = 0;
     gpGame->bStrokeLimit = 0;
     gpGame->b273 = 0;
@@ -41,7 +41,7 @@ void SpeedGolfPoints_Init(void) {
     gpGame->b281 = 0;
     gpGame->b282 = 0;
     gpGame->b283 = 0;
-    gpGame->b285 = 0;
+    gpGame->bAllowGameBreakers = 0;
     gpGame->b286 = 0;
     gpGame->b288 = 0;
     gpGame->n290 = 0;

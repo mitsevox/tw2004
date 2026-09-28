@@ -33,7 +33,7 @@ void GameModeSkins_Init(void) {
     gpGame->pfnGameFinished = GameModeSkins_GameFinished;
     gpGame->pfnGoToPlayoff = GameModeSkins_GoToPlayoff;
     gpGame->pfnEndHole = GameModeSkins_EndHole;
-    gpGame->pfn1EC = fn_800F81EC;
+    gpGame->pfnStartGamePreData = fn_800F81EC;
     gpGame->pfnEndGame = GameModeSkins_EndGame;
     gpGame->b274 = 0;
     gpGame->bAIConcedes = 1;
@@ -194,14 +194,14 @@ u8 GameModeSkins_GameFinished(u8 bCheck) {
     int h;
     int i;
     int nHole;
-    if (gpGame->bD4) {
+    if (gpGame->bInPlayoff) {
         if (lbl_802823C0 == 0) {
             return 1;
         }
         if (bCheck) {
             return 0;
         }
-        gpGame->nD8++;
+        gpGame->nPlayoffHoles++;
         for (h = 0; h < 18; h++) {
             gpGame->bHoleSelected[h] = 0;
         }
@@ -215,12 +215,13 @@ u8 GameModeSkins_GameFinished(u8 bCheck) {
             for (h = 0; h < 18; h++) {
                 // fake match: one chained assignment (stored right to left, so nStrokes first, as in
                 // GameModeSkins_GoToPlayoff) for the original register order
-                gPlayers[i].b2E4[h] = gPlayers[i].b2F6[h] = gPlayers[i].n290[h] = gPlayers[i].n22C[h] =
+                gPlayers[i].bFairwayHit[h] = gPlayers[i].bGreenInReg[h] = gPlayers[i].n290[h]
+                        = gPlayers[i].n22C[h] =
                     gPlayers[i].nModePoints[h] = gPlayers[i].nPutts[h] = gPlayers[i].nStrokes[h] = 0;
             }
             gPlayers[i].n2D8 = 0;
-            gPlayers[i].n2DC = 0;
-            gPlayers[i].n2E0 = 0;
+            gPlayers[i].nLongestDrive = 0;
+            gPlayers[i].nLongestPutt = 0;
             gPlayers[i].n308 = 0;
         }
         GUI_GolfersTiedUIMessage();
@@ -256,10 +257,10 @@ u8 GameModeSkins_GoToPlayoff(u8 bCheck) {
     if (bCheck) {
         return 1;
     }
-    gpGame->bD5 = 1;
+    gpGame->bPlayoffFullRound = 1;
     for (h = 0; h < 18; h++) {
         if (!gpGame->bHoleSelected[h]) {
-            gpGame->bD5 = 0;
+            gpGame->bPlayoffFullRound = 0;
         }
     }
     h = 0;
@@ -279,16 +280,16 @@ u8 GameModeSkins_GoToPlayoff(u8 bCheck) {
             PLAYER(i)->nModePoints[h] = 0;
             PLAYER(i)->n22C[h] = 0;
             PLAYER(i)->n290[h] = 0;
-            PLAYER(i)->b2F6[h] = 0;
-            PLAYER(i)->b2E4[h] = 0;
+            PLAYER(i)->bGreenInReg[h] = 0;
+            PLAYER(i)->bFairwayHit[h] = 0;
         }
         PLAYER(i)->n2D8 = 0;
-        PLAYER(i)->n2DC = 0;
-        PLAYER(i)->n2E0 = 0;
+        PLAYER(i)->nLongestDrive = 0;
+        PLAYER(i)->nLongestPutt = 0;
         PLAYER(i)->n308 = 0;
     }
-    gpGame->bD4 = 1;
-    gpGame->nD8++;
+    gpGame->bInPlayoff = 1;
+    gpGame->nPlayoffHoles++;
     GUI_GolfersTiedUIMessage();
     return 1;
 }
@@ -314,7 +315,7 @@ void GameModeSkins_EndHole(void) {
     }
     if (nSecond != 5 && gPlayers[nBest].nStrokes[Game_CurHoleIndex()] ==
                         gPlayers[nSecond].nStrokes[Game_CurHoleIndex()]) {
-        if (!gpGame->bD4) {
+        if (!gpGame->bInPlayoff) {
             lbl_802823C4 += GM_Earnings_GetSkinsHoleValue(GM_GetHighestRatedGolfer(), Game_CurHoleIndex());
             lbl_802823C0++;
         }
@@ -374,7 +375,7 @@ void GameModeSkins_EndGame(void) {
 // some cases).
 s32 GameModeSkins_CurrentHoleValue(void) {
     int h;
-    if (gpGame->bD4) {
+    if (gpGame->bInPlayoff) {
         return lbl_802823C4;
     }
     if (GUI_ScoreCardUp()) {
@@ -390,7 +391,7 @@ s32 GameModeSkins_CurrentHoleValue(void) {
 
 // Skins at stake on this hole: those carried over, plus one outside the playoff.
 s32 GameModeSkins_CurrentHoleNumberSkins(void) {
-    if (gpGame->bD4) {
+    if (gpGame->bInPlayoff) {
         return lbl_802823C0;
     }
     return lbl_802823C0 + 1;

@@ -18,7 +18,7 @@
 
 // Mode 16's state; only this file uses it. The .sbss ones are defined last address first (the
 // compiler lays a file's .sbss out last definition first).
-s32 gTargetSavedOptionsC = 4;   // options.nC from before the game (StartGamePreData; Shutdown puts it back)
+s32 gTargetSavedWeather = 4;   // options.nWeather before the game (StartGamePreData; Shutdown restores it)
 s32 gTargetShotPoints;          // the points of the last shot (GetShotEarned)
 s32 gTargetBonusMultiplier;     // the points multiplier from bonus objects: 1 each shot, raised by
                                 //   CollisionActor (GetDriveMultiplier)
@@ -57,16 +57,16 @@ void GameModeSkillZoneTarget_Init(void) {
     gpGame->pfnGameFinished = GameModeSkillZoneTarget_GameFinished;
     gpGame->pfnGoToPlayoff = GameModeSkillZoneTarget_GoToPlayoff;
     gpGame->pfnEndGolferTurn = GameModeSkillZoneTarget_EndGolferTurn;
-    gpGame->pfn244 = GameModeSkillZoneTarget_CheckShotAwards;
-    gpGame->pfn1E4 = GameModeSkillZoneTarget_LoadHole;
+    gpGame->pfnCheckShotAwards = GameModeSkillZoneTarget_CheckShotAwards;
+    gpGame->pfnLoadHole = GameModeSkillZoneTarget_LoadHole;
     gpGame->pfn228 = GameModeSkillZoneTarget_UpdateSwingUI;
-    gpGame->pfn224 = GameModeSkillZoneTarget_RestartHole;
-    gpGame->pfn1EC = GameModeSkillZoneTarget_StartGamePreData;
-    gpGame->pfn250 = GameModeSkillZoneTarget_BallOOB;
-    gpGame->pfn264 = GameModeSkillZoneBase_PickPrevTarget;
-    gpGame->pfn258 = GameModeSkillZoneBase_PickTarget;
-    gpGame->pfn26C = GameModeSkillZoneTarget_GreenType;
-    gpGame->pfn268 = GameModeSkillZoneTarget_CollisionActor;
+    gpGame->pfnRestartHole = GameModeSkillZoneTarget_RestartHole;
+    gpGame->pfnStartGamePreData = GameModeSkillZoneTarget_StartGamePreData;
+    gpGame->pfnBallOOB = GameModeSkillZoneTarget_BallOOB;
+    gpGame->pfnPickPrevTarget = GameModeSkillZoneBase_PickPrevTarget;
+    gpGame->pfnPickTarget = GameModeSkillZoneBase_PickTarget;
+    gpGame->pfnGreenType = GameModeSkillZoneTarget_GreenType;
+    gpGame->pfnCollisionActor = GameModeSkillZoneTarget_CollisionActor;
     gpGame->pfnEndGame = GameModeSkillZoneTarget_EndGame;
     gpGame->b276 = 0;
     gpGame->bGimmesAllowed = 0;
@@ -74,7 +74,7 @@ void GameModeSkillZoneTarget_Init(void) {
     gpGame->b271 = 0;
     gpGame->b281 = 0;
     gpGame->bStrokeLimit = 0;
-    gpGame->b285 = 0;
+    gpGame->bAllowGameBreakers = 0;
     gpGame->b274 = 0;
     gpGame->b286 = 1;
     gpGame->b287 = 0;
@@ -96,18 +96,18 @@ void GameModeSkillZoneTarget_Init(void) {
     GM_SetCurrentHole(0);
 }
 
-// Puts back the two options StartGamePreData changed for the game: options.nC and the wind.
+// Puts back the two options StartGamePreData changed for the game: options.nWeather and the wind.
 void GameModeSkillZoneTarget_Shutdown(void) {
-    gSession.options.nC = gTargetSavedOptionsC;
+    gSession.options.nWeather = gTargetSavedWeather;
     gSession.options.nWind = gTargetSavedWind;
 }
 
-// As a round starts (pfn1EC, GM_InitModule_PreDataStream): saves options.nC and the wind setting
-// (Shutdown puts them back) and sets them to 4 and 0, no wind.
+// As a round starts (pfn1EC, GM_InitModule_PreDataStream): saves options.nWeather and the wind
+// setting (Shutdown puts them back) and sets them to 4 and 0, no wind.
 void GameModeSkillZoneTarget_StartGamePreData(void) {
-    gTargetSavedOptionsC = gSession.options.nC;
+    gTargetSavedWeather = gSession.options.nWeather;
     gTargetSavedWind = gSession.options.nWind;
-    gSession.options.nC = 4;
+    gSession.options.nWeather = 4;
     gSession.options.nWind = 0;
 }
 

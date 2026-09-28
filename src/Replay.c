@@ -70,7 +70,7 @@ void REPLAY_Save(int nPlayer) {
     gReplayData.nPinSet = Game_CurrentPinSet();
     gReplayData.nWindDir = fn_80055F78();
     gReplayData.nWindSpeed = fn_80055F80();
-    nMode = gSession.options.nC;
+    nMode = gSession.options.nWeather;
     gReplayData.nF12 = nMode;
     if (nMode == 2) {
         if (fn_80035574()) {

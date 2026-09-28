@@ -199,11 +199,11 @@ int  fn_800D31A4(int nPar);             // the number of the 18 holes with that 
 f32  fn_800D0478(int nPlayer);          // the ball's distance from the pin (yards)
 f32  fn_800D0550(int nPlayer);          // the shot's length
 int  Hole_ScoreAfterTapIn(int nPlayer); // HoleScore.c
-u8   fn_800CF158(int nPlayer);          // gpGame->pfn1F8: holing this ball takes the lead
-u8   fn_800CF450(int nPlayer);          // gpGame->pfn1FC: holing this ball wins
+u8   fn_800CF158(int nPlayer);          // gpGame->pfnIsPuttForLead: holing this ball takes the lead
+u8   fn_800CF450(int nPlayer);          // gpGame->pfnIsPuttForWin: holing this ball wins
 s32  fn_800CFE74(int nPlayer);          // gpGame->pfn200: the lead so far
 s32  fn_800D0098(int nPlayer);          // gpGame->pfn204: the lead if this ball drops
-s32  fn_800D030C(int nPlayer);          // gpGame->pfn208: how the hole ends if it drops
+s32  fn_800D030C(int nPlayer);          // gpGame->pfnGetPotentialHoleResult: how the hole ends if it drops
 int  fn_800D0620(int nPlayer, u8 bCurrent, u8 bOnlyFlagged);   // holes under par so far
 int  fn_800D06FC(int nPlayer, u8 bCurrent, u8 bOnlyFlagged);   // two under par or better so far
 int  fn_800D07D8(int nPlayer, u8 bCurrent);   // the current run of holes under par
@@ -226,9 +226,9 @@ int  fn_800D1530(int nPlayer);          // HoleScore.c
 s32  fn_8008AB4C(void);                 // GameUICommands.c
 int  GM_GetGolferRelativeCurrentScore(int nPlayer, u8 bCurrent);        // GameRound.c
 s32  fn_800E81A0(int nPlayer);          // GameModeBattle.c
-s32  fn_800BCCCC(int nPlayer);          // SitDevFile.c: gpGame->pfn208
+s32  fn_800BCCCC(int nPlayer);          // SitDevFile.c: gpGame->pfnGetPotentialHoleResult
 s32  fn_800BCCF8(int nPlayer);          // SitDevFile.c: gpGame->pfn200's answer (TW06: GetCurrentLead)
-u8   fn_800BCD50(void);                 // SitDevFile.c: gpGame->bD4
+u8   fn_800BCD50(void);                 // SitDevFile.c: gpGame->bInPlayoff
 void CalDate_GetMDY(u16* pDate, s32* pMonth, s32* pDay, s32* pYear);
 void CalDate_SetMDY(u16* pDate, s32 nMonth, s32 nDay, u32 nYear);    // make a date
 void CalDate_AddDays(u16* pDate, s32 nDays);        // move a date on by nDays
@@ -283,11 +283,12 @@ typedef struct GameEffects {
     u8   unk1[3];
     f32  fSlowMo;               // 0x04  its rate (below 1 slows down)
     u8   unk8;
-    u8   b9;                    // 0x09
+    u8   bSpeedyTime;           // 0x09  double speed for fSpeedyTime seconds (nothing in this
+                                //       build sets it; TW07: GameEffects_SpeedyTimeStart)
     u8   unkA[2];
-    f32  fC;                    // 0x0C
-    u8   b10;                   // 0x10  half speed
-    u8   b11;                   // 0x11  quarter-ish speed, counted in n28
+    f32  fSpeedyTime;           // 0x0C  seconds left of it
+    u8   bDoubleTime;           // 0x10  double speed: twice the physics ticks (gocamscripts.c)
+    u8   bHalfTime;             // 0x11  half speed: half the ticks, the slow frames counted in n28
     u8   bGameBreaker;          // 0x12  the letterbox is up
     u8   unk13;
     s32  nGBType;               // 0x14  0 scripted, 1 predicted
@@ -312,8 +313,9 @@ typedef struct GameEffects {
     u8   b4A;                   // 0x4A  u4C holds a sound to stop
     u8   unk4B;
     u16  u4C;                   // 0x4C
-    u8   b4E;                   // 0x4E
-    u8   n4F;                   // 0x4F  the music to go back to
+    u8   bCrowdReactionSet;     // 0x4E  nCrowdReaction is set
+    u8   nCrowdReaction;        // 0x4F  the crowd reaction (Gaud_InitCrowdReactionSound) to play
+                                //       when a scripted GameBreaker ends without doing it
     u32  uFlags;                // 0x50  bit 0x4000: an eagle on a par 5 counts
     f32  f54;                   // 0x54
 } GameEffects;
@@ -344,7 +346,7 @@ void GameEffects_SendMessage50(void);
 void GameEffects_ClearSingleStep(void);
 u8   GameEffects_IsSingleStepPending(void);
 u8   GameEffects_IsFixedTimeStepOn(void);
-u8   GM_IsPuttForLead(int nPlayer);          // the mode's pfn1F8 answer for the player
+u8   GM_IsPuttForLead(int nPlayer);          // the mode's pfnIsPuttForLead answer for the player
 u8   GameEffects_StartOfSlowMoFrame(void);
 u8   GameEffects_IsHalfTimeOn(void);
 void GameEffects_Vec3Sub(f32* pA, f32* pB, f32* pOut);   // out = a - b
@@ -436,7 +438,7 @@ void GUI_BetweenHolesScorecard(u8 bHuman);            // opens the end-of-hole s
 void GUI_SetEndOfHolePending(void);
 void GUI_EndOfGameScorecard(u8 bHuman);            // opens the end-of-round screen, or defers it
 void GUI_SendButtonHeld(int nPlayer);
-void GUI_OnControllerPresent(int i);                // GameMessages.c: clears slot i of lbl_80202B88
+void GUI_OnControllerPresent(int nController);      // GameMessages.c: clears its lbl_80202B88 mark
 
 // The display state (GameUI.c's data; GameMessages.c and GameAnalysis.c use some of it). Twelve
 // queues of display items, each with its count; the pump shows the newest item of the first
@@ -461,7 +463,7 @@ extern UIQueueItem lbl_80202CFC[UI_QUEUE_LEN];  // queue 8 (lbl_80282294)
 extern UIQueueItem lbl_80202C84[UI_QUEUE_LEN];  // queue 9 (lbl_80282290)
 extern UIQueueItem lbl_80202C0C[UI_QUEUE_LEN];  // queue 10 (lbl_8028228C)
 extern UIQueueItem lbl_80202B94[UI_QUEUE_LEN];  // queue 11 (lbl_80282288)
-extern u8          lbl_80202B88[9];             // the menu screens still open (GameMessages.c)
+extern u8          lbl_80202B88[9];             // per controller: pulled out (GameMessages.c)
 extern u8          gTipShown[14];            // the tips already shown (GameMessages.c, GameAnalysis.c)
 
 extern u8  lbl_80282280;

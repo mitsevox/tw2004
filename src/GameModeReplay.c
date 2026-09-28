@@ -28,10 +28,10 @@ void GameModeReplay_Init(void) {
     gpGame->pfnSetupNextGolfer = GameModeReplay_SetupNextGolfer;
     gpGame->pfnHoleFinished = GameModeReplay_HoleFinished;
     gpGame->pfnGameFinished = GameModeReplay_GameFinished;
-    gpGame->pfn1EC = GameModeReplay_StartGamePreData;
+    gpGame->pfnStartGamePreData = GameModeReplay_StartGamePreData;
     gpGame->pfnEndGame = GameModeReplay_EndGame;
-    gpGame->pfn1E4 = GameModeReplay_LoadHole;
-    gpGame->pfn224 = GameModeReplay_RestartHole;
+    gpGame->pfnLoadHole = GameModeReplay_LoadHole;
+    gpGame->pfnRestartHole = GameModeReplay_RestartHole;
     gpGame->b273 = 0;
     gpGame->b276 = 0;
     gpGame->b27B = 0;
@@ -80,7 +80,7 @@ void GameModeReplay_StartGamePreData(void) {
     gSession.bReplay = 1;
     // fake match: a no-op cast of &gSession; written plainly the address is scheduled
     // differently (96.9%)
-    ((Session*)&gSession)->options.nC = gReplayData.nF12;
+    ((Session*)&gSession)->options.nWeather = gReplayData.nF12;
     if (gReplayData.nF12 == 3) {
         PlayNow_ForceWeather(gReplayData.nF14 / 100.0f);
     }
@@ -167,7 +167,7 @@ u8 GameModeReplay_GameFinished(u8 bCheck) {
 }
 
 void GameModeReplay_EndGame(void) {
-    gSession.b12 = 1;
+    gSession.bEndLoop = 1;
 }
 
 // fake match: the original's .sdata2 has a 0.0f here (0x80284694, after 100.0f and before 1.0f)

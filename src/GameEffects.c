@@ -49,10 +49,10 @@ GameEffects gGameEffects;   // the effects state (game.h; GameManager, GoGolfCam
 // the timed double speed (b9) off, the half-time frame count n28 cleared, no GameBreaker, not
 // paused, no rumble or heartbeats, and f54 (a menu command sets it, GameUICommands.c) back to 1.
 void GameEffects_InitGameEffectSettings(void) {
-    gGameEffects.b10 = 0;
-    gGameEffects.b11 = 0;
+    gGameEffects.bDoubleTime = 0;
+    gGameEffects.bHalfTime = 0;
     gGameEffects.bSlowMo = 0;
-    gGameEffects.b9 = 0;
+    gGameEffects.bSpeedyTime = 0;
     gGameEffects.n28 = 0;
     gGameEffects.bGameBreaker = 0;
     gGameEffects.b19 = 0;
@@ -95,10 +95,10 @@ void GameEffects_ResetGameEffectSettings(void) {
 // the half-time frame count n28. Returns the effects state (its callers,
 // GameEffects_ResetGameEffectSettings and STATEFUNC_ReplaySwingInit, ignore it).
 GameEffects* GameEffects_ResetGameEffectTimeSettings(void) {
-    gGameEffects.b10 = 0;
-    gGameEffects.b11 = 0;
+    gGameEffects.bDoubleTime = 0;
+    gGameEffects.bHalfTime = 0;
     gGameEffects.bSlowMo = 0;
-    gGameEffects.b9 = 0;
+    gGameEffects.bSpeedyTime = 0;
     gGameEffects.n28 = 0;
     return &gGameEffects;
 }
@@ -144,17 +144,17 @@ f32 GameEffects_AdjustTimeRate(f32 fFrameTime) {
         if (!fn_800B4AE0()) {
             fTicks *= 0.75f;
         }
-    } else if (gGameEffects.b9) {
+    } else if (gGameEffects.bSpeedyTime) {
         fTicks *= 2.0f;
-        gGameEffects.fC -= fFrameTime;
-        if (gGameEffects.fC < 0.0f) {
-            gGameEffects.b9 = 0;
+        gGameEffects.fSpeedyTime -= fFrameTime;
+        if (gGameEffects.fSpeedyTime < 0.0f) {
+            gGameEffects.bSpeedyTime = 0;
         }
     } else {
-        if (gGameEffects.b10) {
+        if (gGameEffects.bDoubleTime) {
             fTicks *= 2.0f;
         }
-        if (gGameEffects.b11) {
+        if (gGameEffects.bHalfTime) {
             fTicks *= 0.5f;
             gGameEffects.n28++;
         }
@@ -205,11 +205,11 @@ static inline int GE_CurrentTarget(int nPlayer) {
 // reason is kept as bit 1 << nReason in uFlags), with event 0x3D. Reason 12 only while the round
 // can still beat the course record (record kind 0), reason 15 only when 3 * Player.fA64 beats
 // record kind 2's best, any other reason always. Never in the demo, a replay or split screen, with
-// gSession.a8[0] set, when the mode allows no GameBreakers (gpGame->b285 clear), for a CPU player,
-// or while one is up.
+// gSession.bDemo set, when the mode allows no GameBreakers (gpGame->bAllowGameBreakers clear), for
+// a CPU player, or while one is up.
 void GameEffects_ScriptedGameBreakerTrigger(int nPlayer, int nReason) {
     if (((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) || gSession.bReplay ||
-        gSession.nSplitScreen || gSession.a8[0] || !gpGame->b285) {
+        gSession.nSplitScreen || gSession.bDemo || !gpGame->bAllowGameBreakers) {
         return;
     }
     if (gGameEffects.bGameBreaker != 1 && !Player_IsCPU(nPlayer)) {
@@ -227,7 +227,7 @@ void GameEffects_ScriptedGameBreakerTrigger(int nPlayer, int nReason) {
 }
 
 // As a swing starts (STATEFUNC_SwingInit), the target games' scripted GameBreakers, on course 7
-// only, for any player (not in a replay or split screen, not with gSession.a8[0] set, not while one
+// only, for any player (not in a replay or split screen, not with gSession.bDemo set, not while one
 // is up): mode 14 when the player holds 4 targets (GameModeSkillZoneCapture_GetTotalTargetsHit;
 // reason 17), mode 15 when every other player is out (nE88 5 or more; reason 22), mode 17 with 39 targets hit
 // (GameModeSkillZoneBase_CountGreensHit; reason 23), mode 16 with 39 hit and the aimed-at target
@@ -237,7 +237,7 @@ void GameEffects_TargetGameBreakerTrigger(int nPlayer) {
     int nReason;
     int i;
     int n;
-    if (!gSession.bReplay && !gSession.nSplitScreen && !gSession.a8[0]) {
+    if (!gSession.bReplay && !gSession.nSplitScreen && !gSession.bDemo) {
         switch (Game_GetCourse()) {
         case 7:
             break;
@@ -310,12 +310,12 @@ void GameEffects_ScriptedGameBreakerBallHitTrigger(int nPlayer) {
 }
 
 // Whether the putt about to be played earns a scripted GameBreaker (emotion.c asks, fn_8006B0B8).
-// Needs a course loaded, a mode that allows GameBreakers (gpGame->b285), ground under the aim point
-// and the ball on the green; then any of: a putt that would score an eagle or better, a distance to
-// the pin (fn_800D0478) that makes record kind 2's list (HighScoreRecords_CheckRecord), a putt for
-// the lead (GM_IsPuttForLead) or for the win (fn_800BCD24, the mode's pfn1FC), a birdie putt when
-// fn_800D0620 gives 11, or an eagle putt when fn_800D089C gives 1 (birdie and eagle by
-// Hole_ScoreAfterTapIn).
+// Needs a course loaded, a mode that allows GameBreakers (gpGame->bAllowGameBreakers), ground under
+// the aim point and the ball on the green; then any of: a putt that would score an eagle or better,
+// a distance to the pin (fn_800D0478) that makes record kind 2's list
+// (HighScoreRecords_CheckRecord), a putt for the lead (GM_IsPuttForLead) or for the win
+// (fn_800BCD24, the mode's pfnIsPuttForWin), a birdie putt when fn_800D0620 gives 11, or an eagle
+// putt when fn_800D089C gives 1 (birdie and eagle by Hole_ScoreAfterTapIn).
 int GameEffects_IsScriptedGameBreaker(int nPlayer) {
     int bPossible = 0;
     int nPar;
@@ -327,7 +327,7 @@ int GameEffects_IsScriptedGameBreaker(int nPlayer) {
     if (!pCourse) {
         return 0;
     }
-    if (!gpGame->b285) {
+    if (!gpGame->bAllowGameBreakers) {
         return 0;
     }
     nPar = Course_GetCurHolePar();
@@ -358,13 +358,13 @@ int GameEffects_IsScriptedGameBreaker(int nPlayer) {
 
 // A predicted GameBreaker starts while the ball flies (SitDev's actions fire it), for a human
 // (player flag 8 clear), none up yet; never in the demo, a replay or split screen, with
-// gSession.a8[0] set, or when the mode allows no GameBreakers (gpGame->b285 clear). The ball must
-// still be at least 1 (club 25, the putter), 10 (a drive, nShotKind 1) or 5 (any other shot) from
-// the look-ahead ball across the ground, b30D clear and a course loaded. Half and double time go
-// off, and the player's view gets GameBreaker camera sequence 0xB (fn_8003BDBC) for the shot's
-// length to the look-ahead ball, by the ball's lie and the surface class where the look-ahead ball
-// lies. When the shot it picks tracks the golfer (kind 5, fn_8003DC78) on a shot that is not a
-// putt, the golfer is set to animation 14 unless he is in 9. Event 0x3F.
+// gSession.bDemo set, or when the mode allows no GameBreakers (gpGame->bAllowGameBreakers clear).
+// The ball must still be at least 1 (club 25, the putter), 10 (a drive, nShotKind 1) or 5 (any
+// other shot) from the look-ahead ball across the ground, b30D clear and a course loaded. Half and
+// double time go off, and the player's view gets GameBreaker camera sequence 0xB (fn_8003BDBC) for
+// the shot's length to the look-ahead ball, by the ball's lie and the surface class where the
+// look-ahead ball lies. When the shot it picks tracks the golfer (kind 5, fn_8003DC78) on a shot
+// that is not a putt, the golfer is set to animation 14 unless he is in 9. Event 0x3F.
 void GameEffects_InFlightGameBreakerTrigger(int nPlayer) {
     int nClass;
     int nLie;
@@ -380,7 +380,7 @@ void GameEffects_InFlightGameBreakerTrigger(int nPlayer) {
     f32 v2[4];
     f32 v[4];
     if (((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) || gSession.bReplay ||
-        gSession.nSplitScreen || gSession.a8[0] || !gpGame->b285) {
+        gSession.nSplitScreen || gSession.bDemo || !gpGame->bAllowGameBreakers) {
         return;
     }
     if (!(gPlayers[nPlayer].uFlags & 8) && !Player_IsCPU(nPlayer) && gGameEffects.bGameBreaker != 1) {
@@ -474,8 +474,8 @@ void GameEffects_EndGameBreaker(int nPlayer) {
                 if (gGameEffects.b47) {
                     fn_800BD83C(gGameEffects.u48, 0);
                 }
-                Gaud_InitCrowdReactionSound(gGameEffects.n4F, 1);
-                gGameEffects.b4E = 0;
+                Gaud_InitCrowdReactionSound(gGameEffects.nCrowdReaction, 1);
+                gGameEffects.bCrowdReactionSet = 0;
             }
             gGameEffects.b47 = 0;
             break;
@@ -678,8 +678,8 @@ void GameEffects_SetSuperSlowMo(u8 bOn, int nPlayer, f32 fRate) {
             gGameEffects.bSlowMo = bOn;
         }
         gGameEffects.fSlowMo = fRate;
-        gGameEffects.b11 = 0;
-        gGameEffects.b10 = 0;
+        gGameEffects.bHalfTime = 0;
+        gGameEffects.bDoubleTime = 0;
         return;
     }
     if (gGameEffects.bSlowMo) {

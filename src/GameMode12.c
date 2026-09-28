@@ -37,7 +37,7 @@ void GameMode12_ShotSetupUpdate(int nPlayer);
 
 // Mode 12 starts (pfnInit): its callbacks (the honors, hole-finished and game-finished ones are
 // stroke play's, GameModeStroke), round flags b271, b281, b288 and the stroke limit off, any number
-// of mulligans, hole 1, no surface hit yet, no split screen, and the options' nC 0.
+// of mulligans, hole 1, no surface hit yet, no split screen, and the options' nWeather 0.
 void GameMode12_Init(void) {
     gpGame->pfnInit = GameMode12_Init;
     gpGame->pfnGetHonors = GameModeStroke_GetHonors;
@@ -45,12 +45,12 @@ void GameMode12_Init(void) {
     gpGame->pfnGameFinished = GameModeStroke_GameFinished;
     gpGame->pfnGoToPlayoff = GameMode12_GoToPlayoff;
     gpGame->pfnEndGame = GameMode12_EndGame;
-    gpGame->pfn23C = GameMode12_BallLanded;
-    gpGame->pfn240 = GameMode12_BallHitSurface;
+    gpGame->pfnBallCollision = GameMode12_BallLanded;
+    gpGame->pfnTriggerSplash = GameMode12_BallHitSurface;
     gpGame->pfnEndHole = GameMode12_EndHole;
-    gpGame->pfn1E4 = GameMode12_LoadHole;
+    gpGame->pfnLoadHole = GameMode12_LoadHole;
     gpGame->pfnSetupNextGolfer = GameMode12_SetupNextGolfer;
-    gpGame->pfn244 = GameMode12_AddShotPoints;
+    gpGame->pfnCheckShotAwards = GameMode12_AddShotPoints;
     gpGame->pfn228 = GameMode12_ShotSetupUpdate;
     gpGame->b271 = 0;
     gpGame->b281 = 0;
@@ -64,7 +64,7 @@ void GameMode12_Init(void) {
     GM_SetCurrentHole(0);
     gGameMode12Surface = -1;
     gSession.nSplitScreen = 0;
-    gSession.options.nC = 0;
+    gSession.options.nWeather = 0;
 }
 
 // Never a playoff (pfnGoToPlayoff): always 0.
@@ -86,14 +86,14 @@ static inline u8 SurfaceUsedUp(s32* pPoints, s32 nHits) {
     return bUsed;
 }
 
-// The ball has landed (pfn23C) on gGameMode12Surface. If that surface still scores this shot (it
-// has points: up to 5 times, once for one that costs points; a surface with no points never scores)
-// its row of the prize table counts, each part with a message at the ball's place on screen: a
-// multiplier higher than the shot's becomes the shot's (message 0x35); the points times the number
-// of times the surface has now scored this shot are added to the shot's points (nDB8) times the
-// multiplier, the surface to the shot's list and one scoring landing to the hole's count (nD70;
-// message 0x33, not in a replay); the bonus-meter points fill the meter (nD24, at most 100; message
-// 0x34).
+// The ball has landed (pfnBallCollision) on gGameMode12Surface. If that surface still scores this
+// shot (it has points: up to 5 times, once for one that costs points; a surface with no points
+// never scores) its row of the prize table counts, each part with a message at the ball's place on
+// screen: a multiplier higher than the shot's becomes the shot's (message 0x35); the points times
+// the number of times the surface has now scored this shot are added to the shot's points (nDB8)
+// times the multiplier, the surface to the shot's list and one scoring landing to the hole's count
+// (nD70; message 0x33, not in a replay); the bonus-meter points fill the meter (nD24, at most 100;
+// message 0x34).
 void GameMode12_BallLanded(int nPlayer) {
     s32 nHits;
     s32 nScore;
@@ -173,9 +173,9 @@ s32 GameMode12_CountSurfaceHits(int nPlayer, s32 nSurface) {
     return n;
 }
 
-// The ball has touched a surface (pfn240, from the ball effects): its index in gSurfaceTypes is
-// kept for GameMode12_BallLanded (-1 for none). Returns the extra hit effect to play, which is
-// always 0 (none); it still looks the surface up as if a scoring surface had one.
+// The ball has touched a surface (pfnTriggerSplash, from the ball effects): its index in
+// gSurfaceTypes is kept for GameMode12_BallLanded (-1 for none). Returns the extra hit effect to
+// play, which is always 0 (none); it still looks the surface up as if a scoring surface had one.
 s32 GameMode12_BallHitSurface(int nPlayer) {
     SurfaceType* pSurface;
     s32 nHits;
@@ -262,7 +262,7 @@ void GameMode12_EndGame(void) {
     }
 }
 
-// Hole start (pfn1E4): every player's bonus meter (nD24) empties.
+// Hole start (pfnLoadHole): every player's bonus meter (nD24) empties.
 void GameMode12_LoadHole(void) {
     int i;
     i = 0;
@@ -312,7 +312,8 @@ s32 GameMode12_GetRoundPoints(int nPlayer) {
     return n;
 }
 
-// End of a shot (pfn244, from GM_Earnings_PayShotGoals): the shot's points go to the hole.
+// End of a shot (pfnCheckShotAwards, from GM_Earnings_PayShotGoals): the shot's points go to the
+// hole.
 void GameMode12_AddShotPoints(int nPlayer) {
     gPlayers[nPlayer].nD28[Game_CurHoleIndex()] += gPlayers[nPlayer].nDB8;
 }

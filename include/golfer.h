@@ -271,16 +271,21 @@ typedef struct Player {
     u8   unk28D[3];
     s32  n290[18];              // 0x290  per hole
     s32  n2D8;                  // 0x2D8
-    s32  n2DC;                  // 0x2DC
-    s32  n2E0;                  // 0x2E0
-    u8   b2E4[18];              // 0x2E4  per hole
-    u8   b2F6[18];              // 0x2F6  per hole
+    s32  nLongestDrive;         // 0x2DC  the round's longest drive, in yards
+                                //        (GM_RecordIndividualShotStats). TW06: longestdrive
+    s32  nLongestPutt;          // 0x2E0  the round's longest holed putt, in feet. TW06: longestputt
+    u8   bFairwayHit[18];       // 0x2E4  per hole: the drive of a par 4 or 5 found the fairway (or
+                                //        the green, or the hole). TW06: fairways
+    u8   bGreenInReg[18];       // 0x2F6  per hole: a green in regulation (on it in
+                                //        par - 2 strokes or fewer). TW06: gir
     s32  n308;                  // 0x308
     u8   b30C;                  // 0x30C  the start of the block GameModeReplay restores from a replay
     u8   b30D;                  // 0x30D  tested with the course check by GameEffects
     u8   b30E;                  // 0x30E  a replaced ball must be dropped (GM_ReplaceOOBBall)
-    u8   b30F;                  // 0x30F  copied to b310 after a shot (GM_RecordBonusShotStats)
-    u8   b310;                  // 0x310  cleared by GM_ClearHoleBonusStats
+    u8   bBunkerThisShot;       // 0x30F  the ball touched a bunker (surface class 6, PsBallFx.c)
+    u8   bBunkerThisHole;       // 0x310  set from bBunkerThisShot after a shot
+                                //        (GM_RecordBonusShotStats), cleared by GM_ClearHoleBonusStats;
+                                //        the tour's bunker stats
     u8   b311;                  // 0x311  set after a shot with b30E (GM_RecordBonusShotStats)
     u8   b312;                  // 0x312  set when a shot finished on the green or in the hole (GM_RecordBonusShotStats)
     u8   unk313;
@@ -329,13 +334,18 @@ typedef struct Player {
     f32  fC20;                  // 0xC20
     s32  nC24;                  // 0xC24  added to PgaStatCounts.nDriveDistance at the end of a hole (GameModeDriverPGATour_EndHole)
     u8   bMulliganUsed;         // 0xC28  the one mulligan of a one-per-player mode is used (GM_PlayerTakeMulligan)
-    u8   bLowIQPenalty;         // 0xC29  quarters the IQ overconfidence term when set
-    s8   nLevel;                // 0xC2A  CPU difficulty level: 25 modifier points per level
+    u8   bPenaltyShot;          // 0xC29  the last shot cost a penalty stroke (GM_CheckForBallOOB;
+                                //        cleared at the next hit); quarters a CPU's overconfidence
+    s8   nOBCount;              // 0xC2A  penalty strokes in a row: a CPU gets 25 attribute points
+                                //        each (ai_brain.c) and concedes after three. TW06: OBCount
     u8   bPlanReady;            // 0xC2B  the gimme's tap-in was solved when the camera arrived
     u8   bRehearsalDone;        // 0xC2C  the gimme's tap-in rehearsal (GS_FADE_TO_TAP_IN) has settled
-    u8   bC2D;                  // 0xC2D  set when the stroke limit holes the ball; no mulligan then
-    u8   bC2E;                  // 0xC2E  set when a mulligan is taken (GameManager.c), cleared by Swing.c
-    u8   bC2F;                  // 0xC2F  set with bC2E when a mulligan is taken
+    u8   bShotLimitExceeded;    // 0xC2D  the stroke limit holed the ball; no mulligan then.
+                                //        TW06: shotLimitExceeded
+    u8   bUsedMulligan;         // 0xC2E  a mulligan was taken (GM_PlayerTakeMulligan), until the
+                                //        next swing state (STATEFUNC_SwingInit). TW06: usedMulligan
+    u8   bUsedMulliganThisHole; // 0xC2F  a mulligan was taken on this hole. TW06:
+                                //        usedMulliganThisHole
     s32  nRehearseState;        // 0xC30  AI_RehearseShot state machine
     u8   unkC34[4];
     s32  nC38;                  // 0xC38  a frame countdown (speed golf)
@@ -349,7 +359,7 @@ typedef struct Player {
     s32  nC5C;                  // 0xC5C
     s32  nC60;                  // 0xC60  speed golf: strokes when the player holed out
     s32  nC64;                  // 0xC64  speed golf: strokes when the ball reached the green
-    f32  fC68;                  // 0xC68  speed golf: the ball's distance from gpGame->p130 then
+    f32  fC68;                  // 0xC68  speed golf: the ball's distance from gpGame->pPinPos then
     s32  nC6C[18];              // 0xC6C  cleared at the start of a round
     f32  fCB4;                  // 0xCB4  speed golf: raised by a button, falls every frame
     s32  nCB8;                  // 0xCB8  speed golf: cleared by that button
@@ -416,11 +426,18 @@ typedef struct RecordEntry {
 // The round / session state at gSession (0x5BD0 bytes); only what this file reads.
 // The game options (Session.options, 0x88 bytes).
 typedef struct GameOptions {
-    s8   a0[5];                 // 0x00  [4] (0xE7C): 4 while the lessons run, tested by GameUI
+    s8   a0[5];                 // 0x00  levels 0..5 from the menus (the mixer gets 0.2 x level):
+                                //       [0] effects (Gaud_SetSfxLevel), [1] music
+                                //       (Gaud_SetMusicLevel), [2] a menu level (FE_MessageTable.c
+                                //       fn_80081530), [4] commentary (Gaud_SetCommentLevel; 4 while
+                                //       the lessons run)
     u8   bGimmes;               // 0x05  (gSession + 0xE7D) the Gimmes option, default on
     u8   bSkipCameras;          // 0x06  (gSession + 0xE7E) camera states end at once (inferred)
     u8   a7[5];                 // 0x07  [1] and [2] default to 1
-    s32  nC;                    // 0x0C  0, 3 or 4, set by the modes while they run
+    s32  nWeather;              // 0x0C  the weather option (fn_8006F650 picks each hole's weather
+                                //       by it): 0 and 4 clear (weather bit 0), 1 a random pick per
+                                //       hole, 2 a pick kept for several holes, 3 weather bit 1; the
+                                //       menu sets 0, 2 or 3, several modes 4 while they run
     s32  nWind;                 // 0x10  0..3 calm..gusty, 4+ none
     s32  n14;                   // 0x14
     s32  n18;                   // 0x18  -> fn_80055C40
@@ -435,7 +452,8 @@ typedef struct GameOptions {
     u8   b7E;                  // 0x7E
     u8   unk7F;
     s32  n80;                   // 0x80
-    u8   b84;                   // 0x84  cleared while the lessons run (GameMode11)
+    u8   bPuttingGrid;          // 0x84  the green grid shows with the putter (GoGreenGrid.c); the
+                                //       lessons turn it on for lessons 7..9
 } GameOptions;
 LAYOUT_ASSERT(GameOptions, 0x88);
 
@@ -472,15 +490,22 @@ typedef struct Session {
                                 //        weather (fn_8006F650), caddie tips off; many tests want
                                 //        0x8000 with it
     s32  nGameType;             // 0x004  4 gets a second view
-    u8   a8[4];                 // 0x008  [0] nonzero: no GameBreaker (GameEffects.c)
+    u8   bDemo;                 // 0x008  the game the menus start is the demo (set by
+                                //        FE_MessageTable.c fn_8007BCC4; DEMO_Start runs as the
+                                //        menus fade out): no GameBreakers, hole contests, EASBio
+                                //        wins or end-of-game scorecard
+    u8   unk9[3];
     s32  nC;                    // 0x00C
     u8   nSplitScreen;          // 0x010  0 single view, else split screen (2 = side by side); no luck, no caddie
     u8   b11;                   // 0x011  cleared by Session_Init
-    u8   b12;                   // 0x012  set by the pause menu, a replay and the lessons; GameManager
-                                //        tests it
+    u8   bEndLoop;              // 0x012  ends the main loop of a round (game type 6) or the
+                                //        start-up (1): fn_8006D01C (gomainloop.c) checks and clears
+                                //        it; set at the end of a game, by the end-of-round screen,
+                                //        a replay, the lessons and the fade to black
     u8   bReplay;               // 0x013  a saved replay is playing: no luck swap, no spin, instant launch
-    s32  nPaused;               // 0x014  0 running, 1 paused (GameUI GUI_OpenPauseMenu), 2 paused until the last
-                                //        menu screen closes (GUI_OnControllerPresent then unpauses)
+    s32  nPaused;               // 0x014  0 running, 1 paused (GameUI GUI_OpenPauseMenu), 2 paused
+                                //        for a pulled controller, until every pulled one is back
+                                //        (GUI_OnControllerPresent); GameUICommands.c tests 3 too
     f32  fFrameTime;            // 0x018  seconds per frame
     f32  f1C;                   // 0x01C
     s32  n20;                   // 0x020
@@ -532,15 +557,17 @@ typedef struct GameState {
     s32  nHoleNum[18];          // 0x068  and which hole of that course (a custom round mixes courses)
     u8   bHoleSelected[18];     // 0x0B0  holes this round plays (GM_GotoNextSelectedHole)
     u8   bHoleSaved[18];        // 0x0C2  a copy of the selection: the playoff hole pool (GM_Pick_PlayOffHole)
-    u8   bD4;                   // 0x0D4
-    u8   bD5;                   // 0x0D5
+    u8   bInPlayoff;            // 0x0D4  a playoff is being played (the tied modes' playoff starts)
+    u8   bPlayoffFullRound;     // 0x0D5  the round before the playoff played all 18 holes
+                                //        (GM_FullRoundOfGolf answers it during the playoff)
     u8   unkD6[2];
-    s32  nD8;                   // 0x0D8
+    s32  nPlayoffHoles;         // 0x0D8  playoff holes started
     s32  nDC;                   // 0x0DC  the tour event's current round (GameModeDriverPGATour)
     s32  nE0;                   // 0x0E0  the event's round count (1 outside a tour event)
     s32  nPinSet[18];           // 0x0E4  per hole: which of its four pin positions (CourseInfo.pin) is used
     s32  n12C;                  // 0x12C
-    f32* p130;                  // 0x130  a position: speed golf measures the ball's distance to it
+    f32* pPinPos;               // 0x130  the current hole's pin (GoTerrainCollision.c sets it);
+                                //        speed golf measures the ball's distance to it
     u8   b134;                  // 0x134  cleared at the start of a hole
     u8   b135;                  // 0x135  set by GM_SetNeedToBuildPlayoffHoleList
     u8   b136;                  // 0x136  the holes are not one course's 1..18 (four kinds, 0x136..0x139):
@@ -557,51 +584,67 @@ typedef struct GameState {
     u8   unk1C6[0x1C8 - 0x1C6];
     // The mode's callbacks (0x1C8..0x26C). GM_SetModeType sets them all to defaults (mostly empty
     // stubs), then the mode's own setup replaces the ones it needs. The names are TW06's
-    // GameModeBase methods, from the modes' implementations (GameModeStroke, GameModeMatch, ...).
+    // GameModeBase methods, from the modes' implementations (GameModeStroke, GameModeMatch, ...),
+    // and TW07's GameModeBase.cpp, which defines its methods in the slots' order.
     void (*pfnInit)(void);      // 0x1C8  the mode's setup. TW06: Init
     void (*pfnShutdown)(void);  // 0x1CC  the mode ends. TW06: Shutdown (GameModeBattle)
-    void (*pfnSetupNextGolfer)(void);   // 0x1D0  the hole starts. TW06: SetupNextGolfer
+    void (*pfnSetupNextGolfer)(void);   // 0x1D0  the next turn: whose shot it is, once every golfer
+                                //        waits (GM_SetupGolfer_IfAllWaiting). TW06: SetupNextGolfer
     s32  (*pfnGetHonors)(int nPlayer);  // 0x1D4  who plays after nPlayer (5 = nobody). TW06: GetHonors
     u8   (*pfnHoleFinished)(int nPlayer, u8 bCheck);   // 0x1D8  the hole is over; bCheck 1 only asks
                                 //        (Gimme_Allowed). TW06: HoleFinished(PlayerNumber_t, u8)
     u8   (*pfnGameFinished)(u8 bCheck);     // 0x1DC  the game is over. TW06: GameFinished(u8)
     u8   (*pfnGoToPlayoff)(u8 bCheck);      // 0x1E0  TW06: GoToPlayoff(u8). Nothing in the binary
                                 //        calls it (0x800CFB88 only adds the slots up)
-    void (*pfn1E4)(void);       // 0x1E4  hole start
+    void (*pfnLoadHole)(void);  // 0x1E4  a hole starts (GM_InitForHole). TW07: LoadHole (the PGA
+                                //        TOUR's is TW06's PostHoleLoadInit)
     void (*pfnEndHole)(void);   // 0x1E8  hole finished. TW06: EndHole
-    void (*pfn1EC)(void);       // 0x1EC
-    void (*pfn1F0)(void);       // 0x1F0
+    void (*pfnStartGamePreData)(void);  // 0x1EC  a round starts, before the course data and cameras
+                                //        (GM_InitModule_PreDataStream). TW07: StartGamePreData
+    void (*pfnStartGamePostData)(void); // 0x1F0  a round starts, after the players are set up
+                                //        (GM_InitModule_PostDataStream). TW07: StartGamePostData
     void (*pfnEndGame)(void);   // 0x1F4  game finished. TW06: EndGame
-    u8   (*pfn1F8)(int nPlayer); // 0x1F8  GM_IsPuttForLead returns its answer
-    u8   (*pfn1FC)(int nPlayer); // 0x1FC  asked before the special ball pick-up
+    u8   (*pfnIsPuttForLead)(int nPlayer);  // 0x1F8  holing this ball takes the lead
+                                //        (GM_IsPuttForLead). TW07: IsPuttForLead
+    u8   (*pfnIsPuttForWin)(int nPlayer);   // 0x1FC  holing this ball wins; asked before the
+                                //        special ball pick-up. TW07: IsPuttForWin
     s32  (*pfn200)(int nPlayer); // 0x200  strokes behind the leader. TW06: GetCurrentLead
     s32  (*pfn204)(int nPlayer); // 0x204  the same if this putt drops. TW06: GetPotentialLead
-    s32  (*pfn208)(int nPlayer); // 0x208
+    s32  (*pfnGetPotentialHoleResult)(int nPlayer); // 0x208  how the hole ends if this ball
+                                //        drops. TW07: GetPotentialHoleResult
     void (*pfn20C)(int nPlayer); // 0x20C  called as a swing begins (state 1)
     void (*pfn210)(int nPlayer); // 0x210  the hole is over, the game is not
     void (*pfn214)(void);       // 0x214
     void (*pfn218)(int nPlayer); // 0x218
     void (*pfn21C)(int nPlayer); // 0x21C
     void (*pfn220)(void);       // 0x220  every frame in game type 6
-    void (*pfn224)(void);       // 0x224  the hole restarts
+    void (*pfnRestartHole)(void);   // 0x224  the hole restarts (GM_RestartHole). TW07: RestartHole
     void (*pfn228)(int nPlayer); // 0x228  called every frame of the shot setup (state 10)
     void (*pfn22C)(int nPlayer); // 0x22C  called after a re-plan in swing state 9
     u8   (*pfn230)(int nPlayer); // 0x230
-    u8   (*pfn234)(void);       // 0x234  GM_CheckControllerPulled asks it (TW06 CheckControllerPulled)
+    u8   (*pfnCheckControllerPulled)(void);    // 0x234  GM_CheckControllerPulled asks it.
+                                //        TW06 / TW07: CheckControllerPulled
     u8   (*pfn238)(int nPlayer); // 0x238  nonzero: skip addressing the ball (swing state 1)
-    void (*pfn23C)(int nPlayer); // 0x23C
-    s32  (*pfn240)(int nPlayer); // 0x240  called from 0x800A3460 with the player
-    void (*pfn244)(int nPlayer); // 0x244
+    void (*pfnBallCollision)(int nPlayer);  // 0x23C  the ball hit something (event.c, ball events
+                                //        35..38). TW07: BallCollision
+    s32  (*pfnTriggerSplash)(int nPlayer);  // 0x240  the ball touched a surface: returns a hit
+                                //        effect to play too (PsBallFx.c). TW07: TriggerSplash
+    void (*pfnCheckShotAwards)(int nPlayer);    // 0x244  a shot is over, in bounds
+                                //        (GM_Earnings_PayShotGoals). TW07: CheckShotAwards
     void (*pfnEndGolferTurn)(int nPlayer); // 0x248  end of a golfer's turn. TW06: EndGolferTurn
     void (*pfn24C)(int nPlayer); // 0x24C  called when a swing leaves state 20
-    void (*pfn250)(int nPlayer); // 0x250  the ball went out of bounds
-    void (*pfn254)(int nPlayer); // 0x254  a mulligan was taken
-    u8   (*pfn258)(int nPlayer); // 0x258  the re-plan button is allowed
-    void (*pfn25C)(int nPlayer, int nTime); // 0x25C  set the time left (GameMode13)
+    void (*pfnBallOOB)(int nPlayer);    // 0x250  the ball went out of bounds. TW07: BallOOB
+    void (*pfnMulligan)(int nPlayer);   // 0x254  a mulligan was taken. TW07: Mulligan
+    u8   (*pfnPickTarget)(int nPlayer); // 0x258  the re-plan button: the target modes pick the next
+                                //        target; nonzero lets the re-plan run. TW07: PickTarget
+    void (*pfnSetTimer)(int nPlayer, int nTime);    // 0x25C  set the time left. TW07: SetTimer
     void (*pfn260)(int nPlayer); // 0x260
-    u8   (*pfn264)(int nPlayer); // 0x264  "aim at the pin?" for a re-plan
-    void (*pfn268)(int nPlayer, int nId); // 0x268  a bonus was collected (GameMode16)
-    s32  (*pfn26C)(int a, int nTarget); // 0x26C  a target's state for the HUD (GameMode14)
+    u8   (*pfnPickPrevTarget)(int nPlayer); // 0x264  "aim at the pin?" for a re-plan; the target
+                                //        modes pick the previous target. TW07: PickPrevTarget
+    void (*pfnCollisionActor)(int nPlayer, int nId);    // 0x268  the ball hit a world object nId
+                                //        (a bonus, GameMode16). TW07: CollisionActor
+    s32  (*pfnGreenType)(int a, int nTarget);   // 0x26C  a target's state for its marker
+                                //        (GoDynObj.c, GameMode14). TW07: GreenType
     u8   bShowYardage;          // 0x270  show how far each shot went
     u8   b271;                  // 0x271
     u8   bStrokeLimit;          // 0x272  a hole ends at 10 strokes
@@ -623,7 +666,8 @@ typedef struct GameState {
     u8   b282;                  // 0x282
     u8   b283;                  // 0x283  the special swing cameras may be used
     u8   b284;                  // 0x284  the re-plan button works
-    u8   b285;                  // 0x285
+    u8   bAllowGameBreakers;    // 0x285  the mode allows GameBreakers (GameEffects.c). TW07:
+                                //        AllowGameBreakers
     u8   b286;                  // 0x286  the flight camera toggles are allowed
     u8   b287;                  // 0x287  in-flight replays are allowed
     u8   b288;                  // 0x288

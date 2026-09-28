@@ -237,7 +237,7 @@ void STATEFUNC_PreShotInit(int nPlayer) {
     }
     if (GM_DoPreshotAnimation(nPlayer) != 0) {
         SKATime_UnPause(gPlayers[nPlayer].pChar->anim);
-        if (gPlayers[nPlayer].bLowIQPenalty != 0 && gPlayers[nPlayer].ball.nLie != 0
+        if (gPlayers[nPlayer].bPenaltyShot != 0 && gPlayers[nPlayer].ball.nLie != 0
             && !Lessons_IsRunning()) {
             fn_80095744(gPlayers[nPlayer].pChar, 10);
         } else {
@@ -518,7 +518,7 @@ void STATEFUNC_SwingInit(int nPlayer) {
     Emotion_UpdatePlayerEmotion(nPlayer);
     fn_8006ACF8(nPlayer, 5);
     gPlayers[nPlayer].fC20 = 0.0f;
-    if (gPlayers[nPlayer].bC2E == 0 && gpGame->b281 != 0 && !Player_IsCPU(nPlayer)) {
+    if (gPlayers[nPlayer].bUsedMulligan == 0 && gpGame->b281 != 0 && !Player_IsCPU(nPlayer)) {
         if (HoleContest_IsCurrentPlayerOnTee() && HoleContest_IsLongestDriveHole()) {
             GUI_ShowHoleContestIntro(0);
             GUI_ToggleUI(nPlayer, 0);
@@ -535,7 +535,7 @@ void STATEFUNC_SwingInit(int nPlayer) {
             CTIP_ShowCaddieTip(nPlayer);
         }
     }
-    if (gPlayers[nPlayer].bC2E == 0 && !Player_IsCPU(nPlayer) && PlayNow_IsChallengeRunning()
+    if (gPlayers[nPlayer].bUsedMulligan == 0 && !Player_IsCPU(nPlayer) && PlayNow_IsChallengeRunning()
         && PlayNow_IsIntroPending()) {
         if (GM_Currently_RealtimeMode()) {
             GUI_ShowRealtimeEventIntro(fn_800EAC7C());
@@ -559,7 +559,7 @@ void STATEFUNC_SwingInit(int nPlayer) {
     pOwnBall = &gPlayers[nPlayer].ball;
     fn_80047B6C(pOwnBall, nPlayer);
     fn_80047BC0(pOwnBall, nPlayer);
-    gPlayers[nPlayer].bC2E = 0;
+    gPlayers[nPlayer].bUsedMulligan = 0;
     gPlayers[nPlayer].bPlanReady = 0;
     gPlayers[nPlayer].uFlags     = 0;
     EVENT_Trigger(nPlayer, 7, 0, -1);
@@ -629,7 +629,7 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
     Caddie_Update(nPlayer);
     if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(6, 0)) {
         if (gpGame->b284 != 0) {
-            if (gpGame->pfn264(nPlayer)) {
+            if (gpGame->pfnPickPrevTarget(nPlayer)) {
                 AI_DefaultTarget(nPlayer);
             } else if (gPlayers[nPlayer].nShotKind == SHOT_TYPE_PUTT_e) {
                 AI_DefaultTarget(nPlayer);
@@ -1141,7 +1141,7 @@ void STATEFUNC_GreenMorphUpdate(int nPlayer) {
     Caddie_Update(nPlayer);
     if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(6, 0)) {
         if (gpGame->b284 != 0) {
-            if (gpGame->pfn264(nPlayer)) {
+            if (gpGame->pfnPickPrevTarget(nPlayer)) {
                 AI_DefaultTarget(nPlayer);
             } else if (gPlayers[nPlayer].nShotKind == SHOT_TYPE_PUTT_e) {
                 AI_DefaultTarget(nPlayer);
@@ -1443,7 +1443,7 @@ void STATEFUNC_ShowYardageUpdate(int nPlayer) {
     if (GUI_CheckMessageQue()) return;
     if (!GUI_IsPostShotUIAnimating(nPlayer)) {
         if (fn_80063C7C(pV)) {
-            if (gPlayers[nPlayer].bLowIQPenalty != 0) {
+            if (gPlayers[nPlayer].bPenaltyShot != 0) {
                 GM_ReplaceOOBBall(nPlayer);
             }
             GM_EndOfGolferTurn(nPlayer);
@@ -1502,7 +1502,7 @@ void STATEFUNC_ShowYardageUpdate(int nPlayer) {
 }
 
 void STATEFUNC_ShowYardageExit(int nPlayer) {
-    if (gPlayers[nPlayer].bC2E == 0 && lbl_80281E10 == 0) {
+    if (gPlayers[nPlayer].bUsedMulligan == 0 && lbl_80281E10 == 0) {
         GM_BumpBallForObstructions(nPlayer);
     }
     lbl_80281E10 = 0;
@@ -1807,7 +1807,7 @@ void STATEFUNC_InitialFlyByInit(int nPlayer) {
 // is pressed on any pad (Controller_AnyPadHasButtons); the confirm hooks (fn_80062B88, fn_80062B7C) return 1.
 void STATEFUNC_InitialFlyByUpdate(int nPlayer) {
     u8 bDone = 0;
-    if (gSession.a8[0] == 0 || !Controller_AnyPadHasButtons(0)) {
+    if (gSession.bDemo == 0 || !Controller_AnyPadHasButtons(0)) {
         if (gSession.options.bSkipCameras) {
             bDone = 1;
         } else if (CameraController_IsFlybyDone(

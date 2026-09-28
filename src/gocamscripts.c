@@ -2908,32 +2908,33 @@ void fn_80045470(CamLens* pLens, f32 fFov) {
     CA_vUpdateInternalFieldOfViewData(pLens);
 }
 
-// The quarter-speed slow motion (GameEffects.b11) on or off, with its sound events (0x35 on,
-// 0x36 off); every second of its frames moves the ball.
+// Half time, the half-speed slow motion (GameEffects.bHalfTime), on or off, with its sound events
+// (0x35 on, 0x36 off); every second of its frames moves the ball.
 void fn_80045494(u8 bOn, int nPlayer) {
     gGameEffects.n2C = 2;
     if (bOn) {
-        if (!gGameEffects.b11) {
+        if (!gGameEffects.bHalfTime) {
             EVENT_Trigger(nPlayer, 0x35, gPlayers[nPlayer].vBall, -1);
-            gGameEffects.b11 = bOn;
+            gGameEffects.bHalfTime = bOn;
             gGameEffects.n28 = 0;
         }
-    } else if (gGameEffects.b11) {
+    } else if (gGameEffects.bHalfTime) {
         EVENT_Trigger(nPlayer, 0x36, gPlayers[nPlayer].vBall, -1);
-        gGameEffects.b11 = bOn;
+        gGameEffects.bHalfTime = bOn;
     }
 }
 
-// The half-speed slow motion (GameEffects.b10) on or off, with its sound events (0x37 on, 0x38 off).
+// Double time, twice the normal speed (GameEffects.bDoubleTime), on or off, with its sound events
+// (0x37 on, 0x38 off).
 void fn_80045558(u8 bOn, int nPlayer) {
     if (bOn) {
-        if (!gGameEffects.b10) {
+        if (!gGameEffects.bDoubleTime) {
             EVENT_Trigger(nPlayer, 0x37, gPlayers[nPlayer].vBall, -1);
-            gGameEffects.b10 = bOn;
+            gGameEffects.bDoubleTime = bOn;
         }
-    } else if (gGameEffects.b10) {
+    } else if (gGameEffects.bDoubleTime) {
         EVENT_Trigger(nPlayer, 0x38, gPlayers[nPlayer].vBall, -1);
-        gGameEffects.b10 = bOn;
+        gGameEffects.bDoubleTime = bOn;
     }
 }
 
@@ -2944,7 +2945,7 @@ u8 fn_8004560C(void) {
 }
 
 u8 fn_8004561C(void) {
-    return gGameEffects.b10;
+    return gGameEffects.bDoubleTime;
 }
 
 u8 fn_8004562C(CamShot* pShot) {
