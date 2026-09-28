@@ -646,8 +646,8 @@ u16  GetDateFromCellIndex(u32 nCell);            // the date in a grid cell
 s32  GetCellIndexFromDate(u16 nDate);
 
 // GameTargets.c: what the target games (modes 13..17) share
-extern f32 lbl_80211D38[40][4];         // the target list: lbl_80282360 points (w = 1)
-extern s8  lbl_80282360;                // the number of targets (GameModeReplay.c)
+extern f32 gSkillZoneCups[40][4];         // the target list: gSkillZoneNumCups points (w = 1)
+extern s8  gSkillZoneNumCups;                // the number of targets (GameModeReplay.c)
 void GameModeSkillZoneBase_SortCupsByDistanceFromTee(void);                 // sort the targets by distance from the tee
 void GameModeSkillZoneBase_SetCup(int nPlayer, s8 n);
 void GameModeSkillZoneBase_SetCup_AlignGolfer(int nPlayer, s8 n);

@@ -34,7 +34,7 @@ void  Gaud_MultiplierBonus(void);
 
 u8   GameModeSkillZoneBase_FirstShot(int nPlayer);
 
-// Sorts the target list (lbl_80211D38, lbl_80282360 points) by distance from player 0's tee (the
+// Sorts the target list (gSkillZoneCups, gSkillZoneNumCups points) by distance from player 0's tee (the
 // tee of gSession.nTeeSet[0]), nearest first, by swapping pairs. Each target mode's hole start
 // calls it, so target 0 is the nearest.
 void GameModeSkillZoneBase_SortCupsByDistanceFromTee(void) {
@@ -42,13 +42,13 @@ void GameModeSkillZoneBase_SortCupsByDistanceFromTee(void) {
     int i;
     int j;
     f32* pTee = &Ter_GetTGD()->tee[gSession.nTeeSet[0]].x;
-    for (i = 0; i < lbl_80282360 - 1; i++) {
-        for (j = i + 1; j < lbl_80282360; j++) {
-            if (LLMath_DistanceBetween3(lbl_80211D38[i], pTee)
-                > LLMath_DistanceBetween3(lbl_80211D38[j], pTee)) {
-                LLMath_CopyVec(lbl_80211D38[i], tmp);
-                LLMath_CopyVec(lbl_80211D38[j], lbl_80211D38[i]);
-                LLMath_CopyVec(tmp, lbl_80211D38[j]);
+    for (i = 0; i < gSkillZoneNumCups - 1; i++) {
+        for (j = i + 1; j < gSkillZoneNumCups; j++) {
+            if (LLMath_DistanceBetween3(gSkillZoneCups[i], pTee)
+                > LLMath_DistanceBetween3(gSkillZoneCups[j], pTee)) {
+                LLMath_CopyVec(gSkillZoneCups[i], tmp);
+                LLMath_CopyVec(gSkillZoneCups[j], gSkillZoneCups[i]);
+                LLMath_CopyVec(tmp, gSkillZoneCups[j]);
             }
         }
     }
@@ -59,11 +59,11 @@ void GameModeSkillZoneBase_SortCupsByDistanceFromTee(void) {
 // flag model (skeletal object 100) when there is one.
 void GameModeSkillZoneBase_SetCup(int nPlayer, s8 n) {
     Character* pChar;
-    gPlayers[nPlayer].nTarget = n % lbl_80282360;
-    LLMath_CopyVec(lbl_80211D38[gPlayers[nPlayer].nTarget], (f32*)Ter_GetTGD()->pin);
+    gPlayers[nPlayer].nTarget = n % gSkillZoneNumCups;
+    LLMath_CopyVec(gSkillZoneCups[gPlayers[nPlayer].nTarget], (f32*)Ter_GetTGD()->pin);
     pChar = SkeletalObject_FindObject(100);
     if (pChar != NULL) {
-        Character_SetPosition(pChar, lbl_80211D38[gPlayers[nPlayer].nTarget], 1);
+        Character_SetPosition(pChar, gSkillZoneCups[gPlayers[nPlayer].nTarget], 1);
     }
 }
 
@@ -85,7 +85,7 @@ void GameModeSkillZoneBase_SetCup_AlignGolfer(int nPlayer, s8 n) {
 // shot); mode 15 calls it from its own.
 u8 GameModeSkillZoneBase_PickPrevTarget(int nPlayer) {
     if (gPlayers[nPlayer].nTarget == 0) {
-        GameModeSkillZoneBase_SetCup(nPlayer, lbl_80282360 - 1);
+        GameModeSkillZoneBase_SetCup(nPlayer, gSkillZoneNumCups - 1);
     } else {
         GameModeSkillZoneBase_SetCup(nPlayer, gPlayers[nPlayer].nTarget - 1);
     }
@@ -106,9 +106,9 @@ s8 GameModeSkillZoneBase_GetGreenIndexHit(int nPlayer) {
     f32* pBall = gPlayers[nPlayer].ball.vPos;
     s8 i;
     s8 nBest = 0;
-    f32 fBest = LLMath_DistanceBetween3(lbl_80211D38[0], pBall);
-    for (i = 1; i < lbl_80282360; i++) {
-        f32 f = LLMath_DistanceBetween3(lbl_80211D38[i], pBall);
+    f32 fBest = LLMath_DistanceBetween3(gSkillZoneCups[0], pBall);
+    for (i = 1; i < gSkillZoneNumCups; i++) {
+        f32 f = LLMath_DistanceBetween3(gSkillZoneCups[i], pBall);
         if (f < fBest) {
             fBest = f;
             nBest = i;
@@ -123,9 +123,9 @@ int GameModeSkillZoneBase_GetGreenTargetted(int nPlayer) {
     f32* pTarget = gPlayers[nPlayer].vTarget;
     int i;
     int nBest = 0;
-    f32 fBest = LLMath_DistanceBetween3(lbl_80211D38[0], pTarget);
-    for (i = 1; i < lbl_80282360; i++) {
-        f32 f = LLMath_DistanceBetween3(lbl_80211D38[i], pTarget);
+    f32 fBest = LLMath_DistanceBetween3(gSkillZoneCups[0], pTarget);
+    for (i = 1; i < gSkillZoneNumCups; i++) {
+        f32 f = LLMath_DistanceBetween3(gSkillZoneCups[i], pTarget);
         if (f < fBest) {
             fBest = f;
             nBest = i;

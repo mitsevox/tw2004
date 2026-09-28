@@ -1,5 +1,5 @@
 // GameMode4.c (our name): game mode 4, the matches of the 25-event ladder loaded from the 'TCM '
-// stream (lbl_802124B8, 0x44 bytes an event; names from 'TCMS'). An event is a one-on-one match
+// stream (gLadderEvents, 0x44 bytes an event; names from 'TCMS'). An event is a one-on-one match
 // against a pro (mode 4, match play with GameModeMatch's callbacks) or a mode 5 challenge (neither
 // is set up for an event with n1C set; GameModeSkins_EndGame also scores the current event).
 // Winning one sets its flag in the save profile, pays its prize and unlocks the pro and a reward.
@@ -25,7 +25,7 @@ typedef struct LadderEvent {
     s32 nName;                  // 0x3C  the name's offset in the 'TCMS' text
     s32 n40;                    // 0x40
 } LadderEvent;
-LadderEvent lbl_802124B8[25];
+LadderEvent gLadderEvents[25];
 
 // The 'TCMS' text: the events' names.
 typedef struct LadderNames {
@@ -33,15 +33,15 @@ typedef struct LadderNames {
     u32   uSize;
 } LadderNames;
 
-s32 lbl_802816E0 = 4;                    // the options' unkC, saved while a match is played
-void (*lbl_80282450)(void);          // the challenge's own end-of-mode callback
-s32 lbl_8028244C;                    // money to add to the course tracking when the event ends
-s32 lbl_80282448;                    // the event's opponent
-s32 lbl_80282444;                    // the event's reward plus 1
-LadderNames lbl_8028243C;
-s32 lbl_80282438;                    // the current event
-u8  lbl_80282434;                    // a ladder event is being played
-s32 lbl_80282430;                    // the wind option, saved
+s32 gLadderSavedWeather = 4;                    // the options' unkC, saved while a match is played
+void (*gLadderChallengeShutdown)(void);          // the challenge's own end-of-mode callback
+s32 gLadderEventBonus;                    // money to add to the course tracking when the event ends
+s32 gLadderOpponent;                    // the event's opponent
+s32 gLadderReward;                    // the event's reward plus 1
+LadderNames gLadderNames;
+s32 gLadderCurrentEvent;                    // the current event
+u8  gLadderEventRunning;                    // a ladder event is being played
+s32 gLadderSavedWind;                    // the wind option, saved
 
 void  GM_Earnings_AwardDoubleMoney(int nPlayer, int nMoney);
 
@@ -85,15 +85,15 @@ int GameMode4_GetNumEventsWon(void) {
 }
 
 int GameMode4_GetEventOpponent(int nEvent) {
-    return lbl_802124B8[nEvent].nGolfer;
+    return gLadderEvents[nEvent].nGolfer;
 }
 
 int GameMode4_GetEventCourse(int nEvent) {
-    return lbl_802124B8[nEvent].nCourse;
+    return gLadderEvents[nEvent].nCourse;
 }
 
 int GameMode4_GetEventHoles(int nEvent) {
-    return lbl_802124B8[nEvent].nHoles;
+    return gLadderEvents[nEvent].nHoles;
 }
 
 int fn_80102134(void) {
@@ -107,10 +107,10 @@ int fn_80102158(void) {
 // The kind of event: 0 not played here, 1 a challenge, 2 a milestone match (every fourth, and the
 // last two), 3 a match.
 int fn_8010217C_GetEventKind(int nEvent) {
-    if (lbl_802124B8[nEvent].n1C != 0) {
+    if (gLadderEvents[nEvent].n1C != 0) {
         return 0;
     }
-    if (lbl_802124B8[nEvent].nChallenge != 0) {
+    if (gLadderEvents[nEvent].nChallenge != 0) {
         return 1;
     }
     if (nEvent == 3 || nEvent == 7 || nEvent == 11 || nEvent == 15 || nEvent == 19 || nEvent == 23 ||
@@ -121,7 +121,7 @@ int fn_8010217C_GetEventKind(int nEvent) {
 }
 
 int fn_801021FC(void) {
-    return lbl_80282438;
+    return gLadderCurrentEvent;
 }
 
 // Has the profile won the event?
@@ -134,8 +134,8 @@ u8 GameMode4_IsEventOpen(int nProfile, int nEvent) {
     int i;
     u8 bOpen = 1;
     for (i = 0; i < 6; i++) {
-        if (lbl_802124B8[nEvent].aNeeded[i] != 0 &&
-            !GameMode4_HasWonEvent(nProfile, lbl_802124B8[nEvent].aNeeded[i] - 1)) {
+        if (gLadderEvents[nEvent].aNeeded[i] != 0 &&
+            !GameMode4_HasWonEvent(nProfile, gLadderEvents[nEvent].aNeeded[i] - 1)) {
             bOpen = 0;
             break;
         }
@@ -147,14 +147,14 @@ u8 GameMode4_IsEventOpen(int nProfile, int nEvent) {
 u8 GameMode4_SelectEvent(int nProfile, int nEvent) {
     u8 bOk = 0;
     if (GameMode4_IsEventOpen(nProfile, nEvent)) {
-        lbl_80282438 = nEvent;
+        gLadderCurrentEvent = nEvent;
         bOk = 1;
     }
     return bOk;
 }
 
 void fn_80102308(s32 n) {
-    lbl_8028244C = n;
+    gLadderEventBonus = n;
 }
 
 void GameMode4_RegisterStreamClients(void) {
@@ -170,27 +170,27 @@ void GameMode4_LoadTCMFromStream(UStreamObject* pObject) {
     // port: the 'TCM ' object is copied straight into the ladder events (LadderEvent[25]); it is
     //       big-endian on disc, so a little-endian port converts it field by field here
     //       (docs/format-byteorder.md)
-    Stream_StreamLoadFixedSize(pObject, sizeof(lbl_802124B8), lbl_802124B8);
+    Stream_StreamLoadFixedSize(pObject, sizeof(gLadderEvents), gLadderEvents);
 }
 
 void GameMode4_LoadTCMSFromStream(UStreamObject* pObject) {
     if (pObject) {
-        lbl_8028243C.uSize = pObject->uSize;
-        lbl_8028243C.pText = fn_800951A0(lbl_8028243C.uSize, 0x10, 1);
-        memcpy(lbl_8028243C.pText, pObject->pData, lbl_8028243C.uSize);
+        gLadderNames.uSize = pObject->uSize;
+        gLadderNames.pText = fn_800951A0(gLadderNames.uSize, 0x10, 1);
+        memcpy(gLadderNames.pText, pObject->pData, gLadderNames.uSize);
     }
 }
 
 // The mode ends: the challenge's own callback first, then the saved options go back.
 void GameMode4_Shutdown(void) {
-    if (lbl_80282450) {
-        lbl_80282450();
+    if (gLadderChallengeShutdown) {
+        gLadderChallengeShutdown();
     }
     gpGame->nC = 1;
     gpGame->n10 = 1;
-    gSession.options.nWeather = lbl_802816E0;
-    gSession.options.nWind = lbl_80282430;
-    lbl_80282434 = 0;
+    gSession.options.nWeather = gLadderSavedWeather;
+    gSession.options.nWind = gLadderSavedWind;
+    gLadderEventRunning = 0;
 }
 
 // Starts the current event: a challenge through mode 5, or a two-player match against its pro
@@ -198,34 +198,34 @@ void GameMode4_Shutdown(void) {
 void GameMode4_StartEvent(void) {
     int nEvent;
     int nPins;
-    lbl_802816E0 = gSession.options.nWeather;
-    lbl_80282430 = gSession.options.nWind;
+    gLadderSavedWeather = gSession.options.nWeather;
+    gLadderSavedWind = gSession.options.nWind;
     gSession.options.nWeather = 4;
     gSession.options.nWind = 0;
-    lbl_80282434 = 1;
+    gLadderEventRunning = 1;
     nEvent = fn_801021FC();
-    lbl_80282448 = lbl_802124B8[nEvent].nGolfer;
-    lbl_80282444 = lbl_802124B8[nEvent].nReward;
-    if (lbl_802124B8[nEvent].n1C == 0) {
-        if (lbl_802124B8[nEvent].nChallenge != 0) {
+    gLadderOpponent = gLadderEvents[nEvent].nGolfer;
+    gLadderReward = gLadderEvents[nEvent].nReward;
+    if (gLadderEvents[nEvent].n1C == 0) {
+        if (gLadderEvents[nEvent].nChallenge != 0) {
             gSession.nNumPlayers = 1;
             GM_SetModeType(5);
-            PlayNow_SelectChallenge(lbl_802124B8[nEvent].nChallenge - 1);
+            PlayNow_SelectChallenge(gLadderEvents[nEvent].nChallenge - 1);
             PlayNow_StartChallenge();
-            lbl_80282450 = gpGame->pfnShutdown;
+            gLadderChallengeShutdown = gpGame->pfnShutdown;
             gpGame->pfnShutdown = GameMode4_Shutdown;
         } else {
-            lbl_80282450 = NULL;
+            gLadderChallengeShutdown = NULL;
             gpGame->nC = 2;
             gpGame->n10 = 2;
             Session_SetNumPlayers(2);
-            Session_SetGolfer(lbl_802124B8[nEvent].nGolfer, 1);
+            Session_SetGolfer(gLadderEvents[nEvent].nGolfer, 1);
             gSession.nController[1] = CONTROLLER_CPU;
-            GM_SetCurrentCourse(lbl_802124B8[nEvent].nCourse);
-            GM_SelectHoleSet(lbl_802124B8[nEvent].nHoles);
-            nPins = lbl_802124B8[nEvent].nPins;
-            gSession.nTeeSet[0] = lbl_802124B8[nEvent].nTeeSet;
-            gSession.nTeeSet[1] = lbl_802124B8[nEvent].nTeeSet;
+            GM_SetCurrentCourse(gLadderEvents[nEvent].nCourse);
+            GM_SelectHoleSet(gLadderEvents[nEvent].nHoles);
+            nPins = gLadderEvents[nEvent].nPins;
+            gSession.nTeeSet[0] = gLadderEvents[nEvent].nTeeSet;
+            gSession.nTeeSet[1] = gLadderEvents[nEvent].nTeeSet;
             if (nPins != 0) {
                 gSession.nPinSet = nPins - 1;
             }
@@ -235,7 +235,7 @@ void GameMode4_StartEvent(void) {
 
 // Is a ladder event being played?
 u8 fn_801025F4(void) {
-    return lbl_80282434;
+    return gLadderEventRunning;
 }
 
 // EndGame: a win pays the event's prize (its base plus so much a hole of the margin, at most 5),
@@ -317,16 +317,16 @@ void GameMode4_WinEvent(void) {
         // EA bug: the profile number goes in as the player number, so GM_Earnings_GiveAwardToUser checks
         // gPlayers[nProfile] (player 0 only while player 0 plays profile 0).
         GM_Earnings_GiveAwardToUser(nProfile, &gpSaveData[nProfile].aLadderAward[nEvent]);
-        if (lbl_80282448 != 34 && !fn_8005832C(nProfile, lbl_80282448)) {
-            fn_80058278(nProfile, lbl_80282448);
-            GUI_QueueMessage(4, lbl_80282448, 0, nProfile);
+        if (gLadderOpponent != 34 && !fn_8005832C(nProfile, gLadderOpponent)) {
+            fn_80058278(nProfile, gLadderOpponent);
+            GUI_QueueMessage(4, gLadderOpponent, 0, nProfile);
         }
-        if (lbl_80282444 != 0) {
-            fn_80058428(nProfile, lbl_80282444 - 1);
-            GUI_QueueMessage(3, 0x16, lbl_80282444, nProfile);
+        if (gLadderReward != 0) {
+            fn_80058428(nProfile, gLadderReward - 1);
+            GUI_QueueMessage(3, 0x16, gLadderReward, nProfile);
         }
-        if (lbl_8028244C != 0) {
-            GM_Earnings_AwardDoubleMoney(0, lbl_8028244C);
+        if (gLadderEventBonus != 0) {
+            GM_Earnings_AwardDoubleMoney(0, gLadderEventBonus);
         }
         if (fn_80102158() == 2) {
             bLast = 0;
@@ -348,17 +348,17 @@ void GameMode4_WinEvent(void) {
 }
 
 int fn_80102A44(int nEvent) {
-    return lbl_802124B8[nEvent].n0;
+    return gLadderEvents[nEvent].n0;
 }
 
 // Copies the event's name.
 void GameMode4_GetEventName(int nEvent, char* szOut) {
     if (nEvent < 0 || nEvent >= 25) return;
-    strcpy(szOut, lbl_8028243C.pText + lbl_802124B8[nEvent].nName);
+    strcpy(szOut, gLadderNames.pText + gLadderEvents[nEvent].nName);
 }
 
 int fn_80102AAC(int nEvent) {
-    return lbl_802124B8[nEvent].n40;
+    return gLadderEvents[nEvent].n40;
 }
 
 void fn_80102AC4(void) {

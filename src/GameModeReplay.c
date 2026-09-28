@@ -1,6 +1,6 @@
 // GameModeReplay.c (TW06's GameModeReplay): game mode 10, playing back a saved shot (gReplayData):
 // the saved course, hole, wind and player are put back and the shot starts again. Also the target
-// games' target list (lbl_80211D38, lbl_80282360 points); the rest of their shared code is
+// games' target list (gSkillZoneCups, gSkillZoneNumCups points); the rest of their shared code is
 // GameTargets.c.
 
 #include "golfer.h"
@@ -9,7 +9,7 @@
 #include "engine.h"
 
 // This file's .sbss (game.h).
-s8 lbl_80282360;
+s8 gSkillZoneNumCups;
 
 void GameModeReplay_LoadHole(void);
 void GameModeReplay_RestartHole(void);
@@ -20,7 +20,7 @@ u8   GameModeReplay_HoleFinished(int nPlayer, u8 bCheck);
 u8   GameModeReplay_GameFinished(u8 bCheck);
 void GameModeReplay_EndGame(void);
 
-f32 lbl_80211D38[40][4];
+f32 gSkillZoneCups[40][4];
 
 // Mode 10 starts: one player, no mulligans, no split screen; hole 0 of the round is made current.
 void GameModeReplay_Init(void) {
@@ -180,17 +180,17 @@ const f32 lbl_80284694 = 0.0f;
 
 // The target games' target list.
 int fn_800F1960(void) {
-    return lbl_80282360;
+    return gSkillZoneNumCups;
 }
 
 void fn_800F196C(int i, f32* pOut) {
-    LLMath_CopyVec(lbl_80211D38[i], pOut);
+    LLMath_CopyVec(gSkillZoneCups[i], pOut);
 }
 
 void fn_800F199C(f32 x, f32 y, f32 z) {
-    lbl_80211D38[lbl_80282360][0] = x;
-    lbl_80211D38[lbl_80282360][1] = y;
-    lbl_80211D38[lbl_80282360][2] = z;
-    lbl_80211D38[lbl_80282360][3] = 1.0f;
-    lbl_80282360++;
+    gSkillZoneCups[gSkillZoneNumCups][0] = x;
+    gSkillZoneCups[gSkillZoneNumCups][1] = y;
+    gSkillZoneCups[gSkillZoneNumCups][2] = z;
+    gSkillZoneCups[gSkillZoneNumCups][3] = 1.0f;
+    gSkillZoneNumCups++;
 }

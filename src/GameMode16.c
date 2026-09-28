@@ -91,7 +91,7 @@ void GameModeSkillZoneTarget_Init(void) {
     gpGame->n290 = 0;
     gpGame->n294 = 0;
     gpGame->nDC = 0;
-    lbl_80282360 = 0;
+    gSkillZoneNumCups = 0;
     gSession.nPinSet = 0;
     GM_SetCurrentHole(0);
 }
@@ -199,7 +199,7 @@ void GameModeSkillZoneTarget_CheckShotAwards(int nPlayer) {
         } else {
             gPlayers[nPlayer].nDE4[nTarget]++;
             gPlayers[nPlayer].aDC4[3]++;
-            if (lbl_80282360 == GameModeSkillZoneBase_CountGreensHit(nPlayer)) {
+            if (gSkillZoneNumCups == GameModeSkillZoneBase_CountGreensHit(nPlayer)) {
                 gTargetShotPoints = GameModeSkillZoneBase_GetHitAllTargetsBonus();
                 gTargetShotPoints = GM_Earnings_ComputeBonusModifiers(gTargetShotPoints, nPlayer, 1, 1, 1, 0);
                 gTargetShotPoints = GM_Earnings_ComputeTOURCardModifiers(gTargetShotPoints, nPlayer, 0);

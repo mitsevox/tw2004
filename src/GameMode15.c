@@ -104,7 +104,7 @@ void GameModeSkillZoneHorse_Init(void) {
     gpGame->n294 = 0;
     gpGame->nDC = 0;
     GM_SetCurrentHole(0);
-    lbl_80282360 = 0;
+    gSkillZoneNumCups = 0;
     gSession.nSplitScreen = 0;
     gSession.nPinSet = 0;
 }

@@ -11,8 +11,8 @@
 
 void  fn_80102704_WinSkinsEvent(void);
 void  GameMode4_WinEvent(void);
-s32 lbl_802823C4;                    // the money carried over
-s32 lbl_802823C0;                    // skins carried over
+s32 gSkinsCarryOver;                    // the money carried over
+s32 gSkinsNumCarryOver;                    // skins carried over
 
 void fn_800F81EC(void);
 void GameModeSkins_SetupNextGolfer(void);
@@ -42,14 +42,14 @@ void GameModeSkins_Init(void) {
     gpGame->nC = 4;
     gpGame->n10 = 2;
     gpGame->nDC = 0;
-    lbl_802823C4 = 0;
-    lbl_802823C0 = 0;
+    gSkinsCarryOver = 0;
+    gSkinsNumCarryOver = 0;
     gSession.nSplitScreen = 0;
 }
 
 void fn_800F81EC(void) {
-    lbl_802823C4 = 0;
-    lbl_802823C0 = 0;
+    gSkinsCarryOver = 0;
+    gSkinsNumCarryOver = 0;
 }
 
 // When everyone waits: the player GetHonors picks goes to pre-shot, the others wait.
@@ -195,7 +195,7 @@ u8 GameModeSkins_GameFinished(u8 bCheck) {
     int i;
     int nHole;
     if (gpGame->bInPlayoff) {
-        if (lbl_802823C0 == 0) {
+        if (gSkinsNumCarryOver == 0) {
             return 1;
         }
         if (bCheck) {
@@ -316,8 +316,8 @@ void GameModeSkins_EndHole(void) {
     if (nSecond != 5 && gPlayers[nBest].nStrokes[Game_CurHoleIndex()] ==
                         gPlayers[nSecond].nStrokes[Game_CurHoleIndex()]) {
         if (!gpGame->bInPlayoff) {
-            lbl_802823C4 += GM_Earnings_GetSkinsHoleValue(GM_GetHighestRatedGolfer(), Game_CurHoleIndex());
-            lbl_802823C0++;
+            gSkinsCarryOver += GM_Earnings_GetSkinsHoleValue(GM_GetHighestRatedGolfer(), Game_CurHoleIndex());
+            gSkinsNumCarryOver++;
         }
     } else {
         n = GameModeSkins_CurrentHoleValue();
@@ -325,8 +325,8 @@ void GameModeSkins_EndHole(void) {
         gPlayers[nBest].n274 += gPlayers[nBest].n22C[Game_CurHoleIndex()];
         gPlayers[nBest].nModePoints[Game_CurHoleIndex()] = 1;
         gPlayers[nBest].nHolesWon += GameModeSkins_CurrentHoleNumberSkins();
-        lbl_802823C4 = 0;
-        lbl_802823C0 = 0;
+        gSkinsCarryOver = 0;
+        gSkinsNumCarryOver = 0;
     }
 }
 
@@ -376,25 +376,25 @@ void GameModeSkins_EndGame(void) {
 s32 GameModeSkins_CurrentHoleValue(void) {
     int h;
     if (gpGame->bInPlayoff) {
-        return lbl_802823C4;
+        return gSkinsCarryOver;
     }
     if (GUI_ScoreCardUp()) {
         for (h = Game_CurHoleIndex() + 1; h < 18; h++) {
             if (gpGame->bHoleSelected[h]) {
-                return lbl_802823C4 + GM_Earnings_GetSkinsHoleValue(GM_GetHighestRatedGolfer(), h);
+                return gSkinsCarryOver + GM_Earnings_GetSkinsHoleValue(GM_GetHighestRatedGolfer(), h);
             }
         }
     }
     h = Game_CurHoleIndex();
-    return lbl_802823C4 + GM_Earnings_GetSkinsHoleValue(GM_GetHighestRatedGolfer(), h);
+    return gSkinsCarryOver + GM_Earnings_GetSkinsHoleValue(GM_GetHighestRatedGolfer(), h);
 }
 
 // Skins at stake on this hole: those carried over, plus one outside the playoff.
 s32 GameModeSkins_CurrentHoleNumberSkins(void) {
     if (gpGame->bInPlayoff) {
-        return lbl_802823C0;
+        return gSkinsNumCarryOver;
     }
-    return lbl_802823C0 + 1;
+    return gSkinsNumCarryOver + 1;
 }
 
 // The first selected hole.

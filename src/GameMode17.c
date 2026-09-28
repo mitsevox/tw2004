@@ -89,7 +89,7 @@ void GameModeSkillZoneTargetToTarget_Init(void) {
     gpGame->n290 = 0;
     gpGame->n294 = 0;
     gpGame->nDC = 0;
-    lbl_80282360 = 0;
+    gSkillZoneNumCups = 0;
     gSession.nPinSet = 0;
     GM_SetCurrentHole(0);
 }
@@ -187,7 +187,7 @@ void GameModeSkillZoneTargetToTarget_CheckShotAwards(int nPlayer) {
         GameModeSkillZoneBase_GetBullsEyeColor(nSurface);
         if (nTarget == gPlayers[nPlayer].nNextTarget) {
             gPlayers[nPlayer].nNextTarget++;
-            if (gPlayers[nPlayer].nNextTarget >= lbl_80282360) {
+            if (gPlayers[nPlayer].nNextTarget >= gSkillZoneNumCups) {
                 gPlayers[nPlayer].nNextTarget = 0;
             }
             gPlayers[nPlayer].nE90++;
@@ -196,7 +196,7 @@ void GameModeSkillZoneTargetToTarget_CheckShotAwards(int nPlayer) {
             }
             gPlayers[nPlayer].nDE4[nTarget]++;
             gPlayers[nPlayer].aDC4[3]++;
-            if (lbl_80282360 == GameModeSkillZoneBase_CountGreensHit(nPlayer)) {
+            if (gSkillZoneNumCups == GameModeSkillZoneBase_CountGreensHit(nPlayer)) {
                 gTargetToTargetShotPoints = GameModeSkillZoneBase_GetHitAllTargetsBonus();
                 gTargetToTargetShotPoints += gPlayers[nPlayer].nDC0 * 100;
                 gTargetToTargetShotPoints = GM_Earnings_ComputeBonusModifiers(gTargetToTargetShotPoints,
@@ -219,7 +219,7 @@ void GameModeSkillZoneTargetToTarget_CheckShotAwards(int nPlayer) {
                 }
             }
             if (nMsg == -1) {
-                switch (lbl_80282360 - GameModeSkillZoneBase_CountGreensHit(nPlayer)) {
+                switch (gSkillZoneNumCups - GameModeSkillZoneBase_CountGreensHit(nPlayer)) {
                 case 1:
                     if (Misc_RandFunc(0) & 1) {
                         nMsg = 0x26;
@@ -248,7 +248,7 @@ void GameModeSkillZoneTargetToTarget_CheckShotAwards(int nPlayer) {
                     nMsg = 0x2A;
                     break;
                 default:
-                    if (GameModeSkillZoneBase_CountGreensHit(nPlayer) <= lbl_80282360 / 4) {
+                    if (GameModeSkillZoneBase_CountGreensHit(nPlayer) <= gSkillZoneNumCups / 4) {
                         if (gTargetToTargetShotBalls == 1) {
                             if (Misc_RandFunc(0) & 1) {
                                 nMsg = 0x36;
@@ -442,7 +442,7 @@ void GameModeSkillZoneTargetToTarget_BallOOB(int nPlayer) {
 // ball left (nDC0); nPlayer and bCheck are not used.
 u8 GameModeSkillZoneTargetToTarget_HoleFinished(int nPlayer, u8 bCheck) {
     int i;
-    if (lbl_80282360 == GameModeSkillZoneBase_CountGreensHit(0)) {
+    if (gSkillZoneNumCups == GameModeSkillZoneBase_CountGreensHit(0)) {
         return 1;
     }
     for (i = 0; i < gNumPlayersSetUp; i++) {

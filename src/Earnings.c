@@ -330,7 +330,7 @@ int GM_Earnings_GetLadderWinnings(int nWinner, int nLoser, int nMargin, s32* pPr
 
 // Pays player nPlayer twice nMoney, booked in the breakdown's n24 and n3C (nothing with mulligans).
 // Its one caller is GameMode4_WinEvent, with the amount a ladder menu message stored
-// (lbl_8028244C).
+// (gLadderEventBonus).
 void GM_Earnings_AwardDoubleMoney(int nPlayer, int nMoney) {
     CourseMoneyTracking money;
     s32 nPaid;

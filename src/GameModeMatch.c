@@ -9,7 +9,7 @@
 #include "game/modes/challenge.h"
 #include "game/save.h"
 
-s32 lbl_80281658 = 5;                    // who has the honor in the playoff (5 = nobody yet)
+s32 gMatchPlayoffHonors = 5;                    // who has the honor in the playoff (5 = nobody yet)
 
 int  GameModeMatch_GetTeeHonors(int nPlayer);
 void GameModeMatch_EndGame(void);
@@ -30,7 +30,7 @@ void GameModeMatch_Init(void) {
     gpGame->nC = 2;
     gpGame->n10 = 2;
     gpGame->nDC = 0;
-    lbl_80281658 = 5;
+    gMatchPlayoffHonors = 5;
     gSession.nSplitScreen = 0;
 }
 
@@ -52,8 +52,8 @@ void fn_800E9F14(void) {
 int GameModeMatch_GetTeeHonors(int nPlayer) {
     int h;
     int i;
-    if (gpGame->bInPlayoff && nPlayer != lbl_80281658) {
-        return lbl_80281658;
+    if (gpGame->bInPlayoff && nPlayer != gMatchPlayoffHonors) {
+        return gMatchPlayoffHonors;
     }
     for (h = Game_CurHoleIndex() - 1; h >= 0; h--) {
         if (gpGame->bHoleSelected[h]) {
@@ -250,7 +250,7 @@ u8 GameModeMatch_GoToPlayoff(u8 bCheck) {
             return 1;
         }
         gpGame->nCurHole++;
-        lbl_80281658 = GameModeMatch_GetTeeHonors(5);
+        gMatchPlayoffHonors = GameModeMatch_GetTeeHonors(5);
         gpGame->nCurHole--;
         gpGame->bPlayoffFullRound = 1;
         for (h = 0; h < 18; h++) {

@@ -24,7 +24,7 @@ typedef struct Claim {
 
 // Mode 14's state; only this file uses it. The .sbss ones are defined last address first (the
 // compiler lays a file's .sbss out last definition first).
-Claim gCaptureClaims[40];       // per target of the target list (lbl_80211D38)
+Claim gCaptureClaims[40];       // per target of the target list (gSkillZoneCups)
 s32 gCaptureSavedWeather = 4;  // options.nWeather before the game (StartGamePreData; Shutdown restores it)
 s32 gCaptureShotPoints;         // the points of the last claim (GetShotEarned)
 u8  gCaptureShotClockOut;       // the shot clock ran out (ShotClockOut): the shot claims nothing
@@ -101,7 +101,7 @@ void GameModeSkillZoneCapture_Init(void) {
     gpGame->n294 = 0;
     gpGame->nDC = 0;
     GM_SetCurrentHole(0);
-    lbl_80282360 = 0;
+    gSkillZoneNumCups = 0;
     gSession.nSplitScreen = 0;
     gSession.nPinSet = 0;
 }
