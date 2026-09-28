@@ -5532,8 +5532,7 @@ void GM_vFEMessage372_Empty(MsgArg* pArgs, MsgArg* pResult) {
 void GM_vFEMessage380_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Front-end message 399: the string pArgs[0] becomes pArgs[1] asterisks (a hidden entry: the menus
-// show a typed code as stars).
+// Front-end message 399: the string pArgs[0] becomes pArgs[1] asterisks (a hidden entry).
 void GM_vMaskString(MsgArg* pArgs, MsgArg* pResult) {
     char szStars[64] = "";
     int i;
@@ -5543,7 +5542,9 @@ void GM_vMaskString(MsgArg* pArgs, MsgArg* pResult) {
     for (i = 0; i < nLen; i++) {
         szStars[i] = '*';
     }
-    szStars[i + 1] = '\0';      // EA bug: one past the stars; the buffer is zeroed anyway
+    // EA bug: the terminator goes one past the stars (the buffer is zeroed, so the string still
+    // ends); for pArgs[1] of 63 it writes szStars[64], past the buffer (64 or more: the loop does)
+    szStars[i + 1] = '\0';
     strcpy(((MsgString*)pArgs[0].p)->pStr, szStars);
 }
 
