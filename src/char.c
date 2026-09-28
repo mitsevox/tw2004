@@ -151,7 +151,7 @@ void  fn_800CABA0(void);                                        // AnimStream.c
 void  fn_800CB078(void);                                        // AnimStream.c
 void  fn_8001DD18(u8* pData, int nBytes);
 void  fn_8001DEC8(u8* pData, int nBytes);
-s32   fn_800CE8C0(Skin** apSkins, int nSkins, SkinListEntry** ppList);   // SkinPart.c
+s32   SkinPart_ListAllTextures(Skin** apSkins, int nSkins, SkinListEntry** ppList);   // SkinPart.c
 void  fn_800CEEBC(void);                                        // SkinPart.c: empty
 void  fn_800100B0(TexBank* pBank, TexEntry* p8, TexPalette* pC, void* p10, void* p14, int nNumTex,
                   int nNumPalettes);                            // LLTex.c
@@ -1201,8 +1201,8 @@ void Character_FreeTextures(Character* pChar) {
 
 // Reads the character's textures from its CHR object (after the slider definitions, p4C) into
 // bank78: in the front end (game types 10 and 3) all of them; otherwise, for each name the skins
-// use (fn_800CE8C0), the texture of that name (and the one after it when it goes with it) with its
-// palette, or an empty one. Then it opens the golfer's texture file.
+// use (SkinPart_ListAllTextures), the texture of that name (and the one after it when it goes with
+// it) with its palette, or an empty one. Then it opens the golfer's texture file.
 void Character_LoadTextures(Character* pChar, Skin** apSkins, int nSkins) {
     TexEntry* pTexData;
     TexPalette* pPalData;
@@ -1249,7 +1249,7 @@ void Character_LoadTextures(Character* pChar, Skin** apSkins, int nSkins) {
         pChar->nAC = nTex;
         pChar->nB4 = nPal;
     } else {
-        pChar->nAC = fn_800CE8C0(apSkins, nSkins, &pList);
+        pChar->nAC = SkinPart_ListAllTextures(apSkins, nSkins, &pList);
         nExtra = 0;
         pChar->nB4 = pChar->nAC;
         nPalBytes = pChar->nB4 * sizeof(TexPalette);
@@ -1450,7 +1450,7 @@ void Character_ExecuteTextureSwapFE(Character* pChar) {
         fn_8010BA2C(pModel);
         fn_80008380();
         for (i = 0; i < pChar->nSkins; i++) {
-            fn_800CE170(pChar->apSkins[i], pModel);
+            SkinPart_SetupMaterials(pChar->apSkins[i], pModel);
         }
         fn_8010BC64(pModel);
     }
@@ -2970,7 +2970,7 @@ void fn_8001D6F0(void) {
             Character_SetClubsAndClothes(pChar, i);
             Character_CopySkinChoices1To0(pChar);
             for (j = 0; j < pChar->nSkins; j++) {
-                fn_800CE170(pChar->apSkins[j], pChar->a64[pChar->n74]);
+                SkinPart_SetupMaterials(pChar->apSkins[j], pChar->a64[pChar->n74]);
             }
             gSession.aD28[i] = 0;
         }

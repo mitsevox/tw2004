@@ -668,7 +668,7 @@ typedef struct Character {
                                 //         Character_CreateFromMem); fn_8001DC64 applies them
     void (*pfn17B0)(void);      // 0x17B0  called by Character_UpdateAnimation before the bones are
                                 //         transformed; cleared by Character_Create
-    s8    n17B4;                // 0x17B4  cleared by Character_Create; Skin.c hands it to fn_800CE02C as
+    s8    n17B4;                // 0x17B4  cleared by Character_Create; Skin.c hands it to SkinPart_BeginDraw as
                                 //         the a10A0 index
     u8    unk17B5[0x17B8 - 0x17B5];
     struct SkinChoices* pChoices;   // 0x17B8  its look (Character_SetClubsAndClothes dresses it from this); Character_EndLoadTexturesCallbackIG

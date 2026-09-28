@@ -32,7 +32,7 @@ typedef struct SkinVariant {
 } SkinVariant;
 LAYOUT_ASSERT(SkinVariant, 0x18);
 
-// A variant's setting of another part's option (fn_800CDF80).
+// A variant's setting of another part's option (SkinPart_ApplyVariantLink).
 typedef struct SkinLink {
     u64  uPart;                 // 0x0  the part's name code
     s32  nOption;               // 0x8
@@ -41,14 +41,14 @@ typedef struct SkinLink {
 LAYOUT_ASSERT(SkinLink, 0x10);
 
 // A texture's scale (x, y) and offset (x, y): an entry of SkinDesc.pB8, SkinDesc14.a20 (taken from
-// pB8 by fn_800CE224) and a material's copy of it (SkinDesc18.uvC, hwsMaterial_Gc.c fn_80112614
+// pB8 by SkinPart_ApplySetsToMaterialEntry) and a material's copy of it (SkinDesc18.uvC, hwsMaterial_Gc.c fn_80112614
 // copies it whole; hwsRender_Gc.c fn_80112DD8 reads it).
 typedef struct SkinDescB8 {
     f32  a[4];                  // 0x0
 } SkinDescB8;
 LAYOUT_ASSERT(SkinDescB8, 0x10);
 
-// An entry of SkinDesc.p14, copied and patched by fn_800CE224.
+// An entry of SkinDesc.p14, copied and patched by SkinPart_ApplySetsToMaterialEntry.
 typedef struct SkinDesc14 {
     u64  uId;                   // 0x00
     u32  u08;                   // 0x08  bit 2: take a4 from SkinDesc.pB8
@@ -313,7 +313,7 @@ typedef struct Skin {
     struct HwsMemBlock* p1090;  // 0x1090  freed by fn_80037708
     u8   unk1094[0x1098 - 0x1094];
     struct HwsMemBlock* a1098[2];   // 0x1098  indexed like a10A0 (fn_8011CB5C)
-    struct HwsOverrideTable* a10A0[2];  // 0x10A0  indexed by fn_800CE02C's argument; Skin.c sets [0]
+    struct HwsOverrideTable* a10A0[2];  // 0x10A0  indexed by SkinPart_BeginDraw's argument; Skin.c sets [0]
     SkinChoice* aParts[4];      // 0x10A8  a choice per part, four copies (fn_800CEE04 copies one
                                 //         over another); [3] is set while lbl_80282238 is clear
     SkinChoice* aSets[4];       // 0x10B8  the same per SkinDesc.p74 set
@@ -547,15 +547,15 @@ typedef struct SkinIterArgs {
     s32  n;                     // 0x4
 } SkinIterArgs;
 
-// An entry of the lists fn_800CE660 and fn_800CE8C0 build: each name code once.
+// An entry of the lists SkinPart_ListChosenTextures and SkinPart_ListAllTextures build: each name code once.
 typedef struct SkinListEntry {
     u64  uId;                   // 0x0
-    u8*  p8;                    // 0x8  what fn_800CE224 gave for it
+    u8*  p8;                    // 0x8  what SkinPart_ApplySetsToMaterialEntry gave for it
     s32  nC;                    // 0xC
 } SkinListEntry;
 LAYOUT_ASSERT(SkinListEntry, 0x10);
 
-// What fn_800CE170 is given (by char.c and FEgolferanim.c); only what it reads.
+// What SkinPart_SetupMaterials is given (by char.c and FEgolferanim.c); only what it reads.
 typedef struct SkinTarget {
     u8   unk0[4];
     TexBank* pBank;             // 0x4  passed on to fn_80112614: its materials' textures come from it
@@ -634,9 +634,9 @@ void  SkinPart_ChoosePartVariant(Skin* pSkin, int nPart, int nVariant);
 void  SkinPart_ChooseSet(Skin* pSkin, int nSet, int nVariant, int nOption);
 u8*   SkinPart_GetSetOptionData(Skin* pSkin, int nSet, int nVariant, int nOption);    // SkinDesc8C.a08, or NULL
 s32   SkinPart_FindPart(Skin* pSkin, u64 uId);
-s32   fn_800CDBB0(Skin* pSkin, int nPart, u64 uId);
+s32   SkinPart_FindPartVariant(Skin* pSkin, int nPart, u64 uId);
 s32   SkinPart_FindSet(Skin* pSkin, u64 uId);
-s32   fn_800CDCA0(Skin* pSkin, const char* pName);
+s32   SkinPart_FindSetByName(Skin* pSkin, const char* pName);
 s32   SkinPart_FindSetVariant(Skin* pSkin, int nSet, u64 uId);
 s32   SkinPart_FindSetVariantByName(Skin* pSkin, int nSet, const char* pName);
 s32   SkinPart_FindSetOption(Skin* pSkin, int nSet, int nVariant, u64 uId);
@@ -644,7 +644,7 @@ void  CharSlider_UpdateCharacterBasedOnSliderValues(CharSliderDefs* pDefs, CharM
                   struct SKABlendNode* pNode);
                                         // applies slider values (Character.p17AC's definitions)
 void  CharSlider_Free(CharSliderDefs* pDefs);   // CharSliders.c: frees slider definitions
-void  fn_800CE170(Skin* pSkin, SkinTarget* pTarget);
+void  SkinPart_SetupMaterials(Skin* pSkin, SkinTarget* pTarget);
 void  SkinPart_ApplyBodyChoices(Character* pChar, SkinChoices* pChoices);
 void  SkinPart_ChooseBodySetByName(Character* pChar, char* pSet, char* pVariant, char* pOption);
 void  SkinPart_ApplyClubChoices(Character* pChar, SkinChoices* pChoices);
@@ -662,7 +662,7 @@ s32   SkinPart_GetNumParts(Skin* pSkin);
 s32   SkinPart_GetPartVariant(Skin* pSkin, int nPart, int nCopy);
 s32   SkinPart_GetPartOption(Skin* pSkin, int nPart, int nCopy);
 void  SkinPart_MarkAllOptions(Skin* pSkin);
-s32   fn_800CE224(Skin* pSkin, SkinDesc14* pEntry, u8** ppOut, s32* pnOut, int nCopy);
+s32   SkinPart_ApplySetsToMaterialEntry(Skin* pSkin, SkinDesc14* pEntry, u8** ppOut, s32* pnOut, int nCopy);
 u8    SkinIter_IsValid(SkinIter* pIter);
 void  SkinIter_Next(SkinIter* pIter);
 SkinMesh* SkinIter_GetMesh(SkinIter* pIter);
@@ -676,11 +676,11 @@ u8    fn_80112C04(void);                // hwsRender_Gc.c: 0 on course 14's hole
 // SkinPart.c, as Skin.c uses it.
 u64   SkinPart_GetPartId(Skin* pSkin, int nPart);
 void  SkinPart_FreeChoices(Skin* pSkin);
-s32   fn_800CDB70(Skin* pSkin, const char* pName);
-void  fn_800CE02C(Skin* pSkin, int n);
-void  fn_800CE0B0(Skin* pSkin, int nPart);
-void  fn_800CE128(Skin* pSkin);
-void  fn_800CE168(void);
+s32   SkinPart_FindPartByName(Skin* pSkin, const char* pName);
+void  SkinPart_BeginDraw(Skin* pSkin, int n);
+void  SkinPart_DrawPart(Skin* pSkin, int nPart);
+void  SkinPart_EndDraw(Skin* pSkin);
+void  SkinPart_ShutdownSkin(void);
 
 // SkinMorph.c: the morph targets a skin description needs.
 s32   fn_8011C850(SkinDesc* pDesc);

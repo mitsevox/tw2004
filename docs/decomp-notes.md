@@ -874,7 +874,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   strength-reducing `p[i]`. LLFont fn_80011D0C 7 -> 0 (`pLine[n]` instead of a `pCut` walk),
   LLDynTex fn_8010A930 123 -> 105 (`pIndices[i]`).
 - **[verified] One local per job**: reusing a counter or pointer for a second job merges registers
-  EA kept apart. SkinPart fn_800CE660 9 -> 0 (new `v`/`m` loop counters), char
+  EA kept apart. SkinPart SkinPart_ListChosenTextures 9 -> 0 (new `v`/`m` loop counters), char
   Character_PlaceFeetOnGround 3 -> 0 (an `fH` local), UISApi fn_80168FC8 7 -> 0.
 - **[verified] The opposite also happens: route subexpressions through EXISTING multiply-assigned
   locals**; fresh single-assignment locals are copied back into the expression and change nothing.

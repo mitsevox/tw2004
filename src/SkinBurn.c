@@ -283,9 +283,10 @@ void fn_80127B10(Skin* pSkin, HwsBurn* pBurn) {
     fn_801276E4(pSkin);
 }
 
-// The callback fn_80127B98 hands hwsBurn.c: patches an entry (fn_800CE224), clears bit 1 and n16.
+// The callback fn_80127B98 hands hwsBurn.c: patches an entry (SkinPart_ApplySetsToMaterialEntry),
+// clears bit 1 and n16.
 void fn_80127B4C(Skin* pSkin, SkinDesc14* pEntry) {
-    fn_800CE224(pSkin, pEntry, NULL, NULL, 0);
+    SkinPart_ApplySetsToMaterialEntry(pSkin, pEntry, NULL, NULL, 0);
     pEntry->u08 &= ~2;
     pEntry->n16 = 0;
 }

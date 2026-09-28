@@ -825,7 +825,7 @@ void sFE_AdjustAndSetGolferPosition(void) {
         lbl_80281EE0->b87 = 0;
         Character_ExecuteTextureSwapFE(pChar);
         for (i = 0; i < pChar->nSkins; i++) {
-            fn_800CE170(pChar->apSkins[i], pChar->a64[pChar->n74]);
+            SkinPart_SetupMaterials(pChar->apSkins[i], pChar->a64[pChar->n74]);
         }
         fn_8010BC64(pChar->a64[pChar->n74]);
     }

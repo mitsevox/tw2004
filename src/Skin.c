@@ -24,7 +24,7 @@ void  SkinPart_SetChangeAllCopies(u8 b);                       // SkinPart.c
 void  fn_800CEF04(SkinDesc* pDesc);            // SkinPart.c: offsets to pointers
 void  SkinPart_AllocChoices(Skin* pSkin);                // SkinPart.c
 s32   SkinPart_GetMaxOptionsSize(Skin* pSkin);                // SkinPart.c
-void  fn_800CE164(void);                       // SkinPart.c
+void  SkinPart_InitSkin(void);                       // SkinPart.c
 void  SkinPart_UpdateMarks(Skin* pSkin);                // SkinPart.c
 void  fn_8011C9B0(Skin* pSkin);                // SkinMorph.c
 s32   fn_8011CDE8(Skin* pSkin);                // SkinMorph.c
@@ -52,7 +52,7 @@ f32   fn_8004B78C(CourseInfo* pCourse, f32* pPos);           // GoTerrainCollisi
 // GoTerrain.c: calls row nRow's pfn8
 void  SD_SetShaderTypeParameters(int nRow, void* pData);
 void  fn_8011CB5C(Skin* pSkin, int nView);                   // SkinMorph.c
-void  fn_800CE16C(void);                                     // SkinPart.c
+void  SkinPart_UpdateSkin(void);                                     // SkinPart.c
 void  fn_8003662C(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst, int nView);
 void  fn_80036790(Skin* pSkin, int n);
 void  fn_80029EF4(u32* pSrc, u32* pDst, u32 nBits);          // Skeleton.c
@@ -80,23 +80,23 @@ void fn_80035640(Character* pChar) {
     Skin* pSkin;
 
     SKA_PackName(&uShadow, "shadow");
-    fn_800CE02C(pChar->pSkin, pChar->n17B4);
+    SkinPart_BeginDraw(pChar->pSkin, pChar->n17B4);
     nParts = SkinPart_GetNumParts(pChar->pSkin);
     for (i = 0; i < nParts; i++) {
         if (SkinPart_GetPartId(pChar->pSkin, i) == uShadow) {
-            // port: EA passes an argument fn_800CE0B0 ignores
-            ((void (*)(Skin*, int, int))fn_800CE0B0)(pChar->pSkin, i, pChar->n17B4);
+            // port: EA passes an argument SkinPart_DrawPart ignores
+            ((void (*)(Skin*, int, int))SkinPart_DrawPart)(pChar->pSkin, i, pChar->n17B4);
         }
     }
-    fn_800CE128(pChar->pSkin);
+    SkinPart_EndDraw(pChar->pSkin);
     if (pChar->p16D8 != NULL) {
         pSkin = pChar->p16D8->apSkins[pChar->nClubClass];
         if (pSkin != NULL) {
-            fn_800CE02C(pSkin, pChar->n17B4);
-            // port: EA passes an argument fn_800CE0B0 ignores
-            ((void (*)(Skin*, int, int))fn_800CE0B0)(pSkin, SkinPart_FindPart(pSkin, uShadow),
+            SkinPart_BeginDraw(pSkin, pChar->n17B4);
+            // port: EA passes an argument SkinPart_DrawPart ignores
+            ((void (*)(Skin*, int, int))SkinPart_DrawPart)(pSkin, SkinPart_FindPart(pSkin, uShadow),
                                                      pChar->n17B4);
-            fn_800CE128(pSkin);
+            SkinPart_EndDraw(pSkin);
         }
     }
 }
@@ -108,15 +108,15 @@ void fn_80035754(Character* pChar) {
     int i;
 
     SKA_PackName(&uShadow, "shadow");
-    fn_800CE02C(pChar->pSkin, pChar->n17B4);
+    SkinPart_BeginDraw(pChar->pSkin, pChar->n17B4);
     nParts = SkinPart_GetNumParts(pChar->pSkin);
     for (i = 0; i < nParts; i++) {
         if (SkinPart_GetPartId(pChar->pSkin, i) != uShadow) {
-            // port: EA passes an argument fn_800CE0B0 ignores
-            ((void (*)(Skin*, int, int))fn_800CE0B0)(pChar->pSkin, i, pChar->n17B4);
+            // port: EA passes an argument SkinPart_DrawPart ignores
+            ((void (*)(Skin*, int, int))SkinPart_DrawPart)(pChar->pSkin, i, pChar->n17B4);
         }
     }
-    fn_800CE128(pChar->pSkin);
+    SkinPart_EndDraw(pChar->pSkin);
     fn_80035810(pChar);
 }
 
@@ -131,15 +131,15 @@ void fn_80035810(Character* pChar) {
     if (pChar->p16D8 != NULL) {
         pSkin = pChar->p16D8->apSkins[pChar->nClubClass];
         if (pSkin != NULL) {
-            fn_800CE02C(pSkin, pChar->n17B4);
-            nShadow = fn_800CDB70(pSkin, "shadow");
+            SkinPart_BeginDraw(pSkin, pChar->n17B4);
+            nShadow = SkinPart_FindPartByName(pSkin, "shadow");
             for (i = 0; i < SkinPart_GetNumParts(pSkin); i++) {
                 if (i != nShadow) {
-                    // port: EA passes an argument fn_800CE0B0 ignores
-                    ((void (*)(Skin*, int, int))fn_800CE0B0)(pSkin, i, pChar->n17B4);
+                    // port: EA passes an argument SkinPart_DrawPart ignores
+                    ((void (*)(Skin*, int, int))SkinPart_DrawPart)(pSkin, i, pChar->n17B4);
                 }
             }
-            fn_800CE128(pSkin);
+            SkinPart_EndDraw(pSkin);
         }
     }
 }
@@ -274,8 +274,8 @@ void fn_80035B40(Character* pChar, int n) {
     }
     fn_8003662C(pChar->pSkin, pChar->pModel, 0, 0, pChar->n17B4);
     fn_80036790(pChar->pSkin, pChar->n17B4);
-    // port: EA passes arguments fn_800CE16C ignores
-    ((void (*)(Skin*, int))fn_800CE16C)(pChar->pSkin, pChar->n17B4);
+    // port: EA passes arguments SkinPart_UpdateSkin ignores
+    ((void (*)(Skin*, int))SkinPart_UpdateSkin)(pChar->pSkin, pChar->n17B4);
     if (pChar->p16D8 != NULL) {
         pClub = pChar->p16D8->apSkins[pChar->nClubClass];
         if (pClub != NULL) {
@@ -932,7 +932,7 @@ void fn_80037574(BonePose* pBones, s32 nBones) {
 }
 
 // Allocates what a skin needs once loaded (bit 2 of u10D4; 0 if it already was): the matrices,
-// the two bit arrays and, with a description, its morph memory. b: also calls fn_800CE164.
+// the two bit arrays and, with a description, its morph memory. b: also calls SkinPart_InitSkin.
 s32 fn_800375AC(Skin* pSkin, u8 b) {
     SkinModel* pModel;
     SkinDesc* pDesc;
@@ -957,7 +957,7 @@ s32 fn_800375AC(Skin* pSkin, u8 b) {
         pSkin->a10A0[0] = fn_80112A10(pModel->pDesc, 0);
         pSkin->u10D4 = 1;
         if (b) {
-            ((void (*)(Skin*))fn_800CE164)(pSkin);  // port: EA passes an argument fn_800CE164 ignores
+            ((void (*)(Skin*))SkinPart_InitSkin)(pSkin);  // port: EA passes an argument SkinPart_InitSkin ignores
         }
     }
     fn_8011CE58(pSkin);
@@ -983,7 +983,7 @@ s32 fn_80037708(Skin* pSkin) {
         pSkin->a10A0[0] = NULL;
         fn_80037D5C(pSkin->pModel->pDesc);
     }
-    ((void (*)(Skin*))fn_800CE168)(pSkin);  // port: EA passes an argument fn_800CE168 ignores
+    ((void (*)(Skin*))SkinPart_ShutdownSkin)(pSkin);  // port: EA passes an argument SkinPart_ShutdownSkin ignores
     if (pSkin->p108C != NULL) {
         StaticMem_Free(pSkin->p108C);
     }

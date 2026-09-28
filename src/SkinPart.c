@@ -37,12 +37,13 @@ s32   SkinPart_GetMeshBit(Skin* pSkin, s32 n);
 void  SkinPart_MarkMeshMatrices(Skin* pSkin, SkinMesh* pMesh);
 void  SkinPart_MarkOption(Skin* pSkin, int n);
 void  SkinPart_MarkPart(Skin* pSkin, int nPart);
-s32   fn_800CDE80(Skin* pSkin, int nSet, int nVariant, const char* pName);
-s32   fn_800CDEF4(Skin* pSkin, int nPart, int nVariant);
-void  fn_800CDF80(Skin* pSkin, int nPart, int nVariant, int nLink);
-void  fn_800CE4B8(u64 uId, SkinListEntry* aList, s32* pnList, u8* p, s32 n);
-void  fn_800CE52C(Skin* pSkin, int n, SkinListEntry* aList, s32* pnList, int nCopy);
-s32   fn_800CE660(Skin** apSkins, int nSkins, SkinListEntry** ppList, u64* aIds, int nIds, int nCopy);
+s32   SkinPart_FindSetOptionByName(Skin* pSkin, int nSet, int nVariant, const char* pName);
+s32   SkinPart_GetNumVariantLinks(Skin* pSkin, int nPart, int nVariant);
+void  SkinPart_ApplyVariantLink(Skin* pSkin, int nPart, int nVariant, int nLink);
+void  SkinPart_AddToTexList(u64 uId, SkinListEntry* aList, s32* pnList, u8* p, s32 n);
+void  SkinPart_ListOptionTextures(Skin* pSkin, int n, SkinListEntry* aList, s32* pnList, int nCopy);
+s32   SkinPart_ListChosenTextures(Skin** apSkins, int nSkins, SkinListEntry** ppList, u64* aIds, int nIds,
+                                  int nCopy);
 u8    fn_800CEA30(u64 uId, SkinListEntry* aList, int nList);
 u64   fn_800CEA6C(int i, SkinListEntry* aList, int nList);
 u8*   fn_800CEAAC(int i, SkinListEntry* aList, int nList);
@@ -129,7 +130,7 @@ void SkinPart_BurnBodySkin(Character* pChar) {
     if (pChar == NULL || pChar->pSkin == NULL) return;
     n = 0;
     for (ppName = lbl_80281540; *ppName != NULL; ppName++) {
-        nPart = fn_800CDB70(pChar->pSkin, *ppName);
+        nPart = SkinPart_FindPartByName(pChar->pSkin, *ppName);
         if (nPart >= 0) {
             aParts[n++] = nPart;
         }
@@ -153,7 +154,7 @@ void SkinPart_ChooseBodyPartVariantByName(Character* pChar, char* pPart, char* p
     SKA_PackName(&uId, pPart);
     nPart = SkinPart_FindPart(pChar->pSkin, uId);
     SKA_PackName(&uId, pVariant);
-    nVariant = fn_800CDBB0(pChar->pSkin, nPart, uId);
+    nVariant = SkinPart_FindPartVariant(pChar->pSkin, nPart, uId);
     SkinPart_ChooseBodyPartVariant(pChar, nPart, nVariant);
 }
 
@@ -166,9 +167,9 @@ void SkinPart_ChooseBodySetByName(Character* pChar, char* pSet, char* pVariant, 
 
     if (pChar == NULL || pChar->pSkin == NULL) return;
     if (pChar->pSkin->pModel != NULL) {
-        nSet = fn_800CDCA0(pChar->pSkin, pSet);
+        nSet = SkinPart_FindSetByName(pChar->pSkin, pSet);
         nVariant = SkinPart_FindSetVariantByName(pChar->pSkin, nSet, pVariant);
-        nOption = fn_800CDE80(pChar->pSkin, nSet, nVariant, pOption);
+        nOption = SkinPart_FindSetOptionByName(pChar->pSkin, nSet, nVariant, pOption);
         SkinPart_ChooseBodySet(pChar, nSet, nVariant, nOption);
     }
 }
@@ -187,7 +188,7 @@ void SkinPart_ChooseClubPartVariant(Character* pChar, int nSkin, u64 uPart, u64 
     if (pChar->pSkin->pModel != NULL) {
         pSkin = pChar->p16D8->apSkins[nSkin];
         nPart = SkinPart_FindPart(pSkin, uPart);
-        nVariant = fn_800CDBB0(pSkin, nPart, uVariant);
+        nVariant = SkinPart_FindPartVariant(pSkin, nPart, uVariant);
         if (nVariant < 0) {
             nVariant = 0;
         }
@@ -309,7 +310,7 @@ s32 SkinPart_GetNumPartOptions(Skin* pSkin, int nPart, int nVariant) {
 // Picks a part's variant (-1, none, when out of range) in copy 3, or in all four copies when
 // SkinPart_GetChangeAllCopies, then also setting Skin.u10D4 bit 1 so SkinPart_UpdateMarks redoes
 // the drawn meshes. A chosen variant's links then set the options of the parts they name
-// (fn_800CDF80).
+// (SkinPart_ApplyVariantLink).
 void SkinPart_ChoosePartVariant(Skin* pSkin, int nPart, int nVariant) {
     SkinDesc* pDesc;
     int i;
@@ -332,9 +333,9 @@ void SkinPart_ChoosePartVariant(Skin* pSkin, int nPart, int nVariant) {
                 pSkin->aParts[3][nPart].nVariant = nVariant;
             }
             if (nVariant >= 0) {
-                nLinks = fn_800CDEF4(pSkin, nPart, nVariant);
+                nLinks = SkinPart_GetNumVariantLinks(pSkin, nPart, nVariant);
                 for (i = 0; i < nLinks; i++) {
-                    fn_800CDF80(pSkin, nPart, nVariant, i);
+                    SkinPart_ApplyVariantLink(pSkin, nPart, nVariant, i);
                 }
             }
         }
@@ -478,8 +479,9 @@ s32 SkinPart_GetSetVariant(Skin* pSkin, int nSet, int nCopy) {
     return pSkin->aSets[nCopy][nSet].nVariant;
 }
 
-// The texture scale-and-offset a set's variant picks (SkinDesc7C.n10): fn_800CE224 gives a patched
-// p14 entry that entry of its SkinDesc.pB8 run. -1 when the set or the variant is out of range.
+// The texture scale-and-offset a set's variant picks (SkinDesc7C.n10):
+// SkinPart_ApplySetsToMaterialEntry gives a patched p14 entry that entry of its SkinDesc.pB8 run.
+// -1 when the set or the variant is out of range.
 s32 SkinPart_GetSetVariantUVIndex(Skin* pSkin, int nSet, int nVariant) {
     SkinDesc* pDesc;
     SkinDesc74* pSet;
@@ -772,7 +774,7 @@ s32 SkinPart_FindPart(Skin* pSkin, u64 uId) {
 }
 
 // The part with this name, or -1.
-s32 fn_800CDB70(Skin* pSkin, const char* pName) {
+s32 SkinPart_FindPartByName(Skin* pSkin, const char* pName) {
     u64 uId;
 
     SKA_PackName(&uId, pName);
@@ -780,7 +782,7 @@ s32 fn_800CDB70(Skin* pSkin, const char* pName) {
 }
 
 // The part's variant with this name code, or -1.
-s32 fn_800CDBB0(Skin* pSkin, int nPart, u64 uId) {
+s32 SkinPart_FindPartVariant(Skin* pSkin, int nPart, u64 uId) {
     s32 n;
     int i;
 
@@ -808,7 +810,7 @@ s32 SkinPart_FindSet(Skin* pSkin, u64 uId) {
 }
 
 // The set with this name, or -1.
-s32 fn_800CDCA0(Skin* pSkin, const char* pName) {
+s32 SkinPart_FindSetByName(Skin* pSkin, const char* pName) {
     u64 uId;
 
     SKA_PackName(&uId, pName);
@@ -837,8 +839,8 @@ s32 SkinPart_FindSetVariantByName(Skin* pSkin, int nSet, const char* pName) {
     return SkinPart_FindSetVariant(pSkin, nSet, uId);
 }
 
-// The set variant's option with this name code, or -1 (0 when the set or the variant is out of
-// range).
+// The option of variant nVariant of set nSet with this name code, or -1. 0 (not -1) when the skin
+// has no description or the set or the variant is out of range.
 s32 SkinPart_FindSetOption(Skin* pSkin, int nSet, int nVariant, u64 uId) {
     SkinDesc* pDesc;
     SkinDesc74* pSet;
@@ -861,8 +863,9 @@ s32 SkinPart_FindSetOption(Skin* pSkin, int nSet, int nVariant, u64 uId) {
     return -1;
 }
 
-// The set variant's option with this name, or -1.
-s32 fn_800CDE80(Skin* pSkin, int nSet, int nVariant, const char* pName) {
+// The option of variant nVariant of set nSet with this name, or -1 (also for no name); 0 when the
+// set or the variant is out of range (SkinPart_FindSetOption).
+s32 SkinPart_FindSetOptionByName(Skin* pSkin, int nSet, int nVariant, const char* pName) {
     u64 uId;
 
     if (pName == NULL) return -1;
@@ -870,8 +873,9 @@ s32 fn_800CDE80(Skin* pSkin, int nSet, int nVariant, const char* pName) {
     return SkinPart_FindSetOption(pSkin, nSet, nVariant, uId);
 }
 
-// A part variant's number of links.
-s32 fn_800CDEF4(Skin* pSkin, int nPart, int nVariant) {
+// The number of links (SkinLink) of variant nVariant of part nPart: the other parts' options it
+// sets when chosen. 0 with no skin or a variant out of range.
+s32 SkinPart_GetNumVariantLinks(Skin* pSkin, int nPart, int nVariant) {
     SkinDesc* pDesc;
 
     if (pSkin == NULL || nVariant < 0 || nVariant >= SkinPart_GetNumPartVariants(pSkin, nPart)) return 0;
@@ -882,8 +886,10 @@ s32 fn_800CDEF4(Skin* pSkin, int nPart, int nVariant) {
 // fake match: an identity read; gives EA's operand order for add r0, r0, r6.
 static inline int fn_800CDF80_Read(int n) { return n; }
 
-// Applies a link of a part's variant: sets the option of the part it names.
-void fn_800CDF80(Skin* pSkin, int nPart, int nVariant, int nLink) {
+// Applies link nLink of variant nVariant of part nPart: the part the link names (when the skin has
+// it) gets the link's option (SkinPart_ChoosePartOption). SkinPart_ChoosePartVariant applies each
+// link of the variant it picks, so choosing "GloveOff" can change another part too.
+void SkinPart_ApplyVariantLink(Skin* pSkin, int nPart, int nVariant, int nLink) {
     SkinDesc* pDesc;
     SkinLink* pLink;
     s32 nOther;
@@ -899,7 +905,11 @@ void fn_800CDF80(Skin* pSkin, int nPart, int nVariant, int nLink) {
     }
 }
 
-void fn_800CE02C(Skin* pSkin, int n) {
+// Starts drawing the skin's parts for view nView (Skin.c: then SkinPart_DrawPart for each part and
+// SkinPart_EndDraw): once the skin is loaded (u10D4 & 2) and has a description, flushes the render
+// state with clipping on and the camera's matrices, resets the skin renderer (hwsRender_Gc.c) and
+// hands it the description and the view's mesh overrides (a10A0[nView]).
+void SkinPart_BeginDraw(Skin* pSkin, int n) {
     if (pSkin->pModel->pDesc != NULL && (pSkin->u10D4 & 2)) {
         RenderState_SetClipMode(1);
         RenderState_SetCameraMatrices();
@@ -910,7 +920,10 @@ void fn_800CE02C(Skin* pSkin, int n) {
     }
 }
 
-void fn_800CE0B0(Skin* pSkin, int nPart) {
+// Draws part nPart of a loaded skin as copy 0 (the one shown) chooses it: the meshes of its chosen
+// variant's chosen option (hwsRender_Gc.c fn_80113774); nothing when it has no variant. Between
+// SkinPart_BeginDraw and SkinPart_EndDraw.
+void SkinPart_DrawPart(Skin* pSkin, int nPart) {
     s32 nVariant;
     s32 nOption;
 
@@ -923,23 +936,31 @@ void fn_800CE0B0(Skin* pSkin, int nPart) {
     }
 }
 
-void fn_800CE128(Skin* pSkin) {
+// Ends drawing a loaded skin's parts (SkinPart_BeginDraw): hwsRender_Gc.c's end step (fn_8011389C).
+void SkinPart_EndDraw(Skin* pSkin) {
     if (pSkin->pModel->pDesc != NULL && (pSkin->u10D4 & 2)) {
         fn_8011389C();
     }
 }
 
-void fn_800CE164(void) {
+// Empty. Skin.c calls it (passing the skin) as it sets up a loaded skin (fn_800375AC, when asked).
+void SkinPart_InitSkin(void) {
 }
 
-void fn_800CE168(void) {
+// Empty. Skin.c calls it (passing the skin) as it frees what a loaded skin allocated (fn_80037708).
+void SkinPart_ShutdownSkin(void) {
 }
 
-void fn_800CE16C(void) {
+// Empty. Skin.c calls it (passing the body skin and the view) after posing the skin for a view
+// (fn_80035B40).
+void SkinPart_UpdateSkin(void) {
 }
 
-// Hands fn_80112614 each p14 entry as the chosen sets patch it, with its p18 entry.
-void fn_800CE170(Skin* pSkin, SkinTarget* pTarget) {
+// Sets up the skin's materials (SkinDesc.p18) from their entries (p14) as copy 0's chosen sets
+// patch them (SkinPart_ApplySetsToMaterialEntry), with textures from the character's dynamic
+// textures (pTarget is a DynTex; its p4 has TexBank's layout). char.c and FEgolferanim.c call it
+// for each skin once new textures are in.
+void SkinPart_SetupMaterials(Skin* pSkin, SkinTarget* pTarget) {
     SkinDesc* pDesc;
     SkinDesc14 entry;
     int i;
@@ -949,7 +970,7 @@ void fn_800CE170(Skin* pSkin, SkinTarget* pTarget) {
     if (pDesc != NULL) {
         for (i = 0; i < pDesc->n10; i++) {
             Mem_cpy(&entry, &pDesc->p14[i], sizeof(SkinDesc14));
-            fn_800CE224(pSkin, &entry, NULL, NULL, 0);
+            SkinPart_ApplySetsToMaterialEntry(pSkin, &entry, NULL, NULL, 0);
             fn_80112614(&entry, &pDesc->p18[i], pTarget->pBank);
         }
     }
@@ -994,11 +1015,14 @@ static inline void fn_800CE224_Loop(Skin* pSkin, SkinDesc14* pEntry, SkinDesc* p
     }
 }
 
-// Patches a p14 entry for the chosen sets: an entry whose name code a set lists takes the chosen
-// variant's name code (from the second variant on) and the chosen option's p8C entry, and with
-// bit 2 its a20 from pB8. Gives the p8C entry's data and n2C too when asked. Returns whether
-// anything changed.
-s32 fn_800CE224(Skin* pSkin, SkinDesc14* pEntry, u8** ppOut, s32* pnOut, int nCopy) {
+// Patches a material entry (a copy of a SkinDesc.p14 entry) for the sets as copy nCopy chooses
+// them. A set lists texture name codes per variant (SkinDesc.p84, n0C per variant); an entry using
+// one of the first variant's names takes the chosen variant's name in its place and the chosen
+// option's SkinDesc.p8C entry (n18; -1 when the option is out of range). With u08 & 2 it also takes
+// its texture scale and offset (a20) from pB8, at the variant's UV index (0 when out of range).
+// With ppOut and pnOut it gives the option entry's recolouring (a08 and n2C), or NULL in *ppOut.
+// Returns whether the name changed or a recolouring was given.
+s32 SkinPart_ApplySetsToMaterialEntry(Skin* pSkin, SkinDesc14* pEntry, u8** ppOut, s32* pnOut, int nCopy) {
     SkinDesc* pDesc;
     int j;
     int nVariant;
@@ -1034,8 +1058,9 @@ s32 fn_800CE224(Skin* pSkin, SkinDesc14* pEntry, u8** ppOut, s32* pnOut, int nCo
     return bChanged;
 }
 
-// Adds a name code to a list unless it is there already.
-void fn_800CE4B8(u64 uId, SkinListEntry* aList, s32* pnList, u8* p, s32 n) {
+// Adds a texture name code to a texture list, with the recolouring (p, n: a set option's
+// SkinDesc8C.a08 and n2C) it is to be loaded with, unless the list has that name already.
+void SkinPart_AddToTexList(u64 uId, SkinListEntry* aList, s32* pnList, u8* p, s32 n) {
     int i;
 
     for (i = 0; i < *pnList; i++) {
@@ -1047,8 +1072,8 @@ void fn_800CE4B8(u64 uId, SkinListEntry* aList, s32* pnList, u8* p, s32 n) {
     (*pnList)++;
 }
 
-// fake match: fn_800CE52C's inner loop as an inline, everything it writes passed by pointer; its
-// pIndex parameter is a frontend variable, numbered after the hoisted p5C offset (EA's register
+// fake match: SkinPart_ListOptionTextures's inner loop as an inline, everything it writes passed by
+// pointer; its pIndex parameter is a frontend variable, numbered after the hoisted p5C offset (EA's register
 // order). Same statements, same order.
 static inline void fn_800CE52C_Loop(Skin* pSkin, SkinDesc* pDesc, s32* pIndex, s32 nIndices,
                                     SkinListEntry* aList, s32* pnList, int nCopy, SkinDesc14* pEntry,
@@ -1057,15 +1082,18 @@ static inline void fn_800CE52C_Loop(Skin* pSkin, SkinDesc* pDesc, s32* pIndex, s
         if (!(pDesc->p14[*pIndex].u08 & 1)) {
             Mem_cpy(pEntry, &pDesc->p14[*pIndex], sizeof(SkinDesc14));
             *pp = NULL;
-            fn_800CE224(pSkin, pEntry, pp, pnOut, nCopy);
-            fn_800CE4B8(pEntry->uId, aList, pnList, *pp, *pnOut);
+            SkinPart_ApplySetsToMaterialEntry(pSkin, pEntry, pp, pnOut, nCopy);
+            SkinPart_AddToTexList(pEntry->uId, aList, pnList, *pp, *pnOut);
         }
         pIndex++;
     }
 }
 
-// Lists the name codes of option n's p14 entries (as the chosen sets patch them).
-void fn_800CE52C(Skin* pSkin, int n, SkinListEntry* aList, s32* pnList, int nCopy) {
+// Adds to a texture list the textures option n (a SkinDesc.p5C entry) draws with: the material
+// entries of its meshes (p6C to p44 to p20 to p14; entries with u08 & 1 skipped), each patched for
+// copy nCopy's chosen sets (SkinPart_ApplySetsToMaterialEntry) and with its set option's
+// recolouring.
+void SkinPart_ListOptionTextures(Skin* pSkin, int n, SkinListEntry* aList, s32* pnList, int nCopy) {
     SkinDesc14 entry;
     u8* p;
     s32 nOut;
@@ -1092,9 +1120,11 @@ void fn_800CE52C(Skin* pSkin, int n, SkinListEntry* aList, s32* pnList, int nCop
     }
 }
 
-// Lists (in a new *ppList) the name codes the skins' chosen options use; for the parts named in
-// aIds, those of every option. Returns the list's length.
-s32 fn_800CE660(Skin** apSkins, int nSkins, SkinListEntry** ppList, u64* aIds, int nIds, int nCopy) {
+// Lists the textures the skins' parts need as copy nCopy chooses them (each part's chosen variant
+// and option; for a part whose name code is in aIds, every option of every variant), each once with
+// its recolouring, in a new *ppList (StaticMem; the caller frees it). Returns the list's length.
+s32 SkinPart_ListChosenTextures(Skin** apSkins, int nSkins, SkinListEntry** ppList, u64* aIds, int nIds,
+                                int nCopy) {
     int j;
     s32 nList;
     Skin* pSkin;
@@ -1135,12 +1165,14 @@ s32 fn_800CE660(Skin** apSkins, int nSkins, SkinListEntry** ppList, u64* aIds, i
                 if (bAll == 1) {
                     for (v = 0; v < SkinPart_GetNumPartVariants(pSkin, j); v++) {
                         for (m = 0; m < SkinPart_GetNumPartOptions(pSkin, j, v); m++) {
-                            fn_800CE52C(pSkin, m + pDesc->pVariants[v + pDesc->pParts[j].nFirst].nFirstOption,
+                            SkinPart_ListOptionTextures(pSkin, m
+                                                        + pDesc->pVariants[v
+                                                                + pDesc->pParts[j].nFirst].nFirstOption,
                                         *ppList, &nList, nCopy);
                         }
                     }
                 } else if (nVariant >= 0 && nOption >= 0) {
-                    fn_800CE52C(pSkin,
+                    SkinPart_ListOptionTextures(pSkin,
                                 nOption + pDesc->pVariants[nVariant + pDesc->pParts[j].nFirst].nFirstOption,
                                 *ppList, &nList, nCopy);
                 }
@@ -1153,9 +1185,10 @@ s32 fn_800CE660(Skin** apSkins, int nSkins, SkinListEntry** ppList, u64* aIds, i
 // fake match: an identity read; it gives EA's register order.
 static inline SkinDesc* fn_800CE8C0_Read(SkinDesc* p) { return p; }
 
-// Lists (in a new *ppList) the name codes every option of the skins uses. Returns the list's
-// length.
-s32 fn_800CE8C0(Skin** apSkins, int nSkins, SkinListEntry** ppList) {
+// Lists every texture any option of the skins' parts can use (patched for copy 0's chosen sets),
+// each once with its recolouring, in a new *ppList (StaticMem; the caller frees it). Returns the
+// list's length. Character_LoadTextures loads only these outside the front end.
+s32 SkinPart_ListAllTextures(Skin** apSkins, int nSkins, SkinListEntry** ppList) {
     s32 nList;
     int i;
     int j;
@@ -1181,7 +1214,8 @@ s32 fn_800CE8C0(Skin** apSkins, int nSkins, SkinListEntry** ppList) {
                 for (k = 0; k < SkinPart_GetNumPartVariants(pSkin, j); k++) {
                     n = k + pDesc->pParts[j].nFirst;
                     for (m = 0; m < pDesc->pVariants[n].nOptions; m++) {
-                        fn_800CE52C(pSkin, m + pDesc->pVariants[n].nFirstOption, *ppList, &nList, 0);
+                        SkinPart_ListOptionTextures(pSkin, m + pDesc->pVariants[n].nFirstOption, *ppList,
+                                                    &nList, 0);
                     }
                 }
             }
@@ -1225,7 +1259,7 @@ void fn_800CEB1C(Skin** apSkins, int nSkins, DynTex* pTex) {
     u64 uId;
 
     if (pTex == NULL) return;
-    nList = fn_800CE660(apSkins, nSkins, &pList, NULL, 0, 2);
+    nList = SkinPart_ListChosenTextures(apSkins, nSkins, &pList, NULL, 0, 2);
     n = fn_8010AD10(pTex);
     for (i = 0; i < n; i++) {
         uId = fn_8010AD18(pTex, i);
@@ -1240,7 +1274,7 @@ void fn_800CEB1C(Skin** apSkins, int nSkins, DynTex* pTex) {
 }
 
 // Hands fn_8010BCFC each name code the skins' chosen options use that pTex has no entry for. aIds
-// and nIds go on to fn_800CE660.
+// and nIds go on to SkinPart_ListChosenTextures.
 void fn_800CEBE8(Skin** apSkins, int nSkins, DynTex* pTex, u64* aIds, int nIds) {
     SkinListEntry* pList;
     s32 nC;
@@ -1251,7 +1285,7 @@ void fn_800CEBE8(Skin** apSkins, int nSkins, DynTex* pTex, u64* aIds, int nIds) 
 
     pList = NULL;
     if (pTex == NULL) return;
-    nList = fn_800CE660(apSkins, nSkins, &pList, aIds, nIds, 2);
+    nList = SkinPart_ListChosenTextures(apSkins, nSkins, &pList, aIds, nIds, 2);
     // port: a DynTexHeader has TexBank's layout (lldyntex.h); the two are not merged yet.
     pBank = (TexBank*)fn_8010A780(pTex);
     for (i = 0; i < nList; i++) {
