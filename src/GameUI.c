@@ -71,7 +71,7 @@ u8  lbl_80282281;
 u8  lbl_80282280;
 
 // Clears every display flag, queue count and pending message at the start of a hole
-// (GM_InitForHole) and when it restarts (GM_RestartHole); also clears GameMessages' lbl_80203138
+// (GM_InitForHole) and when it restarts (GM_RestartHole); also clears GameMessages' gTipShown
 // flags (GUI_ClearShownTips) and sends UI message 31 (GUI_SendMessage31).
 void GUI_Init(void) {
     lbl_802822DF = 0;

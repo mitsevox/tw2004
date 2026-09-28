@@ -25,7 +25,7 @@ int fn_800E5E54(void) {
     }
     bAny = 0;
     for (i = 0; i < 14; i++) {
-        if (fn_800E6020(Game_GetMode(), i) && fn_800E60E4(i) && !lbl_80203138[i]) {
+        if (fn_800E6020(Game_GetMode(), i) && fn_800E60E4(i) && !gTipShown[i]) {
             bAny = 1;
         }
     }
@@ -35,7 +35,7 @@ int fn_800E5E54(void) {
     bFound = 0;
     nTip = Misc_RandFunc(1) % 14;
     while (!bFound) {
-        if (fn_800E6020(Game_GetMode(), nTip) && fn_800E60E4(nTip) && !lbl_80203138[nTip]) {
+        if (fn_800E6020(Game_GetMode(), nTip) && fn_800E60E4(nTip) && !gTipShown[nTip]) {
             bFound = 1;
         } else {
             nTip = (nTip + 1) % 14;

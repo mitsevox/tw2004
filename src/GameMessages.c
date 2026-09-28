@@ -23,9 +23,9 @@ void  GameMsg_OnSend(int nMsg);
 u8    GUI_GetFadeToBlack(void);
 
 // GameMessages.c's data, defined last address first (CodeWarrior lays each section out in reverse).
-u8  lbl_802822E4;           // pending-message flags, each sent once
-s32 lbl_802822E0;           // the value sent with some of them
-u8  lbl_80203138[14];       // the tips already shown (game.h)
+u8  gGameMsgPending;           // pending-message flags, each sent once
+s32 gGameMsgPendingValue;           // the value sent with some of them
+u8  gTipShown[14];       // the tips already shown (game.h)
 
 // Opens the intro popup of a Play Now challenge in the caddie tip window: message 48 with the
 // challenge's group (fn_800EAC7C). STATEFUNC_SwingInit calls it at a human's first swing while the
@@ -336,36 +336,36 @@ void GUI_ShowPrizeMessage(int nA, int nB, int nC) {
 
 // Drops every pending message (uiProcessInterface's controller reset, fn_800905A8).
 void GameMsg_ClearPending(void) {
-    lbl_802822E4 = 0;
+    gGameMsgPending = 0;
 }
 
 // Flags messages to send on the UI's next update (GameMsg_SendPending): bit 1 a conceded hole, 2 a
 // restarted hole, 4 the pause menu opened, 8 it closed, 0x10 the zoom camera left, 0x20 a tip.
 void GameMsg_SetPending(int n) {
-    lbl_802822E4 = (lbl_802822E4 | n);
+    gGameMsgPending = (gGameMsgPending | n);
 }
 
 // The value sent with pending messages 1 (the conceding player), 0x10 (the player) and 0x20 (the
 // tip). There is one slot: two set before the next update both go with the last value.
 void GameMsg_SetPendingValue(int n) {
-    lbl_802822E0 = n;
+    gGameMsgPendingValue = n;
 }
 
 // Flips pending bits n (an exclusive or); the senders call it with a bit they have just sent, which
 // clears it.
 void GameMsg_TogglePending(int n) {
-    lbl_802822E4 = (lbl_802822E4 ^ n);
+    gGameMsgPending = (gGameMsgPending ^ n);
 }
 
 // GameMsg_SendPending's counterpart in the menus (game type 3; fn_80090628 picks one): pending bit
 // 1 sends message 0x8D and bit 2 message 0x54, no values, each once; the other bits wait.
 void GameMsg_SendPendingMenus(void) {
-    if ((s8) lbl_802822E4 != 0) {
-        if (lbl_802822E4 & 1) {
+    if ((s8) gGameMsgPending != 0) {
+        if (gGameMsgPending & 1) {
             GameMsg_Send(0x8D);
             GameMsg_TogglePending(1);
         }
-        if (lbl_802822E4 & 2) {
+        if (gGameMsgPending & 2) {
             GameMsg_Send(0x54);
             GameMsg_TogglePending(2);
         }
@@ -380,34 +380,34 @@ void GameMsg_SendPendingMenus(void) {
 // a tip (0x21 with the tip, GUI_QueueTip).
 void GameMsg_SendPending(void) {
     MsgArg args[3];
-    if ((s8)lbl_802822E4 != 0) {
-        if (lbl_802822E4 & 1) {
+    if ((s8)gGameMsgPending != 0) {
+        if (gGameMsgPending & 1) {
             Mem_set(args, 0, sizeof(args));
             args[0].i = 15;
             args[1].f = 0.0f;
-            args[2].i = lbl_802822E0;
+            args[2].i = gGameMsgPendingValue;
             UISProcessHint(lbl_80281F1C->pHandler, 5, 3, args);
             GameMsg_TogglePending(1);
         }
-        if (lbl_802822E4 & 2) {
+        if (gGameMsgPending & 2) {
             GameMsg_Send(0x3D);
             GameMsg_TogglePending(2);
             GameMsg_SendInt(1, 1);
         }
-        if (lbl_802822E4 & 4) {
+        if (gGameMsgPending & 4) {
             GameMsg_Send(0x31);
             GameMsg_TogglePending(4);
         }
-        if (lbl_802822E4 & 8) {
+        if (gGameMsgPending & 8) {
             GameMsg_Send(0x27);
             GameMsg_TogglePending(8);
         }
-        if (lbl_802822E4 & 0x10) {
-            GameMsg_Send2Ints(0x62, 0, lbl_802822E0);
+        if (gGameMsgPending & 0x10) {
+            GameMsg_Send2Ints(0x62, 0, gGameMsgPendingValue);
             GameMsg_TogglePending(0x10);
         }
-        if (lbl_802822E4 & 0x20) {
-            GameMsg_SendInt(0x21, lbl_802822E0);
+        if (gGameMsgPending & 0x20) {
+            GameMsg_SendInt(0x21, gGameMsgPendingValue);
             GameMsg_TogglePending(0x20);
         }
     }
@@ -577,23 +577,23 @@ u8 GUI_GetFadeToBlack(void) {
     return lbl_801D87C0.b0;
 }
 
-// Marks every statistic tip as not shown yet (lbl_80203138), from GUI_Init at the start or restart
+// Marks every statistic tip as not shown yet (gTipShown), from GUI_Init at the start or restart
 // of a hole: each tip can come once a hole.
 void GUI_ClearShownTips(void) {
-    lbl_80203138[0] = 0;
-    lbl_80203138[1] = 0;
-    lbl_80203138[2] = 0;
-    lbl_80203138[3] = 0;
-    lbl_80203138[4] = 0;
-    lbl_80203138[5] = 0;
-    lbl_80203138[6] = 0;
-    lbl_80203138[7] = 0;
-    lbl_80203138[8] = 0;
-    lbl_80203138[9] = 0;
-    lbl_80203138[10] = 0;
-    lbl_80203138[11] = 0;
-    lbl_80203138[12] = 0;
-    lbl_80203138[13] = 0;
+    gTipShown[0] = 0;
+    gTipShown[1] = 0;
+    gTipShown[2] = 0;
+    gTipShown[3] = 0;
+    gTipShown[4] = 0;
+    gTipShown[5] = 0;
+    gTipShown[6] = 0;
+    gTipShown[7] = 0;
+    gTipShown[8] = 0;
+    gTipShown[9] = 0;
+    gTipShown[10] = 0;
+    gTipShown[11] = 0;
+    gTipShown[12] = 0;
+    gTipShown[13] = 0;
 }
 
 // Flags tip n to be shown on the UI's next update (pending bit 0x20: message 0x21 with n). Below 15
@@ -603,7 +603,7 @@ void GUI_ClearShownTips(void) {
 void GUI_QueueTip(int n) {
     if (!gpGame->bD4 || n >= 15) {
         if (n < 15 && n != 12) {
-            lbl_80203138[n] = 1;
+            gTipShown[n] = 1;
         }
         GameMsg_SetPending(0x20);
         GameMsg_SetPendingValue(n);
