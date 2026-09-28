@@ -258,7 +258,7 @@ void TrophyRoom_GetAwardEarnedText(MsgArg* pArgs, MsgArg* pResult);
 
 // This file.
 void GetGolferName(int nGolfer, char* szName);
-void fn_8007E458(int n, MsgArg* pArgs, MsgArg* pResult);
+void FE_GetRecordEntry(int n, MsgArg* pArgs, MsgArg* pResult);
 s32  fn_80084FB4(void* pArg);
 s32  fn_80084FF8(void* pArg);
 s32  fn_80085034(void* pArg);
@@ -403,35 +403,35 @@ void GM_vGetProfileBogeys(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetProfileDoubleBogeys(MsgArg* pArgs, MsgArg* pResult);
 void GM_vNextShirt(MsgArg* pArgs, MsgArg* pResult);
 void GM_vSetPinSet(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007E0D0(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007E0F8(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007E128(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007E174(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007E194(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007E200(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007E204(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007E288(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007E28C(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007E354(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007E358(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007E3D4(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007E51C(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007E548(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007E574(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007E5A0(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007E5CC(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007E5F8(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007E624(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007E650(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007E67C(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007E744(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007E748(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007E74C(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007E798(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007E79C(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007E818(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007E85C(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007E8B4(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetButtonConfig(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIsTrophyBallWon(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIsBonusTrophyBallWon(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetEarningsTableA9B4(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetMulligan(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage124_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetGolferClubAvailable(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage126_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vToggleClub(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage305_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetWindOption(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetVibration(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetLowRoundRecord(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetLongestDriveRecord(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetLongestPuttRecord(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetGreensInRegRecord(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetFewestPuttsRecord(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetFairwaysHitRecord(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetEaglesRecord(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetBirdiesRecord(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCLoadReplay(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage139_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage140_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vCountMedalsInARow(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage142_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCIsUserNameOnCard(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCGetNumUsers(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCOverwriteUser(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage146_Return1(MsgArg* pArgs, MsgArg* pResult);
 void fn_8007E8C0(MsgArg* pArgs, MsgArg* pResult);
 void fn_8007E8C4(MsgArg* pArgs, MsgArg* pResult);
 void fn_8007E8DC(MsgArg* pArgs, MsgArg* pResult);
@@ -849,33 +849,33 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[117] = GM_vGetProfileDoubleBogeys;
     gFEMessageHandlers[118] = GM_vNextShirt;
     gFEMessageHandlers[119] = GM_vSetPinSet;
-    gFEMessageHandlers[120] = fn_8007E0D0;
-    gFEMessageHandlers[121] = fn_8007E0F8;
-    gFEMessageHandlers[122] = fn_8007E174;
-    gFEMessageHandlers[123] = fn_8007E194;
-    gFEMessageHandlers[124] = fn_8007E200;
-    gFEMessageHandlers[125] = fn_8007E204;
-    gFEMessageHandlers[126] = fn_8007E288;
-    gFEMessageHandlers[127] = fn_8007E28C;
-    gFEMessageHandlers[128] = fn_8007E358;
-    gFEMessageHandlers[129] = fn_8007E3D4;
-    gFEMessageHandlers[130] = fn_8007E51C;
-    gFEMessageHandlers[131] = fn_8007E548;
-    gFEMessageHandlers[132] = fn_8007E574;
-    gFEMessageHandlers[133] = fn_8007E5A0;
-    gFEMessageHandlers[134] = fn_8007E5CC;
-    gFEMessageHandlers[135] = fn_8007E5F8;
-    gFEMessageHandlers[136] = fn_8007E624;
-    gFEMessageHandlers[137] = fn_8007E650;
-    gFEMessageHandlers[138] = fn_8007E67C;
-    gFEMessageHandlers[139] = fn_8007E744;
-    gFEMessageHandlers[140] = fn_8007E748;
-    gFEMessageHandlers[141] = fn_8007E74C;
-    gFEMessageHandlers[142] = fn_8007E798;
-    gFEMessageHandlers[143] = fn_8007E79C;
-    gFEMessageHandlers[144] = fn_8007E818;
-    gFEMessageHandlers[145] = fn_8007E85C;
-    gFEMessageHandlers[146] = fn_8007E8B4;
+    gFEMessageHandlers[120] = GM_vSetButtonConfig;
+    gFEMessageHandlers[121] = GM_vIsTrophyBallWon;
+    gFEMessageHandlers[122] = GM_vGetEarningsTableA9B4;
+    gFEMessageHandlers[123] = GM_vSetMulligan;
+    gFEMessageHandlers[124] = GM_vFEMessage124_Empty;
+    gFEMessageHandlers[125] = GM_vGetGolferClubAvailable;
+    gFEMessageHandlers[126] = GM_vFEMessage126_Empty;
+    gFEMessageHandlers[127] = GM_vToggleClub;
+    gFEMessageHandlers[128] = GM_vSetWindOption;
+    gFEMessageHandlers[129] = GM_vSetVibration;
+    gFEMessageHandlers[130] = GM_vGetLowRoundRecord;
+    gFEMessageHandlers[131] = GM_vGetLongestDriveRecord;
+    gFEMessageHandlers[132] = GM_vGetLongestPuttRecord;
+    gFEMessageHandlers[133] = GM_vGetGreensInRegRecord;
+    gFEMessageHandlers[134] = GM_vGetFewestPuttsRecord;
+    gFEMessageHandlers[135] = GM_vGetFairwaysHitRecord;
+    gFEMessageHandlers[136] = GM_vGetEaglesRecord;
+    gFEMessageHandlers[137] = GM_vGetBirdiesRecord;
+    gFEMessageHandlers[138] = GM_vMCLoadReplay;
+    gFEMessageHandlers[139] = GM_vFEMessage139_Empty;
+    gFEMessageHandlers[140] = GM_vFEMessage140_Empty;
+    gFEMessageHandlers[141] = GM_vCountMedalsInARow;
+    gFEMessageHandlers[142] = GM_vFEMessage142_Empty;
+    gFEMessageHandlers[143] = GM_vMCIsUserNameOnCard;
+    gFEMessageHandlers[144] = GM_vMCGetNumUsers;
+    gFEMessageHandlers[145] = GM_vMCOverwriteUser;
+    gFEMessageHandlers[146] = GM_vFEMessage146_Return1;
     gFEMessageHandlers[147] = fn_8007E8C0;
     gFEMessageHandlers[148] = fn_8007E8C4;
     gFEMessageHandlers[149] = fn_8007E8DC;
@@ -1035,7 +1035,7 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[302] = GM_vFEMessage302_Empty;
     gFEMessageHandlers[303] = GM_vSetAllGolfersPickable;
     gFEMessageHandlers[304] = fn_80082A94;
-    gFEMessageHandlers[305] = fn_8007E354;
+    gFEMessageHandlers[305] = GM_vFEMessage305_Empty;
     gFEMessageHandlers[306] = fn_80082C74;
     gFEMessageHandlers[307] = fn_80082CA4;
     gFEMessageHandlers[308] = fn_80082CA8;
@@ -1233,7 +1233,7 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[606] = TrophyRoom_GetTourTrophyText;
     gFEMessageHandlers[608] = fn_8007F0D0;
     gFEMessageHandlers[609] = GM_vFEMessage609_Empty;
-    gFEMessageHandlers[610] = fn_8007E128;
+    gFEMessageHandlers[610] = GM_vIsBonusTrophyBallWon;
     gFEMessageHandlers[611] = fn_80083EBC;
     gFEMessageHandlers[612] = fn_80083F60;
     gFEMessageHandlers[623] = fn_80084008;
@@ -2657,26 +2657,36 @@ void GM_vSetPinSet(MsgArg* pArgs, MsgArg* pResult) {
     gSession.nPinSet = pArgs[0].i;
 }
 
-void fn_8007E0D0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 120: selects row pArgs[0] of the button-mask table (lbl_80186AF0) that
+// Controller_GetButtonMask reads (fn_800142A4 keeps it in lbl_80281C98, an s8). The table has only
+// row 0 in this build.
+void GM_vSetButtonConfig(MsgArg* pArgs, MsgArg* pResult) {
     fn_800142A4(pArgs[0].i);
 }
 
-void fn_8007E0F8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 121: whether save profile pArgs[0] has won trophy ball pArgs[1] (its
+// aAward[pArgs[1]].bWon; 0..38, Earnings.c GM_Earnings_AwardTrophyBall).
+void GM_vIsTrophyBallWon(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gpSaveData[pArgs[0].i].aAward[pArgs[1].i].bWon;
 }
 
-void fn_8007E128(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 610: whether the current profile (FE_GetCurrentProfile) has won trophy ball
+// pArgs[0] + 23: aAward[23..38], the ones GM_GetBonusProgress counts.
+void GM_vIsBonusTrophyBallWon(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
 
     pResult->i = pProfile->aAward[pArgs[0].i + 23].bWon;
 }
 
-void fn_8007E174(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 122: entry pArgs[0] (0..11) of gEarningsTable.a9B4, twelve values of the 'ERN '
+// earnings data that no other code reads.
+void GM_vGetEarningsTableA9B4(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gEarningsTable.a9B4[pArgs[0].i];
 }
 
-// The mulligan rule: none in game mode 7, any number in mode 9, else the one picked.
-void fn_8007E194(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 123: the round's mulligan rule (gpGame->nMulligans: 0 none, 1 any number, 2 one
+// per player per nine) is pArgs[0], but none in game mode 7 and any number in mode 9 (practice).
+void GM_vSetMulligan(MsgArg* pArgs, MsgArg* pResult) {
     if (Game_GetMode() == 7) {
         gpGame->nMulligans = 0;
         return;
@@ -2688,12 +2698,15 @@ void fn_8007E194(MsgArg* pArgs, MsgArg* pResult) {
     gpGame->nMulligans = pArgs[0].i;
 }
 
-void fn_8007E200(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 124: empty in this build.
+void GM_vFEMessage124_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Whether club pArgs[1] is in player pArgs[0]'s golfer's bag; the player's bag is also set to the
-// golfer's.
-void fn_8007E204(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 125: whether club pArgs[1] is in the bag of the golfer player pArgs[0] plays
+// (GolferRecord.uBagMask; a created golfer's from the current profile, fn_80077A80): answers the
+// club's bit (1 << pArgs[1]) when it is, 0 when not. The player's bag (gSession.uBag) is also set
+// to the golfer's.
+void GM_vGetGolferClubAvailable(MsgArg* pArgs, MsgArg* pResult) {
     GolferRecord* pRecord = fn_80077A80(gSession.nGolfer[pArgs[0].i]);
     s32 n = pArgs[1].i;
 
@@ -2702,12 +2715,14 @@ void fn_8007E204(MsgArg* pArgs, MsgArg* pResult) {
     gSession.uBag[pArgs[0].i] = pRecord->uBagMask;
 }
 
-void fn_8007E288(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 126: empty in this build.
+void GM_vFEMessage126_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Put club pArgs[1] into player pArgs[0]'s bag or take it out (not with session flag 0x4000). A
-// created golfer, or any golfer in game mode 4, keeps the new bag in its record.
-void fn_8007E28C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 127: puts club pArgs[1] into player pArgs[0]'s bag (gSession.uBag) or takes it
+// out, except in the demo set-up (session flag 0x4000). For a created golfer, or any golfer in game
+// mode 4 (the ladder), the golfer's record (uBagMask) keeps the new bag.
+void GM_vToggleClub(MsgArg* pArgs, MsgArg* pResult) {
     GolferRecord* pRecord;
     s32 nClub;
 
@@ -2722,11 +2737,13 @@ void fn_8007E28C(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_8007E354(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 305: empty in this build.
+void GM_vFEMessage305_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// The wind option: menu choices 1-4 are wind settings 0-3 (calm to gusty).
-void fn_8007E358(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 128: the wind option (options.nWind) from the menu's choice pArgs[0]: 1..4 give
+// 0..3 (calm to gusty); other values change nothing.
+void GM_vSetWindOption(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 1:
         gSession.options.nWind = 0;
@@ -2743,8 +2760,9 @@ void fn_8007E358(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Option a7[0]: menu choice 1 turns it on, 2 off.
-void fn_8007E3D4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 129: the vibration option (options.a7[0]) from the menu's choice pArgs[0]: 1
+// on, 2 off (fn_8002EBA4 stores it and sets all four pads' rumble); other values change nothing.
+void GM_vSetVibration(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 1:
         fn_8002EBA4((u8*)&gSession.options, 1);
@@ -2757,9 +2775,13 @@ void fn_8007E3D4(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Record nKind, place pArgs[1]: its value, and its holder's name into pArgs[2]. pArgs[0] is the
-// course; past the last course it is the all-time records.
-void fn_8007E458(int nKind, MsgArg* pArgs, MsgArg* pResult) {
+// Record kind nKind (0 the round's strokes, 1 the longest drive, 2 the longest putt, 3 greens in
+// regulation, 4 putts, 5 fairways hit, 6 eagles or better, 7 birdies or better: the kinds
+// HighScoreRecords_CheckRecord keeps), place pArgs[1] (0..4): answers its value and copies its
+// holder's name into the string pArgs[2]. pArgs[0] is the course (gSession.aCourseRecord); from
+// NUM_COURSE_RECORDS on it means the all-time records (recA). Front-end messages 130..137 run it
+// for kinds 0..7.
+void FE_GetRecordEntry(int nKind, MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[0].i < NUM_COURSE_RECORDS) {
         pResult->i = gSession.aCourseRecord[pArgs[0].i].aRecord[nKind][pArgs[1].i].nValue;
         strcpy(((MsgString*)pArgs[2].p)->pStr,
@@ -2770,42 +2792,52 @@ void fn_8007E458(int nKind, MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[2].p)->pStr, gSession.recA[nKind][pArgs[1].i].szName);
 }
 
-void fn_8007E51C(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8007E458(0, pArgs, pResult);
+// Front-end message 130: a record of kind 0, the round's strokes (FE_GetRecordEntry).
+void GM_vGetLowRoundRecord(MsgArg* pArgs, MsgArg* pResult) {
+    FE_GetRecordEntry(0, pArgs, pResult);
 }
 
-void fn_8007E548(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8007E458(1, pArgs, pResult);
+// Front-end message 131: a record of kind 1, the longest drive (FE_GetRecordEntry).
+void GM_vGetLongestDriveRecord(MsgArg* pArgs, MsgArg* pResult) {
+    FE_GetRecordEntry(1, pArgs, pResult);
 }
 
-void fn_8007E574(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8007E458(2, pArgs, pResult);
+// Front-end message 132: a record of kind 2, the longest putt (FE_GetRecordEntry).
+void GM_vGetLongestPuttRecord(MsgArg* pArgs, MsgArg* pResult) {
+    FE_GetRecordEntry(2, pArgs, pResult);
 }
 
-void fn_8007E5A0(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8007E458(3, pArgs, pResult);
+// Front-end message 133: a record of kind 3, the round's greens in regulation (FE_GetRecordEntry).
+void GM_vGetGreensInRegRecord(MsgArg* pArgs, MsgArg* pResult) {
+    FE_GetRecordEntry(3, pArgs, pResult);
 }
 
-void fn_8007E5CC(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8007E458(4, pArgs, pResult);
+// Front-end message 134: a record of kind 4, the fewest putts in a round (FE_GetRecordEntry).
+void GM_vGetFewestPuttsRecord(MsgArg* pArgs, MsgArg* pResult) {
+    FE_GetRecordEntry(4, pArgs, pResult);
 }
 
-void fn_8007E5F8(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8007E458(5, pArgs, pResult);
+// Front-end message 135: a record of kind 5, the round's fairways hit (FE_GetRecordEntry).
+void GM_vGetFairwaysHitRecord(MsgArg* pArgs, MsgArg* pResult) {
+    FE_GetRecordEntry(5, pArgs, pResult);
 }
 
-void fn_8007E624(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8007E458(6, pArgs, pResult);
+// Front-end message 136: a record of kind 6, the round's eagles or better (FE_GetRecordEntry).
+void GM_vGetEaglesRecord(MsgArg* pArgs, MsgArg* pResult) {
+    FE_GetRecordEntry(6, pArgs, pResult);
 }
 
-void fn_8007E650(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8007E458(7, pArgs, pResult);
+// Front-end message 137: a record of kind 7, the round's birdies or better (FE_GetRecordEntry).
+void GM_vGetBirdiesRecord(MsgArg* pArgs, MsgArg* pResult) {
+    FE_GetRecordEntry(7, pArgs, pResult);
 }
 
-// Load the replay at card position pArgs[0..2]: 1 when it loaded. Player 0 gets slot 0's created
-// golfer when that slot's profile is loaded, else the replay's golfer (golfer 0 for a created
-// one); the replay's course is set up for the session.
-void fn_8007E67C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 138: loads replay pArgs[2] from the memory card in port pArgs[0], slot pArgs[1]
+// (MC_LoadReplay into gReplayData); answers 1 when it loaded, else 0. Then player 0 plays slot 0's
+// created golfer (FIRST_CREATED_GOLFER) when that slot has a profile loaded, else the replay's
+// golfer (golfer 0 when that was a created one), the replay's course is set, and lbl_80281ED4->b0
+// is cleared (a card replay, not a profile's award replay: GM_vShowAwardReplay).
+void GM_vMCLoadReplay(MsgArg* pArgs, MsgArg* pResult) {
     MCCardPos pos;
 
     pos.nPort = pArgs[0].i;
@@ -2825,14 +2857,17 @@ void fn_8007E67C(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_8007E744(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 139: empty in this build.
+void GM_vFEMessage139_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_8007E748(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 140: empty in this build.
+void GM_vFEMessage140_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// How many challenge groups in a row, from the first, have a medal.
-void fn_8007E74C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 141: how many challenge groups in a row, from the first, save profile pArgs[0]
+// has a medal in (aMedal not 3): the count stops at the first group without one (29 at most).
+void GM_vCountMedalsInARow(MsgArg* pArgs, MsgArg* pResult) {
     int n;
     int i;
 
@@ -2843,11 +2878,13 @@ void fn_8007E74C(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = n;
 }
 
-void fn_8007E798(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 142: empty in this build.
+void GM_vFEMessage142_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Whether one of the four names on the card at pArgs[0], pArgs[1] is pArgs[2].
-void fn_8007E79C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 143: 1 when one of the four profile names on the memory card in port pArgs[0],
+// slot pArgs[1] (MCCardState.aszName) is the string pArgs[2], else 0.
+void GM_vMCIsUserNameOnCard(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState state;
     int i;
 
@@ -2860,7 +2897,9 @@ void fn_8007E79C(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_8007E818(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 144: how many profiles the save on the memory card in port pArgs[0], slot
+// pArgs[1] holds (MC_GetNumUser).
+void GM_vMCGetNumUsers(MsgArg* pArgs, MsgArg* pResult) {
     MCCardPos pos;
 
     pos.nPort = pArgs[0].i;
@@ -2868,7 +2907,10 @@ void fn_8007E818(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = MC_GetNumUser(&pos);
 }
 
-void fn_8007E85C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 145: saves profile pArgs[3] (gpSaveData) over the saved profile named pArgs[2]
+// on the memory card in port pArgs[0], slot pArgs[1], with the options and the records
+// (fn_800A1164). Answers 1, or fn_800A1164's error.
+void GM_vMCOverwriteUser(MsgArg* pArgs, MsgArg* pResult) {
     s32 nError;
     s32 n;
 
@@ -2880,7 +2922,8 @@ void fn_8007E85C(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = n;
 }
 
-void fn_8007E8B4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 146: always answers 1 in this build.
+void GM_vFEMessage146_Return1(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 1;
 }
 

@@ -173,7 +173,7 @@ typedef struct EarningsTable {
     MatchPrize aLadderPrize[25];    // 0x5E4  per ladder event
     MiniPrize aMini[20];            // 0x710
     s32  aMult[EARN_NUM_MULTS]; // 0x940  the payout multipliers, one table (EARN_MULT_...)
-    s32  a9B4[12];              // 0x9B4  read by index by a menu message (fn_8007E174)
+    s32  a9B4[12];              // 0x9B4  read by index by a menu message (GM_vGetEarningsTableA9B4)
     s32  n9E4;                  // 0x9E4  paid with award 0xC, once every challenge has a medal (GameMode5)
     u8   unk9E8[0x9F0 - 0x9E8];
     s32  nLadderDone;           // 0x9F0  paid when the last ladder event is won
