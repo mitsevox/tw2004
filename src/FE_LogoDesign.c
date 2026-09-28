@@ -150,7 +150,7 @@ void fn_8010FA00(void) {
                 nHeight = 32;
             }
             fn_8010FC3C(pPixels, pLogo, 1, nWidth, nHeight);
-            fn_8005CC64(pBank, pTex);
+            RenderState_SetBankTexture(pBank, pTex);
         }
     }
 }

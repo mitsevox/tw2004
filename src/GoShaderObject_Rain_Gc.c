@@ -166,7 +166,7 @@ void fn_800B4FA4(RainObject* pRain) {
     RenderState_SetDrawFlags(0x40);
     DS_vSetAlphaTestMode(0, 7, 0);
     DS_vSetZBufferMode(3);
-    fn_8005CC64(NULL, NULL);
+    RenderState_SetBankTexture(NULL, NULL);
     RenderState_Flush();
     LLMath_CopyMat44(pCamera->viewMtx, mView);
     mView[3][0] = mView[3][1] = mView[3][2] = 0.0f;
@@ -196,7 +196,7 @@ void fn_800B4FA4(RainObject* pRain) {
     }
 
     RenderState_SetDrawFlags(0x50);
-    fn_8005CC64(lbl_802814B8->pBank, lbl_802814B8->pTex);
+    RenderState_SetBankTexture(lbl_802814B8->pBank, lbl_802814B8->pTex);
     RenderState_Flush();
     LLMath_CopyMat44(((Camera*)RC_spGetCurrentRenderCtx())->m15C, mPos);
     fn_800B58FC(mPos[0], mPos[0]);

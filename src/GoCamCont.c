@@ -16,7 +16,7 @@ void Quat_RotateVector(f32* pQuat, f32* pIn, f32* pOut);      // Quaternion.c: a
 void ViewController_SetCurrentViewController(int nView);    // ViewController.c: sets the current view
 void fn_80045824(int n);                                // DepthField.c: turns depth-of-field layer n off
 void Gaud_CameraShake(u8 nPlayer, u8 bLimit);                // GameAudio.c
-f32  fn_8005CC18(f32* pV);                              // Swing.c
+f32  Vec4_LengthSqClamped(f32* pV);                              // Swing.c
 void CameraController_ShakeCamera(View* pView);
 void fn_80064108(View* pView);
 
@@ -194,9 +194,9 @@ void CameraController_Idle(View* pView, int nPlayer) {
         CameraController_ShakeCamera(pView);
         pView->script.fF0 -= gSession.fFrameTime;
     }
-    if ((f32)Math_Sqrt(fn_8005CC18(pView->v20)) == 0.0f) {
+    if ((f32)Math_Sqrt(Vec4_LengthSqClamped(pView->v20)) == 0.0f) {
         fn_80064108(pView);
-        if ((f32)Math_Sqrt(fn_8005CC18(pView->v20)) == 0.0f) {
+        if ((f32)Math_Sqrt(Vec4_LengthSqClamped(pView->v20)) == 0.0f) {
             pView->v20[0] = 1.0f;
             pView->v20[1] = 0.0f;
             pView->v20[2] = 0.0f;

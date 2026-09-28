@@ -128,7 +128,7 @@ void BreakLine_Render(int nView) {
         RenderState_SetBlendFactors(4, 5);
         DS_vSetAlphaTestMode(0, 6, 0x80);
         DS_vEnableZBufferUpdate(0);
-        fn_8005CC64(lbl_80282228->pBank, lbl_80282228->pTex);
+        RenderState_SetBankTexture(lbl_80282228->pBank, lbl_80282228->pTex);
         RenderState_SetDrawFlags(0x70);
         RenderState_SetClipMode(0);
         RenderState_Flush();

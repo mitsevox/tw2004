@@ -229,7 +229,7 @@ void UI_Obj_RenderBoostUI(int nObj) {
     DS_vSetAlphaTestMode(1, 4, 1);
 
     // the base quad
-    fn_8005CC64(lbl_802820BC, lbl_802820C8);
+    RenderState_SetBankTexture(lbl_802820BC, lbl_802820C8);
     RenderState_Flush();
     for (i = 0; i < 4; i++) {
         aXYZ[i][0] = aQuad[i][0] + lbl_801F5B98[nObj].a0[0];
@@ -247,7 +247,7 @@ void UI_Obj_RenderBoostUI(int nObj) {
         aXYZ[i][2] = fBoost * aQuad[i][2] + lbl_801F5B98[nObj].a0[2];
         aXYZ[i][3] = 1.0f;
     }
-    fn_8005CC64(lbl_802820BC, lbl_802820C4);
+    RenderState_SetBankTexture(lbl_802820BC, lbl_802820C4);
     DS_vSetAlphaTestMode(0, 6, 0x80);
     if (gPlayers[nPlayer].swing.nPowerBoost > 0) {
         Vec3Copy(lbl_8018830C[gPlayers[nPlayer].swing.nPowerBoost - 1], aColour);
@@ -257,7 +257,7 @@ void UI_Obj_RenderBoostUI(int nObj) {
     RenderView_DrawPrimitive(0x98, aXYZ[0], NULL, aUV[0], 4);
 
     // a ring per level: each grows until it passes the largest size, fading out on the way
-    fn_8005CC64(lbl_802820BC, lbl_802820C0);
+    RenderState_SetBankTexture(lbl_802820BC, lbl_802820C0);
     RenderState_Flush();
     fMax = lbl_801F5B98[0].a28[0];
     fFade = lbl_801F5B98[0].a28[1];

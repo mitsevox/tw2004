@@ -3387,9 +3387,9 @@ void fn_800C5EC0(View* pView, f32* pCam, f32* pSub, int nPlayer) {
     f32 fTop;
     f32 fTime;
     f32 t;
-    fEnd = fn_8005CB78(gPlayers[nPlayer].pChar, 2);
-    fStart = fn_8005CB78(gPlayers[nPlayer].pChar, 0);
-    fTop = fn_8005CB78(gPlayers[nPlayer].pChar, 1);
+    fEnd = Character_GetTagTime(gPlayers[nPlayer].pChar, 2);
+    fStart = Character_GetTagTime(gPlayers[nPlayer].pChar, 0);
+    fTop = Character_GetTagTime(gPlayers[nPlayer].pChar, 1);
     fTime = gPlayers[nPlayer].pChar->fAnimTime;
     if (fTime < fTop) {
         t = (fTime - fStart) / (fTop - fStart);

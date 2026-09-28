@@ -273,7 +273,7 @@ void fn_800949D0(SD_SShaderObject_Static* pObject) {
         DS_vSetZBufferMode(3);
         DS_vEnableZBufferUpdate(0);
         RenderState_SetDrawFlags(0x70);
-        fn_8005CC64(pSys->pBank, pSys->pTex);
+        RenderState_SetBankTexture(pSys->pBank, pSys->pTex);
         if (pSys->u18 & 0x80) {
             RenderState_SetBlendFactors(4, 1);
         } else if (pSys->u18 & 0x100) {

@@ -532,7 +532,7 @@ typedef struct RenderState {
     s32  nF4;                   // 0x0F4  }
     s32  nF8;                   // 0x0F8  }
     s32  nClipMode;             // 0x0FC  GX clip mode; 0 at reset; bit 0x400
-    TexBank*  pTexBank;         // 0x100  } the texture of the next draw (fn_8005CC64: the swing
+    TexBank*  pTexBank;         // 0x100  } the texture of the next draw (RenderState_SetBankTexture: the swing
     TexEntry* pTexEntry;        // 0x104  } trail's, the logo editor's)
     struct GxTexture* pTex108;  // 0x108  or this texture (fn_8002A608)
     struct LLPict* pPict10C;    // 0x10C  or this picture (LLVideo.c fn_800760D8: a movie's)
@@ -597,7 +597,7 @@ LAYOUT_ASSERT(ViewState, 0x110);
 
 extern ViewState* lbl_80280E08;
 
-void fn_8005CC64(TexBank* pBank, TexEntry* pTex);  // set the texture of the next draw
+void RenderState_SetBankTexture(TexBank* pBank, TexEntry* pTex);  // set the texture of the next draw
 
 // ---- shader objects ----------------------------------------------------------------------------
 

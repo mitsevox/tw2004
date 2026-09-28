@@ -42,7 +42,7 @@ void fn_80007254();
 void fn_800083A0();
 void fn_80091BDC(int nPoint);
 void fn_80091B98(s32 p0);
-void fn_8005CC64();
+void RenderState_SetBankTexture();
 void fn_80091DB8(int nFrames);
 void fn_80091D84(void);
 void fn_80091EE4(void);
@@ -122,11 +122,11 @@ void fn_80090D28(FEQuad* pQuad) {
             if (gSession.nGameType == 3) {
                 pBank = lbl_801A26DC[pQuad->n0];
                 pTex = fn_800922A0(pBank);
-                fn_8005CC64(pBank, pTex);
+                RenderState_SetBankTexture(pBank, pTex);
             } else {
                 // the texture bank by the entry's name (fn_8008FFF0: -1, 0 or 1)
                 nBank = fn_8008FFF0(szName);
-                fn_8005CC64(lbl_80281F1C->p8->ap4[nBank], pEntry->p4);
+                RenderState_SetBankTexture(lbl_80281F1C->p8->ap4[nBank], pEntry->p4);
             }
             if (!(pQuad->n8 & 1)) {
                 bTint = 0;
@@ -496,7 +496,7 @@ void fn_80091BDC(int nPoint) {
     DS_vSetZBufferMode(7);
     RenderView_SetUseCurrentMatrices(0);
     DS_vEnableZBufferUpdate(0);
-    fn_8005CC64(lbl_80281F20, lbl_80281F24);
+    RenderState_SetBankTexture(lbl_80281F20, lbl_80281F24);
     RenderState_SetDrawFlags(0x50);
     RenderState_Flush();
     afColour[0] = 0.5f;
@@ -531,7 +531,7 @@ void fn_80091BDC(int nPoint) {
 
 void fn_80091D84(void) {
     fn_80091DB8(30);
-    fn_8005CC64(0, 0);
+    RenderState_SetBankTexture(0, 0);
     RenderState_Flush();
 }
 
@@ -568,7 +568,7 @@ void fn_80091E1C(void) {
     for (; i < 600; i++) {
         fn_80007254();
     }
-    fn_8005CC64(0, 0);
+    RenderState_SetBankTexture(0, 0);
     RenderState_Flush();
 }
 

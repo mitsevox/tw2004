@@ -110,10 +110,10 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
         if (pEntry->u0 & 1) {
             if (gSession.nGameType == 3) {
                 pBank = lbl_801A26DC[pArc->n0 + pArc->u8];
-                fn_8005CC64(pBank, fn_800922A0(pBank));
+                RenderState_SetBankTexture(pBank, fn_800922A0(pBank));
             } else {
                 nBank = fn_8008FFF0(pName);
-                fn_8005CC64(lbl_80281F1C->p8->ap4[nBank], pEntry->p4);
+                RenderState_SetBankTexture(lbl_80281F1C->p8->ap4[nBank], pEntry->p4);
             }
         } else if (pEntry->u0 & 2) {
             pPict = (LLPict*)pEntry->p8;

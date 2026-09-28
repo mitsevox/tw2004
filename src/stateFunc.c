@@ -738,7 +738,7 @@ void STATEFUNC_ReplaySwingUpdate(int nPlayer) {
                                GolfCamera_ReplaySwingSpeed(
                                        ViewController_GetCameraControl(gPlayers[nPlayer].nView[0])));
     if (!fn_80048574(gPlayers[nPlayer].pChar, 2) ||
-        fn_8005CB78(gPlayers[nPlayer].pChar, 2) < gPlayers[nPlayer].pChar->fAnimTime) {
+        Character_GetTagTime(gPlayers[nPlayer].pChar, 2) < gPlayers[nPlayer].pChar->fAnimTime) {
         if (gSession.bReplay) {
             SKEL_RelaxIK(gPlayers[nPlayer].pChar->pModel->pSkel);
             SW_vImpact(nPlayer);
@@ -1692,8 +1692,8 @@ void STATEFUNC_RemoveBallUpdate(int nPlayer) {
             Vec3Copy(pB->vPos, pPrev);
             Character_GetBallOnFingerPosition(gPlayers[nPlayer].pChar, pB->vPos);
             if (fn_80062BB0(gPlayers[nPlayer].pChar, 3)) {
-                f32 fT4 = fn_8005CB78(gPlayers[nPlayer].pChar, 4);
-                if (fn_8005CB78(gPlayers[nPlayer].pChar, 3) > fT4) {
+                f32 fT4 = Character_GetTagTime(gPlayers[nPlayer].pChar, 4);
+                if (Character_GetTagTime(gPlayers[nPlayer].pChar, 3) > fT4) {
                     fn_80062DDC(pB->vPos, pPrev, vDir);
                     fSpeed = (f32)Math_Sqrt(Vec3_LengthSqClamped(vDir));
                     if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
@@ -1708,8 +1708,8 @@ void STATEFUNC_RemoveBallUpdate(int nPlayer) {
             }
         }
         if (fn_80048574(gPlayers[nPlayer].pChar, 3) && fn_80062BB0(gPlayers[nPlayer].pChar, 3)) {
-            f32 fT4 = fn_8005CB78(gPlayers[nPlayer].pChar, 4);
-            if (fn_8005CB78(gPlayers[nPlayer].pChar, 3) > fT4) {
+            f32 fT4 = Character_GetTagTime(gPlayers[nPlayer].pChar, 4);
+            if (Character_GetTagTime(gPlayers[nPlayer].pChar, 3) > fT4) {
                 s32 nState = gPlayers[nPlayer].ballBefore.nState;
                 if (nState != 1 && nState != 5 && nState != 0) {
                     Player* p;

@@ -778,8 +778,8 @@ int  Golfer_GetAttribute(Player* pPlayer, int nAttr, int nMode);
 u8   fn_8002E8E4(int nController);  // Golfer.c
 f32  SW_vGetHookSlice(int nPlayer);          // Swing.c
 f32  SW_vGetMishitAngle(int nPlayer);          // Swing.c
-int  fn_8005CB48(int nPlayer);          // Swing.c
-int  fn_8005CB60(int nPlayer);          // Swing.c
+int  SW_fGetBoostMagnitude(int nPlayer);          // Swing.c
+int  SW_fGetSpinMagnitude(int nPlayer);          // Swing.c
 u8   Player_IsHoledNotState23(int nPlayer);
 u8   Team_IsAllCPU(int nTeam);
 u8   fn_8002E8B4(int nPlayer);

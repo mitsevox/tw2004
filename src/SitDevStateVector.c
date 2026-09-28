@@ -297,8 +297,8 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
             lbl_80282218 = nValue;
         }
         SitDev_SetStateValue(pValues, 79, SitDev_GetCommentaryZones(pBefore->vPos), pSetBits);
-        SitDev_SetStateValue(pValues, 75, fn_8005CB48(nPlayer), pSetBits);
-        SitDev_SetStateValue(pValues, 76, fn_8005CB60(nPlayer), pSetBits);
+        SitDev_SetStateValue(pValues, 75, SW_fGetBoostMagnitude(nPlayer), pSetBits);
+        SitDev_SetStateValue(pValues, 76, SW_fGetSpinMagnitude(nPlayer), pSetBits);
         SitDev_SetStateValue(pValues, 23, (s32)(100.0f * SW_vGetHookSlice(nPlayer)), pSetBits);
         fAngle = 100.0f * fabsf(SW_vGetMishitAngle(nPlayer));
         SitDev_SetStateValue(pValues, 24, (s32)(fAngle / PI), pSetBits);

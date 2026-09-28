@@ -197,13 +197,13 @@ u8 fn_800B3C64(ComicPanel* pPanel, int nPlayer) {
 
     switch (pPanel->n0) {
     case 0:
-        bBefore = !(fn_8005CB78(gPlayers[nPlayer].pChar, 1) < gPlayers[nPlayer].pChar->fAnimTime);
+        bBefore = !(Character_GetTagTime(gPlayers[nPlayer].pChar, 1) < gPlayers[nPlayer].pChar->fAnimTime);
         if (!bBefore) {
             return 1;
         }
         return 0;
     case 1:
-        bBefore = !(fn_8005CB78(gPlayers[nPlayer].pChar, 2) < gPlayers[nPlayer].pChar->fAnimTime);
+        bBefore = !(Character_GetTagTime(gPlayers[nPlayer].pChar, 2) < gPlayers[nPlayer].pChar->fAnimTime);
         if (!bBefore) {
             return 1;
         }
@@ -407,7 +407,7 @@ u8 fn_800B4818(f32* pRect, int nPlayer) {
     case 0:
         return lbl_80282178->bDone != 0;
     case 1:
-        if (0.5f + fn_8005CB78(gPlayers[nPlayer].pChar, 2) < gPlayers[nPlayer].pChar->fAnimTime) {
+        if (0.5f + Character_GetTagTime(gPlayers[nPlayer].pChar, 2) < gPlayers[nPlayer].pChar->fAnimTime) {
             if (0.0f == pRect[0] && 0.0f == pRect[1] && 1.0f == pRect[2] && 1.0f == pRect[3]) {
                 return 1;
             }
@@ -471,7 +471,7 @@ void fn_800B4914(View* pView, int nPlayer) {
 // Is the golfer past animation event 2? (98%: the original returns the flag without a u8 mask, but
 // GameEffects.c's call masks it as a u8; an int return is exact here but breaks that caller.)
 u8 fn_800B4AE0(void) {
-    u8 bBefore = !(fn_8005CB78(gPlayers[lbl_80282178->nPlayer].pChar, 2) <
+    u8 bBefore = !(Character_GetTagTime(gPlayers[lbl_80282178->nPlayer].pChar, 2) <
                    gPlayers[lbl_80282178->nPlayer].pChar->fAnimTime);
 
     if (!bBefore) {

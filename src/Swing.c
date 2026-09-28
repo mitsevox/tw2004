@@ -106,8 +106,8 @@ extern f32           __float_max[];              // FLT_MAX
 void  SW_vGetClubDirection(int nPlayer, f32* pOut);
 f32   SW_vCalculateMishitAngle(int nPlayer);
 void  SW_vGetStrokeDirection(int nPlayer, f32* pOut);
-f32   fn_8005CC84(f32 fTan);                     // atanf
-void  fn_8005CCA8(int nPlayer);
+f32   Math_Atan(f32 fTan);                     // atanf
+void  SW_vImpactForController8(int nPlayer);
 void  Vec_Sub(f32* pA, f32* pB, f32* pOut);      // 0x8005CBF4  a - b
 void  Vec_Add(f32* pA, f32* pB, f32* pOut);      // 0x8005CBD0  a + b
 void  SW_vUIBlurReset(int nPlayer);
@@ -126,7 +126,7 @@ void  Character_UpdateAnimation(Character* pObj, int a, f32 f);
 void  SW_vSetSwingStrength(int nPlayer);
 void  SW_vCheckForSwingBoost(int nPlayer);
 void  SW_vUIAdjustClub(Character* pObj, SwingData* pSw, int nStickX);
-int   fn_8005CC5C(void);
+int   GM_GetCurrentLesson(void);
 void  UI_Obj_RenderBoostUI(int nView);
 void  SD_DrawShaderObject(u8* pMesh);
 void  SW_vStateInitBackSwingFigit(int nPlayer);
@@ -139,7 +139,7 @@ void  SW_vUpdateSpinControl(int nPlayer);
 void  SW_vCalculateSpinFactor(int nPlayer);
 void  SW_vAdjustMishitFromAttribute(int nPlayer);
 void  SW_vAdjustVibrationFromAttribute(int nPlayer);
-f32   fn_8005CC18(f32* pV);
+f32   Vec4_LengthSqClamped(f32* pV);
 u8    SW_vStateIdleSwing(int nPlayer);
 u8    SW_vStateBackSwing(int nPlayer);
 u8    SW_vStateBackSwingFigit(int nPlayer);
@@ -368,9 +368,9 @@ void SW_vStateInitBackSwing(int nPlayer) {
     CharacterState_UpdateSKAState(pChar);
     pSw->f10 = 0.0f;
     pSw->f14 = 0.0f;
-    pSw->fTimeSwingStart = fn_8005CB78(pChar, 0);
-    pSw->fTimeSwingTop = fn_8005CB78(pChar, 1);
-    pSw->fTimeBallHit = fn_8005CB78(pChar, 2);
+    pSw->fTimeSwingStart = Character_GetTagTime(pChar, 0);
+    pSw->fTimeSwingTop = Character_GetTagTime(pChar, 1);
+    pSw->fTimeBallHit = Character_GetTagTime(pChar, 2);
     for (i = 0; i < 25; i++) {
         pSw->nCtrlListX[i] = pSw->nCalibrateX;
         pSw->nCtrlListY[i] = pSw->nCalibrateY;
@@ -495,9 +495,9 @@ u8 SW_vStateBackSwing(int nPlayer) {
             CharacterState_UpdateSKAState(pObj);
             pObj->n5CC = 2;
             pSw->fTimeSwingTop = pObj->fAnimTime;
-            fn_8005CBC0(pObj, 0.0f);
-            fn_8005CBB0(pObj, 0.0f);
-            fn_8005CB88(pObj, 1.4f * Char_GetBackswing(pObj));
+            Character_Set1634(pObj, 0.0f);
+            Character_Set1630(pObj, 0.0f);
+            Character_Set162C(pObj, 1.4f * Character_GetBackswing(pObj));
             pSw->nState = 3;
         }
         return 0;
@@ -507,7 +507,7 @@ u8 SW_vStateBackSwing(int nPlayer) {
     nY     = SW_vGetStickY(nPlayer, pPad);
     fTop   = SW_vGetControllerTopOfSwing(pSw);
     fStart = SW_vGetControllerStartOfSwing(pSw);
-    if ((nY <= 255 && nY > 96) || (Char_GetBackswing(pObj) < 0.1f && nY < 96)) {
+    if ((nY <= 255 && nY > 96) || (Character_GetBackswing(pObj) < 0.1f && nY < 96)) {
         if (nY < 96) {
             fMag = 0.0f;
         } else {
@@ -578,9 +578,9 @@ u8 SW_vStateBackSwing(int nPlayer) {
         CharacterState_UpdateSKAState(pObj);
         pObj->n5CC = 2;
         pSw->fTimeSwingTop = pObj->fAnimTime;
-        fn_8005CBC0(pObj, 0.0f);
-        fn_8005CBB0(pObj, 0.0f);
-        fn_8005CB88(pObj, 1.4f * Char_GetBackswing(pObj));
+        Character_Set1634(pObj, 0.0f);
+        Character_Set1630(pObj, 0.0f);
+        Character_Set162C(pObj, 1.4f * Character_GetBackswing(pObj));
         pSw->nState = 3;
         EVENT_Trigger(nPlayer, 0x2F, 0, 0);
         pSw->nFollowThroughX = nX;
@@ -832,7 +832,7 @@ void SW_vUIUpdateBlurBuffer(int nPlayer) {
 
     LLMath_CopyVec(pObj->pModel->pMatrices[nHead][3], v98);
     Vec_Sub(v98, pSw->prevClub[0].vClubPos, vB8);
-    f = Math_Sqrt(fn_8005CC18(vB8));
+    f = Math_Sqrt(Vec4_LengthSqClamped(vB8));
     LLMath_CopyVec(v98, vA8);
     if (f > 0.3f && pSw->nNumInBlurQueue != 0) {
         v18[3] = 0.0f;
@@ -844,7 +844,7 @@ void SW_vUIUpdateBlurBuffer(int nPlayer) {
         Vec_Sub(v68, v58, v48);
         Vec_Sub(v88, v78, v38);
         Vec_Sub(v88, v68, v8);
-        fLen = Math_Sqrt(fn_8005CC18(v8));
+        fLen = Math_Sqrt(Vec4_LengthSqClamped(v8));
         for (i = 1; i <= 5; i++) {
             f = (f32)i / 5.0f;
             Vec3_Scale(f, v38, v18);
@@ -899,8 +899,8 @@ void SW_vUIUpdateIK(int nPlayer) {
 
     if (Player_IsCPU(nPlayer)) {
         if (Game_GetMode() != 11) return;
-        if (fn_8005CC5C() != 8) {
-            switch (fn_8005CC5C()) {
+        if (GM_GetCurrentLesson() != 8) {
+            switch (GM_GetCurrentLesson()) {
             case 9:
                 break;
             default:
@@ -915,7 +915,7 @@ void SW_vUIUpdateIK(int nPlayer) {
     if (pObj->nAnim == 6 || pObj->nAnim == 7) {
         pSw = &gPlayers[nPlayer].swing;
         if (Game_GetMode() == 11 && Player_IsCPU(nPlayer)) {
-            if (fn_8005CC5C() == 8) {
+            if (GM_GetCurrentLesson() == 8) {
                 nStickX = 0;
             } else {
                 nStickX = 0xFF;
@@ -1001,8 +1001,8 @@ void SW_vUIRender3D(int nPlayer) {
     nGrip = CharModel_GetBoneIndex(pObj->pModel, 0x52);
     if (Player_IsCPU(nPlayer)) {
         if (Game_GetMode() != 11) return;
-        if (fn_8005CC5C() != 8) {
-            switch (fn_8005CC5C()) {
+        if (GM_GetCurrentLesson() != 8) {
+            switch (GM_GetCurrentLesson()) {
             case 9:
                 break;
             default:
@@ -1049,9 +1049,9 @@ void SW_vUIRender3D(int nPlayer) {
             DS_vSetAlphaTestMode(0, 6, 0x80);
             DS_vEnableZBufferUpdate(0);
             if (pObj->nAnim == 6) {
-                fn_8005CC64(gpSwing->pBank, gpSwing->pClubBack);
+                RenderState_SetBankTexture(gpSwing->pBank, gpSwing->pClubBack);
             } else if (pObj->nAnim == 7) {
-                fn_8005CC64(gpSwing->pBank, gpSwing->pClubDown);
+                RenderState_SetBankTexture(gpSwing->pBank, gpSwing->pClubDown);
             }
             RenderState_Flush();
             draw.nPrims   = 1;
@@ -1166,7 +1166,7 @@ void SW_vImpact(int nPlayer) {
     SW_vGetStrokeDirection(nPlayer, gPlayers[nPlayer].vLaunchB);
     gPlayers[nPlayer].swing.fHookSlice = gPlayers[nPlayer].vLaunchA[0];
     if (Player_IsController8(nPlayer)) {
-        fn_8005CCA8(nPlayer);
+        SW_vImpactForController8(nPlayer);
         nTrajectory = p->nTrajectory;
         nClub       = p->nClub;
         nKind       = p->nShotKind;
@@ -1174,7 +1174,7 @@ void SW_vImpact(int nPlayer) {
     if (0.0f == gPlayers[nPlayer].vLaunchA[2]) {
         fAim = p->fAim + gPlayers[nPlayer].swing.fMishitAngle;
     } else {
-        fAim = p->fAim + fn_8005CC84(gPlayers[nPlayer].vLaunchA[0] / gPlayers[nPlayer].vLaunchA[2]) +
+        fAim = p->fAim + Math_Atan(gPlayers[nPlayer].vLaunchA[0] / gPlayers[nPlayer].vLaunchA[2]) +
                gPlayers[nPlayer].swing.fMishitAngle;
     }
     while (fAim < -PI) {
@@ -1361,7 +1361,7 @@ void SW_vGetClubDirection(int nPlayer, f32* pOut) {
         pOut[2] = 1.0f;
         pOut[3] = 0.0f;
     } else if (gPlayers[nPlayer].nShotKind != SHOT_TYPE_PUTT_e) {
-        fAngle = fn_8005CC84((fTopX - fCentreX) / fDY);
+        fAngle = Math_Atan((fTopX - fCentreX) / fDY);
         gPlayers[nPlayer].swing.fControllerSliceAngle = fAngle;
         fAngle = SW_fCalculateSliceAmount(&gPlayers[nPlayer].nClub, fAngle);
         fSin   = Math_Sin(fAngle);
@@ -1489,7 +1489,7 @@ f32 SW_vCalculateMishitAngle(int nPlayer) {
     Vec_Sub(vThrough, vBack, vDiff);
     Vec_Add(vDir, vDiff, vDir);
     if (vDir[2]) {
-        fAngle = fn_8005CC84(vDir[0] / vDir[2]);
+        fAngle = Math_Atan(vDir[0] / vDir[2]);
     } else {
         fAngle = (PI / 2) * (vDir[0] >= 0.0f ? 1.0f : -1.0f);
     }
@@ -1806,39 +1806,50 @@ void SW_vAdjustVibrationFromAttribute(int nPlayer) {
     }
 }
 
-int fn_8005CB48(int nPlayer) {
+int SW_fGetBoostMagnitude(int nPlayer) {
     return gPlayers[nPlayer].swing.nPowerBoost;
 }
 
-int fn_8005CB60(int nPlayer) {
+int SW_fGetSpinMagnitude(int nPlayer) {
     return gPlayers[nPlayer].swing.nSpinBoost;
 }
 
-// An animation event's time.
-f32 fn_8005CB78(Character* pChar, u64 uEvent) {
+// The time a SKA tag (a timed event of the character's clip, by id: aTags[uEvent].fTime) comes;
+// TW07's char.h inline, out of line here. Read by the swing, the cameras and the golfer states.
+f32 Character_GetTagTime(Character* pChar, u64 uEvent) {
     return pChar->aTags[(int)uEvent].fTime;
 }
 
-void fn_8005CB88(Character* pObj, f32 f) {
+// Sets Character.f162C (nothing without a character). Its only caller, the backswing
+// (Swing_UpdateBackswing), sets it to 1.4 x Character_GetBackswing at the top of the swing;
+// Character_Create starts it at 1.0. No code in this build reads it.
+void Character_Set162C(Character* pObj, f32 f) {
     if (pObj != NULL) {
         pObj->f162C = f;
     }
 }
 
-f32 Char_GetBackswing(Character* pObj) {
+// How far along the backswing the character is (Character.fBackswing, 0..1); 0 without a character.
+f32 Character_GetBackswing(Character* pObj) {
     if (pObj == NULL) {
         return 0.0f;
     }
     return pObj->fBackswing;
 }
 
-void fn_8005CBB0(Character* pObj, f32 f) {
+// Sets Character.f1630 (nothing without a character). Its only caller, the backswing
+// (Swing_UpdateBackswing), sets it to 0 at the top of the swing; Character_Create starts it at 0.5.
+// No code in this build reads it.
+void Character_Set1630(Character* pObj, f32 f) {
     if (pObj != NULL) {
         pObj->f1630 = f;
     }
 }
 
-void fn_8005CBC0(Character* pObj, f32 f) {
+// Sets Character.f1634 (nothing without a character). Its only caller, the backswing
+// (Swing_UpdateBackswing), sets it to 0 at the top of the swing; Character_Create starts it at 0.2.
+// No code in this build reads it.
+void Character_Set1634(Character* pObj, f32 f) {
     if (pObj != NULL) {
         pObj->f1634 = f;
     }
@@ -1868,6 +1879,7 @@ void Vec_Add(f32* pA, f32* pB, f32* pOut) {
 }
 #endif
 
+// Paired-single vector subtract over four floats: pOut = pA - pB.
 #ifdef __MWERKS__
 asm void Vec_Sub(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
@@ -1891,8 +1903,8 @@ void Vec_Sub(f32* pA, f32* pB, f32* pOut) {
 }
 #endif
 
-// A 4-vector's squared length, capped.
-f32 fn_8005CC18(f32* pV) {
+// A 4-float vector's squared length, at most FLT_MAX (__float_max).
+f32 Vec4_LengthSqClamped(f32* pV) {
     f32 f = pV[0] * pV[0] + pV[1] * pV[1] + pV[2] * pV[2] + pV[3] * pV[3];
     if (f > __float_max[0]) {
         f = __float_max[0];
@@ -1900,20 +1912,26 @@ f32 fn_8005CC18(f32* pV) {
     return f;
 }
 
-int fn_8005CC5C(void) {
+// The lesson being played in game mode 11 (lbl_802823FC: 1..11, 12 when all are done). The swing's
+// trail and IK read it to pull a CPU demonstrator's stick hard to one side in lessons 8 and 9.
+int GM_GetCurrentLesson(void) {
     return lbl_802823FC;
 }
 
-void fn_8005CC64(TexBank* pBank, TexEntry* pTex) {
+// The texture of the next draw: entry pTex of bank pBank (gRenderState.pTexBank, pTexEntry; uFlags
+// bit 1 says they are set).
+void RenderState_SetBankTexture(TexBank* pBank, TexEntry* pTex) {
     gRenderState.pTexBank = pBank;
     gRenderState.pTexEntry = pTex;
     gRenderState.uFlags |= 1;
 }
 
-f32 fn_8005CC84(f32 fTan) {
+f32 Math_Atan(f32 fTan) {
     return atan(fTan);
 }
 
-// Empty.
-void fn_8005CCA8(int nPlayer) {
+// Empty in this build. SW_vImpact calls it only for a player on controller 8 (neither a pad nor the
+// CPU) and re-reads the player's club, trajectory and shot kind after it, so it presumably once set
+// them.
+void SW_vImpactForController8(int nPlayer) {
 }

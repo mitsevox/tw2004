@@ -493,7 +493,7 @@ void fn_80066C6C(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
 void fn_80066CAC(int nPlayer, int nEvent, void* pData, int nArg) {
-    if (fn_8005CB48(nPlayer) > 0 && gPlayers[nPlayer].nClub >= 0 && gPlayers[nPlayer].nClub <= 5) {
+    if (SW_fGetBoostMagnitude(nPlayer) > 0 && gPlayers[nPlayer].nClub >= 0 && gPlayers[nPlayer].nClub <= 5) {
         Gaud_PlayTappaFeedback(nPlayer);
     }
 }

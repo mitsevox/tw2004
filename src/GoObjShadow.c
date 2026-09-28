@@ -52,7 +52,7 @@ void fn_80093DB8(Ball* pBall, int nPlayer) {
     int i;
     fGround = fn_8004D80C(Ter_GetTGD(), pBall->vPos);
     if (-65536.125f != fGround) {
-        fn_8005CC64(lbl_80281F50, lbl_80281F54);
+        RenderState_SetBankTexture(lbl_80281F50, lbl_80281F54);
         DS_vEnableZBufferUpdate(0);
         DS_vSetAlphaTestMode(0, 6, 0x80);
         DS_vSetZBufferMode(3);

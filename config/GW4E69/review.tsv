@@ -1392,3 +1392,17 @@ address	name	comment	by	date
 8005C4B4	SW_vCalculateSpinFactor	rewrite	rj2 (replayed by orchestrator)	2026-09-28
 8005C5EC	SW_vAdjustMishitFromAttribute	rewrite	rj2 (replayed by orchestrator)	2026-09-28
 8005C960	SW_vAdjustVibrationFromAttribute	rewrite	rj2 (replayed by orchestrator)	2026-09-28
+8005CB48	SW_fGetBoostMagnitude	none	rj2 (replayed by orchestrator)	2026-09-28
+8005CB60	SW_fGetSpinMagnitude	none	rj2 (replayed by orchestrator)	2026-09-28
+8005CB78	Character_GetTagTime	rewrite	rj2 (replayed by orchestrator)	2026-09-28
+8005CB88	Character_Set162C	add	rj2 (replayed by orchestrator)	2026-09-28
+8005CB98	Character_GetBackswing	add	rj2 (replayed by orchestrator)	2026-09-28
+8005CBB0	Character_Set1630	add	rj2 (replayed by orchestrator)	2026-09-28
+8005CBC0	Character_Set1634	add	rj2 (replayed by orchestrator)	2026-09-28
+8005CBD0	Vec_Add	keep	rj2 (replayed by orchestrator)	2026-09-28
+8005CBF4	Vec_Sub	add	rj2 (replayed by orchestrator)	2026-09-28
+8005CC18	Vec4_LengthSqClamped	rewrite	rj2 (replayed by orchestrator)	2026-09-28
+8005CC5C	GM_GetCurrentLesson	add	rj2 (replayed by orchestrator)	2026-09-28
+8005CC64	RenderState_SetBankTexture	add	rj2 (replayed by orchestrator)	2026-09-28
+8005CC84	Math_Atan	none	rj2 (replayed by orchestrator)	2026-09-28
+8005CCA8	SW_vImpactForController8	rewrite	rj2 (replayed by orchestrator)	2026-09-28

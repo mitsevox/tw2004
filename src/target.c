@@ -236,7 +236,7 @@ void TARGET_RenderBallTarget(int nPlayer) {
     DS_vSetZBufferMode(3);
     DS_vEnableZBufferUpdate(0);
     RenderState_SetBlendFactors(4, 5);
-    fn_8005CC64(lbl_80281E3C, lbl_80281E40);
+    RenderState_SetBankTexture(lbl_80281E3C, lbl_80281E40);
     RenderState_SetDrawFlags(0x50);
     RenderState_Flush();
     RenderView_SetUseCurrentMatrices(1);
@@ -323,7 +323,7 @@ void TARGET_RenderBallTarget(int nPlayer) {
         }
     }
     if (bOnScreen && gPlayers[nPlayer].nSurface != -1) {
-        fn_8005CC64(lbl_80281E34, lbl_80281E38);
+        RenderState_SetBankTexture(lbl_80281E34, lbl_80281E38);
         RenderState_Flush();
         RenderView_DrawPrimitive(0x98, aShadow[0], NULL, aUV, 4);
     }
@@ -1007,7 +1007,7 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
     DS_vSetAlphaTestMode(0, 6, 0x7F);
     DS_vSetZBufferMode(3);
     RenderState_SetBlendFactors(4, 5);
-    fn_8005CC64(lbl_80281E3C, lbl_80281E40);
+    RenderState_SetBankTexture(lbl_80281E3C, lbl_80281E40);
     RenderState_SetDrawFlags(0x50);
     DS_vEnableZBufferUpdate(0);
     RenderState_Flush();
@@ -1086,7 +1086,7 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
     }
     RenderView_SetColor(lbl_801887EC);
     RenderView_DrawPrimitive(0x98, aMarker[0], NULL, aUV, 4);
-    fn_8005CC64(lbl_80281E34, lbl_80281E38);
+    RenderState_SetBankTexture(lbl_80281E34, lbl_80281E38);
     RenderState_Flush();
     RenderView_DrawPrimitive(0x98, aShadow[0], NULL, aUV, 4);
     DS_vSetAlphaTestMode(1, 6, 0x80);

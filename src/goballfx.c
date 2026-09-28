@@ -50,7 +50,7 @@ void BFX_vRender(Ball* pBall, int nPlayer) {
     f32 fSize;
     fGround = fn_8004D80C(Ter_GetTGD(), pBall->vPos);
     if (-65536.125f != fGround) {
-        fn_8005CC64(lbl_80281F44, lbl_80281F48);
+        RenderState_SetBankTexture(lbl_80281F44, lbl_80281F48);
         RenderState_SetCameraMatrices();
         RenderState_SetBlendFactors(4, 5);
         pPos = lbl_801D95C8[nPlayer];

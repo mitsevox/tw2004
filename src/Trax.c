@@ -97,7 +97,7 @@ void fn_800BA1A4(void) {
         RenderView_SetUseCurrentMatrices(0);
         DS_vEnableZBufferUpdate(0);
         if (fn_800BA080()) {
-            fn_8005CC64(pBank, pTex);
+            RenderState_SetBankTexture(pBank, pTex);
             RenderState_SetDrawFlags(0x50);
         } else {
             RenderState_SetDrawFlags(0x40);

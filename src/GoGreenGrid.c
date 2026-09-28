@@ -461,7 +461,7 @@ void fn_8009C914(int nView) {
     RenderState_SetBlendFactors(4, 5);
     DS_vSetAlphaTestMode(0, 6, 0x80);
     DS_vEnableZBufferUpdate(0);
-    fn_8005CC64(lbl_80281FAC, lbl_80281FA8);
+    RenderState_SetBankTexture(lbl_80281FAC, lbl_80281FA8);
     if (lbl_802813C0->b104) {
         RenderState_SetDrawFlags(0x70);
     } else {

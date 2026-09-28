@@ -1232,7 +1232,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   parameter: the function takes something in r3 it never reads (`fn_80051124(Ball*, f32, f32*)`).
 - **[verified] 64-bit arguments skip r4.** `fn(handle, 0, k)` sites where the original sets r5 and
   r6 but never r4 are `fn(handle, (unsigned long long)k)`: a 64-bit integer goes in an aligned
-  register pair (r5:r6). The animation-event lookups (`fn_8005CB78`, `fn_80048574`,
+  register pair (r5:r6). The animation-event lookups (`Character_GetTagTime`, `fn_80048574`,
   `fn_80062BB0`, `fn_80062B98`) take the 64-bit event id that `fn_8000BEE4` hashes.
 - **[verified] A function that returns its pointer argument** keeps r3 untouched and works on a
   copy in another register (`mr r6, r3`); a `void` function advances r3 directly.

@@ -628,7 +628,7 @@ void fn_800A3A84(void) {
     RenderState_SetBlendFactors(1, 1);
     RenderState_Flush();
     if (lbl_80281408->an44[0] > 2) {
-        fn_8005CC64(lbl_80281408->pBank, lbl_80281408->pTex);
+        RenderState_SetBankTexture(lbl_80281408->pBank, lbl_80281408->pTex);
         RenderState_Flush();
         nFirst = lbl_80281408->an40[0];
         nEnd = lbl_80281408->an38[0];
