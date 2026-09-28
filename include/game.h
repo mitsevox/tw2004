@@ -253,14 +253,14 @@ s32  GM_Earnings_ComputeBonusModifiers(s32 nPoints, int nPlayer, u8 bCourse, u8 
 int  GM_Earnings_ComputeTOURCardModifiers(int nReward, int nPlayer, CourseMoneyTracking* pMoney);
 s32  Earnings_CheckShotAwards(int nPlayer, Ball* pBall, u8 b);   // one of GameEffects' GameBreaker checks
 s32  Earnings_CheckPuttAwards(int nPlayer, Ball* pBall, u8 b);   // the same through fn_800D4F14 (pBall unused)
-u8   fn_800D8DB4(int nKind);            // Earnings.c: whether records of a kind count now
+u8   HighScoreRecords_CheckRecordGameSetting(int nKind);            // Earnings.c: whether records of a kind count now
 void fn_800D477C(int nPlayer, Ball* pBall, u8 b);   // Earnings.c: the shot's check
 void fn_800D4F14(int nPlayer, u8 b);                // the putt's
 void fn_800D588C(int nPlayer, u8 a, u8 bRoundOver); // the hole's
-s32  fn_800D9954(void);                 // lbl_80282250: the entries in the three lists below
-s32  fn_800D995C(s32 i);                // lbl_802002B8[i]
-s32  fn_800D9970(s32 i);                // lbl_80200290[i]
-s32  fn_800D9984(s32 i);                // lbl_80200268[i]
+s32  Earnings_GetNumAwards(void);                 // lbl_80282250: the entries in the three lists below
+s32  Earnings_GetShotAwardId(s32 i);                // lbl_802002B8[i]
+s32  Earnings_GetPuttAwardId(s32 i);                // lbl_80200290[i]
+s32  Earnings_GetHoleAwardId(s32 i);                // lbl_80200268[i]
 int  HighScoreRecords_GetEndOfShotRecord(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll);
 int  HighScoreRecords_GetEndOfHoleRecord(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll);   // the putt record check
 s32  fn_8008AB40(void);                 // GameUICommands.c

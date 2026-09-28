@@ -214,10 +214,10 @@ u8   HighScoreRecords_LongDriveRecordExist(int i, int nValue, const char* szName
 // Offer nValue and szName to record kind nKind of the table that the game mode and
 // gpGame->nCurHoleNum pick (MC.c sets both to reach recB and recC, and passes nPlayer 5).
 // Earnings.c tests for 2 or 4, a new best.
-int  fn_800D8750(int nKind, int nValue, int bSave, const char* szName, int nPlayer);
-void fn_800D8D10(int nPlayer);          // clear the player's flags b30C..b30F
-void fn_800D8D38(int nPlayer);          // clear the flags fn_800D9350 sets (b310..b312)
-void fn_800D8D5C(int nPlayer);          // clear the player's money breakdown for the round
-u8   fn_800D9998(int nPlayer, int nAward);
+int  HighScoreRecords_CheckRecord(int nKind, int nValue, int bSave, const char* szName, int nPlayer);
+void GM_ClearShotBonusStats(int nPlayer);          // clear the player's flags b30C..b30F
+void GM_ClearHoleBonusStats(int nPlayer);          // clear the flags GM_RecordBonusShotStats sets (b310..b312)
+void GM_ClearGameBonusStats(int nPlayer);          // clear the player's money breakdown for the round
+u8   Earnings_IsTourAwardEarned(int nPlayer, int nAward);
 
 #endif

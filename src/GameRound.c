@@ -17,7 +17,7 @@
 int  GM_GetPlayerRoundScoreThroughHole(int nPlayer, int nHoles);
 void GM_SetSplitScreen(u8 b);
 
-void  fn_800D8D5C(int nPlayer);   // clears the player's words at 0x314-0x350
+void  GM_ClearGameBonusStats(int nPlayer);   // clears the player's words at 0x314-0x350
 void  GM_BuildRandom18(void);
 void  GM_BuildDream18(void);
 void  GM_BuildRegionalRound(int nCourse);
@@ -320,7 +320,7 @@ void GM_ClearDataForNewGame(void) {
         for (j = 0; j < 18; j++) {
             p->nC6C[j] = 0;
         }
-        fn_800D8D5C(i);
+        GM_ClearGameBonusStats(i);
         if (gpSaveData[p->nIndex].bActive != 0) {
             gpSaveData[p->nIndex].b70 = 0;
         }

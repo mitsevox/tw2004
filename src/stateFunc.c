@@ -43,7 +43,7 @@ void  TARGET_ResetMomentums(int nPlayer);
 f32   fn_800D04AC(int nPlayer);
 void  ViewController_SaveViewportRect(int nView);
 void  fn_8003349C(f32 a, f32 b, f32 c);
-void  fn_800D8D10(int nPlayer);
+void  GM_ClearShotBonusStats(int nPlayer);
 void  PlaceBall_ResetMomentums(int nPlayer);
 void  fn_80062D98(void);
 void  DynObj_TeeAdd(Ball* pBall, int nPlayer, int a);  // tee the ball up
@@ -208,7 +208,7 @@ void STATEFUNC_PreShotInit(int nPlayer) {
         fn_800957D8(gPlayers[nPlayer].pChar);
     }
     GameEffects_ResetGameEffectSettings();
-    fn_800D8D10(nPlayer);
+    GM_ClearShotBonusStats(nPlayer);
     TARGET_ResetMomentums(nPlayer);
     CharacterState_ResetMorphState(gPlayers[nPlayer].pChar, 1);
     Emotion_UpdatePlayerEmotion(nPlayer);
@@ -1956,7 +1956,7 @@ void STATEFUNC_PlaceBallInit(int nPlayer) {
     Character_AlignShotWithTarget(nPlayer, 1, 1);
     fn_800957D8(gPlayers[nPlayer].pChar);
     GameEffects_ResetGameEffectSettings();
-    fn_800D8D10(nPlayer);
+    GM_ClearShotBonusStats(nPlayer);
     PlaceBall_ResetMomentums(nPlayer);
     Emotion_UpdatePlayerEmotion(nPlayer);
     ViewController_GetIndexedViewController(gPlayers[nPlayer].nView[0])->bFlagOut = 1;

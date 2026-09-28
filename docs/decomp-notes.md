@@ -1190,7 +1190,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   `fn_800B044C`: `u32 uLen` -> `int nLen` (98.75 -> 100). PGATour `fn_800EF130`: the callee's
   prototype `fn_800EF0E0(PlayerNumber_t)` -> `(s32)` fixed the CALLER (98.65 -> 100; `int` did not).
 - **[verified] A leftover argument can be an old value still in r4.** GameRound `GM_ClearDataForNewGame`:
-  `fn_800D8D5C(i, 0)` was really `fn_800D8D5C(i)`; the callee sets r4 itself, and the original's r4 = 0
+  `GM_ClearGameBonusStats(i, 0)` was really `GM_ClearGameBonusStats(i)`; the callee sets r4 itself, and the original's r4 = 0
   was the zero shared by earlier stores (97.85 -> 100). Sign: a `li rX, 0` for an argument the
   original lacks, and the callee overwriting that register before reading it.
 

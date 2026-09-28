@@ -68,8 +68,8 @@ u8 MC_LoadInitialUser(void) {
 }
 
 // Merge a save's record tables into the game's: every entry the game's tables do not already hold
-// is offered to them (fn_800D8750) as nobody's. The course and the mode are switched to reach each
-// table, then put back.
+// is offered to them (HighScoreRecords_CheckRecord) as nobody's. The course and the mode are
+// switched to reach each table, then put back.
 void MC_MergeRecords(SaveRecords* pRecords) {
     int nMode;
     int nCourse;
@@ -99,7 +99,8 @@ void MC_MergeRecords(SaveRecords* pRecords) {
                 if (!HighScoreRecords_RecordExist(j,
                                                   pRecords->aCourseRecord[(u32)i].aRecord[(u32)j][k].nValue,
                                  pRecords->aCourseRecord[(u32)i].aRecord[(u32)j][k].szName, i)) {
-                    fn_800D8750(j, pRecords->aCourseRecord[(u32)i].aRecord[(u32)j][k].nValue, 1,
+                    HighScoreRecords_CheckRecord(j,
+                                                 pRecords->aCourseRecord[(u32)i].aRecord[(u32)j][k].nValue, 1,
                                 pRecords->aCourseRecord[(u32)i].aRecord[(u32)j][k].szName, 5);
                 }
             }
@@ -120,7 +121,8 @@ void MC_MergeRecords(SaveRecords* pRecords) {
                 if (!HighScoreRecords_SkillZoneRecordExist(j2, pRow->recB[0][0][0].nValue,
                                                            pRow->recB[0][0][0].szName,
                                  nHole)) {
-                    fn_800D8750(j2, pRow->recB[0][0][0].nValue, 1, pRow->recB[0][0][0].szName, 5);
+                    HighScoreRecords_CheckRecord(j2, pRow->recB[0][0][0].nValue, 1,
+                                                 pRow->recB[0][0][0].szName, 5);
                 }
             }
         }
@@ -135,7 +137,8 @@ void MC_MergeRecords(SaveRecords* pRecords) {
                 if (!HighScoreRecords_LongDriveRecordExist(j3, pRow3->recC[0][0][0].nValue,
                                                            pRow3->recC[0][0][0].szName,
                                  nHole3)) {
-                    fn_800D8750(j3, pRow3->recC[0][0][0].nValue, 1, pRow3->recC[0][0][0].szName,
+                    HighScoreRecords_CheckRecord(j3, pRow3->recC[0][0][0].nValue, 1,
+                                                 pRow3->recC[0][0][0].szName,
                                 5);
                 }
             }

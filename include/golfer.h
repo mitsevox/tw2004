@@ -275,10 +275,10 @@ typedef struct Player {
     u8   b30C;                  // 0x30C  the start of the block GameModeReplay restores from a replay
     u8   b30D;                  // 0x30D  tested with the course check by GameEffects
     u8   b30E;                  // 0x30E  a replaced ball must be dropped (GM_ReplaceOOBBall)
-    u8   b30F;                  // 0x30F  copied to b310 after a shot (fn_800D9350)
-    u8   b310;                  // 0x310  cleared by fn_800D8D38
-    u8   b311;                  // 0x311  set after a shot with b30E (fn_800D9350)
-    u8   b312;                  // 0x312  set when a shot finished on the green or in the hole (fn_800D9350)
+    u8   b30F;                  // 0x30F  copied to b310 after a shot (GM_RecordBonusShotStats)
+    u8   b310;                  // 0x310  cleared by GM_ClearHoleBonusStats
+    u8   b311;                  // 0x311  set after a shot with b30E (GM_RecordBonusShotStats)
+    u8   b312;                  // 0x312  set when a shot finished on the green or in the hole (GM_RecordBonusShotStats)
     u8   unk313;
     CourseMoneyTracking money;  // 0x314  the round's money by kind (GM_Earnings_AwardMoney)
     // Shot block, TW06 AIshot_t (which has 6 preferred clubs where we have 8).

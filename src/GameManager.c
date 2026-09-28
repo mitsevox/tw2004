@@ -17,10 +17,10 @@
 // fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
 
 void  fn_800D33F0(void);
-void  fn_800D8D38(int nPlayer);
+void  GM_ClearHoleBonusStats(int nPlayer);
 u8    GM_IsRoundForcedOver(int nPlayer);
 void  fn_800D439C(int nPlayer, int a);
-void  fn_800D9834(int nPlayer);
+void  GM_RecordIndividualRoundStats(int nPlayer);
 void  GM_PgaTourSim_SetUserEntrantHoleStrokes(int nPlayer, int nStrokes);
 void  GM_GolferConcede_Hole(int nPlayer);
 void  GM_EndOfGolferTurn_HoleFinished(int nPlayer);
@@ -30,11 +30,11 @@ u8    GM_CheckForAIConcede(int nPlayer);
 
 void  GM_RecordIndividualShotStats(int nPlayer);
 void  fn_800D3DDC(int nPlayer);
-void  fn_800D9458(int nPlayer);
+void  GM_RecordIndividualHoleStats(int nPlayer);
 void  fn_800D4030(int nPlayer);
 void  GM_CheckBallForUIHints(int nPlayer);
 u8    fn_8008AC40(void);
-void  fn_800D9350(int nPlayer);
+void  GM_RecordBonusShotStats(int nPlayer);
 void  fn_800BB0A8(void);
 void  REPLAY_Restore(int nPlayer);
 
@@ -188,9 +188,9 @@ int GM_GotoNextSelectedHole(void) {
 
 // A new hole: views 2 and 3 off, the balls to the tee, new wind, the mode's hole-start hook
 // (pfn1E4), effects and HUD reset, the hole contests cleared, the flyover when the mode has one
-// (b27F), each player's flags that fn_800D9350 carries from shot to shot cleared, the player up set
-// to the mode's first (GetHonors), event 0 (player 0xFF); then for all five players the button hold
-// counters (n144, n158) and the shot-limit and mulligan-this-hole flags (bC2D, bC2F) cleared.
+// (b27F), each player's flags that GM_RecordBonusShotStats carries from shot to shot cleared, the
+// player up set to the mode's first (GetHonors), event 0 (player 0xFF); then for all five players
+// the button hold counters (n144, n158) and the shot-limit and mulligan-this-hole flags (bC2D, bC2F) cleared.
 void GM_InitForHole(void) {
     int i;
     ViewController_TurnOnViewController(2, 0);
@@ -205,7 +205,7 @@ void GM_InitForHole(void) {
         GM_FlyByMode_Init();
     }
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        fn_800D8D38(i);
+        GM_ClearHoleBonusStats(i);
     }
     gpGame->b134 = 0;
     lbl_80282278 = gpGame->pfnGetHonors(5);
@@ -260,8 +260,8 @@ void GM_EndOfGolferTurn(int nPlayer) {
 
 // The hole is over: event 1 and the mode's EndHole. On the round's last hole, outside a playoff
 // (bD4), each player's round goals are paid out (fn_800D439C) and the round counted in the profile
-// (fn_800D9834). Then GM_EndOfGolferTurn_GameFinished when the mode says the game is over (or
-// GM_IsRoundForcedOver), else GM_HoleFinished_GameNotFinished.
+// (GM_RecordIndividualRoundStats). Then GM_EndOfGolferTurn_GameFinished when the mode says the game
+// is over (or GM_IsRoundForcedOver), else GM_HoleFinished_GameNotFinished.
 void GM_EndOfGolferTurn_HoleFinished(int nPlayer) {
     int i;
     EVENT_Trigger(nPlayer, 1, 0, -1);
@@ -269,7 +269,7 @@ void GM_EndOfGolferTurn_HoleFinished(int nPlayer) {
     if (GM_CurrentlyOnLastHole() && !gpGame->bD4 && !GM_IsRoundForcedOver(nPlayer)) {
         for (i = 0; i < gNumPlayersSetUp; i++) {
             fn_800D439C(i, 0);
-            fn_800D9834(i);
+            GM_RecordIndividualRoundStats(i);
         }
     }
     if (gpGame->pfnGameFinished(0) || GM_IsRoundForcedOver(nPlayer)) {
@@ -513,7 +513,7 @@ void GM_BumpBallForObstructions(int nPlayer) {
 // limit - the ball is picked up (lie holed, bC2D, 10 strokes in a PGA TOUR event else 11, putts
 // 999), message 3, the mode's pfn218 and pfn21C; messages 0x11-0x13 when fn_8008AC40 (always 0) and
 // bEE0 allow, 0x13 giving the other of players 0 and 1 the hole; otherwise the yardage. A penalty
-// goes to the mode's pfn250. Last, the per-shot flags are carried over (fn_800D9350).
+// goes to the mode's pfn250. Last, the per-shot flags are carried over (GM_RecordBonusShotStats).
 void GM_PlayerTookShot(int nPlayer) {
     u8   bOut;
     if (GM_CanPlayerTakeMulligan(nPlayer) && !(gPlayers[nPlayer].uFlags & 8)) {
@@ -540,7 +540,7 @@ void GM_PlayerTookShot(int nPlayer) {
     }
     if (!bOut) {
         if (GM_CheckForBallInHole(nPlayer)) {
-            fn_800D9458(nPlayer);
+            GM_RecordIndividualHoleStats(nPlayer);
             fn_800D4030(nPlayer);
             GM_CheckBallForUIHints(nPlayer);
             gpGame->pfn218(nPlayer);
@@ -554,7 +554,7 @@ void GM_PlayerTookShot(int nPlayer) {
                     gPlayers[nPlayer].nStrokes[gpGame->nCurHole] = 11;
                 }
                 gPlayers[nPlayer].nPutts[gpGame->nCurHole] = 999;
-                fn_800D9458(nPlayer);
+                GM_RecordIndividualHoleStats(nPlayer);
                 GUI_StartPostShotUI(3, nPlayer, 0.0f);
                 gpGame->pfn218(nPlayer);
                 gpGame->pfn21C(nPlayer);
@@ -581,7 +581,7 @@ void GM_PlayerTookShot(int nPlayer) {
     } else {
         gpGame->pfn250(nPlayer);
     }
-    fn_800D9350(nPlayer);
+    GM_RecordBonusShotStats(nPlayer);
 }
 
 // Takes a mulligan; 1 when taken. Refused when the mode has no mulligans, the golfer has conceded,

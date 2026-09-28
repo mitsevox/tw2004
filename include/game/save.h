@@ -251,12 +251,12 @@ typedef struct SaveProfile {
     s32  n74;                   // 0x00074  stroke-play rounds counted
     s32  n78;                   // 0x00078  their strokes
     s32  n7C;                   // 0x0007C  full rounds counted
-    s32  n80;                  // 0x00080  holes whose putts are counted (fewer than 10; fn_800D9458)
+    s32  n80;                  // 0x00080  holes whose putts are counted (fewer than 10; GM_RecordIndividualHoleStats)
     s32  n84;                   // 0x00084  their putts
     s32  n88;                  // 0x00088  drives counted (the tee shot of a par 4 or 5 off class-1
                                 //          ground; GM_RecordIndividualShotStats)
     s32  n8C;                   // 0x0008C  their distance together
-    s32  n90;                   // 0x00090  } par 4 and 5 holes counted (fn_800D9458), and those where
+    s32  n90;                   // 0x00090  } par 4 and 5 holes counted (GM_RecordIndividualHoleStats), and those where
     s32  n94;                   // 0x00094  } the player's b2E4 was set
     s32  n98;                   // 0x00098  } every hole counted, and those where the player's b2F6
     s32  n9C;                   // 0x0009C  } was set

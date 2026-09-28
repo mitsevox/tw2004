@@ -13,7 +13,7 @@ u8    fn_800B4AE0(void);
 void  fn_800DBFAC(void);
 void  fn_800DC18C(void);
 void  fn_800DC290(f32 fHeight);
-int   fn_800D8750(int a, int b, int c, char* szName, int nPlayer);   // szName: a profile's name
+int   HighScoreRecords_CheckRecord(int a, int b, int c, char* szName, int nPlayer);   // szName: a profile's name
 u8    fn_800BCD24(int nPlayer);
 
 GameEffects lbl_80202898;   // the effects state (game.h; GameManager, GoGolfCam and others read it)
@@ -302,7 +302,7 @@ int fn_800DB86C(int nPlayer) {
     if (gPlayers[nPlayer].ball.nLie == LIE_GREEN_e && nPar - nStrokes >= 2) {
         bPossible = 1;
     } else if (gPlayers[nPlayer].ball.nLie == LIE_GREEN_e &&
-               fn_800D8750(2, fDist, 0, gpSaveData[nPlayer].szName, nPlayer)) {
+               HighScoreRecords_CheckRecord(2, fDist, 0, gpSaveData[nPlayer].szName, nPlayer)) {
         bPossible = 1;
     } else if (gPlayers[nPlayer].ball.nLie == LIE_GREEN_e && GM_IsPuttForLead(nPlayer)) {
         bPossible = 1;

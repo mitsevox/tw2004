@@ -105,7 +105,7 @@ f32   GM_Earnings_GetCourseModifier(void);
 u8    GM_Earnings_AwardShotBonusToUser(int nPlayer);
 u8    GM_Earnings_AwardThisTrophyBallToUser(int nPlayer, int nAward);
 int   HighScoreRecords_GetEndOfGameRecord(int nPlayer, int bSave, u8 bCountStroke, u8 bAll);
-s32   fn_800D9E00(s32 i);
+s32   Earnings_GetAwardMessageId(s32 i);
 
 // Copy the working tables and their two counts into the second set, which the payouts then read.
 void fn_800D3244(void) {
@@ -447,9 +447,9 @@ void fn_800D3DDC(int nPlayer) {
     for (i = 0; i < lbl_80282248; i++) {
         if (GM_Earnings_AwardTrophyBall(nPlayer, lbl_802000D8[i])) {
             if (fn_800D4010(lbl_802000D8[i])) {
-                GUI_QueueMessage(6, fn_800D9E00(lbl_802000D8[i]), 0, nProfile);
+                GUI_QueueMessage(6, Earnings_GetAwardMessageId(lbl_802000D8[i]), 0, nProfile);
             } else {
-                GUI_QueueMessage(2, fn_800D9E00(lbl_802000D8[i]), lbl_80200060[i], nProfile);
+                GUI_QueueMessage(2, Earnings_GetAwardMessageId(lbl_802000D8[i]), lbl_80200060[i], nProfile);
             }
             GM_Earnings_AwardMoney(nPlayer, lbl_80200060[i], NULL);
             gPlayers[nPlayer].money.n8 += lbl_80200060[i];
@@ -500,9 +500,9 @@ void fn_800D4030(int nPlayer) {
     for (i = 0; i < lbl_80282248; i++) {
         if (GM_Earnings_AwardTrophyBall(nPlayer, lbl_802000B0[i])) {
             if (fn_800D4010(lbl_802000B0[i])) {
-                GUI_QueueMessage(6, fn_800D9E00(lbl_802000B0[i]), 0, nProfile);
+                GUI_QueueMessage(6, Earnings_GetAwardMessageId(lbl_802000B0[i]), 0, nProfile);
             } else {
-                GUI_QueueMessage(2, fn_800D9E00(lbl_802000B0[i]), lbl_80200038[i], nProfile);
+                GUI_QueueMessage(2, Earnings_GetAwardMessageId(lbl_802000B0[i]), lbl_80200038[i], nProfile);
             }
             GM_Earnings_AwardMoney(nPlayer, lbl_80200038[i], NULL);
             gPlayers[nPlayer].money.n8 += lbl_80200038[i];
@@ -524,9 +524,9 @@ void fn_800D4030(int nPlayer) {
     for (i = 0; i < lbl_80282248; i++) {
         if (GM_Earnings_AwardTrophyBall(nPlayer, lbl_80200268[i])) {
             if (fn_800D4010(lbl_80200088[i])) {
-                GUI_QueueMessage(6, fn_800D9E00(lbl_80200088[i]), 0, nProfile);
+                GUI_QueueMessage(6, Earnings_GetAwardMessageId(lbl_80200088[i]), 0, nProfile);
             } else {
-                GUI_QueueMessage(2, fn_800D9E00(lbl_80200088[i]), lbl_80200010[i], nProfile);
+                GUI_QueueMessage(2, Earnings_GetAwardMessageId(lbl_80200088[i]), lbl_80200010[i], nProfile);
             }
             GM_Earnings_AwardMoney(nPlayer, lbl_80200010[i], NULL);
             gPlayers[nPlayer].money.n8 += lbl_80200010[i];
@@ -573,9 +573,9 @@ void fn_800D439C(int nPlayer, u8 bRoundOver) {
     for (i = 0; i < lbl_80282248; i++) {
         if (GM_Earnings_AwardTrophyBall(nPlayer, lbl_80200268[i])) {
             if (fn_800D4010(lbl_80200088[i])) {
-                GUI_QueueMessage(6, fn_800D9E00(lbl_80200088[i]), 0, nProfile);
+                GUI_QueueMessage(6, Earnings_GetAwardMessageId(lbl_80200088[i]), 0, nProfile);
             } else {
-                GUI_QueueMessage(2, fn_800D9E00(lbl_80200088[i]), lbl_80200010[i], nProfile);
+                GUI_QueueMessage(2, Earnings_GetAwardMessageId(lbl_80200088[i]), lbl_80200010[i], nProfile);
             }
             GM_Earnings_AwardMoney(nPlayer, lbl_802001F0[i], NULL);
             gPlayers[nPlayer].money.n8 += lbl_802001F0[i];
@@ -704,7 +704,7 @@ void fn_800D477C(int nPlayer, Ball* pBall, u8 bPreview) {
             if (nHoles + nAdj > fn_800D0FBC(nPlayer)) continue;
         }
         if (lbl_80200538.aShotGoal[i].nAward >= 23 && lbl_80200538.aShotGoal[i].nAward <= 38 &&
-            (bPreview || !fn_800D9998(nPlayer, lbl_80200538.aShotGoal[i].nAward))) continue;
+            (bPreview || !Earnings_IsTourAwardEarned(nPlayer, lbl_80200538.aShotGoal[i].nAward))) continue;
         if (lbl_80200538.aShotGoal[i].nAward == 22 &&
             GM_GetGameProgress(&gpSaveData[nPlayer]) < 100.0f) continue;
 
@@ -866,7 +866,7 @@ void fn_800D4F14(int nPlayer, u8 bPreview) {
         if (Earnings_TestBit(lbl_80200538.aPuttGoal[i].uFlags, 6) &&
             (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] > 1 || fn_800D0DC8(nPlayer, -5) < 2)) continue;
         if (lbl_80200538.aPuttGoal[i].nAward >= 23 && lbl_80200538.aPuttGoal[i].nAward <= 38 &&
-            (bPreview || !fn_800D9998(nPlayer, lbl_80200538.aPuttGoal[i].nAward))) continue;
+            (bPreview || !Earnings_IsTourAwardEarned(nPlayer, lbl_80200538.aPuttGoal[i].nAward))) continue;
         if (lbl_80200538.aPuttGoal[i].nAward == 22 &&
             GM_GetGameProgress(&gpSaveData[nPlayer]) < 100.0f) continue;
 
@@ -1044,7 +1044,7 @@ void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
                 <= GM_GetPlayerRoundStrokes(nPlayer)) continue;
         }
         if (lbl_80200538.aHoleGoal[i].nAward >= 23 && lbl_80200538.aHoleGoal[i].nAward <= 38 &&
-            (bPreview || !fn_800D9998(nPlayer, lbl_80200538.aHoleGoal[i].nAward))) continue;
+            (bPreview || !Earnings_IsTourAwardEarned(nPlayer, lbl_80200538.aHoleGoal[i].nAward))) continue;
         if (lbl_80200538.aHoleGoal[i].nAward == 22 &&
             GM_GetGameProgress(&gpSaveData[nPlayer]) < 100.0f) continue;
 
@@ -1611,13 +1611,13 @@ u8 GM_Earnings_AwardTrophyBall(int nPlayer, int nAward) {
 // ball.
 s32 Earnings_CheckShotAwards(int nPlayer, Ball* pBall, u8 b) {
     fn_800D477C(nPlayer, pBall, b);
-    return fn_800D9954();
+    return Earnings_GetNumAwards();
 }
 
 // The same for the putt goals (fn_800D4F14), which read the player's own ball: pBall is not used.
 s32 Earnings_CheckPuttAwards(int nPlayer, Ball* pBall, u8 b) {
     fn_800D4F14(nPlayer, b);
-    return fn_800D9954();
+    return Earnings_GetNumAwards();
 }
 
 // Whether the player can still win award nAward (0..38): a human player with an active profile who
@@ -1693,8 +1693,9 @@ int HighScoreRecords_GetEndOfShotRecord(int nPlayer, Ball* pBall, int a, u8 bCou
     }
     nPar = Course_GetCurHolePar();
     nClass = gSurfaceTypes[pBall->nStartSurface].nClass;
-    if (fn_800D8DB4(1) && (nPar == 4 || nPar == 5) && nClass == 1 && !GM_IsBallOOB(nPlayer, pBall)) {
-        nResult = fn_800D8750(1, (s32)fDist, a, szName, nPlayer);
+    if (HighScoreRecords_CheckRecordGameSetting(1) && (nPar == 4 || nPar == 5) && nClass == 1
+        && !GM_IsBallOOB(nPlayer, pBall)) {
+        nResult = HighScoreRecords_CheckRecord(1, (s32)fDist, a, szName, nPlayer);
         if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
             lbl_80200498[lbl_80282258] = nResult;
             lbl_80200510[lbl_80282258] = 1;
@@ -1740,8 +1741,8 @@ int HighScoreRecords_GetEndOfHoleRecord(int nPlayer, Ball* pBall, int a, u8 bCou
     fDx = pBall->vPos[0] - gPlayers[nPlayer].vBall[0];
     fDz = pBall->vPos[2] - gPlayers[nPlayer].vBall[2];
     fDist = Math_Sqrt(fDx * fDx + fDz * fDz);
-    if (fn_800D8DB4(2) && gPlayers[nPlayer].nClub == 25) {
-        nResult = fn_800D8750(2, (s32)(3.0f * fDist), a, szName, nPlayer);
+    if (HighScoreRecords_CheckRecordGameSetting(2) && gPlayers[nPlayer].nClub == 25) {
+        nResult = HighScoreRecords_CheckRecord(2, (s32)(3.0f * fDist), a, szName, nPlayer);
         if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
             lbl_80200470[lbl_80282258] = nResult;
             lbl_802004E8[lbl_80282258] = 2;
@@ -1785,8 +1786,8 @@ int HighScoreRecords_GetEndOfGameRecord(int nPlayer, int bSave, u8 bCountStroke,
         strcpy(szName, gpSaveData[nProfile].szName);
     }
     if (Game_GetMode() == 22) {
-        if (fn_800D8DB4(9)) {
-            nResult = fn_800D8750(9, gPlayers[nPlayer].nEBC, bSave, szName, nPlayer);
+        if (HighScoreRecords_CheckRecordGameSetting(9)) {
+            nResult = HighScoreRecords_CheckRecord(9, gPlayers[nPlayer].nEBC, bSave, szName, nPlayer);
             if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
                 lbl_80200448[lbl_80282258] = nResult;
                 lbl_802004C0[lbl_80282258] = 9;
@@ -1796,8 +1797,8 @@ int HighScoreRecords_GetEndOfGameRecord(int nPlayer, int bSave, u8 bCountStroke,
         return lbl_80282258;
     }
     if (GM_Currently_SkillZoneMode()) {
-        if (fn_800D8DB4(8)) {
-            nResult = fn_800D8750(8, gPlayers[nPlayer].nDD8, bSave, szName, nPlayer);
+        if (HighScoreRecords_CheckRecordGameSetting(8)) {
+            nResult = HighScoreRecords_CheckRecord(8, gPlayers[nPlayer].nDD8, bSave, szName, nPlayer);
             if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
                 lbl_80200448[lbl_80282258] = nResult;
                 lbl_802004C0[lbl_80282258] = 8;
@@ -1811,24 +1812,24 @@ int HighScoreRecords_GetEndOfGameRecord(int nPlayer, int bSave, u8 bCountStroke,
         gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()]++;
     }
     nValue = GM_GetPlayerRoundStrokes(nPlayer);
-    if (fn_800D8DB4(0)) {
-        nResult = fn_800D8750(0, nValue, bSave, szName, nPlayer);
+    if (HighScoreRecords_CheckRecordGameSetting(0)) {
+        nResult = HighScoreRecords_CheckRecord(0, nValue, bSave, szName, nPlayer);
         if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
             lbl_80200448[lbl_80282258] = nResult;
             lbl_802004C0[lbl_80282258] = 0;
             lbl_80282258++;
         }
     }
-    if (fn_800D8DB4(3)) {
-        nResult = fn_800D8750(3, fn_800D1170(nPlayer, 0), bSave, szName, nPlayer);
+    if (HighScoreRecords_CheckRecordGameSetting(3)) {
+        nResult = HighScoreRecords_CheckRecord(3, fn_800D1170(nPlayer, 0), bSave, szName, nPlayer);
         if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
             lbl_80200448[lbl_80282258] = nResult;
             lbl_802004C0[lbl_80282258] = 3;
             lbl_80282258++;
         }
     }
-    if (fn_800D8DB4(5)) {
-        nResult = fn_800D8750(5, fn_800D0FBC(nPlayer), bSave, szName, nPlayer);
+    if (HighScoreRecords_CheckRecordGameSetting(5)) {
+        nResult = HighScoreRecords_CheckRecord(5, fn_800D0FBC(nPlayer), bSave, szName, nPlayer);
         if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
             lbl_80200448[lbl_80282258] = nResult;
             lbl_802004C0[lbl_80282258] = 5;
@@ -1841,8 +1842,8 @@ int HighScoreRecords_GetEndOfGameRecord(int nPlayer, int bSave, u8 bCountStroke,
             nValue++;
         }
     }
-    if (fn_800D8DB4(7)) {
-        nResult = fn_800D8750(7, nValue, bSave, szName, nPlayer);
+    if (HighScoreRecords_CheckRecordGameSetting(7)) {
+        nResult = HighScoreRecords_CheckRecord(7, nValue, bSave, szName, nPlayer);
         if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
             lbl_80200448[lbl_80282258] = nResult;
             lbl_802004C0[lbl_80282258] = 7;
@@ -1855,8 +1856,8 @@ int HighScoreRecords_GetEndOfGameRecord(int nPlayer, int bSave, u8 bCountStroke,
             nEagles++;
         }
     }
-    if (fn_800D8DB4(6)) {
-        nResult = fn_800D8750(6, nEagles, bSave, szName, nPlayer);
+    if (HighScoreRecords_CheckRecordGameSetting(6)) {
+        nResult = HighScoreRecords_CheckRecord(6, nEagles, bSave, szName, nPlayer);
         if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
             lbl_80200448[lbl_80282258] = nResult;
             lbl_802004C0[lbl_80282258] = 6;
@@ -1867,8 +1868,8 @@ int HighScoreRecords_GetEndOfGameRecord(int nPlayer, int bSave, u8 bCountStroke,
     for (i = 0; i < 18; i++) {
         nPutts += gPlayers[nPlayer].nPutts[i];
     }
-    if (fn_800D8DB4(4)) {
-        nResult = fn_800D8750(4, nPutts, bSave, szName, nPlayer);
+    if (HighScoreRecords_CheckRecordGameSetting(4)) {
+        nResult = HighScoreRecords_CheckRecord(4, nPutts, bSave, szName, nPlayer);
         if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
             lbl_80200448[lbl_80282258] = nResult;
             lbl_802004C0[lbl_80282258] = 4;
@@ -1970,7 +1971,9 @@ s32 HighScoreRecords_GetSkillZoneRecordType(s32 n) {
     }
 }
 
-s32 fn_800D8720(s32 n) {
+// The long-drive record table (recC's second index) of the long-drive contest's setting n
+// (GameMode22 fn_80126FA0): 0 and 1 as they are, anything else 2 (none).
+s32 Earnings_GetLongDriveRecordType(s32 n) {
     switch (n) {
     case 0:
         return 0;
@@ -1981,13 +1984,16 @@ s32 fn_800D8720(s32 n) {
     }
 }
 
-// Offer nValue and szName to record kind nKind: kinds 0..7 to the course's records and the
-// all-time recA, kind 8 to recB (by game mode), the rest to recC. Returns 1 for a place in the
-// course (or recB/recC) top five, 2 for its best, 3 and 4 the same for recA. With bSave the entry
-// is written in (the ones below move down) and the player's profile gets b70.
-// EA passes szName to sprintf as the format. The callers pass bSave unmasked and this function
-// tests its low byte (the (u8) casts): EA's definition took a u8 behind an int prototype.
-int fn_800D8750(int nKind, int nValue, int bSave, const char* szName, int nPlayer) {
+// Offer nValue and szName to record kind nKind: kinds 0..7 go to the current course's records
+// (gSession.aCourseRecord) and then the all-time ones (recA), kind 8 to the skill-zone table of the
+// game mode (recB, by Game_GetCurHoleNum), kind 9 and up to the long-drive table (recC). Returns 1
+// for a place in the course's (or recB's, recC's) top five, 2 for its best, 3 and 4 the same for
+// recA (tested last, so it wins); 0 for none, and always 0 for a round whose holes are not one
+// course's 1..18 (gpGame->b136). With bSave the entry is written in (the ones below move down) and
+// the player's profile is flagged as changed (b70); nPlayer 5 (MC.c) is no player. EA passes szName
+// to sprintf as the format. The callers pass bSave unmasked and this function tests its low byte
+// (the (u8) casts): EA's definition took a u8 (TW07: bool setrecord) behind an int prototype.
+int HighScoreRecords_CheckRecord(int nKind, int nValue, int bSave, const char* szName, int nPlayer) {
     int nResult;
     int nPos;
     int n;
@@ -2081,7 +2087,7 @@ int fn_800D8750(int nKind, int nValue, int bSave, const char* szName, int nPlaye
             }
         }
     } else {
-        n = fn_800D8720(fn_80126FA0());
+        n = Earnings_GetLongDriveRecordType(fn_80126FA0());
         if (n != 2) {
             pLast = &gSession.recC[fn_80127098(Game_GetCurHoleNum())][n][4];
             if (HighScoreRecords_IsEqualOrBetter(nKind, nValue, pLast->nValue)) {
@@ -2121,23 +2127,25 @@ int fn_800D8750(int nKind, int nValue, int bSave, const char* szName, int nPlaye
     return nResult;
 }
 
-// Clear the player's flags b30C..b30F (Swing.c calls it).
-void fn_800D8D10(int nPlayer) {
+// Clear the player's per-shot bonus flags (b30C..b30F), before each shot (the place-ball and
+// pre-shot states).
+void GM_ClearShotBonusStats(int nPlayer) {
     gPlayers[nPlayer].b30C = 0;
     gPlayers[nPlayer].b30D = 0;
     gPlayers[nPlayer].b30F = 0;
     gPlayers[nPlayer].b30E = 0;
 }
 
-// Clear the flags fn_800D9350 sets.
-void fn_800D8D38(int nPlayer) {
+// Clear the flags GM_RecordBonusShotStats keeps over a hole (b310..b312), when a hole starts
+// (GM_InitForHole).
+void GM_ClearHoleBonusStats(int nPlayer) {
     gPlayers[nPlayer].b310 = 0;
     gPlayers[nPlayer].b311 = 0;
     gPlayers[nPlayer].b312 = 0;
 }
 
-// Clear the player's money breakdown for the round (GameRound.c, as a round is set up).
-void fn_800D8D5C(int nPlayer) {
+// Clear the player's money breakdown (Player.money) for a new game (GM_ClearDataForNewGame).
+void GM_ClearGameBonusStats(int nPlayer) {
     gPlayers[nPlayer].money.n0 = 0;
     gPlayers[nPlayer].money.n4 = 0;
     gPlayers[nPlayer].money.n8 = 0;
@@ -2156,10 +2164,12 @@ void fn_800D8D5C(int nPlayer) {
     gPlayers[nPlayer].money.n24 = 0;
 }
 
-// Whether records of kind nKind count now: never in modes 9 and 11 or when Game_GetMulliganRule says so;
-// kinds 0 and 3..7 need GM5_IsChallengeRunning off, a round of every hole and fn_8008AB40 off, kinds 1 and 2
-// only GM5_IsChallengeRunning off, kind 8 GM_Currently_SkillZoneMode, kind 9 game mode 22.
-u8 fn_800D8DB4(int nKind) {
+// Whether records of kind nKind count in this game: never in game modes 9 and 11 or with mulligans
+// on. Kinds 0..9 also need no challenge running (GM5_IsChallengeRunning): the round's kinds (0,
+// 3..7) a full round (GM_FullRoundOfGolf) of stroke scoring (fn_8008AB40 0), the drive and the putt
+// (1, 2) nothing more, kind 8 a skill-zone mode, kind 9 game mode 22 (the long-drive contest). Any
+// other kind counts.
+u8 HighScoreRecords_CheckRecordGameSetting(int nKind) {
     if (Game_GetMode() == 9 || Game_GetMode() == 11) return 0;
     if (Game_GetMulliganRule() != 0) return 0;
     switch (nKind) {
@@ -2197,12 +2207,14 @@ u8 fn_800D8DB4(int nKind) {
     return 1;
 }
 
-// After a shot that stayed in bounds (GM_PlayerTookShot), when gpGame->b27B allows it: the shot's
-// statistics. A drive (the first stroke of a par 4 or 5, off class-1 ground) can be the round's
-// and the profile's longest and is counted in the profile; the first stroke's distance goes in
-// nC24; b2E4 marks a first stroke on a par 4 or 5 that finished on the fairway, the green or in the
-// hole, b2F6 a ball on the green or in the hole in par - 2 strokes or fewer. A putt (club 25) that
-// GM_CheckForBallInHole accepts can be the longest, in feet.
+// After a shot that stayed in bounds (GM_PlayerTookShot), when gpGame->b27B allows it and mulligans
+// are off: the shot's statistics. A drive (the first stroke of a par 4 or 5, off class-1 ground)
+// can be the round's longest (Player.n2DC) and the profile's (nA0), in yards, and is counted in the
+// profile (n88 drives, n8C their yards). The first stroke's length goes in nC24; b2E4 marks a
+// fairway hit (that first stroke on a par 4 or 5 finished on the fairway, the green or in the
+// hole), b2F6 a green in regulation (on the green or in the hole, not on class-3 ground, in par - 2
+// strokes or fewer). A holed putt (club 25) can be the round's and the profile's longest (n2E0,
+// nA4): 3 x Player.fA64, in feet.
 void GM_RecordIndividualShotStats(int nPlayer) {
     u32 nClass;
     Ball* pBall;
@@ -2264,10 +2276,11 @@ void GM_RecordIndividualShotStats(int nPlayer) {
     }
 }
 
-// After every shot (GM_PlayerTookShot calls it last), when the mode allows no mulligans: carry the
-// flags over, and set bit 0 of n308 when the hole's first stroke on a par 4 or 5 finished on the
-// green or in the hole.
-void fn_800D9350(int nPlayer) {
+// After every shot (GM_PlayerTookShot calls it last), unless mulligans are on: the shot's bonus
+// flags carry into the hole's. b30F sets b310; b30E sets b311 and bit 1 of n308; a ball on the
+// green or in the hole sets b312; bit 0 of n308 is set when that happened on the hole's first
+// stroke of a par 4 or more (the green driven).
+void GM_RecordBonusShotStats(int nPlayer) {
     int nLie;
     int nStrokes;
     int nPar;
@@ -2292,10 +2305,14 @@ void fn_800D9350(int nPlayer) {
     }
 }
 
-// The player has finished the current hole: mark it, and add the hole to the statistics of the
-// player's profile (putts, the per-hole flags b2E4 and b2F6, the score against par), recording the
-// date of an eagle or better on a par 5 when the hole is a marked one.
-void fn_800D9458(int nPlayer) {
+// The player's hole is over (holed, or picked up at the stroke limit; GM_PlayerTookShot): it is
+// marked in gpGame->b16C and, when gpGame->b27C allows it, no challenge runs and mulligans are off,
+// added to the profile's statistics: fairways (par 4 and 5 holes n90, hit n94: b2E4), greens in
+// regulation (n98, hit n9C: b2F6), putts (holes with fewer than 10: n80, their putts n84) and the
+// score against par (nAC hole in one, nB0 albatross, nB4 eagle, nB8 birdie, nBC par, nC0 bogey, nC4
+// worse). An eagle or better on a par 5 is marked, with the date, in the profile's par-5 table
+// (a5004, a504C). The profile is flagged as changed (b70).
+void GM_RecordIndividualHoleStats(int nPlayer) {
     int nProfile;
     int nPar;
     int nDiff;
@@ -2313,7 +2330,7 @@ void fn_800D9458(int nPlayer) {
 
     gpGame->b16C[nPlayer][Game_CurHoleIndex()] = 1;
     if (gpGame->b27C) {
-        switch (GM5_IsChallengeRunning()) {    // fake match: as in fn_800D9834
+        switch (GM5_IsChallengeRunning()) {    // fake match: as in GM_RecordIndividualRoundStats
         case 0:
             break;
         default:
@@ -2381,9 +2398,11 @@ void fn_800D9458(int nPlayer) {
     }
 }
 
-// At the end of a round: count it in the profile (a round of every hole; when gpGame->n4 is 0 also
-// its strokes and the best score).
-void fn_800D9834(int nPlayer) {
+// At the end of the round (its last hole, outside a playoff; GM_EndOfGolferTurn_HoleFinished), when
+// gpGame->b27D allows it, no challenge runs and mulligans are off: a full round is counted in the
+// profile (n7C), and in stroke play (gpGame->n4 0) also in n74, with its strokes added to n78 and
+// kept as the best round (nA8) when lower. The profile is flagged as changed (b70).
+void GM_RecordIndividualRoundStats(int nPlayer) {
     PlayerNumber_t nProfile;
     int nStrokes;
 
@@ -2417,25 +2436,37 @@ void fn_800D9834(int nPlayer) {
     }
 }
 
-s32 fn_800D9954(void) {
+// How many awards the last shot, putt or hole goal check listed (lbl_80282250).
+s32 Earnings_GetNumAwards(void) {
     return lbl_80282250;
 }
 
-s32 fn_800D995C(s32 i) {
+// Award i of those the shot goal check listed (lbl_802002B8).
+s32 Earnings_GetShotAwardId(s32 i) {
     return lbl_802002B8[i];
 }
 
-s32 fn_800D9970(s32 i) {
+// Award i of those the putt goal check listed (lbl_80200290).
+s32 Earnings_GetPuttAwardId(s32 i) {
     return lbl_80200290[i];
 }
 
-s32 fn_800D9984(s32 i) {
+// Award i of those the hole goal check listed (lbl_80200268).
+s32 Earnings_GetHoleAwardId(s32 i) {
     return lbl_80200268[i];
 }
 
-// Whether the profile has earned award nAward (23..38, the PGA TOUR and career awards); others
-// give 0. Most need the season's last round and at least 15 tournaments started.
-u8 fn_800D9998(int nPlayer, int nAward) {
+// Whether the player has earned PGA TOUR award nAward (23..38; any other gives 0), with mulligans
+// off and an active profile. nPlayer indexes gpSaveData directly (not through Player.nIndex) and is
+// passed on as the player too. The season awards need the season over (the last round of the last
+// event) and 15 or more events played: 24 a top 25 in every event played, 25 leading 15 of the 28
+// tour statistics, 26 leading the par 3, 4 and 5 birdie statistics, 27 over 4.25 birdies a round,
+// 30 under par in every event played, 33 a scoring average under 68.17. The others at any time: 23
+// more than 18 holes in one (SaveProfile.nAC), 28 GameMode5's fn_800ED6F0 with the best medal
+// (fn_800EC558 0), 29 leading the career money list, 31 tour.n4E96 over 11, 32 a round under 59
+// strokes, 34 more than 100 events (n4E94) with over 28% won, 35 n4E98 over 66, 36 n4E9A over 18,
+// 37 ten or more wins in a season, 38 more season winnings than Tiger Woods's $9,188,321 of 2000.
+u8 Earnings_IsTourAwardEarned(int nPlayer, int nAward) {
     SaveProfile* pProfile;
     u8 bSeasonEnd;
     u8 bFullSeason;
@@ -2544,6 +2575,8 @@ u8 fn_800D9998(int nPlayer, int nAward) {
     return 0;
 }
 
-s32 fn_800D9E00(s32 i) {
+// The message index of award i (lbl_80191A08): awards 0..22 are their own; the PGA TOUR awards
+// 23..38 index the tour awards' message list (GUI_QueueMessage kind 6).
+s32 Earnings_GetAwardMessageId(s32 i) {
     return lbl_80191A08[i];
 }

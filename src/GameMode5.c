@@ -605,7 +605,8 @@ void fn_800EC1E0(void) {
                     }
                 }
                 GM_Earnings_AwardMoney(0, nMoney, (CourseMoneyTracking*)aOut);
-                if (fn_800ED6F0() && fn_800D9998(0, 0x1C) && GM_Earnings_AwardTrophyBall(0, 0x1C)) {
+                if (fn_800ED6F0() && Earnings_IsTourAwardEarned(0, 0x1C)
+                    && GM_Earnings_AwardTrophyBall(0, 0x1C)) {
                     GUI_QueueMessage(6, 0x1C, lbl_80200538.nA24, nProfile);
                     GM_Earnings_AwardMoney(0, lbl_80200538.nA24, 0);
                     gPlayers[0].money.n8 += lbl_80200538.nA24;
