@@ -1,19 +1,22 @@
-// uiText.c (our name): a menu UI text element (UIText): its string drawn in a font (UFont.c), in
-// its own colour or one of the front end's colour table, aligned and optionally shadowed
-// (UIText_Draw), and the message handler that sets it up (UIText_ProcessMessage). Its extent is its data:
-// it is the only user of the .data 0x80189C38-0x80189CA0, .sbss 0x80281F30-0x80281F38 and .sdata2
+// uiText.c (our name; no TW06 or TW07 file has this code): the menu UI's text element (UIText, the
+// UI studio's plugin 7: UIText_ProcessMessage): its string drawn in a font (UFont.c), in its own
+// colour or one of the front end's colour table, placed, turned and scaled by the UI transform,
+// aligned and optionally shadowed (UIText_Draw); and the font settings it sets for that (the
+// shadow, the align point, the angle, drawing at once or queued). Its extent is its data: it is
+// the only user of the .data 0x80189C38-0x80189CA0, .sbss 0x80281F30-0x80281F38 and .sdata2
 // 0x80283BF0-0x80283C20 blocks, between fe_movies.c's and uiTransform.c's.
 
 #include "unsorted/cull.h"
 #include "game/frontend.h"
 #include "frontend/uisvec.h"
 
-// The file's globals: the UI Studio's colour multiply and add (UISGetColorMultipler,
-// UISGetColorAdditive), read again at each draw.
+// The UI studio's colour add and multiply (UISGetColorAdditive, UISGetColorMultipler), taken again
+// at each UIText_Draw.
 UISColorVectorT* gpUITextColourAdd;
 UISColorVectorT* gpUITextColourMul;
 
 // UFont.c's text state setters.
+void FO_vSetCurrentAddMode(s32 nMode);  // 1: strings are drawn at once, 0: queued
 void UFont_SetFont(s32 nFont);
 void fn_80012B6C(f32 f);
 void fn_80012B9C(f32 fX, f32 fY);
@@ -23,9 +26,9 @@ void fn_80012CB4_SetWordWrapBox(f32 fX, f32 fY, f32 fW, f32 fH);
 void fn_800760B0(s32 nX, s32 nY, s32 nW, s32 nH);
 
 void UIText_SetFontShadowColour(f32* pColor);
-void UIText_SetFontShadowOffset(f32 x0, f32 x1);
-void UIText_SetFontAlignPoint(f32 x0, f32 x1);
-void UIText_SetFontAngle(f32 x0);
+void UIText_SetFontShadowOffset(f32 fX, f32 fY);
+void UIText_SetFontAlignPoint(f32 fX, f32 fY);
+void UIText_SetFontAngle(f32 fAngle);
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0, before the 512 and 448 UIText_Draw uses first; its body is unknown, this one only
@@ -264,11 +267,6 @@ void UIText_ProcessMessage(UIText* pText, int nMsg, s32 n, MsgArg* pArgs, MsgArg
     }
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
-void FO_vSetCurrentAddMode();
-void UIText_SetFontDrawAtOnce(void);
-void UIText_SetFontDrawQueued(void);
 // Strings are drawn at once from now on, not queued (FO_vSetCurrentAddMode 1); uiProcessInterface.c
 // calls it when it resets the UI.
 void UIText_SetFontDrawAtOnce(void) {
@@ -281,8 +279,6 @@ void UIText_SetFontDrawQueued(void) {
     FO_vSetCurrentAddMode(0);
 }
 
-// ---- end of sweep code ----
-
 // The text shadow's colour: pColor packed into the font settings' uC8, with colour mode 0x12 (nC4),
 // which draws in that one colour.
 void UIText_SetFontShadowColour(f32* pColor) {
@@ -290,30 +286,26 @@ void UIText_SetFontShadowColour(f32* pColor) {
     UFont_PackColor(pColor, (u8*)&FO_spGetCurrentPacket()->uC8);
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
 // How far the text shadow is moved (the font settings' fCC, fD0): fX across, fY down.
-void UIText_SetFontShadowOffset(f32 x0, f32 x1) {
+void UIText_SetFontShadowOffset(f32 fX, f32 fY) {
     UFontContext* pCtx;
     pCtx = FO_spGetCurrentPacket();
-    pCtx->fCC = x0;
-    pCtx->fD0 = x1;
+    pCtx->fCC = fX;
+    pCtx->fD0 = fY;
 }
 
 // The point text is aligned on with alignment flags 4 and 0x400 (the font settings' fBC, fC0, as
 // fractions of the text's size): UIText_Draw sets it to the pivot of a turned text.
-void UIText_SetFontAlignPoint(f32 x0, f32 x1) {
+void UIText_SetFontAlignPoint(f32 fX, f32 fY) {
     UFontContext* pCtx;
     pCtx = FO_spGetCurrentPacket();
-    pCtx->fBC = x0;
-    pCtx->fC0 = x1;
+    pCtx->fBC = fX;
+    pCtx->fC0 = fY;
 }
 
 // The angle text is turned by (the font settings' fB8; 0: not turned).
-void UIText_SetFontAngle(f32 x0) {
+void UIText_SetFontAngle(f32 fAngle) {
     UFontContext* pCtx;
     pCtx = FO_spGetCurrentPacket();
-    pCtx->fB8 = x0;
+    pCtx->fB8 = fAngle;
 }
-
-// ---- end of sweep code ----

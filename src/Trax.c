@@ -1,6 +1,9 @@
-// Trax.c (our name): the EA Trax music display: the 'TRAX' and 'TRXT' stream objects (the song
-// list and the EA Trax logo) and, for 240 frames after a song starts, its names in a box that
-// slides in from the left and fades out.
+// Trax.c (our name; EA's uiEATrax.c): the EA Trax music display: the 'TRAX' and 'TRXT' stream
+// objects (the song list and the EA Trax logo) and, for 240 frames after a song starts, its names
+// in a box that slides in from the left and fades out.
+// Why uiEATrax.c: TW2003's data names "uiEATrax.c" right after "crcmp_mad_codec.c", and this file
+// links right after rcmp_mad_codec.c; TW07's uiEATrax.c starts UI_vEATraxRegisterStreamClients,
+// UI_vEATraxUnRegisterStreamClients, UI_vEATraxLoadfromStream, in this file's order.
 
 #include "engine.h"
 #include "golfer.h"
@@ -10,8 +13,8 @@
 #include "trax.h"
 
 // Defined in reverse address order: CodeWarrior lays out .bss last-defined first.
-TraxTrack gEATraxSongs[TRAX_NUM_TRACKS];
-TraxState gEATraxDisplay;
+TraxTrack gEATraxSongs[TRAX_NUM_TRACKS];        // the song list ('TRAX')
+TraxState gEATraxDisplay;                       // the song display now
 
 u8 UI_EATraxIsLogoLoaded(void);
 void UI_vEATraxLoadfromStream(UStreamObject* pObject);
@@ -234,6 +237,8 @@ void UI_EATraxShowSong(int bShow, s8 nTrack) {
 }
 
 // data-order note: defined after the functions, so this .sdata pointer follows the file's string
-// literal "\"%s\"" (0x80281508), as in the original.
+// literal "\"%s\"" (0x80281508), as in the original. They are LLDisp_Gc.c's (its fn_80007368 and
+// fn_80007328 count how deep interrupts are turned off through the pointer), but lie in this file's
+// .sbss / .sdata.
 s32 gInterruptsOffDepth;
 s32* gpInterruptsOffDepth = &gInterruptsOffDepth;

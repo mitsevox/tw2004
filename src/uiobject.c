@@ -1,6 +1,9 @@
-// uiobject.c (our name, after TW06's golf/ui core/istudio runtime/uiobject.c; UI_Obj_InitModule is
-// a TW06 pair): the 3D objects the in-game UI draws (TW06: the confidence-boost rings and the
-// "tappa spinna" UI): here the power boost and spin display (UI_Obj_RenderBoostUI).
+// uiobject.c (EA's uiObject.c, golf/ui core/istudio runtime in TW06 and TW07): the 3D objects the
+// in-round UI draws for Swing.c: the power-boost display (a quad grown by the boost level and a
+// ring per level) and the spin display (a model tilted and rolled by the spin asked for), drawn by
+// UI_Obj_RenderBoostUI through a camera of its own. TW07's uiObject.c has UI_Obj_InitModule,
+// UI_Obj_CloseModule, UI_Obj_InitForRender, UI_Obj_ResetBoostRings, ... UI_Obj_RenderBoostUI in
+// this order and shape (TW07 adds the "tappa spinna" set-up between them).
 
 #include "game_types.h"
 #include "engine.h"
@@ -12,20 +15,20 @@
 #include "golfer.h"
 
 #pragma explicit_zero_data on
-f32        gUIObjLookAtTarget[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+f32        gUIObjLookAtTarget[4] = {0.0f, 0.0f, 0.0f, 0.0f};   // where the display's camera looks
 #pragma explicit_zero_data reset
 
-UIObjSettings gUIObjSettings[2];
-f32        gUIObjBoostRingSize[8];
-LightGroup gUIObjLights;
+UIObjSettings gUIObjSettings[2];        // per view: the display's place, tilt, scale and roll
+f32        gUIObjBoostRingSize[8];      // per boost level: its ring's size now
+LightGroup gUIObjLights;                // the spin model's one directional light
 
-UObject*   gpUIObjModel;
-CamLens*   gpUIObjLens;
-TexEntry*  gpUIObjBaseTexture;
-TexEntry*  gpUIObjBoostTexture;
-TexEntry*  gpUIObjRingTexture;
-TexBank*   gpUIObjTexBank;
-f32        gUIObjLightRed;
+UObject*   gpUIObjModel;                // the spin model ('TEO ' object 10003)
+CamLens*   gpUIObjLens;                 // the display's own camera
+TexEntry*  gpUIObjBaseTexture;          // } "toball": the base quad
+TexEntry*  gpUIObjBoostTexture;         // } "toball" again: the quad grown by the boost level
+TexEntry*  gpUIObjRingTexture;          // "ring": the boost rings
+TexBank*   gpUIObjTexBank;              // the bank of the three textures
+f32        gUIObjLightRed;              // the light's red (0: nothing writes it)
 
 void fn_80013E38(u8* p, s32 v);  // GoRenderCtx_Gc.c
 void UI_Obj_InitModule(void);
@@ -49,9 +52,9 @@ void fn_8006EADC(UObject* pObj);        // GoLighting.c: light the object
 void fn_8006ED70(void);                 // GoLighting.c
 void fn_80035294(void);                 // GoTerrain.c
 
-f32 gUIObjLightGreen = 0.05f;
-f32 gUIObjLightBlue = 0.476f;
-f32 gUIObjAlpha = 0.19f;
+f32 gUIObjLightGreen = 0.05f;           // the light's green
+f32 gUIObjLightBlue = 0.476f;           // the light's blue
+f32 gUIObjAlpha = 0.19f;                // the spin model's constant alpha (times 255)
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0f (0x80284018), before the 1.35f UI_Obj_InitModule uses first; its body is unknown.
@@ -111,7 +114,7 @@ void UI_Obj_CloseModule(void) {
 }
 
 // Make the spin display's model from its 'TEO ' model object (id 10003), unless it is made already.
-// port: a 'TEO ' object's UStreamObject.uUnk4 holds its model (see rcmp_mad_codec.c fn_800B9B48).
+// port: a 'TEO ' object's UStreamObject.uUnk4 holds its model (see rcmp_mad_codec.c FE_CrAPBall_MakeObjects).
 void UI_Obj_InitForRender(void) {
     if (gpUIObjModel == NULL) {
         gpUIObjModel = fn_80048808((UObjModel*)fn_8000B70C('TEO ', 10003)->uUnk4);
@@ -121,7 +124,7 @@ void UI_Obj_InitForRender(void) {
 // Put all eight boost rings (gUIObjBoostRingSize) back to their start size (object 0's a28[3]) so
 // they grow afresh; Swing.c calls it on a boost, when the boosts are cleared and when a swing is
 // set up. nPlayer is unused.
-void UI_Obj_ResetBoostRings(int nPlayer) {    // nPlayer: unused (every caller, in Swing.c, passes one)
+void UI_Obj_ResetBoostRings(int nPlayer) {
     gUIObjBoostRingSize[0] = gUIObjSettings[0].a28[3];
     gUIObjBoostRingSize[1] = gUIObjSettings[0].a28[3];
     gUIObjBoostRingSize[2] = gUIObjSettings[0].a28[3];

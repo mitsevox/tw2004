@@ -1,5 +1,16 @@
-// fe_movies.c (TW06's file name, a guess from the filemap): the front end's movies, the loading
-// screen's tiles and the quads the front end draws.
+// fe_movies.c (a filemap guess, from a TW06 call-graph pairing; the code shows it is EA's
+// uiProcessPolygon.c, "UI runtime" / "iStudio runtime"): the menu UI's polygon element (the UI
+// studio's plugin 0: UIPoly_ProcessMessage, UIPoly_Draw), the pictures its elements load with their
+// screens, the loading screen and its progress bar of eight tiles, the start-up movies and the
+// full-screen pictures shown between them.
+// Why uiProcessPolygon.c: TW07's uiProcessPolygon.c holds UI_InitLoadingBar and
+// UI_DrawLoadingScreenAndProgressBar, the jobs of UI_InitLoadingBar and
+// UI_DrawLoadingScreenAndProgressBar here; TW07's uiProcessPolygon.h is included from Golf/MainLoop,
+// Golf/entry and golf/streaming, where this file's callers are (gomainloop.c, GoEntry.c,
+// streammanagerhole.c); TW06 lists uiprocesspolygon.c among the iStudio runtime files; and it links
+// between uiProcessInterface.c and uiText.c / uiTransform.c, in the UI runtime's alphabetical order.
+// EA's fe_movies.c / FE_Movies.c (TW06, TW07: FE_MakeMoviePath, FE_movieFade, FE_PlayIntroMovies)
+// is FE_Manager.c's movie code in this build.
 
 #include "game_types.h"
 #include "llpict.h"
@@ -10,15 +21,19 @@
 #include "frontend/uisvec.h"
 #include "unsorted/cull.h"
 
+// Per 'txf2' texture bank (lbl_801A26DC): nonzero marks the bank's gUITxf2BankState at the menus'
+// shutdown (uiProcessInterface.c UI_CloseInterface); nothing in this build writes it.
 u32 gUITxf2BankMarkOnExit[FE_NUM_801D8890];
+// Per 'txf2' texture bank: UI_FreeTxf2BankPixels frees a bank's pixels before a movie when its n4
+// is positive (nothing sets it positive in this build).
 FE801D8890 gUITxf2BankState[FE_NUM_801D8890];
-FE801D8858 gUILoadingScreen;
-f32 gUILoadingBarTilePos[8][2];
+FE801D8858 gUILoadingScreen;            // the loading screen and its progress bar (UI_InitLoadingBar)
+f32 gUILoadingBarTilePos[8][2];         // the bar's tiles' x, y (UI_InitLoadingBarTilePos)
 
-f32* gpUIPolyColourAdd;
-f32* gpUIPolyColourMul;
-struct TexEntry* gpUILoadingBarTexture;
-struct TexBank*  gpUILoadingBarBank;
+f32* gpUIPolyColourAdd;                 // } the UI studio's colour add and multiply, taken by
+f32* gpUIPolyColourMul;                 // } UIPoly_Draw for UIPoly_TintVertex
+struct TexEntry* gpUILoadingBarTexture; // } the loading bar's texture and its bank
+struct TexBank*  gpUILoadingBarBank;    // } (UI_LoadLoadingBarTexture)
 
 void fn_80008380(void);
 void LLMath_Add(f32* pA, f32* pB, f32* pOut);
@@ -33,7 +48,7 @@ void UIPoly_Draw(FEQuad* pQuad);
 void UIPoly_UnpackVertex(FEVertex* pVtx, f32* pPos, f32* pUV, f32* pColour, f32* pScale, f32* pAdd);
 void UI_LoadEntryPicture(s16 nTable, s16 nEntry);
 void UI_ReleaseEntryPicture(s16 nTable, s16 nEntry);
-f32* UITransform_GetViewParams(void);             // uiTransform.c
+f32* UITransform_GetViewParams(void); // uiTransform.c
 void UI_GetPictureUVScale(f32* pOut, LLPict* pPict);
 void UI_InitForHole(void);
 void fn_80006EDC();
@@ -41,7 +56,7 @@ void fn_80006FE8();
 void fn_80007254();
 void fn_800083A0();
 void UI_DrawLoadingBarTile(int nPoint);
-void UI_ShowLoadingBarTile(s32 p0);
+void UI_ShowLoadingBarTile(s32 nTile);
 void UI_FadeInLoadingScreen(int nFrames);
 void UI_ShowLoadingScreen(void);
 void UI_OnFrontEndStart(void);
@@ -50,9 +65,11 @@ f32 UI_GetDrawDepth(void);
 void fn_80013E30();
 void UI_SetCurrentRenderCtxFrameBuffer(s32 p0);
 
-u8 gbUIFirstMenuDraw = 1;
+u8 gbUIFirstMenuDraw = 1;               // cleared on the first menu draw (UI_ClearFirstMenuDraw)
+// 0.2 for a locked golfer, else 0 (FE_MessageTable.c GM_vIsGolferUnlocked and
+// GM_vIsGolferUnlockedByDefault write it); no code reads it.
 f32 gFELockedGolferShade = 0.25f;
-int gUILoadingBarBankSlot = -1;
+int gUILoadingBarBankSlot = -1;         // the loading bar's texture-bank slot (-1: none)
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0f (0x80283B90), before the unsigned conversion constant UIPoly_TintVertex uses first; its body is
@@ -81,9 +98,9 @@ void UIPoly_TintVertex(FEVertex* pSrc, FEVertex* pDst, u8 bTint) {
 // Draw pQuad, a polygon element of the menu UI. With a UI file entry (n2 its table, n0 its entry;
 // n2 -1: none) it is textured: a texture entry (flag 1) binds its texture (in the menus, game type
 // 3, the first texture of 'txf2' bank n0; else the entry's texture in the bank its name picks,
-// fn_8008FFF0) and keeps its corner colours only with n8 bit 0 (else they are white, alpha kept); a
-// picture entry (flag 2) binds its decoded picture, and the texture coordinates are scaled to the
-// part of the texture the picture fills. Colour-table colour n4 (not -1) replaces the corners'
+// UI_GetTextureBankIndex) and keeps its corner colours only with n8 bit 0 (else they are white,
+// alpha kept); a picture entry (flag 2) binds its decoded picture, and the texture coordinates are
+// scaled to the part of the texture the picture fills. Colour-table colour n4 (not -1) replaces the corners'
 // colours first. The colours are tinted by the UI studio's multiply and add, scaled by the
 // transform's colour level and offset; the corners go through the current UI transform, a
 // perspective divide by the view distance, and are put at the front end's draw depth. Nothing is
@@ -96,7 +113,7 @@ void UIPoly_Draw(FEQuad* pQuad) {
     f32 aColour[4][4];
     f32 vScale[4];
     f32 vAdd[4];
-    f32 vPictUV[4];     // UI_GetPictureUVScale fills all four, two are used; the original's buffer is 16 bytes
+    f32 vPictUV[4];     // UI_GetPictureUVScale fills all four, two are used; EA's buffer is 16 bytes
     f32 fDist;
     f32 fZ;
     f32 fProj;
@@ -499,9 +516,9 @@ void UI_DrawLoadingScreenAndProgressBar(int nMode) {
 
 // Draw loading-bar tile nTile in a frame of its own (start the frame, draw the tile, end the frame,
 // step the audio).
-void UI_ShowLoadingBarTile(s32 p0) {
+void UI_ShowLoadingBarTile(s32 nTile) {
     fn_80006EDC();
-    UI_DrawLoadingBarTile(p0);
+    UI_DrawLoadingBarTile(nTile);
     fn_80006FE8();
     fn_80007254();
     fn_800083A0();
@@ -609,7 +626,7 @@ void UI_OnFrontEndStart(void) {
 }
 
 // The start-up movies, as the start-up UI (game type 1, nC 0) shuts down (uiProcessInterface.c
-// fn_80090400): "eas", then, unless the session has flag 0x4000, one of the two cameo movies
+// UI_CloseInterface): "eas", then, unless the session has flag 0x4000, one of the two cameo movies
 // "tigcam01" / "tigcam02" at random (any button skips it); then the first 'LEGL' picture startUp.c
 // kept, shown for 180 frames (fading in over 30) and freed.
 void UI_PlayStartUpMovies(void) {
@@ -685,7 +702,7 @@ void UI_DrawFullScreenPicture(LLPict* pPict, f32 fAlpha) {
     UI_SetCurrentRenderCtxFrameBuffer(nOld);
 }
 
-// Before a movie (FE_Manager.c fn_800772E0): free the pixel data (fn_8000FFAC) of each 'txf2'
+// Before a movie (FE_Manager.c FE_PreMovieSetup): free the pixel data (fn_8000FFAC) of each 'txf2'
 // texture bank whose gUITxf2BankState n4 is positive, waiting for the GPU first. Nothing in this
 // build makes n4 positive (FE_Manager.c only clears it), so nothing is freed.
 void UI_FreeTxf2BankPixels(void) {
@@ -699,7 +716,7 @@ void UI_FreeTxf2BankPixels(void) {
     }
 }
 
-// Called after a movie (FE_Manager.c fn_8007731C); empty in this build.
+// Called after a movie (FE_Manager.c FE_PostMovieSetup); empty in this build.
 void UI_RestoreAfterMovie(void) {
 }
 
