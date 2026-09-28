@@ -86,7 +86,7 @@ ClipBank* ClipBank_Get(u32 nSlot);                  // skalib.c
 AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank);  // skalib.c
 CharModel* SKEL_LoadFromMem(u8* pData, s8 n, CharModelDefs* pDefs, int b);   // Skeleton.c
 void  fn_80037AB8(Skin* pSkin, CharModel* pModel, int nBone, int nId);   // Skin.c
-void  fn_800CC4EC(Character* pChar);                // SkinPart.c
+void  SkinPart_BurnBodySkin(Character* pChar);                // SkinPart.c
 void* CharSlider_CreateDefinitionsFromMem(u8** ppData);
 void  fn_8001B58C(CharSkinSet* pSet);
 void  fn_8001B878(Character* pChar, int nPlayer);
@@ -179,8 +179,8 @@ void  fn_8008EAC8(u8 v);
 void  fn_800C937C(void);
 void  fn_800C9764(void);
 void  fn_800C9FE0(void);
-void  fn_800CCA1C(void);
-void  fn_800CCA3C(void);
+void  SkinPart_Init(void);
+void  SkinPart_Shutdown(void);
 void  fn_800CEE04(Skin* pSkin, int a, int b);
 s32   SkinPart_GetNumSets(Skin* pSkin);         // SkinPart.c: how many choices aSets[3] holds
 void  SkinPart_SetChangeAllCopies(u8 b);
@@ -1861,7 +1861,7 @@ Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, Skin
     pChar->pChoices = pChoices;
     if (bLook) {
         fn_8001DC64(pChar, pChoices);
-        fn_800CC4EC(pChar);
+        SkinPart_BurnBodySkin(pChar);
     }
     if (gSession.nSplitScreen && Character_IsGolfer(pChar)) {
         fn_800375AC(pChar->pSkin, 0);
@@ -2287,14 +2287,14 @@ void fn_8001C254(void) {
     }
     lbl_80280E20 = n;
     fn_800C937C();
-    fn_800CCA1C();
+    SkinPart_Init();
     SkinPart_SetChangeAllCopies(1);
     fn_80035C58();
 }
 
 void fn_8001C2B4(void) {
     fn_80035CC0();
-    fn_800CCA3C();
+    SkinPart_Shutdown();
     fn_800C9764();
     fn_80095560();
     fn_8001A33C();
@@ -2308,7 +2308,7 @@ void fn_8001C304(void) {
     fn_8001A288();
     SKEL_EnableIK(0);
     lbl_80280E20 = 3;
-    fn_800CCA1C();
+    SkinPart_Init();
     SkinPart_SetChangeAllCopies(0);
     fn_80036460(1800);
     fn_80112C64(1);
@@ -2316,7 +2316,7 @@ void fn_8001C304(void) {
 
 void fn_8001C350(void) {
     fn_8001A33C();
-    fn_800CCA3C();
+    SkinPart_Shutdown();
     fn_80036464();
     fn_80112CEC();
 }
@@ -2818,13 +2818,13 @@ void Character_SetClubsAndClothes(Character* pChar, int nSlot) {
         if (gSession.aProfile[nSlot].n0 > 0) {
             sprintf(szName, "%s%d", szName, gSession.aProfile[nSlot].n0);
         }
-        fn_800CC658(pChar, "shirt", szName, NULL);
+        SkinPart_ChooseBodySetByName(pChar, "shirt", szName, NULL);
     }
     sprintf(szName, "%s", "glove");
     if (gSession.aProfile[nSlot].n2 > 0) {
         sprintf(szName, "%s%d", szName, gSession.aProfile[nSlot].n2);
     }
-    fn_800CC658(pChar, "glove", szName, NULL);
+    SkinPart_ChooseBodySetByName(pChar, "glove", szName, NULL);
 }
 
 void fn_8001D624(int n) {
@@ -2993,7 +2993,7 @@ u8 fn_8001DBF4(Character* pChar) {
 // at a9B4). Outside the menu golfer's game type 3 (or on its screens 1 and 4) n113 sets the
 // model's bEE.
 void fn_8001DC64(Character* pChar, SkinChoices* pChoices) {
-    fn_800CC1EC(pChar, pChoices);
+    SkinPart_ApplyBodyChoices(pChar, pChoices);
     CharSlider_UpdateCharacterBasedOnSliderValues(pChar->p17AC, pChar->pModel, pChar->pSkin, 26, pChoices->a9B4,
                 &pChar->node3E0);
     if (gSession.nGameType != 3 || lbl_80281EE0->n0 == 1 || lbl_80281EE0->n0 == 4) {
@@ -3157,9 +3157,9 @@ void Character_SetClubStatesForCharacter(Character* pChar, int nSlot, SkinChoice
             SkinPart_ChooseClubSet(pChar, 2, uName, uVariant, gGolferTable[nGolfer].aClubs[2].uGrip);
         }
     } else {
-        fn_800CC408(pChar, pChoices);
+        SkinPart_ApplyClubChoices(pChar, pChoices);
     }
-    fn_800CC8BC(pChar, Character_IsLeftHanded(pChar));
+    SkinPart_SetClubsLeftHanded(pChar, Character_IsLeftHanded(pChar));
 }
 
 // Every player for whom fn_800FCC38 says so has its animation played at normal speed.

@@ -1344,13 +1344,13 @@ void FE_CheckSpecialCaseConnections(CrAPAsset* pAsset) {
             nSet = fn_800CDCA0(pSkin, "wire");
             nVariant = SkinPart_FindSetVariantByName(pSkin, nSet, "nowire");
             if (nSet >= 0 && nVariant >= 0) {
-                fn_800CC9D8(lbl_80281EE0->pB4->pChar, nSet, nVariant, 0);
+                SkinPart_ChooseBodySet(lbl_80281EE0->pB4->pChar, nSet, nVariant, 0);
             }
         } else if (nPart == 1) {
             nSet = fn_800CDCA0(pSkin, "hands");
             nVariant = SkinPart_FindSetVariantByName(pSkin, nSet, "nowire");
             if (nSet >= 0 && nVariant >= 0) {
-                fn_800CC9D8(lbl_80281EE0->pB4->pChar, nSet, nVariant, 0);
+                SkinPart_ChooseBodySet(lbl_80281EE0->pB4->pChar, nSet, nVariant, 0);
             }
         }
     }
@@ -1656,7 +1656,7 @@ void FE_CrAP_ApplyAssetParts(CrAPAsset* pAsset, Skin* pSkin) {
         nPart = SkinPart_FindPart(pSkin, pAsset->aPart[i]);
         nVariant = fn_800CDBB0(pSkin, nPart, pAsset->aVariant[i]);
         if (nPart >= 0 && nVariant >= 0) {
-            fn_800CCB08(pSkin, nPart, nVariant);
+            SkinPart_ChoosePartVariant(pSkin, nPart, nVariant);
         }
     }
 }
@@ -1719,7 +1719,7 @@ void FE_CrAP_RemoveAssetParts(CrAPAsset* pAsset, Skin* pSkin) {
         for (i = 0; i < 4; i++) {
             nPart = SkinPart_FindPart(pSkin, pAsset->aPart[i]);
             if (nPart >= 0) {
-                fn_800CCB08(pSkin, nPart, 0);
+                SkinPart_ChoosePartVariant(pSkin, nPart, 0);
             }
         }
     }

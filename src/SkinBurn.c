@@ -314,9 +314,9 @@ void fn_80127B98(Skin* pSkin, s32* aParts, s32* aList) {
             if (i == aParts[j]) break;
         }
         if (aParts[j] < 0) {
-            fn_801109FC(pBurn, i, fn_800CCD30(pSkin, i, 0));
+            fn_801109FC(pBurn, i, SkinPart_GetPartVariant(pSkin, i, 0));
         }
-        fn_80110A0C(pBurn, i, fn_800CCD84(pSkin, i, 0));
+        fn_80110A0C(pBurn, i, SkinPart_GetPartOption(pSkin, i, 0));
     }
 
     nCount = fn_8011C850(pSkin->pModel->pDesc);

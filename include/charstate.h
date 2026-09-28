@@ -25,7 +25,7 @@ LAYOUT_ASSERT(SkinPartDef, 0x10);
 // A variant of a part, such as "GloveOn" or "GloveOff".
 typedef struct SkinVariant {
     u64  uId;                   // 0x00  its name code
-    s32  nOptions;              // 0x08  a part's option must be below it (fn_800CCC1C)
+    s32  nOptions;              // 0x08  a part's option must be below it (SkinPart_ChoosePartOption)
     s32  nFirstOption;          // 0x0C  its options: SkinDesc.p5C entries (fn_800CD664)
     s32  nLinks;                // 0x10  entries in SkinDesc.pLinks from nFirstLink
     s32  nFirstLink;            // 0x14
@@ -629,8 +629,8 @@ extern s32   lbl_80281D78;              // }
 
 // SkinPart.c, as FE_CrAPDB.c uses it: find a part (or set) by id, a variant by id or name, and
 // pick a part's (or set's) variant.
-void  fn_800CC9D8(Character* pChar, int nSet, int nVariant, int nOption);
-void  fn_800CCB08(Skin* pSkin, int nPart, int nVariant);
+void  SkinPart_ChooseBodySet(Character* pChar, int nSet, int nVariant, int nOption);
+void  SkinPart_ChoosePartVariant(Skin* pSkin, int nPart, int nVariant);
 void  SkinPart_ChooseSet(Skin* pSkin, int nSet, int nVariant, int nOption);
 u8*   fn_800CD248(Skin* pSkin, int nSet, int nVariant, int nOption);    // SkinDesc8C.a08, or NULL
 s32   SkinPart_FindPart(Skin* pSkin, u64 uId);
@@ -645,12 +645,12 @@ void  CharSlider_UpdateCharacterBasedOnSliderValues(CharSliderDefs* pDefs, CharM
                                         // applies slider values (Character.p17AC's definitions)
 void  CharSlider_Free(CharSliderDefs* pDefs);   // CharSliders.c: frees slider definitions
 void  fn_800CE170(Skin* pSkin, SkinTarget* pTarget);
-void  fn_800CC1EC(Character* pChar, SkinChoices* pChoices);
-void  fn_800CC658(Character* pChar, char* pSet, char* pVariant, char* pOption);
-void  fn_800CC408(Character* pChar, SkinChoices* pChoices);
+void  SkinPart_ApplyBodyChoices(Character* pChar, SkinChoices* pChoices);
+void  SkinPart_ChooseBodySetByName(Character* pChar, char* pSet, char* pVariant, char* pOption);
+void  SkinPart_ApplyClubChoices(Character* pChar, SkinChoices* pChoices);
 void  SkinPart_ChooseClubPartVariant(Character* pChar, int nSkin, u64 uPart, u64 uVariant);
 void  SkinPart_ChooseClubSet(Character* pChar, int nSkin, u64 uSet, u64 uVariant, u64 uOption);
-void  fn_800CC8BC(Character* pChar, u8 bOn);
+void  SkinPart_SetClubsLeftHanded(Character* pChar, u8 bOn);
 void  fn_800CEB1C(Skin** apSkins, int nSkins, struct DynTex* pTex);
 void  fn_800CEBE8(Skin** apSkins, int nSkins, struct DynTex* pTex, u64* aIds, int nIds);
 void  fn_800CECE0(Skin* pSkin, int nSet, int nVariant, int nOption, struct DynTex* pTex);
@@ -659,8 +659,8 @@ u8    SkinPart_GetChangeAllCopies(void);
 // SkinPart.c, as SkinBurn.c uses it: the part count, a part's variant and option, the mesh
 // iterator and an entry's copy.
 s32   SkinPart_GetNumParts(Skin* pSkin);
-s32   fn_800CCD30(Skin* pSkin, int nPart, int nCopy);
-s32   fn_800CCD84(Skin* pSkin, int nPart, int nCopy);
+s32   SkinPart_GetPartVariant(Skin* pSkin, int nPart, int nCopy);
+s32   SkinPart_GetPartOption(Skin* pSkin, int nPart, int nCopy);
 void  fn_800CD9EC(Skin* pSkin);
 s32   fn_800CE224(Skin* pSkin, SkinDesc14* pEntry, u8** ppOut, s32* pnOut, int nCopy);
 u8    SkinIter_IsValid(SkinIter* pIter);

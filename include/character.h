@@ -836,7 +836,7 @@ void  CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SK
                                      int nAnim, f32 fStart, f32 fFrom, f32 fTo, f32 fOffset, f32 fTime);
 void  CharacterState_SetTapInState(Character* pChar);
 void  CharacterState_UpdateSKAState(Character* pChar);
-void  fn_800CC5C0(Character* pChar, char* pA, char* pB);   // an attachment (the glove) on / off
+void  SkinPart_ChooseBodyPartVariantByName(Character* pChar, char* pA, char* pB);   // an attachment (the glove) on / off
 
 // ---- the skeletal animation library (skalib.c) ------------------------------------------------
 
