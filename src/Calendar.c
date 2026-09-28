@@ -32,12 +32,12 @@ u8 IsLeapYear(u32 nYear) {
     return bLeap;
 }
 
-// The days in a year.
+// The days in year nYear: 366 in a leap year (IsLeapYear, 1900 included), else 365.
 u32 DaysInYear(u32 nYear) {
     return IsLeapYear(nYear) ? 366 : 365;
 }
 
-// A date's day of the month.
+// The day of the month (1..31) of day number nDate.
 s32 CalDate_GetDay(u16 nDate) {
     s32 nMonth;
     s32 nDay;
@@ -46,7 +46,7 @@ s32 CalDate_GetDay(u16 nDate) {
     return nDay;
 }
 
-// A date's month.
+// The month (1 January .. 12 December) of day number nDate.
 u32 CalDate_GetMonth(u16 nDate) {
     s32 nOther;
     s32 nMonth;
@@ -55,7 +55,9 @@ u32 CalDate_GetMonth(u16 nDate) {
     return nMonth;
 }
 
-// The day number of a date.
+// Sets *pDate to the day number of nMonth (1..12), nDay, nYear: 1 January 1900 is day 1 and 1900
+// counts as a leap year (IsLeapYear), so 1 January 2000 is day 36526; years from 2000 on are
+// counted from there. The u16 runs out in 2079.
 void CalDate_SetMDY(u16* pDate, s32 nMonth, s32 nDay, u32 nYear) {
     u32 i;
     u32 nYearAt;
@@ -78,7 +80,8 @@ void CalDate_SetMDY(u16* pDate, s32 nMonth, s32 nDay, u32 nYear) {
     *pDate = nDays;
 }
 
-// A day number's month, day and year.
+// Splits day number *pDate into its month (1..12), day of the month and year: the inverse of
+// CalDate_SetMDY, counting from 2000 for numbers from 36525 on.
 void CalDate_GetMDY(u16* pDate, s32* pMonth, s32* pDay, s32* pYear) {
     u32 nMonth;
     u32 nYear;
@@ -117,12 +120,15 @@ void CalDate_AddDays(u16* pDate, s32 nDays) {
     *pDate += (u16)nDays;
 }
 
-// A date's weekday, 1..7.
+// The weekday of *pDate, 1..7: (day number - 1) % 7 + 1. With 1900's extra leap day this is 1 for
+// Sunday to 7 for Saturday from 1 March 1900 on (1 January 2000, a Saturday, is day 36526: 7). The
+// calendar screen's weeks start with 1 (UpdateCalendarState).
 s32 CalDate_GetDayOfWeek(u16* pDate) {
     return (*pDate - 1) % 7 + 1;
 }
 
-// The days in a month.
+// The days in month nMonth (1..12) of year nYear: 29 for a leap February (IsLeapYear), else
+// gMonthDays.
 s32 DaysInMonth(u32 nMonth, u32 nYear) {
     s32 bLeap;
 
@@ -136,7 +142,8 @@ s32 DaysInMonth(u32 nMonth, u32 nYear) {
     return gMonthDays[nMonth - 1];
 }
 
-// The month before.
+// The month before nMonth of nYear into *pMonth and *pYear (December of the year before, from
+// January).
 void CalDate_GetPrevMonth(s32 nMonth, s32 nYear, s32* pMonth, s32* pYear) {
     if (nMonth == 1) {
         *pMonth = 12;
@@ -147,7 +154,8 @@ void CalDate_GetPrevMonth(s32 nMonth, s32 nYear, s32* pMonth, s32* pYear) {
     *pYear = nYear;
 }
 
-// The month after.
+// The month after nMonth of nYear into *pMonth and *pYear (January of the next year, from
+// December).
 void CalDate_GetNextMonth(s32 nMonth, s32 nYear, s32* pMonth, s32* pYear) {
     if (nMonth == 12) {
         *pMonth = 1;
@@ -158,7 +166,8 @@ void CalDate_GetNextMonth(s32 nMonth, s32 nYear, s32* pMonth, s32* pYear) {
     *pYear = nYear;
 }
 
-// Prints a date as month/day/year.
+// Prints day number nDate into pBuf as month/day/year ("12/25/2003"). No buffer size (TW07's takes
+// one).
 void CalDate_ToString(u16 nDate, char* pBuf) {
     s32 nMonth;
     s32 nDay;
@@ -168,7 +177,7 @@ void CalDate_ToString(u16 nDate, char* pBuf) {
     sprintf(pBuf, "%d/%d/%d", nMonth, nDay, nYear);
 }
 
-// Prints a date as month/day.
+// Prints day number nDate into pBuf as month/day ("12/25"). No buffer size (TW07's takes one).
 void CalDate_ToStringMD(u16 nDate, char* pBuf) {
     s32 nMonth;
     s32 nDay;
@@ -178,7 +187,8 @@ void CalDate_ToStringMD(u16 nDate, char* pBuf) {
     sprintf(pBuf, "%d/%d", nMonth, nDay);
 }
 
-// Today's date.
+// Today's date as a day number: the month, day and year of the console's clock (fn_8011E020,
+// llrtclock.c) through CalDate_SetMDY.
 u16 CalDate_GetToday(void) {
     s32 nMonth;
     s32 nDay;

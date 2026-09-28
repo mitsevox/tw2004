@@ -2847,3 +2847,17 @@ address	name	comment	by	date
 800E98F0	GameModeFourBall_GoToPlayoff	rewrite	ro5 (replayed by orchestrator)	2026-09-28
 800E9BBC	GameModeFourBall_EndHole	rewrite	ro5 (replayed by orchestrator)	2026-09-28
 800E9CF4	GameModeFourBall_EndGame	rewrite	ro5 (replayed by orchestrator)	2026-09-28
+800D256C	IsLeapYear	keep	ro5 (replayed by orchestrator)	2026-09-28
+800D25D4	DaysInYear	rewrite	ro5 (replayed by orchestrator)	2026-09-28
+800D2608	CalDate_GetDay	rewrite	ro5 (replayed by orchestrator)	2026-09-28
+800D2640	CalDate_GetMonth	rewrite	ro5 (replayed by orchestrator)	2026-09-28
+800D2678	CalDate_SetMDY	rewrite	ro5 (replayed by orchestrator)	2026-09-28
+800D2714	CalDate_GetMDY	rewrite	ro5 (replayed by orchestrator)	2026-09-28
+800D27CC	CalDate_AddDays	keep	ro5 (replayed by orchestrator)	2026-09-28
+800D27E0	CalDate_GetDayOfWeek	rewrite	ro5 (replayed by orchestrator)	2026-09-28
+800D2814	DaysInMonth	rewrite	ro5 (replayed by orchestrator)	2026-09-28
+800D2884	CalDate_GetPrevMonth	rewrite	ro5 (replayed by orchestrator)	2026-09-28
+800D28B0	CalDate_GetNextMonth	rewrite	ro5 (replayed by orchestrator)	2026-09-28
+800D28DC	CalDate_ToString	rewrite	ro5 (replayed by orchestrator)	2026-09-28
+800D293C	CalDate_ToStringMD	rewrite	ro5 (replayed by orchestrator)	2026-09-28
+800D2994	CalDate_GetToday	rewrite	ro5 (replayed by orchestrator)	2026-09-28
