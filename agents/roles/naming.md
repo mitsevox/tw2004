@@ -33,14 +33,20 @@ your files' named / commented / done counts; report them before and after.
    "no C yet", "not matched"), `fn_`/`lbl_` names where a real name exists, vague text ("the
    parameters", "a value") that a reader cannot use. Write one where there is none and the name does
    not say everything a caller needs: units, ranges, what 0/NULL means, bit layouts, side effects,
-   which game feature it serves. Plain words, true to the code. Short getters with a clear name need
-   none. Keep every `fake match:`, `port:` and `EA bug:` label (name.py refuses to drop one; each
-   starts its own line); correct its text if it is stale. A comment you are not sure how to fix:
-   leave it and list it in the report. Every comment you read and KEEP as right gets a row with
+   which game feature it serves. Plain words, true to the code. Only a function of 3 body lines or
+   fewer whose name says it all may be NONE (name.py refuses NONE on anything longer). Keep every
+   `fake match:`, `port:` and `EA bug:` label (name.py refuses to drop one; each starts its own
+   line); correct its text if it is stale. A comment you are not sure about still gets written:
+   say exactly what the code does, and put the open question in the report. Every comment you read and KEEP as right gets a row with
    column 8 = KEEP (logged in config/GW4E69/review.tsv, so the function counts as reviewed). Struct field comments in include/ that you find wrong: fix
    them with the Edit tool and list each in the report (they are replayed by hand).
-5. Skip rather than guess wrong: raw sweep code (`src/unsorted/`), a function you cannot explain
-   after reading its callers. List skips in the report with why.
+5. No function you are given is skipped (owner, 2026-09-28): every one leaves your pass with a
+   name AND a comment (or NONE under the 3-line rule). An empty or stripped function is named from
+   where it is called and what for (`SkinPart_InitSkin`: called when a skin is made, empty in this
+   build), tier T3, codes E5/E6; its comment says it is empty and who calls it. A function whose
+   purpose stays unclear after reading its callers is named for exactly what it does
+   (`FE_SetB86FromScreen`-style plain description is better than `fn_`), and the doubt goes in the
+   report. name.py refuses a row that keeps a `fn_XXXXXXXX` name.
 
 ## Applying (one command, all or nothing)
 Write the batch to your scratch folder, tab-separated (docs in `tools/match/name.py`):
