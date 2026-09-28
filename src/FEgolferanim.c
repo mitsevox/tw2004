@@ -632,7 +632,7 @@ void FE_vUpdateGolferAll(void) {
     if (gpCrAPState->pB4->pChar != NULL) {
         fEnd = gpCrAPState->pB4->pChar->fAnimEnd;
         fTime = gpCrAPState->pB4->pChar->fAnimTime;
-        f180 = gpCrAPState->pB4->pChar->f180;
+        f180 = gpCrAPState->pB4->pChar->fAnimStart;
     }
     if (gpCrAPState->n0 == 0) {
         fFade = 1.0f;
@@ -893,7 +893,7 @@ void FE_vUpdateGolferAll(void) {
     if (gpCrAPState->pB4->b18 && gpCrAPState->b86 == 0) {
         fn_80035600();
         Character_UpdateAnimation(gpCrAPState->pB4->pChar, 1, 1.0f / 60.0f);
-        if (gpCrAPState->pB4->pChar->n1698 == 0) {
+        if (gpCrAPState->pB4->pChar->bPosed == 0) {
             SKN_PoseCharacter(gpCrAPState->pB4->pChar, 0);
         }
         LF_vSetCurrentLightFogEnvironment(0);
@@ -1229,14 +1229,14 @@ void FE_CharPositionOverwrite(void) {
     if (bBallExists) {
         pBallBone = &pModel->pBones[CharModel_GetBoneIndex(pModel, 0x54)];
     }
-    if (gpCrAPState->pB4->pChar->u10 & 0x4000) {
+    if (gpCrAPState->pB4->pChar->uCharFlags & 0x4000) {
         FE_Vec4Sub(pClubBone->v1C, pWaistBone->v1C, vClubPos);
     }
     if (bBallExists) {
         FE_Vec4Sub(pBallBone->v1C, pWaistBone->v1C, vBallPos);
     }
     // EA's code subtracts each value from itself, which zeroes it.
-    if (gpCrAPState->pB4->pChar->u10 & 0x4000) {
+    if (gpCrAPState->pB4->pChar->uCharFlags & 0x4000) {
         pClubBone->v1C[0] -= pClubBone->v1C[0];
         pClubBone->v1C[2] -= pClubBone->v1C[2];
         pClubBone->v1C[3] -= pClubBone->v1C[3];
@@ -1249,7 +1249,7 @@ void FE_CharPositionOverwrite(void) {
     pWaistBone->v1C[0] -= pWaistBone->v1C[0];
     pWaistBone->v1C[2] -= pWaistBone->v1C[2];
     pWaistBone->v1C[3] -= pWaistBone->v1C[3];
-    if (gpCrAPState->pB4->pChar->u10 & 0x4000) {
+    if (gpCrAPState->pB4->pChar->uCharFlags & 0x4000) {
         pClubBone->v1C[0] += vClubPos[0];
         pClubBone->v1C[2] += vClubPos[2];
         pClubBone->v1C[3] += vClubPos[3];

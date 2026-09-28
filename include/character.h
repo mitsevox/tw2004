@@ -18,8 +18,10 @@ typedef struct IKLink {
     u8   b0;                    // 0x00  cleared by SKEL_CreateIKChain
     u8   nBone;                 // 0x01  the model's bone index (CharModel_GetBoneIndexMapped)
     u8   pad2[2];
-    f32  f4;                    // 0x04  only links above 0 are posed (SKEL_SetIKChainRotations, SKEL_ResetIKChain)
-    s32  n8;                    // 0x08
+    f32  fTurnShare;            // 0x04  the share of each turn toward the target it takes
+                                //       (SKEL_ItterateIKChain); only links above 0 turn and are
+                                //       posed (SKEL_SetIKChainRotations, SKEL_ResetIKChain)
+    s32  nLockedAxis;           // 0x08  an axis (0-2) its turns never go about, -1 none
     f32  fC;                    // 0x0C
     f32  f10;                   // 0x10
     s8   nPrev;                 // 0x14  the link before it in the chain, -1 for the first (every
@@ -39,16 +41,16 @@ typedef struct IKChain {
     u8   unk1[3];
     IKLink* pLinks;             // 0x04
     f32  v8[4];                 // 0x08  its last link's position (SKEL_InitIKChain)
-    s32  n18;                   // 0x18
-    f32  f1C;                   // 0x1C
+    s32  nMaxIterations;        // 0x18  } SKEL_SolveIKChain: at most this many iterations,
+    f32  fTolerance;            // 0x1C  }   stopping once the miss is below this
 } IKChain;
 LAYOUT_ASSERT(IKChain, 0x20);
 
 // An IK link's setup (our name): what SKEL_CreateIKChain copies into an IKLink.
 typedef struct IKLinkDef {
     s32  nBone;                 // 0x00  a bone id (CharModel_GetBoneIndexMapped gives its index)
-    f32  f4;                    // 0x04  } IKLink's f4, n8, fC and f10
-    s32  n8;                    // 0x08  }
+    f32  fTurnShare;            // 0x04  } IKLink's fTurnShare, nLockedAxis, fC and f10
+    s32  nLockedAxis;           // 0x08  }
     f32  fC;                    // 0x0C  }
     f32  f10;                   // 0x10  }
 } IKLinkDef;
@@ -58,8 +60,8 @@ LAYOUT_ASSERT(IKLinkDef, 0x14);
 typedef struct IKChainDef {
     IKLinkDef* pLinks;          // 0x00
     s32  nLinks;                // 0x04
-    s32  n8;                    // 0x08  IKChain's n18
-    f32  fC;                    // 0x0C  IKChain's f1C
+    s32  nMaxIterations;        // 0x08  } IKChain's nMaxIterations and fTolerance
+    f32  fTolerance;            // 0x0C  }
 } IKChainDef;
 LAYOUT_ASSERT(IKChainDef, 0x10);
 
@@ -110,29 +112,36 @@ typedef struct Skeleton {
     s32  nChains;               // 0x0004
     IKChainDef* pDefs;          // 0x0008  the chains' setups (CharModelDefs.pDefs)
     IKChain* pChains;           // 0x000C
-    u32  a10[4];                // 0x0010  a bit per bone (128; BitArray_ClearBit clears one)
-    f32  (*p20)[4];             // 0x0020  a quaternion per bone
-    f32  (*p24)[4];             // 0x0024  a quaternion per bone
-    f32  (*p28)[4];             // 0x0028  p20 at an IK weight of 0 or 1, otherwise p24
+    u32  aIKBones[4];           // 0x0010  a bit per bone (128) the IK turns (SKEL_InitIKChain sets
+                                //         them, SKEL_ResetIKChain clears them)
+    f32  (*pIKRots)[4];         // 0x0020  the IK rotation (quaternion) per bone
+    f32  (*pWeightedRots)[4];   // 0x0024  pIKRots scaled down by the IK weight (SKEL_WeightIKChain)
+    f32  (*pUsedRots)[4];       // 0x0028  pIKRots at an IK weight of 0 or 1, otherwise
+                                //         pWeightedRots (SKEL_SetIKSolutionWeight)
     struct Clip* pClip;         // 0x002C  its clip (Character_SetupForShot); cleared before and after
                                 //         Character_AlignCharacterForShotImpact's animation update
     SkelPose pose;              // 0x0030  (Character_SetupForShot passes it to SKEL_UpdateState)
     f32  fIKWeight;             // 0x1070  SKEL_SetIKSolutionWeight
-    f32  f1074;                 // 0x1074  } set by SKEL_RelaxIK and SKEL_TransitionIK
-    f32  f1078;                 // 0x1078  }
+    f32  fIKBlendLeft;          // 0x1074  } the IK weight's blend: time left (negative while
+    f32  fIKBlendTime;          // 0x1078  }   blending in) and its length (SKEL_RelaxIK,
+                                //         SKEL_TransitionIK; SKEL_PostTransformIKSkeleton runs it)
     f32  q107C[4];              // 0x107C  a rotation (quaternion) SKEL_PostTransformIKSkeleton turns the grip's by
     f32  v108C[4];              // 0x108C  an offset from the grip, turned by its rotation: the IK
                                 //         target of the second chain (SKEL_PostTransformIKSkeleton)
-    f32  f109C;                 // 0x109C  } 0.025 and 0.15 from SKEL_InitIKSkeleton
-    f32  f10A0;                 // 0x10A0  }
-    f32  v10A4[4];              // 0x10A4
-    f32  v10B4[4];              // 0x10B4  v10A4 scaled by the IK weight
+    f32  fHipRaiseMax;          // 0x109C  } how far the hips may go up and down (0.025, 0.15 from
+    f32  fHipLowerMax;          // 0x10A0  }   SKEL_InitIKSkeleton; SKEL_AdjustHipHeight)
+    f32  vHipOffset[4];         // 0x10A4  the hips' offset (y only; SKEL_AdjustHipHeight)
+    f32  vHipOffsetWeighted[4]; // 0x10B4  vHipOffset scaled by the IK weight (added to bone 1's
+                                //         position)
     f32  f10C4;                 // 0x10C4  the IK weight
-    f32  f10C8;                 // 0x10C8  } set up by SKEL_InitIKSkeleton: the first link's offset height,
-    f32  f10CC;                 // 0x10CC  }   0.025 and 0.05
-    f32  f10D0;                 // 0x10D0  }
-    f32  q10D4[4];              // 0x10D4  a rotation (quaternion) given by SKEL_SetExtraRightShoulderRotation
-    s32  n10E4;                 // 0x10E4  set to 4 as a swing starts
+    f32  fRootLinkHeight;       // 0x10C8  } set up by SKEL_InitIKSkeleton: the first link's offset
+    f32  fHipFollow;            // 0x10CC  }   height; the share of the height miss the hips take
+    f32  f10D0;                 // 0x10D0  }   (0.025); 0.05
+    f32  qShoulderRot[4];       // 0x10D4  the extra right-shoulder rotation (quaternion;
+                                //         SKEL_SetExtraRightShoulderRotation)
+    s32  nShoulderFrames;       // 0x10E4  frames it is still put on (Swing.c sets 4;
+                                //         SKEL_PreTransformIKSkeleton puts it on,
+                                //         SKEL_PostTransformIKSkeleton counts down)
     f32  a10E8[2][4];           // 0x10E8  per leg, the last good bend axis (Character_IKLegToGround,
                                 //         legs 0 and 1)
     u8   a1108[4];              // 0x1108  the indexes of bones 0x24, 0x25, 0x11 and 0x12 (SKEL_CreateIKSkeleton)
@@ -159,17 +168,21 @@ typedef struct CharModel {
     Bone*     pBones;           // 0x004
     f32     (*pMatrices)[4][4]; // 0x008  one per bone (CharModel_GetBoneIndex gives a bone's index); row 3 is its
                                 //        position
-    f32       fC;               // 0x00C  } lengths Character_UpdateTestPoints sets points 0-3 out by
-    f32       f10;              // 0x010  } along the leg bones' axes when the skin has no aFootPoints
+    f32       fLeftFootLen;     // 0x00C  } lengths Character_UpdateTestPoints sets points 0-3 out
+    f32       fRightFootLen;    // 0x010  }   by along the leg bones' axes when the skin has no
+                                //        aFootPoints (SKEL_LoadFromMem reads them)
     u32       a14[4];           // 0x014  } bits per bone: SKEL_TransformBones turns a bone set in a14
     u32       a24[4];           // 0x024  }   and moves one set in a24, then sets them all again
     BonePose* pPoses;           // 0x034  one per bone; freed with the model
     Skeleton* pSkel;            // 0x038
     u8        aBone[0x59];      // 0x03C  each bone id's index (CharModel_GetBoneIndex), 0xFF none; SKEL_GenerateBoneLookupTable
                                 //        fills it in by name
-    u8        aBone2[0x59];     // 0x095  the index CharModel_GetBoneIndexMapped gives while bEE is set, by bone index
-                                //        (SKEL_GenerateLeftHandedTable: itself, or the other bone of a pair)
-    u8        bEE;              // 0x0EE  Character_IsLeftHanded
+    u8        aBone2[0x59];     // 0x095  by bone index, the index CharModel_GetBoneIndexMapped
+                                //        gives while bLeftHanded is set
+                                //        (SKEL_GenerateLeftHandedTable: itself, or the other bone
+                                //        of a pair)
+    u8        bLeftHanded;      // 0x0EE  Character_IsLeftHanded (set by SKEL_LoadFromMem and
+                                //        Character_SetLeftHanded)
     u8        unkEF;
     struct DynChain* pF0;       // 0x0F0  } freed with the model (fn_80114398)
     struct DynChain* pF4;       // 0x0F4  }
@@ -365,8 +378,9 @@ extern UMemPool* gSKABlenderPool;
 extern UMemPool* gSKABlendDataPool;
 extern UMemPool* gSkelPosePool;
 extern UMemPool* gMorphPosePool;
-// animblender.c: clear bit nBit in the three blocks of pNode's format 1 pose buffer, and its sources'.
-void SKABlender_ClearMorph(SKABlendNode* pNode, s32 nBit);
+// animblender.c: unmark morph nMorph in the three blocks of pNode's format 1 pose buffer, and its
+// sources'.
+void SKABlender_ClearMorph(SKABlendNode* pNode, s32 nMorph);
 void SKABlendData_Shutdown(struct SKABlendNode** ppNode, u8 bFreeSources);   // animblender.c: gives a blend
                                         // tree back (bFreeSources: the sources' clips too)
 
@@ -379,8 +393,9 @@ u8 SKABlender_HasMtaLib(SKABlendNode* pNode, void* pSrc);
 typedef void (*SKABlendFn)(SKABlendNode* pNode, CharModel* pModel, f32 fTime);
 
 // animblender.c: set up *ppNode (taken from nType's pool when NULL) as a node of nType with pose
-// format nFormat, bC set from nC.
-void SKABlendData_Init(SKABlendNode** ppNode, int nType, int nFormat, SKABlendFn pfnBlend, int nC);
+// format nFormat, given back as soon as it has ended when bFreeASAP.
+void SKABlendData_Init(SKABlendNode** ppNode, int nType, int nFormat, SKABlendFn pfnBlend,
+                       int bFreeASAP);
 // animblender.c: cut the tree at pNode off at fTime, or start it over (pPlayer plays it).
 void SKABlender_ClampT1(SKABlendNode* pNode, struct AnimPlayer* pPlayer, f32 fTime);
 // animblender.c: pose the tree at pNode at fTime into its buffers (each blend node's pfnBlend).
@@ -394,9 +409,10 @@ void SKABlender_SetBlender(SKABlendNode* pNode, SKABlendFn pfnBlend, f32 fWeight
 f32  SKABlender_GetEndTime(SKABlendNode* pNode);  // animblender.c: the latest end time under pNode
 // animblender.c: pNew plays pClip (a Clip, or an MtaLib from a MAL bank for a format 1 node).
 void SKAChannel_SetChannel(SKABlendNode* pNode, SKABlendNode* pNew, void* pClip, f32 fWeight);
-// animblender.c: blend pNew into *ppNode over the window pBlend (six floats, SKABlend_CalculateBlendInfo).
-void SKABlender_AddBlenderData(struct Character* pChar, SKABlendNode* pNew, SKABlendNode** ppNode, f32* pBlend,
-                 SKABlendFn pfnBlend, int b);
+// animblender.c: blend pNew into *ppNode over the window pInfo (six floats,
+// SKABlend_CalculateBlendInfo); a new blender it makes gets bFreeASAP.
+void SKABlender_AddBlenderData(struct Character* pChar, SKABlendNode* pNew, SKABlendNode** ppNode,
+                               f32* pInfo, SKABlendFn pfnBlend, int bFreeASAP);
 
 // A node of a character's SKA blend tree (animblender.c; the root is at Character + 0x40C). A node
 // of type 1 blends its two children into its pose with pfnBlend; a node of type 0 plays one source
@@ -406,7 +422,7 @@ struct SKABlendNode {
     s32  bPooled;               // 0x00  taken from a pool, so SKABlendData_Shutdown gives it back
     s32  nType;                 // 0x04  0: plays a source, 1: blends apChild
     s32  nFormat;               // 0x08  its pose buffer's format, 0 (0x1040 bytes) or 1 (0x114C bytes)
-    u8   bC;                    // 0x0C
+    u8   bFreeASAP;             // 0x0C  EA's _bFreeASAP: give it back as soon as it has ended
     u8   padD[3];
     f32  fStart;                // 0x10  a blend's is its children's earliest (SKABlender_GetStartTime)
     f32  fEnd;                  // 0x14  a blend's is its children's latest (SKABlender_GetEndTime)
@@ -482,25 +498,35 @@ typedef struct AnimPlayerEntry {
 } AnimPlayerEntry;
 LAYOUT_ASSERT(AnimPlayerEntry, 0x18);
 
-// An animation player (0x138 bytes); only what is read. Character has two: the one at 0x164, whose
-// fields are named in Character directly, and anim29C.
+// An animation player (EA's TSKATime, 0x138 bytes; animblender.c's SKATime_ functions); only what
+// is read. Character has two: the one at 0x164, whose fields are named in Character directly, and
+// morphAnim.
 typedef struct AnimPlayer {
-    s32   n00;                  // 0x00  } reset to 0 and -1 by Character_PlayClip
-    s32   uFlags;               // 0x04  SKATime_Pause sets bit 2, SKATime_UnPause clears bits 1 and 2
-    s32   n08;                  // 0x08  }
-    s32   nC;                   // 0x0C  } set together by CharacterState_SetTransition
-    f32   f10;                  // 0x10  }
-    f32   f14;                  // 0x14  1 after SKATime_Init; SKATime_CalcStep scales its time step by it
+    s32   n00;                  // 0x00  reset to 0 by Character_PlayClip and SKATime_Init
+    s32   uFlags;               // 0x04  0x1 held (not moved), 0x2 paused (SKATime_Pause; the
+                                //       update turns it into the hold; SKATime_UnPause
+                                //       clears both), 0x4 stopped at an end, 0x8 / 0x10
+                                //       easing in / out, 0x20 turn round at the ends, 0x40
+                                //       runs backward, 0x80 hold for fHoldTime, 0x100 rewind
+                                //       to 0 once done, 0x1000 wrapped round this frame
+    s32   nPlays;               // 0x08  plays left: SKATime_Update counts it down at each end and
+                                //       stops there at 0; negative plays on
+    s32   nTransitionState;     // 0x0C  } the state queued for when fTime reaches
+    f32   fTransitionTime;      // 0x10  }   fTransitionTime (0: none;
+                                //       CharacterState_SetTransition sets both)
+    f32   fTimeScale;           // 0x14  1 after SKATime_Init; SKATime_CalcStep scales its time step
+                                //       by it (SKATime_SetTimeScale)
     f32   fTime;                // 0x18
     f32   fStart;               // 0x1C  } SKATime_SetTime's -30000 and -10000 stand for these
     f32   fEnd;                 // 0x20  }
-    f32   f24;                  // 0x24  } SKATime_CalcStep: with uFlags bit 3, f28 climbs to f24; with
-    f32   f28;                  // 0x28  } bit 4, it falls to f2C (at 0 bit 4 gives way to bit 0),
-    f32   f2C;                  // 0x2C  } and the step is scaled by f28 / f24 on the way
-    f32   f30;                  // 0x30  with uFlags bit 7, SKATime_Update counts it down to 0, then
-                                //       clears bits 0 and 7
-    f32   f34;                  // 0x34  SKATime_Idle: a clock that drives a sway of three cosines
-    f32   f38;                  // 0x38  SKATime_Idle: the time the sway is centred on
+    f32   fEaseTime;            // 0x24  } SKATime_CalcStep: easing in (0x8), fEase climbs to
+    f32   fEase;                // 0x28  }   fEaseTime; easing out (0x10) it falls to fEaseFloor (at
+    f32   fEaseFloor;           // 0x2C  }   0 the hold takes over); the step is scaled by
+                                //       fEase / fEaseTime on the way
+    f32   fHoldTime;            // 0x30  with uFlags 0x80, SKATime_Update counts it down to 0, then
+                                //       clears 0x1 and 0x80
+    f32   fIdleClock;           // 0x34  SKATime_Idle: a clock that drives a sway of three cosines
+    f32   fIdleCentre;          // 0x38  SKATime_Idle: the time the sway is centred on
     s32   n3C;                  // 0x3C  } cleared by SKATime_Init
     s32   n40;                  // 0x40  }
     struct AnimPlayerEntry* p44;    // 0x44  a48[0] after SKATime_Init
@@ -545,21 +571,38 @@ typedef struct Character {
     u32   uId;                  // 0x008  the id of the 'SKLO' object it was built from (SkeletalObject_StreamCallback);
                                 //        SkeletalObject_FindObject finds it by this
     s32   nC;                   // 0x00C  the golfer's id (FEgolferanim.c: 7 and 29 are special)
-    u32   u10;                 // 0x010  bit 0x40 tested by the game manager and the swing; bit 0x8000
-                                //        cleared by CharacterState_AddSKABlendData
-    f32   f14;                  // 0x014  set to 2^30 (never) by Character_UpdateAnimation; for a
-                                //        character that is not a golfer it is tested against
+    u32   uCharFlags;           // 0x010  1 hidden (skipped by the update and the draw), 2 the
+                                //        flagstick (hidden while the view has the flag out), 4 /
+                                //        8 / 0x200 / 0x10000 shot set-up requests
+                                //        (Character_SetupForShot), 0x40 asleep, not drawn
+                                //        (Character_Sleep; also while its textures are given
+                                //        back), 0x80 its club or shot kind changed
+                                //        (Character_InitNewClubAndShotType; state 5 clears it),
+                                //        0x100 the animation runs 5 times as fast, 0x400 a flag
+                                //        of its CHR object, 0x1000 cleared each frame
+                                //        (Character_PreRenderAll), 0x4000 the club hangs from the
+                                //        root (Character_UpdateClubAttachment), 0x8000 the putt
+                                //        stance follows the slope (CharacterState_AddSKABlendData)
+    f32   fNearestCamDist;      // 0x014  the nearest the root has come to the camera
+                                //        (Character_ClipTest); set to 2^30 (never) by
+                                //        Character_UpdateAnimation; for a character that is not a
+                                //        golfer it is tested against
                                 //        Character_ComputeMaxVisableDistance first
-    s32   n18;                  // 0x018  cleared with the animation state (Character_ResetBlenders)
-    s32   nAnim;            // 0x01C  the playing animation (6 backswing, 7 downswing)
-    s32   n20;                  // 0x020
-    s8    n24;                  // 0x024  } counters CharacterState's idle update (CharacterState_UpdateFidgetState) runs down
-    s8    n25;                  // 0x025  }
-    s8    n26;                  // 0x026  set while that update's clip plays
+    s32   uSKAFlags;            // 0x018  bit 0: a body state change is waiting
+                                //        (CharacterState_UpdateSKAState)
+    s32   nTargetState;         // 0x01C  the body state wanted (EA's CharacterAnimStateE: 6
+                                //        backswing, 7 downswing)
+    s32   nCurState;            // 0x020  the body state playing (nTargetState once changed)
+    s8    nAmbientFidgets;      // 0x024  } counters the idle update
+    s8    nIdleFidgets;         // 0x025  }   (CharacterState_UpdateFidgetState) runs down: the
+                                //        ambient idle's, then the idle's
+    s8    bFidgeting;           // 0x026  1 while a fidget (group 4) plays
     u8    unk27;
-    s32   u28;                  // 0x028  bit 0: a state change is waiting (CharacterState_UpdateMorphState)
-    s32   n2C;                  // 0x02C  tested for 0 (PreShotInit) and for 4 or 5 (ShotSetupInit)
-    s32   n30;                  // 0x030
+    s32   uMorphFlags;          // 0x028  bit 0: a morph state change is waiting
+                                //        (CharacterState_UpdateMorphState)
+    s32   nMorphTargetState;    // 0x02C  the morph player's (morphAnim's) state wanted; tested
+                                //        for 0 (PreShotInit) and for 4 or 5 (ShotSetupInit)
+    s32   nMorphCurState;       // 0x030  and its state playing
     s32   nSlot;                // 0x034  the animation slot it uses (skalib); the CrAP camera's shot names
                                 //        get an 'f' in front when it is 1
     CharModel* pModel;          // 0x038
@@ -596,32 +639,41 @@ typedef struct Character {
                                 //        (Character_LoadTextures); the size is unknown (up to the
                                 //        next known field)
     u8    anim[4];              // 0x164  the animation player (+0x14 is its playback rate)
-    s32   uFlags;               // 0x168  bit 0x40: the backswing is being backed down; 0x200 / 0x400: the
-                                //        clip lookup fell back (Char_SetClip). Signed: the original tests
-                                //        it with cmpwi
-    s32   n16C;                 // 0x16C  set to -1 by Character_GolferStreamCallbackFE
-    s32   n170;                 // 0x170  } the state queued for when fAnimTime reaches f174
-    f32   f174;                 // 0x174  }   (CharacterState_UpdateSKAState; CharacterState_SetTransition sets both)
+    s32   uFlags;               // 0x168  AnimPlayer.uFlags; bit 0x40: runs backward (the backswing
+                                //        being backed down); 0x200 / 0x400: the clip lookup fell
+                                //        back (Char_SetClip). Signed: the original tests it with
+                                //        cmpwi
+    s32   nPlays;               // 0x16C  AnimPlayer.nPlays: 1 (CharacterState_AddSKABlendData), -1
+                                //        (plays on) from Character_PlayClip and
+                                //        Character_GolferStreamCallbackFE
+    s32   nTransitionState;     // 0x170  } the state queued for when fAnimTime reaches
+    f32   fTransitionTime;      // 0x174  }   fTransitionTime (CharacterState_UpdateSKAState;
+                                //        CharacterState_SetTransition sets both)
     u8    unk178[0x17C - 0x178];
     f32   fAnimTime;            // 0x17C
-    f32   f180;                 // 0x180  Character_AlignCharacterForShotImpact: fAnimTime = f180 + the blend's time - v1638[1]
+    f32   fAnimStart;           // 0x180  AnimPlayer.fStart: the tree's start
+                                //        (CharacterState_AddSKABlendData);
+                                //        Character_AlignCharacterForShotImpact sets fAnimTime to it
+                                //        plus the blend's event 2 time less afSwingTop[1]
     f32   fAnimEnd;             // 0x184  the animation's end time
     u8    unk188[0x198 - 0x188];
-    f32   f198;                 // 0x198  } set to 0 and the animation time when state 8 starts
-    f32   f19C;                 // 0x19C  }   (CharacterState_UpdateSKAState)
+    f32   fIdleClock;           // 0x198  } AnimPlayer.fIdleClock and fIdleCentre: 0 and the
+    f32   fIdleCentre;          // 0x19C  }   animation time when state 8 starts
+                                //        (CharacterState_UpdateSKAState; SKATime_Idle then sways)
     u8    unk1A0[0x29C - 0x1A0];
-    AnimPlayer anim29C;         // 0x29C  a second animation player
+    AnimPlayer morphAnim;       // 0x29C  the second animation player: morph libraries (MtaLib)
     s32   n3D4;                 // 0x3D4  the bytes of its CHR object before the animation library
     AnimLib* pLib;              // 0x3D8  its animation library
     struct ClipRecord* pRecords;    // 0x3DC  records for its merged library (skalib)
-    SKABlendNode node3E0;       // 0x3E0  the root of anim29C's blend tree
+    SKABlendNode morphBlend;    // 0x3E0  the root of morphAnim's blend tree
     SKABlendNode blend;         // 0x40C  the root of its blend tree
     s32   nGroup;               // 0x438  the clip group CharacterState_AddSKABlendData last added
     CharBuffer buffers[4];      // 0x43C
     struct { u32 bSet; f32 fTime; u8 unk8[8]; } aTags[18];    // 0x4AC  EA's SKA tags (TW07
                                 //         Character_InitSKATags): the clip's timed events, by id
                                 //         (whether set, and the time it comes)
-    s32   n5CC;                 // 0x5CC
+    s32   nClampEvent;          // 0x5CC  SKA_Update holds the clip at this event's time once
+                                //        (the swing sets 2, the ball hit), then sets it to -1
     u8    unk5D0[0x1614 - 0x5D0];
     char  szLastClip[16];       // 0x1614  the name of the clip CharacterState_AddSKABlendData played
                                 //         last; the situation scripts test it (fn_800BB7AC)
@@ -631,21 +683,30 @@ typedef struct Character {
     f32   f162C;                // 0x162C
     f32   f1630;                // 0x1630
     f32   f1634;                // 0x1634
-    f32   v1638[3];             // 0x1638
-    f32   f1644;                // 0x1644
-    u8    unk1648[0x1650 - 0x1648];
+    f32   afSwingTop[6];        // 0x1638  the backswing clip's BlendClip sampled at the top of
+                                //         the swing (SKA_SampleBlendClip, Swing.c): [1] where the
+                                //         downswing clip starts (CharacterState_AddSKABlendData's
+                                //         -70000), [3] a lag added to the ball-hit time; the rest
+                                //         unread
     s32   n1650;                // 0x1650  cleared by Character_Create
-    s32   n1654;                // 0x1654  (Character_GetClipResult)
-    s32   n1658;                // 0x1658
-    f32   f165C;                // 0x165C  } scaled by the view's lens (Character_ComputeMaxVisableShadowDistance, Character_ComputeMaxVisableDistance)
-    f32   f1660;                // 0x1660  }
-    f32   f1664;                // 0x1664  } Character_ClipTest: 1 near the camera, fading to 0 from 6 to 15
-    f32   v1668[3];             // 0x1668  } its bounding sphere, tested against the camera
-    f32   f1674;                // 0x1674  } (Character_ClipTest)
-    f32   vMin[4];              // 0x1678  } the box around its bones (Character_CalculateClipPoints), grown by 0.33;
-    f32   vMax[3];              // 0x1688  } v1668 and f1674 are its centre and half its diagonal
+    s32   nClipResult;          // 0x1654  Character_ClipTest's answer for its bounding sphere,
+                                //         2 = out of view (Character_GetClipResult)
+    s32   nShadowClipResult;    // 0x1658  the same for a 3-unit sphere, its shadow
+    f32   fMaxShadowDist;       // 0x165C  } how far along the view its shadow and it are drawn
+    f32   fMaxVisibleDist;      // 0x1660  }   (100 and 200, or 50 and 100), scaled by the lens
+                                //         (Character_ComputeMaxVisableShadowDistance,
+                                //         Character_ComputeMaxVisableDistance)
+    f32   fNearFade;            // 0x1664  Character_ClipTest: 1 near the camera, fading to 0 from
+                                //         6 to 15 units deep (not read)
+    f32   vSphereCentre[3];     // 0x1668  } its bounding sphere, tested against the camera
+    f32   fSphereRadius;        // 0x1674  }   (Character_ClipTest)
+    f32   vMin[4];              // 0x1678  } the box around its bones
+    f32   vMax[3];              // 0x1688  }   (Character_CalculateClipPoints), grown by 0.33;
+                                //         vSphereCentre and fSphereRadius are its centre and half
+                                //         its diagonal
     u8    unk1694[0x1698 - 0x1694];
-    s32   n1698;                // 0x1698
+    s32   bPosed;               // 0x1698  1 once SKN_PoseCharacter has posed its skins (0 for a
+                                //         character found by id); cleared when an update is skipped
     s32   nClubClass;           // 0x169C  the club class for clip lookups (Char_SetClip; 1 looks up as 0)
     s32   nClubHeadBone;        // 0x16A0  bone 0x53's index: the club head (the swing trail's end)
     s32   nGripBone;            // 0x16A4  bone 0x52's index: the grip (the trail's other end)
@@ -668,7 +729,9 @@ typedef struct Character {
                                 //         skeleton code (0x80027FF8) moves them in x and z
     f32   aGroundNormal[4][4];  // 0x1734  } the ground under points 0-3 (Character_UpdateFeetTerrainInfo)
     f32   afGroundHeight[4];    // 0x1774  }
-    s32   n1784;                // 0x1784  set to -1 by Character_SetPosition
+    s32   nFootPointStart;      // 0x1784  the first foot point Character_UpdateFeetTerrainInfo
+                                //         updates (it sets -1 first, so all four each time); -1
+                                //         from Character_SetPosition
     Clip* pCurClip;             // 0x1788  the clip Char_SetClip picked
     struct MtaLib* p178C;       // 0x178C  the MAL library the second player plays (CharacterState_AddMorphBlendData);
                                 //         cleared by Character_PlayClip
@@ -680,8 +743,10 @@ typedef struct Character {
     f32   vAvgGroundNormal[4];  // 0x179C  the average ground normal under the four foot points
                                 //         (Character_PlaceFeetOnGround); Character_KeepClubOutOfGround
                                 //         acts only while its y is above 0.9
-    void* pSliderDefs;          // 0x17AC  its slider definitions (CharSlider_CreateDefinitionsFromMem,
-                                //         Character_CreateFromMem); Character_ApplyCrAPSettings applies them
+    struct CharSliderDefs* pSliderDefs; // 0x17AC  its body sliders (CharSliders.c), made by
+                                //         CharSlider_CreateDefinitionsFromMem in
+                                //         Character_CreateFromMem; Character_ApplyCrAPSettings
+                                //         applies them
     void (*pfnPreBones)(void);  // 0x17B0  called by Character_UpdateAnimation before the bones are
                                 //         transformed; cleared by Character_Create
     s8    nView;                // 0x17B4  the view Skin.c poses the skins for and picks their parts in
@@ -791,7 +856,7 @@ void  Character_SelectClub(Character* pChar, int n);
 void  Character_RegisterGolferStreamClientFE(void);
 void  Character_SetClubsAndClothes(Character* pChar, int nSlot);   // dresses the character (its skins and clubs)
 void  Character_ApplyCrAPSettings(Character* pChar, struct SkinChoices* pChoices);  // applies a look (char.c)
-void  Character_SetLeftHanded(Character* pChar, u8 b);    // sets the model's bEE
+void  Character_SetLeftHanded(Character* pChar, u8 b);    // sets the model's bLeftHanded
 void  Character_SetPosition(Character* pChar, f32* pPos, u8 bPlace);
 int   Character_GetGolferModelID(int nPlayer);          // the model id of the player's golfer
 void  Character_SelectGameShotType(Character* pChar, int nKind);
@@ -806,13 +871,13 @@ void  Character_ClearKeyFrameBuffers(Character* pChar);    // empty the characte
 u8    Character_IsHoldingBall(Character* pChar);    // the clip's n1C is above bone 0x54's index
 void  Character_GetBallOnFingerPosition(Character* pChar, f32* pPos);
 f32 (*Character_GetBoneMatrix(Character* pChar, int nBone))[4];  // a bone's matrix
-u8    Character_IsLeftHanded(Character* pChar);    // the model's bEE
-int   Character_GetShadowClipResult(Character* pChar);    // n1658
+u8    Character_IsLeftHanded(Character* pChar);    // the model's bLeftHanded
+int   Character_GetShadowClipResult(Character* pChar);    // nShadowClipResult
 int   Character_GetClipResult(Character* pChar);
 int   CharModel_GetBoneIndex(CharModel* pModel, int nBone);    // a bone's index
 int   CharModel_GetBoneIndexMapped(CharModel* pModel, int nBone);
 f32   SKA_GetTagTime(struct Clip* pClip, u64 uEvent);   // an event's time (by its 64-bit id)
-void  SKATime_SetTimeScale(u8* pAnim, f32 fRate);           // 0x8001F084
+void  SKATime_SetTimeScale(u8* pAnim, f32 fRate);           // char.c: sets fTimeScale
 // Plays a clip on the character: blended in from the current one, or (bNoBlend) from scratch.
 void  Character_PlayClip(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime);
 void  Quat_Copy(f32* pSrc, f32* pDst);            // copy a quaternion
@@ -835,22 +900,24 @@ void  SKEL_SetDefaultWorld2BoneMatrices(CharModel* pModel, f32 (*pMatrices)[4][4
 void  SKEL_UpdateSkinningMatrix(CharModel* pModel, f32 (*pMtx)[4], int nBone);
 void  SKEL_UpdateAllSkinningMatrices(CharModel* pModel);
 int   fn_80048574(Character* pChar, u64 uEvent);    // the character's animation has event uEvent
-u8    CharacterState_IsNotFidgeting(Character* pChar);    // CharAnim.c: n26 is not 1 (both callers mask the result)
+// CharAnim.c: bFidgeting is not 1 (both callers mask the result).
+u8    CharacterState_IsNotFidgeting(Character* pChar);
 void  SKABlender_BlendLinear(SKABlendNode* pNode, CharModel* pModel, f32 fTime);
 f32   SKABlender_GetTagTime(SKABlendNode* pNode, u64 uEvent); // an event's time in a blend tree
 void  SKATime_Update(AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT);    // advance a player
 void  SKATime_Idle(Character* pChar, int nPlayer, AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT);
 void  SKATime_UnPause(u8* pAnim);
-void  SKATime_SetTime(u8* pAnim, f32 fTime);           // 0x8007327C
+void  SKATime_SetTime(u8* pAnim, f32 fTime);           // animblender.c
 u8    SKABlender_IsNotSingleSKA(SKABlendNode* pNode);
 void  fn_80095744(Character* pChar, int nAnim);     // play an animation
-int   fn_80095780(Character* pChar);    // n20 (-1 for NULL); fn_80095798 reads nAnim
+int   fn_80095780(Character* pChar);    // nCurState (-1 for NULL); fn_80095798 reads nTargetState
 int   fn_80095798(Character* pChar);
 void  fn_800957B0(Character* pChar, int a);
 void  fn_800957D8(Character* pChar);
 void  CharacterState_ResetMorphState(Character* pChar, u8 bReset);   // CharAnim.c: reset the second player's state
-void  CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKABlendFn pfnBlend, int nC,
-                                     int nAnim, f32 fStart, f32 fFrom, f32 fTo, f32 fOffset, f32 fTime);
+void  CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKABlendFn pfnBlend,
+                                     int bFreeASAP, int nTransitionState, f32 fStart, f32 fFrom,
+                                     f32 fTo, f32 fOffset, f32 fTransitionTime);
 void  CharacterState_SetTapInState(Character* pChar);
 void  CharacterState_UpdateSKAState(Character* pChar);
 void  SkinPart_ChooseBodyPartVariantByName(Character* pChar, char* pA, char* pB);   // an attachment (the glove) on / off

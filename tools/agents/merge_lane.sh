@@ -1,7 +1,7 @@
 #!/bin/bash
 # merge_lane.sh <lane> [globals.tsv ...]: 3-way merges every src/include file the lane changed onto
-# the working tree. BASE=<commit> overrides the fork point (use the lane's last commit before
-# its hand edits when it merged main or when a name.py replay differs from its own).
+# the working tree. BASE=<commit> overrides the fork point: use the lane's LAST name.py commit
+# (every commit after it, hand edits and globals alike, then comes over; globals are normalized).
 # Conflicts: read them; tools/agents/merge_take_theirs.py <conflict> <dest> takes the lane's side.
 # (base = the lane's fork point; both sides name-normalized with norm.py), so only
 # its hand edits come over. Clean merges are written in place; conflicts go to $W/<file>.conflict.

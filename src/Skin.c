@@ -203,7 +203,7 @@ void SKN_DrawCharacter(Character* pChar, u32 uFlags) {
     LI_SetObjectLights(NULL);
     if (uShadow) {
         nMode = 2;
-    } else if (pChar->n1654 != 1) {
+    } else if (pChar->nClipResult != 1) {
         nMode = 1;
     } else {
         nMode = 2;
@@ -280,8 +280,8 @@ int SKN_GetLightCourse(void) {
 
 // Poses the character's skin for this frame: blends its changed morph targets (single view or game
 // type 3 only), builds its matrices from the model's and points its drawn meshes at them (override
-// table nView); then the same for its current club's skin, from the grip bone (0x52) on. Sets n1698
-// to 1 (posed), except for player 1000. n: every caller passes 0; unused.
+// table nView); then the same for its current club's skin, from the grip bone (0x52) on. Sets
+// bPosed to 1 (posed), except for player 1000. n: every caller passes 0; unused.
 void SKN_PoseCharacter(Character* pChar, int n) {
     Skin* pClub;
 
@@ -300,9 +300,9 @@ void SKN_PoseCharacter(Character* pChar, int n) {
             SKN_SetMeshMatrices(pClub, pChar->nView);
         }
     }
-    pChar->n1698 = 1;
+    pChar->bPosed = 1;
     if (pChar->nPlayer == 1000) {
-        pChar->n1698 = 0;
+        pChar->bPosed = 0;
     }
 }
 
@@ -374,12 +374,12 @@ void SKN_DrawBoneTri(Character* pChar, int nView) {
 }
 
 // SKN_DrawBoneTri for view nView on every character made so far that is not a golfer
-// (Character_IsGolfer) and has neither bit 0x40 nor bit 1 of u10 set.
+// (Character_IsGolfer) and has neither bit 0x40 nor bit 1 of uCharFlags set.
 void SKN_DrawBoneTris(int nView) {
     int i;
 
     for (i = 0; i < gNumCharacters; i++) {
-        if (!Character_IsGolfer(gCharacters[i]) && !(gCharacters[i]->u10 & 0x41)) {
+        if (!Character_IsGolfer(gCharacters[i]) && !(gCharacters[i]->uCharFlags & 0x41)) {
             SKN_DrawBoneTri(gCharacters[i], nView);
         }
     }

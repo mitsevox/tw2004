@@ -212,7 +212,7 @@ void STATEFUNC_PreShotInit(int nPlayer) {
     TARGET_ResetMomentums(nPlayer);
     CharacterState_ResetMorphState(gPlayers[nPlayer].pChar, 1);
     Emotion_UpdatePlayerEmotion(nPlayer);
-    if (gPlayers[nPlayer].pChar->n2C == 0) {
+    if (gPlayers[nPlayer].pChar->nMorphTargetState == 0) {
         fn_800957B0(gPlayers[nPlayer].pChar, 1);
     }
     fn_80045824(nPlayer);
@@ -413,8 +413,8 @@ void STATEFUNC_ShotSetupInit(int nPlayer) {
     if (gpGame->b276 != 0) {
         TARGET_SetupTarget(nPlayer);
     }
-    if (gPlayers[nPlayer].pChar->n2C == 4 ||
-        gPlayers[nPlayer].pChar->n2C == 5) {
+    if (gPlayers[nPlayer].pChar->nMorphTargetState == 4 ||
+        gPlayers[nPlayer].pChar->nMorphTargetState == 5) {
         CharacterState_ResetMorphState(gPlayers[nPlayer].pChar, 1);
         fn_800957B0(gPlayers[nPlayer].pChar, 1);
     }
@@ -693,8 +693,8 @@ void STATEFUNC_ReplaySwingInit(int nPlayer) {
     }
     Character_AlignShotWithTarget(nPlayer, 1, 1);
     fn_800957D8(gPlayers[nPlayer].pChar);
-    gPlayers[nPlayer].pChar->n20 = 7;
-    gPlayers[nPlayer].pChar->nAnim = 7;
+    gPlayers[nPlayer].pChar->nCurState = 7;
+    gPlayers[nPlayer].pChar->nTargetState = 7;
     if (gPlayers[nPlayer].uFlags & 8) {
         CharacterState_SetTapInState(gPlayers[nPlayer].pChar);
     } else {
@@ -1278,7 +1278,7 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
         if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x18, 0)) &&
             !(gPlayers[nPlayer].uFlags & 8) &&
             (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_CONCEDED && !fn_800E53B8() &&
-            !(gPlayers[nPlayer].pChar->u10 & 0x40)) {
+            !(gPlayers[nPlayer].pChar->uCharFlags & 0x40)) {
             if (gPlayers[nPlayer].ballBefore.nState != 0) {
                 gPlayers[nPlayer].ballBefore.nState = 1;
             }
@@ -1476,7 +1476,7 @@ void STATEFUNC_ShowYardageUpdate(int nPlayer) {
                 && gpGame->b287 != 0 &&
                 !(gPlayers[nPlayer].uFlags & 8) && (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_CONCEDED &&
                 !fn_800E53B8() &&
-                !(gPlayers[nPlayer].pChar->u10 & 0x40)) {
+                !(gPlayers[nPlayer].pChar->uCharFlags & 0x40)) {
                 lbl_80281E10 = 1;
                 fn_80062D0C(nPlayer);
                 REPLAY_Play(nPlayer);

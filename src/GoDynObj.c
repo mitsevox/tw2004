@@ -224,10 +224,10 @@ void DynObj_InitForHole(void) {
     if (pFlag != NULL) {
         Character_SetPosition(pFlag, &Ter_GetTGD()->pin[Game_CurrentPinSet()].x, 1);
         if (Game_GetMode() != 6 && Game_GetMode() != 7 && Game_GetMode() != 8) {
-            pFlag->u10 |= 2;
+            pFlag->uCharFlags |= 2;
         }
         if (GM_Currently_SkillZoneMode()) {
-            pFlag->u10 |= 0x40;
+            pFlag->uCharFlags |= 0x40;
         }
     }
     lbl_80281DA0->fA94 = 7.0f;

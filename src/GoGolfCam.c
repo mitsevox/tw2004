@@ -52,7 +52,7 @@ f32      fn_800C5A70(View* pView, f32* pCam, f32* pSub, int nPlayer);
 u8       fn_800C7450(void);
 u8       fn_8012022C(void);                            // (sweep code) lbl_80281900's +0x370 is nonzero
 void     Character_AlignCharacterForShotImpact(Character* pChar);                 // char.c
-void     SKATime_Pause(u8* pAnim);                        // set bit 2 of the animation player's flags
+void     SKATime_Pause(u8* pAnim);                        // set the player's pause bit (0x2)
 u8       fn_800C3FC0(View* pView, int nPlayer, f32* pSub, f32* pAim, f32* pCam);
 u8       fn_800C43C0(View* pView, int nPlayer);
 u8       fn_800C44F4(View* pView, int nPlayer);

@@ -872,7 +872,7 @@ void fn_80086738(MsgArg* pArgs, MsgArg* pResult) {
     u8 bView6E44;
     u8 bView708C;
     u8 bCharFlag;               // the golfer's uFlags bit 1
-    u8 bOtherN20;               // the golfer's n20 is not 9, 11 or 12
+    u8 bOtherN20;               // the golfer's nCurState is not 9, 11 or 12
     u8 bNearEnd;                // his animation has less than the camera tuning's f170 left
 
     if (pArgs[0].i >= 5) {
@@ -882,8 +882,8 @@ void fn_80086738(MsgArg* pArgs, MsgArg* pResult) {
     bView6E44 = fn_800C6E44(ViewController_GetCameraControl(gPlayers[pArgs[0].i].nView[0]));
     bView708C = fn_800C708C(ViewController_GetCameraControl(gPlayers[pArgs[0].i].nView[0]));
     bCharFlag = fn_80062C1C(gPlayers[pArgs[0].i].pChar);
-    bOtherN20 = gPlayers[pArgs[0].i].pChar->n20 != 9 && gPlayers[pArgs[0].i].pChar->n20 != 11 &&
-                gPlayers[pArgs[0].i].pChar->n20 != 12;
+    bOtherN20 = gPlayers[pArgs[0].i].pChar->nCurState != 9 && gPlayers[pArgs[0].i].pChar->nCurState != 11 &&
+                gPlayers[pArgs[0].i].pChar->nCurState != 12;
     bNearEnd = fn_80062C28(gPlayers[pArgs[0].i].pChar) < lbl_80281F78->f170;
     if ((bView6E44 && (!bView708C || bCharFlag || bNearEnd)) || bOtherN20) {
         pResult->i = 1;

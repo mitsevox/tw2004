@@ -82,21 +82,21 @@ u8 gSkelSleeveBones[6] = { 0x1F, 0x20, 0x21, 0x32, 0x33, 0x34 };
 u8 gSkelIKEnabled = 1;                  // SKEL_EnableIK; while 0 the IK functions do nothing
 
 // Makes each turning link's accumulated turn (v58, axis times angle) its bone's IK rotation in the
-// skeleton (p20). Links with f4 at 0 are left alone.
+// skeleton (pIKRots). Links with fTurnShare at 0 are left alone.
 void SKEL_SetIKChainRotations(Skeleton* pSkel, IKChain* pChain) {
     int i;
     for (i = 0; i < pChain->nLinks; i++) {
         IKLink* pLink = &pChain->pLinks[i];
-        if (pLink->f4 > 0.0f) {
-            Quat_BuildFromVector(pLink->v58, pSkel->p20[pLink->nBone]);
+        if (pLink->fTurnShare > 0.0f) {
+            Quat_BuildFromVector(pLink->v58, pSkel->pIKRots[pLink->nBone]);
         }
     }
 }
 
 // Poses the chain's bones from its links: the first link's bone takes the link's rotation (q18) and
 // position (v28); each later bone is placed at its offset (v28) from the link before it, turned by
-// that link's rotation, and turned by its IK rotation (p20) and its rotation from that link (q18).
-// Only the poses change, not the matrices.
+// that link's rotation, and turned by its IK rotation (pIKRots) and its rotation from that link
+// (q18). Only the poses change, not the matrices.
 void SKEL_TransformIKChain(CharModel* pModel, IKChain* pChain) {
     f32 vOffset[4];
     f32 qRot[4];
@@ -117,16 +117,17 @@ void SKEL_TransformIKChain(CharModel* pModel, IKChain* pChain) {
         Quat_RotateVector(pPrev->q0, pLink->v28, vOffset);
         Quat_Add(pPrev->v10, vOffset, pPose->v10);
         pPose->v10[3] = 0.0f;
-        Quat_Multiply(pSkel->p20[nBone], pLink->q18, qRot);
+        Quat_Multiply(pSkel->pIKRots[nBone], pLink->q18, qRot);
         Quat_Multiply(qRot, pPrev->q0, pPose->q0);
     }
 }
 
 // One IK iteration (cyclic coordinate descent): from link nLast back to link nFirst, turns each
-// link with f4 above 0 so the chain's end swings toward pTarget, by f4 of the angle between them
-// (none under PI/5000), never about the bone's own y axis or the link's locked axis n8 (-1: none);
-// each turn adds up in the link's v58 and the IK rotations are then set (SKEL_SetIKChainRotations).
-// The chain's end position goes into v8. Returns how far the end then is from pTarget.
+// link with fTurnShare above 0 so the chain's end swings toward pTarget, by fTurnShare of the angle
+// between them (none under PI/5000), never about the bone's own y axis or the link's locked axis
+// nLockedAxis (-1: none); each turn adds up in the link's v58 and the IK rotations are then set
+// (SKEL_SetIKChainRotations). The chain's end position goes into v8. Returns how far the end then
+// is from pTarget.
 f32 SKEL_ItterateIKChain(CharModel* pModel, IKChain* pChain, f32* pTarget, int nLast, int nFirst) {
     f32 vEnd[4];
     f32 vDiff[4];
@@ -151,7 +152,7 @@ f32 SKEL_ItterateIKChain(CharModel* pModel, IKChain* pChain, f32* pTarget, int n
     vEnd[3] = 1.0f;
     for (i = nLast; i >= nFirst; i--) {
         pLink = &pChain->pLinks[i];
-        if (pLink->f4 > 0.0f) {
+        if (pLink->fTurnShare > 0.0f) {
             nBone = pLink->nBone;
             SKEL_Vec3Sub(vEnd, pModel->pPoses[nBone].v10, vToEnd);
             SKEL_Vec3Sub(pTarget, pModel->pPoses[nBone].v10, vToTarget);
@@ -160,17 +161,18 @@ f32 SKEL_ItterateIKChain(CharModel* pModel, IKChain* pChain, f32* pTarget, int n
             if (fCos > 1.0f || fCos < -1.0f) {
                 fAngle = 0.0f;
             } else {
-                fAngle = pLink->f4 * Math_Acos(fCos);
+                fAngle = pLink->fTurnShare * Math_Acos(fCos);
             }
             if (fabsf(fAngle) > PI / 5000.0f) {
-                // the turn's axis in the bone's own frame, without its y and locked (n8) components
+                // the turn's axis in the bone's own frame, without its y and locked (nLockedAxis)
+                // components
                 vec4flt_CrossProduct(vToEnd, vToTarget, vAxis);
                 Quat_Invert(pModel->pPoses[nBone].q0, qInv);
                 Quat_RotateVector(qInv, vAxis, vLocal);
                 vLocal[3] = 0.0f;
                 vLocal[1] = 0.0f;
-                if (pLink->n8 >= 0) {
-                    vLocal[pLink->n8] = 0.0f;
+                if (pLink->nLockedAxis >= 0) {
+                    vLocal[pLink->nLockedAxis] = 0.0f;
                 }
                 LLMath_Normalize3(vLocal, vLocal);
                 Vec3_Scale(fAngle, vLocal, vLocal);
@@ -194,43 +196,44 @@ static f64 Skeleton_StrippedFn(f64 x) {
     return 0.5 * x * (3.0 - x);
 }
 
-// Takes the chain's IK off its bones: each link's IK rotation (p20) becomes the identity and its
-// bone leaves the skeleton's IK set (a10); all links with bAll, else only those that turn (f4 above
-// 0).
+// Takes the chain's IK off its bones: each link's IK rotation (pIKRots) becomes the identity and
+// its bone leaves the skeleton's IK set (aIKBones); all links with bAll, else only those that turn
+// (fTurnShare above 0).
 void SKEL_ResetIKChain(Skeleton* pSkel, IKChain* pChain, u8 bAll) {
     int i;
     for (i = 0; i < pChain->nLinks; i++) {
-        if (bAll || pChain->pLinks[i].f4 > 0.0f) {
+        if (bAll || pChain->pLinks[i].fTurnShare > 0.0f) {
             int nBone = pChain->pLinks[i].nBone;
-            Quat_IdentifyForMul(pSkel->p20[nBone]);
-            BitArray_ClearBit(pSkel->a10, nBone);
+            Quat_IdentifyForMul(pSkel->pIKRots[nBone]);
+            BitArray_ClearBit(pSkel->aIKBones, nBone);
         }
     }
 }
 
-// Copies the chain's IK rotations (p20) into p24; below full weight, each is scaled down by the
-// weight (a slerp from no rotation) and normalized.
+// Copies the chain's IK rotations (pIKRots) into pWeightedRots; below full weight, each is scaled
+// down by the weight (a slerp from no rotation) and normalized.
 void SKEL_WeightIKChain(Skeleton* pSkel, IKChain* pChain, f32 fWeight) {
     int i;
     for (i = 0; i < pChain->nLinks; i++) {
         int nBone = pChain->pLinks[i].nBone;
-        Quat_Copy(pSkel->p20[nBone], pSkel->p24[nBone]);
+        Quat_Copy(pSkel->pIKRots[nBone], pSkel->pWeightedRots[nBone]);
         if (fWeight < 1.0f) {
-            Quat_Slerp(gSkelIdentityQuat, pSkel->p24[nBone], fWeight);
-            LLMath_Normalize(pSkel->p24[nBone], pSkel->p24[nBone]);
+            Quat_Slerp(gSkelIdentityQuat, pSkel->pWeightedRots[nBone], fWeight);
+            LLMath_Normalize(pSkel->pWeightedRots[nBone], pSkel->pWeightedRots[nBone]);
         }
     }
 }
 
-// Puts the IK back at rest: no transition running (f1074), no bone in the IK set, no hip offset
-// (v10A4, v10B4), f10C4 at 1, and every chain's IK rotations reset (SKEL_ResetIKChain).
+// Puts the IK back at rest: no transition running (fIKBlendLeft), no bone in the IK set, no hip
+// offset (vHipOffset, vHipOffsetWeighted), f10C4 at 1, and every chain's IK rotations reset
+// (SKEL_ResetIKChain).
 void SKEL_ResetIKSkeleton(Skeleton* pSkel) {
     int i;
 
-    pSkel->f1074 = 0.0f;
-    BitArray_ClearArray(pSkel->a10, 0x80);
-    vec4flt_Zero(pSkel->v10A4);
-    vec4flt_Zero(pSkel->v10B4);
+    pSkel->fIKBlendLeft = 0.0f;
+    BitArray_ClearArray(pSkel->aIKBones, 0x80);
+    vec4flt_Zero(pSkel->vHipOffset);
+    vec4flt_Zero(pSkel->vHipOffsetWeighted);
     pSkel->f10C4 = 1.0f;
     for (i = 0; i < pSkel->nChains; i++) {
         SKEL_ResetIKChain(pSkel, &pSkel->pChains[i], 1);
@@ -241,8 +244,8 @@ void SKEL_ResetIKSkeleton(Skeleton* pSkel) {
 // (v28) from the link before it, taken from its bone's own local ones when that link's bone is its
 // parent, else worked out from the two poses (and kept in q38/v48, with b0 bit 1, when the bone's
 // parent comes before the chain's first bone); the first link takes its bone's pose. Every turn
-// (v58) is cleared and each turning link's bone (f4 above 0) joins the skeleton's IK set (a10). v8
-// takes the chain end's position.
+// (v58) is cleared and each turning link's bone (fTurnShare above 0) joins the skeleton's IK set
+// (aIKBones). v8 takes the chain end's position.
 void SKEL_InitIKChain(CharModel* pModel, IKChain* pChain) {
     f32 qInv[4];
     f32 vDelta[4];
@@ -263,8 +266,8 @@ void SKEL_InitIKChain(CharModel* pModel, IKChain* pChain) {
         pBone = &pModel->pBones[nBone];
         pLink->b0 = 0;
         vec4flt_Zero(pLink->v58);
-        if (pLink->f4 > 0.0f) {
-            BitArray_SetBit(pSkel->a10, pLink->nBone);
+        if (pLink->fTurnShare > 0.0f) {
+            BitArray_SetBit(pSkel->aIKBones, pLink->nBone);
         }
         if (i > 0) {
             pPrevLink = &pChain->pLinks[nPrev];
@@ -363,10 +366,11 @@ void SKEL_TransformIKChainFromBones(CharModel* pModel, IKChain* pChain) {
 }
 
 // SKEL_InitIKSkeleton's IK error for the first chain (the root up to the club head): raises or
-// lowers the hips toward the target. The height miss (pTarget's less the chain end's) adds f10CC of
-// itself to the hip offset v10A4[1], held between -f10A0 and f109C; the chain's end moves by the
-// miss less what the clamp cut, and the root link's height becomes f10C8 plus the offset. Returns
-// how far the chain's end then is from pTarget.
+// lowers the hips toward the target. The height miss (pTarget's less the chain end's) adds
+// fHipFollow of itself to the hip offset vHipOffset[1], held between -fHipLowerMax and
+// fHipRaiseMax; the chain's end moves by the miss less what the clamp cut, and the root link's
+// height becomes fRootLinkHeight plus the offset. Returns how far the chain's end then is from
+// pTarget.
 f32 SKEL_AdjustHipHeight(CharModel* pModel, IKChain* pChain, f32* pTarget) {
     f32 vDiff[4];
     Skeleton* pSkel = pModel->pSkel;
@@ -374,17 +378,17 @@ f32 SKEL_AdjustHipHeight(CharModel* pModel, IKChain* pChain, f32* pTarget) {
 
     CharModel_GetBoneIndex(pModel, 1);  // EA drops the answer
     fDy = pTarget[1] - pChain->v8[1];
-    pSkel->v10A4[1] = fDy * pSkel->f10CC + pSkel->v10A4[1];
-    if (pSkel->v10A4[1] > pSkel->f109C) {
-        pChain->v8[1] += fDy - (pSkel->v10A4[1] - pSkel->f109C);
-        pSkel->v10A4[1] = pSkel->f109C;
-    } else if (pSkel->v10A4[1] < -pSkel->f10A0) {
-        pChain->v8[1] += fDy - (pSkel->v10A4[1] + pSkel->f10A0);
-        pSkel->v10A4[1] = -pSkel->f10A0;
+    pSkel->vHipOffset[1] = fDy * pSkel->fHipFollow + pSkel->vHipOffset[1];
+    if (pSkel->vHipOffset[1] > pSkel->fHipRaiseMax) {
+        pChain->v8[1] += fDy - (pSkel->vHipOffset[1] - pSkel->fHipRaiseMax);
+        pSkel->vHipOffset[1] = pSkel->fHipRaiseMax;
+    } else if (pSkel->vHipOffset[1] < -pSkel->fHipLowerMax) {
+        pChain->v8[1] += fDy - (pSkel->vHipOffset[1] + pSkel->fHipLowerMax);
+        pSkel->vHipOffset[1] = -pSkel->fHipLowerMax;
     } else {
         pChain->v8[1] += fDy;
     }
-    pChain->pLinks[0].v28[1] = pSkel->f10C8 + pSkel->v10A4[1];
+    pChain->pLinks[0].v28[1] = pSkel->fRootLinkHeight + pSkel->vHipOffset[1];
     SKEL_Vec3Sub(pTarget, pChain->v8, vDiff);
     Vec4_CopyPoint(pChain->v8, pModel->pPoses[pChain->pLinks[pChain->nLinks - 1].nBone].v10);
     return (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
@@ -401,22 +405,22 @@ void SKEL_WeightFirstIKChain(Skeleton* pSkel, f32 fWeight) {
 }
 
 // Sets how strongly the IK solution is applied (fWeight, 0..1). At 0 or 1 the bones use the IK
-// rotations (p20) as they are; in between, the first chain's are scaled by the weight into p24 and
-// those are used. The hip offset used (v10B4) becomes v10A4 times the weight, and f10C4 the weight.
-// Nothing without a skeleton or while the IK is off.
+// rotations (pIKRots) as they are; in between, the first chain's are scaled by the weight into
+// pWeightedRots and those are used. The hip offset used (vHipOffsetWeighted) becomes vHipOffset
+// times the weight, and f10C4 the weight. Nothing without a skeleton or while the IK is off.
 void SKEL_SetIKSolutionWeight(Skeleton* pSkel, f32 fWeight) {
     if (pSkel == NULL || gSkelIKEnabled == 0) return;
     pSkel->fIKWeight = fWeight;
     if (0.0f == fWeight) {
-        pSkel->p28 = pSkel->p20;
+        pSkel->pUsedRots = pSkel->pIKRots;
     } else if (1.0f == fWeight) {
-        pSkel->p28 = pSkel->p20;
+        pSkel->pUsedRots = pSkel->pIKRots;
     } else {
         SKEL_WeightFirstIKChain(pSkel, fWeight);
-        pSkel->p28 = pSkel->p24;
+        pSkel->pUsedRots = pSkel->pWeightedRots;
     }
     pSkel->f10C4 = fWeight;
-    Vec3_Scale(fWeight, pSkel->v10A4, pSkel->v10B4);
+    Vec3_Scale(fWeight, pSkel->vHipOffset, pSkel->vHipOffsetWeighted);
 }
 
 // Sets the extra rotation (quaternion pRot) put on the right shoulder while the IK runs
@@ -424,68 +428,69 @@ void SKEL_SetIKSolutionWeight(Skeleton* pSkel, f32 fWeight) {
 // weight it is scaled down by the weight. Nothing without a skeleton.
 void SKEL_SetExtraRightShoulderRotation(CharModel* pModel, f32* pRot) {
     if (pModel->pSkel != NULL) {
-        Quat_Copy(pRot, pModel->pSkel->q10D4);
+        Quat_Copy(pRot, pModel->pSkel->qShoulderRot);
         if (pModel->pSkel->fIKWeight < 1.0f) {
-            Quat_Slerp(gSkelIdentityQuat, pModel->pSkel->q10D4, pModel->pSkel->fIKWeight);
-            LLMath_Normalize(pModel->pSkel->q10D4, pModel->pSkel->q10D4);
+            Quat_Slerp(gSkelIdentityQuat, pModel->pSkel->qShoulderRot, pModel->pSkel->fIKWeight);
+            LLMath_Normalize(pModel->pSkel->qShoulderRot, pModel->pSkel->qShoulderRot);
         }
     }
 }
 
-// Before the bones are posed (Character_UpdateAnimation): while n10E4 counts down (Swing.c sets it
-// to 4), puts the extra right-shoulder rotation (q10D4) on the right shoulder's (0x11) IK rotation;
-// SKEL_PostTransformIKSkeleton takes it off again. Nothing without a skeleton, with the IK off or
-// at no weight.
+// Before the bones are posed (Character_UpdateAnimation): while nShoulderFrames counts down
+// (Swing.c sets it to 4), puts the extra right-shoulder rotation (qShoulderRot) on the right
+// shoulder's (0x11) IK rotation; SKEL_PostTransformIKSkeleton takes it off again. Nothing without a
+// skeleton, with the IK off or at no weight.
 void SKEL_PreTransformIKSkeleton(CharModel* pModel) {
     Skeleton* pSkel = pModel->pSkel;
     f32 qRot[4];
 
     if (pSkel == NULL) return;
     if (gSkelIKEnabled == 0 || pSkel->fIKWeight <= 0.0f) return;
-    if (pSkel->n10E4 != 0) {
-        Quat_Multiply(pSkel->q10D4, pSkel->p20[CharModel_GetBoneIndexMapped(pModel, 0x11)], qRot);
-        Quat_Copy(qRot, pModel->pSkel->p20[CharModel_GetBoneIndexMapped(pModel, 0x11)]);
+    if (pSkel->nShoulderFrames != 0) {
+        Quat_Multiply(pSkel->qShoulderRot, pSkel->pIKRots[CharModel_GetBoneIndexMapped(pModel, 0x11)], qRot);
+        Quat_Copy(qRot, pModel->pSkel->pIKRots[CharModel_GetBoneIndexMapped(pModel, 0x11)]);
     }
 }
 
-// Starts blending the IK out over 0.25 seconds (f1074 the time left, f1078 its length;
-// SKEL_PostTransformIKSkeleton runs it), when the IK has any weight. Nothing without a skeleton or
-// while the IK is off.
+// Starts blending the IK out over 0.25 seconds (fIKBlendLeft the time left, fIKBlendTime its
+// length; SKEL_PostTransformIKSkeleton runs it), when the IK has any weight. Nothing without a
+// skeleton or while the IK is off.
 void SKEL_RelaxIK(Skeleton* pSkel) {
     if (pSkel == NULL || gSkelIKEnabled == 0) return;
     if (pSkel->fIKWeight > 0.0f) {
-        pSkel->f1074 = 0.25f;
-        pSkel->f1078 = 0.25f;
+        pSkel->fIKBlendLeft = 0.25f;
+        pSkel->fIKBlendTime = 0.25f;
     }
 }
 
 // Starts blending the IK out (bRelax, when it has any weight) or in (below full weight) over fTime
-// seconds; a negative time left (f1074) marks a blend in. SKEL_PostTransformIKSkeleton runs it.
-// Nothing without a skeleton or while the IK is off.
+// seconds; a negative time left (fIKBlendLeft) marks a blend in. SKEL_PostTransformIKSkeleton runs
+// it. Nothing without a skeleton or while the IK is off.
 void SKEL_TransitionIK(Skeleton* pSkel, u8 bRelax, f32 fTime) {
     if (pSkel == NULL || gSkelIKEnabled == 0) return;
     if (bRelax) {
         if (pSkel->fIKWeight > 0.0f) {
-            pSkel->f1078 = fTime;
-            pSkel->f1074 = fTime;
+            pSkel->fIKBlendTime = fTime;
+            pSkel->fIKBlendLeft = fTime;
         }
     } else if (pSkel->fIKWeight < 1.0f) {
-        pSkel->f1074 = -fTime;
-        pSkel->f1078 = fTime;
+        pSkel->fIKBlendLeft = -fTime;
+        pSkel->fIKBlendTime = fTime;
     }
 }
 
 // After the bones are posed each frame (Character_UpdateAnimation). First runs a blend of the IK
-// weight (SKEL_RelaxIK, SKEL_TransitionIK): a positive time left (f1074) counts down to 0 and the
-// weight with it, a negative one counts up to 0 and the weight up to 1. Then, with any weight:
-// takes the extra right-shoulder rotation (q10D4) back off while n10E4 counts down; re-poses the
-// first chain from its bones' own rotations (SKEL_TransformIKChainFromBones), and while the
-// character's flag 0x4000 is set and the weight is between 0 and 1, blends the club bone (0x52)
-// from its pose before that toward the new one by the weight. Then solves the second chain (the
-// left arm) so the left wrist (0x28) reaches its place on the club (v108C, SKEL_SaveLeftHandGrip),
-// turns the wrist to its rotation on the club (q107C), rebuilds the bones from the left collarbone
-// (0x23) down, keeping the wrist's rotation, and the club head's test point from the club's matrix,
-// and resets the left arm's chain. Bone ids go through the left-handed map.
+// weight (SKEL_RelaxIK, SKEL_TransitionIK): a positive time left (fIKBlendLeft) counts down to 0
+// and the weight with it, a negative one counts up to 0 and the weight up to 1. Then, with any
+// weight: takes the extra right-shoulder rotation (qShoulderRot) back off while nShoulderFrames
+// counts down; re-poses the first chain from its bones' own rotations
+// (SKEL_TransformIKChainFromBones), and while the character's flag 0x4000 is set and the weight is
+// between 0 and 1, blends the club bone (0x52) from its pose before that toward the new one by the
+// weight. Then solves the second chain (the left arm) so the left wrist (0x28) reaches its place on
+// the club (v108C, SKEL_SaveLeftHandGrip), turns the wrist to its rotation on the club (q107C),
+// rebuilds the bones from the left collarbone (0x23) down, keeping the wrist's rotation, and the
+// club head's test point from the club's matrix, and resets the left arm's chain. Bone ids go
+// through the left-handed map.
 void SKEL_PostTransformIKSkeleton(Character* pChar) {
     f32 vGrip[4];
     f32 qGrip[4];
@@ -502,27 +507,28 @@ void SKEL_PostTransformIKSkeleton(Character* pChar) {
     int nWrist;
 
     if (pSkel == NULL || gSkelIKEnabled == 0) return;
-    if (pSkel->f1074 > 0.0f) {
-        pModel->pSkel->f1074 -= gSession.fFrameTime;
-        if (pModel->pSkel->f1074 < 0.0f) {
-            pModel->pSkel->f1074 = 0.0f;
+    if (pSkel->fIKBlendLeft > 0.0f) {
+        pModel->pSkel->fIKBlendLeft -= gSession.fFrameTime;
+        if (pModel->pSkel->fIKBlendLeft < 0.0f) {
+            pModel->pSkel->fIKBlendLeft = 0.0f;
         }
-        SKEL_SetIKSolutionWeight(pModel->pSkel, pModel->pSkel->f1074 / pModel->pSkel->f1078);
-    } else if (pSkel->f1074 < 0.0f) {
-        pSkel->f1074 += gSession.fFrameTime;
-        if (pModel->pSkel->f1074 > 0.0f) {
-            pModel->pSkel->f1074 = 0.0f;
+        SKEL_SetIKSolutionWeight(pModel->pSkel, pModel->pSkel->fIKBlendLeft / pModel->pSkel->fIKBlendTime);
+    } else if (pSkel->fIKBlendLeft < 0.0f) {
+        pSkel->fIKBlendLeft += gSession.fFrameTime;
+        if (pModel->pSkel->fIKBlendLeft > 0.0f) {
+            pModel->pSkel->fIKBlendLeft = 0.0f;
         }
-        SKEL_SetIKSolutionWeight(pModel->pSkel, 1.0f + pModel->pSkel->f1074 / pModel->pSkel->f1078);
+        SKEL_SetIKSolutionWeight(pModel->pSkel, 1.0f + pModel->pSkel->fIKBlendLeft
+                                 / pModel->pSkel->fIKBlendTime);
     }
     if (pSkel->fIKWeight <= 0.0f) return;
 
     pChain = &pSkel->pChains[1];
-    if (pSkel->n10E4 != 0) {
-        Quat_Invert(pSkel->q10D4, qInv);
-        Quat_Multiply(qInv, pSkel->p20[CharModel_GetBoneIndexMapped(pModel, 0x11)], qRot);
-        Quat_Copy(qRot, pSkel->p20[CharModel_GetBoneIndexMapped(pModel, 0x11)]);
-        pSkel->n10E4--;
+    if (pSkel->nShoulderFrames != 0) {
+        Quat_Invert(pSkel->qShoulderRot, qInv);
+        Quat_Multiply(qInv, pSkel->pIKRots[CharModel_GetBoneIndexMapped(pModel, 0x11)], qRot);
+        Quat_Copy(qRot, pSkel->pIKRots[CharModel_GetBoneIndexMapped(pModel, 0x11)]);
+        pSkel->nShoulderFrames--;
     }
     nGrip = CharModel_GetBoneIndex(pModel, 0x52);
     pGrip = &pModel->pPoses[nGrip];
@@ -531,7 +537,7 @@ void SKEL_PostTransformIKSkeleton(Character* pChar) {
         Quat_Copy(pGrip->v10, vGrip);
     }
     SKEL_TransformIKChainFromBones(pModel, pSkel->pChains);
-    if (pChar->u10 & 0x4000) {
+    if (pChar->uCharFlags & 0x4000) {
         if (pSkel->fIKWeight > 0.0f && pSkel->fIKWeight < 1.0f) {
             Quat_Slerp(qGrip, pGrip->q0, pSkel->fIKWeight);
             SKA_BlendVec3(pGrip->v10, vGrip, pGrip->v10, 1.0f - pSkel->fIKWeight);
@@ -546,7 +552,7 @@ void SKEL_PostTransformIKSkeleton(Character* pChar) {
     Quat_RotateVector(pGrip->q0, pSkel->v108C, vTarget);
     Quat_Add(vTarget, pGrip->v10, vTarget);
     vTarget[3] = 0.0f;
-    SKEL_SolveIKChain(pModel, pChain, vTarget, pChain->n18, NULL, pChain->f1C);
+    SKEL_SolveIKChain(pModel, pChain, vTarget, pChain->nMaxIterations, NULL, pChain->fTolerance);
     if (pSkel->fIKWeight < 1.0f) {
         SKEL_WeightIKChain(pSkel, pChain, pSkel->fIKWeight);
     }
@@ -576,7 +582,7 @@ void SKEL_SaveLeftHandGrip(Character* pChar) {
     if (pModel->pSkel == NULL || gSkelIKEnabled == 0) return;
     pWristMtx = pModel->pMatrices[CharModel_GetBoneIndexMapped(pModel, 0x28)];
     pGripMtx = pModel->pMatrices[CharModel_GetBoneIndex(pModel, 0x52)];
-    if (pModel->bEE) {
+    if (pModel->bLeftHanded) {
         LLMath_IdentifyMat(mFlip);
         mFlip[0][0] = -1.0f;
         LLMath_mat44fltMultiplyList(pGripMtx, mFlip, mGrip, 4);
@@ -671,19 +677,20 @@ f32 SKEL_InitIKSkeleton(Character* pChar, f32* pTarget, int bNormals) {
     SKEL_SaveLeftHandGrip(pChar);
     SKEL_InitIKChain(pModel, pChain);
     fDrop = SKEL_AdjustHipPosition(pModel, pChain, pTarget, bNormals);
-    pSkel->f109C = 0.025f;
-    pSkel->f10A0 = 0.15f;
-    vec4flt_Zero(pSkel->v10A4);
-    vec4flt_Zero(pSkel->v10B4);
+    pSkel->fHipRaiseMax = 0.025f;
+    pSkel->fHipLowerMax = 0.15f;
+    vec4flt_Zero(pSkel->vHipOffset);
+    vec4flt_Zero(pSkel->vHipOffsetWeighted);
     pSkel->f10C4 = 1.0f;
-    pSkel->f10C8 = pChain->pLinks[0].v28[1];
-    pSkel->f10CC = 0.025f;
+    pSkel->fRootLinkHeight = pChain->pLinks[0].v28[1];
+    pSkel->fHipFollow = 0.025f;
     pSkel->f10D0 = 0.05f;
-    pSkel->n10E4 = 0;
-    Quat_IdentifyForMul(pSkel->q10D4);
-    SKEL_SolveIKChain(pModel, pChain, pTarget, pChain->n18, SKEL_AdjustHipHeight, pChain->f1C);
+    pSkel->nShoulderFrames = 0;
+    Quat_IdentifyForMul(pSkel->qShoulderRot);
+    SKEL_SolveIKChain(pModel, pChain, pTarget, pChain->nMaxIterations, SKEL_AdjustHipHeight,
+                      pChain->fTolerance);
     SKEL_SetIKSolutionWeight(pSkel, 1.0f);
-    pSkel->f1074 = 0.0f;
+    pSkel->fIKBlendLeft = 0.0f;
     return fDrop;
 }
 
@@ -694,8 +701,8 @@ void SKEL_CreateIKChain(CharModel* pModel, IKChain* pChain, IKChainDef* pDef) {
     IKLink* pLink;
 
     pChain->nLinks = pDef->nLinks;
-    pChain->n18 = pDef->n8;
-    pChain->f1C = pDef->fC;
+    pChain->nMaxIterations = pDef->nMaxIterations;
+    pChain->fTolerance = pDef->fTolerance;
     pChain->pLinks = StaticMem_Alloc(pChain->nLinks * sizeof(IKLink), 2, 64, "Skeleton.c", 1126);
     for (i = 0; i < pChain->nLinks; i++) {
         pLink = &pChain->pLinks[i];
@@ -703,8 +710,8 @@ void SKEL_CreateIKChain(CharModel* pModel, IKChain* pChain, IKChainDef* pDef) {
         pLink->nPrev = nPrev;
         nPrev = i;
         pLink->b0 = 0;
-        pLink->n8 = pDef->pLinks[i].n8;
-        pLink->f4 = pDef->pLinks[i].f4;
+        pLink->nLockedAxis = pDef->pLinks[i].nLockedAxis;
+        pLink->fTurnShare = pDef->pLinks[i].fTurnShare;
         pLink->fC = pDef->pLinks[i].fC;
         pLink->f10 = pDef->pLinks[i].f10;
     }
@@ -726,29 +733,29 @@ Skeleton* SKEL_CreateIKSkeleton(CharModel* pModel, CharModelDefs* pDefs) {
         SKEL_CreateIKChain(pModel, &pSkel->pChains[i], &pChainDefs[i]);
     }
     pSkel->pDefs = pChainDefs;
-    pSkel->p20 = StaticMem_Alloc(pModel->nBones * sizeof(f32[4]), 2, 64, "Skeleton.c", 1159);
-    pSkel->p24 = StaticMem_Alloc(pModel->nBones * sizeof(f32[4]), 2, 64, "Skeleton.c", 1160);
-    pSkel->p28 = pSkel->p20;
+    pSkel->pIKRots = StaticMem_Alloc(pModel->nBones * sizeof(f32[4]), 2, 64, "Skeleton.c", 1159);
+    pSkel->pWeightedRots = StaticMem_Alloc(pModel->nBones * sizeof(f32[4]), 2, 64, "Skeleton.c", 1160);
+    pSkel->pUsedRots = pSkel->pIKRots;
     pSkel->n112C = -1;
     pSkel->n1130 = -1;
-    BitArray_ClearArray(pSkel->a10, 0x80);
+    BitArray_ClearArray(pSkel->aIKBones, 0x80);
     pSkel->n0 = 0;
-    pSkel->f109C = 0.1f;
-    pSkel->f10A0 = 0.2f;
-    vec4flt_Zero(pSkel->v10A4);
-    vec4flt_Zero(pSkel->v10B4);
+    pSkel->fHipRaiseMax = 0.1f;
+    pSkel->fHipLowerMax = 0.2f;
+    vec4flt_Zero(pSkel->vHipOffset);
+    vec4flt_Zero(pSkel->vHipOffsetWeighted);
     pSkel->f10C4 = 1.0f;
-    pSkel->f10C8 = 0.0f;
-    pSkel->f10CC = 1.0f;
+    pSkel->fRootLinkHeight = 0.0f;
+    pSkel->fHipFollow = 1.0f;
     pSkel->pClip = NULL;
-    pSkel->f1074 = 0.0f;
+    pSkel->fIKBlendLeft = 0.0f;
     pSkel->a1108[0] = CharModel_GetBoneIndexMapped(pModel, 0x24);
     pSkel->a1108[1] = CharModel_GetBoneIndexMapped(pModel, 0x25);
     pSkel->a1108[2] = CharModel_GetBoneIndexMapped(pModel, 0x11);
     pSkel->a1108[3] = CharModel_GetBoneIndexMapped(pModel, 0x12);
     SKEL_SetIKSolutionWeight(pSkel, 0.0f);
-    Quat_IdentifyForMul(pSkel->q10D4);
-    pSkel->n10E4 = 0;
+    Quat_IdentifyForMul(pSkel->qShoulderRot);
+    pSkel->nShoulderFrames = 0;
     return pSkel;
 }
 
@@ -759,17 +766,17 @@ void SKEL_FreeIKSkeleton(Skeleton* pSkel) {
         StaticMem_Free(pSkel->pChains[i].pLinks);
     }
     StaticMem_Free(pSkel->pChains);
-    StaticMem_Free(pSkel->p24);
-    StaticMem_Free(pSkel->p20);
+    StaticMem_Free(pSkel->pWeightedRots);
+    StaticMem_Free(pSkel->pIKRots);
     StaticMem_Free(pSkel);
 }
 
 // Loads a character model from pData (read through BYTESWAP_SWAPDATA): its bone count, two floats
-// (fC, f10), then per bone its 8-byte name, parent and position. nExtra more bones are added at the
-// root, named GBall1 (0x54); a negative nExtra asks for that many bones in all. Then its matrices
-// and poses, the bone lookup and left-handed tables (bLeftHanded), its IK skeleton when pDefs is
-// given, every bone posed, its dynamic chains (the tail1 hair, the chest, gSkelPantBones' and
-// gSkelSleeveBones' six each) and every bone's scale at 1.
+// (fLeftFootLen, fRightFootLen), then per bone its 8-byte name, parent and position. nExtra more
+// bones are added at the root, named GBall1 (0x54); a negative nExtra asks for that many bones in
+// all. Then its matrices and poses, the bone lookup and left-handed tables (bLeftHanded), its IK
+// skeleton when pDefs is given, every bone posed, its dynamic chains (the tail1 hair, the chest,
+// gSkelPantBones' and gSkelSleeveBones' six each) and every bone's scale at 1.
 CharModel* SKEL_LoadFromMem(u8* pData, s8 nExtra, CharModelDefs* pDefs, int bLeftHanded) {
     u32 aAll[4];
     s8 nTotal;
@@ -787,8 +794,8 @@ CharModel* SKEL_LoadFromMem(u8* pData, s8 nExtra, CharModelDefs* pDefs, int bLef
     }
     nTotal = pModel->nBones + nExtra;
     pModel->pBones = StaticMem_Alloc(nTotal * sizeof(Bone), 2, 64, "Skeleton.c", 1242);
-    BYTESWAP_SWAPDATA(&pData, (u8*)&pModel->f10, 4, 4);
-    BYTESWAP_SWAPDATA(&pData, (u8*)&pModel->fC, 4, 4);
+    BYTESWAP_SWAPDATA(&pData, (u8*)&pModel->fRightFootLen, 4, 4);
+    BYTESWAP_SWAPDATA(&pData, (u8*)&pModel->fLeftFootLen, 4, 4);
     for (i = 0; i < pModel->nBones; i++) {
         BYTESWAP_SWAPDATA(&pData, (u8*)&pModel->pBones[i].uId, 8, -8);
         BYTESWAP_SWAPDATA(&pData, (u8*)&pModel->pBones[i].nParent, 1, 1);
@@ -810,7 +817,7 @@ CharModel* SKEL_LoadFromMem(u8* pData, s8 nExtra, CharModelDefs* pDefs, int bLef
     }
     BitArray_FillArray(pModel->a14, 0x80);
     BitArray_FillArray(pModel->a24, 0x80);
-    pModel->bEE = bLeftHanded;
+    pModel->bLeftHanded = bLeftHanded;
     SKEL_GenerateBoneLookupTable(pModel);
     SKEL_GenerateLeftHandedTable(pModel);
     if (pDefs != NULL) {
@@ -870,12 +877,12 @@ void SKEL_ScaleBone(CharModel* pModel, int nBone, u32 uAxes, f32 fScale) {
 // its bit to aBits, so its children follow), walking the bones in order with aCur holding the
 // current bone's bit. A bone's pose comes from its parent's and its own local rotation and
 // position, each only where the model's a14 (rotation) and a24 (position) bits allow (both are set
-// again at the end); its IK rotation (p28) goes first while the IK has weight and the bone is in
-// the IK set, and bone 1 (the root) is moved by the IK's hip offset (v10B4). Its matrix takes the
-// bone's scale (a140; the club's x negated for a left-hander), and its skinning matrix is updated.
-// On the way the shoulders' half joints are set (SKEL_SetHalfJoint) and redone with their
-// shoulders: at rshlddef (0x22) from q740, and at lshlddef (0x35), where EA sets 0x22 again, from
-// q750.
+// again at the end); its IK rotation (pUsedRots) goes first while the IK has weight and the bone is
+// in the IK set, and bone 1 (the root) is moved by the IK's hip offset (vHipOffsetWeighted). Its
+// matrix takes the bone's scale (a140; the club's x negated for a left-hander), and its skinning
+// matrix is updated. On the way the shoulders' half joints are set (SKEL_SetHalfJoint) and redone
+// with their shoulders: at rshlddef (0x22) from q740, and at lshlddef (0x35), where EA sets 0x22
+// again, from q750.
 void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
     f32 mScale[4][4];
     f32 mOut[4][4];
@@ -898,9 +905,9 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
         if (0.0f == pModel->pSkel->fIKWeight) {
             BitArray_ClearArray(aSkel, 0x80);
         } else {
-            BitArray_CopyArray(pModel->pSkel->a10, aSkel, 0x80);
+            BitArray_CopyArray(pModel->pSkel->aIKBones, aSkel, 0x80);
         }
-        pSkelRot = pModel->pSkel->p28;
+        pSkelRot = pModel->pSkel->pUsedRots;
     } else {
         BitArray_ClearArray(aSkel, 0x80);
         pSkelRot = NULL;
@@ -966,7 +973,7 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
                     if (i == 1) {
                         pSkel = pModel->pSkel;
                         if (pSkel != NULL && 0.0f != pSkel->f10C4) {
-                            SKEL_Vec3Add(pPose->v10, pSkel->v10B4, pPose->v10);
+                            SKEL_Vec3Add(pPose->v10, pSkel->vHipOffsetWeighted, pPose->v10);
                         }
                     }
                 }
@@ -983,8 +990,8 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
             mScale[0][0] = pModel->a140[i][0];
             mScale[1][1] = pModel->a140[i][1];
             mScale[2][2] = pModel->a140[i][2];
-            if (pModel->bEE && i == CharModel_GetBoneIndex(pModel, 0x52)) {
-                mScale[0][0] = -mScale[0][0];   // with bEE set, bone 0x52's x is flipped
+            if (pModel->bLeftHanded && i == CharModel_GetBoneIndex(pModel, 0x52)) {
+                mScale[0][0] = -mScale[0][0];   // with bLeftHanded set, bone 0x52's x is flipped
             }
             LLMath_mat44fltMultiplyList(pModel->pMatrices[i], mScale, mOut, 4);
             LLMath_CopyMat44(mOut, pModel->pMatrices[i]);
@@ -1000,10 +1007,10 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
 
 // Copies pPose's local rotations (bones in its a0 bits) and positions (a10 bits) into the model's
 // bones; with bTransform, then rebuilds those bones (SKEL_TransformBones). For a left-handed golfer
-// (bEE) the pose is mirrored: each rotation goes to the bone's left/right partner (aBone2, whose a0
-// bit is set), the root's (1) and a club hanging from the root (0x52) turned half a turn in pitch;
-// the root's, GBall1's (0x54) and the club's positions have z negated (the club's x instead when it
-// has a parent).
+// (bLeftHanded) the pose is mirrored: each rotation goes to the bone's left/right partner (aBone2,
+// whose a0 bit is set), the root's (1) and a club hanging from the root (0x52) turned half a turn
+// in pitch; the root's, GBall1's (0x54) and the club's positions have z negated (the club's x
+// instead when it has a parent).
 void SKEL_UpdateState(CharModel* pModel, SkelPose* pPose, u8 bTransform) {
     u32 aRot[4];
     u32 aPos[4];
@@ -1015,7 +1022,7 @@ void SKEL_UpdateState(CharModel* pModel, SkelPose* pPose, u8 bTransform) {
     BitArray_CopyArray(pPose->a10, aPos, 0x80);
     for (i = 0; i < pModel->nBones; i++) {
         if (BitArray_TestBit(aRot, i)) {
-            if (pModel->bEE) {
+            if (pModel->bLeftHanded) {
                 if (i == CharModel_GetBoneIndex(pModel, 1)) {
                     Legacy_Quat_BuildFromPitch(PI, qTurn);
                     Quat_Multiply(pPose->aBones[i].q0, qTurn, pModel->pBones[pModel->aBone2[i]].q0C);
@@ -1038,11 +1045,11 @@ void SKEL_UpdateState(CharModel* pModel, SkelPose* pPose, u8 bTransform) {
             }
         }
         if (BitArray_TestBit(aPos, i)) {
-            if (pModel->bEE
+            if (pModel->bLeftHanded
                 && (i == CharModel_GetBoneIndex(pModel, 1) || i == CharModel_GetBoneIndex(pModel, 0x54))) {
                 Quat_Copy(pPose->aBones[i].v10, pModel->pBones[i].v1C);
                 pModel->pBones[i].v1C[2] = -pModel->pBones[i].v1C[2];
-            } else if (pModel->bEE && i == CharModel_GetBoneIndex(pModel, 0x52)) {
+            } else if (pModel->bLeftHanded && i == CharModel_GetBoneIndex(pModel, 0x52)) {
                 if (pModel->pBones[i].nParent == 0) {
                     Quat_Copy(pPose->aBones[i].v10, pModel->pBones[i].v1C);
                     pModel->pBones[i].v1C[2] = -pModel->pBones[i].v1C[2];

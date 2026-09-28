@@ -98,7 +98,7 @@ AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank);  // skalib.c
 CharModel* SKEL_LoadFromMem(u8* pData, s8 n, CharModelDefs* pDefs, int b);   // Skeleton.c
 void  fn_80037AB8(Skin* pSkin, CharModel* pModel, int nBone, int nId);   // Skin.c
 void  SkinPart_BurnBodySkin(Character* pChar);                // SkinPart.c
-void* CharSlider_CreateDefinitionsFromMem(u8** ppData);
+CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData);
 void  Character_FreeClubSkinSets(CharSkinSet* pSet);
 void  Character_ClipTest(Character* pChar, int nPlayer);
 f32 (*Character_GetRootMatrix(Character* pChar))[4];                        // bone 1's matrix
@@ -347,8 +347,8 @@ void Character_InitBoneStateBits(Character* pChar, SkelPose* pPose) {
 
 // Reads the ground height under the four foot test points (0 right toe, 1 left toe, 2 right ankle,
 // 3 left ankle) into afGroundHeight, where there is ground, and with bNormals the ground's normal
-// into aGroundNormal (straight up where there is none). n1784 would pick half of the points per
-// call (0 and 2, or 1 and 3), but it is set to -1 first, so every call does all four.
+// into aGroundNormal (straight up where there is none). nFootPointStart would pick half of the
+// points per call (0 and 2, or 1 and 3), but it is set to -1 first, so every call does all four.
 void Character_UpdateFeetTerrainInfo(Character* pChar, int bNormals) {
     f32* pNormal;
     f32 fHeight;
@@ -357,9 +357,9 @@ void Character_UpdateFeetTerrainInfo(Character* pChar, int bNormals) {
     int nStep;
 
     if (Ter_GetTGD() != NULL) {
-        pChar->n1784 = -1;
-        if (pChar->n1784 < 0) {
-            pChar->n1784 = 0;
+        pChar->nFootPointStart = -1;
+        if (pChar->nFootPointStart < 0) {
+            pChar->nFootPointStart = 0;
             nLast = 3;
             nStep = 1;
         } else {
@@ -367,25 +367,26 @@ void Character_UpdateFeetTerrainInfo(Character* pChar, int bNormals) {
             nStep = 2;
         }
         for (i = 0; i <= nLast; i += nStep) {
-            fHeight = Character_GetTerrainHeightAndNormal(pChar, pChar->aTestPoints[i + pChar->n1784],
+            fHeight = Character_GetTerrainHeightAndNormal(pChar,
+                                                          pChar->aTestPoints[i + pChar->nFootPointStart],
                                                           &pNormal);
             if (!(fHeight < -60000.0f)) {
-                pChar->afGroundHeight[i + pChar->n1784] = fHeight;
+                pChar->afGroundHeight[i + pChar->nFootPointStart] = fHeight;
             }
             if (bNormals) {
                 if (fHeight < -60000.0f) {
-                    pChar->aGroundNormal[i + pChar->n1784][0] = 0.0f;
-                    pChar->aGroundNormal[i + pChar->n1784][1] = 1.0f;
-                    pChar->aGroundNormal[i + pChar->n1784][2] = 0.0f;
-                    pChar->aGroundNormal[i + pChar->n1784][3] = 0.0f;
+                    pChar->aGroundNormal[i + pChar->nFootPointStart][0] = 0.0f;
+                    pChar->aGroundNormal[i + pChar->nFootPointStart][1] = 1.0f;
+                    pChar->aGroundNormal[i + pChar->nFootPointStart][2] = 0.0f;
+                    pChar->aGroundNormal[i + pChar->nFootPointStart][3] = 0.0f;
                 } else {
-                    LLMath_CopyVec(pNormal, pChar->aGroundNormal[i + pChar->n1784]);
+                    LLMath_CopyVec(pNormal, pChar->aGroundNormal[i + pChar->nFootPointStart]);
                 }
             }
         }
-        pChar->n1784++;
-        if (pChar->n1784 >= 2) {
-            pChar->n1784 = 0;
+        pChar->nFootPointStart++;
+        if (pChar->nFootPointStart >= 2) {
+            pChar->nFootPointStart = 0;
         }
     }
 }
@@ -439,8 +440,8 @@ f32 Character_GetTerrainHeightAndNormal(Character* pChar, f32* pPos, f32** ppNor
 // Moves a golfer's five test points with its bones (left and right swapped for a left-hander): 0-3
 // the right toe, left toe, right ankle and left ankle (bones 0x3A, 0x48, 0x39, 0x47), from the
 // points Character_SetSkin kept in the skin, or before that set out along the bones' axes by the
-// model's leg sizes (f10 right, fC left); 4 the club class's club point through the club bone 0x52
-// (IGdriver).
+// model's leg sizes (fRightFootLen right, fLeftFootLen left); 4 the club class's club point through
+// the club bone 0x52 (IGdriver).
 void Character_UpdateTestPoints(Character* pChar) {
     f32 (*pClubMtx)[4];
     f32 (*pMtxLToe)[4];
@@ -464,14 +465,14 @@ void Character_UpdateTestPoints(Character* pChar) {
         LLMath_mat44fltMultiply(pMtxRFoot, (Vec4*)pChar->pSkin->aFootPoints[2], (Vec4*)pChar->aTestPoints[2]);
         LLMath_mat44fltMultiply(pMtxLFoot, (Vec4*)pChar->pSkin->aFootPoints[3], (Vec4*)pChar->aTestPoints[3]);
     } else {
-        fRight = 0.8f * pChar->pModel->f10;
-        fLeft = 0.8f * pChar->pModel->fC;
+        fRight = 0.8f * pChar->pModel->fRightFootLen;
+        fLeft = 0.8f * pChar->pModel->fLeftFootLen;
         pMtxLToe = Character_GetBoneMatrixSwapIfLefty(pChar, 0x48);
         pMtxRToe = Character_GetBoneMatrixSwapIfLefty(pChar, 0x3A);
         pMtxLFoot = Character_GetBoneMatrixSwapIfLefty(pChar, 0x47);
         pMtxRFoot = Character_GetBoneMatrixSwapIfLefty(pChar, 0x39);
-        LLMath_AddScale(pMtxRToe[3], pMtxRToe[1], pChar->pModel->f10, pChar->aTestPoints[0]);
-        LLMath_AddScale(pMtxLToe[3], pMtxLToe[1], pChar->pModel->fC, pChar->aTestPoints[1]);
+        LLMath_AddScale(pMtxRToe[3], pMtxRToe[1], pChar->pModel->fRightFootLen, pChar->aTestPoints[0]);
+        LLMath_AddScale(pMtxLToe[3], pMtxLToe[1], pChar->pModel->fLeftFootLen, pChar->aTestPoints[1]);
         LLMath_AddScale(pMtxRFoot[3], pMtxRToe[2], fRight, pChar->aTestPoints[2]);
         LLMath_AddScale(pMtxLFoot[3], pMtxLToe[2], fLeft, pChar->aTestPoints[3]);
         LLMath_AddScale(pChar->aTestPoints[0], pMtxRToe[2], 0.25f * fRight, pChar->aTestPoints[0]);
@@ -526,8 +527,8 @@ void Character_KeepClubOutOfGround(Character* pChar) {
 
 // Advances the character's animation by fTime: both animation players and their blend trees, the
 // pose (the club head at the club class's height), the bones, the feet on the ground and the
-// model's dynamic chains. Unless bForce, it waits while a golfer's state is 0x13 and while f14 of
-// any other character is above Character_ComputeMaxVisableDistance.
+// model's dynamic chains. Unless bForce, it waits while a golfer's state is 0x13 and while
+// fNearestCamDist of any other character is above Character_ComputeMaxVisableDistance.
 void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
     u32 auBits[4];
     int bSetupForShot = 0;
@@ -539,10 +540,10 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
         return;
     }
     if (pChar->uFlags & 1) {
-        pChar->n1698 = 0;
+        pChar->bPosed = 0;
         return;
     }
-    if (pChar->u10 & 1) {
+    if (pChar->uCharFlags & 1) {
         return;
     }
     if (!bForce) {
@@ -551,20 +552,21 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
             if ((s8)GOLFERSTATE_GetCurrentState(pChar->nPlayer) == 0x13) {
                 return;
             }
-        } else if (pChar->f14 > Character_ComputeMaxVisableDistance(pChar, gSession.nSplitScreen)) {
-            pChar->f14 = 1073741824.0f;
-            pChar->n1698 = 0;
+        } else if (pChar->fNearestCamDist
+                   > Character_ComputeMaxVisableDistance(pChar, gSession.nSplitScreen)) {
+            pChar->fNearestCamDist = 1073741824.0f;
+            pChar->bPosed = 0;
             return;
         }
     }
-    pChar->f14 = 1073741824.0f;
-    if (pChar->u10 & 4) {
+    pChar->fNearestCamDist = 1073741824.0f;
+    if (pChar->uCharFlags & 4) {
         Character_SetupForShot(pChar);
         bSetupForShot = 1;
     }
-    if (pChar->n20 == 8 && pChar->nAnim == 8) {
+    if (pChar->nCurState == 8 && pChar->nTargetState == 8) {
         SKATime_Idle(pChar, pChar->nPlayer, (AnimPlayer*)pChar->anim, &pChar->blend, fTime);
-    } else if (pChar->u10 & 0x100) {
+    } else if (pChar->uCharFlags & 0x100) {
         SKATime_Update((AnimPlayer*)pChar->anim, &pChar->blend, 5.0f * fTime);
     } else {
         SKATime_Update((AnimPlayer*)pChar->anim, &pChar->blend, fTime);
@@ -575,9 +577,9 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
             }
         }
     }
-    SKA_SetLeftHanded(pChar->pModel->bEE);
+    SKA_SetLeftHanded(pChar->pModel->bLeftHanded);
     if (!gSession.b11) {
-        SKATime_Update(&pChar->anim29C, &pChar->node3E0, fTime);
+        SKATime_Update(&pChar->morphAnim, &pChar->morphBlend, fTime);
     }
     if (Character_IsGolfer(pChar)) {
         CharacterState_UpdateSKAState(pChar);
@@ -612,9 +614,9 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
             }
         }
     }
-    if (!gSession.b11 && Character_IsGolfer(pChar) && pChar->node3E0.pPose != NULL) {
-        SKABlender_Update(pChar, &pChar->node3E0, pChar->pModel, pChar->anim29C.fTime);
-        fn_80037C48(pChar->pSkin, pChar->node3E0.pPose);
+    if (!gSession.b11 && Character_IsGolfer(pChar) && pChar->morphBlend.pPose != NULL) {
+        SKABlender_Update(pChar, &pChar->morphBlend, pChar->pModel, pChar->morphAnim.fTime);
+        fn_80037C48(pChar->pSkin, pChar->morphBlend.pPose);
     }
     if (pChar->uFlags & 2) {
         pChar->uFlags |= 1;
@@ -627,9 +629,11 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
     SKEL_TransformBones(pChar->pModel, auBits);
     if (Character_IsGolfer(pChar)) {
         Character_UpdateTestPoints(pChar);
-        Character_UpdateFeetTerrainInfo(pChar, bSetupForShot || pChar->n20 != 5 || pChar->n26 == 1);
-        if (pChar->n20 == 1 || pChar->n20 == 0 || pChar->n20 == 9 ||
-            (pChar->n20 == 11 && !(pChar->u10 & 0x8000)) || pChar->n20 == 5 || pChar->n20 == 12) {
+        Character_UpdateFeetTerrainInfo(pChar, bSetupForShot || pChar->nCurState != 5 || pChar->bFidgeting
+                                        == 1);
+        if (pChar->nCurState == 1 || pChar->nCurState == 0 || pChar->nCurState == 9 ||
+            (pChar->nCurState == 11 && !(pChar->uCharFlags & 0x8000)) || pChar->nCurState == 5
+                    || pChar->nCurState == 12) {
             Character_PlaceFeetOnGround(pChar);
         }
         Character_IKLegsToGround(pChar, bRightLegIK, bLeftLegIK);
@@ -640,7 +644,7 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
         }
         Character_KeepClubOutOfGround(pChar);
     }
-    pChar->n1698 = 0;
+    pChar->bPosed = 0;
     Character_CalculateClipPoints(pChar);
     if (Character_IsGolfer(pChar)) {
         SKEL_UpdateDynChain(pChar->pModel, pChar->pModel->pF0, fTime);
@@ -1043,7 +1047,7 @@ void Character_SetPosition(Character* pChar, f32* pPos, u8 bPlace) {
         if (bPlace) {
             SKEL_TransformBones(pChar->pModel, auBits);
             Character_UpdateTestPoints(pChar);
-            pChar->n1784 = -1;
+            pChar->nFootPointStart = -1;
             Character_UpdateFeetTerrainInfo(pChar, 1);
             Character_PlaceFeetOnGround(pChar);
         }
@@ -1107,44 +1111,44 @@ Character* Character_Create(void) {
     pNode = &pChar->blend;
     SKATime_Init((AnimPlayer*)pChar->anim);
     SKABlendData_Init(&pNode, 1, 0, SKABlender_BlendLinear, 1);
-    pNode = &pChar->node3E0;
-    SKATime_Init(&pChar->anim29C);
+    pNode = &pChar->morphBlend;
+    SKATime_Init(&pChar->morphAnim);
     SKABlendData_Init(&pNode, 1, 1, SKABlender_BlendLinear, 1);
     pChar->pLib = NULL;
     pChar->n3D4 = 0;
     pChar->p44 = NULL;
-    pChar->f14 = 0.0f;
-    pChar->nAnim = 0;
-    pChar->n20 = 0;
-    pChar->n18 = 0;
-    pChar->u10 = 0x4000;
+    pChar->fNearestCamDist = 0.0f;
+    pChar->nTargetState = 0;
+    pChar->nCurState = 0;
+    pChar->uSKAFlags = 0;
+    pChar->uCharFlags = 0x4000;
     pChar->f162C = 1.0f;
     pChar->f1630 = 0.5f;
     pChar->f1634 = 0.2f;
     pChar->n1650 = 0;
-    pChar->n1654 = 2;
-    pChar->n1658 = 2;
-    pChar->n1698 = 0;
+    pChar->nClipResult = 2;
+    pChar->nShadowClipResult = 2;
+    pChar->bPosed = 0;
     pChar->pClubSet = NULL;
     pChar->nClubClass = 0;
     pChar->nClipKey = 0;
     pChar->nSlot = 0;
     pChar->n48 = -1;
-    pChar->f1664 = 1.0f;
+    pChar->fNearFade = 1.0f;
     pChar->nStyle = 0;
     pChar->nPlayer = -1;
     pChar->uId = 0;
     pChar->pBlend = NULL;
     pChar->fBackswing = 0.0f;
     pChar->nGroup = -1;
-    pChar->n5CC = -1;
+    pChar->nClampEvent = -1;
     pChar->p1790 = NULL;
-    pChar->n1784 = -1;
+    pChar->nFootPointStart = -1;
     pChar->nView = 0;
     pChar->pRecords = NULL;
     CharacterState_ResetFidgetState(pChar);
     pChar->n16DC = 0;
-    pChar->f165C = pChar->f1660 = 1073741824.0f;
+    pChar->fMaxShadowDist = pChar->fMaxVisibleDist = 1073741824.0f;
     pChar->pCurClip = NULL;
     pChar->p178C = NULL;
     pChar->aDynTexSlot[0] = -1;
@@ -1171,16 +1175,16 @@ void Character_PreHoleInit(void) {
 }
 
 // Poses the character at the moment of impact: the blend's time set to its event 2 (the ball hit;
-// fAnimTime from f180, that event's time in the blend and v1638[1]), u10 bits 0x10000, 8 and 4 set
-// (4: the update sets it up for the shot), then one animation update of no length with the
-// skeleton's clip cleared.
+// fAnimTime from fAnimStart, that event's time in the blend and afSwingTop[1]), uCharFlags bits
+// 0x10000, 8 and 4 set (4: the update sets it up for the shot), then one animation update of no
+// length with the skeleton's clip cleared.
 void Character_AlignCharacterForShotImpact(Character* pChar) {
     if (pChar != NULL && pChar->pBlend != NULL) {
-        pChar->u10 |= 0x10000;
-        pChar->u10 |= 8;
-        pChar->u10 |= 4;
+        pChar->uCharFlags |= 0x10000;
+        pChar->uCharFlags |= 8;
+        pChar->uCharFlags |= 4;
         pChar->pModel->pSkel->pClip = NULL;
-        pChar->fAnimTime = pChar->f180 + SKA_GetTagTime(pChar->pBlend, 2) - pChar->v1638[1];
+        pChar->fAnimTime = pChar->fAnimStart + SKA_GetTagTime(pChar->pBlend, 2) - pChar->afSwingTop[1];
         Character_UpdateAnimation(pChar, 0, 0.0f);
         pChar->pModel->pSkel->pClip = NULL;
     }
@@ -1612,20 +1616,20 @@ void CharacterTex_PreHoleInit(void) {
 }
 
 // With more than two players, the dynamic textures go to player nPlayer (up now) and the next to
-// play (GM_GetSecondHonors). nPlayer's character loses bit 0x40 of u10; after the display finishes
-// drawing (fn_80008380), every other character holding pool entries (except the one being loaded,
-// the pool's a[6].p) gives them back and gets bit 0x40 (not drawn). Unless nPlayer's textures are
-// loaded (bTexLoaded), it takes the entries (the character being loaded giving its back first) and its
-// textures are loaded now (fn_8010BF68); when it is the one being loaded, the loader is just run to
-// the end. The next player's character is then queued the same way, its textures left to
-// CharacterTex_TextureLoader.
+// play (GM_GetSecondHonors). nPlayer's character loses bit 0x40 of uCharFlags; after the display
+// finishes drawing (fn_80008380), every other character holding pool entries (except the one being
+// loaded, the pool's a[6].p) gives them back and gets bit 0x40 (not drawn). Unless nPlayer's
+// textures are loaded (bTexLoaded), it takes the entries (the character being loaded giving its
+// back first) and its textures are loaded now (fn_8010BF68); when it is the one being loaded, the
+// loader is just run to the end. The next player's character is then queued the same way, its
+// textures left to CharacterTex_TextureLoader.
 void CharacterTex_StartStreamingPlayers(int nPlayer) {
     int i;
     Character* pChar;
     Character* pQueued;
 
     if (gSession.nNumPlayers > 2) {
-        gPlayers[nPlayer].pChar->u10 &= ~0x40;
+        gPlayers[nPlayer].pChar->uCharFlags &= ~0x40;
         fn_80008380();
         pChar = gPlayers[nPlayer].pChar;
         for (i = 0; i < gSession.nNumPlayers; i++) {
@@ -1634,7 +1638,7 @@ void CharacterTex_StartStreamingPlayers(int nPlayer) {
                 CharacterTex_PreReleasePoolEntries(gPlayers[i].pChar);
                 CharacterTex_ReleasePoolEntries(gPlayers[i].pChar);
                 gPlayers[i].pChar->bTexLoaded = 0;
-                gPlayers[i].pChar->u10 |= 0x40;
+                gPlayers[i].pChar->uCharFlags |= 0x40;
             }
         }
         if (!pChar->bTexLoaded) {
@@ -1645,7 +1649,7 @@ void CharacterTex_StartStreamingPlayers(int nPlayer) {
                     CharacterTex_PreReleasePoolEntries(pQueued);
                     CharacterTex_ReleasePoolEntries(pQueued);
                     pQueued->bTexLoaded = 0;
-                    pQueued->u10 |= 0x40;
+                    pQueued->uCharFlags |= 0x40;
                 }
                 CharacterTex_TakePoolEntries(pChar);
                 Character_AddTextureLoadRequest(pChar, Character_BeginLoadTexturesCallbackIG,
@@ -1769,12 +1773,12 @@ void Character_PostInit(void) {
 }
 
 // Builds a character from its 'CHR ' object at pData: a header (its animation slot, a skin value, a
-// flag for bit 0x400 of u10, a model flag and five model values), its skin, the p44 entries, its
-// model (SKEL_LoadFromMem; a golfer outside the front end gets the golfer model definitions), its
-// own animation library (kept when its clips are its own or in a bank, else queued as an overlay of
-// its slot), and its slider definitions. A golfer then gets club skin set nSet (gClubSkinSets), and
-// with bLook its look from pChoices. nId: the golfer id (nC). nUnused: not read. NULL when no
-// character could be made.
+// flag for bit 0x400 of uCharFlags, a model flag and five model values), its skin, the p44 entries,
+// its model (SKEL_LoadFromMem; a golfer outside the front end gets the golfer model definitions),
+// its own animation library (kept when its clips are its own or in a bank, else queued as an
+// overlay of its slot), and its slider definitions. A golfer then gets club skin set nSet
+// (gClubSkinSets), and with bLook its look from pChoices. nId: the golfer id (nC). nUnused: not
+// read. NULL when no character could be made.
 // port: the object is little-endian on disc and BYTESWAP_SWAPDATA swaps each value as it reads it:
 //       a little-endian port does not swap there.
 Character* Character_CreateFromMem(u8* pData, int nUnused, int nSet, int nId, u8 bLook,
@@ -1822,7 +1826,7 @@ Character* Character_CreateFromMem(u8* pData, int nUnused, int nSet, int nId, u8
     }
     pData += 0xC;
     if (nFlag400 == 1) {
-        pChar->u10 |= 0x400;
+        pChar->uCharFlags |= 0x400;
     }
     bGolfer = Character_IsGolfer(pChar);
 
@@ -1927,12 +1931,12 @@ Character* Character_CreateFromMem(u8* pData, int nUnused, int nSet, int nId, u8
     if (bGolfer) {
         pChar->pClubSet = gClubSkinSets[nSet];
         pChar->nClubHeadBone = CharModel_GetBoneIndex(pChar->pModel, 0x53);
-        pChar->f165C = 100.0f;
-        pChar->f1660 = 200.0f;
+        pChar->fMaxShadowDist = 100.0f;
+        pChar->fMaxVisibleDist = 200.0f;
     } else {
         pChar->nClubHeadBone = 0;
-        pChar->f165C = 50.0f;
-        pChar->f1660 = 100.0f;
+        pChar->fMaxShadowDist = 50.0f;
+        pChar->fMaxVisibleDist = 100.0f;
     }
     if (pChar->pClubSet != NULL) {
         for (i = 0; i < 6; i++) {
@@ -2057,8 +2061,8 @@ void Character_FreeClubSkinSets(CharSkinSet* pSet) {
 #define MAX(a, b) ((a) <= (b) ? (b) : (a))
 
 // The character's bounding box (vMin / vMax: its bones from bone 1 on, grown by 0.33 each way) and
-// the sphere around it that Character_ClipTest tests (v1668 its centre, f1674 half its diagonal).
-// Nothing for a model of fewer than two bones.
+// the sphere around it that Character_ClipTest tests (vSphereCentre its centre, fSphereRadius half
+// its diagonal). Nothing for a model of fewer than two bones.
 void Character_CalculateClipPoints(Character* pChar) {
     f32 vCentre[4];
     f32 vDiff[4];
@@ -2085,20 +2089,21 @@ void Character_CalculateClipPoints(Character* pChar) {
     pChar->vMax[2] += 0.33f;
     Char_Vec3Add(pChar->vMin, pChar->vMax, vCentre);
     Vec3_Scale(0.5f, vCentre, vCentre);
-    pChar->v1668[0] = vCentre[0];
-    pChar->v1668[1] = vCentre[1];
-    pChar->v1668[2] = vCentre[2];
+    pChar->vSphereCentre[0] = vCentre[0];
+    pChar->vSphereCentre[1] = vCentre[1];
+    pChar->vSphereCentre[2] = vCentre[2];
     Char_Vec3Sub(pChar->vMax, pChar->vMin, vDiff);
-    pChar->f1674 = (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff)) / 2.0f;
+    pChar->fSphereRadius = (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff)) / 2.0f;
 }
 
 // Tests the character against the current camera. Only for the active player of the current view
-// (nPlayer 1000: any character); for another player both answers are 2 (out of view). n1654 is
-// fn_80007D74's answer for its bounding sphere (v1668, f1674; 2 = out of view) and n1658 the same
-// for a 3-unit sphere (its shadow); each is 2 as well past its distance along the lens
-// (Character_ComputeMaxVisableDistance, Character_ComputeMaxVisableShadowDistance; halved in split
-// screen). f14 keeps the nearest bone 1 has been to the camera; f1664 is 1 up close, fading to 0
-// between 6 and 15 units deep (scaled by the lens's field of view).
+// (nPlayer 1000: any character); for another player both answers are 2 (out of view). nClipResult
+// is fn_80007D74's answer for its bounding sphere (vSphereCentre, fSphereRadius; 2 = out of view)
+// and nShadowClipResult the same for a 3-unit sphere (its shadow); each is 2 as well past its
+// distance along the lens (Character_ComputeMaxVisableDistance,
+// Character_ComputeMaxVisableShadowDistance; halved in split screen). fNearestCamDist keeps the
+// nearest bone 1 has been to the camera; fNearFade is 1 up close, fading to 0 between 6 and 15
+// units deep (scaled by the lens's field of view).
 void Character_ClipTest(Character* pChar, int nPlayer) {
     f32 (*pMat)[4];
     f32 fDistInViewSpace;
@@ -2111,48 +2116,48 @@ void Character_ClipTest(Character* pChar, int nPlayer) {
     pMat = Character_GetRootMatrix(pChar);
     if (nPlayer != 1000 && nPlayer
         != ViewController_GetActivePlayerNumber(ViewController_GetCurrentViewControllerID())) {
-        pChar->n1654 = pChar->n1658 = 2;
+        pChar->nClipResult = pChar->nShadowClipResult = 2;
         return;
     }
-    Vec3Copy(pChar->v1668, &xSpherePosInCamSpace.x);
+    Vec3Copy(pChar->vSphereCentre, &xSpherePosInCamSpace.x);
     xSpherePosInCamSpace.w = 1.0f;
     LLMath_mat44fltMultiply(((Camera*)RC_spGetCurrentRenderCtx())->viewMtx, &xSpherePosInCamSpace,
                             &xSpherePosInCamSpace);
     Vec3Copy(&xSpherePosInCamSpace.x, &sSphereInCamSpace.x);
-    sSphereInCamSpace.radius = pChar->f1674;
+    sSphereInCamSpace.radius = pChar->fSphereRadius;
     fDistInViewSpace = sSphereInCamSpace.z;
-    pChar->n1654 = fn_80007D74(&sSphereInCamSpace, RC_spGetCurrentRenderCtx(), 0);
+    pChar->nClipResult = fn_80007D74(&sSphereInCamSpace, RC_spGetCurrentRenderCtx(), 0);
     sSphereInCamSpace.radius = 3.0f;
-    pChar->n1658 = fn_80007D74(&sSphereInCamSpace, RC_spGetCurrentRenderCtx(), 0);
+    pChar->nShadowClipResult = fn_80007D74(&sSphereInCamSpace, RC_spGetCurrentRenderCtx(), 0);
     Char_Vec4Sub(pMat[3], Camera_GetCurrentLens()->m4[3], vDir);
     fDot = Vec3_Dot(Camera_GetCurrentLens()->m4[2], vDir);
     fDist = (f32)Math_Sqrt(Vec3_LengthSqClamped(vDir));
-    if (fDist < pChar->f14) {
-        pChar->f14 = fDist;
+    if (fDist < pChar->fNearestCamDist) {
+        pChar->fNearestCamDist = fDist;
     }
     if (fDot > Character_ComputeMaxVisableDistance(pChar, gSession.nSplitScreen)) {
-        pChar->n1654 = 2;
+        pChar->nClipResult = 2;
     }
     if (fDot > Character_ComputeMaxVisableShadowDistance(pChar, gSession.nSplitScreen)) {
-        pChar->n1658 = 2;
+        pChar->nShadowClipResult = 2;
     }
     fDistInViewSpace *= Camera_GetLensFovScale(Camera_GetCurrentLens());
-    if (pChar->n1654 == 2) {
-        pChar->f1664 = 0.0f;
+    if (pChar->nClipResult == 2) {
+        pChar->fNearFade = 0.0f;
     } else if (fDistInViewSpace > 15.0f) {
-        pChar->f1664 = 0.0f;
+        pChar->fNearFade = 0.0f;
     } else if (fDistInViewSpace < 6.0f) {
-        pChar->f1664 = 1.0f;
+        pChar->fNearFade = 1.0f;
     } else {
-        pChar->f1664 = 1.0f - (fDistInViewSpace - 6.0f) / 9.0f;
+        pChar->fNearFade = 1.0f - (fDistInViewSpace - 6.0f) / 9.0f;
     }
 }
 
-// Each frame before drawing: every character loses bit 0x1000 of u10, and one with bit 2 (the
-// flagstick, GoDynObj.c) gets bit 1 (hidden) while the current view has the flag out. Then every
-// character whose body or shadow is in view (n1654 or n1658 not 2), that is not the player
-// fn_800636EC names, has none of bits 0x1000, 0x40 and 1 of u10 and is not posed yet (n1698 0) gets
-// its skins posed on its model (SKN_PoseCharacter).
+// Each frame before drawing: every character loses bit 0x1000 of uCharFlags, and one with bit 2
+// (the flagstick, GoDynObj.c) gets bit 1 (hidden) while the current view has the flag out. Then
+// every character whose body or shadow is in view (nClipResult or nShadowClipResult not 2), that is
+// not the player fn_800636EC names, has none of bits 0x1000, 0x40 and 1 of uCharFlags and is not
+// posed yet (bPosed 0) gets its skins posed on its model (SKN_PoseCharacter).
 void Character_PreRenderAll(void) {
     int i;
     int iPlayer2Clip;
@@ -2163,29 +2168,30 @@ void Character_PreRenderAll(void) {
     SKN_BeginFrame();
     for (i = 0; i < gNumCharacters; i++) {
         iPlayer2Clip = fn_800636EC();
-        gCharacters[i]->u10 &= ~0x1000;
-        if (gCharacters[i]->u10 & 2) {
+        gCharacters[i]->uCharFlags &= ~0x1000;
+        if (gCharacters[i]->uCharFlags & 2) {
             if (ViewController_GetCurrentViewController()->bFlagOut) {
-                gCharacters[i]->u10 |= 1;
+                gCharacters[i]->uCharFlags |= 1;
             } else {
-                gCharacters[i]->u10 &= ~1;
+                gCharacters[i]->uCharFlags &= ~1;
             }
         }
         bState = Character_GetClipResult(gCharacters[i]) != 2;
         bPreRender = bState || Character_GetShadowClipResult(gCharacters[i]) != 2;
         bPreRender = bPreRender && iPlayer2Clip != gCharacters[i]->nPlayer;
-        bPreRender = bPreRender && !(gCharacters[i]->u10 & 0x1041);
+        bPreRender = bPreRender && !(gCharacters[i]->uCharFlags & 0x1041);
         // fake match: the original turns bPreRender into 0/1 again (neg; or; srwi)
         bPreRender = bPreRender != 0;
-        if (bPreRender && gCharacters[i]->n1698 == 0) {
+        if (bPreRender && gCharacters[i]->bPosed == 0) {
             SKN_PoseCharacter(gCharacters[i], 0);
         }
     }
 }
 
-// Draws every character (SKN_DrawCharacter with uFlags) that is in view (n1654 not 2), is not the player
-// fn_800636EC names, is neither hidden (bit 1 of u10) nor without its textures (bit 0x40), and,
-// when uFlags has bit 4, is a golfer. fn_80035604 first; nothing when no character is made.
+// Draws every character (SKN_DrawCharacter with uFlags) that is in view (nClipResult not 2), is not
+// the player fn_800636EC names, is neither hidden (bit 1 of uCharFlags) nor without its textures
+// (bit 0x40), and, when uFlags has bit 4, is a golfer. fn_80035604 first; nothing when no character
+// is made.
 void Character_RenderAll(u32 uFlags) {
     int i;
     int iPlayer2Clip;
@@ -2195,7 +2201,7 @@ void Character_RenderAll(u32 uFlags) {
         for (i = 0; i < gNumCharacters; i++) {
             iPlayer2Clip = fn_800636EC();
             if (Character_GetClipResult(gCharacters[i]) != 2 && iPlayer2Clip != gCharacters[i]->nPlayer &&
-                !(gCharacters[i]->u10 & 0x41) &&
+                !(gCharacters[i]->uCharFlags & 0x41) &&
                 (Character_IsGolfer(gCharacters[i]) || (uFlags & 4) == 0)) {
                 SKN_DrawCharacter(gCharacters[i], uFlags);
             }
@@ -2216,9 +2222,9 @@ void Character_UpdateAll(f32 fTime) {
 
 // Hangs the club from the hand or from the root, as the clip says. With clip flag 0x10 the club
 // bone (nGripBone, bone 0x52) goes back to its parent, the right wrist (nWristBone); otherwise it is
-// parented to the root (bit 0x4000 of u10) and its rotation and offset from the root are kept in
-// qGripFromRoot and vGripFromRoot (for a left-hander turned half round and mirrored in z). Returns 1 when the
-// attachment changed, 0 when it already was that way.
+// parented to the root (bit 0x4000 of uCharFlags) and its rotation and offset from the root are
+// kept in qGripFromRoot and vGripFromRoot (for a left-hander turned half round and mirrored in z).
+// Returns 1 when the attachment changed, 0 when it already was that way.
 int Character_UpdateClubAttachment(Character* pChar, Clip* pClip) {
     CharModel* pModel;
     f32 qRoot[4];
@@ -2227,14 +2233,14 @@ int Character_UpdateClubAttachment(Character* pChar, Clip* pClip) {
     f32 qTurn[4];
 
     if (pClip->uFlags & 0x10) {
-        if (pChar->u10 & 0x4000) {
-            pChar->u10 &= ~0x4000;
+        if (pChar->uCharFlags & 0x4000) {
+            pChar->uCharFlags &= ~0x4000;
             pChar->pModel->pBones[pChar->nGripBone].nParent = pChar->nWristBone;
             return 1;
         }
-    } else if (!(pChar->u10 & 0x4000)) {
+    } else if (!(pChar->uCharFlags & 0x4000)) {
         pModel = pChar->pModel;
-        pChar->u10 |= 0x4000;
+        pChar->uCharFlags |= 0x4000;
         pChar->pModel->pBones[pChar->nGripBone].nParent = 0;
         Quat_Invert(pModel->pPoses[0].q0, qRoot);
         Quat_Multiply(pModel->pPoses[pChar->nGripBone].q0, qRoot, pChar->qGripFromRoot);
@@ -2284,7 +2290,7 @@ void Character_PlayClip(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime) 
         SKATime_SetTimeScale((u8*)pAnim, 1.0f);
         pAnim->n00 = 0;
         pAnim->uFlags = 0;
-        pAnim->n08 = -1;
+        pAnim->nPlays = -1;
         pAnim->fTime = 0.0f;
     }
     SKABlendData_Init(&pNew, 0, 0, SKABlender_BlendLinear, 1);
@@ -2332,7 +2338,7 @@ void Character_Free(Character* pChar) {
         }
         pNode = &pChar->blend;
         SKABlendData_Shutdown(&pNode, 0);
-        pNode = &pChar->node3E0;  // a node without the root's nGroup
+        pNode = &pChar->morphBlend;  // a node without the root's nGroup
         SKABlendData_Shutdown(&pNode, 0);
         if (pChar->pSkin != NULL) {
             fn_80037CD8(pChar->pSkin);
@@ -2542,9 +2548,9 @@ void Character_SelectShotType(Character* pChar, int nShotType) {
 }
 
 // The player's golfer takes the player's shot kind and club (Character_SelectGameShotType,
-// Character_SelectGameClub). When either changed, its animation restarts: nAnim 0, u10 bit 0x80
-// set, animation 5 asked for (fn_80095744), and a full set-up for the shot requested
-// (Character_AlignShotWithTarget with both flags).
+// Character_SelectGameClub). When either changed, its animation restarts: nTargetState 0,
+// uCharFlags bit 0x80 set, animation 5 asked for (fn_80095744), and a full set-up for the shot
+// requested (Character_AlignShotWithTarget with both flags).
 void Character_InitNewClubAndShotType(int nPlayer) {
     Player* pPlayer = &gPlayers[nPlayer];
     Character* pChar = pPlayer->pChar;
@@ -2555,8 +2561,8 @@ void Character_InitNewClubAndShotType(int nPlayer) {
     nPrevClub = pChar->nClub;
     Character_SelectGameClub(pChar, pPlayer->nClub);
     if (nPrevClub != pPlayer->nClub || nPrevShotKind != pPlayer->nShotKind) {
-        pChar->nAnim = 0;
-        pChar->u10 |= 0x80;
+        pChar->nTargetState = 0;
+        pChar->uCharFlags |= 0x80;
         fn_80095744(pChar, 5);
         Character_AlignShotWithTarget(nPlayer, 1, 1);
     }
@@ -2606,34 +2612,34 @@ void Character_SetEmotion(Character* pChar, int nStyle) {
     pChar->nStyle = nStyle;
 }
 
-// Asks for the player's golfer to be set up for its shot on its next animation update (u10 bit 4:
-// Character_UpdateAnimation runs Character_SetupForShot): at its ball, facing the target. bInitIK
-// (bit 8, set or cleared) has it also take its stance and leg IK; bResetPos (bit 0x200, only set)
-// has the ground under its feet sampled again.
+// Asks for the player's golfer to be set up for its shot on its next animation update (uCharFlags
+// bit 4: Character_UpdateAnimation runs Character_SetupForShot): at its ball, facing the target.
+// bInitIK (bit 8, set or cleared) has it also take its stance and leg IK; bResetPos (bit 0x200,
+// only set) has the ground under its feet sampled again.
 void Character_AlignShotWithTarget(int nPlayer, u8 bResetPos, u8 bInitIK) {
     Character* pChar = gPlayers[nPlayer].pChar;
-    pChar->u10 |= 4;
+    pChar->uCharFlags |= 4;
     if (bInitIK) {
-        pChar->u10 |= 8;
+        pChar->uCharFlags |= 8;
     } else {
-        pChar->u10 &= ~8;
+        pChar->uCharFlags &= ~8;
     }
     if (bResetPos) {
-        pChar->u10 |= 0x200;
+        pChar->uCharFlags |= 0x200;
     }
 }
 
 // fake match: the index passed through an inline's parameter numbers the nPlayer read below the
-// shared u10 read, which gives EA's registers.
+// shared uCharFlags read, which gives EA's registers.
 static inline f32* fn_8001C860_Get(int nPlayer) { return gPlayers[nPlayer].ball.vPos; }
 
 // Puts the golfer at its player's ball, facing the target (level), and resets its root bone's pose
-// and matrix. With u10 bit 8 and a skeleton, it then takes the stance of its clip for the style:
-// the clip is started on the skeleton when it changed (at its event 2's time with bit 0x10000), the
-// root is moved by the club class's offset (mirrored when the model is), the pose updated, the
-// feet placed and both leg chains moved with the root, and the IK weight set (1 in the swing's
-// states 5 and 7). Bits 4, 8, 0x200 and 0x10000 of u10 are cleared; with 0x200 the ground under
-// the feet is sampled again first.
+// and matrix. With uCharFlags bit 8 and a skeleton, it then takes the stance of its clip for the
+// style: the clip is started on the skeleton when it changed (at its event 2's time with bit
+// 0x10000), the root is moved by the club class's offset (mirrored when the model is), the pose
+// updated, the feet placed and both leg chains moved with the root, and the IK weight set (1 in the
+// swing's states 5 and 7). Bits 4, 8, 0x200 and 0x10000 of uCharFlags are cleared; with 0x200 the
+// ground under the feet is sampled again first.
 void Character_SetupForShot(Character* pChar) {
     f32 vDir[4];
     f32 vOffsetX[4];
@@ -2652,12 +2658,12 @@ void Character_SetupForShot(Character* pChar) {
 
     pPlayer = &gPlayers[pChar->nPlayer];
     pModel = pChar->pModel;
-    bResetPos = pChar->u10 & 0x200;
-    bInitIK = pChar->u10 & 8;
-    bClipTime = pChar->u10 & 0x10000;
+    bResetPos = pChar->uCharFlags & 0x200;
+    bInitIK = pChar->uCharFlags & 8;
+    bClipTime = pChar->uCharFlags & 0x10000;
     pBallPos = fn_8001C860_Get(pChar->nPlayer);
     Character_SetPosition(pChar, pBallPos, 0);
-    pChar->u10 &= ~(0x10000 | 0x200 | 8 | 4);
+    pChar->uCharFlags &= ~(0x10000 | 0x200 | 8 | 4);
     // fake match: n2C is compared unsigned here
     if (pChar->p1798 != NULL && (u32)pChar->p1798->n2C == 6 && pChar->nClipKey == 0) {
         pChar->nClipKey = 4;
@@ -2677,12 +2683,12 @@ void Character_SetupForShot(Character* pChar) {
         if (pClip->pD8 == NULL) {
             SKEL_ResetIKSkeleton(pSkel);
             SKEL_SetIKSolutionWeight(pChar->pModel->pSkel, 0.0f);
-            pChar->pModel->pSkel->f1074 = 0.0f;
+            pChar->pModel->pSkel->fIKBlendLeft = 0.0f;
             return;
         }
         if (pSkel->pClip != pClip) {
             pSkel->pClip = pClip;
-            SKA_SetLeftHanded(pChar->pModel->bEE);
+            SKA_SetLeftHanded(pChar->pModel->bLeftHanded);
             if (bClipTime) {
                 SKA_Update(pChar, pClip, &pSkel->pose, 0, pClip->pEvents[2].fTime);
             } else {
@@ -2692,7 +2698,7 @@ void Character_SetupForShot(Character* pChar) {
         Character_UpdateClubAttachment(pChar, pSkel->pClip);
         LLMath_Scale(-gClubStanceOffsets[pChar->nClubClass][0], pChar->pModel->pMatrices[0][0], vOffsetX);
         LLMath_Scale(-gClubStanceOffsets[pChar->nClubClass][2], pChar->pModel->pMatrices[0][2], vOffsetZ);
-        if (pChar->pModel->bEE) {
+        if (pChar->pModel->bLeftHanded) {
             vOffsetZ[0] = -vOffsetZ[0];
             vOffsetZ[2] = -vOffsetZ[2];
         }
@@ -2707,7 +2713,7 @@ void Character_SetupForShot(Character* pChar) {
         SKEL_UpdateState(pChar->pModel, &pSkel->pose, 1);
         Character_UpdateTestPoints(pChar);
         if (bResetPos) {
-            pChar->n1784 = -1;
+            pChar->nFootPointStart = -1;
             Character_UpdateFeetTerrainInfo(pChar, 1);
         }
         fY = pChar->pModel->pBones[0].v1C[1];
@@ -2721,8 +2727,8 @@ void Character_SetupForShot(Character* pChar) {
         SKEL_InitIKSkeleton(pChar, vPos, bResetPos);
         pChar->pModel->pSkel->n1130 = pChar->nClipKey;
         pChar->pModel->pSkel->n112C = pChar->nClubClass;
-        if (((pChar->n20 == 5 || pChar->nAnim == 5) && CharacterState_IsNotFidgeting(pChar)) ||
-            pChar->n20 == 7) {
+        if (((pChar->nCurState == 5 || pChar->nTargetState == 5) && CharacterState_IsNotFidgeting(pChar)) ||
+            pChar->nCurState == 7) {
             SKEL_SetIKSolutionWeight(pChar->pModel->pSkel, 1.0f);
         } else {
             SKEL_SetIKSolutionWeight(pChar->pModel->pSkel, 0.0f);
@@ -2732,7 +2738,7 @@ void Character_SetupForShot(Character* pChar) {
         }
     }
     if (pChar->pModel->pSkel != NULL) {
-        pChar->pModel->pSkel->f1074 = 0.0f;
+        pChar->pModel->pSkel->fIKBlendLeft = 0.0f;
     }
 }
 
@@ -2847,7 +2853,7 @@ void Character_GolferStreamCallbackFE(UStreamObject* pObject) {
     StaticMem_GetCount();
     Character_LoadTextures(gpCrAPState->pB8->pChar, NULL, 0);
     fn_8008F35C();
-    gpCrAPState->pB8->pChar->n16C = -1;
+    gpCrAPState->pB8->pChar->nPlays = -1;
     Character_SetPosition(gpCrAPState->pB8->pChar, gFEGolferPos, 1);
     Character_SetOrientation(gpCrAPState->pB8->pChar, gpCrAPState->f19C);
     if (gpCrAPState->pB8->pChar->nC == 7 || gpCrAPState->pB8->pChar->nC == 29) {
@@ -2882,15 +2888,15 @@ void Character_UnregisterGolferStreamClient(void) {
 }
 
 // Draws the shadow of every skeletal object (a character with no player, nPlayer 1000, from a
-// 'SKLO' object, such as the flag) that is not hidden (u10 bits 0x01 and 0x40) and whose shadow is
-// in view (n1658 not 2): into the shadow texture (fn_800B28D4) and onto the ground (fn_800B2FB0).
-// gomainloop calls it in single view only.
+// 'SKLO' object, such as the flag) that is not hidden (uCharFlags bits 0x01 and 0x40) and whose
+// shadow is in view (nShadowClipResult not 2): into the shadow texture (fn_800B28D4) and onto the
+// ground (fn_800B2FB0). gomainloop calls it in single view only.
 void SkeletalObject_RenderShadowsAll(void) {
     int i;
 
     for (i = 0; i < gNumCharacters; i++) {
-        if (gCharacters[i]->nPlayer == 1000 && gCharacters[i]->n1658 != 2 &&
-            !(gCharacters[i]->u10 & 0x41)) {
+        if (gCharacters[i]->nPlayer == 1000 && gCharacters[i]->nShadowClipResult != 2 &&
+            !(gCharacters[i]->uCharFlags & 0x41)) {
             fn_800B28D4(gCharacters[i], 1, 0);
             fn_800B2FB0(gCharacters[i], 1, 0);
         }
@@ -3026,18 +3032,19 @@ void Character_UpdateClothesIG(void) {
 }
 
 // Puts a golfer to sleep at the end of its turn (GM_EndOfGolferTurn): its animation blending reset
-// (Character_ResetBlenders), the shot set-up requests (u10 bits 4, 8 and 0x200) dropped, and bit
-// 0x40 set, so neither it nor its shadow is drawn until Character_PrepareForRendering wakes it.
+// (Character_ResetBlenders), the shot set-up requests (uCharFlags bits 4, 8 and 0x200) dropped, and
+// bit 0x40 set, so neither it nor its shadow is drawn until Character_PrepareForRendering wakes it.
 void Character_Sleep(Character* pChar) {
     Character_ResetBlenders(pChar);
-    pChar->u10 = pChar->u10 & ~0x20C;
-    pChar->u10 = pChar->u10 | 0x40;
+    pChar->uCharFlags = pChar->uCharFlags & ~0x20C;
+    pChar->uCharFlags = pChar->uCharFlags | 0x40;
 }
 
-// Resets the character's animation blending: each of its two blend trees (blend, node3E0) is given
-// back and rebuilt as one empty node mixing its children with SKABlender_BlendLinear at weight 0.5 (pose
-// format 0 for the first, 1 for the second), both animation players are set back to animation 0 at
-// time 0, and the animation state (n2C, n30, nAnim, n20, n18, u28) is cleared.
+// Resets the character's animation blending: each of its two blend trees (blend, morphBlend) is
+// given back and rebuilt as one empty node mixing its children with SKABlender_BlendLinear at
+// weight 0.5 (pose format 0 for the first, 1 for the second), both animation players are set back
+// to animation 0 at time 0, and the animation state (nMorphTargetState, nMorphCurState,
+// nTargetState, nCurState, uSKAFlags, uMorphFlags) is cleared.
 void Character_ResetBlenders(Character* pChar) {
     SKABlendNode* pNode;
 
@@ -3045,27 +3052,28 @@ void Character_ResetBlenders(Character* pChar) {
     SKABlendData_Shutdown(&pNode, 0);
     SKABlendData_Init(&pNode, 1, 0, SKABlender_BlendLinear, 0);
     SKABlender_SetBlender(pNode, SKABlender_BlendLinear, 0.5f);
-    pNode = &pChar->node3E0;
+    pNode = &pChar->morphBlend;
     SKABlendData_Shutdown(&pNode, 0);
     SKABlendData_Init(&pNode, 1, 1, SKABlender_BlendLinear, 1);
     SKABlender_SetBlender(pNode, SKABlender_BlendLinear, 0.5f);
-    CharacterState_SetTransition(&pChar->anim29C, 0, 0.0f);
-    pChar->n2C = 0;
-    pChar->n30 = 0;
+    CharacterState_SetTransition(&pChar->morphAnim, 0, 0.0f);
+    pChar->nMorphTargetState = 0;
+    pChar->nMorphCurState = 0;
     CharacterState_SetTransition((AnimPlayer*)pChar->anim, 0, 0.0f);
-    pChar->nAnim = 0;
-    pChar->n20 = 0;
-    pChar->n18 = 0;
-    pChar->u28 = 0;
+    pChar->nTargetState = 0;
+    pChar->nCurState = 0;
+    pChar->uSKAFlags = 0;
+    pChar->uMorphFlags = 0;
 }
 
-// Wakes the player's golfer for its turn (stateFunc's PreShot, InitialFlyBy and PlaceBall): u10 bit
-// 0x40 cleared so it is drawn again (Character_Sleep set it), its body skin made the loaded one in
-// single view (fn_800955F0) and its textures streamed (CharacterTex_StartStreamingPlayers). In
-// single view, when it is not the golfer last prepared (gCharTexStreamedPlayer), it is also flagged to be
-// dressed again (Character_RequestClothesUpdateIG).
+// Wakes the player's golfer for its turn (stateFunc's PreShot, InitialFlyBy and PlaceBall):
+// uCharFlags bit 0x40 cleared so it is drawn again (Character_Sleep set it), its body skin made the
+// loaded one in single view (fn_800955F0) and its textures streamed
+// (CharacterTex_StartStreamingPlayers). In single view, when it is not the golfer last prepared
+// (gCharTexStreamedPlayer), it is also flagged to be dressed again
+// (Character_RequestClothesUpdateIG).
 void Character_PrepareForRendering(int nPlayer) {
-    gPlayers[nPlayer].pChar->u10 &= ~0x40;
+    gPlayers[nPlayer].pChar->uCharFlags &= ~0x40;
     fn_800955F0(nPlayer);
     CharacterTex_StartStreamingPlayers(nPlayer);
     if (!gSession.nSplitScreen && gCharTexStreamedPlayer != nPlayer) {
@@ -3163,14 +3171,14 @@ u8 Character_IsHoldingBall(Character* pChar) {
 
 // Gives the character a created golfer's look from pChoices: its skins' choices
 // (SkinPart_ApplyBodyChoices), its 26 body sliders (a9B4) and its handedness (n113 non-zero:
-// left-handed, the model's bEE), the handedness except in the create-a-player mode (game type 3)
-// off its screens 1 and 4 (gpCrAPState->n0); then the skeleton is set up again from the model
-// (Character_SetSkeleton).
+// left-handed, the model's bLeftHanded), the handedness except in the create-a-player mode (game
+// type 3) off its screens 1 and 4 (gpCrAPState->n0); then the skeleton is set up again from the
+// model (Character_SetSkeleton).
 void Character_ApplyCrAPSettings(Character* pChar, SkinChoices* pChoices) {
     SkinPart_ApplyBodyChoices(pChar, pChoices);
     CharSlider_UpdateCharacterBasedOnSliderValues(pChar->pSliderDefs, pChar->pModel, pChar->pSkin, 26,
                                                   pChoices->a9B4,
-                &pChar->node3E0);
+                &pChar->morphBlend);
     if (gSession.nGameType != 3 || gpCrAPState->n0 == 1 || gpCrAPState->n0 == 4) {
         if (pChoices->n113 == 0) {
             Character_SetLeftHanded(pChar, 0);
@@ -3472,15 +3480,15 @@ f32 (*Character_GetBoneMatrix(Character* pChar, int nBone))[4] {
     return Character_GetBoneMatrix_FromIndex(pChar, CharModel_GetBoneIndex(pChar->pModel, nBone));
 }
 
-// How far along the camera's view the character is still drawn: f1660 (200, or 100 for a
+// How far along the camera's view the character is still drawn: fMaxVisibleDist (200, or 100 for a
 // non-golfer) over the lens's field-of-view scale, so farther when zoomed in, and half that when
 // bSplitScreen. Past it Character_ClipTest marks the body out of view, and
 // Character_UpdateAnimation stops animating a character that is not a golfer.
 f32 Character_ComputeMaxVisableDistance(Character* pChar, int bSplitScreen) {
     if (bSplitScreen != 0) {
-        return pChar->f1660 * (0.5f / Camera_GetLensFovScale(Camera_GetCurrentLens()));
+        return pChar->fMaxVisibleDist * (0.5f / Camera_GetLensFovScale(Camera_GetCurrentLens()));
     }
-    return pChar->f1660 * (1.0f / Camera_GetLensFovScale(Camera_GetCurrentLens()));
+    return pChar->fMaxVisibleDist * (1.0f / Camera_GetLensFovScale(Camera_GetCurrentLens()));
 }
 
 // A bone's position by bone id; for a left-handed golfer the bone of the other side
@@ -3492,17 +3500,17 @@ void Character_GetBonePosSwapIfLefty(Character* pChar, int nBone, f32* pPos) {
 // True for a left-handed golfer: its model is mirrored, and bone ids looked up through
 // CharModel_GetBoneIndexMapped go through its second bone table.
 u8 Character_IsLeftHanded(Character* pChar) {
-    return pChar->pModel->bEE;
+    return pChar->pModel->bLeftHanded;
 }
 
-// How far along the camera's view the character's shadow is still drawn: f165C (100, or 50 for a
-// non-golfer) over the lens's field-of-view scale, and half that when bSplitScreen. Past it
+// How far along the camera's view the character's shadow is still drawn: fMaxShadowDist (100, or 50
+// for a non-golfer) over the lens's field-of-view scale, and half that when bSplitScreen. Past it
 // Character_ClipTest marks the shadow out of view.
 f32 Character_ComputeMaxVisableShadowDistance(Character* pChar, int bSplitScreen) {
     if (bSplitScreen != 0) {
-        return pChar->f165C * (0.5f / Camera_GetLensFovScale(Camera_GetCurrentLens()));
+        return pChar->fMaxShadowDist * (0.5f / Camera_GetLensFovScale(Camera_GetCurrentLens()));
     }
-    return pChar->f165C * (1.0f / Camera_GetLensFovScale(Camera_GetCurrentLens()));
+    return pChar->fMaxShadowDist * (1.0f / Camera_GetLensFovScale(Camera_GetCurrentLens()));
 }
 
 f32 (*Character_GetRootMatrix(Character* pChar))[4] {
@@ -3511,18 +3519,18 @@ f32 (*Character_GetRootMatrix(Character* pChar))[4] {
 
 // Character_ClipTest's answer for the character's shadow (a 3-unit sphere): 2 = out of view.
 int Character_GetShadowClipResult(Character* pChar) {
-    return pChar->n1658;
+    return pChar->nShadowClipResult;
 }
 
 // Character_ClipTest's answer for the character's body (its bounding sphere): 2 = out of view.
 int Character_GetClipResult(Character* pChar) {
-    return pChar->n1654;
+    return pChar->nClipResult;
 }
 
 // Makes the golfer left-handed (bLeftHanded 1) or right-handed; the callers set the skeleton again
 // after it (Character_SetSkeleton).
 void Character_SetLeftHanded(Character* pChar, u8 bLeftHanded) {
-    pChar->pModel->bEE = bLeftHanded;
+    pChar->pModel->bLeftHanded = bLeftHanded;
 }
 
 // The dot product of two 4-vectors.
@@ -3536,10 +3544,10 @@ int CharModel_GetBoneIndex(CharModel* pModel, int nBone) {
     return pModel->aBone[nBone];
 }
 
-// A bone id's index in the model's skeleton; while the model is left-handed (bEE) it goes through
-// aBone2 to the bone of the other side, so right-hand bone ids find the left hand's bones.
+// A bone id's index in the model's skeleton; while the model is left-handed (bLeftHanded) it goes
+// through aBone2 to the bone of the other side, so right-hand bone ids find the left hand's bones.
 int CharModel_GetBoneIndexMapped(CharModel* pModel, int nBone) {
-    if (pModel->bEE) {
+    if (pModel->bLeftHanded) {
         return pModel->aBone2[pModel->aBone[nBone]];
     }
     return pModel->aBone[nBone];
@@ -3719,10 +3727,10 @@ f32 SKA_GetTagTime(Clip* pBlend, u64 uEvent) {
     return 0.0f;
 }
 
-// Sets an animation player's time scale (AnimPlayer.f14): 1 plays at normal speed, the swing's hold
-// at the top uses 0.008.
+// Sets an animation player's time scale (AnimPlayer.fTimeScale): 1 plays at normal speed, the
+// swing's hold at the top uses 0.008.
 void SKATime_SetTimeScale(u8* pAnim, f32 fRate) {
-    ((AnimPlayer*)pAnim)->f14 = fRate;
+    ((AnimPlayer*)pAnim)->fTimeScale = fRate;
 }
 
 // Byte-swaps nCount records laid out as pFormat's nFields fields from *ppSrc to *ppDst; both

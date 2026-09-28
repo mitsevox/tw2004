@@ -79,7 +79,7 @@ void AnimBlender_CloseModule(void) {
 
 // Sets up *ppNode as an empty node of nType (0 a channel that plays one clip, 1 a blender that
 // mixes two children with pfnBlend, else a plain node): taken from nType's pool when *ppNode is
-// NULL (bPooled then 1), no times, half weight, bC (free it as soon as it has ended) from
+// NULL (bPooled then 1), no times, half weight, bFreeASAP (free it as soon as it has ended) from
 // bFreeASAP, and a fresh pose buffer of nFormat from its pool (no bones set; format 1's morph
 // blocks all marked, their weights 0). Gives up quietly when a pool is empty.
 void SKABlendData_Init(SKABlendNode** ppNode, int nType, int nFormat, SKABlendFn pfnBlend,
@@ -108,7 +108,7 @@ void SKABlendData_Init(SKABlendNode** ppNode, int nType, int nFormat, SKABlendFn
     }
     (*ppNode)->nType = nType;
     (*ppNode)->nFormat = nFormat;
-    (*ppNode)->bC = bFreeASAP;
+    (*ppNode)->bFreeASAP = bFreeASAP;
     (*ppNode)->fStart = (*ppNode)->fEnd = 0.0f;
     (*ppNode)->fWeight = 0.5f;
     if ((*ppNode)->nFormat == 0) {
@@ -245,8 +245,8 @@ void SKABlender_AddBlenderData(Character* pChar, SKABlendNode* pNew, SKABlendNod
         }
         if (bFree) {
             (*ppNode)->u.blend.apChild[i] = pNew;
-            if (pNew->bC == 0) {
-                (*ppNode)->bC = 0;
+            if (pNew->bFreeASAP == 0) {
+                (*ppNode)->bFreeASAP = 0;
             }
         } else {
             SKABlendData_Init(&pNewBlend, 1, (*ppNode)->nFormat, pfnBlend, bFreeASAP);
@@ -265,7 +265,7 @@ void SKABlender_AddBlenderData(Character* pChar, SKABlendNode* pNew, SKABlendNod
             aInfo[4] = pNewBlend->fEnd;
             aInfo[5] = 0.0f;
             SKABlender_AddBlenderData(NULL, pNewBlend, ppNode, aInfo, pfnBlend, bFreeASAP);
-            SKABlender_AddBlenderData(NULL, pNew, ppNode, pInfo, pfnBlend, pNew->bC);
+            SKABlender_AddBlenderData(NULL, pNew, ppNode, pInfo, pfnBlend, pNew->bFreeASAP);
         }
     } else {
         // EA bug: *ppNode is NULL here, so this reads nFormat through NULL, sets up a node over
@@ -344,10 +344,10 @@ void SKABlender_SetBlender(SKABlendNode* pNode, SKABlendFn pfnBlend, f32 fWeight
 }
 
 // Poses the tree at pNode at fTime (its player's time): takes its times from its children; gives
-// back a child marked to be freed once it has ended (bC) when it has, while the other plays; poses
-// each channel at its clip time (fTime's place between fStart and fEnd carried over to fFrom..fTo,
-// clamped, kept in f2C; a format 0 channel past its clip's end keeps its last pose) and each
-// blender the same way; then mixes the children with pfnBlend. In a gap between two format 0
+// back a child marked to be freed once it has ended (bFreeASAP) when it has, while the other plays;
+// poses each channel at its clip time (fTime's place between fStart and fEnd carried over to
+// fFrom..fTo, clamped, kept in f2C; a format 0 channel past its clip's end keeps its last pose) and
+// each blender the same way; then mixes the children with pfnBlend. In a gap between two format 0
 // channels, when only the earlier one's clip holds the club in the hand (clip flag 0x10,
 // Character_UpdateClubAttachment), its grip bone takes the grip held from the root (qGripFromRoot,
 // vGripFromRoot), so the club does not jump.
@@ -395,7 +395,7 @@ void SKABlender_Update(Character* pChar, SKABlendNode* pNode, CharModel* pModel,
     }
     for (i = 0; i < 2; i++) {
         pChild = pNode->u.blend.apChild[i];
-        if (pChild != NULL && pChild->bC && pChild->fStart < fTime && pChild->fEnd < fTime &&
+        if (pChild != NULL && pChild->bFreeASAP && pChild->fStart < fTime && pChild->fEnd < fTime &&
             nChannel > -1) {
             SKABlendData_Shutdown(&pNode->u.blend.apChild[i], 0);
         }
@@ -611,18 +611,18 @@ f32 SKABlender_GetTagTime(SKABlendNode* pNode, u64 uEvent) {
 }
 
 // Resets an animation player (EA's TSKATime): time, flags, play count and queued transition 0, time
-// scale (f14) 1, and its ten entries chained both ways from p44.
+// scale (fTimeScale) 1, and its ten entries chained both ways from p44.
 void SKATime_Init(AnimPlayer* pPlayer) {
     int i;
     AnimPlayerEntry* pPrev;
 
     pPlayer->fTime = 0.0f;
-    pPlayer->n08 = 0;
+    pPlayer->nPlays = 0;
     pPlayer->uFlags = 0;
     pPlayer->n00 = 0;
-    pPlayer->f14 = 1.0f;
-    pPlayer->nC = 0;
-    pPlayer->f10 = 0.0f;
+    pPlayer->fTimeScale = 1.0f;
+    pPlayer->nTransitionState = 0;
+    pPlayer->fTransitionTime = 0.0f;
     pPlayer->n3C = 0;
     pPlayer->n40 = 0;
     pPlayer->p44 = &pPlayer->a48[0];
@@ -635,10 +635,11 @@ void SKATime_Init(AnimPlayer* pPlayer) {
 }
 
 // Advances a player by its step for fT (SKATime_CalcStep) across the times of the tree under pNode,
-// unless uFlags bit 0 holds it (with bit 7, f30 counts down, then clears bits 0 and 7): forward,
-// or backward with bit 6. At an end n08 counts the plays down (at 0 the player stops there with
-// bit 2 set; going forward with bit 8 it rewinds to 0 and clears bits 0, 2 and 8 instead); with
-// bit 5 it turns round (bit 6 flips, bit 2 set), else it wraps to the other end and sets bit 12.
+// unless uFlags bit 0 holds it (with bit 7, fHoldTime counts down, then clears bits 0 and 7):
+// forward, or backward with bit 6. At an end nPlays counts the plays down (at 0 the player stops
+// there with bit 2 set; going forward with bit 8 it rewinds to 0 and clears bits 0, 2 and 8
+// instead); with bit 5 it turns round (bit 6 flips, bit 2 set), else it wraps to the other end and
+// sets bit 12.
 void SKATime_Update(AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT) {
     f32 fStep;
     f32 fEnd;
@@ -648,9 +649,9 @@ void SKATime_Update(AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT) {
     pPlayer->fStart = SKABlender_GetStartTime(pNode);
     pPlayer->fEnd = SKABlender_GetEndTime(pNode);
     if (pPlayer->uFlags & 0x80) {
-        pPlayer->f30 -= fT;
-        if (pPlayer->f30 <= 0.0f) {
-            pPlayer->f30 = 0.0f;
+        pPlayer->fHoldTime -= fT;
+        if (pPlayer->fHoldTime <= 0.0f) {
+            pPlayer->fHoldTime = 0.0f;
             pPlayer->uFlags &= ~0x81;
         }
     }
@@ -662,10 +663,10 @@ void SKATime_Update(AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT) {
     if (pPlayer->uFlags & 0x40) {
         pPlayer->fTime -= fStep;
         if (pPlayer->fTime < fStart) {
-            if (pPlayer->n08 != 0 && pPlayer->n08 > 0) {
-                pPlayer->n08--;
+            if (pPlayer->nPlays != 0 && pPlayer->nPlays > 0) {
+                pPlayer->nPlays--;
             }
-            if (pPlayer->n08 == 0) {
+            if (pPlayer->nPlays == 0) {
                 pPlayer->uFlags |= 4;
                 pPlayer->fTime = fStart;
                 return;
@@ -682,15 +683,15 @@ void SKATime_Update(AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT) {
     } else {
         pPlayer->fTime += fStep;
         if (pPlayer->fTime > fEnd) {
-            if (pPlayer->n08 != 0 && pPlayer->n08 > 0) {
-                pPlayer->n08--;
+            if (pPlayer->nPlays != 0 && pPlayer->nPlays > 0) {
+                pPlayer->nPlays--;
             }
-            if (pPlayer->n08 == 0) {
+            if (pPlayer->nPlays == 0) {
                 if (pPlayer->uFlags & 0x100) {
                     pPlayer->fTime = 0.0f;
                     pPlayer->uFlags &= ~0x105;
                     pPlayer->n00 = 0;
-                    pPlayer->n08 = 1;
+                    pPlayer->nPlays = 1;
                     return;
                 }
                 pPlayer->uFlags |= 4;
@@ -709,17 +710,18 @@ void SKATime_Update(AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT) {
     }
 }
 
-// The idle sway of a golfer standing still: pPlayer's time moves towards f38 minus a smooth wave
-// (three cosines of the f34 clock, advanced by fT) from 0 to 1, scaled by 0.05, or with the putter
-// by 0.3 (0.033 in clip group 9). SKATime_Update runs the player forward or backward (uFlags bit 6)
-// by the distance.
+// The idle sway of a golfer standing still: pPlayer's time moves towards fIdleCentre minus a smooth
+// wave (three cosines of the fIdleClock clock, advanced by fT) from 0 to 1, scaled by 0.05, or with
+// the putter by 0.3 (0.033 in clip group 9). SKATime_Update runs the player forward or backward
+// (uFlags bit 6) by the distance.
 void SKATime_Idle(Character* pChar, int nPlayer, AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT) {
     f32 fSmoothRand;
     f32 fDelta;
 
-    pPlayer->f34 += fT;
-    fSmoothRand = 1.0f - (3.0f + (Math_Cos(pPlayer->f34 / 5.0f) +
-                                  (Math_Cos(5.0f * pPlayer->f34) + Math_Cos(7.0f * pPlayer->f34 / 3.0f)))) /
+    pPlayer->fIdleClock += fT;
+    fSmoothRand = 1.0f - (3.0f + (Math_Cos(pPlayer->fIdleClock / 5.0f) +
+                                  (Math_Cos(5.0f * pPlayer->fIdleClock)
+                                   + Math_Cos(7.0f * pPlayer->fIdleClock / 3.0f)))) /
                              6.0f;
     if (gPlayers[nPlayer].nClub == CLUB_PUTTER_e) {
         if (pChar->nGroup == 9) {
@@ -730,7 +732,7 @@ void SKATime_Idle(Character* pChar, int nPlayer, AnimPlayer* pPlayer, SKABlendNo
     } else {
         fSmoothRand *= 0.05f;
     }
-    fDelta = (pPlayer->f38 - fSmoothRand) - pPlayer->fTime;
+    fDelta = (pPlayer->fIdleCentre - fSmoothRand) - pPlayer->fTime;
     if (fDelta < 0.0f) {
         fDelta = -fDelta;
         pPlayer->uFlags |= 0x40;
@@ -771,8 +773,8 @@ f32 SKATime_MapTime(f32 fTime, f32 fNow, f32 fStart, f32 fEnd) {
 // Cuts the tree at pNode off at fTime (EA's ClampT1). While pPlayer's time is inside the tree (a
 // child plays at it), the tree's end, the player's and each child's come down to fTime when later
 // (a channel's clip end fTo in proportion), those children are marked to be freed once they have
-// ended (bC), and so is pNode. Otherwise the player's times go back to 0, the tree is given back
-// and pNode set up again as an empty blender of the same format and callback.
+// ended (bFreeASAP), and so is pNode. Otherwise the player's times go back to 0, the tree is given
+// back and pNode set up again as an empty blender of the same format and callback.
 void SKABlender_ClampT1(SKABlendNode* pNode, AnimPlayer* pPlayer, f32 fTime) {
     s32 nFormat;
     SKABlendFn pfnBlend;
@@ -805,7 +807,7 @@ void SKABlender_ClampT1(SKABlendNode* pNode, AnimPlayer* pPlayer, f32 fTime) {
                 }
                 pNode->u.blend.apChild[0]->fEnd = fTime;
             }
-            pNode->u.blend.apChild[0]->bC = 1;
+            pNode->u.blend.apChild[0]->bFreeASAP = 1;
         }
         pChild = pNode->u.blend.apChild[1];
         if (pChild != NULL) {
@@ -816,10 +818,10 @@ void SKABlender_ClampT1(SKABlendNode* pNode, AnimPlayer* pPlayer, f32 fTime) {
                 }
                 pNode->u.blend.apChild[1]->fEnd = fTime;
             }
-            pNode->u.blend.apChild[1]->bC = 1;
+            pNode->u.blend.apChild[1]->bFreeASAP = 1;
         }
     }
-    pNode->bC = 1;
+    pNode->bFreeASAP = 1;
 }
 
 // 1 unless the tree under pNode plays exactly one clip (so also 1 for an empty tree).
@@ -913,33 +915,34 @@ void SKABlender_ClearMorph(SKABlendNode* pNode, s32 nMorph) {
     }
 }
 
-// The player's time step for a frame of fT: fT times its time scale (f14). While it eases in
-// (uFlags bit 3) or out (bit 4), the step is also scaled by f28 / f24, f28 climbing by the step to
-// f24 (then bit 3 clears) or falling by it to f2C (at 0, bit 4 gives way to the hold bit 0).
+// The player's time step for a frame of fT: fT times its time scale (fTimeScale). While it eases in
+// (uFlags bit 3) or out (bit 4), the step is also scaled by fEase / fEaseTime, fEase climbing by
+// the step to fEaseTime (then bit 3 clears) or falling by it to fEaseFloor (at 0, bit 4 gives way
+// to the hold bit 0).
 f32 SKATime_CalcStep(AnimPlayer* pPlayer, f32 fT) {
-    f32 fStep = fT * pPlayer->f14;
+    f32 fStep = fT * pPlayer->fTimeScale;
 
     if (pPlayer->uFlags & 8) {
-        pPlayer->f28 += fStep;
-        if (pPlayer->f28 >= pPlayer->f24) {
+        pPlayer->fEase += fStep;
+        if (pPlayer->fEase >= pPlayer->fEaseTime) {
             pPlayer->uFlags &= ~8;
-            pPlayer->f28 = 0.0f;
+            pPlayer->fEase = 0.0f;
             return fStep;
         }
-        return fStep * (pPlayer->f28 / pPlayer->f24);
+        return fStep * (pPlayer->fEase / pPlayer->fEaseTime);
     }
     if (pPlayer->uFlags & 0x10) {
-        pPlayer->f28 -= fStep;
-        if (pPlayer->f28 < pPlayer->f2C) {
-            pPlayer->f28 = pPlayer->f2C;
+        pPlayer->fEase -= fStep;
+        if (pPlayer->fEase < pPlayer->fEaseFloor) {
+            pPlayer->fEase = pPlayer->fEaseFloor;
         }
-        if (pPlayer->f28 <= 0.0f) {
+        if (pPlayer->fEase <= 0.0f) {
             pPlayer->uFlags &= ~0x10;
             pPlayer->uFlags |= 1;
-            pPlayer->f28 = 0.0f;
+            pPlayer->fEase = 0.0f;
             return fStep;
         }
-        return fStep * (pPlayer->f28 / pPlayer->f24);
+        return fStep * (pPlayer->fEase / pPlayer->fEaseTime);
     }
     return fStep;
 }

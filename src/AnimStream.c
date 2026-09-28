@@ -914,7 +914,7 @@ int AnimStream_FindSlotPlayer(int nId) {
 u8 AnimStream_CanReplaceClip(int nPlayer, Clip* pClip) {
     if (lbl_80282278 != nPlayer) return 1;
     if (SKABlender_HasClip(&gPlayers[nPlayer].pChar->blend, pClip)) return 0;
-    if (SKABlender_HasMtaLib(&gPlayers[nPlayer].pChar->node3E0, pClip->pF4)) return 0;
+    if (SKABlender_HasMtaLib(&gPlayers[nPlayer].pChar->morphBlend, pClip->pF4)) return 0;
     if (gPlayers[nPlayer].pChar->p1790 == pClip || gPlayers[nPlayer].pChar->p1794 == pClip) return 0;
     return 1;
 }

@@ -88,7 +88,7 @@ void fn_8010799C(MsgArg* pArgs, MsgArg* pResult) {
     }
     CharSlider_UpdateCharacterBasedOnSliderValues(pChar->pSliderDefs, pChar->pModel, pChar->pSkin, 26,
                                                   pChoices->a9B4,
-                &pChar->node3E0);
+                &pChar->morphBlend);
     FE_CrAP_TurnOnPart(18, 0, n);
 }
 

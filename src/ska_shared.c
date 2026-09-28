@@ -76,8 +76,8 @@ u8  gSKALeftHanded;
 // 16-bit stream's) and, for a track with keys, its position. pPose's a0 gets a bit for each bone
 // rotated and a10 one for each bone moved; aBits, if not NULL, gets both. With the clip's data in
 // ARAM (clip flag 4) the tracks' ranges and keys are fetched first. A time at or past the
-// character's pending event n5CC is held there once (n5CC then -1); the clip's fCC is updated when
-// it has a BlendClip.
+// character's pending event nClampEvent is held there once (nClampEvent then -1); the clip's fCC is
+// updated when it has a BlendClip.
 void SKA_Update(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32 fTime) {
     // fake match: the declaration order (found by tools/match/declsearch.py) sets the registers
     u8* pKeys;
@@ -104,10 +104,10 @@ void SKA_Update(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32 
     f32 fFrac;
     int aFrame[2];
 
-    if (pChar != NULL && pClip->pEvents != NULL && pChar->n5CC >= 0) {
-        if (fTime >= pClip->pEvents[pChar->n5CC].fTime) {
-            fTime = pClip->pEvents[pChar->n5CC].fTime;
-            pChar->n5CC = -1;
+    if (pChar != NULL && pClip->pEvents != NULL && pChar->nClampEvent >= 0) {
+        if (fTime >= pClip->pEvents[pChar->nClampEvent].fTime) {
+            fTime = pClip->pEvents[pChar->nClampEvent].fTime;
+            pChar->nClampEvent = -1;
         }
     }
     if (pClip->pD8 != NULL) {
@@ -309,7 +309,7 @@ u8 SKAUtil_ExpandSingleFrameToDest(Clip* pClip, int nFrame, f32* pPose2, f32* pP
 
 // Samples pClip's BlendClip at fTime (held to its key range) into pOut's six values, blending the
 // two keys around it. Returns 1, or 0 when the clip has none. SW_vStateBackSwing samples the
-// backswing clip's at the top of the swing into Character.v1638.
+// backswing clip's at the top of the swing into Character.afSwingTop.
 int SKA_SampleBlendClip(Clip* pClip, f32* pOut, f32 fTime) {
     BlendClip* pBlend = pClip->pD8;
     f32 fPos;

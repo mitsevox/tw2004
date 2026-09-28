@@ -485,7 +485,7 @@ u8 SW_vStateBackSwing(int nPlayer) {
     pSw         = &p->swing;
     nController = p->nController;
     if (pObj->pModel->pSkel != NULL) {
-        pObj->pModel->pSkel->n10E4 = 4;
+        pObj->pModel->pSkel->nShoulderFrames = 4;
     }
     if (pObj->pBlend != NULL) {
         pObj->fBackswing = pObj->pBlend->fCC;
@@ -504,13 +504,13 @@ u8 SW_vStateBackSwing(int nPlayer) {
         if (fAnimTime >= pSw->fTimeSwingStart + fFrac * (pSw->fTimeSwingTop - pSw->fTimeSwingStart)) {
             SKATime_SetTimeScale(pObj->anim, 1.0f);
             fn_80095744(pObj, 7);
-            if (SKA_SampleBlendClip(pObj->pBlend, pObj->v1638,
+            if (SKA_SampleBlendClip(pObj->pBlend, pObj->afSwingTop,
                             pObj->pBlend->pD8->f08 + (pObj->fAnimTime - pSw->fTimeSwingStart))) {
-                pSw->fTimeBallHit = pObj->fAnimTime + (pObj->pBlend->pEvents[2].fTime - pObj->v1638[1])
-                                  + pObj->f1644;
+                pSw->fTimeBallHit = pObj->fAnimTime + (pObj->pBlend->pEvents[2].fTime - pObj->afSwingTop[1])
+                                  + pObj->afSwingTop[3];
             }
             CharacterState_UpdateSKAState(pObj);
-            pObj->n5CC = 2;
+            pObj->nClampEvent = 2;
             pSw->fTimeSwingTop = pObj->fAnimTime;
             Character_Set1634(pObj, 0.0f);
             Character_Set1630(pObj, 0.0f);
@@ -587,13 +587,13 @@ u8 SW_vStateBackSwing(int nPlayer) {
         SW_vSetSwingStrength(nPlayer);
         SKATime_SetTimeScale(pObj->anim, 1.0f);
         fn_80095744(pObj, 7);
-        if (SKA_SampleBlendClip(pObj->pBlend, pObj->v1638,
+        if (SKA_SampleBlendClip(pObj->pBlend, pObj->afSwingTop,
                         pObj->pBlend->pD8->f08 + (pObj->fAnimTime - pSw->fTimeSwingStart))) {
-            pSw->fTimeBallHit = pObj->fAnimTime + (pObj->pBlend->pEvents[2].fTime - pObj->v1638[1])
-                              + pObj->f1644;
+            pSw->fTimeBallHit = pObj->fAnimTime + (pObj->pBlend->pEvents[2].fTime - pObj->afSwingTop[1])
+                              + pObj->afSwingTop[3];
         }
         CharacterState_UpdateSKAState(pObj);
-        pObj->n5CC = 2;
+        pObj->nClampEvent = 2;
         pSw->fTimeSwingTop = pObj->fAnimTime;
         Character_Set1634(pObj, 0.0f);
         Character_Set1630(pObj, 0.0f);
@@ -650,7 +650,7 @@ u8 SW_vStateBackSwingFigit(int nPlayer) {
     pSw         = &p->swing;
     nController = p->nController;
     if (pObj->pModel->pSkel != NULL) {
-        pObj->pModel->pSkel->n10E4 = 4;
+        pObj->pModel->pSkel->nShoulderFrames = 4;
     }
     pPad   = SW_vGetStickInfo(nPlayer, nController);
     nX     = SW_vGetStickX(nPlayer, pPad);
@@ -690,8 +690,8 @@ u8 SW_vStateBackSwingFigit(int nPlayer) {
 // the replay mode), each frame the stick is forward (y at most 96) and more than about 17 units
 // (squared distance over 300) from the centre sample, that reading becomes the follow-through and
 // mis-hit sample, so what counts is the last such reading before impact. When the animation reports
-// impact (n5CC < 0): IK relaxed, state 5, SW_vImpact, spin allowed for a human outside a replay,
-// the mis-hit rumble on a pad outside a replay, and event 0x2B on a putt.
+// impact (nClampEvent < 0): IK relaxed, state 5, SW_vImpact, spin allowed for a human outside a
+// replay, the mis-hit rumble on a pad outside a replay, and event 0x2B on a putt.
 u8 SW_vStateDownSwing(int nPlayer) {
     Player*    p;
     int        nController;
@@ -705,7 +705,7 @@ u8 SW_vStateDownSwing(int nPlayer) {
     pObj        = p->pChar;
     nController = p->nController;
     if (pObj->pModel->pSkel != NULL) {
-        pObj->pModel->pSkel->n10E4 = 4;
+        pObj->pModel->pSkel->nShoulderFrames = 4;
     }
     if (!Controller_IsCPU(nController) && Game_GetMode() != 10) {
         int nDX, nDY;
@@ -723,7 +723,7 @@ u8 SW_vStateDownSwing(int nPlayer) {
             pSw->nMishitY = nY;
         }
     }
-    if (pObj->n5CC < 0) {
+    if (pObj->nClampEvent < 0) {
         SKEL_RelaxIK(pObj->pModel->pSkel);
         gPlayers[nPlayer].swing.nState = 5;
         SW_vImpact(nPlayer);
@@ -925,11 +925,12 @@ void SW_vUIUpdateIK(int nPlayer) {
             }
         }
     }
-    if ((pObj->nAnim != 6 && pObj->nAnim != 7) || gPlayers[nPlayer].nShotKind == 0 || pObj->n1698 != 0 ||
+    if ((pObj->nTargetState != 6 && pObj->nTargetState != 7) || gPlayers[nPlayer].nShotKind == 0
+        || pObj->bPosed != 0 ||
         Character_GetClipResult(pObj) == 2) {
         return;
     }
-    if (pObj->nAnim == 6 || pObj->nAnim == 7) {
+    if (pObj->nTargetState == 6 || pObj->nTargetState == 7) {
         pSw = &gPlayers[nPlayer].swing;
         if (Game_GetMode() == 11 && Player_IsCPU(nPlayer)) {
             if (GM_GetCurrentLesson() == 8) {
@@ -943,7 +944,7 @@ void SW_vUIUpdateIK(int nPlayer) {
             SW_vGetStickY(nPlayer, pPad);
         }
         LLMath_CopyVec(pObj->pModel->pMatrices[nBone][3], vPos);
-        if (pObj->nAnim == 6) {
+        if (pObj->nTargetState == 6) {
             if (nStickX < pSw->nCalibrateX) {
                 pSw->fRedColor = 0.0f;
                 pSw->fGreenColor = 0.0f;
@@ -957,7 +958,7 @@ void SW_vUIUpdateIK(int nPlayer) {
                               (f32)(0xFF - pSw->nCalibrateX);
             }
             SW_vUIAdjustClub(pObj, pSw, nStickX);
-        } else if (pObj->nAnim == 7) {
+        } else if (pObj->nTargetState == 7) {
             pSw->fBlueColor = gpSwing->fF4;
             pSw->fGreenColor = gpSwing->fF0;
             pSw->fRedColor = gpSwing->fEC;
@@ -1028,7 +1029,7 @@ void SW_vUIRender3D(int nPlayer) {
         }
     }
     {
-        if ((pObj->nAnim == 6 || pObj->nAnim == 7) && Character_GetClipResult(pObj) != 2 &&
+        if ((pObj->nTargetState == 6 || pObj->nTargetState == 7) && Character_GetClipResult(pObj) != 2 &&
             pSw->nNumInBlurQueue >= 2 && gSession.options.a24[7] != 0) {
             LLMath_CopyVec(pObj->pModel->pMatrices[nGrip][3], vGrip);
             nBlue = 255.0f * pSw->fBlueColor;
@@ -1065,9 +1066,9 @@ void SW_vUIRender3D(int nPlayer) {
             RenderState_SetBlendFactors(4, 5);
             DS_vSetAlphaTestMode(0, 6, 0x80);
             DS_vEnableZBufferUpdate(0);
-            if (pObj->nAnim == 6) {
+            if (pObj->nTargetState == 6) {
                 RenderState_SetBankTexture(gpSwing->pBank, gpSwing->pClubBack);
-            } else if (pObj->nAnim == 7) {
+            } else if (pObj->nTargetState == 7) {
                 RenderState_SetBankTexture(gpSwing->pBank, gpSwing->pClubDown);
             }
             RenderState_Flush();
@@ -1108,10 +1109,10 @@ void SW_vUIAdjustClub(Character* pObj, SwingData* pSw, int nStickX) {
     CharModel_GetBoneIndexMapped(pObj->pModel, 0x24);
     CharModel_GetBoneIndexMapped(pObj->pModel, 0x11);
     CharModel_GetBoneIndex(pObj->pModel, 0x52);
-    if (pObj->nAnim == 6) {
+    if (pObj->nTargetState == 6) {
         fAmount = (pObj->fAnimTime - pSw->fTimeSwingStart) / (pSw->fTimeSwingTop - pSw->fTimeSwingStart);
         fAmount *= fAmount;
-    } else if (pObj->nAnim == 7) {
+    } else if (pObj->nTargetState == 7) {
         fAmount = (pObj->fAnimTime - pSw->fTimeSwingTop) / (pSw->fTimeBallHit - pSw->fTimeSwingTop);
         fAmount *= fAmount;
         fAmount = 1.0f - fAmount;

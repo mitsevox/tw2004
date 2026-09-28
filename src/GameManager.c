@@ -1085,7 +1085,7 @@ void GM_DoPostShotInHoleUI(int nPlayer) {
         if (gReplayData.bF10
             && (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x18, 0)) &&
             gpGame->b287 && (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_CONCEDED && !fn_800E53B8() &&
-            !(gPlayers[nPlayer].pChar->u10 & 0x40)) {
+            !(gPlayers[nPlayer].pChar->uCharFlags & 0x40)) {
             fn_80062D0C(nPlayer);
             REPLAY_Play(nPlayer);
             GOLFERSTATE_Switch(GS_REPLAY_SWING, nPlayer);

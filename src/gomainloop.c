@@ -893,7 +893,7 @@ void fn_8006D27C(void) {
             }
         }
         if (!fn_8006D1C0(nView) || nState == GS_GREEN_MORPH) {
-            gPlayers[ViewController_GetActivePlayerNumber(nView)].pChar->u10 |= 1;
+            gPlayers[ViewController_GetActivePlayerNumber(nView)].pChar->uCharFlags |= 1;
         }
         for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
             Character_ClipTest(gPlayers[nPlayer].pChar, nPlayer);
@@ -909,7 +909,8 @@ void fn_8006D27C(void) {
             for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
                 Character_ClipTest(gPlayers[nPlayer].pChar, nPlayer);
                 if (Character_GetShadowClipResult(gPlayers[nPlayer].pChar) != 2 && nPlayer != fn_80063758()
-                    && !(gPlayers[nPlayer].pChar->u10 & 0x40) && !(gPlayers[nPlayer].pChar->u10 & 1)) {
+                    && !(gPlayers[nPlayer].pChar->uCharFlags & 0x40)
+                    && !(gPlayers[nPlayer].pChar->uCharFlags & 1)) {
                     fn_800B28D4(gPlayers[nPlayer].pChar, 0, 0);
                 }
             }
@@ -923,7 +924,8 @@ void fn_8006D27C(void) {
             for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
                 Character_ClipTest(gPlayers[nPlayer].pChar, nPlayer);
                 if (Character_GetShadowClipResult(gPlayers[nPlayer].pChar) != 2 && nPlayer != fn_80063758()
-                    && !(gPlayers[nPlayer].pChar->u10 & 0x40) && !(gPlayers[nPlayer].pChar->u10 & 1)) {
+                    && !(gPlayers[nPlayer].pChar->uCharFlags & 0x40)
+                    && !(gPlayers[nPlayer].pChar->uCharFlags & 1)) {
                     fn_800B2FB0(gPlayers[nPlayer].pChar, 0, 0);
                 }
             }
@@ -939,7 +941,7 @@ void fn_8006D27C(void) {
             SW_vUIRender3D(ViewController_GetActivePlayerNumber(nView));
         }
         if (!fn_8006D1C0(nView) || nState == GS_GREEN_MORPH) {
-            gPlayers[ViewController_GetActivePlayerNumber(nView)].pChar->u10 &= ~1;
+            gPlayers[ViewController_GetActivePlayerNumber(nView)].pChar->uCharFlags &= ~1;
         }
         if (!gSession.nSplitScreen && !gSession.b11 && nView < 2) {
             fn_8011E974();
