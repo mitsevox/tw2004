@@ -11,7 +11,7 @@
 f32  SKA_GetTagTime(Clip* pBlend, u64 uEvent);   // an event's time (by its 64-bit id)
 void fn_8001F558(void* pItem);          // mtalib.c
 void fn_800977CC(void* p);
-void fn_800293CC(int nBone, int nCount, SkelPose* pA, SkelPose* pB, SkelPose* pOut, f32 fT);   // Skeleton.c
+void SKEL_BlendPoses(int nBone, int nCount, SkelPose* pA, SkelPose* pB, SkelPose* pOut, f32 fT);   // Skeleton.c
 
 int  fn_800723E8(SKABlendNode* pNode, SKABlendNode*** pppOldest);
 int  fn_8007286C(SKABlendNode* pNode, f32 fTime);
@@ -544,7 +544,7 @@ void fn_80072ACC(SKABlendNode* pNode, CharModel* pModel, f32 fTime) {
         fWeight = 1.0f - fWeight;
         pNode->u.blend.apChild[1]->fWeight = fWeight;
         if (pNode->nFormat == 0) {
-            fn_800293CC(1, pModel->nBones - 1, pNode->u.blend.apChild[0]->pPose,
+            SKEL_BlendPoses(1, pModel->nBones - 1, pNode->u.blend.apChild[0]->pPose,
                         pNode->u.blend.apChild[1]->pPose, pNode->pPose, fWeight);
         } else if (pNode->nFormat == 1) {
             SKN_BlendMorphWeights((SkelPose1*)pNode->u.blend.apChild[0]->pPose,

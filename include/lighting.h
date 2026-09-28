@@ -99,7 +99,7 @@ typedef struct GoLighting {
     f32  afPointX[NUM_POINT_LIGHTS];    // 0x0CC  } the point lights' positions
     f32  afPointY[NUM_POINT_LIGHTS];    // 0x0DC  }
     f32  afPointZ[NUM_POINT_LIGHTS];    // 0x0EC  }
-    f32  vFC[4];                // 0x0FC  set by fn_80029BC8
+    f32  vFC[4];                // 0x0FC  set by vec4flt_Zero
     f32  aPointPos[NUM_POINT_LIGHTS][4];    // 0x10C
     s32  nPoints;               // 0x14C  point lights loaded
 } GoLighting;

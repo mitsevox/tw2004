@@ -388,7 +388,7 @@ void fn_8010E224(CharSliderDefs* pDefs, CharModel* pModel) {
                                          pBone->fFrom, pBone->fTo);
                     nBone = SKEL_GetBoneIDFromNameID(pModel, pBone->uId);
                     if (nBone >= 0) {
-                        fn_80028A70(pModel, nBone, pBone->uAxes, fScale);
+                        SKEL_ScaleBone(pModel, nBone, pBone->uAxes, fScale);
                     }
                 }
             }
@@ -441,7 +441,7 @@ void CharSlider_UpdateCharacterBasedOnSliderValues(CharSliderDefs* pDefs, CharMo
     if (pModel == NULL || pSkin == NULL || aValues == NULL || pDefs == NULL) {
         return;
     }
-    fn_80028A3C(pModel);
+    SKEL_ResetBoneScales(pModel);
     CharSlider_ResetGameSettings(pDefs);
     CharSlider_SetInitialVirtualValues(pDefs, nSliders, aValues);
     CharSlider_NormalizePairs(pDefs);

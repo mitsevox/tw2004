@@ -10,7 +10,7 @@
 f32 gSkelIdentityQuat[4];
 struct Character* gSkelIKCharacter;
 
-void fn_80029BC8(f32* pVec);                           // sets a vector to lbl_80186838
+void vec4flt_Zero(f32* pVec);                           // sets a vector to lbl_80186838
 void SKEL_TransformIKChain(CharModel* pModel, IKChain* pChain);
 f32  SKEL_ItterateIKChain(CharModel* pModel, IKChain* pChain, f32* pTarget, int nLink, int n);   // an IK step's
                                                                                        // remaining error
@@ -37,12 +37,12 @@ void Quat_BuildFromVectorAndScale(f32* pAxis, f32* pOut, f32 fAngle);     // Qua
 void Quat_QuatToMatrix(f32* pQ, f32 (*pMtx)[4]);               // Quaternion.c: a rotation's matrix
 void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);        // copies a matrix
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);                        // identity
-void fn_80029A00(CharModel* pModel, int nA, int nB, f32* pRot);
-void fn_80029BF4(f32* pA, f32* pB, f32* pOut);
-void fn_80029C3C(f32* pA, f32* pB, f32* pOut);
-void fn_80029C18(f32* pA, f32* pB, f32* pOut);
-void fn_80029C60(u32* aSrc, u32* aDst, u32 nBits, u32 nShift);
-void fn_80029EF4(u32* pSrc, u32* pDst, u32 nBits);
+void SKEL_SetHalfJoint(CharModel* pModel, int nA, int nB, f32* pRot);
+void SKEL_Vec3Add(f32* pA, f32* pB, f32* pOut);
+void SKEL_VecSub(f32* pA, f32* pB, f32* pOut);
+void SKEL_Vec3Sub(f32* pA, f32* pB, f32* pOut);
+void BitArray_ShiftUp(u32* aSrc, u32* aDst, u32 nBits, u32 nShift);
+void BitArray_CopyArray(u32* pSrc, u32* pDst, u32 nBits);
 void SKEL_GenerateBoneLookupTable(CharModel* pModel);
 void SKEL_GenerateLeftHandedTable(CharModel* pModel);
 void SKEL_TransformBones(CharModel* pModel, u32* aBits);
@@ -137,9 +137,9 @@ f32 SKEL_ItterateIKChain(CharModel* pModel, IKChain* pChain, f32* pTarget, int n
         pLink = &pChain->pLinks[i];
         if (pLink->f4 > 0.0f) {
             nBone = pLink->nBone;
-            fn_80029C18(vEnd, pModel->pPoses[nBone].v10, vToEnd);
-            fn_80029C18(pTarget, pModel->pPoses[nBone].v10, vToTarget);
-            fLen = fn_80029B64(Vec3_LengthSqClamped(vToEnd) * Vec3_LengthSqClamped(vToTarget));
+            SKEL_Vec3Sub(vEnd, pModel->pPoses[nBone].v10, vToEnd);
+            SKEL_Vec3Sub(pTarget, pModel->pPoses[nBone].v10, vToTarget);
+            fLen = Math_Sqrtf(Vec3_LengthSqClamped(vToEnd) * Vec3_LengthSqClamped(vToTarget));
             fCos = Vec3_Dot(vToEnd, vToTarget) / fLen;
             if (fCos > 1.0f || fCos < -1.0f) {
                 fAngle = 0.0f;
@@ -158,22 +158,22 @@ f32 SKEL_ItterateIKChain(CharModel* pModel, IKChain* pChain, f32* pTarget, int n
                 }
                 LLMath_Normalize3(vLocal, vLocal);
                 Vec3_Scale(fAngle, vLocal, vLocal);
-                fn_80029BF4(vLocal, pLink->v58, pLink->v58);
+                SKEL_Vec3Add(vLocal, pLink->v58, pLink->v58);
                 Quat_BuildFromVectorAndScale(vLocal, qTurn, fAngle);
                 Quat_RotateVector(pModel->pPoses[nBone].q0, qTurn, qRot);
                 Quat_RotateVector(qRot, vToEnd, vTurned);
-                fn_80029BF4(pModel->pPoses[nBone].v10, vTurned, vEnd);
+                SKEL_Vec3Add(pModel->pPoses[nBone].v10, vTurned, vEnd);
             }
         }
     }
     SKEL_SetIKChainRotations(pSkel, pChain);
     Vec3Copy(vEnd, pChain->v8);
-    fn_80029C18(vEnd, pTarget, vDiff);
+    SKEL_Vec3Sub(vEnd, pTarget, vDiff);
     return (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
 }
 
 // fake match: EA's file had a function here that the linker stripped; it used the 0.5 and 3.0 of
-// fn_80029B64's square root first, which puts them here in .sdata2.
+// Math_Sqrtf's square root first, which puts them here in .sdata2.
 static f64 Skeleton_StrippedFn(f64 x) {
     return 0.5 * x * (3.0 - x);
 }
@@ -213,8 +213,8 @@ void SKEL_ResetIKSkeleton(Skeleton* pSkel) {
 
     pSkel->f1074 = 0.0f;
     BitArray_ClearArray(pSkel->a10, 0x80);
-    fn_80029BC8(pSkel->v10A4);
-    fn_80029BC8(pSkel->v10B4);
+    vec4flt_Zero(pSkel->v10A4);
+    vec4flt_Zero(pSkel->v10B4);
     pSkel->f10C4 = 1.0f;
     for (i = 0; i < pSkel->nChains; i++) {
         SKEL_ResetIKChain(pSkel, &pSkel->pChains[i], 1);
@@ -246,7 +246,7 @@ void SKEL_InitIKChain(CharModel* pModel, IKChain* pChain) {
         nPrevBone = pChain->pLinks[nPrev].nBone;
         pBone = &pModel->pBones[nBone];
         pLink->b0 = 0;
-        fn_80029BC8(pLink->v58);
+        vec4flt_Zero(pLink->v58);
         if (pLink->f4 > 0.0f) {
             BitArray_SetBit(pSkel->a10, pLink->nBone);
         }
@@ -263,7 +263,7 @@ void SKEL_InitIKChain(CharModel* pModel, IKChain* pChain) {
         if (pPrevLink != NULL && pPrevLink->nBone != pBone->nParent) {
             Quat_Invert(pModel->pPoses[nPrevBone].q0, qInv);
             Quat_Multiply(pModel->pPoses[nBone].q0, qInv, pLink->q18);
-            fn_80029C3C(pModel->pPoses[nBone].v10, pModel->pPoses[nPrevBone].v10, vDelta);
+            SKEL_VecSub(pModel->pPoses[nBone].v10, pModel->pPoses[nPrevBone].v10, vDelta);
             vDelta[3] = 0.0f;
             Quat_RotateVector(qInv, vDelta, pLink->v28);
             pLink->v28[3] = 0.0f;
@@ -369,7 +369,7 @@ f32 SKEL_AdjustHipHeight(CharModel* pModel, IKChain* pChain, f32* pTarget) {
         pChain->v8[1] += fDy;
     }
     pChain->pLinks[0].v28[1] = pSkel->f10C8 + pSkel->v10A4[1];
-    fn_80029C18(pTarget, pChain->v8, vDiff);
+    SKEL_Vec3Sub(pTarget, pChain->v8, vDiff);
     Vec4_CopyPoint(pChain->v8, pModel->pPoses[pChain->pLinks[pChain->nLinks - 1].nBone].v10);
     return (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
 }
@@ -657,8 +657,8 @@ f32 SKEL_InitIKSkeleton(Character* pChar, f32* pTarget, int bNormals) {
     fDrop = SKEL_AdjustHipPosition(pModel, pChain, pTarget, bNormals);
     pSkel->f109C = 0.025f;
     pSkel->f10A0 = 0.15f;
-    fn_80029BC8(pSkel->v10A4);
-    fn_80029BC8(pSkel->v10B4);
+    vec4flt_Zero(pSkel->v10A4);
+    vec4flt_Zero(pSkel->v10B4);
     pSkel->f10C4 = 1.0f;
     pSkel->f10C8 = pChain->pLinks[0].v28[1];
     pSkel->f10CC = 0.025f;
@@ -719,8 +719,8 @@ Skeleton* SKEL_CreateIKSkeleton(CharModel* pModel, CharModelDefs* pDefs) {
     pSkel->n0 = 0;
     pSkel->f109C = 0.1f;
     pSkel->f10A0 = 0.2f;
-    fn_80029BC8(pSkel->v10A4);
-    fn_80029BC8(pSkel->v10B4);
+    vec4flt_Zero(pSkel->v10A4);
+    vec4flt_Zero(pSkel->v10B4);
     pSkel->f10C4 = 1.0f;
     pSkel->f10C8 = 0.0f;
     pSkel->f10CC = 1.0f;
@@ -823,8 +823,9 @@ CharModel* SKEL_LoadFromMem(u8* pData, s8 nExtra, CharModelDefs* pDefs, int b) {
     return pModel;
 }
 
-// Resets every bone's factors to 1.
-void fn_80028A3C(CharModel* pModel) {
+// Resets every bone's scale (a140) to 1 on all three axes, before the character sliders set them
+// again.
+void SKEL_ResetBoneScales(CharModel* pModel) {
     int i;
     for (i = 0; i < pModel->nBones; i++) {
         pModel->a140[i][0] = 1.0f;
@@ -833,8 +834,10 @@ void fn_80028A3C(CharModel* pModel) {
     }
 }
 
-// Multiplies a bone's factors by f: uAxes 1 the first, 4 the second, 2 the third.
-void fn_80028A70(CharModel* pModel, int nBone, u32 uAxes, f32 f) {
+// Multiplies bone nBone's scale (a140) by fScale on the axes in uAxes: bit 1 x, bit 4 y, bit 2 z.
+// The character sliders shape the body with it; SKEL_TransformBones applies it. A bone out of
+// range: nothing.
+void SKEL_ScaleBone(CharModel* pModel, int nBone, u32 uAxes, f32 f) {
     if (nBone < 0 || nBone >= pModel->nBones) return;
     if (uAxes & 1) {
         pModel->a140[nBone][0] *= f;
@@ -847,9 +850,16 @@ void fn_80028A70(CharModel* pModel, int nBone, u32 uAxes, f32 f) {
     }
 }
 
-// TW06: SKEL_TransformBones. Builds each bone's pose and matrix from its parent's, walking the bones
-// in order with aCur holding the current bone's bit: bones in aBits (or whose parent was just done)
-// are redone. At bones 0x22 and 0x35, bone 0x22 first takes q740 (then q750) halfway to 0x11's.
+// Rebuilds the pose and matrix of every bone in aBits and every bone below one (a rebuilt bone adds
+// its bit to aBits, so its children follow), walking the bones in order with aCur holding the
+// current bone's bit. A bone's pose comes from its parent's and its own local rotation and
+// position, each only where the model's a14 (rotation) and a24 (position) bits allow (both are set
+// again at the end); its IK rotation (p28) goes first while the IK has weight and the bone is in
+// the IK set, and bone 1 (the root) is moved by the IK's hip offset (v10B4). Its matrix takes the
+// bone's scale (a140; the club's x negated for a left-hander), and its skinning matrix is updated.
+// On the way the shoulders' half joints are set (SKEL_SetHalfJoint) and redone with their
+// shoulders: at rshlddef (0x22) from q740, and at lshlddef (0x35), where EA sets 0x22 again, from
+// q750.
 void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
     f32 mScale[4][4];
     f32 mOut[4][4];
@@ -872,7 +882,7 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
         if (0.0f == pModel->pSkel->fIKWeight) {
             BitArray_ClearArray(aSkel, 0x80);
         } else {
-            fn_80029EF4(pModel->pSkel->a10, aSkel, 0x80);
+            BitArray_CopyArray(pModel->pSkel->a10, aSkel, 0x80);
         }
         pSkelRot = pModel->pSkel->p28;
     } else {
@@ -893,14 +903,15 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
         Vec4_CopyPoint(pModel->pPoses[0].v10, pModel->pMatrices[0][3]);
         SKEL_UpdateSkinningMatrix(pModel, pModel->pMatrices[0], 0);
     }
-    fn_80029C60(aCur, aCur, 4, 1);
+    BitArray_ShiftUp(aCur, aCur, 4, 1);
 
     for (i = 1; i < pModel->nBones; i++) {
         pBone = &pModel->pBones[i];
         BitArray_ClearArray(aParent, 0x80);
         BitArray_SetBit(aParent, pBone->nParent);
         if (i == CharModel_GetBoneIndex(pModel, 0x22)) {
-            fn_80029A00(pModel, CharModel_GetBoneIndex(pModel, 0x22), CharModel_GetBoneIndex(pModel, 0x11),
+            SKEL_SetHalfJoint(pModel, CharModel_GetBoneIndex(pModel, 0x22),
+                              CharModel_GetBoneIndex(pModel, 0x11),
                         pModel->q740);
             if (BitArray_TestBit(aBits, CharModel_GetBoneIndex(pModel, 0x11))) {
                 BitArray_SetBit(aBits, CharModel_GetBoneIndex(pModel, 0x22));
@@ -914,7 +925,8 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
             }
         } else if (i == CharModel_GetBoneIndex(pModel, 0x35)) {
             // EA passes bone 0x22 here too
-            fn_80029A00(pModel, CharModel_GetBoneIndex(pModel, 0x22), CharModel_GetBoneIndex(pModel, 0x11),
+            SKEL_SetHalfJoint(pModel, CharModel_GetBoneIndex(pModel, 0x22),
+                              CharModel_GetBoneIndex(pModel, 0x11),
                         pModel->q750);
             if (BitArray_TestBit(aBits, CharModel_GetBoneIndex(pModel, 0x24))) {
                 BitArray_SetBit(aBits, CharModel_GetBoneIndex(pModel, 0x35));
@@ -938,7 +950,7 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
                     if (i == 1) {
                         pSkel = pModel->pSkel;
                         if (pSkel != NULL && 0.0f != pSkel->f10C4) {
-                            fn_80029BF4(pPose->v10, pSkel->v10B4, pPose->v10);
+                            SKEL_Vec3Add(pPose->v10, pSkel->v10B4, pPose->v10);
                         }
                     }
                 }
@@ -964,15 +976,18 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
             SKEL_UpdateSkinningMatrix(pModel, pModel->pMatrices[i], i);
             fn_80021980(aBits, aCur, aBits, 0x80);
         }
-        fn_80029C60(aCur, aCur, 0x80, 1);
+        BitArray_ShiftUp(aCur, aCur, 0x80, 1);
     }
     BitArray_FillArray(pModel->a14, 0x80);
     BitArray_FillArray(pModel->a24, 0x80);
 }
 
-// Copies a pose's bone rotations (bits a0) and positions (bits a10) into the model's bones; with
-// bTransform, then rebuilds those bones. With bEE set, each rotation goes to the bone's aBone2 pair,
-// bone 1 (and 0x52 at the root) turned half a turn, and bone 1, 0x54 and 0x52 get a flipped position.
+// Copies pPose's local rotations (bones in its a0 bits) and positions (a10 bits) into the model's
+// bones; with bTransform, then rebuilds those bones (SKEL_TransformBones). For a left-handed golfer
+// (bEE) the pose is mirrored: each rotation goes to the bone's left/right partner (aBone2, whose a0
+// bit is set), the root's (1) and a club hanging from the root (0x52) turned half a turn in pitch;
+// the root's, GBall1's (0x54) and the club's positions have z negated (the club's x instead when it
+// has a parent).
 void SKEL_UpdateState(CharModel* pModel, SkelPose* pPose, u8 bTransform) {
     u32 aRot[4];
     u32 aPos[4];
@@ -980,8 +995,8 @@ void SKEL_UpdateState(CharModel* pModel, SkelPose* pPose, u8 bTransform) {
     f32 qTurn[4];
     int i;
 
-    fn_80029EF4(pPose->a0, aRot, 0x80);
-    fn_80029EF4(pPose->a10, aPos, 0x80);
+    BitArray_CopyArray(pPose->a0, aRot, 0x80);
+    BitArray_CopyArray(pPose->a10, aPos, 0x80);
     for (i = 0; i < pModel->nBones; i++) {
         if (BitArray_TestBit(aRot, i)) {
             if (pModel->bEE) {
@@ -1030,9 +1045,11 @@ void SKEL_UpdateState(CharModel* pModel, SkelPose* pPose, u8 bTransform) {
     }
 }
 
-// Blends poses pA and pB by fT into pOut for nCount bones from nBone: rotations where both have
-// the a30 bit, positions where both have the a20 bit; pOut's a0 and a10 say which it got.
-void fn_800293CC(int nBone, int nCount, SkelPose* pA, SkelPose* pB, SkelPose* pOut, f32 fT) {
+// Blends poses pA and pB into pOut by fT (0: pA, 1: pB) for nCount bones from nBone: a rotation
+// where both carry the bone's rotation (their a30 bits), a position where both carry its position
+// (a20 bits); pOut's a0 and a10 bits say which bones got a rotation and a position. The animation
+// blender's two-child blend.
+void SKEL_BlendPoses(int nBone, int nCount, SkelPose* pA, SkelPose* pB, SkelPose* pOut, f32 fT) {
     u32 aCur[4];
     u32 aPos[4];
     u32 aRot[4];
@@ -1055,11 +1072,12 @@ void fn_800293CC(int nBone, int nCount, SkelPose* pA, SkelPose* pB, SkelPose* pO
             fn_8001FBA4(pA->aBones[i].v10, pB->aBones[i].v10, pOut->aBones[i].v10, fT);
             fn_80021980(pOut->a10, aCur, pOut->a10, 0x80);
         }
-        fn_80029C60(aCur, aCur, 0x80, 1);
+        BitArray_ShiftUp(aCur, aCur, 0x80, 1);
     }
 }
 
-// Sets up: the identity rotation, then the dynamic chains.
+// Sets the module up: gSkelIdentityQuat to the identity rotation, then the dynamic chains' settings
+// (DynChain.c).
 void SKEL_InitModule(void) {
     Quat_IdentifyForMul(gSkelIdentityQuat);
     fn_80113E60();
@@ -1070,7 +1088,7 @@ void SKEL_CloseModule(void) {
     fn_80114080();
 }
 
-// Frees a model: its bones, matrices, dynamic chains and skeleton.
+// Frees a model: its bones, matrices and poses, its dynamic chains, its IK skeleton and the model.
 void SKEL_Free(CharModel* pModel) {
     int i;
 
@@ -1102,8 +1120,10 @@ void SKEL_Free(CharModel* pModel) {
     StaticMem_Free(pModel);
 }
 
-// Fills in aBone: finds each model bone's id by its name (the first 8 bytes of its uId). Of the
-// bones with no known name (up to 30), the first named after a club becomes bone 0x52, the club.
+// Fills in aBone, each bone id's index in the model (0xFF: none; id 0 is bone 0): each model bone
+// from 1 is found by its name (the first 8 bytes of uId) in mtalib.c's bone names (lbl_80187278).
+// The club bone (0x52) can go by other names: of the first 30 bones with no known name, the first
+// named in gSkelClubBoneNames becomes it.
 void SKEL_GenerateBoneLookupTable(CharModel* pModel) {
     char szName[9];
     u8 aUnknown[30];
@@ -1144,8 +1164,9 @@ void SKEL_GenerateBoneLookupTable(CharModel* pModel) {
     }
 }
 
-// Fills in aBone2: each bone maps to itself, except the pairs in gSkelLeftHandedPairs, where the model's
-// first bone maps to its second.
+// Fills in aBone2, the bone a left-handed golfer's pose puts each bone's rotation on
+// (SKEL_UpdateState): itself, except each bone of gSkelLeftHandedPairs (the arms, hands and legs),
+// which maps to its partner when the model has both.
 void SKEL_GenerateLeftHandedTable(CharModel* pModel) {
     int i;
     int nA;
@@ -1164,7 +1185,7 @@ void SKEL_GenerateLeftHandedTable(CharModel* pModel) {
     }
 }
 
-// The index of the bone with this id, -1 for none.
+// The index of the model's bone whose 8-byte name is uId, -1 for none.
 int SKEL_GetBoneIDFromNameID(CharModel* pModel, u64 uId) {
     int i;
     for (i = 0; i < pModel->nBones; i++) {
@@ -1175,14 +1196,16 @@ int SKEL_GetBoneIDFromNameID(CharModel* pModel, u64 uId) {
     return -1;
 }
 
-// Steps one of the model's dynamic chains.
-void fn_80029948(CharModel* pModel, struct DynChain* pChain, f32 f) {
+// Steps one of the model's dynamic chains (hair, chest, trouser legs, sleeves) by fDelta
+// (DynChain.c).
+void SKEL_UpdateDynChain(CharModel* pModel, struct DynChain* pChain, f32 f) {
     fn_8011443C(pModel, pChain, f);
 }
 
-// Copies bone 0x22's rotation in pPose into q740 and q750, when the model has that bone. EA looks
-// the same bone up for both.
-void fn_80029968(CharModel* pModel, SkelPose* pPose) {
+// Keeps the rest rotation of the right shoulder's half joint (rshlddef, 0x22) in pPose as q740 and
+// q750, for SKEL_TransformBones, when the model has that bone. EA looks bone 0x22 up for both (the
+// left one, lshlddef, is 0x35; SKEL_TransformBones makes the same slip).
+void SKEL_InitHalfJoints(CharModel* pModel, SkelPose* pPose) {
     int nFirst = CharModel_GetBoneIndex(pModel, 0x22);
     int nSecond = CharModel_GetBoneIndex(pModel, 0x22);
 
@@ -1194,26 +1217,35 @@ void fn_80029968(CharModel* pModel, SkelPose* pPose) {
     }
 }
 
-// Gives bone nA the rotation pRot, then sets it halfway between that and bone nB's.
-void fn_80029A00(CharModel* pModel, int nA, int nB, f32* pRot) {
+// Sets half joint nBone's local rotation halfway between its rest rotation pRest and bone nJoint's
+// (the shoulder deformer between its rest and the shoulder's turn).
+void SKEL_SetHalfJoint(CharModel* pModel, int nA, int nB, f32* pRot) {
     Quat_Copy(pRot, pModel->pBones[nA].q0C);
     Quat_Slerp(pModel->pBones[nB].q0C, pModel->pBones[nA].q0C, 0.5f);
 }
 
-void fn_80029A74(CharModel* pModel, void* p) {
+// Hands the model its skin's bone poses (SkinModel.p34); SKEL_UpdateSkinningMatrix does nothing
+// without them.
+void SKEL_SetSkinBonePoses(CharModel* pModel, void* p) {
     pModel->p760 = p;
 }
 
-void fn_80029A7C(CharModel* pModel, f32 (*pMatrices)[4][4], s32 nMatrices) {
+// Hands the model the skin's nMatrices skinning matrices (Skin.p108C) that
+// SKEL_UpdateSkinningMatrix fills in; NULL and 0 take them back.
+void SKEL_SetSkinningMatrices(CharModel* pModel, f32 (*pMatrices)[4][4], s32 nMatrices) {
     pModel->p768 = pMatrices;
     pModel->n76C = nMatrices;
 }
 
+// Hands the model the skin's default world-to-bone matrices (Skin.p1088), one per bone, that
+// SKEL_UpdateSkinningMatrix puts each bone's matrix on.
 void SKEL_SetDefaultWorld2BoneMatrices(CharModel* pModel, f32 (*pMatrices)[4][4]) {
     pModel->p764 = pMatrices;
 }
 
-// Transforms a bone's p764 matrix through pMtx into its p768 matrix, when the model has them.
+// Updates bone nBone's skinning matrix (p768): its default world-to-bone matrix (p764) through the
+// bone's matrix pMtx. Nothing for a bone past n76C or until the skin's poses and both matrix sets
+// are handed over (Character_SetPreferedPos).
 void SKEL_UpdateSkinningMatrix(CharModel* pModel, f32 (*pMtx)[4], int nBone) {
     if (nBone >= pModel->n76C || pModel->p760 == NULL || pModel->p768 == NULL || pModel->p764 == NULL) {
         return;
@@ -1221,16 +1253,17 @@ void SKEL_UpdateSkinningMatrix(CharModel* pModel, f32 (*pMtx)[4], int nBone) {
     LLMath_mat44fltMultiplyList(pMtx, pModel->p764[nBone], pModel->p768[nBone], 4);
 }
 
-// Does that for every bone, through the bone's own matrix.
-void fn_80029AF8(CharModel* pModel) {
+// Updates every bone's skinning matrix from its current matrix (SKEL_UpdateSkinningMatrix).
+void SKEL_UpdateAllSkinningMatrices(CharModel* pModel) {
     int i;
     for (i = 0; i < pModel->nBones; i++) {
         SKEL_UpdateSkinningMatrix(pModel, pModel->pMatrices[i], i);
     }
 }
 
-// Square root: three Newton steps from the reciprocal-root estimate; x itself when x <= 0.
-f32 fn_80029B64(f32 x) {
+// Square root of a float: MSL's inline sqrtf (math.h), emitted here out of line: three Newton steps
+// from the reciprocal-root estimate; x itself when x <= 0.
+f32 Math_Sqrtf(f32 x) {
     volatile f32 y;     // fake match: the result goes through the stack
     f64 g;
 
@@ -1245,14 +1278,14 @@ f32 fn_80029B64(f32 x) {
     return x;
 }
 
-// Sets a vector to zero.
-void fn_80029BC8(f32* pVec) {
+// Sets a four-float vector to zero.
+void vec4flt_Zero(f32* pVec) {
     LLMath_CopyVec(lbl_80186838, pVec);
 }
 
 // pA + pB into out, three floats (paired singles).
 #ifdef __MWERKS__
-asm void fn_80029BF4(register f32* pA, register f32* pB, register f32* pOut) {
+asm void SKEL_Vec3Add(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 1, 0
@@ -1266,7 +1299,7 @@ asm void fn_80029BF4(register f32* pA, register f32* pB, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_80029BF4(f32* pA, f32* pB, f32* pOut) {
+void SKEL_Vec3Add(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pB[0] + pA[0];
     pOut[1] = pB[1] + pA[1];
     pOut[2] = pB[2] + pA[2];
@@ -1275,7 +1308,7 @@ void fn_80029BF4(f32* pA, f32* pB, f32* pOut) {
 
 // pA - pB into out, three floats (paired singles).
 #ifdef __MWERKS__
-asm void fn_80029C18(register f32* pA, register f32* pB, register f32* pOut) {
+asm void SKEL_Vec3Sub(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 1, 0
@@ -1289,7 +1322,7 @@ asm void fn_80029C18(register f32* pA, register f32* pB, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_80029C18(f32* pA, f32* pB, f32* pOut) {
+void SKEL_Vec3Sub(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pA[0] - pB[0];
     pOut[1] = pA[1] - pB[1];
     pOut[2] = pA[2] - pB[2];
@@ -1298,7 +1331,7 @@ void fn_80029C18(f32* pA, f32* pB, f32* pOut) {
 
 // pA - pB into out, four floats (paired singles).
 #ifdef __MWERKS__
-asm void fn_80029C3C(register f32* pA, register f32* pB, register f32* pOut) {
+asm void SKEL_VecSub(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 0, 0
@@ -1312,7 +1345,7 @@ asm void fn_80029C3C(register f32* pA, register f32* pB, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_80029C3C(f32* pA, f32* pB, f32* pOut) {
+void SKEL_VecSub(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pA[0] - pB[0];
     pOut[1] = pA[1] - pB[1];
     pOut[2] = pA[2] - pB[2];
@@ -1320,9 +1353,10 @@ void fn_80029C3C(f32* pA, f32* pB, f32* pOut) {
 }
 #endif
 
-// Shifts a bit array of nBits bits (whole words) from aSrc into aDst by nShift bits: each word's top
-// nShift bits carry into the bottom of the next word.
-void fn_80029C60(u32* aSrc, u32* aDst, u32 nBits, u32 nShift) {
+// Shifts a bit array of nBits bits (whole words) from aSrc into aDst up by nShift places (bit i to
+// bit i + nShift): each word's top nShift bits carry into the bottom of the next word, and the last
+// word's are lost. nShift must be 1..31 (the callers pass 1).
+void BitArray_ShiftUp(u32* aSrc, u32* aDst, u32 nBits, u32 nShift) {
     u32 uWord;
     u32 i;
     u32 j;
@@ -1341,7 +1375,7 @@ void fn_80029C60(u32* aSrc, u32* aDst, u32 nBits, u32 nShift) {
 }
 
 // Copies a bit array of nBits bits (whole words) from pSrc to pDst, when both are given.
-void fn_80029EF4(u32* pSrc, u32* pDst, u32 nBits) {
+void BitArray_CopyArray(u32* pSrc, u32* pDst, u32 nBits) {
     u32 nWords;
     u32 i;
 

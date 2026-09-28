@@ -13,7 +13,7 @@ void fn_80095564(void) {
     if (gSession.nSplitScreen == 0) {
         for (i = 0; i < gSession.nNumPlayers; i++) {
             SKN_FreeRenderData(gPlayers[i].pChar->pSkin);
-            fn_80029A7C(gPlayers[i].pChar->pModel, NULL, 0);
+            SKEL_SetSkinningMatrices(gPlayers[i].pChar->pModel, NULL, 0);
         }
     }
 }
@@ -38,14 +38,14 @@ void fn_800955F0(int nPlayer) {
                 if (i != nPlayer) {
                     SKN_FreeRenderData(gPlayers[i].pChar->pSkin);
                     // EA: clears nPlayer's model, not player i's (it is set again below)
-                    fn_80029A7C(gPlayers[nPlayer].pChar->pModel, NULL, 0);
+                    SKEL_SetSkinningMatrices(gPlayers[nPlayer].pChar->pModel, NULL, 0);
                 }
             }
             SKN_AllocRenderData(gPlayers[nPlayer].pChar->pSkin, 1);
             gPlayers[nPlayer].pChar->u10 &= ~0x2000;
-            fn_80029A7C(gPlayers[nPlayer].pChar->pModel, gPlayers[nPlayer].pChar->pSkin->p108C,
+            SKEL_SetSkinningMatrices(gPlayers[nPlayer].pChar->pModel, gPlayers[nPlayer].pChar->pSkin->p108C,
                         gPlayers[nPlayer].pChar->pSkin->pModel->n14);
-            fn_80029AF8(gPlayers[nPlayer].pChar->pModel);
+            SKEL_UpdateAllSkinningMatrices(gPlayers[nPlayer].pChar->pModel);
         }
     }
 }

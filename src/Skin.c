@@ -44,7 +44,7 @@ void  fn_8011C9B0(Skin* pSkin);                          // SkinMorph.c
 void  fn_8011CB5C(Skin* pSkin, int nView);               // SkinMorph.c
 s32   fn_8011CDE8(Skin* pSkin);                          // SkinMorph.c
 void  fn_8011CE58(Skin* pSkin);                          // SkinMorph.c
-void  fn_80029EF4(u32* pSrc, u32* pDst, u32 nBits);      // Skeleton.c
+void  BitArray_CopyArray(u32* pSrc, u32* pDst, u32 nBits);      // Skeleton.c
 u8    Character_IsGolfer(Character* pChar);              // char.c
 void  fn_80037D5C(SkinDesc* pDesc);                      // Code80037AB8.c
 
@@ -478,7 +478,7 @@ void SKN_BlendMorphWeights(SkelPose1* pA, SkelPose1* pB, SkelPose1* pOut, f32 fW
         pBlockB = &pB->aBlocks[i];
         pBlockOut = &pOut->aBlocks[i];
         fn_80021980(pBlockA->aBits, pBlockB->aBits, aBits, 20);
-        fn_80029EF4(aBits, pBlockOut->aBits, 20);
+        BitArray_CopyArray(aBits, pBlockOut->aBits, 20);
         for (j = 0; j < 20; j++) {
             if (BitArray_TestBit(aBits, j)) {
                 pBlockOut->af8[j] = fWeight * (pBlockB->af8[j] - pBlockA->af8[j]) + pBlockA->af8[j];

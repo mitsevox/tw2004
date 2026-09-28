@@ -253,7 +253,7 @@ typedef struct SkinModel {
     s32  n2C;                   // 0x2C  }
     u32  u30;                   // 0x30  0x40000002 both set: already byte-swapped (SKN_Create);
                                 //       0x80000000: offsets made pointers (SKN_FixupModel)
-    BonePose* p34;              // 0x34  n14 of them; handed to the character's model (fn_80029A74)
+    BonePose* p34;              // 0x34  n14 of them; handed to the character's model (SKEL_SetSkinBonePoses)
     void* p38;                  // 0x38  one 0x50-byte block
     void* p3C;                  // 0x3C  n0C 0x50-byte blocks
     s32  n40;                   // 0x40  bits in Skin.aMeshBits; also the entries in p44
@@ -312,7 +312,7 @@ typedef struct Skin {
                                 //         frame: through mat44flt_Invert of the bone's matrix
                                 //         (Character_SetSkin: bones 0x3A, 0x48, 0x39, 0x47)
     f32  (*p1088)[4][4];        // 0x1088  } matrices Character_SetPreferedPos hands the model (SKEL_SetDefaultWorld2BoneMatrices,
-    f32  (*p108C)[4][4];        // 0x108C  } fn_80029A7C)
+    f32  (*p108C)[4][4];        // 0x108C  } SKEL_SetSkinningMatrices)
     struct HwsMemBlock* p1090;  // 0x1090  freed by SKN_FreeRenderData
     u8   unk1094[0x1098 - 0x1094];
     struct HwsMemBlock* a1098[2];   // 0x1098  indexed like a10A0 (fn_8011CB5C)
@@ -412,7 +412,7 @@ typedef struct CharSliderLimit {
     f32  fLength;               // 0x4
 } CharSliderLimit;
 
-// A bone a slider scales (SKEL_GetBoneIDFromNameID finds it by uId; fn_80028A70 scales it on uAxes).
+// A bone a slider scales (SKEL_GetBoneIDFromNameID finds it by uId; SKEL_ScaleBone scales it on uAxes).
 typedef struct CharSliderBone {
     u64  uId;                   // 0x00
     f32  fFrom;                 // 0x08  the scale at the range's start

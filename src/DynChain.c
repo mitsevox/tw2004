@@ -8,7 +8,7 @@
 
 f32  LLMath_NormalizeReturnLength(f32* pSrc, f32* pDst); // VecMath.c: normalises, gives the length
                                                          // (0 if near zero)
-void fn_80029BC8(f32* pVec);                // GoLighting.c
+void vec4flt_Zero(f32* pVec);                // GoLighting.c
 void fn_801164D4(f32* pA, f32* pB, f32* pOut);
 void fn_801164F8(f32* pA, f32* pB, f32* pOut);
 void fn_8011651C(f32* pA, f32* pB, f32* pOut);
@@ -133,7 +133,7 @@ void fn_801140AC(DynChainLink* pLink, CharModel* pModel, int nBone, s32 nType) {
         Quat_Copy(pModel->pPoses[nBone].q0, pLink->q54);
         Quat_Copy(pModel->pPoses[nBone].v10, pLink->v64);
         Quat_Copy(pModel->pPoses[nBone].v10, pLink->v74);
-        fn_80029BC8(pLink->v24);
+        vec4flt_Zero(pLink->v24);
     }
 }
 

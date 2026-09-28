@@ -20,7 +20,7 @@ GoLight* fn_8006EFB8(void);
 void    fn_8006F080(GoLight* pLight);
 
 void LLMath_MultiplyVec(f32* pA, f32* pB, f32* pOut);     // pOut = pA * pB, element by element
-void fn_80029BC8(f32* pVec);                        // sets a vector to lbl_80186838
+void vec4flt_Zero(f32* pVec);                        // sets a vector to lbl_80186838
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);                   // identity
 void LLMath_mat44fltMultiplyList33(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // VecMath.c
 void LLMath_mat44fltMultiply33(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // a vector through a matrix
@@ -73,7 +73,7 @@ void fn_8006E2A4(void) {
     lbl_802811D8->aPointColour2[1][3] = 0.0f;
     lbl_802811D8->aPointColour2[2][3] = 0.0f;
     lbl_802811D8->aPointColour2[3][3] = 0.0f;
-    fn_80029BC8(lbl_802811D8->vFC);
+    vec4flt_Zero(lbl_802811D8->vFC);
     fn_8006E7A4(NULL);
     amb = lbl_80283904;
     mat = lbl_80283904;
@@ -91,7 +91,7 @@ void fn_8006E424(void) {
 
 // Scales the loaded colours by the group's v18[0] (white without a group) into aPointColour2 and
 // vAmbient2, point light 0 by v28 times v18[0] instead; the unused point lights get
-// fn_80029BC8's vector.
+// vec4flt_Zero's vector.
 void fn_8006E460(LightGroup* pGroup) {
     f32 vScale[4];
     s32 n;
@@ -127,7 +127,7 @@ void fn_8006E460(LightGroup* pGroup) {
     }
     LLMath_MultiplyVec(lbl_802811D8->aPointColour[0], vScale, lbl_802811D8->aPointColour2[0]);
     for (n = lbl_802811D8->nPoints; n < NUM_POINT_LIGHTS; n++) {
-        fn_80029BC8(pOut);
+        vec4flt_Zero(pOut);
         pOut += 4;
     }
 }

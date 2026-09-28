@@ -181,9 +181,9 @@ typedef struct CharModel {
     f32       f134;             // 0x134  }
     f32       f138;             // 0x138  }
     f32       f13C;             // 0x13C  }
-    f32       a140[128][3];     // 0x140  per bone, a factor for each axis: reset to 1 by fn_80028A3C,
-                                //        multiplied by fn_80028A70 (the next field is at 0x740)
-    f32       q740[4];          // 0x740  } rotations (quaternions) fn_80029968 fills in
+    f32       a140[128][3];     // 0x140  per bone, a factor for each axis: reset to 1 by SKEL_ResetBoneScales,
+                                //        multiplied by SKEL_ScaleBone (the next field is at 0x740)
+    f32       q740[4];          // 0x740  } rotations (quaternions) SKEL_InitHalfJoints fills in
     f32       q750[4];          // 0x750  }
     void*     p760;             // 0x760  } SKEL_UpdateSkinningMatrix does nothing unless all three are set
     f32     (*p764)[4][4];      // 0x764  }   a matrix per bone, transformed into p768
@@ -197,7 +197,7 @@ typedef struct DynChainLink {
     f32  fLength;               // 0x00  to its parent bone in the rest pose (0.5 unless type 0)
     f32  v04[4];                // 0x04  its matrix's position when set up; the updates move it
     f32  v14[4];                // 0x14  v04 as the last update left it (fn_80114540)
-    f32  v24[4];                // 0x24  set by fn_80029BC8; the updates keep a velocity in it
+    f32  v24[4];                // 0x24  set by vec4flt_Zero; the updates keep a velocity in it
     f32  v34[4];                // 0x34  from its bone to the next one's position (fn_80114A84)
     f32  q44[4];                // 0x44  } its rest pose's rotation, twice
     f32  q54[4];                // 0x54  }
@@ -722,7 +722,7 @@ void  Character_SetClubStatesForCharacter(Character* pChar, int nSlot, struct Sk
 extern f32 gSkelIdentityQuat[4];             // the identity rotation (quaternion), set by SKEL_InitModule
 extern u8  gSkelIKEnabled;                // IK on (SKEL_EnableIK); off, the IK functions do nothing
 extern u8  gSkelLeftHandedPairs[42][2];         // pairs of standard bones (SKEL_GenerateLeftHandedTable reads the first 41)
-extern f32 lbl_80186838[4];             // a zero vector (fn_80029BC8 copies it)
+extern f32 lbl_80186838[4];             // a zero vector (vec4flt_Zero copies it)
 
 // AnimStream.c: the animation groups it streams clips for (groups 1 and 5, the reactions), and the
 // index each has in its tables.
@@ -822,18 +822,18 @@ void  SKEL_TranslateIKChainY(CharModel* pModel, IKChain* pChain, f32 f);   // Sk
 void  SKEL_SetExtraRightShoulderRotation(CharModel* pModel, f32* pRot);
 void  SKEL_RelaxIK(Skeleton* pSkel);
 void  SKEL_TransitionIK(Skeleton* pSkel, u8 b, f32 f);
-void  fn_80028A3C(CharModel* pModel);
-void  fn_80028A70(CharModel* pModel, int nBone, u32 uAxes, f32 f);
+void  SKEL_ResetBoneScales(CharModel* pModel);
+void  SKEL_ScaleBone(CharModel* pModel, int nBone, u32 uAxes, f32 f);
 void  SKEL_InitModule(void);
 void  SKEL_CloseModule(void);
 void  SKEL_Free(CharModel* pModel);
 int   SKEL_GetBoneIDFromNameID(CharModel* pModel, u64 uId);
-void  fn_80029948(CharModel* pModel, struct DynChain* pChain, f32 f);
-void  fn_80029A74(CharModel* pModel, void* p);
-void  fn_80029A7C(CharModel* pModel, f32 (*pMatrices)[4][4], s32 nMatrices);
+void  SKEL_UpdateDynChain(CharModel* pModel, struct DynChain* pChain, f32 f);
+void  SKEL_SetSkinBonePoses(CharModel* pModel, void* p);
+void  SKEL_SetSkinningMatrices(CharModel* pModel, f32 (*pMatrices)[4][4], s32 nMatrices);
 void  SKEL_SetDefaultWorld2BoneMatrices(CharModel* pModel, f32 (*pMatrices)[4][4]);
 void  SKEL_UpdateSkinningMatrix(CharModel* pModel, f32 (*pMtx)[4], int nBone);
-void  fn_80029AF8(CharModel* pModel);
+void  SKEL_UpdateAllSkinningMatrices(CharModel* pModel);
 int   fn_80048574(Character* pChar, u64 uEvent);    // the character's animation has event uEvent
 u8    fn_8009637C(Character* pChar);    // CharAnim.c: n26 is not 1 (both callers mask the result)
 void  fn_80072ACC(SKABlendNode* pNode, CharModel* pModel, f32 fTime);

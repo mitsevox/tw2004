@@ -39,7 +39,7 @@ RainState* lbl_802814B8 = &lbl_801F6320;
 void fn_800B4B5C(void) {
     lbl_802814B8->n0 = 0;
     lbl_802814B8->n4 = 0;
-    lbl_802814B8->f8 = fn_80029B64(3075.0f);
+    lbl_802814B8->f8 = Math_Sqrtf(3075.0f);
     lbl_802814B8->pBank = NULL;
     lbl_802814B8->pTex = NULL;
 }

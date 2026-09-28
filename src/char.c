@@ -138,7 +138,7 @@ void  Character_RequestClothesUpdateIG(int n);
 void  fn_8010B098(void* pModel);                                // LLDynTex.c
 void  fn_800958EC(AnimPlayer* pAnim, s32 n, f32 f);            // CharAnim.c
 void  Quat_ExtractEulerAngles(f32* pQ, f32* pA, f32* pB, f32* pC);          // Quaternion.c: a rotation as angles
-void  fn_80029968(CharModel* pModel, SkelPose* pPose);          // Skeleton.c
+void  SKEL_InitHalfJoints(CharModel* pModel, SkelPose* pPose);          // Skeleton.c
 void  mat44flt_Invert(f32 (*pSrc)[4], f32 (*pDst)[4]);              // UMemPool.c
 void  Character_GetBonePosSwapIfLefty(Character* pChar, int nBone, f32* pPos);
 void  Char_Vec3Add(f32* pA, f32* pB, f32* pOut);
@@ -637,14 +637,14 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
     pChar->n1698 = 0;
     Character_CalculateClipPoints(pChar);
     if (Character_IsGolfer(pChar)) {
-        fn_80029948(pChar->pModel, pChar->pModel->pF0, fTime);
-        fn_80029948(pChar->pModel, pChar->pModel->pF4, fTime);
-        fn_80029948(pChar->pModel, pChar->pModel->pF8, fTime);
+        SKEL_UpdateDynChain(pChar->pModel, pChar->pModel->pF0, fTime);
+        SKEL_UpdateDynChain(pChar->pModel, pChar->pModel->pF4, fTime);
+        SKEL_UpdateDynChain(pChar->pModel, pChar->pModel->pF8, fTime);
         for (i = 0; i < 6; i++) {
-            fn_80029948(pChar->pModel, pChar->pModel->apFC[i], fTime);
+            SKEL_UpdateDynChain(pChar->pModel, pChar->pModel->apFC[i], fTime);
         }
         for (i = 0; i < 6; i++) {
-            fn_80029948(pChar->pModel, pChar->pModel->ap114[i], fTime);
+            SKEL_UpdateDynChain(pChar->pModel, pChar->pModel->ap114[i], fTime);
         }
     }
 }
@@ -729,18 +729,18 @@ void Character_SetSkin(Character* pChar, Skin* pSkin) {
     }
 }
 
-// Poses the character's skeleton in its body skin's rest pose (SKEL_UpdateState, fn_80029968) and,
+// Poses the character's skeleton in its body skin's rest pose (SKEL_UpdateState, SKEL_InitHalfJoints) and,
 // when the skin has a model, hands the skeleton the skin's matrices. Needs a character, a skin and
 // a model.
 void Character_SetPreferedPos(Character* pChar) {
     if (pChar != NULL && pChar->pSkin != NULL && pChar->pModel != NULL) {
         SKEL_UpdateState(pChar->pModel, &pChar->pSkin->pose, 1);
-        fn_80029968(pChar->pModel, &pChar->pSkin->pose);
+        SKEL_InitHalfJoints(pChar->pModel, &pChar->pSkin->pose);
         if (pChar->pSkin->pModel != NULL) {
             fn_80037AB8(pChar->pSkin, pChar->pModel, 0, 0);
-            fn_80029A74(pChar->pModel, pChar->pSkin->pModel->p34);
+            SKEL_SetSkinBonePoses(pChar->pModel, pChar->pSkin->pModel->p34);
             SKEL_SetDefaultWorld2BoneMatrices(pChar->pModel, pChar->pSkin->p1088);
-            fn_80029A7C(pChar->pModel, pChar->pSkin->p108C, pChar->pSkin->pModel->n14);
+            SKEL_SetSkinningMatrices(pChar->pModel, pChar->pSkin->p108C, pChar->pSkin->pModel->n14);
         }
     }
 }

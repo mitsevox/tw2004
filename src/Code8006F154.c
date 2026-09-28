@@ -34,7 +34,7 @@ void fn_8006F154(void) {
     fZ = pLens->m4[2][2];
     fX = pLens->m4[2][0];
     fLen2 = fX * fX + fZ * fZ;
-    fScale = (fLen2 == 0.0f) ? 0.0f : 1.0f / fn_80029B64(fLen2);
+    fScale = (fLen2 == 0.0f) ? 0.0f : 1.0f / Math_Sqrtf(fLen2);
     fX *= fScale;
     fZ *= fScale;
     fCos = (fX < -1.0f) ? -1.0f : (fX > 1.0f) ? 1.0f : fX;
