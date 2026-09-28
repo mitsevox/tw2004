@@ -1221,7 +1221,7 @@ void fn_8006DD44(void) {
 }
 
 void fn_8006DD84(void) {
-    fn_800E58B4(3);
+    GameMsg_Send(3);
 }
 
 // The six points of a frame at which every module's hooks run (ModuleHooks, engine.h).

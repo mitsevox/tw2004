@@ -375,7 +375,7 @@ void fn_8010CA2C(PlayerNumber_t nPlayer) {
     pPlayer->nEBC += nPoints;
     nTotal = pPlayer->nEBC;
     pPlayer->nEBC = (nTotal <= 0) ? 0 : nTotal;     // never below zero
-    fn_800E5CA4(nPlayer, gPlayers[nPlayer].nEBC, nLength, nKind, 0, 0, nPoints, 0.0f);
+    GUI_UpdateLongDriveScore(nPlayer, gPlayers[nPlayer].nEBC, nLength, nKind, 0, 0, nPoints, 0.0f);
 
     // A track the first time the score reaches 1200, 800 and 400 (EA also passes the player's
     // side, 1 or -1, which Gaud_LongDriveUi_Play ignores).
@@ -457,7 +457,7 @@ void fn_8010D278(void) {
         PLAYER(i)->nED4 = 0;
         PLAYER(i)->nED8 = 0;
         PLAYER(i)->nEDC = 0;
-        fn_800E5CA4(i, PLAYER(i)->nEBC, 0, 0, 0, 0, 0, 0.0f);
+        GUI_UpdateLongDriveScore(i, PLAYER(i)->nEBC, 0, 0, 0, 0, 0, 0.0f);
     }
     fn_8010D32C();
 }

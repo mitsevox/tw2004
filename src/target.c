@@ -1183,7 +1183,7 @@ f32 fn_8006A8A8(u8* p) {
 // ---- end of sweep code ----
 
 void fn_8006A8B0(void) {
-    fn_800E58B4(32);
+    GameMsg_Send(32);
 }
 
 // A point given as fractions of the camera's view (0..1) into the view's screen rectangle.

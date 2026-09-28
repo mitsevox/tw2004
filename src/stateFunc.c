@@ -852,8 +852,8 @@ void STATEFUNC_ZoomExit(int nPlayer) {
         nView = gPlayers[nPlayer].nView[0];
         CameraController_SetCameraMode(ViewController_GetCameraControl(nView), 0, nPlayer, nView);
     }
-    fn_800E5714(0x10);
-    fn_800E5724(nPlayer);
+    GameMsg_SetPending(0x10);
+    GameMsg_SetPendingValue(nPlayer);
 }
 
 void STATEFUNC_ElevatorInit(int nPlayer) {
@@ -2102,11 +2102,11 @@ f32 fn_80062C28(Character* pChar) {
 }
 
 void fn_80062C38(void) {
-    fn_800E58B4(7);
+    GameMsg_Send(7);
 }
 
 void fn_80062C5C(void) {
-    fn_800E58B4(8);
+    GameMsg_Send(8);
 }
 
 void fn_80062C80(int a, u8 b) {

@@ -58,7 +58,7 @@ static f32 GameManager_StrippedFn(f32 x) {
 // Sends UI message 50 (no values). Its only caller is GameEffects_ResetGameEffectSettings, when it
 // switches off a GameBreaker that is still up; nothing else sends message 50.
 void GameEffects_SendMessage50(void) {
-    fn_800E58B4(50);
+    GameMsg_Send(50);
 }
 
 // Empty in this build. The time-rate code (GameEffects_AdjustTimeRate) calls it after it has used a pending
@@ -827,7 +827,7 @@ void GM_Update(void) {
 // Restarts the current hole, when the mode allows it (b279): all five players' records of the hole
 // cleared, the balls to the tee, the mode's pfn224, the flyover again when the mode has one (b27F),
 // the frame count in n12C, the HUD re-initialised, effects and cameras reset, each golfer's
-// animation and green morph reset, and message helper fn_800E5714(2).
+// animation and green morph reset, and message helper GameMsg_SetPending(2).
 void GM_RestartHole(void) {
     int i;
     if (gpGame->b279) {
@@ -848,7 +848,7 @@ void GM_RestartHole(void) {
             fn_800957D8(PLAYER(i)->pChar);
             CharacterState_ResetMorphState(PLAYER(i)->pChar, 1);
         }
-        fn_800E5714(2);
+        GameMsg_SetPending(2);
     }
 }
 
@@ -933,8 +933,8 @@ void GM_GolferConcede_Hole(int nPlayer) {
             }
         }
     }
-    fn_800E5714(1);
-    fn_800E5724(nPlayer);
+    GameMsg_SetPending(1);
+    GameMsg_SetPendingValue(nPlayer);
     GUI_FlagPostShotRequest();
     GOLFERSTATE_Switch(GS_CONCEDED, nPlayer);
 }

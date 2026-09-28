@@ -72,7 +72,7 @@ u8  lbl_80282280;
 
 // Clears every display flag, queue count and pending message at the start of a hole
 // (GM_InitForHole) and when it restarts (GM_RestartHole); also clears GameMessages' lbl_80203138
-// flags (fn_800E5DA0) and sends UI message 31 (GUI_SendMessage31).
+// flags (GUI_ClearShownTips) and sends UI message 31 (GUI_SendMessage31).
 void GUI_Init(void) {
     lbl_802822DF = 0;
     lbl_802822DC[0] = 0;
@@ -112,7 +112,7 @@ void GUI_Init(void) {
     lbl_802822BD = 0;
     lbl_802822BC = 0;
     lbl_80282280 = 0;
-    fn_800E5DA0();
+    GUI_ClearShownTips();
     GUI_SendMessage31();
 }
 
@@ -219,12 +219,12 @@ void GUI_UpdateAllUIData(void) {
 }
 
 // Opens the pause menu, once (nothing while already paused): pending UI message 0x31 flagged
-// (fn_800E5714(4)), the controllers' rumble stopped, message 0x23 with 0, timer 1 stopped, the
+// (GameMsg_SetPending(4)), the controllers' rumble stopped, message 0x23 with 0, timer 1 stopped, the
 // pause flag GUI_IsPauseMenuOpen returns and gSession.nPaused set, a GameBreaker paused, EASBio's
 // play state 0, and in a GameMode5 challenge PlayNow_OnPause.
 void GUI_OpenPauseMenu(void) {
     if (gSession.nPaused == 0) {
-        fn_800E5714(4);
+        GameMsg_SetPending(4);
         fn_8001437C();
         fn_80062CE0(0);
         if (TI_bCounterIsRunning(1)) {
@@ -248,7 +248,7 @@ void GUI_SetEndOfGamePending(void) {
 }
 
 // Closes the pause menu (nothing when not paused) and finishes what the pause was covering. Unless
-// a menu screen is still up (fn_800E5C84) it unpauses: timer 1 restarted, the pause flags cleared,
+// a menu screen is still up (GUI_IsFadingToBlack) it unpauses: timer 1 restarted, the pause flags cleared,
 // a GameBreaker resumed, sound unpaused, EASBio's play state 1. Then the save images are parked
 // (fn_8009EF98) and message 0x23 with 1 goes out in a replay outside modes 10 and 11. After the
 // end-of-round screen gSession.b12 = 1 ends the round. After the end-of-hole screen: event 0x46 and
@@ -261,11 +261,11 @@ void GUI_PauseMenuClosed(void) {
     int i;
     int j;
     if (gSession.nPaused != 0) {
-        fn_800E5714(8);
+        GameMsg_SetPending(8);
         if (Lessons_IsRunning()) {
             Lessons_PauseMenuClosed();
         }
-        if (!fn_800E5C84()) {
+        if (!GUI_IsFadingToBlack()) {
             if (!TI_bCounterIsRunning(1)) {
                 TI_vStartCounter(1);
             }
@@ -328,7 +328,7 @@ void GUI_StartPostShotUI(int nMsg, int nPlayer, f32 f) {
     int nWho;
     if (Game_GetMode() != 11) {
         nWho = nPlayer + 1;
-        fn_800E5A4C(5, 2, &nMsg, &f, &nWho);
+        GameMsg_Send3(5, 2, &nMsg, &f, &nWho);
         lbl_802822DB = 1;
     }
 }
@@ -516,38 +516,38 @@ u8 GUI_CheckMessageQue(void) {
         }
         if (lbl_802822C0 && !lbl_802822DB) {
             lbl_802822C0 = 0;
-            fn_800E58B4(0x50);
+            GameMsg_Send(0x50);
             return 1;
         }
         if (lbl_802822BF && !lbl_802822DB) {
             lbl_802822BF = 0;
-            fn_800E5C08(0x53, lbl_80281640);
+            GameMsg_SendString(0x53, lbl_80281640);
             return 1;
         }
     }
     if (lbl_802822B4 != 0) {
-        fn_800E56D0(lbl_80203044[lbl_802822B4 - 1].n0, lbl_80203044[lbl_802822B4 - 1].n4,
+        GUI_ShowPrizeMessage(lbl_80203044[lbl_802822B4 - 1].n0, lbl_80203044[lbl_802822B4 - 1].n4,
                     lbl_80203044[lbl_802822B4 - 1].n8);
         bBusy = 1;
         lbl_802822B4--;
     } else if (lbl_802822B0 != 0) {
-        fn_800E5698(lbl_80202FCC[lbl_802822B0 - 1].n0, lbl_80202FCC[lbl_802822B0 - 1].n4,
+        GUI_ShowTrophyMessage(lbl_80202FCC[lbl_802822B0 - 1].n0, lbl_80202FCC[lbl_802822B0 - 1].n4,
                     lbl_80202FCC[lbl_802822B0 - 1].n8);
         bBusy = 1;
         lbl_802822B0--;
     } else if (lbl_802822B8 != 0) {
-        fn_800E5660(lbl_802030BC[lbl_802822B8 - 1].n0, lbl_802030BC[lbl_802822B8 - 1].n4,
+        GUI_ShowRecordMessage(lbl_802030BC[lbl_802822B8 - 1].n0, lbl_802030BC[lbl_802822B8 - 1].n4,
                     lbl_802030BC[lbl_802822B8 - 1].n8);
         bBusy = 1;
         lbl_802822B8--;
     } else if (lbl_802822AC != 0) {
-        fn_800E5628(lbl_80202F54[lbl_802822AC - 1].n0, lbl_80202F54[lbl_802822AC - 1].n4,
+        GUI_ShowUnlockMessage(lbl_80202F54[lbl_802822AC - 1].n0, lbl_80202F54[lbl_802822AC - 1].n4,
                     lbl_80202F54[lbl_802822AC - 1].n8);
         bBusy = 1;
         lbl_802822AC--;
     } else if (lbl_802822A8 != 0) {
         // EA bug: n4 and n8 are taken at queue 3's count (lbl_802822AC), not this queue's
-        fn_800E55F0(lbl_80202EDC[lbl_802822A8 - 1].n0, lbl_80202EDC[lbl_802822AC - 1].n4,
+        GUI_ShowGolferUnlockMessage(lbl_80202EDC[lbl_802822A8 - 1].n0, lbl_80202EDC[lbl_802822AC - 1].n4,
                     lbl_80202EDC[lbl_802822AC - 1].n8);
         bBusy = 1;
         lbl_802822A8--;

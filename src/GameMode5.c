@@ -1232,7 +1232,7 @@ void PlayNow_Restart(void) {
     gCurChallenge = gPlayNowSelectedChallenge;
     GM_EndOfGolferTurn(0);
     gpGame->pfn224();
-    fn_800E5714(2);
+    GameMsg_SetPending(2);
     GM_ClearDataForNewGame();
     if (GM_Currently_RealtimeMode()) {
         GameModeDriverRTE_StartEvent();

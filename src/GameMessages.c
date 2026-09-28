@@ -16,11 +16,11 @@ void  GUI_SetMessageQueHeld(u8 b);
 void  GUI_StartAwardUI(void);
 void  GUI_MuteForScoreCard(void);
 void  GUI_SetUnreadFlag(u8 b);
-void  fn_800E5708(void);
-void  fn_800E572C(int n);
-void  fn_800E573C(void);
-void  fn_800E5908(int nMsg);
-u8    fn_800E5D90(void);
+void  GameMsg_ClearPending(void);
+void  GameMsg_TogglePending(int n);
+void  GameMsg_SendPendingMenus(void);
+void  GameMsg_OnSend(int nMsg);
+u8    GUI_GetFadeToBlack(void);
 
 // GameMessages.c's data, defined last address first (CodeWarrior lays each section out in reverse).
 u8  lbl_802822E4;           // pending-message flags, each sent once
@@ -240,20 +240,20 @@ void GUI_SetUnreadFlag(u8 b) {
 
 // Sends front-end message nMsg with three int values.
 void GameMsg_Send3Ints(int nMsg, int a, int b, int c) {
-    fn_800E5A4C(nMsg, 0, &a, &b, &c);
+    GameMsg_Send3(nMsg, 0, &a, &b, &c);
 }
 
 // One of the five HUD readout refreshes GUI_UpdateAllUIData sends before a HUD comes up: message 6,
 // no values. TW07 inlines GUI_UpdateGolferUIData and GUI_UpdateCourseUIData among them; which of
 // messages 4 and 6 is which is not known.
 void GUI_UpdateUIData6(void) {
-    fn_800E58B4(6);
+    GameMsg_Send(6);
 }
 
 // The first of the five HUD readout refreshes GUI_UpdateAllUIData sends: message 4, no values (see
 // GUI_UpdateUIData6).
 void GUI_UpdateUIData4(void) {
-    fn_800E58B4(4);
+    GameMsg_Send(4);
 }
 
 // Shows or hides the HUD's tap-in prompt (message 47 with n as a byte); GUI_HideAllHelpTips hides
@@ -298,57 +298,87 @@ void GUI_ShowTourAwardMessage(int nA, int nB, int nC) {
     GameMsg_Send3Ints(91, nA, nB, nC);
 }
 
-void fn_800E55F0(int nA, int nB, int nC) {
+// Shows an item of display queue 4 (GUI_CheckMessageQue, which takes its second and third values at
+// queue 3's count): message 27 with its three values. GameMode4_WinEvent queues a golfer a ladder
+// event unlocks there (the golfer, 0, the profile).
+void GUI_ShowGolferUnlockMessage(int nA, int nB, int nC) {
     GameMsg_Send3Ints(27, nA, nB, nC);
 }
 
-void fn_800E5628(int nA, int nB, int nC) {
+// Shows an item of display queue 3 (GUI_CheckMessageQue): message 12 with its three values.
+// Earnings.c queues the courses the money earned unlocks there (the course, 0, the profile; kind 7
+// with 2 or 3), and GameMode4_WinEvent a ladder event's reward (0x16, the reward, the profile).
+void GUI_ShowUnlockMessage(int nA, int nB, int nC) {
     GameMsg_Send3Ints(12, nA, nB, nC);
 }
 
-void fn_800E5660(int nA, int nB, int nC) {
+// Shows an item of display queue 1 (GUI_CheckMessageQue): message 11 with its three values.
+// Earnings.c queues the records a shot, putt or round sets there (the record kind, its place, the
+// profile), and GameManager the hole contests' results (kind 10 the longest drive, 11 closest to
+// the pin).
+void GUI_ShowRecordMessage(int nA, int nB, int nC) {
     GameMsg_Send3Ints(11, nA, nB, nC);
 }
 
-void fn_800E5698(int nA, int nB, int nC) {
+// Shows an item of display queue 2 (GUI_CheckMessageQue): message 13 with its three values.
+// Earnings.c queues the trophy balls won there (the award's message index, its money, the profile);
+// GameMode4 the ladder's final prize.
+void GUI_ShowTrophyMessage(int nA, int nB, int nC) {
     GameMsg_Send3Ints(13, nA, nB, nC);
 }
 
-void fn_800E56D0(int nA, int nB, int nC) {
+// Shows an item of display queue 0 (GUI_CheckMessageQue shows this queue first): message 10 with
+// its three values. The modes and Earnings.c queue prize money there (the prize's message kind, the
+// amount, the profile), and the tour card level reached.
+void GUI_ShowPrizeMessage(int nA, int nB, int nC) {
     GameMsg_Send3Ints(10, nA, nB, nC);
 }
 
-void fn_800E5708(void) {
+// Drops every pending message (uiProcessInterface's controller reset, fn_800905A8).
+void GameMsg_ClearPending(void) {
     lbl_802822E4 = 0;
 }
 
-void fn_800E5714(int n) {
+// Flags messages to send on the UI's next update (GameMsg_SendPending): bit 1 a conceded hole, 2 a
+// restarted hole, 4 the pause menu opened, 8 it closed, 0x10 the zoom camera left, 0x20 a tip.
+void GameMsg_SetPending(int n) {
     lbl_802822E4 = (lbl_802822E4 | n);
 }
 
-void fn_800E5724(int n) {
+// The value sent with pending messages 1 (the conceding player), 0x10 (the player) and 0x20 (the
+// tip). There is one slot: two set before the next update both go with the last value.
+void GameMsg_SetPendingValue(int n) {
     lbl_802822E0 = n;
 }
 
-void fn_800E572C(int n) {
+// Flips pending bits n (an exclusive or); the senders call it with a bit they have just sent, which
+// clears it.
+void GameMsg_TogglePending(int n) {
     lbl_802822E4 = (lbl_802822E4 ^ n);
 }
 
-void fn_800E573C(void) {
+// GameMsg_SendPending's counterpart in the menus (game type 3; fn_80090628 picks one): pending bit
+// 1 sends message 0x8D and bit 2 message 0x54, no values, each once; the other bits wait.
+void GameMsg_SendPendingMenus(void) {
     if ((s8) lbl_802822E4 != 0) {
         if (lbl_802822E4 & 1) {
-            fn_800E58B4(0x8D);
-            fn_800E572C(1);
+            GameMsg_Send(0x8D);
+            GameMsg_TogglePending(1);
         }
         if (lbl_802822E4 & 2) {
-            fn_800E58B4(0x54);
-            fn_800E572C(2);
+            GameMsg_Send(0x54);
+            GameMsg_TogglePending(2);
         }
     }
 }
 
-// Sends each pending-message flag that is set, once, and clears it.
-void fn_800E5798(void) {
+// Sends each pending message once and clears its bit, on the UI's update in a round (fn_80090628):
+// bit 1 a conceded hole's post-shot message (message 5 built as GUI_StartPostShotUI does: type 15,
+// 0.0, then the value, the player not counted from 1 as GUI_StartPostShotUI counts it), 2 a
+// restarted hole (message 0x3D, then message 1 with 1 hides the single-screen HUD), 4 the pause
+// menu opened (0x31), 8 closed (0x27), 0x10 the zoom camera left (0x62 with 0 and the player), 0x20
+// a tip (0x21 with the tip, GUI_QueueTip).
+void GameMsg_SendPending(void) {
     MsgArg args[3];
     if ((s8)lbl_802822E4 != 0) {
         if (lbl_802822E4 & 1) {
@@ -357,47 +387,50 @@ void fn_800E5798(void) {
             args[1].f = 0.0f;
             args[2].i = lbl_802822E0;
             UISProcessHint(lbl_80281F1C->pHandler, 5, 3, args);
-            fn_800E572C(1);
+            GameMsg_TogglePending(1);
         }
         if (lbl_802822E4 & 2) {
-            fn_800E58B4(0x3D);
-            fn_800E572C(2);
+            GameMsg_Send(0x3D);
+            GameMsg_TogglePending(2);
             GameMsg_SendInt(1, 1);
         }
         if (lbl_802822E4 & 4) {
-            fn_800E58B4(0x31);
-            fn_800E572C(4);
+            GameMsg_Send(0x31);
+            GameMsg_TogglePending(4);
         }
         if (lbl_802822E4 & 8) {
-            fn_800E58B4(0x27);
-            fn_800E572C(8);
+            GameMsg_Send(0x27);
+            GameMsg_TogglePending(8);
         }
         if (lbl_802822E4 & 0x10) {
             GameMsg_Send2Ints(0x62, 0, lbl_802822E0);
-            fn_800E572C(0x10);
+            GameMsg_TogglePending(0x10);
         }
         if (lbl_802822E4 & 0x20) {
             GameMsg_SendInt(0x21, lbl_802822E0);
-            fn_800E572C(0x20);
+            GameMsg_TogglePending(0x20);
         }
     }
 }
 
-// Sends a message with no values.
-void fn_800E58B4(int nMsg) {
+// Sends front-end message nMsg with no values.
+void GameMsg_Send(int nMsg) {
     MsgArg arg;
-    fn_800E5908(nMsg);
+    GameMsg_OnSend(nMsg);
     Mem_set(&arg, 0, sizeof(arg));
     UISProcessHint(lbl_80281F1C->pHandler, nMsg, 0, &arg);
 }
 
-void fn_800E5908(int nMsg) {
+// Empty in this build: every GameMsg_ sender calls it with the message number before it sends.
+void GameMsg_OnSend(int nMsg) {
 }
 
-// Sends a message with one value (bit 0 of uFloats: a float).
+// Sends front-end message nMsg with one value, read through pA: a float when bit 0 of uFloats is
+// set, else an int. Every GameMsg_ sender hands its values to the front end's handler
+// (lbl_80281F1C->pHandler) through UISProcessHint.
 void GameMsg_Send1(int nMsg, u32 uFloats, void* pA) {
     MsgArg args[1];
-    fn_800E5908(nMsg);
+    GameMsg_OnSend(nMsg);
     Mem_set(args, 0, sizeof(args));
     if (uFloats & 1) {
         args[0].f = *(f32*)pA;
@@ -408,10 +441,11 @@ void GameMsg_Send1(int nMsg, u32 uFloats, void* pA) {
     UISProcessHint(lbl_80281F1C->pHandler, nMsg, 1, args);
 }
 
-// Two values.
+// Sends front-end message nMsg with two values, read through pA and pB; bits 0 and 1 of uFloats
+// mark which are floats (else ints).
 void GameMsg_Send2(int nMsg, u32 uFloats, void* pA, void* pB) {
     MsgArg args[2];
-    fn_800E5908(nMsg);
+    GameMsg_OnSend(nMsg);
     Mem_set(args, 0, sizeof(args));
     if (uFloats & 1) {
         args[0].f = *(f32*)pA;
@@ -427,11 +461,12 @@ void GameMsg_Send2(int nMsg, u32 uFloats, void* pA, void* pB) {
     UISProcessHint(lbl_80281F1C->pHandler, nMsg, 2, args);
 }
 
-// Three values.
-void fn_800E5A4C(int nMsg, u32 uFloats, void* pA, void* pB, void* pC) {
+// Sends front-end message nMsg with three values, read through pA, pB and pC; bits 0..2 of uFloats
+// mark which are floats (else ints).
+void GameMsg_Send3(int nMsg, u32 uFloats, void* pA, void* pB, void* pC) {
     MsgArg args[3];
     Mem_set(args, 0, sizeof(args));
-    fn_800E5908(nMsg);
+    GameMsg_OnSend(nMsg);
     if (uFloats & 1) {
         args[0].f = *(f32*)pA;
     }
@@ -451,10 +486,11 @@ void fn_800E5A4C(int nMsg, u32 uFloats, void* pA, void* pB, void* pC) {
     UISProcessHint(lbl_80281F1C->pHandler, nMsg, 3, args);
 }
 
-// Five values.
+// Sends front-end message nMsg with five values, read through pA..pE; bits 0..4 of uFloats mark
+// which are floats (else ints).
 void GameMsg_Send5(int nMsg, u32 uFloats, void* pA, void* pB, void* pC, void* pD, void* pE) {
     MsgArg args[5];
-    fn_800E5908(nMsg);
+    GameMsg_OnSend(nMsg);
     Mem_set(args, 0, sizeof(args));
     if (uFloats & 1) {
         args[0].f = *(f32*)pA;
@@ -485,11 +521,12 @@ void GameMsg_Send5(int nMsg, u32 uFloats, void* pA, void* pB, void* pC, void* pD
     UISProcessHint(lbl_80281F1C->pHandler, nMsg, 5, args);
 }
 
-// Sends a message with a string.
-void fn_800E5C08(int nMsg, char* pStr) {
+// Sends front-end message nMsg with one string value (a MsgString: the text and its length, on the
+// stack for the call).
+void GameMsg_SendString(int nMsg, char* pStr) {
     MsgString str;
     MsgArg arg;
-    fn_800E5908(nMsg);
+    GameMsg_OnSend(nMsg);
     Mem_set(&arg, 0, sizeof(arg));
     str.pStr = pStr;
     arg.p = &str;
@@ -497,14 +534,19 @@ void fn_800E5C08(int nMsg, char* pStr) {
     UISProcessHint(lbl_80281F1C->pHandler, nMsg, 1, &arg);
 }
 
-u8 fn_800E5C84(void) {
-    return fn_800E5D90();
+// Whether the front end's fade to black is running (GUI_GetFadeToBlack): GUI_PauseMenuClosed leaves
+// the game paused while it is (quitting the round from the pause menu starts it; fn_8009069C
+// unpauses once the screen is black).
+u8 GUI_IsFadingToBlack(void) {
+    return GUI_GetFadeToBlack();
 }
 
-// Message 0x42: seven ints and a float (the sixth value).
-void fn_800E5CA4(int a, int b, int c, int d, int e, int g, int h, f32 f) {
+// The long-drive contests' score panel (modes 22 and 26): message 0x42 with eight values in this
+// order: a the player, b the score, c the shot's length, d its kind, e 0, the float f (0.0 from
+// every caller), g 0, h the points the shot scored.
+void GUI_UpdateLongDriveScore(int a, int b, int c, int d, int e, int g, int h, f32 f) {
     MsgArg args[8];
-    fn_800E5908(0x42);
+    GameMsg_OnSend(0x42);
     Mem_set(args, 0, sizeof(args));
     args[0].i = a;
     args[1].i = b;
@@ -517,19 +559,27 @@ void fn_800E5CA4(int a, int b, int c, int d, int e, int g, int h, f32 f) {
     UISProcessHint(lbl_80281F1C->pHandler, 0x42, 8, args);
 }
 
-void fn_800E5D40(int n) {
+// Mode 22's scoring variant for the UI (message 89), once when the mode asks: 1 for variant 0, 2
+// for variant 1 (a shot scores only what it adds to the player's best).
+void GUI_SendLongDriveVariant(int n) {
     GameMsg_SendInt(89, n);
 }
 
-void fn_800E5D68(char* pStr) {
-    fn_800E5C08(90, pStr);
+// Mode 22's text for the UI (message 90 with a string): fn_80127034 sends the number n4 less the
+// current player's nEA0.
+void GUI_SendLongDriveText(char* pStr) {
+    GameMsg_SendString(90, pStr);
 }
 
-u8 fn_800E5D90(void) {
+// The front end's fade-to-black flag (lbl_801D87C0.b0): set when the round or the menus are left,
+// and fn_8009069C darkens the screen while it is.
+u8 GUI_GetFadeToBlack(void) {
     return lbl_801D87C0.b0;
 }
 
-void fn_800E5DA0(void) {
+// Marks every statistic tip as not shown yet (lbl_80203138), from GUI_Init at the start or restart
+// of a hole: each tip can come once a hole.
+void GUI_ClearShownTips(void) {
     lbl_80203138[0] = 0;
     lbl_80203138[1] = 0;
     lbl_80203138[2] = 0;
@@ -546,14 +596,16 @@ void fn_800E5DA0(void) {
     lbl_80203138[13] = 0;
 }
 
-// Queues message 0x21 with n. Below 15 (a tip): dropped while bD4 is set, and marked shown
-// (except tip 12) so fn_800E5E54 does not pick it again. 15 and up: always queued.
-void fn_800E5DE4(int n) {
+// Flags tip n to be shown on the UI's next update (pending bit 0x20: message 0x21 with n). Below 15
+// a statistic tip (fn_800E5E54's pick, through the menu's tip command): dropped during a playoff
+// (gpGame->bD4), else marked shown (tip 12 excepted) so it is not picked again this hole. 15 and
+// up, a GameBreaker's tip (event.c: 15 plus the lowest effect bit set): always flagged.
+void GUI_QueueTip(int n) {
     if (!gpGame->bD4 || n >= 15) {
         if (n < 15 && n != 12) {
             lbl_80203138[n] = 1;
         }
-        fn_800E5714(0x20);
-        fn_800E5724(n);
+        GameMsg_SetPending(0x20);
+        GameMsg_SetPendingValue(n);
     }
 }

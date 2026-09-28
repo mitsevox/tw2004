@@ -525,7 +525,7 @@ void GameModeSkillZoneTimed_ClearPerHoleData(void) {
 // SW_IDLE_SWING), UI message 0x36 (no value) is sent.
 void GameModeSkillZoneTimed_UpdateSwingUI(int nPlayer) {
     if (gPlayers[nPlayer].swing.nState != 0) {
-        fn_800E58B4(0x36);
+        GameMsg_Send(0x36);
     }
 }
 

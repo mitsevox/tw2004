@@ -49,7 +49,7 @@ void Gaud_ExitCamZoom(u8 nPlayer);
 void Gaud_ExitSpecialShot(u8 nPlayer);
 void AnimStream_AssignSlots(void);
 void GameEffects_SpinWindowDone(int nPlayer);
-void fn_800E5DE4(int n);
+void GUI_QueueTip(int n);
 void fn_8010D3B8(int nPlayer);
 void AI_SimAbort(void);
 void AI_AimAtPin(int nPlayer);
@@ -550,7 +550,7 @@ void fn_80066DC4(int nPlayer, int nEvent, void* pData, int nArg) {
 void fn_80066E28(int nPlayer, int nEvent, void* pData, int nArg) {
     Gaud_InitGameBreaker(nPlayer, 0);
     if (fn_80067560()) {
-        fn_800E5DE4((u8)(fn_80067560() + 15));
+        GUI_QueueTip((u8)(fn_80067560() + 15));
     }
 }
 
@@ -752,7 +752,7 @@ void fn_80067220(int nPlayer) {
 }
 
 void fn_8006752C(void) {
-    fn_800E58B4(58);
+    GameMsg_Send(58);
 }
 
 void fn_80067550(int nPlayer) {

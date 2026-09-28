@@ -297,7 +297,7 @@ void  GUI_SetMessageQueHeld(u8 b);
 void  GUI_StartAwardUI(void);
 void  GUI_MuteForScoreCard(void);
 void  GUI_SetUnreadFlag(u8 b);
-void  fn_800E5DE4(int n);
+void  GUI_QueueTip(int n);
 int   fn_800E5E54(void);
 f32   fn_800E6578(int nPlayer, u32 nStat);
 s32   fn_800E8114(int nPlayer);
@@ -1272,7 +1272,7 @@ void fn_80087764(MsgArg* pArgs, MsgArg* pResult) {
     int nTip = fn_800E5E54();
 
     if (nTip != 14) {
-        fn_800E5DE4(nTip);
+        GUI_QueueTip(nTip);
     }
 }
 

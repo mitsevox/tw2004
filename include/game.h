@@ -523,24 +523,24 @@ void GUI_ShowQueue9Message(int a, int b, int c);
 void GUI_ShowQueue8Message(int a, int b, int c);
 void GUI_ShowMedalMessage(int a, int b, int c);
 void GUI_ShowTourAwardMessage(int a, int b, int c);
-void fn_800E55F0(int a, int b, int c);
-void fn_800E5628(int a, int b, int c);
-void fn_800E5660(int a, int b, int c);
-void fn_800E5698(int a, int b, int c);
-void fn_800E56D0(int a, int b, int c);
-void fn_800E5714(int a);
-void fn_800E5724(int a);
-void fn_800E58B4(int nMsg);             // send a message with no values
+void GUI_ShowGolferUnlockMessage(int a, int b, int c);
+void GUI_ShowUnlockMessage(int a, int b, int c);
+void GUI_ShowRecordMessage(int a, int b, int c);
+void GUI_ShowTrophyMessage(int a, int b, int c);
+void GUI_ShowPrizeMessage(int a, int b, int c);
+void GameMsg_SetPending(int a);
+void GameMsg_SetPendingValue(int a);
+void GameMsg_Send(int nMsg);             // send a message with no values
 void GameMsg_Send1(int nMsg, u32 uFloats, void* pA);    // one value; uFloats bit 0: a float
 void GameMsg_Send2(int nMsg, u32 uFloats, void* pA, void* pB);
-void fn_800E5A4C(int nMsg, u32 uFloats, void* pA, void* pB, void* pC);   // three values; uFloats bit n: a float
+void GameMsg_Send3(int nMsg, u32 uFloats, void* pA, void* pB, void* pC);   // three values; uFloats bit n: a float
 void GameMsg_Send5(int nMsg, u32 uFloats, void* pA, void* pB, void* pC, void* pD, void* pE);   // five values
-void fn_800E5C08(int nMsg, char* pStr);  // send a message with a string
-u8   fn_800E5C84(void);
-void fn_800E5CA4(int a, int b, int c, int d, int e, int g, int h, f32 f);    // message 0x42
-void fn_800E5D40(int n);                // message 89 with a value
-void fn_800E5D68(char* pStr);           // message 90 with a string
-void fn_800E5DA0(void);
+void GameMsg_SendString(int nMsg, char* pStr);  // send a message with a string
+u8   GUI_IsFadingToBlack(void);
+void GUI_UpdateLongDriveScore(int a, int b, int c, int d, int e, int g, int h, f32 f);    // message 0x42
+void GUI_SendLongDriveVariant(int n);                // message 89 with a value
+void GUI_SendLongDriveText(char* pStr);           // message 90 with a string
+void GUI_ClearShownTips(void);
 
 // ---- the game modes --------------------------------------------------------------------------
 

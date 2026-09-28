@@ -38,9 +38,9 @@ void fn_80090400(FrontEnd* pFE);
 void fn_80090664(void);
 void fn_8008FE88(FrontEnd* pFE);
 TexEntry* fn_80090904(TexBank* pBank, u64 uHash);
-void fn_800E573C(void);         // GameMessages.c
-void fn_800E5798(void);         // GameMessages.c
-void fn_800E5708(void);         // GameMessages.c
+void GameMsg_SendPendingMenus(void);         // GameMessages.c
+void GameMsg_SendPending(void);         // GameMessages.c
+void GameMsg_ClearPending(void);         // GameMessages.c
 void fn_80092BA0(void);         // uiText.c
 void fn_8008EC30(void);         // uiLoadFile.c
 void fn_800B9FF0(void);
@@ -528,7 +528,7 @@ void fn_80090400(FrontEnd* pFE) {
 }
 
 // Resets the UI's controller state (all four controllers enabled); also calls fn_80092BA0,
-// fn_8008EC30 (nothing loaded), fn_800B9FF0 and fn_800E5708.
+// fn_8008EC30 (nothing loaded), fn_800B9FF0 and GameMsg_ClearPending.
 void fn_800905A8(void) {
     s32 i;
 
@@ -545,15 +545,15 @@ void fn_800905A8(void) {
     }
     lbl_801D87C0.b48 = 0;
     fn_800B9FF0();
-    fn_800E5708();
+    GameMsg_ClearPending();
 }
 
 // Sends the pending messages (GameMessages.c): game type 3 has its own set.
 void fn_80090628(void) {
     if (gSession.nGameType == 3) {
-        fn_800E573C();
+        GameMsg_SendPendingMenus();
     } else {
-        fn_800E5798();
+        GameMsg_SendPending();
     }
 }
 

@@ -326,10 +326,10 @@ void GameMode22_UpdateFrame(void) {
     if (gGameMode22ShowIntro != 0) {
         switch (gGameMode22.n0) {
         case 0:
-            fn_800E5D40(1);
+            GUI_SendLongDriveVariant(1);
             break;
         case 1:
-            fn_800E5D40(2);
+            GUI_SendLongDriveVariant(2);
             break;
         }
         GameMode22_ShowDrivesLeft(lbl_80282278);
@@ -362,7 +362,7 @@ void GameMode22_UpdateFrame(void) {
 void GameMode22_StartSwing(int nPlayer) {
     GameMode22_PreSwing();
     GameMode22_ShowDrivesLeft(nPlayer);
-    fn_800E5CA4(0, gPlayers[nPlayer].nEBC, 0, 0, 0, 0, 0, 0.0f);
+    GUI_UpdateLongDriveScore(0, gPlayers[nPlayer].nEBC, 0, 0, 0, 0, 0, 0.0f);
 }
 
 // The mode's pfnGoToPlayoff: never a playoff (0). The slot passes an argument it does not take.
@@ -687,7 +687,7 @@ void GameMode22_ScoreShot(int nPlayer) {
     nScore = pPlayer->nEBC;
     nScore = (nScore <= 0) ? 0 : nScore;
     pPlayer->nEBC = nScore;
-    fn_800E5CA4(0, gPlayers[nPlayer].nEBC, nLength, nKind, 0, 0, nPoints, 0.0f);
+    GUI_UpdateLongDriveScore(0, gPlayers[nPlayer].nEBC, nLength, nKind, 0, 0, nPoints, 0.0f);
 
     // A track the first time the score reaches 1200, 800 and 400.
     if (!gGameMode22Reached1200[nPlayer] && gPlayers[nPlayer].nEBC >= 1200) {
@@ -770,7 +770,7 @@ void GameMode22_ClearPlayerStats(void) {
         PLAYER(i)->nED4 = 0;
         PLAYER(i)->nED8 = 0;
         PLAYER(i)->nEDC = 0;
-        fn_800E5CA4(i, PLAYER(i)->nEBC, 0, 0, 0, 0, 0, 0.0f);
+        GUI_UpdateLongDriveScore(i, PLAYER(i)->nEBC, 0, 0, 0, 0, 0, 0.0f);
     }
     lbl_80282278 = 5;
     GameMode22_AfterClearStats();
@@ -827,11 +827,11 @@ u8 GameMode22_IsShowingWinner(void) {
     return 0;
 }
 
-// The current player's drives left (n4 less his nEA0), as text in message 90 (fn_800E5D68). nPlayer
+// The current player's drives left (n4 less his nEA0), as text in message 90 (GUI_SendLongDriveText). nPlayer
 // is not read: every caller passes one.
 void GameMode22_ShowDrivesLeft(int nPlayer) {
     sprintf(gGameMode22DrivesLeftText, "%d", gGameMode22.n4 - gPlayers[lbl_80282278].nEA0);
-    fn_800E5D68(gGameMode22DrivesLeftText);
+    GUI_SendLongDriveText(gGameMode22DrivesLeftText);
 }
 
 // The long-drive record slot (Session.recC's first index) of hole number nHole: holes 6, 7, 5, 3

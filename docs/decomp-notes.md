@@ -996,7 +996,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   to every single-use mask in Swing.c (States 04/05/08/09/10 exact, 06/12/14/22 closer).
 - **[verified] Statement order among plain stores matters**: `a[i] = 1; x = 0; y = 0;` and
   `x = 0; a[i] = 1; y = 0;` give different register use (GUI_PostShotUIStart). And a call made for an
-  argument that was never used (`fn_800E5DA0(lbl)` vs `fn_800E5DA0()`) changes the code.
+  argument that was never used (`GUI_ClearShownTips(lbl)` vs `GUI_ClearShownTips()`) changes the code.
 - **[verified] Chained assignment stores backwards.** `a[0] = a[1] = a[2] = 0` stores 2, 1, 0;
   the original wrote four statements in order.
 - **[verified] ...but a chain gets its zero register first.** A run of zero stores whose only

@@ -320,7 +320,7 @@ void fn_800F3358(void) {
 
 void fn_800F33D0(int nPlayer) {
     if (gPlayers[nPlayer].swing.nState != 0) {
-        fn_800E58B4(0x36);
+        GameMsg_Send(0x36);
     }
 }
 

@@ -579,7 +579,7 @@ void Lessons_Update(void) {
     f32 v[4] = {0.0f, 0.0f, 0.0f, 0.5f};
     int nView;
     if (gLessonPauseClosed) {
-        fn_800E58B4(39);
+        GameMsg_Send(39);
         gLessonPauseClosed = 0;
     }
     switch (gLessonStep) {
@@ -1183,7 +1183,7 @@ void Lessons_ShowSwingHint(u8 bShow, int nHint) {
 // Front-end message 40, sent after lesson 7: the question whether to go on, answered by
 // Lessons_ChooseContinue or Lessons_ChooseQuit.
 void Lessons_AskContinue(void) {
-    fn_800E58B4(40);
+    GameMsg_Send(40);
 }
 
 // Front-end message 38: HUD item nItem (0..8) highlighted (bOn 1) or not. The lessons use item 0
