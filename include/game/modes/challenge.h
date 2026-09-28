@@ -16,7 +16,7 @@ typedef struct ChallengeMedal {
     s32 nReward;                // 0x8
 } ChallengeMedal;
 
-// One challenge (0x80 bytes); lbl_80281664 points to the list being played.
+// One challenge (0x80 bytes); gChallengeList points to the list being played.
 typedef struct Challenge {
     s32 n0;                     // 0x00  offset of a line in the challenge text block (fn_800ED280)
     s32 n4;                     // 0x04  the same for a second line (fn_800ED2C8)
@@ -36,7 +36,7 @@ typedef struct Challenge {
     s32 nTargetBase;            // 0x40
     s32 nHoleKind;              // 0x44  what the challenge hole adds
     s32 nHoleExtra;             // 0x48
-    u8  bPlaceBall;             // 0x4C  the ball starts at the spot in lbl_80203170
+    u8  bPlaceBall;             // 0x4C  the ball starts at the spot in gPlayNowBallSpots
     u8  b4D;                    // 0x4D  f54 goes to fn_800ED6F8
     u8  unk4E[2];
     s32 nWind;                  // 0x50  the wind option while it is played
@@ -61,11 +61,11 @@ typedef struct ChallengeSpotRecord {
     u8  nChallenge;             // 0x1C
 } ChallengeSpotRecord;
 
-extern Challenge  lbl_80203554[83];     // mode 5's own challenges ('PLY ')
-extern ChallengeSpot lbl_80203170[83];  // their ball spots
-extern Challenge* lbl_80281664;         // the list being played: lbl_80281668 challenges,
-extern s32        lbl_80281668;
-extern s32        lbl_802822F4;         // the current one
+extern Challenge  gPlayNowChallenges[83];     // mode 5's own challenges ('PLY ')
+extern ChallengeSpot gPlayNowBallSpots[83];  // their ball spots
+extern Challenge* gChallengeList;         // the list being played: gNumChallenges challenges,
+extern s32        gNumChallenges;
+extern s32        gCurChallenge;         // the current one
 
 void fn_800EC544(Challenge* pList, s32 nCount);     // play from another list (mode 24's)
 

@@ -324,15 +324,15 @@ void GameModeMatch_EndGame(void) {
 
 // The current challenge's group.
 s32 fn_800EAC7C(void) {
-    return lbl_80281664[lbl_802822F4].nGroup;
+    return gChallengeList[gCurChallenge].nGroup;
 }
 
 // The index of the first challenge of group n (0 if none).
 int fn_800EAC94(int n) {
     int i;
     int nFound = 0;
-    for (i = 0; i < lbl_80281668; i++) {
-        if (n == lbl_80281664[i].nGroup) {
+    for (i = 0; i < gNumChallenges; i++) {
+        if (n == gChallengeList[i].nGroup) {
             nFound = i;
             break;
         }

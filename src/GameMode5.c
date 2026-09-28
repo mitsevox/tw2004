@@ -1,4 +1,4 @@
-// GameMode5.c (our name): game mode 5, a list of 83 challenges (lbl_80203554, loaded from the
+// GameMode5.c (our name): game mode 5, a list of 83 challenges (gPlayNowChallenges, loaded from the
 // 'PLY ' stream object), each an entry of 0x80 bytes.
 
 #include "golfer.h"
@@ -9,31 +9,31 @@
 #include "game/modes/challenge.h"
 #include "game/earnings.h"
 
-s32 lbl_80281660 = 4;
-Challenge* lbl_80281664 = lbl_80203554;
-s32 lbl_80281668 = 83;
+s32 gPlayNowSavedOptionC = 4;
+Challenge* gChallengeList = gPlayNowChallenges;
+s32 gNumChallenges = 83;
 
-Challenge  lbl_80203554[83];
-ChallengeSpot lbl_80203170[83];
+Challenge  gPlayNowChallenges[83];
+ChallengeSpot gPlayNowBallSpots[83];
 
-void (*lbl_8028232C)(void);
-void (*lbl_80282328)(void);
-void (*lbl_80282324)(void);
-u8  (*lbl_80282320)(u8 bCheck);        // the mode's own GameFinished
-u8 (*lbl_8028231C)(int nPlayer, u8 bCheck);   // and HoleFinished
-void (*lbl_80282318)(int nPlayer);
-u8 lbl_80282314;
-char* lbl_80282310;                  // the challenge text block
-s32 lbl_8028230C;
-s32 lbl_80282308;
-s32 lbl_80282304;
-s32 lbl_80282300;
-u8 lbl_802822FE;
-u8 lbl_802822FD;
-u8 lbl_802822FC;
-s32 lbl_802822F8;
-s32 lbl_802822F4;
-s32 lbl_802822F0;
+void (*gPlayNowModeShutdown)(void);
+void (*gPlayNowModeEndGame)(void);
+void (*gPlayNowModeHoleStart)(void);
+u8  (*gPlayNowModeGameFinished)(u8 bCheck);        // the mode's own GameFinished
+u8 (*gPlayNowModeHoleFinished)(int nPlayer, u8 bCheck);   // and HoleFinished
+void (*gPlayNowModeHoleOver)(int nPlayer);
+u8 gPlayNowIntroPending;
+char* gPlayNowText;                  // the challenge text block
+s32 gPlayNowGroupStrokes;
+s32 gPlayNowGroupPar;
+s32 gPlayNowGroupHoles;
+s32 gPlayNowGroupTime;
+u8 gPlayNowRestarting;
+u8 gPlayNowCalendarFlag;
+u8 gPlayNowChallengeRunning;
+s32 gPlayNowSelectedChallenge;
+s32 gCurChallenge;
+s32 gPlayNowSavedWind;
 
 void fn_800EAE44(int nId);
 s32 fn_800EAE6C(void);
@@ -66,22 +66,22 @@ void fn_800EACD8(void) {
     gpGame->pfn210 = fn_800ED604;
     gpGame->nC = 1;
     gpGame->n10 = 1;
-    lbl_802822FE = 0;
-    lbl_80281664 = lbl_80203554;
-    lbl_80281668 = 83;
+    gPlayNowRestarting = 0;
+    gChallengeList = gPlayNowChallenges;
+    gNumChallenges = 83;
 }
 
 // The mode ends: its cleanup callback runs once, and the options it changed come back.
 void fn_800EAD6C(void) {
-    if (lbl_8028232C) {
-        lbl_8028232C();
-        lbl_8028232C = NULL;
+    if (gPlayNowModeShutdown) {
+        gPlayNowModeShutdown();
+        gPlayNowModeShutdown = NULL;
     }
     gpGame->nC = 1;
     gpGame->n10 = 1;
-    gSession.options.nC = lbl_80281660;
-    gSession.options.nWind = lbl_802822F0;
-    lbl_802822FC = 0;
+    gSession.options.nC = gPlayNowSavedOptionC;
+    gSession.options.nWind = gPlayNowSavedWind;
+    gPlayNowChallengeRunning = 0;
 }
 
 void fn_800EADD8(void) {
@@ -94,22 +94,22 @@ void fn_800EADDC(void* pObj) {
     ChallengeSpotRecord* d = *(ChallengeSpotRecord**)pObj;
     int i = d->nChallenge - 1;
     if (i < 83) {
-        lbl_80203170[i].f0 = d->v[0];
-        lbl_80203170[i].f4 = d->v[1];
-        lbl_80203170[i].f8 = d->v[2];
+        gPlayNowBallSpots[i].f0 = d->v[0];
+        gPlayNowBallSpots[i].f4 = d->v[1];
+        gPlayNowBallSpots[i].f8 = d->v[2];
     }
     StaticMem_Free(pObj);
 }
 
 void fn_800EAE38(s32 p0) {
-    lbl_802822F4 = p0;
-    lbl_802822F8 = p0;
+    gCurChallenge = p0;
+    gPlayNowSelectedChallenge = p0;
 }
 
 void fn_800EAE44(int nId) {
     int i = fn_800EAC94(nId);
-    lbl_802822F4 = i;
-    lbl_802822F8 = i;
+    gCurChallenge = i;
+    gPlayNowSelectedChallenge = i;
 }
 
 s32 fn_800EAE6C(void) {
@@ -130,7 +130,7 @@ void fn_800EAEEC(UStreamObject* pObject) {
     // port: the 'PLY ' object is copied straight into the challenges (Challenge[83]); it is
     //       big-endian on disc, so a little-endian port converts it field by field here
     //       (docs/format-byteorder.md)
-    Stream_StreamLoadFixedSize(pObject, sizeof(lbl_80203554), lbl_80203554);
+    Stream_StreamLoadFixedSize(pObject, sizeof(gPlayNowChallenges), gPlayNowChallenges);
 }
 
 // The 'PLYs' object: the challenge text block is copied out.
@@ -138,8 +138,8 @@ void fn_800EAF18(UStreamObject* pObject) {
     void* pData;
     u32 nSize = fn_8000E81C(pObject, &pData);
     if (nSize) {
-        lbl_80282310 = fn_800951A0(nSize, 0x10, 1);
-        Mem_cpy(lbl_80282310, pData, nSize);
+        gPlayNowText = fn_800951A0(nSize, 0x10, 1);
+        Mem_cpy(gPlayNowText, pData, nSize);
         StaticMem_Free(pObject);
     }
 }
@@ -158,29 +158,29 @@ void fn_800EAF7C(void) {
     int nPar;
     int nHoles;
     u8 bFound;
-    lbl_80281660 = gSession.options.nC;
-    lbl_802822F0 = gSession.options.nWind;
+    gPlayNowSavedOptionC = gSession.options.nC;
+    gPlayNowSavedWind = gSession.options.nWind;
     GM_ClearDataForNewGame();
     if (gpSaveData[gPlayers[0].nIndex].bActive) {
         gpSaveData[gPlayers[0].nIndex].b70 = 1;
     }
-    GM_SetModeType(lbl_80281664[lbl_802822F4].nMode);
-    lbl_802822FC = 1;
-    GM_SetCurrentCourse(lbl_80281664[lbl_802822F4].nCourse);
-    GM_SelectHoleSet(lbl_80281664[lbl_802822F4].nType);
-    if (lbl_80281664[lbl_802822F4].nType == 0) {
-        GM_SelectSingleHole(lbl_80281664[lbl_802822F4].nHole - 1);
+    GM_SetModeType(gChallengeList[gCurChallenge].nMode);
+    gPlayNowChallengeRunning = 1;
+    GM_SetCurrentCourse(gChallengeList[gCurChallenge].nCourse);
+    GM_SelectHoleSet(gChallengeList[gCurChallenge].nType);
+    if (gChallengeList[gCurChallenge].nType == 0) {
+        GM_SelectSingleHole(gChallengeList[gCurChallenge].nHole - 1);
     }
-    if (lbl_80281664[lbl_802822F4].nType != 4 && lbl_80281664[lbl_802822F4].nType != 5 &&
-        lbl_80281664[lbl_802822F4].nType != 6 && lbl_80281664[lbl_802822F4].nType != 7) {
-        GM_SetCurrentHole(lbl_80281664[lbl_802822F4].nHole - 1);
+    if (gChallengeList[gCurChallenge].nType != 4 && gChallengeList[gCurChallenge].nType != 5 &&
+        gChallengeList[gCurChallenge].nType != 6 && gChallengeList[gCurChallenge].nType != 7) {
+        GM_SetCurrentHole(gChallengeList[gCurChallenge].nHole - 1);
     }
-    for (h = 0; h < lbl_80281664[lbl_802822F4].nHole - 1; h++) {
+    for (h = 0; h < gChallengeList[gCurChallenge].nHole - 1; h++) {
         gpGame->bHoleSelected[h] = 0;
     }
-    gSession.nTeeSet[0] = lbl_80281664[lbl_802822F4].nTeeSet;
-    if (lbl_80281664[lbl_802822F4].n20) {
-        gSession.nPinSet = lbl_80281664[lbl_802822F4].n20 - 1;
+    gSession.nTeeSet[0] = gChallengeList[gCurChallenge].nTeeSet;
+    if (gChallengeList[gCurChallenge].n20) {
+        gSession.nPinSet = gChallengeList[gCurChallenge].n20 - 1;
         for (h = 0; h < 18; h++) {
             gpGame->nPinSet[h] = gSession.nPinSet;
         }
@@ -191,11 +191,11 @@ void fn_800EAF7C(void) {
         }
     }
     gNumPlayersSetUp = 1;
-    Session_SetNumPlayers(lbl_80281664[lbl_802822F4].nOpponents + 1);
-    if (lbl_80281664[lbl_802822F4].nOpponents > 0) {
-        Session_SetGolfer(lbl_80281664[lbl_802822F4].aOpponent[0], 1);
+    Session_SetNumPlayers(gChallengeList[gCurChallenge].nOpponents + 1);
+    if (gChallengeList[gCurChallenge].nOpponents > 0) {
+        Session_SetGolfer(gChallengeList[gCurChallenge].aOpponent[0], 1);
         gSession.nController[1] = CONTROLLER_CPU;
-        gSession.nTeeSet[1] = lbl_80281664[lbl_802822F4].nTeeSet;
+        gSession.nTeeSet[1] = gChallengeList[gCurChallenge].nTeeSet;
         gNumPlayersSetUp = 2;
         if (gSession.nGolfer[0] == gSession.nGolfer[1] &&
             gSession.aProfile[0].n0 == gSession.aProfile[1].n0) {
@@ -205,10 +205,10 @@ void fn_800EAF7C(void) {
             }
         }
     }
-    if (lbl_80281664[lbl_802822F4].nOpponents > 1) {
-        Session_SetGolfer(lbl_80281664[lbl_802822F4].aOpponent[1], 2);
+    if (gChallengeList[gCurChallenge].nOpponents > 1) {
+        Session_SetGolfer(gChallengeList[gCurChallenge].aOpponent[1], 2);
         gSession.nController[2] = CONTROLLER_CPU;
-        gSession.nTeeSet[2] = lbl_80281664[lbl_802822F4].nTeeSet;
+        gSession.nTeeSet[2] = gChallengeList[gCurChallenge].nTeeSet;
         gNumPlayersSetUp = 3;
         if (gSession.nGolfer[0] == gSession.nGolfer[2] &&
             gSession.aProfile[0].n0 == gSession.aProfile[2].n0) {
@@ -218,10 +218,10 @@ void fn_800EAF7C(void) {
             }
         }
     }
-    if (lbl_80281664[lbl_802822F4].nOpponents > 2) {
-        Session_SetGolfer(lbl_80281664[lbl_802822F4].aOpponent[2], 3);
+    if (gChallengeList[gCurChallenge].nOpponents > 2) {
+        Session_SetGolfer(gChallengeList[gCurChallenge].aOpponent[2], 3);
         gSession.nController[3] = CONTROLLER_CPU;
-        gSession.nTeeSet[3] = lbl_80281664[lbl_802822F4].nTeeSet;
+        gSession.nTeeSet[3] = gChallengeList[gCurChallenge].nTeeSet;
         gNumPlayersSetUp = 4;
         if (gSession.nGolfer[0] == gSession.nGolfer[3] &&
             gSession.aProfile[0].n0 == gSession.aProfile[3].n0) {
@@ -234,27 +234,27 @@ void fn_800EAF7C(void) {
     nStrokes = 0;
     nPar = 0;
     nHoles = 0;
-    switch (lbl_80281664[lbl_802822F4].nTargetKind) {
+    switch (gChallengeList[gCurChallenge].nTargetKind) {
     case 0:
         for (h = 0; h < Game_CurHoleIndex(); h++) {
             gPlayers[0].nStrokes[h] = 0;
         }
         break;
     case 1:
-        if (lbl_80281664[lbl_802822F4].nType == 0) {
+        if (gChallengeList[gCurChallenge].nType == 0) {
             for (h = 0; h < Game_CurHoleIndex(); h++) {
                 gPlayers[0].nStrokes[h] = 0;
             }
             nPar = 0;
             nHoles = 0;
-            nStrokes = lbl_80281664[lbl_802822F4].nTargetBase;
+            nStrokes = gChallengeList[gCurChallenge].nTargetBase;
         } else {
             nSum0 = 0;
             for (h = 0; h < Game_CurHoleIndex(); h++) {
                 gPlayers[0].nStrokes[h] = Course_GetHolePar(h);
                 nSum0 += gPlayers[0].nStrokes[h];
             }
-            nDiff = lbl_80281664[lbl_802822F4].nTargetBase - nSum0;
+            nDiff = gChallengeList[gCurChallenge].nTargetBase - nSum0;
             while (nDiff != 0) {
                 h = Misc_RandFunc(0) % (Game_CurHoleIndex() + 1);
                 if (nDiff < 0) {
@@ -268,25 +268,25 @@ void fn_800EAF7C(void) {
                 for (h = 0; h < Game_CurHoleIndex(); h++) {
                     nSum += gPlayers[0].nStrokes[h];
                 }
-                nDiff = lbl_80281664[lbl_802822F4].nTargetBase - nSum;
+                nDiff = gChallengeList[gCurChallenge].nTargetBase - nSum;
             }
         }
         break;
     case 2:
-        if (lbl_80281664[lbl_802822F4].nType == 0) {
+        if (gChallengeList[gCurChallenge].nType == 0) {
             for (h = 0; h < Game_CurHoleIndex(); h++) {
                 gPlayers[0].nStrokes[h] = 0;
             }
             nPar = 0;
             nHoles = 1;
-            nStrokes = lbl_80281664[lbl_802822F4].nTargetBase;
+            nStrokes = gChallengeList[gCurChallenge].nTargetBase;
         } else {
             nSum0 = 0;
             for (h = 0; h < Game_CurHoleIndex(); h++) {
                 gPlayers[0].nStrokes[h] = Course_GetHolePar(h);
                 nSum0 += gPlayers[0].nStrokes[h];
             }
-            nDiff = lbl_80281664[lbl_802822F4].nTargetBase;
+            nDiff = gChallengeList[gCurChallenge].nTargetBase;
             while (nDiff != 0) {
                 h = Misc_RandFunc(0) % (Game_CurHoleIndex() + 1);
                 if (nDiff < 0) {
@@ -300,7 +300,7 @@ void fn_800EAF7C(void) {
                 for (h = 0; h < Game_CurHoleIndex(); h++) {
                     nSum += gPlayers[0].nStrokes[h];
                 }
-                nDiff = lbl_80281664[lbl_802822F4].nTargetBase - (nSum - nSum0);
+                nDiff = gChallengeList[gCurChallenge].nTargetBase - (nSum - nSum0);
             }
         }
         break;
@@ -321,7 +321,7 @@ void fn_800EAF7C(void) {
         break;
     case 7:
         if (gpGame->n4 == 1) {
-            nDiff = lbl_80281664[lbl_802822F4].nTargetBase;
+            nDiff = gChallengeList[gCurChallenge].nTargetBase;
             while (nDiff != 0) {
                 h = Misc_RandFunc(0) % (Game_CurHoleIndex() + 1);
                 if (nDiff < 0) {
@@ -346,7 +346,7 @@ void fn_800EAF7C(void) {
                     gPlayers[(u32)i].nStrokes[h] = Course_GetHolePar(h);
                 }
             }
-            nDiff = lbl_80281664[lbl_802822F4].nTargetBase;
+            nDiff = gChallengeList[gCurChallenge].nTargetBase;
             while (nDiff != 0) {
                 i = Misc_RandFunc(0) % (Game_CurHoleIndex() + 1);
                 if (nDiff < 0) {
@@ -360,20 +360,20 @@ void fn_800EAF7C(void) {
                 for (h = 0; h < Game_CurHoleIndex(); h++) {
                     nSum += gPlayers[0].nStrokes[h];
                 }
-                nDiff = lbl_80281664[lbl_802822F4].nTargetBase - (nSum - nSum0);
+                nDiff = gChallengeList[gCurChallenge].nTargetBase - (nSum - nSum0);
             }
         }
         break;
     }
-    switch (lbl_80281664[lbl_802822F4].nHoleKind) {
+    switch (gChallengeList[gCurChallenge].nHoleKind) {
     case 0:
         gPlayers[0].nStrokes[Game_CurHoleIndex()] = 0;
         break;
     case 1:
-        gPlayers[0].nStrokes[Game_CurHoleIndex()] = lbl_80281664[lbl_802822F4].nHoleExtra;
+        gPlayers[0].nStrokes[Game_CurHoleIndex()] = gChallengeList[gCurChallenge].nHoleExtra;
         break;
     case 2:
-        gPlayers[0].nStrokes[Game_CurHoleIndex()] = lbl_80281664[lbl_802822F4].nHoleExtra
+        gPlayers[0].nStrokes[Game_CurHoleIndex()] = gChallengeList[gCurChallenge].nHoleExtra
                 + Course_GetCurHolePar();
         break;
     case 3:
@@ -386,36 +386,36 @@ void fn_800EAF7C(void) {
         gPlayers[0].nStrokes[Game_CurHoleIndex()] = Course_GetCurHolePar() + 1;
         break;
     }
-    if (lbl_80281664[lbl_802822F4].b4D) {
+    if (gChallengeList[gCurChallenge].b4D) {
         gSession.options.nC = 3;
     } else {
         gSession.options.nC = 0;
     }
     gpGame->nMulligans = 0;
-    gSession.options.nWind = lbl_80281664[lbl_802822F4].nWind;
+    gSession.options.nWind = gChallengeList[gCurChallenge].nWind;
     bFound = 0;
-    for (i = lbl_802822F4 - 1; i >= 0; i--) {
-        if (lbl_80281664[i].nGroup == lbl_80281664[lbl_802822F4].nGroup) {
+    for (i = gCurChallenge - 1; i >= 0; i--) {
+        if (gChallengeList[i].nGroup == gChallengeList[gCurChallenge].nGroup) {
             bFound = 1;
         }
     }
     if (!bFound) {
-        lbl_8028230C = nStrokes;
-        lbl_80282308 = nPar;
-        lbl_80282304 = nHoles;
-        lbl_80282300 = 0;
-        lbl_80282314 = 1;
+        gPlayNowGroupStrokes = nStrokes;
+        gPlayNowGroupPar = nPar;
+        gPlayNowGroupHoles = nHoles;
+        gPlayNowGroupTime = 0;
+        gPlayNowIntroPending = 1;
     } else {
-        lbl_8028230C += nStrokes;
-        lbl_80282308 += nPar;
-        lbl_80282304 += nHoles;
+        gPlayNowGroupStrokes += nStrokes;
+        gPlayNowGroupPar += nPar;
+        gPlayNowGroupHoles += nHoles;
     }
-    lbl_8028232C = gpGame->pfnShutdown;
-    lbl_80282328 = gpGame->pfnEndGame;
-    lbl_80282324 = gpGame->pfn1E4;
-    lbl_80282320 = gpGame->pfnGameFinished;
-    lbl_8028231C = gpGame->pfnHoleFinished;
-    lbl_80282318 = gpGame->pfn210;
+    gPlayNowModeShutdown = gpGame->pfnShutdown;
+    gPlayNowModeEndGame = gpGame->pfnEndGame;
+    gPlayNowModeHoleStart = gpGame->pfn1E4;
+    gPlayNowModeGameFinished = gpGame->pfnGameFinished;
+    gPlayNowModeHoleFinished = gpGame->pfnHoleFinished;
+    gPlayNowModeHoleOver = gpGame->pfn210;
     gpGame->pfnShutdown = fn_800EAD6C;
     gpGame->pfnEndGame = fn_800EC1E0;
     gpGame->pfn1E4 = fn_800EBD28;
@@ -427,7 +427,7 @@ void fn_800EAF7C(void) {
 // Hole start (after fn_800EAF7C set the challenge up).
 void fn_800EBD28(void) {
     gpGame->b275 = 1;
-    lbl_80282324();
+    gPlayNowModeHoleStart();
     fn_800EBEF0();
 }
 
@@ -437,27 +437,27 @@ u8 fn_800EBD60(u8 bCheck) {
     int h;
     int nStrokes;
     int i;
-    if (lbl_802822FE) {
+    if (gPlayNowRestarting) {
         return 0;
     }
-    if (lbl_80282320(bCheck)) {
+    if (gPlayNowModeGameFinished(bCheck)) {
         nStrokes = 0;
         for (h = 0; h < 18; h++) {
             if (gpGame->bHoleSelected[h]) {
                 nStrokes += gPlayers[0].nStrokes[h];
-                lbl_80282308 += Course_GetHolePar(h);
-                lbl_80282304++;
-                lbl_80282300 += gPlayers[0].n290[h];
+                gPlayNowGroupPar += Course_GetHolePar(h);
+                gPlayNowGroupHoles++;
+                gPlayNowGroupTime += gPlayers[0].n290[h];
             }
         }
-        lbl_8028230C += nStrokes;
+        gPlayNowGroupStrokes += nStrokes;
         GM_SelectHoleSet(0);
-        for (i = lbl_802822F4 + 1; i < lbl_80281668; i++) {
-            if (lbl_80281664[i].nGroup == lbl_80281664[lbl_802822F4].nGroup) {
+        for (i = gCurChallenge + 1; i < gNumChallenges; i++) {
+            if (gChallengeList[i].nGroup == gChallengeList[gCurChallenge].nGroup) {
                 if (bCheck) {
                     return 0;
                 }
-                lbl_802822F4 = i;
+                gCurChallenge = i;
                 if (GM_Currently_RealtimeMode()) {
                     GM_SetModeType(24);
                     GameModeDriverRTE_StartNextChallenge();
@@ -478,76 +478,76 @@ u8 fn_800EBD60(u8 bCheck) {
 // of the list below; club 25 is always in), and fn_800ED6F8's value.
 void fn_800EBEF0(void) {
     f32 v[4];
-    if (lbl_80281664[lbl_802822F4].bPlaceBall) {
-        v[0] = lbl_80203170[lbl_802822F4].f0;
-        v[1] = lbl_80203170[lbl_802822F4].f4;
-        v[2] = lbl_80203170[lbl_802822F4].f8;
+    if (gChallengeList[gCurChallenge].bPlaceBall) {
+        v[0] = gPlayNowBallSpots[gCurChallenge].f0;
+        v[1] = gPlayNowBallSpots[gCurChallenge].f4;
+        v[2] = gPlayNowBallSpots[gCurChallenge].f8;
         v[3] = 1.0f;
         Physics_InitBall(&gPlayers[0].ball, v, 0);
         Physics_DropBall(&gPlayers[0].ball, v);
         LLMath_CopyVec(v, gPlayers[0].vBall);
     }
-    if (lbl_80281664[lbl_802822F4].nClubBits) {
+    if (gChallengeList[gCurChallenge].nClubBits) {
         gPlayers[0].golfer.uBagMask = 0x2000000;
-        if (lbl_80281664[lbl_802822F4].nClubBits & 1) {
+        if (gChallengeList[gCurChallenge].nClubBits & 1) {
             gPlayers[0].golfer.uBagMask |= 0x1;
         }
-        if (lbl_80281664[lbl_802822F4].nClubBits & 2) {
+        if (gChallengeList[gCurChallenge].nClubBits & 2) {
             gPlayers[0].golfer.uBagMask |= 0x40;
         }
-        if (lbl_80281664[lbl_802822F4].nClubBits & 4) {
+        if (gChallengeList[gCurChallenge].nClubBits & 4) {
             gPlayers[0].golfer.uBagMask |= 0x80;
         }
-        if (lbl_80281664[lbl_802822F4].nClubBits & 8) {
+        if (gChallengeList[gCurChallenge].nClubBits & 8) {
             gPlayers[0].golfer.uBagMask |= 0x100;
         }
-        if (lbl_80281664[lbl_802822F4].nClubBits & 0x10) {
+        if (gChallengeList[gCurChallenge].nClubBits & 0x10) {
             gPlayers[0].golfer.uBagMask |= 0x200;
         }
-        if (lbl_80281664[lbl_802822F4].nClubBits & 0x20) {
+        if (gChallengeList[gCurChallenge].nClubBits & 0x20) {
             gPlayers[0].golfer.uBagMask |= 0x400;
         }
-        if (lbl_80281664[lbl_802822F4].nClubBits & 0x40) {
+        if (gChallengeList[gCurChallenge].nClubBits & 0x40) {
             gPlayers[0].golfer.uBagMask |= 0x800;
         }
-        if (lbl_80281664[lbl_802822F4].nClubBits & 0x80) {
+        if (gChallengeList[gCurChallenge].nClubBits & 0x80) {
             gPlayers[0].golfer.uBagMask |= 0x1000;
         }
-        if (lbl_80281664[lbl_802822F4].nClubBits & 0x100) {
+        if (gChallengeList[gCurChallenge].nClubBits & 0x100) {
             gPlayers[0].golfer.uBagMask |= 0x2000;
         }
-        if (lbl_80281664[lbl_802822F4].nClubBits & 0x200) {
+        if (gChallengeList[gCurChallenge].nClubBits & 0x200) {
             gPlayers[0].golfer.uBagMask |= 0x4000;
         }
-        if (lbl_80281664[lbl_802822F4].nClubBits & 0x400) {
+        if (gChallengeList[gCurChallenge].nClubBits & 0x400) {
             gPlayers[0].golfer.uBagMask |= 0x8000;
         }
-        if (lbl_80281664[lbl_802822F4].nClubBits & 0x800) {
+        if (gChallengeList[gCurChallenge].nClubBits & 0x800) {
             gPlayers[0].golfer.uBagMask |= 0x10000;
         }
-        if (lbl_80281664[lbl_802822F4].nClubBits & 0x1000) {
+        if (gChallengeList[gCurChallenge].nClubBits & 0x1000) {
             gPlayers[0].golfer.uBagMask |= 0x20000;
         }
-        if (lbl_80281664[lbl_802822F4].nClubBits & 0x2000) {
+        if (gChallengeList[gCurChallenge].nClubBits & 0x2000) {
             gPlayers[0].golfer.uBagMask |= 0x40000;
         }
-        if (lbl_80281664[lbl_802822F4].nClubBits & 0x4000) {
+        if (gChallengeList[gCurChallenge].nClubBits & 0x4000) {
             gPlayers[0].golfer.uBagMask |= 0x80000;
         }
-        if (lbl_80281664[lbl_802822F4].nClubBits & 0x8000) {
+        if (gChallengeList[gCurChallenge].nClubBits & 0x8000) {
             gPlayers[0].golfer.uBagMask |= 0x200000;
         }
-        if (lbl_80281664[lbl_802822F4].nClubBits & 0x10000) {
+        if (gChallengeList[gCurChallenge].nClubBits & 0x10000) {
             gPlayers[0].golfer.uBagMask |= 0x800000;
         }
     }
-    if (lbl_80281664[lbl_802822F4].b4D) {
-        fn_800ED6F8(lbl_80281664[lbl_802822F4].f54);
+    if (gChallengeList[gCurChallenge].b4D) {
+        fn_800ED6F8(gChallengeList[gCurChallenge].f54);
     }
 }
 
 // Per medal (0..2): three messages to pick from.
-s32 lbl_801925F0[3][3] = {
+s32 gPlayNowMedalMessages[3][3] = {
     {0, 1, 2},
     {3, 4, 5},
     {6, 7, 8},
@@ -555,7 +555,7 @@ s32 lbl_801925F0[3][3] = {
 
 // A message of kind n: one of three at random.
 void fn_800EC170(int n) {
-    s32 nMsg = lbl_801925F0[n][Misc_RandFunc(0) % 3];
+    s32 nMsg = gPlayNowMedalMessages[n][Misc_RandFunc(0) % 3];
     GUI_QueueMessage(7, nMsg, 0, 0);
 }
 
@@ -568,7 +568,7 @@ void fn_800EC1E0(void) {
     int nMedal;
     int nProfile;
     int nMoney;
-    lbl_80282328();
+    gPlayNowModeEndGame();
     if (!GM_Currently_RealtimeMode()) {
         nMedal = fn_800EC558();
         if (!fn_801025F4() && nMedal != 3) {
@@ -578,13 +578,13 @@ void fn_800EC1E0(void) {
             }
             switch (nMedal) {
             case 0:
-                nReward = lbl_80281664[lbl_802822F4].aMedal[0].nReward;
+                nReward = gChallengeList[gCurChallenge].aMedal[0].nReward;
                 break;
             case 1:
-                nReward = lbl_80281664[lbl_802822F4].aMedal[1].nReward;
+                nReward = gChallengeList[gCurChallenge].aMedal[1].nReward;
                 break;
             case 2:
-                nReward = lbl_80281664[lbl_802822F4].aMedal[2].nReward;
+                nReward = gChallengeList[gCurChallenge].aMedal[2].nReward;
                 break;
             }
             fn_800EC170(nMedal);
@@ -638,13 +638,13 @@ u8 fn_800EC4F0(int n) {
 }
 
 void fn_800EC544(Challenge* p0, s32 p1) {
-    lbl_80281664 = p0;
-    lbl_80281668 = p1;
+    gChallengeList = p0;
+    gNumChallenges = p1;
 }
 
 // Whether one of the mode's challenges is being played (set when it starts, cleared when it ends).
 u8 GM5_IsChallengeRunning(void) {
-    return lbl_802822FC;
+    return gPlayNowChallengeRunning;
 }
 
 // The medal earned (0 best, 3 none): for each medal its rule against the group's totals (strokes
@@ -666,27 +666,27 @@ int fn_800EC558(void) {
     for (m = 0; m < 3; m++) {
         switch (m) {
         case 0:
-            nRule = lbl_80281664[lbl_802822F4].aMedal[0].nRule;
-            nMark = lbl_80281664[lbl_802822F4].aMedal[0].nMark;
+            nRule = gChallengeList[gCurChallenge].aMedal[0].nRule;
+            nMark = gChallengeList[gCurChallenge].aMedal[0].nMark;
             break;
         case 1:
-            nRule = lbl_80281664[lbl_802822F4].aMedal[1].nRule;
-            nMark = lbl_80281664[lbl_802822F4].aMedal[1].nMark;
+            nRule = gChallengeList[gCurChallenge].aMedal[1].nRule;
+            nMark = gChallengeList[gCurChallenge].aMedal[1].nMark;
             break;
         case 2:
-            nRule = lbl_80281664[lbl_802822F4].aMedal[2].nRule;
-            nMark = lbl_80281664[lbl_802822F4].aMedal[2].nMark;
+            nRule = gChallengeList[gCurChallenge].aMedal[2].nRule;
+            nMark = gChallengeList[gCurChallenge].aMedal[2].nMark;
             break;
         }
-        switch (lbl_80281664[lbl_802822F4].nScoring) {
+        switch (gChallengeList[gCurChallenge].nScoring) {
         case 0:
-            nStrokes = lbl_8028230C;
-            nPar = lbl_80282308;
-            nHoles = lbl_80282304;
-            nPen = lbl_80282300;
+            nStrokes = gPlayNowGroupStrokes;
+            nPar = gPlayNowGroupPar;
+            nHoles = gPlayNowGroupHoles;
+            nPen = gPlayNowGroupTime;
             switch (nRule) {
             case 1:
-                if (nStrokes + lbl_80281664[lbl_802822F4].nTargetBase <= nMark) {
+                if (nStrokes + gChallengeList[gCurChallenge].nTargetBase <= nMark) {
                     return m;
                 }
                 break;
@@ -836,36 +836,36 @@ u8 fn_800ECA08(void) {
 // mode 0; -1 when the current challenge gives no such medal).
 s32 fn_800ECA34(int k) {
     int i;
-    int nLast = lbl_802822F4;
+    int nLast = gCurChallenge;
     int nTarget;
-    for (i = 0; i < lbl_80281668; i++) {
-        if (lbl_80281664[i].nGroup == lbl_80281664[lbl_802822F4].nGroup && i > nLast) {
+    for (i = 0; i < gNumChallenges; i++) {
+        if (gChallengeList[i].nGroup == gChallengeList[gCurChallenge].nGroup && i > nLast) {
             nLast = i;
         }
     }
-    nTarget = fn_800ECF9C(lbl_802822F4);
-    if ((lbl_80281664[lbl_802822F4].nTargetKind == 7 && Game_GetMode() == 0) ||
-        lbl_80281664[lbl_802822F4].nTargetKind == 1) {
+    nTarget = fn_800ECF9C(gCurChallenge);
+    if ((gChallengeList[gCurChallenge].nTargetKind == 7 && Game_GetMode() == 0) ||
+        gChallengeList[gCurChallenge].nTargetKind == 1) {
         nTarget = 0;
     }
     switch (k) {
     case 0:
-        if (lbl_80281664[lbl_802822F4].aMedal[2].nRule == 0) {
+        if (gChallengeList[gCurChallenge].aMedal[2].nRule == 0) {
             return -1;
         } else {
-            return lbl_80281664[nLast].aMedal[2].nMark - nTarget;
+            return gChallengeList[nLast].aMedal[2].nMark - nTarget;
         }
     case 1:
-        if (lbl_80281664[lbl_802822F4].aMedal[1].nRule == 0) {
+        if (gChallengeList[gCurChallenge].aMedal[1].nRule == 0) {
             return -1;
         } else {
-            return lbl_80281664[nLast].aMedal[1].nMark - nTarget;
+            return gChallengeList[nLast].aMedal[1].nMark - nTarget;
         }
     case 2:
-        if (lbl_80281664[lbl_802822F4].aMedal[0].nRule == 0) {
+        if (gChallengeList[gCurChallenge].aMedal[0].nRule == 0) {
             return -1;
         } else {
-            return lbl_80281664[nLast].aMedal[0].nMark - nTarget;
+            return gChallengeList[nLast].aMedal[0].nMark - nTarget;
         }
     default:
         return 0;
@@ -910,14 +910,14 @@ int fn_800ECC14(void) {
     }
     i = 0;
     nTarget = 0;
-    for (; i <= lbl_802822F4; i++) {
-        if (lbl_80281664[i].nGroup == lbl_80281664[lbl_802822F4].nGroup) {
+    for (; i <= gCurChallenge; i++) {
+        if (gChallengeList[i].nGroup == gChallengeList[gCurChallenge].nGroup) {
             nTarget += fn_800ED028(i);
         }
     }
     k = 0;
-    nScore = lbl_80281664[lbl_802822F4].nTargetKind != 1 ? lbl_8028230C : 0;
-    if (Game_GetMode() == 0 && lbl_80281664[lbl_802822F4].nTargetKind == 7) {
+    nScore = gChallengeList[gCurChallenge].nTargetKind != 1 ? gPlayNowGroupStrokes : 0;
+    if (Game_GetMode() == 0 && gChallengeList[gCurChallenge].nTargetKind == 7) {
         if (GUI_ScoreCardUp()) {
             k = 1;
         }
@@ -928,12 +928,12 @@ int fn_800ECC14(void) {
         }
     } else {
         for (h = 0; h < 18; h++) {
-            if (gpGame->bHoleSelected[h] || lbl_80281664[lbl_802822F4].nTargetKind == 1) {
+            if (gpGame->bHoleSelected[h] || gChallengeList[gCurChallenge].nTargetKind == 1) {
                 nScore += gPlayers[0].nStrokes[h];
             }
         }
     }
-    if (lbl_80281664[lbl_802822F4].nTargetKind == 1) {
+    if (gChallengeList[gCurChallenge].nTargetKind == 1) {
         nTarget = 0;
     }
     return nScore - nTarget;
@@ -943,8 +943,8 @@ int fn_800ECC14(void) {
 int fn_800ECF9C(int iUnused) {
     int n = 0;
     int i;
-    for (i = 0; i < lbl_80281668; i++) {
-        if (lbl_80281664[i].nGroup == lbl_80281664[lbl_802822F4].nGroup) {
+    for (i = 0; i < gNumChallenges; i++) {
+        if (gChallengeList[i].nGroup == gChallengeList[gCurChallenge].nGroup) {
             n += fn_800ED028(i);
         }
     }
@@ -957,34 +957,34 @@ int fn_800ECF9C(int iUnused) {
 // birdie (3), par (4) or bogey (5).
 int fn_800ED028(int i) {
     int nTarget = 0;
-    int nHole = lbl_80281664[i].nHole - 1;
+    int nHole = gChallengeList[i].nHole - 1;
     int k;               // a loop counter, and in case 7 the current hole once it is over
     int h;
     h = Game_GetMode();     // h is the mode here, a hole number below
     if (h == 0) {
-        switch (lbl_80281664[i].nTargetKind) {
+        switch (gChallengeList[i].nTargetKind) {
         case 1:
-            nTarget = lbl_80281664[i].nTargetBase;
+            nTarget = gChallengeList[i].nTargetBase;
             break;
         case 2:
             for (k = 0; k < nHole; k++) {
-                nTarget += fn_800D2ABC(lbl_80281664[i].nCourse, k);
+                nTarget += fn_800D2ABC(gChallengeList[i].nCourse, k);
             }
-            nTarget += lbl_80281664[i].nTargetBase;
+            nTarget += gChallengeList[i].nTargetBase;
             break;
         case 3:
             for (h = 0; h < nHole; h++) {
-                nTarget += fn_800D2ABC(lbl_80281664[i].nCourse, h) - 1;
+                nTarget += fn_800D2ABC(gChallengeList[i].nCourse, h) - 1;
             }
             break;
         case 4:
             for (h = 0; h < nHole; h++) {
-                nTarget += fn_800D2ABC(lbl_80281664[i].nCourse, h);
+                nTarget += fn_800D2ABC(gChallengeList[i].nCourse, h);
             }
             break;
         case 5:
             for (h = 0; h < nHole; h++) {
-                nTarget += fn_800D2ABC(lbl_80281664[i].nCourse, h) + 1;
+                nTarget += fn_800D2ABC(gChallengeList[i].nCourse, h) + 1;
             }
             break;
         case 7:
@@ -999,21 +999,21 @@ int fn_800ED028(int i) {
             }
             break;
         }
-        switch (lbl_80281664[i].nHoleKind) {
+        switch (gChallengeList[i].nHoleKind) {
         case 1:
-            nTarget += lbl_80281664[i].nHoleExtra;
+            nTarget += gChallengeList[i].nHoleExtra;
             break;
         case 2:
-            nTarget += fn_800D2ABC(lbl_80281664[i].nCourse, nHole) + lbl_80281664[i].nHoleExtra;
+            nTarget += fn_800D2ABC(gChallengeList[i].nCourse, nHole) + gChallengeList[i].nHoleExtra;
             break;
         case 3:
-            nTarget += fn_800D2ABC(lbl_80281664[i].nCourse, nHole) - 1;
+            nTarget += fn_800D2ABC(gChallengeList[i].nCourse, nHole) - 1;
             break;
         case 4:
-            nTarget += fn_800D2ABC(lbl_80281664[i].nCourse, nHole);
+            nTarget += fn_800D2ABC(gChallengeList[i].nCourse, nHole);
             break;
         case 5:
-            nTarget += fn_800D2ABC(lbl_80281664[i].nCourse, nHole) + 1;
+            nTarget += fn_800D2ABC(gChallengeList[i].nCourse, nHole) + 1;
             break;
         }
     }
@@ -1028,7 +1028,7 @@ char* fn_800ED280(int nId) {
     if (i == -1) {
         return 0;
     }
-    return lbl_80282310 + lbl_80203554[i].n0;
+    return gPlayNowText + gPlayNowChallenges[i].n0;
 }
 
 char* fn_800ED2C8(int nId) {
@@ -1037,7 +1037,7 @@ char* fn_800ED2C8(int nId) {
     if (i == -1) {
         return 0;
     }
-    return lbl_80282310 + lbl_80203554[i].n4;
+    return gPlayNowText + gPlayNowChallenges[i].n4;
 }
 
 // The holes left in the group: the rest of this round, plus each later challenge's holes (one, 18,
@@ -1052,10 +1052,10 @@ int fn_800ED314(void) {
         }
     }
     i = !fn_800ED5C8(0, 1);
-    if (fn_800ED508(lbl_80281664[lbl_802822F4].nGroup) > 1) {
-        for (i = lbl_802822F4 + i; i < lbl_80281668; i++) {
-            if (lbl_80281664[i].nGroup == lbl_80281664[lbl_802822F4].nGroup) {
-                switch (lbl_80281664[i].nType) {
+    if (fn_800ED508(gChallengeList[gCurChallenge].nGroup) > 1) {
+        for (i = gCurChallenge + i; i < gNumChallenges; i++) {
+            if (gChallengeList[i].nGroup == gChallengeList[gCurChallenge].nGroup) {
+                switch (gChallengeList[i].nType) {
                 case 0:
                     n += 1;
                     break;
@@ -1070,21 +1070,21 @@ int fn_800ED314(void) {
                     break;
                 case 4:
                     for (h = 0; h < 18; h++) {
-                        if (fn_800D2ABC(lbl_80281664[i].nCourse, h) == 5) {
+                        if (fn_800D2ABC(gChallengeList[i].nCourse, h) == 5) {
                             n++;
                         }
                     }
                     break;
                 case 5:
                     for (h = 0; h < 18; h++) {
-                        if (fn_800D2ABC(lbl_80281664[i].nCourse, h) == 4) {
+                        if (fn_800D2ABC(gChallengeList[i].nCourse, h) == 4) {
                             n++;
                         }
                     }
                     break;
                 case 6:
                     for (h = 0; h < 18; h++) {
-                        if (fn_800D2ABC(lbl_80281664[i].nCourse, h) == 3) {
+                        if (fn_800D2ABC(gChallengeList[i].nCourse, h) == 3) {
                             n++;
                         }
                     }
@@ -1110,8 +1110,8 @@ int fn_800ED314(void) {
 int fn_800ED508(int nGroup) {
     int n = 0;
     int i;
-    for (i = 0; i < lbl_80281668; i++) {
-        if (nGroup == lbl_80281664[i].nGroup) {
+    for (i = 0; i < gNumChallenges; i++) {
+        if (nGroup == gChallengeList[i].nGroup) {
             n++;
         }
     }
@@ -1119,18 +1119,18 @@ int fn_800ED508(int nGroup) {
 }
 
 u8 fn_800ED540(void) {
-    return lbl_80282314;
+    return gPlayNowIntroPending;
 }
 
 void fn_800ED548(void) {
-    lbl_80282314 = 0;
+    gPlayNowIntroPending = 0;
 }
 
 // Restart: back to the challenge it was started on (a UI command, after GM_RestartHole).
 void fn_800ED554(void) {
-    lbl_802822FE = 1;
+    gPlayNowRestarting = 1;
     gpGame->b134 = 1;
-    lbl_802822F4 = lbl_802822F8;
+    gCurChallenge = gPlayNowSelectedChallenge;
     GM_EndOfGolferTurn(0);
     gpGame->pfn224();
     fn_800E5714(2);
@@ -1145,51 +1145,51 @@ void fn_800ED554(void) {
 
 // Hole finished: always after a restart; otherwise the mode's own test.
 u8 fn_800ED5C8(int nPlayer, u8 bCheck) {
-    if (lbl_802822FE) {
+    if (gPlayNowRestarting) {
         return 1;
     }
-    return lbl_8028231C(nPlayer, bCheck);
+    return gPlayNowModeHoleFinished(nPlayer, bCheck);
 }
 
 // The hole is over, the game is not: after a restart GUI_SetEndOfHolePending runs and the restart
 // flag and b275 are cleared; otherwise the mode's own callback runs.
 void fn_800ED604(int nPlayer) {
-    if (lbl_802822FE) {
+    if (gPlayNowRestarting) {
         GUI_SetEndOfHolePending();
-        lbl_802822FE = 0;
+        gPlayNowRestarting = 0;
         gpGame->b275 = 0;
         return;
     }
-    lbl_80282318(nPlayer);
+    gPlayNowModeHoleOver(nPlayer);
 }
 
 // Challenge i's three rewards, the lowest medal's first.
 void fn_800ED650(int i, s32* pA, s32* pB, s32* pC) {
-    *pA = lbl_80281664[i].aMedal[2].nReward;
-    *pB = lbl_80281664[i].aMedal[1].nReward;
-    *pC = lbl_80281664[i].aMedal[0].nReward;
+    *pA = gChallengeList[i].aMedal[2].nReward;
+    *pB = gChallengeList[i].aMedal[1].nReward;
+    *pC = gChallengeList[i].aMedal[0].nReward;
 }
 
 s32 fn_800ED688(int i) {
-    return lbl_80281664[i].nOpponents;
+    return gChallengeList[i].nOpponents;
 }
 
 s32 fn_800ED69C(int i, int k) {
     if (k == 0) {
-        return lbl_80281664[i].aOpponent[0];
+        return gChallengeList[i].aOpponent[0];
     }
     if (k == 1) {
-        return lbl_80281664[i].aOpponent[1];
+        return gChallengeList[i].aOpponent[1];
     }
-    return lbl_80281664[i].aOpponent[2];
+    return gChallengeList[i].aOpponent[2];
 }
 
 void fn_800ED6E8(u8 v) {
-    lbl_802822FD = v;
+    gPlayNowCalendarFlag = v;
 }
 
 u8 fn_800ED6F0(void) {
-    return lbl_802822FD;
+    return gPlayNowCalendarFlag;
 }
 
 void fn_800ED6F8(f32 x0) {
