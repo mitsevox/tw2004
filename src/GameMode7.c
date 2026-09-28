@@ -1,5 +1,6 @@
-// GameMode7.c (our name): game mode 7, a two-player mode on the shared head-to-head code (see
-// GameMode6.c); it sets more of the callbacks than mode 6.
+// GameMode7.c (our name): the setup of game mode 7, two-player speed golf on event points
+// (SpeedGolfPoints_* in GameMode8.c), and two hooks speed golf's modes share: the hole start
+// (modes 6, 7 and 8) and the round start (modes 7 and 8).
 
 #include "golfer.h"
 #include "game.h"

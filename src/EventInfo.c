@@ -1,9 +1,10 @@
-// EventInfo.c (our name): the front end's panel of details about a calendar day's event: for a
-// PGA TOUR event the purse, round, course, leader, score and the defending champion, for a
-// real-time event its rewards, status and dates. The panel functions fill one line's label and
-// value each (lines 3 to 8 of the panel); three front-end messages give the next real-time event,
-// the clock's date and an award.
-// TW06 keeps the like in fe_calendarpopups.c, but nothing here proves the pairing.
+// EventInfo.c (our name; EA's FE_CalendarPopups.c in TW07): the rows of the calendar's day popup
+// about an event, one row's title and text a call (rows 3 to 8; GameModeDriver.c's
+// PGATour_GetPopupRow and RealTime_GetPopupRow fill the rest): for a PGA TOUR event under way,
+// played or to come the purse, round, course, leader, scores, winner and defending champion; for a
+// real-time event its purse, rewards and status. TW07's file has the seven in the same order with
+// the same locals, after three OnlinePopup_GetRow_* ones stripped here. Three front-end messages
+// follow that TW07's file does not have: the next real-time event, the clock's date and an award.
 
 #include "golfer.h"
 #include "game.h"
@@ -16,23 +17,25 @@
 // Up to three reward names for a real-time event (nKind 0x11); how many there are.
 int  FE_CrAP_GetFirstThreeItemsWithLockModeAndVal(int nKind, s32 nId, char* szFirst, char* szSecond, char* szThird);
 void Gaud_PlayUISound(s32 n);
-void PGATourPopup_GetRow_EventUpcoming(int nLine, char* szLabel, char* szValue);
+void PGATourPopup_GetRow_EventUpcoming(int nRow, char* szTitle, char* szText);
 
-// fake match: stands in for a function the original linker stripped. The file's strings start
+// fake match: stands in for the functions the original linker stripped. The file's strings start
 // with "", "Purse:" and "Status:" (.sdata 0x802818A8) and "Rewards:" (.data 0x801944F8), before
-// PGATourPopup_GetRow_EventInProgress's; the body is unknown.
-static void EventInfo_StrippedFn(char* szLabel, char* szValue) {
-    strcpy(szValue, "");
-    strcpy(szLabel, "Purse:");
-    strcpy(szLabel, "Status:");
-    strcpy(szLabel, "Rewards:");
+// PGATourPopup_GetRow_EventInProgress's; TW07's FE_CalendarPopups.c starts with three
+// OnlinePopup_GetRow_* functions (today's event, results, upcoming) whose rows these likely are.
+// Their bodies are unknown.
+static void EventInfo_StrippedFn(char* szTitle, char* szText) {
+    strcpy(szText, "");
+    strcpy(szTitle, "Purse:");
+    strcpy(szTitle, "Status:");
+    strcpy(szTitle, "Rewards:");
 }
 
 // A row of the PGA TOUR calendar's day popup for a tournament under way (popup type 0,
 // PGATour_GetPopupRow): 3 the purse, 4 the round (from 1), 5 the round's course (the first round's
 // when the round is out of range), 6 the leader, 7 the leader's score and 8 the player's, to par
 // ("E" for even). Other rows are left as they were.
-void PGATourPopup_GetRow_EventInProgress(int nLine, char* szLabel, char* szValue) {
+void PGATourPopup_GetRow_EventInProgress(int nRow, char* szTitle, char* szText) {
     char sz[128];
     s32 aCourses[4];
     s32 nId;
@@ -40,53 +43,53 @@ void PGATourPopup_GetRow_EventInProgress(int nLine, char* szLabel, char* szValue
     s32 nRounds;
 
     GameModeDriverPGATour_GetEventByDate(CalendarState.nSelected, &nId, &nRound);
-    switch (nLine) {
+    switch (nRow) {
     case 3:
-        strcpy(szLabel, "Purse:");
+        strcpy(szTitle, "Purse:");
         GameModeDriverPGATour_GetPurseString(nId, sz);
-        sprintf(szValue, "$%s", sz);
+        sprintf(szText, "$%s", sz);
         break;
     case 4:
-        strcpy(szLabel, "Round:");
-        sprintf(szValue, "%d", nRound + 1);
+        strcpy(szTitle, "Round:");
+        sprintf(szText, "%d", nRound + 1);
         break;
     case 5:
-        strcpy(szLabel, "Course:");
+        strcpy(szTitle, "Course:");
         GameModeDriverPGATour_GetCourses(GameModeDriverPGATour_GetEventInfo(nId), aCourses);
         nRounds = GameModeDriverPGATour_GetRounds(nId);
         if (nRound >= 0 && nRound < nRounds) {
-            strcpy(szValue, lbl_80191990[aCourses[nRound]]);
+            strcpy(szText, lbl_80191990[aCourses[nRound]]);
         } else {
-            strcpy(szValue, lbl_80191990[aCourses[0]]);
+            strcpy(szText, lbl_80191990[aCourses[0]]);
         }
         break;
     case 6:
-        strcpy(szLabel, "Leader:");
+        strcpy(szTitle, "Leader:");
         GameModeDriverPGATour_GetCurrentEventLeader(sz);
-        strcpy(szValue, sz);
+        strcpy(szText, sz);
         break;
     case 7: {
         // Each score case has its own block-scoped local (a shared one allocates differently).
         int nScore = GameModeDriverPGATour_GetCurrentLeaderScore();
-        strcpy(szLabel, "Score:");
+        strcpy(szTitle, "Score:");
         if (nScore == 0) {
-            sprintf(szValue, "E");
+            sprintf(szText, "E");
         } else if (nScore > 0) {
-            sprintf(szValue, "+%d", nScore);
+            sprintf(szText, "+%d", nScore);
         } else {
-            sprintf(szValue, "%d", nScore);
+            sprintf(szText, "%d", nScore);
         }
         break;
     }
     case 8: {
         int nScore = GameModeDriverPGATour_GetUserScore(nId);
-        strcpy(szLabel, "Your Score:");
+        strcpy(szTitle, "Your Score:");
         if (nScore == 0) {
-            sprintf(szValue, "E");
+            sprintf(szText, "E");
         } else if (nScore > 0) {
-            sprintf(szValue, "+%d", nScore);
+            sprintf(szText, "+%d", nScore);
         } else {
-            sprintf(szValue, "%d", nScore);
+            sprintf(szText, "%d", nScore);
         }
         break;
     }
@@ -95,41 +98,41 @@ void PGATourPopup_GetRow_EventInProgress(int nLine, char* szLabel, char* szValue
 
 // A row of the PGA TOUR calendar's day popup for a tournament already played (popup type 1): rows 3
 // and 8 blank, 4 the winner, 5 the winning score, 6 the winner's earnings, 7 the player's finish.
-void PGATourPopup_GetRow_EventResults(int nLine, char* szLabel, char* szValue) {
+void PGATourPopup_GetRow_EventResults(int nRow, char* szTitle, char* szText) {
     char sz[128];
     s32 nId;
     s32 nRound;
     s32 nScore;
 
     GameModeDriverPGATour_GetEventByDate(CalendarState.nSelected, &nId, &nRound);
-    switch (nLine) {
+    switch (nRow) {
     case 3:
-        strcpy(szLabel, "");
-        strcpy(szValue, "");
+        strcpy(szTitle, "");
+        strcpy(szText, "");
         break;
     case 4:
-        strcpy(szLabel, "Winner:");
+        strcpy(szTitle, "Winner:");
         GameModeDriverPGATour_GetChamp(nId, sz);
-        strcpy(szValue, sz);
+        strcpy(szText, sz);
         break;
     case 5:
         nScore = GameModeDriverPGATour_GetChampScore(nId);
-        strcpy(szLabel, "Score:");
-        sprintf(szValue, "%d", nScore);
+        strcpy(szTitle, "Score:");
+        sprintf(szText, "%d", nScore);
         break;
     case 6:
-        strcpy(szLabel, "Earnings:");
+        strcpy(szTitle, "Earnings:");
         GameModeDriverPGATour_GetWinnerEarningsString(nId, sz);
-        sprintf(szValue, "$%s", sz);
+        sprintf(szText, "$%s", sz);
         break;
     case 7:
-        strcpy(szLabel, "Your Finish:");
+        strcpy(szTitle, "Your Finish:");
         GameModeDriverPGATour_GetUserFinishString(nId, sz);
-        strcpy(szValue, sz);
+        strcpy(szText, sz);
         break;
     case 8:
-        strcpy(szLabel, "");
-        strcpy(szValue, "");
+        strcpy(szTitle, "");
+        strcpy(szText, "");
         break;
     }
 }
@@ -138,7 +141,7 @@ void PGATourPopup_GetRow_EventResults(int nLine, char* szLabel, char* szValue) {
 // "Defending " / "Champion:" and the defending champion, 5 and 6 "Winning " / "Score:" and the
 // champion's score ("N/A" unless above 0), 7 the purse, 8 the round's course (the first round's
 // when the round is out of range).
-void PGATourPopup_GetRow_EventUpcoming(int nLine, char* szLabel, char* szValue) {
+void PGATourPopup_GetRow_EventUpcoming(int nRow, char* szTitle, char* szText) {
     char sz[128];
     s32 aCourses[4];
     s32 nId;
@@ -147,42 +150,42 @@ void PGATourPopup_GetRow_EventUpcoming(int nLine, char* szLabel, char* szValue) 
     s32 nRounds;
 
     GameModeDriverPGATour_GetEventByDate(CalendarState.nSelected, &nId, &nRound);
-    switch (nLine) {
+    switch (nRow) {
     case 3:
-        strcpy(szLabel, "Defending ");
-        strcpy(szValue, "");
+        strcpy(szTitle, "Defending ");
+        strcpy(szText, "");
         break;
     case 4:
-        strcpy(szLabel, "Champion:");
+        strcpy(szTitle, "Champion:");
         GameModeDriverPGATour_GetChamp(nId, sz);
-        strcpy(szValue, sz);
+        strcpy(szText, sz);
         break;
     case 5:
-        strcpy(szLabel, "Winning ");
-        strcpy(szValue, "");
+        strcpy(szTitle, "Winning ");
+        strcpy(szText, "");
         break;
     case 6:
-        strcpy(szLabel, "Score:");
+        strcpy(szTitle, "Score:");
         if (GameModeDriverPGATour_GetChampScore(nId) > 0) {
-            sprintf(szValue, "%d", GameModeDriverPGATour_GetChampScore(nId));
+            sprintf(szText, "%d", GameModeDriverPGATour_GetChampScore(nId));
         } else {
-            strcpy(szValue, "N/A");
+            strcpy(szText, "N/A");
         }
         break;
     case 7:
-        strcpy(szLabel, "Purse:");
+        strcpy(szTitle, "Purse:");
         GameModeDriverPGATour_GetPurseString(nId, sz);
-        sprintf(szValue, "$%s", sz);
+        sprintf(szText, "$%s", sz);
         break;
     case 8:
-        strcpy(szLabel, "Course:");
+        strcpy(szTitle, "Course:");
         pTournament = GameModeDriverPGATour_GetEventInfo(nId);
         nRounds = GameModeDriverPGATour_GetRounds(nId);
         GameModeDriverPGATour_GetCourses(pTournament, aCourses);
         if (nRound >= 0 && nRound < nRounds) {
-            strcpy(szValue, lbl_80191990[aCourses[nRound]]);
+            strcpy(szText, lbl_80191990[aCourses[nRound]]);
         } else {
-            strcpy(szValue, lbl_80191990[aCourses[0]]);
+            strcpy(szText, lbl_80191990[aCourses[0]]);
         }
         break;
     }
@@ -190,14 +193,14 @@ void PGATourPopup_GetRow_EventUpcoming(int nLine, char* szLabel, char* szValue) 
 
 // A row of the PGA TOUR calendar's day popup before the tournament starts (popup type 3): the same
 // rows as PGATourPopup_GetRow_EventUpcoming. TW07's is empty.
-void PGATourPopup_GetRow_EventNextEvent(int nLine, char* szLabel, char* szValue) {
-    PGATourPopup_GetRow_EventUpcoming(nLine, szLabel, szValue);
+void PGATourPopup_GetRow_EventNextEvent(int nRow, char* szTitle, char* szText) {
+    PGATourPopup_GetRow_EventUpcoming(nRow, szTitle, szText);
 }
 
 // A row of the real-time events calendar's day popup for today's event (popup type 4,
 // RealTime_GetPopupRow): 3 the purse, 4 to 6 up to three rewards (the items the event's trophy
 // unlocks; "N/A" in row 4 when there are none), 7 and 8 blank.
-void RealtimePopup_GetRow_TodaysEvent(int nLine, char* szLabel, char* szValue) {
+void RealtimePopup_GetRow_TodaysEvent(int nRow, char* szTitle, char* szText) {
     char szReward1[36];
     char szReward2[36];
     char szReward3[36];
@@ -212,42 +215,42 @@ void RealtimePopup_GetRow_TodaysEvent(int nLine, char* szLabel, char* szValue) {
                                                             szReward1, szReward2, szReward3);
     fn_800907AC(GameModeDriverRTE_GetPurse(nId), szMoney);
     sprintf(szPurse, "$%s", szMoney);
-    switch (nLine) {
+    switch (nRow) {
     case 3:
-        strcpy(szLabel, "Purse:");
-        strcpy(szValue, szPurse);
+        strcpy(szTitle, "Purse:");
+        strcpy(szText, szPurse);
         break;
     case 4:
-        strcpy(szLabel, "Rewards:");
+        strcpy(szTitle, "Rewards:");
         if (nRewards >= 1) {
-            strcpy(szValue, szReward1);
+            strcpy(szText, szReward1);
         } else {
-            strcpy(szValue, "N/A");
+            strcpy(szText, "N/A");
         }
         break;
     case 5:
-        strcpy(szLabel, "");
+        strcpy(szTitle, "");
         if (nRewards >= 2) {
-            strcpy(szValue, szReward2);
+            strcpy(szText, szReward2);
         } else {
-            strcpy(szValue, "");
+            strcpy(szText, "");
         }
         break;
     case 6:
-        strcpy(szLabel, "");
+        strcpy(szTitle, "");
         if (nRewards >= 3) {
-            strcpy(szValue, szReward3);
+            strcpy(szText, szReward3);
         } else {
-            strcpy(szValue, "");
+            strcpy(szText, "");
         }
         break;
     case 7:
-        strcpy(szLabel, "");
-        strcpy(szValue, "");
+        strcpy(szTitle, "");
+        strcpy(szText, "");
         break;
     case 8:
-        strcpy(szLabel, "");
-        strcpy(szValue, "");
+        strcpy(szTitle, "");
+        strcpy(szText, "");
         break;
     }
 }
@@ -256,7 +259,7 @@ void RealtimePopup_GetRow_TodaysEvent(int nLine, char* szLabel, char* szValue) {
 // earlier day's, or today's once GM_RealtimeMode_TodaysEventCompleted): 3 "COMPLETE" or
 // "INCOMPLETE" for the current profile, 4 the purse, 5 to 7 up to three rewards ("N/A" in row 5
 // when there are none), 8 blank.
-void RealtimePopup_GetRow_EventResults(int nLine, char* szLabel, char* szValue) {
+void RealtimePopup_GetRow_EventResults(int nRow, char* szTitle, char* szText) {
     char szReward1[36];
     char szReward2[36];
     char szReward3[36];
@@ -273,46 +276,46 @@ void RealtimePopup_GetRow_EventResults(int nLine, char* szLabel, char* szValue) 
                                                             szReward1, szReward2, szReward3);
     fn_800907AC(GameModeDriverRTE_GetPurse(nId), szMoney);
     sprintf(szPurse, "$%s", szMoney);
-    switch (nLine) {
+    switch (nRow) {
     case 3:
-        strcpy(szLabel, "Status:");
+        strcpy(szTitle, "Status:");
         if (bComplete) {
-            strcpy(szValue, "COMPLETE");
+            strcpy(szText, "COMPLETE");
         } else {
-            strcpy(szValue, "INCOMPLETE");
+            strcpy(szText, "INCOMPLETE");
         }
         break;
     case 4:
-        strcpy(szLabel, "Purse:");
-        strcpy(szValue, szPurse);
+        strcpy(szTitle, "Purse:");
+        strcpy(szText, szPurse);
         break;
     case 5:
-        strcpy(szLabel, "Rewards:");
+        strcpy(szTitle, "Rewards:");
         if (nRewards >= 1) {
-            strcpy(szValue, szReward1);
+            strcpy(szText, szReward1);
         } else {
-            strcpy(szValue, "N/A");
+            strcpy(szText, "N/A");
         }
         break;
     case 6:
-        strcpy(szLabel, "");
+        strcpy(szTitle, "");
         if (nRewards >= 2) {
-            strcpy(szValue, szReward2);
+            strcpy(szText, szReward2);
         } else {
-            strcpy(szValue, "");
+            strcpy(szText, "");
         }
         break;
     case 7:
-        strcpy(szLabel, "");
+        strcpy(szTitle, "");
         if (nRewards >= 3) {
-            strcpy(szValue, szReward3);
+            strcpy(szText, szReward3);
         } else {
-            strcpy(szValue, "");
+            strcpy(szText, "");
         }
         break;
     case 8:
-        strcpy(szLabel, "");
-        strcpy(szValue, "");
+        strcpy(szTitle, "");
+        strcpy(szText, "");
         break;
     }
 }
@@ -320,7 +323,7 @@ void RealtimePopup_GetRow_EventResults(int nLine, char* szLabel, char* szValue) 
 // A row of the real-time events calendar's day popup for an event on a later day (popup type 6):
 // the same rows as RealtimePopup_GetRow_TodaysEvent (3 the purse, 4 to 6 up to three rewards, 7 and
 // 8 blank).
-void RealtimePopup_GetRow_EventUpcoming(int nLine, char* szLabel, char* szValue) {
+void RealtimePopup_GetRow_EventUpcoming(int nRow, char* szTitle, char* szText) {
     char szReward1[36];
     char szReward2[36];
     char szReward3[36];
@@ -335,42 +338,42 @@ void RealtimePopup_GetRow_EventUpcoming(int nLine, char* szLabel, char* szValue)
                                                             szReward1, szReward2, szReward3);
     fn_800907AC(GameModeDriverRTE_GetPurse(nId), szMoney);
     sprintf(szPurse, "$%s", szMoney);
-    switch (nLine) {
+    switch (nRow) {
     case 3:
-        strcpy(szLabel, "Purse:");
-        strcpy(szValue, szPurse);
+        strcpy(szTitle, "Purse:");
+        strcpy(szText, szPurse);
         break;
     case 4:
-        strcpy(szLabel, "Rewards:");
+        strcpy(szTitle, "Rewards:");
         if (nRewards >= 1) {
-            strcpy(szValue, szReward1);
+            strcpy(szText, szReward1);
         } else {
-            strcpy(szValue, "N/A");
+            strcpy(szText, "N/A");
         }
         break;
     case 5:
-        strcpy(szLabel, "");
+        strcpy(szTitle, "");
         if (nRewards >= 2) {
-            strcpy(szValue, szReward2);
+            strcpy(szText, szReward2);
         } else {
-            strcpy(szValue, "");
+            strcpy(szText, "");
         }
         break;
     case 6:
-        strcpy(szLabel, "");
+        strcpy(szTitle, "");
         if (nRewards >= 3) {
-            strcpy(szValue, szReward3);
+            strcpy(szText, szReward3);
         } else {
-            strcpy(szValue, "");
+            strcpy(szText, "");
         }
         break;
     case 7:
-        strcpy(szLabel, "");
-        strcpy(szValue, "");
+        strcpy(szTitle, "");
+        strcpy(szText, "");
         break;
     case 8:
-        strcpy(szLabel, "");
-        strcpy(szValue, "");
+        strcpy(szTitle, "");
+        strcpy(szText, "");
         break;
     }
 }
@@ -445,11 +448,11 @@ void TrophyRoom_GetRTEAwardStatus(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     s32 nId = pArgs[2].i;
     char* szDate = ((MsgString*)pArgs[3].p)->pStr;
-    s32* pPrize = (s32*)pArgs[5].p;
+    s32* pIcon = (s32*)pArgs[5].p;
     u8 bWon;
 
     GM_RealtimeMode_GetNameByTrophyGroup(nId, ((MsgString*)pArgs[4].p)->pStr);
-    *pPrize = GM_RealtimeMode_GetIconIDByTrophyGroup(nId);
+    *pIcon = GM_RealtimeMode_GetIconIDByTrophyGroup(nId);
     bWon = pProfile->aRTEAward[nId].bWon;
     if (bWon) {
         CalDate_ToString(pProfile->aRTEAward[nId].nDate, szDate);

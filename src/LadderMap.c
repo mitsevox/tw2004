@@ -1,6 +1,8 @@
-// LadderMap.c (our name): the rules of game mode 4's ladder map (GameMode4.c), split from
-// GameMode4Menu.c, which holds the front end's messages. It knows the map's regions and nodes,
-// which nodes are shown, won or locked, and finds the node the cursor moves to.
+// LadderMap.c (our name): the rules of the map screen of game mode 4's ladder (GameMode4.c), split
+// from GameMode4Menu.c, which holds the screen's front-end messages. The map has a node per event
+// (gLadderNodeEvents): six regions of three nodes (0 to 17) that give way, once won, to the
+// region's final (18 to 23), and the World final (24) once every other event is won. It gives each
+// node's region and state (shown, open, won, locked) and finds the node the cursor moves to.
 
 #include "engine.h"
 #include "frontend/fe.h"

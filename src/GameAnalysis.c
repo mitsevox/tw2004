@@ -1,5 +1,7 @@
-// GameAnalysis.c (TW06's name, GameAnalysis_*): round statistics per player (putts, pars, birdies,
-// two per-hole flags, probably fairways and greens) and the pick of a tip quoting one of them.
+// GameAnalysis.c (TW06's name, GameAnalysis_*; TW07 keeps them in AnalysisUtilities.c): a
+// player's statistics over the round's holes played so far (putts, pars, birdies and the like,
+// fairways hit, greens in regulation, the longest drive and putt) and the pick of the statistic
+// tip the HUD shows.
 
 #include "golfer.h"
 #include "game.h"

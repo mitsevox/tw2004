@@ -1,7 +1,7 @@
-// GameMode4Menu.c (our name): the front end's messages for the map of game mode 4's ladder
+// GameMode4Menu.c (our name): the front-end messages of the map screen of game mode 4's ladder
 // (GameMode4.c). They place the map's nodes, move the cursor (gLadderMap) with the rules in
-// LadderMap.c, and fill the menus' text for the event under it: region and tour stop, opponent,
-// course, name and holes.
+// LadderMap.c, fill the panel's text for the event under it (region and tour stop, opponent,
+// course, name, stage and holes) and start that event.
 
 #include "golfer.h"
 #include "engine.h"
@@ -56,7 +56,7 @@ void LadderMenu_GetEventText(MsgArg* pArgs, MsgArg* pResult) {
     char* szOpponent = ((MsgString*)pArgs[1].p)->pStr;
     char* szCourse = ((MsgString*)pArgs[2].p)->pStr;
     char* szName = ((MsgString*)pArgs[3].p)->pStr;
-    char* szPart = ((MsgString*)pArgs[4].p)->pStr;
+    char* szStage = ((MsgString*)pArgs[4].p)->pStr;
     char* szEmpty = ((MsgString*)pArgs[5].p)->pStr;
     char* szHoles = ((MsgString*)pArgs[6].p)->pStr;
     int nStop = fn_80102AAC(gLadderMap.nEvent);
@@ -75,7 +75,7 @@ void LadderMenu_GetEventText(MsgArg* pArgs, MsgArg* pResult) {
         strcpy(szCourse, lbl_80191990[nCourse]);
     }
     GameMode4_GetEventName(gLadderMap.nEvent, szName);
-    strcpy(szPart, gLadderStageNames[LadderMap_GetEventStage(gLadderMap.nEvent)]);
+    strcpy(szStage, gLadderStageNames[LadderMap_GetEventStage(gLadderMap.nEvent)]);
     strcpy(szEmpty, "");
     nHoles = GameMode4_GetEventHoles(gLadderMap.nEvent);
     if (nHoles <= 3) {

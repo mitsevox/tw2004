@@ -160,7 +160,7 @@ void EVENT_PracticeSwing(int nPlayer, int nEvent, void* pData, int nArg) {
 // ball): in the demo (session flag 0x4000) of mode 26 the demo's timer restarts (fn_8009A16C); then
 // the mode's ball-hit hook (gpGame->pfn260), the lessons (their crowd sound), the swing effect at
 // the ball (fn_800A31E0), SitDev starts watching the ball (fn_800BB1A8), commentary situation event
-// 5, and GameMode26's split-screen flag (fn_8010D3B8, which takes no argument).
+// 5, and GameMode26's split-screen flag (GameMode26_NoteSplitScreenShot, which takes no argument).
 void EVENT_HitBall(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1) {
         if (Game_GetMode() == 26 && (gSession.uFlags & 0x4000)) {
@@ -677,7 +677,7 @@ void EVENT_BallPredictionDone(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
 // Event 61 (GameEffects.c: a GameBreaker starts): its audio (Gaud_InitGameBreaker, kind 0), and for
-// any reason but 0 (fn_80067560) the caddie tip 15 + that reason (GUI_QueueTip).
+// any reason but 0 (GameEffects_GetCurrentTriggerType) the caddie tip 15 + that reason (GUI_QueueTip).
 void EVENT_ScriptedGameBreakerStarted(int nPlayer, int nEvent, void* pData, int nArg) {
     Gaud_InitGameBreaker(nPlayer, 0);
     if (GameEffects_GetCurrentTriggerType()) {

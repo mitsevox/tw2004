@@ -1,5 +1,7 @@
-// GameMode6.c (our name): game mode 6, a two-player mode on GameMode8.c's callbacks (from mode 8's
-// setup 0x800F986C on; pfn1E4 is GameMode7.c's SpeedGolf_LoadHole). Only the setup is here.
+// GameMode6.c (our name): the setup of game mode 6, two-player speed golf at match play (the first
+// to hole out wins the hole). The rest of the mode is GameMode8.c's speed golf code
+// (SpeedGolfMatch_* and the SpeedGolf_* callbacks modes 6, 7 and 8 share) and GameMode7.c's hole
+// start.
 
 #include "golfer.h"
 #include "game.h"
