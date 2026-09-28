@@ -1,6 +1,8 @@
-// GameModeDriverRTE.c (TW06's GameModeDriverRTE): game mode 24, real-time events on the calendar
-// ('RTEc'/'RTEs'/'RTEn' stream objects): 118 dated entries, each starting one of 111 challenges (the
-// mode 5 code in GameMode5.c runs them) on its date, by the console's clock.
+// GameModeDriverRTE.c (TW06's GameModeDriverRTE class; TW07's GameModeDriver_RealTimeEvents.cpp):
+// game mode 24, the real-time events. A calendar of 118 dated entries ('RTEc'), each playing one of
+// 111 challenges ('RTEs'; the mode 5 code in GameMode5.c runs them) on its date by the console's
+// clock, with their names and descriptions in 'RTEn'. Also the queries the calendar, its day panels
+// and the trophy room use (GM_RealtimeMode_*, TW07's names), and the purse and award a medal wins.
 
 #include "golfer.h"
 #include "game.h"
@@ -9,13 +11,13 @@
 #include "game/modes/rte.h"
 
 // This file's globals, defined last address first (an object's .bss is laid out in reverse).
-s32 gRTESavedOptionC = 4;                       // gSession.options.nC saved while an event runs
-void (*gRTEChallengeShutdown)(void);                 // mode 5's pfnShutdown, called from ours (GameModeDriverRTE_Shutdown)
-void (*gRTEChallengeEndGame)(void);                 // mode 5's pfnEndGame, called from ours (GameModeDriverRTE_EndGame)
-s32 gRTESelectedDay;                           // the event's round
-s32 gRTESelectedEvent;                           // the event (gRTEs.aEvent index)
-u8  gRTEEventRunning;                           // 1 while an event runs
-s32 gRTESavedWind;                           // gSession.options.nWind saved while an event runs
+s32 gRTESavedOptionC = 4;               // gSession.options.nC saved while an event runs
+void (*gRTEChallengeShutdown)(void);    // mode 5's pfnShutdown, called from GameModeDriverRTE_Shutdown
+void (*gRTEChallengeEndGame)(void);     // mode 5's pfnEndGame, called from GameModeDriverRTE_EndGame
+s32 gRTESelectedDay;                    // the selected event's day (1-based)
+s32 gRTESelectedEvent;                  // the selected event (gRTEs.aEvent index)
+u8  gRTEEventRunning;                   // 1 while an event runs (GM_Currently_RealtimeMode)
+s32 gRTESavedWind;                      // gSession.options.nWind saved while an event runs
 RTEData gRTEs;
 
 void GameModeDriverRTE_UnregisterStreamClients(void);
@@ -292,7 +294,7 @@ u8 GameModeDriverRTE_GetEventByDate(u16 nDate, s32* pId, s32* pRound) {
     s32 nDay;
     s32 nYear;
     s32 i;
-    s32 d;
+    s32 nDelta;
     s32 nSeason;
     u8 bFound;
     CalDate_GetMDY(&nDate, &nMonth, &nDay, &nYear);
@@ -302,11 +304,11 @@ u8 GameModeDriverRTE_GetEventByDate(u16 nDate, s32* pId, s32* pRound) {
     // it), so a date outside 2003..2012 reads past aDate.
     for (i = 0; i < 118; i++) {
         if (gRTEs.aEvent[i].aDate[nSeason] != 0) {
-            d = nDate - gRTEs.aEvent[i].aDate[nSeason];
-            if (d >= 0 && d < GameModeDriverRTE_GetEventDays(i)) {
+            nDelta = nDate - gRTEs.aEvent[i].aDate[nSeason];
+            if (nDelta >= 0 && nDelta < GameModeDriverRTE_GetEventDays(i)) {
                 *pId = i;
                 bFound = 1;
-                *pRound = d + 1;
+                *pRound = nDelta + 1;
                 break;
             }
         }
@@ -392,10 +394,10 @@ s32 GameModeDriverRTE_GetPurse(s32 i) {
 // outside that range.
 s32 GameModeDriverRTE_GetYearIndex(void) {
     s32 nYear;
-    s32 n;
+    s32 nUnused;
     s32 bOk;
     s32 nSeason;
-    fn_8011E020(&n, &n, &nYear, &n, &n, &n, &n);
+    fn_8011E020(&nUnused, &nUnused, &nYear, &nUnused, &nUnused, &nUnused, &nUnused);
     nSeason = nYear - 2003;
     bOk = 0;
     if (nSeason >= 0 && nSeason < 10) {
@@ -434,9 +436,9 @@ s32 GameModeDriverRTE_GetNextEvent(void) {
     s32 nYear;
     u16 nToday;
     s32 nSeason;
-    s32 nBest = -1;
+    s32 nBestDelta = -1;
     s32 i;
-    s32 d;
+    s32 nDelta;
     u8 bFound;
     GameModeDriverRTE_GetCurrentDate(&nMonth, &nDay, &nYear);
     nSeason = nYear - 2003;
@@ -445,10 +447,10 @@ s32 GameModeDriverRTE_GetNextEvent(void) {
         bFound = 0;
         for (i = 0; i < 118; i++) {
             if (gRTEs.aEvent[i].aDate[nSeason] != 0) {
-                d = gRTEs.aEvent[i].aDate[nSeason] - nToday;
-                if (d >= 0 && (nBest == -1 || d < nBest)) {
+                nDelta = gRTEs.aEvent[i].aDate[nSeason] - nToday;
+                if (nDelta >= 0 && (nBestDelta == -1 || nDelta < nBestDelta)) {
                     nNext = i;
-                    nBest = d;
+                    nBestDelta = nDelta;
                     bFound = 1;
                 }
             }

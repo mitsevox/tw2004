@@ -1,5 +1,7 @@
-// GameModeAlternateShot.c (TW06's GameModeAlternateShot): game mode 21, two-against-two match play
-// where partners take turns hitting one ball. Team 0 is players 0 and 1, team 1 players 2 and 3.
+// GameModeAlternateShot.c (TW06's GameModeAlternateShot; TW07's GameMode_AlternateShot.cpp): game
+// mode 21, two-against-two match play where partners take turns hitting one ball and tee off on
+// alternate holes. Team 0 is players 0 and 1, team 1 players 2 and 3; a team's holes won are kept
+// on its first player (0 or 2).
 
 #include "golfer.h"
 #include "ball.h"
@@ -7,7 +9,7 @@
 #include "engine.h"
 #include "game/save.h"
 
-u8 gAltShotTeamHonors[2] = {0, 0};                // per team: 1 when the second partner (1 or 3) hits next
+u8 gAltShotTeamHonors[2] = {0, 0};      // per team: 1 when the second partner (1 or 3) hits next
 
 u8  GameModeAlternateShot_TeamDone(int nTeam);
 int GameModeAlternateShot_GetPartner(int nPlayer);
@@ -294,23 +296,23 @@ u8 GameModeAlternateShot_HoleFinished(int nPlayer, u8 bCheck) {
     return 0;
 }
 
-// Clears every player's round (all 18 holes) for a playoff.
 #define PLAYER_AT(i) (&gPlayers[i])
-#define CLEAR_ROUNDS(P)                                  \
-    for (i = 0; i < gNumPlayersSetUp; i++) {            \
-        for (h = 0; h < 18; h++) {                      \
-            P(i)->nStrokes[h] = 0;                \
-            P(i)->nPutts[h] = 0;                  \
-            P(i)->nModePoints[h] = 0;             \
-            P(i)->n22C[h] = 0;                    \
-            P(i)->n290[h] = 0;                    \
-            P(i)->b2F6[h] = 0;                    \
-            P(i)->b2E4[h] = 0;                    \
-        }                                               \
-        P(i)->n2D8 = 0;                           \
-        P(i)->n2DC = 0;                           \
-        P(i)->n2E0 = 0;                           \
-        P(i)->n308 = 0;                           \
+// Clears every player's round (all 18 holes) for a playoff.
+#define CLEAR_ROUNDS(P)                             \
+    for (i = 0; i < gNumPlayersSetUp; i++) {        \
+        for (h = 0; h < 18; h++) {                  \
+            P(i)->nStrokes[h] = 0;                  \
+            P(i)->nPutts[h] = 0;                    \
+            P(i)->nModePoints[h] = 0;               \
+            P(i)->n22C[h] = 0;                      \
+            P(i)->n290[h] = 0;                      \
+            P(i)->b2F6[h] = 0;                      \
+            P(i)->b2E4[h] = 0;                      \
+        }                                           \
+        P(i)->n2D8 = 0;                             \
+        P(i)->n2DC = 0;                             \
+        P(i)->n2E0 = 0;                             \
+        P(i)->n308 = 0;                             \
     }
 
 // Whether the match is over. In a playoff (gpGame->bD4): over once one team has won more holes;
