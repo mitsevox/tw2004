@@ -250,6 +250,9 @@ void GameModeStableford_EndGame(void) {
                 for (j = 0; j < gNumPlayersSetUp; j++) {
                     if (i != j && Player_IsCPU(j)) {
                         nTheirs = GM_GetPlayerRoundScore(j);
+                        // EA bug: stroke play's test on Stableford points (GameRound.c's
+                        // GM_GetPlayerRoundScoreThroughHole sums nModePoints in mode 18), so the
+                        // human is paid for FEWER points than the CPU golfer, the losing side
                         if (nOurs < nTheirs) {
                             nRating = GM_Earnings_RateGolfer(j);
                             if (nRating > nBest) {
