@@ -44133,5 +44133,21 @@
 "matched_functions": 7647,
 "total_functions": 7647,
 "exact": 7647
+},
+{
+"commit": "2625d4c",
+"sha": "2625d4c2681dce709d548bf2d846352df99a97af",
+"time": 1790554075,
+"subject": "state: readability plan approved; data-scoring lane on hold (owner)",
+"report": true,
+"matched_code": 1550724,
+"complete_code": 1550724,
+"matched_data": 862555,
+"complete_data": 1078855,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7647,
+"total_functions": 7647,
+"exact": 7647
 }
 ]
