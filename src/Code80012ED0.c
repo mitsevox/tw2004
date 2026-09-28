@@ -1,8 +1,10 @@
-// Code80012ED0.c (our name; what the file is is not known yet): small render helpers. Getters for
-// a render camera's screen rectangle, a call that hands GX the changed renderer state, and three
-// setters of the renderer state (gRenderState) that each write one group of fields and set that
-// group's bit in u110, like GoTerrain.c's. Its extent is the space between UFont.c and
-// Controller_Gc.c; whether it is one original file is not proven.
+// Code80012ED0.c (our name; EA's file is not known): small render helpers. First out-of-line
+// copies of header getters TW07 has as inlines: a viewport's left, top, width and height
+// (GoViewport.h VM_fGetViewport*) and a render context's viewport (GoRenderCtx.h). Then the call
+// that hands GX the changed render state, and three of the display-state setters (TW07's
+// Legacy/LL LLDisSt: DS_v...) that each write one group of the render state gRenderState and set
+// that group's bit in u110 for RenderState_Apply. Last an empty start-up step. Its extent is the
+// space between UFont.c and Controller_Gc.c; whether it is one original file is not proven.
 
 #include "engine.h"
 #include "camera.h"
@@ -41,14 +43,14 @@ void RenderState_Flush(void) {
 
 // Sets the depth compare function (GX_ALWAYS turns the depth test off), applied with the next
 // RenderState_Apply.
-void DS_vSetZBufferMode(int a) {
-    gRenderState.n0 = a;
+void DS_vSetZBufferMode(int nCompare) {
+    gRenderState.n0 = nCompare;
     gRenderState.u110 |= 0x1;
 }
 
 // Turns depth-buffer writes on or off, applied with the next RenderState_Apply.
-void DS_vEnableZBufferUpdate(int a) {
-    gRenderState.b4 = a;
+void DS_vEnableZBufferUpdate(int bEnable) {
+    gRenderState.b4 = bEnable;
     gRenderState.u110 |= 0x2;
 }
 
@@ -57,13 +59,13 @@ void DS_vEnableZBufferUpdate(int a) {
 // 0..0x80 scale (callers pass 0x80 for opaque) and is stored as nRef * 2 + 1, kept to 0..255.
 // Applied with the next RenderState_Apply, which also moves the depth test after texturing while
 // the alpha test is on.
-void DS_vSetAlphaTestMode(int a, int b, int c) {
+void DS_vSetAlphaTestMode(int bEnable, int nCompare, int nRef) {
     int n;
 
-    n = c * 2 + 1;
-    gRenderState.n8 = b;
+    n = nRef * 2 + 1;
+    gRenderState.n8 = nCompare;
     gRenderState.bC = (n < 0) ? 0 : ((n <= 0xFF) ? n : 0xFF);
-    gRenderState.bD = a;
+    gRenderState.bD = bEnable;
     gRenderState.u110 |= 0x4;
 }
 

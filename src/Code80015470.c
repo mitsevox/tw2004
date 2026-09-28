@@ -1,5 +1,11 @@
-// Code80015470.c (our name; TW07 gives no file): own unit, its .sdata is padded to 8 at
-// 0x80280E04..0x80280E08 and its .sdata2 at 0x80282B9C..0x80282BA0
+// Code80015470.c (our name): the GameCube display state, most likely EA's Legacy/LL LLDisSt_Gc.c
+// (TW2003 Xbox's source tree has Xbox/LLDisSt_Xbox.c, and TW07's LLDisSt.c DS_vInitModule and
+// DS_vCloseModule sit at the same places in the start-up and shutdown; not proven). It defines the
+// render state gRenderState that the DS_ and RenderState_ setters fill, starts it up
+// (DS_vInitModule), hands its changed groups to GX (RenderState_Apply), keeps the pool of 20
+// display-list blocks UObject3D.c records into, and has small TEV helpers and the current render
+// context's getter. Its .sdata is padded to 8 at 0x80280E04..0x80280E08 and its .sdata2 at
+// 0x80282B9C..0x80282BA0.
 
 #include "ustream.h"
 #include "camera.h"
@@ -21,7 +27,7 @@ BufferPool* gpBufferPool = &gBufferPool;
 
 void Mtx_Identity(f32 (*m)[4]);          // identity matrix
 void DS_vCloseModule(void);
-void RenderState_SetTexCoordGen(s32 p0, s32 p1, s32 p2, s32 p3);
+void RenderState_SetTexCoordGen(s32 nCoord, s32 nFunc, s32 nSrc, s32 nMtx);
 void RenderState_SetKColorAlpha(u8 nAlpha);
 
 // ---- end of sweep code ----
@@ -95,13 +101,9 @@ void DS_vInitModule(void) {
     BufferPool_FreeAll();
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
 // Display-state shutdown (gomainloop's fn_8006C854): nothing to do on this machine.
 void DS_vCloseModule(void) {
 }
-
-// ---- end of sweep code ----
 
 // Hands GX every group of gRenderState whose bit is set in u110 (depth, blending, constant alpha,
 // alpha test, draw flags, clip mode, fog, matrices, scissor, viewport, render surface), then the
@@ -307,12 +309,10 @@ void RenderState_Apply(void) {
     }
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
 // The SDK's GXSetTexCoordGen out of line: texture coordinate nCoord from source nSrc through
 // function nFunc and matrix nMtx, not normalised, with the identity post-transform matrix (125).
-void RenderState_SetTexCoordGen(s32 p0, s32 p1, s32 p2, s32 p3) {
-    GXSetTexCoordGen2(p0, p1, p2, p3, 0, 125);
+void RenderState_SetTexCoordGen(s32 nCoord, s32 nFunc, s32 nSrc, s32 nMtx) {
+    GXSetTexCoordGen2(nCoord, nFunc, nSrc, nMtx, 0, 125);
 }
 
 // The current render context: the render camera being drawn with, as RC_vSetCurrentRenderCtx set
@@ -320,8 +320,6 @@ void RenderState_SetTexCoordGen(s32 p0, s32 p1, s32 p2, s32 p3) {
 void* RC_spGetCurrentRenderCtx(void) {
     return *lbl_80280DF0;
 }
-
-// ---- end of sweep code ----
 
 // Loads TEV constant colour 0 with the alpha nAlpha (RenderState_Apply: the constant alpha b1C
 // while it is on, else 0xFF).
@@ -333,13 +331,9 @@ void RenderState_SetKColorAlpha(u8 nAlpha) {
     GXSetTevKColor(0, colour);
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
 // Sets the flag byte *lbl_80280DC8 (LLTex.c) that the TEV setups read: nonzero while the constant
 // alpha is in use, so untextured stages take their alpha from TEV constant colour 0 instead of the
 // vertex colour.
-void RenderState_SetConstantAlphaActive(u8 v) {
-    *(u8*)(lbl_80280DC8 + 0x0) = v;
+void RenderState_SetConstantAlphaActive(u8 bActive) {
+    *lbl_80280DC8 = bActive;
 }
-
-// ---- end of sweep code ----

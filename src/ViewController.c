@@ -1,7 +1,11 @@
-// ViewController.c (our name, after TW06's viewControllerID): the four views on screen
-// (gViewControllers). Each view controller owns a render camera and the view's camera controller
-// (View); these functions set a view up and shut it down, hand out its parts, and each frame run
-// its camera controller and copy the camera's position into the render camera.
+// ViewController.c (our name): EA's GoViewCont.c (Golf/Hi-Rendering), whose TW07 copy has the
+// same functions in the same order, ViewController_ResetAll to ViewController_TurnOnViewController.
+// The four views on screen (gViewControllers): each view controller owns a render context (render
+// camera: lens, viewport, frame buffer) and the view's camera controller (View), and follows one
+// player. These functions set a view up and shut it down, hand out its parts, and each frame run
+// its camera controller and aim the render context's lens from it. After them come helpers TW07
+// has as header inlines (GoViewport.h, GoCamera.h), out of line here, and small camera-controller
+// getters.
 
 #include "unsorted/cull.h"
 
@@ -60,20 +64,21 @@ int ViewController_GetCurrentViewControllerID(void) {
 // screen): a new lens and viewport, a render context drawing them to the current frame buffer, and
 // a reset camera controller. It follows no player yet (5), is marked active, and its two
 // post-effect settings are switched off (GoPostFx.c fn_80038010, fn_80038054).
-void ViewController_Init(int nView, f32 x, f32 y, f32 w, f32 h) {
-    ViewController* pCtrl;
+void ViewController_Init(int nView, f32 fLeft, f32 fTop, f32 fWidth, f32 fHeight) {
+    ViewController* pViewController;
     CamLens* pLens;
-    f32* pRect;
+    f32* pViewport;
 
-    pCtrl = ViewController_GetDataPtr(nView);
+    pViewController = ViewController_GetDataPtr(nView);
     pLens = CA_spCreateCamera();
-    pRect = VM_spCreateViewport();
-    VM_vSetViewportRect(pRect, x, y, w, h);
+    pViewport = VM_spCreateViewport();
+    VM_vSetViewportRect(pViewport, fLeft, fTop, fWidth, fHeight);
     // port: RC_GetCurrentFrameBuffer is typed s32, but its value is the frame buffer
-    pCtrl->pCamera = RC_spCreateRenderCtx(pLens, (GoFrameBuf*)RC_GetCurrentFrameBuffer(), pRect);
-    fn_80062E40(&pCtrl->view);
-    pCtrl->nPlayer = 5;
-    pCtrl->b274 = 1;
+    pViewController->pCamera =
+        RC_spCreateRenderCtx(pLens, (GoFrameBuf*)RC_GetCurrentFrameBuffer(), pViewport);
+    fn_80062E40(&pViewController->view);
+    pViewController->nPlayer = 5;
+    pViewController->b274 = 1;
     fn_80038010(0, nView, NULL);
     fn_80038054(0, nView, 0.0f, 0.0f);
 }
@@ -86,13 +91,13 @@ ViewController* ViewController_GetDataPtr(int nView) {
 // Shuts view nView down: frees its render context's lens and viewport, then the render context, and
 // marks it inactive.
 void ViewController_Delete(int nView) {
-    ViewController* pCtrl;
+    ViewController* pViewController;
 
-    pCtrl = ViewController_GetDataPtr(nView);
-    CA_vReleaseCamera(Camera_GetLens(pCtrl->pCamera));
-    VM_vReleaseViewport(RC_spGetRenderCtxViewport(pCtrl->pCamera));
-    RC_vReleaseRenderCtx(pCtrl->pCamera);
-    pCtrl->b274 = 0;
+    pViewController = ViewController_GetDataPtr(nView);
+    CA_vReleaseCamera(Camera_GetLens(pViewController->pCamera));
+    VM_vReleaseViewport(RC_spGetRenderCtxViewport(pViewController->pCamera));
+    RC_vReleaseRenderCtx(pViewController->pCamera);
+    pViewController->b274 = 0;
 }
 
 // Runs view nView's camera controller for its player and aims the render context's lens from it:
@@ -101,30 +106,34 @@ void ViewController_Delete(int nView) {
 // script's shot aims by angles. Then recomputes the render context's screen and transformation
 // matrices.
 void ViewController_Update(int nView) {
-    void* pCamera;
-    View* pView;
+    void* pRenderContext;
+    View* pCameraController;
 
-    pCamera = ViewController_GetRenderContext(nView);
-    pView = ViewController_GetCameraControl(nView);
-    CameraController_Idle(pView, ViewController_GetActivePlayerNumber(nView));
-    if (pView->nCurCamera == 2) {
-        CA_vSetLookAtSide(Camera_GetLens(pCamera), CameraController_GetPosition(pView),
-                          CameraController_GetTarget(pView), pView->v20);
-    } else if (fn_800172C4(pView)) {
-        if (pView->nCurCamera == 4) {
-            Camera_SetCameraPositionAndTargetWithOffsetAndScale(Camera_GetLens(pCamera),
-                    CameraController_GetPosition(pView), CameraController_GetTarget(pView),
-                        fn_800172BC(pView), fn_800172B4(pView));
+    pRenderContext = ViewController_GetRenderContext(nView);
+    pCameraController = ViewController_GetCameraControl(nView);
+    CameraController_Idle(pCameraController, ViewController_GetActivePlayerNumber(nView));
+    if (pCameraController->nCurCamera == 2) {
+        CA_vSetLookAtSide(Camera_GetLens(pRenderContext),
+                          CameraController_GetPosition(pCameraController),
+                          CameraController_GetTarget(pCameraController), pCameraController->v20);
+    } else if (fn_800172C4(pCameraController)) {
+        if (pCameraController->nCurCamera == 4) {
+            Camera_SetCameraPositionAndTargetWithOffsetAndScale(
+                Camera_GetLens(pRenderContext), CameraController_GetPosition(pCameraController),
+                CameraController_GetTarget(pCameraController), fn_800172BC(pCameraController),
+                fn_800172B4(pCameraController));
         } else {
-            CA_vSetLookAtSide(Camera_GetLens(pCamera), CameraController_GetPosition(pView),
-                              CameraController_GetTarget(pView), pView->v20);
+            CA_vSetLookAtSide(Camera_GetLens(pRenderContext),
+                              CameraController_GetPosition(pCameraController),
+                              CameraController_GetTarget(pCameraController), pCameraController->v20);
         }
     } else {
-        Camera_SetCameraYawPitchRollAndPosition(Camera_GetLens(pCamera), CameraController_GetPosition(pView),
-                    CameraController_GetTarget(pView));
+        Camera_SetCameraYawPitchRollAndPosition(Camera_GetLens(pRenderContext),
+                                                CameraController_GetPosition(pCameraController),
+                                                CameraController_GetTarget(pCameraController));
     }
-    fn_80013D68(pCamera);
-    RC_vUpdateRenderCtxTransformationMatrices(pCamera);
+    fn_80013D68(pRenderContext);
+    RC_vUpdateRenderCtxTransformationMatrices(pRenderContext);
 }
 
 // The render context (render camera) view nView draws with.
@@ -151,33 +160,32 @@ u8 ViewController_IsActive(int nView) {
 }
 
 // Turns view nView on or off (bActive, the flag ViewController_IsActive returns).
-void ViewController_TurnOnViewController(int nView, u8 b) {
-    ViewController_GetDataPtr(nView)->b274 = b;
+void ViewController_TurnOnViewController(int nView, u8 bActive) {
+    ViewController_GetDataPtr(nView)->b274 = bActive;
 }
 
 // Saves the rectangle of view nView's viewport, which the initial fly-by changes
 // (ViewController_RestoreViewportRect puts it back).
 void ViewController_SaveViewportRect(int nView) {
-    ViewController* pCtrl;
-    f32* pRect;
+    ViewController* pViewController;
+    f32* pViewport;
 
-    pCtrl = ViewController_GetDataPtr(nView);
-    pRect = RC_spGetRenderCtxViewport(ViewController_GetRenderContext(nView));
-    pCtrl->f284 = pRect[0];
-    pCtrl->f280 = pRect[1];
-    pCtrl->f27C = pRect[2];
-    pCtrl->f278 = pRect[3];
+    pViewController = ViewController_GetDataPtr(nView);
+    pViewport = RC_spGetRenderCtxViewport(ViewController_GetRenderContext(nView));
+    pViewController->f284 = pViewport[0];
+    pViewController->f280 = pViewport[1];
+    pViewController->f27C = pViewport[2];
+    pViewController->f278 = pViewport[3];
 }
 
 // Puts back the viewport rectangle ViewController_SaveViewportRect saved for view nView.
 void ViewController_RestoreViewportRect(int nView) {
-    ViewController* pCtrl;
+    ViewController* pViewController;
 
-    pCtrl = ViewController_GetDataPtr(nView);
-    VM_vSetViewportRect(RC_spGetRenderCtxViewport(ViewController_GetRenderContext(nView)), pCtrl->f284,
-                        pCtrl->f280,
-                pCtrl->f27C,
-                pCtrl->f278);
+    pViewController = ViewController_GetDataPtr(nView);
+    VM_vSetViewportRect(RC_spGetRenderCtxViewport(ViewController_GetRenderContext(nView)),
+                        pViewController->f284, pViewController->f280, pViewController->f27C,
+                        pViewController->f278);
 }
 
 // The frame buffer the current render context draws to.
@@ -189,12 +197,12 @@ s32 RC_GetCurrentFrameBuffer(void) {
 
 // Sets a viewport's rectangle (fractions of the frame buffer: 0, 0, 1, 1 is all of it) and
 // recomputes its derived values.
-void VM_vSetViewportRect(f32* pRect, f32 x, f32 y, f32 w, f32 h) {
-    pRect[0] = x;
-    pRect[1] = y;
-    pRect[2] = w;
-    pRect[3] = h;
-    VM_vUpdateInternalViewportRectData(pRect);
+void VM_vSetViewportRect(f32* pViewport, f32 fLeft, f32 fTop, f32 fWidth, f32 fHeight) {
+    pViewport[0] = fLeft;
+    pViewport[1] = fTop;
+    pViewport[2] = fWidth;
+    pViewport[3] = fHeight;
+    VM_vUpdateInternalViewportRectData(pViewport);
 }
 
 // Points the lens from pPos with the angles pAngles (yaw, pitch, roll by TW07's argument name):

@@ -13,7 +13,7 @@ u8   fn_800637C4(int nPlayer, int nView);
 void fn_800642A4(View* pView, f32 fF0, f32 fF4);
 void fn_80064478(f32* pA, f32* pB, f32* pOut);
 void Quat_RotateVector(f32* pQuat, f32* pIn, f32* pOut);      // Quaternion.c: a vector turned by it
-void ViewController_SetCurrentViewController(int nView);                            // ViewController.c: sets the current view
+void ViewController_SetCurrentViewController(int nView);    // ViewController.c: sets the current view
 void fn_80045824(int n);                                // DepthField.c: turns depth-of-field layer n off
 void Gaud_CameraShake(u8 nPlayer, u8 bLimit);                // GameAudio.c
 f32  fn_8005CC18(f32* pV);                              // Swing.c
