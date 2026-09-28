@@ -379,7 +379,7 @@ void fn_80094B84(SD_SShaderObject_Static* pObject, ParticleMsg* pMsg) {
     *pMsg->u.age.pnLive = nLive;
 }
 
-void LLMath_mat44fltMultiply33(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // VecMath.c: a vector through a matrix
+void LLMath_mat44fltMultiply33(f32 (*pMtx)[4], f32* pIn, f32* pOut); // VecMath.c: vector x matrix
 
 // Emits pMsg's particles after the live ones of the buffer not being drawn (at most as many as
 // fit, less one). Their ages run from fAgeSpread down; unless the settings' flag 0x1000 keeps a

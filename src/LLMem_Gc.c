@@ -1,5 +1,6 @@
-// LLMem_Gc.c (our name, after TW06's legacy/ll/xbox/llmem_xbox.c, which holds Mem_cpy): the
-// engine's memory copy, fill and compare.
+// LLMem_Gc.c (our name, after TW07's legacy/ll/ps3/LLMem_PS3.c and TW06's legacy/ll/xbox/
+// llmem_xbox.c; TW07's file holds the same four functions, Mem_cpy, Mem_move, Mem_compare and
+// Mem_set): the engine's memory copy, move, fill and compare.
 
 #include "engine.h"
 

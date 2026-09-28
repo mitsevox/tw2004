@@ -3,7 +3,10 @@
 // much) and keeps a sorted table of its free spans. Blocks come from the low end of a span (first
 // fit, from a moving cursor) or from the high end (first fit searching down from the cursor, or
 // best fit); the 8 bytes before a block hold the start and size of the piece it was cut from. A
-// block outside the big one came from the system heap and goes back there.
+// block outside the big one came from the system heap and goes back there. StaticMem_Init takes
+// the block at start-up; StaticMem_Reset empties it each time the per-mode systems start, so no
+// block outlives that. The fill bytes show a byte's state: 0x77 never taken since the reset, 0x33
+// or 0x55 taken (low or high end), 0x11 freed.
 //
 // port: the span table holds addresses as signed 32-bit integers, and the code compares and
 // aligns them as integers; a 64-bit port needs a wider table.
@@ -11,17 +14,17 @@
 #include "engine.h"
 
 // Written in reverse address order (CodeWarrior lays out .sbss last-defined-first).
-s32* gStaticMemSpans;                      // the span table: addresses, a free span from [i] to [i + 1]
-                                        // for each odd i; [0] and the last one bound the heap
-s32  gStaticMemLast;                      // the table's last index
-s32  gStaticMemCursor;                      // the cursor: where the next low-end search starts
-s32  gStaticMemTableMax;                      // the table's capacity, less one
-s32  lbl_80281BC4;
-u8*  gStaticMemHeap;                      // the heap's memory
-s32  gStaticMemHeapSize;                      // the heap's size
-s32  gStaticMemMode;
-s32  gStaticMemCount;                      // bytes taken since StaticMem_ResetCount, while counting is on
-u8   gStaticMemCounting;                      // count the bytes taken (StaticMem_StartCount / StaticMem_StopCount)
+s32* gStaticMemSpans;       // the span table: sorted addresses, a free span from [i] to [i + 1]
+                            // for each odd i; [0] and the last one bound the heap
+s32  gStaticMemLast;        // the table's last index
+s32  gStaticMemCursor;      // the cursor: low-end searches start at it, high-end ones below it
+s32  gStaticMemTableMax;    // the table's capacity, less one (0x403)
+s32  lbl_80281BC4;          // set to 0x302 by StaticMem_Init and never read in this build
+u8*  gStaticMemHeap;        // the heap's memory
+s32  gStaticMemHeapSize;    // the heap's size in bytes
+s32  gStaticMemMode;        // StaticMem_Alloc's nMode for the EA Sports library (StaticMem_SetMode)
+s32  gStaticMemCount;       // bytes taken since StaticMem_ResetCount, while counting is on
+u8   gStaticMemCounting;    // count the bytes taken (StaticMem_StartCount / StaticMem_StopCount)
 
 int printf(const char* pFmt, ...);          // MSL
 int  StaticMem_FindFitUp(int nSize);
@@ -121,8 +124,8 @@ int StaticMem_FindFitUp(int nSize) {
 }
 
 // The first free span of at least nSize bytes, searching down from the span below the cursor to the
-// bottom, then from the top down to the cursor: its table index (the span runs from [i] to [i +
-// 1]), or -1 when none is big enough. StaticMem_Alloc's mode 1.
+// bottom, then from the top down to the cursor: its table index (the span runs from [i] to
+// [i + 1]), or -1 when none is big enough. StaticMem_Alloc's mode 1.
 int StaticMem_FindFitDown(int nSize) {
     s32* pSpan;
     int i;

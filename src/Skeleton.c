@@ -25,8 +25,8 @@ void Mtx_InvertRigid(f32 (*pSrc)[4], f32 (*pDst)[4]);       // UMemPool.c: inver
 void Quat_BuildFromMatrix(f32 (*m)[4], f32* pQ);                 // Quaternion.c: a rotation matrix's quaternion
 void Character_UpdateFeetTerrainInfo(Character* pChar, int bNormals);   // char.c
 void Character_PlaceFeetOnGround(Character* pChar);                     // char.c
-void LLMath_mat44fltMultiplyList(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // pDst = pSrc's rows
-                                                                                // through pMtx
+// VecMath.c: each of pSrc's rows through pMtx into pDst.
+void LLMath_mat44fltMultiplyList(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void fn_80113E60(void);                                 // DynChain.c
 void fn_80114080(void);                                 // DynChain.c
 void fn_80114398(struct DynChain* pChain);              // DynChain.c: frees a chain

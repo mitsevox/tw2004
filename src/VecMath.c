@@ -1,6 +1,8 @@
-// VecMath.c (our name; TW06 names these functions vec4flt_*): hand-written paired-single vector
-// and matrix helpers used all over the game: vectors through a 4x4 matrix, normalising, lengths
-// and distances.
+// VecMath.c (our name; EA's is likely LLMath_Gc.c: TW07's legacy/ll/ps3/LLMath_PS3.c is the PS3
+// copy of this file, the same LLMath_ routines in AltiVec, and TW06's Xbox build has the portable
+// vec4flt_ ones in uvecflt.c): hand-written paired-single vector and matrix helpers used all over
+// the game: vectors through a 4x4 matrix, normalising, lengths and distances. Vectors are four
+// floats; a name ending in 3 reads and writes only x, y and z, and the w of its output is kept.
 
 #include "game_types.h"
 #include "engine.h"
@@ -96,8 +98,8 @@ loop:
     blr
 }
 
-// LLMath_mat44fltMultiply33 for nRows vectors in a row, 16 bytes apart (three floats used of each four, the
-// fourth not written; nRows must be at least 1).
+// LLMath_mat44fltMultiply33 for nRows vectors in a row, 16 bytes apart (three floats used of each
+// four, the fourth not written; nRows must be at least 1).
 asm void LLMath_mat44fltMultiplyList33(register f32 (*pMtx)[4], register f32 (*pSrc)[4],
                                        register f32 (*pDst)[4],
                      register int nRows) {
@@ -233,8 +235,8 @@ store:
     blr
 }
 
-// LLMath_Normalize that also returns the four-float length (0 for a vector with squared length at most
-// 2^-30, which is copied as it is).
+// LLMath_Normalize that also returns the four-float length (0 for a vector with squared length at
+// most 2^-30, which is copied as it is).
 asm f32 LLMath_NormalizeReturnLength(register f32* pSrc, register f32* pDst) {
     nofralloc
     psq_l    f3, 0(pSrc), 0, 0
