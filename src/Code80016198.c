@@ -269,11 +269,11 @@ void fn_80016B6C(f32 fX, f32 fY) {
 
 // Give the renderer the current camera's matrices, with rows 0 and 2 of the first negated.
 void RenderState_SetCameraMatrices(void) {
-    Mtx_Copy(((Camera*)RC_spGetCurrentRenderCtx())->m15C, lbl_801B8980.m34);
-    Mtx_Copy(((Camera*)RC_spGetCurrentRenderCtx())->m9C, lbl_801B8980.m74);
-    fn_80016C28(lbl_801B8980.m34[0], lbl_801B8980.m34[0]);
-    fn_80016C28(lbl_801B8980.m34[2], lbl_801B8980.m34[2]);
-    lbl_801B8980.u110 |= 0x100;
+    Mtx_Copy(((Camera*)RC_spGetCurrentRenderCtx())->m15C, gRenderState.m34);
+    Mtx_Copy(((Camera*)RC_spGetCurrentRenderCtx())->m9C, gRenderState.m74);
+    fn_80016C28(gRenderState.m34[0], gRenderState.m34[0]);
+    fn_80016C28(gRenderState.m34[2], gRenderState.m34[2]);
+    gRenderState.u110 |= 0x100;
 }
 
 // Negates four floats from pSrc into pDst (paired singles).

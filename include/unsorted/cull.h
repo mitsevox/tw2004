@@ -36,7 +36,7 @@ typedef struct Camera {
     /* 0x018 */ GoFrameBuf* pBuf;    // its frame buffer (GoRenderCtx_Gc.c RC_spCreateRenderCtx)
     /* 0x01C */ char pad1C[0x40];
     /* 0x05C */ float m5C[4][4];     // camera space to the screen (GoDynObj.c fn_8004787C divides by w)
-    /* 0x09C */ float m9C[4][4];     // streammanagerhole.c RenderState_SetCameraMatrices copies it to lbl_801B8980.m74
+    /* 0x09C */ float m9C[4][4];     // streammanagerhole.c RenderState_SetCameraMatrices copies it to gRenderState.m74
     /* 0x0DC */ float mDC[4][4];     // world to the screen (GoCamCont.c fn_8006434C)
     /* 0x11C */ float viewMtx[4][4];
     /* 0x15C */ float m15C[4][4];    // GoShaderObject_Rain_Gc.c fn_800B4FA4 builds its position matrix from it

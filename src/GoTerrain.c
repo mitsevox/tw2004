@@ -2298,51 +2298,51 @@ f32 Math_Floor(f32 x) {
 // stages take the draw's alpha from RenderState_SetConstantAlpha's value (times the texture's)
 // instead of the vertex colour's.
 void RenderState_SetConstantAlphaOn(u8 b) {
-    lbl_801B8980.b1D = b;
-    lbl_801B8980.u110 |= 0x80;
+    gRenderState.b1D = b;
+    gRenderState.u110 |= 0x80;
 }
 
 void fn_800350B4(f32 f) {
-    lbl_801B8980.f2C = f;
-    lbl_801B8980.u110 |= 0x8;
+    gRenderState.f2C = f;
+    gRenderState.u110 |= 0x8;
 }
 
 void fn_800350D0(f32 f) {
-    lbl_801B8980.f28 = f;
-    lbl_801B8980.u110 |= 0x8;
+    gRenderState.f28 = f;
+    gRenderState.u110 |= 0x8;
 }
 
 void fn_800350EC(u8 r, u8 g, u8 b) {
-    lbl_801B8980.c30.r = r;
-    lbl_801B8980.c30.g = g;
-    lbl_801B8980.c30.b = b;
-    lbl_801B8980.c30.a = 0x80;
-    lbl_801B8980.u110 |= 0x8;
+    gRenderState.c30.r = r;
+    gRenderState.c30.g = g;
+    gRenderState.c30.b = b;
+    gRenderState.c30.a = 0x80;
+    gRenderState.u110 |= 0x8;
 }
 
 // Sets the blend source and destination factors, applied with the next RenderState_Apply.
 void RenderState_SetBlendFactors(int a, int b) {
-    lbl_801B8980.n10 = a;
-    lbl_801B8980.n14 = b;
-    lbl_801B8980.u110 |= 0x10;
+    gRenderState.n10 = a;
+    gRenderState.n14 = b;
+    gRenderState.u110 |= 0x10;
 }
 
 // Sets the GX clip mode, applied with the next RenderState_Apply.
 void RenderState_SetClipMode(int a) {
-    lbl_801B8980.nFC = a;
-    lbl_801B8980.u110 |= 0x400;
+    gRenderState.nFC = a;
+    gRenderState.u110 |= 0x400;
 }
 
 // The constant alpha, 0..255, used while RenderState_SetConstantAlphaOn is on.
 void RenderState_SetConstantAlpha(u8 b) {
-    lbl_801B8980.b1C = b;
-    lbl_801B8980.u110 |= 0x80;
+    gRenderState.b1C = b;
+    gRenderState.u110 |= 0x80;
 }
 
 void fn_80035170(u32 uClear, u32 uSet) {
-    lbl_801B8980.u20 &= ~uClear;
-    lbl_801B8980.u20 |= uSet;
-    lbl_801B8980.u110 |= 0x20;
+    gRenderState.u20 &= ~uClear;
+    gRenderState.u20 |= uSet;
+    gRenderState.u110 |= 0x20;
 }
 
 // Hands pData to shader type nRow's SetParameters hook (ModuleHooks.pfn8 of lbl_80188E88; row 17 is

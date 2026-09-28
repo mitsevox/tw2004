@@ -286,7 +286,7 @@ typedef struct View {
 } View;
 LAYOUT_ASSERT(View, 0x26C);
 
-// One of the four views on screen (lbl_801B8BA8, 0x288 bytes each; Player.nView[], TW06's
+// One of the four views on screen (gViewControllers, 0x288 bytes each; Player.nView[], TW06's
 // viewControllerID, index them): the render camera, the view's camera controller, the player it
 // follows.
 typedef struct ViewController {
@@ -615,7 +615,7 @@ void   RC_vSetCurrentRenderCtxTransformationMatrix(f32 (*pMtx)[4]);
 void   RC_vSetRenderCtxTransformationMatrix(void* pCamera, f32 (*pMtx)[4]);
 f32*   fn_8003526C(void);               // GoTerrain.c: the current render camera's screen rectangle
 
-ViewController* ViewController_GetCurrentViewController(void);     // the current view (lbl_80281CA4)
+ViewController* ViewController_GetCurrentViewController(void);     // the current view (gpCurViewController)
 ViewController* ViewController_GetIndexedViewController(int nView);
 void*  ViewController_GetRenderContext(int nView);          // the view's render camera
 View*  ViewController_GetCameraControl(int nView);

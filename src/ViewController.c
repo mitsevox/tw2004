@@ -1,14 +1,14 @@
 // ViewController.c (our name, after TW06's viewControllerID): the four views on screen
-// (lbl_801B8BA8). Each view controller owns a render camera and the view's camera controller
+// (gViewControllers). Each view controller owns a render camera and the view's camera controller
 // (View); these functions set a view up and shut it down, hand out its parts, and each frame run
 // its camera controller and copy the camera's position into the render camera.
 
 #include "unsorted/cull.h"
 
 // .bss/.sbss in reverse address order (CodeWarrior lays them out last-defined-first)
-ViewController lbl_801B8BA8[4];
-ViewController* lbl_80281CA4;               // the current view's controller
-int lbl_80281CA0;                           // the current view
+ViewController gViewControllers[4];
+ViewController* gpCurViewController;               // the current view's controller
+int gCurViewControllerID;                           // the current view
 
 void  fn_80062E40(View* pView);                     // set up a camera controller
 void  fn_80038010(u8 a, int n, f32* pVec);
@@ -33,27 +33,27 @@ void ViewController_ResetAll(void) {
     int i;
 
     for (i = 0; i < 4; i++) {
-        lbl_801B8BA8[i].b274 = 0;
+        gViewControllers[i].b274 = 0;
     }
 }
 
 // Makes view nView the current view (the one ViewController_GetCurrentViewController and
 // ViewController_GetCurrentViewControllerID return).
 void ViewController_SetCurrentViewController(int nView) {
-    lbl_80281CA0 = nView;
-    lbl_80281CA4 = &lbl_801B8BA8[nView];
+    gCurViewControllerID = nView;
+    gpCurViewController = &gViewControllers[nView];
 }
 
 ViewController* ViewController_GetCurrentViewController(void) {
-    return lbl_80281CA4;
+    return gpCurViewController;
 }
 
 ViewController* ViewController_GetIndexedViewController(int nView) {
-    return &lbl_801B8BA8[nView];
+    return &gViewControllers[nView];
 }
 
 int ViewController_GetCurrentViewControllerID(void) {
-    return lbl_80281CA0;
+    return gCurViewControllerID;
 }
 
 // Sets view nView up on the screen rectangle fLeft, fTop, fWidth, fHeight (fractions of the
@@ -80,7 +80,7 @@ void ViewController_Init(int nView, f32 x, f32 y, f32 w, f32 h) {
 
 // The controller of view nView (one per split-screen view).
 ViewController* ViewController_GetDataPtr(int nView) {
-    return &lbl_801B8BA8[nView];
+    return &gViewControllers[nView];
 }
 
 // Shuts view nView down: frees its render context's lens and viewport, then the render context, and

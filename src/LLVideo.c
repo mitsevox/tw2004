@@ -527,17 +527,17 @@ u8 fn_800760A8_HasEnded(Video* pVideo) {
 // bottom, both inclusive (RenderState.nBC..nC8; Code80015470.c passes GXSetScissor right - left + 1).
 // The parameters named nWidth and nHeight are the right and bottom edges.
 void fn_800760B0(int nX, int nY, int nWidth, int nHeight) {
-    lbl_801B8980.nBC = nX;
-    lbl_801B8980.nC4 = nY;
-    lbl_801B8980.nC0 = nWidth;
-    lbl_801B8980.nC8 = nHeight;
-    lbl_801B8980.u110 |= 0x200;
+    gRenderState.nBC = nX;
+    gRenderState.nC4 = nY;
+    gRenderState.nC0 = nWidth;
+    gRenderState.nC8 = nHeight;
+    gRenderState.u110 |= 0x200;
 }
 
 // The next draw uses this picture.
 void fn_800760D8(LLPict* pPict) {
-    lbl_801B8980.pPict10C = pPict;
-    lbl_801B8980.uFlags |= 4;
+    gRenderState.pPict10C = pPict;
+    gRenderState.uFlags |= 4;
 }
 
 // Fills the texture coordinates for drawing a picture (RenderView_DrawPrimitive).

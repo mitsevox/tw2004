@@ -477,7 +477,7 @@ typedef struct DispSync {
     s8   bBreak;                // 0x13  the GPU reached a break point (fn_80006EC8, GX's callback)
 } DispSync;
 
-// The renderer's state (lbl_801B8980, 0x118 bytes); only what the game code writes.
+// The renderer's state (gRenderState, 0x118 bytes); only what the game code writes.
 // GoTerrain.c's setters write one group of fields each and set that group's bit in u110.
 typedef struct RenderState {
     s32  n0;                    // 0x000  3 at reset (DS_vInitModule)
@@ -530,11 +530,11 @@ typedef struct RenderState {
 } RenderState;
 LAYOUT_ASSERT(RenderState, 0x118);
 
-extern RenderState lbl_801B8980;
-void RenderState_Apply(void);                 // hand GX the groups of lbl_801B8980 that changed
+extern RenderState gRenderState;
+void RenderState_Apply(void);                 // hand GX the groups of gRenderState that changed
 
-// A pool of 20 blocks of 0x1000 bytes (our names; lbl_801A4900, 0x14080 bytes, reached through
-// the pointer lbl_80280E00). BufferPool_FreeAll frees them all; BufferPool_GetFreeBlock moves nNext past the used ones.
+// A pool of 20 blocks of 0x1000 bytes (our names; gBufferPool, 0x14080 bytes, reached through
+// the pointer gpBufferPool). BufferPool_FreeAll frees them all; BufferPool_GetFreeBlock moves nNext past the used ones.
 typedef struct BufferPoolBlock {
     u8   unk0[0x1000];
     u32  u1000;                 // 0x1000  nonzero: in use (UObject3D.c: the size of the display
@@ -551,11 +551,11 @@ typedef struct BufferPool {
 } BufferPool;
 LAYOUT_ASSERT(BufferPool, 0x14080);
 
-extern BufferPool* lbl_80280E00;
+extern BufferPool* gpBufferPool;
 BufferPoolBlock* BufferPool_GetFreeBlock(void);     // the first block not in use (UObject3D.c fills it)
 
 // The view being drawn to (our name; lbl_801B8A98, 0x110 bytes, reached through the pointer
-// lbl_80280E08; the renderer state lbl_801B8980 sits just before it). Only what the code reads.
+// lbl_80280E08; the renderer state gRenderState sits just before it). Only what the code reads.
 typedef struct ViewState {
     f32  m0[4][4];              // 0x000  the projection (fn_80016208: orthographic 0..1)
     f32  m40[3][4];             // 0x040  fn_80016208: identity; fn_800169AC sets its scale

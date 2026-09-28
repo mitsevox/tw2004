@@ -1,6 +1,6 @@
 // Code80012ED0.c (our name; what the file is is not known yet): small render helpers. Getters for
 // a render camera's screen rectangle, a call that hands GX the changed renderer state, and three
-// setters of the renderer state (lbl_801B8980) that each write one group of fields and set that
+// setters of the renderer state (gRenderState) that each write one group of fields and set that
 // group's bit in u110, like GoTerrain.c's. Its extent is the space between UFont.c and
 // Controller_Gc.c; whether it is one original file is not proven.
 
@@ -42,14 +42,14 @@ void RenderState_Flush(void) {
 // Sets the depth compare function (GX_ALWAYS turns the depth test off), applied with the next
 // RenderState_Apply.
 void DS_vSetZBufferMode(int a) {
-    lbl_801B8980.n0 = a;
-    lbl_801B8980.u110 |= 0x1;
+    gRenderState.n0 = a;
+    gRenderState.u110 |= 0x1;
 }
 
 // Turns depth-buffer writes on or off, applied with the next RenderState_Apply.
 void DS_vEnableZBufferUpdate(int a) {
-    lbl_801B8980.b4 = a;
-    lbl_801B8980.u110 |= 0x2;
+    gRenderState.b4 = a;
+    gRenderState.u110 |= 0x2;
 }
 
 // Sets the alpha test of the next draws: bEnable 0 turns it off; otherwise a pixel is drawn when
@@ -61,10 +61,10 @@ void DS_vSetAlphaTestMode(int a, int b, int c) {
     int n;
 
     n = c * 2 + 1;
-    lbl_801B8980.n8 = b;
-    lbl_801B8980.bC = (n < 0) ? 0 : ((n <= 0xFF) ? n : 0xFF);
-    lbl_801B8980.bD = a;
-    lbl_801B8980.u110 |= 0x4;
+    gRenderState.n8 = b;
+    gRenderState.bC = (n < 0) ? 0 : ((n <= 0xFF) ? n : 0xFF);
+    gRenderState.bD = a;
+    gRenderState.u110 |= 0x4;
 }
 
 // Empty; called once by the boot sequence fn_80005520, as some module's start-up step. Nothing in

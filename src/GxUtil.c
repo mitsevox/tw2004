@@ -143,8 +143,8 @@ void fn_8002A528(GxTexture* pTex, int nWidth, int nHeight, void* pImage, void* p
 }
 
 void fn_8002A608(GxTexture* pTex) {
-    lbl_801B8980.pTex108 = pTex;
-    lbl_801B8980.uFlags |= 2;
+    gRenderState.pTex108 = pTex;
+    gRenderState.uFlags |= 2;
 }
 
 void* fn_8002A624(void) {

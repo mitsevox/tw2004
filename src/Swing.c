@@ -1806,9 +1806,9 @@ int fn_8005CC5C(void) {
 }
 
 void fn_8005CC64(TexBank* pBank, TexEntry* pTex) {
-    lbl_801B8980.p100 = pBank;
-    lbl_801B8980.p104 = pTex;
-    lbl_801B8980.uFlags |= 1;
+    gRenderState.p100 = pBank;
+    gRenderState.p104 = pTex;
+    gRenderState.uFlags |= 1;
 }
 
 f32 fn_8005CC84(f32 fTan) {
