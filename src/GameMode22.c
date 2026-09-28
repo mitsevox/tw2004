@@ -1,7 +1,15 @@
-// GameMode22.c (our name): game mode 22, a long-drive contest (GameRound.c starts it with
-// GameMode22_Init), and before it the trophy case's text (Rookie of the Year, Player of the Year, the
-// money and scoring leaders; "Earned on %s"). One file: both halves share its .data, .sdata and
-// .sbss blocks.
+// GameMode22.c (our name; no EA name found): game mode 22, the long-drive contest, and before it
+// ten FE message handlers for the trophy room (TrophyRoom_*: the four tour trophies, Rookie of the
+// Year, Player of the Year, the money and scoring leaders; medal, ladder, real-time event and award
+// dates, "Earned on %s"). One file: both halves share its .data, .sdata and .sbss blocks.
+//
+// The contest (GameMode22_*): GM_SetModeType sets it up with GameMode22_Init, the menus pick the
+// variant (0: every drive's points add up; 1: only the best drive counts) and the drives per
+// player (5, 10 or 15), and GameMode22_StartEvent starts it. Each drive is scored by where the ball
+// ends up and how far it went (GameMode22_ScoreShot, using the long-drive sounds of GameAudio's
+// Gaud_LongDriveUi_*); once every player has taken the same number of drives, at least the set
+// count, the highest score wins 5000 (a tie plays on). The long-drive records are kept per hole and
+// per variant (Session.recC; GameMode22_GetHoleRecordIndex, GameMode22_GetVariant).
 
 #include "golfer.h"
 #include "ball.h"
@@ -23,12 +31,12 @@ void GameMode22_StartSwing(int nPlayer);
 s32 GameMode22_GoToPlayoff(void);
 u8   GameMode22_HoleFinished(int nPlayer, int n);
 void GameMode22_ScoreShot(int nPlayer);
-u8   GameMode22_GetWinner(s32* pn8);
+u8   GameMode22_GetWinner(s32* pnWinner);
 u8   GameMode22_GameFinished(int n);
 void GameMode22_BallOutOfBounds(int nPlayer);
 void GameMode22_EndGolferTurn(int nPlayer);
 void GameMode22_DecideWinner(void);
-s32  GameMode22_GetLieGroup(int n);
+s32  GameMode22_GetLieGroup(int nLie);
 s32  GameMode22_GetHonors(int nPlayer);
 void GameMode22_StartEvent(void);
 void GameMode22_ClearPlayerStats(void);
@@ -36,13 +44,13 @@ void GameMode22_HoleStart(void);
 void GameMode22_RestartHole(void);
 void GameMode22_AfterClearStats(void);
 void GameMode22_PreSwing(void);
-void GameMode22_SetNumDrives(s32 p0);
-void GameMode22_SetVariant(s32 n);
+void GameMode22_SetNumDrives(s32 nDrives);
+void GameMode22_SetVariant(s32 nVariant);
 s32 GameMode22_GetVariant(void);
 s32 GameMode22_IsActive(void);
 u8   GameMode22_IsShowingWinner(void);
 void GameMode22_ShowDrivesLeft(int nPlayer);
-s32 GameMode22_GetHoleRecordIndex(s32 arg0);
+s32 GameMode22_GetHoleRecordIndex(s32 nHole);
 
 char* gTourTrophyTitles[4] = {
     "Rookie of the Year",
@@ -419,9 +427,10 @@ void GameMode22_EndGolferTurn(int nPlayer) {
                 &gPlayers[nPlayer].ball.pCourse->tee[gSession.nTeeSet[nPlayer]].x, nPlayer);
 }
 
-// Once every player's nEA0 has reached n4 and they are all level, the player with the highest nEBC
-// wins (n8 = the player, bC set). A tie for the highest leaves no winner, and with n0 1 clears
-// every nEBC.
+// After each drive (GameMode22_ScoreShot): once every player has taken the same number of drives
+// (nEA0), at least the contest's count (n4), the highest score (nEBC) wins: n8 = the player, bC set.
+// A tie for the highest leaves no winner and play goes on; in variant 1 (the best drive counts)
+// the tie also clears every score.
 // fake match: no loop unrolling in the frontend, so the second loop keeps the count in a register
 // and gets the backend's unroll (srwi by 8 + remainder) as EA's does.
 #pragma push
@@ -484,8 +493,8 @@ void GameMode22_DecideWinner(void) {
 // The contest's scoring group of lie nLie: 0 the tee; 1 the fairways and the fringe (and any lie
 // not listed: cart path, water, out of bounds); 2 the roughs, ice, snow and misc; 3 the sands; 4
 // the green; 5 in the cup.
-s32 GameMode22_GetLieGroup(int n) {
-    switch (n) {
+s32 GameMode22_GetLieGroup(int nLie) {
+    switch (nLie) {
     case 0:
         return 0;
     case 1:
@@ -512,7 +521,8 @@ s32 GameMode22_GetLieGroup(int n) {
     }
 }
 
-// Adds message n to the list the shot's comment is picked from (20 at most). Our name.
+// Adds commentary line n to the drive's list, from which one is picked at random (20 at most). Our
+// name.
 #define ADD_MSG(n)                          \
     if (nMsgs < 20) {                       \
         aMsgs[nMsgs] = (n);                 \
@@ -776,14 +786,14 @@ void GameMode22_PreSwing(void) {
 
 // How many drives each player gets (n4), from the menu (FE_MessageTable.c fn_80084AA8: 5, 10 or
 // 15).
-void GameMode22_SetNumDrives(s32 p0) {
-    gGameMode22.n4 = p0;
+void GameMode22_SetNumDrives(s32 nDrives) {
+    gGameMode22.n4 = nDrives;
 }
 
 // The contest's variant (n0), from the menu (FE_MessageTable.c fn_80084AA8): 0 every drive's points
 // add up, 1 only the best fair drive counts.
-void GameMode22_SetVariant(s32 n) {
-    gGameMode22.n0 = n;
+void GameMode22_SetVariant(s32 nVariant) {
+    gGameMode22.n0 = nVariant;
 }
 
 // The contest's variant (n0): 0 the drives' points add up, 1 the best drive. The long-drive records
@@ -792,19 +802,20 @@ s32 GameMode22_GetVariant(void) {
     return gGameMode22.n0;
 }
 
-// Whether a winner is decided (bC); the winner (n8, 5 none) into *pn8 when pn8 is not NULL.
-u8 GameMode22_GetWinner(s32* pn8) {
-    if (pn8 != NULL) {
-        *pn8 = gGameMode22.n8;
+// Whether a winner is decided (bC); the winner (n8, 5 none) into *pnWinner when pnWinner is not
+// NULL.
+u8 GameMode22_GetWinner(s32* pnWinner) {
+    if (pnWinner != NULL) {
+        *pnWinner = gGameMode22.n8;
     }
     return gGameMode22.bC;
 }
 
 // Whether game mode 22 is being played (GUI_IsPostShotUIAnimating asks).
 s32 GameMode22_IsActive(void) {
-    s32 t0;
-    t0 = Game_GetMode();
-    return (((u32)__cntlzw((22 - t0)) >> 5) & 0xFF);
+    s32 nMode;
+    nMode = Game_GetMode();
+    return (((u32)__cntlzw((22 - nMode)) >> 5) & 0xFF);
 }
 
 // Whether a winner is decided and the 120-frame winner countdown (n18) is still running; the
@@ -825,8 +836,8 @@ void GameMode22_ShowDrivesLeft(int nPlayer) {
 
 // The long-drive record slot (Session.recC's first index) of hole number nHole: holes 6, 7, 5, 3
 // and 4 are slots 0 to 4; any other hole slot 0.
-s32 GameMode22_GetHoleRecordIndex(s32 arg0) {
-    switch (arg0) {
+s32 GameMode22_GetHoleRecordIndex(s32 nHole) {
+    switch (nHole) {
     case 6:
         return 0;
     case 7:

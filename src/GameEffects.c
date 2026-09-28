@@ -1,6 +1,16 @@
-// GameEffects.c (TW06's name, GameEffects_*): slow motion, the "GameBreaker" (a letterbox, a
-// wider view and a slow-down during a shot), the heartbeat rumble, the time rate. TW06's copy of
-// the file keeps the same function order, which gives the names.
+// GameEffects.c (EA's name: TW06's and TW07's golf/gamemode/GameEffects.c, GameEffects_*; both keep
+// this file's function order, which gives the names): the game's time rate (double time, half
+// time, super slow motion), the GameBreaker, and the heartbeat rumble.
+//
+// A GameBreaker is the dramatic moment of a shot: black letterbox bars, a wider field of view, its
+// own camera and a slow-down near the end, with its start and end sound events (0x3D..0x40). A
+// scripted one is started by SitDev's actions for a reason (a putt for a record, the lead or an
+// eagle; the target games) and ends with the post-GameBreaker commentary and crowd; a predicted
+// one starts while the ball flies, from the look-ahead ball. All of it lives in one state,
+// gGameEffects (game.h). The small helpers it calls (GameEffects_IsFixedTimeStepOn,
+// _IsSingleStepPending, _ClearSingleStep, _StartOfSlowMoFrame, _IsHalfTimeOn, _SendMessage50,
+// _Vec3Sub, GM_IsPuttForLead) are defined at the top of GameManager.c; half and double time are
+// switched in gocamscripts.c (fn_80045494, fn_80045558).
 
 #include "golfer.h"
 #include "game.h"
@@ -219,9 +229,9 @@ void GameEffects_ScriptedGameBreakerTrigger(int nPlayer, int nReason) {
 // As a swing starts (STATEFUNC_SwingInit), the target games' scripted GameBreakers, on course 7
 // only, for any player (not in a replay or split screen, not with gSession.a8[0] set, not while one
 // is up): mode 14 when the player holds 4 targets (fn_800F354C; reason 17), mode 15 when every
-// other player is out (nE88 5 or more; reason 22), mode 17 with 39 targets hit (fn_800F20C0; reason
-// 23), mode 16 with 39 hit and the aimed-at target not yet hit (reason 23). It starts as
-// GameEffects_ScriptedGameBreakerTrigger does (event 0x3D).
+// other player is out (nE88 5 or more; reason 22), mode 17 with 39 targets hit
+// (GameModeSkillZoneBase_CountGreensHit; reason 23), mode 16 with 39 hit and the aimed-at target
+// not yet hit (reason 23). It starts as GameEffects_ScriptedGameBreakerTrigger does (event 0x3D).
 void GameEffects_TargetGameBreakerTrigger(int nPlayer) {
     u8 bStart = 0;
     int nReason;
@@ -256,8 +266,8 @@ void GameEffects_TargetGameBreakerTrigger(int nPlayer) {
                     bStart = 1;
                     nReason = 23;
                 }
-            } else if ((Game_GetMode() == 16 || Game_GetMode() == 16)
-                       && GameModeSkillZoneBase_CountGreensHit(nPlayer) == 39 &&
+            } else if ((Game_GetMode() == 16 || Game_GetMode() == 16) &&
+                       GameModeSkillZoneBase_CountGreensHit(nPlayer) == 39 &&
                        gPlayers[nPlayer].nDE4[GE_CurrentTarget(nPlayer)] == 0) {
                 bStart = 1;
                 nReason = 23;
@@ -620,7 +630,8 @@ f32 GameEffects_FieldOfViewChange(void) {
 }
 
 // The GameBreaker's depth-of-field change, which the camera scripts add: always 0 in this build.
-f32 GameEffects_DepthOfFieldChange(void) {
+// fCurDof, the current depth of field, is not read (every caller passes it; TW07's takes curDOF).
+f32 GameEffects_DepthOfFieldChange(f32 fCurDof) {
     return 0.0f;
 }
 
@@ -736,32 +747,33 @@ u8 GameEffects_SkipOtherCommentary(void) {
 // (HighScoreRecords_GetEndOfShotRecord); after the shot, with neither of those two, also a big
 // message waiting to be shown (fn_800E5344).
 u8 GameEffects_ScriptedGBDidIt(Ball* pBall, int nPlayer, u8 bNext) {
-    u8  bEagle;
-    int a;
-    int b;
+    u8  bPar5In2;
+    int nTrophyBall;
+    int nRecordBall;
     int nStrokes;
     if (pBall->nLie != LIE_GREEN_e || !(gGameEffects.uFlags & 0x4000)) {
-        bEagle = 0;
+        bPar5In2 = 0;
     } else if (Course_GetCurHolePar() != 5) {
-        bEagle = 0;
+        bPar5In2 = 0;
     } else if (bNext && gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] != 1) {
-        bEagle = 0;
+        bPar5In2 = 0;
     } else if (!bNext && gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] != 2) {
-        bEagle = 0;
+        bPar5In2 = 0;
     } else {
-        bEagle = 1;
+        bPar5In2 = 1;
     }
-    a = Earnings_CheckShotAwards(nPlayer, pBall, bNext);
-    b = HighScoreRecords_GetEndOfShotRecord(nPlayer, pBall, 0, bNext, 1);
+    nTrophyBall = Earnings_CheckShotAwards(nPlayer, pBall, bNext);
+    nRecordBall = HighScoreRecords_GetEndOfShotRecord(nPlayer, pBall, 0, bNext, 1);
     if (!bNext) {
-        if (b == 0 && a == 0) {
-            b = fn_800E5344();
+        if (nRecordBall == 0 && nTrophyBall == 0) {
+            nRecordBall = fn_800E5344();
         }
         nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
     } else {
         nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1;
     }
-    if ((pBall->nLie == LIE_INCUP_e && !GM_IsShotOverLimit(nPlayer, nStrokes - 1)) || bEagle || b || a) {
+    if ((pBall->nLie == LIE_INCUP_e && !GM_IsShotOverLimit(nPlayer, nStrokes - 1)) || bPar5In2 ||
+        nRecordBall || nTrophyBall) {
         return 1;
     }
     return 0;
