@@ -1,12 +1,12 @@
-// GameMode14.c (our name; TW07's GameMode_SkillZoneCapture.cpp): game mode 14, the two-player
-// capture target game, one hole. The targets are up to 40 spots on the hole (the list in
-// GameModeReplay.c; the code the target modes share is GameTargets.c). A shot landing in a
-// target's ring (0 the bullseye .. 4) claims it when that ring is closer than the one it is held
-// with, whoever holds it; a target claimed with a bullseye is locked. Taking one from the other
-// player is a steal. The first to hold 5 targets wins and is paid their points: each held target's
-// ring points (500 for the bullseye down to 100), times the hole's target factor, with the
-// earnings modifiers; the loser gets nothing. Each turn has a shot clock, and running out forfeits
-// the shot.
+// GameMode_SkillZoneCapture.c (TW07's name, GameMode_SkillZoneCapture.cpp there, the same methods
+// in the same order): game mode 14, the two-player capture target game, one hole. The targets are
+// up to 40 spots on the hole (the list in GameModeReplay.c; the code the target modes share is
+// GameMode_SkillZoneBase.c). A shot landing in a target's ring (0 the bullseye .. 4) claims it when
+// that ring is closer than the one it is held with, whoever holds it; a target claimed with a
+// bullseye is locked. Taking one from the other player is a steal. The first to hold 5 targets wins
+// and is paid their points: each held target's ring points (500 for the bullseye down to 100),
+// times the hole's target factor, with the earnings modifiers; the loser gets nothing. Each turn
+// has a shot clock, and running out forfeits the shot.
 
 #include "golfer.h"
 #include "ball.h"
@@ -54,7 +54,7 @@ void  GameModeSkillZoneCapture_EndGame(void);
 s32   GameModeSkillZoneCapture_GreenType(int nPlayer, int nTarget);
 
 // Game mode 14's setup (pfnInit, from GM_SetModeType): its hooks (the target-list ones from
-// GameTargets.c), nC and n10 2 (two players, as GameModeBattle sets them), no wind, no gimmes, no
+// GameMode_SkillZoneBase.c), nC and n10 2 (two players, as GameModeBattle sets them), no wind, no gimmes, no
 // mulligans, b28D set (the re-plan button picks the next target), the current hole 0, pin set 0 and
 // the target list emptied (the hole's targets fill it as they load).
 void GameModeSkillZoneCapture_Init(void) {

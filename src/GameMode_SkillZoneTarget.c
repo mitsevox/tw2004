@@ -1,12 +1,12 @@
-// GameMode16.c (our name; TW07's GameMode_SkillZoneTarget.cpp, whose methods it has in the same
-// order): game mode 16, the target game, one hole. Each player has 20 balls (nBalls) to hit the
-// targets in any order; a target pays its points up to 4 times and is then closed out. Once every
-// target has been hit, each further target hit pays the all-targets prize (the id 999 row) instead.
-// A shot can get a random x2, x3 or x5 multiplier, and bonus objects hit on the way
+// GameMode_SkillZoneTarget.c (TW07's name, GameMode_SkillZoneTarget.cpp there, whose methods it has
+// in the same order): game mode 16, the target game, one hole. Each player has 20 balls (nBalls) to
+// hit the targets in any order; a target pays its points up to 4 times and is then closed out. Once
+// every target has been hit, each further target hit pays the all-targets prize (the id 999 row)
+// instead. A shot can get a random x2, x3 or x5 multiplier, and bonus objects hit on the way
 // (pfnCollisionActor, CollisionActor) raise a second points multiplier. A target surface past the
 // tee set's drive line counts as a drive, paying only for a new longest one. Bullseyes, streaks and
 // the longest drive are counted. The game ends when nobody has a ball left. The shared target-game
-// code is GameTargets.c.
+// code is GameMode_SkillZoneBase.c.
 
 #include "golfer.h"
 #include "ball.h"
@@ -45,7 +45,7 @@ void  GameModeSkillZoneTarget_CollisionActor(int nPlayer, int nId);
 void  GameModeSkillZoneTarget_EndGame(void);
 
 // Game mode 16's setup (pfnInit, from GM_SetModeType): its hooks (the target list ones from
-// GameTargets.c), no wind, no gimmes, no mulligans, no GameBreakers (b285), b28D set (the re-plan
+// GameMode_SkillZoneBase.c), no wind, no gimmes, no mulligans, no GameBreakers (b285), b28D set (the re-plan
 // button picks the next target), pin set 0, the target list emptied (the hole's targets fill it as
 // they load) and the current hole 0.
 void GameModeSkillZoneTarget_Init(void) {

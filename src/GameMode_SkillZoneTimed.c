@@ -1,11 +1,12 @@
-// GameMode13.c (our name; TW07's GameMode_SkillZoneTimed.cpp): game mode 13, the timed target
-// game, one hole. Each player starts with 90 seconds (5400 frames, in n290 for the hole) and plays
-// in turn while they have time. The first hit of a target pays 100 plus its points and adds its
-// time plus 5 seconds; each earlier hit on the same target scales both by 0.75, and a target pays
-// at most 4 times; the last target not yet hit pays the all-targets prize instead. A shot can get a
-// random x2, x3 or x5 multiplier, and bonus objects hit on the way raise a second points multiplier.
-// A target surface past the tee set's drive line counts as a drive, paying only for a new longest
-// one. The game ends when everyone's time is up. The shared target-game code is GameTargets.c.
+// GameMode_SkillZoneTimed.c (TW07's name, GameMode_SkillZoneTimed.cpp there, the same methods in
+// the same order): game mode 13, the timed target game, one hole. Each player starts with 90
+// seconds (5400 frames, in n290 for the hole) and plays in turn while they have time. The first hit
+// of a target pays 100 plus its points and adds its time plus 5 seconds; each earlier hit on the
+// same target scales both by 0.75, and a target pays at most 4 times; the last target not yet hit
+// pays the all-targets prize instead. A shot can get a random x2, x3 or x5 multiplier, and bonus
+// objects hit on the way raise a second points multiplier. A target surface past the tee set's
+// drive line counts as a drive, paying only for a new longest one. The game ends when everyone's
+// time is up. The shared target-game code is GameMode_SkillZoneBase.c.
 
 #include "golfer.h"
 #include "ball.h"
@@ -51,7 +52,7 @@ s32   GameModeSkillZoneTimed_GreenType(int nPlayer, int nTarget);
 void  GameModeSkillZoneTimed_EndGame(void);
 
 // Game mode 13's setup (pfnInit, from GM_SetModeType): its hooks (the target list ones from
-// GameTargets.c), one view, no wind, no gimmes, any number of mulligans (nMulligans 1), b28D set
+// GameMode_SkillZoneBase.c), one view, no wind, no gimmes, any number of mulligans (nMulligans 1), b28D set
 // (the re-plan button picks the next target), the current hole 0, pin set 0 and the target list
 // emptied (the hole's targets fill it as they load).
 void GameModeSkillZoneTimed_Init(void) {

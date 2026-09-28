@@ -1,5 +1,5 @@
-// challenge.h (our name): the challenges of game mode 5 (GameMode5.c), which game mode 24
-// (GameModeDriverRTE.c) and the ladder (GameMode4.c) also run. A challenge is a round set up in
+// challenge.h (our name): the challenges of game mode 5 (PlayNowMode.c), which game mode 24
+// (GameModeDriverRTE.c) and the ladder (LadderedMode.c) also run. A challenge is a round set up in
 // another game mode, with a target score and three medals.
 
 #ifndef GAME_MODES_CHALLENGE_H

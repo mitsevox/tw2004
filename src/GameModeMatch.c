@@ -1,8 +1,8 @@
 // GameModeMatch.c (TW06's GameModeMatch, TW07's GameMode_Match.cpp): game mode 1, one-against-one
 // match play. A hole goes to the player who holes out in fewer strokes; the match ends once one
 // player leads by more holes than are left, with a sudden-death playoff when it is tied after the
-// last hole. GameMode4.c (the ladder's matches), GameModeBattle.c and GameModeDriverRTE.c reuse
-// most of these callbacks. The file ends with two Play Now helpers on GameMode5.c's challenge list
+// last hole. LadderedMode.c (the ladder's matches), GameModeBattle.c and GameModeDriverRTE.c reuse
+// most of these callbacks. The file ends with two Play Now helpers on PlayNowMode.c's challenge list
 // (PlayNow_GetCurrentGroup, PlayNow_GetGroupFirstChallenge).
 
 #include "golfer.h"
@@ -351,7 +351,7 @@ void GameModeMatch_EndGame(void) {
 }
 
 // The current Play Now challenge's group (gChallengeList[gCurChallenge].nGroup): the medal slot
-// PlayNow_EndGame saves, and the intro and name the HUD shows. Play Now code (GameMode5.c's
+// PlayNow_EndGame saves, and the intro and name the HUD shows. Play Now code (PlayNowMode.c's
 // challenge list) though it sits in this file.
 s32 PlayNow_GetCurrentGroup(void) {
     return gChallengeList[gCurChallenge].nGroup;

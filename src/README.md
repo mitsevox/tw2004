@@ -17,7 +17,7 @@ and MetroTRK are built from public decomps in `extern/` (the `progress_category=
 | The entry point | `main()` in `unsorted/sweep_800055D8.c`: boot list (`sweep_80005520.c`), `GoEntry.c`'s loop, shutdown list (`sweep_80005590.c`) |
 | The game's state machine | `GoEntry.c` `fn_800083A4`: a switch on `gSession.nGameType` (table below) |
 | One frame | `gomainloop.c`: `fn_8006D8E8` is the frame loop, `fn_8006DBD4` picks the game type's frame, `fn_8006D27C` draws a round's frame, `fn_8006DDA8` runs every module's hooks |
-| A shot, start to finish | `gomainloop.c` calls `fn_8005D2F8` (`Code8005D2E4.c`) each frame, which runs `GOLFERSTATE_Update` (`StateGolfer.c`): each player's golfer state (`stateFunc.c`, `STATEFUNC_*`). `STATEFUNC_Swing*` drives `Swing.c`, which launches the ball with `Physics_ShotImpact` (`Ball.c`); `GM_BallHit` and `GM_Update` (`GameManager.c`) keep the round's turns and strokes |
+| A shot, start to finish | `gomainloop.c` calls `fn_8005D2F8` (`Code8005D2E4.c`) each frame, which runs `GOLFERSTATE_Update` (`StateGolfer.c`): each player's golfer state (`stateFunc.c`, `STATEFUNC_*`). `STATEFUNC_Swing*` drives `Swing.c`, which launches the ball with `Physics_ShotImpact` (`Ball.c`); `GM_BallHit` and `GM_Update` (`GameMode.c`) keep the round's turns and strokes |
 | A round's rules | `GameRound.c` `GM_SetModeType` fills `gpGame`'s callbacks (`GameState`, `include/golfer.h`) with defaults, then calls the game mode's own setup (`GameMode*.c`) |
 | The menus | `uiProcessInterface.c` runs the UI; the screens run on EA's UI Studio library (`UISApi.c` is the game's side, `UISStack.c` `UISStackProcess` the script interpreter); menu messages land in `FE_MessageTable.c`, a round's in `GameUICommands.c` |
 | Loading anything from disc | `UStream.c` (the chunked `.hog`/`.gcb` streamer; `docs/formats/ctrl-container.md`), handlers registered per chunk type, file lists in `streammanagerhole.c` |
@@ -278,7 +278,7 @@ ball placement, and the golfer state engine that steps each player through a sho
 | target.c | T6 | the aim marker, aim-point and ball-placement controls, where a ball may be dropped |
 | emotion.c | T6 | the golfers' emotions after a shot, picking the reaction they play |
 | Replay.c | EA | shot replay / take-back: saves player and conditions before a shot |
-| SwingTips.c | ours | tips shown as a swing starts |
+| CaddieTips.c | ours | tips shown as a swing starts |
 
 ### Characters
 
@@ -321,7 +321,7 @@ these files and the game modes sit together (0x800D9E14-0x80102AC8).
 | HoleScore.c | ours (TW06 `analysisutilities.c`, medium) | per-player round analysis: distances, lie, streaks by score |
 | GameHoleContests.c | ours | longest drive, closest to the pin, hole-in-one contests |
 | GameEffects.c | T6 | slow motion, the GameBreaker, heartbeat rumble, time rate |
-| GameManager.c | ours (TW06 `GM_*` order) | turns, strokes, mulligans, post-shot reaction, walking to the ball (`GM_*`) |
+| GameMode.c | ours (TW06 `GM_*` order) | turns, strokes, mulligans, post-shot reaction, walking to the ball (`GM_*`) |
 | GameRound.c | ours | the round set-up: a game mode's callbacks, holes, stroke limit, mixed-course rounds |
 | GameUI.c | ours | the in-round display flow: HUD messages, end-of-hole and end-of-round screens |
 | GameMessages.c | ours | the game's messages to the front end (a message id plus values) |
@@ -336,21 +336,21 @@ number (`gpGame->nMode`); several reuse another mode's callbacks.
 |---|---|---|---|
 | 0 | GameModeStroke.c | T6 | stroke play (modes 9, 12..17, 22, 23 reuse some of its callbacks) |
 | 1 | GameModeMatch.c | T6 | match play with sudden-death playoff |
-| 2 | GameMode2.c | ours | skins |
-| 4 | GameMode4.c | ours | the 25-event ladder's matches |
-| 5 | GameMode5.c | ours | 83 challenges (`'PLY '`); also run by mode 24 |
+| 2 | GameMode_Skins.c | ours | skins |
+| 4 | LadderedMode.c | ours | the 25-event ladder's matches |
+| 5 | PlayNowMode.c | ours | 83 challenges (`'PLY '`); also run by mode 24 |
 | 6, 7 | GameMode6.c, GameMode7.c | ours | two-player modes on GameMode8.c's code |
 | 8 | GameMode8.c | ours | speed golf (time plus 3 per stroke) |
-| 9 | GameMode9.c | ours | one player, no opponent; probably TW06's practice mode *(unverified)* |
+| 9 | GameMode_Practice.c | ours | one player, no opponent; probably TW06's practice mode *(unverified)* |
 | 10 | GameModeReplay.c | T6 | replaying a saved shot; the target games' target list |
 | 11 | GameMode11.c | ours | the lessons |
 | 12 | GameMode12.c | ours | stroke play with points for special surfaces |
-| 13..17 | GameTargets.c | ours | the code the target games share |
-| 13 | GameMode13.c | ours | the timed target game |
-| 14 | GameMode14.c | ours | a two-player target game (claim 5 targets) |
-| 15 | GameMode15.c | ours | HORSE on the targets |
-| 16 | GameMode16.c | ours | 20 balls at the targets in any order |
-| 17 | GameMode17.c | ours | the targets in order with 5 balls |
+| 13..17 | GameMode_SkillZoneBase.c | ours | the code the target games share |
+| 13 | GameMode_SkillZoneTimed.c | ours | the timed target game |
+| 14 | GameMode_SkillZoneCapture.c | ours | a two-player target game (claim 5 targets) |
+| 15 | GameMode_SkillZoneHorse.c | ours | HORSE on the targets |
+| 16 | GameMode_SkillZoneTarget.c | ours | 20 balls at the targets in any order |
+| 17 | GameMode_SkillZoneTargetToTarget.c | ours | the targets in order with 5 balls |
 | 18 | GameModeStableford.c | T6 | modified Stableford |
 | 19 | GameModeBestBall.c | T6 | two-against-two best ball stroke play |
 | 20 | GameModeFourBall.c | T6 | two-against-two best ball match play |
@@ -375,14 +375,14 @@ calendar with its real-time events, the ladder map, and the money and goals in t
 | Calendar.c | ours | dates for the tour season: day numbers, weekdays, today's date, date strings |
 | Earnings.c | EA (TW2003 source tree) | money and goals: prize table (`'ERN '`), payouts and multipliers, unlock goals, saved replays |
 | CalendarScreen.c | ours | the career calendar screen's callbacks |
-| GameModeDriver.c | ours | the calendar's per-mode driver tables and the month grid |
+| FE_Calendar.c | ours | the calendar's per-mode driver tables and the month grid |
 | PGATourSimulation.c | T6 | the tour field, entrant scores, season statistics and rankings |
 | fe_stats.c | T6 | the PGA TOUR statistics screen |
-| EventInfo.c | ours | the panel of a calendar day's event details |
+| FE_CalendarPopups.c | ours | the panel of a calendar day's event details |
 | GameMode4Menu.c | ours | the ladder map screen's messages |
 | LadderMap.c | ours | the ladder map's rules: regions, nodes, cursor moves |
 
-Also: GameModeDriverPGATour.c, GameModeDriverRTE.c, GameMode4.c (the ladder), GameMode5.c
+Also: GameModeDriverPGATour.c, GameModeDriverRTE.c, LadderedMode.c (the ladder), PlayNowMode.c
 (challenges) in [Game modes](#game-modes), and FE_PGATourMessages.c in the front end.
 
 ### Situation scripts and commentary

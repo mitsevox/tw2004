@@ -1276,7 +1276,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   different operand order. (`fn_800512BC`.)
 - **[verified] Three identical branches after one compare** (`cmpw; blt; blt; blt`) are
   `(a >= b && a >= b && a >= b)`: a comparison macro written for several fields that are all
-  the same value here (`RECORD_AT_LEAST` in `GameManager.c`).
+  the same value here (`RECORD_AT_LEAST` in `GameMode.c`).
 - **[verified] `x ? 0 : 2` compiles branch-free** (cntlzw/neg/andc); EA's code has
   `a = 2; if (x == 0) a = 0;`. A flag from `(a || b) ? 1 : 0` adds a `neg/or/srwi` normalising
   step that a plain `a || b` does not.

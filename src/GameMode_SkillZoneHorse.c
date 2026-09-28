@@ -1,12 +1,12 @@
-// GameMode15.c (our name; TW07's GameMode_SkillZoneHorse.cpp): game mode 15, HORSE on the targets,
-// one hole, set up for two players. A shot landing in a target's ring (0 the bullseye .. 4) with
-// no leader makes its player the leader. The next player must land on the leader's target in the
-// same ring (a match: the lead stands) or a closer one (they take the lead); anything else takes a
-// letter (nHorseLetters) and ends the lead, so the next shot sets a new one. The lead also ends
-// when play comes back round to the leader. Five letters and you are out; the last player in wins.
-// Each shot on a target also pays its surface's points, which the players still in are paid at the
-// end. Each turn has a shot clock: running out forfeits the shot and, against a leader, takes a
-// letter.
+// GameMode_SkillZoneHorse.c (TW07's name, GameMode_SkillZoneHorse.cpp there, the same methods in
+// the same order): game mode 15, HORSE on the targets, one hole, set up for two players. A shot
+// landing in a target's ring (0 the bullseye .. 4) with no leader makes its player the leader. The
+// next player must land on the leader's target in the same ring (a match: the lead stands) or a
+// closer one (they take the lead); anything else takes a letter (nHorseLetters) and ends the lead,
+// so the next shot sets a new one. The lead also ends when play comes back round to the leader.
+// Five letters and you are out; the last player in wins. Each shot on a target also pays its
+// surface's points, which the players still in are paid at the end. Each turn has a shot clock:
+// running out forfeits the shot and, against a leader, takes a letter.
 
 #include "golfer.h"
 #include "ball.h"

@@ -59,7 +59,7 @@ Objects delivered by UStream
 | `CAMA` | fn_800397EC | GoDynamicCam.c | swapped: fn_80039A48 > ByteSwap_Records | little-endian on disc |
 | `TEO ` | fn_80045F74 | sweep | none seen | asm |
 | `BALL` | fn_80045FC8 | asm | none seen | asm |
-| `Cact` | fn_80048BDC | UKernel.c | none seen | asm; its type-10 objects go to PlayNow_LoadBallSpot (GameMode5.c), which reads a challenge's ball spot in place through `ChallengeSpotRecord` (`port:` note there) |
+| `Cact` | fn_80048BDC | UKernel.c | none seen | asm; its type-10 objects go to PlayNow_LoadBallSpot (PlayNowMode.c), which reads a challenge's ball spot in place through `ChallengeSpotRecord` (`port:` note there) |
 | `CAMC` | fn_800644F4 | GoStaticCam.c | swapped: ByteSwap_Records | little-endian on disc |
 | `sscr` | SitDev_LoadScripts | SitDevFile.c | swapped: fn_800BB52C > ByteSwap_Records | little-endian on disc |
 | `BIO ` | fn_80076F80 | FE_Manager.c | none seen | asm |
@@ -74,14 +74,14 @@ Objects delivered by UStream
 | `TRAX`, `TRXT` | fn_800BA118, fn_800BA15C | sweep | none seen | asm |
 | `CRI `, `CMPS` | fn_800D2A64, fn_800D2A90 | sweep | none seen | asm |
 | `ERN ` | EarningsInfo_LoadERNFromStream | Earnings.c | none seen | yes: copied over the prize table `lbl_80200538` (`EarningsTable`, include/game/earnings.h); a `port:` note in the handler marks where a port converts it |
-| `PLY ` | PlayNow_LoadPLYFromStream | GameMode5.c | none seen | yes: copied over `gPlayNowChallenges` (`Challenge[83]`, include/game/modes/challenge.h); `port:` note in the handler |
-| `PLYs` | PlayNow_LoadPLYsFromStream | GameMode5.c | none seen | bytes: a string block, copied |
+| `PLY ` | PlayNow_LoadPLYFromStream | PlayNowMode.c | none seen | yes: copied over `gPlayNowChallenges` (`Challenge[83]`, include/game/modes/challenge.h); `port:` note in the handler |
+| `PLYs` | PlayNow_LoadPLYsFromStream | PlayNowMode.c | none seen | bytes: a string block, copied |
 | `PGAc`, `PGAt`, `PGAp` | fn_800EDF34, fn_800EDF60, fn_800EDF90 | GameModeDriverPGATour.c | none seen | yes: copied over `gPgaData.aTournament`, `.aTourEvent`, `.aTriple` (`Tournament`, `TourEvent`, `PgaTriple`, include/game/modes/pgatour.h); a `port:` note in each handler |
 | `PGAn` | fn_800EDFC0 | GameModeDriverPGATour.c | none seen | bytes: names, copied |
 | `RTEc`, `RTEs` | fn_800F05B0, fn_800F05DC | GameModeDriverRTE.c | none seen | yes: copied over `gRTEs.aEvent`, `.aChallenge` (`RTEvent`, `Challenge`, include/game/modes/rte.h); a `port:` note in each handler |
 | `RTEn` | fn_800F060C | GameModeDriverRTE.c | none seen | bytes: names, copied |
-| `TCM ` | fn_8010237C | GameMode4.c | none seen | yes: copied over `lbl_802124B8` (`LadderEvent[25]`, GameMode4.c); `port:` note in the handler |
-| `TCMS` | fn_801023A8 | GameMode4.c | none seen | bytes: text, copied |
+| `TCM ` | fn_8010237C | LadderedMode.c | none seen | yes: copied over `lbl_802124B8` (`LadderEvent[25]`, LadderedMode.c); `port:` note in the handler |
+| `TCMS` | fn_801023A8 | LadderedMode.c | none seen | bytes: text, copied |
 | `CR_A` | FE_CrAP_LoadAssetsFromStream | FE_CrAPDB.c | swapped: CrAPAssetsByteSwap > ByteSwap_Records | little-endian on disc |
 | `CR_S` | FE_CrAP_LoadStringsFromStream | FE_CrAPDB.c | none seen | asm |
 | `PGST` | PGATourSimulation_LoadPGSTFromStream | sweep | none seen | asm |

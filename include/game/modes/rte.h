@@ -29,7 +29,7 @@ typedef struct RTEData {
 } RTEData;
 extern RTEData gRTEs;
 
-// GameModeDriverRTE.c, as the career calendar (GameModeDriver.c) uses it
+// GameModeDriverRTE.c, as the career calendar (FE_Calendar.c) uses it
 u8   GameModeDriverRTE_GetEventByDate(u16 nDate, s32* pId, s32* pRound);
 s32  GM_RealtimeMode_SelectEventToday(void);
 RTEvent* GameModeDriverRTE_GetCalData(s32 i);
@@ -39,7 +39,7 @@ char* GameModeDriverRTE_GetDescription(s32 i);
 s32  GameModeDriverRTE_UI_GetEventIconIndexOnCal(s32 i);
 u8   GM_RealtimeMode_TodaysEventCompleted(void);                 // always 0 (the calendar's cell look for today)
 
-// GameModeDriverRTE.c, as the calendar's event details (EventInfo.c) use it
+// GameModeDriverRTE.c, as the calendar's event details (FE_CalendarPopups.c) use it
 s32  GameModeDriverRTE_GetPurse(s32 i);
 u16  GM_RealtimeMode_GetStartDate(s32 i);
 s32  GameModeDriverRTE_GetNextEvent(void);

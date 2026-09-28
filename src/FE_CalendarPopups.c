@@ -1,10 +1,11 @@
-// EventInfo.c (our name; EA's FE_CalendarPopups.c in TW07): the rows of the calendar's day popup
-// about an event, one row's title and text a call (rows 3 to 8; GameModeDriver.c's
-// PGATour_GetPopupRow and RealTime_GetPopupRow fill the rest): for a PGA TOUR event under way,
-// played or to come the purse, round, course, leader, scores, winner and defending champion; for a
-// real-time event its purse, rewards and status. TW07's file has the seven in the same order with
-// the same locals, after three OnlinePopup_GetRow_* ones stripped here. Three front-end messages
-// follow that TW07's file does not have: the next real-time event, the clock's date and an award.
+// FE_CalendarPopups.c (EA's name: TW07's FE_CalendarPopups.c, the same rows in the same order): the
+// rows of the calendar's day popup about an event, one row's title and text a call (rows 3 to 8;
+// FE_Calendar.c's PGATour_GetPopupRow and RealTime_GetPopupRow fill the rest): for a PGA TOUR event
+// under way, played or to come the purse, round, course, leader, scores, winner and defending
+// champion; for a real-time event its purse, rewards and status. TW07's file has the seven in the
+// same order with the same locals, after three OnlinePopup_GetRow_* ones stripped here. Three
+// front-end messages follow that TW07's file does not have: the next real-time event, the clock's
+// date and an award.
 
 #include "golfer.h"
 #include "game.h"

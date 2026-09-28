@@ -39,12 +39,12 @@ s32  MC_NumEASaveGames(s32 nPort, s32 nSlot); // MC_Gc.c
 s32  fn_800A1164(s32 nPort, s32 nSlot, char* pName, s32 n);     // MC.c
 s32  MC_GetUser(s32 nPort, s32 nSlot, s32 n, char* szOut);     // MC.c: clears szOut first
 void fn_8007739C(Replay* pReplay);      // FE_Manager.c
-f32  GM_GetBonusProgress(SaveProfile* pProfile);    // GameManager.c
+f32  GM_GetBonusProgress(SaveProfile* pProfile);    // GameMode.c
 void GM_PgaTourSim_ClearAllSeasons(TourSeason* pTour);    // PGATourSimulation.c
-int  GameMode4_GetCurrentEventHoles(void);                 // GameMode4.c: the current ladder event's holes
-int  GameMode4_GetCurrentEvent(void);                 // GameMode4.c: the current ladder event
-s32  PlayNow_GetNumOpponents(int i);                // GameMode5.c: challenge i's opponent count
-s32  PlayNow_GetOpponent(int i, int k);         // GameMode5.c: its opponent k
+int  GameMode4_GetCurrentEventHoles(void);                 // LadderedMode.c: the current ladder event's holes
+int  GameMode4_GetCurrentEvent(void);                 // LadderedMode.c: the current ladder event
+s32  PlayNow_GetNumOpponents(int i);                // PlayNowMode.c: challenge i's opponent count
+s32  PlayNow_GetOpponent(int i, int k);         // PlayNowMode.c: its opponent k
 u8   GM_UserHasEagledHole(int nSlot, int a, int b);      // GameRound.c
 int  GM_GetPar5EagleDate(int nSlot, int a, int b);      // GameRound.c
 int  GM_GetGolferMoneyRating(int nGolfer);          // Earnings.c: the golfer's rating
@@ -62,15 +62,15 @@ s32  fn_801255C4(s32* pPos);            // EASportsBio.c
 u8   PasswordManager_TestPassword(char* szCode);  // PasswordManager.c
 void GameMode22_SetNumDrives(s32 n);                // GameMode22.c: sets gGameMode22.nDrives
 void GameMode22_SetVariant(s32 n);                // GameMode22.c: sets gGameMode22.nVariant
-void GM_SetupCustomHoleSelection(void); // GameManager.c
-int  GM_vGetAllTimeRecordsHeld(SaveProfile* pProfile);  // GameManager.c
-void PlayNow_SelectGroup(int nId);              // GameMode5.c
-s32  PlayNow_GetNumGroups(void);                 // GameMode5.c
-char* PlayNow_GetGroupName(int nId);             // GameMode5.c
-char* PlayNow_GetGroupDescription(int nId);             // GameMode5.c
-void PlayNow_GetRewards(int i, s32* pA, s32* pB, s32* pC);     // GameMode5.c
-int  GameMode4_GetNumEventsWon(void);                 // GameMode4.c
-void GameMode4_SetEventBonus(s32 n);                // GameMode4.c
+void GM_SetupCustomHoleSelection(void); // GameMode.c
+int  GM_vGetAllTimeRecordsHeld(SaveProfile* pProfile);  // GameMode.c
+void PlayNow_SelectGroup(int nId);              // PlayNowMode.c
+s32  PlayNow_GetNumGroups(void);                 // PlayNowMode.c
+char* PlayNow_GetGroupName(int nId);             // PlayNowMode.c
+char* PlayNow_GetGroupDescription(int nId);             // PlayNowMode.c
+void PlayNow_GetRewards(int i, s32* pA, s32* pB, s32* pC);     // PlayNowMode.c
+int  GameMode4_GetNumEventsWon(void);                 // LadderedMode.c
+void GameMode4_SetEventBonus(s32 n);                // LadderedMode.c
 void GameMode26_SetTargetScore(s32 v);                // CharSliders.c
 void FE_SetProfileLeftHanded(int nSlot, int n);
 s32  MC_LoadOptions(MCCardPos* pPos);      // MC.c: load the save from the card

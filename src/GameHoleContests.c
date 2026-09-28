@@ -10,7 +10,7 @@
 // length, or the distance from the pin in feet) and ranked into a result table the UI shows
 // (gHoleContestPlaceName, gHoleContestPlaceDistance). Once every player has teed off the contest
 // is decided and the winner (gHoleContestWinner) is paid $2,500 (HoleContest_PayWinner). The
-// game-flow calls come from GameManager.c (GM_InitForHole, GM_PlayerTookShot).
+// game-flow calls come from GameMode.c (GM_InitForHole, GM_PlayerTookShot).
 
 #include "golfer.h"
 #include "game.h"

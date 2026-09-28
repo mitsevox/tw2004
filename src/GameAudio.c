@@ -1316,7 +1316,7 @@ void Gaud_BullsEye(void) {
     Aud_EmiAliasSetTrackStatus(3, 0, 1);
 }
 
-// The target games' multiplier sound (variation range 2 of emitter 3's track 0): GameTargets.c
+// The target games' multiplier sound (variation range 2 of emitter 3's track 0): GameMode_SkillZoneBase.c
 // plays it when a player's shot multiplier (nDBC: 2, 3 or 5) is above 1.
 void Gaud_MultiplierBonus(void) {
     Aud_EmiAliasSetTrackVarRange(3, 0, 2);

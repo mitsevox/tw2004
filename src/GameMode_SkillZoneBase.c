@@ -1,11 +1,11 @@
-// GameTargets.c (our name; TW07's GameMode_SkillZoneBase.cpp, the base of its five skill-zone
-// modes, which are our target games, modes 13..17): the code those modes share. The target list
-// sorted by distance from the tee and aimed at (the pin and flag move to the player's target), the
-// target nearest the ball or the aim point, which ring of a target a landing surface is, each
-// player's per-hole and per-shot target-game state, the random shot multiplier, the all-targets
-// prize, each hole's per-target points factor, the drive line, the bonus objects' index, the
-// commentary, and dispatchers into each mode's own file (TW07's virtual methods).
-// Split from GameModeReplay.c (mode 10) because the two halves each have their own copy of the
+// GameMode_SkillZoneBase.c (TW07's name, GameMode_SkillZoneBase.cpp there: the base of its five
+// skill-zone modes, which are our target games, modes 13..17): the code those modes share. The
+// target list sorted by distance from the tee and aimed at (the pin and flag move to the player's
+// target), the target nearest the ball or the aim point, which ring of a target a landing surface
+// is, each player's per-hole and per-shot target-game state, the random shot multiplier, the
+// all-targets prize, each hole's per-target points factor, the drive line, the bonus objects'
+// index, the commentary, and dispatchers into each mode's own file (TW07's virtual methods). Split
+// from GameModeReplay.c (mode 10) because the two halves each have their own copy of the
 // int-to-float constant; the bytes cannot prove the exact split point. TW07's source order puts
 // GetCupCount, GetCupPosition and AddCup right before SortCupsByDistanceFromTee, and
 // GameModeReplay.c ends with three functions that do exactly that

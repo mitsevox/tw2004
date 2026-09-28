@@ -230,7 +230,7 @@ typedef struct Replay {
     s8     nPinSet;             // 0xF07  the session's pin set when the shot was saved
     f32    fF08;                // 0xF08
     f32    fF0C;                // 0xF0C
-    u8     bF10;                // 0xF10  in-flight replays are on (GameManager.c)
+    u8     bF10;                // 0xF10  in-flight replays are on (GameMode.c)
     u8     unkF11;
     s16    nF12;                // 0xF12  1..3: PlayNow_ForceWeather is set from nF14
     s16    nF14;                // 0xF14  hundredths
@@ -297,7 +297,7 @@ typedef struct SaveProfile {
                                 //          the top 25 of the tour
                                 //          (GM_PgaTourSim_CheckEndOfTournamentAward)
     Award aRTEAward[75];        // 0x0020C  per real-time event id. TW06: rteEventAwardInfo
-    Award aLadderAward[25];     // 0x00338  per ladder event (GameMode4.c); fn_800584DC's earnings
+    Award aLadderAward[25];     // 0x00338  per ladder event (LadderedMode.c); fn_800584DC's earnings
                                 //          rating counts the won ones
     Award aAward[39];           // 0x0039C
     Replay aReplay[5];          // 0x00438  a Replay each, saved with awards 0, 6, 9, 3 and 13
@@ -386,7 +386,7 @@ void fn_80056B8C(void);
 void fn_80057364(int nSlot);    // sets up save profile nSlot
 void fn_80057ED0(SaveProfile* pProfile, const char* pName);     // PasswordManager.c: name it
 
-// GameManager.c: the profile's completion score (GM_Earnings_PayRoundGoals raises the TOUR card level with it)
+// GameMode.c: the profile's completion score (GM_Earnings_PayRoundGoals raises the TOUR card level with it)
 f32  GM_GetGameProgress(SaveProfile* pProfile);
 
 // Earnings.c: the awards

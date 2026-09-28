@@ -4,8 +4,8 @@
 // The file ends with the target games' target list (gSkillZoneCups, gSkillZoneNumCups points):
 // GameModeSkillZoneBase_GetCupCount, GetCupPosition and AddCup are TW07's
 // GameMode_SkillZoneBase.cpp methods of those names, which TW07's source order puts right before
-// SortCupsByDistanceFromTee, GameTargets.c's first function. They belong to GameTargets.c's EA file;
-// they stay here because the bytes cannot prove where the split falls (see GameTargets.c).
+// SortCupsByDistanceFromTee, GameMode_SkillZoneBase.c's first function. They belong to that EA file;
+// they stay here because the bytes cannot prove where the split falls (see GameMode_SkillZoneBase.c).
 
 #include "golfer.h"
 #include "ball.h"
@@ -201,7 +201,7 @@ const f32 lbl_80284694 = 0.0f;
 #pragma force_active reset
 
 // How many targets the target games' list holds (gSkillZoneNumCups). With the next two functions it
-// belongs to GameTargets.c's EA file (TW07 GameMode_SkillZoneBase.cpp) though it sits in this one.
+// belongs to GameMode_SkillZoneBase.c's EA file (TW07 GameMode_SkillZoneBase.cpp) though it sits in this one.
 int GameModeSkillZoneBase_GetCupCount(void) {
     return gSkillZoneNumCups;
 }

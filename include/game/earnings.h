@@ -24,7 +24,7 @@ typedef struct SkinsValue {
     s32  n10;                   // 0x10
 } SkinsValue;
 
-// A ladder event's prize (GameMode4.c).
+// A ladder event's prize (LadderedMode.c).
 typedef struct MatchPrize {
     s32  nBase;                 // 0x0  for the win
     s32  nPerHole;              // 0x4  and for each hole of the margin, up to 5

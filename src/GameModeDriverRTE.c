@@ -1,6 +1,6 @@
 // GameModeDriverRTE.c (TW06's GameModeDriverRTE class; TW07's GameModeDriver_RealTimeEvents.cpp):
 // game mode 24, the real-time events. A calendar of 118 dated entries ('RTEc'), each playing one of
-// 111 challenges ('RTEs'; the mode 5 code in GameMode5.c runs them) on its date by the console's
+// 111 challenges ('RTEs'; the mode 5 code in PlayNowMode.c runs them) on its date by the console's
 // clock, with their names and descriptions in 'RTEn'. Also the queries the calendar, its day panels
 // and the trophy room use (GM_RealtimeMode_*, TW07's names), and the purse and award a medal wins.
 
@@ -366,7 +366,7 @@ RTEvent* GameModeDriverRTE_GetCalData(s32 i) {
 }
 
 // The calendar entry of the event held on day number nDate, or NULL when none; the real-time
-// driver's entry in the calendar's per-driver table (GameModeDriver.c).
+// driver's entry in the calendar's per-driver table (FE_Calendar.c).
 RTEvent* GM_RealtimeMode_GetEventInfoByDate(u16 nDate) {
     s32 nId;
     s32 nRound;
@@ -416,7 +416,7 @@ u16 GM_RealtimeMode_GetStartDate(s32 i) {
     return p->aDate[GameModeDriverRTE_GetYearIndex()];
 }
 
-// Event i's icon (RTEvent.n14), shown in its day cell on the calendar (GameModeDriver.c).
+// Event i's icon (RTEvent.n14), shown in its day cell on the calendar (FE_Calendar.c).
 s32 GameModeDriverRTE_UI_GetEventIconIndexOnCal(s32 i) {
     return GameModeDriverRTE_GetCalData(i)->n14;
 }
@@ -465,7 +465,7 @@ s32 GameModeDriverRTE_GetNextEvent(void) {
 }
 
 // The icon (RTEvent.n14) of the first event whose award id is nId, 0 if none; the trophy room shows
-// it for the award (EventInfo.c, GameMode22.c).
+// it for the award (FE_CalendarPopups.c, GameMode22.c).
 s32 GM_RealtimeMode_GetIconIDByTrophyGroup(s32 nId) {
     s32 i;
     for (i = 0; i < 118; i++) {
@@ -488,7 +488,7 @@ void GM_RealtimeMode_GetNameByTrophyGroup(s32 nId, char* pDst) {
 }
 
 // Event i's award id: its slot in SaveProfile.aRTEAward, and the unlock value (lock mode 0x11) of
-// the items winning it gives (EventInfo.c).
+// the items winning it gives (FE_CalendarPopups.c).
 s32 GM_RealtimeMode_GetTrophyID(s32 i) {
     return gRTEs.aEvent[i].nId;
 }

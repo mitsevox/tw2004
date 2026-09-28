@@ -3,7 +3,7 @@
 // (gPgaData) comes from the 'PGAc' (tournaments), 'PGAt' (their formats), 'PGAp' (sponsorship
 // offers) and 'PGAn' (names) stream objects. The player plays a tournament's rounds one by one
 // against a simulated field (PGATourSimulation.c), with a cut after the second round and a playoff
-// on a tie for the lead; the calendar (GameModeDriver.c) can skip ahead, simulating the tournaments
+// on a tie for the lead; the calendar (FE_Calendar.c) can skip ahead, simulating the tournaments
 // in between. The season is kept in save profile 0 (TourSeason): the current tournament and round,
 // each tournament's champion and the player's result ("Did Not Play", "Cut" or a place). The
 // prize bracket grows with the tournaments won.
@@ -1010,7 +1010,7 @@ void GameModeDriverPGATour_GetWinnerEarningsString(s32 i, char* pDst) {
 }
 
 // The player's score to par so far in the current tournament (entrant 0). nEvent is not read
-// (EventInfo.c passes the tournament shown).
+// (FE_CalendarPopups.c passes the tournament shown).
 int GameModeDriverPGATour_GetUserScore(s32 nEvent) {
     return GM_PgaTourSim_GetRelativeScoreFromEntrantID(0, 0, GM_PgaTourSim_IsEntrantUser(0, 0) == 0);
 }

@@ -1783,7 +1783,7 @@ s32 FE_CrAP_GetNumItemsWithLockModeAndLockVal(s32 nKind, s32 nLock) {
 }
 
 // Copy the names of the first three assets offered for the current gender with lock kind nKind and
-// number nLock into szFirst, szSecond, szThird; how many there are, up to 3. EventInfo.c lists an
+// number nLock into szFirst, szSecond, szThird; how many there are, up to 3. FE_CalendarPopups.c lists an
 // event's rewards (kind 17) this way.
 s32 FE_CrAP_GetFirstThreeItemsWithLockModeAndVal(s32 nKind, s32 nLock, char* szFirst, char* szSecond, char* szThird) {
     int i;

@@ -1075,7 +1075,7 @@ HoleScore.c:
 	.sbss       start:0x80282240 end:0x80282248
 	.sdata2     start:0x80284478 end:0x802844C8
 
-SwingTips.c:
+CaddieTips.c:
 	.text       start:0x800D1698 end:0x800D256C
 	.sdata2     start:0x802844C8 end:0x80284510
 
@@ -1110,7 +1110,7 @@ GameEffects.c:
 	.bss        start:0x80202898 end:0x802028F0
 	.sdata2     start:0x80284578 end:0x802845C0
 
-GameManager.c:
+GameMode.c:
 	.text       start:0x800DCAD8 end:0x800E0AF0
 	.rodata     start:0x80184D30 end:0x80184D40
 	.data       start:0x80192010 end:0x80192030
@@ -1173,7 +1173,7 @@ GameModeMatch.c:
 	.sdata      start:0x80281658 end:0x80281660
 	.sdata2     start:0x80284660 end:0x80284668
 
-GameMode5.c:
+PlayNowMode.c:
 	.text       start:0x800EACD8 end:0x800ED738
 	.data       start:0x801925D0 end:0x801926A8
 	.bss        start:0x80203170 end:0x80205ED8
@@ -1181,7 +1181,7 @@ GameMode5.c:
 	.sbss       start:0x802822F0 end:0x80282330
 	.sdata2     start:0x80284668 end:0x80284670
 
-GameMode9.c:
+GameMode_Practice.c:
 	.text       start:0x800ED738 end:0x800EDD18
 	.rodata     start:0x80184DD0 end:0x80184DE0
 	.sbss       start:0x80282330 end:0x80282338
@@ -1206,12 +1206,12 @@ GameModeReplay.c:
 	.sbss       start:0x80282360 end:0x80282368
 	.sdata2     start:0x80284688 end:0x802846A0
 
-GameTargets.c:
+GameMode_SkillZoneBase.c:
 	.text       start:0x800F19D4 end:0x800F2984
 	.data       start:0x80192810 end:0x801928EC
 	.sdata2     start:0x802846A0 end:0x802846B8
 
-GameMode14.c:
+GameMode_SkillZoneCapture.c:
 	.text       start:0x800F2984 end:0x800F39F4
 	.data       start:0x801928F0 end:0x80192908
 	.bss        start:0x80211FB8 end:0x802120F8
@@ -1219,31 +1219,31 @@ GameMode14.c:
 	.sbss       start:0x80282368 end:0x80282378
 	.sdata2     start:0x802846B8 end:0x802846C0
 
-GameMode15.c:
+GameMode_SkillZoneHorse.c:
 	.text       start:0x800F39F4 end:0x800F4B40
 	.sdata      start:0x80281690 end:0x80281698
 	.sbss       start:0x80282378 end:0x80282390
 	.sdata2     start:0x802846C0 end:0x802846D0
 
-GameMode16.c:
+GameMode_SkillZoneTarget.c:
 	.text       start:0x800F4B40 end:0x800F5AAC
 	.sdata      start:0x80281698 end:0x802816A0
 	.sbss       start:0x80282390 end:0x802823A0
 	.sdata2     start:0x802846D0 end:0x802846E0
 
-GameMode17.c:
+GameMode_SkillZoneTargetToTarget.c:
 	.text       start:0x800F5AAC end:0x800F6A60
 	.sdata      start:0x802816A0 end:0x802816A8
 	.sbss       start:0x802823A0 end:0x802823B0
 	.sdata2     start:0x802846E0 end:0x802846E8
 
-GameMode13.c:
+GameMode_SkillZoneTimed.c:
 	.text       start:0x800F6A60 end:0x800F80FC
 	.sdata      start:0x802816A8 end:0x802816B0
 	.sbss       start:0x802823B0 end:0x802823C0
 	.sdata2     start:0x802846E8 end:0x80284700
 
-GameMode2.c:
+GameMode_Skins.c:
 	.text       start:0x800F80FC end:0x800F944C
 	.sbss       start:0x802823C0 end:0x802823C8
 	.sdata2     start:0x80284700 end:0x80284708
@@ -1288,7 +1288,7 @@ GameMode11.c:
 	.sbss       start:0x802823E0 end:0x80282430
 	.sdata2     start:0x802847E8 end:0x80284808
 
-GameMode4.c:
+LadderedMode.c:
 	.text       start:0x80101FEC end:0x80102AC8
 	.data       start:0x80193130 end:0x80193188
 	.bss        start:0x802124B8 end:0x80212B60
@@ -1394,7 +1394,7 @@ DynChain.c:
 	.sbss       start:0x802824F8 end:0x80282500
 	.sdata2     start:0x802848E8 end:0x802849C0
 
-GameModeDriver.c:
+FE_Calendar.c:
 	.text       start:0x80116540 end:0x80117600
 	.data       start:0x80193E70 end:0x80193F88
 	.bss        start:0x80223C48 end:0x80223C70
@@ -1421,7 +1421,7 @@ fe_stats.c:
 	.sdata      start:0x80281888 end:0x802818A8
 	.sbss       start:0x80282508 end:0x80282510
 
-EventInfo.c:
+FE_CalendarPopups.c:
 	.text       start:0x8011D280 end:0x8011E020
 	.data       start:0x801944F8 end:0x80194580
 	.sdata      start:0x802818A8 end:0x802818F8

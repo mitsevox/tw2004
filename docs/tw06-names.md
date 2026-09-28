@@ -362,7 +362,7 @@ their `fn_` names until the rest of each file is confirmed.
 | `GameModeBattle.c` | 25 | `GameModeBattle::` | ClubIsRequired (clubs 13, 21, 25), NumRemovableClubsLeft, RemoveClub, AddClub, Save/RestoreClubSetup, CanAddClub, GetWinner |
 | `GameModeStroke.c` | 0 | `GameModeStroke::` | Init, SetupNextGolfer, GetHonors, HoleFinished, GameFinished, EndGame (GoToPlayoff is the base class's; ours returns 0) |
 | `GameModeStableford.c` | 18 | `GameModeStableford::` | Init, PlayerDoneHole, SetupNextGolfer, GetHonors, HoleFinished, GameFinished, EndHole, EndGame; the data table `stablefordPointTable` (lbl_802816D0) |
-| `GameMode2.c` | 2 | `GameModeSkins::` | GetHonors, GameFinished, GoToPlayoff, EndHole, EndGame (the file keeps its own name) |
+| `GameMode_Skins.c` | 2 | `GameModeSkins::` | GetHonors, GameFinished, GoToPlayoff, EndHole, EndGame (file renamed to EA's name, 2026-09-28) |
 | `GameModeReplay.c` | 10 | `GameModeReplay::` | Init, SetupNextGolfer, HoleFinished, GameFinished, EndGame, LoadHole, RestartHole, StartGamePreData |
 | `GameModeDriverPGATour.c` | 23 | `GameModeDriverPGATour::` | the file's TW06 class; 31 methods, rows below |
 | `GameModeDriverRTE.c` | 24 | `GameModeDriverRTE::` | the file's TW06 class; 13 methods, rows below |

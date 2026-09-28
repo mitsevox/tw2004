@@ -1,14 +1,14 @@
-// GameMode5.c (our name; EA's file is probably TW2003's Golf\GameMode\PlayNowMode.c): game mode 5,
-// the Play Now challenges. Its data is the 'PLY ' stream object, EA's DATA\PLAYNOW_GC.BIN: 83
-// challenges of 0x80 bytes (Challenge, include/game/modes/challenge.h), with their names and
-// descriptions in 'PLYs' (PLAYNOW.STR) and their ball spots in the course's objects. The challenges
-// come in 29 groups, one per entry of the Play Now menu ("Lucky 7", "2 Down Comeback"); a group is
-// played as one or more challenges in a row, each a round set up in another game mode (stroke,
-// match, skins, speed golf, a target game) with a target score, and it earns one of three medals,
-// the best kept per group in the save profile, with money and trophy balls. Mode 5 runs the played
-// mode with its own callbacks wrapped around that mode's. The ladder (GameMode4.c) plays some of
-// these challenges as events, and the real-time events (mode 24, GameModeDriverRTE.c) play their
-// own list of 111 through this code.
+// PlayNowMode.c (EA's name: the source paths Golf\GameMode\PlayNowMode.c in TW2003 and TW2005):
+// game mode 5, the Play Now challenges. Its data is the 'PLY ' stream
+// object, EA's DATA\PLAYNOW_GC.BIN: 83 challenges of 0x80 bytes (Challenge,
+// include/game/modes/challenge.h), with their names and descriptions in 'PLYs' (PLAYNOW.STR) and
+// their ball spots in the course's objects. The challenges come in 29 groups, one per entry of the
+// Play Now menu ("Lucky 7", "2 Down Comeback"); a group is played as one or more challenges in a
+// row, each a round set up in another game mode (stroke, match, skins, speed golf, a target game)
+// with a target score, and it earns one of three medals, the best kept per group in the save
+// profile, with money and trophy balls. Mode 5 runs the played mode with its own callbacks wrapped
+// around that mode's. The ladder (LadderedMode.c) plays some of these challenges as events, and the
+// real-time events (mode 24, GameModeDriverRTE.c) play their own list of 111 through this code.
 
 #include "golfer.h"
 #include "ball.h"
@@ -1313,7 +1313,7 @@ void PlayNow_ForceWeather(f32 fAmount) {
 }
 
 // Sends game message 18 with player nPlayer. The timed modes send it when a player's turn or time
-// ends (GameMode8.c, GameMode13.c), and PlayNow_OnPause when a speed golf challenge is paused.
+// ends (GameMode8.c, GameMode_SkillZoneTimed.c), and PlayNow_OnPause when a speed golf challenge is paused.
 void PlayNow_SendMessage18(s32 nPlayer) {
     GameMsg_SendInt(18, nPlayer);
 }

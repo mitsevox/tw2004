@@ -9,7 +9,7 @@
 // one starts while the ball flies, from the look-ahead ball. All of it lives in one state,
 // gGameEffects (game.h). The small helpers it calls (GameEffects_IsFixedTimeStepOn,
 // _IsSingleStepPending, _ClearSingleStep, _StartOfSlowMoFrame, _IsHalfTimeOn, _SendMessage50,
-// _Vec3Sub, GM_IsPuttForLead) are defined at the top of GameManager.c; half and double time are
+// _Vec3Sub, GM_IsPuttForLead) are defined at the top of GameMode.c; half and double time are
 // switched in gocamscripts.c (fn_80045494, fn_80045558).
 
 #include "golfer.h"

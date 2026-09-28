@@ -1,4 +1,4 @@
-// ladder.h (our name): game mode 4's ladder of 25 events (GameMode4.c) and the map screen the
+// ladder.h (our name): game mode 4's ladder of 25 events (LadderedMode.c) and the map screen the
 // player picks them on (GameMode4Menu.c, LadderMap.c).
 
 #ifndef GAME_MODES_LADDER_H
@@ -9,7 +9,7 @@
 
 #define NUM_LADDER_EVENTS 25
 
-// GameMode4.c
+// LadderedMode.c
 int  GameMode4_GetEventOpponent(int nEvent);                   // the event's opponent (a golfer id)
 int  GameMode4_GetEventCourse(int nEvent);                   // its course
 int  GameMode4_GetEventHoles(int nEvent);                   // its hole-selection preset

@@ -72,7 +72,7 @@ typedef struct PgaTour_WinInfo {
     s32  nWinnings;             // 0x8  the money won
 } PgaTour_WinInfo;
 
-// GameModeDriverPGATour.c, as the career calendar (GameModeDriver.c) uses it
+// GameModeDriverPGATour.c, as the career calendar (FE_Calendar.c) uses it
 u8   GameModeDriverPGATour_GetEventByDate(u16 nDate, s32* pId, s32* pRound);
 s32  GameModeDriverPGATour_GetSelectedEvent(s32* pRound);
 s32  GameModeDriverPGATour_GetFinalEventOfSeason(void);
@@ -93,7 +93,7 @@ s32  GameModeDriverPGATour_GetNextEvent(void);  // -1 when the season is over
 s32  GameModeDriverPGATour_ComputePurseForBracket(s32 i, s32 k);
 s32  GameModeDriverPGATour_ComputeFirstPrizeForBracket(s32 i, s32 k);
 
-// GameModeDriverPGATour.c, as the calendar's event details (EventInfo.c) use it
+// GameModeDriverPGATour.c, as the calendar's event details (FE_CalendarPopups.c) use it
 s32  GameModeDriverPGATour_GetCourses(Tournament* p, s32* pCourses);
 void GameModeDriverPGATour_GetPurseString(s32 i, char* pDst);
 void GameModeDriverPGATour_GetCurrentEventLeader(char* pDst);

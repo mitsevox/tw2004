@@ -1,5 +1,5 @@
 // GameMode4Menu.c (our name): the front-end messages of the map screen of game mode 4's ladder
-// (GameMode4.c). They place the map's nodes, move the cursor (gLadderMap) with the rules in
+// (LadderedMode.c). They place the map's nodes, move the cursor (gLadderMap) with the rules in
 // LadderMap.c, fill the panel's text for the event under it (region and tour stop, opponent,
 // course, name, stage and holes) and start that event.
 

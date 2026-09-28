@@ -1,13 +1,14 @@
-// GameMode4.c (our name): game mode 4, the ladder of 25 events loaded from the 'TCM ' stream chunk
-// (gLadderEvents, 0x44 bytes an event; their names from 'TCMS'). Its counterpart in TW07 is
-// GameModeDriver_TigerChallenge.cpp (its own 'TGRC' events, with SelectEvent, StartEvent and
-// GetNumEventsWon). An event is a one-on-one match against a pro (mode 4: GameModeMatch's
-// match-play callbacks with this file's shutdown and end of game) or a Play Now challenge (mode 5);
-// an event with n1C set is neither. A match is scored by GameMode4_EndGame, a challenge only when it
-// is played as Skins (GameModeSkins_EndGame; PlayNow_EndGame skips a ladder event). Winning one
-// marks its award in the save profile, pays its prize and unlocks the pro and a reward; the region
-// finals and the World final queue messages of their own. The map screen that picks the events is
-// LadderMap.c and GameMode4Menu.c.
+// LadderedMode.c (EA's name: the source path Golf/GameMode/LadderedMode.c in TW2005; TW07 still has
+// Locale_LadderedMode_LoadTCMfromStream for the 'TCM ' data this file loads): game mode 4, the
+// ladder of 25 events loaded from the 'TCM ' stream chunk (gLadderEvents, 0x44 bytes an event;
+// their names from 'TCMS'). Its counterpart in TW07 is GameModeDriver_TigerChallenge.cpp (its own
+// 'TGRC' events, with SelectEvent, StartEvent and GetNumEventsWon). An event is a one-on-one match
+// against a pro (mode 4: GameModeMatch's match-play callbacks with this file's shutdown and end of
+// game) or a Play Now challenge (mode 5); an event with n1C set is neither. A match is scored by
+// GameMode4_EndGame, a challenge only when it is played as Skins (GameModeSkins_EndGame;
+// PlayNow_EndGame skips a ladder event). Winning one marks its award in the save profile, pays its
+// prize and unlocks the pro and a reward; the region finals and the World final queue messages of
+// their own. The map screen that picks the events is LadderMap.c and GameMode4Menu.c.
 
 #include "golfer.h"
 #include "game.h"

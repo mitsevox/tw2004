@@ -1,6 +1,6 @@
 // GameRound.c (our name; EA's file is GameModeCore.c: the functions it shares with TW07's
 // GameModeCore.c, GM_SetModeType to GM_RenderBallTarget, come in the same order): the round's
-// rules and state, after GameManager.c - a game mode's setup and default callbacks, the round's
+// rules and state, after GameMode.c - a game mode's setup and default callbacks, the round's
 // holes and courses (Random 18, Dream 18, the regional rounds), scores against par, mulligans, the
 // stroke limit, gimmes, honors, playoff holes, par-5 eagle records, course and hole folder names.
 

@@ -378,7 +378,7 @@ typedef struct Player {
     f32  vCBC[3];               // 0xCBC  a vector (the run's velocity?): the first-person camera's step is
                                 //        three times the length of its x and z
     u8   unkCC8[0xCD0 - 0xCC8];
-    // Mode 12 and the target games (modes 13..17, GameTargets.c): cleared per shot
+    // Mode 12 and the target games (modes 13..17, GameMode_SkillZoneBase.c): cleared per shot
     // (GameModeSkillZoneBase_ClearPerShotData) or per hole (ClearPerHoleData).
     s32  nShotSurfaceCount;     // 0xCD0  the surfaces this shot scored on, in aShotSurfaces
     s32  aShotSurfaces[20];     // 0xCD4  (mode 12 counts a surface's repeats)
@@ -398,7 +398,7 @@ typedef struct Player {
                                 //        (GameModeSkillZoneBase_IsLongDrive)
     s32  nBullseyes;            // 0xDE0  hits on a target's centre (surfaces 0x85, 0x88, 0x8C)
     s32  nTargetHits[40];       // 0xDE4  hits per target (GameModeSkillZoneBase_GetGreenIndexHit)
-    s8   nTarget;               // 0xE84  the current target (set in GameTargets.c)
+    s8   nTarget;               // 0xE84  the current target (set in GameMode_SkillZoneBase.c)
     u8   unkE85[3];
     s32  nHorseLetters;         // 0xE88  mode 15 (HORSE): a letter per miss; out at 5
     s32  nBestHitStreak;        // 0xE8C  the longest run of target hits

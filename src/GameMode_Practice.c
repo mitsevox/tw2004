@@ -1,10 +1,10 @@
-// GameMode9.c (our name; TW06/TW07's GameModePractice, TW07's GameMode_Practice.cpp: TW06's
-// GM_ModeType_t has GM_Practice_mode = 9): game mode 9, practice. The chosen holes
-// (bHoleSelected) are played with the ball placed by hand before every shot (player 0 goes to
-// GS_PLACE_BALL, InitCamera), any number of mulligans, and no GameBreakers, profile statistics or
-// flyover at the hole start. The player can end a hole early (FinishHole, from a UI command). It
-// borrows mode 0's GetHonors and GoToPlayoff (GameModeStroke_GetHonors, GameModeStroke_GoToPlayoff). The pad
-// reading for placing the ball in every mode (GameModePractice_ReadPlaceBallSticks) is here too.
+// GameMode_Practice.c (TW07's name, GameMode_Practice.cpp there; TW06's mode list has
+// GM_Practice_mode, 9): game mode 9, practice. The chosen holes (bHoleSelected) are played with
+// the ball placed by hand before every shot (player 0 goes to GS_PLACE_BALL, InitCamera), any
+// number of mulligans, and no GameBreakers, profile statistics or flyover at the hole start. The
+// player can end a hole early (FinishHole, from a UI command). It borrows mode 0's GetHonors and
+// GoToPlayoff (GameModeStroke_GetHonors, GameModeStroke_GoToPlayoff). The pad reading for placing
+// the ball in every mode (GameModePractice_ReadPlaceBallSticks) is here too.
 
 #include "golfer.h"
 #include "game.h"

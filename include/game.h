@@ -343,7 +343,7 @@ u8   GameEffects_IsSlowDownSwingOn(int nPlayer);         // super slow motion is
 void GameEffects_Pause(int a);                // pause or resume a GameBreaker
 u8   fn_8003DCAC(void);                 // GoDynamicCam.c: the letterbox is up (predicted, or b19)
 
-// GameManager.c
+// GameMode.c
 void GameEffects_SendMessage50(void);
 void GameEffects_ClearSingleStep(void);
 u8   GameEffects_IsSingleStepPending(void);
@@ -571,7 +571,7 @@ void GameModeStableford_Init(void);                 // mode 18 (GameModeStablefo
 void GameMode12_Init(void);                 // mode 12 (GameMode12.c)
 void GameModeStroke_Init(void);                 // mode 0 (GameModeStroke.c)
 void Lessons_Init(void);                 // mode 11 (GameMode11.c)
-void GameMode4_Init(void);                 // mode 4 (GameMode4.c)
+void GameMode4_Init(void);                 // mode 4 (LadderedMode.c)
 
 int  GM_BestBallMode_GetTeamHoleScore(int nPlayer, int nHole);   // GameModeBestBall.c
 
@@ -586,7 +586,7 @@ void GameModeMatch_EndHole(void);
 s32  PlayNow_GetCurrentGroup(void);
 int  PlayNow_GetGroupFirstChallenge(int n);
 
-// GameMode5.c
+// PlayNowMode.c
 void PlayNow_DeInit(void);
 void PlayNow_SelectChallenge(s32 nChallenge);
 void PlayNow_StartChallenge(void);
@@ -600,14 +600,14 @@ u8   PlayNow_GetCalendarFlag(void);
 void PlayNow_ForceWeather(f32 fAmount);
 void PlayNow_SendMessage18(s32 nPlayer);
 
-void GameModePractice_ReadPlaceBallSticks(int nPlayer);          // GameMode9.c
+void GameModePractice_ReadPlaceBallSticks(int nPlayer);          // GameMode_Practice.c
 void GameModeDriverPGATour_FreeStreamMemory(void);                 // GameModeDriverPGATour.c
 u8   GM_Currently_PgaTourMode(void);                 // GameModeDriverPGATour.c
 void GameModeDriverRTE_StartEvent(void);                 // GameModeDriverRTE.c
 void GameModeDriverRTE_StartNextChallenge(void);                 // GameModeDriverRTE.c
 u8   GM_Currently_RealtimeMode(void);                 // GameModeDriverRTE.c
 
-// GameModeDriver.c: the career calendar. Its functions come in tables of three, indexed by
+// FE_Calendar.c: the career calendar. Its functions come in tables of three, indexed by
 // CareerCalendar.nDriver: no career, the PGA TOUR season (GameModeDriverPGATour.c), the real-time
 // events (GameModeDriverRTE.c). The calendar shows one month as a grid of 35 day cells.
 typedef struct CareerCalendar {
@@ -643,13 +643,13 @@ extern void* (*gCalendarGetEventInfoByDate[3])(u16 nDate);     // the event on a
 extern void (*gCalendarPlay[3])(void);
 extern u8 (*gCalendarIsSimulationNecessary[3])(void);
 
-// GameModeDriver.c
+// FE_Calendar.c
 void ResetCalendarState(void);
 void UpdateCalendarState(void);
 u16  GetDateFromCellIndex(u32 nCell);            // the date in a grid cell
 s32  GetCellIndexFromDate(u16 nDate);
 
-// GameTargets.c: what the target games (modes 13..17) share
+// GameMode_SkillZoneBase.c: what the target games (modes 13..17) share
 extern f32 gSkillZoneCups[40][4];         // the target list: gSkillZoneNumCups points (w = 1)
 extern s8  gSkillZoneNumCups;                // the number of targets (GameModeReplay.c)
 void GameModeSkillZoneBase_SortCupsByDistanceFromTee(void);                 // sort the targets by distance from the tee
@@ -675,24 +675,24 @@ void GameModeSkillZoneBase_PlayComment(s32 nMsg, s32 a);
 // The modes' own getters behind the dispatchers GameModeSkillZoneBase_GetShotEarned ..
 // GameModeSkillZoneBase_GetExtraBallsEarned, which pass their argument on; the getters ignore it
 // (not GameModeSkillZoneCapture_GetTotalTargetsHit: it is called directly, per player).
-int  GameModeSkillZoneCapture_GetTotalTargetsHit(int nPlayer);         // GameMode14.c
-s32  GameModeSkillZoneCapture_GetShotEarned(s32 nPlayer);              // GameMode14.c
-s32  GameModeSkillZoneTarget_GetShotEarned(s32 nPlayer);               // GameMode16.c
-s32  GameModeSkillZoneTarget_GetDriveMultiplier(s32 nPlayer);          // GameMode16.c
-s32  GameModeSkillZoneTargetToTarget_GetShotEarned(s32 nPlayer);       // GameMode17.c
-s32  GameModeSkillZoneTargetToTarget_GetExtraBallsEarned(s32 nPlayer); // GameMode17.c
-s32  GameModeSkillZoneTimed_GetShotEarned(s32 nPlayer);                // GameMode13.c
-s32  GameModeSkillZoneTimed_GetTimeEarned(s32 nPlayer);                // GameMode13.c
-s32  GameModeSkillZoneTimed_GetDriveMultiplier(s32 nPlayer);           // GameMode13.c
+int  GameModeSkillZoneCapture_GetTotalTargetsHit(int nPlayer);         // GameMode_SkillZoneCapture.c
+s32  GameModeSkillZoneCapture_GetShotEarned(s32 nPlayer);              // GameMode_SkillZoneCapture.c
+s32  GameModeSkillZoneTarget_GetShotEarned(s32 nPlayer);               // GameMode_SkillZoneTarget.c
+s32  GameModeSkillZoneTarget_GetDriveMultiplier(s32 nPlayer);          // GameMode_SkillZoneTarget.c
+s32  GameModeSkillZoneTargetToTarget_GetShotEarned(s32 nPlayer);       // GameMode_SkillZoneTargetToTarget.c
+s32  GameModeSkillZoneTargetToTarget_GetExtraBallsEarned(s32 nPlayer); // GameMode_SkillZoneTargetToTarget.c
+s32  GameModeSkillZoneTimed_GetShotEarned(s32 nPlayer);                // GameMode_SkillZoneTimed.c
+s32  GameModeSkillZoneTimed_GetTimeEarned(s32 nPlayer);                // GameMode_SkillZoneTimed.c
+s32  GameModeSkillZoneTimed_GetDriveMultiplier(s32 nPlayer);           // GameMode_SkillZoneTimed.c
 
-void GameModeSkillZoneCapture_ShotClockOut(void);                    // GameMode14.c
-void GameMsg_Send5Ints(int nMsg, s32 a, s32 b, s32 c, s32 d, s32 e); // GameMode14.c
-void GameModeSkillZoneCapture_SetShotClock(s32 nClock);              // GameMode14.c
-void GameModeSkillZoneHorse_ShotClockOut(void);                      // GameMode15.c
-void GameModeSkillZoneTimed_TimerOut(void);                          // GameMode13.c
-void GameModeSkillZoneTimed_SetHudClock(s32 nTime);                  // GameMode13.c
-s32  GameModeSkins_CurrentHoleValue(void);                 // GameMode2.c: the skin on this hole
-s32  SpeedGolf_GetFirstSelectedHole(void);                 // GameMode2.c: the first selected hole (-1: none)
+void GameModeSkillZoneCapture_ShotClockOut(void);                    // GameMode_SkillZoneCapture.c
+void GameMsg_Send5Ints(int nMsg, s32 a, s32 b, s32 c, s32 d, s32 e); // GameMode_SkillZoneCapture.c
+void GameModeSkillZoneCapture_SetShotClock(s32 nClock);              // GameMode_SkillZoneCapture.c
+void GameModeSkillZoneHorse_ShotClockOut(void);                      // GameMode_SkillZoneHorse.c
+void GameModeSkillZoneTimed_TimerOut(void);                          // GameMode_SkillZoneTimed.c
+void GameModeSkillZoneTimed_SetHudClock(s32 nTime);                  // GameMode_SkillZoneTimed.c
+s32  GameModeSkins_CurrentHoleValue(void);                 // GameMode_Skins.c: the skin on this hole
+s32  SpeedGolf_GetFirstSelectedHole(void);                 // GameMode_Skins.c: the first selected hole (-1: none)
 s32  SpeedGolf_GetNextSelectedHole(int h);                // the next selected hole after h (-1: none)
 s32  SpeedGolf_GetPrevSelectedHole(int h);                // the selected hole before h (-1: none)
 

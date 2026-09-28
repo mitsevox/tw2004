@@ -2,7 +2,7 @@
 // registered in the front end's message table (FE_MessageTable.c), fill the month grid, the lines
 // around it and the day-details popup, move between months and play the selected day, each through
 // the current career driver's entry in the calendar tables (gCalendar*, indexed by
-// CalendarState.nDriver: GameModeDriver.c, which is EA's FE_Calendar.c in TW07). Its last messages
+// CalendarState.nDriver: FE_Calendar.c, which is EA's FE_Calendar.c in TW07). Its last messages
 // are not the calendar's: a square root (FE_Sqrt), whether the "SHERWOOD TARGET" code was entered,
 // and GameMode5's Play Now calendar flag.
 

@@ -1,15 +1,15 @@
-// GameModeDriver.c (our name; EA's FE_Calendar.c, TW07 PS3 has every function here in the same
-// order): the front end's calendar, the month grid a career is played from. The calendar screen
+// FE_Calendar.c (EA's name: TW07 PS3's FE_Calendar.c has every function here in the same order):
+// the front end's calendar, the month grid a career is played from. The calendar screen
 // (CalendarScreen.c) asks the driver CalendarState.nDriver for everything it shows, through the
 // per-driver tables gCalendarAtEarliest..gCalendarIsSimulationNecessary: 0 the online tournaments
 // (Online_: stubs in this build), 1 the PGA TOUR season (PGATour_, game mode 23,
 // GameModeDriverPGATour.c) and 2 the real-time events (RealTime_, game mode 24,
-// GameModeDriverRTE.c). Each driver says whether the month can move (AtEarliest / AtLatest), fills a
-// day cell (FillCell), the header lines and the line under the selected day, picks and fills the
-// day-details popup (GetPopupType / GetPopupRow; the rows themselves are EventInfo.c's), gives the
-// current day and a day's event, and starts play (Play; IsSimulationNecessary when events before
-// the selected day must be played out first). The file ends with the grid itself: the month shown
-// laid out in 35 day cells (CalendarState, ResetCalendarState / UpdateCalendarState, and the
+// GameModeDriverRTE.c). Each driver says whether the month can move (AtEarliest / AtLatest), fills
+// a day cell (FillCell), the header lines and the line under the selected day, picks and fills the
+// day-details popup (GetPopupType / GetPopupRow; the rows themselves are FE_CalendarPopups.c's),
+// gives the current day and a day's event, and starts play (Play; IsSimulationNecessary when events
+// before the selected day must be played out first). The file ends with the grid itself: the month
+// shown laid out in 35 day cells (CalendarState, ResetCalendarState / UpdateCalendarState, and the
 // conversions between a cell and its date).
 
 #include "golfer.h"
@@ -20,7 +20,7 @@
 #include "game/modes/pgatoursim.h"
 #include "frontend/fe.h"
 
-// The rows of the day-details popups (EventInfo.c): PGA TOUR in progress, results, upcoming,
+// The rows of the day-details popups (FE_CalendarPopups.c): PGA TOUR in progress, results, upcoming,
 // before it starts; real-time today's event, results, upcoming.
 void PGATourPopup_GetRow_EventInProgress(int nRow, char* szTitle, char* szText);
 void PGATourPopup_GetRow_EventResults(int nRow, char* szTitle, char* szText);

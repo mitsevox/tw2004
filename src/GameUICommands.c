@@ -252,9 +252,9 @@ void Gaud_StartPlaylist20Comment(int nMsg, int a);
 void Gaud_StartPlaylist18Comment(int nMsg, int a);
 
 // Other files' functions no header declares yet.
-f32   GM_GetGolferDistanceToPin(int nPlayer);                 // GameManager.c
-void  GM_GolferConcede_Hole(int nPlayer);                     // GameManager.c
-void  GM_RestartHole(void);                                   // GameManager.c
+f32   GM_GetGolferDistanceToPin(int nPlayer);                 // GameMode.c
+void  GM_GolferConcede_Hole(int nPlayer);                     // GameMode.c
+void  GM_RestartHole(void);                                   // GameMode.c
 void  GameModeBattle_AddClub(int nPlayer, int nClub);         // GameModeBattle.c
 int   GameModeBattle_CanAddClub(int nPlayer, int nClub);
 s32   GameModeBattle_GetHoleWinner(void);

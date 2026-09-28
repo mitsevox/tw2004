@@ -1,10 +1,11 @@
-// GameMode17.c (our name; TW07's GameMode_SkillZoneTargetToTarget.cpp, whose methods it has in the
-// same order): game mode 17, target to target, one hole. Each player starts with 5 balls (nBalls)
-// and must hit the targets in order, nearest the tee first (nNextTarget; the target buttons keep
-// the aim on it); a hit on any other target pays nothing. The surface a ball lands on can pay
-// points and extra balls. Hitting every target wins the all-targets prize (the id 999 row) plus 100
-// points per ball left. There are no shot multipliers. The hole ends when player 0 has hit every
-// target or nobody has a ball left. The shared target-game code is GameTargets.c.
+// GameMode_SkillZoneTargetToTarget.c (TW07's name, GameMode_SkillZoneTargetToTarget.cpp there,
+// whose methods it has in the same order): game mode 17, target to target, one hole. Each player
+// starts with 5 balls (nBalls) and must hit the targets in order, nearest the tee first
+// (nNextTarget; the target buttons keep the aim on it); a hit on any other target pays nothing. The
+// surface a ball lands on can pay points and extra balls. Hitting every target wins the all-targets
+// prize (the id 999 row) plus 100 points per ball left. There are no shot multipliers. The hole
+// ends when player 0 has hit every target or nobody has a ball left. The shared target-game code is
+// GameMode_SkillZoneBase.c.
 
 #include "golfer.h"
 #include "ball.h"

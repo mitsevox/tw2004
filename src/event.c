@@ -667,7 +667,7 @@ void EVENT_SpecialSwingEnded(int nPlayer, int nEvent, void* pData, int nArg) {
     }
 }
 
-// Event 60 (GameManager.c: the look-ahead ball, Player.ballBefore, has been worked out): queues
+// Event 60 (GameMode.c: the look-ahead ball, Player.ballBefore, has been worked out): queues
 // commentary situation event 20, and when that ball ends in the cup, camera event 11 for the
 // player's view.
 void EVENT_BallPredictionDone(int nPlayer, int nEvent, void* pData, int nArg) {
@@ -702,7 +702,7 @@ void EVENT_PredictedGameBreakerEnd(int nPlayer, int nEvent, void* pData, int nAr
     Gaud_ExitGameBreaker(nPlayer);
 }
 
-// Event 5 (GameManager.c, GameMode11.c: the round is over): counts a game played in the player's
+// Event 5 (GameMode.c, GameMode11.c: the round is over): counts a game played in the player's
 // stats (EASBio_IncrementGamesPlayed) unless the session is the demo (gSession.bDemo), and queues
 // commentary situation event 13.
 void EVENT_EndGame(int nPlayer, int nEvent, void* pData, int nArg) {

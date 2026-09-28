@@ -1,12 +1,11 @@
-// GameManager.c (our name; EA's file is GameMode.c: GM_vInitModuleONCE to GM_GetBonusProgress
-// come in the order and with the names of TW07's GameMode.c): the round's flow - the game
-// manager's setup and teardown, the start of each hole, the end of a golfer's turn, of the hole
-// and of the game (payouts, scorecards, CPU concessions), strokes and penalties after a shot,
-// mulligans, drops, the pre- and post-shot animations, walking to the ball, the in-the-hole
-// display, the aiming buttons and the profile's completion score. The eight functions before
-// GM_vInitModuleONCE and the four after GM_GetBonusProgress include TW07 header inlines
-// (GameEffects.h, GameModeCore.h, GameUI.h), most likely header functions kept out of line here;
-// the GameEffects ones serve only GameEffects.c.
+// GameMode.c (EA's name: GM_vInitModuleONCE to GM_GetBonusProgress come in the order and with the
+// names of TW07's GameMode.c): the round's flow - the game manager's setup and teardown, the start
+// of each hole, the end of a golfer's turn, of the hole and of the game (payouts, scorecards, CPU
+// concessions), strokes and penalties after a shot, mulligans, drops, the pre- and post-shot
+// animations, walking to the ball, the in-the-hole display, the aiming buttons and the profile's
+// completion score. The eight functions before GM_vInitModuleONCE and the four after
+// GM_GetBonusProgress include TW07 header inlines (GameEffects.h, GameModeCore.h, GameUI.h), most
+// likely header functions kept out of line here; the GameEffects ones serve only GameEffects.c.
 
 #include "golfer.h"
 #include "ball.h"

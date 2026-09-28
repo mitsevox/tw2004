@@ -1,4 +1,4 @@
-// SwingTips.c (our name; EA's CaddieTips.c in TW07, whose CTIP_ functions are these, in the same
+// CaddieTips.c (EA's name: TW07's CaddieTips.c, whose CTIP_ functions are these, in the same
 // order): the caddie tips shown as a swing starts (CTIP_ShowCaddieTip, from STATEFUNC_SwingInit).
 // Each trigger (the wind, the lie, the slope to the target, the weather, the hole's par and length
 // on the tee shot, the club's reach, a short pitch) picks a tip; the first time a save profile
