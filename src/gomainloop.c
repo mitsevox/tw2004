@@ -260,7 +260,7 @@ void GM_DeInitModule(void);
 void GM_SetupDefaultProfile(void);
 void GUI_ClearControllersPulled(void);
 s32  SpeedGolf_IsRunning(int nPlayer);
-void fn_801020BC(void);
+void GameMode4_CloseFE(void);
 void FE_CrAP_InitModule(void);
 void FE_CrAP_CloseModule(void);
 void fn_8010A448(int nSize);
@@ -596,7 +596,7 @@ void fn_8006CB2C(void) {
     fn_8009CC88();
     fn_80037F80();
     fn_800B9AAC();
-    fn_801020BC();
+    GameMode4_CloseFE();
     Aud_ExitSession(1);
     fn_8002A020();
     fn_8006DD44();

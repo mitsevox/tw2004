@@ -47,10 +47,10 @@ void LadderMenu_GetOpponentName(int nGolfer, char* szOut) {
 }
 
 // FE message 575: the texts of the event under the cursor, into seven strings: "<region> / Tour
-// Stop <n>" (fn_80102AAC, the event's tour stop), the opponent (LadderMenu_GetOpponentName; left as
-// it was for a golfer id above 29), the course's name (left as it was for an id past the last
-// course), the event's name, its stage (gLadderStageNames), an empty string, and its hole set's
-// name (gLadderHoleSetNames; left as it was for a preset above 3).
+// Stop <n>" (GameMode4_GetEventTourStop, the event's tour stop), the opponent
+// (LadderMenu_GetOpponentName; left as it was for a golfer id above 29), the course's name (left as
+// it was for an id past the last course), the event's name, its stage (gLadderStageNames), an empty
+// string, and its hole set's name (gLadderHoleSetNames; left as it was for a preset above 3).
 void LadderMenu_GetEventText(MsgArg* pArgs, MsgArg* pResult) {
     char* szStop = ((MsgString*)pArgs[0].p)->pStr;
     char* szOpponent = ((MsgString*)pArgs[1].p)->pStr;
@@ -59,7 +59,7 @@ void LadderMenu_GetEventText(MsgArg* pArgs, MsgArg* pResult) {
     char* szStage = ((MsgString*)pArgs[4].p)->pStr;
     char* szEmpty = ((MsgString*)pArgs[5].p)->pStr;
     char* szHoles = ((MsgString*)pArgs[6].p)->pStr;
-    int nStop = fn_80102AAC(gLadderMap.nEvent);
+    int nStop = GameMode4_GetEventTourStop(gLadderMap.nEvent);
     int nRegion = LadderMap_GetNodeRegion(gLadderMap.nNode);
     int nGolfer;
     int nCourse;
@@ -107,10 +107,10 @@ void LadderMenu_MoveCursor(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = nNode;
 }
 
-// FE message 579: field n0 of the event at node pArgs[0] (fn_80102A44: the first word of the
+// FE message 579: field n0 of the event at node pArgs[0] (GameMode4_GetEventN0: the first word of the
 // event's 'TCM ' record, read nowhere else; what it holds is not known).
 void LadderMenu_GetNodeEventN0(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_80102A44(gLadderNodeEvents[pArgs[0].i]);
+    pResult->i = GameMode4_GetEventN0(gLadderNodeEvents[pArgs[0].i]);
 }
 
 // FE message 580: node 0's x and y and the cursor node's x and y, into the four floats pArgs[0] to

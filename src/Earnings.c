@@ -91,7 +91,7 @@ f32 gTournamentPayoutShares[70] = {
 
 void  EarningsInfo_LoadERNFromStream(UStreamObject* pObject);
 int   GameMode4_GetNumEventsWon(void);
-int   fn_801021FC(void);                                // GameMode4: the current ladder event
+int   GameMode4_GetCurrentEvent(void);                                // GameMode4: the current ladder event
 f32   fn_800D04AC(int nPlayer);                         // HoleScore.c
 u32   fn_800D0BAC(int nPlayer);                         // the class of the ground the shot left
 u8    fn_800D0BF8(int nPlayer, u8 bUnder, u8 bAnyLie);
@@ -312,7 +312,7 @@ int GM_Earnings_GetLadderWinnings(int nWinner, int nLoser, int nMargin, s32* pPr
     int nMoney;
 
     if (Game_GetMulliganRule() != 0) return 0;
-    nEvent = fn_801021FC();
+    nEvent = GameMode4_GetCurrentEvent();
     if (nMargin > 5) {
         nMargin = 5;
     }
@@ -742,7 +742,7 @@ void GM_Earnings_CheckShotGoals(int nPlayer, Ball* pBall, u8 bPreview) {
     for (i = 0; i < NUM_SHOT_GOALS; i++) {
         if (!gEarningsTable.aShotGoal[i].bEnabled) continue;
         if (!Earnings_TestBit(gEarningsTable.aShotGoal[i].uModes, Game_GetMode())) continue;
-        if (PlayNow_IsChallengeRunning() && !fn_801025F4()
+        if (PlayNow_IsChallengeRunning() && !GameMode4_IsEventRunning()
             && !Earnings_TestBit(gEarningsTable.aShotGoal[i].uModes, 5)) continue;
         if (!Earnings_TestBit(gEarningsTable.aShotGoal[i].uPars, 0) && Course_GetCurHolePar() == 3) continue;
         if (!Earnings_TestBit(gEarningsTable.aShotGoal[i].uPars, 1) && Course_GetCurHolePar() == 4) continue;
@@ -889,7 +889,7 @@ void GM_Earnings_CheckPuttGoals(int nPlayer, u8 bPreview) {
     if (gSession.uFlags & 0x4000) return;
     if (Player_IsCPU(nPlayer)) return;
     if (!GM_Earnings_AwardShotBonusToUser(nPlayer)) return;
-    if (PlayNow_IsChallengeRunning() && !fn_801025F4()) return;
+    if (PlayNow_IsChallengeRunning() && !GameMode4_IsEventRunning()) return;
     if (Game_GetMulliganRule() != 0) return;
 
     for (i = Game_CurHoleIndex() + 1; i < 18; i++) {
@@ -904,7 +904,7 @@ void GM_Earnings_CheckPuttGoals(int nPlayer, u8 bPreview) {
     for (i = 0; i < NUM_PUTT_GOALS; i++) {
         if (!gEarningsTable.aPuttGoal[i].bEnabled) continue;
         if (!Earnings_TestBit(gEarningsTable.aPuttGoal[i].uModes, Game_GetMode())) continue;
-        if (PlayNow_IsChallengeRunning() && !fn_801025F4()
+        if (PlayNow_IsChallengeRunning() && !GameMode4_IsEventRunning()
             && !Earnings_TestBit(gEarningsTable.aPuttGoal[i].uModes, 5)) continue;
         if (!Earnings_TestBit(gEarningsTable.aPuttGoal[i].uPars, 0) && Course_GetCurHolePar() == 3) continue;
         if (!Earnings_TestBit(gEarningsTable.aPuttGoal[i].uPars, 1) && Course_GetCurHolePar() == 4) continue;
@@ -1082,7 +1082,7 @@ void GM_Earnings_CheckHoleGoals(int nPlayer, u8 bPreview, u8 bRoundOver) {
         if (!gEarningsTable.aHoleGoal[i].bEachHole && !bRoundOver) continue;
         if (!gEarningsTable.aHoleGoal[i].bEnabled) continue;
         if (!Earnings_TestBit(gEarningsTable.aHoleGoal[i].uModes, Game_GetMode())) continue;
-        if (PlayNow_IsChallengeRunning() && !fn_801025F4()
+        if (PlayNow_IsChallengeRunning() && !GameMode4_IsEventRunning()
             && !Earnings_TestBit(gEarningsTable.aHoleGoal[i].uModes, 5)) continue;
         if (!gEarningsTable.aHoleGoal[i].b19 && bMore) continue;
         if (gEarningsTable.aHoleGoal[i].aToPar[0] != 0 &&

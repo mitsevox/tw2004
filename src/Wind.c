@@ -9,7 +9,7 @@
 #include "golfer.h"
 #include "engine.h"
 
-int    fn_801021FC(void);
+int    GameMode4_GetCurrentEvent(void);
 void   fn_800348DC(void);
 
 f32 gWindDirs[8][4] = {                          // 0x80187EF8  unit vectors, 45 degrees apart
@@ -75,7 +75,7 @@ void Wind_Generate(void) {
         switch (Game_GetCourse()) {
         case 6:
         case 15:
-            if (Game_GetMode() != 4 || fn_801021FC() > 0) {
+            if (Game_GetMode() != 4 || GameMode4_GetCurrentEvent() > 0) {
                 if (n < 2) {
                     n = 2;
                 } else {

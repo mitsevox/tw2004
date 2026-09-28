@@ -755,7 +755,7 @@ u8   Lessons_IsLucky(int nPlayer);          // a CPU in game mode 11 is always l
 u8   Lessons_IsLessonAnim(char* szName);         // one of the lessons' animations
 void Lessons_PauseMenuClosed(void);
 
-u8   fn_801025F4(void);
+u8   GameMode4_IsEventRunning(void);
 
 // DiscCheck.c: which disc is in the drive, and changing discs
 extern char lbl_80213BB0[256][0x80];    // } the file names listed for each disc (fn_8010FF9C reads

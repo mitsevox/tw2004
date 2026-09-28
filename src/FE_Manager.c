@@ -24,7 +24,7 @@ void fn_80092198(void);
 void fn_8009220C(void);
 void Gaud_StartFEMusic(int a);
 void Gaud_ExitFE(void);
-void fn_80102AC4(void);
+void GameMode4_ExitFE(void);
 void FE_CrAP_SetTriggerAnims(u8 b);
 void FE_CrAP_UnequipSlot(s16 nSlot);            // FE_CrAPDB.c
 u8   PasswordManager_IsPasswordEntered(int a);
@@ -1252,7 +1252,7 @@ void fn_80079AD4(void) {
         }
     }
     lbl_801D7148.nMode = Game_GetMode();
-    if (fn_801025F4()) {
+    if (GameMode4_IsEventRunning()) {
         lbl_801D7148.nMode = 4;
     }
     if (GM_Currently_PgaTourMode()) {
@@ -1268,7 +1268,7 @@ void fn_80079AD4(void) {
     lbl_801D87C0.bFadeToBlack = 1;
     gSession.bDemo = 0;
     Gaud_ExitFE();
-    fn_80102AC4();
+    GameMode4_ExitFE();
 }
 
 // ---- the profile backups in ARAM ---------------------------------------------------------------

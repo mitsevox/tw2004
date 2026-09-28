@@ -33,8 +33,8 @@ s32  MC_GetUser(s32 nPort, s32 nSlot, s32 n, char* szOut);     // MC.c: clears s
 void fn_8007739C(Replay* pReplay);      // FE_Manager.c
 f32  GM_GetBonusProgress(SaveProfile* pProfile);    // GameManager.c
 void fn_801176C0(TourSeason* pTour);    // PGATourSimulation.c
-int  fn_80102134(void);                 // GameMode4.c: the current ladder event's holes
-int  fn_801021FC(void);                 // GameMode4.c: the current ladder event
+int  GameMode4_GetCurrentEventHoles(void);                 // GameMode4.c: the current ladder event's holes
+int  GameMode4_GetCurrentEvent(void);                 // GameMode4.c: the current ladder event
 s32  PlayNow_GetNumOpponents(int i);                // GameMode5.c: challenge i's opponent count
 s32  PlayNow_GetOpponent(int i, int k);         // GameMode5.c: its opponent k
 u8   GM_UserHasEagledHole(int nSlot, int a, int b);      // GameRound.c
@@ -62,7 +62,7 @@ char* PlayNow_GetGroupName(int nId);             // GameMode5.c
 char* PlayNow_GetGroupDescription(int nId);             // GameMode5.c
 void PlayNow_GetRewards(int i, s32* pA, s32* pB, s32* pC);     // GameMode5.c
 int  GameMode4_GetNumEventsWon(void);                 // GameMode4.c
-void fn_80102308(s32 n);                // GameMode4.c
+void GameMode4_SetEventBonus(s32 n);                // GameMode4.c
 void GameMode26_SetTargetScore(s32 v);                // CharSliders.c
 void FE_SetProfileLeftHanded(int nSlot, int n);
 s32  MC_LoadOptions(MCCardPos* pPos);      // MC.c: load the save from the card
@@ -1911,7 +1911,7 @@ void fn_8007CE20(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8007CE58(MsgArg* pArgs, MsgArg* pResult) {
-    fn_80102308(pArgs[0].i);
+    GameMode4_SetEventBonus(pArgs[0].i);
 }
 
 // Find golfer pArgs[0]'s bio (golfer 1 has golfer 0's) and hand back its index and its numbers.
@@ -4585,10 +4585,10 @@ void fn_80083068(MsgArg* pArgs, MsgArg* pResult) {
 // holes played (the front nine, the back nine or both; each hole's skin at the opponent's rating),
 // and each opponent playing the player's own golfer gets the next of its four looks.
 void fn_8008311C(MsgArg* pArgs, MsgArg* pResult) {
-    int  nChallenge = fn_801021FC() - 1;
+    int  nChallenge = GameMode4_GetCurrentEvent() - 1;
     s32  nOpponents = PlayNow_GetNumOpponents(nChallenge);
     s32  nMax = 0;
-    s32  nHoles = fn_80102134();
+    s32  nHoles = GameMode4_GetCurrentEventHoles();
     s32  nGolfer;
     s32  nSum;
     s32  nLook;

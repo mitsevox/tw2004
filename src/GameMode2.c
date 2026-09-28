@@ -9,7 +9,7 @@
 #include "game/save.h"
 #include "game/earnings.h"
 
-void  fn_80102704_WinSkinsEvent(void);
+void  GameMode4_WinSkinsEvent(void);
 void  GameMode4_WinEvent(void);
 s32 gSkinsCarryOver;                    // the money carried over
 s32 gSkinsNumCarryOver;                    // skins carried over
@@ -336,7 +336,7 @@ void GameModeSkins_EndGame(void) {
     int nProfile;
     u8 bFirst = 1;
     s32 bWon;
-    if (!PlayNow_IsChallengeRunning() || fn_801025F4()) {
+    if (!PlayNow_IsChallengeRunning() || GameMode4_IsEventRunning()) {
         for (i = 0; i < gNumPlayersSetUp; i++) {
             if (!Player_IsCPU(i)) {
                 nProfile = PLAYER(i)->nIndex;
@@ -353,7 +353,7 @@ void GameModeSkins_EndGame(void) {
                 }
             }
         }
-        if (fn_801025F4()) {
+        if (GameMode4_IsEventRunning()) {
             bWon = 1;
             for (i = 1; i < gNumPlayersSetUp; i++) {
                 if (gPlayers[0].n274 <= gPlayers[i].n274) {
@@ -361,7 +361,7 @@ void GameModeSkins_EndGame(void) {
                 }
             }
             if (bWon) {
-                fn_80102704_WinSkinsEvent();
+                GameMode4_WinSkinsEvent();
             } else {
                 // EA bug: a lost ladder event is scored as won as well: GameMode4_WinEvent marks its
                 // award, unlocks its pro and reward (asm 800F923C; GameMode4 calls it only on a win)

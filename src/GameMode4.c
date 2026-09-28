@@ -48,16 +48,18 @@ void  GM_Earnings_AwardDoubleMoney(int nPlayer, int nMoney);
 void GameMode4_Shutdown(void);
 u8   GameMode4_HasWonEvent(int nProfile, int nEvent);
 int  GameMode4_GetEventHoles(int nEvent);
-int  fn_8010217C_GetEventKind(int nEvent);
-int  fn_801021FC(void);
+int  GameMode4_GetEventKind(int nEvent);
+int  GameMode4_GetCurrentEvent(void);
 u8   GameMode4_IsEventOpen(int nProfile, int nEvent);
 void GameMode4_LoadTCMFromStream(UStreamObject* pObject);
 void GameMode4_LoadTCMSFromStream(UStreamObject* pObject);
 void GameMode4_EndGame(void);
-void fn_801027A4(void);
+void GameMode4_QueueRegionFinalMessage(void);
 void GameMode4_WinEvent(void);
 
-// Mode 4 starts: a match against the event's pro, with GameModeMatch's rules.
+// Mode 4's setup (GM_SetModeType): GameModeMatch's match-play callbacks with this file's own
+// shutdown and end of game; no mulligans, no split screen. Unlike GameModeMatch_Init it leaves
+// bAIConcedes as it was and sets nC and n10 to 1 (GameMode4_StartEvent sets 2 for a match).
 void GameMode4_Init(void) {
     gpGame->pfnInit = GameMode4_Init;
     gpGame->pfnShutdown = GameMode4_Shutdown;
@@ -76,14 +78,18 @@ void GameMode4_Init(void) {
     gSession.nSplitScreen = 0;
 }
 
-void fn_801020BC(void) {
+// Empty in this build; the front end's shutdown (fn_8006CB2C, gomainloop.c) calls it among the
+// other systems' close calls.
+void GameMode4_CloseFE(void) {
 }
 
-// How many ladder events player 0's profile has won.
+// How many of the 25 ladder events player 0's profile has won (fn_800584DC counts its aLadderAward
+// flags). The money rating (GM_GetGolferMoneyRating) and two front-end messages read it.
 int GameMode4_GetNumEventsWon(void) {
     return fn_800584DC(gPlayers[0].nIndex);
 }
 
+// Event nEvent's opponent, a golfer id (34 = none: GameMode4_WinEvent then unlocks nobody).
 int GameMode4_GetEventOpponent(int nEvent) {
     return gLadderEvents[nEvent].nGolfer;
 }
@@ -92,21 +98,26 @@ int GameMode4_GetEventCourse(int nEvent) {
     return gLadderEvents[nEvent].nCourse;
 }
 
+// Event nEvent's hole set, as GM_SelectHoleSet takes it: 1 all 18 holes, 2 the front nine, 3 the
+// back nine (gLadderHoleSetNames; 0 is "None").
 int GameMode4_GetEventHoles(int nEvent) {
     return gLadderEvents[nEvent].nHoles;
 }
 
-int fn_80102134(void) {
-    return GameMode4_GetEventHoles(fn_801021FC());
+int GameMode4_GetCurrentEventHoles(void) {
+    return GameMode4_GetEventHoles(GameMode4_GetCurrentEvent());
 }
 
-int fn_80102158(void) {
-    return fn_8010217C_GetEventKind(fn_801021FC());
+// The current event's kind (GameMode4_GetEventKind: 0 not played here, 1 challenge, 2 region or
+// World final, 3 match).
+int GameMode4_GetCurrentEventKind(void) {
+    return GameMode4_GetEventKind(GameMode4_GetCurrentEvent());
 }
 
-// The kind of event: 0 not played here, 1 a challenge, 2 a milestone match (every fourth, and the
-// last two), 3 a match.
-int fn_8010217C_GetEventKind(int nEvent) {
+// The kind of event nEvent, tested in this order: 0 when its n1C is set (not played here), 1 a Play
+// Now challenge (nChallenge set), 2 a region final (events 3, 7, 11, 15, 19 and 23) or the World
+// final (24), 3 any other match.
+int GameMode4_GetEventKind(int nEvent) {
     if (gLadderEvents[nEvent].n1C != 0) {
         return 0;
     }
@@ -120,16 +131,19 @@ int fn_8010217C_GetEventKind(int nEvent) {
     return 3;
 }
 
-int fn_801021FC(void) {
+// The current ladder event, 0..24 (gLadderCurrentEvent, set by GameMode4_SelectEvent).
+int GameMode4_GetCurrentEvent(void) {
     return gLadderCurrentEvent;
 }
 
-// Has the profile won the event?
+// Whether profile nProfile has won event nEvent: its aLadderAward entry's bWon, which
+// GameMode4_WinEvent sets through GM_Earnings_GiveAwardToUser.
 u8 GameMode4_HasWonEvent(int nProfile, int nEvent) {
     return gpSaveData[nProfile].aLadderAward[nEvent].bWon;
 }
 
-// Has the profile won every event this one needs?
+// Whether profile nProfile may play event nEvent: it has won every event in the event's aNeeded
+// list (up to six, each stored plus 1; 0 is an empty entry).
 u8 GameMode4_IsEventOpen(int nProfile, int nEvent) {
     int i;
     u8 bOpen = 1;
@@ -143,7 +157,8 @@ u8 GameMode4_IsEventOpen(int nProfile, int nEvent) {
     return bOpen;
 }
 
-// Makes the event current if the profile may play it.
+// Makes nEvent the current event (gLadderCurrentEvent) when profile nProfile may play it
+// (GameMode4_IsEventOpen). Returns 1 if it did; 0 leaves the current event as it was.
 u8 GameMode4_SelectEvent(int nProfile, int nEvent) {
     u8 bOk = 0;
     if (GameMode4_IsEventOpen(nProfile, nEvent)) {
@@ -153,19 +168,25 @@ u8 GameMode4_SelectEvent(int nProfile, int nEvent) {
     return bOk;
 }
 
-void fn_80102308(s32 n) {
+// Sets the bonus a won event pays (gLadderEventBonus): GameMode4_WinEvent pays twice the amount
+// (GM_Earnings_AwardDoubleMoney) when it is not 0. Front-end message 66 sets it; nothing else
+// writes it.
+void GameMode4_SetEventBonus(s32 n) {
     gLadderEventBonus = n;
 }
 
+// Registers the ladder's stream chunks: 'TCM ' (the 25 events) and 'TCMS' (their names).
 void GameMode4_RegisterStreamClients(void) {
     Stream_RegisterLoadChunkCallback('TCM ', GameMode4_LoadTCMFromStream);
     Stream_RegisterLoadChunkCallback('TCMS', GameMode4_LoadTCMSFromStream);
 }
 
+// Unregisters the 'TCM ' chunk only; 'TCMS' stays registered.
 void GameMode4_UnregisterStreamClients(void) {
     Stream_UnregisterLoadChunkCallback('TCM ');
 }
 
+// The 'TCM ' chunk: the 25 events, copied over gLadderEvents.
 void GameMode4_LoadTCMFromStream(UStreamObject* pObject) {
     // port: the 'TCM ' object is copied straight into the ladder events (LadderEvent[25]); it is
     //       big-endian on disc, so a little-endian port converts it field by field here
@@ -173,6 +194,8 @@ void GameMode4_LoadTCMFromStream(UStreamObject* pObject) {
     Stream_StreamLoadFixedSize(pObject, sizeof(gLadderEvents), gLadderEvents);
 }
 
+// The 'TCMS' chunk: the events' names, copied into a new 16-byte-aligned block (fn_800951A0) that
+// gLadderNames keeps with its size. A NULL object is ignored.
 void GameMode4_LoadTCMSFromStream(UStreamObject* pObject) {
     if (pObject) {
         gLadderNames.uSize = pObject->uSize;
@@ -181,7 +204,9 @@ void GameMode4_LoadTCMSFromStream(UStreamObject* pObject) {
     }
 }
 
-// The mode ends: the challenge's own callback first, then the saved options go back.
+// Mode 4's shutdown (pfnShutdown). For a challenge event it takes the place of mode 5's shutdown,
+// which it calls first (gLadderChallengeShutdown). Then nC and n10 go back to 1, the weather and
+// wind options saved by GameMode4_StartEvent are restored, and no ladder event is running any more.
 void GameMode4_Shutdown(void) {
     if (gLadderChallengeShutdown) {
         gLadderChallengeShutdown();
@@ -193,8 +218,13 @@ void GameMode4_Shutdown(void) {
     gLadderEventRunning = 0;
 }
 
-// Starts the current event: a challenge through mode 5, or a two-player match against its pro
-// (neither for an event with n1C set).
+// Sets the session up for the current event (front-end message 46, LadderMenu_StartEvent). The
+// weather and wind options are saved and forced clear and calm (4 and 0), a ladder event is marked
+// running, and the event's opponent and reward are kept for GameMode4_WinEvent. A challenge event
+// switches to mode 5 with one player and starts Play Now challenge nChallenge - 1, its shutdown
+// chained through GameMode4_Shutdown; a match has two players, player 1 the event's opponent under
+// CPU control, on the event's course, hole set and tee set, and pin set nPins - 1 when nPins is not
+// 0. An event with n1C set gets neither.
 void GameMode4_StartEvent(void) {
     int nEvent;
     int nPins;
@@ -203,7 +233,7 @@ void GameMode4_StartEvent(void) {
     gSession.options.nWeather = 4;
     gSession.options.nWind = 0;
     gLadderEventRunning = 1;
-    nEvent = fn_801021FC();
+    nEvent = GameMode4_GetCurrentEvent();
     gLadderOpponent = gLadderEvents[nEvent].nGolfer;
     gLadderReward = gLadderEvents[nEvent].nReward;
     if (gLadderEvents[nEvent].n1C == 0) {
@@ -233,13 +263,17 @@ void GameMode4_StartEvent(void) {
     }
 }
 
-// Is a ladder event being played?
-u8 fn_801025F4(void) {
+// Whether a ladder event is being played, from GameMode4_StartEvent to GameMode4_Shutdown. Skins
+// and Play Now scoring, the earnings goals and the front end's game setup check it.
+u8 GameMode4_IsEventRunning(void) {
     return gLadderEventRunning;
 }
 
-// EndGame: a win pays the event's prize (its base plus so much a hole of the margin, at most 5),
-// then the event is scored.
+// Mode 4's end of game (pfnEndGame) for a match. When player 0 won more holes than player 1 and has
+// an active profile: the game counts as won for the EA Sports Bio, the prize message (0x6E with the
+// event's base prize) is queued, GM_Earnings_GetLadderWinnings's amount (the base prize plus so
+// much a hole of the margin, at most 5 holes; 0 with mulligans) is paid and booked in money.nC and
+// money.n10, and GameMode4_WinEvent scores the event. A loss changes nothing.
 void GameMode4_EndGame(void) {
     int nMargin;
     int nMoney;
@@ -257,7 +291,7 @@ void GameMode4_EndGame(void) {
             EASBio_SetCurrentGameWon(1);
             GUI_QueueMessage(0, 0x6E, nPrize, nProfile);
             GM_Earnings_AwardMoney(0, nMoney, NULL);
-            nEvent = fn_801021FC();
+            nEvent = GameMode4_GetCurrentEvent();
             gPlayers[0].money.nC += gEarningsTable.aLadderPrize[nEvent].nBase;
             gPlayers[0].money.n10 += gEarningsTable.aLadderPrize[nEvent].nPerHole * nMargin;
             GameMode4_WinEvent();
@@ -265,9 +299,11 @@ void GameMode4_EndGame(void) {
     }
 }
 
-// Player 0 won a ladder event played as skins (GameModeSkins_EndGame): the event's base prize,
-// then the event is scored.
-void fn_80102704_WinSkinsEvent(void) {
+// Player 0 won a ladder event played as Skins (GameModeSkins_EndGame): the event's base prize
+// (GM_Earnings_GetLadderWinnings with no margin; 0 with mulligans), when it is not 0 and player 0's
+// profile is active, is announced (message 0x6E), paid and booked in money.nC. Then
+// GameMode4_WinEvent scores the event.
+void GameMode4_WinSkinsEvent(void) {
     s32 nPrize;
     int nMoney = GM_Earnings_GetLadderWinnings(0, 1, 0, &nPrize);
     if (nMoney != 0) {
@@ -281,9 +317,11 @@ void fn_80102704_WinSkinsEvent(void) {
     GameMode4_WinEvent();
 }
 
-// The message for a milestone event.
-void fn_801027A4(void) {
-    switch (fn_801021FC()) {
+// Queues the ladder message for a won region final (display queue 11, shown by
+// GUI_ShowLadderMessage): kind 4 for event 3, 7 for event 7, 3 for event 11, 8 for event 15, 5 for
+// event 19 and 13 for event 23. Any other event queues nothing.
+void GameMode4_QueueRegionFinalMessage(void) {
+    switch (GameMode4_GetCurrentEvent()) {
     case 11:
         GUI_QueueMessage(11, 3, 0, 0);
         break;
@@ -305,15 +343,20 @@ void fn_801027A4(void) {
     }
 }
 
-// The event is won: its flag, the pro and the reward unlocked, and a message every fourth event
-// (the last one also pays the ladder's prize).
+// Scores the current event as won for player 0's profile, when it is active: the region-final
+// message (GameMode4_QueueRegionFinalMessage); the event's award marked won with today's date; the
+// opponent unlocked, with a message (queue 4), unless it is 34 or already available; the reward
+// nReward - 1 unlocked, with a message (queue 3, 0x16); the bonus (gLadderEventBonus) paid twice.
+// For a final (kind 2): the World final (24) queues message 0x1A (queue 5) and, when trophy ball 15
+// is newly given, pays gEarningsTable.nLadderDone with its message and books it in money.n8; a
+// region final queues message 20 + nEvent / 4 (queue 5).
 void GameMode4_WinEvent(void) {
     int nProfile = gPlayers[0].nIndex;
     int nEvent;
     u8 bLast;
     if (gpSaveData[nProfile].bActive) {
-        nEvent = fn_801021FC();
-        fn_801027A4();
+        nEvent = GameMode4_GetCurrentEvent();
+        GameMode4_QueueRegionFinalMessage();
         // EA bug: the profile number goes in as the player number, so GM_Earnings_GiveAwardToUser checks
         // gPlayers[nProfile] (player 0 only while player 0 plays profile 0).
         GM_Earnings_GiveAwardToUser(nProfile, &gpSaveData[nProfile].aLadderAward[nEvent]);
@@ -328,7 +371,7 @@ void GameMode4_WinEvent(void) {
         if (gLadderEventBonus != 0) {
             GM_Earnings_AwardDoubleMoney(0, gLadderEventBonus);
         }
-        if (fn_80102158() == 2) {
+        if (GameMode4_GetCurrentEventKind() == 2) {
             bLast = 0;
             if (nEvent >= 24) {
                 bLast = 1;
@@ -347,19 +390,26 @@ void GameMode4_WinEvent(void) {
     }
 }
 
-int fn_80102A44(int nEvent) {
+// Event nEvent's first word (LadderEvent.n0). Only front-end message 579
+// (LadderMenu_GetNodeEventN0) reads it; what it holds is not known.
+int GameMode4_GetEventN0(int nEvent) {
     return gLadderEvents[nEvent].n0;
 }
 
-// Copies the event's name.
+// Copies event nEvent's name (its nName offset into the 'TCMS' text, gLadderNames) to szOut; szOut
+// is left as it was for an event outside 0..24.
 void GameMode4_GetEventName(int nEvent, char* szOut) {
     if (nEvent < 0 || nEvent >= 25) return;
     strcpy(szOut, gLadderNames.pText + gLadderEvents[nEvent].nName);
 }
 
-int fn_80102AAC(int nEvent) {
+// Event nEvent's tour stop number, which the map's panel prints as "<region> / Tour Stop <n>"
+// (LadderMenu_GetEventText).
+int GameMode4_GetEventTourStop(int nEvent) {
     return gLadderEvents[nEvent].n40;
 }
 
-void fn_80102AC4(void) {
+// Empty in this build; called last when a game started from the menus is set up (fn_80079AD4,
+// FE_Manager.c), right after Gaud_ExitFE.
+void GameMode4_ExitFE(void) {
 }

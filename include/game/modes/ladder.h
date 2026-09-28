@@ -17,9 +17,9 @@ u8   GameMode4_HasWonEvent(int nProfile, int nEvent);     // the profile has won
 u8   GameMode4_IsEventOpen(int nProfile, int nEvent);     // the profile has won every event it needs
 u8   GameMode4_SelectEvent(int nProfile, int nEvent);     // makes it the current event if it may be played
 void GameMode4_StartEvent(void);                         // sets the session up for the current event
-int  fn_80102A44(int nEvent);
+int  GameMode4_GetEventN0(int nEvent);
 void GameMode4_GetEventName(int nEvent, char* szOut);      // its name
-int  fn_80102AAC(int nEvent);                   // its tour stop number
+int  GameMode4_GetEventTourStop(int nEvent);                   // its tour stop number
 
 // GameMode4Menu.c and LadderMap.c: the map. Each event has a node on it; the menus place the
 // nodes, and the cursor jumps to the nearest node in the direction pressed. The first 18 nodes are

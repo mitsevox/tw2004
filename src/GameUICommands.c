@@ -2148,7 +2148,7 @@ void GM_vGetWrapupData(MsgArg* pArgs, MsgArg* pResult) {
             nMult = EARN_MULT_TOUR + 5;
             break;
         }
-        fn_801025F4();
+        GameMode4_IsEventRunning();
         pResult->i = gEarningsTable.aMult[nMult];
         return;
     case 104:
@@ -2177,7 +2177,7 @@ void GM_vGetWrapupData(MsgArg* pArgs, MsgArg* pResult) {
             nMult = 6;
             break;
         }
-        fn_801025F4();
+        GameMode4_IsEventRunning();
         pResult->i = nMult;
         return;
     case 200:
@@ -2262,9 +2262,9 @@ void GM_vGetHoleContestWon(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Whether a ladder event is being played (command 135; fn_801025F4).
+// Whether a ladder event is being played (command 135; GameMode4_IsEventRunning).
 void GM_vIsLadderEvent(MsgArg* pArgs, MsgArg* pResult) {
-    if (fn_801025F4()) {
+    if (GameMode4_IsEventRunning()) {
         pResult->i = 1;
         return;
     }

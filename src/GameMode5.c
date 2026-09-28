@@ -635,7 +635,7 @@ void PlayNow_EndGame(void) {
     gPlayNowModeEndGame();
     if (!GM_Currently_RealtimeMode()) {
         nMedal = PlayNow_GetMedal();
-        if (!fn_801025F4() && nMedal != 3) {
+        if (!GameMode4_IsEventRunning() && nMedal != 3) {
             if (nMedal < gpSaveData[gPlayers[0].nIndex].aMedal[fn_800EAC7C()]) {
                 gpSaveData[gPlayers[0].nIndex].aMedal[fn_800EAC7C()] = nMedal;
                 gpSaveData[gPlayers[0].nIndex].aMedalDate[fn_800EAC7C()] = CalDate_GetToday();
