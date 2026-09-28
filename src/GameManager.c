@@ -16,7 +16,7 @@
 
 // fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
 
-void  fn_800D33F0(void);
+void  GM_Earnings_FreeStreamMemory(void);
 void  GM_ClearHoleBonusStats(int nPlayer);
 u8    GM_IsRoundForcedOver(int nPlayer);
 void  fn_800D439C(int nPlayer, int a);
@@ -158,13 +158,13 @@ void GM_InitModule_PostDataStream(void) {
 // A round is torn down (gomainloop): the mode's Shutdown (pfnShutdown) and the HUD (GUI_DeInit),
 // then four frees that are empty in this build: the PGA TOUR one
 // (GameModeDriverPGATour_FreeStreamMemory), the GameMode5 one (fn_800EADD8), the earnings' stream
-// memory (fn_800D33F0) and the course data (fn_800D29E8).
+// memory (GM_Earnings_FreeStreamMemory) and the course data (fn_800D29E8).
 void GM_DeInitModule(void) {
     (*(s32 (**)(void*))((u8*)(gpGame) + 0x1CC))(gpGame);
     GUI_DeInit();
     GameModeDriverPGATour_FreeStreamMemory();
     fn_800EADD8();
-    fn_800D33F0();
+    GM_Earnings_FreeStreamMemory();
     fn_800D29E8();
 }
 

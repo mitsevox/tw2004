@@ -9,7 +9,7 @@
 #include "game_types.h"
 #include "platform.h"
 
-#define NUM_EARNINGS_RATINGS 26  // fn_800D3CF8 caps a rating at 25
+#define NUM_EARNINGS_RATINGS 26  // GM_Earnings_CapRating caps a rating at 25
 
 // Beating a CPU golfer of one rating in stroke play (GM_Earnings_GetStrokeWinnings; TW06: GM_Earnings_GetStrokeWinnings
 // (by position)).
@@ -144,7 +144,7 @@ typedef struct CoursePrice {
     s32  nBio;                  // 0x4  aBio index, -1 none
 } CoursePrice;
 
-#define NUM_COURSE_PRICES 24    // the 'ERN ' data has 24 rows (0x114..0x1D4): fn_800D3A20 reads 0..20, 21 and 23
+#define NUM_COURSE_PRICES 24    // the 'ERN ' data has 24 rows (0x114..0x1D4): GM_Earnings_CheckUnlockCourses reads 0..20, 21 and 23
 
 // The payout multipliers are one table of 29 (EarningsTable.aMult; GameUICommands.c's fn_80088CF0
 // indexes it across the groups). Where each group starts:
@@ -189,7 +189,7 @@ typedef struct EarningsTable {
 LAYOUT_ASSERT(EarningsTable, 0x22F0);
 
 extern EarningsTable gEarningsTable;
-extern s32 gUnlockedCourses[10];    // the courses fn_800D3A20 unlocked, for their messages
+extern s32 gUnlockedCourses[10];    // the courses GM_Earnings_CheckUnlockCourses unlocked, for their messages
 extern s32 gRoundRecordResults[10];    // a working table: fn_800D439C messages the entries of kind 2 or 4
 extern s32 gRoundRecordKinds[10];    // with these ids
 extern s32 gPuttRecordKinds[10];    // the putt record ids (2)
@@ -202,7 +202,7 @@ extern s32 gPuttPrizeBases[10];    // the money prizes fn_800D4F14 finds, before
 extern s32 gHolePrizeBases[10];    // and those fn_800D588C finds
 
 // Earnings.c
-int  fn_800D38F0(int nWinner, int nLoser, int nMargin, s32* pPrize);   // a ladder event's winnings
+int  GM_Earnings_GetLadderWinnings(int nWinner, int nLoser, int nMargin, s32* pPrize);   // a ladder event's winnings
 int  GM_GetHighestRatedGolfer(void);                 // the best rating among the players
 s32  GM_Earnings_GetSkinsHoleValue(int nRating, int nHole);   // a skin's value
 u8   GM_Earnings_AwardTrophyBall(int nPlayer, int nAward);  // give an award if the player does not have it yet

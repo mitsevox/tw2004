@@ -443,10 +443,10 @@ Every name below exists in the builds named in the Evidence column. The symbols 
 | `800F0F10` | `fn_800F0F10` | `GameModeDriverRTE::GetDescription` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
 | `800F1034` | `fn_800F1034` | `GameModeDriverRTE::GetNextEvent` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
 | `800F1224` | `fn_800F1224` | `GameModeDriverRTE::IsEventComplete` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
-| `800D33A8` | `fn_800D33A8` | `roundToNearest25` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
-| `800D33F0` | `fn_800D33F0` | `GM_Earnings_FreeStreamMemory` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
-| `800D33F4` | `fn_800D33F4` | `EarningsInfo::RegisterStreamClients` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
-| `800D3424` | `fn_800D3424` | `EarningsInfo::UnRegisterStreamClients` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800D33A8` | `roundToNearest25` | `roundToNearest25` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800D33F0` | `GM_Earnings_FreeStreamMemory` | `GM_Earnings_FreeStreamMemory` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800D33F4` | `EarningsInfo_RegisterStreamClients` | `EarningsInfo::RegisterStreamClients` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
+| `800D3424` | `EarningsInfo_UnRegisterStreamClients` | `EarningsInfo::UnRegisterStreamClients` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
 | `800D3478` | `fn_800D3478` | `GM_Earnings_TournamentPayout` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
 | `800D36E0` | `fn_800D36E0` | `GM_Earnings_GetStrokeWinnings` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |
 | `800D37BC` | `fn_800D37BC` | `GM_Earnings_GetStrokeWinningsTeam` | position | PS2 map and Xbox PDB; its place in the PS2 map's source order |

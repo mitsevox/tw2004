@@ -921,7 +921,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
 
 - **[verified] A value computed before a call and kept in a saved register gets its own local.**
   `nMoney *= 2;` puts the shift after the following call (58.5%); `s32 nPaid = nMoney * 2;` is
-  exact (Earnings `fn_800D39B4`). Reusing locals for a second value swaps float registers
+  exact (Earnings `GM_Earnings_AwardDoubleMoney`). Reusing locals for a second value swaps float registers
   (Earnings `fn_800D6A70`, 99.9% until separate locals).
 - **[verified] Locals take the higher volatile registers in declaration order; compiler
   temporaries take the lower ones.** In GetHonors' sort all 5040 orders of 7 variables gave two

@@ -29,8 +29,8 @@ s32 gPuttRecordResults[10];
 s32 gRoundRecordResults[10];
 // The working lists the shot, putt and hole goal checks fill, ten entries each: per money prize
 // (gNumPrizes) its message, its payout after the multipliers and its base before them; per award
-// (gNumAwards) its id and the money paid with it. Then the gPay copies fn_800D3244 makes of them,
-// which the payouts read.
+// (gNumAwards) its id and the money paid with it. Then the gPay copies GM_Earnings_CopyGoalResults
+// makes of them, which the payouts read.
 s32 gShotPrizeMsgs[10];
 s32 gPuttPrizeMsgs[10];
 s32 gHolePrizeMsgs[10];
@@ -59,7 +59,7 @@ s32 gPayShotAwardMoney[10];
 s32 gPayPuttAwardMoney[10];
 s32 gPayHoleAwardMoney[10];
 CourseMoneyTracking gPayPrizeBreakdowns[10];     // the breakdown of each gPay...Prizes payout
-s32 gUnlockedCourses[10];       // the courses fn_800D3A20 unlocked, for their messages
+s32 gUnlockedCourses[10];       // the courses GM_Earnings_CheckUnlockCourses unlocked, for their messages
 CourseMoneyTracking gPrizeBreakdowns[10];        // the breakdown of each prize the goal checks list
 
 // .sbss, reverse address order (gNumRecordHits is in game/earnings.h)
@@ -89,7 +89,7 @@ f32 gTournamentPayoutShares[70] = {
 };
 
 
-void  fn_800D344C(UStreamObject* pObject);
+void  EarningsInfo_LoadERNFromStream(UStreamObject* pObject);
 int   GameMode4_GetNumEventsWon(void);
 int   fn_801021FC(void);                                // GameMode4: the current ladder event
 f32   fn_800D04AC(int nPlayer);                         // HoleScore.c
@@ -107,8 +107,8 @@ u8    fn_800D69B8(int nPlayer, u8 bCheck);
 s32   fn_80126FA0(void);                                // GameMode22.c
 s32   fn_80127098(s32 n);
 
-int   fn_800D3A20(int nProfile, u8 bMessage);
-int   fn_800D3CF8(int nRating);
+int   GM_Earnings_CheckUnlockCourses(int nProfile, u8 bMessage);
+int   GM_Earnings_CapRating(int nRating);
 u8    fn_800D4010(int nId);
 u8    Earnings_TestBit(u32 uMask, int nBit);
 f32   GM_Earnings_GetCourseModifier(void);
@@ -117,8 +117,12 @@ u8    GM_Earnings_AwardThisTrophyBallToUser(int nPlayer, int nAward);
 int   HighScoreRecords_GetEndOfGameRecord(int nPlayer, int bSave, u8 bCountStroke, u8 bAll);
 s32   Earnings_GetAwardMessageId(s32 i);
 
-// Copy the working tables and their two counts into the second set, which the payouts then read.
-void fn_800D3244(void) {
+// Copies what the last goal check found into the second set of tables, which the payers read: the
+// working tables fn_800D477C, fn_800D4F14 and fn_800D588C fill (the money prizes after the
+// multipliers, with their message ids and breakdowns; the awards, with their values) and the two
+// counts (lbl_80282254 prizes, lbl_80282250 awards). fn_800D3DDC, fn_800D4030 and fn_800D439C call
+// it after each check, then pay from the copies.
+void GM_Earnings_CopyGoalResults(void) {
     gPayNumPrizes = gNumPrizes;
     gPayNumAwards = gNumAwards;
     memcpy(gPayShotPrizeMsgs, gShotPrizeMsgs, sizeof(gPayShotPrizeMsgs));
@@ -141,26 +145,34 @@ static f32 Earnings_StrippedFn(f32 x) {
     return x + 1.0f;
 }
 
-// nMoney rounded to the nearest $25. TW06: roundToNearest25 (by position).
-s32 fn_800D33A8(s32 nMoney) {
+// nMoney rounded to the nearest $25. For a negative amount the cast truncates toward zero, so the
+// result can be $25 higher than the nearest. TW06: roundToNearest25 (by position); TW07's
+// roundToNearest25Or5 has the same place.
+s32 roundToNearest25(s32 nMoney) {
     return (s32)((12.5f + (f32)nMoney) / 25.0f) * 25;
 }
 
-// TW06: GM_Earnings_FreeStreamMemory (by position).
-void fn_800D33F0(void) {
+// Empty in this build: GM_DeInitModule calls it when a round is torn down. TW06:
+// GM_Earnings_FreeStreamMemory (by position).
+void GM_Earnings_FreeStreamMemory(void) {
 }
 
-// The prize table comes from the stream. TW06: EarningsInfo_RegisterStreamClients (by position).
-void fn_800D33F4(void) {
-    Stream_RegisterLoadChunkCallback('ERN ', fn_800D344C);
+// Registers EarningsInfo_LoadERNFromStream as the loader of stream chunk 'ERN ' (the prize table);
+// the hole stream manager (fn_80014864) calls it. TW06: EarningsInfo::RegisterStreamClients (by
+// position).
+void EarningsInfo_RegisterStreamClients(void) {
+    Stream_RegisterLoadChunkCallback('ERN ', EarningsInfo_LoadERNFromStream);
 }
 
-// TW06: EarningsInfo_UnRegisterStreamClients (by position).
-void fn_800D3424(void) {
+// Removes the 'ERN ' chunk loader again; the hole stream manager (fn_800148A8) calls it. TW06:
+// EarningsInfo::UnRegisterStreamClients (by position).
+void EarningsInfo_UnRegisterStreamClients(void) {
     Stream_UnregisterLoadChunkCallback('ERN ');
 }
 
-void fn_800D344C(UStreamObject* pObject) {
+// The 'ERN ' chunk loader: copies the object into the prize table lbl_80200538 (EarningsTable,
+// 0x22F0 bytes). TW07: EarningsInfo::LoadERNFromStream.
+void EarningsInfo_LoadERNFromStream(UStreamObject* pObject) {
     // port: the 'ERN ' object is copied straight into the prize table (EarningsTable); it is
     //       big-endian on disc, so a little-endian port converts it field by field here
     //       (docs/format-byteorder.md)
@@ -172,9 +184,12 @@ static f32 Earnings_StrippedFn2(f32 x) {
     return x + 0.5f;
 }
 
-// Row 0 gets n as it is; any other row gets nTotal * gTournamentPayoutShares[nRow] scaled by
-// (1 - n / nTotal) / (1 - gTournamentPayoutShares[0]), rounded to $10.
-// TW06: GM_Earnings_TournamentPayout (by position).
+// A PGA TOUR tournament's prize for finishing place nRow (0 the winner;
+// GM_PgaTourSim_DistributeWinnings pays places 0..69 and splits ties). The winner gets n, the first
+// prize, as it is. Any other place gets its share of the purse nTotal (lbl_80191AA4[nRow]: 18% for
+// first down to 0.2% for 70th) times (1 - n / nTotal) / (1 - 18%), so the other places share what
+// the given first prize leaves as the table shares it; rounded to the nearest $10. TW06:
+// GM_Earnings_TournamentPayout (by position); TW07's arguments are (purse, firstPrize, place).
 s32 GM_Earnings_TournamentPayout(int nTotal, int n, int nRow) {
     f32 f;
     s32 nRounded;
@@ -195,8 +210,12 @@ s32 GM_Earnings_TournamentPayout(int nTotal, int n, int nRow) {
     return nRet;
 }
 
-// Pay a human player: the money goes into the round's breakdown (field by field from pMoney, or
-// all as the payout) and into the profile's money, and the courses it now buys are unlocked.
+// Pays nMoney to player nPlayer (0..3) when the player is human with an active profile and
+// mulligans are off (with mulligans nothing is earned). pMoney, when given, is the payout's
+// breakdown and is added to the player's round totals (Player.money) field by field; without it the
+// whole amount goes into money.n24. The profile's money (SaveProfile.n64 and n6C) grows by nMoney,
+// b70 is set, and GM_Earnings_CheckUnlockCourses unlocks, with their messages, the courses the
+// money now buys.
 void GM_Earnings_AwardMoney(int nPlayer, int nMoney, CourseMoneyTracking* pMoney) {
     int nProfile;
 
@@ -222,12 +241,13 @@ void GM_Earnings_AwardMoney(int nPlayer, int nMoney, CourseMoneyTracking* pMoney
     gpSaveData[nProfile].n64 += nMoney;
     gpSaveData[nProfile].n6C += nMoney;
     gpSaveData[nProfile].b70 = 1;
-    fn_800D3A20(nProfile, 1);
+    GM_Earnings_CheckUnlockCourses(nProfile, 1);
 }
 
-// Beating a CPU golfer pays by their earnings rating: a base
-// prize and so much a stroke of the margin (at most 5). *pPrize gets the base.
-// TW06: GM_Earnings_GetStrokeWinnings (by position).
+// What a human beating a CPU golfer by nMargin strokes earns: by the loser's earnings rating
+// (GM_Earnings_RateGolfer), the base prize plus so much a stroke of the margin (at most 5). *pPrize
+// (may be NULL) gets the base. 0 with mulligans, a CPU winner or a human loser. TW06:
+// GM_Earnings_GetStrokeWinnings (by position).
 int GM_Earnings_GetStrokeWinnings(int nWinner, int nLoser, int nMargin, int* pPrize) {
     int nRating;
 
@@ -244,9 +264,10 @@ int GM_Earnings_GetStrokeWinnings(int nWinner, int nLoser, int nMargin, int* pPr
             * nMargin;
 }
 
-// The same for a team (0: players 0 and 1, 1: players 2 and
-// 3) beating a CPU team: the average of what the two losers would pay.
-// TW06: GM_Earnings_GetStrokeWinningsTeam (by position).
+// The same for teams (team 0: players 0 and 1, team 1: players 2 and 3): what a team with a human
+// beating an all-CPU team by nMargin strokes earns, the average of what its two golfers would pay
+// (GM_Earnings_GetStrokeWinnings' formula each). *pPrize (may be NULL) gets the average base prize.
+// 0 with mulligans. TW06: GM_Earnings_GetStrokeWinningsTeam (by position).
 int GM_Earnings_GetStrokeWinningsTeam(int nWinner, int nLoser, int nMargin, int* pPrize) {
     int nFirst;
     int nSecond;
@@ -282,9 +303,10 @@ int GM_Earnings_GetStrokeWinningsTeam(int nWinner, int nLoser, int nMargin, int*
     return nTotal / 2;
 }
 
-// A ladder event won (GameMode4): the event's prize and so much a hole of the margin (at most 5),
-// and its EA Sports Bio accomplishment is posted. *pPrize gets the prize.
-int fn_800D38F0(int nWinner, int nLoser, int nMargin, s32* pPrize) {
+// What winning the current ladder event (GameMode4) by nMargin holes earns: the event's prize plus
+// so much a hole of the margin (at most 5); its EA Sports Bio accomplishment, if any, is posted.
+// *pPrize (may be NULL) gets the event's prize. nWinner and nLoser are not read. 0 with mulligans.
+int GM_Earnings_GetLadderWinnings(int nWinner, int nLoser, int nMargin, s32* pPrize) {
     int nEvent;
     int nMoney;
 
@@ -305,8 +327,10 @@ int fn_800D38F0(int nWinner, int nLoser, int nMargin, s32* pPrize) {
     return nMoney;
 }
 
-// Pay a player twice nMoney, booked in the breakdown's n24 and n3C.
-void fn_800D39B4(int nPlayer, int nMoney) {
+// Pays player nPlayer twice nMoney, booked in the breakdown's n24 and n3C (nothing with mulligans).
+// Its one caller is GameMode4_WinEvent, with the amount a ladder menu message stored
+// (lbl_8028244C).
+void GM_Earnings_AwardDoubleMoney(int nPlayer, int nMoney) {
     CourseMoneyTracking money;
     s32 nPaid;
 
@@ -319,11 +343,12 @@ void fn_800D39B4(int nPlayer, int nMoney) {
     }
 }
 
-// The courses a profile's money has bought: each of courses 0..20 whose price the money has reached
-// is unlocked and, except course 4, listed, with its EA Sports Bio accomplishment when it has one;
-// entries 21 and 23 get a message of their own. With bMessage, a message for each listed course.
-// Returns how many were listed.
-int fn_800D3A20(int nProfile, u8 bMessage) {
+// Unlocks what profile nProfile's money (SaveProfile.n64) now buys, from the prize table's
+// aCoursePrice: each course 0..20 is unlocked and, except course 4, listed, with its EA Sports Bio
+// accomplishment when it has one. Price 21 unlocks course slot 22 and price 23 slot 21, each with a
+// message of its own (3, 7, 2 and 3, 7, 3). With bMessage a message is queued for each listed
+// course. Returns how many were listed.
+int GM_Earnings_CheckUnlockCourses(int nProfile, u8 bMessage) {
     int i;
     int n;
 
@@ -383,8 +408,9 @@ int GM_GetHighestRatedGolfer(void) {
     return nBest;
 }
 
-// A CPU plays at its golfer's rating; a human's comes from the profile.
-// TW06: GM_Earnings_RateGolfer (by position).
+// A player's earnings rating (0..25), which picks the prize rows: a CPU plays at its golfer's
+// rating; a human's is the number of ladder events their profile has won, at most 25. TW06:
+// GM_Earnings_RateGolfer (by position).
 int GM_Earnings_RateGolfer(int nPlayer) {
     int nRating;
 
@@ -392,11 +418,12 @@ int GM_Earnings_RateGolfer(int nPlayer) {
     if (Player_IsCPU(nPlayer)) {
         return gPlayers[nPlayer].golfer.nEarningsRating;
     }
-    return fn_800D3CF8(nRating);
+    return GM_Earnings_CapRating(nRating);
 }
 
-// Ratings stop at 25.
-int fn_800D3CF8(int nRating) {
+// nRating, at most 25 (the last row of the rating tables, NUM_EARNINGS_RATINGS - 1). Its callers
+// pass a count of ladder wins, which cannot pass 25 (there are 25 events).
+int GM_Earnings_CapRating(int nRating) {
     int n;
 
     n = 25;
@@ -412,7 +439,7 @@ int fn_800D3D10(int nGolfer) {
 
     nRating = GameMode4_GetNumEventsWon();
     if (nGolfer >= FIRST_CREATED_GOLFER) {
-        return fn_800D3CF8(nRating);
+        return GM_Earnings_CapRating(nRating);
     }
     return gGolferTable[nGolfer].nEarningsRating;
 }
@@ -427,7 +454,7 @@ s32 GM_Earnings_GetSkinsHoleValue(int nRating, int nHole) {
 
 // After a shot that stayed in bounds (GM_PlayerTookShot), for a human player with a profile (not in
 // game mode 10): the shot is checked (HighScoreRecords_GetEndOfShotRecord, fn_800D477C) and what it
-// earned is paid out from the copies fn_800D3244 makes of the working tables, each with its
+// earned is paid out from the copies GM_Earnings_CopyGoalResults makes of the working tables, each with its
 // message: the gShotRecordResults entries of kind 2 or 4, the shot's bonuses with their breakdowns, and
 // the awards won with their money (booked as bonuses, money.n8).
 void fn_800D3DDC(int nPlayer) {
@@ -449,7 +476,7 @@ void fn_800D3DDC(int nPlayer) {
         }
     }
     fn_800D477C(nPlayer, &gPlayers[nPlayer].ball, 0);
-    fn_800D3244();
+    GM_Earnings_CopyGoalResults();
     for (i = 0; i < gPayNumPrizes; i++) {
         if (gPayShotPrizes[i] != 0) {
             GUI_QueueMessage(0, gPayShotPrizeMsgs[i], gPayShotPrizes[i], nProfile);
@@ -503,7 +530,7 @@ void fn_800D4030(int nPlayer) {
         }
     }
     fn_800D4F14(nPlayer, 0);
-    fn_800D3244();
+    GM_Earnings_CopyGoalResults();
     for (i = 0; i < gPayNumPrizes; i++) {
         if (gPayPuttPrizes[i] != 0) {
             GUI_QueueMessage(0, gPayPuttPrizeMsgs[i], gPayPuttPrizes[i], nProfile);
@@ -528,7 +555,7 @@ void fn_800D4030(int nPlayer) {
         gNumPrizes = 0;
         gNumAwards = 0;
     }
-    fn_800D3244();
+    GM_Earnings_CopyGoalResults();
     for (i = 0; i < gPayNumPrizes; i++) {
         if (gPayHolePrizes[i] != 0) {
             GUI_QueueMessage(0, gPayHolePrizeMsgs[i], gPayHolePrizes[i], nProfile);
@@ -578,7 +605,7 @@ void fn_800D439C(int nPlayer, u8 bRoundOver) {
         }
     }
     fn_800D588C(nPlayer, 0, bRoundOver);
-    fn_800D3244();
+    GM_Earnings_CopyGoalResults();
     for (i = 0; i < gPayNumPrizes; i++) {
         if (gHolePrizes[i] != 0) {
             GUI_QueueMessage(0, gHolePrizeMsgs[i], gHolePrizes[i], nProfile);
@@ -1440,7 +1467,7 @@ s32 GM_Earnings_ComputeBonusModifiers(s32 nPoints, int nPlayer, u8 bCourse, u8 b
         fHole = (f32)gEarningsTable.aMult[EARN_MULT_PINSET +3] / 100.0f;
         break;
     }
-    nBase = fn_800D33A8(nPoints);
+    nBase = roundToNearest25(nPoints);
     if (bCourse) {
         fCourse = (f32)nBase * fCourse - (f32)nBase;
     } else {
@@ -1456,9 +1483,9 @@ s32 GM_Earnings_ComputeBonusModifiers(s32 nPoints, int nPlayer, u8 bCourse, u8 b
     } else {
         fHole = 0.0f;
     }
-    fCourseBonus = fn_800D33A8((s32)fCourse);
-    fTeeBonus = fn_800D33A8((s32)fTee);
-    fHoleBonus = fn_800D33A8((s32)fHole);
+    fCourseBonus = roundToNearest25((s32)fCourse);
+    fTeeBonus = roundToNearest25((s32)fTee);
+    fHoleBonus = roundToNearest25((s32)fHole);
     nTotal = (s32)((f32)nBase + (fHoleBonus + (fCourseBonus + fTeeBonus)));
     if (nTotal < 0) {
         nTotal = 0;

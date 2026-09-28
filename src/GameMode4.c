@@ -43,7 +43,7 @@ s32 lbl_80282438;                    // the current event
 u8  lbl_80282434;                    // a ladder event is being played
 s32 lbl_80282430;                    // the wind option, saved
 
-void  fn_800D39B4(int nPlayer, int nMoney);
+void  GM_Earnings_AwardDoubleMoney(int nPlayer, int nMoney);
 
 void GameMode4_Shutdown(void);
 u8   GameMode4_HasWonEvent(int nProfile, int nEvent);
@@ -251,7 +251,7 @@ void GameMode4_EndGame(void) {
         if (nMargin > 5) {
             nMargin = 5;
         }
-        nMoney = fn_800D38F0(0, 1, nMargin, &nPrize);
+        nMoney = GM_Earnings_GetLadderWinnings(0, 1, nMargin, &nPrize);
         nProfile = gPlayers[0].nIndex;
         if (gpSaveData[nProfile].bActive) {
             EASBio_SetCurrentGameWon(1);
@@ -269,7 +269,7 @@ void GameMode4_EndGame(void) {
 // then the event is scored.
 void fn_80102704_WinSkinsEvent(void) {
     s32 nPrize;
-    int nMoney = fn_800D38F0(0, 1, 0, &nPrize);
+    int nMoney = GM_Earnings_GetLadderWinnings(0, 1, 0, &nPrize);
     if (nMoney != 0) {
         int nIndex = gPlayers[0].nIndex;
         if (gpSaveData[nIndex].bActive) {
@@ -326,7 +326,7 @@ void GameMode4_WinEvent(void) {
             GUI_QueueMessage(3, 0x16, lbl_80282444, nProfile);
         }
         if (lbl_8028244C != 0) {
-            fn_800D39B4(0, lbl_8028244C);
+            GM_Earnings_AwardDoubleMoney(0, lbl_8028244C);
         }
         if (fn_80102158() == 2) {
             bLast = 0;

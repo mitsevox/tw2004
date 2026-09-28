@@ -242,7 +242,7 @@ typedef struct SaveProfile {
     u8   aRewardUnlocked[0x64 - 0x51];  // 0x00051  per reward (fn_80058428 sets); the
                                 //          "THEKITCHENSINK" code (0x80056568) sets the first 18
     s32  n64;                   // 0x00064  money: every payout is added (GM_Earnings_AwardMoney); a course unlocks
-                                //          when it reaches the course's price (fn_800D3A20)
+                                //          when it reaches the course's price (GM_Earnings_CheckUnlockCourses)
     s32  n68;                   // 0x00068  cleared by the profile setup (fn_80057438)
     s32  n6C;                  // 0x0006C  money: every payout is added here too (GM_Earnings_AwardMoney)
     u8   b70;                   // 0x00070  set when an award is won, a round is counted or a challenge
