@@ -46,7 +46,7 @@ void GM_BuildRandom18(void);                 // GameRound.c: builds the random m
 void Lessons_StartFromMenu(void);                 // GameMode11.c
 void GameModeDriverPGATour_PrepareForTeeOff(void);                 // GameModeDriverPGATour.c
 u8*  fn_8010C718(void);                 // CharSliders.c
-void fn_801260C0(void);                 // GameMode22.c
+void GameMode22_StartEvent(void);                 // GameMode22.c
 s32  Gba_GetState(void);                 // gbacable.c
 void fn_8012409C(void);                 // gbacable.c
 void fn_801240A8(void);                 // gbacable.c
@@ -237,16 +237,16 @@ void fn_801217C4(MsgArg* pArgs, MsgArg* pResult);
 void fn_80121808(MsgArg* pArgs, MsgArg* pResult);
 void fn_8012185C(MsgArg* pArgs, MsgArg* pResult);
 void fn_80121890(MsgArg* pArgs, MsgArg* pResult);
-void fn_8012597C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80125A24(MsgArg* pArgs, MsgArg* pResult);
-void fn_80125AA4(MsgArg* pArgs, MsgArg* pResult);
-void fn_80125B38(MsgArg* pArgs, MsgArg* pResult);
-void fn_80125BB8(MsgArg* pArgs, MsgArg* pResult);
-void fn_80125BD8(MsgArg* pArgs, MsgArg* pResult);
-void fn_80125C5C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80125D08(MsgArg* pArgs, MsgArg* pResult);
-void fn_80125D78(MsgArg* pArgs, MsgArg* pResult);
-void fn_80125DE0(MsgArg* pArgs, MsgArg* pResult);
+void TrophyRoom_GetTourTrophy(MsgArg* pArgs, MsgArg* pResult);
+void TrophyRoom_GetTourTrophyText(MsgArg* pArgs, MsgArg* pResult);
+void TrophyRoom_CountEventsInMonth(MsgArg* pArgs, MsgArg* pResult);
+void TrophyRoom_GetPlaceholderText(MsgArg* pArgs, MsgArg* pResult);
+void TrophyRoom_GetIndexMod4(MsgArg* pArgs, MsgArg* pResult);
+void TrophyRoom_GetMedalDate(MsgArg* pArgs, MsgArg* pResult);
+void TrophyRoom_GetLadderAward(MsgArg* pArgs, MsgArg* pResult);
+void TrophyRoom_GetLadderEventCourse(MsgArg* pArgs, MsgArg* pResult);
+void TrophyRoom_GetRTEAwardIcon(MsgArg* pArgs, MsgArg* pResult);
+void TrophyRoom_GetAwardEarnedText(MsgArg* pArgs, MsgArg* pResult);
 
 // This file.
 void GetGolferName(int nGolfer, char* szName);
@@ -1214,8 +1214,8 @@ void fn_80079EA8(void) {
     lbl_801D77A8[596] = fn_80121808;
     lbl_801D77A8[599] = fn_800816DC;
     lbl_801D77A8[600] = fn_80081270;
-    lbl_801D77A8[605] = fn_8012597C;
-    lbl_801D77A8[606] = fn_80125A24;
+    lbl_801D77A8[605] = TrophyRoom_GetTourTrophy;
+    lbl_801D77A8[606] = TrophyRoom_GetTourTrophyText;
     lbl_801D77A8[608] = fn_8007F0D0;
     lbl_801D77A8[609] = fn_80109734;
     lbl_801D77A8[610] = fn_8007E128;
@@ -1231,8 +1231,8 @@ void fn_80079EA8(void) {
     lbl_801D77A8[748] = fn_80084208;
     lbl_801D77A8[618] = fn_80084158;
     lbl_801D77A8[619] = fn_8008415C;
-    lbl_801D77A8[607] = fn_80125AA4;
-    lbl_801D77A8[613] = fn_80125B38;
+    lbl_801D77A8[607] = TrophyRoom_CountEventsInMonth;
+    lbl_801D77A8[613] = TrophyRoom_GetPlaceholderText;
     lbl_801D77A8[614] = fn_8008422C;
     lbl_801D77A8[615] = fn_80084258;
     lbl_801D77A8[616] = fn_80084288;
@@ -1243,10 +1243,10 @@ void fn_80079EA8(void) {
     lbl_801D77A8[627] = fn_800842D0;
     lbl_801D77A8[628] = fn_80084354;
     lbl_801D77A8[632] = fn_800826C4;
-    lbl_801D77A8[637] = fn_80125BB8;
-    lbl_801D77A8[638] = fn_80125BD8;
-    lbl_801D77A8[640] = fn_80125C5C;
-    lbl_801D77A8[641] = fn_80125D08;
+    lbl_801D77A8[637] = TrophyRoom_GetIndexMod4;
+    lbl_801D77A8[638] = TrophyRoom_GetMedalDate;
+    lbl_801D77A8[640] = TrophyRoom_GetLadderAward;
+    lbl_801D77A8[641] = TrophyRoom_GetLadderEventCourse;
     lbl_801D77A8[643] = fn_80084458;
     lbl_801D77A8[644] = fn_8008449C;
     lbl_801D77A8[645] = fn_800844E0;
@@ -1266,8 +1266,8 @@ void fn_80079EA8(void) {
     lbl_801D77A8[668] = fn_80084754;
     lbl_801D77A8[671] = fn_800847BC;
     lbl_801D77A8[672] = fn_800847E0;
-    lbl_801D77A8[670] = fn_80125D78;
-    lbl_801D77A8[674] = fn_80125DE0;
+    lbl_801D77A8[670] = TrophyRoom_GetRTEAwardIcon;
+    lbl_801D77A8[674] = TrophyRoom_GetAwardEarnedText;
     lbl_801D77A8[675] = fn_800848E4;
     lbl_801D77A8[678] = fn_800848E8;
     lbl_801D77A8[679] = fn_80084918;
@@ -4942,7 +4942,7 @@ void fn_80083BFC(MsgArg* pArgs, MsgArg* pResult) {
     } else if (Game_GetMode() == 26) {
         fn_8010C718();
     } else if (Game_GetMode() == 22) {
-        fn_801260C0();
+        GameMode22_StartEvent();
     } else if (Game_GetMode() == 24) {
         GameModeDriverRTE_StartEvent();
     }

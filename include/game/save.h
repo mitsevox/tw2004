@@ -276,7 +276,7 @@ typedef struct SaveProfile {
                                 //          of the Month, per month (the tour's month money leader,
                                 //          n44; FE_PGATourMessages.c fn_8010F3A4); 12..15: the
                                 //          four trophies (both awarded by PGATourSimulation
-                                //          GM_PgaTourSim_CheckEndOfTournamentAward; GameMode22 fn_8012597C reads their days)
+                                //          GM_PgaTourSim_CheckEndOfTournamentAward; GameMode22 TrophyRoom_GetTourTrophy reads their days)
     Award a200[3];              // 0x00200  the player's career winnings first, in the top 5 and in the
                                 //          top 25 of the tour (PGATourSimulation GM_PgaTourSim_CheckEndOfTournamentAward)
     Award aRTEAward[75];        // 0x0020C  per real-time event id. TW06: rteEventAwardInfo
@@ -329,7 +329,7 @@ typedef struct SaveProfile {
     u32  aB344[94];             // 0x0B344
     u32  aB4BC[94];             // 0x0B4BC
     TourSeason tour;            // 0x0B634
-    u8   a104D0[118];           // 0x104D0  per real-time event (GM_RealtimeMode_GetStartDate's ids); GameMode22 fn_80125AA4
+    u8   a104D0[118];           // 0x104D0  per real-time event (GM_RealtimeMode_GetStartDate's ids); GameMode22 TrophyRoom_CountEventsInMonth
                                 //          counts the nonzero ones in a month
     u8   unk10546[0x10548 - 0x10546];
     u32  a10548[1];             // 0x10548  a bit array: FE_CrAPMessages.c's fn_80108E4C tests bit n; fn_80058304 tests one (bit 1 for FE_Manager)

@@ -292,8 +292,8 @@ They will be sorted into the sections below.
 - **[verified] Set every loop cursor and end pointer as plain statements at the head of the loop**, in the
   original's order; an end pointer can double as the backward cursor (hlaudvoice fn_800AC330 78 -> 100).
 - **[verified] EA's message-list macro is `aMsgs[n] = x; n++;`**, not `aMsgs[n++] = x` (GameMode26
-  fn_8010CA2C, GameMode22 fn_80126698 91.4 -> 94.1). `PLAYER(i)->` instead of `gPlayers[i].` fixed both
-  twins' loops (fn_8010D278, fn_80126EC0, about 73 -> 100).
+  fn_8010CA2C, GameMode22 GameMode22_ScoreShot 91.4 -> 94.1). `PLAYER(i)->` instead of `gPlayers[i].` fixed both
+  twins' loops (fn_8010D278, GameMode22_ClearPlayerStats, about 73 -> 100).
 - **[verified] `(u32)` of a float held in a local calls `__cvt_fp2unsigned`**; the same cast of a literal is
   folded (DynChain fn_80116304 75.5 -> 95.4).
 - **[verified] A 64-bit id packed from u16s**: `u <<= 16; u |= p[i];` gives `slwi; or`
@@ -560,7 +560,7 @@ so try EA's own forms (TW07, one local per job, the unswitched loop) before them
   29 neighbours, so they leave the graph in the second sweep and take r31/r30/r29 (rasim replay).
   Completed 2026-09-27: the deletion rule is "not live out of the block": a srawi whose register
   is dead at the block's end also goes (BFX_vRender: r0 before a call), and inside a loop a dead
-  srawi is never deleted (GameMode22 fn_801264B8 lab tests).
+  srawi is never deleted (GameMode22 GameMode22_DecideWinner lab tests).
 - **[verified, fake-match class] An index written as a signed 64-bit product adds an early
   instruction that leaves no trace.** `(u8*)p + (s32)n * (s64)sizeof(T)` in place of `&p[n]`
   makes `li rK,size; mulhw` for the dead high word; the pre-RA scheduler issues the `li` in the
@@ -633,7 +633,7 @@ Added 2026-09-27 (from the ledgers solved that night; each ledger has the full s
   no code.** The backend has no dead-code pass for non-copies: the high word of a 64-bit op whose
   low word is used survives to allocation, and the post-RA peephole deletes it outside loops.
   `nWinner = (s32)((u64)(s64)nWinner | ((u64)(u32)pPlayer << 32));` after loop 1 keeps pPlayer live
-  to the loop's end (11 -> 24 neighbours): GameMode22 fn_801264B8 97.96 -> 100. The low word must
+  to the loop's end (11 -> 24 neighbours): GameMode22 GameMode22_DecideWinner 97.96 -> 100. The low word must
   reduce to a copy (`+` leaves `addc`; an unsigned OR/XOR folds the high word to a copy: use the
   `(s64)` form). Within a block it does nothing (liveness is global there; use a srawi). Also
   UISScreen fn_8016A2D4 (uEvent kept live across the calls). Dead copies never get this far: the
@@ -751,7 +751,7 @@ Added 2026-09-27 (from the ledgers solved that night; each ledger has the full s
 - **[verified, EA form] A small constant loop is unrolled after the first CSE**, so its copies'
   constants are not merged with earlier ones: DepthField DF_vDrawBufferToScreen, the two vertices
   as `for (j = 0; j < 2; j++)` (97.88 -> 100). `#pragma opt_unroll_loops off` on one function hands
-  the unroll to the backend (srwi scheme instead of cmpwi 8): GameMode22 fn_801264B8 (labelled).
+  the unroll to the backend (srwi scheme instead of cmpwi 8): GameMode22 GameMode22_DecideWinner (labelled).
 - **[verified] A 2-instruction block EA scheduled differently from ours means a deleted
   instruction**: our such preheaders are never scheduled (`{0004}` in every pass), so EA's block had a
   third instruction, a copy coalesced away by allocation. MC MC_MergeRecords: EA's `add row; li k` =

@@ -1,5 +1,5 @@
 // GameMode22.c (our name): game mode 22, a long-drive contest (GameRound.c starts it with
-// fn_80125E68), and before it the trophy case's text (Rookie of the Year, Player of the Year, the
+// GameMode22_Init), and before it the trophy case's text (Rookie of the Year, Player of the Year, the
 // money and scoring leaders; "Earned on %s"). One file: both halves share its .data, .sdata and
 // .sbss blocks.
 
@@ -14,26 +14,26 @@
 #include "game/modes/rte.h"
 #include "game/modes/mode22.h"
 
-void fn_801260B8(void);
-void fn_801260BC(void);
-void fn_80126130(void);
-void fn_80126150(void);
-void fn_80126184(void);
-void fn_801262C4(int nPlayer);
-s32 fn_8012632C(void);
-u8   fn_801263C4(int nPlayer, int n);
-void fn_80126698(int nPlayer);
+void GameMode22_Shutdown(void);
+void GameMode22_Unused1F0(void);
+void GameMode22_SetupNextGolfer(void);
+void GameMode22_EndGame(void);
+void GameMode22_UpdateFrame(void);
+void GameMode22_StartSwing(int nPlayer);
+s32 GameMode22_GoToPlayoff(void);
+u8   GameMode22_HoleFinished(int nPlayer, int n);
+void GameMode22_ScoreShot(int nPlayer);
 u8   fn_80126FB0(s32* pn8);
-u8   fn_80126418(int n);
-void fn_8012643C(int nPlayer);
-void fn_8012645C(int nPlayer);
-void fn_801264B8(void);
-s32  fn_80126640(int n);
-s32  fn_80126334(int nPlayer);
-void fn_801260C0(void);
-void fn_80126EC0(void);
-void fn_80126E68(void);
-void fn_80126E88(void);
+u8   GameMode22_GameFinished(int n);
+void GameMode22_BallOutOfBounds(int nPlayer);
+void GameMode22_EndGolferTurn(int nPlayer);
+void GameMode22_DecideWinner(void);
+s32  GameMode22_GetLieGroup(int n);
+s32  GameMode22_GetHonors(int nPlayer);
+void GameMode22_StartEvent(void);
+void GameMode22_ClearPlayerStats(void);
+void GameMode22_HoleStart(void);
+void GameMode22_RestartHole(void);
 void fn_80126F7C(void);
 void fn_80126F80(void);
 void fn_80126F84(s32 p0);
@@ -51,9 +51,10 @@ char* lbl_8019543C[4] = {
     "PGA Tour\xAE Scoring Leader",
 };
 
-// Message handler (FE_MessageTable.c): one of the four trophies: whether it is won, its title,
-// and the day it was won (empty while not).
-void fn_8012597C(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 605: tour trophy pArgs[0] (0..3: Rookie of the Year, Player of the Year, the money
+// leader and the scoring leader; the profile's a1C0[12..15]). Returns whether it is won, writes its
+// title and the day it was won (empty while not).
+void TrophyRoom_GetTourTrophy(MsgArg* pArgs, MsgArg* pResult) {
     s32 nTrophy = pArgs[0].i;
     char* szName = ((MsgString*)pArgs[1].p)->pStr;
     char* szDate = ((MsgString*)pArgs[2].p)->pStr;
@@ -67,9 +68,9 @@ void fn_8012597C(MsgArg* pArgs, MsgArg* pResult) {
     szDate[0] = '\0';
 }
 
-// Message handler (FE_MessageTable.c): a trophy's text, by column: 0 its title, 1 and 2
-// placeholders.
-void fn_80125A24(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 606: a tour trophy's text by column pArgs[1]: 0 its title; 1 and 2 only placeholders
+// ("some year", "amount").
+void TrophyRoom_GetTourTrophyText(MsgArg* pArgs, MsgArg* pResult) {
     s32 nTrophy = pArgs[0].i;
     s32 nColumn = pArgs[1].i;
     char* szOut = ((MsgString*)pArgs[2].p)->pStr;
@@ -87,9 +88,9 @@ void fn_80125A24(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Message handler (FE_MessageTable.c): how many real-time events of a month (0-based) have their
-// profile flag set.
-void fn_80125AA4(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 607: how many of the 118 real-time events start in month pArgs[0] (0-based) and have
+// their profile flag (a104D0) set.
+void TrophyRoom_CountEventsInMonth(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile;
     s32 nMonth;
     s32 i;
@@ -111,8 +112,9 @@ void fn_80125AA4(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = nCount;
 }
 
-// Message handler (FE_MessageTable.c): placeholder texts for a trophy's name and date.
-void fn_80125B38(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 613: placeholder texts, "trophy name %d %d" and "date %d %d" of the two values
+// pArgs[0] and pArgs[1].
+void TrophyRoom_GetPlaceholderText(MsgArg* pArgs, MsgArg* pResult) {
     s32 nA = pArgs[0].i;
     s32 nB = pArgs[1].i;
     char* szDate = ((MsgString*)pArgs[3].p)->pStr;
@@ -121,14 +123,14 @@ void fn_80125B38(MsgArg* pArgs, MsgArg* pResult) {
     sprintf(szDate, "date %d %d", nA, nB);
 }
 
-// Message handler (FE_MessageTable.c): the value mod 4.
-void fn_80125BB8(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 637: pArgs[0] modulo 4.
+void TrophyRoom_GetIndexMod4(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = pArgs[0].i % 4;
 }
 
-// Message handler (FE_MessageTable.c): the day the medal of group n (1-based) was earned, as
-// text; empty for group 0 or no medal (aMedal 3).
-void fn_80125BD8(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 638: the day the best medal of challenge group pArgs[0] (1-based) was earned, as text;
+// empty for group 0 or while the group has no medal (aMedal 3).
+void TrophyRoom_GetMedalDate(MsgArg* pArgs, MsgArg* pResult) {
     s32 nGroup = pArgs[0].i;
     char* szOut = ((MsgString*)pArgs[1].p)->pStr;
     SaveProfile* pProfile = FE_GetCurrentProfile();
@@ -144,9 +146,8 @@ void fn_80125BD8(MsgArg* pArgs, MsgArg* pResult) {
     szOut[0] = '\0';
 }
 
-// Message handler (FE_MessageTable.c): a ladder event's course name, and the day it was won
-// (empty while not).
-void fn_80125C5C(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 640: ladder event pArgs[0]'s course name, and the day it was won (empty while not).
+void TrophyRoom_GetLadderAward(MsgArg* pArgs, MsgArg* pResult) {
     s32 nEvent = pArgs[0].i;
     char* szCourse = ((MsgString*)pArgs[1].p)->pStr;
     char* szDate = ((MsgString*)pArgs[2].p)->pStr;
@@ -160,8 +161,9 @@ void fn_80125C5C(MsgArg* pArgs, MsgArg* pResult) {
     szDate[0] = '\0';
 }
 
-// Message handler (FE_MessageTable.c): a ladder event's course, and whether it is won.
-void fn_80125D08(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 641: ladder event pArgs[0]'s course (into the int pArgs[1] points to); returns whether
+// the event is won.
+void TrophyRoom_GetLadderEventCourse(MsgArg* pArgs, MsgArg* pResult) {
     s32 nEvent = pArgs[0].i;
     SaveProfile* pProfile = FE_GetCurrentProfile();
 
@@ -169,9 +171,9 @@ void fn_80125D08(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = pProfile->aLadderAward[nEvent].bWon;
 }
 
-// Message handler (FE_MessageTable.c): GM_RealtimeMode_GetIconIDByTrophyGroup of a won real-time
-// event, else -1.
-void fn_80125D78(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 670: the icon of real-time event award pArgs[0]
+// (GM_RealtimeMode_GetIconIDByTrophyGroup) once it is won, else -1.
+void TrophyRoom_GetRTEAwardIcon(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     s32 nEvent = pArgs[0].i;
 
@@ -182,8 +184,9 @@ void fn_80125D78(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = -1;
 }
 
-// Message handler (FE_MessageTable.c): "Earned on <day>" for a won award, else empty.
-void fn_80125DE0(MsgArg* pArgs, MsgArg* pResult) {
+// FE message 674: "Earned on <day>" for award pArgs[0] (the profile's aAward) once it is won, else
+// empty.
+void TrophyRoom_GetAwardEarnedText(MsgArg* pArgs, MsgArg* pResult) {
     s32 nAward = pArgs[0].i;
     char* szOut = ((MsgString*)pArgs[1].p)->pStr;
     char szDate[12];    // the size is not known (the frame leaves room for 12 bytes)
@@ -208,27 +211,29 @@ s32 lbl_80282588;
 s32 lbl_80282584;
 s32 lbl_80282580;
 
-// The mode's setup: its callbacks and options, split screen as chosen, the per-player values
-// cleared, and its messages to show.
-void fn_80125E68(void) {
+// Game mode 22's setup (GM_SetModeType): its callbacks; no gimmes, mulligans, stroke limit,
+// GameBreakers (b285), yardage or bumped obstructions; split screen as chosen (lbl_8028227C); the
+// per-player score sounds cleared (400 / 800 / 1200) and the intro messages to show
+// (GameMode22_UpdateFrame).
+void GameMode22_Init(void) {
     s32 i;
 
-    gpGame->pfnInit = fn_80125E68;
-    gpGame->pfnShutdown = fn_801260B8;
-    gpGame->pfn1F0 = fn_801260BC;
-    gpGame->pfnSetupNextGolfer = fn_80126130;
-    gpGame->pfnGetHonors = fn_80126334;
-    gpGame->pfn250 = fn_8012643C;
-    gpGame->pfnHoleFinished = (u8 (*)(int, u8))fn_801263C4;
-    gpGame->pfnGameFinished = (u8 (*)(u8))fn_80126418;
-    gpGame->pfnGoToPlayoff = (u8 (*)(u8))fn_8012632C;  // port: EA passes an argument fn_8012632C ignores
-    gpGame->pfnEndGolferTurn = fn_8012645C;
-    gpGame->pfnEndGame = fn_80126150;
-    gpGame->pfn220 = fn_80126184;
-    gpGame->pfn20C = fn_801262C4;
-    gpGame->pfn244 = fn_80126698;
-    gpGame->pfn1E4 = fn_80126E68;
-    gpGame->pfn224 = fn_80126E88;
+    gpGame->pfnInit = GameMode22_Init;
+    gpGame->pfnShutdown = GameMode22_Shutdown;
+    gpGame->pfn1F0 = GameMode22_Unused1F0;
+    gpGame->pfnSetupNextGolfer = GameMode22_SetupNextGolfer;
+    gpGame->pfnGetHonors = GameMode22_GetHonors;
+    gpGame->pfn250 = GameMode22_BallOutOfBounds;
+    gpGame->pfnHoleFinished = (u8 (*)(int, u8))GameMode22_HoleFinished;
+    gpGame->pfnGameFinished = (u8 (*)(u8))GameMode22_GameFinished;
+    gpGame->pfnGoToPlayoff = (u8 (*)(u8))GameMode22_GoToPlayoff;  // port: EA passes an argument GameMode22_GoToPlayoff ignores
+    gpGame->pfnEndGolferTurn = GameMode22_EndGolferTurn;
+    gpGame->pfnEndGame = GameMode22_EndGame;
+    gpGame->pfn220 = GameMode22_UpdateFrame;
+    gpGame->pfn20C = GameMode22_StartSwing;
+    gpGame->pfn244 = GameMode22_ScoreShot;
+    gpGame->pfn1E4 = GameMode22_HoleStart;
+    gpGame->pfn224 = GameMode22_RestartHole;
     gpGame->bGimmesAllowed = 0;
     gpGame->b279 = 1;
     gpGame->b27F = 0;
@@ -261,14 +266,19 @@ void fn_80125E68(void) {
     lbl_80282580 = 1;
 }
 
-void fn_801260B8(void) {
+// The mode's pfnShutdown: empty.
+void GameMode22_Shutdown(void) {
 }
 
-void fn_801260BC(void) {
+// The mode's pfn1F0 slot, which nothing in the binary calls: empty.
+void GameMode22_Unused1F0(void) {
 }
 
-// Every player on the first tee set, the option n20 off and the mode's state reset.
-void fn_801260C0(void) {
+// Starts a long-drive event from the menus (FE_MessageTable.c fn_80083BFC, as
+// GameModeDriverRTE_StartEvent does for mode 24): every player on tee set 0, options.n20 off, no
+// winner (n8 5, bC 0), no longest drive yet (f10 0, n14 5), and the 120-frame winner countdown
+// (n18) reset.
+void GameMode22_StartEvent(void) {
     s32 i;
 
     i = 0;
@@ -283,21 +293,25 @@ void fn_801260C0(void) {
     lbl_80195498.n18 = 120;
 }
 
-void fn_80126130(void) {
+// The mode's pfnSetupNextGolfer: stroke play's (GameModeStroke_SetupNextGolfer).
+void GameMode22_SetupNextGolfer(void) {
     GameModeStroke_SetupNextGolfer();
 }
 
-// Pays the player in fn_80126FB0's n8 5000.
-void fn_80126150(void) {
+// The game is over (pfnEndGame): the winner (n8, from GameMode22_GetWinner) is paid 5000.
+void GameMode22_EndGame(void) {
     s32 nPlayer;
 
     fn_80126FB0(&nPlayer);
     GM_Earnings_AwardMoney(nPlayer, 5000, NULL);
 }
 
-// The mode's frame: its message once when asked, every 16 frames the current shot's length sent
-// as message 0x4D (a track plays while it is a new nonzero length), and the n18 countdown.
-void fn_80126184(void) {
+// Each frame (pfn220). Once after the setup: intro message 89 with 1 (variant 0) or 2 (variant 1)
+// and the drives-left text (GameMode22_ShowDrivesLeft). Every 16 frames: the current player's shot
+// length (fn_800D0550) sent as message 0x4D; while it is nonzero and still changing, a long-drive
+// UI sound plays (script 0, track 1; started once), and it stops once the length stops changing.
+// After a winner is decided (n8 not 5), the winner countdown n18 runs down.
+void GameMode22_UpdateFrame(void) {
     s32 nLength;
 
     if (lbl_80282580 != 0) {
@@ -334,19 +348,22 @@ void fn_80126184(void) {
     }
 }
 
-void fn_801262C4(int nPlayer) {
+// As a swing begins (pfn20C): GameMode22_PreSwing (empty), the drives-left text, and message 0x42
+// for scoreboard slot 0 with nPlayer's score (nEBC).
+void GameMode22_StartSwing(int nPlayer) {
     fn_80126F80();
     fn_80127034(nPlayer);
     fn_800E5CA4(0, gPlayers[nPlayer].nEBC, 0, 0, 0, 0, 0, 0.0f);
 }
 
-s32 fn_8012632C(void) {
+// The mode's pfnGoToPlayoff: never a playoff (0). The slot passes an argument it does not take.
+s32 GameMode22_GoToPlayoff(void) {
     return 0;
 }
 
-// The next player after the current one other than nPlayer (5: none); 0 while no player has an
-// nEA0.
-s32 fn_80126334(int nPlayer) {
+// Who drives next (pfnGetHonors): player 0 until someone has driven (nEA0), then the next player
+// after the current one (lbl_80282278) that is not nPlayer; 5 when there is none.
+s32 GameMode22_GetHonors(int nPlayer) {
     u8 bNone = 1;
     s32 nNext;
     s32 i;
@@ -372,27 +389,31 @@ s32 fn_80126334(int nPlayer) {
     return 5;
 }
 
-u8 fn_801263C4(int nPlayer, int n) {
+// The hole is over (pfnHoleFinished) once a winner is decided (GameMode22_GameFinished) and the
+// 120-frame winner countdown (n18) has run out. nPlayer is not read.
+u8 GameMode22_HoleFinished(int nPlayer, int n) {
     s32 bRet = 0;
 
-    if (fn_80126418(n) && lbl_80195498.n18 < 0) {
+    if (GameMode22_GameFinished(n) && lbl_80195498.n18 < 0) {
         bRet = 1;
     }
     return bRet;
 }
 
-// n is not read (fn_801263C4 passes one).
-u8 fn_80126418(int n) {
+// The game is over (pfnGameFinished) once a winner is decided (bC, GameMode22_GetWinner). n is not
+// read.
+u8 GameMode22_GameFinished(int n) {
     return fn_80126FB0(NULL);
 }
 
-// The ball went out of bounds: scored as a shot.
-void fn_8012643C(int nPlayer) {
-    fn_80126698(nPlayer);
+// The ball went out of bounds (pfn250): the drive is scored like any other (GameMode22_ScoreShot).
+void GameMode22_BallOutOfBounds(int nPlayer) {
+    GameMode22_ScoreShot(nPlayer);
 }
 
-// The ball back on the player's tee.
-void fn_8012645C(int nPlayer) {
+// End of a golfer's turn (pfnEndGolferTurn): the ball goes back on the player's tee (his tee set)
+// for the next drive.
+void GameMode22_EndGolferTurn(int nPlayer) {
     Physics_InitBall(&gPlayers[nPlayer].ball,
                 &gPlayers[nPlayer].ball.pCourse->tee[gSession.nTeeSet[nPlayer]].x, nPlayer);
 }
@@ -404,7 +425,7 @@ void fn_8012645C(int nPlayer) {
 // and gets the backend's unroll (srwi by 8 + remainder) as EA's does.
 #pragma push
 #pragma opt_unroll_loops off
-void fn_801264B8(void) {
+void GameMode22_DecideWinner(void) {
     s32 nMin;
     s32 nFirst;
     s32* pScore;
@@ -459,7 +480,10 @@ void fn_801264B8(void) {
 }
 #pragma pop
 
-s32 fn_80126640(int n) {
+// The contest's scoring group of lie nLie: 0 the tee; 1 the fairways and the fringe (and any lie
+// not listed: cart path, water, out of bounds); 2 the roughs, ice, snow and misc; 3 the sands; 4
+// the green; 5 in the cup.
+s32 GameMode22_GetLieGroup(int n) {
     switch (n) {
     case 0:
         return 0;
@@ -494,10 +518,19 @@ s32 fn_80126640(int n) {
         nMsgs++;                            \
     }
 
-// A shot is over (gpGame->pfn244): the player's points for it from where the ball ended up (and
-// how far it went), the longest shot kept, the score's tracks, the winner's message, or else a
-// comment picked at random from the ones the shot earned.
-void fn_80126698(int nPlayer) {
+// A drive is over (pfn244; GameMode22_BallOutOfBounds for one out of bounds). It counts as a drive
+// (nEA0) and scores by where the ball ended: surface 0x9B kind 1, the length plus 20%; surface 0x2F
+// or 0x68 kind 4, -100 (with a sound); bLowIQPenalty set kind 5, -100; else by
+// GameMode22_GetLieGroup: the tee or the rough kind 2, 0 points; the fairway, green or cup kind 0,
+// the length; sand kind 3, -50. Kinds 0 and 1 are fair drives: counted (nEA4), their total (nEC4)
+// and average (nEC0) kept, and 400 or more earns 100 more; each kind has its own count (nEC8, nECC,
+// nED0, nED4, nED8, nEDC). In variant 1 a drive scores only what it adds to the player's best fair
+// drive. The score (nEBC) never drops below 0 and goes to the scoreboard (message 0x42); sounds the
+// first time it reaches 400, 800 and 1200. The player's longest fair drive (nEA8) and where it lay
+// (vEAC) are kept, with message 0x4C when it beats the other player's. Then
+// GameMode22_DecideWinner: a winner gets his commentary line, otherwise one line is picked at
+// random from those the drive earned (a new longest drive, a long one, a bad one).
+void GameMode22_ScoreShot(int nPlayer) {
     s32 nPoints;
     s32 nKind;
     Player* pPlayer = &gPlayers[nPlayer];
@@ -523,7 +556,7 @@ void fn_80126698(int nPlayer) {
             nKind = 5;
             break;
         }
-        switch (fn_80126640(pPlayer->ball.nLie)) {
+        switch (GameMode22_GetLieGroup(pPlayer->ball.nLie)) {
         case 0:
         case 2:
             nKind = 2;
@@ -673,7 +706,7 @@ void fn_80126698(int nPlayer) {
         }
     }
 
-    fn_801264B8();
+    GameMode22_DecideWinner();
     if (lbl_80195498.n8 != 5) {
         nMsgs = 0;
         if (nPlayer > 1) {
@@ -695,18 +728,22 @@ void fn_80126698(int nPlayer) {
     }
 }
 
-void fn_80126E68(void) {
-    fn_80126EC0();
+// The hole starts (pfn1E4): every player's contest values cleared (GameMode22_ClearPlayerStats).
+void GameMode22_HoleStart(void) {
+    GameMode22_ClearPlayerStats();
 }
 
-void fn_80126E88(void) {
-    fn_80126EC0();
+// The hole restarts (pfn224): every player's contest values cleared, and no winner (n8 5, bC 0).
+void GameMode22_RestartHole(void) {
+    GameMode22_ClearPlayerStats();
     lbl_80195498.n8 = 5;
     lbl_80195498.bC = 0;
 }
 
-// Every player's mode values cleared (and message 0x42 sent for each); no current player.
-void fn_80126EC0(void) {
+// Every player's contest values cleared: drives, fair drives, longest drive, score (nEBC), average,
+// total and the counts per kind (0xEA0..0xEDC; vEAC stays), each score sent to the scoreboard
+// (message 0x42); no current player (5); then GameMode22_AfterClearStats (empty).
+void GameMode22_ClearPlayerStats(void) {
     s32 i;
 
     for (i = 0; i < 5; i++) {
