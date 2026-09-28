@@ -125,3 +125,32 @@ Code:
   DS_vSetAlphaBlendingFunction / PR_vSetCurrentUsage.
 - hotnames comment_state misses a comment above a two-line asm signature with an #else C copy
   (LLMath_mat44fltMultiplyList / List33 are commented).
+
+## Round 5 (re1-re4) leftovers
+Core (for the next core-area touch; the core header pass itself is done, re2):
+- GoRenderCtx_Gc.c 0x800142A4-0x800143B8 is TW07 LLInput.c in order: 800142A4 Input_vSelectControlSet,
+  Controller_GetButtonMask = Input_uiMap, Controller_AnyPadHasButtons = Input_AnyPadPressed,
+  8001437C Input_vStopAllVibration. GoRenderCtx_Gc.c:17 local Mtx_OrthoScale prototype is stale.
+- camera.h View: f50-f58 the view scale, f5C-f64 the view offset (GetCameraViewScale / Offset); v0 is
+  the camera origin (TW07 GetCameraOrigin). Misaligned trailing comments camera.h ~626-628, engine.h
+  ~1345-1358; ~40 camera.h lines past 110 columns.
+- engine.h: PadAnalog is TW07 Controller_StickInfo; the Input_sGetStickInfo prototype comment ("stick
+  bytes at +0, +2, +3") to check. Code8002DB80.c:51 local prototype of Input_vSetVibrationStatus
+  (int, u8) vs definition (int, int). LLVideo.c scissor setter params nWidth/nHeight are right/bottom.
+  GoCamera.c fn_80076948 params fB4/fB8 -> fFlatWidth/fFlatHeight. RenderState nF4/nF8 unnamed.
+Golfer area header pass (char.c / SkinPart.c lanes, include/ not edited):
+- character.h 0x16E4 aPoints: 0 right toe, 1 left toe, 2 right ankle, 3 left ankle (bones
+  0x3A/0x48/0x39/0x47, swapped for a lefty), 4 the club point. 0x179C a179C: the average ground normal
+  under the four foot points. 0x16A8 n16A8: bone 0x15, the right wrist; 0x16A4 nGripBone: bone 0x52
+  "IGdriver". 0x4AC events: EA's SKA tags. character.h:1020 two prototypes on one line;
+  Character_AddTextureLoadRequest params pfnBegin/pfnEnd. lldyntex.h DynTexJob pfnA/pfnB = begin/end.
+- charstate.h: SkinIterArgs "(or, from SkinPart_GetOptionSize, a SkinVariant.nC index)" misleading;
+  SkinDesc7C.n10 = the entry of a SkinDesc14 pB8 run (texture scale/offset) the variant picks;
+  Skin.p10CC one bit per SkinModel.p54 blended matrix Skin.c computes, p10D0 one bit per SkinModel.p44
+  entry Skin.c draws; u10D4 bit 1 (value 0x1) cleared by SkinPart_UpdateMarks; Skin.aParts copy 3
+  newest, copy 0 drawn; Skin.a1048 the toe/ankle points. game/save.h 182-183 past 100 columns.
+- mtalib.c bone table names: 0x36 rhip, 0x38 rknee, 0x39 rankl, 0x3A rtoe, 0x44-0x48 left leg, 0x52
+  IGdriver, 0x53 clubhead, 0x15 rwrst.
+- FEgolferanim.c: 8008E918 likely TW07 FE_SetTextureSwapState, 8008E944 FE_SetDelayTextureSwap.
+- char.c file header is stale ("Not all of it matches yet"): for the lane that finishes char.c.
+Continue: char.c from 0x8001A288 (120 to go); SkinPart.c from 0x800CDAFC SkinPart_FindPart (42 to go).
