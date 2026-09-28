@@ -36,7 +36,8 @@ typedef struct Camera {
     /* 0x018 */ GoFrameBuf* pBuf;    // its frame buffer (GoRenderCtx_Gc.c RC_spCreateRenderCtx)
     /* 0x01C */ char pad1C[0x40];
     /* 0x05C */ float m5C[4][4];     // camera space to the screen (GoDynObj.c fn_8004787C divides by w)
-    /* 0x09C */ float m9C[4][4];     // streammanagerhole.c RenderState_SetCameraMatrices copies it to gRenderState.m74
+    /* 0x09C */ float m9C[4][4];     // the projection: RenderState_SetCameraMatrices (Code80016198.c)
+                                     // copies it to gRenderState.mProjection
     /* 0x0DC */ float mDC[4][4];     // world to the screen (GoCamCont.c fn_8006434C)
     /* 0x11C */ float viewMtx[4][4];
     /* 0x15C */ float m15C[4][4];    // GoShaderObject_Rain_Gc.c fn_800B4FA4 builds its position matrix from it
@@ -69,7 +70,8 @@ LAYOUT_ASSERT(Camera, 0x234);       // GoRenderCtx_Gc.c RC_spCreateRenderCtx all
 GoFrameBuf* fn_80013E40(Camera* pCamera);   // GoRenderCtx_Gc.c: the camera's frame buffer
 
 Sphere* fn_800082F8(RenderObj* obj);
-void LLMath_mat44fltMultiply(float mtx[4][4], Vec4* src, Vec4* dst);
+void LLMath_mat44fltMultiply(float mtx[4][4], Vec4* src, Vec4* dst);   // VecMath.c: dst = src x mtx
+                                                                        // (row vector; dst may be src)
 int fn_80007D74(Sphere* sphere, Camera* cam, int mode);
 float fn_80008320(Camera* cam);
 float fn_80008328(Camera* cam);

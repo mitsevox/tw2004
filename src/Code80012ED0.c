@@ -3,7 +3,7 @@
 // (GoViewport.h VM_fGetViewport*) and a render context's viewport (GoRenderCtx.h). Then the call
 // that hands GX the changed render state, and three of the display-state setters (TW07's
 // Legacy/LL LLDisSt: DS_v...) that each write one group of the render state gRenderState and set
-// that group's bit in u110 for RenderState_Apply. Last an empty start-up step. Its extent is the
+// that group's bit in uChanged for RenderState_Apply. Last an empty start-up step. Its extent is the
 // space between UFont.c and Controller_Gc.c; whether it is one original file is not proven.
 
 #include "engine.h"
@@ -44,14 +44,14 @@ void RenderState_Flush(void) {
 // Sets the depth compare function (GX_ALWAYS turns the depth test off), applied with the next
 // RenderState_Apply.
 void DS_vSetZBufferMode(int nCompare) {
-    gRenderState.n0 = nCompare;
-    gRenderState.u110 |= 0x1;
+    gRenderState.nDepthCompare = nCompare;
+    gRenderState.uChanged |= 0x1;
 }
 
 // Turns depth-buffer writes on or off, applied with the next RenderState_Apply.
 void DS_vEnableZBufferUpdate(int bEnable) {
-    gRenderState.b4 = bEnable;
-    gRenderState.u110 |= 0x2;
+    gRenderState.bDepthWrite = bEnable;
+    gRenderState.uChanged |= 0x2;
 }
 
 // Sets the alpha test of the next draws: bEnable 0 turns it off; otherwise a pixel is drawn when
@@ -63,10 +63,10 @@ void DS_vSetAlphaTestMode(int bEnable, int nCompare, int nRef) {
     int n;
 
     n = nRef * 2 + 1;
-    gRenderState.n8 = nCompare;
-    gRenderState.bC = (n < 0) ? 0 : ((n <= 0xFF) ? n : 0xFF);
-    gRenderState.bD = bEnable;
-    gRenderState.u110 |= 0x4;
+    gRenderState.nAlphaCompare = nCompare;
+    gRenderState.nAlphaRef = (n < 0) ? 0 : ((n <= 0xFF) ? n : 0xFF);
+    gRenderState.bAlphaTest = bEnable;
+    gRenderState.uChanged |= 0x4;
 }
 
 // Empty; called once by the boot sequence fn_80005520, as some module's start-up step. Nothing in

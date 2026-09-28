@@ -527,11 +527,11 @@ u8 fn_800760A8_HasEnded(Video* pVideo) {
 // bottom, both inclusive (RenderState.nBC..nC8; Code80015470.c passes GXSetScissor right - left + 1).
 // The parameters named nWidth and nHeight are the right and bottom edges.
 void fn_800760B0(int nX, int nY, int nWidth, int nHeight) {
-    gRenderState.nBC = nX;
-    gRenderState.nC4 = nY;
-    gRenderState.nC0 = nWidth;
-    gRenderState.nC8 = nHeight;
-    gRenderState.u110 |= 0x200;
+    gRenderState.nScissorLeft = nX;
+    gRenderState.nScissorTop = nY;
+    gRenderState.nScissorRight = nWidth;
+    gRenderState.nScissorBottom = nHeight;
+    gRenderState.uChanged |= 0x200;
 }
 
 // The next draw uses this picture.
