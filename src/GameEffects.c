@@ -95,7 +95,7 @@ f32 fn_800DAF98(f32 fFrameTime) {
     if (fn_800DCB08() && 0.0f != fFrameTime) {
         fFrameTime = FRAME_TIME;
     }
-    if (fn_8005D2DC()) {
+    if (GOLFERSTATE_IsFrozen()) {
         fFrameTime = 0.0f;
     }
     if (fn_800DCB00()) {

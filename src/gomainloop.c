@@ -290,7 +290,7 @@ void FE_movieFade(void);
 void fn_800DFC18(void);
 void GM_Update(void);
 void GR_vInit(void);
-void Luck_ResetAllOdds2(void);
+void Luck_InitIG(void);
 void Player_SetGolfer(int nPlayer, int nGolfer, int nController, u32 uBag, int bRightSide);
 void Players_Reset(void);
 void Players_SetupAll(void);
@@ -677,7 +677,7 @@ void GO_vInitIG(void) {
     }
     GM_SetupDefaultProfile();
     fn_800E5314();
-    Luck_ResetAllOdds2();
+    Luck_InitIG();
     fn_8011407C();
     fn_80065B44();
 }

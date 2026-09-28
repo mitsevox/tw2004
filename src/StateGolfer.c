@@ -17,7 +17,8 @@ u8            gInSwingExit;               // 0x80281E00  set while a state's ent
 // Each player has a small stack of golfer states (GS_*, rows of sGolferStateEngineTable, whose
 // entries carry the state's callbacks). The top is the current state; -1 is empty.
 
-// Empty every player's swing stack.
+// Empties every player's golfer state stack and clears gInSwingExit; once, when the game's modules
+// start.
 void GOLFERSTATE_OpenONCE(void) {
     int i = 0;
     while (i < 5) {
@@ -26,11 +27,13 @@ void GOLFERSTATE_OpenONCE(void) {
     gInSwingExit = 0;
 }
 
-// Run the current state's update for every player (none while GUI_IsPauseMenuOpen() is true).
+// Runs the current golfer state's update for every player that has one, once a frame (slot 1 of the
+// mode state table that Code8005D2E4.c runs). Nothing while the pause menu is open
+// (GUI_IsPauseMenuOpen) or while GOLFERSTATE_IsFrozen is set (never, in this build).
 void GOLFERSTATE_Update(void) {
     int i;
     if (GUI_IsPauseMenuOpen()) return;
-    switch (fn_8005D2DC()) {
+    switch (GOLFERSTATE_IsFrozen()) {
     case 0:
         for (i = 0; i < 5; i++) {
             SwingStack* pStack = &gSwingStacks[(u32)i];
@@ -46,7 +49,8 @@ void GOLFERSTATE_Update(void) {
     }
 }
 
-// Pop every player's states.
+// Pops every player's golfer states, top first, running each one's exit callback (gInSwingExit set
+// around it); once, when the game's modules shut down.
 void GOLFERSTATE_CloseONCE(void) {
     s8*         pTop;
     SwingStack* pStack;
@@ -66,7 +70,8 @@ void GOLFERSTATE_CloseONCE(void) {
     gInSwingExit = 0;
 }
 
-// Pop every state, running each one's exit callback.
+// Pops all of one player's golfer states, top first, running each one's exit callback; the stack is
+// left empty. Players_Reset does it for every player.
 void GOLFERSTATE_Kill(int nPlayer) {
     s8*         pTop;
     SwingStack* pStack = &gSwingStacks[nPlayer];
@@ -107,7 +112,8 @@ void GOLFERSTATE_Pop(int nPlayer) {
     gSwingStacks[nPlayer].nTop--;
 }
 
-// Pop everything and start again from one state.
+// Replaces a player's whole state stack with one state: pops every state, running each one's exit
+// callback, then pushes nState and runs its enter callback.
 void GOLFERSTATE_Set(s8 nState, int nPlayer) {
     void (*pfn)(int);
     while (gSwingStacks[nPlayer].nTop > -1) {
@@ -155,12 +161,17 @@ int GOLFERSTATE_GetCurrentState(int nPlayer) {
     return (u8)pStack->nState[pStack->nTop];
 }
 
+// The state under the current one on the player's stack (the one a Pop returns to), -1 when there
+// is none. The STATEFUNC_* exits ask it whether their state was pushed over GS_SWING.
 s8 GOLFERSTATE_GetPreviousState(int nPlayer) {
     SwingStack* pStack = &gSwingStacks[nPlayer];
     if (pStack->nTop < 1) return -1;
     return pStack->nState[pStack->nTop - 1];
 }
 
-u8 fn_8005D2DC(void) {
+// Whether the golfer states are frozen: always 0 in this build (a stripped switch).
+// GOLFERSTATE_Update runs the states only when it is 0, and the GameEffects time step (fn_800DAF98)
+// stops time while it is set.
+u8 GOLFERSTATE_IsFrozen(void) {
     return 0;
 }

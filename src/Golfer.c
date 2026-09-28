@@ -21,10 +21,13 @@ s8 gLuckOdds[8] = {12, 12, 12, 12, 12}; // 0x802810B0  "1 in n" per player: 12 1
 
 // ---- luck -------------------------------------------------------------------------------------
 
-void Luck_ResetAllOdds2(void) {
+// The round's set-up (GO_vInitIG): every player's lucky-shot odds back to 1 in 12.
+void Luck_InitIG(void) {
     Luck_ResetAllOdds();
 }
 
+// Every player's lucky-shot odds back to 1 in 12, all five player slots (slot 4 is the caddie's
+// copy).
 void Luck_ResetAllOdds(void) {
     int i;
     for (i = 0; i < 5; i++) {
@@ -32,12 +35,15 @@ void Luck_ResetAllOdds(void) {
     }
 }
 
-// The luck odds: "1 in gLuckOdds[n]". 12 at the start of a round, and every hole transition
-// takes one off any player still above 9 - so 1 in 12, 11, 10, then 1 in 9 for the rest.
+// A player's lucky-shot odds back to 1 in 12 (gLuckOdds): every player at the start of a round
+// (Luck_ResetAllOdds), and a player who has just taken a lucky shot (Luck_TakePerfectShot).
+// Luck_TightenOdds improves them hole by hole.
 void Luck_ResetOdds(int nPlayer) {
     gLuckOdds[nPlayer] = 12;
 }
 
+// After each hole (the game loop's hole exit): every player's lucky-shot odds improve by one, 1 in
+// 12, 11, 10, then 1 in 9 for the rest of the round.
 void Luck_TightenOdds(void) {
     int i;
     for (i = 0; i < 5; i++) {
@@ -47,10 +53,13 @@ void Luck_TightenOdds(void) {
     }
 }
 
-// Is this shot the perfect (lucky) one? Humans only, not in split screen (fn_80101D4C can force
-// it). One chance in the player's odds (12), halved when player 0 is 5+ holes down to player 1 in
-// game mode 4 or when fn_800DA234 says so, then cut by LUCK/2 percent. Only off the green, never
-// a putt, and only on a par 3, for pitches, or from lies 1/2 under 250 (fn_800D0478).
+// Rolls whether this shot is the perfect (lucky) one, stored in Player.bPerfect when the shot is
+// planned. Always for a CPU in game mode 11 (fn_80101D4C); never for a CPU or in split screen. The
+// chance is 1 in the player's odds (gLuckOdds, 12 to 9), halved in game mode 4 when player 0 is 5
+// or more holes down to player 1, or else when the hole-in-one prize is on this hole (fn_800DA234);
+// for players 0-3 then cut by LUCK/2 percent (LUCK clamped to 0..110, odds at least 1 in 1). Only
+// off the green and never on a putt, and only on a par 3, for a pitch, or from the fairway (lies 1
+// and 2) within 250 yards of the pin.
 u8 Golfer_IsLucky(int nPlayer) {
     u8      bLucky = 0;
     u32     uOdds;

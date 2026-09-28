@@ -92,7 +92,7 @@ void GOLFERSTATE_Switch(int nState, int nPlayer);   // replace the current state
 // to 61/66). The same holds for the (u8) some callers put on GOLFERSTATE_Set's player (GameMode8,
 // GameRound). Both casts are harmless for the values these take (-1..0x30, 0..4).
 int  GOLFERSTATE_GetCurrentState(int nPlayer);
-u8   fn_8005D2DC(void);
+u8   GOLFERSTATE_IsFrozen(void);
 void STATEFUNC_SimulateInit(int nPlayer);
 void STATEFUNC_SimulateUpdate(int nPlayer);
 void STATEFUNC_SimulateExit(int nPlayer);
