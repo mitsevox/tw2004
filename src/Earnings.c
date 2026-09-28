@@ -356,8 +356,8 @@ int GM_Earnings_CheckUnlockCourses(int nProfile, u8 bMessage) {
     n = 0;
     for (i = 0; i < 21; i++) {
         if (gpSaveData[nProfile].nTotalCash >= gEarningsTable.aCoursePrice[i].nPrice
-            && !fn_800583FC(nProfile, i)) {
-            fn_800583B0(nProfile, i);
+            && !UserInfo_IsCourseUnlocked(nProfile, i)) {
+            UserInfo_UnlockCourse(nProfile, i);
             if (i != 4) {
                 // EA bug: the list holds 10, and up to 20 courses could be bought at once
                 gUnlockedCourses[n] = i;
@@ -369,16 +369,18 @@ int GM_Earnings_CheckUnlockCourses(int nProfile, u8 bMessage) {
             }
         }
     }
-    if (gpSaveData[nProfile].nTotalCash >= gEarningsTable.aCoursePrice[21].nPrice && !fn_800584B4(nProfile)) {
-        fn_80058494(nProfile);
+    if (gpSaveData[nProfile].nTotalCash >= gEarningsTable.aCoursePrice[21].nPrice
+        && !UserInfo_IsCourseSlot22Unlocked(nProfile)) {
+        UserInfo_UnlockCourseSlot22(nProfile);
         GUI_QueueMessage(3, 7, 2, nProfile);
         if (gEarningsTable.aCoursePrice[21].nBio != -1) {
             EASBio_SetAccomplishment(gEarningsTable.aBio[gEarningsTable.aCoursePrice[21].nBio].szName,
                                      gEarningsTable.aBio[gEarningsTable.aCoursePrice[21].nBio].nValue);
         }
     }
-    if (gpSaveData[nProfile].nTotalCash >= gEarningsTable.aCoursePrice[23].nPrice && !fn_8005846C(nProfile)) {
-        fn_8005844C(nProfile);
+    if (gpSaveData[nProfile].nTotalCash >= gEarningsTable.aCoursePrice[23].nPrice
+        && !UserInfo_IsCourseSlot21Unlocked(nProfile)) {
+        UserInfo_UnlockCourseSlot21(nProfile);
         GUI_QueueMessage(3, 7, 3, nProfile);
         if (gEarningsTable.aCoursePrice[23].nBio != -1) {
             EASBio_SetAccomplishment(gEarningsTable.aBio[gEarningsTable.aCoursePrice[23].nBio].szName,
@@ -416,7 +418,7 @@ int GM_GetHighestRatedGolfer(void) {
 int GM_Earnings_RateGolfer(int nPlayer) {
     int nRating;
 
-    nRating = fn_800584DC(gPlayers[nPlayer].nIndex);
+    nRating = UserInfo_GetNumLadderEventsWon(gPlayers[nPlayer].nIndex);
     if (Player_IsCPU(nPlayer)) {
         return gPlayers[nPlayer].golfer.nEarningsRating;
     }
@@ -1244,7 +1246,7 @@ u8 GM_Earnings_CheckEagleEveryPar5(int nPlayer, u8 bPreview) {
     if (!bPreview) {
         bAll = 1;
         for (i = 0; i < 71; i++) {
-            if (!fn_800588F4(&gpSaveData[nProfile], 0, i)) {
+            if (!UserInfo_GetPar5EagleStat(&gpSaveData[nProfile], 0, i)) {
                 bAll = 0;
             }
         }
@@ -1256,7 +1258,7 @@ u8 GM_Earnings_CheckEagleEveryPar5(int nPlayer, u8 bPreview) {
         // EA bug: from here the profile is picked by nPlayer, not nProfile as above.
         nHave = 0;
         for (i = 0; i < 71; i++) {
-            if (fn_800588F4(&gpSaveData[nPlayer], 0, i)) {
+            if (UserInfo_GetPar5EagleStat(&gpSaveData[nPlayer], 0, i)) {
                 nHave++;
             }
         }
@@ -1412,7 +1414,7 @@ u8 GM_Earnings_CheckEagleEveryPar5(int nPlayer, u8 bPreview) {
                 }
                 break;
             }
-            if (nItem >= 0 && !fn_800588F4(&gpSaveData[nPlayer], 0, nItem)) return 1;
+            if (nItem >= 0 && !UserInfo_GetPar5EagleStat(&gpSaveData[nPlayer], 0, nItem)) return 1;
         }
     }
     return 0;
@@ -2502,8 +2504,8 @@ void GM_RecordIndividualHoleStats(int nPlayer) {
                 fn_8011E020(&nMonth, &nDay, &nYear, &nHour, &nMinute, &nSecond, &nMsec);
                 nDate = FE_DateToInt(nMonth, nDay, nYear);
                 if (nMarked != -1) {
-                    fn_8005897C(&gpSaveData[nProfile], 0, nMarked, 1);
-                    fn_8005897C(&gpSaveData[nProfile], 1, nMarked, nDate);
+                    UserInfo_SetPar5EagleStat(&gpSaveData[nProfile], 0, nMarked, 1);
+                    UserInfo_SetPar5EagleStat(&gpSaveData[nProfile], 1, nMarked, nDate);
                 }
             }
         }

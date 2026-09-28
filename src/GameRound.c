@@ -590,7 +590,7 @@ u8 GM_CurrentlyOnLastHole(void) {
 
 // A course's par 5 to its index in the profile's par-5 eagle records (0..74: two to five per
 // course, none on course 7), or -1 for a hole that is not one; nHole counts from 0.
-// GM_UserHasEagledHole and GM_GetPar5EagleDate read the records (fn_800588F4) and
+// GM_UserHasEagledHole and GM_GetPar5EagleDate read the records (UserInfo_GetPar5EagleStat) and
 // GM_GetGameProgress counts them. EA wrote the cases as 1-based hole numbers; the courses come in
 // the original's order, which numbers the records.
 int GM_ConvertCourseAndHoleToPar5EagleIndex(int nCourse, int nHole) {
@@ -755,21 +755,21 @@ int GM_ConvertCourseAndHoleToPar5EagleIndex(int nCourse, int nHole) {
 }
 
 // Whether save profile nSlot has eagled par 5 b (counted from 0) of course a: the record's flag
-// (fn_800588F4 kind 0); 0 when the hole is not a par 5.
+// (UserInfo_GetPar5EagleStat kind 0); 0 when the hole is not a par 5.
 u8 GM_UserHasEagledHole(int nSlot, int a, int b) {
     int i = GM_ConvertCourseAndHoleToPar5EagleIndex(a, b);
     if (i != -1) {
-        return fn_800588F4(&gpSaveData[nSlot], 0, i);
+        return UserInfo_GetPar5EagleStat(&gpSaveData[nSlot], 0, i);
     }
     return 0;
 }
 
-// The date save profile nSlot eagled par 5 b of course a (fn_800588F4 kind 1); 0 when the hole is
-// not a par 5.
+// The date save profile nSlot eagled par 5 b of course a (UserInfo_GetPar5EagleStat kind 1); 0 when
+// the hole is not a par 5.
 int GM_GetPar5EagleDate(int nSlot, int a, int b) {
     int i = GM_ConvertCourseAndHoleToPar5EagleIndex(a, b);
     if (i != -1) {
-        return fn_800588F4(&gpSaveData[nSlot], 1, i);
+        return UserInfo_GetPar5EagleStat(&gpSaveData[nSlot], 1, i);
     }
     return 0;
 }

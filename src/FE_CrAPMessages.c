@@ -461,8 +461,8 @@ void GM_vIsCrAPCategoryWorn(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Menu message 474: choice pArgs[2] under entry pArgs[1] of part pArgs[0] is in use: for part 13
-// (custom animations) its animation is in the profile's list pArgs[1] (fn_800587A8), for other
-// parts it is the asset in its slot (FE_CrAP_IsItemEquipped).
+// (custom animations) its animation is in the profile's list pArgs[1]
+// (FE_CrAP_IsCustomAnimationSelected), for other parts it is the asset in its slot (FE_CrAP_IsItemEquipped).
 void GM_vIsCrAPItemEquipped(MsgArg* pArgs, MsgArg* pResult) {
     char szName[16];                    // the size is unknown (the frame allows up to 20)
     SaveProfile* pProfile = FE_GetCurrentProfile();
@@ -473,7 +473,7 @@ void GM_vIsCrAPItemEquipped(MsgArg* pArgs, MsgArg* pResult) {
     FE_CrAP_GetSubCategoryIDForCategoryAndSubcategoryIndex(nPart, nEntry);
     if (nPart == 13) {
         FE_CrAP_GetPartVariantName(nPart, nEntry, nChoice, szName);
-        pResult->i = fn_800587A8(pProfile, nEntry, szName);
+        pResult->i = FE_CrAP_IsCustomAnimationSelected(pProfile, nEntry, szName);
     } else {
         pResult->i = FE_CrAP_IsItemEquipped(nPart, nEntry, nChoice);
     }

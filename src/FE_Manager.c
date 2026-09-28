@@ -607,7 +607,7 @@ void FE_CrAP_UpdateSaleInfo(int a, int b) {
 // of the session's flags or cheat bit 0 (PasswordManager_IsPasswordEntered(0)). The asset gives a
 // lock kind (FE_CrAP_GetPartGMLockIDByAssetNum) and a value n (FE_CrAP_GetPartGMLockValByAssetNum).
 // Unlocked by kind:
-//   0 bit n of aAssetOwned (bought)       2 bit 1 of a10548 (fn_80058304)
+//   0 bit n of aAssetOwned (bought)       2 bit 1 of a10548 (UserInfo_GetUserFlag)
 //   6 cheat bit n + 1 (codes "A".."E")    7 award aC8[n] won; 8 n of those 31 won
 //   9 PGA TOUR season n reached           10 sponsor n's code entered
 //                                            (PasswordManager_IsSponsorshipPasswordEntered) or signed
@@ -639,7 +639,7 @@ u8 FE_CrAP_IsItemLocked(s32 nAsset, SaveProfile* pProfile) {
         bLocked = BitArray_TestBit(pProfile->aAssetOwned, n) == 0;
         break;
     case 2:
-        bLocked = !fn_80058304(pProfile, 1);
+        bLocked = !UserInfo_GetUserFlag(pProfile, 1);
         break;
     case 3:
         bLocked = 1;

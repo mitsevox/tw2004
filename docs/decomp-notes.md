@@ -316,7 +316,7 @@ They will be sorted into the sections below.
 - **[verified] Early exits:** `if (A || B) return;` compiles B as `bcond; b exit` while separate ifs
   branch straight out (GoCamCont fn_80063920); a `blt` to a return block placed after the fall-through
   code is a `goto` to a label after that code (char GetTerrainHeightAndNormal); a duplicated tail is
-  written twice (`if (n < 30) { if (x) return 1; return t; } return t;`, fe_craputils fn_8005832C).
+  written twice (`if (n < 30) { if (x) return 1; return t; } return t;`, fe_craputils UserInfo_IsGolferAvailable).
 - **[verified] `b = b != 0;`** before a test reproduces `clrlwi; neg; or; srwi.` (char Character_PreRenderAll).
 - **[verified] Two calls multiplied: the right-hand one runs first** (`f(a) * f(b)`; Skeleton SKEL_ItterateIKChain,
   GoRenderCtx RenderState_SetViewport). `f = call(); f *= c;` puts the call result first in `fmuls`; `call() * c` puts
@@ -334,7 +334,7 @@ They will be sorted into the sections below.
 - **[verified] `const` on read-only pointer parameters changes argument-load order** (EASBStorage
   fn_80129F98 94.4 -> 100, fn_8012A050 90.2 -> 100, fn_80128580 83.8 -> 100).
 - **[verified] A constant left in r5..r8 at a call is not always an argument**: it can be left over from a
-  store just before (fe_craputils fn_80058278, fn_8012B4C0, Code800BA940 fn_800BAA50). Check before
+  store just before (fe_craputils UserInfo_UnlockGolfer, fn_8012B4C0, Code800BA940 fn_800BAA50). Check before
   adding parameters.
 - **[verified] `volatile` on a global that interrupt callbacks write** (LLDisp_Gc's DispSync) fixed five
   functions at once; this is real volatile, not a fake match.

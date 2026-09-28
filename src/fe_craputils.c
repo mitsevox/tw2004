@@ -10,11 +10,14 @@
 
 char lbl_80188138[] = "NoLogoName";
 
-void fn_80057FBC(SaveProfile* pProfile);
-void fn_80058208(SaveProfile* pProfile);
+void UserInfo_InitCrAPItemBitArrays(SaveProfile* pProfile);
+void FE_CrAP_ResetSliders(SaveProfile* pProfile);
 
-// Resets the Create-A-Player data: nothing chosen, the sliders at 50, the asset bits refreshed and
-// the logos renamed.
+// Resets a profile's Create-A-Player data: clears 0x5500..0xB634 (the choices, the date, the asset
+// slots and the four asset bit arrays), sets every part and set choice to -1 (none) and the 26
+// sliders to 50 (FE_CrAP_ResetSliders), refreshes the asset bits, logos and slots from the database
+// when it is loaded (UserInfo_InitCrAPItemBitArrays) and names the five user logos "NoLogoName".
+// Called when a profile is loaded (MC_LoadUser, MC_LoadLastUser) or set up.
 void FE_CrAP_InitCrAPInfo(SaveProfile* pProfile) {
     int i;
 
@@ -25,16 +28,19 @@ void FE_CrAP_InitCrAPInfo(SaveProfile* pProfile) {
                sizeof(pProfile->nDateYear) + sizeof(pProfile->aAF80) + 4 * sizeof(pProfile->aAssetLocked));
     memset(pProfile->choices.aParts, -1, sizeof(pProfile->choices.aParts));
     memset(pProfile->choices.aSets, -1, sizeof(pProfile->choices.aSets));
-    fn_80058208(pProfile);
-    fn_80057FBC(pProfile);
+    FE_CrAP_ResetSliders(pProfile);
+    UserInfo_InitCrAPItemBitArrays(pProfile);
     for (i = 0; i < 5; i++) {
         strcpy(pProfile->choices.aLogo[i].szName, lbl_80188138);
     }
 }
 
-// Refreshes the four asset bit arrays from the Create-A-Player database (when it is loaded), then
-// clears the logos' bSaved and empties the asset slots.
-void fn_80057FBC(SaveProfile* pProfile) {
+// Only while the Create-A-Player database is loaded: for every asset, aAssetOwned is set for a
+// level-0 asset (FE_CrAP_GetPartLevelFromAssetIndex) and cleared otherwise, aAssetNew and
+// aAssetMarkedNew are cleared, and aAssetLocked is set as fn_80078008 answers with the asset's own
+// gender made current (the current gender is put back after). Then the five user logos' bSaved are
+// cleared and the 53 asset slots (aAF80) emptied (-1).
+void UserInfo_InitCrAPItemBitArrays(SaveProfile* pProfile) {
     s8 nOffered;
     s32 nAssets;
     s32 i;
@@ -67,8 +73,9 @@ void fn_80057FBC(SaveProfile* pProfile) {
     }
 }
 
-// The 26 bytes at 0x5EB4 start at 50, set one by one (the last two in EA's order: 25, then 24).
-void fn_80058208(SaveProfile* pProfile) {
+// Puts the created golfer's 26 sliders (choices.a9B4) at 50, the middle. EA sets them one by one,
+// 25 before 24.
+void FE_CrAP_ResetSliders(SaveProfile* pProfile) {
     pProfile->choices.a9B4[0] = 50;
     pProfile->choices.a9B4[1] = 50;
     pProfile->choices.a9B4[2] = 50;
@@ -97,13 +104,16 @@ void fn_80058208(SaveProfile* pProfile) {
     pProfile->choices.a9B4[24] = 50;
 }
 
-// Unlock golfer nGolfer for profile nProfile, and tell the event table (event 0x42).
-void fn_80058278(int nProfile, int nGolfer) {
+// Unlocks golfer nGolfer (0..29) for save profile nProfile (aGolferUnlocked) and triggers event
+// 0x42 (EVENT_UnlockedNewCharacter). The ladder unlocks the opponent it beat (GameMode4_WinEvent).
+void UserInfo_UnlockGolfer(int nProfile, int nGolfer) {
     gpSaveData[nProfile].aGolferUnlocked[nGolfer] = 1;
     EVENT_Trigger(nProfile, 0x42, NULL, -1);
 }
 
-void fn_800582C4(SaveProfile* pProfile, int nBit, u8 bSet) {
+// Sets (bSet) or clears flag bit nBit of the profile's a10548. Bit 1 records that the Game Boy
+// Advance link's unlocks were given (GM_vGbaGrantUnlocks).
+void UserInfo_SetUserFlag(SaveProfile* pProfile, int nBit, u8 bSet) {
     if (bSet) {
         BitArray_SetBit(pProfile->a10548, nBit);
     } else {
@@ -111,12 +121,13 @@ void fn_800582C4(SaveProfile* pProfile, int nBit, u8 bSet) {
     }
 }
 
-u8 fn_80058304(SaveProfile* pProfile, int nBit) {
+u8 UserInfo_GetUserFlag(SaveProfile* pProfile, int nBit) {
     return BitArray_TestBit(pProfile->a10548, nBit);
 }
 
-// Golfer nGolfer is unlocked for profile nProfile, or available to everyone.
-u8 fn_8005832C(int nProfile, int nGolfer) {
+// 1 when golfer nGolfer can be played with save profile nProfile: one of the first 30 that the
+// profile has unlocked (aGolferUnlocked), or any golfer whose gGolferTable entry has bAvailable 1.
+u8 UserInfo_IsGolferAvailable(int nProfile, int nGolfer) {
     if (nGolfer < 30) {
         if (gpSaveData[nProfile].aGolferUnlocked[nGolfer]) {
             return 1;
@@ -126,38 +137,49 @@ u8 fn_8005832C(int nProfile, int nGolfer) {
     return (s8)gGolferTable[nGolfer].bAvailable == 1;
 }
 
-// Unlock course nCourse for profile nProfile, and tell the event table (event 0x43).
-void fn_800583B0(int nProfile, int nCourse) {
+// Unlocks course nCourse (0..20) for save profile nProfile (aCourseUnlocked) and triggers event
+// 0x43 (EVENT_UnlockedNewCourse). GM_Earnings_CheckUnlockCourses calls it when the profile's money
+// reaches the course's price.
+void UserInfo_UnlockCourse(int nProfile, int nCourse) {
     gpSaveData[nProfile].aCourseUnlocked[nCourse] = 1;
     EVENT_Trigger(nProfile, 0x43, NULL, -1);
 }
 
-u8 fn_800583FC(int nProfile, int nCourse) {
+u8 UserInfo_IsCourseUnlocked(int nProfile, int nCourse) {
     return gpSaveData[nProfile].aCourseUnlocked[nCourse] != 0;
 }
 
-void fn_80058428(int nProfile, int nReward) {
+// Unlocks reward nReward for save profile nProfile (aRewardUnlocked); no event. The ladder gives
+// its event's reward (GameMode4_WinEvent).
+void UserInfo_UnlockReward(int nProfile, int nReward) {
     gpSaveData[nProfile].aRewardUnlocked[nReward] = 1;
 }
 
-void fn_8005844C(int nProfile) {
+// Unlocks course slot 21 for save profile nProfile (aCourseUnlocked[21]; the course picker's choice
+// 2, GM_vIsCourseChoiceUnlocked), with no event. GM_Earnings_CheckUnlockCourses buys it with price
+// 23.
+void UserInfo_UnlockCourseSlot21(int nProfile) {
     gpSaveData[nProfile].aCourseUnlocked[21] = 1;
 }
 
-u8 fn_8005846C(int nProfile) {
+u8 UserInfo_IsCourseSlot21Unlocked(int nProfile) {
     return gpSaveData[nProfile].aCourseUnlocked[21] != 0;
 }
 
-void fn_80058494(int nProfile) {
+// Unlocks course slot 22 for save profile nProfile (aCourseUnlocked[22]; the course picker's choice
+// 3, GM_vIsCourseChoiceUnlocked), with no event. GM_Earnings_CheckUnlockCourses buys it with price
+// 21.
+void UserInfo_UnlockCourseSlot22(int nProfile) {
     gpSaveData[nProfile].aCourseUnlocked[22] = 1;
 }
 
-u8 fn_800584B4(int nProfile) {
+u8 UserInfo_IsCourseSlot22Unlocked(int nProfile) {
     return gpSaveData[nProfile].aCourseUnlocked[22] != 0;
 }
 
-// The number of ladder events profile nProfile has won.
-int fn_800584DC(int nProfile) {
+// The number of the 25 ladder events save profile nProfile has won (aLadderAward[].bWon).
+// GM_Earnings_RateGolfer uses it as the profile's earnings rating.
+int UserInfo_GetNumLadderEventsWon(int nProfile) {
     int nWon = 0;
     int i;
 
@@ -169,7 +191,11 @@ int fn_800584DC(int nProfile) {
     return nWon;
 }
 
-void fn_80058560(SaveProfile* pProfile, int nKind, char* pName) {
+// Adds animation pName to the created golfer's custom animation list nKind (the entry of part 13 it
+// belongs to): lists 0 and 1 (choices.a1, a82) take up to 8 names and ignore more; list 2 holds one
+// name (sz103), which this replaces and switches on (n102 = 1). Called when a part 13 asset is
+// turned on (sTurnOnAnimation).
+void FE_CrAP_AddCustomAnimation(SaveProfile* pProfile, int nKind, char* pName) {
     switch (nKind) {
     case 2:
         strcpy(pProfile->choices.sz103, pName);
@@ -190,7 +216,10 @@ void fn_80058560(SaveProfile* pProfile, int nKind, char* pName) {
     }
 }
 
-void fn_80058624(SaveProfile* pProfile, int nKind, char* pName) {
+// Takes animation pName out of the created golfer's custom animation list nKind: in lists 0 and 1
+// the names after it move up one; list 2 is simply switched off (n102 = 0) whatever pName is. A
+// name not in the list changes nothing.
+void FE_CrAP_RemoveCustomAnimation(SaveProfile* pProfile, int nKind, char* pName) {
     int nFound;
     int i;
 
@@ -231,7 +260,9 @@ void fn_80058624(SaveProfile* pProfile, int nKind, char* pName) {
     }
 }
 
-u8 fn_800587A8(SaveProfile* pProfile, int nKind, char* pName) {
+// 1 when animation pName is in the created golfer's custom animation list nKind (0..2; list 2
+// counts only while it is switched on). Any other nKind: 0.
+u8 FE_CrAP_IsCustomAnimationSelected(SaveProfile* pProfile, int nKind, char* pName) {
     int i;
 
     switch (nKind) {
@@ -261,19 +292,22 @@ u8 fn_800587A8(SaveProfile* pProfile, int nKind, char* pName) {
     return 0;
 }
 
-void fn_800588D4(s16 n) {
+// Signs sponsor n (a Create-A-Player asset's n2C) into lbl_80281DF0, the sponsorship a new profile
+// starts with; the profile setup (PasswordManager.c) copies it into the profile's first slot.
+// Called by PGASponsor_PickStartingSponsor.
+void FE_SetStartingSponsor(s16 n) {
     lbl_80281DF0.bSigned = 1;
     lbl_80281DF0.nSponsor = n;
 }
 
-int fn_800588E8(void) {
+int FE_GetStartingSponsor(void) {
     return lbl_80281DF0.nSponsor;
 }
 
-// Par-5 eagle record i (GM_ConvertCourseAndHoleToPar5EagleIndex): kind 0 whether the hole is
-// eagled, kind 1 the eagle's date; -1 for another kind. Records 0..70 are kept in a5004/a504C,
-// 71..74 in a10578/a1057C.
-int fn_800588F4(SaveProfile* pProfile, int nKind, int i) {
+// Par-5 eagle record i (GM_ConvertCourseAndHoleToPar5EagleIndex, 0..74) of the profile: kind 0
+// whether the hole has been eagled, kind 1 the date of that eagle (packed by fn_80078604); -1 for
+// another kind. Records 0..70 are kept in a5004/a504C, 71..74 in a10578/a1057C.
+int UserInfo_GetPar5EagleStat(SaveProfile* pProfile, int nKind, int i) {
     u8 bFirst = i < 71;
 
     switch (nKind) {
@@ -291,7 +325,10 @@ int fn_800588F4(SaveProfile* pProfile, int nKind, int i) {
     return -1;
 }
 
-void fn_8005897C(SaveProfile* pProfile, int nKind, int i, int nValue) {
+// Sets par-5 eagle record i of the profile to nValue: kind 0 the eagled flag (stored as a byte),
+// kind 1 the eagle's date; another kind is ignored. Records 0..70 go to a5004/a504C, 71..74 to
+// a10578/a1057C.
+void UserInfo_SetPar5EagleStat(SaveProfile* pProfile, int nKind, int i, int nValue) {
     u8 bFirst = i < 71;
 
     switch (nKind) {

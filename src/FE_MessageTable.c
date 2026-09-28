@@ -3357,14 +3357,14 @@ void GM_vGetProfileStats(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 173: how many of par-5 holes 0..70 save profile pArgs[0] has eagled
-// (fn_800588F4's kind 0, a5004); holes 71..74 (a10578) are not counted.
+// (UserInfo_GetPar5EagleStat's kind 0, a5004); holes 71..74 (a10578) are not counted.
 void GM_vPar5Eagles(MsgArg* pArgs, MsgArg* pResult) {
     int n;
     int i;
 
     n = 0;
     for (i = 0; i < 71; i++) {
-        if (fn_800588F4(&gpSaveData[pArgs[0].i], 0, i) == 1) {
+        if (UserInfo_GetPar5EagleStat(&gpSaveData[pArgs[0].i], 0, i) == 1) {
             n++;
         }
     }
@@ -5690,10 +5690,10 @@ void GM_vGbaCancelLink(MsgArg* pArgs, MsgArg* pResult) {
 void GM_vGbaGrantUnlocks(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
 
-    if (!fn_80058304(pProfile, 1)) {
+    if (!UserInfo_GetUserFlag(pProfile, 1)) {
         Gba_UnlockProfileRewards();
         Gba_MarkUnlocksGranted();
-        fn_800582C4(pProfile, 1, 1);
+        UserInfo_SetUserFlag(pProfile, 1, 1);
         pResult->i = 1;
         return;
     }

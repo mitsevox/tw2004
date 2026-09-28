@@ -337,8 +337,8 @@ void sTurnOffAnimation(CrAPAsset* pAsset, int b) {
     char szName[16];
 
     FE_CrAP_GetAssetVariantName(pAsset, szName);
-    if (fn_800587A8(pProfile, b, szName)) {
-        fn_80058624(pProfile, b, szName);
+    if (FE_CrAP_IsCustomAnimationSelected(pProfile, b, szName)) {
+        FE_CrAP_RemoveCustomAnimation(pProfile, b, szName);
     }
 }
 
@@ -397,10 +397,10 @@ void sTurnOnAnimation(CrAPAsset* pAsset, int b) {
     char szName[24];
 
     FE_CrAP_GetAssetVariantName(pAsset, szName);
-    if (fn_800587A8(pProfile, b, szName)) {
-        fn_80058624(pProfile, b, szName);
+    if (FE_CrAP_IsCustomAnimationSelected(pProfile, b, szName)) {
+        FE_CrAP_RemoveCustomAnimation(pProfile, b, szName);
     } else {
-        fn_80058560(pProfile, b, szName);
+        FE_CrAP_AddCustomAnimation(pProfile, b, szName);
         if (FE_GetCurrentAnimName() == NULL || strcmp(FE_GetCurrentAnimName(), szName) != 0) {
             FE_QueueCrAPAnim(szName, FE_CrAP_GetStringFromTable(pAsset->n114), 1, 0);
         }

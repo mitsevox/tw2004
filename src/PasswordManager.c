@@ -224,7 +224,7 @@ void PasswordManager_SetDefaults(void) {
         lbl_80281DF4->aRTEAward[i].bWon = 0;
     }
     for (i = 0; i < 75; i++) {
-        fn_8005897C(lbl_80281DF4, 0, i, 0);
+        UserInfo_SetPar5EagleStat(lbl_80281DF4, 0, i, 0);
     }
     for (i = 0; i < 29; i++) {
         lbl_80281DF4->aMedal[i] = 3;
@@ -361,7 +361,7 @@ void SaveProfile_InitNew(SaveProfile* pProfile) {
         pProfile->aRTEAward[i].bWon = 0;
     }
     for (i = 0; i < 75; i++) {
-        fn_8005897C(pProfile, 0, i, 0);
+        UserInfo_SetPar5EagleStat(pProfile, 0, i, 0);
     }
     for (i = 0; i < 29; i++) {
         pProfile->aMedal[i] = 3;

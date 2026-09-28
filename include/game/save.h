@@ -195,8 +195,8 @@ LAYOUT_ASSERT(SkinChoice, 8);
 // or the skin from it; SkinPart_ApplyClubChoices gives the other six skins theirs;
 // char_tex_manager.c puts its logos on the model.
 typedef struct SkinChoices {
-    // Three name lists of the created golfer (fe_craputils.c fn_80058560 adds, fn_80058624 removes,
-    // fn_800587A8 looks up): lists 0 and 1 hold up to 8 names with a count, list 2 one name (its
+    // Three name lists of the created golfer (fe_craputils.c FE_CrAP_AddCustomAnimation adds, FE_CrAP_RemoveCustomAnimation removes,
+    // FE_CrAP_IsCustomAnimationSelected looks up): lists 0 and 1 hold up to 8 names with a count, list 2 one name (its
     // count is 0 or 1).
     s8   n0;                    // 0x000  names in a1
     char a1[8][0x10];           // 0x001
@@ -214,7 +214,7 @@ typedef struct SkinChoices {
     u8   a9B4[26];              // 0x9B4  the 26 sliders (CharSlider_UpdateCharacterBasedOnSliderValues;
                                 //        a menu message reads slider n signed); set to 50 each when
                                 //        FE_CrAP_InitCrAPInfo clears
-                                //        the profile's 0x5500..0xB634 (fn_80058208)
+                                //        the profile's 0x5500..0xB634 (FE_CrAP_ResetSliders)
     u8   unk9CE[2];
     LogoRecord aLogo[5];        // 0x9D0  the user logos ("_usrtextr0".."_usrtextr4")
     u8   nGender;               // 0x5A7A  (the profile's 0xAF7A) the created golfer's gender
@@ -254,9 +254,9 @@ typedef struct SaveProfile {
     u8   bActive;               // 0x00000  1: the slot holds a profile; payouts are scaled and
                                 //          awards given only then
     char szName[0x1C - 0x1];    // 0x00001  the profile's name, compared with the record holders'
-    u8   aGolferUnlocked[30];   // 0x0001C  per golfer (fn_80058278 sets, fn_8005832C tests)
+    u8   aGolferUnlocked[30];   // 0x0001C  per golfer (UserInfo_UnlockGolfer sets, UserInfo_IsGolferAvailable tests)
     u8   aCourseUnlocked[23];   // 0x0003A  per course
-    u8   aRewardUnlocked[0x64 - 0x51];  // 0x00051  per reward (fn_80058428 sets); the
+    u8   aRewardUnlocked[0x64 - 0x51];  // 0x00051  per reward (UserInfo_UnlockReward sets); the
                                 //          "THEKITCHENSINK" code (0x80056568) sets the first 18
     s32  nTotalCash;            // 0x00064  all the money ever won: every payout is added
                                 //          (GM_Earnings_AwardMoney), nothing taken off; a course
@@ -305,7 +305,7 @@ typedef struct SaveProfile {
                                 //          the top 25 of the tour
                                 //          (GM_PgaTourSim_CheckEndOfTournamentAward)
     Award aRTEAward[75];        // 0x0020C  per real-time event id. TW06: rteEventAwardInfo
-    Award aLadderAward[25];     // 0x00338  per ladder event (LadderedMode.c); fn_800584DC's earnings
+    Award aLadderAward[25];     // 0x00338  per ladder event (LadderedMode.c); UserInfo_GetNumLadderEventsWon's earnings
                                 //          rating counts the won ones
     Award aAward[39];           // 0x0039C
     Replay aReplay[5];          // 0x00438  a Replay each, saved with awards 0, 6, 9, 3 and 13
@@ -314,10 +314,10 @@ typedef struct SaveProfile {
                                 //          (GM_Earnings_ComputeTOURCardModifiers)
     u8   a5004[71];             // 0x05004  per par-5 hole 0..70 (GM_ConvertCourseAndHoleToPar5EagleIndex):
                                 //          1 once the profile has eagled it (Earnings.c);
-                                //          fn_800588F4's kind 0
+                                //          UserInfo_GetPar5EagleStat's kind 0
     u8   unk504B;
     s32  a504C[71];             // 0x0504C  the same holes: the date of that eagle (packed by FE_DateToInt);
-                                //          fn_800588F4's kind 1
+                                //          UserInfo_GetPar5EagleStat's kind 1
     s32  n5168;                 // 0x05168  set to 3 with the medals by the profile setup
     s32  aMedal[29];           // 0x0516C  the best medal per challenge group (0 best, 3 none)
     u8   unk51E0[4];
@@ -367,11 +367,11 @@ typedef struct SaveProfile {
                                 //          in a month; no C code here writes it
     u8   unk10546[0x10548 - 0x10546];
     u32  a10548[1];             // 0x10548  a bit array: FE_CrAPMessages.c's GM_vGetProfileFlag tests
-                                //          bit n; fn_80058304 tests one (bit 1 for FE_Manager)
+                                //          bit n; UserInfo_GetUserFlag tests one (bit 1 for FE_Manager)
     SponsorSlot aSponsor[11];   // 0x1054C  the sponsorship slots; cleared by the profile setup;
                                 //          FE_CrAP_IsItemLocked's lock kinds 10 (a sponsor signed) and 11
                                 //          (so many slots signed) read them
-    u8   a10578[4];             // 0x10578  par-5 holes 71..74, as a5004: eagled (fn_800588F4's kind 0)
+    u8   a10578[4];             // 0x10578  par-5 holes 71..74, as a5004: eagled (UserInfo_GetPar5EagleStat's kind 0)
     s32  a1057C[4];             // 0x1057C  and their eagle dates, as a504C (kind 1)
     u8   unk1058C[0x10600 - 0x1058C];
 } SaveProfile;
@@ -411,27 +411,27 @@ u8   GM_Earnings_GiveAwardToUser(int nPlayer, Award* pAward);
 // fe_craputils.c (TW06's FE_CrAP_ utilities)
 extern char lbl_80188138[];     // "NoLogoName": a user logo's name until one is given
 void FE_CrAP_InitCrAPInfo(SaveProfile* pProfile);
-void fn_80058278(int nProfile, int nGolfer);        // unlock a golfer for the profile
-void fn_800582C4(SaveProfile* pProfile, int nBit, u8 bSet);    // set or clear bit nBit of a10548
-u8   fn_80058304(SaveProfile* pProfile, int nBit);  // bit nBit of pProfile->a10548
-u8   fn_8005832C(int nProfile, int nGolfer);        // the golfer is unlocked for the profile
-void fn_800583B0(int nProfile, int nCourse);        // unlock a course (aCourseUnlocked)
-u8   fn_800583FC(int nProfile, int nCourse);        // whether a course is unlocked
-void fn_80058428(int nProfile, int nReward);        // unlock a reward
-void fn_8005844C(int nProfile);                     // set aCourseUnlocked[21] (no event)
-u8   fn_8005846C(int nProfile);
-void fn_80058494(int nProfile);                     // and for aCourseUnlocked[22]
-u8   fn_800584B4(int nProfile);
-int  fn_800584DC(int nProfile);                     // how many ladder events the profile has won
-void fn_80058560(SaveProfile* pProfile, int nKind, char* pName);  // add pName to list nKind
-void fn_80058624(SaveProfile* pProfile, int nKind, char* pName);  // take pName out of list nKind
-u8   fn_800587A8(SaveProfile* pProfile, int nKind, char* pName);  // pName is in list nKind (0..2)
-void fn_800588D4(s16 n);            // sign lbl_80281DF0 with sponsor n
-int  fn_800588E8(void);             // lbl_80281DF0's sponsor (callers take it without extsh)
+void UserInfo_UnlockGolfer(int nProfile, int nGolfer);        // unlock a golfer for the profile
+void UserInfo_SetUserFlag(SaveProfile* pProfile, int nBit, u8 bSet);    // set or clear bit nBit of a10548
+u8   UserInfo_GetUserFlag(SaveProfile* pProfile, int nBit);  // bit nBit of pProfile->a10548
+u8   UserInfo_IsGolferAvailable(int nProfile, int nGolfer);        // the golfer is unlocked for the profile
+void UserInfo_UnlockCourse(int nProfile, int nCourse);        // unlock a course (aCourseUnlocked)
+u8   UserInfo_IsCourseUnlocked(int nProfile, int nCourse);        // whether a course is unlocked
+void UserInfo_UnlockReward(int nProfile, int nReward);        // unlock a reward
+void UserInfo_UnlockCourseSlot21(int nProfile);                     // set aCourseUnlocked[21] (no event)
+u8   UserInfo_IsCourseSlot21Unlocked(int nProfile);
+void UserInfo_UnlockCourseSlot22(int nProfile);                     // and for aCourseUnlocked[22]
+u8   UserInfo_IsCourseSlot22Unlocked(int nProfile);
+int  UserInfo_GetNumLadderEventsWon(int nProfile);                     // how many ladder events the profile has won
+void FE_CrAP_AddCustomAnimation(SaveProfile* pProfile, int nKind, char* pName);  // add pName to list nKind
+void FE_CrAP_RemoveCustomAnimation(SaveProfile* pProfile, int nKind, char* pName);  // take pName out of list nKind
+u8   FE_CrAP_IsCustomAnimationSelected(SaveProfile* pProfile, int nKind, char* pName);  // pName is in list nKind (0..2)
+void FE_SetStartingSponsor(s16 n);            // sign lbl_80281DF0 with sponsor n
+int  FE_GetStartingSponsor(void);             // lbl_80281DF0's sponsor (callers take it without extsh)
 
 // 0x800588F4: par-5 eagle record i: kind 0 whether that hole is eagled (a5004/a10578), kind 1 the
 // eagle's date (a504C/a1057C); -1 for another kind.
-int  fn_800588F4(SaveProfile* pProfile, int nKind, int i);
-void fn_8005897C(SaveProfile* pProfile, int nKind, int i, int nValue);  // and set it
+int  UserInfo_GetPar5EagleStat(SaveProfile* pProfile, int nKind, int i);
+void UserInfo_SetPar5EagleStat(SaveProfile* pProfile, int nKind, int i, int nValue);  // and set it
 
 #endif

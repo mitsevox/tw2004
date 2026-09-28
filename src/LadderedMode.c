@@ -89,10 +89,11 @@ void GameMode4_Init(void) {
 void GameMode4_CloseFE(void) {
 }
 
-// How many of the 25 ladder events player 0's profile has won (fn_800584DC counts its aLadderAward
-// flags). The money rating (GM_GetGolferMoneyRating) and two front-end messages read it.
+// How many of the 25 ladder events player 0's profile has won (UserInfo_GetNumLadderEventsWon
+// counts its aLadderAward flags). The money rating (GM_GetGolferMoneyRating) and two front-end
+// messages read it.
 int GameMode4_GetNumEventsWon(void) {
-    return fn_800584DC(gPlayers[0].nIndex);
+    return UserInfo_GetNumLadderEventsWon(gPlayers[0].nIndex);
 }
 
 // Event nEvent's opponent, a golfer id (34 = none: GameMode4_WinEvent then unlocks nobody).
@@ -366,12 +367,12 @@ void GameMode4_WinEvent(void) {
         // EA bug: the profile number goes in as the player number, so GM_Earnings_GiveAwardToUser checks
         // gPlayers[nProfile] (player 0 only while player 0 plays profile 0).
         GM_Earnings_GiveAwardToUser(nProfile, &gpSaveData[nProfile].aLadderAward[nEvent]);
-        if (gLadderOpponent != 34 && !fn_8005832C(nProfile, gLadderOpponent)) {
-            fn_80058278(nProfile, gLadderOpponent);
+        if (gLadderOpponent != 34 && !UserInfo_IsGolferAvailable(nProfile, gLadderOpponent)) {
+            UserInfo_UnlockGolfer(nProfile, gLadderOpponent);
             GUI_QueueMessage(4, gLadderOpponent, 0, nProfile);
         }
         if (gLadderReward != 0) {
-            fn_80058428(nProfile, gLadderReward - 1);
+            UserInfo_UnlockReward(nProfile, gLadderReward - 1);
             GUI_QueueMessage(3, 0x16, gLadderReward, nProfile);
         }
         if (gLadderEventBonus != 0) {
