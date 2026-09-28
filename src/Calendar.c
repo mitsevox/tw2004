@@ -1,13 +1,18 @@
-// Calendar.c (our name): dates for the tour season: a day number (u16, day 1 is 1 January 1900)
-// turned into weekday, day, month and year and back, month steps, today's date (CalDate_GetToday) and
-// the date strings the menus print.
+// Calendar.c (EA's name: TW07's golf/gamemode/Calendar.c, TW06's calendar.c; every function here
+// has TW07's name): dates as day numbers (a u16, CalendarDate in TW07; day 1 is 1 January 1900,
+// which counts as a leap year, see IsLeapYear): turned into month, day and year and back, the
+// weekday, month steps, today's date from the console clock (CalDate_GetToday) and the
+// "month/day/year" strings the menus print. The tour season, the calendar screen, the awards and
+// the Play Now medals keep their dates this way. TW07's CalDate_GetYear, CalDate_SetMDYHMS,
+// CalDate_AddMonths and CalDate_AddYears are not in this build.
 
 #include "game.h"
 
 u8  IsLeapYear(u32 nYear);
 u32 DaysInYear(u32 nYear);
 
-u8 gMonthDays[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};    // days in each month
+// The days of January..December; February's 28 (DaysInMonth gives 29 in a leap year).
+u8 gMonthDays[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 // Whether a year is a leap year. EA bug: 1900 counts as one (it was not), which the day numbers
 // rely on (36525 days from 1900 to 2000).

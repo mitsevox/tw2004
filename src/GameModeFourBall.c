@@ -1,5 +1,12 @@
-// GameModeFourBall.c (TW06's GameModeFourBall): game mode 20, two-against-two match play where each
-// team counts its better ball on every hole. Team 0 is players 0 and 1, team 1 players 2 and 3.
+// GameModeFourBall.c (TW06's class GameModeFourBall; TW07's GameMode_FourBall.cpp): game mode 20,
+// two-against-two match play where each team counts its better ball on every hole. Team 0 is players
+// 0 and 1, team 1 players 2 and 3. The mode's callbacks and the team tests they share (TeamDone,
+// TeamConceded, TeamBestPossibleScore, TeamMatchWins: TW06's and TW07's names). A hole goes to the
+// team that holes out beyond the other's reach, or whose opponents both concede; its point is
+// booked on the team's first player (0 or 2). The match ends once a team leads by more holes than
+// are left; level after the last hole, a sudden-death playoff follows. A human team that beats an
+// all-CPU team over a full round is paid the team stroke prize (GameModeFourBall_EndGame).
+// GameModeBestBall.c (mode 19) is its stroke-play twin.
 
 #include "golfer.h"
 #include "ball.h"

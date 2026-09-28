@@ -1,9 +1,17 @@
-// FE_MessageTable.c (our name): the menus' message table. The menu UI (uiProcessInterface.c) sends
-// its messages here while the front end runs (game type 3): FE_InitGameMessages fills 612 of a table of
-// 770 slots with handlers and FE_RunGameMessage calls the one for a message's number with its arguments
-// and results. The handlers read and set what the menus show: golfer names, the session's setup,
-// the save profile's stats and records, the Create-A-Player choices. TW06 has GetGolferName in
-// apt_fe_gamemessages.c. Rounds have their own table (IG_RunGameMessage).
+// FE_MessageTable.c (our name): the front end's messages, the questions and orders the menu UI
+// sends while the menus run (game type 3; uiProcessInterface.c routes them to FE_RunGameMessage).
+// FE_InitGameMessages fills gFEMessageHandlers, 612 of 770 slots, with this file's handlers and those
+// of the other front-end files (Create-A-Player, the logo editor, the PGA TOUR screens, the
+// calendar, the ladder, the trophy room). This file's handlers set up the game the menus start
+// (mode, players, golfers, controllers, course, holes, tees, weather), work the memory card
+// screens (card state, loading and saving profiles and options), set the options (commentary,
+// sounds) and read the save profiles' stats and records for the menus. The handlers are EA's
+// GM_v... message functions: TW07's UI_Core/frontend/GameMessages/APT_FE_GameMessages.c (TW06's
+// apt_fe_gamemessages.c) has GetGolferName, GM_vGetGolferName, GM_vGetGameMode, GM_vHideCharacter,
+// GM_vSetCharState and GM_vSetCommentaryOption, but in another order and mostly with other
+// handlers, so most names here are read from the code; a handler that is empty or answers a
+// constant is named after its message number. The round's twin is GameUICommands.c
+// (IG_RunGameMessage).
 
 #include "game.h"
 #include "camera.h"
@@ -185,7 +193,7 @@ void PGASchedule_Build(MsgArg* pArgs, MsgArg* pResult);
 void PGATourMsg_GetLastEventLine(MsgArg* pArgs, MsgArg* pResult);
 void PGATourMsg_IsSeasonOver(MsgArg* pArgs, MsgArg* pResult);
 void PGASeasonWrapUp_GetLine(MsgArg* pArgs, MsgArg* pResult);
-void PGADriver_ShowCalendar_AdvanceSeason(MsgArg* pArgs, MsgArg* pResult);
+void PGADriver_ShowCalendar_AdvanceSeason(void);       // FE_PGATourMessages.c: message 553
 void PGATourMsg_GetTestText(MsgArg* pArgs, MsgArg* pResult);
 void PGATourMsg_Get25(MsgArg* pArgs, MsgArg* pResult);
 void PGASponsor_SignNext(MsgArg* pArgs, MsgArg* pResult);
@@ -705,7 +713,8 @@ void fn_80084F3C(MsgArg* pArgs, MsgArg* pResult);
 void fn_80084F40(MsgArg* pArgs, MsgArg* pResult);
 void fn_80084F84(MsgArg* pArgs, MsgArg* pResult);
 
-// The handlers, by message number (FE_InitGameMessages fills it).
+// The front end's message handlers by message number (FE_InitGameMessages fills 612 of the 770
+// slots; the rest stay NULL). GameUICommands.c's gIGMessageHandlers is the round's twin.
 #define FE_NUM_MESSAGES 770
 MsgHandler gFEMessageHandlers[FE_NUM_MESSAGES];
 
@@ -1157,7 +1166,8 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[520] = PGATourMsg_GetLastEventLine;
     gFEMessageHandlers[551] = PGATourMsg_IsSeasonOver;
     gFEMessageHandlers[552] = PGASeasonWrapUp_GetLine;
-    gFEMessageHandlers[553] = PGADriver_ShowCalendar_AdvanceSeason;
+    // port: EA passes two arguments PGADriver_ShowCalendar_AdvanceSeason ignores (defined (void))
+    gFEMessageHandlers[553] = (MsgHandler)PGADriver_ShowCalendar_AdvanceSeason;
     gFEMessageHandlers[559] = PGATourMsg_GetTestText;
     gFEMessageHandlers[560] = PGATourMsg_Get25;
     gFEMessageHandlers[563] = PGASponsor_SignNext;
@@ -1778,12 +1788,12 @@ void GM_vIsControllerPluggedIn(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 49: 1 when the memory card in port pArgs[0], slot pArgs[1] is formatted
-// (MC_CARD_FORMATTED, flag 8, in its MCCardState).
+// (MC_CARD_FORMATTED in its MCCardState).
 void GM_vMCIsCardFormatted(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState state;
 
     MC_GetMC(&state, pArgs[0].i, pArgs[1].i);
-    pResult->i = (state.uFlags & 8) >> 3;
+    pResult->i = (state.uFlags & MC_CARD_FORMATTED) >> 3;
 }
 
 // Front-end message 686: 1 when the device in port pArgs[0], slot pArgs[1] is not a memory card
