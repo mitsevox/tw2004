@@ -108,7 +108,7 @@ void  Character_ClubStreamCallbackFE(UStreamObject* pObject);
 void  Character_GolferStreamCallbackIG(UStreamObject* pObject);
 void  Character_GolferStreamCallbackFE(UStreamObject* pObject);
 void  SkeletalObject_StreamCallback(UStreamObject* pObject);
-void  fn_8001D7EC(Character* pChar);
+void  Character_ResetBlenders(Character* pChar);
 void  fn_800BBADC(int nValue);         // SitDevFile.c
 void  Character_GetBonePos_FromIndex(Character* pChar, int nBone, f32* pPos);
 u8    Character_IsGolfer(Character* pChar);
@@ -149,8 +149,8 @@ void  fn_80025478(void);                                        // skalib.c
 void  fn_800CA7E0(void);                                        // AnimStream.c
 void  fn_800CABA0(void);                                        // AnimStream.c
 void  fn_800CB078(void);                                        // AnimStream.c
-void  fn_8001DD18(u8* pData, int nBytes);
-void  fn_8001DEC8(u8* pData, int nBytes);
+void  Character_SwapTexEntries(u8* pData, int nBytes);
+void  Character_SwapTexPalettes(u8* pData, int nBytes);
 s32   SkinPart_ListAllTextures(Skin** apSkins, int nSkins, SkinListEntry** ppList);   // SkinPart.c
 void  SkinPart_InitTextures(void);                                        // SkinPart.c: empty
 void  fn_800100B0(TexBank* pBank, TexEntry* p8, TexPalette* pC, void* p10, void* p14, int nNumTex,
@@ -1235,12 +1235,12 @@ void Character_LoadTextures(Character* pChar, Skin** apSkins, int nSkins) {
         pTexData = (TexEntry*)pData;
         // fake match: pTexData and pPalData (the same pointers as pData) go to the swaps: EA's
         // registers
-        fn_8001DD18((u8*)pTexData, nTexBytes);
+        Character_SwapTexEntries((u8*)pTexData, nTexBytes);
         pData += nTexBytes;
     }
     if (nPalBytes != 0) {
         pPalData = (TexPalette*)pData;
-        fn_8001DEC8((u8*)pPalData, nPalBytes);
+        Character_SwapTexPalettes((u8*)pPalData, nPalBytes);
     } else {
         pChar->n5C = 0;
     }
@@ -1937,7 +1937,7 @@ Character* Character_CreateFromMem(u8* pData, int nUnused, int nSet, int nId, u8
     }
     pChar->pChoices = pChoices;
     if (bLook) {
-        fn_8001DC64(pChar, pChoices);
+        Character_ApplyCrAPSettings(pChar, pChoices);
         SkinPart_BurnBodySkin(pChar);
     }
     if (gSession.nSplitScreen && Character_IsGolfer(pChar)) {
@@ -2819,7 +2819,7 @@ void Character_RegisterGolferStreamClientIG(void) {
 // (header and data), and the object is freed; the character is made from the copy (the static heap
 // counting what it takes) and its textures loaded, then the UI file is brought back. The character
 // is placed at lbl_80189A30 facing f19C, given the profile's created-golfer look for golfers 7 and
-// 29 (fn_8001DC64), set to club class 5 (the wedges) and its first clip. When it is still the
+// 29 (Character_ApplyCrAPSettings), set to club class 5 (the wedges) and its first clip. When it is still the
 // golfer the menu wants (pB8->nC is n8C), its body and six club skins are listed on it (created
 // golfers with one texture pool entry get two) and it takes its pool entries.
 void Character_GolferStreamCallbackFE(UStreamObject* pObject) {
@@ -2843,7 +2843,7 @@ void Character_GolferStreamCallbackFE(UStreamObject* pObject) {
     Character_SetPosition(lbl_80281EE0->pB8->pChar, lbl_80189A30, 1);
     Character_SetOrientation(lbl_80281EE0->pB8->pChar, lbl_80281EE0->f19C);
     if (lbl_80281EE0->pB8->pChar->nC == 7 || lbl_80281EE0->pB8->pChar->nC == 29) {
-        fn_8001DC64(lbl_80281EE0->pB8->pChar, &FE_GetCurrentProfile()->choices);
+        Character_ApplyCrAPSettings(lbl_80281EE0->pB8->pChar, &FE_GetCurrentProfile()->choices);
     }
     Character_SelectClub(lbl_80281EE0->pB8->pChar, 5);
     pClip = Char_SetClip(lbl_80281EE0->pB8->pChar, 0, 0, NULL);
@@ -3018,18 +3018,19 @@ void Character_UpdateClothesIG(void) {
 }
 
 // Puts a golfer to sleep at the end of its turn (GM_EndOfGolferTurn): its animation blending reset
-// (fn_8001D7EC), the shot set-up requests (u10 bits 4, 8 and 0x200) dropped, and bit 0x40 set, so
-// neither it nor its shadow is drawn until fn_8001D8DC wakes it.
+// (Character_ResetBlenders), the shot set-up requests (u10 bits 4, 8 and 0x200) dropped, and bit 0x40 set, so
+// neither it nor its shadow is drawn until Character_PrepareForRendering wakes it.
 void Character_Sleep(Character* pChar) {
-    fn_8001D7EC(pChar);
+    Character_ResetBlenders(pChar);
     pChar->u10 = pChar->u10 & ~0x20C;
     pChar->u10 = pChar->u10 | 0x40;
 }
 
-// Resets the character's animation: both blend trees are given back and rebuilt as one node
-// blending with fn_80072ACC (fn_800725BC, 0.5), both animation players are reset and the state
-// cleared.
-void fn_8001D7EC(Character* pChar) {
+// Resets the character's animation blending: each of its two blend trees (blend, node3E0) is given
+// back and rebuilt as one empty node mixing its children with fn_80072ACC at weight 0.5 (pose
+// format 0 for the first, 1 for the second), both animation players are set back to animation 0 at
+// time 0, and the animation state (n2C, n30, nAnim, n20, n18, u28) is cleared.
+void Character_ResetBlenders(Character* pChar) {
     SKABlendNode* pNode;
 
     pNode = &pChar->blend;
@@ -3050,7 +3051,12 @@ void fn_8001D7EC(Character* pChar) {
     pChar->u28 = 0;
 }
 
-void fn_8001D8DC(int nPlayer) {
+// Wakes the player's golfer for its turn (stateFunc's PreShot, InitialFlyBy and PlaceBall): u10 bit
+// 0x40 cleared so it is drawn again (Character_Sleep set it), its body skin made the loaded one in
+// single view (fn_800955F0) and its textures streamed (CharacterTex_StartStreamingPlayers). In
+// single view, when it is not the golfer last prepared (lbl_80281CAC), it is also flagged to be
+// dressed again (Character_RequestClothesUpdateIG).
+void Character_PrepareForRendering(int nPlayer) {
     gPlayers[nPlayer].pChar->u10 &= ~0x40;
     fn_800955F0(nPlayer);
     CharacterTex_StartStreamingPlayers(nPlayer);
@@ -3060,8 +3066,9 @@ void fn_8001D8DC(int nPlayer) {
     }
 }
 
-// Where the ball sits on the hand: bone 0x1A's position, moved 0.05 along the bone's x axis (the
-// other way while the model's bEE is set).
+// Where the ball sits in the golfer's fingers (pPos): the index finger bone's position (0x1A,
+// "ri2"; the left hand's for a left-hander, Character_GetBoneMatrixSwapIfLefty) moved 0.05 against
+// the bone's x axis (along it for a left-hander).
 void Character_GetBallOnFingerPosition(Character* pChar, f32* pPos) {
     f32 (*pMtx)[4] = Character_GetBoneMatrixSwapIfLefty(pChar, 0x1A);
     f32 vAxis[3];
@@ -3076,10 +3083,13 @@ void Character_GetBallOnFingerPosition(Character* pChar, f32* pPos) {
     }
 }
 
-// A point at the hand and three angles: bone 0x1A's position moved 0.000625 along the bone's x
-// axis (the other way while the model's bEE is set), and bone 0x15's pose as three angles
-// (Quat_ExtractEulerAngles), the second 30 degrees more.
-void fn_8001DA04(Character* pChar, f32* pPos, f32* pAngles) {
+// Where the tee held in the golfer's hand goes (pPos) and its rotation (pAngles, three Euler angles
+// in radians; stateFunc's PreShot update places the tee with them): the index finger bone's
+// position (0x1A, the left hand's for a left-hander) moved 0.000625 along the bone's x axis
+// (against it for a left-hander), and the wrist bone's pose (0x15, CharModel_GetBoneIndexMapped) as
+// angles (Quat_ExtractEulerAngles), the second turned 30 degrees more. Nothing without a character
+// or model.
+void Character_GetTeeInHandPositionAndRot(Character* pChar, f32* pPos, f32* pAngles) {
     f32 (*pMtx)[4];
     f32 vAxis[3];
 
@@ -3100,9 +3110,10 @@ void fn_8001DA04(Character* pChar, f32* pPos, f32* pAngles) {
     }
 }
 
-// The clip's point v80 through bone 0's matrix (Character_GetBoneMatrix) into pOut; without a clip, bone 0's
-// position (Character_GetBonePos).
-void fn_8001DB04(Character* pChar, f32* pOut) {
+// Where the golfer will stand when its current clip ends (pOut): the clip's end offset (v80)
+// through bone id 0's matrix; without a clip, bone id 0's position. GM_ShowPostShotAnimation checks
+// the ground there.
+void Character_GetEndOfAnimationPosition(Character* pChar, f32* pOut) {
     Vec4 vPos;
     f32 (*pMtx)[4];
 
@@ -3117,7 +3128,10 @@ void fn_8001DB04(Character* pChar, f32* pOut) {
     Character_GetBonePos(pChar, 0, pOut);
 }
 
-void fn_8001DB98(Character* pChar) {
+// Empties the character's four key-frame buffers (ska_shared.c's cache of a clip's decoded keys:
+// n00 -1, no clip), so the next pose decodes its keys again; AnimStream calls it when it hands out
+// the player's streamed clip data. The buffers' memory is kept.
+void Character_ClearKeyFrameBuffers(Character* pChar) {
     int i;
     for (i = 0; i < 4; i++) {
         pChar->buffers[i].n00 = -1;
@@ -3128,9 +3142,10 @@ void fn_8001DB98(Character* pChar) {
     }
 }
 
-// 1 when there is a current clip, the model has bone 0x54 and the clip's n1C is above that bone's
-// index (Swing.c then puts the ball on bone 0x54).
-u8 fn_8001DBF4(Character* pChar) {
+// 1 when the golfer's current clip animates the ball bone (0x54, "GBall1"): the model has that bone
+// and the clip's track count (n1C) reaches past its index. Its callers then put the ball at that
+// bone (stateFunc's ball removal, the create-a-player golfer's ball in hand).
+u8 Character_IsHoldingBall(Character* pChar) {
     if (pChar->pCurClip != NULL && CharModel_GetBoneIndex(pChar->pModel, 0x54) != 0xFF &&
         pChar->pCurClip->n1C > CharModel_GetBoneIndex(pChar->pModel, 0x54)) {
         return 1;
@@ -3138,10 +3153,12 @@ u8 fn_8001DBF4(Character* pChar) {
     return 0;
 }
 
-// Gives the character the look in pChoices: its skins' choices, then its sliders (the 26 values
-// at a9B4). Outside the menu golfer's game type 3 (or on its screens 1 and 4) n113 sets the
-// model's bEE.
-void fn_8001DC64(Character* pChar, SkinChoices* pChoices) {
+// Gives the character a created golfer's look from pChoices: its skins' choices
+// (SkinPart_ApplyBodyChoices), its 26 body sliders (a9B4) and its handedness (n113 non-zero:
+// left-handed, the model's bEE), the handedness except in the create-a-player mode (game type 3)
+// off its screens 1 and 4 (lbl_80281EE0->n0); then the skeleton is set up again from the model
+// (Character_SetSkeleton).
+void Character_ApplyCrAPSettings(Character* pChar, SkinChoices* pChoices) {
     SkinPart_ApplyBodyChoices(pChar, pChoices);
     CharSlider_UpdateCharacterBasedOnSliderValues(pChar->pSliderDefs, pChar->pModel, pChar->pSkin, 26,
                                                   pChoices->a9B4,
@@ -3156,11 +3173,13 @@ void fn_8001DC64(Character* pChar, SkinChoices* pChoices) {
     Character_SetSkeleton(pChar, pChar->pModel);
 }
 
-// Byte-swaps nBytes of 0x50-byte texture entries in place, once (bit 0x40 of b47 marks it done):
-// from 0x08 four 12-byte records (a 4-byte field, four 2-byte ones), then four 2-byte fields,
-// nine bytes and seven bytes. An entry with b40 0 has its name decoded (not used) and goes with
-// the entry before when that one has the same name and goes with its next.
-void fn_8001DD18(u8* pData, int nBytes) {
+// Byte-swaps the character file's texture table in place (nBytes of 0x50-byte TexEntry rows), once:
+// bit 0x40 of the first row's b47 marks it done. In each row the 8-byte name hash stays; the four
+// mip records (a 4-byte field, four 2-byte ones), nWidth, nHeight, nPalette and n3E are swapped,
+// the nine single bytes after them stay and the last seven bytes are reversed as one field. A row
+// with b40 0 has its name unpacked (into a buffer nothing reads) and, when the row before has the
+// same name and b47 bit 0 (the next texture goes with it), takes that bit too.
+void Character_SwapTexEntries(u8* pData, int nBytes) {
     SwapField aRecord[5] = { { 4, 4 }, { 2, 2 }, { 2, 2 }, { 2, 2 }, { 2, 2 } };
     SwapField aTail[14] = { { 2, 2 }, { 2, 2 }, { 2, 2 }, { 2, 2 }, { 1, 1 }, { 1, 1 }, { 1, 1 },
                             { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 }, { 7, 7 } };
@@ -3200,8 +3219,9 @@ void fn_8001DD18(u8* pData, int nBytes) {
     }
 }
 
-// Byte-swaps nBytes of 12-byte records in place: a 4-byte field, then four 2-byte ones.
-void fn_8001DEC8(u8* pData, int nBytes) {
+// Byte-swaps the character file's palette table in place (nBytes of 12-byte TexPalette rows): a
+// 4-byte field, then four 2-byte ones.
+void Character_SwapTexPalettes(u8* pData, int nBytes) {
     SwapField aFormat[5] = { { 4, 4 }, { 2, 2 }, { 2, 2 }, { 2, 2 }, { 2, 2 } };
     void* pSrc;
     void* pDst;

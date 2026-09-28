@@ -2232,7 +2232,7 @@ void fn_8007D968(MsgArg* pArgs, MsgArg* pResult) {
     lbl_80281ED4->nSlot = pArgs[0].i;
     if (lbl_80281EE0->pB4->pChar != NULL &&
         (lbl_80281EE0->pB4->pChar->nC == 7 || lbl_80281EE0->pB4->pChar->nC == 29)) {
-        fn_8001DC64(lbl_80281EE0->pB4->pChar, &FE_GetCurrentProfile()->choices);
+        Character_ApplyCrAPSettings(lbl_80281EE0->pB4->pChar, &FE_GetCurrentProfile()->choices);
     }
 }
 

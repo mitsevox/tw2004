@@ -476,7 +476,7 @@ void fn_800FA608(int nPlayer) {
     for (i = 0; i < 2; i++) {
         ViewController_SetActivePlayerNumber(gPlayers[nPlayer].nView[i], nPlayer);
     }
-    fn_8001D8DC(nPlayer);
+    Character_PrepareForRendering(nPlayer);
     Character_AlignShotWithTarget(nPlayer, 1, 1);
     fn_800957D8(gPlayers[nPlayer].pChar);
     fn_80095744(gPlayers[nPlayer].pChar, 5);

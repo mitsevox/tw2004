@@ -306,7 +306,7 @@ typedef struct Clip {
     s32    n60;                 // 0x60  passed to fn_80021134 with pE8
     s32    n64;                 // 0x64
     u8     unk68[0x80 - 0x68];
-    f32    v80[3];              // 0x80  a point fn_8001DB04 puts through bone 0's matrix
+    f32    v80[3];              // 0x80  a point Character_GetEndOfAnimationPosition puts through bone 0's matrix
     s16    n8C;                 // 0x8C  halfwords per frame, first stream
     s16    n8E;                 // 0x8E  bytes per frame, second stream
     u64    u90;                 // 0x90  looked up in lbl_801B9638 (FEgolferanim.c fn_8008D058)
@@ -462,7 +462,7 @@ LAYOUT_ASSERT(ClipEvent, 0x10);
 
 // One of a character's four data buffers (Character.buffers): pBuf holds three runs of 16-byte
 // entries, p0C..p18 mark where they start and end, their counts read from p04's +0x60, +0x58 and
-// +0x5C (the code at 0x8001FE50 fills them; fn_8001DB98 empties them, Character_Free frees pBuf).
+// +0x5C (the code at 0x8001FE50 fills them; Character_ClearKeyFrameBuffers empties them, Character_Free frees pBuf).
 typedef struct CharBuffer {
     s32   n00;                  // 0x00  -1 when empty
     void* p04;                  // 0x04  what the buffer was filled for
@@ -550,7 +550,7 @@ typedef struct Character {
     f32   f14;                  // 0x014  set to 2^30 (never) by Character_UpdateAnimation; for a
                                 //        character that is not a golfer it is tested against
                                 //        fn_8001ED44 first
-    s32   n18;                  // 0x018  cleared with the animation state (fn_8001D7EC)
+    s32   n18;                  // 0x018  cleared with the animation state (Character_ResetBlenders)
     s32   nAnim;            // 0x01C  the playing animation (6 backswing, 7 downswing)
     s32   n20;                  // 0x020
     s8    n24;                  // 0x024  } counters CharacterState's idle update (CharacterState_UpdateFidgetState) runs down
@@ -681,7 +681,7 @@ typedef struct Character {
                                 //         (Character_PlaceFeetOnGround); Character_KeepClubOutOfGround
                                 //         acts only while its y is above 0.9
     void* pSliderDefs;          // 0x17AC  its slider definitions (CharSlider_CreateDefinitionsFromMem,
-                                //         Character_CreateFromMem); fn_8001DC64 applies them
+                                //         Character_CreateFromMem); Character_ApplyCrAPSettings applies them
     void (*pfnPreBones)(void);  // 0x17B0  called by Character_UpdateAnimation before the bones are
                                 //         transformed; cleared by Character_Create
     s8    nView;                // 0x17B4  the view Skin.c poses the skins for and picks their parts in
@@ -790,7 +790,7 @@ void  Character_Free(Character* pChar);    // frees the character
 void  Character_SelectClub(Character* pChar, int n);
 void  Character_RegisterGolferStreamClientFE(void);
 void  Character_SetClubsAndClothes(Character* pChar, int nSlot);   // dresses the character (its skins and clubs)
-void  fn_8001DC64(Character* pChar, struct SkinChoices* pChoices);  // applies a look (char.c)
+void  Character_ApplyCrAPSettings(Character* pChar, struct SkinChoices* pChoices);  // applies a look (char.c)
 void  fn_8001EE98(Character* pChar, u8 b);    // sets the model's bEE
 void  Character_SetPosition(Character* pChar, f32* pPos, u8 bPlace);
 int   Character_GetGolferModelID(int nPlayer);          // the model id of the player's golfer
@@ -800,10 +800,10 @@ void  Character_SetEmotion(Character* pChar, int nStyle);   // the animation sty
 Character* SkeletalObject_FindObject(int nId);        // the character with this id (100: the flag, by its clips), or NULL
 void  Character_RequestClothesUpdateFE(int n);               // set gSession.aD2D[n]
 void  Character_Sleep(Character* pChar);
-void  fn_8001DA04(Character* pChar, f32* pPos, f32* pAngles);   // hand point, bone 0x15's angles
-void  fn_8001DB04(Character* pChar, f32* pOut);    // the clip's point v80 placed by bone 0
-void  fn_8001DB98(Character* pChar);    // empty the character's four data buffers
-u8    fn_8001DBF4(Character* pChar);    // the clip's n1C is above bone 0x54's index
+void  Character_GetTeeInHandPositionAndRot(Character* pChar, f32* pPos, f32* pAngles);   // hand point, bone 0x15's angles
+void  Character_GetEndOfAnimationPosition(Character* pChar, f32* pOut);    // the clip's point v80 placed by bone 0
+void  Character_ClearKeyFrameBuffers(Character* pChar);    // empty the character's four data buffers
+u8    Character_IsHoldingBall(Character* pChar);    // the clip's n1C is above bone 0x54's index
 void  Character_GetBallOnFingerPosition(Character* pChar, f32* pPos);
 f32 (*Character_GetBoneMatrix(Character* pChar, int nBone))[4];  // a bone's matrix
 u8    Character_IsLeftHanded(Character* pChar);    // the model's bEE

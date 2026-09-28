@@ -1126,7 +1126,7 @@ void fn_8008D058(void) {
 }
 
 // With b85 set, move bones 0x52 (when the character's bit 0x4000 is set) and 0x54 (when the clip
-// has it, fn_8001DBF4) to their offset from bone 1, and bone 1 to 0, in x, z and w.
+// has it, Character_IsHoldingBall) to their offset from bone 1, and bone 1 to 0, in x, z and w.
 void fn_8008D6CC(void) {
     f32 v52[4];
     f32 v54[4];
@@ -1140,7 +1140,7 @@ void fn_8008D6CC(void) {
     pBone1 = &pModel->pBones[CharModel_GetBoneIndex(pModel, 1)];
     pBone52 = &pModel->pBones[CharModel_GetBoneIndex(pModel, 0x52)];
     CharModel_GetBoneIndex(pModel, 0x54);              // EA looks bone 0x54 up here without using it
-    bBall = fn_8001DBF4(lbl_80281EE0->pB4->pChar);
+    bBall = Character_IsHoldingBall(lbl_80281EE0->pB4->pChar);
     if (lbl_80281EE0->b85 == 0) {
         return;
     }

@@ -181,7 +181,7 @@ void vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut);   // cross product
 // ---- textures --------------------------------------------------------------------------------
 
 // A texture in a bank (0x50 bytes; the bank's p8 is an array of them). Only what the game code reads.
-// One level of a texture (12 bytes; char.c fn_8001DD18 byte-swaps four of them).
+// One level of a texture (12 bytes; char.c Character_SwapTexEntries byte-swaps four of them).
 typedef struct TexMip {
     u32  uPixels;               // 0x0  where its pixels start in the bank's p18
     s16  nC;                    // 0x4  its size in 16-byte units (fn_80045FC8, fn_800B9EB8 copy nC * 16)
@@ -197,12 +197,12 @@ typedef struct TexEntry {
     u16  nHeight;               // 0x3A
     s16  nPalette;              // 0x3C  its row in the bank's pC
     u16  n3E;                   // 0x3E  its row in the bank's p10 (ShaderObjectsData fn_800740F4)
-    s8   b40;                   // 0x40  0: char.c fn_8001DD18 decodes the name and pairs the texture
+    s8   b40;                   // 0x40  0: char.c Character_SwapTexEntries decodes the name and pairs the texture
     s8   n41;                   // 0x41  (fn_80045FC8)
     u8   unk42[0x46 - 0x42];
     s8   b46;                   // 0x46  bit 0: clamp in s, bit 1: clamp in t (else repeat)
     u8   b47;                   // 0x47  bit 0: the next texture goes with it (char.c Character_LoadTextures);
-                                //       bit 0x40: byte-swapped (fn_8001DD18)
+                                //       bit 0x40: byte-swapped (Character_SwapTexEntries)
     u8   unk48[0x50 - 0x48];
 } TexEntry;
 LAYOUT_ASSERT(TexEntry, 0x50);
@@ -1418,7 +1418,7 @@ extern FadeNode* lbl_80281FA0;
 
 // char.c: sets bits of the player's character's u10.
 void Character_AlignShotWithTarget(int nPlayer, u8 a, u8 b);
-void fn_8001D8DC(int nPlayer);
+void Character_PrepareForRendering(int nPlayer);
 void Vec3_Scale(f32 f, f32* pIn, f32* pOut);   // scale a vector (paired singles)
 
 void fn_80045494(u8 bOn, int nPlayer);

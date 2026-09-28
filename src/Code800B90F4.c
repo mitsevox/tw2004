@@ -445,7 +445,7 @@ void fn_800B9CF0(u8 bTarget) {
     f32 mScale[4][4];
     f32 (*mBone)[4];
 
-    if (fn_8001DBF4(lbl_80281EE0->pB4->pChar)) {
+    if (Character_IsHoldingBall(lbl_80281EE0->pB4->pChar)) {
         vPos[0] = lbl_802821C8;
         vPos[1] = lbl_802821CC;
         vPos[2] = lbl_802814EC;

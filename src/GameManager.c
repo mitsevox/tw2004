@@ -646,7 +646,7 @@ int GM_ShowPostShotAnimation(int nPlayer) {
     }
     pCourse = Ter_GetTGD();
     if (pCourse) {
-        fn_8001DB04(gPlayers[nPlayer].pChar, vPos);
+        Character_GetEndOfAnimationPosition(gPlayers[nPlayer].pChar, vPos);
         Ter_GetEnclosingGroundData(pCourse, vPos, &fHighA, &pSurfA, vNormA, &fHighB, &pSurfB, vNormB);
         if (-65536.125f == fHighA && -65536.125f == fHighB) {
             return 0;

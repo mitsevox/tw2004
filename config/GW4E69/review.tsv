@@ -760,3 +760,13 @@ address	name	comment	by	date
 8001D6D8	Character_RequestClothesUpdateIG	add	rg1 (replayed by orchestrator)	2026-09-28
 8001D6F0	Character_UpdateClothesIG	rewrite	rg1 (replayed by orchestrator)	2026-09-28
 8001D7A4	Character_Sleep	add	rg1 (replayed by orchestrator)	2026-09-28
+8001D7EC	Character_ResetBlenders	rewrite	rg1 (replayed by orchestrator)	2026-09-28
+8001D8DC	Character_PrepareForRendering	add	rg1 (replayed by orchestrator)	2026-09-28
+8001D95C	Character_GetBallOnFingerPosition	rewrite	rg1 (replayed by orchestrator)	2026-09-28
+8001DA04	Character_GetTeeInHandPositionAndRot	rewrite	rg1 (replayed by orchestrator)	2026-09-28
+8001DB04	Character_GetEndOfAnimationPosition	rewrite	rg1 (replayed by orchestrator)	2026-09-28
+8001DB98	Character_ClearKeyFrameBuffers	add	rg1 (replayed by orchestrator)	2026-09-28
+8001DBF4	Character_IsHoldingBall	rewrite	rg1 (replayed by orchestrator)	2026-09-28
+8001DC64	Character_ApplyCrAPSettings	rewrite	rg1 (replayed by orchestrator)	2026-09-28
+8001DD18	Character_SwapTexEntries	rewrite	rg1 (replayed by orchestrator)	2026-09-28
+8001DEC8	Character_SwapTexPalettes	rewrite	rg1 (replayed by orchestrator)	2026-09-28

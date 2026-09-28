@@ -201,7 +201,7 @@ void STATEFUNC_PreShotInit(int nPlayer) {
         ViewController_SetActivePlayerNumber(gPlayers[nPlayer].nView[k], nPlayer);
     }
     EVENT_Trigger(nPlayer, 0x2A, 0, -1);
-    fn_8001D8DC(nPlayer);
+    Character_PrepareForRendering(nPlayer);
     Character_AlignShotWithTarget(nPlayer, 1, 1);
     if (gpGame->b277 != 0) {
         fn_800957D8(gPlayers[nPlayer].pChar);
@@ -303,7 +303,7 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
             DynObj_TeeAdd(&gPlayers[nPlayer].ball, nPlayer, 0);
         } else {
             Character_GetBallOnFingerPosition(gPlayers[nPlayer].pChar, gPlayers[nPlayer].ball.vPos);
-            fn_8001DA04(gPlayers[nPlayer].pChar, pSlot->v30, pSlot->v50);
+            Character_GetTeeInHandPositionAndRot(gPlayers[nPlayer].pChar, pSlot->v30, pSlot->v50);
             bInHand = 1;
         }
     } else if (gPlayers[nPlayer].ball.nLie == 0) {
@@ -1670,7 +1670,7 @@ void STATEFUNC_RemoveBallUpdate(int nPlayer) {
         CameraController_FadeIn(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 0.75f,
                                 (f32*)&vOffset);
     }
-    if (fn_8001DBF4(gPlayers[nPlayer].pChar)) {
+    if (Character_IsHoldingBall(gPlayers[nPlayer].pChar)) {
         pBall = &gPlayers[nPlayer].ball;
         Vec3Copy(gPlayers[nPlayer].pChar->pModel->pMatrices[CharModel_GetBoneIndex(gPlayers[nPlayer].pChar->pModel,
                                                                          0x54)][3],
@@ -1788,7 +1788,7 @@ void STATEFUNC_InitialFlyByInit(int nPlayer) {
     fn_80045824(nPlayer);
     GM_MovePlayerToBall(nPlayer);
     Shot_Plan(nPlayer, 1);
-    fn_8001D8DC(nPlayer);
+    Character_PrepareForRendering(nPlayer);
     Character_AlignShotWithTarget(nPlayer, 1, 1);
     fn_800957D8(gPlayers[nPlayer].pChar);
     fn_80095744(gPlayers[nPlayer].pChar, 1);
@@ -2011,7 +2011,7 @@ void STATEFUNC_PlaceBallUpdate(int nPlayer) {
         }
         if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x19, 0)) &&
             gPlayers[nPlayer].ball.nLie != 0 && GM_PlayerTakeMulligan(nPlayer)) {
-            fn_8001D8DC(nPlayer);
+            Character_PrepareForRendering(nPlayer);
             TARGET_SetupTarget(nPlayer);
         }
     }

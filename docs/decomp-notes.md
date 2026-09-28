@@ -275,7 +275,7 @@ They will be sorted into the sections below.
 - **[verified] A `u8` function returning an `int` local** gives the `li; li; clrlwi` join; a `u8` local lets
   CW use `bnelr` (LLDynTex fn_8010BF3C 80 -> 100).
 - **[verified] A parameter reused as the running pointer** is the parameter itself, not a new local (char
-  fn_8001DD18 95.3 -> 100).
+  Character_SwapTexEntries 95.3 -> 100).
 - **[verified] Copy a `u16` field to a `u32` local before shifting** it into a pointer offset: plain `slwi`
   instead of `clrlslwi` (SkinMorph fn_8011C4D4 95 -> 100).
 - **[verified] `!(a ^ b)`** gives the original's `xor.` where `a == b` gives `cmpw` (u8 field vs int

@@ -613,7 +613,7 @@ void* fn_800CAA7C(int nPlayer, int nGroup, int nStyle, int nClub) {
         nUseStyle = 0;
     }
     fn_800CA268(nPlayer, lbl_80282230->players[nPlayer].nId, nGroup, nClub, nUseStyle);
-    fn_8001DB98(gPlayers[nPlayer].pChar);
+    Character_ClearKeyFrameBuffers(gPlayers[nPlayer].pChar);
     return pData;
 }
 

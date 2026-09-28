@@ -609,7 +609,7 @@ extern f32        lbl_801B95D8[4];      // } reads (the pNormalHigh / pNormalLow
 extern CharPool   lbl_801B95E8;
 extern Character* lbl_801B9624[5];     // the characters made so far (Character_Add)
 extern s32        lbl_80281CA8;         // how many
-extern s32        lbl_80281CAC;         // the player fn_8001D8DC last marked (-1 at start)
+extern s32        lbl_80281CAC;         // the player Character_PrepareForRendering last marked (-1 at start)
 extern s32        lbl_80187164[8];      // the clip key for each shot kind (Character_SelectGameShotType)
 extern s32        lbl_80280E20;         // set to 6 (4 in split screen) by Character_InitIG, 3 by Character_InitFE
 extern CharSkinSet* lbl_80280E24[2];   // what Character_CreateClubSkinSet makes of the 'CLB ' object: one, or one per
