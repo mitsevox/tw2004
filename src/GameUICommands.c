@@ -1,8 +1,11 @@
-// GameUICommands.c (our name): the commands the menu UI can send while a round is on (session game
-// types 4 to 8; uiProcessInterface.c's fn_8008F568 routes them here). IG_InitGameMessages fills a table of
-// 214 slots with 212 command functions (0 and 119 stay NULL) and IG_RunGameMessage runs one: most
-// answer a question about the round (a player's state, the score, the wind, Battle mode's clubs,
-// the PGA Tour event) or act on it.
+// GameUICommands.c (our name): the in-game UI messages, the questions and orders the menu UI can
+// send while a round is on (session game types 4 to 8; uiProcessInterface.c's fn_8008F568 routes
+// them here). IG_InitGameMessages fills gIGMessageHandlers, 214 slots with 212 handlers (0 and 119
+// stay NULL), and IG_RunGameMessage runs one by number. Most answer a question about the round (a
+// player's name and state, the score, the wind, the leaderboard, Battle mode's clubs, the PGA TOUR
+// event) or act on it (pause, restart the hole, leave). TW07's UI_Core/InGame/APT_IG_GameMessages.c
+// (a file TW06 also lists) has the same handlers, GM_v... / IG_v..., in the same order for long
+// runs: the EA names here come from it. This build's own file name is not known.
 
 #include "game.h"
 #include "game/frontend.h"
@@ -14,13 +17,15 @@
 #include "core/startup.h"
 #include "frontend/fe.h"
 
+// The in-game UI messages by number (IG_InitGameMessages fills it; slots 0 and 119 stay NULL).
 MsgHandler gIGMessageHandlers[UI_NUM_ROUND_COMMANDS];
 
 // in reverse address order: CodeWarrior lays .sbss out last-defined-first
-s32 gSpeedGolfLogCycle;               // counts -1..10, one step per fn_800894E8
-u8  gAlternateGolferUp;               // which player the alternating question answers next (mode 26)
+s32 gSpeedGolfLogCycle;         // -1..10, one step per fn_800894E8 call; the event answer it writes
+                                // is always overwritten after
+u8  gAlternateGolferUp;         // mode 26: the player the next golfer-up question answers (0 / 1)
 
-// The round's commands, in address order (the table's order is IG_InitGameMessages's).
+// The message handlers, in address order (IG_InitGameMessages gives their numbers).
 void GM_vGetRoundUIKind(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetPlayerName(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetPlayerShortName(MsgArg* pArgs, MsgArg* pResult);
@@ -904,23 +909,24 @@ void GM_vGetGolferUserMoney(MsgArg* pArgs, MsgArg* pResult) {
 // camera's script has ended (fn_800C6E44) and either it is not tracking him (fn_800C708C) or his
 // animation is paused or has less than the camera tuning's f170 left.
 void GM_vIsPostShotCameraDone(MsgArg* pArgs, MsgArg* pResult) {
-    u8 bView6E44;
-    u8 bView708C;
-    u8 bCharFlag;               // the golfer's uFlags bit 1
-    u8 bOtherN20;               // the golfer's nCurState is not 9, 11 or 12
-    u8 bNearEnd;                // his animation has less than the camera tuning's f170 left
+    u8 bPostShotCamDone;        // the locals are TW07's
+    u8 bCamTrackingPlayer;
+    u8 bAnimPaused;             // the golfer's uFlags bit 0
+    u8 bNotReactionAnim;        // the golfer's nCurState is not 9, 11 or 12
+    u8 bAnimAlmostDone;         // his animation has less than the camera tuning's f170 left
 
     if (pArgs[0].i >= 5) {
         pResult->i = 1;
         return;
     }
-    bView6E44 = fn_800C6E44(ViewController_GetCameraControl(gPlayers[pArgs[0].i].nView[0]));
-    bView708C = fn_800C708C(ViewController_GetCameraControl(gPlayers[pArgs[0].i].nView[0]));
-    bCharFlag = fn_80062C1C(gPlayers[pArgs[0].i].pChar);
-    bOtherN20 = gPlayers[pArgs[0].i].pChar->nCurState != 9 && gPlayers[pArgs[0].i].pChar->nCurState != 11 &&
-                gPlayers[pArgs[0].i].pChar->nCurState != 12;
-    bNearEnd = fn_80062C28(gPlayers[pArgs[0].i].pChar) < lbl_80281F78->f170;
-    if ((bView6E44 && (!bView708C || bCharFlag || bNearEnd)) || bOtherN20) {
+    bPostShotCamDone = fn_800C6E44(ViewController_GetCameraControl(gPlayers[pArgs[0].i].nView[0]));
+    bCamTrackingPlayer = fn_800C708C(ViewController_GetCameraControl(gPlayers[pArgs[0].i].nView[0]));
+    bAnimPaused = fn_80062C1C(gPlayers[pArgs[0].i].pChar);
+    bNotReactionAnim = gPlayers[pArgs[0].i].pChar->nCurState != 9 &&
+                       gPlayers[pArgs[0].i].pChar->nCurState != 11 &&
+                       gPlayers[pArgs[0].i].pChar->nCurState != 12;
+    bAnimAlmostDone = fn_80062C28(gPlayers[pArgs[0].i].pChar) < lbl_80281F78->f170;
+    if ((bPostShotCamDone && (!bCamTrackingPlayer || bAnimPaused || bAnimAlmostDone)) || bNotReactionAnim) {
         pResult->i = 1;
         return;
     }
