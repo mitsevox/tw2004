@@ -8,17 +8,17 @@
 
 int fn_80121B8C(int nNode);
 
-char* lbl_80194694[7] = {
+char* gLadderRegionNames[7] = {
     "US Northwest", "US Southwest", "US East", "Europe", "Pacific", "Southern Hemisphere", "World",
 };
 
-s32 lbl_801946B0[NUM_LADDER_EVENTS] = {
+s32 gLadderNodeEvents[NUM_LADDER_EVENTS] = {
     1, 0, 2, 5, 6, 4, 8, 10, 9, 13, 12, 14, 18, 16, 17, 20, 21, 22, 3, 7, 11, 15, 19, 23, 24,
 };
 
-char* lbl_80194714[4] = { "None", "All", "Front 9", "Back 9" };
+char* gLadderHoleSetNames[4] = { "None", "All", "Front 9", "Back 9" };
 
-char* lbl_80194730[6] = { "1/4", "2/4", "3/4", "Dominated", "World", NULL };
+char* gLadderStageNames[6] = { "1/4", "2/4", "3/4", "Dominated", "World", NULL };
 
 // Nodes 18 to 23 stand alone.
 u8 fn_801218BC(int nNode) {
@@ -46,9 +46,9 @@ u8 fn_801218FC(int nRegion) {
     if (fn_801218EC(nRegion)) {
         return GameMode4_HasWonEvent(nProfile, 24);
     }
-    return GameMode4_HasWonEvent(nProfile, lbl_801946B0[nRegion * 3]) &&
-           GameMode4_HasWonEvent(nProfile, lbl_801946B0[nRegion * 3 + 1]) &&
-           GameMode4_HasWonEvent(nProfile, lbl_801946B0[nRegion * 3 + 2]);
+    return GameMode4_HasWonEvent(nProfile, gLadderNodeEvents[nRegion * 3]) &&
+           GameMode4_HasWonEvent(nProfile, gLadderNodeEvents[nRegion * 3 + 1]) &&
+           GameMode4_HasWonEvent(nProfile, gLadderNodeEvents[nRegion * 3 + 2]);
 }
 
 // Has the player won every event but the final?
@@ -69,7 +69,7 @@ u8 fn_801219CC(void) {
 // A node's state: -1 not shown, 0 open, 1 won, 2 locked.
 int fn_80121A38(int nNode) {
     int nProfile;
-    int nEvent = lbl_801946B0[nNode];
+    int nEvent = gLadderNodeEvents[nNode];
 
     nProfile = fn_80077B08();
     if (!fn_80121B8C(nNode)) return -1;
@@ -118,15 +118,15 @@ int fn_80121C44(int nEvent) {
 void fn_80121C80(int nDir, u8* abCandidate) {
     f32 fDX;
     f32 fDY;
-    f32 fX = lbl_80260CB8.aNode[lbl_80260CB8.nNode].fX;
-    f32 fY = lbl_80260CB8.aNode[lbl_80260CB8.nNode].fY;
+    f32 fX = gLadderMap.aNode[gLadderMap.nNode].fX;
+    f32 fY = gLadderMap.aNode[gLadderMap.nNode].fY;
     int i;
     u8 b;
 
     for (i = 0; i < NUM_LADDER_EVENTS; i++) {
-        if (i != lbl_80260CB8.nNode) {
-            fDX = lbl_80260CB8.aNode[i].fX - fX;
-            fDY = lbl_80260CB8.aNode[i].fY - fY;
+        if (i != gLadderMap.nNode) {
+            fDX = gLadderMap.aNode[i].fX - fX;
+            fDY = gLadderMap.aNode[i].fY - fY;
             switch (nDir) {
             case 0:
                 b = 0;
@@ -163,8 +163,8 @@ void fn_80121C80(int nDir, u8* abCandidate) {
 
 // The marked node nearest the cursor's node, -1 for none.
 int fn_80121E1C(u8* abCandidate) {
-    f32 fX = lbl_80260CB8.aNode[lbl_80260CB8.nNode].fX;
-    f32 fY = lbl_80260CB8.aNode[lbl_80260CB8.nNode].fY;
+    f32 fX = gLadderMap.aNode[gLadderMap.nNode].fX;
+    f32 fY = gLadderMap.aNode[gLadderMap.nNode].fY;
     f32 fBest = 3.4028235e38f;
     f32 fDX;
     f32 fDY;
@@ -174,8 +174,8 @@ int fn_80121E1C(u8* abCandidate) {
 
     for (i = 0; i < NUM_LADDER_EVENTS; i++) {
         if (abCandidate[i]) {
-            fDX = fX - lbl_80260CB8.aNode[i].fX;
-            fDY = fY - lbl_80260CB8.aNode[i].fY;
+            fDX = fX - gLadderMap.aNode[i].fX;
+            fDY = fY - gLadderMap.aNode[i].fY;
             fDX *= fDX;
             fDY *= fDY;
             fDist = Math_Sqrt(fDX + fDY);
@@ -205,7 +205,7 @@ int fn_80121F7C(int nEvent) {
     int i;
 
     for (i = 0; i < NUM_LADDER_EVENTS; i++) {
-        if (nEvent == lbl_801946B0[i]) return i;
+        if (nEvent == gLadderNodeEvents[i]) return i;
     }
     return -1;
 }

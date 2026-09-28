@@ -3359,7 +3359,7 @@ void fn_80080208(MsgArg* pArgs, MsgArg* pResult) {
             pResult->i = gEarningsTable.aLadderPrize[24].nBase;
             return;
         }
-        pResult->i = gEarningsTable.aLadderPrize[lbl_80260CB8.nEvent].nBase;
+        pResult->i = gEarningsTable.aLadderPrize[gLadderMap.nEvent].nBase;
         return;
     case 0:
     case 1:

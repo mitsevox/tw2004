@@ -1,5 +1,5 @@
 // GameMode4Menu.c (our name): the front end's messages for the map of game mode 4's ladder
-// (GameMode4.c). They place the map's nodes, move the cursor (lbl_80260CB8) with the rules in
+// (GameMode4.c). They place the map's nodes, move the cursor (gLadderMap) with the rules in
 // LadderMap.c, and fill the menus' text for the event under it: region and tour stop, opponent,
 // course, name and holes.
 
@@ -10,7 +10,7 @@
 #include "frontend/fe.h"
 #include "game/modes/ladder.h"
 
-LadderMap lbl_80260CB8;
+LadderMap gLadderMap;
 
 // Places a node: node, x, y.
 void fn_80121430(MsgArg* pArgs, MsgArg* pResult) {
@@ -18,8 +18,8 @@ void fn_80121430(MsgArg* pArgs, MsgArg* pResult) {
     f32 fX = pArgs[1].f;
     f32 fY = pArgs[2].f;
 
-    lbl_80260CB8.aNode[nNode].fX = fX;
-    lbl_80260CB8.aNode[nNode].fY = fY;
+    gLadderMap.aNode[nNode].fX = fX;
+    gLadderMap.aNode[nNode].fY = fY;
 }
 
 // Where a node is.
@@ -28,8 +28,8 @@ void fn_80121458(MsgArg* pArgs, MsgArg* pResult) {
     f32* pX = (f32*)pArgs[1].p;
     f32* pY = (f32*)pArgs[2].p;
 
-    *pX = lbl_80260CB8.aNode[nNode].fX;
-    *pY = lbl_80260CB8.aNode[nNode].fY;
+    *pX = gLadderMap.aNode[nNode].fX;
+    *pY = gLadderMap.aNode[nNode].fY;
 }
 
 // The opponent's nickname in quotes, or the last name when there is none (golfer 18 always
@@ -54,27 +54,27 @@ void fn_8012153C(MsgArg* pArgs, MsgArg* pResult) {
     char* szPart = ((MsgString*)pArgs[4].p)->pStr;
     char* szEmpty = ((MsgString*)pArgs[5].p)->pStr;
     char* szHoles = ((MsgString*)pArgs[6].p)->pStr;
-    int nStop = fn_80102AAC(lbl_80260CB8.nEvent);
-    int nRegion = fn_80121C08(lbl_80260CB8.nNode);
+    int nStop = fn_80102AAC(gLadderMap.nEvent);
+    int nRegion = fn_80121C08(gLadderMap.nNode);
     int nGolfer;
     int nCourse;
     int nHoles;
 
-    sprintf(szStop, "%s / Tour Stop %d", lbl_80194694[nRegion], nStop);
-    nGolfer = GameMode4_GetEventOpponent(lbl_80260CB8.nEvent);
+    sprintf(szStop, "%s / Tour Stop %d", gLadderRegionNames[nRegion], nStop);
+    nGolfer = GameMode4_GetEventOpponent(gLadderMap.nEvent);
     if (nGolfer <= 29) {
         fn_80121488(nGolfer, szOpponent);
     }
-    nCourse = GameMode4_GetEventCourse(lbl_80260CB8.nEvent);
+    nCourse = GameMode4_GetEventCourse(gLadderMap.nEvent);
     if (nCourse <= NUM_COURSES - 1) {
         strcpy(szCourse, lbl_80191990[nCourse]);
     }
-    GameMode4_GetEventName(lbl_80260CB8.nEvent, szName);
-    strcpy(szPart, lbl_80194730[fn_80121C44(lbl_80260CB8.nEvent)]);
+    GameMode4_GetEventName(gLadderMap.nEvent, szName);
+    strcpy(szPart, gLadderStageNames[fn_80121C44(gLadderMap.nEvent)]);
     strcpy(szEmpty, "");
-    nHoles = GameMode4_GetEventHoles(lbl_80260CB8.nEvent);
+    nHoles = GameMode4_GetEventHoles(gLadderMap.nEvent);
     if (nHoles <= 3) {
-        strcpy(szHoles, lbl_80194714[nHoles]);
+        strcpy(szHoles, gLadderHoleSetNames[nHoles]);
     }
 }
 
@@ -94,14 +94,14 @@ void fn_8012168C(MsgArg* pArgs, MsgArg* pResult) {
         nNode = fn_80121E1C(abCandidate);
     }
     if (nNode != -1) {
-        lbl_80260CB8.nNode = nNode;
+        gLadderMap.nNode = nNode;
     }
-    lbl_80260CB8.nEvent = lbl_801946B0[lbl_80260CB8.nNode];
+    gLadderMap.nEvent = gLadderNodeEvents[gLadderMap.nNode];
     pResult->i = nNode;
 }
 
 void fn_8012172C(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_80102A44(lbl_801946B0[pArgs[0].i]);
+    pResult->i = fn_80102A44(gLadderNodeEvents[pArgs[0].i]);
 }
 
 // Where the first node and the cursor's node are.
@@ -111,15 +111,15 @@ void fn_80121770(MsgArg* pArgs, MsgArg* pResult) {
     f32* pX = (f32*)pArgs[2].p;
     f32* pY = (f32*)pArgs[3].p;
 
-    *pFirstX = lbl_80260CB8.aNode[0].fX;
-    *pFirstY = lbl_80260CB8.aNode[0].fY;
-    *pX = lbl_80260CB8.aNode[lbl_80260CB8.nNode].fX;
-    *pY = lbl_80260CB8.aNode[lbl_80260CB8.nNode].fY;
+    *pFirstX = gLadderMap.aNode[0].fX;
+    *pFirstY = gLadderMap.aNode[0].fY;
+    *pX = gLadderMap.aNode[gLadderMap.nNode].fX;
+    *pY = gLadderMap.aNode[gLadderMap.nNode].fY;
 }
 
 // Starts the event under the cursor, with the player on the created golfer.
 void fn_801217C4(MsgArg* pArgs, MsgArg* pResult) {
-    GameMode4_SelectEvent(fn_80077B08(), lbl_80260CB8.nEvent);
+    GameMode4_SelectEvent(fn_80077B08(), gLadderMap.nEvent);
     gSession.nGolfer[0] = FIRST_CREATED_GOLFER;
     GameMode4_StartEvent();
 }

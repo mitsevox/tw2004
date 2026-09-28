@@ -36,11 +36,11 @@ typedef struct LadderMap {
 } LadderMap;
 LAYOUT_ASSERT(LadderMap, 0xD0);
 
-extern LadderMap lbl_80260CB8;
-extern s32 lbl_801946B0[NUM_LADDER_EVENTS];     // the event at each node
-extern char* lbl_80194694[7];   // each region's name
-extern char* lbl_80194714[4];   // each hole-selection preset's name ("All", "Front 9", ...)
-extern char* lbl_80194730[6];   // what fn_80121C44 picks: "1/4", "2/4", "3/4", "Dominated", "World"
+extern LadderMap gLadderMap;
+extern s32 gLadderNodeEvents[NUM_LADDER_EVENTS];     // the event at each node
+extern char* gLadderRegionNames[7];   // each region's name
+extern char* gLadderHoleSetNames[4];   // each hole-selection preset's name ("All", "Front 9", ...)
+extern char* gLadderStageNames[6];   // what fn_80121C44 picks: "1/4", "2/4", "3/4", "Dominated", "World"
 
 // LadderMap.c
 int  fn_80121A38(int nNode);                    // the node's state: -1 not shown, 0 open, 1 won, 2 locked
