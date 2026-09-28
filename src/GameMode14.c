@@ -172,7 +172,7 @@ void fn_800F2E08(int nPlayer) {
             nRank = fn_800F1E58(nSurface);
             if (lbl_80211FB8[nTarget].nRank == 0) {
                 GameMsg_Send5Ints(0x33, 0, 0, 0, 0xCD, 1);
-                fn_800A63D0();
+                Gaud_TargetClosedOut();
                 nMsg = 2;
             } else if (nRank >= lbl_80211FB8[nTarget].nRank) {
                 GameMsg_Send5Ints(0x33, 0, 0, 0, 0xCC, 1);
@@ -236,7 +236,7 @@ void fn_800F2E08(int nPlayer) {
                     }
                     if (nRank == 0) {
                         Ball* pBall;
-                        fn_800A62E0();
+                        Gaud_BullsEye();
                         pBall = &gPlayers[nPlayer].ball;
                         fn_800A30E4(8, pBall, nPlayer, 0, 0.0f);
                         nMult = gPlayers[nPlayer].nDBC;
@@ -244,7 +244,7 @@ void fn_800F2E08(int nPlayer) {
                             fn_800A30E4(nMult + 7, pBall, nPlayer, 0, 0.0f);
                         }
                     } else {
-                        fn_800A6358();
+                        Gaud_ScoreInRing();
                         nMult = gPlayers[nPlayer].nDBC;
                         if (nMult > 1) {
                             fn_800A30E4(nMult + 7, &gPlayers[nPlayer].ball, nPlayer, 0, 0.0f);

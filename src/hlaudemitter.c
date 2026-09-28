@@ -73,6 +73,7 @@ int Aud_EmiInitSession(void) {
     return 1;
 }
 
+// The emitters' part of ending a sound session (Aud_ExitSession): nothing to do.
 void Aud_EmiExitSession(void) {
 }
 
@@ -330,16 +331,23 @@ void Aud_EmiSetTrackVariation(u8 nId, u8 nTrack, u8 n) {
     }
 }
 
+// Picks variation range n for track nTrack of emitter instance nId (Emi_SetTrackVarRange, which
+// starts the track if needed), if the instance is alive.
 void Aud_EmiSetTrackVarRange(u8 nId, u8 nTrack, u8 n) {
     if (Aud_CheckEmitterInstance(nId) != NULL) {
         Emi_SetTrackVarRange(nId, nTrack, n);
     }
 }
 
+// Sets variation range n for track nTrack of sound nSound's definition (Emi_SetTrackVarRangeTmpl),
+// so every instance playing that sound uses it. No instance check: nSound is a sound, not an
+// instance.
 void Aud_EmiSetTrackVarRangeTmpl(s16 nSound, u8 nTrack, u8 n) {
     Emi_SetTrackVarRangeTmpl(nSound, nTrack, n);
 }
 
+// Asks track nTrack of emitter instance nId to play step n next (with bCheck, not when n is already
+// the current step; Emi_SetTrackStep), if the instance is alive.
 void Aud_EmiSetTrackStep(u8 nId, u8 nTrack, u8 n, int bCheck) {
     if (Aud_CheckEmitterInstance(nId) != NULL) {
         Emi_SetTrackStep(nId, nTrack, n, bCheck);
@@ -353,6 +361,8 @@ void Aud_EmiSetTrackAttenuation(u8 nId, u8 nTrack, f32 fVolume) {
     }
 }
 
+// Sets the pitch factor (AudTrack.f4C; tracks start at 1.0) of track nTrack of emitter instance nId
+// (Emi_SetTrackPitchFactor), if the instance is alive.
 void Aud_EmiSetTrackPitchFactor(u8 nId, u8 nTrack, f32 fPitch) {
     if (Aud_CheckEmitterInstance(nId) != NULL) {
         Emi_SetTrackPitchFactor(nId, nTrack, fPitch);

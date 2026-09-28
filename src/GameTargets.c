@@ -22,7 +22,7 @@ f32 lbl_80192880[15] = {
     1.1f, 1.1f, 1.0f, 1.0f, 1.0f, 1.1f, 1.2f, 1.3f, 1.0f, 1.3f, 1.4f, 1.4f, 1.3f, 1.0f, 1.0f,
 };
 
-void  fn_800A631C(void);
+void  Gaud_MultiplierBonus(void);
 
 u8   fn_800F2358(int nPlayer);
 
@@ -223,7 +223,7 @@ void fn_800F21B4(int nPlayer) {
         gPlayers[nPlayer].nE98++;
     }
     if (gPlayers[nPlayer].nDBC > 1) {
-        fn_800A631C();
+        Gaud_MultiplierBonus();
         switch (gPlayers[nPlayer].nDBC) {
         case 2:
             nMsg = 0x3A;

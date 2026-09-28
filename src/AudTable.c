@@ -38,10 +38,13 @@ u8 Emi_InitModule(void) {
     return bOk;
 }
 
+// The source table's part of starting a sound session, one of Ses_Init's steps: nothing to do,
+// always succeeds (1).
 u8 Emi_InitSession(void) {
     return 1;
 }
 
+// The source table's part of ending a sound session (fn_800A8D88): nothing to do.
 void Emi_ExitSession(void) {
 }
 

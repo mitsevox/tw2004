@@ -19,8 +19,8 @@ u8  lbl_8028237D;                    // set by fn_800F48C4: the shot then scores
 u8  lbl_8028237C;                    // a closer shot just took the lead (not set for the first leader)
 s32 lbl_80282378;
 
-void  fn_800A6394(void);
-void  fn_800A640C(void);
+void  Gaud_LetterForfeit(void);
+void  Gaud_LetterGained(void);
 
 void  fn_800F3C2C(void);
 void  fn_800F3C48(void);
@@ -195,7 +195,7 @@ void fn_800F3EBC(int nPlayer) {
                 if (nTarget == lbl_80282384 && nRank == lbl_80282388) {
                     GameMsg_Send5Ints(0x33, 0, 0, 0, nSurface, 1);
                     if (nRank == 0) {
-                        fn_800A62E0();
+                        Gaud_BullsEye();
                         nMsg = 0x32;
                         pBall = &gPlayers[nPlayer].ball;
                         fn_800A30E4(8, pBall, nPlayer, 0, 0.0f);
@@ -204,7 +204,7 @@ void fn_800F3EBC(int nPlayer) {
                             fn_800A30E4(nMult + 7, pBall, nPlayer, 0, 0.0f);
                         }
                     } else {
-                        fn_800A6358();
+                        Gaud_ScoreInRing();
                         nMsg = 0x11;
                         nMult = gPlayers[nPlayer].nDBC;
                         if (nMult > 1) {
@@ -218,7 +218,7 @@ void fn_800F3EBC(int nPlayer) {
                     GameMsg_Send5Ints(0x33, 0, 0, 0, 0xCF, 1);
                     lbl_8028237C = 1;
                     if (nRank == 0) {
-                        fn_800A62E0();
+                        Gaud_BullsEye();
                         nMsg = 0x31;
                         pBall = &gPlayers[nPlayer].ball;
                         fn_800A30E4(8, pBall, nPlayer, 0, 0.0f);
@@ -227,7 +227,7 @@ void fn_800F3EBC(int nPlayer) {
                             fn_800A30E4(nMult + 7, pBall, nPlayer, 0, 0.0f);
                         }
                     } else {
-                        fn_800A6358();
+                        Gaud_ScoreInRing();
                         nMsg = 0x33;
                         nMult = gPlayers[nPlayer].nDBC;
                         if (nMult > 1) {
@@ -238,7 +238,7 @@ void fn_800F3EBC(int nPlayer) {
                     lbl_8028238C = 5;
                     gPlayers[nPlayer].nE88++;
                     GameMsg_SendInt(0x38, gPlayers[nPlayer].nE88);
-                    fn_800A640C();
+                    Gaud_LetterGained();
                     if (nTarget == lbl_80282384) {
                         GameMsg_Send5Ints(0x33, 0, 0, 0, 0xCE, 1);
                         if (!(Misc_RandFunc(0) & 1)) {
@@ -261,7 +261,7 @@ void fn_800F3EBC(int nPlayer) {
                 lbl_80282384 = nTarget;
                 GameMsg_Send5Ints(0x33, 0, 0, 0, nSurface, 1);
                 if (nRank == 0) {
-                    fn_800A62E0();
+                    Gaud_BullsEye();
                     pBall = &gPlayers[nPlayer].ball;
                     fn_800A30E4(8, pBall, nPlayer, 0, 0.0f);
                     nMult = gPlayers[nPlayer].nDBC;
@@ -269,7 +269,7 @@ void fn_800F3EBC(int nPlayer) {
                         fn_800A30E4(nMult + 7, pBall, nPlayer, 0, 0.0f);
                     }
                 } else {
-                    fn_800A6358();
+                    Gaud_ScoreInRing();
                     nMult = gPlayers[nPlayer].nDBC;
                     if (nMult > 1) {
                         fn_800A30E4(nMult + 7, &gPlayers[nPlayer].ball, nPlayer, 0, 0.0f);
@@ -298,7 +298,7 @@ void fn_800F3EBC(int nPlayer) {
             gPlayers[nPlayer].nE88++;
             GameMsg_Send5Ints(0x33, 0, 0, 0, 0xCE, 1);
             GameMsg_SendInt(0x38, gPlayers[nPlayer].nE88);
-            fn_800A640C();
+            Gaud_LetterGained();
             switch (gPlayers[nPlayer].nE88) {
             case 1:
                 if (!(Misc_RandFunc(0) & 1)) {
@@ -454,7 +454,7 @@ void fn_800F48C4(void) {
             gPlayers[0].nE88++;
             GameMsg_SendInt(0x38, gPlayers[0].nE88);
         }
-        fn_800A6394();
+        Gaud_LetterForfeit();
     }
 }
 

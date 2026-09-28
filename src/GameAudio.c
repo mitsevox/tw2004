@@ -246,14 +246,21 @@ void Aud_Mute(u8 bLow, u8 bHigh) {
     fn_800A874C(nMask);
 }
 
+// Stores sound output mode n (HLAudMaster.c's lbl_80282064: 2 from start-up, and GameAudio passes 2
+// again). Nothing in this build reads it.
 void Aud_SetOutputmode(u8 n) {
     fn_800A8700(n);
 }
 
+// Sets the volume of submix (curve) nCurve, 0..31, 1.0 being full (Mas_SetSubmixChan); every track
+// played through that curve is scaled by it (Mas_GetSubmix). GameAudio sets them from the options'
+// volume levels times the start-up table lbl_8018E988.
 void Aud_SetSubmixAttn(u8 nCurve, f32 fVolume) {
     Mas_SetSubmixChan(nCurve, fVolume);
 }
 
+// Sets the volumes of submixes 0..nCurves-1 from pVolumes (Mas_SetSubmixAll); at start-up all 32
+// from the table lbl_8018E988.
 void Aud_SetSubmixAll(u8 nCurves, f32* pVolumes) {
     Mas_SetSubmixAll(nCurves, pVolumes);
 }
@@ -1288,41 +1295,58 @@ void Gaud_StartShotClock(void) {
     Aud_EmiAliasSetTrackStatus(3, 1, 1);
 }
 
+// Stops the shot clock's ticking (track 1 of emitter 3): when added time lifts a player's clock
+// back above 10 seconds, when the time runs out, and when a target game ends a shot.
 void Gaud_StopShotClock(void) {
     Aud_EmiAliasSetTrackStatus(3, 1, 0);
 }
 
-void fn_800A62A4(void) {
+// The target games' points sound (variation range 0 of emitter 3's track 0): modes 13, 16 and 17
+// play it when a ball that lands off the targets (surface below 0x85) still pays points.
+void Gaud_MoneyAward(void) {
     Aud_EmiAliasSetTrackVarRange(3, 0, 0);
     Aud_EmiAliasSetTrackStatus(3, 0, 1);
 }
 
-void fn_800A62E0(void) {
+// The target games' bullseye sound (variation range 1 of emitter 3's track 0): a ball in a target's
+// centre (modes 13 to 17).
+void Gaud_BullsEye(void) {
     Aud_EmiAliasSetTrackVarRange(3, 0, 1);
     Aud_EmiAliasSetTrackStatus(3, 0, 1);
 }
 
-void fn_800A631C(void) {
+// The target games' multiplier sound (variation range 2 of emitter 3's track 0): GameTargets.c
+// plays it when a player's shot multiplier (nDBC: 2, 3 or 5) is above 1.
+void Gaud_MultiplierBonus(void) {
     Aud_EmiAliasSetTrackVarRange(3, 0, 2);
     Aud_EmiAliasSetTrackStatus(3, 0, 1);
 }
 
-void fn_800A6358(void) {
+// The target games' ring sound (variation range 3 of emitter 3's track 0): a ball on a target but
+// outside its centre (modes 13 to 17).
+void Gaud_ScoreInRing(void) {
     Aud_EmiAliasSetTrackVarRange(3, 0, 3);
     Aud_EmiAliasSetTrackStatus(3, 0, 1);
 }
 
-void fn_800A6394(void) {
+// Mode 15 (HORSE on the targets): variation range 4 of emitter 3's track 0, played when a UI
+// command voids the current shot (fn_800F48C4) and the leader's opponent takes a letter.
+void Gaud_LetterForfeit(void) {
     Aud_EmiAliasSetTrackVarRange(3, 0, 4);
     Aud_EmiAliasSetTrackStatus(3, 0, 1);
 }
 
-void fn_800A63D0(void) {
+// The target games' closed-target sound (variation range 6 of emitter 3's track 0): the ball found
+// a target that pays nothing any more, already paid 4 times (modes 13 and 16) or held at the best
+// closeness (mode 14).
+void Gaud_TargetClosedOut(void) {
     Aud_EmiAliasSetTrackVarRange(3, 0, 6);
     Aud_EmiAliasSetTrackStatus(3, 0, 1);
 }
 
-void fn_800A640C(void) {
+// Mode 15 (HORSE on the targets): variation range 7 of emitter 3's track 0, played when a player
+// misses the leader's target, or matches it too far out, and takes a letter.
+void Gaud_LetterGained(void) {
     Aud_EmiAliasSetTrackVarRange(3, 0, 7);
     Aud_EmiAliasSetTrackStatus(3, 0, 1);
 }
@@ -1879,6 +1903,7 @@ void Gaud_StopComment(void) {
     lbl_80282038 = 0;
 }
 
+// Whether a commentary line is playing (track 0 of the commentary emitter is on).
 u8 Gaud_GetCommentStatus(void) {
     return Aud_EmiGetTrackStatus(lbl_80281419, 0);
 }
@@ -1946,18 +1971,24 @@ void Aud_EmiSetTrackStream(u8 nId, u8 nTrack, u8 a, u16 b, s32 c) {
     Aud_EmiSetControllerInt(nId, nTrack, (c << 24) | (a << 16) | b);
 }
 
+// Sets up a movie's sound when LLVideo.c starts one: its two voices and their ARAM blocks
+// (Mov_Init).
 void Aud_InitMovie(void) {
     Mov_Init();
 }
 
+// Releases the movie's sound (Mov_Exit) when LLVideo.c stops the movie.
 void Aud_ExitMovie(void) {
     Mov_Exit();
 }
 
+// Starts the movie's two voices (Mov_Start), at its first decoded frame.
 void Aud_StartMovie(void) {
     Mov_Start();
 }
 
+// Once per LLVideo.c movie update: counts off each block of the movie's sound ring the voices have
+// played past (Mov_Tick).
 void Aud_CycleMovie(void) {
     Mov_Tick();
 }

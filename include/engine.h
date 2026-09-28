@@ -1432,10 +1432,10 @@ void fn_8009EF98(void);
 void Gaud_StopShotClock(void);
 void Gaud_InitTopOfArcBuildup(void);
 void Gaud_ExitTopOfArcBuildup(void);
-void fn_800A62A4(void);
-void fn_800A62E0(void);
-void fn_800A6358(void);
-void fn_800A63D0(void);
+void Gaud_MoneyAward(void);
+void Gaud_BullsEye(void);
+void Gaud_ScoreInRing(void);
+void Gaud_TargetClosedOut(void);
 void Gaud_InitCrowdReactionSound(int nMusic, int a);
 void Gaud_OnScoreCard(u8 a, u8 b);
 void Gaud_LongDriveUi_Play(s32 nKind, int nTrack, int n);     // GameAudio.c: start a track

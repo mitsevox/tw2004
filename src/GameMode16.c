@@ -162,7 +162,7 @@ void fn_800F5014(int nPlayer) {
         if (gPlayers[nPlayer].nDE4[nTarget] > 3) {
             lbl_80282398 = 0;
             GameMsg_Send5Ints(0x33, 0, 0, 0, 0xC8, 1);
-            fn_800A63D0();
+            Gaud_TargetClosedOut();
             nMsg = 2;
         } else {
             gPlayers[nPlayer].nDE4[nTarget]++;
@@ -187,7 +187,7 @@ void fn_800F5014(int nPlayer) {
             }
             if (nSurface == 0x85 || nSurface == 0x88 || nSurface == 0x8C) {
                 gPlayers[nPlayer].nDE0++;
-                fn_800A62E0();
+                Gaud_BullsEye();
                 pBall = &gPlayers[nPlayer].ball;
                 fn_800A30E4(8, pBall, nPlayer, 0, 0.0f);
                 nMult = gPlayers[nPlayer].nDBC;
@@ -195,7 +195,7 @@ void fn_800F5014(int nPlayer) {
                     fn_800A30E4(nMult + 7, pBall, nPlayer, 0, 0.0f);
                 }
             } else {
-                fn_800A6358();
+                Gaud_ScoreInRing();
                 nMult = gPlayers[nPlayer].nDBC;
                 if (nMult > 1) {
                     fn_800A30E4(nMult + 7, &gPlayers[nPlayer].ball, nPlayer, 0, 0.0f);
@@ -298,7 +298,7 @@ void fn_800F5014(int nPlayer) {
                 GameMsg_Send5Ints(0x33, lbl_80282398, 0, 0, nSurface, 1);
             }
             if (lbl_80282398 > 0 && nSurface < 0x85) {
-                fn_800A62A4();
+                Gaud_MoneyAward();
             }
         }
     }
