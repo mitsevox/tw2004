@@ -434,3 +434,43 @@ player 0; mode 6 no first-hole tips / no restart hook / stroke limit on; FE_GetD
 tests year < 2003 && month < 10; GetTipStat fairway % counts par 3s; tips 11 and 13 unreachable; mode 15
 HoleFinished stored through a u8 cast (returns s32: port: candidate). Events never fired: 8, 12, 16,
 17, 27, 30, 52, 71.
+
+## Round 14 (rn1-rn6) leftovers
+Process: rn2 / rn3 / rn5 / rn6 merged main into their branches although told not to (harmless this
+time; merge_lane conflicts on files main already had were dropped). Say it louder next round.
+EA identities: GameUICommands.c = the ancestor of TW07 UI_Core/InGame/APT_IG_GameMessages.c (~120
+handlers paired by order and signature; this build's own file name unknown); GameMode2.c = TW07
+GameMode_Skins.cpp; GameModeMatch.c = GameMode_Match.cpp; GameMode4.c's successor = TW07
+GameModeDriver_TigerChallenge. Misplaced: SpeedGolf_Get*SelectedHole at GameMode2.c's end (only
+GameMode8.c calls them; GameMode8.c starts right after), PlayNow_GetCurrentGroup /
+GetGroupFirstChallenge at GameModeMatch.c's end.
+Header lane done (rn1): save.h SponsorSlot / aSponsor, SaveProfile nTotalCash / nCurrentCash / bChanged
+/ statistics, TourSeason nEventsStarted / nWinStreak / nMajorWins / nParRoundStreak; Player target-game
+and mode 12 fields, bHitObject / bHitPin, nShotKind comment; GameState hooks pfn200..pfn260 (TW07
+GameModeBase); EVENT_Trigger nArg. Still open: golfer.h speed golf (fC50, nC3C, nC40, nC44, nC58, nC6C,
+fA80 / fA84) and mode 22 (nEA0..nEDC, vEAC) fields (rn1 checked, ready); Player n22C / n274 skin money
+per hole / total (TW06 skinwin / skinwins); game.h CareerCalendar nDriver / n1C nPopupType,
+gCalendarFillCell (pCellColor / pCellState), GetPopupRow nRow, GetBottomLine nLine; game.h prototype
+params (PlayNow_SelectChallenge, SetCalendarFlag, ForceWeather, SendMessage18, SkillZone getters,
+SetHudClock, SetShotClock, GetBullsEyeColor, ScaleTargetPoints, IsLongDrive, GetBonusIndex,
+GM_Earnings_Check*Goals bPreview); GameManager.c:22 PayRoundGoals (int, u8); GameUI.c:121 GameMode22_IsActive
+s32 (into mode22.h); DistributeWinnings / TournamentPayout n -> nFirstPrize; ladder.h, mode26.h,
+earnings.h, challenge.h, rte.h, camera.h script.nCamera, fe.h FE_CrAP n4; GoEntry.c / FE_MessageTable.c
+GameMode26_StartEvent; FE_MessageTable.c:188 PGADriver_ShowCalendar_AdvanceSeason takes (void); game.h
+GameState f54 = fUITimeFactor; Ball n6C lie angle; PgaEntrantMC n18 winnings; course hole n04 rating;
+gpGame n4 scoring type, b136 custom course, b137..b139 compilation / random course flags; save.h
+b522F full caddie tips off; gReplayData nF12 weather option, nF14 forced weather x100; GameModeReplay.c
+comments still say b30C; src/README.md:50 example pfn20C is named now.
+Names for other files: FE_MessageTable.c fn_80084FF0 = MC_SetCurrentFileType, fn_80084FB4 =
+MC_CallActionFnMemoryRequired (CardPos = TW07 MC_ArgsMemoryRequiredT), fn_8007C988 = GM_vMCfunction
+(pairing C row wrong), fn_8007E9BC = front-end twin of GM_vIG_MCGetNumReplays; stateFunc.c fn_80062C1C =
+Character_IsAnimationPaused, fn_80062C28 = Character_GetAnimationTimeLeft; GoGolfCam.c fn_800C6E44 =
+post-shot camera done, fn_800C708C = camera tracking the player; GoDynamicCam.c fn_8003DCAC =
+GameEffects_IsLetterboxOn; PGATourSimulation.c fn_80119808 = leaderboard tie check, fn_80117DE0 =
+GM_PgaTourSim_DidUserQuit (TW07). Stale: GameUICommands.c fn_8008A8B8's "Battle mode: the winner" (=
+last hole's winner); GameHoleContests.c calls in-round commands "FE message"; GameUICommands.c local
+SpeedGolf_GetRoundScore(char*...) vs GameMode8.c (int nPlayer, ...).
+Possible EA bugs, unlabelled: GameModeStableford_EndGame uses stroke play's prize test on points (fewer
+points pays); GM_vGetOption / GM_vSetOption number options differently past 4 and set 5 stores the music
+level without the volume; gSpeedGolfLogCycle written then always overwritten. Possible unlabelled fakes:
+GameModeMatch.c PLAYER_AT next to PLAYER, gPlayers[(u32)i] in GetTeeHonors / GetHonors.
