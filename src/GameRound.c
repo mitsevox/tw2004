@@ -214,7 +214,7 @@ void GM_SetModeType(int nMode) {
         fn_800F9610();
         break;
     case 8:
-        fn_800F986C();
+        SpeedGolf_Init();
         break;
     case 9:
         fn_800ED738();

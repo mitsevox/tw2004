@@ -329,7 +329,7 @@ s8    fn_800F4878(void);
 s32   fn_800F4B00(void);
 void  GameModeSkillZoneTimed_TenSecWarning(void);
 s32   GameModeSkins_CurrentHoleNumberSkins(void);
-s32   fn_800FA4B8(int nPlayer);
+s32   SpeedGolf_GetTotalTimeScore(int nPlayer);
 s32   fn_800FD704(int nPlayer, int nHole, s32* pWon);
 s32   fn_800FD8D0(char* szName1, s32* pPoints1, char* szName2, s32* pPoints2);
 void  fn_800FDADC(void);
@@ -925,7 +925,7 @@ void fn_80086940(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80086970(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_800FA4B8(pArgs[0].i);
+    pResult->i = SpeedGolf_GetTotalTimeScore(pArgs[0].i);
 }
 
 // A value of the modes' own for a player, picked by pArgs[1].

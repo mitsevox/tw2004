@@ -47,7 +47,7 @@ if things are going well.
 ## Hard rules for lanes
 
 - **Commit in your branch only**, plain messages like the history
-  (`GameMode8.c: fn_800FA9E0, GM_TradeEventPoints exact (43/66)`), never a Co-Authored-By line or AI footer.
+  (`GameMode8.c: SpeedGolf_RunInit, SpeedGolf_TradeEventPoints exact (43/66)`), never a Co-Authored-By line or AI footer.
 - **Never delete any file** (no `rm`, not even scratch temp files, and never anything outside your
   worktree and scratch: `rm -f /dev/null` broke a cloud container on 2026-09-24). `git checkout --
   <file>` to undo your own edit is fine.

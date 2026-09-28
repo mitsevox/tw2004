@@ -104,7 +104,7 @@ and keeps only an exact one. Write the script in your scratch folder:
 import sys; sys.path.insert(0, r'<checkout>/tools/match')
 from trial import Trial
 t = Trial('GameMode8')
-t.trial('fn_800FA518', old_text, [variant1, variant2])   # keeps the first variant scoring 100
+t.trial('SpeedGolf_TickRunDelay', old_text, [variant1, variant2])   # keeps the first variant scoring 100
 t.apply(old_text, new_text)                              # plain edit, no scoring
 ```
 

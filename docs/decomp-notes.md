@@ -1016,7 +1016,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
 - **[verified] A table read before its range check was a local.** When the original loads
   `table[n]` before testing `n`, the source read it into a local at the top:
   `u16 nSound = lbl_80192BA8[nEvent]; if (nEvent >= 37 || nSound == 0xFFFF) return;` (GameMode8
-  `fn_800FAA70`, 71.7% -> 93.9, then exact with the or-chain). Check the table is big enough for
+  `SpeedGolf_PlayEventComment`, 71.7% -> 93.9, then exact with the or-chain). Check the table is big enough for
   every index the callers pass; if not, it is an EA bug and gets a comment.
 
 ### Structs, arrays and pointers
@@ -1059,7 +1059,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
 - **[verified] One function can use both.** When the original keeps `&gPlayers[n]` in one saved
   register for the first statements and computes the player offset afresh after the calls, the
   source used a `Player* p` for the first part and `gPlayers[n].field` at the end (GameMode8
-  `fn_800FA9E0`, 77% -> 100; `p` throughout gives 83.7%).
+  `SpeedGolf_RunInit`, 77% -> 100; `p` throughout gives 83.7%).
 - **[verified] `Player* p = &gPlayers[n]` vs `gPlayers[n].field`** pick different address shapes:
   the pointer form gives `mulli r5; addi r0, rB, sym@l; add r3, r0, r5`; direct indexing gives
   `mulli r0; addi r3, r3, sym@l; add r3, r3, r0`. Match whichever the original has per function.
@@ -1136,7 +1136,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
 - **[verified] Two neighbouring words handled with 64-bit operations are one `u64`.** When the
   code ORs, ANDs and tests two adjacent words together (`and`/`xor`/`or.` on both halves, an AND
   with `li -1` for the upper word), declare one `u64` field. Player 0xC48/0xC4C as two `s32`s
-  could not match in any statement order; as `u64 uC48` GameMode8 `GM_TradeEventPoints` went 93.3% ->
+  could not match in any statement order; as `u64 uC48` GameMode8 `SpeedGolf_TradeEventPoints` went 93.3% ->
   99.2%, then exact with statement order.
 - **[verified] Taking a field's address on a cast pointer reuses the base register.**
   `((Ball*)gPlayers[n].ball)->vPrev` gives `addi r4, r3, 0x10` where the original computes it
@@ -1261,7 +1261,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   `if (...) b = 1;` does not**: `bDown = (A || B) && (C || D) && (E || F);` (GameMode8
   `fn_800FCC38`, 98.9% -> 100).
 - **[verified] `n ? 0 : 1` and `n == 0` give the same instructions, different saved registers.**
-  GameMode8 `GM_TradeEventPoints`: `nOther = nPlayer ? 0 : 1;` put `nOther` in the original's register
+  GameMode8 `SpeedGolf_TradeEventPoints`: `nOther = nPlayer ? 0 : 1;` put `nOther` in the original's register
   (91.7% -> 93.1); `nOther = nPlayer == 0;` and `!nPlayer` (89.4%) did not.
 - **[verified] Float compares.** `if (a < b) return;` gives `fcmpo; blt`; `if (a >= b) return;`
   gives `fcmpo; cror eq,gt,eq; beq` (the NaN-safe form). When the original has a plain `bge`,
@@ -1344,7 +1344,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   r3 still holds the constant 1 used in the test; nested ifs setting a flag do not.
 - **[verified] A draft that "falls off the end" still has real returns.** m2c sometimes shows a
   non-void function whose last path returns nothing, because the value is already in `r3`. The
-  original still returned it explicitly: `fn_800FA518` (GameMode8) matched as
+  original still returned it explicitly: `SpeedGolf_TickRunDelay` (GameMode8) matched as
   `if (gPlayers[nPlayer].nC38 <= 0) return gPlayers[nPlayer].nC38; return 1;`. Leaving the return
   out is undefined behaviour; `lint.py` reports it (`ub-missing-return`), and no unit has one.
 

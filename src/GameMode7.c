@@ -6,18 +6,18 @@
 
 void fn_800F9610(void) {
     gpGame->pfnInit = fn_800F9610;
-    gpGame->pfnShutdown = fn_800F9A58;
+    gpGame->pfnShutdown = SpeedGolf_Shutdown;
     gpGame->pfn1EC = fn_800F9844;
-    gpGame->pfnSetupNextGolfer = fn_800F9B34;
-    gpGame->pfnGetHonors = fn_800F9BF8;
-    gpGame->pfnHoleFinished = fn_800FA118;
-    gpGame->pfnGameFinished = fn_800FA148;
-    gpGame->pfnGoToPlayoff = fn_800FA2C8;
-    gpGame->pfnEndHole = fn_800FA3AC;
-    gpGame->pfnEndGame = fn_800FA410;
+    gpGame->pfnSetupNextGolfer = SpeedGolf_SetupNextGolfer;
+    gpGame->pfnGetHonors = SpeedGolf_GetHonors;
+    gpGame->pfnHoleFinished = SpeedGolfPoints_HoleFinished;
+    gpGame->pfnGameFinished = SpeedGolfPoints_GameFinished;
+    gpGame->pfnGoToPlayoff = SpeedGolf_GoToPlayoff;
+    gpGame->pfnEndHole = SpeedGolfPoints_EndHole;
+    gpGame->pfnEndGame = SpeedGolf_EndGame;
     gpGame->pfn1E4 = fn_800F9824;
     gpGame->pfn220 = fn_800FDF38;
-    gpGame->pfn228 = fn_800FA998;
+    gpGame->pfn228 = SpeedGolfPoints_ClearStartFlags;
     gpGame->pfn230 = fn_800FDF58;
     gpGame->pfn234 = fn_800FDF60;
     gpGame->pfn25C = fn_800FDA30;
@@ -50,10 +50,10 @@ void fn_800F9610(void) {
 }
 
 void fn_800F9824(void) {
-    fn_800FA570();
+    SpeedGolf_StartHole();
 }
 
 void fn_800F9844(void) {
     gSpeedGolfFirstHoleTips = 1;
-    fn_800F9AB0();
+    SpeedGolf_SetGolferStates();
 }

@@ -429,7 +429,7 @@ void STATEFUNC_ShotSetupInit(int nPlayer) {
 // A human goes straight on to state 10 (the swing). A CPU rehearses its shot here, one frame at a
 // time, and moves on once the rehearsal is done, more than a second has passed (3 s in mode 11) and
 // fn_800C7100(view) agrees - or when its time is up: 4 s; in modes 6 and 7 (which wait while
-// fn_800FA118) 1.5 s on the hole's first stroke and 3.5 s after. Out of time, an unfinished
+// SpeedGolfPoints_HoleFinished) 1.5 s on the hole's first stroke and 3.5 s after. Out of time, an unfinished
 // rehearsal is finished (nRehearseState 3); then AI_ApplyError and state 10.
 void STATEFUNC_ShotSetupUpdate(int nPlayer) {
     View*   pView;
@@ -449,7 +449,7 @@ void STATEFUNC_ShotSetupUpdate(int nPlayer) {
         switch (Game_GetMode()) {
         case 6:
         case 7:
-            if (fn_800FA118(0, 0)) return;
+            if (SpeedGolfPoints_HoleFinished(0, 0)) return;
             if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] <= 0) {
                 fMax = 1.5f;
             } else {

@@ -562,7 +562,7 @@ void GameModeSkillZoneTimed_Init(void);                 // mode 13
 void GameModeSkins_Init(void);                 // mode 2
 void fn_800F944C(void);                 // mode 6
 void fn_800F9610(void);                 // mode 7
-void fn_800F986C(void);                 // mode 8
+void SpeedGolf_Init(void);                 // mode 8
 void GameModeStableford_Init(void);                 // mode 18 (GameModeStableford.c)
 void GameMode12_Init(void);                 // mode 12 (GameMode12.c)
 void GameModeStroke_Init(void);                 // mode 0 (GameModeStroke.c)
@@ -704,22 +704,22 @@ typedef struct SGLog {
 } SGLog;
 extern SGLog gSpeedGolfEventLog[100];
 extern s32 gSpeedGolfUnused;
-void fn_800F9A58(void);
-void fn_800F9AB0(void);
-void fn_800F9B34(void);
-s32  fn_800F9BF8(int nPlayer);
-u8   fn_800F9C00(int nPlayer, u8 bCheck);
-void fn_800F9C48(void);
-u8   fn_800F9D00(u8 bCheck);
-void fn_800F9E00(void);
-u8   fn_800F9F04(u8 bCheck);
-u8   fn_800FA118(int nPlayer, u8 bCheck);
-u8   fn_800FA148(u8 bCheck);
-u8   fn_800FA2C8(u8 bCheck);
-void fn_800FA3AC(void);
-void fn_800FA410(void);
-void fn_800FA570(void);
-void fn_800FA998(int nPlayer);
+void SpeedGolf_Shutdown(void);
+void SpeedGolf_SetGolferStates(void);
+void SpeedGolf_SetupNextGolfer(void);
+s32  SpeedGolf_GetHonors(int nPlayer);
+u8   SpeedGolfMatch_HoleFinished(int nPlayer, u8 bCheck);
+void SpeedGolfMatch_EndHole(void);
+u8   SpeedGolfMatch_GameFinished(u8 bCheck);
+void SpeedGolfMatch_EndGame(void);
+u8   SpeedGolfMatch_GoToPlayoff(u8 bCheck);
+u8   SpeedGolfPoints_HoleFinished(int nPlayer, u8 bCheck);
+u8   SpeedGolfPoints_GameFinished(u8 bCheck);
+u8   SpeedGolf_GoToPlayoff(u8 bCheck);
+void SpeedGolfPoints_EndHole(void);
+void SpeedGolf_EndGame(void);
+void SpeedGolf_StartHole(void);
+void SpeedGolfPoints_ClearStartFlags(int nPlayer);
 void fn_800FDA30(int nPlayer, int a);
 void fn_800FDF38(void);
 u8   fn_800FDF58(int nPlayer);
