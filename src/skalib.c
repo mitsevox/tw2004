@@ -13,8 +13,9 @@
 ClipBank* ClipBank_Get(u32 nSlot);
 void  SKA_SwapClip(void* pClip);                        // swaps a clip in place
 void  SKA_PatchMemory(struct Clip* pClip, u32 uAram);
-void  fn_800269E4(struct LibOverlay* pOv, int nSlot, s32 n);
-void  fn_80026844(LibOverlay* pOv, int nSlot, int nGroup, int nClub, int nStyle, int nKey, char* pNames,
+void  AnimLib_ApplyCustomAnims(struct LibOverlay* pOv, int nSlot, s32 n);
+void  AnimLib_SetLeafClipsByName(LibOverlay* pOv, int nSlot, int nGroup, int nClub, int nStyle, int nKey,
+                                 char* pNames,
                   int nNames);
 u32   Skalib_NextSlot(void);
 void  Skalib_SetBudgets(void);
@@ -1642,7 +1643,8 @@ void AnimLib_FreeWorkCopies(void) {
     }
 }
 
-// Frees the pristine copies of every slot's libraries.
+// Frees the pristine (as-loaded, unswapped) copies of each slot's library and overlays that
+// AnimLib_ReloadSlot rebuilds from, and empties every slot's overlay list.
 void AnimLib_FreeCopies(void) {
     LibSlot*    pSlot;
     LibOverlay* pOv;
@@ -1666,8 +1668,10 @@ void AnimLib_FreeCopies(void) {
     }
 }
 
-// Applies each active overlay's player's saved name lists to it (fn_800269E4).
-void fn_800253E0_ApplySavedChoices(int nSlot) {
+// Applies each active overlay's golfer's custom animations (AnimLib_ApplyCustomAnims, from the
+// player's save profile) to the overlay in slot nSlot: Character_PostInit for slots 0 and 1,
+// AnimLib_ReloadSlot for the slot it reloads.
+void AnimLib_ApplySlotCustomAnims(int nSlot) {
     LibSlot*    pSlot = &lbl_801C6068[nSlot];
     LibOverlay* pOv;
     int         n     = pSlot->nOverlays;
@@ -1677,13 +1681,16 @@ void fn_800253E0_ApplySavedChoices(int nSlot) {
         pOv = pSlot->overlays;
         for (i = 0; i < n; pOv++, i++) {
             if (pOv->bActive) {
-                fn_800269E4(pOv, nSlot, pOv->pChar->nPlayer);
+                AnimLib_ApplyCustomAnims(pOv, nSlot, pOv->pChar->nPlayer);
             }
         }
     }
 }
 
-void fn_80025478(void) {
+// Sets the round's clip bank budgets (Skalib_SetBudgets) and plans the bank of each of the three
+// slots (AnimLib_PlanBank), before Character_PostInit loads the sac files into them. The sizes it
+// adds up are not used.
+void Skalib_PlanBanks(void) {
     u32 i;
     int nTotal = 0;
     Skalib_SetBudgets();
@@ -1692,9 +1699,13 @@ void fn_80025478(void) {
     }
 }
 
-// Rebuilds the next slot's (Skalib_NextSlot) libraries from their pristine copies when it has
-// overlays (they are swapped in place when loaded, so a reload starts from the copy), first
-// freeing the bank clips kept in ARAM; then applies the saved name lists and plans the bank.
+// Before a hole (Character_ReloadSacFiles): rebuilds the libraries of the next slot
+// (Skalib_NextSlot) so its sac files can be merged again. The ARAM of the slot's bank clips is
+// freed; when the slot has overlays its library and overlays are copied again from their pristine
+// copies (they were swapped in place, so a reload starts from the file) and set up (AnimLib_Load),
+// each overlay waiting for its sac file again (stream id golfer id + 3). Then the golfers' custom
+// animations are applied, the animation stream set up for the slot's players (fn_800CA9DC) and the
+// bank planned (AnimLib_PlanBank).
 void AnimLib_ReloadSlot(void) {
     u32         nSlot = Skalib_NextSlot();
     u32         i;
@@ -1724,15 +1735,17 @@ void AnimLib_ReloadSlot(void) {
             pOv->n10 = pOv->n14 + 3;
         }
     }
-    fn_800253E0_ApplySavedChoices(nSlot);
+    AnimLib_ApplySlotCustomAnims(nSlot);
     AnimStream_SizeSlotClips(nSlot);
     AnimLib_PlanBank(nSlot);
 }
 
-// The clips for an animation group, style, club class and key: a missing style tries style 0
-// first; then each level falls back to its default (flag 1 when the group, style or club level
-// did, flag 2 when only the key did), and the library default is the last resort. Returns the
-// leaf's clip pointers.
+// The clips of a library for an animation group (0..20), style (0..7), club class (0..5) and key
+// (0..10): returns the leaf's first entry in ppClips, with its clip count in *pCount, its played
+// mask in *ppUsed and its first index in *pFirst (each when given). A missing style tries style 0;
+// a missing group, style or club falls back to the group's default leaf, then the library's, and
+// sets flag 1 in *pFlags; a missing key falls back to the club's default leaf, then the group's,
+// then the library's, and sets flag 2. NULL for arguments out of range or when no default is left.
 void** AnimLib_Find(AnimLib* pLib, int nGroup, int nStyle, int nClub, int nKey, s32* pCount,
                     u32* pFlags, u32** ppUsed, s32* pFirst) {
     s16* pNode;
@@ -1832,10 +1845,13 @@ u8 AnimLib_WasLastPlayed(int nPlayer, const char* pName, char** ppSlot, int nGro
 int   AnimLib_RandomIndex(u32 uUsed, int nCount);
 void* AnimStream_GetClip(int nPlayer, int nGroup, int nStyle, int nClub);
 
-// The clip a player plays for a group, style, club class and key: AnimStream_GetClip's clip when
-// AnimStream_IsStreamed picks this position and there is one; a named clip by its name; otherwise one of the
-// leaf's clips at random, never the reaction played last time, and - through the leaf's played
-// mask - none again until all of them have been played.
+// The clip a player plays for an animation group, style, club class and key (NULL when the group is
+// out of range or the leaf is empty). At a streamed position (fn_800C9828, the key taken as the
+// default when the leaf came from a key default) it is the animation stream's clip (fn_800CAA7C)
+// when there is one; with pName the library's clip of that name; otherwise one of the leaf's clips
+// at random, never the reaction the player played last (the next one instead), and, through the
+// leaf's played mask, none again until all of them have been played. A reaction's pick is recorded
+// as the player's last.
 void* AnimLib_Pick(int nPlayer, AnimLib* pLib, int nGroup, int nStyle, int nClub, int nKey, u32* pFlags,
                    const char* pName) {
     s32    nCount;
@@ -1907,7 +1923,8 @@ int AnimLib_RandomIndex(u32 uUsed, int nCount) {
     return nPick;
 }
 
-// Swaps a clip bank's header.
+// Byte-swaps a clip bank file's header in place: its 64-bit id, then the next four words (clip
+// count onwards).
 void ClipBank_SwapHeader(void* p) {
     SwapField fmt[5] = {{8, -8}, {4, 4}, {4, 4}, {4, 4}, {4, 4}};
     void*     pSrc = p;
@@ -1916,25 +1933,32 @@ void ClipBank_SwapHeader(void* p) {
     ByteSwap_Records(&pSrc, &pDst, fmt, 5, 1);
 }
 
-// Swap one node of the clip tree (see AnimLib).
+// Byte-swaps a group node of a library's clip tree from pSrc into pDst: its default leaf and eight
+// style node offsets (halfwords), then two bytes left as they are.
 void AnimLib_SwapGroupNode(void* pSrc, void* pDst) {
     SwapField fmt[3] = {{2, 2}, {0x10, 2}, {2, 1}};
     // port: a clip-tree group node ('SAL '), little-endian on disc; a little-endian port does not swap here
     ByteSwap_Records(&pSrc, &pDst, fmt, 3, 1);
 }
 
+// Byte-swaps a style node of a library's clip tree from pSrc into pDst: its six club node offsets
+// (halfwords), then two bytes left as they are.
 void AnimLib_SwapStyleNode(void* pSrc, void* pDst) {
     SwapField fmt[2] = {{12, 2}, {2, 1}};
     // port: a clip-tree style node ('SAL '), little-endian on disc; a little-endian port does not swap here
     ByteSwap_Records(&pSrc, &pDst, fmt, 2, 1);
 }
 
+// Byte-swaps a club node of a library's clip tree (AnimClubNode, 0x20 bytes) from pSrc into pDst:
+// its halfwords (the default leaf and the eleven keys' leaves among them), then its flags word.
 void AnimLib_SwapClubNode(void* pSrc, void* pDst) {
     SwapField fmt[5] = {{2, 2}, {2, 2}, {0x16, 2}, {2, 2}, {4, 4}};
     // port: a clip-tree club node ('SAL '), little-endian on disc; a little-endian port does not swap here
     ByteSwap_Records(&pSrc, &pDst, fmt, 5, 1);
 }
 
+// Byte-swaps a leaf of a library's clip tree (AnimLeaf) from pSrc into pDst: clip count, first
+// entry, played mask.
 void AnimLib_SwapLeaf(void* pSrc, void* pDst) {
     SwapField fmt[3] = {{2, 2}, {2, 2}, {4, 4}};
     // port: a clip-tree leaf ('SAL '), little-endian on disc; a little-endian port does not swap here
@@ -1987,9 +2011,13 @@ void AnimLib_SwapTree(AnimLib* pLib, u8* pSrc, u8* pDst) {
     }
 }
 
-// Sets up an animation library loaded at pData (swapping it in place). Its clips come either from
-// the clip bank pBank, or (flag 1) from the library itself; a library whose id does not match the
-// bank's plays the bank's first clip for everything. NULL when it needs a bank and there is none.
+// Sets up an animation library file at pData in place and returns it: the header, at the first
+// 16-byte boundary in pData, is byte-swapped (its pFile then points at pData), the parts after it
+// are swapped and its offsets turned into pointers. A library whose header names a bank takes its
+// clips from pBank by number (all of them the bank's first clip when the ids differ; NULL when
+// there is no bank). Otherwise it has a clip index and records: with flag 1 its clips follow them
+// in the file (SKA_LoadFromMem, into a clip table allocated here); without, it is an overlay
+// library whose clips a sac file brings into a bank later (no clip table).
 AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank) {
 
     SwapField hdrFmt[19] = {{0x100, 4}, {8, -8}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4},
@@ -2078,7 +2106,9 @@ AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank) {
     return pLib;
 }
 
-// Sets up a clip bank loaded at pData, aligned to uAlign.
+// Sets up a clip bank file at pFile in place and returns it: the header at the first uAlign
+// boundary is byte-swapped, and each clip offset of the table after it turned into its clip
+// (SKA_LoadFromMem, from the 16-aligned data after the table).
 ClipBank* ClipBank_Load(u8* pFile, u32 uAlign) {
     u32       uUnused;
     u8*       pSrc;
@@ -2117,7 +2147,10 @@ ClipBank* ClipBank_Load(u8* pFile, u32 uAlign) {
     return pBank;
 }
 
-// A slot's animation library has loaded: keep a copy and set it up against the slot's bank.
+// The 'SAL ' stream chunk handler (Skalib_Register). For slot uId (0..2) without a bank library
+// yet: keeps a pristine copy of the file (for AnimLib_ReloadSlot), sets it up (AnimLib_Load against
+// the slot's bank) and files it as the slot's bank library when its clips are in the bank, else as
+// the slot's own library that overlays are merged over. Any other object is freed.
 void AnimLib_OnLoaded(UStreamObject* pFile) {
     u8       bFree = 1;
     u32      nSlot = pFile->uId;
@@ -2143,14 +2176,16 @@ void AnimLib_OnLoaded(UStreamObject* pFile) {
 
 void ClipBank_Stash(int nSlot);
 
-// A slot's clip bank file has loaded: park it in ARAM.
+// The 'BNK ' stream chunk handler (Skalib_Register): the clip bank file of slot uId goes to ARAM
+// (ClipBank_Stash) until a character needs it (ClipBank_Restore).
 void ClipBank_OnLoaded(UStreamObject* pFile) {
     u32 nSlot = pFile->uId;
     lbl_801C6488[nSlot] = pFile;
     ClipBank_Stash(nSlot);
 }
 
-// Makes a loaded clip bank file the slot's bank.
+// Makes a clip bank file the bank of slot uId (ClipBank_Load), the bank owning the file; when the
+// slot is out of range or already has a bank the file is freed instead.
 void ClipBank_Install(UStreamObject* pFile) {
     u8  bFree = 1;
     u32 nSlot = pFile->uId;
@@ -2165,7 +2200,9 @@ void ClipBank_Install(UStreamObject* pFile) {
     }
 }
 
-// Forgets a slot's bank.
+// Forgets slot nSlot's clip bank and bank file without freeing them: in the front end (game type 3)
+// the bank lives in the restore buffer, and Character_Free lets it go so the next character brings
+// it back from ARAM (ClipBank_Restore).
 void ClipBank_Release(int nSlot) {
     if (lbl_801C6050[nSlot] != NULL) {
         if (lbl_801C6050[nSlot]->pFile != NULL) {
@@ -2181,8 +2218,9 @@ void ClipBank_Release(int nSlot) {
     }
 }
 
-// Copies a slot's bank file to ARAM and frees it; for slot 0, when there is none yet, allocates
-// the buffer banks are brought back into.
+// Copies slot nSlot's clip bank file (the stream object with its 0x80-byte header) to ARAM,
+// allocated the first time, and frees it unless it is the restore buffer; for slot 0, when there is
+// no restore buffer yet, allocates it at the file's size. Nothing without a file.
 void ClipBank_Stash(int nSlot) {
     if (lbl_801C6488[nSlot] != NULL) {
         lbl_801C647C[nSlot] = ((lbl_801C6488[nSlot]->uSize + 0x80) / 32 + 1) * 32;
@@ -2200,7 +2238,9 @@ void ClipBank_Stash(int nSlot) {
     }
 }
 
-// Brings a slot's bank back from ARAM and installs it.
+// Brings slot nSlot's clip bank file back from ARAM into the restore buffer and installs it
+// (ClipBank_Install), unless the file is already in memory. Character_CreateFromMem calls it in the
+// front end (game type 3).
 void ClipBank_Restore(int nSlot) {
     if (lbl_801C6488[nSlot] == NULL) {
         lbl_801C6488[nSlot] = lbl_80281CE0;
@@ -2232,16 +2272,20 @@ void Skalib_Register(void) {
     Stream_RegisterLoadChunkCallback('BNK ', ClipBank_OnLoaded);
 }
 
+// Unhooks the 'SAL ' and 'BNK ' loaders from the file streamer (Skalib_Register's undo).
 void Skalib_Unregister(void) {
     Stream_UnregisterLoadChunkCallback('SAL ');
     Stream_UnregisterLoadChunkCallback('BNK ');
 }
 
-// Points each clip of one leaf of the overlay's tree (group nGroup, style nStyle, club nClub, key
-// nKey, or the club's default leaf when nKey < 0) at the clip of group 20's first default leaf
-// (style 0, club 0) named in pNames (16 characters each, taken in turn), and counts the use. nSlot
-// is not used.
-void fn_80026844(LibOverlay* pOv, int nSlot, int nGroup, int nClub, int nStyle, int nKey, char* pNames,
+// Makes one leaf of an overlay's clip tree play chosen clips: each of its entries in turn is
+// pointed at the clip named pNames[i % nNames] (16 characters each) among the clips of group 20's
+// pool (style 0, club 0, the default leaf), which gains a user; an entry whose name is not in the
+// pool is left. The leaf is group nGroup, style nStyle, club class nClub and key nKey (the club's
+// default leaf when nKey < 0). Nothing when there are no names or a node on either path is missing;
+// nSlot is not used.
+void AnimLib_SetLeafClipsByName(LibOverlay* pOv, int nSlot, int nGroup, int nClub, int nStyle, int nKey,
+                                char* pNames,
                  int nNames) {
     int i;
     int j;
@@ -2301,16 +2345,22 @@ void fn_80026844(LibOverlay* pOv, int nSlot, int nGroup, int nClub, int nStyle, 
     }
 }
 
-// Applies player n's three saved name lists (gpSaveData[n].choices: a1, a82 and sz103) to the
-// overlay (fn_80026844).
-void fn_800269E4(LibOverlay* pOv, int nSlot, s32 n) {
-    fn_80026844(pOv, nSlot, 5, 2, 7, -1, gpSaveData[n].choices.a1[0], gpSaveData[n].choices.n0);
-    fn_80026844(pOv, nSlot, 5, 2, 1, -1, gpSaveData[n].choices.a82[0], gpSaveData[n].choices.n81);
-    fn_80026844(pOv, nSlot, 0, 0, 0, 0, gpSaveData[n].choices.sz103, gpSaveData[n].choices.n102);
+// Applies player n's custom animations (the three lists of gpSaveData[n].choices the
+// Create-a-Player screen fills) to the overlay: list 0 (a1) replaces the reactions of group 5 style
+// 7, list 1 (a82) those of group 5 style 1 (both club class 2, the default leaf), and list 2
+// (sz103, one name) the clips of group 0, style 0, club 0, key 0 (AnimLib_SetLeafClipsByName).
+void AnimLib_ApplyCustomAnims(LibOverlay* pOv, int nSlot, s32 n) {
+    AnimLib_SetLeafClipsByName(pOv, nSlot, 5, 2, 7, -1, gpSaveData[n].choices.a1[0],
+                               gpSaveData[n].choices.n0);
+    AnimLib_SetLeafClipsByName(pOv, nSlot, 5, 2, 1, -1, gpSaveData[n].choices.a82[0],
+                               gpSaveData[n].choices.n81);
+    AnimLib_SetLeafClipsByName(pOv, nSlot, 0, 0, 0, 0, gpSaveData[n].choices.sz103,
+                               gpSaveData[n].choices.n102);
 }
 
-// The overlay library loaded for the character in slot 0 or 1, or NULL.
-AnimLib* fn_80026AC0(Character* pChar) {
+// The working overlay library loaded for the character in slot 0 or 1, or NULL (AnimStream sets up
+// a player's streamed clips from it).
+AnimLib* AnimLib_GetCharOverlay(Character* pChar) {
     int i;
     int nSlot;
 
@@ -2324,7 +2374,8 @@ AnimLib* fn_80026AC0(Character* pChar) {
     return NULL;
 }
 
-// The library of the character's animation slot.
-AnimLib* fn_80026B34(Character* pChar) {
+// The own library (LibSlot.pLib, the one overlays merge over) of the character's animation slot;
+// NULL once the work copies are freed.
+AnimLib* AnimLib_GetCharSlotLib(Character* pChar) {
     return lbl_801C6068[pChar->nSlot].pLib;
 }

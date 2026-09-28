@@ -69,7 +69,7 @@ by the orchestrator with the owner's OK.
 function, no permuter, refill from the queue. b1 char MtaLib_SwapAndLink, b2 uiProcessInterface fn_8008F820,
 b3 hlaudtrackstm Stm_Tick, b4 UISApi fn_80169D90, b5 UISApi fn_80168CD8, b6 UISScreen fn_8016C6C4,
 b7 UISScreen fn_8016B188, b8 UISEvent fn_80165ACC. Codex: UIStudio fn_80166098. Gemini: out of usage.
-Merged just before: Codex SkinPart SkinPart_ApplySetsToMaterialEntry (fake, SkinPart linked) + skalib fn_80026844 (EA form):
+Merged just before: Codex SkinPart SkinPart_ApplySetsToMaterialEntry (fake, SkinPart linked) + skalib AnimLib_SetLeafClipsByName (EA form):
 7,600/7,647 exact, 96.86% matched, 88.35% code / 85.76% data linked.
 Night: GoGreenGrid linked; Golfer.c split into its 4 original files (ai_brain.c,
 Code8002BBB0.c, Code8002C984.c, Golfer.c = the Luck part), all linked; gPlayers/gCurGolferRecord/gGolferTable

@@ -154,8 +154,8 @@ void  Character_GetBonePosSwapIfLefty(Character* pChar, int nBone, f32* pPos);
 void  Char_Vec3Add(f32* pA, f32* pB, f32* pOut);
 void  Char_Vec3Sub(f32* pA, f32* pB, f32* pOut);
 void  fn_80095558(void);
-void  fn_800253E0_ApplySavedChoices(int nSlot);                         // skalib.c
-void  fn_80025478(void);                                        // skalib.c
+void  AnimLib_ApplySlotCustomAnims(int nSlot);                         // skalib.c
+void  Skalib_PlanBanks(void);                                        // skalib.c
 void  AnimStream_AllocBuffers(void);                                        // AnimStream.c
 void  AnimStream_RandomizeClips(void);                                        // AnimStream.c
 void  AnimStream_ReadFirstClips(void);                                        // AnimStream.c
@@ -1757,11 +1757,11 @@ void Character_PostInit(void) {
             }
         }
     }
-    fn_800253E0_ApplySavedChoices(0);
-    fn_800253E0_ApplySavedChoices(1);
+    AnimLib_ApplySlotCustomAnims(0);
+    AnimLib_ApplySlotCustomAnims(1);
     AnimStream_SizeSlotClips(-1);
     AnimStream_AllocBuffers();
-    fn_80025478();
+    Skalib_PlanBanks();
     Character_LoadSacFiles();
     AnimLib_FreeWorkCopies();
     AnimStream_RandomizeClips();

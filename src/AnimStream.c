@@ -604,7 +604,8 @@ void AnimStream_SizeSlotClips(int nSlot) {
     if (gpAnimStream->bOn == 0) return;
     for (i = 0; i < gSession.nNumPlayers; i++) {
         if (nSlot == -1 || nSlot == gPlayers[i].pChar->nSlot) {
-            AnimStream_SizePlayerClips(i, fn_80026AC0(gPlayers[i].pChar), fn_80026B34(gPlayers[i].pChar));
+            AnimStream_SizePlayerClips(i, AnimLib_GetCharOverlay(gPlayers[i].pChar),
+                                       AnimLib_GetCharSlotLib(gPlayers[i].pChar));
         }
     }
 }
