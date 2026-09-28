@@ -1,14 +1,14 @@
 // uiTransform.c (EA's name, from its asserts; also in EA's 2002 source tree): the menu UI's
-// transform stack (lbl_80281F38). Pushing a UI element multiplies its move, rotation and scale
-// into a copy of the current level; the current level is also kept in lbl_801D91FC.
+// transform stack (gpUITransformStack). Pushing a UI element multiplies its move, rotation and scale
+// into a copy of the current level; the current level is also kept in gUICurTransform.
 
 #include "golfer.h"
 #include "game/frontend.h"
 
 // The file's globals, defined last-address-first (the compiler lays .bss out in reverse).
-UITransform       lbl_801D91FC;         // a copy of the current level
-f32               lbl_801D91F0[3];      // the UI view: field of view, tan of half of it, distance
-UITransformStack* lbl_80281F38;         // the stack (fn_8009349C)
+UITransform       gUICurTransform;         // a copy of the current level
+f32               gUIViewParams[3];      // the UI view: field of view, tan of half of it, distance
+UITransformStack* gpUITransformStack;         // the stack (fn_8009349C)
 
 f32  Math_Tan(f32 x);                // tan
 
@@ -111,33 +111,33 @@ void fn_80092F00(UITransform* p, f32 fAngle) {
 // Apply an element's transform to the current level: move it, then rotate and scale it about its
 // pivot, keeping the running totals.
 void fn_80092F8C(UITransformDesc* p) {
-    fn_80092CE8(&lbl_80281F38->aLevel[lbl_80281F38->nTop], p->vMove[0], p->vMove[1], p->vMove[2]);
-    fn_80092CE8(&lbl_80281F38->aLevel[lbl_80281F38->nTop], p->vPivot[0], p->vPivot[1], p->vPivot[2]);
-    lbl_80281F38->aLevel[lbl_80281F38->nTop].f74 += p->vMove[0];
-    lbl_80281F38->aLevel[lbl_80281F38->nTop].f78 += p->vMove[1];
-    lbl_80281F38->aLevel[lbl_80281F38->nTop].f64 += p->vPivot[0];
-    lbl_80281F38->aLevel[lbl_80281F38->nTop].f68 += p->vPivot[1];
-    fn_80092DE8(&lbl_80281F38->aLevel[lbl_80281F38->nTop], PI * p->vRotate[0] / 180.0f);
-    fn_80092E74(&lbl_80281F38->aLevel[lbl_80281F38->nTop], PI * p->vRotate[1] / 180.0f);
-    lbl_80281F38->aLevel[lbl_80281F38->nTop].f60 += PI * p->vRotate[2] / 180.0f;
-    fn_80092F00(&lbl_80281F38->aLevel[lbl_80281F38->nTop], PI * p->vRotate[2] / 180.0f);
-    lbl_80281F38->aLevel[lbl_80281F38->nTop].f6C *= p->vScale[0];
-    lbl_80281F38->aLevel[lbl_80281F38->nTop].f70 *= p->vScale[1];
-    fn_80092D68(&lbl_80281F38->aLevel[lbl_80281F38->nTop], p->vScale[0], p->vScale[1], p->vScale[2]);
-    fn_80092CE8(&lbl_80281F38->aLevel[lbl_80281F38->nTop], -p->vPivot[0], -p->vPivot[1], -p->vPivot[2]);
-    lbl_80281F38->aLevel[lbl_80281F38->nTop].w40 = p->w34;
-    lbl_80281F38->aLevel[lbl_80281F38->nTop].f50[0] = p->f44[0] / 511.0f;
-    lbl_80281F38->aLevel[lbl_80281F38->nTop].f50[1] = p->f44[1] / 511.0f;
-    lbl_80281F38->aLevel[lbl_80281F38->nTop].f50[2] = p->f44[2] / 511.0f;
-    lbl_80281F38->aLevel[lbl_80281F38->nTop].f5C += p->f44[3] / 511.0f;
+    fn_80092CE8(&gpUITransformStack->aLevel[gpUITransformStack->nTop], p->vMove[0], p->vMove[1], p->vMove[2]);
+    fn_80092CE8(&gpUITransformStack->aLevel[gpUITransformStack->nTop], p->vPivot[0], p->vPivot[1], p->vPivot[2]);
+    gpUITransformStack->aLevel[gpUITransformStack->nTop].f74 += p->vMove[0];
+    gpUITransformStack->aLevel[gpUITransformStack->nTop].f78 += p->vMove[1];
+    gpUITransformStack->aLevel[gpUITransformStack->nTop].f64 += p->vPivot[0];
+    gpUITransformStack->aLevel[gpUITransformStack->nTop].f68 += p->vPivot[1];
+    fn_80092DE8(&gpUITransformStack->aLevel[gpUITransformStack->nTop], PI * p->vRotate[0] / 180.0f);
+    fn_80092E74(&gpUITransformStack->aLevel[gpUITransformStack->nTop], PI * p->vRotate[1] / 180.0f);
+    gpUITransformStack->aLevel[gpUITransformStack->nTop].f60 += PI * p->vRotate[2] / 180.0f;
+    fn_80092F00(&gpUITransformStack->aLevel[gpUITransformStack->nTop], PI * p->vRotate[2] / 180.0f);
+    gpUITransformStack->aLevel[gpUITransformStack->nTop].f6C *= p->vScale[0];
+    gpUITransformStack->aLevel[gpUITransformStack->nTop].f70 *= p->vScale[1];
+    fn_80092D68(&gpUITransformStack->aLevel[gpUITransformStack->nTop], p->vScale[0], p->vScale[1], p->vScale[2]);
+    fn_80092CE8(&gpUITransformStack->aLevel[gpUITransformStack->nTop], -p->vPivot[0], -p->vPivot[1], -p->vPivot[2]);
+    gpUITransformStack->aLevel[gpUITransformStack->nTop].w40 = p->w34;
+    gpUITransformStack->aLevel[gpUITransformStack->nTop].f50[0] = p->f44[0] / 511.0f;
+    gpUITransformStack->aLevel[gpUITransformStack->nTop].f50[1] = p->f44[1] / 511.0f;
+    gpUITransformStack->aLevel[gpUITransformStack->nTop].f50[2] = p->f44[2] / 511.0f;
+    gpUITransformStack->aLevel[gpUITransformStack->nTop].f5C += p->f44[3] / 511.0f;
 }
 
 f32* fn_80093268(void) {
-    return lbl_801D91F0;
+    return gUIViewParams;
 }
 
 UITransform* fn_80093274(void) {
-    return &lbl_801D91FC;
+    return &gUICurTransform;
 }
 
 // The front end's transform callback. 0: reset the current level's totals and set up the view
@@ -146,27 +146,27 @@ UITransform* fn_80093274(void) {
 void fn_80093280(int nOp, UITransformDesc* p) {
     switch (nOp) {
     case 0:
-        lbl_80281F38->aLevel[lbl_80281F38->nTop].f60 = 0.0f;
-        lbl_80281F38->aLevel[lbl_80281F38->nTop].f5C = 0.0f;
-        lbl_80281F38->aLevel[lbl_80281F38->nTop].f64 = 0.0f;
-        lbl_80281F38->aLevel[lbl_80281F38->nTop].f68 = 0.0f;
-        lbl_80281F38->aLevel[lbl_80281F38->nTop].f74 = 0.0f;
-        lbl_80281F38->aLevel[lbl_80281F38->nTop].f78 = 0.0f;
-        lbl_80281F38->aLevel[lbl_80281F38->nTop].f6C = 1.0f;
-        lbl_80281F38->aLevel[lbl_80281F38->nTop].f70 = 1.0f;
-        lbl_801D91F0[0] = DEG(50.0f);
-        lbl_801D91F0[1] = Math_Tan(0.5f * lbl_801D91F0[0]);
-        lbl_801D91F0[2] = 256.0f * (1.0f / lbl_801D91F0[1]);
+        gpUITransformStack->aLevel[gpUITransformStack->nTop].f60 = 0.0f;
+        gpUITransformStack->aLevel[gpUITransformStack->nTop].f5C = 0.0f;
+        gpUITransformStack->aLevel[gpUITransformStack->nTop].f64 = 0.0f;
+        gpUITransformStack->aLevel[gpUITransformStack->nTop].f68 = 0.0f;
+        gpUITransformStack->aLevel[gpUITransformStack->nTop].f74 = 0.0f;
+        gpUITransformStack->aLevel[gpUITransformStack->nTop].f78 = 0.0f;
+        gpUITransformStack->aLevel[gpUITransformStack->nTop].f6C = 1.0f;
+        gpUITransformStack->aLevel[gpUITransformStack->nTop].f70 = 1.0f;
+        gUIViewParams[0] = DEG(50.0f);
+        gUIViewParams[1] = Math_Tan(0.5f * gUIViewParams[0]);
+        gUIViewParams[2] = 256.0f * (1.0f / gUIViewParams[1]);
         break;
     case 1:
-        lbl_80281F38->aLevel[lbl_80281F38->nTop + 1] = lbl_80281F38->aLevel[lbl_80281F38->nTop];
-        lbl_80281F38->nTop++;
+        gpUITransformStack->aLevel[gpUITransformStack->nTop + 1] = gpUITransformStack->aLevel[gpUITransformStack->nTop];
+        gpUITransformStack->nTop++;
         fn_80092F8C(p);
-        lbl_801D91FC = lbl_80281F38->aLevel[lbl_80281F38->nTop];
+        gUICurTransform = gpUITransformStack->aLevel[gpUITransformStack->nTop];
         break;
     case 2:
-        lbl_80281F38->nTop--;
-        lbl_801D91FC = lbl_80281F38->aLevel[lbl_80281F38->nTop];
+        gpUITransformStack->nTop--;
+        gUICurTransform = gpUITransformStack->aLevel[gpUITransformStack->nTop];
         break;
     case 3:
         p->n30 = 0;
@@ -176,12 +176,12 @@ void fn_80093280(int nOp, UITransformDesc* p) {
 
 // Allocate the stack with its bottom level at identity.
 void fn_8009349C(void) {
-    lbl_80281F38 = StaticMem_Alloc(sizeof(UITransformStack), 2, 16, "uiTransform.c", 203);
-    lbl_80281F38->nTop = 0;
-    LLMath_IdentifyMat(lbl_80281F38->aLevel[lbl_80281F38->nTop].m);
+    gpUITransformStack = StaticMem_Alloc(sizeof(UITransformStack), 2, 16, "uiTransform.c", 203);
+    gpUITransformStack->nTop = 0;
+    LLMath_IdentifyMat(gpUITransformStack->aLevel[gpUITransformStack->nTop].m);
 }
 
 void fn_800934F8(void) {
-    StaticMem_Free(lbl_80281F38);
-    lbl_80281F38 = NULL;
+    StaticMem_Free(gpUITransformStack);
+    gpUITransformStack = NULL;
 }

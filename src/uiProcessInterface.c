@@ -11,24 +11,24 @@
 #include "frontend/uistudio.h"
 
 // Defined here (declared in game/frontend.h); .sbss in reverse address order.
-FrontEnd* lbl_80281F1C;
-u8 lbl_80281F1B;
-u8 lbl_80281F1A;                // set: fn_8008FD60 passes events to the UI
-u8 lbl_80281F19;
-u8 lbl_80281F18;
+FrontEnd* gpFrontEnd;
+u8 gbUIClosed;
+u8 gbUIRunning;                // set: fn_8008FD60 passes events to the UI
+u8 gbUICloseRequested;
+u8 gbPausedWithoutScoreCard;
 
 // .bss, reverse address order (declared in frontend/fe.h)
-FE801D880C lbl_801D880C;
-FEScreen lbl_801D87C0;
+FE801D880C gUIDelayedHint;
+FEScreen gUIState;
 
-s32 lbl_80189B38[8] = {0};
-UIButtonEvent lbl_80189B58[UI_NUM_BUTTON_EVENTS] = {
+s32 gUIButtonHeldFrames[8] = {0};
+UIButtonEvent gUIButtonEvents[UI_NUM_BUTTON_EVENTS] = {
     {0x1000, 0x0}, {0x800, 0x6}, {0x100, 0x7}, {0x8, 0x2},
     {0x4, 0x3},    {0x1, 0x4},   {0x2, 0x5},   {0x200, 0x8},
     {0x400, 0x9},  {0x40, 0xA},  {0x10, 0xC},  {0x0, 0xE},
     {0x20, 0xB},   {0x10, 0xD},  {0x0, 0xF},   {0x0, 0x1},
 };
-s8 lbl_80281368 = -1;
+s8 gSavedCrAPHidden = -1;
 
 void fn_8008F80C(s32 p0, s32 p1);
 s32 fn_80092BC4();
@@ -64,7 +64,7 @@ void fn_800908CC(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4);
 void fn_800908D0(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4);
 
 u8 fn_8008F39C(void) {
-    return lbl_80281F1B;
+    return gbUIClosed;
 }
 
 // Add uBase to n words, nStride words apart.
@@ -120,10 +120,10 @@ void fn_8008F568(s32 nCmd, s32 unused1, s32 unused2, s32 unused3, s32 a, s32 b) 
 void* fn_8008F610(u16 uGroup, u16 uScreen) {
     UIFilePair* pPair;
 
-    if (uScreen >= lbl_80281F1C->pFile->p4->nCount) {
+    if (uScreen >= gpFrontEnd->pFile->p4->nCount) {
         return NULL;
     }
-    pPair = &lbl_80281F1C->pFile->p4->aPairs[uScreen];
+    pPair = &gpFrontEnd->pFile->p4->aPairs[uScreen];
     return pPair->p4;
 }
 
@@ -137,12 +137,12 @@ static f32 uiProcessInterface_StrippedFn(f32 x) {
     return x + 1.0f;
 }
 
-// Run and draw the UI for nTicks (while lbl_80281F1A is set), then step lbl_801D880C: counting
+// Run and draw the UI for nTicks (while gbUIRunning is set), then step gUIDelayedHint: counting
 // 0..2 up, and past 2 it is reset and its n4 sent to the menus (0x23) or the round (0x24).
 void fn_8008F648(s32 nTicks) {
     s32 aArgs[1];
 
-    if (lbl_80281F1A) {
+    if (gbUIRunning) {
         RenderView_SetUseCurrentMatrices(0);
         RenderState_SetBlendFactors(4, 5);
         DS_vEnableZBufferUpdate(0);
@@ -156,8 +156,8 @@ void fn_8008F648(s32 nTicks) {
         FO_vSetCurrentAddMode(1);
         fn_80012C54_SetWordWrap(1);
         fn_800908D4(0.85f);
-        if (lbl_80281F1C != NULL) {
-            UISDrawObjects(lbl_80281F1C->pHandler, nTicks);
+        if (gpFrontEnd != NULL) {
+            UISDrawObjects(gpFrontEnd->pHandler, nTicks);
         }
         fn_800908D4(1.0f);
         fn_80012C54_SetWordWrap(0);
@@ -166,17 +166,17 @@ void fn_8008F648(s32 nTicks) {
         DS_vSetAlphaTestMode(1, 6, 0x80);
         DS_vSetZBufferMode(3);
         RenderState_Flush();
-        if (lbl_801D880C.n0 <= 2 && lbl_801D880C.n0 >= 0) {
-            lbl_801D880C.n0++;
-        } else if (lbl_801D880C.n0 > 2) {
-            lbl_801D880C.n0 = -1;
+        if (gUIDelayedHint.n0 <= 2 && gUIDelayedHint.n0 >= 0) {
+            gUIDelayedHint.n0++;
+        } else if (gUIDelayedHint.n0 > 2) {
+            gUIDelayedHint.n0 = -1;
             Mem_set(aArgs, 0, sizeof(aArgs));
-            aArgs[0] = lbl_801D880C.n4;
+            aArgs[0] = gUIDelayedHint.n4;
             if (gSession.nGameType == 3) {
-                UISProcessHint(lbl_80281F1C->pHandler, 0x23, 1, aArgs);
+                UISProcessHint(gpFrontEnd->pHandler, 0x23, 1, aArgs);
             }
             if (gSession.nGameType >= 4 && gSession.nGameType <= 8) {
-                UISProcessHint(lbl_80281F1C->pHandler, 0x24, 1, aArgs);
+                UISProcessHint(gpFrontEnd->pHandler, 0x24, 1, aArgs);
             }
         }
         UFont_ResetContext();
@@ -184,7 +184,7 @@ void fn_8008F648(s32 nTicks) {
 }
 
 void fn_8008F80C(s32 n, s32 b) {
-    lbl_801D87C0.a30[n] = b;
+    gUIState.a30[n] = b;
 }
 
 // Read the controllers for the UI. The main stick works the D-pad in start-up, the menus and (when
@@ -192,7 +192,7 @@ void fn_8008F80C(s32 n, s32 b) {
 // scripted camera (fn_80063C90, or script camera 3) other than camera 0x15. Each plugged-in
 // controller's buttons (the stick's directions folded into the D-pad bits) are compared with last
 // frame's, a held button repeating every 9 frames; each newly pressed button sends its
-// lbl_80189B58 event to the UI (not during the fade or while a movie is queued). In the menus,
+// gUIButtonEvents event to the UI (not during the fade or while a movie is queued). In the menus,
 // event 0x34 (which stops that input) is sent with fewer than two controllers in mode 0x1A, or in
 // mode 7 without CPU players; otherwise 0x2D while any is plugged in.
 void fn_8008F820(void) {
@@ -229,7 +229,7 @@ void fn_8008F820(void) {
     // first use makes the frontend give their array uses below temps numbered after the input
     // loop counter's (EA's r22/r23/r24), which the late loop's indexing then shares; the void*
     // copy keeps pButtons's use from being propagated away.
-    pPressed = (u32*)&lbl_801D87C0.n38;
+    pPressed = (u32*)&gUIState.n38;
     pButtons = (u32*)(void*)pPressed;
     *pButtons = 0;
     Mem_set(aArgs, 0, sizeof(aArgs));
@@ -237,13 +237,13 @@ void fn_8008F820(void) {
     pPressed = aPressed;
     for (i = 0; i < 4; i++) {
         if (Input_bDoesPadExist(i)) {
-            lbl_801D87C0.a1[i] = 1;
-            lbl_801D87C0.n34 = 0;
-            lbl_801D87C0.n38++;
+            gUIState.a1[i] = 1;
+            gUIState.n34 = 0;
+            gUIState.n38++;
         } else {
-            lbl_801D87C0.a1[i] = 0;
+            gUIState.a1[i] = 0;
         }
-        if (lbl_801D87C0.a1[i]) {
+        if (gUIState.a1[i]) {
             pButtons[i] = Input_ReadControlPad(i);
             if (pButtons[i] & 0x40000) {
                 pButtons[i] |= 4;
@@ -257,56 +257,56 @@ void fn_8008F820(void) {
             if (pButtons[i] & 0x10000) {
                 pButtons[i] |= 1;
             }
-            if (lbl_801D87C0.a8[i] != pButtons[i]) {
-                lbl_801D87C0.a18[i] = 0;
-            } else if (lbl_801D87C0.a18[i] > 8) {
-                lbl_801D87C0.a18[i] = 0;
-                lbl_801D87C0.a8[i] = 0;
+            if (gUIState.a8[i] != pButtons[i]) {
+                gUIState.a18[i] = 0;
+            } else if (gUIState.a18[i] > 8) {
+                gUIState.a18[i] = 0;
+                gUIState.a8[i] = 0;
             }
-            lbl_801D87C0.a18[i]++;
-            pPressed[i] = pButtons[i] & ~lbl_801D87C0.a8[i];
-            lbl_801D87C0.a8[i] = pButtons[i];
+            gUIState.a18[i]++;
+            pPressed[i] = pButtons[i] & ~gUIState.a8[i];
+            gUIState.a8[i] = pButtons[i];
         }
-        lbl_801D87C0.a28[i] = lbl_801D87C0.a1[i];
+        gUIState.a28[i] = gUIState.a1[i];
     }
-    if (lbl_801D87C0.n38 == 0) {
-        lbl_801D87C0.n34++;
+    if (gUIState.n38 == 0) {
+        gUIState.n34++;
     }
-    if (lbl_801D87C0.n38 > 0 && gSession.nGameType == 3 &&
-        ((Game_GetMode() != 7 && Game_GetMode() != 0x1A) || lbl_801D87C0.n38 >= 2 ||
+    if (gUIState.n38 > 0 && gSession.nGameType == 3 &&
+        ((Game_GetMode() != 7 && Game_GetMode() != 0x1A) || gUIState.n38 >= 2 ||
          gFEState.aCPU[0] || gFEState.aCPU[1])) {
-        if (lbl_80281368 != -1) {
-            gpCrAPState->bHidden = lbl_80281368;
-            lbl_80281368 = -1;
+        if (gSavedCrAPHidden != -1) {
+            gpCrAPState->bHidden = gSavedCrAPHidden;
+            gSavedCrAPHidden = -1;
         }
-        lbl_801D87C0.b49 = 0;
-        UISProcessHint(lbl_80281F1C->pHandler, 0x2D, 1, aArgs);
-        lbl_801D87C0.b40 = 0;
+        gUIState.b49 = 0;
+        UISProcessHint(gpFrontEnd->pHandler, 0x2D, 1, aArgs);
+        gUIState.b40 = 0;
     }
     if (((Game_GetMode() == 7 && !gFEState.aCPU[0] && !gFEState.aCPU[1]) ||
          Game_GetMode() == 0x1A) &&
-        lbl_801D87C0.n38 < 2 && gSession.nGameType == 3) {
-        if (lbl_80281368 == -1) {
-            lbl_80281368 = gpCrAPState->bHidden;
+        gUIState.n38 < 2 && gSession.nGameType == 3) {
+        if (gSavedCrAPHidden == -1) {
+            gSavedCrAPHidden = gpCrAPState->bHidden;
         }
-        UISProcessHint(lbl_80281F1C->pHandler, 0x34, 1, aArgs);
-        lbl_801D87C0.b40 = 1;
-        lbl_801D87C0.b49 = 1;
+        UISProcessHint(gpFrontEnd->pHandler, 0x34, 1, aArgs);
+        gUIState.b40 = 1;
+        gUIState.b49 = 1;
     }
     aArgs[0] = 0;
-    if (lbl_801D87C0.bFadeToBlack == 0 && FE_movieIsQueueEmpty() && lbl_801D87C0.b40 == 0) {
+    if (gUIState.bFadeToBlack == 0 && FE_movieIsQueueEmpty() && gUIState.b40 == 0) {
         for (k = 0; k < 4; k++) {
-            if (lbl_801D87C0.a1[k] && lbl_801D87C0.a30[k]) {
+            if (gUIState.a1[k] && gUIState.a30[k]) {
                 if (gSession.nGameType != 6 || (gSession.nPaused != 2 && gSession.nPaused != 3)) {
-                    pEvent = lbl_80189B58;
+                    pEvent = gUIButtonEvents;
                     for (j = 0; j < UI_NUM_BUTTON_EVENTS; j++) {
                         if (pEvent->uMask & pPressed[k]) {
-                            UISProcessEvent(lbl_80281F1C->pHandler, k, pEvent->nEvent, 1, &fOne, 0);
+                            UISProcessEvent(gpFrontEnd->pHandler, k, pEvent->nEvent, 1, &fOne, 0);
                         }
                         pEvent++;
                     }
                     if (pButtons[k] != 0 && gSession.nGameType == 3) {
-                        UISProcessHint(lbl_80281F1C->pHandler, 0x22, 1, aArgs);
+                        UISProcessHint(gpFrontEnd->pHandler, 0x22, 1, aArgs);
                     }
                 }
                 if (gSession.nGameType == 6) {
@@ -316,33 +316,33 @@ void fn_8008F820(void) {
                     uMask = Controller_GetButtonMask(0x20, 1);
                     uButtons = Input_ReadControlPad(k);
                     if (uButtons & uMask) {
-                        lbl_80189B38[k]++;
+                        gUIButtonHeldFrames[k]++;
                     } else {
-                        lbl_80189B38[k] = 0;
+                        gUIButtonHeldFrames[k] = 0;
                     }
                 }
-                if (lbl_80189B38[k] > 10) {
+                if (gUIButtonHeldFrames[k] > 10) {
                     GUI_SendButtonHeld(k);
-                    lbl_80189B38[k] = 0;
+                    gUIButtonHeldFrames[k] = 0;
                 }
             }
         }
     }
 }
 
-// Passes an event to the UI (while lbl_80281F1A is set). With lbl_80281F19 set it then shuts the UI
-// down (fn_80090400) and sets lbl_80281F1B; otherwise fn_8008F820 runs.
+// Passes an event to the UI (while gbUIRunning is set). With gbUICloseRequested set it then shuts the UI
+// down (fn_80090400) and sets gbUIClosed; otherwise fn_8008F820 runs.
 void fn_8008FD60(u32 uEvent) {
-    if (lbl_80281F1A) {
-        if (lbl_80281F1C != NULL) {
-            UISIdleProcess(lbl_80281F1C->pHandler, uEvent);
+    if (gbUIRunning) {
+        if (gpFrontEnd != NULL) {
+            UISIdleProcess(gpFrontEnd->pHandler, uEvent);
         }
-        if (lbl_80281F19) {
-            fn_80090400(lbl_80281F1C);
-            lbl_80281F19 = 0;
-            lbl_80281F1A = 0;
-            lbl_80281F1B = 1;
-        } else if (lbl_80281F1C != NULL) {
+        if (gbUICloseRequested) {
+            fn_80090400(gpFrontEnd);
+            gbUICloseRequested = 0;
+            gbUIRunning = 0;
+            gbUIClosed = 1;
+        } else if (gpFrontEnd != NULL) {
             fn_8008F820();
         }
     }
@@ -378,7 +378,7 @@ void fn_8008FDDC(FrontEnd* pFE) {
 
 // Resolve the UI file's entries by their names: kind 1 (except in game type 3) to the texture of
 // that name in the texture bank fn_8008FFF0 picks (none for -1), kind 2 (with a name list in pC)
-// to the same name in that list (p8 cleared; the table's index noted in lbl_801D87C0.n3C).
+// to the same name in that list (p8 cleared; the table's index noted in gUIState.n3C).
 void fn_8008FE88(FrontEnd* pFE) {
     u32 k;
     UIColorTable* pTable;
@@ -399,11 +399,11 @@ void fn_8008FE88(FrontEnd* pFE) {
                     uHash = fn_8000BEE4(szName);
                     nBank = fn_8008FFF0(szName);
                     if (nBank != -1) {
-                        pEntry->p4 = fn_80090904(lbl_80281F1C->p8->ap4[nBank], uHash);
+                        pEntry->p4 = fn_80090904(gpFrontEnd->p8->ap4[nBank], uHash);
                     }
                 }
             } else if (pEntry->u0 == 2 && pFE->pC != NULL) {
-                lbl_801D87C0.n3C = i;
+                gUIState.n3C = i;
                 for (k = 0; k < pFE->pC->nCount; k++) {
                     if (strcmp(pEntry->szC, pFE->pC->apNames[k]) == 0) {
                         pEntry->p4 = pFE->pC->apNames[k];
@@ -435,64 +435,64 @@ FrontEnd* fn_8009005C(char* szSet) {
     s32 aArgs[2];
     int i;
 
-    lbl_80281F19 = 0;
-    lbl_80281F1A = 1;
-    lbl_80281F1B = 0;
+    gbUICloseRequested = 0;
+    gbUIRunning = 1;
+    gbUIClosed = 0;
     fn_8008EC60(szSet);
-    lbl_80281F1C = StaticMem_Alloc(sizeof(FrontEnd), 2, 16, "uiProcessInterface.c", 904);
-    lbl_80281F1C->f18 = 0.0f;
-    lbl_80281F1C->pFile = fn_8008F0C0(szSet);
-    lbl_80281F1C->p8 = fn_8008F0F0(szSet);
-    lbl_80281F1C->pC = fn_8008F15C(szSet);
-    lbl_80281F1C->p10 = fn_8008F18C(szSet);
+    gpFrontEnd = StaticMem_Alloc(sizeof(FrontEnd), 2, 16, "uiProcessInterface.c", 904);
+    gpFrontEnd->f18 = 0.0f;
+    gpFrontEnd->pFile = fn_8008F0C0(szSet);
+    gpFrontEnd->p8 = fn_8008F0F0(szSet);
+    gpFrontEnd->pC = fn_8008F15C(szSet);
+    gpFrontEnd->p10 = fn_8008F18C(szSet);
     fn_8009349C();
-    lbl_801D87C0.a2C[0] = 0;
-    lbl_801D87C0.a2C[1] = 0;
-    lbl_801D87C0.a2C[2] = 0;
-    lbl_801D87C0.a2C[3] = 0;
-    lbl_801D87C0.bFadeToBlack = 0;
-    lbl_801D87C0.fFade = 0.0f;
-    lbl_801D880C.n4 = 0;
-    lbl_801D880C.n0 = -1;
-    fn_8008F488(lbl_80281F1C);
-    fn_8008FE88(lbl_80281F1C);
-    fn_8008FDDC(lbl_80281F1C);
-    lbl_80281F1C->pHandler = StaticMem_Alloc(UISGetMemSize(10, 9, 256, 2, 2048, 128), 2, 16,
+    gUIState.a2C[0] = 0;
+    gUIState.a2C[1] = 0;
+    gUIState.a2C[2] = 0;
+    gUIState.a2C[3] = 0;
+    gUIState.bFadeToBlack = 0;
+    gUIState.fFade = 0.0f;
+    gUIDelayedHint.n4 = 0;
+    gUIDelayedHint.n0 = -1;
+    fn_8008F488(gpFrontEnd);
+    fn_8008FE88(gpFrontEnd);
+    fn_8008FDDC(gpFrontEnd);
+    gpFrontEnd->pHandler = StaticMem_Alloc(UISGetMemSize(10, 9, 256, 2, 2048, 128), 2, 16,
                                          "uiProcessInterface.c", 943);
-    UISInit(lbl_80281F1C->pHandler, 10, 9, 256, 2, 2048, 128, 16);
-    UISRegisterPluginFnc(lbl_80281F1C->pHandler, 0, (UISPluginFncT*)fn_800914DC);
-    UISRegisterPluginFnc(lbl_80281F1C->pHandler, 1, fn_800908BC);
-    UISRegisterPluginFnc(lbl_80281F1C->pHandler, 2, fn_800908C0);
-    UISRegisterPluginFnc(lbl_80281F1C->pHandler, 3, fn_800908C4);
-    UISRegisterPluginFnc(lbl_80281F1C->pHandler, 4, fn_800908C8);
-    UISRegisterPluginFnc(lbl_80281F1C->pHandler, 5, fn_800908CC);
-    UISRegisterPluginFnc(lbl_80281F1C->pHandler, 6, fn_800908D0);
-    UISRegisterPluginFnc(lbl_80281F1C->pHandler, 7, (UISPluginFncT*)fn_800929E4);
-    UISRegisterPluginFnc(lbl_80281F1C->pHandler, 8, (UISPluginFncT*)fn_80103684);
-    UISRegisterResourceFncs(lbl_80281F1C->pHandler, fn_8008F610, fn_8008F644);
-    UISRegisterTransformFncs(lbl_80281F1C->pHandler, (UISTransformFncT*)fn_80093280);
-    UISRegisterMessageFnc(lbl_80281F1C->pHandler, fn_8008F568);
+    UISInit(gpFrontEnd->pHandler, 10, 9, 256, 2, 2048, 128, 16);
+    UISRegisterPluginFnc(gpFrontEnd->pHandler, 0, (UISPluginFncT*)fn_800914DC);
+    UISRegisterPluginFnc(gpFrontEnd->pHandler, 1, fn_800908BC);
+    UISRegisterPluginFnc(gpFrontEnd->pHandler, 2, fn_800908C0);
+    UISRegisterPluginFnc(gpFrontEnd->pHandler, 3, fn_800908C4);
+    UISRegisterPluginFnc(gpFrontEnd->pHandler, 4, fn_800908C8);
+    UISRegisterPluginFnc(gpFrontEnd->pHandler, 5, fn_800908CC);
+    UISRegisterPluginFnc(gpFrontEnd->pHandler, 6, fn_800908D0);
+    UISRegisterPluginFnc(gpFrontEnd->pHandler, 7, (UISPluginFncT*)fn_800929E4);
+    UISRegisterPluginFnc(gpFrontEnd->pHandler, 8, (UISPluginFncT*)fn_80103684);
+    UISRegisterResourceFncs(gpFrontEnd->pHandler, fn_8008F610, fn_8008F644);
+    UISRegisterTransformFncs(gpFrontEnd->pHandler, (UISTransformFncT*)fn_80093280);
+    UISRegisterMessageFnc(gpFrontEnd->pHandler, fn_8008F568);
     // fake match: the original compares the count signed here (cmpw), unsigned in fn_8008F610
-    for (i = 0; i < (s32)lbl_80281F1C->pFile->p4->nCount; i++) {
-        if (strcmp(lbl_80281F1C->pFile->p4->aPairs[i].p0, "GlobalScript") == 0) {
-            UISSetGlobalScript(lbl_80281F1C->pHandler, lbl_80281F1C->pFile->p4->aPairs[i].p4);
+    for (i = 0; i < (s32)gpFrontEnd->pFile->p4->nCount; i++) {
+        if (strcmp(gpFrontEnd->pFile->p4->aPairs[i].p0, "GlobalScript") == 0) {
+            UISSetGlobalScript(gpFrontEnd->pHandler, gpFrontEnd->pFile->p4->aPairs[i].p4);
             break;
         }
     }
     if (gSession.nGameType != 1) {
-        UISLoadScreen(lbl_80281F1C->pHandler, 0, 0, 0, NULL);
+        UISLoadScreen(gpFrontEnd->pHandler, 0, 0, 0, NULL);
     } else {
         aArgs[0] = 0;
         aArgs[1] = 0;
-        UISLoadScreen(lbl_80281F1C->pHandler, 0, 0, 2, aArgs);
+        UISLoadScreen(gpFrontEnd->pHandler, 0, 0, 2, aArgs);
     }
     if (gSession.nGameType == 3) {
         FE_InitGolferTextures();
     }
-    UISSetScreenActive(lbl_80281F1C->pHandler, 0, 0);
-    UISRegisterScreenDrawDebugFnc(lbl_80281F1C->pHandler, fn_80090894);
+    UISSetScreenActive(gpFrontEnd->pHandler, 0, 0);
+    UISRegisterScreenDrawDebugFnc(gpFrontEnd->pHandler, fn_80090894);
     UISRegisterRuntimeErrorFnc(fn_80090890);
-    return lbl_80281F1C;
+    return gpFrontEnd;
 }
 
 // Shut the front end down: in game type 1 with no nC, fe_movies.c's fn_80091EE8; in game type 3,
@@ -517,14 +517,14 @@ void fn_80090400(FrontEnd* pFE) {
         fn_8008F294();
         fn_8008F24C();
     }
-    UISShutdown(lbl_80281F1C->pHandler);
+    UISShutdown(gpFrontEnd->pHandler);
     fn_8008F194(pFE->p10);
     fn_8008F164(pFE->pC);
     fn_8008F0FC(pFE->p8);
     fn_8008F0C8(pFE->pFile);
-    StaticMem_Free(lbl_80281F1C->pHandler);
-    StaticMem_Free(lbl_80281F1C);
-    lbl_80281F1C = NULL;
+    StaticMem_Free(gpFrontEnd->pHandler);
+    StaticMem_Free(gpFrontEnd);
+    gpFrontEnd = NULL;
 }
 
 // Resets the UI's controller state (all four controllers enabled); also calls fn_80092BA0,
@@ -534,16 +534,16 @@ void fn_800905A8(void) {
 
     fn_80092BA0();
     fn_8008EC30();
-    lbl_801D87C0.n34 = 0;
-    lbl_801D87C0.n38 = 0;
-    lbl_801D87C0.b49 = 0;
-    lbl_801D87C0.b40 = 0;
+    gUIState.n34 = 0;
+    gUIState.n38 = 0;
+    gUIState.b49 = 0;
+    gUIState.b40 = 0;
     for (i = 0; i < 4; i++) {
-        lbl_801D87C0.a18[i] = 0;
-        lbl_801D87C0.a2C[i] = 0;
-        lbl_801D87C0.a30[i] = 1;
+        gUIState.a18[i] = 0;
+        gUIState.a2C[i] = 0;
+        gUIState.a30[i] = 1;
     }
-    lbl_801D87C0.b48 = 0;
+    gUIState.b48 = 0;
     fn_800B9FF0();
     GameMsg_ClearPending();
 }
@@ -558,36 +558,36 @@ void fn_80090628(void) {
 }
 
 void fn_80090664(void) {
-    if (lbl_80281F1C != NULL) {
-        fn_80090400(lbl_80281F1C);
+    if (gpFrontEnd != NULL) {
+        fn_80090400(gpFrontEnd);
     }
     fn_800934F8();
     fn_80092BC4();
     fn_800BA038();
 }
 
-// The fade to black (while lbl_801D87C0.bFadeToBlack is set): draw it, 0.05 darker each frame. Once
-// it is black, unpause; start-up (1) shuts the UI down (fn_8008FD60 sees lbl_80281F19) and sets
+// The fade to black (while gUIState.bFadeToBlack is set): draw it, 0.05 darker each frame. Once
+// it is black, unpause; start-up (1) shuts the UI down (fn_8008FD60 sees gbUICloseRequested) and sets
 // gSession.bEndLoop, the menus (3) shut it down, start the demo when gSession.bDemo is set and call
 // FE_Manager.c's function for mode 0x17, 0x18 or 4, and other game types set gSession.bEndLoop.
 void fn_8009069C(void) {
     f32 aColor[4];
 
-    if (lbl_801D87C0.bFadeToBlack == 0) return;
+    if (gUIState.bFadeToBlack == 0) return;
     aColor[0] = 0.0f;
     aColor[1] = 0.0f;
     aColor[2] = 0.0f;
-    aColor[3] = lbl_801D87C0.fFade;
+    aColor[3] = gUIState.fFade;
     fn_80037FB4(1, aColor);
-    lbl_801D87C0.fFade += 0.05f;
-    if (lbl_801D87C0.fFade >= 1.0f) {
-        lbl_801D87C0.fFade = 1.0f;
+    gUIState.fFade += 0.05f;
+    if (gUIState.fFade >= 1.0f) {
+        gUIState.fFade = 1.0f;
         gSession.nPaused = 0;
         if (gSession.nGameType == 1) {
-            lbl_80281F19 = 1;
+            gbUICloseRequested = 1;
             gSession.bEndLoop = 1;
         } else if (gSession.nGameType == 3) {
-            lbl_80281F19 = 1;
+            gbUICloseRequested = 1;
             if (gSession.bDemo != 0) {
                 DEMO_Start();
             }
@@ -641,7 +641,7 @@ void fn_80090894(u16 uGroup, u16 uScreen, s32 n) {
 }
 
 void fn_80090898(void) {
-    fn_8008FE88(lbl_80281F1C);
+    fn_8008FE88(gpFrontEnd);
 }
 
 // The studio's handlers 1 to 6 (fn_8009005C): they do nothing.

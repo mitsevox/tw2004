@@ -138,7 +138,7 @@ void fn_800922A8(UIText* pText) {
         fn_80092BE8(aColor);
     }
     nColor = pText->n8;
-    pTable = lbl_80281F1C->p14;
+    pTable = gpFrontEnd->p14;
     if (pTable != NULL && nColor < (s16)pTable->nCount && nColor != -1) {
         pRGBA = pTable->apEntries[nColor]->p8;
         fA = pRGBA[0];

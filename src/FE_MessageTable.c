@@ -1400,7 +1400,7 @@ void GM_vStartDemo(MsgArg* pArgs, MsgArg* pResult) {
     gFEState.b11 = 1;
     GM_SetModeType((u8)pArgs[0].i);
     gSession.bDemo = 1;
-    lbl_801D87C0.bFadeToBlack = 1;
+    gUIState.bFadeToBlack = 1;
     Gaud_ExitFE();
 }
 
@@ -1513,7 +1513,7 @@ void GM_vGetNumPlayers(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 22: player pArgs[0] uses controller pArgs[1]. -1 and 9 give 9 (CONTROLLER_CPU);
-// a real controller is also marked in lbl_801D87C0.a2C.
+// a real controller is also marked in gUIState.a2C.
 void GM_vSetPlayerController(MsgArg* pArgs, MsgArg* pResult) {
     s32 nController;
 
@@ -1523,7 +1523,7 @@ void GM_vSetPlayerController(MsgArg* pArgs, MsgArg* pResult) {
         return;
     }
     gSession.nController[pArgs[0].i] = nController;
-    lbl_801D87C0.a2C[pArgs[1].i] = 1;
+    gUIState.a2C[pArgs[1].i] = 1;
 }
 
 // Front-end message 23: the golfer player pArgs[0] plays.
@@ -1617,7 +1617,7 @@ void GM_vFEMessage31_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 32: whether controller pArgs[0]'s buttons reach the menu UI (pArgs[1] nonzero:
-// yes), through lbl_801D87C0.a30 (fn_8008F80C), which uiProcessInterface.c's fn_8008F820 tests.
+// yes), through gUIState.a30 (fn_8008F80C), which uiProcessInterface.c's fn_8008F820 tests.
 void GM_vSetControllerInputEnabled(MsgArg* pArgs, MsgArg* pResult) {
     fn_8008F80C(pArgs[0].i, (u8)pArgs[1].i);
 }
@@ -1780,7 +1780,7 @@ void GM_vIsGolferAvailable(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = (s8)FE_spGetGolfer(pArgs[0].i)->bAvailable;
 }
 
-// Front-end message 48: whether controller pArgs[0] is plugged in (lbl_801D87C0.a1); 9
+// Front-end message 48: whether controller pArgs[0] is plugged in (gUIState.a1); 9
 // (CONTROLLER_CPU) always answers 1.
 void GM_vIsControllerPluggedIn(MsgArg* pArgs, MsgArg* pResult) {
     s32 n;
@@ -1790,7 +1790,7 @@ void GM_vIsControllerPluggedIn(MsgArg* pArgs, MsgArg* pResult) {
         pResult->i = 1;
         return;
     }
-    pResult->i = lbl_801D87C0.a1[n];
+    pResult->i = gUIState.a1[n];
 }
 
 // Front-end message 49: 1 when the memory card in port pArgs[0], slot pArgs[1] is formatted
@@ -1845,11 +1845,11 @@ void GM_vMCIsMultitapPluggedIn(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 53: asks for pArgs[0] to be handed back to the menu UI a little later:
-// uiProcessInterface.c counts three UI updates (lbl_801D880C.n0) and then sends it as hint 0x23.
+// uiProcessInterface.c counts three UI updates (gUIDelayedHint.n0) and then sends it as hint 0x23.
 // The menus' twin of GM_vIG_MCfunction.
 void GM_vMCfunction(MsgArg* pArgs, MsgArg* pResult) {
-    lbl_801D880C.n4 = pArgs[0].i;
-    lbl_801D880C.n0 = 0;
+    gUIDelayedHint.n4 = pArgs[0].i;
+    gUIDelayedHint.n0 = 0;
 }
 
 // Front-end message 54: saves the options and records to the memory card in port pArgs[0], slot
@@ -2477,26 +2477,26 @@ void GM_vIsProfileActive(MsgArg* pArgs, MsgArg* pResult) {
 void GM_vFEMessage94_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Front-end message 95: how many controllers are plugged in (lbl_801D87C0.n38, counted every menu
+// Front-end message 95: how many controllers are plugged in (gUIState.n38, counted every menu
 // update by uiProcessInterface.c).
 void GM_vGetNumControllersPluggedIn(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = lbl_801D87C0.n38;
+    pResult->i = gUIState.n38;
 }
 
-// Front-end message 96: whether controller pArgs[0] has been given to a player (lbl_801D87C0.a2C,
+// Front-end message 96: whether controller pArgs[0] has been given to a player (gUIState.a2C,
 // set by GM_vSetPlayerController, cleared by GM_vClearControllerAssigned and when the menus start).
 void GM_vIsControllerAssigned(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = lbl_801D87C0.a2C[pArgs[0].i];
+    pResult->i = gUIState.a2C[pArgs[0].i];
 }
 
 // Front-end message 97: clears the mark that controller pArgs[0] (0..3; others are ignored) has
-// been given to a player (lbl_801D87C0.a2C).
+// been given to a player (gUIState.a2C).
 void GM_vClearControllerAssigned(MsgArg* pArgs, MsgArg* pResult) {
     s32 n;
 
     n = pArgs[0].i;
     if (n < 4) {
-        lbl_801D87C0.a2C[n] = 0;
+        gUIState.a2C[n] = 0;
     }
 }
 

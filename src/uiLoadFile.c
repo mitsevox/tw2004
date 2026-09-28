@@ -9,19 +9,19 @@
 #include "game/frontend.h"
 
 // .sbss: defined in reverse address order (CodeWarrior lays them out last-defined-first).
-char* lbl_80281F10;             // the name of the UI set: "frontend", "ingame" or "startup"
-void* lbl_80281F0C;             // the UI file's data, copied out of its stream object (fn_8008ED80)
-u32*  lbl_80281F08;             // the 'FONS' data: a count, then that many UIFont offsets, turned
+char* gUIInterfaceName;             // the name of the UI set: "frontend", "ingame" or "startup"
+void* gpUIFileData;             // the UI file's data, copied out of its stream object (fn_8008ED80)
+u32*  gpUIFonts;             // the 'FONS' data: a count, then that many UIFont offsets, turned
                                 // into pointers the same way
-UINamedList* lbl_80281F04;      // the 'GRPS'/'MPCS' data: a count, then that many offsets that
+UINamedList* gpUIPictureList;      // the 'GRPS'/'MPCS' data: a count, then that many offsets that
                                 // fn_8008EFC0 turns into pointers
-u8    lbl_80281F00;             // it is in ARAM (fn_8008F310), not in main memory
-u32   lbl_80281EFC;             // the next multiple of 32 above its size
-u32   lbl_80281EF8;             // the UI file's ARAM address while it is parked there
-u32   lbl_80281EF4;             // the next multiple of 32 above its size
-u32   lbl_80281EF0;             // the menus' 'GRPS'/'MPCS' data's ARAM address
+u8    gbUIFileInAram;             // it is in ARAM (fn_8008F310), not in main memory
+u32   gUIFileAramSize;             // the next multiple of 32 above its size
+u32   gUIFileAram;             // the UI file's ARAM address while it is parked there
+u32   gUIPicturesAramSize;             // the next multiple of 32 above its size
+u32   gUIPicturesAram;             // the menus' 'GRPS'/'MPCS' data's ARAM address
 
-UILoaded lbl_801D87A8;
+UILoaded gUITextureBanks;
 
 void fn_8008ED28(void);
 void fn_8008ED80(UStreamObject* pObject);
@@ -40,28 +40,28 @@ void UFont_FreeFont(int nSlot);                            // UFont.c: free a fo
 void fn_8008EC30(void) {
     int i;
 
-    lbl_801D87A8.nCount = 0;
-    lbl_80281F0C = NULL;
+    gUITextureBanks.nCount = 0;
+    gpUIFileData = NULL;
     for (i = 0; i < UI_NUM_LOADED; i++) {
-        lbl_801D87A8.ap4[i] = NULL;
+        gUITextureBanks.ap4[i] = NULL;
     }
-    lbl_80281F08 = 0;
-    lbl_80281F04 = 0;
+    gpUIFonts = 0;
+    gpUIPictureList = 0;
 }
 
 void fn_8008EC60(char* szSet) {
-    lbl_80281F10 = szSet;
+    gUIInterfaceName = szSet;
 }
 
 // Pick the UI set by the game type (a round, start-up or the menus) and register the handlers
 // for its stream objects.
 void fn_8008EC68(void) {
     if (gSession.nGameType == 4) {
-        lbl_80281F10 = "ingame";
+        gUIInterfaceName = "ingame";
     } else if (gSession.nGameType == 0) {
-        lbl_80281F10 = "startup";
+        gUIInterfaceName = "startup";
     } else {
-        lbl_80281F10 = "frontend";
+        gUIInterfaceName = "frontend";
     }
     Stream_RegisterLoadChunkCallback('DATS', fn_8008ED80);
     Stream_RegisterLoadChunkCallback('TXFS', fn_8008EE1C);
@@ -82,41 +82,41 @@ void fn_8008ED28(void) {
 void fn_8008ED80(UStreamObject* pObject) {
     void* pData;
 
-    if (lbl_80281EF8 == 0 && gSession.nGameType == 10) {
-        lbl_80281EFC = ((pObject->uSize >> 5) + 1) << 5;
+    if (gUIFileAram == 0 && gSession.nGameType == 10) {
+        gUIFileAramSize = ((pObject->uSize >> 5) + 1) << 5;
     }
     pData = StaticMem_Alloc(pObject->uSize, 2, 32, "uiLoadFile.c", 165);
     Mem_cpy(pData, pObject->pData, pObject->uSize);
-    lbl_80281F0C = pData;
+    gpUIFileData = pData;
     StaticMem_Free(pObject);
 }
 
 // 'TXFS': a texture bank, kept when fn_8008F204 wants the object's kind.
 void fn_8008EE1C(UStreamObject* pObject) {
     if (fn_8008F204((int)pObject->uId % 100000)) {
-        lbl_801D87A8.ap4[lbl_801D87A8.nCount] = fn_8000FB88(pObject, NULL, 0);
-        lbl_801D87A8.nCount++;
+        gUITextureBanks.ap4[gUITextureBanks.nCount] = fn_8000FB88(pObject, NULL, 0);
+        gUITextureBanks.nCount++;
     }
     StaticMem_Free(pObject);
 }
 
 // .sdata order: defined here, after fn_8008EC68's "ingame" and "startup", as in the original.
-u8    lbl_80281360 = 1;         // the menus' 'GRPS'/'MPCS' data has not been copied to ARAM yet
+u8    gbUIPicturesToAram = 1;         // the menus' 'GRPS'/'MPCS' data has not been copied to ARAM yet
 
 // 'GRPS' and 'MPCS'. The menus' copy goes to ARAM the first time it comes in, and later ones
 // are dropped: fn_8008F294 brings it back from there.
 void fn_8008EEB8(UStreamObject* pObject) {
     UINamedList* pData;
 
-    if (strcmp(lbl_80281F10, "frontend") == 0) {
-        if (lbl_80281EF4 == 0) {
-            lbl_80281EF4 = ((pObject->uSize >> 5) + 1) << 5;
-            lbl_80281EF0 = GoARAM_Alloc(lbl_80281EF4);
+    if (strcmp(gUIInterfaceName, "frontend") == 0) {
+        if (gUIPicturesAramSize == 0) {
+            gUIPicturesAramSize = ((pObject->uSize >> 5) + 1) << 5;
+            gUIPicturesAram = GoARAM_Alloc(gUIPicturesAramSize);
         }
-        if (lbl_80281360) {
-            GoARAM_WaitTransfer(GoARAM_CopyToAram(pObject->pData, lbl_80281EF0, lbl_80281EF4));
+        if (gbUIPicturesToAram) {
+            GoARAM_WaitTransfer(GoARAM_CopyToAram(pObject->pData, gUIPicturesAram, gUIPicturesAramSize));
             pData = StaticMem_Alloc(pObject->uSize, 1, 32, "uiLoadFile.c", 247);
-            lbl_80281360 = 0;
+            gbUIPicturesToAram = 0;
         } else {
             StaticMem_Free(pObject);
             return;
@@ -135,13 +135,13 @@ void fn_8008EFC0(UINamedList* pList) {
     u32 i;
     char* pName;
 
-    lbl_80281F04 = pList;
-    for (i = 0; i < lbl_80281F04->nCount; i++) {
+    gpUIPictureList = pList;
+    for (i = 0; i < gpUIPictureList->nCount; i++) {
         // fake match: the add goes through a local (in one expression the value and the offset
         // come out in each other's registers)
-        pName = lbl_80281F04->apNames[i];
+        pName = gpUIPictureList->apNames[i];
         pName += (uptr)pList;
-        lbl_80281F04->apNames[i] = pName;
+        gpUIPictureList->apNames[i] = pName;
     }
 }
 
@@ -155,21 +155,21 @@ void fn_8008EFFC(UStreamObject* pObject) {
 
     pData = StaticMem_Alloc(pObject->uSize, 2, 32, "uiLoadFile.c", 348);
     Mem_cpy(pData, pObject->pData, pObject->uSize);
-    lbl_80281F08 = pData;
-    for (i = 0; i < lbl_80281F08[0]; i++) {
-        uFont = lbl_80281F08[1 + i];        // fake match: through a local, as in fn_8008EFC0
+    gpUIFonts = pData;
+    for (i = 0; i < gpUIFonts[0]; i++) {
+        uFont = gpUIFonts[1 + i];        // fake match: through a local, as in fn_8008EFC0
         uFont += (uptr)pData;
-        lbl_80281F08[1 + i] = uFont;
+        gpUIFonts[1 + i] = uFont;
         nSlot = UFont_FindFreeSlot();
-        UFont_LoadFont(nSlot, &((UIFont*)lbl_80281F08[1 + i])->nSlot, 0);
-        ((UIFont*)lbl_80281F08[1 + i])->nSlot = nSlot;
+        UFont_LoadFont(nSlot, &((UIFont*)gpUIFonts[1 + i])->nSlot, 0);
+        ((UIFont*)gpUIFonts[1 + i])->nSlot = nSlot;
     }
     StaticMem_Free(pObject);
 }
 
 // szUnused: EA passes the UI set's name (fn_8009005C) to this getter and the three below.
 void* fn_8008F0C0(char* szUnused) {
-    return lbl_80281F0C;
+    return gpUIFileData;
 }
 
 void fn_8008F0C8(void* p) {
@@ -179,7 +179,7 @@ void fn_8008F0C8(void* p) {
 }
 
 UILoaded* fn_8008F0F0(char* szUnused) {
-    return &lbl_801D87A8;
+    return &gUITextureBanks;
 }
 
 // Free the texture banks the 'TXFS' handler kept.
@@ -195,7 +195,7 @@ void fn_8008F0FC(UILoaded* pLoaded) {
 }
 
 UINamedList* fn_8008F15C(char* szUnused) {
-    return lbl_80281F04;
+    return gpUIPictureList;
 }
 
 void fn_8008F164(void* p) {
@@ -205,7 +205,7 @@ void fn_8008F164(void* p) {
 }
 
 u32* fn_8008F18C(char* szUnused) {
-    return lbl_80281F08;
+    return gpUIFonts;
 }
 
 // Free the fonts' slots and the 'FONS' data.
@@ -229,10 +229,10 @@ u8 fn_8008F204(int nKind) {
 }
 
 void fn_8008F24C(void) {
-    if (lbl_80281F1C->pC != NULL) {
+    if (gpFrontEnd->pC != NULL) {
         fn_80090B10();
-        fn_8008F164(lbl_80281F1C->pC);
-        lbl_80281F1C->pC = NULL;
+        fn_8008F164(gpFrontEnd->pC);
+        gpFrontEnd->pC = NULL;
     }
 }
 
@@ -240,29 +240,29 @@ void fn_8008F24C(void) {
 void fn_8008F294(void) {
     UINamedList* pData;
 
-    if (lbl_80281F1C->pC == NULL) {
-        pData = StaticMem_Alloc(lbl_80281EF4, 1, 32, "uiLoadFile.c", 585);
-        GoARAM_WaitTransfer(GoARAM_CopyFromAram(pData, lbl_80281EF0, lbl_80281EF4));
+    if (gpFrontEnd->pC == NULL) {
+        pData = StaticMem_Alloc(gUIPicturesAramSize, 1, 32, "uiLoadFile.c", 585);
+        GoARAM_WaitTransfer(GoARAM_CopyFromAram(pData, gUIPicturesAram, gUIPicturesAramSize));
         fn_8008EFC0(pData);
-        lbl_80281F1C->pC = lbl_80281F04;
+        gpFrontEnd->pC = gpUIPictureList;
         fn_80090898();
     }
 }
 
 // Park the UI file's data in ARAM (the main memory copy stays allocated).
 void fn_8008F310(void) {
-    lbl_80281EF8 = GoARAM_Alloc(lbl_80281EFC);
-    GoARAM_WaitTransfer(GoARAM_CopyToAram(lbl_80281F0C, lbl_80281EF8, lbl_80281EFC));
-    lbl_80281F00 = 1;
+    gUIFileAram = GoARAM_Alloc(gUIFileAramSize);
+    GoARAM_WaitTransfer(GoARAM_CopyToAram(gpUIFileData, gUIFileAram, gUIFileAramSize));
+    gbUIFileInAram = 1;
 }
 
 void* fn_8008F354(void) {
-    return lbl_80281F0C;
+    return gpUIFileData;
 }
 
 // Bring the UI file's data back from ARAM and free the ARAM.
 void fn_8008F35C(void) {
-    lbl_80281F00 = 0;
-    GoARAM_WaitTransfer(GoARAM_CopyFromAram(lbl_80281F0C, lbl_80281EF8, lbl_80281EFC));
-    GoARAM_Free(lbl_80281EF8);
+    gbUIFileInAram = 0;
+    GoARAM_WaitTransfer(GoARAM_CopyFromAram(gpUIFileData, gUIFileAram, gUIFileAramSize));
+    GoARAM_Free(gUIFileAram);
 }

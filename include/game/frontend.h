@@ -78,7 +78,7 @@ typedef struct FrontEnd {
     f32   f18;                  // 0x18  set to 1 when a round starts (gomainloop fn_8006DC20)
 } FrontEnd;
 
-extern FrontEnd* lbl_80281F1C;
+extern FrontEnd* gpFrontEnd;
 
 // uiProcessInterface.c's controller input (fn_8008F820): which UI event each button sends.
 typedef struct UIButtonEvent {
@@ -86,12 +86,12 @@ typedef struct UIButtonEvent {
     s32 nEvent;                 // 0x4  the event UISProcessEvent sends the UI
 } UIButtonEvent;
 #define UI_NUM_BUTTON_EVENTS 16
-extern UIButtonEvent lbl_80189B58[UI_NUM_BUTTON_EVENTS];
-extern s32 lbl_80189B38[8];     // per controller (0..3): frames Controller_GetButtonMask(0x20, 1)'s button is held
+extern UIButtonEvent gUIButtonEvents[UI_NUM_BUTTON_EVENTS];
+extern s32 gUIButtonHeldFrames[8];     // per controller (0..3): frames Controller_GetButtonMask(0x20, 1)'s button is held
                                 // in game type 6; past 10 GUI_SendButtonHeld runs
-extern s8 lbl_80281368;         // CrAPState.bHidden put aside while fn_8008F820's lone-player UI is up (-1: none)
+extern s8 gSavedCrAPHidden;         // CrAPState.bHidden put aside while fn_8008F820's lone-player UI is up (-1: none)
 
-// What uiLoadFile.c's stream handlers loaded (lbl_801D87A8): up to five objects, freed together
+// What uiLoadFile.c's stream handlers loaded (gUITextureBanks): up to five objects, freed together
 // by fn_8008F0FC.
 #define UI_NUM_LOADED 5
 typedef struct UILoaded {
@@ -100,7 +100,7 @@ typedef struct UILoaded {
 } UILoaded;
 LAYOUT_ASSERT(UILoaded, 0x18);
 
-extern UILoaded lbl_801D87A8;
+extern UILoaded gUITextureBanks;
 
 // uiLoadFile.c: what the front end's shutdown (uiProcessInterface.c fn_80090400) frees.
 void fn_8008F0C8(void* p);              // free p unless it is NULL
@@ -214,8 +214,8 @@ void GM_vMCDeleteSave(MsgArg* pArgs, MsgArg* pResult);
 void GM_vMCHadIOError(MsgArg* pArgs, MsgArg* pResult);
 void GM_vMCGetSaveNeeds(MsgArg* pArgs, MsgArg* pResult);
 
-extern u8 lbl_80281F18;         // set by the pause handler (GameUICommands.c GM_vPauseGame)
-extern u8 lbl_80281F19;         // (uiProcessInterface.c) FEgolferanim.c's FE_IsGolferRenderAllowed tests it
+extern u8 gbPausedWithoutScoreCard;         // set by the pause handler (GameUICommands.c GM_vPauseGame)
+extern u8 gbUICloseRequested;         // (uiProcessInterface.c) FEgolferanim.c's FE_IsGolferRenderAllowed tests it
 
 // Four floats a UI element passes down its transform stack, copied as one struct; fe_movies.c's
 // fn_80090D28 scales its quad's colours by them / 511.

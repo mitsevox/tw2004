@@ -105,7 +105,7 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
     lbl_80282458 = &UISGetColorMultipler()->r;
     lbl_8028245C = &UISGetColorAdditive()->r;
     if (pArc->n2 != -1) {
-        pEntry = lbl_80281F1C->pFile->p8->apTables[pArc->n2]->apEntries[pArc->n0];
+        pEntry = gpFrontEnd->pFile->p8->apTables[pArc->n2]->apEntries[pArc->n0];
         pName = pEntry->szC;    // fake match: EA takes the name's address before the flag tests
         if (pEntry->u0 & 1) {
             if (gSession.nGameType == 3) {
@@ -113,7 +113,7 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
                 RenderState_SetBankTexture(pBank, fn_800922A0(pBank));
             } else {
                 nBank = fn_8008FFF0(pName);
-                RenderState_SetBankTexture(lbl_80281F1C->p8->ap4[nBank], pEntry->p4);
+                RenderState_SetBankTexture(gpFrontEnd->p8->ap4[nBank], pEntry->p4);
             }
         } else if (pEntry->u0 & 2) {
             pPict = (LLPict*)pEntry->p8;

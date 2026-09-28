@@ -738,14 +738,14 @@ void GM_vGetCurrentGolferIndex(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Message 7: leave the round: in mode 9 the end of the game is set pending
-// (GUI_SetEndOfGamePending), in any other the fade to black starts (lbl_801D87C0.bFadeToBlack); in
+// (GUI_SetEndOfGamePending), in any other the fade to black starts (gUIState.bFadeToBlack); in
 // the PGA TOUR (mode 23) GM_PgaTourSim_SetUserQuit(0, 1). The online branch
 // (OnlineGolf_bIsOnlineGame, always 0 in this build) never runs.
 void GM_vExitGame(MsgArg* pArgs, MsgArg* pResult) {
     if (Game_GetMode() == 9) {
         GUI_SetEndOfGamePending();
     } else {
-        lbl_801D87C0.bFadeToBlack = 1;
+        gUIState.bFadeToBlack = 1;
     }
     if (Game_GetMode() == 23) {
         GM_PgaTourSim_SetUserQuit(0, 1);
@@ -761,17 +761,17 @@ void GM_vExitGame(MsgArg* pArgs, MsgArg* pResult) {
 // for is cancelled (fn_8006F4E0).
 void GM_vClosePauseMenu(MsgArg* pArgs, MsgArg* pResult) {
     GUI_PauseMenuClosed();
-    if (lbl_801D87C0.bFadeToBlack == 0) {
+    if (gUIState.bFadeToBlack == 0) {
         Lessons_RestartLesson();
         return;
     }
     fn_8006F4E0();
 }
 
-// Message 9: pause: notes whether the scorecard was down (lbl_80281F18), pauses the sound and opens
+// Message 9: pause: notes whether the scorecard was down (gbPausedWithoutScoreCard), pauses the sound and opens
 // the pause menu.
 void GM_vPauseGame(MsgArg* pArgs, MsgArg* pResult) {
-    lbl_80281F18 = GUI_ScoreCardUp() == 0;
+    gbPausedWithoutScoreCard = GUI_ScoreCardUp() == 0;
     Gaud_Pause(1);
     GUI_OpenPauseMenu();
 }
@@ -1596,11 +1596,11 @@ void GM_vIG_MCGetNumReplays(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Asks for pArgs[0] to be handed back to the UI a little later (command 84): uiProcessInterface.c
-// counts three UI updates (lbl_801D880C.n0), then sends it to the UI as hint 0x24 in a round (0x23
+// counts three UI updates (gUIDelayedHint.n0), then sends it to the UI as hint 0x24 in a round (0x23
 // in the menus). The menus' GM_vMCfunction does the same.
 void GM_vIG_MCfunction(MsgArg* pArgs, MsgArg* pResult) {
-    lbl_801D880C.n4 = pArgs[0].i;
-    lbl_801D880C.n0 = 0;
+    gUIDelayedHint.n4 = pArgs[0].i;
+    gUIDelayedHint.n0 = 0;
 }
 
 // Formats the card in port pArgs[0], slot pArgs[1] (command 85); MC_FormatCard's result.
@@ -1847,7 +1847,7 @@ void GM_vIG_ReplaySpaceNeeded(MsgArg* pArgs, MsgArg* pResult) {
 void GM_vPauseMenuClosed(MsgArg* pArgs, MsgArg* pResult) {
     Gaud_Pause(0);
     GUI_PauseMenuClosed();
-    if (lbl_801D87C0.bFadeToBlack == 0) {
+    if (gUIState.bFadeToBlack == 0) {
         Lessons_RestartLesson();
     }
 }

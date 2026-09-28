@@ -55,7 +55,7 @@ extern FEState gFEState;
 extern f32 lbl_80281374;        // .sdata 0x80281374 = 0.25f: past FE_MessageTable's .sdata, in a
                                 // later file's (not placed yet)
 
-// The front end's screen state (lbl_801D87C0, 0x4C bytes). Only what the cleaned code reads.
+// The front end's screen state (gUIState, 0x4C bytes). Only what the cleaned code reads.
 typedef struct FEScreen {
     u8  bFadeToBlack;           // 0x00  the fade to black runs (set when the round or the menus
                                 //       are left; uiProcessInterface.c draws it and clears it)
@@ -80,7 +80,7 @@ typedef struct FEScreen {
 } FEScreen;
 LAYOUT_ASSERT(FEScreen, 0x4C);
 
-extern FEScreen lbl_801D87C0;
+extern FEScreen gUIState;
 
 // lbl_801D8858 (0x38 bytes), also used by the code at 0x8009170C. Only what the cleaned code reads.
 typedef struct FE801D8858 {
@@ -142,7 +142,7 @@ void fn_800914DC(FEQuad* pQuad, int nMsg, u32 bSplit, FEMsgArg* pArgs);
 extern f32* lbl_80281F28;
 extern f32* lbl_80281F2C;
 
-// lbl_801D880C (0xC bytes), also read by uiProcessInterface.c. A menu message sets n4 and clears n0.
+// gUIDelayedHint (0xC bytes), also read by uiProcessInterface.c. A menu message sets n4 and clears n0.
 typedef struct FE801D880C {
     s32 n0;                     // 0x0  0..2; uiProcessInterface.c sets it to -1
     s32 n4;                     // 0x4
@@ -150,7 +150,7 @@ typedef struct FE801D880C {
 } FE801D880C;
 LAYOUT_ASSERT(FE801D880C, 0xC);
 
-extern FE801D880C lbl_801D880C;
+extern FE801D880C gUIDelayedHint;
 
 // One of 200 entries (lbl_801D8890); uiProcessInterface.c sets them from lbl_801D8ED0.
 typedef struct FE801D8890 {

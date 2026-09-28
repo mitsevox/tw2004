@@ -220,11 +220,11 @@ void FE_movieFade(void) {
         vColor[0] = 0.0f;
         vColor[1] = 0.0f;
         vColor[2] = 0.0f;
-        vColor[3] = lbl_801D87C0.fFade;
+        vColor[3] = gUIState.fFade;
         fn_80037FB4(1, vColor);
-        lbl_801D87C0.fFade += 0.05f;
+        gUIState.fFade += 0.05f;
         pMovie = &gFEState.aMovies[gFEState.nMovieNext];
-        if (lbl_801D87C0.fFade >= 1.0f) {
+        if (gUIState.fFade >= 1.0f) {
             Gaud_StopMusic();
             FE_PreMovieSetup();
             switch (pMovie->nKind) {
@@ -242,7 +242,7 @@ void FE_movieFade(void) {
             }
             FE_PostMovieSetup();
             Gaud_StartFEMusic(0);
-            lbl_801D87C0.fFade = 0.0f;
+            gUIState.fFade = 0.0f;
             gFEState.nMovieNext++;
             if (gFEState.nMovieNext % FE_NUM_MOVIES == 0) {
                 gFEState.nMovieNext = 0;
@@ -1377,7 +1377,7 @@ void FE_vExitUI(void) {
         gFEState.nMode = 28;
     }
     gFEState.b11 = 0;
-    lbl_801D87C0.bFadeToBlack = 1;
+    gUIState.bFadeToBlack = 1;
     gSession.bDemo = 0;
     Gaud_ExitFE();
     GameMode4_ExitFE();

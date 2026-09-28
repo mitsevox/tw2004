@@ -515,11 +515,11 @@ void PGATourWins_GetDetails(MsgArg* pArgs, MsgArg* pResult) {
 
 // FE message 718: after a tour round, profile 0's tournament is moved on
 // (GameModeDriverPGATour_CheckAdvanceTournament); when a movie is queued (FE_movieIsQueueEmpty false), the
-// front end's fade to black (lbl_801D87C0.fFade) is set to full at once.
+// front end's fade to black (gUIState.fFade) is set to full at once.
 void PGATourMsg_CheckAdvanceTournament(MsgArg* pArgs, MsgArg* pResult) {
     GameModeDriverPGATour_CheckAdvanceTournament(0);
     if (!FE_movieIsQueueEmpty()) {
-        lbl_801D87C0.fFade = 1.0f;
+        gUIState.fFade = 1.0f;
     }
 }
 

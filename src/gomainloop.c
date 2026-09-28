@@ -1165,8 +1165,8 @@ void fn_8006DBD4(void) {
 }
 
 void fn_8006DC20(f32 f) {
-    if (lbl_80281F1C != NULL) {
-        lbl_80281F1C->f18 = f;
+    if (gpFrontEnd != NULL) {
+        gpFrontEnd->f18 = f;
     }
 }
 

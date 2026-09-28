@@ -394,7 +394,7 @@ void GameMsg_SendPending(void) {
             args[0].i = 15;
             args[1].f = 0.0f;
             args[2].i = gGameMsgPendingValue;
-            UISProcessHint(lbl_80281F1C->pHandler, 5, 3, args);
+            UISProcessHint(gpFrontEnd->pHandler, 5, 3, args);
             GameMsg_TogglePending(1);
         }
         if (gGameMsgPending & 2) {
@@ -426,7 +426,7 @@ void GameMsg_Send(int nMsg) {
     MsgArg arg;
     GameMsg_OnSend(nMsg);
     Mem_set(&arg, 0, sizeof(arg));
-    UISProcessHint(lbl_80281F1C->pHandler, nMsg, 0, &arg);
+    UISProcessHint(gpFrontEnd->pHandler, nMsg, 0, &arg);
 }
 
 // Empty in this build: every GameMsg_ sender calls it with the message number before it sends.
@@ -435,7 +435,7 @@ void GameMsg_OnSend(int nMsg) {
 
 // Sends front-end message nMsg with one value, read through pA: a float when bit 0 of uFloats is
 // set, else an int. Every GameMsg_ sender hands its values to the front end's handler
-// (lbl_80281F1C->pHandler) through UISProcessHint.
+// (gpFrontEnd->pHandler) through UISProcessHint.
 void GameMsg_Send1(int nMsg, u32 uFloats, void* pA) {
     MsgArg args[1];
     GameMsg_OnSend(nMsg);
@@ -446,7 +446,7 @@ void GameMsg_Send1(int nMsg, u32 uFloats, void* pA) {
     if (!(uFloats & 1)) {
         args[0].i = *(s32*)pA;
     }
-    UISProcessHint(lbl_80281F1C->pHandler, nMsg, 1, args);
+    UISProcessHint(gpFrontEnd->pHandler, nMsg, 1, args);
 }
 
 // Sends front-end message nMsg with two values, read through pA and pB; bits 0 and 1 of uFloats
@@ -466,7 +466,7 @@ void GameMsg_Send2(int nMsg, u32 uFloats, void* pA, void* pB) {
     } else {
         args[1].i = *(s32*)pB;
     }
-    UISProcessHint(lbl_80281F1C->pHandler, nMsg, 2, args);
+    UISProcessHint(gpFrontEnd->pHandler, nMsg, 2, args);
 }
 
 // Sends front-end message nMsg with three values, read through pA, pB and pC; bits 0..2 of uFloats
@@ -491,7 +491,7 @@ void GameMsg_Send3(int nMsg, u32 uFloats, void* pA, void* pB, void* pC) {
     } else {
         args[2].i = *(s32*)pC;
     }
-    UISProcessHint(lbl_80281F1C->pHandler, nMsg, 3, args);
+    UISProcessHint(gpFrontEnd->pHandler, nMsg, 3, args);
 }
 
 // Sends front-end message nMsg with five values, read through pA..pE; bits 0..4 of uFloats mark
@@ -526,7 +526,7 @@ void GameMsg_Send5(int nMsg, u32 uFloats, void* pA, void* pB, void* pC, void* pD
     } else {
         args[4].i = *(s32*)pE;
     }
-    UISProcessHint(lbl_80281F1C->pHandler, nMsg, 5, args);
+    UISProcessHint(gpFrontEnd->pHandler, nMsg, 5, args);
 }
 
 // Sends front-end message nMsg with one string value (a MsgString: the text and its length, on the
@@ -539,7 +539,7 @@ void GameMsg_SendString(int nMsg, char* pStr) {
     str.pStr = pStr;
     arg.p = &str;
     ((MsgString*)arg.p)->nLen = strlen(pStr);
-    UISProcessHint(lbl_80281F1C->pHandler, nMsg, 1, &arg);
+    UISProcessHint(gpFrontEnd->pHandler, nMsg, 1, &arg);
 }
 
 // Whether the front end's fade to black is running (GUI_GetFadeToBlack): GUI_PauseMenuClosed leaves
@@ -565,7 +565,7 @@ void GUI_UpdateLongDriveScore(int nPlayer, int nScore, int nLength, int nKind, i
     args[5].f = fValue6;
     args[6].i = nValue7;
     args[7].i = nPoints;
-    UISProcessHint(lbl_80281F1C->pHandler, 0x42, 8, args);
+    UISProcessHint(gpFrontEnd->pHandler, 0x42, 8, args);
 }
 
 // Mode 22's scoring variant for the UI (message 89), once when the mode asks: 1 for variant 0, 2
@@ -580,10 +580,10 @@ void GUI_SendLongDriveText(char* pStr) {
     GameMsg_SendString(90, pStr);
 }
 
-// The front end's fade-to-black flag (lbl_801D87C0.bFadeToBlack): set when the round or the menus
+// The front end's fade-to-black flag (gUIState.bFadeToBlack): set when the round or the menus
 // are left, and fn_8009069C darkens the screen while it is.
 u8 GUI_GetFadeToBlack(void) {
-    return lbl_801D87C0.bFadeToBlack;
+    return gUIState.bFadeToBlack;
 }
 
 // Marks every statistic tip as not shown yet (gTipShown), from GUI_Init at the start or restart

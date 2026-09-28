@@ -1967,44 +1967,44 @@ u8 FE_CrAP_IsAssetRemovable(int nAsset) {
     return 0;
 }
 
-// Send message nMsg with the value nA to the front end's handler (lbl_80281F1C), when there is a
+// Send message nMsg with the value nA to the front end's handler (gpFrontEnd), when there is a
 // front end. The EA Sports Bio screens (EASportsBio.c) use this file's FE_SendHint senders; a
 // string value goes as a MsgString (FE_SetHintString).
 void FE_SendHintInt(int nMsg, s32 nA) {
     MsgArg arg;
 
-    if (lbl_80281F1C != NULL) {
+    if (gpFrontEnd != NULL) {
         arg.i = nA;
-        UISProcessHint(lbl_80281F1C->pHandler, nMsg, 1, &arg);
+        UISProcessHint(gpFrontEnd->pHandler, nMsg, 1, &arg);
     }
 }
 
-// Send message nMsg with the value nA and the string szB to the front end's handler (lbl_80281F1C),
+// Send message nMsg with the value nA and the string szB to the front end's handler (gpFrontEnd),
 // when there is a front end.
 void FE_SendHintIntString(int nMsg, s32 nA, char* szB) {
     MsgString str;
     MsgArg args[2];
 
-    if (lbl_80281F1C != NULL) {
+    if (gpFrontEnd != NULL) {
         args[0].i = nA;
         args[1].p = &str;
         FE_SetHintString(&args[1], szB);
-        UISProcessHint(lbl_80281F1C->pHandler, nMsg, 2, args);
+        UISProcessHint(gpFrontEnd->pHandler, nMsg, 2, args);
     }
 }
 
 // Send message nMsg with the value nA, the string szB and the value nC to the front end's handler
-// (lbl_80281F1C), when there is a front end.
+// (gpFrontEnd), when there is a front end.
 void FE_SendHintIntStringInt(int nMsg, s32 nA, char* szB, s32 nC) {
     MsgArg args[3];
     MsgString str;
 
-    if (lbl_80281F1C != NULL) {
+    if (gpFrontEnd != NULL) {
         args[0].i = nA;
         args[1].p = &str;
         FE_SetHintString(&args[1], szB);
         args[2].i = nC;
-        UISProcessHint(lbl_80281F1C->pHandler, nMsg, 3, args);
+        UISProcessHint(gpFrontEnd->pHandler, nMsg, 3, args);
     }
 }
 
@@ -2021,21 +2021,21 @@ int FE_SendHintString(char* sz, int nMsg) {
     MsgArg arg;
     MsgString str;
 
-    if (lbl_80281F1C == NULL) {
+    if (gpFrontEnd == NULL) {
         return -1;
     }
     arg.p = &str;
     FE_SetHintString(&arg, sz);
-    UISProcessHint(lbl_80281F1C->pHandler, nMsg, 1, &arg);
+    UISProcessHint(gpFrontEnd->pHandler, nMsg, 1, &arg);
     return 0;
 }
 
 // Send message nMsg with the six values nA..nF and the float fG to the front end's handler
-// (lbl_80281F1C), when there is a front end.
+// (gpFrontEnd), when there is a front end.
 void FE_SendHint7Args(int nMsg, s32 nA, s32 nB, s32 nC, s32 nD, s32 nE, s32 nF, f32 fG) {
     MsgArg args[7];
 
-    if (lbl_80281F1C != NULL) {
+    if (gpFrontEnd != NULL) {
         args[0].i = nA;
         args[1].i = nB;
         args[2].i = nC;
@@ -2043,17 +2043,17 @@ void FE_SendHint7Args(int nMsg, s32 nA, s32 nB, s32 nC, s32 nD, s32 nE, s32 nF, 
         args[4].i = nE;
         args[5].i = nF;
         args[6].f = fG;
-        UISProcessHint(lbl_80281F1C->pHandler, nMsg, 7, args);
+        UISProcessHint(gpFrontEnd->pHandler, nMsg, 7, args);
     }
 }
 
-// Send message nMsg with the ten values nA..nJ to the front end's handler (lbl_80281F1C), when
+// Send message nMsg with the ten values nA..nJ to the front end's handler (gpFrontEnd), when
 // there is a front end.
 void FE_SendHint10Args(int nMsg, s32 nA, s32 nB, s32 nC, s32 nD, s32 nE, s32 nF, s32 nG, s32 nH, s32 nI,
                  s32 nJ) {
     MsgArg args[10];
 
-    if (lbl_80281F1C != NULL) {
+    if (gpFrontEnd != NULL) {
         args[0].i = nA;
         args[1].i = nB;
         args[2].i = nC;
@@ -2064,6 +2064,6 @@ void FE_SendHint10Args(int nMsg, s32 nA, s32 nB, s32 nC, s32 nD, s32 nE, s32 nF,
         args[7].i = nH;
         args[8].i = nI;
         args[9].i = nJ;
-        UISProcessHint(lbl_80281F1C->pHandler, nMsg, 10, args);
+        UISProcessHint(gpFrontEnd->pHandler, nMsg, 10, args);
     }
 }

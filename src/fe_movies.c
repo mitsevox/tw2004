@@ -115,7 +115,7 @@ void fn_80090D28(FEQuad* pQuad) {
     lbl_80281F2C = &UISGetColorAdditive()->r;
     bTint = 1;
     if (pQuad->n2 != -1) {
-        pEntry = lbl_80281F1C->pFile->p8->apTables[pQuad->n2]->apEntries[pQuad->n0];
+        pEntry = gpFrontEnd->pFile->p8->apTables[pQuad->n2]->apEntries[pQuad->n0];
         szName = pEntry->szC;
         if (pEntry->u0 & 1) {
             if (gSession.nGameType == 3) {
@@ -125,7 +125,7 @@ void fn_80090D28(FEQuad* pQuad) {
             } else {
                 // the texture bank by the entry's name (fn_8008FFF0: -1, 0 or 1)
                 nBank = fn_8008FFF0(szName);
-                RenderState_SetBankTexture(lbl_80281F1C->p8->ap4[nBank], pEntry->p4);
+                RenderState_SetBankTexture(gpFrontEnd->p8->ap4[nBank], pEntry->p4);
             }
             if (!(pQuad->n8 & 1)) {
                 bTint = 0;
@@ -148,24 +148,24 @@ void fn_80090D28(FEQuad* pQuad) {
     vAdd[2] = pAdd->f50[2];
     vAdd[3] = pAdd->f5C;
     nColour = pQuad->n4;
-    if (lbl_80281F1C->p14 != NULL && nColour < (s16)lbl_80281F1C->p14->nCount && nColour != -1) {
+    if (gpFrontEnd->p14 != NULL && nColour < (s16)gpFrontEnd->p14->nCount && nColour != -1) {
         // the table's colours are alpha, blue, green, red
-        pQuad->aVtx[0].au14[3] = lbl_80281F1C->p14->apEntries[nColour]->p8[0];
-        pQuad->aVtx[1].au14[3] = lbl_80281F1C->p14->apEntries[nColour]->p8[0];
-        pQuad->aVtx[2].au14[3] = lbl_80281F1C->p14->apEntries[nColour]->p8[0];
-        pQuad->aVtx[3].au14[3] = lbl_80281F1C->p14->apEntries[nColour]->p8[0];
-        pQuad->aVtx[0].au14[2] = lbl_80281F1C->p14->apEntries[nColour]->p8[1];
-        pQuad->aVtx[1].au14[2] = lbl_80281F1C->p14->apEntries[nColour]->p8[1];
-        pQuad->aVtx[2].au14[2] = lbl_80281F1C->p14->apEntries[nColour]->p8[1];
-        pQuad->aVtx[3].au14[2] = lbl_80281F1C->p14->apEntries[nColour]->p8[1];
-        pQuad->aVtx[0].au14[1] = lbl_80281F1C->p14->apEntries[nColour]->p8[2];
-        pQuad->aVtx[1].au14[1] = lbl_80281F1C->p14->apEntries[nColour]->p8[2];
-        pQuad->aVtx[2].au14[1] = lbl_80281F1C->p14->apEntries[nColour]->p8[2];
-        pQuad->aVtx[3].au14[1] = lbl_80281F1C->p14->apEntries[nColour]->p8[2];
-        pQuad->aVtx[0].au14[0] = lbl_80281F1C->p14->apEntries[nColour]->p8[3];
-        pQuad->aVtx[1].au14[0] = lbl_80281F1C->p14->apEntries[nColour]->p8[3];
-        pQuad->aVtx[2].au14[0] = lbl_80281F1C->p14->apEntries[nColour]->p8[3];
-        pQuad->aVtx[3].au14[0] = lbl_80281F1C->p14->apEntries[nColour]->p8[3];
+        pQuad->aVtx[0].au14[3] = gpFrontEnd->p14->apEntries[nColour]->p8[0];
+        pQuad->aVtx[1].au14[3] = gpFrontEnd->p14->apEntries[nColour]->p8[0];
+        pQuad->aVtx[2].au14[3] = gpFrontEnd->p14->apEntries[nColour]->p8[0];
+        pQuad->aVtx[3].au14[3] = gpFrontEnd->p14->apEntries[nColour]->p8[0];
+        pQuad->aVtx[0].au14[2] = gpFrontEnd->p14->apEntries[nColour]->p8[1];
+        pQuad->aVtx[1].au14[2] = gpFrontEnd->p14->apEntries[nColour]->p8[1];
+        pQuad->aVtx[2].au14[2] = gpFrontEnd->p14->apEntries[nColour]->p8[1];
+        pQuad->aVtx[3].au14[2] = gpFrontEnd->p14->apEntries[nColour]->p8[1];
+        pQuad->aVtx[0].au14[1] = gpFrontEnd->p14->apEntries[nColour]->p8[2];
+        pQuad->aVtx[1].au14[1] = gpFrontEnd->p14->apEntries[nColour]->p8[2];
+        pQuad->aVtx[2].au14[1] = gpFrontEnd->p14->apEntries[nColour]->p8[2];
+        pQuad->aVtx[3].au14[1] = gpFrontEnd->p14->apEntries[nColour]->p8[2];
+        pQuad->aVtx[0].au14[0] = gpFrontEnd->p14->apEntries[nColour]->p8[3];
+        pQuad->aVtx[1].au14[0] = gpFrontEnd->p14->apEntries[nColour]->p8[3];
+        pQuad->aVtx[2].au14[0] = gpFrontEnd->p14->apEntries[nColour]->p8[3];
+        pQuad->aVtx[3].au14[0] = gpFrontEnd->p14->apEntries[nColour]->p8[3];
     }
     fn_80090B80(&pQuad->aVtx[0], &aVtx[0], bTint);
     fn_80090B80(&pQuad->aVtx[1], &aVtx[1], bTint);
@@ -227,12 +227,12 @@ void fn_800912F4(FEVertex* pVtx, f32* pPos, f32* pUV, f32* pColour, f32* pScale,
 }
 
 // When UI file entry (nTable, nEntry) has flag 2 set and 1 clear, make the picture of entry
-// nEntry of table lbl_801D87C0.n3C (fn_80090940).
+// nEntry of table gUIState.n3C (fn_80090940).
 void fn_800913EC(s16 nTable, s16 nEntry) {
     u32 uFlags;
 
     if (nTable == -1) return;
-    uFlags = lbl_80281F1C->pFile->p8->apTables[nTable]->apEntries[nEntry]->u0;
+    uFlags = gpFrontEnd->pFile->p8->apTables[nTable]->apEntries[nEntry]->u0;
     if (!(uFlags & 1) && (uFlags & 2)) {
         fn_80090940(nEntry);
     }
@@ -243,12 +243,12 @@ void fn_80091454(void) {
 }
 
 // For UI file entry (nTable, nEntry) with flags 2 set and 1 clear: fn_80008380, then flag 0x10
-// on entry nEntry of table lbl_801D87C0.n3C (fn_800909B4).
+// on entry nEntry of table gUIState.n3C (fn_800909B4).
 void fn_80091460(s16 nTable, s16 nEntry) {
     u32 uFlags;
 
     if (nTable == -1) return;
-    uFlags = lbl_80281F1C->pFile->p8->apTables[nTable]->apEntries[nEntry]->u0;
+    uFlags = gpFrontEnd->pFile->p8->apTables[nTable]->apEntries[nEntry]->u0;
     if (!(uFlags & 1) && (uFlags & 2)) {
         fn_80008380();
         fn_800909B4(nEntry);
@@ -546,7 +546,7 @@ void fn_80091DB8(int nFrames) {
     fn_8002FEAC();
 }
 
-// Show the picture of entry 0 of table lbl_801D87C0.n3C (fading in over 30 frames) and free it.
+// Show the picture of entry 0 of table gUIState.n3C (fading in over 30 frames) and free it.
 // The 600 calls to fn_80007254 after it do nothing (it is empty).
 void fn_80091E1C(void) {
     int i = 0;
@@ -554,7 +554,7 @@ void fn_80091E1C(void) {
     UIFileEntry* pEntry;
     UIMovieData* pData;
 
-    pEntry = lbl_80281F1C->pFile->p8->apTables[lbl_801D87C0.n3C]->apEntries[0];
+    pEntry = gpFrontEnd->pFile->p8->apTables[gUIState.n3C]->apEntries[0];
     pData = pEntry->p4;
     pEntry->p8 = (u8*)fn_8002FD00(pData->aData, pData->uSize);
     pPict = (LLPict*)pEntry->p8;
@@ -665,8 +665,8 @@ void fn_8009220C(void) {
 }
 
 f32 fn_80092210(void) {
-    if (lbl_80281F1C != NULL) {
-        return lbl_80281F1C->f18;
+    if (gpFrontEnd != NULL) {
+        return gpFrontEnd->f18;
     }
     return 0.0f;
 }

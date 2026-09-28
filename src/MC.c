@@ -170,11 +170,11 @@ s32 MC_LoadOptionsFromFirstCardFound(void) {
             if (MC_CheckCardReady(nPort, nSlot) == 0) {
                 nResult = MC_GotoDirectory(nPort, nSlot, MC_DIR_NAME);
                 if (nResult == 0) {
-                    if (lbl_80281F1C != NULL) {
+                    if (gpFrontEnd != NULL) {
                         Mem_set(args, 0, sizeof(args));
                         args[0].i = nPort;
                         args[1].i = nSlot;
-                        UISDoHint(lbl_80281F1C->pHandler, 0x85, 2, (s32*)args);
+                        UISDoHint(gpFrontEnd->pHandler, 0x85, 2, (s32*)args);
                     }
                     nResult = MC_LoadFile(nPort, nSlot, MC_FILE_NAME, lbl_80281FDC, MC_BUFFER_SIZE);
                     if (nResult == 0) {
@@ -204,9 +204,9 @@ s32 MC_LoadOptionsFromFirstCardFound(void) {
             MC_MergeRecords(&lbl_80281FDC->records);
         }
         fn_8009EF98();
-    } else if (lbl_80281F1C != NULL) {
+    } else if (gpFrontEnd != NULL) {
         Mem_set(&arg, 0, sizeof(arg));
-        UISDoHint(lbl_80281F1C->pHandler, 0x86, 1, (s32*)&arg);
+        UISDoHint(gpFrontEnd->pHandler, 0x86, 1, (s32*)&arg);
     }
     // EA bug: nResult is never set when no card gets as far as the file check
     return nResult;
