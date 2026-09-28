@@ -182,9 +182,9 @@ typedef enum StatsUnits {
 
 #define FE_STATS_NUM_CATEGORIES 29      // the screen's rows, one per category
 
-extern char* lbl_8019439C[FE_STATS_NUM_CATEGORIES];     // per category: its title
-extern s32 lbl_80194410[FE_STATS_NUM_CATEGORIES];       // per category: its statistic, -1 none yet
-extern StatsUnits lbl_80194484[FE_STATS_NUM_CATEGORIES];    // per category: its units
-extern s32 lbl_80282508;        // the category the leader board shows
+extern char* gStatsCategoryTitle[FE_STATS_NUM_CATEGORIES];     // per category: its title
+extern s32 gStatsCategoryStat[FE_STATS_NUM_CATEGORIES];       // per category: its statistic, -1 none yet
+extern StatsUnits gStatsCategoryUnits[FE_STATS_NUM_CATEGORIES];    // per category: its units
+extern s32 gStatsActiveCategory;        // the category the leader board shows
 
 #endif

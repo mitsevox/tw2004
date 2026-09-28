@@ -1,12 +1,12 @@
 // fe_stats.c (TW06's fe_stats.c): the front end's PGA TOUR statistics screen. It fills the
 // menus' text for the player's own line in each of the 29 categories and for the leader board of
-// the chosen category (lbl_80282508), from the statistics PGATourSimulation.c keeps.
+// the chosen category (gStatsActiveCategory), from the statistics PGATourSimulation.c keeps.
 
 #include "game/frontend.h"
 #include "frontend/fe.h"
 #include "game/modes/pgatoursim.h"
 
-char* lbl_8019439C[FE_STATS_NUM_CATEGORIES] = {
+char* gStatsCategoryTitle[FE_STATS_NUM_CATEGORIES] = {
     "Season Money Leaders", "Career Money Leaders", "All-Around Ranking", "Total Rounds",
     "Scoring Average", "Total Driving", "Longest Drive", "Driving Distance", "Driving Accuracy",
     "Ball Striking", "Greens In Regulation (GIR)", "Putts Per Round", "Putting Average",
@@ -15,11 +15,11 @@ char* lbl_8019439C[FE_STATS_NUM_CATEGORIES] = {
     "Par 4 Birdie Leaders", "Par 5 Birdie Leaders", "Birdie Conversion", "Par Breakers",
     "Par 3 Performance", "Par 4 Performance", "Par 5 Performance",
 };
-s32 lbl_80194410[FE_STATS_NUM_CATEGORIES] = {
+s32 gStatsCategoryStat[FE_STATS_NUM_CATEGORIES] = {
     24, 25, 28, 26, 14, 29, 19, 0, 1, 30, 2, 3, 4, 5, 6, 7, 23, 21, 8, 22, 9, 10, 11, 12, 13, 15,
     16, 17, 18,
 };
-StatsUnits lbl_80194484[FE_STATS_NUM_CATEGORIES] = {
+StatsUnits gStatsCategoryUnits[FE_STATS_NUM_CATEGORIES] = {
     UNITS_MONEY, UNITS_MONEY, UNITS_NONE, UNITS_NONE, UNITS_NONE, UNITS_NONE, UNITS_YARDS,
     UNITS_YARDS, UNITS_PERCENT, UNITS_NONE, UNITS_PERCENT, UNITS_NONE, UNITS_NONE, UNITS_PERCENT,
     UNITS_PERCENT, UNITS_PERCENT, UNITS_NONE, UNITS_NONE, UNITS_NONE, UNITS_NONE, UNITS_NONE,
@@ -27,7 +27,7 @@ StatsUnits lbl_80194484[FE_STATS_NUM_CATEGORIES] = {
     UNITS_NONE,
 };
 
-s32 lbl_80282508;
+s32 gStatsActiveCategory;
 
 // Prints a statistic's value text with its units into szOut: as it is, as money with thousands
 // commas ("$1,234,567", fn_800907AC), with " yds", or with "%".
@@ -60,12 +60,12 @@ void UIStatsRankings_GetRow(MsgArg* pArgs, MsgArg* pResult) {
     char* szTitle = ((MsgString*)pArgs[1].p)->pStr;
     char* szValue = ((MsgString*)pArgs[2].p)->pStr;
     char* szRank = ((MsgString*)pArgs[3].p)->pStr;
-    GM_Pga_StatTypes_t nStat = lbl_80194410[nCategory];
-    StatsUnits eUnits = lbl_80194484[nCategory];
+    GM_Pga_StatTypes_t nStat = gStatsCategoryStat[nCategory];
+    StatsUnits eUnits = gStatsCategoryUnits[nCategory];
     int nPlayer = fn_80077B08();
     char szStat[32];
 
-    strcpy(szTitle, lbl_8019439C[nCategory]);
+    strcpy(szTitle, gStatsCategoryTitle[nCategory]);
     if (nStat != -1) {
         GM_PgaTourSim_GetStatValString(
             nStat, GM_PgaTourSim_GetStatValueFromGolferID(nPlayer, PGA_USER_GOLFER, nStat), szStat);
@@ -88,7 +88,7 @@ void UIStatsRankings_GetProfileName(MsgArg* pArgs, MsgArg* pResult) {
 // FE message 523: picks the category (a row of the statistics screen, not a statistic number) that
 // the leader board shows.
 void UIStatsRankings_SetActiveStat(MsgArg* pArgs, MsgArg* pResult) {
-    lbl_80282508 = pArgs[0].i;
+    gStatsActiveCategory = pArgs[0].i;
 }
 
 // FE message 524: a line of the chosen category's leader board (arguments: the row, -1 for the
@@ -109,7 +109,7 @@ void UIStatsRankings_GetIndStatsRow(MsgArg* pArgs, MsgArg* pResult) {
     char szStat[16];
 
     nPlayer = fn_80077B08();
-    nStat = lbl_80194410[lbl_80282508];
+    nStat = gStatsCategoryStat[gStatsActiveCategory];
     if (nGolfer == -1) {
         nGolfer = PGA_USER_GOLFER;
     } else {
@@ -118,7 +118,7 @@ void UIStatsRankings_GetIndStatsRow(MsgArg* pArgs, MsgArg* pResult) {
     if (nStat != -1) {
         sprintf(szRank, "%d", GM_PgaTourSim_GetStatRankFromGolferID(nPlayer, nGolfer, nStat));
         strcpy(szName, GM_PgaTourSim_GetNameFromGolferID(nPlayer, nGolfer));
-        if (lbl_80282508 == 1) {
+        if (gStatsActiveCategory == 1) {
             szPlayed[0] = '\0';
         } else if (GM_PgaTourSim_GetStatView(nStat) == 0) {
             sprintf(szPlayed, "%d", GM_PgaTourSim_GetNEventsFromGolferID(nPlayer, nGolfer));
@@ -127,7 +127,7 @@ void UIStatsRankings_GetIndStatsRow(MsgArg* pArgs, MsgArg* pResult) {
         }
         GM_PgaTourSim_GetStatValString(nStat, GM_PgaTourSim_GetStatValueFromGolferID(nPlayer, nGolfer, nStat),
                                        szStat);
-        eUnits = lbl_80194484[lbl_80282508];
+        eUnits = gStatsCategoryUnits[gStatsActiveCategory];
         if (eUnits == UNITS_PERCENT) {
             eUnits = UNITS_NONE;
         }
