@@ -20,7 +20,7 @@ void SKEL_TransformBones(CharModel* pModel, u32* auBits);
 f32  fn_80116304(u32 nFrame, f32 fPhase, f32 fStrength);
 f32  fn_80116468(void);
 void Quat_QuatToMatrix(f32* pQ, f32 (*pMtx)[4]);                                    // Quaternion.c
-void Mtx_Identity(f32 (*pMtx)[4]);                                             // identity
+void LLMath_IdentifyMat(f32 (*pMtx)[4]);                                             // identity
 void LLMath_mat44fltMultiplyList33(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);  // VecMath.c
 void fn_80114540(CharModel* pModel, DynChain* pChain, f32 f);
 void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 f);
@@ -119,7 +119,7 @@ void fn_801140AC(DynChainLink* pLink, CharModel* pModel, int nBone, s32 nType) {
     if (nBone != -1) {
         pLink->nBone = nBone;
         pLink->nParent = pModel->pBones[nBone].nParent;
-        Vec_Copy(pModel->pMatrices[nBone][3], pLink->v04);
+        LLMath_CopyVec(pModel->pMatrices[nBone][3], pLink->v04);
         if (nType == 0) {
             Vec4_CopyPoint(pModel->pPoses[pLink->nParent].v10, vParent);
             Vec4_CopyPoint(pModel->pPoses[nBone].v10, vBone);
@@ -343,13 +343,13 @@ void fn_80114540(CharModel* pModel, DynChain* pChain, f32 fDelta) {
             Quat_Multiply(pModel->pPoses[pChain->nBone].q0, qTurn, pModel->pPoses[pChain->nBone].q0);
         }
         Quat_QuatToMatrix(pModel->pPoses[pChain->nBone].q0, mRot);
-        Mtx_Identity(mScale);
+        LLMath_IdentifyMat(mScale);
         mScale[0][0] = pModel->a140[pChain->nBone][0];
         mScale[1][1] = pModel->a140[pChain->nBone][1];
         mScale[2][2] = pModel->a140[pChain->nBone][2];
-        Vec_Copy(pModel->pMatrices[pChain->nBone][3], vPos);
+        LLMath_CopyVec(pModel->pMatrices[pChain->nBone][3], vPos);
         LLMath_mat44fltMultiplyList33(mRot, mScale, pModel->pMatrices[pChain->nBone], 3);
-        Vec_Copy(vPos, pModel->pMatrices[pChain->nBone][3]);
+        LLMath_CopyVec(vPos, pModel->pMatrices[pChain->nBone][3]);
         SKEL_UpdateSkinningMatrix(pModel, pModel->pMatrices[pChain->nBone], pChain->nBone);
     }
     Vec3Copy(pChain->pLinks->v04, pChain->pLinks->v14);
@@ -497,13 +497,13 @@ void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 fDelta) {
                 }
             }
             Quat_QuatToMatrix(pModel->pPoses[pChain->nBone + i].q0, mRot);
-            Mtx_Identity(mScale);
+            LLMath_IdentifyMat(mScale);
             mScale[0][0] = pModel->a140[pChain->nBone + i][0];
             mScale[1][1] = pModel->a140[pChain->nBone + i][1];
             mScale[2][2] = pModel->a140[pChain->nBone + i][2];
-            Vec_Copy(pModel->pMatrices[pChain->nBone + i][3], vSave);
+            LLMath_CopyVec(pModel->pMatrices[pChain->nBone + i][3], vSave);
             LLMath_mat44fltMultiplyList33(mRot, mScale, pModel->pMatrices[pChain->nBone + i], 3);
-            Vec_Copy(vSave, pModel->pMatrices[pChain->nBone + i][3]);
+            LLMath_CopyVec(vSave, pModel->pMatrices[pChain->nBone + i][3]);
             SKEL_UpdateSkinningMatrix(pModel, pModel->pMatrices[pChain->nBone + i], pChain->nBone + i);
         } else {
             // The last bone takes the rotation of the one above it (not in 4-link chains).
@@ -511,13 +511,13 @@ void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 fDelta) {
                 Quat_Copy(pModel->pPoses[pChain->nBone + i - 1].q0, pModel->pPoses[pChain->nBone + i].q0);
             }
             Quat_QuatToMatrix(pModel->pPoses[pChain->nBone + i].q0, mRot);
-            Mtx_Identity(mScale);
+            LLMath_IdentifyMat(mScale);
             mScale[0][0] = pModel->a140[pChain->nBone + i][0];
             mScale[1][1] = pModel->a140[pChain->nBone + i][1];
             mScale[2][2] = pModel->a140[pChain->nBone + i][2];
-            Vec_Copy(pModel->pMatrices[pChain->nBone + i][3], vSave);
+            LLMath_CopyVec(pModel->pMatrices[pChain->nBone + i][3], vSave);
             LLMath_mat44fltMultiplyList33(mRot, mScale, pModel->pMatrices[pChain->nBone + i], 3);
-            Vec_Copy(vSave, pModel->pMatrices[pChain->nBone + i][3]);
+            LLMath_CopyVec(vSave, pModel->pMatrices[pChain->nBone + i][3]);
             SKEL_UpdateSkinningMatrix(pModel, pModel->pMatrices[pChain->nBone + i], pChain->nBone + i);
         }
         Quat_Copy(pChain->pLinks[i].q44, pChain->pLinks[i].q54);
@@ -657,7 +657,7 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         } else {
             fAngle = 0.0f;
         }
-        Vec_Scale(fAngle, vAxis1, vAxis1);
+        LLMath_Scale(fAngle, vAxis1, vAxis1);
         Quat_BuildFromVector(vAxis1, qTurn);
         Quat_Copy(pModel->pBones[pChain->pLinks[i].nBone].q0C, pChain->pLinks[i].q44);
         if (lbl_802824F8->an9C[pChain->n10] != 0) {
@@ -702,7 +702,7 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         } else {
             fAngle = 0.0f;
         }
-        Vec_Scale(fAngle, vAxis2, vAxis2);
+        LLMath_Scale(fAngle, vAxis2, vAxis2);
         Quat_BuildFromVector(vAxis2, qTurn);
         if (lbl_802824F8->an9C[pChain->n10] != 0) {
             Quat_Multiply(pModel->pBones[pChain->pLinks[i].nBone].q0C, qTurn, qOut);
@@ -783,12 +783,12 @@ void fn_80115B2C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
             fLevel *= 1.0f - fOff / lbl_802824F8->f70;
         }
         fLevel *= fBend;
-        Vec_Copy(vBone, vDown);
+        LLMath_CopyVec(vBone, vDown);
         vDown[1] = vDown[1] - 1.0f;
         vec4flt_CrossProduct(vBone, vDown, vAxis);
         if (0.0f != vAxis[0] || 0.0f != vAxis[1] || 0.0f != vAxis[2]) {
             LLMath_Normalize3(vAxis, vAxisN);
-            Vec_Scale(DEG(lbl_802824F8->f68) * fLevel, vAxisN, vTurn);
+            LLMath_Scale(DEG(lbl_802824F8->f68) * fLevel, vAxisN, vTurn);
             Quat_BuildFromVector(vTurn, qTurn);
             Quat_RotateVector(qTurn, vBone, vNew);
             fn_801164F8(vNew, pModel->pMatrices[pChain->pLinks->nParent][3],
@@ -852,7 +852,7 @@ void fn_80115B2C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
                             if (!(fabsf(vAxis[0]) < 0.001f) || !(fabsf(vAxis[1]) < 0.001f) ||
                                 !(fabsf(vAxis[2]) < 0.001f)) {
                                 LLMath_Normalize3(vAxis, vAxis);
-                                Vec_Scale(fAngle, vAxis, vAxis);
+                                LLMath_Scale(fAngle, vAxis, vAxis);
                                 Quat_BuildFromVector(vAxis, qTurn);
                                 Quat_RotateVector(qTurn, vDir, vSwung);
                                 fn_801164F8(vSwung, pModel->pMatrices[pChain->pLinks->nParent][3],

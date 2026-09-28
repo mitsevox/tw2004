@@ -28,7 +28,7 @@ s32  RC_GetCurrentFrameBuffer(void);                 // ViewController.c
 void fn_800760D8(LLPict* pPict);        // LLVideo.c
 void fn_800760F4(f32* pUV, LLPict* pPict);  // LLVideo.c
 void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
-void fn_8000AE48(f32* pA, f32* pB, f32* pOut);     // pOut = pA * pB, element by element
+void LLMath_MultiplyVec(f32* pA, f32* pB, f32* pOut);     // pOut = pA * pB, element by element
 void fn_80090D28(FEQuad* pQuad);
 void fn_800912F4(FEVertex* pVtx, f32* pPos, f32* pUV, f32* pColour, f32* pScale, f32* pAdd);
 void fn_800913EC(s16 nTable, s16 nEntry);
@@ -223,7 +223,7 @@ void fn_800912F4(FEVertex* pVtx, f32* pPos, f32* pUV, f32* pColour, f32* pScale,
     pColour[1] = pVtx->au14[1];
     pColour[2] = pVtx->au14[2];
     pColour[3] = pVtx->au14[3];
-    fn_8000AE48(pColour, pScale, pColour);
+    LLMath_MultiplyVec(pColour, pScale, pColour);
     fn_80092250(pColour, pAdd, pColour);
 }
 

@@ -38,9 +38,9 @@ void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, in
 void fn_80035F1C(void);
 void RC_UpdateCurrentScreenMatrices(void);
 void fn_8005C15C(int nPlayer, f32* pSpinY, f32* pSpinX);   // Swing.c: the spin asked for
-void Mtx_Identity(f32 (*pMtx)[4]);                          // identity
+void LLMath_IdentifyMat(f32 (*pMtx)[4]);                          // identity
 void LLMath_mat44fltMultiplyList33(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // VecMath.c
-void Mtx_Copy(f32 (*pSrc)[4], f32 (*pDst)[4]);          // copy a matrix
+void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);          // copy a matrix
 void fn_8000C5A4(f32 (*pMtx)[4]);
 void fn_800AEFE4(void);
 void fn_800AF0D4(UObjMesh* pMesh);
@@ -301,10 +301,10 @@ void UI_Obj_RenderBoostUI(int nObj) {
             if (fSpinY < 0.0f) {
                 lbl_801F5B98[nObj].a0[5] = -lbl_801F5B98[nObj].a0[5];
             }
-            Mtx_Identity(mRot);
-            Mtx_Identity(mRoll);
-            Mtx_Identity(mTilt);
-            Mtx_Identity(mScale);
+            LLMath_IdentifyMat(mRot);
+            LLMath_IdentifyMat(mRoll);
+            LLMath_IdentifyMat(mTilt);
+            LLMath_IdentifyMat(mScale);
             mScale[0][0] = lbl_801F5B98[nObj].a0[6];
             mScale[1][1] = lbl_801F5B98[nObj].a0[6];
             mScale[2][2] = lbl_801F5B98[nObj].a0[6];
@@ -333,19 +333,19 @@ void UI_Obj_RenderBoostUI(int nObj) {
             LLMath_mat44fltMultiplyList33(mTilt, mRoll, mRot, 3);
 
             // draw it with the rotation, scale and position, then put its matrices back
-            Mtx_Copy(lbl_802820D0->m0, mSave0);
-            Mtx_Copy(lbl_802820D0->m40, mSave40);
-            Mtx_Copy(lbl_802820D0->m80, mSave80);
+            LLMath_CopyMat44(lbl_802820D0->m0, mSave0);
+            LLMath_CopyMat44(lbl_802820D0->m40, mSave40);
+            LLMath_CopyMat44(lbl_802820D0->m80, mSave80);
             LLMath_mat44fltMultiplyList33(mRot, lbl_802820D0->m0, lbl_802820D0->m0, 3);
             LLMath_mat44fltMultiplyList33(mScale, lbl_802820D0->m40, lbl_802820D0->m40, 3);
             fn_8000C5A4(lbl_802820D0->m0);
-            Vec_Copy(vPos, lbl_802820D0->m80[3]);
+            LLMath_CopyVec(vPos, lbl_802820D0->m80[3]);
             lbl_802820D0->m80[3][3] = 1.0f;
             fn_800AEFE4();
             // EA bug: m0's copy goes back into m40 and m40's into m0
-            Mtx_Copy(mSave0, lbl_802820D0->m40);
-            Mtx_Copy(mSave40, lbl_802820D0->m0);
-            Mtx_Copy(mSave80, lbl_802820D0->m80);
+            LLMath_CopyMat44(mSave0, lbl_802820D0->m40);
+            LLMath_CopyMat44(mSave40, lbl_802820D0->m0);
+            LLMath_CopyMat44(mSave80, lbl_802820D0->m80);
         }
     }
 

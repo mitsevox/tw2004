@@ -50,7 +50,7 @@ static f32 GoShaderObject_Grass_Gc_StrippedFn(f32 x) {
 
 // The grass type starts: a pool of 32 render records of 32 bytes.
 void SD_vShaderObject_Grass_Type_Init(void) {
-    SD_gpGrassTypeData->pPool = UMemPool_Create(32, 32, 2, 16);
+    SD_gpGrassTypeData->pPool = CreateMemPool(32, 32, 2, 16);
 }
 
 void SD_vShaderObject_Grass_Type_Close(void) {
@@ -424,10 +424,10 @@ void SD_vSetGrassParamsOnce(f32* pUnused0, f32* pUnused1, f32 (*a2)[4], f32* p8,
     // port: pUnused0 and pUnused1 are passed by the only caller and never read
     int i;
     for (i = 0; i < 2; i++) {
-        Vec_Copy(a2[i], lbl_80260920[i]);
+        LLMath_CopyVec(a2[i], lbl_80260920[i]);
     }
     for (i = 0; i < 2; i++) {
-        Vec_Copy(b2[i], lbl_80260900[i]);
+        LLMath_CopyVec(b2[i], lbl_80260900[i]);
     }
     for (i = 0; i < 8; i++) {
         lbl_802608E0[i] = p8[i];
@@ -437,7 +437,7 @@ void SD_vSetGrassParamsOnce(f32* pUnused0, f32* pUnused1, f32 (*a2)[4], f32* p8,
     lbl_802608D0[2] = fB;
     lbl_802608D0[3] = 16.0f;
     for (i = 0; i < 16; i++) {
-        Vec_Copy(a16[i], lbl_802607D0[i]);
+        LLMath_CopyVec(a16[i], lbl_802607D0[i]);
     }
 }
 
@@ -487,7 +487,7 @@ void SD_vShaderObject_Grass_Static_Render(SD_SShaderObject_Static* pObject) {
     GXSetVtxDesc(14, 1);
 
     // How fast the camera distance changes along x and along z, from 2.5-unit steps.
-    Vec_Copy(Camera_GetCurrentLens()->m4[3], vEye);
+    LLMath_CopyVec(Camera_GetCurrentLens()->m4[3], vEye);
     vAt[0] = pParams->a04[0];
     vAt[1] = pVert[1].f;
     vAt[2] = pParams->a04[1];

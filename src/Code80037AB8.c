@@ -9,7 +9,7 @@ void  fn_801127C4(void* pDesc);                // hwsMaterial_Gc.c
 void  Quat_Add(f32* pA, f32* pB, f32* pOut);                // Quaternion.c
 void  Quat_RotateVector(f32* pQuat, f32* pIn, f32* pOut);            // Quaternion.c: pIn turned by pQuat
 void  Quat_QuatToMatrix(f32* pQ, f32 (*pMtx)[4]);                   // Quaternion.c: to a matrix
-void  Mtx_InvertRigid(f32 (*pSrc)[4], f32 (*pDst)[4]);            // UMemPool.c: inverts a matrix
+void  LLMath_InvertNormalized(f32 (*pSrc)[4], f32 (*pDst)[4]);            // UMemPool.c: inverts a matrix
 
 // section note: the .bss between Skin.c's and GoPostFx.c's; only lbl_80281100 (the .sdata right
 // after Skin.c's) points at it. Skin.c's tail fits the addresses equally well.
@@ -46,7 +46,7 @@ void fn_80037AB8(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst) {
         for (i = 0; i < pSkin->pModel->n14; i++) {
             Quat_QuatToMatrix(pSkin->pModel->p34[i].q0, aMtx);
             Vec4_CopyPoint(pSkin->pModel->p34[i].v10, aMtx[3]);
-            Mtx_InvertRigid(aMtx, pSkin->p1088[i]);
+            LLMath_InvertNormalized(aMtx, pSkin->p1088[i]);
         }
     }
 }

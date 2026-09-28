@@ -13,11 +13,11 @@ UITransformStack* lbl_80281F38;         // the stack (fn_8009349C)
 f32  Math_Tan(f32 x);                // tan
 
 // 4x4 matrix helpers (the engine's; declared here until their own files are written).
-void Mtx_Identity(f32 m[4][4]);                                          // identity
+void LLMath_IdentifyMat(f32 m[4][4]);                                          // identity
 void LLMath_mat44fltMultiplyList(f32 a[4][4], f32 b[4][4], f32 out[4][4], int nRows); // out = a x b, 4 rows
 void LLMath_mat44fltMultiplyList33(f32 a[4][4], f32 b[4][4], f32 out[4][4], int nRows); // out = a x b, 3 rows
-void Mtx_Copy(f32 src[4][4], f32 dst[4][4]);                         // copy 4 rows
-void Mtx_CopyRotation(f32 src[4][4], f32 dst[4][4]);                         // copy 3 rows
+void LLMath_CopyMat44(f32 src[4][4], f32 dst[4][4]);                         // copy 4 rows
+void LLMath_CopyMat34(f32 src[4][4], f32 dst[4][4]);                         // copy 3 rows
 
 // Multiply a translation, a scale or a rotation (radians, about x, y or z) into a level's matrix.
 void fn_80092CE8(UITransform* p, f32 x, f32 y, f32 z);
@@ -41,23 +41,23 @@ static void uiTransform_StrippedFn(f32* p) {
 void fn_80092CE8(UITransform* p, f32 x, f32 y, f32 z) {
     f32 mMove[4][4];
     f32 mOut[4][4];
-    Mtx_Identity(mMove);
+    LLMath_IdentifyMat(mMove);
     mMove[3][0] = x;
     mMove[3][1] = y;
     mMove[3][2] = z;
     LLMath_mat44fltMultiplyList(p->m, mMove, mOut, 4);
-    Mtx_Copy(mOut, p->m);
+    LLMath_CopyMat44(mOut, p->m);
 }
 
 void fn_80092D68(UITransform* p, f32 x, f32 y, f32 z) {
     f32 mScale[4][4];
     f32 mOut[4][4];
-    Mtx_Identity(mScale);
+    LLMath_IdentifyMat(mScale);
     mScale[0][0] = x;
     mScale[1][1] = y;
     mScale[2][2] = z;
     LLMath_mat44fltMultiplyList33(p->m, mScale, mOut, 3);
-    Mtx_CopyRotation(mOut, p->m);
+    LLMath_CopyMat34(mOut, p->m);
 }
 
 void fn_80092DE8(UITransform* p, f32 fAngle) {
@@ -65,7 +65,7 @@ void fn_80092DE8(UITransform* p, f32 fAngle) {
     f32 mOut[4][4];
     f32 fSin;
     f32 fCos;
-    Mtx_Identity(mRot);
+    LLMath_IdentifyMat(mRot);
     fSin = Math_Sin(fAngle);
     fCos = Math_Cos(fAngle);
     mRot[1][1] = fCos;
@@ -73,7 +73,7 @@ void fn_80092DE8(UITransform* p, f32 fAngle) {
     mRot[2][1] = -fSin;
     mRot[2][2] = fCos;
     LLMath_mat44fltMultiplyList33(p->m, mRot, mOut, 3);
-    Mtx_CopyRotation(mOut, p->m);
+    LLMath_CopyMat34(mOut, p->m);
 }
 
 void fn_80092E74(UITransform* p, f32 fAngle) {
@@ -81,7 +81,7 @@ void fn_80092E74(UITransform* p, f32 fAngle) {
     f32 mOut[4][4];
     f32 fSin;
     f32 fCos;
-    Mtx_Identity(mRot);
+    LLMath_IdentifyMat(mRot);
     fSin = Math_Sin(fAngle);
     fCos = Math_Cos(fAngle);
     mRot[0][0] = fCos;
@@ -89,7 +89,7 @@ void fn_80092E74(UITransform* p, f32 fAngle) {
     mRot[2][0] = fSin;
     mRot[2][2] = fCos;
     LLMath_mat44fltMultiplyList33(p->m, mRot, mOut, 3);
-    Mtx_CopyRotation(mOut, p->m);
+    LLMath_CopyMat34(mOut, p->m);
 }
 
 void fn_80092F00(UITransform* p, f32 fAngle) {
@@ -97,7 +97,7 @@ void fn_80092F00(UITransform* p, f32 fAngle) {
     f32 mOut[4][4];
     f32 fSin;
     f32 fCos;
-    Mtx_Identity(mRot);
+    LLMath_IdentifyMat(mRot);
     fSin = Math_Sin(fAngle);
     fCos = Math_Cos(fAngle);
     mRot[0][0] = fCos;
@@ -105,7 +105,7 @@ void fn_80092F00(UITransform* p, f32 fAngle) {
     mRot[1][0] = -fSin;
     mRot[1][1] = fCos;
     LLMath_mat44fltMultiplyList33(p->m, mRot, mOut, 3);
-    Mtx_CopyRotation(mOut, p->m);
+    LLMath_CopyMat34(mOut, p->m);
 }
 
 // Apply an element's transform to the current level: move it, then rotate and scale it about its
@@ -178,7 +178,7 @@ void fn_80093280(int nOp, UITransformDesc* p) {
 void fn_8009349C(void) {
     lbl_80281F38 = StaticMem_Alloc(sizeof(UITransformStack), 2, 16, "uiTransform.c", 203);
     lbl_80281F38->nTop = 0;
-    Mtx_Identity(lbl_80281F38->aLevel[lbl_80281F38->nTop].m);
+    LLMath_IdentifyMat(lbl_80281F38->aLevel[lbl_80281F38->nTop].m);
 }
 
 void fn_800934F8(void) {

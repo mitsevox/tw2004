@@ -55,14 +55,14 @@ void fn_800F196C(int i, f32* pOut);     // GameModeReplay.c: target i's position
 void fn_80093DB8(Ball* pBall, int nPlayer);    // GoObjShadow.c
 void BFX_vRender(Ball* pBall, int nPlayer);    // GoObjShadow.c
 void fn_80048584(UObject* pObj, s8 nLod);
-void Mtx_Identity(f32 (*pMtx)[4]);                   // identity
+void LLMath_IdentifyMat(f32 (*pMtx)[4]);                   // identity
 int  fn_800636EC(void);
 void fn_8004858C(f32* pOut, f32 fTurn, f32 fTilt);
 void fn_8000C5A4(f32 (*pMtx)[4]);
 void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
-void Mtx_Copy(f32 (*pSrc)[4], f32 (*pDst)[4]);
+void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);
 void LLMath_mat44fltMultiplyList(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
-void Mtx_CopyRotation(f32 (*pSrc)[4], f32 (*pDst)[4]);        // copies three rows
+void LLMath_CopyMat34(f32 (*pSrc)[4], f32 (*pDst)[4]);        // copies three rows
 void fn_80048680(f32* pA, f32* pB, f32* pOut);
 void fn_800486A4(f32* pA, f32* pB, f32* pOut);
 void fn_800486C8(f32* pA, f32* pB, f32* pOut);
@@ -446,7 +446,7 @@ void fn_80046C34(f32* pPos, int nPlayer) {
                 lbl_80281DA0->apRing[lbl_80281DA0->nRing] = fn_80048E4C(nId);
             }
         } else {
-            Vec_Copy(vPos, lbl_80281DA0->apRing[lbl_80281DA0->nRing]->obj.m80[3]);
+            LLMath_CopyVec(vPos, lbl_80281DA0->apRing[lbl_80281DA0->nRing]->obj.m80[3]);
             fn_8000C5A4(lbl_80281DA0->apRing[lbl_80281DA0->nRing]->obj.m0);
         }
         lbl_80281DA0->nRing = lbl_80281DA0->nRing + 1;
@@ -494,12 +494,12 @@ void fn_80046E1C(f32* pPos, int nPlayer) {
             lbl_80281DA0->apPlayer[nPlayer] = fn_80048E4C(nId);
         }
     }
-    Mtx_Identity(mTurn);
-    Mtx_Identity(lbl_80281DA0->apPlayer[nPlayer]->obj.m0);
+    LLMath_IdentifyMat(mTurn);
+    LLMath_IdentifyMat(lbl_80281DA0->apPlayer[nPlayer]->obj.m0);
     mat44flt_EulerAngles(mTurn, -gPlayers[nPlayer].fAim, 0.0f, 0.0f);
     LLMath_mat44fltMultiplyList(lbl_80281DA0->apPlayer[nPlayer]->obj.m0, mTurn, mObj, 4);
-    Mtx_Copy(mObj, lbl_80281DA0->apPlayer[nPlayer]->obj.m0);
-    Vec_Copy(vPos, lbl_80281DA0->apPlayer[nPlayer]->obj.m80[3]);
+    LLMath_CopyMat44(mObj, lbl_80281DA0->apPlayer[nPlayer]->obj.m0);
+    LLMath_CopyVec(vPos, lbl_80281DA0->apPlayer[nPlayer]->obj.m80[3]);
     fn_8000C5A4(lbl_80281DA0->apPlayer[nPlayer]->obj.m0);
 }
 
@@ -514,8 +514,8 @@ void fn_80046FDC(s32 nView) {
         nKind = gpGame->pfn26C(ViewController_GetActivePlayerNumber(nView), i);
         if (lbl_80281DA0->apTeo10006[nKind] != NULL) {
             fn_80048584(lbl_80281DA0->apTeo10006[nKind], 0);
-            Mtx_Identity(lbl_80281DA0->apTeo10006[nKind]->m80);
-            Vec_Copy(vPos, lbl_80281DA0->apTeo10006[nKind]->m80[3]);
+            LLMath_IdentifyMat(lbl_80281DA0->apTeo10006[nKind]->m80);
+            LLMath_CopyVec(vPos, lbl_80281DA0->apTeo10006[nKind]->m80[3]);
             fn_80048894(lbl_80281DA0->apTeo10006[nKind]);
         }
     }
@@ -548,8 +548,8 @@ void fn_800470B0(s32 nView) {
         }
         if (nModel != -1 && lbl_80281DA0->apTeo10020[nModel] != NULL) {
             fn_80048584(lbl_80281DA0->apTeo10020[nModel], 0);
-            Mtx_Identity(lbl_80281DA0->apTeo10020[nModel]->m80);
-            Vec_Copy(vPos, lbl_80281DA0->apTeo10020[nModel]->m80[3]);
+            LLMath_IdentifyMat(lbl_80281DA0->apTeo10020[nModel]->m80);
+            LLMath_CopyVec(vPos, lbl_80281DA0->apTeo10020[nModel]->m80[3]);
             fn_80048894(lbl_80281DA0->apTeo10020[nModel]);
         }
     }
@@ -664,12 +664,12 @@ void fn_8004731C(u8* pState) {
                 fn_80048584(pLogoB, 0);
             }
         }
-        Mtx_Identity(pBall->m40);
+        LLMath_IdentifyMat(pBall->m40);
         if (pLogoA != NULL) {
-            Mtx_Identity(pLogoA->m40);
+            LLMath_IdentifyMat(pLogoA->m40);
         }
         if (pLogoB != NULL) {
-            Mtx_Identity(pLogoB->m40);
+            LLMath_IdentifyMat(pLogoB->m40);
         }
         pBall->m40[0][0] = lbl_80281128;
         pBall->m40[1][1] = lbl_80281128 / ViewController_GetCameraControl(gPlayers[i].nView[0])->f54;
@@ -684,14 +684,14 @@ void fn_8004731C(u8* pState) {
             pLogoB->m40[1][1] = lbl_80281128 / ViewController_GetCameraControl(gPlayers[i].nView[0])->f54;
             pLogoB->m40[2][2] = lbl_80281128;
         }
-        Vec_Copy(gPlayers[i].ball.vPos, pBall->m80[3]);
+        LLMath_CopyVec(gPlayers[i].ball.vPos, pBall->m80[3]);
         pBall->m80[3][3] = 1.0f;
         if (pLogoA != NULL) {
-            Vec_Copy(gPlayers[i].ball.vPos, pLogoA->m80[3]);
+            LLMath_CopyVec(gPlayers[i].ball.vPos, pLogoA->m80[3]);
             pLogoA->m80[3][3] = 1.0f;
         }
         if (pLogoB != NULL) {
-            Vec_Copy(gPlayers[i].ball.vPos, pLogoB->m80[3]);
+            LLMath_CopyVec(gPlayers[i].ball.vPos, pLogoB->m80[3]);
             pLogoB->m80[3][3] = 1.0f;
         }
         if (gPlayers[i].ball.nState != 2 && gPlayers[i].ball.nSurface >= 0) {
@@ -711,26 +711,26 @@ void fn_8004731C(u8* pState) {
         if (fSize < 1.5f) {
             fGrow = 1.0f / (fSize / 1.5f);
             fGrow = 0.7f * (fGrow - 1.0f) + 1.0f;
-            Vec_Scale(fGrow, pBall->m40[0], pBall->m40[0]);
-            Vec_Scale(fGrow, pBall->m40[1], pBall->m40[1]);
-            Vec_Scale(fGrow, pBall->m40[2], pBall->m40[2]);
+            LLMath_Scale(fGrow, pBall->m40[0], pBall->m40[0]);
+            LLMath_Scale(fGrow, pBall->m40[1], pBall->m40[1]);
+            LLMath_Scale(fGrow, pBall->m40[2], pBall->m40[2]);
             if (pLogoA != NULL) {
-                Vec_Scale(fGrow, pLogoA->m40[0], pLogoA->m40[0]);
-            }
-            if (pLogoA != NULL) {
-                Vec_Scale(fGrow, pLogoA->m40[1], pLogoA->m40[1]);
+                LLMath_Scale(fGrow, pLogoA->m40[0], pLogoA->m40[0]);
             }
             if (pLogoA != NULL) {
-                Vec_Scale(fGrow, pLogoA->m40[2], pLogoA->m40[2]);
+                LLMath_Scale(fGrow, pLogoA->m40[1], pLogoA->m40[1]);
+            }
+            if (pLogoA != NULL) {
+                LLMath_Scale(fGrow, pLogoA->m40[2], pLogoA->m40[2]);
             }
             if (pLogoB != NULL) {
-                Vec_Scale(fGrow, pLogoB->m40[0], pLogoB->m40[0]);
+                LLMath_Scale(fGrow, pLogoB->m40[0], pLogoB->m40[0]);
             }
             if (pLogoB != NULL) {
-                Vec_Scale(fGrow, pLogoB->m40[1], pLogoB->m40[1]);
+                LLMath_Scale(fGrow, pLogoB->m40[1], pLogoB->m40[1]);
             }
             if (pLogoB != NULL) {
-                Vec_Scale(fGrow, pLogoB->m40[2], pLogoB->m40[2]);
+                LLMath_Scale(fGrow, pLogoB->m40[2], pLogoB->m40[2]);
             }
         }
         fn_8000C5A4(pBall->m0);
@@ -769,19 +769,19 @@ f32 fn_8004787C(int nPlayer) {
     pCamera = RC_spGetCurrentRenderCtx();
     pLens = Camera_GetLens(pCamera);
     fRadius = lbl_80281DA0->pTeo10000->pModel->apLod[0]->pInfo->f64 * lbl_80281128;
-    Vec_Copy(gPlayers[nPlayer].ball.vPos, &vPos.x);
+    LLMath_CopyVec(gPlayers[nPlayer].ball.vPos, &vPos.x);
     vPos.w = 1.0f;
     LLMath_mat44fltMultiply(pLens->m44, &vPos, &vAbove);
-    Vec_Copy(&vAbove.x, &vBelow.x);
+    LLMath_CopyVec(&vAbove.x, &vBelow.x);
     vAbove.y += fRadius;
     vBelow.y -= fRadius;
     LLMath_mat44fltMultiply(pCamera->m5C, &vAbove, &vTop);
     LLMath_mat44fltMultiply(pCamera->m5C, &vBelow, &vBottom);
     if (0.0f != vTop.w) {
-        Vec_Scale(1.0f / vTop.w, &vTop.x, &vTop.x);
+        LLMath_Scale(1.0f / vTop.w, &vTop.x, &vTop.x);
     }
     if (0.0f != vBottom.w) {
-        Vec_Scale(1.0f / vBottom.w, &vBottom.x, &vBottom.x);
+        LLMath_Scale(1.0f / vBottom.w, &vBottom.x, &vBottom.x);
     }
     vTop.z = 0.0f;
     vTop.x = 256.0f * (1.0f + vTop.x);
@@ -830,8 +830,8 @@ void fn_80047A24(f32* pPos, int nPlayer) {
         }
         pB->bF4 = 1;
     } else {
-        Mtx_Identity(pB->pF0->obj.m0);
-        Vec_Copy(pB->v20, pB->pF0->obj.m80[3]);
+        LLMath_IdentifyMat(pB->pF0->obj.m0);
+        LLMath_CopyVec(pB->v20, pB->pF0->obj.m80[3]);
         fn_8000C5A4(pB->pF0->obj.m0);
     }
 }
@@ -868,14 +868,14 @@ void fn_80047C24(int nPlayer) {
     if (!pB->bF4) return;
     pB->b0 = 0;
     if (pB->bF5) {
-        Mtx_Identity(pB->mB0);
+        LLMath_IdentifyMat(pB->mB0);
         mat44flt_EulerAngles(pB->mB0, pB->fC, 0.0f, 0.0f);
         LLMath_mat44fltMultiplyList(pB->pF0->obj.m0, pB->mB0, mTmp, 4);
-        Mtx_Copy(mTmp, pB->pF0->obj.m0);
+        LLMath_CopyMat44(mTmp, pB->pF0->obj.m0);
         fn_8000C5A4(pB->pF0->obj.m0);
-        Vec_Copy(pB->v20, pB->v30);
+        LLMath_CopyVec(pB->v20, pB->v30);
         fn_8004858C(pB->v40, pB->fC, lbl_80281DA0->fAA0);
-        Vec_Scale(lbl_80281DA0->fA98 * (0.5f * Misc_RandFuncf(1) + 0.5f), pB->v40, pB->v40);
+        LLMath_Scale(lbl_80281DA0->fA98 * (0.5f * Misc_RandFuncf(1) + 0.5f), pB->v40, pB->v40);
         pB->v40[3] = pB->v40[1];
         pB->bF5 = 0;
         pB->b0 = 1;
@@ -893,7 +893,7 @@ void fn_80047C24(int nPlayer) {
     }
     pB->f10 += gSession.fFrameTime;
     Wind_Get(vWind);
-    Vec_Scale(0.48888f * 0.3f, vWind, vWind);
+    LLMath_Scale(0.48888f * 0.3f, vWind, vWind);
     fn_800486C8(vWind, pB->v40, vMove);
     Vec3_Scale(pB->f10, vMove, vMove);
     vMove[1] = vMove[1] + -4.9f * pB->f10 * pB->f10;
@@ -905,11 +905,11 @@ void fn_80047C24(int nPlayer) {
         pB->b0 = 0;
     }
     fn_800486A4(pB->v60, pB->v50, pB->v50);
-    Mtx_Identity(pB->mB0);
+    LLMath_IdentifyMat(pB->mB0);
     mat44flt_EulerAngles(pB->mB0, pB->fC + pB->v50[0], pB->v50[1], pB->v50[2]);
-    Mtx_CopyRotation(pB->mB0, pB->pF0->obj.m0);
+    LLMath_CopyMat34(pB->mB0, pB->pF0->obj.m0);
     fn_8000C5A4(pB->pF0->obj.m0);
-    Vec_Copy(pB->v30, pB->pF0->obj.m80[3]);
+    LLMath_CopyVec(pB->v30, pB->pF0->obj.m80[3]);
     pB->pF0->obj.m80[3][3] = 1.0f;
 }
 
@@ -951,9 +951,9 @@ void DynObj_TeeAdd(f32* pPos, int nPlayer, u8 bReset) {
             pA->pF4 = fn_80048E4C(nId);
         }
         pA->bF8 = 1;
-        Mtx_Identity(pA->mB4);
-        Vec_Copy(pA->v20, pA->v30);
-        Vec_Copy(pA->v20, pA->pF4->obj.m80[3]);
+        LLMath_IdentifyMat(pA->mB4);
+        LLMath_CopyVec(pA->v20, pA->v30);
+        LLMath_CopyVec(pA->v20, pA->pF4->obj.m80[3]);
         fn_8000C5A4(pA->pF4->obj.m0);
         return;
     }
@@ -980,11 +980,11 @@ void DynObj_TeeAdd(f32* pPos, int nPlayer, u8 bReset) {
             }
         }
     }
-    Mtx_Identity(pA->mB4);
+    LLMath_IdentifyMat(pA->mB4);
     mat44flt_EulerAngles(pA->mB4, pA->v50[0], pA->v50[1], pA->v50[2]);
-    Mtx_CopyRotation(pA->mB4, pA->pF4->obj.m0);
-    Vec_Copy(pA->v20, pA->v30);
-    Vec_Copy(pA->v20, pA->pF4->obj.m80[3]);
+    LLMath_CopyMat34(pA->mB4, pA->pF4->obj.m0);
+    LLMath_CopyVec(pA->v20, pA->v30);
+    LLMath_CopyVec(pA->v20, pA->pF4->obj.m80[3]);
     fn_8000C5A4(pA->pF4->obj.m0);
 }
 
@@ -1009,14 +1009,14 @@ void fn_80048184(int nPlayer) {
         pA->b0 = 0;
         if (pA->bF9) {
             pA->fC = -gPlayers[nPlayer].fAim + Misc_RandFuncf(1) - 0.5f;
-            Mtx_Identity(pA->mB4);
+            LLMath_IdentifyMat(pA->mB4);
             mat44flt_EulerAngles(pA->mB4, pA->fC, 0.0f, 0.0f);
             LLMath_mat44fltMultiplyList(pA->pF4->obj.m0, pA->mB4, mTmp, 4);
-            Mtx_Copy(mTmp, pA->pF4->obj.m0);
+            LLMath_CopyMat44(mTmp, pA->pF4->obj.m0);
             fn_8000C5A4(pA->pF4->obj.m0);
-            Vec_Copy(pA->v20, pA->v30);
+            LLMath_CopyVec(pA->v20, pA->v30);
             fn_8004858C(pA->v40, pA->fC, lbl_80281DA0->fA9C);
-            Vec_Scale(lbl_80281DA0->fA94 * Misc_RandFuncf(1), pA->v40, pA->v40);
+            LLMath_Scale(lbl_80281DA0->fA94 * Misc_RandFuncf(1), pA->v40, pA->v40);
             pA->v40[3] = pA->v40[1];
             pA->bF9 = 0;
             pA->b0 = 1;
@@ -1034,7 +1034,7 @@ void fn_80048184(int nPlayer) {
         }
         pA->f10 += gSession.fFrameTime;
         Wind_Get(vWind);
-        Vec_Scale(0.48888f, vWind, vWind);
+        LLMath_Scale(0.48888f, vWind, vWind);
         fn_800486C8(vWind, pA->v40, vMove);
         Vec3_Scale(pA->f10, vMove, vMove);
         vMove[1] = vMove[1] + -4.9f * pA->f10 * pA->f10;
@@ -1046,18 +1046,18 @@ void fn_80048184(int nPlayer) {
             pA->b0 = 0;
         }
         fn_800486A4(pA->v60, pA->v50, pA->v50);
-        Mtx_Identity(pA->mB4);
+        LLMath_IdentifyMat(pA->mB4);
         mat44flt_EulerAngles(pA->mB4, pA->fC + pA->v50[0], pA->v50[1], pA->v50[2]);
-        Mtx_CopyRotation(pA->mB4, pA->pF4->obj.m0);
+        LLMath_CopyMat34(pA->mB4, pA->pF4->obj.m0);
         fn_8000C5A4(pA->pF4->obj.m0);
-        Vec_Copy(pA->v30, pA->pF4->obj.m80[3]);
+        LLMath_CopyVec(pA->v30, pA->pF4->obj.m80[3]);
         pA->pF4->obj.m80[3][3] = 1.0f;
     } else {
-        Mtx_Identity(pA->mB4);
+        LLMath_IdentifyMat(pA->mB4);
         mat44flt_EulerAngles(pA->mB4, pA->v50[0], pA->v50[1], pA->v50[2]);
-        Mtx_CopyRotation(pA->mB4, pA->pF4->obj.m0);
+        LLMath_CopyMat34(pA->mB4, pA->pF4->obj.m0);
         fn_8000C5A4(pA->pF4->obj.m0);
-        Vec_Copy(pA->v30, pA->pF4->obj.m80[3]);
+        LLMath_CopyVec(pA->v30, pA->pF4->obj.m80[3]);
         pA->pF4->obj.m80[3][3] = 1.0f;
     }
 }

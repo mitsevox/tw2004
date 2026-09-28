@@ -25,7 +25,7 @@ BufferPool* gpBufferPool = &gBufferPool;
 
 // ---- sweep code (not yet cleaned up) ----
 
-void Mtx_Identity(f32 (*m)[4]);          // identity matrix
+void LLMath_IdentifyMat(f32 (*m)[4]);          // identity matrix
 void DS_vCloseModule(void);
 void RenderState_SetTexCoordGen(s32 nCoord, s32 nFunc, s32 nSrc, s32 nMtx);
 void RenderState_SetKColorAlpha(u8 nAlpha);
@@ -91,8 +91,8 @@ void DS_vInitModule(void) {
     p->fFogStart = 100.0f;
     p->fFogEnd = 2048.0f;
     *(u32*)&p->c30 = 0xFFFFFFFF; // port: all four GXColor bytes 0xFF, stored as one word
-    Mtx_Identity(p->mView);
-    Mtx_Identity(gRenderState.mProjection);
+    LLMath_IdentifyMat(p->mView);
+    LLMath_IdentifyMat(gRenderState.mProjection);
     p->pTexBank = NULL;
     p->pTexEntry = NULL;
     gRenderState.uChanged = 0;

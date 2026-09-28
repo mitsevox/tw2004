@@ -96,8 +96,8 @@ void fn_8009AA28(void) {
         lbl_802813B8->aCA4[n][3] = 0.0f;
         n++;
     }
-    Vec_Copy(lbl_802813B8->a24[1], lbl_802813B8->a24[n]);
-    Vec_Copy(lbl_802813B8->aCA4[1], lbl_802813B8->aCA4[n]);
+    LLMath_CopyVec(lbl_802813B8->a24[1], lbl_802813B8->a24[n]);
+    LLMath_CopyVec(lbl_802813B8->aCA4[1], lbl_802813B8->aCA4[n]);
     lbl_802813B8->n1948 = n + 1;
 }
 
@@ -209,7 +209,7 @@ void fn_8009B260(f32* pPos, u32 uColorA, u32 uColorB, u8 n25, u8 n24, u8 n26, f3
         pGlow = &lbl_80281F80->a[lbl_80281F80->nCount++];
         pGlow->uColorA = uColorA;
         pGlow->uColorB = uColorB;
-        Vec_Copy(pPos, pGlow->vPos);
+        LLMath_CopyVec(pPos, pGlow->vPos);
         pGlow->f18 = f18;
         pGlow->f1C = f1C;
         pGlow->f20 = f20;

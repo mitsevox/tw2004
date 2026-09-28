@@ -19,12 +19,12 @@ void    fn_8006ED70(void);
 GoLight* fn_8006EFB8(void);
 void    fn_8006F080(GoLight* pLight);
 
-void fn_8000AE48(f32* pA, f32* pB, f32* pOut);     // pOut = pA * pB, element by element
+void LLMath_MultiplyVec(f32* pA, f32* pB, f32* pOut);     // pOut = pA * pB, element by element
 void fn_80029BC8(f32* pVec);                        // sets a vector to lbl_80186838
-void Mtx_Identity(f32 (*pMtx)[4]);                   // identity
+void LLMath_IdentifyMat(f32 (*pMtx)[4]);                   // identity
 void LLMath_mat44fltMultiplyList33(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // VecMath.c
 void LLMath_mat44fltMultiply33(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // a vector through a matrix
-void Mtx_InvertRigid(f32 (*pSrc)[4], f32 (*pDst)[4]);  // UMemPool.c: inverts a rotation+translation
+void LLMath_InvertNormalized(f32 (*pSrc)[4], f32 (*pDst)[4]);  // UMemPool.c: inverts a rotation+translation
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0f (0x80283900), before the white below and the 128.0f and 0.0f fn_8006E2A4 uses first; its
@@ -110,9 +110,9 @@ void fn_8006E460(LightGroup* pGroup) {
         vScale[2] = 1.0f;
         vScale[3] = 1.0f;
     }
-    fn_8000AE48(lbl_802811D8->vAmbient, vScale, lbl_802811D8->vAmbient2);
+    LLMath_MultiplyVec(lbl_802811D8->vAmbient, vScale, lbl_802811D8->vAmbient2);
     for (n = lbl_802811D8->nPoints; n > 0; n--) {
-        fn_8000AE48(pColour, vScale, pOut);
+        LLMath_MultiplyVec(pColour, vScale, pOut);
         pColour += 4;
         pOut += 4;
     }
@@ -122,10 +122,10 @@ void fn_8006E460(LightGroup* pGroup) {
     vScale[3] = 1.0f;
     if (pGroup != NULL) {
         pGroup->v28[3] = 1.0f;
-        fn_8000AE48(pGroup->v28, vScale, vScale);
+        LLMath_MultiplyVec(pGroup->v28, vScale, vScale);
         Vec3_Scale(pGroup->v18[0], vScale, vScale);
     }
-    fn_8000AE48(lbl_802811D8->aPointColour[0], vScale, lbl_802811D8->aPointColour2[0]);
+    LLMath_MultiplyVec(lbl_802811D8->aPointColour[0], vScale, lbl_802811D8->aPointColour2[0]);
     for (n = lbl_802811D8->nPoints; n < NUM_POINT_LIGHTS; n++) {
         fn_80029BC8(pOut);
         pOut += 4;
@@ -169,9 +169,9 @@ void LI_vEulerAnglesRYP(f32 (*pMtx)[4], f32 fA, f32 fB, f32 fC) {
     f32 mB[4][4];
     f32 mC[4][4];
 
-    Mtx_Identity(mA);
-    Mtx_Identity(mB);
-    Mtx_Identity(mC);
+    LLMath_IdentifyMat(mA);
+    LLMath_IdentifyMat(mB);
+    LLMath_IdentifyMat(mC);
     mA[2][0] = Math_Sin(fA);
     mA[2][2] = Math_Cos(fA);
     mB[1][2] = Math_Sin(fB);
@@ -277,7 +277,7 @@ void fn_8006EADC(UObject* pObj) {
             pPoint++;
         }
     } else {
-        Mtx_InvertRigid(pObj->m0, mInv);
+        LLMath_InvertNormalized(pObj->m0, mInv);
         pPoint = lbl_802811D8->aPointPos;
         for (i = 0; i < lbl_802811D8->nPoints; i++) {
             uMask |= 1 << i;

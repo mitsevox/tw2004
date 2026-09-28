@@ -17,7 +17,7 @@ UMemPool* lbl_80281DA8;
 
 DynObj* fn_80049018(DynObjSetup* pSetup);
 void fn_8000E830(DynObj* pObj);
-void Mtx_Identity(f32 (*pMtx)[4]);                   // identity
+void LLMath_IdentifyMat(f32 (*pMtx)[4]);                   // identity
 void fn_8000C5A4(f32 (*pMtx)[4]);
 
 void fn_800646D0(UStreamObject* pObject);
@@ -113,8 +113,8 @@ void fn_80048BDC(UStreamObject* pObject) {
 // Sets the kernel up: the 'Cact' stream handler, the two node pools and an empty list.
 void fn_80048DD0(void) {
     Stream_RegisterLoadChunkCallback('Cact', fn_80048BDC);
-    lbl_80281DAC = UMemPool_Create(256, 400, 2, 16);
-    lbl_80281DA8 = UMemPool_Create(256, 528, 2, 16);
+    lbl_80281DAC = CreateMemPool(256, 400, 2, 16);
+    lbl_80281DA8 = CreateMemPool(256, 528, 2, 16);
     lbl_80281DBC = NULL;
     lbl_80281DB8 = NULL;
     lbl_80281DB4 = 0;
@@ -421,8 +421,8 @@ void fn_80049514(DynObj* pObj, DynObjSetup* pSetup) {
     } else {
         fn_800486F4(&pObj->obj, NULL, nFlags);
     }
-    Mtx_Identity(pObj->obj.m0);
-    Mtx_Identity(pObj->obj.m40);
+    LLMath_IdentifyMat(pObj->obj.m0);
+    LLMath_IdentifyMat(pObj->obj.m40);
     fn_8000C5A4(pObj->obj.m0);
     pObj->obj.m80[3][0] = pDef->aPos[0];
     pObj->obj.m80[3][1] = pDef->aPos[1];

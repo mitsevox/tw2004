@@ -63,7 +63,7 @@ void fn_800C8134(void) {
     }
     uHash = fn_8000BEE4("brkline");
     fn_800102DC(uHash, &lbl_80282228->pBank, &lbl_80282228->pTex);
-    Vec_Copy(&pCourse->pin[nPin].x, lbl_80282228->vPin);
+    LLMath_CopyVec(&pCourse->pin[nPin].x, lbl_80282228->vPin);
     lbl_80282228->abSkip[0] = 1;
     lbl_80282228->anVerts[0] = 0;
     if (gSession.nSplitScreen) {
@@ -143,7 +143,7 @@ void BreakLine_Render(int nView) {
                                     &lbl_80282228->aBall[nView].pCourse->pin[Game_CurrentPinSet()].x);
                 if (fDist < lbl_80282228->afAAD4[nView]) {
                     lbl_80282228->afAAD4[nView] = fDist;
-                    Vec_Copy(lbl_80282228->aBall[nView].vPos, lbl_80282228->aViewPoint[nView]);
+                    LLMath_CopyVec(lbl_80282228->aBall[nView].vPos, lbl_80282228->aViewPoint[nView]);
                 } else if (!lbl_80282228->abAADC[nView]) {
                     EVENT_Trigger(nPlayer, 0x29, lbl_80282228->aBall[nView].vPrev, 0);
                     lbl_80282228->abAADC[nView] = 1;
@@ -240,7 +240,7 @@ void BreakLine_Render(int nView) {
 
 // View nView's point.
 void fn_800C8C3C(int nView, f32* pOut) {
-    Vec_Copy(lbl_80282228->aViewPoint[nView], pOut);
+    LLMath_CopyVec(lbl_80282228->aViewPoint[nView], pOut);
 }
 
 // fake match: EA reads the player through an inline; written in place, pPlayer is allocated r29, not r31
@@ -264,7 +264,7 @@ void BreakLine_Reset(int nView) {
         lbl_80282228->anVerts[nView] = 0;
         lbl_8028222C = 1;
         Mem_cpy(&lbl_80282228->aBall[nView], &pPlayer->ball, sizeof(Ball));
-        Vec_Copy(lbl_80282228->aBall[nView].vPos, lbl_80282228->aViewPoint[nView]);
+        LLMath_CopyVec(lbl_80282228->aBall[nView].vPos, lbl_80282228->aViewPoint[nView]);
         lbl_80282228->afAAD4[nView] = 1000000.0f;
         lbl_80282228->abAADC[nView] = 0;
         fPower = fn_80050D34(pPlayer->fDistance);
@@ -342,12 +342,12 @@ void fn_800C9038(int nView, f32* pLong, f32* pSide) {
         return;
     }
     // Flatten the three points onto the ground (y = 0).
-    Vec_Copy(&pCourse->pin[nPin].x, vPin);
-    Vec_Copy(vPin, vHole);
+    LLMath_CopyVec(&pCourse->pin[nPin].x, vPin);
+    LLMath_CopyVec(vPin, vHole);
     vHole[1] = 0.0f;
-    Vec_Copy(gPlayers[nPlayer].vBall, vBall);
+    LLMath_CopyVec(gPlayers[nPlayer].vBall, vBall);
     vBall[1] = 0.0f;
-    Vec_Copy(vTip, vAim);
+    LLMath_CopyVec(vTip, vAim);
     vAim[1] = 0.0f;
     if (vAim[0] == vHole[0] && vAim[2] == vHole[2]) {
         *pLong = 0.0f;

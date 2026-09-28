@@ -11,7 +11,7 @@
 #include "unsorted/cull.h"
 #include "core/startup.h"
 
-void Mtx_Copy(f32 (*pSrc)[4], f32 (*pDst)[4]);      // UMemPool.c: copy a 4x4 matrix
+void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);      // UMemPool.c: copy a 4x4 matrix
 void fn_80070168(void);                                 // calls a display list (see fn_800B4FA4)
 void fn_80012520(u32 ePrim, u32 eFormat, u16 nVerts);  // LLFont.c: GXBegin
 void fn_800124A8(void);                                // LLFont.c: end the primitive
@@ -168,9 +168,9 @@ void fn_800B4FA4(RainObject* pRain) {
     DS_vSetZBufferMode(3);
     fn_8005CC64(NULL, NULL);
     RenderState_Flush();
-    Mtx_Copy(pCamera->viewMtx, mView);
+    LLMath_CopyMat44(pCamera->viewMtx, mView);
     mView[3][0] = mView[3][1] = mView[3][2] = 0.0f;
-    Mtx_Copy(((Camera*)RC_spGetCurrentRenderCtx())->m15C, mPos);
+    LLMath_CopyMat44(((Camera*)RC_spGetCurrentRenderCtx())->m15C, mPos);
     fn_800B58FC(mPos[0], mPos[0]);
     fn_800B58FC(mPos[2], mPos[2]);
     for (i = 0; i < 3; i++) {
@@ -198,7 +198,7 @@ void fn_800B4FA4(RainObject* pRain) {
     RenderState_SetDrawFlags(0x50);
     fn_8005CC64(lbl_802814B8->pBank, lbl_802814B8->pTex);
     RenderState_Flush();
-    Mtx_Copy(((Camera*)RC_spGetCurrentRenderCtx())->m15C, mPos);
+    LLMath_CopyMat44(((Camera*)RC_spGetCurrentRenderCtx())->m15C, mPos);
     fn_800B58FC(mPos[0], mPos[0]);
     fn_800B58FC(mPos[2], mPos[2]);
     GXLoadPosMtxImm(mPos, 0);
@@ -264,7 +264,7 @@ void fn_800B52D4(RainObject* pRain, f32* pTime) {
     vCenter.y = 0.0f;
     fOff = (vCenter.z >= 0.0f) ? 17.5f : -17.5f;
     vCenter.z = vCenter.z - 35.0f * (int)(vCenter.z / 35.0f) - fOff;
-    Mtx_Copy(pCamera->viewMtx, mView);
+    LLMath_CopyMat44(pCamera->viewMtx, mView);
     mView[3][0] = mView[3][1] = mView[3][2] = 0.0f;
     for (i = 0; i < 3; i++) {
         fX = 35.0f * (i - 1);

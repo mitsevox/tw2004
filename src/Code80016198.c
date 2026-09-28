@@ -17,9 +17,9 @@ ViewState* lbl_80280E08 = &lbl_801B8A98;
 
 // ---- sweep code (not yet cleaned up) ----
 
-void Mtx_Identity(f32 (*m)[4]);          // identity matrix
+void LLMath_IdentifyMat(f32 (*m)[4]);          // identity matrix
 s32  fn_800072E0(void);
-void Mtx_Copy(f32 (*pSrc)[4], f32 (*pDst)[4]);  // UMemPool.c: copy a 4x4 matrix
+void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);  // UMemPool.c: copy a 4x4 matrix
 void fn_80016C28(f32* pSrc, f32* pDst);             // negate four floats
 void fn_80012520(u32 ePrim, u32 eFormat, u16 nVerts);  // LLFont.c: GXBegin
 void fn_800124A8(void);                                // LLFont.c: end the primitive
@@ -96,17 +96,17 @@ void fn_800162AC(f32* pPos, f32* pColour, f32* pUV, int nVerts) {
     for (i = 0; i < nVerts - 1; i += 2) {
         fX0 = pPos[i * 4];
         fX1 = pPos[i * 4 + 4];
-        Vec_Copy(&pPos[i * 4], aPos[0]);
-        Vec_Copy(&pPos[i * 4], aPos[1]);
+        LLMath_CopyVec(&pPos[i * 4], aPos[0]);
+        LLMath_CopyVec(&pPos[i * 4], aPos[1]);
         aPos[1][0] = fX1;
-        Vec_Copy(&pPos[(i + 1) * 4], aPos[2]);
+        LLMath_CopyVec(&pPos[(i + 1) * 4], aPos[2]);
         aPos[2][0] = fX0;
-        Vec_Copy(&pPos[(i + 1) * 4], aPos[3]);
+        LLMath_CopyVec(&pPos[(i + 1) * 4], aPos[3]);
         if (pColour != NULL) {
-            Vec_Copy(&pColour[i * 4], aColour[0]);
-            Vec_Copy(&pColour[i * 4], aColour[1]);
-            Vec_Copy(&pColour[(i + 1) * 4], aColour[2]);
-            Vec_Copy(&pColour[(i + 1) * 4], aColour[3]);
+            LLMath_CopyVec(&pColour[i * 4], aColour[0]);
+            LLMath_CopyVec(&pColour[i * 4], aColour[1]);
+            LLMath_CopyVec(&pColour[(i + 1) * 4], aColour[2]);
+            LLMath_CopyVec(&pColour[(i + 1) * 4], aColour[3]);
             pQuadColour = aColour[0];
         } else {
             pQuadColour = NULL;
@@ -114,12 +114,12 @@ void fn_800162AC(f32* pPos, f32* pColour, f32* pUV, int nVerts) {
         if (pUV != NULL) {
             fX0 = pUV[i * 4];
             fX1 = pUV[i * 4 + 4];
-            Vec_Copy(&pUV[i * 4], aUV[0]);
-            Vec_Copy(&pUV[i * 4], aUV[1]);
+            LLMath_CopyVec(&pUV[i * 4], aUV[0]);
+            LLMath_CopyVec(&pUV[i * 4], aUV[1]);
             aUV[1][0] = fX1;
-            Vec_Copy(&pUV[(i + 1) * 4], aUV[2]);
+            LLMath_CopyVec(&pUV[(i + 1) * 4], aUV[2]);
             aUV[2][0] = fX0;
-            Vec_Copy(&pUV[(i + 1) * 4], aUV[3]);
+            LLMath_CopyVec(&pUV[(i + 1) * 4], aUV[3]);
             pQuadUV = aUV[0];
         } else {
             pQuadUV = NULL;
@@ -244,7 +244,7 @@ void fn_800169AC(void) {
     pView->n7C = pView->fE0 * pView->nE8;
     pView->m40[0][0] = pView->fF4;
     pView->m40[1][1] = pView->fF8;
-    Mtx_Identity(pView->m80);
+    LLMath_IdentifyMat(pView->m80);
     pView->m80[3][0] += pView->n70;
     pView->m80[3][1] += pView->n74;
     pView->m80[0][0] = pView->n78 * pView->fF4;
@@ -269,8 +269,8 @@ void fn_80016B6C(f32 fX, f32 fY) {
 
 // Give the renderer the current camera's matrices, with rows 0 and 2 of the first negated.
 void RenderState_SetCameraMatrices(void) {
-    Mtx_Copy(((Camera*)RC_spGetCurrentRenderCtx())->m15C, gRenderState.mView);
-    Mtx_Copy(((Camera*)RC_spGetCurrentRenderCtx())->m9C, gRenderState.mProjection);
+    LLMath_CopyMat44(((Camera*)RC_spGetCurrentRenderCtx())->m15C, gRenderState.mView);
+    LLMath_CopyMat44(((Camera*)RC_spGetCurrentRenderCtx())->m9C, gRenderState.mProjection);
     fn_80016C28(gRenderState.mView[0], gRenderState.mView[0]);
     fn_80016C28(gRenderState.mView[2], gRenderState.mView[2]);
     gRenderState.uChanged |= 0x100;

@@ -4,9 +4,9 @@
 
 #include "camera.h"
 
-void Mtx_Copy(f32 (*pSrc)[4], f32 (*pDst)[4]);     // UMemPool.c: copy a 4x4 matrix
-void Mtx_InvertRigid(f32 (*pSrc)[4], f32 (*pDst)[4]);     // UMemPool.c: inverts a rotation+translation
-void Mtx_Identity(f32 (*pMtx)[4]);                     // identity
+void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);     // UMemPool.c: copy a 4x4 matrix
+void LLMath_InvertNormalized(f32 (*pSrc)[4], f32 (*pDst)[4]);     // UMemPool.c: inverts a rotation+translation
+void LLMath_IdentifyMat(f32 (*pMtx)[4]);                     // identity
 void CA_vSetDefaultScalingVectors(CamLens* pLens);
 f32  Math_Tan(f32 x);                              // tan, as a float
 void fn_800354B4(u8* p, f32 v);                       // GoTerrain.c: sets the lens's far clip, fAC
@@ -65,7 +65,7 @@ void CA_vSetLookAt(CamLens* pLens, f32* pPos, f32* pTarget) {
         }
         vec4flt_CrossProduct(pLens->m4[2], pLens->m4[0], pLens->m4[1]);
     }
-    Mtx_InvertRigid(pLens->m4, pLens->m44);
+    LLMath_InvertNormalized(pLens->m4, pLens->m44);
 }
 
 // The same with the lens's x axis given (pSide, normalised here).
@@ -88,7 +88,7 @@ void CA_vSetLookAtSide(CamLens* pLens, f32* pPos, f32* pTarget, f32* pSide) {
         LLMath_Normalize3(pLens->m4[0], pLens->m4[0]);
         vec4flt_CrossProduct(pLens->m4[2], pLens->m4[0], pLens->m4[1]);
     }
-    Mtx_InvertRigid(pLens->m4, pLens->m44);
+    LLMath_InvertNormalized(pLens->m4, pLens->m44);
 }
 
 // Aims the lens like CA_vSetLookAt, then scales the world by pScale around pCenter: m44 gets the
@@ -99,7 +99,7 @@ void Camera_SetCameraPositionAndTargetWithOffsetAndScale(CamLens* pLens, f32* pP
     f32 mA[4][4];
     f32 mTmp[4][4];
 
-    Vec_Copy(pScale, pLens->m84[1]);
+    LLMath_CopyVec(pScale, pLens->m84[1]);
     fn_80076A38(pLens->m84[1], pLens->m84[0]);
     pLens->m4[3][0] = pPos[0];
     pLens->m4[3][1] = pPos[1];
@@ -118,42 +118,42 @@ void Camera_SetCameraPositionAndTargetWithOffsetAndScale(CamLens* pLens, f32* pP
         }
         vec4flt_CrossProduct(pLens->m4[2], pLens->m4[0], pLens->m4[1]);
     }
-    Mtx_InvertRigid(pLens->m4, pLens->m44);
+    LLMath_InvertNormalized(pLens->m4, pLens->m44);
 
     // world to camera: move pCenter to the origin, scale, move it back
-    Mtx_Identity(mTmp);
+    LLMath_IdentifyMat(mTmp);
     mTmp[3][0] = pCenter[0];
     mTmp[3][1] = pCenter[1];
     mTmp[3][2] = pCenter[2];
     LLMath_mat44fltMultiplyList(mTmp, pLens->m44, mB, 4);
-    Mtx_Identity(mTmp);
+    LLMath_IdentifyMat(mTmp);
     mTmp[0][0] = pScale[0];
     mTmp[1][1] = pScale[1];
     mTmp[2][2] = pScale[2];
     LLMath_mat44fltMultiplyList(mTmp, mB, mA, 4);
-    Mtx_Identity(mTmp);
+    LLMath_IdentifyMat(mTmp);
     mTmp[3][0] = -pCenter[0];
     mTmp[3][1] = -pCenter[1];
     mTmp[3][2] = -pCenter[2];
     LLMath_mat44fltMultiplyList(mTmp, mA, pLens->m44, 4);
 
     // camera to world: the same with the inverse scale
-    Mtx_Identity(mTmp);
+    LLMath_IdentifyMat(mTmp);
     mTmp[3][0] = pCenter[0];
     mTmp[3][1] = pCenter[1];
     mTmp[3][2] = pCenter[2];
-    Mtx_Identity(mB);
+    LLMath_IdentifyMat(mB);
     mB[0][0] = pLens->m84[0][0];
     mB[1][1] = pLens->m84[0][1];
     mB[2][2] = pLens->m84[0][2];
     LLMath_mat44fltMultiplyList(mB, mTmp, mA, 4);
-    Mtx_Identity(mTmp);
+    LLMath_IdentifyMat(mTmp);
     mTmp[3][0] = -pCenter[0];
     mTmp[3][1] = -pCenter[1];
     mTmp[3][2] = -pCenter[2];
     LLMath_mat44fltMultiplyList(mTmp, mA, mB, 4);
     LLMath_mat44fltMultiplyList(pLens->m4, mB, mA, 4);
-    Mtx_Copy(mA, pLens->m4);
+    LLMath_CopyMat44(mA, pLens->m4);
     LLMath_mat44fltMultiplyList(pLens->m4, pLens->m44, mB, 4);   // the result is never used
 }
 
@@ -175,11 +175,11 @@ void fn_80076948(CamLens* pLens, f32 fB4, f32 fB8) {
 // Sets the lens's camera-to-world matrix (pMtx, or the identity when NULL) and its inverse.
 void CA_vSetMatrix(CamLens* pLens, f32 (*pMtx)[4]) {
     if (pMtx == NULL) {
-        Mtx_Identity(pLens->m4);
-        Mtx_Identity(pLens->m44);
+        LLMath_IdentifyMat(pLens->m4);
+        LLMath_IdentifyMat(pLens->m44);
     } else {
-        Mtx_Copy(pMtx, pLens->m4);
-        Mtx_InvertRigid(pMtx, pLens->m44);
+        LLMath_CopyMat44(pMtx, pLens->m4);
+        LLMath_InvertNormalized(pMtx, pLens->m44);
     }
     CA_vSetDefaultScalingVectors(pLens);
 }

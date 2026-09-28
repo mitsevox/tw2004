@@ -21,7 +21,7 @@ void Quat_Invert(f32* pQ, f32* pOut);                   // Quaternion.c
 void fn_8001FBA4(f32* pA, f32* pB, f32* pOut, f32 fT);  // a blend of two points by fT
 void fn_8001FB00(f32* pA, f32* pB, f32* pOut, f32 fT);  // a blend of two rotations by fT
 void LLMath_mat44fltMultiply(f32 mtx[4][4], Vec4* src, Vec4* dst);  // VecMath.c: a point through a matrix
-void Mtx_InvertRigid(f32 (*pSrc)[4], f32 (*pDst)[4]);       // UMemPool.c: inverts a rotation+translation
+void LLMath_InvertNormalized(f32 (*pSrc)[4], f32 (*pDst)[4]);       // UMemPool.c: inverts a rotation+translation
 void Quat_BuildFromMatrix(f32 (*m)[4], f32* pQ);                 // Quaternion.c: a rotation matrix's quaternion
 void Character_UpdateFeetTerrainInfo(Character* pChar, int bNormals);   // char.c
 void Character_PlaceFeetOnGround(Character* pChar);                     // char.c
@@ -35,8 +35,8 @@ void Quat_Add(f32* pA, f32* pB, f32* pOut);           // Quaternion.c
 void Quat_RotateVector(f32* pQuat, f32* pIn, f32* pOut);       // Quaternion.c: a vector turned by it
 void Quat_BuildFromVectorAndScale(f32* pAxis, f32* pOut, f32 fAngle);     // Quaternion.c: an axis-angle rotation
 void Quat_QuatToMatrix(f32* pQ, f32 (*pMtx)[4]);               // Quaternion.c: a rotation's matrix
-void Mtx_Copy(f32 (*pSrc)[4], f32 (*pDst)[4]);        // copies a matrix
-void Mtx_Identity(f32 (*pMtx)[4]);                        // identity
+void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);        // copies a matrix
+void LLMath_IdentifyMat(f32 (*pMtx)[4]);                        // identity
 void fn_80029A00(CharModel* pModel, int nA, int nB, f32* pRot);
 void fn_80029BF4(f32* pA, f32* pB, f32* pOut);
 void fn_80029C3C(f32* pA, f32* pB, f32* pOut);
@@ -265,9 +265,9 @@ void fn_800271A0(CharModel* pModel, IKChain* pChain) {
                 pLink->b0 |= 1;
             }
         } else if (i == 0) {
-            Vec_Copy(pModel->pPoses[nBone].v10, pLink->v28);
+            LLMath_CopyVec(pModel->pPoses[nBone].v10, pLink->v28);
         } else {
-            Vec_Copy(pBone->v1C, pLink->v28);
+            LLMath_CopyVec(pBone->v1C, pLink->v28);
         }
     }
     Vec4_CopyPoint(pModel->pPoses[pChain->pLinks[pChain->nLinks - 1].nBone].v10, pChain->v8);
@@ -532,13 +532,13 @@ void fn_80027D14(Character* pChar) {
     pMtx28 = pModel->pMatrices[CharModel_GetBoneIndexMapped(pModel, 0x28)];
     pGripMtx = pModel->pMatrices[CharModel_GetBoneIndex(pModel, 0x52)];
     if (pModel->bEE) {
-        Mtx_Identity(mFlip);
+        LLMath_IdentifyMat(mFlip);
         mFlip[0][0] = -1.0f;
         LLMath_mat44fltMultiplyList(pGripMtx, mFlip, mGrip, 4);
     } else {
-        Mtx_Copy(pGripMtx, mGrip);
+        LLMath_CopyMat44(pGripMtx, mGrip);
     }
-    Mtx_InvertRigid(mGrip, mInv);
+    LLMath_InvertNormalized(mGrip, mInv);
     LLMath_mat44fltMultiplyList(mInv, pMtx28, mRel, 4);
     Quat_BuildFromMatrix(mRel, pModel->pSkel->q107C);
     LLMath_mat44fltMultiply(mInv, (Vec4*)pMtx28[3], (Vec4*)pModel->pSkel->v108C);
@@ -842,7 +842,7 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
         pSkelRot = NULL;
     }
     fn_80021980(pModel->a14, pModel->a24, aModel, 0x80);
-    Mtx_Identity(mScale);
+    LLMath_IdentifyMat(mScale);
     if (BitArray_Intersects(aBits, aCur, 0x80)) {
         Quat_Copy(pModel->pBones[0].q0C, pModel->pPoses[0].q0);
         Quat_Copy(pModel->pBones[0].v1C, pModel->pPoses[0].v10);
@@ -851,7 +851,7 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
         mScale[1][1] = pModel->a140[0][1];
         mScale[2][2] = pModel->a140[0][2];
         LLMath_mat44fltMultiplyList(pModel->pMatrices[0], mScale, mOut, 4);
-        Mtx_Copy(mOut, pModel->pMatrices[0]);
+        LLMath_CopyMat44(mOut, pModel->pMatrices[0]);
         Vec4_CopyPoint(pModel->pPoses[0].v10, pModel->pMatrices[0][3]);
         SKEL_UpdateSkinningMatrix(pModel, pModel->pMatrices[0], 0);
     }
@@ -921,7 +921,7 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
                 mScale[0][0] = -mScale[0][0];   // with bEE set, bone 0x52's x is flipped
             }
             LLMath_mat44fltMultiplyList(pModel->pMatrices[i], mScale, mOut, 4);
-            Mtx_Copy(mOut, pModel->pMatrices[i]);
+            LLMath_CopyMat44(mOut, pModel->pMatrices[i]);
             Vec4_CopyPoint(pPose->v10, pModel->pMatrices[i][3]);
             SKEL_UpdateSkinningMatrix(pModel, pModel->pMatrices[i], i);
             fn_80021980(aBits, aCur, aBits, 0x80);
@@ -1209,7 +1209,7 @@ f32 fn_80029B64(f32 x) {
 
 // Sets a vector to zero.
 void fn_80029BC8(f32* pVec) {
-    Vec_Copy(lbl_80186838, pVec);
+    LLMath_CopyVec(lbl_80186838, pVec);
 }
 
 // pA + pB into out, three floats (paired singles).

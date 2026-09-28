@@ -109,7 +109,7 @@ void fn_8008AD80(void);
 
 void fn_80007254(void);
 void fn_80008380(void);
-void Mtx_Identity(f32 (*m)[4]);          // identity matrix
+void LLMath_IdentifyMat(f32 (*m)[4]);          // identity matrix
 void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
 void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
 void fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY);
@@ -515,23 +515,23 @@ void fn_8008B9A0(void) {
 
     pView = ViewController_GetCameraControl(ViewController_GetCurrentViewControllerID());
     ViewController_Update(ViewController_GetCurrentViewControllerID());
-    Mtx_Identity(lbl_80281EE0->mC0);
-    Vec_Copy(pView->v0, lbl_80281EE0->v100);
-    Vec_Copy(pView->v10, lbl_80281EE0->v110);
+    LLMath_IdentifyMat(lbl_80281EE0->mC0);
+    LLMath_CopyVec(pView->v0, lbl_80281EE0->v100);
+    LLMath_CopyVec(pView->v10, lbl_80281EE0->v110);
     switch (lbl_80281EE0->n0) {
     case 0:
-        Vec_Copy(lbl_80189A40[0], lbl_80281EE0->v120);
-        Vec_Copy(lbl_80189A40[1], lbl_80281EE0->v130);
+        LLMath_CopyVec(lbl_80189A40[0], lbl_80281EE0->v120);
+        LLMath_CopyVec(lbl_80189A40[1], lbl_80281EE0->v130);
         break;
     case 1:
     case 3:
     case 4:
-        Vec_Copy(lbl_80189A60[0], lbl_80281EE0->v120);
-        Vec_Copy(lbl_80189A60[1], lbl_80281EE0->v130);
+        LLMath_CopyVec(lbl_80189A60[0], lbl_80281EE0->v120);
+        LLMath_CopyVec(lbl_80189A60[1], lbl_80281EE0->v130);
         break;
     case 2:
-        Vec_Copy(lbl_80189A80[0], lbl_80281EE0->v120);
-        Vec_Copy(lbl_80189A80[1], lbl_80281EE0->v130);
+        LLMath_CopyVec(lbl_80189A80[0], lbl_80281EE0->v120);
+        LLMath_CopyVec(lbl_80189A80[1], lbl_80281EE0->v130);
         break;
     }
 }
@@ -754,7 +754,7 @@ void sFE_AdjustAndSetGolferPosition(void) {
         }
         if (lbl_80281EE0->n8 == 1) {
             // Raise him by his club class's amount while he is placed, then put the spot back.
-            Vec_Copy(lbl_80189A30, vSaved);
+            LLMath_CopyVec(lbl_80189A30, vSaved);
             if (lbl_80281EE0->pB4->pChar->nClubClass == 3) {
                 lbl_80189A30[1] += 0.13166f;
             } else if (lbl_80281EE0->pB4->pChar->nClubClass == 4) {
@@ -765,7 +765,7 @@ void sFE_AdjustAndSetGolferPosition(void) {
                 lbl_80189A30[1] += 0.23167f;
             }
             Character_SetPosition(lbl_80281EE0->pB4->pChar, lbl_80189A30, 1);
-            Vec_Copy(vSaved, lbl_80189A30);
+            LLMath_CopyVec(vSaved, lbl_80189A30);
         } else {
             Character_SetPosition(lbl_80281EE0->pB4->pChar, lbl_80189A30, 1);
         }

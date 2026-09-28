@@ -101,7 +101,7 @@ void fn_80037FB4(u8 b, f32* pColour) {
 void fn_80038010(u8 b, int nView, f32* pColour) {
     lbl_801D50C0[nView].b0 = b;
     if (b) {
-        Vec_Copy(pColour, lbl_801D50C0[nView].aColour);
+        LLMath_CopyVec(pColour, lbl_801D50C0[nView].aColour);
     }
 }
 
@@ -116,7 +116,7 @@ void fn_80038054(u8 b, int nView, f32 f4, f32 f8) {
 
 void fn_800380A8(u8 b, f32* pColour, u8 bCopy, int nView, f32 fX, f32 fY) {
     lbl_801D5020[nView].b0 = b;
-    Vec_Copy(pColour, lbl_801D5020[nView].aColour);
+    LLMath_CopyVec(pColour, lbl_801D5020[nView].aColour);
     lbl_801D5020[nView].b1 = bCopy;
     lbl_801D5020[nView].fX = fX;
     lbl_801D5020[nView].fY = fY;
@@ -321,7 +321,7 @@ void fn_80038624(f32* pColour) {
 
 // Copies view nView's colour to pOut.
 void fn_800386F0(int nView, f32* pOut) {
-    Vec_Copy(lbl_801D50C0[nView].aColour, pOut);
+    LLMath_CopyVec(lbl_801D50C0[nView].aColour, pOut);
 }
 
 // Draws the effect's screen copy (nField picks which of the two) over view nView's rectangle at

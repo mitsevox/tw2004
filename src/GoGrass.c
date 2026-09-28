@@ -286,7 +286,7 @@ void fn_8011E6E8(void) {
         vPoint[2] = fSin * lbl_80281900->f41C *
                     Math_Sin(lbl_80281900->f414 + 2.0f * PI * ((f32)i / 16.0f));
         vPoint[3] = 0.0f;
-        Vec_Copy(vPoint, lbl_80281900->av230[i]);
+        LLMath_CopyVec(vPoint, lbl_80281900->av230[i]);
     }
     lbl_80281900->f228 = 16.0f * lbl_80281900->f410 * fCos;
     lbl_80281900->f22C = 16.0f * lbl_80281900->f410 * fSin;
@@ -532,7 +532,7 @@ void fn_8011F3AC(void) {
     CamLens* pLens = Camera_GetCurrentLens();
 
     nBuffers = lbl_80281900->anF8[lbl_80281900->n100];
-    Vec_Copy(pLens->m4[2], vDir);
+    LLMath_CopyVec(pLens->m4[2], vDir);
     vDir[1] = 0.0f;
     if (vDir[0] != 0.0f || vDir[1] != 0.0f || vDir[2] != 0.0f) {
         LLMath_Normalize3(vDir, vDir);
@@ -686,8 +686,8 @@ void fn_8011F7F8(void) {
     if (vFlat[0] != 0.0f || vFlat[1] != 0.0f || vFlat[2] != 0.0f) {
         LLMath_Normalize3(vFlat, vFlat);
     }
-    Vec_Copy(pLens->m4[3], vPos);
-    Vec_Scale(lbl_80281900->f3EC, vFlat, vAhead);
+    LLMath_CopyVec(pLens->m4[3], vPos);
+    LLMath_Scale(lbl_80281900->f3EC, vFlat, vAhead);
     fn_80120268(vAhead, vPos, vCentre);
     if (vCentre[0] < 0.0f) {
         fX = vCentre[0] - (2.5f - (f32)fabs(fn_80120244(vCentre[0], 2.5f)));

@@ -492,7 +492,7 @@ void fn_80063920(int nView, f32* pBounds) {
 // to 0 over fTime.
 void CameraController_FadeIn(View* pView, f32 fTime, f32* pVec) {
     pView->script.nCamera = 2;
-    Vec_Copy(pVec, pView->script.v40);
+    LLMath_CopyVec(pVec, pView->script.v40);
     pView->script.f90 = 0.0f;
     pView->script.f94 = fTime;
 }
@@ -501,7 +501,7 @@ void CameraController_FadeIn(View* pView, f32 fTime, f32* pVec) {
 // pVec[3] over fTime.
 void CameraController_FadeOut(View* pView, f32 fTime, f32* pVec) {
     pView->script.nCamera = 1;
-    Vec_Copy(pVec, pView->script.v40);
+    LLMath_CopyVec(pVec, pView->script.v40);
     pView->script.f90 = 0.0f;
     pView->script.f94 = fTime;
 }
@@ -526,7 +526,7 @@ u8 fn_80063C90(View* pView) {
 
 void fn_80063CBC(View* pView, f32* pVec) {
     pView->script.nCamera = 3;
-    Vec_Copy(pVec, pView->script.v40);
+    LLMath_CopyVec(pVec, pView->script.v40);
 }
 
 // Asks for shot kind nKind on the player's view. With club 25 only kinds 0, 5, 8, 11 and 23 are
@@ -689,11 +689,11 @@ u8 fn_8006434C(void* pCamera, f32* pPos, f32* pX, f32* pY, f32* pZ) {
         bInFront = 0;
     }
     if (v[3] < -0.0001f || v[3] > 0.0001f) {
-        Vec_Scale(1.0f / v[3], v, v);
+        LLMath_Scale(1.0f / v[3], v, v);
     } else if (v[3] < 0.0f) {
-        Vec_Scale(-10000.0f, v, v);
+        LLMath_Scale(-10000.0f, v, v);
     } else {
-        Vec_Scale(10000.0f, v, v);
+        LLMath_Scale(10000.0f, v, v);
     }
     if (pX != NULL) {
         *pX = 0.5f * (1.0f + v[0]);

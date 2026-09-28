@@ -24,7 +24,7 @@ void  Camera_SetCameraYawPitchRollAndPosition(CamLens* pLens, f32* pPos, f32* pA
 void  fn_80013D68(void* pCamera);
 void  VM_vUpdateInternalViewportRectData(f32* pRect);
 void  mat44flt_EulerAngles(f32 (*pMtx)[4], f32 fA, f32 fB, f32 fC);  // UMemPool.c: yaw, pitch, roll
-void  Mtx_InvertRigid(f32 (*pSrc)[4], f32 (*pDst)[4]);          // UMemPool.c: inverts a rotation+translation
+void  LLMath_InvertNormalized(f32 (*pSrc)[4], f32 (*pDst)[4]);          // UMemPool.c: inverts a rotation+translation
 void  CA_vSetDefaultScalingVectors(CamLens* pLens);
 
 ViewController* ViewController_GetDataPtr(int nView);
@@ -215,7 +215,7 @@ void Camera_SetCameraYawPitchRollAndPosition(CamLens* pLens, f32* pPos, f32* pAn
     pLens->m4[3][1] = pPos[1];
     pLens->m4[3][2] = pPos[2];
     pLens->m4[3][3] = 1.0f;
-    Mtx_InvertRigid(pLens->m4, pLens->m44);
+    LLMath_InvertNormalized(pLens->m4, pLens->m44);
 }
 
 // Sets both of the lens's scaling vectors (m84[0], m84[1]) to 1: no scaling (the scaled look-at of

@@ -310,8 +310,8 @@ char lbl_802814FC[] = "logoea";
 
 void fn_800B99BC(UStreamObject* pObject);
 void fn_800B99FC(UStreamObject* arg0);
-void Mtx_Copy(f32 (*pSrc)[4], f32 (*pDst)[4]);
-void Mtx_Identity(f32 (*pMtx)[4]);                   // identity
+void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);
+void LLMath_IdentifyMat(f32 (*pMtx)[4]);                   // identity
 void fn_8000C5A4(f32 (*pMtx)[4]);
 void LLMath_mat44fltMultiplyList(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void LLMath_mat44fltMultiplyList33(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
@@ -422,20 +422,20 @@ void fn_800B9BF4(UObject* pObj, f32 (*mBone)[4], f32 (*mScale)[4], f32* pPos) {
     f32 m40[4][4];
     f32 m80[4][4];
 
-    Mtx_Copy(pObj->m0, m0);
-    Mtx_Copy(pObj->m40, m40);
-    Mtx_Copy(pObj->m80, m80);
+    LLMath_CopyMat44(pObj->m0, m0);
+    LLMath_CopyMat44(pObj->m40, m40);
+    LLMath_CopyMat44(pObj->m80, m80);
     LLMath_mat44fltMultiplyList33(mBone, pObj->m0, pObj->m0, 3);
     LLMath_mat44fltMultiplyList33(mScale, pObj->m40, pObj->m40, 3);
     fn_8000C5A4(pObj->m0);
-    Vec_Copy(pPos, pObj->m80[3]);
+    LLMath_CopyVec(pPos, pObj->m80[3]);
     pObj->m80[3][3] = 1.0f;
     LLMath_mat44fltMultiplyList(lbl_80281EE0->mC0, pObj->m80, pObj->m80, 4);
-    Mtx_Identity(pObj->m0);
+    LLMath_IdentifyMat(pObj->m0);
     fn_80048894(pObj);
-    Mtx_Copy(m0, pObj->m0);
-    Mtx_Copy(m40, pObj->m40);
-    Mtx_Copy(m80, pObj->m80);
+    LLMath_CopyMat44(m0, pObj->m0);
+    LLMath_CopyMat44(m40, pObj->m40);
+    LLMath_CopyMat44(m80, pObj->m80);
 }
 
 // Draw the ball in the create-a-player golfer's hand (bone 0x54), when he holds it: to the
@@ -452,7 +452,7 @@ void fn_800B9CF0(u8 bTarget) {
         vPos[3] = 1.0f;
         Character_GetBonePos(lbl_80281EE0->pB4->pChar, 0x54, vPos);
         mBone = Character_GetBoneMatrix(lbl_80281EE0->pB4->pChar, 0x54);
-        Mtx_Identity(mScale);
+        LLMath_IdentifyMat(mScale);
         mScale[0][0] = lbl_802814F0;
         mScale[1][1] = lbl_802814F4;
         mScale[2][2] = lbl_802814F8;

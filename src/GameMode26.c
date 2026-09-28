@@ -403,7 +403,7 @@ void fn_8010CA2C(PlayerNumber_t nPlayer) {
     // The player's longest counted shot, and where the ball lay.
     if (bCounts && nLength > pPlayer->nEA8) {
         pPlayer->nEA8 = nLength;
-        Vec_Copy(pPlayer->ball.vPos, pPlayer->vEAC);
+        LLMath_CopyVec(pPlayer->ball.vPos, pPlayer->vEAC);
         if (gPlayers[nPlayer].nEA8 > gPlayers[1 - nPlayer].nEA8) {
             GameMsg_Send2Ints(0x4C, nLength, nPlayer);
             // port: EA passes two arguments Gaud_LongDriveUi_Play ignores

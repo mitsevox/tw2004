@@ -7,7 +7,7 @@ void fn_800055D4();
 void fn_800060DC();
 void fn_8000724C();
 void StaticMem_Shutdown();
-void fn_8000AF58();
+void Math_FreeLog2Table();
 void fn_80013030();
 void fn_80014590();
 void fn_800B5C34();
@@ -21,7 +21,7 @@ void fn_80005590(void) {
     fn_800060DC();
     fn_80013030();
     StaticMem_Shutdown();
-    fn_8000AF58();
+    Math_FreeLog2Table();
     GoARAM_Shutdown();
     fn_800B5C34();
     fn_800055D4();

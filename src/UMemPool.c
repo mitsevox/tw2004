@@ -1,4 +1,4 @@
-// UMemPool.c (EA's name, from the assert in UMemPool_Create; also in EA's 2002 source tree).
+// UMemPool.c (EA's name, from the assert in CreateMemPool; also in EA's 2002 source tree).
 // Despite the name, most of this unit is 4x4 matrix code: it reads as EA's UMatFlt.c and UMath.c
 // linked just before UMemPool.c (TW06 and TW07 keep them as neighbouring legacy/lib files, in that
 // order; TW07's UMatFlt.c has mat44flt_EulerAngles, mat44flt_ExtractEulerAngles, mat44flt_gaussj
@@ -6,12 +6,12 @@
 // In address order:
 // - matrices (row vectors, translation in row 3): copies, Euler angles to and from a matrix,
 //   transposes, inverses and the projection matrices the render context builds;
-// - 4-float vector helpers (Vec_Copy, Vec_Swap, paired-single negate, scale, multiply and
+// - 4-float vector helpers (LLMath_CopyVec, Vec_Swap, paired-single negate, scale, multiply and
 //   add-scaled), atan2f, fabsf, fabs and logf;
 // - the log2 lookup table (1024 entries) and its init and close (possibly UMath.c's module
 //   functions: TW07's UMath.c has four near-empty MF_v* init/close functions);
 // - the pools of fixed-size nodes carved from one allocation (the file streamer keeps its object
-//   nodes in one): UMemPool_Create, DeleteMemPool, AllocPoolMem, ReturnPoolMem.
+//   nodes in one): CreateMemPool, DeleteMemPool, AllocPoolMem, ReturnPoolMem.
 
 #include "engine.h"
 
@@ -19,25 +19,25 @@ f32* gLog2Table;   // log2(1 + i / 1024) for i = 0..1023: the log2 of a float's 
 
 int  mat44flt_gaussj(f32 (*pA)[4], f32 (*pB)[4]);
 void Vec_Swap(f32* pA, f32* pB);
-void Mtx_Identity(f32 (*pDst)[4]);
-void fn_8000AE0C(f32* pSrc, f32* pDst);
-void fn_8000AE9C(void);
+void LLMath_IdentifyMat(f32 (*pDst)[4]);
+void LLMath_Negate3(f32* pSrc, f32* pDst);
+void Math_FillLog2Table(void);
 void LLMath_mat44fltMultiply33(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // a vector through a matrix
 
 // Copies a 4x4 matrix, one row at a time.
-void Mtx_Copy(f32 (*pSrc)[4], f32 (*pDst)[4]) {
-    Vec_Copy(pSrc[0], pDst[0]);
-    Vec_Copy(pSrc[1], pDst[1]);
-    Vec_Copy(pSrc[2], pDst[2]);
-    Vec_Copy(pSrc[3], pDst[3]);
+void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]) {
+    LLMath_CopyVec(pSrc[0], pDst[0]);
+    LLMath_CopyVec(pSrc[1], pDst[1]);
+    LLMath_CopyVec(pSrc[2], pDst[2]);
+    LLMath_CopyVec(pSrc[3], pDst[3]);
 }
 
 // Copies rows 0-2 of a 4x4 matrix (the rotation, each row with its fourth float); row 3, the
 // translation, is left as it is.
-void Mtx_CopyRotation(f32 (*pSrc)[4], f32 (*pDst)[4]) {
-    Vec_Copy(pSrc[0], pDst[0]);
-    Vec_Copy(pSrc[1], pDst[1]);
-    Vec_Copy(pSrc[2], pDst[2]);
+void LLMath_CopyMat34(f32 (*pSrc)[4], f32 (*pDst)[4]) {
+    LLMath_CopyVec(pSrc[0], pDst[0]);
+    LLMath_CopyVec(pSrc[1], pDst[1]);
+    LLMath_CopyVec(pSrc[2], pDst[2]);
 }
 
 // A rotation matrix from yaw (about y), pitch (about x) and roll (about z), in radians, into rows
@@ -221,7 +221,7 @@ void mat44flt_ExtractEulerAngles(f32 (*pMtx)[4], f32* pYaw, f32* pPitch, f32* pR
 }
 
 // Transposes the 3x3 part of a 4x4 matrix (pSrc and pDst may be the same matrix).
-void Mtx_Transpose3x3(f32 (*pSrc)[4], f32 (*pDst)[4]) {
+void LLMath_Transpose33(f32 (*pSrc)[4], f32 (*pDst)[4]) {
     f32 f;
 
     pDst[0][0] = pSrc[0][0];
@@ -239,7 +239,7 @@ void Mtx_Transpose3x3(f32 (*pSrc)[4], f32 (*pDst)[4]) {
 }
 
 // Transposes a 4x4 matrix (pSrc and pDst may be the same matrix).
-void Mtx_Transpose4x4(f32 (*pSrc)[4], f32 (*pDst)[4]) {
+void LLMath_Transpose44(f32 (*pSrc)[4], f32 (*pDst)[4]) {
     f32 f;
 
     pDst[0][0] = pSrc[0][0];
@@ -269,18 +269,18 @@ void Mtx_Transpose4x4(f32 (*pSrc)[4], f32 (*pDst)[4]) {
 // Inverts a rotation-plus-translation matrix (rotation in rows 0-2, translation in row 3, no
 // scale): the rotation is transposed and the new translation is minus the old one turned by it.
 // pSrc and pDst may be the same matrix.
-void Mtx_InvertRigid(f32 (*pSrc)[4], f32 (*pDst)[4]) {
+void LLMath_InvertNormalized(f32 (*pSrc)[4], f32 (*pDst)[4]) {
     f32 aTurned[4];
     f32 aPos[4];
 
-    Vec_Copy(pSrc[3], aPos);
+    LLMath_CopyVec(pSrc[3], aPos);
     pDst[0][3] = 0.0f;
     pDst[1][3] = 0.0f;
     pDst[2][3] = 0.0f;
     pDst[3][3] = 1.0f;
-    Mtx_Transpose3x3(pSrc, pDst);
+    LLMath_Transpose33(pSrc, pDst);
     LLMath_mat44fltMultiply33(pDst, aPos, aTurned);
-    fn_8000AE0C(aTurned, pDst[3]);
+    LLMath_Negate3(aTurned, pDst[3]);
 }
 
 // Gauss-Jordan elimination with full pivoting: pA is replaced by its inverse, and pB goes
@@ -331,14 +331,14 @@ int mat44flt_gaussj(f32 (*pA)[4], f32 (*pB)[4]) {
         }
         fPivInv = 1.0f / pA[nCol][nCol];
         pA[nCol][nCol] = 1.0f;
-        Vec_Scale(fPivInv, pA[nCol], pA[nCol]);
-        Vec_Scale(fPivInv, pB[nCol], pB[nCol]);
+        LLMath_Scale(fPivInv, pA[nCol], pA[nCol]);
+        LLMath_Scale(fPivInv, pB[nCol], pB[nCol]);
         for (j = 0; j < 4; j++) {
             if (j != nCol) {
                 fDum = -pA[j][nCol];
                 pA[j][nCol] = 0.0f;
-                fn_8000AE6C(pA[j], pA[nCol], fDum, pA[j]);
-                fn_8000AE6C(pB[j], pB[nCol], fDum, pB[j]);
+                LLMath_AddScale(pA[j], pA[nCol], fDum, pA[j]);
+                LLMath_AddScale(pB[j], pB[nCol], fDum, pB[j]);
             }
         }
     }
@@ -360,8 +360,8 @@ int mat44flt_gaussj(f32 (*pA)[4], f32 (*pB)[4]) {
 void mat44flt_Invert(f32 (*pSrc)[4], f32 (*pDst)[4]) {
     f32 aIdentity[4][4];
 
-    Mtx_Copy(pSrc, pDst);
-    Mtx_Identity(aIdentity);
+    LLMath_CopyMat44(pSrc, pDst);
+    LLMath_IdentifyMat(aIdentity);
     mat44flt_gaussj(pDst, aIdentity);
 }
 
@@ -369,7 +369,7 @@ void mat44flt_Invert(f32 (*pSrc)[4], f32 (*pDst)[4]) {
 // centred on 0 spans -1..1 (z is left alone). RC_vUpdateRenderCtxScreenMatricesAndInfo uses it for
 // a lens whose type is not 0.
 void Mtx_OrthoScale(f32 (*pDst)[4], f32 fWidth, f32 fHeight) {
-    Mtx_Identity(pDst);
+    LLMath_IdentifyMat(pDst);
     pDst[0][0] = 2.0f / fWidth;
     pDst[1][1] = 2.0f / fHeight;
 }
@@ -401,7 +401,7 @@ void Mtx_Perspective(f32 (*pDst)[4], f32 fScale, f32 fScaleX, f32 fScaleY, f32 f
 // only when fNear is 1). RC_vUpdateRenderCtxScreenMatricesAndInfo uses it, with Mtx_OrthoScale, for
 // a lens whose type is not 0.
 void Mtx_PerspectiveDepthOverNear(f32 (*pDst)[4], f32 fScaleX, f32 fScaleY, f32 fNear, f32 fFar) {
-    Mtx_Identity(pDst);
+    LLMath_IdentifyMat(pDst);
     pDst[0][0] = fScaleX;
     pDst[1][1] = fScaleY;
     pDst[2][2] = -1.0f / (fFar - fNear);
@@ -411,7 +411,7 @@ void Mtx_PerspectiveDepthOverNear(f32 (*pDst)[4], f32 fScaleX, f32 fScaleY, f32 
 }
 
 // Copies a 4-float vector.
-void Vec_Copy(const f32* pSrc, f32* pDst) {
+void LLMath_CopyVec(const f32* pSrc, f32* pDst) {
     pDst[0] = pSrc[0];
     pDst[1] = pSrc[1];
     pDst[2] = pSrc[2];
@@ -447,7 +447,7 @@ f32 fabsf(f32 x) {
 }
 
 // Sets a 4x4 matrix to the identity.
-void Mtx_Identity(f32 (*pDst)[4]) {
+void LLMath_IdentifyMat(f32 (*pDst)[4]) {
     pDst[0][0] = 1.0f;
     pDst[0][1] = 0.0f;
     pDst[0][2] = 0.0f;
@@ -466,9 +466,9 @@ void Mtx_Identity(f32 (*pDst)[4]) {
     pDst[3][3] = 1.0f;
 }
 
-// Negates a 3-float vector into pDst.
+// Negates the first three floats of pSrc into pDst; pDst's fourth float is left as it is.
 #ifdef __MWERKS__
-asm void fn_8000AE0C(register f32* pSrc, register f32* pDst) {
+asm void LLMath_Negate3(register f32* pSrc, register f32* pDst) {
     nofralloc
     psq_l  f0, 0(pSrc), 0, 0
     psq_l  f1, 8(pSrc), 1, 0
@@ -480,16 +480,16 @@ asm void fn_8000AE0C(register f32* pSrc, register f32* pDst) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_8000AE0C(f32* pSrc, f32* pDst) {
+void LLMath_Negate3(f32* pSrc, f32* pDst) {
     pDst[0] = -pSrc[0];
     pDst[1] = -pSrc[1];
     pDst[2] = -pSrc[2];
 }
 #endif
 
-// Scales a 4-float vector into pOut.
+// Scales all four floats of pIn by fScale into pOut (pIn and pOut may be the same).
 #ifdef __MWERKS__
-asm void Vec_Scale(register f32 fScale, register f32* pIn, register f32* pOut) {
+asm void LLMath_Scale(register f32 fScale, register f32* pIn, register f32* pOut) {
     nofralloc
     fmr      f2, fScale
     psq_l    f0, 0(pIn), 0, 0
@@ -502,7 +502,7 @@ asm void Vec_Scale(register f32 fScale, register f32* pIn, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void Vec_Scale(f32 fScale, f32* pIn, f32* pOut) {
+void LLMath_Scale(f32 fScale, f32* pIn, f32* pOut) {
     pOut[0] = pIn[0] * fScale;
     pOut[1] = pIn[1] * fScale;
     pOut[2] = pIn[2] * fScale;
@@ -512,7 +512,7 @@ void Vec_Scale(f32 fScale, f32* pIn, f32* pOut) {
 
 // Multiplies two 4-float vectors component by component into pOut.
 #ifdef __MWERKS__
-asm void fn_8000AE48(register f32* pA, register f32* pB, register f32* pOut) {
+asm void LLMath_MultiplyVec(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 0, 0
@@ -526,7 +526,7 @@ asm void fn_8000AE48(register f32* pA, register f32* pB, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_8000AE48(f32* pA, f32* pB, f32* pOut) {
+void LLMath_MultiplyVec(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pA[0] * pB[0];
     pOut[1] = pA[1] * pB[1];
     pOut[2] = pA[2] * pB[2];
@@ -534,9 +534,9 @@ void fn_8000AE48(f32* pA, f32* pB, f32* pOut) {
 }
 #endif
 
-// pA + pB * fScale into pOut (four floats).
+// pA + pB * fScale into pOut (four floats; pOut may be pA).
 #ifdef __MWERKS__
-asm void fn_8000AE6C(register f32* pA, register f32* pB, register f32 fScale, register f32* pOut) {
+asm void LLMath_AddScale(register f32* pA, register f32* pB, register f32 fScale, register f32* pOut) {
     nofralloc
     fmr       f4, fScale
     psq_l     f0, 0(pA), 0, 0
@@ -551,7 +551,7 @@ asm void fn_8000AE6C(register f32* pA, register f32* pB, register f32 fScale, re
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_8000AE6C(f32* pA, f32* pB, f32 fScale, f32* pOut) {
+void LLMath_AddScale(f32* pA, f32* pB, f32 fScale, f32* pOut) {
     pOut[0] = pB[0] * fScale + pA[0];
     pOut[1] = pB[1] * fScale + pA[1];
     pOut[2] = pB[2] * fScale + pA[2];
@@ -559,14 +559,14 @@ void fn_8000AE6C(f32* pA, f32* pB, f32 fScale, f32* pOut) {
 }
 #endif
 
-// 0x8000AE94: the absolute value of a double (fabsf, which rounds its result to a float, is
-// the float version).
+// The absolute value of a double (fabsf is the float version: this, rounded to a float).
 double fabs(double x) {
     return __fabs(x);
 }
 
-// Fills the log2 table: entry i is log2(1 + i / 1024).
-void fn_8000AE9C(void) {
+// Fills gLog2Table: entry i is log2(1 + i / 1024), the log2 of a float's mantissa (natural log
+// times 1 / ln 2).
+void Math_FillLog2Table(void) {
     u32 uMantissa;
     f32* pEntry;
     u32 i;
@@ -585,26 +585,34 @@ void fn_8000AE9C(void) {
     } while (i < 0x400);
 }
 
+// Empty in this build; the log2 table's start-up calls it first. Left unnamed: an empty body says
+// nothing about what it was for (TW07's UMath.c keeps four empty module functions, MF_vInitOnce to
+// MF_vCloseModule).
 void fn_8000AF1C(void) {
 }
 
-void fn_8000AF20(void) {
+// Makes the log2 table (gLog2Table) at start-up: 1024 floats from the system heap, filled by
+// Math_FillLog2Table. Nothing in this build reads the table.
+void Math_InitLog2Table(void) {
     fn_8000AF1C();
     gLog2Table = fn_800951A0(0x400 * sizeof(f32), 16, 1);
-    fn_8000AE9C();
+    Math_FillLog2Table();
 }
 
-void fn_8000AF58(void) {
+void Math_FreeLog2Table(void) {
     fn_8009527C(gLog2Table);
 }
 
+// The float log: the natural logarithm of x, through the double log().
 f32 logf(f32 x) {
     return log(x);
 }
 
-// Makes a pool of nNodes nodes of uNodeSize bytes each, every node aligned to uAlign (a power of
-// two). The nodes are filled with 0xDD and chained into the free list, the last one first.
-UMemPool* UMemPool_Create(int nNodes, u32 uNodeSize, u32 uFlags, u32 uAlign) {
+// Makes a pool of nNodes nodes of uNodeSize bytes each from one StaticMem_Alloc block (uFlags is
+// its memory type): the header is padded to uAlign (a power of two) and each node's size is rounded
+// up to it. The nodes are filled with 0xDD and chained into the free list, the last one first. NULL
+// when the allocation fails.
+UMemPool* CreateMemPool(int nNodes, u32 uNodeSize, u32 uFlags, u32 uAlign) {
     UMemPool* pPool;
     u32 uSize;
     u8* pNode;
@@ -634,6 +642,7 @@ UMemPool* UMemPool_Create(int nNodes, u32 uNodeSize, u32 uFlags, u32 uAlign) {
     return pPool;
 }
 
+// Frees a pool and all its nodes at once (its one StaticMem_Alloc block).
 void DeleteMemPool(UMemPool* pPool) {
     StaticMem_Free(pPool);
 }

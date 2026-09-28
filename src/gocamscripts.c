@@ -52,8 +52,8 @@ f32  Camera_GetLensFovScale(CamLens* pLens);       // char.c: the lens's fB0
 u8   fn_8004561C(void);
 u8   fn_80044E2C(int n);
 u8   fn_80044AA8(SurfaceType* pSurface);
-void Mtx_Identity(f32 (*pMtx)[4]);                   // identity
-void Mtx_Transpose3x3(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: transposes the 3x3 part
+void LLMath_IdentifyMat(f32 (*pMtx)[4]);                   // identity
+void LLMath_Transpose33(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: transposes the 3x3 part
 void LLMath_mat44fltMultiply33(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // a vector through a matrix
 void fn_80038010(u8 a, int n, f32* pVec);
 void fn_800386F0(int n, f32* pVec);
@@ -110,7 +110,7 @@ void CamScript_RunScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, 
         }
         return;
     }
-    Vec_Copy(pCam, vPrev);
+    LLMath_CopyVec(pCam, vPrev);
     nUpdates = GameEffects_BallUpdatesThisFrame(nPlayer);
     if (nUpdates > 0 && (f32)nUpdates != pScript->fEC) {
         if (pScript->fEC < (f32)nUpdates) {
@@ -276,7 +276,7 @@ void CamScript_RunFEScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript
 
     if (pScript->pShot == NULL) return;
     pScript->fD8 = 0.0f;
-    Vec_Copy(pCam, vPrev);
+    LLMath_CopyVec(pCam, vPrev);
     if (pScript->pShot->bA8 == 1) {
         fn_8003A148(pScript->pShot, nPlayer, pScript, pScript->v0, pSub, vPrev, fTime);
     } else {
@@ -380,7 +380,7 @@ void CamScript_RunFlybyCamera(int nPlayer, f32* pCam, f32* pSub, CamScript* pScr
     f32 fMoveTime = lbl_80281F78->f178;
 
     if (pScript->pShot == NULL) return;
-    Vec_Copy(lbl_80281F78->v17C, vMoveTo);
+    LLMath_CopyVec(lbl_80281F78->v17C, vMoveTo);
     if (!b && !CameraScript_SnapToScript(pScript, pScript->pShot)
         && (gSession.nPaused != 0 || (0.0f == gSession.fFrameTime && 0.0f == fTime))) {
         if (pScript->nCamera != 0) {
@@ -405,7 +405,7 @@ void CamScript_RunFlybyCamera(int nPlayer, f32* pCam, f32* pSub, CamScript* pScr
                 pScript->pNextShot = pScript->pNextShot->p40;
                 pScript->fCamTime = 0.0f;
                 pScript->nCamera = 2;
-                Vec_Copy(vMoveTo, pScript->v40);
+                LLMath_CopyVec(vMoveTo, pScript->v40);
                 pScript->f90 = 0.0f;
                 pScript->f94 = fMoveTime;
                 pScript->fA0 = 0.0f;
@@ -422,7 +422,7 @@ void CamScript_RunFlybyCamera(int nPlayer, f32* pCam, f32* pSub, CamScript* pScr
         pScript->f8C = pPath->fLength;
         return;
     }
-    Vec_Copy(pCam, vPrev);
+    LLMath_CopyVec(pCam, vPrev);
     fn_80064F54(pScript->pShot, nPlayer, pScript->v0);
     if (pScript->pNextShot != NULL) {
         fn_80064F54(pScript->pNextShot, nPlayer, pScript->v10);
@@ -1954,7 +1954,7 @@ void CameraScript_InterpToNewScript(CamScript* pScript, CamShot* pShot, int nPla
             Vec3Copy(pCam, pScript->v10);
         }
         if (nA != 5) {
-            Vec_Copy(pScript->v10, vPos);
+            LLMath_CopyVec(pScript->v10, vPos);
             fn_8003A148(pScript->pNextShot, nPlayer, pScript, vPos, pSub, pCam, 0.0f);
             Vec3_Sub(vPos, pCam, vDiff);
             fDist = Math_Sqrt(Vec3_LengthSqClamped(vDiff));
@@ -2117,8 +2117,8 @@ void CameraScript_KeepPointInView(int nPlayer, f32* pCam, f32* pOut, f32* pTarge
         mTurn[3][1] = 0.0f;
         mTurn[3][2] = 0.0f;
         mTurn[3][3] = 1.0f;
-        Mtx_Identity(mBack);
-        Mtx_Transpose3x3(mAlign, mBack);
+        LLMath_IdentifyMat(mBack);
+        LLMath_Transpose33(mAlign, mBack);
         LLMath_mat44fltMultiply33(mAlign, vToOut, vTurned);
         LLMath_mat44fltMultiply33(mTurn, vTurned, vTurned);
         LLMath_mat44fltMultiply33(mBack, vTurned, vTurned);
@@ -2372,7 +2372,7 @@ void CamScript_GetCameraOnFairwayPos(CamScript* pScript, f32* pOut, f32* pCam, i
     }
     if (!(fHeight < -60000.0f)) {
         vSpot[1] = fHeight + lbl_80281F78->f10C;
-        Vec_Copy(vSpot, pOut);
+        LLMath_CopyVec(vSpot, pOut);
     }
 }
 
@@ -2817,7 +2817,7 @@ u8 CameraScript_WillGolferBeOccludedInThisView(int nPlayer, CamShot* pShot, CamS
     Mem_cpy(&script, pScript, sizeof(CamScript));
     CameraScript_InterpToNewScript(&script, &shot, nPlayer, vCam, vSub, 5, 0.0f, 100.0f, 25, 0.0f);
     CamScript_RunScript(nPlayer, vCam, vSub, &script, &shotSaved, 0, 0.0f);
-    Vec_Copy(gPlayers[nPlayer].vBall, vGolfer);
+    LLMath_CopyVec(gPlayers[nPlayer].vBall, vGolfer);
     vGolfer[1] += 1.0f;
     return Ter_CheckForGroundCollision(pCourse, vCam, vGolfer, vHit, vNormal, &pSurface, &pObj) != 0;
 }

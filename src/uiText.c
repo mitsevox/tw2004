@@ -66,10 +66,10 @@ void fn_800922A8(UIText* pText) {
     lbl_80281F34 = UISGetColorAdditive();
     t.m[3][0] = 512.0f * (t.m[3][0] / 512.0f);
     t.m[3][1] = 448.0f * (t.m[3][1] / 448.0f);
-    Vec_Copy(t.m[0], m[0]);
-    Vec_Copy(t.m[1], m[1]);
-    Vec_Copy(t.m[2], m[2]);
-    Vec_Copy(t.m[3], m[3]);
+    LLMath_CopyVec(t.m[0], m[0]);
+    LLMath_CopyVec(t.m[1], m[1]);
+    LLMath_CopyVec(t.m[2], m[2]);
+    LLMath_CopyVec(t.m[3], m[3]);
     vPos.x = 512.0f * (pText->v18[0] / 512.0f);
     vPos.y = 448.0f * (pText->v18[1] / 448.0f);
     vPos.z = 1.0f;

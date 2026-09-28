@@ -866,7 +866,7 @@ void GM_MovePlayerToBall(int nPlayer) {
     CourseInfo* pCourse;
     f32         f;
     Vec3Copy(gPlayers[nPlayer].ball.vPos, gPlayers[nPlayer].vBall);
-    Vec_Copy(gPlayers[nPlayer].ball.vPos, gPlayers[nPlayer].vPreShot);
+    LLMath_CopyVec(gPlayers[nPlayer].ball.vPos, gPlayers[nPlayer].vPreShot);
     pCourse = Ter_GetTGD();
     if (pCourse) {
         Ter_GetEnclosingGroundHeight(pCourse, gPlayers[nPlayer].vBall, &fLow, &fHigh);

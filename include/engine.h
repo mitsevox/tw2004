@@ -107,7 +107,7 @@ typedef struct UMemPool {
 } UMemPool;
 LAYOUT_ASSERT(UMemPool, 0x10);
 
-UMemPool* UMemPool_Create(int nNodes, u32 uNodeSize, u32 uFlags, u32 uAlign);   // create
+UMemPool* CreateMemPool(int nNodes, u32 uNodeSize, u32 uFlags, u32 uAlign);   // create
 void  DeleteMemPool(UMemPool* pPool);                     // destroy
 void* AllocPoolMem(UMemPool* pPool);                     // take a node (NULL when none is free)
 void  ReturnPoolMem(UMemPool* pPool, void* pNode);        // give a node back
@@ -138,14 +138,14 @@ f32  Math_Asin(f32 x);                // asin
 double Math_Sqrt(double x);           // sqrt
 f32  Vec3_LengthSqClamped(f32* pVec);            // dot with itself (at most FLT_MAX)
 extern f32 __float_max[];               // FLT_MAX (MSL's)
-void Vec_Copy(const f32* pSrc, f32* pDst);   // 0x8000AD10 (const: see Vec3Copy)
+void LLMath_CopyVec(const f32* pSrc, f32* pDst);   // 0x8000AD10 (const: see Vec3Copy)
 f32  atan2f(f32 y, f32 x);         // atan2f
 f32  fabsf(f32 x);                      // 0x8000AD9C: fabs (0x8000AE94, platform.h) rounded to a float
 f32  logf(f32 x);                // natural logarithm
 // A rotation matrix's yaw (about z), pitch (about y) and roll (about x), radians (UMemPool.c).
 void mat44flt_ExtractEulerAngles(f32 (*pMtx)[4], f32* pYaw, f32* pPitch, f32* pRoll);
-void fn_8000AF20(void);                 // make the log2 table (gLog2Table)
-void fn_8000AF58(void);                 // free the log2 table
+void Math_InitLog2Table(void);                 // make the log2 table (gLog2Table)
+void Math_FreeLog2Table(void);                 // free the log2 table
 double acos(double x);                  // 0x8015F784 (MSL)
 double asin(double x);                  // 0x8015F7A4 (MSL)
 double atan2(double y, double x);       // 0x8015F7C4 (MSL)
@@ -171,8 +171,8 @@ f32  fn_80029B64(f32 x);                // square root (Skeleton.c); x itself wh
 void fn_8000C5D4(f32* pA, f32* pB, f32 f, f32* pOut);   // out = a + f x b
 f32  Vec3_Dot(f32* pA, f32* pB);     // dot product
 f32  Math_Acos(f32 x);                // arc cosine
-void Vec_Scale(f32 f, f32* pIn, f32* pOut);   // scale a vector (four floats)
-void fn_8000AE6C(f32* pA, f32* pB, f32 fScale, f32* pOut);   // out = a + fScale x b (four floats)
+void LLMath_Scale(f32 f, f32* pIn, f32* pOut);   // scale a vector (four floats)
+void LLMath_AddScale(f32* pA, f32* pB, f32 fScale, f32* pOut);   // out = a + fScale x b (four floats)
 double pow(double x, double y);         // 0x8015F824 (MSL)
 f32  powf(f32 x, f32 y);                // 0x8002C8D0 (Golfer.c): pow rounded to a float
 f32  LLMath_SquareDistanceBetween3(f32* pA, f32* pB);   // three-float squared distance

@@ -37,8 +37,8 @@ void fn_80055F18(void) {
 f32 Wind_Get(f32* pOut) {
     if (pOut != NULL) {
         f32 v[4];
-        Vec_Scale(gWindSpeed, gWindDirs[gWindDir], v);
-        Vec_Copy(v, pOut);
+        LLMath_Scale(gWindSpeed, gWindDirs[gWindDir], v);
+        LLMath_CopyVec(v, pOut);
     }
     return gWindSpeed;
 }
@@ -105,5 +105,5 @@ void Wind_Generate(void) {
 
 // The wind's direction as a unit vector.
 void fn_800561CC(f32* pOut) {
-    Vec_Copy(gWindDirs[gWindDir], pOut);
+    LLMath_CopyVec(gWindDirs[gWindDir], pOut);
 }

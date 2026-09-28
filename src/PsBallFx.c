@@ -333,13 +333,13 @@ void fn_800A2E68(void) {
     if (Game_GetCourse() == 18
         && (Game_GetCurHoleNum() == 0 || Game_GetCurHoleNum() == 1 || Game_GetCurHoleNum() == 2 ||
                                    Game_GetCurHoleNum() == 17)) {
-        Vec_Copy(lbl_8018E958[0], lbl_8018CA98[0].vF0);
-        Vec_Copy(lbl_8018E958[1], lbl_8018CA98[14].vF0);
-        Vec_Copy(lbl_8018E958[1], lbl_8018CA98[6].vF0);
+        LLMath_CopyVec(lbl_8018E958[0], lbl_8018CA98[0].vF0);
+        LLMath_CopyVec(lbl_8018E958[1], lbl_8018CA98[14].vF0);
+        LLMath_CopyVec(lbl_8018E958[1], lbl_8018CA98[6].vF0);
     } else {
-        Vec_Copy(lbl_8018E6B8[Game_GetCourse()][0], lbl_8018CA98[0].vF0);
-        Vec_Copy(lbl_8018E6B8[Game_GetCourse()][1], lbl_8018CA98[14].vF0);
-        Vec_Copy(lbl_8018E6B8[Game_GetCourse()][1], lbl_8018CA98[6].vF0);
+        LLMath_CopyVec(lbl_8018E6B8[Game_GetCourse()][0], lbl_8018CA98[0].vF0);
+        LLMath_CopyVec(lbl_8018E6B8[Game_GetCourse()][1], lbl_8018CA98[14].vF0);
+        LLMath_CopyVec(lbl_8018E6B8[Game_GetCourse()][1], lbl_8018CA98[6].vF0);
     }
 }
 
@@ -353,7 +353,7 @@ void fn_800A2FFC(int nPlayer, int bOn) {
     if (!bOn || gPlayers[nPlayer].nClub > 8) {
         return;
     }
-    Vec_Copy(gPlayers[nPlayer].ball.vPos, vPos);
+    LLMath_CopyVec(gPlayers[nPlayer].ball.vPos, vPos);
     Vec3Copy(vPos, lbl_8018CA98[9].v80);
     pEmitter = fn_80099758(&lbl_8018CA98[9]);
     if (pEmitter != NULL) {
@@ -585,7 +585,7 @@ void PsBallFx_TriggerTrail(Ball* pBall, int nPlayer) {
         0.375f != pSurface->f1C || (int)pSurface->nClass != 6) {    // EA compares the class signed here
         return;
     }
-    Vec_Copy(gPlayers[nPlayer].ball.vVel, vDir);
+    LLMath_CopyVec(gPlayers[nPlayer].ball.vVel, vDir);
     vDir[1] = 0.0f;
     if (vDir[0] != 0.0f || vDir[2] != 0.0f) {
         LLMath_Normalize3(vDir, vDir);
@@ -606,13 +606,15 @@ void fn_800A3A84(void) {
 
     pEmitter = lbl_80281408->ap74[0];
     if (pEmitter != NULL && (pEmitter->params.u58 & 0x20000)) {
-        Vec_Copy(gPlayers[ViewController_GetActivePlayerNumber(0)].ball.vPos, pEmitter->params.v80);
-        Vec_Copy(gPlayers[ViewController_GetActivePlayerNumber(0)].ball.vPos, lbl_80281408->ap74[0]->mtx[3]);
+        LLMath_CopyVec(gPlayers[ViewController_GetActivePlayerNumber(0)].ball.vPos, pEmitter->params.v80);
+        LLMath_CopyVec(gPlayers[ViewController_GetActivePlayerNumber(0)].ball.vPos,
+                       lbl_80281408->ap74[0]->mtx[3]);
     }
     pEmitter = lbl_80281408->ap74[1];
     if (pEmitter != NULL && (pEmitter->params.u58 & 0x20000)) {
-        Vec_Copy(gPlayers[ViewController_GetActivePlayerNumber(1)].ball.vPos, pEmitter->params.v80);
-        Vec_Copy(gPlayers[ViewController_GetActivePlayerNumber(1)].ball.vPos, lbl_80281408->ap74[1]->mtx[3]);
+        LLMath_CopyVec(gPlayers[ViewController_GetActivePlayerNumber(1)].ball.vPos, pEmitter->params.v80);
+        LLMath_CopyVec(gPlayers[ViewController_GetActivePlayerNumber(1)].ball.vPos,
+                       lbl_80281408->ap74[1]->mtx[3]);
     }
     RenderState_SetDrawFlags(0x70);
     RC_UpdateCurrentScreenMatrices();
@@ -664,7 +666,7 @@ void fn_800A3CB0(f32* pPos, int nPlayer) {
     int nView = gPlayers[nPlayer].nView[0];
 
     Wind_Get(vWind);
-    Vec_Scale(0.1f, vWind, vWind);
+    LLMath_Scale(0.1f, vWind, vWind);
     Vec3Copy(pPos, lbl_8018CA98[15].v80);
     Vec3Copy(vWind, lbl_8018CA98[15].vA0);
     lbl_80281408->apEmitter[nView] = fn_80099758(&lbl_8018CA98[15]);
@@ -677,8 +679,8 @@ void fn_800A3CB0(f32* pPos, int nPlayer) {
 void fn_800A3D6C(f32* pPos, int nPlayer) {
     int nView = gPlayers[nPlayer].nView[0];
     if (lbl_80281408->apEmitter[nView] != NULL && (lbl_80281408->apEmitter[nView]->params.u58 & 0x20000)) {
-        Vec_Copy(pPos, lbl_80281408->apEmitter[nView]->params.v80);
-        Vec_Copy(pPos, lbl_80281408->apEmitter[nView]->mtx[3]);
+        LLMath_CopyVec(pPos, lbl_80281408->apEmitter[nView]->params.v80);
+        LLMath_CopyVec(pPos, lbl_80281408->apEmitter[nView]->mtx[3]);
     }
 }
 

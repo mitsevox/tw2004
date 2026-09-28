@@ -9,7 +9,7 @@ void fn_80005EC0();
 void fn_800071BC();
 void fn_800097C8();
 void StaticMem_Init();
-void fn_8000AF20();
+void Math_InitLog2Table();
 void fn_8000B984();
 void fn_80012FA0();
 void fn_80012FA4();
@@ -28,7 +28,7 @@ void fn_80005520(void) {
     fn_80095108();
     fn_800B5C30();
     GoARAM_Init();
-    fn_8000AF20();
+    Math_InitLog2Table();
     fn_8000B984();
     StaticMem_Init();
     fn_80005EC0();

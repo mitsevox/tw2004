@@ -170,7 +170,7 @@ void Shot_Prepare(int nPlayer, u8 bNotify) {
     }
     Shot_FitTargetToClub(nPlayer);
     if (!Player_IsCPU(nPlayer)) {
-        Vec_Copy(p->vTarget, p->vTarget2);
+        LLMath_CopyVec(p->vTarget, p->vTarget2);
         fn_8002BDEC_SetTarget(nPlayer, p->vTarget);
     }
     p->nTrajectory = Shot_Trajectory(nPlayer);

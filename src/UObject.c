@@ -7,7 +7,7 @@
 #include "terrain.h"
 #include "golfer.h"
 
-void Mtx_Identity(f32 (*pMtx)[4]);                   // identity
+void LLMath_IdentifyMat(f32 (*pMtx)[4]);                   // identity
 void fn_800488B4(UObject* pObj);
 void fn_80048A84(UObjMesh* pMesh);
 UObjMesh* fn_80048AC4(UObjMesh* pMesh, int i);
@@ -27,9 +27,9 @@ void fn_80035FBC(void);
 void fn_800486F4(UObject* pObj, UObjModel* pModel, u32 uFlags) {
     f32 fScale;
 
-    Mtx_Identity(pObj->m0);
-    Mtx_Identity(pObj->m40);
-    Mtx_Identity(pObj->m80);
+    LLMath_IdentifyMat(pObj->m0);
+    LLMath_IdentifyMat(pObj->m40);
+    LLMath_IdentifyMat(pObj->m80);
     pObj->pModel = pModel;
     pObj->uFlags = uFlags;
     pObj->n104 = 0;

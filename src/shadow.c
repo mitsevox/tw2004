@@ -27,9 +27,9 @@ void fn_800358E0(Character* pChar, u32 uFlags);
 u8   Character_IsGolfer(Character* pChar);
 void Character_GetBonePos(Character* pChar, int nBone, f32* pPos);   // char.c: a bone's position
 void RC_vSetCurrentRenderCtx(void* pCamera);        // makes it the current render camera
-void Mtx_Identity(f32 (*pMtx)[4]);       // identity
-void Mtx_Copy(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: copy a 4x4 matrix
-void Mtx_InvertRigid(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: inverts a rotation+translation
+void LLMath_IdentifyMat(f32 (*pMtx)[4]);       // identity
+void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: copy a 4x4 matrix
+void LLMath_InvertNormalized(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: inverts a rotation+translation
 void CA_vSetDefaultScalingVectors(CamLens* pLens);
 f32  Math_Tan(f32 x);                // tan, as a float
 void fn_800760B0(int nX, int nY, int nWidth, int nHeight);
@@ -275,7 +275,7 @@ void fn_800B28D4(Character* pChar, int nView, u8 bFlat) {
         Character_GetBonePos(pChar, 0x47, vA);
         Character_GetBonePos(pChar, 0x39, vB);
         fn_800B3460(vA, vB, vPos);
-        Vec_Scale(0.5f, vPos, vPos);
+        LLMath_Scale(0.5f, vPos, vPos);
     } else {
         Character_GetBonePos(pChar, 0, vPos);
     }
@@ -323,7 +323,7 @@ void fn_800B28D4(Character* pChar, int nView, u8 bFlat) {
                 vCorner[2] = fZ;
                 vCorner[3] = 1.0f;
                 LLMath_mat44fltMultiply(aLight, (Vec4*)vCorner, (Vec4*)vOut);
-                Vec_Scale(1.0f / vOut[3], vOut, vOut);
+                LLMath_Scale(1.0f / vOut[3], vOut, vOut);
                 if (vOut[0] > fMaxX) {
                     fMaxX = vOut[0];
                 }
@@ -345,11 +345,11 @@ void fn_800B28D4(Character* pChar, int nView, u8 bFlat) {
     vCentre[3] = 1.0f;
     fHalfX = fMaxX - vCentre[0];
     fHalfZ = fMaxZ - vCentre[2];
-    Vec_Copy(vCentre, p->v414);
+    LLMath_CopyVec(vCentre, p->v414);
     p->f424 = fHalfX;
     p->f428 = fHalfZ;
     // the shadow camera: the square seen from above, scaled to fill the texture
-    Mtx_Identity(aView);
+    LLMath_IdentifyMat(aView);
     aView[0][0] = 1.0f / fHalfX;
     aView[2][2] = 0.0f;
     aView[1][1] = 0.0f;
@@ -495,7 +495,7 @@ void fn_800B2FB0(Character* pChar, int nView, u8 bFlat) {
     aQuad[3][1] = 0.0f;
     aQuad[3][2] = fHalfZ;
     aQuad[3][3] = 1.0f;
-    Vec_Copy(p->v414, vCentre);
+    LLMath_CopyVec(p->v414, vCentre);
     aQuad[0][0] += vCentre[0];
     aQuad[1][0] += vCentre[0];
     aQuad[2][0] += vCentre[0];
@@ -620,11 +620,11 @@ void fn_800B3460(f32* pA, f32* pB, f32* pOut) {
 void fn_800B3484(CamLens* pLens, f32 (*pMtx)[4]) {
     if (pMtx == NULL) {
         // the matrix at +0x04 overlaps the v4/v24/v34 rows (camera.h)
-        Mtx_Identity(pLens->m4);
-        Mtx_Identity(pLens->m44);
+        LLMath_IdentifyMat(pLens->m4);
+        LLMath_IdentifyMat(pLens->m44);
     } else {
-        Mtx_Copy(pMtx, pLens->m44);
-        Mtx_InvertRigid(pMtx, pLens->m4);
+        LLMath_CopyMat44(pMtx, pLens->m44);
+        LLMath_InvertNormalized(pMtx, pLens->m4);
     }
     CA_vSetDefaultScalingVectors(pLens);
 }

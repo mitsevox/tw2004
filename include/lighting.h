@@ -94,8 +94,8 @@ typedef struct GoLighting {
     u8   unk28[4];
     f32  aPointColour[NUM_POINT_LIGHTS][4]; // 0x02C  0..255
     f32  vAmbient[4];           // 0x06C  0..255 (from a directional light)
-    f32  aPointColour2[NUM_POINT_LIGHTS][4]; // 0x07C  aPointColour through fn_8000AE48
-    f32  vAmbient2[4];          // 0x0BC  vAmbient through fn_8000AE48
+    f32  aPointColour2[NUM_POINT_LIGHTS][4]; // 0x07C  aPointColour through LLMath_MultiplyVec
+    f32  vAmbient2[4];          // 0x0BC  vAmbient through LLMath_MultiplyVec
     f32  afPointX[NUM_POINT_LIGHTS];    // 0x0CC  } the point lights' positions
     f32  afPointY[NUM_POINT_LIGHTS];    // 0x0DC  }
     f32  afPointZ[NUM_POINT_LIGHTS];    // 0x0EC  }

@@ -89,7 +89,7 @@ void fn_8002BDEC_SetTarget(int nPlayer, f32* pTarget) {
     f32          fDX, fDZ;
     int          nType;
 
-    Vec_Copy(pTarget, gPlayers[nPlayer].vTarget);
+    LLMath_CopyVec(pTarget, gPlayers[nPlayer].vTarget);
     fHeight = CamScript_GuessBestPlayableHeight(gPlayers[nPlayer].vTarget, &pSurface);
     gPlayers[nPlayer].uFlagsEF0 &= ~2;
     if (pSurface != NULL) {
@@ -124,7 +124,7 @@ void fn_8002BDEC_SetTarget(int nPlayer, f32* pTarget) {
         }
     }
     gPlayers[nPlayer].fDistance2 = gPlayers[nPlayer].fDistance;
-    Vec_Copy(gPlayers[nPlayer].vTarget, gPlayers[nPlayer].vTargetCopy);
+    LLMath_CopyVec(gPlayers[nPlayer].vTarget, gPlayers[nPlayer].vTargetCopy);
 }
 
 // Turn the aim by fDelta radians (wrapped to -pi..pi) and re-plan the target at the same distance.
@@ -169,7 +169,7 @@ void AI_DefaultTarget(int nPlayer) {
     p->vTarget[2]    = pCourse->pin[nPinSet].z;
     p->nShotShape = 0;
     fn_8002BDEC_SetTarget(nPlayer, pTarget);
-    Vec_Copy(pTarget, p->vTarget2);
+    LLMath_CopyVec(pTarget, p->vTarget2);
 }
 
 // ---- targets ----------------------------------------------------------------------------------
@@ -341,7 +341,7 @@ void AI_ChooseTarget(int nPlayer) {
     p->vTarget[2]    = gAITargets[nBest].pDef->z;
     p->nShotShape = gAITargets[nBest].nType;
     fn_8002BDEC_SetTarget(nPlayer, p->vTarget);
-    Vec_Copy(p->vTarget, p->vTarget2);
+    LLMath_CopyVec(p->vTarget, p->vTarget2);
 }
 
 // Empty.

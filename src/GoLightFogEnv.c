@@ -62,7 +62,7 @@ void fn_800935CC(CourseLights* pLights) {
     }
     pLight = pSet->group.apLight[4];
     pLight->nType = 1;
-    Vec_Scale(0.5f, pDir->vColor, pLight->u.dir.vColor);
+    LLMath_Scale(0.5f, pDir->vColor, pLight->u.dir.vColor);
     pLight->u.dir.f10 = 1.0f;
     pLight->u.dir.fC = 1.0f;
 
@@ -73,8 +73,8 @@ void fn_800935CC(CourseLights* pLights) {
     pRec = bSkip ? &pLights->aLight[1] : &pLights->aLight[0];
     pLight = pSet->group.apLight[0];
     pLight->nType = 2;
-    Vec_Scale(0.5f, pRec->vColor, pLight->u.point.vColor);
-    Vec_Copy(pRec->vPos, pLight->u.point.vPos);
+    LLMath_Scale(0.5f, pRec->vColor, pLight->u.point.vColor);
+    LLMath_CopyVec(pRec->vPos, pLight->u.point.vPos);
     pLight->u.point.fC = 1.0f;
     pLight->u.point.f10 = 1.0f;
     pLight->u.point.f14 = 1.0f;
@@ -89,8 +89,8 @@ void fn_800935CC(CourseLights* pLights) {
     pRec = bSkip ? &pLights->aLight[2] : &pLights->aLight[1];
     pLight = pSet->group.apLight[1];
     pLight->nType = 2;
-    Vec_Scale(0.5f, pRec->vColor, pLight->u.point.vColor);
-    Vec_Copy(pRec->vPos, pLight->u.point.vPos);
+    LLMath_Scale(0.5f, pRec->vColor, pLight->u.point.vColor);
+    LLMath_CopyVec(pRec->vPos, pLight->u.point.vPos);
     pLight->u.point.fC = 1.0f;
     pLight->u.point.f10 = 1.0f;
     pLight->u.point.f14 = 1.0f;
@@ -105,8 +105,8 @@ void fn_800935CC(CourseLights* pLights) {
     pRec = bSkip ? &pLights->aLight[3] : &pLights->aLight[2];
     pLight = pSet->group.apLight[2];
     pLight->nType = 2;
-    Vec_Scale(0.5f, pRec->vColor, pLight->u.point.vColor);
-    Vec_Copy(pRec->vPos, pLight->u.point.vPos);
+    LLMath_Scale(0.5f, pRec->vColor, pLight->u.point.vColor);
+    LLMath_CopyVec(pRec->vPos, pLight->u.point.vPos);
     pLight->u.point.fC = 1.0f;
     pLight->u.point.f10 = 1.0f;
     pLight->u.point.f14 = 1.0f;
@@ -116,8 +116,8 @@ void fn_800935CC(CourseLights* pLights) {
     // directional one
     pLight = pSet->group.apLight[3];
     pLight->nType = 2;
-    Vec_Scale(0.5f, pLights->aLight[3].vColor, pLight->u.point.vColor);
-    Vec_Copy(pLights->aLight[3].vPos, pLight->u.point.vPos);
+    LLMath_Scale(0.5f, pLights->aLight[3].vColor, pLight->u.point.vColor);
+    LLMath_CopyVec(pLights->aLight[3].vPos, pLight->u.point.vPos);
     pLight->u.point.fC = 1.0f;
     pLight->u.point.f10 = 1.0f;
     pLight->u.point.f14 = 1.0f;

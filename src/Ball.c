@@ -876,9 +876,9 @@ done:
 // Launch the ball from a point along a direction at a speed (x 0.489): in the air, no spin.
 void Physics_ThrowBall(Ball* pBall, f32* pDir, f32 fSpeed, f32* pFrom) {
     pBall->nState = 2;
-    Vec_Copy(pFrom, pBall->vStart);
-    Vec_Copy(pFrom, pBall->vPos);
-    Vec_Copy(pFrom, pBall->vPrev);
+    LLMath_CopyVec(pFrom, pBall->vStart);
+    LLMath_CopyVec(pFrom, pBall->vPos);
+    LLMath_CopyVec(pFrom, pBall->vPrev);
     Vec3_Scale(0.48888889f * fSpeed, pDir, pBall->vVel);
     pBall->vSpin[0] = 0.0f;
     pBall->vSpin[1] = 0.0f;
@@ -901,7 +901,7 @@ void Physics_ThrowBall(Ball* pBall, f32* pDir, f32 fSpeed, f32* pFrom) {
 // blocks into its velocity and spin (failing that it is a hazard). A putt (kind 0, or the
 // putter) starts rolling (state 3), anything else is in the air (state 2). Event 10.
 void Physics_ShotImpact(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int nTrajectory, f32* pA, f32* pB) {
-    Vec_Copy(pBall->vPos, pBall->vStart);
+    LLMath_CopyVec(pBall->vPos, pBall->vStart);
     pBall->fAC    = 0.0f;
     pBall->fLastDistFromInitShotPos    = 0.0f;
     pBall->fTimeSinceLastCheck    = 0.0f;
@@ -1015,7 +1015,7 @@ void Ball_FlightStep(Ball* pBall, f32 fTicks) {
     fn_80055E7C(vDrag, vAccel, vAccel);
     vAccel[1] -= 0.107170001f;
     if (!gSimulating || gSimFullCup) {
-        Vec_Copy(PIN(pBall), vPin);
+        LLMath_CopyVec(PIN(pBall), vPin);
         vPin[1] += BALL_RADIUS;
         if (LLMath_DistanceBetween3(vPin, pBall->vPos) < 0.0625f) {
             vAccel[1] -= 0.214340001f;
@@ -2011,7 +2011,7 @@ f32 Ball_DistanceToPin(f32* pPos) {
 // as the closest so far.
 void Physics_InitShotData(Ball* pBall) {
     pBall->nStartSurface = pBall->nSurface;
-    Vec_Copy(pBall->vPos, pBall->vStart);
+    LLMath_CopyVec(pBall->vPos, pBall->vStart);
     pBall->fClosest = Ball_DistanceToPin(pBall->vPos);
 }
 
@@ -2026,7 +2026,7 @@ void Ball_CupPull(Ball* pBall, f32 fDt) {
 
     fDist = LLMath_DistanceBetween3(PIN(pBall), (f32*)pBall);
     if (fDist >= INCHES(5.5f)) return;
-    Vec_Copy(PIN(pBall), vPin);
+    LLMath_CopyVec(PIN(pBall), vPin);
     vPin[1] += BALL_RADIUS;
     {
         f32 fStartDist = LLMath_DistanceBetween3(pBall->vStart, vPin);
@@ -2223,7 +2223,7 @@ f32 Physics_GetBallAltitude(Ball* pBall) {
     Ter_GetEnclosingGroundData(pBall->pCourse, pBall->vPos, &fHeight, &pSurface, vNormal, &fHeight2,
                                &pSurface2, vNormal2);
     if (fHeight < -60000.0f) {
-        Vec_Copy(PIN(pBall), vPin);
+        LLMath_CopyVec(PIN(pBall), vPin);
         vPin[1] += BALL_RADIUS;
         if (LLMath_DistanceBetween3(vPin, pBall->vPos) < 2.66666675f) {
             pBall->vPos[1]  = 0.0013888889f + (BALL_RADIUS + fHeight2);
@@ -2409,7 +2409,7 @@ u8 Physics_SetBallPosition(Ball* pBall, f32* pPos) {
 // ground). Returns 1 when there is no course.
 u8 Physics_InitBall(Ball* pBall, f32* pPos, int nPlayer) {
     f32 fGround;
-    Vec_Copy(pPos, pBall->vPos);
+    LLMath_CopyVec(pPos, pBall->vPos);
     pBall->nState        = 0;
     pBall->nLie          = LIE_TEE_e;
     pBall->n6C           = 0;
@@ -2444,10 +2444,10 @@ u8 Physics_InitBall(Ball* pBall, f32* pPos, int nPlayer) {
         }
     }
     pBall->vPos[1] = 0.027777778f + (BALL_RADIUS + fGround);
-    Vec_Copy(pPos, pBall->vPrev);
+    LLMath_CopyVec(pPos, pBall->vPrev);
     if (nPlayer >= 0 && nPlayer <= 3) {
-        Vec_Copy(pPos, lbl_801D58C8[nPlayer]);
-        Vec_Copy(pPos, lbl_801D5888[nPlayer]);
+        LLMath_CopyVec(pPos, lbl_801D58C8[nPlayer]);
+        LLMath_CopyVec(pPos, lbl_801D5888[nPlayer]);
     }
     return 0;
 }

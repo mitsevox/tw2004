@@ -36,9 +36,9 @@ void fn_800F19D4(void) {
         for (j = i + 1; j < lbl_80282360; j++) {
             if (LLMath_DistanceBetween3(lbl_80211D38[i], pTee)
                 > LLMath_DistanceBetween3(lbl_80211D38[j], pTee)) {
-                Vec_Copy(lbl_80211D38[i], tmp);
-                Vec_Copy(lbl_80211D38[j], lbl_80211D38[i]);
-                Vec_Copy(tmp, lbl_80211D38[j]);
+                LLMath_CopyVec(lbl_80211D38[i], tmp);
+                LLMath_CopyVec(lbl_80211D38[j], lbl_80211D38[i]);
+                LLMath_CopyVec(tmp, lbl_80211D38[j]);
             }
         }
     }
@@ -48,7 +48,7 @@ void fn_800F19D4(void) {
 void fn_800F1ABC(int nPlayer, s8 n) {
     Character* pChar;
     gPlayers[nPlayer].nTarget = n % lbl_80282360;
-    Vec_Copy(lbl_80211D38[gPlayers[nPlayer].nTarget], (f32*)Ter_GetTGD()->pin);
+    LLMath_CopyVec(lbl_80211D38[gPlayers[nPlayer].nTarget], (f32*)Ter_GetTGD()->pin);
     pChar = fn_8001D324(100);
     if (pChar != NULL) {
         Character_SetPosition(pChar, lbl_80211D38[gPlayers[nPlayer].nTarget], 1);

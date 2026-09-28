@@ -320,16 +320,16 @@ void fn_80100508(void) {
     if (-1.0f == lbl_80192DF8[n].vPos[0] && -1.0f == lbl_80192DF8[n].vPos[1] &&
         -1.0f == lbl_80192DF8[n].vPos[2]) {
         pCourse = Ter_GetTGD();
-        Vec_Copy(&pCourse->tee[gSession.nTeeSet[0]].x, gPlayers[0].vBall);
+        LLMath_CopyVec(&pCourse->tee[gSession.nTeeSet[0]].x, gPlayers[0].vBall);
     } else {
         fHeight = CamScript_GuessBestPlayableHeight(lbl_80192DF8[n].vPos, NULL);
         if (-65536.125f != fHeight) {
             lbl_80192DF8[n].vPos[1] = fHeight;
         }
-        Vec_Copy(lbl_80192DF8[n].vPos, gPlayers[0].vBall);
+        LLMath_CopyVec(lbl_80192DF8[n].vPos, gPlayers[0].vBall);
     }
-    Vec_Copy(gPlayers[0].vBall, gPlayers[0].vPreShot);
-    Vec_Copy(gPlayers[0].vBall, gPlayers[0].ball.vPos);
+    LLMath_CopyVec(gPlayers[0].vBall, gPlayers[0].vPreShot);
+    LLMath_CopyVec(gPlayers[0].vBall, gPlayers[0].ball.vPos);
     Physics_InitBall(&gPlayers[0].ball, gPlayers[0].vBall, 0);
     // EA bug: always true (|| where && was meant), so the ball is always dropped.
     if (lbl_802823FC != 1 || lbl_802823FC != 8 || lbl_802823FC != 9 || lbl_802823FC != 11) {

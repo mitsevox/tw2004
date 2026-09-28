@@ -37,11 +37,11 @@ void fn_80071AD0(void) {
     } else {
         nCount = 50;
     }
-    lbl_80281E98 = UMemPool_Create(nCount, 0x34, 2, 16);
-    lbl_80281E94 = UMemPool_Create(nCount, 0x2C, 2, 16);
-    lbl_80281E90 = UMemPool_Create(nCount, 0x20, 2, 16);
-    lbl_80281E8C = UMemPool_Create(nCount, sizeof(SkelPose), 2, 16);
-    lbl_80281E88 = UMemPool_Create(nCount, 0x114C, 2, 16);
+    lbl_80281E98 = CreateMemPool(nCount, 0x34, 2, 16);
+    lbl_80281E94 = CreateMemPool(nCount, 0x2C, 2, 16);
+    lbl_80281E90 = CreateMemPool(nCount, 0x20, 2, 16);
+    lbl_80281E8C = CreateMemPool(nCount, sizeof(SkelPose), 2, 16);
+    lbl_80281E88 = CreateMemPool(nCount, 0x114C, 2, 16);
 }
 
 // Destroy the pools fn_80071AD0 made.
@@ -362,8 +362,8 @@ void fn_8007260C(Character* pChar, SKABlendNode* pNode, CharModel* pModel, f32 f
                     }
                     if ((pClipFirst->uFlags & 0x10) && !(pClipOther->uFlags & 0x10)) {
                         pPose = pFirst->pPose;
-                        Vec_Copy(pChar->q16AC, pPose->aBones[pChar->nGripBone].q0);
-                        Vec_Copy(pChar->v16BC, pPose->aBones[pChar->nGripBone].v10);
+                        LLMath_CopyVec(pChar->q16AC, pPose->aBones[pChar->nGripBone].q0);
+                        LLMath_CopyVec(pChar->v16BC, pPose->aBones[pChar->nGripBone].v10);
                     }
                 }
             }

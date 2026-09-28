@@ -113,12 +113,12 @@ void GameModeReplay_SetupNextGolfer(void) {
     // port: the swing data up to (not including) its byte 0x630
     Mem_cpy(&gPlayers[0].swing, &gReplayData.player.swing, 0x630);
     gPlayers[0].uFlags = gReplayData.player.uFlags;
-    Vec_Copy(gReplayData.player.vBall, gPlayers[0].vBall);
-    Vec_Copy(gReplayData.player.vPreShot, gPlayers[0].vPreShot);
-    Vec_Copy(gReplayData.player.vTarget, gPlayers[0].vTarget);
-    Vec_Copy(gReplayData.player.vTargetCopy, gPlayers[0].vTargetCopy);
-    Vec_Copy(gReplayData.player.vTarget2, gPlayers[0].vTarget2);
-    Vec_Copy(gReplayData.player.vA44, gPlayers[0].vA44);
+    LLMath_CopyVec(gReplayData.player.vBall, gPlayers[0].vBall);
+    LLMath_CopyVec(gReplayData.player.vPreShot, gPlayers[0].vPreShot);
+    LLMath_CopyVec(gReplayData.player.vTarget, gPlayers[0].vTarget);
+    LLMath_CopyVec(gReplayData.player.vTargetCopy, gPlayers[0].vTargetCopy);
+    LLMath_CopyVec(gReplayData.player.vTarget2, gPlayers[0].vTarget2);
+    LLMath_CopyVec(gReplayData.player.vA44, gPlayers[0].vA44);
     gPlayers[0].nStrokes[Game_CurHoleIndex()] = gReplayData.nStrokes;
     gPlayers[0].fDistance = gReplayData.player.fDistance;
     gPlayers[0].fDistance2 = gReplayData.player.fDistance2;
@@ -184,7 +184,7 @@ int fn_800F1960(void) {
 }
 
 void fn_800F196C(int i, f32* pOut) {
-    Vec_Copy(lbl_80211D38[i], pOut);
+    LLMath_CopyVec(lbl_80211D38[i], pOut);
 }
 
 void fn_800F199C(f32 x, f32 y, f32 z) {

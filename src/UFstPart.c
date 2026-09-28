@@ -479,7 +479,7 @@ PsEmitter* fn_80099758(ParticleParams* pParams) {
     }
     pEmitter->p40 = NULL;
     mat44flt_EulerAngles(pEmitter->mtx, pEmitter->params.f40, pEmitter->params.f44, pEmitter->params.f48);
-    Vec_Copy(pEmitter->params.v80, pEmitter->mtx[3]);
+    LLMath_CopyVec(pEmitter->params.v80, pEmitter->mtx[3]);
     pEmitter->f4C = 0.0f;
     pEmitter->n50 = 0;
     if (pEmitter->params.f94) {

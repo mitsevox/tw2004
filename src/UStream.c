@@ -989,7 +989,7 @@ void UStream_Init(void) {
     gpUsedList = NULL;
     gFill.pObject = NULL;
     gpDoneList = NULL;
-    gpNodePool = UMemPool_Create(0x200, 8, 1, 0x10);
+    gpNodePool = CreateMemPool(0x200, 8, 1, 0x10);
     gnNumStreams = 0;
     gnNumHandlers = 0;
     for (i = 0; i < USTREAM_MAX_HANDLERS; i++) {

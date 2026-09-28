@@ -532,12 +532,12 @@ u8 Ter_SearchForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut) {
         if ((p->ball.vStart[0] != lbl_801D58C8[nPlayer][0] || p->ball.vStart[1] != lbl_801D58C8[nPlayer][1]
              || p->ball.vStart[2] != lbl_801D58C8[nPlayer][2])
             && fDist - fDropDist < 10.0f) {
-            Vec_Copy(lbl_801D58C8[nPlayer], pOut);
+            LLMath_CopyVec(lbl_801D58C8[nPlayer], pOut);
         } else {
-            Vec_Copy(lbl_801D5888[nPlayer], pOut);
+            LLMath_CopyVec(lbl_801D5888[nPlayer], pOut);
         }
     } else {
-        Vec_Copy(lbl_801D5888[nPlayer], pOut);
+        LLMath_CopyVec(lbl_801D5888[nPlayer], pOut);
     }
     vPos[0] = pOut[0];
     vPos[1] = 1000000.0f;
@@ -564,12 +564,12 @@ u8 Ter_SearchForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut) {
                 vPos[1] = Ter_CheckForDropLocation(pCourse, vPos, 0, &bDrop, &bPreferredLie, &pSurface);
                 if ((bPreferred && bPreferredLie) || (!bPreferred && bDrop)) {
                     if (pSurface->nClass == gSurfaceTypes[p->ball.nSurface].nClass) {
-                        Vec_Copy(vPos, pOut);
+                        LLMath_CopyVec(vPos, pOut);
                         goto done;  // fake match: the original branches straight to the end, past the
                                     // ring loop's compare, which a break (and a flag) would keep
                     }
                     if (fRadius < fDist2) {     // EA bug: a distance against a squared one
-                        Vec_Copy(vPos, pOut);
+                        LLMath_CopyVec(vPos, pOut);
                         fDist2 = fRadius;
                     }
                 }
@@ -1466,11 +1466,11 @@ u8 fn_8004E558(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit
     }
     fn_8005097C(pTo, pFrom, vDir);
     LLMath_Normalize3(vDir, vDir);
-    Vec_Copy(pFrom, vPos);
+    LLMath_CopyVec(pFrom, vPos);
     for (;;) {
-        Vec_Copy(vPos, vPrev);
+        LLMath_CopyVec(vPos, vPrev);
         if (nCell[0] == nEndX && nCell[1] == nEndZ) {
-            Vec_Copy(pTo, vPos);
+            LLMath_CopyVec(pTo, vPos);
         } else {
             if (vEdge[nMajor] - vStart[nMajor] != 0.0f) {
                 fRatio = (vEdge[nMinor] - vStart[nMinor]) / (vEdge[nMajor] - vStart[nMajor]);
@@ -1498,8 +1498,8 @@ u8 fn_8004E558(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit
             fDist = LLMath_SquareDistanceBetween3(pFrom, vHit);
             if (fDist < fBest) {
                 fBest = fDist;
-                Vec_Copy(vHit, pHit);
-                Vec_Copy(vNormal, pNormal);
+                LLMath_CopyVec(vHit, pHit);
+                LLMath_CopyVec(vNormal, pNormal);
                 *ppSurface = pSurface;
                 *ppObj = pObj;
             }
@@ -1564,8 +1564,8 @@ u8 fn_8004EB7C(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* p
                 for (j = pRef->nTris - 1; j >= 0; j--) {
                     if ((pFlags[2] & 7) && fn_8004AFA0(pFrom, pDir, fMax, pVert, &fT, vHit, vNormal)) {
                         fMax = fT;
-                        Vec_Copy(vHit, pHit);
-                        Vec_Copy(vNormal, pNormal);
+                        LLMath_CopyVec(vHit, pHit);
+                        LLMath_CopyVec(vNormal, pNormal);
                         if (pbFlags != NULL) {
                             *pbFlags = pFlags[2] & 7;
                         }
@@ -1663,11 +1663,11 @@ u8 fn_8004EE20(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit
     }
     fn_8005097C(pTo, pFrom, vDir);
     LLMath_Normalize3(vDir, vDir);
-    Vec_Copy(pFrom, vPos);
+    LLMath_CopyVec(pFrom, vPos);
     for (;;) {
-        Vec_Copy(vPos, vPrev);
+        LLMath_CopyVec(vPos, vPrev);
         if (nCell[0] == nEndX && nCell[1] == nEndZ) {
-            Vec_Copy(pTo, vPos);
+            LLMath_CopyVec(pTo, vPos);
         } else {
             if (vEdge[nMajor] - vStart[nMajor] != 0.0f) {
                 fRatio = (vEdge[nMinor] - vStart[nMinor]) / (vEdge[nMajor] - vStart[nMajor]);
@@ -1695,8 +1695,8 @@ u8 fn_8004EE20(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit
             fDist = LLMath_SquareDistanceBetween3(pFrom, vHit);
             if (fDist < fBest) {
                 fBest = fDist;
-                Vec_Copy(vHit, pHit);
-                Vec_Copy(vNormal, pNormal);
+                LLMath_CopyVec(vHit, pHit);
+                LLMath_CopyVec(vNormal, pNormal);
                 *ppSurface = pSurface;
                 *ppObj = pObj;
             }
@@ -1760,8 +1760,8 @@ u8 fn_8004F43C(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* p
                 for (j = pRef->nTris - 1; j >= 0; j--) {
                     if ((pFlags[2] & 7) && fn_8004AFA0(pFrom, pDir, fMax, pVert, &fT, vHit, vNormal)) {
                         fMax = fT;
-                        Vec_Copy(vHit, pHit);
-                        Vec_Copy(vNormal, pNormal);
+                        LLMath_CopyVec(vHit, pHit);
+                        LLMath_CopyVec(vNormal, pNormal);
                         *ppSurface = &gSurfaceTypes[pRef->nSurface];
                         if (pRef->n2 != 0) {
                             *ppObj = &pCourse->pObjects[pRef->n2];
@@ -1853,11 +1853,11 @@ u8 Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* p
     }
     fn_8005097C(pTo, pFrom, vDir);
     LLMath_Normalize3(vDir, vDir);
-    Vec_Copy(pFrom, vPos);
+    LLMath_CopyVec(pFrom, vPos);
     for (;;) {
-        Vec_Copy(vPos, vPrev);
+        LLMath_CopyVec(vPos, vPrev);
         if (nCell[0] == nEndX && nCell[1] == nEndZ) {
-            Vec_Copy(pTo, vPos);
+            LLMath_CopyVec(pTo, vPos);
         } else {
             if (vEdge[nMajor] - vStart[nMajor] != 0.0f) {
                 fRatio = (vEdge[nMinor] - vStart[nMinor]) / (vEdge[nMajor] - vStart[nMajor]);
@@ -1884,8 +1884,8 @@ u8 Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* p
             fDist = LLMath_SquareDistanceBetween3(pFrom, vHit);
             if (fDist < fBest) {
                 fBest = fDist;
-                Vec_Copy(vHit, pHit);
-                Vec_Copy(vNormal, pNormal);
+                LLMath_CopyVec(vHit, pHit);
+                LLMath_CopyVec(vNormal, pNormal);
                 *ppSurface = pSurface;
                 *ppObj = pObj;
             }
@@ -1946,8 +1946,8 @@ u8 fn_8004FCB4(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* p
                 for (j = pRef->nTris - 1; j >= 0; j--) {
                     if ((pFlags[2] & 7) && fn_8004AFA0(pFrom, pDir, fMax, pVert, &fT, vHit, vNormal)) {
                         fMax = fT;
-                        Vec_Copy(vHit, pHit);
-                        Vec_Copy(vNormal, pNormal);
+                        LLMath_CopyVec(vHit, pHit);
+                        LLMath_CopyVec(vNormal, pNormal);
                         *ppSurface = &gSurfaceTypes[pRef->nSurface];
                         if (pRef->n2 != 0) {
                             *ppObj = &pCourse->pObjects[pRef->n2];
@@ -2038,11 +2038,11 @@ u8 fn_8004FF34(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNorma
     }
     fn_8005097C(pTo, pFrom, vDir);
     LLMath_Normalize3(vDir, vDir);
-    Vec_Copy(pFrom, vPos);
+    LLMath_CopyVec(pFrom, vPos);
     for (;;) {
-        Vec_Copy(vPos, vPrev);
+        LLMath_CopyVec(vPos, vPrev);
         if (nCell[0] == nEndX && nCell[1] == nEndZ) {
-            Vec_Copy(pTo, vPos);
+            LLMath_CopyVec(pTo, vPos);
         } else {
             if (vEdge[nMajor] - vStart[nMajor] != 0.0f) {
                 fRatio = (vEdge[nMinor] - vStart[nMinor]) / (vEdge[nMajor] - vStart[nMajor]);
@@ -2069,8 +2069,8 @@ u8 fn_8004FF34(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNorma
             fDist = LLMath_SquareDistanceBetween3(pFrom, vHit);
             if (fDist < fBest) {
                 fBest = fDist;
-                Vec_Copy(vHit, pHit);
-                Vec_Copy(vNormal, pNormal);
+                LLMath_CopyVec(vHit, pHit);
+                LLMath_CopyVec(vNormal, pNormal);
                 *ppSurface = pSurface;
                 *ppObj = pObj;
             }
@@ -2132,8 +2132,8 @@ u8 fn_800504F4(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* p
                 for (j = pRef->nTris - 1; j >= 0; j--) {
                     if ((pFlags[2] & 7) && fn_8004AFA0(pFrom, pDir, fMax, pVert, &fT, vHit, vNormal)) {
                         fMax = fT;
-                        Vec_Copy(vHit, pHit);
-                        Vec_Copy(vNormal, pNormal);
+                        LLMath_CopyVec(vHit, pHit);
+                        LLMath_CopyVec(vNormal, pNormal);
                         *ppSurface = &gSurfaceTypes[pRef->nSurface];
                         if (pRef->n2 != 0) {
                             *ppObj = &pCourse->pObjects[pRef->n2];

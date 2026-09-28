@@ -66,7 +66,7 @@ void  fn_800332F4(void);
 u8    fn_8003505C(u8 b);
 f32*  fn_80035508(UObjMesh* pMesh);
 u8    fn_80033308(Ter_ObjectDrawData* pDraw, u8 bForce);
-void  Mtx_Identity(f32 (*pMtx)[4]);  // identity matrix
+void  LLMath_IdentifyMat(f32 (*pMtx)[4]);  // identity matrix
 void  fn_80035370(void);
 void  fn_80034CAC(int nRenderPass);
 void  fn_80034DE4(void);
@@ -1297,7 +1297,7 @@ void fn_80032B7C(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s3
     }
     if (gSession.nSplitScreen == 0 && (uFlags2 & 0x40) && b2 == 0) {
         if (fNear < 60.0f * lbl_801D3CB0.fFOVScale && pMesh->n20 != 0) {
-            Mtx_Identity(mRaise);
+            LLMath_IdentifyMat(mRaise);
             mRaise[3][1] = 0.005f;
             RC_vSetCurrentRenderCtxTransformationMatrix(mRaise);
             RenderState_SetCameraMatrices();
@@ -2563,11 +2563,11 @@ void fn_80035584(s32 v) {
 }
 
 void fn_80035590(f32* p0) {
-    Vec_Copy(p0, lbl_802813B8->v4);
+    LLMath_CopyVec(p0, lbl_802813B8->v4);
 }
 
 void fn_800355B8(f32* p0) {
-    Vec_Copy(p0, lbl_802813B8->v14);
+    LLMath_CopyVec(p0, lbl_802813B8->v14);
 }
 
 void fn_800355E0(s32 arg0) {

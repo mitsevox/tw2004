@@ -26,7 +26,7 @@ int   fn_8001BD18(Character* pChar, Clip* pClip);           // char.c
 void  Character_InitSKATags(Character* pChar, Clip* pBlend, f32 fStart);   // char.c
 void  fn_801141F8(struct DynChain* pChain, CharModel* pModel);   // DynChain.c
 char* fn_801008A8(void);                                    // GameMode11.c
-void  Mtx_CopyRotation(f32 (*pSrc)[4], f32 (*pDst)[4]);          // UMemPool.c: copies three rows
+void  LLMath_CopyMat34(f32 (*pSrc)[4], f32 (*pDst)[4]);          // UMemPool.c: copies three rows
 void  Quat_BuildFromMatrix(f32 (*m)[4], f32* pQ);                    // Quaternion.c: a rotation matrix's quaternion
 
 // .bss (character.h). Section note: owner by link order only. Nothing here uses it (only skalib.c's
@@ -170,7 +170,7 @@ void CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKA
         }
         if (strcmp(pClip->name, "gplptt12") == 0 && (pCourse = Ter_GetTGD()) != NULL &&
             Ter_GetSupportingGroundNormal(pCourse, pChar->pModel->pMatrices[0][3], vNormal)) {
-            Vec_Copy(pChar->a179C, m[1]);
+            LLMath_CopyVec(pChar->a179C, m[1]);
             vec4flt_CrossProduct(pChar->pModel->pMatrices[0][0], pChar->a179C, m[2]);
             LLMath_Normalize3(m[2], m[2]);
             vec4flt_CrossProduct(pChar->a179C, m[2], m[0]);
@@ -178,7 +178,7 @@ void CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKA
             m[1][3] = 0.0f;
             m[2][3] = 0.0f;
             m[3][3] = 1.0f;
-            Mtx_CopyRotation(m, pChar->pModel->pMatrices[0]);
+            LLMath_CopyMat34(m, pChar->pModel->pMatrices[0]);
             Quat_BuildFromMatrix(m, pChar->pModel->pBones->q0C);
             pChar->u10 |= 0x8000;
         }

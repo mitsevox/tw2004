@@ -60,13 +60,13 @@ static f32 GoRenderCtx_Gc_StrippedFn(f32 x) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-s32 Mtx_Copy();
-s32 Mtx_Transpose4x4();
+s32 LLMath_CopyMat44();
+s32 LLMath_Transpose44();
 s32 LLMath_mat44fltMultiplyList();
 void RC_vSetCurrentRenderCtx(s32 v);
 void RC_vUpdateRenderCtxScreenMatricesAndInfo(Camera* pCamera);   // not decompiled yet
 void fn_80013DD0(u8* arg0, f32 (*arg1)[4]);
-s32 Mtx_Identity();
+s32 LLMath_IdentifyMat();
 f32 fn_80014134(u8* p);
 f32 fn_8001413C(u8* p);
 f32 fn_80014144(u8* p);
@@ -182,7 +182,7 @@ void RC_vUpdateRenderCtxScreenMatricesAndInfo(Camera* pCamera) {
         Mtx_PerspectiveDepthOverNear(mProj, 1.0f / fn_8001413C((u8*)pRect), f, pCamera->unk1F4, pCamera->unk1F8);
         LLMath_mat44fltMultiplyList(mProj, mFlat, pCamera->m5C, 4);
     }
-    Mtx_Transpose4x4(pCamera->m5C, pCamera->m9C);
+    LLMath_Transpose44(pCamera->m5C, pCamera->m9C);
     LLMath_mat44fltMultiplyList(pCamera->m5C, pLens->m44, pCamera->mDC, 4);
 }
 
@@ -190,13 +190,13 @@ void RC_vUpdateRenderCtxTransformationMatrices(void* pCamera) {
     u8* arg0 = pCamera;
 
     if ((u8) (*(u8*)((u8*)(arg0) + 0x1DC)) != 0) {
-        Mtx_Copy((*(s32*)((u8*)(arg0) + 0x10)) + 0x44, arg0 + 0x11C);
-        Mtx_Copy(arg0 + 0xDC, arg0 + 0x19C);
+        LLMath_CopyMat44((*(s32*)((u8*)(arg0) + 0x10)) + 0x44, arg0 + 0x11C);
+        LLMath_CopyMat44(arg0 + 0xDC, arg0 + 0x19C);
     } else {
         LLMath_mat44fltMultiplyList((*(s32*)((u8*)(arg0) + 0x10)) + 0x44, arg0 + 0x1C, arg0 + 0x11C, 4);
         LLMath_mat44fltMultiplyList(arg0 + 0xDC, arg0 + 0x1C, arg0 + 0x19C, 4);
     }
-    Mtx_Transpose4x4(arg0 + 0x11C, arg0 + 0x15C);
+    LLMath_Transpose44(arg0 + 0x11C, arg0 + 0x15C);
 }
 
 void fn_80013D58(Camera* pCamera) {
@@ -220,11 +220,11 @@ void RC_vSetRenderCtxTransformationMatrix(void* pCamera, f32 (*pMtx)[4]) {
 
 void fn_80013DD0(u8* arg0, f32 (*arg1)[4]) {
     if (arg1 == NULL) {
-        Mtx_Identity(arg0 + 0x1C);
+        LLMath_IdentifyMat(arg0 + 0x1C);
         (*(s8*)((u8*)(arg0) + 0x1DC)) = 1;
         return;
     }
-    Mtx_Copy(arg1, arg0 + 0x1C);
+    LLMath_CopyMat44(arg1, arg0 + 0x1C);
     (*(s8*)((u8*)(arg0) + 0x1DC)) = 0;
 }
 
@@ -358,7 +358,7 @@ void RenderView_SetColor(f32* pColour) {
         fn_800141CC();
         return;
     }
-    Vec_Copy(pColour, lbl_80280E08->aColour);
+    LLMath_CopyVec(pColour, lbl_80280E08->aColour);
 }
 
 // The default vertex colour: half grey, opaque.

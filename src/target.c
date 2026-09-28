@@ -174,7 +174,7 @@ void TARGET_RenderBallTarget(int nPlayer) {
     aShadowQuad[3][0] = -fShadow;
     aShadowQuad[3][1] = 0.0f;
     aShadowQuad[3][2] = fShadow;
-    Vec_Copy(gPlayers[nPlayer].vTargetCopy, vPos);
+    LLMath_CopyVec(gPlayers[nPlayer].vTargetCopy, vPos);
     if (gPlayers[nPlayer].uFlagsEF0 & 2) {
         aShadowQuad[0][1] -= 1.0f / 9.0f;
         aShadowQuad[1][1] -= 1.0f / 9.0f;
@@ -448,7 +448,7 @@ u8 TARGET_UpdateMomentums(int nPlayer) {
         gPlayers[nPlayer].vTarget[0] = fDX + gPlayers[nPlayer].vBall[0];
         gPlayers[nPlayer].vTarget[2] = fDZ + gPlayers[nPlayer].vBall[2];
         fn_8002BDEC_SetTarget(nPlayer, gPlayers[nPlayer].vTarget);
-        Vec_Copy(gPlayers[nPlayer].vTarget, gPlayers[nPlayer].vTarget2);
+        LLMath_CopyVec(gPlayers[nPlayer].vTarget, gPlayers[nPlayer].vTarget2);
         Character_AlignShotWithTarget(nPlayer, 0, 1);
         fn_80062C38();
         fn_8006A8B0();
@@ -509,7 +509,7 @@ u8 TARGET_UpdateMomentums(int nPlayer) {
             gPlayers[nPlayer].vTarget[0] = fDX + gPlayers[nPlayer].vBall[0];
             gPlayers[nPlayer].vTarget[2] = fDZ + gPlayers[nPlayer].vBall[2];
             fn_8002BDEC_SetTarget(nPlayer, gPlayers[nPlayer].vTarget);
-            Vec_Copy(gPlayers[nPlayer].vTarget, gPlayers[nPlayer].vTarget2);
+            LLMath_CopyVec(gPlayers[nPlayer].vTarget, gPlayers[nPlayer].vTarget2);
             if (gPlayers[nPlayer].nShotKind != 2) {
                 nClub = gPlayers[nPlayer].nClub;
                 gPlayers[nPlayer].nClub = AI_ClubForShot(nPlayer, gPlayers[nPlayer].nShotKind, 1,
@@ -974,7 +974,7 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
         bBall = 1;
     }
 
-    Vec_Copy(gPlayers[nPlayer].vPlacement, vPos);
+    LLMath_CopyVec(gPlayers[nPlayer].vPlacement, vPos);
     if (bBall) {
         fn_8006A988(vPos, gPlayers[nPlayer].ball.vPos, vBallDir);
         fBallDist = Math_Sqrt(vBallDir[0] * vBallDir[0] + vBallDir[2] * vBallDir[2]);

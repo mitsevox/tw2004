@@ -28,7 +28,7 @@ Checks against names we had already given by hand (all agree): `Ball_GroundConta
 `Physics_SetLie`, `Ball_Stop` = `Physics_StopBall`, `Ball_Holed` = `Physics_ForceBallInHole`,
 `Ball_Launch` = `Physics_ShotImpact`, `Ball_Tick` = `Physics_QuickSimulate`, `SwingState01_Update` =
 `STATEFUNC_PreShotUpdate`, `LLMath_DistanceBetween3` = `LLMath_DistanceBetween3`. One wrong pairing found
-during tuning (`Vec_Copy`, a 36-byte copy, paired with an accessor) led to the rule that
+during tuning (`LLMath_CopyVec`, a 36-byte copy, paired with an accessor) led to the rule that
 functions under 48 bytes are never named from call-graph evidence.
 
 Functions still unnamed or named from TW06:

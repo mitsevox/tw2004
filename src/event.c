@@ -181,7 +181,7 @@ void fn_80065E9C(int nPlayer, int nEvent, void* pData, int nArg) {
     }
     if (gPlayers[nPlayer].nShotKind != 2) {
         Shot_FitTargetToClub(nPlayer);
-        Vec_Copy(gPlayers[nPlayer].vTarget, gPlayers[nPlayer].vTarget2);
+        LLMath_CopyVec(gPlayers[nPlayer].vTarget, gPlayers[nPlayer].vTarget2);
     }
     gPlayers[nPlayer].fPower = AI_PowerForTarget(nPlayer);
     fn_80062C38();
@@ -224,7 +224,7 @@ void fn_80066058(int nPlayer, int nEvent, void* pData, int nArg) {
     }
     if (gPlayers[nPlayer].nShotKind != 2) {
         Shot_FitTargetToClub(nPlayer);
-        Vec_Copy(gPlayers[nPlayer].vTarget, gPlayers[nPlayer].vTarget2);
+        LLMath_CopyVec(gPlayers[nPlayer].vTarget, gPlayers[nPlayer].vTarget2);
     }
     gPlayers[nPlayer].fPower = AI_PowerForTarget(nPlayer);
     fn_80062C38();
@@ -745,7 +745,7 @@ void fn_80067220(int nPlayer) {
     TARGET_SetupTarget(nPlayer);
     pPlayer->fA60 = 0.0f;
     Shot_FitTargetToClub(nPlayer);
-    Vec_Copy(pPlayer->vTarget, pPlayer->vTarget2);
+    LLMath_CopyVec(pPlayer->vTarget, pPlayer->vTarget2);
     gPlayers[nPlayer].fPower = AI_PowerForTarget(nPlayer);
     fn_80062C38();
     fn_8001C680(nPlayer);

@@ -786,17 +786,17 @@ void fn_8005A0FC(int nPlayer) {
     int        k;
     int        i;
 
-    Vec_Copy(pObj->pModel->pMatrices[nHead][3], v98);
+    LLMath_CopyVec(pObj->pModel->pMatrices[nHead][3], v98);
     Vec_Sub(v98, pSw->prevClub[0].vClubPos, vB8);
     f = Math_Sqrt(fn_8005CC18(vB8));
-    Vec_Copy(v98, vA8);
+    LLMath_CopyVec(v98, vA8);
     if (f > 0.3f && pSw->nNumInBlurQueue != 0) {
         v18[3] = 0.0f;
         v28[3] = 0.0f;
-        Vec_Copy(pObj->pModel->pMatrices[nHead][3], v88);
-        Vec_Copy(pObj->pModel->pMatrices[nGrip][3], v68);
-        Vec_Copy(pSw->prevClub[0].vClubPos, v78);
-        Vec_Copy(pSw->prevClub[0].vHandPos, v58);
+        LLMath_CopyVec(pObj->pModel->pMatrices[nHead][3], v88);
+        LLMath_CopyVec(pObj->pModel->pMatrices[nGrip][3], v68);
+        LLMath_CopyVec(pSw->prevClub[0].vClubPos, v78);
+        LLMath_CopyVec(pSw->prevClub[0].vHandPos, v58);
         Vec_Sub(v68, v58, v48);
         Vec_Sub(v88, v78, v38);
         Vec_Sub(v88, v68, v8);
@@ -817,9 +817,9 @@ void fn_8005A0FC(int nPlayer) {
             for (k = 24; k > 0; k--) {
                 Mem_cpy(&pSw->prevClub[k], &pSw->prevClub[k - 1], sizeof(pSw->prevClub[k]));
             }
-            Vec_Copy(v8, pSw->prevClub[0].vClubPos);
+            LLMath_CopyVec(v8, pSw->prevClub[0].vClubPos);
             pSw->prevClub[0].vClubPos[3] = 1.0f;
-            Vec_Copy(v68, pSw->prevClub[0].vHandPos);
+            LLMath_CopyVec(v68, pSw->prevClub[0].vHandPos);
             if (pSw->nNumInBlurQueue < 25) {
                 pSw->nNumInBlurQueue++;
             }
@@ -828,9 +828,9 @@ void fn_8005A0FC(int nPlayer) {
         for (k = 24; k > 0; k--) {
             Mem_cpy(&pSw->prevClub[k], &pSw->prevClub[k - 1], sizeof(pSw->prevClub[k]));
         }
-        Vec_Copy(vA8, pSw->prevClub[0].vClubPos);
+        LLMath_CopyVec(vA8, pSw->prevClub[0].vClubPos);
         pSw->prevClub[0].vClubPos[3] = 1.0f;
-        Vec_Copy(pObj->pModel->pMatrices[nGrip][3], pSw->prevClub[0].vHandPos);
+        LLMath_CopyVec(pObj->pModel->pMatrices[nGrip][3], pSw->prevClub[0].vHandPos);
         if (pSw->nNumInBlurQueue < 25) {
             pSw->nNumInBlurQueue++;
         }
@@ -879,7 +879,7 @@ void fn_8005A478(int nPlayer) {
             nStickX = Swing_StickX(nPlayer, pPad);
             Swing_StickY(nPlayer, pPad);
         }
-        Vec_Copy(pObj->pModel->pMatrices[nBone][3], vPos);
+        LLMath_CopyVec(pObj->pModel->pMatrices[nBone][3], vPos);
         if (pObj->nAnim == 6) {
             if (nStickX < pSw->nCalibrateX) {
                 pSw->fRedColor = 0.0f;
@@ -959,7 +959,7 @@ void fn_8005A850(int nPlayer) {
     {
         if ((pObj->nAnim == 6 || pObj->nAnim == 7) && fn_8001EE90(pObj) != 2 && pSw->nNumInBlurQueue >= 2 &&
             gSession.options.a24[7] != 0) {
-            Vec_Copy(pObj->pModel->pMatrices[nGrip][3], vGrip);
+            LLMath_CopyVec(pObj->pModel->pMatrices[nGrip][3], vGrip);
             nBlue = 255.0f * pSw->fBlueColor;
             nRed = 255.0f * pSw->fRedColor;
             nGreen = 255.0f * pSw->fGreenColor;

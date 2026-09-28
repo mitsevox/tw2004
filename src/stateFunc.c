@@ -1837,7 +1837,7 @@ void STATEFUNC_InitialFlyByExit(int nPlayer) {
         ViewController_TurnOnViewController(gPlayers[i].nView[0], 1);
         pDst->script.nCamera = pSrc->script.nCamera;
         pDst->script.f94     = pSrc->script.f94;
-        Vec_Copy(pSrc->script.v40, pDst->script.v40);
+        LLMath_CopyVec(pSrc->script.v40, pDst->script.v40);
         pDst->script.f90     = pSrc->script.f90;
     }
     gpGame->pfn24C(nPlayer);
@@ -1968,7 +1968,7 @@ void STATEFUNC_PlaceBallInit(int nPlayer) {
     fn_80045824(nPlayer);
     CameraController_SetCameraMode(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 8, nPlayer,
                                    gPlayers[nPlayer].nView[0]);
-    Vec_Copy(gPlayers[nPlayer].vBall, fTmp);
+    LLMath_CopyVec(gPlayers[nPlayer].vBall, fTmp);
     PlaceBall_Set(nPlayer, fTmp);
     PlaceBall_SetupTarget(nPlayer);
     SW_vClearBoosts(nPlayer);
@@ -1988,7 +1988,7 @@ void STATEFUNC_PlaceBallUpdate(int nPlayer) {
                 if (gSurfaceTypes[gPlayers[nPlayer].ball.nSurface].nClass == 1) {
                     Physics_InitBall(pBall, pBall->vPos, nPlayer);
                 }
-                Vec_Copy(pBall->vPos, p->vBall);
+                LLMath_CopyVec(pBall->vPos, p->vBall);
                 GOLFERSTATE_Switch(GS_PRE_SHOT, nPlayer);
             }
         }

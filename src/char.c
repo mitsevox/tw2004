@@ -372,7 +372,7 @@ void Character_UpdateFeetTerrainInfo(Character* pChar, int bNormals) {
                     pChar->aGroundNormal[i + pChar->n1784][2] = 0.0f;
                     pChar->aGroundNormal[i + pChar->n1784][3] = 0.0f;
                 } else {
-                    Vec_Copy(pNormal, pChar->aGroundNormal[i + pChar->n1784]);
+                    LLMath_CopyVec(pNormal, pChar->aGroundNormal[i + pChar->n1784]);
                 }
             }
         }
@@ -398,7 +398,7 @@ f32 Character_GetTerrainHeightAndNormal(Character* pChar, f32* pPos, f32** ppNor
 
     if (pChar != NULL) {
         if ((pCourse = Ter_GetTGD()) != NULL) {
-            Vec_Copy(pPos, vPos);
+            LLMath_CopyVec(pPos, vPos);
             vPos[1] += 0.66f / 12.0f;
             Ter_GetEnclosingGroundData(pCourse, vPos, &fSupportingHeight, &pSupportingSurface, lbl_801B95D8,
                                        &fCoveringHeight, &pCoveringSurface, lbl_801B95C8);
@@ -462,12 +462,12 @@ void Character_UpdateTestPoints(Character* pChar) {
         pMtxRToe = Character_GetBoneMatrixSwapIfLefty(pChar, 0x3A);
         pMtxLFoot = Character_GetBoneMatrixSwapIfLefty(pChar, 0x47);
         pMtxRFoot = Character_GetBoneMatrixSwapIfLefty(pChar, 0x39);
-        fn_8000AE6C(pMtxRToe[3], pMtxRToe[1], pChar->pModel->f10, pChar->aPoints[0]);
-        fn_8000AE6C(pMtxLToe[3], pMtxLToe[1], pChar->pModel->fC, pChar->aPoints[1]);
-        fn_8000AE6C(pMtxRFoot[3], pMtxRToe[2], fRight, pChar->aPoints[2]);
-        fn_8000AE6C(pMtxLFoot[3], pMtxLToe[2], fLeft, pChar->aPoints[3]);
-        fn_8000AE6C(pChar->aPoints[0], pMtxRToe[2], 0.25f * fRight, pChar->aPoints[0]);
-        fn_8000AE6C(pChar->aPoints[1], pMtxLToe[2], 0.25f * fLeft, pChar->aPoints[1]);
+        LLMath_AddScale(pMtxRToe[3], pMtxRToe[1], pChar->pModel->f10, pChar->aPoints[0]);
+        LLMath_AddScale(pMtxLToe[3], pMtxLToe[1], pChar->pModel->fC, pChar->aPoints[1]);
+        LLMath_AddScale(pMtxRFoot[3], pMtxRToe[2], fRight, pChar->aPoints[2]);
+        LLMath_AddScale(pMtxLFoot[3], pMtxLToe[2], fLeft, pChar->aPoints[3]);
+        LLMath_AddScale(pChar->aPoints[0], pMtxRToe[2], 0.25f * fRight, pChar->aPoints[0]);
+        LLMath_AddScale(pChar->aPoints[1], pMtxLToe[2], 0.25f * fLeft, pChar->aPoints[1]);
     }
     if (pChar->p16D8 != NULL && pClubMtx != NULL) {
         LLMath_mat44fltMultiply(pClubMtx, (Vec4*)pChar->p16D8->a3C[pChar->nClubClass],
@@ -909,7 +909,7 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     Character_GetBonePos_FromIndex(pChar, nHip, vHip);
     Character_GetBonePos_FromIndex(pChar, nKnee, vKnee);
     Character_GetBonePos_FromIndex(pChar, nToe, vToe);
-    Vec_Copy(pChar->aPoints[nAnklePoint], vPoint);
+    LLMath_CopyVec(pChar->aPoints[nAnklePoint], vPoint);
     // how far each test point sits below the ground (0.165 in, in feet)
     fDropA = 0.165f / 12.0f + (pChar->afGroundHeight[nAnklePoint] - vPoint[1]);
     fDropB = 0.165f / 12.0f + (pChar->afGroundHeight[nToePoint] - pChar->aPoints[nToePoint][1]);
@@ -964,9 +964,9 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     if (pSkel != NULL) {
         // a degenerate bend axis falls back on the last good one
         if (fLen > 0.0001f) {
-            Vec_Copy(vNormal, pSkel->a10E8[nLeg]);
+            LLMath_CopyVec(vNormal, pSkel->a10E8[nLeg]);
         } else {
-            Vec_Copy(pSkel->a10E8[nLeg], vNormal);
+            LLMath_CopyVec(pSkel->a10E8[nLeg], vNormal);
         }
     }
     if (fabsf(fTurn) > 0.0001f) {
@@ -1030,7 +1030,7 @@ void Character_SetPosition(Character* pChar, f32* pPos, u8 bPlace) {
 
     BitArray_SetAll(auBits, 0x80);
     if (pChar != NULL) {
-        Vec_Copy(pPos, pChar->pModel->pBones->v1C);
+        LLMath_CopyVec(pPos, pChar->pModel->pBones->v1C);
         if (bPlace) {
             SKEL_TransformBones(pChar->pModel, auBits);
             Character_UpdateTestPoints(pChar);
@@ -2604,8 +2604,8 @@ void Character_SetupForShot(Character* pChar) {
             }
         }
         fn_8001BD18(pChar, pSkel->pClip);
-        Vec_Scale(-lbl_80187184[pChar->nClubClass][0], pChar->pModel->pMatrices[0][0], vOffsetX);
-        Vec_Scale(-lbl_80187184[pChar->nClubClass][2], pChar->pModel->pMatrices[0][2], vOffsetZ);
+        LLMath_Scale(-lbl_80187184[pChar->nClubClass][0], pChar->pModel->pMatrices[0][0], vOffsetX);
+        LLMath_Scale(-lbl_80187184[pChar->nClubClass][2], pChar->pModel->pMatrices[0][2], vOffsetZ);
         if (pChar->pModel->bEE) {
             vOffsetZ[0] = -vOffsetZ[0];
             vOffsetZ[2] = -vOffsetZ[2];
@@ -2962,7 +2962,7 @@ void Character_GetBallOnFingerPosition(Character* pChar, f32* pPos) {
     f32 (*pMtx)[4] = Character_GetBoneMatrixSwapIfLefty(pChar, 0x1A);
     f32 vAxis[3];
 
-    Vec_Copy(pMtx[3], pPos);
+    LLMath_CopyVec(pMtx[3], pPos);
     Vec3Copy(pMtx[0], vAxis);
     LLMath_Normalize3(vAxis, vAxis);
     if (Character_IsLeftHanded(pChar)) {
@@ -2981,7 +2981,7 @@ void fn_8001DA04(Character* pChar, f32* pPos, f32* pAngles) {
 
     if (pChar != NULL && pChar->pModel != NULL) {
         pMtx = Character_GetBoneMatrixSwapIfLefty(pChar, 0x1A);
-        Vec_Copy(pMtx[3], pPos);
+        LLMath_CopyVec(pMtx[3], pPos);
         Vec3Copy(pMtx[0], vAxis);
         LLMath_Normalize3(vAxis, vAxis);
         if (Character_IsLeftHanded(pChar)) {
@@ -3293,7 +3293,7 @@ void Character_GetBonePos_FromIndex(Character* pChar, int nBone, f32* pPos) {
         if (Character_IsGolfer(pChar) == 0) {
             nBone = 1;
         }
-        Vec_Copy(pChar->pModel->pMatrices[nBone][3], pPos);
+        LLMath_CopyVec(pChar->pModel->pMatrices[nBone][3], pPos);
     }
 }
 

@@ -31,10 +31,10 @@ void fn_800A27FC(f32 fDir, f32 fPoint) {
 
     for (i = 0; i < Ter_GetTGD()->lights.nLights; i++) {
         if (Ter_GetTGD()->lights.aLight[i].nType == 1) {
-            Vec_Scale(fDir, Ter_GetTGD()->lights.aLight[i].vColor,
+            LLMath_Scale(fDir, Ter_GetTGD()->lights.aLight[i].vColor,
                         Ter_GetTGD()->lights.aLight[i].vColor);
         } else if (Ter_GetTGD()->lights.aLight[i].nType == 2) {
-            Vec_Scale(fPoint, Ter_GetTGD()->lights.aLight[i].vColor,
+            LLMath_Scale(fPoint, Ter_GetTGD()->lights.aLight[i].vColor,
                         Ter_GetTGD()->lights.aLight[i].vColor);
         }
     }

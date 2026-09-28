@@ -117,7 +117,7 @@ s8 Caddie_GetTip(int nPlayer, f32* pOut) {
         gCaddieDone = 1;
         return 2;
     }
-    Vec_Copy(gPlayers[CADDIE_SLOT].vTarget, pOut);
+    LLMath_CopyVec(gPlayers[CADDIE_SLOT].vTarget, pOut);
     return (s8)gCaddieDone;
 }
 

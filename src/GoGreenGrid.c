@@ -117,7 +117,8 @@ void fn_8009B970(int nView) {
     if (!fn_8009BD24(ViewController_GetActivePlayerNumber(nViewCopy))) {
         return;
     }
-    Vec_Copy(PLAYER(ViewController_GetActivePlayerNumber(nViewCopy))->vTarget, lbl_802813C0->aTarget[nView]);
+    LLMath_CopyVec(PLAYER(ViewController_GetActivePlayerNumber(nViewCopy))->vTarget,
+                   lbl_802813C0->aTarget[nView]);
     lbl_802813C0->anDone[nView] = 0;
     fn_8009CB78(PLAYER(ViewController_GetActivePlayerNumber(nViewCopy))->vTarget,
                 PLAYER(ViewController_GetActivePlayerNumber(nViewCopy))->ball.vPos,

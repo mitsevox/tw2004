@@ -197,7 +197,7 @@ void fn_800358E0(Character* pChar, u32 uFlags) {
         nMode = 2;
     }
     if (uShadow) {
-        Vec_Copy(aRow10, aData);
+        LLMath_CopyVec(aRow10, aData);
         switch (nMode) {
         case 2:
             RenderState_SetClipMode(1);
@@ -430,7 +430,7 @@ void fn_8003612C(LightGroup* pGroup) {
 // Copies the character's root bone position to pOut.
 void fn_8003614C(Character* pChar, f32* pOut) {
     if (pChar != NULL) {
-        Vec_Copy(pChar->pModel->pBones[0].v1C, pOut);
+        LLMath_CopyVec(pChar->pModel->pBones[0].v1C, pOut);
     }
 }
 
@@ -608,7 +608,7 @@ void fn_8003662C(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst, int 
                 pDst = aMtx[i];
                 fWeight = pEntry->afWeights[j];
                 for (k = 0, pSrc = aMtx[pEntry->aBones[j]]; k < 4; k++) {
-                    fn_8000AE6C(pDst[k], pSrc[k], fWeight, pDst[k]);
+                    LLMath_AddScale(pDst[k], pSrc[k], fWeight, pDst[k]);
                 }
             }
         }
