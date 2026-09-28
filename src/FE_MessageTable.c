@@ -5684,7 +5684,7 @@ void GM_vGbaCancelLink(MsgArg* pArgs, MsgArg* pResult) {
 // Front-end message 629: the Game Boy Advance link's unlocks, once per profile. When bit 1 of the
 // current profile's a10548 is still clear (the bit also unlocks the Create-A-Player items of lock
 // kind 2, FE_Manager.c fn_80078008): the last course (22) and rewards 0..17 are unlocked
-// (fn_801240A8), gbacable.c's lbl_80282518 is set (fn_8012409C), the bit is set and the answer is
+// (fn_801240A8), gbacable.c's gGbaUnlocksGranted is set (fn_8012409C), the bit is set and the answer is
 // 1. Else 0.
 void GM_vGbaGrantUnlocks(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
@@ -5742,9 +5742,9 @@ void GM_vGbaGetLinkState(MsgArg* pArgs, MsgArg* pResult) {
 // Front-end message 623: reads what the Game Boy Advance holds into the words pArgs[0..4] point at:
 // its cash (request 0x70, GbaChannel.u68), then its four stats (requests 0xB0 with 0..3: the best
 // round, holes in one, longest drive, longest putt; GbaChannel.n70). It stops once a command fails
-// (link state 18) or no link state is set (-1). Then gbacable.c's lbl_80282528 is cleared, and if
-// lbl_80282534 is set a link state of 7 becomes 12 (send the cash back) and 9 becomes 13 (copy the
-// stats into the profile) and lbl_80282534 is cleared; nothing in this build sets lbl_80282534.
+// (link state 18) or no link state is set (-1). Then gbacable.c's gGbaReadPending is cleared, and if
+// gGbaUndoTransfer is set a link state of 7 becomes 12 (send the cash back) and 9 becomes 13 (copy the
+// stats into the profile) and gGbaUndoTransfer is cleared; nothing in this build sets gGbaUndoTransfer.
 void GM_vGbaReadCashAndStats(MsgArg* pArgs, MsgArg* pResult) {
     u32 i;
 
@@ -5788,7 +5788,7 @@ void GM_vFEMessage618_Empty(MsgArg* pArgs, MsgArg* pResult) {
 void GM_vFEMessage619_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Front-end message 633: answers gbacable.c's flag lbl_80282528 (fn_801241CC).
+// Front-end message 633: answers gbacable.c's flag gGbaReadPending (fn_801241CC).
 // GM_vGbaReadCashAndStats clears it after reading the Game Boy Advance, and nothing in this build
 // sets it, so the answer is always 0.
 void GM_vGbaIsReadPending(MsgArg* pArgs, MsgArg* pResult) {
