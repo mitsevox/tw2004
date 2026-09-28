@@ -65,7 +65,7 @@ void fn_80093DB8(Ball* pBall, int nPlayer) {
         vAway[1] = 0.0f;
         vAway[2] = pBall->vPos[2] - gSession.f5B44;
         vAway[3] = 1.0f;
-        Vec3_Normalize(vAway, vAway);
+        LLMath_Normalize3(vAway, vAway);
         Vec3_Scale(lbl_802813A0, vAway, vAway);
         lbl_801D97B0[0] = vAway[0] + (pBall->vPos[0] - lbl_8028139C);
         lbl_801D97B0[1] = 0.005f + fGround;

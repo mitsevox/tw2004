@@ -189,7 +189,7 @@ void fn_80090D28(FEQuad* pQuad) {
         aUV[3][1] *= vPictUV[1];
     }
     for (i = 0; i < 4; i++) {
-        Mtx_MultVec4(pMtx->m, &aPos[i], &aOut[i]);
+        LLMath_mat44fltMultiply(pMtx->m, &aPos[i], &aOut[i]);
         fProj = fDist / (fDist + aOut[i].z);
         aOut[i].x *= fProj;
         aOut[i].y *= fProj;

@@ -509,7 +509,7 @@ u32 fn_80099AE4(PsEmitter* pEmitter, Camera* pCamera) {
     if (pEmitter->params.f24 > 1000.0f) {
         return 1;
     }
-    Mtx_MultVec4(pCamera->viewMtx, (Vec4*)pEmitter->params.v70, &vView);
+    LLMath_mat44fltMultiply(pCamera->viewMtx, (Vec4*)pEmitter->params.v70, &vView);
     Vec3Copy(&vView.x, &sphere.x);
     sphere.radius = pEmitter->params.f24;
     return fn_80007D74(&sphere, pCamera, 0) != 2;
@@ -623,8 +623,8 @@ void* fn_80099C50(void* pList, int nLink, int (*pfnCompare)(void* pA, void* pB))
 
 // fn_80099BA0's sort order: pB's squared distance from lbl_801DB878 minus pA's.
 int fn_80099E34(void* pA, void* pB) {
-    f32 fA = Vec3_DistanceSq(lbl_801DB878, ((PsEmitter*)pA)->params.v80);
-    return Vec3_DistanceSq(lbl_801DB878, ((PsEmitter*)pB)->params.v80) - fA;
+    f32 fA = LLMath_SquareDistanceBetween3(lbl_801DB878, ((PsEmitter*)pA)->params.v80);
+    return LLMath_SquareDistanceBetween3(lbl_801DB878, ((PsEmitter*)pB)->params.v80) - fA;
 }
 
 void fn_80099EA4(PsEmitter* pEmitter) {

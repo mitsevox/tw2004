@@ -535,7 +535,7 @@ void fn_8011F3AC(void) {
     Vec_Copy(pLens->m4[2], vDir);
     vDir[1] = 0.0f;
     if (vDir[0] != 0.0f || vDir[1] != 0.0f || vDir[2] != 0.0f) {
-        Vec3_Normalize(vDir, vDir);
+        LLMath_Normalize3(vDir, vDir);
     }
     if (vDir[2] < 0.0f) {
         lbl_80281900->n360 = 0;
@@ -672,7 +672,7 @@ void fn_8011F7F8(void) {
     Vec3Copy(pLens->m4[2], vLook);
     Vec3Copy(vLook, vFlat);
     if (vLook[0] != 0.0f || vLook[1] != 0.0f || vLook[2] != 0.0f) {
-        Vec3_Normalize(vLook, vLook);
+        LLMath_Normalize3(vLook, vLook);
     }
     lbl_80281900->f3F8 =
         (vLook[1] - lbl_80281900->f400) / (lbl_80281900->f3FC - lbl_80281900->f400);
@@ -684,7 +684,7 @@ void fn_8011F7F8(void) {
     }
     vFlat[1] = 0.0f;
     if (vFlat[0] != 0.0f || vFlat[1] != 0.0f || vFlat[2] != 0.0f) {
-        Vec3_Normalize(vFlat, vFlat);
+        LLMath_Normalize3(vFlat, vFlat);
     }
     Vec_Copy(pLens->m4[3], vPos);
     Vec_Scale(lbl_80281900->f3EC, vFlat, vAhead);
@@ -727,7 +727,7 @@ void fn_8011F7F8(void) {
                 continue;
             }
             Vec3Copy(&pSphere->x, vSphere);
-            fn_8011F544(nX, nZ, nCull, Vec3_DistanceSq(vSphere, vPos));
+            fn_8011F544(nX, nZ, nCull, LLMath_SquareDistanceBetween3(vSphere, vPos));
         }
     }
     // port: fn_8011E6B0 compares two GrassBuffer pointers' f8 (the larger first)

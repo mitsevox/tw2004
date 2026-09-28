@@ -436,7 +436,7 @@ void fn_80030CC8(void* pHoleData) {
                     iRenderPass = 0;
                 }
                 fRadius = fn_800354C4(pMesh)[3];
-                fDist = vec4flt_DistanceBetween3(lbl_801D3CB0.xCameraReferencePos, fn_800354C4(pMesh))
+                fDist = LLMath_DistanceBetween3(lbl_801D3CB0.xCameraReferencePos, fn_800354C4(pMesh))
                         - fRadius;
                 if (fDist < 0.0f) {
                     fDist = 0.0f;
@@ -959,8 +959,8 @@ u8 fn_80032330(UObjMesh* pModel) {
     int i;
 
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        if (Vec3_DistanceSq(gPlayers[i].ball.vPos, gPlayers[i].ball.vStart) > 0.0f
-            && Vec3_DistanceSq(pSphere, gPlayers[i].ball.vPos) < fRadiusSq
+        if (LLMath_SquareDistanceBetween3(gPlayers[i].ball.vPos, gPlayers[i].ball.vStart) > 0.0f
+            && LLMath_SquareDistanceBetween3(pSphere, gPlayers[i].ball.vPos) < fRadiusSq
             && gPlayers[i].ball.nCollideCount != 0 && gPlayers[i].ball.fSpeed < 10.0f) {
             return 1;
         }
@@ -2262,7 +2262,7 @@ void fn_80034F28(void* pUnused) {
         pPatch = &lbl_801D3CB0.pPatchList[i];
         if ((pPatch->n1C & 0x80) || (Ter_GetMeshFlags(fn_8003556C(pPatch->pGround), 3) & 8)) {
             fRadius = fn_800354C4(fn_8003556C(pPatch->pGround))[3];
-            fDist = vec4flt_DistanceBetween3(lbl_801D3CB0.xCameraReferencePos,
+            fDist = LLMath_DistanceBetween3(lbl_801D3CB0.xCameraReferencePos,
                                              fn_800354C4(fn_8003556C(pPatch->pGround)))
                     - fRadius;
             if (fDist < 0.0f) {

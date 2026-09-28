@@ -763,7 +763,7 @@ u8 Physics_GetShotData(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, 
         fSpeed *= 7.2f;
         Vec3_Scale(fSpeed, pB, vDir);
         Ball_RotatePair(&vDir[0], &vDir[2], fSinAim, fCosAim);
-        Vec3_Normalize(vNormal, vNormal);
+        LLMath_Normalize3(vNormal, vNormal);
         fn_8000C5D4(vDir, vNormal, -Vec3_Dot(vDir, vNormal), pVel);
         Vec3_Scale(1.8f, pVel, pVel);
         pSpin[0] = 0.0f;
@@ -1017,7 +1017,7 @@ void Ball_FlightStep(Ball* pBall, f32 fTicks) {
     if (!gSimulating || gSimFullCup) {
         Vec_Copy(PIN(pBall), vPin);
         vPin[1] += BALL_RADIUS;
-        if (vec4flt_DistanceBetween3(vPin, pBall->vPos) < 0.0625f) {
+        if (LLMath_DistanceBetween3(vPin, pBall->vPos) < 0.0625f) {
             vAccel[1] -= 0.214340001f;
         }
     }
@@ -1112,7 +1112,7 @@ void Physics_BallRollingandSlipping(Ball* pBall, f32 fTicks) {
     f32          fPull, fDot, fFric;
     if (!Physics_GetSurfaceInfo(pBall, &pSurface, vNormal)) return;
     pBall->nSurface = fn_80050BEC(pSurface);
-    Vec3_Normalize(vNormal, vNormal);
+    LLMath_Normalize3(vNormal, vNormal);
     fPull = 1.0f - pSurface->f14;
     if (pSurface->nClass == 3) {
         fPull *= 2.0f - gGreenSpeedMul[gGreenSpeedSetting];
@@ -1131,7 +1131,7 @@ void Physics_BallRollingandSlipping(Ball* pBall, f32 fTicks) {
     vAccel[1] = fPull * (-0.107170001f - vNormal[1] * fDot);
     vAccel[2] = -(fPull * (vNormal[2] * fDot));
     fn_8000C5D4(pBall->vVel, vNormal, -Vec3_Dot(pBall->vVel, vNormal), vTmp);
-    Vec3_Normalize(vTmp, vDir);
+    LLMath_Normalize3(vTmp, vDir);
     Vec3_Scale(Math_Sqrt(Vec3_LengthSqClamped(pBall->vVel)), vDir, pBall->vVel);
     fFric = 1.5f * (pSurface->f18 * (-0.107170001f * vNormal[1]));
     if (pSurface->nClass == 3) {
@@ -1277,13 +1277,13 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, SurfaceType* pSurface) {
     } else if (fT != 0.0f) {
         fn_8000C5D4(pNormal, vBent, fA / fT, pNormal);
     }
-    Vec3_Normalize(pNormal, pNormal);
+    LLMath_Normalize3(pNormal, pNormal);
     Vec3_Scale(-0.839999974f, pNormal, vDown);
     vec4flt_CrossProduct(pBall->vSpin, vDown, vCon);
     fn_80055E7C(vCon, pBall->vVel, vCon);
     fn_8000C5D4(vCon, pNormal, -Vec3_Dot(vCon, pNormal), vSlide);
     if (Vec3_LengthSqClamped(vSlide) != 0.0f) {
-        Vec3_Normalize(vSlide, vDir);
+        LLMath_Normalize3(vSlide, vDir);
     } else {
         Vec3Copy(pNormal, vDir);
     }
@@ -1451,13 +1451,13 @@ u8 fn_80053240(Ball* pBall, f32 fTicks) {
     vFrom[1] -= BALL_RADIUS;
     Vec3Copy(pBall->vPos, vTo);
     vTo[1] -= BALL_RADIUS;
-    if (Vec3_DistanceSq(vTo, pBall->vStart) > 360000.0f) {
+    if (LLMath_SquareDistanceBetween3(vTo, pBall->vStart) > 360000.0f) {
         Physics_OutOfBounds(pBall, 1);
         return 0;
     }
     if (pBall->nSurface < 0 || pBall->nSurface >= 156) return 0;
     pSurface = &gSurfaceTypes[pBall->nSurface];
-    if (Vec3_DistanceSq(PIN(pBall), pBall->vPos) > 11.1111107f) {
+    if (LLMath_SquareDistanceBetween3(PIN(pBall), pBall->vPos) > 11.1111107f) {
         if (!fn_8004FF34(pBall->pCourse, vFrom, vTo, vHit, vNormal, &pSurface, &pObj)) return 0;
     } else {
         if (!Ter_CheckForPinCollision(pBall->pCourse, pBall->nPlayer, vFrom, vTo, vHit, vNormal, &pSurface,
@@ -1469,7 +1469,7 @@ u8 fn_80053240(Ball* pBall, f32 fTicks) {
     if (0.375f != pSurface->f1C) {
         pSurface = &gSurfaceTypes[14];
     }
-    Vec3_Normalize(vNormal, vNormal);
+    LLMath_Normalize3(vNormal, vNormal);
     if (pSurface->f0C >= 0.0f) {
         Vec3Copy(vHit, pBall->vPos);
         pBall->vPos[1] += 0.027055556f;
@@ -1692,19 +1692,19 @@ u8 Physics_ProcessCollision(Ball* pBall, f32* pHit, f32* pNormal, SurfaceType* p
         if (r & 31) {
             nB = -nB;
         }
-        Vec3_Normalize(pNormal, pNormal);
+        LLMath_Normalize3(pNormal, pNormal);
         fn_80055E28(0.017453292f * nA, &fSin, &fCos);
         Ball_RotatePair(&pNormal[0], &pNormal[1], fSin, fCos);
         fn_80055E28(0.017453292f * nB, &fSin, &fCos);
         Ball_RotatePair(&pNormal[2], &pNormal[1], fSin, fCos);
     }
-    Vec3_Normalize(pNormal, pNormal);
+    LLMath_Normalize3(pNormal, pNormal);
     pHit[1] += BALL_RADIUS;
     if (pNormal[1] > 0.0f) {
         pHit[1] += 0.0013888889f;
     }
-    fPrev = vec4flt_DistanceBetween3(pBall->vPrev, pBall->vPos);
-    fNow  = vec4flt_DistanceBetween3(pBall->vPrev, pHit);
+    fPrev = LLMath_DistanceBetween3(pBall->vPrev, pBall->vPos);
+    fNow  = LLMath_DistanceBetween3(pBall->vPrev, pHit);
     if (fPrev <= 2.77777799e-05f) {
         fPrev = 2.77777799e-05f;
     }
@@ -1923,7 +1923,7 @@ u8 Physics_CheckTerrainCollisions(Ball* pBall, f32 fTicks) {
     vFrom[1] -= BALL_RADIUS;
     Vec3Copy(pBall->vPos, vTo);
     vTo[1] -= BALL_RADIUS;
-    if (Vec3_DistanceSq(vTo, pBall->vStart) > 360000.0f) {
+    if (LLMath_SquareDistanceBetween3(vTo, pBall->vStart) > 360000.0f) {
         Physics_OutOfBounds(pBall, 1);
         return 0;
     }
@@ -1950,7 +1950,7 @@ u8 Physics_CheckTerrainCollisions(Ball* pBall, f32 fTicks) {
         Vec3Copy(pBall->vPos, pBall->vFirstSandPos);
     }
     if (pSurface->nClass == 12 || pSurface->nClass == 18 ||
-        (nIndex == 90 && vec4flt_DistanceBetween3(pBall->vPos, PIN(pBall)) < 2.0f)) {
+        (nIndex == 90 && LLMath_DistanceBetween3(pBall->vPos, PIN(pBall)) < 2.0f)) {
         if (pBall->pCourse->pin[Game_CurrentPinSet()].y - pBall->vPos[1] > 0.0694444478f) {
             Physics_ForceBallInHole(pBall);
             return 1;
@@ -2002,7 +2002,7 @@ u8 Physics_CheckTerrainCollisions(Ball* pBall, f32 fTicks) {
 f32 Ball_DistanceToPin(f32* pPos) {
     CourseInfo* pCourse = Ter_GetTGD();
     if (pCourse != NULL) {
-        return vec4flt_DistanceBetween3(pPos, &pCourse->pin[Game_CurrentPinSet()].x);
+        return LLMath_DistanceBetween3(pPos, &pCourse->pin[Game_CurrentPinSet()].x);
     }
     return 1000.0f;
 }
@@ -2024,15 +2024,15 @@ void Ball_CupPull(Ball* pBall, f32 fDt) {
     f32 vPin[3];
     f32 fDist;
 
-    fDist = vec4flt_DistanceBetween3(PIN(pBall), (f32*)pBall);
+    fDist = LLMath_DistanceBetween3(PIN(pBall), (f32*)pBall);
     if (fDist >= INCHES(5.5f)) return;
     Vec_Copy(PIN(pBall), vPin);
     vPin[1] += BALL_RADIUS;
     {
-        f32 fStartDist = vec4flt_DistanceBetween3(pBall->vStart, vPin);
+        f32 fStartDist = LLMath_DistanceBetween3(pBall->vStart, vPin);
         f32 fAngle, fK, fPull;
         if (fStartDist < INCHES(6.0f)) return;
-        if (vec4flt_DistanceBetween3(pBall->vStart, (f32*)pBall) > fStartDist - INCHES(1.5f)) return;
+        if (LLMath_DistanceBetween3(pBall->vStart, (f32*)pBall) > fStartDist - INCHES(1.5f)) return;
 
         fAngle = atan2f(pBall->vPos[0] - pBall->vPrev[0], pBall->vPos[2] - pBall->vPrev[2]);
         fAngle = fabsf(fAngle - atan2f(vPin[0] - pBall->vPos[0], vPin[2] - pBall->vPos[2]));
@@ -2094,15 +2094,15 @@ void Ball_GroundContact(Ball* pBall, f32 fTicks) {
     if (!Physics_GetSurfaceInfo(pBall, &pSurface, vNormal)) return;
     pBall->nSurface = fn_80050BEC(pSurface);
     if (pSurface->nClass == 12 || pSurface->nClass == 18 ||
-        (pBall->nSurface == 90 && vec4flt_DistanceBetween3(pBall->vPos, PIN(pBall)) < 2.0f)) {
+        (pBall->nSurface == 90 && LLMath_DistanceBetween3(pBall->vPos, PIN(pBall)) < 2.0f)) {
         if (pBall->pCourse->pin[Game_CurrentPinSet()].y - pBall->vPos[1] > 0.055555556f) {
             Physics_ForceBallInHole(pBall);
             return;
         }
     }
-    Vec3_Normalize(vNormal, vNormal);
+    LLMath_Normalize3(vNormal, vNormal);
     fn_8000C5D4(pBall->vVel, vNormal, -Vec3_Dot(pBall->vVel, vNormal), vTmp);
-    Vec3_Normalize(vTmp, vDir);
+    LLMath_Normalize3(vTmp, vDir);
     Vec3_Scale(Math_Sqrt(Vec3_LengthSqClamped(pBall->vVel)), vDir, pBall->vVel);
     Vec3_Scale(-0.839999974f, vNormal, vDown);
     fZ   = -0.173615396f * vDown[2];
@@ -2225,7 +2225,7 @@ f32 Physics_GetBallAltitude(Ball* pBall) {
     if (fHeight < -60000.0f) {
         Vec_Copy(PIN(pBall), vPin);
         vPin[1] += BALL_RADIUS;
-        if (vec4flt_DistanceBetween3(vPin, pBall->vPos) < 2.66666675f) {
+        if (LLMath_DistanceBetween3(vPin, pBall->vPos) < 2.66666675f) {
             pBall->vPos[1]  = 0.0013888889f + (BALL_RADIUS + fHeight2);
             pBall->nSurface = -1;
             return 0.0f;
@@ -2280,7 +2280,7 @@ void Physics_QuickSimulate(Ball* pBall, f32 fTicks) {
         }
         pBall->fTimeSinceLastCheck += 0.0166666675f * fTicks;
         if (pBall->fTimeSinceLastCheck > 4.0f) {
-            fDist = vec4flt_DistanceBetween3(pBall->vStart, pBall->vPos);
+            fDist = LLMath_DistanceBetween3(pBall->vStart, pBall->vPos);
             if (fabsf(fDist - pBall->fLastDistFromInitShotPos) < 0.111111112f) {
                 Physics_StopBall(pBall);
             } else {

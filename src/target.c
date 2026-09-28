@@ -185,13 +185,13 @@ void TARGET_RenderBallTarget(int nPlayer) {
     pView = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
     pCamPos = CameraController_GetPosition(pView);
     pLook = CameraController_GetTarget(pView);
-    fCamDist = vec4flt_DistanceBetween3(pCamPos, vPos);
+    fCamDist = LLMath_DistanceBetween3(pCamPos, vPos);
     fn_8006A964(pLook, pCamPos, vDir);
     vDir[1] = 0.0f;
     if (0.0f == vDir[0] && 0.0f == vDir[2]) {
         return;
     }
-    Vec3_Normalize(vDir, vDir);
+    LLMath_Normalize3(vDir, vDir);
     fDot = Vec3_Dot(vUp, vDir);
     vec4flt_CrossProduct(vDir, vUp, vCross);
     fCos = (fDot < -1.0f) ? -1.0f : ((fDot > 1.0f) ? 1.0f : fDot);
@@ -990,13 +990,13 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
     pView = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
     pCamPos = CameraController_GetPosition(pView);
     pLook = CameraController_GetTarget(pView);
-    vec4flt_DistanceBetween3(pCamPos, vPos);
+    LLMath_DistanceBetween3(pCamPos, vPos);
     fn_8006A964(pLook, pCamPos, vDir);
     vDir[1] = 0.0f;
     if (0.0f == vDir[0] && 0.0f == vDir[2]) {
         return;
     }
-    Vec3_Normalize(vDir, vDir);
+    LLMath_Normalize3(vDir, vDir);
     fDot = Vec3_Dot(vUp, vDir);
     vec4flt_CrossProduct(vDir, vUp, vCross);
     fCos = (fDot < -1.0f) ? -1.0f : ((fDot > 1.0f) ? 1.0f : fDot);
@@ -1023,7 +1023,7 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
     fHalfFov = 0.75f * fHalfFov * fn_8001414C((u8*)fn_8003526C());
     fn_8006A964(pView->v10, pView->v0, vDir);
     if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
-        Vec3_Normalize(vDir, vDir);
+        LLMath_Normalize3(vDir, vDir);
     }
     fn_8006A964(vPos, pView->v0, vRel);
     fDotX = vDir[0] * vRel[0];
@@ -1130,7 +1130,7 @@ void PlaceBall_SetupTarget(int nPlayer) {
 
     fn_8006A988(gPlayers[nPlayer].vPlacement, gpGame->p130, vDir);
     vDir[1] = 0.0f;
-    Vec_Normalize(vDir, vDir);
+    LLMath_Normalize(vDir, vDir);
     gPlayers[nPlayer].fA88 = atan2f(vDir[2], vDir[0]) - PI / 2.0f;
     lbl_801D5BF0[nPlayer].f0 = 0.01f;
     lbl_801D5BF0[nPlayer].f4 = 0.0f;

@@ -229,7 +229,7 @@ void fn_800985FC(GlowQueue* pQueue, f32 (*pMtx)[4], int bOnTop) {
             v.y = pGlow->vPos[1];
             v.z = pGlow->vPos[2];
             v.w = 1.0f;
-            Mtx_MultVec4(pMtx, &v, &v);
+            LLMath_mat44fltMultiply(pMtx, &v, &v);
             if (v.z > 0.0f) {
                 fn_80098408(pGlow, &v.x);
             }

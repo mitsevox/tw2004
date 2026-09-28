@@ -1016,7 +1016,7 @@ void STATEFUNC_GreenWatchRollUpdate(int nPlayer) {
             int nPinSet = Game_CurrentPinSet();
             if (gPlayers[nPlayer].ballBefore.fClosest < 0.5f ||
                 gPlayers[nPlayer].ballBefore.fClosest <
-                    vec4flt_DistanceBetween3(gPlayers[nPlayer].ballBefore.vPos, &pCourse->pin[nPinSet].x)
+                    LLMath_DistanceBetween3(gPlayers[nPlayer].ballBefore.vPos, &pCourse->pin[nPinSet].x)
                             - 0.1f) {
                 CameraController_FadeOut(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]),
                                          0.25f, (f32*)&vOffset);
@@ -1696,7 +1696,7 @@ void STATEFUNC_RemoveBallUpdate(int nPlayer) {
                     fn_80062DDC(pB->vPos, pPrev, vDir);
                     fSpeed = (f32)Math_Sqrt(Vec3_LengthSqClamped(vDir));
                     if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
-                        Vec3_Normalize(vDir, vDir);
+                        LLMath_Normalize3(vDir, vDir);
                     }
                     fSpeed = 60.0f * (60.0f * (FRAME_RATE * (fSpeed / 1760.0f)));
                     fSpeed = fSpeed / 2.0f;

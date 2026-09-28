@@ -61,7 +61,7 @@ void fn_8004858C(f32* pOut, f32 fTurn, f32 fTilt);
 void fn_8000C5A4(f32 (*pMtx)[4]);
 void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
 void Mtx_Copy(f32 (*pSrc)[4], f32 (*pDst)[4]);
-void Mtx_MultVec4Array(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
+void LLMath_mat44fltMultiplyList(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void Mtx_CopyRotation(f32 (*pSrc)[4], f32 (*pDst)[4]);        // copies three rows
 void fn_80048680(f32* pA, f32* pB, f32* pOut);
 void fn_800486A4(f32* pA, f32* pB, f32* pOut);
@@ -497,7 +497,7 @@ void fn_80046E1C(f32* pPos, int nPlayer) {
     Mtx_Identity(mTurn);
     Mtx_Identity(lbl_80281DA0->apPlayer[nPlayer]->obj.m0);
     mat44flt_EulerAngles(mTurn, -gPlayers[nPlayer].fAim, 0.0f, 0.0f);
-    Mtx_MultVec4Array(lbl_80281DA0->apPlayer[nPlayer]->obj.m0, mTurn, mObj, 4);
+    LLMath_mat44fltMultiplyList(lbl_80281DA0->apPlayer[nPlayer]->obj.m0, mTurn, mObj, 4);
     Mtx_Copy(mObj, lbl_80281DA0->apPlayer[nPlayer]->obj.m0);
     Vec_Copy(vPos, lbl_80281DA0->apPlayer[nPlayer]->obj.m80[3]);
     fn_8000C5A4(lbl_80281DA0->apPlayer[nPlayer]->obj.m0);
@@ -638,7 +638,7 @@ void fn_8004731C(u8* pState) {
                 Quat_QuatToMatrix(gPlayers[i].vOrient, pLogoB->m0);
             }
         }
-        fDist = Vec3_DistanceSq(Camera_GetCurrentLens()->m4[3], gPlayers[i].ball.vPos);
+        fDist = LLMath_SquareDistanceBetween3(Camera_GetCurrentLens()->m4[3], gPlayers[i].ball.vPos);
         if (fDist > 2500.0f) {
             fn_80048584(pBall, 2);
             if (pLogoA != NULL) {
@@ -771,12 +771,12 @@ f32 fn_8004787C(int nPlayer) {
     fRadius = lbl_80281DA0->pTeo10000->pModel->apLod[0]->pInfo->f64 * lbl_80281128;
     Vec_Copy(gPlayers[nPlayer].ball.vPos, &vPos.x);
     vPos.w = 1.0f;
-    Mtx_MultVec4(pLens->m44, &vPos, &vAbove);
+    LLMath_mat44fltMultiply(pLens->m44, &vPos, &vAbove);
     Vec_Copy(&vAbove.x, &vBelow.x);
     vAbove.y += fRadius;
     vBelow.y -= fRadius;
-    Mtx_MultVec4(pCamera->m5C, &vAbove, &vTop);
-    Mtx_MultVec4(pCamera->m5C, &vBelow, &vBottom);
+    LLMath_mat44fltMultiply(pCamera->m5C, &vAbove, &vTop);
+    LLMath_mat44fltMultiply(pCamera->m5C, &vBelow, &vBottom);
     if (0.0f != vTop.w) {
         Vec_Scale(1.0f / vTop.w, &vTop.x, &vTop.x);
     }
@@ -870,7 +870,7 @@ void fn_80047C24(int nPlayer) {
     if (pB->bF5) {
         Mtx_Identity(pB->mB0);
         mat44flt_EulerAngles(pB->mB0, pB->fC, 0.0f, 0.0f);
-        Mtx_MultVec4Array(pB->pF0->obj.m0, pB->mB0, mTmp, 4);
+        LLMath_mat44fltMultiplyList(pB->pF0->obj.m0, pB->mB0, mTmp, 4);
         Mtx_Copy(mTmp, pB->pF0->obj.m0);
         fn_8000C5A4(pB->pF0->obj.m0);
         Vec_Copy(pB->v20, pB->v30);
@@ -1011,7 +1011,7 @@ void fn_80048184(int nPlayer) {
             pA->fC = -gPlayers[nPlayer].fAim + Misc_RandFuncf(1) - 0.5f;
             Mtx_Identity(pA->mB4);
             mat44flt_EulerAngles(pA->mB4, pA->fC, 0.0f, 0.0f);
-            Mtx_MultVec4Array(pA->pF4->obj.m0, pA->mB4, mTmp, 4);
+            LLMath_mat44fltMultiplyList(pA->pF4->obj.m0, pA->mB4, mTmp, 4);
             Mtx_Copy(mTmp, pA->pF4->obj.m0);
             fn_8000C5A4(pA->pF4->obj.m0);
             Vec_Copy(pA->v20, pA->v30);

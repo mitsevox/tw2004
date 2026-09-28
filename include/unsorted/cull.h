@@ -69,7 +69,7 @@ LAYOUT_ASSERT(Camera, 0x234);       // GoRenderCtx_Gc.c RC_spCreateRenderCtx all
 GoFrameBuf* fn_80013E40(Camera* pCamera);   // GoRenderCtx_Gc.c: the camera's frame buffer
 
 Sphere* fn_800082F8(RenderObj* obj);
-void Mtx_MultVec4(float mtx[4][4], Vec4* src, Vec4* dst);
+void LLMath_mat44fltMultiply(float mtx[4][4], Vec4* src, Vec4* dst);
 int fn_80007D74(Sphere* sphere, Camera* cam, int mode);
 float fn_80008320(Camera* cam);
 float fn_80008328(Camera* cam);

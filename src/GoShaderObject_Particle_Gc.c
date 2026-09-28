@@ -192,7 +192,7 @@ void fn_80094534(f32 (*pMtx)[4], ParticleShape* pShape, ParticleVertex* pVerts, 
         fDiff = fA - pShape->v60[2] * pShape->f54;
         fA = pShape->v60[2] * t + pVerts->v0[2];
         v.z = fA + fDiff - (1.0f / fEase) * fDiff;
-        Mtx_MultVec4(pMtx, &v, &v);
+        LLMath_mat44fltMultiply(pMtx, &v, &v);
         if (v.z > 0.0f) {
             fSize = pShape->f48 * t + pVerts->f20;
             fSize = (fSize <= pShape->f4C) ? fSize : pShape->f4C;
@@ -379,7 +379,7 @@ void fn_80094B84(SD_SShaderObject_Static* pObject, ParticleMsg* pMsg) {
     *pMsg->u.age.pnLive = nLive;
 }
 
-void Mtx_MultVec3(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // VecMath.c: a vector through a matrix
+void LLMath_mat44fltMultiply33(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // VecMath.c: a vector through a matrix
 
 // Emits pMsg's particles after the live ones of the buffer not being drawn (at most as many as
 // fit, less one). Their ages run from fAgeSpread down; unless the settings' flag 0x1000 keeps a
@@ -424,13 +424,13 @@ void fn_80094E34(SD_SShaderObject_Static* pObject, ParticleMsg* pMsg) {
             v.y = pVert->v0[1];
             v.z = pVert->v0[2];
             v.w = 1.0f;
-            Mtx_MultVec4(pMsg->u.emit.pMtx, &v, &v);
+            LLMath_mat44fltMultiply(pMsg->u.emit.pMtx, &v, &v);
             Vec3Copy(&v.x, pVert->v0);
             v.x = pVert->vC[0];
             v.y = pVert->vC[1];
             v.z = pVert->vC[2];
             v.w = 1.0f;
-            Mtx_MultVec3(pMsg->u.emit.pMtx, &v.x, &v.x);
+            LLMath_mat44fltMultiply33(pMsg->u.emit.pMtx, &v.x, &v.x);
             Vec3Copy(&v.x, pVert->vC);
             // the next three slots get copies of it
             Mem_cpy(pVert + 1, pVert, sizeof(ParticleVertex));

@@ -93,7 +93,7 @@ void fn_800BAB80(int nPlayer) {
     pLens = Camera_GetLens(RC_spGetCurrentRenderCtx());
     pBall = &gPlayers[nPlayer].ball;
     nView = gPlayers[nPlayer].nView[0];
-    fScale = lbl_80281518->fDistScale * vec4flt_DistanceBetween3(pLens->m4[3], pBall->vPos);
+    fScale = lbl_80281518->fDistScale * LLMath_DistanceBetween3(pLens->m4[3], pBall->vPos);
     for (i = 0; i < 2; i++) {
         Vec3Copy(pBall->vPos, lbl_80281518->aGlow[nView][i].vPos);
         lbl_80281518->aGlow[nView][i].fScale = fScale;

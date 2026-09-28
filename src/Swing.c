@@ -810,7 +810,7 @@ void fn_8005A0FC(int nPlayer) {
             Vec_Sub(v18, v28, v8);
             if (v8[0] != 0.0f || v8[1] != 0.0f || v8[2] != 0.0f || v8[3] != 0.0f) {
                 v8[3] = 0.0f;
-                Vec_Normalize(v8, v8);
+                LLMath_Normalize(v8, v8);
             }
             Vec3_Scale(fLen, v8, v8);
             Vec_Add(v8, v28, v8);
@@ -1318,7 +1318,7 @@ void Swing_FaceVector(int nPlayer, f32* pOut) {
         pOut[2] = 1.0f;
         pOut[3] = 0.0f;
     }
-    Vec_Normalize(pOut, pOut);
+    LLMath_Normalize(pOut, pOut);
 }
 
 // The second launch block: a CPU's (or a perfect shot's) shape vector; square for a human.
@@ -1404,10 +1404,10 @@ f32 fn_8005BA94_MishitAngle(int nPlayer) {
     vThrough[2] = fCentreY - fImpactY;
     vThrough[3] = 0.0f;
     if (0.0f != vThrough[0] || 0.0f != vThrough[2]) {
-        Vec_Normalize(vThrough, vThrough);
+        LLMath_Normalize(vThrough, vThrough);
     }
     if (0.0f != vBack[0] || 0.0f != vBack[2]) {
-        Vec_Normalize(vBack, vBack);
+        LLMath_Normalize(vBack, vBack);
     }
     Vec_Sub(vThrough, vBack, vDiff);
     Vec_Add(vDir, vDiff, vDir);

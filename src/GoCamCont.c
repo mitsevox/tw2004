@@ -464,16 +464,16 @@ void fn_80063920(int nView, f32* pBounds) {
     fn_80064478(vObj, pPos, vToObj);
     vToObj[1] = 0.0f;
     if (vToObj[0] != 0.0f || vToObj[1] != 0.0f || vToObj[2] != 0.0f) {
-        Vec3_Normalize(vToObj, vToObj);
+        LLMath_Normalize3(vToObj, vToObj);
     }
     if (vMove[0] != 0.0f || vMove[1] != 0.0f || vMove[2] != 0.0f) {
-        Vec3_Normalize(vMove, vMove);
+        LLMath_Normalize3(vMove, vMove);
     }
     fMoveCos = Vec3_Dot(vMove, vToObj);
     fn_80064478(pAt, pPos, vLook);
     vLook[1] = 0.0f;
     if (vLook[0] != 0.0f || vLook[1] != 0.0f || vLook[2] != 0.0f) {
-        Vec3_Normalize(vLook, vLook);
+        LLMath_Normalize3(vLook, vLook);
     }
     fLookCos = Vec3_Dot(vLook, vToObj);
     if (fSpeed <= 0.0f) {
@@ -599,14 +599,14 @@ void fn_80063F08(f32* pA, f32* pB, f32* pOut) {
         return;
     }
     if (pA[0] != 0.0f || pA[1] != 0.0f || pA[2] != 0.0f) {
-        Vec3_Normalize(pA, vA);
+        LLMath_Normalize3(pA, vA);
     } else {
         vA[0] = 0.0f;
         vA[1] = 0.0f;
         vA[2] = 0.0f;
     }
     if (pB[0] != 0.0f || pB[1] != 0.0f || pB[2] != 0.0f) {
-        Vec3_Normalize(pB, vB);
+        LLMath_Normalize3(pB, vB);
     } else {
         vB[0] = 0.0f;
         vB[1] = 0.0f;
@@ -618,7 +618,7 @@ void fn_80063F08(f32* pA, f32* pB, f32* pOut) {
     fAngle *= 0.2f;
     vec4flt_CrossProduct(vA, vB, vAxis);
     if (vAxis[0] != 0.0f || vAxis[1] != 0.0f || vAxis[2] != 0.0f) {
-        Vec3_Normalize(vAxis, vAxis);
+        LLMath_Normalize3(vAxis, vAxis);
     }
     Vec3_Scale(fAngle, vAxis, vAxis);
     Quat_BuildFromVector(vAxis, qTurn);
@@ -640,7 +640,7 @@ void fn_80064108(View* pView) {
         vDir[0] = 0.01f;
     }
     if (vDir[0] != 0.0f || vDir[1] != 0.0f || vDir[2] != 0.0f) {
-        Vec3_Normalize(vDir, vDir);
+        LLMath_Normalize3(vDir, vDir);
     }
     vec4flt_CrossProduct(vUp, vDir, vSide);
     if (pView->script.pShot == NULL) {
@@ -684,7 +684,7 @@ u8 fn_8006434C(void* pCamera, f32* pPos, f32* pX, f32* pY, f32* pZ) {
     u8 bInFront = 1;
 
     pPos[3] = 1.0f;
-    Mtx_MultVec4(((Camera*)pCamera)->mDC, (Vec4*)pPos, (Vec4*)v);
+    LLMath_mat44fltMultiply(((Camera*)pCamera)->mDC, (Vec4*)pPos, (Vec4*)v);
     if (v[3] >= 0.0f) {
         bInFront = 0;
     }

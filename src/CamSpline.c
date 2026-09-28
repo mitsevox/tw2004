@@ -1,5 +1,5 @@
 // CamSpline.c (our name): the spline paths the scripted, static and dynamic cameras move along
-// (a Catmull-Rom basis matrix in lbl_80191440 applied with VecMath.c's Mtx_MultVec4).
+// (a Catmull-Rom basis matrix in lbl_80191440 applied with VecMath.c's LLMath_mat44fltMultiply).
 
 #include "game_types.h"
 #include "engine.h"
@@ -105,8 +105,8 @@ void fn_800C7480(f32* pPos0, f32* pPos1, f32* pPos2, f32* pPos3, f32* pLook0, f3
     aPoints[1][3] = 0.0f;
     aPoints[2][3] = 0.0f;
     aPoints[3][3] = 0.0f;
-    Mtx_MultVec4(lbl_80191440, &vT, &vWeights);
-    Mtx_MultVec4(aPoints, &vWeights, &vOut);
+    LLMath_mat44fltMultiply(lbl_80191440, &vT, &vWeights);
+    LLMath_mat44fltMultiply(aPoints, &vWeights, &vOut);
     Vec3Copy(&vOut.x, pSub);
     *pFov = fT * (fFov2 - fFov1) + fFov1;
 }
@@ -132,8 +132,8 @@ void fn_800C7898(f32* p0, f32* p1, f32* p2, f32* p3, f32* pOut, f32 fT) {
     aPoints[1][3] = 0.0f;
     aPoints[2][3] = 0.0f;
     aPoints[3][3] = 0.0f;
-    Mtx_MultVec4(lbl_80191440, &vT, &vWeights);
-    Mtx_MultVec4(aPoints, &vWeights, &vOut);
+    LLMath_mat44fltMultiply(lbl_80191440, &vT, &vWeights);
+    LLMath_mat44fltMultiply(aPoints, &vWeights, &vOut);
     Vec3Copy(&vOut.x, pOut);
 }
 
@@ -265,12 +265,12 @@ void fn_800C7D14(f32* pA, f32* pB, u8 bKeepY, u8 bRaw, f32* pOut, f32 fDist, f32
         aDir[1] = 0.0f;
     }
     if (!bRaw && (0.0f != aDir[0] || 0.0f != aDir[1] || 0.0f != aDir[2])) {
-        Vec3_Normalize(aDir, aDir);
+        LLMath_Normalize3(aDir, aDir);
     }
     fn_8000C5D4(pA, aDir, fDist, pOut);
     aDir[1] = 0.0f;
     if (0.0f != aDir[0] || 0.0f != aDir[1] || 0.0f != aDir[2]) {
-        Vec3_Normalize(aDir, aDir);
+        LLMath_Normalize3(aDir, aDir);
     }
     pOut[0] = fSide * -aDir[2] + pOut[0];
     pOut[2] = fSide * aDir[0] + pOut[2];

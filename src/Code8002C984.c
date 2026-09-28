@@ -138,7 +138,7 @@ u8 AI_GreenTowardPin(int nPlayer, f32 fDist) {
     if (0.0f == vDir[0] && 0.0f == vDir[2]) {
         return 1;
     }
-    Vec_Normalize(vDir, vDir);
+    LLMath_Normalize(vDir, vDir);
     vDir[0] = gPlayers[nPlayer].ball.vPos[0] + vDir[0] * fDist;
     vDir[2] = gPlayers[nPlayer].ball.vPos[2] + vDir[2] * fDist;
     fHeight = Ter_GetHighestGroundHeight(pCourse, vDir);
@@ -361,7 +361,7 @@ void fn_8002D560_ShapeDir(int nPlayer, f32* pOut) {
         pOut[2] = 0.96f;
         pOut[3] = 0.0f;
     }
-    Vec_Normalize(pOut, pOut);
+    LLMath_Normalize(pOut, pOut);
 }
 
 // The second launch block (vLaunchB): a CPU's shot-shape direction, a human's straight one.

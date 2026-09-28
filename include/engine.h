@@ -173,7 +173,7 @@ void Vec_Scale(f32 f, f32* pIn, f32* pOut);   // scale a vector (four floats)
 void fn_8000AE6C(f32* pA, f32* pB, f32 fScale, f32* pOut);   // out = a + fScale x b (four floats)
 double pow(double x, double y);         // 0x8015F824 (MSL)
 f32  powf(f32 x, f32 y);                // 0x8002C8D0 (Golfer.c): pow rounded to a float
-f32  Vec3_DistanceSq(f32* pA, f32* pB);     // squared distance
+f32  LLMath_SquareDistanceBetween3(f32* pA, f32* pB);     // squared distance
 void vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut);   // cross product
 
 // ---- textures --------------------------------------------------------------------------------
@@ -1446,11 +1446,11 @@ void Gaud_StopComment(void);
 void Gaud_SetSfxLevel(f32 f);                // } the options menu passes them 0.2 x options.a0[0], a0[4]
 void Gaud_SetCommentLevel(f32 f);                // } and a0[1] (FE_MessageTable.c, GameUICommands.c)
 void Gaud_SetMusicLevel(f32 f);                // }
-void Vec_Normalize(f32* pSrc, f32* pDst);
-void Vec3_Normalize(f32* pSrc, f32* pDst);   // normalise
+void LLMath_Normalize(f32* pSrc, f32* pDst);
+void LLMath_Normalize3(f32* pSrc, f32* pDst);   // normalise
 void fn_800B5918(const f32* pSrc, f32* pDst);   // GoShaderObject_Rain_Gc.c: copy three floats
-f32  Vec3_NormalizeLength(f32* pSrc, f32* pDst);   // VecMath.c: normalises pSrc into pDst, gives its length
-f32  vec4flt_DistanceBetween3(f32* pA, f32* pB);
+f32  LLMath_NormalizeReturnLength3(f32* pSrc, f32* pDst);   // VecMath.c: normalises pSrc into pDst, gives its length
+f32  LLMath_DistanceBetween3(f32* pA, f32* pB);
 void fn_800BD83C(int nSound, int a);      // SitDevFile.c: Gaud_StartComment(0, nSound, a)
 void BreakLine_Reset(int nView);
 // The EA Sports Bio, game side (EASportsBio.c; TW06's names)

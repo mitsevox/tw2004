@@ -183,7 +183,7 @@ void fn_800B4FA4(RainObject* pRain) {
                     v.y = pPoint->vPos[1];
                     v.z = pPoint->vPos[2];
                     v.w = 1.0f;
-                    Mtx_MultVec4(mView, &v, &v);
+                    LLMath_mat44fltMultiply(mView, &v, &v);
                     mPos[0][3] = -v.x;
                     mPos[1][3] = v.y;
                     mPos[2][3] = -v.z;
@@ -283,7 +283,7 @@ void fn_800B52D4(RainObject* pRain, f32* pTime) {
                 vPos.y = pPoint->vPos[1];
                 vPos.z = pPoint->vPos[2];
                 vPos.w = 1.0f;
-                Mtx_MultVec4(mView, &vPos, &vPos);
+                LLMath_mat44fltMultiply(mView, &vPos, &vPos);
                 sphere.x = vPos.x;
                 sphere.y = vPos.y;
                 sphere.z = vPos.z;

@@ -301,7 +301,7 @@ void Aud_EmiSet3DPos(u8 nId, f32* pPos, f32* pLast, u8 nView) {
                     pPos = pInst->vPos;
                 }
                 if (pInst->n28 == 0) {
-                    Mtx_MultVec4(pLens->m44, (Vec4*)pPos, &vRel);
+                    LLMath_mat44fltMultiply(pLens->m44, (Vec4*)pPos, &vRel);
                     pRel = &vRel.x;
                 } else if (i == nView) {
                     pRel = pPos;

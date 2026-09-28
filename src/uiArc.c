@@ -294,7 +294,7 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
             aUV[3][1] *= vPictUV[1];
         }
         for (j = 0; j < 4; j++) {
-            Mtx_MultVec4(pMtx->m, &aPos[j], &aOut[j]);
+            LLMath_mat44fltMultiply(pMtx->m, &aPos[j], &aOut[j]);
             fProj = fDist / (fDist + aOut[j].z);
             aOut[j].x *= fProj;
             aOut[j].y *= fProj;

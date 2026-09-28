@@ -29,7 +29,7 @@ void     fn_80038010(u8 a, int n, f32* pVec);
 void     fn_800380A8(u8 a, f32* pVec, u8 b, int nSlot, f32 f1, f32 f2);
 int      fn_800636EC(void);
 void     mat44flt_EulerAngles(f32 (*m)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
-void     Mtx_MultVec3(f32 (*m)[4], f32* pIn, f32* pOut);  // a vector through a matrix
+void     LLMath_mat44fltMultiply33(f32 (*m)[4], f32* pIn, f32* pOut);  // a vector through a matrix
 void     fn_800636B4(int nPlayer);
 void     GolfCamera_ClampLookAngle(f32* pFrom, f32* pTo, f32* pOut);
 int      fn_800C4D2C(f32* pFrom, f32* pTo, f32* pOut, f32 fMax);
@@ -203,7 +203,7 @@ void GolfCamera_InitZoomToAimCamera(View* pView, int nPlayer) {
     if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_SHOT_SETUP) {
         GolfCam_Vec3Sub(pSub, pCam, vDir);
         if (vDir[0] != 0.0f || vDir[1] != 0.0f || vDir[2] != 0.0f) {
-            Vec3_Normalize(vDir, vDir);
+            LLMath_Normalize3(vDir, vDir);
         }
         GolfCam_Vec3Sub(vAim, pCam, v);
         Vec3_Scale(Math_Sqrt(Vec3_LengthSqClamped(v)), vDir, vDir);
@@ -271,7 +271,7 @@ void GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer) {
         vCreep[1] = 0.0f;
         fSlow = Math_Sqrt(Vec3_LengthSqClamped(vCreep));
         if (vCreep[0] != 0.0f || vCreep[1] != 0.0f || vCreep[2] != 0.0f) {
-            Vec3_Normalize(vCreep, vCreep);
+            LLMath_Normalize3(vCreep, vCreep);
         }
         fSlow /= lbl_80281F78->f18;
         Vec3_Scale(fSlow, vCreep, vCreep);
@@ -300,7 +300,7 @@ void GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer) {
             fSlow = fDist;
         }
         if (vMove[0] != 0.0f || vMove[1] != 0.0f || vMove[2] != 0.0f) {
-            Vec3_Normalize(vMove, vMove);
+            LLMath_Normalize3(vMove, vMove);
         }
         Vec3_Scale(fSlow, vMove, vMove);
         fn_800C73B8(vMove, pCam, pCam);
@@ -466,7 +466,7 @@ void GolfCamera_InitGreenZoomToAimCamera(View* pView, int nPlayer) {
         if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_SHOT_SETUP) {
             GolfCam_Vec3Sub(pSub, pCam, vDir);
             if (vDir[0] != 0.0f || vDir[1] != 0.0f || vDir[2] != 0.0f) {
-                Vec3_Normalize(vDir, vDir);
+                LLMath_Normalize3(vDir, vDir);
             }
             GolfCam_Vec3Sub(vAim, pCam, v);
             Vec3_Scale(Math_Sqrt(Vec3_LengthSqClamped(v)), vDir, vDir);
@@ -550,7 +550,7 @@ void GolfCamera_ProcessGreenZoomToAimCamera(View* pView, int nPlayer) {
             vCreep[1] = 0.0f;
             fSlow = Math_Sqrt(Vec3_LengthSqClamped(vCreep));
             if (vCreep[0] != 0.0f || vCreep[1] != 0.0f || vCreep[2] != 0.0f) {
-                Vec3_Normalize(vCreep, vCreep);
+                LLMath_Normalize3(vCreep, vCreep);
             }
             fSlow /= lbl_80281F78->f48;
             Vec3_Scale(fSlow, vCreep, vCreep);
@@ -597,7 +597,7 @@ void GolfCamera_ProcessGreenZoomToAimCamera(View* pView, int nPlayer) {
                 bArrived = 1;
             }
             if (vMove[0] != 0.0f || vMove[1] != 0.0f || vMove[2] != 0.0f) {
-                Vec3_Normalize(vMove, vMove);
+                LLMath_Normalize3(vMove, vMove);
             }
             Vec3_Scale(fSlow, vMove, vMove);
             fn_800C73B8(vMove, pCam, pCam);
@@ -1020,7 +1020,7 @@ void fn_800BFC80(View* pView, int nPlayer) {
         Vec_Copy(pCam, pView->v30);
         GolfCam_Vec3Sub(pSub, pCam, v);
         if (v[0] != 0.0f || v[1] != 0.0f || v[2] != 0.0f) {
-            Vec3_Normalize(v, v);
+            LLMath_Normalize3(v, v);
         }
         fn_800C73B8(pCam, v, v);
         Vec_Copy(v, pView->v40);
@@ -1196,7 +1196,7 @@ void fn_800C0414(View* pView, int nPlayer) {
             GolfCam_Vec3Sub(gPlayers[nPlayer].ballBefore.vPos, &pCourse->pin[nPinSet].x, vDir);
             vDir[1] = 0.0f;
             if (vDir[0] != 0.0f || vDir[1] != 0.0f || vDir[2] != 0.0f) {
-                Vec3_Normalize(vDir, vDir);
+                LLMath_Normalize3(vDir, vDir);
             }
             t = 1.0f - pView->script.fCamTime / fTime;
             Vec3_Scale(fOut * (t * t), vDir, vDir);
@@ -1879,7 +1879,7 @@ void GolfCamera_InitBallFlightCamera(View* pView, int nPlayer) {
         fDist *= SW_vGetShotPower(nPlayer);
         nClass = 2;
         GolfCam_Vec3Sub(gPlayers[nPlayer].vTarget, gPlayers[nPlayer].vBall, vAim);
-        Vec3_Normalize(vAim, vAim);
+        LLMath_Normalize3(vAim, vAim);
         Vec3_Scale(fDist, vAim, vAim);
         fn_800C73B8(vAim, gPlayers[nPlayer].vBall, pView->script.v50);
     }
@@ -2240,7 +2240,7 @@ void GolfCamera_ProcessPostShotCamera(View* pView, int nPlayer) {
             pView->script.fCamTime = 0.0f;
             pView->script.bCF = 0;
             mat44flt_EulerAngles(m, pSub[1], pSub[0], pSub[2]);
-            Mtx_MultVec3(m, v, pSub);
+            LLMath_mat44fltMultiply33(m, v, pSub);
             fn_800C73B8(pSub, pCam, pSub);
             CameraScript_RecordCurrentCam(&pView->shot19C, pCam, pSub, nPlayer, &pView->script, 0);
             pView->script.pShot = &pView->shot19C;
@@ -2597,7 +2597,7 @@ u8 fn_800C3FC0(View* pView, int nPlayer, f32* pSub, f32* pAim, f32* pCam) {
     vDir[1] = 0.0f;
     fDist = Math_Sqrt(Vec3_LengthSqClamped(vDir));
     if (vDir[0] != 0.0f || vDir[1] != 0.0f || vDir[2] != 0.0f) {
-        Vec3_Normalize(vDir, vDir);
+        LLMath_Normalize3(vDir, vDir);
     }
     Vec3_Scale(pView->shot19C.f60, vDir, vOff);
     fn_800C73B8(pBall, vOff, pAim);
@@ -2607,7 +2607,7 @@ u8 fn_800C3FC0(View* pView, int nPlayer, f32* pSub, f32* pAim, f32* pCam) {
     GolfCam_Vec3Sub(vTarget, pAim, vBack);
     vBack[1] = 0.0f;
     if (vBack[0] != 0.0f || vBack[1] != 0.0f || vBack[2] != 0.0f) {
-        Vec3_Normalize(vBack, vBack);
+        LLMath_Normalize3(vBack, vBack);
     }
     if (gPlayers[nPlayer].nShotKind != 0) {
         fBack = lbl_80281F78->f4;
@@ -2813,7 +2813,7 @@ void GolfCamera_ComputeSteepSlopeCamVectors(View* pView, int nPlayer) {
     if (lbl_80281520 == -1) {
         fn_800B5918(pTarget, lbl_801FA1E8);
         nMax = lbl_80281F78->n1DC;
-    } else if (Vec3_DistanceSq(lbl_801FA1E8, pTarget) > 0.1f) {
+    } else if (LLMath_SquareDistanceBetween3(lbl_801FA1E8, pTarget) > 0.1f) {
         fn_800B5918(pTarget, lbl_801FA1E8);
         nMax = (lbl_80281520 + 1 <= lbl_80281F78->n1DC) ? lbl_80281520 + 1 : lbl_80281F78->n1DC;
     } else {
@@ -2826,7 +2826,7 @@ void GolfCamera_ComputeSteepSlopeCamVectors(View* pView, int nPlayer) {
     vBase[3] = 0.0f;
     GolfCam_Vec3Sub(vTarget, vBase, vDelta);
     if (vDelta[0] != 0.0f || vDelta[1] != 0.0f || vDelta[2] != 0.0f) {
-        Vec3_Normalize(vDelta, vDir);
+        LLMath_Normalize3(vDelta, vDir);
     } else {
         vDir[0] = 0.0f;
         vDir[1] = 0.0f;
@@ -2898,14 +2898,14 @@ void GolfCamera_ClampLookAngle(f32* pFrom, f32* pTo, f32* pOut) {
     vFlat[2] = v[2];
     vFlat[3] = 0.0f;
     if (v[0] != 0.0f || v[1] != 0.0f || v[2] != 0.0f) {
-        Vec3_Normalize(v, vDir);
+        LLMath_Normalize3(v, vDir);
     } else {
         vDir[0] = 0.0f;
         vDir[1] = 0.0f;
         vDir[2] = 0.0f;
     }
     if (vFlat[0] != 0.0f || vFlat[1] != 0.0f || vFlat[2] != 0.0f) {
-        Vec3_Normalize(vFlat, vFlatDir);
+        LLMath_Normalize3(vFlat, vFlatDir);
     } else {
         vFlatDir[0] = 0.0f;
         vFlatDir[1] = 0.0f;
@@ -2924,7 +2924,7 @@ void GolfCamera_ClampLookAngle(f32* pFrom, f32* pTo, f32* pOut) {
     if (bClamp) {
         vec4flt_CrossProduct(vDir, vFlatDir, vAxis);
         if (vAxis[0] != 0.0f || vAxis[1] != 0.0f || vAxis[2] != 0.0f) {
-            Vec3_Normalize(vAxis, vAxis);
+            LLMath_Normalize3(vAxis, vAxis);
         }
         Vec_Scale(fOver, vAxis, vAxis);
         Quat_BuildFromVector(vAxis, vQuat);
@@ -3921,10 +3921,10 @@ u8 fn_800C71A4(View* pView, int nPlayer) {
     vLook[1] = 0.0f;
     vBall[1] = 0.0f;
     if (vLook[0] != 0.0f || vLook[1] != 0.0f || vLook[2] != 0.0f) {
-        Vec3_Normalize(vLook, vLook);
+        LLMath_Normalize3(vLook, vLook);
     }
     if (vBall[0] != 0.0f || vBall[1] != 0.0f || vBall[2] != 0.0f) {
-        Vec3_Normalize(vBall, vBall);
+        LLMath_Normalize3(vBall, vBall);
     }
     if (Vec3_Dot(vLook, vBall) > 0.0f) {
         return 0;

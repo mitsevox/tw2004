@@ -82,8 +82,8 @@ void fn_800922A8(UIText* pText) {
         uFlags |= 4;
         uFlags |= 0x400;
     }
-    Mtx_MultVec4(m, &vPos, &vOut);
-    Mtx_MultVec4(m, &vPos, &vOut);
+    LLMath_mat44fltMultiply(m, &vPos, &vOut);
+    LLMath_mat44fltMultiply(m, &vPos, &vOut);
     UFont_SetFont(pText->n4);
     fW = 1.0f;
     fH = fW;
@@ -104,7 +104,7 @@ void fn_800922A8(UIText* pText) {
     // EA bug: tests 0x200 twice (0x100 was surely meant), so with only 0x100 set vEndOut is read
     // below without being set
     if ((pText->nFlags & 0x200) || (pText->nFlags & 0x200)) {
-        Mtx_MultVec4(m, &vEnd, &vEndOut);
+        LLMath_mat44fltMultiply(m, &vEnd, &vEndOut);
     }
     if (pText->nFlags & 0x100) {
         vEndOut.x /= 512.0f;

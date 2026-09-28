@@ -33,7 +33,7 @@ void Mtx_InvertRigid(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: inverts a
 void CA_vSetDefaultScalingVectors(CamLens* pLens);
 f32  Math_Tan(f32 x);                // tan, as a float
 void fn_800760B0(int nX, int nY, int nWidth, int nHeight);
-void Mtx_MultVec4Array(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
+void LLMath_mat44fltMultiplyList(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void fn_800B2470(void);
 void fn_800B281C(void);
 void fn_800B3460(f32* pA, f32* pB, f32* pOut);
@@ -322,7 +322,7 @@ void fn_800B28D4(Character* pChar, int nView, u8 bFlat) {
                 vCorner[1] = fY;
                 vCorner[2] = fZ;
                 vCorner[3] = 1.0f;
-                Mtx_MultVec4(aLight, (Vec4*)vCorner, (Vec4*)vOut);
+                LLMath_mat44fltMultiply(aLight, (Vec4*)vCorner, (Vec4*)vOut);
                 Vec_Scale(1.0f / vOut[3], vOut, vOut);
                 if (vOut[0] > fMaxX) {
                     fMaxX = vOut[0];
@@ -358,7 +358,7 @@ void fn_800B28D4(Character* pChar, int nView, u8 bFlat) {
     aView[3][0] = -vCentre[0] / fHalfX;
     aView[3][1] = -vCentre[2] / fHalfZ;
     aView[3][2] = 1.0f / Math_Tan(0.5f * p->pLens->fFov);
-    Mtx_MultVec4Array(aView, aLight, aMtx, 4);
+    LLMath_mat44fltMultiplyList(aView, aLight, aMtx, 4);
     fn_800B3484(Camera_GetCurrentLens(), aMtx);
     RC_UpdateCurrentScreenMatrices();
     RC_vUpdateRenderCtxTransformationMatrices(RC_spGetCurrentRenderCtx());

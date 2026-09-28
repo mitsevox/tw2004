@@ -1407,7 +1407,7 @@ u8 fn_800B1B18(int nPlayer, f32* pTo, f32* pFrom, f32* pHit, f32* pNormal, HitOb
             if (fDist < fReach) {
                 fDY = pTo[1] - vCenter[1];
                 if ((f32)Math_Sqrt(fDY * fDY + fFlat) < fReach && fn_800B1AA8(&pObj->obj, pTo)) {
-                    fDist = vec4flt_DistanceBetween3(pFrom, vCenter);
+                    fDist = LLMath_DistanceBetween3(pFrom, vCenter);
                     if (pBest == NULL || fDist < fBest) {
                         fBest = fDist;
                         pBest = pObj;
@@ -1421,7 +1421,7 @@ u8 fn_800B1B18(int nPlayer, f32* pTo, f32* pFrom, f32* pHit, f32* pNormal, HitOb
         pBest->pfnHandler(12, pBest, (void*)nPlayer, NULL);
         fn_800B1AB0(pBest, vCenter, &fRadius);
         fn_800B1D18(pTo, vCenter, vNormal);
-        Vec3_Normalize(vNormal, vNormal);
+        LLMath_Normalize3(vNormal, vNormal);
         if (pHit != NULL) {
             fn_8000C5D4(vCenter, vNormal, fRadius, pHit);
         }

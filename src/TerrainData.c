@@ -8,7 +8,7 @@
 #include "game.h"
 #include "ustream.h"
 
-void Mtx_MultVec3Array(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // VecMath.c
+void LLMath_mat44fltMultiplyList33(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // VecMath.c
 
 // The globals, in reverse address order (CodeWarrior lays them out last-defined-first).
 int lbl_80281C10;                       // how many networks lbl_801A2A40 holds
@@ -306,7 +306,7 @@ CourseInfo* Ter_GetTGD(void) {
 
 // Rows 4..6 of the matrix block times rows 0..2, into rows 8..10.
 void fn_8000C5A4(f32 (*pMtx)[4]) {
-    Mtx_MultVec3Array(pMtx + 4, pMtx, pMtx + 8, 3);
+    LLMath_mat44fltMultiplyList33(pMtx + 4, pMtx, pMtx + 8, 3);
 }
 
 #ifdef __MWERKS__

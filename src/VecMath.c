@@ -6,16 +6,16 @@
 #include "engine.h"
 #include "unsorted/cull.h"
 
-void Mtx_MultVec3(f32 (*pMtx)[4], f32* pIn, f32* pOut);
-void Mtx_MultVec4Array(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
-void Mtx_MultVec3Array(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
+void LLMath_mat44fltMultiply33(f32 (*pMtx)[4], f32* pIn, f32* pOut);
+void LLMath_mat44fltMultiplyList(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
+void LLMath_mat44fltMultiplyList33(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 
 // ---- matrices ------------------------------------------------------------------------------
 // A row vector times a 4x4 matrix: out[j] = in[0] * m[0][j] + in[1] * m[1][j] + ...
 
 #ifdef __MWERKS__
 // dst = src times mtx (four floats, a row vector: see above); src and dst may be the same.
-asm void Mtx_MultVec4(register float mtx[4][4], register Vec4* src, register Vec4* dst) {
+asm void LLMath_mat44fltMultiply(register float mtx[4][4], register Vec4* src, register Vec4* dst) {
     nofralloc
     psq_l     f0, 0(src), 0, 0
     psq_l     f1, 0(mtx), 0, 0
@@ -42,7 +42,7 @@ asm void Mtx_MultVec4(register float mtx[4][4], register Vec4* src, register Vec
 
 // pOut = pIn times the top-left 3x3 of pMtx (three floats: a rotation, no translation); pOut[3] is
 // not written, and pIn and pOut may be the same.
-asm void Mtx_MultVec3(register f32 (*pMtx)[4], register f32* pIn, register f32* pOut) {
+asm void LLMath_mat44fltMultiply33(register f32 (*pMtx)[4], register f32* pIn, register f32* pOut) {
     nofralloc
     psq_l     f0, 0(pIn), 0, 0
     psq_l     f1, 0(pMtx), 0, 0
@@ -63,8 +63,9 @@ asm void Mtx_MultVec3(register f32 (*pMtx)[4], register f32* pIn, register f32* 
     blr
 }
 
-// Mtx_MultVec4 for nRows four-float vectors in a row (nRows must be at least 1).
-asm void Mtx_MultVec4Array(register f32 (*pMtx)[4], register f32 (*pSrc)[4], register f32 (*pDst)[4],
+// LLMath_mat44fltMultiply for nRows four-float vectors in a row (nRows must be at least 1).
+asm void LLMath_mat44fltMultiplyList(register f32 (*pMtx)[4], register f32 (*pSrc)[4],
+                                     register f32 (*pDst)[4],
                      register int nRows) {
     nofralloc
     psq_l     f4, 0(pMtx), 0, 0
@@ -95,9 +96,10 @@ loop:
     blr
 }
 
-// Mtx_MultVec3 for nRows vectors in a row, 16 bytes apart (three floats used of each four, the
+// LLMath_mat44fltMultiply33 for nRows vectors in a row, 16 bytes apart (three floats used of each four, the
 // fourth not written; nRows must be at least 1).
-asm void Mtx_MultVec3Array(register f32 (*pMtx)[4], register f32 (*pSrc)[4], register f32 (*pDst)[4],
+asm void LLMath_mat44fltMultiplyList33(register f32 (*pMtx)[4], register f32 (*pSrc)[4],
+                                       register f32 (*pDst)[4],
                      register int nRows) {
     nofralloc
     psq_l     f4, 0(pMtx), 0, 0
@@ -126,7 +128,7 @@ loop:
 #else
 // port: untested, the plain-C versions for compilers without paired singles. The paired-single
 // code rounds each multiply-add the same way, so results can differ in the last bits.
-void Mtx_MultVec4(float mtx[4][4], Vec4* src, Vec4* dst) {
+void LLMath_mat44fltMultiply(float mtx[4][4], Vec4* src, Vec4* dst) {
     f32* pIn = (f32*)src;
     f32 out[4];
     int j;
@@ -138,7 +140,7 @@ void Mtx_MultVec4(float mtx[4][4], Vec4* src, Vec4* dst) {
     }
 }
 
-void Mtx_MultVec3(f32 (*pMtx)[4], f32* pIn, f32* pOut) {
+void LLMath_mat44fltMultiply33(f32 (*pMtx)[4], f32* pIn, f32* pOut) {
     f32 out[3];
     int j;
     for (j = 0; j < 3; j++) {
@@ -149,17 +151,17 @@ void Mtx_MultVec3(f32 (*pMtx)[4], f32* pIn, f32* pOut) {
     }
 }
 
-void Mtx_MultVec4Array(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows) {
+void LLMath_mat44fltMultiplyList(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows) {
     int i;
     for (i = 0; i < nRows; i++) {
-        Mtx_MultVec4(pMtx, (Vec4*)pSrc[i], (Vec4*)pDst[i]);
+        LLMath_mat44fltMultiply(pMtx, (Vec4*)pSrc[i], (Vec4*)pDst[i]);
     }
 }
 
-void Mtx_MultVec3Array(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows) {
+void LLMath_mat44fltMultiplyList33(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows) {
     int i;
     for (i = 0; i < nRows; i++) {
-        Mtx_MultVec3(pMtx, pSrc[i], pDst[i]);
+        LLMath_mat44fltMultiply33(pMtx, pSrc[i], pDst[i]);
     }
 }
 #endif
@@ -177,7 +179,7 @@ static const f32 kZero = 0.0f;
 // Normalises the four-float vector pSrc into pDst (all four floats scaled by one over the
 // four-float length); one whose squared length is at most 2^-30 is copied as it is. pSrc and pDst
 // may be the same.
-asm void Vec_Normalize(register f32* pSrc, register f32* pDst) {
+asm void LLMath_Normalize(register f32* pSrc, register f32* pDst) {
     nofralloc
     psq_l    f3, 0(pSrc), 0, 0
     psq_l    f4, 8(pSrc), 0, 0
@@ -205,7 +207,7 @@ store:
 
 // Normalises the three-float vector pSrc into pDst (pDst[3] is not written); one whose squared
 // length is at most 2^-30 is copied as it is. pSrc and pDst may be the same.
-asm void Vec3_Normalize(register f32* pSrc, register f32* pDst) {
+asm void LLMath_Normalize3(register f32* pSrc, register f32* pDst) {
     nofralloc
     psq_l    f3, 0(pSrc), 0, 0
     psq_l    f4, 8(pSrc), 1, 0
@@ -231,9 +233,9 @@ store:
     blr
 }
 
-// Vec_Normalize that also returns the four-float length (0 for a vector with squared length at most
+// LLMath_Normalize that also returns the four-float length (0 for a vector with squared length at most
 // 2^-30, which is copied as it is).
-asm f32 Vec_NormalizeLength(register f32* pSrc, register f32* pDst) {
+asm f32 LLMath_NormalizeReturnLength(register f32* pSrc, register f32* pDst) {
     nofralloc
     psq_l    f3, 0(pSrc), 0, 0
     psq_l    f4, 8(pSrc), 0, 0
@@ -264,9 +266,9 @@ zero:
     blr
 }
 
-// Vec3_Normalize that also returns the three-float length (0 for a vector with squared length at
+// LLMath_Normalize3 that also returns the three-float length (0 for a vector with squared length at
 // most 2^-30, which is copied as it is).
-asm f32 Vec3_NormalizeLength(register f32* pSrc, register f32* pDst) {
+asm f32 LLMath_NormalizeReturnLength3(register f32* pSrc, register f32* pDst) {
     nofralloc
     psq_l    f3, 0(pSrc), 0, 0
     psq_l    f4, 8(pSrc), 1, 0
@@ -298,7 +300,7 @@ zero:
 }
 
 // The squared distance between two three-float points.
-asm f32 Vec3_DistanceSq(register f32* pA, register f32* pB) {
+asm f32 LLMath_SquareDistanceBetween3(register f32* pA, register f32* pB) {
     nofralloc
     psq_l    f0, 0(pA), 0, 0
     psq_l    f1, 8(pA), 1, 0
@@ -313,7 +315,7 @@ asm f32 Vec3_DistanceSq(register f32* pA, register f32* pB) {
 }
 
 // The distance between two three-float points (0 when they are the same).
-asm f32 vec4flt_DistanceBetween3(register f32* pA, register f32* pB) {
+asm f32 LLMath_DistanceBetween3(register f32* pA, register f32* pB) {
     nofralloc
     psq_l    f0, 0(pA), 0, 0
     psq_l    f1, 8(pA), 1, 0
@@ -345,7 +347,7 @@ static f32 Vec3_LengthSq(const f32* p) {
     return p[0] * p[0] + p[1] * p[1] + p[2] * p[2];
 }
 
-void Vec_Normalize(f32* pSrc, f32* pDst) {
+void LLMath_Normalize(f32* pSrc, f32* pDst) {
     f32 s = pSrc[0] * pSrc[0] + pSrc[1] * pSrc[1] + pSrc[2] * pSrc[2] + pSrc[3] * pSrc[3];
     f32 k = 1.0f;
     int i;
@@ -357,7 +359,7 @@ void Vec_Normalize(f32* pSrc, f32* pDst) {
     }
 }
 
-void Vec3_Normalize(f32* pSrc, f32* pDst) {
+void LLMath_Normalize3(f32* pSrc, f32* pDst) {
     f32 s = Vec3_LengthSq(pSrc);
     f32 k = 1.0f;
     int i;
@@ -369,7 +371,7 @@ void Vec3_Normalize(f32* pSrc, f32* pDst) {
     }
 }
 
-f32 Vec_NormalizeLength(f32* pSrc, f32* pDst) {
+f32 LLMath_NormalizeReturnLength(f32* pSrc, f32* pDst) {
     f32 s = pSrc[0] * pSrc[0] + pSrc[1] * pSrc[1] + pSrc[2] * pSrc[2] + pSrc[3] * pSrc[3];
     f32 fLen;
     int i;
@@ -386,7 +388,7 @@ f32 Vec_NormalizeLength(f32* pSrc, f32* pDst) {
     return fLen;
 }
 
-f32 Vec3_NormalizeLength(f32* pSrc, f32* pDst) {
+f32 LLMath_NormalizeReturnLength3(f32* pSrc, f32* pDst) {
     f32 s = Vec3_LengthSq(pSrc);
     f32 fLen;
     int i;
@@ -403,7 +405,7 @@ f32 Vec3_NormalizeLength(f32* pSrc, f32* pDst) {
     return fLen;
 }
 
-f32 Vec3_DistanceSq(f32* pA, f32* pB) {
+f32 LLMath_SquareDistanceBetween3(f32* pA, f32* pB) {
     f32 d[3];
     d[0] = pA[0] - pB[0];
     d[1] = pA[1] - pB[1];
@@ -411,8 +413,8 @@ f32 Vec3_DistanceSq(f32* pA, f32* pB) {
     return Vec3_LengthSq(d);
 }
 
-f32 vec4flt_DistanceBetween3(f32* pA, f32* pB) {
-    f32 s = Vec3_DistanceSq(pA, pB);
+f32 LLMath_DistanceBetween3(f32* pA, f32* pB) {
+    f32 s = LLMath_SquareDistanceBetween3(pA, pB);
     if (!(s > 0.0f)) return 0.0f;
     return (f32)sqrt(s);
 }

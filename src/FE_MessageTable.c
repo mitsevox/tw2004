@@ -3558,7 +3558,7 @@ void fn_80080AE8(MsgArg* pArgs, MsgArg* pResult) {
     mtx[0][1] = fSin;
     mtx[1][0] = -fSin;
     mtx[1][1] = fCos;
-    Mtx_MultVec4(mtx, &v, &v);
+    LLMath_mat44fltMultiply(mtx, &v, &v);
     *(f32*)pArgs[1].p = v.x;
     *(f32*)pArgs[2].p = v.y;
 }

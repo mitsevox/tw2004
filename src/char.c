@@ -100,7 +100,7 @@ void  Character_PlaceFeetOnGround(Character* pChar);
 void  SKEL_TransformBones(CharModel* pModel, u32* auBits);
 void  fn_800B28D4(Character* pChar, int a, int b);
 void  fn_800B2FB0(Character* pChar, int a, int b);
-void  Mtx_MultVec4(f32 mtx[4][4], Vec4* src, Vec4* dst);    // VecMath.c: a point through a matrix
+void  LLMath_mat44fltMultiply(f32 mtx[4][4], Vec4* src, Vec4* dst);    // VecMath.c: a point through a matrix
 void  Character_GetBonePos(Character* pChar, int nBone, f32* pPos);
 void  fn_8001CCF8(UStreamObject* pObject);
 void  fn_8001CD80(UStreamObject* pObject);
@@ -441,10 +441,10 @@ void Character_UpdateTestPoints(Character* pChar) {
         pMtx3A = Character_GetBoneMatrixSwapIfLefty(pChar, 0x3A);
         pMtx47 = Character_GetBoneMatrixSwapIfLefty(pChar, 0x47);
         pMtx39 = Character_GetBoneMatrixSwapIfLefty(pChar, 0x39);
-        Mtx_MultVec4(pMtx3A, (Vec4*)pChar->pSkin->a1048[0], (Vec4*)pChar->aPoints[0]);
-        Mtx_MultVec4(pMtx48, (Vec4*)pChar->pSkin->a1048[1], (Vec4*)pChar->aPoints[1]);
-        Mtx_MultVec4(pMtx39, (Vec4*)pChar->pSkin->a1048[2], (Vec4*)pChar->aPoints[2]);
-        Mtx_MultVec4(pMtx47, (Vec4*)pChar->pSkin->a1048[3], (Vec4*)pChar->aPoints[3]);
+        LLMath_mat44fltMultiply(pMtx3A, (Vec4*)pChar->pSkin->a1048[0], (Vec4*)pChar->aPoints[0]);
+        LLMath_mat44fltMultiply(pMtx48, (Vec4*)pChar->pSkin->a1048[1], (Vec4*)pChar->aPoints[1]);
+        LLMath_mat44fltMultiply(pMtx39, (Vec4*)pChar->pSkin->a1048[2], (Vec4*)pChar->aPoints[2]);
+        LLMath_mat44fltMultiply(pMtx47, (Vec4*)pChar->pSkin->a1048[3], (Vec4*)pChar->aPoints[3]);
     } else {
         fA = 0.8f * pChar->pModel->f10;
         fB = 0.8f * pChar->pModel->fC;
@@ -460,7 +460,8 @@ void Character_UpdateTestPoints(Character* pChar) {
         fn_8000AE6C(pChar->aPoints[1], pMtx48[2], 0.25f * fB, pChar->aPoints[1]);
     }
     if (pChar->p16D8 != NULL && pClubMtx != NULL) {
-        Mtx_MultVec4(pClubMtx, (Vec4*)pChar->p16D8->a3C[pChar->nClubClass], (Vec4*)pChar->aPoints[4]);
+        LLMath_mat44fltMultiply(pClubMtx, (Vec4*)pChar->p16D8->a3C[pChar->nClubClass],
+                                (Vec4*)pChar->aPoints[4]);
     }
 }
 
@@ -703,10 +704,10 @@ void fn_800184E4(Character* pChar, Skin* pSkin) {
             Char_Vec3Add(&v3A.x, &vOffsetA.x, &v3A.x);
             Char_Vec3Add(&v47.x, &vOffsetB.x, &v47.x);
             Char_Vec3Add(&v39.x, &vOffsetB.x, &v39.x);
-            Mtx_MultVec4(m3A, &v3A, (Vec4*)pChar->pSkin->a1048[0]);
-            Mtx_MultVec4(m48, &v48, (Vec4*)pChar->pSkin->a1048[1]);
-            Mtx_MultVec4(m39, &v39, (Vec4*)pChar->pSkin->a1048[2]);
-            Mtx_MultVec4(m47, &v47, (Vec4*)pChar->pSkin->a1048[3]);
+            LLMath_mat44fltMultiply(m3A, &v3A, (Vec4*)pChar->pSkin->a1048[0]);
+            LLMath_mat44fltMultiply(m48, &v48, (Vec4*)pChar->pSkin->a1048[1]);
+            LLMath_mat44fltMultiply(m39, &v39, (Vec4*)pChar->pSkin->a1048[2]);
+            LLMath_mat44fltMultiply(m47, &v47, (Vec4*)pChar->pSkin->a1048[3]);
             pChar->pSkin->b1044 = 1;
         }
     }
@@ -767,7 +768,7 @@ void Character_PlaceFeetOnGround(Character* pChar) {
                 fLowest = pChar->afGroundHeight[i];
             }
         }
-        Vec3_Normalize(pChar->a179C, pChar->a179C);
+        LLMath_Normalize3(pChar->a179C, pChar->a179C);
         if (fLowest < -60000.0f) {
             return;
         }
@@ -904,7 +905,7 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
         return;
     }
     Char_Vec3Add(pChar->aGroundNormal[nPoint], pChar->aGroundNormal[nOther], vSlope);
-    Vec3_Normalize(vSlope, vSlope);
+    LLMath_Normalize3(vSlope, vSlope);
     if (fDrop > 0.33f / 12.0f) {
         fDrop = 1.0f;
     } else {
@@ -941,7 +942,7 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     fAngleB = Math_Acos((fCos < -1.0f) ? -1.0f : ((fCos > 1.0f) ? 1.0f : fCos));
     fTurn = fAngleA - fAngleB;
     vec4flt_CrossProduct(vShin, vThigh, vNormal);
-    fLen = Vec3_NormalizeLength(vNormal, vNormal);
+    fLen = LLMath_NormalizeReturnLength3(vNormal, vNormal);
     vNormal[3] = 0.0f;
     pSkel = pChar->pModel->pSkel;
     if (pSkel != NULL) {
@@ -2024,7 +2025,7 @@ void fn_8001B878(Character* pChar, int nPlayer) {
     }
     Vec3Copy(pChar->v1668, &vPos.x);
     vPos.w = 1.0f;
-    Mtx_MultVec4(((Camera*)RC_spGetCurrentRenderCtx())->viewMtx, &vPos, &vPos);
+    LLMath_mat44fltMultiply(((Camera*)RC_spGetCurrentRenderCtx())->viewMtx, &vPos, &vPos);
     Vec3Copy(&vPos.x, &sphere.x);
     sphere.radius = pChar->f1674;
     fDepth = sphere.z;
@@ -2918,7 +2919,7 @@ void Character_GetBallOnFingerPosition(Character* pChar, f32* pPos) {
 
     Vec_Copy(pMtx[3], pPos);
     Vec3Copy(pMtx[0], vAxis);
-    Vec3_Normalize(vAxis, vAxis);
+    LLMath_Normalize3(vAxis, vAxis);
     if (Character_IsLeftHanded(pChar)) {
         fn_8000C5D4(pPos, vAxis, 0.05f, pPos);
     } else {
@@ -2937,7 +2938,7 @@ void fn_8001DA04(Character* pChar, f32* pPos, f32* pAngles) {
         pMtx = Character_GetBoneMatrixSwapIfLefty(pChar, 0x1A);
         Vec_Copy(pMtx[3], pPos);
         Vec3Copy(pMtx[0], vAxis);
-        Vec3_Normalize(vAxis, vAxis);
+        LLMath_Normalize3(vAxis, vAxis);
         if (Character_IsLeftHanded(pChar)) {
             fn_8000C5D4(pPos, vAxis, -0.000625f, pPos);
         } else {
@@ -2961,7 +2962,7 @@ void fn_8001DB04(Character* pChar, f32* pOut) {
         pMtx = Character_GetBoneMatrix(pChar, 0);
         Vec3Copy(pChar->pCurClip->v80, &vPos.x);
         vPos.w = 1.0f;
-        Mtx_MultVec4(pMtx, &vPos, (Vec4*)pOut);
+        LLMath_mat44fltMultiply(pMtx, &vPos, (Vec4*)pOut);
         return;
     }
     Character_GetBonePos(pChar, 0, pOut);

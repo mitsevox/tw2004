@@ -15,7 +15,7 @@ void fn_8001FB00(f32* pA, f32* pB, f32* pOut, f32 fT) {
     Quat_Copy(pB, pOut);
     Quat_Slerp(pA, pOut, fT);
     if (0.0f != pOut[0] || 0.0f != pOut[1] || 0.0f != pOut[2] || 0.0f != pOut[3]) {
-        Vec_Normalize(pOut, pOut);
+        LLMath_Normalize(pOut, pOut);
     }
 }
 

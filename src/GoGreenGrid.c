@@ -124,7 +124,7 @@ void fn_8009B970(int nView) {
                 lbl_802813C0->aDir[nView]);
     lbl_802813C0->aDir[nView][1] = 0.0f;
     fDist = (f32)Math_Sqrt(Vec3_LengthSqClamped(lbl_802813C0->aDir[nView]));
-    Vec3_Normalize(lbl_802813C0->aDir[nView], lbl_802813C0->aDir[nView]);
+    LLMath_Normalize3(lbl_802813C0->aDir[nView], lbl_802813C0->aDir[nView]);
     if (PLAYER(ViewController_GetActivePlayerNumber(nViewCopy))->nClub == CLUB_PUTTER_e) {
         fn_8009CB78(&Ter_GetTGD()->pin[Game_CurrentPinSet()].x,
                     PLAYER(ViewController_GetActivePlayerNumber(nViewCopy))->ball.vPos,

@@ -54,7 +54,7 @@ u8   fn_80044E2C(int n);
 u8   fn_80044AA8(SurfaceType* pSurface);
 void Mtx_Identity(f32 (*pMtx)[4]);                   // identity
 void Mtx_Transpose3x3(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: transposes the 3x3 part
-void Mtx_MultVec3(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // a vector through a matrix
+void LLMath_mat44fltMultiply33(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // a vector through a matrix
 void fn_80038010(u8 a, int n, f32* pVec);
 void fn_800386F0(int n, f32* pVec);
 f32  fn_8003F194(CamShot* pShot, f32 fA, f32 fB, f32 fTime);
@@ -811,13 +811,13 @@ void fn_8003FD54(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
     CamScript_GetLookAtPoint(pShot, nPlayer, pScript->a20, pScript->v0, pScript, pPrev, fTime);
     Vec3_Sub(pScript->a20, pScript->v0, vDir0);
     if (0.0f != vDir0[0] || 0.0f != vDir0[1] || 0.0f != vDir0[2]) {
-        Vec3_Normalize(vDir0, vDir0);
+        LLMath_Normalize3(vDir0, vDir0);
     }
     Vec3_Sub(pScript->v10, &pScript->a20[4], vToAim);
     CamScript_GetLookAtPoint(pNext, nPlayer, &pScript->a20[4], pScript->v10, pScript, pPrev, fTime);
     Vec3_Sub(&pScript->a20[4], pScript->v10, vDir1);
     if (0.0f != vDir1[0] || 0.0f != vDir1[1] || 0.0f != vDir1[2]) {
-        Vec3_Normalize(vDir1, vDir1);
+        LLMath_Normalize3(vDir1, vDir1);
     }
     // the dot product clamped to -1..1 (worked out again for each test)
     fDot = Vec3_Dot(vDir0, vDir1) < -1.0f ? -1.0f
@@ -826,14 +826,14 @@ void fn_8003FD54(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
     fAngle *= fT;
     vec4flt_CrossProduct(vDir0, vDir1, vAxis);
     if (0.0f != vAxis[0] || 0.0f != vAxis[1] || 0.0f != vAxis[2]) {
-        Vec3_Normalize(vAxis, vAxis);
+        LLMath_Normalize3(vAxis, vAxis);
     }
     Vec3_Scale(fAngle, vAxis, vAxis);
     Quat_BuildFromVector(vAxis, qTurn);
     vDir0[3] = 0.0f;
     Quat_RotateVector(qTurn, vDir0, pSub);
     if (0.0f != pSub[0] || 0.0f != pSub[1] || 0.0f != pSub[2]) {
-        Vec3_Normalize(pSub, pSub);
+        LLMath_Normalize3(pSub, pSub);
     }
     fDist = Math_Sqrt(Vec3_LengthSqClamped(vFromAim));
     Vec3_Scale(fT * ((f32)Math_Sqrt(Vec3_LengthSqClamped(vToAim)) - fDist) + fDist, pSub, pSub);
@@ -885,7 +885,7 @@ void CamScript_LerpSwingToBallFlightCameras(int nPlayer, f32* pCam, f32* pSub, C
     CamScript_GetLookAtPoint(pShot, nPlayer, pScript->a20, pScript->v0, pScript, pPrev, fTime);
     Vec3_Sub(pScript->a20, pScript->v0, vDir);
     if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
-        Vec3_Normalize(vDir, vDir);
+        LLMath_Normalize3(vDir, vDir);
     }
     Vec3_Sub(gPlayers[nPlayer].ball.vPos, pScript->v0, vBall);
     vBall[1] = 0.0f;
@@ -1428,7 +1428,7 @@ void CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* pShot
         fA = Math_Sqrt(Vec3_LengthSqClamped(vDir));
         if (fA < fMin && bClose) {
             if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
-                Vec3_Normalize(vDir, vDir);
+                LLMath_Normalize3(vDir, vDir);
             }
             Vec3_Scale(fMin, vDir, vDir);
             fAimY = vAim[1];
@@ -1451,10 +1451,10 @@ void CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* pShot
         fDist = Math_Sqrt(Vec3_LengthSqClamped(vDir));
         Vec3_Sub(vGoal, pSub, vToGoal);  // vToGoal is not read
         if (0.0f != vCur[0] || 0.0f != vCur[1] || 0.0f != vCur[2]) {
-            Vec3_Normalize(vCur, vCur);
+            LLMath_Normalize3(vCur, vCur);
         }
         if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
-            Vec3_Normalize(vDir, vDir);
+            LLMath_Normalize3(vDir, vDir);
         }
         // the dot product is taken up to three times, as a clamp macro would
         fAngle = Math_Acos(Vec3_Dot(vCur, vDir) < -1.0f ? -1.0f
@@ -1462,14 +1462,14 @@ void CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* pShot
                  / fDiv;
         vec4flt_CrossProduct(vCur, vDir, vAxis);
         if (0.0f != vAxis[0] || 0.0f != vAxis[1] || 0.0f != vAxis[2]) {
-            Vec3_Normalize(vAxis, vAxis);
+            LLMath_Normalize3(vAxis, vAxis);
         }
         Vec3_Scale(fAngle, vAxis, vAxis);
         Quat_BuildFromVector(vAxis, qTurn);
         vCur[3] = 0.0f;
         Quat_RotateVector(qTurn, vCur, vDir);
         if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
-            Vec3_Normalize(vDir, vDir);
+            LLMath_Normalize3(vDir, vDir);
         }
         Vec3_Scale(fDist, vDir, vDir);
         Vec3_Add(pCam, vDir, pSub);
@@ -1635,7 +1635,7 @@ void CameraScript_OffsetLookVector(f32* pPos, f32* pTarget, f32 fUp, f32 fSide) 
     pPos[1] += fUp;
     Vec3_Sub(pPos, pTarget, vDir);
     if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
-        Vec3_Normalize(vDir, vDir);
+        LLMath_Normalize3(vDir, vDir);
     }
     pPos[0] += fSide * -vDir[2];
     pPos[2] += fSide * vDir[0];
@@ -1745,13 +1745,13 @@ void CameraScript_UpdateLandingEstimate(CamScript* pScript, int nPlayer) {
         if (0.0f != vVel[0] || 0.0f != vVel[1] || 0.0f != vVel[2]) {
             if (vVel[1] >= 0.0f) {
                 fRise = pBall->vVel[1] / 0.10717f;
-                Vec3_Normalize(vVel, vStep);
+                LLMath_Normalize3(vVel, vStep);
                 Vec3_Scale(fRise, vStep, vUp);
                 Vec3_Add(vPos, vUp, vPos);
                 vVel[1] = 0.0f;
             }
             vVel[1] -= powf(pBall->fHeight, 0.7f) / 1.4f;
-            Vec3_Normalize(vVel, vVel);
+            LLMath_Normalize3(vVel, vVel);
             Vec3_Scale(200.0f, vVel, vVel);
             Vec3_Add(vPos, vVel, vStep);
             pCourse = Ter_GetTGD();
@@ -1762,7 +1762,7 @@ void CameraScript_UpdateLandingEstimate(CamScript* pScript, int nPlayer) {
                 fReach *= Physics_GetLiePowerPercentage(&gPlayers[nPlayer].ball);
                 fReach *= SW_vGetShotPower(nPlayer);
                 if (fReach < fDist - 50.0f) {
-                    Vec3_Normalize(vLand, vLand);
+                    LLMath_Normalize3(vLand, vLand);
                     Vec3_Scale(fReach, vLand, vLand);
                     Vec3_Add(pBall->vStart, vLand, vLand);
                     fHeight = CamScript_GuessBestPlayableHeight(vLand, NULL);
@@ -2065,8 +2065,8 @@ void CameraScript_KeepPointInView(int nPlayer, f32* pCam, f32* pOut, f32* pTarge
         (0.0f == vToOut[0] && 0.0f == vToOut[1] && 0.0f == vToOut[2])) {
         return;
     }
-    Vec3_Normalize(vToTarget, vTargetDir);
-    Vec3_Normalize(vToOut, vOutDir);
+    LLMath_Normalize3(vToTarget, vTargetDir);
+    LLMath_Normalize3(vToOut, vOutDir);
     fDot = Vec3_Dot(vTargetDir, vOutDir);
     if (fDot < -1.0f) {
         fDot = -1.0f;
@@ -2078,7 +2078,7 @@ void CameraScript_KeepPointInView(int nPlayer, f32* pCam, f32* pOut, f32* pTarge
         fAngle -= pScript->fDC;
         vec4flt_CrossProduct(vOutDir, vTargetDir, vAxis);
         if (0.0f == vAxis[0] && 0.0f == vAxis[1] && 0.0f == vAxis[2]) return;
-        Vec3_Normalize(vAxis, vAxis);
+        LLMath_Normalize3(vAxis, vAxis);
         fLen = Math_Sqrt(vAxis[1] * vAxis[1] + vAxis[2] * vAxis[2]);
         if (0.0f == fLen) return;
         // mAlign turns the axis onto x; mTurn turns by fAngle about it there; mBack turns back
@@ -2119,9 +2119,9 @@ void CameraScript_KeepPointInView(int nPlayer, f32* pCam, f32* pOut, f32* pTarge
         mTurn[3][3] = 1.0f;
         Mtx_Identity(mBack);
         Mtx_Transpose3x3(mAlign, mBack);
-        Mtx_MultVec3(mAlign, vToOut, vTurned);
-        Mtx_MultVec3(mTurn, vTurned, vTurned);
-        Mtx_MultVec3(mBack, vTurned, vTurned);
+        LLMath_mat44fltMultiply33(mAlign, vToOut, vTurned);
+        LLMath_mat44fltMultiply33(mTurn, vTurned, vTurned);
+        LLMath_mat44fltMultiply33(mBack, vTurned, vTurned);
         Vec3_Add(pCam, vTurned, pOut);
     } else if (fabsf(fAngle) > fLag) {
         pScript->fDC = fAngle;
@@ -2142,12 +2142,12 @@ u8 CameraScript_IsDefaultSwingCam(CamShot* pShot, int nPlayer, f32* pCam) {
     Vec3_Sub(gPlayers[nPlayer].vTargetCopy, pBall, vAim);
     vAim[1] = 0.0f;
     if (0.0f != vAim[0] || 0.0f != vAim[1] || 0.0f != vAim[2]) {
-        Vec3_Normalize(vAim, vAim);
+        LLMath_Normalize3(vAim, vAim);
     }
     Vec3_Sub(pBall, pCam, vCam);
     vCam[1] = 0.0f;
     if (0.0f != vCam[0] || 0.0f != vCam[1] || 0.0f != vCam[2]) {
-        Vec3_Normalize(vCam, vCam);
+        LLMath_Normalize3(vCam, vCam);
     }
     if (Vec3_Dot(vCam, vAim) > lbl_80281F78->fFC) return 1;
     return 0;
@@ -2266,7 +2266,7 @@ void CamScript_GetCameraOnFairwayPos(CamScript* pScript, f32* pOut, f32* pCam, i
     Vec3_Sub(gPlayers[nPlayer].ball.vPos, pSub, vCamDir);
     vCamDir[1] = 0.0f;
     if (0.0f != vCamDir[0] || 0.0f != vCamDir[1] || 0.0f != vCamDir[2]) {
-        Vec3_Normalize(vCamDir, vCamDir);
+        LLMath_Normalize3(vCamDir, vCamDir);
     }
     fn_80044768(gPlayers[nPlayer].ball.vPos, vNearBall);
     fn_80044768(gPlayers[nPlayer].vTarget, vNearTarget);
@@ -2274,7 +2274,7 @@ void CamScript_GetCameraOnFairwayPos(CamScript* pScript, f32* pOut, f32* pCam, i
     Vec3_Sub(pPin, gPlayers[nPlayer].vBall, vPastPin);
     vSpot[1] = 0.0f;    // EA bug: meant vPastPin[1]; the direction past the pin is not levelled
     if (0.0f != vPastPin[0] || 0.0f != vPastPin[1] || 0.0f != vPastPin[2]) {
-        Vec3_Normalize(vPastPin, vPastPin);
+        LLMath_Normalize3(vPastPin, vPastPin);
     }
     Vec3_Scale(3.0f, vPastPin, vPastPin);
     Vec3_Add(pPin, vPastPin, vPastPin);
@@ -2322,7 +2322,7 @@ void CamScript_GetCameraOnFairwayPos(CamScript* pScript, f32* pOut, f32* pCam, i
     Vec3_Sub(gPlayers[nPlayer].ball.vPos, vSpot, vDir);
     vDir[1] = 0.0f;
     if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
-        Vec3_Normalize(vDir, vDir);
+        LLMath_Normalize3(vDir, vDir);
     }
     if (Vec3_Dot(vDir, vCamDir) < lbl_80281F78->fF4) {
         bFound = 1;
@@ -2332,7 +2332,7 @@ void CamScript_GetCameraOnFairwayPos(CamScript* pScript, f32* pOut, f32* pCam, i
         Vec3_Sub(gPlayers[nPlayer].ball.vPos, vSpot, vDir);
         vDir[1] = 0.0f;
         if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
-            Vec3_Normalize(vDir, vDir);
+            LLMath_Normalize3(vDir, vDir);
         }
         if (Vec3_Dot(vDir, vCamDir) < lbl_80281F78->fF4) {
             bFound = 1;
@@ -2343,7 +2343,7 @@ void CamScript_GetCameraOnFairwayPos(CamScript* pScript, f32* pOut, f32* pCam, i
         Vec3_Sub(gPlayers[nPlayer].ball.vPos, vSpot, vDir);
         vDir[1] = 0.0f;
         if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
-            Vec3_Normalize(vDir, vDir);
+            LLMath_Normalize3(vDir, vDir);
         }
         if (Vec3_Dot(vDir, vCamDir) < lbl_80281F78->fF4) {
             bFound = 1;
@@ -2361,7 +2361,7 @@ void CamScript_GetCameraOnFairwayPos(CamScript* pScript, f32* pOut, f32* pCam, i
         Vec3_Sub(pPin, gPlayers[nPlayer].ball.vPos, vNearBall);
         vNearBall[1] = 0.0f;
         if (0.0f != vNearBall[0] || 0.0f != vNearBall[1] || 0.0f != vNearBall[2]) {
-            Vec3_Normalize(vNearBall, vNearBall);
+            LLMath_Normalize3(vNearBall, vNearBall);
         }
         Vec3_Scale(2.0f, vNearBall, vNearBall);
         Vec3_Add(pPin, vNearBall, vSpot);
@@ -2469,7 +2469,7 @@ void CamScript_UpdateFairwayCam(CamScript* pScript, f32* pCam, f32* pSub, int nP
         Vec3_Sub(pCam, gPlayers[nPlayer].ball.vPos, vFromBall);
         vFromBall[1] = 0.0f;
         if (0.0f != vFromBall[0] || 0.0f != vFromBall[1] || 0.0f != vFromBall[2]) {
-            Vec3_Normalize(vFromBall, vDir);
+            LLMath_Normalize3(vFromBall, vDir);
         } else {
             vDir[0] = 0.0f;
             vDir[1] = 0.0f;
@@ -2478,7 +2478,7 @@ void CamScript_UpdateFairwayCam(CamScript* pScript, f32* pCam, f32* pSub, int nP
         Vec3Copy(gPlayers[nPlayer].ball.vVel, vVel);
         vVel[1] = 0.0f;
         if (0.0f != vVel[0] || 0.0f != vVel[1] || 0.0f != vVel[2]) {
-            Vec3_Normalize(vVel, vVel);
+            LLMath_Normalize3(vVel, vVel);
         }
         fDot = Vec3_Dot(vDir, vVel);
         if (fDist < lbl_80281F78->f100) return;

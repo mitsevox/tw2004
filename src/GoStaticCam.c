@@ -13,7 +13,7 @@
 
 CamLens* Camera_GetLens(void* pCamera);                        // the render camera's lens
 void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 a, f32 b, f32 c);      // a rotation matrix from three angles
-void Mtx_MultVec3(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // a vector through a matrix
+void LLMath_mat44fltMultiply33(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // a vector through a matrix
 f32  fn_800C79BC(f32* pPos0, f32* pPos1, f32* pPos2, f32* pPos3);
 
 void fn_800644F4(UStreamObject* pObject);
@@ -157,7 +157,7 @@ void fn_80064A0C(UStreamObject* pObject) {
     lbl_80281E18->aStatic[lbl_80281E18->nStatic].v30[2] = PI * (pDef->aAngle[2] / 180.0f);
     pShot = &lbl_80281E18->aStatic[lbl_80281E18->nStatic];
     mat44flt_EulerAngles(m, pShot->v30[1], pShot->v30[0], pShot->v30[2]);
-    Mtx_MultVec3(m, vAhead, lbl_80281E18->aStatic[lbl_80281E18->nStatic].v30);
+    LLMath_mat44fltMultiply33(m, vAhead, lbl_80281E18->aStatic[lbl_80281E18->nStatic].v30);
     fn_80065AFC(lbl_80281E18->aStatic[lbl_80281E18->nStatic].v30,
                 lbl_80281E18->aStatic[lbl_80281E18->nStatic].v20,
                 lbl_80281E18->aStatic[lbl_80281E18->nStatic].v30);

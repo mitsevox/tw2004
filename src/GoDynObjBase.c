@@ -8,7 +8,7 @@
 
 void Mtx_Identity(f32 (*pMtx)[4]);                                           // identity
 void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
-void Mtx_MultVec4Array(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
+void LLMath_mat44fltMultiplyList(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void fn_8000C5A4(f32 (*pMtx)[4]);
 int  fn_80049ACC(int nMsg, DynObj* pObj, void* pArg, void* pArg2);
 
@@ -160,7 +160,7 @@ void fn_80049A54(DynObjTurning* pObj, void* pArg) {
 
     Mtx_Identity(mTurn);
     mat44flt_EulerAngles(mTurn, 2.0f * PI * (pObj->fSpeed / 360.0f) / 60.0f, 0.0f, 0.0f);
-    Mtx_MultVec4Array(pObj->base.obj.m0, mTurn, pObj->base.obj.m0, 4);
+    LLMath_mat44fltMultiplyList(pObj->base.obj.m0, mTurn, pObj->base.obj.m0, 4);
     fn_8000C5A4(pObj->base.obj.m0);
 }
 

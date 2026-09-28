@@ -237,7 +237,7 @@ int fn_80007BC4(RenderObj* obj, Camera* cam, float* outDepth, int mode, float sc
 
     Vec3Copy((f32*)bounds, (f32*)&pos);
     pos.w = 1.0f;
-    Mtx_MultVec4(cam->viewMtx, &pos, &pos);
+    LLMath_mat44fltMultiply(cam->viewMtx, &pos, &pos);
     Vec3Copy((f32*)&pos, (f32*)&sphere);
     if (outDepth != 0) {
         *outDepth = sphere.z;
@@ -251,7 +251,7 @@ void fn_80007C80(Camera* cam, const Vec3* src, Vec3* dst) {
 
     Vec3Copy((f32*)src, (f32*)&pos);
     pos.w = 1.0f;
-    Mtx_MultVec4(cam->viewMtx, &pos, &pos);
+    LLMath_mat44fltMultiply(cam->viewMtx, &pos, &pos);
     Vec3Copy((f32*)&pos, (f32*)dst);
 }
 

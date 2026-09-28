@@ -912,7 +912,7 @@ void fn_800FBB30(Player* p) {
     f32 fLow;
     fn_800FE190(p->ball.vPos, p->vPlacement, v);
     fDistSq = v[0] * v[0] + v[2] * v[2];
-    Vec3_Normalize(v, v);
+    LLMath_Normalize3(v, v);
     fAngle = p->fA88 - atan2f(v[2], v[0]) - PI / 2.0f;
     while (fAngle < -PI) {
         fAngle += TWOPI;
@@ -1179,7 +1179,7 @@ void fn_800FBD2C(int nPlayer) {
             gPlayers[nPlayer].nC54 = 179;
         }
         fn_800FE190(p->ball.vPos, p->vPlacement, vDir);
-        Vec_Normalize(vDir, vDir);
+        LLMath_Normalize(vDir, vDir);
         gPlayers[nPlayer].fA88 = PI / 2.0f + atan2f(vDir[2], vDir[0]);
         break;
     case -1:
@@ -1200,7 +1200,7 @@ void fn_800FBD2C(int nPlayer) {
         pBall = &p->ball;
         pTarget = p->vPlacement;
         fn_800FE190(pBall->vPos, pTarget, vDir);
-        Vec_Normalize(vDir, vDir);
+        LLMath_Normalize(vDir, vDir);
         fAngle = gPlayers[nPlayer].fA88 - atan2f(vDir[2], vDir[0]) - PI / 2.0f;
         fAngle *= 180.0f / PI;
         if (gPlayers[nPlayer].nC58 == 2) {

@@ -10,7 +10,7 @@ void Mtx_Identity(f32 (*pMtx)[4]);                     // identity
 void CA_vSetDefaultScalingVectors(CamLens* pLens);
 f32  Math_Tan(f32 x);                              // tan, as a float
 void fn_800354B4(u8* p, f32 v);                       // GoTerrain.c: sets the lens's far clip, fAC
-void Mtx_MultVec4Array(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
+void LLMath_mat44fltMultiplyList(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void CA_vSetMatrix(CamLens* pLens, f32 (*pMtx)[4]);
 void fn_800769C0(CamLens* pLens, f32 fA8, f32 fAC);
 void fn_80076A04(CamLens* pLens, f32 fA8);
@@ -55,13 +55,13 @@ void CA_vSetLookAt(CamLens* pLens, f32* pPos, f32* pTarget) {
     vDir[3] = 0.0f;
     fn_80076A14(pTarget, pPos, vDir);
     if ((f32)Math_Sqrt(Vec3_LengthSqClamped(vDir)) > 0.1f) {
-        Vec3_Normalize(vDir, pLens->m4[2]);
+        LLMath_Normalize3(vDir, pLens->m4[2]);
         if (fabsf(pLens->m4[2][1]) < 0.99f) {
             pLens->m4[0][0] = pLens->m4[2][2];
             pLens->m4[0][1] = 0.0f;
             pLens->m4[0][2] = -pLens->m4[2][0];
             pLens->m4[0][3] = 0.0f;
-            Vec3_Normalize(pLens->m4[0], pLens->m4[0]);
+            LLMath_Normalize3(pLens->m4[0], pLens->m4[0]);
         }
         vec4flt_CrossProduct(pLens->m4[2], pLens->m4[0], pLens->m4[1]);
     }
@@ -80,12 +80,12 @@ void CA_vSetLookAtSide(CamLens* pLens, f32* pPos, f32* pTarget, f32* pSide) {
     vDir[3] = 0.0f;
     fn_80076A14(pTarget, pPos, vDir);
     if ((f32)Math_Sqrt(Vec3_LengthSqClamped(vDir)) > 0.1f) {
-        Vec3_Normalize(vDir, pLens->m4[2]);
+        LLMath_Normalize3(vDir, pLens->m4[2]);
         pLens->m4[0][0] = pSide[0];
         pLens->m4[0][1] = pSide[1];
         pLens->m4[0][2] = pSide[2];
         pLens->m4[0][3] = 0.0f;
-        Vec3_Normalize(pLens->m4[0], pLens->m4[0]);
+        LLMath_Normalize3(pLens->m4[0], pLens->m4[0]);
         vec4flt_CrossProduct(pLens->m4[2], pLens->m4[0], pLens->m4[1]);
     }
     Mtx_InvertRigid(pLens->m4, pLens->m44);
@@ -108,13 +108,13 @@ void Camera_SetCameraPositionAndTargetWithOffsetAndScale(CamLens* pLens, f32* pP
     vDir[3] = 0.0f;
     fn_80076A14(pTarget, pPos, vDir);
     if ((f32)Math_Sqrt(Vec3_LengthSqClamped(vDir)) > 0.1f) {
-        Vec3_Normalize(vDir, pLens->m4[2]);
+        LLMath_Normalize3(vDir, pLens->m4[2]);
         if (fabsf(pLens->m4[2][1]) < 0.99f) {
             pLens->m4[0][0] = pLens->m4[2][2];
             pLens->m4[0][1] = 0.0f;
             pLens->m4[0][2] = -pLens->m4[2][0];
             pLens->m4[0][3] = 0.0f;
-            Vec3_Normalize(pLens->m4[0], pLens->m4[0]);
+            LLMath_Normalize3(pLens->m4[0], pLens->m4[0]);
         }
         vec4flt_CrossProduct(pLens->m4[2], pLens->m4[0], pLens->m4[1]);
     }
@@ -125,17 +125,17 @@ void Camera_SetCameraPositionAndTargetWithOffsetAndScale(CamLens* pLens, f32* pP
     mTmp[3][0] = pCenter[0];
     mTmp[3][1] = pCenter[1];
     mTmp[3][2] = pCenter[2];
-    Mtx_MultVec4Array(mTmp, pLens->m44, mB, 4);
+    LLMath_mat44fltMultiplyList(mTmp, pLens->m44, mB, 4);
     Mtx_Identity(mTmp);
     mTmp[0][0] = pScale[0];
     mTmp[1][1] = pScale[1];
     mTmp[2][2] = pScale[2];
-    Mtx_MultVec4Array(mTmp, mB, mA, 4);
+    LLMath_mat44fltMultiplyList(mTmp, mB, mA, 4);
     Mtx_Identity(mTmp);
     mTmp[3][0] = -pCenter[0];
     mTmp[3][1] = -pCenter[1];
     mTmp[3][2] = -pCenter[2];
-    Mtx_MultVec4Array(mTmp, mA, pLens->m44, 4);
+    LLMath_mat44fltMultiplyList(mTmp, mA, pLens->m44, 4);
 
     // camera to world: the same with the inverse scale
     Mtx_Identity(mTmp);
@@ -146,15 +146,15 @@ void Camera_SetCameraPositionAndTargetWithOffsetAndScale(CamLens* pLens, f32* pP
     mB[0][0] = pLens->m84[0][0];
     mB[1][1] = pLens->m84[0][1];
     mB[2][2] = pLens->m84[0][2];
-    Mtx_MultVec4Array(mB, mTmp, mA, 4);
+    LLMath_mat44fltMultiplyList(mB, mTmp, mA, 4);
     Mtx_Identity(mTmp);
     mTmp[3][0] = -pCenter[0];
     mTmp[3][1] = -pCenter[1];
     mTmp[3][2] = -pCenter[2];
-    Mtx_MultVec4Array(mTmp, mA, mB, 4);
-    Mtx_MultVec4Array(pLens->m4, mB, mA, 4);
+    LLMath_mat44fltMultiplyList(mTmp, mA, mB, 4);
+    LLMath_mat44fltMultiplyList(pLens->m4, mB, mA, 4);
     Mtx_Copy(mA, pLens->m4);
-    Mtx_MultVec4Array(pLens->m4, pLens->m44, mB, 4);   // the result is never used
+    LLMath_mat44fltMultiplyList(pLens->m4, pLens->m44, mB, 4);   // the result is never used
 }
 
 // A new lens's settings: a perspective camera, near clip 0.1 and far clip 4096, a 60-degree field

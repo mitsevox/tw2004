@@ -478,3 +478,13 @@ address	name	comment	by	date
 800BAFC0	Vec3_NormalizeLength	rewrite	rd1 (replayed by orchestrator)	2026-09-28
 800BB028	Vec3_DistanceSq	keep	rd1 (replayed by orchestrator)	2026-09-28
 800BB050	vec4flt_DistanceBetween3	rewrite	rd1 (replayed by orchestrator)	2026-09-28
+800BAD60	LLMath_mat44fltMultiply	keep	rd1 (replayed by orchestrator)	2026-09-28
+800BADB4	LLMath_mat44fltMultiply33	keep	rd1 (replayed by orchestrator)	2026-09-28
+800BADF8	LLMath_mat44fltMultiplyList	keep	rd1 (replayed by orchestrator)	2026-09-28
+800BAE5C	LLMath_mat44fltMultiplyList33	keep	rd1 (replayed by orchestrator)	2026-09-28
+800BAEB0	LLMath_Normalize	keep	rd1 (replayed by orchestrator)	2026-09-28
+800BAF04	LLMath_Normalize3	keep	rd1 (replayed by orchestrator)	2026-09-28
+800BAF58	LLMath_NormalizeReturnLength	keep	rd1 (replayed by orchestrator)	2026-09-28
+800BAFC0	LLMath_NormalizeReturnLength3	keep	rd1 (replayed by orchestrator)	2026-09-28
+800BB028	LLMath_SquareDistanceBetween3	keep	rd1 (replayed by orchestrator)	2026-09-28
+800BB050	LLMath_DistanceBetween3	keep	rd1 (replayed by orchestrator)	2026-09-28
