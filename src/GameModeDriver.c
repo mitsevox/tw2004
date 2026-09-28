@@ -1,8 +1,8 @@
 // GameModeDriver.c (our name): the career calendar's per-mode driver. The front end's calendar
-// screen calls through tables of three functions (lbl_80193E70..lbl_80193F00), indexed by
+// screen calls through tables of three functions (gCalendarAtEarliest..gCalendarIsSimulationNecessary), indexed by
 // CareerCalendar.nDriver: no career (the stubs first), the PGA TOUR season (GameModeDriverPGATour.c)
 // and the real-time events (GameModeDriverRTE.c). The file ends with the calendar grid itself: the
-// month shown in 35 day cells (lbl_80223C48).
+// month shown in 35 day cells (CalendarState).
 
 #include "golfer.h"
 #include "game.h"
@@ -102,7 +102,7 @@ void PGATour_Init(void) {
 }
 
 // Whether the PGA TOUR calendar shows January of the year of the career's current day
-// (lbl_80223C48.nToday): the season's first month, the calendar cannot go back from it. 1 there,
+// (CalendarState.nToday): the season's first month, the calendar cannot go back from it. 1 there,
 // else 0.
 u8 PGATour_AtEarliest(void) {
     s32 nMonth;
@@ -110,9 +110,9 @@ u8 PGATour_AtEarliest(void) {
     s32 nYear;
     int b;
 
-    CalDate_GetMDY(&lbl_80223C48.nToday, &nMonth, &nDay, &nYear);
+    CalDate_GetMDY(&CalendarState.nToday, &nMonth, &nDay, &nYear);
     b = 0;
-    if (lbl_80223C48.nMonth == 1 && lbl_80223C48.nYear == nYear) {
+    if (CalendarState.nMonth == 1 && CalendarState.nYear == nYear) {
         b = 1;
     }
     return b;
@@ -126,9 +126,9 @@ u8 PGATour_AtLatest(void) {
     s32 nYear;
     int b;
 
-    CalDate_GetMDY(&lbl_80223C48.nToday, &nMonth, &nDay, &nYear);
+    CalDate_GetMDY(&CalendarState.nToday, &nMonth, &nDay, &nYear);
     b = 0;
-    if (lbl_80223C48.nMonth == 12 && lbl_80223C48.nYear == nYear) {
+    if (CalendarState.nMonth == 12 && CalendarState.nYear == nYear) {
         b = 1;
     }
     return b;
@@ -158,30 +158,30 @@ u8    RealTime_IsSimulationNecessary(void);
 
 // The calendar screen's tables, indexed by CareerCalendar.nDriver: no career, the PGA TOUR season,
 // the real-time events. (Defined here, before the strings below, to keep EA's data order.)
-u8 (*lbl_80193E70[3])(void) = { Online_AtEarliest, PGATour_AtEarliest, RealTime_AtEarliest };
-u8 (*lbl_80193E7C[3])(void) = { Online_AtLatest, PGATour_AtLatest, RealTime_AtLatest };
-s32 (*lbl_80193E88[3])(char* sz, u16 nDate, s32* pLook, s32* pButton) = {
+u8 (*gCalendarAtEarliest[3])(void) = { Online_AtEarliest, PGATour_AtEarliest, RealTime_AtEarliest };
+u8 (*gCalendarAtLatest[3])(void) = { Online_AtLatest, PGATour_AtLatest, RealTime_AtLatest };
+s32 (*gCalendarFillCell[3])(char* sz, u16 nDate, s32* pLook, s32* pButton) = {
     Online_FillCell, PGATour_FillCell, RealTime_FillCell
 };
-void (*lbl_80193E94[3])(int nLine, char* sz) = { Online_GetLine, PGATour_GetLine, RealTime_GetLine };
-void (*lbl_80193EA0[3])(u16 nDate, int n,
+void (*gCalendarGetLine[3])(int nLine, char* sz) = { Online_GetLine, PGATour_GetLine, RealTime_GetLine };
+void (*gCalendarGetBottomLine[3])(u16 nDate, int n,
                         char* sz) = { Online_GetBottomLine, PGATour_GetBottomLine, RealTime_GetBottomLine };
-s32 (*lbl_80193EAC[3])(u16 nDate) = { Online_GetPopupType, PGATour_GetPopupType, RealTime_GetPopupType };
-void (*lbl_80193EB8[3])(int nKind, char* szTitle, char* szText) = {
+s32 (*gCalendarGetPopupType[3])(u16 nDate) = { Online_GetPopupType, PGATour_GetPopupType, RealTime_GetPopupType };
+void (*gCalendarGetPopupRow[3])(int nKind, char* szTitle, char* szText) = {
     Online_GetPopupRow, PGATour_GetPopupRow, RealTime_GetPopupRow
 };
-u16 (*lbl_80193EC4[3])(void) = { Online_GetCurrentDay, PGATour_GetCurrentDay, RealTime_GetCurrentDay };
-void (*lbl_80193ED0[3])(void) = { Online_Init, PGATour_Init, RealTime_Init };
-char* (*lbl_80193EDC[3])(u16 nDate) = { Online_GetEventName, PGATour_GetEventName, RealTime_GetEventName };
+u16 (*gCalendarGetCurrentDay[3])(void) = { Online_GetCurrentDay, PGATour_GetCurrentDay, RealTime_GetCurrentDay };
+void (*gCalendarInit[3])(void) = { Online_Init, PGATour_Init, RealTime_Init };
+char* (*gCalendarGetEventName[3])(u16 nDate) = { Online_GetEventName, PGATour_GetEventName, RealTime_GetEventName };
 // port: the PGA TOUR and real-time drivers return their own event types through this void* entry
-void* (*lbl_80193EE8[3])(u16 nDate) = {
+void* (*gCalendarGetEventInfoByDate[3])(u16 nDate) = {
     Online_GetEventInfoByDate, (void* (*)(u16))fn_800EFC80, (void* (*)(u16))GM_RealtimeMode_GetEventInfoByDate
 };
-void (*lbl_80193EF4[3])(void) = { Online_Play, PGATour_Play, RealTime_Play };
-u8 (*lbl_80193F00[3])(void) = { Online_IsSimulationNecessary, PGATour_IsSimulationNecessary, RealTime_IsSimulationNecessary };
+void (*gCalendarPlay[3])(void) = { Online_Play, PGATour_Play, RealTime_Play };
+u8 (*gCalendarIsSimulationNecessary[3])(void) = { Online_IsSimulationNecessary, PGATour_IsSimulationNecessary, RealTime_IsSimulationNecessary };
 
 // The calendar grid.
-CareerCalendar lbl_80223C48;
+CareerCalendar CalendarState;
 
 // The PGA TOUR calendar's header lines: line 1 today's tournament and round (Calendar_GetEventNameLine), or
 // "Season Complete" once the season has no tournament left; line 2 empty. Other lines leave the
@@ -189,11 +189,11 @@ CareerCalendar lbl_80223C48;
 void PGATour_GetLine(int nLine, char* sz) {
     switch (nLine) {
     case 1:
-        if (lbl_80223C48.bSeasonOver) {
+        if (CalendarState.bSeasonOver) {
             strcpy(sz, "Season Complete");
             return;
         }
-        Calendar_GetEventNameLine(lbl_80223C48.nToday, sz);
+        Calendar_GetEventNameLine(CalendarState.nToday, sz);
         return;
     case 2:
         sz[0] = 0;
@@ -204,7 +204,7 @@ void PGATour_GetLine(int nLine, char* sz) {
 // The PGA TOUR calendar's line under "Selected Day:" for a date: "Event: <name>, Round <n>" (the
 // round the tournament plays that day), or "No Event Scheduled". The line number is not used.
 void PGATour_GetBottomLine(u16 nDate, int n, char* sz) {
-    char* szName = lbl_80193EDC[lbl_80223C48.nDriver](nDate);
+    char* szName = gCalendarGetEventName[CalendarState.nDriver](nDate);
     s32 nId;
     s32 nRound;
 
@@ -259,8 +259,8 @@ s32 PGATour_FillCell(char* sz, u16 nDate, s32* pLook, s32* pButton) {
     if (GameModeDriverPGATour_GetEventByDate(nDate, &nId, &nRound)) {
         bSelected = nId == GameModeDriverPGATour_GetSelectedEvent(&nRound2);
         fn_800EFA70(nId);
-        if (nDate == lbl_80223C48.nToday) {
-            if (lbl_80223C48.bSeasonOver) {
+        if (nDate == CalendarState.nToday) {
+            if (CalendarState.bSeasonOver) {
                 strcpy(sz, "");
                 *pButton = 4;
             } else if (nSelRound == 0) {
@@ -270,24 +270,24 @@ s32 PGATour_FillCell(char* sz, u16 nDate, s32* pLook, s32* pButton) {
                 strcpy(sz, "\nCONTINUE");
                 *pButton = 2;
             }
-        } else if (nRound == 0 && bSelected == 0 && nDate > lbl_80223C48.nToday) {
+        } else if (nRound == 0 && bSelected == 0 && nDate > CalendarState.nToday) {
             *pButton = 3;
             strcpy(sz, "");
         } else {
             *pButton = 4;
             strcpy(sz, "");
         }
-        if (nDate == lbl_80223C48.nToday - 1 && bSelected) {
+        if (nDate == CalendarState.nToday - 1 && bSelected) {
             GetRankText(GM_PgaTourSim_GetScoreRankFromEntrantID(fn_80077B08(), 0), sz);
         }
         if (bSelected) {
             *pLook = 4;
         } else if (FE_GetCurrentProfile()->aC8[nId].award.bWon &&
-                   (nDate < lbl_80223C48.nToday ||
-                    (lbl_80223C48.bSeasonOver && nDate == lbl_80223C48.nToday))) {
+                   (nDate < CalendarState.nToday ||
+                    (CalendarState.bSeasonOver && nDate == CalendarState.nToday))) {
             *pLook = 5;
-        } else if (nDate < lbl_80223C48.nToday ||
-                   (lbl_80223C48.bSeasonOver && nDate == lbl_80223C48.nToday)) {
+        } else if (nDate < CalendarState.nToday ||
+                   (CalendarState.bSeasonOver && nDate == CalendarState.nToday)) {
             *pLook = 2;
         } else {
             *pLook = 3;
@@ -303,7 +303,7 @@ s32 PGATour_FillCell(char* sz, u16 nDate, s32* pLook, s32* pButton) {
 }
 
 // Which day-details popup the PGA TOUR calendar shows for a date's tournament (the calendar screen
-// keeps it in lbl_80223C48.n1C for PGATour_GetPopupRow), by its start against the current
+// keeps it in CalendarState.n1C for PGATour_GetPopupRow), by its start against the current
 // tournament's: 1 results (an earlier tournament, or any while player 1 has no current tournament,
 // fn_800F0428(0) == -1), 3 the current one before it starts (today is its first round), 0 the
 // current one in progress, 2 upcoming (a later one).
@@ -316,7 +316,7 @@ s32 PGATour_GetPopupType(u16 nDate) {
     u16 nStart;
     s32 nResult;
 
-    GameModeDriverPGATour_GetEventByDate(lbl_80223C48.nToday, &nTodayId, &nTodayRound);
+    GameModeDriverPGATour_GetEventByDate(CalendarState.nToday, &nTodayId, &nTodayRound);
     GameModeDriverPGATour_GetEventByDate(nDate, &nId, &nRound);
     nTodayStart = fn_800EFD38(nTodayId);
     nStart = fn_800EFD38(nId);
@@ -338,7 +338,7 @@ s32 PGATour_GetPopupType(u16 nDate) {
 
 // A row of the PGA TOUR calendar's day-details popup (row 0, "Event:", is the calendar screen's):
 // row 1 blank, row 2 "Dates:" and the selected day's tournament's first and last days ("<start> -
-// <end>"); the other rows come from the popup lbl_80223C48.n1C names (0 in progress fn_8011D280, 1
+// <end>"); the other rows come from the popup CalendarState.n1C names (0 in progress fn_8011D280, 1
 // results fn_8011D4DC, 2 upcoming fn_8011D658, 3 before it starts fn_8011D858).
 void PGATour_GetPopupRow(int nKind, char* szTitle, char* szText) {
     s32 nId;
@@ -354,7 +354,7 @@ void PGATour_GetPopupRow(int nKind, char* szTitle, char* szText) {
         szText[0] = 0;
         return;
     case 2:
-        GameModeDriverPGATour_GetEventByDate(lbl_80223C48.nSelected, &nId, &nRound);
+        GameModeDriverPGATour_GetEventByDate(CalendarState.nSelected, &nId, &nRound);
         nStart = fn_800EFD38(nId);
         nEnd = GameModeDriverPGATour_GetEndDate(nId);
         CalDate_ToString(nStart, szStart);
@@ -363,7 +363,7 @@ void PGATour_GetPopupRow(int nKind, char* szTitle, char* szText) {
         sprintf(szText, "%s - %s", szStart, szEnd);
         return;
     default:
-        switch (lbl_80223C48.n1C) {
+        switch (CalendarState.n1C) {
         case 0:
             fn_8011D280(nKind, szTitle, szText);
             return;
@@ -413,7 +413,7 @@ void PGATour_Play(void) {
 
     Session_SetGolfer(30, 0);
     GM_SetModeType(23);
-    GameModeDriverPGATour_GetEventByDate(lbl_80223C48.nSelected, &nId, &nRound);
+    GameModeDriverPGATour_GetEventByDate(CalendarState.nSelected, &nId, &nRound);
     fn_800EF9D0(nId);
 }
 
@@ -426,7 +426,7 @@ u8 PGATour_IsSimulationNecessary(void) {
     s32 nRound;
 
     nSel =GameModeDriverPGATour_GetSelectedEvent(&nRound);
-    GameModeDriverPGATour_GetEventByDate(lbl_80223C48.nSelected, &nId, &nRound);
+    GameModeDriverPGATour_GetEventByDate(CalendarState.nSelected, &nId, &nRound);
     return nSel != nId;
 }
 
@@ -438,16 +438,16 @@ void RealTime_Init(void) {
 }
 
 // Whether the real-time events calendar shows January of the year of the current day
-// (lbl_80223C48.nToday): its first month, the calendar cannot go back from it. 1 there, else 0.
+// (CalendarState.nToday): its first month, the calendar cannot go back from it. 1 there, else 0.
 u8 RealTime_AtEarliest(void) {
     s32 nMonth;
     s32 nDay;
     s32 nYear;
     int b;
 
-    CalDate_GetMDY(&lbl_80223C48.nToday, &nMonth, &nDay, &nYear);
+    CalDate_GetMDY(&CalendarState.nToday, &nMonth, &nDay, &nYear);
     b = 0;
-    if (lbl_80223C48.nMonth == 1 && lbl_80223C48.nYear == nYear) {
+    if (CalendarState.nMonth == 1 && CalendarState.nYear == nYear) {
         b = 1;
     }
     return b;
@@ -461,9 +461,9 @@ u8 RealTime_AtLatest(void) {
     s32 nYear;
     int b;
 
-    CalDate_GetMDY(&lbl_80223C48.nToday, &nMonth, &nDay, &nYear);
+    CalDate_GetMDY(&CalendarState.nToday, &nMonth, &nDay, &nYear);
     b = 0;
-    if (lbl_80223C48.nMonth == 1 && lbl_80223C48.nYear == nYear + 1) {
+    if (CalendarState.nMonth == 1 && CalendarState.nYear == nYear + 1) {
         b = 1;
     }
     return b;
@@ -497,7 +497,7 @@ void RealTime_GetLine(int nLine, char* sz) {
         sprintf(sz, "Today: %s", szDate);
         return;
     case 2:
-        Calendar_GetEventNameLine(lbl_80223C48.nToday, sz);
+        Calendar_GetEventNameLine(CalendarState.nToday, sz);
         return;
     }
 }
@@ -509,13 +509,13 @@ void RealTime_GetBottomLine(u16 nDate, int n, char* sz) {
 }
 
 // Which day-details popup the real-time events calendar shows for a date (the calendar screen keeps
-// it in lbl_80223C48.n1C for RealTime_GetPopupRow): 5 results for a past day; 4 today's event, or 5
+// it in CalendarState.n1C for RealTime_GetPopupRow): 5 results for a past day; 4 today's event, or 5
 // once it is completed (fn_800F102C, always 0 in this build); 6 upcoming for a day to come.
 s32 RealTime_GetPopupType(u16 nDate) {
-    if (nDate < lbl_80223C48.nToday) {
+    if (nDate < CalendarState.nToday) {
         return 5;
     }
-    if (nDate == lbl_80223C48.nToday) {
+    if (nDate == CalendarState.nToday) {
         return (GM_RealtimeMode_TodaysEventCompleted() != 0) + 4;
     }
     return 6;
@@ -523,14 +523,14 @@ s32 RealTime_GetPopupType(u16 nDate) {
 
 // A row of the real-time events calendar's day-details popup (row 0, "Event:", is the calendar
 // screen's): row 1 "Date:" and the selected day, row 2 blank; the other rows come from the popup
-// lbl_80223C48.n1C names (4 today's event fn_8011D878, 5 results fn_8011DA44, 6 upcoming
+// CalendarState.n1C names (4 today's event fn_8011D878, 5 results fn_8011DA44, 6 upcoming
 // fn_8011DC30).
 void RealTime_GetPopupRow(int nKind, char* szTitle, char* szText) {
     char szDate[12];
 
     switch (nKind) {
     case 1:
-        CalDate_ToString(lbl_80223C48.nSelected, szDate);
+        CalDate_ToString(CalendarState.nSelected, szDate);
         strcpy(szTitle, "Date:");
         strcpy(szText, szDate);
         return;
@@ -539,7 +539,7 @@ void RealTime_GetPopupRow(int nKind, char* szTitle, char* szText) {
         szText[0] = 0;
         return;
     default:
-        switch (lbl_80223C48.n1C) {
+        switch (CalendarState.n1C) {
         case 4:
             fn_8011D878(nKind, szTitle, szText);
             return;
@@ -587,7 +587,7 @@ u8 RealTime_IsSimulationNecessary(void) {
 
 // ---- the calendar -----------------------------------------------------------------------------
 
-// Opens the calendar on the driver's current day (lbl_80223C48.nToday; once the PGA TOUR season has
+// Opens the calendar on the driver's current day (CalendarState.nToday; once the PGA TOUR season has
 // no tournament left, the last tournament's last day, with bSeasonOver set) and shows the month it
 // falls in; when that day's cell would lie past the grid's 35 cells the month after is shown
 // instead (not from December). Called when the calendar screen switches driver and when a new
@@ -598,19 +598,19 @@ void ResetCalendarState(void) {
     s32 nDay;
     s32 nYear;
 
-    lbl_80223C48.bSeasonOver = 0;
-    nDate = lbl_80193EC4[lbl_80223C48.nDriver]();
+    CalendarState.bSeasonOver = 0;
+    nDate = gCalendarGetCurrentDay[CalendarState.nDriver]();
     if (nDate == 0xFFFF) {
         nDate = GameModeDriverPGATour_GetEndDate(GameModeDriverPGATour_GetFinalEventOfSeason());
-        lbl_80223C48.bSeasonOver = 1;
+        CalendarState.bSeasonOver = 1;
     }
-    lbl_80223C48.nToday = nDate;
-    CalDate_GetMDY(&lbl_80223C48.nToday, &nMonth, &nDay, &nYear);
-    lbl_80223C48.nMonth = nMonth;
-    lbl_80223C48.nYear = nYear;
+    CalendarState.nToday = nDate;
+    CalDate_GetMDY(&CalendarState.nToday, &nMonth, &nDay, &nYear);
+    CalendarState.nMonth = nMonth;
+    CalendarState.nYear = nYear;
     UpdateCalendarState();
-    if ((u32)(lbl_80223C48.nFirstCell + nDay) > 35 && lbl_80223C48.nMonth != 12) {
-        lbl_80223C48.nMonth++;
+    if ((u32)(CalendarState.nFirstCell + nDay) > 35 && CalendarState.nMonth != 12) {
+        CalendarState.nMonth++;
         UpdateCalendarState();
     }
 }
@@ -618,23 +618,23 @@ void ResetCalendarState(void) {
 // A day's event as text: "No Event Scheduled", on the PGA TOUR "Active Event: <name>, Round <n>"
 // (the round of the event on nToday, not nDate), else "Event: <name>".
 void Calendar_GetEventNameLine(u16 nDate, char* sz) {
-    char* szName = lbl_80193EDC[lbl_80223C48.nDriver](nDate);
+    char* szName = gCalendarGetEventName[CalendarState.nDriver](nDate);
     s32 nId;
     s32 nRound;
 
-    GameModeDriverPGATour_GetEventByDate(lbl_80223C48.nToday, &nId, &nRound);
+    GameModeDriverPGATour_GetEventByDate(CalendarState.nToday, &nId, &nRound);
     if (szName[0] == 0) {
         strcpy(sz, "No Event Scheduled");
         return;
     }
-    if (lbl_80223C48.nDriver == 1) {
+    if (CalendarState.nDriver == 1) {
         sprintf(sz, "Active Event: %s, Round %d", szName, nRound + 1);
         return;
     }
     sprintf(sz, "Event: %s", szName);
 }
 
-// Lays the month shown (lbl_80223C48.nMonth and nYear) out on the 35-cell grid: the cell of its
+// Lays the month shown (CalendarState.nMonth and nYear) out on the 35-cell grid: the cell of its
 // first day (its day of the week, counted from 0), the cell after its last day, and the number of
 // days in the month before. Called whenever the month shown changes.
 void UpdateCalendarState(void) {
@@ -643,13 +643,13 @@ void UpdateCalendarState(void) {
     s32 nMonth;
     s32 nYear;
 
-    nDays = DaysInMonth(lbl_80223C48.nMonth, lbl_80223C48.nYear);
-    CalDate_SetMDY(&nDate, lbl_80223C48.nMonth, 1, lbl_80223C48.nYear);
-    lbl_80223C48.nFirstCell = CalDate_GetDayOfWeek(&nDate);
-    lbl_80223C48.nFirstCell = lbl_80223C48.nFirstCell - 1;
-    lbl_80223C48.nEndCell = lbl_80223C48.nFirstCell + nDays;
-    CalDate_GetPrevMonth(lbl_80223C48.nMonth, lbl_80223C48.nYear, &nMonth, &nYear);
-    lbl_80223C48.nPrevMonthDays = DaysInMonth(nMonth, nYear);
+    nDays = DaysInMonth(CalendarState.nMonth, CalendarState.nYear);
+    CalDate_SetMDY(&nDate, CalendarState.nMonth, 1, CalendarState.nYear);
+    CalendarState.nFirstCell = CalDate_GetDayOfWeek(&nDate);
+    CalendarState.nFirstCell = CalendarState.nFirstCell - 1;
+    CalendarState.nEndCell = CalendarState.nFirstCell + nDays;
+    CalDate_GetPrevMonth(CalendarState.nMonth, CalendarState.nYear, &nMonth, &nYear);
+    CalendarState.nPrevMonthDays = DaysInMonth(nMonth, nYear);
 }
 
 // The date in a cell of the grid (cells before day 1 belong to the month before, those after the
@@ -662,16 +662,16 @@ u16 GetDateFromCellIndex(u32 nCell) {
 
     nMonth = 0;
     nYear = 0;
-    if (nCell < lbl_80223C48.nFirstCell) {
-        nDay = 1 + (lbl_80223C48.nPrevMonthDays - lbl_80223C48.nFirstCell) + nCell;
-        CalDate_GetPrevMonth(lbl_80223C48.nMonth, lbl_80223C48.nYear, &nMonth, &nYear);
-    } else if (nCell >= lbl_80223C48.nEndCell) {
-        nDay = nCell - (lbl_80223C48.nEndCell - 1);
-        CalDate_GetNextMonth(lbl_80223C48.nMonth, lbl_80223C48.nYear, &nMonth, &nYear);
+    if (nCell < CalendarState.nFirstCell) {
+        nDay = 1 + (CalendarState.nPrevMonthDays - CalendarState.nFirstCell) + nCell;
+        CalDate_GetPrevMonth(CalendarState.nMonth, CalendarState.nYear, &nMonth, &nYear);
+    } else if (nCell >= CalendarState.nEndCell) {
+        nDay = nCell - (CalendarState.nEndCell - 1);
+        CalDate_GetNextMonth(CalendarState.nMonth, CalendarState.nYear, &nMonth, &nYear);
     } else {
-        nDay = (nCell - lbl_80223C48.nFirstCell) + 1;
-        nMonth = lbl_80223C48.nMonth;
-        nYear = lbl_80223C48.nYear;
+        nDay = (nCell - CalendarState.nFirstCell) + 1;
+        nMonth = CalendarState.nMonth;
+        nYear = CalendarState.nYear;
     }
     CalDate_SetMDY(&nDate, nMonth, nDay, nYear);
     return nDate;
@@ -704,16 +704,16 @@ s32 GetCellIndexFromDate(u16 nDate) {
     u32 nPrevShown;
 
     nCopy = nDate;
-    nPrevShown = lbl_80223C48.nPrevMonthDays - lbl_80223C48.nFirstCell;
+    nPrevShown = CalendarState.nPrevMonthDays - CalendarState.nFirstCell;
     CalDate_GetMDY(&nCopy, &nMonth, &nDay, &nYear);
     // fake match: the original compares the months unsigned (cmplw); both are 1..12.
-    if ((u32)lbl_80223C48.nMonth == nMonth) {
-        return nDay + (s32)lbl_80223C48.nFirstCell - 1;
+    if ((u32)CalendarState.nMonth == nMonth) {
+        return nDay + (s32)CalendarState.nFirstCell - 1;
     }
-    if (IsAMonthAhead(lbl_80223C48.nMonth, nMonth) && nDay < 35 - lbl_80223C48.nEndCell) {
-        return nDay + (s32)lbl_80223C48.nEndCell - 1;
+    if (IsAMonthAhead(CalendarState.nMonth, nMonth) && nDay < 35 - CalendarState.nEndCell) {
+        return nDay + (s32)CalendarState.nEndCell - 1;
     }
-    if (IsAMonthBehind(lbl_80223C48.nMonth, nMonth) && nDay > nPrevShown) {
+    if (IsAMonthBehind(CalendarState.nMonth, nMonth) && nDay > nPrevShown) {
         return (nDay - nPrevShown) - 1;
     }
     return -1;

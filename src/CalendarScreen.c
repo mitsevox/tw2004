@@ -1,6 +1,6 @@
 // CalendarScreen.c (our name): the front end's career calendar screen. Its callbacks, registered
 // in the front end's message table, fill the month grid and the day-details panel through the
-// career calendar's driver tables (GameModeDriver.c, CareerCalendar lbl_80223C48).
+// career calendar's driver tables (GameModeDriver.c, CareerCalendar CalendarState).
 
 #include "engine.h"
 #include "game.h"
@@ -21,14 +21,14 @@ void fn_80111F58(MsgArg* pArgs, MsgArg* pResult) {
 
     sprintf(szDay, "%d", CalDate_GetDay(nDate));
     *pLook = 0;
-    *pCell = lbl_80193E88[lbl_80223C48.nDriver](szText, nDate, pLook, pButton);
-    if (lbl_80223C48.nMonth != CalDate_GetMonth(nDate)) {
+    *pCell = gCalendarFillCell[CalendarState.nDriver](szText, nDate, pLook, pButton);
+    if (CalendarState.nMonth != CalDate_GetMonth(nDate)) {
         *pLook = 1;
     }
 }
 
 void fn_80112020(MsgArg* pArgs, MsgArg* pResult) {
-    lbl_80193E94[lbl_80223C48.nDriver](pArgs[0].i, ((MsgString*)pArgs[1].p)->pStr);
+    gCalendarGetLine[CalendarState.nDriver](pArgs[0].i, ((MsgString*)pArgs[1].p)->pStr);
 }
 
 // Line pArgs[1] about grid cell pArgs[0]: 1 its date, 2 the driver's text.
@@ -47,7 +47,7 @@ void fn_8011206C(MsgArg* pArgs, MsgArg* pResult) {
         sprintf(sz, "Selected Day: %d/%d/%d", nMonth, nDay, nYear);
         return;
     case 2:
-        lbl_80193EA0[lbl_80223C48.nDriver](nDate, nLine, sz);
+        gCalendarGetBottomLine[CalendarState.nDriver](nDate, nLine, sz);
         return;
     }
 }
@@ -57,18 +57,18 @@ void fn_80112130(MsgArg* pArgs, MsgArg* pResult) {
     s32* pMonth = (s32*)pArgs[0].p;
     s32* pYear = (s32*)pArgs[1].p;
 
-    *pMonth = lbl_80223C48.nMonth;
-    *pYear = lbl_80223C48.nYear;
+    *pMonth = CalendarState.nMonth;
+    *pYear = CalendarState.nYear;
 }
 
 // Show the month before (unless the driver keeps it).
 void fn_80112154(MsgArg* pArgs, MsgArg* pResult) {
-    if (!lbl_80193E70[lbl_80223C48.nDriver]()) {
-        if (lbl_80223C48.nMonth == 1) {
-            lbl_80223C48.nMonth = 12;
-            lbl_80223C48.nYear--;
+    if (!gCalendarAtEarliest[CalendarState.nDriver]()) {
+        if (CalendarState.nMonth == 1) {
+            CalendarState.nMonth = 12;
+            CalendarState.nYear--;
         } else {
-            lbl_80223C48.nMonth--;
+            CalendarState.nMonth--;
         }
     }
     UpdateCalendarState();
@@ -76,27 +76,27 @@ void fn_80112154(MsgArg* pArgs, MsgArg* pResult) {
 
 // Show the month after (unless the driver keeps it).
 void fn_801121D4(MsgArg* pArgs, MsgArg* pResult) {
-    if (!lbl_80193E7C[lbl_80223C48.nDriver]()) {
-        if (lbl_80223C48.nMonth == 12) {
-            lbl_80223C48.nMonth = 1;
-            lbl_80223C48.nYear++;
+    if (!gCalendarAtLatest[CalendarState.nDriver]()) {
+        if (CalendarState.nMonth == 12) {
+            CalendarState.nMonth = 1;
+            CalendarState.nYear++;
         } else {
-            lbl_80223C48.nMonth++;
+            CalendarState.nMonth++;
         }
     }
     UpdateCalendarState();
 }
 
 void fn_80112254(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = GetCellIndexFromDate(lbl_80223C48.nToday);
+    pResult->i = GetCellIndexFromDate(CalendarState.nToday);
 }
 
 // Switch the calendar to driver pArgs[0].
 void fn_80112290(MsgArg* pArgs, MsgArg* pResult) {
     s32 nDriver = pArgs[0].i;
 
-    lbl_80223C48.nDriver = nDriver;
-    lbl_80193ED0[nDriver]();
+    CalendarState.nDriver = nDriver;
+    gCalendarInit[nDriver]();
     ResetCalendarState();
 }
 
@@ -105,13 +105,13 @@ void fn_801122D8(MsgArg* pArgs, MsgArg* pResult) {
     u16 nDate = GetDateFromCellIndex(pArgs[0].i);
     s32 nPanel;
 
-    lbl_80223C48.nSelected = nDate;
-    if (lbl_80193EE8[lbl_80223C48.nDriver](nDate)) {
-        nPanel = lbl_80193EAC[lbl_80223C48.nDriver](nDate);
+    CalendarState.nSelected = nDate;
+    if (gCalendarGetEventInfoByDate[CalendarState.nDriver](nDate)) {
+        nPanel = gCalendarGetPopupType[CalendarState.nDriver](nDate);
     } else {
         nPanel = -1;
     }
-    lbl_80223C48.n1C = nPanel;
+    CalendarState.n1C = nPanel;
     pResult->i = nPanel;
 }
 
@@ -125,10 +125,10 @@ void fn_80112384(MsgArg* pArgs, MsgArg* pResult) {
     switch (nKind) {
     case 0:
         strcpy(szTitle, "Event:");
-        strcpy(szText, lbl_80193EDC[lbl_80223C48.nDriver](lbl_80223C48.nSelected));
+        strcpy(szText, gCalendarGetEventName[CalendarState.nDriver](CalendarState.nSelected));
         break;
     default:
-        lbl_80193EB8[lbl_80223C48.nDriver](nKind, szTitle, szText);
+        gCalendarGetPopupRow[CalendarState.nDriver](nKind, szTitle, szText);
         break;
     }
 }
@@ -137,11 +137,11 @@ void fn_80112438(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8011243C(MsgArg* pArgs, MsgArg* pResult) {
-    lbl_80193EF4[lbl_80223C48.nDriver]();
+    gCalendarPlay[CalendarState.nDriver]();
 }
 
 void fn_8011247C(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = lbl_80193F00[lbl_80223C48.nDriver]();
+    pResult->i = gCalendarIsSimulationNecessary[CalendarState.nDriver]();
 }
 
 // The selected real-time event's description (panel 4), else a blank.
@@ -150,9 +150,9 @@ void fn_801124D0(MsgArg* pArgs, MsgArg* pResult) {
     s32 nRound;
     char* sz = ((MsgString*)pArgs[0].p)->pStr;
 
-    switch (lbl_80223C48.n1C) {
+    switch (CalendarState.n1C) {
     case 4:
-        GameModeDriverRTE_GetEventByDate(lbl_80223C48.nSelected, &nId, &nRound);
+        GameModeDriverRTE_GetEventByDate(CalendarState.nSelected, &nId, &nRound);
         strcpy(sz, GameModeDriverRTE_GetDescription(nId));
         break;
     default:

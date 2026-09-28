@@ -271,7 +271,7 @@ void fn_8010EBDC(MsgArg* pArgs, MsgArg* pResult) {
 
 // Start the next season.
 void fn_8010EEA8(void) {
-    lbl_80223C48.bSeasonOver = 0;
+    CalendarState.bSeasonOver = 0;
     fn_800EFAD0();
     ResetCalendarState();
     fn_80077808(0);

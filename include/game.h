@@ -621,21 +621,21 @@ typedef struct CareerCalendar {
 } CareerCalendar;
 LAYOUT_ASSERT(CareerCalendar, 0x28);
 
-extern CareerCalendar lbl_80223C48;
-extern char* (*lbl_80193EDC[3])(u16 nDate);    // the name of the event on a day ("" none)
-extern u16 (*lbl_80193EC4[3])(void);           // the career's current day
+extern CareerCalendar CalendarState;
+extern char* (*gCalendarGetEventName[3])(u16 nDate);    // the name of the event on a day ("" none)
+extern u16 (*gCalendarGetCurrentDay[3])(void);           // the career's current day
 // The calendar screen's (CalendarScreen.c) per-driver tables.
-extern u8 (*lbl_80193E70[3])(void);             // the month before; 0: the calendar may move there
-extern u8 (*lbl_80193E7C[3])(void);             // the month after
-extern s32 (*lbl_80193E88[3])(char* sz, u16 nDate, s32* pLook, s32* pButton);  // a day cell
-extern void (*lbl_80193E94[3])(int nLine, char* sz);
-extern void (*lbl_80193EA0[3])(u16 nDate, int n, char* sz);
-extern s32 (*lbl_80193EAC[3])(u16 nDate);       // the day-details panel for a day
-extern void (*lbl_80193EB8[3])(int nKind, char* szTitle, char* szText);
-extern void (*lbl_80193ED0[3])(void);           // set the driver up
-extern void* (*lbl_80193EE8[3])(u16 nDate);     // the event on a day (NULL: none)
-extern void (*lbl_80193EF4[3])(void);
-extern u8 (*lbl_80193F00[3])(void);
+extern u8 (*gCalendarAtEarliest[3])(void);             // the month before; 0: the calendar may move there
+extern u8 (*gCalendarAtLatest[3])(void);             // the month after
+extern s32 (*gCalendarFillCell[3])(char* sz, u16 nDate, s32* pLook, s32* pButton);  // a day cell
+extern void (*gCalendarGetLine[3])(int nLine, char* sz);
+extern void (*gCalendarGetBottomLine[3])(u16 nDate, int n, char* sz);
+extern s32 (*gCalendarGetPopupType[3])(u16 nDate);       // the day-details panel for a day
+extern void (*gCalendarGetPopupRow[3])(int nKind, char* szTitle, char* szText);
+extern void (*gCalendarInit[3])(void);           // set the driver up
+extern void* (*gCalendarGetEventInfoByDate[3])(u16 nDate);     // the event on a day (NULL: none)
+extern void (*gCalendarPlay[3])(void);
+extern u8 (*gCalendarIsSimulationNecessary[3])(void);
 
 // GameModeDriver.c
 void ResetCalendarState(void);

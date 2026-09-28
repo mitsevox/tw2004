@@ -36,7 +36,7 @@ void fn_8011D280(int nLine, char* szLabel, char* szValue) {
     s32 nRound;
     s32 nRounds;
 
-    GameModeDriverPGATour_GetEventByDate(lbl_80223C48.nSelected, &nId, &nRound);
+    GameModeDriverPGATour_GetEventByDate(CalendarState.nSelected, &nId, &nRound);
     switch (nLine) {
     case 3:
         strcpy(szLabel, "Purse:");
@@ -97,7 +97,7 @@ void fn_8011D4DC(int nLine, char* szLabel, char* szValue) {
     s32 nRound;
     s32 nScore;
 
-    GameModeDriverPGATour_GetEventByDate(lbl_80223C48.nSelected, &nId, &nRound);
+    GameModeDriverPGATour_GetEventByDate(CalendarState.nSelected, &nId, &nRound);
     switch (nLine) {
     case 3:
         strcpy(szLabel, "");
@@ -139,7 +139,7 @@ void fn_8011D658(int nLine, char* szLabel, char* szValue) {
     Tournament* pTournament;
     s32 nRounds;
 
-    GameModeDriverPGATour_GetEventByDate(lbl_80223C48.nSelected, &nId, &nRound);
+    GameModeDriverPGATour_GetEventByDate(CalendarState.nSelected, &nId, &nRound);
     switch (nLine) {
     case 3:
         strcpy(szLabel, "Defending ");
@@ -196,7 +196,7 @@ void fn_8011D878(int nLine, char* szLabel, char* szValue) {
     s32 nRound;
     int nRewards;
 
-    GameModeDriverRTE_GetEventByDate(lbl_80223C48.nSelected, &nId, &nRound);
+    GameModeDriverRTE_GetEventByDate(CalendarState.nSelected, &nId, &nRound);
     nRewards = FE_CrAP_GetFirstThreeItemsWithLockModeAndVal(0x11, GM_RealtimeMode_GetTrophyID(nId),
                                                             szReward1, szReward2, szReward3);
     fn_800907AC(GameModeDriverRTE_GetPurse(nId), szMoney);
@@ -254,7 +254,7 @@ void fn_8011DA44(int nLine, char* szLabel, char* szValue) {
     int nRewards;
     u8 bComplete;
 
-    GameModeDriverRTE_GetEventByDate(lbl_80223C48.nSelected, &nId, &nRound);
+    GameModeDriverRTE_GetEventByDate(CalendarState.nSelected, &nId, &nRound);
     bComplete = GameModeDriverRTE_IsEventComplete(lbl_80281ED4->nSlot, nId);
     nRewards = FE_CrAP_GetFirstThreeItemsWithLockModeAndVal(0x11, GM_RealtimeMode_GetTrophyID(nId),
                                                             szReward1, szReward2, szReward3);
@@ -316,7 +316,7 @@ void fn_8011DC30(int nLine, char* szLabel, char* szValue) {
     s32 nRound;
     int nRewards;
 
-    GameModeDriverRTE_GetEventByDate(lbl_80223C48.nSelected, &nId, &nRound);
+    GameModeDriverRTE_GetEventByDate(CalendarState.nSelected, &nId, &nRound);
     nRewards = FE_CrAP_GetFirstThreeItemsWithLockModeAndVal(0x11, GM_RealtimeMode_GetTrophyID(nId),
                                                             szReward1, szReward2, szReward3);
     fn_800907AC(GameModeDriverRTE_GetPurse(nId), szMoney);
