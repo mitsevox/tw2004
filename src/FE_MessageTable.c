@@ -23,7 +23,7 @@ void fn_800142A4(s8 n);                 // sets lbl_80281C98
 void fn_80057438(SaveProfile* pProfile);
 void FE_OnGolferHiddenChanged(void);                 // FEgolferanim.c
 void fn_8008F80C(s32 p0, s32 p1);       // uiProcessInterface.c
-void FE_SetOffscreenBufferRender(s32 p0);               // FEgolferanim.c
+void FE_SetOffscreenBufferRender(u8 bOn);               // FEgolferanim.c
 s32  MC_LoadUser(MCCardPosStr* pPos);   // MC.c
 s32  MC_LoadReplay(MCCardPos* pPos);      // MC.c: load a replay from the card
 void MC_ConnectCard(s32 nPort, s32 nSlot); // MC_Gc.c
@@ -2231,7 +2231,7 @@ void fn_8007D964(MsgArg* pArgs, MsgArg* pResult) {
 void fn_8007D968(MsgArg* pArgs, MsgArg* pResult) {
     lbl_80281ED4->nSlot = pArgs[0].i;
     if (gpCrAPState->pB4->pChar != NULL &&
-        (gpCrAPState->pB4->pChar->nC == 7 || gpCrAPState->pB4->pChar->nC == 29)) {
+        (gpCrAPState->pB4->pChar->nGolferId == 7 || gpCrAPState->pB4->pChar->nGolferId == 29)) {
         Character_ApplyCrAPSettings(gpCrAPState->pB4->pChar, &FE_GetCurrentProfile()->choices);
     }
 }
@@ -2419,7 +2419,7 @@ void fn_8007DF30(MsgArg* pArgs, MsgArg* pResult) {
         }
         if (gSession.aProfile[lbl_80281ED4->nSlot].n0 == nStart) break;
     }
-    Character_RequestClothesUpdateFE(gpCrAPState->pB4->n10);
+    Character_RequestClothesUpdateFE(gpCrAPState->pB4->nIndex);
 }
 
 void fn_8007E0BC(MsgArg* pArgs, MsgArg* pResult) {

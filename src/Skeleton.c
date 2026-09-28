@@ -736,8 +736,8 @@ Skeleton* SKEL_CreateIKSkeleton(CharModel* pModel, CharModelDefs* pDefs) {
     pSkel->pIKRots = StaticMem_Alloc(pModel->nBones * sizeof(f32[4]), 2, 64, "Skeleton.c", 1159);
     pSkel->pWeightedRots = StaticMem_Alloc(pModel->nBones * sizeof(f32[4]), 2, 64, "Skeleton.c", 1160);
     pSkel->pUsedRots = pSkel->pIKRots;
-    pSkel->n112C = -1;
-    pSkel->n1130 = -1;
+    pSkel->nIKClubClass = -1;
+    pSkel->nIKClipKey = -1;
     BitArray_ClearArray(pSkel->aIKBones, 0x80);
     pSkel->n0 = 0;
     pSkel->fHipRaiseMax = 0.1f;

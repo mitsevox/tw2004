@@ -53,7 +53,7 @@ typedef struct CamShot {
     f32  f4C;                   // 0x4C
     union {
         struct {
-            u32 u50;            // 0x50  on the CrAP screen: bit n for CrAPGolfer.nC = n up to 32
+            u32 u50;            // 0x50  on the CrAP screen: bit n for CrAPGolfer.nGolferId = n up to 32
             u32 u54;            // 0x54  ... bit n - 32 above that (fn_8003D294)
         } bits;
         f32 aArea[4];           // 0x50  a static camera (GoStaticCam.c): it is picked while the
@@ -519,11 +519,14 @@ typedef struct CrAPGolfer {
     struct CrAPGolfer* pPrev;   // 0x00  } the ring
     struct CrAPGolfer* pNext;   // 0x04  }
     struct Character* pChar;    // 0x08  the golfer being edited (character.h)
-    s32  nC;                    // 0x0C  the golfer's id (-1: none)
-    s32  n10;                   // 0x10
-    s32  n14;                   // 0x14  nC once its stream was opened
-    u8   b18;                   // 0x18  the camera script runs
-    u8   b19;                   // 0x19
+    s32  nGolferId;             // 0x0C  the golfer's id (-1: none)
+    s32  nIndex;                // 0x10  its slot number (FE_CharMgrInit); the gSession.aD2D entry
+                                //       Character_RequestClothesUpdateFE sets for it
+    s32  nStreamedId;           // 0x14  nGolferId once its stream was opened
+                                //       (FE_StreamFunc_SkinInit), -1 none
+    u8   bLoaded;               // 0x18  loaded and ready to show (set once its textures are in;
+                                //       the CrAP camera script runs only then)
+    u8   bFree;                 // 0x19  its character is to be freed (FE_vFreeUnusedCharacters)
     u8   unk1A[2];
     s32  n1C;                   // 0x1C
 } CrAPGolfer;

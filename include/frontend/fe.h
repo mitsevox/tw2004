@@ -477,36 +477,37 @@ extern s32 lbl_80281FFC;                // set by fn_80084FF0: the lbl_8018C7D8 
 
 // ---- the golfers animated on menu screens (FEgolferanim.c) ------------------------------------
 
-void FE_setupStreaming(int nGolfer, int a, int b);    // show golfer nGolfer
+void FE_setupStreaming(int nGolfer, int nOtherA, int nOtherB);   // show golfer nGolfer
 void FE_StreamStopAllStreaming(void);
-u8   FE_PauseFECharStreaming(u8 bPaused);           // pause the menus' state machine (or not); the old setting
+u8   FE_PauseFECharStreaming(u8 bPaused);   // pause the golfer loader (or not); the old setting
 int  FE_StreamGetCurrentState(void);
 void FE_vClearGolferCache(void);
 void FE_ResetCrAPZoom(void);
 void FE_SetCrapRotation(u8 bTarget, f32 fAngle);
-void FE_SetCrAPCameraIdleState(int n);
+void FE_SetCrAPCameraIdleState(int nState);
 int  FE_HasGolferCharacter(void);
 int  FE_IsGolferReady(void);
-u8   FE_vTriggerCrAPAnimAndCamera(char* szAnim, char* szShot, u8 bNoBlend);  // 1: the animation was started
+// 1: the animation was started
+u8   FE_vTriggerCrAPAnimAndCamera(char* szAnim, char* szShot, u8 bBlend);
 char* FE_GetCurrentAnimName(void);
-void FE_SetCrapClub(int n);
-void FE_SetTempCrapClub(int n);
-void FE_QueueCrAPAnim(char* szAnim, char* szShot, s8 n, u8 bLoop);
-void FE_SetAnimRepeatCount(int n);
+void FE_SetCrapClub(int nClub);
+void FE_SetTempCrapClub(int nClub);
+void FE_QueueCrAPAnim(char* szAnim, char* szShot, s8 bFade, u8 bWaitForEnd);
+void FE_SetAnimRepeatCount(int nCount);
 void FE_RestartCrAPAnim(void);
-void FE_SetCrapRenderState(int n);
-void FE_SetTempCrapRenderState(int n);
-u8   FE_SetDelayTextureSwap(u8 b, f32 f);
-void FE_QueueBallChange(char* sz);
+void FE_SetCrapRenderState(int nState);
+void FE_SetTempCrapRenderState(int nState);
+u8   FE_SetDelayTextureSwap(u8 bDelay, f32 fTime);
+void FE_QueueBallChange(char* szTex);
 int  FE_GetCrapRenderState(void);
 void FE_RestartClubIdleAnim(void);
-void FE_SetNewTexturesFlag(u8 b);
+void FE_SetNewTexturesFlag(u8 bNew);
 u8   FE_GetClubStatesAllowed(void);
 u8   FE_IsTextureSwapDue(void);
-void FE_SetClubStatesAllowed(u8 b);
-void FE_SetLastCrAPAsset(int n);
+void FE_SetClubStatesAllowed(u8 bAllowed);
+void FE_SetLastCrAPAsset(int nAsset);
 int  FE_GetLastCrAPAsset(void);
-void FE_SetLastCrAPCategory(int n);
+void FE_SetLastCrAPCategory(int nPart);
 int  FE_GetLastCrAPCategory(void);
 void FE_ResetCrAPGolferFromPreview(void);
 

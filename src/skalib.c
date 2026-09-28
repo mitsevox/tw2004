@@ -18,8 +18,8 @@
 #include "game/save.h"
 
 ClipBank* ClipBank_Get(u32 nSlot);
-void  SKA_SwapClip(void* pClip);                        // swaps a clip in place
-void  SKA_PatchMemory(struct Clip* pClip, u32 uAram);
+void  SKA_SwapClip(u8* p);                               // swaps a clip in place
+Clip* SKA_PatchMemory(Clip* pClip, u32 uAram);
 void  AnimLib_ApplyCustomAnims(struct LibOverlay* pOv, int nSlot, s32 n);
 void  AnimLib_SetLeafClipsByName(LibOverlay* pOv, int nSlot, int nGroup, int nClub, int nStyle, int nKey,
                                  char* pNames, int nNames);
@@ -97,16 +97,16 @@ void SKALIB_InitModule(void) {
     gClipBanks[2] = NULL;
     lbl_801D9908[0] = 0;
     for (i = 0; i < 3; i++) {
-        gLibSlots[i].n150      = 0;
+        gLibSlots[i].nCopied   = 0;
         gLibSlots[i].nOverlays = 0;
         gLibSlots[i].pLib      = NULL;
         gLibSlots[i].pCopy     = NULL;
         for (j = 0; j < 10; j++) {
-            gLibSlots[i].overlays[j].bActive = 0;
-            gLibSlots[i].overlays[j].n10     = -1;
-            gLibSlots[i].overlays[j].n14     = -1;
-            gLibSlots[i].overlays[j].pCopy   = NULL;
-            gLibSlots[i].overlays[j].pWork   = NULL;
+            gLibSlots[i].overlays[j].bActive   = 0;
+            gLibSlots[i].overlays[j].nStreamId = -1;
+            gLibSlots[i].overlays[j].nGolferId = -1;
+            gLibSlots[i].overlays[j].pCopy     = NULL;
+            gLibSlots[i].overlays[j].pWork     = NULL;
         }
     }
     if (gSession.nGameType == 3 || gSession.nGameType == 10) {
@@ -367,7 +367,7 @@ int AnimLib_MergeReleaseCb(AnimLib* pLibA, AnimLib* pLibB, AnimLeaf* pLeafA, Ani
             pRec->n10--;
             if (pRec->n10 == 0) {
                 (*pCtx->pCount)--;
-                pCtx->nBytes -= pRec->n14;
+                pCtx->nBytes -= pRec->nBytes;
             }
         }
     }
@@ -378,7 +378,7 @@ int AnimLib_MergeReleaseCb(AnimLib* pLibA, AnimLib* pLibB, AnimLeaf* pLeafA, Ani
             pRec->n10--;
             if (pRec->n10 == 0) {
                 (*pCtx->pCount)--;
-                pCtx->nBytes -= pRec->n14;
+                pCtx->nBytes -= pRec->nBytes;
             }
         }
     }
@@ -415,8 +415,8 @@ u32 Skalib_CurSlot(void) {
 // Sets the round's clip bank limits: the clips a leaf may keep (all of them with one player, 10
 // with more) and each slot's bank budget (0xE6000 bytes, 920 KB). When slots 0 and 1 both have
 // overlays and there is more than one player they are double buffered, and the 920 KB is split
-// between them by the clip bytes (AnimLib.n140) of each slot's library and overlays: slot 0's share
-// goes into gSlot0BankShare, kept to 44..56%. The current slot starts at random.
+// between them by the clip bytes (AnimLib.nClipBytes) of each slot's library and overlays: slot 0's
+// share goes into gSlot0BankShare, kept to 44..56%. The current slot starts at random.
 void Skalib_SetBudgets(void) {
     s32      aKeepSingle[4] = {100000, 10, 10, 10};
     s32      aKeepDouble[4] = {100000, 10, 10, 10};
@@ -448,13 +448,13 @@ void Skalib_SetBudgets(void) {
     if (gSlotsDoubleBuffered) {
         pSlot0 = &gLibSlots[0];
         pSlot1 = &gLibSlots[1];
-        nSize0 = pSlot0->pLib->n140;
-        nSize1 = pSlot1->pLib->n140;
+        nSize0 = pSlot0->pLib->nClipBytes;
+        nSize1 = pSlot1->pLib->nClipBytes;
         for (i = 0; pSlot0->nOverlays > i; i++) {
-            nSize0 += pSlot0->overlays[i].pWork->n140;
+            nSize0 += pSlot0->overlays[i].pWork->nClipBytes;
         }
         for (i = 0; pSlot1->nOverlays > i; i++) {
-            nSize1 += pSlot1->overlays[i].pWork->n140;
+            nSize1 += pSlot1->overlays[i].pWork->nClipBytes;
         }
         gSlot0BankShare = (f32)nSize0 / (f32)(nSize0 + nSize1);
         gSlot0BankShare = (gSlot0BankShare
@@ -493,7 +493,7 @@ int AnimLib_TrimCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB,
             pRec->n10--;
             if (pRec->n10 == 0 && pCtx != NULL) {
                 (*pCtx->pCount)--;
-                pCtx->nBytes -= pRec->n14;
+                pCtx->nBytes -= pRec->nBytes;
             }
         }
         for (i = nStart + nKeep; i < pLeafA->nCount; i++) {
@@ -501,7 +501,7 @@ int AnimLib_TrimCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB,
             pRec->n10--;
             if (pRec->n10 == 0 && pCtx != NULL) {
                 (*pCtx->pCount)--;
-                pCtx->nBytes -= pRec->n14;
+                pCtx->nBytes -= pRec->nBytes;
             }
         }
         pLeafA->nFirst += (s16)nStart;
@@ -515,7 +515,7 @@ int AnimLib_TrimCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB,
             pB->nClips--;
             if (pRec->n10 == 0 && pCtx != NULL) {
                 (*pCtx->pCount)--;
-                pCtx->nBytes -= pRec->n14;
+                pCtx->nBytes -= pRec->nBytes;
             }
         }
         for (i = nStart + nKeep; i < pLeafB->nCount; i++) {
@@ -524,7 +524,7 @@ int AnimLib_TrimCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB,
             pB->nClips--;
             if (pRec->n10 == 0 && pCtx != NULL) {
                 (*pCtx->pCount)--;
-                pCtx->nBytes -= pRec->n14;
+                pCtx->nBytes -= pRec->nBytes;
             }
         }
         pLeafB->nFirst += (s16)nStart;
@@ -542,16 +542,17 @@ f32 Skalib_Random(void) {
 // A clip that can still be flagged for dropping: not merged into another record (2, 0x10), not
 // flagged already (1), and used by between 1 and nMaxUsers leaves.
 #define SKA_MARKABLE(pRec, pCtx) \
-    (!((pRec)->n12 & 2) && !((pRec)->n12 & 0x10) && !((pRec)->n12 & 1) && (pRec)->n10 > 0 && \
+    (!((pRec)->uFlags & 2) && !((pRec)->uFlags & 0x10) && !((pRec)->uFlags & 1) && (pRec)->n10 > 0 && \
      (pRec)->n10 <= (pCtx)->nMaxUsers)
 
 // Trim walk, mark pass (AnimLib_TrimToFit, first try): for the one leaf given (pA's, else pB's)
 // when it is in use (not marked 2) and holds more than pCtx->nKeep clips, flags that many surplus
-// clips (ClipRecord.n12 1) for AnimLib_DropCb, each picked at random: from a random start the first
-// markable clip forward, else backward (markable: not merged into another record (2, 0x10), not
-// flagged yet, used by 1 to nMaxUsers leaves). During a lesson (fn_80100294, game mode 11) a lesson
-// animation (fn_80101E34) is never flagged but still counts as a pick. The picks it could not make
-// are tried again through merged records, following each to the record it points to. Always 0.
+// clips (ClipRecord.uFlags 1) for AnimLib_DropCb, each picked at random: from a random start the
+// first markable clip forward, else backward (markable: not merged into another record (2, 0x10),
+// not flagged yet, used by 1 to nMaxUsers leaves). During a lesson (fn_80100294, game mode 11) a
+// lesson animation (fn_80101E34) is never flagged but still counts as a pick. The picks it could
+// not make are tried again through merged records, following each to the record it points to.
+// Always 0.
 int AnimLib_MarkDropRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx,
                          int nLevel, int nIndex) {
     AnimLeaf*   pLeaf;
@@ -597,11 +598,11 @@ int AnimLib_MarkDropRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLea
             found:
                 if (fn_80100294()) {
                     if (!fn_80101E34(pRec->name)) {
-                        pRec->n12 |= 1;
+                        pRec->uFlags |= 1;
                     }
                     nMarked++;
                 } else {
-                    pRec->n12 |= 1;
+                    pRec->uFlags |= 1;
                     nMarked++;
                 }
             }
@@ -609,20 +610,20 @@ int AnimLib_MarkDropRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLea
                 nStart = Misc_RandFunc(1) % pLeaf->nCount;
                 for (j = nStart; j < pLeaf->nCount; j++) {
                     pRec = &pLib->pRecords[pIdx[j]];
-                    while ((pRec->n12 & 2) || (pRec->n12 & 0x10)) {
+                    while ((pRec->uFlags & 2) || (pRec->uFlags & 0x10)) {
                         pRec = (ClipRecord*)pRec->pClip;
                     }
-                    if (!(pRec->n12 & 1) && pRec->n10 > 0 && pRec->n10 <= pCtx->nMaxUsers) {
+                    if (!(pRec->uFlags & 1) && pRec->n10 > 0 && pRec->n10 <= pCtx->nMaxUsers) {
                         // fake match: skips the other search (breaks and a test: 169 differ, not 0)
                         goto found2;
                     }
                 }
                 for (j = nStart; j >= 0; j--) {
                     pRec = &pLib->pRecords[pIdx[j]];
-                    while ((pRec->n12 & 2) || (pRec->n12 & 0x10)) {
+                    while ((pRec->uFlags & 2) || (pRec->uFlags & 0x10)) {
                         pRec = (ClipRecord*)pRec->pClip;
                     }
-                    if (!(pRec->n12 & 1) && pRec->n10 > 0 && pRec->n10 <= pCtx->nMaxUsers) {
+                    if (!(pRec->uFlags & 1) && pRec->n10 > 0 && pRec->n10 <= pCtx->nMaxUsers) {
                         // fake match: skips the other search (breaks and a test: 169 differ, not 0)
                         goto found2;
                     }
@@ -631,10 +632,10 @@ int AnimLib_MarkDropRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLea
             found2:
                 if (fn_80100294()) {
                     if (!fn_80101E34(pRec->name)) {
-                        pRec->n12 |= 1;
+                        pRec->uFlags |= 1;
                     }
                 } else {
-                    pRec->n12 |= 1;
+                    pRec->uFlags |= 1;
                 }
             }
         }
@@ -683,11 +684,11 @@ int AnimLib_MarkDropHighestCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLe
                 if (pBest != NULL) {
                     if (fn_80100294()) {
                         if (!fn_80101E34(pBest->name)) {
-                            pBest->n12 |= 1;
+                            pBest->uFlags |= 1;
                         }
                         nMarked++;
                     } else {
-                        pBest->n12 |= 1;
+                        pBest->uFlags |= 1;
                         nMarked++;
                     }
                 }
@@ -696,10 +697,10 @@ int AnimLib_MarkDropHighestCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLe
                 pBest = NULL;
                 for (j = 0; j < pLeaf->nCount; j++) {
                     pRec = &pLib->pRecords[pIdx[j]];
-                    while ((pRec->n12 & 2) || (pRec->n12 & 0x10)) {
+                    while ((pRec->uFlags & 2) || (pRec->uFlags & 0x10)) {
                         pRec = (ClipRecord*)pRec->pClip;
                     }
-                    if (!(pRec->n12 & 1) && pRec->n10 > 0 && pRec->n10 <= pCtx->nMaxUsers) {
+                    if (!(pRec->uFlags & 1) && pRec->n10 > 0 && pRec->n10 <= pCtx->nMaxUsers) {
                         if (pBest == NULL || pRec->n18 > pBest->n18) {
                             pBest = pRec;
                         }
@@ -708,10 +709,10 @@ int AnimLib_MarkDropHighestCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLe
                 if (pBest != NULL) {
                     if (fn_80100294()) {
                         if (!fn_80101E34(pBest->name)) {
-                            pBest->n12 |= 1;
+                            pBest->uFlags |= 1;
                         }
                     } else {
-                        pBest->n12 |= 1;
+                        pBest->uFlags |= 1;
                     }
                 }
             }
@@ -742,11 +743,12 @@ int AnimLib_MaxCountCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLe
     return 0;
 }
 
-// Trim walk, drop pass (AnimLib_TrimToFit): takes the flagged clips (ClipRecord.n12 1) out of the
-// leaf (pA's, else pB's, when in use), while the leaf is longer than gTrimMinLeafClips; for pB's leaf
-// merged records are followed to the record they point to. Each clip taken out loses a user; one
-// nobody uses any more is dropped (pClip NULL, users -1) and comes off the context's byte total and
-// clip count. Returns 1 (stopping the walk) once the bytes fall under pCtx->nTarget, else 0.
+// Trim walk, drop pass (AnimLib_TrimToFit): takes the flagged clips (ClipRecord.uFlags 1) out of
+// the leaf (pA's, else pB's, when in use), while the leaf is longer than gTrimMinLeafClips; for
+// pB's leaf merged records are followed to the record they point to. Each clip taken out loses a
+// user; one nobody uses any more is dropped (pClip NULL, users -1) and comes off the context's byte
+// total and clip count. Returns 1 (stopping the walk) once the bytes fall under pCtx->nTarget, else
+// 0.
 int AnimLib_DropCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx, int nLevel,
                    int nIndex) {
     int         bDone = 0;
@@ -773,16 +775,16 @@ int AnimLib_DropCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB,
             p    = &pIdx[i];
             pRec = &pLib->pRecords[*p];
             if (pLeaf == pLeafB) {
-                while ((pRec->n12 & 2) || (pRec->n12 & 0x10)) {
+                while ((pRec->uFlags & 2) || (pRec->uFlags & 0x10)) {
                     pRec = (ClipRecord*)pRec->pClip;
                 }
             }
-            if (pRec->n12 & 1) {
+            if (pRec->uFlags & 1) {
                 pRec->n10--;
                 if (pRec->n10 == 0) {
                     pRec->pClip = NULL;
                     pRec->n10--;
-                    pCtx->nBytes -= pRec->n14;
+                    pCtx->nBytes -= pRec->nBytes;
                     (*pCtx->pCount)--;
                     if (pCtx->nBytes < pCtx->nTarget) {
                         bDone = 1;
@@ -920,7 +922,7 @@ int AnimLib_BuildCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB
             pLib->ppClips[pLib->nClips] = AnimLib_ResolveRecord(pSrcLib, *pIdx, &pRecs[pLib->nClips], bKeep);
             pIdx++;
             if (bFromA) {
-                pRecs[pLib->nClips].n12 |= 2;
+                pRecs[pLib->nClips].uFlags |= 2;
             }
             pLib->nClips++;
         }
@@ -933,7 +935,7 @@ int AnimLib_BuildCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB
             pLib->ppClips[pLib->nClips] = AnimLib_ResolveRecord(pA, *pIdx, &pRecs[pLib->nClips], bKeep);
             pIdx++;
             if (bFromA || bKeep) {
-                pRecs[pLib->nClips].n12 |= 2;
+                pRecs[pLib->nClips].uFlags |= 2;
             }
             pLib->nClips++;
         }
@@ -942,7 +944,7 @@ int AnimLib_BuildCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB
             pLib->ppClips[pLib->nClips] = AnimLib_ResolveRecord(pB, *pIdx, &pRecs[pLib->nClips], bKeep);
             pIdx++;
             if (bFromA) {
-                pRecs[pLib->nClips].n12 |= 2;
+                pRecs[pLib->nClips].uFlags |= 2;
             }
             pLib->nClips++;
         }
@@ -960,11 +962,11 @@ void* AnimLib_ResolveRecord(AnimLib* pLib, int nRec, ClipRecord* pOut, u8 bLink)
     s32         n20;
     s32         bMove;
 
-    if ((pRec->n12 & 4) && bLink) {
+    if ((pRec->uFlags & 4) && bLink) {
         bLinked = 1;
     }
     n20 = pRec->n20;
-    while ((bMove = pRec->n12 & 2) || (pRec->n12 & 0x10)) {
+    while ((bMove = pRec->uFlags & 2) || (pRec->uFlags & 0x10)) {
         if (bMove) {
             bMoved = 1;
         }
@@ -972,10 +974,10 @@ void* AnimLib_ResolveRecord(AnimLib* pLib, int nRec, ClipRecord* pOut, u8 bLink)
     }
     Mem_cpy(pOut, pRec, sizeof(ClipRecord));
     if (bMoved) {
-        pOut->n12 |= 2;
+        pOut->uFlags |= 2;
     }
     if (bLinked) {
-        pOut->n12 |= 4;
+        pOut->uFlags |= 4;
     }
     if (bLinked && !bMoved) {
         pOut->n20 = n20;
@@ -1121,7 +1123,7 @@ u32 AnimLib_PlanBank(u32 nSlot) {
     pOvs   = pSlot->overlays;
     if (pLib != NULL) {
         nLibClips = pLib->nRecords;
-        nBytes    = pLib->n140;
+        nBytes    = pLib->nClipBytes;
     } else {
         nLibClips = 0;
         nBytes    = 0;
@@ -1140,7 +1142,7 @@ u32 AnimLib_PlanBank(u32 nSlot) {
             if (pWork->nTreeSize & 15) {
                 pWork->nTreeSize = ((pWork->nTreeSize >> 4) + 1) << 4;
             }
-            pOvs[i].n14 = pOvs[i].n10 - 3;
+            pOvs[i].nGolferId = pOvs[i].nStreamId - 3;
         }
     }
     if (pLib != NULL && nSlot != 2) {
@@ -1161,7 +1163,7 @@ u32 AnimLib_PlanBank(u32 nSlot) {
         for (j = 0; j < pOvLib->nRecords; j++) {
             pRec = &pOvLib->pRecords[j];
             if (pRec->n10 != 0) {
-                nBytes += pRec->n14;
+                nBytes += pRec->nBytes;
                 k      = -1;
                 pOther = pLib;
                 do {
@@ -1171,15 +1173,15 @@ u32 AnimLib_PlanBank(u32 nSlot) {
                             if (strcmp(pRec->name, pRecO->name) == 0) {
                                 if (pRecO->n10 != 0) {
                                     nLeft--;
-                                    nBytes -= pRec->n14;
+                                    nBytes -= pRec->nBytes;
                                 }
                                 pRecO->n10 += pRec->n10;
                                 pRec->n10   = 0;
                                 pRec->pClip = pRecO;
                                 if (k != -1) {
-                                    pRec->n12 |= 0x10;
+                                    pRec->uFlags |= 0x10;
                                 } else {
-                                    pRec->n12 |= 2;
+                                    pRec->uFlags |= 2;
                                 }
                                 // fake match: leaves both loops (a found flag: 635 differ, not 421)
                                 goto next;
@@ -1189,7 +1191,7 @@ u32 AnimLib_PlanBank(u32 nSlot) {
                     k++;
                     pOther = pOvs[k].pWork;
                 } while (k < i);
-            } else if (pRec->n12 & 4) {
+            } else if (pRec->uFlags & 4) {
                 k      = -1;
                 pOther = pLib;
                 do {
@@ -1376,15 +1378,16 @@ void Skalib_ReclaimBankMemory(int n) {
 
 // Copies the clips of a sac file (pData, the 'SAC ' object Character_LoadSacFromStream got) into
 // its slot's clip bank, when the slot has overlays. nSlot 0..2 is the slot's own library (malesac /
-// femsac); 3 and up the stream id of a golfer's overlay (LibOverlay.n10: golfer id + 3; -1 once
-// merged). Each clip still in use (users above 0, n18 not 0) is byte-swapped and its header and the
-// parts kept in main memory (tracks, the pE0 / pE8 data, its morph library, the tracks' two bit
-// arrays) copied to the end of the bank's records (LibSlot.pEnd); its frame streams, ranges and
-// keys go to ARAM through the staging buffers, each padded to 32 bytes. The copied bytes are added
-// to the bank (ClipBank.uId) and the slot's stats, and the record then points at the copy (flag 8).
-// For a golfer's overlay the merged library (AnimLib_BuildCb over the slot's library and the
-// overlay) is then built into the golfer's 0x2800-byte library block, with its records in the
-// character's pRecords (allocated the first time). Returns 0x2800 for a golfer's overlay, else 0.
+// femsac); 3 and up the stream id of a golfer's overlay (LibOverlay.nStreamId: golfer id + 3; -1
+// once merged). Each clip still in use (users above 0, n18 not 0) is byte-swapped and its header
+// and the parts kept in main memory (tracks, the pBaseAngles / pFixedRots data, its morph library,
+// the tracks' two bit arrays) copied to the end of the bank's records (LibSlot.pEnd); its frame
+// streams, ranges and keys go to ARAM through the staging buffers, each padded to 32 bytes. The
+// copied bytes are added to the bank (ClipBank.uId) and the slot's stats, and the record then
+// points at the copy (flag 8). For a golfer's overlay the merged library (AnimLib_BuildCb over the
+// slot's library and the overlay) is then built into the golfer's 0x2800-byte library block, with
+// its records in the character's pRecords (allocated the first time). Returns 0x2800 for a golfer's
+// overlay, else 0.
 s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
     u8*         pClipSrc;
     LibSlot*    pSlot;
@@ -1432,9 +1435,9 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
             pSlot = &gLibSlots[k];
             for (i = 0; i < pSlot->nOverlays; i++) {
                 pOv = &pSlot->overlays[i];
-                if (pOv->n10 == nSlot) {
+                if (pOv->nStreamId == nSlot) {
                     k        = pOv->pChar->nSlot;
-                    pOv->n10 = -1;
+                    pOv->nStreamId = -1;
                     // fake match: leaves both loops (two breaks and a test: 84.8%, not 87.1%)
                     goto found;
                 }
@@ -1456,7 +1459,7 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
 
             pRec = &pSrc->pRecords[i];
             if (pRec->n10 <= 0 || pRec->n18 == 0) continue;
-            pBank->ppClips[pSlot->n150] = pHdr;
+            pBank->ppClips[pSlot->nCopied] = pHdr;
             // port: a clip of an overlay library ('SAL '/'SAC '), little-endian on disc; a little-endian
             //       port does not swap here (Clip is then read in place)
             SKA_SwapClip(pData + (uptr)pSrc->pRecords[i].pClip);
@@ -1479,44 +1482,44 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
                 pOut += uPad;
                 nCopied += uPad;
             }
-            n = ((Clip*)pClipSrc)->n40 + ((Clip*)pClipSrc)->n3C;
+            n = ((Clip*)pClipSrc)->nFixedRotBytes + ((Clip*)pClipSrc)->nBaseAngleBytes;
             Mem_cpy(pOut, (u8*)((Clip*)pClipSrc)->uAram - n, n);
             pOut += n;
             nCopied += n;
             if (((Clip*)pClipSrc)->n64 != 0) {
-                Mem_cpy(pOut, ((Clip*)pClipSrc)->pF4, pHdr->n64);
-                pHdr->pF4 = pOut;
+                Mem_cpy(pOut, ((Clip*)pClipSrc)->pMtaLib, pHdr->n64);
+                pHdr->pMtaLib = pOut;
                 pOut += pHdr->n64;
                 nCopied += pHdr->n64;
             } else {
-                pHdr->pF4 = NULL;
+                pHdr->pMtaLib = NULL;
             }
             n = (pHdr->n1C * 2 + 31) / 32 * 4;
-            Mem_cpy(pOut, ((Clip*)pClipSrc)->pF8, n);
-            pHdr->pF8 = pOut;
+            Mem_cpy(pOut, ((Clip*)pClipSrc)->p8BitAxes, n);
+            pHdr->p8BitAxes = pOut;
             pOut += n;
             nCopied += n;
-            Mem_cpy(pOut, ((Clip*)pClipSrc)->pFC, n);
-            pHdr->pFC = pOut;
+            Mem_cpy(pOut, ((Clip*)pClipSrc)->p16BitAxes, n);
+            pHdr->p16BitAxes = pOut;
             nCopied += n;
             // fake match: the four sizes are rounded up to 32 through one u32 scratch, tested and
             // rounded from the size itself (a local per size, or rounding the local in place, gives
             // other registers and keeps no copy of the result)
-            uAl = pHdr->n8C * 2;
-            if (pHdr->n8C * 2 & 31) {
-                uAl = ((pHdr->n8C * 2 >> 5) + 1) << 5;
+            uAl = pHdr->n16BitStride * 2;
+            if (pHdr->n16BitStride * 2 & 31) {
+                uAl = ((pHdr->n16BitStride * 2 >> 5) + 1) << 5;
             }
             nStride1 = uAl;
-            uAl      = pHdr->n8E;
-            if (pHdr->n8E & 31) {
-                uAl = ((pHdr->n8E >> 5) + 1) << 5;
+            uAl      = pHdr->n8BitStride;
+            if (pHdr->n8BitStride & 31) {
+                uAl = ((pHdr->n8BitStride >> 5) + 1) << 5;
             }
             nStride2   = uAl;
             pSrc1      = (u8*)((Clip*)pClipSrc)->uAram;
-            pSrc2      = ((Clip*)pClipSrc)->pE4;
-            pHdr->n38  = nStride1 * pHdr->nFrames;
-            pHdr->n04  = nStride2 * pHdr->nFrames;
-            nSize      = pHdr->n38 + pHdr->n04;
+            pSrc2      = ((Clip*)pClipSrc)->p8BitFrames;
+            pHdr->n16BitBytes = nStride1 * pHdr->nFrames;
+            pHdr->n8BitBytes = nStride2 * pHdr->nFrames;
+            nSize      = pHdr->n16BitBytes + pHdr->n8BitBytes;
             n4C        = pHdr->n4C;
             uAl        = n4C;
             if (n4C & 31) {
@@ -1531,26 +1534,26 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
             n50Al      = uAl;
             uAram      = GoARAM_Alloc(n4CAl + n50Al + nSize);
             uAramStart = uAram;
-            if (pHdr->n38 != 0) {
+            if (pHdr->n16BitBytes != 0) {
                 for (f = 0; f < pHdr->nFrames; f++) {
-                    Mem_cpy(gSKAAram16BitFrame, pSrc1, pHdr->n8C * 2);
+                    Mem_cpy(gSKAAram16BitFrame, pSrc1, pHdr->n16BitStride * 2);
                     GoARAM_WaitTransfer(GoARAM_CopyToAram(gSKAAram16BitFrame, uAram, nStride1));
                     uAram += nStride1;
-                    pSrc1 += pHdr->n8C * 2;
+                    pSrc1 += pHdr->n16BitStride * 2;
                 }
             }
-            if (pHdr->n04 != 0) {
+            if (pHdr->n8BitBytes != 0) {
                 for (f = 0; f < pHdr->nFrames; f++) {
-                    Mem_cpy(gSKAAram8BitFrame, pSrc2, pHdr->n8E);
+                    Mem_cpy(gSKAAram8BitFrame, pSrc2, pHdr->n8BitStride);
                     GoARAM_WaitTransfer(GoARAM_CopyToAram(gSKAAram8BitFrame, uAram, nStride2));
                     uAram += nStride2;
-                    pSrc2 += pHdr->n8E;
+                    pSrc2 += pHdr->n8BitStride;
                 }
             }
             // fake match: the strides are u32 (as s32, the ARAM calls' (u32) conversion becomes a
             // loop temp of its own); the halving is signed, as in the original
-            pHdr->n8C = (s32)nStride1 / 2;
-            pHdr->n8E = nStride2;
+            pHdr->n16BitStride = (s32)nStride1 / 2;
+            pHdr->n8BitStride = nStride2;
             if (n50 != 0) {
                 Mem_cpy(gSKAAramRanges, ((Clip*)pClipSrc)->pEC, pHdr->n50);
                 GoARAM_WaitTransfer(GoARAM_CopyToAram(gSKAAramRanges, uAram, n50Al));
@@ -1566,9 +1569,9 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
             pBank->uId += nCopied;
             pHdr = (Clip*)((u8*)pHdr + nCopied);
             gClipBankStats[k].n04 += nCopied;
-            pSrc->pRecords[i].pClip = pBank->ppClips[pSlot->n150];
-            pSrc->pRecords[i].n12 |= 8;
-            pSlot->n150++;
+            pSrc->pRecords[i].pClip = pBank->ppClips[pSlot->nCopied];
+            pSrc->pRecords[i].uFlags |= 8;
+            pSlot->nCopied++;
         }
         pSlot->pEnd = (u8*)pHdr;
         if (nSlot >= 3) {
@@ -1584,7 +1587,7 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
             pNew->ppClips   = (void**)(pNew->pTree + pSrc->nTreeSize);
             pNew->pIndex    = NULL;
             pNew->pFile     = pNew;
-            pNew->n12C      = nSize;
+            pNew->nBuiltSize = nSize;
             pNew->pClipData = NULL;
             pNew->uFlags    = pSrc->uFlags;
             pNew->nRecords  = 0;
@@ -1641,9 +1644,9 @@ void AnimLib_FreeWorkCopies(void) {
                 pOv = &pSlot->overlays[k];
                 AnimLib_Free(pOv->pWork);
                 pOv->pWork = NULL;
-                pOv->n10   = -1;
+                pOv->nStreamId   = -1;
             }
-            pSlot->n150 = 0;
+            pSlot->nCopied = 0;
         }
         if (pSlot->pLib != NULL) {
             AnimLib_Free(pSlot->pLib);
@@ -1741,7 +1744,7 @@ void AnimLib_ReloadSlot(void) {
             pOv->pWork = StaticMem_Alloc(pOv->nSize, 1, 0x40, "skalib.c", 3207);
             Mem_cpy(pOv->pWork, pOv->pCopy, pOv->nSize);
             AnimLib_Load((u8*)pOv->pWork, ClipBank_Get(nSlot));
-            pOv->n10 = pOv->n14 + 3;
+            pOv->nStreamId = pOv->nGolferId + 3;
         }
     }
     AnimLib_ApplySlotCustomAnims(nSlot);

@@ -141,7 +141,7 @@ void  Quat_QuatToMatrix(f32* pQ, f32 (*m)[4]);                        // Quatern
 int   Character_UpdateClubAttachment(Character* pChar, Clip* pClip);
 void  Quat_Invert(f32* pQ, f32* pOut);                          // Quaternion.c
 void  Quat_RotateVector(f32* pQ, f32* pIn, f32* pOut);                // Quaternion.c: a vector turned by pQ
-void  SKEL_InitIKSkeleton(Character* pChar, f32* pPos, int bPlace);     // Skeleton.c
+f32   SKEL_InitIKSkeleton(Character* pChar, f32* pTarget, int bNormals);  // Skeleton.c
 void  Char_Vec4Sub(f32* pA, f32* pB, f32* pOut);
 void  Character_BeginLoadTexturesCallbackIG(Character* pChar);
 void  Character_RequestClothesUpdateIG(int n);
@@ -184,9 +184,9 @@ void  fn_8010BA2C(void* p);
 void  FE_StreamInterruptState(void);               // FEgolferanim.c
 void  FE_StreamSetNextState(int nNext);           // FEgolferanim.c
 u8    FE_IsTextureSwapDone(void);                // FEgolferanim.c
-void  FE_SetTextureSwapState(s32 v);
+void  FE_SetTextureSwapState(int nState);
 u8    FE_GetDelayTextureSwap(void);
-void  FE_SetTextureSwapDue(u8 v);
+void  FE_SetTextureSwapDue(u8 bDue);
 void  AnimStream_Init(void);
 void  AnimStream_Close(void);
 void  AnimStream_AssignSlots(void);
@@ -572,8 +572,8 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
         SKATime_Update((AnimPlayer*)pChar->anim, &pChar->blend, fTime);
         if (pChar->uFlags & 0x1000) {
             pChar->uFlags &= ~0x1000;
-            if (pChar->pCurClip != NULL && pChar->pCurClip->pF4 != NULL) {
-                CharacterState_PlayClipMorphs(pChar, pChar->pCurClip->pF4, 0, 0.5f);
+            if (pChar->pCurClip != NULL && pChar->pCurClip->pMtaLib != NULL) {
+                CharacterState_PlayClipMorphs(pChar, pChar->pCurClip->pMtaLib, 0, 0.5f);
             }
         }
     }
@@ -1142,7 +1142,7 @@ Character* Character_Create(void) {
     pChar->fBackswing = 0.0f;
     pChar->nGroup = -1;
     pChar->nClampEvent = -1;
-    pChar->p1790 = NULL;
+    pChar->pReactionClip = NULL;
     pChar->nFootPointStart = -1;
     pChar->nView = 0;
     pChar->pRecords = NULL;
@@ -1150,7 +1150,7 @@ Character* Character_Create(void) {
     pChar->n16DC = 0;
     pChar->fMaxShadowDist = pChar->fMaxVisibleDist = 1073741824.0f;
     pChar->pCurClip = NULL;
-    pChar->p178C = NULL;
+    pChar->pMorphLib = NULL;
     pChar->aDynTexSlot[0] = -1;
     pChar->apDynTex[0] = NULL;
     pChar->aDynTexSlot[1] = -1;
@@ -1330,7 +1330,7 @@ void Character_LoadTextures(Character* pChar, Skin** apSkins, int nSkins) {
     // port: EA passes arguments SkinPart_InitTextures (empty) ignores
     ((void (*)(Skin*, TexBank*, int, int))SkinPart_InitTextures)(pChar->pSkin, &pChar->bank78, 0xBF600,
             0xCDA);
-    sprintf(pChar->szTexFile, "%sdata\\CharStrm\\CharTex\\%02dalltex.fxg", "", pChar->nC + 1);
+    sprintf(pChar->szTexFile, "%sdata\\CharStrm\\CharTex\\%02dalltex.fxg", "", pChar->nGolferId + 1);
     pChar->hFile = fn_800060E0(pChar->szTexFile);
 }
 
@@ -1733,7 +1733,7 @@ void Character_ReopenTextureFiles(void) {
     }
     for (i = 0; i < gSession.nNumPlayers; i++) {
         pChar = gPlayers[i].pChar;
-        sprintf(pChar->szTexFile, "%sdata\\CharStrm\\CharTex\\%02dalltex.fxg", "", pChar->nC + 1);
+        sprintf(pChar->szTexFile, "%sdata\\CharStrm\\CharTex\\%02dalltex.fxg", "", pChar->nGolferId + 1);
         pChar->hFile = fn_800060E0(pChar->szTexFile);
     }
 }
@@ -1777,8 +1777,8 @@ void Character_PostInit(void) {
 // its model (SKEL_LoadFromMem; a golfer outside the front end gets the golfer model definitions),
 // its own animation library (kept when its clips are its own or in a bank, else queued as an
 // overlay of its slot), and its slider definitions. A golfer then gets club skin set nSet
-// (gClubSkinSets), and with bLook its look from pChoices. nId: the golfer id (nC). nUnused: not
-// read. NULL when no character could be made.
+// (gClubSkinSets), and with bLook its look from pChoices. nId: the golfer id (nGolferId). nUnused:
+// not read. NULL when no character could be made.
 // port: the object is little-endian on disc and BYTESWAP_SWAPDATA swaps each value as it reads it:
 //       a little-endian port does not swap there.
 Character* Character_CreateFromMem(u8* pData, int nUnused, int nSet, int nId, u8 bLook,
@@ -1810,7 +1810,7 @@ Character* Character_CreateFromMem(u8* pData, int nUnused, int nSet, int nId, u8
     if (pChar == NULL) {
         return NULL;
     }
-    pChar->nC = nId;
+    pChar->nGolferId = nId;
     pStart = pData;
     BYTESWAP_SWAPDATA(&pData, (u8*)&pChar->nSlot, 4, 4);
     BYTESWAP_SWAPDATA(&pData, (u8*)&fSkin, 4, 4);
@@ -1873,7 +1873,7 @@ Character* Character_CreateFromMem(u8* pData, int nUnused, int nSet, int nId, u8
     }
     bModel = nModel == 1;
     if (bLook && pChoices != NULL) {
-        bModel = (u8)pChoices->n113;
+        bModel = (u8)pChoices->bLeftHanded;
     }
     Character_SetSkeleton(pChar, SKEL_LoadFromMem(pData, 1, pDefs, bModel));
     if (pChar->pSkin != NULL) {
@@ -1915,7 +1915,7 @@ Character* Character_CreateFromMem(u8* pData, int nUnused, int nSet, int nId, u8
                     pData, nSize);
             gLibSlots[pChar->nSlot].overlays[gLibSlots[pChar->nSlot].nOverlays].nSize = nSize;
             gLibSlots[pChar->nSlot].overlays[gLibSlots[pChar->nSlot].nOverlays].pChar = pChar;
-            gLibSlots[pChar->nSlot].overlays[gLibSlots[pChar->nSlot].nOverlays].n10 = nId + 3;
+            gLibSlots[pChar->nSlot].overlays[gLibSlots[pChar->nSlot].nOverlays].nStreamId = nId + 3;
             gLibSlots[pChar->nSlot].overlays[gLibSlots[pChar->nSlot].nOverlays].bActive = bLook;
             gLibSlots[pChar->nSlot].nOverlays++;
             pChar->pLib = StaticMem_Alloc(0x2800, 2, 0x40, "char.c", 0xE75);
@@ -2264,7 +2264,7 @@ int Character_UpdateClubAttachment(Character* pChar, Clip* pClip) {
 // Plays pClip on the character (nothing for NULL); a golfer's club first follows the clip
 // (Character_UpdateClubAttachment). With bNoBlend the blend tree and the animation player start
 // over; otherwise the clip is blended in over its first f18 seconds from the current time plus
-// fTime. Its SKA tags then start at the blend's start, and the clip's pF4 animation plays too
+// fTime. Its SKA tags then start at the blend's start, and the clip's pMtaLib animation plays too
 // (CharacterState_PlayClipMorphs).
 void Character_PlayClip(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime) {
     f32 aBlend[6];
@@ -2282,7 +2282,7 @@ void Character_PlayClip(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime) 
     if (Character_IsGolfer(pChar)) {
         Character_UpdateClubAttachment(pChar, pClip);
     }
-    pChar->p178C = NULL;
+    pChar->pMorphLib = NULL;
     if (bNoBlend) {
         SKABlendData_Shutdown(&pNode, 0);
         SKABlendData_Init(&pNode, 1, 0, SKABlender_BlendLinear, 0);
@@ -2315,8 +2315,8 @@ void Character_PlayClip(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime) 
     pAnim->fStart = pNode->fStart;
     pAnim->fEnd = pNode->fEnd;
     Character_InitSKATags(pChar, pClip, aBlend[3]);
-    if (pClip != NULL && pClip->pF4 != NULL) {
-        CharacterState_PlayClipMorphs(pChar, pClip->pF4, bNoBlend, fTime);
+    if (pClip != NULL && pClip->pMtaLib != NULL) {
+        CharacterState_PlayClipMorphs(pChar, pClip->pMtaLib, bNoBlend, fTime);
     }
     pChar->pCurClip = pClip;
     fn_801141F8(pChar->pModel->pF0, pChar->pModel);
@@ -2725,8 +2725,8 @@ void Character_SetupForShot(Character* pChar) {
         Char_Vec4Add(vPos, vOffsetZ, vPos);
         vPos[1] += gClubStanceOffsets[pChar->nClubClass][1];
         SKEL_InitIKSkeleton(pChar, vPos, bResetPos);
-        pChar->pModel->pSkel->n1130 = pChar->nClipKey;
-        pChar->pModel->pSkel->n112C = pChar->nClubClass;
+        pChar->pModel->pSkel->nIKClipKey = pChar->nClipKey;
+        pChar->pModel->pSkel->nIKClubClass = pChar->nClubClass;
         if (((pChar->nCurState == 5 || pChar->nTargetState == 5) && CharacterState_IsNotFidgeting(pChar)) ||
             pChar->nCurState == 7) {
             SKEL_SetIKSolutionWeight(pChar->pModel->pSkel, 1.0f);
@@ -2834,8 +2834,8 @@ void Character_RegisterGolferStreamClientIG(void) {
 // counting what it takes) and its textures loaded, then the UI file is brought back. The character
 // is placed at gFEGolferPos facing f19C, given the profile's created-golfer look for golfers 7 and
 // 29 (Character_ApplyCrAPSettings), set to club class 5 (the wedges) and its first clip. When it
-// is still the golfer the menu wants (pB8->nC is n8C), its body and six club skins are listed on
-// it (created golfers with one texture pool entry get two) and it takes its pool entries.
+// is still the golfer the menu wants (pB8->nGolferId is n8C), its body and six club skins are
+// listed on it (created golfers with one texture pool entry get two) and it takes its pool entries.
 void Character_GolferStreamCallbackFE(UStreamObject* pObject) {
     UStreamObject* pCopy;
     Character* pChar;
@@ -2856,13 +2856,13 @@ void Character_GolferStreamCallbackFE(UStreamObject* pObject) {
     gpCrAPState->pB8->pChar->nPlays = -1;
     Character_SetPosition(gpCrAPState->pB8->pChar, gFEGolferPos, 1);
     Character_SetOrientation(gpCrAPState->pB8->pChar, gpCrAPState->f19C);
-    if (gpCrAPState->pB8->pChar->nC == 7 || gpCrAPState->pB8->pChar->nC == 29) {
+    if (gpCrAPState->pB8->pChar->nGolferId == 7 || gpCrAPState->pB8->pChar->nGolferId == 29) {
         Character_ApplyCrAPSettings(gpCrAPState->pB8->pChar, &FE_GetCurrentProfile()->choices);
     }
     Character_SelectClub(gpCrAPState->pB8->pChar, 5);
     pClip = Char_SetClip(gpCrAPState->pB8->pChar, 0, 0, NULL);
     Character_PlayClip(gpCrAPState->pB8->pChar, pClip, 1, 0.0f);
-    if (gpCrAPState->pB8->nC == gpCrAPState->n8C) {
+    if (gpCrAPState->pB8->nGolferId == gpCrAPState->n8C) {
         pChar = gpCrAPState->pB8->pChar;
         pChar->nSkins = 7;
         pChar->apSkins[0] = pChar->pSkin;
@@ -2872,7 +2872,7 @@ void Character_GolferStreamCallbackFE(UStreamObject* pObject) {
         pChar->apSkins[4] = pChar->pClubSet->apSkins[3];
         pChar->apSkins[5] = pChar->pClubSet->apSkins[4];
         pChar->apSkins[6] = pChar->pClubSet->apSkins[5];
-        if ((pChar->nC == 7 || pChar->nC == 29) && pChar->nDynTex == 1) {
+        if ((pChar->nGolferId == 7 || pChar->nGolferId == 29) && pChar->nDynTex == 1) {
             pChar->nDynTex = 2;
         }
         CharacterTex_TakePoolEntries(pChar);
@@ -2953,7 +2953,7 @@ void Character_SetClubsAndClothes(Character* pChar, int nSlot) {
     char szName[32];            // the size is not known
 
     if (gSession.nGameType == 3) {
-        if (pChar->nC == 7 || pChar->nC == 29) {
+        if (pChar->nGolferId == 7 || pChar->nGolferId == 29) {
             Character_SetClubStatesForCharacter(pChar, nSlot, &FE_GetCurrentProfile()->choices);
         } else {
             Character_SetClubStatesForCharacter(pChar, nSlot, NULL);
@@ -2984,15 +2984,15 @@ void Character_RequestClothesUpdateFE(int n) {
 }
 
 // Each frame in the create-a-player mode (game type 3): for every flag
-// Character_RequestClothesUpdateFE set, once the shown golfer (gpCrAPState->pB4) is ready (b18),
-// the menu golfer's state machine is not in state 4 and nothing holds it (FE_IsTextureSwapDone), the flag is
-// cleared and the running state aborted for state 4, which dresses the shown golfer again and swaps
-// its textures (FE_StreamFunc_SwapTexturesInit).
+// Character_RequestClothesUpdateFE set, once the shown golfer (gpCrAPState->pB4) is ready
+// (bLoaded), the menu golfer's state machine is not in state 4 and nothing holds it
+// (FE_IsTextureSwapDone), the flag is cleared and the running state aborted for state 4, which
+// dresses the shown golfer again and swaps its textures (FE_StreamFunc_SwapTexturesInit).
 void Character_UpdateClothesFE(void) {
     int i;
 
     for (i = 0; i < 5; i++) {
-        if (gSession.aD2D[i] && gpCrAPState->pB4 != NULL && gpCrAPState->pB4->b18 &&
+        if (gSession.aD2D[i] && gpCrAPState->pB4 != NULL && gpCrAPState->pB4->bLoaded &&
             FE_StreamGetCurrentState() != 4 && FE_IsTextureSwapDone()) {
             gSession.aD2D[i] = 0;
             FE_StreamInterruptState();
@@ -3170,7 +3170,7 @@ u8 Character_IsHoldingBall(Character* pChar) {
 }
 
 // Gives the character a created golfer's look from pChoices: its skins' choices
-// (SkinPart_ApplyBodyChoices), its 26 body sliders (a9B4) and its handedness (n113 non-zero:
+// (SkinPart_ApplyBodyChoices), its 26 body sliders (a9B4) and its handedness (bLeftHanded non-zero:
 // left-handed, the model's bLeftHanded), the handedness except in the create-a-player mode (game
 // type 3) off its screens 1 and 4 (gpCrAPState->n0); then the skeleton is set up again from the
 // model (Character_SetSkeleton).
@@ -3180,7 +3180,7 @@ void Character_ApplyCrAPSettings(Character* pChar, SkinChoices* pChoices) {
                                                   pChoices->a9B4,
                 &pChar->morphBlend);
     if (gSession.nGameType != 3 || gpCrAPState->n0 == 1 || gpCrAPState->n0 == 4) {
-        if (pChoices->n113 == 0) {
+        if (pChoices->bLeftHanded == 0) {
             Character_SetLeftHanded(pChar, 0);
         } else {
             Character_SetLeftHanded(pChar, 1);
@@ -3253,11 +3253,11 @@ void Character_SwapTexPalettes(u8* pData, int nBytes) {
 
 // Dresses the character's six club skins (driver, fairway wood, putter, 3 and 7 irons, wedge: the
 // gClubPartNames classes): from pChoices when given (SkinPart_ApplyClubChoices), else from the
-// golfer's gGolferTable row found by its id nC (row 7 itself for golfer 7 while gSession.uFlags has
-// 0x4000), each class's part variant and its head, shaft and grip sets; then the clubs are mirrored
-// for a left-handed golfer. In the front end (game type 3) a call while the menu golfer's b1D1 is
-// clear only sets it (FE_SetClubStatesAllowed) and returns. nSlot is not used; nothing without a character or
-// its club set.
+// golfer's gGolferTable row found by its id nGolferId (row 7 itself for golfer 7 while
+// gSession.uFlags has 0x4000), each class's part variant and its head, shaft and grip sets; then
+// the clubs are mirrored for a left-handed golfer. In the front end (game type 3) a call while the
+// menu golfer's b1D1 is clear only sets it (FE_SetClubStatesAllowed) and returns. nSlot is not
+// used; nothing without a character or its club set.
 void Character_SetClubStatesForCharacter(Character* pChar, int nSlot, SkinChoices* pChoices) {
     int nGolfer;
     u64 uName;
@@ -3269,8 +3269,8 @@ void Character_SetClubStatesForCharacter(Character* pChar, int nSlot, SkinChoice
         return;
     }
     if (pChoices == NULL) {
-        nGolfer = Golfer_FindById(pChar->nC);
-        if ((gSession.uFlags & 0x4000) && pChar->nC == 7) {
+        nGolfer = Golfer_FindById(pChar->nGolferId);
+        if ((gSession.uFlags & 0x4000) && pChar->nGolferId == 7) {
             nGolfer = 7;
         }
         if (nGolfer >= 0) {

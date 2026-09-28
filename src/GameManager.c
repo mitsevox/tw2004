@@ -768,7 +768,7 @@ int GM_ShowPostShotAnimation(int nPlayer) {
         return 1;
     }
     if (gPlayers[nPlayer].uFlags & 1) {
-        return gPlayers[nPlayer].pChar->p1790 != NULL;
+        return gPlayers[nPlayer].pChar->pReactionClip != NULL;
     }
     if (gPlayers[nPlayer].nShotKind == SHOT_TYPE_PUTT_e) {
         switch (nResult) {

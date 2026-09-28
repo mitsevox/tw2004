@@ -146,8 +146,9 @@ typedef struct Skeleton {
                                 //         legs 0 and 1)
     u8   a1108[4];              // 0x1108  the indexes of bones 0x24, 0x25, 0x11 and 0x12 (SKEL_CreateIKSkeleton)
     u8   unk110C[0x112C - 0x110C];
-    s32  n112C;                 // 0x112C  } the character's club class and nClipKey (Character_SetupForShot)
-    s32  n1130;                 // 0x1130  }
+    s32  nIKClubClass;          // 0x112C  } the character's club class and clip key the IK was
+    s32  nIKClipKey;            // 0x1130  }   set up for (Character_SetupForShot; -1 at first);
+                                //         not read
 } Skeleton;
 
 // A bone of a character's model (CharModel.pBones).
@@ -284,14 +285,17 @@ extern struct Character* gSkelIKCharacter;   // Skeleton.c: the character SKEL_A
 extern u8 gSkelPantBones[6];      // Skeleton.c: the bone ids of the model's kind 2 dynamic chains
 extern u8 gSkelSleeveBones[6];      // Skeleton.c: the bone ids of its kind 3 dynamic chains
 
-// A clip's header (the fields used here). In a file, pD0 marks the end of the header and
-// uAram points at the end of the key data; once a clip's frames are streamed out, uAram is
-// their ARAM address and flag 4 is set.
+// A clip's header (the fields used here). A clip's bone rotations come in two frame streams: the
+// 16-bit one (u16 angles, at uAram) and the 8-bit one (bytes added to base angles, at
+// p8BitFrames); SKAUtil_ExpandSingleFrameToDest decodes a frame of each. In a file, pD0 marks the
+// end of the header and uAram points at the end of the key data; once a clip's frames are streamed
+// out, uAram is their ARAM address and flag 4 is set.
 typedef struct Clip {
-    u32    uFlags;              // 0x00  4: its frame data is in ARAM
-    s32    n04;                 // 0x04  bytes of the second frame stream
+    u32    uFlags;              // 0x00  2: a BlendClip follows its events (SKA_SwapClip,
+                                //       SKA_PatchMemory); 4: its frame data is in ARAM
+    s32    n8BitBytes;          // 0x04  bytes of the 8-bit frame stream (p8BitFrames)
     u8     unk08[2];
-    s16    n0A;                 // 0x0A  non-zero: it has a first frame stream (SKAUtil_ExpandSingleFrameToDest)
+    s16    b16BitFrames;        // 0x0A  non-zero: it has the 16-bit frame stream
     s16    nFrames;             // 0x0C
     s16    n0E;                 // 0x0E  the last key SKA_Update reads
     f32    f10;                 // 0x10  the time from one key to the next (SKA_Update)
@@ -299,29 +303,30 @@ typedef struct Clip {
     f32    f18;                 // 0x18  Character_PlayClip blends up to it
     s32    n1C;                 // 0x1C  how many tracks (pD0)
     u8     unk20[8];
-    s16    n28;                 // 0x28  bytes SKAUtil_ExpandSingleFrameToDest copies out of a frame of the first stream
+    s16    n28;                 // 0x28  bytes SKAUtil_ExpandSingleFrameToDest copies out of a
+                                //       16-bit frame
     s16    n2A;                 // 0x2A  from this offset
     s32    n2C;                 // 0x2C
     u32    u30;                 // 0x30  SKA_LoadFromMem hands it back
     u8     unk34[2];
-    s16    n36;                 // 0x36  non-zero: it has a second frame stream (SKAUtil_ExpandSingleFrameToDest)
-    s32    n38;                 // 0x38  bytes of the first frame stream
-    s32    n3C;                 // 0x3C
-    s32    n40;                 // 0x40
+    s16    b8BitFrames;         // 0x36  non-zero: it has the 8-bit frame stream
+    s32    n16BitBytes;         // 0x38  bytes of the 16-bit frame stream
+    s32    nBaseAngleBytes;     // 0x3C  bytes at pBaseAngles
+    s32    nFixedRotBytes;      // 0x40  bytes at pFixedRots
     u8     unk44[4];
     s16    nEvents;             // 0x48  how many pEvents holds
     u8     unk4A[2];
     s32    n4C;                 // 0x4C
     s32    n50;                 // 0x50
-    s32    n54;                 // 0x54  bytes from pC4 to the pF4 library (SKA_LoadFromMem)
-    s32    n58;                 // 0x58  passed to SKAUtil_EulerAnglesToQTs8 with a second-stream frame
-    s32    n5C;                 // 0x5C  passed to SKAUtil_EulerAnglesToQTs16 with a first-stream frame
-    s32    n60;                 // 0x60  passed to SKAUtil_EulerAnglesToQTs16 with pE8
+    s32    n54;                 // 0x54  bytes from pC4 to the pMtaLib library (SKA_LoadFromMem)
+    s32    n8BitBones;          // 0x58  bones an 8-bit frame rotates
+    s32    n16BitBones;         // 0x5C  bones a 16-bit frame rotates
+    s32    nFixedBones;         // 0x60  bones pFixedRots rotates (SKA_Update)
     s32    n64;                 // 0x64
     u8     unk68[0x80 - 0x68];
     f32    v80[3];              // 0x80  a point Character_GetEndOfAnimationPosition puts through bone 0's matrix
-    s16    n8C;                 // 0x8C  halfwords per frame, first stream
-    s16    n8E;                 // 0x8E  bytes per frame, second stream
+    s16    n16BitStride;        // 0x8C  halfwords per 16-bit frame
+    s16    n8BitStride;         // 0x8E  bytes per 8-bit frame
     u64    u90;                 // 0x90  looked up in gClubBoneIds (FEgolferanim.c FE_SetupCharState)
     u8     unk98[8];
     char   name[0x20];          // 0xA0  (SKA_SwapHeader swaps 0xA0 and 0xB0 as 16 bytes each, then words)
@@ -334,16 +339,20 @@ typedef struct Clip {
     struct ClipEvent* pEvents;  // 0xD4  its timed events (SKA_GetTagTime finds one by its id)
     struct BlendClip* pD8;      // 0xD8  SKA_SampleBlendClip samples it; set: FEgolferanim.c turns the
                                 //       golfer round for the clip
-    u32    uAram;               // 0xDC  the first frame stream: its ARAM address with flag 4, else its
-                                //       address in memory (SKA_DistributePointers)
-    u8*    pE0;                 // 0xE0  n3C bytes (SKA_SwapClip swaps them as halfwords)
-    u8*    pE4;                 // 0xE4  the second frame stream (n04 bytes)
-    u8*    pE8;                 // 0xE8  n40 bytes (halfwords)
+    u32    uAram;               // 0xDC  the 16-bit frame stream: its ARAM address with flag 4, else
+                                //       its address in memory (SKA_DistributePointers)
+    u8*    pBaseAngles;         // 0xE0  the 8-bit stream's base angles, a u16 per axis of each bone
+                                //       (SKAUtil_EulerAnglesToQTs8's aBase)
+    u8*    p8BitFrames;         // 0xE4  the 8-bit frame stream (n8BitBytes bytes)
+    u8*    pFixedRots;          // 0xE8  the fixed rotations: nFixedBones bones of u16 angles
+                                //       (SKA_Update decodes them once per key-frame buffer)
     u8*    pEC;                 // 0xEC  the tracks' ranges, 0x18 bytes each (ClipTrack.aRange)
-    u8*    pF0;                 // 0xF0  the tracks' packed keys, nFrames * 6 bytes each (ClipTrack.pKeys)
-    u8*    pF4;                 // 0xF4
-    u8*    pF8;                 // 0xF8
-    u8*    pFC;                 // 0xFC
+    u8*    pF0;                 // 0xF0  the tracks' packed keys, nFrames * 6 bytes each
+                                //       (ClipTrack.pKeys)
+    u8*    pMtaLib;             // 0xF4  the clip's own morph library (an MtaLib; n64 non-zero:
+                                //       SKA_PatchMemory links it), played with the clip
+    u8*    p8BitAxes;           // 0xF8  } the axis masks (two bits a bone) of the 8-bit and the
+    u8*    p16BitAxes;          // 0xFC  }   16-bit stream (SKAUtil_EulerAnglesToQTs8 / 16's pBits)
 } Clip;
 LAYOUT_ASSERT(Clip, 0x100);
 
@@ -476,12 +485,13 @@ typedef struct ClipEvent {
 } ClipEvent;
 LAYOUT_ASSERT(ClipEvent, 0x10);
 
-// One of a character's four data buffers (Character.buffers): pBuf holds three runs of 16-byte
-// entries, p0C..p18 mark where they start and end, their counts read from p04's +0x60, +0x58 and
-// +0x5C (the code at 0x8001FE50 fills them; Character_ClearKeyFrameBuffers empties them, Character_Free frees pBuf).
+// One of a character's four key-frame buffers (Character.buffers): SKA_Update decodes a key of the
+// clip p04 into it, as three runs of quaternions (16 bytes each) in pBuf that p0C..p18 mark: the
+// clip's nFixedBones fixed rotations, then an 8-bit frame (n8BitBones) and a 16-bit frame
+// (n16BitBones). Character_ClearKeyFrameBuffers empties them, Character_Free frees pBuf.
 typedef struct CharBuffer {
-    s32   n00;                  // 0x00  -1 when empty
-    void* p04;                  // 0x04  what the buffer was filled for
+    s32   n00;                  // 0x00  the key it holds, -1 when empty
+    void* p04;                  // 0x04  the clip it holds a key of
     u8*   pBuf;                 // 0x08
     u8*   p0C;                  // 0x0C
     u8*   p10;                  // 0x10
@@ -570,7 +580,9 @@ typedef struct Character {
                                 //        characters SkeletalObject_FindObject finds by id
     u32   uId;                  // 0x008  the id of the 'SKLO' object it was built from (SkeletalObject_StreamCallback);
                                 //        SkeletalObject_FindObject finds it by this
-    s32   nC;                   // 0x00C  the golfer's id (FEgolferanim.c: 7 and 29 are special)
+    s32   nGolferId;            // 0x00C  its golfer's id (Character_CreateFromMem; its texture
+                                //        file is numbered nGolferId + 1; 7 and 29 are the created
+                                //        golfers)
     u32   uCharFlags;           // 0x010  1 hidden (skipped by the update and the draw), 2 the
                                 //        flagstick (hidden while the view has the flag out), 4 /
                                 //        8 / 0x200 / 0x10000 shot set-up requests
@@ -578,7 +590,8 @@ typedef struct Character {
                                 //        (Character_Sleep; also while its textures are given
                                 //        back), 0x80 its club or shot kind changed
                                 //        (Character_InitNewClubAndShotType; state 5 clears it),
-                                //        0x100 the animation runs 5 times as fast, 0x400 a flag
+                                //        0x100 the animation runs 5 times as fast, 0x2000 cleared
+                                //        by fn_800955F0's skin reload (set nowhere), 0x400 a flag
                                 //        of its CHR object, 0x1000 cleared each frame
                                 //        (Character_PreRenderAll), 0x4000 the club hangs from the
                                 //        root (Character_UpdateClubAttachment), 0x8000 the putt
@@ -680,9 +693,9 @@ typedef struct Character {
     Clip* pBlend;               // 0x1624
     f32   fBackswing;           // 0x1628  how far along the backswing is, 0..1 (pBlend's fCC, copied every
                                 //         frame of the backswing; the swing's power is its square root)
-    f32   f162C;                // 0x162C
-    f32   f1630;                // 0x1630
-    f32   f1634;                // 0x1634
+    f32   f162C;                // 0x162C  } 1, 0.5 and 0.2 from Character_Create; Swing.c's
+    f32   f1630;                // 0x1630  }   Character_Set162C / 1630 / 1634 write them; nothing
+    f32   f1634;                // 0x1634  }   reads them in this build
     f32   afSwingTop[6];        // 0x1638  the backswing clip's BlendClip sampled at the top of
                                 //         the swing (SKA_SampleBlendClip, Swing.c): [1] where the
                                 //         downswing clip starts (CharacterState_AddSKABlendData's
@@ -733,13 +746,16 @@ typedef struct Character {
                                 //         updates (it sets -1 first, so all four each time); -1
                                 //         from Character_SetPosition
     Clip* pCurClip;             // 0x1788  the clip Char_SetClip picked
-    struct MtaLib* p178C;       // 0x178C  the MAL library the second player plays (CharacterState_AddMorphBlendData);
-                                //         cleared by Character_PlayClip
-    Clip* p1790;                // 0x1790  cleared by fn_80062BFC; CharacterState_AddSKABlendData plays it for
-                                //         groups 5, 6 and 10
-    void* p1794;                // 0x1794  cleared by fn_80062BE8; the same for group 9
-    Clip* p1798;                // 0x1798  cleared by Character_Create; with n2C 6, Character_SelectShotType and
-                                //         Character_SetupForShot set nClipKey to 4 when it is 0
+    struct MtaLib* pMorphLib;   // 0x178C  the morph library the morph player plays
+                                //         (CharacterState_AddMorphBlendData); cleared by
+                                //         Character_PlayClip
+    Clip* pReactionClip;        // 0x1790  the clip kept for clip groups 5, 6 and 10 (the reaction):
+                                //         CharacterState_AddSKABlendData picks it once and plays it
+                                //         again; cleared by fn_80062BFC
+    void* pTapInClip;           // 0x1794  the same for group 9, the tap-in; cleared by fn_80062BE8
+    Clip* p1798;                // 0x1798  cleared by Character_Create and set nowhere, so the tests
+                                //         on it never pass (with n2C 6, Character_SelectShotType
+                                //         and Character_SetupForShot would make nClipKey 0 into 4)
     f32   vAvgGroundNormal[4];  // 0x179C  the average ground normal under the four foot points
                                 //         (Character_PlaceFeetOnGround); Character_KeepClubOutOfGround
                                 //         acts only while its y is above 0.9
@@ -810,22 +826,24 @@ LAYOUT_ASSERT(AnimStreamBuf, 8);
 typedef struct AnimStreamClips {
     s32  nNext;                 // 0x0  the next of them to play (wraps around)
     s32  nMaxSize;              // 0x4  the largest of them, in bytes
-    u8   b8;                    // 0x8  set by AnimStream_MarkClips
+    u8   bReadNext;             // 0x8  its next clip is to be read (AnimStream_MarkClips)
     u8   pad9[3];
 } AnimStreamClips;
 LAYOUT_ASSERT(AnimStreamClips, 0xC);
 
 // A player's part of the stream.
 typedef struct AnimStreamPlayer {
-    s32  nId;                   // 0x000  -1 unused; AnimStream_FindSlotPlayer finds a player's part by it
+    s32  nSlot;                 // 0x000  the stream slot (0 or 1) the player's clips use, -1 none
+                                //        (AnimStream_FindSlotPlayer)
     AnimStreamClips clips[2][8][6];     // 0x004  [group index][style][club class]
 } AnimStreamPlayer;
 LAYOUT_ASSERT(AnimStreamPlayer, 0x484);
 
 // The stream's state (gpAnimStream, allocated by AnimStream_Init).
 typedef struct AnimStream {
-    AnimStreamBuf*   p0;        // 0x0000  the buffer the current read fills (a clip, AnimStream_EndRead)
-    AnimStreamClips* p4;        // 0x0004  the clips it is for
+    AnimStreamBuf*   pReadBuf;  // 0x0000  the buffer the current read fills (a clip,
+                                //         AnimStream_EndRead); NULL: no read
+    AnimStreamClips* pReadClips;    // 0x0004  the clips it is for
     AnimStreamBuf bufs[2][2][8][6];     // 0x0008  [double buffer][group index][style][club class]
     AnimStreamPlayer players[5];        // 0x0608
     void* pRead;                // 0x1C9C  the read buffer
@@ -835,7 +853,7 @@ typedef struct AnimStream {
     s32   hFile;                // 0x1CBC  the open file, -1 none
     s32   nState;               // 0x1CC0  0 idle, 1 reading, 2 read (AnimStream_OnReadDone)
     s32   nResult;              // 0x1CC4  the bytes the last read got (its callback's nBytes)
-    s32   n1CC8;                // 0x1CC8
+    s32   nReadPlayer;          // 0x1CC8  the player the current read is for
     u8    bReadDone;            // 0x1CCC  set when a waited-for read finishes (AnimStream_OnReadNowDone)
     u8    bOn;                  // 0x1CCD  streaming is on (off in split screen, multiplayer and some
                                 //         modes)
@@ -943,12 +961,14 @@ struct AnimLib {
     void** ppClips;             // 0x120  clip pointers (Clip)
     s16*   pIndex;              // 0x124  record of each clip
     void*  pFile;               // 0x128  the loaded file this library sits in
-    s32    n12C;                // 0x12C
+    s32    nBuiltSize;          // 0x12C  a golfer's merged library: the size AnimLib_MergeOverlay
+                                //        built it to
     struct ClipRecord* pRecords;    // 0x130
     u8*    pClipData;           // 0x134  the library's own clips
     struct ClipBank* pBank;     // 0x138  set in the file: the clips are in a bank instead
     u32    uFlags;              // 0x13C  1: the library carries its own clips
-    s32    n140;                // 0x140
+    s32    nClipBytes;          // 0x140  its clips' bytes (AnimLib_TrimToFit; the banks' budget is
+                                //        shared out by them)
     s16    n144;                // 0x144
     s16    nClips2;             // 0x146
 };
@@ -958,10 +978,12 @@ LAYOUT_ASSERT(AnimLib, 0x148);
 typedef struct ClipRecord {
     char   name[16];            // 0x00
     s16    n10;                 // 0x10  leaves using the clip, while merging
-    s16    n12;                 // 0x12  merge flags: 1 keep, 2 / 0x10 moved (pClip then points to the
-                                //       record it went to)
-    s32    n14;                 // 0x14
-    s32    n18;                 // 0x18
+    s16    uFlags;              // 0x12  1 picked to drop (AnimLib_DropCb takes it out), 2 / 0x10
+                                //       moved (pClip then points to the record it went to), 4
+                                //       linked, 8 copied into the slot's clip bank
+                                //       (AnimLib_MergeOverlay)
+    s32    nBytes;              // 0x14  the clip's size (MergeCtx.nBytes loses it when it goes)
+    s32    n18;                 // 0x18  AnimLib_MarkDropHighestCb picks the highest first
     void*  pClip;               // 0x1C  offset into the clip data on disc, pointer once loaded
     s32    n20;                 // 0x20
 } ClipRecord;
@@ -970,7 +992,9 @@ LAYOUT_ASSERT(ClipRecord, 0x24);
 // A clip bank: clips shared by several libraries (a 0x20-byte header, the clip offsets, then the
 // clips, each 16-aligned).
 typedef struct ClipBank {
-    u64    uId;                 // 0x00
+    u64    uId;                 // 0x00  a library's clips are in it when their uIds match; a
+                                //       planned bank counts the bytes copied in here instead
+                                //       (AnimLib_MergeOverlay)
     s32    nClips;              // 0x08
     s32    n0C;                 // 0x0C
     void** ppClips;             // 0x10
@@ -986,8 +1010,9 @@ typedef struct LibOverlay {
     void*  pCopy;               // 0x04  the file as it came off the disc
     u32    nSize;               // 0x08
     Character* pChar;           // 0x0C  the golfer it was loaded for
-    s32    n10;                 // 0x10
-    s32    n14;                 // 0x14
+    s32    nStreamId;           // 0x10  the 'SAC ' stream id of its clips: nGolferId + 3, -1 once
+                                //       merged (AnimLib_MergeOverlay)
+    s32    nGolferId;           // 0x14  nStreamId - 3, kept while merged (AnimLib_ReloadSlot)
     u8     bActive;             // 0x18
     u8     pad19[3];
     s32    nTree;               // 0x1C  the tree size before a merge
@@ -1001,13 +1026,14 @@ typedef struct LibSlot {
     u32        nSize;           // 0x008
     LibOverlay overlays[10];    // 0x00C
     s32        nOverlays;       // 0x14C
-    s32        n150;            // 0x150
+    s32        nCopied;         // 0x150  clips copied into the slot's bank so far: the next
+                                //        ClipBank.ppClips entry (AnimLib_MergeOverlay)
     u8*        pEnd;            // 0x154  the end of the slot's clip bank records
 } LibSlot;
 LAYOUT_ASSERT(LibSlot, 0x158);
 
 // A leaf of the clip tree (see AnimLib); while two trees are merged its mask holds flags
-// instead: 1 keep this one, 2 replace it.
+// instead: 1 its clips are kept, 2 they go unused (AnimLib_MergeSizeCb).
 typedef struct AnimLeaf {
     s16 nCount;                 // 0x0
     s16 nFirst;                 // 0x2

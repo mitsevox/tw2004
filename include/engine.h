@@ -84,9 +84,11 @@ u64  TI_sStopCounter(int nWatch);           // stop; returns the reading
 u64  TI_sReadCounter(int nWatch);           // the reading
 f32  fn_8006E118(u64 uNow, u64 uLast);  // seconds between two readings (gomainloop.c)
 void TI_vResetCounter(int nWatch);           // reset to 0
-// Pack up to 12 characters of pName into a 64-bit code (base 40, table gSKANameCodes).
+// Pack up to 12 characters of pName into a 64-bit code (base 40, table gSKANameCodes), stored with
+// its bytes reversed; returns 0, 1 for a name past 12 characters, 2 when a character was replaced.
 int   SKA_PackName(u64* pId, const char* pName);
-// And back: the 12 characters a code was made from (table gSKANameChars); szName takes 13 bytes.
+// And back: the 12 characters a code in this machine's byte order was made from (table
+// gSKANameChars); szName takes 13 bytes. SKA_PackName's own codes go through SKA_UnpackSwappedName.
 void  SKA_UnpackName(u64* pId, char* szName);
 void  SKA_UnpackSwappedName(u64* pId, char* szName);      // for a code stored with its bytes reversed
 extern char gSKANameChars[40];                   // the 40 characters a name code is made of

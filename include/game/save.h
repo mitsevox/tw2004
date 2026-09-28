@@ -192,8 +192,9 @@ typedef struct SkinChoices {
     char a82[8][0x10];          // 0x082
     s8   n102;                  // 0x102  1: sz103 is set
     char sz103[0x10];           // 0x103
-    s8   n113;                  // 0x113  set by FE_SetProfileLeftHanded; FEgolferanim.c passes it to the
-                                //        character (FE_CRAPSetHandednessForScreen)
+    s8   bLeftHanded;           // 0x113  the created golfer is left-handed
+                                //        (FE_SetProfileLeftHanded; FEgolferanim.c hands it on with
+                                //        FE_CRAPSetHandednessForScreen)
     SkinChoice aParts[40];      // 0x114  the body's, per part (-1 -1 throughout: not set yet)
     SkinChoice aSets[116];      // 0x254  the body's, per set
     SkinChoice aSkinParts[6][10];   // 0x5F4  the six skins' of CharSkinSet

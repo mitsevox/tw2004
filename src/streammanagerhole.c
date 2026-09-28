@@ -493,7 +493,7 @@ void fn_80014C9C(void) {
     for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
         nModel = Character_GetGolferModelID(nPlayer);
         for (i = 0; i < pSlot->nOverlays; i++) {
-            if (pSlot->overlays[i].n14 == nModel) {
+            if (pSlot->overlays[i].nGolferId == nModel) {
                 break;
             }
         }
@@ -526,7 +526,7 @@ void fn_80014DFC(s32 nChar, s32 nUnused) {   // port: FEgolferanim.c passes a se
 
     fn_80015454();
     sprintf(szName, lbl_80186CA8, nChar + 1);
-    gpCrAPState->pB8->n14 = -1;
+    gpCrAPState->pB8->nStreamedId = -1;
     fn_800153CC(szName, fn_80014E74, fn_80014E8C);
 }
 

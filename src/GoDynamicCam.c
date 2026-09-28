@@ -1343,9 +1343,9 @@ u8 fn_8003C800(char* szName, CamSequence** ppSeq, CamShot** ppShot) {
     return 0;
 }
 
-// The sequence and shot named after the golfer's clip: with b, the clip in Character.p1790 when
-// there is one, else the clip it is playing. While the GameBreaker letterbox is up (fn_8003DCAC)
-// the "LB" version of the name is tried first.
+// The sequence and shot named after the golfer's clip: with b, the clip in Character.pReactionClip
+// when there is one, else the clip it is playing. While the GameBreaker letterbox is up
+// (fn_8003DCAC) the "LB" version of the name is tried first.
 u8 DynamicCam_ChoosePairedSequenceOrCamera(int nPlayer, u8 b, CamSequence** ppSeq, CamShot** ppShot) {
     char szName[0x18];          // the frame allows 12 to 24 bytes; the true size is unknown
     char* pName = NULL;
@@ -1355,8 +1355,8 @@ u8 DynamicCam_ChoosePairedSequenceOrCamera(int nPlayer, u8 b, CamSequence** ppSe
     }
     *ppSeq = NULL;
     *ppShot = NULL;
-    if (b && gPlayers[nPlayer].pChar->p1790 != NULL) {
-        pName = gPlayers[nPlayer].pChar->p1790->name;
+    if (b && gPlayers[nPlayer].pChar->pReactionClip != NULL) {
+        pName = gPlayers[nPlayer].pChar->pReactionClip->name;
     }
     if (pName == NULL && gPlayers[nPlayer].pChar->pCurClip != NULL) {
         pName = gPlayers[nPlayer].pChar->pCurClip->name;
@@ -1603,7 +1603,7 @@ u8 fn_8003D240(CamShot* pShot, int nKind) {
 }
 
 // The shot may be used: always outside game type 3; there (the CrAP screen) only while a golfer
-// is being edited and the shot's u50/u54 bit for that golfer's nC is set.
+// is being edited and the shot's u50/u54 bit for that golfer's nGolferId is set.
 u8 fn_8003D294(CamShot* pShot) {
     CrAPGolfer* pGolfer;
     int n;
@@ -1611,7 +1611,7 @@ u8 fn_8003D294(CamShot* pShot) {
     if (gSession.nGameType != 3) return 1;
     pGolfer = gpCrAPState->pB4;
     if (pGolfer != NULL && pGolfer->pChar != NULL) {
-        n = pGolfer->nC;
+        n = pGolfer->nGolferId;
         if (n <= 32) {
             // EA bug: n == 32 shifts by 32 (undefined in C; the PowerPC gives 0)
             return (pShot->u.bits.u50 & (1 << n)) != 0;

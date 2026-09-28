@@ -2076,13 +2076,13 @@ int fn_80062BB0(Character* pChar, u64 uEvent) {
 
 void fn_80062BE8(Character* pChar) {
     if (pChar != NULL) {
-        pChar->p1794 = NULL;
+        pChar->pTapInClip = NULL;
     }
 }
 
 void fn_80062BFC(Character* pChar) {
     if (pChar != NULL) {
-        pChar->p1790 = NULL;
+        pChar->pReactionClip = NULL;
     }
 }
 

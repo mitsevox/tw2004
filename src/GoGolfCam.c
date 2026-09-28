@@ -2433,8 +2433,9 @@ void GolfCamera_ProcessFECamera(View* pView, int nPlayer) {
     pSub = CameraController_GetCameraLookPoint(pView);
     pShot = NULL;
     // The original compares script.n114 and n0, both ints, as floats.
-    if (gpCrAPState->pB4 != NULL && gpCrAPState->pB4->b18
-        && (pView->script.n110 != gpCrAPState->pB4->nC || (f32)pView->script.n114 != gpCrAPState->n0)) {
+    if (gpCrAPState->pB4 != NULL && gpCrAPState->pB4->bLoaded
+        && (pView->script.n110 != gpCrAPState->pB4->nGolferId || (f32)pView->script.n114
+            != gpCrAPState->n0)) {
         switch (gpCrAPState->n0) {
         case 0:
             pShot = DynamicCam_ChooseScript(0, 0x23, pView->p80);
@@ -2481,10 +2482,10 @@ void GolfCamera_ProcessFECamera(View* pView, int nPlayer) {
         CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f, 0x19,
                                        0.0f);
         pView->p80 = pShot;
-        pView->script.n110 = gpCrAPState->pB4->nC;
+        pView->script.n110 = gpCrAPState->pB4->nGolferId;
     }
-    // EA bug: with no golfer (pB4 NULL) this reads b18 through the NULL pointer.
-    if (gpCrAPState->pB4->b18) {
+    // EA bug: with no golfer (pB4 NULL) this reads bLoaded through the NULL pointer.
+    if (gpCrAPState->pB4->bLoaded) {
         CamScript_RunFEScript(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, FRAME_TIME);
     }
 }
@@ -2541,9 +2542,9 @@ void GolfCamera_SwitchCrAPCamera(View* pView, char* szName, int nShot, u8 bBlend
         }
     }
     // EA bug: pB4 may be NULL (tested above for the 'f' names), but it is read here without a test.
-    pView->script.n110 = gpCrAPState->pB4->nC;
+    pView->script.n110 = gpCrAPState->pB4->nGolferId;
     pView->script.n114 = gpCrAPState->n0;
-    if (gpCrAPState->pB4->b18) {
+    if (gpCrAPState->pB4->bLoaded) {
         CamScript_RunFEScript(0, pCam, pSub, &pView->script, &pView->shot19C, 0, FRAME_TIME);
     }
 }

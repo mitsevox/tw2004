@@ -335,7 +335,7 @@ void fn_80108140(MsgArg* pArgs, MsgArg* pResult) {
 // ---- end of sweep code ----
 
 // Set one of the profile's settings: 0 its name (pArgs[1]), 1 choices.n5A7A, 2 the date (packed as
-// fn_80078604 packs it), 3 choices.n113 (pArgs[2]).
+// fn_80078604 packs it), 3 choices.bLeftHanded (pArgs[2]).
 void fn_80108178(MsgArg* pArgs, MsgArg* pResult) {
     int nMonth;
     int nDay;
@@ -357,7 +357,7 @@ void fn_80108178(MsgArg* pArgs, MsgArg* pResult) {
         pProfile->nDateYear = nYear;
         break;
     case 3:
-        pProfile->choices.n113 = pArgs[2].i;
+        pProfile->choices.bLeftHanded = pArgs[2].i;
         break;
     }
 }
@@ -377,7 +377,7 @@ void fn_80108244(MsgArg* pArgs, MsgArg* pResult) {
         *(s32*)pArgs[2].p = fn_80078604(pProfile->nDateMonth, pProfile->nDateDay, pProfile->nDateYear);
         break;
     case 3:
-        *(s32*)pArgs[2].p = pProfile->choices.n113;
+        *(s32*)pArgs[2].p = pProfile->choices.bLeftHanded;
         break;
     }
 }

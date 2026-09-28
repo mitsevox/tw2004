@@ -144,8 +144,8 @@ f32 SKABlend_CalculateBlendInfo(Character* pChar, f32* aPrev, Clip* pClip, f32* 
 // root bone square to the ground under the golfer. With bReset the blend tree starts over. The
 // window comes from SKABlend_CalculateBlendInfo (fStart -20000: the player's time now). The
 // transition to nTransitionState comes at fTransitionTime (-20000 the player's time, -10000 the
-// tree's end, -30000 its start) plus a negative fOffset. A clip with its own morph library (pF4)
-// starts that too (CharacterState_PlayClipMorphs).
+// tree's end, -30000 its start) plus a negative fOffset. A clip with its own morph library
+// (pMtaLib) starts that too (CharacterState_PlayClipMorphs).
 void CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKABlendFn pfnBlend,
                                     int bFreeASAP, int nTransitionState, f32 fStart, f32 fFrom,
                                     f32 fTo, f32 fOffset, f32 fTransitionTime) {
@@ -168,10 +168,10 @@ void CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKA
     if (-70000.0f == fFrom && pChar->pBlend != NULL) {
         pClip = pChar->pBlend;
     } else {
-        if ((nGroup == 5 || nGroup == 10 || nGroup == 6) && pChar->p1790 != NULL) {
-            pClip = pChar->p1790;
-        } else if (nGroup == 9 && pChar->p1794 != NULL) {
-            pClip = pChar->p1794;
+        if ((nGroup == 5 || nGroup == 10 || nGroup == 6) && pChar->pReactionClip != NULL) {
+            pClip = pChar->pReactionClip;
+        } else if (nGroup == 9 && pChar->pTapInClip != NULL) {
+            pClip = pChar->pTapInClip;
         } else {
             pName = NULL;
             if (fn_80100294() && nGroup == 1) {
@@ -179,9 +179,9 @@ void CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKA
             }
             pClip = Char_SetClip(pChar, nGroup, pChar->nStyle, pName);
             if (nGroup == 5 || nGroup == 10 || nGroup == 6) {
-                pChar->p1790 = pClip;
+                pChar->pReactionClip = pClip;
             } else if (nGroup == 9) {
-                pChar->p1794 = pClip;
+                pChar->pTapInClip = pClip;
             }
         }
         if (strcmp(pClip->name, "gplptt12") == 0 && (pCourse = Ter_GetTGD()) != NULL &&
@@ -242,13 +242,13 @@ void CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKA
         fTransitionTime += fOffset;
     }
     CharacterState_SetTransition((AnimPlayer*)pChar->anim, nTransitionState, fTransitionTime);
-    pChar->p178C = NULL;
-    if (pClip != NULL && pClip->pF4 != NULL) {
-        CharacterState_PlayClipMorphs(pChar, pClip->pF4, bReset, fDelay);
+    pChar->pMorphLib = NULL;
+    if (pClip != NULL && pClip->pMtaLib != NULL) {
+        CharacterState_PlayClipMorphs(pChar, pClip->pMtaLib, bReset, fDelay);
     }
 }
 
-// Play pLib (a morph library: an item of a 'MAL ' bank, or a clip's pF4) on the morph player
+// Play pLib (a morph library: an item of a 'MAL ' bank, or a clip's pMtaLib) on the morph player
 // (morphAnim, tree morphBlend) from fFrom to fTo, starting at fStart on the player's clock (-20000:
 // its time now); negative fFrom and fTo mean 0 and the library's end. With bReset the tree starts
 // over. The transition to nTransitionState comes at fTransitionTime (-20000 the player's time,
@@ -303,7 +303,7 @@ void CharacterState_AddMorphBlendData(Character* pChar, MtaLib* pLib, u8 bReset,
         fTransitionTime += fOffset;
     }
     CharacterState_SetTransition(&pChar->morphAnim, nTransitionState, fTransitionTime);
-    pChar->p178C = pLib;
+    pChar->pMorphLib = pLib;
     if (gSession.nGameType == 3 && pChar->pSliderDefs != NULL) {
         CharSlider_UpdateCharacterBasedOnSliderValues(pChar->pSliderDefs, pChar->pModel, pChar->pSkin, 26,
                                                       FE_GetCurrentProfile()->choices.a9B4,
@@ -311,10 +311,10 @@ void CharacterState_AddMorphBlendData(Character* pChar, MtaLib* pLib, u8 bReset,
     }
 }
 
-// Play a body clip's own morph library pLib (Clip.pF4) on the morph player, to its end, in morph
-// state 4; state 5 follows at the end (0.95 earlier while the body is in state 5). Without bReset
-// the morph tree is first cut off at fOffset past the player's time (SKABlender_ClampT1) so the library
-// blends in; with it the tree starts over.
+// Play a body clip's own morph library pLib (Clip.pMtaLib) on the morph player, to its end, in
+// morph state 4; state 5 follows at the end (0.95 earlier while the body is in state 5). Without
+// bReset the morph tree is first cut off at fOffset past the player's time (SKABlender_ClampT1) so
+// the library blends in; with it the tree starts over.
 void CharacterState_PlayClipMorphs(Character* pChar, void* pLib, u8 bReset, f32 fOffset) {
     if (pLib == NULL) return;
     if (!bReset) {

@@ -180,11 +180,14 @@ typedef struct SwingData {
     u8   unk376[2];
     s32  nCalibrateX;           // 0x378  (0x74C) stick at the start of the swing
     s32  nCalibrateY;           // 0x37C  (0x750)
-    s32  nRestCX;               // 0x380  (0x754) the sticks' rest positions while waiting. TW06 has six
-    s32  nRestCY;               // 0x384  (0x758)   fields here (iCalibrateXstick2, ...Left..., ...Right...);
-    s32  nRestX;                // 0x388  (0x75C)   which four these are is not settled
-    s32  nRestY;                // 0x38C  (0x760)
-    s32  nStickUsed;            // 0x390  (0x764) nonzero: the C stick is swinging
+    s32  nRestCX;               // 0x380  (0x754) } the sticks' rest positions while waiting
+    s32  nRestCY;               // 0x384  (0x758) }   (SW_vStateIdleSwing, all 128): nRestCX / CY
+    s32  nRestX;                // 0x388  (0x75C) }   become nCalibrateX / Y for the main stick,
+    s32  nRestY;                // 0x38C  (0x760) }   nRestX / Y for the C stick. TW06 has six
+                                //                    fields here (iCalibrateXstick2, ...Left...)
+    s32  nStickUsed;            // 0x390  (0x764) nonzero: the main stick (pad bytes 2 and 3) is
+                                //                swinging, 0 the C stick (bytes 0 and 1;
+                                //                SW_vGetStickX / Y)
     s32  nCtrlListX[25];        // 0x394  (0x768) the last 25 stick samples
     s32  nCtrlListY[25];        // 0x3F8  (0x7CC)
     s32  nCtrlListIndex;        // 0x45C  (0x830)
@@ -211,8 +214,9 @@ typedef struct SwingData {
     s32  nSpinBoost;            // 0x610  (0x9E4) how much spin was asked for, 0..20
     s32  nSpinCtrlX;            // 0x614  (0x9E8) 0..255, 128 centre
     s32  nSpinCtrlY;            // 0x618  (0x9EC)
-    f32  fForwardSpin;          // 0x61C  (0x9F0) from the distance error on a CPU shot
-    f32  fSideSpin;             // 0x620  (0x9F4) from the aim error
+    f32  fForwardSpin;          // 0x61C  (0x9F0) } the spin asked for: a human's from the spin
+    f32  fSideSpin;             // 0x620  (0x9F4) }   stick (y, sign flipped, and x), a CPU's from
+                                //                    its distance and aim errors (ai_brain.c)
     u8   bCanSpin;              // 0x624  (0x9F8) a human struck the ball (not in a replay): spin input is live
     u8   unk625[3];
     f32  fTargetTurnAngle;      // 0x628
@@ -393,7 +397,9 @@ typedef struct Player {
     u8   bEE0;                  // 0xEE0
     u8   unkEE1[3];
     s32  nEE4;                  // 0xEE4  2 or 3 picks a message after a shot (GM_PlayerTookShot)
-    u32  uFlags;                // 0xEE8  bit 0: scripted reaction, bit 2: the early reaction has played, bit 3: score display
+    u32  uFlags;                // 0xEE8  0x1 a scripted reaction, 0x2 set as the ball is taken out
+                                //        of the hole (GS_FADE_TO_REMOVE_BALL), 0x4 the early
+                                //        reaction has played, 0x8 a tap-in (STATEFUNC_TapInInit)
     f32  fEEC;                  // 0xEEC  distance to the pin when the early reaction started (GM_SimulateBallMovement)
     u32  uFlagsEF0;             // 0xEF0  0x1: the ball can be placed at vPlacement (PlaceBall_ResetMomentums);
                                 //        0x2: target is over water
@@ -460,7 +466,11 @@ LAYOUT_ASSERT(CourseRecord, 0x320);
 
 typedef struct Session {
     u32  uFlags;                // 0x000  bit 1: use the alternate attribute block everywhere;
-                                //        bit 9: every club in the bag
+                                //        bit 9: every club in the bag; 0x4000 the demo set-up
+                                //        (GoEntry.c starts DEMO_Start with it): one player on
+                                //        controller 9, every attribute 105, no earnings, clear
+                                //        weather (fn_8006F650), caddie tips off; many tests want
+                                //        0x8000 with it
     s32  nGameType;             // 0x004  4 gets a second view
     u8   a8[4];                 // 0x008  [0] nonzero: no GameBreaker (GameEffects.c)
     s32  nC;                    // 0x00C

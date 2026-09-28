@@ -5,9 +5,9 @@
 // drive one morph's weight (MtaLib_ApplyToPose), played on a character's second animation player
 // through its morph blend tree (AnimBlender.c). The libraries come in 'MAL ' banks from the
 // stream files (two slots, gMtaLibBanks), three groups each, one picked at random
-// (Character_GetRandomMtaLib); a clip can also carry its own (Clip.pF4, MtaLib_Link). The file also
-// holds EA's bone name table (gSkelBoneNames). MtaLib_SwapAndLink and ByteSwap_Records, at the end
-// of char.c right before this file, may belong here.
+// (Character_GetRandomMtaLib); a clip can also carry its own (Clip.pMtaLib, MtaLib_Link). The file
+// also holds EA's bone name table (gSkelBoneNames). MtaLib_SwapAndLink and ByteSwap_Records, at the
+// end of char.c right before this file, may belong here.
 
 #include "charstate.h"
 
@@ -110,7 +110,7 @@ void MtaLib_Free(void* pItem) {
 
 // Links a library that is already in the machine's byte order (MtaLib_SwapAndLink without the
 // swap): the records after the header, each record's entries after those, then each entry's data
-// (4-byte aligned). ska_shared.c does this for a clip's own library (Clip.pF4).
+// (4-byte aligned). ska_shared.c does this for a clip's own library (Clip.pMtaLib).
 void MtaLib_Link(MtaLib* pLib) {
     int i;
     int nPad;

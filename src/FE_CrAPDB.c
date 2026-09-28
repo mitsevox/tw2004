@@ -355,7 +355,7 @@ void FE_CrAP_TurnOffAsset(CrAPAsset* pAsset) {
         FE_CrAP_RemoveAssetParts(pBase, pSkin);
         FE_CrAP_RemoveAssetSets(pBase, pSkin);
         FE_SetDelayTextureSwap(0, 0.0f);
-        Character_RequestClothesUpdateFE(gpCrAPState->pB4->n10);
+        Character_RequestClothesUpdateFE(gpCrAPState->pB4->nIndex);
         FE_CrAP_SaveBodySkinChoices();
         FE_CrAP_ClearEquippedAsset(pBase);
     }
@@ -441,7 +441,7 @@ void sTurnOnLogo(s16 nPart, int b, int i) {
         nVariant = SkinPart_FindSetVariant(pSkin, nSet, uVariantId);
         SkinPart_ChooseSet(pSkin, nSet, nVariant, 0);
     }
-    Character_RequestClothesUpdateFE(gpCrAPState->pB4->n10);
+    Character_RequestClothesUpdateFE(gpCrAPState->pB4->nIndex);
     FE_CrAP_SaveBodySkinChoices();
 }
 
@@ -497,7 +497,7 @@ void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset) {
     FE_SetNewTexturesFlag(1);
     if (FE_CrAP_TryClubSwappingAsset(pAsset)) {
         FE_SetClubStatesAllowed(0);
-        Character_RequestClothesUpdateFE(gpCrAPState->pB4->n10);
+        Character_RequestClothesUpdateFE(gpCrAPState->pB4->nIndex);
         if (stricmp(FE_CrAP_GetStringFromTable(pAsset->n112), "gdlcrp07") == 0 ||
             stricmp(FE_CrAP_GetStringFromTable(pAsset->n112), "fdlcrp07") == 0) {
             fAngle = 4.0f;
@@ -534,7 +534,7 @@ void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset) {
         }
         FE_CrAP_ApplyAssetParts(pAsset, pSkin);
         FE_CrAP_ApplyAssetSets(pAsset, pSkin);
-        Character_RequestClothesUpdateFE(gpCrAPState->pB4->n10);
+        Character_RequestClothesUpdateFE(gpCrAPState->pB4->nIndex);
         FE_CrAP_SaveBodySkinChoices();
         if (FE_GetCrapRenderState() != 0) {
             FE_SetTempCrapRenderState(0);
@@ -1688,7 +1688,7 @@ void FE_CrAP_ApplyAssetSets(CrAPAsset* pAsset, Skin* pSkin) {
 }
 
 // FE_CrAP_ApplyAssetSets for a club skin: a set that has a "DefaultL" variant gets that one instead
-// when the profile's choices.n113 is 1.
+// when the profile's choices.bLeftHanded is 1.
 void FE_CrAP_ApplyAssetSetsToClubSkin(CrAPAsset* pAsset, Skin* pSkin) {
     s32 nSet;
     s32 nVariant;
@@ -1700,7 +1700,7 @@ void FE_CrAP_ApplyAssetSetsToClubSkin(CrAPAsset* pAsset, Skin* pSkin) {
         nSet = SkinPart_FindSet(pSkin, pAsset->aSet[i]);
         nVariant = SkinPart_FindSetVariant(pSkin, nSet, pAsset->aSetVariant[i]);
         nDefaultL = SkinPart_FindSetVariantByName(pSkin, nSet, "DefaultL");
-        if (nDefaultL >= 0 && FE_GetCurrentProfile()->choices.n113 == 1) {
+        if (nDefaultL >= 0 && FE_GetCurrentProfile()->choices.bLeftHanded == 1) {
             nVariant = nDefaultL;
         }
         if (nSet >= 0 && nVariant >= 0) {
