@@ -7,8 +7,8 @@
 #include "golfer.h"
 #include "unsorted/cull.h"
 
-f32 lbl_801C6498[4];
-struct Character* lbl_80281D20;
+f32 gSkelIdentityQuat[4];
+struct Character* gSkelIKCharacter;
 
 void fn_80029BC8(f32* pVec);                           // sets a vector to lbl_80186838
 void fn_80026BF4(CharModel* pModel, IKChain* pChain);
@@ -49,9 +49,9 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits);
 Skeleton* SKEL_CreateIKSkeleton(CharModel* pModel, CharModelDefs* pDefs);
 struct DynChain* fn_80114270(CharModel* pModel, int nBone, s32 nType, s32 n10);   // DynChain.c
 
-char* lbl_80187418[5] = { "IGDriver", "IGputter", "IGiron3", "IGiron7", "IGwedge" };
+char* gSkelClubBoneNames[5] = { "IGDriver", "IGputter", "IGiron3", "IGiron7", "IGwedge" };
 
-u8 lbl_8018742C[42][2] = {
+u8 gSkelLeftHandedPairs[42][2] = {
     { 0x23, 0x10 }, { 0x24, 0x11 }, { 0x25, 0x12 }, { 0x26, 0x13 }, { 0x27, 0x14 }, { 0x28, 0x15 },
     { 0x29, 0x16 }, { 0x2A, 0x17 }, { 0x2B, 0x18 }, { 0x2C, 0x19 }, { 0x2D, 0x1A }, { 0x2E, 0x1B },
     { 0x2F, 0x1C }, { 0x30, 0x1D }, { 0x31, 0x1E }, { 0x10, 0x23 }, { 0x11, 0x24 }, { 0x12, 0x25 },
@@ -61,9 +61,9 @@ u8 lbl_8018742C[42][2] = {
     { 0x37, 0x45 }, { 0x38, 0x46 }, { 0x39, 0x47 }, { 0x3A, 0x48 },
 };
 
-u8 lbl_80281098[6] = { 0x3E, 0x41, 0x3B, 0x4C, 0x4F, 0x49 };
-u8 lbl_802810A0[6] = { 0x1F, 0x20, 0x21, 0x32, 0x33, 0x34 };
-u8 lbl_802810A6 = 1;
+u8 gSkelPantBones[6] = { 0x3E, 0x41, 0x3B, 0x4C, 0x4F, 0x49 };
+u8 gSkelSleeveBones[6] = { 0x1F, 0x20, 0x21, 0x32, 0x33, 0x34 };
+u8 gSkelIKEnabled = 1;
 
 // Turns the rotation vector v58 of each link with f4 above 0 into its bone's rotation in p20.
 void fn_80026B4C(Skeleton* pSkel, IKChain* pChain) {
@@ -195,7 +195,7 @@ void SKEL_WeightIKChain(Skeleton* pSkel, IKChain* pChain, f32 fWeight) {
         int nBone = pChain->pLinks[i].nBone;
         Quat_Copy(pSkel->p20[nBone], pSkel->p24[nBone]);
         if (fWeight < 1.0f) {
-            Quat_Slerp(lbl_801C6498, pSkel->p24[nBone], fWeight);
+            Quat_Slerp(gSkelIdentityQuat, pSkel->p24[nBone], fWeight);
             LLMath_Normalize(pSkel->p24[nBone], pSkel->p24[nBone]);
         }
     }
@@ -364,7 +364,7 @@ f32 fn_800275F4(CharModel* pModel, IKChain* pChain, f32* pTarget) {
 
 // Turns the IK on or off.
 void SKEL_EnableIK(u8 bOn) {
-    lbl_802810A6 = bOn;
+    gSkelIKEnabled = bOn;
 }
 
 // Applies the IK weight to the first IK chain.
@@ -375,7 +375,7 @@ void fn_80027740(Skeleton* pSkel, f32 fWeight) {
 // Sets how strongly the IK solution is applied. At 0 or 1 the bones use p20 as they are; in
 // between, the first chain is weighted into p24 and that is used.
 void SKEL_SetIKSolutionWeight(Skeleton* pSkel, f32 fWeight) {
-    if (pSkel == NULL || lbl_802810A6 == 0) return;
+    if (pSkel == NULL || gSkelIKEnabled == 0) return;
     pSkel->fIKWeight = fWeight;
     if (0.0f == fWeight) {
         pSkel->p28 = pSkel->p20;
@@ -395,7 +395,7 @@ void fn_80027808(CharModel* pModel, f32* pRot) {
     if (pModel->pSkel != NULL) {
         Quat_Copy(pRot, pModel->pSkel->q10D4);
         if (pModel->pSkel->fIKWeight < 1.0f) {
-            Quat_Slerp(lbl_801C6498, pModel->pSkel->q10D4, pModel->pSkel->fIKWeight);
+            Quat_Slerp(gSkelIdentityQuat, pModel->pSkel->q10D4, pModel->pSkel->fIKWeight);
             LLMath_Normalize(pModel->pSkel->q10D4, pModel->pSkel->q10D4);
         }
     }
@@ -408,7 +408,7 @@ void fn_8002787C(CharModel* pModel) {
     f32 qRot[4];
 
     if (pSkel == NULL) return;
-    if (lbl_802810A6 == 0 || pSkel->fIKWeight <= 0.0f) return;
+    if (gSkelIKEnabled == 0 || pSkel->fIKWeight <= 0.0f) return;
     if (pSkel->n10E4 != 0) {
         Quat_Multiply(pSkel->q10D4, pSkel->p20[CharModel_GetBoneIndexMapped(pModel, 0x11)], qRot);
         Quat_Copy(qRot, pModel->pSkel->p20[CharModel_GetBoneIndexMapped(pModel, 0x11)]);
@@ -417,7 +417,7 @@ void fn_8002787C(CharModel* pModel) {
 
 // With any IK weight, sets f1074 and f1078 to 0.25.
 void SKEL_RelaxIK(Skeleton* pSkel) {
-    if (pSkel == NULL || lbl_802810A6 == 0) return;
+    if (pSkel == NULL || gSkelIKEnabled == 0) return;
     if (pSkel->fIKWeight > 0.0f) {
         pSkel->f1074 = 0.25f;
         pSkel->f1078 = 0.25f;
@@ -427,7 +427,7 @@ void SKEL_RelaxIK(Skeleton* pSkel) {
 // TW06: SKEL_TransitionIK. With b set and any IK weight, f1074 and f1078 become f; without b and
 // below full weight, f1074 becomes -f and f1078 f.
 void SKEL_TransitionIK(Skeleton* pSkel, u8 b, f32 f) {
-    if (pSkel == NULL || lbl_802810A6 == 0) return;
+    if (pSkel == NULL || gSkelIKEnabled == 0) return;
     if (b) {
         if (pSkel->fIKWeight > 0.0f) {
             pSkel->f1078 = f;
@@ -458,7 +458,7 @@ void fn_800279C0(Character* pChar) {
     int nGrip;
     int n28;
 
-    if (pSkel == NULL || lbl_802810A6 == 0) return;
+    if (pSkel == NULL || gSkelIKEnabled == 0) return;
     if (pSkel->f1074 > 0.0f) {
         pModel->pSkel->f1074 -= gSession.fFrameTime;
         if (pModel->pSkel->f1074 < 0.0f) {
@@ -528,7 +528,7 @@ void fn_80027D14(Character* pChar) {
     f32 (*pMtx28)[4];
     f32 (*pGripMtx)[4];
 
-    if (pModel->pSkel == NULL || lbl_802810A6 == 0) return;
+    if (pModel->pSkel == NULL || gSkelIKEnabled == 0) return;
     pMtx28 = pModel->pMatrices[CharModel_GetBoneIndexMapped(pModel, 0x28)];
     pGripMtx = pModel->pMatrices[CharModel_GetBoneIndex(pModel, 0x52)];
     if (pModel->bEE) {
@@ -557,7 +557,7 @@ void SKEL_TranslateIKChainY(CharModel* pModel, IKChain* pChain, f32 f) {
 
 // When the chain's end is more than 0.1 below pTarget: the shortfall (eased in from 0.1 to 0.2, at
 // most 0.65, then times 0.75) becomes a sideways move, away from the chain's end, of the chain's
-// root, the model's root bone and lbl_80281D20's points; the feet are put back on the ground (with
+// root, the model's root bone and gSkelIKCharacter's points; the feet are put back on the ground (with
 // bNormals, their terrain first), the chain takes the root bone's height change and is re-posed.
 // Returns the move (negative), 0 when nothing moved.
 f32 fn_80027E8C(CharModel* pModel, IKChain* pChain, f32* pTarget, int bNormals) {
@@ -588,14 +588,14 @@ f32 fn_80027E8C(CharModel* pModel, IKChain* pChain, f32* pTarget, int bNormals) 
         pModel->pBones[0].v1C[0] += fDx;
         pModel->pBones[0].v1C[2] += fDz;
         for (i = 0; i < 5; i++) {
-            lbl_80281D20->aTestPoints[i][0] += fDx;
-            lbl_80281D20->aTestPoints[i][2] += fDz;
+            gSkelIKCharacter->aTestPoints[i][0] += fDx;
+            gSkelIKCharacter->aTestPoints[i][2] += fDz;
         }
         if (bNormals) {
-            Character_UpdateFeetTerrainInfo(lbl_80281D20, 1);
+            Character_UpdateFeetTerrainInfo(gSkelIKCharacter, 1);
         }
         fOldY = pModel->pBones[0].v1C[1];
-        Character_PlaceFeetOnGround(lbl_80281D20);
+        Character_PlaceFeetOnGround(gSkelIKCharacter);
         fDy = pModel->pBones[0].v1C[1] - fOldY;
         pChain->pLinks[0].v28[1] += fDy;
         pChain->v8[1] += fDy;
@@ -616,8 +616,8 @@ f32 fn_800280E8(Character* pChar, f32* pTarget, int bNormals) {
     IKChain* pChain = pModel->pSkel->pChains;   // EA bug: read before the NULL test below
     f32 fDrop;
 
-    if (pSkel == NULL || lbl_802810A6 == 0) return 0.0f;
-    lbl_80281D20 = pChar;
+    if (pSkel == NULL || gSkelIKEnabled == 0) return 0.0f;
+    gSkelIKCharacter = pChar;
     fn_80027D14(pChar);
     fn_800271A0(pModel, pChain);
     fDrop = fn_80027E8C(pModel, pChain, pTarget, bNormals);
@@ -770,10 +770,10 @@ CharModel* SKEL_LoadFromMem(u8* pData, s8 nExtra, CharModelDefs* pDefs, int b) {
     pModel->pF4 = fn_80114270(pModel, CharModel_GetBoneIndex(pModel, 0x57), 1, 0);
     pModel->pF8 = fn_80114270(pModel, CharModel_GetBoneIndex(pModel, 0x58), 1, 1);
     for (i = 0; i < 6; i++) {
-        pModel->apFC[i] = fn_80114270(pModel, CharModel_GetBoneIndex(pModel, lbl_80281098[i]), 2, i);
+        pModel->apFC[i] = fn_80114270(pModel, CharModel_GetBoneIndex(pModel, gSkelPantBones[i]), 2, i);
     }
     for (i = 0; i < 6; i++) {
-        pModel->ap114[i] = fn_80114270(pModel, CharModel_GetBoneIndex(pModel, lbl_802810A0[i]), 3, i);
+        pModel->ap114[i] = fn_80114270(pModel, CharModel_GetBoneIndex(pModel, gSkelSleeveBones[i]), 3, i);
     }
     for (i = 0; i < pModel->nBones; i++) {
         pModel->a140[i][0] = 1.0f;
@@ -1023,7 +1023,7 @@ void fn_800293CC(int nBone, int nCount, SkelPose* pA, SkelPose* pB, SkelPose* pO
 
 // Sets up: the identity rotation, then the dynamic chains.
 void SKEL_InitModule(void) {
-    Quat_IdentifyForMul(lbl_801C6498);
+    Quat_IdentifyForMul(gSkelIdentityQuat);
     fn_80113E60();
 }
 
@@ -1096,8 +1096,8 @@ void SKEL_GenerateBoneLookupTable(CharModel* pModel) {
         for (i = 0; i < nUnknown; i++) {
             strncpy(szName, (char*)&pModel->pBones[aUnknown[i]].uId, 8);
             szName[8] = '\0';
-            for (j = 0; j < sizeof(lbl_80187418) / sizeof(lbl_80187418[0]); j++) {
-                if (strcmp(lbl_80187418[j], szName) == 0) {
+            for (j = 0; j < sizeof(gSkelClubBoneNames) / sizeof(gSkelClubBoneNames[0]); j++) {
+                if (strcmp(gSkelClubBoneNames[j], szName) == 0) {
                     pModel->aBone[0x52] = aUnknown[i];
                     return;
                 }
@@ -1106,7 +1106,7 @@ void SKEL_GenerateBoneLookupTable(CharModel* pModel) {
     }
 }
 
-// Fills in aBone2: each bone maps to itself, except the pairs in lbl_8018742C, where the model's
+// Fills in aBone2: each bone maps to itself, except the pairs in gSkelLeftHandedPairs, where the model's
 // first bone maps to its second.
 void SKEL_GenerateLeftHandedTable(CharModel* pModel) {
     int i;
@@ -1118,8 +1118,8 @@ void SKEL_GenerateLeftHandedTable(CharModel* pModel) {
         pModel->aBone2[i] = i;
     }
     for (i = 0; i < 0x29; i++) {
-        nA = CharModel_GetBoneIndex(pModel, lbl_8018742C[i][0]);
-        nB = CharModel_GetBoneIndex(pModel, lbl_8018742C[i][1]);
+        nA = CharModel_GetBoneIndex(pModel, gSkelLeftHandedPairs[i][0]);
+        nB = CharModel_GetBoneIndex(pModel, gSkelLeftHandedPairs[i][1]);
         if (nA != 0xFF && nB != 0xFF) {
             pModel->aBone2[nA] = nB;
         }

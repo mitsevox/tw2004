@@ -266,10 +266,10 @@ LAYOUT_ASSERT(DynChainSettings, 0xC0);
 extern char* lbl_80187278[90];
 // Skeleton.c: the names of the club models' bones ("IGDriver", "IGputter", "IGiron3", "IGiron7",
 // "IGwedge"); SKEL_GenerateBoneLookupTable gives a model bone with one of them bone id 0x52's index.
-extern char* lbl_80187418[5];
-extern struct Character* lbl_80281D20;   // Skeleton.c: the character fn_80027E8C moves with its root
-extern u8 lbl_80281098[6];      // Skeleton.c: the bone ids of the model's kind 2 dynamic chains
-extern u8 lbl_802810A0[6];      // Skeleton.c: the bone ids of its kind 3 dynamic chains
+extern char* gSkelClubBoneNames[5];
+extern struct Character* gSkelIKCharacter;   // Skeleton.c: the character fn_80027E8C moves with its root
+extern u8 gSkelPantBones[6];      // Skeleton.c: the bone ids of the model's kind 2 dynamic chains
+extern u8 gSkelSleeveBones[6];      // Skeleton.c: the bone ids of its kind 3 dynamic chains
 
 // A clip's header (the fields used here). In a file, pD0 marks the end of the header and
 // uAram points at the end of the key data; once a clip's frames are streamed out, uAram is
@@ -719,9 +719,9 @@ extern char gClubGripVariantNames[6][13];        // "Defaults"
 void  Character_SetClubStatesForCharacter(Character* pChar, int nSlot, struct SkinChoices* pChoices);
 
 // Skeleton.c
-extern f32 lbl_801C6498[4];             // the identity rotation (quaternion), set by SKEL_InitModule
-extern u8  lbl_802810A6;                // IK on (SKEL_EnableIK); off, the IK functions do nothing
-extern u8  lbl_8018742C[42][2];         // pairs of standard bones (SKEL_GenerateLeftHandedTable reads the first 41)
+extern f32 gSkelIdentityQuat[4];             // the identity rotation (quaternion), set by SKEL_InitModule
+extern u8  gSkelIKEnabled;                // IK on (SKEL_EnableIK); off, the IK functions do nothing
+extern u8  gSkelLeftHandedPairs[42][2];         // pairs of standard bones (SKEL_GenerateLeftHandedTable reads the first 41)
 extern f32 lbl_80186838[4];             // a zero vector (fn_80029BC8 copies it)
 
 // AnimStream.c: the animation groups it streams clips for (groups 1 and 5, the reactions), and the
