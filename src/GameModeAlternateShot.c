@@ -24,7 +24,9 @@ u8   GameModeAlternateShot_GoToPlayoff(u8 bCheck);
 void GameModeAlternateShot_EndHole(void);
 void GameModeAlternateShot_EndGame(void);
 
-// No mulligans, no gimmes, one view.
+// Game mode 21 (alternate shot) starts, from GameRound's mode switch: this file's golfer order,
+// honors, turn, hole, game-over, playoff and end-of-game callbacks; no gimmes, no mulligans, nC and
+// n10 4 (as the other team modes), nDC 0, single view.
 void GameModeAlternateShot_Init(void) {
     gpGame->pfnInit = GameModeAlternateShot_Init;
     gpGame->pfnSetupNextGolfer = GameModeAlternateShot_SetupNextGolfer;
@@ -44,7 +46,8 @@ void GameModeAlternateShot_Init(void) {
     gSession.nSplitScreen = 0;
 }
 
-// The team's ball is in the hole.
+// Whether team nTeam (0: players 0 and 1, 1: players 2 and 3) has holed out: either partner holed
+// counts, as they share one ball.
 u8 GameModeAlternateShot_TeamDone(int nTeam) {
     int nHole = Game_CurHoleIndex();
     int a;
@@ -65,6 +68,7 @@ u8 GameModeAlternateShot_TeamDone(int nTeam) {
     return bDone;
 }
 
+// The partner of player 0..3 (0 and 1, 2 and 3); 5 (nobody) for any other number.
 int GameModeAlternateShot_GetPartner(int nPlayer) {
     switch (nPlayer) {
     case 0:
@@ -91,8 +95,9 @@ int GetGamePlayerTeam(int nPlayer) {
     return nPlayer / 2;
 }
 
-// The team's score on this hole if it holes the
-// next shot (at most 9), or its score once holed.
+// The best score team nTeam can still make on this hole, read from its first player (0 or 2), who
+// holds the team's strokes: its strokes plus one (holing the next shot), at most 9; once holed, its
+// strokes (also at most 9).
 int GameModeAlternateShot_TeamBestPossibleScore(int nTeam) {
     int nHole = Game_CurHoleIndex();
     int a;
@@ -112,6 +117,8 @@ int GameModeAlternateShot_TeamBestPossibleScore(int nTeam) {
     return n;
 }
 
+// The holes team nTeam has won in the match: both partners' nHolesWon
+// (GameModeAlternateShot_EndHole credits the first).
 int GameModeAlternateShot_TeamMatchWins(int nTeam) {
     int nHole = Game_CurHoleIndex();
     int b;
@@ -140,9 +147,12 @@ void GameModeAlternateShot_SetupNextGolfer(void) {
     }
 }
 
-// Who plays next after nPlayer (5 = nobody): on the tee the
-// team that won the last decided hole goes first; otherwise whoever's turn it is on the team that is
-// farthest from the pin and off the green, then anyone farthest.
+// Who plays next, never nPlayer (5 = nobody). On the tee: the tee order starts 0, 1, 2, 3 and the
+// teams swap places whenever a hole is won by the team not leading the order (a halved hole changes
+// nothing); the first player in it who is on the tee, whose turn it is on the team
+// (GameModeAlternateShot_PlayerHasTeamHonors) and whose team has not holed out. Otherwise, of the
+// players whose turn it is on a team still playing, the one farthest from the pin (flat distance)
+// and off the green; if all are on the green, the farthest of them.
 s32 GameModeAlternateShot_GetHonors(int nPlayer) {
     s32 aOrder[4] = {0, 1, 2, 3};  // the tee order before anyone has won a hole
     int nBest;
@@ -226,8 +236,8 @@ s32 GameModeAlternateShot_GetHonors(int nPlayer) {
     return nBest;
 }
 
-// The partner takes over the ball (and the stroke
-// count), and it becomes the partner's turn.
+// After nPlayer's shot the partner takes over the team's ball: the Ball, the low-IQ penalty flag
+// and this hole's strokes are copied to the partner, and it becomes the partner's turn.
 void GameModeAlternateShot_EndGolferTurn(int nPlayer) {
     int nPartner = GameModeAlternateShot_GetPartner(nPlayer);
     int nTeam;
@@ -239,9 +249,10 @@ void GameModeAlternateShot_EndGolferTurn(int nPlayer) {
     lbl_80281648[nTeam] = 1 - lbl_80281648[nTeam];
 }
 
-// Both teams holed; or one team holed and the other can
-// no longer beat it (can only tie, when the holed team is dormie); lbl_80282240 excuses the
-// holed team's own players.
+// Whether the hole is over (bCheck is not used): both teams holed out; or one team holed out and
+// the other can no longer beat its score; or can at best tie it when a tie would lose the match
+// (the holed team is ahead by the holes left, this one included). While lbl_80282240 is set, a
+// holed team's own players (nPlayer) do not end it this way.
 u8 GameModeAlternateShot_HoleFinished(int nPlayer, u8 bCheck) {
     int nLeft;
     int h;
@@ -302,9 +313,11 @@ u8 GameModeAlternateShot_HoleFinished(int nPlayer, u8 bCheck) {
         P(i)->n308 = 0;                           \
     }
 
-// In a playoff: over once a team is ahead; otherwise
-// (unless only checking) the next playoff hole starts. In the round: over when no holes are left and
-// no playoff starts, or when a team leads by more than the holes left.
+// Whether the match is over. In a playoff (gpGame->bD4): over once one team has won more holes;
+// otherwise, unless bCheck (only asking), the next playoff hole is set up (nD8 counted, hole
+// picked, every player's scores cleared, the tied message). In the round: after the last hole it is
+// over unless a playoff starts (GameModeAlternateShot_GoToPlayoff); before, when a team leads by
+// more than the holes left.
 u8 GameModeAlternateShot_GameFinished(u8 bCheck) {
     int nLeft;
     int h;
@@ -337,8 +350,10 @@ u8 GameModeAlternateShot_GameFinished(u8 bCheck) {
     return 0;
 }
 
-// After the last hole with the match tied: a playoff
-// starts (bD5 when the round played all 18 holes).
+// After the round's last hole with the match tied, a playoff starts (with bCheck set it is only
+// reported): bD5 records whether the round played all 18 holes, a playoff hole is picked, every
+// player's scores are cleared, bD4 (in a playoff) is set, nD8 counted and the tied message queued.
+// Returns 1 for a playoff, 0 while holes are left or a team is ahead.
 u8 GameModeAlternateShot_GoToPlayoff(u8 bCheck) {
     int h;
     int i;
@@ -367,8 +382,10 @@ u8 GameModeAlternateShot_GoToPlayoff(u8 bCheck) {
     return 0;
 }
 
-// A team that holed out and cannot be caught wins the hole
-// (the point goes on players 0 and 2); on the next hole the other partner tees off.
+// The hole is scored: a team that holed out with a better score than the other can still make wins
+// it (nModePoints and nHolesWon on its first player, 0 or 2). Then both teams' turn flags are set
+// from this hole's number: after an odd-numbered hole (1, 3, ...) the second partners (1 and 3) tee
+// off next, after an even-numbered one the first partners (0 and 2).
 void GameModeAlternateShot_EndHole(void) {
     int nHole = Game_CurHoleIndex();
     if (GameModeAlternateShot_TeamDone(0) &&
@@ -384,8 +401,11 @@ void GameModeAlternateShot_EndHole(void) {
     lbl_80281648[0] = lbl_80281648[1] = 1 - (nHole & 1);
 }
 
-// The winning team's human players with a profile get the
-// prize money (by the margin).
+// The match's end, for a full round outside a mode 5 challenge: the team with more holes won (team
+// 1 on a tie) wins by the difference in holes won. If both its players are human, each of them with
+// an active profile counts the game as won (EASBio) and, when the team's winnings
+// (GM_Earnings_GetStrokeWinningsTeam) are not 0, gets the prize message (queue 0, 0x6B), the money
+// (GM_Earnings_AwardMoney) and the money added to money.n14.
 void GameModeAlternateShot_EndGame(void) {
     int nPrize;
     Player* p;
