@@ -2076,3 +2076,16 @@ address	name	comment	by	date
 8010D3B8	GameMode26_NoteSplitScreenShot	add	rm4 (replayed by orchestrator)	2026-09-28
 8010D3D8	GameMode26_BallBounceSound	rewrite	rm4 (replayed by orchestrator)	2026-09-28
 8010D428	GameMode26_StartComment	add	rm4 (replayed by orchestrator)	2026-09-28
+800E81C4	GameModeBestBall_Init	rewrite	rm4 (replayed by orchestrator)	2026-09-28
+800E82AC	GameModeBestBall_TeamDone	rewrite	rm4 (replayed by orchestrator)	2026-09-28
+800E83A8	GameModeBestBall_GetPartner	rewrite	rm4 (replayed by orchestrator)	2026-09-28
+800E83F8	GameModeBestBall_SetupNextGolfer	rewrite	rm4 (replayed by orchestrator)	2026-09-28
+800E84B0	GameModeBestBall_GetHonors	rewrite	rm4 (replayed by orchestrator)	2026-09-28
+800E8848	GameModeBestBall_GetPlayerTeam	rewrite	rm4 (replayed by orchestrator)	2026-09-28
+800E8858	GameModeBestBall_HoleFinished	rewrite	rm4 (replayed by orchestrator)	2026-09-28
+800E88A8	GameModeBestBall_GameFinished	rewrite	rm4 (replayed by orchestrator)	2026-09-28
+800E8904	GameModeBestBall_GoToPlayoff	rewrite	rm4 (replayed by orchestrator)	2026-09-28
+800E890C	GameModeBestBall_EndHole	rewrite	rm4 (replayed by orchestrator)	2026-09-28
+800E8A68	GameModeBestBall_EndGame	rewrite	rm4 (replayed by orchestrator)	2026-09-28
+800E8C24	GM_BestBallMode_GetTeamHoleScore	rewrite	rm4 (replayed by orchestrator)	2026-09-28
+800E8CA8	GM_BestBallMode_GetTeamRelativeScore	rewrite	rm4 (replayed by orchestrator)	2026-09-28

@@ -8,28 +8,29 @@
 #include "game/save.h"
 #include "game/earnings.h"
 
-u8   fn_800E82AC(int nTeam);
-int  fn_800E83A8(int nPlayer);
-void fn_800E83F8(void);
-s32  fn_800E84B0(int nPlayer);
-int  fn_800E8848(int nPlayer);
-u8   fn_800E8858(int nPlayer, u8 bCheck);
-u8   fn_800E88A8(u8 bCheck);
-u8   fn_800E8904(u8 bCheck);
-void fn_800E890C(void);
-void fn_800E8A68(void);
+u8   GameModeBestBall_TeamDone(int nTeam);
+int  GameModeBestBall_GetPartner(int nPlayer);
+void GameModeBestBall_SetupNextGolfer(void);
+s32  GameModeBestBall_GetHonors(int nPlayer);
+int  GameModeBestBall_GetPlayerTeam(int nPlayer);
+u8   GameModeBestBall_HoleFinished(int nPlayer, u8 bCheck);
+u8   GameModeBestBall_GameFinished(u8 bCheck);
+u8   GameModeBestBall_GoToPlayoff(u8 bCheck);
+void GameModeBestBall_EndHole(void);
+void GameModeBestBall_EndGame(void);
 
-// TW06: GameModeBestBall::Init. Installs the mode's handlers in gpGame, mulligan rule 2, nC and
-// n10 4, split screen off.
-void fn_800E81C4(void) {
-    gpGame->pfnInit = fn_800E81C4;
-    gpGame->pfnSetupNextGolfer = fn_800E83F8;
-    gpGame->pfnGetHonors = fn_800E84B0;
-    gpGame->pfnHoleFinished = fn_800E8858;
-    gpGame->pfnGameFinished = fn_800E88A8;
-    gpGame->pfnGoToPlayoff = fn_800E8904;
-    gpGame->pfnEndHole = fn_800E890C;
-    gpGame->pfnEndGame = fn_800E8A68;
+// Game mode 19's setup (GM_SetModeType): its callbacks; n4 0, one mulligan per player per nine
+// (nMulligans 2), nC and n10 4 as in the other team modes, nDC 0, the current hole back to 0
+// (GM_SetCurrentHole) and split screen off.
+void GameModeBestBall_Init(void) {
+    gpGame->pfnInit = GameModeBestBall_Init;
+    gpGame->pfnSetupNextGolfer = GameModeBestBall_SetupNextGolfer;
+    gpGame->pfnGetHonors = GameModeBestBall_GetHonors;
+    gpGame->pfnHoleFinished = GameModeBestBall_HoleFinished;
+    gpGame->pfnGameFinished = GameModeBestBall_GameFinished;
+    gpGame->pfnGoToPlayoff = GameModeBestBall_GoToPlayoff;
+    gpGame->pfnEndHole = GameModeBestBall_EndHole;
+    gpGame->pfnEndGame = GameModeBestBall_EndGame;
     gpGame->n4 = 0;
     gpGame->nMulligans = 2;
     gpGame->nC = 4;
@@ -39,9 +40,10 @@ void fn_800E81C4(void) {
     gSession.nSplitScreen = 0;
 }
 
-// TW06: GameModeBestBall::TeamDone. A partner has holed out and the other can no longer beat that
-// score.
-u8 fn_800E82AC(int nTeam) {
+// Whether team nTeam (0: players 0 and 1; 1: players 2 and 3) is done on the current hole: one
+// partner has holed out in no more strokes than the other has so far plus one, so the other can no
+// longer beat it.
+u8 GameModeBestBall_TeamDone(int nTeam) {
     int nHole = Game_CurHoleIndex();
     int a;
     int bDone;
@@ -62,8 +64,8 @@ u8 fn_800E82AC(int nTeam) {
     return bDone;
 }
 
-// TW06: GameModeBestBall::GetPartner (found by the sweep).
-int fn_800E83A8(int nPlayer) {
+// The partner of player nPlayer: 0 and 1 play together, 2 and 3; 5 for any other player.
+int GameModeBestBall_GetPartner(int nPlayer) {
     switch (nPlayer) {
     case 0:
         return 1;
@@ -78,9 +80,10 @@ int fn_800E83A8(int nPlayer) {
     }
 }
 
-// The next shot: in split screen everyone plays at once; otherwise the golfer pfnGetHonors picks
-// gets ready and the others wait.
-void fn_800E83F8(void) {
+// The next shot (pfnSetupNextGolfer): in split screen every golfer gets ready at once
+// (GS_PRE_SHOT); otherwise the golfer the mode's honors picks (pfnGetHonors, kept in lbl_80282278)
+// gets ready and the others wait (GS_WAIT).
+void GameModeBestBall_SetupNextGolfer(void) {
     int i;
     if (gSession.nSplitScreen == 1) {
         for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -98,10 +101,13 @@ void fn_800E83F8(void) {
     }
 }
 
-// TW06: GameModeBestBall::GetHonors. Who plays next after nPlayer (5 = nobody): on the tee the team
-// with the better score on the last decided hole, and within a team the better score; otherwise the
-// player farthest from the pin (off the green first) whose team is still playing.
-s32 fn_800E84B0(int nPlayer) {
+// Who plays next after nPlayer (pfnGetHonors; 5 = nobody). On the tee: the team that won the last
+// decided hole (a tie keeps the order) goes first, and within each team the player with the better
+// score on it; the first in that order who is not nPlayer, is on the tee, not cut and whose team is
+// not done (GameModeBestBall_TeamDone). Otherwise the player farthest from the pin among those off
+// the green, then among those on it, leaving out nPlayer, holed-out and cut players and done teams;
+// 5 when that is nPlayer.
+s32 GameModeBestBall_GetHonors(int nPlayer) {
     s32 aOrder[4] = {0, 1, 2, 3};  // the tee order before anyone has a lower team score
     s32* pOrder;        // fake match: the within-team compares read aOrder through a pointer
     int a;
@@ -162,7 +168,7 @@ s32 fn_800E84B0(int nPlayer) {
     // register (h, t or w all match)
     for (h = 0; h < gNumPlayersSetUp; h++) {
         if (nPlayer != aOrder[h] && Player_OnTee(aOrder[h]) && !gPlayers[aOrder[h]].bPlayerCut &&
-            !fn_800E82AC(fn_800E8848(aOrder[h]))) {
+            !GameModeBestBall_TeamDone(GameModeBestBall_GetPlayerTeam(aOrder[h]))) {
             return aOrder[h];
         }
     }
@@ -171,7 +177,8 @@ s32 fn_800E84B0(int nPlayer) {
     fBest = 0.0f;
     nBest = 5;
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        if (i != nPlayer && !Player_IsHoled(i) && !PLAYER(i)->bPlayerCut && !fn_800E82AC(fn_800E8848(i)) &&
+        if (i != nPlayer && !Player_IsHoled(i) && !PLAYER(i)->bPlayerCut
+            && !GameModeBestBall_TeamDone(GameModeBestBall_GetPlayerTeam(i)) &&
             PLAYER(i)->ball.nLie != LIE_GREEN_e) {
             dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nPinSet].x;
             dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nPinSet].z;
@@ -187,7 +194,7 @@ s32 fn_800E84B0(int nPlayer) {
         nBest = 5;
         for (i = 0; i < gNumPlayersSetUp; i++) {
             if (i != nPlayer && !Player_IsHoled(i) && !PLAYER(i)->bPlayerCut &&
-                !fn_800E82AC(fn_800E8848(i))) {
+                !GameModeBestBall_TeamDone(GameModeBestBall_GetPlayerTeam(i))) {
                 dx = PLAYER(i)->ball.vPos[0] - pCourse->pin[nPinSet].x;
                 dz = PLAYER(i)->ball.vPos[2] - pCourse->pin[nPinSet].z;
                 d = Math_Sqrt(dx * dx + dz * dz);
@@ -204,22 +211,25 @@ s32 fn_800E84B0(int nPlayer) {
     return nBest;
 }
 
-// A player's team (TW06 has this as GameModeFourBall::GetPlayerTeam; its best ball mode has none).
-int fn_800E8848(int nPlayer) {
+// The team of player nPlayer: 0 for players 0 and 1, 1 for 2 and 3 (TW06 has this as
+// GameModeFourBall::GetPlayerTeam; its best ball mode has none).
+int GameModeBestBall_GetPlayerTeam(int nPlayer) {
     return nPlayer / 2;
 }
 
-// TW06: GameModeBestBall::HoleFinished. Both teams are done.
-u8 fn_800E8858(int nPlayer, u8 bCheck) {
+// The hole is over (pfnHoleFinished) once both teams are done (GameModeBestBall_TeamDone). nPlayer
+// and bCheck are not read.
+u8 GameModeBestBall_HoleFinished(int nPlayer, u8 bCheck) {
     int bDone = 0;
-    if (fn_800E82AC(0) && fn_800E82AC(1)) {
+    if (GameModeBestBall_TeamDone(0) && GameModeBestBall_TeamDone(1)) {
         bDone = 1;
     }
     return bDone;
 }
 
-// TW06: GameModeBestBall::GameFinished. No selected hole is left.
-u8 fn_800E88A8(u8 bCheck) {
+// The game is over (pfnGameFinished) when no selected hole is left after the current one. bCheck is
+// not read.
+u8 GameModeBestBall_GameFinished(u8 bCheck) {
     int h;
     for (h = Game_CurHoleIndex() + 1; h < 18; h++) {
         if (gpGame->bHoleSelected[h]) {
@@ -229,14 +239,16 @@ u8 fn_800E88A8(u8 bCheck) {
     return 1;
 }
 
-// GoToPlayoff: never (TW06's GameModeBestBall does not override GameModeBase::GoToPlayoff).
-u8 fn_800E8904(u8 bCheck) {
+// The mode's pfnGoToPlayoff: never a playoff (TW06's GameModeBestBall keeps
+// GameModeBase::GoToPlayoff). bCheck is not read.
+u8 GameModeBestBall_GoToPlayoff(u8 bCheck) {
     return 0;
 }
 
-// TW06: GameModeBestBall::EndHole. On each team the ball that does not count (or was not holed)
-// is marked 9.
-void fn_800E890C(void) {
+// The hole is over (pfnEndHole): on each team the ball that does not count gets 9 strokes on the
+// hole: of two holed balls the worse (the first player's on a tie), else the one not holed (the
+// first player's when neither is).
+void GameModeBestBall_EndHole(void) {
     int nHole = Game_CurHoleIndex();
     if (Player_IsHoled(0)) {
         if (Player_IsHoled(1)) {
@@ -266,18 +278,15 @@ void fn_800E890C(void) {
     }
 }
 
-// TW06: GameModeBestBall::EndGame. A human team that beats an all-CPU team wins money: half the two
-// CPU golfers' base prizes plus their per-stroke prizes for up to 5 strokes of margin. EA reuses the
-// team loop's counter for the inner loop, so the loop ends after the first team that wins.
-// Not exact yet: nBase and nFirst + i swap r26/r25, and the prize block schedules the two row
-// addresses and the loop's hoisted gPlayers/0x10600/i = 0 in another order. The two-statement
-// nSum (= base 1; += base 2) fixed its scratch registers (94.46 -> 94.82). Tried without effect: every order
-// and operand order of the sum/money/base statements, Earnings.c GM_Earnings_GetStrokeWinningsTeam's shape
-// (nBase1/nBase2), row pointers, inline accessors and a whole-prize inline helper with an out pointer, nBase
-// reusing any earlier local, an nPlayer local for nFirst + i in every declaration slot, i + nFirst, PLAYER(),
-// (u32) index, int/s32 on eight locals (256 combinations), declaration climb, GC/2.0 to 2.7, the permuter (20
-// min).
-void fn_800E8A68(void) {
+// The round is over (pfnEndGame): after a full round (GM_FullRoundOfGolf) outside a Play Now
+// challenge, a human team (Team_IsAllHuman) that beats an all-CPU team (Team_IsAllCPU) on the
+// round's total strokes wins money: half of the two CPU golfers' base prizes
+// (gEarningsTable.aStrokePrize by GM_Earnings_RateGolfer) plus half of their per-stroke prizes
+// times the margin (at most 5 strokes). Each of the team's players with an active profile is paid
+// (GM_Earnings_AwardMoney), gets a won game in the EA SPORTS Bio and, when the base half is
+// nonzero, message 0x76 with it. EA reuses the team loop's counter for the inner loop, so the team
+// loop ends after a team is paid.
+void GameModeBestBall_EndGame(void) {
     int i;
     int nFirst;
     int nSum;
@@ -349,17 +358,17 @@ void fn_800E8A68(void) {
     }
 }
 
-// TW06: GM_BestBallMode_GetTeamHoleScore. The team's (better) score on a hole.
-int fn_800E8C24(int nPlayer, int nHole) {
-    if (gPlayers[nPlayer].nStrokes[nHole] <= gPlayers[fn_800E83A8(nPlayer)].nStrokes[nHole]) {
+// The strokes of nPlayer's team on hole nHole: the better of nPlayer's and his partner's.
+int GM_BestBallMode_GetTeamHoleScore(int nPlayer, int nHole) {
+    if (gPlayers[nPlayer].nStrokes[nHole] <= gPlayers[GameModeBestBall_GetPartner(nPlayer)].nStrokes[nHole]) {
         return gPlayers[nPlayer].nStrokes[nHole];
     }
-    return gPlayers[fn_800E83A8(nPlayer)].nStrokes[nHole];
+    return gPlayers[GameModeBestBall_GetPartner(nPlayer)].nStrokes[nHole];
 }
 
-// TW06: GM_BestBallMode_GetTeamRelativeScore. The team's score against par so far (and on the
-// current hole once holed, when asked).
-int fn_800E8CA8(int nPlayer, u8 bCurrent) {
+// nPlayer's team score against par over the selected holes before the current one; with bCurrent,
+// the current hole too once nPlayer's ball is in the cup.
+int GM_BestBallMode_GetTeamRelativeScore(int nPlayer, u8 bCurrent) {
     int nPar;
     int nScore;
     int h;
@@ -373,7 +382,7 @@ int fn_800E8CA8(int nPlayer, u8 bCurrent) {
     for (h = 0; h < n; h++) {
         if (gpGame->bHoleSelected[h]) {
             nPar += Course_GetHolePar(h);
-            nScore += fn_800E8C24(nPlayer, h);
+            nScore += GM_BestBallMode_GetTeamHoleScore(nPlayer, h);
         }
     }
     return nScore - nPar;

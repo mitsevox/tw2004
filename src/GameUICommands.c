@@ -301,7 +301,7 @@ void  GUI_QueueTip(int n);
 int   fn_800E5E54(void);
 f32   fn_800E6578(int nPlayer, u32 nStat);
 s32   fn_800E8114(int nPlayer);
-int   fn_800E8CA8(int nPlayer, u8 bCurrent);
+int   GM_BestBallMode_GetTeamRelativeScore(int nPlayer, u8 bCurrent);
 u8    PlayNow_IsSpeedGolf(void);
 s32   PlayNow_GetMedalMark(int k);
 int   PlayNow_GetScoreToTarget(void);
@@ -673,7 +673,7 @@ void fn_80085FDC(MsgArg* pArgs, MsgArg* pResult) {
     } else if (pArgs[1].i == 20) {
         pResult->i = GM_GetPlayerRoundScore(pArgs[0].i);
     } else if (Game_GetMode() == 19) {
-        pResult->i = fn_800E8C24((u8)pArgs[0].i, pArgs[1].i);
+        pResult->i = GM_BestBallMode_GetTeamHoleScore((u8)pArgs[0].i, pArgs[1].i);
     } else {
         pResult->i = gPlayers[pArgs[0].i].nStrokes[pArgs[1].i];
     }
@@ -1073,7 +1073,7 @@ void fn_80086F0C(MsgArg* pArgs, MsgArg* pResult) {
         pResult->i = GM_PgaTourSim_GetRelativeScoreFromEntrantID(pArgs[0].i, 0, 0);
         return;
     case 19:
-        pResult->i = fn_800E8CA8(pArgs[0].i, 1);
+        pResult->i = GM_BestBallMode_GetTeamRelativeScore(pArgs[0].i, 1);
         return;
     default:
         pResult->i = GM_GetGolferRelativeCumulativeScore(pArgs[0].i, 1);

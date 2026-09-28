@@ -547,7 +547,7 @@ void GUI_ClearShownTips(void);
 // Each mode's setup, called by GM_SetModeType.
 void GameModeAlternateShot_Init(void);                 // mode 21 (GameModeAlternateShot.c)
 void GameModeBattle_Init(void);                 // mode 25 (GameModeBattle.c)
-void fn_800E81C4(void);                 // mode 19 (GameModeBestBall.c)
+void GameModeBestBall_Init(void);                 // mode 19 (GameModeBestBall.c)
 void GameModeFourBall_Init(void);                 // mode 20 (GameModeFourBall.c)
 void GameModeMatch_Init(void);                 // mode 1 (GameModeMatch.c)
 void PlayNow_Init(void);                 // mode 5
@@ -569,7 +569,7 @@ void GameModeStroke_Init(void);                 // mode 0 (GameModeStroke.c)
 void Lessons_Init(void);                 // mode 11 (GameMode11.c)
 void GameMode4_Init(void);                 // mode 4 (GameMode4.c)
 
-int  fn_800E8C24(int nPlayer, int nHole);   // GameModeBestBall.c
+int  GM_BestBallMode_GetTeamHoleScore(int nPlayer, int nHole);   // GameModeBestBall.c
 
 // GameModeMatch.c: match play, which the other two-player modes build on
 extern u8  lbl_80282240;                // the hole-finished test excuses the holed side's own players

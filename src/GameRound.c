@@ -250,7 +250,7 @@ void GM_SetModeType(int nMode) {
         GameModeStableford_Init();
         break;
     case 19:
-        fn_800E81C4();
+        GameModeBestBall_Init();
         break;
     case 20:
         GameModeFourBall_Init();
@@ -537,14 +537,14 @@ int GM_GetGolferRelativeCumulativeScore(int nPlayer, u8 bCurrent) {
 }
 
 // A player's total for the first nHoles holes: the mode's points in mode 18 (Stableford), the
-// team's better score per hole (fn_800E8C24) in mode 19 (best ball), strokes otherwise.
+// team's better score per hole (GM_BestBallMode_GetTeamHoleScore) in mode 19 (best ball), strokes otherwise.
 int GM_GetPlayerRoundScoreThroughHole(int nPlayer, int nHoles) {
     int n;
     int i;
     if (Game_GetMode() == 19) {
         n = 0;
         for (i = 0; i < nHoles; i++) {
-            n += fn_800E8C24(nPlayer, i);
+            n += GM_BestBallMode_GetTeamHoleScore(nPlayer, i);
         }
     } else if (Game_GetMode() == 18) {
         n = 0;
