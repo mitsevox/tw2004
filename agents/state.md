@@ -19,6 +19,11 @@ Cleanup done before it: 18 stale remote branches deleted (gemini/round4 and 2 yo
 matching-era records removed (in history at 6839245), docs/README.md index.
 Owner 2026-09-28: the readability plan is APPROVED; continue it. The matched-data scoring lane is ON
 HOLD (decomp.dev already shows 100%; objdiff's local "matched data" 79.95% is per-symbol scoring).
+Progress log: config/GW4E69/readability_progress.tsv (`hotnames.py --units --log` after every round);
+per-file work lists: `hotnames.py --unit X --todo`. Round 4 running (2026-09-28 ~00:15 UTC): rd1
+StaticMemory + LLMem_Gc + VecMath; rd2 Quaternion + UMemPool (first 40); rd3 Code80012ED0 +
+Code80015470 + ViewController + Controller_Gc (first 40); rd4 closes GameRound, GameUI, FE_CrAPDB,
+AudTable, hlaudemitter, GameAudio (34 left).
 PHASE: readability. Plan and feedback loop: agents/plan-readability.md (one complete pass per file,
 areas in order, measure with `hotnames.py --units`: named / commented / reviewed / done).
 Matching-era audit rules and tooling retired 2026-09-27 (tag audit-baseline-1 kept as history).
