@@ -392,3 +392,45 @@ SetupBonusBall case 4 never set; mode 8's pace always falls at the slow rate (nC
 GameMsg_SendPending bit 1 numbers players from 0 (GUI_StartPostShotUI from 1); gGameMsgPendingValue
 shared by three messages. Tools: the refs-only refresh can leave comment lines past 110 that one
 wraplong pass cascades; run wraplong until lint is clean (12 passes used this round).
+
+## Round 13 (rm1-rm6) leftovers
+EA identities found (misfiled-units renames, owner-approved batch): GameMode14.c = TW07
+GameMode_SkillZoneCapture.cpp, GameMode15.c = SkillZoneHorse, GameMode16.c = SkillZoneTarget,
+GameMode17.c = SkillZoneTargetToTarget, GameMode9.c = GameMode_Practice.cpp (TW06 GM_Practice_mode = 9),
+GameModeBestBall.c = TW06 gamemode_bestball.cpp / TW07 GameMode_BestBall.cpp, EventInfo.c = TW07
+FE_CalendarPopups.c (its three FE messages 536 / 544 / 696 are not in TW07's file). event.c's tail
+0x80067608..0x80067710 (SitDev_vInitModule .. vUnregisterStreamClients, gSitDevData / gpSitDevData) +
+Code80067710.c = TW07 SitDev.c: split event.c there. GameModePractice_ReadPlaceBallSticks is in
+GameMode9's range but serves every mode's ball placing. GameModeReplay.c's last three = SkillZoneBase
+(Round 12). Event numbers = TW06 EVENTID_e up to 59, one lower from 60 on.
+Header lane done (rm1): CharPool (a[6] texture entries + pLoadingChar), AnimPlayer -> TSKATime, GameState
+playoff fields / pPinPos / bAllowGameBreakers / 19 callbacks (TW07 GameModeBase), Player round stats,
+GameEffects, mode22.h, options nWeather / bPuttingGrid, FEScreen.bFadeToBlack, Session bDemo / bEndLoop;
+orchestrator renamed g*SavedOptionsC -> g*SavedWeather. Still open: save.h (n4E98 / n4E94 / a1054C /
+line 38 / UserInfo stats / a104D0 / n113); golfer.h Player fC50, nC3C, nC44, nC58, nC6C, nC40, fA80 /
+fA84, nCD0 / aCD4, nD28, nD70, nDB8, nDC0 (target games' balls), aDC4 ([0] multiplier shots, [1] extra
+balls, [3] hits, [4] time frames), nDD8 (winnings in the target modes), nDDC, nDE0, nDE4, nE88 (HORSE
+letters), nE8C / nE90, nE94 (mode 14 steals), bE9E, nEA0..nEDC, nShotKind comment wrong (SHOT_TYPE_: 0
+putt, 1 drive, 2 chip, 3 pitch, 4 punch, 5 flop), b30C hit a course object (event 36), b30D hit the
+flagstick (event 38); hooks pfn20C, pfn214..pfn230 (TW07 order), pfn228 is called from
+STATEFUNC_SwingUpdate (not "shot setup"); game.h Session.uFlags 0x4000, CareerCalendar, gCalendarFillCell,
+record-check / TournamentPayout / PlayNow_ params, GM_Earnings_PayRoundGoals (int, u8), target-game /
+GameMessages / SkillZone getter prototypes' params (a, i, n) and misaligned trailing comments,
+GameMode22_IsActive u8 vs s32; engine.h EVENT_Trigger 4th param = nArg (1 real ball, 0 simulated, -1
+none), GameMode26_StartComment params / comment; ladder.h LadderEvent.n40 tour stop, "six region
+finals"; mode26.h stale fn_ wording; earnings.h; challenge.h; rte.h RTEvent.n14; camera.h
+script.nCamera; fe.h FE_CrAP n4; AnimPlayerEntry -> TSKATimeEvent (TW06, unproven);
+GM_PgaTourSim_DistributeWinnings third param; GameManager.c raw 0x1EC / 0x1F0 hook calls.
+Prototypes in other files: FE_MessageTable.c:48 / GoEntry.c:35 `u8* GameMode26_StartEvent(void)` (void
+definition) and FE_MessageTable.c:66 SetTargetScore, both marked "// CharSliders.c"; GameUICommands.c
+place / target parameter names; gocamscripts.c fn_80045494 / fn_80045558 = SetHalfTime / SetDoubleTime;
+SitDevTrigger.c fn_800BD7D0 "music" = crowd reaction. Stale comment words in finished files:
+GameMode6.c:2 (pfn1E4), GameMode16.c:3 (pfn268), GameAnalysis.c:121-170 (b2E4 / b2F6 / n2DC / n2E0).
+Pairing TSV: event A/B rows shifted by one (80066214, 80066D54, 80066FA8, 8006702C).
+Possible EA bugs, unlabelled: EVENT_PracticeSwing passes 21 to the lessons (not 9); EVENT_PrevClub 13 (not
+14, harmless); EVENT_TopOfArc passes 13 to fn_80095744 (ignored); mode 16 SetupNextGolfer re-aims only at
+nDC0 == 0 (copied from Timed); mode 16 re-pays the all-targets prize; mode 17 HoleFinished checks only
+player 0; mode 6 no first-hole tips / no restart hook / stroke limit on; FE_GetDateTimeIfClockEarly
+tests year < 2003 && month < 10; GetTipStat fairway % counts par 3s; tips 11 and 13 unreachable; mode 15
+HoleFinished stored through a u8 cast (returns s32: port: candidate). Events never fired: 8, 12, 16,
+17, 27, 30, 52, 71.
