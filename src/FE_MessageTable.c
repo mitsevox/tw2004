@@ -259,11 +259,11 @@ void TrophyRoom_GetAwardEarnedText(MsgArg* pArgs, MsgArg* pResult);
 // This file.
 void GetGolferName(int nGolfer, char* szName);
 void FE_GetRecordEntry(int nKind, MsgArg* pArgs, MsgArg* pResult);
-s32  fn_80084FB4(void* pArg);
-s32  fn_80084FF8(void* pArg);
-s32  fn_80085034(void* pArg);
-s32  fn_80085070(void* pArg);
-s32  fn_800850AC(void* pArg);
+s32  MC_CallActionFnMemoryRequired(void* pArg);
+s32  MC_CallActionFnNumFilesOnCard(void* pArg);
+s32  MC_CallActionFnDataCorrupt(void* pArg);
+s32  MC_CallActionFnLoad(void* pArg);
+s32  MC_CallActionFnSave(void* pArg);
 
 // This file's message handlers, in address order.
 void GM_vGetMinPlayersForMode(MsgArg* pArgs, MsgArg* pResult);
@@ -698,20 +698,20 @@ void GM_vSetCourseFindDisc(MsgArg* pArgs, MsgArg* pResult);
 void GM_vSetLongDriveOptions(MsgArg* pArgs, MsgArg* pResult);
 void GM_vTrophyRoomGetStatus(MsgArg* pArgs, MsgArg* pResult);
 void GM_vFEMessage715_Empty(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084BE8(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084C88(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084CFC(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084D6C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084DF4(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084E7C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084E90(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084EC8(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084F04(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084F08(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084F0C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084F3C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084F40(MsgArg* pArgs, MsgArg* pResult);
-void fn_80084F84(MsgArg* pArgs, MsgArg* pResult);
+void GM_vControlMusic(MsgArg* pArgs, MsgArg* pResult);
+void GM_vDefaultBlankUserName(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCIsUserOnCard(MsgArg* pArgs, MsgArg* pResult);
+void GM_vShortenString12(MsgArg* pArgs, MsgArg* pResult);
+void GM_vShortenString32(MsgArg* pArgs, MsgArg* pResult);
+void GM_vEASBioGetLastError(MsgArg* pArgs, MsgArg* pResult);
+void GM_vEASBioCheck(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCGetBlocksNeeded(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage762_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage763_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vMCGetLastSavedUser(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEMessage765_Empty(MsgArg* pArgs, MsgArg* pResult);
+void GM_vEASBioCreate(MsgArg* pArgs, MsgArg* pResult);
+void GM_vEASBioGetRewardMessage(MsgArg* pArgs, MsgArg* pResult);
 
 // The front end's message handlers by message number (FE_InitGameMessages fills 612 of the 770
 // slots; the rest stay NULL). GameUICommands.c's gIGMessageHandlers is the round's twin.
@@ -1319,32 +1319,32 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[721] = GM_vGetPuttingTipOption;
     gFEMessageHandlers[722] = GM_vSetPuttingTipOption;
     gFEMessageHandlers[723] = GM_vBonusTrophyBallsWon;
-    gFEMessageHandlers[727] = fn_80084BE8;
+    gFEMessageHandlers[727] = GM_vControlMusic;
     gFEMessageHandlers[725] = GM_vClearQueuedCrAPAnim;
-    gFEMessageHandlers[726] = fn_80084C88;
+    gFEMessageHandlers[726] = GM_vDefaultBlankUserName;
     gFEMessageHandlers[728] = GM_vGetEquippedCrAPItemInSubcategory;
     gFEMessageHandlers[730] = GM_vIsCrAPAnimInGolferLib;
-    gFEMessageHandlers[736] = fn_80084CFC;
-    gFEMessageHandlers[737] = fn_80084D6C;
+    gFEMessageHandlers[736] = GM_vMCIsUserOnCard;
+    gFEMessageHandlers[737] = GM_vShortenString12;
     gFEMessageHandlers[739] = GM_vGetCrAPItemSlot;
     gFEMessageHandlers[740] = GM_vRestoreAfterPreview;
     gFEMessageHandlers[741] = GM_vFEMessage741_Empty;
-    gFEMessageHandlers[746] = fn_80084DF4;
+    gFEMessageHandlers[746] = GM_vShortenString32;
     gFEMessageHandlers[749] = PGATourMsg_DidUserQuit;
-    gFEMessageHandlers[751] = fn_80084E7C;
+    gFEMessageHandlers[751] = GM_vEASBioGetLastError;
     gFEMessageHandlers[754] = PGASponsor_GetSlot;
     gFEMessageHandlers[755] = PGASponsor_GetTotalItemBonus;
     gFEMessageHandlers[756] = GM_vIsLeapYear;
     gFEMessageHandlers[757] = GM_vIsCrAPItemRemovable;
     gFEMessageHandlers[760] = GM_vPreviewItem;
-    gFEMessageHandlers[759] = fn_80084E90;
-    gFEMessageHandlers[761] = fn_80084EC8;
-    gFEMessageHandlers[762] = fn_80084F04;
-    gFEMessageHandlers[763] = fn_80084F08;
-    gFEMessageHandlers[764] = fn_80084F0C;
-    gFEMessageHandlers[765] = fn_80084F3C;
-    gFEMessageHandlers[768] = fn_80084F40;
-    gFEMessageHandlers[769] = fn_80084F84;
+    gFEMessageHandlers[759] = GM_vEASBioCheck;
+    gFEMessageHandlers[761] = GM_vMCGetBlocksNeeded;
+    gFEMessageHandlers[762] = GM_vFEMessage762_Empty;
+    gFEMessageHandlers[763] = GM_vFEMessage763_Empty;
+    gFEMessageHandlers[764] = GM_vMCGetLastSavedUser;
+    gFEMessageHandlers[765] = GM_vFEMessage765_Empty;
+    gFEMessageHandlers[768] = GM_vEASBioCreate;
+    gFEMessageHandlers[769] = GM_vEASBioGetRewardMessage;
 }
 
 // Front-end message 2: the fewest players game mode pArgs[0] takes (GM_GetMinPlayersForMode).
@@ -1815,16 +1815,17 @@ void GM_vMCGetFreeBlocks(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 51: the space the options save needs on the memory card in port pArgs[0], slot
-// pArgs[1]: file type 0, the options (fn_80084FF0), and its memory-required operation (fn_80084FB4,
-// which runs MC_MemoryRequiredForOptions), between MC_ConnectCard and MC_Disconnect.
+// pArgs[1]: file type 0, the options (MC_SetCurrentFileType), and its memory-required operation
+// (MC_CallActionFnMemoryRequired, which runs MC_MemoryRequiredForOptions), between MC_ConnectCard
+// and MC_Disconnect.
 void GM_vMCOptionsMemoryRequired(MsgArg* pArgs, MsgArg* pResult) {
     MCCardPos pos;
 
     pos.nPort = pArgs[0].i;
     pos.nSlot = pArgs[1].i;
-    fn_80084FF0(0);
+    MC_SetCurrentFileType(0);
     MC_ConnectCard(pos.nPort, pos.nSlot);
-    pResult->i = fn_80084FB4(&pos);
+    pResult->i = MC_CallActionFnMemoryRequired(&pos);
     MC_Disconnect();
 }
 
@@ -2009,16 +2010,16 @@ void GM_vGetStringWidth(MsgArg* pArgs, MsgArg* pResult) {
 
 // Front-end message 62: the space a profile save (save kind 1, the MC_SaveUser set of lbl_8018C7D8)
 // needs on the memory card in port pArgs[0], slot pArgs[1]: its memory-required operation
-// (fn_80084FB4, which runs fn_800A270C: MC_BlocksNeededForSave kind 1), between MC_ConnectCard and
-// MC_Disconnect. The twin of GM_vMCOptionsMemoryRequired.
+// (MC_CallActionFnMemoryRequired, which runs fn_800A270C: MC_BlocksNeededForSave kind 1), between
+// MC_ConnectCard and MC_Disconnect. The twin of GM_vMCOptionsMemoryRequired.
 void GM_vMCUserMemoryRequired(MsgArg* pArgs, MsgArg* pResult) {
     MCCardPos pos;
 
     pos.nPort = pArgs[0].i;
     pos.nSlot = pArgs[1].i;
     MC_ConnectCard(pos.nPort, pos.nSlot);
-    fn_80084FF0(1);
-    pResult->i = fn_80084FB4(&pos);
+    MC_SetCurrentFileType(1);
+    pResult->i = MC_CallActionFnMemoryRequired(&pos);
     MC_Disconnect();
 }
 
@@ -5565,8 +5566,8 @@ void GM_vSwapDisc(MsgArg* pArgs, MsgArg* pResult) {
 // Front-end message 472: starts the current game mode's event: the lesson (mode 11), the Play Now
 // challenge (5), the PGA TOUR tee-off (23), the long-drive race (26), the long-drive contest (22)
 // or the real-time event (24). In modes 11 and 5 player 0 first gets golfer 0, or, with profile 0
-// loaded, the created golfer (FIRST_CREATED_GOLFER; not when the working profile's b11703 is set;
-// the slot's p658 row is cleared). Answers whether the course is on the disc in the drive
+// loaded, row 0 of p658 (lbl_801D7148.aBackup[0]) and the created golfer (FIRST_CREATED_GOLFER; not
+// when the working profile's b11703 is set). Answers whether the course is on the disc in the drive
 // (fn_80110180, its hole-file check turned on while it runs).
 void GM_vStartEventCheckDisc(MsgArg* pArgs, MsgArg* pResult) {
     if (Game_GetMode() == 11) {
@@ -6025,7 +6026,7 @@ void GM_vEASBioGetLevelProgress(MsgArg* pArgs, MsgArg* pResult) {
 // Front-end message 671: the memory-card screens' save kind is pArgs[0] (MC_SetCurrentFileType: 0
 // the options, 1 a profile, 2 a replay, 3 the EA Sports Bio).
 void GM_vMCSetCurrentFileType(MsgArg* pArgs, MsgArg* pResult) {
-    fn_80084FF0(pArgs[0].i);
+    MC_SetCurrentFileType(pArgs[0].i);
 }
 
 // Front-end message 672: runs memory-card operation pArgs[0] of the save kind MC_SetCurrentFileType
@@ -6051,31 +6052,31 @@ void GM_vMCCallActionFn(MsgArg* pArgs, MsgArg* pResult) {
         pos0.nPort = nPort;
         pos0.nSlot = nSlot;
         pos0.n8 = n8;
-        pResult->i = fn_800850AC(&pos0) == 0;
+        pResult->i = MC_CallActionFnSave(&pos0) == 0;
         break;
     case 1:
         posStr.pos.nPort = nPort;
         posStr.pos.nSlot = nSlot;
         posStr.pos.n8 = n8;
         posStr.szC = szName;
-        pResult->i = fn_80085070(&posStr) == 0;
+        pResult->i = MC_CallActionFnLoad(&posStr) == 0;
         break;
     case 3:
         pos3.nPort = nPort;
         pos3.nSlot = nSlot;
         pos3.n8 = n8;
-        pResult->i = fn_80085034(&pos3);
+        pResult->i = MC_CallActionFnDataCorrupt(&pos3);
         break;
     case 2:
         card.nPort = nPort;
         card.nSlot = nSlot;
-        pResult->i = fn_80084FF8(&card);
+        pResult->i = MC_CallActionFnNumFilesOnCard(&card);
         break;
     case 4:
         cardName.nPort = nPort;
         cardName.nSlot = nSlot;
         cardName.szName = szName;
-        pResult->i = fn_80084FB4(&cardName);
+        pResult->i = MC_CallActionFnMemoryRequired(&cardName);
         break;
     }
 }
@@ -6212,9 +6213,10 @@ void GM_vTrophyRoomGetStatus(MsgArg* pArgs, MsgArg* pResult) {
 void GM_vFEMessage715_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Music commands: 0 turns music row 0 and its track pArgs[1] on and plays the track, 1 calls
-// Gaud_StopMusic, 2 calls Gaud_RestartMusic unless Gaud_GetMusicStatus says not to.
-void fn_80084BE8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 727, music commands by pArgs[0]: 0 switches music row 0 and its track pArgs[1]
+// on and plays that track (Gaud_StartMusic, play list 13) after re-picking the stream; 1 stops the
+// music; 2 restarts it (Gaud_RestartMusic) unless music is playing.
+void GM_vControlMusic(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 0:
         gSession.options.abRowOn[0] = 1;
@@ -6234,8 +6236,9 @@ void fn_80084BE8(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// A name typed as nothing but spaces becomes "User <n>" for the working slot.
-void fn_80084C88(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 726: a profile name typed as nothing but spaces (or nothing) becomes "User <n>"
+// in place in the string pArgs[0], n the working profile's slot + 1.
+void GM_vDefaultBlankUserName(MsgArg* pArgs, MsgArg* pResult) {
     char* szName = ((MsgString*)pArgs[0].p)->pStr;
     int n = 0;
     int i;
@@ -6250,9 +6253,10 @@ void fn_80084C88(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Checks the card pArgs[0], pArgs[1] with MC_GetUser: 1 when it succeeds, -1 when the file read
-// back is not a good save, else 0.
-void fn_80084CFC(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 736: whether profile pArgs[2] is in the save on the card in port pArgs[0], slot
+// pArgs[1] (MC_GetUser; the name it reads is dropped): 1 when it is, -1 when the save read back is
+// not a good one (MC_ERR_BADDATA), else 0.
+void GM_vMCIsUserOnCard(MsgArg* pArgs, MsgArg* pResult) {
     char sz[0x20];              // the size is unknown (0x20 gives the original's frame)
     s32  nResult = MC_GetUser(pArgs[0].i, pArgs[1].i, pArgs[2].i, sz);
 
@@ -6265,8 +6269,9 @@ void fn_80084CFC(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Copy a string, cut to eight characters and "..." when it is longer than 12.
-void fn_80084D6C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 737: copies the string pArgs[0] into the string pArgs[1], cut to its first 8
+// characters and "..." when it is longer than 12.
+void GM_vShortenString12(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[1].p)->pStr, ((MsgString*)pArgs[0].p)->pStr);
     if (strlen(((MsgString*)pArgs[0].p)->pStr) > 12) {
         ((MsgString*)pArgs[1].p)->pStr[11] = '\0';
@@ -6276,8 +6281,9 @@ void fn_80084D6C(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// The same, to 28 characters and "..." when it is longer than 32.
-void fn_80084DF4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 746: copies the string pArgs[0] into the string pArgs[1], cut to its first 28
+// characters and "..." when it is longer than 32.
+void GM_vShortenString32(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[1].p)->pStr, ((MsgString*)pArgs[0].p)->pStr);
     if (strlen(((MsgString*)pArgs[0].p)->pStr) > 32) {
         ((MsgString*)pArgs[1].p)->pStr[31] = '\0';
@@ -6287,61 +6293,90 @@ void fn_80084DF4(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_80084E7C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 751: the last EA Sports Bio error (the working profile's n11704, kept by
+// GM_vEASBioLoad, GM_vEASBioSave, GM_vEASBioLoadProducts and GM_vEASBioDelete; 0 none).
+void GM_vEASBioGetLastError(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_80281ED4->n11704;
 }
 
-void fn_80084E90(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 759: opens the EA Sports Bio on the card and closes it again (fn_80125194);
+// answers the open's error (0 when it opened).
+void GM_vEASBioCheck(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_80125194(0, 0);
 }
 
-void fn_80084EC8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 761: the space the game's save and the EA Sports Bio need together on the card
+// in port pArgs[0], slot pArgs[1] (fn_8009D390).
+void GM_vMCGetBlocksNeeded(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_8009D390(pArgs[0].i, pArgs[1].i);
 }
 
-void fn_80084F04(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 762: empty in this build.
+void GM_vFEMessage762_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80084F08(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 763: empty in this build.
+void GM_vFEMessage763_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80084F0C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 764: which profile of the card's save was saved last (fn_800A27F4: the save's
+// n4D0C0 as MC_LoadOptions last read it; 0 when the save has none).
+void GM_vMCGetLastSavedUser(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_800A27F4();
 }
 
-void fn_80084F3C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 765: empty in this build.
+void GM_vFEMessage765_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-void fn_80084F40(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 768: makes a new EA Sports Bio file on the card (fn_801252D0); 1 when it
+// succeeds, else 0. pArgs[0], pArgs[1] (the card) are handed on but not used.
+void GM_vEASBioCreate(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_801252D0(pArgs[0].i, pArgs[1].i) == 0;
 }
 
-void fn_80084F84(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 769: the EA Sports Bio reward message to show (EASBio_eReward, as
+// GM_vEASBioCheckReward set it; -1 none).
+void GM_vEASBioGetRewardMessage(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = EASBio_GetCurrentRewardMessage();
 }
 
-// The memory-card operations of the set picked (lbl_80281FFC), given each operation's own payload
-// (core/memcard.h, MCOpCard).
-s32 fn_80084FB4(void* pArg) {
+// Operation 4 of the save kind MC_SetCurrentFileType picked: the space it needs on the card
+// (MC_BlocksNeededForSave for that kind: MC_MemoryRequiredForOptions, fn_800A270C, fn_800A2740,
+// fn_801255C4). The payload starts with the card's port and slot (core/memcard.h).
+s32 MC_CallActionFnMemoryRequired(void* pArg) {
     return lbl_8018C7D8[lbl_80281FFC].apfn[4](pArg);
 }
 
-void fn_80084FF0(int n) {
+// Picks the save kind the MC_CallActionFn* functions work on (the row of lbl_8018C7D8): 0 the
+// options, 1 a profile, 2 a replay, 3 the EA Sports Bio.
+void MC_SetCurrentFileType(int n) {
     lbl_80281FFC = n;
 }
 
-s32 fn_80084FF8(void* pArg) {
+// Operation 2 of the save kind MC_SetCurrentFileType picked: its files on the card (a count, or
+// whether the file is there: fn_800A1758, MC_GetNumUser, fn_800A09EC, fn_80125118). The payload is
+// the card (MCOpCard).
+s32 MC_CallActionFnNumFilesOnCard(void* pArg) {
     return lbl_8018C7D8[lbl_80281FFC].apfn[2](pArg);
 }
 
-s32 fn_80085034(void* pArg) {
+// Operation 3 of the save kind MC_SetCurrentFileType picked: whether its file on the card is bad
+// data (fn_800A2630, fn_800A26A0, fn_800A2668, fn_8012555C). The payload is an MCCardPos.
+s32 MC_CallActionFnDataCorrupt(void* pArg) {
     return lbl_8018C7D8[lbl_80281FFC].apfn[3](pArg);
 }
 
-s32 fn_80085070(void* pArg) {
+// Operation 1 of the save kind MC_SetCurrentFileType picked: load it from the card (MC_LoadOptions,
+// MC_LoadUser, MC_LoadReplay; 0 when it succeeds). The EA Sports Bio's row has none (NULL): kind 3
+// must not be loaded this way. The payload is an MCCardPosStr (the card and a name).
+s32 MC_CallActionFnLoad(void* pArg) {
     return lbl_8018C7D8[lbl_80281FFC].apfn[1](pArg);
 }
 
-s32 fn_800850AC(void* pArg) {
+// Operation 0 of the save kind MC_SetCurrentFileType picked: save it to the card (MC_SaveOptions,
+// MC_SaveUser, MC_SaveReplay, or the EA Sports Bio's record, fn_801251EC; 0 when it succeeds). The
+// payload is an MCCardPos.
+s32 MC_CallActionFnSave(void* pArg) {
     return lbl_8018C7D8[lbl_80281FFC].apfn[0](pArg);
 }

@@ -264,7 +264,7 @@ u8    GameModeBattle_RemoveClub(int nPlayer, int nClub);
 void  Character_ReopenTextureFiles(void);
 void  fn_80062B84(int a);
 void  fn_8006F4E0(void);
-s32   fn_80084FB4(CardPos* pPos);
+s32   MC_CallActionFnMemoryRequired(CardPos* pPos);
 void  MC_ConnectCard(s32 nPort, s32 nSlot);
 s32   MC_SaveReplay(MCCardPos* pPos);
 s32   fn_800A0610(s32 nPort, s32 nSlot, s32 n);
@@ -1536,8 +1536,8 @@ void GM_vDisableCaddieTips(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // The space a replay save still needs on the card in port pArgs[0], slot pArgs[1] (command 76): the
-// card is looked at, the replay file type's card operations are picked (fn_80084FF0(2); TW07's
-// MC_SetCurrentFileType) and their memory-required one asked (fn_80084FB4; TW07's
+// card is looked at, the replay file type's card operations are picked (MC_SetCurrentFileType(2); TW07's
+// MC_SetCurrentFileType) and their memory-required one asked (MC_CallActionFnMemoryRequired; TW07's
 // MC_CallActionFnMemoryRequired).
 void GM_vIG_MCMemforReplay(MsgArg* pArgs, MsgArg* pResult) {
     CardPos pos;
@@ -1545,8 +1545,8 @@ void GM_vIG_MCMemforReplay(MsgArg* pArgs, MsgArg* pResult) {
     pos.nPort = pArgs[0].i;
     pos.nSlot = pArgs[1].i;
     MC_ConnectCard(pos.nPort, pos.nSlot);
-    fn_80084FF0(2);
-    pResult->i = fn_80084FB4(&pos);
+    MC_SetCurrentFileType(2);
+    pResult->i = MC_CallActionFnMemoryRequired(&pos);
     MC_Disconnect();
 }
 
@@ -1835,8 +1835,8 @@ void GM_vIG_ReplaySpaceNeeded(MsgArg* pArgs, MsgArg* pResult) {
     pos.nPort = pArgs[0].i;
     pos.nSlot = pArgs[1].i;
     MC_ConnectCard(pos.nPort, pos.nSlot);
-    fn_80084FF0(2);
-    pResult->i = fn_80084FB4(&pos);
+    MC_SetCurrentFileType(2);
+    pResult->i = MC_CallActionFnMemoryRequired(&pos);
     MC_Disconnect();
 }
 

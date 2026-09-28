@@ -95,7 +95,7 @@ void   fn_800B1A88(f32* pA, f32* pB);   // swap two floats
 void   fn_800B1A9C(f32* v, f32 x, f32 y);
 
 // The save kinds (a table of functions at lbl_8018C7D8).
-s32    fn_80084FB4(CardPos* pPos);      // the picked save kind's size on that card
+s32    MC_CallActionFnMemoryRequired(CardPos* pPos);      // the picked save kind's size on that card
 
 // The sounds' ADPCM data is game data: tools/build/gendata.py writes the initializers from main.dol.
 u8 lbl_8018F040[0x600] = {
@@ -866,12 +866,12 @@ s32 fn_800B09C8(int nPort, int nSlot) {
             } else {
                 pos.nPort = nPort;
                 pos.nSlot = nSlot;
-                fn_80084FF0(0);
+                MC_SetCurrentFileType(0);
                 nStatus = 2;
-                nBlocks = fn_80084FB4(&pos);
-                fn_80084FF0(3);
-                nBlocks3 = fn_80084FB4(&pos);
-                fn_80084FF0(0);
+                nBlocks = MC_CallActionFnMemoryRequired(&pos);
+                MC_SetCurrentFileType(3);
+                nBlocks3 = MC_CallActionFnMemoryRequired(&pos);
+                MC_SetCurrentFileType(0);
                 nBlocks += nBlocks3;
                 nFiles = fn_8009D50C(nPort, nSlot) + fn_8009D3DC(nPort, nSlot);
                 if (fn_8009EE28(nPort, nSlot) == -18) {

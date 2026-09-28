@@ -43,7 +43,7 @@ typedef struct GameAudioSource {
     u32  nKind;                 // 0x24   passed on to Aud_EmiAdd; 0, 3 and 5 play as a stereo pair
 } GameAudioSource;
 
-// Called from other files: music by the menus (FE_MessageTable.c fn_80084BE8); startUp.c's sound.
+// Called from other files: music by the menus (FE_MessageTable.c GM_vControlMusic); startUp.c's sound.
 void Gaud_SetStreamingContext(void);                 // picks music or ambience and records it in lbl_8028203C
 void Gaud_StartMusic(u8 a, u16 b);
 u8   Gaud_GetMusicStatus(void);

@@ -91,9 +91,9 @@ typedef struct MCCardPosStr {
 LAYOUT_ASSERT(MCCardPosStr, 0x10);
 
 // The memory-card screens' operations (lbl_8018C7D8): four sets of five, one set per kind of save
-// (fn_80084FF0 picks one; set 0 is the game's save, starting with MC_SaveOptions and MC_LoadOptions; set 3
+// (MC_SetCurrentFileType picks one; set 0 is the game's save, starting with MC_SaveOptions and MC_LoadOptions; set 3
 // is the EA Sports Bio's). apfn[4] gives the save's size on the card (startUp.c). The menus'
-// messages call them through fn_80084FB4 and its neighbours with the card they picked.
+// messages call them through MC_CallActionFnMemoryRequired and its neighbours with the card they picked.
 typedef s32 (*MCOp)(MCCardPos* pPos);
 typedef struct MCOpSet {
     MCOp apfn[5];               // 0x00
@@ -104,7 +104,7 @@ extern MCOpSet lbl_8018C7D8[4];
 
 // The operations do not all take the same payload: the menus' message GM_vMCCallActionFn builds op 0
 // and 3 an MCCardPos, op 1 an MCCardPosStr, op 2 the card alone and op 4 the card and a name.
-// So fn_80084FB4 and its neighbours take the payload as a void*.
+// So MC_CallActionFnMemoryRequired and its neighbours take the payload as a void*.
 typedef struct MCOpCard {       // op 2's payload (8 bytes)
     s32  nPort;                 // 0x0
     s32  nSlot;                 // 0x4
