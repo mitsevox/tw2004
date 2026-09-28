@@ -161,7 +161,7 @@ typedef struct UIArc {
     u16  uFlags;                // 0x0A
     u16  nSegments;             // 0x0C  message 8
     u16  nQuarterTurns;         // 0x0E  message 11: a rotation in degrees, as quarter turns 0..3
-    GXColor colorA;             // 0x10  message 6 (fn_80102AC8 copies it whole)
+    GXColor colorA;             // 0x10  message 6 (UIArc_Draw copies it whole)
     GXColor colorB;             // 0x14  message 7
     f32  v18[2];                // 0x18  message 5
     f32  v20[2];                // 0x20  message 1
@@ -184,7 +184,7 @@ typedef struct UIText {
     u8   aColor[4];             // 0x10  message 0: red, green, blue, alpha
     u8   aShadowColor[4];       // 0x14  message 1
     f32  v18[3];                // 0x18  message 6
-    f32  f24;                   // 0x24  } passed to fn_80092C38 when it has a shadow
+    f32  f24;                   // 0x24  } passed to UIText_SetFontShadowOffset when it has a shadow
     f32  f28;                   // 0x28  }
     u8   unk2C[4];
     f32  f30;                   // 0x30  messages 18 and 20, as an int
@@ -264,8 +264,8 @@ void UITransform_HandleOp(int nOp, UITransformDesc* p);  // uiTransform.c: the s
 void UITransform_Init(void);                         // uiTransform.c: allocate the stack
 
 // The studio's message handlers the front end registers (uiProcessInterface.c UI_OpenInterface).
-void fn_800929E4(UIText* pText, int nMsg, s32 n, MsgArg* pArgs, MsgArg* pResult);  // uiText.c
-void fn_80103684(UIArc* pArc, int nMsg, s32 n, MsgArg* pArgs);                     // uiArc.c
+void UIText_ProcessMessage(UIText* pText, int nMsg, s32 n, MsgArg* pArgs, MsgArg* pResult);  // uiText.c
+void UIArc_ProcessMessage(UIArc* pArc, int nMsg, s32 n, MsgArg* pArgs);                     // uiArc.c
 
 // uiProcessInterface.c: start the front end with the UI set szSet ("frontend", "ingame" or
 // "startup").

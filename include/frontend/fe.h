@@ -447,7 +447,7 @@ u8   FE_IsMovieSkipPressed(struct Video* pVideo, int nArg);
 
 // fe_movies.c: the texture bank loaded from LoadData.c's 'txf2' copy (UI_LoadLoadingBarTexture), its slot and its
 // first texture.
-struct TexEntry* fn_800922A0(struct TexBank* pBank);   // a bank's first texture
+struct TexEntry* UI_GetTexBankFirstTexture(struct TexBank* pBank);   // a bank's first texture
 extern int gUILoadingBarBankSlot;                // the bank's slot
 extern struct TexBank*  gpUILoadingBarBank;
 extern struct TexEntry* gpUILoadingBarTexture;
@@ -579,6 +579,6 @@ extern u8 gbUIFirstMenuDraw;         // UI_ClearFirstMenuDraw clears it; the fro
                                 // sets it (uiProcessInterface.c UI_CloseInterface)
 void UI_FreeAllEntryPictures(void);
 void UI_ClearFirstMenuDraw(void);
-void fn_80091EE8(void);
+void UI_PlayStartUpMovies(void);
 
 #endif

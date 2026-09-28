@@ -40,7 +40,7 @@ UIButtonEvent gUIButtonEvents[UI_NUM_BUTTON_EVENTS] = {
 s8 gSavedCrAPHidden = -1;      // gpCrAPState->bHidden put aside while hint 0x34 is up (-1: none)
 
 void UI_SetControllerEnabled(s32 n, s32 b);
-void fn_80092BC4(void);         // uiText.c
+void UIText_SetFontDrawQueued(void);         // uiText.c
 void UITransform_Shutdown(void);
 void fn_800BA038(void);         // Trax.c
 void UI_CloseInterface(FrontEnd* pFE);
@@ -50,7 +50,7 @@ TexEntry* UI_FindTexture(TexBank* pBank, u64 uHash);
 void GameMsg_SendPendingMenus(void);         // GameMessages.c
 void GameMsg_SendPending(void);         // GameMessages.c
 void GameMsg_ClearPending(void);         // GameMessages.c
-void fn_80092BA0(void);         // uiText.c
+void UIText_SetFontDrawAtOnce(void);         // uiText.c
 void UI_ResetLoadedFiles(void);         // uiLoadFile.c
 void fn_800B9FF0(void);
 void fn_80037FB4(u8 a, f32* pColor);    // a full-screen colour (GoPostFx.c)
@@ -508,8 +508,8 @@ FrontEnd* UI_OpenInterface(char* szSet) {
     UISRegisterPluginFnc(gpFrontEnd->pHandler, 4, UI_BlankProcess4);
     UISRegisterPluginFnc(gpFrontEnd->pHandler, 5, UI_BlankProcess5);
     UISRegisterPluginFnc(gpFrontEnd->pHandler, 6, UI_BlankProcess6);
-    UISRegisterPluginFnc(gpFrontEnd->pHandler, 7, (UISPluginFncT*)fn_800929E4);
-    UISRegisterPluginFnc(gpFrontEnd->pHandler, 8, (UISPluginFncT*)fn_80103684);
+    UISRegisterPluginFnc(gpFrontEnd->pHandler, 7, (UISPluginFncT*)UIText_ProcessMessage);
+    UISRegisterPluginFnc(gpFrontEnd->pHandler, 8, (UISPluginFncT*)UIArc_ProcessMessage);
     UISRegisterResourceFncs(gpFrontEnd->pHandler, UI_ResLoad, UI_ResUnload);
     UISRegisterTransformFncs(gpFrontEnd->pHandler, (UISTransformFncT*)UITransform_HandleOp);
     UISRegisterMessageFnc(gpFrontEnd->pHandler, UI_RunGameMessage);
@@ -537,7 +537,7 @@ FrontEnd* UI_OpenInterface(char* szSet) {
 }
 
 // Shut the UI pFE down. First the movie entries' pictures are freed (UI_FreeAllEntryPictures);
-// leaving start-up with no nC plays the start-up movies and legal screen (fn_80091EE8); leaving the
+// leaving start-up with no nC plays the start-up movies and legal screen (UI_PlayStartUpMovies); leaving the
 // menus sets b0 and clears b1 of every gUITxf2BankState entry whose gUITxf2BankMarkOnExit word is
 // set, clears gbUIFirstMenuDraw (set, then cleared by UI_ClearFirstMenuDraw), and brings the
 // picture list back from ARAM and frees it (UI_RestoreMenuPictures, UI_FreeMenuPictures). Then the
@@ -548,7 +548,7 @@ void UI_CloseInterface(FrontEnd* pFE) {
 
     UI_FreeAllEntryPictures();
     if (gSession.nGameType == 1 && gSession.nC == 0) {
-        fn_80091EE8();
+        UI_PlayStartUpMovies();
     } else if (gSession.nGameType == 3) {
         for (i = 0; i < FE_NUM_801D8890; i++) {
             if (gUITxf2BankMarkOnExit[i] != 0) {
@@ -572,13 +572,13 @@ void UI_CloseInterface(FrontEnd* pFE) {
 }
 
 // Start the UI module (GO_vInitFE, GO_vInitIG, start-up's gomainloop fn_8006CEFC): the font add
-// mode set to 1 (fn_80092BA0), nothing loaded (UI_ResetLoadedFiles), the controller state cleared with all
-// four controllers enabled, the EA Trax display reset (fn_800B9FF0) and the pending UI messages
-// dropped (GameMsg_ClearPending).
+// mode set to 1 (UIText_SetFontDrawAtOnce), nothing loaded (UI_ResetLoadedFiles), the controller
+// state cleared with all four controllers enabled, the EA Trax display reset (fn_800B9FF0) and the
+// pending UI messages dropped (GameMsg_ClearPending).
 void UI_vInitModule(void) {
     s32 i;
 
-    fn_80092BA0();
+    UIText_SetFontDrawAtOnce();
     UI_ResetLoadedFiles();
     gUIState.n34 = 0;
     gUIState.n38 = 0;
@@ -607,13 +607,13 @@ void UI_SendPendingMessages(void) {
 
 // End the UI module (gomainloop's shut-down steps for the menus, a round and start-up): shut the UI
 // down if it is still open (UI_CloseInterface), free the transform stack (UITransform_Shutdown),
-// set the font add mode back to 0 (fn_80092BC4) and free the EA Trax logo (fn_800BA038).
+// set the font add mode back to 0 (UIText_SetFontDrawQueued) and free the EA Trax logo (fn_800BA038).
 void UI_vCloseModule(void) {
     if (gpFrontEnd != NULL) {
         UI_CloseInterface(gpFrontEnd);
     }
     UITransform_Shutdown();
-    fn_80092BC4();
+    UIText_SetFontDrawQueued();
     fn_800BA038();
 }
 

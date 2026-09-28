@@ -21,9 +21,9 @@ struct TexEntry* gpUILoadingBarTexture;
 struct TexBank*  gpUILoadingBarBank;
 
 void fn_80008380(void);
-void fn_80092250(f32* pA, f32* pB, f32* pOut);
-void fn_80092080(LLPict* pPict, f32 fAlpha);    // draws the picture at that alpha
-void fn_80091FC0(LLPict* pPict, int nFrames, f32 fStep);
+void LLMath_Add(f32* pA, f32* pB, f32* pOut);
+void UI_DrawFullScreenPicture(LLPict* pPict, f32 fAlpha);    // draws the picture at that alpha
+void UI_ShowPictureFadingIn(LLPict* pPict, int nFrames, f32 fStep);
 s32  RC_GetCurrentFrameBuffer(void);                 // ViewController.c
 void fn_800760D8(LLPict* pPict);        // LLVideo.c
 void fn_800760F4(f32* pUV, LLPict* pPict);  // LLVideo.c
@@ -34,7 +34,7 @@ void UIPoly_UnpackVertex(FEVertex* pVtx, f32* pPos, f32* pUV, f32* pColour, f32*
 void UI_LoadEntryPicture(s16 nTable, s16 nEntry);
 void UI_ReleaseEntryPicture(s16 nTable, s16 nEntry);
 f32* UITransform_GetViewParams(void);             // uiTransform.c
-void fn_8009222C(f32* pOut, LLPict* pPict);
+void UI_GetPictureUVScale(f32* pOut, LLPict* pPict);
 void UI_InitForHole(void);
 void fn_80006EDC();
 void fn_80006FE8();
@@ -44,11 +44,11 @@ void UI_DrawLoadingBarTile(int nPoint);
 void UI_ShowLoadingBarTile(s32 p0);
 void UI_FadeInLoadingScreen(int nFrames);
 void UI_ShowLoadingScreen(void);
-void fn_80091EE4(void);
-void fn_8009220C(void);
-f32 fn_80092210(void);
+void UI_OnFrontEndStart(void);
+void UI_RestoreAfterMovie(void);
+f32 UI_GetDrawDepth(void);
 void fn_80013E30();
-void fn_80092274(s32 p0);
+void UI_SetCurrentRenderCtxFrameBuffer(s32 p0);
 
 u8 gbUIFirstMenuDraw = 1;
 f32 gFELockedGolferShade = 0.25f;
@@ -96,7 +96,7 @@ void UIPoly_Draw(FEQuad* pQuad) {
     f32 aColour[4][4];
     f32 vScale[4];
     f32 vAdd[4];
-    f32 vPictUV[4];     // fn_8009222C fills all four, two are used; the original's buffer is 16 bytes
+    f32 vPictUV[4];     // UI_GetPictureUVScale fills all four, two are used; the original's buffer is 16 bytes
     f32 fDist;
     f32 fZ;
     f32 fProj;
@@ -114,7 +114,7 @@ void UIPoly_Draw(FEQuad* pQuad) {
     int i;
 
     fDist = UITransform_GetViewParams()[2];
-    fZ = fn_80092210();
+    fZ = UI_GetDrawDepth();
     pMtx = UITransform_GetCurrent();
     pColour = UITransform_GetCurrent();
     pAdd = UITransform_GetCurrent();
@@ -127,7 +127,7 @@ void UIPoly_Draw(FEQuad* pQuad) {
         if (pEntry->u0 & 1) {
             if (gSession.nGameType == 3) {
                 pBank = lbl_801A26DC[pQuad->n0];
-                pTex = fn_800922A0(pBank);
+                pTex = UI_GetTexBankFirstTexture(pBank);
                 RenderState_SetBankTexture(pBank, pTex);
             } else {
                 // the texture bank by the entry's name (UI_GetTextureBankIndex: -1, 0 or 1)
@@ -184,7 +184,7 @@ void UIPoly_Draw(FEQuad* pQuad) {
     UIPoly_UnpackVertex(&aVtx[3], &aPos[3].x, aUV[3], aColour[3], vScale, vAdd);
     if (pQuad->n2 != -1 && (pEntry->u0 & 2)) {
         // a picture fills only part of its texture
-        fn_8009222C(vPictUV, pPict);
+        UI_GetPictureUVScale(vPictUV, pPict);
         aUV[0][0] *= vPictUV[0];
         aUV[0][1] *= vPictUV[1];
         aUV[1][0] *= vPictUV[0];
@@ -230,7 +230,7 @@ void UIPoly_UnpackVertex(FEVertex* pVtx, f32* pPos, f32* pUV, f32* pColour, f32*
     pColour[2] = pVtx->au14[2];
     pColour[3] = pVtx->au14[3];
     LLMath_MultiplyVec(pColour, pScale, pColour);
-    fn_80092250(pColour, pAdd, pColour);
+    LLMath_Add(pColour, pAdd, pColour);
 }
 
 // When a screen loads (message -1 of the polygon and arc elements): if UI file entry (nTable,
@@ -354,7 +354,7 @@ void UI_InitForHole(void) {
 }
 
 // fake match: stands in for a function the original linker stripped. The pool has 512.0f and
-// 448.0f (0x80283BA8, the screen size fn_80092080 uses) before UI_InitLoadingBarTilePos's
+// 448.0f (0x80283BA8, the screen size UI_DrawFullScreenPicture uses) before UI_InitLoadingBarTilePos's
 // constants; its body is unknown.
 static f32 fe_movies_StrippedFn2(f32 x) {
     return x + 448.0f + 512.0f;
@@ -387,7 +387,7 @@ void UI_LoadLoadingBarTexture(void) {
     if (gSession.uFlags & 4) return;
     gUILoadingBarBankSlot = fn_800107C0(lbl_80281C0C, NULL, 0);
     gpUILoadingBarBank = fn_800106C4(gUILoadingBarBankSlot);
-    gpUILoadingBarTexture = fn_800922A0(gpUILoadingBarBank);
+    gpUILoadingBarTexture = UI_GetTexBankFirstTexture(gpUILoadingBarBank);
 }
 
 // Decode the loading screen's picture from the 'load' object's data into gUILoadingScreen.p30,
@@ -464,7 +464,7 @@ void UI_DrawLoadingScreenAndProgressBar(int nMode) {
         }
     }
     fn_80006EDC();
-    fn_80092080(gUILoadingScreen.p30, 1.0f);
+    UI_DrawFullScreenPicture(gUILoadingScreen.p30, 1.0f);
     if (gUILoadingScreen.n1C >= 0) {
         for (i = 0; i <= gUILoadingScreen.n1C; i++) {
             if (i >= 8) break;
@@ -570,7 +570,7 @@ void UI_FadeInLoadingScreen(int nFrames) {
     LLPict* pPict;
 
     pPict = fn_8002FD00(lbl_80281C04, lbl_801A25F0.uSize);
-    fn_80091FC0(pPict, nFrames, 1.0f / 30.0f);
+    UI_ShowPictureFadingIn(pPict, nFrames, 1.0f / 30.0f);
     fn_80008380();
     fn_8002FE70(pPict);
     fn_8002FEAC();
@@ -591,7 +591,7 @@ void UI_ShowDemoLoadingScreen(void) {
     pEntry->p8 = (u8*)fn_8002FD00(pData->aData, pData->uSize);
     pPict = (LLPict*)pEntry->p8;
     fn_800760D8(pPict);
-    fn_80091FC0(pPict, 30, 1.0f / 30.0f);
+    UI_ShowPictureFadingIn(pPict, 30, 1.0f / 30.0f);
     fn_80008380();
     fn_8002FE70((LLPict*)pEntry->p8);
     pEntry->p8 = NULL;
@@ -603,14 +603,16 @@ void UI_ShowDemoLoadingScreen(void) {
     RenderState_Flush();
 }
 
-void fn_80091EE4(void) {
+// Called by GoEntry.c each time the menus start (game type 3), before the intro movie; empty in
+// this build.
+void UI_OnFrontEndStart(void) {
 }
 
-// The start-up movies, when the start-up front end (game type 1, nC 0) shuts down
-// (uiProcessInterface.c UI_CloseInterface): "eas", then, unless the session has flag 0x4000, one of the
-// two cameo movies "tigcam01"/"tigcam02" at random (skippable with any button); then the first
-// 'LEGL' picture startUp.c kept, shown for 180 frames (fading in over 30) and freed.
-void fn_80091EE8(void) {
+// The start-up movies, as the start-up UI (game type 1, nC 0) shuts down (uiProcessInterface.c
+// fn_80090400): "eas", then, unless the session has flag 0x4000, one of the two cameo movies
+// "tigcam01" / "tigcam02" at random (any button skips it); then the first 'LEGL' picture startUp.c
+// kept, shown for 180 frames (fading in over 30) and freed.
+void UI_PlayStartUpMovies(void) {
     char szPath[0x40];          // the size is unknown: the frame leaves 0x40 bytes for it
     char szName[0x40];          // the size is unknown: the frame leaves 0x40 bytes for it
     LLPict* pPict;
@@ -623,15 +625,16 @@ void fn_80091EE8(void) {
         LLVideo_PlayFile(szPath, FE_IsMovieSkipPressed, 0, 0);
     }
     pPict = fn_8002FD00(lbl_80282134, lbl_8028212C);
-    fn_80091FC0(pPict, 180, 1.0f / 30.0f);
+    UI_ShowPictureFadingIn(pPict, 180, 1.0f / 30.0f);
     fn_80008380();
     fn_8002FE70(pPict);
     StaticMem_Free(lbl_80282134);
     lbl_80282134 = NULL;
 }
 
-// Show pPict for nFrames frames, fading it in by fStep a frame (up to 1).
-void fn_80091FC0(LLPict* pPict, int nFrames, f32 fStep) {
+// Show pPict over the whole screen for nFrames frames, a frame each (with the audio stepped and the
+// disc checked, fn_800B7490), its alpha rising by fStep a frame from 0 up to 1.
+void UI_ShowPictureFadingIn(LLPict* pPict, int nFrames, f32 fStep) {
     f32 fAlpha = 0.0f;
     int i;
 
@@ -641,7 +644,7 @@ void fn_80091FC0(LLPict* pPict, int nFrames, f32 fStep) {
         if (fAlpha > 1.0f) {
             fAlpha = 1.0f;
         }
-        fn_80092080(pPict, fAlpha);
+        UI_DrawFullScreenPicture(pPict, fAlpha);
         fn_80006FE8();
         fn_80007254();
         fn_800083A0();
@@ -650,9 +653,10 @@ void fn_80091FC0(LLPict* pPict, int nFrames, f32 fStep) {
     }
 }
 
-// Draw pPict over the whole 512x448 screen at fAlpha, through a frame buffer of its own, then put
-// the previous render slot back.
-void fn_80092080(LLPict* pPict, f32 fAlpha) {
+// Draw pPict over the whole 512 x 448 screen at alpha fAlpha (colour 0.5, the renderer's full
+// strength, alpha 0.5 * fAlpha), through a frame buffer of its own, then put the previous frame
+// buffer back.
+void UI_DrawFullScreenPicture(LLPict* pPict, f32 fAlpha) {
     f32 afColour[4];
     f32 afXY[8];
     f32 afUV[8];
@@ -667,7 +671,7 @@ void fn_80092080(LLPict* pPict, f32 fAlpha) {
     nOld = RC_GetCurrentFrameBuffer();
     FB_vSetFrameBuffer(&frameBuf, 0.0f, 0.0f, 512.0f, 448.0f, 1.0f, 1.0f);
     // port: the render slot is typed s32 but holds a pointer
-    fn_80092274((s32)&frameBuf);
+    UI_SetCurrentRenderCtxFrameBuffer((s32)&frameBuf);
     RenderState_SetViewport(RC_spGetCurrentRenderCtx());
     RenderState_Flush();
     afColour[0] = 0.5f;
@@ -678,11 +682,13 @@ void fn_80092080(LLPict* pPict, f32 fAlpha) {
     fn_800760F4(afUV, pPict);
     RenderView_SetColor(afColour);
     RenderView_DrawPrimitive(0xA1, afXY, 0, afUV, 2);
-    fn_80092274(nOld);
+    UI_SetCurrentRenderCtxFrameBuffer(nOld);
 }
 
-// Free the pixel data of every bank whose entry in gUITxf2BankState has a positive n4.
-void fn_80092198(void) {
+// Before a movie (FE_Manager.c fn_800772E0): free the pixel data (fn_8000FFAC) of each 'txf2'
+// texture bank whose gUITxf2BankState n4 is positive, waiting for the GPU first. Nothing in this
+// build makes n4 positive (FE_Manager.c only clears it), so nothing is freed.
+void UI_FreeTxf2BankPixels(void) {
     int i;
 
     for (i = 0; i < FE_NUM_801D8890; i++) {
@@ -693,18 +699,22 @@ void fn_80092198(void) {
     }
 }
 
-void fn_8009220C(void) {
+// Called after a movie (FE_Manager.c fn_8007731C); empty in this build.
+void UI_RestoreAfterMovie(void) {
 }
 
-f32 fn_80092210(void) {
+// The depth the menu UI's polygons and arcs are drawn at: the front end's f18 (set to 1 when a
+// round starts), 0 without a front end.
+f32 UI_GetDrawDepth(void) {
     if (gpFrontEnd != NULL) {
         return gpFrontEnd->f18;
     }
     return 0.0f;
 }
 
-// The picture's f6C and f70, then 0 and 1.
-void fn_8009222C(f32* pOut, LLPict* pPict) {
+// The texture coordinates of pPict's far corner (f6C, f70: how much of its texture the picture
+// fills), then 0 and 1.
+void UI_GetPictureUVScale(f32* pOut, LLPict* pPict) {
     pOut[0] = pPict->f6C;
     pOut[1] = pPict->f70;
     pOut[2] = 0.0f;
@@ -713,7 +723,7 @@ void fn_8009222C(f32* pOut, LLPict* pPict) {
 
 // b + a into out (four floats)
 #ifdef __MWERKS__
-asm void fn_80092250(register f32* pA, register f32* pB, register f32* pOut) {
+asm void LLMath_Add(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 0, 0
@@ -727,7 +737,7 @@ asm void fn_80092250(register f32* pA, register f32* pB, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_80092250(f32* pA, f32* pB, f32* pOut) {
+void LLMath_Add(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pB[0] + pA[0];
     pOut[1] = pB[1] + pA[1];
     pOut[2] = pB[2] + pA[2];
@@ -735,10 +745,13 @@ void fn_80092250(f32* pA, f32* pB, f32* pOut) {
 }
 #endif
 
-void fn_80092274(s32 p0) {
+// Make p0 (a GoFrameBuf) the current render context's frame buffer (GoRenderCtx_Gc.c fn_80013E30).
+// port: the frame buffer travels as an s32, and fn_80013E30 is declared here without parameters: EA
+//       passes the render-context slot as a third argument it ignores.
+void UI_SetCurrentRenderCtxFrameBuffer(s32 p0) {
     fn_80013E30(*(s32*)((u8*)lbl_80280DF0), p0, lbl_80280DF0);
 }
 
-TexEntry* fn_800922A0(TexBank* pBank) {
+TexEntry* UI_GetTexBankFirstTexture(TexBank* pBank) {
     return pBank->p8;
 }

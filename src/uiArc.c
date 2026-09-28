@@ -1,6 +1,6 @@
 // uiArc.c (our name): a menu UI element drawn as an arc or circle: nSegments pieces from fStart
-// to fEnd degrees (0 to 360 by default), shaded from one colour to another (fn_80102AC8), and
-// the message handler that sets it up (fn_80103684).
+// to fEnd degrees (0 to 360 by default), shaded from one colour to another (UIArc_Draw), and
+// the message handler that sets it up (UIArc_ProcessMessage).
 
 #include "game_types.h"
 #include "llpict.h"
@@ -14,8 +14,8 @@
 void UI_LoadEntryPicture(s16 n2, s16 n0, s16 n8, s32 a, s32 b);
 void UI_ReleaseEntryPicture(s16 n2, s16 n0, s16 n8, s32 a, s32 b);
 void UIPoly_UnpackVertex(FEVertex* pVtx, f32* pPos, f32* pUV, f32* pColour, f32* pScale, f32* pAdd);
-void fn_8009222C(f32* pOut, LLPict* pPict);
-f32  fn_80092210(void);
+void UI_GetPictureUVScale(f32* pOut, LLPict* pPict);
+f32  UI_GetDrawDepth(void);
 f32* UITransform_GetViewParams(void);                 // uiTransform.c
 void fn_800760D8(LLPict* pPict);        // LLVideo.c
 
@@ -25,7 +25,7 @@ f32* gpUIArcColourAdd;
 f32* gpUIArcColourMul;
 
 // fake match: these two stand in for code the original linker stripped. The file's pool starts
-// with the u32 conversion's constant and then 1/511, before fn_80102AC8 uses 0.0f first; their
+// with the u32 conversion's constant and then 1/511, before UIArc_Draw uses 0.0f first; their
 // bodies are unknown, these only reproduce the order (a conversion's constant is pooled after the
 // function's literal constants, hence two functions).
 static f32 uiArc_StrippedFn(u32 n) {
@@ -36,11 +36,14 @@ static f32 uiArc_StrippedFn2(f32 x) {
     return (1.0f / 511.0f) * x;
 }
 
-// Draw pArc: nSegments quads from its inner to its outer radius (v20 * v28 with flag 1, else the
-// centre; v28), from fStart to fEnd degrees (flag 0x10: the whole circle), textured like fe_movies.c's
-// quads, its colour aColorA (flag 0x20: shaded towards aColorB; with flag 4 and not 2, white with
-// only the alpha of the colours). a and b are unused: fn_80103684 passes 0, 0.
-void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
+// Draw pArc, an arc element of the menu UI: nSegments quads from its inner radii (v20 times the
+// outer radii with flag 1, else 0: a pie) to its outer radii v28 (across, down), from fStart to
+// fEnd degrees (flag 0x10: the whole circle), textured like UIPoly_Draw's polygons (in the menus,
+// game type 3, 'txf2' bank n0 + u8), the texture offset by v18 and turned by nQuarterTurns. Its
+// colour is colorA (flag 0x20: shaded from colorA to colorB along the arc; with flag 4 and not 2,
+// white with only the colours' alpha). Drawing stops at the first segment whose four corners are
+// all transparent. a and b are unused: UIArc_ProcessMessage passes 0, 0.
+void UIArc_Draw(UIArc* pArc, s32 a, s32 b) {
     FEVertex aVtx[4];
     Vec4 aPos[4];
     Vec4 aOut[4];
@@ -48,7 +51,7 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
     f32 aColour[4][4];
     f32 vScale[4];
     f32 vAdd[4];
-    f32 vPictUV[4];     // fn_8009222C fills two
+    f32 vPictUV[4];     // UI_GetPictureUVScale fills two
     GXColor colorA;
     GXColor colorB;
     // fake match: scalar declaration order controls CodeWarrior's saved-FPR allocation.
@@ -98,7 +101,7 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
     int j;
 
     fDist = UITransform_GetViewParams()[2];
-    fZ = fn_80092210();
+    fZ = UI_GetDrawDepth();
     pMtx = UITransform_GetCurrent();
     pColour = UITransform_GetCurrent();
     pAdd = UITransform_GetCurrent();
@@ -110,7 +113,7 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
         if (pEntry->u0 & 1) {
             if (gSession.nGameType == 3) {
                 pBank = lbl_801A26DC[pArc->n0 + pArc->u8];
-                RenderState_SetBankTexture(pBank, fn_800922A0(pBank));
+                RenderState_SetBankTexture(pBank, UI_GetTexBankFirstTexture(pBank));
             } else {
                 nBank = UI_GetTextureBankIndex(pName);
                 RenderState_SetBankTexture(gpFrontEnd->p8->ap4[nBank], pEntry->p4);
@@ -283,7 +286,7 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
         UIPoly_UnpackVertex(&aVtx[3], &aPos[3].x, aUV[3], aColour[3], vScale, vAdd);
         if (pArc->n2 != -1 && (pEntry->u0 & 2)) {
             // a movie's picture fills only part of its texture
-            fn_8009222C(vPictUV, pPict);
+            UI_GetPictureUVScale(vPictUV, pPict);
             aUV[0][0] *= vPictUV[0];
             aUV[0][1] *= vPictUV[1];
             aUV[1][0] *= vPictUV[0];
@@ -315,14 +318,18 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
     }
 }
 
-// The element's messages: -1, -3 pass it on, -2 draws it, the others set its fields.
-void fn_80103684(UIArc* pArc, int nMsg, s32 n, MsgArg* pArgs) {
+// The arc element's messages (the UI studio's plugin 8): -1 (its screen loads) decodes its picture,
+// -2 draws it, -3 (its screen unloads) marks the picture to be freed; 1 sets its inner radii (as
+// fractions of the outer), 2 its outer radii, 3 the start and 4 the end angle (degrees), 5 the
+// texture offset, 6 and 7 the two colours (red, green, blue, alpha), 8 the number of segments, 11
+// the texture's turn (pArgs[0] degrees, in quarter turns); 12 to 14 are taken and ignored.
+void UIArc_ProcessMessage(UIArc* pArc, int nMsg, s32 n, MsgArg* pArgs) {
     switch (nMsg) {
     case -1:
         UI_LoadEntryPicture(pArc->n2, pArc->n0, pArc->u8, 0, 0);
         return;
     case -2:
-        fn_80102AC8(pArc, 0, 0);
+        UIArc_Draw(pArc, 0, 0);
         return;
     case -3:
         UI_ReleaseEntryPicture(pArc->n2, pArc->n0, pArc->u8, 0, 0);

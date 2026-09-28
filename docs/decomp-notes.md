@@ -226,7 +226,7 @@ They will be sorted into the sections below.
 - **[verified] `!(u & bit)` as an argument gives `rlwinm; cntlzw; srwi 5`; `(u & bit) == 0` gives
   `extrwi; xori`** (UKernel fn_800491C4 91.9 -> 100).
 - **[verified] `x * (1.0f / 512.0f)` puts the constant first in `fmuls`; `x / 512.0f` puts x first**
-  (uiText fn_800922A8 97.0 -> 98.7).
+  (uiText UIText_Draw 97.0 -> 98.7).
 - **[verified] `(old & 0xFFFFFF) | (v << 24)` gives `slwi` + `rlwimi` into old; the other operand order
   inserts v the other way** (Code8009B340 fn_8009B340 96.7 -> 100). A bitfield store gives `stb` instead.
 - **[verified] A shared product kept in a local sets the `fmadds` operand order** (UMemPool mat44flt_EulerAngles).
@@ -417,7 +417,7 @@ They will be sorted into the sections below.
 - **[verified] EA's vector-scale helpers take the scale first** (TW07 `LLMath_Scale3(float, const float*,
   float*)`): Vec3_Scale / LLMath_Scale fixed in 149 calls; Ball_FlightStep became exact.
 - **Permuter traps:** it ignores branch targets, so a "score 0" result can move a statement out of its `if`
-  and change the behaviour (uiText fn_800922A8); check the diff's meaning. A float operand swap can
+  and change the behaviour (uiText UIText_Draw); check the diff's meaning. A float operand swap can
   score higher but fuse the other multiply into `fmadds` and round differently (AI_ChooseTarget): check
   which product is fused. perm_setup's base.c breaks on `__declspec(export)` and on a char literal
   inside a comment: edit base.c by hand.
@@ -640,7 +640,7 @@ Added 2026-09-27 (from the ledgers solved that night; each ledger has the full s
   first copy-propagation pass deletes every dead copy at once, even under `opt_dead_assignments off`.
 - **[verified, fake-match class] A dead srawi fixes float scheduling too.** A srawi that is ready
   early takes the first free issue slot whatever its source, pushing a float op back: uiArc
-  fn_80102AC8 (EA's first pass issued fV0's `fadds` after the other corners' `fsubs`, the one
+  UIArc_Draw (EA's first pass issued fV0's `fadds` after the other corners' `fsubs`, the one
   interference rasim said was missing). Host it on an int already live through the block, or its
   GPR moves: `((s32)(s64)(s32)pArc->uFlags & 0x10)` in both ternaries, 98.26 -> 100.
   `(s32)(s64)x` without the inner `(s32)` makes no srawi.
@@ -713,7 +713,7 @@ Added 2026-09-27 (from the ledgers solved that night; each ledger has the full s
   BFX_vRender, the third dead statement).
 - **[verified] A one-element local array (`f32 fR[1]`) is scalarized into a frontend temp numbered
   in order of first use**; a dead store (`fR[0] = 0`, removed) counts as a first use. That puts
-  locals among the temps: uiArc fn_80102AC8, every saved FPR EA's (98.08 -> 98.26, labelled).
+  locals among the temps: uiArc UIArc_Draw, every saved FPR EA's (98.08 -> 98.26, labelled).
 - **[verified] Inlined variables are numbered above the caller's hoisted temps**: an inlined
   function's locals get vregs above them (first declared = lowest), its parameters between the
   temps and those locals (UISApi fn_8016A030
@@ -849,7 +849,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   fn_8003241C's parameters in Ter_ObjectDrawData's field order. Worth a look wherever a ledger says
   "argument order" (PictInt_Decode, Stm_Tick, fn_80006A98, fn_8009A708, UISApi/UISEvent).
 - **[verified] File-wide `opt_propagation off` keeps consecutive `x |= c` statements separate**
-  (the frontend otherwise merges them into one `ori`): uiText fn_800922A8 2 -> 0, no function worse.
+  (the frontend otherwise merges them into one `ori`): uiText UIText_Draw 2 -> 0, no function worse.
   A one-file flag: on the after-100% flag audit list.
 - **[observed] A `const` pointer lets loads move past stores through another pointer**; EA's code
   kept each load after the previous store, so EA's parameters were not const. UISScreen fn_8016C270

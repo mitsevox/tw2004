@@ -193,8 +193,8 @@ void ViewController_RestoreViewportRect(int nView) {
 
 // The frame buffer the current render context draws to.
 s32 RC_GetCurrentFrameBuffer(void) {
-    // port: RC_GetCurrentFrameBuffer (and fn_80092274's slot) are typed s32, but the value is the
-    //       frame buffer
+    // port: RC_GetCurrentFrameBuffer (and UI_SetCurrentRenderCtxFrameBuffer's slot) are typed s32,
+    //       but the value is the frame buffer
     return (s32)fn_80013E40(*lbl_80280DF0);
 }
 

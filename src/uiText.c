@@ -1,6 +1,6 @@
 // uiText.c (our name): a menu UI text element (UIText): its string drawn in a font (UFont.c), in
 // its own colour or one of the front end's colour table, aligned and optionally shadowed
-// (fn_800922A8), and the message handler that sets it up (fn_800929E4). Its extent is its data:
+// (UIText_Draw), and the message handler that sets it up (UIText_ProcessMessage). Its extent is its data:
 // it is the only user of the .data 0x80189C38-0x80189CA0, .sbss 0x80281F30-0x80281F38 and .sdata2
 // 0x80283BF0-0x80283C20 blocks, between fe_movies.c's and uiTransform.c's.
 
@@ -22,21 +22,26 @@ void fn_80012CB4_SetWordWrapBox(f32 fX, f32 fY, f32 fW, f32 fH);
 
 void fn_800760B0(s32 nX, s32 nY, s32 nW, s32 nH);
 
-void fn_80092BE8(f32* pColor);
-void fn_80092C38(f32 x0, f32 x1);
-void fn_80092C78(f32 x0, f32 x1);
-void fn_80092CB8(f32 x0);
+void UIText_SetFontShadowColour(f32* pColor);
+void UIText_SetFontShadowOffset(f32 x0, f32 x1);
+void UIText_SetFontAlignPoint(f32 x0, f32 x1);
+void UIText_SetFontAngle(f32 x0);
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
-// 1.0, before the 512 and 448 fn_800922A8 uses first; its body is unknown, this one only
+// 1.0, before the 512 and 448 UIText_Draw uses first; its body is unknown, this one only
 // reproduces the order.
 static f32 uiText_StrippedFn(f32 f) {
     return f + 1.0f;
 }
 
-// Draws the element's string: its place and size through the UI transform (screen units of
-// 512 x 448), its colour through the UI Studio's multiply and add, then the string itself.
-void fn_800922A8(UIText* pText) {
+// Draw pText, a text element of the menu UI: its string (nText, an offset from the element) in font
+// n4, placed and sized through the current UI transform (screen units of 512 x 448) and turned by
+// the transform's angle (f60) about its point (f64, f68). Flags 0x100 / 0x200 give it a box f30
+// wide / f34 high to word-wrap in; flag 1 centres it (across its box with 0x100), flag 2 aligns it
+// right; flag 0x10 draws a shadow in aShadowColor, moved by f24, f28. Its colour is colour-table
+// colour n8 (not -1) or aColor, tinted by the UI studio's multiply and add, the alpha offset by the
+// transform's (f5C) and held to 0..0.5; nothing is drawn at alpha 0.
+void UIText_Draw(UIText* pText) {
     UITransform t;
     f32 m[4][4];
     f32 aColor[4];
@@ -76,8 +81,8 @@ void fn_800922A8(UIText* pText) {
     vPos.w = 1.0f;
     fn_80012B9C(t.f6C, t.f70);
     fn_80012B6C(m[2][2]);
-    fn_80092CB8(-t.f60);
-    fn_80092C78(t.f64 / 512.0f, t.f68 / 448.0f);
+    UIText_SetFontAngle(-t.f60);
+    UIText_SetFontAlignPoint(t.f64 / 512.0f, t.f68 / 448.0f);
     if (t.f60 > 0.0f) {
         uFlags |= 4;
         uFlags |= 0x400;
@@ -133,9 +138,9 @@ void fn_800922A8(UIText* pText) {
         if (aColor[3] > 0.5f) {
             aColor[3] = 0.5f;
         }
-        fn_80092C38(pText->f24 / 512.0f, pText->f28 / 512.0f);
+        UIText_SetFontShadowOffset(pText->f24 / 512.0f, pText->f28 / 512.0f);
         uFlags |= 0x10000;
-        fn_80092BE8(aColor);
+        UIText_SetFontShadowColour(aColor);
     }
     nColor = pText->n8;
     pTable = gpFrontEnd->p14;
@@ -177,19 +182,27 @@ void fn_800922A8(UIText* pText) {
     }
 }
 
-void fn_800929E0(UIText* pText) {
+// The text element's step when its screen loads (message -1 of UIText_ProcessMessage); empty in
+// this build.
+void UIText_OnScreenLoad(UIText* pText) {
 }
 
-// The element's messages: -2 draws it, -1 does nothing here, the others set or get its fields.
-void fn_800929E4(UIText* pText, int nMsg, s32 n, MsgArg* pArgs, MsgArg* pResult) {
+// The text element's messages (the UI studio's plugin 7): -1 (its screen loads) does nothing here,
+// -2 draws it, -3 is taken and ignored; 0 sets its colour and 1 its shadow's colour (pArgs[0..3],
+// red, green, blue, alpha); 3 sets its string (kept as an offset from the element) and 4 answers
+// it; 5 its alignment (0 centred, 1 right, else left); 6 its position (pArgs[0..2]); 8 its
+// colour-table colour n8 (the low 16 bits of pArgs[0]) and nA (the high 16); 16 / 17 set / answer
+// nE; 18 / 19 set its box's width / height (f30, f34) from an integer, 20 / 21 answer them as
+// integers.
+void UIText_ProcessMessage(UIText* pText, int nMsg, s32 n, MsgArg* pArgs, MsgArg* pResult) {
     u32 uValue;
 
     switch (nMsg) {
     case -1:
-        fn_800929E0(pText);
+        UIText_OnScreenLoad(pText);
         return;
     case -2:
-        fn_800922A8(pText);
+        UIText_Draw(pText);
         return;
     case 0:
         pText->aColor[0] = pArgs[0].i;
@@ -254,41 +267,50 @@ void fn_800929E4(UIText* pText, int nMsg, s32 n, MsgArg* pArgs, MsgArg* pResult)
 // ---- sweep code (not yet cleaned up) ----
 
 void FO_vSetCurrentAddMode();
-void fn_80092BA0(void);
-void fn_80092BC4(void);
-void fn_80092BA0(void) {
+void UIText_SetFontDrawAtOnce(void);
+void UIText_SetFontDrawQueued(void);
+// Strings are drawn at once from now on, not queued (FO_vSetCurrentAddMode 1); uiProcessInterface.c
+// calls it when it resets the UI.
+void UIText_SetFontDrawAtOnce(void) {
     FO_vSetCurrentAddMode(1);
 }
 
-void fn_80092BC4(void) {
+// Strings are queued again (FO_vSetCurrentAddMode 0); uiProcessInterface.c calls it as the UI
+// closes.
+void UIText_SetFontDrawQueued(void) {
     FO_vSetCurrentAddMode(0);
 }
 
 // ---- end of sweep code ----
 
-// Sets up the text shadow: nC4 0x12, and uC8 packed from the colour pColor.
-void fn_80092BE8(f32* pColor) {
+// The text shadow's colour: pColor packed into the font settings' uC8, with colour mode 0x12 (nC4),
+// which draws in that one colour.
+void UIText_SetFontShadowColour(f32* pColor) {
     FO_spGetCurrentPacket()->nC4 = 0x12;
     UFont_PackColor(pColor, (u8*)&FO_spGetCurrentPacket()->uC8);
 }
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_80092C38(f32 x0, f32 x1) {
+// How far the text shadow is moved (the font settings' fCC, fD0): fX across, fY down.
+void UIText_SetFontShadowOffset(f32 x0, f32 x1) {
     UFontContext* pCtx;
     pCtx = FO_spGetCurrentPacket();
     pCtx->fCC = x0;
     pCtx->fD0 = x1;
 }
 
-void fn_80092C78(f32 x0, f32 x1) {
+// The point text is aligned on with alignment flags 4 and 0x400 (the font settings' fBC, fC0, as
+// fractions of the text's size): UIText_Draw sets it to the pivot of a turned text.
+void UIText_SetFontAlignPoint(f32 x0, f32 x1) {
     UFontContext* pCtx;
     pCtx = FO_spGetCurrentPacket();
     pCtx->fBC = x0;
     pCtx->fC0 = x1;
 }
 
-void fn_80092CB8(f32 x0) {
+// The angle text is turned by (the font settings' fB8; 0: not turned).
+void UIText_SetFontAngle(f32 x0) {
     UFontContext* pCtx;
     pCtx = FO_spGetCurrentPacket();
     pCtx->fB8 = x0;

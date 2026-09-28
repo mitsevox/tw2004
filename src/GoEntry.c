@@ -29,7 +29,7 @@ void GO_vInitIG(void);
 void fn_80008380(void);
 void SkinBurn_CheckSignatureFile(void);
 void SaveProfile_SetupDummy(void);
-void fn_80091EE4(void);
+void UI_OnFrontEndStart(void);
 void FE_PlayIntroMovies(void);
 void Gaud_StartFEMusic(int a);
 void GameMode26_StartEvent(void);                     // GameMode26.c
@@ -103,7 +103,7 @@ void fn_800083A4(void) {
             gSession.nGameType = 3;
             break;
         case 3:
-            fn_80091EE4();
+            UI_OnFrontEndStart();
             if (gFEState.b0F) {
                 FE_PlayIntroMovies();
             }

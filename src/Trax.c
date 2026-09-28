@@ -89,7 +89,7 @@ void fn_800BA1A4(void) {
     if (gEATraxDisplay.bShow && gEATraxDisplay.nFrames < 240) {
         if (fn_800BA080()) {
             pBank = fn_800106C4(gEATraxDisplay.nLogo);
-            pTex = fn_800922A0(pBank);
+            pTex = UI_GetTexBankFirstTexture(pBank);
         }
         RenderState_SetBlendFactors(4, 5);
         DS_vSetAlphaTestMode(0, 6, 0x80);

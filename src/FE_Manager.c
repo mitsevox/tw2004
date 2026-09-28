@@ -31,8 +31,8 @@ void FE_StreamSetNextState(int a);
 void FE_StreamWaitForState(int a);
 void FE_vInitFECharModule(void);
 void FE_vExecuteClearGolferCache(void);
-void fn_80092198(void);
-void fn_8009220C(void);
+void UI_FreeTxf2BankPixels(void);
+void UI_RestoreAfterMovie(void);
 void Gaud_StartFEMusic(int a);
 void Gaud_ExitFE(void);
 void GameMode4_ExitFE(void);
@@ -253,20 +253,20 @@ void FE_movieFade(void) {
 
 // Makes room before a movie plays (FE_movieFade): the menu golfers' streaming is stopped
 // (FE_StreamSetNextState(1), interrupted, waited for), the golfer cache cleared, and the pixel data
-// of the menus' texture banks freed (fn_80092198).
+// of the menus' texture banks freed (UI_FreeTxf2BankPixels).
 void FE_PreMovieSetup(void) {
     FE_StreamSetNextState(1);
     FE_StreamInterruptState();
     FE_StreamWaitForState(1);
     FE_vClearGolferCache();
     FE_vExecuteClearGolferCache();
-    fn_80092198();
+    UI_FreeTxf2BankPixels();
 }
 
-// After a movie (FE_movieFade): fn_8009220C (empty) and the menu golfers' textures set up again
+// After a movie (FE_movieFade): UI_RestoreAfterMovie (empty) and the menu golfers' textures set up again
 // (FE_InitGolferTextures).
 void FE_PostMovieSetup(void) {
-    fn_8009220C();
+    UI_RestoreAfterMovie();
     FE_InitGolferTextures();
 }
 
