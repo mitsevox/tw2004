@@ -46,7 +46,7 @@ void GameModeDriverPGATour_EndHole(void);
 u8   GameModeDriverPGATour_GameFinished(u8 bCheck);
 u8   GameModeDriverPGATour_GoToPlayoff(u8 bCheck);
 s32  GameModeDriverPGATour_GetEventOnOrAfter(s32 i);
-s32  fn_800F02A8(void);
+s32  GameModeDriverPGATour_GetNumEventsWon(void);
 
 // Stroke play's hole and honors rules, the tour's own round and
 // playoff handling; no mulligans, no split screen.
@@ -299,7 +299,7 @@ void fn_800EE8C4(void) {
     int i;
     int nWins;
     if (lbl_80205F30.b0 == 1) {
-        if (fn_800F02A8() == 0) {
+        if (GameModeDriverPGATour_GetNumEventsWon() == 0) {
             GUI_QueueMessage(5, 31, 0, 0);
         }
         if (p->nC) {
@@ -448,7 +448,7 @@ void fn_800EF094(int a, s32 n) {
 
 // The player's bracket, 0..9: tournaments won x 10 / 31 (profile 0's awards; nPlayer is not read).
 s32 fn_800EF0E0(int nPlayer) {
-    s32 n = fn_800F02A8() * 10 / 31;
+    s32 n = GameModeDriverPGATour_GetNumEventsWon() * 10 / 31;
     return n > 9 ? 9 : n;
 }
 
@@ -844,16 +844,21 @@ s32 GameModeDriverPGATour_GetTextureID(s32 i) {
     return GameModeDriverPGATour_GetEventInfo(i)->n10;
 }
 
+// Tournament i's champion before the tour is played, from the 'PGAc' data: a new tour in a profile
+// starts each tournament's champion with it (GameModeDriverPGATour_GetChamp gives the latest).
 char* GameModeDriverPGATour_GetInitialChampName(s32 i) {
     return gPgaData.aTournament[i].szChampName;
 }
 
+// The winning score of tournament i's champion before the tour is played, from the 'PGAc' data (see
+// GameModeDriverPGATour_GetInitialChampName).
 s32 GameModeDriverPGATour_GetInitialChampScore(s32 i) {
     return gPgaData.aTournament[i].nChampScore;
 }
 
-// The course of each round of a tournament; returns the
-// number of rounds.
+// The course of each round of tournament p into pCourses (up to 4); returns the number of rounds.
+// The NULL test on its format never fails: p must have one (nTourEvent 0 would read the entry
+// before aTourEvent).
 s32 GameModeDriverPGATour_GetCourses(Tournament* p, s32* pCourses) {
     TourEvent* pEvent = &gPgaData.aTourEvent[p->nTourEvent - 1];
     s32 nRounds;
@@ -870,8 +875,8 @@ s32 GameModeDriverPGATour_GetCourses(Tournament* p, s32* pCourses) {
     return 0;
 }
 
-// Tournament i's total purse as text: in the
-// player's bracket when it was played, else in the current one.
+// Tournament i's total purse as money text into pDst (no "$"): in the bracket profile 0 played it
+// in for a tournament already past, else in the player's current bracket.
 void GameModeDriverPGATour_GetPurseString(s32 i, char* pDst) {
     PlayerNumber_t nPlayer = PLR_1_e;
     SeasonEvent* p = &gpSaveData[nPlayer].tour.aEvent[i];
@@ -884,7 +889,8 @@ void GameModeDriverPGATour_GetPurseString(s32 i, char* pDst) {
     fn_800907AC(GameModeDriverPGATour_ComputePurseForBracket(i, nBracket), pDst);
 }
 
-// The leader's name, or "Tied (%d players)".
+// The current tournament's leader into pDst: the golfer's name, or "Tied (%d players)" when several
+// share first place.
 void GameModeDriverPGATour_GetCurrentEventLeader(char* pDst) {
     s32 n = fn_80118684(0);
     if (n > 1) {
@@ -896,13 +902,15 @@ void GameModeDriverPGATour_GetCurrentEventLeader(char* pDst) {
     }
 }
 
-// The leader's score in the current tournament.
-int fn_800F009C(void) {
+// The current tournament leader's score to par so far (the entrant in score row 0; the last
+// argument is 1 unless the leader is the player).
+int GameModeDriverPGATour_GetCurrentLeaderScore(void) {
     s32 nLeader = GM_PgaTourSim_GetEntrantIDFromScoreRow(0, 0);
     return GM_PgaTourSim_GetRelativeScoreFromEntrantID(0, nLeader, GM_PgaTourSim_IsEntrantUser(0, nLeader) == 0);
 }
 
-// The same for the first prize (the winner's share).
+// Tournament i's first prize (the winner's share) as money text into pDst (no "$"): in the bracket
+// profile 0 played it in for a tournament already past, else in the player's current bracket.
 void GameModeDriverPGATour_GetWinnerEarningsString(s32 i, char* pDst) {
     PlayerNumber_t nPlayer = PLR_1_e;
     SeasonEvent* p = &gpSaveData[nPlayer].tour.aEvent[i];
@@ -915,13 +923,14 @@ void GameModeDriverPGATour_GetWinnerEarningsString(s32 i, char* pDst) {
     fn_800907AC(GameModeDriverPGATour_ComputeFirstPrizeForBracket(i, nBracket), pDst);
 }
 
-// The player's own score in the current tournament. The event (EventInfo.c passes it) is not used.
-int fn_800F018C(s32 nEvent) {
+// The player's score to par so far in the current tournament (entrant 0). nEvent is not read
+// (EventInfo.c passes the tournament shown).
+int GameModeDriverPGATour_GetUserScore(s32 nEvent) {
     return GM_PgaTourSim_GetRelativeScoreFromEntrantID(0, 0, GM_PgaTourSim_IsEntrantUser(0, 0) == 0);
 }
 
-// Profile 0's result in tournament i:
-// "Did Not Play", "Cut", or the place.
+// Profile 0's result in tournament i this season into pDst: "Did Not Play", "Cut", or the place as
+// a number (pDst is left as it is for any other result kind).
 void GameModeDriverPGATour_GetUserFinishString(s32 i, char* pDst) {
     switch (gpSaveData->tour.aEvent[i].nUserRankType) {
     case 0:
@@ -936,16 +945,21 @@ void GameModeDriverPGATour_GetUserFinishString(s32 i, char* pDst) {
     }
 }
 
+// Tournament i's latest champion into pDst, from profile 0's tour: set when the tournament ends,
+// the tour data's champion (GameModeDriverPGATour_GetInitialChampName) until then.
 void GameModeDriverPGATour_GetChamp(s32 i, char* pDst) {
     strcpy(pDst, gpSaveData->tour.aEvent[i].szChampName);
 }
 
+// The winning score of tournament i's latest champion (to par when the tournament was played on the
+// tour), from profile 0's tour.
 s32 GameModeDriverPGATour_GetChampScore(s32 i) {
     return gpSaveData->tour.aEvent[i].nChampScore;
 }
 
-// How many tournaments profile 0 has won.
-s32 fn_800F02A8(void) {
+// How many of the 31 tournaments profile 0 has won: its awards (aC8[].award), so each tournament
+// counts once however often it was won. The player's prize bracket is worked out from it.
+s32 GameModeDriverPGATour_GetNumEventsWon(void) {
     s32 n = 0;
     s32 i;
     for (i = 0; i < 31; i++) {
@@ -956,21 +970,28 @@ s32 fn_800F02A8(void) {
     return n;
 }
 
-s32 fn_800F02D4(s32 i) {
+// Sponsorship offer i's (0..10, the 'PGAp' data) game progress: the offer is made once the
+// profile's game progress (GM_GetGameProgress) reaches it.
+s32 GameModeDriverPGATour_GetSponsorshipProgress(s32 i) {
     return gPgaData.aTriple[i].n0;
 }
 
-s32 fn_800F02EC(s32 i) {
+// Sponsorship offer i's signing money, paid into the profile's money when the sponsorship is
+// signed.
+s32 GameModeDriverPGATour_GetSponsorshipStartCash(s32 i) {
     return gPgaData.aTriple[i].n4;
 }
 
-s32 fn_800F0304(s32 i) {
+// Sponsorship offer i's cash bonus: paid for each of the sponsor's items the player wears.
+s32 GameModeDriverPGATour_GetSponsorshipBonusCash(s32 i) {
     return gPgaData.aTriple[i].n8;
 }
 
-// The message after a round, if there is one: after the second round whether the player made the
-// cut, and in a playoff the score to beat.
-s32 fn_800F031C(char* pDst) {
+// The tour's message after the player's hole into pDst; returns 1 when there is one, else 0. After
+// the 18th hole of the second round: whether the player made the cut (the top 70). In a playoff
+// (gpGame->bD4) that the player is in with at least one other: the opponent's best score on the
+// playoff hole, which the player must beat.
+s32 GameModeDriverPGATour_DisplayEndOfHoleMessage(char* pDst) {
     PlayerNumber_t nPlayer = PLR_1_e;
     if (gpSaveData[nPlayer].tour.nRound == 1 && GM_PgaTourSim_GetCurrentHoleFromEntrantID(0, 0) == 18) {
         if (GM_PgaTourSim_GetWasCutFromEntrantID(0, 0)) {
@@ -991,6 +1012,8 @@ s32 fn_800F031C(char* pDst) {
     return 0;
 }
 
-s32 fn_800F0428(s32 nPlayer) {
+// Profile nPlayer's current tournament: -1 once its season's last one is over (the calendar's
+// PGATour_GetPopupType tests that).
+s32 GameModeDriverPGATour_GetUsersCurrentEventID(s32 nPlayer) {
     return gpSaveData[nPlayer].tour.nEvent;
 }

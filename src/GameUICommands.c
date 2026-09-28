@@ -311,7 +311,7 @@ int   fn_800ED314(void);
 void  fn_800ED554(void);
 void  fn_800ED974(void);
 Pga80205F30* fn_800EE8B8(void);
-s32   fn_800F031C(char* pDst);
+s32   GameModeDriverPGATour_DisplayEndOfHoleMessage(char* pDst);
 s32   GM_RealtimeMode_GetSelectedEvent(s32* pRound);
 int   fn_800F1960(void);
 void  fn_800F1DF0(void);
@@ -2730,7 +2730,7 @@ void fn_8008A8E8(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8008A914(MsgArg* pArgs, MsgArg* pResult) {
-    if ((u8)fn_800F031C(((MsgString*)pArgs[0].p)->pStr) != 0) {
+    if ((u8)GameModeDriverPGATour_DisplayEndOfHoleMessage(((MsgString*)pArgs[0].p)->pStr) != 0) {
         pResult->i = 1;
         return;
     }

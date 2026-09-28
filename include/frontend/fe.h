@@ -320,7 +320,7 @@ LAYOUT_ASSERT(CrAPDB, 0x18);
 typedef struct CrAPRecord {
     s16  n0;                    // 0x00  the sponsor (an index into lbl_801935C8)
     u8   unk2[2];
-    s32  n4;                    // 0x04  fn_800F0304 of the sponsorship entry (TW07: the cash bonus)
+    s32  n4;                    // 0x04  GameModeDriverPGATour_GetSponsorshipBonusCash of the sponsorship entry (TW07: the cash bonus)
     char sz8[0x2C - 0x8];       // 0x08  the worn asset's name (FE_CrAP_CollectSponsorshipItems)
 } CrAPRecord;
 LAYOUT_ASSERT(CrAPRecord, 0x2C);

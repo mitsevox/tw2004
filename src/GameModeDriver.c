@@ -328,8 +328,8 @@ s32 PGATour_FillCell(char* sz, u16 nDate, s32* pCellColor, s32* pCellState) {
 // Which day-details popup the PGA TOUR calendar shows for a date's tournament (the calendar screen
 // keeps it in CalendarState.n1C for PGATour_GetPopupRow), by its start against the current
 // tournament's: 1 results (an earlier tournament, or any while player 1 has no current tournament,
-// fn_800F0428(0) == -1), 3 the current one before it starts (today is its first round), 0 the
-// current one in progress, 2 upcoming (a later one).
+// GameModeDriverPGATour_GetUsersCurrentEventID(0) == -1), 3 the current one before it starts (today
+// is its first round), 0 the current one in progress, 2 upcoming (a later one).
 s32 PGATour_GetPopupType(u16 nDate) {
     s32 nId;
     s32 nTodayId;
@@ -343,7 +343,7 @@ s32 PGATour_GetPopupType(u16 nDate) {
     GameModeDriverPGATour_GetEventByDate(nDate, &nId, &nRound);
     nTodayStart = GameModeDriverPGATour_GetStartDate(nTodayId);
     nStart = GameModeDriverPGATour_GetStartDate(nId);
-    if (fn_800F0428(0) == -1) {
+    if (GameModeDriverPGATour_GetUsersCurrentEventID(0) == -1) {
         return 1;
     }
     if (nStart < nTodayStart) {

@@ -1032,7 +1032,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   moves it after the store (GoGolfCam `fn_800C0880`, 94.6% -> 100).
 - **[verified] A typed struct-pointer global indexes differently from a cast byte pointer.**
   `extern Profile* gpSaveData; gpSaveData[n].f` gives `addis base; add; lwz off`;
-  `((Profile*)u8ptr)[n].f` gives `addis idx; addi; lwzx` (GameMode23 `fn_800F0428` 83.75% -> 100).
+  `((Profile*)u8ptr)[n].f` gives `addis idx; addi; lwzx` (GameMode23 `GameModeDriverPGATour_GetUsersCurrentEventID` 83.75% -> 100).
 - **[verified] `a[x - 1]` folds the -1 into the displacement; `n = x - 1; a[n]` keeps a `subi`.**
   Per function: GameMode23 `fn_800EE064` needs the local, its neighbour `fn_800EFA9C` does not.
 - **[verified] Pointer-to-index with `mulhwu` is a byte difference divided by `sizeof`.**

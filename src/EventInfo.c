@@ -64,7 +64,7 @@ void fn_8011D280(int nLine, char* szLabel, char* szValue) {
         break;
     case 7: {
         // Each score case has its own block-scoped local (a shared one allocates differently).
-        int nScore = fn_800F009C();
+        int nScore = GameModeDriverPGATour_GetCurrentLeaderScore();
         strcpy(szLabel, "Score:");
         if (nScore == 0) {
             sprintf(szValue, "E");
@@ -76,7 +76,7 @@ void fn_8011D280(int nLine, char* szLabel, char* szValue) {
         break;
     }
     case 8: {
-        int nScore = fn_800F018C(nId);
+        int nScore = GameModeDriverPGATour_GetUserScore(nId);
         strcpy(szLabel, "Your Score:");
         if (nScore == 0) {
             sprintf(szValue, "E");

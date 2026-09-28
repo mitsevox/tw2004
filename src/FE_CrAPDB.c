@@ -1830,8 +1830,8 @@ s32 FE_CrAP_GetNextUnlockVal(s32 nKind, s32 nAfter) {
 
 // Fill the sponsorship records (lbl_80282470, their count in lbl_8028246C): for each of the
 // profile's 11 a1054C entries that is on (b), one record per worn asset of its sponsor (n), holding
-// the sponsor, fn_800F0304 of the entry (TW07 calls it the cash bonus) and the asset's name.
-// Returns how many records there are.
+// the sponsor, GameModeDriverPGATour_GetSponsorshipBonusCash of the entry (TW07 calls it the cash
+// bonus) and the asset's name. Returns how many records there are.
 s32 FE_CrAP_CollectSponsorshipItems(void) {
     s32 aAssets[64];
     s16 nSlot;
@@ -1855,7 +1855,7 @@ s32 FE_CrAP_CollectSponsorshipItems(void) {
             for (j = 0; j < nAssets; j++) {
                 if (pProfile->a1054C[i].n == lbl_80282460->pAssets[pBase[j]].n2C) {
                     lbl_80282470[lbl_8028246C].n0 = pProfile->a1054C[i].n;
-                    lbl_80282470[lbl_8028246C].n4 = fn_800F0304(i);
+                    lbl_80282470[lbl_8028246C].n4 = GameModeDriverPGATour_GetSponsorshipBonusCash(i);
                     strcpy(lbl_80282470[lbl_8028246C].sz8, lbl_80282460->pAssets[pBase[j]].szName);
                     lbl_8028246C++;
                 }

@@ -78,8 +78,8 @@ u16  GameModeDriverPGATour_GetStartDate(s32 i);                // the tournament
 u16  GameModeDriverPGATour_GetEndDate(s32 i);
 char* GameModeDriverPGATour_GetName(s32 i);
 s32  GameModeDriverPGATour_GetTextureID(s32 i);
-int  fn_800F009C(void);                 // the leader's score in the current tournament
-int  fn_800F018C(s32 nEvent);           // the player's own score in it (nEvent is not used)
+int  GameModeDriverPGATour_GetCurrentLeaderScore(void);                 // the leader's score in the current tournament
+int  GameModeDriverPGATour_GetUserScore(s32 nEvent);           // the player's own score in it (nEvent is not used)
 
 // GameModeDriverPGATour.c, as the tour simulation (PGATourSimulation.c) uses it
 void fn_800EF094(int a, s32 n);       // the player's prize: n, at the player's place
@@ -95,10 +95,10 @@ void GameModeDriverPGATour_GetWinnerEarningsString(s32 i, char* pDst);
 void GameModeDriverPGATour_GetUserFinishString(s32 i, char* pDst);
 void GameModeDriverPGATour_GetChamp(s32 i, char* pDst);
 s32  GameModeDriverPGATour_GetChampScore(s32 i);
-s32  fn_800F0428(s32 nPlayer);
+s32  GameModeDriverPGATour_GetUsersCurrentEventID(s32 nPlayer);
 
 // GameModeDriverPGATour.c, as FE_CrAPDB.c uses it
-s32  fn_800F0304(s32 i);                // aTriple[i].n8
+s32  GameModeDriverPGATour_GetSponsorshipBonusCash(s32 i);                // aTriple[i].n8
 
 // GameModeDriverPGATour.c, as the PGA TOUR menus (FE_PGATourMessages.c) use it
 void fn_800EEF88(s32 nPlayer);
@@ -106,7 +106,7 @@ s32  fn_800EF834(void);                 // the number of tournaments (31)
 s32  GameModeDriverPGATour_AdvanceSeason(void);                 // the next season: 0 after the tenth
 s32  GameModeDriverPGATour_GetCurrentSeasonYear(void);                 // the current season's year
 s32  GameModeDriverPGATour_GetCurrentEventID(void);
-s32  fn_800F02D4(s32 i);                // aTriple[i].n0
-s32  fn_800F02EC(s32 i);                // aTriple[i].n4
+s32  GameModeDriverPGATour_GetSponsorshipProgress(s32 i);                // aTriple[i].n0
+s32  GameModeDriverPGATour_GetSponsorshipStartCash(s32 i);                // aTriple[i].n4
 
 #endif

@@ -325,9 +325,9 @@ void fn_8010EF8C(MsgArg* pArgs, MsgArg* pResult) {
     bFound = 0;
 
     do {
-        nProgress = fn_800F02D4(i);
-        n4 = fn_800F02EC(i);
-        n8 = fn_800F0304(i);
+        nProgress = GameModeDriverPGATour_GetSponsorshipProgress(i);
+        n4 = GameModeDriverPGATour_GetSponsorshipStartCash(i);
+        n8 = GameModeDriverPGATour_GetSponsorshipBonusCash(i);
         if (!pProfile->a1054C[i].b && nProgress <= (s32)GM_GetGameProgress(pProfile)) {
         retry:
             nKind = lbl_80193CFC[Misc_RandFunc(0) % 11];
@@ -364,7 +364,7 @@ void fn_8010F10C(MsgArg* pArgs, MsgArg* pResult) {
     s32* pValue = (s32*)pArgs[1].p;
     s32* pKind = (s32*)pArgs[2].p;
     int nCount = 0;
-    s32 n8 = fn_800F0304(i);
+    s32 n8 = GameModeDriverPGATour_GetSponsorshipBonusCash(i);
 
     if (pProfile->a1054C[i].b) {
         nCount = FE_CrAP_GetNumEquippedItemsWithSponsor(pProfile->a1054C[i].n);
@@ -386,8 +386,8 @@ void fn_8010F1B4(MsgArg* pArgs, MsgArg* pResult) {
 
     fn_800588D4(lbl_80193CFC[Misc_RandFunc(0) % 11]);
     *pKind = fn_800588E8();
-    *p4 = fn_800F02EC(0);
-    *p8 = fn_800F0304(0);
+    *p4 = GameModeDriverPGATour_GetSponsorshipStartCash(0);
+    *p8 = GameModeDriverPGATour_GetSponsorshipBonusCash(0);
 }
 
 // ---- sweep code (not yet cleaned up) ----
@@ -509,7 +509,7 @@ void fn_8010F5AC(MsgArg* pArgs, MsgArg* pResult) {
 
     if (pProfile->a1054C[i].b) {
         *pKind = pProfile->a1054C[i].n;
-        *p8 = fn_800F0304(i);
+        *p8 = GameModeDriverPGATour_GetSponsorshipBonusCash(i);
         *p3 = 0;
         return;
     }

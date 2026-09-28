@@ -303,7 +303,7 @@ void fn_80057438(SaveProfile* pProfile) {
     } else {
         pProfile->n6C = lbl_801D7148.n1C + 25000;
         if (lbl_80281DF0.b) {
-            pProfile->n6C += fn_800F02EC(0);
+            pProfile->n6C += GameModeDriverPGATour_GetSponsorshipStartCash(0);
         }
     }
 
