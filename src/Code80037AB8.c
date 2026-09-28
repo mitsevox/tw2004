@@ -75,7 +75,7 @@ void fn_80037CD8(Skin* pSkin) {
 
     fn_80037708(pSkin);
     fn_8011CD84(pSkin);
-    fn_800CD56C(pSkin);
+    SkinPart_FreeChoices(pSkin);
     pModel = pSkin->pModel;
     if (pModel != NULL) {
         if (pModel->pDesc != NULL) {

@@ -1185,7 +1185,7 @@ void FE_CrAP_GetPartColorRGBA(s16 nPart, int b, int i, int n, u8* pColor) {
         nOption = SkinPart_FindSetOption(pSkin, nSet, nVariant, pAsset->aSetOption[0]);
         if (nOption >= 0) {
             // the option's data is three RGB colours, 0..1 each
-            pOption = (f32*)fn_800CD248(pSkin, nSet, nVariant, nOption);
+            pOption = (f32*)SkinPart_GetSetOptionData(pSkin, nSet, nVariant, nOption);
             if (pOption == NULL) {
                 pColor[0] = pAsset->aColor[n][0];
                 pColor[1] = pAsset->aColor[n][1];

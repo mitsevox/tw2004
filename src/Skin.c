@@ -22,10 +22,10 @@ void  fn_8006ED70(void);                       // GoLighting.c
 void  fn_801127A0(void* pDesc);                // hwsMaterial_Gc.c
 void  SkinPart_SetChangeAllCopies(u8 b);                       // SkinPart.c
 void  fn_800CEF04(SkinDesc* pDesc);            // SkinPart.c: offsets to pointers
-void  fn_800CD404(Skin* pSkin);                // SkinPart.c
-s32   fn_800CD700(Skin* pSkin);                // SkinPart.c
+void  SkinPart_AllocChoices(Skin* pSkin);                // SkinPart.c
+s32   SkinPart_GetMaxOptionsSize(Skin* pSkin);                // SkinPart.c
 void  fn_800CE164(void);                       // SkinPart.c
-void  fn_800CDA68(Skin* pSkin);                // SkinPart.c
+void  SkinPart_UpdateMarks(Skin* pSkin);                // SkinPart.c
 void  fn_8011C9B0(Skin* pSkin);                // SkinMorph.c
 s32   fn_8011CDE8(Skin* pSkin);                // SkinMorph.c
 void  fn_8011CE58(Skin* pSkin);                // SkinMorph.c
@@ -593,7 +593,7 @@ void fn_8003662C(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst, int 
     if (!(pSkin->u10D4 & 2)) {
         return;
     }
-    fn_800CDA68(pSkin);
+    SkinPart_UpdateMarks(pSkin);
     if (pSkin->p108C != pCharModel->p768) {
         Mem_cpy(pSkin->p108C[nFirst], pCharModel->p768[nFirst + nSkip],
                 (pSkin->pModel->n14 - nFirst) * sizeof(*pSkin->p108C));
@@ -949,7 +949,7 @@ s32 fn_800375AC(Skin* pSkin, u8 b) {
     BitArray_ClearAll(pSkin->p10CC, pModel->n50);
     BitArray_ClearAll(pSkin->p10D0, pModel->n40);
     if (pDesc != NULL) {
-        fn_800CD700(pSkin);
+        SkinPart_GetMaxOptionsSize(pSkin);
         nSize = fn_8011CDE8(pSkin);
         if (nSize != 0) {
             pSkin->a1098[0] = fn_801128C8(pModel->pDesc, nSize);
@@ -1079,7 +1079,7 @@ Skin* fn_800377FC(u8* pData, u8 b) {
     if (pDesc != NULL) {
         fn_801127A0(pDesc);
     }
-    fn_800CD404(pSkin);
+    SkinPart_AllocChoices(pSkin);
     fn_8011C9B0(pSkin);
     SkinPart_SetChangeAllCopies(bOld);
     fn_800375AC(pSkin, 0);

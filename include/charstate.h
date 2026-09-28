@@ -26,7 +26,7 @@ LAYOUT_ASSERT(SkinPartDef, 0x10);
 typedef struct SkinVariant {
     u64  uId;                   // 0x00  its name code
     s32  nOptions;              // 0x08  a part's option must be below it (SkinPart_ChoosePartOption)
-    s32  nFirstOption;          // 0x0C  its options: SkinDesc.p5C entries (fn_800CD664)
+    s32  nFirstOption;          // 0x0C  its options: SkinDesc.p5C entries (SkinPart_GetMaxPartOptionSize)
     s32  nLinks;                // 0x10  entries in SkinDesc.pLinks from nFirstLink
     s32  nFirstLink;            // 0x14
 } SkinVariant;
@@ -84,7 +84,7 @@ LAYOUT_ASSERT(SkinMeshBit, 8);
 
 // An entry of the iterator fn_80113B34 walks and of SkinDesc.p34.
 typedef struct SkinMesh {
-    SkinMeshBit* pBits;         // 0x0  n8 of them (fn_800CD7D4)
+    SkinMeshBit* pBits;         // 0x0  n8 of them (SkinPart_MarkMeshMatrices)
     s32  nSize;                 // 0x4
     s32  n8;                    // 0x8
     u32  uFlags;                // 0xC  0x300000 both set: counted; 1 and 0x10: marks its bits
@@ -141,14 +141,14 @@ typedef struct SkinDesc7C {
     u64  uId;                   // 0x00  its name code
     s32  n08;                   // 0x08  entries in SkinDesc.p8C from n0C
     s32  n0C;                   // 0x0C
-    s32  n10;                   // 0x10  given by fn_800CD124
+    s32  n10;                   // 0x10  given by SkinPart_GetSetVariantUVIndex
     u8   unk14[4];
 } SkinDesc7C;
 LAYOUT_ASSERT(SkinDesc7C, 0x18);
 
 typedef struct SkinDesc8C {
     u64  uId;                   // 0x00  its name code
-    u8   a08[0x2C - 8];         // 0x08  fn_800CD248 gives its address
+    u8   a08[0x2C - 8];         // 0x08  SkinPart_GetSetOptionData gives its address
     s32  n2C;                   // 0x2C
 } SkinDesc8C;
 LAYOUT_ASSERT(SkinDesc8C, 0x30);
@@ -540,7 +540,7 @@ typedef struct HwsBurn {
 } HwsBurn;
 LAYOUT_ASSERT(HwsBurn, 0x84);
 
-// What fn_80113B34 walks: a description and a SkinDesc.p5C entry (or, from fn_800CD5D0, a
+// What fn_80113B34 walks: a description and a SkinDesc.p5C entry (or, from SkinPart_GetOptionSize, a
 // SkinVariant.nC index).
 typedef struct SkinIterArgs {
     SkinDesc* pDesc;            // 0x0
@@ -632,7 +632,7 @@ extern s32   lbl_80281D78;              // }
 void  SkinPart_ChooseBodySet(Character* pChar, int nSet, int nVariant, int nOption);
 void  SkinPart_ChoosePartVariant(Skin* pSkin, int nPart, int nVariant);
 void  SkinPart_ChooseSet(Skin* pSkin, int nSet, int nVariant, int nOption);
-u8*   fn_800CD248(Skin* pSkin, int nSet, int nVariant, int nOption);    // SkinDesc8C.a08, or NULL
+u8*   SkinPart_GetSetOptionData(Skin* pSkin, int nSet, int nVariant, int nOption);    // SkinDesc8C.a08, or NULL
 s32   SkinPart_FindPart(Skin* pSkin, u64 uId);
 s32   fn_800CDBB0(Skin* pSkin, int nPart, u64 uId);
 s32   SkinPart_FindSet(Skin* pSkin, u64 uId);
@@ -661,7 +661,7 @@ u8    SkinPart_GetChangeAllCopies(void);
 s32   SkinPart_GetNumParts(Skin* pSkin);
 s32   SkinPart_GetPartVariant(Skin* pSkin, int nPart, int nCopy);
 s32   SkinPart_GetPartOption(Skin* pSkin, int nPart, int nCopy);
-void  fn_800CD9EC(Skin* pSkin);
+void  SkinPart_MarkAllOptions(Skin* pSkin);
 s32   fn_800CE224(Skin* pSkin, SkinDesc14* pEntry, u8** ppOut, s32* pnOut, int nCopy);
 u8    SkinIter_IsValid(SkinIter* pIter);
 void  SkinIter_Next(SkinIter* pIter);
@@ -675,7 +675,7 @@ u8    fn_80112C04(void);                // hwsRender_Gc.c: 0 on course 14's hole
 
 // SkinPart.c, as Skin.c uses it.
 u64   SkinPart_GetPartId(Skin* pSkin, int nPart);
-void  fn_800CD56C(Skin* pSkin);
+void  SkinPart_FreeChoices(Skin* pSkin);
 s32   fn_800CDB70(Skin* pSkin, const char* pName);
 void  fn_800CE02C(Skin* pSkin, int n);
 void  fn_800CE0B0(Skin* pSkin, int nPart);

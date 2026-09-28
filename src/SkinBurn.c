@@ -92,7 +92,7 @@ void fn_80127218(Skin* pSkin, s32 n) {
     fn_80113BAC(pIter);
 }
 
-// Drops the bits (Skin.p10CC) no option uses: keeps the first n14 and those fn_800CD9EC marks,
+// Drops the bits (Skin.p10CC) no option uses: keeps the first n14 and those SkinPart_MarkAllOptions marks,
 // renumbers them 0, 1, 2... (lbl_802825A8 holds the new number of each old one) and packs their
 // SkinModel.p54 entries to the front.
 void fn_801272B4(Skin* pSkin) {
@@ -137,7 +137,7 @@ void fn_801272B4(Skin* pSkin) {
     // Mark the bits the options use, in aBits instead of the skin's own array.
     pSaved = pSkin->p10CC;
     pSkin->p10CC = aBits;
-    fn_800CD9EC(pSkin);
+    SkinPart_MarkAllOptions(pSkin);
     pSkin->p10CC = pSaved;
 
     pOld = aOld;
