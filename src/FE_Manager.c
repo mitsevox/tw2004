@@ -271,17 +271,17 @@ void FE_PostMovieSetup(void) {
 }
 
 // Empty (in TW07 too). Called when the menus' fade to black ends and game mode 23, the PGA TOUR
-// season, starts (uiProcessInterface.c fn_8009069C).
+// season, starts (uiProcessInterface.c UI_ExitFade).
 void FE_PlayPGATourMovie(void) {
 }
 
 // Empty in this build (TW07's plays a movie). Called when the menus' fade to black ends and game
-// mode 24, the real-time events, starts (uiProcessInterface.c fn_8009069C).
+// mode 24, the real-time events, starts (uiProcessInterface.c UI_ExitFade).
 void FE_PlayRTEMovie(void) {
 }
 
 // Empty in this build. Called when the menus' fade to black ends and game mode 4, the ladder,
-// starts (uiProcessInterface.c fn_8009069C).
+// starts (uiProcessInterface.c UI_ExitFade).
 void FE_PlayLadderMovie(void) {
 }
 

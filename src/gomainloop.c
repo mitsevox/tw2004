@@ -182,13 +182,13 @@ void FE_vRenderGolferAllPhase1(void);
 void FE_vRenderGolferAllPhase2(void);
 void FE_vFreeUnusedCharacters(void);
 u8   FE_IsGolferRenderAllowed(void);
-u8   fn_8008F39C(void);
-void fn_8008F648(int n);
-void fn_8008FD60(int n);
-void fn_800905A8(void);
-void fn_80090628(void);
-void fn_80090664(void);
-void fn_8009069C(void);
+u8   UI_IsClosed(void);
+void UI_DrawInterface(int n);
+void UI_UpdateInterface(int n);
+void UI_vInitModule(void);
+void UI_SendPendingMessages(void);
+void UI_vCloseModule(void);
+void UI_ExitFade(void);
 void fn_80090A60(void);
 void fn_80091778(void);
 void fn_80091870(void);
@@ -536,7 +536,7 @@ void GO_vInitFE(void) {
     fn_8006DCA8(384, 528, 4, 1);
     fn_80029FC8();
     fn_8009CC00();
-    fn_800905A8();
+    UI_vInitModule();
     FE_CrAP_InitModule();
     fn_8010A448(0x18000);
     lbl_80281E60 = CA_spCreateCamera();
@@ -589,7 +589,7 @@ void fn_8006CB2C(void) {
     TI_sStopCounter(2);
     FE_CrAP_CloseModule();
     fn_8010A4E8();
-    fn_80090664();
+    UI_vCloseModule();
     fn_8000B8F4();
     fn_801250C0();
     ViewController_Delete(0);
@@ -610,7 +610,7 @@ void GO_vInitIG(void) {
     fn_80029FC8();
     fn_8010A448(0x6000);
     fn_800B251C_ShadowInit(0);
-    fn_800905A8();
+    UI_vInitModule();
     Session_SetupProfiles();
     Character_InitIG();
     fn_80055D54();
@@ -661,7 +661,7 @@ void GO_vInitIG(void) {
     BS_vInit();
     GR_vInit();
     fn_8006F4B4();
-    fn_8009005C("ingame");
+    UI_OpenInterface("ingame");
     fn_8006DC20(1.0f);
     SW_vInitModule();
     REPLAY_InitModule();
@@ -719,7 +719,7 @@ void fn_8006CDC4(void) {
     fn_800B2734();
     REPLAY_CloseModule();
     SW_vCloseModule();
-    fn_80090664();
+    UI_vCloseModule();
     Character_CloseIG();
     fn_8001058C();
     fn_80048E7C();
@@ -745,7 +745,7 @@ void fn_8006CEFC(void) {
 
     fn_8006C7A8();
     fn_8009CC00();
-    fn_800905A8();
+    UI_vInitModule();
     lbl_80281E60 = CA_spCreateCamera();
     lbl_80281E5C = FB_spCreateFrameBuffer();
     lbl_80281E58 = VM_spCreateViewport();
@@ -766,7 +766,7 @@ void fn_8006CEFC(void) {
 
 // Shuts the start-up screens down.
 void fn_8006CFC8(void) {
-    fn_80090664();
+    UI_vCloseModule();
     fn_8010F794();
     RC_vReleaseRenderCtx(lbl_80281E54);
     VM_vReleaseViewport(lbl_80281E58);
@@ -779,7 +779,7 @@ void fn_8006CFC8(void) {
 }
 
 // Whether the main loop should end this frame, by the game type's own tests: gSession's bEndLoop
-// and nC, lbl_802811E8[1], the pads, fn_8009A180 and fn_8008F39C.
+// and nC, lbl_802811E8[1], the pads, fn_8009A180 and UI_IsClosed.
 u8 fn_8006D01C(void) {
     u8 bDone = 0;
 
@@ -806,7 +806,7 @@ u8 fn_8006D01C(void) {
         if (gSession.nC == 2) {
             bDone = 1;
         }
-        if (fn_8008F39C()) {
+        if (UI_IsClosed()) {
             bDone = 1;
         }
     } else if (gSession.nGameType == 1 && (gSession.bEndLoop || gSession.nC == 2)) {
@@ -979,14 +979,14 @@ void fn_8006D27C(void) {
     if (gSession.nSplitScreen && ViewController_IsActive(0) && ViewController_IsActive(1)) {
         fn_80038128();
     }
-    fn_8008F648(1);
+    UI_DrawInterface(1);
     UFont_DrawQueue();
     GameEffects_UpdateGameEffects(ViewController_GetActivePlayerNumber(0));
     GameEffects_RenderGameBreakerEffects();
     fn_800389C0();
-    fn_8009069C();
+    UI_ExitFade();
     fn_800382E0();
-    fn_8008FD60(1);
+    UI_UpdateInterface(1);
     fn_800BA1A4();
     fn_8006DDA8();
 }
@@ -995,11 +995,11 @@ void fn_8006D27C(void) {
 void fn_8006D7E8(void) {
     if (ViewController_IsActive(0)) {
         fn_8006C8EC(0);
-        fn_8008F648(1);
+        UI_DrawInterface(1);
     }
     UFont_DrawQueue();
-    fn_8008FD60(1);
-    fn_8009069C();
+    UI_UpdateInterface(1);
+    UI_ExitFade();
     fn_800382E0();
 }
 
@@ -1020,7 +1020,7 @@ void fn_8006D838(void) {
             FE_vRenderGolferAllPhase1();
         }
         if (lbl_80281E50) {
-            fn_8008F648(1);
+            UI_DrawInterface(1);
         }
         if (b) {
             FE_vRenderGolferAllPhase2();
@@ -1028,8 +1028,8 @@ void fn_8006D838(void) {
     }
     UFont_DrawQueue();
     fn_800BA1A4();
-    fn_8009069C();
-    fn_8008FD60(1);
+    UI_ExitFade();
+    UI_UpdateInterface(1);
     fn_800382E0();
     FE_movieFade();
     fn_8006DE28();
@@ -1067,7 +1067,7 @@ void fn_8006D8E8(void) {
         if (gSession.nGameType == 6) {
             GM_CheckControllerPulled();
         }
-        fn_80090628();
+        UI_SendPendingMessages();
         gSession.fFrameTime = GameEffects_AdjustTimeRate(gSession.fFrameTime);
         if (gSession.nGameType != 1 && GolfCamera_IsFreezeTimeActive()) {
             gSession.fFrameTime = 0.0f;

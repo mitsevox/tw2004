@@ -89,7 +89,7 @@ void fn_800083A4(void) {
             }
             break;
         case 1:
-            fn_8009005C("startup");
+            UI_OpenInterface("startup");
             fn_8006D8E8();
             fn_8006CFC8();
             if (gSession.nC == 0) {
@@ -108,7 +108,7 @@ void fn_800083A4(void) {
                 FE_PlayIntroMovies();
             }
             Gaud_StartFEMusic(gFEState.b0F);
-            fn_8009005C("frontend");
+            UI_OpenInterface("frontend");
             fn_8006D8E8();
             if (gSession.nC == 0 && gSession.nGameType != 13) {
                 FE_StreamStopAllStreaming();

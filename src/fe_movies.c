@@ -123,8 +123,8 @@ void fn_80090D28(FEQuad* pQuad) {
                 pTex = fn_800922A0(pBank);
                 RenderState_SetBankTexture(pBank, pTex);
             } else {
-                // the texture bank by the entry's name (fn_8008FFF0: -1, 0 or 1)
-                nBank = fn_8008FFF0(szName);
+                // the texture bank by the entry's name (UI_GetTextureBankIndex: -1, 0 or 1)
+                nBank = UI_GetTextureBankIndex(szName);
                 RenderState_SetBankTexture(gpFrontEnd->p8->ap4[nBank], pEntry->p4);
             }
             if (!(pQuad->n8 & 1)) {
@@ -575,7 +575,7 @@ void fn_80091EE4(void) {
 }
 
 // The start-up movies, when the start-up front end (game type 1, nC 0) shuts down
-// (uiProcessInterface.c fn_80090400): "eas", then, unless the session has flag 0x4000, one of the
+// (uiProcessInterface.c UI_CloseInterface): "eas", then, unless the session has flag 0x4000, one of the
 // two cameo movies "tigcam01"/"tigcam02" at random (skippable with any button); then the first
 // 'LEGL' picture startUp.c kept, shown for 180 frames (fading in over 30) and freed.
 void fn_80091EE8(void) {

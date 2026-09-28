@@ -67,7 +67,7 @@ LLFont x2 (b11 lane; Codex fn_8001144C). /dev/null was deleted by a lane again (
 by the orchestrator with the owner's OK.
 
 **Running (BATTLE PLAN, 2026-09-27 02:17 UTC, agents/assign/2026-09-27-battle-plan.md):** one lane = one
-function, no permuter, refill from the queue. b1 char MtaLib_SwapAndLink, b2 uiProcessInterface fn_8008F820,
+function, no permuter, refill from the queue. b1 char MtaLib_SwapAndLink, b2 uiProcessInterface UI_ReadControllers,
 b3 hlaudtrackstm Stm_Tick, b4 UISApi fn_80169D90, b5 UISApi fn_80168CD8, b6 UISScreen fn_8016C6C4,
 b7 UISScreen fn_8016B188, b8 UISEvent fn_80165ACC. Codex: UIStudio fn_80166098. Gemini: out of usage.
 Merged just before: Codex SkinPart SkinPart_ApplySetsToMaterialEntry (fake, SkinPart linked) + skalib AnimLib_SetLeafClipsByName (EA form):
@@ -146,7 +146,7 @@ float registers (lead, not kept).
 **Biggest blockers** by link gain per function: Golfer AI_ChooseTarget (98.53%, registers only:
 agents/tried/AI_ChooseTarget.md), Ball Physics_HandleCollision, Earnings x2, startUp fn_800B0748,
 gocamscripts x2, skalib (52 KB data, 5 left), rcmp fn_800B769C/fn_800B8618. One function from
-linking: SunFlr_Gc (fn_8009A708), uiProcessInterface (fn_8008F820), hwsBurn (HwsBurn_CopySetOptions, 1
+linking: SunFlr_Gc (fn_8009A708), uiProcessInterface (UI_ReadControllers), hwsBurn (HwsBurn_CopySetOptions, 1
 instruction). Every attempt is in agents/tried/<fn>.md; new rules in docs/decomp-notes.md.
 
 Follow-ups (audit, not matching lanes): Swing.c's and goballfx.c's file headers still describe code

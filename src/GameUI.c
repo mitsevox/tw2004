@@ -665,7 +665,7 @@ void GUI_EndOfGameScorecard(u8 bHuman) {
     }
 }
 
-// Sends UI message 59 with a controller number: uiProcessInterface's input loop (fn_8008F820)
+// Sends UI message 59 with a controller number: uiProcessInterface's input loop (UI_ReadControllers)
 // calls it in game type 6 when that controller has held button 0x20 of the button table for more
 // than 10 frames.
 void GUI_SendButtonHeld(int nPlayer) {

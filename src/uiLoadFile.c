@@ -30,7 +30,7 @@ void fn_8008EEB8(UStreamObject* pObject);
 void fn_8008EFC0(UINamedList* pList);
 void fn_8008EFFC(UStreamObject* pObject);
 u8 fn_8008F204(int nKind);
-void fn_80090898(void);                                 // uiProcessInterface.c
+void UI_RefreshFileEntries(void);                                 // uiProcessInterface.c
 void fn_80010028(void* pBank);                          // LLTex.c: free a texture bank
 int  UFont_FindFreeSlot(void);                                 // UFont.c: a free font slot
 void UFont_LoadFont(int nSlot, void* pFont, int n);        // UFont.c: load a font into a slot
@@ -167,7 +167,7 @@ void fn_8008EFFC(UStreamObject* pObject) {
     StaticMem_Free(pObject);
 }
 
-// szUnused: EA passes the UI set's name (fn_8009005C) to this getter and the three below.
+// szUnused: EA passes the UI set's name (UI_OpenInterface) to this getter and the three below.
 void* fn_8008F0C0(char* szUnused) {
     return gpUIFileData;
 }
@@ -245,7 +245,7 @@ void fn_8008F294(void) {
         GoARAM_WaitTransfer(GoARAM_CopyFromAram(pData, gUIPicturesAram, gUIPicturesAramSize));
         fn_8008EFC0(pData);
         gpFrontEnd->pC = gpUIPictureList;
-        fn_80090898();
+        UI_RefreshFileEntries();
     }
 }
 

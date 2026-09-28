@@ -13,7 +13,7 @@
 // Defined here (declared in game/frontend.h); .sbss in reverse address order.
 FrontEnd* gpFrontEnd;
 u8 gbUIClosed;
-u8 gbUIRunning;                // set: fn_8008FD60 passes events to the UI
+u8 gbUIRunning;                // set: UI_UpdateInterface passes events to the UI
 u8 gbUICloseRequested;
 u8 gbPausedWithoutScoreCard;
 
@@ -30,13 +30,13 @@ UIButtonEvent gUIButtonEvents[UI_NUM_BUTTON_EVENTS] = {
 };
 s8 gSavedCrAPHidden = -1;
 
-void fn_8008F80C(s32 p0, s32 p1);
+void UI_SetControllerEnabled(s32 p0, s32 p1);
 s32 fn_80092BC4();
 s32 fn_800934F8();
 s32 fn_800BA038();
-void fn_80090400(FrontEnd* pFE);
-void fn_80090664(void);
-void fn_8008FE88(FrontEnd* pFE);
+void UI_CloseInterface(FrontEnd* pFE);
+void UI_vCloseModule(void);
+void UI_ResolveFileEntries(FrontEnd* pFE);
 TexEntry* fn_80090904(TexBank* pBank, u64 uHash);
 void GameMsg_SendPendingMenus(void);         // GameMessages.c
 void GameMsg_SendPending(void);         // GameMessages.c
@@ -53,22 +53,25 @@ void fn_80016B6C(f32 x, f32 y);
 void FO_vSetCurrentAddMode(s32 nMode);
 void fn_80012C54_SetWordWrap(s32 v);
 void UFont_ResetContext(void);
-void fn_800908D4(f32 x0);
-void fn_80090890(s32 nLevel, const char* szFile, s32 nLine, const char* szMsg);
-void fn_80090894(u16 uGroup, u16 uScreen, s32 n);
-void fn_800908BC(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4);
-void fn_800908C0(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4);
-void fn_800908C4(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4);
-void fn_800908C8(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4);
-void fn_800908CC(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4);
-void fn_800908D0(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4);
+void UI_SetTextLineSpacing(f32 x0);
+void UI_ReportUISError(s32 nLevel, const char* szFile, s32 nLine, const char* szMsg);
+void UI_ScreenDrawDebug(u16 uGroup, u16 uScreen, s32 n);
+void UI_BlankProcess1(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4);
+void UI_BlankProcess2(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4);
+void UI_BlankProcess3(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4);
+void UI_BlankProcess4(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4);
+void UI_BlankProcess5(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4);
+void UI_BlankProcess6(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4);
 
-u8 fn_8008F39C(void) {
+// Whether the UI has shut down after its exit fade (gbUIClosed, set by UI_UpdateInterface);
+// gomainloop's main loop stops on it.
+u8 UI_IsClosed(void) {
     return gbUIClosed;
 }
 
-// Add uBase to n words, nStride words apart.
-void fn_8008F3A4(u32* p, uptr uBase, int nStride, u32 n) {
+// Relocate n offsets: add uBase to n words, nStride words apart (UI_RelocateFile turns the UI
+// file's offsets into pointers with it).
+void UI_RelocateOffsets(u32* p, uptr uBase, int nStride, u32 n) {
     u32 i;
 
     for (i = 0; i < n; i++) {
@@ -85,25 +88,30 @@ static inline void* fn_8008F488_Read(void* p) {
     return p;
 }
 
-// Turn the UI file's offsets into pointers.
+// Turn the UI file's offsets into pointers: its pair list and table list, both words of every pair,
+// the table pointers and each table's entry pointers (the entries' own fields are done later by
+// UI_FindColorTable and UI_ResolveFileEntries).
 // port: the file stores 32-bit offsets in its pointer fields, as the GameCube's pointers are.
-void fn_8008F488(FrontEnd* pFE) {
+void UI_RelocateFile(FrontEnd* pFE) {
     u32 i;
     uptr uBase = (uptr)pFE->pFile;
 
     pFE->pFile->p4 = (UIFilePairs*)((uptr)pFE->pFile->p4 + uBase);
     pFE->pFile->p8 = (UIFileTables*)((uptr)pFE->pFile->p8 + uBase);
-    fn_8008F3A4((u32*)pFE->pFile->p4->aPairs, uBase, 1, pFE->pFile->p4->nCount * 2);
-    fn_8008F3A4((u32*)fn_8008F488_Read(pFE->pFile->p8->apTables), uBase, 1, pFE->pFile->p8->nCount);
+    UI_RelocateOffsets((u32*)pFE->pFile->p4->aPairs, uBase, 1, pFE->pFile->p4->nCount * 2);
+    UI_RelocateOffsets((u32*)fn_8008F488_Read(pFE->pFile->p8->apTables), uBase, 1, pFE->pFile->p8->nCount);
     for (i = 0; i < pFE->pFile->p8->nCount; i++) {
-        fn_8008F3A4((u32*)pFE->pFile->p8->apTables[i]->apEntries, uBase, 1,
+        UI_RelocateOffsets((u32*)pFE->pFile->p8->apTables[i]->apEntries, uBase, 1,
                     pFE->pFile->p8->apTables[i]->nCount);
     }
 }
 
-// Pass a UI command to the part of the game that is running: by the session's game type,
-// start-up (1), the menus (3) or a round (4 to 8).
-void fn_8008F568(s32 nCmd, s32 unused1, s32 unused2, s32 unused3, s32 a, s32 b) {
+// The studio's message callback (UISMessageFncT, registered by UI_OpenInterface): runs UI command
+// nCmd with the addresses of its arguments and its answer, by the session's game type: start-up (1)
+// through startUp.c's handlers (fn_800B1D3C), the menus (3) through FE_RunGameMessage, a round (4
+// to 8) through IG_RunGameMessage; other game types drop it. The group, screen and argument count
+// are not used.
+void UI_RunGameMessage(s32 nCmd, s32 unused1, s32 unused2, s32 unused3, s32 a, s32 b) {
     // port: the studio passes the addresses of the command's values and answer as 32-bit words
     if (gSession.nGameType == 1) {
         fn_800B1D3C(nCmd, (MsgArg*)a, (MsgArg*)b);
@@ -117,7 +125,7 @@ void fn_8008F568(s32 nCmd, s32 unused1, s32 unused2, s32 unused3, s32 a, s32 b) 
 
 // The studio's UISResLoadFncT: screen uScreen's data from the UI file's pairs (0 past the end). The
 // group is ignored.
-void* fn_8008F610(u16 uGroup, u16 uScreen) {
+void* UI_ResLoad(u16 uGroup, u16 uScreen) {
     UIFilePair* pPair;
 
     if (uScreen >= gpFrontEnd->pFile->p4->nCount) {
@@ -128,18 +136,22 @@ void* fn_8008F610(u16 uGroup, u16 uScreen) {
 }
 
 // The studio's UISResUnloadFncT: nothing to do, the screens' data stays in the UI file.
-void fn_8008F644(u16 uGroup, u16 uScreen, void* pData) {
+void UI_ResUnload(u16 uGroup, u16 uScreen, void* pData) {
 }
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
-// 1.0f (0x80283B78), before the 1.0f / 512.0f fn_8008F648 uses first; its body is unknown.
+// 1.0f (0x80283B78), before the 1.0f / 512.0f UI_DrawInterface uses first; its body is unknown.
 static f32 uiProcessInterface_StrippedFn(f32 x) {
     return x + 1.0f;
 }
 
-// Run and draw the UI for nTicks (while gbUIRunning is set), then step gUIDelayedHint: counting
-// 0..2 up, and past 2 it is reset and its n4 sent to the menus (0x23) or the round (0x24).
-void fn_8008F648(s32 nTicks) {
+// Once a frame (gomainloop's frame loops, nTicks 1), while gbUIRunning: draw the UI
+// (UISDrawObjects) with alpha blending, no depth writes and an alpha test, in the UI's 512 x 448
+// coordinates (fn_80016B6C) and with word-wrapped text at 0.85 line spacing
+// (UI_SetTextLineSpacing), then put the render state back. In the menus it first clears
+// lbl_80281370 (fn_80091454). Then it steps gUIDelayedHint: n0 counts 0 to 2, one a frame, and past
+// 2 goes back to -1 while n4 is sent to the UI as hint 0x23 (the menus) or 0x24 (a round).
+void UI_DrawInterface(s32 nTicks) {
     s32 aArgs[1];
 
     if (gbUIRunning) {
@@ -155,11 +167,11 @@ void fn_8008F648(s32 nTicks) {
         fn_80016B6C(1.0f / 512.0f, 1.0f / 448.0f);
         FO_vSetCurrentAddMode(1);
         fn_80012C54_SetWordWrap(1);
-        fn_800908D4(0.85f);
+        UI_SetTextLineSpacing(0.85f);
         if (gpFrontEnd != NULL) {
             UISDrawObjects(gpFrontEnd->pHandler, nTicks);
         }
-        fn_800908D4(1.0f);
+        UI_SetTextLineSpacing(1.0f);
         fn_80012C54_SetWordWrap(0);
         fn_80016B6C(1.0f, 1.0f);
         DS_vEnableZBufferUpdate(1);
@@ -183,19 +195,28 @@ void fn_8008F648(s32 nTicks) {
     }
 }
 
-void fn_8008F80C(s32 n, s32 b) {
+// Let controller n's buttons reach the UI (b 1) or not (0): gUIState.a30 (front-end message 32,
+// GM_vSetControllerInputEnabled; UI_vInitModule enables all four).
+void UI_SetControllerEnabled(s32 n, s32 b) {
     gUIState.a30[n] = b;
 }
 
-// Read the controllers for the UI. The main stick works the D-pad in start-up, the menus and (when
-// GUI_IsPauseMenuOpen says so) game type 6. In a round, nothing happens while a player's view runs a
-// scripted camera (fn_80063C90, or script camera 3) other than camera 0x15. Each plugged-in
-// controller's buttons (the stick's directions folded into the D-pad bits) are compared with last
-// frame's, a held button repeating every 9 frames; each newly pressed button sends its
-// gUIButtonEvents event to the UI (not during the fade or while a movie is queued). In the menus,
-// event 0x34 (which stops that input) is sent with fewer than two controllers in mode 0x1A, or in
-// mode 7 without CPU players; otherwise 0x2D while any is plugged in.
-void fn_8008F820(void) {
+// Once a frame (from UI_UpdateInterface): read the controllers for the UI. The main stick works the
+// D-pad in start-up, the menus and, while the pause menu is open, in play (game type 6). In a round
+// (4 to 8, not paused) nothing is read while any player's view has a script fade running or held
+// (script.nFade 1 to 4) with a camera other than 0x15. Each plugged-in controller's buttons (the
+// stick's directions folded into the D-pad bits) are compared with last frame's: a button held 9
+// frames counts as pressed again. gUIState.n38 counts the controllers plugged in, n34 the frames
+// with none. In the menus, the two-player modes 7 (speed golf on points) and 26 (the long-drive
+// race) with fewer than two controllers (mode 7: and no CPU player in slot 0 or 1) send hint 0x34,
+// block the buttons (b40) and hide the menu golfer (b49), putting gpCrAPState->bHidden aside in
+// gSavedCrAPHidden; otherwise, with any controller in, hint 0x2D lifts that and puts bHidden back.
+// Unless blocked, fading out (bFadeToBlack) or a movie is queued, each enabled controller's newly
+// pressed buttons send their gUIButtonEvents event (UISProcessEvent; in play not while nPaused is 2
+// or 3), and in the menus any held button sends hint 0x22; in play each such controller is also
+// reported present (GUI_OnControllerPresent), and holding Controller_GetButtonMask(0x20, 1)'s
+// button over 10 frames sends GUI_SendButtonHeld.
+void UI_ReadControllers(void) {
     f32 fOne;
     s32 aArgs[1];
     u32 aButtons[8];            // fake match: 4 are used; the stack frame holds 8
@@ -330,27 +351,30 @@ void fn_8008F820(void) {
     }
 }
 
-// Passes an event to the UI (while gbUIRunning is set). With gbUICloseRequested set it then shuts the UI
-// down (fn_80090400) and sets gbUIClosed; otherwise fn_8008F820 runs.
-void fn_8008FD60(u32 uEvent) {
+// Once a frame (gomainloop's frame loops, uEvent 1), while gbUIRunning: run the UI
+// (UISIdleProcess). When the exit fade has asked for it (gbUICloseRequested), shut the UI down
+// (UI_CloseInterface), clear gbUIRunning and set gbUIClosed; otherwise read the controllers
+// (UI_ReadControllers).
+void UI_UpdateInterface(u32 uEvent) {
     if (gbUIRunning) {
         if (gpFrontEnd != NULL) {
             UISIdleProcess(gpFrontEnd->pHandler, uEvent);
         }
         if (gbUICloseRequested) {
-            fn_80090400(gpFrontEnd);
+            UI_CloseInterface(gpFrontEnd);
             gbUICloseRequested = 0;
             gbUIRunning = 0;
             gbUIClosed = 1;
         } else if (gpFrontEnd != NULL) {
-            fn_8008F820();
+            UI_ReadControllers();
         }
     }
 }
 
-// Find the UI file's table whose first entry is of kind 0x10 (the last, if several), keep it in
-// p14 and turn its entries' p8 offsets into pointers; with none, p14 is NULL.
-void fn_8008FDDC(FrontEnd* pFE) {
+// Find the UI file's colour table, the table whose first entry is of kind 0x10 (the last, if
+// several): keep it in pFE->p14 (the colours uiText.c draws text in) and turn its entries' p8
+// offsets into pointers; with none, p14 is NULL.
+void UI_FindColorTable(FrontEnd* pFE) {
     uptr uBase = (uptr)pFE->pFile;
     UIColorTable* pTable;
     u8 bFound = 0;
@@ -376,10 +400,11 @@ void fn_8008FDDC(FrontEnd* pFE) {
     }
 }
 
-// Resolve the UI file's entries by their names: kind 1 (except in game type 3) to the texture of
-// that name in the texture bank fn_8008FFF0 picks (none for -1), kind 2 (with a name list in pC)
-// to the same name in that list (p8 cleared; the table's index noted in gUIState.n3C).
-void fn_8008FE88(FrontEnd* pFE) {
+// Resolve the UI file's entries by name. Kind 1, outside the menus: the texture of that name (p4)
+// in the texture bank UI_GetTextureBankIndex picks, left alone when that is -1. Kind 2, while the
+// picture list (pFE->pC) is loaded: the picture record of the same name (p4), its decoded picture
+// (p8) cleared, and gUIState.n3C notes the table (the movie entries' table).
+void UI_ResolveFileEntries(FrontEnd* pFE) {
     u32 k;
     UIColorTable* pTable;
     UIFileEntry* pEntry;
@@ -397,7 +422,7 @@ void fn_8008FE88(FrontEnd* pFE) {
             if (pEntry->u0 == 1) {
                 if (gSession.nGameType != 3) {
                     uHash = fn_8000BEE4(szName);
-                    nBank = fn_8008FFF0(szName);
+                    nBank = UI_GetTextureBankIndex(szName);
                     if (nBank != -1) {
                         pEntry->p4 = fn_80090904(gpFrontEnd->p8->ap4[nBank], uHash);
                     }
@@ -416,9 +441,10 @@ void fn_8008FE88(FrontEnd* pFE) {
     }
 }
 
-// A UI name starting "tu": 1 in a lesson, -1 otherwise; 0 for any other name, and
-// always 0 when the game type is 1.
-int fn_8008FFF0(const char* szName) {
+// The texture bank (an index into gpFrontEnd->p8->ap4) a UI texture name is in: a name starting
+// "tu" is in bank 1 while a lesson runs and in none (-1) otherwise; every other name, and every
+// name in start-up (game type 1), is in bank 0.
+int UI_GetTextureBankIndex(const char* szName) {
     if (gSession.nGameType == 1) return 0;
     if (szName[0] == 't' && szName[1] == 'u') {
         if (Lessons_IsRunning()) return 1;
@@ -427,11 +453,15 @@ int fn_8008FFF0(const char* szName) {
     return 0;
 }
 
-// Start the front end with the UI set szSet: take what uiLoadFile.c loaded, resolve the UI file,
-// set up the studio (its handlers 0 to 8 and the game's callbacks), hand it the file's
-// "GlobalScript" screen if there is one and show the first screen (start-up passes it two zero
-// words).
-FrontEnd* fn_8009005C(char* szSet) {
+// Open the UI set szSet ("startup", "frontend" or "ingame"): allocate the front end (gpFrontEnd),
+// take what uiLoadFile.c loaded (the UI file, texture banks, picture list and fonts), allocate the
+// transform stack, clear the exit fade and the delayed hint, resolve the UI file (UI_RelocateFile,
+// UI_ResolveFileEntries, UI_FindColorTable), set up the studio (10 screens, 9 plugins, 256 rate
+// functions, 2 modals, a 2048-word stack) with its plugins 0 to 8 and the game's callbacks, hand it
+// the file's "GlobalScript" screen if there is one, and load and activate screen 0 (start-up passes
+// it two zero words). In the menus the golfer textures are set up too (FE_InitGolferTextures).
+// Returns gpFrontEnd.
+FrontEnd* UI_OpenInterface(char* szSet) {
     s32 aArgs[2];
     int i;
 
@@ -454,25 +484,25 @@ FrontEnd* fn_8009005C(char* szSet) {
     gUIState.fFade = 0.0f;
     gUIDelayedHint.n4 = 0;
     gUIDelayedHint.n0 = -1;
-    fn_8008F488(gpFrontEnd);
-    fn_8008FE88(gpFrontEnd);
-    fn_8008FDDC(gpFrontEnd);
+    UI_RelocateFile(gpFrontEnd);
+    UI_ResolveFileEntries(gpFrontEnd);
+    UI_FindColorTable(gpFrontEnd);
     gpFrontEnd->pHandler = StaticMem_Alloc(UISGetMemSize(10, 9, 256, 2, 2048, 128), 2, 16,
                                          "uiProcessInterface.c", 943);
     UISInit(gpFrontEnd->pHandler, 10, 9, 256, 2, 2048, 128, 16);
     UISRegisterPluginFnc(gpFrontEnd->pHandler, 0, (UISPluginFncT*)fn_800914DC);
-    UISRegisterPluginFnc(gpFrontEnd->pHandler, 1, fn_800908BC);
-    UISRegisterPluginFnc(gpFrontEnd->pHandler, 2, fn_800908C0);
-    UISRegisterPluginFnc(gpFrontEnd->pHandler, 3, fn_800908C4);
-    UISRegisterPluginFnc(gpFrontEnd->pHandler, 4, fn_800908C8);
-    UISRegisterPluginFnc(gpFrontEnd->pHandler, 5, fn_800908CC);
-    UISRegisterPluginFnc(gpFrontEnd->pHandler, 6, fn_800908D0);
+    UISRegisterPluginFnc(gpFrontEnd->pHandler, 1, UI_BlankProcess1);
+    UISRegisterPluginFnc(gpFrontEnd->pHandler, 2, UI_BlankProcess2);
+    UISRegisterPluginFnc(gpFrontEnd->pHandler, 3, UI_BlankProcess3);
+    UISRegisterPluginFnc(gpFrontEnd->pHandler, 4, UI_BlankProcess4);
+    UISRegisterPluginFnc(gpFrontEnd->pHandler, 5, UI_BlankProcess5);
+    UISRegisterPluginFnc(gpFrontEnd->pHandler, 6, UI_BlankProcess6);
     UISRegisterPluginFnc(gpFrontEnd->pHandler, 7, (UISPluginFncT*)fn_800929E4);
     UISRegisterPluginFnc(gpFrontEnd->pHandler, 8, (UISPluginFncT*)fn_80103684);
-    UISRegisterResourceFncs(gpFrontEnd->pHandler, fn_8008F610, fn_8008F644);
+    UISRegisterResourceFncs(gpFrontEnd->pHandler, UI_ResLoad, UI_ResUnload);
     UISRegisterTransformFncs(gpFrontEnd->pHandler, (UISTransformFncT*)fn_80093280);
-    UISRegisterMessageFnc(gpFrontEnd->pHandler, fn_8008F568);
-    // fake match: the original compares the count signed here (cmpw), unsigned in fn_8008F610
+    UISRegisterMessageFnc(gpFrontEnd->pHandler, UI_RunGameMessage);
+    // fake match: the original compares the count signed here (cmpw), unsigned in UI_ResLoad
     for (i = 0; i < (s32)gpFrontEnd->pFile->p4->nCount; i++) {
         if (strcmp(gpFrontEnd->pFile->p4->aPairs[i].p0, "GlobalScript") == 0) {
             UISSetGlobalScript(gpFrontEnd->pHandler, gpFrontEnd->pFile->p4->aPairs[i].p4);
@@ -490,16 +520,18 @@ FrontEnd* fn_8009005C(char* szSet) {
         FE_InitGolferTextures();
     }
     UISSetScreenActive(gpFrontEnd->pHandler, 0, 0);
-    UISRegisterScreenDrawDebugFnc(gpFrontEnd->pHandler, fn_80090894);
-    UISRegisterRuntimeErrorFnc(fn_80090890);
+    UISRegisterScreenDrawDebugFnc(gpFrontEnd->pHandler, UI_ScreenDrawDebug);
+    UISRegisterRuntimeErrorFnc(UI_ReportUISError);
     return gpFrontEnd;
 }
 
-// Shut the front end down: in game type 1 with no nC, fe_movies.c's fn_80091EE8; in game type 3,
-// every lbl_801D8890 entry whose lbl_801D8ED0 word is set gets b0 set and b1 cleared, and the
-// menus' data is brought back and freed (fn_8008F294, fn_8008F24C). Then everything the front
-// end loaded is freed, and the front end itself.
-void fn_80090400(FrontEnd* pFE) {
+// Shut the UI pFE down. First the movie entries' pictures are freed (fn_80090B10); leaving start-up
+// with no nC plays the start-up movies and legal screen (fn_80091EE8); leaving the menus sets b0
+// and clears b1 of every lbl_801D8890 entry whose lbl_801D8ED0 word is set, clears lbl_80281370
+// (set, then cleared by fn_80091454), and brings the picture list back from ARAM and frees it
+// (fn_8008F294, fn_8008F24C). Then the studio is shut down, the fonts, picture list, texture banks
+// and UI file are freed, and the studio and the front end with them; gpFrontEnd is NULL after.
+void UI_CloseInterface(FrontEnd* pFE) {
     int i;
 
     fn_80090B10();
@@ -527,9 +559,11 @@ void fn_80090400(FrontEnd* pFE) {
     gpFrontEnd = NULL;
 }
 
-// Resets the UI's controller state (all four controllers enabled); also calls fn_80092BA0,
-// fn_8008EC30 (nothing loaded), fn_800B9FF0 and GameMsg_ClearPending.
-void fn_800905A8(void) {
+// Start the UI module (GO_vInitFE, GO_vInitIG, start-up's gomainloop fn_8006CEFC): text additive
+// mode on (fn_80092BA0), nothing loaded (fn_8008EC30), the controller state cleared with all four
+// controllers enabled, the EA Trax display reset (fn_800B9FF0) and the pending UI messages dropped
+// (GameMsg_ClearPending).
+void UI_vInitModule(void) {
     s32 i;
 
     fn_80092BA0();
@@ -548,8 +582,10 @@ void fn_800905A8(void) {
     GameMsg_ClearPending();
 }
 
-// Sends the pending messages (GameMessages.c): game type 3 has its own set.
-void fn_80090628(void) {
+// Once a main-loop frame (gomainloop fn_8006D8E8): send the messages queued for the UI
+// (GameMessages.c), the menus' own set in game type 3 (GameMsg_SendPendingMenus), else
+// GameMsg_SendPending.
+void UI_SendPendingMessages(void) {
     if (gSession.nGameType == 3) {
         GameMsg_SendPendingMenus();
     } else {
@@ -557,20 +593,24 @@ void fn_80090628(void) {
     }
 }
 
-void fn_80090664(void) {
+// End the UI module (gomainloop's shut-down steps for the menus, a round and start-up): shut the UI
+// down if it is still open (UI_CloseInterface), free the transform stack (fn_800934F8), turn text
+// additive mode off (fn_80092BC4) and free the EA Trax logo (fn_800BA038).
+void UI_vCloseModule(void) {
     if (gpFrontEnd != NULL) {
-        fn_80090400(gpFrontEnd);
+        UI_CloseInterface(gpFrontEnd);
     }
     fn_800934F8();
     fn_80092BC4();
     fn_800BA038();
 }
 
-// The fade to black (while gUIState.bFadeToBlack is set): draw it, 0.05 darker each frame. Once
-// it is black, unpause; start-up (1) shuts the UI down (fn_8008FD60 sees gbUICloseRequested) and sets
-// gSession.bEndLoop, the menus (3) shut it down, start the demo when gSession.bDemo is set and call
-// FE_Manager.c's function for mode 0x17, 0x18 or 4, and other game types set gSession.bEndLoop.
-void fn_8009069C(void) {
+// The fade to black when the UI is left (while gUIState.bFadeToBlack is set): draw it, 0.05 darker
+// each frame. Once it is black, unpause; start-up (1) asks for the UI to close (gbUICloseRequested)
+// and ends the loop (gSession.bEndLoop); the menus (3) ask for it to close, start the demo when
+// gSession.bDemo is set and call FE_Manager.c's (empty) function for game mode 23 (the PGA TOUR),
+// 24 (a real-time event) or 4 (the ladder); other game types end the loop.
+void UI_ExitFade(void) {
     f32 aColor[4];
 
     if (gUIState.bFadeToBlack == 0) return;
@@ -604,7 +644,10 @@ void fn_8009069C(void) {
     }
 }
 
-void fn_800907AC(int nValue, char* szOut) {
+// Print nValue into szOut with a comma every three digits ("1234567" becomes "1,234,567"), through
+// a 128-character buffer. Meant for amounts of money: the '-' of a negative value counts as a digit
+// ("-123" becomes "-,123").
+void UI_GetMoneyString(int nValue, char* szOut) {
     char aBuf[128];
     int nDigit = 1;
     u32 nLen;
@@ -632,35 +675,44 @@ void fn_800907AC(int nValue, char* szOut) {
     sprintf(szOut, aBuf);       // EA: the result is used as a format; it holds only digits, '-' and ','
 }
 
-// The studio's report callback (UISRuntimeErrorFncT): the retail game prints nothing.
-void fn_80090890(s32 nLevel, const char* szFile, s32 nLine, const char* szMsg) {
+// The studio's runtime-error callback (UISRuntimeErrorFncT, UI_OpenInterface): the retail game
+// prints nothing, as Madden 2003's ReportUISError.
+void UI_ReportUISError(s32 nLevel, const char* szFile, s32 nLine, const char* szMsg) {
 }
 
-// The studio's UISScreenDrawDebugFncT: nothing to do.
-void fn_80090894(u16 uGroup, u16 uScreen, s32 n) {
+// The studio's screen debug-draw callback (UISScreenDrawDebugFncT, UI_OpenInterface): nothing to
+// do.
+void UI_ScreenDrawDebug(u16 uGroup, u16 uScreen, s32 n) {
 }
 
-void fn_80090898(void) {
-    fn_8008FE88(gpFrontEnd);
+// Resolve the open UI file's entries again (UI_ResolveFileEntries on gpFrontEnd), once fn_8008F294
+// has brought the picture list back from ARAM.
+void UI_RefreshFileEntries(void) {
+    UI_ResolveFileEntries(gpFrontEnd);
 }
 
-// The studio's handlers 1 to 6 (fn_8009005C): they do nothing.
-void fn_800908BC(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
+// The studio's plugin 1 (UISPluginFncT, UI_OpenInterface): empty, as Madden 2003's _BlankProcess.
+void UI_BlankProcess1(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
 }
 
-void fn_800908C0(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
+// The studio's plugin 2 (UISPluginFncT, UI_OpenInterface): empty, as Madden 2003's _BlankProcess.
+void UI_BlankProcess2(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
 }
 
-void fn_800908C4(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
+// The studio's plugin 3 (UISPluginFncT, UI_OpenInterface): empty, as Madden 2003's _BlankProcess.
+void UI_BlankProcess3(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
 }
 
-void fn_800908C8(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
+// The studio's plugin 4 (UISPluginFncT, UI_OpenInterface): empty, as Madden 2003's _BlankProcess.
+void UI_BlankProcess4(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
 }
 
-void fn_800908CC(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
+// The studio's plugin 5 (UISPluginFncT, UI_OpenInterface): empty, as Madden 2003's _BlankProcess.
+void UI_BlankProcess5(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
 }
 
-void fn_800908D0(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
+// The studio's plugin 6 (UISPluginFncT, UI_OpenInterface): empty, as Madden 2003's _BlankProcess.
+void UI_BlankProcess6(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
 }
 
 // ---- sweep code (not yet cleaned up) ----
@@ -668,7 +720,10 @@ void fn_800908D0(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
 int  fn_8001005C(TexBank* pBank, u64 uHash);       // LLTex.c: the texture's index, or 0x80000000
 TexEntry* fn_800107E4(TexBank* pBank, int nTex);  // LLTexGrp.c
 
-void fn_800908D4(f32 x0) {
+// Set the current text context's line spacing (UFontContext.fB4): word-wrapped lines are fB4 times
+// the font's height apart (LLFont.c fn_80011D0C); 1 is normal, UI_DrawInterface draws the UI at
+// 0.85.
+void UI_SetTextLineSpacing(f32 x0) {
     UFontContext* pCtx;
     pCtx = FO_spGetCurrentPacket();
     pCtx->fB4 = x0;

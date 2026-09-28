@@ -1,5 +1,5 @@
 // GameUICommands.c (our name): the in-game UI messages, the questions and orders the menu UI can
-// send while a round is on (session game types 4 to 8; uiProcessInterface.c's fn_8008F568 routes
+// send while a round is on (session game types 4 to 8; uiProcessInterface.c's UI_RunGameMessage routes
 // them here). IG_InitGameMessages fills gIGMessageHandlers, 214 slots with 212 handlers (0 and 119
 // stay NULL), and IG_RunGameMessage runs one by number. Most answer a question about the round (a
 // player's name and state, the score, the wind, the leaderboard, Battle mode's clubs, the PGA TOUR
@@ -2015,9 +2015,9 @@ void GM_vGetRecordScore(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gSession.aCourseRecord[Game_GetCourse()].aRecord[pArgs[1].i][pArgs[2].i].nValue;
 }
 
-// pArgs[0] printed into pArgs[1] with thousands commas, "12,345" (command 126; fn_800907AC).
+// pArgs[0] printed into pArgs[1] with thousands commas, "12,345" (command 126; UI_GetMoneyString).
 void GM_vFormatWithCommas(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800907AC(pArgs[0].i, ((MsgString*)pArgs[1].p)->pStr);
+    UI_GetMoneyString(pArgs[0].i, ((MsgString*)pArgs[1].p)->pStr);
 }
 
 // The end-of-round money screen's numbers for player pArgs[0], picked by pArgs[1] (command 127): 0
@@ -2780,7 +2780,7 @@ void IG_v_PGATour_GetCheckInfo(MsgArg* pArgs, MsgArg* pResult) {
 
     strcpy(((MsgString*)pArgs[0].p)->pStr, gpSaveData->szName);
     ((MsgString*)pArgs[1].p)->pStr[0] = '$';
-    fn_800907AC(pTour->nWinnings, ((MsgString*)pArgs[1].p)->pStr + 1);
+    UI_GetMoneyString(pTour->nWinnings, ((MsgString*)pArgs[1].p)->pStr + 1);
     strcpy(((MsgString*)pArgs[2].p)->pStr, GameModeDriverPGATour_GetName(gpSaveData->tour.nEvent));
     CalDate_ToString(GameModeDriverPGATour_GetEndDate(gpSaveData->tour.nEvent), ((MsgString*)pArgs[3].p)->pStr);
     nPlace = pTour->nPosition;

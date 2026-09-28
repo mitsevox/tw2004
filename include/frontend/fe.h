@@ -59,22 +59,22 @@ extern f32 lbl_80281374;        // .sdata 0x80281374 = 0.25f: past FE_MessageTab
 typedef struct FEScreen {
     u8  bFadeToBlack;           // 0x00  the fade to black runs (set when the round or the menus
                                 //       are left; uiProcessInterface.c draws it and clears it)
-    u8  a1[4];                  // 0x01  per controller: plugged in (fn_8008F820); read by a menu
+    u8  a1[4];                  // 0x01  per controller: plugged in (UI_ReadControllers); read by a menu
                                 //       message (GM_vIsControllerPluggedIn: 1 for index 9)
     u8  unk5[3];
-    u32 a8[4];                  // 0x08  per controller: the buttons held last frame (fn_8008F820)
+    u32 a8[4];                  // 0x08  per controller: the buttons held last frame (UI_ReadControllers)
     u32 a18[4];                 // 0x18  per controller: frames the same buttons have been held,
-                                //       restarted past 8; cleared by fn_800905A8
+                                //       restarted past 8; cleared by UI_vInitModule
     u8  a28[4];                 // 0x28  per controller: a1 as of the last frame
     u8  a2C[4];                 // 0x2C  read and cleared by menu messages
-    u8  a30[4];                 // 0x30  set to 1 by fn_800905A8; fn_8008F80C sets one
-    s32 n34;                    // 0x34  cleared by fn_800905A8
+    u8  a30[4];                 // 0x30  set to 1 by UI_vInitModule; UI_SetControllerEnabled sets one
+    s32 n34;                    // 0x34  cleared by UI_vInitModule
     s32 n38;                    // 0x38  a menu message reads it (GM_vGetNumControllersPluggedIn)
-    s32 n3C;                    // 0x3C  the UI file table holding the movie entries (fn_8008FE88)
-    u8  b40;                    // 0x40  cleared by fn_800905A8
+    s32 n3C;                    // 0x3C  the UI file table holding the movie entries (UI_ResolveFileEntries)
+    u8  b40;                    // 0x40  cleared by UI_vInitModule
     u8  unk41[0x44 - 0x41];
     f32 fFade;                  // 0x44  the fade to black before a movie, 0 to 1
-    u8  b48;                    // 0x48  cleared by fn_800905A8
+    u8  b48;                    // 0x48  cleared by UI_vInitModule
     u8  b49;                    // 0x49  FEgolferanim.c's FE_IsGolferRenderAllowed tests it
     u8  unk4A[0x4C - 0x4A];
 } FEScreen;
@@ -134,7 +134,7 @@ typedef union FEMsgArg {
 
 void FE_InitGolferTextures(void);  // FEgolferanim.c (FE_Manager.c, uiProcessInterface.c call it)
 
-// fe_movies.c: the quads' message handler (the studio's handler 0, uiProcessInterface.c fn_8009005C).
+// fe_movies.c: the quads' message handler (the studio's handler 0, uiProcessInterface.c UI_OpenInterface).
 void fn_800914DC(FEQuad* pQuad, int nMsg, u32 bSplit, FEMsgArg* pArgs);
 
 // Four floats each, set by fe_movies.c fn_80090D28: fn_80090B80 tints a vertex colour to
@@ -164,7 +164,7 @@ LAYOUT_ASSERT(FE801D8890, 0x8);
 #define FE_NUM_801D8890 200
 extern FE801D8890 lbl_801D8890[FE_NUM_801D8890];
 // One word per lbl_801D8890 entry: nonzero sets that entry's b0 (and clears its b1) when the front
-// end is shut down in game type 3 (uiProcessInterface.c fn_80090400).
+// end is shut down in game type 3 (uiProcessInterface.c UI_CloseInterface).
 extern u32 lbl_801D8ED0[FE_NUM_801D8890];
 
 // The profile being worked on in the menus (gpFEProfile points to it; 0x11708 bytes, allocated
@@ -576,7 +576,7 @@ extern u8 lbl_80212B60[64 * 64];        // a logo's pixels laid out as a texture
 // ---- the front end's movies (fe_movies.c) -------------------------------------------------------
 
 extern u8 lbl_80281370;         // fn_80091454 clears it; the front end's shutdown in game type 3
-                                // sets it (uiProcessInterface.c fn_80090400)
+                                // sets it (uiProcessInterface.c UI_CloseInterface)
 void fn_80090B10(void);
 void fn_80091454(void);
 void fn_80091EE8(void);

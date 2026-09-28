@@ -328,7 +328,7 @@ They will be sorted into the sections below.
   (GoAnimalActors ANIMAL_WAVE 94.4 -> 98.3).
 - **[verified] Keep call results in named locals** before passing them on (uiProcessInterface
   fn_80090904 93 -> 100), before using them as a base pointer (DynamicCam_GetLocation), and put a loop
-  bound read through a pointer in a local to get the ctr loop (uiProcessInterface fn_8008FDDC 58 -> 97).
+  bound read through a pointer in a local to get the ctr loop (uiProcessInterface UI_FindColorTable 58 -> 97).
 - **[verified] `&a[i]` indexing matches where hand-walked pointers don't** (fe_movies fn_80090D28,
   ActAnimal_SetWorldMatrix, SitDevFile fn_800BCF84 74.7 -> 98.8).
 - **[verified] `const` on read-only pointer parameters changes argument-load order** (EASBStorage
@@ -706,7 +706,7 @@ Added 2026-09-27 (from the ledgers solved that night; each ledger has the full s
   own `n`; LLTex TX_spParseTextureGroupFromStream palette counter k); reusing a variable makes the
   later web a temp (skalib AnimLib_MergeOverlay: i also as the overlay search counter gives EA's
   `mr` IV copy, 97.36 -> 100). Giving a pointer an earlier dummy use turns its later array webs
-  into temps (uiProcessInterface fn_8008F820: `pPressed = &n38; pButtons = (u32*)(void*)pPressed;
+  into temps (uiProcessInterface UI_ReadControllers: `pPressed = &n38; pButtons = (u32*)(void*)pPressed;
   *pButtons = 0;`, 99.94 -> 100).
 - **[verified] Frontend CSE temps are numbered in order of each expression's SECOND occurrence**
   (the first one only records it): add a late extra use to get a late-coloured temp (goballfx

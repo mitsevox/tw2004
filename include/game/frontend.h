@@ -10,14 +10,14 @@
 #include "gx.h"
 
 // An entry of a table in the UI file's second list; u0 is the entry's kind. In the colour table
-// (kind 0x10, fn_8008FDDC) p8 points at four bytes, alpha first (uiText.c). fn_8008FE88 resolves
+// (kind 0x10, UI_FindColorTable) p8 points at four bytes, alpha first (uiText.c). UI_ResolveFileEntries resolves
 // kind 1 to a texture and kind 2 to a named record (p4). Movie entries (fe_movies.c) use the same
 // shape: flags 1 a texture (p4 its data), 2 a movie (p8 its LLPict).
 typedef struct UIFileEntry {
     u32  u0;                    // 0x0
     void* p4;                   // 0x4
     u8*  p8;                    // 0x8
-    char szC[4];                // 0xC  its name (fn_8008FFF0 reads it); the length is not known
+    char szC[4];                // 0xC  its name (UI_GetTextureBankIndex reads it); the length is not known
 } UIFileEntry;
 
 // A movie entry's data (UIFileEntry.p4; our name): uSize bytes of a picture file at aData, which
@@ -33,7 +33,7 @@ typedef struct UIColorTable {
     UIFileEntry* apEntries[1];  // 0x4  nCount of them
 } UIColorTable;
 
-// A pair in the UI file's first list. fn_8008F610 hands p4 to the studio as a screen's data.
+// A pair in the UI file's first list. UI_ResLoad hands p4 to the studio as a screen's data.
 typedef struct UIFilePair {
     void* p0;                   // 0x0
     void* p4;                   // 0x4
@@ -44,16 +44,16 @@ typedef struct UIFilePairs {
     UIFilePair aPairs[1];      // 0x4  nCount of them
 } UIFilePairs;
 
-// The UI file's second list: its tables, one of them the colour table (fn_8008FDDC).
+// The UI file's second list: its tables, one of them the colour table (UI_FindColorTable).
 typedef struct UIFileTables {
     s32  nCount;                // 0x0
     UIColorTable* apTables[1];  // 0x4  nCount of them
 } UIFileTables;
 
 // The menu UI's file (the 'DATS' object uiLoadFile.c keeps). Its lists hold offsets from the
-// file's start until fn_8008F488 adds the file's address to them.
+// file's start until UI_RelocateFile adds the file's address to them.
 // port: the file stores 32-bit offsets in these pointer fields and in the lists' pointers, and
-//       fn_8008F488 turns them into pointers in place; a 64-bit port must load the file into
+//       UI_RelocateFile turns them into pointers in place; a 64-bit port must load the file into
 //       structs.
 typedef struct UIFile {
     u32  u0;                    // 0x0
@@ -62,7 +62,7 @@ typedef struct UIFile {
 } UIFile;
 
 // The block at FrontEnd.pC: a count, then pointers to records that each start with a name;
-// fn_8008FE88 gives a UI file entry of kind 2 the record of its name.
+// UI_ResolveFileEntries gives a UI file entry of kind 2 the record of its name.
 typedef struct UINamedList {
     u32   nCount;               // 0x0
     char* apNames[1];           // 0x4  nCount of them
@@ -71,16 +71,16 @@ typedef struct UINamedList {
 typedef struct FrontEnd {
     UIFile* pFile;              // 0x0
     void* pHandler;             // 0x4  where GameMessages.c sends its messages (UISProcessHint)
-    struct UILoaded* p8;        // 0x8  the texture banks fn_8008F0FC frees (fn_80090400)
+    struct UILoaded* p8;        // 0x8  the texture banks fn_8008F0FC frees (UI_CloseInterface)
     UINamedList* pC;            // 0xC  a block uiLoadFile.c frees (fn_8008F24C)
-    u32*  p10;                  // 0x10  the fonts table fn_8008F194 frees (fn_80090400)
+    u32*  p10;                  // 0x10  the fonts table fn_8008F194 frees (UI_CloseInterface)
     UIColorTable* p14;          // 0x14  the colours UIText.n8 picks from (uiText.c), NULL: none
     f32   f18;                  // 0x18  set to 1 when a round starts (gomainloop fn_8006DC20)
 } FrontEnd;
 
 extern FrontEnd* gpFrontEnd;
 
-// uiProcessInterface.c's controller input (fn_8008F820): which UI event each button sends.
+// uiProcessInterface.c's controller input (UI_ReadControllers): which UI event each button sends.
 typedef struct UIButtonEvent {
     u32 uMask;                  // 0x0  the button's bit in Input_ReadControlPad's pressed-this-frame half
     s32 nEvent;                 // 0x4  the event UISProcessEvent sends the UI
@@ -89,7 +89,7 @@ typedef struct UIButtonEvent {
 extern UIButtonEvent gUIButtonEvents[UI_NUM_BUTTON_EVENTS];
 extern s32 gUIButtonHeldFrames[8];     // per controller (0..3): frames Controller_GetButtonMask(0x20, 1)'s button is held
                                 // in game type 6; past 10 GUI_SendButtonHeld runs
-extern s8 gSavedCrAPHidden;         // CrAPState.bHidden put aside while fn_8008F820's lone-player UI is up (-1: none)
+extern s8 gSavedCrAPHidden;         // CrAPState.bHidden put aside while UI_ReadControllers's lone-player UI is up (-1: none)
 
 // What uiLoadFile.c's stream handlers loaded (gUITextureBanks): up to five objects, freed together
 // by fn_8008F0FC.
@@ -102,14 +102,14 @@ LAYOUT_ASSERT(UILoaded, 0x18);
 
 extern UILoaded gUITextureBanks;
 
-// uiLoadFile.c: what the front end's shutdown (uiProcessInterface.c fn_80090400) frees.
+// uiLoadFile.c: what the front end's shutdown (uiProcessInterface.c UI_CloseInterface) frees.
 void fn_8008F0C8(void* p);              // free p unless it is NULL
 void fn_8008F0FC(UILoaded* pLoaded);    // free the texture banks the 'TXFS' handler kept
 void fn_8008F164(void* p);              // free p unless it is NULL
 void fn_8008F194(u32* pTable);          // free the fonts' slots and the 'FONS' data
 void fn_8008F24C(void);
 void fn_8008F294(void);
-// uiLoadFile.c: what the front end's start (uiProcessInterface.c fn_8009005C) takes. EA passes
+// uiLoadFile.c: what the front end's start (uiProcessInterface.c UI_OpenInterface) takes. EA passes
 // the UI set's name to each; only fn_8008EC60 uses it.
 void fn_8008EC60(char* szSet);
 void* fn_8008F0C0(char* szUnused);          // the UI file's data
@@ -125,7 +125,7 @@ typedef struct UIFont {
 } UIFont;
 
 // Print nValue into szOut with a comma between every three digits ("1,234,567").
-void fn_800907AC(int nValue, char* szOut);
+void UI_GetMoneyString(int nValue, char* szOut);
 
 // One value of a message: an int or a float (the mask passed with it says which), or a pointer.
 typedef union MsgArg {
@@ -192,7 +192,7 @@ typedef struct UIText {
 } UIText;
 
 // The menu UI's commands go to one of these, by the session's game type (uiProcessInterface.c's
-// fn_8008F568): each runs the handler for message nMsg of its table.
+// UI_RunGameMessage): each runs the handler for message nMsg of its table.
 void FE_RunGameMessage(int nMsg, MsgArg* pArgs, MsgArg* pResult);    // the menus (FE_MessageTable.c)
 void IG_RunGameMessage(int nMsg, MsgArg* pArgs, MsgArg* pResult);    // a round (GameUICommands.c)
 void fn_800B1D3C(int nCmd, MsgArg* pArgs, MsgArg* pResult);    // start-up (startUp.c)
@@ -263,16 +263,16 @@ UITransform* fn_80093274(void);         // the current level (uiTransform.c)
 void fn_80093280(int nOp, UITransformDesc* p);  // uiTransform.c: the studio's transform callback
 void fn_8009349C(void);                         // uiTransform.c: allocate the stack
 
-// The studio's message handlers the front end registers (uiProcessInterface.c fn_8009005C).
+// The studio's message handlers the front end registers (uiProcessInterface.c UI_OpenInterface).
 void fn_800929E4(UIText* pText, int nMsg, s32 n, MsgArg* pArgs, MsgArg* pResult);  // uiText.c
 void fn_80103684(UIArc* pArc, int nMsg, s32 n, MsgArg* pArgs);                     // uiArc.c
 
 // uiProcessInterface.c: start the front end with the UI set szSet ("frontend", "ingame" or
 // "startup").
-FrontEnd* fn_8009005C(char* szSet);
+FrontEnd* UI_OpenInterface(char* szSet);
 
 // uiProcessInterface.c: for a UI name starting "tu", 1 in a lesson and -1 otherwise; else 0.
-int fn_8008FFF0(const char* szName);
+int UI_GetTextureBankIndex(const char* szName);
 
 // Code80090940.c: the movie entries' pictures (fe_movies.c).
 UIFileEntry* fn_80090940(int nEntry);   // make entry nEntry's picture

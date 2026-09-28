@@ -38,7 +38,7 @@ StatsUnits gStatsCategoryUnits[FE_STATS_NUM_CATEGORIES] = {
 s32 gStatsActiveCategory;
 
 // Prints a statistic's value text with its units into szOut: as it is, as money with thousands
-// commas ("$1,234,567", fn_800907AC), with " yds", or with "%".
+// commas ("$1,234,567", UI_GetMoneyString), with " yds", or with "%".
 void PrintStatsWithUnits(const char* szValue, StatsUnits eUnits, char* szOut) {
     char szMoney[128];
 
@@ -47,7 +47,7 @@ void PrintStatsWithUnits(const char* szValue, StatsUnits eUnits, char* szOut) {
         strcpy(szOut, szValue);
         break;
     case UNITS_MONEY:
-        fn_800907AC(atoi(szValue), szMoney);
+        UI_GetMoneyString(atoi(szValue), szMoney);
         sprintf(szOut, "$%s", szMoney);
         break;
     case UNITS_YARDS:

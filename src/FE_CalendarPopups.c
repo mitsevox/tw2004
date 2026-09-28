@@ -214,7 +214,7 @@ void RealtimePopup_GetRow_TodaysEvent(int nRow, char* szTitle, char* szText) {
     GameModeDriverRTE_GetEventByDate(CalendarState.nSelected, &nId, &nRound);
     nRewards = FE_CrAP_GetFirstThreeItemsWithLockModeAndVal(0x11, GM_RealtimeMode_GetTrophyID(nId),
                                                             szReward1, szReward2, szReward3);
-    fn_800907AC(GameModeDriverRTE_GetPurse(nId), szMoney);
+    UI_GetMoneyString(GameModeDriverRTE_GetPurse(nId), szMoney);
     sprintf(szPurse, "$%s", szMoney);
     switch (nRow) {
     case 3:
@@ -275,7 +275,7 @@ void RealtimePopup_GetRow_EventResults(int nRow, char* szTitle, char* szText) {
     bComplete = GameModeDriverRTE_IsEventComplete(gpFEProfile->nSlot, nId);
     nRewards = FE_CrAP_GetFirstThreeItemsWithLockModeAndVal(0x11, GM_RealtimeMode_GetTrophyID(nId),
                                                             szReward1, szReward2, szReward3);
-    fn_800907AC(GameModeDriverRTE_GetPurse(nId), szMoney);
+    UI_GetMoneyString(GameModeDriverRTE_GetPurse(nId), szMoney);
     sprintf(szPurse, "$%s", szMoney);
     switch (nRow) {
     case 3:
@@ -337,7 +337,7 @@ void RealtimePopup_GetRow_EventUpcoming(int nRow, char* szTitle, char* szText) {
     GameModeDriverRTE_GetEventByDate(CalendarState.nSelected, &nId, &nRound);
     nRewards = FE_CrAP_GetFirstThreeItemsWithLockModeAndVal(0x11, GM_RealtimeMode_GetTrophyID(nId),
                                                             szReward1, szReward2, szReward3);
-    fn_800907AC(GameModeDriverRTE_GetPurse(nId), szMoney);
+    UI_GetMoneyString(GameModeDriverRTE_GetPurse(nId), szMoney);
     sprintf(szPurse, "$%s", szMoney);
     switch (nRow) {
     case 3:

@@ -112,7 +112,7 @@ void fn_80102AC8(UIArc* pArc, s32 a, s32 b) {
                 pBank = lbl_801A26DC[pArc->n0 + pArc->u8];
                 RenderState_SetBankTexture(pBank, fn_800922A0(pBank));
             } else {
-                nBank = fn_8008FFF0(pName);
+                nBank = UI_GetTextureBankIndex(pName);
                 RenderState_SetBankTexture(gpFrontEnd->p8->ap4[nBank], pEntry->p4);
             }
         } else if (pEntry->u0 & 2) {

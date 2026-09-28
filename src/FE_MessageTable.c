@@ -36,7 +36,7 @@
 void fn_800142A4(s8 n);                 // sets lbl_80281C98
 void SaveProfile_InitNew(SaveProfile* pProfile);
 void FE_OnGolferHiddenChanged(void);                 // FEgolferanim.c
-void fn_8008F80C(s32 p0, s32 p1);       // uiProcessInterface.c
+void UI_SetControllerEnabled(s32 p0, s32 p1);       // uiProcessInterface.c
 void FE_SetOffscreenBufferRender(u8 bOn);               // FEgolferanim.c
 s32  MC_LoadUser(MCCardPosStr* pPos);   // MC.c
 s32  MC_LoadReplay(MCCardPos* pPos);      // MC.c: load a replay from the card
@@ -1617,9 +1617,10 @@ void GM_vFEMessage31_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 32: whether controller pArgs[0]'s buttons reach the menu UI (pArgs[1] nonzero:
-// yes), through gUIState.a30 (fn_8008F80C), which uiProcessInterface.c's fn_8008F820 tests.
+// yes), through gUIState.a30 (UI_SetControllerEnabled), which uiProcessInterface.c's
+// UI_ReadControllers tests.
 void GM_vSetControllerInputEnabled(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8008F80C(pArgs[0].i, (u8)pArgs[1].i);
+    UI_SetControllerEnabled(pArgs[0].i, (u8)pArgs[1].i);
 }
 
 // Front-end message 33: starts the memory card screens' work (MC_Connect: both ports reset and
@@ -3605,9 +3606,9 @@ void GM_vGetMostRewardsUnlocked(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 186: pArgs[0] printed into the string pArgs[1] with thousands commas, "12,345"
-// (fn_800907AC); the menus' twin of the round's GM_vFormatWithCommas.
+// (UI_GetMoneyString); the menus' twin of the round's GM_vFormatWithCommas.
 void GM_vFEFormatWithCommas(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800907AC(pArgs[0].i, ((MsgString*)pArgs[1].p)->pStr);
+    UI_GetMoneyString(pArgs[0].i, ((MsgString*)pArgs[1].p)->pStr);
 }
 
 // Front-end message 187: gFEState.b18: set by the front end's setup (FE_vOpenONCE), cleared by

@@ -34,7 +34,7 @@ u8  gbPgaTourRoundActive;       // 1 from a tour round's start until the mode sh
 s32 gPgaSavedWind;              // the options' nWind from before a tour round (Shutdown puts it back)
 
 // Not in a C unit yet
-void fn_800907AC(s32 nMoney, char* pDst);               // money as text
+void UI_GetMoneyString(s32 nMoney, char* pDst);               // money as text
 
 void GameModeDriverPGATour_LoadPGAcFromStream(UStreamObject* pObject);
 void GameModeDriverPGATour_LoadPGAtFromStream(UStreamObject* pObject);
@@ -972,7 +972,7 @@ void GameModeDriverPGATour_GetPurseString(s32 i, char* pDst) {
     } else {
         nBracket = GameModeDriverPGATour_GetCurrentBracket(nPlayer);
     }
-    fn_800907AC(GameModeDriverPGATour_ComputePurseForBracket(i, nBracket), pDst);
+    UI_GetMoneyString(GameModeDriverPGATour_ComputePurseForBracket(i, nBracket), pDst);
 }
 
 // The current tournament's leader into pDst: the golfer's name, or "Tied (%d players)" when several
@@ -1006,7 +1006,7 @@ void GameModeDriverPGATour_GetWinnerEarningsString(s32 i, char* pDst) {
     } else {
         nBracket = GameModeDriverPGATour_GetCurrentBracket(nPlayer);
     }
-    fn_800907AC(GameModeDriverPGATour_ComputeFirstPrizeForBracket(i, nBracket), pDst);
+    UI_GetMoneyString(GameModeDriverPGATour_ComputeFirstPrizeForBracket(i, nBracket), pDst);
 }
 
 // The player's score to par so far in the current tournament (entrant 0). nEvent is not read

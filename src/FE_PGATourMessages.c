@@ -28,7 +28,7 @@ s32* gPgaScheduleEvents;                // the tournaments held this season, in 
 // place (GM_PgaTourSim_IsEntrantTied), else "3"; szName the golfer's name; szScore the total score
 // (GM_PgaTourSim_GetTotalScoreFromEntrantID with flag 1); szRounds the round scores so far
 // separated by spaces (a round scored 0 is left out); szMoney "$" and the money won as text
-// (fn_800907AC), empty when none.
+// (UI_GetMoneyString), empty when none.
 void PGALeaderboard_FormatRow(char* szPlace, char* szName, char* szScore, char* szRounds,
                               char* szMoney, int nEntrant) {
     int i;
@@ -61,7 +61,7 @@ void PGALeaderboard_FormatRow(char* szPlace, char* szName, char* szScore, char* 
     }
     nMoney = GM_PgaTourSim_GetLeaderboardWinningsFromEntrantID(nPlayer, nEntrant);
     if (nMoney) {
-        fn_800907AC(nMoney, szAmount);
+        UI_GetMoneyString(nMoney, szAmount);
         sprintf(szMoney, "$%s", szAmount);
         return;
     }
@@ -509,7 +509,7 @@ void PGATourWins_GetDetails(MsgArg* pArgs, MsgArg* pResult) {
     CalDate_ToString(FE_GetCurrentProfile()->aC8[nEvent].award.nDate, ((MsgString*)pArgs[1].p)->pStr);
     strcpy(szName, FE_GetCurrentProfile()->szName);
     GameModeDriverPGATour_GetPurseString(nEvent, szEarnings);
-    fn_800907AC(FE_GetCurrentProfile()->aC8[nEvent].n6 * 1000, szMoney);
+    UI_GetMoneyString(FE_GetCurrentProfile()->aC8[nEvent].n6 * 1000, szMoney);
     *pScore = FE_GetCurrentProfile()->aC8[nEvent].nScore;
 }
 

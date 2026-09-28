@@ -342,7 +342,7 @@ void GUI_ShowPrizeMessage(int nA, int nB, int nC) {
     GameMsg_Send3Ints(10, nA, nB, nC);
 }
 
-// Drops every pending message (uiProcessInterface's controller reset, fn_800905A8).
+// Drops every pending message (uiProcessInterface's controller reset, UI_vInitModule).
 void GameMsg_ClearPending(void) {
     gGameMsgPending = 0;
 }
@@ -365,7 +365,7 @@ void GameMsg_TogglePending(int nBits) {
     gGameMsgPending = (gGameMsgPending ^ nBits);
 }
 
-// GameMsg_SendPending's counterpart in the menus (game type 3; fn_80090628 picks one): pending bit
+// GameMsg_SendPending's counterpart in the menus (game type 3; UI_SendPendingMessages picks one): pending bit
 // 1 sends message 0x8D and bit 2 message 0x54, no values, each once; the other bits wait.
 void GameMsg_SendPendingMenus(void) {
     if ((s8) gGameMsgPending != 0) {
@@ -380,7 +380,7 @@ void GameMsg_SendPendingMenus(void) {
     }
 }
 
-// Sends each pending message once and clears its bit, on the UI's update in a round (fn_80090628):
+// Sends each pending message once and clears its bit, on the UI's update in a round (UI_SendPendingMessages):
 // bit 1 a conceded hole's post-shot message (message 5 built as GUI_StartPostShotUI does: type 15,
 // 0.0, then the value, the player not counted from 1 as GUI_StartPostShotUI counts it), 2 a
 // restarted hole (message 0x3D, then message 1 with 1 hides the single-screen HUD), 4 the pause
@@ -543,7 +543,7 @@ void GameMsg_SendString(int nMsg, char* pStr) {
 }
 
 // Whether the front end's fade to black is running (GUI_GetFadeToBlack): GUI_PauseMenuClosed leaves
-// the game paused while it is (quitting the round from the pause menu starts it; fn_8009069C
+// the game paused while it is (quitting the round from the pause menu starts it; UI_ExitFade
 // unpauses once the screen is black).
 u8 GUI_IsFadingToBlack(void) {
     return GUI_GetFadeToBlack();
@@ -581,7 +581,7 @@ void GUI_SendLongDriveText(char* pStr) {
 }
 
 // The front end's fade-to-black flag (gUIState.bFadeToBlack): set when the round or the menus
-// are left, and fn_8009069C darkens the screen while it is.
+// are left, and UI_ExitFade darkens the screen while it is.
 u8 GUI_GetFadeToBlack(void) {
     return gUIState.bFadeToBlack;
 }
