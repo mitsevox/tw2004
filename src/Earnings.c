@@ -1864,7 +1864,7 @@ int HighScoreRecords_GetEndOfHoleRecord(int nPlayer, Ball* pBall, int a, u8 bCou
 }
 
 // The end-of-round record checks (after the last hole, GM_Earnings_PayRoundGoals). In game mode 22 (the
-// long-drive contest) only record kind 9 (Player.nEBC); in the skill-zone modes only kind 8
+// long-drive contest) only record kind 9 (Player.nDriveScore); in the skill-zone modes only kind 8
 // (Player.nSkillZonePoints). Otherwise, outside "Random 18": the round's strokes (kind 0), its
 // greens in regulation (3, fn_800D1170), fairways hit (5, fn_800D0FBC), birdies or better (7),
 // eagles or better (6) and putts (4). Each kind only while HighScoreRecords_CheckRecordGameSetting
@@ -1896,7 +1896,7 @@ int HighScoreRecords_GetEndOfGameRecord(int nPlayer, int bSave, u8 bCountStroke,
     }
     if (Game_GetMode() == 22) {
         if (HighScoreRecords_CheckRecordGameSetting(9)) {
-            nResult = HighScoreRecords_CheckRecord(9, gPlayers[nPlayer].nEBC, bSave, szName, nPlayer);
+            nResult = HighScoreRecords_CheckRecord(9, gPlayers[nPlayer].nDriveScore, bSave, szName, nPlayer);
             if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
                 gRoundRecordResults[gNumRecordHits] = nResult;
                 gRoundRecordKinds[gNumRecordHits] = 9;

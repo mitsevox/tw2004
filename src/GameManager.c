@@ -19,7 +19,6 @@
 void  GM_Earnings_FreeStreamMemory(void);
 void  GM_ClearHoleBonusStats(int nPlayer);
 u8    GM_IsRoundForcedOver(int nPlayer);
-void  GM_Earnings_PayRoundGoals(int nPlayer, int a);
 void  GM_RecordIndividualRoundStats(int nPlayer);
 void  GM_PgaTourSim_SetUserEntrantHoleStrokes(int nPlayer, int nStrokes);
 void  GM_GolferConcede_Hole(int nPlayer);

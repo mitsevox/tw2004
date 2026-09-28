@@ -327,7 +327,7 @@ s32 PGATour_FillCell(char* sz, u16 nDate, s32* pCellColor, s32* pCellState) {
 }
 
 // Which day-details popup the PGA TOUR calendar shows for a date's tournament (the calendar screen
-// keeps it in CalendarState.n1C for PGATour_GetPopupRow), by its start against the current
+// keeps it in CalendarState.nPopupType for PGATour_GetPopupRow), by its start against the current
 // tournament's: 1 results (an earlier tournament, or any while player 1 has no current tournament,
 // GameModeDriverPGATour_GetUsersCurrentEventID(0) == -1), 3 the current one before it starts (today
 // is its first round), 0 the current one in progress, 2 upcoming (a later one).
@@ -362,7 +362,7 @@ s32 PGATour_GetPopupType(u16 nDate) {
 
 // A row of the PGA TOUR calendar's day-details popup (row 0, "Event:", is the calendar screen's):
 // row 1 blank, row 2 "Dates:" and the selected day's tournament's first and last days ("<start> -
-// <end>"); the other rows come from the popup CalendarState.n1C names (0 in progress
+// <end>"); the other rows come from the popup CalendarState.nPopupType names (0 in progress
 // PGATourPopup_GetRow_EventInProgress, 1 results PGATourPopup_GetRow_EventResults, 2 upcoming
 // PGATourPopup_GetRow_EventUpcoming, 3 before it starts PGATourPopup_GetRow_EventNextEvent).
 void PGATour_GetPopupRow(int nRow, char* szTitle, char* szText) {
@@ -388,7 +388,7 @@ void PGATour_GetPopupRow(int nRow, char* szTitle, char* szText) {
         sprintf(szText, "%s - %s", szStart, szEnd);
         return;
     default:
-        switch (CalendarState.n1C) {
+        switch (CalendarState.nPopupType) {
         case 0:
             PGATourPopup_GetRow_EventInProgress(nRow, szTitle, szText);
             return;
@@ -534,9 +534,9 @@ void RealTime_GetBottomLine(u16 nDate, int nLine, char* sz) {
 }
 
 // Which day-details popup the real-time events calendar shows for a date (the calendar screen keeps
-// it in CalendarState.n1C for RealTime_GetPopupRow): 5 results for a past day; 4 today's event, or 5
-// once it is completed (GM_RealtimeMode_TodaysEventCompleted, always 0 in this build); 6 upcoming
-// for a day to come.
+// it in CalendarState.nPopupType for RealTime_GetPopupRow): 5 results for a past day; 4 today's
+// event, or 5 once it is completed (GM_RealtimeMode_TodaysEventCompleted, always 0 in this build);
+// 6 upcoming for a day to come.
 s32 RealTime_GetPopupType(u16 nDate) {
     if (nDate < CalendarState.nToday) {
         return 5;
@@ -549,7 +549,7 @@ s32 RealTime_GetPopupType(u16 nDate) {
 
 // A row of the real-time events calendar's day-details popup (row 0, "Event:", is the calendar
 // screen's): row 1 "Date:" and the selected day, row 2 blank; the other rows come from the popup
-// CalendarState.n1C names (4 today's event RealtimePopup_GetRow_TodaysEvent, 5 results
+// CalendarState.nPopupType names (4 today's event RealtimePopup_GetRow_TodaysEvent, 5 results
 // RealtimePopup_GetRow_EventResults, 6 upcoming RealtimePopup_GetRow_EventUpcoming).
 void RealTime_GetPopupRow(int nRow, char* szTitle, char* szText) {
     char szDate[12];
@@ -565,7 +565,7 @@ void RealTime_GetPopupRow(int nRow, char* szTitle, char* szText) {
         szText[0] = 0;
         return;
     default:
-        switch (CalendarState.n1C) {
+        switch (CalendarState.nPopupType) {
         case 4:
             RealtimePopup_GetRow_TodaysEvent(nRow, szTitle, szText);
             return;

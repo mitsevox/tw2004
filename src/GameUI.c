@@ -6,6 +6,8 @@
 #include "golfer.h"
 #include "game.h"
 #include "engine.h"
+#include "game/modes/mode22.h"
+#include "game/modes/mode26.h"
 
 void  fn_8001437C(void);
 void  fn_8006A8B0(void);
@@ -115,11 +117,6 @@ void GUI_Init(void) {
     GUI_ClearShownTips();
     GUI_SendMessage31();
 }
-
-u8    GameMode26_IsActive(void);
-u8    GameMode26_IsShowingWinner(void);
-u8    GameMode22_IsActive(void);
-u8    GameMode22_IsShowingWinner(void);
 
 #define UI_PUSH(q, n)       \
     {                       \

@@ -339,7 +339,7 @@ void TARGET_RenderBallTarget(int nPlayer) {
         nY = 285;
     }
     if (bOnScreen != lbl_801D5BF0[nPlayer].b28) {
-        fn_80062C80(gPlayers[nPlayer].nC58, bOnScreen);
+        fn_80062C80(gPlayers[nPlayer].nUISlot, bOnScreen);
         lbl_801D5BF0[nPlayer].b28 = bOnScreen;
     }
     GUI_MoveTargetInfo(nX, nY, nPlayer);
@@ -640,11 +640,12 @@ TNetwork* PlaceBall_GetPlaceBallNetwork(void) {
     return lbl_80281E30;
 }
 
-// Each frame while the ball is being placed: fA80 and fA84 (the cursor's push, -1..1) ease off
-// by 0.05 and move the placement point, scaled by fSpeed and by the ground's surface class under
-// it (0.5 to 1.2; 1 in game mode 9); fA7C turns the heading fA88. A spot outside the placement
-// outline is retried turned 15, 30 .. 90 degrees either way; with none inside, the cursor stops.
-// Then flags whether the ball can be placed there. Returns 0 only when the cursor was stopped.
+// Each frame while the ball is being placed: fMomentumX and fMomentumZ (the cursor's push, -1..1)
+// ease off by 0.05 and move the placement point, scaled by fSpeed and by the ground's surface class
+// under it (0.5 to 1.2; 1 in game mode 9); fMomentumTurn turns the heading fPlaceHeading. A spot
+// outside the placement outline is retried turned 15, 30 .. 90 degrees either way; with none
+// inside, the cursor stops. Then flags whether the ball can be placed there. Returns 0 only when
+// the cursor was stopped.
 u8 PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed) {
     SurfaceType* pSurface;
     f32          vPos[3];
@@ -717,59 +718,59 @@ u8 PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed) {
     fStep *= fSpeed;
     fStep *= fGround;
 
-    if (gPlayers[nPlayer].fA80 < 0.0f) {
-        gPlayers[nPlayer].fA80 += 0.05f;
-        if (gPlayers[nPlayer].fA80 > 0.0f) {
-            gPlayers[nPlayer].fA80 = 0.0f;
+    if (gPlayers[nPlayer].fMomentumX < 0.0f) {
+        gPlayers[nPlayer].fMomentumX += 0.05f;
+        if (gPlayers[nPlayer].fMomentumX > 0.0f) {
+            gPlayers[nPlayer].fMomentumX = 0.0f;
         }
-    } else if (gPlayers[nPlayer].fA80 > 0.0f) {
-        gPlayers[nPlayer].fA80 -= 0.05f;
-        if (gPlayers[nPlayer].fA80 < 0.0f) {
-            gPlayers[nPlayer].fA80 = 0.0f;
+    } else if (gPlayers[nPlayer].fMomentumX > 0.0f) {
+        gPlayers[nPlayer].fMomentumX -= 0.05f;
+        if (gPlayers[nPlayer].fMomentumX < 0.0f) {
+            gPlayers[nPlayer].fMomentumX = 0.0f;
         }
     }
-    fX = fStep * gPlayers[nPlayer].fA80;
+    fX = fStep * gPlayers[nPlayer].fMomentumX;
     gPlayers[nPlayer].vCBC[0] = fX;
 
-    if (gPlayers[nPlayer].fA84 < 0.0f) {
-        gPlayers[nPlayer].fA84 += 0.05f;
-        if (gPlayers[nPlayer].fA84 > 0.0f) {
-            gPlayers[nPlayer].fA84 = 0.0f;
+    if (gPlayers[nPlayer].fMomentumZ < 0.0f) {
+        gPlayers[nPlayer].fMomentumZ += 0.05f;
+        if (gPlayers[nPlayer].fMomentumZ > 0.0f) {
+            gPlayers[nPlayer].fMomentumZ = 0.0f;
         }
-    } else if (gPlayers[nPlayer].fA84 > 0.0f) {
-        gPlayers[nPlayer].fA84 -= 0.05f;
-        if (gPlayers[nPlayer].fA84 < 0.0f) {
-            gPlayers[nPlayer].fA84 = 0.0f;
+    } else if (gPlayers[nPlayer].fMomentumZ > 0.0f) {
+        gPlayers[nPlayer].fMomentumZ -= 0.05f;
+        if (gPlayers[nPlayer].fMomentumZ < 0.0f) {
+            gPlayers[nPlayer].fMomentumZ = 0.0f;
         }
     }
-    fZ = fStep * gPlayers[nPlayer].fA84;
+    fZ = fStep * gPlayers[nPlayer].fMomentumZ;
     bMoved = 1;
     gPlayers[nPlayer].vCBC[2] = fZ;
 
-    if (gPlayers[nPlayer].fA7C < 0.0f) {
-        gPlayers[nPlayer].fA7C += 0.05f;
-        if (gPlayers[nPlayer].fA7C > 0.0f) {
-            gPlayers[nPlayer].fA7C = 0.0f;
+    if (gPlayers[nPlayer].fMomentumTurn < 0.0f) {
+        gPlayers[nPlayer].fMomentumTurn += 0.05f;
+        if (gPlayers[nPlayer].fMomentumTurn > 0.0f) {
+            gPlayers[nPlayer].fMomentumTurn = 0.0f;
         }
-    } else if (gPlayers[nPlayer].fA7C > 0.0f) {
-        gPlayers[nPlayer].fA7C -= 0.05f;
-        if (gPlayers[nPlayer].fA7C < 0.0f) {
-            gPlayers[nPlayer].fA7C = 0.0f;
+    } else if (gPlayers[nPlayer].fMomentumTurn > 0.0f) {
+        gPlayers[nPlayer].fMomentumTurn -= 0.05f;
+        if (gPlayers[nPlayer].fMomentumTurn < 0.0f) {
+            gPlayers[nPlayer].fMomentumTurn = 0.0f;
         }
     }
-    if (0.0f != gPlayers[nPlayer].fA7C) {
-        fTurn = 2.0f * (fTicks * (PI / 180.0f * gPlayers[nPlayer].fA7C));
-        gPlayers[nPlayer].fA88 += fTurn;
-        if (gPlayers[nPlayer].fA88 < -PI) {
-            gPlayers[nPlayer].fA88 += 2.0f * PI;
-        } else if (gPlayers[nPlayer].fA88 > PI) {
-            gPlayers[nPlayer].fA88 -= 2.0f * PI;
+    if (0.0f != gPlayers[nPlayer].fMomentumTurn) {
+        fTurn = 2.0f * (fTicks * (PI / 180.0f * gPlayers[nPlayer].fMomentumTurn));
+        gPlayers[nPlayer].fPlaceHeading += fTurn;
+        if (gPlayers[nPlayer].fPlaceHeading < -PI) {
+            gPlayers[nPlayer].fPlaceHeading += 2.0f * PI;
+        } else if (gPlayers[nPlayer].fPlaceHeading > PI) {
+            gPlayers[nPlayer].fPlaceHeading -= 2.0f * PI;
         }
         bMoved = 1;
     }
 
     if (bMoved) {
-        fHeading = gPlayers[nPlayer].fA88;
+        fHeading = gPlayers[nPlayer].fPlaceHeading;
         fSin = Math_Sin(fHeading);
         fCos = Math_Cos(fHeading);
         fBaseX = gPlayers[nPlayer].vPlacement[0];
@@ -785,7 +786,7 @@ u8 PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed) {
             // outside: try the step turned further and further either way
             for (fAngle = 15.0f; fAngle <= 90.0f; fAngle += 15.0f) {
                 fTurn = PI / 180.0f * fAngle;
-                fHeading = fTurn + gPlayers[nPlayer].fA88;
+                fHeading = fTurn + gPlayers[nPlayer].fPlaceHeading;
                 if (fHeading > PI) {
                     fHeading -= 2.0f * PI;
                 }
@@ -794,10 +795,10 @@ u8 PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed) {
                 vPos[0] = fZ * -fSin + fBaseX + fX * fCos;
                 vPos[2] = fZ * fCos + fBaseZ + fX * fSin;
                 if (PlaceBall_CheckInBounds(vPos)) {
-                    gPlayers[nPlayer].fA84 = 0.0f;
+                    gPlayers[nPlayer].fMomentumZ = 0.0f;
                     goto place;  // fake match: the original has one copy of the placing code
                 }
-                fHeading = gPlayers[nPlayer].fA88 - fTurn;
+                fHeading = gPlayers[nPlayer].fPlaceHeading - fTurn;
                 if (fHeading < -PI) {
                     fHeading += 2.0f * PI;
                 }
@@ -806,14 +807,14 @@ u8 PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed) {
                 vPos[0] = fZ * -fSin + fBaseX + fX * fCos;
                 vPos[2] = fZ * fCos + fBaseZ + fX * fSin;
                 if (PlaceBall_CheckInBounds(vPos)) {
-                    gPlayers[nPlayer].fA84 = 0.0f;
+                    gPlayers[nPlayer].fMomentumZ = 0.0f;
                     goto place;  // fake match: as above
                 }
             }
             bMoved = 0;
-            gPlayers[nPlayer].fA80 = 0.0f;
-            gPlayers[nPlayer].fA84 = 0.0f;
-            gPlayers[nPlayer].fA7C = 0.0f;
+            gPlayers[nPlayer].fMomentumX = 0.0f;
+            gPlayers[nPlayer].fMomentumZ = 0.0f;
+            gPlayers[nPlayer].fMomentumTurn = 0.0f;
         }
     }
     if (PlaceBall_IsValidDropLocation(gPlayers[nPlayer].vPlacement)) {
@@ -824,55 +825,55 @@ u8 PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed) {
     return bMoved;
 }
 
-// fA84 (with nC38 set): as fn_80069148.
+// fMomentumZ (with nC38 set): as fn_80069148.
 void fn_80069A84(int nPlayer) {
     if (gPlayers[nPlayer].nC38 == -1) return;
-    if (1000.0f == gPlayers[nPlayer].fA84) return;
-    if (-1000.0f == gPlayers[nPlayer].fA84) {
-        gPlayers[nPlayer].fA84 = 0.0f;
+    if (1000.0f == gPlayers[nPlayer].fMomentumZ) return;
+    if (-1000.0f == gPlayers[nPlayer].fMomentumZ) {
+        gPlayers[nPlayer].fMomentumZ = 0.0f;
     }
-    gPlayers[nPlayer].fA84 += 4.5f * gSession.fFrameTime;
-    if (gPlayers[nPlayer].fA84 > 1.0f) {
-        gPlayers[nPlayer].fA84 = 1.0f;
+    gPlayers[nPlayer].fMomentumZ += 4.5f * gSession.fFrameTime;
+    if (gPlayers[nPlayer].fMomentumZ > 1.0f) {
+        gPlayers[nPlayer].fMomentumZ = 1.0f;
     }
 }
 
-// fA84 (with nC38 set): as fn_800691B0.
+// fMomentumZ (with nC38 set): as fn_800691B0.
 void fn_80069AFC(int nPlayer) {
     if (gPlayers[nPlayer].nC38 == -1) return;
-    if (-1000.0f == gPlayers[nPlayer].fA84) return;
-    if (1000.0f == gPlayers[nPlayer].fA84) {
-        gPlayers[nPlayer].fA84 = 0.0f;
+    if (-1000.0f == gPlayers[nPlayer].fMomentumZ) return;
+    if (1000.0f == gPlayers[nPlayer].fMomentumZ) {
+        gPlayers[nPlayer].fMomentumZ = 0.0f;
     }
-    gPlayers[nPlayer].fA84 -= 4.5f * gSession.fFrameTime;
-    if (gPlayers[nPlayer].fA84 < -1.0f) {
-        gPlayers[nPlayer].fA84 = -1.0f;
+    gPlayers[nPlayer].fMomentumZ -= 4.5f * gSession.fFrameTime;
+    if (gPlayers[nPlayer].fMomentumZ < -1.0f) {
+        gPlayers[nPlayer].fMomentumZ = -1.0f;
     }
 }
 
-// fA80 (with nC38 set): as fn_80069148.
+// fMomentumX (with nC38 set): as fn_80069148.
 void fn_80069B74(int nPlayer) {
     if (gPlayers[nPlayer].nC38 == -1) return;
-    if (1000.0f == gPlayers[nPlayer].fA80) return;
-    if (-1000.0f == gPlayers[nPlayer].fA80) {
-        gPlayers[nPlayer].fA80 = 0.0f;
+    if (1000.0f == gPlayers[nPlayer].fMomentumX) return;
+    if (-1000.0f == gPlayers[nPlayer].fMomentumX) {
+        gPlayers[nPlayer].fMomentumX = 0.0f;
     }
-    gPlayers[nPlayer].fA80 += 4.5f * gSession.fFrameTime;
-    if (gPlayers[nPlayer].fA80 > 1.0f) {
-        gPlayers[nPlayer].fA80 = 1.0f;
+    gPlayers[nPlayer].fMomentumX += 4.5f * gSession.fFrameTime;
+    if (gPlayers[nPlayer].fMomentumX > 1.0f) {
+        gPlayers[nPlayer].fMomentumX = 1.0f;
     }
 }
 
-// fA80 (with nC38 set): as fn_800691B0.
+// fMomentumX (with nC38 set): as fn_800691B0.
 void fn_80069BEC(int nPlayer) {
     if (gPlayers[nPlayer].nC38 == -1) return;
-    if (-1000.0f == gPlayers[nPlayer].fA80) return;
-    if (1000.0f == gPlayers[nPlayer].fA80) {
-        gPlayers[nPlayer].fA80 = 0.0f;
+    if (-1000.0f == gPlayers[nPlayer].fMomentumX) return;
+    if (1000.0f == gPlayers[nPlayer].fMomentumX) {
+        gPlayers[nPlayer].fMomentumX = 0.0f;
     }
-    gPlayers[nPlayer].fA80 -= 4.5f * gSession.fFrameTime;
-    if (gPlayers[nPlayer].fA80 < -1.0f) {
-        gPlayers[nPlayer].fA80 = -1.0f;
+    gPlayers[nPlayer].fMomentumX -= 4.5f * gSession.fFrameTime;
+    if (gPlayers[nPlayer].fMomentumX < -1.0f) {
+        gPlayers[nPlayer].fMomentumX = -1.0f;
     }
 }
 
@@ -893,7 +894,7 @@ f32 lbl_801887EC[4] = { 0.4f, 0.4f, 0.4f, 0.5f };
 // shadow at the placement point, the marker kept inside the camera's view, and below it the
 // distances to the tee and the hole, in another colour when the spot is out of bounds or not a
 // valid drop. When the mode's pfnRenderBallTarget says so, only the marker is drawn, and only with
-// nC3C's bit 0 set.
+// nSGFlags's bit 0 set.
 void PlaceBall_RenderBallTarget(int nPlayer) {
     char  szText[128];          // size unknown
     f32   aMarker[4][4];
@@ -969,7 +970,7 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
         return;
     }
     if (gpGame->pfnRenderBallTarget(nPlayer)) {
-        if (!(gPlayers[nPlayer].nC3C & 1) || gSession.nPaused != 0) {
+        if (!(gPlayers[nPlayer].nSGFlags & 1) || gSession.nPaused != 0) {
             return;
         }
         bBall = 1;
@@ -1124,15 +1125,15 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
     }
 }
 
-// fA88: the heading from the game's point (gpGame->pPinPos) to the placement point, less a quarter
-// turn; and the aim marker's usual settings.
+// fPlaceHeading: the heading from the game's point (gpGame->pPinPos) to the placement point, less a
+// quarter turn; and the aim marker's usual settings.
 void PlaceBall_SetupTarget(int nPlayer) {
     f32 vDir[4];
 
     fn_8006A988(gPlayers[nPlayer].vPlacement, gpGame->pPinPos, vDir);
     vDir[1] = 0.0f;
     LLMath_Normalize(vDir, vDir);
-    gPlayers[nPlayer].fA88 = atan2f(vDir[2], vDir[0]) - PI / 2.0f;
+    gPlayers[nPlayer].fPlaceHeading = atan2f(vDir[2], vDir[0]) - PI / 2.0f;
     lbl_801D5BF0[nPlayer].f0 = 0.01f;
     lbl_801D5BF0[nPlayer].f4 = 0.0f;
     lbl_801D5BF0[nPlayer].f8 = 0.04f;

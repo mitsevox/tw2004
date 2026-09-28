@@ -1,10 +1,10 @@
 // GameMode2.c (our name; EA's is TW06's and TW07's GameMode_Skins.cpp, class GameModeSkins): game
 // mode 2, Skins. The lowest score on a hole, alone, wins its skin: the hole's money with everything
-// carried over (n22C, totalled in n274); a tie carries the skin over to the next hole. When the
-// last hole's skin is carried over, a sudden-death playoff follows on random holes until one is
-// won. Humans are paid their skins at the end; a ladder event (GameMode4.c) played as Skins is won
-// by the most skins money. The file ends with three selected-hole helpers that only speed golf
-// (GameMode8.c, which follows it) calls.
+// carried over (nSkinsWon, totalled in nSkinsTotal); a tie carries the skin over to the next hole.
+// When the last hole's skin is carried over, a sudden-death playoff follows on random holes until
+// one is won. Humans are paid their skins at the end; a ladder event (GameMode4.c) played as Skins
+// is won by the most skins money. The file ends with three selected-hole helpers that only speed
+// golf (GameMode8.c, which follows it) calls.
 
 #include "golfer.h"
 #include "ball.h"
@@ -75,8 +75,8 @@ void GameModeSkins_SetupNextGolfer(void) {
 
 // Who plays after nPlayer in Skins (pfnGetHonors; 5 = nobody, and nPlayer 5 leaves nobody out).
 // Only a player who can still win the hole (fewer strokes than the best holed score) is picked. On
-// the tee: a player who won a skin (n22C), latest hole first, then anyone on the tee; otherwise the
-// player farthest from the pin, off the green first.
+// the tee: a player who won a skin (nSkinsWon), latest hole first, then anyone on the tee;
+// otherwise the player farthest from the pin, off the green first.
 s32 GameModeSkins_GetHonors(int nPlayer) {
     int i;
     int h;
@@ -97,7 +97,7 @@ s32 GameModeSkins_GetHonors(int nPlayer) {
     for (h = Game_CurHoleIndex() - 1; h >= 0; h--) {
         if (gpGame->bHoleSelected[h]) {
             for (i = 0; i < gNumPlayersSetUp; i++) {
-                if (i != nPlayer && Player_OnTee(i) && gPlayers[(u32)i].n22C[h] != 0 &&
+                if (i != nPlayer && Player_OnTee(i) && gPlayers[(u32)i].nSkinsWon[h] != 0 &&
                     PLAYER(i)->nStrokes[Game_CurHoleIndex()] < nLow) {
                     return i;
                 }
@@ -229,7 +229,7 @@ u8 GameModeSkins_GameFinished(u8 bCheck) {
                 // fake match: one chained assignment (stored right to left, so nStrokes first, as in
                 // GameModeSkins_GoToPlayoff) for the original register order
                 gPlayers[i].bFairwayHit[h] = gPlayers[i].bGreenInReg[h] = gPlayers[i].n290[h]
-                        = gPlayers[i].n22C[h] =
+                        = gPlayers[i].nSkinsWon[h] =
                     gPlayers[i].nModePoints[h] = gPlayers[i].nPutts[h] = gPlayers[i].nStrokes[h] = 0;
             }
             gPlayers[i].n2D8 = 0;
@@ -266,7 +266,7 @@ u8 GameModeSkins_GoToPlayoff(u8 bCheck) {
         }
     }
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        if (PLAYER(i)->n22C[Game_CurHoleIndex()] != 0) {
+        if (PLAYER(i)->nSkinsWon[Game_CurHoleIndex()] != 0) {
             return 0;
         }
     }
@@ -294,7 +294,7 @@ u8 GameModeSkins_GoToPlayoff(u8 bCheck) {
             PLAYER(i)->nStrokes[h] = 0;
             PLAYER(i)->nPutts[h] = 0;
             PLAYER(i)->nModePoints[h] = 0;
-            PLAYER(i)->n22C[h] = 0;
+            PLAYER(i)->nSkinsWon[h] = 0;
             PLAYER(i)->n290[h] = 0;
             PLAYER(i)->bGreenInReg[h] = 0;
             PLAYER(i)->bFairwayHit[h] = 0;
@@ -311,10 +311,10 @@ u8 GameModeSkins_GoToPlayoff(u8 bCheck) {
 }
 
 // Mode 2's end of hole (pfnEndHole). The lowest holed score alone wins the skin: the hole's value
-// with everything carried over (GameModeSkins_CurrentHoleValue) in its n22C and its n274 total, the
-// hole marked won and the skins at stake added to its nHolesWon; the carry-over starts again. A tie
-// carries the skin over (outside the playoff the hole's value at the players' best earnings rating,
-// and one more skin).
+// with everything carried over (GameModeSkins_CurrentHoleValue) in its nSkinsWon and its
+// nSkinsTotal total, the hole marked won and the skins at stake added to its nHolesWon; the
+// carry-over starts again. A tie carries the skin over (outside the playoff the hole's value at the
+// players' best earnings rating, and one more skin).
 void GameModeSkins_EndHole(void) {
     int i;
     int nBest = 5;
@@ -340,8 +340,8 @@ void GameModeSkins_EndHole(void) {
         }
     } else {
         n = GameModeSkins_CurrentHoleValue();
-        gPlayers[nBest].n22C[Game_CurHoleIndex()] = n;
-        gPlayers[nBest].n274 += gPlayers[nBest].n22C[Game_CurHoleIndex()];
+        gPlayers[nBest].nSkinsWon[Game_CurHoleIndex()] = n;
+        gPlayers[nBest].nSkinsTotal += gPlayers[nBest].nSkinsWon[Game_CurHoleIndex()];
         gPlayers[nBest].nModePoints[Game_CurHoleIndex()] = 1;
         gPlayers[nBest].nHolesWon += GameModeSkins_CurrentHoleNumberSkins();
         gSkinsCarryOver = 0;
@@ -350,9 +350,9 @@ void GameModeSkins_EndHole(void) {
 }
 
 // Mode 2's end of game (pfnEndGame), outside a Play Now challenge unless it is a ladder event: each
-// human player with an active profile is paid their skins money (n274), booked in money.n18, with a
-// message (0x6C) when it is not 0; the first such winner counts a game won for the EA Sports Bio.
-// In a ladder event, player 0 with more skins money than every other player wins it
+// human player with an active profile is paid their skins money (nSkinsTotal), booked in money.n18,
+// with a message (0x6C) when it is not 0; the first such winner counts a game won for the EA Sports
+// Bio. In a ladder event, player 0 with more skins money than every other player wins it
 // (GameMode4_WinSkinsEvent).
 void GameModeSkins_EndGame(void) {
     int i;
@@ -364,22 +364,22 @@ void GameModeSkins_EndGame(void) {
             if (!Player_IsCPU(i)) {
                 nProfile = PLAYER(i)->nIndex;
                 if (gpSaveData[nProfile].bActive) {
-                    if (PLAYER(i)->n274 != 0) {
+                    if (PLAYER(i)->nSkinsTotal != 0) {
                         if (bFirst) {
                             EASBio_IncrementGamesWon(1);
                             bFirst = 0;
                         }
-                        GUI_QueueMessage(0, 0x6C, PLAYER(i)->n274, nProfile);
+                        GUI_QueueMessage(0, 0x6C, PLAYER(i)->nSkinsTotal, nProfile);
                     }
-                    GM_Earnings_AwardMoney(i, PLAYER(i)->n274, 0);
-                    PLAYER(i)->money.n18 += PLAYER(i)->n274;
+                    GM_Earnings_AwardMoney(i, PLAYER(i)->nSkinsTotal, 0);
+                    PLAYER(i)->money.n18 += PLAYER(i)->nSkinsTotal;
                 }
             }
         }
         if (GameMode4_IsEventRunning()) {
             bWon = 1;
             for (i = 1; i < gNumPlayersSetUp; i++) {
-                if (gPlayers[0].n274 <= gPlayers[i].n274) {
+                if (gPlayers[0].nSkinsTotal <= gPlayers[i].nSkinsTotal) {
                     bWon = 0;
                 }
             }

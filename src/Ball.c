@@ -1631,7 +1631,7 @@ void Ball_SetLie(Ball* pBall, SurfaceType* pSurface) {
         pBall->nLie = LIE_MISC_e;
         break;
     }
-    pBall->n6C = 0;
+    pBall->nLieAngle = 0;
     pBall->f70 = 0.0f;
     if (pBall->nSurface >= 0 && pBall->nSurface < 156) {
         pLie = &gSurfaceTypes[pBall->nSurface];
@@ -1875,9 +1875,9 @@ void Physics_FixBallHeight(Ball* pBall, u8 bSettle, f32 fTicks) {
 void Physics_StopBall(Ball* pBall) {
     SurfaceType* pSurface;
     if (pBall->bHoled) {
-        pBall->nState = 1;
-        pBall->nLie   = LIE_INCUP_e;
-        pBall->n6C    = 0;
+        pBall->nState    = 1;
+        pBall->nLie      = LIE_INCUP_e;
+        pBall->nLieAngle = 0;
         if (pBall->nPlayer >= 0) {
             EVENT_Trigger(pBall->nPlayer, 0x21, pBall, !gSimulating);
             EVENT_Trigger(pBall->nPlayer, 0x20, pBall, !gSimulating);
@@ -2412,7 +2412,7 @@ u8 Physics_InitBall(Ball* pBall, f32* pPos, int nPlayer) {
     LLMath_CopyVec(pPos, pBall->vPos);
     pBall->nState        = 0;
     pBall->nLie          = LIE_TEE_e;
-    pBall->n6C           = 0;
+    pBall->nLieAngle     = 0;
     pBall->fHeight       = 0.0f;
     pBall->f70           = 0.0f;
     pBall->nStartSurface = 45;

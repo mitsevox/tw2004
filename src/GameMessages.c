@@ -74,7 +74,7 @@ void GUI_CaddieTipWindowIsOpen(void) {
 u8 GUI_IsCaddieTipWindowOpen(void) {
     if (lbl_802822BD) {
         GUI_ShowToggleFullScreenUI(1);
-        fn_80062C80(gPlayers[lbl_80282278].nC58, 1);
+        fn_80062C80(gPlayers[lbl_80282278].nUISlot, 1);
         lbl_802822BD = 0;
         return 1;
     }
@@ -575,7 +575,7 @@ void GUI_SendLongDriveVariant(int nVariant) {
 }
 
 // Mode 22's text for the UI (message 90 with a string): GameMode22_ShowDrivesLeft sends the number
-// nDrives less the current player's nEA0.
+// nDrives less the current player's nDrivesTaken.
 void GUI_SendLongDriveText(char* pStr) {
     GameMsg_SendString(90, pStr);
 }

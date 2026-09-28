@@ -211,9 +211,9 @@ static inline u32 SwingTips_Pick(u32 nCount) {
 // The caddie tips as a swing starts (STATEFUNC_SwingInit): only when the tips option is on (options
 // a24[0]), session flag 0x4000 is clear, the shot is not a putt, the player's save profile is
 // active and every controller in use is plugged in. Each test that passes shows its tip: the full
-// tip the first time for this profile (unless b522F is set; the profile's aTipSeen flag is then
-// set), else a random one of its short versions. After a full tip the round's UI is hidden
-// (GUI_ToggleUI) and fn_80062C80 is called with the player's nC58.
+// tip the first time for this profile (unless bCaddieTipsOff is set; the profile's aTipSeen flag is
+// then set), else a random one of its short versions. After a full tip the round's UI is hidden
+// (GUI_ToggleUI) and fn_80062C80 is called with the player's nUISlot.
 void CTIP_ShowCaddieTip(int nPlayer) {
     u8 bTipShown;
     u8 bControllerIsPulled;
@@ -247,7 +247,7 @@ void CTIP_ShowCaddieTip(int nPlayer) {
         return;
     }
     if (CTIP_CheckGeneralWindTrigger(nPlayer)) {
-        if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[0]) {
+        if (!gpSaveData[nProfile].bCaddieTipsOff && !gpSaveData[nProfile].aTipSeen[0]) {
             GUI_ShowSwingTip(1, 0);
             bTipShown = 1;
             gpSaveData[nProfile].aTipSeen[0] = 1;
@@ -256,7 +256,7 @@ void CTIP_ShowCaddieTip(int nPlayer) {
         }
     }
     if (CTIP_CheckIntoWindTrigger(nPlayer)) {
-        if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[1]) {
+        if (!gpSaveData[nProfile].bCaddieTipsOff && !gpSaveData[nProfile].aTipSeen[1]) {
             GUI_ShowSwingTip(1, 2);
             bTipShown = 1;
             gpSaveData[nProfile].aTipSeen[1] = 1;
@@ -265,7 +265,7 @@ void CTIP_ShowCaddieTip(int nPlayer) {
         }
     }
     if (CTIP_CheckWithWindTrigger(nPlayer)) {
-        if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[2]) {
+        if (!gpSaveData[nProfile].bCaddieTipsOff && !gpSaveData[nProfile].aTipSeen[2]) {
             GUI_ShowSwingTip(1, 6);
             bTipShown = 1;
             gpSaveData[nProfile].aTipSeen[2] = 1;
@@ -274,7 +274,7 @@ void CTIP_ShowCaddieTip(int nPlayer) {
         }
     }
     if (CTIP_CheckPenaltyLieTrigger(nPlayer)) {
-        if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[3]) {
+        if (!gpSaveData[nProfile].bCaddieTipsOff && !gpSaveData[nProfile].aTipSeen[3]) {
             GUI_ShowSwingTip(1, 8);
             bTipShown = 1;
             gpSaveData[nProfile].aTipSeen[3] = 1;
@@ -283,7 +283,7 @@ void CTIP_ShowCaddieTip(int nPlayer) {
         }
     }
     if (CTIP_CheckRoughLieTrigger(nPlayer)) {
-        if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[4]) {
+        if (!gpSaveData[nProfile].bCaddieTipsOff && !gpSaveData[nProfile].aTipSeen[4]) {
             GUI_ShowSwingTip(1, 11);
             bTipShown = 1;
             gpSaveData[nProfile].aTipSeen[4] = 1;
@@ -292,7 +292,7 @@ void CTIP_ShowCaddieTip(int nPlayer) {
         }
     }
     if (CTIP_CheckSandLieTrigger(nPlayer)) {
-        if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[5]) {
+        if (!gpSaveData[nProfile].bCaddieTipsOff && !gpSaveData[nProfile].aTipSeen[5]) {
             GUI_ShowSwingTip(1, 13);
             bTipShown = 1;
             gpSaveData[nProfile].aTipSeen[5] = 1;
@@ -301,7 +301,7 @@ void CTIP_ShowCaddieTip(int nPlayer) {
         }
     }
     if (CTIP_CheckDownhillLieTrigger(nPlayer)) {
-        if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[6]) {
+        if (!gpSaveData[nProfile].bCaddieTipsOff && !gpSaveData[nProfile].aTipSeen[6]) {
             GUI_ShowSwingTip(1, 15);
             bTipShown = 1;
             gpSaveData[nProfile].aTipSeen[6] = 1;
@@ -310,7 +310,7 @@ void CTIP_ShowCaddieTip(int nPlayer) {
         }
     }
     if (CTIP_CheckUphillLieTrigger(nPlayer)) {
-        if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[7]) {
+        if (!gpSaveData[nProfile].bCaddieTipsOff && !gpSaveData[nProfile].aTipSeen[7]) {
             GUI_ShowSwingTip(1, 17);
             bTipShown = 1;
             gpSaveData[nProfile].aTipSeen[7] = 1;
@@ -320,7 +320,7 @@ void CTIP_ShowCaddieTip(int nPlayer) {
     }
     // port: EA passes an argument CTIP_CheckWeatherTrigger ignores
     if (((u8 (*)(int))CTIP_CheckWeatherTrigger)(nPlayer)) {
-        if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[8]) {
+        if (!gpSaveData[nProfile].bCaddieTipsOff && !gpSaveData[nProfile].aTipSeen[8]) {
             GUI_ShowSwingTip(1, 19);
             bTipShown = 1;
             gpSaveData[nProfile].aTipSeen[8] = 1;
@@ -329,7 +329,7 @@ void CTIP_ShowCaddieTip(int nPlayer) {
         }
     }
     if (CTIP_LongDistanceTeeShotTrigger(nPlayer)) {
-        if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[9]) {
+        if (!gpSaveData[nProfile].bCaddieTipsOff && !gpSaveData[nProfile].aTipSeen[9]) {
             GUI_ShowSwingTip(1, 22);
             bTipShown = 1;
             gpSaveData[nProfile].aTipSeen[9] = 1;
@@ -338,7 +338,7 @@ void CTIP_ShowCaddieTip(int nPlayer) {
         }
     }
     if (CTIP_MediumDistanceTeeShotTrigger(nPlayer)) {
-        if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[10]) {
+        if (!gpSaveData[nProfile].bCaddieTipsOff && !gpSaveData[nProfile].aTipSeen[10]) {
             GUI_ShowSwingTip(1, 25);
             bTipShown = 1;
             gpSaveData[nProfile].aTipSeen[10] = 1;
@@ -347,7 +347,7 @@ void CTIP_ShowCaddieTip(int nPlayer) {
         }
     }
     if (CTIP_SpinnaShotTrigger(nPlayer)) {
-        if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[11]) {
+        if (!gpSaveData[nProfile].bCaddieTipsOff && !gpSaveData[nProfile].aTipSeen[11]) {
             GUI_ShowSwingTip(1, 26);
             bTipShown = 1;
             gpSaveData[nProfile].aTipSeen[11] = 1;
@@ -356,7 +356,7 @@ void CTIP_ShowCaddieTip(int nPlayer) {
         }
     }
     if (CTIP_TeeSpinnaShotTrigger(nPlayer)) {
-        if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[12]) {
+        if (!gpSaveData[nProfile].bCaddieTipsOff && !gpSaveData[nProfile].aTipSeen[12]) {
             GUI_ShowSwingTip(1, 28);
             bTipShown = 1;
             gpSaveData[nProfile].aTipSeen[12] = 1;
@@ -366,7 +366,7 @@ void CTIP_ShowCaddieTip(int nPlayer) {
     }
     // port: EA passes an argument CTIP_CheckDisabledTrigger ignores
     if (((u8 (*)(int))CTIP_CheckDisabledTrigger)(nPlayer)) {
-        if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[13]) {
+        if (!gpSaveData[nProfile].bCaddieTipsOff && !gpSaveData[nProfile].aTipSeen[13]) {
             GUI_ShowSwingTip(1, 29);
             bTipShown = 1;
             gpSaveData[nProfile].aTipSeen[13] = 1;
@@ -375,7 +375,7 @@ void CTIP_ShowCaddieTip(int nPlayer) {
         }
     }
     if (CTIP_FlopShotTrigger(nPlayer)) {
-        if (!gpSaveData[nProfile].b522F && !gpSaveData[nProfile].aTipSeen[14]) {
+        if (!gpSaveData[nProfile].bCaddieTipsOff && !gpSaveData[nProfile].aTipSeen[14]) {
             GUI_ShowSwingTip(1, 30);
             bTipShown = 1;
             gpSaveData[nProfile].aTipSeen[14] = 1;
@@ -385,6 +385,6 @@ void CTIP_ShowCaddieTip(int nPlayer) {
     }
     if (bTipShown) {
         GUI_ToggleUI(nPlayer, 0);
-        fn_80062C80(gPlayers[nPlayer].nC58, 0);
+        fn_80062C80(gPlayers[nPlayer].nUISlot, 0);
     }
 }

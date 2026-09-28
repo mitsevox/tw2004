@@ -532,7 +532,7 @@ void Lessons_RestartLesson(void) {
         gLessonFailedTries = 0;
         gLessonWaitingForLine = 0;
         GM_EndOfGolferTurn(0);
-        fn_80062C80(gPlayers[0].nC58, 0);
+        fn_80062C80(gPlayers[0].nUISlot, 0);
         GUI_ToggleUI(0, 0);
         Lessons_ShowSwingHint(0, 0);
         Lessons_SetHintPhase(0);

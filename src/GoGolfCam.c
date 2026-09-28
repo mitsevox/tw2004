@@ -699,8 +699,9 @@ void fn_800BF110(View* pView, int nPlayer) {
     pView->script.pShot = NULL;
 }
 
-// Camera 8: 10 back and up at 20 degrees from the ball's placement spot along its heading (fA88),
-// over the ground there, which it follows smoothly; it looks at the placement spot.
+// Camera 8: 10 back and up at 20 degrees from the ball's placement spot along its heading
+// (fPlaceHeading), over the ground there, which it follows smoothly; it looks at the placement
+// spot.
 void GolfCamera_ProcessPlaceBallCamera(View* pView, int nPlayer) {
     f32 vOld[4];
     f32 v[4];
@@ -737,8 +738,8 @@ void GolfCamera_ProcessPlaceBallCamera(View* pView, int nPlayer) {
             fCos = Math_Cos(20.0f * PI / 180.0f);
             fUp = 10.0f * fSin;
             fBack = 10.0f * fCos;
-            fSin = Math_Sin(gPlayers[nPlayer].fA88);
-            fCos = Math_Cos(gPlayers[nPlayer].fA88);
+            fSin = Math_Sin(gPlayers[nPlayer].fPlaceHeading);
+            fCos = Math_Cos(gPlayers[nPlayer].fPlaceHeading);
             fX = fBack * -fSin;
             fZ = fBack * fCos;
             pCam[0] = fX + gPlayers[nPlayer].vPlacement[0];
@@ -855,9 +856,9 @@ f32 lbl_80191398[4] = {1.0f, 0.0f, 0.0f, 0.0f};     // the x axis
 f32 lbl_801913A8[4] = {0.0f, 0.0f, 1.0f, 0.0f};     // the z axis
 
 // The first-person camera's tick (camera 9's process, after camera 8's): the eye at vPlacement
-// facing along fA88, 1.4 over it (0.1 in water), bobbing and swaying in steps as long as vCBC's x
-// and z, with a rumble on each step for a human player. It looks ahead, at a height set by the
-// pad's stick (fA8C).
+// facing along fPlaceHeading, 1.4 over it (0.1 in water), bobbing and swaying in steps as long as
+// vCBC's x and z, with a rumble on each step for a human player. It looks ahead, at a height set by
+// the pad's stick (fA8C).
 void fn_800BF658(View* pView, int nPlayer) {
     f32 vOld[4];
     f32 fAbove;
@@ -888,8 +889,8 @@ void fn_800BF658(View* pView, int nPlayer) {
             // 20 degrees, written out: DEG(20.0f) rounds one bit lower than the original's constant
             fUp = fDist * Math_Sin(20.0f * PI / 180.0f);    // camera 8's height over the golfer; unused
             fBack = fDist * Math_Cos(20.0f * PI / 180.0f);
-            fSin = Math_Sin(gPlayers[nPlayer].fA88);
-            fCos = Math_Cos(gPlayers[nPlayer].fA88);
+            fSin = Math_Sin(gPlayers[nPlayer].fPlaceHeading);
+            fCos = Math_Cos(gPlayers[nPlayer].fPlaceHeading);
             fX = fBack * -fSin;
             fZ = fBack * fCos;
             pCam[0] = gPlayers[nPlayer].vPlacement[0];

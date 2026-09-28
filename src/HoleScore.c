@@ -101,11 +101,11 @@ u8 fn_800CF158(int nPlayer) {
         nBestStrokes = 1000;
         for (i = 0; i < gNumPlayersSetUp; i++) {
             if (i == nPlayer) {
-                nMine = gPlayers[i].n274;
+                nMine = gPlayers[i].nSkinsTotal;
                 nMineStrokes = gPlayers[i].nStrokes[Game_CurHoleIndex()];
             } else {
-                if (gPlayers[i].n274 > nBest) {
-                    nBest = gPlayers[i].n274;
+                if (gPlayers[i].nSkinsTotal > nBest) {
+                    nBest = gPlayers[i].nSkinsTotal;
                 }
                 nOther = gPlayers[i].nStrokes[Game_CurHoleIndex()];
                 if (gPlayers[i].ball.nLie != LIE_INCUP_e) {
@@ -208,11 +208,11 @@ u8 fn_800CF450(int nPlayer) {
         nBestStrokes = 1000;
         for (i = 0; i < gNumPlayersSetUp; i++) {
             if (i == nPlayer) {
-                nMine = gPlayers[i].n274;
+                nMine = gPlayers[i].nSkinsTotal;
                 nMineStrokes = gPlayers[i].nStrokes[Game_CurHoleIndex()];
             } else {
-                if (gPlayers[i].n274 > nBest) {
-                    nBest = gPlayers[i].n274;
+                if (gPlayers[i].nSkinsTotal > nBest) {
+                    nBest = gPlayers[i].nSkinsTotal;
                 }
                 nOther = gPlayers[i].nStrokes[Game_CurHoleIndex()];
                 if (gPlayers[i].ball.nLie != LIE_INCUP_e) {
@@ -412,9 +412,9 @@ s32 fn_800CFE74(int nPlayer) {
         nBest = 0;
         for (i = 0; i < gNumPlayersSetUp; i++) {
             if (i == nPlayer) {
-                nMine = gPlayers[i].n274;
-            } else if (gPlayers[i].n274 > nBest) {
-                nBest = gPlayers[i].n274;
+                nMine = gPlayers[i].nSkinsTotal;
+            } else if (gPlayers[i].nSkinsTotal > nBest) {
+                nBest = gPlayers[i].nSkinsTotal;
             }
         }
         return nMine - nBest;
@@ -744,8 +744,8 @@ int Hole_ScoreAfterTapIn(int nPlayer) {
     return gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 - Course_GetCurHolePar();
 }
 
-// Whether nobody took anything (mode points or n22C) on the last hole played before this one; 0
-// on the round's first hole.
+// Whether nobody took anything (mode points or nSkinsWon) on the last hole played before this one;
+// 0 on the round's first hole.
 u8 fn_800D0AF4(void) {
     int i;
     int j;
@@ -755,7 +755,7 @@ u8 fn_800D0AF4(void) {
     for (i = Game_CurHoleIndex() - 1; i >= 0; i--) {
         if (gpGame->bHoleSelected[i]) {
             for (j = 0; j < gNumPlayersSetUp; j++) {
-                if (gPlayers[j].nModePoints[i] != 0 || gPlayers[j].n22C[i] != 0) {
+                if (gPlayers[j].nModePoints[i] != 0 || gPlayers[j].nSkinsWon[i] != 0) {
                     return 0;
                 }
             }

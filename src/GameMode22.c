@@ -47,8 +47,6 @@ void GameMode22_PreSwing(void);
 void GameMode22_SetNumDrives(s32 nDrives);
 void GameMode22_SetVariant(s32 nVariant);
 s32 GameMode22_GetVariant(void);
-s32 GameMode22_IsActive(void);
-u8   GameMode22_IsShowingWinner(void);
 void GameMode22_ShowDrivesLeft(int nPlayer);
 s32 GameMode22_GetHoleRecordIndex(s32 nHole);
 
@@ -359,11 +357,11 @@ void GameMode22_UpdateFrame(void) {
 }
 
 // As a swing begins (pfnPreShotInit): GameMode22_PreSwing (empty), the drives-left text, and
-// message 0x42 for scoreboard slot 0 with nPlayer's score (nEBC).
+// message 0x42 for scoreboard slot 0 with nPlayer's score (nDriveScore).
 void GameMode22_StartSwing(int nPlayer) {
     GameMode22_PreSwing();
     GameMode22_ShowDrivesLeft(nPlayer);
-    GUI_UpdateLongDriveScore(0, gPlayers[nPlayer].nEBC, 0, 0, 0, 0, 0, 0.0f);
+    GUI_UpdateLongDriveScore(0, gPlayers[nPlayer].nDriveScore, 0, 0, 0, 0, 0, 0.0f);
 }
 
 // The mode's pfnGoToPlayoff: never a playoff (0). The slot passes an argument it does not take.
@@ -371,15 +369,15 @@ s32 GameMode22_GoToPlayoff(void) {
     return 0;
 }
 
-// Who drives next (pfnGetHonors): player 0 until someone has driven (nEA0), then the next player
-// after the current one (lbl_80282278) that is not nPlayer; 5 when there is none.
+// Who drives next (pfnGetHonors): player 0 until someone has driven (nDrivesTaken), then the next
+// player after the current one (lbl_80282278) that is not nPlayer; 5 when there is none.
 s32 GameMode22_GetHonors(int nPlayer) {
     u8 bNone = 1;
     s32 nNext;
     s32 i;
 
     for (i = 0; i < gSession.nNumPlayers; i++) {
-        if (PLAYER(i)->nEA0 != 0) {
+        if (PLAYER(i)->nDrivesTaken != 0) {
             bNone = 0;
         }
     }
@@ -430,9 +428,9 @@ void GameMode22_EndGolferTurn(int nPlayer) {
 }
 
 // After each drive (GameMode22_ScoreShot): once every player has taken the same number of drives
-// (nEA0), at least the contest's count (nDrives), the highest score (nEBC) wins: nWinner = the
-// player, bDecided set. A tie for the highest leaves no winner and play goes on; in variant 1 (the
-// best drive counts) the tie also clears every score.
+// (nDrivesTaken), at least the contest's count (nDrives), the highest score (nDriveScore) wins:
+// nWinner = the player, bDecided set. A tie for the highest leaves no winner and play goes on; in
+// variant 1 (the best drive counts) the tie also clears every score.
 // fake match: no loop unrolling in the frontend, so the second loop keeps the count in a register
 // and gets the backend's unroll (srwi by 8 + remainder) as EA's does.
 #pragma push
@@ -449,17 +447,17 @@ void GameMode22_DecideWinner(void) {
     u8 bTie = 0;
 
     nMin = gGameMode22.nDrives;
-    nFirst = gPlayers[0].nEA0;
+    nFirst = gPlayers[0].nDrivesTaken;
     n = gSession.nNumPlayers;
     for (i = 0; i < n; i++) {
         pPlayer = PLAYER(i);
-        if (pPlayer->nEA0 < nMin) {
+        if (pPlayer->nDrivesTaken < nMin) {
             return;
         }
-        if (nFirst != pPlayer->nEA0) {
+        if (nFirst != pPlayer->nDrivesTaken) {
             return;
         }
-        pScore = &pPlayer->nEBC;
+        pScore = &pPlayer->nDriveScore;
         if (*pScore >= nBest) {
             bTie = 0;
             if (nBest == *pScore && nWinner != 5) {
@@ -485,7 +483,7 @@ void GameMode22_DecideWinner(void) {
         gGameMode22.bDecided = 0;
         if (gGameMode22.nVariant == 1) {
             for (i = 0; i < n; i++) {
-                PLAYER(i)->nEBC = 0;
+                PLAYER(i)->nDriveScore = 0;
             }
         }
     }
@@ -532,17 +530,19 @@ s32 GameMode22_GetLieGroup(int nLie) {
     }
 
 // A drive is over (pfnCheckShotAwards; GameMode22_BallOutOfBounds for one out of bounds). It counts
-// as a drive (nEA0) and scores by where the ball ended: surface 0x9B kind 1, the length plus 20%;
-// surface 0x2F or 0x68 kind 4, -100 (with a sound); bPenaltyShot set kind 5, -100; else by
-// GameMode22_GetLieGroup: the tee or the rough kind 2, 0 points; the fairway, green or cup kind 0,
-// the length; sand kind 3, -50. Kinds 0 and 1 are fair drives: counted (nEA4), their total (nEC4)
-// and average (nEC0) kept, and 400 or more earns 100 more; each kind has its own count (nEC8, nECC,
-// nED0, nED4, nED8, nEDC). In variant 1 a drive scores only what it adds to the player's best fair
-// drive. The score (nEBC) never drops below 0 and goes to the scoreboard (message 0x42); sounds the
-// first time it reaches 400, 800 and 1200. The player's longest fair drive (nEA8) and where it lay
-// (vEAC) are kept, with message 0x4C when it beats the other player's. Then
-// GameMode22_DecideWinner: a winner gets his commentary line, otherwise one line is picked at
-// random from those the drive earned (a new longest drive, a long one, a bad one).
+// as a drive (nDrivesTaken) and scores by where the ball ended: surface 0x9B kind 1, the length
+// plus 20%; surface 0x2F or 0x68 kind 4, -100 (with a sound); bPenaltyShot set kind 5, -100; else
+// by GameMode22_GetLieGroup: the tee or the rough kind 2, 0 points; the fairway, green or cup kind
+// 0, the length; sand kind 3, -50. Kinds 0 and 1 are fair drives: counted (nFairDrives), their
+// total (nFairDriveTotal) and average (nAverageDrive) kept, and 400 or more earns 100 more; each
+// kind has its own count (nFairwayDrives, nBonusDrives, nRoughDrives, nSandDrives,
+// nSurfacePenaltyDrives, nPenaltyDrives). In variant 1 a drive scores only what it adds to the
+// player's best fair drive. The score (nDriveScore) never drops below 0 and goes to the scoreboard
+// (message 0x42); sounds the first time it reaches 400, 800 and 1200. The player's longest fair
+// drive (nBestDrive) and where it lay (vBestDrivePos) are kept, with message 0x4C when it beats the
+// other player's. Then GameMode22_DecideWinner: a winner gets his commentary line, otherwise one
+// line is picked at random from those the drive earned (a new longest drive, a long one, a bad
+// one).
 void GameMode22_ScoreShot(int nPlayer) {
     s32 nPoints;
     s32 nKind;
@@ -554,7 +554,7 @@ void GameMode22_ScoreShot(int nPlayer) {
     s32 nScore;
 
     nMsgs = 0;
-    pPlayer->nEA0++;
+    pPlayer->nDrivesTaken++;
     switch (pPlayer->ball.nSurface) {
     case 0x9B:
         nKind = 1;
@@ -592,31 +592,32 @@ void GameMode22_ScoreShot(int nPlayer) {
 
     nLength = fn_800D0550(nPlayer);
     if (bCounts) {
-        gPlayers[nPlayer].nEA4++;
-        gPlayers[nPlayer].nEC4 += nLength;
-        gPlayers[nPlayer].nEC0 = (f32)gPlayers[nPlayer].nEC4 / (f32)gPlayers[nPlayer].nEA4;
+        gPlayers[nPlayer].nFairDrives++;
+        gPlayers[nPlayer].nFairDriveTotal += nLength;
+        gPlayers[nPlayer].nAverageDrive = (f32)gPlayers[nPlayer].nFairDriveTotal
+                / (f32)gPlayers[nPlayer].nFairDrives;
     }
 
     nPoints = 0;
     switch (nKind) {
     case 1:
         ADD_MSG(0x17);
-        gPlayers[nPlayer].nECC++;
+        gPlayers[nPlayer].nBonusDrives++;
         nPoints = nLength + (s32)(0.2f * nLength);
         break;
     case 0:
         nPoints = nLength;
-        gPlayers[nPlayer].nEC8++;
+        gPlayers[nPlayer].nFairwayDrives++;
         break;
     case 2:
         ADD_MSG(0x1C);
         nPoints = 0;
-        gPlayers[nPlayer].nED0++;
+        gPlayers[nPlayer].nRoughDrives++;
         break;
     case 3:
         ADD_MSG(0x1D);
         nPoints = -50;
-        gPlayers[nPlayer].nED4++;
+        gPlayers[nPlayer].nSandDrives++;
         break;
     case 4:
         if (Game_GetCurHoleNum() == 4) {
@@ -628,12 +629,12 @@ void GameMode22_ScoreShot(int nPlayer) {
         }
         ADD_MSG(0x1E);
         nPoints = -100;
-        gPlayers[nPlayer].nED8++;
+        gPlayers[nPlayer].nSurfacePenaltyDrives++;
         break;
     case 5:
         ADD_MSG(0x1B);
         nPoints = -100;
-        gPlayers[nPlayer].nEDC++;
+        gPlayers[nPlayer].nPenaltyDrives++;
         break;
     }
     if (nLength >= 400 && (nKind == 1 || nKind == 0)) {
@@ -681,39 +682,39 @@ void GameMode22_ScoreShot(int nPlayer) {
     // With nVariant 1 a shot only scores what it adds to the player's best.
     if (gGameMode22.nVariant == 1) {
         nPoints = 0;
-        if (bCounts && pPlayer->nEBC < nLength) {
-            nPoints = nLength - pPlayer->nEBC;
+        if (bCounts && pPlayer->nDriveScore < nLength) {
+            nPoints = nLength - pPlayer->nDriveScore;
         }
     }
-    pPlayer->nEBC += nPoints;
+    pPlayer->nDriveScore += nPoints;
     // The score never drops below 0.
-    nScore = pPlayer->nEBC;
+    nScore = pPlayer->nDriveScore;
     nScore = (nScore <= 0) ? 0 : nScore;
-    pPlayer->nEBC = nScore;
-    GUI_UpdateLongDriveScore(0, gPlayers[nPlayer].nEBC, nLength, nKind, 0, 0, nPoints, 0.0f);
+    pPlayer->nDriveScore = nScore;
+    GUI_UpdateLongDriveScore(0, gPlayers[nPlayer].nDriveScore, nLength, nKind, 0, 0, nPoints, 0.0f);
 
     // A track the first time the score reaches 1200, 800 and 400.
-    if (!gGameMode22Reached1200[nPlayer] && gPlayers[nPlayer].nEBC >= 1200) {
+    if (!gGameMode22Reached1200[nPlayer] && gPlayers[nPlayer].nDriveScore >= 1200) {
         // port: EA passes two arguments Gaud_LongDriveUi_Play ignores
         ((void (*)(s32, int, int, int, int))Gaud_LongDriveUi_Play)(0, 0, 2, 0, 0);
         gGameMode22Reached1200[nPlayer] = 1;
     }
-    if (!gGameMode22Reached800[nPlayer] && gPlayers[nPlayer].nEBC >= 800) {
+    if (!gGameMode22Reached800[nPlayer] && gPlayers[nPlayer].nDriveScore >= 800) {
         // port: EA passes two arguments Gaud_LongDriveUi_Play ignores
         ((void (*)(s32, int, int, int, int))Gaud_LongDriveUi_Play)(0, 0, 3, 0, 0);
         gGameMode22Reached800[nPlayer] = 1;
     }
-    if (!gGameMode22Reached400[nPlayer] && gPlayers[nPlayer].nEBC >= 400) {
+    if (!gGameMode22Reached400[nPlayer] && gPlayers[nPlayer].nDriveScore >= 400) {
         // port: EA passes two arguments Gaud_LongDriveUi_Play ignores
         ((void (*)(s32, int, int, int, int))Gaud_LongDriveUi_Play)(0, 0, 4, 0, 0);
         gGameMode22Reached400[nPlayer] = 1;
     }
 
     // The player's longest counted shot, and where the ball lay.
-    if (bCounts && nLength > pPlayer->nEA8) {
-        pPlayer->nEA8 = nLength;
-        LLMath_CopyVec(pPlayer->ball.vPos, pPlayer->vEAC);
-        if (gPlayers[nPlayer].nEA8 > gPlayers[1 - nPlayer].nEA8) {
+    if (bCounts && nLength > pPlayer->nBestDrive) {
+        pPlayer->nBestDrive = nLength;
+        LLMath_CopyVec(pPlayer->ball.vPos, pPlayer->vBestDrivePos);
+        if (gPlayers[nPlayer].nBestDrive > gPlayers[1 - nPlayer].nBestDrive) {
             GameMsg_Send2Ints(0x4C, nLength, nPlayer);
             // port: EA passes two arguments Gaud_LongDriveUi_Play ignores
             ((void (*)(s32, int, int, int, int))Gaud_LongDriveUi_Play)(0, 0, 0, 0, 0);
@@ -756,26 +757,26 @@ void GameMode22_RestartHole(void) {
     gGameMode22.bDecided = 0;
 }
 
-// Every player's contest values cleared: drives, fair drives, longest drive, score (nEBC), average,
-// total and the counts per kind (0xEA0..0xEDC; vEAC stays), each score sent to the scoreboard
-// (message 0x42); no current player (5); then GameMode22_AfterClearStats (empty).
+// Every player's contest values cleared: drives, fair drives, longest drive, score (nDriveScore),
+// average, total and the counts per kind (0xEA0..0xEDC; vBestDrivePos stays), each score sent to
+// the scoreboard (message 0x42); no current player (5); then GameMode22_AfterClearStats (empty).
 void GameMode22_ClearPlayerStats(void) {
     s32 i;
 
     for (i = 0; i < 5; i++) {
-        PLAYER(i)->nEA0 = 0;
-        PLAYER(i)->nEA4 = 0;
-        PLAYER(i)->nEA8 = 0;
-        PLAYER(i)->nEBC = 0;
-        PLAYER(i)->nEC0 = 0;
-        PLAYER(i)->nEC4 = 0;
-        PLAYER(i)->nEC8 = 0;
-        PLAYER(i)->nECC = 0;
-        PLAYER(i)->nED0 = 0;
-        PLAYER(i)->nED4 = 0;
-        PLAYER(i)->nED8 = 0;
-        PLAYER(i)->nEDC = 0;
-        GUI_UpdateLongDriveScore(i, PLAYER(i)->nEBC, 0, 0, 0, 0, 0, 0.0f);
+        PLAYER(i)->nDrivesTaken = 0;
+        PLAYER(i)->nFairDrives = 0;
+        PLAYER(i)->nBestDrive = 0;
+        PLAYER(i)->nDriveScore = 0;
+        PLAYER(i)->nAverageDrive = 0;
+        PLAYER(i)->nFairDriveTotal = 0;
+        PLAYER(i)->nFairwayDrives = 0;
+        PLAYER(i)->nBonusDrives = 0;
+        PLAYER(i)->nRoughDrives = 0;
+        PLAYER(i)->nSandDrives = 0;
+        PLAYER(i)->nSurfacePenaltyDrives = 0;
+        PLAYER(i)->nPenaltyDrives = 0;
+        GUI_UpdateLongDriveScore(i, PLAYER(i)->nDriveScore, 0, 0, 0, 0, 0, 0.0f);
     }
     lbl_80282278 = 5;
     GameMode22_AfterClearStats();
@@ -817,10 +818,8 @@ u8 GameMode22_GetWinner(s32* pnWinner) {
 }
 
 // Whether game mode 22 is being played (GUI_IsPostShotUIAnimating asks).
-s32 GameMode22_IsActive(void) {
-    s32 nMode;
-    nMode = Game_GetMode();
-    return (((u32)__cntlzw((22 - nMode)) >> 5) & 0xFF);
+u8 GameMode22_IsActive(void) {
+    return Game_GetMode() == 22;
 }
 
 // Whether a winner is decided and the 120-frame winner countdown (nWinnerFrames) is still running;
@@ -832,10 +831,10 @@ u8 GameMode22_IsShowingWinner(void) {
     return 0;
 }
 
-// The current player's drives left (nDrives less his nEA0), as text in message 90
+// The current player's drives left (nDrives less his nDrivesTaken), as text in message 90
 // (GUI_SendLongDriveText). nPlayer is not read: every caller passes one.
 void GameMode22_ShowDrivesLeft(int nPlayer) {
-    sprintf(gGameMode22DrivesLeftText, "%d", gGameMode22.nDrives - gPlayers[lbl_80282278].nEA0);
+    sprintf(gGameMode22DrivesLeftText, "%d", gGameMode22.nDrives - gPlayers[lbl_80282278].nDrivesTaken);
     GUI_SendLongDriveText(gGameMode22DrivesLeftText);
 }
 

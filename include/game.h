@@ -254,9 +254,10 @@ int  GM_Earnings_ComputeTOURCardModifiers(int nReward, int nPlayer, CourseMoneyT
 s32  Earnings_CheckShotAwards(int nPlayer, Ball* pBall, u8 b);   // one of GameEffects' GameBreaker checks
 s32  Earnings_CheckPuttAwards(int nPlayer, Ball* pBall, u8 b);   // the same through GM_Earnings_CheckPuttGoals (pBall unused)
 u8   HighScoreRecords_CheckRecordGameSetting(int nKind);            // Earnings.c: whether records of a kind count now
-void GM_Earnings_CheckShotGoals(int nPlayer, Ball* pBall, u8 b);   // Earnings.c: the shot's check
-void GM_Earnings_CheckPuttGoals(int nPlayer, u8 b);                // the putt's
-void GM_Earnings_CheckHoleGoals(int nPlayer, u8 a, u8 bRoundOver); // the hole's
+void GM_Earnings_CheckShotGoals(int nPlayer, Ball* pBall, u8 bPreview);   // Earnings.c: the shot's check
+void GM_Earnings_CheckPuttGoals(int nPlayer, u8 bPreview);                // the putt's
+void GM_Earnings_CheckHoleGoals(int nPlayer, u8 bPreview, u8 bRoundOver); // the hole's
+void GM_Earnings_PayRoundGoals(int nPlayer, u8 bRoundOver);               // the round's payout
 s32  Earnings_GetNumAwards(void);                 // gNumAwards: the entries in the three lists below
 s32  Earnings_GetShotAwardId(s32 i);                // gShotAwards[i]
 s32  Earnings_GetPuttAwardId(s32 i);                // gPuttAwards[i]
@@ -317,7 +318,8 @@ typedef struct GameEffects {
     u8   nCrowdReaction;        // 0x4F  the crowd reaction (Gaud_InitCrowdReactionSound) to play
                                 //       when a scripted GameBreaker ends without doing it
     u32  uFlags;                // 0x50  bit 0x4000: an eagle on a par 5 counts
-    f32  f54;                   // 0x54
+    f32  fUITimeFactor;         // 0x54  1 at setup; set by UI command 157 (GM_vSetUITimeFactor);
+                                //       nothing reads it
 } GameEffects;
 LAYOUT_ASSERT(GameEffects, 0x58);
 
@@ -586,17 +588,17 @@ int  PlayNow_GetGroupFirstChallenge(int n);
 
 // GameMode5.c
 void PlayNow_DeInit(void);
-void PlayNow_SelectChallenge(s32 a);
+void PlayNow_SelectChallenge(s32 nChallenge);
 void PlayNow_StartChallenge(void);
 u8   PlayNow_IsChallengeRunning(void);
 int  PlayNow_GetMedal(void);
 void PlayNow_OnPause(void);
 u8   PlayNow_IsIntroPending(void);
 void PlayNow_ClearIntroPending(void);
-void PlayNow_SetCalendarFlag(u8 v);
+void PlayNow_SetCalendarFlag(u8 bOn);
 u8   PlayNow_GetCalendarFlag(void);
-void PlayNow_ForceWeather(f32 x);
-void PlayNow_SendMessage18(s32 a);
+void PlayNow_ForceWeather(f32 fAmount);
+void PlayNow_SendMessage18(s32 nPlayer);
 
 void GameModePractice_ReadPlaceBallSticks(int nPlayer);          // GameMode9.c
 void GameModeDriverPGATour_FreeStreamMemory(void);                 // GameModeDriverPGATour.c
@@ -617,7 +619,8 @@ typedef struct CareerCalendar {
     u32  nEndCell;              // 0x10  the cell after its last day
     u32  nPrevMonthDays;        // 0x14  the days in the month before
     s32  nDriver;               // 0x18  0 none, 1 PGA TOUR, 2 real-time events
-    s32  n1C;                   // 0x1C  which panel the day's details show (PGA TOUR 0..3, RTE 4..6)
+    s32  nPopupType;            // 0x1C  which panel the day's details show (PGA TOUR 0..3, RTE
+                                //       4..6, -1 no event; Calendar_SelectCell)
     u8   bSeasonOver;           // 0x20  the PGA TOUR season has no event left
     u8   unk21[0x28 - 0x21];
 } CareerCalendar;
@@ -629,11 +632,12 @@ extern u16 (*gCalendarGetCurrentDay[3])(void);           // the career's current
 // The calendar screen's (CalendarScreen.c) per-driver tables.
 extern u8 (*gCalendarAtEarliest[3])(void);             // the month before; 0: the calendar may move there
 extern u8 (*gCalendarAtLatest[3])(void);             // the month after
-extern s32 (*gCalendarFillCell[3])(char* sz, u16 nDate, s32* pLook, s32* pButton);  // a day cell
+// A day cell: its text, color and button state; returns its icon (-1 none; Calendar_FillCell).
+extern s32 (*gCalendarFillCell[3])(char* sz, u16 nDate, s32* pCellColor, s32* pCellState);
 extern void (*gCalendarGetLine[3])(int nLine, char* sz);
-extern void (*gCalendarGetBottomLine[3])(u16 nDate, int n, char* sz);
+extern void (*gCalendarGetBottomLine[3])(u16 nDate, int nLine, char* sz);
 extern s32 (*gCalendarGetPopupType[3])(u16 nDate);       // the day-details panel for a day
-extern void (*gCalendarGetPopupRow[3])(int nKind, char* szTitle, char* szText);
+extern void (*gCalendarGetPopupRow[3])(int nRow, char* szTitle, char* szText);
 extern void (*gCalendarInit[3])(void);           // set the driver up
 extern void* (*gCalendarGetEventInfoByDate[3])(u16 nDate);     // the event on a day (NULL: none)
 extern void (*gCalendarPlay[3])(void);
@@ -655,7 +659,7 @@ u8   GameModeSkillZoneBase_PickPrevTarget(int nPlayer);          // previous tar
 u8   GameModeSkillZoneBase_PickTarget(int nPlayer);          // next target
 s8   GameModeSkillZoneBase_GetGreenIndexHit(int nPlayer);          // the target nearest the ball
 int  GameModeSkillZoneBase_GetGreenTargetted(int nPlayer);          // the target nearest the player's aim point
-s32  GameModeSkillZoneBase_GetBullsEyeColor(s32 n);
+s32  GameModeSkillZoneBase_GetBullsEyeColor(s32 nSurface);
 void GameModeSkillZoneBase_ClearPerHoleData(void);                 // every player's target-game state cleared
 void GameModeSkillZoneBase_ClearPerShotData(void);
 s32  GameModeSkillZoneBase_CountGreensHit(int nPlayer);          // how many targets the player has hit
@@ -664,28 +668,29 @@ s32  GameModeSkillZoneBase_GetHitAllTargetsBonus(void);                 // the t
 void GameModeSkillZoneBase_StartComment(s32 nMsg);
 void GameModeSkillZoneBase_PostShotAwards1(int nPlayer);
 void GameModeSkillZoneBase_PostShotAwards2(int nPlayer);
-s32  GameModeSkillZoneBase_ScaleTargetPoints(s32 n, int i);         // scale n by table entry i
-u8   GameModeSkillZoneBase_IsLongDrive(int nPlayer, f32 f);   // whether f is far enough for the player's tees
-s32  GameModeSkillZoneBase_GetBonusIndex(s32 n);
+s32  GameModeSkillZoneBase_ScaleTargetPoints(s32 nPoints, int nTarget); // by the target's factor on this hole
+u8   GameModeSkillZoneBase_IsLongDrive(int nPlayer, f32 fLength); // past the player's tees' drive line
+s32  GameModeSkillZoneBase_GetBonusIndex(s32 nId);
 void GameModeSkillZoneBase_PlayComment(s32 nMsg, s32 a);
-// The modes' own getters behind the dispatchers GameModeSkillZoneBase_GetShotEarned..GameModeSkillZoneBase_GetExtraBallsEarned, which pass their
-// argument on; the getters ignore it (not GameModeSkillZoneCapture_GetTotalTargetsHit: it is called directly, per player).
-int  GameModeSkillZoneCapture_GetTotalTargetsHit(int nPlayer);          // GameMode14.c
-s32  GameModeSkillZoneCapture_GetShotEarned(s32 a);                // GameMode14.c
-s32  GameModeSkillZoneTarget_GetShotEarned(s32 a);                // GameMode16.c
-s32  GameModeSkillZoneTarget_GetDriveMultiplier(s32 a);                // GameMode16.c
-s32  GameModeSkillZoneTargetToTarget_GetShotEarned(s32 a);                // GameMode17.c
-s32  GameModeSkillZoneTargetToTarget_GetExtraBallsEarned(s32 a);                // GameMode17.c
-s32  GameModeSkillZoneTimed_GetShotEarned(s32 a);                // GameMode13.c
-s32  GameModeSkillZoneTimed_GetTimeEarned(s32 a);                // GameMode13.c
-s32  GameModeSkillZoneTimed_GetDriveMultiplier(s32 a);                // GameMode13.c
+// The modes' own getters behind the dispatchers GameModeSkillZoneBase_GetShotEarned ..
+// GameModeSkillZoneBase_GetExtraBallsEarned, which pass their argument on; the getters ignore it
+// (not GameModeSkillZoneCapture_GetTotalTargetsHit: it is called directly, per player).
+int  GameModeSkillZoneCapture_GetTotalTargetsHit(int nPlayer);         // GameMode14.c
+s32  GameModeSkillZoneCapture_GetShotEarned(s32 nPlayer);              // GameMode14.c
+s32  GameModeSkillZoneTarget_GetShotEarned(s32 nPlayer);               // GameMode16.c
+s32  GameModeSkillZoneTarget_GetDriveMultiplier(s32 nPlayer);          // GameMode16.c
+s32  GameModeSkillZoneTargetToTarget_GetShotEarned(s32 nPlayer);       // GameMode17.c
+s32  GameModeSkillZoneTargetToTarget_GetExtraBallsEarned(s32 nPlayer); // GameMode17.c
+s32  GameModeSkillZoneTimed_GetShotEarned(s32 nPlayer);                // GameMode13.c
+s32  GameModeSkillZoneTimed_GetTimeEarned(s32 nPlayer);                // GameMode13.c
+s32  GameModeSkillZoneTimed_GetDriveMultiplier(s32 nPlayer);           // GameMode13.c
 
-void GameModeSkillZoneCapture_ShotClockOut(void);                 // GameMode14.c
-void GameMsg_Send5Ints(int nMsg, s32 a, s32 b, s32 c, s32 d, s32 e);    // GameMode14.c
-void GameModeSkillZoneCapture_SetShotClock(s32 a);                // GameMode14.c
-void GameModeSkillZoneHorse_ShotClockOut(void);                 // GameMode15.c
-void GameModeSkillZoneTimed_TimerOut(void);                 // GameMode13.c
-void GameModeSkillZoneTimed_SetHudClock(s32 a);                // GameMode13.c
+void GameModeSkillZoneCapture_ShotClockOut(void);                    // GameMode14.c
+void GameMsg_Send5Ints(int nMsg, s32 a, s32 b, s32 c, s32 d, s32 e); // GameMode14.c
+void GameModeSkillZoneCapture_SetShotClock(s32 nClock);              // GameMode14.c
+void GameModeSkillZoneHorse_ShotClockOut(void);                      // GameMode15.c
+void GameModeSkillZoneTimed_TimerOut(void);                          // GameMode13.c
+void GameModeSkillZoneTimed_SetHudClock(s32 nTime);                  // GameMode13.c
 s32  GameModeSkins_CurrentHoleValue(void);                 // GameMode2.c: the skin on this hole
 s32  SpeedGolf_GetFirstSelectedHole(void);                 // GameMode2.c: the first selected hole (-1: none)
 s32  SpeedGolf_GetNextSelectedHole(int h);                // the next selected hole after h (-1: none)

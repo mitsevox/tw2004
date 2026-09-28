@@ -522,15 +522,15 @@ void STATEFUNC_SwingInit(int nPlayer) {
         if (HoleContest_IsCurrentPlayerOnTee() && HoleContest_IsLongestDriveHole()) {
             GUI_ShowHoleContestIntro(0);
             GUI_ToggleUI(nPlayer, 0);
-            fn_80062C80(gPlayers[nPlayer].nC58, 0);
+            fn_80062C80(gPlayers[nPlayer].nUISlot, 0);
         } else if (HoleContest_IsCurrentPlayerOnTee() && HoleContest_IsClosestToPinHole()) {
             GUI_ShowHoleContestIntro(1);
             GUI_ToggleUI(nPlayer, 0);
-            fn_80062C80(gPlayers[nPlayer].nC58, 0);
+            fn_80062C80(gPlayers[nPlayer].nUISlot, 0);
         } else if (HoleContest_IsCurrentPlayerOnTee() && HoleContest_IsHoleInOneHole()) {
             GUI_ShowHoleContestIntro(2);
             GUI_ToggleUI(nPlayer, 0);
-            fn_80062C80(gPlayers[nPlayer].nC58, 0);
+            fn_80062C80(gPlayers[nPlayer].nUISlot, 0);
         } else {
             CTIP_ShowCaddieTip(nPlayer);
         }
@@ -543,7 +543,7 @@ void STATEFUNC_SwingInit(int nPlayer) {
             GUI_ShowChallengeIntro(PlayNow_GetCurrentGroup());
         }
         GUI_ToggleUI(nPlayer, 0);
-        fn_80062C80(gPlayers[nPlayer].nC58, 0);
+        fn_80062C80(gPlayers[nPlayer].nUISlot, 0);
         PlayNow_ClearIntroPending();
     }
     Caddie_Start(nPlayer);
@@ -645,7 +645,7 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
             TARGET_SetupTarget(nPlayer);
             fn_80062C38();
             if (gSession.nSplitScreen != 0) {
-                fn_80062CB0(gPlayers[nPlayer].nC58, 1);
+                fn_80062CB0(gPlayers[nPlayer].nUISlot, 1);
             }
             TARGET_ResetMomentums(nPlayer);
             fn_800642D0_ReapplyCurrentShot(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]),
@@ -1155,7 +1155,7 @@ void STATEFUNC_GreenMorphUpdate(int nPlayer) {
             fn_80095744(gPlayers[nPlayer].pChar, 5);
             fn_80062C38();
             if (gSession.nSplitScreen != 0) {
-                fn_80062CB0(gPlayers[nPlayer].nC58, 1);
+                fn_80062CB0(gPlayers[nPlayer].nUISlot, 1);
             }
         }
         gpGame->pfnResetShot(nPlayer);

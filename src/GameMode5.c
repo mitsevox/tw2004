@@ -829,7 +829,7 @@ int PlayNow_GetMedal(void) {
             case 8:
                 bBest = 1;
                 for (i = 1; i < gNumPlayersSetUp; i++) {
-                    if (gPlayers[0].n274 <= PLAYER(i)->n274) {
+                    if (gPlayers[0].nSkinsTotal <= PLAYER(i)->nSkinsTotal) {
                         bBest = 0;
                     }
                 }

@@ -284,7 +284,7 @@ void GM_ClearPlayerHoleData(int nPlayer, int nHole) {
     gPlayers[nPlayer].nStrokes[nHole] = 0;
     gPlayers[nPlayer].nPutts[nHole] = 0;
     gPlayers[nPlayer].nModePoints[nHole] = 0;
-    gPlayers[nPlayer].n22C[nHole] = 0;
+    gPlayers[nPlayer].nSkinsWon[nHole] = 0;
     gPlayers[nPlayer].n290[nHole] = 0;
     gPlayers[nPlayer].bGreenInReg[nHole] = 0;
     gPlayers[nPlayer].bFairwayHit[nHole] = 0;
@@ -309,16 +309,16 @@ void GM_ClearDataForNewGame(void) {
         }
         p->bPlayerCut = 0;
         p->nHolesWon = 0;
-        p->n274 = 0;
+        p->nSkinsTotal = 0;
         p->n2D8 = 0;
         p->nLongestDrive = 0;
         p->nLongestPutt = 0;
         p->n308 = 0;
-        p->nC44 = 3000;
-        p->nC3C = 0;
+        p->nSGPoints = 3000;
+        p->nSGFlags = 0;
         p->uC48 = 0;
         for (j = 0; j < 18; j++) {
-            p->nC6C[j] = 0;
+            p->nSGHoleScore[j] = 0;
         }
         GM_ClearGameBonusStats(i);
         if (gpSaveData[p->nIndex].bActive != 0) {

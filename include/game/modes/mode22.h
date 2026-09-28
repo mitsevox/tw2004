@@ -33,4 +33,8 @@ extern char* gTourTrophyTitles[4];  // the trophies' titles ("Rookie of the Year
 // The text GameMode22_ShowDrivesLeft prints (starts as "D"; 0xE zero bytes follow it, so likely 16 bytes).
 extern char gGameMode22DrivesLeftText[];
 
+// GameMode22.c: what the post-shot UI asks (GameUI.c GUI_IsPostShotUIAnimating)
+u8   GameMode22_IsActive(void);          // game mode 22 is being played
+u8   GameMode22_IsShowingWinner(void);   // a winner is decided and his 120 frames still run
+
 #endif

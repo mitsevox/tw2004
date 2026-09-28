@@ -264,14 +264,14 @@ s32 GameMode26_GetLieGroup(int nLie) {
 // once somebody has won. Scored as in GameMode22_ScoreShot: surface 0x9B kind 1, the length plus
 // 20%; surface 0x2F or 0x68 kind 4, -100 (with a sound); bLowIQPenalty set kind 5, -100; else by
 // GameMode26_GetLieGroup: the tee or the rough kind 2, 0 points; the fairway, green or cup kind 0,
-// the length; sand kind 3, -50. Kinds 0 and 1 are fair drives: counted (nEA4), their total (nEC4)
-// and average (nEC0) kept, and 400 or more earns 100 more; every drive counts (nEA0) and each kind
-// has its own count. The score (nEBC) never drops below 0 and goes to the scoreboard (message
-// 0x42); sounds the first time it reaches 400, 800 and 1200. The player's longest fair drive (nEA8)
-// and where it lay (vEAC) are kept, with message 0x4C when it beats the other player's. The first
-// to gGameMode26TargetScore points wins (gGameMode26Winner) with one of four winning lines;
-// otherwise one line is said at random from those the drive earned (a new longest drive, a long
-// one, a bad one, taking the lead).
+// the length; sand kind 3, -50. Kinds 0 and 1 are fair drives: counted (nFairDrives), their total
+// (nFairDriveTotal) and average (nAverageDrive) kept, and 400 or more earns 100 more; every drive
+// counts (nDrivesTaken) and each kind has its own count. The score (nDriveScore) never drops below
+// 0 and goes to the scoreboard (message 0x42); sounds the first time it reaches 400, 800 and 1200.
+// The player's longest fair drive (nBestDrive) and where it lay (vBestDrivePos) are kept, with
+// message 0x4C when it beats the other player's. The first to gGameMode26TargetScore points wins
+// (gGameMode26Winner) with one of four winning lines; otherwise one line is said at random from
+// those the drive earned (a new longest drive, a long one, a bad one, taking the lead).
 void GameMode26_ScoreShot(PlayerNumber_t nPlayer) {
     s32 nKind;
     Player* pPlayer = &gPlayers[nPlayer];
@@ -287,8 +287,8 @@ void GameMode26_ScoreShot(PlayerNumber_t nPlayer) {
     if (GameMode26_GetWinner(NULL)) {
         return;
     }
-    nLead = gPlayers[nPlayer].nEBC - gPlayers[nPlayer == 0].nEBC;
-    gPlayers[nPlayer].nEA0++;
+    nLead = gPlayers[nPlayer].nDriveScore - gPlayers[nPlayer == 0].nDriveScore;
+    gPlayers[nPlayer].nDrivesTaken++;
     switch (pPlayer->ball.nSurface) {
     case 0x9B:
         nKind = 1;
@@ -326,31 +326,32 @@ void GameMode26_ScoreShot(PlayerNumber_t nPlayer) {
 
     nLength = fn_800D0550(nPlayer);
     if (bCounts) {
-        gPlayers[nPlayer].nEA4++;
-        gPlayers[nPlayer].nEC4 += nLength;
-        gPlayers[nPlayer].nEC0 = (f32)gPlayers[nPlayer].nEC4 / (f32)gPlayers[nPlayer].nEA4;
+        gPlayers[nPlayer].nFairDrives++;
+        gPlayers[nPlayer].nFairDriveTotal += nLength;
+        gPlayers[nPlayer].nAverageDrive = (f32)gPlayers[nPlayer].nFairDriveTotal
+                / (f32)gPlayers[nPlayer].nFairDrives;
     }
 
     nPoints = 0;
     switch (nKind) {
     case 1:
         ADD_MSG(0x17);
-        gPlayers[nPlayer].nECC++;
+        gPlayers[nPlayer].nBonusDrives++;
         nPoints = nLength + (s32)(0.2f * nLength);
         break;
     case 0:
         nPoints = nLength;
-        gPlayers[nPlayer].nEC8++;
+        gPlayers[nPlayer].nFairwayDrives++;
         break;
     case 2:
         ADD_MSG(0x1C);
         nPoints = 0;
-        gPlayers[nPlayer].nED0++;
+        gPlayers[nPlayer].nRoughDrives++;
         break;
     case 3:
         ADD_MSG(0x1D);
         nPoints = -50;
-        gPlayers[nPlayer].nED4++;
+        gPlayers[nPlayer].nSandDrives++;
         break;
     case 4:
         if (Game_GetCurHoleNum() == 4) {
@@ -362,12 +363,12 @@ void GameMode26_ScoreShot(PlayerNumber_t nPlayer) {
         }
         ADD_MSG(0x1E);
         nPoints = -100;
-        gPlayers[nPlayer].nED8++;
+        gPlayers[nPlayer].nSurfacePenaltyDrives++;
         break;
     case 5:
         ADD_MSG(0x1B);
         nPoints = -100;
-        gPlayers[nPlayer].nEDC++;
+        gPlayers[nPlayer].nPenaltyDrives++;
         break;
     }
     if (nLength >= 400 && (nKind == 1 || nKind == 0)) {
@@ -410,39 +411,39 @@ void GameMode26_ScoreShot(PlayerNumber_t nPlayer) {
         ADD_MSG(0x19);
     }
 
-    pPlayer->nEBC += nPoints;
-    nTotal = pPlayer->nEBC;
-    pPlayer->nEBC = (nTotal <= 0) ? 0 : nTotal;     // never below zero
-    GUI_UpdateLongDriveScore(nPlayer, gPlayers[nPlayer].nEBC, nLength, nKind, 0, 0, nPoints, 0.0f);
+    pPlayer->nDriveScore += nPoints;
+    nTotal = pPlayer->nDriveScore;
+    pPlayer->nDriveScore = (nTotal <= 0) ? 0 : nTotal;     // never below zero
+    GUI_UpdateLongDriveScore(nPlayer, gPlayers[nPlayer].nDriveScore, nLength, nKind, 0, 0, nPoints, 0.0f);
 
     // A track the first time the score reaches 1200, 800 and 400 (EA also passes the player's
     // side, 1 or -1, which Gaud_LongDriveUi_Play ignores).
-    if (!gGameMode26Reached1200[nPlayer] && gPlayers[nPlayer].nEBC >= 1200) {
+    if (!gGameMode26Reached1200[nPlayer] && gPlayers[nPlayer].nDriveScore >= 1200) {
         // port: EA passes two arguments Gaud_LongDriveUi_Play ignores
         ((void (*)(s32, int, int, int, int))Gaud_LongDriveUi_Play)(0, 0, 2, 0, (nPlayer != 0) ? 1 : -1);
         gGameMode26Reached1200[nPlayer] = 1;
     }
-    if (!gGameMode26Reached800[nPlayer] && gPlayers[nPlayer].nEBC >= 800) {
+    if (!gGameMode26Reached800[nPlayer] && gPlayers[nPlayer].nDriveScore >= 800) {
         // port: EA passes two arguments Gaud_LongDriveUi_Play ignores
         ((void (*)(s32, int, int, int, int))Gaud_LongDriveUi_Play)(0, 0, 3, 0, (nPlayer != 0) ? 1 : -1);
         gGameMode26Reached800[nPlayer] = 1;
     }
-    if (!gGameMode26Reached400[nPlayer] && gPlayers[nPlayer].nEBC >= 400) {
+    if (!gGameMode26Reached400[nPlayer] && gPlayers[nPlayer].nDriveScore >= 400) {
         // port: EA passes two arguments Gaud_LongDriveUi_Play ignores
         ((void (*)(s32, int, int, int, int))Gaud_LongDriveUi_Play)(0, 0, 4, 0, (nPlayer != 0) ? 1 : -1);
         gGameMode26Reached400[nPlayer] = 1;
     }
 
     // The shot took the lead.
-    if (nLead < 0 && gPlayers[nPlayer].nEBC - gPlayers[nPlayer == 0].nEBC > 0) {
+    if (nLead < 0 && gPlayers[nPlayer].nDriveScore - gPlayers[nPlayer == 0].nDriveScore > 0) {
         ADD_MSG(0x18);
     }
 
     // The player's longest counted shot, and where the ball lay.
-    if (bCounts && nLength > pPlayer->nEA8) {
-        pPlayer->nEA8 = nLength;
-        LLMath_CopyVec(pPlayer->ball.vPos, pPlayer->vEAC);
-        if (gPlayers[nPlayer].nEA8 > gPlayers[1 - nPlayer].nEA8) {
+    if (bCounts && nLength > pPlayer->nBestDrive) {
+        pPlayer->nBestDrive = nLength;
+        LLMath_CopyVec(pPlayer->ball.vPos, pPlayer->vBestDrivePos);
+        if (gPlayers[nPlayer].nBestDrive > gPlayers[1 - nPlayer].nBestDrive) {
             GameMsg_Send2Ints(0x4C, nLength, nPlayer);
             // port: EA passes two arguments Gaud_LongDriveUi_Play ignores
             ((void (*)(s32, int, int, int, int))Gaud_LongDriveUi_Play)(0, 0, 0, 0, 0);
@@ -450,7 +451,7 @@ void GameMode26_ScoreShot(PlayerNumber_t nPlayer) {
     }
 
     // The target score reached: the player wins, with one of four winning messages.
-    if (pPlayer->nEBC >= gGameMode26TargetScore) {
+    if (pPlayer->nDriveScore >= gGameMode26TargetScore) {
         gGameMode26Winner = nPlayer;
         nMsgs = 0;
         nPick = Misc_RandFunc(1) % 3;
@@ -482,27 +483,27 @@ void GameMode26_RestartHole(void) {
     gGameMode26Winner = 5;
 }
 
-// Every player's contest values cleared: drives, fair drives, longest drive, score (nEBC), average,
-// total and the counts per kind (0xEA0..0xEDC; vEAC stays), each score sent to the scoreboard
-// (message 0x42); then GameMode26_AfterClearStats (empty). Unlike GameMode22_ClearPlayerStats it
-// leaves the current player (lbl_80282278) as it is.
+// Every player's contest values cleared: drives, fair drives, longest drive, score (nDriveScore),
+// average, total and the counts per kind (0xEA0..0xEDC; vBestDrivePos stays), each score sent to
+// the scoreboard (message 0x42); then GameMode26_AfterClearStats (empty). Unlike
+// GameMode22_ClearPlayerStats it leaves the current player (lbl_80282278) as it is.
 void GameMode26_ClearPlayerStats(void) {
     s32 i;
 
     for (i = 0; i < 5; i++) {
-        PLAYER(i)->nEA0 = 0;
-        PLAYER(i)->nEA4 = 0;
-        PLAYER(i)->nEA8 = 0;
-        PLAYER(i)->nEBC = 0;
-        PLAYER(i)->nEC0 = 0;
-        PLAYER(i)->nEC4 = 0;
-        PLAYER(i)->nEC8 = 0;
-        PLAYER(i)->nECC = 0;
-        PLAYER(i)->nED0 = 0;
-        PLAYER(i)->nED4 = 0;
-        PLAYER(i)->nED8 = 0;
-        PLAYER(i)->nEDC = 0;
-        GUI_UpdateLongDriveScore(i, PLAYER(i)->nEBC, 0, 0, 0, 0, 0, 0.0f);
+        PLAYER(i)->nDrivesTaken = 0;
+        PLAYER(i)->nFairDrives = 0;
+        PLAYER(i)->nBestDrive = 0;
+        PLAYER(i)->nDriveScore = 0;
+        PLAYER(i)->nAverageDrive = 0;
+        PLAYER(i)->nFairDriveTotal = 0;
+        PLAYER(i)->nFairwayDrives = 0;
+        PLAYER(i)->nBonusDrives = 0;
+        PLAYER(i)->nRoughDrives = 0;
+        PLAYER(i)->nSandDrives = 0;
+        PLAYER(i)->nSurfacePenaltyDrives = 0;
+        PLAYER(i)->nPenaltyDrives = 0;
+        GUI_UpdateLongDriveScore(i, PLAYER(i)->nDriveScore, 0, 0, 0, 0, 0, 0.0f);
     }
     GameMode26_AfterClearStats();
 }

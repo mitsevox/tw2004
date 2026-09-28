@@ -304,7 +304,7 @@ u8 GameModeAlternateShot_HoleFinished(int nPlayer, u8 bCheck) {
             P(i)->nStrokes[h] = 0;                  \
             P(i)->nPutts[h] = 0;                    \
             P(i)->nModePoints[h] = 0;               \
-            P(i)->n22C[h] = 0;                      \
+            P(i)->nSkinsWon[h] = 0;                      \
             P(i)->n290[h] = 0;                      \
             P(i)->bGreenInReg[h] = 0;                      \
             P(i)->bFairwayHit[h] = 0;                      \

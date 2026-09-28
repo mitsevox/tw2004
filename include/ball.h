@@ -155,8 +155,11 @@ typedef struct Ball {
     f32  fClosest;              // 0x60  closest approach to the pin so far. TW06: closestToCupThisShot
     s32  nState;                // 0x64  physicsBallState_t: 0 dead, 1 waiting, 2 flying, 3/4 rolling, 5 out (OB or water)
     s32  nLie;                  // 0x68  Lie_t: 12 in the cup, 16 out of bounds (also water here)
-    s32  n6C;                   // 0x6C  TW06 has five lie fields here (initialLie, lie, lieAngle,
-    f32  f70;                   // 0x70  lieModifier, lieReadOffset); this game has three. f70 is added to a surface's value
+    s32  nLieAngle;             // 0x6C  the UI can ask it (message 19,
+                                //       GM_vGetPlayerCurrentLieAngle); only ever set to 0. TW06
+                                //       has five lie fields here (initialLie, lie, lieAngle,
+                                //       lieModifier, lieReadOffset); this game has three
+    f32  f70;                   // 0x70  added to a surface's value
     s32  nSurface;              // 0x74  surface type under the ball (90 = the cup). TW06: surfaceID
     s32  nStartSurface;         // 0x78  surface at the start of the shot. TW06: initialSurfaceID
     CourseInfo* pCourse;        // 0x7C  TW06: pTerrainData (TGD_TerrainInfo*)

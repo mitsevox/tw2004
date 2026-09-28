@@ -230,7 +230,7 @@ void fn_80056B8C(void) {
     for (i = 0; i < 15; i++) {
         lbl_80281DF4->aTipSeen[i] = 0;
     }
-    lbl_80281DF4->b522F = 0;
+    lbl_80281DF4->bCaddieTipsOff = 0;
     lbl_80281DF4->nTourCardLevel = 0;
 }
 
@@ -360,7 +360,7 @@ void fn_80057438(SaveProfile* pProfile) {
     for (i = 0; i < 15; i++) {
         pProfile->aTipSeen[i] = 0;
     }
-    pProfile->b522F = 0;
+    pProfile->bCaddieTipsOff = 0;
     pProfile->nTourCardLevel = 0;
 
     for (i = 0; i < NUM_SAVED_ROUNDS; i++) {

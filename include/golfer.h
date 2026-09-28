@@ -263,8 +263,9 @@ typedef struct Player {
     s32  nStrokes[18];          // 0x154  strokes taken per hole
     s32  nPutts[18];            // 0x19C  putts per hole (GM_PlayerAddStroke). TW06: putts
     s32  nModePoints[18];       // 0x1E4  per hole, the mode's points (match play: 1 = hole won). TW06: modepoints
-    s32  n22C[18];              // 0x22C  per hole. TW06: skinwin
-    s32  n274;                  // 0x274  TW06: skinwins
+    s32  nSkinsWon[18];         // 0x22C  skins: the money won per hole (GameModeSkins_ScoreHole).
+                                //        TW06: skinwin
+    s32  nSkinsTotal;           // 0x274  skins: their sum, paid at the end. TW06: skinwins
     s32  nHolesWon;             // 0x278  match play. TW06: matchwins
     s32  nRoundScore[4];        // 0x27C  TW06: roundscore
     u8   bPlayerCut;            // 0x28C  TW06: playercut
@@ -323,10 +324,12 @@ typedef struct Player {
     f32  fA64;                 // 0xA64  a distance, set when a swing state 16 begins
     s32  nSurface;              // 0xA68  surface type under the target, -1 none, 16 water. TW06: targetedSurfaceID
     f32  vPlacement[4];         // 0xA6C  where the ball may be placed (swing state 22)
-    f32  fA7C;                  // 0xA7C  pad stick x, -1..1 (GameMode9 GameModePractice_ReadPlaceBallSticks)
-    f32  fA80;                  // 0xA80
-    f32  fA84;                  // 0xA84
-    f32  fA88;                  // 0xA88  an angle (speed golf: the run's heading)
+    // The ball placement point (swing state 22; speed golf's runner): stick inputs, -1..1, eased
+    // back to 0 by 0.05 a frame (PlaceBall_UpdateMomentums, target.c), and its heading.
+    f32  fMomentumTurn;         // 0xA7C  turns the heading
+    f32  fMomentumX;            // 0xA80  moves the point sideways
+    f32  fMomentumZ;            // 0xA84  moves it forward
+    f32  fPlaceHeading;         // 0xA88  radians (speed golf: the run's heading)
     f32  fA8C;                  // 0xA8C  pad stick y, -1..1 (GameMode8 SpeedGolf_ReadSticks)
     Ball ball;                  // 0xA90  the player's ball
     f32  vOrient[4];            // 0xB4C  a quaternion, identity at setup. TW06: ballRot
@@ -352,18 +355,24 @@ typedef struct Player {
     s32  nRehearseState;        // 0xC30  AI_RehearseShot state machine
     u8   unkC34[4];
     s32  nC38;                  // 0xC38  a frame countdown (speed golf)
-    s32  nC3C;                  // 0xC3C
-    s32  nC40;                  // 0xC40
-    s32  nC44;                  // 0xC44  3000 at the start of a round
+    s32  nSGFlags;              // 0xC3C  speed golf's state bits (GameMode8.c: the countdown, the
+                                //        run, drive measured, tips, out / won)
+    s32  nRunStartLie;          // 0xC40  the ball's lie as the run starts (SpeedGolf_RunInit);
+                                //        never read
+    s32  nSGPoints;             // 0xC44  speed golf mode 7: 3000 at the start of a round; 0 loses
+                                //        (the winner gets 6000)
     u64  uC48;                  // 0xC48  speed golf: the events' flags (SGEvent), 64 bits
-    f32  fC50;                  // 0xC50  speed golf: a distance from the ball to vA44
+    f32  fDriveLength;          // 0xC50  speed golf: the tee shot's length from the tee (vA44),
+                                //        then the replay's longer drive
     s32  nC54;                  // 0xC54  a frame countdown (speed golf's run to the ball)
-    s32  nC58;                  // 0xC58
+    s32  nUISlot;               // 0xC58  the player's slot in the front end's in-round messages;
+                                //        speed golf sets 2 for player 0, 3 for player 1
     s32  nC5C;                  // 0xC5C
     s32  nC60;                  // 0xC60  speed golf: strokes when the player holed out
     s32  nC64;                  // 0xC64  speed golf: strokes when the ball reached the green
     f32  fC68;                  // 0xC68  speed golf: the ball's distance from gpGame->pPinPos then
-    s32  nC6C[18];              // 0xC6C  cleared at the start of a round
+    s32  nSGHoleScore[18];      // 0xC6C  speed golf, per hole: mode 7 the points after it, modes 6
+                                //        and 8 seconds plus 3 a stroke (SpeedGolf_SetHoleTime)
     f32  fCB4;                  // 0xCB4  speed golf: raised by a button, falls every frame
     s32  nCB8;                  // 0xCB8  speed golf: cleared by that button
     f32  vCBC[3];               // 0xCBC  a vector (the run's velocity?): the first-person camera's step is
@@ -401,20 +410,23 @@ typedef struct Player {
     u8   bAllTargetsHit;        // 0xE9E  the hit-every-target prize was paid (its commentary
                                 //        plays once)
     u8   unkE9F;
-    s32  nEA0;                  // 0xEA0  } values of the modes' own the menus ask for
-    s32  nEA4;                  // 0xEA4  } (GameUICommands.c IG_vGetLongDriveStat)
-    s32  nEA8;                  // 0xEA8  }
-    f32  vEAC[3];               // 0xEAC  where the ball lay at nEA8's shot (GameMode22 GameMode22_ScoreShot)
+    // The long-drive contests (modes 22 and 26): kept by GameMode22_ScoreShot and
+    // GameMode26_ScoreShot, cleared (all but vBestDrivePos) by their ClearPlayerStats, read by the
+    // UI (GameUICommands.c IG_vGetLongDriveStat). A fair drive is one of kind 0 or 1 below.
+    s32  nDrivesTaken;          // 0xEA0  every drive
+    s32  nFairDrives;           // 0xEA4  the fair ones
+    s32  nBestDrive;            // 0xEA8  the longest fair drive
+    f32  vBestDrivePos[3];      // 0xEAC  where its ball lay
     u8   unkEB8[0xEBC - 0xEB8];
-    s32  nEBC;                  // 0xEBC  }
-    s32  nEC0;                  // 0xEC0  }
-    s32  nEC4;                  // 0xEC4  } (GameMode22 GameMode22_ClearPlayerStats clears 0xEA0..0xEDC)
-    s32  nEC8;                  // 0xEC8  }
-    s32  nECC;                  // 0xECC  }
-    s32  nED0;                  // 0xED0  }
-    s32  nED4;                  // 0xED4  }
-    s32  nED8;                  // 0xED8  }
-    s32  nEDC;                  // 0xEDC  }
+    s32  nDriveScore;           // 0xEBC  the points (never below 0)
+    s32  nAverageDrive;         // 0xEC0  nFairDriveTotal / nFairDrives
+    s32  nFairDriveTotal;       // 0xEC4  the fair drives' lengths added up
+    s32  nFairwayDrives;        // 0xEC8  kind 0: on the fairway, fringe, green or in the cup
+    s32  nBonusDrives;          // 0xECC  kind 1: on surface 0x9B (the length plus 20%)
+    s32  nRoughDrives;          // 0xED0  kind 2: on the tee or in the rough (0 points)
+    s32  nSandDrives;           // 0xED4  kind 3: in sand (-50)
+    s32  nSurfacePenaltyDrives; // 0xED8  kind 4: on surface 0x2F or 0x68 (-100)
+    s32  nPenaltyDrives;        // 0xEDC  kind 5: a penalty shot (-100)
     u8   bEE0;                  // 0xEE0
     u8   unkEE1[3];
     s32  nEE4;                  // 0xEE4  2 or 3 picks a message after a shot (GM_PlayerTookShot)

@@ -121,7 +121,7 @@ void Calendar_SetDriver(MsgArg* pArgs, MsgArg* pResult) {
 
 // FE message 496: selects day cell pArgs[0] (CalendarState.nSelected) and gives the day-details
 // popup its event shows (the driver's gCalendarGetPopupType; -1 when the day has no event), also
-// kept in CalendarState.n1C for the popup's rows.
+// kept in CalendarState.nPopupType for the popup's rows.
 void Calendar_SelectCell(MsgArg* pArgs, MsgArg* pResult) {
     u16 nDate = GetDateFromCellIndex(pArgs[0].i);
     s32 nPanel;
@@ -132,7 +132,7 @@ void Calendar_SelectCell(MsgArg* pArgs, MsgArg* pResult) {
     } else {
         nPanel = -1;
     }
-    CalendarState.n1C = nPanel;
+    CalendarState.nPopupType = nPanel;
     pResult->i = nPanel;
 }
 
@@ -173,14 +173,14 @@ void Calendar_IsSimulationNecessary(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // FE message 708: into the text pArgs[0], the description of the selected day's real-time event
-// (GameModeDriverRTE_GetDescription) while the day-details popup is type 4 (CalendarState.n1C),
-// else a single space.
+// (GameModeDriverRTE_GetDescription) while the day-details popup is type 4
+// (CalendarState.nPopupType), else a single space.
 void Calendar_GetRTEDescription(MsgArg* pArgs, MsgArg* pResult) {
     s32 nId;
     s32 nRound;
     char* sz = ((MsgString*)pArgs[0].p)->pStr;
 
-    switch (CalendarState.n1C) {
+    switch (CalendarState.nPopupType) {
     case 4:
         GameModeDriverRTE_GetEventByDate(CalendarState.nSelected, &nId, &nRound);
         strcpy(sz, GameModeDriverRTE_GetDescription(nId));

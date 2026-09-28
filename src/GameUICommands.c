@@ -826,9 +826,9 @@ void GM_vGetPlayerCurrentLie(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gPlayers[pArgs[0].i].ball.nLie;
 }
 
-// Message 19: the lie angle of player pArgs[0]'s ball (ball.n6C).
+// Message 19: the lie angle of player pArgs[0]'s ball (ball.nLieAngle).
 void GM_vGetPlayerCurrentLieAngle(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = gPlayers[pArgs[0].i].ball.n6C;
+    pResult->i = gPlayers[pArgs[0].i].ball.nLieAngle;
 }
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
@@ -957,9 +957,9 @@ void GM_vGetMatchWins(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gPlayers[pArgs[0].i].nHolesWon;
 }
 
-// Message 31: the skins player pArgs[0] has won (Player.n274, TW06 skinwins).
+// Message 31: the skins player pArgs[0] has won (Player.nSkinsTotal, TW06 skinwins).
 void GM_vGetSkinWins(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = gPlayers[pArgs[0].i].n274;
+    pResult->i = gPlayers[pArgs[0].i].nSkinsTotal;
 }
 
 // Message 32: the game mode (Game_GetMode).
@@ -1522,15 +1522,16 @@ void GM_vReportCaddieTipWindow(MsgArg* pArgs, MsgArg* pResult) {
         return;
     }
     GUI_ToggleUI(lbl_80282278, 0);
-    fn_80062C80(gPlayers[lbl_80282278].nC58, 0);
+    fn_80062C80(gPlayers[lbl_80282278].nUISlot, 0);
     GUI_CaddieTipWindowIsOpen();
 }
 
 // Turns the full caddie tips off for the player whose turn it is (command 75): sets his save
-// profile's b522F, when the profile is in use, and CTIP_ShowCaddieTip then shows only short tips.
+// profile's bCaddieTipsOff, when the profile is in use, and CTIP_ShowCaddieTip then shows only
+// short tips.
 void GM_vDisableCaddieTips(MsgArg* pArgs, MsgArg* pResult) {
     if (gpSaveData[gPlayers[lbl_80282278].nIndex].bActive != 0) {
-        gpSaveData[gPlayers[lbl_80282278].nIndex].b522F = 1;
+        gpSaveData[gPlayers[lbl_80282278].nIndex].bCaddieTipsOff = 1;
     }
 }
 
@@ -2484,13 +2485,13 @@ void GM_vIG_MCDeleteSave(MsgArg* pArgs, MsgArg* pResult) {
     fn_80082E10(pArgs, pResult);
 }
 
-// Command 157: sets the UI's time factor gGameEffects.f54 to the float pArgs[0]; a negative one
-// becomes 1 (written back into pArgs[0] too). Nothing else in this build reads it.
+// Command 157: sets the UI's time factor gGameEffects.fUITimeFactor to the float pArgs[0]; a
+// negative one becomes 1 (written back into pArgs[0] too). Nothing else in this build reads it.
 void GM_vSetUITimeFactor(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[0].f < 0.0f) {
         pArgs[0].f = 1.0f;
     }
-    gGameEffects.f54 = pArgs[0].f;
+    gGameEffects.fUITimeFactor = pArgs[0].f;
 }
 
 // Command 158: a quick cheer from the crowd (Gaud_FireQuickCheer) and commentary line pArgs[0]
@@ -2561,36 +2562,37 @@ void IG_vReturnZero195(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Command 169: a long-drive contest number of player pArgs[0] (modes 22 and 26 keep them), picked
-// by pArgs[1]: 0 drives taken (nEA0), 1 the average length of the drives that count (nEC0), 2 nEA8,
-// 3..6 how many drives of kinds 1, 3, 4 and 5 (nECC, nED4, nED8, nEDC), 7 the points (nEBC), 8 the
-// number of players. Any other pArgs[1] leaves the result alone.
+// by pArgs[1]: 0 drives taken (nDrivesTaken), 1 the average length of the drives that count
+// (nAverageDrive), 2 nBestDrive, 3..6 how many drives of kinds 1, 3, 4 and 5 (nBonusDrives,
+// nSandDrives, nSurfacePenaltyDrives, nPenaltyDrives), 7 the points (nDriveScore), 8 the number of
+// players. Any other pArgs[1] leaves the result alone.
 void IG_vGetLongDriveStat(MsgArg* pArgs, MsgArg* pResult) {
     Player* pPlayer = &gPlayers[pArgs[0].i];
 
     switch (pArgs[1].i) {
     case 0:
-        pResult->i = pPlayer->nEA0;
+        pResult->i = pPlayer->nDrivesTaken;
         return;
     case 1:
-        pResult->i = pPlayer->nEC0;
+        pResult->i = pPlayer->nAverageDrive;
         return;
     case 2:
-        pResult->i = pPlayer->nEA8;
+        pResult->i = pPlayer->nBestDrive;
         return;
     case 3:
-        pResult->i = pPlayer->nECC;
+        pResult->i = pPlayer->nBonusDrives;
         return;
     case 4:
-        pResult->i = pPlayer->nED4;
+        pResult->i = pPlayer->nSandDrives;
         return;
     case 5:
-        pResult->i = pPlayer->nED8;
+        pResult->i = pPlayer->nSurfacePenaltyDrives;
         return;
     case 6:
-        pResult->i = pPlayer->nEDC;
+        pResult->i = pPlayer->nPenaltyDrives;
         return;
     case 7:
-        pResult->i = pPlayer->nEBC;
+        pResult->i = pPlayer->nDriveScore;
         return;
     case 8:
         pResult->i = gSession.nNumPlayers;

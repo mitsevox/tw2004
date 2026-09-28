@@ -559,9 +559,9 @@ void GameModeSkillZoneTimed_TenSecWarning(void) {
 
 // The current golfer's time ran out (through GameModeSkillZoneBase_TimerOut): the ticking stops. If
 // the ball is not yet in play (GS_PRE_SHOT to GS_ELEVATOR, or GS_SWING) the golfer's game ends: the
-// lie set to in the hole (12), nC3C bit 26, the HUD clock 0, message 18, GS_IN_THE_HOLE and comment
-// 0x14. With the shot under way bE9D is set instead, and CheckShotAwards decides once the ball
-// stops.
+// lie set to in the hole (12), nSGFlags bit 26, the HUD clock 0, message 18, GS_IN_THE_HOLE and
+// comment 0x14. With the shot under way bE9D is set instead, and CheckShotAwards decides once the
+// ball stops.
 void GameModeSkillZoneTimed_TimerOut(void) {
     Gaud_StopShotClock();
     if ((s8)GOLFERSTATE_GetCurrentState(lbl_80282278) == 1 ||
@@ -570,7 +570,7 @@ void GameModeSkillZoneTimed_TimerOut(void) {
         (s8)GOLFERSTATE_GetCurrentState(lbl_80282278) == 4 ||
         (s8)GOLFERSTATE_GetCurrentState(lbl_80282278) == 10) {
         gPlayers[lbl_80282278].ball.nLie = 12;
-        gPlayers[lbl_80282278].nC3C |= 0x04000000;
+        gPlayers[lbl_80282278].nSGFlags |= 0x04000000;
         GameModeSkillZoneTimed_SetHudClock(0);
         PlayNow_SendMessage18(lbl_80282278);
         GOLFERSTATE_Switch(13, lbl_80282278);

@@ -818,7 +818,7 @@ u8 fn_8006D01C(void) {
 }
 
 // Whether view nView's golfer is drawn normally: in mode 9 except while placing the ball (state
-// 22); never while paused; in modes 7 and 8 not when nC3C has bit 0x1 or 0x02000000.
+// 22); never while paused; in modes 7 and 8 not when nSGFlags has bit 0x1 or 0x02000000.
 u8 fn_8006D1C0(int nView) {
     int nPlayer = ViewController_GetActivePlayerNumber(nView);
 
@@ -829,7 +829,7 @@ u8 fn_8006D1C0(int nView) {
         return 0;
     }
     if ((Game_GetMode() == 7 || Game_GetMode() == 8)
-        && ((gPlayers[nPlayer].nC3C & 1) || (gPlayers[nPlayer].nC3C & 0x02000000))) {
+        && ((gPlayers[nPlayer].nSGFlags & 1) || (gPlayers[nPlayer].nSGFlags & 0x02000000))) {
         return 0;
     }
     return 1;

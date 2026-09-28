@@ -155,29 +155,29 @@ void GameModePractice_InitCamera(void) {
 
 // The pad's sticks while the ball is being placed (STATEFUNC_PlaceBallUpdate, in every mode): stick
 // bytes 3, 2 and 0 (Input_sGetStickInfo), beyond a 96..160 dead zone and scaled to about -1..1, go
-// into fA84, fA80 and fA7C (the last negated), which PlaceBall_UpdateMomentums uses to move the
-// cursor and turn its heading. Inside the dead zone a value is left as it was
+// into fMomentumZ, fMomentumX and fMomentumTurn (the last negated), which PlaceBall_UpdateMomentums
+// uses to move the cursor and turn its heading. Inside the dead zone a value is left as it was
 // (PlaceBall_UpdateMomentums eases it back to 0).
 void GameModePractice_ReadPlaceBallSticks(int nPlayer) {
     u8* pPad = Input_sGetStickInfo(gPlayers[nPlayer].nController);
     if (pPad) {
         if (pPad[3] < 96.0f) {
-            gPlayers[nPlayer].fA84 = (96.0f - pPad[3]) / 96.0f;
+            gPlayers[nPlayer].fMomentumZ = (96.0f - pPad[3]) / 96.0f;
         }
         if (pPad[3] > 160.0f) {
-            gPlayers[nPlayer].fA84 = (160.0f - pPad[3]) / 96.0f;
+            gPlayers[nPlayer].fMomentumZ = (160.0f - pPad[3]) / 96.0f;
         }
         if (pPad[2] < 96.0f) {
-            gPlayers[nPlayer].fA80 = (96.0f - pPad[2]) / 96.0f;
+            gPlayers[nPlayer].fMomentumX = (96.0f - pPad[2]) / 96.0f;
         }
         if (pPad[2] > 160.0f) {
-            gPlayers[nPlayer].fA80 = (160.0f - pPad[2]) / 96.0f;
+            gPlayers[nPlayer].fMomentumX = (160.0f - pPad[2]) / 96.0f;
         }
         if (pPad[0] < 96.0f) {
-            gPlayers[nPlayer].fA7C = -(96.0f - pPad[0]) / 96.0f;
+            gPlayers[nPlayer].fMomentumTurn = -(96.0f - pPad[0]) / 96.0f;
         }
         if (pPad[0] > 160.0f) {
-            gPlayers[nPlayer].fA7C = -(160.0f - pPad[0]) / 96.0f;
+            gPlayers[nPlayer].fMomentumTurn = -(160.0f - pPad[0]) / 96.0f;
         }
     }
 }

@@ -231,7 +231,7 @@ void EVENT_NextClub(int nPlayer, int nEvent, void* pData, int nArg) {
     Character_InitNewClubAndShotType(nPlayer);
     gPlayers[nPlayer].nClubPerKind[gPlayers[nPlayer].nShotKind] = gPlayers[nPlayer].nClub;
     if (gSession.nSplitScreen) {
-        fn_80062CB0(gPlayers[nPlayer].nC58, 1);
+        fn_80062CB0(gPlayers[nPlayer].nUISlot, 1);
     }
 }
 
@@ -275,18 +275,18 @@ void EVENT_PrevClub(int nPlayer, int nEvent, void* pData, int nArg) {
     Character_InitNewClubAndShotType(nPlayer);
     gPlayers[nPlayer].nClubPerKind[gPlayers[nPlayer].nShotKind] = gPlayers[nPlayer].nClub;
     if (gSession.nSplitScreen) {
-        fn_80062CB0(gPlayers[nPlayer].nC58, 1);
+        fn_80062CB0(gPlayers[nPlayer].nUISlot, 1);
     }
 }
 
 // Event 15 (the shot-kind button): the next shot kind with its club (NextShotType), and in split
-// screen the front end is sent message 0x14 with the player's nC58. Nothing when a lesson blocks it
-// or in the long-drive modes 22 and 26.
+// screen the front end is sent message 0x14 with the player's nUISlot. Nothing when a lesson blocks
+// it or in the long-drive modes 22 and 26.
 void EVENT_NextShotType(int nPlayer, int nEvent, void* pData, int nArg) {
     if (Lessons_OnEvent(nPlayer, 15) || Game_GetMode() == 26 || Game_GetMode() == 22) return;
     NextShotType(nPlayer);
     if (gSession.nSplitScreen) {
-        fn_80062CB0(gPlayers[nPlayer].nC58, 1);
+        fn_80062CB0(gPlayers[nPlayer].nUISlot, 1);
     }
 }
 
@@ -349,25 +349,25 @@ void EVENT_MoveTargetBack(int nPlayer, int nEvent, void* pData, int nArg) {
     }
 }
 
-// Event 23 (placing the ball): the placement cursor's turn input (fA80) ramps toward -1
+// Event 23 (placing the ball): the placement cursor's turn input (fMomentumX) ramps toward -1
 // (fn_80069BEC).
 void EVENT_PlaceBallRotateRight(int nPlayer, int nEvent, void* pData, int nArg) {
     fn_80069BEC(nPlayer);
 }
 
-// Event 22 (placing the ball): the placement cursor's turn input (fA80) ramps toward +1
+// Event 22 (placing the ball): the placement cursor's turn input (fMomentumX) ramps toward +1
 // (fn_80069B74).
 void EVENT_PlaceBallRotateLeft(int nPlayer, int nEvent, void* pData, int nArg) {
     fn_80069B74(nPlayer);
 }
 
-// Event 24 (placing the ball): the placement cursor's move input (fA84) ramps toward +1
+// Event 24 (placing the ball): the placement cursor's move input (fMomentumZ) ramps toward +1
 // (fn_80069A84).
 void EVENT_PlaceBallMoveTargetForward(int nPlayer, int nEvent, void* pData, int nArg) {
     fn_80069A84(nPlayer);
 }
 
-// Event 25 (placing the ball): the placement cursor's move input (fA84) ramps toward -1
+// Event 25 (placing the ball): the placement cursor's move input (fMomentumZ) ramps toward -1
 // (fn_80069AFC).
 void EVENT_PlaceBallMoveTargetBack(int nPlayer, int nEvent, void* pData, int nArg) {
     fn_80069AFC(nPlayer);

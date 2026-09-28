@@ -20,4 +20,8 @@ extern u8  gGameMode26Reached400[5];     // } per player: the track for reaching
 extern u8  gGameMode26Reached800[5];     // } has played (400, 800, 1200 in this order)
 extern u8  gGameMode26Reached1200[5];     // }
 
+// GameMode26.c: what the post-shot UI asks (GameUI.c GUI_IsPostShotUIAnimating)
+u8   GameMode26_IsActive(void);          // game mode 26 is being played
+u8   GameMode26_IsShowingWinner(void);   // somebody has won and the 120 frames still run
+
 #endif

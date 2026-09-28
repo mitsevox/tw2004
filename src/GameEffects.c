@@ -59,7 +59,7 @@ void GameEffects_InitGameEffectSettings(void) {
     gGameEffects.bPaused = 0;
     gGameEffects.bRumble = 0;
     gGameEffects.nHeartbeats = 0;
-    gGameEffects.f54 = 1.0f;
+    gGameEffects.fUITimeFactor = 1.0f;
 }
 
 // Every effect off (at each hole's start and restart, the scorecards, and the swing and shot
