@@ -192,9 +192,9 @@ void STATEFUNC_PreShotInit(int nPlayer) {
         Shot_Plan(nPlayer, 1);
     }
     if (gPlayers[nPlayer].nClub == CLUB_PUTTER_e) {
-        fn_800CC5C0(gPlayers[nPlayer].pChar, "Glove", "GloveOff");
+        SkinPart_ChooseBodyPartVariantByName(gPlayers[nPlayer].pChar, "Glove", "GloveOff");
     } else {
-        fn_800CC5C0(gPlayers[nPlayer].pChar, "Glove", "GloveOn");
+        SkinPart_ChooseBodyPartVariantByName(gPlayers[nPlayer].pChar, "Glove", "GloveOn");
     }
     gPlayers[nPlayer].fThinkTime = 0.0f;
     for (k = 0; k < 2; k++) {
