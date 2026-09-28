@@ -176,3 +176,36 @@ Continue: char.c from 0x8001A288 (120 to go); SkinPart.c from 0x800CDAFC SkinPar
 - hwsRender_Gc.c declares `s32 SKN_CloseModule();` vs `void SKN_CloseModule(void)`. Code80016198.c
   fn_80016978's comment says corners, RC_ApplyViewport passes left, top, width, height.
 - Tool: name.py drops the `port:` continuation indent ("//       ") when it rewraps a comment.
+
+## Round 7 (rg1-rg4, golfer area) leftovers
+Golfer header pass 2 (character.h / charstate.h / camera.h / fe.h; not edited this round):
+- Character: n1654 nClipResult, n1658 nShadowClipResult (getters Character_GetClipResult /
+  GetShadowClipResult), f1660 fMaxVisibleDist, f165C fMaxShadowDist; nAnim = the target body state
+  (EA's CharacterAnimStateE), n20 the current one, n18 bit 0 a state change waiting, n24 / n25 the
+  ambient / idle fidget counts, n26 a fidget playing, n2C / n30 the morph player's target / current
+  state, anim29C + node3E0 the morph player and its tree. AnimPlayer.f14 fTimeScale (TW07
+  SKATime_SetTimeScale; its prototype could take AnimPlayer*), AnimPlayer.nC / f10 the queued
+  transition state and time. Clip.pF4 the clip's own MtaLib.
+- Skeleton: f1074 / f1078 the IK weight blend's time left (negative blending in) and length, v10A4 the
+  hip offset (y only), v10B4 it times the weight, p20 / p24 / a10 the IK rotations / weighted / bones
+  turned, q10D4 the extra right-shoulder rotation, n10E4 its frames. IKLink.f4 the share of each turn,
+  n8 a locked axis (-1 none); IKChain.n18 / f1C most iterations / tolerance. CharModel: a140 per-bone
+  scale, p760 / p764 / p768 bone poses / world-to-bone / skinning matrices, bEE left-handed.
+- Prototypes: CharacterState_AddSKABlendData params nTransitionState / fTransitionTime;
+  fe.h FE_setupStreaming (nOtherA, nOtherB); char.c declares SKEL_InitIKSkeleton void, it returns f32.
+  camera.h CrAPGolfer.b18 = the golfer is loaded/ready (not "the camera script runs"), b19 = to be freed.
+  Extern comments out of column in charstate.h / character.h after the global renames; three
+  character.h lines past 100 columns (uId comment, RequestClothesUpdateFE, SkeletalObject_FindObject).
+Other:
+- FEgolferanim.c: continue from after 0x8008B790 (69 to go); 8008B990 is probably TW07
+  FE_StreamGetCurrentState; 8008E918 / 8008E944 FE_SetTextureSwapState / FE_SetDelayTextureSwap.
+  Pairing rows wrong: 800962F8 / 80096338 / 8009637C shifted by one; 800957FC not SetSKAState;
+  8008B61C / B674 / B694 / B6E4 (FEAnimManager_*) are state 4's handlers.
+- fn_80021980 is TW07 BitArray_MergeArrayWithOr. Char_Vec3Add/Sub, Vec3_Scale, Char_Vec4Add/Sub,
+  Vec4_Dot are copies of TW07 UVecFlt.h inlines (vec4flt_Add3 ...): a project-wide naming call.
+  Character_IsGolfer may be TW07 Character_IsHuman (unsure). ByteSwap_Records / MtaLib_SwapAndLink at
+  the end of char.c may belong to mtalib.c (misfiled units list).
+- Skeleton.c Math_Sqrtf is MSL's inline sqrtf emitted out of line; Skeleton_StrippedFn's fake match
+  likely stands for MSL's _half/_three: for a matching lane.
+- Tools: name.py does not find definitions returning a pointer to an array (`f32 (*Fn(...))[4]`);
+  wraplong does not wrap long initializer rows.
