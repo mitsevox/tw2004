@@ -239,6 +239,8 @@ void FE_CrAP_SetTriggerAnims(u8 b) {
     lbl_80282460->b14 = b;
 }
 
+// Whether putting on an asset runs the menu golfer's animation and camera calls (1) or not (0); see
+// FE_CrAP_SetTriggerAnims.
 u8 FE_CrAP_GetTriggerAnims(void) {
     return lbl_80282460->b14;
 }
@@ -250,6 +252,8 @@ void FE_CrAP_SetCurrentGender(s8 n) {
     FE_CrAP_ResetLastCategoryTables();
 }
 
+// The gender of the golfer being created (FE_CrAP_SetCurrentGender), which picks the assets offered
+// (FE_IsValidCurrentGender).
 s8 FE_CrAP_GetCurrentGender(void) {
     return lbl_80282460->n4;
 }
@@ -821,10 +825,14 @@ CrAPAsset* FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(s16 nPart,
     return NULL;
 }
 
+// The database's asset number nAsset (no range check); FE_CrAP_GetAssetIndexFromAsset is the
+// reverse.
 CrAPAsset* FE_CrAP_GetAssetFromAssetIndex(int nAsset) {
     return &lbl_80282460->pAssets[nAsset];
 }
 
+// The number of pAsset, an entry of the database's asset array (the reverse of
+// FE_CrAP_GetAssetFromAssetIndex).
 int FE_CrAP_GetAssetIndexFromAsset(CrAPAsset* pAsset) {
     return pAsset - lbl_80282460->pAssets;
 }
@@ -1096,6 +1104,10 @@ s16 FE_CrAP_GetPartGMLockValByAssetNum(int nAsset) {
     return lbl_80282460->pAssets[nAsset].nLock;
 }
 
+// Value n (0..5) of a part's choice i under its list entry b: the asset's a4A[n]
+// (FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum), or -1 when there is no such choice.
+// The UI reads it through FE_CrAPMessages.c fn_80107828. What a4A holds is not known; it has six
+// entries, like the asset's six colours.
 int fn_80105644(s16 nPart, int b, int i, int n) {
     CrAPAsset* pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(nPart, b, i);
     if (pAsset == NULL) {
@@ -1233,6 +1245,7 @@ void FE_CrAP_GetAssetVariantName(CrAPAsset* pAsset, char* pName) {
     BYTESWAP_SWAPDATA(&pSrc, (u8*)pAsset->aVariant, sizeof(pAsset->aVariant), sizeof(u64));
 }
 
+// The number of assets in the database (nAssets): asset numbers run from 0 to one less.
 s32 FE_CrAP_GetNumEntriesInCrAPDB(void) {
     return lbl_80282460->nAssets;
 }
@@ -1906,6 +1919,8 @@ s16 FE_CrAP_GetCategoryFromAssetID(int nAsset) {
     return lbl_80282460->pAssets[nAsset].nPart;
 }
 
+// An asset's level (its n38, as FE_CrAP_GetPartLevelFromAssetIndex returns it); level 0 assets are
+// owned from the start. No range check on nAsset.
 int FE_CrAP_GetLevelFromAssetID(int nAsset) {
     return lbl_80282460->pAssets[nAsset].n38;
 }

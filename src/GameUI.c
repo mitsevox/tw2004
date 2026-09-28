@@ -314,6 +314,8 @@ void GUI_PauseMenuClosed(void) {
     }
 }
 
+// The pause flag: set by GUI_OpenPauseMenu, cleared when the menu closes (GUI_PauseMenuClosed,
+// GameMessages.c fn_800E5240) and by GUI_Init.
 u8 GUI_IsPauseMenuOpen(void) {
     return lbl_802822DF;
 }
@@ -385,6 +387,8 @@ void GUI_PostShotUIFinished(int i) {
     lbl_802822DB = 0;
 }
 
+// Whether the pause menu is open or player nPlayer's post-shot display is still running;
+// stateFunc.c's flight update takes no replay or mulligan button while it is.
 u8 GUI_IsPausedOrPostShotUIAnimating(int nPlayer) {
     int b = 0;
     if (GUI_IsPauseMenuOpen() || GUI_IsPostShotUIAnimating(nPlayer)) {

@@ -356,3 +356,14 @@ address	name	comment	by	date
 800ADAF0	Aud_EmiSetTrackPitchFactor	add	rd4 (replayed by orchestrator)	2026-09-28
 800A7C24	Emi_InitSession	add	rd4 (replayed by orchestrator)	2026-09-28
 800A7C2C	Emi_ExitSession	add	rd4 (replayed by orchestrator)	2026-09-28
+800E3B04	fn_800E3B04	keep	rd4 (replayed by orchestrator)	2026-09-28
+800E415C	GUI_IsPauseMenuOpen	add	rd4 (replayed by orchestrator)	2026-09-28
+800E430C	GUI_IsPausedOrPostShotUIAnimating	add	rd4 (replayed by orchestrator)	2026-09-28
+800E4F88	fn_800E4F88	keep	rd4 (replayed by orchestrator)	2026-09-28
+80103B80	FE_CrAP_GetTriggerAnims	add	rd4 (replayed by orchestrator)	2026-09-28
+80103BB4	FE_CrAP_GetCurrentGender	add	rd4 (replayed by orchestrator)	2026-09-28
+80104F68	FE_CrAP_GetAssetFromAssetIndex	add	rd4 (replayed by orchestrator)	2026-09-28
+80104F7C	FE_CrAP_GetAssetIndexFromAsset	add	rd4 (replayed by orchestrator)	2026-09-28
+80105644	fn_80105644	add	rd4 (replayed by orchestrator)	2026-09-28
+80105C00	FE_CrAP_GetNumEntriesInCrAPDB	add	rd4 (replayed by orchestrator)	2026-09-28
+80107444	FE_CrAP_GetLevelFromAssetID	add	rd4 (replayed by orchestrator)	2026-09-28
