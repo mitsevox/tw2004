@@ -1,6 +1,10 @@
-// GameMode17.c (our name): game mode 17. Each player hits the targets in order (nNextTarget) with
-// 5 balls; the surface a ball lands on can pay extra balls. Hitting every target wins the prize
-// row's bonus plus 100 points per ball left.
+// GameMode17.c (our name; TW07's GameMode_SkillZoneTargetToTarget.cpp, whose methods it has in the
+// same order): game mode 17, target to target, one hole. Each player starts with 5 balls (nDC0) and
+// must hit the targets in order, nearest the tee first (nNextTarget; the target buttons keep the
+// aim on it); a hit on any other target pays nothing. The surface a ball lands on can pay points
+// and extra balls. Hitting every target wins the all-targets prize (the id 999 row) plus 100
+// points per ball left. There are no shot multipliers. The hole ends when player 0 has hit every
+// target or nobody has a ball left. The shared target-game code is GameTargets.c.
 
 #include "golfer.h"
 #include "ball.h"
@@ -10,10 +14,14 @@
 
 // fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
 
-s32 gTargetToTargetSavedOptionsC = 4;                    // the options saved while the game runs
-s32 gTargetToTargetShotPoints;                    // the points of the last shot
-s32 gTargetToTargetShotBalls;                    // the extra balls of the last shot
-s32 gTargetToTargetSavedWind;
+// Mode 17's state; only this file uses it. The .sbss ones are defined last address first (the
+// compiler lays a file's .sbss out last definition first).
+s32 gTargetToTargetSavedOptionsC = 4;   // options.nC from before the game (StartGamePreData;
+                                        //   Shutdown puts it back)
+s32 gTargetToTargetShotPoints;          // the points of the last shot (GetShotEarned)
+s32 gTargetToTargetShotBalls;           // the extra balls of the last shot (GetExtraBallsEarned)
+s32 gTargetToTargetSavedWind;           // options.nWind from before the game (StartGamePreData;
+                                        //   Shutdown puts it back)
 
 void  GameModeSkillZoneTargetToTarget_Shutdown(void);
 void  GameModeSkillZoneTargetToTarget_StartGamePreData(void);
@@ -32,7 +40,7 @@ u8    GameModeSkillZoneTargetToTarget_HoleFinished(int nPlayer, u8 bCheck);
 void  GameModeSkillZoneTargetToTarget_GetIDScore(s32 nSurface, s32* pPoints, s32* pBalls);
 u8    GameModeSkillZoneTargetToTarget_PickPrevTarget(int nPlayer);
 u8    GameModeSkillZoneTargetToTarget_PickTarget(int nPlayer);
-s32   GameModeSkillZoneTargetToTarget_GreenType(int nPlayer, int i);
+s32   GameModeSkillZoneTargetToTarget_GreenType(int nPlayer, int nTarget);
 void  GameModeSkillZoneTargetToTarget_EndGame(void);
 
 // Game mode 17's setup (pfnInit, from GM_SetModeType): its hooks (its own target pickers, which
@@ -111,7 +119,7 @@ u8 GameModeSkillZoneTargetToTarget_GoToPlayoff(u8 bCheck) {
 // balls (nDC0); 5 when there is none.
 s32 GameModeSkillZoneTargetToTarget_GetHonors(int nPlayer) {
     int i;
-    int n;
+    int nNext;
     u8 bFirst = 1;
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if (PLAYER(i)->nStrokes[Game_CurHoleIndex()] != 0) {
@@ -121,14 +129,14 @@ s32 GameModeSkillZoneTargetToTarget_GetHonors(int nPlayer) {
     if (bFirst) {
         return 0;
     }
-    n = lbl_80282278;
+    nNext = lbl_80282278;
     for (i = 0; i < 5; i++) {
-        n++;
-        if (n >= gNumPlayersSetUp) {
-            n = 0;
+        nNext++;
+        if (nNext >= gNumPlayersSetUp) {
+            nNext = 0;
         }
-        if (n != nPlayer && gPlayers[n].nDC0 != 0) {
-            return n;
+        if (nNext != nPlayer && gPlayers[nNext].nDC0 != 0) {
+            return nNext;
         }
     }
     return 5;
@@ -191,8 +199,10 @@ void GameModeSkillZoneTargetToTarget_CheckShotAwards(int nPlayer) {
             if (lbl_80282360 == GameModeSkillZoneBase_CountGreensHit(nPlayer)) {
                 gTargetToTargetShotPoints = GameModeSkillZoneBase_GetHitAllTargetsBonus();
                 gTargetToTargetShotPoints += gPlayers[nPlayer].nDC0 * 100;
-                gTargetToTargetShotPoints = GM_Earnings_ComputeBonusModifiers(gTargetToTargetShotPoints, nPlayer, 1, 1, 1, 0);
-                gTargetToTargetShotPoints = GM_Earnings_ComputeTOURCardModifiers(gTargetToTargetShotPoints, nPlayer, 0);
+                gTargetToTargetShotPoints = GM_Earnings_ComputeBonusModifiers(gTargetToTargetShotPoints,
+                        nPlayer, 1, 1, 1, 0);
+                gTargetToTargetShotPoints = GM_Earnings_ComputeTOURCardModifiers(gTargetToTargetShotPoints,
+                        nPlayer, 0);
                 GM_Earnings_AwardMoney(nPlayer, gTargetToTargetShotPoints, 0);
                 gPlayers[nPlayer].nD70[Game_CurHoleIndex()]++;
                 bDone = 1;
@@ -328,8 +338,10 @@ void GameModeSkillZoneTargetToTarget_CheckShotAwards(int nPlayer) {
     }
     if (gTargetToTargetShotPoints != 0) {
         if (gTargetToTargetShotPoints > 0) {
-            gTargetToTargetShotPoints = GM_Earnings_ComputeBonusModifiers(gTargetToTargetShotPoints, nPlayer, 1, 1, 1, 0);
-            gTargetToTargetShotPoints = GM_Earnings_ComputeTOURCardModifiers(gTargetToTargetShotPoints, nPlayer, 0);
+            gTargetToTargetShotPoints = GM_Earnings_ComputeBonusModifiers(gTargetToTargetShotPoints, nPlayer,
+                    1, 1, 1, 0);
+            gTargetToTargetShotPoints = GM_Earnings_ComputeTOURCardModifiers(gTargetToTargetShotPoints,
+                    nPlayer, 0);
         } else if (nMsg == -1) {
             if (!(Misc_RandFunc(0) & 1)) {
                 nMsg = 0;
@@ -470,18 +482,18 @@ u8 GameModeSkillZoneTargetToTarget_PickTarget(int nPlayer) {
 }
 
 // The points the last shot earned (gTargetToTargetShotPoints), whoever nPlayer is.
-s32 GameModeSkillZoneTargetToTarget_GetShotEarned(s32 a) {
+s32 GameModeSkillZoneTargetToTarget_GetShotEarned(s32 nPlayer) {
     return gTargetToTargetShotPoints;
 }
 
 // Which marker model target nTarget shows for the player (pfn26C, GoDynObj.c): 0 for their next
 // target in order (nNextTarget), 1 for every other.
-s32 GameModeSkillZoneTargetToTarget_GreenType(int nPlayer, int i) {
-    return i != gPlayers[nPlayer].nNextTarget;
+s32 GameModeSkillZoneTargetToTarget_GreenType(int nPlayer, int nTarget) {
+    return nTarget != gPlayers[nPlayer].nNextTarget;
 }
 
 // The extra balls the last shot earned (gTargetToTargetShotBalls), whoever nPlayer is.
-s32 GameModeSkillZoneTargetToTarget_GetExtraBallsEarned(s32 a) {
+s32 GameModeSkillZoneTargetToTarget_GetExtraBallsEarned(s32 nPlayer) {
     return gTargetToTargetShotBalls;
 }
 

@@ -1,7 +1,12 @@
-// GameMode16.c (our name): game mode 16. Each player has 20 balls (nDC0) to hit the targets in any
-// order; a target pays up to 4 times, hitting every target pays the prize row's bonus, and the
-// bullseyes, streaks and the longest shot are counted. Hitting world objects on the way (pfn268)
-// raises a points multiplier.
+// GameMode16.c (our name; TW07's GameMode_SkillZoneTarget.cpp, whose methods it has in the same
+// order): game mode 16, the target game, one hole. Each player has 20 balls (nDC0) to hit the
+// targets in any order; a target pays its points up to 4 times and is then closed out. Once every
+// target has been hit, each further target hit pays the all-targets prize (the id 999 row) instead.
+// A shot can get a random x2, x3 or x5 multiplier, and bonus objects hit on the way (pfn268,
+// CollisionActor) raise a second points multiplier. A target surface past the tee set's drive line
+// counts as a drive, paying only for a new longest one. Bullseyes, streaks and the longest drive
+// are counted. The game ends when nobody has a ball left. The shared target-game code is
+// GameTargets.c.
 
 #include "golfer.h"
 #include "ball.h"
@@ -11,10 +16,14 @@
 
 // fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
 
-s32 gTargetSavedOptionsC = 4;                    // the options saved while the game runs
-s32 gTargetShotPoints;                    // the points of the last shot
-s32 gTargetBonusMultiplier;                    // the points multiplier from bonuses
-s32 gTargetSavedWind;
+// Mode 16's state; only this file uses it. The .sbss ones are defined last address first (the
+// compiler lays a file's .sbss out last definition first).
+s32 gTargetSavedOptionsC = 4;   // options.nC from before the game (StartGamePreData; Shutdown puts it back)
+s32 gTargetShotPoints;          // the points of the last shot (GetShotEarned)
+s32 gTargetBonusMultiplier;     // the points multiplier from bonus objects: 1 each shot, raised by
+                                //   CollisionActor (GetDriveMultiplier)
+s32 gTargetSavedWind;           // options.nWind from before the game (StartGamePreData; Shutdown puts
+                                //   it back)
 
 void  GameModeSkillZoneTarget_Shutdown(void);
 void  GameModeSkillZoneTarget_StartGamePreData(void);
@@ -31,7 +40,7 @@ u8    GameModeSkillZoneTarget_GameFinished(u8 bCheck);
 void  GameModeSkillZoneTarget_BallOOB(int nPlayer);
 u8    GameModeSkillZoneTarget_HoleFinished(int nPlayer, u8 bCheck);
 void  GameModeSkillZoneTarget_GetIDScore(s32 nSurface, s32* pPoints);
-s32   GameModeSkillZoneTarget_GreenType(int nPlayer, int i);
+s32   GameModeSkillZoneTarget_GreenType(int nPlayer, int nTarget);
 void  GameModeSkillZoneTarget_CollisionActor(int nPlayer, int nId);
 void  GameModeSkillZoneTarget_EndGame(void);
 
@@ -112,7 +121,7 @@ u8 GameModeSkillZoneTarget_GoToPlayoff(u8 bCheck) {
 // balls (nDC0); 5 when there is none.
 s32 GameModeSkillZoneTarget_GetHonors(int nPlayer) {
     int i;
-    int n;
+    int nNext;
     u8 bFirst = 1;
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if (PLAYER(i)->nStrokes[Game_CurHoleIndex()] != 0) {
@@ -122,14 +131,14 @@ s32 GameModeSkillZoneTarget_GetHonors(int nPlayer) {
     if (bFirst) {
         return 0;
     }
-    n = lbl_80282278;
+    nNext = lbl_80282278;
     for (i = 0; i < 5; i++) {
-        n++;
-        if (n >= gNumPlayersSetUp) {
-            n = 0;
+        nNext++;
+        if (nNext >= gNumPlayersSetUp) {
+            nNext = 0;
         }
-        if (n != nPlayer && gPlayers[n].nDC0 != 0) {
-            return n;
+        if (nNext != nPlayer && gPlayers[nNext].nDC0 != 0) {
+            return nNext;
         }
     }
     return 5;
@@ -421,19 +430,19 @@ void GameModeSkillZoneTarget_GetIDScore(s32 nSurface, s32* pPoints) {
 }
 
 // The points the last shot earned (gTargetShotPoints), whoever nPlayer is.
-s32 GameModeSkillZoneTarget_GetShotEarned(s32 a) {
+s32 GameModeSkillZoneTarget_GetShotEarned(s32 nPlayer) {
     return gTargetShotPoints;
 }
 
 // The bonus-object multiplier (gTargetBonusMultiplier), whoever nPlayer is.
-s32 GameModeSkillZoneTarget_GetDriveMultiplier(s32 a) {
+s32 GameModeSkillZoneTarget_GetDriveMultiplier(s32 nPlayer) {
     return gTargetBonusMultiplier;
 }
 
 // Which marker model target nTarget shows for the player (pfn26C, GoDynObj.c): 1 once they have hit
 // it 4 times (closed out, it pays no more), else 0.
-s32 GameModeSkillZoneTarget_GreenType(int nPlayer, int i) {
-    if (gPlayers[nPlayer].nDE4[i] > 3) {
+s32 GameModeSkillZoneTarget_GreenType(int nPlayer, int nTarget) {
+    if (gPlayers[nPlayer].nDE4[nTarget] > 3) {
         return 1;
     }
     return 0;
@@ -443,9 +452,9 @@ s32 GameModeSkillZoneTarget_GreenType(int nPlayer, int i) {
 // the bonus multiplier (gTargetBonusMultiplier) goes up by 2 plus the object's index
 // (GameModeSkillZoneBase_GetBonusIndex), so by 2 to 6.
 void GameModeSkillZoneTarget_CollisionActor(int nPlayer, int nId) {
-    s32 n = GameModeSkillZoneBase_GetBonusIndex(nId);
+    s32 nIndex = GameModeSkillZoneBase_GetBonusIndex(nId);
     fn_800A30E4(8, &gPlayers[nPlayer].ball, nPlayer, 0, 0.0f);
-    gTargetBonusMultiplier += n + 2;
+    gTargetBonusMultiplier += nIndex + 2;
 }
 
 // End of the game (pfnEndGame): the game counts as won in the bio (EASBio_SetCurrentGameWon).
