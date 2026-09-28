@@ -14,8 +14,8 @@ f32  Math_Tan(f32 x);                // tan
 
 // 4x4 matrix helpers (the engine's; declared here until their own files are written).
 void Mtx_Identity(f32 m[4][4]);                                          // identity
-void fn_800BADF8(f32 a[4][4], f32 b[4][4], f32 out[4][4], int nRows);   // out = a x b, 4 rows
-void fn_800BAE5C(f32 a[4][4], f32 b[4][4], f32 out[4][4], int nRows);   // out = a x b, 3 rows
+void Mtx_MultVec4Array(f32 a[4][4], f32 b[4][4], f32 out[4][4], int nRows);   // out = a x b, 4 rows
+void Mtx_MultVec3Array(f32 a[4][4], f32 b[4][4], f32 out[4][4], int nRows);   // out = a x b, 3 rows
 void Mtx_Copy(f32 src[4][4], f32 dst[4][4]);                         // copy 4 rows
 void Mtx_CopyRotation(f32 src[4][4], f32 dst[4][4]);                         // copy 3 rows
 
@@ -45,7 +45,7 @@ void fn_80092CE8(UITransform* p, f32 x, f32 y, f32 z) {
     mMove[3][0] = x;
     mMove[3][1] = y;
     mMove[3][2] = z;
-    fn_800BADF8(p->m, mMove, mOut, 4);
+    Mtx_MultVec4Array(p->m, mMove, mOut, 4);
     Mtx_Copy(mOut, p->m);
 }
 
@@ -56,7 +56,7 @@ void fn_80092D68(UITransform* p, f32 x, f32 y, f32 z) {
     mScale[0][0] = x;
     mScale[1][1] = y;
     mScale[2][2] = z;
-    fn_800BAE5C(p->m, mScale, mOut, 3);
+    Mtx_MultVec3Array(p->m, mScale, mOut, 3);
     Mtx_CopyRotation(mOut, p->m);
 }
 
@@ -72,7 +72,7 @@ void fn_80092DE8(UITransform* p, f32 fAngle) {
     mRot[1][2] = fSin;
     mRot[2][1] = -fSin;
     mRot[2][2] = fCos;
-    fn_800BAE5C(p->m, mRot, mOut, 3);
+    Mtx_MultVec3Array(p->m, mRot, mOut, 3);
     Mtx_CopyRotation(mOut, p->m);
 }
 
@@ -88,7 +88,7 @@ void fn_80092E74(UITransform* p, f32 fAngle) {
     mRot[0][2] = -fSin;
     mRot[2][0] = fSin;
     mRot[2][2] = fCos;
-    fn_800BAE5C(p->m, mRot, mOut, 3);
+    Mtx_MultVec3Array(p->m, mRot, mOut, 3);
     Mtx_CopyRotation(mOut, p->m);
 }
 
@@ -104,7 +104,7 @@ void fn_80092F00(UITransform* p, f32 fAngle) {
     mRot[0][1] = fSin;
     mRot[1][0] = -fSin;
     mRot[1][1] = fCos;
-    fn_800BAE5C(p->m, mRot, mOut, 3);
+    Mtx_MultVec3Array(p->m, mRot, mOut, 3);
     Mtx_CopyRotation(mOut, p->m);
 }
 

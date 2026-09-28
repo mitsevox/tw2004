@@ -552,7 +552,7 @@ void fn_8003A148(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
         fn_8003DC54(pOut, aOld, aStep);
         fDist = (f32)Math_Sqrt(Vec3_LengthSqClamped(aStep));
         if (aStep[0] != 0.0f || aStep[1] != 0.0f || aStep[2] != 0.0f) {
-            Vec_NormalizeTo(aStep, aDir);
+            Vec3_Normalize(aStep, aDir);
         } else {
             aDir[0] = 0.0f;
             aDir[1] = 0.0f;
@@ -808,7 +808,7 @@ void fn_8003B028(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
         aBallDir[1] = 0.0f;
     }
     if (aBallDir[0] != 0.0f || aBallDir[1] != 0.0f || aBallDir[2] != 0.0f) {
-        Vec_NormalizeTo(aBallDir, aBallDir);
+        Vec3_Normalize(aBallDir, aBallDir);
     }
     fn_8003D810(aBallDir, pOut, aFrom);
     if (pScript->pNextShot != NULL && pScript->pShot->bB1 == pScript->pNextShot->bB1) {
@@ -870,14 +870,14 @@ void fn_8003B028(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
     fStep = (f32)Math_Sqrt(Vec3_LengthSqClamped(aTgtOff)) - fCurDist;
     fStep *= fMove;
     if (aCurOff[0] != 0.0f || aCurOff[1] != 0.0f || aCurOff[2] != 0.0f) {
-        Vec_NormalizeTo(aCurOff, aCurDir);
+        Vec3_Normalize(aCurOff, aCurDir);
     } else {
         aCurDir[0] = 0.0f;
         aCurDir[1] = 0.0f;
         aCurDir[2] = 0.0f;
     }
     if (aTgtOff[0] != 0.0f || aTgtOff[1] != 0.0f || aTgtOff[2] != 0.0f) {
-        Vec_NormalizeTo(aTgtOff, aTgtDir);
+        Vec3_Normalize(aTgtOff, aTgtDir);
     } else {
         aTgtDir[0] = 0.0f;
         aTgtDir[1] = 0.0f;
@@ -887,14 +887,14 @@ void fn_8003B028(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
     fTurn = fAngle * fTurn;
     vec4flt_CrossProduct(aCurDir, aTgtDir, aAxis);
     if (aAxis[0] != 0.0f || aAxis[1] != 0.0f || aAxis[2] != 0.0f) {
-        Vec_NormalizeTo(aAxis, aAxis);
+        Vec3_Normalize(aAxis, aAxis);
     }
     Vec3_Scale(fTurn, aAxis, aAxis);
     Quat_BuildFromVector(aAxis, aTurn);
     aCurDir[3] = 0.0f;
     Quat_RotateVector(aTurn, aCurDir, aNew);
     if (aNew[0] != 0.0f || aNew[1] != 0.0f || aNew[2] != 0.0f) {
-        Vec_NormalizeTo(aNew, aNewDir);
+        Vec3_Normalize(aNew, aNewDir);
     } else {
         aNewDir[0] = 0.0f;
         aNewDir[1] = 0.0f;
@@ -923,7 +923,7 @@ void fn_8003B534(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
     DynamicCam_GetLocation(0, nPlayer, vFrom, pScript, pShot, pCam, pSub);
     Vec3Copy(gPlayers[nPlayer].ball.vVel, vDir);
     if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
-        Vec_NormalizeTo(vDir, vDir);
+        Vec3_Normalize(vDir, vDir);
     }
     if (gPlayers[nPlayer].ball.fSpeed < lbl_80281F78->f198) return;
     if (pScript->pNextShot != NULL && pScript->pShot->bB1 == pScript->pNextShot->bB1) {
@@ -1055,7 +1055,7 @@ void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CamScript* pScrip
         }
         Vec3Copy(pMatrix[2], vDir10);
         if (0.0f != vDir10[0] || 0.0f != vDir10[1] || 0.0f != vDir10[2]) {
-            Vec_NormalizeTo(vDir10, vDir10);
+            Vec3_Normalize(vDir10, vDir10);
         }
         fn_8003DC30(vBone10, vDir10, pOut);
         break;
@@ -1068,7 +1068,7 @@ void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CamScript* pScrip
         }
         Vec3Copy(pMatrix[2], vDir7);
         if (0.0f != vDir7[0] || 0.0f != vDir7[1] || 0.0f != vDir7[2]) {
-            Vec_NormalizeTo(vDir7, vDir7);
+            Vec3_Normalize(vDir7, vDir7);
         }
         fn_8003DC30(vBone7, vDir7, pOut);
         break;
@@ -1081,7 +1081,7 @@ void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CamScript* pScrip
         }
         Vec3Copy(pMatrix[2], vDir1);
         if (0.0f != vDir1[0] || 0.0f != vDir1[1] || 0.0f != vDir1[2]) {
-            Vec_NormalizeTo(vDir1, vDir1);
+            Vec3_Normalize(vDir1, vDir1);
         }
         fn_8003DC30(vBone1, vDir1, pOut);
         break;
@@ -1098,7 +1098,7 @@ void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CamScript* pScrip
         }
         Vec3Copy(pMatrix[0], vDir);
         if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
-            Vec_NormalizeTo(vDir, vDir);
+            Vec3_Normalize(vDir, vDir);
         }
         fn_8003DC30(vFrom, vDir, pOut);
         break;
@@ -1115,7 +1115,7 @@ void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CamScript* pScrip
         }
         Vec3Copy(pMatrix[2], vDir);
         if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
-            Vec_NormalizeTo(vDir, vDir);
+            Vec3_Normalize(vDir, vDir);
         }
         fn_8003DC30(vFrom, vDir, pOut);
         break;
@@ -1628,7 +1628,7 @@ void fn_8003D324(f32* pPos, f32* pDir, CamScript* pScript, CamShot* pShot, int n
     Vec3Copy(pDir, vDir);
     vDir[1] = 0.0f;
     if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
-        Vec_NormalizeTo(vDir, vDir);
+        Vec3_Normalize(vDir, vDir);
     }
     pPos[0] += fSide * -vDir[2];
     pPos[2] += fSide * vDir[0];
@@ -1760,26 +1760,26 @@ void fn_8003D810(f32* pDir, f32* pA, f32* pB) {
     if (0.0f == pDir[0] && 0.0f == pDir[2]) {
         fn_8003DC54(pB, pA, pDir);
         if (0.0f != pDir[0] || 0.0f != pDir[1] || 0.0f != pDir[2]) {
-            Vec_NormalizeTo(pDir, pDir);
+            Vec3_Normalize(pDir, pDir);
         }
         return;
     }
     Vec3Copy(pDir, vLevel);
     vLevel[1] = 0.0f;
     if (0.0f != vLevel[0] || 0.0f != vLevel[1] || 0.0f != vLevel[2]) {
-        Vec_NormalizeTo(vLevel, vLevel);
+        Vec3_Normalize(vLevel, vLevel);
     }
     if (fabsf(Math_Acos(Vec3_Dot(vLevel, pDir))) > lbl_80281F78->f19C) {
         vec4flt_CrossProduct(pDir, vLevel, vAxis);
         if (0.0f != vAxis[0] || 0.0f != vAxis[1] || 0.0f != vAxis[2]) {
-            Vec_NormalizeTo(vAxis, vAxis);
+            Vec3_Normalize(vAxis, vAxis);
         }
         Vec3_Scale(lbl_80281F78->f19C, vAxis, vAxis);
         Quat_BuildFromVector(vAxis, qTurn);
         vLevel[3] = 0.0f;
         Quat_RotateVector(qTurn, vLevel, pDir);
         if (0.0f != pDir[0] || 0.0f != pDir[1] || 0.0f != pDir[2]) {
-            Vec_NormalizeTo(pDir, pDir);
+            Vec3_Normalize(pDir, pDir);
         }
     }
 }
@@ -1796,7 +1796,7 @@ void DynamicCam_GetSmoothBallLocation(CamScript* pScript, CamShot* pShot, int nP
          || gPlayers[nPlayer].ball.nLie == 12)
         && pCourse != NULL) {
         if (pCourse->pin[nPin].y - gPlayers[nPlayer].ball.vPos[1] > 0.005f
-            && Vec_Distance(pScript->v70, gPlayers[nPlayer].ball.vPos) < 2.0f) {
+            && vec4flt_DistanceBetween3(pScript->v70, gPlayers[nPlayer].ball.vPos) < 2.0f) {
             bNear = 1;
         }
     }

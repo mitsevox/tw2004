@@ -999,7 +999,7 @@ void Gaud_UpdtSwing(u8 nPlayer) {
                 if (nLastState == 1 && nLastState != nState) {
                     Aud_EmiSetTrackStep(nId, 0, 1, 1);
                 } else {
-                    fSpeed = Vec_Distance(vPos, vLast) / (FRAME_RATE * pView->fC);
+                    fSpeed = vec4flt_DistanceBetween3(vPos, vLast) / (FRAME_RATE * pView->fC);
                     fPitch = fSpeed * lbl_80281438;
                     fVolume = fSpeed * lbl_8028143C;
                     fPitch = (fPitch <= lbl_80281444) ? lbl_80281444 : fPitch;

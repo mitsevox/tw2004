@@ -172,7 +172,7 @@ void CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKA
             Ter_GetSupportingGroundNormal(pCourse, pChar->pModel->pMatrices[0][3], vNormal)) {
             Vec_Copy(pChar->a179C, m[1]);
             vec4flt_CrossProduct(pChar->pModel->pMatrices[0][0], pChar->a179C, m[2]);
-            Vec_NormalizeTo(m[2], m[2]);
+            Vec3_Normalize(m[2], m[2]);
             vec4flt_CrossProduct(pChar->a179C, m[2], m[0]);
             m[0][3] = 0.0f;
             m[1][3] = 0.0f;

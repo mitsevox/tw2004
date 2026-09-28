@@ -22,8 +22,8 @@ void    fn_8006F080(GoLight* pLight);
 void fn_8000AE48(f32* pA, f32* pB, f32* pOut);     // pOut = pA * pB, element by element
 void fn_80029BC8(f32* pVec);                        // sets a vector to lbl_80186838
 void Mtx_Identity(f32 (*pMtx)[4]);                   // identity
-void fn_800BAE5C(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // VecMath.c
-void fn_800BADB4(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // a vector through a matrix
+void Mtx_MultVec3Array(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // VecMath.c
+void Mtx_MultVec3(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // a vector through a matrix
 void Mtx_InvertRigid(f32 (*pSrc)[4], f32 (*pDst)[4]);  // UMemPool.c: inverts a rotation+translation
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
@@ -184,8 +184,8 @@ void LI_vEulerAnglesRYP(f32 (*pMtx)[4], f32 fA, f32 fB, f32 fC) {
     mB[2][2] = mB[1][1];
     mC[1][0] = -mC[0][1];
     mC[1][1] = mC[0][0];
-    fn_800BAE5C(mA, mB, pMtx, 3);
-    fn_800BAE5C(mC, pMtx, pMtx, 3);
+    Mtx_MultVec3Array(mA, mB, pMtx, 3);
+    Mtx_MultVec3Array(mC, pMtx, pMtx, 3);
 }
 
 // Loads a group (or none): the directional light becomes the ambient colour (63.75 grey without
@@ -270,7 +270,7 @@ void fn_8006EADC(UObject* pObj) {
         pPoint = lbl_802811D8->aPointPos;
         for (i = 0; i < lbl_802811D8->nPoints; i++) {
             uMask |= 1 << i;
-            fn_800BADB4(pCamera->viewMtx, *pPoint, vPos);
+            Mtx_MultVec3(pCamera->viewMtx, *pPoint, vPos);
             aPos[0][i] = vPos[0];
             aPos[1][i] = vPos[1];
             aPos[2][i] = vPos[2];
@@ -281,8 +281,8 @@ void fn_8006EADC(UObject* pObj) {
         pPoint = lbl_802811D8->aPointPos;
         for (i = 0; i < lbl_802811D8->nPoints; i++) {
             uMask |= 1 << i;
-            fn_800BADB4(mInv, *pPoint, vPos);
-            fn_800BADB4(pCamera->viewMtx, vPos, vPos);
+            Mtx_MultVec3(mInv, *pPoint, vPos);
+            Mtx_MultVec3(pCamera->viewMtx, vPos, vPos);
             aPos[0][i] = vPos[0];
             aPos[1][i] = vPos[1];
             aPos[2][i] = vPos[2];
@@ -346,7 +346,7 @@ void fn_8006EDC0(LightGroup* pGroup) {
     v0[2] = 1.0f;
     // the angles are degrees / 180 * PI: DEG(x) rounds 175, -17 and -5 one bit differently
     LI_vEulerAnglesRYP(m0, 175.0f / 180.0f * PI, -17.0f / 180.0f * PI, 0.0f);
-    fn_800BADB4(m0, v0, pLight->u.point.vPos);
+    Mtx_MultVec3(m0, v0, pLight->u.point.vPos);
     pLight->u.point.fC = 1.0f;
     pLight->u.point.f10 = 1.0f;
     pLight->u.point.f14 = 1.0f;
@@ -361,7 +361,7 @@ void fn_8006EDC0(LightGroup* pGroup) {
     v1[1] = 0.0f;
     v1[2] = 1.0f;
     LI_vEulerAnglesRYP(m1, 63.0f / 180.0f * PI, -5.0f / 180.0f * PI, 0.0f);
-    fn_800BADB4(m1, v1, pLight->u.point.vPos);
+    Mtx_MultVec3(m1, v1, pLight->u.point.vPos);
     pLight->u.point.fC = 0.5f;
     pLight->u.point.f10 = 1.0f;
     pLight->u.point.f14 = 1.0f;
@@ -376,7 +376,7 @@ void fn_8006EDC0(LightGroup* pGroup) {
     v2[1] = 0.0f;
     v2[2] = 1.0f;
     LI_vEulerAnglesRYP(m2, -71.0f / 180.0f * PI, -30.0f / 180.0f * PI, 0.0f);
-    fn_800BADB4(m2, v2, pLight->u.point.vPos);
+    Mtx_MultVec3(m2, v2, pLight->u.point.vPos);
     pLight->u.point.fC = 0.58f;
     pLight->u.point.f10 = 1.0f;
     pLight->u.point.f14 = 1.0f;
@@ -391,7 +391,7 @@ void fn_8006EDC0(LightGroup* pGroup) {
     v3[1] = 0.0f;
     v3[2] = 1.0f;
     LI_vEulerAnglesRYP(m3, -5.0f / 180.0f * PI, 90.0f / 180.0f * PI, 0.0f);
-    fn_800BADB4(m3, v3, pLight->u.point.vPos);
+    Mtx_MultVec3(m3, v3, pLight->u.point.vPos);
     pLight->u.point.fC = 0.4f;
     pLight->u.point.f10 = 1.0f;
     pLight->u.point.f14 = 1.0f;

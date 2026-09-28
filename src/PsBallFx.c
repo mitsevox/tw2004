@@ -481,7 +481,7 @@ void fn_800A34C0(int nTrail, Ball* pBall, f32* pDir) {
     nVert = lbl_80281408->an34[nTrail];
     nIndex = lbl_80281408->an38[nTrail];
     nUsed = lbl_80281408->an44[nTrail];
-    if (fn_800BB028(pBall->vPos, lbl_80281408->a54[nTrail]) < 0.001f) {
+    if (Vec3_DistanceSq(pBall->vPos, lbl_80281408->a54[nTrail]) < 0.001f) {
         return;
     }
     Vec3Copy(pBall->vPos, lbl_80281408->a54[nTrail]);
@@ -509,7 +509,7 @@ void fn_800A34C0(int nTrail, Ball* pBall, f32* pDir) {
     lbl_80281408->ap30[nTrail][nCur * 4 + 6] = 5;
     lbl_80281408->ap30[nTrail][nCur * 4 + 7] = 0;
     if (nUsed >= 2) {
-        fGap = fn_800BB028(&lbl_80281408->ap28[nTrail][nCur * 3], &lbl_80281408->ap28[nTrail][nPrev * 3]);
+        fGap = Vec3_DistanceSq(&lbl_80281408->ap28[nTrail][nCur * 3], &lbl_80281408->ap28[nTrail][nPrev * 3]);
     } else {
         fGap = 0.0f;
     }
@@ -587,7 +587,7 @@ void PsBallFx_TriggerTrail(Ball* pBall, int nPlayer) {
     Vec_Copy(gPlayers[nPlayer].ball.vVel, vDir);
     vDir[1] = 0.0f;
     if (vDir[0] != 0.0f || vDir[2] != 0.0f) {
-        Vec_NormalizeTo(vDir, vDir);
+        Vec3_Normalize(vDir, vDir);
         fn_800A34C0(0, pBall, vDir);
     }
 }

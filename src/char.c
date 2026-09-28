@@ -767,7 +767,7 @@ void Character_PlaceFeetOnGround(Character* pChar) {
                 fLowest = pChar->afGroundHeight[i];
             }
         }
-        Vec_NormalizeTo(pChar->a179C, pChar->a179C);
+        Vec3_Normalize(pChar->a179C, pChar->a179C);
         if (fLowest < -60000.0f) {
             return;
         }
@@ -904,7 +904,7 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
         return;
     }
     Char_Vec3Add(pChar->aGroundNormal[nPoint], pChar->aGroundNormal[nOther], vSlope);
-    Vec_NormalizeTo(vSlope, vSlope);
+    Vec3_Normalize(vSlope, vSlope);
     if (fDrop > 0.33f / 12.0f) {
         fDrop = 1.0f;
     } else {
@@ -941,7 +941,7 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     fAngleB = Math_Acos((fCos < -1.0f) ? -1.0f : ((fCos > 1.0f) ? 1.0f : fCos));
     fTurn = fAngleA - fAngleB;
     vec4flt_CrossProduct(vShin, vThigh, vNormal);
-    fLen = fn_800BAFC0(vNormal, vNormal);
+    fLen = Vec3_NormalizeLength(vNormal, vNormal);
     vNormal[3] = 0.0f;
     pSkel = pChar->pModel->pSkel;
     if (pSkel != NULL) {
@@ -2918,7 +2918,7 @@ void Character_GetBallOnFingerPosition(Character* pChar, f32* pPos) {
 
     Vec_Copy(pMtx[3], pPos);
     Vec3Copy(pMtx[0], vAxis);
-    Vec_NormalizeTo(vAxis, vAxis);
+    Vec3_Normalize(vAxis, vAxis);
     if (Character_IsLeftHanded(pChar)) {
         fn_8000C5D4(pPos, vAxis, 0.05f, pPos);
     } else {
@@ -2937,7 +2937,7 @@ void fn_8001DA04(Character* pChar, f32* pPos, f32* pAngles) {
         pMtx = Character_GetBoneMatrixSwapIfLefty(pChar, 0x1A);
         Vec_Copy(pMtx[3], pPos);
         Vec3Copy(pMtx[0], vAxis);
-        Vec_NormalizeTo(vAxis, vAxis);
+        Vec3_Normalize(vAxis, vAxis);
         if (Character_IsLeftHanded(pChar)) {
             fn_8000C5D4(pPos, vAxis, -0.000625f, pPos);
         } else {

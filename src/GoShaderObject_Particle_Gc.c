@@ -379,7 +379,7 @@ void fn_80094B84(SD_SShaderObject_Static* pObject, ParticleMsg* pMsg) {
     *pMsg->u.age.pnLive = nLive;
 }
 
-void fn_800BADB4(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // VecMath.c: a vector through a matrix
+void Mtx_MultVec3(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // VecMath.c: a vector through a matrix
 
 // Emits pMsg's particles after the live ones of the buffer not being drawn (at most as many as
 // fit, less one). Their ages run from fAgeSpread down; unless the settings' flag 0x1000 keeps a
@@ -430,7 +430,7 @@ void fn_80094E34(SD_SShaderObject_Static* pObject, ParticleMsg* pMsg) {
             v.y = pVert->vC[1];
             v.z = pVert->vC[2];
             v.w = 1.0f;
-            fn_800BADB4(pMsg->u.emit.pMtx, &v.x, &v.x);
+            Mtx_MultVec3(pMsg->u.emit.pMtx, &v.x, &v.x);
             Vec3Copy(&v.x, pVert->vC);
             // the next three slots get copies of it
             Mem_cpy(pVert + 1, pVert, sizeof(ParticleVertex));

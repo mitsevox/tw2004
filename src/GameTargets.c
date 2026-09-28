@@ -34,7 +34,8 @@ void fn_800F19D4(void) {
     f32* pTee = &Ter_GetTGD()->tee[gSession.nTeeSet[0]].x;
     for (i = 0; i < lbl_80282360 - 1; i++) {
         for (j = i + 1; j < lbl_80282360; j++) {
-            if (Vec_Distance(lbl_80211D38[i], pTee) > Vec_Distance(lbl_80211D38[j], pTee)) {
+            if (vec4flt_DistanceBetween3(lbl_80211D38[i], pTee)
+                > vec4flt_DistanceBetween3(lbl_80211D38[j], pTee)) {
                 Vec_Copy(lbl_80211D38[i], tmp);
                 Vec_Copy(lbl_80211D38[j], lbl_80211D38[i]);
                 Vec_Copy(tmp, lbl_80211D38[j]);
@@ -85,9 +86,9 @@ s8 fn_800F1C74(int nPlayer) {
     f32* pBall = gPlayers[nPlayer].ball.vPos;
     s8 i;
     s8 nBest = 0;
-    f32 fBest = Vec_Distance(lbl_80211D38[0], pBall);
+    f32 fBest = vec4flt_DistanceBetween3(lbl_80211D38[0], pBall);
     for (i = 1; i < lbl_80282360; i++) {
-        f32 f = Vec_Distance(lbl_80211D38[i], pBall);
+        f32 f = vec4flt_DistanceBetween3(lbl_80211D38[i], pBall);
         if (f < fBest) {
             fBest = f;
             nBest = i;
@@ -101,9 +102,9 @@ int fn_800F1D34(int nPlayer) {
     f32* pTarget = gPlayers[nPlayer].vTarget;
     int i;
     int nBest = 0;
-    f32 fBest = Vec_Distance(lbl_80211D38[0], pTarget);
+    f32 fBest = vec4flt_DistanceBetween3(lbl_80211D38[0], pTarget);
     for (i = 1; i < lbl_80282360; i++) {
-        f32 f = Vec_Distance(lbl_80211D38[i], pTarget);
+        f32 f = vec4flt_DistanceBetween3(lbl_80211D38[i], pTarget);
         if (f < fBest) {
             fBest = f;
             nBest = i;

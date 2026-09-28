@@ -22,7 +22,7 @@ void Vec_Swap(f32* pA, f32* pB);
 void Mtx_Identity(f32 (*pDst)[4]);
 void fn_8000AE0C(f32* pSrc, f32* pDst);
 void fn_8000AE9C(void);
-void fn_800BADB4(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // a vector through a matrix
+void Mtx_MultVec3(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // a vector through a matrix
 
 // Copies a 4x4 matrix, one row at a time.
 void Mtx_Copy(f32 (*pSrc)[4], f32 (*pDst)[4]) {
@@ -279,7 +279,7 @@ void Mtx_InvertRigid(f32 (*pSrc)[4], f32 (*pDst)[4]) {
     pDst[2][3] = 0.0f;
     pDst[3][3] = 1.0f;
     Mtx_Transpose3x3(pSrc, pDst);
-    fn_800BADB4(pDst, aPos, aTurned);
+    Mtx_MultVec3(pDst, aPos, aTurned);
     fn_8000AE0C(aTurned, pDst[3]);
 }
 

@@ -464,3 +464,17 @@ address	name	comment	by	date
 8000A0C8	StaticMem_StartCount	none	rd1 (replayed by orchestrator)	2026-09-28
 8000A0D4	StaticMem_StopCount	none	rd1 (replayed by orchestrator)	2026-09-28
 8000A0E0	StaticMem_GetCount	add	rd1 (replayed by orchestrator)	2026-09-28
+80005628	Mem_cpy	keep	rd1 (replayed by orchestrator)	2026-09-28
+80005884	Mem_move	keep	rd1 (replayed by orchestrator)	2026-09-28
+80005AE8	Mem_set	rewrite	rd1 (replayed by orchestrator)	2026-09-28
+80005BC8	Mem_compare	add	rd1 (replayed by orchestrator)	2026-09-28
+800BAD60	Mtx_MultVec4	rewrite	rd1 (replayed by orchestrator)	2026-09-28
+800BADB4	Mtx_MultVec3	rewrite	rd1 (replayed by orchestrator)	2026-09-28
+800BADF8	Mtx_MultVec4Array	rewrite	rd1 (replayed by orchestrator)	2026-09-28
+800BAE5C	Mtx_MultVec3Array	rewrite	rd1 (replayed by orchestrator)	2026-09-28
+800BAEB0	Vec_Normalize	rewrite	rd1 (replayed by orchestrator)	2026-09-28
+800BAF04	Vec3_Normalize	rewrite	rd1 (replayed by orchestrator)	2026-09-28
+800BAF58	Vec_NormalizeLength	rewrite	rd1 (replayed by orchestrator)	2026-09-28
+800BAFC0	Vec3_NormalizeLength	rewrite	rd1 (replayed by orchestrator)	2026-09-28
+800BB028	Vec3_DistanceSq	keep	rd1 (replayed by orchestrator)	2026-09-28
+800BB050	vec4flt_DistanceBetween3	rewrite	rd1 (replayed by orchestrator)	2026-09-28

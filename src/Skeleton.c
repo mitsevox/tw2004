@@ -25,7 +25,7 @@ void Mtx_InvertRigid(f32 (*pSrc)[4], f32 (*pDst)[4]);       // UMemPool.c: inver
 void Quat_BuildFromMatrix(f32 (*m)[4], f32* pQ);                 // Quaternion.c: a rotation matrix's quaternion
 void Character_UpdateFeetTerrainInfo(Character* pChar, int bNormals);   // char.c
 void Character_PlaceFeetOnGround(Character* pChar);                     // char.c
-void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // pDst = pSrc's rows
+void Mtx_MultVec4Array(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // pDst = pSrc's rows
                                                                                 // through pMtx
 void fn_80113E60(void);                                 // DynChain.c
 void fn_80114080(void);                                 // DynChain.c
@@ -152,7 +152,7 @@ f32 fn_80026D18(CharModel* pModel, IKChain* pChain, f32* pTarget, int nLink, int
                 if (pLink->n8 >= 0) {
                     vLocal[pLink->n8] = 0.0f;
                 }
-                Vec_NormalizeTo(vLocal, vLocal);
+                Vec3_Normalize(vLocal, vLocal);
                 Vec3_Scale(fAngle, vLocal, vLocal);
                 fn_80029BF4(vLocal, pLink->v58, pLink->v58);
                 Quat_BuildFromVectorAndScale(vLocal, qTurn, fAngle);
@@ -534,12 +534,12 @@ void fn_80027D14(Character* pChar) {
     if (pModel->bEE) {
         Mtx_Identity(mFlip);
         mFlip[0][0] = -1.0f;
-        fn_800BADF8(pGripMtx, mFlip, mGrip, 4);
+        Mtx_MultVec4Array(pGripMtx, mFlip, mGrip, 4);
     } else {
         Mtx_Copy(pGripMtx, mGrip);
     }
     Mtx_InvertRigid(mGrip, mInv);
-    fn_800BADF8(mInv, pMtx28, mRel, 4);
+    Mtx_MultVec4Array(mInv, pMtx28, mRel, 4);
     Quat_BuildFromMatrix(mRel, pModel->pSkel->q107C);
     Mtx_MultVec4(mInv, (Vec4*)pMtx28[3], (Vec4*)pModel->pSkel->v108C);
     pModel->pSkel->v108C[3] = 0.0f;
@@ -850,7 +850,7 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
         mScale[0][0] = pModel->a140[0][0];
         mScale[1][1] = pModel->a140[0][1];
         mScale[2][2] = pModel->a140[0][2];
-        fn_800BADF8(pModel->pMatrices[0], mScale, mOut, 4);
+        Mtx_MultVec4Array(pModel->pMatrices[0], mScale, mOut, 4);
         Mtx_Copy(mOut, pModel->pMatrices[0]);
         Vec4_CopyPoint(pModel->pPoses[0].v10, pModel->pMatrices[0][3]);
         SKEL_UpdateSkinningMatrix(pModel, pModel->pMatrices[0], 0);
@@ -920,7 +920,7 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
             if (pModel->bEE && i == CharModel_GetBoneIndex(pModel, 0x52)) {
                 mScale[0][0] = -mScale[0][0];   // with bEE set, bone 0x52's x is flipped
             }
-            fn_800BADF8(pModel->pMatrices[i], mScale, mOut, 4);
+            Mtx_MultVec4Array(pModel->pMatrices[i], mScale, mOut, 4);
             Mtx_Copy(mOut, pModel->pMatrices[i]);
             Vec4_CopyPoint(pPose->v10, pModel->pMatrices[i][3]);
             SKEL_UpdateSkinningMatrix(pModel, pModel->pMatrices[i], i);
@@ -1180,7 +1180,7 @@ void SKEL_UpdateSkinningMatrix(CharModel* pModel, f32 (*pMtx)[4], int nBone) {
     if (nBone >= pModel->n76C || pModel->p760 == NULL || pModel->p768 == NULL || pModel->p764 == NULL) {
         return;
     }
-    fn_800BADF8(pMtx, pModel->p764[nBone], pModel->p768[nBone], 4);
+    Mtx_MultVec4Array(pMtx, pModel->p764[nBone], pModel->p768[nBone], 4);
 }
 
 // Does that for every bone, through the bone's own matrix.

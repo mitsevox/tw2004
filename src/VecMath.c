@@ -6,15 +6,15 @@
 #include "engine.h"
 #include "unsorted/cull.h"
 
-void fn_800BADB4(f32 (*pMtx)[4], f32* pIn, f32* pOut);
-void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
-void fn_800BAE5C(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
+void Mtx_MultVec3(f32 (*pMtx)[4], f32* pIn, f32* pOut);
+void Mtx_MultVec4Array(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
+void Mtx_MultVec3Array(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 
 // ---- matrices ------------------------------------------------------------------------------
 // A row vector times a 4x4 matrix: out[j] = in[0] * m[0][j] + in[1] * m[1][j] + ...
 
 #ifdef __MWERKS__
-// A four-float vector through the whole matrix.
+// dst = src times mtx (four floats, a row vector: see above); src and dst may be the same.
 asm void Mtx_MultVec4(register float mtx[4][4], register Vec4* src, register Vec4* dst) {
     nofralloc
     psq_l     f0, 0(src), 0, 0
@@ -40,8 +40,9 @@ asm void Mtx_MultVec4(register float mtx[4][4], register Vec4* src, register Vec
     blr
 }
 
-// A three-float vector through the matrix's top-left 3x3 (a rotation, no translation).
-asm void fn_800BADB4(register f32 (*pMtx)[4], register f32* pIn, register f32* pOut) {
+// pOut = pIn times the top-left 3x3 of pMtx (three floats: a rotation, no translation); pOut[3] is
+// not written, and pIn and pOut may be the same.
+asm void Mtx_MultVec3(register f32 (*pMtx)[4], register f32* pIn, register f32* pOut) {
     nofralloc
     psq_l     f0, 0(pIn), 0, 0
     psq_l     f1, 0(pMtx), 0, 0
@@ -62,8 +63,8 @@ asm void fn_800BADB4(register f32 (*pMtx)[4], register f32* pIn, register f32* p
     blr
 }
 
-// Mtx_MultVec4 for nRows four-float vectors in a row.
-asm void fn_800BADF8(register f32 (*pMtx)[4], register f32 (*pSrc)[4], register f32 (*pDst)[4],
+// Mtx_MultVec4 for nRows four-float vectors in a row (nRows must be at least 1).
+asm void Mtx_MultVec4Array(register f32 (*pMtx)[4], register f32 (*pSrc)[4], register f32 (*pDst)[4],
                      register int nRows) {
     nofralloc
     psq_l     f4, 0(pMtx), 0, 0
@@ -94,8 +95,9 @@ loop:
     blr
 }
 
-// fn_800BADB4 for nRows vectors in a row (three floats used of each four).
-asm void fn_800BAE5C(register f32 (*pMtx)[4], register f32 (*pSrc)[4], register f32 (*pDst)[4],
+// Mtx_MultVec3 for nRows vectors in a row, 16 bytes apart (three floats used of each four, the
+// fourth not written; nRows must be at least 1).
+asm void Mtx_MultVec3Array(register f32 (*pMtx)[4], register f32 (*pSrc)[4], register f32 (*pDst)[4],
                      register int nRows) {
     nofralloc
     psq_l     f4, 0(pMtx), 0, 0
@@ -136,7 +138,7 @@ void Mtx_MultVec4(float mtx[4][4], Vec4* src, Vec4* dst) {
     }
 }
 
-void fn_800BADB4(f32 (*pMtx)[4], f32* pIn, f32* pOut) {
+void Mtx_MultVec3(f32 (*pMtx)[4], f32* pIn, f32* pOut) {
     f32 out[3];
     int j;
     for (j = 0; j < 3; j++) {
@@ -147,17 +149,17 @@ void fn_800BADB4(f32 (*pMtx)[4], f32* pIn, f32* pOut) {
     }
 }
 
-void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows) {
+void Mtx_MultVec4Array(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows) {
     int i;
     for (i = 0; i < nRows; i++) {
         Mtx_MultVec4(pMtx, (Vec4*)pSrc[i], (Vec4*)pDst[i]);
     }
 }
 
-void fn_800BAE5C(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows) {
+void Mtx_MultVec3Array(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows) {
     int i;
     for (i = 0; i < nRows; i++) {
-        fn_800BADB4(pMtx, pSrc[i], pDst[i]);
+        Mtx_MultVec3(pMtx, pSrc[i], pDst[i]);
     }
 }
 #endif
@@ -172,7 +174,9 @@ static const f32 kHalf = 0.5f;
 static const f32 kThree = 3.0f;
 static const f32 kZero = 0.0f;
 
-// Normalise a four-float vector from pSrc into pDst; a near-zero one is copied.
+// Normalises the four-float vector pSrc into pDst (all four floats scaled by one over the
+// four-float length); one whose squared length is at most 2^-30 is copied as it is. pSrc and pDst
+// may be the same.
 asm void Vec_Normalize(register f32* pSrc, register f32* pDst) {
     nofralloc
     psq_l    f3, 0(pSrc), 0, 0
@@ -199,8 +203,9 @@ store:
     blr
 }
 
-// Normalise a three-float vector from pSrc into pDst; a near-zero one is copied.
-asm void Vec_NormalizeTo(register f32* pSrc, register f32* pDst) {
+// Normalises the three-float vector pSrc into pDst (pDst[3] is not written); one whose squared
+// length is at most 2^-30 is copied as it is. pSrc and pDst may be the same.
+asm void Vec3_Normalize(register f32* pSrc, register f32* pDst) {
     nofralloc
     psq_l    f3, 0(pSrc), 0, 0
     psq_l    f4, 8(pSrc), 1, 0
@@ -226,8 +231,9 @@ store:
     blr
 }
 
-// Vec_Normalize that also returns the length (0 for a near-zero vector).
-asm f32 fn_800BAF58(register f32* pSrc, register f32* pDst) {
+// Vec_Normalize that also returns the four-float length (0 for a vector with squared length at most
+// 2^-30, which is copied as it is).
+asm f32 Vec_NormalizeLength(register f32* pSrc, register f32* pDst) {
     nofralloc
     psq_l    f3, 0(pSrc), 0, 0
     psq_l    f4, 8(pSrc), 0, 0
@@ -258,8 +264,9 @@ zero:
     blr
 }
 
-// Vec_NormalizeTo that also returns the length (0 for a near-zero vector).
-asm f32 fn_800BAFC0(register f32* pSrc, register f32* pDst) {
+// Vec3_Normalize that also returns the three-float length (0 for a vector with squared length at
+// most 2^-30, which is copied as it is).
+asm f32 Vec3_NormalizeLength(register f32* pSrc, register f32* pDst) {
     nofralloc
     psq_l    f3, 0(pSrc), 0, 0
     psq_l    f4, 8(pSrc), 1, 0
@@ -291,7 +298,7 @@ zero:
 }
 
 // The squared distance between two three-float points.
-asm f32 fn_800BB028(register f32* pA, register f32* pB) {
+asm f32 Vec3_DistanceSq(register f32* pA, register f32* pB) {
     nofralloc
     psq_l    f0, 0(pA), 0, 0
     psq_l    f1, 8(pA), 1, 0
@@ -305,8 +312,8 @@ asm f32 fn_800BB028(register f32* pA, register f32* pB) {
     blr
 }
 
-// The distance between two three-float points.
-asm f32 Vec_Distance(register f32* pA, register f32* pB) {
+// The distance between two three-float points (0 when they are the same).
+asm f32 vec4flt_DistanceBetween3(register f32* pA, register f32* pB) {
     nofralloc
     psq_l    f0, 0(pA), 0, 0
     psq_l    f1, 8(pA), 1, 0
@@ -350,7 +357,7 @@ void Vec_Normalize(f32* pSrc, f32* pDst) {
     }
 }
 
-void Vec_NormalizeTo(f32* pSrc, f32* pDst) {
+void Vec3_Normalize(f32* pSrc, f32* pDst) {
     f32 s = Vec3_LengthSq(pSrc);
     f32 k = 1.0f;
     int i;
@@ -362,7 +369,7 @@ void Vec_NormalizeTo(f32* pSrc, f32* pDst) {
     }
 }
 
-f32 fn_800BAF58(f32* pSrc, f32* pDst) {
+f32 Vec_NormalizeLength(f32* pSrc, f32* pDst) {
     f32 s = pSrc[0] * pSrc[0] + pSrc[1] * pSrc[1] + pSrc[2] * pSrc[2] + pSrc[3] * pSrc[3];
     f32 fLen;
     int i;
@@ -379,7 +386,7 @@ f32 fn_800BAF58(f32* pSrc, f32* pDst) {
     return fLen;
 }
 
-f32 fn_800BAFC0(f32* pSrc, f32* pDst) {
+f32 Vec3_NormalizeLength(f32* pSrc, f32* pDst) {
     f32 s = Vec3_LengthSq(pSrc);
     f32 fLen;
     int i;
@@ -396,7 +403,7 @@ f32 fn_800BAFC0(f32* pSrc, f32* pDst) {
     return fLen;
 }
 
-f32 fn_800BB028(f32* pA, f32* pB) {
+f32 Vec3_DistanceSq(f32* pA, f32* pB) {
     f32 d[3];
     d[0] = pA[0] - pB[0];
     d[1] = pA[1] - pB[1];
@@ -404,8 +411,8 @@ f32 fn_800BB028(f32* pA, f32* pB) {
     return Vec3_LengthSq(d);
 }
 
-f32 Vec_Distance(f32* pA, f32* pB) {
-    f32 s = fn_800BB028(pA, pB);
+f32 vec4flt_DistanceBetween3(f32* pA, f32* pB) {
+    f32 s = Vec3_DistanceSq(pA, pB);
     if (!(s > 0.0f)) return 0.0f;
     return (f32)sqrt(s);
 }

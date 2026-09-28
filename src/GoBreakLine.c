@@ -89,7 +89,7 @@ void BreakLine_Update(int nView) {
     int nPlayer = ViewController_GetActivePlayerNumber(nView);
     f32 fDist;
 
-    fDist = Vec_Distance(lbl_80282228->vPin, gPlayers[nPlayer].vTarget);
+    fDist = vec4flt_DistanceBetween3(lbl_80282228->vPin, gPlayers[nPlayer].vTarget);
     fDist *= 36.0f;                     // yards to inches
     if (fDist <= 1.0f &&
         gPlayers[nPlayer].nShotKind == 0 && gPlayers[nPlayer].swing.nState == 0 &&
@@ -123,7 +123,7 @@ void BreakLine_Render(int nView) {
     int i;
 
     if (gSession.options.a24[2]) {
-        Vec_Distance(lbl_80282228->vPin, gPlayers[nPlayer].vTarget);
+        vec4flt_DistanceBetween3(lbl_80282228->vPin, gPlayers[nPlayer].vTarget);
         RenderState_SetCameraMatrices();
         RenderState_SetBlendFactors(4, 5);
         DS_vSetAlphaTestMode(0, 6, 0x80);
@@ -132,14 +132,14 @@ void BreakLine_Render(int nView) {
         RenderState_SetDrawFlags(0x70);
         RenderState_SetClipMode(0);
         RenderState_Flush();
-        fDist = Vec_Distance(lbl_80282228->aBall[nView].vPos, lbl_80282228->vPin);
+        fDist = vec4flt_DistanceBetween3(lbl_80282228->aBall[nView].vPos, lbl_80282228->vPin);
         if (lbl_80282228->abA91C[nView]) {
             if ((lbl_80282228->aBall[nView].nState == 2 || lbl_80282228->aBall[nView].nState == 3 ||
                  lbl_80282228->aBall[nView].nState == 4) && fDist > 0.001f) {
                 fn_80050D24_SetSimulating(1);
                 fn_8005585C_SimForTime(&lbl_80282228->aBall[nView], lbl_80282228->fAAE0, lbl_80282228->fAAE4);
                 fn_80050D24_SetSimulating(0);
-                fDist = fn_800BB028(lbl_80282228->aBall[nView].vPos,
+                fDist = Vec3_DistanceSq(lbl_80282228->aBall[nView].vPos,
                                     &lbl_80282228->aBall[nView].pCourse->pin[Game_CurrentPinSet()].x);
                 if (fDist < lbl_80282228->afAAD4[nView]) {
                     lbl_80282228->afAAD4[nView] = fDist;
@@ -153,7 +153,7 @@ void BreakLine_Render(int nView) {
                 vDir[1] = 0.0f;
                 // EA bug: tests y, just cleared, where z was surely meant
                 if (vDir[0] != 0.0f || vDir[1] != 0.0f) {
-                    Vec_NormalizeTo(vDir, vDir);
+                    Vec3_Normalize(vDir, vDir);
                 }
                 fAngle = Math_Acos(Vec3_Dot(vDir, vAxis));
                 vec4flt_CrossProduct(vDir, vAxis, vCross);
@@ -354,7 +354,7 @@ void fn_800C9038(int nView, f32* pLong, f32* pSide) {
         *pSide = 0.0f;
         return;
     }
-    fHoleDist = Vec_Distance(vHole, vBall);
+    fHoleDist = vec4flt_DistanceBetween3(vHole, vBall);
     if (fabs(fHoleDist) < 0.001f) {
         *pLong = 0.0f;
         *pSide = 0.0f;
@@ -365,7 +365,7 @@ void fn_800C9038(int nView, f32* pLong, f32* pSide) {
         *pSide = 0.0f;
         return;
     }
-    fAimDist = Vec_Distance(vAim, vBall);
+    fAimDist = vec4flt_DistanceBetween3(vAim, vBall);
     if (fabs(fAimDist) < 0.001f) {
         *pLong = 0.0f;
         *pSide = 0.0f;
@@ -377,9 +377,9 @@ void fn_800C9038(int nView, f32* pLong, f32* pSide) {
         return;
     }
     fn_800C9358(vHole, vBall, vToHole);
-    Vec_NormalizeTo(vToHole, vToHole);
+    Vec3_Normalize(vToHole, vToHole);
     fn_800C9358(vAim, vBall, vToAim);
-    Vec_NormalizeTo(vToAim, vToAim);
+    Vec3_Normalize(vToAim, vToAim);
     fDot = Vec3_Dot(vToHole, vToAim);
     if (0.0f == fDot) {
         *pLong = 0.0f;

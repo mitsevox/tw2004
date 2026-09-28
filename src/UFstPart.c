@@ -623,8 +623,8 @@ void* fn_80099C50(void* pList, int nLink, int (*pfnCompare)(void* pA, void* pB))
 
 // fn_80099BA0's sort order: pB's squared distance from lbl_801DB878 minus pA's.
 int fn_80099E34(void* pA, void* pB) {
-    f32 fA = fn_800BB028(lbl_801DB878, ((PsEmitter*)pA)->params.v80);
-    return fn_800BB028(lbl_801DB878, ((PsEmitter*)pB)->params.v80) - fA;
+    f32 fA = Vec3_DistanceSq(lbl_801DB878, ((PsEmitter*)pA)->params.v80);
+    return Vec3_DistanceSq(lbl_801DB878, ((PsEmitter*)pB)->params.v80) - fA;
 }
 
 void fn_80099EA4(PsEmitter* pEmitter) {

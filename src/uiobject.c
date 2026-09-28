@@ -39,7 +39,7 @@ void fn_80035F1C(void);
 void RC_UpdateCurrentScreenMatrices(void);
 void fn_8005C15C(int nPlayer, f32* pSpinY, f32* pSpinX);   // Swing.c: the spin asked for
 void Mtx_Identity(f32 (*pMtx)[4]);                          // identity
-void fn_800BAE5C(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // VecMath.c
+void Mtx_MultVec3Array(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // VecMath.c
 void Mtx_Copy(f32 (*pSrc)[4], f32 (*pDst)[4]);          // copy a matrix
 void fn_8000C5A4(f32 (*pMtx)[4]);
 void fn_800AEFE4(void);
@@ -294,7 +294,7 @@ void UI_Obj_RenderBoostUI(int nObj) {
             aDir[1] = fSpinY;
             aDir[2] = 0.0f;
             aDir[3] = 1.0f;
-            Vec_NormalizeTo(aDir, aDir);
+            Vec3_Normalize(aDir, aDir);
             fDot = (Vec3_Dot(aUp, aDir) < -1.0f) ? -1.0f
                  : ((Vec3_Dot(aUp, aDir) > 1.0f) ? 1.0f : Vec3_Dot(aUp, aDir));
             lbl_801F5B98[nObj].a0[5] = Math_Acos(fDot);
@@ -330,14 +330,14 @@ void UI_Obj_RenderBoostUI(int nObj) {
             mTilt[0][1] = fSinTilt;
             mTilt[1][0] = -fSinTilt;
             mTilt[1][1] = fCosTilt;
-            fn_800BAE5C(mTilt, mRoll, mRot, 3);
+            Mtx_MultVec3Array(mTilt, mRoll, mRot, 3);
 
             // draw it with the rotation, scale and position, then put its matrices back
             Mtx_Copy(lbl_802820D0->m0, mSave0);
             Mtx_Copy(lbl_802820D0->m40, mSave40);
             Mtx_Copy(lbl_802820D0->m80, mSave80);
-            fn_800BAE5C(mRot, lbl_802820D0->m0, lbl_802820D0->m0, 3);
-            fn_800BAE5C(mScale, lbl_802820D0->m40, lbl_802820D0->m40, 3);
+            Mtx_MultVec3Array(mRot, lbl_802820D0->m0, lbl_802820D0->m0, 3);
+            Mtx_MultVec3Array(mScale, lbl_802820D0->m40, lbl_802820D0->m40, 3);
             fn_8000C5A4(lbl_802820D0->m0);
             Vec_Copy(vPos, lbl_802820D0->m80[3]);
             lbl_802820D0->m80[3][3] = 1.0f;

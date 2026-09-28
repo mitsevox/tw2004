@@ -27,7 +27,7 @@ Checks against names we had already given by hand (all agree): `Ball_GroundConta
 `Physics_CheckTerrainCollisions`, `Ball_FlightStep` = `Physics_BallFlying`, `Ball_SetLie` =
 `Physics_SetLie`, `Ball_Stop` = `Physics_StopBall`, `Ball_Holed` = `Physics_ForceBallInHole`,
 `Ball_Launch` = `Physics_ShotImpact`, `Ball_Tick` = `Physics_QuickSimulate`, `SwingState01_Update` =
-`STATEFUNC_PreShotUpdate`, `Vec_Distance` = `vec4flt_DistanceBetween3`. One wrong pairing found
+`STATEFUNC_PreShotUpdate`, `vec4flt_DistanceBetween3` = `vec4flt_DistanceBetween3`. One wrong pairing found
 during tuning (`Vec_Copy`, a 36-byte copy, paired with an accessor) led to the rule that
 functions under 48 bytes are never named from call-graph evidence.
 
@@ -216,7 +216,7 @@ Functions still unnamed or named from TW06:
 | `8011E020` | `fn_8011E020` | `GetLocalTime` | medium | Xbox calls(r1,1) |
 | `8007706C` | `fn_8007706C` | - | conflict | Xbox: sfsnprintf calls(r0,1) / PS2: FE_MakeMoviePathWithSubDir anchor(1) |
 | `800C4AB0` | `GolfCamera_ClampLookAngle` | - | conflict | Xbox: GolfCamera_ClampLookAngle nbr(r9,3) / PS2: CameraController_BallIsOnScreen nbr2(r8,2) |
-| `800BAF04` | `Vec_NormalizeTo` | ~~-~~ | rejected | Xbox: vec4flt_LengthSquared3 nbr(r7,11) / PS2: GetGamePlayerCoreShotInfo nbr(r1,7); our code shows it normalises a vector |
+| `800BAF04` | `Vec3_Normalize` | ~~-~~ | rejected | Xbox: vec4flt_LengthSquared3 nbr(r7,11) / PS2: GetGamePlayerCoreShotInfo nbr(r1,7); our code shows it normalises a vector |
 
 Functions we had named by hand, with their TW06 equivalents (our names kept):
 
@@ -252,7 +252,7 @@ Functions we had named by hand, with their TW06 equivalents (our names kept):
 | `80062900` | `SwingState22_Update` | `STATEFUNC_PlaceBallUpdate` | strong | both builds: Xbox nbr2(r3,2), PS2 xbox:nbr2(r3,2) |
 | `800632E4` | `View_SetCamera` | `CameraController_SetCameraMode` | strong | both builds: Xbox nbr(r0,3), PS2 xbox:nbr(r0,3) |
 | `800965DC` | `CharAnim_StartTapIn` | `CharacterState_SetTapInState` | strong | both builds: Xbox nbr2(r3,3), PS2 xbox:nbr2(r3,3) |
-| `800BB050` | `Vec_Distance` | `vec4flt_DistanceBetween3` | strong | Xbox nbr(r5,6) |
+| `800BB050` | `vec4flt_DistanceBetween3` | `vec4flt_DistanceBetween3` | strong | Xbox nbr(r5,6) |
 | `800D0AA0` | `Hole_ScoreAfterTapIn` | `GameAnalysis_IsPuttFor` | strong | both builds: Xbox nbr2(r5,2), PS2 xbox:nbr2(r5,2) |
 | `8016FE1C` | `SFIOBeginSave` | `SFIOCreateStart` | strong | PS2 nbr(r0,5) |
 | `8000B428` | `Rand_Float` | `Physics_ComputeBallLieModifier` | medium | PS2 nbr(r1,2) |

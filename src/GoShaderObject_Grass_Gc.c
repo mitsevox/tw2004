@@ -491,12 +491,12 @@ void SD_vShaderObject_Grass_Static_Render(SD_SShaderObject_Static* pObject) {
     vAt[0] = pParams->a04[0];
     vAt[1] = pVert[1].f;
     vAt[2] = pParams->a04[1];
-    fDist = Vec_Distance(vEye, vAt);
+    fDist = vec4flt_DistanceBetween3(vEye, vAt);
     vAt[0] = 2.5f + pParams->a04[0];
-    fPerX = Vec_Distance(vEye, vAt) - fDist;
+    fPerX = vec4flt_DistanceBetween3(vEye, vAt) - fDist;
     vAt[0] = pParams->a04[0];
     vAt[2] = 2.5f + pParams->a04[1];
-    fPerZ = Vec_Distance(vEye, vAt) - fDist;
+    fPerZ = vec4flt_DistanceBetween3(vEye, vAt) - fDist;
     fPerX /= 2.5f;
     fPerZ /= 2.5f;
 

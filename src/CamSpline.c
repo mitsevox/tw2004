@@ -265,12 +265,12 @@ void fn_800C7D14(f32* pA, f32* pB, u8 bKeepY, u8 bRaw, f32* pOut, f32 fDist, f32
         aDir[1] = 0.0f;
     }
     if (!bRaw && (0.0f != aDir[0] || 0.0f != aDir[1] || 0.0f != aDir[2])) {
-        Vec_NormalizeTo(aDir, aDir);
+        Vec3_Normalize(aDir, aDir);
     }
     fn_8000C5D4(pA, aDir, fDist, pOut);
     aDir[1] = 0.0f;
     if (0.0f != aDir[0] || 0.0f != aDir[1] || 0.0f != aDir[2]) {
-        Vec_NormalizeTo(aDir, aDir);
+        Vec3_Normalize(aDir, aDir);
     }
     pOut[0] = fSide * -aDir[2] + pOut[0];
     pOut[2] = fSide * aDir[0] + pOut[2];

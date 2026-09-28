@@ -93,7 +93,7 @@ void* Mem_cpy(void* pDst, const void* pSrc, u32 uLen) {
 
 // memmove: Mem_cpy unless pSrc is below pDst and runs into it; then the copy runs backwards from
 // the ends, in the widest unit the ends and the length are aligned to.
-void* fn_80005884(void* pDst, const void* pSrc, u32 uLen) {
+void* Mem_move(void* pDst, const void* pSrc, u32 uLen) {
     void* pDstEnd;
     const void* pSrcEnd;
 
@@ -119,8 +119,9 @@ void* fn_80005884(void* pDst, const void* pSrc, u32 uLen) {
     return pDst;
 }
 
-// memset: short fills byte by byte; longer ones align to 8 and store the byte pattern 32 and then
-// 8 bytes at a time through a double.
+// memset: fills uLen bytes at pDst with the low byte of nValue and returns pDst. Under 32 bytes it
+// goes byte by byte; longer fills align to 8, then store the byte pattern 32 and then 8 bytes at a
+// time through a double.
 void* Mem_set(void* pDst, int nValue, u32 uLen) {
     u8* p;
     u8* pWide;
@@ -173,6 +174,8 @@ void* Mem_set(void* pDst, int nValue, u32 uLen) {
     return pDst;
 }
 
-int fn_80005BC8(const void* pA, const void* pB, u32 uLen) {
+// memcmp (MSL's): below 0, 0 or above 0 as the first differing byte of pA is below, equal to (none
+// differs) or above pB's.
+int Mem_compare(const void* pA, const void* pB, u32 uLen) {
     return memcmp(pA, pB, uLen);
 }

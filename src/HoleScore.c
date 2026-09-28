@@ -717,10 +717,10 @@ f32 fn_800D0960(int nPlayer) {
     fn_800D1674(vView, gPlayers[nPlayer].ball.vStart, vToView);
     vToView[1] = 0.0f;
     if ((f32)Math_Sqrt(Vec3_LengthSqClamped(vToPin)) > 0.0f) {
-        Vec_NormalizeTo(vToPin, vToPin);
+        Vec3_Normalize(vToPin, vToPin);
     }
     if ((f32)Math_Sqrt(Vec3_LengthSqClamped(vToView)) > 0.0f) {
-        Vec_NormalizeTo(vToView, vToView);
+        Vec3_Normalize(vToView, vToView);
     }
     fCos = Vec3_Dot(vToView, vToPin);
     if (fCos < -1.0f) {

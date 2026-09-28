@@ -752,7 +752,7 @@ u8 UStream_Update(void) {
                 UStreamObject* pOld = fn_8000B70C(pObject->uType, pObject->uId);
                 if (pOld != NULL) {
                     if (pObject->uSize == pOld->uSize
-                        && fn_80005BC8(pObject->pData, pOld->pData, pObject->uSize) == 0) {
+                        && Mem_compare(pObject->pData, pOld->pData, pObject->uSize) == 0) {
                         StaticMem_Free(pObject);
                         break;
                     }

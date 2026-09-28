@@ -313,8 +313,8 @@ void fn_800B99FC(UStreamObject* arg0);
 void Mtx_Copy(f32 (*pSrc)[4], f32 (*pDst)[4]);
 void Mtx_Identity(f32 (*pMtx)[4]);                   // identity
 void fn_8000C5A4(f32 (*pMtx)[4]);
-void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
-void fn_800BAE5C(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
+void Mtx_MultVec4Array(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
+void Mtx_MultVec3Array(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void Character_GetBonePos(Character* pChar, int nBone, f32* pPos);
 void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
 int  fn_8001005C(TexBank* pBank, u64 uHash);       // LLTex.c: the texture's index, or 0x80000000
@@ -425,12 +425,12 @@ void fn_800B9BF4(UObject* pObj, f32 (*mBone)[4], f32 (*mScale)[4], f32* pPos) {
     Mtx_Copy(pObj->m0, m0);
     Mtx_Copy(pObj->m40, m40);
     Mtx_Copy(pObj->m80, m80);
-    fn_800BAE5C(mBone, pObj->m0, pObj->m0, 3);
-    fn_800BAE5C(mScale, pObj->m40, pObj->m40, 3);
+    Mtx_MultVec3Array(mBone, pObj->m0, pObj->m0, 3);
+    Mtx_MultVec3Array(mScale, pObj->m40, pObj->m40, 3);
     fn_8000C5A4(pObj->m0);
     Vec_Copy(pPos, pObj->m80[3]);
     pObj->m80[3][3] = 1.0f;
-    fn_800BADF8(lbl_80281EE0->mC0, pObj->m80, pObj->m80, 4);
+    Mtx_MultVec4Array(lbl_80281EE0->mC0, pObj->m80, pObj->m80, 4);
     Mtx_Identity(pObj->m0);
     fn_80048894(pObj);
     Mtx_Copy(m0, pObj->m0);

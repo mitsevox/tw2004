@@ -185,13 +185,13 @@ void TARGET_RenderBallTarget(int nPlayer) {
     pView = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
     pCamPos = CameraController_GetPosition(pView);
     pLook = CameraController_GetTarget(pView);
-    fCamDist = Vec_Distance(pCamPos, vPos);
+    fCamDist = vec4flt_DistanceBetween3(pCamPos, vPos);
     fn_8006A964(pLook, pCamPos, vDir);
     vDir[1] = 0.0f;
     if (0.0f == vDir[0] && 0.0f == vDir[2]) {
         return;
     }
-    Vec_NormalizeTo(vDir, vDir);
+    Vec3_Normalize(vDir, vDir);
     fDot = Vec3_Dot(vUp, vDir);
     vec4flt_CrossProduct(vDir, vUp, vCross);
     fCos = (fDot < -1.0f) ? -1.0f : ((fDot > 1.0f) ? 1.0f : fDot);
@@ -990,13 +990,13 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
     pView = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
     pCamPos = CameraController_GetPosition(pView);
     pLook = CameraController_GetTarget(pView);
-    Vec_Distance(pCamPos, vPos);
+    vec4flt_DistanceBetween3(pCamPos, vPos);
     fn_8006A964(pLook, pCamPos, vDir);
     vDir[1] = 0.0f;
     if (0.0f == vDir[0] && 0.0f == vDir[2]) {
         return;
     }
-    Vec_NormalizeTo(vDir, vDir);
+    Vec3_Normalize(vDir, vDir);
     fDot = Vec3_Dot(vUp, vDir);
     vec4flt_CrossProduct(vDir, vUp, vCross);
     fCos = (fDot < -1.0f) ? -1.0f : ((fDot > 1.0f) ? 1.0f : fDot);
@@ -1023,7 +1023,7 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
     fHalfFov = 0.75f * fHalfFov * fn_8001414C((u8*)fn_8003526C());
     fn_8006A964(pView->v10, pView->v0, vDir);
     if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
-        Vec_NormalizeTo(vDir, vDir);
+        Vec3_Normalize(vDir, vDir);
     }
     fn_8006A964(vPos, pView->v0, vRel);
     fDotX = vDir[0] * vRel[0];

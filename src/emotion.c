@@ -445,10 +445,10 @@ void fn_8006B87C(int nPlayer) {
     vAim[1] = 0.0f;
     vShot[1] = 0.0f;
     if (0.0f != vAim[0] && 0.0f != vAim[2]) {
-        Vec_NormalizeTo(vAim, vAim);
+        Vec3_Normalize(vAim, vAim);
     }
     if (0.0f != vShot[0] && 0.0f != vShot[2]) {
-        Vec_NormalizeTo(vShot, vShot);
+        Vec3_Normalize(vShot, vShot);
     }
     fDot = Vec3_Dot(vAim, vShot);
     nLevel = lbl_801D5F78[nPlayer].n4;

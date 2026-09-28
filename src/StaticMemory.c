@@ -362,7 +362,7 @@ void StaticMem_Free(void* p) {
             } else if (i > 0) {
                 pSpan[0] = nEnd;
             } else {
-                fn_80005884(&lbl_80281BD4[3], &lbl_80281BD4[1], lbl_80281BD0 * sizeof(s32));
+                Mem_move(&lbl_80281BD4[3], &lbl_80281BD4[1], lbl_80281BD0 * sizeof(s32));
                 lbl_80281BD4[1] = nStart;
                 lbl_80281BD4[2] = nEnd;
                 lbl_80281BD0 += 2;
@@ -381,7 +381,7 @@ void StaticMem_Free(void* p) {
                     lbl_80281BD0 += 2;
                 }
             } else {
-                fn_80005884(pSpan + 3, pEnd, (lbl_80281BD0 - i) * sizeof(s32));
+                Mem_move(pSpan + 3, pEnd, (lbl_80281BD0 - i) * sizeof(s32));
                 lbl_80281BD0 += 2;
                 if (lbl_80281BCC > i) {
                     lbl_80281BCC += 2;

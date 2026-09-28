@@ -196,7 +196,7 @@ changes. Read from the disassembly, not yet verified by matching:
 - `cam+0x224` = result of `Math_Tan(0.5 * fov)` (looks like a tangent); `cam+0x228` = its reciprocal.
 - `cam+0x1FC` and `cam+0x200` = half-extents of the view, built from `0x224` and viewport values.
   `0x1FC` feeds the planes the cull test uses with `x`, `0x200` the ones used with `y`.
-- Each edge plane is made by normalizing `(1, extent, 0)` with `Vec_NormalizeTo`; the two results are
+- Each edge plane is made by normalizing `(1, extent, 0)` with `Vec3_Normalize`; the two results are
   stored as a pair (set A: `0x204`/`0x20C` and `0x208`/`0x210`).
 - **Set B (`0x214` - `0x220`) is the same thing with the extents multiplied by 2.0** (constant at
   `0x80282B7C`). So mode 1 of the cull test is a view twice as wide: a loose second-chance test.
@@ -387,7 +387,7 @@ Leads and loose ends
   library built with an older compiler.
 - The GCC block is the file-reading layer (`TagFile`, `SharedFileIO`). Unoptimized code is the
   easiest to decompile, and it is the bridge to the asset formats.
-- 79 small functions contain real paired-single math (e.g. `Mtx_MultVec4`, `fn_800BADF8`,
+- 79 small functions contain real paired-single math (e.g. `Mtx_MultVec4`, `Mtx_MultVec4Array`,
   `fn_8001EF78`). Probably hand-written assembly; would be matched as assembly, not C.
 
 Suggested next steps

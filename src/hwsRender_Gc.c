@@ -20,7 +20,7 @@ void fn_8011368C(SkinMesh* pMesh, SkinMeshRefs* pOut, u16 n0, u16 n2);
 void fn_801136C4(SkinMesh* pMesh, void* pData, SkinMeshRefs* pOut, u16 n0, u16 n2);
 SkinMeshRefs* fn_80113764(void);
 void fn_800738DC(TexBank* pBank, TexEntry* pTex, u8 bFirst);  // GoShaderObjectCommon
-void fn_800BADB4(f32 (*pMtx)[4], f32* pIn, f32* pOut);  // VecMath.c
+void Mtx_MultVec3(f32 (*pMtx)[4], f32* pIn, f32* pOut);  // VecMath.c
 void fn_80113BCC(SkinIter* pIter);
 void fn_80113C70(SkinIter* pIter);
 void fn_80113D28(SkinIter* pIter);
@@ -324,7 +324,7 @@ void fn_801132C4(SkinMeshRefs* pRefs) {
             vNormalIn.w = 1.0f;
             pMatrix = pMatrices[nMatrix];
             Mtx_MultVec4(pMatrix, &vPosIn, &vPosOut);
-            fn_800BADB4(pMatrix, &vNormalIn.x, &vNormalOut.x);
+            Mtx_MultVec3(pMatrix, &vNormalIn.x, &vNormalOut.x);
             pPosOut[0] = vPosOut.x;
             pPosOut[1] = vPosOut.y;
             pPosOut[2] = vPosOut.z;

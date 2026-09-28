@@ -912,7 +912,7 @@ void fn_800FBB30(Player* p) {
     f32 fLow;
     fn_800FE190(p->ball.vPos, p->vPlacement, v);
     fDistSq = v[0] * v[0] + v[2] * v[2];
-    Vec_NormalizeTo(v, v);
+    Vec3_Normalize(v, v);
     fAngle = p->fA88 - atan2f(v[2], v[0]) - PI / 2.0f;
     while (fAngle < -PI) {
         fAngle += TWOPI;

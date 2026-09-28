@@ -62,7 +62,7 @@ static f32 GoRenderCtx_Gc_StrippedFn(f32 x) {
 
 s32 Mtx_Copy();
 s32 Mtx_Transpose4x4();
-s32 fn_800BADF8();
+s32 Mtx_MultVec4Array();
 void RC_vSetCurrentRenderCtx(s32 v);
 void RC_vUpdateRenderCtxScreenMatricesAndInfo(Camera* pCamera);   // not decompiled yet
 void fn_80013DD0(u8* arg0, f32 (*arg1)[4]);
@@ -150,25 +150,25 @@ void RC_vUpdateRenderCtxScreenMatricesAndInfo(Camera* pCamera) {
     aSrc[0] = 1.0f;
     aSrc[1] = pCamera->f1FC;
     aSrc[2] = 0.0f;
-    Vec_NormalizeTo(aSrc, aDst);
+    Vec3_Normalize(aSrc, aDst);
     pCamera->unk204 = aDst[1];
     pCamera->unk20C = aDst[0];
     aSrc[0] = 1.0f;
     aSrc[1] = pCamera->f200;
     aSrc[2] = 0.0f;
-    Vec_NormalizeTo(aSrc, aDst);
+    Vec3_Normalize(aSrc, aDst);
     pCamera->unk208 = aDst[1];
     pCamera->unk210 = aDst[0];
     aSrc[0] = 1.0f;
     aSrc[1] = pCamera->f1FC * 2.0f;
     aSrc[2] = 0.0f;
-    Vec_NormalizeTo(aSrc, aDst);
+    Vec3_Normalize(aSrc, aDst);
     pCamera->unk214 = aDst[1];
     pCamera->unk218 = aDst[0];
     aSrc[0] = 1.0f;
     aSrc[1] = pCamera->f200 * 2.0f;
     aSrc[2] = 0.0f;
-    Vec_NormalizeTo(aSrc, aDst);
+    Vec3_Normalize(aSrc, aDst);
     pCamera->unk21C = aDst[1];
     pCamera->unk220 = aDst[0];
 
@@ -180,10 +180,10 @@ void RC_vUpdateRenderCtxScreenMatricesAndInfo(Camera* pCamera) {
         Mtx_OrthoScale(mFlat, pLens->fB4, pLens->fB8);
         f = pRect[2] * (1.0f / fn_80014134((u8*)pRect)) / pRect[3];
         Mtx_PerspectiveDepthOverNear(mProj, 1.0f / fn_8001413C((u8*)pRect), f, pCamera->unk1F4, pCamera->unk1F8);
-        fn_800BADF8(mProj, mFlat, pCamera->m5C, 4);
+        Mtx_MultVec4Array(mProj, mFlat, pCamera->m5C, 4);
     }
     Mtx_Transpose4x4(pCamera->m5C, pCamera->m9C);
-    fn_800BADF8(pCamera->m5C, pLens->m44, pCamera->mDC, 4);
+    Mtx_MultVec4Array(pCamera->m5C, pLens->m44, pCamera->mDC, 4);
 }
 
 void RC_vUpdateRenderCtxTransformationMatrices(void* pCamera) {
@@ -193,8 +193,8 @@ void RC_vUpdateRenderCtxTransformationMatrices(void* pCamera) {
         Mtx_Copy((*(s32*)((u8*)(arg0) + 0x10)) + 0x44, arg0 + 0x11C);
         Mtx_Copy(arg0 + 0xDC, arg0 + 0x19C);
     } else {
-        fn_800BADF8((*(s32*)((u8*)(arg0) + 0x10)) + 0x44, arg0 + 0x1C, arg0 + 0x11C, 4);
-        fn_800BADF8(arg0 + 0xDC, arg0 + 0x1C, arg0 + 0x19C, 4);
+        Mtx_MultVec4Array((*(s32*)((u8*)(arg0) + 0x10)) + 0x44, arg0 + 0x1C, arg0 + 0x11C, 4);
+        Mtx_MultVec4Array(arg0 + 0xDC, arg0 + 0x1C, arg0 + 0x19C, 4);
     }
     Mtx_Transpose4x4(arg0 + 0x11C, arg0 + 0x15C);
 }

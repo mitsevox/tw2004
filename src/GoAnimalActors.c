@@ -98,7 +98,7 @@ void ActAnimal_SetWorldMatrix(DynObjAnimal* pAnimal, f32 fDt) {
             aTan[i][3] = 0.0f;
         }
         if (aTan[i][0] || aTan[i][1] || aTan[i][2]) {
-            Vec_NormalizeTo(aTan[i], aTan[i]);
+            Vec3_Normalize(aTan[i], aTan[i]);
         }
     }
     fn_800C7480(aPos[0], aPos[1], aPos[2], aPos[3], aTan[0], aTan[1], aTan[2], aTan[3],
@@ -118,14 +118,14 @@ void ActAnimal_SetWorldMatrix(DynObjAnimal* pAnimal, f32 fDt) {
 
     // face the heading: row 2 along it, row 0 level across it, row 1 up
     if (vDir[0] || vDir[1] || vDir[2]) {
-        Vec_NormalizeTo(vDir, pAnimal->base.obj.m0[2]);
+        Vec3_Normalize(vDir, pAnimal->base.obj.m0[2]);
     }
     if (fabsf(pAnimal->base.obj.m0[2][1]) < 0.98f) {
         pAnimal->base.obj.m0[0][0] = pAnimal->base.obj.m0[2][2];
         pAnimal->base.obj.m0[0][1] = 0.0f;
         pAnimal->base.obj.m0[0][2] = -pAnimal->base.obj.m0[2][0];
         pAnimal->base.obj.m0[0][3] = 0.0f;
-        Vec_NormalizeTo(pAnimal->base.obj.m0[0], pAnimal->base.obj.m0[0]);
+        Vec3_Normalize(pAnimal->base.obj.m0[0], pAnimal->base.obj.m0[0]);
     }
     vec4flt_CrossProduct(pAnimal->base.obj.m0[2], pAnimal->base.obj.m0[0], pAnimal->base.obj.m0[1]);
 

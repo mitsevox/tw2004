@@ -114,7 +114,7 @@ u8 fn_8004AFA0(f32* pFrom, f32* pDir, f32 fMax, f32 (*pTri)[3], f32* pT, f32* pH
     pHit[1] = fT * pDir[1] + pFrom[1];
     pHit[2] = fT * pDir[2] + pFrom[2];
     vec4flt_CrossProduct(vE1, vE2, pNormal);
-    Vec_NormalizeTo(pNormal, pNormal);
+    Vec3_Normalize(pNormal, pNormal);
     return 1;
 }
 
@@ -522,13 +522,13 @@ u8 Ter_SearchForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut) {
 
     p = &gPlayers[nPlayer];
     pCourse = Ter_GetTGD();
-    fDist = fn_800BB028(&pCourse->pin[Game_CurrentPinSet()].x, p->ball.vStart);
-    if (fn_800BB028(p->ball.vPos, p->ball.vStart) > fDist) {
+    fDist = Vec3_DistanceSq(&pCourse->pin[Game_CurrentPinSet()].x, p->ball.vStart);
+    if (Vec3_DistanceSq(p->ball.vPos, p->ball.vStart) > fDist) {
         bPreferred = 0;                 // past the pin
     }
     if (bPreferred) {
-        fDist = Vec_Distance(lbl_801D58C8[nPlayer], p->ball.vPos);
-        fDropDist = Vec_Distance(lbl_801D5888[nPlayer], p->ball.vPos);
+        fDist = vec4flt_DistanceBetween3(lbl_801D58C8[nPlayer], p->ball.vPos);
+        fDropDist = vec4flt_DistanceBetween3(lbl_801D5888[nPlayer], p->ball.vPos);
         if ((p->ball.vStart[0] != lbl_801D58C8[nPlayer][0] || p->ball.vStart[1] != lbl_801D58C8[nPlayer][1]
              || p->ball.vStart[2] != lbl_801D58C8[nPlayer][2])
             && fDist - fDropDist < 10.0f) {
@@ -544,11 +544,11 @@ u8 Ter_SearchForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut) {
     vPos[2] = pOut[2];
     vPos[3] = 1.0f;
     pGround = Ter_GetSupportingGroundMaterial(pCourse, vPos);
-    fDist2 = fn_800BB028(pOut, p->ball.vPos);
+    fDist2 = Vec3_DistanceSq(pOut, p->ball.vPos);
     if (fDist2 > 9.0f
         || (!bPreferred && pGround->nClass != gSurfaceTypes[p->ball.nSurface].nClass)) {
         fn_8005097C(&pCourse->pin[Game_CurrentPinSet()].x, p->ball.vPos, vDir);
-        Vec_NormalizeTo(vDir, vDir);
+        Vec3_Normalize(vDir, vDir);
         fHeading = atan2f(vDir[0], vDir[2]);
         fRadius = 1.0f;
         for (nRing = 0; nRing < 4; nRing++) {
@@ -580,7 +580,7 @@ u8 Ter_SearchForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut) {
 done:
     if (p->ball.vStart[0] == pOut[0] && p->ball.vStart[2] == pOut[2]) return 0;
     if (bCheck && p->vA44[0] == p->vBall[0] && p->vA44[2] == p->vBall[2]
-        && fn_800BB028(pOut, p->vA44) < 2500.0f) {
+        && Vec3_DistanceSq(pOut, p->vA44) < 2500.0f) {
         return 0;
     }
     return 1;
@@ -1033,7 +1033,7 @@ f32 fn_8004D650(CourseInfo* pCourse, f32* pPos, f32* pNormal) {
         fn_8005097C(vA, vB, vAB);
         fn_8005097C(vB, vC, vBC);
         vec4flt_CrossProduct(vAB, vBC, pNormal);
-        Vec_NormalizeTo(pNormal, pNormal);
+        Vec3_Normalize(pNormal, pNormal);
         if (pNormal[1] < 0.0f) {
             fn_800509A0(pNormal, pNormal);
         }
@@ -1062,7 +1062,7 @@ u8 Ter_GetSupportingGroundNormal(CourseInfo* pCourse, f32* pPos, f32* pNormal) {
         fn_8005097C(vA, vB, vAB);
         fn_8005097C(vB, vC, vBC);
         vec4flt_CrossProduct(vAB, vBC, pNormal);
-        Vec_NormalizeTo(pNormal, pNormal);
+        Vec3_Normalize(pNormal, pNormal);
         if (pNormal[1] < 0.0f) {
             fn_800509A0(pNormal, pNormal);
         }
@@ -1117,7 +1117,7 @@ f32 Ter_GetSupportingGroundData(CourseInfo* pCourse, f32* pPos, SurfaceType** pp
         fn_8005097C(vA, vB, vAB);
         fn_8005097C(vB, vC, vBC);
         vec4flt_CrossProduct(vAB, vBC, pNormal);
-        Vec_NormalizeTo(pNormal, pNormal);
+        Vec3_Normalize(pNormal, pNormal);
         if (pNormal[1] < 0.0f) {
             fn_800509A0(pNormal, pNormal);
         }
@@ -1164,7 +1164,7 @@ void Ter_GetEnclosingGroundData(CourseInfo* pCourse, f32* pPos, f32* pLow, Surfa
         fn_8005097C(vA, vB, vAB);
         fn_8005097C(vB, vC, vBC);
         vec4flt_CrossProduct(vAB, vBC, pNormalLow);
-        Vec_NormalizeTo(pNormalLow, pNormalLow);
+        Vec3_Normalize(pNormalLow, pNormalLow);
         if (pNormalLow[1] < 0.0f) {
             fn_800509A0(pNormalLow, pNormalLow);
         }
@@ -1179,7 +1179,7 @@ void Ter_GetEnclosingGroundData(CourseInfo* pCourse, f32* pPos, f32* pLow, Surfa
         fn_8005097C(vA, vB, vAB2);
         fn_8005097C(vB, vC, vBC2);
         vec4flt_CrossProduct(vAB2, vBC2, pNormalHigh);
-        Vec_NormalizeTo(pNormalHigh, pNormalHigh);
+        Vec3_Normalize(pNormalHigh, pNormalHigh);
         if (pNormalHigh[1] < 0.0f) {
             fn_800509A0(pNormalHigh, pNormalHigh);
         }
@@ -1211,7 +1211,7 @@ f32 fn_8004DBB0(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurface, f32* pN
         fn_8005097C(vA, vB, vAB);
         fn_8005097C(vB, vC, vBC);
         vec4flt_CrossProduct(vAB, vBC, pNormal);
-        Vec_NormalizeTo(pNormal, pNormal);
+        Vec3_Normalize(pNormal, pNormal);
         if (pNormal[1] < 0.0f) {
             fn_800509A0(pNormal, pNormal);
         }
@@ -1379,7 +1379,7 @@ u8 Ter_CheckForPinCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* p
     pNormal[1] = 0.0f;
     pNormal[2] = pHit[2];
     pNormal[3] = 1.0f;
-    Vec_NormalizeTo(pNormal, pNormal);
+    Vec3_Normalize(pNormal, pNormal);
     pHit[0] += pCourse->pin[Game_CurrentPinSet()].x;
     pHit[1] += pCourse->pin[Game_CurrentPinSet()].y;
     pHit[2] += pCourse->pin[Game_CurrentPinSet()].z;
@@ -1422,7 +1422,7 @@ u8 fn_8004E558(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit
 
     if (pFrom[0] == pTo[0] && pFrom[1] == pTo[1] && pFrom[2] == pTo[2]) return 0;
     if (Ter_CheckForPinCollision(pCourse, nPlayer, pFrom, pTo, pHit, pNormal, ppSurface, ppObj)) {
-        fBest = fn_800BB028(pFrom, pHit);
+        fBest = Vec3_DistanceSq(pFrom, pHit);
     }
     nCell[0] = Ter_GridCell((pFrom[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
     nCell[1] = Ter_GridCell((pFrom[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
@@ -1465,7 +1465,7 @@ u8 fn_8004E558(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit
         vEdge[nMinor] += pCourse->fGridCellSize[nMinor];
     }
     fn_8005097C(pTo, pFrom, vDir);
-    Vec_NormalizeTo(vDir, vDir);
+    Vec3_Normalize(vDir, vDir);
     Vec_Copy(pFrom, vPos);
     for (;;) {
         Vec_Copy(vPos, vPrev);
@@ -1491,11 +1491,11 @@ u8 fn_8004E558(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit
                 vPos[1] = pFrom[1] + vDir[1] * fRun / vDir[AXIS3(nMinor)];
             }
         }
-        fLen = Vec_Distance(vPos, vPrev);
+        fLen = vec4flt_DistanceBetween3(vPos, vPrev);
         fn_8004DF10(pCourse, vPrev, vDir, nCell[0], nCell[1], fLen);
         if (fn_8004EB7C(pCourse, nCell[0], nCell[1], vPrev, vPos, vDir, fLen, vHit, vNormal, &pSurface, &pObj,
                         pbFlags)) {
-            fDist = fn_800BB028(pFrom, vHit);
+            fDist = Vec3_DistanceSq(pFrom, vHit);
             if (fDist < fBest) {
                 fBest = fDist;
                 Vec_Copy(vHit, pHit);
@@ -1619,7 +1619,7 @@ u8 fn_8004EE20(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit
 
     if (pFrom[0] == pTo[0] && pFrom[1] == pTo[1] && pFrom[2] == pTo[2]) return 0;
     if (Ter_CheckForPinCollision(pCourse, nPlayer, pFrom, pTo, pHit, pNormal, ppSurface, ppObj)) {
-        fBest = fn_800BB028(pFrom, pHit);
+        fBest = Vec3_DistanceSq(pFrom, pHit);
     }
     nCell[0] = Ter_GridCell((pFrom[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
     nCell[1] = Ter_GridCell((pFrom[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
@@ -1662,7 +1662,7 @@ u8 fn_8004EE20(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit
         vEdge[nMinor] += pCourse->fGridCellSize[nMinor];
     }
     fn_8005097C(pTo, pFrom, vDir);
-    Vec_NormalizeTo(vDir, vDir);
+    Vec3_Normalize(vDir, vDir);
     Vec_Copy(pFrom, vPos);
     for (;;) {
         Vec_Copy(vPos, vPrev);
@@ -1688,11 +1688,11 @@ u8 fn_8004EE20(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit
                 vPos[1] = pFrom[1] + vDir[1] * fRun / vDir[AXIS3(nMinor)];
             }
         }
-        fLen = Vec_Distance(vPos, vPrev);
+        fLen = vec4flt_DistanceBetween3(vPos, vPrev);
         fn_8004DF10(pCourse, vPrev, vDir, nCell[0], nCell[1], fLen);
         if (fn_8004F43C(pCourse, nCell[0], nCell[1], vPrev, vPos, vDir, fLen, vHit, vNormal, &pSurface,
                         &pObj)) {
-            fDist = fn_800BB028(pFrom, vHit);
+            fDist = Vec3_DistanceSq(pFrom, vHit);
             if (fDist < fBest) {
                 fBest = fDist;
                 Vec_Copy(vHit, pHit);
@@ -1852,7 +1852,7 @@ u8 Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* p
         vEdge[nMinor] += pCourse->fGridCellSize[nMinor];
     }
     fn_8005097C(pTo, pFrom, vDir);
-    Vec_NormalizeTo(vDir, vDir);
+    Vec3_Normalize(vDir, vDir);
     Vec_Copy(pFrom, vPos);
     for (;;) {
         Vec_Copy(vPos, vPrev);
@@ -1878,10 +1878,10 @@ u8 Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* p
                 vPos[1] = pFrom[1] + vDir[1] * fRun / vDir[AXIS3(nMinor)];
             }
         }
-        fLen = Vec_Distance(vPos, vPrev);
+        fLen = vec4flt_DistanceBetween3(vPos, vPrev);
         if (fn_8004FCB4(pCourse, nCell[0], nCell[1], vPrev, vPos, vDir, fLen, vHit, vNormal, &pSurface,
                         &pObj)) {
-            fDist = fn_800BB028(pFrom, vHit);
+            fDist = Vec3_DistanceSq(pFrom, vHit);
             if (fDist < fBest) {
                 fBest = fDist;
                 Vec_Copy(vHit, pHit);
@@ -2037,7 +2037,7 @@ u8 fn_8004FF34(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNorma
         vEdge[nMinor] += pCourse->fGridCellSize[nMinor];
     }
     fn_8005097C(pTo, pFrom, vDir);
-    Vec_NormalizeTo(vDir, vDir);
+    Vec3_Normalize(vDir, vDir);
     Vec_Copy(pFrom, vPos);
     for (;;) {
         Vec_Copy(vPos, vPrev);
@@ -2063,10 +2063,10 @@ u8 fn_8004FF34(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNorma
                 vPos[1] = pFrom[1] + vDir[1] * fRun / vDir[AXIS3(nMinor)];
             }
         }
-        fLen = Vec_Distance(vPos, vPrev);
+        fLen = vec4flt_DistanceBetween3(vPos, vPrev);
         if (fn_800504F4(pCourse, nCell[0], nCell[1], vPrev, vPos, vDir, fLen, vHit, vNormal, &pSurface,
                         &pObj)) {
-            fDist = fn_800BB028(pFrom, vHit);
+            fDist = Vec3_DistanceSq(pFrom, vHit);
             if (fDist < fBest) {
                 fBest = fDist;
                 Vec_Copy(vHit, pHit);
