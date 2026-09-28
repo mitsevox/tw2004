@@ -28,7 +28,7 @@ u8       fn_800C708C(View* pView);
 void     fn_80038010(u8 a, int n, f32* pVec);
 void     fn_800380A8(u8 a, f32* pVec, u8 b, int nSlot, f32 f1, f32 f2);
 int      fn_800636EC(void);
-void     fn_8000A194(f32 (*m)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
+void     mat44flt_EulerAngles(f32 (*m)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
 void     fn_800BADB4(f32 (*m)[4], f32* pIn, f32* pOut);  // a vector through a matrix
 void     fn_800636B4(int nPlayer);
 void     GolfCamera_ClampLookAngle(f32* pFrom, f32* pTo, f32* pOut);
@@ -2237,7 +2237,7 @@ void GolfCamera_ProcessPostShotCamera(View* pView, int nPlayer) {
         if (pView->script.pShot == NULL) {
             pView->script.fCamTime = 0.0f;
             pView->script.bCF = 0;
-            fn_8000A194(m, pSub[1], pSub[0], pSub[2]);
+            mat44flt_EulerAngles(m, pSub[1], pSub[0], pSub[2]);
             fn_800BADB4(m, v, pSub);
             fn_800C73B8(pSub, pCam, pSub);
             CameraScript_RecordCurrentCam(&pView->shot19C, pCam, pSub, nPlayer, &pView->script, 0);

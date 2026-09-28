@@ -16,7 +16,7 @@ AnimalStep lbl_80187DF0[6] = {
 };
 
 void Mtx_Identity(f32 (*pMtx)[4]);                       // identity
-void fn_8000A194(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
+void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
 void fn_8000C5A4(f32 (*pMtx)[4]);
 void ActAnimal_SetWorldMatrix(DynObjAnimal* pAnimal, f32 f);
 f32  Ter_GetTimeInCycle(u32 n, f32 fPeriod);                   // GoTerrain.c
@@ -157,12 +157,12 @@ void ActAnimal_SetWorldMatrix(DynObjAnimal* pAnimal, f32 fDt) {
                 pAnimal->f19C = 0.0f;
             }
         }
-        fn_8000A4E0(pAnimal->base.obj.m0, &fA, &fB, &fC);
+        mat44flt_ExtractEulerAngles(pAnimal->base.obj.m0, &fA, &fB, &fC);
         fA = pAnimal->f1A0;
         if (fA > 6.2831855f) {
             fA = fA - 6.2831855f;
         }
-        fn_8000A194(pAnimal->base.obj.m0, fA, fB, fC);
+        mat44flt_EulerAngles(pAnimal->base.obj.m0, fA, fB, fC);
     }
     fn_8000C5A4(pAnimal->base.obj.m0);
 }
@@ -286,7 +286,8 @@ void fn_8004A24C(DynObjAnimal* pAnimal, DynObjSetup* pSetup) {
     }
     pAnimal->f19C = 0.0f;
     pAnimal->f1A0 = 0.0f;
-    fn_8000A194(pAnimal->base.obj.m0, pDef->aAngles[1] * (PI / 180.0f), pDef->aAngles[0] * (PI / 180.0f),
+    mat44flt_EulerAngles(pAnimal->base.obj.m0, pDef->aAngles[1] * (PI / 180.0f), pDef->aAngles[0]
+                         * (PI / 180.0f),
                 pDef->aAngles[2] * (PI / 180.0f));
     Mtx_Identity(pAnimal->base.obj.m40);
     fn_8000C5A4(pAnimal->base.obj.m0);

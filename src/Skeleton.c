@@ -21,7 +21,7 @@ void Quat_Invert(f32* pQ, f32* pOut);                   // Quaternion.c
 void fn_8001FBA4(f32* pA, f32* pB, f32* pOut, f32 fT);  // a blend of two points by fT
 void fn_8001FB00(f32* pA, f32* pB, f32* pOut, f32 fT);  // a blend of two rotations by fT
 void Mtx_MultVec4(f32 mtx[4][4], Vec4* src, Vec4* dst);  // VecMath.c: a point through a matrix
-void fn_8000A798(f32 (*pSrc)[4], f32 (*pDst)[4]);       // UMemPool.c: inverts a rotation+translation
+void Mtx_InvertRigid(f32 (*pSrc)[4], f32 (*pDst)[4]);       // UMemPool.c: inverts a rotation+translation
 void Quat_BuildFromMatrix(f32 (*m)[4], f32* pQ);                 // Quaternion.c: a rotation matrix's quaternion
 void Character_UpdateFeetTerrainInfo(Character* pChar, int bNormals);   // char.c
 void Character_PlaceFeetOnGround(Character* pChar);                     // char.c
@@ -538,7 +538,7 @@ void fn_80027D14(Character* pChar) {
     } else {
         Mtx_Copy(pGripMtx, mGrip);
     }
-    fn_8000A798(mGrip, mInv);
+    Mtx_InvertRigid(mGrip, mInv);
     fn_800BADF8(mInv, pMtx28, mRel, 4);
     Quat_BuildFromMatrix(mRel, pModel->pSkel->q107C);
     Mtx_MultVec4(mInv, (Vec4*)pMtx28[3], (Vec4*)pModel->pSkel->v108C);

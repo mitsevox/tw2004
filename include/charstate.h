@@ -306,7 +306,7 @@ typedef struct Skin {
     SkelPose pose;              // 0x0004  (fn_80018710 hands it to SKEL_UpdateState)
     u8   b1044;                 // 0x1044  set once fn_800184E4 has filled a1048
     u8   pad1045[3];
-    f32  a1048[4][4];           // 0x1048  four leg points, each through fn_8000AB40 of its bone's
+    f32  a1048[4][4];           // 0x1048  four leg points, each through mat44flt_Invert of its bone's
                                 //         matrix (fn_800184E4: bones 0x3A, 0x48, 0x39, 0x47)
     f32  (*p1088)[4][4];        // 0x1088  } matrices fn_80018710 hands the model (SKEL_SetDefaultWorld2BoneMatrices,
     f32  (*p108C)[4][4];        // 0x108C  } fn_80029A7C)

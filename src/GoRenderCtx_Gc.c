@@ -14,9 +14,9 @@ void fn_80013E38(Camera* pCamera, CamLens* pLens);
 void fn_80013E48(Camera* pCamera);
 void fn_80013EA0(Camera* pCamera);
 void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
-void fn_8000AB80(f32 (*pMtx)[4], f32 f1, f32 f2);   // matrix builders, not decompiled yet
-void fn_8000ABE8(f32 (*pMtx)[4], f32 f1, f32 f2, f32 f3, f32 f4, f32 f5);
-void fn_8000AC5C(f32 (*pMtx)[4], f32 f1, f32 f2, f32 f3, f32 f4);
+void Mtx_OrthoScale(f32 (*pMtx)[4], f32 f1, f32 f2);   // matrix builders, not decompiled yet
+void Mtx_Perspective(f32 (*pMtx)[4], f32 f1, f32 f2, f32 f3, f32 f4, f32 f5);
+void Mtx_PerspectiveDepthOverNear(f32 (*pMtx)[4], f32 f1, f32 f2, f32 f3, f32 f4);
 f32 fn_80014268(u8* p);
 f32 fn_80014270(u8* p);
 f32 Math_Tan(f32 x0);
@@ -61,7 +61,7 @@ static f32 GoRenderCtx_Gc_StrippedFn(f32 x) {
 // ---- sweep code (not yet cleaned up) ----
 
 s32 Mtx_Copy();
-s32 fn_8000A714();
+s32 Mtx_Transpose4x4();
 s32 fn_800BADF8();
 void RC_vSetCurrentRenderCtx(s32 v);
 void RC_vUpdateRenderCtxScreenMatricesAndInfo(Camera* pCamera);   // not decompiled yet
@@ -174,15 +174,15 @@ void RC_vUpdateRenderCtxScreenMatricesAndInfo(Camera* pCamera) {
 
     if (fn_80008378(pLens) == 0) {
         f = pRect[2] * (1.0f / fn_80014134((u8*)pRect)) / pRect[3];
-        fn_8000ABE8(pCamera->m5C, pCamera->f228, 1.0f / fn_8001413C((u8*)pRect), f,
+        Mtx_Perspective(pCamera->m5C, pCamera->f228, 1.0f / fn_8001413C((u8*)pRect), f,
                     pCamera->unk1F4, pCamera->unk1F8);
     } else {
-        fn_8000AB80(mFlat, pLens->fB4, pLens->fB8);
+        Mtx_OrthoScale(mFlat, pLens->fB4, pLens->fB8);
         f = pRect[2] * (1.0f / fn_80014134((u8*)pRect)) / pRect[3];
-        fn_8000AC5C(mProj, 1.0f / fn_8001413C((u8*)pRect), f, pCamera->unk1F4, pCamera->unk1F8);
+        Mtx_PerspectiveDepthOverNear(mProj, 1.0f / fn_8001413C((u8*)pRect), f, pCamera->unk1F4, pCamera->unk1F8);
         fn_800BADF8(mProj, mFlat, pCamera->m5C, 4);
     }
-    fn_8000A714(pCamera->m5C, pCamera->m9C);
+    Mtx_Transpose4x4(pCamera->m5C, pCamera->m9C);
     fn_800BADF8(pCamera->m5C, pLens->m44, pCamera->mDC, 4);
 }
 
@@ -196,7 +196,7 @@ void RC_vUpdateRenderCtxTransformationMatrices(void* pCamera) {
         fn_800BADF8((*(s32*)((u8*)(arg0) + 0x10)) + 0x44, arg0 + 0x1C, arg0 + 0x11C, 4);
         fn_800BADF8(arg0 + 0xDC, arg0 + 0x1C, arg0 + 0x19C, 4);
     }
-    fn_8000A714(arg0 + 0x11C, arg0 + 0x15C);
+    Mtx_Transpose4x4(arg0 + 0x11C, arg0 + 0x15C);
 }
 
 void fn_80013D58(Camera* pCamera) {

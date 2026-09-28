@@ -24,7 +24,7 @@ void fn_80029BC8(f32* pVec);                        // sets a vector to lbl_8018
 void Mtx_Identity(f32 (*pMtx)[4]);                   // identity
 void fn_800BAE5C(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // VecMath.c
 void fn_800BADB4(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // a vector through a matrix
-void fn_8000A798(f32 (*pSrc)[4], f32 (*pDst)[4]);  // UMemPool.c: inverts a rotation+translation
+void Mtx_InvertRigid(f32 (*pSrc)[4], f32 (*pDst)[4]);  // UMemPool.c: inverts a rotation+translation
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0f (0x80283900), before the white below and the 128.0f and 0.0f fn_8006E2A4 uses first; its
@@ -277,7 +277,7 @@ void fn_8006EADC(UObject* pObj) {
             pPoint++;
         }
     } else {
-        fn_8000A798(pObj->m0, mInv);
+        Mtx_InvertRigid(pObj->m0, mInv);
         pPoint = lbl_802811D8->aPointPos;
         for (i = 0; i < lbl_802811D8->nPoints; i++) {
             uMask |= 1 << i;

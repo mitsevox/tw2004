@@ -29,7 +29,7 @@ void Character_GetBonePos(Character* pChar, int nBone, f32* pPos);   // char.c: 
 void RC_vSetCurrentRenderCtx(void* pCamera);        // makes it the current render camera
 void Mtx_Identity(f32 (*pMtx)[4]);       // identity
 void Mtx_Copy(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: copy a 4x4 matrix
-void fn_8000A798(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: inverts a rotation+translation
+void Mtx_InvertRigid(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: inverts a rotation+translation
 void fn_8001728C(CamLens* pLens);
 f32  Math_Tan(f32 x);                // tan, as a float
 void fn_800760B0(int nX, int nY, int nWidth, int nHeight);
@@ -624,7 +624,7 @@ void fn_800B3484(CamLens* pLens, f32 (*pMtx)[4]) {
         Mtx_Identity(pLens->m44);
     } else {
         Mtx_Copy(pMtx, pLens->m44);
-        fn_8000A798(pMtx, pLens->m4);
+        Mtx_InvertRigid(pMtx, pLens->m4);
     }
     fn_8001728C(pLens);
 }

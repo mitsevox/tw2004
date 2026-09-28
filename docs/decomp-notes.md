@@ -229,7 +229,7 @@ They will be sorted into the sections below.
   (uiText fn_800922A8 97.0 -> 98.7).
 - **[verified] `(old & 0xFFFFFF) | (v << 24)` gives `slwi` + `rlwimi` into old; the other operand order
   inserts v the other way** (Code8009B340 fn_8009B340 96.7 -> 100). A bitfield store gives `stb` instead.
-- **[verified] A shared product kept in a local sets the `fmadds` operand order** (UMemPool fn_8000A194).
+- **[verified] A shared product kept in a local sets the `fmadds` operand order** (UMemPool mat44flt_EulerAngles).
 - **[verified] A param compare gives `cmpwi` only when both the parameter and the field it is stored to
   are `int`** (GoARAM fn_800B65C0: u32 99.3, int param only 97.2, both int 100).
 - **[verified] The stack frame does not fix a local char buffer's size** (GoDynamicCam fn_8003C9D0 exact

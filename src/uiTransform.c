@@ -17,7 +17,7 @@ void Mtx_Identity(f32 m[4][4]);                                          // iden
 void fn_800BADF8(f32 a[4][4], f32 b[4][4], f32 out[4][4], int nRows);   // out = a x b, 4 rows
 void fn_800BAE5C(f32 a[4][4], f32 b[4][4], f32 out[4][4], int nRows);   // out = a x b, 3 rows
 void Mtx_Copy(f32 src[4][4], f32 dst[4][4]);                         // copy 4 rows
-void fn_8000A144(f32 src[4][4], f32 dst[4][4]);                         // copy 3 rows
+void Mtx_CopyRotation(f32 src[4][4], f32 dst[4][4]);                         // copy 3 rows
 
 // Multiply a translation, a scale or a rotation (radians, about x, y or z) into a level's matrix.
 void fn_80092CE8(UITransform* p, f32 x, f32 y, f32 z);
@@ -57,7 +57,7 @@ void fn_80092D68(UITransform* p, f32 x, f32 y, f32 z) {
     mScale[1][1] = y;
     mScale[2][2] = z;
     fn_800BAE5C(p->m, mScale, mOut, 3);
-    fn_8000A144(mOut, p->m);
+    Mtx_CopyRotation(mOut, p->m);
 }
 
 void fn_80092DE8(UITransform* p, f32 fAngle) {
@@ -73,7 +73,7 @@ void fn_80092DE8(UITransform* p, f32 fAngle) {
     mRot[2][1] = -fSin;
     mRot[2][2] = fCos;
     fn_800BAE5C(p->m, mRot, mOut, 3);
-    fn_8000A144(mOut, p->m);
+    Mtx_CopyRotation(mOut, p->m);
 }
 
 void fn_80092E74(UITransform* p, f32 fAngle) {
@@ -89,7 +89,7 @@ void fn_80092E74(UITransform* p, f32 fAngle) {
     mRot[2][0] = fSin;
     mRot[2][2] = fCos;
     fn_800BAE5C(p->m, mRot, mOut, 3);
-    fn_8000A144(mOut, p->m);
+    Mtx_CopyRotation(mOut, p->m);
 }
 
 void fn_80092F00(UITransform* p, f32 fAngle) {
@@ -105,7 +105,7 @@ void fn_80092F00(UITransform* p, f32 fAngle) {
     mRot[1][0] = -fSin;
     mRot[1][1] = fCos;
     fn_800BAE5C(p->m, mRot, mOut, 3);
-    fn_8000A144(mOut, p->m);
+    Mtx_CopyRotation(mOut, p->m);
 }
 
 // Apply an element's transform to the current level: move it, then rotate and scale it about its

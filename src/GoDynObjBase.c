@@ -7,7 +7,7 @@
 #include "golfer.h"
 
 void Mtx_Identity(f32 (*pMtx)[4]);                                           // identity
-void fn_8000A194(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
+void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
 void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void fn_8000C5A4(f32 (*pMtx)[4]);
 int  fn_80049ACC(int nMsg, DynObj* pObj, void* pArg, void* pArg2);
@@ -158,7 +158,7 @@ void fn_80049A54(DynObjTurning* pObj, void* pArg) {
     f32 mTurn[4][4];
 
     Mtx_Identity(mTurn);
-    fn_8000A194(mTurn, 2.0f * PI * (pObj->fSpeed / 360.0f) / 60.0f, 0.0f, 0.0f);
+    mat44flt_EulerAngles(mTurn, 2.0f * PI * (pObj->fSpeed / 360.0f) / 60.0f, 0.0f, 0.0f);
     fn_800BADF8(pObj->base.obj.m0, mTurn, pObj->base.obj.m0, 4);
     fn_8000C5A4(pObj->base.obj.m0);
 }

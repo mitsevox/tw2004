@@ -19,8 +19,8 @@ void  Camera_SetCameraPositionAndTargetWithOffsetAndScale(CamLens* pLens, f32* p
 void  fn_80017208(CamLens* pLens, f32* pPos, f32* pAngles);
 void  fn_80013D68(void* pCamera);
 void  VM_vUpdateInternalViewportRectData(f32* pRect);
-void  fn_8000A194(f32 (*pMtx)[4], f32 fA, f32 fB, f32 fC);  // UMemPool.c: a rotation matrix from three angles
-void  fn_8000A798(f32 (*pSrc)[4], f32 (*pDst)[4]);          // UMemPool.c: inverts a rotation+translation
+void  mat44flt_EulerAngles(f32 (*pMtx)[4], f32 fA, f32 fB, f32 fC);  // UMemPool.c: a rotation matrix from three angles
+void  Mtx_InvertRigid(f32 (*pSrc)[4], f32 (*pDst)[4]);          // UMemPool.c: inverts a rotation+translation
 void  fn_8001728C(CamLens* pLens);
 
 ViewController* ViewController_Get(int nView);
@@ -178,12 +178,12 @@ void fn_800171D8(f32* pRect, f32 x, f32 y, f32 w, f32 h) {
 // the angles, pPos as the translation row) and inverts it into the world-to-camera matrix m44.
 void fn_80017208(CamLens* pLens, f32* pPos, f32* pAngles) {
     fn_8001728C(pLens);
-    fn_8000A194(pLens->m4, pAngles[1], pAngles[0], pAngles[2]);
+    mat44flt_EulerAngles(pLens->m4, pAngles[1], pAngles[0], pAngles[2]);
     pLens->m4[3][0] = pPos[0];
     pLens->m4[3][1] = pPos[1];
     pLens->m4[3][2] = pPos[2];
     pLens->m4[3][3] = 1.0f;
-    fn_8000A798(pLens->m4, pLens->m44);
+    Mtx_InvertRigid(pLens->m4, pLens->m44);
 }
 
 void fn_8001728C(CamLens* pLens) {

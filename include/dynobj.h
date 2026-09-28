@@ -39,7 +39,7 @@ typedef struct DynObjAnimalDef {
     f32  a20[5];                // 0x20  -> DynObjAnimal.a178
     f32  f34;                   // 0x34  -> DynObjAnimal.f194
     f32  f38;                   // 0x38  -> DynObjAnimal.f198
-    f32  aAngles[3];            // 0x3C  its rotation, in degrees (given to fn_8000A194 as 0x40, 0x3C, 0x44)
+    f32  aAngles[3];            // 0x3C  its rotation, in degrees (given to mat44flt_EulerAngles as 0x40, 0x3C, 0x44)
 } DynObjAnimalDef;
 
 // The stream object an object's model comes from (a view of UStreamObject: its +4 is the model).

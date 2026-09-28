@@ -7,8 +7,8 @@
 
 f32* lbl_80281BD8;                      // the log2 table: 1024 entries over the mantissa of [1, 2)
 
-int  fn_8000A818(f32 (*pA)[4], f32 (*pB)[4]);
-void fn_8000AD34(f32* pA, f32* pB);
+int  mat44flt_gaussj(f32 (*pA)[4], f32 (*pB)[4]);
+void Vec_Swap(f32* pA, f32* pB);
 void Mtx_Identity(f32 (*pDst)[4]);
 void fn_8000AE0C(f32* pSrc, f32* pDst);
 void fn_8000AE9C(void);
@@ -22,16 +22,18 @@ void Mtx_Copy(f32 (*pSrc)[4], f32 (*pDst)[4]) {
     Vec_Copy(pSrc[3], pDst[3]);
 }
 
-// Copies the first three rows of a 4x4 matrix.
-void fn_8000A144(f32 (*pSrc)[4], f32 (*pDst)[4]) {
+// Copies rows 0-2 of a 4x4 matrix (the rotation, each row with its fourth float); row 3, the
+// translation, is left as it is.
+void Mtx_CopyRotation(f32 (*pSrc)[4], f32 (*pDst)[4]) {
     Vec_Copy(pSrc[0], pDst[0]);
     Vec_Copy(pSrc[1], pDst[1]);
     Vec_Copy(pSrc[2], pDst[2]);
 }
 
-// A rotation matrix from three angles (the 3x3 part and a zero fourth column; row 3 is left as
-// it is). An angle of exactly 0 skips its sin and cos.
-void fn_8000A194(f32 (*pMtx)[4], f32 fA, f32 fB, f32 fC) {
+// A rotation matrix from yaw (about y), pitch (about x) and roll (about z), in radians, into rows
+// 0-2 of pMtx (their fourth float set to 0; row 3 is left as it is). An angle of exactly 0 skips
+// its sin and cos.
+void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 fA, f32 fB, f32 fC) {
     f32 fSinA;
     f32 fCosA;
     f32 fSinB;
@@ -150,10 +152,10 @@ void fn_8000A194(f32 (*pMtx)[4], f32 fA, f32 fB, f32 fC) {
     pMtx[0][3] = 0.0f;
 }
 
-// The three angles of a rotation matrix (the reverse of fn_8000A194): *pA = atan2(m[2][0],
-// m[2][2]), *pB = -asin(m[2][1]), *pC = atan2(m[0][1], m[1][1]), with a quarter turn chosen by
-// sign where an atan2 would divide by zero.
-void fn_8000A4E0(f32 (*pMtx)[4], f32* pA, f32* pB, f32* pC) {
+// The yaw, pitch and roll (radians) of a rotation matrix, the reverse of mat44flt_EulerAngles: yaw
+// is atan2(m[2][0], m[2][2]), pitch is -asin(m[2][1]) and roll is atan2(m[0][1], m[1][1]), with a
+// quarter turn chosen by sign where an atan2 would divide by zero.
+void mat44flt_ExtractEulerAngles(f32 (*pMtx)[4], f32* pA, f32* pB, f32* pC) {
     f32 fA;
     f32 fB;
     f32 fC;
@@ -209,7 +211,7 @@ void fn_8000A4E0(f32 (*pMtx)[4], f32* pA, f32* pB, f32* pC) {
 }
 
 // Transposes the 3x3 part of a 4x4 matrix (pSrc and pDst may be the same matrix).
-void fn_8000A6C8(f32 (*pSrc)[4], f32 (*pDst)[4]) {
+void Mtx_Transpose3x3(f32 (*pSrc)[4], f32 (*pDst)[4]) {
     f32 f;
 
     pDst[0][0] = pSrc[0][0];
@@ -227,7 +229,7 @@ void fn_8000A6C8(f32 (*pSrc)[4], f32 (*pDst)[4]) {
 }
 
 // Transposes a 4x4 matrix (pSrc and pDst may be the same matrix).
-void fn_8000A714(f32 (*pSrc)[4], f32 (*pDst)[4]) {
+void Mtx_Transpose4x4(f32 (*pSrc)[4], f32 (*pDst)[4]) {
     f32 f;
 
     pDst[0][0] = pSrc[0][0];
@@ -254,9 +256,10 @@ void fn_8000A714(f32 (*pSrc)[4], f32 (*pDst)[4]) {
     pDst[3][2] = f;
 }
 
-// Inverts a rotation-and-translation matrix: the rotation transposed, and the translation
-// turned back through it and negated.
-void fn_8000A798(f32 (*pSrc)[4], f32 (*pDst)[4]) {
+// Inverts a rotation-plus-translation matrix (rotation in rows 0-2, translation in row 3, no
+// scale): the rotation is transposed and the new translation is minus the old one turned by it.
+// pSrc and pDst may be the same matrix.
+void Mtx_InvertRigid(f32 (*pSrc)[4], f32 (*pDst)[4]) {
     f32 aTurned[4];
     f32 aPos[4];
 
@@ -265,7 +268,7 @@ void fn_8000A798(f32 (*pSrc)[4], f32 (*pDst)[4]) {
     pDst[1][3] = 0.0f;
     pDst[2][3] = 0.0f;
     pDst[3][3] = 1.0f;
-    fn_8000A6C8(pSrc, pDst);
+    Mtx_Transpose3x3(pSrc, pDst);
     fn_800BADB4(pDst, aPos, aTurned);
     fn_8000AE0C(aTurned, pDst[3]);
 }
@@ -273,7 +276,7 @@ void fn_8000A798(f32 (*pSrc)[4], f32 (*pDst)[4]) {
 // Gauss-Jordan elimination with full pivoting: pA is replaced by its inverse, and pB goes
 // through the same row steps (so an identity pB also comes out as the inverse). Returns 0, or
 // -1 / -2 when pA is singular.
-int fn_8000A818(f32 (*pA)[4], f32 (*pB)[4]) {
+int mat44flt_gaussj(f32 (*pA)[4], f32 (*pB)[4]) {
     int anCol[4];
     int anRow[4];
     int anPivot[4];
@@ -308,8 +311,8 @@ int fn_8000A818(f32 (*pA)[4], f32 (*pB)[4]) {
         }
         anPivot[nCol]++;
         if (nRow != nCol) {
-            fn_8000AD34(pA[nRow], pA[nCol]);
-            fn_8000AD34(pB[nRow], pB[nCol]);
+            Vec_Swap(pA[nRow], pA[nCol]);
+            Vec_Swap(pB[nRow], pB[nCol]);
         }
         anRow[i] = nRow;
         anCol[i] = nCol;
@@ -342,25 +345,29 @@ int fn_8000A818(f32 (*pA)[4], f32 (*pB)[4]) {
     return 0;
 }
 
-// Inverts a 4x4 matrix into pDst.
-void fn_8000AB40(f32 (*pSrc)[4], f32 (*pDst)[4]) {
+// The inverse of a 4x4 matrix, into pDst (Gauss-Jordan through mat44flt_gaussj). A singular matrix
+// is not reported: pDst is left part-way through.
+void mat44flt_Invert(f32 (*pSrc)[4], f32 (*pDst)[4]) {
     f32 aIdentity[4][4];
 
     Mtx_Copy(pSrc, pDst);
     Mtx_Identity(aIdentity);
-    fn_8000A818(pDst, aIdentity);
+    mat44flt_gaussj(pDst, aIdentity);
 }
 
-// A 2D projection: the identity, scaled so fWidth by fHeight spans 2 units (-1 to 1).
-void fn_8000AB80(f32 (*pDst)[4], f32 fWidth, f32 fHeight) {
+// The identity with x scaled by 2 / fWidth and y by 2 / fHeight, so a view fWidth by fHeight
+// centred on 0 spans -1..1 (z is left alone). RC_vUpdateRenderCtxScreenMatricesAndInfo uses it for
+// a lens whose type is not 0.
+void Mtx_OrthoScale(f32 (*pDst)[4], f32 fWidth, f32 fHeight) {
     Mtx_Identity(pDst);
     pDst[0][0] = 2.0f / fWidth;
     pDst[1][1] = 2.0f / fHeight;
 }
 
-// A perspective projection in the GameCube's layout (the rows are the columns of GX's
-// matrix): depth from fNear to fFar maps to -1..0, w = -z.
-void fn_8000ABE8(f32 (*pDst)[4], f32 fScale, f32 fScaleX, f32 fScaleY, f32 fNear, f32 fFar) {
+// A perspective projection for row vectors (the transpose of GX's layout): x scaled by fScale times
+// fScaleX, y by fScale times fScaleY, w = -z, and depth from fNear to fFar mapped to -1..0 as GX
+// expects.
+void Mtx_Perspective(f32 (*pDst)[4], f32 fScale, f32 fScaleX, f32 fScaleY, f32 fNear, f32 fFar) {
     pDst[0][0] = fScale * fScaleX;
     pDst[1][0] = 0.0f;
     pDst[2][0] = 0.0f;
@@ -379,9 +386,11 @@ void fn_8000ABE8(f32 (*pDst)[4], f32 fScale, f32 fScaleX, f32 fScaleY, f32 fNear
     pDst[3][3] = 0.0f;
 }
 
-// A perspective projection with its x and y scales given, w = -z: depth fFar maps to 0 and
-// fNear to -1 / fNear (-1 only when fNear is 1; fn_8000ABE8 maps it to -1).
-void fn_8000AC5C(f32 (*pDst)[4], f32 fScaleX, f32 fScaleY, f32 fNear, f32 fFar) {
+// Like Mtx_Perspective (row vectors, w = -z) with x scaled by fScaleX and y by fScaleY, but its
+// depth is Mtx_Perspective's divided by fNear: fFar maps to 0 and fNear to -1 / fNear (the same
+// only when fNear is 1). RC_vUpdateRenderCtxScreenMatricesAndInfo uses it, with Mtx_OrthoScale, for
+// a lens whose type is not 0.
+void Mtx_PerspectiveDepthOverNear(f32 (*pDst)[4], f32 fScaleX, f32 fScaleY, f32 fNear, f32 fFar) {
     Mtx_Identity(pDst);
     pDst[0][0] = fScaleX;
     pDst[1][1] = fScaleY;
@@ -400,7 +409,7 @@ void Vec_Copy(const f32* pSrc, f32* pDst) {
 }
 
 // Swaps two 4-float vectors.
-void fn_8000AD34(f32* pA, f32* pB) {
+void Vec_Swap(f32* pA, f32* pB) {
     f32 f;
 
     f = pA[0];
@@ -417,10 +426,12 @@ void fn_8000AD34(f32* pA, f32* pB) {
     pB[3] = f;
 }
 
+// The float atan2: the angle of the point (x, y) in radians, -pi..pi, through the double atan2().
 f32 atan2f(f32 y, f32 x) {
     return atan2(y, x);
 }
 
+// The float fabs: |x|, through the double fabs().
 f32 fabsf(f32 x) {
     return fabs(x);
 }

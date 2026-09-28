@@ -201,7 +201,7 @@ changes. Read from the disassembly, not yet verified by matching:
 - **Set B (`0x214` - `0x220`) is the same thing with the extents multiplied by 2.0** (constant at
   `0x80282B7C`). So mode 1 of the cull test is a view twice as wide: a loose second-chance test.
 - `cam+0x1F4` / `0x1F8` = near / far limits. Then it builds the projection matrix at `cam+0x5C`
-  (`fn_8000ABE8` for perspective, `fn_8000AC5C` for flat), and a combined matrix at `cam+0xDC`.
+  (`Mtx_Perspective` for perspective, `Mtx_PerspectiveDepthOverNear` for flat), and a combined matrix at `cam+0xDC`.
 - `fn_800977F8` (424 instructions) also writes both plane sets. Unexamined - maybe another camera type.
 
 How callers use the cull result: all five call sites only ask "was it 2?". `fn_80007B2C` maps

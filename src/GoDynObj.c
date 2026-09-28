@@ -59,10 +59,10 @@ void Mtx_Identity(f32 (*pMtx)[4]);                   // identity
 int  fn_800636EC(void);
 void fn_8004858C(f32* pOut, f32 fTurn, f32 fTilt);
 void fn_8000C5A4(f32 (*pMtx)[4]);
-void fn_8000A194(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
+void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
 void Mtx_Copy(f32 (*pSrc)[4], f32 (*pDst)[4]);
 void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
-void fn_8000A144(f32 (*pSrc)[4], f32 (*pDst)[4]);        // copies three rows
+void Mtx_CopyRotation(f32 (*pSrc)[4], f32 (*pDst)[4]);        // copies three rows
 void fn_80048680(f32* pA, f32* pB, f32* pOut);
 void fn_800486A4(f32* pA, f32* pB, f32* pOut);
 void fn_800486C8(f32* pA, f32* pB, f32* pOut);
@@ -496,7 +496,7 @@ void fn_80046E1C(f32* pPos, int nPlayer) {
     }
     Mtx_Identity(mTurn);
     Mtx_Identity(lbl_80281DA0->apPlayer[nPlayer]->obj.m0);
-    fn_8000A194(mTurn, -gPlayers[nPlayer].fAim, 0.0f, 0.0f);
+    mat44flt_EulerAngles(mTurn, -gPlayers[nPlayer].fAim, 0.0f, 0.0f);
     fn_800BADF8(lbl_80281DA0->apPlayer[nPlayer]->obj.m0, mTurn, mObj, 4);
     Mtx_Copy(mObj, lbl_80281DA0->apPlayer[nPlayer]->obj.m0);
     Vec_Copy(vPos, lbl_80281DA0->apPlayer[nPlayer]->obj.m80[3]);
@@ -869,7 +869,7 @@ void fn_80047C24(int nPlayer) {
     pB->b0 = 0;
     if (pB->bF5) {
         Mtx_Identity(pB->mB0);
-        fn_8000A194(pB->mB0, pB->fC, 0.0f, 0.0f);
+        mat44flt_EulerAngles(pB->mB0, pB->fC, 0.0f, 0.0f);
         fn_800BADF8(pB->pF0->obj.m0, pB->mB0, mTmp, 4);
         Mtx_Copy(mTmp, pB->pF0->obj.m0);
         fn_8000C5A4(pB->pF0->obj.m0);
@@ -906,8 +906,8 @@ void fn_80047C24(int nPlayer) {
     }
     fn_800486A4(pB->v60, pB->v50, pB->v50);
     Mtx_Identity(pB->mB0);
-    fn_8000A194(pB->mB0, pB->fC + pB->v50[0], pB->v50[1], pB->v50[2]);
-    fn_8000A144(pB->mB0, pB->pF0->obj.m0);
+    mat44flt_EulerAngles(pB->mB0, pB->fC + pB->v50[0], pB->v50[1], pB->v50[2]);
+    Mtx_CopyRotation(pB->mB0, pB->pF0->obj.m0);
     fn_8000C5A4(pB->pF0->obj.m0);
     Vec_Copy(pB->v30, pB->pF0->obj.m80[3]);
     pB->pF0->obj.m80[3][3] = 1.0f;
@@ -981,8 +981,8 @@ void DynObj_TeeAdd(f32* pPos, int nPlayer, u8 bReset) {
         }
     }
     Mtx_Identity(pA->mB4);
-    fn_8000A194(pA->mB4, pA->v50[0], pA->v50[1], pA->v50[2]);
-    fn_8000A144(pA->mB4, pA->pF4->obj.m0);
+    mat44flt_EulerAngles(pA->mB4, pA->v50[0], pA->v50[1], pA->v50[2]);
+    Mtx_CopyRotation(pA->mB4, pA->pF4->obj.m0);
     Vec_Copy(pA->v20, pA->v30);
     Vec_Copy(pA->v20, pA->pF4->obj.m80[3]);
     fn_8000C5A4(pA->pF4->obj.m0);
@@ -1010,7 +1010,7 @@ void fn_80048184(int nPlayer) {
         if (pA->bF9) {
             pA->fC = -gPlayers[nPlayer].fAim + Misc_RandFuncf(1) - 0.5f;
             Mtx_Identity(pA->mB4);
-            fn_8000A194(pA->mB4, pA->fC, 0.0f, 0.0f);
+            mat44flt_EulerAngles(pA->mB4, pA->fC, 0.0f, 0.0f);
             fn_800BADF8(pA->pF4->obj.m0, pA->mB4, mTmp, 4);
             Mtx_Copy(mTmp, pA->pF4->obj.m0);
             fn_8000C5A4(pA->pF4->obj.m0);
@@ -1047,15 +1047,15 @@ void fn_80048184(int nPlayer) {
         }
         fn_800486A4(pA->v60, pA->v50, pA->v50);
         Mtx_Identity(pA->mB4);
-        fn_8000A194(pA->mB4, pA->fC + pA->v50[0], pA->v50[1], pA->v50[2]);
-        fn_8000A144(pA->mB4, pA->pF4->obj.m0);
+        mat44flt_EulerAngles(pA->mB4, pA->fC + pA->v50[0], pA->v50[1], pA->v50[2]);
+        Mtx_CopyRotation(pA->mB4, pA->pF4->obj.m0);
         fn_8000C5A4(pA->pF4->obj.m0);
         Vec_Copy(pA->v30, pA->pF4->obj.m80[3]);
         pA->pF4->obj.m80[3][3] = 1.0f;
     } else {
         Mtx_Identity(pA->mB4);
-        fn_8000A194(pA->mB4, pA->v50[0], pA->v50[1], pA->v50[2]);
-        fn_8000A144(pA->mB4, pA->pF4->obj.m0);
+        mat44flt_EulerAngles(pA->mB4, pA->v50[0], pA->v50[1], pA->v50[2]);
+        Mtx_CopyRotation(pA->mB4, pA->pF4->obj.m0);
         fn_8000C5A4(pA->pF4->obj.m0);
         Vec_Copy(pA->v30, pA->pF4->obj.m80[3]);
         pA->pF4->obj.m80[3][3] = 1.0f;

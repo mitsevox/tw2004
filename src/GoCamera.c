@@ -5,7 +5,7 @@
 #include "camera.h"
 
 void Mtx_Copy(f32 (*pSrc)[4], f32 (*pDst)[4]);     // UMemPool.c: copy a 4x4 matrix
-void fn_8000A798(f32 (*pSrc)[4], f32 (*pDst)[4]);     // UMemPool.c: inverts a rotation+translation
+void Mtx_InvertRigid(f32 (*pSrc)[4], f32 (*pDst)[4]);     // UMemPool.c: inverts a rotation+translation
 void Mtx_Identity(f32 (*pMtx)[4]);                     // identity
 void fn_8001728C(CamLens* pLens);
 f32  Math_Tan(f32 x);                              // tan, as a float
@@ -65,7 +65,7 @@ void CA_vSetLookAt(CamLens* pLens, f32* pPos, f32* pTarget) {
         }
         vec4flt_CrossProduct(pLens->m4[2], pLens->m4[0], pLens->m4[1]);
     }
-    fn_8000A798(pLens->m4, pLens->m44);
+    Mtx_InvertRigid(pLens->m4, pLens->m44);
 }
 
 // The same with the lens's x axis given (pSide, normalised here).
@@ -88,7 +88,7 @@ void CA_vSetLookAtSide(CamLens* pLens, f32* pPos, f32* pTarget, f32* pSide) {
         Vec_NormalizeTo(pLens->m4[0], pLens->m4[0]);
         vec4flt_CrossProduct(pLens->m4[2], pLens->m4[0], pLens->m4[1]);
     }
-    fn_8000A798(pLens->m4, pLens->m44);
+    Mtx_InvertRigid(pLens->m4, pLens->m44);
 }
 
 // Aims the lens like CA_vSetLookAt, then scales the world by pScale around pCenter: m44 gets the
@@ -118,7 +118,7 @@ void Camera_SetCameraPositionAndTargetWithOffsetAndScale(CamLens* pLens, f32* pP
         }
         vec4flt_CrossProduct(pLens->m4[2], pLens->m4[0], pLens->m4[1]);
     }
-    fn_8000A798(pLens->m4, pLens->m44);
+    Mtx_InvertRigid(pLens->m4, pLens->m44);
 
     // world to camera: move pCenter to the origin, scale, move it back
     Mtx_Identity(mTmp);
@@ -179,7 +179,7 @@ void CA_vSetMatrix(CamLens* pLens, f32 (*pMtx)[4]) {
         Mtx_Identity(pLens->m44);
     } else {
         Mtx_Copy(pMtx, pLens->m4);
-        fn_8000A798(pMtx, pLens->m44);
+        Mtx_InvertRigid(pMtx, pLens->m44);
     }
     fn_8001728C(pLens);
 }

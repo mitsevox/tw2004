@@ -138,7 +138,7 @@ void  fn_8010B098(void* pModel);                                // LLDynTex.c
 void  fn_800958EC(AnimPlayer* pAnim, s32 n, f32 f);            // CharAnim.c
 void  Quat_ExtractEulerAngles(f32* pQ, f32* pA, f32* pB, f32* pC);          // Quaternion.c: a rotation as angles
 void  fn_80029968(CharModel* pModel, SkelPose* pPose);          // Skeleton.c
-void  fn_8000AB40(f32 (*pSrc)[4], f32 (*pDst)[4]);              // UMemPool.c
+void  mat44flt_Invert(f32 (*pSrc)[4], f32 (*pDst)[4]);              // UMemPool.c
 void  Character_GetBonePosSwapIfLefty(Character* pChar, int nBone, f32* pPos);
 void  Char_Vec3Add(f32* pA, f32* pB, f32* pOut);
 void  Char_Vec3Sub(f32* pA, f32* pB, f32* pOut);
@@ -647,7 +647,7 @@ void fn_80018484(Character* pChar, CharModel* pModel) {
 
 // Gives the character its body's skin and poses the model from it; for a golfer, the skin also
 // keeps four points of the legs (bones 0x3A, 0x48, 0x39, 0x47, each moved by a small offset that
-// depends on the animation slot) in the frame of their bone (through fn_8000AB40's matrix).
+// depends on the animation slot) in the frame of their bone (through mat44flt_Invert's matrix).
 void fn_800184E4(Character* pChar, Skin* pSkin) {
     f32 m48[4][4];
     f32 m3A[4][4];
@@ -672,10 +672,10 @@ void fn_800184E4(Character* pChar, Skin* pSkin) {
             pMtx3A = Character_GetBoneMatrixSwapIfLefty(pChar, 0x3A);
             pMtx47 = Character_GetBoneMatrixSwapIfLefty(pChar, 0x47);
             pMtx39 = Character_GetBoneMatrixSwapIfLefty(pChar, 0x39);
-            fn_8000AB40(pMtx48, m48);
-            fn_8000AB40(pMtx3A, m3A);
-            fn_8000AB40(pMtx47, m47);
-            fn_8000AB40(pMtx39, m39);
+            mat44flt_Invert(pMtx48, m48);
+            mat44flt_Invert(pMtx3A, m3A);
+            mat44flt_Invert(pMtx47, m47);
+            mat44flt_Invert(pMtx39, m39);
             if (pChar->nSlot == 0) {
                 vOffsetA.x = 0.0f;
                 vOffsetA.y = -0.031f;
@@ -1039,7 +1039,7 @@ void Character_SetOrientation(Character* pChar, f32 fAngle) {
 // 0.01 is ignored.
 void fn_80019358(Character* pChar, f32* pDir, f32 fAngle) {
     f32 fLen;
-    f32 mtx[4][4];              // row 3 is left unset (fn_8000A4E0 reads rows 0..2)
+    f32 mtx[4][4];              // row 3 is left unset (mat44flt_ExtractEulerAngles reads rows 0..2)
     f32 fYaw;
     f32 fB;
     f32 fC;
@@ -1055,7 +1055,7 @@ void fn_80019358(Character* pChar, f32* pDir, f32 fAngle) {
         mtx[1][3] = 0.0f;
         vec4flt_CrossProduct(mtx[0], mtx[1], mtx[2]);
         mtx[2][3] = 0.0f;
-        fn_8000A4E0(mtx, &fYaw, &fB, &fC);
+        mat44flt_ExtractEulerAngles(mtx, &fYaw, &fB, &fC);
         Character_SetOrientation(pChar, fYaw + fAngle);
     }
 }

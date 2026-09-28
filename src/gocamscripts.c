@@ -53,7 +53,7 @@ u8   fn_8004561C(void);
 u8   fn_80044E2C(int n);
 u8   fn_80044AA8(SurfaceType* pSurface);
 void Mtx_Identity(f32 (*pMtx)[4]);                   // identity
-void fn_8000A6C8(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: transposes the 3x3 part
+void Mtx_Transpose3x3(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: transposes the 3x3 part
 void fn_800BADB4(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // a vector through a matrix
 void fn_80038010(u8 a, int n, f32* pVec);
 void fn_800386F0(int n, f32* pVec);
@@ -2112,7 +2112,7 @@ void CameraScript_KeepPointInView(int nPlayer, f32* pCam, f32* pOut, f32* pTarge
         mTurn[3][2] = 0.0f;
         mTurn[3][3] = 1.0f;
         Mtx_Identity(mBack);
-        fn_8000A6C8(mAlign, mBack);
+        Mtx_Transpose3x3(mAlign, mBack);
         fn_800BADB4(mAlign, vToOut, vTurned);
         fn_800BADB4(mTurn, vTurned, vTurned);
         fn_800BADB4(mBack, vTurned, vTurned);
