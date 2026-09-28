@@ -645,7 +645,7 @@ u8 GameEffects_SimulateBall(int nPlayer) {
     return gGameEffects.bSpinWindowDone;
 }
 
-// The spin window is over (event.c, fn_80066BE8): the look-ahead ball restarts as a copy of the
+// The spin window is over (event.c, EVENT_SpinWindowFinished): the look-ahead ball restarts as a copy of the
 // ball (player -1), except in a replay while the look-ahead ball is at rest (nState 0); from now on
 // GameEffects_SimulateBall says yes.
 void GameEffects_SpinWindowDone(int nPlayer) {

@@ -388,7 +388,12 @@ void EVENT_TopOfArc(int nPlayer, int nEvent, void* pData, int nArg) {
     }
 }
 
-void fn_80066664(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 29 (Ball.c: the ball's first bounce), only for the real ball (nArg 1): commentary situation
+// event 28 unless a lesson blocks it, camera event 3 for the player's view, emotion event 2
+// (fn_8006ACF8), then fn_80067554 for a player on controller 8, fn_80067550 otherwise (both empty),
+// and the spin asked for with the stick (SW_vGetCurrentSpin) goes onto the ball (fn_80051C84),
+// saved to the replay first unless a replay is playing.
+void EVENT_FirstBounce(int nPlayer, int nEvent, void* pData, int nArg) {
     f32 fSpinY;
     f32 fSpinX;
 
@@ -413,13 +418,17 @@ void fn_80066664(int nPlayer, int nEvent, void* pData, int nArg) {
     }
 }
 
-void fn_8006676C(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 30 (a later bounce), only for the real ball (nArg 1): camera event 30 for the player's
+// view. Nothing in this build fires the event.
+void EVENT_NonFirstBounce(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1) {
         fn_80063CF0(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 30, nPlayer);
     }
 }
 
-void fn_800667C0(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 31 (Ball.c: the last bounce the spin can still act on), only for the real ball (nArg 1):
+// camera event 31 for the player's view, the spin window closed and the boost display hidden.
+void EVENT_LastBounceForSpinna(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1) {
         fn_80063CF0(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 31, nPlayer);
         SW_vCloseSpinWindow(nPlayer);
@@ -427,7 +436,10 @@ void fn_800667C0(int nPlayer, int nEvent, void* pData, int nArg) {
     }
 }
 
-void fn_80066828(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 32 (Ball.c: the ball comes to rest), only for the real ball (nArg 1): Gaud_BallStopped,
+// commentary situation event 8 unless a lesson takes the event (a lesson judges the shot here),
+// then fn_8006755C for a player on controller 8, fn_80067558 otherwise (both empty).
+void EVENT_BallStop(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1) {
         Gaud_BallStopped(nPlayer);
         if (!Lessons_OnEvent(nPlayer, 32)) {
@@ -441,7 +453,9 @@ void fn_80066828(int nPlayer, int nEvent, void* pData, int nArg) {
     }
 }
 
-void fn_800668A8(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 33 (Ball.c: the ball drops in the cup), only for the real ball (nArg 1): camera event 8 for
+// the player's view, emotion event 4, Gaud_BallInCup and commentary situation event 9.
+void EVENT_InHole(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1) {
         fn_80063CF0(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 8, nPlayer);
         fn_8006ACF8(nPlayer, 4);
@@ -450,7 +464,10 @@ void fn_800668A8(int nPlayer, int nEvent, void* pData, int nArg) {
     }
 }
 
-void fn_80066920(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 34 (Ball.c: the ball is out of bounds), only for the real ball (nArg 1) and unless a lesson
+// takes the event (a lesson judges the shot here): camera event 6 for the player's view and
+// commentary situation event 8.
+void EVENT_OutOfBounds(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1 && !Lessons_OnEvent(nPlayer, 34)) {
         fn_80063CF0(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 6, nPlayer);
         SitDev_QueueEvent(nPlayer, 2, 8);
@@ -459,35 +476,47 @@ void fn_80066920(int nPlayer, int nEvent, void* pData, int nArg) {
 
 void fn_800670A8(int nPlayer, int nEvent, void* pData, int nArg);
 
-void fn_80066994(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 35 (Ball.c: the ball lands on the ground): fn_800670A8.
+void EVENT_Collision(int nPlayer, int nEvent, void* pData, int nArg) {
     fn_800670A8(nPlayer, nEvent, pData, nArg);
 }
 
-void fn_800669B4(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 36 (Ball.c: the ball hits a course object): fn_800670A8.
+void EVENT_CollisionObject(int nPlayer, int nEvent, void* pData, int nArg) {
     fn_800670A8(nPlayer, nEvent, pData, nArg);
 }
 
-void fn_800669D4(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 37 (Ball.c: the ball hits a surface with flag 0x10, a tree): fn_800670A8.
+void EVENT_CollisionTree(int nPlayer, int nEvent, void* pData, int nArg) {
     fn_800670A8(nPlayer, nEvent, pData, nArg);
 }
 
-void fn_800669F4(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 38 (Ball.c: the ball hits surface 90, the flagstick): fn_800670A8.
+void EVENT_CollisionPin(int nPlayer, int nEvent, void* pData, int nArg) {
     fn_800670A8(nPlayer, nEvent, pData, nArg);
 }
 
-void fn_80066A14(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 73 (Ball.c: the look-ahead ball, Player.ballBefore, first lands): queues commentary
+// situation event 29.
+void EVENT_EstimatedBallFirstBounce(int nPlayer, int nEvent, void* pData, int nArg) {
     SitDev_QueueEvent(nPlayer, 2, 29);
 }
 
-// Event 39: the ball hit a world object; tell the game mode which.
-void fn_80066A3C(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 39 (Ball.c: the ball hit a world object), for the real and the simulated ball alike: when
+// ball.pHitActor is set, the game mode's hook gets the object's n140 (gpGame->pfn268; GameMode16's
+// bonuses) and Gaud_BallHitMetalTarget plays.
+void EVENT_CollisionActor(int nPlayer, int nEvent, void* pData, int nArg) {
     if (gPlayers[nPlayer].ball.pHitActor != NULL) {
         gpGame->pfn268(nPlayer, gPlayers[nPlayer].ball.pHitActor->n140);
         Gaud_BallHitMetalTarget(nPlayer);
     }
 }
 
-void fn_80066A9C(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 42 (emotion.c: the player's emotion changed; nArg -1): nothing in the lessons (mode 11)
+// unless nArg is 1. For an emotion (PlayerEmotion.n0) of 0..4 the golfer's character gets reaction
+// 1 (fn_800957B0); for emotion 0 the crowd animates too, by PlayerEmotion.n4: 0.3 of it for 3
+// seconds, 0.5 for 6, 0.8 for 8, all of it for 10 (3 and above).
+void EVENT_PlayerEmotionUpdated(int nPlayer, int nEvent, void* pData, int nArg) {
     int nA;
     int nB;
     int nAnim;
@@ -530,69 +559,92 @@ void fn_80066A9C(int nPlayer, int nEvent, void* pData, int nArg) {
     }
 }
 
-void fn_80066BB8(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 27 (the ball is moving), only for the real ball (nArg 1): queues commentary situation event
+// 7. Nothing in this build fires the event.
+void EVENT_BallMoving(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1) {
         SitDev_QueueEvent(nPlayer, 2, 7);
     }
 }
 
-void fn_80066BE8(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 43 (Swing.c: the time to add spin is over): GameEffects_SpinWindowDone.
+void EVENT_SpinWindowFinished(int nPlayer, int nEvent, void* pData, int nArg) {
     GameEffects_SpinWindowDone(nPlayer);
 }
 
-void fn_80066C08(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 44 (Swing.c: the backswing starts): the crowd stops animating and its objects go back to
+// rest (fn_800335F8).
+void EVENT_BeganBackswing(int nPlayer, int nEvent, void* pData, int nArg) {
     fn_800335F8(0);
 }
 
-void fn_80066C2C(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 46 (Swing.c: spin is added while the ball flies): Gaud_Spina, then the lessons are told
+// (they note the spin was used; their answer changes nothing).
+void EVENT_SpinnaSpinnaSpinna(int nPlayer, int nEvent, void* pData, int nArg) {
     Gaud_Spina(nPlayer);
     if (Lessons_OnEvent(nPlayer, 46)) return;   // the result is tested (clrlwi.) with nothing after it
 }
 
-void fn_80066C6C(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 45 (Swing.c: a power boost is tapped in): Gaud_Tappa, then the lessons are told (they note
+// the boost was used; their answer changes nothing).
+void EVENT_TappaTappaTappa(int nPlayer, int nEvent, void* pData, int nArg) {
     Gaud_Tappa(nPlayer);
-    if (Lessons_OnEvent(nPlayer, 45)) return;   // as in fn_80066C2C
+    if (Lessons_OnEvent(nPlayer, 45)) return;   // as in EVENT_SpinnaSpinnaSpinna
 }
 
-void fn_80066CAC(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 47 (Swing.c: the downswing starts): with a boost built up (SW_fGetBoostMagnitude above 0)
+// and one of the drivers (clubs 0..5) in hand, the boost's sound (Gaud_PlayTappaFeedback).
+void EVENT_BeganDownSwing(int nPlayer, int nEvent, void* pData, int nArg) {
     if (SW_fGetBoostMagnitude(nPlayer) > 0 && gPlayers[nPlayer].nClub >= 0 && gPlayers[nPlayer].nClub <= 5) {
         Gaud_PlayTappaFeedback(nPlayer);
     }
 }
 
-void fn_80066D0C(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 48 (GoGolfCam.c: the camera zooms in on the ball): Gaud_InitCamZoom.
+void EVENT_StartCameraZoom(int nPlayer, int nEvent, void* pData, int nArg) {
     Gaud_InitCamZoom(nPlayer);
 }
 
-void fn_80066D30(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 49 (GoGolfCam.c: the camera zoom is over): Gaud_ExitCamZoom.
+void EVENT_EndCameraZoom(int nPlayer, int nEvent, void* pData, int nArg) {
     Gaud_ExitCamZoom(nPlayer);
 }
 
-void fn_80066D54(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 50 (GoGolfCam.c: the matrix camera starts, the golfer frozen at impact): does nothing.
+void EVENT_StartMatrixCam(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
-void fn_80066D58(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 51 (GoGolfCam.c: the matrix camera ends): does nothing.
+void EVENT_EndMatrixCam(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
-void fn_80066D5C(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 52: does nothing (nothing in this build fires it).
+void EVENT_3ShotSwingStarted(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
-void fn_80066D60(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 53 (slow motion starts): does nothing.
+void EVENT_SlowMotionStart(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
-void fn_80066D64(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 54 (slow motion ends): does nothing.
+void EVENT_SlowMotionEnd(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
-void fn_80066D68(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 55 (fast motion starts): does nothing.
+void EVENT_FastMotionStart(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
-void fn_80066D6C(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 56 (fast motion ends): does nothing.
+void EVENT_FastMotionEnd(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
-void fn_80066D70(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 57 (GoGolfCam.c: the super-zoom camera starts, the golfer's animation paused): does
+// nothing.
+void EVENT_StartSuperZoomCam(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
-void fn_80066D74(int nPlayer, int nEvent, void* pData, int nArg) {
+// Event 58 (GoGolfCam.c: the super-zoom camera ends): does nothing.
+void EVENT_EndSuperZoomCam(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
 void fn_80066D78(int nPlayer, int nEvent, void* pData, int nArg) {
@@ -681,14 +733,14 @@ EventHandler lbl_80188628[76] = {
     EVENT_BeginHole, EVENT_EndHole, EVENT_RestartHole, EVENT_BeginTurn, EVENT_EndTurn, fn_80066EDC, EVENT_ShotSetup,
     EVENT_PreSwing, EVENT_Delay, EVENT_PracticeSwing, EVENT_HitBall, EVENT_SwingDone, EVENT_BallBounce, EVENT_NextClub,
     EVENT_PrevClub, EVENT_NextShotType, EVENT_PrevStance, EVENT_NextStance, EVENT_RotateLeft, EVENT_RotateRight, EVENT_MoveTargetForward,
-    EVENT_MoveTargetBack, EVENT_PlaceBallRotateLeft, EVENT_PlaceBallRotateRight, EVENT_PlaceBallMoveTargetForward, EVENT_PlaceBallMoveTargetBack, EVENT_Idle, fn_80066BB8,
-    EVENT_TopOfArc, fn_80066664, fn_8006676C, fn_800667C0, fn_80066828, fn_800668A8, fn_80066920,
-    fn_80066994, fn_800669B4, fn_800669D4, fn_800669F4, fn_80066A3C, EVENT_BreaklineDone, EVENT_BreaklinePassedCup,
-    fn_80066A9C, fn_80066BE8, fn_80066C08, fn_80066C6C, fn_80066C2C, fn_80066CAC, fn_80066D0C,
-    fn_80066D30, fn_80066D54, fn_80066D58, fn_80066D5C, fn_80066D60, fn_80066D64, fn_80066D68,
-    fn_80066D6C, fn_80066D70, fn_80066D74, fn_80066D78, fn_80066DC4, fn_80066E28, fn_80066E6C,
+    EVENT_MoveTargetBack, EVENT_PlaceBallRotateLeft, EVENT_PlaceBallRotateRight, EVENT_PlaceBallMoveTargetForward, EVENT_PlaceBallMoveTargetBack, EVENT_Idle, EVENT_BallMoving,
+    EVENT_TopOfArc, EVENT_FirstBounce, EVENT_NonFirstBounce, EVENT_LastBounceForSpinna, EVENT_BallStop, EVENT_InHole, EVENT_OutOfBounds,
+    EVENT_Collision, EVENT_CollisionObject, EVENT_CollisionTree, EVENT_CollisionPin, EVENT_CollisionActor, EVENT_BreaklineDone, EVENT_BreaklinePassedCup,
+    EVENT_PlayerEmotionUpdated, EVENT_SpinWindowFinished, EVENT_BeganBackswing, EVENT_TappaTappaTappa, EVENT_SpinnaSpinnaSpinna, EVENT_BeganDownSwing, EVENT_StartCameraZoom,
+    EVENT_EndCameraZoom, EVENT_StartMatrixCam, EVENT_EndMatrixCam, EVENT_3ShotSwingStarted, EVENT_SlowMotionStart, EVENT_SlowMotionEnd, EVENT_FastMotionStart,
+    EVENT_FastMotionEnd, EVENT_StartSuperZoomCam, EVENT_EndSuperZoomCam, fn_80066D78, fn_80066DC4, fn_80066E28, fn_80066E6C,
     fn_80066E90, fn_80066EB8, fn_80066F30, fn_80066F58, fn_80066F80, fn_80066FA8, fn_80066FAC,
-    fn_80066FB0, fn_80066FB4, fn_80066FD4, fn_80066A14, fn_80067004, fn_8006702C,
+    fn_80066FB0, fn_80066FB4, fn_80066FD4, EVENT_EstimatedBallFirstBounce, fn_80067004, fn_8006702C,
 };
 
 void EVENT_Trigger(int nPlayer, int nEvent, void* pData, int b) {

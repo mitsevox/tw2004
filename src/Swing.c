@@ -1632,7 +1632,7 @@ f32 SW_vGetNonPowerAttributeAffectedShotPower(int nPlayer) {
 }
 
 // Ends the spin input for this shot (bCanSpin = 0): SW_vUpdateSpinControl takes no more stick.
-// Called from the event code (fn_800667C0).
+// Called from the event code (EVENT_LastBounceForSpinna).
 void SW_vCloseSpinWindow(int nPlayer) {
     gPlayers[nPlayer].swing.bCanSpin = 0;
 }
