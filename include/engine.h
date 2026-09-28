@@ -1428,7 +1428,7 @@ void fn_80045558(u8 bOn, int nPlayer);
 u8   fn_8004560C(void);
 typedef void (*EventHandler)(int nPlayer, int nEvent, void* pData, int nArg);   // event.c's table
 void EVENT_Trigger(int nPlayer, int nEvent, void* pData, int b);   // through the event table at
-                                        // lbl_80188628; pData: the ball, a position, or NULL
+                                        // gEventHandlers; pData: the ball, a position, or NULL
 void TARGET_SetupTarget(int nPlayer);
 u8   TARGET_UpdateMomentums(int nPlayer);
 void PlaceBall_Set(int nPlayer, f32* pPos);

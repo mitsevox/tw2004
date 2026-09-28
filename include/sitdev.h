@@ -17,7 +17,7 @@ typedef struct SitDevEvent {
     u8    unk5[3];
 } SitDevEvent;
 
-// The block lbl_802811B8 points at (lbl_801D5AB0, 0x140 bytes).
+// The block gpSitDevData points at (gSitDevData, 0x140 bytes).
 typedef struct SitDevData {
     u16   aValue[SITDEV_NUM_VALUES];            // 0x000  set through SitDev_SetStateValue
     u32   aSetBits[SITDEV_NUM_VALUES / 32];     // 0x0C0  bit n: aValue[n] has been set
@@ -33,8 +33,8 @@ typedef struct SitDevData {
 } SitDevData;
 LAYOUT_ASSERT(SitDevData, 0x140);
 
-extern SitDevData  lbl_801D5AB0;
-extern SitDevData* lbl_802811B8;    // 0x802811B8 (.sdata): &lbl_801D5AB0
+extern SitDevData  gSitDevData;
+extern SitDevData* gpSitDevData;    // 0x802811B8 (.sdata): &gSitDevData
 
 // A halfword the loader rewrites (fn_800BB52C): on disc its two bit-fields are in the other bit
 // order, so it reads the raw value and stores its low 11 bits and its top 5 bits back as fields.

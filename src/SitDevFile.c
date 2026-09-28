@@ -1,6 +1,6 @@
 // SitDevFile.c (EA's name, from its asserts; TW06): a watcher that follows the ball after a shot
 // (an event 48 frames in, a call when it reaches surface 105), the loading of the situation
-// scripts (lbl_80282208; their state is in the block lbl_802811B8 points at, sitdev.h), the values
+// scripts (lbl_80282208; their state is in the block gpSitDevData points at, sitdev.h), the values
 // the scripts test, and running the scripts' actions (commentary lines, sounds, music).
 
 #include "game_types.h"
@@ -38,14 +38,14 @@ void fn_800BB52C(void);
 // their per-entry bytes.
 void SitDev_LoadScripts(SitDevScripts** ppScripts) {
     fn_800BB4B0();
-    lbl_802811B8->pCC = ppScripts;
+    gpSitDevData->pCC = ppScripts;
     if (lbl_80282208 == NULL) {
         lbl_80282208 = *ppScripts;
         fn_800BB4E8();
         fn_800BB4B4(lbl_80282208);
         fn_800BB52C();
     }
-    lbl_802811B8->pD4 = StaticMem_Alloc(lbl_80282208->n10, 2, 16, "SitDevFile.c", 105);
+    gpSitDevData->pD4 = StaticMem_Alloc(lbl_80282208->n10, 2, 16, "SitDevFile.c", 105);
     fn_800BD74C();
 }
 

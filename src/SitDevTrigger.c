@@ -53,14 +53,14 @@ u8 fn_800BCE70(SitDevAction* pAction, u8 nEvent) {
     int nCount;
     u32 nSound;
     int bNot30;
-    if (lbl_802811B8->abPlayed[pAction->nKind]) return 0;
+    if (gpSitDevData->abPlayed[pAction->nKind]) return 0;
     nCount = fn_800BB218(pAction->aList, 50);
     nLeft = fn_800BB248(pAction->aList, nCount);
     nSound = fn_800BB334(pAction->aList, nCount, nLeft, Misc_RandFunc(1) % nLeft);
     bNot30 = nEvent != 30;
     if (!GameEffects_SkipOtherCommentary()) {
         fn_800BD83C(nSound, bNot30);
-        lbl_802811B8->abPlayed[pAction->nKind] = 1;
+        gpSitDevData->abPlayed[pAction->nKind] = 1;
         return 1;
     }
     if (nEvent == 8) {
@@ -87,10 +87,10 @@ u8 fn_800BCF84(SitDevAction* pAction, int nPlayer, u8 nEvent) {
 
     if (pAction->aList[1] == 0xFFF0) {
         pDo = &lbl_80282208->p1C[pAction->aList[0]];
-        if (pDo == lbl_802811B8->pE8 && nEvent != 30) return 0;
-        if (lbl_802811B8->abPlayed[pDo->nKind]) return 0;
+        if (pDo == gpSitDevData->pE8 && nEvent != 30) return 0;
+        if (gpSitDevData->abPlayed[pDo->nKind]) return 0;
         fn_800BD580(pDo, nPlayer, nEvent);
-        lbl_802811B8->abPlayed[pDo->nKind] = 1;
+        gpSitDevData->abPlayed[pDo->nKind] = 1;
         return 1;
     }
     for (i = 0; i < 14; i++) {
@@ -100,7 +100,7 @@ u8 fn_800BCF84(SitDevAction* pAction, int nPlayer, u8 nEvent) {
     for (i = 0; i < 50; i++) {
         if (pAction->aList[i] != 0xFFF0) {
             nKind = lbl_80282208->p1C[pAction->aList[i] & 0x7FFF].nKind;
-            if (!lbl_802811B8->abPlayed[nKind]) {
+            if (!gpSitDevData->abPlayed[nKind]) {
                 aaIndex[nKind][anCount[nKind]] = i;
                 anCount[(u32)nKind]++;      // fake match: a second spelling of the index, not CSE'd
             }
@@ -108,10 +108,10 @@ u8 fn_800BCF84(SitDevAction* pAction, int nPlayer, u8 nEvent) {
     }
     for (nKind = 0; nKind < 14; nKind++) {
         if (anCount[nKind] == 1) {
-            if (&lbl_80282208->p1C[pAction->aList[aaIndex[nKind][0]]] != lbl_802811B8->pE8) {
+            if (&lbl_80282208->p1C[pAction->aList[aaIndex[nKind][0]]] != gpSitDevData->pE8) {
                 fn_800BD580(&lbl_80282208->p1C[pAction->aList[aaIndex[nKind][0]]], nPlayer, nEvent);
                 bPlayed = 1;
-                lbl_802811B8->abPlayed[nKind] = 1;
+                gpSitDevData->abPlayed[nKind] = 1;
             }
         } else if (anCount[nKind] > 1) {
             nPick = Misc_RandFunc(1) % anCount[nKind];
@@ -133,7 +133,7 @@ u8 fn_800BCF84(SitDevAction* pAction, int nPlayer, u8 nEvent) {
                 }
             }
             pDo = &lbl_80282208->p1C[pAction->aList[nEntry]];
-            if (pDo == lbl_802811B8->pE8) {
+            if (pDo == gpSitDevData->pE8) {
                 nPick++;
                 if (nPick == anCount[nKind]) {
                     nPick = 0;
@@ -142,7 +142,7 @@ u8 fn_800BCF84(SitDevAction* pAction, int nPlayer, u8 nEvent) {
                 pDo =&lbl_80282208->p1C[pAction->aList[nEntry] & 0x7FFF];
             }
             fn_800BD580(pDo, nPlayer, nEvent);
-            lbl_802811B8->abPlayed[nKind] = 1;
+            gpSitDevData->abPlayed[nKind] = 1;
             pAction->aList[nEntry] |= 0x8000;
             bPlayed = 1;
         }
@@ -183,7 +183,7 @@ void fn_800BD580(SitDevEntry8* pDo, int nPlayer, u8 nEvent) {
             if (!GameEffects_SkipOtherCommentary()) {
                 fn_800BD83C((u16)pDo->n4, bNot30);
             }
-            lbl_802811B8->pE8 = pDo;
+            gpSitDevData->pE8 = pDo;
         }
         break;
     case 11:
@@ -232,7 +232,7 @@ void fn_800BD580(SitDevEntry8* pDo, int nPlayer, u8 nEvent) {
 void fn_800BD74C(void) {
     u32 i;
     for (i = 0; i < lbl_80282208->n10; i++) {
-        lbl_802811B8->pD4[i] = 0;
+        gpSitDevData->pD4[i] = 0;
     }
 }
 

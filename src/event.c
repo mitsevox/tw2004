@@ -1,5 +1,5 @@
 // event.c (TW06's golf/eventmanager/event.c): the game's event handlers. EVENT_Trigger calls the
-// handler for an event number from the file's table (lbl_80188628): stepping through the clubs and
+// handler for an event number from the file's table (gEventHandlers): stepping through the clubs and
 // shot kinds, the camera and commentary for each moment of a shot, and the lessons' checks
 // (Lessons_OnEvent can block an event). Most handlers pass the moment on to SitDev_QueueEvent.
 
@@ -8,9 +8,9 @@
 #include "sitdev.h"
 #include "core/easb.h"
 
-SitDevData lbl_801D5AB0;
-SitDevData* lbl_802811B8 = &lbl_801D5AB0;
-u32 lbl_80281E20;              // seconds counted by event 26
+SitDevData gSitDevData;
+SitDevData* gpSitDevData = &gSitDevData;
+u32 gEventIdleSeconds;              // seconds counted by event 26
 
 void Character_InitNewClubAndShotType(int nPlayer);
 void fn_80033704(u16 nPatch, u16 nObject);
@@ -65,7 +65,7 @@ int  GameEffects_GetCurrentTriggerType(void);
 // TW07 has both EVENT_InitForGame and EVENT_ResetIdleSeconds here, the same size; the caller makes
 // this one InitForGame.
 void EVENT_InitForGame(void) {
-    lbl_80281E20 = 0;
+    gEventIdleSeconds = 0;
 }
 
 // Event 41 (GoBreakLine.c: the putt's break line passed the cup): queues situation event 26 for the
@@ -369,10 +369,10 @@ void EVENT_PlaceBallMoveTargetBack(int nPlayer, int nEvent, void* pData, int nAr
 // Event 26 (the main loop, once a second of game time, for player 0xFF): counts the second, then
 // queues commentary situation event 19 on every 60th second and 18 on every other 10th.
 void EVENT_Idle(int nPlayer, int nEvent, void* pData, int nArg) {
-    lbl_80281E20++;
-    if (lbl_80281E20 % 60 == 0) {
+    gEventIdleSeconds++;
+    if (gEventIdleSeconds % 60 == 0) {
         SitDev_QueueEvent(nPlayer, 5, 19);
-    } else if (lbl_80281E20 % 10 == 0) {
+    } else if (gEventIdleSeconds % 10 == 0) {
         SitDev_QueueEvent(nPlayer, 5, 18);
     }
 }
@@ -759,7 +759,7 @@ void EVENT_BallHitDelayed(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
 // The handlers, by event number.
-EventHandler lbl_80188628[76] = {
+EventHandler gEventHandlers[76] = {
     EVENT_BeginHole, EVENT_EndHole, EVENT_RestartHole, EVENT_BeginTurn, EVENT_EndTurn, EVENT_EndGame, EVENT_ShotSetup,
     EVENT_PreSwing, EVENT_Delay, EVENT_PracticeSwing, EVENT_HitBall, EVENT_SwingDone, EVENT_BallBounce, EVENT_NextClub,
     EVENT_PrevClub, EVENT_NextShotType, EVENT_PrevStance, EVENT_NextStance, EVENT_RotateLeft, EVENT_RotateRight, EVENT_MoveTargetForward,
@@ -778,7 +778,7 @@ EventHandler lbl_80188628[76] = {
 // position, or NULL) and the last argument (for ball events 1 for the real ball, 0 for the AI's
 // simulated one; -1 when there is no value).
 void EVENT_Trigger(int nPlayer, int nEvent, void* pData, int b) {
-    lbl_80188628[nEvent](nPlayer, nEvent, pData, b);
+    gEventHandlers[nEvent](nPlayer, nEvent, pData, b);
 }
 
 // The landings, events 35..38 (EVENT_Collision the ground, EVENT_CollisionObject a course object,
@@ -952,9 +952,9 @@ int GameEffects_GetCurrentTriggerType(void) {
 // no events queued), registers the loader for a hole's commentary zones (course chunk 5,
 // fn_800BB6DC) and stops watching any ball (fn_800BB0C8).
 void SitDev_vInitModule(void) {
-    Mem_set(lbl_802811B8, 0, sizeof(SitDevData));
-    lbl_802811B8->pE8 = NULL;
-    lbl_802811B8->n13C = 0;
+    Mem_set(gpSitDevData, 0, sizeof(SitDevData));
+    gpSitDevData->pE8 = NULL;
+    gpSitDevData->n13C = 0;
     Course_RegisterLoader(5, fn_800BB6DC);
     fn_800BB0C8();
 }
@@ -962,11 +962,11 @@ void SitDev_vInitModule(void) {
 // Round end (fn_8006CDC4): frees the commentary scripts' buffers (SitDevData pD0 when set, pCC,
 // pD4) and forgets the loaded scripts (lbl_80282208).
 void SitDev_vCloseModule(void) {
-    if (lbl_802811B8->pD0 != NULL) {
-        StaticMem_Free(lbl_802811B8->pD0);
+    if (gpSitDevData->pD0 != NULL) {
+        StaticMem_Free(gpSitDevData->pD0);
     }
-    StaticMem_Free(lbl_802811B8->pCC);
-    StaticMem_Free(lbl_802811B8->pD4);
+    StaticMem_Free(gpSitDevData->pCC);
+    StaticMem_Free(gpSitDevData->pD4);
     lbl_80282208 = NULL;
 }
 

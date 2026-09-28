@@ -65,26 +65,26 @@ void SitDev_QueueEvent(int nPlayer, int a, u8 nEvent) {
         // fall through
     case 25:
         fn_800BB1C0();
-        for (i = 0; i < lbl_802811B8->n13C; i++) {
-            if (lbl_802811B8->aEvents[i].nEvent == 8 || lbl_802811B8->aEvents[i].nEvent == 9 ||
-                lbl_802811B8->aEvents[i].nEvent == 10 || lbl_802811B8->aEvents[i].nEvent == 11) {
+        for (i = 0; i < gpSitDevData->n13C; i++) {
+            if (gpSitDevData->aEvents[i].nEvent == 8 || gpSitDevData->aEvents[i].nEvent == 9 ||
+                gpSitDevData->aEvents[i].nEvent == 10 || gpSitDevData->aEvents[i].nEvent == 11) {
                 return;
             }
         }
         break;
     }
-    pEvent = &lbl_802811B8->aEvents[lbl_802811B8->n13C];
+    pEvent = &gpSitDevData->aEvents[gpSitDevData->n13C];
     pEvent->nPlayer = nWho;
     pEvent->nEvent = nEvent;
-    lbl_802811B8->n13C++;
-    if (lbl_802811B8->n13C == 1) {
+    gpSitDevData->n13C++;
+    if (gpSitDevData->n13C == 1) {
         SitDev_SetupStateVector(nWho, nEvent);
         if (nEvent == 20 || nEvent == 29) {
             fn_80067B5C(gPlayers[nPlayer].ballBefore.vPos, gPlayers[nPlayer].ball.vStart, vDiff);
             vDiff[1] = 0.0f;
             nInches = 36.0f * (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
-            SitDev_SetStateValue(lbl_802811B8->aValue, 18, nInches, lbl_802811B8->aSetBits);
-            SitDev_SetStateValue(lbl_802811B8->aValue, 19, nInches, lbl_802811B8->aSetBits);
+            SitDev_SetStateValue(gpSitDevData->aValue, 18, nInches, gpSitDevData->aSetBits);
+            SitDev_SetStateValue(gpSitDevData->aValue, 19, nInches, gpSitDevData->aSetBits);
         }
     }
 }
@@ -101,13 +101,13 @@ void SitDev_ProcessEventQueue(void) {
     u8 nEvent;
 
     nPlayer33 = 5;
-    if (lbl_802811B8->n13C == 0) {
+    if (gpSitDevData->n13C == 0) {
         return;
     }
     pEntry = lbl_80282208->p14;
     // fake match: a signed compare here, an unsigned one in SitDevFile.c's fn_800BB52C
     for (i = 0; i < (int)lbl_80282208->nEntries; i++, pEntry++) {
-        pData = lbl_802811B8;
+        pData = gpSitDevData;
         bFound = 0;
         for (j = 0; j < pData->n13C; j++) {
             pEvent = &pData->aEvents[j];
@@ -122,24 +122,24 @@ void SitDev_ProcessEventQueue(void) {
         }
         if (bFound) {
             if (pEntry->b2.s.n5 != 22) {
-                SitDev_SetStateValue(lbl_802811B8->aValue, 0, Game_CurHoleIndex() + 1, pData->aSetBits);
+                SitDev_SetStateValue(gpSitDevData->aValue, 0, Game_CurHoleIndex() + 1, pData->aSetBits);
             }
-            if (fn_800BB7AC(pEntry, lbl_802811B8, pEvent->nPlayer) &&
-                (pEntry->n0 == 0 || !lbl_802811B8->pD4[pEntry->n0])) {
-                lbl_802811B8->pD4[pEntry->n0] = 1;
-                nEvent = lbl_802811B8->aEvents[j].nEvent;
+            if (fn_800BB7AC(pEntry, gpSitDevData, pEvent->nPlayer) &&
+                (pEntry->n0 == 0 || !gpSitDevData->pD4[pEntry->n0])) {
+                gpSitDevData->pD4[pEntry->n0] = 1;
+                nEvent = gpSitDevData->aEvents[j].nEvent;
                 if (nEvent == 29 && (pEntry->auTests[2] & 1)) {
                     lbl_80281E28 = 1;
                     lbl_80281E29 = 1;
                 }
-                fn_800BCD68(pEntry, pEntry->b2.s.n5, lbl_802811B8->aEvents[j].nPlayer, nEvent);
+                fn_800BCD68(pEntry, pEntry->b2.s.n5, gpSitDevData->aEvents[j].nPlayer, nEvent);
             }
         }
     }
     if (nPlayer33 != 5 && lbl_801FA198[nPlayer33] == 0) {
         fn_8006AAB4(nPlayer33, 5);
     }
-    lbl_802811B8->n13C = 0;
+    gpSitDevData->n13C = 0;
 }
 
 // Stores value nIndex of the situation state vector and marks it as set.

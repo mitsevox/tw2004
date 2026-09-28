@@ -79,7 +79,7 @@ u8 fn_800BB8A8(SitDevEntry* pEntry, int nTest, SitDevData* pData, int nValue) {
 
 // Set value 5 of the shared block.
 void fn_800BBADC(int nValue) {
-    SitDev_SetStateValue(lbl_802811B8->aValue, 5, (u16)nValue, lbl_802811B8->aSetBits);
+    SitDev_SetStateValue(gpSitDevData->aValue, 5, (u16)nValue, gpSitDevData->aSetBits);
 }
 
 // ---- the values the scripts test -----------------------------------------------------------
@@ -112,8 +112,8 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
     Ball* pBefore = &pPlayer->ballBefore;
     int nSurface = pBall->nSurface;
     int nBeforeSurface = pBefore->nSurface;
-    u16* pValues = lbl_802811B8->aValue;
-    u32* pSetBits = lbl_802811B8->aSetBits;
+    u16* pValues = gpSitDevData->aValue;
+    u32* pSetBits = gpSitDevData->aSetBits;
     u16 nRound = fn_800BCD5C();
     s32 nValue;
     u16 nMode;
@@ -123,10 +123,10 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
     int i;
 
     for (i = 0; i < 3; i++) {
-        lbl_802811B8->aSetBits[i] = 0;
+        gpSitDevData->aSetBits[i] = 0;
     }
     for (i = 0; i < 14; i++) {
-        lbl_802811B8->abPlayed[i] = 0;
+        gpSitDevData->abPlayed[i] = 0;
     }
     if (nKind == 25) {
         SitDev_SetStateValue(pValues, 5, pPlayer->nClub, pSetBits);
@@ -245,7 +245,7 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
         SitDev_SetStateValue(pValues, 53, Hole_ScoreAfterTapIn(nPlayer), pSetBits);
         SitDev_SetStateValue(pValues, 10, pPlayer->nShotKind, pSetBits);
         if (nKind == 33) {
-            lbl_802811B8->aValue[53]--;
+            gpSitDevData->aValue[53]--;
         }
         SitDev_SetStateValue(pValues, 56, fn_800CFFE4(nPlayer), pSetBits);
         SitDev_SetStateValue(pValues, 8, pPlayer->nStrokes[nHole], pSetBits);
