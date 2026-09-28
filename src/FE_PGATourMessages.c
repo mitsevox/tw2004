@@ -523,16 +523,16 @@ void PGATourMsg_CheckAdvanceTournament(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// FE message 742: marks the tour statistics as needing an update (fn_8011C058(1); TW06:
+// FE message 742: marks the tour statistics as needing an update (GM_PgaTourSim_SetStatsDirty(1); TW06:
 // GM_PgaTourSim_SetStatsDirty).
 void PGATourMsg_SetStatsDirty(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8011C058(1);
+    GM_PgaTourSim_SetStatsDirty(1);
 }
 
-// FE message 743: marks the tour scores as needing an update (fn_8011C060(1); TW06:
+// FE message 743: marks the tour scores as needing an update (GM_PgaTourSim_SetScoresDirty(1); TW06:
 // GM_PgaTourSim_SetScoresDirty).
 void PGATourMsg_SetScoresDirty(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8011C060(1);
+    GM_PgaTourSim_SetScoresDirty(1);
 }
 
 // FE message 749: whether the player quit the tour round (the tour simulation's user-quit flag,

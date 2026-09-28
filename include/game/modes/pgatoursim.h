@@ -112,7 +112,7 @@ extern PgaStatSort gPgaStatSort;
 extern int gPgaScoreSortPlayer;        // the same for the score sorts: the player
 // Per simple statistic: the Calc function that works it out from a golfer's counts.
 extern u8 (*gPgaSimpleStatCalcs[GM_PGA_STAT_SIMPLE_COUNT])(PgaStatCounts* pCounts, f32* pfValue);
-// Per statistic: its sort comparison, fn_8011BCFC (higher is better) or fn_8011BBD8 (lower).
+// Per statistic: its sort comparison, StatRankDecreasing (higher is better) or StatRankIncreasing (lower).
 extern s32 (*gPgaStatCompares[GM_PGA_STAT_COUNT])(const void* pA, const void* pB);
 extern s32 gPgaStatViews[GM_PGA_STAT_COUNT];     // per statistic: GM_PgaTourSim_GetStatView
 extern s32 gPgaStatDecimals[32];    // per statistic: the decimal places GM_PgaTourSim_GetStatValString prints
@@ -159,8 +159,8 @@ s32   GM_PgaTourSim_GetNumPlayoffEntrants(int nPlayer);                 // TW06:
 u8    GM_PgaTourSim_EntrantIsInPlayoff(int nPlayer, int nEntrant);   // TW06: GM_PgaTourSim_EntrantIsInPlayoff
 void  GM_PgaTourSim_UpdatePlayoffs(int nPlayer, int nHole);
 s32   GM_PgaTourSim_GetBestOpponentPlayoffHoleScore(int nPlayer, int nHole);
-void  fn_8011C058(u8 bDirty);                   // TW06: GM_PgaTourSim_SetStatsDirty
-void  fn_8011C060(u8 bDirty);                   // TW06: GM_PgaTourSim_SetScoresDirty
+void  GM_PgaTourSim_SetStatsDirty(u8 bDirty);                   // TW06: GM_PgaTourSim_SetStatsDirty
+void  GM_PgaTourSim_SetScoresDirty(u8 bDirty);                   // TW06: GM_PgaTourSim_SetScoresDirty
 void  GM_PgaTourSim_GetStatValString(GM_Pga_StatTypes_t nStat, f32 fValue, char* szOut);
 s32   GM_PgaTourSim_GetStatRankFromGolferID(int nPlayer, int nGolfer, GM_Pga_StatTypes_t nStat);
 f32   GM_PgaTourSim_GetStatValueFromGolferID(int nPlayer, int nGolfer, GM_Pga_StatTypes_t nStat);

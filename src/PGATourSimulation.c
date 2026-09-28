@@ -29,7 +29,7 @@ void GM_PgaTourSim_SimAdjustEntrantScores(int nPlayer, int nEntrant, int nRound)
 s32  FindFirstCutEntrantIndex(int nPlayer);
 s32  TournamentRankIncreasing(const void* pA, const void* pB);
 s32  TournamentRankIncreasingForCutEntrants(const void* pA, const void* pB);
-s32  fn_8011BCFC(const void* pA, const void* pB);
+s32  StatRankDecreasing(const void* pA, const void* pB);
 s32  TotalEntrantHoleScores(int nEntrant);
 void GM_PgaTourSim_SimEntrantStatsOnHole(int nPlayer, int nRound, int nEntrant, int nHole);
 void CalcScoreRankings(int nPlayer);
@@ -47,7 +47,7 @@ void CalcBallStriking(int nGolfer, f32* pfValue);
 void SplitWinnings(int nPlayer, s32 nTotal, s32 nFirstRow, s32 nCount);
 void GM_PgaTourSim_DistributeWinnings(int nPlayer, int nTotal, int n);
 void GM_PgaTourSim_CheckEndOfTournamentAward(int nPlayer, u8 bUser, u8 bFirst);
-void fn_8011C054(int nA, int nB);
+void PlayPGAAwardVideo(int nA, int nB);
 void PGATourSimulation_LoadPGSTFromStream(UStreamObject* pObject);
 
 char* GameModeDriverPGATour_GetInitialChampName(s32 i);               // a tournament's first champion
@@ -380,18 +380,18 @@ void GM_PgaTourSim_CheckEndOfTournamentAward(int nPlayer, u8 bUser, u8 bFirst) {
     }
     if (nAhead == 0) {
         if (GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].a200[0])) {
-            fn_8011C054(1, 1);
+            PlayPGAAwardVideo(1, 1);
         }
         GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].a200[1]);
         GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].a200[2]);
     } else if (nAhead <= 4) {
         if (GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].a200[1])) {
-            fn_8011C054(3, 1);
+            PlayPGAAwardVideo(3, 1);
         }
         GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].a200[2]);
     } else if (nAhead <= 24) {
         if (GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].a200[2])) {
-            fn_8011C054(4, 1);
+            PlayPGAAwardVideo(4, 1);
         }
     }
 
@@ -400,24 +400,24 @@ void GM_PgaTourSim_CheckEndOfTournamentAward(int nPlayer, u8 bUser, u8 bFirst) {
         if (gpSaveData[nPlayer].tour.nSeason == 0
             && pStats->nSeasonWins > 1
             && GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].a1C0[12])) {
-            fn_8011C054(12, 2);
+            PlayPGAAwardVideo(12, 2);
         }
         if (GM_PgaTourSim_IsLeaderForStat(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_PLAYER_OF_YEAR_POINTS)
             && GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].a1C0[13])) {
-            fn_8011C054(11, 1);
+            PlayPGAAwardVideo(11, 1);
         }
         if (GM_PgaTourSim_IsLeaderForStat(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_SEASON_WINNINGS)
             && GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].a1C0[14])) {
             if ((Misc_RandFunc(0) & 1) == 0) {
-                fn_8011C054(5, 1);
+                PlayPGAAwardVideo(5, 1);
             } else {
-                fn_8011C054(2, 1);
+                PlayPGAAwardVideo(2, 1);
             }
         }
         if (pStats->nEvents >= 15
             && GM_PgaTourSim_IsLeaderForStat(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_SCORING)
             && GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].a1C0[15])) {
-            fn_8011C054(6, 2);
+            PlayPGAAwardVideo(6, 2);
         }
     }
 
@@ -434,7 +434,7 @@ void GM_PgaTourSim_CheckEndOfTournamentAward(int nPlayer, u8 bUser, u8 bFirst) {
                                            &gpSaveData[nPlayer].a1C0[CalDate_GetMonth(
                                                    GameModeDriverPGATour_GetEndDate(
                                         gpSaveData[nPlayer].tour.nEvent)) - 1])) {
-            fn_8011C054(14, 6);
+            PlayPGAAwardVideo(14, 6);
         }
         for (i = 0; i < PGA_NUM_GOLFERS; i++) {
             gpSaveData[nPlayer].tour.aStats[i].n44 = 0;
@@ -650,7 +650,7 @@ u8 GM_PgaTourSim_IsLeaderForStat(int nPlayer, int nGolfer, GM_Pga_StatTypes_t nS
     CalcAllStatsIfDirty(nPlayer);
     fValue = gPgaStatRankings[nStat].aValue[nGolfer].fValue;
     for (i = 0; i < PGA_NUM_GOLFERS; i++) {
-        if (gPgaStatCompares[nStat] == fn_8011BCFC) {
+        if (gPgaStatCompares[nStat] == StatRankDecreasing) {
             if (i != nGolfer && gPgaStatRankings[nStat].aValue[i].fValue > fValue) {
                 return 0;
             }
@@ -1640,35 +1640,45 @@ u8 CalcPar3BirdieAvg(PgaStatCounts* pCounts, f32* pfValue) {
     return SafeDividePct(pCounts->nPar3Birdies, pCounts->nPar3Holes, pfValue);
 }
 
+// The percent of par 4s played that the golfer birdied.
 u8 CalcPar4BirdieAvg(PgaStatCounts* pCounts, f32* pfValue) {
     return SafeDividePct(pCounts->nPar4Birdies, pCounts->nPar4Holes, pfValue);
 }
 
+// The percent of par 5s played that the golfer birdied.
 u8 CalcPar5BirdieAvg(PgaStatCounts* pCounts, f32* pfValue) {
     return SafeDividePct(pCounts->nPar5Birdies, pCounts->nPar5Holes, pfValue);
 }
 
+// Birdie conversion: the percent of greens hit in regulation on which the golfer made birdie or
+// better.
 u8 CalcBirdieConversion(PgaStatCounts* pCounts, f32* pfValue) {
     return SafeDividePct(pCounts->nGIRBirdies, pCounts->nGreensHit, pfValue);
 }
 
+// Scoring average: strokes per round.
 u8 CalcScoringAvg(PgaStatCounts* pCounts, f32* pfValue) {
     return SafeDivide(pCounts->nStrokes, pCounts->nRounds, pfValue);
 }
 
-// Birdies plus eagles, as a percentage of the holes played.
+// Par breakers: birdies plus eagles as a percent of the holes played.
+// EA bug: nBirdies already counts every hole under par, eagles included (GameModeDriverPGATour.c
+// and the simulated holes both count an eagle in nBirdies and nEagles), so each eagle counts twice.
 u8 CalcParBreakers(PgaStatCounts* pCounts, f32* pfValue) {
     return SafeDividePct(pCounts->nBirdies + pCounts->nEagles, pCounts->nHoles, pfValue);
 }
 
+// Par 3 performance: strokes per par 3.
 u8 CalcPar3ScoringAvg(PgaStatCounts* pCounts, f32* pfValue) {
     return SafeDivide(pCounts->nPar3Strokes, pCounts->nPar3Holes, pfValue);
 }
 
+// Par 4 performance: strokes per par 4.
 u8 CalcPar4ScoringAvg(PgaStatCounts* pCounts, f32* pfValue) {
     return SafeDivide(pCounts->nPar4Strokes, pCounts->nPar4Holes, pfValue);
 }
 
+// Par 5 performance: strokes per par 5.
 u8 CalcPar5ScoringAvg(PgaStatCounts* pCounts, f32* pfValue) {
     return SafeDivide(pCounts->nPar5Strokes, pCounts->nPar5Holes, pfValue);
 }
@@ -1726,6 +1736,9 @@ static inline f32 StatRank(GM_Pga_StatTypes_t nStat, int nGolfer) {
     return gPgaStatRankings[nStat].aRank[nGolfer];
 }
 
+// All-around: the sum of the golfer's places in driving distance, driving accuracy, greens in
+// regulation, putting average, sand saves, holes per eagle, birdie average and scoring average
+// (lower is better).
 void CalcAllAroundScore(int nGolfer, f32* pfValue) {
     *pfValue = StatRank(GM_PGA_STAT_DRIVING, nGolfer) + StatRank(GM_PGA_STAT_FAIRWAYS, nGolfer)
              + StatRank(GM_PGA_STAT_GIR, nGolfer) + StatRank(GM_PGA_STAT_PUTTING, nGolfer)
@@ -1733,16 +1746,23 @@ void CalcAllAroundScore(int nGolfer, f32* pfValue) {
              + StatRank(GM_PGA_STAT_BIRDIESPERROUND, nGolfer) + StatRank(GM_PGA_STAT_SCORING, nGolfer);
 }
 
+// Total driving: the golfer's place in driving distance plus the place in driving accuracy (lower
+// is better).
 void CalcTotalDriving(int nGolfer, f32* pfValue) {
     *pfValue = StatRank(GM_PGA_STAT_DRIVING, nGolfer) + StatRank(GM_PGA_STAT_FAIRWAYS, nGolfer);
 }
 
+// Ball striking: the golfer's place in total driving plus the place in greens in regulation (lower
+// is better).
 void CalcBallStriking(int nGolfer, f32* pfValue) {
     *pfValue = StatRank(GM_PGA_STAT_TOTALDRIVING, nGolfer) + StatRank(GM_PGA_STAT_GIR, nGolfer);
 }
 
-// Entrants tied on a place share the prizes of the rows they fill: nCount entrants from score row
-// nFirstRow each get nTotal / nCount, added to their golfer's winnings.
+// Pays one place's prize money: nTotal (the prizes of the score rows the place fills, added up) is
+// split evenly among the nCount entrants from score row nFirstRow, the share cut to a whole number.
+// Each share becomes the entrant's leader board winnings (PgaEntrantMC n18) and is added to the
+// golfer's month, season and career winnings; the player's share is also paid into the profile
+// (GameModeDriverPGATour_AwardMoney). nCount 0 pays nothing.
 void SplitWinnings(int nPlayer, s32 nTotal, s32 nFirstRow, s32 nCount) {
     int i;
     s32 nShare;
@@ -1763,8 +1783,11 @@ void SplitWinnings(int nPlayer, s32 nTotal, s32 nFirstRow, s32 nCount) {
     }
 }
 
-// Pays the tournament's prizes (GM_Earnings_TournamentPayout of nTotal and n per row) down the score ranking;
-// only the first 70 rows are paid and the cut entrants get nothing.
+// The tournament's prize money paid down the score order at its end
+// (GM_PgaTourSim_SimTournamentWinner): each of the first 70 score rows is worth
+// GM_Earnings_TournamentPayout(nTotal, n, row), nTotal the purse and n the first prize, and the
+// entrants tied on a place split the rows they fill (SplitWinnings). The cut entrants, who sort
+// last, get nothing.
 void GM_PgaTourSim_DistributeWinnings(int nPlayer, int nTotal, int n) {
     s32 nRow;
     s32 nRank = -1;
@@ -1798,8 +1821,11 @@ void GM_PgaTourSim_DistributeWinnings(int nPlayer, int nTotal, int n) {
 // The statistic sort comparisons (gPgaStatCompares). Golfers whose values print differently go by
 // value, a golfer with no value (0) last; the same printed value goes by name.
 
-// Lower is better.
-s32 fn_8011BBD8(const void* pA, const void* pB) {
+// The statistic sort (qsort over golfer ids; lbl_80281840 gives the statistic and the player) for
+// the statistics where lower is better: putts, putting and scoring averages, holes per eagle, the
+// par 3, 4 and 5 averages and the combined rankings. Lower values first, but a golfer with no value
+// (0) after every golfer with one; golfers whose values print the same go by name.
+s32 StatRankIncreasing(const void* pA, const void* pB) {
     s32 nGolferA = *(const s32*)pA;
     s32 nGolferB = *(const s32*)pB;
     s32 nRet;
@@ -1830,8 +1856,10 @@ s32 fn_8011BBD8(const void* pA, const void* pB) {
     return nRet;
 }
 
-// Higher is better.
-s32 fn_8011BCFC(const void* pA, const void* pB) {
+// The statistic sort (as StatRankIncreasing) for the statistics where higher is better: higher
+// values first; golfers whose values print the same go by name. GM_PgaTourSim_IsLeaderForStat tells
+// the two kinds apart by this function.
+s32 StatRankDecreasing(const void* pA, const void* pB) {
     s32 nGolferA = *(const s32*)pA;
     s32 nGolferB = *(const s32*)pB;
     s32 nRet;
@@ -1856,7 +1884,9 @@ s32 fn_8011BCFC(const void* pA, const void* pB) {
 
 // The score sort comparisons (gPgaScoreSortPlayer is the player). Lower scores first, then by name.
 
-// All entrants: a cut entrant sorts last, the winner first.
+// The score sort of CalcScoreRankings (qsort over entrant numbers; lbl_80281848 gives the player):
+// lower score to par first, counting the holes each entrant has finished; a cut entrant sorts as
+// the worst score, the winner as the best; the same score goes by the golfer's name.
 s32 TournamentRankIncreasing(const void* pA, const void* pB) {
     PgaEntrantMC* pEntrantA;
     PgaEntrantMC* pEntrantB;
@@ -1893,7 +1923,8 @@ s32 TournamentRankIncreasing(const void* pA, const void* pB) {
                   GM_PgaTourSim_GetNameFromGolferID(nPlayer, pEntrantB->nGolfer));
 }
 
-// The cut entrants among themselves.
+// The score sort of CalcScoreRankingsForCutEntrants: the cut entrants by their real score to par
+// (no cut or winner override), then by the golfer's name.
 s32 TournamentRankIncreasingForCutEntrants(const void* pA, const void* pB) {
     int nEntrantA = *(const s32*)pA;
     int nEntrantB = *(const s32*)pB;
@@ -1913,15 +1944,21 @@ s32 TournamentRankIncreasingForCutEntrants(const void* pA, const void* pB) {
                   GM_PgaTourSim_GetNameFromGolferID(nPlayer, pEntrantB->nGolfer));
 }
 
-// Called from GM_PgaTourSim_CheckEndOfTournamentAward with two numbers as each award is won; empty in this build.
-void fn_8011C054(int nA, int nB) {
+// Empty in this build. GM_PgaTourSim_CheckEndOfTournamentAward calls it each time the player wins
+// an award, with a movie number and a count (TW07's movieIndex and numRandom): TW07's name says it
+// plays the award's video.
+void PlayPGAAwardVideo(int nA, int nB) {
 }
 
-void fn_8011C058(u8 bDirty) {
+// Sets gbStatsDirty: 1 makes the next statistic getter work every statistic out again
+// (CalcAllStatsIfDirty). FE message 742 sets it.
+void GM_PgaTourSim_SetStatsDirty(u8 bDirty) {
     gbStatsDirty = bDirty;
 }
 
-void fn_8011C060(u8 bDirty) {
+// Sets gbScoresDirty: 1 makes the next score getter sort the field again
+// (CalcScoreRankingsIfDirty). FE message 743 sets it.
+void GM_PgaTourSim_SetScoresDirty(u8 bDirty) {
     gbScoresDirty = bDirty;
 }
 
@@ -1934,14 +1971,14 @@ u8 (*gPgaSimpleStatCalcs[GM_PGA_STAT_SIMPLE_COUNT])(PgaStatCounts* pCounts, f32*
     CalcTotalEagles, CalcTotalBirdies, CalcConsecutiveCuts, CalcSeasonWinnings, CalcCareerWinnings,
     CalcRounds, CalcPlayerOfYearPoints,
 };
-// Per statistic: its ranking's sort comparison, fn_8011BCFC where higher is better, fn_8011BBD8
+// Per statistic: its ranking's sort comparison, StatRankDecreasing where higher is better, StatRankIncreasing
 // where lower is (GM_PgaTourSim_IsLeaderForStat compares the same way).
 s32 (*gPgaStatCompares[GM_PGA_STAT_COUNT])(const void* pA, const void* pB) = {
-    fn_8011BCFC, fn_8011BCFC, fn_8011BCFC, fn_8011BBD8, fn_8011BBD8, fn_8011BCFC, fn_8011BCFC,
-    fn_8011BCFC, fn_8011BBD8, fn_8011BCFC, fn_8011BCFC, fn_8011BCFC, fn_8011BCFC, fn_8011BCFC,
-    fn_8011BBD8, fn_8011BCFC, fn_8011BBD8, fn_8011BBD8, fn_8011BBD8, fn_8011BCFC, fn_8011BCFC,
-    fn_8011BCFC, fn_8011BCFC, fn_8011BCFC, fn_8011BCFC, fn_8011BCFC, fn_8011BCFC, fn_8011BCFC,
-    fn_8011BBD8, fn_8011BBD8, fn_8011BBD8,
+    StatRankDecreasing, StatRankDecreasing, StatRankDecreasing, StatRankIncreasing, StatRankIncreasing, StatRankDecreasing, StatRankDecreasing,
+    StatRankDecreasing, StatRankIncreasing, StatRankDecreasing, StatRankDecreasing, StatRankDecreasing, StatRankDecreasing, StatRankDecreasing,
+    StatRankIncreasing, StatRankDecreasing, StatRankIncreasing, StatRankIncreasing, StatRankIncreasing, StatRankDecreasing, StatRankDecreasing,
+    StatRankDecreasing, StatRankDecreasing, StatRankDecreasing, StatRankDecreasing, StatRankDecreasing, StatRankDecreasing, StatRankDecreasing,
+    StatRankIncreasing, StatRankIncreasing, StatRankIncreasing,
 };
 // Per statistic: its view (GM_PgaTourSim_GetStatView). The statistics screen's played column shows
 // the golfer's tournaments for 0 and rounds for 1.
