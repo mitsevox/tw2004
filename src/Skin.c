@@ -21,7 +21,7 @@ void  fn_8006EADC(UObject* pObj);              // GoLighting.c: light the object
 void  fn_8006ED70(void);                       // GoLighting.c
 void  fn_801127A0(void* pDesc);                // hwsMaterial_Gc.c
 void  SkinPart_SetChangeAllCopies(u8 b);                       // SkinPart.c
-void  fn_800CEF04(SkinDesc* pDesc);            // SkinPart.c: offsets to pointers
+void  SkinPart_FixupDesc(SkinDesc* pDesc);            // SkinPart.c: offsets to pointers
 void  SkinPart_AllocChoices(Skin* pSkin);                // SkinPart.c
 s32   SkinPart_GetMaxOptionsSize(Skin* pSkin);                // SkinPart.c
 void  SkinPart_InitSkin(void);                       // SkinPart.c
@@ -1058,7 +1058,7 @@ Skin* fn_800377FC(u8* pData, u8 b) {
             pModel->pDesc = StaticMem_Alloc(nDescSize, 2, 0x80, "Skin.c", 0x608);
         }
         memcpy(pModel->pDesc, pDesc, nDescSize);
-        fn_800CEF04(pModel->pDesc);
+        SkinPart_FixupDesc(pModel->pDesc);
         fn_800368FC(pModel->pDesc);
     } else {
         pModel->pDesc = NULL;

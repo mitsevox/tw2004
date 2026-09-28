@@ -1662,7 +1662,7 @@ void FE_CrAP_ApplyAssetParts(CrAPAsset* pAsset, Skin* pSkin) {
 }
 
 // Put the asset's sets on a skin: each of its four sets the skin has gets the asset's variant and
-// option; fn_800CECE0 gets them too when SkinPart_GetChangeAllCopies is set.
+// option; SkinPart_DropSetVariantTextures gets them too when SkinPart_GetChangeAllCopies is set.
 void FE_CrAP_ApplyAssetSets(CrAPAsset* pAsset, Skin* pSkin) {
     s32 nSet;
     s32 nVariant;
@@ -1676,7 +1676,7 @@ void FE_CrAP_ApplyAssetSets(CrAPAsset* pAsset, Skin* pSkin) {
             nOption = SkinPart_FindSetOption(pSkin, nSet, nVariant, pAsset->aSetOption[i]);
             SkinPart_ChooseSet(pSkin, nSet, nVariant, nOption);
             if (SkinPart_GetChangeAllCopies() && nOption >= 0) {
-                fn_800CECE0(pSkin, nSet, nVariant, nOption,
+                SkinPart_DropSetVariantTextures(pSkin, nSet, nVariant, nOption,
                             lbl_80281EE0->pB4->pChar->a64[lbl_80281EE0->pB4->pChar->n74]);
             }
         }
@@ -1703,7 +1703,7 @@ void FE_CrAP_ApplyAssetSetsToClubSkin(CrAPAsset* pAsset, Skin* pSkin) {
             nOption = SkinPart_FindSetOption(pSkin, nSet, nVariant, pAsset->aSetOption[i]);
             SkinPart_ChooseSet(pSkin, nSet, nVariant, nOption);
             if (SkinPart_GetChangeAllCopies() && nOption >= 0) {
-                fn_800CECE0(pSkin, nSet, nVariant, nOption,
+                SkinPart_DropSetVariantTextures(pSkin, nSet, nVariant, nOption,
                             lbl_80281EE0->pB4->pChar->a64[lbl_80281EE0->pB4->pChar->n74]);
             }
         }

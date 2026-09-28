@@ -152,7 +152,7 @@ void  fn_800CB078(void);                                        // AnimStream.c
 void  fn_8001DD18(u8* pData, int nBytes);
 void  fn_8001DEC8(u8* pData, int nBytes);
 s32   SkinPart_ListAllTextures(Skin** apSkins, int nSkins, SkinListEntry** ppList);   // SkinPart.c
-void  fn_800CEEBC(void);                                        // SkinPart.c: empty
+void  SkinPart_InitTextures(void);                                        // SkinPart.c: empty
 void  fn_800100B0(TexBank* pBank, TexEntry* p8, TexPalette* pC, void* p10, void* p14, int nNumTex,
                   int nNumPalettes);                            // LLTex.c
 void  fn_8001EFD8(f32* pA, f32* pB, f32* pOut);
@@ -182,7 +182,7 @@ void  fn_800C9764(void);
 void  fn_800C9FE0(void);
 void  SkinPart_Init(void);
 void  SkinPart_Shutdown(void);
-void  fn_800CEE04(Skin* pSkin, int a, int b);
+void  SkinPart_CopyChoices(Skin* pSkin, int a, int b);
 s32   SkinPart_GetNumSets(Skin* pSkin);         // SkinPart.c: how many choices aSets[3] holds
 void  SkinPart_SetChangeAllCopies(u8 b);
 u8    fn_800FCC38(int nPlayer);
@@ -1314,8 +1314,9 @@ void Character_LoadTextures(Character* pChar, Skin** apSkins, int nSkins) {
     }
     fn_800100B0(&pChar->bank78, pChar->pA8, pChar->pB0, pChar->pB8, pChar->pBC, pChar->nAC, pChar->nB4);
     pChar->p50 = &pChar->bank78;
-    // port: EA passes arguments fn_800CEEBC (empty) ignores
-    ((void (*)(Skin*, TexBank*, int, int))fn_800CEEBC)(pChar->pSkin, &pChar->bank78, 0xBF600, 0xCDA);
+    // port: EA passes arguments SkinPart_InitTextures (empty) ignores
+    ((void (*)(Skin*, TexBank*, int, int))SkinPart_InitTextures)(pChar->pSkin, &pChar->bank78, 0xBF600,
+            0xCDA);
     sprintf(pChar->szE1, "%sdata\\CharStrm\\CharTex\\%02dalltex.fxg", "", pChar->nC + 1);
     pChar->hFile = fn_800060E0(pChar->szE1);
 }
@@ -1325,7 +1326,7 @@ void Character_LoadTextures(Character* pChar, Skin** apSkins, int nSkins) {
 void Character_CopySkinChoices3To2(Character* pChar) {
     int i;
     for (i = 0; i < pChar->nSkins; i++) {
-        fn_800CEE04(pChar->apSkins[i], 3, 2);
+        SkinPart_CopyChoices(pChar->apSkins[i], 3, 2);
     }
 }
 
@@ -1333,7 +1334,7 @@ void Character_CopySkinChoices3To2(Character* pChar) {
 void Character_CopySkinChoices2To1(Character* pChar) {
     int i;
     for (i = 0; i < pChar->nSkins; i++) {
-        fn_800CEE04(pChar->apSkins[i], 2, 1);
+        SkinPart_CopyChoices(pChar->apSkins[i], 2, 1);
     }
 }
 
@@ -1342,7 +1343,7 @@ void Character_CopySkinChoices2To1(Character* pChar) {
 void Character_CopySkinChoices1To0(Character* pChar) {
     int i;
     for (i = 0; i < pChar->nSkins; i++) {
-        fn_800CEE04(pChar->apSkins[i], 1, 0);
+        SkinPart_CopyChoices(pChar->apSkins[i], 1, 0);
         pChar->apSkins[i]->u10D4 |= 1;
     }
 }
@@ -1369,7 +1370,7 @@ void Character_AddTextureLoadRequest(Character* pChar, void (*pfnBegin)(Characte
 // The front end's begin callback of a texture load (the golfer that came in): sets up the dynamic
 // textures of the character's model in use for the skins' newest choices
 // (Character_CopySkinChoices3To2): the name codes the choices do not use and the ones they need go
-// to its dynamic textures (fn_800CEB1C, fn_800CEBE8).
+// to its dynamic textures (SkinPart_DropUnusedTextures, SkinPart_QueueMissingTextures).
 void Character_BeginLoadTexturesCallbackFE(Character* pArg) {
     // fake match: a copy of the parameter through void* (a plain copy is merged into it)
     Character* pChar = (Character*)(void*)pArg;
@@ -1381,8 +1382,8 @@ void Character_BeginLoadTexturesCallbackFE(Character* pArg) {
     // port: EA passes an argument fn_8010BEC4 ignores
     ((void (*)(void*))fn_8010BEC4)(pModel);
     Character_CopySkinChoices3To2(pChar);
-    fn_800CEB1C(pChar->apSkins, pChar->nSkins, pModel);
-    fn_800CEBE8(pChar->apSkins, pChar->nSkins, pModel, NULL, 0);
+    SkinPart_DropUnusedTextures(pChar->apSkins, pChar->nSkins, pModel);
+    SkinPart_QueueMissingTextures(pChar->apSkins, pChar->nSkins, pModel, NULL, 0);
     // port: EA passes an argument fn_8010BED4 ignores
     ((void (*)(void*))fn_8010BED4)(pModel);
 }
@@ -1421,13 +1422,14 @@ void Character_BeginSwapTexturesCallbackFE(Character* pArg) {
         pSkin = pChar->apSkins[i];
         for (j = 0; j < SkinPart_GetNumSets(pSkin); j++) {
             if (memcmp(&pSkin->aSets[2][j], &pSkin->aSets[3][j], sizeof(SkinChoice)) != 0) {
-                fn_800CECE0(pSkin, j, pSkin->aSets[3][j].nVariant, pSkin->aSets[3][j].nOption, pModel);
+                SkinPart_DropSetVariantTextures(pSkin, j, pSkin->aSets[3][j].nVariant,
+                                                pSkin->aSets[3][j].nOption, pModel);
             }
         }
     }
     Character_CopySkinChoices3To2(pChar);
-    fn_800CEB1C(pChar->apSkins, pChar->nSkins, pModel);
-    fn_800CEBE8(pChar->apSkins, pChar->nSkins, pModel, NULL, 0);
+    SkinPart_DropUnusedTextures(pChar->apSkins, pChar->nSkins, pModel);
+    SkinPart_QueueMissingTextures(pChar->apSkins, pChar->nSkins, pModel, NULL, 0);
     // port: EA passes an argument fn_8010BED4 ignores
     ((void (*)(void*))fn_8010BED4)(pModel);
 }
@@ -1469,8 +1471,8 @@ void Character_EndSwapTexturesCallbackFE(Character* pChar) {
 
 // The in-game begin callback of a texture load: sets up the dynamic textures of the character's
 // model in use (fn_8010B098), dresses it (Character_SetClubsAndClothes) and hands its dynamic
-// textures the name codes the skins' newest choices need (fn_800CEBE8, given the "Glove" part's
-// id); the last marked player (lbl_80281CAC) is dressed again.
+// textures the name codes the skins' newest choices need (SkinPart_QueueMissingTextures, given the
+// "Glove" part's id); the last marked player (lbl_80281CAC) is dressed again.
 void Character_BeginLoadTexturesCallbackIG(Character* pArg) {
     // fake match: a copy of the parameter through void* (a plain copy is merged into it)
     Character* pChar = (Character*)(void*)pArg;
@@ -1486,7 +1488,7 @@ void Character_BeginLoadTexturesCallbackIG(Character* pArg) {
     Character_SetClubsAndClothes(pChar, pChar->nPlayer);
     Character_CopySkinChoices3To2(pChar);
     SKA_PackName(&uGlove, "Glove");
-    fn_800CEBE8(pChar->apSkins, pChar->nSkins, pModel, &uGlove, 1);
+    SkinPart_QueueMissingTextures(pChar->apSkins, pChar->nSkins, pModel, &uGlove, 1);
     if (lbl_80281CAC >= 0) {
         Character_SetClubsAndClothes(gPlayers[lbl_80281CAC].pChar, lbl_80281CAC);
     }

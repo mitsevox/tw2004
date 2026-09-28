@@ -11,7 +11,7 @@
 
 // ---- a skin's parts (SkinPart.c) ----------------------------------------------------------------
 // Parts, variants and the other entries are found by a 64-bit name code: SKA_PackName packs a name
-// ("Glove", "GloveOn") into one. The description comes from a file: fn_800CEF04 turns its offsets
+// ("Glove", "GloveOn") into one. The description comes from a file: SkinPart_FixupDesc turns its offsets
 // into pointers.
 
 // A part of a skin, such as the glove.
@@ -314,7 +314,7 @@ typedef struct Skin {
     u8   unk1094[0x1098 - 0x1094];
     struct HwsMemBlock* a1098[2];   // 0x1098  indexed like a10A0 (fn_8011CB5C)
     struct HwsOverrideTable* a10A0[2];  // 0x10A0  indexed by SkinPart_BeginDraw's argument; Skin.c sets [0]
-    SkinChoice* aParts[4];      // 0x10A8  a choice per part, four copies (fn_800CEE04 copies one
+    SkinChoice* aParts[4];      // 0x10A8  a choice per part, four copies (SkinPart_CopyChoices copies one
                                 //         over another); [3] is set while lbl_80282238 is clear
     SkinChoice* aSets[4];       // 0x10B8  the same per SkinDesc.p74 set
     SkinMorphState* pMorph;     // 0x10C8
@@ -651,9 +651,9 @@ void  SkinPart_ApplyClubChoices(Character* pChar, SkinChoices* pChoices);
 void  SkinPart_ChooseClubPartVariant(Character* pChar, int nSkin, u64 uPart, u64 uVariant);
 void  SkinPart_ChooseClubSet(Character* pChar, int nSkin, u64 uSet, u64 uVariant, u64 uOption);
 void  SkinPart_SetClubsLeftHanded(Character* pChar, u8 bOn);
-void  fn_800CEB1C(Skin** apSkins, int nSkins, struct DynTex* pTex);
-void  fn_800CEBE8(Skin** apSkins, int nSkins, struct DynTex* pTex, u64* aIds, int nIds);
-void  fn_800CECE0(Skin* pSkin, int nSet, int nVariant, int nOption, struct DynTex* pTex);
+void  SkinPart_DropUnusedTextures(Skin** apSkins, int nSkins, struct DynTex* pTex);
+void  SkinPart_QueueMissingTextures(Skin** apSkins, int nSkins, struct DynTex* pTex, u64* aIds, int nIds);
+void  SkinPart_DropSetVariantTextures(Skin* pSkin, int nSet, int nVariant, int nOption, struct DynTex* pTex);
 u8    SkinPart_GetChangeAllCopies(void);
 
 // SkinPart.c, as SkinBurn.c uses it: the part count, a part's variant and option, the mesh

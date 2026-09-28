@@ -44,14 +44,14 @@ void  SkinPart_AddToTexList(u64 uId, SkinListEntry* aList, s32* pnList, u8* p, s
 void  SkinPart_ListOptionTextures(Skin* pSkin, int n, SkinListEntry* aList, s32* pnList, int nCopy);
 s32   SkinPart_ListChosenTextures(Skin** apSkins, int nSkins, SkinListEntry** ppList, u64* aIds, int nIds,
                                   int nCopy);
-u8    fn_800CEA30(u64 uId, SkinListEntry* aList, int nList);
-u64   fn_800CEA6C(int i, SkinListEntry* aList, int nList);
-u8*   fn_800CEAAC(int i, SkinListEntry* aList, int nList);
-s32   fn_800CEAE4(int i, SkinListEntry* aList, int nList);
-void  fn_800CEDE0(Skin* pSkin, DynTex* pTex, u64 uId);
-void  fn_800CEE04(Skin* pSkin, int nFrom, int nTo);
+u8    SkinPart_TexListHas(u64 uId, SkinListEntry* aList, int nList);
+u64   SkinPart_TexListGetId(int i, SkinListEntry* aList, int nList);
+u8*   SkinPart_TexListGetRecolor(int i, SkinListEntry* aList, int nList);
+s32   SkinPart_TexListGetRecolorMode(int i, SkinListEntry* aList, int nList);
+void  SkinPart_DropTexture(Skin* pSkin, DynTex* pTex, u64 uId);
+void  SkinPart_CopyChoices(Skin* pSkin, int nFrom, int nTo);
 void  SkinPart_SetChangeAllCopies(u8 b);
-void  fn_800CEE98(void);
+void  SkinPart_InitChangeAllCopies(void);
 
 s32   lbl_80191748[11] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1};
 char* lbl_80281540[2] = {"Glove", NULL};     // the parts SkinPart_BurnBodySkin lists
@@ -262,10 +262,11 @@ void SkinPart_ChooseBodySet(Character* pChar, int nSet, int nVariant, int nOptio
     }
 }
 
-// The module's start-up: new choices go into all four copies at once (fn_800CEE98). char.c calls it
-// from both of its start-ups, then sets the mode it wants with SkinPart_SetChangeAllCopies.
+// The module's start-up: new choices go into all four copies at once
+// (SkinPart_InitChangeAllCopies). char.c calls it from both of its start-ups, then sets the mode it
+// wants with SkinPart_SetChangeAllCopies.
 void SkinPart_Init(void) {
-    fn_800CEE98();
+    SkinPart_InitChangeAllCopies();
 }
 
 // Empty in this build; char.c calls it from both of its shut-downs, the pairs of the start-ups that
@@ -303,7 +304,7 @@ s32 SkinPart_GetNumPartOptions(Skin* pSkin, int nPart, int nVariant) {
     if (pSkin == NULL || pSkin->pModel == NULL) return 0;
     pDesc = pSkin->pModel->pDesc;
     // fake match: the cast to the field's own type gives EA's (i * 0x18 + 8) lwzx; perhaps EA's field
-    // was untyped (fn_800CEF04 turns the file's offsets into pointers)
+    // was untyped (SkinPart_FixupDesc turns the file's offsets into pointers)
     return ((SkinVariant*)pDesc->pVariants)[nVariant + pDesc->pParts[nPart].nFirst].nOptions;
 }
 
@@ -1224,8 +1225,8 @@ s32 SkinPart_ListAllTextures(Skin** apSkins, int nSkins, SkinListEntry** ppList)
     return nList;
 }
 
-// Whether a list holds the name code.
-u8 fn_800CEA30(u64 uId, SkinListEntry* aList, int nList) {
+// Whether the texture list holds the name code.
+u8 SkinPart_TexListHas(u64 uId, SkinListEntry* aList, int nList) {
     int i;
 
     for (i = 0; i < nList; i++) {
@@ -1234,24 +1235,28 @@ u8 fn_800CEA30(u64 uId, SkinListEntry* aList, int nList) {
     return 0;
 }
 
-u64 fn_800CEA6C(int i, SkinListEntry* aList, int nList) {
+u64 SkinPart_TexListGetId(int i, SkinListEntry* aList, int nList) {
     if (nList <= 0 || aList == NULL || i < 0 || i >= nList) return 0;
     return aList[i].uId;
 }
 
-u8* fn_800CEAAC(int i, SkinListEntry* aList, int nList) {
+// Entry i's recolouring data (a set option's SkinDesc8C.a08, which LLDynTex.c applies to the
+// texture's pixels), or NULL (also for i out of range).
+u8* SkinPart_TexListGetRecolor(int i, SkinListEntry* aList, int nList) {
     if (nList <= 0 || aList == NULL || i < 0 || i >= nList) return NULL;
     return aList[i].p8;
 }
 
-s32 fn_800CEAE4(int i, SkinListEntry* aList, int nList) {
+// Entry i's recolouring mode (the set option's SkinDesc8C.n2C), or 0 (also for i out of range).
+s32 SkinPart_TexListGetRecolorMode(int i, SkinListEntry* aList, int nList) {
     if (nList <= 0 || aList == NULL || i < 0 || i >= nList) return 0;
     return aList[i].nC;
 }
 
-// Hands fn_8010AD50 each of pTex's name codes the skins' chosen options do not use, then calls
-// fn_8010ADA4.
-void fn_800CEB1C(Skin** apSkins, int nSkins, DynTex* pTex) {
+// Drops from the dynamic textures pTex every texture the skins' parts do not use as copy 2 chooses
+// them (LLDynTex.c fn_8010AD50 clears its name, fn_8010ADA4 packs the rest). char.c's begin
+// callbacks of a texture load call it once the newest choices are in copy 2.
+void SkinPart_DropUnusedTextures(Skin** apSkins, int nSkins, DynTex* pTex) {
     int i;
     SkinListEntry* pList;
     int nList;
@@ -1263,7 +1268,7 @@ void fn_800CEB1C(Skin** apSkins, int nSkins, DynTex* pTex) {
     n = fn_8010AD10(pTex);
     for (i = 0; i < n; i++) {
         uId = fn_8010AD18(pTex, i);
-        if (uId != 0 && !fn_800CEA30(uId, pList, nList)) {
+        if (uId != 0 && !SkinPart_TexListHas(uId, pList, nList)) {
             fn_8010AD50(pTex, uId);
         }
     }
@@ -1273,9 +1278,11 @@ void fn_800CEB1C(Skin** apSkins, int nSkins, DynTex* pTex) {
     }
 }
 
-// Hands fn_8010BCFC each name code the skins' chosen options use that pTex has no entry for. aIds
-// and nIds go on to SkinPart_ListChosenTextures.
-void fn_800CEBE8(Skin** apSkins, int nSkins, DynTex* pTex, u64* aIds, int nIds) {
+// Queues for loading (LLDynTex.c fn_8010BCFC) each texture the skins' parts need as copy 2 chooses
+// them that pTex does not hold yet, with its recolouring. The parts whose name codes are in aIds
+// (nIds of them) get every option's textures: the in-game load passes the "Glove" part, so the
+// glove can come off and go back on.
+void SkinPart_QueueMissingTextures(Skin** apSkins, int nSkins, DynTex* pTex, u64* aIds, int nIds) {
     SkinListEntry* pList;
     s32 nC;
     int i;
@@ -1289,10 +1296,10 @@ void fn_800CEBE8(Skin** apSkins, int nSkins, DynTex* pTex, u64* aIds, int nIds) 
     // port: a DynTexHeader has TexBank's layout (lldyntex.h); the two are not merged yet.
     pBank = (TexBank*)fn_8010A780(pTex);
     for (i = 0; i < nList; i++) {
-        uId = fn_800CEA6C(i, pList, nList);
+        uId = SkinPart_TexListGetId(i, pList, nList);
         if (uId != 0 && fn_8001005C(pBank, uId) == -0x80000000) {
-            nC = fn_800CEAE4(i, pList, nList);
-            fn_8010BCFC(uId, fn_800CEAAC(i, pList, nList), nC);
+            nC = SkinPart_TexListGetRecolorMode(i, pList, nList);
+            fn_8010BCFC(uId, SkinPart_TexListGetRecolor(i, pList, nList), nC);
         }
     }
     if (pList != NULL) {
@@ -1300,8 +1307,11 @@ void fn_800CEBE8(Skin** apSkins, int nSkins, DynTex* pTex, u64* aIds, int nIds) 
     }
 }
 
-// Hands fn_800CEDE0 the name codes a set's variant uses.
-void fn_800CECE0(Skin* pSkin, int nSet, int nVariant, int nOption, DynTex* pTex) {
+// Drops from the dynamic textures pTex the textures variant nVariant of set nSet names
+// (SkinDesc.p84), so they load again with the new option's recolouring. Nothing when the set, the
+// variant or nOption is out of range (nOption is only checked). char.c's texture swap and
+// FE_CrAPDB.c call it as a set's choice changes.
+void SkinPart_DropSetVariantTextures(Skin* pSkin, int nSet, int nVariant, int nOption, DynTex* pTex) {
     int i;
     SkinDesc74* pSet;
     SkinDesc* pDesc;
@@ -1312,16 +1322,18 @@ void fn_800CECE0(Skin* pSkin, int nSet, int nVariant, int nOption, DynTex* pTex)
     pDesc = pSkin->pModel->pDesc;
     pSet = &pDesc->p74[nSet];
     for (i = 0; i < pSet->n0C; i++) {
-        fn_800CEDE0(pSkin, pTex, pDesc->p84[i + nVariant * pSet->n0C + pSet->n14]);
+        SkinPart_DropTexture(pSkin, pTex, pDesc->p84[i + nVariant * pSet->n0C + pSet->n14]);
     }
 }
 
-void fn_800CEDE0(Skin* pSkin, DynTex* pTex, u64 uId) {
+// Drops the texture with this name code from the dynamic textures pTex (LLDynTex.c fn_8010AD50);
+// pSkin is not used.
+void SkinPart_DropTexture(Skin* pSkin, DynTex* pTex, u64 uId) {
     fn_8010AD50(pTex, uId);
 }
 
 // Copies one copy of the skin's choices over another.
-void fn_800CEE04(Skin* pSkin, int nFrom, int nTo) {
+void SkinPart_CopyChoices(Skin* pSkin, int nFrom, int nTo) {
     Mem_cpy(pSkin->aParts[nTo], pSkin->aParts[nFrom], SkinPart_GetNumParts(pSkin) * sizeof(SkinChoice));
     Mem_cpy(pSkin->aSets[nTo], pSkin->aSets[nFrom], SkinPart_GetNumSets(pSkin) * sizeof(SkinChoice));
 }
@@ -1339,11 +1351,14 @@ u8 SkinPart_GetChangeAllCopies(void) {
     return lbl_80282238;
 }
 
-void fn_800CEE98(void) {
+// Turns SkinPart_SetChangeAllCopies on, the default (SkinPart_Init).
+void SkinPart_InitChangeAllCopies(void) {
     SkinPart_SetChangeAllCopies(1);
 }
 
-void fn_800CEEBC(void) {
+// Empty. char.c's Character_LoadTextures calls it (passing the body skin, its new texture bank and
+// two sizes, 0xBF600 and 0xCDA) once the bank is set up.
+void SkinPart_InitTextures(void) {
 }
 
 // Whether the iterator is on an entry; false once it has stepped past the last one.
@@ -1367,7 +1382,7 @@ s32 SkinIter_GetIndex(SkinIter* pIter) {
 
 // Makes a loaded description usable: its offsets become pointers (once). One of another version
 // is cleared instead.
-void fn_800CEF04(SkinDesc* pDesc) {
+void SkinPart_FixupDesc(SkinDesc* pDesc) {
     // port: the file holds offsets from its start where the struct holds pointers
     if (pDesc->uFlags & 1) return;
     if (pDesc->nVersion != 8) {
@@ -1440,8 +1455,9 @@ void fn_800CEF04(SkinDesc* pDesc) {
     pDesc->uFlags |= 1;
 }
 
-// The part with this name code, or -1.
-s32 fn_800CF104(SkinDesc* pDesc, u64 uId) {
+// The description's part with this name code, or -1: SkinPart_FindPart without a skin (hwsBurn.c
+// resolves a link's part with it).
+s32 SkinPart_FindDescPart(SkinDesc* pDesc, u64 uId) {
     int i;
 
     for (i = 0; i < pDesc->nParts; i++) {

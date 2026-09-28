@@ -7,7 +7,7 @@
 
 SkinIter* fn_80113A9C(u8* pBuf, SkinIterArgs* pArgs);   // hwsRender_Gc.c
 void  fn_80113B14(SkinIter* pIter);                     // hwsRender_Gc.c: ends the iterator
-s32   fn_800CF104(SkinDesc* pDesc, u64 uId);
+s32   SkinPart_FindDescPart(SkinDesc* pDesc, u64 uId);
 void  fn_80110A38(HwsBurn* pBurn, int n);
 SkinDesc* fn_80111850(HwsBurn* pBurn);
 
@@ -243,7 +243,7 @@ void fn_80110D10(HwsBurn* pBurn, int nPart, int nVariant) {
     nFirstLink = pBurn->pDesc->pVariants[nVariant].nFirstLink;
     for (i = 0; i < pBurn->pDesc->pVariants[nVariant].nLinks; i++) {
         pLink = &pBurn->pDesc->pLinks[nFirstLink + i];
-        nLinked = fn_800CF104(pBurn->pDesc, pLink->uPart);
+        nLinked = SkinPart_FindDescPart(pBurn->pDesc, pLink->uPart);
         if (nLinked != -1) {
             int j;
             s32 nFirstVariant;
