@@ -413,7 +413,7 @@ They will be sorted into the sections below.
   constant loop fully, with other registers than hand-written stores (SitDev_SetupStateVector 23 diffs ->
   exact with two `for` loops).
 - **[verified] Copy a real struct member, not a cast byte array:** the struct copy keeps the original's
-  load/store order (FE_MessageTable fn_8007F8A0 86 -> 100 with `SaveProfile.aReplay` as `Replay[5]`).
+  load/store order (FE_MessageTable GM_vShowAwardReplay 86 -> 100 with `SaveProfile.aReplay` as `Replay[5]`).
 - **[verified] EA's vector-scale helpers take the scale first** (TW07 `LLMath_Scale3(float, const float*,
   float*)`): Vec3_Scale / LLMath_Scale fixed in 149 calls; Ball_FlightStep became exact.
 - **Permuter traps:** it ignores branch targets, so a "score 0" result can move a statement out of its `if`

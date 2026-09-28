@@ -461,27 +461,27 @@ void GM_vGetProfileRecordsHeld(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetProfileProgress(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetProfileStats(MsgArg* pArgs, MsgArg* pResult);
 void GM_vPar5Eagles(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007F640(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007F724(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007F784(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007F7D0(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007F81C(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007F87C(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007F8A0(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007FA60(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007FCC0(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007FCD4(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007FCE8(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007FD0C(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007FEAC(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007FED8(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007FEEC(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007FF3C(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007FF4C(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007FF6C(MsgArg* pArgs, MsgArg* pResult);
-void fn_8007FF8C(MsgArg* pArgs, MsgArg* pResult);
-void fn_80080054(MsgArg* pArgs, MsgArg* pResult);
-void fn_8008017C(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetProfileNumLadderEventsWon(MsgArg* pArgs, MsgArg* pResult);
+void GM_vCountMedalsAndTourCard(MsgArg* pArgs, MsgArg* pResult);
+void GM_vCountMedal2(MsgArg* pArgs, MsgArg* pResult);
+void GM_vCountMedal1(MsgArg* pArgs, MsgArg* pResult);
+void GM_vCountBestMedalsAndTourCard(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetTourCardLevel(MsgArg* pArgs, MsgArg* pResult);
+void GM_vShowAwardReplay(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSaveCreatedPlayerToSlot(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetMenuGameMode(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetMenuGameMode(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIsProfileChanged(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetMostRewardsUnlocked(MsgArg* pArgs, MsgArg* pResult);
+void GM_vFEFormatWithCommas(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetTourCardWithheld(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetTourCardWithheld(MsgArg* pArgs, MsgArg* pResult);
+void GM_vIsCharacterHidden(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetPlayerController(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetCoursePrice(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSaveProfileWithDefaultName(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetHolePar(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetReplayCourseName(MsgArg* pArgs, MsgArg* pResult);
 void fn_800801C0(MsgArg* pArgs, MsgArg* pResult);
 void fn_800801D4(MsgArg* pArgs, MsgArg* pResult);
 void fn_80080208(MsgArg* pArgs, MsgArg* pResult);
@@ -902,27 +902,27 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[171] = GM_vGetProfileRecordsHeld;
     gFEMessageHandlers[172] = GM_vGetProfileStats;
     gFEMessageHandlers[173] = GM_vPar5Eagles;
-    gFEMessageHandlers[174] = fn_8007F640;
-    gFEMessageHandlers[175] = fn_8007F724;
-    gFEMessageHandlers[176] = fn_8007F784;
-    gFEMessageHandlers[177] = fn_8007F7D0;
-    gFEMessageHandlers[178] = fn_8007F81C;
-    gFEMessageHandlers[179] = fn_8007F87C;
-    gFEMessageHandlers[180] = fn_8007F8A0;
-    gFEMessageHandlers[181] = fn_8007FA60;
-    gFEMessageHandlers[182] = fn_8007FCC0;
-    gFEMessageHandlers[183] = fn_8007FCD4;
-    gFEMessageHandlers[184] = fn_8007FCE8;
-    gFEMessageHandlers[185] = fn_8007FD0C;
-    gFEMessageHandlers[186] = fn_8007FEAC;
-    gFEMessageHandlers[187] = fn_8007FED8;
-    gFEMessageHandlers[188] = fn_8007FEEC;
-    gFEMessageHandlers[189] = fn_8007FF3C;
-    gFEMessageHandlers[190] = fn_8007FF4C;
-    gFEMessageHandlers[191] = fn_8007FF6C;
-    gFEMessageHandlers[192] = fn_8007FF8C;
-    gFEMessageHandlers[193] = fn_80080054;
-    gFEMessageHandlers[194] = fn_8008017C;
+    gFEMessageHandlers[174] = GM_vGetProfileNumLadderEventsWon;
+    gFEMessageHandlers[175] = GM_vCountMedalsAndTourCard;
+    gFEMessageHandlers[176] = GM_vCountMedal2;
+    gFEMessageHandlers[177] = GM_vCountMedal1;
+    gFEMessageHandlers[178] = GM_vCountBestMedalsAndTourCard;
+    gFEMessageHandlers[179] = GM_vGetTourCardLevel;
+    gFEMessageHandlers[180] = GM_vShowAwardReplay;
+    gFEMessageHandlers[181] = GM_vSaveCreatedPlayerToSlot;
+    gFEMessageHandlers[182] = GM_vGetMenuGameMode;
+    gFEMessageHandlers[183] = GM_vSetMenuGameMode;
+    gFEMessageHandlers[184] = GM_vIsProfileChanged;
+    gFEMessageHandlers[185] = GM_vGetMostRewardsUnlocked;
+    gFEMessageHandlers[186] = GM_vFEFormatWithCommas;
+    gFEMessageHandlers[187] = GM_vGetTourCardWithheld;
+    gFEMessageHandlers[188] = GM_vSetTourCardWithheld;
+    gFEMessageHandlers[189] = GM_vIsCharacterHidden;
+    gFEMessageHandlers[190] = GM_vGetPlayerController;
+    gFEMessageHandlers[191] = GM_vGetCoursePrice;
+    gFEMessageHandlers[192] = GM_vSaveProfileWithDefaultName;
+    gFEMessageHandlers[193] = GM_vGetHolePar;
+    gFEMessageHandlers[194] = GM_vGetReplayCourseName;
     gFEMessageHandlers[195] = fn_800801C0;
     gFEMessageHandlers[196] = fn_800801D4;
     gFEMessageHandlers[197] = fn_80080208;
@@ -3363,8 +3363,9 @@ void GM_vPar5Eagles(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = n;
 }
 
-// How many ladder events the slot's profile has won.
-void fn_8007F640(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 174: how many of the 25 ladder events save profile pArgs[0] has won
+// (aLadderAward).
+void GM_vGetProfileNumLadderEventsWon(MsgArg* pArgs, MsgArg* pResult) {
     int n;
     int i;
 
@@ -3377,8 +3378,9 @@ void fn_8007F640(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = n;
 }
 
-// One for a TOUR card, plus one per challenge group with a medal.
-void fn_8007F724(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 175: one per challenge group save profile pArgs[0] has any medal in (aMedal not
+// 3), plus one when it has a TOUR card (nTourCardLevel 1 or more).
+void GM_vCountMedalsAndTourCard(MsgArg* pArgs, MsgArg* pResult) {
     int n;
     int i;
 
@@ -3394,8 +3396,9 @@ void fn_8007F724(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = n;
 }
 
-// How many challenge groups have medal 2.
-void fn_8007F784(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 176: how many challenge groups save profile pArgs[0] has medal 2 in (aMedal: 0
+// the best, 3 none).
+void GM_vCountMedal2(MsgArg* pArgs, MsgArg* pResult) {
     int n;
     int i;
 
@@ -3408,8 +3411,9 @@ void fn_8007F784(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = n;
 }
 
-// How many challenge groups have medal 1.
-void fn_8007F7D0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 177: how many challenge groups save profile pArgs[0] has medal 1 in (aMedal: 0
+// the best, 3 none).
+void GM_vCountMedal1(MsgArg* pArgs, MsgArg* pResult) {
     int n;
     int i;
 
@@ -3422,8 +3426,9 @@ void fn_8007F7D0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = n;
 }
 
-// One for a TOUR card, plus one per challenge group with the best medal (0).
-void fn_8007F81C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 178: how many challenge groups save profile pArgs[0] has the best medal (0) in,
+// plus one when it has a TOUR card (nTourCardLevel 1 or more).
+void GM_vCountBestMedalsAndTourCard(MsgArg* pArgs, MsgArg* pResult) {
     int n;
     int i;
 
@@ -3439,13 +3444,18 @@ void fn_8007F81C(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = n;
 }
 
-void fn_8007F87C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 179: save profile pArgs[0]'s TOUR card level (nTourCardLevel: 0 none, 1..6).
+void GM_vGetTourCardLevel(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gpSaveData[pArgs[0].i].nTourCardLevel;
 }
 
-// Shows the replay profile pArgs[0] saved with award pArgs[1] (awards 0, 6, 9, 3 and 13 have one).
-// SaveProfile.aReplay is Replay[5]: copying the struct member gives the original's copy order.
-void fn_8007F8A0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 180: plays the replay save profile pArgs[0] kept with trophy ball pArgs[1]
+// (aReplay[0..4] for awards 0, 6, 9, 3 and 13; another award only sets the flags): lbl_80281ED4->b0
+// is set (fn_80079AD4 then records game mode 27 for the menus) and n1061C keeps the award;
+// fn_8007739C copies the replay into gReplayData and sets up game mode 10 with its golfer and
+// course. SaveProfile.aReplay is Replay[5]: copying the struct member gives the original's copy
+// order.
+void GM_vShowAwardReplay(MsgArg* pArgs, MsgArg* pResult) {
     Replay replay0;
     Replay replay6;
     Replay replay9;
@@ -3478,11 +3488,15 @@ void fn_8007F8A0(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Saves the working profile (lbl_80281ED4) into slot pArgs[0]: its name, created golfer and its
-// bytes from 0x54C0 up to 0xB634. A new slot keeps its money and gets n1C and 25,000 more. The
-// all-time records held under the slot's old name, and its saved replays, take the new name (the
-// course records were meant to: see the EA bug below).
-void fn_8007FA60(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 181: saves part of the profile being worked on (lbl_80281ED4) into save slot
+// pArgs[0]: its name, its created golfer (createdGolfer and bytes 0x54C0..0x5500) and its looks,
+// dates, assets and unlock bits (0x5500 up to tour); the slot keeps its own stats, awards and
+// money. A slot with no profile loaded gets its money plus lbl_801D7148.n1C plus 25,000. The slot
+// is marked active and loaded and backed up (fn_80077808), gets TOUR card level 1 if it has none,
+// and its PGA TOUR seasons are cleared (GM_PgaTourSim_ClearAllSeasons). Its saved replays' golfer
+// and the all-time records held under its old name take the new name; the course records were meant
+// to as well (the EA bug below).
+void GM_vSaveCreatedPlayerToSlot(MsgArg* pArgs, MsgArg* pResult) {
     char szOld[0x20];           // the size is unknown (0x20 gives the original's frame)
     int  nSlot;
     int  nMoney;
@@ -3533,20 +3547,27 @@ void fn_8007FA60(MsgArg* pArgs, MsgArg* pResult) {
     GM_PgaTourSim_ClearAllSeasons(&gpSaveData[nSlot].tour);
 }
 
-void fn_8007FCC0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 182: lbl_801D7148.nMode, the game mode fn_80079AD4 records as the menus start a
+// game (the session's, or 4 a ladder event, 23 the PGA TOUR, 27 a trophy ball's replay, 28 the
+// lessons with a TOUR card); -1 after the front end's setup.
+void GM_vGetMenuGameMode(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_801D7148.nMode;
 }
 
-void fn_8007FCD4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 183: sets lbl_801D7148.nMode (GM_vGetMenuGameMode) to pArgs[0].
+void GM_vSetMenuGameMode(MsgArg* pArgs, MsgArg* pResult) {
     lbl_801D7148.nMode = pArgs[0].i;
 }
 
-void fn_8007FCE8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 184: whether save profile pArgs[0] has changed (bChanged: a stat, an award or
+// its money changed or a challenge started since a round was last set up).
+void GM_vIsProfileChanged(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gpSaveData[pArgs[0].i].bChanged;
 }
 
-// The most rewards any one profile has unlocked, or the cheat codes have, if that is more.
-void fn_8007FD0C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 185: the most rewards (of the first 18, aRewardUnlocked) any of the five save
+// profiles has unlocked, or the cheat codes' unlocks (lbl_80281DF4) have, if that is more.
+void GM_vGetMostRewardsUnlocked(MsgArg* pArgs, MsgArg* pResult) {
     int i;
     int j;
     int nCount;
@@ -3576,16 +3597,23 @@ void fn_8007FD0C(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = nMax;
 }
 
-void fn_8007FEAC(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 186: pArgs[0] printed into the string pArgs[1] with thousands commas, "12,345"
+// (fn_800907AC); the menus' twin of the round's GM_vFormatWithCommas.
+void GM_vFEFormatWithCommas(MsgArg* pArgs, MsgArg* pResult) {
     fn_800907AC(pArgs[0].i, ((MsgString*)pArgs[1].p)->pStr);
 }
 
-void fn_8007FED8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 187: lbl_801D7148.b18: set by the front end's setup (fn_80076E48), cleared by
+// the "THEKITCHENSINK" cheat code and by front-end message 188. While it is clear, a profile stored
+// without a TOUR card gets level 1 (GM_vStoreProfileInSlot).
+void GM_vGetTourCardWithheld(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_801D7148.b18;
 }
 
-// Set b18; clearing it gives slot 0's profile (and its backup) TOUR card level 1 if it has none.
-void fn_8007FEEC(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 188: sets lbl_801D7148.b18 (GM_vGetTourCardWithheld) to pArgs[0]; clearing it
+// gives save profile 0 TOUR card level 1 when it has none, and its backup (p658[0]) too when that
+// has none.
+void GM_vSetTourCardWithheld(MsgArg* pArgs, MsgArg* pResult) {
     lbl_801D7148.b18 = pArgs[0].i;
     if (lbl_801D7148.b18 == 0 && gpSaveData[0].nTourCardLevel == 0) {
         if (lbl_801D7148.p658[0].nTourCardLevel < 1) {
@@ -3595,22 +3623,30 @@ void fn_8007FEEC(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_8007FF3C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 189: whether the menu golfer is hidden (gpCrAPState->bHidden, which
+// GM_vHideCharacter sets).
+void GM_vIsCharacterHidden(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gpCrAPState->bHidden;
 }
 
-void fn_8007FF4C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 190: the controller player pArgs[0] uses (gSession.nController; 9 is
+// CONTROLLER_CPU), as GM_vSetPlayerController sets it.
+void GM_vGetPlayerController(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gSession.nController[pArgs[0].i];
 }
 
-// What unlocks a course.
-void fn_8007FF6C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 191: the money that unlocks course pArgs[0] (gEarningsTable.aCoursePrice: a
+// profile's nTotalCash must reach it; 0 not for sale).
+void GM_vGetCoursePrice(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gEarningsTable.aCoursePrice[pArgs[0].i].nPrice;
 }
 
-// Make the profile being worked on a new one named "USER<n>" and save it into slot pArgs[0]. A
-// slot that had no profile gets 25000 more money, plus n1C.
-void fn_8007FF8C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 192: names the profile being worked on (lbl_80281ED4) "USER<n>", n being slot
+// pArgs[0] + 1 (fn_80057ED0: its name and its created golfer's last name), and stores it in that
+// save slot: when the slot has no profile loaded, lbl_801D7148.n1C plus 25,000 is first added to
+// its money; it is marked active, gets TOUR card level 1 if it has none, the slot is marked loaded
+// and backed up (fn_80077808).
+void GM_vSaveProfileWithDefaultName(MsgArg* pArgs, MsgArg* pResult) {
     s32 nSlot = pArgs[0].i;
     char szName[16];
 
@@ -3628,9 +3664,11 @@ void fn_8007FF8C(MsgArg* pArgs, MsgArg* pResult) {
     fn_80077808(nSlot);
 }
 
-// Hole pArgs[1]'s par on course pArgs[0]. Below 0 it is the custom round being edited (slot n3,
-// round n4); 22 and 24..29 are built rounds, whose holes come from other courses.
-void fn_80080054(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 193: the par of hole pArgs[1] (0-based) of course pArgs[0] (fn_800D2ABC). Below
+// 0 it is the saved round being edited (save slot lbl_80281ED4->n3, round n4: that entry's course
+// and hole); 22 and 24..29 are built rounds, whose holes come from other courses (fn_800D3118,
+// fn_800D315C).
+void GM_vGetHolePar(MsgArg* pArgs, MsgArg* pResult) {
     int nCourse;
     int nCourseArg = pArgs[0].i;
 
@@ -3654,8 +3692,9 @@ void fn_80080054(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_800D2ABC(nCourseArg, pArgs[1].i);
 }
 
-// The saved replay's course, hole and golfer.
-void fn_8008017C(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 194: the name of the replay's course (lbl_80191990[gReplayData.nCourse]) into
+// the string pArgs[0].
+void GM_vGetReplayCourseName(MsgArg* pArgs, MsgArg* pResult) {
     strcpy(((MsgString*)pArgs[0].p)->pStr, lbl_80191990[gReplayData.nCourse]);
 }
 
