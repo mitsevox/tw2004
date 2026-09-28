@@ -135,8 +135,8 @@ f32 Misc_RandFuncf(int nStream) {
     f32 f;
 
     f = 0.0f;
-    // port: writes the float's bits through a u32 pointer (a union does not keep the store of
-    // 0.0f above, which the original has); build with -fno-strict-aliasing or use memcpy.
+    // port: writes the float's bits through a u32 pointer (a union does not keep the store of 0.0f
+    //       above, which the original has); build with -fno-strict-aliasing or use memcpy.
     *(u32*)&f = (Misc_RandFunc(nStream) & 0x7FFFFF) | 0x3F800000;
     f -= 1.0f;
     return f;

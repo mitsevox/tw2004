@@ -2,8 +2,8 @@
 // (lbl_802820E8, 50 of them, each wrapping one hardware voice) and the audio-RAM (ARAM) heap.
 //
 // port: almost everything here drives the GameCube's audio hardware through Nintendo's libraries
-// (AX voices, the MIX mixer, ARAM DMA, the CPU data cache). A PC build keeps the voice table and
-// its state machine and replaces those calls with its own sound back end.
+//       (AX voices, the MIX mixer, ARAM DMA, the CPU data cache). A PC build keeps the voice table
+//       and its state machine and replaces those calls with its own sound back end.
 
 #ifndef CORE_STARTUP_H
 #define CORE_STARTUP_H

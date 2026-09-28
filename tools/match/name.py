@@ -113,17 +113,22 @@ def update_markdown(rows):
 
 
 def wrap_comment(text, indent=''):
-    """// lines of at most 100 columns; each fake match: / port: / EA bug: label starts a line."""
+    """// lines of at most 100 columns; each fake match: / port: / EA bug: label starts a line. A
+    `port:` note's continuation lines are indented under its text ("//       "), so a porter sees
+    where the note ends."""
     out = []
     for part in re.split(r'\s+(?=(?:fake match:|port:|EA bug:))', text.strip()):
         lines, cur = [], ''
+        cont = '//       ' if part.startswith('port:') else '// '
         for w in part.split():
-            if cur and len(indent) + 3 + len(cur) + 1 + len(w) > 100:
+            pre = cont if lines else '// '
+            if cur and len(indent) + len(pre) + len(cur) + 1 + len(w) > 100:
                 lines.append(cur)
                 cur = w
             else:
                 cur = f'{cur} {w}' if cur else w
-        out += [f'{indent}// {l}' for l in lines + [cur]]
+        lines.append(cur)
+        out += [f'{indent}{"// " if k == 0 else cont}{l}' for k, l in enumerate(lines)]
     return out
 
 

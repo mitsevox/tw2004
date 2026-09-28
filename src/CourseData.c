@@ -39,7 +39,7 @@ void fn_800D2A30(void) {
 }
 
 // port: both chunks are copied straight into their tables; they are big-endian on disc, so a
-// little-endian port converts them field by field here (docs/format-byteorder.md)
+//       little-endian port converts them field by field here (docs/format-byteorder.md)
 void fn_800D2A64(UStreamObject* pObject) {
     Stream_StreamLoadFixedSize(pObject, sizeof(lbl_801FA2F4), lbl_801FA2F4);
 }

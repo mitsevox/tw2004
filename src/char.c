@@ -280,7 +280,7 @@ void* Character_GetRandomMtaLib(Character* pChar, int nGroup, int n) {
 
     if ((pBank = fn_8001F760(pChar->nSlot)) != NULL) {
         // port: EA passes fn_8001F780's arguments (with the count's address) to fn_8001F79C, which
-        // takes three: the count's address arrives as its unused n, and n is ignored
+        //       takes three: the count's address arrives as its unused n, and n is ignored
         pItem = ((void* (*)(MalBank*, int, int*, int))fn_8001F79C)(pBank, nGroup, &nNum, n);
     }
     return pItem;

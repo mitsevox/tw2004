@@ -802,7 +802,7 @@ void fn_800676AC(void) {
 
 void fn_800676B8(void) {
     // port: SitDevFile.c defines the handler with the object's first word (the scripts) as its
-    // parameter; UStream calls it with the object. Same address on the GameCube.
+    //       parameter; UStream calls it with the object. Same address on the GameCube.
     Stream_RegisterLoadChunkCallback('sscr', (void (*)(UStreamObject*))SitDev_LoadScripts);
 }
 

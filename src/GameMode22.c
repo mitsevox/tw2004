@@ -442,7 +442,7 @@ void fn_801264B8(void) {
     // allocation, which puts pPlayer and pScore in different registers (the original's r8 / r7:
     // the peephole then loads through pPlayer + 0xEBC), and it is deleted after allocation.
     // port: reads pPlayer uninitialised when there are no players (the value is discarded);
-    // truncates the pointer to 32 bits; a port leaves this line out.
+    //       truncates the pointer to 32 bits; a port leaves this line out.
     nWinner = (s32)((u64)(s64)nWinner | ((u64)(u32)pPlayer << 32));
     lbl_80195498.n8 = nWinner;
     lbl_80195498.bC = 1;

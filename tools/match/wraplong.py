@@ -106,6 +106,8 @@ def main():
             if s.startswith('//') and ' ' in s[3:LIMIT - (len(l) - len(s))]:
                 # a whole-line comment: move the words past the limit to a new comment line
                 pre = l[:len(l) - len(s)] + '// '
+                if s.startswith(('// port:', '//       ')):
+                    pre += '      '                     # a port: note's lines stay under its text
                 cut = l.rfind(' ', 0, 101)                    # docs/style.md: comments wrap at 100
                 if cut > len(pre):
                     rest = l[cut + 1:]

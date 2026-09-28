@@ -466,7 +466,7 @@ u32 fn_800AFD8C(u16 nVoice) {
     }
     // fake match: one 32-bit load across both halves (combining them in C loads each alone).
     // port: this reads a u32 at a 2-byte boundary and assumes big-endian; a port should use
-    // ((u32)n1B2 << 16 | n1B4).
+    //       ((u32)n1B2 << 16 | n1B4).
     return *(u32*)&p->pVpb->n1B2 >> 1;
 }
 
@@ -629,7 +629,7 @@ void fn_800B0338(u16 nVoice, MovieSoundBlock* pBlock, int nChannel, int nMode) {
     u32* pCoefs;
     u16 nHeader;
     // port: the coefficients sit at a 2-byte boundary and EA copies them as words, which the
-    // GameCube allows; a port should copy the 32 bytes with memcpy.
+    //       GameCube allows; a port should copy the 32 bytes with memcpy.
     if (nChannel == 0) {
         pCoefs = (u32*)pBlock->a1A;
         nHeader = pBlock->aDataL[0];

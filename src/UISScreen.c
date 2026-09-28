@@ -755,7 +755,7 @@ s32 _DetermineVisibility(UISScreenT* pScreen, UISControlInfoT* pTarget, s32 cont
                 // unchanged). The shifts become a chain of word copies; each copy-propagation pass
                 // removes one link, so EA's copy of the call result survives (mr r0,r3; cmpwi r0,-1).
                 // port: relies on the conversion to s64 wrapping and on >> of a negative s64 being
-                // arithmetic.
+                //       arithmetic.
                 iResult = (s32)((s64)((u64)(u32)iResult << 32) >> 32);
                 if (iResult != -1) return iResult;
             }
@@ -998,8 +998,8 @@ s32 _ParseMaps(UISInfoT* pInfo, UISScreenT* pScreen, UISStackInfoT* pStackInfo, 
                         // fake match: nRet through a 64-bit shift up and back down (unchanged), then
                         // a dropped identity conversion: the copy chain keeps EA's copy of the call
                         // result (mr r0,r3; cmpwi r0,2).
-                        // port: relies on the conversion to s64 wrapping and on >> of a negative s64
-                        // being arithmetic.
+                        // port: relies on the conversion to s64 wrapping and on >> of a negative
+                        //       s64 being arithmetic.
                         nRet = (s32)((s64)((u64)(u32)nRet << 32) >> 32);
                         nRet = (u32)(s32)nRet;
                         if (nRet == UISPROCESS_HARDABORT) return nRet;

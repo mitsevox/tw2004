@@ -506,8 +506,8 @@ void Golfer_TableByteSwap(void) {
     for (i = 0; i < NUM_GOLFERS; i++) {
         pSrc = (u8*)&gGolferTable[i] + 0x98;
         // port: 'stat' is little-endian on disc; a little-endian port does not swap here. Only
-        // 0x98..0x140 of each record is swapped, in 8-byte units (the u32 at 0x90 is not); the
-        // records are then read in place as GolferRecord.
+        //       0x98..0x140 of each record is swapped, in 8-byte units (the u32 at 0x90 is not);
+        //       the records are then read in place as GolferRecord.
         BYTESWAP_SWAPDATA(&pSrc, (u8*)&gGolferTable[i] + 0x98, 0xA8, 8);
     }
 }
@@ -515,7 +515,7 @@ void Golfer_TableByteSwap(void) {
 // The 'rcrd' handler: the courses' records into the session.
 void Session_OnRecordsLoaded(UStreamObject* pObject) {
     // port: the records are big-endian on disc and copied straight over the course-record structs;
-    // a little-endian port converts them field by field here.
+    //       a little-endian port converts them field by field here.
     Mem_cpy(gSession.aCourseRecord, pObject->pData, pObject->uSize);
     StaticMem_Free(pObject);
 }

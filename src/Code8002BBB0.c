@@ -54,8 +54,8 @@ void AI_TargetsLoad(u8* pChunk) {
 
     gNumAITargets = 0;
     // port: the course's AI targets are big-endian and read in place: AITargetDef is laid over the
-    // chunk (and written to), and gAITargets points into it; a little-endian port converts the
-    // chunk's AITargetDefs before this loop (the count at +2 is read with BES16).
+    //       chunk (and written to), and gAITargets points into it; a little-endian port converts
+    //       the chunk's AITargetDefs before this loop (the count at +2 is read with BES16).
     pDef = (AITargetDef*)(pChunk + 4);
     for (i = 0; i < BES16(pChunk + 2); pDef++, i++) {
         gAITargets[i].pDef = pDef;

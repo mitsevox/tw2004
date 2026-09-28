@@ -128,8 +128,8 @@ loop:
     blr
 }
 #else
-// port: untested, the plain-C versions for compilers without paired singles. The paired-single
-// code rounds each multiply-add the same way, so results can differ in the last bits.
+// port: untested, the plain-C versions for compilers without paired singles. The paired-single code
+//       rounds each multiply-add the same way, so results can differ in the last bits.
 void LLMath_mat44fltMultiply(float mtx[4][4], Vec4* src, Vec4* dst) {
     f32* pIn = (f32*)src;
     f32 out[4];
@@ -343,8 +343,8 @@ asm f32 LLMath_DistanceBetween3(register f32* pA, register f32* pB) {
     blr
 }
 #else
-// port: untested, the plain-C versions for compilers without paired singles. The originals use
-// the hardware square-root estimate plus one refinement step, so results differ in the last bits.
+// port: untested, the plain-C versions for compilers without paired singles. The originals use the
+//       hardware square-root estimate plus one refinement step, so results differ in the last bits.
 static f32 Vec3_LengthSq(const f32* p) {
     return p[0] * p[0] + p[1] * p[1] + p[2] * p[2];
 }

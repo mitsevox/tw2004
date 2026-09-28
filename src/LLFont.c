@@ -506,7 +506,7 @@ void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
                 }
                 if (pCtx->n10 != 0) {
                     // port: EA drops the colours fn_8001208C returns, so the gradients change
-                    // nothing here.
+                    //       nothing here.
                     if (pCtx->n10 & 4) {
                         f32 fZero = 0.0f;
                         f32 fGYMid;

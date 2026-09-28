@@ -233,8 +233,8 @@ asm void fn_80076A38(register f32* pA, register f32* pOut) {
     blr
 }
 #else
-// port: untested, the plain-C version for compilers without paired singles; ps_res is an
-// estimate good to about 1/4096, this is the exact reciprocal.
+// port: untested, the plain-C version for compilers without paired singles; ps_res is an estimate
+//       good to about 1/4096, this is the exact reciprocal.
 void fn_80076A38(f32* pA, f32* pOut) {
     pOut[0] = 1.0f / pA[0];
     pOut[1] = 1.0f / pA[1];

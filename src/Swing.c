@@ -95,9 +95,9 @@ enum {
                t * (gForgivenessTable[2][rowS] - gForgivenessTable[1][rowS]);                  \
     }
 
-// port: at these calls the original sign-extends Golfer_GetAttribute's result as if it returned
-// s8, while its definition in Golfer.c returns an int; the cast reproduces that. Calling through
-// the mismatched type is undefined in standard C: a port writes (s8)Golfer_GetAttribute(...).
+// port: at these calls the original sign-extends Golfer_GetAttribute's result as if it returned s8,
+//       while its definition in Golfer.c returns an int; the cast reproduces that. Calling through
+//       the mismatched type is undefined in standard C: a port writes (s8)Golfer_GetAttribute(...).
 #define GOLFER_GET_ATTRIBUTE_S8(p, nAttr, nMode) \
     (((s8 (*)(Player*, int, int))Golfer_GetAttribute)(p, nAttr, nMode))
 

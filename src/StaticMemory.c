@@ -8,8 +8,8 @@
 // block outlives that. The fill bytes show a byte's state: 0x77 never taken since the reset, 0x33
 // or 0x55 taken (low or high end), 0x11 freed.
 //
-// port: the span table holds addresses as signed 32-bit integers, and the code compares and
-// aligns them as integers; a 64-bit port needs a wider table.
+// port: the span table holds addresses as signed 32-bit integers, and the code compares and aligns
+//       them as integers; a 64-bit port needs a wider table.
 
 #include "engine.h"
 

@@ -198,7 +198,8 @@ The base types and the platform layer:
   no `__MWERKS__`.
 
 When the original's code can only be matched with one of these, keep it and say why with
-`// port: <why>` on the line or the line before, so a porter knows to look there. Data read from
+`// port: <why>` on the line or the line before, so a porter knows to look there (a longer note's
+next lines are indented under its text, `//       `, so it is clear where the note ends). Data read from
 the disc or the memory card is big-endian and laid out for a 32-bit machine: read it through the
 loader's byte-order helpers, never by laying a struct over the buffer in new code.
 

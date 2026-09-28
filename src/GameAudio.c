@@ -1878,7 +1878,7 @@ void Gaud_StartFEMusic(void) {
 // commentary volume option is 0. Within 15 frames of Gaud_StopComment the line is queued, and
 // Gaud_Cycle plays it when the wait runs out.
 // port: the callers pass nKind and nMsg as full ints (their prototype takes int), but this body was
-// compiled for a u8 nKind and a u16 nMsg: it stores and passes them on without masking.
+//       compiled for a u8 nKind and a u16 nMsg: it stores and passes them on without masking.
 void Gaud_StartComment(int nKind, int nMsg, int a) {
     if ((s8)gSession.options.a0[4] != 0) {
         if (lbl_80282054 != 0) {
@@ -1889,7 +1889,7 @@ void Gaud_StartComment(int nKind, int nMsg, int a) {
             return;
         }
         // port: EA passes nKind and nMsg as ints, unmasked, to Aud_EmiSetTrackStream's u8 and u16
-        // parameters
+        //       parameters
         ((void (*)(u8, u8, int, int, s32))Aud_EmiSetTrackStream)(lbl_80281419, 0, nKind, nMsg, a);
         Aud_EmiSetTrackStatus(lbl_80281419, 0, 1);
     }

@@ -87,7 +87,7 @@ void _ParseRateFncs(UISInfoT* pInfo, u32 MSElapsed) {
                 // allocation and stays a neighbour of every variable live here: one more for each
                 // of them, which gives EA's allocation order.
                 // port: relies on the conversion to s64 wrapping and on >> of a negative s64 being
-                // arithmetic; truncates the pointer to 32 bits. A port leaves this line out.
+                //       arithmetic; truncates the pointer to 32 bits. A port leaves this line out.
                 pfModVal = (f32*)(u32)((s64)((u64)(u32)pfModVal << 32) >> 32);
                 // fake match: fStepValue read into newVal before the scale test (EA loads it there)
                 newVal = pRateFnc->AnimationData.fStepValue;

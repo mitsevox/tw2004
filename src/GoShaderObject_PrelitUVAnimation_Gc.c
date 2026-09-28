@@ -131,8 +131,8 @@ void fn_800711A4(StaticShaderObject* pObj) {
     if (pObj->anim.b8 != 0) {
         GXSetArray(9, pObj->pArrays->apPos[0], 12);
     }
-    // port: fn_80070168 (sweep_80070168.c) is defined without parameters but hands r3 and r4
-    // on to GXCallDisplayList
+    // port: fn_80070168 (sweep_80070168.c) is defined without parameters but hands r3 and r4 on to
+    //       GXCallDisplayList
     ((void (*)(void*, u32))fn_80070168)(pObj->anim.p4, pObj->anim.n0);
 }
 
@@ -276,8 +276,8 @@ void fn_800715D0(StaticShaderObject* pObj) {
     if (pObj->anim.b8 != 0) {
         GXSetArray(9, pObj->pArrays->apPos[0], 12);
     }
-    // port: fn_80070168 (sweep_80070168.c) is defined without parameters but hands r3 and r4
-    // on to GXCallDisplayList
+    // port: fn_80070168 (sweep_80070168.c) is defined without parameters but hands r3 and r4 on to
+    //       GXCallDisplayList
     ((void (*)(void*, u32))fn_80070168)(pObj->anim.p4, pObj->anim.n0);
 }
 
@@ -301,8 +301,8 @@ void fn_80071680(StaticShaderObject* pObj) {
     if (pObj->anim.b8 != 0) {
         GXSetArray(9, pObj->pArrays->apPos[0], 12);
     }
-    // port: fn_80070168 (sweep_80070168.c) is defined without parameters but hands r3 and r4
-    // on to GXCallDisplayList
+    // port: fn_80070168 (sweep_80070168.c) is defined without parameters but hands r3 and r4 on to
+    //       GXCallDisplayList
     ((void (*)(void*, u32))fn_80070168)(pObj->anim.p4, pObj->anim.n0);
 }
 
@@ -458,8 +458,8 @@ void fn_80071A90(int nRow) {
 }
 
 // port: most hooks in these two tables are defined with their own object and data types, not their
-// field's (the pfn8 hooks of rows 6, 7 and 10 take nothing); each is cast to its field's type here,
-// and a port must call each through its real type.
+//       field's (the pfn8 hooks of rows 6, 7 and 10 take nothing); each is cast to its field's type
+//       here, and a port must call each through its real type.
 HookRow lbl_80188E78[1] = {
     {
         fn_8006FDCC, fn_8006FDD0,

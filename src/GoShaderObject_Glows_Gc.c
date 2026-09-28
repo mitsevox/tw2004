@@ -202,8 +202,8 @@ void fn_80098408(GlowQueued* pGlow, const f32* pPos) {
         } else {
             GXSetZMode(1, 3, 1);                // less or equal, with depth write
         }
-        // port: fn_80070168 (sweep_80070168.c) is defined without parameters but hands r3 and r4
-        // on to GXCallDisplayList: the list and its size
+        // port: fn_80070168 (sweep_80070168.c) is defined without parameters but hands r3 and r4 on
+        //       to GXCallDisplayList: the list and its size
         ((void (*)(void*, u32))fn_80070168)(lbl_801D99D0.a[pGlow->n25].p4, lbl_801D99D0.a[pGlow->n25].n0);
     }
 }

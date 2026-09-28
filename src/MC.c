@@ -39,7 +39,7 @@ s32 fn_801255C4(s32* pArgs);            // EASportsBio.c
 u32 lbl_8018C7C8[4] = {0x98, 0xA0, 0, 0xB0};
 
 // port: the table calls every entry as an MCOp; the entries cast here have other types in their
-// definitions (void results, int, MCCardPosStr*, s32*), which a port gives one signature.
+//       definitions (void results, int, MCCardPosStr*, s32*), which a port gives one signature.
 MCOpSet lbl_8018C7D8[4] = {
     {{MC_SaveOptions, MC_LoadOptions, (MCOp)fn_800A1758, fn_800A2630, (MCOp)MC_MemoryRequiredForOptions}},
     {{MC_SaveUser, (MCOp)MC_LoadUser, MC_GetNumUser, fn_800A26A0, (MCOp)fn_800A270C}},

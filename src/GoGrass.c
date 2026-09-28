@@ -298,7 +298,7 @@ void fn_8011E6E8(void) {
 
 void fn_8011E974(void) {
     // port: EA's GoGrass.c saw fn_800C6CB0 as returning int (its result is not masked here); it
-    // returns u8
+    //       returns u8
     if (lbl_80281900->p370 != NULL && lbl_80281900->n3E0 != 0 && ((int (*)(void))fn_800C6CB0)() == 0) {
         fn_8011EF88();
         fn_8011F3AC();

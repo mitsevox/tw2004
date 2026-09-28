@@ -53,7 +53,8 @@ typedef struct UIFileTables {
 // The menu UI's file (the 'DATS' object uiLoadFile.c keeps). Its lists hold offsets from the
 // file's start until fn_8008F488 adds the file's address to them.
 // port: the file stores 32-bit offsets in these pointer fields and in the lists' pointers, and
-// fn_8008F488 turns them into pointers in place; a 64-bit port must load the file into structs.
+//       fn_8008F488 turns them into pointers in place; a 64-bit port must load the file into
+//       structs.
 typedef struct UIFile {
     u32  u0;                    // 0x0
     UIFilePairs*  p4;           // 0x4  its pairs

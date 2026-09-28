@@ -577,8 +577,8 @@ TexBank* TX_spParseTextureGroupFromStream(u8* p, TexBank* pInto, int n) {
     int j;
 
     // port: `((T*)p)++` (a cast used as an lvalue) is a CodeWarrior extension, not ISO C; it means
-    // `x = (T*)p; p += sizeof(T);`. Written the plain way, the compiler folds every step into
-    // offsets from the parameter instead of keeping the cursor.
+    //       `x = (T*)p; p += sizeof(T);`. Written the plain way, the compiler folds every step into
+    //       offsets from the parameter instead of keeping the cursor.
     p += 0x10;
     pHead = ((TexBankHeader*)p)++;
     nSize = sizeof(TexBank) + pHead->n2 * sizeof(TexEntry) + pHead->n4 * sizeof(TexPalette);
