@@ -512,36 +512,36 @@ void GM_vSetCustomRoundIndex(MsgArg* pArgs, MsgArg* pResult);
 void GM_vGetFEProfileN5(MsgArg* pArgs, MsgArg* pResult);
 void GM_vSetFEProfileN5(MsgArg* pArgs, MsgArg* pResult);
 void GM_vFEMessage227_Return0(MsgArg* pArgs, MsgArg* pResult);
-void fn_80080CC8(MsgArg* pArgs, MsgArg* pResult);
-void fn_800810BC(MsgArg* pArgs, MsgArg* pResult);
-void fn_800810D8(MsgArg* pArgs, MsgArg* pResult);
-void fn_800810F4(MsgArg* pArgs, MsgArg* pResult);
-void fn_80081158(MsgArg* pArgs, MsgArg* pResult);
-void fn_800811E4(MsgArg* pArgs, MsgArg* pResult);
-void fn_80081270(MsgArg* pArgs, MsgArg* pResult);
-void fn_800812B0(MsgArg* pArgs, MsgArg* pResult);
-void fn_800812F0(MsgArg* pArgs, MsgArg* pResult);
-void fn_80081330(MsgArg* pArgs, MsgArg* pResult);
-void fn_80081370(MsgArg* pArgs, MsgArg* pResult);
-void fn_800813B0(MsgArg* pArgs, MsgArg* pResult);
-void fn_800813F0(MsgArg* pArgs, MsgArg* pResult);
-void fn_80081430(MsgArg* pArgs, MsgArg* pResult);
-void fn_80081470(MsgArg* pArgs, MsgArg* pResult);
-void fn_800814B0(MsgArg* pArgs, MsgArg* pResult);
-void fn_800814F0(MsgArg* pArgs, MsgArg* pResult);
-void fn_80081530(MsgArg* pArgs, MsgArg* pResult);
-void fn_800815E0(MsgArg* pArgs, MsgArg* pResult);
-void fn_80081634(MsgArg* pArgs, MsgArg* pResult);
-void fn_80081688(MsgArg* pArgs, MsgArg* pResult);
-void fn_800816DC(MsgArg* pArgs, MsgArg* pResult);
-void fn_80081718(MsgArg* pArgs, MsgArg* pResult);
-void fn_80081754(MsgArg* pArgs, MsgArg* pResult);
-void fn_80081790(MsgArg* pArgs, MsgArg* pResult);
-void fn_800817CC(MsgArg* pArgs, MsgArg* pResult);
-void fn_80081808(MsgArg* pArgs, MsgArg* pResult);
-void fn_80081844(MsgArg* pArgs, MsgArg* pResult);
-void fn_80081880(MsgArg* pArgs, MsgArg* pResult);
-void fn_800818BC(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetRandomCustomRoundHole(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetPlayerIsCPU(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetPlayerIsCPU(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetOptionN14(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetGreenSpeedOption(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetFairwaySpeedOption(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetGreenGridOption(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetCaddieTipsOption(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetPuttingTipOption(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetBreakLineOption(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetOnOffOption3(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetOnOffOption4(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetOnOffOption5(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetOnOffOption6(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetSwingAidOption(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetPowerBoostOption(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetSpinControlOption(MsgArg* pArgs, MsgArg* pResult);
+void GM_vSetOptionLevel2(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetOptionN14(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetGreenSpeedOption(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetFairwaySpeedOption(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetGreenGridOption(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetCaddieTipsOption(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetPuttingTipOption(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetBreakLineOption(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetOnOffOption3(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetOnOffOption4(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetOnOffOption5(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetOnOffOption6(MsgArg* pArgs, MsgArg* pResult);
+void GM_vGetSwingAidOption(MsgArg* pArgs, MsgArg* pResult);
 void fn_800818F8(MsgArg* pArgs, MsgArg* pResult);
 void fn_80081934(MsgArg* pArgs, MsgArg* pResult);
 void fn_80081970(MsgArg* pArgs, MsgArg* pResult);
@@ -958,30 +958,30 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[225] = GM_vGetFEProfileN5;
     gFEMessageHandlers[226] = GM_vSetFEProfileN5;
     gFEMessageHandlers[227] = GM_vFEMessage227_Return0;
-    gFEMessageHandlers[228] = fn_80080CC8;
-    gFEMessageHandlers[229] = fn_800810BC;
-    gFEMessageHandlers[230] = fn_800810D8;
-    gFEMessageHandlers[231] = fn_800810F4;
-    gFEMessageHandlers[232] = fn_80081158;
-    gFEMessageHandlers[233] = fn_800812B0;
-    gFEMessageHandlers[234] = fn_80081330;
-    gFEMessageHandlers[235] = fn_80081370;
-    gFEMessageHandlers[236] = fn_800813B0;
-    gFEMessageHandlers[237] = fn_800813F0;
-    gFEMessageHandlers[238] = fn_80081430;
-    gFEMessageHandlers[239] = fn_80081470;
-    gFEMessageHandlers[240] = fn_800814B0;
-    gFEMessageHandlers[241] = fn_800814F0;
-    gFEMessageHandlers[242] = fn_80081530;
-    gFEMessageHandlers[243] = fn_800815E0;
-    gFEMessageHandlers[244] = fn_80081634;
-    gFEMessageHandlers[245] = fn_80081718;
-    gFEMessageHandlers[246] = fn_80081790;
-    gFEMessageHandlers[247] = fn_800817CC;
-    gFEMessageHandlers[248] = fn_80081808;
-    gFEMessageHandlers[249] = fn_80081844;
-    gFEMessageHandlers[250] = fn_80081880;
-    gFEMessageHandlers[251] = fn_800818BC;
+    gFEMessageHandlers[228] = GM_vSetRandomCustomRoundHole;
+    gFEMessageHandlers[229] = GM_vSetPlayerIsCPU;
+    gFEMessageHandlers[230] = GM_vGetPlayerIsCPU;
+    gFEMessageHandlers[231] = GM_vSetOptionN14;
+    gFEMessageHandlers[232] = GM_vSetGreenSpeedOption;
+    gFEMessageHandlers[233] = GM_vSetCaddieTipsOption;
+    gFEMessageHandlers[234] = GM_vSetBreakLineOption;
+    gFEMessageHandlers[235] = GM_vSetOnOffOption3;
+    gFEMessageHandlers[236] = GM_vSetOnOffOption4;
+    gFEMessageHandlers[237] = GM_vSetOnOffOption5;
+    gFEMessageHandlers[238] = GM_vSetOnOffOption6;
+    gFEMessageHandlers[239] = GM_vSetSwingAidOption;
+    gFEMessageHandlers[240] = GM_vSetPowerBoostOption;
+    gFEMessageHandlers[241] = GM_vSetSpinControlOption;
+    gFEMessageHandlers[242] = GM_vSetOptionLevel2;
+    gFEMessageHandlers[243] = GM_vGetOptionN14;
+    gFEMessageHandlers[244] = GM_vGetGreenSpeedOption;
+    gFEMessageHandlers[245] = GM_vGetCaddieTipsOption;
+    gFEMessageHandlers[246] = GM_vGetBreakLineOption;
+    gFEMessageHandlers[247] = GM_vGetOnOffOption3;
+    gFEMessageHandlers[248] = GM_vGetOnOffOption4;
+    gFEMessageHandlers[249] = GM_vGetOnOffOption5;
+    gFEMessageHandlers[250] = GM_vGetOnOffOption6;
+    gFEMessageHandlers[251] = GM_vGetSwingAidOption;
     gFEMessageHandlers[252] = fn_800818F8;
     gFEMessageHandlers[253] = fn_80081934;
     gFEMessageHandlers[254] = fn_80081970;
@@ -1104,8 +1104,8 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[370] = fn_80083970;
     gFEMessageHandlers[371] = fn_80083974;
     gFEMessageHandlers[372] = fn_80083A44;
-    gFEMessageHandlers[374] = fn_80081688;
-    gFEMessageHandlers[375] = fn_800811E4;
+    gFEMessageHandlers[374] = GM_vGetFairwaySpeedOption;
+    gFEMessageHandlers[375] = GM_vSetFairwaySpeedOption;
     gFEMessageHandlers[380] = fn_80083A48;
     gFEMessageHandlers[381] = GM_vGetNumCrAPItems;
     gFEMessageHandlers[382] = GM_vGetCrAPItemValue;
@@ -1227,8 +1227,8 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[594] = fn_80083E94;
     gFEMessageHandlers[595] = fn_80083EB8;
     gFEMessageHandlers[596] = LadderMenu_GetAngleBetween;
-    gFEMessageHandlers[599] = fn_800816DC;
-    gFEMessageHandlers[600] = fn_80081270;
+    gFEMessageHandlers[599] = GM_vGetGreenGridOption;
+    gFEMessageHandlers[600] = GM_vSetGreenGridOption;
     gFEMessageHandlers[605] = TrophyRoom_GetTourTrophy;
     gFEMessageHandlers[606] = TrophyRoom_GetTourTrophyText;
     gFEMessageHandlers[608] = GM_vGetProfileProgress;
@@ -1316,8 +1316,8 @@ void FE_InitGameMessages(void) {
     gFEMessageHandlers[715] = fn_80084BE4;
     gFEMessageHandlers[718] = PGATourMsg_CheckAdvanceTournament;
     gFEMessageHandlers[720] = LadderMenu_GetEventName;
-    gFEMessageHandlers[721] = fn_80081754;
-    gFEMessageHandlers[722] = fn_800812F0;
+    gFEMessageHandlers[721] = GM_vGetPuttingTipOption;
+    gFEMessageHandlers[722] = GM_vSetPuttingTipOption;
     gFEMessageHandlers[723] = GM_vBonusTrophyBallsWon;
     gFEMessageHandlers[727] = fn_80084BE8;
     gFEMessageHandlers[725] = GM_vClearQueuedCrAPAnim;
@@ -4006,10 +4006,12 @@ void GM_vFEMessage227_Return0(MsgArg* pArgs, MsgArg* pResult) {
     *(s32*)pArgs[4].p = 0;
 }
 
-// Fill entry pArgs[2] of slot pArgs[0]'s saved round pArgs[1] with a random hole: a random course
-// from a list of 20 (course 0 twice, no 4 or 7) that this profile or the cheat codes have unlocked,
-// and a random hole number 0..17, drawn again while the round already holds that course and hole.
-void fn_80080CC8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 228: fills entry pArgs[2] of save slot pArgs[0]'s custom round pArgs[1] with a
+// random hole: a random course from a list of 20 (course 0 twice, so twice as likely; no 4, 7, 21
+// or 22) among those this profile or a cheat code (lbl_80281DF4) has unlocked, and a random hole
+// number 0..17, both drawn again while the round already holds that course and hole (the entry
+// being filled counts too).
+void GM_vSetRandomCustomRoundHole(MsgArg* pArgs, MsgArg* pResult) {
     int i;
     int nSlot = pArgs[0].i;
     int nRound = pArgs[1].i;
@@ -4049,16 +4051,23 @@ retry:
     gpSaveData[nSlot].aSavedRound[nRound].nHoleNum[nEntry] = nHoleNum;
 }
 
-void fn_800810BC(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 229: player slot pArgs[0] is a CPU player (pArgs[1] nonzero) or not
+// (lbl_801D7148.aCPU; the players' setup, fn_80079AD4, gives a CPU player CONTROLLER_CPU and no
+// profile). Message 230 reads it back.
+void GM_vSetPlayerIsCPU(MsgArg* pArgs, MsgArg* pResult) {
     lbl_801D7148.aCPU[pArgs[0].i] = pArgs[1].i;
 }
 
-void fn_800810D8(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 230: whether player slot pArgs[0] is a CPU player (lbl_801D7148.aCPU;
+// GM_vSetPlayerIsCPU sets it).
+void GM_vGetPlayerIsCPU(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_801D7148.aCPU[pArgs[0].i];
 }
 
-// Option n14: menu choices 1-3 are the values 0-2.
-void fn_800810F4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 231: game option n14 from the menu's choice pArgs[0]: 1, 2, 3 give 0, 1, 2;
+// another choice changes nothing. Message 243 reads it back; no other code reads it
+// (Options_SetDefaults sets it to 0).
+void GM_vSetOptionN14(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 1:
         gSession.options.n14 = 0;
@@ -4072,8 +4081,10 @@ void fn_800810F4(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Option n18: menu choices 1-3 are the values 0-2, applied at once.
-void fn_80081158(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 232: the green speed option (options.n18) from the menu's choice pArgs[0]: 1,
+// 2, 3 give 0, 1, 2 (another choice keeps the old value), then applied at once (fn_80055C40 sets
+// gGreenSpeedSetting, which the ball's roll reads). Message 244 reads it back.
+void GM_vSetGreenSpeedOption(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 1:
         gSession.options.n18 = 0;
@@ -4088,8 +4099,10 @@ void fn_80081158(MsgArg* pArgs, MsgArg* pResult) {
     fn_80055C40(gSession.options.n18);
 }
 
-// Option n20, the same way.
-void fn_800811E4(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 375: the fairway speed option (options.n20) from the menu's choice pArgs[0]: 1,
+// 2, 3 give 0, 1, 2 (another choice keeps the old value), then applied at once (fn_80055CAC sets
+// gFairwaySetting, which the ball's roll reads). Message 374 reads it back.
+void GM_vSetFairwaySpeedOption(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 1:
         gSession.options.n20 = 0;
@@ -4104,7 +4117,10 @@ void fn_800811E4(MsgArg* pArgs, MsgArg* pResult) {
     fn_80055CAC(gSession.options.n20);
 }
 
-void fn_80081270(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 600: the green grid option (options.bPuttingGrid: the grid on the green shows
+// with the putter, GoGreenGrid.c) from the menu's choice pArgs[0]: 1 on, 2 off; another choice
+// changes nothing. Message 599 reads it back.
+void GM_vSetGreenGridOption(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 1:
         gSession.options.bPuttingGrid = 1;
@@ -4115,7 +4131,10 @@ void fn_80081270(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_800812B0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 233: the caddie tips option (options.a24[0]; CTIP_ShowCaddieTip shows no tip
+// while it is off) from the menu's choice pArgs[0]: 1 on, 2 off; another choice changes nothing.
+// Message 245 reads it back.
+void GM_vSetCaddieTipsOption(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 1:
         gSession.options.a24[0] = 1;
@@ -4126,7 +4145,10 @@ void fn_800812B0(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_800812F0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 722: the putting tip option (options.a24[1]; the round's UI asks it with
+// IG_vShow_Putting_Tip) from the menu's choice pArgs[0]: 1 on, 2 off; another choice changes
+// nothing. Message 721 reads it back.
+void GM_vSetPuttingTipOption(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 1:
         gSession.options.a24[1] = 1;
@@ -4137,7 +4159,10 @@ void fn_800812F0(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_80081330(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 234: the break line option (options.a24[2]; GoBreakLine.c draws the putt's
+// break line only while it is on) from the menu's choice pArgs[0]: 1 on, 2 off; another choice
+// changes nothing. Message 246 reads it back.
+void GM_vSetBreakLineOption(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 1:
         gSession.options.a24[2] = 1;
@@ -4148,7 +4173,9 @@ void fn_80081330(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_80081370(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 235: on/off game option a24[3] from the menu's choice pArgs[0]: 1 on, 2 off;
+// another choice changes nothing. Only message 247 reads it back; the game never tests it.
+void GM_vSetOnOffOption3(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 1:
         gSession.options.a24[3] = 1;
@@ -4159,7 +4186,10 @@ void fn_80081370(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_800813B0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 236: on/off game option a24[4] from the menu's choice pArgs[0]: 1 on, 2 off;
+// another choice changes nothing. Message 248 reads it back, and the round's menu as option 6 of
+// GM_vGetOption; the game itself never tests it.
+void GM_vSetOnOffOption4(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 1:
         gSession.options.a24[4] = 1;
@@ -4170,7 +4200,9 @@ void fn_800813B0(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_800813F0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 237: on/off game option a24[5] from the menu's choice pArgs[0]: 1 on, 2 off;
+// another choice changes nothing. Only message 249 reads it back; the game never tests it.
+void GM_vSetOnOffOption5(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 1:
         gSession.options.a24[5] = 1;
@@ -4181,7 +4213,11 @@ void fn_800813F0(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_80081430(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 238: on/off game option a24[6] from the menu's choice pArgs[0]: 1 on, 2 off;
+// another choice changes nothing. Message 250 reads it back, the round's menu as option 5 of
+// GM_vGetOption; while it is off and the wind option is on (nWind 1 or more),
+// CharacterState_UpdateSKAState plays clip group 16 for the golfer whose ball is on the tee.
+void GM_vSetOnOffOption6(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 1:
         gSession.options.a24[6] = 1;
@@ -4192,7 +4228,10 @@ void fn_80081430(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_80081470(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 239: the swing aid option (options.a24[7]: Swing.c draws the club's trail on
+// the backswing and downswing only while it is on) from the menu's choice pArgs[0]: 1 on, 2 off;
+// another choice changes nothing. Message 251 reads it back.
+void GM_vSetSwingAidOption(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 1:
         gSession.options.a24[7] = 1;
@@ -4203,7 +4242,10 @@ void fn_80081470(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_800814B0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 240: the power boost option (options.bBoostEnabled; SW_vCheckForSwingBoost does
+// nothing while it is off) from the menu's choice pArgs[0]: 1 on, 2 off; another choice changes
+// nothing. Message 252 reads it back.
+void GM_vSetPowerBoostOption(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 1:
         gSession.options.bBoostEnabled = 1;
@@ -4214,7 +4256,10 @@ void fn_800814B0(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_800814F0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 241: the spin control option (options.bSpinEnabled; SW_vUpdateSpinControl does
+// nothing while it is off) from the menu's choice pArgs[0]: 1 on, 2 off; another choice changes
+// nothing. Message 253 reads it back.
+void GM_vSetSpinControlOption(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 1:
         gSession.options.bSpinEnabled = 1;
@@ -4225,8 +4270,11 @@ void fn_800814F0(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Option a0[2]: the menus' choices 1..6 are the values 5, 0, 1, 2, 3, 4.
-void fn_80081530(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 242: level option a0[2] (0..5, default 5) from the menu's choice pArgs[0]: 1
+// gives 5, 2..6 give 0..4, as the commentary volume's (GM_vSetCommentaryOption); another choice
+// changes nothing. Unlike the effects, music and commentary levels it goes to no mixer: only
+// message 254 reads it back.
+void GM_vSetOptionLevel2(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 1:
         gSession.options.a0[2] = 5;
@@ -4249,8 +4297,9 @@ void fn_80081530(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Option n14 as the menus' choice (1..3).
-void fn_800815E0(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 243: game option n14 as the menu's choice: 0, 1, 2 answer 1, 2, 3 (another
+// value leaves pResult alone). GM_vSetOptionN14 sets it.
+void GM_vGetOptionN14(MsgArg* pArgs, MsgArg* pResult) {
     switch (gSession.options.n14) {
     case 0:
         pResult->i = 1;
@@ -4264,8 +4313,9 @@ void fn_800815E0(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Option n18 as the menus' choice (1..3).
-void fn_80081634(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 244: the green speed option (options.n18) as the menu's choice: 0, 1, 2 answer
+// 1, 2, 3 (another value leaves pResult alone). GM_vSetGreenSpeedOption sets it.
+void GM_vGetGreenSpeedOption(MsgArg* pArgs, MsgArg* pResult) {
     switch (gSession.options.n18) {
     case 0:
         pResult->i = 1;
@@ -4279,8 +4329,9 @@ void fn_80081634(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Option n20 as the menus' choice (1..3).
-void fn_80081688(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 374: the fairway speed option (options.n20) as the menu's choice: 0, 1, 2
+// answer 1, 2, 3 (another value leaves pResult alone). GM_vSetFairwaySpeedOption sets it.
+void GM_vGetFairwaySpeedOption(MsgArg* pArgs, MsgArg* pResult) {
     switch (gSession.options.n20) {
     case 0:
         pResult->i = 1;
@@ -4294,7 +4345,9 @@ void fn_80081688(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_800816DC(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 599: the green grid option (options.bPuttingGrid) as the menu's choice: 1 on, 2
+// off (another value leaves pResult alone). GM_vSetGreenGridOption sets it.
+void GM_vGetGreenGridOption(MsgArg* pArgs, MsgArg* pResult) {
     switch (gSession.options.bPuttingGrid) {
     case 1:
         pResult->i = 1;
@@ -4305,7 +4358,9 @@ void fn_800816DC(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_80081718(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 245: the caddie tips option (options.a24[0]) as the menu's choice: 1 on, 2 off
+// (another value leaves pResult alone). GM_vSetCaddieTipsOption sets it.
+void GM_vGetCaddieTipsOption(MsgArg* pArgs, MsgArg* pResult) {
     switch (gSession.options.a24[0]) {
     case 1:
         pResult->i = 1;
@@ -4316,7 +4371,9 @@ void fn_80081718(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_80081754(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 721: the putting tip option (options.a24[1]) as the menu's choice: 1 on, 2 off
+// (another value leaves pResult alone). GM_vSetPuttingTipOption sets it.
+void GM_vGetPuttingTipOption(MsgArg* pArgs, MsgArg* pResult) {
     switch (gSession.options.a24[1]) {
     case 1:
         pResult->i = 1;
@@ -4327,7 +4384,9 @@ void fn_80081754(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_80081790(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 246: the break line option (options.a24[2]) as the menu's choice: 1 on, 2 off
+// (another value leaves pResult alone). GM_vSetBreakLineOption sets it.
+void GM_vGetBreakLineOption(MsgArg* pArgs, MsgArg* pResult) {
     switch (gSession.options.a24[2]) {
     case 1:
         pResult->i = 1;
@@ -4338,7 +4397,9 @@ void fn_80081790(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_800817CC(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 247: on/off game option a24[3] as the menu's choice: 1 on, 2 off (another value
+// leaves pResult alone). GM_vSetOnOffOption3 sets it.
+void GM_vGetOnOffOption3(MsgArg* pArgs, MsgArg* pResult) {
     switch (gSession.options.a24[3]) {
     case 1:
         pResult->i = 1;
@@ -4349,7 +4410,9 @@ void fn_800817CC(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_80081808(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 248: on/off game option a24[4] as the menu's choice: 1 on, 2 off (another value
+// leaves pResult alone). GM_vSetOnOffOption4 sets it.
+void GM_vGetOnOffOption4(MsgArg* pArgs, MsgArg* pResult) {
     switch (gSession.options.a24[4]) {
     case 1:
         pResult->i = 1;
@@ -4360,7 +4423,9 @@ void fn_80081808(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_80081844(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 249: on/off game option a24[5] as the menu's choice: 1 on, 2 off (another value
+// leaves pResult alone). GM_vSetOnOffOption5 sets it.
+void GM_vGetOnOffOption5(MsgArg* pArgs, MsgArg* pResult) {
     switch (gSession.options.a24[5]) {
     case 1:
         pResult->i = 1;
@@ -4371,7 +4436,9 @@ void fn_80081844(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_80081880(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 250: on/off game option a24[6] as the menu's choice: 1 on, 2 off (another value
+// leaves pResult alone). GM_vSetOnOffOption6 sets it.
+void GM_vGetOnOffOption6(MsgArg* pArgs, MsgArg* pResult) {
     switch (gSession.options.a24[6]) {
     case 1:
         pResult->i = 1;
@@ -4382,7 +4449,9 @@ void fn_80081880(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-void fn_800818BC(MsgArg* pArgs, MsgArg* pResult) {
+// Front-end message 251: the swing aid option (options.a24[7], the swing trail) as the menu's
+// choice: 1 on, 2 off (another value leaves pResult alone). GM_vSetSwingAidOption sets it.
+void GM_vGetSwingAidOption(MsgArg* pArgs, MsgArg* pResult) {
     switch (gSession.options.a24[7]) {
     case 1:
         pResult->i = 1;

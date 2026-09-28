@@ -452,7 +452,7 @@ typedef struct GameOptions {
     s8   a0[5];                 // 0x00  levels 0..5 from the menus (the mixer gets 0.2 x level):
                                 //       [0] effects (Gaud_SetSfxLevel), [1] music
                                 //       (Gaud_SetMusicLevel), [2] a menu level (FE_MessageTable.c
-                                //       fn_80081530), [4] commentary (Gaud_SetCommentLevel; 4 while
+                                //       GM_vSetOptionLevel2), [4] commentary (Gaud_SetCommentLevel; 4 while
                                 //       the lessons run)
     u8   bGimmes;               // 0x05  (gSession + 0xE7D) the Gimmes option, default on
     u8   bSkipCameras;          // 0x06  (gSession + 0xE7E) camera states end at once (inferred)
@@ -465,7 +465,7 @@ typedef struct GameOptions {
     s32  n14;                   // 0x14
     s32  n18;                   // 0x18  -> fn_80055C40
     s32  n1C;                   // 0x1C  -> fn_80055CD0
-    s32  n20;                   // 0x20  0..2 -> fn_80055CAC (FE_MessageTable.c fn_800811E4)
+    s32  n20;                   // 0x20  0..2 -> fn_80055CAC (FE_MessageTable.c GM_vSetFairwaySpeedOption)
     u8   a24[8];               // 0x24  eight on/off options, default on; [7] (0xEA3) the swing trail
     u8   bBoostEnabled;         // 0x2C  (gSession + 0xEA4)
     u8   bSpinEnabled;          // 0x2D  (gSession + 0xEA5)

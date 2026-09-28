@@ -2951,7 +2951,7 @@ void IG_vGetLocalUserIndex(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Command 199: whether the putting tip is shown: on/off game option a24[1], which the menus set
-// (FE_MessageTable.c fn_800812F0).
+// (FE_MessageTable.c GM_vSetPuttingTipOption).
 void IG_vShow_Putting_Tip(MsgArg* pArgs, MsgArg* pResult) {
     if (gSession.options.a24[1] != 0) {
         pResult->i = 1;
