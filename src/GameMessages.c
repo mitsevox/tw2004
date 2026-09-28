@@ -35,8 +35,9 @@ s32 gGameMsgPendingValue;   // the one value sent with pending bits 1, 0x10 and 
 u8  gTipShown[14];          // per statistic tip: already shown this hole (GUI_QueueTip, GameAnalysis)
 
 // Opens the intro popup of a Play Now challenge in the caddie tip window: message 48 with the
-// challenge's group (fn_800EAC7C). STATEFUNC_SwingInit calls it at a human's first swing while the
-// intro is pending; the swing is held until the UI closes the window (GUI_IsCaddieTipWindowOpen).
+// challenge's group (PlayNow_GetCurrentGroup). STATEFUNC_SwingInit calls it at a human's first
+// swing while the intro is pending; the swing is held until the UI closes the window
+// (GUI_IsCaddieTipWindowOpen).
 void GUI_ShowChallengeIntro(int nGroup) {
     GameMsg_SendInt(48, nGroup);
     lbl_802822BE = 1;

@@ -1770,8 +1770,8 @@ void GM_vGetEventNameAndText(MsgArg* pArgs, MsgArg* pResult) {
                GameModeDriverRTE_GetDescription(GM_RealtimeMode_GetSelectedEvent(&nRound)));
         return;
     }
-    strcpy(((MsgString*)pArgs[0].p)->pStr, PlayNow_GetGroupName(fn_800EAC7C()));
-    strcpy(((MsgString*)pArgs[1].p)->pStr, PlayNow_GetGroupDescription(fn_800EAC7C()));
+    strcpy(((MsgString*)pArgs[0].p)->pStr, PlayNow_GetGroupName(PlayNow_GetCurrentGroup()));
+    strcpy(((MsgString*)pArgs[1].p)->pStr, PlayNow_GetGroupDescription(PlayNow_GetCurrentGroup()));
 }
 
 // Plays UI sound pArgs[1] (command 106; Gaud_PlayGameUISound, which does not use pArgs[0]).

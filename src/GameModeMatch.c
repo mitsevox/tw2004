@@ -14,10 +14,13 @@ s32 gMatchPlayoffHonors = 5;                    // who has the honor in the play
 int  GameModeMatch_GetTeeHonors(int nPlayer);
 void GameModeMatch_EndGame(void);
 
-// Two players; the CPU may concede.
+// Mode 1's setup (GM_SetModeType): this file's callbacks, two players (nC and n10 2), CPU players
+// may concede, no mulligans, no split screen, and nobody holds the playoff honor yet
+// (gMatchPlayoffHonors 5). GameMode4 (the ladder's matches), GameModeBattle and GameModeDriverRTE
+// reuse most of the callbacks.
 void GameModeMatch_Init(void) {
     gpGame->pfnInit = GameModeMatch_Init;
-    gpGame->pfnSetupNextGolfer = fn_800E9F14;
+    gpGame->pfnSetupNextGolfer = GameModeMatch_SetupNextGolfer;
     gpGame->pfnGetHonors = GameModeMatch_GetHonors;
     gpGame->pfnHoleFinished = GameModeMatch_HoleFinished;
     gpGame->pfnGameFinished = GameModeMatch_GameFinished;
@@ -34,8 +37,10 @@ void GameModeMatch_Init(void) {
     gSession.nSplitScreen = 0;
 }
 
-// Next shot (every player waiting): the honors callback's pick gets ready, the other waits.
-void fn_800E9F14(void) {
+// Match play's next turn (pfnSetupNextGolfer, once every golfer waits): the player pfnGetHonors(5)
+// picks becomes the player whose turn it is (lbl_80282278) and goes to the pre-shot state; the
+// other waits. Modes 4 and 25 and the real-time events use it too.
+void GameModeMatch_SetupNextGolfer(void) {
     int i;
     lbl_80282278 = gpGame->pfnGetHonors(5);
     for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -47,8 +52,10 @@ void fn_800E9F14(void) {
     }
 }
 
-// In the playoff the player who had the honor at its start;
-// otherwise the winner of the last decided hole, else the first other player (5 = nobody).
+// Who has the honor on the tee, leaving nPlayer out (nPlayer 5 leaves nobody out; 5 = nobody). In
+// the playoff: the player who had it when the playoff started (gMatchPlayoffHonors), unless that is
+// nPlayer. Otherwise, of the players other than nPlayer, the one who won the latest hole any of
+// them won (nModePoints), else the first of them.
 int GameModeMatch_GetTeeHonors(int nPlayer) {
     int h;
     int i;
@@ -72,8 +79,10 @@ int GameModeMatch_GetTeeHonors(int nPlayer) {
     return 5;
 }
 
-// On the tee the honor; otherwise the player farthest from the pin
-// (off the green first).
+// Who plays after nPlayer in match play (pfnGetHonors; 5 = nobody): the tee honor
+// (GameModeMatch_GetTeeHonors) while that player is on the tee; otherwise, of the other players not
+// holed out, the one farthest from the pin off the green, else the farthest on it. With nPlayer 5
+// and nobody left to play, 5.
 s32 GameModeMatch_GetHonors(int nPlayer) {
     int i;
     CourseInfo* pCourse;
@@ -133,9 +142,11 @@ s32 GameModeMatch_GetHonors(int nPlayer) {
     return nBest;
 }
 
-// Both holed; or one holed and the other can no longer halve the
-// hole (with the holed player dormie: no longer win it). Unless only checking, the other's score
-// gets a stroke for the putt they did not take.
+// Mode 1's hole-over test (pfnHoleFinished). Over when both players have holed out, or when one has
+// and the other can no longer halve the hole or, with the holed player dormie (ahead by as many
+// holes as are left, this one included), can no longer win it; unless bCheck only asks, the other's
+// score then gets a stroke for the putt they did not take. While lbl_80282240 is set, nPlayer's own
+// holed ball does not count.
 u8 GameModeMatch_HoleFinished(int nPlayer, u8 bCheck) {
     int nLeft;
     int h;
@@ -204,6 +215,11 @@ u8 GameModeMatch_HoleFinished(int nPlayer, u8 bCheck) {
         P(i)->n308 = 0;                             \
     }
 
+// Mode 1's game-over test (pfnGameFinished). In the playoff: over once the players have won
+// different numbers of holes; otherwise, unless bCheck only asks, the next playoff hole is picked
+// (GM_Pick_PlayOffHole), every player's round is cleared and the tie message queued. Outside it:
+// after the last selected hole, over unless GameModeMatch_GoToPlayoff starts a playoff; before it,
+// over once either player leads by more holes than are left.
 u8 GameModeMatch_GameFinished(u8 bCheck) {
     int nLeft;
     int h;
@@ -236,7 +252,11 @@ u8 GameModeMatch_GameFinished(u8 bCheck) {
     return 0;
 }
 
-// The honor for the playoff is worked out as if on the next hole.
+// Starts the sudden-death playoff after the last selected hole when both players have won as many
+// holes; bCheck 1 only asks. The playoff's tee honor is worked out as if on the next hole
+// (gMatchPlayoffHonors), the playoff notes whether the round was all 18 holes, GM_Pick_PlayOffHole
+// picks the hole, every player's round is cleared and the tie message queued. Returns 1 when there
+// is a playoff.
 u8 GameModeMatch_GoToPlayoff(u8 bCheck) {
     int h;
     int i;
@@ -268,7 +288,8 @@ u8 GameModeMatch_GoToPlayoff(u8 bCheck) {
     return 0;
 }
 
-// The player who holed out in fewer strokes wins the hole.
+// Mode 1's end of hole (pfnEndHole): the player who holed out in fewer strokes than the other wins
+// the hole (nModePoints 1 on it, one more in nHolesWon); a halved hole changes nothing.
 void GameModeMatch_EndHole(void) {
     if (Player_IsHoled(0) &&
         gPlayers[0].nStrokes[Game_CurHoleIndex()] < gPlayers[1].nStrokes[Game_CurHoleIndex()]) {
@@ -282,7 +303,11 @@ void GameModeMatch_EndHole(void) {
     }
 }
 
-// A human winner with a profile gets the prize.
+// Mode 1's end of game (pfnEndGame), after a full round (GM_FullRoundOfGolf) and outside a Play Now
+// challenge: the player with more holes won (player 1 when level) wins by the difference. A human
+// winner with an active profile counts a game won for the EA Sports Bio and, when
+// GM_Earnings_GetStrokeWinnings gives money, has the prize message (0x6B) queued, the money paid
+// and booked (the prize added to money.n14, money.n10 set to money.n24 minus the prize).
 void GameModeMatch_EndGame(void) {
     int nPrize;
     int nWinner;
@@ -322,13 +347,17 @@ void GameModeMatch_EndGame(void) {
     }
 }
 
-// The current challenge's group.
-s32 fn_800EAC7C(void) {
+// The current Play Now challenge's group (gChallengeList[gCurChallenge].nGroup): the medal slot
+// PlayNow_EndGame saves, and the intro and name the HUD shows. Play Now code (GameMode5.c's
+// challenge list) though it sits in this file.
+s32 PlayNow_GetCurrentGroup(void) {
     return gChallengeList[gCurChallenge].nGroup;
 }
 
-// The index of the first challenge of group n (0 if none).
-int fn_800EAC94(int n) {
+// The index in the challenge list (gChallengeList, gNumChallenges entries) of group n's first
+// challenge; 0, not -1, when no challenge has that group (PlayNow_GetGroupName tests for -1: see
+// the EA bug there).
+int PlayNow_GetGroupFirstChallenge(int n) {
     int i;
     int nFound = 0;
     for (i = 0; i < gNumChallenges; i++) {

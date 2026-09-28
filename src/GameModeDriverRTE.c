@@ -42,7 +42,7 @@ s32   GameModeDriverRTE_GetYearIndex(void);
 void GameModeDriverRTE_Init(void) {
     gpGame->pfnInit = GameModeDriverRTE_Init;
     gpGame->pfnShutdown = GameModeDriverRTE_Shutdown;
-    gpGame->pfnSetupNextGolfer = fn_800E9F14;
+    gpGame->pfnSetupNextGolfer = GameModeMatch_SetupNextGolfer;
     gpGame->pfnGetHonors = GameModeMatch_GetHonors;
     gpGame->pfnHoleFinished = GameModeMatch_HoleFinished;
     gpGame->pfnGameFinished = GameModeMatch_GameFinished;

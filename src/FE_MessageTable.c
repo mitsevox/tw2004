@@ -1900,7 +1900,7 @@ void fn_8007CDF0(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8007CDF4(MsgArg* pArgs, MsgArg* pResult) {
-    PlayNow_SelectChallenge(fn_800EAC94(pArgs[0].i));
+    PlayNow_SelectChallenge(PlayNow_GetGroupFirstChallenge(pArgs[0].i));
 }
 
 void fn_8007CE1C(MsgArg* pArgs, MsgArg* pResult) {

@@ -2531,3 +2531,14 @@ address	name	comment	by	date
 800F9328	SpeedGolf_GetFirstSelectedHole	rewrite	rn5 (replayed by orchestrator)	2026-09-28
 800F93D8	SpeedGolf_GetNextSelectedHole	rewrite	rn5 (replayed by orchestrator)	2026-09-28
 800F9414	SpeedGolf_GetPrevSelectedHole	rewrite	rn5 (replayed by orchestrator)	2026-09-28
+800E9E40	GameModeMatch_Init	rewrite	rn5 (replayed by orchestrator)	2026-09-28
+800E9F14	GameModeMatch_SetupNextGolfer	rewrite	rn5 (replayed by orchestrator)	2026-09-28
+800E9F90	GameModeMatch_GetTeeHonors	rewrite	rn5 (replayed by orchestrator)	2026-09-28
+800EA084	GameModeMatch_GetHonors	rewrite	rn5 (replayed by orchestrator)	2026-09-28
+800EA278	GameModeMatch_HoleFinished	rewrite	rn5 (replayed by orchestrator)	2026-09-28
+800EA548	GameModeMatch_GameFinished	add	rn5 (replayed by orchestrator)	2026-09-28
+800EA758	GameModeMatch_GoToPlayoff	rewrite	rn5 (replayed by orchestrator)	2026-09-28
+800EAA40	GameModeMatch_EndHole	rewrite	rn5 (replayed by orchestrator)	2026-09-28
+800EAB44	GameModeMatch_EndGame	rewrite	rn5 (replayed by orchestrator)	2026-09-28
+800EAC7C	PlayNow_GetCurrentGroup	rewrite	rn5 (replayed by orchestrator)	2026-09-28
+800EAC94	PlayNow_GetGroupFirstChallenge	rewrite	rn5 (replayed by orchestrator)	2026-09-28

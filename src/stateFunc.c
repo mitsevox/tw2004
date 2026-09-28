@@ -538,9 +538,9 @@ void STATEFUNC_SwingInit(int nPlayer) {
     if (gPlayers[nPlayer].bUsedMulligan == 0 && !Player_IsCPU(nPlayer) && PlayNow_IsChallengeRunning()
         && PlayNow_IsIntroPending()) {
         if (GM_Currently_RealtimeMode()) {
-            GUI_ShowRealtimeEventIntro(fn_800EAC7C());
+            GUI_ShowRealtimeEventIntro(PlayNow_GetCurrentGroup());
         } else {
-            GUI_ShowChallengeIntro(fn_800EAC7C());
+            GUI_ShowChallengeIntro(PlayNow_GetCurrentGroup());
         }
         GUI_ToggleUI(nPlayer, 0);
         fn_80062C80(gPlayers[nPlayer].nC58, 0);

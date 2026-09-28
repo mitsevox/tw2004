@@ -134,7 +134,7 @@ void PlayNow_SelectChallenge(s32 nChallenge) {
 // Play Now menu, played as one or more challenges in a row; the menu's FE message passes its
 // 1-based choice minus one.
 void PlayNow_SelectGroup(int nGroup) {
-    int i = fn_800EAC94(nGroup);
+    int i = PlayNow_GetGroupFirstChallenge(nGroup);
     gCurChallenge = i;
     gPlayNowSelectedChallenge = i;
 }
@@ -636,9 +636,9 @@ void PlayNow_EndGame(void) {
     if (!GM_Currently_RealtimeMode()) {
         nMedal = PlayNow_GetMedal();
         if (!GameMode4_IsEventRunning() && nMedal != 3) {
-            if (nMedal < gpSaveData[gPlayers[0].nIndex].aMedal[fn_800EAC7C()]) {
-                gpSaveData[gPlayers[0].nIndex].aMedal[fn_800EAC7C()] = nMedal;
-                gpSaveData[gPlayers[0].nIndex].aMedalDate[fn_800EAC7C()] = CalDate_GetToday();
+            if (nMedal < gpSaveData[gPlayers[0].nIndex].aMedal[PlayNow_GetCurrentGroup()]) {
+                gpSaveData[gPlayers[0].nIndex].aMedal[PlayNow_GetCurrentGroup()] = nMedal;
+                gpSaveData[gPlayers[0].nIndex].aMedalDate[PlayNow_GetCurrentGroup()] = CalDate_GetToday();
             }
             switch (nMedal) {
             case 0:
@@ -1104,13 +1104,13 @@ int PlayNow_GetChallengeTarget(int i) {
 }
 
 // Group nGroup's name: the text at its first challenge's n0 in the 'PLYs' block. The first
-// challenge is looked up in the list being played (fn_800EAC94), but its n0 is read from the mode's
-// own 83 (gPlayNowChallenges); the menu and the in-round screens show it (a real-time event shows
-// GameModeDriverRTE_GetName instead).
+// challenge is looked up in the list being played (PlayNow_GetGroupFirstChallenge), but its n0 is
+// read from the mode's own 83 (gPlayNowChallenges); the menu and the in-round screens show it (a
+// real-time event shows GameModeDriverRTE_GetName instead).
 char* PlayNow_GetGroupName(int nGroup) {
-    int i = fn_800EAC94(nGroup);
-    // EA bug: fn_800EAC94 returns 0, never -1, for a group it does not find, so this test never
-    // passes and an unknown group gets challenge 0's line.
+    int i = PlayNow_GetGroupFirstChallenge(nGroup);
+    // EA bug: PlayNow_GetGroupFirstChallenge returns 0, never -1, for a group it does not find, so
+    // this test never passes and an unknown group gets challenge 0's line.
     if (i == -1) {
         return 0;
     }
@@ -1120,7 +1120,7 @@ char* PlayNow_GetGroupName(int nGroup) {
 // Group nGroup's description: the text at its first challenge's n4 in the 'PLYs' block, as
 // PlayNow_GetGroupName reads the name.
 char* PlayNow_GetGroupDescription(int nGroup) {
-    int i = fn_800EAC94(nGroup);
+    int i = PlayNow_GetGroupFirstChallenge(nGroup);
     // EA bug: never -1, as above.
     if (i == -1) {
         return 0;

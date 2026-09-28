@@ -63,7 +63,7 @@ void GameMode4_WinEvent(void);
 void GameMode4_Init(void) {
     gpGame->pfnInit = GameMode4_Init;
     gpGame->pfnShutdown = GameMode4_Shutdown;
-    gpGame->pfnSetupNextGolfer = fn_800E9F14;
+    gpGame->pfnSetupNextGolfer = GameModeMatch_SetupNextGolfer;
     gpGame->pfnGetHonors = GameModeMatch_GetHonors;
     gpGame->pfnHoleFinished = GameModeMatch_HoleFinished;
     gpGame->pfnGameFinished = GameModeMatch_GameFinished;

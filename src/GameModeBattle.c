@@ -27,7 +27,7 @@ void GameModeBattle_RestoreClubSetup(void);
 void GameModeBattle_Init(void) {
     gpGame->pfnInit = GameModeBattle_Init;
     gpGame->pfnShutdown = GameModeBattle_Shutdown;
-    gpGame->pfnSetupNextGolfer = fn_800E9F14;
+    gpGame->pfnSetupNextGolfer = GameModeMatch_SetupNextGolfer;
     gpGame->pfnGetHonors = GameModeMatch_GetHonors;
     gpGame->pfnHoleFinished = GameModeMatch_HoleFinished;
     gpGame->pfnGameFinished = GameModeBattle_GameFinished;

@@ -575,14 +575,14 @@ int  GM_BestBallMode_GetTeamHoleScore(int nPlayer, int nHole);   // GameModeBest
 
 // GameModeMatch.c: match play, which the other two-player modes build on
 extern u8  lbl_80282240;                // the hole-finished test excuses the holed side's own players
-void fn_800E9F14(void);
+void GameModeMatch_SetupNextGolfer(void);
 s32  GameModeMatch_GetHonors(int nPlayer);
 u8   GameModeMatch_HoleFinished(int nPlayer, u8 bCheck);
 u8   GameModeMatch_GameFinished(u8 bCheck);            // the game is over
 u8   GameModeMatch_GoToPlayoff(u8 bCheck);
 void GameModeMatch_EndHole(void);
-s32  fn_800EAC7C(void);
-int  fn_800EAC94(int n);
+s32  PlayNow_GetCurrentGroup(void);
+int  PlayNow_GetGroupFirstChallenge(int n);
 
 // GameMode5.c
 void PlayNow_DeInit(void);
