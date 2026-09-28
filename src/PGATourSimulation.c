@@ -33,11 +33,11 @@ s32  fn_8011BCFC(const void* pA, const void* pB);
 s32  TotalEntrantHoleScores(int nEntrant);
 void GM_PgaTourSim_SimEntrantStatsOnHole(int nPlayer, int nRound, int nEntrant, int nHole);
 void CalcScoreRankings(int nPlayer);
-void fn_8011AAC0(int nPlayer);
-void fn_8011AC40(int nPlayer, GM_Pga_StatTypes_t nStat);
-void fn_8011AE1C(int nPlayer, int nGolfer);
-void fn_8011AF60(int nGolfer);
-void fn_8011B094(int nGolfer);
+void CalcScoreRankingsForCutEntrants(int nPlayer);
+void CalcRankingsForStat(int nPlayer, GM_Pga_StatTypes_t nStat);
+void CalcSimplePlayerStats(int nPlayer, int nGolfer);
+void CalcComplex1PlayerStats(int nGolfer);
+void CalcComplex2PlayerStats(int nGolfer);
 void CalcAllStatsIfDirty(int nPlayer);
 void CalcScoreRankingsIfDirty(int nPlayer);
 void CalcAllStats(int nPlayer);
@@ -1276,8 +1276,10 @@ u8 GM_PgaTourSim_EntrantIsInPlayoff(int nPlayer, int nEntrant) {
     return GetEntrantNonMCPtr(nEntrant)->bInPlayoff;
 }
 
-// A playoff hole played: an entrant who beat the player's strokes knocks the player out, and one
-// who took more drops out. TW06: GM_PgaTourSim_UpdatePlayoffs.
+// A playoff hole is over (nHole: its index in each entrant's aHoleStrokes). The player's strokes on
+// it are lbl_80282504 (GM_PgaTourSim_SetUserEntrantHoleStrokes). The first opponent still in the
+// playoff who took fewer knocks the player out and ends the check (the opponents after him are left
+// as they are); an opponent who took more drops out; the same strokes play on.
 void GM_PgaTourSim_UpdatePlayoffs(int nPlayer, int nHole) {
     s32 nEntrants = GM_PgaTourSim_GetNumEntrants(nPlayer);
     s32 i;
@@ -1299,8 +1301,9 @@ void GM_PgaTourSim_UpdatePlayoffs(int nPlayer, int nHole) {
     }
 }
 
-// The fewest strokes on a playoff hole among the player's opponents still in it (999: none).
-// TW06: GM_PgaTourSim_GetBestOpponentPlayoffHoleScore.
+// The fewest strokes on a playoff hole among the player's opponents still in the playoff (entrants
+// 1 on), 999 when none is left. GameModeDriverPGATour.c compares it with the player's strokes for
+// the lead and the putt to win.
 s32 GM_PgaTourSim_GetBestOpponentPlayoffHoleScore(int nPlayer, int nHole) {
     s32 i;
     s32 nBest = 999;
@@ -1316,6 +1319,8 @@ s32 GM_PgaTourSim_GetBestOpponentPlayoffHoleScore(int nPlayer, int nHole) {
     return nBest;
 }
 
+// Every statistic and ranking worked out again (CalcAllStats) if the counts changed since the last
+// time (gbStatsDirty). Every statistic getter calls it first.
 void CalcAllStatsIfDirty(int nPlayer) {
     if (gbStatsDirty) {
         CalcAllStats(nPlayer);
@@ -1323,8 +1328,10 @@ void CalcAllStatsIfDirty(int nPlayer) {
     }
 }
 
-// The score order: every entrant sorted by score (TournamentRankIncreasing), then each given a place, entrants
-// with the same score sharing it. A cut entrant counts as the worst score, the winner as the best.
+// The score order: every entrant sorted by score (TournamentRankIncreasing; lbl_80281848 tells it
+// the player), then each given its place, entrants on the same score sharing it. A score counts the
+// holes each entrant has finished; a cut entrant counts as the worst score, the winner as the best,
+// so after a playoff the winner has first place alone.
 void CalcScoreRankings(int nPlayer) {
     s32 i;
     s32 nEntrant;
@@ -1363,9 +1370,11 @@ void CalcScoreRankings(int nPlayer) {
     }
 }
 
-// The same after the cut: the cut entrants, from the first cut row on, sorted among themselves
-// (TournamentRankIncreasingForCutEntrants), then every place worked out again.
-void fn_8011AAC0(int nPlayer) {
+// After CalcScoreRankings: the cut entrants, who all sorted last as the same worst score and so by
+// name, are sorted again among themselves by their real score
+// (TournamentRankIncreasingForCutEntrants), so the leader board lists them in score order. The
+// places are then given again as there; the cut entrants still share one place.
+void CalcScoreRankingsForCutEntrants(int nPlayer) {
     s32 nEntrants = GM_PgaTourSim_GetNumEntrants(nPlayer);
     s32 nCutRow;
     s32 i;
@@ -1401,17 +1410,20 @@ void fn_8011AAC0(int nPlayer) {
     }
 }
 
+// The score order and places made again (CalcScoreRankings, then CalcScoreRankingsForCutEntrants)
+// if a score changed since the last time (gbScoresDirty). Every score-rank getter calls it first.
 void CalcScoreRankingsIfDirty(int nPlayer) {
     if (gbScoresDirty) {
         CalcScoreRankings(nPlayer);
         gbScoresDirty = 0;
-        fn_8011AAC0(nPlayer);
+        CalcScoreRankingsForCutEntrants(nPlayer);
     }
 }
 
-// Ranks every tour golfer in a statistic: sorts them with the statistic's comparison, then gives
-// each its place; golfers whose values print the same share the place.
-void fn_8011AC40(int nPlayer, GM_Pga_StatTypes_t nStat) {
+// Ranks every tour golfer in a statistic: sorts them with the statistic's comparison (lbl_80193FF8:
+// StatRankIncreasing or StatRankDecreasing; lbl_80281840 tells it the statistic and the player),
+// then gives each its place. Golfers whose values print the same share the place.
+void CalcRankingsForStat(int nPlayer, GM_Pga_StatTypes_t nStat) {
     PgaStatRanking* pRanking = &gPgaStatRankings[nStat];
     char* szValue;
     s32 nRow;
@@ -1441,8 +1453,10 @@ void fn_8011AC40(int nPlayer, GM_Pga_StatTypes_t nStat) {
     }
 }
 
-// Works out a golfer's simple statistics from the counts in the player's profile, with their text.
-void fn_8011AE1C(int nPlayer, int nGolfer) {
+// Works out a golfer's 28 simple statistics from the golfer's season counts in the player's profile
+// (the Calc functions of lbl_80193F88; their return is not used), each with its text
+// (GM_PgaTourSim_GetStatValString).
+void CalcSimplePlayerStats(int nPlayer, int nGolfer) {
     GM_Pga_StatTypes_t nStat;
 
     for (nStat = 0; nStat < GM_PGA_STAT_SIMPLE_COUNT; nStat++) {
@@ -1453,24 +1467,27 @@ void fn_8011AE1C(int nPlayer, int nGolfer) {
     }
 }
 
+// The simple statistics of every tour golfer and the player (CalcSimplePlayerStats).
 void CalcAllSimpleStats(int nPlayer) {
     s32 nGolfer;
 
     for (nGolfer = 0; nGolfer < PGA_NUM_GOLFERS; nGolfer++) {
-        fn_8011AE1C(nPlayer, nGolfer);
+        CalcSimplePlayerStats(nPlayer, nGolfer);
     }
 }
 
+// Every simple statistic's ranking (CalcRankingsForStat), which the combined statistics add up.
 void CalcAllSimpleRankings(int nPlayer) {
     s32 nStat;
 
     for (nStat = 0; nStat < GM_PGA_STAT_SIMPLE_COUNT; nStat++) {
-        fn_8011AC40(nPlayer, nStat);
+        CalcRankingsForStat(nPlayer, nStat);
     }
 }
 
-// Works out a golfer's all-around and total driving statistics, with their text.
-void fn_8011AF60(int nGolfer) {
+// Works out a golfer's two first combined statistics, all-around (CalcAllAroundScore) and total
+// driving (CalcTotalDriving), from the simple statistics' rankings, each with its text.
+void CalcComplex1PlayerStats(int nGolfer) {
     CalcAllAroundScore(nGolfer, &gPgaStatRankings[GM_PGA_STAT_ALLAROUND].aValue[nGolfer].fValue);
     CalcTotalDriving(nGolfer, &gPgaStatRankings[GM_PGA_STAT_TOTALDRIVING].aValue[nGolfer].fValue);
     GM_PgaTourSim_GetStatValString(GM_PGA_STAT_ALLAROUND,
@@ -1481,44 +1498,52 @@ void fn_8011AF60(int nGolfer) {
                                    gPgaStatRankings[GM_PGA_STAT_TOTALDRIVING].aValue[nGolfer].szValue);
 }
 
+// Every tour golfer's all-around and total driving statistics (CalcComplex1PlayerStats); the simple
+// rankings must be made first.
 void CalcAllComplex1Stats(void) {
     s32 nGolfer;
 
     for (nGolfer = 0; nGolfer < PGA_NUM_GOLFERS; nGolfer++) {
-        fn_8011AF60(nGolfer);
+        CalcComplex1PlayerStats(nGolfer);
     }
 }
 
+// The all-around and total driving rankings (CalcRankingsForStat).
 void CalcAllComplex1Rankings(int nPlayer) {
     s32 nStat;
 
     for (nStat = GM_PGA_STAT_SIMPLE_COUNT; nStat < GM_PGA_STAT_COMPLEX1_COUNT; nStat++) {
-        fn_8011AC40(nPlayer, nStat);
+        CalcRankingsForStat(nPlayer, nStat);
     }
 }
 
-// Works out a golfer's ball striking statistic, with its text.
-void fn_8011B094(int nGolfer) {
+// Works out a golfer's ball striking statistic (CalcBallStriking), which adds up the total driving
+// ranking, with its text.
+void CalcComplex2PlayerStats(int nGolfer) {
     CalcBallStriking(nGolfer, &gPgaStatRankings[GM_PGA_STAT_BALLSTRIKING].aValue[nGolfer].fValue);
     GM_PgaTourSim_GetStatValString(GM_PGA_STAT_BALLSTRIKING,
                                    gPgaStatRankings[GM_PGA_STAT_BALLSTRIKING].aValue[nGolfer].fValue,
                                    gPgaStatRankings[GM_PGA_STAT_BALLSTRIKING].aValue[nGolfer].szValue);
 }
 
+// Every tour golfer's ball striking statistic (CalcComplex2PlayerStats); the total driving ranking
+// must be made first.
 void CalcAllComplex2Stats(void) {
     s32 nGolfer;
 
     for (nGolfer = 0; nGolfer < PGA_NUM_GOLFERS; nGolfer++) {
-        fn_8011B094(nGolfer);
+        CalcComplex2PlayerStats(nGolfer);
     }
 }
 
+// The ball striking ranking, the only statistic of the second combined level.
 void CalcAllComplex2Rankings(int nPlayer) {
-    fn_8011AC40(nPlayer, GM_PGA_STAT_BALLSTRIKING);
+    CalcRankingsForStat(nPlayer, GM_PGA_STAT_BALLSTRIKING);
 }
 
-// Each golfer's values, then each statistic's ranking; the combined statistics come after the
-// rankings they add up.
+// Works out and ranks every statistic of every tour golfer, level by level: the simple ones from
+// the counts, then all-around and total driving from the simple rankings, then ball striking from
+// the total driving ranking.
 void CalcAllStats(int nPlayer) {
     CalcAllSimpleStats(nPlayer);
     CalcAllSimpleRankings(nPlayer);
@@ -1535,10 +1560,13 @@ void CalcAllStats(int nPlayer) {
 u8 SafeDivide(u32 nCount, u32 nOutOf, f32* pfValue);
 u8 SafeDividePct(u32 nCount, u32 nOutOf, f32* pfValue);
 
+// Yards per drive: all drives' distance over the number of drives.
 u8 CalcDrivingDistance(PgaStatCounts* pCounts, f32* pfValue) {
     return SafeDivide(pCounts->nDriveDistance, pCounts->nDrives, pfValue);
 }
 
+// *pfValue = nCount / nOutOf as a float, and returns 1; when nOutOf is 0, *pfValue = 0 and returns
+// 0 (a golfer with nothing counted yet).
 u8 SafeDivide(u32 nCount, u32 nOutOf, f32* pfValue) {
     if (nOutOf == 0) {
         *pfValue = 0.0f;
@@ -1548,11 +1576,13 @@ u8 SafeDivide(u32 nCount, u32 nOutOf, f32* pfValue) {
     return 1;
 }
 
+// Driving accuracy: the percent of fairways hit (the par 4s and 5s).
 u8 CalcAccuracy(PgaStatCounts* pCounts, f32* pfValue) {
     return SafeDividePct(pCounts->nFairwaysHit, pCounts->nFairways, pfValue);
 }
 
-// The same as a percentage.
+// SafeDivide as a percentage: *pfValue = 100 * nCount / nOutOf, and returns 1; when nOutOf is 0,
+// *pfValue = 0 and returns 0.
 u8 SafeDividePct(u32 nCount, u32 nOutOf, f32* pfValue) {
     if (nOutOf == 0) {
         *pfValue = 0.0f;
@@ -1562,39 +1592,50 @@ u8 SafeDividePct(u32 nCount, u32 nOutOf, f32* pfValue) {
     return 1;
 }
 
+// Greens in regulation: the percent of holes on which the green was hit in regulation.
 u8 CalcGIR(PgaStatCounts* pCounts, f32* pfValue) {
     return SafeDividePct(pCounts->nGreensHit, pCounts->nHoles, pfValue);
 }
 
+// Putts per round.
 u8 CalcPuttsPerRound(PgaStatCounts* pCounts, f32* pfValue) {
     return SafeDivide(pCounts->nPutts, pCounts->nRounds, pfValue);
 }
 
+// Putting average: putts per green hit in regulation.
 u8 CalcPuttingAvg(PgaStatCounts* pCounts, f32* pfValue) {
     return SafeDivide(pCounts->nGIRPutts, pCounts->nGreensHit, pfValue);
 }
 
+// Sand saves: the percent of holes with a bunker in them that the golfer still finished in par or
+// better.
 u8 CalcSandSave(PgaStatCounts* pCounts, f32* pfValue) {
     return SafeDividePct(pCounts->nBunkerSaves, pCounts->nBunkers, pfValue);
 }
 
-// Pars saved on the greens missed in regulation.
+// Scrambling: the percent of greens missed in regulation on which the golfer still made par or
+// better.
 u8 CalcScrambling(PgaStatCounts* pCounts, f32* pfValue) {
     return SafeDividePct(pCounts->nNonGIRPars, pCounts->nHoles - pCounts->nGreensHit, pfValue);
 }
 
+// Bounce back: the birdies or better made right after a bogey or worse, as a percent of the bogeys
+// or worse.
 u8 CalcBounceBack(PgaStatCounts* pCounts, f32* pfValue) {
     return SafeDividePct(pCounts->nBirdiesAfterBogey, pCounts->nBogeys, pfValue);
 }
 
+// Holes played per eagle (0 while the golfer has none).
 u8 CalcHolesPerEagle(PgaStatCounts* pCounts, f32* pfValue) {
     return SafeDivide(pCounts->nHoles, pCounts->nEagles, pfValue);
 }
 
+// Birdie average: birdies or better per round.
 u8 CalcBirdieAvg(PgaStatCounts* pCounts, f32* pfValue) {
     return SafeDivide(pCounts->nBirdies, pCounts->nRounds, pfValue);
 }
 
+// The percent of par 3s played that the golfer birdied.
 u8 CalcPar3BirdieAvg(PgaStatCounts* pCounts, f32* pfValue) {
     return SafeDividePct(pCounts->nPar3Birdies, pCounts->nPar3Holes, pfValue);
 }
