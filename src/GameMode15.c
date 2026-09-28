@@ -15,59 +15,62 @@ s32 gHorseLeader;                    // the leader (5 = none)
 s32 gHorseLeaderRing;                    // the leader's rank (0 best .. 4)
 s8  gHorseLeaderTarget;                    // the leader's target
 s32 gHorseShotPoints;                    // the points of the last shot
-u8  gHorseShotClockOut;                    // set by fn_800F48C4: the shot then scores nothing
+u8  gHorseShotClockOut;                    // set by GameModeSkillZoneHorse_ShotClockOut: the shot then scores nothing
 u8  gHorseLastShotExceeded;                    // a closer shot just took the lead (not set for the first leader)
 s32 gHorseSavedWind;
 
 void  Gaud_LetterForfeit(void);
 void  Gaud_LetterGained(void);
 
-void  fn_800F3C2C(void);
-void  fn_800F3C48(void);
-u8    fn_800F3C74(u8 bCheck);
-s32   fn_800F3C7C(int nPlayer);
-void  fn_800F3E00(int nPlayer);
-void  fn_800F3EBC(int nPlayer);
-void  fn_800F4584(void);
-void  fn_800F4698(void);
-void  fn_800F46BC(void);
-void  fn_800F46E4(void);
-void  fn_800F471C(int nPlayer);
-u8    fn_800F475C(u8 bCheck);
-void  fn_800F4764(int nPlayer);
-s32   fn_800F4784(int nPlayer, u8 bCheck);
-u8    fn_800F47D8(int nPlayer);
-u8    fn_800F4828(int nPlayer);
-s8    fn_800F4878(void);
-void  fn_800F4894(int nPlayer);
-void  fn_800F4950(void);
-void  fn_800F49E8(s32 nSurface, s32* pPoints);
-s32   fn_800F4B00(void);
-s32   fn_800F4B14(int a, int i);
+void  GameModeSkillZoneHorse_Shutdown(void);
+void  GameModeSkillZoneHorse_StartGamePreData(void);
+u8    GameModeSkillZoneHorse_GoToPlayoff(u8 bCheck);
+s32   GameModeSkillZoneHorse_GetHonors(int nPlayer);
+void  GameModeSkillZoneHorse_EndGolferTurn(int nPlayer);
+void  GameModeSkillZoneHorse_CheckShotAwards(int nPlayer);
+void  GameModeSkillZoneHorse_SetupNextGolfer(void);
+void  GameModeSkillZoneHorse_LoadHole(void);
+void  GameModeSkillZoneHorse_RestartHole(void);
+void  GameModeSkillZoneHorse_ClearPerHoleData(void);
+void  GameModeSkillZoneHorse_UpdateSwingUI(int nPlayer);
+u8    GameModeSkillZoneHorse_GameFinished(u8 bCheck);
+void  GameModeSkillZoneHorse_BallOOB(int nPlayer);
+s32   GameModeSkillZoneHorse_HoleFinished(int nPlayer, u8 bCheck);
+u8    GameModeSkillZoneHorse_PickPrevTarget(int nPlayer);
+u8    GameModeSkillZoneHorse_PickTarget(int nPlayer);
+s8    GameModeSkillZoneHorse_GetCurrentLeaderRing(void);
+void  GameModeSkillZoneHorse_HitBall(int nPlayer);
+void  GameModeSkillZoneHorse_EndGame(void);
+void  GameModeSkillZoneHorse_GetIDScore(s32 nSurface, s32* pPoints);
+s32   GameModeSkillZoneHorse_GetLastShotExceeded(void);
+s32   GameModeSkillZoneHorse_GreenType(int a, int i);
 
-// Mode 15 starts: the same setup as mode 14.
-void fn_800F39F4(void) {
-    gpGame->pfnInit = fn_800F39F4;
-    gpGame->pfnShutdown = fn_800F3C2C;
-    gpGame->pfnSetupNextGolfer = fn_800F4584;
-    gpGame->pfnGetHonors = fn_800F3C7C;
-    // The original's fn_800F4784 returns an s32 (0 or 1; a u8 return adds a clrlwi: 95%), so it
-    // goes in the u8 slot through a cast.
-    gpGame->pfnHoleFinished = (u8 (*)(int, u8))fn_800F4784;
-    gpGame->pfnGameFinished = fn_800F475C;
-    gpGame->pfnGoToPlayoff = fn_800F3C74;
-    gpGame->pfnEndGolferTurn = fn_800F3E00;
-    gpGame->pfn244 = fn_800F3EBC;
-    gpGame->pfn1E4 = fn_800F4698;
-    gpGame->pfn228 = fn_800F471C;
-    gpGame->pfn224 = fn_800F46BC;
-    gpGame->pfn1EC = fn_800F3C48;
-    gpGame->pfn250 = fn_800F4764;
-    gpGame->pfn264 = fn_800F47D8;
-    gpGame->pfn258 = fn_800F4828;
-    gpGame->pfn260 = fn_800F4894;
-    gpGame->pfnEndGame = fn_800F4950;
-    gpGame->pfn26C = fn_800F4B14;
+// Game mode 15's setup (pfnInit, from GM_SetModeType): its hooks, nC and n10 2 (two players, as
+// GameModeBattle sets them), no wind, no gimmes, no mulligans, b28D set (the re-plan button picks
+// the next target), the current hole 0, pin set 0 and the target list emptied (the hole's targets
+// fill it as they load). The same settings as mode 14.
+void GameModeSkillZoneHorse_Init(void) {
+    gpGame->pfnInit = GameModeSkillZoneHorse_Init;
+    gpGame->pfnShutdown = GameModeSkillZoneHorse_Shutdown;
+    gpGame->pfnSetupNextGolfer = GameModeSkillZoneHorse_SetupNextGolfer;
+    gpGame->pfnGetHonors = GameModeSkillZoneHorse_GetHonors;
+    // The original's GameModeSkillZoneHorse_HoleFinished returns an s32 (0 or 1; a u8 return adds a
+    // clrlwi: 95%), so it goes in the u8 slot through a cast.
+    gpGame->pfnHoleFinished = (u8 (*)(int, u8))GameModeSkillZoneHorse_HoleFinished;
+    gpGame->pfnGameFinished = GameModeSkillZoneHorse_GameFinished;
+    gpGame->pfnGoToPlayoff = GameModeSkillZoneHorse_GoToPlayoff;
+    gpGame->pfnEndGolferTurn = GameModeSkillZoneHorse_EndGolferTurn;
+    gpGame->pfn244 = GameModeSkillZoneHorse_CheckShotAwards;
+    gpGame->pfn1E4 = GameModeSkillZoneHorse_LoadHole;
+    gpGame->pfn228 = GameModeSkillZoneHorse_UpdateSwingUI;
+    gpGame->pfn224 = GameModeSkillZoneHorse_RestartHole;
+    gpGame->pfn1EC = GameModeSkillZoneHorse_StartGamePreData;
+    gpGame->pfn250 = GameModeSkillZoneHorse_BallOOB;
+    gpGame->pfn264 = GameModeSkillZoneHorse_PickPrevTarget;
+    gpGame->pfn258 = GameModeSkillZoneHorse_PickTarget;
+    gpGame->pfn260 = GameModeSkillZoneHorse_HitBall;
+    gpGame->pfnEndGame = GameModeSkillZoneHorse_EndGame;
+    gpGame->pfn26C = GameModeSkillZoneHorse_GreenType;
     gpGame->b276 = 0;
     gpGame->bGimmesAllowed = 0;
     gpGame->b280 = 0;
@@ -97,24 +100,29 @@ void fn_800F39F4(void) {
     gSession.nPinSet = 0;
 }
 
-void fn_800F3C2C(void) {
+// Puts back the two options StartGamePreData changed for the game: options.nC and the wind.
+void GameModeSkillZoneHorse_Shutdown(void) {
     gSession.options.nC = gHorseSavedOptionsC;
     gSession.options.nWind = gHorseSavedWind;
 }
 
-void fn_800F3C48(void) {
+// As a round starts (pfn1EC, GM_InitModule_PreDataStream): saves options.nC and the wind setting
+// (Shutdown puts them back) and sets them to 4 and 0, no wind.
+void GameModeSkillZoneHorse_StartGamePreData(void) {
     gHorseSavedOptionsC = gSession.options.nC;
     gHorseSavedWind = gSession.options.nWind;
     gSession.options.nC = 4;
     gSession.options.nWind = 0;
 }
 
-u8 fn_800F3C74(u8 bCheck) {
+u8 GameModeSkillZoneHorse_GoToPlayoff(u8 bCheck) {
     return 0;
 }
 
-// Who plays next: player 0 first, then the players still in, in turn.
-s32 fn_800F3C7C(int nPlayer) {
+// Who plays next (pfnGetHonors): player 0 while nobody has a stroke on the hole; after that the
+// next player in turn after the current golfer (lbl_80282278) who is not nPlayer and is still in
+// (fewer than 5 letters, nE88); 5 when there is none.
+s32 GameModeSkillZoneHorse_GetHonors(int nPlayer) {
     int i;
     int n;
     u8 bFirst = 1;
@@ -139,8 +147,10 @@ s32 fn_800F3C7C(int nPlayer) {
     return 5;
 }
 
-// End of a golfer's turn: the ball goes back to the tee (or to the replay's ball).
-void fn_800F3E00(int nPlayer) {
+// End of a golfer's turn (pfnEndGolferTurn): the ball goes back on the player's tee (with in-flight
+// replays on, gReplayData.bF10, the replay's saved ball is copied back instead) and the shots taken
+// (nDC0) are counted.
+void GameModeSkillZoneHorse_EndGolferTurn(int nPlayer) {
     if (gReplayData.bF10) {
         Mem_cpy(&gPlayers[nPlayer].ball, &gReplayData.player.ball, sizeof(Ball));
     } else {
@@ -150,8 +160,21 @@ void fn_800F3E00(int nPlayer) {
     gPlayers[nPlayer].nDC0++;
 }
 
-// The ball stopped: match the leader, beat them, or take a letter.
-void fn_800F3EBC(int nPlayer) {
+// Scores a shot once the ball stops (pfn244 from GM_Earnings_PayShotGoals; BallOOB too). After a
+// shot-clock timeout (gHorseShotClockOut) it only shows text 0xD1 and comment 0x14. A landing on a
+// target short of the drive line (GameModeSkillZoneBase_IsLongDrive) is in one of its rings (0 the
+// bullseye .. 4) and counts as a hit (nDE4 per target, aDC4[3]); its surface's points (GetIDScore,
+// gHorseShotPoints; positive ones with the earnings modifiers) go to the winnings (nDD8, never
+// below 0) and, outside replays, float up at the ball's screen position (message 0x33). With a
+// leader (gHorseLeader): the leader's target in the leader's ring matches (comment 0x32 for a
+// bullseye, else 0x11); the leader's target in a closer ring takes the lead (text 0xCF,
+// gHorseLastShotExceeded set, comment 0x31 or 0x33); anything else takes a letter (nE88, message
+// 0x38 with the count, Gaud_LetterGained; text 0xCE on the leader's target, else 0xD0) and ends the
+// lead. Without a leader the shot sets the lead: its target and ring (a comment per ring). A shot
+// off the targets takes a letter and ends the lead when there is one (text 0xCE, a comment per
+// letter count 1..5); without one it does nothing. Rings, bullseyes and the shot multiplier (nDBC)
+// play their sounds and ball effects.
+void GameModeSkillZoneHorse_CheckShotAwards(int nPlayer) {
     s32 nSurface;
     s8 nTarget;
     s32 nRank;
@@ -168,7 +191,7 @@ void fn_800F3EBC(int nPlayer) {
     } else {
         nSurface = gPlayers[nPlayer].ball.nSurface;
         fLength = fn_800D0550(nPlayer);
-        fn_800F49E8(nSurface, &gHorseShotPoints);
+        GameModeSkillZoneHorse_GetIDScore(nSurface, &gHorseShotPoints);
         if (nSurface >= 0x85 && nSurface <= 0x90 && !GameModeSkillZoneBase_IsLongDrive(nPlayer, fLength)) {
             nTarget = GameModeSkillZoneBase_GetGreenIndexHit(nPlayer);
             nRank = GameModeSkillZoneBase_GetBullsEyeColor(nSurface);
@@ -333,11 +356,14 @@ void fn_800F3EBC(int nPlayer) {
     }
 }
 
-// Next golfer: gHorseShotClockOut clears, and a golfer ready to play (state 1) gets
-// GameModeSkillZoneCapture_SetShotClock(900). When the turn comes back to the leader, the lead is
-// lost. While there is a leader the golfer aims at the leader's target; otherwise, on his first
-// shot, at his own.
-void fn_800F4584(void) {
+// Before each shot (pfnSetupNextGolfer): the shot-clock timeout flag (gHorseShotClockOut) and the
+// per-shot data clear (ClearPerShotData) and stroke play's golfer order runs
+// (GameModeStroke_SetupNextGolfer). The golfer about to play (GS_PRE_SHOT) gets a 900 shot clock
+// (GameModeSkillZoneCapture_SetShotClock); if they are the leader, play has come round to them
+// unmatched and the lead ends (comment 0x23 or 0x24). While there is a leader the golfer is aimed
+// at the leader's target (Player.nTarget, SetCup_AlignGolfer); with none, only before their first
+// shot, at their own target.
+void GameModeSkillZoneHorse_SetupNextGolfer(void) {
     int i;
     gHorseShotClockOut = 0;
     GameModeSkillZoneBase_ClearPerShotData();
@@ -363,17 +389,23 @@ void fn_800F4584(void) {
     }
 }
 
-void fn_800F4698(void) {
+// Hole start (pfn1E4): the targets sorted nearest the tee first (SortCupsByDistanceFromTee), then
+// ClearPerHoleData.
+void GameModeSkillZoneHorse_LoadHole(void) {
     GameModeSkillZoneBase_SortCupsByDistanceFromTee();
-    fn_800F46E4();
+    GameModeSkillZoneHorse_ClearPerHoleData();
 }
 
-void fn_800F46BC(void) {
-    fn_800F46E4();
+// The hole restarts (pfn224, GM_RestartHole): the lead cleared (ClearPerHoleData) and player 0
+// given the default aim.
+void GameModeSkillZoneHorse_RestartHole(void) {
+    GameModeSkillZoneHorse_ClearPerHoleData();
     AI_DefaultTarget(0);
 }
 
-void fn_800F46E4(void) {
+// The shared per-hole clear (GameModeSkillZoneBase_ClearPerHoleData), then no leader: gHorseLeader
+// and gHorseLeaderRing 5, gHorseLeaderTarget 0, gHorseLastShotExceeded clear.
+void GameModeSkillZoneHorse_ClearPerHoleData(void) {
     GameModeSkillZoneBase_ClearPerHoleData();
     gHorseLeader = 5;
     gHorseLeaderRing = 5;
@@ -381,22 +413,27 @@ void fn_800F46E4(void) {
     gHorseLastShotExceeded = 0;
 }
 
-void fn_800F471C(int nPlayer) {
+// Every frame of the swing state (pfn228): once the swing has begun (SwingData.nState not
+// SW_IDLE_SWING), UI message 0x36 (no value) is sent.
+void GameModeSkillZoneHorse_UpdateSwingUI(int nPlayer) {
     if (gPlayers[nPlayer].swing.nState != 0) {
         GameMsg_Send(0x36);
     }
 }
 
-u8 fn_800F475C(u8 bCheck) {
+// The game is over once its one hole is: always 1.
+u8 GameModeSkillZoneHorse_GameFinished(u8 bCheck) {
     return 1;
 }
 
-void fn_800F4764(int nPlayer) {
-    fn_800F3EBC(nPlayer);
+// The ball went out of bounds (pfn250): the shot is scored as usual (CheckShotAwards).
+void GameModeSkillZoneHorse_BallOOB(int nPlayer) {
+    GameModeSkillZoneHorse_CheckShotAwards(nPlayer);
 }
 
-// The game is over when at most one player is still in.
-s32 fn_800F4784(int nPlayer, u8 bCheck) {
+// The hole (and so the game) is over once at most one player is still in (fewer than 5 letters,
+// nE88): 1, else 0. nPlayer and bCheck are not used.
+s32 GameModeSkillZoneHorse_HoleFinished(int nPlayer, u8 bCheck) {
     int i;
     s32 n = 0;
     for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -407,8 +444,10 @@ s32 fn_800F4784(int nPlayer, u8 bCheck) {
     return n <= 1;
 }
 
-// Previous / next target: only without a leader; with one, the leader's target stays.
-u8 fn_800F47D8(int nPlayer) {
+// Aim at the previous target (pfn264, a re-plan), only without a leader
+// (GameModeSkillZoneBase_PickPrevTarget); with one, the player's target (the leader's) is set
+// again. Always 1.
+u8 GameModeSkillZoneHorse_PickPrevTarget(int nPlayer) {
     if (gHorseLeader == 5) {
         GameModeSkillZoneBase_PickPrevTarget(nPlayer);
     } else {
@@ -417,7 +456,10 @@ u8 fn_800F47D8(int nPlayer) {
     return 1;
 }
 
-u8 fn_800F4828(int nPlayer) {
+// Aim at the next target (pfn258, a re-plan), only without a leader
+// (GameModeSkillZoneBase_PickTarget); with one, the player's target (the leader's) is set again.
+// Always 1.
+u8 GameModeSkillZoneHorse_PickTarget(int nPlayer) {
     if (gHorseLeader == 5) {
         GameModeSkillZoneBase_PickTarget(nPlayer);
     } else {
@@ -426,23 +468,29 @@ u8 fn_800F4828(int nPlayer) {
     return 1;
 }
 
-s8 fn_800F4878(void) {
+// The ring the leader landed in, for the HUD (UI command 21): 0 the bullseye .. 4; -1 when there is
+// no leader.
+s8 GameModeSkillZoneHorse_GetCurrentLeaderRing(void) {
     if ((s32) gHorseLeader != 5) {
         return (s8) gHorseLeaderRing;
     }
     return -1;
 }
 
-void fn_800F4894(int nPlayer) {
+// The ball was hit (pfn260): the shot clock is switched off (-1), its ticking stopped and
+// gHorseLastShotExceeded cleared.
+void GameModeSkillZoneHorse_HitBall(int nPlayer) {
     GameModeSkillZoneCapture_SetShotClock(-1);
     Gaud_StopShotClock();
     gHorseLastShotExceeded = 0;
 }
 
-// The current golfer goes to state 12 and gHorseShotClockOut is set, so the shot scores nothing and
-// shows text 0xD1 (through GameTargets GameModeSkillZoneBase_ShotClockOut, from a UI command). With
-// a leader, a letter goes to player 1 if the leader is player 0, else to player 0.
-void fn_800F48C4(void) {
+// The shot clock ran out (GameModeSkillZoneBase_ShotClockOut, from a UI command): the current
+// golfer goes to GS_SIMULATE, the toggle UI hides, the ticking stops and gHorseShotClockOut is set,
+// so CheckShotAwards scores nothing and shows text 0xD1. With a leader, the player who is not the
+// leader takes a letter (player 1 when the leader is player 0, else player 0: two players only;
+// message 0x38, Gaud_LetterForfeit).
+void GameModeSkillZoneHorse_ShotClockOut(void) {
     GOLFERSTATE_Switch(12, lbl_80282278);   // GS_SIMULATE
     GUI_HideAllToggleUI();
     Gaud_StopShotClock();
@@ -459,8 +507,10 @@ void fn_800F48C4(void) {
     }
 }
 
-// Game finished: the players still in are paid their points.
-void fn_800F4950(void) {
+// End of the game (pfnEndGame): the game counts as won in the bio (EASBio_SetCurrentGameWon); each
+// player still in (fewer than 5 letters) is paid their winnings (nDD8, GM_Earnings_AwardMoney), the
+// others lose theirs (nDD8 0).
+void GameModeSkillZoneHorse_EndGame(void) {
     int i;
     EASBio_SetCurrentGameWon(1);
     for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -472,8 +522,9 @@ void fn_800F4950(void) {
     }
 }
 
-// The points for landing on a surface.
-void fn_800F49E8(s32 nSurface, s32* pPoints) {
+// The points for landing on surface nSurface: the n10 of its gEarningsTable.aMini row (the last of
+// the 20 rows with that id), 0 when no row has it.
+void GameModeSkillZoneHorse_GetIDScore(s32 nSurface, s32* pPoints) {
     int i;
     *pPoints = 0;
     for (i = 0; i < 20; i++) {
@@ -483,13 +534,15 @@ void fn_800F49E8(s32 nSurface, s32* pPoints) {
     }
 }
 
-s32 fn_800F4B00(void) {
+// Whether the last shot took the lead from a leader (gHorseLastShotExceeded), for the HUD (UI
+// command 26): 1 or 0.
+s32 GameModeSkillZoneHorse_GetLastShotExceeded(void) {
     return ((u32)((-gHorseLastShotExceeded) | gHorseLastShotExceeded) >> 31);
 }
 
-// A target's state for its marker (GoDynObj): with a leader, 1 for every target but the leader's
-// (0 for it); 0 for all without a leader.
-s32 fn_800F4B14(int a, int i) {
+// Which marker model target nTarget shows (pfn26C, GoDynObj.c): with a leader, 1 for every target
+// but the leader's; 0 for the leader's and for all when there is none. nPlayer is not used.
+s32 GameModeSkillZoneHorse_GreenType(int a, int i) {
     if (gHorseLeader == 5 || i == gHorseLeaderTarget) {
         return 0;
     }

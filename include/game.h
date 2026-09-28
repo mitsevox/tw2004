@@ -555,7 +555,7 @@ void fn_800ED738(void);                 // mode 9
 void GameModeDriverRTE_Init(void);                 // mode 24
 void GameModeReplay_Init(void);                 // mode 10
 void GameModeSkillZoneCapture_Init(void);                 // mode 14
-void fn_800F39F4(void);                 // mode 15
+void GameModeSkillZoneHorse_Init(void);                 // mode 15
 void fn_800F4B40(void);                 // mode 16
 void fn_800F5AAC(void);                 // mode 17
 void GameModeSkillZoneTimed_Init(void);                 // mode 13
@@ -681,7 +681,7 @@ s32  GameModeSkillZoneTimed_GetDriveMultiplier(s32 a);                // GameMod
 void GameModeSkillZoneCapture_ShotClockOut(void);                 // GameMode14.c
 void GameMsg_Send5Ints(int nMsg, s32 a, s32 b, s32 c, s32 d, s32 e);    // GameMode14.c
 void GameModeSkillZoneCapture_SetShotClock(s32 a);                // GameMode14.c
-void fn_800F48C4(void);                 // GameMode15.c
+void GameModeSkillZoneHorse_ShotClockOut(void);                 // GameMode15.c
 void GameModeSkillZoneTimed_TimerOut(void);                 // GameMode13.c
 void GameModeSkillZoneTimed_SetHudClock(s32 a);                // GameMode13.c
 s32  GameModeSkins_CurrentHoleValue(void);                 // GameMode2.c: the skin on this hole

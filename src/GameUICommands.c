@@ -325,8 +325,8 @@ s32   GameModeSkillZoneCapture_GetTargettedCapturedRing(int nPlayer);
 s32   GameModeSkillZoneCapture_GetRingOwnerFromIndex(int i);
 s32   GameModeSkillZoneCapture_GetCapturedRingFromIndex(s32 p0);
 s32   GameModeSkillZoneCapture_GetMadeMoneyFromIndex(int n);
-s8    fn_800F4878(void);
-s32   fn_800F4B00(void);
+s8    GameModeSkillZoneHorse_GetCurrentLeaderRing(void);
+s32   GameModeSkillZoneHorse_GetLastShotExceeded(void);
 void  GameModeSkillZoneTimed_TenSecWarning(void);
 s32   GameModeSkins_CurrentHoleNumberSkins(void);
 s32   SpeedGolf_GetTotalTimeScore(int nPlayer);
@@ -996,7 +996,7 @@ void fn_800869A4(MsgArg* pArgs, MsgArg* pResult) {
         pResult->i = gPlayers[pArgs[0].i].nE88;
         return;
     case 21:
-        pResult->i = fn_800F4878();
+        pResult->i = GameModeSkillZoneHorse_GetCurrentLeaderRing();
         return;
     case 22:
         pResult->i = gPlayers[pArgs[0].i].nE8C;
@@ -1011,7 +1011,7 @@ void fn_800869A4(MsgArg* pArgs, MsgArg* pResult) {
         pResult->i = gPlayers[pArgs[0].i].aDC4[1] + 5;
         return;
     case 26:
-        pResult->i = fn_800F4B00();
+        pResult->i = GameModeSkillZoneHorse_GetLastShotExceeded();
         return;
     case 27:
         pResult->i = fn_800F1960();

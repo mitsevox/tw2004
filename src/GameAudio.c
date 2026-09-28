@@ -1331,7 +1331,8 @@ void Gaud_ScoreInRing(void) {
 }
 
 // Mode 15 (HORSE on the targets): variation range 4 of emitter 3's track 0, played when a UI
-// command voids the current shot (fn_800F48C4) and the leader's opponent takes a letter.
+// command voids the current shot (GameModeSkillZoneHorse_ShotClockOut) and the leader's opponent
+// takes a letter.
 void Gaud_LetterForfeit(void) {
     Aud_EmiAliasSetTrackVarRange(3, 0, 4);
     Aud_EmiAliasSetTrackStatus(3, 0, 1);
