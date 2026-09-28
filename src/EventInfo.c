@@ -417,7 +417,7 @@ void FE_GetNextRealtimeEventInfo(MsgArg* pArgs, MsgArg* pResult) {
 // FE message 544: the console clock's date and time as text ("M/D/YYYY H:MM AM",
 // RTClock_GetDateTimeString) when its year is before 2003 and its month before October; otherwise
 // an empty string. Gives 1 when it wrote the date. As written, October to December of an earlier
-// year give the empty string too.
+// year give the empty string too (see the EA bug).
 void FE_GetDateTimeIfClockEarly(MsgArg* pArgs, MsgArg* pResult) {
     s32 nMonth;
     s32 nYear;
@@ -427,6 +427,8 @@ void FE_GetDateTimeIfClockEarly(MsgArg* pArgs, MsgArg* pResult) {
 
     fn_8011E020(&nMonth, &nUnused, &nYear, &nUnused, &nUnused, &nUnused, &nUnused);
     bShow = 0;
+    // EA bug: && makes this no date cutoff: a clock in January to September of a year before 2003
+    // counts as early, one in October to December of the same year does not
     if (nYear < 2003 && nMonth < 10) {
         bShow = 1;
     }

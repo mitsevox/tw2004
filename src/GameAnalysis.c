@@ -182,9 +182,9 @@ int GameAnalysis_CountHolesWithPuttsSoFarThisRound(int nPlayer) {
 
 // A player's statistic for tip nStat over the round's holes before the current one: 0 the longest
 // drive (Player.nLongestDrive), 1 fairways hit as a percentage of the holes played (par 3s count in
-// the total), 2 greens in regulation as a percentage, 3 putts on greens hit in regulation, 4 putts
-// per hole, 5 the longest putt (Player.nLongestPutt), 6 pars, 7 birdies, 8 eagles, 9 albatrosses,
-// 10 bogeys, 11 double bogeys or worse; 0 for any other tip (12, 13).
+// the total: see the EA bug), 2 greens in regulation as a percentage, 3 putts on greens hit in
+// regulation, 4 putts per hole, 5 the longest putt (Player.nLongestPutt), 6 pars, 7 birdies, 8
+// eagles, 9 albatrosses, 10 bogeys, 11 double bogeys or worse; 0 for any other tip (12, 13).
 f32 GameAnalysis_GetTipStat(int nPlayer, u32 nStat) {
     f32 f = 0.0f;
     int nHoles = GameAnalysis_CountCompletedHoles();
@@ -197,6 +197,9 @@ f32 GameAnalysis_GetTipStat(int nPlayer, u32 nStat) {
         break;
     case 1:
         if (nHoles != 0) {
+            // EA bug: divides by every hole played, par 3s too, though only a par 4 or 5 can have
+            // its fairway hit (Earnings.c sets bFairwayHit only there; the PGA TOUR round statistics
+            // count par 4s and 5s only), so after a par 3 hitting every fairway shows below 100%
             f = 100.0f * ((f32)GameAnalysis_CountTotalFairwaysSoFarThisRound(nPlayer) / (f32)nHoles);
         }
         break;
