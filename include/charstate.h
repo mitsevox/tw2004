@@ -51,7 +51,7 @@ LAYOUT_ASSERT(SkinDescB8, 0x10);
 // An entry of SkinDesc.p14, copied and patched by SkinPart_ApplySetsToMaterialEntry.
 typedef struct SkinDesc14 {
     u64  uId;                   // 0x00
-    u32  u08;                   // 0x08  bit 2: take a4 from SkinDesc.pB8
+    u32  u08;                   // 0x08  bit 2: take a20 from SkinDesc.pB8; bit 1: not listed (SkinPart_ListOptionTextures)
     u32  u0C;                   // 0x0C
     u32  u10;                   // 0x10
     s16  n14;                   // 0x14
@@ -633,9 +633,10 @@ typedef struct SkinTris {
 LAYOUT_ASSERT(SkinTris, 0xF0);
 extern SkinTris gSkinBoneTris;
 
-extern void* gSkinFrameBuf;              // } Skin.c; SKN_CloseModule frees gSkinFrameBuf and clears all
-extern s32   gSkinFrameBufUsed;              // } three
-extern s32   gSkinFrameBufSize;              // }
+// Skin.c: SKN_CloseModule frees gSkinFrameBuf and clears all three.
+extern void* gSkinFrameBuf;
+extern s32   gSkinFrameBufUsed;
+extern s32   gSkinFrameBufSize;
 
 // SkinPart.c, as FE_CrAPDB.c uses it: find a part (or set) by id, a variant by id or name, and
 // pick a part's (or set's) variant.
