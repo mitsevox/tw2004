@@ -48,7 +48,8 @@ LAYOUT_ASSERT(LightGroup, 0x38);
 // One set of lights (0x8C bytes).
 typedef struct LightSet {
     TerSettings settings;       // 0x00  the terrain colours: LF_UseCurrentFogSettings copies them to the renderer's
-                                //       (fn_80035440), LF_ResetCurrentFogSettings resets them (fn_8006F334)
+                                //       (LF_SetFogSettings), LF_ResetCurrentFogSettings resets them
+                                //       (fn_8006F334)
     LightGroup group;           // 0x54
 } LightSet;
 LAYOUT_ASSERT(LightSet, 0x8C);

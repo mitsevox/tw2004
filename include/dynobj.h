@@ -97,17 +97,18 @@ typedef struct UObjMeshInfo {
     u8   unk8[0x24 - 0x8];
     s8   a24[0x54 - 0x24];      // 0x24  Object_GetMeshFlags, GoTerrain.c Ter_GetMeshFlags (length unknown, at
                                 //       most this)
-    f32  f54;                   // 0x54  scales a terrain object's mipmap bias (GoTerrain.c fn_80035560)
+    f32  f54;                   // 0x54  scales a terrain object's mipmap bias (GoTerrain.c Ter_GetMeshMipmapBiasScale)
     f32  v58[3];                // 0x58  copied to UObjModel.v2C by type 0's setup; with f64 the
-                                //       bounding sphere GoTerrain.c's fn_800354C4 returns
+                                //       bounding sphere GoTerrain.c's Ter_GetMeshBoundingSphere returns
     f32  f64;                   // 0x64  copied to UObjModel.f5C by type 0's setup
-    f32  a68[8];                // 0x68  a terrain object's bounds (GoTerrain.c fn_80035508,
+    f32  a68[8];                // 0x68  a terrain object's bounds (GoTerrain.c Ter_GetMeshBounds,
                                 //       Ter_AddPatchObjects): its centre [0..2], a radius [3] and a height
                                 //       [7]
     s16  n88;                   // 0x88  the type of the mesh's parts (LLObj_Gc.c fn_80007658)
     u8   unk8A[0x8B - 0x8A];
     u8   b8B;                   // 0x8B  bit 1: a terrain object drawn without z writes (GoTerrain.c
-                                //       fn_80035554, Ter_SetObjectRenderState); passed on in UObjPartDesc.u0A
+                                //       Ter_GetMeshDrawFlags, Ter_SetObjectRenderState); passed on
+                                //       in UObjPartDesc.u0A
     s16  n8C;                   // 0x8C  how many parts UObjMesh.p18 holds (fn_80007658)
     u16  u8E;                   // 0x8E  (fn_80007658)
 } UObjMeshInfo;
@@ -134,14 +135,15 @@ typedef struct UObjPartDesc {
 } UObjPartDesc;
 
 // One level of detail of a UObjModel. The terrain's hole data is a tree of them (GoTerrain.c,
-// Ter_GetMeshNext..fn_80035500): the root holds a mesh per patch in its p8[1], a patch's p8[0] is its
-// ground and its p8[1] holds its object lists, whose meshes are the objects' (Ter_GetObjectListModel).
+// Ter_GetMeshNext..Ter_GetHoleModelRoot): the root holds a mesh per patch in its p8[1], a patch's
+// p8[0] is its ground and its p8[1] holds its object lists, whose meshes are the objects'
+// (Ter_GetObjectListModel).
 typedef struct UObjMesh {
     UObjMeshInfo* pInfo;        // 0x00
     u8   unk4[4];
     struct UObjMesh** p8;       // 0x08  alternatives, by UObject.n108 (Object_GetMeshAlternative); a terrain
                                 //       mesh's children (Ter_GetMeshChild)
-    struct UObjMesh* pC;        // 0x0C  in a terrain patch's ground: the mesh drawn for it (fn_8003556C)
+    struct UObjMesh* pC;        // 0x0C  in a terrain patch's ground: the mesh drawn for it (Ter_GetGroundDrawMesh)
     struct UObjMesh* p10;       // 0x10  its first child, the rest by p14 (pInfo->n0 of them; LLObj_Gc.c
                                 //       fn_80007524)
     struct UObjMesh* p14;       // 0x14  the next terrain mesh of a list (Ter_GetMeshNext); a patch's

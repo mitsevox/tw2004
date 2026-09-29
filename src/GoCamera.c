@@ -9,7 +9,7 @@ void LLMath_InvertNormalized(f32 (*pSrc)[4], f32 (*pDst)[4]);     // UMemPool.c:
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);                     // identity
 void CA_vSetDefaultScalingVectors(CamLens* pLens);
 f32  Math_Tan(f32 x);                              // tan, as a float
-void fn_800354B4(u8* p, f32 v);                       // GoTerrain.c: sets the lens's far clip, fAC
+void Camera_SetLensFarClip(u8* p, f32 v);             // GoTerrain.c: sets the lens's far clip, fAC
 void LLMath_mat44fltMultiplyList(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void CA_vSetMatrix(CamLens* pLens, f32 (*pMtx)[4]);
 void fn_800769C0(CamLens* pLens, f32 fA8, f32 fAC);
@@ -186,7 +186,7 @@ void CA_vSetMatrix(CamLens* pLens, f32 (*pMtx)[4]) {
 
 void fn_800769C0(CamLens* pLens, f32 fA8, f32 fAC) {
     fn_80076A04(pLens, fA8);
-    fn_800354B4((u8*)pLens, fAC);
+    Camera_SetLensFarClip((u8*)pLens, fAC);
 }
 
 void fn_80076A04(CamLens* pLens, f32 fA8) {

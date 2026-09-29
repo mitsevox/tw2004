@@ -73,7 +73,7 @@ void REPLAY_Save(int nPlayer) {
     nMode = gSession.options.nWeather;
     gReplayData.nWeather = nMode;
     if (nMode == 2) {
-        if (fn_80035574()) {
+        if (Weather_IsRaining()) {
             gReplayData.nWeather = 3;
         } else {
             gReplayData.nWeather = 4;

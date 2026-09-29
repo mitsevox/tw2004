@@ -40,7 +40,7 @@ void  Ter_DrawPatchPass(int nRenderPass);
 void  Ter_DrawFarClipPatches(void);
 void  Ter_DrawObjects(void);
 void  Ter_DrawPanoramaList(void* pHoleData, u32 nList);
-void  fn_8003546C(f32* pA, f32* pB, f32* pOut);
+void  LLMath_Subtract3(f32* pA, f32* pB, f32* pOut);
 f32   Camera_GetLensFovScale(CamLens* pLens);
 f32   Ter_GetTimeInCycle(u32 n, f32 fPeriod);
 // calls row nRow's function of lbl_80188E88 with pData
@@ -50,7 +50,7 @@ void  Ter_SetZWrite(int n);
 void  RenderState_ChangeDrawFlags(u32 uClear, u32 uSet);
 void  RC_vUpdateCurrentRenderCtxTransformationMatrices(void);
 void  RC_UpdateCurrentScreenMatrices(void);
-void  fn_800354B4(u8* p, f32 v);        // sets the lens's far clip distance, fAC (fn_80014268 reads it)
+void  Camera_SetLensFarClip(u8* p, f32 v); // sets the lens's far clip distance, fAC (fn_80014268 reads it)
 f32   fn_80014268(u8* p);
 void  Ter_SetLODPlanes(Ter_LODPlane* pPlanes, f32 fStep, s32 a, s32 b, s32 c, s32 d);
 void  Ter_DrawPatchGround(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s32 n20, u8* pbFirst,
@@ -60,36 +60,36 @@ void  Ter_DrawObjectList(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, 
 void  Ter_LODLoadCallback(UStreamObject* pObject);
 void  Ter_HoleDataLoadCallback(UStreamObject* pObject);
 void  Ter_CourseLoadCallback(UStreamObject* pObject);
-void  fn_80035584(s32 v);
-void  fn_80035590(f32* p0);
-void  fn_800355B8(f32* p0);
+void  SF_vSetFlareType(s32 v);
+void  SF_vSetSunPosition(f32* p0);
+void  SF_vSetSunColor(f32* p0);
 void  Ter_SetCourseMipmapBias(int n);
-void  fn_80035514(u8* pObject);
+void  Ter_DrawMeshCurrentPart(u8* pObject);
 void  Ter_ResetObjectRenderState(void);
 u8    Ter_SetManageZUpdate(u8 b);
-f32*  fn_80035508(UObjMesh* pMesh);
+f32*  Ter_GetMeshBounds(UObjMesh* pMesh);
 u8    Ter_SetObjectRenderState(Ter_ObjectDrawData* pDraw, u8 bForce);
 void  LLMath_IdentifyMat(f32 (*pMtx)[4]);  // identity matrix
 void  LF_SetCurrentDefaultLights(void);
 void  Ter_DrawGrassPatches(int nRenderPass);
 void  Ter_DrawGrassPatchesPass3(void);
 void  Ter_BuildGrassPatchList(void* pUnused);
-void  fn_80035490(f32* pA, f32* pB, f32* pOut);
+void  LLMath_Subtract(f32* pA, f32* pB, f32* pOut);
 
 UObjMesh* Ter_GetMeshNext(UObjMesh* pNode);
-f32       fn_80035560(UObjMesh* pMesh);
-f32*      fn_800354C4(UObjMesh* pNode);
+f32       Ter_GetMeshMipmapBiasScale(UObjMesh* pMesh);
+f32*      Ter_GetMeshBoundingSphere(UObjMesh* pNode);
 s32       Ter_GetMeshFlags(UObjMesh* pNode, s32 n);
 UObjMesh* Ter_GetMeshChild(UObjMesh* pNode, s32 n);
 s32       Ter_GetMeshChildCount(UObjMesh* pNode);
-UObjMesh* fn_80035500(u8* pHoleData);
-UObjMesh* fn_8003556C(UObjMesh* pGround);
-s32       fn_80035554(UObjMesh* pMesh);
+UObjMesh* Ter_GetHoleModelRoot(u8* pHoleData);
+UObjMesh* Ter_GetGroundDrawMesh(UObjMesh* pGround);
+s32       Ter_GetMeshDrawFlags(UObjMesh* pMesh);
 
 // .bss and .sbss in reverse address order
 Ter_TerrainRendererMgr gTerRenderer;   // the terrain renderer's state
 s32 gTerLowBitCounts[5][32];        // [n][k]: how many of k's lowest n bits are set
-s32 gTerUnreadToggle;               // written by fn_800355E0, read nowhere
+s32 gTerUnreadToggle;               // written by CharacterRender_SetCurrentBuffer, read nowhere
 s32 gTerPanoramaList2HiddenCount;   // Ter_DrawPanoramaList leaves out list 2's last this-many
 f32 gTerTreePeriodRandom;           // Ter_vInitModule's pseudo-random number, 0..1
 
@@ -322,8 +322,8 @@ void Ter_BeginRender(void) {
 
 // fake match: these two stand in for code the original linker stripped. The file's pool has
 // Ter_GetTimeInCycle's constants (1/59.94, 59.94, 0.5/59.94, the u32 conversion's) and then 0.375, 4.15
-// and 10 (as fn_80035398 uses them) right after Ter_BeginRender's; their bodies are unknown, these
-// only reproduce the order.
+// and 10 (as LF_ApplyFogToRenderState uses them) right after Ter_BeginRender's; their bodies are
+// unknown, these only reproduce the order.
 static f32 GoTerrain_StrippedFn2(u32 n, f32 x) {
     return FRAME_TIME * (f32)(n % (u32)(FRAME_RATE * (0.5f / FRAME_RATE + x)));
 }
@@ -357,14 +357,14 @@ void Ter_RenderView(void* pHoleData, int nView) {
     gTerRenderer.xCameraLookVector[3] = 1.0f;
     gTerRenderer.fXZDistanceToClosestBallSquared = 1000000.0f;
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        fn_80035490(gPlayers[i].ball.vPos, gTerRenderer.xCameraReferencePos, vDiff);
+        LLMath_Subtract(gPlayers[i].ball.vPos, gTerRenderer.xCameraReferencePos, vDiff);
         vDiff[1] = 0.0f;
         fDist = Vec3_LengthSqClamped(vDiff);
         if (fDist < gTerRenderer.fXZDistanceToClosestBallSquared) {
             gTerRenderer.fXZDistanceToClosestBallSquared = fDist;
         }
     }
-    fn_8003546C(gPlayers[ViewController_GetActivePlayerNumber(gTerRenderer.iCurrentViewContext)].vBall,
+    LLMath_Subtract3(gPlayers[ViewController_GetActivePlayerNumber(gTerRenderer.iCurrentViewContext)].vBall,
                 &Ter_GetTGD()->pin[Game_CurrentPinSet()].x, vToPin);
     vToPin[1] = 0.0f;
     gTerRenderer.fGolferDistanceToCup = Math_Sqrt(Vec3_LengthSqClamped(vToPin));
@@ -433,7 +433,7 @@ void Ter_BuildPatchLists(void* pHoleData) {
             }
         }
     }
-    pRoot = fn_80035500(pHoleData);
+    pRoot = Ter_GetHoleModelRoot(pHoleData);
     if (gTerRenderer.bObjectTestMode) {
         pPatch = &gTerRenderer.pPatchList[gTerRenderer.iTotalPatches++];
         pPatch->fDistance = 0.0f;
@@ -459,8 +459,9 @@ void Ter_BuildPatchLists(void* pHoleData) {
                 } else {
                     iRenderPass = 0;
                 }
-                fRadius = fn_800354C4(pMesh)[3];
-                fDist = LLMath_DistanceBetween3(gTerRenderer.xCameraReferencePos, fn_800354C4(pMesh))
+                fRadius = Ter_GetMeshBoundingSphere(pMesh)[3];
+                fDist = LLMath_DistanceBetween3(gTerRenderer.xCameraReferencePos,
+                                                Ter_GetMeshBoundingSphere(pMesh))
                         - fRadius;
                 if (fDist < 0.0f) {
                     fDist = 0.0f;
@@ -506,7 +507,7 @@ void Ter_FillPatchReference(UObjMesh* pNode, s32 eClipMethod, s32 iRenderPass, T
     s32 nNodes;
 
     pPatch->fDistance = fDistance;
-    pPatch->fBoundingRadius = fn_800354C4(pNode)[3];
+    pPatch->fBoundingRadius = Ter_GetMeshBoundingSphere(pNode)[3];
     pPatch->eClipMethod = eClipMethod;
     pPatch->iRenderPass = iRenderPass;
     nNodes = Ter_GetMeshChildCount(pNode);
@@ -589,12 +590,12 @@ void Ter_AddPatchObjects(Ter_PatchReference* pPatch, s32 nFirstObject) {
     for (i = nObjects - 1; i >= 0; i--) {
         uFlags2 = Ter_GetMeshFlags(pLOD0, 2);
         if (gSession.nSplitScreen == 0 || !(uFlags2 & 8)) {
-            pBounds = fn_80035508(pLOD0);
+            pBounds = Ter_GetMeshBounds(pLOD0);
             fHeight = fabsf(gTerRenderer.xCameraReferencePos[1] - pBounds[1]) - pBounds[7];
             if (fHeight < 0.0f) {
                 fHeight = 0.0f;
             }
-            fn_8003546C(pBounds, gTerRenderer.xCameraReferencePos, v48);
+            LLMath_Subtract3(pBounds, gTerRenderer.xCameraReferencePos, v48);
             v48[1] = 0.0f;
             fXZ = (f32)Math_Sqrt(Vec3_LengthSqClamped(v48)) - pBounds[3];
             if (fXZ < 0.0f) {
@@ -612,19 +613,19 @@ void Ter_AddPatchObjects(Ter_PatchReference* pPatch, s32 nFirstObject) {
                 pBall = gPlayers[ViewController_GetActivePlayerNumber(
                         gTerRenderer.iCurrentViewContext)].vBall;
                 pPin = &Ter_GetTGD()->pin[Game_CurrentPinSet()].x;
-                fn_8003546C(pBounds, pBall, v28);
+                LLMath_Subtract3(pBounds, pBall, v28);
                 v28[1] = 0.0f;
                 fBallToObject = (f32)Math_Sqrt(Vec3_LengthSqClamped(v28)) - pBounds[3];
                 if (fBallToObject < 0.0f) {
                     fBallToObject = 0.0f;
                 }
-                fn_8003546C(pPin, pBall, v18);
+                LLMath_Subtract3(pPin, pBall, v18);
                 v18[1] = 0.0f;
                 fPinToBall = Math_Sqrt(Vec3_LengthSqClamped(v18));
                 if (fPinToBall < 0.0f) {
                     fPinToBall = 0.0f;
                 }
-                fn_8003546C(pBounds, pPin, v8);
+                LLMath_Subtract3(pBounds, pPin, v8);
                 v8[1] = 0.0f;
                 fObjectToPin = (f32)Math_Sqrt(Vec3_LengthSqClamped(v8)) - pBounds[3];
                 if (fObjectToPin < 0.0f) {
@@ -673,7 +674,7 @@ void Ter_AddPatchObjects(Ter_PatchReference* pPatch, s32 nFirstObject) {
                 pRef = &gTerRenderer.pObjectSortList[gTerRenderer.iTotalSortObjects];
                 pRef->fDistanceSquared = fDistanceSquared;
                 pRef->f14 = Vec3_LengthSqClamped(v48);
-                fn_8003546C(pBounds, gTerRenderer.xCameraReferencePos, v38);
+                LLMath_Subtract3(pBounds, gTerRenderer.xCameraReferencePos, v38);
                 pRef->f18 = Vec3_Dot(gTerRenderer.xCameraLookVector, v38);
                 iObject = nLast - i;
                 pRef->eClipMethod = eClipMethod;
@@ -988,7 +989,7 @@ void Ter_BuildObjectDrawLists(void) {
 // Whether a ball has settled inside pModel's bounding sphere: a ball that has left where its shot
 // started, has hit something (nCollideCount) and moves slower than 10.
 u8 Ter_IsBallStoppedInModel(UObjMesh* pModel) {
-    f32* pSphere = fn_800354C4(pModel);
+    f32* pSphere = Ter_GetMeshBoundingSphere(pModel);
     f32 fRadiusSq = pSphere[3] * pSphere[3];
     int i;
 
@@ -1138,13 +1139,13 @@ void Ter_DrawFarClipPatches(void) {
         Ter_SetZWrite(0);
         pLens = ((Camera*)*lbl_80280DF0)->unk10;
         fAC = fn_80014268((u8*)pLens);
-        fn_800354B4((u8*)pLens, 25.0f + fAC);
+        Camera_SetLensFarClip((u8*)pLens, 25.0f + fAC);
         RC_UpdateCurrentScreenMatrices();
         RC_vUpdateCurrentRenderCtxTransformationMatrices();
         RenderState_SetCameraMatrices();
         RenderState_SetCameraMatrices();
         RenderState_SetCameraMatrices();
-        fn_800354B4((u8*)pLens, fAC);
+        Camera_SetLensFarClip((u8*)pLens, fAC);
         RenderState_Flush();
         RenderState_SetDrawFlags(0x70);
         for (nClip = 0; nClip <= 2; nClip++) {
@@ -1317,7 +1318,7 @@ void Ter_DrawPatchGround(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32
         RenderState_Flush();
     }
     if (uFlags2 & 8) {
-        fn_80035514((u8*)pMesh);
+        Ter_DrawMeshCurrentPart((u8*)pMesh);
         pMesh = Ter_GetMeshNext(pMesh);
     }
     if (bLake) {
@@ -1347,7 +1348,7 @@ void Ter_DrawPatchGround(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32
             RenderState_SetCameraMatrices();
             DS_vEnableZBufferUpdate(0);
             RenderState_Flush();
-            fn_80035514((u8*)pMesh);
+            Ter_DrawMeshCurrentPart((u8*)pMesh);
             DS_vEnableZBufferUpdate(1);
             RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
             RenderState_SetCameraMatrices();
@@ -1466,7 +1467,7 @@ void Ter_DrawObjectList(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s
             RenderState_Flush();
             bDirty = 0;
         }
-        fn_80035514((u8*)pDraw->pObject);
+        Ter_DrawMeshCurrentPart((u8*)pDraw->pObject);
         if (pDraw->bSetsPrimField) {
             bForce = 1;
         }
@@ -1489,7 +1490,7 @@ u8 Ter_SetObjectRenderState(Ter_ObjectDrawData* pDraw, u8 bForce) {
     u32 uFlags;
     u8 bZWrite;
 
-    if (fn_80035554(pDraw->pObject) & 2) {
+    if (Ter_GetMeshDrawFlags(pDraw->pObject) & 2) {
         nRef = 1;
         uFlags = 0x40;
         bZWrite = 0;
@@ -1865,7 +1866,7 @@ void Ter_DrawPanoramaList(void* pHoleData, u32 nList) {
     int i;
 
     if ((nList != 0 || gTerDrawPanoramaList0) && (nList != 2 || gTerDrawPanoramaList2)) {
-        pRoot = fn_80035500(pHoleData);
+        pRoot = Ter_GetHoleModelRoot(pHoleData);
         nItems = 0;
         if (Ter_GetMeshChildCount(pRoot) >= (s32)(nList + 1)) {
             pList = Ter_GetMeshChild(pRoot, nList);
@@ -1873,7 +1874,7 @@ void Ter_DrawPanoramaList(void* pHoleData, u32 nList) {
             pMesh = Ter_GetMeshChild(pList, 0);
             for (i = 0; i < nCount; i++) {
                 if (nList == 0) {
-                    if (fn_80035574()) {
+                    if (Weather_IsRaining()) {
                         if (i >= 0 && i <= 1) {
                             pMesh = Ter_GetMeshNext(pMesh);
                             continue;
@@ -1895,10 +1896,11 @@ void Ter_DrawPanoramaList(void* pHoleData, u32 nList) {
                                         pView->f54);
                     if (nClip != 3) {
                         // fake match: uFlags is reused for bUseFog (fog unless flag 0x20); a new local
-                        // is computed after the call to fn_80035560, the original before it
+                        // is computed after the call to Ter_GetMeshMipmapBiasScale, the original before it
                         uFlags = ((uFlags & 0x20) >> 5) ^ 1;
                         Ter_AddObjectDraw(&gTerRenderer.pPanoramaItemsList[nItems], &nItems, 300, pMesh, 1.0f,
-                                    gTerRenderer.fDefaultObjectMipmapBias[0] * fn_80035560(pMesh), 0.0f,
+                                    gTerRenderer.fDefaultObjectMipmapBias[0]
+                                            * Ter_GetMeshMipmapBiasScale(pMesh), 0.0f,
                                     0x289 - i, nClip, uFlags, 0);
                     }
                 }
@@ -2013,9 +2015,9 @@ void Ter_CourseLoadCallback(UStreamObject* pObject) {
         v8[2] = -400.0f;
         v8[3] = 1.0f;
     }
-    fn_800355B8(v18);
-    fn_80035590(v8);
-    fn_80035584(nGlow);
+    SF_vSetSunColor(v18);
+    SF_vSetSunPosition(v8);
+    SF_vSetFlareType(nGlow);
     if (gTerRenderer.pCourse->v60[0] || gTerRenderer.pCourse->v60[1] || gTerRenderer.pCourse->v60[2]) {
         gSession.f5B3C = gTerRenderer.pCourse->v60[0];
         gSession.f5B40 = gTerRenderer.pCourse->v60[1];
@@ -2154,7 +2156,7 @@ UObjMesh* Ter_GetObjectListModel(u16 nPatch, u16 nObjList) {
     UObjMesh* pModel = NULL;
     UObjMesh* pNode;
 
-    pNode = Ter_GetMeshChild(fn_80035500(gTerRenderer.pCurrentHoleData), 1);
+    pNode = Ter_GetMeshChild(Ter_GetHoleModelRoot(gTerRenderer.pCurrentHoleData), 1);
     if (nPatch < Ter_GetMeshChildCount(pNode)) {
         pNode = Ter_GetMeshChild(pNode, nPatch);
         if (Ter_GetMeshChildCount(pNode) >= 2) {
@@ -2198,7 +2200,7 @@ void Ter_RenderGrass(void) {
     gTerRenderer.xCameraLookVector[3] = 1.0f;
     gTerRenderer.fXZDistanceToClosestBallSquared = 1000000.0f;
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        fn_80035490(gPlayers[i].ball.vPos, gTerRenderer.xCameraReferencePos, vDiff);
+        LLMath_Subtract(gPlayers[i].ball.vPos, gTerRenderer.xCameraReferencePos, vDiff);
         vDiff[1] = 0.0f;
         fDist = Vec3_LengthSqClamped(vDiff);
         if (fDist < gTerRenderer.fXZDistanceToClosestBallSquared) {
@@ -2322,16 +2324,17 @@ void Ter_BuildGrassPatchList(void* pUnused) {
     pGrass = gTerRenderer.xpGrassPatchList;
     for (i = 0; i < gTerRenderer.iTotalPatches; i++) {
         pPatch = &gTerRenderer.pPatchList[i];
-        if ((pPatch->n1C & 0x80) || (Ter_GetMeshFlags(fn_8003556C(pPatch->pGround), 3) & 8)) {
-            fRadius = fn_800354C4(fn_8003556C(pPatch->pGround))[3];
+        if ((pPatch->n1C & 0x80) || (Ter_GetMeshFlags(Ter_GetGroundDrawMesh(pPatch->pGround), 3) & 8)) {
+            fRadius = Ter_GetMeshBoundingSphere(Ter_GetGroundDrawMesh(pPatch->pGround))[3];
             fDist = LLMath_DistanceBetween3(gTerRenderer.xCameraReferencePos,
-                                             fn_800354C4(fn_8003556C(pPatch->pGround)))
+                                             Ter_GetMeshBoundingSphere(
+                                                     Ter_GetGroundDrawMesh(pPatch->pGround)))
                     - fRadius;
             if (fDist < 0.0f) {
                 fDist = 0.0f;
             }
             pView = ViewController_GetCameraControl(gTerRenderer.iCurrentViewContext);
-            nClip = fn_80007B2C(fn_8003556C(pPatch->pGround), pCamera, fDist,
+            nClip = fn_80007B2C(Ter_GetGroundDrawMesh(pPatch->pGround), pCamera, fDist,
                                 gTerRenderer.fCameraMinHalfFieldOfViewTan, pView->f54);
             if (nClip != 3) {
                 Mem_cpy(pGrass, pPatch, sizeof(Ter_PatchReference));
@@ -2429,9 +2432,9 @@ f32 Ter_GetTimeInCycle(u32 n, f32 fPeriod) {
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_80013D68();
-void fn_80035398(void);
-void fn_8003541C();
-void fn_80035440(TerSettings* pSettings);
+void LF_ApplyFogToRenderState(void);
+void LF_UpdateFogColourForCamera();
+void LF_SetFogSettings(TerSettings* pSettings);
 
 // Gives the current render camera the model matrix pMtx (NULL: the identity).
 void RC_vSetCurrentRenderCtxTransformationMatrix(f32 (*pMtx)[4]) {
@@ -2460,8 +2463,8 @@ void RC_UpdateCurrentScreenMatrices(void) {
 // (LF_UpdateFogColourForCamera), then hands the fog colour and distances to the renderer
 // (LF_ApplyFogToRenderState).
 void LF_UpdateFog(void) {
-    fn_8003541C();
-    fn_80035398();
+    LF_UpdateFogColourForCamera();
+    LF_ApplyFogToRenderState();
 }
 
 // ---- end of sweep code ----
@@ -2469,7 +2472,7 @@ void LF_UpdateFog(void) {
 // Takes the current light set's fog settings (colours round the compass, fog distance) as the ones
 // the fog is made from (LF_SetFogSettings).
 void LF_UseCurrentFogSettings(void) {
-    fn_80035440(&LF_spGetCurrentLightFogEnvironment()->settings);
+    LF_SetFogSettings(&LF_spGetCurrentLightFogEnvironment()->settings);
 }
 
 LightSet* LF_spGetCurrentLightFogEnvironment(void) {
@@ -2493,8 +2496,9 @@ void LF_SetCurrentDefaultLights(void) {
     fn_8006EDC0(&LF_spGetCurrentLightFogEnvironment()->group);
 }
 
-// Hands the renderer the colour and the two distances made from the current settings.
-void fn_80035398(void) {
+// Hands the renderer the fog made from the fog settings (lbl_802811E0): the colour f44..f4C, a
+// start distance of 0.375 x f50 and an end of 4.15 x (f50 + 10).
+void LF_ApplyFogToRenderState(void) {
     RenderState_SetFogColour(lbl_802811E0->f44, lbl_802811E0->f48, lbl_802811E0->f4C);
     RenderState_SetFogStart(0.375f * lbl_802811E0->f50);
     RenderState_SetFogEnd(4.15f * (10.0f + lbl_802811E0->f50));
@@ -2504,24 +2508,27 @@ void fn_80035398(void) {
 
 void fn_8006F154();
 extern s32 lbl_80281B88;
-void fn_800355E0(s32 arg0);
-void fn_80035600(void);
+void CharacterRender_SetCurrentBuffer(s32 arg0);
+void CharacterRender_StartNewFrame(void);
 
-void fn_8003541C(void) {
+// Blends the fog colour for the current camera's heading (fn_8006F154). The current render context
+// it fetches first is not used.
+void LF_UpdateFogColourForCamera(void) {
     RC_spGetCurrentRenderCtx();
     fn_8006F154();
 }
 
 // ---- end of sweep code ----
 
-// Takes a copy of the settings the renderer's colour and distances are made from.
-void fn_80035440(TerSettings* pSettings) {
+// Takes a copy of the fog settings (colours round the compass, turn, fog distance) that the fog
+// colour and distances are made from (lbl_802811E0).
+void LF_SetFogSettings(TerSettings* pSettings) {
     Mem_cpy(lbl_802811E0, pSettings, sizeof(TerSettings));
 }
 
 // a - b into out, three floats; the same helper as Ball.c's Ball_Vec3Sub.
 #ifdef __MWERKS__
-asm void fn_8003546C(register f32* pA, register f32* pB, register f32* pOut) {
+asm void LLMath_Subtract3(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 1, 0
@@ -2535,7 +2542,7 @@ asm void fn_8003546C(register f32* pA, register f32* pB, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_8003546C(f32* pA, f32* pB, f32* pOut) {
+void LLMath_Subtract3(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pA[0] - pB[0];
     pOut[1] = pA[1] - pB[1];
     pOut[2] = pA[2] - pB[2];
@@ -2544,7 +2551,7 @@ void fn_8003546C(f32* pA, f32* pB, f32* pOut) {
 
 // a - b into out, four floats.
 #ifdef __MWERKS__
-asm void fn_80035490(register f32* pA, register f32* pB, register f32* pOut) {
+asm void LLMath_Subtract(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 0, 0
@@ -2558,7 +2565,7 @@ asm void fn_80035490(register f32* pA, register f32* pB, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_80035490(f32* pA, f32* pB, f32* pOut) {
+void LLMath_Subtract(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pA[0] - pB[0];
     pOut[1] = pA[1] - pB[1];
     pOut[2] = pA[2] - pB[2];
@@ -2568,18 +2575,21 @@ void fn_80035490(f32* pA, f32* pB, f32* pOut) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_800354B4(u8* p, f32 v) {
+// Sets the lens's far clip distance (fAC, which fn_80014268 reads). Ter_DrawFarClipPatches and
+// GoGreenGrid.c push it out for a draw and put it back.
+void Camera_SetLensFarClip(u8* p, f32 v) {
     *(f32*)(p + 0xAC) = v;
 }
 
 // ---- end of sweep code ----
 
+// The next mesh after pNode among its parent's children (p14).
 UObjMesh* Ter_GetMeshNext(UObjMesh* pNode) {
     return pNode->p14;
 }
 
 // The node's bounding sphere: centre (v58), then radius (f64).
-f32* fn_800354C4(UObjMesh* pNode) {
+f32* Ter_GetMeshBoundingSphere(UObjMesh* pNode) {
     return pNode->pInfo->v58;
 }
 
@@ -2597,22 +2607,23 @@ s32 Ter_GetMeshChildCount(UObjMesh* pNode) {
     return pNode->pInfo->n0;
 }
 
-// The root of the hole data's model tree. The hole data's layout is not known yet, so the offset
-// stays raw.
-UObjMesh* fn_80035500(u8* pHoleData) {
+// The root of the hole data's model tree (the pointer at offset 0xEC of the hole data, whose layout
+// is not described): its p8[1] holds a mesh per patch.
+UObjMesh* Ter_GetHoleModelRoot(u8* pHoleData) {
     return *(UObjMesh**)(pHoleData + 0xEC);
 }
 
 // ---- sweep code (not yet cleaned up) ----
 
-// A terrain object's bounds.
-f32* fn_80035508(UObjMesh* pMesh) {
+// A terrain object's bounds (pInfo->a68): its centre [0..2], a radius [3] and a height [7].
+f32* Ter_GetMeshBounds(UObjMesh* pMesh) {
     return pMesh->pInfo->a68;
 }
 
-// If the object's current entry (n28) is switched on, hands its 0x2C-byte record to LLObj_Gc.c's
-// fn_800082CC. Raw offsets until the object's type is described.
-void fn_80035514(u8* pObject) {
+// Draws the mesh's current part: if part n28 is switched on (byte 0x1C + n28), hands its 0x2C-byte
+// UObjMeshPart (p18[n28]) to LLObj_Gc.c's fn_800082CC, as Object_DrawMesh does. Raw offsets: the
+// mesh comes in as bytes.
+void Ter_DrawMeshCurrentPart(u8* pObject) {
     s32 n = *(s32*)(pObject + 0x28);
 
     if (pObject[n + 0x1C] != 0) {
@@ -2620,36 +2631,51 @@ void fn_80035514(u8* pObject) {
     }
 }
 
-s32 fn_80035554(UObjMesh* pMesh) {
+// A terrain object's draw flag byte (pInfo->b8B): bit 1, drawn without z writes
+// (Ter_SetObjectRenderState).
+s32 Ter_GetMeshDrawFlags(UObjMesh* pMesh) {
     return pMesh->pInfo->b8B;
 }
 
-f32 fn_80035560(UObjMesh* pMesh) {
+// What a terrain object's mipmap bias is scaled by (pInfo->f54).
+f32 Ter_GetMeshMipmapBiasScale(UObjMesh* pMesh) {
     return pMesh->pInfo->f54;
 }
 
-// The ground's pC node: Ter_BuildGrassPatchList tests its flags and bounds for the grass list.
-UObjMesh* fn_8003556C(UObjMesh* pGround) {
+// The mesh drawn for a patch's ground (pC): Ter_BuildGrassPatchList tests its flags and bounds for
+// the grass list.
+UObjMesh* Ter_GetGroundDrawMesh(UObjMesh* pGround) {
     return pGround->pC;
 }
 
-u8 fn_80035574(void) {
+// Whether the hole's weather has flag 0x2 (lbl_802811F0, rolled per course by fn_8006F650):
+// GameAudio.c plays the rain sound on it, Replay.c records it as weather 3, the caddie's weather
+// tip fires, and Ter_DrawPanoramaList leaves out panorama list 0's first two meshes.
+u8 Weather_IsRaining(void) {
     return lbl_802811F0->uFlags & 2;
 }
 
-void fn_80035584(s32 v) {
+// Sets the sun flare's type (lbl_802813B8->n1930; SF_vInitModule sets 1, a course's glow data
+// 0..3).
+void SF_vSetFlareType(s32 v) {
     lbl_802813B8->n1930 = v;
 }
 
-void fn_80035590(f32* p0) {
+// Sets the sun's position for the flare (lbl_802813B8->v4; SF_vInitModule sets (0, 150, -400)).
+void SF_vSetSunPosition(f32* p0) {
     LLMath_CopyVec(p0, lbl_802813B8->v4);
 }
 
-void fn_800355B8(f32* p0) {
+// Sets the sun's colour for the flare (lbl_802813B8->v14; SF_vInitModule sets 0.8, 0.8, 0.4).
+void SF_vSetSunColor(f32* p0) {
     LLMath_CopyVec(p0, lbl_802813B8->v14);
 }
 
-void fn_800355E0(s32 arg0) {
+// Records which buffer this frame draws to for the characters (gCharRendCurrentBuffer):
+// gomainloop.c passes the video field's parity (lbl_80281B88 & 1) each frame outside start-up; when
+// the value equals that parity, which with that one caller is always, the stored value flips
+// instead. Nothing reads it in this build.
+void CharacterRender_SetCurrentBuffer(s32 arg0) {
     s32 var_r3;
 
     var_r3 = arg0;
@@ -2659,10 +2685,16 @@ void fn_800355E0(s32 arg0) {
     gTerUnreadToggle = var_r3;
 }
 
-void fn_80035600(void) {
+// Starts a frame of character drawing: empty in this build (and in TW07). Character_PreRenderAll
+// and FEgolferanim.c call it first.
+void CharacterRender_StartNewFrame(void) {
 }
 
-void fn_80035604(void) {
+// Sets the renderer up for drawing the characters: the identity model matrix, the render context's
+// matrices and the camera's, blend source alpha over inverse source alpha. Character_RenderAll and
+// shadow.c call it first. EA's takes a flags word (TW07: uint32 flags); shadow.c passes 2, which
+// this build ignores.
+void CharacterRender_RenderSetup(void) {
     RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
     RC_vUpdateCurrentRenderCtxTransformationMatrices();
     RenderState_SetCameraMatrices();

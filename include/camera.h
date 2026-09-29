@@ -27,7 +27,7 @@ typedef struct CamLens {
     f32  fA8;                   // 0xA8  the near clip distance (RC_vUpdateRenderCtxScreenMatricesAndInfo
                                 //       builds the projection from it); CA_vInitCamera starts it at 0.1
     f32  fAC;                   // 0xAC  the far clip distance; CA_vInitCamera starts it at 4096
-                                //       (GoTerrain.c fn_800354B4 sets it)
+                                //       (GoTerrain.c Camera_SetLensFarClip sets it)
     f32  fB0;                   // 0xB0  Camera_GetLensFovScale; the zoom-to-aim camera divides its
                                 //       distance by it
     f32  fFlatWidth;            // 0xB4  } a flat camera's view width and height in world units:

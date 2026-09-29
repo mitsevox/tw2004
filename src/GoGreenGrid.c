@@ -18,7 +18,7 @@ void SD_FreeShaderObject(void* pMesh);
 void SD_DrawShaderObject(u8* pMesh);
 void RC_vUpdateCurrentRenderCtxTransformationMatrices(void);
 void RC_UpdateCurrentScreenMatrices(void);
-void fn_800354B4(u8* p, f32 v);         // sets the lens's far clip distance, fAC (fn_80014268 reads it)
+void Camera_SetLensFarClip(u8* p, f32 v); // sets the lens's far clip distance, fAC (fn_80014268 reads it)
 f32  fn_80014268(u8* p);
 
 void fn_8009CB78(f32* pA, f32* pB, f32* pOut);
@@ -470,13 +470,13 @@ void fn_8009C914(int nView) {
     RenderState_SetClipMode(0);
     pLens = ((Camera*)*lbl_80280DF0)->unk10;
     fAC = fn_80014268((u8*)pLens);
-    fn_800354B4((u8*)pLens, 500.0f + fAC);
+    Camera_SetLensFarClip((u8*)pLens, 500.0f + fAC);
     RC_UpdateCurrentScreenMatrices();
     RC_vUpdateCurrentRenderCtxTransformationMatrices();
     RenderState_SetCameraMatrices();
     RenderState_SetCameraMatrices();
     RenderState_SetCameraMatrices();
-    fn_800354B4((u8*)pLens, fAC);
+    Camera_SetLensFarClip((u8*)pLens, fAC);
     RenderState_Flush();
     draw.nPrims = 3;
     draw.nFirst = 0;

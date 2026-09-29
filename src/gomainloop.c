@@ -99,7 +99,7 @@ void Ter_DrawHoleView(int nView);
 void RenderState_SetFogEnd(f32 f);
 void RenderState_SetFogStart(f32 f);
 void RenderState_SetFogColour(u8 r, u8 g, u8 b);
-void fn_800355E0(s32 nField);
+void CharacterRender_SetCurrentBuffer(s32 nField);
 void SKN_DrawBoneTris(int nView);
 void RC_ApplyCurrentViewport(void);
 void fn_80037F80(void);
@@ -376,12 +376,12 @@ void fn_8006C63C(void) {
 }
 
 // Hands the frame parity (lbl_80281B88 & 1) to fn_8006DC40 and fn_800162A4 (both empty) and,
-// outside start-up (game type 1), to fn_800355E0.
+// outside start-up (game type 1), to CharacterRender_SetCurrentBuffer.
 void fn_8006C69C(void) {
     fn_8006DC40(lbl_80281B88 & 1);
     fn_800162A4(lbl_80281B88 & 1);
     if (gSession.nGameType != 1) {
-        fn_800355E0(lbl_80281B88 & 1);
+        CharacterRender_SetCurrentBuffer(lbl_80281B88 & 1);
     }
 }
 
@@ -955,13 +955,13 @@ void fn_8006D27C(void) {
             fn_80067CD4(ViewController_GetActivePlayerNumber(nView));
         }
         fn_8006DEA8();
-        if (nView < 2 && (!fn_80035574() || (fn_80035574() && fn_8006E0C0()))) {
+        if (nView < 2 && (!Weather_IsRaining() || (Weather_IsRaining() && fn_8006E0C0()))) {
             GLW_vUpdateGlows(nView);
             GLW_vRenderGlows(nView);
         }
         fn_8006DF28();
         if (nView < 2) {
-            fn_80035574();
+            Weather_IsRaining();
         }
         fn_8006DEA8();
         if (nView < 2) {

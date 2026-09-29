@@ -13,7 +13,7 @@
 struct CourseInfo;
 struct UStreamObject;
 struct UObjMesh;                    // dynobj.h: the hole data is a tree of them
-                                    // (Ter_GetMeshNext..fn_80035500)
+                                    // (Ter_GetMeshNext..Ter_GetHoleModelRoot)
 
 // A patch of ground to draw (0x34 bytes; TW06: Ter_PatchReference, 0x2C, the same up to 0x10).
 // Ter_BuildPatchLists fills Ter_TerrainRendererMgr.pPatchList with them and chains each into
@@ -203,7 +203,7 @@ typedef struct Ter_TerrainRendererMgr {
 } Ter_TerrainRendererMgr;
 LAYOUT_ASSERT(Ter_TerrainRendererMgr, 0x11C8);
 
-// The settings fn_80035440 copies in (0x54 bytes); fn_80035398 makes the renderer's colour
+// The settings LF_SetFogSettings copies in (0x54 bytes); LF_ApplyFogToRenderState makes the renderer's colour
 // (RenderState.a30) and its distances f28 and f2C from them.
 typedef struct TerSettings {
     f32  aColours[4][4];        // 0x00  Code8006F154.c: four colours, blended round the compass by

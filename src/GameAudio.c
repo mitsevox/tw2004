@@ -278,7 +278,7 @@ void Aud_MicCycle(void) {
 
 // On a hole's first frame (Gaud_Monitor): outside start-up and the front end (game types 0, 1, 3)
 // starts the course's ambient sounds: the crowd's idle murmur (crowd reaction 0), the wind and the
-// trees at the wind option's strength, the rain when fn_80035574 (at fn_8006C630's strength), and
+// trees at the wind option's strength, the rain when Weather_IsRaining (at fn_8006C630's strength), and
 // the flag flapping at the pin (sound 9, lbl_80281420, by the wind). Then lets Gaud_Monitor run the
 // rest (lbl_80282029).
 void FirstFrameInit(void) {
@@ -290,7 +290,7 @@ void FirstFrameInit(void) {
         Gaud_InitCrowdReactionSound(0, 0);
         Gaud_InitWindSound(nWind);
         Gaud_InitTreeSound(nWind);
-        if (fn_80035574()) {
+        if (Weather_IsRaining()) {
             Gaud_InitRainSound(fn_8006C630());
         }
         lbl_80281420 = Aud_EmiAdd(9, -1, 1, 0, NULL);
@@ -503,7 +503,7 @@ void StartBackgroundMusic(void) {
 }
 
 // When ambience is what streams (lbl_8028203C 2): starts the ambience emitter's tracks 0 and 1,
-// track 2 when fn_80035574 (the course flag that also starts the rain sound), track 3 by course and
+// track 2 when Weather_IsRaining (the course flag that also starts the rain sound), track 3 by course and
 // track 4 by course and hole (GetAmbientStreamRange).
 void StartAmbientStreamer(void) {
     int nCourse;
@@ -515,7 +515,7 @@ void StartAmbientStreamer(void) {
         n = Game_GetCurHoleNum();
         Aud_EmiSetTrackAttenuation(lbl_8028141A, 0, 1.0f);
         Aud_EmiSetTrackStatus(lbl_8028141A, 1, 1);
-        if (fn_80035574()) {
+        if (Weather_IsRaining()) {
             Aud_EmiSetTrackStatus(lbl_8028141A, 2, 1);
         }
         Aud_EmiSetTrackVarRange(lbl_8028141A, 3, nCourse);

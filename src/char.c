@@ -204,8 +204,8 @@ void  UI_ParkFileInAram(void);         // uiLoadFile.c: park the UI file's data 
 void* UI_GetFileBuffer(void);          // uiLoadFile.c: the UI file's buffer
 void  UI_RestoreFileFromAram(void);    // uiLoadFile.c: bring the UI file's data back
 void  fn_801141F8(struct DynChain* pChain, CharModel* pModel);                         // DynChain.c
-void  fn_80035600(void);                // GoTerrain.c
-void  fn_80035604(void);                // GoTerrain.c
+void  CharacterRender_StartNewFrame(void); // GoTerrain.c
+void  CharacterRender_RenderSetup(void); // GoTerrain.c
 void  SKN_DrawCharacter(Character* pChar, u32 uFlags);
 void  SKN_PoseCharacter(Character* pChar, int n);
 void  SKN_BeginFrame(void);                // Skin.c
@@ -2164,7 +2164,7 @@ void Character_PreRenderAll(void) {
     u8 bPreRender;
     int bState;
 
-    fn_80035600();
+    CharacterRender_StartNewFrame();
     SKN_BeginFrame();
     for (i = 0; i < gNumCharacters; i++) {
         iPlayer2Clip = CameraController_GetClippedGolfer();
@@ -2190,14 +2190,14 @@ void Character_PreRenderAll(void) {
 
 // Draws every character (SKN_DrawCharacter with uFlags) that is in view (nClipResult not 2), is not
 // the player CameraController_GetClippedGolfer names, is neither hidden (bit 1 of uCharFlags) nor
-// without its textures (bit 0x40), and, when uFlags has bit 4, is a golfer. fn_80035604 first;
-// nothing when no character is made.
+// without its textures (bit 0x40), and, when uFlags has bit 4, is a golfer.
+// CharacterRender_RenderSetup first; nothing when no character is made.
 void Character_RenderAll(u32 uFlags) {
     int i;
     int iPlayer2Clip;
 
     if (gNumCharacters != 0) {
-        fn_80035604();
+        CharacterRender_RenderSetup();
         for (i = 0; i < gNumCharacters; i++) {
             iPlayer2Clip = CameraController_GetClippedGolfer();
             if (Character_GetClipResult(gCharacters[i]) != 2 && iPlayer2Clip != gCharacters[i]->nPlayer &&

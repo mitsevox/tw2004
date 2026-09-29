@@ -128,16 +128,16 @@ extern u8 lbl_8018A4D8[];
 // Code8009AA28.c's state (our name), reached through lbl_802813B8. Only the fields read are named.
 typedef struct SunFlrState {
     f32  f0;                    // 0x0000  scales fn_8009A754's sum
-    f32  v4[3];                 // 0x0004  set by GoTerrain.c's fn_80035590
+    f32  v4[3];                 // 0x0004  set by GoTerrain.c's SF_vSetSunPosition
     u8   unk10[4];
-    f32  v14[3];                // 0x0014  set by GoTerrain.c's fn_800355B8
+    f32  v14[3];                // 0x0014  set by GoTerrain.c's SF_vSetSunColor
     u8   unk20[4];
     f32  a24[200][4];           // 0x0024  } colour ramps filled by fn_8009AA28 from [1] on (four
     f32  aCA4[200][4];          // 0x0CA4  } sweeps of ten, closed with a copy of [1])
     SunFlrSet* p1924;           // 0x1924  lbl_80189E78
     u8*  p1928;                 // 0x1928  lbl_8018A028
     u8*  p192C;                 // 0x192C  lbl_8018A4D8
-    s32  n1930;                 // 0x1930  set by GoTerrain.c's fn_80035584
+    s32  n1930;                 // 0x1930  set by GoTerrain.c's SF_vSetFlareType
     f32  f1934;                 // 0x1934  0 at set-up
     f32  f1938;                 // 0x1938  1 at set-up
     f32  af193C[3];             // 0x193C  per entry of p1924, its elements' largest f24

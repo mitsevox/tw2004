@@ -353,7 +353,7 @@ void modifyInitialLie(s32* pClass, int nSurface) {
     }
 }
 
-// State value 32: how the hole's weather effect bit 1 (lbl_802811F0 flag 0x2, fn_80035574; rolled
+// State value 32: how the hole's weather effect bit 1 (lbl_802811F0 flag 0x2, Weather_IsRaining; rolled
 // per hole by fn_8006F650) changed from the last hole: 1 it began (SitDev_WeatherEffectBegan), 3 it
 // ended (SitDev_WeatherEffectEnded), 2 it goes on, 0 it is off.
 int SitDev_GetWeatherChangeCondition(void) {
@@ -364,7 +364,7 @@ int SitDev_GetWeatherChangeCondition(void) {
     } else if (SitDev_WeatherEffectEnded()) {
         nResult = 3;
     } else {
-        bFlag = fn_80035574();
+        bFlag = Weather_IsRaining();
         nResult = 0;
         if (bFlag) {
             nResult = 2;
@@ -378,7 +378,7 @@ int SitDev_GetWeatherChangeCondition(void) {
 // weather pick).
 u8 SitDev_WeatherEffectEnded(void) {
     int bResult = 0;
-    if (!fn_80035574() && !lbl_802811F0->b14 && SitDev_WeatherEffectWasOn()) {
+    if (!Weather_IsRaining() && !lbl_802811F0->b14 && SitDev_WeatherEffectWasOn()) {
         bResult = 1;
     }
     return bResult;
@@ -393,7 +393,7 @@ u8 SitDev_WeatherEffectWasOn(void) {
 // (SitDev_WeatherEffectWasOn) or b14 still set (no normal weather pick since the round began).
 u8 SitDev_WeatherEffectBegan(void) {
     int bResult = 0;
-    if (fn_80035574() && (!SitDev_WeatherEffectWasOn() || lbl_802811F0->b14)) {
+    if (Weather_IsRaining() && (!SitDev_WeatherEffectWasOn() || lbl_802811F0->b14)) {
         bResult = 1;
     }
     return bResult;

@@ -736,10 +736,10 @@ void EVENT_SpeedgolfGo(int nPlayer, int nEvent, void* pData, int nArg) {
 void EVENT_ScoreCardDone(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
-// Event 71: only calls fn_80035574 (bit 2 of a terrain block's flags) and drops the answer. Nothing
+// Event 71: only calls Weather_IsRaining (bit 2 of a terrain block's flags) and drops the answer. Nothing
 // in this build fires the event.
 void EVENT_AnimationSkinReset(int nPlayer, int nEvent, void* pData, int nArg) {
-    fn_80035574();
+    Weather_IsRaining();
 }
 
 // Event 72 (CharAnim.c: a golfer's animation clip starts; nArg is its group): for group 5, queues

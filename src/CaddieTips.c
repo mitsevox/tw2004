@@ -139,7 +139,7 @@ u8 CTIP_CheckUphillLieTrigger(int nPlayer) {
 // (lbl_802811F0; fn_8006F650 rolls it per course, and fn_8006FB10 then starts particle effects 0 to
 // 2 at a strength and sets the turf speed). Takes no player, though CTIP_ShowCaddieTip passes one.
 u8 CTIP_CheckWeatherTrigger(void) {
-    return fn_80035574() != 0;
+    return Weather_IsRaining() != 0;
 }
 
 // The long tee shot tip's test (tip 22, three short versions): the player's first shot on a par 5

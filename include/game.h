@@ -113,7 +113,7 @@ void GameMsg_SendInt(int nMsg, int nValue);        // send message nMsg with one
 // it). GameMode5's PlayNow_ForceWeather sets f18 and flags it in b1C; SitDevStateVector.c tests
 // the flags.
 typedef struct Unk802811F0 {
-    u32 uFlags;                 // 0x00  bit 0x2: fn_80035574
+    u32 uFlags;                 // 0x00  bit 0x2: Weather_IsRaining
     u32 u04;                    // 0x04  bit 0x2: SitDev_WeatherEffectWasOn
     s32 n08;                    // 0x08
     s32 n0C;                    // 0x0C
@@ -134,7 +134,7 @@ typedef struct Unk80188900 {
     s32 nMax;                   // 0x8
 } Unk80188900;
 
-u8   fn_80035574(void);                 // lbl_802811F0's flag 0x2
+u8   Weather_IsRaining(void);           // lbl_802811F0's flag 0x2
 
 // ---- the course table (CourseData.c) ---------------------------------------------------------
 

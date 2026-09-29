@@ -137,7 +137,7 @@ void LI_SetObjectLights(UObject* pObj);
 void SKN_BeginFrame(void);
 void Character_ExecuteTextureSwapFE(Character* pChar);
 char* DynObj_GetGolfBallLogoTextureName(int i);
-void fn_80035600(void);
+void CharacterRender_StartNewFrame(void);
 void Character_UpdateAnimation(Character* pChar, int a, f32 f);
 void SKN_PoseCharacter(Character* pChar, int n);
 void LF_LoadCurrentLights(void);
@@ -893,7 +893,7 @@ void FE_vUpdateGolferAll(void) {
         fn_8010BC64(pChar->apDynTex[pChar->nCurDynTex]);
     }
     if (gpCrAPState->pB4->bLoaded && gpCrAPState->bHidden == 0) {
-        fn_80035600();
+        CharacterRender_StartNewFrame();
         Character_UpdateAnimation(gpCrAPState->pB4->pChar, 1, 1.0f / 60.0f);
         if (gpCrAPState->pB4->pChar->bPosed == 0) {
             SKN_PoseCharacter(gpCrAPState->pB4->pChar, 0);

@@ -23,9 +23,9 @@ f32  fn_8009A754(s32 nView, SunFlrView* pView);
 s32  RC_GetCurrentFrameBuffer(void);                 // ViewController.c
 void fn_8009A250(void);                 // SunFlr_Gc.c
 void fn_8009B314(u8 v);
-void fn_80035584(s32 v);                // GoTerrain.c
-void fn_80035590(f32* p0);
-void fn_800355B8(f32* p0);
+void SF_vSetFlareType(s32 v);           // GoTerrain.c
+void SF_vSetSunPosition(f32* p0);
+void SF_vSetSunColor(f32* p0);
 
 SunFlrSet lbl_80189E78[3] = {
     { { { {0}, 1.0f, 1.0f, 1.0f, 0.2f, -1.0f, 0.4f, {0}, 1, 3 } }, 1 },
@@ -139,7 +139,7 @@ void SF_vInitModule(s32 nViews) {
         pView->bA5 = 1;
     }
     fn_8009B314(1);
-    fn_80035584(1);
+    SF_vSetFlareType(1);
     v14[0] = 0.8f;
     v14[1] = 0.8f;
     v14[2] = 0.4f;
@@ -148,8 +148,8 @@ void SF_vInitModule(s32 nViews) {
     v4[1] = 150.0f;
     v4[2] = -400.0f;
     v4[3] = 1.0f;
-    fn_800355B8(v14);
-    fn_80035590(v4);
+    SF_vSetSunColor(v14);
+    SF_vSetSunPosition(v4);
 }
 
 // Frees each view's part.

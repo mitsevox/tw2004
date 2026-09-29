@@ -73,9 +73,9 @@ typedef struct CourseLights {
 // The optional block at CourseInfo.p3C: what Ter_CourseLoadCallback hands the glows (glows.h) when a hole is
 // loaded; without it the glows get 0.8, 0.8, 0.4 / 0, 150, -400 / 1.
 typedef struct CourseGlowBlock {
-    f32  v0[3];                 // 0x00  to fn_80035590 (GlowState.v4), and gSession.f5B3C..f5B44
-    u32  nC;                    // 0x0C  to fn_80035584 (GlowState.n1930) when 0..3, else 1
-    f32  v10[4];                // 0x10  to fn_800355B8 (GlowState.v14)
+    f32  v0[3];                 // 0x00  to SF_vSetSunPosition (GlowState.v4), and gSession.f5B3C..f5B44
+    u32  nC;                    // 0x0C  to SF_vSetFlareType (GlowState.n1930) when 0..3, else 1
+    f32  v10[4];                // 0x10  to SF_vSetSunColor (GlowState.v14)
 } CourseGlowBlock;
 
 // A block of four light vectors and values (CourseInfo.p38 and p44): fn_80093900 hands them to
