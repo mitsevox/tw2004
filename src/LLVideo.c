@@ -368,7 +368,7 @@ void LLVideo_SetLastFrameTime(Video* pVideo) {
 // the first frame also sizes the picture and starts the movie's sound, Aud_StartMovie). A movie
 // whose read found the queue dry (bStarved) is stopped and marked ended at its next due frame. The
 // end test beside it (Pict_IsMovieAtEnd) always answers 0 (MAD_ReadNextFile's EA bug,
-// Code800B90F4.c), so a movie ends only when it is starved: normally once the stream has delivered
+// rcmp_mad_codec.c), so a movie ends only when it is starved: normally once the stream has delivered
 // the whole file, but also mid-movie if the disc falls behind the decoder.
 void LLVideo_UpdateAll(void) {
     Video* pVideo;

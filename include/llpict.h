@@ -56,7 +56,7 @@ typedef struct MadDecoder {
 } MadDecoder;
 LAYOUT_ASSERT(MadDecoder, 0x50);
 
-// rcmp_mad_codec.c (Code800B90F4.c): the decoder LLPict_Gc.c runs a movie with.
+// rcmp_mad_codec.c: the decoder LLPict_Gc.c runs a movie with.
 int  MAD_InitDecoder(MadDecoder* p);                        // reset it for a new movie; 1
 void MAD_CloseDecoder(MadDecoder* p);                       // free its frames
 u8   MAD_IsAtEnd(MadDecoder* p);                            // the movie has ended

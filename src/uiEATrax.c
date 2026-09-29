@@ -2,8 +2,9 @@
 // objects (the song list and the EA Trax logo) and, for 240 frames after a song starts, its names
 // in a box that slides in from the left and fades out.
 // Why uiEATrax.c: TW2003's data names "uiEATrax.c" right after "crcmp_mad_codec.c", and this file
-// links right after rcmp_mad_codec.c; TW07's uiEATrax.c starts UI_vEATraxRegisterStreamClients,
-// UI_vEATraxUnRegisterStreamClients, UI_vEATraxLoadfromStream, in this file's order.
+// links right after rcmp_mad_codec.c and the Create-A-Player ball's Code800B9944.c; TW07's
+// uiEATrax.c starts UI_vEATraxRegisterStreamClients, UI_vEATraxUnRegisterStreamClients,
+// UI_vEATraxLoadfromStream, in this file's order.
 
 #include "engine.h"
 #include "golfer.h"

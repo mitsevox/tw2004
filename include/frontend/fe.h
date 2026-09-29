@@ -572,7 +572,7 @@ int  FE_GetLastCrAPAsset(void);
 void FE_SetLastCrAPCategory(int nPart);
 int  FE_GetLastCrAPCategory(void);
 void FE_ResetCrAPGolferFromPreview(void);
-// Code800B90F4.c: the ball the Create-A-Player menu golfer holds.
+// Code800B9944.c: the ball the Create-A-Player menu golfer holds.
 void FE_CrAPBall_RegisterStreamClients(void);     // its 'TEO ' models and 'BALF' logo bank
 void FE_CrAPBall_UnRegisterStreamClients(void);
 void FE_CrAPBall_Init(void);

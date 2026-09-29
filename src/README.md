@@ -426,7 +426,7 @@ round) answer. The menu screens themselves run on the [EA UI Studio library](#ea
 | uiObject.c | T7 | 3D objects the in-round UI draws: the power boost and spin display |
 | Code800B1D3C.c | ph | the start-up UI commands (23 slots): card checks, built-in sounds, the disc change |
 | uiEATrax.c | T03/T7 | the EA Trax music display (song names sliding in) |
-| Code800B90F4.c | ph | MAD picture frame lists (for rcmp_mad_codec.c); the ball models and logo on the Create-A-Player golfer (`'TEO '`, `'BALF'`) |
+| Code800B9944.c | ph | the ball models and logo on the Create-A-Player golfer (`'TEO '`, `'BALF'`) |
 | uiArc.c | ours | a UI arc or circle element |
 | FE_CrAPDB.c | EA | the Create-A-Player database (`'CR_A'`, `'CR_S'`) |
 | FE_CrAPMessages.c | ours | the Create-A-Player screens' message handlers |
@@ -459,8 +459,9 @@ The movie player (intro, credits, golfer bios) and EA's MAD picture and movie fo
 | maddec.c | EA | the MAD block decoder: bit reader, code tables, macroblocks |
 | maddeca.c | EA | the MAD decoder's coefficient (run and level) decoder |
 | madidct.c | EA | the MAD decoder's inverse DCT |
+| rcmp_mad_codec.c | EA | the MAD movie decoder's frames: files read, frames handed out, each file decoded |
 
-Also: `hlaudmovie.c` (a movie's sound), `uiProcessPolygon.c`, `Code800B90F4.c` (frame lists).
+Also: `hlaudmovie.c` (a movie's sound), `uiProcessPolygon.c`.
 
 ### Audio
 

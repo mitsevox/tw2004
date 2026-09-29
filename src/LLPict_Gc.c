@@ -16,7 +16,7 @@ void** gpPictWorkBuffer = &gPictWorkBuffer;     // every use of the work buffer 
 
 void PictInt_InitModule(void);
 void PictInt_CloseModule(void);
-// Code800B90F4.c; declared without its parameters: it takes a PictFile* (*)(void*) reader, and
+// rcmp_mad_codec.c; declared without its parameters: it takes a PictFile* (*)(void*) reader, and
 // Pict_OpenMovie passes LLVideo.c's void* (*)(void*) one
 void MAD_SetReadCallback();
 
