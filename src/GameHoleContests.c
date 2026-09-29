@@ -33,7 +33,7 @@ u8   gHoleContestWon;               // a contest has a winner this round (HoleCo
 
 // a flag of the hole's course data (byte 0x35): the drive can count
 u8   GM_GetHoleIndexDrivingSideGame(int nHole);
-u8   fn_800D0D54(int nPlayer);  // the shot started on fairway-class ground and ended on the fairway,
+u8   GameAnalysis_GetFairwayDrive(int nPlayer); // the shot started on fairway-class ground and ended on the fairway,
                                 // the green or in the cup (HoleScore.c)
 
 u8   HoleContest_RoundHasContests(void);
@@ -209,27 +209,27 @@ void HoleContest_InitForHole(void) {
 }
 
 // After a player's shot (GM_PlayerTookShot). On the longest-drive hole a first stroke that
-// fn_800D0D54 accepts (from fairway-class ground to the fairway, the green or the cup) records its
-// length (fn_800D0550); on the closest-to-the-pin hole a first stroke onto the green records its
-// distance from the pin in feet (3 x fn_800D0478), holed 0; both then re-rank
-// (HoleContest_RankResults). On the hole-in-one prize hole a holed first stroke wins $100,000
-// (message 0x74 for an active profile) and marks a contest won. A mulligan's shot (bC2F) does not
-// count.
+// GameAnalysis_GetFairwayDrive accepts (from fairway-class ground to the fairway, the green or the
+// cup) records its length (GameAnalysis_GetCurrentBallFlightDistance); on the closest-to-the-pin
+// hole a first stroke onto the green records its distance from the pin in feet (3 x
+// GameAnalysis_GetCurrentDistanceToPin), holed 0; both then re-rank (HoleContest_RankResults). On
+// the hole-in-one prize hole a holed first stroke wins $100,000 (message 0x74 for an active
+// profile) and marks a contest won. A mulligan's shot (bC2F) does not count.
 void HoleContest_PlayerTookShot(int nPlayer) {
     CourseMoneyTracking money;
     s32 nIndex;
 
     if (HoleContest_IsLongestDriveHole()) {
-        if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == 1 && fn_800D0D54(nPlayer) &&
+        if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == 1 && GameAnalysis_GetFairwayDrive(nPlayer) &&
             gPlayers[nPlayer].bUsedMulliganThisHole == 0) {
-            gHoleContestPlayerResult[nPlayer] = fn_800D0550(nPlayer);
+            gHoleContestPlayerResult[nPlayer] = GameAnalysis_GetCurrentBallFlightDistance(nPlayer);
         }
         HoleContest_RankResults();
     }
     if (HoleContest_IsClosestToPinHole()) {
         if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == 1 && gPlayers[nPlayer].ball.nLie == 9 &&
             gPlayers[nPlayer].bUsedMulliganThisHole == 0) {
-            gHoleContestPlayerResult[nPlayer] = 3.0f * fn_800D0478(nPlayer);
+            gHoleContestPlayerResult[nPlayer] = 3.0f * GameAnalysis_GetCurrentDistanceToPin(nPlayer);
         }
         if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == 1 &&
             gPlayers[nPlayer].ball.nLie == LIE_INCUP_e && gPlayers[nPlayer].bUsedMulliganThisHole == 0) {
@@ -454,7 +454,7 @@ s32 HoleContest_GetWinnerShotKind(void) {
             return 1;
         }
         // fake match: the original loads gHoleContestWinner again for the call; the volatile read does that
-        if (3.0f * fn_800D0478(*(volatile s32*)&gHoleContestWinner) < 1.0f) {
+        if (3.0f * GameAnalysis_GetCurrentDistanceToPin(*(volatile s32*)&gHoleContestWinner) < 1.0f) {
             return 2;
         }
     }

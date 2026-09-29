@@ -250,7 +250,7 @@ They will be sorted into the sections below.
   picked per branch (Code8006F154 fn_8006F154 91.3 -> 98.75). `(f32)sqrt(...)` must be cast before
   multiplying by a float constant, or the multiply is done in double.
 - **[verified] A call or global load on the right of a comparison is evaluated first**: write
-  `f(n) + 1 < rec`, not `rec > f(n) + 1`, when the original calls first (HoleScore fn_800CF904 78.7 ->
+  `f(n) + 1 < rec`, not `rec > f(n) + 1`, when the original calls first (HoleScore GameAnalysis_IsShotForRecord 78.7 ->
   98.8).
 - **[verified] `do {} while (++i < 4)`** for a 4-step loop with no ctr and the test at the bottom (UKernel
   Kernel_PostPairToObject 80.5 -> 100).

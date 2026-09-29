@@ -398,7 +398,7 @@ Gimmes and the pool-cue tap-in
 
 **When** (`fn_800E2810`, from swing state 14 once the ball has stopped): the gimme option is on
 (options byte 5, default on), not a replay, two mode flags clear, the ball within **0.5 yd (18 in)**
-of the pin (`fn_800D0478`), and either the club is the putter or it is a one-player game. Then
+of the pin (`GameAnalysis_GetCurrentDistanceToPin`), and either the club is the putter or it is a one-player game. Then
 state 15 (FadeToTapIn: the CPU rehearsal runs on the player until it settles) and state 16 (TapIn): animation 11,
 camera 12, and `Swing_Launch` with the controller set to the CPU for the call.
 
@@ -841,7 +841,7 @@ At the strike, `STATEFUNC_SimulateInit` copies the launched ball into a second b
 4. once per shot (`+0xC2C`), when the prediction's outcome class is 8 or 9 and the **real** ball
    is between **2 and 5.5 yd** from the pin and within **0.3 yd** of its closest approach so far
    (still closing): if the prediction is **holed** and the score would be par or better
-   (`Hole_ScoreAfterTapIn <= 0`), a **50% roll** (`Rand_Next(1) % 100 < 50`); if **not holed** but
+   (`GameAnalysis_IsPuttFor <= 0`), a **50% roll** (`Rand_Next(1) % 100 < 50`); if **not holed** but
    its closest approach (ball `+0x60`, a running minimum kept by `Ball_Tick`) is **under 0.2 yd
    (7.2 in)**, always. Either way: flag 4 on the player, the distance saved at `+0xEEC`, and golfer
    animation 9 (clip group 10 or 5, by `fn_80096530`).

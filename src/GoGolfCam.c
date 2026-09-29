@@ -54,7 +54,7 @@ void     Gaud_InitSpecialShot(u8 nPlayer);
 void     fn_80039344(int nView, f32 f);                 // a per-view float (Swing.c's declaration)
 f32      Math_Tan(f32 x);                            // tan, as a float
 void     CameraController_CheckForEvents(View* pView, int nPlayer);
-f32      fn_800D04AC(int nPlayer);                      // Swing.c's declaration
+f32      GameAnalysis_GetInitialDistanceToPin(int nPlayer); // Swing.c's declaration
 f32      GolfCamera_UpdateMatrixCamera(View* pView, f32* pCam, f32* pSub, int nPlayer);
 f32      GolfCamera_UpdateSuperZoomCamera(View* pView, f32* pCam, f32* pSub, int nPlayer);
 u8       GameEffects_IsPredictedGameBreakerOn(void);
@@ -2135,7 +2135,7 @@ void GolfCamera_ProcessBallFlightCamera(View* pView, int nPlayer) {
                     nA = 5;
                     f1 = 0.0f;
                 } else {
-                    f = fn_800D04AC(nPlayer);
+                    f = GameAnalysis_GetInitialDistanceToPin(nPlayer);
                     if (f > 15.0f) {
                         f1 += 0.05f * (f - 15.0f);
                     }

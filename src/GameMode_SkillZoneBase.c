@@ -399,10 +399,10 @@ s32 GameModeSkillZoneBase_ScaleTargetPoints(s32 nPoints, int nTarget) {
     return nPoints;
 }
 
-// Whether a shot of length fLength (fn_800D0550) reaches the drive line of the player's tee set:
-// 313 from tee set 0, 300 from 1, 293 from 2 and 3; never from another. The target modes count a
-// target hit only short of it; modes 13, 16 and 17 score a target surface reached that far as a
-// drive.
+// Whether a shot of length fLength (GameAnalysis_GetCurrentBallFlightDistance) reaches the drive
+// line of the player's tee set: 313 from tee set 0, 300 from 1, 293 from 2 and 3; never from
+// another. The target modes count a target hit only short of it; modes 13, 16 and 17 score a target
+// surface reached that far as a drive.
 u8 GameModeSkillZoneBase_IsLongDrive(int nPlayer, f32 fLength) {
     switch (gSession.nTeeSet[nPlayer]) {
     case 0:

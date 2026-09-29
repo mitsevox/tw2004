@@ -856,9 +856,9 @@ void GM_RestartHole(void) {
     }
 }
 
-// The player's ball's distance from the pin (fn_800D0478's).
+// The player's ball's distance from the pin (GameAnalysis_GetCurrentDistanceToPin's).
 f32 GM_GetGolferDistanceToPin(int nPlayer) {
-    return fn_800D0478(nPlayer);
+    return GameAnalysis_GetCurrentDistanceToPin(nPlayer);
 }
 
 // A ball that must be dropped (b30E), or one in bounds (Ter_PointInOOBNetwork) after a shot with no
@@ -1235,7 +1235,7 @@ void GM_SimulateBallMovement(int nPlayer) {
             nResult = fn_8006AA9C(nPlayer);
             bReact  = nResult == 8 || nResult == 9;
             bOn     = GM_IsValidPostShotGameType();
-            fDist   = fn_800D0478(nPlayer);
+            fDist   = GameAnalysis_GetCurrentDistanceToPin(nPlayer);
             if (bOn) {
                 if (gPlayers[nPlayer].uFlags & 1) {
                     if ((gPlayers[nPlayer].uFlags & 4) && fDist < gPlayers[nPlayer].fEEC) {
@@ -1245,7 +1245,7 @@ void GM_SimulateBallMovement(int nPlayer) {
                     if (!gPlayers[nPlayer].bRehearsalDone && fDist < 5.5f && fDist > 2.0f &&
                         fDist - gPlayers[nPlayer].ball.fClosest < 0.3f) {
                         if (gPlayers[nPlayer].ballBefore.nLie == LIE_INCUP_e &&
-                            Hole_ScoreAfterTapIn(nPlayer) <= 0) {
+                            GameAnalysis_IsPuttFor(nPlayer) <= 0) {
                             if (Misc_RandFunc(1) % 100 < 50) {
                                 gPlayers[nPlayer].uFlags |= 4;
                                 gPlayers[nPlayer].fEEC = fDist;

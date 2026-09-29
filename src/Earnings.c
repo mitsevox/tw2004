@@ -92,13 +92,13 @@ f32 gTournamentPayoutShares[70] = {
 void  EarningsInfo_LoadERNFromStream(UStreamObject* pObject);
 int   GameMode4_GetNumEventsWon(void);
 int   GameMode4_GetCurrentEvent(void);                                // GameMode4: the current ladder event
-f32   fn_800D04AC(int nPlayer);                         // HoleScore.c
-u32   fn_800D0BAC(int nPlayer);                         // the class of the ground the shot left
-u8    fn_800D0BF8(int nPlayer, u8 bUnder, u8 bAnyLie);
-u8    fn_800D0D54(int nPlayer);
-int   fn_800D0DC8(int nPlayer, int nToPar);
-int   fn_800D0E74(int nPlayer);
-int   fn_800D0F04(int nPlayer, int nToPar);
+f32   GameAnalysis_GetInitialDistanceToPin(int nPlayer); // HoleScore.c
+u32   GameAnalysis_GetInitialStartingLie(int nPlayer);  // the class of the ground the shot left
+u8    GameAnalysis_CurrentShotGIR(int nPlayer, u8 bUnder, u8 bAnyLie);
+u8    GameAnalysis_GetFairwayDrive(int nPlayer);
+int   GameAnalysis_CountHoleScoresOrBetter(int nPlayer, int nToPar);
+int   GameAnalysis_CountHolesOverPar(int nPlayer);
+int   GameAnalysis_CountStreakHoleScores(int nPlayer, int nToPar);
 int   fn_800D1330(int nPlayer);
 int   GM_CurrentCourseTotalPar4andPar5Holes(void);                                // CourseData.c
 u8    GM_Earnings_CheckEagleEveryPar5(int nPlayer, u8 bPreview);
@@ -664,8 +664,8 @@ void GM_Earnings_PayRoundGoals(int nPlayer, u8 bRoundOver) {
 }
 
 // The bit of ShotGoal.uLies and PuttGoal.uLies for a surface class (SurfaceType.nClass; the goal
-// checkers pass fn_800D0BAC, the surface the shot left): class 1 bit 0, 2 (fairway) bit 1, 5
-// (rough) bit 2, 6 (sand) bit 3, 3 (green) bit 4; any other class bit 6.
+// checkers pass GameAnalysis_GetInitialStartingLie, the surface the shot left): class 1 bit 0, 2
+// (fairway) bit 1, 5 (rough) bit 2, 6 (sand) bit 3, 3 (green) bit 4; any other class bit 6.
 s32 Earnings_GetSurfaceClassBit(u32 n) {
     if (n == 1) return 0;
     if (n == 2) return 1;
@@ -752,21 +752,23 @@ void GM_Earnings_CheckShotGoals(int nPlayer, Ball* pBall, u8 bPreview) {
         if (!Earnings_TestBit(gEarningsTable.aShotGoal[i].uPars, 1) && GM_GetCurrentHolePar() == 4) continue;
         if (!Earnings_TestBit(gEarningsTable.aShotGoal[i].uPars, 2) && GM_GetCurrentHolePar() == 5) continue;
         if (!Earnings_TestBit(gEarningsTable.aShotGoal[i].uLies,
-                              Earnings_GetSurfaceClassBit(fn_800D0BAC(nPlayer)))) continue;
-        if (gEarningsTable.aShotGoal[i].f0C > fn_800D04AC(nPlayer)) continue;
+                              Earnings_GetSurfaceClassBit(
+                                      GameAnalysis_GetInitialStartingLie(nPlayer)))) continue;
+        if (gEarningsTable.aShotGoal[i].f0C > GameAnalysis_GetInitialDistanceToPin(nPlayer)) continue;
         if (!bNoBall && !Earnings_TestBit(gEarningsTable.aShotGoal[i].uBallLies,
                                      Earnings_GetLieBit(gPlayers[nPlayer].ball.nLie))) continue;
-        if (!bNoBall && gEarningsTable.aShotGoal[i].f14 > fn_800D0550(nPlayer)) continue;
+        if (!bNoBall && gEarningsTable.aShotGoal[i].f14
+            > GameAnalysis_GetCurrentBallFlightDistance(nPlayer)) continue;
         if (!bNoBall && gEarningsTable.aShotGoal[i].f18 &&
-            gEarningsTable.aShotGoal[i].f18 < fn_800D0478(nPlayer)) continue;
+            gEarningsTable.aShotGoal[i].f18 < GameAnalysis_GetCurrentDistanceToPin(nPlayer)) continue;
         if (!Earnings_TestBit(gEarningsTable.aShotGoal[i].uShotKinds, gPlayers[nPlayer].nShotKind)) continue;
         if (!Earnings_TestBit(gEarningsTable.aShotGoal[i].uClubs, gPlayers[nPlayer].nClub)) continue;
         if (Earnings_TestBit(gEarningsTable.aShotGoal[i].uFlags, 0)
-            && !fn_800D0BF8(nPlayer, 1, bPreview)) continue;
+            && !GameAnalysis_CurrentShotGIR(nPlayer, 1, bPreview)) continue;
         if (Earnings_TestBit(gEarningsTable.aShotGoal[i].uFlags, 1)
-            && !fn_800D0BF8(nPlayer, 0, bPreview)) continue;
+            && !GameAnalysis_CurrentShotGIR(nPlayer, 0, bPreview)) continue;
         if (!bNoBall && Earnings_TestBit(gEarningsTable.aShotGoal[i].uFlags, 2)
-            && !fn_800D0D54(nPlayer)) continue;
+            && !GameAnalysis_GetFairwayDrive(nPlayer)) continue;
         if (Earnings_TestBit(gEarningsTable.aShotGoal[i].uFlags, 3) && gPlayers[nPlayer].b312) continue;
         if (!bNoBall && Earnings_TestBit(gEarningsTable.aShotGoal[i].uFlags, 4)
             && !gPlayers[nPlayer].bHitObject) continue;
@@ -914,14 +916,17 @@ void GM_Earnings_CheckPuttGoals(int nPlayer, u8 bPreview) {
         if (!Earnings_TestBit(gEarningsTable.aPuttGoal[i].uPars, 1) && GM_GetCurrentHolePar() == 4) continue;
         if (!Earnings_TestBit(gEarningsTable.aPuttGoal[i].uPars, 2) && GM_GetCurrentHolePar() == 5) continue;
         if (!Earnings_TestBit(gEarningsTable.aPuttGoal[i].uLies,
-                              Earnings_GetSurfaceClassBit(fn_800D0BAC(nPlayer)))) continue;
-        if (gEarningsTable.aPuttGoal[i].f0C > fn_800D04AC(nPlayer)) continue;
+                              Earnings_GetSurfaceClassBit(
+                                      GameAnalysis_GetInitialStartingLie(nPlayer)))) continue;
+        if (gEarningsTable.aPuttGoal[i].f0C > GameAnalysis_GetInitialDistanceToPin(nPlayer)) continue;
         if (!Earnings_TestBit(gEarningsTable.aPuttGoal[i].uShotKinds, gPlayers[nPlayer].nShotKind)) continue;
         if (!Earnings_TestBit(gEarningsTable.aPuttGoal[i].uClubs, gPlayers[nPlayer].nClub)) continue;
-        if (Earnings_TestBit(gEarningsTable.aPuttGoal[i].uFlags, 0) && !fn_800D0BF8(nPlayer, 1, 0)) continue;
-        if (Earnings_TestBit(gEarningsTable.aPuttGoal[i].uFlags, 1) && !fn_800D0BF8(nPlayer, 0, 0)) continue;
+        if (Earnings_TestBit(gEarningsTable.aPuttGoal[i].uFlags, 0)
+            && !GameAnalysis_CurrentShotGIR(nPlayer, 1, 0)) continue;
+        if (Earnings_TestBit(gEarningsTable.aPuttGoal[i].uFlags, 1)
+            && !GameAnalysis_CurrentShotGIR(nPlayer, 0, 0)) continue;
         if (!bPreview && Earnings_TestBit(gEarningsTable.aPuttGoal[i].uFlags, 2)
-            && !fn_800D0D54(nPlayer)) continue;
+            && !GameAnalysis_GetFairwayDrive(nPlayer)) continue;
         if (Earnings_TestBit(gEarningsTable.aPuttGoal[i].uFlags, 4) &&
             !gPlayers[nPlayer].bBunkerThisHole && !gPlayers[nPlayer].b311) continue;
         if (!bPreview && Earnings_TestBit(gEarningsTable.aPuttGoal[i].uFlags, 5) &&
@@ -948,9 +953,11 @@ void GM_Earnings_CheckPuttGoals(int nPlayer, u8 bPreview) {
              gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] != GM_GetCurrentHolePar() - 3)) continue;
         if (gEarningsTable.aPuttGoal[i].nScore == 9 &&
             gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] > 1) continue;
-        // Flag 6: a hole in one, and the round's second (fn_800D0DC8 below -3 counts holes in one).
+        // Flag 6: a hole in one, and the round's second (GameAnalysis_CountHoleScoresOrBetter below
+        // -3 counts holes in one).
         if (Earnings_TestBit(gEarningsTable.aPuttGoal[i].uFlags, 6) &&
-            (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] > 1 || fn_800D0DC8(nPlayer, -5) < 2)) continue;
+            (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] > 1
+             || GameAnalysis_CountHoleScoresOrBetter(nPlayer, -5) < 2)) continue;
         if (gEarningsTable.aPuttGoal[i].nAward >= 23 && gEarningsTable.aPuttGoal[i].nAward <= 38 &&
             (bPreview || !Earnings_IsTourAwardEarned(nPlayer, gEarningsTable.aPuttGoal[i].nAward))) continue;
         if (gEarningsTable.aPuttGoal[i].nAward == 22 &&
@@ -1090,25 +1097,30 @@ void GM_Earnings_CheckHoleGoals(int nPlayer, u8 bPreview, u8 bRoundOver) {
             && !Earnings_TestBit(gEarningsTable.aHoleGoal[i].uModes, 5)) continue;
         if (!gEarningsTable.aHoleGoal[i].b19 && bMore) continue;
         if (gEarningsTable.aHoleGoal[i].aToPar[0] != 0 &&
-            gEarningsTable.aHoleGoal[i].aToPar[0] > fn_800D0DC8(nPlayer, 0)) continue;
+            gEarningsTable.aHoleGoal[i].aToPar[0]
+                    > GameAnalysis_CountHoleScoresOrBetter(nPlayer, 0)) continue;
         if (gEarningsTable.aHoleGoal[i].aToPar[1] != 0 &&
-            gEarningsTable.aHoleGoal[i].aToPar[1] > fn_800D0DC8(nPlayer, -1)) continue;
+            gEarningsTable.aHoleGoal[i].aToPar[1]
+                    > GameAnalysis_CountHoleScoresOrBetter(nPlayer, -1)) continue;
         if (gEarningsTable.aHoleGoal[i].aToPar[2] != 0 &&
-            gEarningsTable.aHoleGoal[i].aToPar[2] > fn_800D0DC8(nPlayer, -2)) continue;
+            gEarningsTable.aHoleGoal[i].aToPar[2]
+                    > GameAnalysis_CountHoleScoresOrBetter(nPlayer, -2)) continue;
         if (gEarningsTable.aHoleGoal[i].aToPar[3] != 0 &&
-            gEarningsTable.aHoleGoal[i].aToPar[3] > fn_800D0DC8(nPlayer, -3)) continue;
+            gEarningsTable.aHoleGoal[i].aToPar[3]
+                    > GameAnalysis_CountHoleScoresOrBetter(nPlayer, -3)) continue;
         if (gEarningsTable.aHoleGoal[i].aToPar[4] != 0 &&
-            gEarningsTable.aHoleGoal[i].aToPar[4] > fn_800D0DC8(nPlayer, -5)) continue;
+            gEarningsTable.aHoleGoal[i].aToPar[4]
+                    > GameAnalysis_CountHoleScoresOrBetter(nPlayer, -5)) continue;
         if (gEarningsTable.aHoleGoal[i].aRun[0] != 0 &&
-            gEarningsTable.aHoleGoal[i].aRun[0] > fn_800D0F04(nPlayer, 0)) continue;
+            gEarningsTable.aHoleGoal[i].aRun[0] > GameAnalysis_CountStreakHoleScores(nPlayer, 0)) continue;
         if (gEarningsTable.aHoleGoal[i].aRun[1] != 0 &&
-            gEarningsTable.aHoleGoal[i].aRun[1] > fn_800D0F04(nPlayer, -1)) continue;
+            gEarningsTable.aHoleGoal[i].aRun[1] > GameAnalysis_CountStreakHoleScores(nPlayer, -1)) continue;
         if (gEarningsTable.aHoleGoal[i].aRun[2] != 0 &&
-            gEarningsTable.aHoleGoal[i].aRun[2] > fn_800D0F04(nPlayer, -2)) continue;
+            gEarningsTable.aHoleGoal[i].aRun[2] > GameAnalysis_CountStreakHoleScores(nPlayer, -2)) continue;
         if (gEarningsTable.aHoleGoal[i].aRun[3] != 0 &&
-            gEarningsTable.aHoleGoal[i].aRun[3] > fn_800D0F04(nPlayer, -3)) continue;
+            gEarningsTable.aHoleGoal[i].aRun[3] > GameAnalysis_CountStreakHoleScores(nPlayer, -3)) continue;
         if (gEarningsTable.aHoleGoal[i].aRun[4] != 0 &&
-            gEarningsTable.aHoleGoal[i].aRun[4] > fn_800D0F04(nPlayer, -5)) continue;
+            gEarningsTable.aHoleGoal[i].aRun[4] > GameAnalysis_CountStreakHoleScores(nPlayer, -5)) continue;
         if (gEarningsTable.aHoleGoal[i].n13 != 0) {
             nNeed = gEarningsTable.aHoleGoal[i].n13;
             nHoles = GM_CurrentCourseTotalPar4andPar5Holes();
@@ -1136,7 +1148,8 @@ void GM_Earnings_CheckHoleGoals(int nPlayer, u8 bPreview, u8 bRoundOver) {
             if (gEarningsTable.aHoleGoal[i].nKind == 3) continue;
             if (gEarningsTable.aHoleGoal[i].nKind == 4
                 && !GM_Earnings_CheckFirstTournamentWin(nPlayer, bPreview)) continue;
-            if (gEarningsTable.aHoleGoal[i].nKind == 5 && fn_800D0E74(nPlayer) != 0) continue;
+            if (gEarningsTable.aHoleGoal[i].nKind == 5 && GameAnalysis_CountHolesOverPar(nPlayer)
+                != 0) continue;
             if (gEarningsTable.aHoleGoal[i].nKind == 6 && GM_GetCurrentCourseTotalPar(0)
                 <= GM_GetPlayerRoundStrokes(nPlayer)) continue;
         }
@@ -1423,7 +1436,7 @@ u8 GM_Earnings_CheckEagleEveryPar5(int nPlayer, u8 bPreview) {
 
 // Whole-round test 2 of the hole goals: without bPreview, whether the profile has won all 31 PGA
 // TOUR tournaments; with it, whether this is the PGA TOUR (game mode 23) with 30 won and holing
-// this ball would win (fn_800CF450). TW07: GM_Earnings_CheckWinAllTournaments.
+// this ball would win (GameAnalysis_IsPuttForWin). TW07: GM_Earnings_CheckWinAllTournaments.
 u8 GM_Earnings_CheckWinAllTournaments(int nPlayer, u8 bPreview) {
     SaveProfile* pProfile;
     int i;
@@ -1449,13 +1462,13 @@ u8 GM_Earnings_CheckWinAllTournaments(int nPlayer, u8 bPreview) {
             n++;
         }
     }
-    if (Game_GetMode() == 23 && n == 30 && fn_800CF450(nPlayer)) return 1;
+    if (Game_GetMode() == 23 && n == 30 && GameAnalysis_IsPuttForWin(nPlayer)) return 1;
     return 0;
 }
 
 // Whole-round test 4 of the hole goals: without bPreview, whether the profile has won any PGA TOUR
 // tournament; with it, whether this is the PGA TOUR (game mode 23) and holing this ball would win
-// (fn_800CF450). TW07: GM_Earnings_CheckFirstTournamentWin.
+// (GameAnalysis_IsPuttForWin). TW07: GM_Earnings_CheckFirstTournamentWin.
 u8 GM_Earnings_CheckFirstTournamentWin(int nPlayer, u8 bPreview) {
     SaveProfile* pProfile;
     int i;
@@ -1474,7 +1487,7 @@ u8 GM_Earnings_CheckFirstTournamentWin(int nPlayer, u8 bPreview) {
         }
         return bAny;
     }
-    if (Game_GetMode() == 23 && fn_800CF450(nPlayer)) return 1;
+    if (Game_GetMode() == 23 && GameAnalysis_IsPuttForWin(nPlayer)) return 1;
     return 0;
 }
 

@@ -930,7 +930,7 @@ void Lessons_JudgeShot(void) {
         gLessonStep = 16;
         return;
     }
-    fLength = fn_800D0550(0);
+    fLength = GameAnalysis_GetCurrentBallFlightDistance(0);
     nLesson = gLessonNum;
     nLie = gPlayers[0].ball.nLie;
     switch (nLesson) {

@@ -335,7 +335,7 @@ s32 GameModeDriverPGATour_GetPotentialLead(int nPlayer) {
 
 // pfnGetPotentialHoleResult: how the hole would end for the player if the ball dropped now. The
 // tour never says: always 3, unknown (TW06 GM_HoleResult_t: 0 loses, 1 ties, 2 wins, 3 unknown);
-// HoleScore.c's default (fn_800D030C) works it out for the other modes.
+// HoleScore.c's default (GameAnalysis_GetPotentialHoleResult) works it out for the other modes.
 s32 GameModeDriverPGATour_GetPotentialHoleResult(int nPlayer) {
     return 3;
 }

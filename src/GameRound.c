@@ -163,11 +163,11 @@ void GM_SetModeType(int nMode) {
     gpGame->pfnStartGamePreData = GM_DefaultNoOp;
     gpGame->pfnStartGamePostData = GM_DefaultNoOp;
     gpGame->pfnEndGame = GM_DefaultNoOp;
-    gpGame->pfnIsPuttForLead = fn_800CF158;
-    gpGame->pfnIsPuttForWin = fn_800CF450;
-    gpGame->pfnGetCurrentLead = fn_800CFE74;
-    gpGame->pfnGetPotentialLead = fn_800D0098;
-    gpGame->pfnGetPotentialHoleResult = fn_800D030C;
+    gpGame->pfnIsPuttForLead = GameAnalysis_IsPuttForLead;
+    gpGame->pfnIsPuttForWin = GameAnalysis_IsPuttForWin;
+    gpGame->pfnGetCurrentLead = GameAnalysis_GetCurrentEventLead;
+    gpGame->pfnGetPotentialLead = GameAnalysis_GetPotentialEventLead;
+    gpGame->pfnGetPotentialHoleResult = GameAnalysis_GetPotentialHoleResult;
     gpGame->pfnEndTurnEndHoleNotGame = GM_DefaultNoOpPlayer;
     gpGame->pfnScorecardClosed = GM_DefaultNoOp;
     gpGame->pfnHoledOut = GM_DefaultNoOpPlayer;
@@ -941,7 +941,7 @@ u8 Gimme_Allowed(int nPlayer) {
     if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) return 0;
     if (!gpGame->bGimmesAllowed) return 0;
     if (gpGame->pfnHoleFinished(nPlayer, 1)) return 0;
-    if (fn_800D0478(nPlayer) > 0.5f) return 0;
+    if (GameAnalysis_GetCurrentDistanceToPin(nPlayer) > 0.5f) return 0;
     if (gPlayers[nPlayer].nClub != CLUB_PUTTER_e && gSession.nNumPlayers > 1) return 0;
     return 1;
 }

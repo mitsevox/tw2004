@@ -2222,9 +2222,10 @@ void GM_vGetRecordValue(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gSession.aCourseRecord[Game_GetCourse()].aRecord[pArgs[1].i][pArgs[2].i].nValue;
 }
 
-// The distance from player pArgs[0]'s ball to the pin, a float (command 130; fn_800D0478).
+// The distance from player pArgs[0]'s ball to the pin, a float (command 130;
+// GameAnalysis_GetCurrentDistanceToPin).
 void GM_vGetYardsToPin(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->f = fn_800D0478(pArgs[0].i);
+    pResult->f = GameAnalysis_GetCurrentDistanceToPin(pArgs[0].i);
 }
 
 // Entry pArgs[0] of speed golf's event log: its player into *pArgs[1] and its event into *pArgs[2];

@@ -49,10 +49,10 @@ typedef struct ShotGoal {
     u8   uShotKinds;            // 0x0A  a bit per Player.nShotKind
     u8   uLies;                 // 0x0B  a bit per Earnings_GetSurfaceClassBit class of the ground
                                 //        the shot left
-    f32  f0C;                   // 0x0C  the most fn_800D04AC may return
+    f32  f0C;                   // 0x0C  the most GameAnalysis_GetInitialDistanceToPin may return
     u8   uBallLies;             // 0x10  a bit per Earnings_GetLieBit class of the ball's lie
-    f32  f14;                   // 0x14  the least fn_800D0550 (the shot's length) may return
-    f32  f18;                   // 0x18  the most fn_800D0478 (the distance from the pin) may return, 0 any
+    f32  f14;                   // 0x14  the least GameAnalysis_GetCurrentBallFlightDistance (the shot's length) may return
+    f32  f18;                   // 0x18  the most GameAnalysis_GetCurrentDistanceToPin (the distance from the pin) may return, 0 any
     u32  uClubs;                // 0x1C  a bit per Player.nClub
     u16  uFlags;                // 0x20  more tests, a bit each (GM_Earnings_CheckShotGoals)
     u8   uMults;                // 0x22  the multipliers a prize takes (as PuttGoal.uMults)
@@ -80,7 +80,7 @@ typedef struct PuttGoal {
     u8   uShotKinds;            // 0x0A  a bit per Player.nShotKind
     u8   uLies;                 // 0x0B  a bit per Earnings_GetSurfaceClassBit class of the ground
                                 //        the shot left
-    f32  f0C;                   // 0x0C  the most fn_800D04AC may return
+    f32  f0C;                   // 0x0C  the most GameAnalysis_GetInitialDistanceToPin may return
     u32  uClubs;                // 0x10  a bit per Player.nClub
     u8   uFlags;                // 0x14  more tests, a bit each (GM_Earnings_CheckPuttGoals)
     s8   nMaxPutts;             // 0x15  the most putts on the hole, 0 any
@@ -104,8 +104,8 @@ typedef struct HoleGoal {
     s32  nId;                   // 0x00  goals with the same nonzero id compete: the biggest nValue is kept
     u32  uModes;                // 0x04  the game modes it counts in, a bit per mode
     s8   bEachHole;             // 0x08  checked after each hole (else only when the round is over)
-    s8   aToPar[5];             // 0x09  holes finished at par, -1, -2, -3 and -5 or better (fn_800D0DC8)
-    s8   aRun[5];               // 0x0E  the same as runs of holes in a row (fn_800D0F04)
+    s8   aToPar[5];             // 0x09  holes finished at par, -1, -2, -3 and -5 or better (GameAnalysis_CountHoleScoresOrBetter)
+    s8   aRun[5];               // 0x0E  the same as runs of holes in a row (GameAnalysis_CountStreakHoleScores)
     s8   n13;                   // 0x13  holes counted by fn_800D0FBC (at most the course's
                                 //       GM_CurrentCourseTotalPar4andPar5Holes)
     s8   n14;                   // 0x14  holes counted by fn_800D1170

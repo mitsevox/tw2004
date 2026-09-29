@@ -1302,8 +1302,8 @@ CamSequence* DynamicCam_ChooseSequence(int nPlayer, int nLie, int nClass, int nK
 
 // DynamicCam_ChooseSequence's pick for the pre-flight cameras: state nKind (3 becomes 28 when an
 // object or hazard is within CamTuning.f16C of the ball, and 3 again for the last fallback), the
-// ball's distance to the pin (fn_800D0478) within f24..f28 (DynamicCam_MatchDistToPin) in place of a shot
-// distance, no end lie, generic shot types allowed.
+// ball's distance to the pin (GameAnalysis_GetCurrentDistanceToPin) within f24..f28
+// (DynamicCam_MatchDistToPin) in place of a shot distance, no end lie, generic shot types allowed.
 CamSequence* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind) {
     int anPicked[50];
     CourseInfo* pCourse;
@@ -1327,7 +1327,7 @@ CamSequence* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind
     } else {
         nTee = DynamicCam_BallLieToCameraLie(nLie, nPlayer);
     }
-    fPinDist = fn_800D0478(nPlayer);
+    fPinDist = GameAnalysis_GetCurrentDistanceToPin(nPlayer);
     nPinSet = Game_CurrentPinSet();
     pCourse = Ter_GetTGD();
     if (pCourse == NULL) {

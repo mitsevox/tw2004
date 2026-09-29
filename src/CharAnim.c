@@ -437,7 +437,7 @@ int CharacterState_UpdateGameEmotionState(Character* pChar) {
 void CharacterState_SetTapInState(Character* pChar) {
     int nScore;
     if (pChar == NULL) return;
-    nScore = Hole_ScoreAfterTapIn(pChar->nPlayer);
+    nScore = GameAnalysis_IsPuttFor(pChar->nPlayer);
     if (nScore < 0) {
         Character_SetEmotion(pChar, 6);
     } else if (nScore == 0) {

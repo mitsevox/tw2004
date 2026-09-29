@@ -40,7 +40,7 @@ void  fn_80062B84(int a);
 u8    fn_80062B7C(void);
 void  Gaud_SwingBallHit(u8 nPlayer);
 void  TARGET_ResetMomentums(int nPlayer);
-f32   fn_800D04AC(int nPlayer);
+f32   GameAnalysis_GetInitialDistanceToPin(int nPlayer);
 void  ViewController_SaveViewportRect(int nView);
 void  Ter_StartCrowdAnimation(f32 a, f32 b, f32 c);
 void  GM_ClearShotBonusStats(int nPlayer);
@@ -230,7 +230,7 @@ void STATEFUNC_PreShotInit(int nPlayer) {
     pBall = &gPlayers[nPlayer].ball;
     Physics_InitShotData(pBall);
     Mem_cpy(&gPlayers[nPlayer].ballBefore, pBall, sizeof(Ball));
-    gPlayers[nPlayer].fA64 = fn_800D04AC(nPlayer);
+    gPlayers[nPlayer].fA64 = GameAnalysis_GetInitialDistanceToPin(nPlayer);
     EVENT_Trigger(nPlayer, 3, 0, -1);
     if (gSession.nGameType != 8 && Player_IsCPU(nPlayer)) {
         GUI_ToggleUI(nPlayer, 1);
@@ -422,7 +422,7 @@ void STATEFUNC_ShotSetupInit(int nPlayer) {
         fn_800957B0(gPlayers[nPlayer].pChar, 1);
     }
     Physics_InitShotData(pBall);
-    gPlayers[nPlayer].fA64 = fn_800D04AC(nPlayer);
+    gPlayers[nPlayer].fA64 = GameAnalysis_GetInitialDistanceToPin(nPlayer);
     EVENT_Trigger(nPlayer, 6, 0, -1);
 }
 
@@ -1580,7 +1580,7 @@ void STATEFUNC_TapInInit(int nPlayer) {
     Character_SelectGameShotType(gPlayers[nPlayer].pChar, gPlayers[nPlayer].nShotKind);
     Character_AlignShotWithTarget(nPlayer, 1, 1);
     gPlayers[nPlayer].uFlags |= 8;
-    gPlayers[nPlayer].fA64 = fn_800D0478(nPlayer);
+    gPlayers[nPlayer].fA64 = GameAnalysis_GetCurrentDistanceToPin(nPlayer);
     GUI_HideAllHelpTips();
     ViewController_GetIndexedViewController(gPlayers[nPlayer].nView[0])->bFlagOut = 1;
 }

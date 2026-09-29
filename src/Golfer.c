@@ -98,7 +98,7 @@ u8 Golfer_IsLucky(int nPlayer) {
         } else if (gPlayers[nPlayer].nShotKind == SHOT_TYPE_PITCH_e) {
             bLucky = 1;
         } else if ((gPlayers[nPlayer].ball.nLie == 1 || gPlayers[nPlayer].ball.nLie == 2) &&
-                   fn_800D0478(nPlayer) < 250.0f) {
+                   GameAnalysis_GetCurrentDistanceToPin(nPlayer) < 250.0f) {
             bLucky = 1;
         }
     }

@@ -170,7 +170,7 @@ u8 CTIP_MediumDistanceTeeShotTrigger(int nPlayer) {
 // (AI_MaxDistance for the shot and club) than the ball lies from the pin.
 u8 CTIP_SpinnaShotTrigger(int nPlayer) {
     f32 fClubDistance = AI_MaxDistance(nPlayer, gPlayers[nPlayer].nShotKind, gPlayers[nPlayer].nClub);
-    return fClubDistance > fn_800D0478(nPlayer);
+    return fClubDistance > GameAnalysis_GetCurrentDistanceToPin(nPlayer);
 }
 
 // The tee spin shot tip's test (tip 28, one short version): the player's first shot on a par 4 of

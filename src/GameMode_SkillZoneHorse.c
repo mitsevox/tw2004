@@ -200,7 +200,7 @@ void GameModeSkillZoneHorse_CheckShotAwards(int nPlayer) {
         nMsg = 0x14;
     } else {
         nSurface = gPlayers[nPlayer].ball.nSurface;
-        fLength = fn_800D0550(nPlayer);
+        fLength = GameAnalysis_GetCurrentBallFlightDistance(nPlayer);
         GameModeSkillZoneHorse_GetIDScore(nSurface, &gHorseShotPoints);
         if (nSurface >= 0x85 && nSurface <= 0x90 && !GameModeSkillZoneBase_IsLongDrive(nPlayer, fLength)) {
             nTarget = GameModeSkillZoneBase_GetGreenIndexHit(nPlayer);

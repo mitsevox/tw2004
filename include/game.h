@@ -199,27 +199,27 @@ int  GM_CurrentCourseTotalParXHoles(int nPar);             // the number of the 
 
 // ---- the game manager ------------------------------------------------------------------------
 
-f32  fn_800D0478(int nPlayer);          // the ball's distance from the pin (yards)
-f32  fn_800D0550(int nPlayer);          // the shot's length
-int  Hole_ScoreAfterTapIn(int nPlayer); // HoleScore.c
-u8   fn_800CF158(int nPlayer);          // gpGame->pfnIsPuttForLead: holing this ball takes the lead
-u8   fn_800CF450(int nPlayer);          // gpGame->pfnIsPuttForWin: holing this ball wins
-s32  fn_800CFE74(int nPlayer);          // gpGame->pfnGetCurrentLead: the lead so far
-s32  fn_800D0098(int nPlayer);          // gpGame->pfnGetPotentialLead: the lead if this ball drops
-s32  fn_800D030C(int nPlayer);          // gpGame->pfnGetPotentialHoleResult: how the hole ends if it drops
-int  fn_800D0620(int nPlayer, u8 bCurrent, u8 bOnlyFlagged);   // holes under par so far
-int  fn_800D06FC(int nPlayer, u8 bCurrent, u8 bOnlyFlagged);   // two under par or better so far
-int  fn_800D07D8(int nPlayer, u8 bCurrent);   // the current run of holes under par
-int  fn_800D089C(int nPlayer, u8 bCurrent);   // the current run of holes two under par or better
-u8   fn_800D0AF4(void);                 // nobody took anything on the last hole played
-u8   fn_800CF77C(int nPlayer);          // HoleScore.c
-u8   fn_800CF848(int nPlayer);          // HoleScore.c
-u32  fn_800CF904(int nPlayer);          // HoleScore.c
-u32  fn_800CFD58(int nPlayer);          // HoleScore.c
-int  fn_800CFFE4(int nPlayer);          // HoleScore.c
-f32  fn_800D04E0(int nPlayer);          // HoleScore.c
-int  fn_800D0514(int nPlayer);          // HoleScore.c
-f32  fn_800D0960(int nPlayer);          // HoleScore.c
+f32  GameAnalysis_GetCurrentDistanceToPin(int nPlayer); // the ball's distance from the pin (yards)
+f32  GameAnalysis_GetCurrentBallFlightDistance(int nPlayer); // the shot's length
+int  GameAnalysis_IsPuttFor(int nPlayer); // HoleScore.c
+u8   GameAnalysis_IsPuttForLead(int nPlayer); // gpGame->pfnIsPuttForLead: holing this ball takes the lead
+u8   GameAnalysis_IsPuttForWin(int nPlayer); // gpGame->pfnIsPuttForWin: holing this ball wins
+s32  GameAnalysis_GetCurrentEventLead(int nPlayer); // gpGame->pfnGetCurrentLead: the lead so far
+s32  GameAnalysis_GetPotentialEventLead(int nPlayer); // gpGame->pfnGetPotentialLead: the lead if this ball drops
+s32  GameAnalysis_GetPotentialHoleResult(int nPlayer); // gpGame->pfnGetPotentialHoleResult: how the hole ends if it drops
+int  GameAnalysis_NumBirdiesSoFarThisRound(int nPlayer, u8 bCurrent, u8 bOnlyFlagged); // holes under par so far
+int  GameAnalysis_NumEaglesSoFarThisRound(int nPlayer, u8 bCurrent, u8 bOnlyFlagged); // two under par or better so far
+int  GameAnalysis_CurrentBirdieStreak(int nPlayer, u8 bCurrent); // the current run of holes under par
+int  GameAnalysis_CurrentEagleStreak(int nPlayer, u8 bCurrent); // the current run of holes two under par or better
+u8   GameAnalysis_LastHoleWasTied(void); // nobody took anything on the last hole played
+u8   GameAnalysis_IsPredictedBallRecord(int nPlayer); // HoleScore.c
+u8   GameAnalysis_IsPredictedBallTrophy(int nPlayer); // HoleScore.c
+u32  GameAnalysis_IsShotForRecord(int nPlayer); // HoleScore.c
+u32  GameAnalysis_IsShotForTrophyBall(int nPlayer); // HoleScore.c
+int  GameAnalysis_GetPotentailRoundParScore(int nPlayer); // HoleScore.c
+f32  GameAnalysis_GetEstimatedDistanceToPin(int nPlayer); // HoleScore.c
+int  GameAnalysis_GetEstimatedLie(int nPlayer); // HoleScore.c
+f32  GameAnalysis_GetPuttBreakAngle(int nPlayer); // HoleScore.c
 int  fn_800D0FBC(int nPlayer);          // HoleScore.c
 int  fn_800D10B0(int nPlayer);          // HoleScore.c
 int  fn_800D1170(int nPlayer, u8 bOnlyFlagged);    // HoleScore.c

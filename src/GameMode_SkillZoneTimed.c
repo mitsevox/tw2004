@@ -209,7 +209,7 @@ void GameModeSkillZoneTimed_CheckShotAwards(int nPlayer) {
     fScale = 1.0f;
     nAdded = 0;
     bTime = gTimedShotSeconds != 0;
-    fLength = fn_800D0550(nPlayer);
+    fLength = GameAnalysis_GetCurrentBallFlightDistance(nPlayer);
     if (nSurface >= 0x85 && nSurface <= 0x90 && !GameModeSkillZoneBase_IsLongDrive(nPlayer, fLength)) {
         nTarget = GameModeSkillZoneBase_GetGreenIndexHit(nPlayer);
         gPlayers[nPlayer].nHitStreak++;

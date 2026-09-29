@@ -139,19 +139,19 @@ void GameMode26_EndGame(void) {
     EASBio_SetCurrentGameWon(1);
 }
 
-// Each frame (pfnUpdate). Every 16 frames, for both players: the shot length (fn_800D0550) sent as
-// message 0x4D with the player; while it is nonzero and still changing a long-drive UI sound plays
-// (script 0, track 1; started once per player; EA also passes a loop flag and the player's side,
-// which Gaud_LongDriveUi_Play ignores), and it stops once the length stops changing. Once somebody
-// has won (gGameMode26Winner not 5) the winner countdown runs down. On the first frame the mode's
-// intro comment (line 0) is said.
+// Each frame (pfnUpdate). Every 16 frames, for both players: the shot length
+// (GameAnalysis_GetCurrentBallFlightDistance) sent as message 0x4D with the player; while it is
+// nonzero and still changing a long-drive UI sound plays (script 0, track 1; started once per
+// player; EA also passes a loop flag and the player's side, which Gaud_LongDriveUi_Play ignores),
+// and it stops once the length stops changing. Once somebody has won (gGameMode26Winner not 5) the
+// winner countdown runs down. On the first frame the mode's intro comment (line 0) is said.
 void GameMode26_UpdateFrame(void) {
     s32 i;
     s32 nLength;
 
     if (gGameMode26LengthCheckFrames-- <= 0) {
         for (i = 0; i <= 1; i++) {
-            nLength = fn_800D0550(i);
+            nLength = GameAnalysis_GetCurrentBallFlightDistance(i);
             GameMsg_Send2Ints(0x4D, i, nLength);
             if (nLength != 0 && nLength != *(s32*)((u8*)gGameMode26LastLength + i * sizeof(s32))) {
                 if (*(s32*)((u8*)gGameMode26LengthSoundOn + i * sizeof(s32)) == 0) {
@@ -324,7 +324,7 @@ void GameMode26_ScoreShot(PlayerNumber_t nPlayer) {
         break;
     }
 
-    nLength = fn_800D0550(nPlayer);
+    nLength = GameAnalysis_GetCurrentBallFlightDistance(nPlayer);
     if (bCounts) {
         gPlayers[nPlayer].nFairDrives++;
         gPlayers[nPlayer].nFairDriveTotal += nLength;

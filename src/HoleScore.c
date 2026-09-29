@@ -1,5 +1,5 @@
 // HoleScore.c (our name; TW06's golf/gamemode/analysisutilities.c, medium evidence: TW06 names
-// Hole_ScoreAfterTapIn GameAnalysis_IsPuttFor): per-player round analysis for the situation
+// GameAnalysis_IsPuttFor GameAnalysis_IsPuttFor): per-player round analysis for the situation
 // scripts, the earnings and the game modes: distances to the pin, the ground the shot started from,
 // and counts and streaks of holes by score against par.
 
@@ -8,13 +8,13 @@
 
 u8  lbl_80282240;
 
-f32  fn_800D04AC(int nPlayer);
-f32  fn_800D05A4(f32* pPos);
-u32  fn_800D0BAC(int nPlayer);
-u8   fn_800D0D54(int nPlayer);
-int  fn_800D0DC8(int nPlayer, int nToPar);
-int  fn_800D0E74(int nPlayer);
-int  fn_800D0F04(int nPlayer, int nToPar);
+f32  GameAnalysis_GetInitialDistanceToPin(int nPlayer);
+f32  GameAnalysis_GetPositionDistanceToPin(f32* pPos);
+u32  GameAnalysis_GetInitialStartingLie(int nPlayer);
+u8   GameAnalysis_GetFairwayDrive(int nPlayer);
+int  GameAnalysis_CountHoleScoresOrBetter(int nPlayer, int nToPar);
+int  GameAnalysis_CountHolesOverPar(int nPlayer);
+int  GameAnalysis_CountStreakHoleScores(int nPlayer, int nToPar);
 int  fn_800D1330(int nPlayer);
 void fn_800D1674(f32* pA, f32* pB, f32* pOut);
 void fn_800C8C3C(int nView, f32* pOut);   // GoBreakLine: a point kept per view
@@ -24,8 +24,8 @@ void fn_800C8C3C(int nView, f32* pOut);   // GoBreakLine: a point kept per view
 // already. Holes won (1): level on holes and beating the best other score on this hole by more
 // than a stroke. Skins (2): the same, from level or behind, when this hole's skin would lift the
 // player past the best.
-u8 fn_800CF158(int nPlayer) {
-    int anTotal[4];   // one per player set up, as in fn_800CFE74
+u8 GameAnalysis_IsPuttForLead(int nPlayer) {
+    int anTotal[4];   // one per player set up, as in GameAnalysis_GetCurrentEventLead
     int i;
     int nKind;
     int nMineStrokes;
@@ -129,8 +129,8 @@ u8 fn_800CF158(int nPlayer) {
 // gpGame->bInPlayoff, beating the best other total. Holes won (1): winning this hole puts the
 // player more holes up than are left, or halving it (beating the best by less than two) already
 // does. Skins (2): winning this hole's skin lifts the player past the best.
-u8 fn_800CF450(int nPlayer) {
-    int anTotal[4];   // one per player set up, as in fn_800CFE74
+u8 GameAnalysis_IsPuttForWin(int nPlayer) {
+    int anTotal[4];   // one per player set up, as in GameAnalysis_GetCurrentEventLead
     int nMineStrokes;
     int i;
     int nKind;
@@ -231,9 +231,10 @@ u8 fn_800CF450(int nPlayer) {
     return 0;
 }
 
-// For a human player: whether Player.ballBefore passes the HighScoreRecords_GetEndOfShotRecord
-// check or, when that ball is in the cup, the HighScoreRecords_GetEndOfHoleRecord putt check.
-u8 fn_800CF77C(int nPlayer) {
+// For a human player: whether the look-ahead ball (Player.ballBefore) would set a record, by
+// HighScoreRecords_GetEndOfShotRecord or, when that ball ends in the cup, by
+// HighScoreRecords_GetEndOfHoleRecord. 0 for a CPU player.
+u8 GameAnalysis_IsPredictedBallRecord(int nPlayer) {
     if (Player_IsCPU(nPlayer)) {
         return 0;
     }
@@ -247,8 +248,9 @@ u8 fn_800CF77C(int nPlayer) {
     return 0;
 }
 
-// As fn_800CF77C, with the checks Earnings_CheckShotAwards and Earnings_CheckPuttAwards.
-u8 fn_800CF848(int nPlayer) {
+// As GameAnalysis_IsPredictedBallRecord, for the earnings awards: Earnings_CheckShotAwards or, when
+// Player.ballBefore ends in the cup, Earnings_CheckPuttAwards. 0 for a CPU player.
+u8 GameAnalysis_IsPredictedBallTrophy(int nPlayer) {
     if (Player_IsCPU(nPlayer)) {
         return 0;
     }
@@ -270,8 +272,8 @@ u8 fn_800CF848(int nPlayer) {
 // better, one more of fn_800D1170 beats kind 3's; 0x10 on the last hole, the round's putts (one
 // more on the green or fringe) beat kind 4's; 0x20 on the tee of a par 4 or 5, one more of
 // fn_800D0FBC beats kind 5's; 0x40 and 0x80 two under / one under par or better, one more eagle
-// (fn_800D06FC) / birdie (fn_800D0620) beats kinds 6 / 7.
-u32 fn_800CF904(int nPlayer) {
+// (GameAnalysis_NumEaglesSoFarThisRound) / birdie (GameAnalysis_NumBirdiesSoFarThisRound) beats kinds 6 / 7.
+u32 GameAnalysis_IsShotForRecord(int nPlayer) {
     Player* pPlayer = &gPlayers[nPlayer];
     u32 uFlags = 0;
     int nPutts;
@@ -322,13 +324,15 @@ u32 fn_800CF904(int nPlayer) {
     }
     if (HighScoreRecords_CheckRecordGameSetting(6) && !gpGame->bInPlayoff &&
         gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 <= GM_GetCurrentHolePar() - 2) {
-        if (fn_800D06FC(nPlayer, 0, 0) + 1 > gSession.aCourseRecord[Game_GetCourse()].aRecord[6][0].nValue) {
+        if (GameAnalysis_NumEaglesSoFarThisRound(nPlayer, 0, 0) + 1
+            > gSession.aCourseRecord[Game_GetCourse()].aRecord[6][0].nValue) {
             uFlags |= 0x40;
         }
     }
     if (HighScoreRecords_CheckRecordGameSetting(7) && !gpGame->bInPlayoff &&
         gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 <= GM_GetCurrentHolePar() - 1) {
-        if (fn_800D0620(nPlayer, 0, 0) + 1 > gSession.aCourseRecord[Game_GetCourse()].aRecord[7][0].nValue) {
+        if (GameAnalysis_NumBirdiesSoFarThisRound(nPlayer, 0, 0) + 1
+            > gSession.aCourseRecord[Game_GetCourse()].aRecord[7][0].nValue) {
             uFlags |= 0x80;
         }
     }
@@ -337,7 +341,7 @@ u32 fn_800CF904(int nPlayer) {
 
 // Runs the shot, putt and (outside a playoff) hole checks of Earnings.c for the player as a
 // preview (bPreview 1) and returns the ids 0..22 they list, as a bit set.
-u32 fn_800CFD58(int nPlayer) {
+u32 GameAnalysis_IsShotForTrophyBall(int nPlayer) {
     u32 uIds = 0;
     u32 nId;
     int i;
@@ -368,12 +372,11 @@ u32 fn_800CFD58(int nPlayer) {
     return uIds;
 }
 
-// gpGame->pfnGetCurrentLead (TW06: GetCurrentLead).
-// The player's lead in the round so far (strokes, holes won or skins by the scoring kind
-// GM_GetScoringType): kind 0, the best other total (GM_GetGolferRelativeCumulativeScore; cut
-// players left out) less the
-// player's; kinds 1 and 2, the player's holes won (skins) less the best of the others'.
-s32 fn_800CFE74(int nPlayer) {
+// gpGame->pfnGetCurrentLead (TW06: GetCurrentLead). The player's lead in the round so far, by the
+// scoring kind (GM_GetScoringType): kind 0 (strokes), the best other total against par
+// (GM_GetGolferRelativeCumulativeScore; players who missed the cut left out) less the player's;
+// kinds 1 and 2, the player's holes won (skins) less the best of the others'. 0 when playing alone.
+s32 GameAnalysis_GetCurrentEventLead(int nPlayer) {
     int anTotal[4];   // one per player set up; the frame has room for four
     int i;
     int nKind;
@@ -422,9 +425,9 @@ s32 fn_800CFE74(int nPlayer) {
     return 0;
 }
 
-// The player's score against par for the round once the tap-in on this hole drops; 0 when
-// GM_GetScoringType is set.
-int fn_800CFFE4(int nPlayer) {
+// The player's score against par for the round once the tap-in on this hole drops (EA's spelling,
+// Potentail); 0 when GM_GetScoringType is not strokes (0).
+int GameAnalysis_GetPotentailRoundParScore(int nPlayer) {
     int nPar = 0;
     int nStrokes = 0;
     int i;
@@ -444,8 +447,8 @@ int fn_800CFFE4(int nPlayer) {
 // ball's score on this hole, less the player's total with the tap-in; players who missed the cut
 // are left out. Kinds 1 and 2: the lead from GM_GetCurrentEventLead, moved by
 // GM_GetPotentialHoleResult's value: 3 no change, 2 up one (kind 2: up this hole's skin), 0 down the same.
-s32 fn_800D0098(int nPlayer) {
-    int anTotal[4];   // one per player set up, as in fn_800CFE74
+s32 GameAnalysis_GetPotentialEventLead(int nPlayer) {
+    int anTotal[4];   // one per player set up, as in GameAnalysis_GetCurrentEventLead
     int i;
     int nKind;
     int nMine;
@@ -509,9 +512,10 @@ s32 fn_800D0098(int nPlayer) {
     return 0;
 }
 
-// Whether holing the ball now would finish the hole: puts the ball in the cup with one more
-// stroke, asks the mode (pfnHoleFinished, only asking), then puts both back.
-u8 fn_800D024C(int nPlayer) {
+// Whether holing the ball now would finish the hole: puts the ball in the cup with one more stroke,
+// asks the mode (gpGame->pfnHoleFinished) with lbl_80282240 set, so the match modes do not count
+// the asking player's own side as done, then puts both back.
+u8 GameAnalysis_ShotWouldEndHole(int nPlayer) {
     int nLie;
     int nStrokes;
     int bFinished;
@@ -532,7 +536,7 @@ u8 fn_800D024C(int nPlayer) {
 // How the hole ends for the player if the ball drops now, against the best of the others (a
 // ball not yet holed counts one more stroke; in mode 21 the other side is player 2 or 0): 2 the
 // player wins it, 1 ties, 0 loses; 3 when playing alone or when holing would not end the hole.
-s32 fn_800D030C(int nPlayer) {
+s32 GameAnalysis_GetPotentialHoleResult(int nPlayer) {
     int i;
     int nMine;
     int nBest;
@@ -542,7 +546,7 @@ s32 fn_800D030C(int nPlayer) {
     if (gNumPlayersSetUp == 1) {
         return 3;
     }
-    if (!fn_800D024C(nPlayer)) {
+    if (!GameAnalysis_ShotWouldEndHole(nPlayer)) {
         return 3;
     }
     nBest = 1000;
@@ -580,22 +584,25 @@ s32 fn_800D030C(int nPlayer) {
     return nMine == nBest;
 }
 
-// The ball's distance from the pin: where it lies, where the shot started, and where it lay before
-// the shot.
-f32 fn_800D0478(int nPlayer) {
-    return fn_800D05A4(gPlayers[nPlayer].ball.vPos);
+// The distance from the pin, along the ground, of where the player's ball lies now.
+f32 GameAnalysis_GetCurrentDistanceToPin(int nPlayer) {
+    return GameAnalysis_GetPositionDistanceToPin(gPlayers[nPlayer].ball.vPos);
 }
 
-f32 fn_800D04AC(int nPlayer) {
-    return fn_800D05A4(gPlayers[nPlayer].ball.vStart);
+// The distance from the pin, along the ground, of where the shot started (Ball.vStart).
+f32 GameAnalysis_GetInitialDistanceToPin(int nPlayer) {
+    return GameAnalysis_GetPositionDistanceToPin(gPlayers[nPlayer].ball.vStart);
 }
 
-f32 fn_800D04E0(int nPlayer) {
-    return fn_800D05A4(gPlayers[nPlayer].ballBefore.vPos);
+// The distance from the pin, along the ground, of Player.ballBefore (the ball before the shot, then
+// the look-ahead ball).
+f32 GameAnalysis_GetEstimatedDistanceToPin(int nPlayer) {
+    return GameAnalysis_GetPositionDistanceToPin(gPlayers[nPlayer].ballBefore.vPos);
 }
 
-// The class (SurfaceType.nClass) of the surface under the lying ball before the shot, or -1.
-int fn_800D0514(int nPlayer) {
+// The class (SurfaceType.nClass) of the surface under Player.ballBefore (the look-ahead ball), -1
+// when it has none.
+int GameAnalysis_GetEstimatedLie(int nPlayer) {
     int nSurface = gPlayers[nPlayer].ballBefore.nSurface;
     if (nSurface >= 0) {
         return gSurfaceTypes[nSurface].nClass;
@@ -603,8 +610,9 @@ int fn_800D0514(int nPlayer) {
     return -1;
 }
 
-// The shot's length along the ground (the height left out).
-f32 fn_800D0550(int nPlayer) {
+// The distance along the ground (height left out) from where the shot started to where the ball is
+// now.
+f32 GameAnalysis_GetCurrentBallFlightDistance(int nPlayer) {
     f32 vDiff[3];
     fn_800D1674(gPlayers[nPlayer].ball.vPos, gPlayers[nPlayer].ball.vStart, vDiff);
     vDiff[1] = 0.0f;
@@ -612,7 +620,7 @@ f32 fn_800D0550(int nPlayer) {
 }
 
 // A point's distance from the current pin along the ground; 0 with no hole loaded.
-f32 fn_800D05A4(f32* pPos) {
+f32 GameAnalysis_GetPositionDistanceToPin(f32* pPos) {
     f32 vDiff[3];
     CourseInfo* pCourse = Ter_GetTGD();
     int nPin;
@@ -623,9 +631,11 @@ f32 fn_800D05A4(f32* pPos) {
     return Math_Sqrt(Vec3_LengthSqClamped(vDiff));
 }
 
-// The round's holes the player finished under par, counting back from the current hole (with
-// bCurrent) or the one before; with bOnlyFlagged, only those whose gpGame->b16C entry is 1.
-int fn_800D0620(int nPlayer, u8 bCurrent, u8 bOnlyFlagged) {
+// The round's holes the player finished one under par or better, counting back from the current
+// hole (with bCurrent: TW07's includeCurrentHole) or the one before; with bOnlyFlagged (TW07's
+// onlyCompletedHoles, which there tests GM_PlayerHoledOut), only holes whose gpGame->b16C entry is
+// 1.
+int GameAnalysis_NumBirdiesSoFarThisRound(int nPlayer, u8 bCurrent, u8 bOnlyFlagged) {
     int nCount = 0;
     int i;
     if (bCurrent) {
@@ -643,8 +653,8 @@ int fn_800D0620(int nPlayer, u8 bCurrent, u8 bOnlyFlagged) {
     return nCount;
 }
 
-// As fn_800D0620, two under par or better.
-int fn_800D06FC(int nPlayer, u8 bCurrent, u8 bOnlyFlagged) {
+// As GameAnalysis_NumBirdiesSoFarThisRound, for holes two under par or better.
+int GameAnalysis_NumEaglesSoFarThisRound(int nPlayer, u8 bCurrent, u8 bOnlyFlagged) {
     int nCount = 0;
     int i;
     if (bCurrent) {
@@ -662,9 +672,10 @@ int fn_800D06FC(int nPlayer, u8 bCurrent, u8 bOnlyFlagged) {
     return nCount;
 }
 
-// The player's current run of holes under par: counting back from the current hole (with
-// bCurrent) or the one before, until a hole that is not.
-int fn_800D07D8(int nPlayer, u8 bCurrent) {
+// The player's current run of holes one under par or better: counting back from the current hole
+// (with bCurrent) or the one before, until a hole that is not (holes outside the round are
+// skipped).
+int GameAnalysis_CurrentBirdieStreak(int nPlayer, u8 bCurrent) {
     int i;
     int nRun = 0;
     if (bCurrent) {
@@ -684,8 +695,8 @@ int fn_800D07D8(int nPlayer, u8 bCurrent) {
     return nRun;
 }
 
-// As fn_800D07D8, two under par or better.
-int fn_800D089C(int nPlayer, u8 bCurrent) {
+// As GameAnalysis_CurrentBirdieStreak, for holes two under par or better.
+int GameAnalysis_CurrentEagleStreak(int nPlayer, u8 bCurrent) {
     int i;
     int nRun = 0;
     if (bCurrent) {
@@ -705,9 +716,10 @@ int fn_800D089C(int nPlayer, u8 bCurrent) {
     return nRun;
 }
 
-// The angle (radians) at the start of the shot, along the ground, from the direction of the pin
-// to that of the player's view's point (fn_800C8C3C); negative on one side.
-f32 fn_800D0960(int nPlayer) {
+// The putt's break angle (radians): from the shot's start, along the ground, the angle from the
+// direction of the pin to that of the break line's point closest to the cup in the player's view
+// (fn_800C8C3C); negative when the cross product's y is below 0.
+f32 GameAnalysis_GetPuttBreakAngle(int nPlayer) {
     f32 vView[4];
     f32 vToPin[4];
     f32 vToView[4];
@@ -739,14 +751,15 @@ f32 fn_800D0960(int nPlayer) {
     return fAngle;
 }
 
-// The score the hole will finish on once the tap-in drops: strokes so far plus one, minus par.
-int Hole_ScoreAfterTapIn(int nPlayer) {
+// What the putt is for: the hole's score against par once this stroke drops (strokes so far plus
+// one, minus par); -1 a birdie putt, 0 par, 1 bogey.
+int GameAnalysis_IsPuttFor(int nPlayer) {
     return gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 - GM_GetCurrentHolePar();
 }
 
-// Whether nobody took anything (mode points or nSkinsWon) on the last hole played before this one;
-// 0 on the round's first hole.
-u8 fn_800D0AF4(void) {
+// Whether the last hole played before this one was tied: nobody took mode points or skins
+// (nSkinsWon) on it; 0 on the round's first hole.
+u8 GameAnalysis_LastHoleWasTied(void) {
     int i;
     int j;
     if (GM_OnFirstSelectedHole()) {
@@ -765,8 +778,9 @@ u8 fn_800D0AF4(void) {
     return 0;
 }
 
-// The class of the surface the shot started from, 0 for none.
-u32 fn_800D0BAC(int nPlayer) {
+// The class (SurfaceType.nClass) of the surface the shot started from (Ball.nStartSurface), 0 when
+// it has none or is out of range.
+u32 GameAnalysis_GetInitialStartingLie(int nPlayer) {
     if (gPlayers[nPlayer].ball.nStartSurface < 0 ||
         gPlayers[nPlayer].ball.nStartSurface >= NUM_SURFACE_TYPES) {
         return 0;
@@ -777,7 +791,7 @@ u32 fn_800D0BAC(int nPlayer) {
 // The ground under Player.vBall is not green (class 3) and the hole's strokes so far are three
 // under par or better (bUnder: more than three); without bAnyLie, the ball must also be on the
 // green or in the cup and two under par (bUnder: more).
-u8 fn_800D0BF8(int nPlayer, u8 bUnder, u8 bAnyLie) {
+u8 GameAnalysis_CurrentShotGIR(int nPlayer, u8 bUnder, u8 bAnyLie) {
     SurfaceType* pSurface;
     int nPar;
     int nStrokes;
@@ -812,9 +826,11 @@ u8 fn_800D0BF8(int nPlayer, u8 bUnder, u8 bAnyLie) {
     return 0;
 }
 
-// The shot started from class 1 ground (fairway) and the ball now lies 1, 9 or 12 (12: in the cup).
-u8 fn_800D0D54(int nPlayer) {
-    if (fn_800D0BAC(nPlayer) != 1) return 0;
+// Whether the shot started from fairway ground (surface class 1) and the ball now lies on the
+// fairway (LIE_FAIRWAY_e), the green (LIE_GREEN_e) or in the cup (LIE_INCUP_e). Earnings.c's awards
+// test it.
+u8 GameAnalysis_GetFairwayDrive(int nPlayer) {
+    if (GameAnalysis_GetInitialStartingLie(nPlayer) != 1) return 0;
     if (gPlayers[nPlayer].ball.nLie == 1 || gPlayers[nPlayer].ball.nLie == 9 ||
         gPlayers[nPlayer].ball.nLie == 12) {
         return 1;
@@ -823,7 +839,7 @@ u8 fn_800D0D54(int nPlayer) {
 }
 
 // The round's holes the player finished nToPar or better; below -3 a hole in one always counts.
-int fn_800D0DC8(int nPlayer, int nToPar) {
+int GameAnalysis_CountHoleScoresOrBetter(int nPlayer, int nToPar) {
     int nCount = 0;
     int i;
     for (i = 0; i < 18; i++) {
@@ -838,7 +854,7 @@ int fn_800D0DC8(int nPlayer, int nToPar) {
 }
 
 // The round's holes the player finished over par.
-int fn_800D0E74(int nPlayer) {
+int GameAnalysis_CountHolesOverPar(int nPlayer) {
     int nCount = 0;
     int i;
     for (i = 0; i < 18; i++) {
@@ -851,8 +867,9 @@ int fn_800D0E74(int nPlayer) {
     return nCount;
 }
 
-// The longest run of the round's holes finished nToPar or better (as fn_800D0DC8 counts them).
-int fn_800D0F04(int nPlayer, int nToPar) {
+// The longest run of the round's holes finished nToPar or better (as
+// GameAnalysis_CountHoleScoresOrBetter counts them).
+int GameAnalysis_CountStreakHoleScores(int nPlayer, int nToPar) {
     int nRun;
     int nBest;
     int i;

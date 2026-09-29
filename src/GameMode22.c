@@ -315,10 +315,10 @@ void GameMode22_EndGame(void) {
 
 // Each frame (pfnUpdate). Once after the setup: intro message 89 with 1 (variant 0) or 2 (variant
 // 1) and the drives-left text (GameMode22_ShowDrivesLeft). Every 16 frames: the current player's
-// shot length (fn_800D0550) sent as message 0x4D; while it is nonzero and still changing, a
-// long-drive UI sound plays (script 0, track 1; started once), and it stops once the length stops
-// changing. After a winner is decided (nWinner not 5), the winner countdown nWinnerFrames runs
-// down.
+// shot length (GameAnalysis_GetCurrentBallFlightDistance) sent as message 0x4D; while it is nonzero
+// and still changing, a long-drive UI sound plays (script 0, track 1; started once), and it stops
+// once the length stops changing. After a winner is decided (nWinner not 5), the winner countdown
+// nWinnerFrames runs down.
 void GameMode22_UpdateFrame(void) {
     s32 nLength;
 
@@ -335,7 +335,7 @@ void GameMode22_UpdateFrame(void) {
         gGameMode22ShowIntro = 0;
     }
     if (gGameMode22LengthCheckFrames-- <= 0) {
-        nLength = fn_800D0550(lbl_80282278);
+        nLength = GameAnalysis_GetCurrentBallFlightDistance(lbl_80282278);
         GameMsg_Send2Ints(0x4D, 0, nLength);
         if (nLength != 0 && nLength != gGameMode22LastLength) {
             if (gGameMode22LengthSoundOn == 0) {
@@ -590,7 +590,7 @@ void GameMode22_ScoreShot(int nPlayer) {
         break;
     }
 
-    nLength = fn_800D0550(nPlayer);
+    nLength = GameAnalysis_GetCurrentBallFlightDistance(nPlayer);
     if (bCounts) {
         gPlayers[nPlayer].nFairDrives++;
         gPlayers[nPlayer].nFairDriveTotal += nLength;

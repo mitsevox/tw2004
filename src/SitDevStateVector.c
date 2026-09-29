@@ -166,7 +166,7 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
         _SetStateVecAndCondition(pValues, 7, GM_GetCurrentHolePar(), pSetBits);
         _SetStateVecAndCondition(pValues, 29, GM_IsPlayoff(), pSetBits);
         _SetStateVecAndCondition(pValues, 28, GM_GetNumHolesInRound(), pSetBits);
-        _SetStateVecAndCondition(pValues, 31, fn_800D0AF4(), pSetBits);
+        _SetStateVecAndCondition(pValues, 31, GameAnalysis_LastHoleWasTied(), pSetBits);
         _SetStateVecAndCondition(pValues, 65, Game_CurrentPinSet(), pSetBits);
         _SetStateVecAndCondition(pValues, 85, 0, pSetBits);
         _SetStateVecAndCondition(pValues, 88, gSession.options.nFairwaySpeed, pSetBits);
@@ -177,12 +177,12 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
     case 2:
         nValue = nRound != 0 ? pPlayer->nRoundScore[nRound - 1] : 0;
         _SetStateVecAndCondition(pValues, 14, nValue, pSetBits);
-        _SetStateVecAndCondition(pValues, 33, fn_800D07D8(nPlayer, 0), pSetBits);
-        _SetStateVecAndCondition(pValues, 34, fn_800D089C(nPlayer, 0), pSetBits);
+        _SetStateVecAndCondition(pValues, 33, GameAnalysis_CurrentBirdieStreak(nPlayer, 0), pSetBits);
+        _SetStateVecAndCondition(pValues, 34, GameAnalysis_CurrentEagleStreak(nPlayer, 0), pSetBits);
         _SetStateVecAndCondition(pValues, 35, fn_800D10B0(nPlayer), pSetBits);
         _SetStateVecAndCondition(pValues, 36, fn_800D1250(nPlayer), pSetBits);
-        _SetStateVecAndCondition(pValues, 39, fn_800D0620(nPlayer, 0, 0), pSetBits);
-        _SetStateVecAndCondition(pValues, 40, fn_800D06FC(nPlayer, 0, 0), pSetBits);
+        _SetStateVecAndCondition(pValues, 39, GameAnalysis_NumBirdiesSoFarThisRound(nPlayer, 0, 0), pSetBits);
+        _SetStateVecAndCondition(pValues, 40, GameAnalysis_NumEaglesSoFarThisRound(nPlayer, 0, 0), pSetBits);
         _SetStateVecAndCondition(pValues, 41, fn_800D0FBC(nPlayer), pSetBits);
         _SetStateVecAndCondition(pValues, 42, fn_800D1170(nPlayer, 0), pSetBits);
         _SetStateVecAndCondition(pValues, 6, pPlayer->pChar->nSlot, pSetBits);
@@ -227,12 +227,12 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
         _SetStateVecAndCondition(pValues, 44, pPlayer->b311 && !pPlayer->bMulliganUsed, pSetBits);
         _SetStateVecAndCondition(pValues, 49, GM_IsPuttForWin(nPlayer), pSetBits);
         _SetStateVecAndCondition(pValues, 38, GM_GetCurrentEventLead(nPlayer), pSetBits);
-        _SetStateVecAndCondition(pValues, 51, fn_800CF848(nPlayer), pSetBits);
-        _SetStateVecAndCondition(pValues, 52, fn_800CF77C(nPlayer), pSetBits);
+        _SetStateVecAndCondition(pValues, 51, GameAnalysis_IsPredictedBallTrophy(nPlayer), pSetBits);
+        _SetStateVecAndCondition(pValues, 52, GameAnalysis_IsPredictedBallRecord(nPlayer), pSetBits);
         _SetStateVecAndCondition(pValues, 37, GM_GetGolferRelativeCurrentScore(nPlayer, 0), pSetBits);
         _SetStateVecAndCondition(pValues, 55, GM_GetGolferRelativeCumulativeScore(nPlayer, 0), pSetBits);
         // radians to degrees
-        nDeg = 180.0f * fn_800D0960(nPlayer) / PI;
+        nDeg = 180.0f * GameAnalysis_GetPuttBreakAngle(nPlayer) / PI;
         _SetStateVecAndCondition(pValues, 17, nDeg, pSetBits);
         _SetStateVecAndCondition(pValues, 57, nDeg, pSetBits);
         // yards to inches
@@ -243,7 +243,7 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
         _SetStateVecAndCondition(pValues, 80, (f32)pPlayer->nLongestPutt >= 10.0f / 3.0f, pSetBits);
         _SetStateVecAndCondition(pValues, 81, pPlayer->n308 & 2, pSetBits);
         _SetStateVecAndCondition(pValues, 82, pPlayer->n308 & 1, pSetBits);
-        _SetStateVecAndCondition(pValues, 47, fn_800CFD58(nPlayer), pSetBits);
+        _SetStateVecAndCondition(pValues, 47, GameAnalysis_IsShotForTrophyBall(nPlayer), pSetBits);
         _SetStateVecAndCondition(pValues, 94, SitDev_GetPGARank(nPlayer), pSetBits);
     case 5:
     case 7:
@@ -254,15 +254,15 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
     case 29:
     case 31:
         nHole = Game_CurHoleIndex();
-        _SetStateVecAndCondition(pValues, 46, fn_800CF904(nPlayer), pSetBits);
+        _SetStateVecAndCondition(pValues, 46, GameAnalysis_IsShotForRecord(nPlayer), pSetBits);
         _SetStateVecAndCondition(pValues, 48, GM_GetPotentialHoleResult(nPlayer), pSetBits);
         _SetStateVecAndCondition(pValues, 50, GM_GetPotentialEventLead(nPlayer), pSetBits);
-        _SetStateVecAndCondition(pValues, 53, Hole_ScoreAfterTapIn(nPlayer), pSetBits);
+        _SetStateVecAndCondition(pValues, 53, GameAnalysis_IsPuttFor(nPlayer), pSetBits);
         _SetStateVecAndCondition(pValues, 10, pPlayer->nShotKind, pSetBits);
         if (nKind == 33) {
             gpSitDevData->aValue[53]--;
         }
-        _SetStateVecAndCondition(pValues, 56, fn_800CFFE4(nPlayer), pSetBits);
+        _SetStateVecAndCondition(pValues, 56, GameAnalysis_GetPotentailRoundParScore(nPlayer), pSetBits);
         _SetStateVecAndCondition(pValues, 8, pPlayer->nStrokes[nHole], pSetBits);
         _SetStateVecAndCondition(pValues, 9, pPlayer->nPutts[nHole], pSetBits);
         _SetStateVecAndCondition(pValues, 32, SitDev_GetWeatherChangeCondition(), pSetBits);
@@ -282,10 +282,10 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
         nValue = SurfaceType_IsValid(pPlayer->nSurface) ?
                  gSurfaceTypes[*(volatile s32*)&pPlayer->nSurface].nClass : -1;   // fake match: reload
         _SetStateVecAndCondition(pValues, 15, nValue, pSetBits);
-        nValue = 36.0f * fn_800D0550(nPlayer);
+        nValue = 36.0f * GameAnalysis_GetCurrentBallFlightDistance(nPlayer);
         _SetStateVecAndCondition(pValues, 18, nValue, pSetBits);
         _SetStateVecAndCondition(pValues, 19, nValue, pSetBits);
-        nValue = 36.0f * fn_800D0478(nPlayer);
+        nValue = 36.0f * GameAnalysis_GetCurrentDistanceToPin(nPlayer);
         _SetStateVecAndCondition(pValues, 20, nValue, pSetBits);
         _SetStateVecAndCondition(pValues, 21, nValue, pSetBits);
         // the class of where the ball lies
@@ -295,8 +295,9 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
         _SetStateVecAndCondition(pValues, 87, gSitDevPredictionVoiced && gSitDevPredictedHitClass != nValue,
                                  pSetBits);
         _SetStateVecAndCondition(pValues, 25, (s32)(36.0f * pBall->fClosest), pSetBits);
-        _SetStateVecAndCondition(pValues, 26, (s32)(36.0f * fn_800D04E0(nPlayer)), pSetBits);
-        nValue = fn_800D0514(nPlayer);
+        _SetStateVecAndCondition(pValues, 26, (s32)(36.0f * GameAnalysis_GetEstimatedDistanceToPin(nPlayer)),
+                                 pSetBits);
+        nValue = GameAnalysis_GetEstimatedLie(nPlayer);
         modifyFinalLie(&nValue, nBeforeSurface, pBefore, pPlayer);
         _SetStateVecAndCondition(pValues, 27, nValue, pSetBits);
         // the lie, in percent (Physics_GetLiePowerPercentage inlined)

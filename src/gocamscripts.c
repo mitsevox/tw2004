@@ -2943,9 +2943,10 @@ u8 CameraScript_WillGolferBeOccludedInThisView(int nPlayer, CamShot* pShot, CamS
 // kinds 1..7) must be passed over for the player (1); 0 for any other shot and without a club (25).
 // Passed over for a CPU player, when the current shot does not follow the ball
 // (CamScript_DoesScriptTrackBall), in double time, when the ball is coming down below 5, has b99
-// set or has collided, or is within 40 of the pin (fn_800D0478). From the tee (lie 0) it is shown
-// only for a drive (shot kind 1) at 0.9 power or more with a club below 9 aimed at surface 14 on a
-// par 4 or 5; from elsewhere only while GameBreaker is on or the aim is at water (surface 16).
+// set or has collided, or is within 40 of the pin (GameAnalysis_GetCurrentDistanceToPin). From the
+// tee (lie 0) it is shown only for a drive (shot kind 1) at 0.9 power or more with a club below 9
+// aimed at surface 14 on a par 4 or 5; from elsewhere only while GameBreaker is on or the aim is at
+// water (surface 16).
 u8 CamScript_SkipLookBackCam(CamScript* pScript, CamShot* pShot, int nPlayer) {
     if (!CamScript_DoesScriptTrackGolfer(pShot)) return 0;
     if (gPlayers[nPlayer].nClub == 25) return 0;
@@ -2955,7 +2956,7 @@ u8 CamScript_SkipLookBackCam(CamScript* pScript, CamShot* pShot, int nPlayer) {
     if (gPlayers[nPlayer].ball.fHeight < 5.0f && gPlayers[nPlayer].ball.vVel[1] < 0.0f) return 1;
     if (gPlayers[nPlayer].ball.b99) return 1;
     if (gPlayers[nPlayer].ball.nCollideCount > 0) return 1;
-    if (fn_800D0478(nPlayer) < 40.0f) return 1;
+    if (GameAnalysis_GetCurrentDistanceToPin(nPlayer) < 40.0f) return 1;
     if (gPlayers[nPlayer].ball.nLie == 0) {
         if (GM_GetHoleIndexPar(Game_GetCurHoleNum()) != 4 && GM_GetHoleIndexPar(Game_GetCurHoleNum())
             != 5) return 1;

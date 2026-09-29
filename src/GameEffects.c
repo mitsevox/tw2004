@@ -313,10 +313,11 @@ void GameEffects_ScriptedGameBreakerBallHitTrigger(int nPlayer) {
 // Whether the putt about to be played earns a scripted GameBreaker (emotion.c asks, fn_8006B0B8).
 // Needs a course loaded, a mode that allows GameBreakers (gpGame->bAllowGameBreakers), ground under
 // the aim point and the ball on the green; then any of: a putt that would score an eagle or better,
-// a distance to the pin (fn_800D0478) that makes record kind 2's list
+// a distance to the pin (GameAnalysis_GetCurrentDistanceToPin) that makes record kind 2's list
 // (HighScoreRecords_CheckRecord), a putt for the lead (GM_IsPuttForLead) or for the win
-// (GM_IsPuttForWin, the mode's pfnIsPuttForWin), a birdie putt when fn_800D0620 gives 11, or an eagle
-// putt when fn_800D089C gives 1 (birdie and eagle by Hole_ScoreAfterTapIn).
+// (GM_IsPuttForWin, the mode's pfnIsPuttForWin), a birdie putt when
+// GameAnalysis_NumBirdiesSoFarThisRound gives 11, or an eagle putt when
+// GameAnalysis_CurrentEagleStreak gives 1 (birdie and eagle by GameAnalysis_IsPuttFor).
 int GameEffects_IsScriptedGameBreaker(int nPlayer) {
     int bPossible = 0;
     int nPar;
@@ -334,7 +335,7 @@ int GameEffects_IsScriptedGameBreaker(int nPlayer) {
     nPar = GM_GetCurrentHolePar();
     nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1;
     pSurface = Ter_GetSupportingGroundMaterial(pCourse, gPlayers[nPlayer].vTarget2);
-    fDist = fn_800D0478(nPlayer);
+    fDist = GameAnalysis_GetCurrentDistanceToPin(nPlayer);
     if (!pSurface) {
         return 0;
     }
@@ -347,11 +348,13 @@ int GameEffects_IsScriptedGameBreaker(int nPlayer) {
         bPossible = 1;
     } else if (gPlayers[nPlayer].ball.nLie == LIE_GREEN_e && GM_IsPuttForWin(nPlayer)) {
         bPossible = 1;
-    } else if (gPlayers[nPlayer].ball.nLie == LIE_GREEN_e && fn_800D0620(nPlayer, 0, 0) == 11 &&
-               Hole_ScoreAfterTapIn(nPlayer) < 0) {
+    } else if (gPlayers[nPlayer].ball.nLie == LIE_GREEN_e
+               && GameAnalysis_NumBirdiesSoFarThisRound(nPlayer, 0, 0) == 11 &&
+               GameAnalysis_IsPuttFor(nPlayer) < 0) {
         bPossible = 1;
-    } else if (gPlayers[nPlayer].ball.nLie == LIE_GREEN_e && fn_800D089C(nPlayer, 0) == 1 &&
-               Hole_ScoreAfterTapIn(nPlayer) < -1) {
+    } else if (gPlayers[nPlayer].ball.nLie == LIE_GREEN_e && GameAnalysis_CurrentEagleStreak(nPlayer, 0)
+               == 1 &&
+               GameAnalysis_IsPuttFor(nPlayer) < -1) {
         bPossible = 1;
     }
     return bPossible;

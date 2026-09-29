@@ -181,7 +181,7 @@ void GameModeSkillZoneTargetToTarget_CheckShotAwards(int nPlayer) {
     nMsg = -1;
     bDone = 0;
     nSurface = gPlayers[nPlayer].ball.nSurface;
-    fLength = fn_800D0550(nPlayer);
+    fLength = GameAnalysis_GetCurrentBallFlightDistance(nPlayer);
     GameModeSkillZoneTargetToTarget_GetIDScore(nSurface, &gTargetToTargetShotPoints,
                                                &gTargetToTargetShotBalls);
     if (nSurface >= 0x85 && nSurface <= 0x90 && !GameModeSkillZoneBase_IsLongDrive(nPlayer, fLength)) {
