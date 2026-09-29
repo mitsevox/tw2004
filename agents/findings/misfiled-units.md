@@ -44,4 +44,4 @@ the naming pass. Details and evidence: agents/findings/2026-09-27-naming-leads.m
 | event.c's tail -> SitDev.c | 356313a |
 | fe_movies.c -> uiProcessPolygon.c, Trax.c -> uiEATrax.c, uiobject.c -> uiObject.c; LogoTexture.c + sweep_8010FF5C.c into FE_LogoDesign.c | 2026-09-29 |
 | UAudMem.c out of UAudMemStack.c; startUp.c -> + UAudVector.c, Code800B1AA8.c, Code800B1D3C.c; hlaudmovie.c -> hlaudmic.c / hlaudmovie.c / hlaudsession.c | 37c5c96, eb2462e, b2f7315 |
-| rcmp_mad_codec.c -> maddec / maddeca / madidct; Code800B90F4.c's first part = rcmp_mad_codec.c | in progress (sp4) |
+| rcmp_mad_codec.c -> maddec.c / maddeca.c / madidct.c; Code800B90F4.c -> rcmp_mad_codec.c (EA's) + Code800B9944.c (the Create-A-Player ball, placeholder name) | sp4, 2026-09-29 |
