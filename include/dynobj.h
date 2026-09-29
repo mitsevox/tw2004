@@ -1,5 +1,5 @@
 // dynobj.h (our name): the course's dynamic objects (GoDynObj.c) and their types. Each type has
-// a message handler, found by the type number (fn_800499B0): message 1 asks the size of the
+// a message handler, found by the type number (DynObj_GetTypeHandler): message 1 asks the size of the
 // type's object, 2 sets one up from its definition, 3 runs Object_Draw on its object part (when
 // it has a model), 6 is the per-frame update. Only what the code reads so far.
 
@@ -16,7 +16,7 @@ typedef int (*DynObjHandler)(int nMsg, struct DynObj* pObj, void* pArg, void* pA
 // (fn_80048BDC; TagRecord).
 typedef struct DynObjDef {
     s32  n0;                    // 0x00  the chunk's id -> DynObj.n140
-    u8   n4;                    // 0x04  its type (fn_800499B0) -> DynObj.n146
+    u8   n4;                    // 0x04  its type (DynObj_GetTypeHandler) -> DynObj.n146
     u8   unk5[3];
     f32  aPos[3];               // 0x08  where it stands
     u32  u14;                   // 0x14  -> DynObj.uFlags (type 0)
@@ -450,8 +450,8 @@ void Object_Draw(UObject* pObj);
 void fn_80048F68(int nMsg, void* pArg, void* pArg2);     // sends nMsg to every object with id > 0
 
 // GoDynObjBase.c
-int  fn_80049820(int nMsg, DynObj* pObj, void* pArg, void* pArg2);  // type 0's handler, types 2/11's default
-DynObjHandler fn_800499B0(int nType);
+int  DynObjBase_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2);  // type 0's handler, types 2/11's default
+DynObjHandler DynObj_GetTypeHandler(int nType);
 
 // GoDynObjTypes.c: the handlers of types 6 and 9.
 int  fn_8004AD54(int nMsg, DynObj* pObj, void* pArg, void* pArg2);

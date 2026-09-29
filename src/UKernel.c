@@ -102,7 +102,7 @@ void fn_80048BDC(UStreamObject* pObject) {
     } else {
         setup.pModel = NULL;
     }
-    setup.pfnHandler = fn_800499B0(setup.pDef->n4);
+    setup.pfnHandler = DynObj_GetTypeHandler(setup.pDef->n4);
     setup.pC = (DynObjNames*)pObject;
     pObject->pData = (u8*)setup.pModel;
     pObject->pfn8 = NULL;

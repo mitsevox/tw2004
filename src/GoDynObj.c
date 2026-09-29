@@ -456,7 +456,7 @@ void DynObj_PitchMarkAdd(f32* pPos, int nPlayer) {
             setup.pModel = &model;
             model.aEntries[0].uType = 'TEO ';
             setup.pModel->aEntries[0].u.pRef = (DynObjModelRef*)fn_8000B70C('TEO ', 10005);
-            setup.pfnHandler = fn_800499B0(setup.pDef->n4);
+            setup.pfnHandler = DynObj_GetTypeHandler(setup.pDef->n4);
             setup.pC = NULL;
             nId = fn_800490B8(&setup);
             if (nId != -2) {
@@ -504,7 +504,7 @@ void DynObj_ShotDivotHoleAdd(f32* pPos, int nPlayer) {
         setup.pModel = &model;
         model.aEntries[0].uType = 'TEO ';
         setup.pModel->aEntries[0].u.pRef = (DynObjModelRef*)fn_8000B70C('TEO ', 10001);
-        setup.pfnHandler = fn_800499B0(setup.pDef->n4);
+        setup.pfnHandler = DynObj_GetTypeHandler(setup.pDef->n4);
         setup.pC = NULL;
         nId = fn_800490B8(&setup);
         if (nId != -2) {
@@ -843,7 +843,7 @@ void DynObj_DivotAdd(f32* pPos, int nPlayer) {
         setup.pModel = &model;
         model.aEntries[0].uType = 'TEO ';
         setup.pModel->aEntries[0].u.pRef = (DynObjModelRef*)fn_8000B70C('TEO ', 10002);
-        setup.pfnHandler = fn_800499B0(setup.pDef->n4);
+        setup.pfnHandler = DynObj_GetTypeHandler(setup.pDef->n4);
         setup.pC = NULL;
         nId = fn_800490B8(&setup);
         if (nId != -2) {
@@ -968,7 +968,7 @@ void DynObj_TeeAdd(f32* pPos, int nPlayer, u8 bReset) {
         setup.pModel = &model;
         model.aEntries[0].uType = 'TEO ';
         setup.pModel->aEntries[0].u.pRef = (DynObjModelRef*)fn_8000B70C('TEO ', 10004);
-        setup.pfnHandler = fn_800499B0(setup.pDef->n4);
+        setup.pfnHandler = DynObj_GetTypeHandler(setup.pDef->n4);
         setup.pC = NULL;
         nId = fn_800490B8(&setup);
         if (nId != -2) {

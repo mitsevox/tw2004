@@ -477,7 +477,7 @@ int fn_8004AAEC(int nMsg, DynObj* pObj, void* pArg, void* pArg2) {
         }
         return 0;
     default:
-        return fn_80049820(nMsg, pObj, pArg, pArg2);
+        return DynObjBase_MessageHandler(nMsg, pObj, pArg, pArg2);
     }
 }
 

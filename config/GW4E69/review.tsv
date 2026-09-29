@@ -4530,3 +4530,11 @@ address	name	comment	by	date
 80048AC4	Object_GetMeshAlternative	keep	rt3 (replayed by orchestrator)	2026-09-29
 80048AD4	Object_GetMeshFlags	none	rt3 (replayed by orchestrator)	2026-09-29
 80048AE8	Object_GetLod	keep	rt3 (replayed by orchestrator)	2026-09-29
+800496E0	DynObjBase_SetRemoved	rewrite	rt3 (replayed by orchestrator)	2026-09-29
+80049728	DynObjBase_TakeAmount	keep	rt3 (replayed by orchestrator)	2026-09-29
+800497BC	DynObjBase_GetValue	rewrite	rt3 (replayed by orchestrator)	2026-09-29
+80049820	DynObjBase_MessageHandler	add	rt3 (replayed by orchestrator)	2026-09-29
+800499B0	DynObj_GetTypeHandler	add	rt3 (replayed by orchestrator)	2026-09-29
+80049A14	DynObjTurning_Init	add	rt3 (replayed by orchestrator)	2026-09-29
+80049A54	DynObjTurning_Update	rewrite	rt3 (replayed by orchestrator)	2026-09-29
+80049ACC	DynObjTurning_MessageHandler	add	rt3 (replayed by orchestrator)	2026-09-29
