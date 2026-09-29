@@ -597,3 +597,53 @@ UserInfo_InitCrAPItemBitArrays, FE_LogoDesign_UploadCustomLogo (0x8010FA00; the 
 0x8010FAF4), UserInfo_*CourseSlot21/22, UI_OpenInterface / UI_vInitModule (TW07 bodies differ),
 gUIState / UI_BlankProcess1-6, gbUIFirstMenuDraw, gUITxf2Bank*, UIText_SetFontAlignPoint,
 Gba_ReadHandshakeCode, the GBA "UndoTransfer" / "Unsaved" flags (never raised).
+
+## Round 18 (rr1-rr6) leftovers
+The AUDIO area and the commentary scripts are DONE (startUp, hlaudtrack, hlaudtrackseq, hlaudtrackstm,
+hlaudmovie, hlaudvoice, HLAudMaster, UAudContainers, UAudMemStack, AudLock, AudReverb, SitDev*).
+name.py now lets an EA name spelled as EA did through for E1 (EA's text in this build) as well as E2
+(rr4, a428185). Kept EA's spelling `_SetStateVecAndCondition` (TW07's inline; a reserved identifier
+in C, same bytes).
+Misfiled-unit evidence (report only; nothing moved): startUp.c 0x800B1960..0x800B1AA8 = EA's
+UAudVector.c (TW07's four functions; the two header inlines out of line at a unit's end); the ball test
+0x800B1AA8..0x800B1D3C (DynObj / Ball only) another unit, perhaps GoDynObj's area; whether the start-up
+command table (0x800B1D3C on) is startUp.c's is open. hlaudmovie.c = three TW06 files in link order:
+hlaudmic.c 0x800A8754-0x800A87D8 (.sbss 0x80282068-6F), hlaudmovie.c 0x800A87D8-0x800A8D00 (.bss
+0x801F1850), hlaudsession.c 0x800A8D00-0x800A9590 (.sdata 0x80281468, .sbss 0x80282070-95);
+TrkRender3D / TrkRenderStereo (0x800A9590-0x800A9808) open TW07's HLAudTrack.c (so hlaudtrack.c's);
+UAudMemStack.c's AudMem_ part (from 0x800B5B80) = TW07's UAudMem.c (TW06 lists uaudmem.c too);
+HLAudMaster.c starts with Ses_GetEmitterTemplateFromID (TW07 HLAudSession.c) and audfrac_Mul.
+Still open (headers): audtrack.h AudVoice.bA_1 = tone loops (request b9), bA_6 = no reverb (request
+b14); AudTrackTmpl.n0 bits 0x02 loops, 0x04 switched by hand, 0x10 no restart while playing, 0x20
+reverb off; AudTrack.f48 = distance attenuation (TW07 distAttn), not a priority (Trk_AllocPerf /
+Trk_UpdatePerf parameter fPriority); f50 = pitch ramp; AudVoiceParams.a8 = ADSR volumes, nC = start
+offset; AudTrackFlags.b7; AudTrackStmFlags.b6 never set (state 5 never happens), b3 = silence queued
+after the end; AudStreamRead.bRestart queues a silence block; Trk_InitSession(nSession, nSubSession);
+AudBlock48 = the listeners' block (gMicData); audcontainers.h UList.n8 = TW07 nslots (UList_Reset
+prototype says n8), UAudMemStack.n14 (bottom blocks? a guess), AudReverb's globals declared there;
+core/startup.h SoundHeader u0 start / current, u4 end, u8 loop start, uC loop flag; startup.h line 59
+nState comment past 110; game.h GameEffects b47 / b4A comments wrong (u48 / u4C are lines to PLAY at
+the GameBreaker's end: fails / works, TW07 SetPostGB[Negative]Commentary), nCrowdReaction = crowdLevel;
+sitdev.h SitDevEntry.aOp "3 <, 4 >" reads backwards (3 tests value > argument, 4 value < argument),
+SitDevEntry / SitDevAction / SitDevEntry8 / SitDevScripts = TW07 Situation / Action / Response /
+SitDevHeader, SitDevEntry.n0 = the group whose flag is in pD4, b2.s.n5 = TW07 iFileIndex,
+gSitDevPredictedHitClass is the look-ahead ball's (event 29), its "// SitDevFile.c" prototype heading
+and top comment stale, renamed extern lines past 110; engine.h / game.h notes "SitDevFile.c:" on
+Gaud_StartRegularComment and the GM_ wrappers should say SitDevTrigger.c / SitDevStateVector.c;
+UStream.c prototypes Ses_AllocBankHdr(u32, int) vs (u32, u32), Ses_AllocSampleAram void* vs u32;
+Ses_AllocBankHdr's inline "fake match: EA bug: no return" label: the missing return is EA's form (the
+"fake match:" part looks wrong); FE_CrAPBall_* local prototypes (streammanagerhole.c, FEgolferanim.c,
+gomainloop.c) and MAD_SetReadCallback (LLPict_Gc.c) belong in fe.h / llpict.h; UI_BlankProcess1-6
+still use (n2, pn3, n4); FEVertex f0 / f4 texture coordinates, f8..f10 position; SaveProfile.a200
+probably TW07 AwardInfoPGAMoneyList; TraxTrack sz0 / sz100 (artist or album: the 'TRAX' data);
+FEState.b10 (only messages 333 / 334); ~370 protodiff rows.
+Globals not renamed: startUp.c's sound-data arrays lbl_8018F040 / lbl_8018F640 (tools/build/gendata.py
+looks them up by name: a coordinated rename) and three KEEP_UNUSED words; gSesUnread8C / 90 / 94 / 95
+(cleared, never read); lbl_80281DF4; gInterruptsOffDepth lives in uiEATrax.c's data.
+Least-sure names: AudDma_InitModule / InitSession / ExitSession, BootSound_InitModule (empty, placed by
+position), Startup_LoadLegalPicture ('LEGL' = legal: TW07 FE_GetLegalChunkID), GM_vStartupPlaySound,
+GM_vStartupSkipCardLoad, GM_vStartupLoadOptionsCheckDisc, the GM_vStartup prefix itself (rule 5 names
+only FE and IG), Ses_GetInstrumentTone, Mas_GetUpdateRateScale (always 1), Ses_IsSessionZero,
+Ses_ProcessArticulationData, Voc_StartStream, Voc_ResetModule, the empty AudMem_* steps,
+SitDev_BindHeader, SitDev_BeginLoadScripts, SitDev_Weather* (bit 1 probably rain),
+Gaud_StartPlaylist2Comment.

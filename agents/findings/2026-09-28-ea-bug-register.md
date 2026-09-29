@@ -20,6 +20,9 @@ own files in its pass; the rest come here.
 | FE_Manager.c FE_CrAP_IsItemLocked, kind 20 | counts groups with aMedal != 0, but 0 is the best medal and 3 none: a new profile (all 3) unlocks every kind-20 item with n <= 29, and winning best medals lowers the count (message 175 tests != 3) | round 17 (rq2) |
 | FE_Manager.c FE_CrAP_IsItemLocked, kind 24 | the loop `i = 23; i < 16` never runs: only n <= 0 unlocks (label made exact) | round 17 (rq2) |
 | Code800B90F4.c MAD_ReadNextFile | the end-of-movie test repeats the NULL test above it, so nEnd is never set: MAD_IsAtEnd always answers 0 and LLVideo.c stops a movie only when it is starved | round 17 (rq5) |
+| startUp.c Startup_CheckCards | hint 0x8B (card slot B empty) can never be sent: port 1 is only reached when port 0's status is 0, and that case tests port 0's status != 0 | round 18 (rr2) |
+| hlaudtrackstm.c Stm_Exit | cancels its DMAs with the track as owner, but AudDma_ToAram's owner is always 0 or 1: the cancel never matches, so a queued block DMA writes into ARAM buffers just freed and its callback counts into the freed track | round 18 (rr4) |
+| UAudContainers.c UList_InsertAt | an insert at the tail (not also the head) links after it, not in front: InsertSortWorldPerf leaves a higher-priority track at the tail, where Trk_AllocPerf steals first | round 18 (rr5) |
 
 ## Open: behaviour proven possible, needs data or intent to settle
 | Where | What | What settles it |
@@ -58,6 +61,16 @@ own files in its pass; the rest come here.
 | uiArc.c UIArc_Draw | stops at the first segment whose four corners are all transparent (later visible segments skipped) | intent only |
 | uiProcessInterface.c UI_GetMoneyString | -123 prints as "-,123" | whether the UI scripts pass negative money |
 | uiTransform.c UITransform_HandleOp / uiLoadFile.c UI_StreamLoadTextures | no check against the stack's 8 levels / the 5 texture slots | the UI file's data |
+| startUp.c slot numbering | Startup_FindNextCardWithStatus answers slot + 1, Startup_GetNextCardStatus the slot; command 0 subtracts 1, commands 7 / 15 / 17 / 18 do not: a 1-based slot passed to format is out of range | the start-up UI script |
+| startUp.c command 4 | its table entry stays NULL: calling it crashes | whether the UI sends it |
+| startUp.c Startup_LoadLegalPicture | copies uSize plus up to 128 bytes of padding from the stream object | whether the stream allocation is padded |
+| hlaudtrackseq.c Seq_Tick (step path) | picks the event as n64 * n3 + n66, ignoring the variation set n68 that SetVarCmdBounds uses | a stepped template with n8 > 1 in the bank data |
+| AudLock.c AudLock_LockReadQueue | skips the take when the semaphore is held; the unlock then raises it to 2: no exclusion if two threads collide | whether the file and main threads overlap in the read queue |
+| UAudMemStack.c AudMemStack_FreeTop | lowers the top by the freed block's size: freeing out of order corrupts the stack (Ses_Init frees bank 1 then 0) | the load order above the banks |
+| SitDevFile.c SitDev_LoadScripts | allocates pD4 on every 'sscr' chunk, freed once at round end | whether a round loads more than one 'sscr' chunk |
+| SitDevTrigger.c SitDev_InvokeMultipleActions | bPlayed is the last action's: an earlier line that played can still clear gSitDevPredictionVoiced | intent only |
+| SitDev.c / SitDevCommentaryZones.c | the event queue and the zone list (10 slots each) have no bounds check | the scripts' data |
+| SitDevTrigger.c SitDev_InvokeCommentaryBank | `% nLeft` with an empty list divides by zero | the commentary banks' data |
 
 ## Dropped (checked: harmless or not a bug)
 AnimStream_AssignSlots / StartRead (streaming is never on: AnimStream_Init clears bOn);
