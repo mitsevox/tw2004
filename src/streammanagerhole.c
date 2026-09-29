@@ -116,8 +116,8 @@ void PGATourSimulation_CloseONCE();
 void fn_80014864(void);
 void fn_800148A8(void);
 void fn_800148EC(void);
-void fn_800307C0();
-void fn_80030818();
+void Ter_RegisterStreamClients();
+void Ter_UnRegisterStreamClients();
 void StaticCam_RegisterStreamClients();
 void StaticCam_UnRegisterStreamClients();
 void fn_8011E468();
@@ -381,7 +381,7 @@ void fn_800148EC(void) {
 
 void fn_8001491C(void) {
     fn_80010284();
-    fn_800307C0();
+    Ter_RegisterStreamClients();
     DynObj_RegisterStreamClients();
     StaticCam_RegisterStreamClients();
     fn_8011E468();
@@ -390,7 +390,7 @@ void fn_8001491C(void) {
 void fn_8001494C(void) {
     fn_8011E4A4();
     DynObj_UnRegisterStreamClients();
-    fn_80030818();
+    Ter_UnRegisterStreamClients();
     fn_800102B4();
     StaticCam_UnRegisterStreamClients();
 }

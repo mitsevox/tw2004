@@ -99,7 +99,7 @@ typedef struct UObjMeshInfo {
     f32  v58[3];                // 0x58  copied to UObjModel.v2C by type 0's setup; with f64 the
                                 //       bounding sphere GoTerrain.c's fn_800354C4 returns
     f32  f64;                   // 0x64  copied to UObjModel.f5C by type 0's setup
-    f32  a68[8];                // 0x68  a terrain object's bounds (GoTerrain.c fn_80035508, fn_80031154):
+    f32  a68[8];                // 0x68  a terrain object's bounds (GoTerrain.c fn_80035508, Ter_AddPatchObjects):
                                 //       its centre [0..2], a radius [3] and a height [7]
     s16  n88;                   // 0x88  the type of the mesh's parts (LLObj_Gc.c fn_80007658)
     u8   unk8A[0x8B - 0x8A];
@@ -112,7 +112,7 @@ typedef struct UObjMeshInfo {
 // An entry of UObjMesh.p18 (0x2C bytes; what fn_800082CC takes).
 typedef struct UObjMeshPart {
     s32  n0;                    // 0x00  its type (fn_8000827C); copied to
-                                //       Ter_ObjectDrawData.eShaderObjectType (fn_8003241C)
+                                //       Ter_ObjectDrawData.eShaderObjectType (Ter_AddObjectDraw)
     s32  n4;                    // 0x04  copied to UObjMesh.n24 (LLObj_Gc.c fn_80007658)
     u32  u8;                    // 0x08  not 0: the part is used; copied to UObjMesh.n20 (fn_80007658)
     u8   unkC[0x24 - 0xC];

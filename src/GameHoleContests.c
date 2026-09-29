@@ -262,7 +262,7 @@ void HoleContest_PlayerTookShot(int nPlayer) {
 // The first place is the winner (gHoleContestWinner) and marks a contest won. Nothing on the
 // hole-in-one prize hole.
 // fake match: the (u32) casts on the player index; with a signed index the compiler walks one
-// pointer instead of keeping the array start and the offset apart (see GoTerrain fn_80032518).
+// pointer instead of keeping the array start and the offset apart (see GoTerrain Ter_DrawPatchPass).
 void HoleContest_RankResults(void) {
     s32 aRank[5];               // per player: the place in the table, -1 not placed yet
     char szName[32];            // the stack frame gives 32 bytes; the real size is not known

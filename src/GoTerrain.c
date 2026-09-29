@@ -19,38 +19,38 @@ void  Character_SetOrientationVec(Character* pChar, f32* pDir, f32 f);
 void  GameModeSkillZoneBase_AddCup(f32 x, f32 y, f32 z);
 f32   fn_8001414C(u8* p);
 f32   Math_Tan(f32 x);           // tan
-void  fn_80030894(void);
-void  fn_80030A40(void* pHoleData, int nView);
-void  fn_80030CC8(void* pHoleData);
-void  fn_80031084(UObjMesh* pNode, s32 eClipMethod, s32 iRenderPass, Ter_PatchReference* pPatch,
+void  Ter_BeginRender(void);
+void  Ter_RenderView(void* pHoleData, int nView);
+void  Ter_BuildPatchLists(void* pHoleData);
+void  Ter_FillPatchReference(UObjMesh* pNode, s32 eClipMethod, s32 iRenderPass, Ter_PatchReference* pPatch,
                   f32 fDistance);
-void  fn_80031154(Ter_PatchReference* pPatch, s32 nFirstObject);
-void  fn_8003185C(void);
-void  fn_800318D8(void);
-void  fn_80031AB4(void);
-u8    fn_80031E40(void);
-void  fn_80031E58(void);
-u8    fn_80032330(UObjMesh* pModel);
-void  fn_8003241C(Ter_ObjectDrawData* pDraw, s32* pCount, s32 nUnused, UObjMesh* pModel, f32 fAlpha,
+void  Ter_AddPatchObjects(Ter_PatchReference* pPatch, s32 nFirstObject);
+void  Ter_SortObjects(void);
+void  Ter_UpdateLODPlanes(void);
+void  Ter_SelectObjectLODs(void);
+u8    Ter_IsLODDataLoaded(void);
+void  Ter_BuildObjectDrawLists(void);
+u8    Ter_IsBallStoppedInModel(UObjMesh* pModel);
+void  Ter_AddObjectDraw(Ter_ObjectDrawData* pDraw, s32* pCount, s32 nUnused, UObjMesh* pModel, f32 fAlpha,
                   f32 fMipmapBias, f32 fDistanceSquared, s32 iObject, s32 eClipMethod, u8 bUseFog,
                   u8 bSetsPrimField);
-void  fn_80032518(int nRenderPass);
-void  fn_80032770(void);
-void  fn_80032954(void);
+void  Ter_DrawPatchPass(int nRenderPass);
+void  Ter_DrawFarClipPatches(void);
+void  Ter_DrawObjects(void);
 void  fn_80033F94(void* pHoleData, u32 nList);
 void  fn_8003546C(f32* pA, f32* pB, f32* pOut);
 f32   Camera_GetLensFovScale(CamLens* pLens);
 f32   Ter_GetTimeInCycle(u32 n, f32 fPeriod);
 // calls row nRow's function of lbl_80188E88 with pData
 void  SD_SetShaderTypeParameters(int nRow, void* pData);
-s32   fn_800318AC(const void* pA, const void* pB);
+s32   Ter_CompareObjectDistance(const void* pA, const void* pB);
 void  Ter_SetZWrite(int n);
 void  fn_80035170(u32 uClear, u32 uSet);
 void  fn_80035294(void);
 void  RC_UpdateCurrentScreenMatrices(void);
 void  fn_800354B4(u8* p, f32 v);        // sets the lens's far clip distance, fAC (fn_80014268 reads it)
 f32   fn_80014268(u8* p);
-void  fn_80031938(Ter_LODPlane* pPlanes, f32 fStep, s32 a, s32 b, s32 c, s32 d);
+void  Ter_SetLODPlanes(Ter_LODPlane* pPlanes, f32 fStep, s32 a, s32 b, s32 c, s32 d);
 void  fn_80032B7C(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s32 n20, u8* pbFirst, u8 b1,
                   u8 b2, f32 fNear, f32 fFar);
 void  fn_80032F88(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s32 eFilterMag);
@@ -127,7 +127,7 @@ f32 lbl_801876D8[21][3] = {
 };
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
-// 1.0 before fn_80030254's 3.7 and 1.6; its body is unknown, this one only reproduces the order.
+// 1.0 before Ter_vInitModule's 3.7 and 1.6; its body is unknown, this one only reproduces the order.
 static f32 GoTerrain_StrippedFn(f32 x) {
     return x + 1.0f;
 }
@@ -135,7 +135,7 @@ static f32 GoTerrain_StrippedFn(f32 x) {
 // Sets up the terrain renderer: allocates its lists, gives every object state its starting values
 // (each tree its own period from a stepped random number), sets the renderer's defaults and fills
 // the bit-count table lbl_801D3A30.
-void fn_80030254(void) {
+void Ter_vInitModule(void) {
     s32 i;
     s32 n;
     s32 k;
@@ -220,7 +220,9 @@ void fn_80030254(void) {
     }
 }
 
-void fn_800306B8(void) {
+// Shuts the terrain renderer down (gomainloop): frees the lists Ter_vInitModule allocated (not
+// xpGrassPatchList), the hole's data (fn_800075CC) and the course.
+void Ter_vCloseModule(void) {
     StaticMem_Free(lbl_801D3CB0.pPatchList);
     StaticMem_Free(lbl_801D3CB0.pPostDrawTerrainList);
     StaticMem_Free(lbl_801D3CB0.pObjectSortList);
@@ -241,19 +243,24 @@ void fn_800306B8(void) {
     }
 }
 
-// The terrain's chunk loaders.
-void fn_800307C0(void) {
+// Registers the terrain's chunk loaders (streammanagerhole.c): 'ter ' the hole's ground and objects
+// (Ter_HoleDataLoadCallback), 'tgd ' the course data (Ter_CourseLoadCallback), 'tLOD' the LOD
+// distances (Ter_LODLoadCallback).
+void Ter_RegisterStreamClients(void) {
     Stream_RegisterLoadChunkCallback('ter ', fn_800342B4);
     Stream_RegisterLoadChunkCallback('tgd ', fn_800342F0);
     Stream_RegisterLoadChunkCallback('tLOD', fn_800341A4);
 }
 
-void fn_80030818(void) {
+// Unregisters the 'ter ' and 'tgd ' chunk loaders; 'tLOD' stays registered.
+void Ter_UnRegisterStreamClients(void) {
     Stream_UnregisterLoadChunkCallback('ter ');
     Stream_UnregisterLoadChunkCallback('tgd ');
 }
 
-void fn_8003084C(void) {
+// Puts the render state back after drawing terrain: constant alpha off, alpha test on (mode 6,
+// reference 128), z buffer mode 3 with writes on.
+void Ter_EndRender(void) {
     RenderState_SetConstantAlphaOn(0);
     DS_vSetAlphaTestMode(1, 6, 128);
     DS_vSetZBufferMode(3);
@@ -263,7 +270,7 @@ void fn_8003084C(void) {
 
 // Sets the renderer up for the terrain, then hands rows 4 and 5 of lbl_80188E88 the frame count,
 // row 4 with four waves between 0 and 1 whose cycles are 1591.2 x (5.5 + i) / 1000 seconds.
-void fn_80030894(void) {
+void Ter_BeginRender(void) {
     TerWaveData wave;
     u32 nFrame;
     int i;
@@ -298,7 +305,7 @@ void fn_80030894(void) {
 
 // fake match: these two stand in for code the original linker stripped. The file's pool has
 // Ter_GetTimeInCycle's constants (1/59.94, 59.94, 0.5/59.94, the u32 conversion's) and then 0.375, 4.15
-// and 10 (as fn_80035398 uses them) right after fn_80030894's; their bodies are unknown, these
+// and 10 (as fn_80035398 uses them) right after Ter_BeginRender's; their bodies are unknown, these
 // only reproduce the order.
 static f32 GoTerrain_StrippedFn2(u32 n, f32 x) {
     return FRAME_TIME * (f32)(n % (u32)(FRAME_RATE * (0.5f / FRAME_RATE + x)));
@@ -311,7 +318,7 @@ static f32 GoTerrain_StrippedFn3(f32 x) {
 // Draws the terrain in view nView: takes the camera's position and look direction, the flat
 // distance to the nearest ball, the followed player's distance to the pin and the smaller half
 // field of view's tangent, then builds the lists and draws them pass by pass.
-void fn_80030A40(void* pHoleData, int nView) {
+void Ter_RenderView(void* pHoleData, int nView) {
     int i;
     CamLens* pLens;
     f32 vToPin[4];
@@ -353,19 +360,19 @@ void fn_80030A40(void* pHoleData, int nView) {
     if (!lbl_801D3CB0.bObjectTestMode) {
         fn_80033F94(pHoleData, 0);
     }
-    fn_80030CC8(pHoleData);
-    fn_8003185C();
-    fn_800318D8();
-    fn_80031AB4();
-    fn_80031E58();
-    fn_80032518(0);
-    fn_80032770();
+    Ter_BuildPatchLists(pHoleData);
+    Ter_SortObjects();
+    Ter_UpdateLODPlanes();
+    Ter_SelectObjectLODs();
+    Ter_BuildObjectDrawLists();
+    Ter_DrawPatchPass(0);
+    Ter_DrawFarClipPatches();
     if (!lbl_801D3CB0.bObjectTestMode) {
         fn_80033F94(pHoleData, 2);
     }
-    fn_80032518(1);
-    fn_80032518(2);
-    fn_80032954();
+    Ter_DrawPatchPass(1);
+    Ter_DrawPatchPass(2);
+    Ter_DrawObjects();
     RenderState_SetBlendFactors(4, 5);
     DS_vSetAlphaTestMode(1, 6, 0x80);
     RenderState_SetDrawFlags(0x70);
@@ -374,9 +381,9 @@ void fn_80030A40(void* pHoleData, int nView) {
 
 // Builds the patch lists: clears the counts and pSortedPatchList, then takes each patch of the hole
 // data that is used with the current pin position (or with any) and is not off screen, fills its
-// Ter_PatchReference (fn_80031084) and objects (fn_80031154) and chains it into the lists its n1C
-// bits ask for. In object test mode the whole object tree goes in as one patch.
-void fn_80030CC8(void* pHoleData) {
+// Ter_PatchReference (Ter_FillPatchReference) and objects (Ter_AddPatchObjects) and chains it into
+// the lists its n1C bits ask for. In object test mode the whole object tree goes in as one patch.
+void Ter_BuildPatchLists(void* pHoleData) {
     Ter_PatchReference* pPatch;
     s32 nCount;
     s32 iRenderPass;
@@ -417,7 +424,7 @@ void fn_80030CC8(void* pHoleData) {
         pPatch->eClipMethod = 1;
         pPatch->pGround = NULL;
         pPatch->pObjects = pRoot;
-        fn_80031154(pPatch, 0);
+        Ter_AddPatchObjects(pPatch, 0);
         return;
     }
     if (Ter_GetMeshChildCount(pRoot) >= 1) {
@@ -446,9 +453,9 @@ void fn_80030CC8(void* pHoleData) {
                                                   lbl_801D3CB0.iCurrentViewContext)->f54);
                 if (eClipMethod != 3) {
                     pPatch = &lbl_801D3CB0.pPatchList[lbl_801D3CB0.iTotalPatches++];
-                    fn_80031084(pMesh, eClipMethod, iRenderPass, pPatch, fDist);
+                    Ter_FillPatchReference(pMesh, eClipMethod, iRenderPass, pPatch, fDist);
                     if (pPatch->pObjects != NULL) {
-                        fn_80031154(pPatch, nFirstObject);
+                        Ter_AddPatchObjects(pPatch, nFirstObject);
                     }
                     if (pPatch->n1C & 1) {
                         pPatch->pNext[0] = lbl_801D3CB0.pSortedPatchList[iRenderPass][0][eClipMethod];
@@ -477,7 +484,7 @@ void fn_80030CC8(void* pHoleData) {
 }
 
 // Fills pPatch from a patch's node: its ground is node 0, its objects come with a second node.
-void fn_80031084(UObjMesh* pNode, s32 eClipMethod, s32 iRenderPass, Ter_PatchReference* pPatch,
+void Ter_FillPatchReference(UObjMesh* pNode, s32 eClipMethod, s32 iRenderPass, Ter_PatchReference* pPatch,
                  f32 fDistance) {
     s32 nNodes;
 
@@ -506,7 +513,7 @@ void fn_80031084(UObjMesh* pNode, s32 eClipMethod, s32 iRenderPass, Ter_PatchRef
 // farther from the pin than the ball is (every other one when nearer); and of those, tee markers
 // (word 1 bits 0x1, 0x2, 0x4: tee sets 0-2) not of the player's tee set, and all of them once the
 // ball is off the tee (Ball.nLie).
-void fn_80031154(Ter_PatchReference* pPatch, s32 nFirstObject) {
+void Ter_AddPatchObjects(Ter_PatchReference* pPatch, s32 nFirstObject) {
     f32 v48[4];
     s32 iObject;
     UObjMesh* pLOD1;
@@ -679,15 +686,15 @@ void fn_80031154(Ter_PatchReference* pPatch, s32 nFirstObject) {
 }
 
 // Sorts pObjectSortList by distance, except when gSession.b11 is set.
-void fn_8003185C(void) {
+void Ter_SortObjects(void) {
     if (gSession.b11 == 0) {
         qsort(lbl_801D3CB0.pObjectSortList, lbl_801D3CB0.iTotalSortObjects, sizeof(Ter_ObjectReference),
-              fn_800318AC);
+              Ter_CompareObjectDistance);
     }
 }
 
-// fn_8003185C's comparison: nearest first.
-s32 fn_800318AC(const void* pA, const void* pB) {
+// Ter_SortObjects's comparison: nearest first.
+s32 Ter_CompareObjectDistance(const void* pA, const void* pB) {
     f32 fA = ((const Ter_ObjectReference*)pA)->fDistanceSquared;
     f32 fB = ((const Ter_ObjectReference*)pB)->fDistanceSquared;
 
@@ -696,8 +703,10 @@ s32 fn_800318AC(const void* pA, const void* pB) {
     return 0;
 }
 
-void fn_800318D8(void) {
-    fn_80031938(lbl_801D3CB0.LODPlanes, lbl_802810D8, lbl_802810D0, lbl_802810D4, lbl_802810DC,
+// Sets this frame's LOD planes (Ter_SetLODPlanes with the LOD steps lbl_802810D0..lbl_802810E0) and
+// the object cull distance, (fFOVScale x fDistanceCullYardsBase) squared.
+void Ter_UpdateLODPlanes(void) {
+    Ter_SetLODPlanes(lbl_801D3CB0.LODPlanes, lbl_802810D8, lbl_802810D0, lbl_802810D4, lbl_802810DC,
                 lbl_802810E0);
     lbl_801D3CB0.fDistanceCullFrameYardsSquared =
         lbl_801D3CB0.fFOVScale * lbl_801D3CB0.fDistanceCullYardsBase;
@@ -707,7 +716,7 @@ void fn_800318D8(void) {
 
 // The three levels of detail's ranges, in steps of fStep: LOD 0 from 0 to (a x fFOVScale + 1)
 // steps, LOD 1 from c steps before that end to b steps after, LOD 2 from d steps before that on.
-void fn_80031938(Ter_LODPlane* pPlanes, f32 fStep, s32 a, s32 b, s32 c, s32 d) {
+void Ter_SetLODPlanes(Ter_LODPlane* pPlanes, f32 fStep, s32 a, s32 b, s32 c, s32 d) {
     s32 n = (f32)a * lbl_801D3CB0.fFOVScale;
 
     pPlanes[0].fBegin = 0.0f;
@@ -718,7 +727,10 @@ void fn_80031938(Ter_LODPlane* pPlanes, f32 fStep, s32 a, s32 b, s32 c, s32 d) {
     pPlanes[2].fBegin = pPlanes[1].fEnd - (f32)d * fStep;
 }
 
-void fn_80031A08(s32* pA, s32* pB, s32 a, s32 b) {
+// Turns the 'tLOD' chunk's distances a and b into Ter_SetLODPlanes's step counts, with step s =
+// lbl_802810D8 and overlaps c = lbl_802810DC, d = lbl_802810E0: *pA = ((a + c x s) / s - 1) /
+// fFOVScale, *pB = c + (b + d x s - (a + c x s)) / s (integer divisions).
+void Ter_LODStepsFromDistances(s32* pA, s32* pB, s32 a, s32 b) {
     // fake match: the (s32) and (int) casts of lbl_802810D8 are two conversions (the original
     // stores the one fctiwz result twice); the same cast everywhere shares one.
     s32 n = a + lbl_802810DC * (s32)lbl_802810D8;
@@ -728,7 +740,7 @@ void fn_80031A08(s32* pA, s32* pB, s32 a, s32 b) {
 }
 
 // fake match: stands in for a function the original linker stripped. The file's pool has 0.4,
-// 0.2, 0.1 and 2.0 in that order right after fn_80030A40's; its body is unknown, this one only
+// 0.2, 0.1 and 2.0 in that order right after Ter_RenderView's; its body is unknown, this one only
 // reproduces the order.
 static f32 GoTerrain_StrippedFn4(f32 x) {
     x += 0.4f;
@@ -742,7 +754,7 @@ static f32 GoTerrain_StrippedFn4(f32 x) {
 // word 3) ask for it always get level 0, and the others never get level 0 when
 // CameraController_IsFlybyDone is 0 for the view.
 // Unless gSession.b11 is set, an object between two planes fades from one level into the next.
-void fn_80031AB4(void) {
+void Ter_SelectObjectLODs(void) {
     Ter_LODPlane* pPlanes = lbl_801D3CB0.LODPlanes;
     f32 fT;
     f32 fAlpha;
@@ -763,7 +775,7 @@ void fn_80031AB4(void) {
             if (((lbl_801D3CB0.pObjectStateList[iObject].a20[3] & 4) ||
                  (lbl_801D3CB0.pObjectStateList[iObject].a20[3] & 0x10) ||
                  (lbl_801D3CB0.pObjectStateList[iObject].a20[3] & 0x20)) &&
-                fn_80031E40()) {
+                Ter_IsLODDataLoaded()) {
                 nLOD = 0;
             } else {
                 for (nLOD = 0; nLOD < nLast; nLOD++) {
@@ -772,7 +784,8 @@ void fn_80031AB4(void) {
                 if (!CameraController_IsFlybyDone(
                         ViewController_GetCameraControl(lbl_801D3CB0.iCurrentViewContext))) {
                     uFlags = lbl_801D3CB0.pObjectStateList[iObject].a20[3];
-                    if (!(uFlags & 4) && !(uFlags & 0x10) && !(uFlags & 0x20) && fn_80031E40() && nLOD == 0) {
+                    if (!(uFlags & 4) && !(uFlags & 0x10) && !(uFlags & 0x20) && Ter_IsLODDataLoaded()
+                        && nLOD == 0) {
                         nLOD = 1;
                     }
                 }
@@ -794,7 +807,7 @@ void fn_80031AB4(void) {
         if (!CameraController_IsFlybyDone(
                 ViewController_GetCameraControl(lbl_801D3CB0.iCurrentViewContext))) {
             uFlags = lbl_801D3CB0.pObjectStateList[iObject].a20[3];
-            if (!(uFlags & 4) && !(uFlags & 0x10) && !(uFlags & 0x20) && fn_80031E40() && nLOD == 0) {
+            if (!(uFlags & 4) && !(uFlags & 0x10) && !(uFlags & 0x20) && Ter_IsLODDataLoaded() && nLOD == 0) {
                 nLOD = 1;
             }
         }
@@ -818,7 +831,7 @@ void fn_80031AB4(void) {
                 fAlpha = 1.0f;
             }
             uFlags = lbl_801D3CB0.pObjectStateList[iObject].a20[3];
-            if (((uFlags & 4) || (uFlags & 0x10) || (uFlags & 0x20)) && fn_80031E40()) {
+            if (((uFlags & 4) || (uFlags & 0x10) || (uFlags & 0x20)) && Ter_IsLODDataLoaded()) {
                 fAlpha = 0.0f;
                 nTranslucent = 0;
                 nLOD = 0;
@@ -826,7 +839,7 @@ void fn_80031AB4(void) {
         } else {
             fAlpha = 0.0f;
             uFlags = lbl_801D3CB0.pObjectStateList[iObject].a20[3];
-            if (((uFlags & 4) || (uFlags & 0x10) || (uFlags & 0x20)) && fn_80031E40()) {
+            if (((uFlags & 4) || (uFlags & 0x10) || (uFlags & 0x20)) && Ter_IsLODDataLoaded()) {
                 nLOD = 0;
             }
             nTranslucent = nLOD;
@@ -838,7 +851,7 @@ void fn_80031AB4(void) {
 }
 
 // Whether the 'tLOD' chunk has been loaded.
-u8 fn_80031E40(void) {
+u8 Ter_IsLODDataLoaded(void) {
     return lbl_802810E4 != -1;
 }
 
@@ -847,7 +860,7 @@ u8 fn_80031E40(void) {
 // stay solid, faded in over the near range (pNearbyObjectList), and their fading level into
 // pTranslucentObjectList. Crowd objects (bit 0x20 of word 0, or 0x10 or 0x20 of word 3; not when
 // CameraController_IsFlybyDone is 0 for the view) use the crowd's fade distances.
-void fn_80031E58(void) {
+void Ter_BuildObjectDrawLists(void) {
     UObjMesh* pModel;
     s32 uFlags0;
     s32 i;
@@ -899,7 +912,7 @@ void fn_80031E58(void) {
         // every draw re-reads the list pointer, as the original does
         if (uFlags2 & 0x80) {
             pRef = &lbl_801D3CB0.pObjectSortList[i];
-            fn_8003241C(&lbl_801D3CB0.pPostDrawItemsList[lbl_801D3CB0.iPostDrawItems],
+            Ter_AddObjectDraw(&lbl_801D3CB0.pPostDrawItemsList[lbl_801D3CB0.iPostDrawItems],
                         &lbl_801D3CB0.iPostDrawItems, 400, pRef->apObject[pRef->iOpaqueLOD], 1.0f,
                         lbl_801D3CB0.fDefaultObjectMipmapBias[pRef->iOpaqueLOD], pRef->fDistanceSquared,
                         pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f, 0);
@@ -909,12 +922,12 @@ void fn_80031E58(void) {
                 || (uCrowd == 0
                     && ((lbl_801D3CB0.pObjectSortList[i].f14 > lbl_801D3CB0.fXZDistanceToClosestBallSquared
                          && lbl_801D3CB0.pObjectSortList[i].f18 > 0.0f)
-                        || fn_80032330(lbl_801D3CB0.pObjectSortList[i].apObject[0])))) {
+                        || Ter_IsBallStoppedInModel(lbl_801D3CB0.pObjectSortList[i].apObject[0])))) {
                 iObject = lbl_801D3CB0.pObjectSortList[i].iGlobalObjectIndex;
                 lbl_801D3CB0.pObjectStateList[iObject].aView[lbl_801D3CB0.iCurrentViewContext].n4 = 3;
                 lbl_801D3CB0.pObjectStateList[iObject].aView[lbl_801D3CB0.iCurrentViewContext].f0 = 1.0f;
                 pRef = &lbl_801D3CB0.pObjectSortList[i];
-                fn_8003241C(&lbl_801D3CB0.pOpaqueObjectList[lbl_801D3CB0.iOpaqueObjects],
+                Ter_AddObjectDraw(&lbl_801D3CB0.pOpaqueObjectList[lbl_801D3CB0.iOpaqueObjects],
                             &lbl_801D3CB0.iOpaqueObjects, 650, pRef->apObject[pRef->iOpaqueLOD], 1.0f,
                             lbl_801D3CB0.fDefaultObjectMipmapBias[pRef->iOpaqueLOD], pRef->fDistanceSquared,
                             pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f, 0);
@@ -925,7 +938,7 @@ void fn_80031E58(void) {
                 }
                 if (fT != 0.0f) {
                     pRef = &lbl_801D3CB0.pObjectSortList[i];
-                    fn_8003241C(&lbl_801D3CB0.pNearbyObjectList[lbl_801D3CB0.iNearbyObjects],
+                    Ter_AddObjectDraw(&lbl_801D3CB0.pNearbyObjectList[lbl_801D3CB0.iNearbyObjects],
                                 &lbl_801D3CB0.iNearbyObjects, 70, pRef->apObject[pRef->iOpaqueLOD], fT,
                                 lbl_801D3CB0.fDefaultObjectMipmapBias[pRef->iOpaqueLOD],
                                 pRef->fDistanceSquared, pRef->iGlobalObjectIndex, pRef->eClipMethod,
@@ -937,7 +950,7 @@ void fn_80031E58(void) {
             lbl_801D3CB0.pObjectStateList[pRef->iGlobalObjectIndex]
                 .aView[lbl_801D3CB0.iCurrentViewContext].n4 = 3;
             pRef = &lbl_801D3CB0.pObjectSortList[i];
-            fn_8003241C(&lbl_801D3CB0.pOpaqueObjectList[lbl_801D3CB0.iOpaqueObjects],
+            Ter_AddObjectDraw(&lbl_801D3CB0.pOpaqueObjectList[lbl_801D3CB0.iOpaqueObjects],
                         &lbl_801D3CB0.iOpaqueObjects, 650, pRef->apObject[pRef->iOpaqueLOD], 1.0f,
                         lbl_801D3CB0.fDefaultObjectMipmapBias[pRef->iOpaqueLOD], pRef->fDistanceSquared,
                         pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f, 0);
@@ -945,7 +958,7 @@ void fn_80031E58(void) {
         if (gSession.b11 == 0) {
             pRef = &lbl_801D3CB0.pObjectSortList[i];
             if (pRef->fAlpha != 0.0f && !(uFlags0 & 0x40)) {
-                fn_8003241C(&lbl_801D3CB0.pTranslucentObjectList[lbl_801D3CB0.iTranslucentObjects],
+                Ter_AddObjectDraw(&lbl_801D3CB0.pTranslucentObjectList[lbl_801D3CB0.iTranslucentObjects],
                             &lbl_801D3CB0.iTranslucentObjects, 200, pRef->apObject[pRef->iTranslucentLOD],
                             pRef->fAlpha, lbl_801D3CB0.fDefaultObjectMipmapBias[pRef->iTranslucentLOD],
                             pRef->fDistanceSquared, pRef->iGlobalObjectIndex, pRef->eClipMethod,
@@ -957,7 +970,7 @@ void fn_80031E58(void) {
 
 // Whether a ball has settled inside pModel's bounding sphere: a ball that has left where its shot
 // started, has hit something (nCollideCount) and moves slower than 10.
-u8 fn_80032330(UObjMesh* pModel) {
+u8 Ter_IsBallStoppedInModel(UObjMesh* pModel) {
     f32* pSphere = fn_800354C4(pModel);
     f32 fRadiusSq = pSphere[3] * pSphere[3];
     int i;
@@ -975,7 +988,7 @@ u8 fn_80032330(UObjMesh* pModel) {
 // Adds a draw of pModel to a draw list: fills pDraw and counts it in *pCount. A model whose flags
 // (bytes 0 and 3) ask for it is skipped in modes 6-8 (GM_IsSpeedGolfMode); one with bits 0 and 1 of byte 0
 // is otherwise drawn as its node chosen by the object's state (n18).
-void fn_8003241C(Ter_ObjectDrawData* pDraw, s32* pCount, s32 nUnused, UObjMesh* pModel, f32 fAlpha,
+void Ter_AddObjectDraw(Ter_ObjectDrawData* pDraw, s32* pCount, s32 nUnused, UObjMesh* pModel, f32 fAlpha,
                  f32 fMipmapBias, f32 fDistanceSquared, s32 iObject, s32 eClipMethod, u8 bUseFog,
                  u8 bSetsPrimField) {
     s32 uFlags0;
@@ -1010,7 +1023,7 @@ void fn_8003241C(Ter_ObjectDrawData* pDraw, s32* pCount, s32 nUnused, UObjMesh* 
 // drawn in, 0..2) one clip method at a time, then the deferred items with the terrain's filters.
 // fake match: the (u32) casts on the clip index; with a signed index the compiler walks one pointer
 // through the lists instead of keeping the list base and a byte offset apart as EA's code does.
-void fn_80032518(int nRenderPass) {
+void Ter_DrawPatchPass(int nRenderPass) {
     u8 bFirst = 1;
     u8 bAny;
     int nList;
@@ -1087,8 +1100,8 @@ void Ter_SetZWrite(int n) {
 // Draws render pass 0's fourth patch lists (pSortedPatchList[0][3]), if it has any, without z
 // writes; the lens's far clip distance (0xAC) is raised by 25 while the renderer is set up, then
 // put back. In split screen, patches with bit 0x8 of n1C are left out.
-// fake match: the (u32) casts on the clip index, as in fn_80032518.
-void fn_80032770(void) {
+// fake match: the (u32) casts on the clip index, as in Ter_DrawPatchPass.
+void Ter_DrawFarClipPatches(void) {
     u8 bFirst = 1;
     u8 bAny;
     int nClip;
@@ -1148,7 +1161,9 @@ void fn_80032770(void) {
     }
 }
 
-void fn_80032954(void) {
+// Draws the opaque object list, then the translucent one (objects fading between two levels of
+// detail) if it has any, both with the object filters; alpha test back to reference 128.
+void Ter_DrawObjects(void) {
     fn_80032F88(lbl_801D3CB0.pOpaqueObjectList, lbl_801D3CB0.iOpaqueObjects, lbl_801D3CB0.eObjectFilterMin,
                 lbl_801D3CB0.eObjectFilterMag);
     if (lbl_801D3CB0.iTranslucentObjects != 0) {
@@ -1166,7 +1181,7 @@ void fn_800329CC(void) {
     int nPass;
     int nPassBit;
 
-    fn_80030894();
+    Ter_BeginRender();
     RenderState_SetDrawFlags(0x70);
     for (i = 0; i < lbl_801D3CB0.iTotalPostDrawTerrainPatches; i++) {
         switch (lbl_801D3CB0.pPostDrawTerrainList[i].eClipMethod) {
@@ -1194,11 +1209,11 @@ void fn_800329CC(void) {
             }
         }
     }
-    fn_8003084C();
+    Ter_EndRender();
 }
 
 void fn_80032AEC(void) {
-    fn_80030894();
+    Ter_BeginRender();
     fn_80032F88(lbl_801D3CB0.pPostDrawItemsList, lbl_801D3CB0.iPostDrawItems, lbl_801D3CB0.eObjectFilterMin,
                 lbl_801D3CB0.eObjectFilterMag);
     Ter_SetZWrite(0);
@@ -1206,7 +1221,7 @@ void fn_80032AEC(void) {
                 lbl_801D3CB0.eObjectFilterMag);
     Ter_SetZWrite(1);
     RenderState_SetConstantAlphaOn(0);
-    fn_8003084C();
+    Ter_EndRender();
     DS_vSetAlphaTestMode(1, 6, 128);
     RenderState_Flush();
 }
@@ -1285,7 +1300,7 @@ void fn_80032B7C(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s3
     }
     if ((uFlags2 & 0x10) && b2 == 0) {
         if (pMesh->n20 != 0) {
-            fn_8003241C(&lbl_801D3CB0.pDeferredItemsList[lbl_801D3CB0.iDeferredItems],
+            Ter_AddObjectDraw(&lbl_801D3CB0.pDeferredItemsList[lbl_801D3CB0.iDeferredItems],
                         &lbl_801D3CB0.iDeferredItems, 50, pMesh, 1.0f, bLake ? fBias : 0.0f, 0.0f, 0x289,
                         eClipMethod, fFar > 0.0f, 0);
         }
@@ -1293,7 +1308,7 @@ void fn_80032B7C(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s3
     }
     if (uFlags2 & 0x20) {
         if (pMesh->n20 != 0) {
-            fn_8003241C(&lbl_801D3CB0.pDeferredItemsList[lbl_801D3CB0.iDeferredItems],
+            Ter_AddObjectDraw(&lbl_801D3CB0.pDeferredItemsList[lbl_801D3CB0.iDeferredItems],
                         &lbl_801D3CB0.iDeferredItems, 50, pMesh, 1.0f, bLake ? fBias : 0.0f, 0.0f, 0x289,
                         eClipMethod, fFar > 0.0f, 0);
         }
@@ -1851,7 +1866,7 @@ void fn_80033F94(void* pHoleData, u32 nList) {
                         // fake match: uFlags is reused for bUseFog (fog unless flag 0x20); a new local
                         // is computed after the call to fn_80035560, the original before it
                         uFlags = ((uFlags & 0x20) >> 5) ^ 1;
-                        fn_8003241C(&lbl_801D3CB0.pPanoramaItemsList[nItems], &nItems, 300, pMesh, 1.0f,
+                        Ter_AddObjectDraw(&lbl_801D3CB0.pPanoramaItemsList[nItems], &nItems, 300, pMesh, 1.0f,
                                     lbl_801D3CB0.fDefaultObjectMipmapBias[0] * fn_80035560(pMesh), 0.0f,
                                     0x289 - i, nClip, uFlags, 0);
                     }
@@ -1891,7 +1906,7 @@ void fn_800341A4(UStreamObject* pObject) {
         if (lbl_802810E4 < fLimit || lbl_802810E8 < fLimit) {
             return;
         }
-        fn_80031A08(&lbl_802810D0, &lbl_802810D4, lbl_802810E4, lbl_802810E8);
+        Ter_LODStepsFromDistances(&lbl_802810D0, &lbl_802810D4, lbl_802810E4, lbl_802810E8);
     }
 }
 
@@ -2088,9 +2103,9 @@ void fn_800348DC(void) {
 
 void fn_800349CC(int n) {
     if (lbl_801D3CB0.pCurrentHoleData != NULL) {
-        fn_80030894();
-        fn_80030A40(lbl_801D3CB0.pCurrentHoleData, n);
-        fn_8003084C();
+        Ter_BeginRender();
+        Ter_RenderView(lbl_801D3CB0.pCurrentHoleData, n);
+        Ter_EndRender();
     }
 }
 

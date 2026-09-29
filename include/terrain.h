@@ -15,7 +15,7 @@ struct UStreamObject;
 struct UObjMesh;                    // dynobj.h: the hole data is a tree of them (Ter_GetMeshNext..fn_80035500)
 
 // A patch of ground to draw (0x34 bytes; TW06: Ter_PatchReference, 0x2C, the same up to 0x10).
-// fn_80030CC8 fills Ter_TerrainRendererMgr.pPatchList with them and chains each into
+// Ter_BuildPatchLists fills Ter_TerrainRendererMgr.pPatchList with them and chains each into
 // pSortedPatchList by the bits of n1C.
 typedef struct Ter_PatchReference {
     void*  pGround;             // 0x00  TW06: pGround
@@ -34,13 +34,13 @@ typedef struct Ter_PatchReference {
 LAYOUT_ASSERT(Ter_PatchReference, 0x34);
 
 // An object to sort by distance (0x30 bytes; TW06: Ter_ObjectReference, 0x24, the same up to 0x14).
-// From 0x1C on the fields carry TW06's names by their use (fn_80031AB4); TW06 keeps them elsewhere.
+// From 0x1C on the fields carry TW06's names by their use (Ter_SelectObjectLODs); TW06 keeps them elsewhere.
 typedef struct Ter_ObjectReference {
-    struct UObjMesh* apObject[3];   // 0x00  its model at each level of detail (fn_80031E58). TW06:
+    struct UObjMesh* apObject[3];   // 0x00  its model at each level of detail (Ter_BuildObjectDrawLists). TW06:
                                 //       pObject
-    struct Ter_PatchReference* pContainerPatch; // 0x0C  the patch it is in (fn_80031154). TW06: the same
-    f32  fDistanceSquared;      // 0x10  the sort key (fn_8003185C, smallest first). TW06: the same
-    f32  f14;                   // 0x14  } fn_80031E58 draws it opaque when f14 is beyond
+    struct Ter_PatchReference* pContainerPatch; // 0x0C  the patch it is in (Ter_AddPatchObjects). TW06: the same
+    f32  fDistanceSquared;      // 0x10  the sort key (Ter_SortObjects, smallest first). TW06: the same
+    f32  f14;                   // 0x14  } Ter_BuildObjectDrawLists draws it opaque when f14 is beyond
     f32  f18;                   // 0x18  }   fXZDistanceToClosestBallSquared and f18 is above 0
     s8   nLODs;                 // 0x1C  how many levels of detail its model has. TW06: nLODs
     s8   iOpaqueLOD;            // 0x1D  the level drawn opaque. TW06: iOpaqueLOD
@@ -56,7 +56,7 @@ LAYOUT_ASSERT(Ter_ObjectReference, 0x30);
 // An object in a draw list (0x20 bytes; TW06: Ter_ObjectDrawData, the same size); fn_80032F88 draws a
 // list of them.
 typedef struct Ter_ObjectDrawData {
-    struct UObjMesh* pObject;   // 0x00  its model (fn_8003241C). TW06: pObject
+    struct UObjMesh* pObject;   // 0x00  its model (Ter_AddObjectDraw). TW06: pObject
     f32    fAlpha;              // 0x04  TW06: fAlpha
     f32    fMipmapBias;         // 0x08  TW06: fMipmapBias
     f32    fDistanceSquared;    // 0x0C  TW06: fDistanceSquared
@@ -74,7 +74,7 @@ LAYOUT_ASSERT(Ter_ObjectDrawData, 0x20);
 // The state of one course object (0x40 bytes; TW06: Ter_ObjectState, 0x2C, laid out differently).
 // Found by patch: iPatchFirstObjectInstanceIndex[patch] + the object's number in it.
 typedef struct Ter_ObjectState {
-    f32  f0;                    // 0x00  fn_80030254: fTreeMinPeriod plus a random share of fTreeDiffPeriod
+    f32  f0;                    // 0x00  Ter_vInitModule: fTreeMinPeriod plus a random share of fTreeDiffPeriod
     f32  f4;                    // 0x04  handed to row 2 or 3 of SD_SetShaderTypeParameters (fn_80032F88), 0.5 the rest;
                                 //       fTreeOverdrive at first
     f32  f8;                    // 0x08
@@ -85,7 +85,7 @@ typedef struct Ter_ObjectState {
     s32  n1C;                   // 0x1C
     s32  a20[4];                // 0x20  four flag words read from the object's model (Ter_GetMeshFlags, 0..3)
     struct {
-        f32  f0;                // 0x0   fn_80031E58 sets 1 and n4 3 when it draws the object opaque
+        f32  f0;                // 0x0   Ter_BuildObjectDrawLists sets 1 and n4 3 when it draws the object opaque
         s32  n4;                // 0x4
     } aView[2];                 // 0x30  one per view (Ter_TerrainRendererMgr.iCurrentViewContext)
 } Ter_ObjectState;
@@ -106,8 +106,8 @@ typedef struct TerPosData {
     u8   nIndex;                // 0x1C  its row of CourseInfo.tee or CourseInfo.pin
 } TerPosData;
 
-// What fn_80030894 hands to row 4 of the table SD_SetShaderTypeParameters calls through: four values that swing
-// between 0 and 1 over cycles of different lengths, and the frame count they were made for.
+// What Ter_BeginRender hands to row 4 of the table SD_SetShaderTypeParameters calls through: four
+// values that swing between 0 and 1 over cycles of different lengths, and the frame count they were made for.
 typedef struct TerWaveData {
     f32  aWave[4];              // 0x00
     u32  nFrame;                // 0x10  gSession.nFrameCount
@@ -153,7 +153,7 @@ typedef struct Ter_TerrainRendererMgr {
     f32          xCameraLookVector[4];          // 0x10F8
     f32          fXZDistanceToClosestBallSquared;   // 0x1108
     f32          fCameraMinHalfFieldOfViewTan;  // 0x110C
-    Ter_LODPlane LODPlanes[3];                  // 0x1110  filled by fn_80031938
+    Ter_LODPlane LODPlanes[3];                  // 0x1110  filled by Ter_SetLODPlanes
     s32          iLOD0End;                      // 0x1128
     s32          iLOD1Begin;                    // 0x112C
     s32          iLOD1End;                      // 0x1130
@@ -225,8 +225,8 @@ typedef struct TerPoseStep {
 
 extern TerPoseStep lbl_801877E0[6]; // fn_80033744: for objects without bit 0x40 of word 3
 extern TerPoseStep lbl_80187858[2]; // fn_80033744: for objects with it
-extern f32 lbl_80281D60;           // fn_80030254's random number, 0..1, stepped once per object
-extern s32 lbl_801D3A30[5][32];     // [n][k]: how many of k's lowest n bits are set (fn_80030254);
+extern f32 lbl_80281D60;           // Ter_vInitModule's random number, 0..1, stepped once per object
+extern s32 lbl_801D3A30[5][32];     // [n][k]: how many of k's lowest n bits are set (Ter_vInitModule);
                                     // fn_80032B7C picks a ground's mesh by it
 
 void fn_8006F334(TerSettings* pSettings);   // Code8006F154.c: the default colours
@@ -236,8 +236,8 @@ extern s8  lbl_802810CC;
 extern u8  lbl_802810EC;            // } 1: fn_80033F94 draws object list 0, list 2
 extern u8  lbl_802810ED;            // }
 extern s32 lbl_80281D64;            // how many of list 2's last objects fn_80033F94 leaves out
-extern s32 lbl_802810D0;            // } fn_80031938's arguments (the LOD planes); 26 and 16 once
-extern s32 lbl_802810D4;            // } unloaded, else set by fn_80031A08 from the 'tLOD' chunk
+extern s32 lbl_802810D0;            // } Ter_SetLODPlanes's arguments (the LOD planes); 26 and 16 once
+extern s32 lbl_802810D4;            // } unloaded, else set by Ter_LODStepsFromDistances from the 'tLOD' chunk
 extern f32 lbl_802810D8;            // }
 extern s32 lbl_802810DC;            // }
 extern s32 lbl_802810E0;            // }
@@ -245,7 +245,7 @@ extern s32 lbl_802810E4;            // } from the 'tLOD' chunk (fn_800341A4); -1
 extern s32 lbl_802810E8;            // }
 
 // GoTerrain.c
-void fn_800306B8(void);             // frees the terrain
+void Ter_vCloseModule(void);             // frees the terrain
 void fn_800335F8(u8 bReset);
 f32  fn_800336E4(void);
 f32  fn_800336F4(void);

@@ -287,7 +287,7 @@ They will be sorted into the sections below.
 - **[verified] Read fields into locals before a run of matrix stores**, or CW reloads them after each store
   (Glows fn_80098408 80.6 -> 94.5).
 - **[verified] Calls inside a later argument can run before a call in an earlier one**: write the
-  expression inline as the argument (GoTerrain fn_80030A40 96.7 -> 100).
+  expression inline as the argument (GoTerrain Ter_RenderView 96.7 -> 100).
 - **[verified] `(int)` before a float-to-u8 conversion** gives `fctiwz` + `clrlwi` (GoComicCam ComicCam_Init9ScreenRapidMode).
 - **[verified] Set every loop cursor and end pointer as plain statements at the head of the loop**, in the
   original's order; an end pointer can double as the backward cursor (hlaudvoice Voc_ResetModule 78 -> 100).
@@ -459,7 +459,7 @@ They will be sorted into the sections below.
   38 -> 0 (`s32 i`, pLogoA before pLogoB).
 - **[verified] A list walked with a signed index gets folded into one walking pointer; EA's code keeps the
   list start and a byte offset apart.** The cast in the index, `list[(u32)i]`, brings EA's form back;
-  declaring the variable `u32` does not (GoTerrain fn_80032518 96.27 -> 100, fn_80032770 89.62 -> 100;
+  declaring the variable `u32` does not (GoTerrain Ter_DrawPatchPass 96.27 -> 100, Ter_DrawFarClipPatches 89.62 -> 100;
   also GameHoleContests).
 - **[verified] Late constant load in `c * x` (fmuls const,x):** write the min or ternary into its own
   temp; `0.5f * fTemp` alone still hoists the lfs above it. An unrelated statement between the temp
@@ -845,8 +845,8 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   (the frontend makes the temp) can. Swing SW_vImpact: pLaunchA/B locals -> `gPlayers[nPlayer].vLaunchA/B`
   at each call, 6 -> 0.
 - **[verified] A callee's parameter order sets its callers' argument schedule**, even when every
-  register stays the same. GoTerrain fn_80032B7C 98.46 -> 100 and fn_80031E58 83.6 -> 100 from
-  fn_8003241C's parameters in Ter_ObjectDrawData's field order. Worth a look wherever a ledger says
+  register stays the same. GoTerrain fn_80032B7C 98.46 -> 100 and Ter_BuildObjectDrawLists 83.6 -> 100 from
+  Ter_AddObjectDraw's parameters in Ter_ObjectDrawData's field order. Worth a look wherever a ledger says
   "argument order" (PictInt_Decode, Stm_Tick, fn_80006A98, fn_8009A708, UISApi/UISEvent).
 - **[verified] File-wide `opt_propagation off` keeps consecutive `x |= c` statements separate**
   (the frontend otherwise merges them into one `ori`): uiText UIText_Draw 2 -> 0, no function worse.

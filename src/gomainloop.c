@@ -91,7 +91,7 @@ void fn_8002F180(void);
 void fn_8002F32C(s32 nSurface);
 void Pict_InitModule(void);
 void Pict_CloseModule(void);
-void fn_80030254(void);
+void Ter_vInitModule(void);
 void fn_800329CC(void);
 void fn_80032AEC(void);
 void fn_80033744(void);
@@ -613,7 +613,7 @@ void GO_vInitIG(void) {
     lbl_80281E58 = VM_spCreateViewport();
     lbl_80281E54 = RC_spCreateRenderCtx(lbl_80281E60, lbl_80281E5C, lbl_80281E58);
     RC_vSetCurrentRenderCtx(lbl_80281E54);
-    fn_80030254();
+    Ter_vInitModule();
     Ter_Init();
     Aud_InitSession(1, 0, (gSession.nSplitScreen != 0) + 1, 0);
     fn_8006F608();
@@ -724,7 +724,7 @@ void fn_8006CDC4(void) {
     fn_80097E98();
     GM_DeInitModule();
     fn_8006F64C();
-    fn_800306B8();
+    Ter_vCloseModule();
     fn_8010A4E8();
     gSession.nSplitScreen = 0;
     fn_8002A020();

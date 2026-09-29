@@ -168,7 +168,7 @@ Functions still unnamed or named from TW06:
 | `80027E8C` | `SKEL_AdjustHipPosition` | `SKEL_AdjustHipPosition` | medium | Xbox anchor(1)+graph |
 | `800280E8` | `SKEL_InitIKSkeleton` | `SKEL_InitIKSkeleton` | medium | PS2 nbr(r3,2) |
 | `80028564` | `fn_80028564` | `_HLBListAddChangeBuddy` | medium | PS2 nbr(r1,2) |
-| `80030254` | `fn_80030254` | `Ter_vInitModule` | medium | PS2 anchor(1)+graph |
+| `80030254` | `Ter_vInitModule` | `Ter_vInitModule` | medium | PS2 anchor(1)+graph |
 | `8003A7C8` | `fn_8003A7C8` | `DynamicCam_ChooseScript` | medium | PS2 calls(r0,1) |
 | `8003DCE8` | `fn_8003DCE8` | `CamScript_RunScript` | medium | PS2 nbr(r3,2) |
 | `8003E624` | `fn_8003E624` | `CamScript_RunFEScript` | medium | PS2 nbr2(r7,2) |

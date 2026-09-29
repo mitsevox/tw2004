@@ -224,7 +224,7 @@ through memory or to a global, which a pointer could alias); an identity inline 
 match (look for EA's helper in TW07 first, else `fn_<caller>_Read` with `// fake match:`).
 `leversweep_selftest.py` sweeps functions already solved, from their source before the fix: on
 2026-09-25 it rediscovered BreakLine_Reset, GoDynObj DynObj_DrawGolfBalls (a two-change pair), GoTerrain
-fn_80032518 and Glows fn_800981D0; the swap lever finds AI_ChooseTarget's fDX/fDZ order (112 -> 90
+Ter_DrawPatchPass and Glows fn_800981D0; the swap lever finds AI_ChooseTarget's fDX/fDZ order (112 -> 90
 with other levers in 4 min; the PC permuter found it first).
 
 **Heavy jobs on the owner's PC** (permuter, sweeper) and **branch cleanup** run as GitHub
