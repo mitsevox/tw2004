@@ -1,12 +1,20 @@
-// rcmp_mad_codec.c (EA's name, from its asserts; also in EA's 2002 source tree): the decoder for
-// the 'MAD' movie format (TW06's rcmp folder splits it into maddec.c and madidct.c): the block
-// decoder and inverse DCT, the movie decoder that hands out frames (MadDecoder, llpict.h). After
-// it comes front-end code: the 'TEO '/'BALF' stream handlers and the ball models and logo drawn
-// on the create-a-player golfer (FEgolferanim.c).
+// rcmp_mad_codec.c (our name for now; EA's rcmp_mad_codec.c is the next unit, see below): the core
+// of EA's MAD picture and movie decoder: the bit reader, the coefficient decoder (MPEG-1-style run
+// and level codes), the inverse DCT and the macroblock decoder, which MAD_DecodeFrame
+// (Code800B90F4.c) and PictInt_Decode (LLPictInt.c) run 16x16 pixels at a time.
 //
 // A MAD file is a picture: 'MADk' a key frame, 'MADm' and 'MADe' frames coded against the last
 // key or 'MADm' frame. The coded data is read 16 bits at a time, little-endian, into a 32-bit
 // bit buffer.
+//
+// File name: EA's only "rcmp_mad_codec.c" string tags the frame allocations of the code after this
+// unit (Code800B90F4.c, 0x800B90F4..0x800B9944: MAD_AllocFrame, MAD_GetNextFrame), and the .sbss
+// pad at 0x802821BC..0x802821C0 puts a unit boundary between that code's globals and this file's.
+// EA's rcmp package as NFSMW links it has rcmp_mad_codec.cpp apart from maddec.cpp, maddeca.cpp and
+// madidct.cpp, and TW06's PDB puts these functions in maddec.c (madinit..MAD_decodemacroblock),
+// maddeca.c (madvlcdecode; NFSMW's maddeca.cpp also has its own static discardbits, our
+// MAD_DiscardBitsVlc) and madidct.c (IdctColumn, IdctRow, idctcompute): this file is EA's three,
+// not its rcmp_mad_codec.c.
 
 #include "engine.h"
 #include "dynobj.h"
@@ -19,9 +27,11 @@
 u8* maddataptr;                 // the next coded byte
 u32 madshiftreg;                // the bit buffer, next bit at the top
 s32 madbitcount;                // bits left in madshiftreg
-s32 gMadMotion;               // 0: a key frame, 1: coded against a reference
-s32 gbMadTablesBuilt;               // the decoder's tables are built
+s32 gMadMotion;                 // 0: a key frame, 1: coded against a reference (MAD_initdecode)
+s32 gbMadTablesBuilt;           // madinit has built the decoder's tables
 
+// The run and level codes madinit spreads into madvlctbl1 (codes of up to 9 bits) and madvlctbl3
+// (the rest, after their six zero bits); entry 0 is not used.
 const MadCode gMadCoefCodes[95] = {
     {2, 0xFE00, 0, 0x8000}, {3, 0x1, 0, 0xC000}, {3, 0x3FF, 0, 0xE000}, {4, 0x401, 0, 0x6000},
     {4, 0x7FF, 0, 0x7000}, {5, 0x2, 0, 0x4000}, {5, 0x3FE, 0, 0x4800}, {5, 0x801, 0, 0x5000},
@@ -48,6 +58,8 @@ const MadCode gMadCoefCodes[95] = {
     {13, 0x4BFF, 0, 0x1A8}, {13, 0x4C01, 0, 0x190}, {13, 0x4FFF, 0, 0x198}, {13, 0x5001, 0, 0x170},
     {13, 0x53FF, 0, 0x178}, {13, 0x5401, 0, 0x160}, {13, 0x57FF, 0, 0x168},
 };
+// The longest run and level codes, stored without their zero bits: madinit spreads them into
+// madvlctbl2 (after nine zero bits) and madvlctbl3 (after six).
 const MadCode gMadCoefCodesLong[128] = {
     {6, 0xC, 0, 0xD000}, {6, 0x3F4, 0, 0xD400}, {6, 0xD, 0, 0xC800}, {6, 0x3F3, 0, 0xCC00},
     {6, 0xE, 0, 0xC000}, {6, 0x3F2, 0, 0xC400}, {6, 0xF, 0, 0xB800}, {6, 0x3F1, 0, 0xBC00},
@@ -95,7 +107,8 @@ const s32 gMadIntraQuant[64] = {
     27, 29, 35, 38, 46, 56, 69, 83,
 };
 
-// the scaled IDCT's factors for each coefficient (0x2000 = 1.0)
+// the scaled IDCT's factors for each coefficient (0x2000 = 1.0; the reciprocals of the AAN IDCT's
+// scale factors, 0x1712 = 1 / 1.387), which MAD_initdecode folds into madquant
 s32 idctprescale[64] = {
     0x2000, 0x1712, 0x187E, 0x1B37, 0x2000, 0x28BA, 0x3B21, 0x73FC,
     0x1712, 0x10A2, 0x11A8, 0x139F, 0x1712, 0x1D5D, 0x2AA1, 0x539F,
@@ -106,7 +119,7 @@ s32 idctprescale[64] = {
     0x3B21, 0x2AA1, 0x2D41, 0x3249, 0x3B21, 0x4B42, 0x6D41, 0xD650,
     0x73FC, 0x539F, 0x58C5, 0x62A3, 0x73FC, 0x939F, 0xD650, 0x1A463,
 };
-// the scan order of a block's coefficients
+// the scan order of a block's coefficients (the zigzag, transposed): scan position -> index
 const s32 gMadScanOrder[64] = {
     0,  8,  1,  2,  9,  16, 24, 17, 10, 3,  4,  11, 18, 25, 32, 40,
     33, 26, 19, 12, 5,  6,  13, 20, 27, 34, 41, 48, 56, 49, 42, 35,
@@ -114,16 +127,16 @@ const s32 gMadScanOrder[64] = {
     23, 31, 38, 45, 52, 59, 60, 53, 46, 39, 47, 54, 61, 62, 55, 63,
 };
 
-s32 idctinput[64];           // a block's coefficients
-s32 gMadIdctColumns[64];           // the inverse DCT's first pass
-u32 madvlctbl1[512];            // } the coefficient codes: the first 9 bits index
-u32 madvlctbl2[256];          // } madvlctbl1; longer codes continue in these two
-u32 madvlctbl3[256];          // }
-u32 madvlctbl4[64];             // looked up by the buffer's top 6 bits
+s32 idctinput[64];              // a block's coefficients, dequantized (madvlcdecode)
+s32 gMadIdctColumns[64];        // the inverse DCT's first pass (IdctColumn), read back as rows
+u32 madvlctbl1[512];            // } the coefficient codes: the first 9 bits index madvlctbl1;
+u32 madvlctbl2[256];            // } longer codes continue in madvlctbl2 (after nine zero bits)
+u32 madvlctbl3[256];            // } and madvlctbl3 (after six)
+u32 madvlctbl4[64];             // the delta codes (getdelta), by the buffer's top 6 bits
 s32 madquant[64];               // the quantizer for this picture
-s32 gMadLumaBlock[256];          // a macroblock's 16x16 Y block
-s32 gMadChromaBlocks[2][64];        // a macroblock's U and V blocks
-u8 gMadClamp[512];           // a pixel value's clamp to 0..255, by its low 9 bits
+s32 gMadLumaBlock[256];         // a macroblock's 16x16 Y block, 16.16 values
+s32 gMadChromaBlocks[2][64];    // a macroblock's U and V blocks, 16.16 values
+u8 gMadClamp[512];              // a value (-256..255, by its low 9 bits) clamped to a pixel 0..255
 
 void madinit(void);
 u32 MAD_ReadLittleEndian(u8* pData, int nBytes);
@@ -155,6 +168,9 @@ void madinit(void) {
     int j;
     int n;
 
+    // EA bug: the loop stops at 254, so gMadClamp[255] stays 0: a value of +255 comes out as pixel
+    // 0 (black) where +128..+254 give 255 (white). (Values from +256 wrap to the table's negative
+    // end by their low 9 bits and come out black as well.)
     for (i = -256; i < 255; i++) {
         n = i;
         if (n < -128) {

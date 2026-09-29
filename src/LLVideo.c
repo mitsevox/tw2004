@@ -1,6 +1,9 @@
-// LLVideo.c (EA's name, from its asserts; also in EA's 2002 source tree): the movie player (the
-// intro, the credits, the golfers' bios). The stream loader hands it the movie's MPG2 chunks,
-// which wait in a queue (llvideo.h) until the decoder takes them. Partly decompiled.
+// LLVideo.c (EA's name, from its asserts; also in EA's 2002 source tree and TW06): the movie player
+// (the intro, the credits, the golfers' bios), full screen at up to 33 frames a second. The stream
+// loader hands it the movie's MPG2 chunks, which wait in a queue (llvideo.h) until the MAD decoder
+// reads them as whole files (LLVideo_ReadNextFile); LLPict_Gc.c turns each frame into a picture.
+// After the player come four small setters other files use too: the scissor, the picture to draw,
+// a picture quad's texture coordinates and the text colour (TW07 has that one in UFont.c).
 
 #include "game_types.h"
 #include "ustream.h"
@@ -8,10 +11,11 @@
 #include "camera.h"
 #include "terrain.h"
 
-VideoSlots gVideoSlots;
-VideoSlots* gpVideoSlots = &gVideoSlots;
+VideoSlots gVideoSlots;                     // the movies being played, by slot
+VideoSlots* gpVideoSlots = &gVideoSlots;    // every slot access goes through it
 
-u8 gbVideoFrameWasOpen;
+u8 gbVideoFrameWasOpen;         // a frame was started and not ended when the last movie began
+                                // (LLVideo_PlayFile ends it first); nothing else reads it
 
 u8   LLVideo_UpdateStream(Video* pVideo, int* pnQueued);
 void LLVideo_PreloadQueue(Video* pVideo);
@@ -186,10 +190,10 @@ void LLVideo_SetupRender(void);
 void LLVideo_RestoreRender(void);
 int  LLVideo_GetFrame(Video* pVideo);
 u8   LLVideo_HasEnded(Video* pVideo);
-void RenderState_SetScissor(int nX, int nY, int nWidth, int nHeight);
+void RenderState_SetScissor(int nLeft, int nTop, int nRight, int nBottom);
 void RenderState_SetPicture(LLPict* pPict);
 void RenderView_MakePictUV(f32* pUV, LLPict* pPict);
-void FO_vSetCurrentColor(s32 p0);
+void FO_vSetCurrentColor(s32 nColor);
 
 // Draws a full-screen black quad (alpha 0.5) over the screen for one frame, two when nFlags bit 0
 // is set. With bit 1 it first fades to black over 30 frames (alpha 0.1 each, 0.5 for the last two),
@@ -562,13 +566,13 @@ u8 LLVideo_HasEnded(Video* pVideo) {
 
 // Sets the renderer's scissor rectangle in 512 x 448 screen pixels: left, top, then right and
 // bottom, both edges inclusive (gRenderState.nScissorLeft..nScissorBottom, changed bit 0x200;
-// Code80015470.c passes GXSetScissor right - left + 1). The two parameters named nWidth and nHeight
-// are the right and bottom edges.
-void RenderState_SetScissor(int nX, int nY, int nWidth, int nHeight) {
-    gRenderState.nScissorLeft = nX;
-    gRenderState.nScissorTop = nY;
-    gRenderState.nScissorRight = nWidth;
-    gRenderState.nScissorBottom = nHeight;
+// Code80015470.c passes GXSetScissor right - left + 1). Other files' prototypes still call the
+// right and bottom edges nWidth and nHeight.
+void RenderState_SetScissor(int nLeft, int nTop, int nRight, int nBottom) {
+    gRenderState.nScissorLeft = nLeft;
+    gRenderState.nScissorTop = nTop;
+    gRenderState.nScissorRight = nRight;
+    gRenderState.nScissorBottom = nBottom;
     gRenderState.uChanged |= 0x200;
 }
 
@@ -593,15 +597,11 @@ void RenderView_MakePictUV(f32* pUV, LLPict* pPict) {
     pUV[7] = 1.0f;
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
 // Sets the colour the next strings are drawn in: an index into LLFont.c's colour table
 // (lbl_80186A80), 0x12 for the current packet's own RGB (u5C). TW07's name; in TW07 it lives in
 // UFont.c.
-void FO_vSetCurrentColor(s32 p0) {
+void FO_vSetCurrentColor(s32 nColor) {
     UFontContext* pCtx;
     pCtx = FO_spGetCurrentPacket();
-    pCtx->nA4 = p0;
+    pCtx->nA4 = nColor;
 }
-
-// ---- end of sweep code ----

@@ -1,31 +1,32 @@
-// LLPict_Gc.c (EA's name, from its asserts; also in EA's 2002 source tree): all of it is in C; the
-// sweep code below is the matched small functions not yet cleaned up.
+// LLPict_Gc.c (EA's name, from its asserts; the 2002 source tree has its Xbox twin,
+// Legacy\LL\Xbox\LLPict_Xbox.c): the GameCube side of EA's pictures (LLPict, llpict.h: Y, U and V
+// planes drawn as three I8 textures). It makes pictures from "MADk" files for the menus and
+// loading screens, and shows a movie's decoded frames for LLVideo.c: each plane is copied into the
+// GPU's 8 x 4 tile order.
 
 #include "llpict.h"
 #include "core/startup.h"
 
-void Pict_TilePlane(u8* pSrc, u8* pDst, int nWidth, int nHeight);   // copies one plane
+void Pict_TilePlane(u8* pSrc, u8* pDst, int nWidth, int nHeight);
 void Pict_InitTextures(LLPict* pPict);
 void Pict_TilePlaneInPlace(u8* pPlane, void* pWork, int nWidth, int nHeight);  // reorders one plane through pWork
 
-void* gPictWorkBuffer;
-void** gpPictWorkBuffer = &gPictWorkBuffer;
+void* gPictWorkBuffer;          // 2048 bytes from Pict_InitModule: a band of four rows being tiled
+void** gpPictWorkBuffer = &gPictWorkBuffer;     // every use of the work buffer goes through it
 
-// ---- sweep code (not yet cleaned up) ----
-
-void PictInt_InitModule();
-void PictInt_CloseModule();
-void Pict_InitModule(void);
-void Pict_CloseModule(void);
+void PictInt_InitModule(void);
+void PictInt_CloseModule(void);
+// Code800B90F4.c; declared without its parameters: it takes a PictFile* (*)(void*) reader, and
+// Pict_OpenMovie passes LLVideo.c's void* (*)(void*) one
 void MAD_SetReadCallback();
 
 // At boot (gomainloop.c): starts LLPictInt.c (nothing to do) and allocates the 2048-byte work
 // buffer Pict_CreateFromMemory tiles pictures through (gPictWorkBuffer).
 void Pict_InitModule(void) {
-    void* t1;
+    void* pBuffer;
     PictInt_InitModule();
-    t1 = StaticMem_Alloc(2048, 2, 32, "LLPict_Gc.c", 68);
-    *gpPictWorkBuffer = t1;
+    pBuffer = StaticMem_Alloc(2048, 2, 32, "LLPict_Gc.c", 68);
+    *gpPictWorkBuffer = pBuffer;
 }
 
 // At shutdown: closes LLPictInt.c (nothing to do) and frees the work buffer Pict_InitModule
@@ -34,8 +35,6 @@ void Pict_CloseModule(void) {
     PictInt_CloseModule();
     StaticMem_Free(*gpPictWorkBuffer);
 }
-
-// ---- end of sweep code ----
 
 // Pict_TilePlane in place: rearranges an nWidth x nHeight plane of bytes (nHeight a multiple of 4)
 // into GameCube I8 tile order. Each band of four rows (nWidth * 4 bytes: the 2048-byte work buffer
@@ -110,8 +109,6 @@ LLPict* Pict_CreateFromMemory(u8* pData, u32 uSize) {
     return pPict;
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
 // Frees a picture Pict_CreateFromMemory made, and its pixels; NULL does nothing.
 void Pict_Free(LLPict* pPict) {
     if (pPict != NULL) {
@@ -137,8 +134,6 @@ void Pict_OpenMovie(LLPict* pPict, PictStream* pStream, void* (*pfnRead)(void* p
     MAD_InitDecoder(pStream->pDecoder);
 }
 
-// ---- end of sweep code ----
-
 // Undoes Pict_OpenMovie (LLVideo.c LLVideo_Destroy): frees the picture's pixels, gives the held
 // frame back, closes the decoder (frees its frames) and frees it. The LLPict itself belongs to the
 // Video and is not freed.
@@ -153,13 +148,9 @@ void Pict_CloseMovie(LLPict* pPict, PictStream* pStream) {
     StaticMem_Free(pStream->pDecoder);
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
 // Empty in this build. LLVideo_Start calls it when a movie starts playing.
 void Pict_StartMovie(LLPict* pPict, PictStream* pStream) {
 }
-
-// ---- end of sweep code ----
 
 // On a movie's first frame (LLVideo_UpdateAll): sizes the picture to the decoder's frame, allocates
 // its three planes (1.5 bytes a pixel) and draws the whole texture (f6C, f70 = 1).
@@ -172,15 +163,11 @@ void Pict_SizeToMovie(LLPict* pPict, PictStream* pStream) {
     pPict->f70 = 1.0f;
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
 // The decoder has reached the movie's end (MAD_IsAtEnd). Always 0 in this game: MAD_ReadNextFile
 // never sets the end count (its EA bug), so LLVideo.c ends a movie only when it is starved.
 u8 Pict_IsMovieAtEnd(LLPict* pPict, PictStream* pStream) {
     return MAD_IsAtEnd(pStream->pDecoder);
 }
-
-// ---- end of sweep code ----
 
 // Gives back the frame held and takes the decoder's next one (MAD_GetNextFrame, which reads the
 // next MAD file through the read function); 1 when there is one, 0 when the read found nothing or
@@ -193,14 +180,10 @@ u8 Pict_NextMovieFrame(LLPict* pPict, PictStream* pStream) {
     return pStream->pFrame != NULL;
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
 // Empty in this build. LLVideo_UpdateAll calls it with n2 = 0 on a movie's first frame, right after
 // Pict_SizeToMovie.
 void Pict_OnFirstMovieFrame(LLPict* pPict, PictStream* pStream, int n2) {
 }
-
-// ---- end of sweep code ----
 
 // Shows the decoder's current frame: copies its three planes into the picture in GameCube I8 tile
 // order (Pict_TilePlane; U and V at half the width and height) and makes the picture's textures

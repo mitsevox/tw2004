@@ -1,10 +1,12 @@
 // LLPictInt.c (EA's name, from its asserts; also in TW06 and EA's 2002 source tree): decodes a
-// "MADk" picture file (EA's MAD codec) into a new picture, 16x16 pixels at a time.
+// "MADk" picture file (EA's MAD codec, rcmp_mad_codec.c) into a new picture, 16x16 pixels at a
+// time, for LLPict_Gc.c; and that file's module start and stop hooks, empty in this build.
 
 #include "llpict.h"
 
 void MAD_initdecode(u8* src, int motion, int quality);
-void MAD_decodemacroblock(u8* src_y, u8* src_cb, u8* src_cr, u8* dest_y, u8* dest_cb, u8* dest_cr, int width);
+void MAD_decodemacroblock(u8* src_y, u8* src_cb, u8* src_cr, u8* dest_y, u8* dest_cb, u8* dest_cr,
+                          int width);
 
 // Empty in this build. Pict_InitModule calls it at boot.
 void PictInt_InitModule(void) {
