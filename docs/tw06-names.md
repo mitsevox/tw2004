@@ -177,8 +177,8 @@ Functions still unnamed or named from TW06:
 | `800439E4` | `fn_800439E4` | `CamScript_CheckObstructedCamera` | medium | PS2 nbr(r4,2) |
 | `80043C74` | `fn_80043C74` | `CamScript_GetCameraOnFairwayPos` | medium | PS2 nbr2(r6,2) |
 | `80052268` | `fn_80052268` | `Physics_BallRollingandSlipping` | medium | Xbox nbr(r5,2) |
-| `80053240` | `fn_80053240` | `Physics_CheckObjectCollisions` | medium | Xbox nbr(r2,2) |
-| `80054040` | `fn_80054040` | `Physics_CheckActorCollisions` | medium | Xbox nbr(r0,2) |
+| `80053240` | `Physics_CheckObjectCollisions` | `Physics_CheckObjectCollisions` | medium | Xbox nbr(r2,2) |
+| `80054040` | `Physics_CheckDynObjCollisions` | `Physics_CheckActorCollisions` | medium | Xbox nbr(r0,2) |
 | `80055324` | `fn_80055324` | `Physics_GetBallAltitude` | medium | Xbox nbr(r4,2) |
 | `800642D0` | `fn_800642D0` | `CameraController_ResetAimMarkerInSwingCamera` | medium | PS2 nbr(r7,2) |
 | `80069218` | `fn_80069218` | `PlaceBall_IsValidDropLocation` | medium | Xbox nbr2(r5,2) |
@@ -229,7 +229,7 @@ Functions we had named by hand, with their TW06 equivalents (our names kept):
 | `80051AF4` | `Ball_Launch` | `Physics_ShotImpact` | strong | both builds: Xbox nbr(r2,2), PS2 xbox:nbr(r2,2) |
 | `80054340` | `Ball_Stop` | `Physics_StopBall` | strong | Xbox nbr(r2,4) |
 | `80054450` | `Ball_Collide` | `Physics_CheckTerrainCollisions` | strong | Xbox anchor(3) |
-| `80054AB0` | `Ball_CupPull` | `Physics_CupDynamics` | strong | Xbox anchor(4) |
+| `80054AB0` | `Physics_ApplySuperSucka` | `Physics_CupDynamics` | strong | Xbox anchor(4) |
 | `80054D28` | `Ball_GroundContact` | `Physics_BallRolling` | strong | Xbox anchor(9) |
 | `8005A080` | `Swing_LoadTuning` | `SW_vUIInit` | strong | both builds: Xbox anchor(2), PS2 anchor(2) |
 | `8005AEE0` | `Swing_Launch` | `SW_vImpact` | strong | PS2 nbr(r5,3) |
@@ -259,9 +259,9 @@ Functions we had named by hand, with their TW06 equivalents (our names kept):
 | `8002DB80` | `Caddie_Start` | `AICore::CreatePhantom` | medium | PS2 nbr(r6,2) |
 | `8002DC50` | `Caddie_Update` | `AICore::PhantomThink` | medium | PS2 nbr(r5,2) |
 | `80050C2C` | `Ball_Holed` | `Physics_ForceBallInHole` | medium | Xbox anchor(1)+graph |
-| `80051CD0` | `Ball_FlightStep` | `Physics_BallFlying` | medium | Xbox nbr(r3,2) |
-| `80053594` | `Ball_SetLie` | `Physics_SetLie` | medium | Xbox nbr(r4,2) |
-| `80054A10` | `Ball_DistanceToPin` | `Physics_GetDistanceToCup` | medium | Xbox nbr(r6,2) |
+| `80051CD0` | `Physics_BallFlying` | `Physics_BallFlying` | medium | Xbox nbr(r3,2) |
+| `80053594` | `Physics_SetLie` | `Physics_SetLie` | medium | Xbox nbr(r4,2) |
+| `80054A10` | `Physics_GetDistanceToCup` | `Physics_GetDistanceToCup` | medium | Xbox nbr(r6,2) |
 | `800554A8` | `Ball_Tick` | `Physics_QuickSimulate` | medium | Xbox nbr(r0,2) |
 | `800589F8` | `Swing_Init` | `SW_vInitModule` | medium | PS2 nbr(r1,2) |
 | `8005FA84` | `SwingState06_Update` | `STATEFUNC_GreenWatchRollUpdate` | medium | PS2 nbr(r4,2) |

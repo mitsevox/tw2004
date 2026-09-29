@@ -345,7 +345,7 @@ A Gecko code that turns the lucky shot off (keeping lesson mode 11's scripted on
 `tools/codes/no_lucky_shots.txt` - **untested**: one instruction, `Golfer_IsLucky` always takes
 its "not lucky" exit after the CPU / split-screen test.
 
-What the event does is in the lie code (`Ball_SetLie`, now in C - full rules under "Landings,
+What the event does is in the lie code (`Physics_SetLie`, now in C - full rules under "Landings,
 lies, trees and water" below): landing in the rough is a coin flip between the good rough lie
 and the bad one, and `(roll & 127) < LUCK/2` forces the good one - 50% good at LUCK 0, ~70% at
 100. On a worse surface, `(LUCK/4 + 16)/128` is the chance of getting the rough treatment
@@ -365,7 +365,7 @@ declares the ball holed when it is on one of those and more than **2 inches** be
 height. No speed test, no capture radius: the ball has to physically fall in. `Ball_Holed` then
 parks it 3 in down in the cup.
 
-**There is a pull, though.** `Ball_CupPull` (`0x80054AB0`, in C at the original instruction
+**There is a pull, though.** `Physics_ApplySuperSucka` (`0x80054AB0`, in C at the original instruction
 count) runs from the rolling step (`Ball_GroundContact`, state 4) every tick, for every *real*
 ball, human or CPU. **It is skipped in simulations** (`gSimulating`) unless `gSimFullCup` is set -
 so the CPU's shot rehearsal and the caddie's putt read run *without* it, while the state-15
@@ -556,7 +556,7 @@ wobble.
 Putt power and club distances (`Ball.c`, in C)
 ---------------------------------------------
 
-**Putts** (`fn_80050D34`, distance -> power; used by the CPU and by your putt meter). A table of
+**Putts** (`Physics_EstimatePuttPower`, distance -> power; used by the CPU and by your putt meter). A table of
 23 distances at power 0, 0.05, 0.10 .. 1.10 (`gPuttDist`), times a **green-speed scale**
 (`gPuttSpeedScale[setting]`: 0.606, 0.65, **1.0**, 1.3, 1.82 for settings 0..4; default 2),
 interpolated. On a medium green the table is almost exactly **distance = 43.4 yd x power^2**:
@@ -574,7 +574,7 @@ harness; which setting the options menu starts on is not checked yet.)
 Because roll grows with the *square* of power, **the CPU's +5% putt pace (above) is +10% of
 distance**: a putt planned to die at the hole would finish about 10% of its length past it.
 
-**Full shots, chips and the rest** (`fn_80050DE4` picks the table, `fn_80050F88` interpolates):
+**Full shots, chips and the rest** (`Physics_GetShotTableAndSurfaceID` picks the table, `fn_80050F88` interpolates):
 seven tables, one per shot kind 1..7, of 25 clubs x 11 distances at power 0.1, 0.2 .. 1.1
 (`gClubRows1..7`; corrected 2026-09-23 - the columns were first read as 0.0 .. 1.0, one step
 low). The tenth column (full power, 1.0) is the club's "reach" that `AI_PowerScale` divides a
@@ -611,10 +611,10 @@ spin. Every number here is from the code.
   trajectory (low -5, normal 0, high +5), clamped to 0..80. Kind 4 also loses 0.8 degrees and
   0.01 speed per club step (`gClubStep`: 0 for clubs 0-5, then 1..15): a punch. Kind 5 is
   tilted up a further 42 degrees: a flop.
-- **Uphill lie** (slope along the aim, `fn_800511F0`, above 0): speed x `(max - slope) / max`
+- **Uphill lie** (slope along the aim, `Physics_GetFeetAngle_ForwardBackward`, above 0): speed x `(max - slope) / max`
   with max = 125 degrees (75 for a pitch) - 1.8 per club step + 40 x the slope, and the ball is
   launched that much steeper. Downhill does nothing here.
-- **Sidehill lie** (ball above or below your feet, `fn_80051124`, clamped to +-45 degrees)
+- **Sidehill lie** (ball above or below your feet, `Physics_GetFeetAngle_RightLeft`, clamped to +-45 degrees)
   tilts the spin axis by 0.2 of the slope, and by 0.9 of it again before the spin is made: a
   sidehill lie curves the shot. **Not for a perfect (lucky) shot, and not for player slot 4**
   (the caddie's and the lucky shot's rehearsal copy).
@@ -628,7 +628,7 @@ spin. Every number here is from the code.
       4 rough, bad lie           80%        70%
       anything else           surface table (+0x00, +0x08)
 
-  (Lie numbers corrected 2026-09-23 from `Ball_SetLie`: 3/4 are the rough, 6/7/8 the sand.)
+  (Lie numbers corrected 2026-09-23 from `Physics_SetLie`: 3/4 are the rough, 6/7/8 the sand.)
 
   plus the ball's own `+0x70`, and **each club step gives back 1.25% of what was lost** - a
   wedge (step 15) keeps about 19% more of the lost speed than a driver. A chip from the rough
@@ -637,19 +637,19 @@ spin. Every number here is from the code.
   (`gClubSpin`: 0.87 for the woods down to 0.11 for club 24) x kind spin (`gKindSpin`: kind 4
   x 1.5, kind 5 x 0.01 - a flop has no spin) x 0.85 x the lie's spin / 0.84.
 
-The ball in flight (`Ball_Tick`, `Ball_FlightStep` and helpers, in C)
+The ball in flight (`Ball_Tick`, `Physics_BallFlying` and helpers, in C)
 -------------------------------------------------------------------------
 
 **Each tick** (`Ball_Tick`; a tick is one 20 ms step of the real ball, the same step the
-rehearsals use): the state's own step runs - in the air (`Ball_FlightStep`), rolling
+rehearsals use): the state's own step runs - in the air (`Physics_BallFlying`), rolling
 (`fn_80052268`) or bouncing (`Ball_GroundContact`) - then the ball moves by velocity / 36. A
 ball still in play is kept on the ground (`fn_8005418C`) or collided with the ground
-(`Ball_Collide`), then swept against trees and objects (`fn_80054040`: event 0x27, and a bounce
+(`Ball_Collide`), then swept against trees and objects (`Physics_CheckDynObjCollisions`: event 0x27, and a bounce
 off it as surface 13). **Stall check:** every 4 seconds' worth of ticks the ball must have moved
 at least 4 inches since the last check, or it is stopped where it is. Then its speed, its
 height above the ground and its closest approach to the pin are updated.
 
-**In the air** (`Ball_FlightStep`):
+**In the air** (`Physics_BallFlying`):
 
 - **Wind is weaker near the ground**: below 25 ft it is scaled by 0.25 + 0.75 x height / 25 ft -
   a quarter of the wind at ground level. A CPU's wind is clamped to +-15 per axis (as before).
@@ -721,16 +721,16 @@ fairways about 1.6x as sticky, and the putt table shortened to match, so your pu
 CPU both know. Settings 3 and 4 (faster) are never set by anything we have found.
 
 **The menu green speed is not in the putt table.** Options `+0x18` makes greens up to 20% less
-sticky, but `fn_80050D34` (putt power for a distance) ignores it. That does not break the aim
+sticky, but `Physics_EstimatePuttPower` (putt power for a distance) ignores it. That does not break the aim
 marker - the caddie and the CPU rehearse on the real physics - but a putt struck at the power the
 table gives for a distance rolls further on faster menu greens than the table says.
 
-Landings, lies, trees and water (`Ball_Collide`, `Ball_SetLie`, `fn_800539F8`, in C)
+Landings, lies, trees and water (`Ball_Collide`, `Physics_SetLie`, `fn_800539F8`, in C)
 ------------------------------------------------------------------------------------
 
 **Out of bounds** is 600 yards from where the shot started (squared distance over 360,000).
 
-**The lie** (`Ball_SetLie`, 99%), by surface class. LUCK (0..110, humans and CPUs in slots 0-3)
+**The lie** (`Physics_SetLie`, 99%), by surface class. LUCK (0..110, humans and CPUs in slots 0-3)
 enters three rolls; a simulation rolls 0, which always gives the kind result:
 
 - 1, 2 -> lie 1 (fairway). 3, 18 -> lie 9 (green). 4 -> lie 10. 7, 16 -> lie 13 (water).
@@ -757,7 +757,7 @@ enters three rolls; a simulation rolls 0, which always gives the kind result:
 typo for a coin flip. A simulation, slot 4, or a perfect (lucky) shot rolls 0: a fixed +12, +12.
 So the CPU's rehearsal cannot predict where a tree sends the real ball.
 
-**The flagstick** (`fn_80053E98`): the pole (object type 11) stops a ball that reaches it along
+**The flagstick** (`Physics_CheckFlagstickHit`): the pole (object type 11) stops a ball that reaches it along
 the course's z axis only (the normal is +-z whatever the ball's direction), and a real ball sets
 the flag swaying by how far off-centre and how fast it hit. Nothing happens while it is still
 swaying.

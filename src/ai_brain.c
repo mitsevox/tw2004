@@ -252,22 +252,22 @@ u8 AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance) {
         if (fPower > 1.5f) {
             fPower = 1.5f;
         }
-        fn_80050D24_SetSimulating(1);
+        Physics_SetSimulating(1);
         // Always the normal trajectory.
         Physics_ShotImpact(&gSimBall, p->nClub, p->nShotKind, fPower, p->fAim, 1, p->vLaunchA, p->vLaunchB);
-        fn_80050D24_SetSimulating(0);
+        Physics_SetSimulating(0);
         p->nRehearseState = 1;
         break;
 
     case 1:     // step
         gSimAborted = 0;
-        fn_80050D24_SetSimulating(1);
+        Physics_SetSimulating(1);
         if (bFast) {
             fn_8005585C_SimForTime(&gSimBall, 0.1f, 1.0f);
         } else {
             fn_8005585C_SimForTime(&gSimBall, 0.2f, 1.0f);
         }
-        fn_80050D24_SetSimulating(0);
+        Physics_SetSimulating(0);
         if (gSimAborted) {
             if (gSimHaveResult) {
                 p->vTarget[0]       = gSimBestAim[0];

@@ -1204,8 +1204,8 @@ void GM_SimulateBallMovement(int nPlayer) {
         fBudget = 0.83f;
     }
     if (gSession.nSplitScreen == 0 && gSession.fFrameTime > 0.0f) {
-        fn_80050D24_SetSimulating(1);
-        fn_80050D2C(1);
+        Physics_SetSimulating(1);
+        Physics_SetSimFullCup(1);
         while (gPlayers[nPlayer].ballBefore.nState != 1 && gPlayers[nPlayer].ballBefore.nState != 5 &&
                gPlayers[nPlayer].ballBefore.nState != 0 && fBudget > 0.1f) {
             t0 = TI_sReadCounter(0);
@@ -1229,8 +1229,8 @@ void GM_SimulateBallMovement(int nPlayer) {
                 break;
             }
         }
-        fn_80050D2C(0);
-        fn_80050D24_SetSimulating(0);
+        Physics_SetSimFullCup(0);
+        Physics_SetSimulating(0);
         if (SitDev_PredictedEmotionAvailable(nPlayer)) {
             nResult = fn_8006AA9C(nPlayer);
             bReact  = nResult == 8 || nResult == 9;

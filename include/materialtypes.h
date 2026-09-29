@@ -14,7 +14,7 @@
 typedef struct SurfaceType {
     f32  f00;                   // 0x00  launch: share of the speed kept; + the ball's f70 (Physics_GetLiePowerPercentage).
                                 //       TW06: impactV
-    f32  f04;                   // 0x04  lie: size of the random lie quality (Ball_SetLie).
+    f32  f04;                   // 0x04  lie: size of the random lie quality (Physics_SetLie).
                                 //       TW06: impactV_Modifier
     f32  f08;                   // 0x08  launch: spin factor. TW06: impactSpin
     f32  f0C;                   // 0x0C  bounce restitution; below 0: branches/leaves (randomised, LUCK).
@@ -28,7 +28,7 @@ typedef struct SurfaceType {
     f32  f24;                   // 0x24  bounce: how hard a landing it takes to bend the normal (softness).
                                 //       TW06: terminalVy
     f32  f28;                   // 0x28  bounce: base softness. TW06: surfaceFriction
-    u32  nClass;                // 0x2C  surface class (TW06: lieID), not a Lie_t. Ball_SetLie makes the lie
+    u32  nClass;                // 0x2C  surface class (TW06: lieID), not a Lie_t. Physics_SetLie makes the lie
                                 //       from it: 1, 2 fairway; 3 green; 4 fringe; 5, 11 rough; 6, 20 sand;
                                 //       7, 16 water; 8 cart path; 12 the cup; 18 green (holes a ball, as 12).
                                 //       17 = tree; 19 = not playable (Ter_CalcLowestPlayableWorldHeight)

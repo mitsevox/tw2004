@@ -210,7 +210,7 @@ the attribute; (2) above that, PUTTING shrinks a stroke error under 0.436 (at 10
 The CPU gets the mirror image: no error on putts under 1.5 units, angle error halved under 5.
 The physics-side question (a pull toward the cup, capture radius) is still open.
 
-**Result (2026-09-22, `Ball_CupPull` in C):** **yes, there is a pull.** Inside 5.5 in of the pin
+**Result (2026-09-22, `Physics_ApplySuperSucka` in C):** **yes, there is a pull.** Inside 5.5 in of the pin
 (the physics is in yards; we first misread it as metres), while the ball is still short of the
 hole, a ball heading within 30 degrees of the cup (or within 3.5 in regardless) gets `0.455 x dt x (pin - ball)` added to its velocity each frame - an
 acceleration toward the cup - limited so it never speeds the ball up along an axis on which it
@@ -239,13 +239,13 @@ putts of the same length, run through the real rehearsal and ball code.
 **Leads already known:** `AI_ApplyError` (in C) does read the distance for putts: no error at all
 under 1.5 units, the angle error halved under 5, above that up to 8 degrees of aim and 20% / 10%
 of distance, scaled by `(100 - PUTTING)`. The shot itself comes from `AI_RehearseShot`, which
-solves for the ball *stopping* within 1.8 in of the pin, and `Ball_CupPull` pulls in any ball
+solves for the ball *stopping* within 1.8 in of the pin, and `Physics_ApplySuperSucka` pulls in any ball
 within 5.5 in of the pin that is heading within 30 degrees of the cup. So the question is how
 those combine on a real green: does the pull swallow the error on straight putts, and does an
 aim or pace error on a breaking putt move the ball's line more than the same error does on a
 straight one?
 
-**Where to look:** `AI_ApplyError` (`Golfer.c`), `AI_RehearseShot`, `Ball_CupPull`, the green slope
+**Where to look:** `AI_ApplyError` (`Golfer.c`), `AI_RehearseShot`, `Physics_ApplySuperSucka`, the green slope
 code (`GoGreenGrid.c`, `0x8009B68C`) and the putt part of the ball physics.
 
 **Result (2026-09-22):** **half right: distance is coded, but break causes misses by itself.**
@@ -278,7 +278,7 @@ counts).
 **Update (2026-09-23, rolling code in C):** two more things push the same way. (1) The break per
 tick is `slope / spin`, and spin is proportional to speed, so a firmer ball really does take
 less break - the +5% pace is a line error on every breaking putt. (2) The CPU's rehearsal runs
-**without the cup pull** (`Ball_CupPull` is skipped when simulating), so the real putt has help
+**without the cup pull** (`Physics_ApplySuperSucka` is skipped when simulating), so the real putt has help
 at the hole that the rehearsal never counted; that only rescues putts that arrive close.
 
 **Update (2026-09-23, measured):** `tools/research/putt_sim.py` ports the skid, roll, break, cup
@@ -435,7 +435,7 @@ before or regardless of the ball's roll, and is the roll a real physics run that
 (b) How the caddy tip decides "straight in": what it measures (slope under the ball? along the
 line? just at the start?) compared with the slope the rolling ball actually feels.
 
-**Leads already known:** the cup capture (`Ball_CupPull`) acts only within 5.5 in of the pin and
+**Leads already known:** the cup capture (`Physics_ApplySuperSucka`) acts only within 5.5 in of the pin and
 30 degrees of heading, so a ball can reach the cup and still be rejected. This game is 2004, not
 2003, so the glitch itself may have been fixed; the code will say whether the gimme path still
 lets the ball roll freely.

@@ -415,7 +415,7 @@ They will be sorted into the sections below.
 - **[verified] Copy a real struct member, not a cast byte array:** the struct copy keeps the original's
   load/store order (FE_MessageTable GM_vShowAwardReplay 86 -> 100 with `SaveProfile.aReplay` as `Replay[5]`).
 - **[verified] EA's vector-scale helpers take the scale first** (TW07 `LLMath_Scale3(float, const float*,
-  float*)`): Vec3_Scale / LLMath_Scale fixed in 149 calls; Ball_FlightStep became exact.
+  float*)`): Vec3_Scale / LLMath_Scale fixed in 149 calls; Physics_BallFlying became exact.
 - **Permuter traps:** it ignores branch targets, so a "score 0" result can move a statement out of its `if`
   and change the behaviour (uiText UIText_Draw); check the diff's meaning. A float operand swap can
   score higher but fuse the other multiply into `fmadds` and round differently (AI_ChooseTarget): check
@@ -1229,7 +1229,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   `fn_800EDE7C`, GameMode24 `fn_800F0518`, GameMode5 `PlayNow_RegisterStreamClients` all went exact once it was
   dropped. Check each extra argument m2c shows against the callee's definition.
 - **[verified] An unexplained `mr r3, r4` before the first call** means an unused first
-  parameter: the function takes something in r3 it never reads (`fn_80051124(Ball*, f32, f32*)`).
+  parameter: the function takes something in r3 it never reads (`Physics_GetFeetAngle_RightLeft(Ball*, f32, f32*)`).
 - **[verified] 64-bit arguments skip r4.** `fn(handle, 0, k)` sites where the original sets r5 and
   r6 but never r4 are `fn(handle, (unsigned long long)k)`: a 64-bit integer goes in an aligned
   register pair (r5:r6). The animation-event lookups (`Character_GetTagTime`, `Character_IsTagSet`,
@@ -1339,7 +1339,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   first time written with `goto done;`. Do not assume it must be nested `if`/`else`.
 - **[verified] One result variable for every return.** A lookup whose float registers would
   not settle matched once both returns went through one local: `p = k * (i - 1); p = k * t + p;
-  return p; ... p = 1.1f; return p;` (`fn_80050D34`, found by the permuter).
+  return p; ... p = 1.1f; return p;` (`Physics_EstimatePuttPower`, found by the permuter).
 - **[verified] A boolean result** `return a && b;` (u8 function) gives `li r5,0 ... mr r5,r3` where
   r3 still holds the constant 1 used in the test; nested ifs setting a flag do not.
 - **[verified] A draft that "falls off the end" still has real returns.** m2c sometimes shows a
@@ -1424,9 +1424,9 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
 - **[verified] `a + b*c` where the original fuses the *other* product.** CodeWarrior evaluates
   the heavier operand first and fuses the last product into `fmadds`; swapping the operands in
   the source changes nothing. To fuse `spin * (...)` and keep `k * speed` as the addend, compute
-  the addend into a local first: `t = k * speed; x = spin * (...) + t;` (`Ball_FlightStep`).
+  the addend into a local first: `t = k * speed; x = spin * (...) + t;` (`Physics_BallFlying`).
 - **[verified] A squared distance written inline.** `(a[0] - b[0]) * (a[0] - b[0]) + ...` matched
-  where every spelling with a named difference was one register off (`fn_80053E98`).
+  where every spelling with a named difference was one register off (`Physics_CheckFlagstickHit`).
 - **[verified] Multiplication operand order.** With two variables, `a * b` and `b * a` produce
   `fmuls` with the operands in source order, so flip the C if only that differs. With a constant,
   flipping the C changed nothing: `x * 0.5f` and `0.5f * x` both came out constant-first.

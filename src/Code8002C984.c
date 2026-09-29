@@ -199,7 +199,7 @@ f32 AI_MaxDistance(int nPlayer, int nKind, int nClub) {
         fMax = 60.0f;
     } else {
         Player* p = &gPlayers[nPlayer];
-        fMax = fn_80050F44(nKind, nClub);
+        fMax = Physics_EstimateShotDistance100(nKind, nClub);
         if (nKind == SHOT_TYPE_DRIVE_e || nKind == 7 || nKind == 4 || nKind == 6) {
             f32 fPower = (f32)(s8)Golfer_GetAttribute(p, ATTR_POWER, ATTR_TOTAL);
             if (fPower < 100.0f) {
@@ -296,7 +296,7 @@ int Shot_Trajectory(int nPlayer) {
 f32 AI_PowerForTarget(int nPlayer) {
     Player* p = &gPlayers[nPlayer];
     if (p->nShotKind == SHOT_TYPE_PUTT_e) {
-        return fn_80050D34(p->fDistance);
+        return Physics_EstimatePuttPower(p->fDistance);
     }
     if (p->nShotKind == SHOT_TYPE_CHIP_e) {
         return Physics_EstimateShotPower(p->fDistance, &p->ball, SHOT_TYPE_CHIP_e, p->nClub);
@@ -309,7 +309,7 @@ f32 AI_PowerScale(int nPlayer) {
     Player* p = &gPlayers[nPlayer];
     f32 fTable;
     if (p->nShotKind == SHOT_TYPE_DRIVE_e || p->nShotKind == 7 || p->nShotKind == 4 || p->nShotKind == 6) {
-        fTable = fn_80050F44(p->nShotKind, p->nClub);
+        fTable = Physics_EstimateShotDistance100(p->nShotKind, p->nClub);
         return AI_MaxDistance(nPlayer, p->nShotKind, p->nClub) / fTable;
     }
     return 1.0f;

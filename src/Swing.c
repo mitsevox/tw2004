@@ -1278,7 +1278,7 @@ f32 SW_vCalculateShotPower(int nPlayer) {
         if (*pPower > gpSwing->fPuttFullPower) {
             *pPower = 1.0f;
         }
-        fPower = *pPower * fn_80050D34(fDist);
+        fPower = *pPower * Physics_EstimatePuttPower(fDist);
         Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_PUTTING, ATTR_TOTAL);
         if (fPower < 0.1f) {
             fPower = 0.1f;

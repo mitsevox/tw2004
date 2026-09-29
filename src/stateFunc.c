@@ -313,11 +313,11 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
     }
     if (gPlayers[nPlayer].ball.nState != 0 && gPlayers[nPlayer].ball.nCollideCount == 0) {
         nSteps = GameEffects_BallUpdatesThisFrame(nPlayer);
-        fn_80050D24_SetSimulating(1);
+        Physics_SetSimulating(1);
         for (i = 0; i < nSteps; i++) {
             Physics_Simulate(&gPlayers[nPlayer].ball, 20);
         }
-        fn_80050D24_SetSimulating(0);
+        Physics_SetSimulating(0);
     } else if (gPlayers[nPlayer].ball.nState != 0) {
         Physics_DropBall(&gPlayers[nPlayer].ball, gPlayers[nPlayer].ball.vPos);
     }
@@ -1011,9 +1011,9 @@ void STATEFUNC_GreenWatchRollUpdate(int nPlayer) {
         return;
     }
     for (i = 0; i < nSteps; i++) {
-        fn_80050D24_SetSimulating(1);
+        Physics_SetSimulating(1);
         Physics_Simulate(&gPlayers[nPlayer].ballBefore, 20);
-        fn_80050D24_SetSimulating(0);
+        Physics_SetSimulating(0);
         if (gPlayers[nPlayer].ballBefore.nState == 1 || gPlayers[nPlayer].ballBefore.nState == 5) {
             if (!CameraController_IsFadeOn(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]))) {
                 CameraController_FadeOut(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]),
@@ -1534,14 +1534,14 @@ void STATEFUNC_FadeToTapInInit(int nPlayer) {
 }
 
 // State 15 (fade to tap-in): while the camera moves, the CPU's rehearsal runs on the player -
-// human or not, made a CPU for the call, with fn_80050D2C on - until it solves the tap-in. When the
+// human or not, made a CPU for the call, with Physics_SetSimFullCup on - until it solves the tap-in. When the
 // camera finishes: solved -> camera move and state 16 (the tap-in is played for the player);
 // not yet -> the turn ends (GM_EndOfGolferTurn) unless it had been solved before.
 void STATEFUNC_FadeToTapInUpdate(int nPlayer) {
     Vec4  vOffset = {0.0f, 0.0f, 0.0f, 0.5f};
     f32   vSaved[4];
 
-    fn_80050D2C(1);
+    Physics_SetSimFullCup(1);
     if (gPlayers[nPlayer].bRehearsalDone == 0) {
         int  nController = gPlayers[nPlayer].nController;
         gPlayers[nPlayer].nController = CONTROLLER_CPU;
@@ -1565,7 +1565,7 @@ void STATEFUNC_FadeToTapInUpdate(int nPlayer) {
                                            (f32*)&vOffset);
         }
     }
-    fn_80050D2C(0);
+    Physics_SetSimFullCup(0);
 }
 
 void STATEFUNC_FadeToTapInExit(int nPlayer) {
@@ -1727,12 +1727,12 @@ void STATEFUNC_RemoveBallUpdate(int nPlayer) {
                 if (nState != 1 && nState != 5 && nState != 0) {
                     Player* p;
                     Ball*   pKept;
-                    fn_80050D24_SetSimulating(1);
+                    Physics_SetSimulating(1);
                     p     = &gPlayers[nPlayer];
                     pKept = &p->ballBefore;
                     Physics_Simulate(pKept, 20);
                     Vec3Copy(pKept->vPos, p->ball.vPos);
-                    fn_80050D24_SetSimulating(0);
+                    Physics_SetSimulating(0);
                 }
             }
         }

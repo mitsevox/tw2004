@@ -18,7 +18,7 @@ u32 gEventIdleSeconds;                      // seconds counted by EVENT_Idle (ev
 void Character_InitNewClubAndShotType(int nPlayer);
 void fn_80033704(u16 nPatch, u16 nObject);
 void fn_8003349C(f32 fPercentage, f32 fDuration, f32 fDelay);
-void fn_80051C84(Ball* pBall, f32 fX, f32 fY);
+void Physics_SetSpin(Ball* pBall, f32 fX, f32 fY);
 void SW_vSetDisplayBoostUI(int nPlayer, int bDisplay);
 void SW_vGetCurrentSpin(int nPlayer, f32* pfSide, f32* pfForward);
 void SW_vCloseSpinWindow(int nPlayer);
@@ -396,7 +396,7 @@ void EVENT_TopOfArc(int nPlayer, int nEvent, void* pData, int nArg) {
 // event 28 unless a lesson blocks it, camera event 3 for the player's view, emotion event 2
 // (fn_8006ACF8), then EVENT_FirstBounceController8 for a player on controller 8,
 // EVENT_FirstBounceDefault otherwise (both empty), and the spin asked for with the stick
-// (SW_vGetCurrentSpin) goes onto the ball (fn_80051C84), saved to the replay first unless a replay
+// (SW_vGetCurrentSpin) goes onto the ball (Physics_SetSpin), saved to the replay first unless a replay
 // is playing.
 void EVENT_FirstBounce(int nPlayer, int nEvent, void* pData, int nArg) {
     f32 fSideSpin;
@@ -419,7 +419,7 @@ void EVENT_FirstBounce(int nPlayer, int nEvent, void* pData, int nArg) {
         if (!gSession.bReplay) {
             REPLAY_SaveSpin(nPlayer, fForwardSpin, fSideSpin);
         }
-        fn_80051C84(&gPlayers[nPlayer].ball, fSideSpin, fForwardSpin);
+        Physics_SetSpin(&gPlayers[nPlayer].ball, fSideSpin, fForwardSpin);
     }
 }
 

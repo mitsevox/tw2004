@@ -657,7 +657,7 @@ f32 Ter_CheckForDropLocation(CourseInfo* pCourse, f32* pPos, u8 bOnDropSurface, 
 }
 
 // TW06: bool Ter_LieIsPreferred(u32). Whether a surface class (SurfaceType.nClass, which TW06 calls
-// the lie ID; not a Lie_t) is a preferred place for a drop: classes 1 to 4, the ones Ball_SetLie
+// the lie ID; not a Lie_t) is a preferred place for a drop: classes 1 to 4, the ones Physics_SetLie
 // turns into the fairway (1, 2), green (3) and fringe (4) lies.
 u8 Ter_LieIsPreferred(u32 nClass) {
     if (nClass == 1 || nClass == 2 || nClass == 3 || nClass == 4) {

@@ -168,7 +168,7 @@ typedef struct Ball {
     s32  nSolidCollideCount;    // 0x84  TW06: solidCollideCount
     SurfaceType* pHitSurface;   // 0x88  what it last hit. TW06: pLastCollisionSurface
     TerObject* pHitObject;      // 0x8C  the object it last hit. TW06: pLastCollisionObject
-    HitObject* pHitActor;       // 0x90  the world object it last hit (fn_80054040). TW06: pLastCollisionActor
+    HitObject* pHitActor;       // 0x90  the world object it last hit (Physics_CheckDynObjCollisions). TW06: pLastCollisionActor
     s32  nPlayer;               // 0x94  -1 when nobody's. TW06: playerID
     u8   bHoled;                // 0x98  TW06: PBF_InHole
     u8   b99;                   // 0x99
@@ -322,10 +322,10 @@ typedef struct ClubRow {
     f32 fDist[11];
 } ClubRow;
 
-void fn_80050D24_SetSimulating(u8 bOn);        // rehearsals and look-aheads: no sounds, effects or tree roll
-void fn_80050D2C(u8 b);
-f32  fn_80050D34(f32 fDist);            // putt power for a distance
-f32  fn_80050F44(int nKind, int nClub); // a club's table reach for a shot kind
+void Physics_SetSimulating(u8 bOn);        // rehearsals and look-aheads: no sounds, effects or tree roll
+void Physics_SetSimFullCup(u8 b);
+f32  Physics_EstimatePuttPower(f32 fDist);            // putt power for a distance
+f32  Physics_EstimateShotDistance100(int nKind, int nClub); // a club's table reach for a shot kind
 f32  Physics_EstimateShotPower(f32 fDist, Ball* pBall, int nKind, int nClub);   // chip power from the ball's lie
 f32  Physics_GetLiePowerPercentage(Ball* pBall);          // the ball's f70 + its surface's f00; 1 without either
 void Physics_ThrowBall(Ball* pBall, f32* pDir, f32 fSpeed, f32* pFrom);
