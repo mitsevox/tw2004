@@ -124,26 +124,26 @@ void fn_8011E468();
 void fn_8011E4A4();
 void StreamManagerHole_RegisterStreamClients(void);
 void StreamManagerHole_UnregisterStreamClients(void);
-void fn_80014A60(void);
-void fn_80014DC0(void);
-void fn_80014DF8(void);
-void fn_80014E68(void* pArg);
-void fn_80014E6C(void* pArg);
-void fn_80014E70(void* pArg);
-void fn_80014E74(void* pArg);
-void fn_80014E78(void* pArg);
-void fn_80014E7C(void* pArg);
-void fn_80014E80(void* pArg);
-void fn_80014E84(void* pArg);
-void fn_80014E88(void* pArg);
-void fn_80014E8C(void* pArg);
+void StreamManagerHole_InitModule(void);
+void StreamManagerIngame_StreamSacFiles(void);
+void StreamManagerFEChar_InitModule(void);
+void StreamManagerIngame_BeginStreamCallbackIGChar(void* pArg);
+void StreamManagerFrontend_BeginStreamCallback(void* pArg);
+void StreamManagerLoadScreen_BeginStreamCallback(void* pArg);
+void StreamManagerFEChar_BeginStreamCallback(void* pArg);
+void StreamManagerGlobals_BeginStreamCallback(void* pArg);
+void StreamManagerHole_BeginStreamCallback(void* pArg);
+void StreamManagerIngame_EndStreamCallbackIGChar(void* pArg);
+void StreamManagerFrontend_EndStreamCallback(void* pArg);
+void StreamManagerLoadScreen_EndStreamCallback(void* pArg);
+void StreamManagerFEChar_EndStreamCallback(void* pArg);
 void fn_800153CC(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
 void fn_80015030(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
 void fn_80015334(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
 u32  Skalib_CurSlot(void);          // skalib.c
 int  Skalib_HasOverlays(int nSlot); // skalib.c
-void fn_80014E90(void* pArg);
-void fn_80014E94(void* pArg);
+void StreamManagerGlobals_EndStreamCallback(void* pArg);
+void StreamManagerHole_EndStreamCallback(void* pArg);
 void UStream_Close();
 s32 Stream_OpenStreamFiles();
 void fn_800150B8(void);
@@ -182,16 +182,21 @@ void StreamManager_InitModule(void) {
     gpStreamManagerLists->aParams[4].nNumFiles = 0;
     gpStreamManagerLists->aParams[5].nNumFiles = 0;
     gpStreamManagerLists->aParams[6].nNumFiles = 0;
-    fn_80014FA8(gszStreamFrontendFile, fn_80014E6C, fn_80014E84);
-    fn_80014FA8(gszStreamFECharFile, fn_80014E6C, fn_80014E84);
-    fn_80014F20(gszStreamLoadOnceFile, fn_80014E78, fn_80014E90);
-    fn_80014E98(gszStreamLoadOnceFile, fn_80014E78, fn_80014E90);
-    fn_80014E98(gszStreamStartupFile, fn_80014E78, fn_80014E90);
+    fn_80014FA8(gszStreamFrontendFile, StreamManagerFrontend_BeginStreamCallback,
+                StreamManagerFrontend_EndStreamCallback);
+    fn_80014FA8(gszStreamFECharFile, StreamManagerFrontend_BeginStreamCallback,
+                StreamManagerFrontend_EndStreamCallback);
+    fn_80014F20(gszStreamLoadOnceFile, StreamManagerGlobals_BeginStreamCallback,
+                StreamManagerGlobals_EndStreamCallback);
+    fn_80014E98(gszStreamLoadOnceFile, StreamManagerGlobals_BeginStreamCallback,
+                StreamManagerGlobals_EndStreamCallback);
+    fn_80014E98(gszStreamStartupFile, StreamManagerGlobals_BeginStreamCallback,
+                StreamManagerGlobals_EndStreamCallback);
     for (i = 0; i < 30; i++) {
         gStreamManagerCharAdded[i] = 0;
     }
-    fn_80014DF8();
-    fn_80014A60();
+    StreamManagerFEChar_InitModule();
+    StreamManagerHole_InitModule();
 }
 
 // ---- sweep code (not yet cleaned up) ----
@@ -210,7 +215,8 @@ void StreamManager_AddLoadScreenFile(int nFile) {
     char szName[0x40];   // size unknown: the frame allows 0x40..0x48 bytes
 
     sprintf(szName, gszStreamLoadScreenFileFmt, nFile);
-    fn_80015030(szName, fn_80014E70, fn_80014E88);
+    fn_80015030(szName, StreamManagerLoadScreen_BeginStreamCallback,
+                StreamManagerLoadScreen_EndStreamCallback);
 }
 
 // ---- sweep code (not yet cleaned up) ----
@@ -439,14 +445,15 @@ void StreamManagerHole_StreamFiles(void) {
     UI_InitLoadingBar();
     fn_80015324();
     if (gSession.n5B34 != 0) {
-        fn_8001529C(gSession.p5B30, fn_80014E7C, fn_80014E94);
+        fn_8001529C(gSession.p5B30, StreamManagerHole_BeginStreamCallback,
+                    StreamManagerHole_EndStreamCallback);
     } else {
         szCourse = GM_GetCourseName();
         szHole = GameManager_GetHoleName(Game_GetCurHoleNum());
         sprintf(szPath, gszStreamCourseDirFmt, szCourse);
         strcat(szPath, szHole);
         strcat(szPath, gszStreamHoleFileName);
-        fn_8001529C(szPath, fn_80014E7C, fn_80014E94);
+        fn_8001529C(szPath, StreamManagerHole_BeginStreamCallback, StreamManagerHole_EndStreamCallback);
     }
     fn_8001526C();
     do {
@@ -459,53 +466,64 @@ void StreamManagerHole_StreamFiles(void) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_80014A60(void) {
+// Called by StreamManager_InitModule; empty in this build. Named for its place beside the hole
+// manager's functions.
+void StreamManagerHole_InitModule(void) {
 }
 
 // ---- end of sweep code ----
 
-// Refill stream list 0 with the global data and character files and every player's golfer's
-// character file.
-void fn_80014A64(void) {
+// Refill the in-game stream list (0) with GlbData.gcb, GlbChar.gcb and every player's golfer's
+// character file (data/Chars/<model + 1>char.gcb), clear gSacReloading and gStreamManagerCharAdded.
+// Called by GO_vInitIG.
+void StreamManagerIngame_SetupFileStream(void) {
     char szName[0x80];  // size unknown: the frame allows up to 0x84 bytes
     int nPlayer;
     int i;
 
     gSacReloading = 0;
     fn_800153BC();
-    fn_80015334(gszStreamGlbDataFile, fn_80014E78, fn_80014E90);
-    fn_80015334(gszStreamGlbCharFile, fn_80014E68, fn_80014E80);
+    fn_80015334(gszStreamGlbDataFile, StreamManagerGlobals_BeginStreamCallback,
+                StreamManagerGlobals_EndStreamCallback);
+    fn_80015334(gszStreamGlbCharFile, StreamManagerIngame_BeginStreamCallbackIGChar,
+                StreamManagerIngame_EndStreamCallbackIGChar);
     for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
         sprintf(szName, gszStreamCharFileFmt, Character_GetGolferModelID(nPlayer) + 1);
-        fn_80015334(szName, fn_80014E68, fn_80014E80);
+        fn_80015334(szName, StreamManagerIngame_BeginStreamCallbackIGChar,
+                    StreamManagerIngame_EndStreamCallbackIGChar);
     }
     for (i = 0; i < 30; i++) {
         gStreamManagerCharAdded[i] = 0;
     }
 }
 
-// Refill stream list 0 with the sac files: malesac for animation slot 0 and femsac for slot 1
-// when that slot has overlays, and every player's golfer's CharSac file.
-void fn_80014BB4(void) {
+// Refill the in-game stream list (0) with the sac files: malesac.gcb if animation slot 0 has
+// overlays, femsac.gcb if slot 1 has, and every player's golfer's CharSac file. Called by
+// Character_LoadSacFiles.
+void StreamManagerIngame_SetupSacFiles(void) {
     char szName[0x80];  // size unknown: the frame allows up to 0x88 bytes
     int nPlayer;
 
     fn_800153BC();
     if (Skalib_HasOverlays(0) != 0) {
-        fn_80015334(gszStreamMaleSacFile, fn_80014E78, fn_80014E90);
+        fn_80015334(gszStreamMaleSacFile, StreamManagerGlobals_BeginStreamCallback,
+                    StreamManagerGlobals_EndStreamCallback);
     }
     if (Skalib_HasOverlays(1) != 0) {
-        fn_80015334(gszStreamFemaleSacFile, fn_80014E78, fn_80014E90);
+        fn_80015334(gszStreamFemaleSacFile, StreamManagerGlobals_BeginStreamCallback,
+                    StreamManagerGlobals_EndStreamCallback);
     }
     for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
         sprintf(szName, gszStreamCharSacFileFmt, Character_GetGolferModelID(nPlayer) + 1);
-        fn_80015334(szName, fn_80014E68, fn_80014E80);
+        fn_80015334(szName, StreamManagerIngame_BeginStreamCallbackIGChar,
+                    StreamManagerIngame_EndStreamCallbackIGChar);
     }
 }
 
-// Refill stream list 0 with the current animation slot's sac file and the CharSac file of every
-// player whose golfer has an overlay loaded in that slot.
-void fn_80014C9C(void) {
+// Refill the in-game stream list (0) with the current animation slot's sac file (malesac.gcb for
+// slot 0, else femsac.gcb) and the CharSac file of every player whose golfer has an overlay in that
+// slot. Called by Character_ReloadSacFiles.
+void StreamManagerIngame_SetupCurSlotSacFiles(void) {
     char szName[0x80];  // size unknown: the frame allows up to 0x8C bytes
     u32 nSlot;
     int nPlayer;
@@ -516,9 +534,11 @@ void fn_80014C9C(void) {
     fn_800153BC();
     nSlot = Skalib_CurSlot();
     if (nSlot == 0) {
-        fn_80015334(gszStreamMaleSacFile, fn_80014E78, fn_80014E90);
+        fn_80015334(gszStreamMaleSacFile, StreamManagerGlobals_BeginStreamCallback,
+                    StreamManagerGlobals_EndStreamCallback);
     } else {
-        fn_80015334(gszStreamFemaleSacFile, fn_80014E78, fn_80014E90);
+        fn_80015334(gszStreamFemaleSacFile, StreamManagerGlobals_BeginStreamCallback,
+                    StreamManagerGlobals_EndStreamCallback);
     }
     pSlot = &gLibSlots[nSlot];
     for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
@@ -530,14 +550,18 @@ void fn_80014C9C(void) {
         }
         if (i < pSlot->nOverlays) {
             sprintf(szName, gszStreamCharSacFileFmt, nModel + 1);
-            fn_80015334(szName, fn_80014E68, fn_80014E80);
+            fn_80015334(szName, StreamManagerIngame_BeginStreamCallbackIGChar,
+                        StreamManagerIngame_EndStreamCallbackIGChar);
         }
     }
 }
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_80014DC0(void) {
+// Read the in-game stream list (0) to the end, drawing the loading screen, which the caller has
+// already set up (StreamManagerIngame_StreamFiles also inits it). Called by Character_LoadSacFiles
+// and Character_ReloadSacFiles.
+void StreamManagerIngame_StreamSacFiles(void) {
     fn_800150E0();
     do {
         UI_DrawLoadingScreenAndProgressBar(0);
@@ -545,60 +569,85 @@ void fn_80014DC0(void) {
     fn_800150B8();
 }
 
-void fn_80014DF8(void) {
+// Called by StreamManager_InitModule; empty in this build. Named for its place beside the FE
+// character manager's functions.
+void StreamManagerFEChar_InitModule(void) {
 }
 
 // ---- end of sweep code ----
 
-// Make stream list 3 hold only the front-end character file for character nChar
-// (data/FEChars/<nChar + 1>charfe.gcb), for the golfer the front end is loading.
-void fn_80014DFC(s32 nChar, s32 nUnused) {   // port: FEgolferanim.c passes a second argument this ignores
+// Make the FE character stream list (3) hold only character nChar's front-end file
+// (data/FEChars/<nChar + 1>charfe.gcb), and mark the CrAP golfer as not yet streamed (nStreamedId =
+// -1). Called by FE_StreamFunc_SkinInit.
+void StreamManagerFEChar_SetupFileStream(s32 nChar, s32 nUnused) { // port: FEgolferanim.c passes a second argument this ignores
     char szName[0x100];  // size unknown: the frame allows up to 0x100 bytes
 
     fn_80015454();
     sprintf(szName, gszStreamFECharFileFmt, nChar + 1);
     gpCrAPState->pB8->nStreamedId = -1;
-    fn_800153CC(szName, fn_80014E74, fn_80014E8C);
+    fn_800153CC(szName, StreamManagerFEChar_BeginStreamCallback, StreamManagerFEChar_EndStreamCallback);
 }
 
 // ---- sweep code (not yet cleaned up) ----
 
-// Stream file callbacks that do nothing: fn_80014E68..fn_80014E7C are called when a list's file
-// is opened, fn_80014E80..fn_80014E94 when it is closed.
-void fn_80014E68(void* pArg) {
+// The stream opened callback of the in-game character files (GlbChar.gcb, data/Chars, data/CharSac)
+// (UStream calls it when the file is opened). Empty in this build.
+void StreamManagerIngame_BeginStreamCallbackIGChar(void* pArg) {
 }
 
-void fn_80014E6C(void* pArg) {
+// The stream opened callback of the front end's files (FEnd.gcb, FEChar.gcb) (UStream calls it when
+// the file is opened). Empty in this build.
+void StreamManagerFrontend_BeginStreamCallback(void* pArg) {
 }
 
-void fn_80014E70(void* pArg) {
+// The stream opened callback of the loading screen's file (Load<n>.gcb) (UStream calls it when the
+// file is opened). Empty in this build.
+void StreamManagerLoadScreen_BeginStreamCallback(void* pArg) {
 }
 
-void fn_80014E74(void* pArg) {
+// The stream opened callback of the FE character file (data/FEChars) (UStream calls it when the
+// file is opened). Empty in this build.
+void StreamManagerFEChar_BeginStreamCallback(void* pArg) {
 }
 
-void fn_80014E78(void* pArg) {
+// The stream opened callback of the global files (GlbData.gcb, LoadOnce.gcb, startup.gcb,
+// malesac/femsac) (UStream calls it when the file is opened). Empty in this build.
+void StreamManagerGlobals_BeginStreamCallback(void* pArg) {
 }
 
-void fn_80014E7C(void* pArg) {
+// The stream opened callback of the hole file (UStream calls it when the file is opened). Empty in
+// this build.
+void StreamManagerHole_BeginStreamCallback(void* pArg) {
 }
 
-void fn_80014E80(void* pArg) {
+// The stream closed callback of the in-game character files (GlbChar.gcb, data/Chars, data/CharSac)
+// (UStream calls it when the file is closed). Empty in this build.
+void StreamManagerIngame_EndStreamCallbackIGChar(void* pArg) {
 }
 
-void fn_80014E84(void* pArg) {
+// The stream closed callback of the front end's files (FEnd.gcb, FEChar.gcb) (UStream calls it when
+// the file is closed). Empty in this build.
+void StreamManagerFrontend_EndStreamCallback(void* pArg) {
 }
 
-void fn_80014E88(void* pArg) {
+// The stream closed callback of the loading screen's file (Load<n>.gcb) (UStream calls it when the
+// file is closed). Empty in this build.
+void StreamManagerLoadScreen_EndStreamCallback(void* pArg) {
 }
 
-void fn_80014E8C(void* pArg) {
+// The stream closed callback of the FE character file (data/FEChars) (UStream calls it when the
+// file is closed). Empty in this build.
+void StreamManagerFEChar_EndStreamCallback(void* pArg) {
 }
 
-void fn_80014E90(void* pArg) {
+// The stream closed callback of the global files (GlbData.gcb, LoadOnce.gcb, startup.gcb,
+// malesac/femsac) (UStream calls it when the file is closed). Empty in this build.
+void StreamManagerGlobals_EndStreamCallback(void* pArg) {
 }
 
-void fn_80014E94(void* pArg) {
+// The stream closed callback of the hole file (UStream calls it when the file is closed). Empty in
+// this build.
+void StreamManagerHole_EndStreamCallback(void* pArg) {
 }
 
 // ---- end of sweep code ----

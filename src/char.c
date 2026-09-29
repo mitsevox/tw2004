@@ -73,9 +73,9 @@ char gClubGripVariantNames[6][13] = {"Defaults", "Defaults", "Defaults", "Defaul
 // char.c's first string at 0x801870FC, which a separate char.o could not start at).
 #include "../src/char_tex_manager.c"
 
-void  fn_80014BB4(void);
-void  fn_80014C9C(void);
-void  fn_80014DC0(void);
+void  StreamManagerIngame_SetupSacFiles(void);
+void  StreamManagerIngame_SetupCurSlotSacFiles(void);
+void  StreamManagerIngame_StreamSacFiles(void);
 void  Character_ExecuteTextureSwapFE(Character* pChar);
 void  CharacterTex_Init(void);
 void  CharacterTex_Close(void);
@@ -1695,27 +1695,27 @@ void Character_UnregisterSacStreamClient(void) {
 }
 
 // Loads the round's sac animation files, merging each as it arrives (Character_LoadSacFromStream):
-// fn_80014BB4 fills stream list 0 with the slots' malesac / femsac and every player's CharSac file,
-// fn_80014DC0 loads until done.
+// StreamManagerIngame_SetupSacFiles fills stream list 0 with the slots' malesac / femsac and every
+// player's CharSac file, StreamManagerIngame_StreamSacFiles loads until done.
 void Character_LoadSacFiles(void) {
     Character_RegisterSacStreamClient();
-    fn_80014BB4();
-    fn_80014DC0();
+    StreamManagerIngame_SetupSacFiles();
+    StreamManagerIngame_StreamSacFiles();
     Character_UnregisterSacStreamClient();
 }
 
 // Before each hole after the first, with more than one player: the animation slot's libraries are
 // rebuilt from their copies (AnimLib_ReloadSlot), its sac files are streamed in and merged
-// (fn_80014C9C, Character_LoadSacFromStream), and the current slot's work copies freed
-// (gSacReloading set). Then AnimStream_AssignSlots gives the first two players to play an animation
-// stream slot each.
+// (StreamManagerIngame_SetupCurSlotSacFiles, Character_LoadSacFromStream), and the current slot's
+// work copies freed (gSacReloading set). Then AnimStream_AssignSlots gives the first two players to
+// play an animation stream slot each.
 void Character_ReloadSacFiles(void) {
     if (gSession.nNumPlayers > 1) {
         gSacReloading = 1;
         AnimLib_ReloadSlot();
         Character_RegisterSacStreamClient();
-        fn_80014C9C();
-        fn_80014DC0();
+        StreamManagerIngame_SetupCurSlotSacFiles();
+        StreamManagerIngame_StreamSacFiles();
         Character_UnregisterSacStreamClient();
         AnimLib_FreeWorkCopies();
     }

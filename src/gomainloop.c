@@ -55,7 +55,7 @@ void StreamManagerStartup_StreamFiles(void);
 void StreamManagerGlobals_RegisterStreamClients(void);
 void StreamManagerGlobals_UnregisterStreamClients(void);
 void StreamManagerGlobals_StreamFiles(void);
-void fn_80014A64(void);
+void StreamManagerIngame_SetupFileStream(void);
 void DS_vInitModule(void);
 void DS_vCloseModule(void);
 void fn_80016198(void);
@@ -629,7 +629,7 @@ void GO_vInitIG(void) {
     ComicCam_InitComicCam();
     Kernel_InitModule();
     fn_8006DCA0(0);
-    fn_80014A64();
+    StreamManagerIngame_SetupFileStream();
     UI_LoadLoadingBarTexture();
     StreamManagerIngame_StreamFiles();
     StreamManagerIngame_UnregisterStreamClients();

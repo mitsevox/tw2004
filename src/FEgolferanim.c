@@ -368,10 +368,10 @@ void FE_StreamFunc_IdleInterrupt(void) {
 }
 
 // The skin state's start: open the stream of the front-end character file of the golfer being
-// loaded (pB8; fn_80014DFC, FE_OpenGolferStream) and note his id as streamed (nStreamedId, n8C);
-// n190 counts the loads.
+// loaded (pB8; StreamManagerFEChar_SetupFileStream, FE_OpenGolferStream) and note his id as
+// streamed (nStreamedId, n8C); n190 counts the loads.
 void FE_StreamFunc_SkinInit(void) {
-    fn_80014DFC(gpCrAPState->pB8->nGolferId, gpCrAPState->pB8->nIndex);
+    StreamManagerFEChar_SetupFileStream(gpCrAPState->pB8->nGolferId, gpCrAPState->pB8->nIndex);
     FE_OpenGolferStream();
     gpCrAPState->pB8->nStreamedId = gpCrAPState->pB8->nGolferId;
     gpCrAPState->n8C = gpCrAPState->pB8->nGolferId;
@@ -1905,8 +1905,8 @@ void FE_ResetCrAPGolferFromPreview(void) {
     FE_SetDelayTextureSwap(0, 0.0f);
 }
 
-// Open the stream of stream list 3, the front-end golfer file fn_80014DFC puts there, and keep it
-// in gpStreamManagerLists->nStream.
+// Open the stream of stream list 3, the front-end golfer file StreamManagerFEChar_SetupFileStream
+// puts there, and keep it in gpStreamManagerLists->nStream.
 void FE_OpenGolferStream(void) {
     gpStreamManagerLists->nStream = Stream_OpenStreamFiles(&gpStreamManagerLists->aParams[3]);
 }

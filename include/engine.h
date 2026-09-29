@@ -354,7 +354,7 @@ extern struct UStreamObject* lbl_80281C0C;   // LoadData.c: a copy of the 'txf2'
 
 void StreamManager_AddLoadScreenFile(int n); // add loading file n to stream list 2 (sprintf'd name)
 void StreamManagerLoadScreen_StreamFiles(void); // streammanagerhole.c
-void fn_80014DFC(s32 nChar, s32 nUnused);   // streammanagerhole.c: stream list 3 = one FEChars file
+void StreamManagerFEChar_SetupFileStream(s32 nChar, s32 nUnused); // streammanagerhole.c: stream list 3 = one FEChars file
 // LLTex.c: points at a flag byte RenderState_SetConstantAlphaActive (Code80015470.c) sets; while
 // it is set, the shader objects' untextured stage takes its alpha from the constant colour, not
 // the vertex colour (GoShaderObjectCommon_ShaderObjectsData_Gc.c fn_800740F4).

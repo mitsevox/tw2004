@@ -75,14 +75,14 @@ typedef struct StreamLists {
 } StreamLists;
 extern StreamLists* gpStreamManagerLists;
 extern char gszStreamLoadScreenFileFmt[]; // "data/Load/Load%d.gcb" (streammanagerhole.c StreamManager_AddLoadScreenFile)
-extern char gszStreamFECharFileFmt[]; // "data/FEChars/%02dcharfe.gcb" (streammanagerhole.c fn_80014DFC)
+extern char gszStreamFECharFileFmt[]; // "data/FEChars/%02dcharfe.gcb" (streammanagerhole.c StreamManagerFEChar_SetupFileStream)
 extern char gszStreamFrontendFile[]; // "data/FEnd/FEnd.gcb" (streammanagerhole.c StreamManager_InitModule)
 extern char gszStreamFECharFile[]; // "FEChar.gcb" (StreamManager_InitModule)
 extern char gszStreamLoadOnceFile[]; // "LoadOnce.gcb" (StreamManager_InitModule)
 extern char gszStreamStartupFile[]; // "startup.gcb" (StreamManager_InitModule)
-extern char gszStreamGlbDataFile[]; // "GlbData.gcb" (fn_80014A64)
-extern char gszStreamGlbCharFile[]; // "GlbChar.gcb" (fn_80014A64)
-extern char gszStreamCharFileFmt[]; // "data/Chars/%02dchar.gcb" (fn_80014A64)
+extern char gszStreamGlbDataFile[]; // "GlbData.gcb" (StreamManagerIngame_SetupFileStream)
+extern char gszStreamGlbCharFile[]; // "GlbChar.gcb" (StreamManagerIngame_SetupFileStream)
+extern char gszStreamCharFileFmt[]; // "data/Chars/%02dchar.gcb" (StreamManagerIngame_SetupFileStream)
 extern u8   gStreamManagerCharAdded[0x38]; // streammanagerhole.c: 30 flag bytes its list setups clear
 extern char gszStreamCourseDirFmt[]; // "data/%s/" (StreamManagerHole_StreamFiles)
 extern char gszStreamHoleFileName[]; // "/hole.hog" (StreamManagerHole_StreamFiles)
