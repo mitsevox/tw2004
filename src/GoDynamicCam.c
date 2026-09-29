@@ -450,7 +450,7 @@ void DynamicCam_DeInit(void) {
 // time f), 7 DynamicCam_TrackBallVelocityTight, 9 DynamicCam_TrackFixed. Then keeps it between the
 // shot's least and most height (f68, f6C) over the ground: the ground is measured when
 // CameraScript_SnapToScript holds for a shot other than the script's next one (on course 12 with
-// Game_GetCurHoleNum 10, fn_8004D5F0's height within 40 of the player's tee; else
+// Game_GetCurHoleNum 10, Ter_GetLowestGroundHeight's height within 40 of the player's tee; else
 // CamScript_GuessBestPlayableHeight, raised for a kind 4 shot that is neither a swing camera nor
 // tracks the golfer to the lower of the pin and the tee) and kept in the script's fD8; without
 // course data it is 0 (the shot's f68 on the CrAP screen, game type 3). A swing camera or one that
@@ -513,7 +513,7 @@ void DynamicCam_ProcessScript(CamShot* pShot, int nPlayer, CamScript* pScript, f
                 DynamicCam_Vec3Sub(&pCourse->tee[gSession.nTeeSet[nPlayer]].x, pOut, aOff);
                 aOff[1] = 0.0f;
                 if ((f32)Math_Sqrt(Vec3_LengthSqClamped(aOff)) < 40.0f) {
-                    fGround = fn_8004D5F0(pCourse, pOut);
+                    fGround = Ter_GetLowestGroundHeight(pCourse, pOut);
                 } else {
                     fGround = CamScript_GuessBestPlayableHeight(pOut, NULL);
                     if (pShot->bAD == 4 && !DynamicCam_bIsSwingCamera(pShot)
@@ -552,7 +552,7 @@ void DynamicCam_ProcessScript(CamShot* pShot, int nPlayer, CamScript* pScript, f
         fGround = 0.0f;
     }
     if (fGround < -60000.0f) {
-        fGround = fn_8004D5F0(pCourse, pOut);
+        fGround = Ter_GetLowestGroundHeight(pCourse, pOut);
     }
     if (DynamicCam_bIsSwingCamera(pShot) || CamScript_DoesScriptTrackGolfer(pShot)) {
         fDiff = gPlayers[nPlayer].vBall[1] - fGround;

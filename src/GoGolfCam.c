@@ -41,7 +41,7 @@ void     CameraController_BallIsOnScreen(int nPlayer);
 void     GolfCamera_ClampLookAngle(f32* pFrom, f32* pTo, f32* pOut);
 int      GolfCamera_LimitPositionChange(f32* pFrom, f32* pTo, f32* pOut, f32 fMax);
 // The segment crosses the outline (at pHit).
-u8       fn_8004B6F8(f32* pFrom, f32* pTo, f32* pHit);
+u8       Ter_CollisionWithOOBNetwork(f32* pFrom, f32* pTo, f32* pHit);
 f32      Camera_GetLensFovScale(CamLens* pLens);            // char.c: the lens's fB0
 void     fn_80038054(u8 a, int n, f32 f1, f32 f2);
 CamShot* GolfCamera_GetAlternateSwingCamera(int nFirst, int nPlayer);
@@ -2710,7 +2710,7 @@ u8 GolfCamera_ZoomCamGetStartAndEndVecs(View* pView, int nPlayer, f32* pSub, f32
                 bMoved = 1;
                 pCam[0] = vHit[0];
                 pCam[2] = vHit[2];
-            } else if (fn_8004B6F8(pCam, pAim, vHit)) {
+            } else if (Ter_CollisionWithOOBNetwork(pCam, pAim, vHit)) {
                 bMoved = 1;
                 pCam[0] = vHit[0];
                 pCam[2] = vHit[2];
@@ -2719,7 +2719,7 @@ u8 GolfCamera_ZoomCamGetStartAndEndVecs(View* pView, int nPlayer, f32* pSub, f32
                 pCam[0] = gPlayers[nPlayer].vBall[0] + (gPlayers[nPlayer].vBall[0] - pAim[0]);
                 pCam[2] = gPlayers[nPlayer].vBall[2] + (gPlayers[nPlayer].vBall[2] - pAim[2]);
             }
-        } else if (fn_8004B6F8(pCam, pAim, vHit)) {
+        } else if (Ter_CollisionWithOOBNetwork(pCam, pAim, vHit)) {
             bMoved = 1;
             pCam[0] = vHit[0];
             pCam[2] = vHit[2];

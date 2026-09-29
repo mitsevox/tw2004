@@ -15,7 +15,7 @@ int  fn_80048AD4(UObjMesh* pMesh, int i);
 int  fn_80048AE8(UObject* pObj);
 f32  fn_8001414C(u8* p);
 f32  Math_Tan(f32 f);
-void fn_8004B78C(CourseInfo* pCourse, f32* pPos);  // the ground's light at pPos
+void Ter_GetAmbientLight(CourseInfo* pCourse, f32* pPos);  // the ground's light at pPos
 void LF_SetCurrentBrightness(f32 f);
 void LF_LoadCurrentLights(void);
 void LI_SetObjectLights(UObject* pObj);
@@ -117,7 +117,7 @@ void fn_800488B4(UObject* pObj) {
     bLit = nFlags2 & 4;
     if (bLit) {
         if (gSession.nGameType != 3) {
-            fn_8004B78C(Ter_GetTGD(), pObj->m80[3]);
+            Ter_GetAmbientLight(Ter_GetTGD(), pObj->m80[3]);
             LF_SetCurrentBrightness(0.8f);
         }
         LF_LoadCurrentLights();

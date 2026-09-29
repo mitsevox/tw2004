@@ -125,7 +125,7 @@ void fn_80048DD0(void);
 void fn_80048E7C(void);
 void fn_8004950C(void);
 void fn_80049510(void);
-void fn_8004B1A4(void);
+void Ter_Init(void);
 void fn_80055D3C(void);
 void fn_80055D54(void);
 void fn_80055D6C(void);
@@ -614,7 +614,7 @@ void GO_vInitIG(void) {
     lbl_80281E54 = RC_spCreateRenderCtx(lbl_80281E60, lbl_80281E5C, lbl_80281E58);
     RC_vSetCurrentRenderCtx(lbl_80281E54);
     fn_80030254();
-    fn_8004B1A4();
+    Ter_Init();
     Aud_InitSession(1, 0, (gSession.nSplitScreen != 0) + 1, 0);
     fn_8006F608();
     fn_80014594();

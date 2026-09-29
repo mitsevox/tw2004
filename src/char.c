@@ -501,7 +501,7 @@ void Character_KeepClubOutOfGround(Character* pChar) {
     if (pChar->pClubSet != NULL && pChar->vAvgGroundNormal[1] > 0.9f) {
         pMtx = Character_GetBoneMatrix(pChar, 0x52);
         if (pMtx != NULL && (pCourse = Ter_GetTGD()) != NULL) {
-            fHeight = fn_8004D650(pCourse, pChar->aTestPoints[4], vNormal);
+            fHeight = Ter_GetCoveringGroundHeightAndNormal(pCourse, pChar->aTestPoints[4], vNormal);
             // the else's return is the dead second `b` after the fUnder return; !(<) keeps the
             // NaN case of `fHeight < -60000.0f`
             if (!(fHeight < -60000.0f)) {

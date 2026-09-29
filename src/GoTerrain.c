@@ -1926,7 +1926,7 @@ void fn_800342F0(UStreamObject* pObject) {
         lbl_801D3CB0.pCourse->tee[i].w = 0.0f;
         lbl_801D3CB0.pCourse->pin[i].w = 0.0f;
     }
-    fn_8004B1EC(lbl_801D3CB0.pCourse);
+    Ter_InitTGD(lbl_801D3CB0.pCourse);
     LF_vSetCurrentLightFogEnvironment(2);
     fn_800935CC(&lbl_801D3CB0.pCourse->lights);
     fn_80093900(lbl_801D3CB0.pCourse->p38);

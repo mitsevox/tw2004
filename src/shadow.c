@@ -290,7 +290,7 @@ void fn_800B28D4(Character* pChar, int nView, u8 bFlat) {
             if (fGround == -65536.125f || fGround > vPos[1] + 0.25f) {
                 fGround = fLow;
                 if (fGround == -65536.125f) {
-                    fGround = fn_8004D5F0(pCourse, vPos);
+                    fGround = Ter_GetLowestGroundHeight(pCourse, vPos);
                 }
             }
             vPos[1] = fGround;

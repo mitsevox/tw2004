@@ -899,7 +899,7 @@ void fn_80047C24(int nPlayer) {
     vMove[1] = vMove[1] + -4.9f * pB->f10 * pB->f10;
     fn_800486C8(vMove, pB->v20, pB->v30);
     pB->b0 = 1;
-    fGround = fn_8004D5F0(Ter_GetTGD(), pB->v30);
+    fGround = Ter_GetLowestGroundHeight(Ter_GetTGD(), pB->v30);
     if (pB->v30[1] < fGround) {
         pB->v30[1] = 0.01f + fGround;
         pB->b0 = 0;
@@ -1040,7 +1040,7 @@ void fn_80048184(int nPlayer) {
         vMove[1] = vMove[1] + -4.9f * pA->f10 * pA->f10;
         fn_800486C8(vMove, pA->v20, pA->v30);
         pA->b0 = 1;
-        fGround = fn_8004D5F0(Ter_GetTGD(), pA->v30);
+        fGround = Ter_GetLowestGroundHeight(Ter_GetTGD(), pA->v30);
         if (pA->v30[1] < fGround) {
             pA->v30[1] = 0.01f + fGround;
             pA->b0 = 0;

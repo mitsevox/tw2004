@@ -508,7 +508,7 @@ void CamScript_SmoothTerrainHeight(CamScript* pScript, f32* pCam, u8 b, int nPla
             fGround = pScript->fD8;
         }
         if (fGround < -60000.0f) {
-            fGround = fn_8004D5F0(pCourse, pCam);
+            fGround = Ter_GetLowestGroundHeight(pCourse, pCam);
             if (fGround < -60000.0f) {
                 fGround = pScript->fD8;
                 pScript->bE8 = 1;

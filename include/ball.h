@@ -104,7 +104,7 @@ typedef struct CourseInfo {
     f32  (*pVerts)[3];          // 0x28  TW06: pVertexList
     u8*    pTriFlags;           // 0x2C  per vertex, for the triangle that ends there: bits 0-2 = 0 skip it;
                                 //       bit 3 done (fn_80050794); bits 4-5 / 6-7 its highest / lowest corner
-    u8*    pLight;              // 0x30  per vertex: the light on the ground there, 0..255 (fn_8004B78C)
+    u8*    pLight;              // 0x30  per vertex: the light on the ground there, 0..255 (Ter_GetAmbientLight)
     TerCell* pGrid;             // 0x34  nGridWidth x nGridLength cells, row by row. TW06: pTerrainGrid (0x3C)
     CourseLightBlock* p38;      // 0x38  four optional blocks (NULL when absent); TW06 has its fog, sun,
     struct CourseGlowBlock* p3C;    // 0x3C    sky and lighting data in the same place. fn_800A27FC uses
@@ -273,7 +273,7 @@ f32  Ter_GetSupportingGroundTriangle(CourseInfo* pCourse, f32* pPos, TerCell** p
 SurfaceType* Ter_GetSupportingGroundMaterial(CourseInfo* pCourse, f32* pPos);   // surface type under a point
 
 // GoTerrainCollision (TW06's goterraincollision.c; types from its definitions)
-void fn_8004B1EC(CourseInfo* pCourse);          // TW06: Ter_InitTGD, readies a loaded course's data
+void Ter_InitTGD(CourseInfo* pCourse);          // TW06: Ter_InitTGD, readies a loaded course's data
 u8   Ter_Use3DCupGeometry(void);               // the cup is real geometry the ball drops into
 u8   Ter_PointInFreeDropNetwork(f32* pPos);    // inside a free-drop area
 u8   Ter_PointInOOBNetwork(f32* pPos);         // inside the in-bounds outlines (always, with none loaded)
@@ -287,11 +287,11 @@ u8   Ter_GetSupportingGroundNormal(CourseInfo* pCourse, f32* pPos, f32* pNormal)
 u8   fn_80050A9C(f32* pA, f32* pB, f32* pC, f32 fX, f32 fZ);   // (x, z) lies inside the triangle
 void fn_800509D8(f32 (*pTri)[3], f32* pPos, f32* pA, f32* pB, f32* pC);   // a point's weights in a triangle
 f32  Ter_GetHighestGroundHeight(CourseInfo* pCourse, f32* pPos);   // ground height, -65536.1 if none
-f32  fn_8004D5F0(CourseInfo* pCourse, f32* pPos);   // ground height (GoTerrainCollision.c)
+f32  Ter_GetLowestGroundHeight(CourseInfo* pCourse, f32* pPos);   // ground height (GoTerrainCollision.c)
 // Every ground height under and over pPos (up to nMax), with its surface; returns how many.
 u32  fn_8004DCC4(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurfaces, f32* pHeights, u32 nMax);
 f32  Ter_GetSupportingGroundHeight(CourseInfo* pCourse, f32* pPos);   // ground height, -60000 and below if none
-f32  fn_8004D650(CourseInfo* pCourse, f32* pPos, f32* pNormal);   // covering ground height and normal
+f32  Ter_GetCoveringGroundHeightAndNormal(CourseInfo* pCourse, f32* pPos, f32* pNormal);   // covering ground height and normal
 SurfaceType* Ter_GetSupportingWorldMaterial(CourseInfo* pCourse, f32* pPos);   // the surface under a point
 f32  Ter_GetSupportingGroundData(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurface, f32* pNormal);
 // The same with objects included (TW06: Ter_GetSupportingWorldData); GoTerrainCollision.c.

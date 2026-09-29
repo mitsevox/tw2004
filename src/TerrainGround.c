@@ -139,7 +139,7 @@ int fn_800CB950(CourseInfo* pCourse, f32* pA, f32* pB, f32* pC, f32* pD, TerPoly
 
 // The supporting ground triangle under a point: the highest one at or below it. Its height
 // there, the grid cell, the strip, the triangle's vertices and its number in the strip;
-// TER_NO_GROUND when there is none. The strips that count are those of fn_8004C8E0.
+// TER_NO_GROUND when there is none. The strips that count are those of Ter_GetHighestGroundTriangle.
 f32 Ter_GetSupportingGroundTriangle(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3],
                 s32* pTri) {
     u32 uPinSet = 1 << Game_CurrentPinSet();

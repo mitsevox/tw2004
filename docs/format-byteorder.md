@@ -52,7 +52,7 @@ Objects delivered by UStream
 | `stat` | Golfer_OnStatsLoaded | Golfer.c | swapped: Golfer_TableByteSwap > fn_80076158 | yes: copied over `gGolferTable[34]` (`GolferRecord`); only 0x98..0x140 of each record is swapped, in 8-byte units; the u32 at 0x90 is not. A `port:` note at the swap call |
 | `rcrd` | Session_OnRecordsLoaded | Golfer.c | none seen | yes: copied straight over `gSession.aCourseRecord`, big-endian; a `port:` note there (a little-endian port converts the records field by field) |
 | `ter ` | fn_800342B4 | GoTerrain.c | none seen | asm |
-| `tgd ` | fn_800342F0 | GoTerrain.c | none seen | yes: the course's collision data; `Ter_InitTGD` (fn_8004B1EC, GoTerrainCollision.c) lays `CourseInfo` (ball.h) over it and turns its offsets into pointers in place (`TER_RELOCATE`, 32-bit); `TerCell`, `TerPolyRef`, `TerObject` and the vertex list are read in place |
+| `tgd ` | fn_800342F0 | GoTerrain.c | none seen | yes: the course's collision data; `Ter_InitTGD` (Ter_InitTGD, GoTerrainCollision.c) lays `CourseInfo` (ball.h) over it and turns its offsets into pointers in place (`TER_RELOCATE`, 32-bit); `TerCell`, `TerPolyRef`, `TerObject` and the vertex list are read in place |
 | `tLOD` | fn_800341A4 | GoTerrain.c | none seen | asm |
 | `CAMS` | DynamicCam_LoadCAMSfromStream | GoDynamicCam.c | swapped: fn_80076158 | little-endian on disc |
 | `CAMV` (2) | DynamicCam_LoadCAMVfromStream, DynamicCam_LoadCAMVfromStreamFE | GoDynamicCam.c | swapped: DynamicCam_CopyScriptData > ByteSwap_Records | little-endian on disc |
@@ -97,8 +97,8 @@ walks; each loader gets its sub-chunk's bytes.
 | Sub-chunk | Loader | Unit | Swap | Overlay |
 |---|---|---|---|---|
 | 0: AI targets | AI_TargetsLoad | Golfer.c | none seen | yes: `AITargetDef` (golfer.h) laid over the chunk, count an s16 at +2 (read with `BES16`, include/endian.h); the loader also writes into the chunk (a self-link becomes -1); `gAITargets[i].pDef` points into it. A `port:` note at the overlay |
-| 1: out-of-bounds outlines | fn_8004B63C | GoTerrainCollision.c | none seen | yes: `TNetwork` (ball.h) pointers into the chunk |
-| 4: free-drop outlines | fn_8004B588 | GoTerrainCollision.c | none seen | yes: `TNetwork` pointers into the chunk |
+| 1: out-of-bounds outlines | Ter_OOBNetworkLoadCallback | GoTerrainCollision.c | none seen | yes: `TNetwork` (ball.h) pointers into the chunk |
+| 4: free-drop outlines | Ter_FreeDropNetworkLoadCallback | GoTerrainCollision.c | none seen | yes: `TNetwork` pointers into the chunk |
 
 The memory card
 ---------------

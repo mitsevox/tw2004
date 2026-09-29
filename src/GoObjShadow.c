@@ -14,7 +14,7 @@ void SD_FreeShaderObject(void* pMesh);
 void SD_DrawShaderObject(u8* pMesh);
 
 // GoTerrainCollision.c
-f32 fn_8004D80C(CourseInfo* pCourse, f32* pPos);
+f32 Ter_GetSupportingWorldHeight(CourseInfo* pCourse, f32* pPos);
 
 #define NUM_SHADOW_MESHES 5
 
@@ -50,7 +50,7 @@ void fn_80093DB8(Ball* pBall, int nPlayer) {
     TrailMeshDesc desc;
     f32 fGround;
     int i;
-    fGround = fn_8004D80C(Ter_GetTGD(), pBall->vPos);
+    fGround = Ter_GetSupportingWorldHeight(Ter_GetTGD(), pBall->vPos);
     if (-65536.125f != fGround) {
         RenderState_SetBankTexture(lbl_80281F50, lbl_80281F54);
         DS_vEnableZBufferUpdate(0);

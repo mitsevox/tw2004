@@ -27,9 +27,9 @@ s32       lbl_80281DC8;
 s32       lbl_80281DC4;
 u8        lbl_80281DC0;
 
-void  fn_8004B588(TNetwork* pNet);
+void  Ter_FreeDropNetworkLoadCallback(TNetwork* pNet);
 u8    Ter_LieIsPreferred(u32 nClass);
-void  fn_8004B63C(TNetwork* pNet);
+void  Ter_OOBNetworkLoadCallback(TNetwork* pNet);
 void  fn_8005097C(f32* pA, f32* pB, f32* pOut);           // a - b (paired-single assembly)
 void  fn_800509A0(f32* pSrc, f32* pDst);                  // negate (paired-single assembly)
 void  fn_800509BC(f32* pSrc, f32* pDst);                  // negate, four floats (paired-single assembly)
@@ -46,15 +46,19 @@ static inline int Ter_GridCell(f32 fCells) {
     return (int)Ter_Floor(fCells);
 }
 
-f32   fn_8004C8E0(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3],
+f32   Ter_GetHighestGroundTriangle(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef,
+                                   f32 (**ppTri)[3],
                   s32* pTri);
 void  fn_80050794(CourseInfo* pCourse);
 f32   Ter_CalcLowestPlayableWorldHeight(CourseInfo* pCourse);
-f32   fn_8004CB30(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3],
+f32   Ter_GetLowestGroundTriangle(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef,
+                                  f32 (**ppTri)[3],
                   s32* pTri);
-f32   fn_8004D01C(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3],
+f32   Ter_GetCoveringGroundTriangle(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef,
+                                    f32 (**ppTri)[3],
                   s32* pTri);
-void  fn_8004D2E0(CourseInfo* pCourse, f32* pPos, TerPolyRef** ppRefLow, f32* pLow, f32 (**ppTriLow)[3],
+void  Ter_GetSupportingAndCoveringGroundTriangles(CourseInfo* pCourse, f32* pPos, TerPolyRef** ppRefLow,
+                                                  f32* pLow, f32 (**ppTriLow)[3],
                   TerPolyRef** ppRefHigh, f32* pHigh, f32 (**ppTriHigh)[3]);
 u8    Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
                                   SurfaceType** ppSurface, TerObject** ppObj);
@@ -70,7 +74,7 @@ u8    fn_8004E0D4(f32* pFrom, f32* pDir, f32 fRange, f32* pCentre, f32 fRadius);
 int   fn_80050BD8(UObjMesh* pModel, int n);
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
-// 1.0f (0x80283288), before the constants fn_8004AFA0 uses first; its body is unknown.
+// 1.0f (0x80283288), before the constants Ter_LineTriangleIntersection uses first; its body is unknown.
 static f32 GoTerrainCollision_StrippedFn(f32 x) {
     return x + 1.0f;
 }
@@ -78,7 +82,8 @@ static f32 GoTerrainCollision_StrippedFn(f32 x) {
 // TW06: bool Ter_LineTriangleIntersection(f32*, f32*, f32, f32**, f32*, f32[4]*, f32[4]*). Where the
 // line from pFrom along pDir meets a triangle, as a fraction t of pDir (0 < t < fMax): t, the point
 // and the triangle's normal. A line along the triangle's plane never meets it.
-u8 fn_8004AFA0(f32* pFrom, f32* pDir, f32 fMax, f32 (*pTri)[3], f32* pT, f32* pHit, f32* pNormal) {
+u8 Ter_LineTriangleIntersection(f32* pFrom, f32* pDir, f32 fMax, f32 (*pTri)[3], f32* pT, f32* pHit,
+                                f32* pNormal) {
     f32 vP[4];
     f32 vQ[4];
     f32 vS[4];
@@ -119,11 +124,12 @@ u8 fn_8004AFA0(f32* pFrom, f32* pDir, f32 fMax, f32 (*pTri)[3], f32* pT, f32* pH
     return 1;
 }
 
-// Probably TW06's Ter_Init (the same size and file): register the course-file loaders for the
-// out-of-bounds (chunk 1) and free-drop (chunk 4) networks and forget the old ones.
-void fn_8004B1A4(void) {
-    Course_RegisterLoader(1, (void (*)(u8*))fn_8004B63C);
-    Course_RegisterLoader(4, (void (*)(u8*))fn_8004B588);
+// TW07's Ter_Init (the first function of GoTerrainCollision.c there): register the loaders for the
+// out-of-bounds (network type 1) and free-drop (network type 4) networks and forget the old ones.
+// Called when the game's systems start.
+void Ter_Init(void) {
+    Course_RegisterLoader(1, (void (*)(u8*))Ter_OOBNetworkLoadCallback);
+    Course_RegisterLoader(4, (void (*)(u8*))Ter_FreeDropNetworkLoadCallback);
     lbl_80281DC8 = 0;
     lbl_80281DC4 = 0;
 }
@@ -132,7 +138,7 @@ void fn_8004B1A4(void) {
 // its offsets become pointers; strips flagged for one of the four pin positions (flags 1, 2, 4, 8)
 // are 3D cup geometry, and each pin goes at the centre top of its geometry's bounds; then the
 // triangles' high and low corners and the course floor.
-void fn_8004B1EC(CourseInfo* pCourse) {
+void Ter_InitTGD(CourseInfo* pCourse) {
     u32 i;
     int k;
     int j;
@@ -226,8 +232,9 @@ u8 Ter_Use3DCupGeometry(void) {
     return lbl_80281DC0;
 }
 
-// TW06: void Ter_FreeDropNetworkLoadCallback(TNetwork*).
-void fn_8004B588(TNetwork* pNet) {
+// Network type 4's load callback (Ter_Init registers it): adds a loaded free-drop outline to the
+// hole's list. No check against MAX_FREE_DROP_NETWORKS.
+void Ter_FreeDropNetworkLoadCallback(TNetwork* pNet) {
     lbl_801D5428[lbl_80281DC4] = pNet;
     lbl_80281DC4++;
 }
@@ -243,8 +250,9 @@ u8 Ter_PointInFreeDropNetwork(f32* pPos) {
     return 0;
 }
 
-// TW06: void Ter_OOBNetworkLoadCallback(TNetwork*).
-void fn_8004B63C(TNetwork* pNet) {
+// Network type 1's load callback (Ter_Init registers it): adds a loaded out-of-bounds outline to
+// the hole's list. No check against MAX_OOB_NETWORKS.
+void Ter_OOBNetworkLoadCallback(TNetwork* pNet) {
     lbl_801D548C[lbl_80281DC8] = pNet;
     lbl_80281DC8++;
 }
@@ -268,7 +276,7 @@ u8 Ter_PointInOOBNetwork(f32* pPos) {
 
 // TW06: bool Ter_CollisionWithOOBNetwork(const f32*, const f32*, f32*). Whether the segment from
 // pFrom to pTo crosses one of the outlines, and where.
-u8 fn_8004B6F8(f32* pFrom, f32* pTo, f32* pHit) {
+u8 Ter_CollisionWithOOBNetwork(f32* pFrom, f32* pTo, f32* pHit) {
     int i;
 
     if (lbl_80281DC8 == 0) return 0;
@@ -282,18 +290,18 @@ u8 fn_8004B6F8(f32* pFrom, f32* pTo, f32* pHit) {
 // from the brightness byte of the triangle's vertex: the ground covering the point when it is
 // less than a quarter of a yard above it, else the ground under it, else the lowest ground. 1
 // (full light) with no ground, or on an object.
-f32 fn_8004B78C(CourseInfo* pCourse, f32* pPos) {
+f32 Ter_GetAmbientLight(CourseInfo* pCourse, f32* pPos) {
     TerCell* pCell;
     TerPolyRef* pRef;
     f32 (*pTri)[3];
     s32 nTri;
     f32 fHeight;
 
-    fHeight = fn_8004D01C(pCourse, pPos, &pCell, &pRef, &pTri, &nTri);
+    fHeight = Ter_GetCoveringGroundTriangle(pCourse, pPos, &pCell, &pRef, &pTri, &nTri);
     if (fHeight == TER_NO_GROUND || fHeight > pPos[1] + 0.25f) {
         fHeight = Ter_GetSupportingGroundTriangle(pCourse, pPos, &pCell, &pRef, &pTri, &nTri);
         if (fHeight == TER_NO_GROUND) {
-            fHeight = fn_8004CB30(pCourse, pPos, &pCell, &pRef, &pTri, &nTri);
+            fHeight = Ter_GetLowestGroundTriangle(pCourse, pPos, &pCell, &pRef, &pTri, &nTri);
         }
     }
     if (fHeight != TER_NO_GROUND && pRef->n2 == 0) {
@@ -695,7 +703,8 @@ f32 Ter_CalcLowestPlayableWorldHeight(CourseInfo* pCourse) {
 // ground strips count (not objects), and only those in use: a strip flagged as the cup geometry of
 // some pin positions (bits 1, 2, 4, 8) is skipped unless the current one is among them, and one
 // with 0x10 in split screen.
-f32 fn_8004C8E0(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3],
+f32 Ter_GetHighestGroundTriangle(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef,
+                                 f32 (**ppTri)[3],
                 s32* pTri) {
     u32 uPinSet = 1 << Game_CurrentPinSet();
     f32 fBest = TER_NO_GROUND;
@@ -749,8 +758,9 @@ f32 fn_8004C8E0(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** p
 }
 
 // The lowest ground triangle under a point (x, z), with the same outputs and strip rules as
-// fn_8004C8E0; TER_NO_GROUND when there is none.
-f32 fn_8004CB30(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3],
+// Ter_GetHighestGroundTriangle; TER_NO_GROUND when there is none.
+f32 Ter_GetLowestGroundTriangle(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef,
+                                f32 (**ppTri)[3],
                 s32* pTri) {
     u32 uPinSet = 1 << Game_CurrentPinSet();
     f32 fBest = 50000.0f;
@@ -804,10 +814,11 @@ f32 fn_8004CB30(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** p
     return TER_NO_GROUND;
 }
 
-// The highest triangle under a point at or below its height, objects included (so a ball on a
-// bridge is on the bridge); TER_NO_GROUND when there is none. Probably TW06's
-// Ter_GetSupportingWorldTriangle.
-f32 fn_8004CD94(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3]) {
+// The supporting triangle of the world under a point: the highest one at or below its height,
+// object triangles included (so a ball on a bridge is on the bridge). Returns its height there,
+// with the grid cell, strip and vertices; TER_NO_GROUND when there is none.
+f32 Ter_GetSupportingWorldTriangle(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef,
+                                   f32 (**ppTri)[3]) {
     u32 uPinSet = 1 << Game_CurrentPinSet();
     f32 fBest = TER_NO_GROUND;
     int nX = (int)Ter_Floor((pPos[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
@@ -858,9 +869,11 @@ f32 fn_8004CD94(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** p
     return TER_NO_GROUND;
 }
 
-// The lowest ground triangle under a point at or above its height (the ground covering it);
-// TER_NO_GROUND when there is none. Probably TW06's Ter_GetCoveringGroundTriangle.
-f32 fn_8004D01C(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3],
+// The covering ground triangle over a point: the lowest ground triangle at or above its height.
+// Returns its height there, with the grid cell, strip, vertices and the triangle's number in the
+// strip; TER_NO_GROUND when there is none.
+f32 Ter_GetCoveringGroundTriangle(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef,
+                                  f32 (**ppTri)[3],
                 s32* pTri) {
     u32 uPinSet = 1 << Game_CurrentPinSet();
     f32 fBest = 65536.0f;
@@ -921,7 +934,8 @@ f32 fn_8004D01C(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** p
 // their heights (TER_NO_GROUND for none), strips and vertices. TW06:
 // void Ter_GetSupportingAndCoveringGroundTriangles(TGD_TerrainInfo*, f32*, TGD_PolygonReference**, f32*,
 // f32***, TGD_PolygonReference**, f32*, f32***), the same parameters.
-void fn_8004D2E0(CourseInfo* pCourse, f32* pPos, TerPolyRef** ppRefLow, f32* pLow, f32 (**ppTriLow)[3],
+void Ter_GetSupportingAndCoveringGroundTriangles(CourseInfo* pCourse, f32* pPos, TerPolyRef** ppRefLow,
+                                                 f32* pLow, f32 (**ppTriLow)[3],
                  TerPolyRef** ppRefHigh, f32* pHigh, f32 (**ppTriHigh)[3]) {
     u32 uPinSet = 1 << Game_CurrentPinSet();
     f32 fHigh = 65536.0f;
@@ -982,27 +996,30 @@ void fn_8004D2E0(CourseInfo* pCourse, f32* pPos, TerPolyRef** ppRefLow, f32* pLo
     *pHigh = TER_NO_GROUND;
 }
 
-// The height of the highest ground under a point. Probably TW06's Ter_GetHighestGroundHeight.
+// The height of the highest ground triangle under a point (x, z), whatever the point's own height
+// (Ter_GetHighestGroundTriangle); TER_NO_GROUND when there is none.
 f32 Ter_GetHighestGroundHeight(CourseInfo* pCourse, f32* pPos) {
     TerCell* pCell;
     TerPolyRef* pRef;
     f32 (*pTri)[3];
     s32 nTri;
 
-    return fn_8004C8E0(pCourse, pPos, &pCell, &pRef, &pTri, &nTri);
+    return Ter_GetHighestGroundTriangle(pCourse, pPos, &pCell, &pRef, &pTri, &nTri);
 }
 
-// The same through fn_8004CB30.
-f32 fn_8004D5F0(CourseInfo* pCourse, f32* pPos) {
+// The height of the lowest ground triangle under a point (x, z), whatever the point's own height
+// (Ter_GetLowestGroundTriangle); TER_NO_GROUND when there is none.
+f32 Ter_GetLowestGroundHeight(CourseInfo* pCourse, f32* pPos) {
     TerCell* pCell;
     TerPolyRef* pRef;
     f32 (*pTri)[3];
     s32 nTri;
 
-    return fn_8004CB30(pCourse, pPos, &pCell, &pRef, &pTri, &nTri);
+    return Ter_GetLowestGroundTriangle(pCourse, pPos, &pCell, &pRef, &pTri, &nTri);
 }
 
-// The height of the ground that supports a point. Probably TW06's Ter_GetSupportingGroundHeight.
+// The height of the supporting ground under a point: the highest ground triangle at or below it
+// (Ter_GetSupportingGroundTriangle); TER_NO_GROUND when there is none.
 f32 Ter_GetSupportingGroundHeight(CourseInfo* pCourse, f32* pPos) {
     TerCell* pCell;
     TerPolyRef* pRef;
@@ -1012,9 +1029,9 @@ f32 Ter_GetSupportingGroundHeight(CourseInfo* pCourse, f32* pPos) {
     return Ter_GetSupportingGroundTriangle(pCourse, pPos, &pCell, &pRef, &pTri, &nTri);
 }
 
-// The height of the ground covering a point, with that triangle's upward normal. Probably TW06's
-// Ter_GetCoveringGroundHeightAndNormal.
-f32 fn_8004D650(CourseInfo* pCourse, f32* pPos, f32* pNormal) {
+// The height of the ground covering a point (Ter_GetCoveringGroundTriangle) and, when there is one,
+// that triangle's normal turned to face up; TER_NO_GROUND (pNormal untouched) when there is none.
+f32 Ter_GetCoveringGroundHeightAndNormal(CourseInfo* pCourse, f32* pPos, f32* pNormal) {
     f32 vA[4];
     f32 vB[4];
     f32 vC[4];
@@ -1026,7 +1043,7 @@ f32 fn_8004D650(CourseInfo* pCourse, f32* pPos, f32* pNormal) {
     s32 nTri;
     f32 fHeight;
 
-    fHeight = fn_8004D01C(pCourse, pPos, &pCell, &pRef, &pTri, &nTri);
+    fHeight = Ter_GetCoveringGroundTriangle(pCourse, pPos, &pCell, &pRef, &pTri, &nTri);
     if (fHeight != TER_NO_GROUND) {
         Vec3Copy(pTri[0], vA);
         Vec3Copy(pTri[1], vB);
@@ -1072,14 +1089,14 @@ u8 Ter_GetSupportingGroundNormal(CourseInfo* pCourse, f32* pPos, f32* pNormal) {
     return 0;
 }
 
-// The height of whatever supports a point, objects included. Probably TW06's
-// Ter_GetSupportingWorldHeight.
-f32 fn_8004D80C(CourseInfo* pCourse, f32* pPos) {
+// The height of whatever supports a point, object triangles included
+// (Ter_GetSupportingWorldTriangle); TER_NO_GROUND when there is none.
+f32 Ter_GetSupportingWorldHeight(CourseInfo* pCourse, f32* pPos) {
     TerCell* pCell;
     TerPolyRef* pRef;
     f32 (*pTri)[3];
 
-    return fn_8004CD94(pCourse, pPos, &pCell, &pRef, &pTri);
+    return Ter_GetSupportingWorldTriangle(pCourse, pPos, &pCell, &pRef, &pTri);
 }
 
 // TW06: TGD_MaterialInfo* Ter_GetSupportingWorldMaterial(TGD_TerrainInfo*, f32*). The surface
@@ -1089,7 +1106,7 @@ SurfaceType* Ter_GetSupportingWorldMaterial(CourseInfo* pCourse, f32* pPos) {
     TerPolyRef* pRef;
     f32 (*pTri)[3];
 
-    if (fn_8004CD94(pCourse, pPos, &pCell, &pRef, &pTri) != TER_NO_GROUND) {
+    if (Ter_GetSupportingWorldTriangle(pCourse, pPos, &pCell, &pRef, &pTri) != TER_NO_GROUND) {
         return &gSurfaceTypes[pRef->nSurface];
     }
     return NULL;
@@ -1137,7 +1154,8 @@ void Ter_GetEnclosingGroundHeight(CourseInfo* pCourse, f32* pPos, f32* pLow, f32
     f32 (*pTriLow)[3];
     f32 (*pTriHigh)[3];
 
-    fn_8004D2E0(pCourse, pPos, &pRefLow, pLow, &pTriLow, &pRefHigh, pHigh, &pTriHigh);
+    Ter_GetSupportingAndCoveringGroundTriangles(pCourse, pPos, &pRefLow, pLow, &pTriLow, &pRefHigh, pHigh,
+                                                &pTriHigh);
 }
 
 // TW06: void Ter_GetEnclosingGroundData(TGD_TerrainInfo*, f32*, f32*, TGD_MaterialInfo**, f32*, f32*,
@@ -1157,7 +1175,8 @@ void Ter_GetEnclosingGroundData(CourseInfo* pCourse, f32* pPos, f32* pLow, Surfa
     f32 (*pTriLow)[3];
     f32 (*pTriHigh)[3];
 
-    fn_8004D2E0(pCourse, pPos, &pRefLow, pLow, &pTriLow, &pRefHigh, pHigh, &pTriHigh);
+    Ter_GetSupportingAndCoveringGroundTriangles(pCourse, pPos, &pRefLow, pLow, &pTriLow, &pRefHigh, pHigh,
+                                                &pTriHigh);
     if (*pLow != TER_NO_GROUND) {
         Vec3Copy(pTriLow[0], vA);
         Vec3Copy(pTriLow[1], vB);
@@ -1204,7 +1223,7 @@ f32 fn_8004DBB0(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurface, f32* pN
     f32 (*pTri)[3];
     f32 fHeight;
 
-    fHeight = fn_8004CD94(pCourse, pPos, &pCell, &pRef, &pTri);
+    fHeight = Ter_GetSupportingWorldTriangle(pCourse, pPos, &pCell, &pRef, &pTri);
     if (fHeight != TER_NO_GROUND) {
         Vec3Copy(pTri[0], vA);
         Vec3Copy(pTri[1], vB);
@@ -1563,7 +1582,8 @@ u8 fn_8004EB7C(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* p
                 pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
                 pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
                 for (j = pRef->nTris - 1; j >= 0; j--) {
-                    if ((pFlags[2] & 7) && fn_8004AFA0(pFrom, pDir, fMax, pVert, &fT, vHit, vNormal)) {
+                    if ((pFlags[2] & 7)
+                        && Ter_LineTriangleIntersection(pFrom, pDir, fMax, pVert, &fT, vHit, vNormal)) {
                         fMax = fT;
                         LLMath_CopyVec(vHit, pHit);
                         LLMath_CopyVec(vNormal, pNormal);
@@ -1759,7 +1779,8 @@ u8 fn_8004F43C(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* p
                 pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
                 pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
                 for (j = pRef->nTris - 1; j >= 0; j--) {
-                    if ((pFlags[2] & 7) && fn_8004AFA0(pFrom, pDir, fMax, pVert, &fT, vHit, vNormal)) {
+                    if ((pFlags[2] & 7)
+                        && Ter_LineTriangleIntersection(pFrom, pDir, fMax, pVert, &fT, vHit, vNormal)) {
                         fMax = fT;
                         LLMath_CopyVec(vHit, pHit);
                         LLMath_CopyVec(vNormal, pNormal);
@@ -1945,7 +1966,8 @@ u8 fn_8004FCB4(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* p
                 pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
                 pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
                 for (j = pRef->nTris - 1; j >= 0; j--) {
-                    if ((pFlags[2] & 7) && fn_8004AFA0(pFrom, pDir, fMax, pVert, &fT, vHit, vNormal)) {
+                    if ((pFlags[2] & 7)
+                        && Ter_LineTriangleIntersection(pFrom, pDir, fMax, pVert, &fT, vHit, vNormal)) {
                         fMax = fT;
                         LLMath_CopyVec(vHit, pHit);
                         LLMath_CopyVec(vNormal, pNormal);
@@ -2131,7 +2153,8 @@ u8 fn_800504F4(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* p
                 pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
                 pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
                 for (j = pRef->nTris - 1; j >= 0; j--) {
-                    if ((pFlags[2] & 7) && fn_8004AFA0(pFrom, pDir, fMax, pVert, &fT, vHit, vNormal)) {
+                    if ((pFlags[2] & 7)
+                        && Ter_LineTriangleIntersection(pFrom, pDir, fMax, pVert, &fT, vHit, vNormal)) {
                         fMax = fT;
                         LLMath_CopyVec(vHit, pHit);
                         LLMath_CopyVec(vNormal, pNormal);

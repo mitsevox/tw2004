@@ -27,7 +27,7 @@ void  fn_8006E7A4(LightGroup* pGroup);                   // GoLighting.c: load t
 void  fn_8006EADC(UObject* pObj);                        // GoLighting.c: light the object
 void  fn_8006ED70(void);                                 // GoLighting.c: lighting off
 void  fn_80093824(void);                                 // GoLightFogEnv.c
-f32   fn_8004B78C(CourseInfo* pCourse, f32* pPos);       // GoTerrainCollision.c: the ground's light
+f32   Ter_GetAmbientLight(CourseInfo* pCourse, f32* pPos);       // GoTerrainCollision.c: the ground's light
 void  SD_SetShaderTypeParameters(int nRow, void* pData); // GoTerrain.c: calls row nRow's pfn8
 void  fn_801127A0(void* pDesc);                          // hwsMaterial_Gc.c
 HwsMemBlock* fn_801128C8(SkinDesc* pDesc, s32 nSize);         // hwsOverride_Gc.c
@@ -164,7 +164,7 @@ static f32 Skin_StrippedFn(f32 x) {
 // type 10's parameters set to 128 grey (shadow.c). Otherwise every other part, lit: bit 4 picks
 // light set 3; without it light set 0 with the character's lighting entry for this course
 // (Character.p44, SKN_GetLightCourse) and fn_80093824. The lights' brightness is 0.5 plus half the
-// ground's light under the character (fn_8004B78C). Clip mode 1 either way.
+// ground's light under the character (Ter_GetAmbientLight). Clip mode 1 either way.
 void SKN_DrawCharacter(Character* pChar, u32 uFlags) {
     static f32 aShadowParams[4] = { 128.0f, 128.0f, 128.0f, 128.0f };
     f32 vPos[3];
@@ -195,7 +195,7 @@ void SKN_DrawCharacter(Character* pChar, u32 uFlags) {
             fn_80093824();
         }
         SKN_GetCharPosition(pChar, vPos);
-        LF_SetCurrentBrightness(0.5f * fn_8004B78C(Ter_GetTGD(), vPos) + 0.5f);
+        LF_SetCurrentBrightness(0.5f * Ter_GetAmbientLight(Ter_GetTGD(), vPos) + 0.5f);
         LF_LoadCurrentLights();
         fn_80035308();
     }
