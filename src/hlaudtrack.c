@@ -7,10 +7,10 @@
 
 #include "core/audtrack.h"
 
-UList lbl_801F1868[2];
+UList gTrkPerfLists[2];
 
-AudTrack* lbl_802820A0;
-UPool lbl_80282098;
+AudTrack* gTrkPerfs;
+UPool gTrkPerfPool;
 
 // Puts a placed (3D) track into the sorted track list, on f48, its distance attenuation (TW07's
 // distAttn), loudest first: before the first quieter track, else at the end. Trk_AllocPerf steals
@@ -19,8 +19,8 @@ void InsertSortWorldPerf(AudTrack* pTrack) {
     AudTrack* pAt;
     UList* pList;
 
-    pAt = (AudTrack*)lbl_801F1868[1].pHead;
-    pList = &lbl_801F1868[1];
+    pAt = (AudTrack*)gTrkPerfLists[1].pHead;
+    pList = &gTrkPerfLists[1];
     if (pAt == NULL) {
         fn_800ADEC8(pList, &pTrack->link);
     }
@@ -45,16 +45,16 @@ u8 Trk_InitModule(void) {
     u8 i;
 
     bOk = 0;
-    lbl_802820A0 = fn_800B5BD8(32 * sizeof(AudTrack));
-    if (lbl_802820A0 != NULL) {
-        Mem_set(lbl_802820A0, 0, 32 * sizeof(AudTrack));
+    gTrkPerfs = fn_800B5BD8(32 * sizeof(AudTrack));
+    if (gTrkPerfs != NULL) {
+        Mem_set(gTrkPerfs, 0, 32 * sizeof(AudTrack));
         for (i = 0; i < 32; i++) {
-            lbl_802820A0[i].nIndex = i;
-            lbl_802820A0[i].nState = 0;
+            gTrkPerfs[i].nIndex = i;
+            gTrkPerfs[i].nState = 0;
         }
-        fn_800AE0DC(&lbl_80282098, lbl_802820A0, 32, sizeof(AudTrack));
-        fn_800ADE70(&lbl_801F1868[0], 32);
-        fn_800ADE70(&lbl_801F1868[1], 32);
+        fn_800AE0DC(&gTrkPerfPool, gTrkPerfs, 32, sizeof(AudTrack));
+        fn_800ADE70(&gTrkPerfLists[0], 32);
+        fn_800ADE70(&gTrkPerfLists[1], 32);
         bOk = Seq_InitModule();
         if (bOk) {
             bOk = Stm_InitModule();
@@ -71,7 +71,7 @@ u8 Trk_InitSession(u8 a, u8 b) {
     AudTrack* pTrack;
 
     i = 0;
-    pList = lbl_801F1868;
+    pList = gTrkPerfLists;
     do {
         pTrack = (AudTrack*)pList->pHead;
         while (pTrack != NULL) {
@@ -100,7 +100,7 @@ void Trk_Cycle(void) {
     AudTrack* pTrack;
     AudTrackTmpl* pTmpl;
 
-    pList = lbl_801F1868;
+    pList = gTrkPerfLists;
     if ((lbl_8028207C & 0xD) != 0xD) return;
     i = 0;
     do {
@@ -135,16 +135,16 @@ void Trk_Cycle(void) {
 // that is past state 1 and not streamed, for any other source the last one. Returns NULL when there
 // is none to take.
 AudTrack* Trk_AllocPerf(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f32 fPriority) {
-    UPool* const pPool = &lbl_80282098;
+    UPool* const pPool = &gTrkPerfPool;
     s32 bSorted;
     UList* pList;
     AudTrack* pTrack;
 
     bSorted = pSource->pSound->n3 & 1;
-    pList = &lbl_801F1868[bSorted];
+    pList = &gTrkPerfLists[bSorted];
     if (pPool->nFree == 0) {
-        pTrack = (AudTrack*)lbl_801F1868[1].pTail;
-        if (lbl_801F1868[1].nCount == 0) return NULL;
+        pTrack = (AudTrack*)gTrkPerfLists[1].pTail;
+        if (gTrkPerfLists[1].nCount == 0) return NULL;
         if (bSorted == 1) {
             while (pTrack != NULL) {
                 if (pTrack->nState != 1 && !(pTrack->pTmpl->n0 & 8) && pTrack->f48 < fPriority) break;
@@ -197,10 +197,10 @@ s32 Trk_FreePerf(AudTrack* pTrack) {
     AudTrackTmpl* pTmpl;
     AudSource* pSource;
 
-    pPool = &lbl_80282098;
+    pPool = &gTrkPerfPool;
     if (pTrack == NULL) return 0;
     pSource = pTrack->pSource;
-    pList = &lbl_801F1868[pTrack->bits.b.bSorted];
+    pList = &gTrkPerfLists[pTrack->bits.b.bSorted];
     pTmpl = pTrack->pTmpl;
     if (!pTrack->bits.b.bDetached) {
         pTrack->pSource->apTracks[pTrack->nChannel] = NULL;
@@ -282,7 +282,7 @@ void Trk_UpdatePerf(AudSource* pSource, AudTrack* pTrack, AudTrackTmpl* pTmpl, u
     }
     if (bResort && pTrack->bits.b.bSorted == 1) {
         pTrack->f48 = fPriority;
-        fn_800ADF6C(&lbl_801F1868[1], &pTrack->link);
+        fn_800ADF6C(&gTrkPerfLists[1], &pTrack->link);
         InsertSortWorldPerf(pTrack);
     }
 }

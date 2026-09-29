@@ -163,7 +163,7 @@ typedef struct AudSeqBank {
     AudSeqTone aTones[1];       // 0x4    the count is not known
 } AudSeqBank;
 
-// A sequencer event (8 bytes). Its handler is lbl_801F1880[nType].
+// A sequencer event (8 bytes). Its handler is gSeqCmdHandlers[nType].
 typedef struct AudSeqEvent {
     u16  n0;                    // 0x0    ticks to wait before it runs (scaled by Seq_Check)
     u8   nType;                 // 0x2
@@ -296,7 +296,7 @@ typedef struct AudTrackSeq {
 
 // A playing track (0x8C bytes, from a pool of 32 made by Trk_InitModule).
 typedef struct AudTrack {
-    UListNode link;             // 0x0    in one of the two track lists (lbl_801F1868)
+    UListNode link;             // 0x0    in one of the two track lists (gTrkPerfLists)
     AudTrackTmpl* pTmpl;        // 0x8
     AudVoice* apVoices[8];      // 0xC    one per channel (Trk_AllocPerf clears 0x20 bytes)
     struct AudSource* pSource;  // 0x2C   the sound source the track plays for
@@ -347,7 +347,7 @@ LAYOUT_ASSERT(AudSource, 0x7C);
 
 // The sequencer's event handlers, by event type (filled by Seq_InitModule).
 typedef void (*AudSeqHandler)(AudSeqEvent* pEvent, AudTrack* pTrack);
-extern AudSeqHandler lbl_801F1880[13];
+extern AudSeqHandler gSeqCmdHandlers[13];
 
 // One of hlaudemitter.c's 256 emitter instances (lbl_801F2740); only the fields read so far.
 typedef struct AudInstance {
@@ -387,11 +387,11 @@ LAYOUT_ASSERT(AudEmitters, 0xD8);
 extern AudEmitters lbl_801F2668;
 
 // The two track lists: [0] in start order, [1] sorted on f48, highest first.
-extern UList lbl_801F1868[2];
-extern UPool lbl_80282098;              // the free tracks
-extern AudTrack* lbl_802820A0;          // the pool's memory
+extern UList gTrkPerfLists[2];
+extern UPool gTrkPerfPool;              // the free tracks
+extern AudTrack* gTrkPerfs;          // the pool's memory
 
-// A disc read waiting in the stream read queue (lbl_801F18B8). bRestart marks a request to refill
+// A disc read waiting in the stream read queue (gAudStreamReadQueue). bRestart marks a request to refill
 // the whole buffer (Stm_SendSilenceToVoices) instead of a read.
 typedef struct AudStreamRead {
     s32  hFile;                 // 0x0
@@ -493,10 +493,10 @@ AudPlayList* fn_800A9564(u8 nPlayList);
 void         fn_800A9590(AudSource* pSource, AudTrack* pTrack, f32 fVolume);   // placed sounds
 void         fn_800A96DC(AudSource* pSource, AudTrack* pTrack, f32 fVolume);   // the others
 
-extern AudStreamQueue lbl_801F18B8;
+extern AudStreamQueue gAudStreamReadQueue;
 extern s32 lbl_80281468;                // the stream file (hlaudmovie.c opens "/AudioStm_GC.sab")
-extern u8 lbl_802820A8;                 // the last read id handed out (hlaudtrackstm.c)
-extern AudTrack* lbl_802820AC;          // the track whose block is being DMA'd (hlaudtrackstm.c)
+extern u8 gStmLastReadId;                 // the last read id handed out (hlaudtrackstm.c)
+extern AudTrack* gStmDmaTrack;          // the track whose block is being DMA'd (hlaudtrackstm.c)
 
 // hlaudtrack.c
 void InsertSortWorldPerf(AudTrack* pTrack);

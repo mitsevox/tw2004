@@ -2,7 +2,7 @@
 // functions that hand a name string to the audio locks are EA's own, from those strings, and
 // Stm_Stop, Stm_FlushQueue, CheckQueue and StartStreamVoices are TW07's):
 // the streamed tracks of the sound engine (music and long sounds read from disc). Each track reads
-// its stream into a main-memory buffer through a queue of disc reads (lbl_801F18B8), DMAs each
+// its stream into a main-memory buffer through a queue of disc reads (gAudStreamReadQueue), DMAs each
 // block into its voices' ARAM buffers, and keeps the reads ahead of what the voices play.
 
 #include "core/audtrack.h"
@@ -20,9 +20,9 @@ void RemoveFromAudStreamQueue(AudTrack* pTrack);
 void Stm_ReadDoneCB(void* pDst, int nBytes, AudTrack* pTrack, u8 nId);
 
 // .bss/.sbss in reverse address order
-AudStreamQueue lbl_801F18B8;
-AudTrack* lbl_802820AC;
-u8 lbl_802820A8;
+AudStreamQueue gAudStreamReadQueue;
+AudTrack* gStmDmaTrack;
+u8 gStmLastReadId;
 
 // Applies the play list and stream changes that came in while the track was busy (Stm_SetPlayList,
 // Stm_SetStream). Returns 1 when it applied one; Stm_Tick then starts the stopped track again.
@@ -72,8 +72,8 @@ u8 AddToAudStreamReadQueue(s32 hFile, u8* pDst, u32 uLen, u32 uOffset,
 
     bQueued = 0;
     fn_800B59BC("AddToAudStreamReadQueue");
-    if (lbl_801F18B8.queue.nCount + 1 <= lbl_801F18B8.queue.nMax) {
-        pRead = fn_800AE03C(&lbl_801F18B8.queue);
+    if (gAudStreamReadQueue.queue.nCount + 1 <= gAudStreamReadQueue.queue.nMax) {
+        pRead = fn_800AE03C(&gAudStreamReadQueue.queue);
         pRead->hFile = hFile;
         bQueued = 1;
         pRead->pDst = pDst;
@@ -97,8 +97,8 @@ u8 Stm_QueueSilence(AudTrack* pTrack) {
 
     bQueued = 0;
     fn_800B59BC("AddToAudStreamReadQueue");
-    if (lbl_801F18B8.queue.nCount + 1 <= lbl_801F18B8.queue.nMax) {
-        pRead = fn_800AE03C(&lbl_801F18B8.queue);
+    if (gAudStreamReadQueue.queue.nCount + 1 <= gAudStreamReadQueue.queue.nMax) {
+        pRead = fn_800AE03C(&gAudStreamReadQueue.queue);
         memset(pRead, 0, sizeof(AudStreamRead));
         pRead->pTrack = pTrack;
         bQueued = 1;
@@ -111,8 +111,8 @@ u8 Stm_QueueSilence(AudTrack* pTrack) {
 // The oldest read is done: take it off the queue so the next one can start.
 void RemoveFromAudStreamQueue(AudTrack* pTrack) {
     fn_800B59BC("RemoveFromAudStreamQueue");
-    fn_800AE084(&lbl_801F18B8.queue);
-    lbl_801F18B8.bBusy = 0;
+    fn_800AE084(&gAudStreamReadQueue.queue);
+    gAudStreamReadQueue.bBusy = 0;
     fn_800B59EC("RemoveFromAudStreamQueue");
 }
 
@@ -124,9 +124,9 @@ void ProcessAudStreamReadQueue(void) {
     bMore = 1;
     while (bMore) {
         fn_800B59BC("ProcessAudStreamReadQueue");
-        if (lbl_801F18B8.queue.nCount != 0 && lbl_801F18B8.bBusy == 0) {
-            lbl_801F18B8.bBusy = 1;
-            pRead = (AudStreamRead*)lbl_801F18B8.queue.pRead;
+        if (gAudStreamReadQueue.queue.nCount != 0 && gAudStreamReadQueue.bBusy == 0) {
+            gAudStreamReadQueue.bBusy = 1;
+            pRead = (AudStreamRead*)gAudStreamReadQueue.queue.pRead;
             if (pRead->bRestart) {
                 Stm_SendSilenceToVoices(pRead->pTrack);
             } else {
@@ -143,7 +143,7 @@ void ProcessAudStreamReadQueue(void) {
 // DMAs one 0x8000-byte chunk per channel from the track's buffer into its voice's ARAM buffer, into
 // the half the voice is not playing, and flips the halves; the chunks lie uStep apart (0: all
 // channels get the same one). Channels without a voice are skipped. pfnDone(1) comes with the last
-// channel's DMA; the track waits for it in lbl_802820AC.
+// channel's DMA; the track waits for it in gStmDmaTrack.
 void Stm_SendBlockToVoices(AudTrack* pTrack, void (*pfnDone)(u32 bLast), u32 uStep, u8 bSkipEmpty) {
     u8 i;
     u8* pSrc;
@@ -155,7 +155,7 @@ void Stm_SendBlockToVoices(AudTrack* pTrack, void (*pfnDone)(u32 bLast), u32 uSt
     i = 0;
     pSrc = pTrack->u.stm.pBuffer;
     pList = pTrack->pTmpl->data.pPlayList;
-    lbl_802820AC = pTrack;
+    gStmDmaTrack = pTrack;
     while (i < (nChannels = pList->nChannels)) {
         pVoice = pTrack->apVoices[i];
         if ((!bSkipEmpty || pVoice != NULL) && pVoice != NULL) {
@@ -174,10 +174,10 @@ void Stm_SendBlockToVoices(AudTrack* pTrack, void (*pfnDone)(u32 bLast), u32 uSt
 void Stm_SilenceDmaDoneCB(u32 bLast) {
     AudTrack* pTrack;
 
-    pTrack = lbl_802820AC;
+    pTrack = gStmDmaTrack;
     pTrack->u.stm.uFilled += 0x8000;
     if (bLast) {
-        lbl_802820AC = NULL;
+        gStmDmaTrack = NULL;
         RemoveFromAudStreamQueue(pTrack);
     }
 }
@@ -211,11 +211,11 @@ void Stm_CheckStreamEnd(AudTrack* pTrack) {
 void Stm_BlockDmaDoneCB(u32 bLast) {
     AudTrack* pTrack;
 
-    pTrack = lbl_802820AC;
+    pTrack = gStmDmaTrack;
     pTrack->u.stm.uFilled += 0x8000;
     if (bLast) {
         Stm_CheckStreamEnd(pTrack);
-        lbl_802820AC = NULL;
+        gStmDmaTrack = NULL;
         RemoveFromAudStreamQueue(pTrack);
     }
 }
@@ -275,8 +275,8 @@ void PrimeStreamer(AudTrack* pTrack) {
         if (pVoice == NULL) return;
         pTrack->apVoices[i] = pVoice;
     }
-    if (++lbl_802820A8 == 0) {
-        lbl_802820A8 = 1;
+    if (++gStmLastReadId == 0) {
+        gStmLastReadId = 1;
     }
     pTrack->u.stm.uReadPos = 0;
     pTrack->u.stm.uRead = 0;
@@ -284,7 +284,7 @@ void PrimeStreamer(AudTrack* pTrack) {
     pTrack->u.stm.uPlayed = 0;
     pTrack->bits.b.b7 = 0;
     pTrack->nState = 4;
-    pTrack->u.stm.nReadId = lbl_802820A8;
+    pTrack->u.stm.nReadId = gStmLastReadId;
     pTrack->n5D += pList->nChannels;
     pTrack->u.stm.flags.n = 0;
     AddToAudStreamReadQueue(hFile, pTrack->u.stm.pBuffer, (pTrack->u.stm.uBufferSize >> 1) * pList->nChannels,
@@ -293,9 +293,9 @@ void PrimeStreamer(AudTrack* pTrack) {
 
 // Sets up the stream read queue at start-up: 8 empty requests, none under way. Always returns 1.
 u8 Stm_InitModule(void) {
-    Mem_set(lbl_801F18B8.aReads, 0, sizeof(lbl_801F18B8.aReads));
-    fn_800AE00C(&lbl_801F18B8.queue, lbl_801F18B8.aReads, 8, sizeof(AudStreamRead));
-    lbl_801F18B8.bBusy = 0;
+    Mem_set(gAudStreamReadQueue.aReads, 0, sizeof(gAudStreamReadQueue.aReads));
+    fn_800AE00C(&gAudStreamReadQueue.queue, gAudStreamReadQueue.aReads, 8, sizeof(AudStreamRead));
+    gAudStreamReadQueue.bBusy = 0;
     return 1;
 }
 

@@ -1,14 +1,14 @@
 // hlaudtrackseq.c (TW06's name, by structure: golf/audio/engine/hl/hlaudtrackseq.c, between
 // hlaudtrack.c and hlaudtrackstm.c): the sequencer, the tracks that play events instead of a
 // stream. A template holds sets of variations of events; each tick the track waits out the next
-// event's delay, then runs it through the handler table Seq_InitModule fills (lbl_801F1880). Notes
+// event's delay, then runs it through the handler table Seq_InitModule fills (gSeqCmdHandlers). Notes
 // take a voice per channel, stealing one when all are busy. Its extent is its data: OnKeyOn is
 // the first to use its .sdata2 block (0x80283FD8-0x80283FF8), and its handlers run up to
 // 0x800AAD14.
 
 #include "core/audtrack.h"
 
-AudSeqHandler lbl_801F1880[13];
+AudSeqHandler gSeqCmdHandlers[13];
 
 // Picks a sequenced track's next variation the way its template's n1 says: 4 and up the next in
 // order, 2 at random but not the same one twice, 3 at random but not the one the template played
@@ -330,19 +330,19 @@ void OnRvbWetAttn(AudSeqEvent* pEvent, AudTrack* pTrack) {
 // Fills the sequencer's event handler table, by event type (0 OnNoOp .. 12 OnRvbWetAttn). Always
 // returns 1. Trk_InitModule and Aud_InitOnce both call it.
 u8 Seq_InitModule(void) {
-    lbl_801F1880[0] = OnNoOp;
-    lbl_801F1880[1] = OnEnd;
-    lbl_801F1880[2] = OnKeyOn;
-    lbl_801F1880[3] = OnKeyOff;
-    lbl_801F1880[4] = OnPitchBend;
-    lbl_801F1880[5] = OnPitchRamp;
-    lbl_801F1880[6] = OnTrackStatus;
-    lbl_801F1880[7] = OnTrackSetPlayList;
-    lbl_801F1880[8] = OnTrackSetStream;
-    lbl_801F1880[9] = OnModPitch;
-    lbl_801F1880[10] = OnModADSRVol;
-    lbl_801F1880[11] = OnModStartOffset;
-    lbl_801F1880[12] = OnRvbWetAttn;
+    gSeqCmdHandlers[0] = OnNoOp;
+    gSeqCmdHandlers[1] = OnEnd;
+    gSeqCmdHandlers[2] = OnKeyOn;
+    gSeqCmdHandlers[3] = OnKeyOff;
+    gSeqCmdHandlers[4] = OnPitchBend;
+    gSeqCmdHandlers[5] = OnPitchRamp;
+    gSeqCmdHandlers[6] = OnTrackStatus;
+    gSeqCmdHandlers[7] = OnTrackSetPlayList;
+    gSeqCmdHandlers[8] = OnTrackSetStream;
+    gSeqCmdHandlers[9] = OnModPitch;
+    gSeqCmdHandlers[10] = OnModADSRVol;
+    gSeqCmdHandlers[11] = OnModStartOffset;
+    gSeqCmdHandlers[12] = OnRvbWetAttn;
     return 1;
 }
 
@@ -421,7 +421,7 @@ u8 Seq_Tick(AudTrack* pTrack) {
                 // fake match: its own local (pEvent's address is taken below, so it lives on the stack)
                 AudSeqEvent* pNext = pTmpl->pEvents + pTrack->u.seq.n64 * pTmpl->n3 + pTrack->u.seq.n66;
 
-                lbl_801F1880[pNext->nType](pNext, pTrack);
+                gSeqCmdHandlers[pNext->nType](pNext, pTrack);
             }
             pTrack->u.seq.n67 = 0xFF;
         }
@@ -432,7 +432,7 @@ u8 Seq_Tick(AudTrack* pTrack) {
                 pTrack->n62++;
                 break;
             }
-            lbl_801F1880[pEvent->nType](pEvent, pTrack);
+            gSeqCmdHandlers[pEvent->nType](pEvent, pTrack);
             if (pTrack->bits.b.b7) {
                 pTrack->bits.b.b7 = 0;
                 SetVarCmdBounds(pTrack, &pEvent, &pEnd);
