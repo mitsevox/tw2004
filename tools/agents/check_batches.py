@@ -16,13 +16,14 @@ for l in open('config/GW4E69/symbols.txt'):
     m = re.match(r'^(\S+) = \.\w+:0x([0-9A-Fa-f]+);', l)
     if m:
         owner[m.group(1)] = m.group(2).upper()
-errors, given = [], {}
+errors, given, rows = [], {}, 0
 for f in sys.argv[1:]:
     for n, l in enumerate(open(f, encoding='utf-8'), 1):
         l = l.rstrip('\n')
         if not l.strip() or l.startswith('#'):
             continue
         c = l.split('\t')
+        rows += 1
         where = '%s:%d' % (f, n)
         is_batch = len(c) >= 4 and re.match(r'^T\d$', c[3] or '')
         if not addr.match(c[0]):
@@ -49,5 +50,5 @@ for f in sys.argv[1:]:
             errors.append('%s: %s is already the name of %s on main' % (where, new, owner[new]))
 for e in errors:
     print(e)
-print('%d rows checked, %d problems' % (len(given), len(errors)))
+print('%d rows checked (%d new names), %d problems' % (rows, len(given), len(errors)))
 sys.exit(1 if errors else 0)
