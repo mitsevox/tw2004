@@ -69,7 +69,7 @@ void UI_InitLoadingBar(void);     // uiProcessPolygon.c: set up the loading scre
 void UI_DrawLoadingScreenAndProgressBar(int nMode);    // uiProcessPolygon.c: update the loading screen
 void UI_FreeLoadingPicture(void);     // uiProcessPolygon.c
 void UI_LoadLoadingBarTexture(void);     // uiProcessPolygon.c
-void fn_8001529C(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
+void StreamManagerHole_AddStreamFileName(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
 void StreamManagerIngame_StreamFiles(void);
 void fn_8000B9E4();
 void fn_8000BA14();
@@ -137,35 +137,38 @@ void StreamManagerIngame_EndStreamCallbackIGChar(void* pArg);
 void StreamManagerFrontend_EndStreamCallback(void* pArg);
 void StreamManagerLoadScreen_EndStreamCallback(void* pArg);
 void StreamManagerFEChar_EndStreamCallback(void* pArg);
-void fn_800153CC(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
-void fn_80015030(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
-void fn_80015334(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
+void StreamManagerFEChar_AddStreamFileName(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
+void StreamManagerLoadScreen_AddStreamFileName(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
+void StreamManagerIngame_AddStreamFileName(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
 u32  Skalib_CurSlot(void);          // skalib.c
 int  Skalib_HasOverlays(int nSlot); // skalib.c
 void StreamManagerGlobals_EndStreamCallback(void* pArg);
 void StreamManagerHole_EndStreamCallback(void* pArg);
 void UStream_Close();
 s32 Stream_OpenStreamFiles();
-void fn_800150B8(void);
-void fn_800150E0(void);
-void fn_8001510C(void);
-void fn_80015134(void);
-void fn_80015164(void);
-void fn_8001518C(void);
-void fn_800151BC(void);
-void fn_800151E4(void);
-void fn_80015214(void);
-void fn_80015244(void);
-void fn_8001526C(void);
-void fn_80015324(void);
-void fn_800153BC(void);
-void fn_80015454(void);
+void StreamManagerIngame_CloseStreamFiles(void);
+void StreamManagerIngame_OpenStreamFiles(void);
+void StreamManagerFrontend_CloseStreamFiles(void);
+void StreamManagerFrontend_OpenStreamFiles(void);
+void StreamManagerLoadScreen_CloseStreamFiles(void);
+void StreamManagerLoadScreen_OpenStreamFiles(void);
+void StreamManagerStartup_CloseStreamFiles(void);
+void StreamManagerStartup_OpenStreamFiles(void);
+void StreamManagerGlobals_OpenStreamFiles(void);
+void StreamManagerHole_CloseStreamFiles(void);
+void StreamManagerHole_OpenStreamFiles(void);
+void StreamManagerHole_ClearStreamFileNames(void);
+void StreamManagerIngame_ClearStreamFileNames(void);
+void StreamManagerFEChar_ClearStreamFileNames(void);
 
 // ---- end of sweep code ----
 
-void fn_80014E98(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
-void fn_80014F20(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
-void fn_80014FA8(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
+void StreamManagerStartup_AddStreamFileName(const char* szName, void (*pfnOpened)(void*),
+                                            void (*pfnClosed)(void*));
+void StreamManagerGlobals_AddStreamFileName(const char* szName, void (*pfnOpened)(void*),
+                                            void (*pfnClosed)(void*));
+void StreamManagerFrontend_AddStreamFileName(const char* szName, void (*pfnOpened)(void*),
+                                             void (*pfnClosed)(void*));
 
 // Set up the stream lists once at boot: empty all seven, put the front end's files in the front-end
 // list (1), LoadOnce.gcb in the globals list (4) and LoadOnce.gcb + startup.gcb in the startup list
@@ -182,15 +185,15 @@ void StreamManager_InitModule(void) {
     gpStreamManagerLists->aParams[4].nNumFiles = 0;
     gpStreamManagerLists->aParams[5].nNumFiles = 0;
     gpStreamManagerLists->aParams[6].nNumFiles = 0;
-    fn_80014FA8(gszStreamFrontendFile, StreamManagerFrontend_BeginStreamCallback,
+    StreamManagerFrontend_AddStreamFileName(gszStreamFrontendFile, StreamManagerFrontend_BeginStreamCallback,
                 StreamManagerFrontend_EndStreamCallback);
-    fn_80014FA8(gszStreamFECharFile, StreamManagerFrontend_BeginStreamCallback,
+    StreamManagerFrontend_AddStreamFileName(gszStreamFECharFile, StreamManagerFrontend_BeginStreamCallback,
                 StreamManagerFrontend_EndStreamCallback);
-    fn_80014F20(gszStreamLoadOnceFile, StreamManagerGlobals_BeginStreamCallback,
+    StreamManagerGlobals_AddStreamFileName(gszStreamLoadOnceFile, StreamManagerGlobals_BeginStreamCallback,
                 StreamManagerGlobals_EndStreamCallback);
-    fn_80014E98(gszStreamLoadOnceFile, StreamManagerGlobals_BeginStreamCallback,
+    StreamManagerStartup_AddStreamFileName(gszStreamLoadOnceFile, StreamManagerGlobals_BeginStreamCallback,
                 StreamManagerGlobals_EndStreamCallback);
-    fn_80014E98(gszStreamStartupFile, StreamManagerGlobals_BeginStreamCallback,
+    StreamManagerStartup_AddStreamFileName(gszStreamStartupFile, StreamManagerGlobals_BeginStreamCallback,
                 StreamManagerGlobals_EndStreamCallback);
     for (i = 0; i < 30; i++) {
         gStreamManagerCharAdded[i] = 0;
@@ -215,7 +218,7 @@ void StreamManager_AddLoadScreenFile(int nFile) {
     char szName[0x40];   // size unknown: the frame allows 0x40..0x48 bytes
 
     sprintf(szName, gszStreamLoadScreenFileFmt, nFile);
-    fn_80015030(szName, StreamManagerLoadScreen_BeginStreamCallback,
+    StreamManagerLoadScreen_AddStreamFileName(szName, StreamManagerLoadScreen_BeginStreamCallback,
                 StreamManagerLoadScreen_EndStreamCallback);
 }
 
@@ -263,11 +266,11 @@ void StreamManagerIngame_UnregisterStreamClients(void) {
 // while it streams.
 void StreamManagerIngame_StreamFiles(void) {
     UI_InitLoadingBar();
-    fn_800150E0();
+    StreamManagerIngame_OpenStreamFiles();
     do {
         UI_DrawLoadingScreenAndProgressBar(0);
     } while ((u8)UStream_Update() != 0);   // fake match: this file tests the result as a byte
-    fn_800150B8();
+    StreamManagerIngame_CloseStreamFiles();
 }
 
 // Register every stream handler the front end's files need (FE golfer and club, animation
@@ -318,7 +321,7 @@ void StreamManagerFrontend_StreamFiles(void) {
         UI_LoadLoadingBarTexture();
         UI_InitLoadingBar();
     }
-    fn_80015134();
+    StreamManagerFrontend_OpenStreamFiles();
     do {
         if (gFEState.bFirstTime == 0) {
             UI_DrawLoadingScreenAndProgressBar(0);
@@ -327,7 +330,7 @@ void StreamManagerFrontend_StreamFiles(void) {
     if (gFEState.bFirstTime == 0) {
         UI_DrawLoadingScreenAndProgressBar(1);
     }
-    fn_8001510C();
+    StreamManagerFrontend_CloseStreamFiles();
     if (gFEState.bFirstTime == 0) {
         UI_FreeLoadingPicture();
     }
@@ -338,11 +341,11 @@ void StreamManagerFrontend_StreamFiles(void) {
 // Read the loading-screen stream list (2) to the end, with nothing drawn (it is the loading
 // screen's own picture). Called by LoadData.c.
 void StreamManagerLoadScreen_StreamFiles(void) {
-    fn_8001518C();
+    StreamManagerLoadScreen_OpenStreamFiles();
     do {
 
     } while ((u8)UStream_Update() != 0);   // fake match: this file tests the result as a byte
-    fn_80015164();
+    StreamManagerLoadScreen_CloseStreamFiles();
 }
 
 // Register the stream handlers the startup files need: UI, memory card, startup and the globals'
@@ -367,11 +370,11 @@ void StreamManagerStartup_UnregisterStreamClients(void) {
 // Read the startup stream list (5: LoadOnce.gcb and startup.gcb) to the end, with no loading
 // screen.
 void StreamManagerStartup_StreamFiles(void) {
-    fn_800151E4();
+    StreamManagerStartup_OpenStreamFiles();
     do {
 
     } while ((u8)UStream_Update() != 0);   // fake match: this file tests the result as a byte
-    fn_800151BC();
+    StreamManagerStartup_CloseStreamFiles();
 }
 
 // Register the stream handlers of the global data (golfer stats, records, EA Trax, course info,
@@ -408,11 +411,11 @@ void StreamManagerGlobals_UnregisterStreamClients(void) {
 // Read the globals stream list (4: LoadOnce.gcb) to the end, with no loading screen. It closes
 // through StreamManagerFrontend_CloseStreamFiles (every close is the same).
 void StreamManagerGlobals_StreamFiles(void) {
-    fn_80015214();
+    StreamManagerGlobals_OpenStreamFiles();
     do {
 
     } while ((u8)UStream_Update() != 0);   // fake match: this file tests the result as a byte
-    fn_8001510C();
+    StreamManagerFrontend_CloseStreamFiles();
 }
 
 // Register the stream handlers a hole file needs (terrain, dynamic objects, static cameras).
@@ -443,9 +446,9 @@ void StreamManagerHole_StreamFiles(void) {
     char* szHole;
 
     UI_InitLoadingBar();
-    fn_80015324();
+    StreamManagerHole_ClearStreamFileNames();
     if (gSession.n5B34 != 0) {
-        fn_8001529C(gSession.p5B30, StreamManagerHole_BeginStreamCallback,
+        StreamManagerHole_AddStreamFileName(gSession.p5B30, StreamManagerHole_BeginStreamCallback,
                     StreamManagerHole_EndStreamCallback);
     } else {
         szCourse = GM_GetCourseName();
@@ -453,14 +456,15 @@ void StreamManagerHole_StreamFiles(void) {
         sprintf(szPath, gszStreamCourseDirFmt, szCourse);
         strcat(szPath, szHole);
         strcat(szPath, gszStreamHoleFileName);
-        fn_8001529C(szPath, StreamManagerHole_BeginStreamCallback, StreamManagerHole_EndStreamCallback);
+        StreamManagerHole_AddStreamFileName(szPath, StreamManagerHole_BeginStreamCallback,
+                                            StreamManagerHole_EndStreamCallback);
     }
-    fn_8001526C();
+    StreamManagerHole_OpenStreamFiles();
     do {
         UI_DrawLoadingScreenAndProgressBar(0);
     } while (UStream_Update() != 0);
     UI_DrawLoadingScreenAndProgressBar(1);
-    fn_80015244();
+    StreamManagerHole_CloseStreamFiles();
     UI_FreeLoadingPicture();
 }
 
@@ -482,14 +486,14 @@ void StreamManagerIngame_SetupFileStream(void) {
     int i;
 
     gSacReloading = 0;
-    fn_800153BC();
-    fn_80015334(gszStreamGlbDataFile, StreamManagerGlobals_BeginStreamCallback,
+    StreamManagerIngame_ClearStreamFileNames();
+    StreamManagerIngame_AddStreamFileName(gszStreamGlbDataFile, StreamManagerGlobals_BeginStreamCallback,
                 StreamManagerGlobals_EndStreamCallback);
-    fn_80015334(gszStreamGlbCharFile, StreamManagerIngame_BeginStreamCallbackIGChar,
+    StreamManagerIngame_AddStreamFileName(gszStreamGlbCharFile, StreamManagerIngame_BeginStreamCallbackIGChar,
                 StreamManagerIngame_EndStreamCallbackIGChar);
     for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
         sprintf(szName, gszStreamCharFileFmt, Character_GetGolferModelID(nPlayer) + 1);
-        fn_80015334(szName, StreamManagerIngame_BeginStreamCallbackIGChar,
+        StreamManagerIngame_AddStreamFileName(szName, StreamManagerIngame_BeginStreamCallbackIGChar,
                     StreamManagerIngame_EndStreamCallbackIGChar);
     }
     for (i = 0; i < 30; i++) {
@@ -504,18 +508,19 @@ void StreamManagerIngame_SetupSacFiles(void) {
     char szName[0x80];  // size unknown: the frame allows up to 0x88 bytes
     int nPlayer;
 
-    fn_800153BC();
+    StreamManagerIngame_ClearStreamFileNames();
     if (Skalib_HasOverlays(0) != 0) {
-        fn_80015334(gszStreamMaleSacFile, StreamManagerGlobals_BeginStreamCallback,
+        StreamManagerIngame_AddStreamFileName(gszStreamMaleSacFile, StreamManagerGlobals_BeginStreamCallback,
                     StreamManagerGlobals_EndStreamCallback);
     }
     if (Skalib_HasOverlays(1) != 0) {
-        fn_80015334(gszStreamFemaleSacFile, StreamManagerGlobals_BeginStreamCallback,
+        StreamManagerIngame_AddStreamFileName(gszStreamFemaleSacFile,
+                                              StreamManagerGlobals_BeginStreamCallback,
                     StreamManagerGlobals_EndStreamCallback);
     }
     for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
         sprintf(szName, gszStreamCharSacFileFmt, Character_GetGolferModelID(nPlayer) + 1);
-        fn_80015334(szName, StreamManagerIngame_BeginStreamCallbackIGChar,
+        StreamManagerIngame_AddStreamFileName(szName, StreamManagerIngame_BeginStreamCallbackIGChar,
                     StreamManagerIngame_EndStreamCallbackIGChar);
     }
 }
@@ -531,13 +536,14 @@ void StreamManagerIngame_SetupCurSlotSacFiles(void) {
     int nModel;
     int i;
 
-    fn_800153BC();
+    StreamManagerIngame_ClearStreamFileNames();
     nSlot = Skalib_CurSlot();
     if (nSlot == 0) {
-        fn_80015334(gszStreamMaleSacFile, StreamManagerGlobals_BeginStreamCallback,
+        StreamManagerIngame_AddStreamFileName(gszStreamMaleSacFile, StreamManagerGlobals_BeginStreamCallback,
                     StreamManagerGlobals_EndStreamCallback);
     } else {
-        fn_80015334(gszStreamFemaleSacFile, StreamManagerGlobals_BeginStreamCallback,
+        StreamManagerIngame_AddStreamFileName(gszStreamFemaleSacFile,
+                                              StreamManagerGlobals_BeginStreamCallback,
                     StreamManagerGlobals_EndStreamCallback);
     }
     pSlot = &gLibSlots[nSlot];
@@ -550,7 +556,7 @@ void StreamManagerIngame_SetupCurSlotSacFiles(void) {
         }
         if (i < pSlot->nOverlays) {
             sprintf(szName, gszStreamCharSacFileFmt, nModel + 1);
-            fn_80015334(szName, StreamManagerIngame_BeginStreamCallbackIGChar,
+            StreamManagerIngame_AddStreamFileName(szName, StreamManagerIngame_BeginStreamCallbackIGChar,
                         StreamManagerIngame_EndStreamCallbackIGChar);
         }
     }
@@ -562,11 +568,11 @@ void StreamManagerIngame_SetupCurSlotSacFiles(void) {
 // already set up (StreamManagerIngame_StreamFiles also inits it). Called by Character_LoadSacFiles
 // and Character_ReloadSacFiles.
 void StreamManagerIngame_StreamSacFiles(void) {
-    fn_800150E0();
+    StreamManagerIngame_OpenStreamFiles();
     do {
         UI_DrawLoadingScreenAndProgressBar(0);
     } while ((u8)UStream_Update() != 0);   // fake match: this file tests the result as a byte
-    fn_800150B8();
+    StreamManagerIngame_CloseStreamFiles();
 }
 
 // Called by StreamManager_InitModule; empty in this build. Named for its place beside the FE
@@ -582,10 +588,11 @@ void StreamManagerFEChar_InitModule(void) {
 void StreamManagerFEChar_SetupFileStream(s32 nChar, s32 nUnused) { // port: FEgolferanim.c passes a second argument this ignores
     char szName[0x100];  // size unknown: the frame allows up to 0x100 bytes
 
-    fn_80015454();
+    StreamManagerFEChar_ClearStreamFileNames();
     sprintf(szName, gszStreamFECharFileFmt, nChar + 1);
     gpCrAPState->pB8->nStreamedId = -1;
-    fn_800153CC(szName, StreamManagerFEChar_BeginStreamCallback, StreamManagerFEChar_EndStreamCallback);
+    StreamManagerFEChar_AddStreamFileName(szName, StreamManagerFEChar_BeginStreamCallback,
+                                          StreamManagerFEChar_EndStreamCallback);
 }
 
 // ---- sweep code (not yet cleaned up) ----
@@ -652,32 +659,40 @@ void StreamManagerHole_EndStreamCallback(void* pArg) {
 
 // ---- end of sweep code ----
 
-// Add a file to stream list 5, with the calls made when it is opened and closed.
-void fn_80014E98(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*)) {
+// Add file szName to the startup stream list (5), with the calls UStream makes when it is opened
+// and closed. No bounds check: the list holds 8 files.
+void StreamManagerStartup_AddStreamFileName(const char* szName, void (*pfnOpened)(void*),
+                                            void (*pfnClosed)(void*)) {
     strcpy(gpStreamManagerLists->aParams[5].aszName[gpStreamManagerLists->aParams[5].nNumFiles], szName);
     gpStreamManagerLists->aParams[5].apfnOpened[gpStreamManagerLists->aParams[5].nNumFiles] = pfnOpened;
     gpStreamManagerLists->aParams[5].apfnClosed[gpStreamManagerLists->aParams[5].nNumFiles] = pfnClosed;
     gpStreamManagerLists->aParams[5].nNumFiles++;
 }
 
-// The same for list 4.
-void fn_80014F20(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*)) {
+// Add file szName to the globals stream list (4), with the calls UStream makes when it is opened
+// and closed. No bounds check: the list holds 8 files.
+void StreamManagerGlobals_AddStreamFileName(const char* szName, void (*pfnOpened)(void*),
+                                            void (*pfnClosed)(void*)) {
     strcpy(gpStreamManagerLists->aParams[4].aszName[gpStreamManagerLists->aParams[4].nNumFiles], szName);
     gpStreamManagerLists->aParams[4].apfnOpened[gpStreamManagerLists->aParams[4].nNumFiles] = pfnOpened;
     gpStreamManagerLists->aParams[4].apfnClosed[gpStreamManagerLists->aParams[4].nNumFiles] = pfnClosed;
     gpStreamManagerLists->aParams[4].nNumFiles++;
 }
 
-// The same for list 1.
-void fn_80014FA8(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*)) {
+// Add file szName to the front end's stream list (1), with the calls UStream makes when it is
+// opened and closed. No bounds check: the list holds 8 files.
+void StreamManagerFrontend_AddStreamFileName(const char* szName, void (*pfnOpened)(void*),
+                                             void (*pfnClosed)(void*)) {
     strcpy(gpStreamManagerLists->aParams[1].aszName[gpStreamManagerLists->aParams[1].nNumFiles], szName);
     gpStreamManagerLists->aParams[1].apfnOpened[gpStreamManagerLists->aParams[1].nNumFiles] = pfnOpened;
     gpStreamManagerLists->aParams[1].apfnClosed[gpStreamManagerLists->aParams[1].nNumFiles] = pfnClosed;
     gpStreamManagerLists->aParams[1].nNumFiles++;
 }
 
-// The same for list 2.
-void fn_80015030(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*)) {
+// Add file szName to the loading-screen stream list (2), with the calls UStream makes when it is
+// opened and closed. No bounds check: the list holds 8 files.
+void StreamManagerLoadScreen_AddStreamFileName(const char* szName, void (*pfnOpened)(void*),
+                                               void (*pfnClosed)(void*)) {
     strcpy(gpStreamManagerLists->aParams[2].aszName[gpStreamManagerLists->aParams[2].nNumFiles], szName);
     gpStreamManagerLists->aParams[2].apfnOpened[gpStreamManagerLists->aParams[2].nNumFiles] = pfnOpened;
     gpStreamManagerLists->aParams[2].apfnClosed[gpStreamManagerLists->aParams[2].nNumFiles] = pfnClosed;
@@ -686,57 +701,70 @@ void fn_80015030(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_800150B8(void) {
+// Close the open stream (gpStreamManagerLists->nStream) after the in-game list (0) has streamed.
+void StreamManagerIngame_CloseStreamFiles(void) {
     UStream_Close(gpStreamManagerLists->nStream);
 }
 
-void fn_800150E0(void) {
+// Start streaming the in-game list (0); the stream is kept in gpStreamManagerLists->nStream.
+void StreamManagerIngame_OpenStreamFiles(void) {
     s32 t0;
     t0 = Stream_OpenStreamFiles(&gpStreamManagerLists->aParams[0]);
     gpStreamManagerLists->nStream = t0;
 }
 
-void fn_8001510C(void) {
+// Close the open stream (gpStreamManagerLists->nStream) after the front end's list (1) has
+// streamed. StreamManagerGlobals_StreamFiles closes the globals list (4) with it too.
+void StreamManagerFrontend_CloseStreamFiles(void) {
     UStream_Close(gpStreamManagerLists->nStream);
 }
 
-void fn_80015134(void) {
+// Start streaming the front end's list (1); the stream is kept in gpStreamManagerLists->nStream.
+void StreamManagerFrontend_OpenStreamFiles(void) {
     s32 t0;
     t0 = Stream_OpenStreamFiles(&gpStreamManagerLists->aParams[1]);
     gpStreamManagerLists->nStream = t0;
 }
 
-void fn_80015164(void) {
+// Close the open stream (gpStreamManagerLists->nStream) after the loading-screen list (2) has
+// streamed.
+void StreamManagerLoadScreen_CloseStreamFiles(void) {
     UStream_Close(gpStreamManagerLists->nStream);
 }
 
-void fn_8001518C(void) {
+// Start streaming the loading-screen list (2); the stream is kept in gpStreamManagerLists->nStream.
+void StreamManagerLoadScreen_OpenStreamFiles(void) {
     s32 t0;
     t0 = Stream_OpenStreamFiles(&gpStreamManagerLists->aParams[2]);
     gpStreamManagerLists->nStream = t0;
 }
 
-void fn_800151BC(void) {
+// Close the open stream (gpStreamManagerLists->nStream) after the startup list (5) has streamed.
+void StreamManagerStartup_CloseStreamFiles(void) {
     UStream_Close(gpStreamManagerLists->nStream);
 }
 
-void fn_800151E4(void) {
+// Start streaming the startup list (5); the stream is kept in gpStreamManagerLists->nStream.
+void StreamManagerStartup_OpenStreamFiles(void) {
     s32 t0;
     t0 = Stream_OpenStreamFiles(&gpStreamManagerLists->aParams[5]);
     gpStreamManagerLists->nStream = t0;
 }
 
-void fn_80015214(void) {
+// Start streaming the globals list (4); the stream is kept in gpStreamManagerLists->nStream.
+void StreamManagerGlobals_OpenStreamFiles(void) {
     s32 t0;
     t0 = Stream_OpenStreamFiles(&gpStreamManagerLists->aParams[4]);
     gpStreamManagerLists->nStream = t0;
 }
 
-void fn_80015244(void) {
+// Close the open stream (gpStreamManagerLists->nStream) after the hole list (6) has streamed.
+void StreamManagerHole_CloseStreamFiles(void) {
     UStream_Close(gpStreamManagerLists->nStream);
 }
 
-void fn_8001526C(void) {
+// Start streaming the hole list (6); the stream is kept in gpStreamManagerLists->nStream.
+void StreamManagerHole_OpenStreamFiles(void) {
     s32 t0;
     t0 = Stream_OpenStreamFiles(&gpStreamManagerLists->aParams[6]);
     gpStreamManagerLists->nStream = t0;
@@ -744,8 +772,10 @@ void fn_8001526C(void) {
 
 // ---- end of sweep code ----
 
-// The same for list 6.
-void fn_8001529C(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*)) {
+// Add file szName to the hole stream list (6), with the calls UStream makes when it is opened and
+// closed. No bounds check: the list holds 8 files.
+void StreamManagerHole_AddStreamFileName(const char* szName, void (*pfnOpened)(void*),
+                                         void (*pfnClosed)(void*)) {
     strcpy(gpStreamManagerLists->aParams[6].aszName[gpStreamManagerLists->aParams[6].nNumFiles], szName);
     gpStreamManagerLists->aParams[6].apfnOpened[gpStreamManagerLists->aParams[6].nNumFiles] = pfnOpened;
     gpStreamManagerLists->aParams[6].apfnClosed[gpStreamManagerLists->aParams[6].nNumFiles] = pfnClosed;
@@ -754,14 +784,16 @@ void fn_8001529C(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_80015324(void) {
+void StreamManagerHole_ClearStreamFileNames(void) {
     gpStreamManagerLists->aParams[6].nNumFiles = 0;
 }
 
 // ---- end of sweep code ----
 
-// The same for list 0.
-void fn_80015334(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*)) {
+// Add file szName to the in-game stream list (0), with the calls UStream makes when it is opened
+// and closed. No bounds check: the list holds 8 files.
+void StreamManagerIngame_AddStreamFileName(const char* szName, void (*pfnOpened)(void*),
+                                           void (*pfnClosed)(void*)) {
     strcpy(gpStreamManagerLists->aParams[0].aszName[gpStreamManagerLists->aParams[0].nNumFiles], szName);
     gpStreamManagerLists->aParams[0].apfnOpened[gpStreamManagerLists->aParams[0].nNumFiles] = pfnOpened;
     gpStreamManagerLists->aParams[0].apfnClosed[gpStreamManagerLists->aParams[0].nNumFiles] = pfnClosed;
@@ -770,14 +802,16 @@ void fn_80015334(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_800153BC(void) {
+void StreamManagerIngame_ClearStreamFileNames(void) {
     gpStreamManagerLists->aParams[0].nNumFiles = 0;
 }
 
 // ---- end of sweep code ----
 
-// The same for list 3.
-void fn_800153CC(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*)) {
+// Add file szName to the FE character stream list (3), with the calls UStream makes when it is
+// opened and closed. No bounds check: the list holds 8 files.
+void StreamManagerFEChar_AddStreamFileName(const char* szName, void (*pfnOpened)(void*),
+                                           void (*pfnClosed)(void*)) {
     strcpy(gpStreamManagerLists->aParams[3].aszName[gpStreamManagerLists->aParams[3].nNumFiles], szName);
     gpStreamManagerLists->aParams[3].apfnOpened[gpStreamManagerLists->aParams[3].nNumFiles] = pfnOpened;
     gpStreamManagerLists->aParams[3].apfnClosed[gpStreamManagerLists->aParams[3].nNumFiles] = pfnClosed;
@@ -786,7 +820,7 @@ void fn_800153CC(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_80015454(void) {
+void StreamManagerFEChar_ClearStreamFileNames(void) {
     gpStreamManagerLists->aParams[3].nNumFiles = 0;
 }
 
