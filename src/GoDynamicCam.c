@@ -246,8 +246,8 @@ void fn_80039B14(int nSize) {
             lbl_80281D88->pShots[i].p40 = &lbl_80281D88->pShots[(s32)lbl_80281D88->pShots[i].p40];
             lbl_80281D88->pShots[i].p40->bA9 = 1;
         }
-        if (lbl_80281D88->pShots[i].f68 < lbl_80281F78->f168) {
-            lbl_80281D88->pShots[i].f68 = lbl_80281F78->f168;
+        if (lbl_80281D88->pShots[i].f68 < gpCamTuning->f168) {
+            lbl_80281D88->pShots[i].f68 = gpCamTuning->f168;
         }
         if (lbl_80281D88->pShots[i].f6C < lbl_80281D88->pShots[i].f68) {
             lbl_80281D88->pShots[i].f6C = lbl_80281D88->pShots[i].f68;
@@ -508,11 +508,11 @@ void fn_8003A148(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
         fDiff = gPlayers[nPlayer].vBall[1] - fGround;
         fLo = pShot->f68 + fDiff;
         fHi = pShot->f6C + fDiff;
-        if (fLo < lbl_80281F78->f168) {
-            fLo = lbl_80281F78->f168;
+        if (fLo < gpCamTuning->f168) {
+            fLo = gpCamTuning->f168;
         }
-        if (fHi < lbl_80281F78->f168) {
-            fHi = lbl_80281F78->f168;
+        if (fHi < gpCamTuning->f168) {
+            fHi = gpCamTuning->f168;
         }
     } else {
         fLo = pShot->f68;
@@ -522,20 +522,20 @@ void fn_8003A148(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
         if (pShot->bB1 == 5 || pShot->bB1 == 6 || pShot->bB1 == 7) {
             // fake match: a negated >=, where < gives a plain bge
             if (!(aOld[1] - fGround >= fLo)) {
-                pOut[1] += lbl_80281F78->f194;
+                pOut[1] += gpCamTuning->f194;
                 if (pOut[1] - fGround > fLo) {
                     pOut[1] = fGround + fLo;
                 }
             }
-            if (pOut[1] - fGround < lbl_80281F78->f168) {
-                pOut[1] = fGround + lbl_80281F78->f168;
+            if (pOut[1] - fGround < gpCamTuning->f168) {
+                pOut[1] = fGround + gpCamTuning->f168;
             }
         } else {
             pOut[1] = fGround + fLo;
         }
     } else {
         fFollow = pScript->fD8;
-        fEase = lbl_80281F78->f174;
+        fEase = gpCamTuning->f174;
         fAbove = pOut[1] - fFollow;
         fTop = fHi - fEase;
         if (fAbove > fTop) {
@@ -749,12 +749,12 @@ void fn_8003ADF8(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
             fFar = pScript->f100;
             fn_8003DC54(pOut, pSub, vOff);
             vOff[1] = 0.0f;
-            if (fFar > lbl_80281F78->f23C) {
-                if (fFar > lbl_80281F78->f244) {
-                    fScale = lbl_80281F78->f248;
+            if (fFar > gpCamTuning->f23C) {
+                if (fFar > gpCamTuning->f244) {
+                    fScale = gpCamTuning->f248;
                 } else {
-                    fScale = (fFar - lbl_80281F78->f23C) / (lbl_80281F78->f244 - lbl_80281F78->f23C);
-                    fScale = lbl_80281F78->f240 - fScale * (lbl_80281F78->f240 - lbl_80281F78->f248);
+                    fScale = (fFar - gpCamTuning->f23C) / (gpCamTuning->f244 - gpCamTuning->f23C);
+                    fScale = gpCamTuning->f240 - fScale * (gpCamTuning->f240 - gpCamTuning->f248);
                 }
                 Vec3_Scale(fScale, vOff, vOff);
                 fn_8003DC30(vOff, pSub, pOut);
@@ -821,9 +821,9 @@ void fn_8003B028(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
     }
     fHeight = gPlayers[nPlayer].ball.vPos[1] - pScript->fD8;
     if (fHeight > fHi) {
-        fDist = lbl_80281F78->f18C * (fHi - fHeight) + pShot->f60;
+        fDist = gpCamTuning->f18C * (fHi - fHeight) + pShot->f60;
     } else if (fHeight < fLo) {
-        fDist = lbl_80281F78->f190 * (fHeight - fLo) + pShot->f60;
+        fDist = gpCamTuning->f190 * (fHeight - fLo) + pShot->f60;
     } else {
         fDist = pShot->f60;
     }
@@ -835,12 +835,12 @@ void fn_8003B028(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
     }
     // port: NTSC rate
     fFrames = f / (1.0f / 59.94f);
-    fMove = lbl_80281F78->f14C * fFrames;
-    fTurn = lbl_80281F78->f150 * fFrames;
-    if (pScript->f98 < lbl_80281F78->f154) {
-        fT = (lbl_80281F78->f154 - pScript->fCamTime) / lbl_80281F78->f154;
+    fMove = gpCamTuning->f14C * fFrames;
+    fTurn = gpCamTuning->f150 * fFrames;
+    if (pScript->f98 < gpCamTuning->f154) {
+        fT = (gpCamTuning->f154 - pScript->fCamTime) / gpCamTuning->f154;
         fT *= fT;
-        fEase = (1.0f / lbl_80281F78->f14C) * fT;
+        fEase = (1.0f / gpCamTuning->f14C) * fT;
         fMove *= fEase;
         fTurn *= fEase;
     }
@@ -848,19 +848,19 @@ void fn_8003B028(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
         fMove *= pScript->f8C;
         fTurn *= pScript->f8C;
     }
-    if (gPlayers[nPlayer].ball.fSpeed < lbl_80281F78->f198) {
-        fGrow = gPlayers[nPlayer].ball.fSpeed / lbl_80281F78->f198;
+    if (gPlayers[nPlayer].ball.fSpeed < gpCamTuning->f198) {
+        fGrow = gPlayers[nPlayer].ball.fSpeed / gpCamTuning->f198;
         fGrow = fGrow * fGrow;
         fGrow = fGrow * fGrow;
         fMove *= fGrow;
         fTurn *= fGrow;
     }
-    if (pScript->f88 < lbl_80281F78->f158) {
-        fMove *= pScript->f88 / lbl_80281F78->f158;
-        fTurn *= pScript->f88 / lbl_80281F78->f158;
+    if (pScript->f88 < gpCamTuning->f158) {
+        fMove *= pScript->f88 / gpCamTuning->f158;
+        fTurn *= pScript->f88 / gpCamTuning->f158;
     }
-    if (pScript->f88 < lbl_80281F78->f15C) {
-        fRise = powf(pScript->f88 / lbl_80281F78->f15C, lbl_80281F78->f160);
+    if (pScript->f88 < gpCamTuning->f15C) {
+        fRise = powf(pScript->f88 / gpCamTuning->f15C, gpCamTuning->f160);
         fRise *= fFrames;
         aTarget[1] = fRise * (aTarget[1] - pOut[1]) + pOut[1];
     }
@@ -925,7 +925,7 @@ void fn_8003B534(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
     if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
         LLMath_Normalize3(vDir, vDir);
     }
-    if (gPlayers[nPlayer].ball.fSpeed < lbl_80281F78->f198) return;
+    if (gPlayers[nPlayer].ball.fSpeed < gpCamTuning->f198) return;
     if (pScript->pNextShot != NULL && pScript->pShot->bB1 == pScript->pNextShot->bB1) {
         fMax = pScript->pShot->f6C;
         fMin = pScript->pShot->f68;
@@ -935,9 +935,9 @@ void fn_8003B534(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
     }
     fHeight = gPlayers[nPlayer].ball.vPos[1] - pScript->fD8;
     if (fHeight > fMax) {
-        fDist = lbl_80281F78->f18C * (fMax - fHeight) + pShot->f60;
+        fDist = gpCamTuning->f18C * (fMax - fHeight) + pShot->f60;
     } else if (fHeight < fMin) {
-        fDist = lbl_80281F78->f190 * (fHeight - fMin) + pShot->f60;
+        fDist = gpCamTuning->f190 * (fHeight - fMin) + pShot->f60;
     } else {
         fDist = pShot->f60;
     }
@@ -1248,8 +1248,8 @@ CamSequence* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind
         return NULL;
     }
     fHeight = pCourse->pin[nPinSet].y - gPlayers[nPlayer].vBall[1];
-    if (nKind == 3 && Ter_CheckObjectAndHazardObstruction(gPlayers[nPlayer].ball.vPos, lbl_80281F78->f16C, 1,
-                                                          0, 0.0f, 1, lbl_80281F78->f1A4)) {
+    if (nKind == 3 && Ter_CheckObjectAndHazardObstruction(gPlayers[nPlayer].ball.vPos, gpCamTuning->f16C, 1,
+                                                          0, 0.0f, 1, gpCamTuning->f1A4)) {
         nKind = 28;
     }
     for (i = 0; i < lbl_80281D88->nSequences; i++) {
@@ -1718,21 +1718,21 @@ void DynamicCam_AddHeightOffset(f32* pPos, CamScript* pScript, CamShot* pShot, i
             fLow = 0.15f;
         }
         if (!gPlayers[nPlayer].ball.bHitTopArc) {
-            fEase = lbl_80281F78->f22C;
+            fEase = gpCamTuning->f22C;
             pScript->f104 = pPos[1] - pScript->fD8;
         } else {
             fHeight = pPos[1] - pScript->fD8;
             if (fHeight <= fLow || pScript->f104 < fLow) {
-                fEase = lbl_80281F78->f230;
+                fEase = gpCamTuning->f230;
             } else if (fHeight > pScript->f104) {
-                fEase = lbl_80281F78->f22C;
+                fEase = gpCamTuning->f22C;
             } else {
-                fEase = (lbl_80281F78->f22C - lbl_80281F78->f230) * ((fHeight - fLow) / pScript->f104) +
-                        lbl_80281F78->f230;
+                fEase = (gpCamTuning->f22C - gpCamTuning->f230) * ((fHeight - fLow) / pScript->f104) +
+                        gpCamTuning->f230;
             }
         }
-        if (pScript->f98 < lbl_80281F78->fD4) {
-            dSmooth = Math_Sqrt((f32)Math_Sqrt(pScript->f98 / lbl_80281F78->fD4));
+        if (pScript->f98 < gpCamTuning->fD4) {
+            dSmooth = Math_Sqrt((f32)Math_Sqrt(pScript->f98 / gpCamTuning->fD4));
             fEase = 1.0f - (f32)dSmooth * (1.0f - fEase);
         }
         pPos[1] = fEase * (pPos[1] - fY) + fY;
@@ -1769,12 +1769,12 @@ void fn_8003D810(f32* pDir, f32* pA, f32* pB) {
     if (0.0f != vLevel[0] || 0.0f != vLevel[1] || 0.0f != vLevel[2]) {
         LLMath_Normalize3(vLevel, vLevel);
     }
-    if (fabsf(Math_Acos(Vec3_Dot(vLevel, pDir))) > lbl_80281F78->f19C) {
+    if (fabsf(Math_Acos(Vec3_Dot(vLevel, pDir))) > gpCamTuning->f19C) {
         vec4flt_CrossProduct(pDir, vLevel, vAxis);
         if (0.0f != vAxis[0] || 0.0f != vAxis[1] || 0.0f != vAxis[2]) {
             LLMath_Normalize3(vAxis, vAxis);
         }
-        Vec3_Scale(lbl_80281F78->f19C, vAxis, vAxis);
+        Vec3_Scale(gpCamTuning->f19C, vAxis, vAxis);
         Quat_BuildFromVector(vAxis, qTurn);
         vLevel[3] = 0.0f;
         Quat_RotateVector(qTurn, vLevel, pDir);

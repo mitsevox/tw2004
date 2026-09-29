@@ -633,7 +633,7 @@ void fn_80039358(int nView) {
         aColour[0] = 0.0f;
         aColour[1] = 0.0f;
         aColour[2] = 0.0f;
-        aColour[3] = lbl_80281F78->f208 * f;
+        aColour[3] = gpCamTuning->f208 * f;
         RenderView_SetUseCurrentMatrices(0);
         RenderState_SetDrawFlags(0x40);
         RenderState_SetBlendFactors(4, 5);

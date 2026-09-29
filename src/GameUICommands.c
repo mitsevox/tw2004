@@ -929,7 +929,7 @@ void GM_vIsPostShotCameraDone(MsgArg* pArgs, MsgArg* pResult) {
     bNotReactionAnim = gPlayers[pArgs[0].i].pChar->nCurState != 9 &&
                        gPlayers[pArgs[0].i].pChar->nCurState != 11 &&
                        gPlayers[pArgs[0].i].pChar->nCurState != 12;
-    bAnimAlmostDone = fn_80062C28(gPlayers[pArgs[0].i].pChar) < lbl_80281F78->f170;
+    bAnimAlmostDone = fn_80062C28(gPlayers[pArgs[0].i].pChar) < gpCamTuning->f170;
     if ((bPostShotCamDone && (!bCamTrackingPlayer || bAnimPaused || bAnimAlmostDone)) || bNotReactionAnim) {
         pResult->i = 1;
         return;

@@ -1,5 +1,5 @@
 // GoComicCam.c (EA's name, from its asserts; also in EA's 2002 source tree): the comic-book camera,
-// which shows the shot in panels on screen, one after another (the state at lbl_80282178,
+// which shows the shot in panels on screen, one after another (the state at gpComicCam,
 // comiccam.h). Layout 0 is three panels side by side, layout 1 a 3x3 grid filled in a random order.
 
 #include "golfer.h"
@@ -20,16 +20,16 @@ u8   ComicCam_IsComicCamOver(f32* pRect, int nPlayer);
 u8   ComicCam_IsScreenFrozen(void);
 void ComicCam_CheckForCameraSwitch(View* pView, int nPlayer);
 
-ComicCam* lbl_80282178;
+ComicCam* gpComicCam;
 
-// Allocate the comic camera's state (lbl_80282178) when a round's systems start (GO_vInitIG).
+// Allocate the comic camera's state (gpComicCam) when a round's systems start (GO_vInitIG).
 void ComicCam_InitComicCam(void) {
-    lbl_80282178 = StaticMem_Alloc(sizeof(ComicCam), 2, 0, "GoComicCam.c", 91);
+    gpComicCam = StaticMem_Alloc(sizeof(ComicCam), 2, 0, "GoComicCam.c", 91);
 }
 
-// Free the comic camera's state (lbl_80282178) when the round's systems shut down (gomainloop.c).
+// Free the comic camera's state (gpComicCam) when the round's systems shut down (gomainloop.c).
 void ComicCam_CloseComicCam(void) {
-    StaticMem_Free(lbl_80282178);
+    StaticMem_Free(gpComicCam);
 }
 
 // Start the comic camera for nPlayer's view (GolfCamera_Init3ScreenCamera) with layout nKind (0:
@@ -43,7 +43,7 @@ void ComicCam_StartComicCam(int nKind, View* pView, int nPlayer) {
     CamShot* pShot;
 
     for (i = 0; i < 10; i++) {
-        lbl_80282178->a24[i] = lbl_80282178->a4C[i] = -1.0f;
+        gpComicCam->a24[i] = gpComicCam->a4C[i] = -1.0f;
     }
     // EA bug: nShot is left unset for any other nKind (GoGolfCam.c only passes 0 and 1).
     switch (nKind) {
@@ -56,11 +56,11 @@ void ComicCam_StartComicCam(int nKind, View* pView, int nPlayer) {
         nShot = 0x2B;
         break;
     }
-    lbl_80282178->bNext = 0;
-    lbl_80282178->n8 = 0;
-    lbl_80282178->nKind = nKind;
-    lbl_80282178->bDone = 0;
-    lbl_80282178->nPlayer = nPlayer;
+    gpComicCam->bNext = 0;
+    gpComicCam->n8 = 0;
+    gpComicCam->nKind = nKind;
+    gpComicCam->bDone = 0;
+    gpComicCam->nPlayer = nPlayer;
     pShot = DynamicCam_ChooseScript(nPlayer, nShot, pView->script.pShot);
     if (pShot != NULL && !CameraScript_WillGolferBeOccludedInThisView(nPlayer, pShot, &pView->script)) {
         CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f, 0x19,
@@ -73,47 +73,47 @@ void ComicCam_StartComicCam(int nKind, View* pView, int nPlayer) {
 u8 ComicCam_UpdateComicCam(View* pView, int nPlayer, f32 fFrameTime) {
     f32 aColour[4] = { 0.0f, 0.0f, 0.0f, 0.5f };
     f32* pRect;
-    ComicPanel* pPanel = &lbl_80282178->aPanel[lbl_80282178->nPanel];
+    ComicPanel* pPanel = &gpComicCam->aPanel[gpComicCam->nPanel];
 
     pRect = RC_spGetRenderCtxViewport(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0]));
     if (gSession.nPaused != 0) {
-        lbl_80282178->n8 = -2;
+        gpComicCam->n8 = -2;
     }
-    if (lbl_80282178->n8 < 2) {
+    if (gpComicCam->n8 < 2) {
         ComicCam_SetViewportToSize(pRect, 0.0f, 0.0f, 1.0f, 1.0f);
         fn_80038624(aColour);
         if (gSession.nPaused == 0) {
             ComicCam_SetViewportToSize(pRect, pPanel->fTop, pPanel->fLeft, pPanel->fWidth, pPanel->fHeight);
         }
-        lbl_80282178->n8 = lbl_80282178->n8 + 1;
+        gpComicCam->n8 = gpComicCam->n8 + 1;
     }
-    if (lbl_80282178->bNext && gSession.nPaused == 0) {
-        lbl_80282178->n10++;
+    if (gpComicCam->bNext && gSession.nPaused == 0) {
+        gpComicCam->n10++;
         ComicCam_PerformFadeOuts(pPanel, pRect, fFrameTime);
-        if (lbl_80282178->n10 > 2) {
-            lbl_80282178->bNext = 0;
+        if (gpComicCam->n10 > 2) {
+            gpComicCam->bNext = 0;
             ComicCam_SetViewportToSize(pRect, pPanel->fTop, pPanel->fLeft, pPanel->fWidth, pPanel->fHeight);
             ComicCam_CheckForCameraSwitch(pView, nPlayer);
         }
-    } else if (lbl_80282178->bNext && gSession.nPaused != 0) {
-        lbl_80282178->n10 = -2;
+    } else if (gpComicCam->bNext && gSession.nPaused != 0) {
+        gpComicCam->n10 = -2;
     }
-    if (!lbl_80282178->bNext) {
+    if (!gpComicCam->bNext) {
         ComicCam_ModeSpecificUpdate(pPanel, pRect, nPlayer, fFrameTime);
         ComicCam_PerformTransition(pPanel, pView, fFrameTime);
         ComicCam_PerformFadeOuts(pPanel, pRect, fFrameTime);
-        lbl_80282178->fTime = lbl_80282178->fTime + fFrameTime;
+        gpComicCam->fTime = gpComicCam->fTime + fFrameTime;
         if (ComicCam_IsFrameOver(pPanel, nPlayer)) {
-            lbl_80282178->a4C[lbl_80282178->nPanel] = pPanel->fTime;
-            lbl_80282178->a24[lbl_80282178->nPanel] = pPanel->fTime;
+            gpComicCam->a4C[gpComicCam->nPanel] = pPanel->fTime;
+            gpComicCam->a24[gpComicCam->nPanel] = pPanel->fTime;
             if (pPanel->nNext >= 0) {
-                lbl_80282178->bNext = 1;
-                lbl_80282178->nPanel = pPanel->nNext;
-                lbl_80282178->fTime = 0.0f;
-                lbl_80282178->n10 = 0;
-                lbl_80282178->nShown = lbl_80282178->nShown + 1;
+                gpComicCam->bNext = 1;
+                gpComicCam->nPanel = pPanel->nNext;
+                gpComicCam->fTime = 0.0f;
+                gpComicCam->n10 = 0;
+                gpComicCam->nShown = gpComicCam->nShown + 1;
             } else {
-                lbl_80282178->bDone = 1;
+                gpComicCam->bDone = 1;
             }
         }
         if (ComicCam_IsComicCamOver(pRect, nPlayer)) {
@@ -138,12 +138,12 @@ void ComicCam_ModeSpecificUpdate(ComicPanel* pPanel, f32* pRect, int nPlayer, f3
     u8 bGrowY;
 
     fFrames = FRAME_RATE * fFrameTime;
-    switch (lbl_80282178->nKind) {
+    switch (gpComicCam->nKind) {
     case 0:
         break;
     case 1:
         if ((pPanel->nNext == -1 ||
-             (lbl_80282178->nShown >= lbl_80282178->nPanels - 1 && 0.0f == lbl_80282178->fTime)) &&
+             (gpComicCam->nShown >= gpComicCam->nPanels - 1 && 0.0f == gpComicCam->fTime)) &&
             fFrameTime > 0.0f) {
             pPanel->nNext = -1;
             fX = pRect[0];
@@ -214,7 +214,7 @@ u8 ComicCam_IsFrameOver(ComicPanel* pPanel, int nPlayer) {
         }
         return 0;
     case 2:
-        return lbl_80282178->fTime >= pPanel->f4;
+        return gpComicCam->fTime >= pPanel->f4;
     default:
         return 0;
     }
@@ -240,15 +240,15 @@ void ComicCam_PerformFadeOuts(ComicPanel* pPanel, f32* pRect, f32 fFrameTime) {
     fHeight = pRect[3];
     fWidth = pRect[2];
     for (i = 0; i < 10; i++) {
-        if (lbl_80282178->a24[i] > 0.0f) {
-            ComicCam_SetViewportToSize(pRect, lbl_80282178->aPanel[i].fTop, lbl_80282178->aPanel[i].fLeft,
-                        lbl_80282178->aPanel[i].fWidth, lbl_80282178->aPanel[i].fHeight);
-            aColour[3] = 0.5f * (1.0f - lbl_80282178->a24[i] / lbl_80282178->a4C[i]);
+        if (gpComicCam->a24[i] > 0.0f) {
+            ComicCam_SetViewportToSize(pRect, gpComicCam->aPanel[i].fTop, gpComicCam->aPanel[i].fLeft,
+                        gpComicCam->aPanel[i].fWidth, gpComicCam->aPanel[i].fHeight);
+            aColour[3] = 0.5f * (1.0f - gpComicCam->a24[i] / gpComicCam->a4C[i]);
             aColour[3] = aColour[3] < 0.0f ? 0.0f : (aColour[3] > 0.5f ? 0.5f : aColour[3]);
-            lbl_80282178->a24[i] = lbl_80282178->a24[i] - fFrameTime;
+            gpComicCam->a24[i] = gpComicCam->a24[i] - fFrameTime;
             fn_80038624(aColour);
-            if (lbl_80282178->bNext && lbl_80282178->a24[i] <= 0.0f) {
-                lbl_80282178->a24[i] += fFrameTime;
+            if (gpComicCam->bNext && gpComicCam->a24[i] <= 0.0f) {
+                gpComicCam->a24[i] += fFrameTime;
             }
         }
     }
@@ -269,38 +269,38 @@ void ComicCam_SetViewportToSize(f32* pRect, f32 fTop, f32 fLeft, f32 fWidth, f32
 // Layout 0: three tall panels side by side, ended by the golfer's animation tag 1, tag 2 and then
 // one second; 3 panels in all. Tells the special-shot audio (Gaud_UpdtSpecialShot) column 0.
 void ComicCam_Init3ScreenMode(void) {
-    lbl_80282178->aPanel[0].fTop = 0.15f;
-    lbl_80282178->aPanel[0].fLeft = 0.03f;
-    lbl_80282178->aPanel[0].fWidth = 0.28f;
-    lbl_80282178->aPanel[0].fHeight = 0.7f;
-    lbl_80282178->aPanel[0].n0 = 0;
-    lbl_80282178->aPanel[0].f1C = 0.5f;
-    lbl_80282178->aPanel[0].n24 = 0;
-    lbl_80282178->aPanel[0].nNext = 1;
-    lbl_80282178->aPanel[0].fTime = -1.0f;
-    lbl_80282178->aPanel[1].fTop = 0.15f;
-    lbl_80282178->aPanel[1].fLeft = 0.36f;
-    lbl_80282178->aPanel[1].fWidth = 0.28f;
-    lbl_80282178->aPanel[1].fHeight = 0.7f;
-    lbl_80282178->aPanel[1].f1C = 0.1f;
-    lbl_80282178->aPanel[1].n0 = 1;
-    lbl_80282178->aPanel[1].n24 = 0;
-    lbl_80282178->aPanel[1].nNext = 2;
-    lbl_80282178->aPanel[1].fTime = -1.0f;
-    lbl_80282178->aPanel[2].fTop = 0.15f;
-    lbl_80282178->aPanel[2].fLeft = 0.69f;
-    lbl_80282178->aPanel[2].fWidth = 0.28f;
-    lbl_80282178->aPanel[2].fHeight = 0.7f;
-    lbl_80282178->aPanel[2].n0 = 2;
-    lbl_80282178->aPanel[2].f4 = 1.0f;
-    lbl_80282178->aPanel[2].f1C = 0.2f;
-    lbl_80282178->aPanel[2].n24 = 0;
-    lbl_80282178->aPanel[2].nNext = -1;
-    lbl_80282178->aPanel[2].fTime = -1.0f;
-    lbl_80282178->nPanel = 0;
-    lbl_80282178->fTime = 0.0f;
-    lbl_80282178->nShown = 0;
-    lbl_80282178->nPanels = 3;
+    gpComicCam->aPanel[0].fTop = 0.15f;
+    gpComicCam->aPanel[0].fLeft = 0.03f;
+    gpComicCam->aPanel[0].fWidth = 0.28f;
+    gpComicCam->aPanel[0].fHeight = 0.7f;
+    gpComicCam->aPanel[0].n0 = 0;
+    gpComicCam->aPanel[0].f1C = 0.5f;
+    gpComicCam->aPanel[0].n24 = 0;
+    gpComicCam->aPanel[0].nNext = 1;
+    gpComicCam->aPanel[0].fTime = -1.0f;
+    gpComicCam->aPanel[1].fTop = 0.15f;
+    gpComicCam->aPanel[1].fLeft = 0.36f;
+    gpComicCam->aPanel[1].fWidth = 0.28f;
+    gpComicCam->aPanel[1].fHeight = 0.7f;
+    gpComicCam->aPanel[1].f1C = 0.1f;
+    gpComicCam->aPanel[1].n0 = 1;
+    gpComicCam->aPanel[1].n24 = 0;
+    gpComicCam->aPanel[1].nNext = 2;
+    gpComicCam->aPanel[1].fTime = -1.0f;
+    gpComicCam->aPanel[2].fTop = 0.15f;
+    gpComicCam->aPanel[2].fLeft = 0.69f;
+    gpComicCam->aPanel[2].fWidth = 0.28f;
+    gpComicCam->aPanel[2].fHeight = 0.7f;
+    gpComicCam->aPanel[2].n0 = 2;
+    gpComicCam->aPanel[2].f4 = 1.0f;
+    gpComicCam->aPanel[2].f1C = 0.2f;
+    gpComicCam->aPanel[2].n24 = 0;
+    gpComicCam->aPanel[2].nNext = -1;
+    gpComicCam->aPanel[2].fTime = -1.0f;
+    gpComicCam->nPanel = 0;
+    gpComicCam->fTime = 0.0f;
+    gpComicCam->nShown = 0;
+    gpComicCam->nPanels = 3;
     Gaud_UpdtSpecialShot(0, 0);
 }
 
@@ -315,104 +315,104 @@ void ComicCam_Init9ScreenRapidMode(void) {
     };
     int nOrder = Misc_RandFunc(1) & 3;
 
-    lbl_80282178->aPanel[aOrder[nOrder][0]].fTop = 0.03f;
-    lbl_80282178->aPanel[aOrder[nOrder][0]].fLeft = 0.03f;
-    lbl_80282178->aPanel[aOrder[nOrder][0]].fWidth = 0.28f;
-    lbl_80282178->aPanel[aOrder[nOrder][0]].fHeight = 0.28f;
-    lbl_80282178->aPanel[aOrder[nOrder][0]].n0 = 2;
-    lbl_80282178->aPanel[aOrder[nOrder][0]].f4 = 3.0f / FRAME_RATE;
-    lbl_80282178->aPanel[aOrder[nOrder][0]].n24 = 1;
-    lbl_80282178->aPanel[0].nNext = 1;
-    lbl_80282178->aPanel[aOrder[nOrder][0]].fTime = 2.0f;
-    lbl_80282178->aPanel[aOrder[nOrder][1]].fTop = 0.03f;
-    lbl_80282178->aPanel[aOrder[nOrder][1]].fLeft = 0.36f;
-    lbl_80282178->aPanel[aOrder[nOrder][1]].fWidth = 0.28f;
-    lbl_80282178->aPanel[aOrder[nOrder][1]].fHeight = 0.28f;
-    lbl_80282178->aPanel[aOrder[nOrder][1]].n0 = 2;
-    lbl_80282178->aPanel[aOrder[nOrder][1]].f4 = 3.0f / FRAME_RATE;
-    lbl_80282178->aPanel[aOrder[nOrder][1]].n24 = 1;
-    lbl_80282178->aPanel[1].nNext = 2;
-    lbl_80282178->aPanel[aOrder[nOrder][1]].fTime = 2.0f;
-    lbl_80282178->aPanel[aOrder[nOrder][2]].fTop = 0.03f;
-    lbl_80282178->aPanel[aOrder[nOrder][2]].fLeft = 0.69f;
-    lbl_80282178->aPanel[aOrder[nOrder][2]].fWidth = 0.28f;
-    lbl_80282178->aPanel[aOrder[nOrder][2]].fHeight = 0.28f;
-    lbl_80282178->aPanel[aOrder[nOrder][2]].n0 = 2;
-    lbl_80282178->aPanel[aOrder[nOrder][2]].f4 = 3.0f / FRAME_RATE;
-    lbl_80282178->aPanel[aOrder[nOrder][2]].n24 = 1;
-    lbl_80282178->aPanel[2].nNext = 3;
-    lbl_80282178->aPanel[aOrder[nOrder][2]].fTime = 2.0f;
-    lbl_80282178->aPanel[aOrder[nOrder][3]].fTop = 0.36f;
-    lbl_80282178->aPanel[aOrder[nOrder][3]].fLeft = 0.03f;
-    lbl_80282178->aPanel[aOrder[nOrder][3]].fWidth = 0.28f;
-    lbl_80282178->aPanel[aOrder[nOrder][3]].fHeight = 0.28f;
-    lbl_80282178->aPanel[aOrder[nOrder][3]].n0 = 2;
-    lbl_80282178->aPanel[aOrder[nOrder][3]].f4 = 3.0f / FRAME_RATE;
-    lbl_80282178->aPanel[aOrder[nOrder][3]].n24 = 1;
-    lbl_80282178->aPanel[3].nNext = 4;
-    lbl_80282178->aPanel[aOrder[nOrder][3]].fTime = 2.0f;
-    lbl_80282178->aPanel[aOrder[nOrder][4]].fTop = 0.36f;
-    lbl_80282178->aPanel[aOrder[nOrder][4]].fLeft = 0.36f;
-    lbl_80282178->aPanel[aOrder[nOrder][4]].fWidth = 0.28f;
-    lbl_80282178->aPanel[aOrder[nOrder][4]].fHeight = 0.28f;
-    lbl_80282178->aPanel[aOrder[nOrder][4]].n0 = 2;
-    lbl_80282178->aPanel[aOrder[nOrder][4]].f4 = 3.0f / FRAME_RATE;
-    lbl_80282178->aPanel[aOrder[nOrder][4]].n24 = 1;
-    lbl_80282178->aPanel[4].nNext = 5;
-    lbl_80282178->aPanel[aOrder[nOrder][4]].fTime = 2.0f;
-    lbl_80282178->aPanel[aOrder[nOrder][5]].fTop = 0.36f;
-    lbl_80282178->aPanel[aOrder[nOrder][5]].fLeft = 0.69f;
-    lbl_80282178->aPanel[aOrder[nOrder][5]].fWidth = 0.28f;
-    lbl_80282178->aPanel[aOrder[nOrder][5]].fHeight = 0.28f;
-    lbl_80282178->aPanel[aOrder[nOrder][5]].n0 = 2;
-    lbl_80282178->aPanel[aOrder[nOrder][5]].f4 = 3.0f / FRAME_RATE;
-    lbl_80282178->aPanel[aOrder[nOrder][5]].n24 = 1;
-    lbl_80282178->aPanel[5].nNext = 6;
-    lbl_80282178->aPanel[aOrder[nOrder][5]].fTime = 2.0f;
-    lbl_80282178->aPanel[aOrder[nOrder][6]].fTop = 0.69f;
-    lbl_80282178->aPanel[aOrder[nOrder][6]].fLeft = 0.03f;
-    lbl_80282178->aPanel[aOrder[nOrder][6]].fWidth = 0.28f;
-    lbl_80282178->aPanel[aOrder[nOrder][6]].fHeight = 0.28f;
-    lbl_80282178->aPanel[aOrder[nOrder][6]].n0 = 2;
-    lbl_80282178->aPanel[aOrder[nOrder][6]].f4 = 3.0f / FRAME_RATE;
-    lbl_80282178->aPanel[aOrder[nOrder][6]].n24 = 1;
-    lbl_80282178->aPanel[6].nNext = 7;
-    lbl_80282178->aPanel[aOrder[nOrder][6]].fTime = 2.0f;
-    lbl_80282178->aPanel[aOrder[nOrder][7]].fTop = 0.69f;
-    lbl_80282178->aPanel[aOrder[nOrder][7]].fLeft = 0.36f;
-    lbl_80282178->aPanel[aOrder[nOrder][7]].fWidth = 0.28f;
-    lbl_80282178->aPanel[aOrder[nOrder][7]].fHeight = 0.28f;
-    lbl_80282178->aPanel[aOrder[nOrder][7]].n0 = 2;
-    lbl_80282178->aPanel[aOrder[nOrder][7]].f4 = 3.0f / FRAME_RATE;
-    lbl_80282178->aPanel[aOrder[nOrder][7]].n24 = 1;
-    lbl_80282178->aPanel[7].nNext = 8;
-    lbl_80282178->aPanel[aOrder[nOrder][7]].fTime = 2.0f;
-    lbl_80282178->aPanel[aOrder[nOrder][8]].fTop = 0.69f;
-    lbl_80282178->aPanel[aOrder[nOrder][8]].fLeft = 0.69f;
-    lbl_80282178->aPanel[aOrder[nOrder][8]].fWidth = 0.28f;
-    lbl_80282178->aPanel[aOrder[nOrder][8]].fHeight = 0.28f;
-    lbl_80282178->aPanel[aOrder[nOrder][8]].n0 = 2;
-    lbl_80282178->aPanel[aOrder[nOrder][8]].f4 = 3.0f / FRAME_RATE;
-    lbl_80282178->aPanel[aOrder[nOrder][8]].n24 = 1;
-    lbl_80282178->aPanel[8].nNext = 0;
-    lbl_80282178->aPanel[aOrder[nOrder][8]].fTime = 2.0f;
-    lbl_80282178->nPanel = 0;
-    lbl_80282178->fTime = 0.0f;
-    lbl_80282178->nShown = 0;
+    gpComicCam->aPanel[aOrder[nOrder][0]].fTop = 0.03f;
+    gpComicCam->aPanel[aOrder[nOrder][0]].fLeft = 0.03f;
+    gpComicCam->aPanel[aOrder[nOrder][0]].fWidth = 0.28f;
+    gpComicCam->aPanel[aOrder[nOrder][0]].fHeight = 0.28f;
+    gpComicCam->aPanel[aOrder[nOrder][0]].n0 = 2;
+    gpComicCam->aPanel[aOrder[nOrder][0]].f4 = 3.0f / FRAME_RATE;
+    gpComicCam->aPanel[aOrder[nOrder][0]].n24 = 1;
+    gpComicCam->aPanel[0].nNext = 1;
+    gpComicCam->aPanel[aOrder[nOrder][0]].fTime = 2.0f;
+    gpComicCam->aPanel[aOrder[nOrder][1]].fTop = 0.03f;
+    gpComicCam->aPanel[aOrder[nOrder][1]].fLeft = 0.36f;
+    gpComicCam->aPanel[aOrder[nOrder][1]].fWidth = 0.28f;
+    gpComicCam->aPanel[aOrder[nOrder][1]].fHeight = 0.28f;
+    gpComicCam->aPanel[aOrder[nOrder][1]].n0 = 2;
+    gpComicCam->aPanel[aOrder[nOrder][1]].f4 = 3.0f / FRAME_RATE;
+    gpComicCam->aPanel[aOrder[nOrder][1]].n24 = 1;
+    gpComicCam->aPanel[1].nNext = 2;
+    gpComicCam->aPanel[aOrder[nOrder][1]].fTime = 2.0f;
+    gpComicCam->aPanel[aOrder[nOrder][2]].fTop = 0.03f;
+    gpComicCam->aPanel[aOrder[nOrder][2]].fLeft = 0.69f;
+    gpComicCam->aPanel[aOrder[nOrder][2]].fWidth = 0.28f;
+    gpComicCam->aPanel[aOrder[nOrder][2]].fHeight = 0.28f;
+    gpComicCam->aPanel[aOrder[nOrder][2]].n0 = 2;
+    gpComicCam->aPanel[aOrder[nOrder][2]].f4 = 3.0f / FRAME_RATE;
+    gpComicCam->aPanel[aOrder[nOrder][2]].n24 = 1;
+    gpComicCam->aPanel[2].nNext = 3;
+    gpComicCam->aPanel[aOrder[nOrder][2]].fTime = 2.0f;
+    gpComicCam->aPanel[aOrder[nOrder][3]].fTop = 0.36f;
+    gpComicCam->aPanel[aOrder[nOrder][3]].fLeft = 0.03f;
+    gpComicCam->aPanel[aOrder[nOrder][3]].fWidth = 0.28f;
+    gpComicCam->aPanel[aOrder[nOrder][3]].fHeight = 0.28f;
+    gpComicCam->aPanel[aOrder[nOrder][3]].n0 = 2;
+    gpComicCam->aPanel[aOrder[nOrder][3]].f4 = 3.0f / FRAME_RATE;
+    gpComicCam->aPanel[aOrder[nOrder][3]].n24 = 1;
+    gpComicCam->aPanel[3].nNext = 4;
+    gpComicCam->aPanel[aOrder[nOrder][3]].fTime = 2.0f;
+    gpComicCam->aPanel[aOrder[nOrder][4]].fTop = 0.36f;
+    gpComicCam->aPanel[aOrder[nOrder][4]].fLeft = 0.36f;
+    gpComicCam->aPanel[aOrder[nOrder][4]].fWidth = 0.28f;
+    gpComicCam->aPanel[aOrder[nOrder][4]].fHeight = 0.28f;
+    gpComicCam->aPanel[aOrder[nOrder][4]].n0 = 2;
+    gpComicCam->aPanel[aOrder[nOrder][4]].f4 = 3.0f / FRAME_RATE;
+    gpComicCam->aPanel[aOrder[nOrder][4]].n24 = 1;
+    gpComicCam->aPanel[4].nNext = 5;
+    gpComicCam->aPanel[aOrder[nOrder][4]].fTime = 2.0f;
+    gpComicCam->aPanel[aOrder[nOrder][5]].fTop = 0.36f;
+    gpComicCam->aPanel[aOrder[nOrder][5]].fLeft = 0.69f;
+    gpComicCam->aPanel[aOrder[nOrder][5]].fWidth = 0.28f;
+    gpComicCam->aPanel[aOrder[nOrder][5]].fHeight = 0.28f;
+    gpComicCam->aPanel[aOrder[nOrder][5]].n0 = 2;
+    gpComicCam->aPanel[aOrder[nOrder][5]].f4 = 3.0f / FRAME_RATE;
+    gpComicCam->aPanel[aOrder[nOrder][5]].n24 = 1;
+    gpComicCam->aPanel[5].nNext = 6;
+    gpComicCam->aPanel[aOrder[nOrder][5]].fTime = 2.0f;
+    gpComicCam->aPanel[aOrder[nOrder][6]].fTop = 0.69f;
+    gpComicCam->aPanel[aOrder[nOrder][6]].fLeft = 0.03f;
+    gpComicCam->aPanel[aOrder[nOrder][6]].fWidth = 0.28f;
+    gpComicCam->aPanel[aOrder[nOrder][6]].fHeight = 0.28f;
+    gpComicCam->aPanel[aOrder[nOrder][6]].n0 = 2;
+    gpComicCam->aPanel[aOrder[nOrder][6]].f4 = 3.0f / FRAME_RATE;
+    gpComicCam->aPanel[aOrder[nOrder][6]].n24 = 1;
+    gpComicCam->aPanel[6].nNext = 7;
+    gpComicCam->aPanel[aOrder[nOrder][6]].fTime = 2.0f;
+    gpComicCam->aPanel[aOrder[nOrder][7]].fTop = 0.69f;
+    gpComicCam->aPanel[aOrder[nOrder][7]].fLeft = 0.36f;
+    gpComicCam->aPanel[aOrder[nOrder][7]].fWidth = 0.28f;
+    gpComicCam->aPanel[aOrder[nOrder][7]].fHeight = 0.28f;
+    gpComicCam->aPanel[aOrder[nOrder][7]].n0 = 2;
+    gpComicCam->aPanel[aOrder[nOrder][7]].f4 = 3.0f / FRAME_RATE;
+    gpComicCam->aPanel[aOrder[nOrder][7]].n24 = 1;
+    gpComicCam->aPanel[7].nNext = 8;
+    gpComicCam->aPanel[aOrder[nOrder][7]].fTime = 2.0f;
+    gpComicCam->aPanel[aOrder[nOrder][8]].fTop = 0.69f;
+    gpComicCam->aPanel[aOrder[nOrder][8]].fLeft = 0.69f;
+    gpComicCam->aPanel[aOrder[nOrder][8]].fWidth = 0.28f;
+    gpComicCam->aPanel[aOrder[nOrder][8]].fHeight = 0.28f;
+    gpComicCam->aPanel[aOrder[nOrder][8]].n0 = 2;
+    gpComicCam->aPanel[aOrder[nOrder][8]].f4 = 3.0f / FRAME_RATE;
+    gpComicCam->aPanel[aOrder[nOrder][8]].n24 = 1;
+    gpComicCam->aPanel[8].nNext = 0;
+    gpComicCam->aPanel[aOrder[nOrder][8]].fTime = 2.0f;
+    gpComicCam->nPanel = 0;
+    gpComicCam->fTime = 0.0f;
+    gpComicCam->nShown = 0;
     if (!(Misc_RandFunc(1) & 1)) {
-        lbl_80282178->nPanels = 18;
+        gpComicCam->nPanels = 18;
     } else {
-        lbl_80282178->nPanels = 9;
+        gpComicCam->nPanels = 9;
     }
-    Gaud_UpdtSpecialShot(0, (int)(lbl_80282178->aPanel[0].fLeft * 3.0f));
+    Gaud_UpdtSpecialShot(0, (int)(gpComicCam->aPanel[0].fLeft * 3.0f));
 }
 
 // Is the comic camera finished? Layout 1: once the golfer is half a second past animation event 2
 // and the current panel fills the screen; layout 0: once the last panel has run its course (bDone).
 u8 ComicCam_IsComicCamOver(f32* pRect, int nPlayer) {
-    switch (lbl_80282178->nKind) {
+    switch (gpComicCam->nKind) {
     case 0:
-        return lbl_80282178->bDone != 0;
+        return gpComicCam->bDone != 0;
     case 1:
         if (0.5f + Character_GetTagTime(gPlayers[nPlayer].pChar, 2) < gPlayers[nPlayer].pChar->fAnimTime) {
             if (0.0f == pRect[0] && 0.0f == pRect[1] && 1.0f == pRect[2] && 1.0f == pRect[3]) {
@@ -429,7 +429,7 @@ u8 ComicCam_IsComicCamOver(f32* pRect, int nPlayer) {
 // Is the comic camera moving on to its next panel (bNext)? EA calls that the frozen screen:
 // GolfCamera_bIs3ScreenFreezeOn asks.
 u8 ComicCam_IsScreenFrozen(void) {
-    return lbl_80282178->bNext;
+    return gpComicCam->bNext;
 }
 
 // Move the camera on for the current panel: layout 0 to shot 0x28 + the panel, layout 1 to the next
@@ -438,13 +438,13 @@ u8 ComicCam_IsScreenFrozen(void) {
 void ComicCam_CheckForCameraSwitch(View* pView, int nPlayer) {
     f32* pCam = CameraController_GetCameraOrigin(pView);
     f32* pSub = CameraController_GetCameraLookPoint(pView);
-    int nPanel = lbl_80282178->nPanel;
-    ComicPanel* pPanel = &lbl_80282178->aPanel[nPanel];
+    int nPanel = gpComicCam->nPanel;
+    ComicPanel* pPanel = &gpComicCam->aPanel[nPanel];
     u8 nColumn = (int)(pPanel->fLeft * 3.0f);
     CamShot* pShot;
     int nShot;
 
-    switch (lbl_80282178->nKind) {
+    switch (gpComicCam->nKind) {
     case 0:
         pShot = DynamicCam_ChooseScript(nPlayer, nPanel + 0x28, pView->script.pShot);
         if (pShot != NULL && !CameraScript_WillGolferBeOccludedInThisView(nPlayer, pShot, &pView->script)) {
@@ -454,7 +454,7 @@ void ComicCam_CheckForCameraSwitch(View* pView, int nPlayer) {
         Gaud_UpdtSpecialShot(nPlayer, nColumn);
         return;
     case 1:
-        if (lbl_80282178->nShown % 9 == 0) {
+        if (gpComicCam->nShown % 9 == 0) {
             pShot = pView->script.pShot;
             if (pShot != NULL) {
                 nShot = pShot->bAD + 1;
@@ -469,7 +469,7 @@ void ComicCam_CheckForCameraSwitch(View* pView, int nPlayer) {
                 }
             }
         }
-        if (lbl_80282178->nShown >= lbl_80282178->nPanels - 1 && 0.0f == lbl_80282178->fTime) {
+        if (gpComicCam->nShown >= gpComicCam->nPanels - 1 && 0.0f == gpComicCam->fTime) {
             nColumn = 3;
         }
         Gaud_UpdtSpecialShot(nPlayer, nColumn);
@@ -480,8 +480,8 @@ void ComicCam_CheckForCameraSwitch(View* pView, int nPlayer) {
 // Has the comic camera's golfer passed animation tag 2 (the ball hit)? GameEffects_AdjustTimeRate
 // asks.
 u8 ComicCam_HasBallBeenHit(void) {
-    u8 bBefore = !(Character_GetTagTime(gPlayers[lbl_80282178->nPlayer].pChar, 2) <
-                   gPlayers[lbl_80282178->nPlayer].pChar->fAnimTime);
+    u8 bBefore = !(Character_GetTagTime(gPlayers[gpComicCam->nPlayer].pChar, 2) <
+                   gPlayers[gpComicCam->nPlayer].pChar->fAnimTime);
 
     if (!bBefore) {
         return 1;

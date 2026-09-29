@@ -197,7 +197,7 @@ void CameraController_Idle(View* pView, int nPlayer) {
         for (i = 0; i <= 9; i++) {
             if (fn_80048574(gPlayers[nPlayer].pChar, i + 5) && fn_80062BB0(gPlayers[nPlayer].pChar, i + 5)) {
                 fn_80062B98(gPlayers[nPlayer].pChar, i + 5);
-                CameraController_SetShakeAmount(pView, lbl_80281F78->f204, lbl_80281F78->f200);
+                CameraController_SetShakeAmount(pView, gpCamTuning->f204, gpCamTuning->f200);
                 Gaud_CameraShake(nPlayer, 0);
             }
         }
@@ -433,7 +433,7 @@ u8 CameraController_HideGolfer(int nPlayer, int nView) {
 // Posts camera event 2 (CameraController_PostEvent) while the player's ball is coming down below
 // CamTuning.f90 before its first collision.
 void CameraController_CheckForEvents(View* pView, int nPlayer) {
-    if (gPlayers[nPlayer].ball.vVel[1] < 0.0f && gPlayers[nPlayer].ball.fHeight < lbl_80281F78->f90
+    if (gPlayers[nPlayer].ball.vVel[1] < 0.0f && gPlayers[nPlayer].ball.fHeight < gpCamTuning->f90
         && gPlayers[nPlayer].ball.nCollideCount < 1) {
         CameraController_PostEvent(pView, 2, nPlayer);
     }
@@ -502,10 +502,10 @@ void CameraController_CameraCollision(int nView, f32* pBounds) {
     if (fSpeed <= 0.0f) {
         return;
     }
-    if (fSpeed > lbl_80281F78->f1BC) {
+    if (fSpeed > gpCamTuning->f1BC) {
         return;
     }
-    if (fMoveCos < lbl_80281F78->f1B4 || fLookCos < lbl_80281F78->f1B8) {
+    if (fMoveCos < gpCamTuning->f1B4 || fLookCos < gpCamTuning->f1B8) {
         return;
     }
     CamScript_PutBackOnFairway(&pView->script, pPos, pAt, nPlayer, &pView->shot19C, pPos);

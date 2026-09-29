@@ -127,12 +127,12 @@ void CamScript_RunScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, 
     nUpdates = GameEffects_BallUpdatesThisFrame(nPlayer);
     if (nUpdates > 0 && (f32)nUpdates != pScript->fEC) {
         if (pScript->fEC < (f32)nUpdates) {
-            pScript->fEC += lbl_80281F78->f1A8;
+            pScript->fEC += gpCamTuning->f1A8;
             if (pScript->fEC > (f32)nUpdates) {
                 pScript->fEC = nUpdates;
             }
         } else {
-            pScript->fEC -= lbl_80281F78->f1A8;
+            pScript->fEC -= gpCamTuning->f1A8;
             if (pScript->fEC < (f32)nUpdates) {
                 pScript->fEC = nUpdates;
             }
@@ -217,7 +217,7 @@ void CamScript_RunScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, 
     if (pScript->pShot->bA8 == 1 || (pScript->pNextShot != NULL && pScript->pNextShot->bA8 == 1)) {
         if (pScript->pShot->bAD != 0
             && CamScript_KeepAboveGround(nPlayer, pCam, vPrev, CameraScript_SnapToScript(pScript, pScript->pShot) == 0,
-                                         NULL, NULL, NULL, lbl_80281F78->f168)
+                                         NULL, NULL, NULL, gpCamTuning->f168)
             && (s8)GOLFERSTATE_GetCurrentState(nPlayer) == 12 && pScript->pShot->bAD != 3) {
             CamScript_PutBackOnFairway(pScript, pCam, pSub, nPlayer, pShot, vPrev);
         }
@@ -400,10 +400,10 @@ void CamScript_RunFlybyCamera(int nPlayer, f32* pCam, f32* pSub, CamScript* pScr
     FlyByPath* pPath;
     f32 fShare;
     f32 fStep;
-    f32 fMoveTime = lbl_80281F78->f178;
+    f32 fMoveTime = gpCamTuning->f178;
 
     if (pScript->pShot == NULL) return;
-    LLMath_CopyVec(lbl_80281F78->v17C, vMoveTo);
+    LLMath_CopyVec(gpCamTuning->v17C, vMoveTo);
     if (!b && !CameraScript_SnapToScript(pScript, pScript->pShot)
         && (gSession.nPaused != 0 || (0.0f == gSession.fFrameTime && 0.0f == fTime))) {
         if (pScript->nFade != 0) {
@@ -513,7 +513,7 @@ void CamScript_SmoothTerrainHeight(CamScript* pScript, f32* pCam, u8 b, int nPla
                 pScript->bE8 = 1;
             }
         }
-        fRate = lbl_80281F78->fE0;
+        fRate = gpCamTuning->fE0;
         // All three cases ease the same way (only a level fD8 is left alone in golfer state 12).
         if (!b || gPlayers[nPlayer].ball.nCollideCount > 0
             || (s8)GOLFERSTATE_GetCurrentState(nPlayer) != 12) {
@@ -1254,14 +1254,14 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
                 fY = vDiff[1];
                 vDiff[1] = 0.0f;
                 fLen = Math_Sqrt(Vec3_LengthSqClamped(vDiff));
-                if (fY / fLen < -0.2f && fLen > lbl_80281F78->f128) {
+                if (fY / fLen < -0.2f && fLen > gpCamTuning->f128) {
                     vPos[1] = pCam[1] - 0.2f * fLen;
                 }
             }
             Vec3Copy(vPos, pOut);
             pOut[1] = CameraScript_GetBallHeightWithMaxHeight(nPlayer, pScript, vPos, pCam, pShot);
             CameraScript_OffsetLookVector(pOut, pCam, pShot->f74, pShot->f70);
-            pScript->fDC = lbl_80281F78->fE4;
+            pScript->fDC = gpCamTuning->fE4;
         } else {
             CameraScript_LagBallFlight(nPlayer, pOut, pCam, pShot, pScript, pVec, fTime);
         }
@@ -1275,9 +1275,9 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
         if (CameraScript_SnapToScript(pScript, pShot)) {
             Vec3Copy(vAim, pOut);
         } else {
-            CameraScript_LagTargetPoint(nPlayer, pOut, pCam, vAim, pShot, pScript, fTime, lbl_80281F78->fE4);
+            CameraScript_LagTargetPoint(nPlayer, pOut, pCam, vAim, pShot, pScript, fTime, gpCamTuning->fE4);
         }
-        CameraScript_KeepPointInView(nPlayer, pCam, pOut, gPlayers[nPlayer].ball.vPos, pScript, lbl_80281F78->fE4);
+        CameraScript_KeepPointInView(nPlayer, pCam, pOut, gPlayers[nPlayer].ball.vPos, pScript, gpCamTuning->fE4);
         break;
     case 15:
         Vec3Copy(gPlayers[nPlayer].ball.vPos, pOut);
@@ -1292,11 +1292,11 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
             vPos[1] -= gPlayers[nPlayer].ball.fHeight;
             CameraScript_OffsetLookVector(vPos, pCam, pShot->f74, pShot->f70);
             fStep = vPos[1] - pOut[1];
-            fStep *= lbl_80281F78->f164;
+            fStep *= gpCamTuning->f164;
             pOut[0] = vPos[0];
             pOut[1] += fStep;
             pOut[2] = vPos[2];
-            CameraScript_KeepPointInView(nPlayer, pCam, pOut, pOut, pScript, lbl_80281F78->fE4);
+            CameraScript_KeepPointInView(nPlayer, pCam, pOut, pOut, pScript, gpCamTuning->fE4);
         }
         break;
     case 1:
@@ -1332,7 +1332,7 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
                 CameraScript_OffsetLookVector(pOut, pCam, pShot->f74, pShot->f70);
             }
         } else {
-            CameraScript_LagTargetPoint(nPlayer, pOut, pCam, vMid, pShot, pScript, fTime, lbl_80281F78->fE8);
+            CameraScript_LagTargetPoint(nPlayer, pOut, pCam, vMid, pShot, pScript, fTime, gpCamTuning->fE8);
         }
         break;
     case 4:
@@ -1354,7 +1354,7 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
                 CameraScript_OffsetLookVector(pOut, pCam, pShot->f74, pShot->f70);
             }
         } else {
-            CameraScript_LagTargetPoint(nPlayer, pOut, pCam, vBone1, pShot, pScript, fTime, lbl_80281F78->fE8);
+            CameraScript_LagTargetPoint(nPlayer, pOut, pCam, vBone1, pShot, pScript, fTime, gpCamTuning->fE8);
         }
         break;
     case 6:
@@ -1376,7 +1376,7 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
                 CameraScript_OffsetLookVector(pOut, pCam, pShot->f74, pShot->f70);
             }
         } else {
-            CameraScript_LagTargetPoint(nPlayer, pOut, pCam, vBone10, pShot, pScript, fTime, lbl_80281F78->fE8);
+            CameraScript_LagTargetPoint(nPlayer, pOut, pCam, vBone10, pShot, pScript, fTime, gpCamTuning->fE8);
         }
         break;
     case 10:
@@ -1396,8 +1396,8 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
             Vec3Copy(gPlayers[nPlayer].vTargetCopy, pOut);
             CameraScript_OffsetLookVector(pOut, pCam, pShot->f74, pShot->f70);
         } else {
-            CameraScript_LagAimMarker(nPlayer, pOut, pCam, pShot, 1, 0, lbl_80281F78->fD8, 0.0f,
-                                      lbl_80281F78->fDC);
+            CameraScript_LagAimMarker(nPlayer, pOut, pCam, pShot, 1, 0, gpCamTuning->fD8, 0.0f,
+                                      gpCamTuning->fDC);
         }
         break;
     case 14:
@@ -1436,9 +1436,9 @@ void CameraScript_CalculateShoulderShake(CamShot* pShot, f32* pOut, f32 fTime, f
         fX -= 0.5f;
         fY -= 0.5f;
         fZ -= 0.5f;
-        pOut[0] = fX * (pShot->f94 / lbl_80281F78->f11C);
-        pOut[1] = fY * (pShot->f94 / lbl_80281F78->f11C);
-        pOut[2] = fZ * (pShot->f94 / lbl_80281F78->f11C);
+        pOut[0] = fX * (pShot->f94 / gpCamTuning->f11C);
+        pOut[1] = fY * (pShot->f94 / gpCamTuning->f11C);
+        pOut[2] = fZ * (pShot->f94 / gpCamTuning->f11C);
         pOut[3] = 0.0f;
     } else {
         pOut[0] = 0.0f;
@@ -1489,7 +1489,7 @@ void CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* pShot
             CameraScript_OffsetLookVector(vGoal, pCam, pShot->f74, pShot->f70);
         }
         Vec3_Sub(vGoal, pCam, vDir);
-        fMin = lbl_80281F78->fF0;
+        fMin = gpCamTuning->fF0;
         fB = 1.0f / Camera_GetLensFovScale(
                         Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])));
         fMin *= fB;
@@ -1510,8 +1510,8 @@ void CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* pShot
             Vec3_Sub(vGoal, pCam, vFlat);
             vFlat[1] = 0.0f;
             if ((f32)Math_Sqrt(Vec3_LengthSqClamped(vFlat)) > fMinDist
-                && pCam[1] - vGoal[1] > lbl_80281F78->f12C) {
-                vGoal[1] = pCam[1] - lbl_80281F78->f12C;
+                && pCam[1] - vGoal[1] > gpCamTuning->f12C) {
+                vGoal[1] = pCam[1] - gpCamTuning->f12C;
             }
         }
         Vec3_Sub(pSub, pCam, vCur);
@@ -1595,38 +1595,38 @@ void CameraScript_LagBallFlight(int nPlayer, f32* pOut, f32* pCam, CamShot* pSho
             // EA bug: fDrop is not set when the script has no current shot
             if (0.0f != fLen && fDrop / fLen < -0.2f) {
                 fLimit = fBase - 0.2f * fLen;
-                if (fLen > lbl_80281F78->f128) {
+                if (fLen > gpCamTuning->f128) {
                     vAim[1] = fLimit;
                 } else {
-                    vAim[1] = vAim[1] + fLen * (fLimit - vAim[1]) / lbl_80281F78->f128;
+                    vAim[1] = vAim[1] + fLen * (fLimit - vAim[1]) / gpCamTuning->f128;
                 }
             }
         }
         Vec3_Sub(vAim, pOut, vMove);
         fRate = Math_Sqrt(Vec3_LengthSqClamped(vMove));
-        fRate = lbl_80281F78->f138 * (fRate / lbl_80281F78->f13C);
+        fRate = gpCamTuning->f138 * (fRate / gpCamTuning->f13C);
         fShare = fRate < 0.0f ? 0.0f : (fRate > 1.0f ? 1.0f : fRate);
-        if (pScript->f98 < lbl_80281F78->fD4) {
-            fRate = (f32)Math_Sqrt(pScript->f98 / lbl_80281F78->fD4);
+        if (pScript->f98 < gpCamTuning->fD4) {
+            fRate = (f32)Math_Sqrt(pScript->f98 / gpCamTuning->fD4);
             fRate = 1.0f - fRate * (1.0f - fShare);
         } else {
-            fRate = fShare < 0.0f ? 0.0f : (fShare > lbl_80281F78->f138 ? lbl_80281F78->f138 : fShare);
+            fRate = fShare < 0.0f ? 0.0f : (fShare > gpCamTuning->f138 ? gpCamTuning->f138 : fShare);
         }
-        if (pScript->f88 < lbl_80281F78->f158) {
-            fRate *= pScript->f88 / lbl_80281F78->f158;
+        if (pScript->f88 < gpCamTuning->f158) {
+            fRate *= pScript->f88 / gpCamTuning->f158;
         }
-        if (pScript->f88 < lbl_80281F78->f15C) {
-            f32 fScale = powf(pScript->f88 / lbl_80281F78->f15C, lbl_80281F78->f160);
+        if (pScript->f88 < gpCamTuning->f15C) {
+            f32 fScale = powf(pScript->f88 / gpCamTuning->f15C, gpCamTuning->f160);
 
             fScale *= fTime / (1.0f / FRAME_RATE);
             vMove[1] = fScale * vMove[1];
         }
         if (gPlayers[nPlayer].ball.bHitTopArc) {
             if (gPlayers[nPlayer].ball.fHeight <= 0.15f) {
-                vMove[1] *= lbl_80281F78->f140;
+                vMove[1] *= gpCamTuning->f140;
             } else if (!(gPlayers[nPlayer].ball.fHeight > 10.0f)) {
-                vMove[1] *= (1.0f - lbl_80281F78->f140) * ((gPlayers[nPlayer].ball.fHeight - 0.15f) / 10.0f)
-                            + lbl_80281F78->f140;
+                vMove[1] *= (1.0f - gpCamTuning->f140) * ((gPlayers[nPlayer].ball.fHeight - 0.15f) / 10.0f)
+                            + gpCamTuning->f140;
             }
         }
         Vec3_Scale(fRate, vMove, vMove);
@@ -1634,9 +1634,9 @@ void CameraScript_LagBallFlight(int nPlayer, f32* pOut, f32* pCam, CamShot* pSho
         Vec3Copy(pOut, vLast);
     }
     if (pScript->bCF) {
-        CameraScript_KeepPointInView(nPlayer, pCam, pOut, vAim, pScript, lbl_80281F78->fE4);
+        CameraScript_KeepPointInView(nPlayer, pCam, pOut, vAim, pScript, gpCamTuning->fE4);
     } else {
-        CameraScript_KeepPointInView(nPlayer, pCam, pOut, gPlayers[nPlayer].ball.vPos, pScript, lbl_80281F78->fE4);
+        CameraScript_KeepPointInView(nPlayer, pCam, pOut, gPlayers[nPlayer].ball.vPos, pScript, gpCamTuning->fE4);
     }
 }
 
@@ -1668,11 +1668,11 @@ void CameraScript_LagTargetPoint(int nPlayer, f32* pOut, f32* pCam, f32* pTarget
         vMove[1] = 0.0f;
         fDist = Math_Sqrt(Vec3_LengthSqClamped(vMove));
         fFrames = fTime / (1.0f / FRAME_RATE);
-        fRate = lbl_80281F78->f144 * fFrames;
+        fRate = gpCamTuning->f144 * fFrames;
         Vec3_Sub(vAim, pCam, vSpan);
         fRange = Math_Sqrt(Vec3_LengthSqClamped(vSpan));
         fRange *= pShot->f78 / DEG(60.0f);
-        fNear = lbl_80281F78->f134 * fRange;
+        fNear = gpCamTuning->f134 * fRange;
         if (fDist < fNear) {
             fRate *= fRange / fNear;    // EA bug: fDist was likely meant (this is always 1 / f134)
         }
@@ -1684,7 +1684,7 @@ void CameraScript_LagTargetPoint(int nPlayer, f32* pOut, f32* pCam, f32* pTarget
         Vec3_Add(vMove, pOut, pOut);
         Vec3_Sub(vAim, pOut, vMove);
         fDy = vAim[1] - pOut[1];
-        fRate = lbl_80281F78->f148 * fFrames;
+        fRate = gpCamTuning->f148 * fFrames;
         if (fabsf(fDy) < fNear) {
             fRate *= fabsf(fDy) / fNear;
         }
@@ -1876,7 +1876,7 @@ void CameraScript_GoToNewScript(CamScript* pScript, CamShot* pShot, int nPlayer,
     if (pScript->pShot->bAD == 0) {
         pScript->fCamTime -= pScript->f8C;
     } else {
-        pScript->f88 = lbl_80281F78->f15C;
+        pScript->f88 = gpCamTuning->f15C;
         pScript->fCamTime = 0.0f;
     }
     if (pScript->pNextShot->bAC == 0) {
@@ -1968,20 +1968,20 @@ void CameraScript_InterpToNewScript(CamScript* pScript, CamShot* pShot, int nPla
     if (nA == 4) {
         if (pScript->pShot == NULL) {
             nA = 5;
-            pScript->f88 = lbl_80281F78->f15C;
+            pScript->f88 = gpCamTuning->f15C;
         } else if (pScript->pShot->bAD == 3) {
             if (pScript->pShot->p44 == NULL) {
                 nA = 5;
-                pScript->f88 = lbl_80281F78->f15C;
+                pScript->f88 = gpCamTuning->f15C;
             } else if (CameraScript_IsDefaultSwingCam(pScript->pShot, nPlayer, pCam)) {
                 pScript->f88 = 0.0f;
             } else {
                 nA = 5;
-                pScript->f88 = lbl_80281F78->f15C;
+                pScript->f88 = gpCamTuning->f15C;
             }
         }
     } else {
-        pScript->f88 = lbl_80281F78->f15C;
+        pScript->f88 = gpCamTuning->f15C;
     }
     if (pShot->bAC == 0) {
         if (nA != 5 || pShot->bAF == 0 || pShot->bB0 == 0) {
@@ -2108,7 +2108,7 @@ f32 CameraScript_GetBallHeightWithMaxHeight(int nPlayer, CamScript* pScript, f32
     f32 fDrop;
 
     if (fAbove > pShot->f6C) {
-        fDrop = lbl_80281F78->fD0 * (fAbove - pShot->f6C);
+        fDrop = gpCamTuning->fD0 * (fAbove - pShot->f6C);
         fDrop *= Camera_GetLensFovScale(Camera_GetCurrentLens());
         fY -= fDrop;
     }
@@ -2227,7 +2227,7 @@ u8 CameraScript_IsDefaultSwingCam(CamShot* pShot, int nPlayer, f32* pCam) {
     if (0.0f != vCam[0] || 0.0f != vCam[1] || 0.0f != vCam[2]) {
         LLMath_Normalize3(vCam, vCam);
     }
-    if (Vec3_Dot(vCam, vAim) > lbl_80281F78->fFC) return 1;
+    if (Vec3_Dot(vCam, vAim) > gpCamTuning->fFC) return 1;
     return 0;
 }
 
@@ -2268,8 +2268,8 @@ u8 CamScript_CheckObstructedCamera(f32* pCam, int nPlayer) {
         vDiff[1] = 0.0f;
         fDist = Math_Sqrt(Vec3_LengthSqClamped(vDiff));
         fDist *= Camera_GetLensFovScale(Camera_GetCurrentLens());
-        if (fDist < lbl_80281F78->f120
-            && pCam[1] - pCourse->pin[nPin].y < lbl_80281F78->f124) {
+        if (fDist < gpCamTuning->f120
+            && pCam[1] - pCourse->pin[nPin].y < gpCamTuning->f124) {
             bBlocked = 1;
         }
     }
@@ -2287,7 +2287,7 @@ void CamScript_CheckOutOfBounds(CamScript* pScript, f32* pCam, f32* pSub, int nP
     u8 bEarly = 0;
 
     if (Ter_GetTGD() == NULL) return;
-    if (!b && pScript->fCamTime < lbl_80281F78->fEC) {
+    if (!b && pScript->fCamTime < gpCamTuning->fEC) {
         bEarly = 1;
     }
     if (GolfCamera_IsFreezeTimeActive()) return;
@@ -2403,7 +2403,7 @@ void CamScript_GetCameraOnFairwayPos(CamScript* pScript, f32* pOut, f32* pCam, i
     if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
         LLMath_Normalize3(vDir, vDir);
     }
-    if (Vec3_Dot(vDir, vCamDir) < lbl_80281F78->fF4) {
+    if (Vec3_Dot(vDir, vCamDir) < gpCamTuning->fF4) {
         bFound = 1;
     }
     if (!bFound) {
@@ -2413,7 +2413,7 @@ void CamScript_GetCameraOnFairwayPos(CamScript* pScript, f32* pOut, f32* pCam, i
         if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
             LLMath_Normalize3(vDir, vDir);
         }
-        if (Vec3_Dot(vDir, vCamDir) < lbl_80281F78->fF4) {
+        if (Vec3_Dot(vDir, vCamDir) < gpCamTuning->fF4) {
             bFound = 1;
         }
     }
@@ -2424,7 +2424,7 @@ void CamScript_GetCameraOnFairwayPos(CamScript* pScript, f32* pOut, f32* pCam, i
         if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
             LLMath_Normalize3(vDir, vDir);
         }
-        if (Vec3_Dot(vDir, vCamDir) < lbl_80281F78->fF4) {
+        if (Vec3_Dot(vDir, vCamDir) < gpCamTuning->fF4) {
             bFound = 1;
         }
     }
@@ -2450,7 +2450,7 @@ void CamScript_GetCameraOnFairwayPos(CamScript* pScript, f32* pOut, f32* pCam, i
         *pHeight = fHeight;
     }
     if (!(fHeight < -60000.0f)) {
-        vSpot[1] = fHeight + lbl_80281F78->f10C;
+        vSpot[1] = fHeight + gpCamTuning->f10C;
         LLMath_CopyVec(vSpot, pOut);
     }
 }
@@ -2473,10 +2473,10 @@ void CamScript_CheckFlagCollision(CamScript* pScript, f32* pCam, f32* pSub, int 
     vDiff[1] = 0.0f;
     fDist = Math_Sqrt(Vec3_LengthSqClamped(vDiff));
     fDist *= Camera_GetLensFovScale(Camera_GetCurrentLens());
-    if (fDist < lbl_80281F78->f120) {
-        if (pCam[1] - pCourse->pin[nPin].y < lbl_80281F78->f124) {
+    if (fDist < gpCamTuning->f120) {
+        if (pCam[1] - pCourse->pin[nPin].y < gpCamTuning->f124) {
             fAbove = pCam[1] - pCourse->pin[nPin].y;
-            pCam[1] += (lbl_80281F78->f124 - fAbove) * (1.0f - fDist / lbl_80281F78->f120);
+            pCam[1] += (gpCamTuning->f124 - fAbove) * (1.0f - fDist / gpCamTuning->f120);
         }
     }
 }
@@ -2498,7 +2498,7 @@ void CamScript_PutBackOnFairway(CamScript* pScript, f32* pCam, f32* pSub, int nP
     pScript->pNextShot = NULL;
     pScript->fCamTime = 0.0f;
     pScript->pShot->bAC = 0;
-    pScript->pShot->f68 = lbl_80281F78->f10C;
+    pScript->pShot->f68 = gpCamTuning->f10C;
     pScript->pShot->f6C = 1000.0f;
     pScript->pShot->f4C = 2.0f;
     pScript->pShot->f8C = 0.0f;
@@ -2507,7 +2507,7 @@ void CamScript_PutBackOnFairway(CamScript* pScript, f32* pCam, f32* pSub, int nP
     pScript->pShot->nA0 = 1;
     pScript->pShot->bB2 = 0;
     pScript->pShot->f94 = 0.0f;
-    pScript->pShot->f78 = lbl_80281F78->f114;
+    pScript->pShot->f78 = gpCamTuning->f114;
     pScript->pShot->f7C = pScript->pShot->f78;
     pScript->nE0 = 25;
     pScript->fD8 = fHeight;
@@ -2538,11 +2538,11 @@ void CamScript_UpdateFairwayCam(CamScript* pScript, f32* pCam, f32* pSub, int nP
     f32 fDot;
     f32 fHeight;
 
-    if (pScript->pShot != NULL && pScript->pShot->f78 > lbl_80281F78->f110) {
-        pScript->pShot->f78 -= lbl_80281F78->f118;
+    if (pScript->pShot != NULL && pScript->pShot->f78 > gpCamTuning->f110) {
+        pScript->pShot->f78 -= gpCamTuning->f118;
         pScript->pShot->f7C = pScript->pShot->f78;
     }
-    if (pScript->fCamTime > lbl_80281F78->f104) {
+    if (pScript->fCamTime > gpCamTuning->f104) {
         fFov = pScript->pShot->f78;
         CamScript_GetNearestAIPoint(gPlayers[nPlayer].ball.vPos, vSpot);
         Vec3_Sub(pCam, vSpot, vToSpot);
@@ -2563,12 +2563,12 @@ void CamScript_UpdateFairwayCam(CamScript* pScript, f32* pCam, f32* pSub, int nP
             LLMath_Normalize3(vVel, vVel);
         }
         fDot = Vec3_Dot(vDir, vVel);
-        if (fDist < lbl_80281F78->f100) return;
-        if (fDot > lbl_80281F78->f108) return;
+        if (fDist < gpCamTuning->f100) return;
+        if (fDot > gpCamTuning->f108) return;
         fHeight = CamScript_GuessBestPlayableHeight(vSpot, NULL);
         if (!(fHeight < -60000.0f) && pScript->pShot != NULL) {
             Vec3Copy(vSpot, pScript->pShot->v20);
-            pScript->pShot->v20[1] = fHeight + lbl_80281F78->f10C;
+            pScript->pShot->v20[1] = fHeight + gpCamTuning->f10C;
             pScript->pShot->f78 = fFov;
             pScript->pShot->f7C = pScript->pShot->f78;
             CameraScript_InterpToNewScript(pScript, pScript->pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f, 25,
@@ -2634,7 +2634,7 @@ f32 CamScript_GuessBestPlayableHeight(f32* pPos, SurfaceType** ppSurface) {
                 nIdx = j;
             }
         }
-        fCeiling = 0.1f + (fTop + lbl_80281F78->f130);
+        fCeiling = 0.1f + (fTop + gpCamTuning->f130);
         for (i = 0; i < nHeights; i++) {
             fBest = -10000000.0f;
             for (j = 0; j < (int)nHeights; j++) {
@@ -2648,13 +2648,13 @@ f32 CamScript_GuessBestPlayableHeight(f32* pPos, SurfaceType** ppSurface) {
             if ((int)(((uptr)aSurfaces[nIdx] - (uptr)gSurfaceTypes) / sizeof(SurfaceType)) != 149
                 && !(Game_GetCourse() == 7 && Game_GetCurHoleNum() == 2 && fBest > 10.0f)) {
                 if (CamScript_PlayableSurface(aSurfaces[nIdx])) {
-                    if (!bRegion && fLast - aHeights[nIdx] > lbl_80281F78->f130) {
+                    if (!bRegion && fLast - aHeights[nIdx] > gpCamTuning->f130) {
                         fTop = aHeights[nIdx];
                         nTop = nIdx;
                         break;
                     }
                     // EA bug: fLower is read before it is set when no region has started yet
-                    if (fLast - aHeights[nIdx] > lbl_80281F78->f130 && fLower < aHeights[nIdx]) {
+                    if (fLast - aHeights[nIdx] > gpCamTuning->f130 && fLower < aHeights[nIdx]) {
                         fLower = aHeights[nIdx];
                         nLower = nIdx;
                     }

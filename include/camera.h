@@ -512,7 +512,7 @@ typedef struct CamTuning {
 } CamTuning;
 LAYOUT_ASSERT(CamTuning, 0x25C);
 
-extern CamTuning* lbl_80281F78;         // EA's file list has GoCamTuningVars
+extern CamTuning* gpCamTuning;         // EA's file list has GoCamTuningVars
 
 // The golf cameras' shared state (0x200 bytes, allocated by GolfCamera_Init).
 typedef struct GolfCamState {
@@ -787,7 +787,7 @@ f32    CamScript_GetFlybyTimeStep(f32 fA, f32 fB, f32 fC, f32 fD, f32 fE, f32 fF
 // The value of a fly-by path's curve at time fT (CamScript_RunFlybyCamera).
 f32    CamScript_fEvaluateCurve(FlyByPath* pPath, f32 fT);
 // CamSpline.c: the Catmull-Rom basis matrix.
-extern f32 lbl_80191440[4][4];
+extern f32 gCatmullRomBasis[4][4];
 
 // ---- the static and fly-by cameras (GoStaticCam.c, 0x8006449C..) ----------------------------
 

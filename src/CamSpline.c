@@ -1,5 +1,5 @@
 // CamSpline.c (our name): the spline paths the scripted, static and dynamic cameras move along
-// (a Catmull-Rom basis matrix in lbl_80191440 applied with VecMath.c's LLMath_mat44fltMultiply).
+// (a Catmull-Rom basis matrix in gCatmullRomBasis applied with VecMath.c's LLMath_mat44fltMultiply).
 
 #include "game_types.h"
 #include "engine.h"
@@ -9,7 +9,7 @@
 f32  CamScript_fGetDistanceBetweenSplinePoints(f32* p0, f32* p1, f32* p2, f32* p3);
 void CamUtils_Vec3Sub(f32* pA, f32* pB, f32* pOut);
 
-f32 lbl_80191440[4][4] = {
+f32 gCatmullRomBasis[4][4] = {
     { 0.0f, 1.0f, 0.0f, 0.0f },
     { -0.5f, 0.0f, 0.5f, 0.0f },
     { 1.0f, -2.5f, 2.0f, -0.5f },
@@ -106,7 +106,7 @@ void CamScript_SplineCamerasByPositionAndLook(f32* pPos0, f32* pPos1, f32* pPos2
     aPoints[1][3] = 0.0f;
     aPoints[2][3] = 0.0f;
     aPoints[3][3] = 0.0f;
-    LLMath_mat44fltMultiply(lbl_80191440, &vT, &vWeights);
+    LLMath_mat44fltMultiply(gCatmullRomBasis, &vT, &vWeights);
     LLMath_mat44fltMultiply(aPoints, &vWeights, &vOut);
     Vec3Copy(&vOut.x, pSub);
     *pFov = fT * (fFov2 - fFov1) + fFov1;
@@ -133,7 +133,7 @@ void CamScript_SplineCamerasByPosition(f32* p0, f32* p1, f32* p2, f32* p3, f32* 
     aPoints[1][3] = 0.0f;
     aPoints[2][3] = 0.0f;
     aPoints[3][3] = 0.0f;
-    LLMath_mat44fltMultiply(lbl_80191440, &vT, &vWeights);
+    LLMath_mat44fltMultiply(gCatmullRomBasis, &vT, &vWeights);
     LLMath_mat44fltMultiply(aPoints, &vWeights, &vOut);
     Vec3Copy(&vOut.x, pOut);
 }

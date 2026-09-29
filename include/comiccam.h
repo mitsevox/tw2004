@@ -1,5 +1,5 @@
 // comiccam.h (our name): GoComicCam.c's state, the comic-book camera that splits the screen into
-// panels (lbl_80282178, 0x204 bytes, allocated by ComicCam_InitComicCam). Only the fields read so far.
+// panels (gpComicCam, 0x204 bytes, allocated by ComicCam_InitComicCam). Only the fields read so far.
 
 #ifndef COMICCAM_H
 #define COMICCAM_H
@@ -39,7 +39,7 @@ typedef struct ComicCam {
 } ComicCam;
 LAYOUT_ASSERT(ComicCam, 0x204);
 
-extern ComicCam* lbl_80282178;
+extern ComicCam* gpComicCam;
 
 void ComicCam_InitComicCam(void);                                         // allocate the state
 void ComicCam_CloseComicCam(void);                                         // free it

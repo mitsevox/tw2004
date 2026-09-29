@@ -669,7 +669,7 @@ int GM_DoPreshotAnimation(int nPlayer) {
     if (gPlayers[nPlayer].ball.nLie != 0 && gPlayers[nPlayer].nClub < 9) {
         return 0;
     }
-    if (Ter_CheckObjectAndHazardObstruction(gPlayers[nPlayer].ball.vPos, lbl_80281F78->f16C, 0, 1, 4.0f, 1,
+    if (Ter_CheckObjectAndHazardObstruction(gPlayers[nPlayer].ball.vPos, gpCamTuning->f16C, 0, 1, 4.0f, 1,
                                             0.577f)) {
         return 0;
     }
@@ -1076,7 +1076,7 @@ void GM_DoPostShotInHoleUI(int nPlayer) {
         fn_80062B78(nPlayer);
         fn_80062B74(nPlayer);
         fn_80062B70();
-        CameraController_FadeOut(pView, lbl_80281F78->f170, vOffset);
+        CameraController_FadeOut(pView, gpCamTuning->f170, vOffset);
         return;
     }
     if (fn_8002E8B4(nPlayer) && gSession.nSplitScreen == 0) {
