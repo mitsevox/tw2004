@@ -881,14 +881,14 @@ u8     GolfCamera_ChooseShutterCam(View* pView, int nPlayer);
 int    GolfCamera_NumCompletedReplayCams(View* pView);
 u8     GolfCamera_NeedSteepSlopeCam(View* pView, int nPlayer);
 void   GolfCamera_vSwitchToNextAlternateSwingCamera(View* pView, int nPlayer);
-void   fn_800C5CEC(View* pView, int nPlayer);
-u8     fn_800C5FE4(View* pView, int nPlayer);
-void   fn_800C6010(View* pView, int nPlayer);
-void   fn_800C60E8(View* pView, int nPlayer);
+void   GolfCamera_PickNextSwingReplayCam(View* pView, int nPlayer);
+u8     GolfCamera_ChooseSuperSwing(View* pView, int nPlayer);
+void   GolfCamera_ZoomGreenCamera(View* pView, int nPlayer);
+void   GolfCamera_UnZoomGreenCamera(View* pView, int nPlayer);
 void   GolfCamera_CutToGolferDoneAnimatingCam(View* pView, int nPlayer);
 // Every caller passes a sixth argument (0 or 1) that the camera does not read.
 void   GolfCamera_SwitchCrAPCamera(View* pView, char* szName, int nShot, u8 bBlend, u8 bForce, int n6);
-u8     fn_800C6604(View* pView);
+u8     GolfCamera_IsPostShotCamFinalCutDone(View* pView);
 void   GolfCamera_ChooseSpecialSwing(View* pView, int nPlayer);
 int    GolfCamera_HowManyReplaySwings(View* pView);
 f32    GolfCamera_ReplaySwingSpeed(View* pView);        // the slow-motion rate for the swing camera kind

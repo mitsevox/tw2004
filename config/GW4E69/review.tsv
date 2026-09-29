@@ -4238,3 +4238,17 @@ address	name	comment	by	date
 800C7170	GolfCamera_ShowPostRemoveBall	add	rs4 (replayed by orchestrator)	2026-09-29
 800C7178	GolfCamera_AbortAllSpecialSwings	add	rs4 (replayed by orchestrator)	2026-09-29
 800C71A4	GolfCamera_IsBallFlightPaused	rewrite	rs4 (replayed by orchestrator)	2026-09-29
+800C4FF0	GolfCamera_CreateMatrixCamera	keep	rs4 (replayed by orchestrator)	2026-09-29
+800C54FC	GolfCamera_UpdateMatrixCamera	keep	rs4 (replayed by orchestrator)	2026-09-29
+800C56B4	GolfCamera_CreateSuperZoomCamera	keep	rs4 (replayed by orchestrator)	2026-09-29
+800C5A70	GolfCamera_UpdateSuperZoomCamera	keep	rs4 (replayed by orchestrator)	2026-09-29
+800C5CEC	GolfCamera_PickNextSwingReplayCam	add	rs4 (replayed by orchestrator)	2026-09-29
+800C5D64	GolfCamera_CreateReplayCamera	rewrite	rs4 (replayed by orchestrator)	2026-09-29
+800C5EC0	GolfCamera_UpdateSwingSlowMoCamera	rewrite	rs4 (replayed by orchestrator)	2026-09-29
+800C5FE4	GolfCamera_ChooseSuperSwing	add	rs4 (replayed by orchestrator)	2026-09-29
+800C6010	GolfCamera_ZoomGreenCamera	rewrite	rs4 (replayed by orchestrator)	2026-09-29
+800C60E8	GolfCamera_UnZoomGreenCamera	add	rs4 (replayed by orchestrator)	2026-09-29
+800C6110	GolfCamera_ChooseReactionCam	rewrite	rs4 (replayed by orchestrator)	2026-09-29
+800C6358	GolfCamera_CutToGolferDoneAnimatingCam	rewrite	rs4 (replayed by orchestrator)	2026-09-29
+800C6604	GolfCamera_IsPostShotCamFinalCutDone	add	rs4 (replayed by orchestrator)	2026-09-29
+800C6618	GolfCamera_ChooseSpecialSwing	rewrite	rs4 (replayed by orchestrator)	2026-09-29

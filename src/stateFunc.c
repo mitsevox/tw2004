@@ -737,7 +737,7 @@ void STATEFUNC_ReplaySwingInit(int nPlayer) {
 // (2). Then in a replay the ball launches and it is state 12; otherwise once
 // GolfCamera_NumCompletedReplayCams(view) reaches GolfCamera_HowManyReplaySwings(view) event 0xA
 // fires, the ball launches and it is state 12; before that the slow-mo camera advances
-// (fn_800C5CEC) and one of two swing blends restarts.
+// (GolfCamera_PickNextSwingReplayCam) and one of two swing blends restarts.
 void STATEFUNC_ReplaySwingUpdate(int nPlayer) {
     View* pV    = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
     u8    bSpecial = 0;
@@ -757,10 +757,10 @@ void STATEFUNC_ReplaySwingUpdate(int nPlayer) {
             SW_vImpact(nPlayer);
             GOLFERSTATE_Switch(GS_SIMULATE, nPlayer);
         } else {
-            fn_800C5CEC(pV, nPlayer);
+            GolfCamera_PickNextSwingReplayCam(pV, nPlayer);
             GameEffects_SetSuperSlowMo(1, nPlayer, GolfCamera_ReplaySwingSpeed(pV));
             if (GolfCamera_NumCompletedReplayCams(pV) >= GolfCamera_HowManyReplaySwings(pV)) {
-                bSpecial = fn_800C5FE4(pV, nPlayer);
+                bSpecial = GolfCamera_ChooseSuperSwing(pV, nPlayer);
             }
             if (bSpecial) {
                 CharacterState_AddSKABlendData(gPlayers[nPlayer].pChar, 1, 0x12, SKABlender_BlendLinear, 1, 8,
@@ -1082,7 +1082,7 @@ void STATEFUNC_KneeCamInit(int nPlayer) {
 }
 
 // State 8 (camera 7): pops once button 19 is released; while it is held, buttons 11/12 and 13/14
-// fire events 0x12..0x15. Button 4 held calls fn_800C6010, else fn_800C60E8.
+// fire events 0x12..0x15. Button 4 held calls GolfCamera_ZoomGreenCamera, else GolfCamera_UnZoomGreenCamera.
 void STATEFUNC_KneeCamUpdate(int nPlayer) {
     if (!(Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x13, 1))) {
         GOLFERSTATE_Pop(nPlayer);
@@ -1103,9 +1103,9 @@ void STATEFUNC_KneeCamUpdate(int nPlayer) {
         }
     }
     if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(4, 1)) {
-        fn_800C6010(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), nPlayer);
+        GolfCamera_ZoomGreenCamera(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), nPlayer);
     } else {
-        fn_800C60E8(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), nPlayer);
+        GolfCamera_UnZoomGreenCamera(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), nPlayer);
     }
     TARGET_UpdateMomentums(nPlayer);
 }
@@ -1376,7 +1376,7 @@ void STATEFUNC_InTheHoleUpdate(int nPlayer) {
     }
     if (fn_80095780(gPlayers[nPlayer].pChar) == 9) {
         if ((fn_80062C1C(gPlayers[nPlayer].pChar) != 0 || fn_80062C10(gPlayers[nPlayer].pChar) != 0) &&
-            !fn_800C6604(pV)) {
+            !GolfCamera_IsPostShotCamFinalCutDone(pV)) {
             GolfCamera_CutToGolferDoneAnimatingCam(pV, nPlayer);
         }
     }
@@ -1444,7 +1444,7 @@ void STATEFUNC_ShowYardageUpdate(int nPlayer) {
         CameraController_SetCameraMode(pV, 0xF, nPlayer, gPlayers[nPlayer].nView[0]);
     }
     if ((fn_80062C1C(gPlayers[nPlayer].pChar) != 0 || fn_80062C10(gPlayers[nPlayer].pChar) != 0) &&
-        fn_80095780(gPlayers[nPlayer].pChar) == 9 && !fn_800C6604(pV)) {
+        fn_80095780(gPlayers[nPlayer].pChar) == 9 && !GolfCamera_IsPostShotCamFinalCutDone(pV)) {
         GolfCamera_CutToGolferDoneAnimatingCam(pV, nPlayer);
     }
     if (GUI_CheckMessageQue()) return;
@@ -1457,7 +1457,7 @@ void STATEFUNC_ShowYardageUpdate(int nPlayer) {
             return;
         }
         if (CameraController_IsFadeOn(pV)) return;
-        if (!fn_800C6604(pV) && fn_80095780(gPlayers[nPlayer].pChar) == 9) {
+        if (!GolfCamera_IsPostShotCamFinalCutDone(pV) && fn_80095780(gPlayers[nPlayer].pChar) == 9) {
             if (!(fn_80062C28(gPlayers[nPlayer].pChar) >= lbl_80281F78->f170 / 2.0f ||
                   pV->script.f98 > 1.0f)) {
                 return;
