@@ -9,29 +9,33 @@ void RC_UpdateCurrentScreenMatrices(void);
 void fn_80038624(f32* pColour);
 void Gaud_UpdtSpecialShot(u8 nPlayer, u8 n);     // GameAudio.c
 
-void fn_800B39B8(ComicPanel* pPanel, f32* pRect, int nPlayer, f32 fFrameTime);
-u8   fn_800B3C64(ComicPanel* pPanel, int nPlayer);
-void fn_800B3D64(ComicPanel* pPanel, View* pView, f32 fFrameTime);
-void fn_800B3D68(ComicPanel* pPanel, f32* pRect, f32 fFrameTime);
-void fn_800B3F4C(f32* pRect, f32 fTop, f32 fLeft, f32 fWidth, f32 fHeight);
-void fn_800B3F9C(void);
-void fn_800B4108(void);
-u8   fn_800B4818(f32* pRect, int nPlayer);
-u8   fn_800B4908(void);
-void fn_800B4914(View* pView, int nPlayer);
+void ComicCam_ModeSpecificUpdate(ComicPanel* pPanel, f32* pRect, int nPlayer, f32 fFrameTime);
+u8   ComicCam_IsFrameOver(ComicPanel* pPanel, int nPlayer);
+void ComicCam_PerformTransition(ComicPanel* pPanel, View* pView, f32 fFrameTime);
+void ComicCam_PerformFadeOuts(ComicPanel* pPanel, f32* pRect, f32 fFrameTime);
+void ComicCam_SetViewportToSize(f32* pRect, f32 fTop, f32 fLeft, f32 fWidth, f32 fHeight);
+void ComicCam_Init3ScreenMode(void);
+void ComicCam_Init9ScreenRapidMode(void);
+u8   ComicCam_IsComicCamOver(f32* pRect, int nPlayer);
+u8   ComicCam_IsScreenFrozen(void);
+void ComicCam_CheckForCameraSwitch(View* pView, int nPlayer);
 
 ComicCam* lbl_80282178;
 
-void fn_800B34F0(void) {
+// Allocate the comic camera's state (lbl_80282178) when a round's systems start (GO_vInitIG).
+void ComicCam_InitComicCam(void) {
     lbl_80282178 = StaticMem_Alloc(sizeof(ComicCam), 2, 0, "GoComicCam.c", 91);
 }
 
-void fn_800B352C(void) {
+// Free the comic camera's state (lbl_80282178) when the round's systems shut down (gomainloop.c).
+void ComicCam_CloseComicCam(void) {
     StaticMem_Free(lbl_80282178);
 }
 
-// Start the comic camera for nPlayer's view with layout nKind.
-void fn_800B3550(int nKind, View* pView, int nPlayer) {
+// Start the comic camera for nPlayer's view (GolfCamera_Init3ScreenCamera) with layout nKind (0:
+// three panels, 1: the 3x3 grid): clear the panels' fade timers, lay the panels out and cut to the
+// layout's first shot (kind 0x28 or 0x2B) unless it would hide the golfer.
+void ComicCam_StartComicCam(int nKind, View* pView, int nPlayer) {
     f32* pCam = CameraController_GetCameraOrigin(pView);
     f32* pSub = CameraController_GetCameraLookPoint(pView);
     int i;
@@ -44,11 +48,11 @@ void fn_800B3550(int nKind, View* pView, int nPlayer) {
     // EA bug: nShot is left unset for any other nKind (GoGolfCam.c only passes 0 and 1).
     switch (nKind) {
     case 0:
-        fn_800B3F9C();
+        ComicCam_Init3ScreenMode();
         nShot = 0x28;
         break;
     case 1:
-        fn_800B4108();
+        ComicCam_Init9ScreenRapidMode();
         nShot = 0x2B;
         break;
     }
@@ -66,7 +70,7 @@ void fn_800B3550(int nKind, View* pView, int nPlayer) {
 
 // A frame of the comic camera for nPlayer's view: draw the panels, and when the current one has run
 // its course move on to the next. Returns 1 when the camera is finished.
-u8 fn_800B36F4(View* pView, int nPlayer, f32 fFrameTime) {
+u8 ComicCam_UpdateComicCam(View* pView, int nPlayer, f32 fFrameTime) {
     f32 aColour[4] = { 0.0f, 0.0f, 0.0f, 0.5f };
     f32* pRect;
     ComicPanel* pPanel = &lbl_80282178->aPanel[lbl_80282178->nPanel];
@@ -76,30 +80,30 @@ u8 fn_800B36F4(View* pView, int nPlayer, f32 fFrameTime) {
         lbl_80282178->n8 = -2;
     }
     if (lbl_80282178->n8 < 2) {
-        fn_800B3F4C(pRect, 0.0f, 0.0f, 1.0f, 1.0f);
+        ComicCam_SetViewportToSize(pRect, 0.0f, 0.0f, 1.0f, 1.0f);
         fn_80038624(aColour);
         if (gSession.nPaused == 0) {
-            fn_800B3F4C(pRect, pPanel->fTop, pPanel->fLeft, pPanel->fWidth, pPanel->fHeight);
+            ComicCam_SetViewportToSize(pRect, pPanel->fTop, pPanel->fLeft, pPanel->fWidth, pPanel->fHeight);
         }
         lbl_80282178->n8 = lbl_80282178->n8 + 1;
     }
     if (lbl_80282178->bNext && gSession.nPaused == 0) {
         lbl_80282178->n10++;
-        fn_800B3D68(pPanel, pRect, fFrameTime);
+        ComicCam_PerformFadeOuts(pPanel, pRect, fFrameTime);
         if (lbl_80282178->n10 > 2) {
             lbl_80282178->bNext = 0;
-            fn_800B3F4C(pRect, pPanel->fTop, pPanel->fLeft, pPanel->fWidth, pPanel->fHeight);
-            fn_800B4914(pView, nPlayer);
+            ComicCam_SetViewportToSize(pRect, pPanel->fTop, pPanel->fLeft, pPanel->fWidth, pPanel->fHeight);
+            ComicCam_CheckForCameraSwitch(pView, nPlayer);
         }
     } else if (lbl_80282178->bNext && gSession.nPaused != 0) {
         lbl_80282178->n10 = -2;
     }
     if (!lbl_80282178->bNext) {
-        fn_800B39B8(pPanel, pRect, nPlayer, fFrameTime);
-        fn_800B3D64(pPanel, pView, fFrameTime);
-        fn_800B3D68(pPanel, pRect, fFrameTime);
+        ComicCam_ModeSpecificUpdate(pPanel, pRect, nPlayer, fFrameTime);
+        ComicCam_PerformTransition(pPanel, pView, fFrameTime);
+        ComicCam_PerformFadeOuts(pPanel, pRect, fFrameTime);
         lbl_80282178->fTime = lbl_80282178->fTime + fFrameTime;
-        if (fn_800B3C64(pPanel, nPlayer)) {
+        if (ComicCam_IsFrameOver(pPanel, nPlayer)) {
             lbl_80282178->a4C[lbl_80282178->nPanel] = pPanel->fTime;
             lbl_80282178->a24[lbl_80282178->nPanel] = pPanel->fTime;
             if (pPanel->nNext >= 0) {
@@ -112,7 +116,7 @@ u8 fn_800B36F4(View* pView, int nPlayer, f32 fFrameTime) {
                 lbl_80282178->bDone = 1;
             }
         }
-        if (fn_800B4818(pRect, nPlayer)) {
+        if (ComicCam_IsComicCamOver(pRect, nPlayer)) {
             return 1;
         }
     }
@@ -122,7 +126,7 @@ u8 fn_800B36F4(View* pView, int nPlayer, f32 fFrameTime) {
 // Layout 1's ending: once the last panel is reached, grow it a little each frame until it fills the
 // screen: its shorter side (both when square), from the centre when centred, else away from the
 // nearer screen edge. nPlayer is not used.
-void fn_800B39B8(ComicPanel* pPanel, f32* pRect, int nPlayer, f32 fFrameTime) {
+void ComicCam_ModeSpecificUpdate(ComicPanel* pPanel, f32* pRect, int nPlayer, f32 fFrameTime) {
     f32 fX;
     f32 fY;
     f32 fHeight;
@@ -184,15 +188,16 @@ void fn_800B39B8(ComicPanel* pPanel, f32* pRect, int nPlayer, f32 fFrameTime) {
             fY = fY < 0.0f ? 0.0f : (fY > 1.0f ? 1.0f : fY);
             fHeight = fHeight < 0.0f ? 0.0f : (fHeight > 1.0f - fY ? 1.0f - fY : fHeight);
             fWidth = fWidth < 0.0f ? 0.0f : (fWidth > 1.0f - fX ? 1.0f - fX : fWidth);
-            fn_800B3F4C(pRect, fY, fX, fWidth, fHeight);
+            ComicCam_SetViewportToSize(pRect, fY, fX, fWidth, fHeight);
         }
         break;
     }
 }
 
-// Has the panel run its course? Kinds 0 and 1 wait for the golfer's animation events 1 and 2, kind
-// 2 for the panel's time.
-u8 fn_800B3C64(ComicPanel* pPanel, int nPlayer) {
+// Has the panel run its course? By the panel's end condition n0: 0 once the golfer passes animation
+// tag 1 (the top of the backswing), 1 once past tag 2 (the ball hit), 2 once the panel's time f4 is
+// up.
+u8 ComicCam_IsFrameOver(ComicPanel* pPanel, int nPlayer) {
     u8 bBefore;
 
     switch (pPanel->n0) {
@@ -215,13 +220,14 @@ u8 fn_800B3C64(ComicPanel* pPanel, int nPlayer) {
     }
 }
 
-// Does nothing; its only caller, fn_800B36F4, passes these.
-void fn_800B3D64(ComicPanel* pPanel, View* pView, f32 fFrameTime) {
+// Empty in this build (TW07's is empty too); ComicCam_UpdateComicCam calls it each frame for the
+// current panel.
+void ComicCam_PerformTransition(ComicPanel* pPanel, View* pView, f32 fFrameTime) {
 }
 
 // Draw the panels still showing, each darkened as its time runs out, then put the render camera's
 // rectangle pRect back. pPanel is not used.
-void fn_800B3D68(ComicPanel* pPanel, f32* pRect, f32 fFrameTime) {
+void ComicCam_PerformFadeOuts(ComicPanel* pPanel, f32* pRect, f32 fFrameTime) {
     f32 aColour[4] = { 0.0f, 0.0f, 0.0f, 0.5f };
     f32 fY;
     f32 fX;
@@ -235,7 +241,7 @@ void fn_800B3D68(ComicPanel* pPanel, f32* pRect, f32 fFrameTime) {
     fWidth = pRect[2];
     for (i = 0; i < 10; i++) {
         if (lbl_80282178->a24[i] > 0.0f) {
-            fn_800B3F4C(pRect, lbl_80282178->aPanel[i].fTop, lbl_80282178->aPanel[i].fLeft,
+            ComicCam_SetViewportToSize(pRect, lbl_80282178->aPanel[i].fTop, lbl_80282178->aPanel[i].fLeft,
                         lbl_80282178->aPanel[i].fWidth, lbl_80282178->aPanel[i].fHeight);
             aColour[3] = 0.5f * (1.0f - lbl_80282178->a24[i] / lbl_80282178->a4C[i]);
             aColour[3] = aColour[3] < 0.0f ? 0.0f : (aColour[3] > 0.5f ? 0.5f : aColour[3]);
@@ -246,11 +252,11 @@ void fn_800B3D68(ComicPanel* pPanel, f32* pRect, f32 fFrameTime) {
             }
         }
     }
-    fn_800B3F4C(pRect, fY, fX, fWidth, fHeight);
+    ComicCam_SetViewportToSize(pRect, fY, fX, fWidth, fHeight);
 }
 
 // Set the render camera's screen rectangle pRect and bring the camera up to date.
-void fn_800B3F4C(f32* pRect, f32 fTop, f32 fLeft, f32 fWidth, f32 fHeight) {
+void ComicCam_SetViewportToSize(f32* pRect, f32 fTop, f32 fLeft, f32 fWidth, f32 fHeight) {
     VM_vSetViewportRect(pRect, fLeft, fTop, fWidth, fHeight);
     RC_UpdateCurrentScreenMatrices();
     RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
@@ -260,8 +266,9 @@ void fn_800B3F4C(f32* pRect, f32 fTop, f32 fLeft, f32 fWidth, f32 fHeight) {
     RenderState_Flush();
 }
 
-// Layout 0: three panels side by side.
-void fn_800B3F9C(void) {
+// Layout 0: three tall panels side by side, ended by the golfer's animation tag 1, tag 2 and then
+// one second; 3 panels in all. Tells the special-shot audio (Gaud_UpdtSpecialShot) column 0.
+void ComicCam_Init3ScreenMode(void) {
     lbl_80282178->aPanel[0].fTop = 0.15f;
     lbl_80282178->aPanel[0].fLeft = 0.03f;
     lbl_80282178->aPanel[0].fWidth = 0.28f;
@@ -299,7 +306,7 @@ void fn_800B3F9C(void) {
 
 // Layout 1: a 3x3 grid of small panels, shown in one of four orders picked at random; each panel
 // stays 3 frames. Half the time the grid is run through twice (18 panels).
-void fn_800B4108(void) {
+void ComicCam_Init9ScreenRapidMode(void) {
     s32 aOrder[4][9] = {
         { 3, 2, 6, 0, 8, 7, 4, 1, 5 },
         { 7, 3, 1, 0, 8, 2, 6, 5, 4 },
@@ -402,7 +409,7 @@ void fn_800B4108(void) {
 
 // Is the comic camera finished? Layout 1: once the golfer is half a second past animation event 2
 // and the current panel fills the screen; layout 0: once the last panel has run its course (bDone).
-u8 fn_800B4818(f32* pRect, int nPlayer) {
+u8 ComicCam_IsComicCamOver(f32* pRect, int nPlayer) {
     switch (lbl_80282178->nKind) {
     case 0:
         return lbl_80282178->bDone != 0;
@@ -419,14 +426,16 @@ u8 fn_800B4818(f32* pRect, int nPlayer) {
     }
 }
 
-u8 fn_800B4908(void) {
+// Is the comic camera moving on to its next panel (bNext)? EA calls that the frozen screen:
+// fn_800C6CCC asks.
+u8 ComicCam_IsScreenFrozen(void) {
     return lbl_80282178->bNext;
 }
 
 // Move the camera on for the current panel: layout 0 to shot 0x28 + the panel, layout 1 to the next
 // of shots 0x2B..0x2D every 9 panels shown. Then hand Gaud_UpdtSpecialShot (GameAudio.c) the panel's column
 // (3 for layout 1's last panel).
-void fn_800B4914(View* pView, int nPlayer) {
+void ComicCam_CheckForCameraSwitch(View* pView, int nPlayer) {
     f32* pCam = CameraController_GetCameraOrigin(pView);
     f32* pSub = CameraController_GetCameraLookPoint(pView);
     int nPanel = lbl_80282178->nPanel;
@@ -468,9 +477,9 @@ void fn_800B4914(View* pView, int nPlayer) {
     }
 }
 
-// Is the golfer past animation event 2? (98%: the original returns the flag without a u8 mask, but
-// GameEffects.c's call masks it as a u8; an int return is exact here but breaks that caller.)
-u8 fn_800B4AE0(void) {
+// Has the comic camera's golfer passed animation tag 2 (the ball hit)? GameEffects_AdjustTimeRate
+// asks.
+u8 ComicCam_HasBallBeenHit(void) {
     u8 bBefore = !(Character_GetTagTime(gPlayers[lbl_80282178->nPlayer].pChar, 2) <
                    gPlayers[lbl_80282178->nPlayer].pChar->fAnimTime);
 

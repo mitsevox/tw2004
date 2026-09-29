@@ -771,21 +771,21 @@ void     CA_vUpdateInternalFieldOfViewData(CamLens* pLens);
 
 // ---- camera script helpers (CamSpline.c, 0x800C7480..)-------------------------------------
 
-// Both write a point into pOut: fn_800C7D14 goes fDist along the direction from pA to pB (its y
+// Both write a point into pOut: CamUtils_vGetPositionBetweenTwoPoints goes fDist along the direction from pA to pB (its y
 // cleared unless bKeepY, normalised unless bRaw), then fSide across the flattened direction;
-// fn_800C7E50 swings around pC from pA towards pB at share fT (nDir: 0 the short way round, 1 angle
+// CamUtils_vCalcArcPosition swings around pC from pA towards pB at share fT (nDir: 0 the short way round, 1 angle
 // decreasing, else increasing).
-void   fn_800C7D14(f32* pA, f32* pB, u8 bKeepY, u8 bRaw, f32* pOut, f32 fDist, f32 fSide);
-void   fn_800C7E50(f32* pA, f32* pB, f32* pC, int nDir, f32* pOut, f32 fT);
+void   CamUtils_vGetPositionBetweenTwoPoints(f32* pA, f32* pB, u8 bKeepY, u8 bRaw, f32* pOut, f32 fDist, f32 fSide);
+void   CamUtils_vCalcArcPosition(f32* pA, f32* pB, f32* pC, int nDir, f32* pOut, f32 fT);
 // The splined camera (CamScript_SplineCameras): the camera position on the spline through pPos0..3,
 // the look angles on the one through pLook0..3 (each unwrapped to within half a turn of the one
 // before), and the field of view between fFov1 and fFov2, at share fT between the middle two.
-void   fn_800C7480(f32* pPos0, f32* pPos1, f32* pPos2, f32* pPos3, f32* pLook0, f32* pLook1, f32* pLook2,
+void   CamScript_SplineCamerasByPositionAndLook(f32* pPos0, f32* pPos1, f32* pPos2, f32* pPos3, f32* pLook0, f32* pLook1, f32* pLook2,
                    f32* pLook3, f32* pCam, f32* pSub, f32* pFov, f32 fFov1, f32 fFov2, f32 fT);
-void   fn_800C7898(f32* p0, f32* p1, f32* p2, f32* p3, f32* pOut, f32 fT);   // a point on the spline
-f32    fn_800C7970(f32 fA, f32 fB, f32 fC, f32 fD, f32 fE, f32 fF);
+void   CamScript_SplineCamerasByPosition(f32* p0, f32* p1, f32* p2, f32* p3, f32* pOut, f32 fT);   // a point on the spline
+f32    CamScript_GetFlybyTimeStep(f32 fA, f32 fB, f32 fC, f32 fD, f32 fE, f32 fF);
 // The value of a fly-by path's curve at time fT (CamScript_RunFlybyCamera).
-f32    fn_800C7A9C(FlyByPath* pPath, f32 fT);
+f32    CamScript_fEvaluateCurve(FlyByPath* pPath, f32 fT);
 // CamSpline.c: the Catmull-Rom basis matrix.
 extern f32 lbl_80191440[4][4];
 

@@ -9,7 +9,10 @@ void CameraTuning_Init(void);
 
 CamTuning* lbl_80281F78;
 
-// Allocate the camera tuning values and set every one.
+// Allocate the camera tuning values (lbl_80281F78) and set each to its fixed value; run when the
+// front end and each round start (GO_vInitFE, GO_vInitIG). fMaxPitchUp and fMaxPitchDown are in
+// degrees (GolfCamera_ClampLookAngle converts them). fn_80097E98 (sweep_80097E98.c, TW07's
+// CameraTuning_Close) frees them.
 void CameraTuning_Init(void) {
     lbl_80281F78 = StaticMem_Alloc(sizeof(CamTuning), 2, 0, "GoCamTuningVars.c", 24);
     lbl_80281F78->f0 = 10.0f;

@@ -227,8 +227,8 @@ void fn_800B2724(void);
 void fn_800B2734(void);
 void fn_800B28D4(Character* pChar, int a, int b);
 void fn_800B2FB0(Character* pChar, int a, int b);
-void fn_800B34F0(void);
-void fn_800B352C(void);
+void ComicCam_InitComicCam(void);
+void ComicCam_CloseComicCam(void);
 void AudMem_InitModule(void);
 void AudMem_CloseModule(void);
 void fn_800B655C(void);
@@ -628,7 +628,7 @@ void GO_vInitIG(void) {
     fn_80062E00();
     DynamicCam_Init();
     StaticCam_Init();
-    fn_800B34F0();
+    ComicCam_InitComicCam();
     fn_80048DD0();
     fn_8006DCA0(0);
     fn_80014A64();
@@ -719,7 +719,7 @@ void fn_8006CDC4(void) {
     Character_CloseIG();
     fn_8001058C();
     fn_80048E7C();
-    fn_800B352C();
+    ComicCam_CloseComicCam();
     fn_80062E20();
     DynamicCam_DeInit();
     StaticCam_DeInit();

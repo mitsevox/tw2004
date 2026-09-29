@@ -701,14 +701,14 @@ void fn_8003AC50(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
     DynamicCam_GetLocation(pShot->bB0, nPlayer, vTo, pScript, pShot, pCam, pSub);
     if (pShot->bB1 == 0) {
         if (CameraScript_FlipCameraForLefty(nPlayer, pShot)) {
-            fn_800C7D14(vFrom, vTo, 0, 1, pOut, pShot->f60, -pShot->f64);
+            CamUtils_vGetPositionBetweenTwoPoints(vFrom, vTo, 0, 1, pOut, pShot->f60, -pShot->f64);
         } else {
-            fn_800C7D14(vFrom, vTo, 0, 1, pOut, pShot->f60, pShot->f64);
+            CamUtils_vGetPositionBetweenTwoPoints(vFrom, vTo, 0, 1, pOut, pShot->f60, pShot->f64);
         }
     } else if (CameraScript_FlipCameraForLefty(nPlayer, pShot)) {
-        fn_800C7D14(vFrom, vTo, 1, 1, pOut, pShot->f60, -pShot->f64);
+        CamUtils_vGetPositionBetweenTwoPoints(vFrom, vTo, 1, 1, pOut, pShot->f60, -pShot->f64);
     } else {
-        fn_800C7D14(vFrom, vTo, 1, 1, pOut, pShot->f60, pShot->f64);
+        CamUtils_vGetPositionBetweenTwoPoints(vFrom, vTo, 1, 1, pOut, pShot->f60, pShot->f64);
     }
     DynamicCam_AddHeightOffset(pOut, pScript, pShot, nPlayer, fY);
 }
@@ -735,10 +735,10 @@ void fn_8003ADF8(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
     DynamicCam_GetLocation(pShot->bB0, nPlayer, vTo, pScript, pShot, pCam, pSub);
     if (pShot->bB1 == 2 || pShot->bB1 == 3) {
         fn_8003DAC8(pShot, nPlayer, &fSide, &fDist);
-        fn_800C7D14(vFrom, vTo, 0, 0, pOut, fDist, fSide);
+        CamUtils_vGetPositionBetweenTwoPoints(vFrom, vTo, 0, 0, pOut, fDist, fSide);
     } else {
         fn_8003DAC8(pShot, nPlayer, &fSide, &fDist);
-        fn_800C7D14(vFrom, vTo, 1, 0, pOut, fDist, fSide);
+        CamUtils_vGetPositionBetweenTwoPoints(vFrom, vTo, 1, 0, pOut, fDist, fSide);
     }
     if (pShot->bB1 == 8) {
         fFar = CamScript_GetBallToPinPercent(nPlayer, pScript);

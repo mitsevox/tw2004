@@ -20,15 +20,15 @@
 CamLens* Camera_GetLens(void* pCamera);                    // the render camera's lens
 void     RC_UpdateCurrentScreenMatrices(void);
 u8       CameraController_TargetIsOnScreen(int nPlayer);
-u8       fn_800B36F4(View* pView, int nPlayer, f32 fFrameTime);
+u8       ComicCam_UpdateComicCam(View* pView, int nPlayer, f32 fFrameTime);
 void     fn_800C73B8(f32* pA, f32* pB, f32* pOut);
 void     GolfCam_Vec3Sub(f32* pA, f32* pB, f32* pOut);
 void     fn_800C7400(f32* pA, f32* pOut);
 f32      fn_800C741C(Character* pChar, u64 uEvent);
 void     GolfCamera_ChooseReactionCam(View* pView, int nPlayer, int a);
 void     CameraController_StartScriptOfKind(View* pView, int nPlayer, int nCamera);
-void     fn_800B3550(int a, View* pView, int nPlayer);
-u8       fn_800B4908(void);
+void     ComicCam_StartComicCam(int a, View* pView, int nPlayer);
+u8       ComicCam_IsScreenFrozen(void);
 void     GolfCamera_ComputeSteepSlopeCamVectors(View* pView, int nPlayer);
 void     fn_800C5D64(View* pView, f32* pCam, f32* pSub, int nPlayer);
 u8       fn_800C708C(View* pView);
@@ -1136,9 +1136,11 @@ void GolfCamera_ProcessGreenCamera(View* pView, int nPlayer) {
         } else {
             fT = lbl_80281F78->f21C;
         }
-        fn_800C7D14(pView->script.v0, pView->script.v10, 1, 1, pCam, fabsf(pView->script.fCamTime) - 0.5f,
+        CamUtils_vGetPositionBetweenTwoPoints(pView->script.v0, pView->script.v10, 1, 1, pCam,
+                                              fabsf(pView->script.fCamTime) - 0.5f,
                     fT);
-        fn_800C7D14(pView->script.v0, pView->script.v10, 1, 1, pSub, fabsf(pView->script.fCamTime) - 0.5f,
+        CamUtils_vGetPositionBetweenTwoPoints(pView->script.v0, pView->script.v10, 1, 1, pSub,
+                                              fabsf(pView->script.fCamTime) - 0.5f,
                     0.0f);
     } else {
         // behind the ball (looking at the pin) or behind the pin (looking at the ball)
@@ -1154,9 +1156,9 @@ void GolfCamera_ProcessGreenCamera(View* pView, int nPlayer) {
             pTo = pView->script.v0;
             fT = 0.5f + pView->script.fCamTime;
         }
-        fn_800C7D14(pFrom, pTo, 1, 1, vA, 1.0f, -lbl_80281F78->f21C);
-        fn_800C7D14(pFrom, pTo, 1, 1, vB, 1.0f, lbl_80281F78->f21C);
-        fn_800C7E50(vA, vB, pTo, 2, pCam, fT);
+        CamUtils_vGetPositionBetweenTwoPoints(pFrom, pTo, 1, 1, vA, 1.0f, -lbl_80281F78->f21C);
+        CamUtils_vGetPositionBetweenTwoPoints(pFrom, pTo, 1, 1, vB, 1.0f, lbl_80281F78->f21C);
+        CamUtils_vCalcArcPosition(vA, vB, pTo, 2, pCam, fT);
         LLMath_CopyVec(pTo, pSub);
     }
     CamScript_KeepAboveGround(nPlayer, pCam, vOld, 1, NULL, &fAbove, NULL, lbl_80281F78->f220);
@@ -1170,8 +1172,8 @@ void GolfCamera_ProcessGreenCamera(View* pView, int nPlayer) {
         pSub[1] += f;
     }
     if (pView->shot19C.f6C < 1.0f) {
-        fn_800C7D14(pView->v30, pView->v0, 1, 1, pCam, pView->shot19C.f6C, 0.0f);
-        fn_800C7D14(pView->v40, pView->v10, 1, 1, pSub, pView->shot19C.f6C, 0.0f);
+        CamUtils_vGetPositionBetweenTwoPoints(pView->v30, pView->v0, 1, 1, pCam, pView->shot19C.f6C, 0.0f);
+        CamUtils_vGetPositionBetweenTwoPoints(pView->v40, pView->v10, 1, 1, pSub, pView->shot19C.f6C, 0.0f);
     }
     if (pView->shot19C.f6C >= 1.0f) {
         pView->f5C = 0.0f;
@@ -1712,9 +1714,9 @@ void GolfCamera_ProcessReplaySwingCamera(View* pView, int nPlayer) {
 // special swing kind 9, else 0) and mark it on (b56).
 void GolfCamera_Init3ScreenCamera(View* pView, int nPlayer) {
     if (pView->n260 == 9) {
-        fn_800B3550(1, pView, nPlayer);
+        ComicCam_StartComicCam(1, pView, nPlayer);
     } else {
-        fn_800B3550(0, pView, nPlayer);
+        ComicCam_StartComicCam(0, pView, nPlayer);
     }
     gGolfCamState->b56 = 1;
 }
@@ -1729,7 +1731,7 @@ void GolfCamera_Process3ScreenCamera(View* pView, int nPlayer) {
     pCam = CameraController_GetCameraOrigin(pView);
     pSub = CameraController_GetCameraLookPoint(pView);
     nView = gPlayers[nPlayer].nView[0];
-    if (fn_800B36F4(pView, nPlayer, gSession.fFrameTime)) {
+    if (ComicCam_UpdateComicCam(pView, nPlayer, gSession.fFrameTime)) {
         GolfCamera_TurnOffComicCam(pView, nPlayer);
         CameraController_SetCameraMode(ViewController_GetCameraControl(nView), 14, nPlayer, nView);
         GolfCamera_ProcessBallFlightCamera(pView, nPlayer);
@@ -3813,7 +3815,7 @@ u8 fn_800C6CCC(void) {
         return 0;
     }
     bOn = 0;
-    if (gGolfCamState->b56 && fn_800B4908()) {
+    if (gGolfCamState->b56 && ComicCam_IsScreenFrozen()) {
         bOn = 1;
     }
     return bOn;

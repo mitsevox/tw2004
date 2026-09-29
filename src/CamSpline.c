@@ -6,8 +6,8 @@
 #include "camera.h"
 #include "unsorted/cull.h"
 
-f32  fn_800C79BC(f32* p0, f32* p1, f32* p2, f32* p3);
-void fn_800C8068(f32* pA, f32* pB, f32* pOut);
+f32  CamScript_fGetDistanceBetweenSplinePoints(f32* p0, f32* p1, f32* p2, f32* p3);
+void CamUtils_Vec3Sub(f32* pA, f32* pB, f32* pOut);
 
 f32 lbl_80191440[4][4] = {
     { 0.0f, 1.0f, 0.0f, 0.0f },
@@ -19,7 +19,8 @@ f32 lbl_80191440[4][4] = {
 // The splined camera: the camera position on the spline through pPos0..3, the look angles on the
 // one through pLook0..3 (each angle first unwrapped to within half a turn of the one before), and
 // the field of view between fFov1 and fFov2, at share fT between the middle two.
-void fn_800C7480(f32* pPos0, f32* pPos1, f32* pPos2, f32* pPos3, f32* pLook0, f32* pLook1, f32* pLook2,
+void CamScript_SplineCamerasByPositionAndLook(f32* pPos0, f32* pPos1, f32* pPos2, f32* pPos3, f32* pLook0,
+                                              f32* pLook1, f32* pLook2,
                  f32* pLook3, f32* pCam, f32* pSub, f32* pFov, f32 fFov1, f32 fFov2, f32 fT) {
     f32 aPoints[4][4];
     Vec4 vT;
@@ -35,7 +36,7 @@ void fn_800C7480(f32* pPos0, f32* pPos1, f32* pPos2, f32* pPos3, f32* pLook0, f3
     vT.y = fT;
     vT.z = fT2;
     vT.w = fT * fT2;
-    fn_800C7898(pPos0, pPos1, pPos2, pPos3, pCam, fT);
+    CamScript_SplineCamerasByPosition(pPos0, pPos1, pPos2, pPos3, pCam, fT);
 
     Vec3Copy(pLook1, &v1.x);
     while (v1.x - pLook0[0] > PI) {
@@ -112,7 +113,7 @@ void fn_800C7480(f32* pPos0, f32* pPos1, f32* pPos2, f32* pPos3, f32* pLook0, f3
 }
 
 // The point at share fT between p1 and p2 on the Catmull-Rom spline through p0..p3.
-void fn_800C7898(f32* p0, f32* p1, f32* p2, f32* p3, f32* pOut, f32 fT) {
+void CamScript_SplineCamerasByPosition(f32* p0, f32* p1, f32* p2, f32* p3, f32* pOut, f32 fT) {
     Vec4 vT;
     Vec4 vOut;
     Vec4 vWeights;
@@ -137,9 +138,11 @@ void fn_800C7898(f32* p0, f32* p1, f32* p2, f32* p3, f32* pOut, f32 fT) {
     Vec3Copy(&vOut.x, pOut);
 }
 
-// fF scaled by where fE falls in fC * fD, mapped from fA..fB and divided by fB; fF itself when fD
-// is 0 or fE is past the end.
-f32 fn_800C7970(f32 fA, f32 fB, f32 fC, f32 fD, f32 fE, f32 fF) {
+// The fly-by time step fF (TW07: timeStep) while the fly-by speeds up: the rate goes linearly from
+// fA to fB (rate0, rate1) over the first fD (accelParam) share of fC (time1), and the step is fF
+// times rate / fB. From fE (currentTime) past that, or with fD 0, the step is fF; a 0 step stays 0.
+// CamScript_AccelerateTime calls it.
+f32 CamScript_GetFlybyTimeStep(f32 fA, f32 fB, f32 fC, f32 fD, f32 fE, f32 fF) {
     f32 fEnd;
 
     if (0.0f == fF) {
@@ -152,7 +155,7 @@ f32 fn_800C7970(f32 fA, f32 fB, f32 fC, f32 fD, f32 fE, f32 fF) {
 }
 
 // The length of the spline between p1 and p2, added up over 32 straight steps.
-f32 fn_800C79BC(f32* p0, f32* p1, f32* p2, f32* p3) {
+f32 CamScript_fGetDistanceBetweenSplinePoints(f32* p0, f32* p1, f32* p2, f32* p3) {
     Vec4 vLast;
     Vec4 vPoint;
     Vec4 vDelta;
@@ -165,15 +168,15 @@ f32 fn_800C79BC(f32* p0, f32* p1, f32* p2, f32* p3) {
     Vec3Copy(p1, &vLast.x);
     for (i = 0; i < 32; i++) {
         fT += 1.0f / 32.0f;
-        fn_800C7898(p0, p1, p2, p3, &vPoint.x, fT);
-        fn_800C8068(&vPoint.x, &vLast.x, &vDelta.x);
+        CamScript_SplineCamerasByPosition(p0, p1, p2, p3, &vPoint.x, fT);
+        CamUtils_Vec3Sub(&vPoint.x, &vLast.x, &vDelta.x);
         fLength += (f32)Math_Sqrt(Vec3_LengthSqClamped(&vDelta.x));
         Vec3Copy(&vPoint.x, &vLast.x);
     }
     return fLength;
 }
 
-// fake match: puts -1.0f in the constant pool before fn_800C7A9C's step-count array, which the
+// fake match: puts -1.0f in the constant pool before CamScript_fEvaluateCurve's step-count array, which the
 // compiler emits ahead of that function's own literals (EA's 128.0f was a pooled literal, after
 // the -1.0f). Unused, so the linker strips it.
 static f32 CamSpline_StrippedFn(f32 x) {
@@ -189,7 +192,7 @@ static f32 CamSpline_StrippedFn(f32 x) {
 // the divide first uses it, as in EA's code. The key count is read into nKeys so that the key
 // search still counts down in ctr.
 #pragma opt_loop_invariants off
-f32 fn_800C7A9C(FlyByPath* pPath, f32 fT) {
+f32 CamScript_fEvaluateCurve(FlyByPath* pPath, f32 fT) {
     // fake match: the step count as a one-element const array, not the literal 128.0f: the literal
     // divide becomes a multiply by 1/128 (CW does that for powers of two from 2 to 1024), while EA's
     // code divides by the .sdata2 constant.
@@ -255,12 +258,13 @@ f32 fn_800C7A9C(FlyByPath* pPath, f32 fT) {
 }
 #pragma opt_loop_invariants reset
 
-// A point fDist along the direction from pA to pB (flattened unless bKeepY, normalised unless
-// bRaw), then moved fSide sideways (across the flat direction).
-void fn_800C7D14(f32* pA, f32* pB, u8 bKeepY, u8 bRaw, f32* pOut, f32 fDist, f32 fSide) {
+// A point fDist along the direction from pA to pB (flattened unless bKeepY; normalised unless bRaw,
+// so with bRaw fDist is a share of the way), then moved fSide sideways (across the flat direction).
+void CamUtils_vGetPositionBetweenTwoPoints(f32* pA, f32* pB, u8 bKeepY, u8 bRaw, f32* pOut, f32 fDist,
+                                           f32 fSide) {
     f32 aDir[3];
 
-    fn_800C8068(pB, pA, aDir);
+    CamUtils_Vec3Sub(pB, pA, aDir);
     if (!bKeepY) {
         aDir[1] = 0.0f;
     }
@@ -279,7 +283,7 @@ void fn_800C7D14(f32* pA, f32* pB, u8 bKeepY, u8 bRaw, f32* pOut, f32 fDist, f32
 // A point swung around pC from pA towards pB, at share fT: the flat angle and distance from pC and
 // the height are each blended. nDir picks the way round: 0 the short way, 1 decreasing, else
 // increasing.
-void fn_800C7E50(f32* pA, f32* pB, f32* pC, int nDir, f32* pOut, f32 fT) {
+void CamUtils_vCalcArcPosition(f32* pA, f32* pB, f32* pC, int nDir, f32* pOut, f32 fT) {
     Vec4 vFrom;
     Vec4 vTo;
     f32 fAngleFrom;
@@ -289,8 +293,8 @@ void fn_800C7E50(f32* pA, f32* pB, f32* pC, int nDir, f32* pOut, f32 fT) {
     f32 fAngle;
     f32 fDist;
 
-    fn_800C8068(pA, pC, &vFrom.x);
-    fn_800C8068(pB, pC, &vTo.x);
+    CamUtils_Vec3Sub(pA, pC, &vFrom.x);
+    CamUtils_Vec3Sub(pB, pC, &vTo.x);
     vFrom.y = 0.0f;
     vTo.y = 0.0f;
     if (0.0f == vFrom.x) {
@@ -340,7 +344,7 @@ void fn_800C7E50(f32* pA, f32* pB, f32* pC, int nDir, f32* pOut, f32 fT) {
 
 // Three floats: pOut gets pA minus pB.
 #ifdef __MWERKS__
-asm void fn_800C8068(register f32* pA, register f32* pB, register f32* pOut) {
+asm void CamUtils_Vec3Sub(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 1, 0
@@ -354,7 +358,7 @@ asm void fn_800C8068(register f32* pA, register f32* pB, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_800C8068(f32* pA, f32* pB, f32* pOut) {
+void CamUtils_Vec3Sub(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pA[0] - pB[0];
     pOut[1] = pA[1] - pB[1];
     pOut[2] = pA[2] - pB[2];

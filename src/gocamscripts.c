@@ -387,11 +387,11 @@ void CamScript_RunFEScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript
 
 // The script frame of a fly-by camera (GolfCamera_ProcessFlyByCamera and the post-shot camera;
 // GoStaticCam.c's paths). When the current shot has a timed path (fn_80065424 of its nA4), the
-// camera flies along it (StaticCam_GetFlybyInformation) at the point the path's curve (fn_800C7A9C)
-// gives for the share of its length the time has reached; at the end it goes on to the next shot
-// and its follow-on with a colour fade from CamTuning.v17C over f178, or clears the script when
-// there is none. Without a path the camera plays the shot or moves on the spline between the shots
-// (CamScript_SplineCameras). Unless b, nothing moves while paused or without time.
+// camera flies along it (StaticCam_GetFlybyInformation) at the point the path's curve
+// (CamScript_fEvaluateCurve) gives for the share of its length the time has reached; at the end it
+// goes on to the next shot and its follow-on with a colour fade from CamTuning.v17C over f178, or
+// clears the script when there is none. Without a path the camera plays the shot or moves on the
+// spline between the shots (CamScript_SplineCameras). Unless b, nothing moves while paused or without time.
 void CamScript_RunFlybyCamera(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, u8 b, f32 fTime) {
     f32 vPrev[4];
     f32 vMove[4];
@@ -417,7 +417,8 @@ void CamScript_RunFlybyCamera(int nPlayer, f32* pCam, f32* pSub, CamScript* pScr
         if (fShare > 1.0f) {
             fShare = 1.0f;
         }
-        StaticCam_GetFlybyInformation(pScript, pScript->pShot->nA4, pCam, pSub, &fFov, nPlayer, fn_800C7A9C(pPath, fShare));
+        StaticCam_GetFlybyInformation(pScript, pScript->pShot->nA4, pCam, pSub, &fFov, nPlayer,
+                                      CamScript_fEvaluateCurve(pPath, fShare));
         CA_vSetCameraFieldOfView(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])),
                                  fFov);
         if (pScript->nFade != 0) {
@@ -543,8 +544,9 @@ void CamScript_SmoothTerrainHeight(CamScript* pScript, f32* pCam, u8 b, int nPla
 
 // The script's time step this frame: fTime, except on a fly-by shot (bAD 0) with shots before and
 // after it (p44, p40) when the camera's speed fD4 is not between the spline speeds
-// (CamScript_GetFlybyCamRate) at the start of the move and this frame; then fn_800C7970 gives a
-// step that eases the speed from fD4 towards the spline's (with the shot's f48 and f4C).
+// (CamScript_GetFlybyCamRate) at the start of the move and this frame; then
+// CamScript_GetFlybyTimeStep gives a step that eases the speed from fD4 towards the spline's (with
+// the shot's f48 and f4C).
 f32 CamScript_AccelerateTime(CamScript* pScript, f32 fTime) {
     f32 fSpeed;
     f32 fNow;
@@ -558,8 +560,8 @@ f32 CamScript_AccelerateTime(CamScript* pScript, f32 fTime) {
     fStart = CamScript_GetFlybyCamRate(pScript->pShot, 0.0f, fTime / pScript->f8C, fTime);
     if (fSpeed < fStart && fSpeed > fNow) return fTime;
     if (fSpeed > fStart && fSpeed < fNow) return fTime;
-    // port: EA passes an argument fn_800C7970 ignores (the shot, in r3)
-    return ((f32 (*)(CamShot*, f32, f32, f32, f32, f32, f32))fn_800C7970)(
+    // port: EA passes an argument CamScript_GetFlybyTimeStep ignores (the shot, in r3)
+    return ((f32 (*)(CamShot*, f32, f32, f32, f32, f32, f32))CamScript_GetFlybyTimeStep)(
         pScript->pShot, fSpeed, fNow, pScript->pShot->f48, pScript->pShot->f4C, pScript->fCamTime, fTime);
 }
 
@@ -589,8 +591,8 @@ f32 CamScript_GetFlybyCamRate(CamShot* pShot, f32 fA, f32 fB, f32 fTime) {
     } else {
         Vec3Copy(pNext->p40->v20, vNext);
     }
-    fn_800C7898(vPrev, vFrom, vTo, vNext, vA, fA);
-    fn_800C7898(vPrev, vFrom, vTo, vNext, vB, fB);
+    CamScript_SplineCamerasByPosition(vPrev, vFrom, vTo, vNext, vA, fA);
+    CamScript_SplineCamerasByPosition(vPrev, vFrom, vTo, vNext, vB, fB);
     Vec3_Sub(vB, vA, vDiff);
     return (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff)) / fTime;
 }
@@ -967,9 +969,9 @@ void CamScript_LerpSwingToBallFlightCameras(int nPlayer, f32* pCam, f32* pSub, C
 }
 
 // Blend kind 3: the camera, the point it looks at and the field of view follow splines
-// (fn_800C7480) through the current and next shots, with the shot before the current one (p44) and
-// the one after the next (p40) as the outer points (the shots' own when there are none); depth of
-// field, blur and roll blend by the camera's time over the blend's length f8C.
+// (CamScript_SplineCamerasByPositionAndLook) through the current and next shots, with the shot
+// before the current one (p44) and the one after the next (p40) as the outer points (the shots' own
+// when there are none); depth of field, blur and roll blend by the camera's time over the blend's length f8C.
 void CamScript_SplineCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime) {
     f32 vPrevPos[4];
     f32 vPos0[4];
@@ -1014,7 +1016,8 @@ void CamScript_SplineCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScri
         Vec3Copy(pSub, vNextLook);
         CamScript_GetLookAtPoint(pNext->p40, nPlayer, vNextLook, pCam, pScript, pPrev, fTime);
     }
-    fn_800C7480(vPrevPos, vPos0, vPos1, vNextPos, vPrevLook, vLook0, vLook1, vNextLook, pCam, pSub, &fFov,
+    CamScript_SplineCamerasByPositionAndLook(vPrevPos, vPos0, vPos1, vNextPos, vPrevLook, vLook0, vLook1,
+                                             vNextLook, pCam, pSub, &fFov,
                 pShot->f78, pNext->f78, fT);
     fFov += GameEffects_FieldOfViewChange();
     if (CamScript_IsSecondViewShot(pScript->pShot)) {
@@ -1040,9 +1043,10 @@ void CamScript_SplineCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScri
 }
 
 // Blend kinds 2, 11 and 12: the point looked at moves on the straight line between the two shots'
-// look-at points; the camera swings round it from the one position to the other (fn_800C7E50, the
-// way round nD0 that CamScript_PickArcDirection picks on the blend's first frame); field of view,
-// depth of field, blur and roll blend by the share (CameraScript_GetSmoothTimeParam).
+// look-at points; the camera swings round it from the one position to the other
+// (CamUtils_vCalcArcPosition, the way round nD0 that CamScript_PickArcDirection picks on the
+// blend's first frame); field of view, depth of field, blur and roll blend by the share
+// (CameraScript_GetSmoothTimeParam).
 void CamScript_ArcCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime) {
     f32 vMove[4];
     f32 vPos[4];
@@ -1061,7 +1065,7 @@ void CamScript_ArcCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript,
     if (0.0f == pScript->fCamTime) {
         CamScript_PickArcDirection(pScript, pSub, nPlayer, pPrev, fTime);
     }
-    fn_800C7E50(pScript->v0, pScript->v10, pSub, pScript->nD0, pCam, fT);
+    CamUtils_vCalcArcPosition(pScript->v0, pScript->v10, pSub, pScript->nD0, pCam, fT);
     f = fT * (pNext->f78 - pShot->f78) + pShot->f78;
     f += GameEffects_FieldOfViewChange();
     if (CamScript_IsSecondViewShot(pScript->pShot)) {
@@ -1087,8 +1091,8 @@ void CamScript_ArcCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript,
 }
 
 // Blend kind 7: there and back. The share runs to 1 at the blend's middle and back to 0; the point
-// looked at, the camera's swing (fn_800C7E50, way round nD0: 1 going, 2 coming back), the field of
-// view, depth of field and blur follow it; the roll (fA8) blends by the doubled share instead.
+// looked at, the camera's swing (CamUtils_vCalcArcPosition, way round nD0: 1 going, 2 coming back),
+// the field of view, depth of field and blur follow it; the roll (fA8) blends by the doubled share instead.
 void CamScript_CircleCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime) {
     f32 vMove[4];
     f32 vPos[4];
@@ -1116,7 +1120,7 @@ void CamScript_CircleCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScri
     } else {
         pScript->nD0 = 2;
     }
-    fn_800C7E50(pScript->v0, pScript->v10, pSub, pScript->nD0, pCam, fShare);
+    CamUtils_vCalcArcPosition(pScript->v0, pScript->v10, pSub, pScript->nD0, pCam, fShare);
     f = fShare * (pNext->f78 - pShot->f78) + pShot->f78;
     f += GameEffects_FieldOfViewChange();
     if (CamScript_IsSecondViewShot(pScript->pShot)) {
@@ -1146,9 +1150,9 @@ void CamScript_CircleCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScri
 
 // Picks the way round (nD0: 1 or 2, 0 for either) of an arced move between the two shots. For blend
 // kind 12 it is 2 for a left-handed golfer (CameraScript_FlipCameraForLefty), else 1; kind 11 the
-// other way. Otherwise each way's curve midpoint (fn_800C7E50, round the halfway point of the two
-// look-at points) is tested against the in-bounds outlines (Ter_PointInOOBNetwork), and the way
-// whose point alone is inside is taken.
+// other way. Otherwise each way's curve midpoint (CamUtils_vCalcArcPosition, round the halfway
+// point of the two look-at points) is tested against the in-bounds outlines
+// (Ter_PointInOOBNetwork), and the way whose point alone is inside is taken.
 void CamScript_PickArcDirection(CamScript* pScript, f32* pSub, int nPlayer, f32* pPrev, f32 fTime) {
     f32 vSide1[4];
     f32 vSide2[4];
@@ -1182,9 +1186,9 @@ void CamScript_PickArcDirection(CamScript* pScript, f32* pSub, int nPlayer, f32*
         Vec3_Add(vPoint, vLook, vPoint);
         Vec3Copy(vPoint, vMid);
         pScript->nD0 = 1;
-        fn_800C7E50(pScript->v0, pScript->v10, vMid, 1, vSide1, 0.5f);
+        CamUtils_vCalcArcPosition(pScript->v0, pScript->v10, vMid, 1, vSide1, 0.5f);
         pScript->nD0 = 2;
-        fn_800C7E50(pScript->v0, pScript->v10, vMid, 2, vSide2, 0.5f);
+        CamUtils_vCalcArcPosition(pScript->v0, pScript->v10, vMid, 2, vSide2, 0.5f);
         bIn1 = Ter_PointInOOBNetwork(vSide1);
         bIn2 = Ter_PointInOOBNetwork(vSide2);
         if (!bIn1) {

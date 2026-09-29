@@ -288,7 +288,7 @@ They will be sorted into the sections below.
   (Glows fn_80098408 80.6 -> 94.5).
 - **[verified] Calls inside a later argument can run before a call in an earlier one**: write the
   expression inline as the argument (GoTerrain fn_80030A40 96.7 -> 100).
-- **[verified] `(int)` before a float-to-u8 conversion** gives `fctiwz` + `clrlwi` (GoComicCam fn_800B4108).
+- **[verified] `(int)` before a float-to-u8 conversion** gives `fctiwz` + `clrlwi` (GoComicCam ComicCam_Init9ScreenRapidMode).
 - **[verified] Set every loop cursor and end pointer as plain statements at the head of the loop**, in the
   original's order; an end pointer can double as the backward cursor (hlaudvoice Voc_ResetModule 78 -> 100).
 - **[verified] EA's message-list macro is `aMsgs[n] = x; n++;`**, not `aMsgs[n++] = x` (GameMode26
@@ -773,7 +773,7 @@ Added 2026-09-27 (from the ledgers solved that night; each ledger has the full s
   (2048, 4096, 16384, 0.5, 0.25, -128 stay `fdivs`), in every spelling and every compiler 1.0 -
   3.0a5.2. The frontend always hoists a loop test's load; `#pragma opt_loop_invariants off` on the
   function plus the test spelled differently from the divide (`*(const f32*)aStep` vs `aStep[0]`)
-  gave CamSpline fn_800C7A9C 98.48 -> 100 (labelled).
+  gave CamSpline CamScript_fEvaluateCurve 98.48 -> 100 (labelled).
 - **[verified, EA form] A byte swap in C, mask first**, `((v & 0xFF000000) >> 24) | ((v & 0xFF0000)
   >> 8) | ((v & 0xFF00) << 8) | ((v & 0xFF) << 24)`, stays rlwinm/rlwimi through allocation and the
   post-RA peephole makes it `stwbrx`: LLPictInt PictInt_Decode 93.26 -> 100 (the shift-first

@@ -28,9 +28,10 @@ void fn_8004A578(DynObjAnimal* pAnimal, void* pArg);            // message 6: pA
                                                                 // time's bits
 
 // Places the animal on its route at f194 (0..1 round it): a spline through the four points around
-// that place (camera spline code, fn_800C7480) gives its position and heading, dropped onto the
-// ground when b1BD is set and raised by f198. Then the matrix faces the heading, and a spin f19C
-// turns the animal (f1A0 the angle so far, fDt the frame time) until it is near 0 or 180 degrees.
+// that place (camera spline code, CamScript_SplineCamerasByPositionAndLook) gives its position and
+// heading, dropped onto the ground when b1BD is set and raised by f198. Then the matrix faces the
+// heading, and a spin f19C turns the animal (f1A0 the angle so far, fDt the frame time) until it is
+// near 0 or 180 degrees.
 void ActAnimal_SetWorldMatrix(DynObjAnimal* pAnimal, f32 fDt) {
     f32 aPos[4][4];
     f32 aTan[4][4];
@@ -101,7 +102,8 @@ void ActAnimal_SetWorldMatrix(DynObjAnimal* pAnimal, f32 fDt) {
             LLMath_Normalize3(aTan[i], aTan[i]);
         }
     }
-    fn_800C7480(aPos[0], aPos[1], aPos[2], aPos[3], aTan[0], aTan[1], aTan[2], aTan[3],
+    CamScript_SplineCamerasByPositionAndLook(aPos[0], aPos[1], aPos[2], aPos[3], aTan[0], aTan[1], aTan[2],
+                                             aTan[3],
                 pAnimal->base.obj.m80[3], vDir, &fUnused, 0.0f, 0.0f, fT);
     vDir[3] = 0.0f;
     if (pAnimal->b1BD && (pCourse = Ter_GetTGD()) != NULL) {

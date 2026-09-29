@@ -14,7 +14,7 @@
 CamLens* Camera_GetLens(void* pCamera);                        // the render camera's lens
 void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 a, f32 b, f32 c);      // a rotation matrix from three angles
 void LLMath_mat44fltMultiply33(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // a vector through a matrix
-f32  fn_800C79BC(f32* pPos0, f32* pPos1, f32* pPos2, f32* pPos3);
+f32  CamScript_fGetDistanceBetweenSplinePoints(f32* pPos0, f32* pPos1, f32* pPos2, f32* pPos3);
 
 void fn_800644F4(UStreamObject* pObject);
 void StaticCam_Reset(void);
@@ -318,7 +318,8 @@ CamShot* StaticCam_GetFlyByCam(int nPath) {
                         } else {
                             pAfter = pNext;
                         }
-                        pShot->f4C = fn_800C79BC(pPrev->v20, pShot->v20, pNext->v20, pAfter->v20);
+                        pShot->f4C = CamScript_fGetDistanceBetweenSplinePoints(pPrev->v20, pShot->v20,
+                                pNext->v20, pAfter->v20);
                         lbl_80281E18->afPathLength[i] += pShot->f4C;
                     }
                     if (pShot != NULL) {
@@ -389,7 +390,8 @@ void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32
     *pFov = CA_fGetCameraFieldOfView(
         Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])));
     if (0.0f == fTarget) {
-        fn_800C7480(pPrev->v20, pShot->v20, pNext->v20, pAfter->v20, pPrev->v30, pShot->v30, pNext->v30,
+        CamScript_SplineCamerasByPositionAndLook(pPrev->v20, pShot->v20, pNext->v20, pAfter->v20, pPrev->v30,
+                                                 pShot->v30, pNext->v30,
                     pAfter->v30, pCam, pSub, pFov, pShot->f78, pNext->f78, fT);
     } else {
         while (fTarget > fDist) {
@@ -407,7 +409,8 @@ void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32
                 StaticCam_SetupFlybyCameraPointers(pShot, &pPrev, &pNext, &pAfter);
                 fT = 0.0f;
             }
-            fn_800C7480(pPrev->v20, pShot->v20, pNext->v20, pAfter->v20, pPrev->v30, pShot->v30, pNext->v30,
+            CamScript_SplineCamerasByPositionAndLook(pPrev->v20, pShot->v20, pNext->v20, pAfter->v20,
+                                                     pPrev->v30, pShot->v30, pNext->v30,
                         pAfter->v30, pCam, pSub, pFov, pShot->f78, pNext->f78, fT);
             fn_80065B20(pCam, vLast, vDiff);
             fDist += (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
@@ -445,7 +448,8 @@ void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32
                 fHiT = fT;
                 fT -= fStep / (f32)(2 << i);
             }
-            fn_800C7480(pPrev->v20, pShot->v20, pNext->v20, pAfter->v20, pPrev->v30, pShot->v30, pNext->v30,
+            CamScript_SplineCamerasByPositionAndLook(pPrev->v20, pShot->v20, pNext->v20, pAfter->v20,
+                                                     pPrev->v30, pShot->v30, pNext->v30,
                         pAfter->v30, pCam, pSub, pFov, pShot->f78, pNext->f78, fT);
             fn_80065B20(pCam, vLast, vDiff);
             fDist = fLastDist + (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
@@ -454,7 +458,8 @@ void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32
         if (fDist > fTarget) {
             fEnd = (fT - fLoT) * (1.0f - (fDist - fTarget) / (fDist - fLoDist)) + fLoT;
             fT = fEnd;
-            fn_800C7480(pPrev->v20, pShot->v20, pNext->v20, pAfter->v20, pPrev->v30, pShot->v30, pNext->v30,
+            CamScript_SplineCamerasByPositionAndLook(pPrev->v20, pShot->v20, pNext->v20, pAfter->v20,
+                                                     pPrev->v30, pShot->v30, pNext->v30,
                         pAfter->v30, pCam, pSub, pFov, pShot->f78, pNext->f78, fT);
             fn_80065B20(pCam, vLast, vDiff);
             fDist = fLastDist + (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
@@ -471,7 +476,8 @@ void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32
             if (pPrev->v20) {
             } else {
             }
-            fn_800C7480(pPrev->v20, pShot->v20, pNext->v20, pAfter->v20, pPrev->v30, pShot->v30, pNext->v30,
+            CamScript_SplineCamerasByPositionAndLook(pPrev->v20, pShot->v20, pNext->v20, pAfter->v20,
+                                                     pPrev->v30, pShot->v30, pNext->v30,
                         pAfter->v30, pCam, pSub, pFov, pShot->f78, pNext->f78, fT);
             fn_80065B20(pCam, vLast, vDiff);
             fDist = fLastDist + (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
