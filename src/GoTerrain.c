@@ -85,7 +85,7 @@ UObjMesh* fn_8003556C(UObjMesh* pGround);
 s32       fn_80035554(UObjMesh* pMesh);
 
 // .bss and .sbss in reverse address order
-Ter_TerrainRendererMgr gTerrainRendererMgr;
+Ter_TerrainRendererMgr gTerRenderer;
 s32 gTerLowBitCounts[5][32];
 s32 gTerUnreadToggle;
 s32 gTerPanoramaList2HiddenCount;
@@ -143,70 +143,70 @@ void Ter_vInitModule(void) {
     s32 j;
     s32 nBits;
 
-    gTerrainRendererMgr.pPatchList = StaticMem_Alloc(1024 * sizeof(Ter_PatchReference), 2, 16, "GoTerrain.c", 567);
-    gTerrainRendererMgr.pPostDrawTerrainList =
+    gTerRenderer.pPatchList = StaticMem_Alloc(1024 * sizeof(Ter_PatchReference), 2, 16, "GoTerrain.c", 567);
+    gTerRenderer.pPostDrawTerrainList =
         StaticMem_Alloc(20 * sizeof(Ter_PatchReference), 2, 16, "GoTerrain.c", 572);
-    gTerrainRendererMgr.pObjectSortList = StaticMem_Alloc(650 * sizeof(Ter_ObjectReference), 2, 16, "GoTerrain.c", 577);
-    gTerrainRendererMgr.pOpaqueObjectList = StaticMem_Alloc(650 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 582);
-    gTerrainRendererMgr.pTranslucentObjectList =
+    gTerRenderer.pObjectSortList = StaticMem_Alloc(650 * sizeof(Ter_ObjectReference), 2, 16, "GoTerrain.c", 577);
+    gTerRenderer.pOpaqueObjectList = StaticMem_Alloc(650 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 582);
+    gTerRenderer.pTranslucentObjectList =
         StaticMem_Alloc(200 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 587);
-    gTerrainRendererMgr.pNearbyObjectList = StaticMem_Alloc(70 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 592);
-    gTerrainRendererMgr.pDeferredItemsList = StaticMem_Alloc(50 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 597);
-    gTerrainRendererMgr.pPanoramaItemsList =
+    gTerRenderer.pNearbyObjectList = StaticMem_Alloc(70 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 592);
+    gTerRenderer.pDeferredItemsList = StaticMem_Alloc(50 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 597);
+    gTerRenderer.pPanoramaItemsList =
         StaticMem_Alloc(300 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 602);
-    gTerrainRendererMgr.pPostDrawItemsList =
+    gTerRenderer.pPostDrawItemsList =
         StaticMem_Alloc(400 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 607);
-    gTerrainRendererMgr.pObjectStateList =
+    gTerRenderer.pObjectStateList =
         StaticMem_Alloc(TER_NUM_OBJECTS * sizeof(Ter_ObjectState), 2, 16, "GoTerrain.c", 612);
-    gTerrainRendererMgr.xpGrassPatchList = StaticMem_Alloc(128 * sizeof(Ter_PatchReference), 2, 16, "GoTerrain.c", 633);
-    gTerrainRendererMgr.fTreeMinPeriod = 3.7f;
-    gTerrainRendererMgr.fTreeDiffPeriod = 1.6f;
-    gTerrainRendererMgr.fTreeOverdrive = 1.0f;
-    gTerrainRendererMgr.fTreeNoisePeriodScale = 1.0f;
-    gTerrainRendererMgr.fTreeNoiseAmplitudeScale = 0.0f;
+    gTerRenderer.xpGrassPatchList = StaticMem_Alloc(128 * sizeof(Ter_PatchReference), 2, 16, "GoTerrain.c", 633);
+    gTerRenderer.fTreeMinPeriod = 3.7f;
+    gTerRenderer.fTreeDiffPeriod = 1.6f;
+    gTerRenderer.fTreeOverdrive = 1.0f;
+    gTerRenderer.fTreeNoisePeriodScale = 1.0f;
+    gTerRenderer.fTreeNoiseAmplitudeScale = 0.0f;
     for (i = 0; i < TER_NUM_OBJECTS; i++) {
-        gTerrainRendererMgr.pObjectStateList[i].a20[0] = 0;
-        gTerrainRendererMgr.pObjectStateList[i].a20[1] = 0;
-        gTerrainRendererMgr.pObjectStateList[i].a20[2] = 0;
-        gTerrainRendererMgr.pObjectStateList[i].a20[3] = 0;
-        gTerrainRendererMgr.pObjectStateList[i].f0 =
-            gTerTreePeriodRandom * gTerrainRendererMgr.fTreeDiffPeriod + gTerrainRendererMgr.fTreeMinPeriod;
+        gTerRenderer.pObjectStateList[i].a20[0] = 0;
+        gTerRenderer.pObjectStateList[i].a20[1] = 0;
+        gTerRenderer.pObjectStateList[i].a20[2] = 0;
+        gTerRenderer.pObjectStateList[i].a20[3] = 0;
+        gTerRenderer.pObjectStateList[i].f0 =
+            gTerTreePeriodRandom * gTerRenderer.fTreeDiffPeriod + gTerRenderer.fTreeMinPeriod;
         gTerTreePeriodRandom *= 131.2934f;
         gTerTreePeriodRandom += 82.459f;
         gTerTreePeriodRandom -= Math_Floor(gTerTreePeriodRandom);
-        gTerrainRendererMgr.pObjectStateList[i].f4 = gTerrainRendererMgr.fTreeOverdrive;
-        gTerrainRendererMgr.pObjectStateList[i].f8 = 0.0f;
-        gTerrainRendererMgr.pObjectStateList[i].nC = 0;
-        gTerrainRendererMgr.pObjectStateList[i].n18 = 0;
-        gTerrainRendererMgr.pObjectStateList[i].n1C = 0;
-        gTerrainRendererMgr.pObjectStateList[i].f10 = gTerTreePeriodRandom;
-        gTerrainRendererMgr.pObjectStateList[i].aView[0].n4 = 3;
-        gTerrainRendererMgr.pObjectStateList[i].aView[0].f0 = 1.0f;
-        gTerrainRendererMgr.pObjectStateList[i].aView[1].n4 = 3;
-        gTerrainRendererMgr.pObjectStateList[i].aView[1].f0 = 1.0f;
+        gTerRenderer.pObjectStateList[i].f4 = gTerRenderer.fTreeOverdrive;
+        gTerRenderer.pObjectStateList[i].f8 = 0.0f;
+        gTerRenderer.pObjectStateList[i].nC = 0;
+        gTerRenderer.pObjectStateList[i].n18 = 0;
+        gTerRenderer.pObjectStateList[i].n1C = 0;
+        gTerRenderer.pObjectStateList[i].f10 = gTerTreePeriodRandom;
+        gTerRenderer.pObjectStateList[i].aView[0].n4 = 3;
+        gTerRenderer.pObjectStateList[i].aView[0].f0 = 1.0f;
+        gTerRenderer.pObjectStateList[i].aView[1].n4 = 3;
+        gTerRenderer.pObjectStateList[i].aView[1].f0 = 1.0f;
     }
-    gTerrainRendererMgr.pCurrentHoleData = NULL;
-    gTerrainRendererMgr.pCourse = NULL;
-    gTerrainRendererMgr.fDetailMipmapBias = 0.0f;
-    gTerrainRendererMgr.fLakeSurfaceMipmapBias = 0.0f;
-    gTerrainRendererMgr.iLowLODListOffset = -1;
-    gTerrainRendererMgr.fCrowdAnimationDelayedStartTimer = -1.0f;
-    gTerrainRendererMgr.fCrowdAnimationDelayedStartPercentage = 0.0f;
-    gTerrainRendererMgr.fCrowdAnimationDelayedStartDuration = 0.0f;
-    gTerrainRendererMgr.fCrowdAnimationCountdown = -1.0f;
-    gTerrainRendererMgr.fCrowdFadeDistanceMin = 4.0f;
-    gTerrainRendererMgr.fCrowdFadeDistanceMax = 5.0f;
-    gTerrainRendererMgr.iCrowdPose = 0;
-    gTerrainRendererMgr.fCrowdInterpValue = 0.5f;
-    gTerrainRendererMgr.fTreeDampingDistance = 5625.0f;
-    gTerrainRendererMgr.fTreeDampingMaxForce = 0.5f;
-    gTerrainRendererMgr.fDistanceCullYardsBase = 150.0f;
-    gTerrainRendererMgr.eObjectFilterMin = 4;
-    gTerrainRendererMgr.eObjectFilterMag = 1;
-    gTerrainRendererMgr.eTerrainFilterMin = 5;
-    gTerrainRendererMgr.eTerrainFilterMag = 1;
-    gTerrainRendererMgr.fCrowdFullMaxDistanceFromGolfer = 60.0f;
-    gTerrainRendererMgr.fCrowdHalfMaxDistanceFromGolfer = 350.0f;
+    gTerRenderer.pCurrentHoleData = NULL;
+    gTerRenderer.pCourse = NULL;
+    gTerRenderer.fDetailMipmapBias = 0.0f;
+    gTerRenderer.fLakeSurfaceMipmapBias = 0.0f;
+    gTerRenderer.iLowLODListOffset = -1;
+    gTerRenderer.fCrowdAnimationDelayedStartTimer = -1.0f;
+    gTerRenderer.fCrowdAnimationDelayedStartPercentage = 0.0f;
+    gTerRenderer.fCrowdAnimationDelayedStartDuration = 0.0f;
+    gTerRenderer.fCrowdAnimationCountdown = -1.0f;
+    gTerRenderer.fCrowdFadeDistanceMin = 4.0f;
+    gTerRenderer.fCrowdFadeDistanceMax = 5.0f;
+    gTerRenderer.iCrowdPose = 0;
+    gTerRenderer.fCrowdInterpValue = 0.5f;
+    gTerRenderer.fTreeDampingDistance = 5625.0f;
+    gTerRenderer.fTreeDampingMaxForce = 0.5f;
+    gTerRenderer.fDistanceCullYardsBase = 150.0f;
+    gTerRenderer.eObjectFilterMin = 4;
+    gTerRenderer.eObjectFilterMag = 1;
+    gTerRenderer.eTerrainFilterMin = 5;
+    gTerRenderer.eTerrainFilterMag = 1;
+    gTerRenderer.fCrowdFullMaxDistanceFromGolfer = 60.0f;
+    gTerRenderer.fCrowdHalfMaxDistanceFromGolfer = 350.0f;
     fn_8003505C(1);
     for (n = 0; n < 5; n++) {
         for (k = 0; k < 32; k++) {
@@ -224,23 +224,23 @@ void Ter_vInitModule(void) {
 // Shuts the terrain renderer down (gomainloop): frees the lists Ter_vInitModule allocated (not
 // xpGrassPatchList), the hole's data (fn_800075CC) and the course.
 void Ter_vCloseModule(void) {
-    StaticMem_Free(gTerrainRendererMgr.pPatchList);
-    StaticMem_Free(gTerrainRendererMgr.pPostDrawTerrainList);
-    StaticMem_Free(gTerrainRendererMgr.pObjectSortList);
-    StaticMem_Free(gTerrainRendererMgr.pOpaqueObjectList);
-    StaticMem_Free(gTerrainRendererMgr.pTranslucentObjectList);
-    StaticMem_Free(gTerrainRendererMgr.pNearbyObjectList);
-    StaticMem_Free(gTerrainRendererMgr.pDeferredItemsList);
-    StaticMem_Free(gTerrainRendererMgr.pPanoramaItemsList);
-    StaticMem_Free(gTerrainRendererMgr.pPostDrawItemsList);
-    StaticMem_Free(gTerrainRendererMgr.pObjectStateList);
-    if (gTerrainRendererMgr.pCurrentHoleData != NULL) {
-        fn_800075CC(gTerrainRendererMgr.pCurrentHoleData);
-        gTerrainRendererMgr.pCurrentHoleData = NULL;
+    StaticMem_Free(gTerRenderer.pPatchList);
+    StaticMem_Free(gTerRenderer.pPostDrawTerrainList);
+    StaticMem_Free(gTerRenderer.pObjectSortList);
+    StaticMem_Free(gTerRenderer.pOpaqueObjectList);
+    StaticMem_Free(gTerRenderer.pTranslucentObjectList);
+    StaticMem_Free(gTerRenderer.pNearbyObjectList);
+    StaticMem_Free(gTerRenderer.pDeferredItemsList);
+    StaticMem_Free(gTerRenderer.pPanoramaItemsList);
+    StaticMem_Free(gTerRenderer.pPostDrawItemsList);
+    StaticMem_Free(gTerRenderer.pObjectStateList);
+    if (gTerRenderer.pCurrentHoleData != NULL) {
+        fn_800075CC(gTerRenderer.pCurrentHoleData);
+        gTerRenderer.pCurrentHoleData = NULL;
     }
-    if (gTerrainRendererMgr.pCourse != NULL) {
-        StaticMem_Free(gTerrainRendererMgr.pCourse);
-        gTerrainRendererMgr.pCourse = NULL;
+    if (gTerRenderer.pCourse != NULL) {
+        StaticMem_Free(gTerRenderer.pCourse);
+        gTerRenderer.pCourse = NULL;
     }
 }
 
@@ -328,37 +328,37 @@ void Ter_RenderView(void* pHoleData, int nView) {
     f32 fTan;
     f32 fWideTan;
 
-    gTerrainRendererMgr.iCurrentViewContext = nView;
+    gTerRenderer.iCurrentViewContext = nView;
     pLens = Camera_GetCurrentLens();
-    gTerrainRendererMgr.fFOVScale = 1.0f / Camera_GetLensFovScale(pLens);
-    gTerrainRendererMgr.xCameraReferencePos[0] = pLens->m4[3][0];
-    gTerrainRendererMgr.xCameraReferencePos[1] = pLens->m4[3][1];
-    gTerrainRendererMgr.xCameraReferencePos[2] = pLens->m4[3][2];
-    gTerrainRendererMgr.xCameraReferencePos[3] = 1.0f;
-    gTerrainRendererMgr.xCameraLookVector[0] = pLens->m4[2][0];
-    gTerrainRendererMgr.xCameraLookVector[1] = pLens->m4[2][1];
-    gTerrainRendererMgr.xCameraLookVector[2] = pLens->m4[2][2];
-    gTerrainRendererMgr.xCameraLookVector[3] = 1.0f;
-    gTerrainRendererMgr.fXZDistanceToClosestBallSquared = 1000000.0f;
+    gTerRenderer.fFOVScale = 1.0f / Camera_GetLensFovScale(pLens);
+    gTerRenderer.xCameraReferencePos[0] = pLens->m4[3][0];
+    gTerRenderer.xCameraReferencePos[1] = pLens->m4[3][1];
+    gTerRenderer.xCameraReferencePos[2] = pLens->m4[3][2];
+    gTerRenderer.xCameraReferencePos[3] = 1.0f;
+    gTerRenderer.xCameraLookVector[0] = pLens->m4[2][0];
+    gTerRenderer.xCameraLookVector[1] = pLens->m4[2][1];
+    gTerRenderer.xCameraLookVector[2] = pLens->m4[2][2];
+    gTerRenderer.xCameraLookVector[3] = 1.0f;
+    gTerRenderer.fXZDistanceToClosestBallSquared = 1000000.0f;
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        fn_80035490(gPlayers[i].ball.vPos, gTerrainRendererMgr.xCameraReferencePos, vDiff);
+        fn_80035490(gPlayers[i].ball.vPos, gTerRenderer.xCameraReferencePos, vDiff);
         vDiff[1] = 0.0f;
         fDist = Vec3_LengthSqClamped(vDiff);
-        if (fDist < gTerrainRendererMgr.fXZDistanceToClosestBallSquared) {
-            gTerrainRendererMgr.fXZDistanceToClosestBallSquared = fDist;
+        if (fDist < gTerRenderer.fXZDistanceToClosestBallSquared) {
+            gTerRenderer.fXZDistanceToClosestBallSquared = fDist;
         }
     }
-    fn_8003546C(gPlayers[ViewController_GetActivePlayerNumber(gTerrainRendererMgr.iCurrentViewContext)].vBall,
+    fn_8003546C(gPlayers[ViewController_GetActivePlayerNumber(gTerRenderer.iCurrentViewContext)].vBall,
                 &Ter_GetTGD()->pin[Game_CurrentPinSet()].x, vToPin);
     vToPin[1] = 0.0f;
-    gTerrainRendererMgr.fGolferDistanceToCup = Math_Sqrt(Vec3_LengthSqClamped(vToPin));
+    gTerRenderer.fGolferDistanceToCup = Math_Sqrt(Vec3_LengthSqClamped(vToPin));
     fTan = Math_Tan(0.5f * pLens->fFov);
     fWideTan = Math_Tan(0.5f * (0.75f * pLens->fFov * fn_8001414C((u8*)fn_8003526C())));
-    gTerrainRendererMgr.fCameraMinHalfFieldOfViewTan =
+    gTerRenderer.fCameraMinHalfFieldOfViewTan =
         (fTan <= fWideTan / ViewController_GetCameraControl(nView)->f54) ? fTan : fWideTan
                 / ViewController_GetCameraControl(nView)->f54;
     RenderState_Flush();
-    if (!gTerrainRendererMgr.bObjectTestMode) {
+    if (!gTerRenderer.bObjectTestMode) {
         Ter_DrawPanoramaList(pHoleData, 0);
     }
     Ter_BuildPatchLists(pHoleData);
@@ -368,7 +368,7 @@ void Ter_RenderView(void* pHoleData, int nView) {
     Ter_BuildObjectDrawLists();
     Ter_DrawPatchPass(0);
     Ter_DrawFarClipPatches();
-    if (!gTerrainRendererMgr.bObjectTestMode) {
+    if (!gTerRenderer.bObjectTestMode) {
         Ter_DrawPanoramaList(pHoleData, 2);
     }
     Ter_DrawPatchPass(1);
@@ -402,24 +402,24 @@ void Ter_BuildPatchLists(void* pHoleData) {
     int j;
     int k;
 
-    gTerrainRendererMgr.iTotalPatches = 0;
-    gTerrainRendererMgr.iTotalPostDrawTerrainPatches = 0;
-    gTerrainRendererMgr.iTotalSortObjects = 0;
-    gTerrainRendererMgr.iOpaqueObjects = 0;
-    gTerrainRendererMgr.iTranslucentObjects = 0;
-    gTerrainRendererMgr.iNearbyObjects = 0;
-    gTerrainRendererMgr.iDeferredItems = 0;
-    gTerrainRendererMgr.iPostDrawItems = 0;
+    gTerRenderer.iTotalPatches = 0;
+    gTerRenderer.iTotalPostDrawTerrainPatches = 0;
+    gTerRenderer.iTotalSortObjects = 0;
+    gTerRenderer.iOpaqueObjects = 0;
+    gTerRenderer.iTranslucentObjects = 0;
+    gTerRenderer.iNearbyObjects = 0;
+    gTerRenderer.iDeferredItems = 0;
+    gTerRenderer.iPostDrawItems = 0;
     for (i = 0; i < 3; i++) {
         for (j = 0; j < 4; j++) {
             for (k = 0; k < 3; k++) {
-                gTerrainRendererMgr.pSortedPatchList[i][j][k] = NULL;
+                gTerRenderer.pSortedPatchList[i][j][k] = NULL;
             }
         }
     }
     pRoot = fn_80035500(pHoleData);
-    if (gTerrainRendererMgr.bObjectTestMode) {
-        pPatch = &gTerrainRendererMgr.pPatchList[gTerrainRendererMgr.iTotalPatches++];
+    if (gTerRenderer.bObjectTestMode) {
+        pPatch = &gTerRenderer.pPatchList[gTerRenderer.iTotalPatches++];
         pPatch->fDistance = 0.0f;
         pPatch->fBoundingRadius = 0.0f;
         pPatch->eClipMethod = 1;
@@ -433,7 +433,7 @@ void Ter_BuildPatchLists(void* pHoleData) {
         nCount = Ter_GetMeshChildCount(pList);
         pMesh = Ter_GetMeshChild(pList, 0);
         for (i = nCount; i > 0; i--) {
-            gTerrainRendererMgr.iPatchFirstObjectInstanceIndex[nCount - i] = nFirstObject;
+            gTerRenderer.iPatchFirstObjectInstanceIndex[nCount - i] = nFirstObject;
             uFlags = Ter_GetMeshFlags(pMesh, 1);
             if ((uFlags & uPinBit) || !(uFlags & 0xF)) {
                 if (uFlags & 0x40) {
@@ -444,35 +444,35 @@ void Ter_BuildPatchLists(void* pHoleData) {
                     iRenderPass = 0;
                 }
                 fRadius = fn_800354C4(pMesh)[3];
-                fDist = LLMath_DistanceBetween3(gTerrainRendererMgr.xCameraReferencePos, fn_800354C4(pMesh))
+                fDist = LLMath_DistanceBetween3(gTerRenderer.xCameraReferencePos, fn_800354C4(pMesh))
                         - fRadius;
                 if (fDist < 0.0f) {
                     fDist = 0.0f;
                 }
-                eClipMethod = fn_80007B2C(pMesh, pCamera, fDist, gTerrainRendererMgr.fCameraMinHalfFieldOfViewTan,
+                eClipMethod = fn_80007B2C(pMesh, pCamera, fDist, gTerRenderer.fCameraMinHalfFieldOfViewTan,
                                           ViewController_GetCameraControl(
-                                                  gTerrainRendererMgr.iCurrentViewContext)->f54);
+                                                  gTerRenderer.iCurrentViewContext)->f54);
                 if (eClipMethod != 3) {
-                    pPatch = &gTerrainRendererMgr.pPatchList[gTerrainRendererMgr.iTotalPatches++];
+                    pPatch = &gTerRenderer.pPatchList[gTerRenderer.iTotalPatches++];
                     Ter_FillPatchReference(pMesh, eClipMethod, iRenderPass, pPatch, fDist);
                     if (pPatch->pObjects != NULL) {
                         Ter_AddPatchObjects(pPatch, nFirstObject);
                     }
                     if (pPatch->n1C & 1) {
-                        pPatch->pNext[0] = gTerrainRendererMgr.pSortedPatchList[iRenderPass][0][eClipMethod];
-                        gTerrainRendererMgr.pSortedPatchList[iRenderPass][0][eClipMethod] = pPatch;
+                        pPatch->pNext[0] = gTerRenderer.pSortedPatchList[iRenderPass][0][eClipMethod];
+                        gTerRenderer.pSortedPatchList[iRenderPass][0][eClipMethod] = pPatch;
                     }
                     if (pPatch->n1C & 2) {
-                        pPatch->pNext[1] = gTerrainRendererMgr.pSortedPatchList[iRenderPass][1][eClipMethod];
-                        gTerrainRendererMgr.pSortedPatchList[iRenderPass][1][eClipMethod] = pPatch;
+                        pPatch->pNext[1] = gTerRenderer.pSortedPatchList[iRenderPass][1][eClipMethod];
+                        gTerRenderer.pSortedPatchList[iRenderPass][1][eClipMethod] = pPatch;
                     }
                     if (pPatch->n1C & 4) {
-                        pPatch->pNext[2] = gTerrainRendererMgr.pSortedPatchList[iRenderPass][2][eClipMethod];
-                        gTerrainRendererMgr.pSortedPatchList[iRenderPass][2][eClipMethod] = pPatch;
+                        pPatch->pNext[2] = gTerRenderer.pSortedPatchList[iRenderPass][2][eClipMethod];
+                        gTerRenderer.pSortedPatchList[iRenderPass][2][eClipMethod] = pPatch;
                     }
                     if (pPatch->n1C & 0x80) {
-                        pPatch->pNext[3] = gTerrainRendererMgr.pSortedPatchList[0][3][eClipMethod];
-                        gTerrainRendererMgr.pSortedPatchList[0][3][eClipMethod] = pPatch;
+                        pPatch->pNext[3] = gTerRenderer.pSortedPatchList[0][3][eClipMethod];
+                        gTerRenderer.pSortedPatchList[0][3][eClipMethod] = pPatch;
                     }
                 }
             }
@@ -547,7 +547,7 @@ void Ter_AddPatchObjects(Ter_PatchReference* pPatch, s32 nFirstObject) {
     if (nObjects == 0) {
         return;
     }
-    if (gTerrainRendererMgr.bObjectTestMode) {
+    if (gTerRenderer.bObjectTestMode) {
         nObjects = 1;
         nLists = Ter_GetMeshChildCount(Ter_GetMeshChild(pPatch->pObjects, 0));
         pLOD0 = Ter_GetMeshChild(Ter_GetMeshChild(pPatch->pObjects, 0), 0);
@@ -558,27 +558,27 @@ void Ter_AddPatchObjects(Ter_PatchReference* pPatch, s32 nFirstObject) {
             pLOD2 = pLOD1;
         }
     } else {
-        if (gTerrainRendererMgr.iLowLODListOffset == -1) {
+        if (gTerRenderer.iLowLODListOffset == -1) {
             if (Ter_GetMeshChildCount(pPatch->pObjects) == 5) {
-                gTerrainRendererMgr.iLowLODListOffset = 2;
+                gTerRenderer.iLowLODListOffset = 2;
             } else {
-                gTerrainRendererMgr.iLowLODListOffset = 0;
+                gTerRenderer.iLowLODListOffset = 0;
             }
         }
         pLOD0 = Ter_GetMeshChild(Ter_GetMeshChild(pPatch->pObjects, 0), 0);
-        pLOD1 = Ter_GetMeshChild(Ter_GetMeshChild(pPatch->pObjects, gTerrainRendererMgr.iLowLODListOffset + 1), 0);
-        pLOD2 = Ter_GetMeshChild(Ter_GetMeshChild(pPatch->pObjects, gTerrainRendererMgr.iLowLODListOffset + 2), 0);
+        pLOD1 = Ter_GetMeshChild(Ter_GetMeshChild(pPatch->pObjects, gTerRenderer.iLowLODListOffset + 1), 0);
+        pLOD2 = Ter_GetMeshChild(Ter_GetMeshChild(pPatch->pObjects, gTerRenderer.iLowLODListOffset + 2), 0);
     }
     nLast = nObjects - 1 + nFirstObject;
     for (i = nObjects - 1; i >= 0; i--) {
         uFlags2 = Ter_GetMeshFlags(pLOD0, 2);
         if (gSession.nSplitScreen == 0 || !(uFlags2 & 8)) {
             pBounds = fn_80035508(pLOD0);
-            fHeight = fabsf(gTerrainRendererMgr.xCameraReferencePos[1] - pBounds[1]) - pBounds[7];
+            fHeight = fabsf(gTerRenderer.xCameraReferencePos[1] - pBounds[1]) - pBounds[7];
             if (fHeight < 0.0f) {
                 fHeight = 0.0f;
             }
-            fn_8003546C(pBounds, gTerrainRendererMgr.xCameraReferencePos, v48);
+            fn_8003546C(pBounds, gTerRenderer.xCameraReferencePos, v48);
             v48[1] = 0.0f;
             fXZ = (f32)Math_Sqrt(Vec3_LengthSqClamped(v48)) - pBounds[3];
             if (fXZ < 0.0f) {
@@ -586,15 +586,15 @@ void Ter_AddPatchObjects(Ter_PatchReference* pPatch, s32 nFirstObject) {
             }
             fDistanceSquared = fHeight * fHeight + fXZ * fXZ;
             if (fDistanceSquared <= 0.0f) {
-                CameraController_CameraCollision(gTerrainRendererMgr.iCurrentViewContext, pBounds);
+                CameraController_CameraCollision(gTerRenderer.iCurrentViewContext, pBounds);
             }
             bHide = 0;
-            if ((uFlags2 & 0x80) && fDistanceSquared > gTerrainRendererMgr.fDistanceCullFrameYardsSquared) {
+            if ((uFlags2 & 0x80) && fDistanceSquared > gTerRenderer.fDistanceCullFrameYardsSquared) {
                 bHide = 1;
             } else if ((Ter_GetMeshFlags(pLOD0, 3) & 4) || (Ter_GetMeshFlags(pLOD0, 3) & 0x10)
                        || (Ter_GetMeshFlags(pLOD0, 3) & 0x20)) {
                 pBall = gPlayers[ViewController_GetActivePlayerNumber(
-                        gTerrainRendererMgr.iCurrentViewContext)].vBall;
+                        gTerRenderer.iCurrentViewContext)].vBall;
                 pPin = &Ter_GetTGD()->pin[Game_CurrentPinSet()].x;
                 fn_8003546C(pBounds, pBall, v28);
                 v28[1] = 0.0f;
@@ -615,31 +615,31 @@ void Ter_AddPatchObjects(Ter_PatchReference* pPatch, s32 nFirstObject) {
                     fObjectToPin = 0.0f;
                 }
                 if (!CameraController_IsFlybyDone(
-                        ViewController_GetCameraControl(gTerrainRendererMgr.iCurrentViewContext))) {
+                        ViewController_GetCameraControl(gTerRenderer.iCurrentViewContext))) {
                     bHide = 1;
-                } else if (fBallToObject > gTerrainRendererMgr.fCrowdHalfMaxDistanceFromGolfer) {
+                } else if (fBallToObject > gTerRenderer.fCrowdHalfMaxDistanceFromGolfer) {
                     bHide = 1;
-                } else if (fBallToObject > gTerrainRendererMgr.fCrowdFullMaxDistanceFromGolfer
+                } else if (fBallToObject > gTerRenderer.fCrowdFullMaxDistanceFromGolfer
                            && fObjectToPin > fPinToBall) {
                     bHide = 1;
-                } else if (fBallToObject > gTerrainRendererMgr.fCrowdFullMaxDistanceFromGolfer
+                } else if (fBallToObject > gTerRenderer.fCrowdFullMaxDistanceFromGolfer
                            && fObjectToPin <= fPinToBall && (nLast - i) % 2 != 0) {
                     bHide = 1;
                 } else if (((Ter_GetMeshFlags(pLOD0, 1) & 1)
                             && gSession.nTeeSet[ViewController_GetActivePlayerNumber(
-                                    gTerrainRendererMgr.iCurrentViewContext)]
+                                    gTerRenderer.iCurrentViewContext)]
                                     != 0)
                            || ((Ter_GetMeshFlags(pLOD0, 1) & 2)
                                && gSession.nTeeSet[ViewController_GetActivePlayerNumber(
-                                       gTerrainRendererMgr.iCurrentViewContext)] != 1)
+                                       gTerRenderer.iCurrentViewContext)] != 1)
                            || ((Ter_GetMeshFlags(pLOD0, 1) & 4)
                                && gSession.nTeeSet[ViewController_GetActivePlayerNumber(
-                                       gTerrainRendererMgr.iCurrentViewContext)] != 2)) {
+                                       gTerRenderer.iCurrentViewContext)] != 2)) {
                     bHide = 1;
                 } else if (((Ter_GetMeshFlags(pLOD0, 1) & 1) || (Ter_GetMeshFlags(pLOD0, 1) & 2)
                             || (Ter_GetMeshFlags(pLOD0, 1) & 4))
                            && gPlayers[ViewController_GetActivePlayerNumber(
-                                   gTerrainRendererMgr.iCurrentViewContext)].ball.nLie
+                                   gTerRenderer.iCurrentViewContext)].ball.nLie
                                    != 0) {
                     bHide = 1;
                 }
@@ -649,24 +649,24 @@ void Ter_AddPatchObjects(Ter_PatchReference* pPatch, s32 nFirstObject) {
             } else if (pPatch->eClipMethod == 2) {
                 eClipMethod = 2;
             } else {
-                pView = ViewController_GetCameraControl(gTerrainRendererMgr.iCurrentViewContext);
+                pView = ViewController_GetCameraControl(gTerRenderer.iCurrentViewContext);
                 eClipMethod = fn_80007B2C(pLOD0, RC_spGetCurrentRenderCtx(), Math_Sqrt(fDistanceSquared),
-                                          gTerrainRendererMgr.fCameraMinHalfFieldOfViewTan, pView->f54);
+                                          gTerRenderer.fCameraMinHalfFieldOfViewTan, pView->f54);
             }
             if (eClipMethod != 3) {
-                pRef = &gTerrainRendererMgr.pObjectSortList[gTerrainRendererMgr.iTotalSortObjects];
+                pRef = &gTerRenderer.pObjectSortList[gTerRenderer.iTotalSortObjects];
                 pRef->fDistanceSquared = fDistanceSquared;
                 pRef->f14 = Vec3_LengthSqClamped(v48);
-                fn_8003546C(pBounds, gTerrainRendererMgr.xCameraReferencePos, v38);
-                pRef->f18 = Vec3_Dot(gTerrainRendererMgr.xCameraLookVector, v38);
+                fn_8003546C(pBounds, gTerRenderer.xCameraReferencePos, v38);
+                pRef->f18 = Vec3_Dot(gTerRenderer.xCameraLookVector, v38);
                 iObject = nLast - i;
                 pRef->eClipMethod = eClipMethod;
                 pRef->pContainerPatch = pPatch;
                 pRef->iGlobalObjectIndex = iObject;
-                gTerrainRendererMgr.pObjectStateList[iObject].a20[0] = Ter_GetMeshFlags(pLOD0, 0);
-                gTerrainRendererMgr.pObjectStateList[iObject].a20[1] = Ter_GetMeshFlags(pLOD0, 1);
-                gTerrainRendererMgr.pObjectStateList[iObject].a20[2] = Ter_GetMeshFlags(pLOD0, 2);
-                gTerrainRendererMgr.pObjectStateList[iObject].a20[3] = Ter_GetMeshFlags(pLOD0, 3);
+                gTerRenderer.pObjectStateList[iObject].a20[0] = Ter_GetMeshFlags(pLOD0, 0);
+                gTerRenderer.pObjectStateList[iObject].a20[1] = Ter_GetMeshFlags(pLOD0, 1);
+                gTerRenderer.pObjectStateList[iObject].a20[2] = Ter_GetMeshFlags(pLOD0, 2);
+                gTerRenderer.pObjectStateList[iObject].a20[3] = Ter_GetMeshFlags(pLOD0, 3);
                 if ((uFlags2 & 0x40) || (Ter_GetMeshFlags(pLOD0, 3) & 0x10)
                     || (Ter_GetMeshFlags(pLOD0, 3) & 0x20)) {
                     pRef->nLODs = 1;
@@ -677,7 +677,7 @@ void Ter_AddPatchObjects(Ter_PatchReference* pPatch, s32 nFirstObject) {
                     pRef->apObject[1] = pLOD1;
                     pRef->apObject[2] = pLOD2;
                 }
-                gTerrainRendererMgr.iTotalSortObjects++;
+                gTerRenderer.iTotalSortObjects++;
             }
         }
         pLOD0 = Ter_GetMeshNext(pLOD0);
@@ -689,7 +689,7 @@ void Ter_AddPatchObjects(Ter_PatchReference* pPatch, s32 nFirstObject) {
 // Sorts pObjectSortList by distance, except when gSession.b11 is set.
 void Ter_SortObjects(void) {
     if (gSession.b11 == 0) {
-        qsort(gTerrainRendererMgr.pObjectSortList, gTerrainRendererMgr.iTotalSortObjects, sizeof(Ter_ObjectReference),
+        qsort(gTerRenderer.pObjectSortList, gTerRenderer.iTotalSortObjects, sizeof(Ter_ObjectReference),
               Ter_CompareObjectDistance);
     }
 }
@@ -707,18 +707,18 @@ s32 Ter_CompareObjectDistance(const void* pA, const void* pB) {
 // Sets this frame's LOD planes (Ter_SetLODPlanes with the LOD steps gTerLOD0Steps..gTerLOD2OverlapSteps) and
 // the object cull distance, (fFOVScale x fDistanceCullYardsBase) squared.
 void Ter_UpdateLODPlanes(void) {
-    Ter_SetLODPlanes(gTerrainRendererMgr.LODPlanes, gTerLODStepSize, gTerLOD0Steps, gTerLOD1Steps, gTerLOD1OverlapSteps,
+    Ter_SetLODPlanes(gTerRenderer.LODPlanes, gTerLODStepSize, gTerLOD0Steps, gTerLOD1Steps, gTerLOD1OverlapSteps,
                 gTerLOD2OverlapSteps);
-    gTerrainRendererMgr.fDistanceCullFrameYardsSquared =
-        gTerrainRendererMgr.fFOVScale * gTerrainRendererMgr.fDistanceCullYardsBase;
-    gTerrainRendererMgr.fDistanceCullFrameYardsSquared =
-        gTerrainRendererMgr.fDistanceCullFrameYardsSquared * gTerrainRendererMgr.fDistanceCullFrameYardsSquared;
+    gTerRenderer.fDistanceCullFrameYardsSquared =
+        gTerRenderer.fFOVScale * gTerRenderer.fDistanceCullYardsBase;
+    gTerRenderer.fDistanceCullFrameYardsSquared =
+        gTerRenderer.fDistanceCullFrameYardsSquared * gTerRenderer.fDistanceCullFrameYardsSquared;
 }
 
 // The three levels of detail's ranges, in steps of fStep: LOD 0 from 0 to (a x fFOVScale + 1)
 // steps, LOD 1 from c steps before that end to b steps after, LOD 2 from d steps before that on.
 void Ter_SetLODPlanes(Ter_LODPlane* pPlanes, f32 fStep, s32 a, s32 b, s32 c, s32 d) {
-    s32 n = (f32)a * gTerrainRendererMgr.fFOVScale;
+    s32 n = (f32)a * gTerRenderer.fFOVScale;
 
     pPlanes[0].fBegin = 0.0f;
     pPlanes[2].fEnd = 0.0f;
@@ -736,7 +736,7 @@ void Ter_LODStepsFromDistances(s32* pA, s32* pB, s32 a, s32 b) {
     // stores the one fctiwz result twice); the same cast everywhere shares one.
     s32 n = a + gTerLOD1OverlapSteps * (s32)gTerLODStepSize;
 
-    *pA = (f32)(n / (int)gTerLODStepSize - 1) / gTerrainRendererMgr.fFOVScale;
+    *pA = (f32)(n / (int)gTerLODStepSize - 1) / gTerRenderer.fFOVScale;
     *pB = gTerLOD1OverlapSteps + (b + gTerLOD2OverlapSteps * (s32)gTerLODStepSize - n) / (int)gTerLODStepSize;
 }
 
@@ -756,7 +756,7 @@ static f32 GoTerrain_StrippedFn4(f32 x) {
 // CameraController_IsFlybyDone is 0 for the view.
 // Unless gSession.b11 is set, an object between two planes fades from one level into the next.
 void Ter_SelectObjectLODs(void) {
-    Ter_LODPlane* pPlanes = gTerrainRendererMgr.LODPlanes;
+    Ter_LODPlane* pPlanes = gTerRenderer.LODPlanes;
     f32 fT;
     f32 fAlpha;
     f32 fDistanceSquared;
@@ -768,14 +768,14 @@ void Ter_SelectObjectLODs(void) {
 
     if (gSession.b11 != 0) {
         fAlpha = 0.0f;
-        for (i = gTerrainRendererMgr.iTotalSortObjects - 1; i >= 0; i--) {
+        for (i = gTerRenderer.iTotalSortObjects - 1; i >= 0; i--) {
             s32 iObject;
-            iObject = gTerrainRendererMgr.pObjectSortList[i].iGlobalObjectIndex;
-            fDistanceSquared = gTerrainRendererMgr.pObjectSortList[i].fDistanceSquared;
-            nLast = gTerrainRendererMgr.pObjectSortList[i].nLODs - 1;
-            if (((gTerrainRendererMgr.pObjectStateList[iObject].a20[3] & 4) ||
-                 (gTerrainRendererMgr.pObjectStateList[iObject].a20[3] & 0x10) ||
-                 (gTerrainRendererMgr.pObjectStateList[iObject].a20[3] & 0x20)) &&
+            iObject = gTerRenderer.pObjectSortList[i].iGlobalObjectIndex;
+            fDistanceSquared = gTerRenderer.pObjectSortList[i].fDistanceSquared;
+            nLast = gTerRenderer.pObjectSortList[i].nLODs - 1;
+            if (((gTerRenderer.pObjectStateList[iObject].a20[3] & 4) ||
+                 (gTerRenderer.pObjectStateList[iObject].a20[3] & 0x10) ||
+                 (gTerRenderer.pObjectStateList[iObject].a20[3] & 0x20)) &&
                 Ter_IsLODDataLoaded()) {
                 nLOD = 0;
             } else {
@@ -783,31 +783,31 @@ void Ter_SelectObjectLODs(void) {
                     if (fDistanceSquared <= pPlanes[nLOD].fEnd * pPlanes[nLOD].fEnd) break;
                 }
                 if (!CameraController_IsFlybyDone(
-                        ViewController_GetCameraControl(gTerrainRendererMgr.iCurrentViewContext))) {
-                    uFlags = gTerrainRendererMgr.pObjectStateList[iObject].a20[3];
+                        ViewController_GetCameraControl(gTerRenderer.iCurrentViewContext))) {
+                    uFlags = gTerRenderer.pObjectStateList[iObject].a20[3];
                     if (!(uFlags & 4) && !(uFlags & 0x10) && !(uFlags & 0x20) && Ter_IsLODDataLoaded()
                         && nLOD == 0) {
                         nLOD = 1;
                     }
                 }
             }
-            gTerrainRendererMgr.pObjectSortList[i].fAlpha = fAlpha;
-            gTerrainRendererMgr.pObjectSortList[i].iOpaqueLOD = nLOD;
-            gTerrainRendererMgr.pObjectSortList[i].iTranslucentLOD = nLOD;
+            gTerRenderer.pObjectSortList[i].fAlpha = fAlpha;
+            gTerRenderer.pObjectSortList[i].iOpaqueLOD = nLOD;
+            gTerRenderer.pObjectSortList[i].iTranslucentLOD = nLOD;
         }
         return;
     }
-    for (i = gTerrainRendererMgr.iTotalSortObjects - 1; i >= 0; i--) {
+    for (i = gTerRenderer.iTotalSortObjects - 1; i >= 0; i--) {
         s32 iObject;
-        fDistanceSquared = gTerrainRendererMgr.pObjectSortList[i].fDistanceSquared;
-        iObject = gTerrainRendererMgr.pObjectSortList[i].iGlobalObjectIndex;
-        nLast = gTerrainRendererMgr.pObjectSortList[i].nLODs - 1;
+        fDistanceSquared = gTerRenderer.pObjectSortList[i].fDistanceSquared;
+        iObject = gTerRenderer.pObjectSortList[i].iGlobalObjectIndex;
+        nLast = gTerRenderer.pObjectSortList[i].nLODs - 1;
         for (nLOD = 0; nLOD < nLast; nLOD++) {
             if (fDistanceSquared <= pPlanes[nLOD].fEnd * pPlanes[nLOD].fEnd) break;
         }
         if (!CameraController_IsFlybyDone(
-                ViewController_GetCameraControl(gTerrainRendererMgr.iCurrentViewContext))) {
-            uFlags = gTerrainRendererMgr.pObjectStateList[iObject].a20[3];
+                ViewController_GetCameraControl(gTerRenderer.iCurrentViewContext))) {
+            uFlags = gTerRenderer.pObjectStateList[iObject].a20[3];
             if (!(uFlags & 4) && !(uFlags & 0x10) && !(uFlags & 0x20) && Ter_IsLODDataLoaded() && nLOD == 0) {
                 nLOD = 1;
             }
@@ -831,7 +831,7 @@ void Ter_SelectObjectLODs(void) {
             if (fAlpha > 1.0f) {
                 fAlpha = 1.0f;
             }
-            uFlags = gTerrainRendererMgr.pObjectStateList[iObject].a20[3];
+            uFlags = gTerRenderer.pObjectStateList[iObject].a20[3];
             if (((uFlags & 4) || (uFlags & 0x10) || (uFlags & 0x20)) && Ter_IsLODDataLoaded()) {
                 fAlpha = 0.0f;
                 nTranslucent = 0;
@@ -839,15 +839,15 @@ void Ter_SelectObjectLODs(void) {
             }
         } else {
             fAlpha = 0.0f;
-            uFlags = gTerrainRendererMgr.pObjectStateList[iObject].a20[3];
+            uFlags = gTerRenderer.pObjectStateList[iObject].a20[3];
             if (((uFlags & 4) || (uFlags & 0x10) || (uFlags & 0x20)) && Ter_IsLODDataLoaded()) {
                 nLOD = 0;
             }
             nTranslucent = nLOD;
         }
-        gTerrainRendererMgr.pObjectSortList[i].iOpaqueLOD = nLOD;
-        gTerrainRendererMgr.pObjectSortList[i].iTranslucentLOD = nTranslucent;
-        gTerrainRendererMgr.pObjectSortList[i].fAlpha = fAlpha;
+        gTerRenderer.pObjectSortList[i].iOpaqueLOD = nLOD;
+        gTerRenderer.pObjectSortList[i].iTranslucentLOD = nTranslucent;
+        gTerRenderer.pObjectSortList[i].fAlpha = fAlpha;
     }
 }
 
@@ -876,8 +876,8 @@ void Ter_BuildObjectDrawLists(void) {
     Ter_ObjectReference* pRef;
     s32 iObject;
 
-    for (i = gTerrainRendererMgr.iTotalSortObjects - 1; i >= 0; i--) {
-        pRef = &gTerrainRendererMgr.pObjectSortList[i];
+    for (i = gTerRenderer.iTotalSortObjects - 1; i >= 0; i--) {
+        pRef = &gTerRenderer.pObjectSortList[i];
         pModel = pRef->apObject[pRef->iOpaqueLOD];
         uFlags0 = Ter_GetMeshFlags(pModel, 0);
         uFlags2 = Ter_GetMeshFlags(pModel, 2);
@@ -887,18 +887,18 @@ void Ter_BuildObjectDrawLists(void) {
             uFlags0 &= ~0x40;
         }
         if (!CameraController_IsFlybyDone(
-                ViewController_GetCameraControl(gTerrainRendererMgr.iCurrentViewContext))) {
+                ViewController_GetCameraControl(gTerRenderer.iCurrentViewContext))) {
             uFlags0 &= ~0x20;
         }
         uCrowd = uFlags0 & 0x20;
         if (uCrowd == 0 && !(uFlags0 & 0x40)) {
-            fNear = 0.1f * gTerrainRendererMgr.fFOVScale;
-            fFar = 0.2f * gTerrainRendererMgr.fFOVScale;
+            fNear = 0.1f * gTerRenderer.fFOVScale;
+            fFar = 0.2f * gTerRenderer.fFOVScale;
             fFarSquared = fFar * fFar;
             fRange = fFar - fNear;
         } else if (uCrowd != 0 && !(uFlags0 & 0x40)) {
-            fNear = gTerrainRendererMgr.fCrowdFadeDistanceMin * gTerrainRendererMgr.fFOVScale;
-            fFar = gTerrainRendererMgr.fCrowdFadeDistanceMax * gTerrainRendererMgr.fFOVScale;
+            fNear = gTerRenderer.fCrowdFadeDistanceMin * gTerRenderer.fFOVScale;
+            fFar = gTerRenderer.fCrowdFadeDistanceMax * gTerRenderer.fFOVScale;
             if (fNear < 0.1f) {
                 fNear = 0.1f;
             }
@@ -912,25 +912,25 @@ void Ter_BuildObjectDrawLists(void) {
         }
         // every draw re-reads the list pointer, as the original does
         if (uFlags2 & 0x80) {
-            pRef = &gTerrainRendererMgr.pObjectSortList[i];
-            Ter_AddObjectDraw(&gTerrainRendererMgr.pPostDrawItemsList[gTerrainRendererMgr.iPostDrawItems],
-                        &gTerrainRendererMgr.iPostDrawItems, 400, pRef->apObject[pRef->iOpaqueLOD], 1.0f,
-                        gTerrainRendererMgr.fDefaultObjectMipmapBias[pRef->iOpaqueLOD], pRef->fDistanceSquared,
+            pRef = &gTerRenderer.pObjectSortList[i];
+            Ter_AddObjectDraw(&gTerRenderer.pPostDrawItemsList[gTerRenderer.iPostDrawItems],
+                        &gTerRenderer.iPostDrawItems, 400, pRef->apObject[pRef->iOpaqueLOD], 1.0f,
+                        gTerRenderer.fDefaultObjectMipmapBias[pRef->iOpaqueLOD], pRef->fDistanceSquared,
                         pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f, 0);
-        } else if (gTerrainRendererMgr.pObjectSortList[i].fDistanceSquared < fFarSquared) {
-            fDistance = Math_Sqrt(gTerrainRendererMgr.pObjectSortList[i].fDistanceSquared);
+        } else if (gTerRenderer.pObjectSortList[i].fDistanceSquared < fFarSquared) {
+            fDistance = Math_Sqrt(gTerRenderer.pObjectSortList[i].fDistanceSquared);
             if (fDistance > fFar || (uFlags0 & 0x40)
                 || (uCrowd == 0
-                    && ((gTerrainRendererMgr.pObjectSortList[i].f14 > gTerrainRendererMgr.fXZDistanceToClosestBallSquared
-                         && gTerrainRendererMgr.pObjectSortList[i].f18 > 0.0f)
-                        || Ter_IsBallStoppedInModel(gTerrainRendererMgr.pObjectSortList[i].apObject[0])))) {
-                iObject = gTerrainRendererMgr.pObjectSortList[i].iGlobalObjectIndex;
-                gTerrainRendererMgr.pObjectStateList[iObject].aView[gTerrainRendererMgr.iCurrentViewContext].n4 = 3;
-                gTerrainRendererMgr.pObjectStateList[iObject].aView[gTerrainRendererMgr.iCurrentViewContext].f0 = 1.0f;
-                pRef = &gTerrainRendererMgr.pObjectSortList[i];
-                Ter_AddObjectDraw(&gTerrainRendererMgr.pOpaqueObjectList[gTerrainRendererMgr.iOpaqueObjects],
-                            &gTerrainRendererMgr.iOpaqueObjects, 650, pRef->apObject[pRef->iOpaqueLOD], 1.0f,
-                            gTerrainRendererMgr.fDefaultObjectMipmapBias[pRef->iOpaqueLOD], pRef->fDistanceSquared,
+                    && ((gTerRenderer.pObjectSortList[i].f14 > gTerRenderer.fXZDistanceToClosestBallSquared
+                         && gTerRenderer.pObjectSortList[i].f18 > 0.0f)
+                        || Ter_IsBallStoppedInModel(gTerRenderer.pObjectSortList[i].apObject[0])))) {
+                iObject = gTerRenderer.pObjectSortList[i].iGlobalObjectIndex;
+                gTerRenderer.pObjectStateList[iObject].aView[gTerRenderer.iCurrentViewContext].n4 = 3;
+                gTerRenderer.pObjectStateList[iObject].aView[gTerRenderer.iCurrentViewContext].f0 = 1.0f;
+                pRef = &gTerRenderer.pObjectSortList[i];
+                Ter_AddObjectDraw(&gTerRenderer.pOpaqueObjectList[gTerRenderer.iOpaqueObjects],
+                            &gTerRenderer.iOpaqueObjects, 650, pRef->apObject[pRef->iOpaqueLOD], 1.0f,
+                            gTerRenderer.fDefaultObjectMipmapBias[pRef->iOpaqueLOD], pRef->fDistanceSquared,
                             pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f, 0);
             } else {
                 fT = (fDistance - fNear) / fRange;
@@ -938,30 +938,30 @@ void Ter_BuildObjectDrawLists(void) {
                     fT = 0.0f;
                 }
                 if (fT != 0.0f) {
-                    pRef = &gTerrainRendererMgr.pObjectSortList[i];
-                    Ter_AddObjectDraw(&gTerrainRendererMgr.pNearbyObjectList[gTerrainRendererMgr.iNearbyObjects],
-                                &gTerrainRendererMgr.iNearbyObjects, 70, pRef->apObject[pRef->iOpaqueLOD], fT,
-                                gTerrainRendererMgr.fDefaultObjectMipmapBias[pRef->iOpaqueLOD],
+                    pRef = &gTerRenderer.pObjectSortList[i];
+                    Ter_AddObjectDraw(&gTerRenderer.pNearbyObjectList[gTerRenderer.iNearbyObjects],
+                                &gTerRenderer.iNearbyObjects, 70, pRef->apObject[pRef->iOpaqueLOD], fT,
+                                gTerRenderer.fDefaultObjectMipmapBias[pRef->iOpaqueLOD],
                                 pRef->fDistanceSquared, pRef->iGlobalObjectIndex, pRef->eClipMethod,
                                 pRef->fDistanceSquared > 0.0f, 0);
                 }
             }
         } else {
-            pRef = &gTerrainRendererMgr.pObjectSortList[i];
-            gTerrainRendererMgr.pObjectStateList[pRef->iGlobalObjectIndex]
-                .aView[gTerrainRendererMgr.iCurrentViewContext].n4 = 3;
-            pRef = &gTerrainRendererMgr.pObjectSortList[i];
-            Ter_AddObjectDraw(&gTerrainRendererMgr.pOpaqueObjectList[gTerrainRendererMgr.iOpaqueObjects],
-                        &gTerrainRendererMgr.iOpaqueObjects, 650, pRef->apObject[pRef->iOpaqueLOD], 1.0f,
-                        gTerrainRendererMgr.fDefaultObjectMipmapBias[pRef->iOpaqueLOD], pRef->fDistanceSquared,
+            pRef = &gTerRenderer.pObjectSortList[i];
+            gTerRenderer.pObjectStateList[pRef->iGlobalObjectIndex]
+                .aView[gTerRenderer.iCurrentViewContext].n4 = 3;
+            pRef = &gTerRenderer.pObjectSortList[i];
+            Ter_AddObjectDraw(&gTerRenderer.pOpaqueObjectList[gTerRenderer.iOpaqueObjects],
+                        &gTerRenderer.iOpaqueObjects, 650, pRef->apObject[pRef->iOpaqueLOD], 1.0f,
+                        gTerRenderer.fDefaultObjectMipmapBias[pRef->iOpaqueLOD], pRef->fDistanceSquared,
                         pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f, 0);
         }
         if (gSession.b11 == 0) {
-            pRef = &gTerrainRendererMgr.pObjectSortList[i];
+            pRef = &gTerRenderer.pObjectSortList[i];
             if (pRef->fAlpha != 0.0f && !(uFlags0 & 0x40)) {
-                Ter_AddObjectDraw(&gTerrainRendererMgr.pTranslucentObjectList[gTerrainRendererMgr.iTranslucentObjects],
-                            &gTerrainRendererMgr.iTranslucentObjects, 200, pRef->apObject[pRef->iTranslucentLOD],
-                            pRef->fAlpha, gTerrainRendererMgr.fDefaultObjectMipmapBias[pRef->iTranslucentLOD],
+                Ter_AddObjectDraw(&gTerRenderer.pTranslucentObjectList[gTerRenderer.iTranslucentObjects],
+                            &gTerRenderer.iTranslucentObjects, 200, pRef->apObject[pRef->iTranslucentLOD],
+                            pRef->fAlpha, gTerRenderer.fDefaultObjectMipmapBias[pRef->iTranslucentLOD],
                             pRef->fDistanceSquared, pRef->iGlobalObjectIndex, pRef->eClipMethod,
                             pRef->fDistanceSquared > 0.0f, 0);
             }
@@ -1009,7 +1009,7 @@ void Ter_AddObjectDraw(Ter_ObjectDrawData* pDraw, s32* pCount, s32 nUnused, UObj
     if (uFlags0 & 1) {
         if (uFlags0 & 2) {
             if (GM_IsSpeedGolfMode()) return;
-            pDraw->pObject = Ter_GetMeshChild(pModel, gTerrainRendererMgr.pObjectStateList[iObject].n18);
+            pDraw->pObject = Ter_GetMeshChild(pModel, gTerRenderer.pObjectStateList[iObject].n18);
         }
     } else if ((uFlags3 & 4) || (uFlags3 & 0x10) || (uFlags3 & 0x20)) {
         if (GM_IsSpeedGolfMode()) return;
@@ -1034,7 +1034,7 @@ void Ter_DrawPatchPass(int nRenderPass) {
     bAny = 0;
     for (nList = 0; nList < 3; nList++) {
         for (nClip = 0; nClip < 3; nClip++) {
-            if (gTerrainRendererMgr.pSortedPatchList[nRenderPass][nList][(u32)nClip] != NULL) {
+            if (gTerRenderer.pSortedPatchList[nRenderPass][nList][(u32)nClip] != NULL) {
                 bAny = 1;
                 break;
             }
@@ -1056,7 +1056,7 @@ void Ter_DrawPatchPass(int nRenderPass) {
                 }
             }
             for (nClip = 0; nClip <= 2; nClip++) {
-                if (gTerrainRendererMgr.pSortedPatchList[nRenderPass][nList][(u32)nClip] != NULL) {
+                if (gTerRenderer.pSortedPatchList[nRenderPass][nList][(u32)nClip] != NULL) {
                     switch (nClip) {
                     case 2:
                         RenderState_SetClipMode(1);
@@ -1070,7 +1070,7 @@ void Ter_DrawPatchPass(int nRenderPass) {
                     }
                     RenderState_Flush();
                     for (pPatch =
-                             gTerrainRendererMgr.pSortedPatchList[nRenderPass][nList][(u32)nClip];
+                             gTerRenderer.pSortedPatchList[nRenderPass][nList][(u32)nClip];
                          pPatch != NULL; pPatch = pPatch->pNext[nList]) {
                         Ter_DrawPatchGround(pPatch->pGround, nClip, nList, pPatch->n1C, pPatch->n18,
                                             pPatch->n20,
@@ -1080,9 +1080,9 @@ void Ter_DrawPatchPass(int nRenderPass) {
                 }
             }
         }
-        Ter_DrawObjectList(gTerrainRendererMgr.pDeferredItemsList, gTerrainRendererMgr.iDeferredItems,
-                    gTerrainRendererMgr.eTerrainFilterMin, gTerrainRendererMgr.eTerrainFilterMag);
-        gTerrainRendererMgr.iDeferredItems = 0;
+        Ter_DrawObjectList(gTerRenderer.pDeferredItemsList, gTerRenderer.iDeferredItems,
+                    gTerRenderer.eTerrainFilterMin, gTerRenderer.eTerrainFilterMag);
+        gTerRenderer.iDeferredItems = 0;
         DS_vSetAlphaTestMode(1, 6, 1);
         RenderState_Flush();
         Ter_SetZWrite(1);
@@ -1093,7 +1093,7 @@ void Ter_DrawPatchPass(int nRenderPass) {
 // Turns z writes on or off, only while the terrain manages them (boManageZUpdate), and remembers
 // the setting in gTerLastZWrite (Ter_SetObjectRenderState compares against it).
 void Ter_SetZWrite(int n) {
-    if (gTerrainRendererMgr.boManageZUpdate) {
+    if (gTerRenderer.boManageZUpdate) {
         DS_vEnableZBufferUpdate(n);
         gTerLastZWrite = n;
     }
@@ -1113,7 +1113,7 @@ void Ter_DrawFarClipPatches(void) {
 
     bAny = 0;
     for (nClip = 0; nClip < 3; nClip++) {
-        if (gTerrainRendererMgr.pSortedPatchList[0][3][(u32)nClip] != NULL) {
+        if (gTerRenderer.pSortedPatchList[0][3][(u32)nClip] != NULL) {
             bAny = 1;
             break;
         }
@@ -1132,7 +1132,7 @@ void Ter_DrawFarClipPatches(void) {
         RenderState_Flush();
         RenderState_SetDrawFlags(0x70);
         for (nClip = 0; nClip <= 2; nClip++) {
-            if (gTerrainRendererMgr.pSortedPatchList[0][3][(u32)nClip] != NULL) {
+            if (gTerRenderer.pSortedPatchList[0][3][(u32)nClip] != NULL) {
                 switch (nClip) {
                 case 2:
                     RenderState_SetClipMode(1);
@@ -1146,7 +1146,7 @@ void Ter_DrawFarClipPatches(void) {
                 }
                 RenderState_Flush();
                 for (pPatch =
-                         gTerrainRendererMgr.pSortedPatchList[0][3][(u32)nClip];
+                         gTerRenderer.pSortedPatchList[0][3][(u32)nClip];
                      pPatch != NULL; pPatch = pPatch->pNext[3]) {
                     if (!gSession.nSplitScreen || !(pPatch->n1C & 8)) {
                         Ter_DrawPatchGround(pPatch->pGround, nClip, 3, pPatch->n1C, pPatch->n18, pPatch->n20,
@@ -1167,12 +1167,12 @@ void Ter_DrawFarClipPatches(void) {
 // Draws the opaque object list, then the translucent one (objects fading between two levels of
 // detail) if it has any, both with the object filters; alpha test back to reference 128.
 void Ter_DrawObjects(void) {
-    Ter_DrawObjectList(gTerrainRendererMgr.pOpaqueObjectList, gTerrainRendererMgr.iOpaqueObjects,
-                       gTerrainRendererMgr.eObjectFilterMin,
-                gTerrainRendererMgr.eObjectFilterMag);
-    if (gTerrainRendererMgr.iTranslucentObjects != 0) {
-        Ter_DrawObjectList(gTerrainRendererMgr.pTranslucentObjectList, gTerrainRendererMgr.iTranslucentObjects,
-                    gTerrainRendererMgr.eObjectFilterMin, gTerrainRendererMgr.eObjectFilterMag);
+    Ter_DrawObjectList(gTerRenderer.pOpaqueObjectList, gTerRenderer.iOpaqueObjects,
+                       gTerRenderer.eObjectFilterMin,
+                gTerRenderer.eObjectFilterMag);
+    if (gTerRenderer.iTranslucentObjects != 0) {
+        Ter_DrawObjectList(gTerRenderer.pTranslucentObjectList, gTerRenderer.iTranslucentObjects,
+                    gTerRenderer.eObjectFilterMin, gTerRenderer.eObjectFilterMag);
     }
     DS_vSetAlphaTestMode(1, 6, 128);
     RenderState_Flush();
@@ -1187,8 +1187,8 @@ void Ter_DrawPostDrawPatches(void) {
 
     Ter_BeginRender();
     RenderState_SetDrawFlags(0x70);
-    for (i = 0; i < gTerrainRendererMgr.iTotalPostDrawTerrainPatches; i++) {
-        switch (gTerrainRendererMgr.pPostDrawTerrainList[i].eClipMethod) {
+    for (i = 0; i < gTerRenderer.iTotalPostDrawTerrainPatches; i++) {
+        switch (gTerRenderer.pPostDrawTerrainList[i].eClipMethod) {
         case 2:
             RenderState_SetClipMode(1);
             break;
@@ -1201,15 +1201,15 @@ void Ter_DrawPostDrawPatches(void) {
         }
         RenderState_Flush();
         for (nPass = 0, nPassBit = 1; nPass <= 2; nPass++, nPassBit <<= 1) {
-            if (nPassBit & gTerrainRendererMgr.pPostDrawTerrainList[i].n1C) {
-                Ter_DrawPatchGround(gTerrainRendererMgr.pPostDrawTerrainList[i].pGround,
-                            gTerrainRendererMgr.pPostDrawTerrainList[i].eClipMethod, nPass,
-                            gTerrainRendererMgr.pPostDrawTerrainList[i].n1C,
-                            gTerrainRendererMgr.pPostDrawTerrainList[i].n18,
-                            gTerrainRendererMgr.pPostDrawTerrainList[i].n20, &bFirst, 1, 0,
-                            gTerrainRendererMgr.pPostDrawTerrainList[i].fDistance,
-                            gTerrainRendererMgr.pPostDrawTerrainList[i].fDistance
-                                + 2.0f * gTerrainRendererMgr.pPostDrawTerrainList[i].fBoundingRadius);
+            if (nPassBit & gTerRenderer.pPostDrawTerrainList[i].n1C) {
+                Ter_DrawPatchGround(gTerRenderer.pPostDrawTerrainList[i].pGround,
+                            gTerRenderer.pPostDrawTerrainList[i].eClipMethod, nPass,
+                            gTerRenderer.pPostDrawTerrainList[i].n1C,
+                            gTerRenderer.pPostDrawTerrainList[i].n18,
+                            gTerRenderer.pPostDrawTerrainList[i].n20, &bFirst, 1, 0,
+                            gTerRenderer.pPostDrawTerrainList[i].fDistance,
+                            gTerRenderer.pPostDrawTerrainList[i].fDistance
+                                + 2.0f * gTerRenderer.pPostDrawTerrainList[i].fBoundingRadius);
             }
         }
     }
@@ -1220,13 +1220,13 @@ void Ter_DrawPostDrawPatches(void) {
 // writes. gomainloop calls it after a view's scene, for views 0 and 1.
 void Ter_DrawPostDrawObjects(void) {
     Ter_BeginRender();
-    Ter_DrawObjectList(gTerrainRendererMgr.pPostDrawItemsList, gTerrainRendererMgr.iPostDrawItems,
-                       gTerrainRendererMgr.eObjectFilterMin,
-                gTerrainRendererMgr.eObjectFilterMag);
+    Ter_DrawObjectList(gTerRenderer.pPostDrawItemsList, gTerRenderer.iPostDrawItems,
+                       gTerRenderer.eObjectFilterMin,
+                gTerRenderer.eObjectFilterMag);
     Ter_SetZWrite(0);
-    Ter_DrawObjectList(gTerrainRendererMgr.pNearbyObjectList, gTerrainRendererMgr.iNearbyObjects,
-                       gTerrainRendererMgr.eObjectFilterMin,
-                gTerrainRendererMgr.eObjectFilterMag);
+    Ter_DrawObjectList(gTerRenderer.pNearbyObjectList, gTerRenderer.iNearbyObjects,
+                       gTerRenderer.eObjectFilterMin,
+                gTerRenderer.eObjectFilterMag);
     Ter_SetZWrite(1);
     RenderState_SetConstantAlphaOn(0);
     Ter_EndRender();
@@ -1260,7 +1260,7 @@ void Ter_DrawPatchGround(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32
     bLake = 0;
     uPinBit = 1 << Game_CurrentPinSet();
     uOtherPins = ~(uPinBit | uPinBit) & 0xF;
-    if (nPass >= 1 && nPass <= 2 && fNear > 100.0f * gTerrainRendererMgr.fFOVScale
+    if (nPass >= 1 && nPass <= 2 && fNear > 100.0f * gTerRenderer.fFOVScale
         && !(Ter_GetMeshFlags(pGround, 0) & 0x80)) {
         return;
     }
@@ -1272,12 +1272,12 @@ void Ter_DrawPatchGround(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32
         nMesh |= 0x10;
     }
     if (n20 & 0x80) {
-        if (!CameraController_IsFlybyDone(ViewController_GetCameraControl(gTerrainRendererMgr.iCurrentViewContext))
+        if (!CameraController_IsFlybyDone(ViewController_GetCameraControl(gTerRenderer.iCurrentViewContext))
             && (Ter_GetMeshFlags(pGround, 0) & 0x80)) {
             return;
         }
         bLake = 1;
-        fBias = gTerrainRendererMgr.fLakeSurfaceMipmapBias;
+        fBias = gTerRenderer.fLakeSurfaceMipmapBias;
     }
     pGround = Ter_GetMeshChild(pGround, gTerLowBitCounts[nPass][nMesh]);
     bFirst = *pbFirst;
@@ -1309,22 +1309,22 @@ void Ter_DrawPatchGround(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32
     }
     if ((uFlags2 & 0x10) && b2 == 0) {
         if (pMesh->n20 != 0) {
-            Ter_AddObjectDraw(&gTerrainRendererMgr.pDeferredItemsList[gTerrainRendererMgr.iDeferredItems],
-                        &gTerrainRendererMgr.iDeferredItems, 50, pMesh, 1.0f, bLake ? fBias : 0.0f, 0.0f, 0x289,
+            Ter_AddObjectDraw(&gTerRenderer.pDeferredItemsList[gTerRenderer.iDeferredItems],
+                        &gTerRenderer.iDeferredItems, 50, pMesh, 1.0f, bLake ? fBias : 0.0f, 0.0f, 0x289,
                         eClipMethod, fFar > 0.0f, 0);
         }
         pMesh = Ter_GetMeshNext(pMesh);
     }
     if (uFlags2 & 0x20) {
         if (pMesh->n20 != 0) {
-            Ter_AddObjectDraw(&gTerrainRendererMgr.pDeferredItemsList[gTerrainRendererMgr.iDeferredItems],
-                        &gTerrainRendererMgr.iDeferredItems, 50, pMesh, 1.0f, bLake ? fBias : 0.0f, 0.0f, 0x289,
+            Ter_AddObjectDraw(&gTerRenderer.pDeferredItemsList[gTerRenderer.iDeferredItems],
+                        &gTerRenderer.iDeferredItems, 50, pMesh, 1.0f, bLake ? fBias : 0.0f, 0.0f, 0x289,
                         eClipMethod, fFar > 0.0f, 0);
         }
         pMesh = Ter_GetMeshNext(pMesh);
     }
     if (gSession.nSplitScreen == 0 && (uFlags2 & 0x40) && b2 == 0) {
-        if (fNear < 60.0f * gTerrainRendererMgr.fFOVScale && pMesh->n20 != 0) {
+        if (fNear < 60.0f * gTerRenderer.fFOVScale && pMesh->n20 != 0) {
             LLMath_IdentifyMat(mRaise);
             mRaise[3][1] = 0.005f;
             RC_vSetCurrentRenderCtxTransformationMatrix(mRaise);
@@ -1397,7 +1397,7 @@ void Ter_DrawObjectList(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s
             fBias = pDraw->fMipmapBias;
             bDirty = 1;
         }
-        bNewBit5 = (gTerrainRendererMgr.pObjectStateList[iObject].a20[1] >> 5) & 1;
+        bNewBit5 = (gTerRenderer.pObjectStateList[iObject].a20[1] >> 5) & 1;
         bNewShaded = pDraw->eShaderObjectType != 1 && pDraw->eShaderObjectType != 3;
         if (pDraw->bSetsPrimField == 0
             && (bUseFog != pDraw->bUseFog || bBit5 != bNewBit5 || bShaded != bNewShaded || bForce)) {
@@ -1411,13 +1411,13 @@ void Ter_DrawObjectList(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s
         if (Ter_SetObjectRenderState(pDraw, 0)) {
             bDirty = 1;
         }
-        if ((gTerrainRendererMgr.pObjectStateList[iObject].a20[0] & 1)
-            && !(gTerrainRendererMgr.pObjectStateList[iObject].a20[0] & 2)) {
+        if ((gTerRenderer.pObjectStateList[iObject].a20[0] & 1)
+            && !(gTerRenderer.pObjectStateList[iObject].a20[0] & 2)) {
             fDamp = 1.0f;
-            if (gTerrainRendererMgr.fTreeDampingMaxForce) {
-                fDamp = gTerrainRendererMgr.fTreeDampingMaxForce
-                        * (pDraw->fDistanceSquared / gTerrainRendererMgr.fTreeDampingDistance)
-                      + (1.0f - gTerrainRendererMgr.fTreeDampingMaxForce);
+            if (gTerRenderer.fTreeDampingMaxForce) {
+                fDamp = gTerRenderer.fTreeDampingMaxForce
+                        * (pDraw->fDistanceSquared / gTerRenderer.fTreeDampingDistance)
+                      + (1.0f - gTerRenderer.fTreeDampingMaxForce);
                 if (fDamp > 1.0f) {
                     fDamp = 1.0f;
                 }
@@ -1427,23 +1427,23 @@ void Ter_DrawObjectList(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s
                 bDirty = 0;
             }
             if (pDraw->eShaderObjectType == 2) {
-                fWave2 = fDamp * (gTerrainRendererMgr.pObjectStateList[iObject].f4 - 0.5f) + 0.5f;
+                fWave2 = fDamp * (gTerRenderer.pObjectStateList[iObject].f4 - 0.5f) + 0.5f;
                 SD_SetShaderTypeParameters(2, &fWave2);
             } else if (pDraw->eShaderObjectType == 3) {
-                fWave3 = fDamp * (gTerrainRendererMgr.pObjectStateList[iObject].f4 - 0.5f) + 0.5f;
+                fWave3 = fDamp * (gTerRenderer.pObjectStateList[iObject].f4 - 0.5f) + 0.5f;
                 SD_SetShaderTypeParameters(3, &fWave3);
             }
-        } else if ((gTerrainRendererMgr.pObjectStateList[iObject].a20[0] & 1)
-                   && (gTerrainRendererMgr.pObjectStateList[iObject].a20[0] & 2)) {
+        } else if ((gTerRenderer.pObjectStateList[iObject].a20[0] & 1)
+                   && (gTerRenderer.pObjectStateList[iObject].a20[0] & 2)) {
             if (bDirty) {
                 RenderState_Flush();
                 bDirty = 0;
             }
             if (pDraw->eShaderObjectType == 2) {
-                fWave2 = gTerrainRendererMgr.pObjectStateList[iObject].f4;
+                fWave2 = gTerRenderer.pObjectStateList[iObject].f4;
                 SD_SetShaderTypeParameters(2, &fWave2);
             } else if (pDraw->eShaderObjectType == 3) {
-                fWave3 = gTerrainRendererMgr.pObjectStateList[iObject].f4;
+                fWave3 = gTerRenderer.pObjectStateList[iObject].f4;
                 SD_SetShaderTypeParameters(3, &fWave3);
             }
         } else if (bDirty) {
@@ -1512,30 +1512,30 @@ void Ter_StartCrowdAnimation(f32 fPercentage, f32 fDuration, f32 fDelay) {
 
     fPercentage = 1.0f;
     if (fDelay > fRand) {
-        gTerrainRendererMgr.fCrowdAnimationDelayedStartTimer = fDelay;
-        gTerrainRendererMgr.fCrowdAnimationDelayedStartPercentage = fPercentage;
-        gTerrainRendererMgr.fCrowdAnimationDelayedStartDuration = fDuration;
+        gTerRenderer.fCrowdAnimationDelayedStartTimer = fDelay;
+        gTerRenderer.fCrowdAnimationDelayedStartPercentage = fPercentage;
+        gTerRenderer.fCrowdAnimationDelayedStartDuration = fDuration;
         return;
     }
-    gTerrainRendererMgr.fCrowdAnimationCountdown = fDuration;
-    gTerrainRendererMgr.fCrowdAnimationDelayedStartPercentage = fPercentage;
+    gTerRenderer.fCrowdAnimationCountdown = fDuration;
+    gTerRenderer.fCrowdAnimationDelayedStartPercentage = fPercentage;
     for (i = 0; i < TER_NUM_OBJECTS; i++) {
-        s32 nFlags = gTerrainRendererMgr.pObjectStateList[i].a20[0];
-        s32 nFlags3 = gTerrainRendererMgr.pObjectStateList[i].a20[3];
+        s32 nFlags = gTerRenderer.pObjectStateList[i].a20[0];
+        s32 nFlags3 = gTerRenderer.pObjectStateList[i].a20[3];
 
         if (nFlags & 1) {
             if ((nFlags & 2) && !(nFlags3 & 0x40)) {
                 if (fPercentage >= fRand) {
-                    gTerrainRendererMgr.pObjectStateList[i].n1C = 3;
-                    gTerrainRendererMgr.pObjectStateList[i].f14 = gTerrainRendererMgr.pObjectStateList[i].f10;
+                    gTerRenderer.pObjectStateList[i].n1C = 3;
+                    gTerRenderer.pObjectStateList[i].f14 = gTerRenderer.pObjectStateList[i].f10;
                 }
                 fRand *= 131.2934f;
                 fRand += 82.459f;
                 fRand -= Math_Floor(fRand);
             } else if ((nFlags & 2) && (nFlags3 & 0x40)) {
                 if (fPercentage >= fRand) {
-                    gTerrainRendererMgr.pObjectStateList[i].n1C = 1;
-                    gTerrainRendererMgr.pObjectStateList[i].f14 = gTerrainRendererMgr.pObjectStateList[i].f10;
+                    gTerRenderer.pObjectStateList[i].n1C = 1;
+                    gTerRenderer.pObjectStateList[i].f14 = gTerRenderer.pObjectStateList[i].f10;
                 }
                 fRand *= 131.2934f;
                 fRand += 82.459f;
@@ -1550,28 +1550,28 @@ void Ter_StartCrowdAnimation(f32 fPercentage, f32 fDuration, f32 fDelay) {
 void Ter_StopCrowdAnimation(u8 bReset) {
     int i;
 
-    gTerrainRendererMgr.fCrowdAnimationDelayedStartTimer = -1.0f;
-    gTerrainRendererMgr.fCrowdAnimationCountdown = 0.0f;
+    gTerRenderer.fCrowdAnimationDelayedStartTimer = -1.0f;
+    gTerRenderer.fCrowdAnimationCountdown = 0.0f;
     for (i = 0; i < TER_NUM_OBJECTS; i++) {
-        s32 nFlags = gTerrainRendererMgr.pObjectStateList[i].a20[0];
-        s32 nFlags3 = gTerrainRendererMgr.pObjectStateList[i].a20[3];
+        s32 nFlags = gTerRenderer.pObjectStateList[i].a20[0];
+        s32 nFlags3 = gTerRenderer.pObjectStateList[i].a20[3];
 
         if (nFlags & 1) {
             if ((nFlags & 2) && !(nFlags3 & 0x40)) {
-                gTerrainRendererMgr.pObjectStateList[i].n1C = 0;
+                gTerRenderer.pObjectStateList[i].n1C = 0;
                 if (bReset) {
-                    gTerrainRendererMgr.pObjectStateList[i].f14 = 0.0f;
-                    gTerrainRendererMgr.pObjectStateList[i].n18 = 0;
+                    gTerRenderer.pObjectStateList[i].f14 = 0.0f;
+                    gTerRenderer.pObjectStateList[i].n18 = 0;
                 } else {
-                    gTerrainRendererMgr.pObjectStateList[i].f14 = gTerrainRendererMgr.pObjectStateList[i].f10;
+                    gTerRenderer.pObjectStateList[i].f14 = gTerRenderer.pObjectStateList[i].f10;
                 }
             } else if ((nFlags & 2) && (nFlags3 & 0x40)) {
-                gTerrainRendererMgr.pObjectStateList[i].n1C = 0;
+                gTerRenderer.pObjectStateList[i].n1C = 0;
                 if (bReset) {
-                    gTerrainRendererMgr.pObjectStateList[i].f14 = 0.0f;
-                    gTerrainRendererMgr.pObjectStateList[i].n18 = 0;
+                    gTerRenderer.pObjectStateList[i].f14 = 0.0f;
+                    gTerRenderer.pObjectStateList[i].n18 = 0;
                 } else {
-                    gTerrainRendererMgr.pObjectStateList[i].f14 = gTerrainRendererMgr.pObjectStateList[i].f10;
+                    gTerRenderer.pObjectStateList[i].f14 = gTerRenderer.pObjectStateList[i].f10;
                 }
             }
         }
@@ -1579,18 +1579,18 @@ void Ter_StopCrowdAnimation(u8 bReset) {
 }
 
 f32 Ter_GetCrowdAnimationCountdown(void) {
-    return gTerrainRendererMgr.fCrowdAnimationCountdown;
+    return gTerRenderer.fCrowdAnimationCountdown;
 }
 
 f32 Ter_GetCrowdAnimationDelayedStartPercentage(void) {
-    return gTerrainRendererMgr.fCrowdAnimationDelayedStartPercentage;
+    return gTerRenderer.fCrowdAnimationDelayedStartPercentage;
 }
 
 // The ball hit object nObject of patch nPatch (event.c): its state's n1C becomes 1 when bit 0x1 of
 // its word 3 is set (Ter_AnimateObjects then raises that object).
 void Ter_SetObjectHit(u16 nPatch, u16 nObject) {
     Ter_ObjectState* pState =
-        &gTerrainRendererMgr.pObjectStateList[gTerrainRendererMgr.iPatchFirstObjectInstanceIndex[nPatch] + nObject];
+        &gTerRenderer.pObjectStateList[gTerRenderer.iPatchFirstObjectInstanceIndex[nPatch] + nObject];
 
     if (pState->a20[3] & 1) {
         pState->n1C = 1;
@@ -1637,80 +1637,80 @@ void Ter_AnimateObjects(void) {
     if (fTime < 0.0f) {
         fTime = 0.0f;
     }
-    if (gTerrainRendererMgr.fCrowdAnimationDelayedStartTimer > 0.0f) {
-        gTerrainRendererMgr.fCrowdAnimationDelayedStartTimer -= fTime;
-        if (gTerrainRendererMgr.fCrowdAnimationDelayedStartTimer <= 0.0f) {
-            Ter_StartCrowdAnimation(gTerrainRendererMgr.fCrowdAnimationDelayedStartPercentage,
-                        gTerrainRendererMgr.fCrowdAnimationDelayedStartDuration, 0.0f);
+    if (gTerRenderer.fCrowdAnimationDelayedStartTimer > 0.0f) {
+        gTerRenderer.fCrowdAnimationDelayedStartTimer -= fTime;
+        if (gTerRenderer.fCrowdAnimationDelayedStartTimer <= 0.0f) {
+            Ter_StartCrowdAnimation(gTerRenderer.fCrowdAnimationDelayedStartPercentage,
+                        gTerRenderer.fCrowdAnimationDelayedStartDuration, 0.0f);
         }
     }
-    if (gTerrainRendererMgr.fCrowdAnimationCountdown > 0.0f) {
-        gTerrainRendererMgr.fCrowdAnimationCountdown -= fTime;
-        if (gTerrainRendererMgr.fCrowdAnimationCountdown <= 0.0f) {
+    if (gTerRenderer.fCrowdAnimationCountdown > 0.0f) {
+        gTerRenderer.fCrowdAnimationCountdown -= fTime;
+        if (gTerRenderer.fCrowdAnimationCountdown <= 0.0f) {
             Ter_StopCrowdAnimation(0);
         }
     }
     for (i = 0; i < TER_NUM_OBJECTS; i++) {
         for (v = 0; v < 2; v++) {
-            if (gTerrainRendererMgr.pObjectStateList[i].aView[v].n4 == 2) {
-                gTerrainRendererMgr.pObjectStateList[i].aView[v].f0 += 4.0f * gSession.fFrameTime;
-                if (gTerrainRendererMgr.pObjectStateList[i].aView[v].f0 >= 1.0f) {
-                    gTerrainRendererMgr.pObjectStateList[i].aView[v].f0 = 1.0f;
-                    gTerrainRendererMgr.pObjectStateList[i].aView[v].n4 = 3;
+            if (gTerRenderer.pObjectStateList[i].aView[v].n4 == 2) {
+                gTerRenderer.pObjectStateList[i].aView[v].f0 += 4.0f * gSession.fFrameTime;
+                if (gTerRenderer.pObjectStateList[i].aView[v].f0 >= 1.0f) {
+                    gTerRenderer.pObjectStateList[i].aView[v].f0 = 1.0f;
+                    gTerRenderer.pObjectStateList[i].aView[v].n4 = 3;
                 }
             }
-            if (gTerrainRendererMgr.pObjectStateList[i].aView[v].n4 == 0) {
-                gTerrainRendererMgr.pObjectStateList[i].aView[v].f0 -= 4.0f * gSession.fFrameTime;
-                if (gTerrainRendererMgr.pObjectStateList[i].aView[v].f0 <= 0.0f) {
-                    gTerrainRendererMgr.pObjectStateList[i].aView[v].f0 = 0.0f;
-                    gTerrainRendererMgr.pObjectStateList[i].aView[v].n4 = 1;
+            if (gTerRenderer.pObjectStateList[i].aView[v].n4 == 0) {
+                gTerRenderer.pObjectStateList[i].aView[v].f0 -= 4.0f * gSession.fFrameTime;
+                if (gTerRenderer.pObjectStateList[i].aView[v].f0 <= 0.0f) {
+                    gTerRenderer.pObjectStateList[i].aView[v].f0 = 0.0f;
+                    gTerRenderer.pObjectStateList[i].aView[v].n4 = 1;
                 }
             }
         }
-        uFlags0 = gTerrainRendererMgr.pObjectStateList[i].a20[0];
-        uFlags3 = gTerrainRendererMgr.pObjectStateList[i].a20[3];
+        uFlags0 = gTerRenderer.pObjectStateList[i].a20[0];
+        uFlags3 = gTerRenderer.pObjectStateList[i].a20[3];
         if (!(uFlags0 & 1)) {
             continue;
         }
-        if ((uFlags0 & 2) && gTerrainRendererMgr.iCrowdPose != 0) {
-            if (gTerrainRendererMgr.iCrowdPose == 1) {
-                gTerrainRendererMgr.pObjectStateList[i].n18 = 0;
-                gTerrainRendererMgr.pObjectStateList[i].n1C = 0;
+        if ((uFlags0 & 2) && gTerRenderer.iCrowdPose != 0) {
+            if (gTerRenderer.iCrowdPose == 1) {
+                gTerRenderer.pObjectStateList[i].n18 = 0;
+                gTerRenderer.pObjectStateList[i].n1C = 0;
             } else {
-                gTerrainRendererMgr.pObjectStateList[i].n18 = 3;
-                gTerrainRendererMgr.pObjectStateList[i].n1C = 3;
+                gTerRenderer.pObjectStateList[i].n18 = 3;
+                gTerRenderer.pObjectStateList[i].n1C = 3;
             }
-            gTerrainRendererMgr.pObjectStateList[i].f4 = gTerrainRendererMgr.fCrowdInterpValue;
+            gTerRenderer.pObjectStateList[i].f4 = gTerRenderer.fCrowdInterpValue;
         } else if ((uFlags0 & 2) && !(uFlags3 & 0x40)) {
-            gTerrainRendererMgr.pObjectStateList[i].nC += (u32)(FRAME_RATE * fTime);
-            if (gTerrainRendererMgr.pObjectStateList[i].n18 == gTerrainRendererMgr.pObjectStateList[i].n1C
-                || gTerrainRendererMgr.pObjectStateList[i].f14 > 0.0f) {
-                fPeriod = 4.0f * (gTerrainRendererMgr.pObjectStateList[i].f0 - gTerrainRendererMgr.fTreeMinPeriod) + 1.5f;
-                if (gTerrainRendererMgr.pObjectStateList[i].n18 == 3) {
-                    gTerrainRendererMgr.pObjectStateList[i].f4 =
+            gTerRenderer.pObjectStateList[i].nC += (u32)(FRAME_RATE * fTime);
+            if (gTerRenderer.pObjectStateList[i].n18 == gTerRenderer.pObjectStateList[i].n1C
+                || gTerRenderer.pObjectStateList[i].f14 > 0.0f) {
+                fPeriod = 4.0f * (gTerRenderer.pObjectStateList[i].f0 - gTerRenderer.fTreeMinPeriod) + 1.5f;
+                if (gTerRenderer.pObjectStateList[i].n18 == 3) {
+                    gTerRenderer.pObjectStateList[i].f4 =
                         0.5f * Math_Sin(10.0f
                                            * (6.2831855f
-                                              * Ter_GetTimeInCycle(gTerrainRendererMgr.pObjectStateList[i].nC,
+                                              * Ter_GetTimeInCycle(gTerRenderer.pObjectStateList[i].nC,
                                                             fPeriod / 10.0f)
                                               / fPeriod))
                         + 0.5f;
                 } else {
-                    gTerrainRendererMgr.pObjectStateList[i].f4 =
+                    gTerRenderer.pObjectStateList[i].f4 =
                         0.5f * Math_Sin(0.5f
                                            * (6.2831855f
-                                              * Ter_GetTimeInCycle(gTerrainRendererMgr.pObjectStateList[i].nC,
+                                              * Ter_GetTimeInCycle(gTerRenderer.pObjectStateList[i].nC,
                                                             fPeriod / 0.5f)
                                               / fPeriod))
                         + 0.5f;
                 }
-                gTerrainRendererMgr.pObjectStateList[i].f14 -= fTime;
+                gTerRenderer.pObjectStateList[i].f14 -= fTime;
             } else {
                 for (k = 0; k < sizeof(gTerCrowdPoseSteps) / sizeof(gTerCrowdPoseSteps[0]); k++) {
-                    if (gTerrainRendererMgr.pObjectStateList[i].n18 == gTerCrowdPoseSteps[k].n0
-                        && gTerrainRendererMgr.pObjectStateList[i].n1C == gTerCrowdPoseSteps[k].n4) {
-                        fStep = gTerCrowdPoseSteps[k].fC - gTerrainRendererMgr.pObjectStateList[i].f4;
-                        if (gTerrainRendererMgr.pObjectStateList[i].n18 == 2
-                            || 3 == gTerrainRendererMgr.pObjectStateList[i].n18) {
+                    if (gTerRenderer.pObjectStateList[i].n18 == gTerCrowdPoseSteps[k].n0
+                        && gTerRenderer.pObjectStateList[i].n1C == gTerCrowdPoseSteps[k].n4) {
+                        fStep = gTerCrowdPoseSteps[k].fC - gTerRenderer.pObjectStateList[i].f4;
+                        if (gTerRenderer.pObjectStateList[i].n18 == 2
+                            || 3 == gTerRenderer.pObjectStateList[i].n18) {
                             if (fStep > 6.0f * fTime) {
                                 fStep = 6.0f * fTime;
                             }
@@ -1725,55 +1725,55 @@ void Ter_AnimateObjects(void) {
                                 fStep = -4.0f * fTime;
                             }
                         }
-                        gTerrainRendererMgr.pObjectStateList[i].f4 += fStep;
-                        if (fabsf(gTerrainRendererMgr.pObjectStateList[i].f4 - gTerCrowdPoseSteps[k].fC) < 0.01f) {
-                            gTerrainRendererMgr.pObjectStateList[i].n18 = gTerCrowdPoseSteps[k].n8;
-                            gTerrainRendererMgr.pObjectStateList[i].f4 = gTerCrowdPoseSteps[k].f10;
-                            gTerrainRendererMgr.pObjectStateList[i].nC = 0;
+                        gTerRenderer.pObjectStateList[i].f4 += fStep;
+                        if (fabsf(gTerRenderer.pObjectStateList[i].f4 - gTerCrowdPoseSteps[k].fC) < 0.01f) {
+                            gTerRenderer.pObjectStateList[i].n18 = gTerCrowdPoseSteps[k].n8;
+                            gTerRenderer.pObjectStateList[i].f4 = gTerCrowdPoseSteps[k].f10;
+                            gTerRenderer.pObjectStateList[i].nC = 0;
                             break;
                         }
                     }
                 }
             }
         } else if ((uFlags0 & 2) && (uFlags3 & 0x40)) {
-            gTerrainRendererMgr.pObjectStateList[i].nC += (u32)(FRAME_RATE * fTime);
-            if (gTerrainRendererMgr.pObjectStateList[i].n18 == gTerrainRendererMgr.pObjectStateList[i].n1C
-                || gTerrainRendererMgr.pObjectStateList[i].f14 > 0.0f) {
-                if (gTerrainRendererMgr.pObjectStateList[i].n18 == 0) {
-                    gTerrainRendererMgr.pObjectStateList[i].f4 -= 5.0f * fTime;
-                    if (gTerrainRendererMgr.pObjectStateList[i].f4 < 0.0f) {
-                        gTerrainRendererMgr.pObjectStateList[i].f4 = 0.0f;
+            gTerRenderer.pObjectStateList[i].nC += (u32)(FRAME_RATE * fTime);
+            if (gTerRenderer.pObjectStateList[i].n18 == gTerRenderer.pObjectStateList[i].n1C
+                || gTerRenderer.pObjectStateList[i].f14 > 0.0f) {
+                if (gTerRenderer.pObjectStateList[i].n18 == 0) {
+                    gTerRenderer.pObjectStateList[i].f4 -= 5.0f * fTime;
+                    if (gTerRenderer.pObjectStateList[i].f4 < 0.0f) {
+                        gTerRenderer.pObjectStateList[i].f4 = 0.0f;
                     }
-                    gTerrainRendererMgr.pObjectStateList[i].f14 -= fTime;
+                    gTerRenderer.pObjectStateList[i].f14 -= fTime;
                 } else {
                     fPeriod =
-                        4.0f * (gTerrainRendererMgr.pObjectStateList[i].f0 - gTerrainRendererMgr.fTreeMinPeriod) + 1.5f;
-                    if (gTerrainRendererMgr.pObjectStateList[i].n18 == 1) {
-                        gTerrainRendererMgr.pObjectStateList[i].f4 =
+                        4.0f * (gTerRenderer.pObjectStateList[i].f0 - gTerRenderer.fTreeMinPeriod) + 1.5f;
+                    if (gTerRenderer.pObjectStateList[i].n18 == 1) {
+                        gTerRenderer.pObjectStateList[i].f4 =
                             0.5f * Math_Sin(10.0f
                                                * (6.2831855f
-                                                  * Ter_GetTimeInCycle(gTerrainRendererMgr.pObjectStateList[i].nC,
+                                                  * Ter_GetTimeInCycle(gTerRenderer.pObjectStateList[i].nC,
                                                                 fPeriod / 10.0f)
                                                   / fPeriod))
                             + 0.5f;
                     } else {
-                        gTerrainRendererMgr.pObjectStateList[i].f4 =
+                        gTerRenderer.pObjectStateList[i].f4 =
                             0.5f * Math_Sin(0.5f
                                                * (6.2831855f
-                                                  * Ter_GetTimeInCycle(gTerrainRendererMgr.pObjectStateList[i].nC,
+                                                  * Ter_GetTimeInCycle(gTerRenderer.pObjectStateList[i].nC,
                                                                 fPeriod / 0.5f)
                                                   / fPeriod))
                             + 0.5f;
                     }
-                    gTerrainRendererMgr.pObjectStateList[i].f14 -= fTime;
+                    gTerRenderer.pObjectStateList[i].f14 -= fTime;
                 }
             } else {
                 for (k = 0; k < sizeof(gTerCrowdPoseStepsFlag40) / sizeof(gTerCrowdPoseStepsFlag40[0]); k++) {
-                    if (gTerrainRendererMgr.pObjectStateList[i].n18 == gTerCrowdPoseStepsFlag40[k].n0
-                        && gTerrainRendererMgr.pObjectStateList[i].n1C == gTerCrowdPoseStepsFlag40[k].n4) {
-                        fStep = gTerCrowdPoseStepsFlag40[k].fC - gTerrainRendererMgr.pObjectStateList[i].f4;
-                        if (gTerrainRendererMgr.pObjectStateList[i].n18 == 2
-                            || 3 == gTerrainRendererMgr.pObjectStateList[i].n18) {
+                    if (gTerRenderer.pObjectStateList[i].n18 == gTerCrowdPoseStepsFlag40[k].n0
+                        && gTerRenderer.pObjectStateList[i].n1C == gTerCrowdPoseStepsFlag40[k].n4) {
+                        fStep = gTerCrowdPoseStepsFlag40[k].fC - gTerRenderer.pObjectStateList[i].f4;
+                        if (gTerRenderer.pObjectStateList[i].n18 == 2
+                            || 3 == gTerRenderer.pObjectStateList[i].n18) {
                             if (fStep > 6.0f * fTime) {
                                 fStep = 6.0f * fTime;
                             }
@@ -1788,44 +1788,44 @@ void Ter_AnimateObjects(void) {
                                 fStep = -4.0f * fTime;
                             }
                         }
-                        gTerrainRendererMgr.pObjectStateList[i].f4 += fStep;
-                        if (fabsf(gTerrainRendererMgr.pObjectStateList[i].f4 - gTerCrowdPoseStepsFlag40[k].fC) < 0.01f) {
-                            gTerrainRendererMgr.pObjectStateList[i].n18 = gTerCrowdPoseStepsFlag40[k].n8;
-                            gTerrainRendererMgr.pObjectStateList[i].f4 = gTerCrowdPoseStepsFlag40[k].f10;
-                            gTerrainRendererMgr.pObjectStateList[i].nC = 0;
+                        gTerRenderer.pObjectStateList[i].f4 += fStep;
+                        if (fabsf(gTerRenderer.pObjectStateList[i].f4 - gTerCrowdPoseStepsFlag40[k].fC) < 0.01f) {
+                            gTerRenderer.pObjectStateList[i].n18 = gTerCrowdPoseStepsFlag40[k].n8;
+                            gTerRenderer.pObjectStateList[i].f4 = gTerCrowdPoseStepsFlag40[k].f10;
+                            gTerRenderer.pObjectStateList[i].nC = 0;
                             break;
                         }
                     }
                 }
             }
         } else if (uFlags3 & 1) {
-            if (gTerrainRendererMgr.pObjectStateList[i].n1C == 1) {
-                gTerrainRendererMgr.pObjectStateList[i].f4 += fTime;
-                if (gTerrainRendererMgr.pObjectStateList[i].f4 > 1.0f) {
-                    gTerrainRendererMgr.pObjectStateList[i].f4 = 1.0f;
+            if (gTerRenderer.pObjectStateList[i].n1C == 1) {
+                gTerRenderer.pObjectStateList[i].f4 += fTime;
+                if (gTerRenderer.pObjectStateList[i].f4 > 1.0f) {
+                    gTerRenderer.pObjectStateList[i].f4 = 1.0f;
                 }
             } else {
-                gTerrainRendererMgr.pObjectStateList[i].f4 = 0.0f;
+                gTerRenderer.pObjectStateList[i].f4 = 0.0f;
             }
         } else {
-            fSum = 1.0f + gTerrainRendererMgr.fTreeNoiseAmplitudeScale;
+            fSum = 1.0f + gTerRenderer.fTreeNoiseAmplitudeScale;
             fScale = 1.0f / fSum;
-            fNoise = gTerrainRendererMgr.fTreeNoiseAmplitudeScale;
-            gTerrainRendererMgr.pObjectStateList[i].f4 =
+            fNoise = gTerRenderer.fTreeNoiseAmplitudeScale;
+            gTerRenderer.pObjectStateList[i].f4 =
                 0.5f * fScale
                     * Math_Sin(6.2831855f
                                   * Ter_GetTimeInCycle(gSession.nFrameCount,
-                                                       gTerrainRendererMgr.pObjectStateList[i].f0)
-                                  / gTerrainRendererMgr.pObjectStateList[i].f0)
+                                                       gTerRenderer.pObjectStateList[i].f0)
+                                  / gTerRenderer.pObjectStateList[i].f0)
                 + 0.5f * (fScale * fNoise)
                       * Math_Sin(6.2831855f
                                     * Ter_GetTimeInCycle(gSession.nFrameCount,
-                                                  gTerrainRendererMgr.fTreeNoisePeriodScale
-                                                      * gTerrainRendererMgr.pObjectStateList[i].f0)
-                                    / (gTerrainRendererMgr.fTreeNoisePeriodScale
-                                       * gTerrainRendererMgr.pObjectStateList[i].f0));
-            gTerrainRendererMgr.pObjectStateList[i].f4 *= gTerrainRendererMgr.fTreeOverdrive;
-            gTerrainRendererMgr.pObjectStateList[i].f4 += 0.5f;
+                                                  gTerRenderer.fTreeNoisePeriodScale
+                                                      * gTerRenderer.pObjectStateList[i].f0)
+                                    / (gTerRenderer.fTreeNoisePeriodScale
+                                       * gTerRenderer.pObjectStateList[i].f0));
+            gTerRenderer.pObjectStateList[i].f4 *= gTerRenderer.fTreeOverdrive;
+            gTerRenderer.pObjectStateList[i].f4 += 0.5f;
         }
     }
 }
@@ -1869,24 +1869,24 @@ void Ter_DrawPanoramaList(void* pHoleData, u32 nList) {
                 }
                 uFlags = Ter_GetMeshFlags(pMesh, 2);
                 if (!gSession.nSplitScreen || !(uFlags & 8)) {
-                    pView = ViewController_GetCameraControl(gTerrainRendererMgr.iCurrentViewContext);
+                    pView = ViewController_GetCameraControl(gTerRenderer.iCurrentViewContext);
                     nClip = fn_80007B2C(pMesh, RC_spGetCurrentRenderCtx(), 0.0f,
-                                        gTerrainRendererMgr.fCameraMinHalfFieldOfViewTan,
+                                        gTerRenderer.fCameraMinHalfFieldOfViewTan,
                                         pView->f54);
                     if (nClip != 3) {
                         // fake match: uFlags is reused for bUseFog (fog unless flag 0x20); a new local
                         // is computed after the call to fn_80035560, the original before it
                         uFlags = ((uFlags & 0x20) >> 5) ^ 1;
-                        Ter_AddObjectDraw(&gTerrainRendererMgr.pPanoramaItemsList[nItems], &nItems, 300, pMesh, 1.0f,
-                                    gTerrainRendererMgr.fDefaultObjectMipmapBias[0] * fn_80035560(pMesh), 0.0f,
+                        Ter_AddObjectDraw(&gTerRenderer.pPanoramaItemsList[nItems], &nItems, 300, pMesh, 1.0f,
+                                    gTerRenderer.fDefaultObjectMipmapBias[0] * fn_80035560(pMesh), 0.0f,
                                     0x289 - i, nClip, uFlags, 0);
                     }
                 }
                 pMesh = Ter_GetMeshNext(pMesh);
             }
         }
-        Ter_DrawObjectList(gTerrainRendererMgr.pPanoramaItemsList, nItems, gTerrainRendererMgr.eTerrainFilterMin,
-                    gTerrainRendererMgr.eTerrainFilterMag);
+        Ter_DrawObjectList(gTerRenderer.pPanoramaItemsList, nItems, gTerRenderer.eTerrainFilterMin,
+                    gTerRenderer.eTerrainFilterMag);
         Ter_SetZWrite(1);
         RenderState_Flush();
     }
@@ -1924,8 +1924,8 @@ void Ter_LODLoadCallback(UStreamObject* pObject) {
 // The 'ter ' chunk arrived: keeps it (pCurrentHoleDataStreamData) and its hole data
 // (pCurrentHoleData, from fn_800073B4) for drawing.
 void Ter_HoleDataLoadCallback(UStreamObject* pObject) {
-    gTerrainRendererMgr.pCurrentHoleDataStreamData = pObject;
-    gTerrainRendererMgr.pCurrentHoleData = fn_800073B4(pObject->pData, 0);
+    gTerRenderer.pCurrentHoleDataStreamData = pObject;
+    gTerRenderer.pCurrentHoleData = fn_800073B4(pObject->pData, 0);
 }
 
 // The 'tgd ' (course) chunk arrived: clears the pin and tee positions (Ter_TeeLoadCallback and
@@ -1942,32 +1942,32 @@ void Ter_CourseLoadCallback(UStreamObject* pObject) {
     CourseGlowBlock* pGlow;
     f32 fLength;
 
-    gTerrainRendererMgr.pCourseStreamData = pObject;
-    gTerrainRendererMgr.pCourse = (CourseInfo*)pObject->pData;
+    gTerRenderer.pCourseStreamData = pObject;
+    gTerRenderer.pCourse = (CourseInfo*)pObject->pData;
     for (i = 0; i < 4; i++) {
-        gTerrainRendererMgr.pCourse->tee[i].x = 0.0f;
-        gTerrainRendererMgr.pCourse->pin[i].x = 0.0f;
-        gTerrainRendererMgr.pCourse->tee[i].y = 0.0f;
-        gTerrainRendererMgr.pCourse->pin[i].y = 0.0f;
-        gTerrainRendererMgr.pCourse->tee[i].z = 0.0f;
-        gTerrainRendererMgr.pCourse->pin[i].z = 0.0f;
-        gTerrainRendererMgr.pCourse->tee[i].w = 0.0f;
-        gTerrainRendererMgr.pCourse->pin[i].w = 0.0f;
+        gTerRenderer.pCourse->tee[i].x = 0.0f;
+        gTerRenderer.pCourse->pin[i].x = 0.0f;
+        gTerRenderer.pCourse->tee[i].y = 0.0f;
+        gTerRenderer.pCourse->pin[i].y = 0.0f;
+        gTerRenderer.pCourse->tee[i].z = 0.0f;
+        gTerRenderer.pCourse->pin[i].z = 0.0f;
+        gTerRenderer.pCourse->tee[i].w = 0.0f;
+        gTerRenderer.pCourse->pin[i].w = 0.0f;
     }
-    Ter_InitTGD(gTerrainRendererMgr.pCourse);
+    Ter_InitTGD(gTerRenderer.pCourse);
     LF_vSetCurrentLightFogEnvironment(2);
-    fn_800935CC(&gTerrainRendererMgr.pCourse->lights);
-    fn_80093900(gTerrainRendererMgr.pCourse->p38);
+    fn_800935CC(&gTerRenderer.pCourse->lights);
+    fn_80093900(gTerRenderer.pCourse->p38);
     LF_vSetCurrentLightFogEnvironment(0);
-    fn_800935CC(&gTerrainRendererMgr.pCourse->lights);
-    fn_80093900(gTerrainRendererMgr.pCourse->p38);
+    fn_800935CC(&gTerRenderer.pCourse->lights);
+    fn_80093900(gTerRenderer.pCourse->p38);
     LF_vSetCurrentLightFogEnvironment(1);
-    fn_800935CC(&gTerrainRendererMgr.pCourse->lights);
-    fn_80093900(gTerrainRendererMgr.pCourse->p38);
+    fn_800935CC(&gTerRenderer.pCourse->lights);
+    fn_80093900(gTerRenderer.pCourse->p38);
     LF_vSetCurrentLightFogEnvironment(3);
     fn_80035370();
     fn_8003534C();
-    pGlow = gTerrainRendererMgr.pCourse->p3C;
+    pGlow = gTerRenderer.pCourse->p3C;
     if (pGlow != NULL) {
         v18[0] = pGlow->v10[0];
         v18[1] = pGlow->v10[1];
@@ -1996,10 +1996,10 @@ void Ter_CourseLoadCallback(UStreamObject* pObject) {
     fn_800355B8(v18);
     fn_80035590(v8);
     fn_80035584(nGlow);
-    if (gTerrainRendererMgr.pCourse->v60[0] || gTerrainRendererMgr.pCourse->v60[1] || gTerrainRendererMgr.pCourse->v60[2]) {
-        gSession.f5B3C = gTerrainRendererMgr.pCourse->v60[0];
-        gSession.f5B40 = gTerrainRendererMgr.pCourse->v60[1];
-        gSession.f5B44 = gTerrainRendererMgr.pCourse->v60[2];
+    if (gTerRenderer.pCourse->v60[0] || gTerRenderer.pCourse->v60[1] || gTerRenderer.pCourse->v60[2]) {
+        gSession.f5B3C = gTerRenderer.pCourse->v60[0];
+        gSession.f5B40 = gTerRenderer.pCourse->v60[1];
+        gSession.f5B44 = gTerRenderer.pCourse->v60[2];
         gSession.f5B48 = 1.0f;
     } else {
         gSession.f5B3C = v8[0];
@@ -2026,9 +2026,9 @@ void Ter_CourseLoadCallback(UStreamObject* pObject) {
 // Sets the three levels of detail's object mipmap biases (fDefaultObjectMipmapBias) from course n's
 // row of gTerCourseMipmapBias.
 void Ter_SetCourseMipmapBias(int n) {
-    gTerrainRendererMgr.fDefaultObjectMipmapBias[0] = gTerCourseMipmapBias[n][0];
-    gTerrainRendererMgr.fDefaultObjectMipmapBias[1] = gTerCourseMipmapBias[n][1];
-    gTerrainRendererMgr.fDefaultObjectMipmapBias[2] = gTerCourseMipmapBias[n][2];
+    gTerRenderer.fDefaultObjectMipmapBias[0] = gTerCourseMipmapBias[n][0];
+    gTerRenderer.fDefaultObjectMipmapBias[1] = gTerCourseMipmapBias[n][1];
+    gTerRenderer.fDefaultObjectMipmapBias[2] = gTerCourseMipmapBias[n][2];
 }
 
 // Unloads the hole's terrain (the hole loader, Code8006F438.c): stops the crowd, frees the 'ter '
@@ -2036,16 +2036,16 @@ void Ter_SetCourseMipmapBias(int n) {
 // and 16).
 void Ter_UnloadHole(void) {
     Ter_StopCrowdAnimation(1);
-    if (gTerrainRendererMgr.pCurrentHoleData != NULL) {
-        fn_800075CC(gTerrainRendererMgr.pCurrentHoleData);
-        gTerrainRendererMgr.pCurrentHoleData = NULL;
-        StaticMem_Free(gTerrainRendererMgr.pCurrentHoleDataStreamData);
+    if (gTerRenderer.pCurrentHoleData != NULL) {
+        fn_800075CC(gTerRenderer.pCurrentHoleData);
+        gTerRenderer.pCurrentHoleData = NULL;
+        StaticMem_Free(gTerRenderer.pCurrentHoleDataStreamData);
     }
-    if (gTerrainRendererMgr.pCourse != NULL) {
-        StaticMem_Free(gTerrainRendererMgr.pCourseStreamData);
-        gTerrainRendererMgr.pCourse = NULL;
+    if (gTerRenderer.pCourse != NULL) {
+        StaticMem_Free(gTerRenderer.pCourseStreamData);
+        gTerRenderer.pCourse = NULL;
     }
-    gTerrainRendererMgr.iLowLODListOffset = -1;
+    gTerRenderer.iLowLODListOffset = -1;
     gTerLODDataNear = -1;
     gTerLODDataFar = -1;
     gTerLOD0Steps = 26;
@@ -2056,11 +2056,11 @@ void Ter_UnloadHole(void) {
 void Ter_TeeLoadCallback(UStreamObject* pObject) {
     TerPosData* pTee = (TerPosData*)pObject->pData;
 
-    if (gTerrainRendererMgr.pCourse != NULL) {
-        gTerrainRendererMgr.pCourse->tee[pTee->nIndex].x = pTee->vPos[0];
-        gTerrainRendererMgr.pCourse->tee[pTee->nIndex].y = pTee->vPos[1];
-        gTerrainRendererMgr.pCourse->tee[pTee->nIndex].z = pTee->vPos[2];
-        gTerrainRendererMgr.pCourse->tee[pTee->nIndex].w = 1.0f;
+    if (gTerRenderer.pCourse != NULL) {
+        gTerRenderer.pCourse->tee[pTee->nIndex].x = pTee->vPos[0];
+        gTerRenderer.pCourse->tee[pTee->nIndex].y = pTee->vPos[1];
+        gTerRenderer.pCourse->tee[pTee->nIndex].z = pTee->vPos[2];
+        gTerRenderer.pCourse->tee[pTee->nIndex].w = 1.0f;
     }
     StaticMem_Free(pObject);
 }
@@ -2071,18 +2071,18 @@ void Ter_TeeLoadCallback(UStreamObject* pObject) {
 u8 Ter_PinLoadCallback(UStreamObject* pObject) {
     TerPosData* pPin = (TerPosData*)pObject->pData;
 
-    if (gTerrainRendererMgr.pCourse != NULL) {
+    if (gTerRenderer.pCourse != NULL) {
         if (GM_Currently_SkillZoneMode()) {
             GameModeSkillZoneBase_AddCup(pPin->vPos[0], pPin->vPos[1], pPin->vPos[2]);
-        } else if (0.0f != gTerrainRendererMgr.pCourse->pin[pPin->nIndex].w) {
-            pPin->vPos[0] = gTerrainRendererMgr.pCourse->pin[pPin->nIndex].x;
-            pPin->vPos[1] = gTerrainRendererMgr.pCourse->pin[pPin->nIndex].y;
-            pPin->vPos[2] = gTerrainRendererMgr.pCourse->pin[pPin->nIndex].z;
+        } else if (0.0f != gTerRenderer.pCourse->pin[pPin->nIndex].w) {
+            pPin->vPos[0] = gTerRenderer.pCourse->pin[pPin->nIndex].x;
+            pPin->vPos[1] = gTerRenderer.pCourse->pin[pPin->nIndex].y;
+            pPin->vPos[2] = gTerRenderer.pCourse->pin[pPin->nIndex].z;
         } else {
-            gTerrainRendererMgr.pCourse->pin[pPin->nIndex].x = pPin->vPos[0];
-            gTerrainRendererMgr.pCourse->pin[pPin->nIndex].y = pPin->vPos[1];
-            gTerrainRendererMgr.pCourse->pin[pPin->nIndex].z = pPin->vPos[2];
-            gTerrainRendererMgr.pCourse->pin[pPin->nIndex].w = 1.0f;
+            gTerRenderer.pCourse->pin[pPin->nIndex].x = pPin->vPos[0];
+            gTerRenderer.pCourse->pin[pPin->nIndex].y = pPin->vPos[1];
+            gTerRenderer.pCourse->pin[pPin->nIndex].z = pPin->vPos[2];
+            gTerRenderer.pCourse->pin[pPin->nIndex].w = 1.0f;
         }
     }
     StaticMem_Free(pObject);
@@ -2121,9 +2121,9 @@ void Ter_UpdateFlagForWind(void) {
 // Draws the loaded hole's terrain in view n (gomainloop, once per view); nothing before a 'ter '
 // chunk has arrived.
 void Ter_DrawHoleView(int n) {
-    if (gTerrainRendererMgr.pCurrentHoleData != NULL) {
+    if (gTerRenderer.pCurrentHoleData != NULL) {
         Ter_BeginRender();
-        Ter_RenderView(gTerrainRendererMgr.pCurrentHoleData, n);
+        Ter_RenderView(gTerRenderer.pCurrentHoleData, n);
         Ter_EndRender();
     }
 }
@@ -2134,7 +2134,7 @@ UObjMesh* Ter_GetObjectListModel(u16 nPatch, u16 nObjList) {
     UObjMesh* pModel = NULL;
     UObjMesh* pNode;
 
-    pNode = Ter_GetMeshChild(fn_80035500(gTerrainRendererMgr.pCurrentHoleData), 1);
+    pNode = Ter_GetMeshChild(fn_80035500(gTerRenderer.pCurrentHoleData), 1);
     if (nPatch < Ter_GetMeshChildCount(pNode)) {
         pNode = Ter_GetMeshChild(pNode, nPatch);
         if (Ter_GetMeshChildCount(pNode) >= 2) {
@@ -2153,7 +2153,7 @@ UObjMesh* Ter_GetObjectListModel(u16 nPatch, u16 nObjList) {
 // fn_80034DE4).
 void Ter_RenderGrass(void) {
     int i;
-    void* pHoleData = gTerrainRendererMgr.pCurrentHoleData;
+    void* pHoleData = gTerRenderer.pCurrentHoleData;
     CamLens* pLens = Camera_GetCurrentLens();
     f32 vDiff[4];
     f32 fDist;
@@ -2168,26 +2168,26 @@ void Ter_RenderGrass(void) {
     DS_vSetAlphaTestMode(1, 6, 1);
     RenderState_SetDrawFlags(0x70);
     RenderState_Flush();
-    gTerrainRendererMgr.xCameraReferencePos[0] = pLens->m4[3][0];
-    gTerrainRendererMgr.xCameraReferencePos[1] = pLens->m4[3][1];
-    gTerrainRendererMgr.xCameraReferencePos[2] = pLens->m4[3][2];
-    gTerrainRendererMgr.xCameraReferencePos[3] = 1.0f;
-    gTerrainRendererMgr.xCameraLookVector[0] = pLens->m4[2][0];
-    gTerrainRendererMgr.xCameraLookVector[1] = pLens->m4[2][1];
-    gTerrainRendererMgr.xCameraLookVector[2] = pLens->m4[2][2];
-    gTerrainRendererMgr.xCameraLookVector[3] = 1.0f;
-    gTerrainRendererMgr.fXZDistanceToClosestBallSquared = 1000000.0f;
+    gTerRenderer.xCameraReferencePos[0] = pLens->m4[3][0];
+    gTerRenderer.xCameraReferencePos[1] = pLens->m4[3][1];
+    gTerRenderer.xCameraReferencePos[2] = pLens->m4[3][2];
+    gTerRenderer.xCameraReferencePos[3] = 1.0f;
+    gTerRenderer.xCameraLookVector[0] = pLens->m4[2][0];
+    gTerRenderer.xCameraLookVector[1] = pLens->m4[2][1];
+    gTerRenderer.xCameraLookVector[2] = pLens->m4[2][2];
+    gTerRenderer.xCameraLookVector[3] = 1.0f;
+    gTerRenderer.fXZDistanceToClosestBallSquared = 1000000.0f;
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        fn_80035490(gPlayers[i].ball.vPos, gTerrainRendererMgr.xCameraReferencePos, vDiff);
+        fn_80035490(gPlayers[i].ball.vPos, gTerRenderer.xCameraReferencePos, vDiff);
         vDiff[1] = 0.0f;
         fDist = Vec3_LengthSqClamped(vDiff);
-        if (fDist < gTerrainRendererMgr.fXZDistanceToClosestBallSquared) {
-            gTerrainRendererMgr.fXZDistanceToClosestBallSquared = fDist;
+        if (fDist < gTerRenderer.fXZDistanceToClosestBallSquared) {
+            gTerRenderer.fXZDistanceToClosestBallSquared = fDist;
         }
     }
     fTan = Math_Tan(0.5f * pLens->fFov);
     fWideTan = Math_Tan(0.5f * (0.75f * pLens->fFov * fn_8001414C((u8*)fn_8003526C())));
-    gTerrainRendererMgr.fCameraMinHalfFieldOfViewTan =
+    gTerRenderer.fCameraMinHalfFieldOfViewTan =
         (fTan <= fWideTan / ViewController_GetCameraControl(0)->f54) ? fTan : fWideTan
                 / ViewController_GetCameraControl(0)->f54;
     RenderState_Flush();
@@ -2224,8 +2224,8 @@ void fn_80034CAC(int nRenderPass) {
                 break;
             }
             RenderState_Flush();
-            for (i = gTerrainRendererMgr.iNumGrassPatches - 1; i >= 0; i--) {
-                pPatch = &gTerrainRendererMgr.xpGrassPatchList[i];
+            for (i = gTerRenderer.iNumGrassPatches - 1; i >= 0; i--) {
+                pPatch = &gTerRenderer.xpGrassPatchList[i];
                 if (pPatch->eClipMethod == nClip && pPatch->iRenderPass == nRenderPass
                     && (pPatch->n1C & nPassBit)) {
                     Ter_DrawPatchGround(pPatch->pGround, nClip, nPass, pPatch->n1C, pPatch->n18, pPatch->n20,
@@ -2265,8 +2265,8 @@ void fn_80034DE4(void) {
             break;
         }
         RenderState_Flush();
-        for (i = gTerrainRendererMgr.iNumGrassPatches - 1; i >= 0; i--) {
-            pPatch = &gTerrainRendererMgr.xpGrassPatchList[i];
+        for (i = gTerRenderer.iNumGrassPatches - 1; i >= 0; i--) {
+            pPatch = &gTerRenderer.xpGrassPatchList[i];
             if (pPatch->eClipMethod == nClip && (pPatch->n1C & 0x80)) {
                 Ter_DrawPatchGround(pPatch->pGround, nClip, 3, pPatch->n1C, pPatch->n18, pPatch->n20,
                                     &bFirst, 0,
@@ -2296,27 +2296,27 @@ void fn_80034F28(void* pUnused) {
 
     // pUnused: the one caller, Ter_RenderGrass, passes the hole data, which this function does not read
     pCamera = RC_spGetCurrentRenderCtx();
-    gTerrainRendererMgr.iNumGrassPatches = 0;
-    pGrass = gTerrainRendererMgr.xpGrassPatchList;
-    for (i = 0; i < gTerrainRendererMgr.iTotalPatches; i++) {
-        pPatch = &gTerrainRendererMgr.pPatchList[i];
+    gTerRenderer.iNumGrassPatches = 0;
+    pGrass = gTerRenderer.xpGrassPatchList;
+    for (i = 0; i < gTerRenderer.iTotalPatches; i++) {
+        pPatch = &gTerRenderer.pPatchList[i];
         if ((pPatch->n1C & 0x80) || (Ter_GetMeshFlags(fn_8003556C(pPatch->pGround), 3) & 8)) {
             fRadius = fn_800354C4(fn_8003556C(pPatch->pGround))[3];
-            fDist = LLMath_DistanceBetween3(gTerrainRendererMgr.xCameraReferencePos,
+            fDist = LLMath_DistanceBetween3(gTerRenderer.xCameraReferencePos,
                                              fn_800354C4(fn_8003556C(pPatch->pGround)))
                     - fRadius;
             if (fDist < 0.0f) {
                 fDist = 0.0f;
             }
-            pView = ViewController_GetCameraControl(gTerrainRendererMgr.iCurrentViewContext);
+            pView = ViewController_GetCameraControl(gTerRenderer.iCurrentViewContext);
             nClip = fn_80007B2C(fn_8003556C(pPatch->pGround), pCamera, fDist,
-                                gTerrainRendererMgr.fCameraMinHalfFieldOfViewTan, pView->f54);
+                                gTerRenderer.fCameraMinHalfFieldOfViewTan, pView->f54);
             if (nClip != 3) {
                 Mem_cpy(pGrass, pPatch, sizeof(Ter_PatchReference));
                 pGrass->eClipMethod = nClip;
                 pGrass->fDistance = fDist;
                 pGrass++;
-                gTerrainRendererMgr.iNumGrassPatches++;
+                gTerRenderer.iNumGrassPatches++;
             }
         }
     }
@@ -2324,9 +2324,9 @@ void fn_80034F28(void* pUnused) {
 
 // Sets boManageZUpdate and returns what it was.
 u8 fn_8003505C(u8 b) {
-    u8 bOld = gTerrainRendererMgr.boManageZUpdate;
+    u8 bOld = gTerRenderer.boManageZUpdate;
 
-    gTerrainRendererMgr.boManageZUpdate = b;
+    gTerRenderer.boManageZUpdate = b;
     return bOld;
 }
 

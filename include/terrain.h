@@ -210,7 +210,7 @@ typedef struct TerSettings {
 } TerSettings;
 LAYOUT_ASSERT(TerSettings, 0x54);
 
-extern Ter_TerrainRendererMgr gTerrainRendererMgr;
+extern Ter_TerrainRendererMgr gTerRenderer;
 extern TerSettings* lbl_802811E0;    // Code8006F154.c: points at lbl_801D70A8
 extern TerSettings lbl_801D70A8;
 // A step of a crowd member's move from one pose state to another (0x14 bytes; Ter_AnimateObjects): when its

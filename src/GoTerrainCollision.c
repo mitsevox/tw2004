@@ -220,20 +220,20 @@ void Ter_InitTGD(CourseInfo* pCourse) {
         nPinSet = Game_CurrentPinSet();
         for (k = 0; k < NUM_CUP_POSITIONS; k++) {
             gpGame->nPinSet[Game_CurHoleIndex()] = k;
-            gTerrainRendererMgr.pCourse->pin[k].x
+            gTerRenderer.pCourse->pin[k].x
                 = (gTerCupGeometryBounds[k].vMin[0] + gTerCupGeometryBounds[k].vMax[0]) / 2.0f;
-            gTerrainRendererMgr.pCourse->pin[k].z
+            gTerRenderer.pCourse->pin[k].z
                 = (gTerCupGeometryBounds[k].vMin[2] + gTerCupGeometryBounds[k].vMax[2]) / 2.0f;
-            gTerrainRendererMgr.pCourse->pin[k].y = gTerCupGeometryBounds[k].vMax[1];
-            gTerrainRendererMgr.pCourse->pin[k].w = 1.0f;
+            gTerRenderer.pCourse->pin[k].y = gTerCupGeometryBounds[k].vMax[1];
+            gTerRenderer.pCourse->pin[k].w = 1.0f;
         }
         gpGame->nPinSet[Game_CurHoleIndex()] = nPinSet;
     }
-    gpGame->pPinPos = &gTerrainRendererMgr.pCourse->pin[Game_CurrentPinSet()].x;
+    gpGame->pPinPos = &gTerRenderer.pCourse->pin[Game_CurrentPinSet()].x;
     gTerNumOOBNetworks = 0;
     gTerNumFreeDropNetworks = 0;
-    Ter_ComputeHighestPointInEveryTriangle(gTerrainRendererMgr.pCourse);
-    gTerrainRendererMgr.pCourse->fFloor = Ter_CalcLowestPlayableWorldHeight(gTerrainRendererMgr.pCourse);
+    Ter_ComputeHighestPointInEveryTriangle(gTerRenderer.pCourse);
+    gTerRenderer.pCourse->fFloor = Ter_CalcLowestPlayableWorldHeight(gTerRenderer.pCourse);
 }
 
 // TW06: bool Ter_Use3DCupGeometry(void). Whether the cup is real geometry the ball drops into;
