@@ -247,7 +247,7 @@ typedef struct FEBio {
     s32  a34[6];                // 0x034  numbers the menus show
     char sz4C[0x1C];            // 0x04C
     s32  n68;                   // 0x068
-    s32  nCourse;               // 0x06C  shown as the course's name (lbl_80191990); -1: "N/A"
+    s32  nCourse;               // 0x06C  shown as the course's name (gCourseNames); -1: "N/A"
     char sz70[0x28];            // 0x070
     char sz98[0x160];           // 0x098  up to five lines, split at '\n'
 } FEBio;
@@ -532,7 +532,7 @@ void Gaud_StopMusic(void);                 // (0x800A75B4) FE_Manager.c calls it
 
 void FE_InitGameMessages(void);                 // fill the table
 void MC_SetCurrentFileType(int n);      // sets lbl_80281FFC
-extern char* lbl_80191990[30];          // per course: a string the menus show (a replay's course
+extern char* gCourseNames[30];          // per course: a string the menus show (a replay's course
                                         // picks it)
 extern s32 lbl_80281FFC;                // set by MC_SetCurrentFileType: the lbl_8018C7D8 set (memcard.h) the
                                         // menus' memory-card messages use

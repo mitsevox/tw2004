@@ -2359,7 +2359,7 @@ void GM_vGetCourseHoleName(MsgArg* pArgs, MsgArg* pResult) {
             strcpy(((MsgString*)pArgs[1].p)->pStr, "Sherwood CC");
             return;
         }
-        strcpy(((MsgString*)pArgs[1].p)->pStr, lbl_80191990[gpGame->nCurCourse]);
+        strcpy(((MsgString*)pArgs[1].p)->pStr, gCourseNames[gpGame->nCurCourse]);
         return;
     }
     if (gpGame->bCustomRound != 0) {
@@ -2405,7 +2405,7 @@ void GM_vGetCourseHoleName(MsgArg* pArgs, MsgArg* pResult) {
         strcpy(((MsgString*)pArgs[1].p)->pStr, "Sherwood CC");
         return;
     }
-    strcpy(((MsgString*)pArgs[1].p)->pStr, lbl_80191990[gpGame->nCurCourse]);
+    strcpy(((MsgString*)pArgs[1].p)->pStr, gCourseNames[gpGame->nCurCourse]);
 }
 
 // The UI holds the HUD's message queue (pArgs[0] nonzero) or lets it go (command 145;

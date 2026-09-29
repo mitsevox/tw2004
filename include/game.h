@@ -19,7 +19,7 @@ extern u8  lbl_8028227C;                // the split-screen choice (GM_SetSplitS
 extern Replay gReplayData;              // 0x801D6030
 
 #define NUM_COURSES 30
-extern char* lbl_80191990[NUM_COURSES]; // each course's name ("Pebble Beach", ...)
+extern char* gCourseNames[NUM_COURSES]; // each course's name ("Pebble Beach", ...)
 
 // The replay recorder's buffer (our name; 0x15260 bytes, made by REPLAY_InitModule at the start of a
 // round): what REPLAY_Save saves before a shot besides gReplayData, put back when it replays.
@@ -183,8 +183,8 @@ typedef struct BuiltRound {
 } BuiltRound;
 LAYOUT_ASSERT(BuiltRound, 0x24);
 
-extern BuiltRound lbl_801FA1F8[NUM_BUILT_ROUNDS];    // 0x801FA1F8
-extern CourseData lbl_801FA2F4[NUM_COURSE_DATA];     // 0x801FA2F4
+extern BuiltRound gCompilationCourses[NUM_BUILT_ROUNDS];    // 0x801FA1F8
+extern CourseData gCourseInfo[NUM_COURSE_DATA];     // 0x801FA2F4
 
 void GM_CourseInfo_DeInit(void);
 int  GM_GetCurrentHolePrevailingWindDir(void);

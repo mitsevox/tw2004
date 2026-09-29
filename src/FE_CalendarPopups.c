@@ -59,9 +59,9 @@ void PGATourPopup_GetRow_EventInProgress(int nRow, char* szTitle, char* szText) 
         GameModeDriverPGATour_GetCourses(GameModeDriverPGATour_GetEventInfo(nId), aCourses);
         nRounds = GameModeDriverPGATour_GetRounds(nId);
         if (nRound >= 0 && nRound < nRounds) {
-            strcpy(szText, lbl_80191990[aCourses[nRound]]);
+            strcpy(szText, gCourseNames[aCourses[nRound]]);
         } else {
-            strcpy(szText, lbl_80191990[aCourses[0]]);
+            strcpy(szText, gCourseNames[aCourses[0]]);
         }
         break;
     case 6:
@@ -184,9 +184,9 @@ void PGATourPopup_GetRow_EventUpcoming(int nRow, char* szTitle, char* szText) {
         nRounds = GameModeDriverPGATour_GetRounds(nId);
         GameModeDriverPGATour_GetCourses(pTournament, aCourses);
         if (nRound >= 0 && nRound < nRounds) {
-            strcpy(szText, lbl_80191990[aCourses[nRound]]);
+            strcpy(szText, gCourseNames[aCourses[nRound]]);
         } else {
-            strcpy(szText, lbl_80191990[aCourses[0]]);
+            strcpy(szText, gCourseNames[aCourses[0]]);
         }
         break;
     }

@@ -1,19 +1,19 @@
 // UKernel.c (EA's name, from its asserts; also in EA's 2002 source tree; TW06): the kernel's list
-// of the course's dynamic objects (dynobj.h), chained through DynObj.pNext from lbl_80281DBC to
-// lbl_80281DB8.
+// of the course's dynamic objects (dynobj.h), chained through DynObj.pNext from gKernelFirstObject to
+// gKernelLastObject.
 
 #include "dynobj.h"
 #include "terrain.h"
 #include "psmgr.h"
 
-DynObjSlot lbl_801D5228[32];
+DynObjSlot gKernelOverflowSlots[32];
 
-DynObj* lbl_80281DBC;
-DynObj* lbl_80281DB8;
-s32 lbl_80281DB4;
-u32 lbl_80281DB0;
-UMemPool* lbl_80281DAC;
-UMemPool* lbl_80281DA8;
+DynObj* gKernelFirstObject;
+DynObj* gKernelLastObject;
+s32 gKernelLastObjectId;
+u32 gKernelOverflowSlotMask;
+UMemPool* gKernelSmallObjectPool;
+UMemPool* gKernelLargeObjectPool;
 
 DynObj* Kernel_CreateObject(DynObjSetup* pSetup);
 void fn_8000E830(DynObj* pObj);
@@ -31,21 +31,21 @@ void Kernel_DownloadActors(UStreamObject* pObject);
 // Memory for an object of nSize bytes: a node of the small or the large pool while one is free,
 // else from the heap.
 void* Kernel_AllocObjectMem(int nSize) {
-    if (nSize < 400 && lbl_80281DAC->nFree != 0) {
-        return AllocPoolMem(lbl_80281DAC);
+    if (nSize < 400 && gKernelSmallObjectPool->nFree != 0) {
+        return AllocPoolMem(gKernelSmallObjectPool);
     }
-    if (nSize < 528 && lbl_80281DA8->nFree != 0) {
-        return AllocPoolMem(lbl_80281DA8);
+    if (nSize < 528 && gKernelLargeObjectPool->nFree != 0) {
+        return AllocPoolMem(gKernelLargeObjectPool);
     }
     return StaticMem_Alloc(nSize, 1, 16, "UKernel.c", 201);
 }
 
 // Gives an object's memory back to the pool it came from, or to the heap.
 void Kernel_FreeObjectMem(void* p) {
-    if ((u8*)p > (u8*)lbl_80281DAC && (u8*)p < lbl_80281DAC->pEnd) {
-        ReturnPoolMem(lbl_80281DAC, p);
-    } else if ((u8*)p > (u8*)lbl_80281DA8 && (u8*)p < lbl_80281DA8->pEnd) {
-        ReturnPoolMem(lbl_80281DA8, p);
+    if ((u8*)p > (u8*)gKernelSmallObjectPool && (u8*)p < gKernelSmallObjectPool->pEnd) {
+        ReturnPoolMem(gKernelSmallObjectPool, p);
+    } else if ((u8*)p > (u8*)gKernelLargeObjectPool && (u8*)p < gKernelLargeObjectPool->pEnd) {
+        ReturnPoolMem(gKernelLargeObjectPool, p);
     } else {
         StaticMem_Free(p);
     }
@@ -117,23 +117,23 @@ void Kernel_DownloadActors(UStreamObject* pObject) {
 // the two node pools (256 nodes each of 400 and 528 bytes) and an empty object list.
 void Kernel_InitModule(void) {
     Stream_RegisterLoadChunkCallback('Cact', Kernel_DownloadActors);
-    lbl_80281DAC = CreateMemPool(256, 400, 2, 16);
-    lbl_80281DA8 = CreateMemPool(256, 528, 2, 16);
-    lbl_80281DBC = NULL;
-    lbl_80281DB8 = NULL;
-    lbl_80281DB4 = 0;
-    lbl_80281DB0 = 0;
+    gKernelSmallObjectPool = CreateMemPool(256, 400, 2, 16);
+    gKernelLargeObjectPool = CreateMemPool(256, 528, 2, 16);
+    gKernelFirstObject = NULL;
+    gKernelLastObject = NULL;
+    gKernelLastObjectId = 0;
+    gKernelOverflowSlotMask = 0;
 }
 
 DynObj* Kernel_GetFirstObject(void) {
-    return lbl_80281DBC;
+    return gKernelFirstObject;
 }
 
 // The dynamic object whose id (n134, given by Kernel_CreateObject) is nId; NULL when none has it.
 DynObj* Kernel_FindObjectById(int nId) {
     DynObj* pObj;
 
-    for (pObj = lbl_80281DBC; pObj != NULL; pObj = pObj->pNext) {
+    for (pObj = gKernelFirstObject; pObj != NULL; pObj = pObj->pNext) {
         if (pObj->n134 == nId) {
             return pObj;
         }
@@ -147,7 +147,7 @@ DynObj* Kernel_FindObjectById(int nId) {
 void Kernel_CloseModule(void) {
     DynObj* pObj;
 
-    for (pObj = lbl_80281DBC; pObj != NULL; pObj = pObj->pNext) {
+    for (pObj = gKernelFirstObject; pObj != NULL; pObj = pObj->pNext) {
         if (pObj->n134 != 0) {
             pObj->uFlags |= 0x10000000;
             Kernel_ReleaseObject(pObj);
@@ -155,9 +155,9 @@ void Kernel_CloseModule(void) {
     }
     Kernel_SweepDeadObjects();
     Kernel_SweepDeadObjects();
-    lbl_80281DB4 = 0;
-    DeleteMemPool(lbl_80281DAC);
-    DeleteMemPool(lbl_80281DA8);
+    gKernelLastObjectId = 0;
+    DeleteMemPool(gKernelSmallObjectPool);
+    DeleteMemPool(gKernelLargeObjectPool);
 }
 
 // Removes every dynamic object as Kernel_CloseModule does, but keeps the pools and starts the list,
@@ -165,7 +165,7 @@ void Kernel_CloseModule(void) {
 void Kernel_RemoveAllObjects(void) {
     DynObj* pObj;
 
-    for (pObj = lbl_80281DBC; pObj != NULL; pObj = pObj->pNext) {
+    for (pObj = gKernelFirstObject; pObj != NULL; pObj = pObj->pNext) {
         if (pObj->n134 != 0) {
             pObj->uFlags |= 0x10000000;
             Kernel_ReleaseObject(pObj);
@@ -173,17 +173,17 @@ void Kernel_RemoveAllObjects(void) {
     }
     Kernel_SweepDeadObjects();
     Kernel_SweepDeadObjects();
-    lbl_80281DBC = NULL;
-    lbl_80281DB8 = NULL;
-    lbl_80281DB4 = 0;
-    lbl_80281DB0 = 0;
+    gKernelFirstObject = NULL;
+    gKernelLastObject = NULL;
+    gKernelLastObjectId = 0;
+    gKernelOverflowSlotMask = 0;
 }
 
 // Sends message nMsg with pArg and pArg2 to the handler of every live object (id above 0).
 void Kernel_BroadcastMessage(int nMsg, void* pArg, void* pArg2) {
     DynObj* pObj;
 
-    for (pObj = lbl_80281DBC; pObj != NULL; pObj = pObj->pNext) {
+    for (pObj = gKernelFirstObject; pObj != NULL; pObj = pObj->pNext) {
         if (pObj->n134 > 0) {
             pObj->pfnHandler(nMsg, pObj, pArg, pArg2);
         }
@@ -193,12 +193,12 @@ void Kernel_BroadcastMessage(int nMsg, void* pArg, void* pArg2) {
 // Links the new object in at the end of the kernel's list (its pNext cleared); Kernel_CreateObject
 // calls it.
 void Kernel_AppendObject(DynObj* pObj) {
-    if (lbl_80281DB8 != NULL) {
-        lbl_80281DB8->pNext = pObj;
-        lbl_80281DB8 = pObj;
+    if (gKernelLastObject != NULL) {
+        gKernelLastObject->pNext = pObj;
+        gKernelLastObject = pObj;
     } else {
-        lbl_80281DBC = pObj;
-        lbl_80281DB8 = pObj;
+        gKernelFirstObject = pObj;
+        gKernelLastObject = pObj;
     }
     pObj->pNext = NULL;
 }
@@ -212,7 +212,7 @@ DynObj* Kernel_CreateObject(DynObjSetup* pSetup) {
         return NULL;
     }
     pObj->pfnHandler = pSetup->pfnHandler;
-    pObj->n134 = ++lbl_80281DB4;
+    pObj->n134 = ++gKernelLastObjectId;
     pObj->pfnHandler(2, pObj, pSetup, NULL);
     Kernel_AppendObject(pObj);
     return pObj;
@@ -236,7 +236,7 @@ void Kernel_SweepDeadObjects(void) {
     DynObj* pObj;
     DynObj* pAfter;
 
-    pNext = lbl_80281DBC;
+    pNext = gKernelFirstObject;
     while (pNext != NULL) {
         pObj = pNext;
         pNext = pNext->pNext;
@@ -249,10 +249,10 @@ void Kernel_SweepDeadObjects(void) {
                 if (pPrev != NULL) {
                     pAfter = pPrev->pNext = pObj->pNext;
                 } else {
-                    pAfter = lbl_80281DBC = pObj->pNext;
+                    pAfter = gKernelFirstObject = pObj->pNext;
                 }
                 if (pAfter == NULL) {
-                    lbl_80281DB8 = pPrev;
+                    gKernelLastObject = pPrev;
                 }
                 Kernel_FreeObjectMem(pObj);
             } else {
@@ -275,23 +275,23 @@ void Kernel_ReleaseObject(DynObj* pObj) {
     }
 }
 
-// Takes a free entry of lbl_801D5228 for the object and the pair (a, b). 0 when all 16 are taken.
+// Takes a free entry of gKernelOverflowSlots for the object and the pair (a, b). 0 when all 16 are taken.
 int Kernel_PostPairToOverflowSlot(DynObj* pObj, int a, int b) {
     DynObjSlot* pSlot;
     u32 uBit;
 
-    if (lbl_80281DB0 == 0xFFFF) {
+    if (gKernelOverflowSlotMask == 0xFFFF) {
         return 0;
     }
     uBit = 1;
-    pSlot = lbl_801D5228;
-    while (lbl_80281DB0 & uBit) {
+    pSlot = gKernelOverflowSlots;
+    while (gKernelOverflowSlotMask & uBit) {
         uBit <<= 1;
         pSlot++;
     }
     pSlot->pObj = pObj;
     pSlot->pair.b0 = a;
-    lbl_80281DB0 |= uBit;
+    gKernelOverflowSlotMask |= uBit;
     pSlot->pair.b1 = b;
     pSlot->nId = pObj->n134;
     pSlot->n2 = 600;
@@ -299,7 +299,7 @@ int Kernel_PostPairToOverflowSlot(DynObj* pObj, int a, int b) {
 }
 
 // Records the pair (a, b) on the object, in its first free pair; when all four are taken and
-// bOverflow is set, in lbl_801D5228 instead. 0 when it could not be recorded.
+// bOverflow is set, in gKernelOverflowSlots instead. 0 when it could not be recorded.
 int Kernel_PostPairToObject(DynObj* pObj, int a, int b, int bOverflow) {
     int i = 0;
 
@@ -325,7 +325,7 @@ void Kernel_PostPairByActorId(int nKey, int a, int b) {
     case 126:
         return;
     default:
-        for (pObj = lbl_80281DBC; pObj != NULL; pObj = pObj->pNext) {
+        for (pObj = gKernelFirstObject; pObj != NULL; pObj = pObj->pNext) {
             if (pObj->n140 == nKey && pObj->n134 != 0) {
                 Kernel_PostPairToObject(pObj, a, b, 1);
             }
@@ -338,7 +338,7 @@ void Kernel_PostPairByActorId(int nKey, int a, int b) {
 void Kernel_PostPairByKey147(int nKey, int a, int b) {
     DynObj* pObj;
 
-    for (pObj = lbl_80281DBC; pObj != NULL; pObj = pObj->pNext) {
+    for (pObj = gKernelFirstObject; pObj != NULL; pObj = pObj->pNext) {
         if (pObj->n147 == nKey && pObj->n134 != 0) {
             Kernel_PostPairToObject(pObj, a, b, 1);
         }
@@ -349,7 +349,7 @@ void Kernel_PostPairByKey147(int nKey, int a, int b) {
 void Kernel_PostPairByKey148(int nKey, int a, int b) {
     DynObj* pObj;
 
-    for (pObj = lbl_80281DBC; pObj != NULL; pObj = pObj->pNext) {
+    for (pObj = gKernelFirstObject; pObj != NULL; pObj = pObj->pNext) {
         if (pObj->n148 == nKey && pObj->n134 != 0) {
             Kernel_PostPairToObject(pObj, a, b, 1);
         }
@@ -361,7 +361,7 @@ void Kernel_PostPairByKey148(int nKey, int a, int b) {
 int Kernel_QueryActorById(int nKey, uptr nWhat) {
     DynObj* pObj;
 
-    for (pObj = lbl_80281DBC; pObj != NULL; pObj = pObj->pNext) {
+    for (pObj = gKernelFirstObject; pObj != NULL; pObj = pObj->pNext) {
         if (pObj->n140 == nKey) {
             return pObj->pfnHandler(9, pObj, (void*)nWhat, NULL);
         }

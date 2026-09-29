@@ -72,7 +72,7 @@ void LadderMenu_GetEventText(MsgArg* pArgs, MsgArg* pResult) {
     }
     nCourse = GameMode4_GetEventCourse(gLadderMap.nEvent);
     if (nCourse <= NUM_COURSES - 1) {
-        strcpy(szCourse, lbl_80191990[nCourse]);
+        strcpy(szCourse, gCourseNames[nCourse]);
     }
     GameMode4_GetEventName(gLadderMap.nEvent, szName);
     strcpy(szStage, gLadderStageNames[LadderMap_GetEventStage(gLadderMap.nEvent)]);

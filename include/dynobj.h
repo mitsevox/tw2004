@@ -81,7 +81,7 @@ typedef struct DynObjSetup {
     DynObjNames* pC;            // 0x0C
 } DynObjSetup;
 
-// Two bytes UKernel.c's Kernel_PostPairToObject records on an object (DynObj.a138), or in lbl_801D5228 when
+// Two bytes UKernel.c's Kernel_PostPairToObject records on an object (DynObj.a138), or in gKernelOverflowSlots when
 // the object's four are taken.
 typedef struct DynObjPair {
     u8   b0;                    // 0x0
@@ -327,7 +327,7 @@ typedef struct AnimalStep {
 } AnimalStep;
 extern AnimalStep gAnimalPoseSteps[6];
 
-// One entry of UKernel.c's lbl_801D5228 (12 bytes), taken by Kernel_PostPairToOverflowSlot.
+// One entry of UKernel.c's gKernelOverflowSlots (12 bytes), taken by Kernel_PostPairToOverflowSlot.
 typedef struct DynObjSlot {
     DynObjPair pair;            // 0x00
     s16  n2;                    // 0x02  600 when taken
@@ -336,7 +336,7 @@ typedef struct DynObjSlot {
 } DynObjSlot;
 LAYOUT_ASSERT(DynObjSlot, 0xC);
 
-extern DynObjSlot lbl_801D5228[32];
+extern DynObjSlot gKernelOverflowSlots[32];
 
 // GoDynObj.c's two records per player (our names; 0x104 and 0x100 bytes, GoDynObjMgr.aA and aB).
 typedef struct GoDynObjPlayerA {
@@ -410,14 +410,14 @@ extern char gGolfBallLogoSlotNames[4][13];        // GoDynObj.c: each player's b
 extern f32  gGolfBallScale;               // 1.0: scales the ball's radius (DynObj_GetBallPixels); owner unknown
 
 // UKernel.c's list of the objects, first and last, the last id given out (DynObj.n134), a bit
-// mask of the used entries of lbl_801D5228 (Kernel_PostPairToOverflowSlot; 16 at most), and two
+// mask of the used entries of gKernelOverflowSlots (Kernel_PostPairToOverflowSlot; 16 at most), and two
 // node pools (400- and 528-byte nodes).
-extern DynObj* lbl_80281DBC;
-extern DynObj* lbl_80281DB8;
-extern s32 lbl_80281DB4;
-extern u32 lbl_80281DB0;
-extern UMemPool* lbl_80281DAC;
-extern UMemPool* lbl_80281DA8;
+extern DynObj* gKernelFirstObject;
+extern DynObj* gKernelLastObject;
+extern s32 gKernelLastObjectId;
+extern u32 gKernelOverflowSlotMask;
+extern UMemPool* gKernelSmallObjectPool;
+extern UMemPool* gKernelLargeObjectPool;
 
 // LLObj_Gc.c
 void fn_800075CC(UObjModelRoot* pRoot);    // frees a model fn_800073B4 made

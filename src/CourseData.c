@@ -21,8 +21,8 @@ u8   GM_GetHoleIndexDrivingSideGame(int nHole);
 int  GM_CourseInfo_MapCompilationCourse(int nRound);
 int  GM_CurrentCourseTotalPar4andPar5Holes(void);
 
-CourseData lbl_801FA2F4[NUM_COURSE_DATA];
-BuiltRound lbl_801FA1F8[NUM_BUILT_ROUNDS];
+CourseData gCourseInfo[NUM_COURSE_DATA];
+BuiltRound gCompilationCourses[NUM_BUILT_ROUNDS];
 
 // The course table's close, called by GM_DeInitModule with the other units' stream frees: empty
 // (the 'CRI ' and 'CMPS' tables are static arrays, nothing to free).
@@ -45,33 +45,33 @@ void GM_CourseInfo_UnRegisterStreamClients(void) {
 // port: both chunks are copied straight into their tables; they are big-endian on disc, so a
 //       little-endian port converts them field by field here (docs/format-byteorder.md)
 void GM_CourseInfo_LoadCRIfromStream(UStreamObject* pObject) {
-    Stream_StreamLoadFixedSize(pObject, sizeof(lbl_801FA2F4), lbl_801FA2F4);
+    Stream_StreamLoadFixedSize(pObject, sizeof(gCourseInfo), gCourseInfo);
 }
 
 // The 'CMPS' chunk's loader: copies it into gCompilationCourses.
 void GM_CourseInfo_LoadCMPSfromStream(UStreamObject* pObject) {
-    Stream_StreamLoadFixedSize(pObject, sizeof(lbl_801FA1F8), lbl_801FA1F8);
+    Stream_StreamLoadFixedSize(pObject, sizeof(gCompilationCourses), gCompilationCourses);
 }
 
 // Hole nHole's (0-based) par on course nCourse, from the course table.
 int GM_GetHolePar(int nCourse, int nHole) {
-    return lbl_801FA2F4[nCourse].aHoles[nHole].nPar;
+    return gCourseInfo[nCourse].aHoles[nHole].nPar;
 }
 
 // The par of the round's hole nHole (0..17; the round's own course and hole for that slot).
 int GM_GetHoleIndexPar(int nHole) {
-    return lbl_801FA2F4[gpGame->nHoleCourse[nHole]].aHoles[gpGame->nHoleNum[nHole]].nPar;
+    return gCourseInfo[gpGame->nHoleCourse[nHole]].aHoles[gpGame->nHoleNum[nHole]].nPar;
 }
 
 // The current hole's par.
 int GM_GetCurrentHolePar(void) {
-    return lbl_801FA2F4[Game_GetCourse()].aHoles[Game_GetCurHoleNum()].nPar;
+    return gCourseInfo[Game_GetCourse()].aHoles[Game_GetCurHoleNum()].nPar;
 }
 
 // The handicap (stroke index) of the round's hole nHole (0..17): the course table's field nRating,
 // which the scorecard shows (GM_vGetHoleRating).
 s32 GM_GetHoleIndexHandicap(int nHole) {
-    return lbl_801FA2F4[gpGame->nHoleCourse[nHole]].aHoles[gpGame->nHoleNum[nHole]].nRating;
+    return gCourseInfo[gpGame->nHoleCourse[nHole]].aHoles[gpGame->nHoleNum[nHole]].nRating;
 }
 
 // Hole nHole's length (yards) on course nCourse from tee nTee (0..3: fields n14, n10, n0C, n08); 0
@@ -79,13 +79,13 @@ s32 GM_GetHoleIndexHandicap(int nHole) {
 s32 GM_GetHoleTeeDistance(int nCourse, int nHole, int nTee) {
     switch (nTee) {
     case 0:
-        return lbl_801FA2F4[nCourse].aHoles[nHole].n14;
+        return gCourseInfo[nCourse].aHoles[nHole].n14;
     case 1:
-        return lbl_801FA2F4[nCourse].aHoles[nHole].n10;
+        return gCourseInfo[nCourse].aHoles[nHole].n10;
     case 2:
-        return lbl_801FA2F4[nCourse].aHoles[nHole].n0C;
+        return gCourseInfo[nCourse].aHoles[nHole].n0C;
     case 3:
-        return lbl_801FA2F4[nCourse].aHoles[nHole].n08;
+        return gCourseInfo[nCourse].aHoles[nHole].n08;
     }
     return 0;
 }
@@ -102,11 +102,11 @@ s32 GM_GetCurrentHoleTeeDistance(int nTee) {
 // The current hole's authored (prevailing) wind direction, 0..7 as gWindDirs; Wind_InitForHole
 // rolls a wind when both it and the speed are 0.
 int GM_GetCurrentHolePrevailingWindDir(void) {
-    return lbl_801FA2F4[Game_GetCourse()].aHoles[Game_GetCurHoleNum()].nWindDir;
+    return gCourseInfo[Game_GetCourse()].aHoles[Game_GetCurHoleNum()].nWindDir;
 }
 
 f32 GM_GetCurrentHolePrevailingWindSpeed(void) {
-    return lbl_801FA2F4[Game_GetCourse()].aHoles[Game_GetCurHoleNum()].fWindSpeed;
+    return gCourseInfo[Game_GetCourse()].aHoles[Game_GetCurHoleNum()].fWindSpeed;
 }
 
 // The round's length (yards) from tee nTee: its 18 holes added up (GM_vGetTeeYardage).
@@ -174,7 +174,7 @@ s32 GM_GetTotalPar(int nCourse, int nTeeSet) {
         }
         return nPar;
     }
-    return lbl_801FA2F4[nCourse].aTeeSets[nTeeSet].nPar;
+    return gCourseInfo[nCourse].aTeeSets[nTeeSet].nPar;
 }
 
 // The par of the round's 18 holes (nTeeSet is not used).
@@ -191,19 +191,19 @@ s32 GM_GetCurrentCourseTotalPar(s32 nTeeSet) {
 // course-table byte 0x34 (b34). The round's frame then sets gSession.b11, which skips the terrain
 // objects' sort and level fades and the golfers' morph blending.
 u8 GM_GetCurrentHoleSplitScreenLowDetail(void) {
-    return lbl_801FA2F4[Game_GetCourse()].aHoles[Game_GetCurHoleNum()].b34;
+    return gCourseInfo[Game_GetCourse()].aHoles[Game_GetCurHoleNum()].b34;
 }
 
 // Whether the round's hole nHole (0..17) can hold the longest-drive contest (course-table byte
 // 0x35, b35); HoleContest_DrawHoles also needs a par 4 or 5.
 u8 GM_GetHoleIndexDrivingSideGame(int nHole) {
-    return lbl_801FA2F4[gpGame->nHoleCourse[nHole]].aHoles[gpGame->nHoleNum[nHole]].b35;
+    return gCourseInfo[gpGame->nHoleCourse[nHole]].aHoles[gpGame->nHoleNum[nHole]].b35;
 }
 
 // Whether the round's hole nHole's drive counts for the driving-distance stats (course-table byte
 // 0x37, b37): the PGA Tour's end of hole and its simulated players both check it.
 u8 GM_GetHoleIndexCountsForDrivingStat(int nHole) {
-    return lbl_801FA2F4[gpGame->nHoleCourse[nHole]].aHoles[gpGame->nHoleNum[nHole]].b37;
+    return gCourseInfo[gpGame->nHoleCourse[nHole]].aHoles[gpGame->nHoleNum[nHole]].b37;
 }
 
 // Which row of the 'CMPS' compilation table a built round uses: course 22 (Tiger's Dream 18) row 0,
@@ -230,13 +230,13 @@ int GM_CourseInfo_MapCompilationCourse(int nRound) {
 
 // The course that built round nRound's hole nHole (0..17) is taken from.
 int GM_CourseInfo_GetCompilationCourse(int nRound, int nHole) {
-    return lbl_801FA1F8[GM_CourseInfo_MapCompilationCourse(nRound)].aHoles[nHole].nCourse;
+    return gCompilationCourses[GM_CourseInfo_MapCompilationCourse(nRound)].aHoles[nHole].nCourse;
 }
 
 // The hole number (1-based) on its own course of built round nRound's hole nHole (0..17).
 int GM_CourseInfo_GetCompilationHole(int nRound, int nHole) {
     int nRow = GM_CourseInfo_MapCompilationCourse(nRound);
-    return lbl_801FA1F8[nRow].aHoles[nHole].nHole;
+    return gCompilationCourses[nRow].aHoles[nHole].nHole;
 }
 
 // How many of the round's 18 holes are a par nPar.
@@ -258,7 +258,7 @@ int GM_CurrentCourseTotalPar4andPar5Holes(void) {
 
 // Data order: after GM_CourseInfo_MapCompilationCourse's jump table in .data; "Skillz" and "NA"
 // land in .sdata.
-char* lbl_80191990[NUM_COURSES] = {
+char* gCourseNames[NUM_COURSES] = {
     "Pebble Beach",
     "Princeville Resort",
     "TPC at Sawgrass",

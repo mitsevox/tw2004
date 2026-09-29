@@ -2069,7 +2069,7 @@ void GM_vFindGolferBio(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 68: bio pArgs[0]'s four texts (FEBio sz4, sz24, sz4C, sz70) into the strings
-// pArgs[1] to pArgs[4], and the name of its course (lbl_80191990[nCourse]) into pArgs[5], "N/A"
+// pArgs[1] to pArgs[4], and the name of its course (gCourseNames[nCourse]) into pArgs[5], "N/A"
 // when nCourse is -1.
 void GM_vGetBioTexts(MsgArg* pArgs, MsgArg* pResult) {
     s32 nBio = pArgs[0].i;
@@ -2082,7 +2082,7 @@ void GM_vGetBioTexts(MsgArg* pArgs, MsgArg* pResult) {
         strcpy(((MsgString*)pArgs[5].p)->pStr, "N/A");
         return;
     }
-    strcpy(((MsgString*)pArgs[5].p)->pStr, lbl_80191990[gpFEBios[nBio].nCourse]);
+    strcpy(((MsgString*)pArgs[5].p)->pStr, gCourseNames[gpFEBios[nBio].nCourse]);
 }
 
 // Front-end message 293: bio pArgs[0]'s long text (FEBio sz98) split at its newlines into the
@@ -3688,10 +3688,10 @@ void GM_vGetHolePar(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = GM_GetHolePar(nCourseArg, pArgs[1].i);
 }
 
-// Front-end message 194: the name of the replay's course (lbl_80191990[gReplayData.nCourse]) into
+// Front-end message 194: the name of the replay's course (gCourseNames[gReplayData.nCourse]) into
 // the string pArgs[0].
 void GM_vGetReplayCourseName(MsgArg* pArgs, MsgArg* pResult) {
-    strcpy(((MsgString*)pArgs[0].p)->pStr, lbl_80191990[gReplayData.nCourse]);
+    strcpy(((MsgString*)pArgs[0].p)->pStr, gCourseNames[gReplayData.nCourse]);
 }
 
 // Front-end message 195: the saved replay's hole (gReplayData.nHole). Messages 194 and 196 give its
@@ -4910,10 +4910,10 @@ void GM_vEndGameLoop(MsgArg* pArgs, MsgArg* pResult) {
     gSession.nC = 2;
 }
 
-// Front-end message 282: course pArgs[0]'s name (lbl_80191990: "Pebble Beach", ...), copied into
+// Front-end message 282: course pArgs[0]'s name (gCourseNames: "Pebble Beach", ...), copied into
 // the string pArgs[1].
 void GM_vGetCourseName(MsgArg* pArgs, MsgArg* pResult) {
-    strcpy(((MsgString*)pArgs[1].p)->pStr, lbl_80191990[pArgs[0].i]);
+    strcpy(((MsgString*)pArgs[1].p)->pStr, gCourseNames[pArgs[0].i]);
 }
 
 // Front-end message 284: empty in this build.

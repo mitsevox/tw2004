@@ -143,11 +143,11 @@ void PGASchedule_GetRow(MsgArg* pArgs, MsgArg* pResult) {
             break;
         }
     }
-    strcpy(szCourses, lbl_80191990[aCourses[0]]);
+    strcpy(szCourses, gCourseNames[aCourses[0]]);
     if (!bOneCourse) {
         for (i = 1; i < nCourses; i++) {
             strcat(szCourses, "\n");
-            strcat(szCourses, lbl_80191990[aCourses[i]]);
+            strcat(szCourses, gCourseNames[aCourses[i]]);
         }
     }
     GameModeDriverPGATour_GetChamp(nEvent, szChamp);

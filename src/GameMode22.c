@@ -159,7 +159,7 @@ void TrophyRoom_GetLadderAward(MsgArg* pArgs, MsgArg* pResult) {
     char* szDate = ((MsgString*)pArgs[2].p)->pStr;
     SaveProfile* pProfile = FE_GetCurrentProfile();
 
-    strcpy(szCourse, lbl_80191990[GameMode4_GetEventCourse(nEvent)]);
+    strcpy(szCourse, gCourseNames[GameMode4_GetEventCourse(nEvent)]);
     if (pProfile->aLadderAward[nEvent].bWon) {
         CalDate_ToString(FE_GetCurrentProfile()->aLadderAward[nEvent].nDate, szDate);
         return;
