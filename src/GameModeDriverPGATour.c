@@ -583,7 +583,7 @@ void GameModeDriverPGATour_EndHole(void) {
     nPlayer = PLR_1_e;
     p = &gPlayers[0];
     nHole = Game_CurHoleIndex();
-    nPar = Course_GetCurHolePar();
+    nPar = GM_GetCurrentHolePar();
     nStrokes = gPlayers[0].nStrokes[nHole];
     nPutts = gPlayers[0].nPutts[nHole];
     bUnder = nStrokes < nPar;
@@ -647,11 +647,11 @@ void GameModeDriverPGATour_EndHole(void) {
     }
     if (nHole >= 1 && bUnder) {
         nPrev = nHole - 1;
-        if (p->nStrokes[nPrev] > Course_GetHolePar(nPrev)) {
+        if (p->nStrokes[nPrev] > GM_GetHoleIndexPar(nPrev)) {
             pRound->nBirdiesAfterBogey++;
         }
     }
-    if (fn_800D3080(nHole)) {
+    if (GM_GetHoleIndexCountsForDrivingStat(nHole)) {
         pRound->nDrives++;
         pRound->nDriveDistance += p->nC24;
     }
@@ -661,7 +661,7 @@ void GameModeDriverPGATour_EndHole(void) {
         pRound->nLongestPutt <= (u16)p->nLongestPutt ? (u16)p->nLongestPutt : pRound->nLongestPutt;
     if (nHole == 17) {
         n = GM_PgaTourSim_GetRoundScoreFromEntrantID(0, 0, gpSaveData[nPlayer].tour.nRound);
-        if (n <= fn_800D2FB4(gSession.nTeeSet[0])) {
+        if (n <= GM_GetCurrentCourseTotalPar(gSession.nTeeSet[0])) {
             gpSaveData[nPlayer].tour.nParRoundStreak++;
         } else {
             gpSaveData[nPlayer].tour.nParRoundStreak = 0;

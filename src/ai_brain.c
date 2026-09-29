@@ -38,7 +38,7 @@ void AI_SetShotModifiers(int nPlayer) {
         p->attrMod[ATTR_LUCK]          = 0;
         return;
     }
-    nPar     = Course_GetCurHolePar();
+    nPar     = GM_GetCurrentHolePar();
     nHole    = Game_CurHoleIndex();
     nLevel   = p->nOBCount;
     nStrokes = p->nStrokes[nHole];
@@ -471,7 +471,7 @@ void AI_ApplyError(int nPlayer) {
         fRand     = Misc_RandFuncf(0);
         fDistErr += fDist2 * (fMiss * fRand) / 100.0f;
         // (A full swing on anything but a par 3 always comes up short; otherwise a coin flip.)
-        if ((p->nShotKind == SHOT_TYPE_DRIVE_e && Course_GetCurHolePar() != 3) || (Misc_RandFunc(0) & 1)) {
+        if ((p->nShotKind == SHOT_TYPE_DRIVE_e && GM_GetCurrentHolePar() != 3) || (Misc_RandFunc(0) & 1)) {
             fDistErr *= -1.0f;
         }
         p->fDistance = p->fDistance * ((100.0f + fDistErr) / 100.0f);

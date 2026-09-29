@@ -298,17 +298,17 @@ void PlayNow_StartChallenge(void) {
         } else {
             nSum0 = 0;
             for (h = 0; h < Game_CurHoleIndex(); h++) {
-                gPlayers[0].nStrokes[h] = Course_GetHolePar(h);
+                gPlayers[0].nStrokes[h] = GM_GetHoleIndexPar(h);
                 nSum0 += gPlayers[0].nStrokes[h];
             }
             nDiff = gChallengeList[gCurChallenge].nTargetBase - nSum0;
             while (nDiff != 0) {
                 h = Misc_RandFunc(0) % (Game_CurHoleIndex() + 1);
                 if (nDiff < 0) {
-                    if (gPlayers[0].nStrokes[h] > Course_GetHolePar(h) - 1) {
+                    if (gPlayers[0].nStrokes[h] > GM_GetHoleIndexPar(h) - 1) {
                         gPlayers[0].nStrokes[h]--;
                     }
-                } else if (gPlayers[0].nStrokes[h] < Course_GetHolePar(h) + 1) {
+                } else if (gPlayers[0].nStrokes[h] < GM_GetHoleIndexPar(h) + 1) {
                     gPlayers[0].nStrokes[h]++;
                 }
                 nSum = 0;
@@ -330,17 +330,17 @@ void PlayNow_StartChallenge(void) {
         } else {
             nSum0 = 0;
             for (h = 0; h < Game_CurHoleIndex(); h++) {
-                gPlayers[0].nStrokes[h] = Course_GetHolePar(h);
+                gPlayers[0].nStrokes[h] = GM_GetHoleIndexPar(h);
                 nSum0 += gPlayers[0].nStrokes[h];
             }
             nDiff = gChallengeList[gCurChallenge].nTargetBase;
             while (nDiff != 0) {
                 h = Misc_RandFunc(0) % (Game_CurHoleIndex() + 1);
                 if (nDiff < 0) {
-                    if (gPlayers[0].nStrokes[h] > Course_GetHolePar(h) - 1) {
+                    if (gPlayers[0].nStrokes[h] > GM_GetHoleIndexPar(h) - 1) {
                         gPlayers[0].nStrokes[h]--;
                     }
-                } else if (gPlayers[0].nStrokes[h] < Course_GetHolePar(h) + 1) {
+                } else if (gPlayers[0].nStrokes[h] < GM_GetHoleIndexPar(h) + 1) {
                     gPlayers[0].nStrokes[h]++;
                 }
                 nSum = 0;
@@ -353,17 +353,17 @@ void PlayNow_StartChallenge(void) {
         break;
     case 3:
         for (h = 0; h < Game_CurHoleIndex(); h++) {
-            gPlayers[0].nStrokes[h] = Course_GetHolePar(h) - 1;
+            gPlayers[0].nStrokes[h] = GM_GetHoleIndexPar(h) - 1;
         }
         break;
     case 4:
         for (h = 0; h < Game_CurHoleIndex(); h++) {
-            gPlayers[0].nStrokes[h] = Course_GetHolePar(h);
+            gPlayers[0].nStrokes[h] = GM_GetHoleIndexPar(h);
         }
         break;
     case 5:
         for (h = 0; h < Game_CurHoleIndex(); h++) {
-            gPlayers[0].nStrokes[h] = Course_GetHolePar(h) + 1;
+            gPlayers[0].nStrokes[h] = GM_GetHoleIndexPar(h) + 1;
         }
         break;
     case 7:
@@ -387,20 +387,20 @@ void PlayNow_StartChallenge(void) {
         if (gpGame->nScoringType == 0) {
             nSum0 = 0;
             for (h = 0; h < Game_CurHoleIndex(); h++) {
-                gPlayers[0].nStrokes[h] = Course_GetHolePar(h);
+                gPlayers[0].nStrokes[h] = GM_GetHoleIndexPar(h);
                 nSum0 += gPlayers[0].nStrokes[h];
                 for (i = 1; i < gNumPlayersSetUp; i++) {
-                    gPlayers[(u32)i].nStrokes[h] = Course_GetHolePar(h);
+                    gPlayers[(u32)i].nStrokes[h] = GM_GetHoleIndexPar(h);
                 }
             }
             nDiff = gChallengeList[gCurChallenge].nTargetBase;
             while (nDiff != 0) {
                 i = Misc_RandFunc(0) % (Game_CurHoleIndex() + 1);
                 if (nDiff < 0) {
-                    if (gPlayers[0].nStrokes[i] > Course_GetHolePar(i) - 1) {
+                    if (gPlayers[0].nStrokes[i] > GM_GetHoleIndexPar(i) - 1) {
                         gPlayers[0].nStrokes[i]--;
                     }
-                } else if (gPlayers[0].nStrokes[i] < Course_GetHolePar(i) + 1) {
+                } else if (gPlayers[0].nStrokes[i] < GM_GetHoleIndexPar(i) + 1) {
                     gPlayers[0].nStrokes[i]++;
                 }
                 nSum = 0;
@@ -421,16 +421,16 @@ void PlayNow_StartChallenge(void) {
         break;
     case 2:
         gPlayers[0].nStrokes[Game_CurHoleIndex()] = gChallengeList[gCurChallenge].nHoleExtra
-                + Course_GetCurHolePar();
+                + GM_GetCurrentHolePar();
         break;
     case 3:
-        gPlayers[0].nStrokes[Game_CurHoleIndex()] = Course_GetCurHolePar() - 1;
+        gPlayers[0].nStrokes[Game_CurHoleIndex()] = GM_GetCurrentHolePar() - 1;
         break;
     case 4:
-        gPlayers[0].nStrokes[Game_CurHoleIndex()] = Course_GetCurHolePar();
+        gPlayers[0].nStrokes[Game_CurHoleIndex()] = GM_GetCurrentHolePar();
         break;
     case 5:
-        gPlayers[0].nStrokes[Game_CurHoleIndex()] = Course_GetCurHolePar() + 1;
+        gPlayers[0].nStrokes[Game_CurHoleIndex()] = GM_GetCurrentHolePar() + 1;
         break;
     }
     if (gChallengeList[gCurChallenge].bForceWeather) {
@@ -499,7 +499,7 @@ u8 PlayNow_GameFinished(u8 bCheck) {
         for (h = 0; h < 18; h++) {
             if (gpGame->bHoleSelected[h]) {
                 nStrokes += gPlayers[0].nStrokes[h];
-                gPlayNowGroupPar += Course_GetHolePar(h);
+                gPlayNowGroupPar += GM_GetHoleIndexPar(h);
                 gPlayNowGroupHoles++;
                 gPlayNowGroupTime += gPlayers[0].n290[h];
             }
@@ -846,7 +846,7 @@ int PlayNow_GetMedal(void) {
             break;
         case 1:
             nStrokes = gPlayers[0].nStrokes[Game_CurHoleIndex()];
-            nPar = Course_GetCurHolePar();
+            nPar = GM_GetCurrentHolePar();
             switch (nRule) {
             case 1:
                 if (nStrokes <= nMark) {
@@ -1052,23 +1052,23 @@ int PlayNow_GetChallengeTarget(int i) {
             break;
         case 2:
             for (k = 0; k < nHole; k++) {
-                nTarget += fn_800D2ABC(gChallengeList[i].nCourse, k);
+                nTarget += GM_GetHolePar(gChallengeList[i].nCourse, k);
             }
             nTarget += gChallengeList[i].nTargetBase;
             break;
         case 3:
             for (h = 0; h < nHole; h++) {
-                nTarget += fn_800D2ABC(gChallengeList[i].nCourse, h) - 1;
+                nTarget += GM_GetHolePar(gChallengeList[i].nCourse, h) - 1;
             }
             break;
         case 4:
             for (h = 0; h < nHole; h++) {
-                nTarget += fn_800D2ABC(gChallengeList[i].nCourse, h);
+                nTarget += GM_GetHolePar(gChallengeList[i].nCourse, h);
             }
             break;
         case 5:
             for (h = 0; h < nHole; h++) {
-                nTarget += fn_800D2ABC(gChallengeList[i].nCourse, h) + 1;
+                nTarget += GM_GetHolePar(gChallengeList[i].nCourse, h) + 1;
             }
             break;
         case 7:
@@ -1088,16 +1088,16 @@ int PlayNow_GetChallengeTarget(int i) {
             nTarget += gChallengeList[i].nHoleExtra;
             break;
         case 2:
-            nTarget += fn_800D2ABC(gChallengeList[i].nCourse, nHole) + gChallengeList[i].nHoleExtra;
+            nTarget += GM_GetHolePar(gChallengeList[i].nCourse, nHole) + gChallengeList[i].nHoleExtra;
             break;
         case 3:
-            nTarget += fn_800D2ABC(gChallengeList[i].nCourse, nHole) - 1;
+            nTarget += GM_GetHolePar(gChallengeList[i].nCourse, nHole) - 1;
             break;
         case 4:
-            nTarget += fn_800D2ABC(gChallengeList[i].nCourse, nHole);
+            nTarget += GM_GetHolePar(gChallengeList[i].nCourse, nHole);
             break;
         case 5:
-            nTarget += fn_800D2ABC(gChallengeList[i].nCourse, nHole) + 1;
+            nTarget += GM_GetHolePar(gChallengeList[i].nCourse, nHole) + 1;
             break;
         }
     }
@@ -1162,21 +1162,21 @@ int PlayNow_GetHolesLeft(void) {
                     break;
                 case 4:
                     for (h = 0; h < 18; h++) {
-                        if (fn_800D2ABC(gChallengeList[i].nCourse, h) == 5) {
+                        if (GM_GetHolePar(gChallengeList[i].nCourse, h) == 5) {
                             n++;
                         }
                     }
                     break;
                 case 5:
                     for (h = 0; h < 18; h++) {
-                        if (fn_800D2ABC(gChallengeList[i].nCourse, h) == 4) {
+                        if (GM_GetHolePar(gChallengeList[i].nCourse, h) == 4) {
                             n++;
                         }
                     }
                     break;
                 case 6:
                     for (h = 0; h < 18; h++) {
-                        if (fn_800D2ABC(gChallengeList[i].nCourse, h) == 3) {
+                        if (GM_GetHolePar(gChallengeList[i].nCourse, h) == 3) {
                             n++;
                         }
                     }

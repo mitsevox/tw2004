@@ -2930,7 +2930,7 @@ u8 CamScript_SkipLookBackCam(CamScript* pScript, CamShot* pShot, int nPlayer) {
     if (gPlayers[nPlayer].ball.nCollideCount > 0) return 1;
     if (fn_800D0478(nPlayer) < 40.0f) return 1;
     if (gPlayers[nPlayer].ball.nLie == 0) {
-        if (Course_GetHolePar(Game_GetCurHoleNum()) != 4 && Course_GetHolePar(Game_GetCurHoleNum())
+        if (GM_GetHoleIndexPar(Game_GetCurHoleNum()) != 4 && GM_GetHoleIndexPar(Game_GetCurHoleNum())
             != 5) return 1;
         if (gPlayers[nPlayer].nShotKind != 1) return 1;
         if (gPlayers[nPlayer].nSurface != 14) return 1;

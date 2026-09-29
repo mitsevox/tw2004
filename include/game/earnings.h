@@ -106,7 +106,7 @@ typedef struct HoleGoal {
     s8   bEachHole;             // 0x08  checked after each hole (else only when the round is over)
     s8   aToPar[5];             // 0x09  holes finished at par, -1, -2, -3 and -5 or better (fn_800D0DC8)
     s8   aRun[5];               // 0x0E  the same as runs of holes in a row (fn_800D0F04)
-    s8   n13;                   // 0x13  holes counted by fn_800D0FBC (at most the course's fn_800D3208)
+    s8   n13;                   // 0x13  holes counted by fn_800D0FBC (at most the course's GM_CurrentCourseTotalPar4andPar5Holes)
     s8   n14;                   // 0x14  holes counted by fn_800D1170
     s8   n15;                   // 0x15  the run fn_800D10B0 finds
     s8   n16;                   // 0x16  the run fn_800D1250 finds

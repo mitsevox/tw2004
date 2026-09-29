@@ -364,21 +364,21 @@ void GM_SelectHoleSet(int nPreset) {
             }
             break;
         case 4:
-            if (Course_GetHolePar(i) == 5) {
+            if (GM_GetHoleIndexPar(i) == 5) {
                 gpGame->bHoleSelected[i] = 1;
             } else {
                 gpGame->bHoleSelected[i] = 0;
             }
             break;
         case 5:
-            if (Course_GetHolePar(i) == 4) {
+            if (GM_GetHoleIndexPar(i) == 4) {
                 gpGame->bHoleSelected[i] = 1;
             } else {
                 gpGame->bHoleSelected[i] = 0;
             }
             break;
         case 6:
-            if (Course_GetHolePar(i) == 3) {
+            if (GM_GetHoleIndexPar(i) == 3) {
                 gpGame->bHoleSelected[i] = 1;
             } else {
                 gpGame->bHoleSelected[i] = 0;
@@ -513,7 +513,7 @@ int GM_GetGolferRelativeCurrentScore(int nPlayer, u8 bCurrent) {
     }
     for (i = 0; i < nEnd; i++) {
         if (gpGame->bHoleSelected[i]) {
-            nPar += Course_GetHolePar(i);
+            nPar += GM_GetHoleIndexPar(i);
             nStrokes += gPlayers[nPlayer].nStrokes[i];
         }
     }
@@ -1100,12 +1100,13 @@ void GM_SetupDefaultProfile(void) {
 }
 
 // Builds the "Dream 18" round (course 22): each hole's course and hole number from row 0 of the
-// 'CMPS' table (fn_800D3118, fn_800D315C; the table counts holes from 1).
+// 'CMPS' table (GM_CourseInfo_GetCompilationCourse, GM_CourseInfo_GetCompilationHole; the table
+// counts holes from 1).
 void GM_BuildDream18(void) {
     int i;
     for (i = 0; i < 18; i++) {
-        gpGame->nHoleCourse[i] = fn_800D3118(22, i);
-        gpGame->nHoleNum[i] = fn_800D315C(22, i) - 1;
+        gpGame->nHoleCourse[i] = GM_CourseInfo_GetCompilationCourse(22, i);
+        gpGame->nHoleNum[i] = GM_CourseInfo_GetCompilationHole(22, i) - 1;
     }
 }
 
@@ -1114,8 +1115,8 @@ void GM_BuildDream18(void) {
 void GM_BuildRegionalRound(int nCourse) {
     int i;
     for (i = 0; i < 18; i++) {
-        gpGame->nHoleCourse[i] = fn_800D3118(nCourse, i);
-        gpGame->nHoleNum[i] = fn_800D315C(nCourse, i) - 1;
+        gpGame->nHoleCourse[i] = GM_CourseInfo_GetCompilationCourse(nCourse, i);
+        gpGame->nHoleNum[i] = GM_CourseInfo_GetCompilationHole(nCourse, i) - 1;
     }
 }
 
@@ -1201,7 +1202,7 @@ void GM_BuildRandom18(void) {
         p = holes;
         nHoles = 0;
         for (h = 0; h < 18; h++) {
-            if (fn_800D2ABC(nCourse, h) == 3) {
+            if (GM_GetHolePar(nCourse, h) == 3) {
                 *p++ = h;
                 nHoles++;
             }
@@ -1262,7 +1263,7 @@ void GM_BuildRandom18(void) {
         p = holes;
         nHoles = 0;
         for (h = 0; h < 18; h++) {
-            if (fn_800D2ABC(nCourse, h) == 5) {
+            if (GM_GetHolePar(nCourse, h) == 5) {
                 *p++ = h;
                 nHoles++;
             }
@@ -1306,7 +1307,7 @@ void GM_BuildRandom18(void) {
             nCourse = courses.a[nPick];
             p = holes;
             for (h = 0; h < 18; h++) {
-                if (fn_800D2ABC(nCourse, h) == 4) {
+                if (GM_GetHolePar(nCourse, h) == 4) {
                     *p++ = h;
                     nHoles++;
                 }

@@ -156,14 +156,14 @@ void GM_InitModule_PostDataStream(void) {
 // A round is torn down (gomainloop): the mode's Shutdown (pfnShutdown) and the HUD (GUI_DeInit),
 // then four frees that are empty in this build: the PGA TOUR one
 // (GameModeDriverPGATour_FreeStreamMemory), the GameMode5 one (PlayNow_DeInit), the earnings' stream
-// memory (GM_Earnings_FreeStreamMemory) and the course data (fn_800D29E8).
+// memory (GM_Earnings_FreeStreamMemory) and the course data (GM_CourseInfo_DeInit).
 void GM_DeInitModule(void) {
     (*(s32 (**)(void*))((u8*)(gpGame) + 0x1CC))(gpGame);
     GUI_DeInit();
     GameModeDriverPGATour_FreeStreamMemory();
     PlayNow_DeInit();
     GM_Earnings_FreeStreamMemory();
-    fn_800D29E8();
+    GM_CourseInfo_DeInit();
 }
 
 // Moves the round to its next selected hole and asks for it to be loaded (fn_8006F4B4); 1 when
@@ -454,7 +454,7 @@ void GM_CheckBallForUIHints(int nPlayer) {
         GUI_StartPostShotUI(4, nPlayer, 0.0f);
         return;
     }
-    nDiff = gPlayers[nPlayer].nStrokes[gpGame->nCurHole] - Course_GetCurHolePar();
+    nDiff = gPlayers[nPlayer].nStrokes[gpGame->nCurHole] - GM_GetCurrentHolePar();
     switch (nDiff) {
     case -3: GUI_StartPostShotUI(5, nPlayer, 0.0f); break;
     case -2: GUI_StartPostShotUI(6, nPlayer, 0.0f); break;
@@ -1158,7 +1158,7 @@ int GM_ChooseRemoveBallState(int nPlayer) {
     if (gPlayers[nPlayer].uFlags & 1) {
         return (gPlayers[nPlayer].uFlags >> 1) & 1;
     }
-    if (Course_GetCurHolePar() - gPlayers[nPlayer].nStrokes[gpGame->nCurHole] > 1) {
+    if (GM_GetCurrentHolePar() - gPlayers[nPlayer].nStrokes[gpGame->nCurHole] > 1) {
         if (Misc_RandFunc(1) % 10 == 0) {
             return 1;
         }

@@ -3659,10 +3659,10 @@ void GM_vSaveProfileWithDefaultName(MsgArg* pArgs, MsgArg* pResult) {
     FE_BackupProfileClaimRow(nSlot);
 }
 
-// Front-end message 193: the par of hole pArgs[1] (0-based) of course pArgs[0] (fn_800D2ABC). Below
+// Front-end message 193: the par of hole pArgs[1] (0-based) of course pArgs[0] (GM_GetHolePar). Below
 // 0 it is the saved round being edited (save slot gpFEProfile->nCustomRoundSlot, round
 // gpFEProfile->nCustomRound: that entry's course and hole); 22 and 24..29 are built rounds, whose
-// holes come from other courses (fn_800D3118, fn_800D315C).
+// holes come from other courses (GM_CourseInfo_GetCompilationCourse, GM_CourseInfo_GetCompilationHole).
 void GM_vGetHolePar(MsgArg* pArgs, MsgArg* pResult) {
     int nCourse;
     int nCourseArg = pArgs[0].i;
@@ -3670,22 +3670,22 @@ void GM_vGetHolePar(MsgArg* pArgs, MsgArg* pResult) {
     if (nCourseArg <= -1) {
         nCourse = gpSaveData[gpFEProfile->nCustomRoundSlot]
             .aSavedRound[gpFEProfile->nCustomRound].nCourse[pArgs[1].i];
-        pResult->i = fn_800D2ABC(nCourse, gpSaveData[gpFEProfile->nCustomRoundSlot]
+        pResult->i = GM_GetHolePar(nCourse, gpSaveData[gpFEProfile->nCustomRoundSlot]
             .aSavedRound[gpFEProfile->nCustomRound].nHoleNum[pArgs[1].i]);
         return;
     }
     if (nCourseArg == 22) {
-        nCourse = fn_800D3118(22, pArgs[1].i);
-        pResult->i = fn_800D2ABC(nCourse, fn_800D315C(22, pArgs[1].i) - 1);
+        nCourse = GM_CourseInfo_GetCompilationCourse(22, pArgs[1].i);
+        pResult->i = GM_GetHolePar(nCourse, GM_CourseInfo_GetCompilationHole(22, pArgs[1].i) - 1);
         return;
     }
     if (nCourseArg >= 24 && nCourseArg < 30) {
         // the argument is read again here (the original reloads it after the call)
-        nCourse = fn_800D3118(pArgs[0].i, pArgs[1].i);
-        pResult->i = fn_800D2ABC(nCourse, fn_800D315C(pArgs[0].i, pArgs[1].i) - 1);
+        nCourse = GM_CourseInfo_GetCompilationCourse(pArgs[0].i, pArgs[1].i);
+        pResult->i = GM_GetHolePar(nCourse, GM_CourseInfo_GetCompilationHole(pArgs[0].i, pArgs[1].i) - 1);
         return;
     }
-    pResult->i = fn_800D2ABC(nCourseArg, pArgs[1].i);
+    pResult->i = GM_GetHolePar(nCourseArg, pArgs[1].i);
 }
 
 // Front-end message 194: the name of the replay's course (lbl_80191990[gReplayData.nCourse]) into

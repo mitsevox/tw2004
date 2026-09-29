@@ -72,8 +72,8 @@ void Wind_SetPhysicsWind(int nDir, f32 fSpeed) {
 // (GameMode4_GetCurrentEvent 0). Speed by setting: 0..6, 2..12, 5..20 or 12..31; direction one of
 // eight at random.
 void Wind_InitForHole(void) {
-    int n      = fn_800D2CB0_HoleWindDir();
-    f32 fSpeed = fn_800D2CF8_HoleWindSpeed();
+    int n      = GM_GetCurrentHolePrevailingWindDir();
+    f32 fSpeed = GM_GetCurrentHolePrevailingWindSpeed();
     if (gpGame->bNoWind) {
         fSpeed = 0.0f;
         n      = 0;

@@ -243,7 +243,7 @@ void SitDev_ThrowBallHitDelayedEvent(void);
 void BreakLine_InitModule(void);
 void fn_800C8108(void);
 void AnimStream_Update(void);
-u8   fn_800D3004(void);
+u8   GM_GetCurrentHoleSplitScreenLowDetail(void);
 void GameEffects_InitGameEffectSettings(void);
 f32  GameEffects_AdjustTimeRate(f32 fFrameTime);
 void GameEffects_RenderGameBreakerEffects(void);
@@ -839,7 +839,8 @@ void fn_8006D27C(void) {
 
     fn_8006E028();
     fn_800A2BA8();
-    if (gSession.nSplitScreen && ViewController_IsActive(0) && ViewController_IsActive(1) && fn_800D3004()) {
+    if (gSession.nSplitScreen && ViewController_IsActive(0) && ViewController_IsActive(1)
+        && GM_GetCurrentHoleSplitScreenLowDetail()) {
         gSession.b11 = 1;
     } else {
         gSession.b11 = 0;

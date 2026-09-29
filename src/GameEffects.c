@@ -331,7 +331,7 @@ int GameEffects_IsScriptedGameBreaker(int nPlayer) {
     if (!gpGame->bAllowGameBreakers) {
         return 0;
     }
-    nPar = Course_GetCurHolePar();
+    nPar = GM_GetCurrentHolePar();
     nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1;
     pSurface = Ter_GetSupportingGroundMaterial(pCourse, gPlayers[nPlayer].vTarget2);
     fDist = fn_800D0478(nPlayer);
@@ -756,7 +756,7 @@ u8 GameEffects_ScriptedGBDidIt(Ball* pBall, int nPlayer, u8 bNext) {
     int nStrokes;
     if (pBall->nLie != LIE_GREEN_e || !(gGameEffects.uFlags & 0x4000)) {
         bPar5In2 = 0;
-    } else if (Course_GetCurHolePar() != 5) {
+    } else if (GM_GetCurrentHolePar() != 5) {
         bPar5In2 = 0;
     } else if (bNext && gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] != 1) {
         bPar5In2 = 0;

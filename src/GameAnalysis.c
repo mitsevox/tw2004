@@ -109,7 +109,7 @@ int GameAnalysis_CountTotalHoleScores(int nPlayer, int nRel) {
     int h;
     int n = 0;
     for (h = Game_CurHoleIndex() - 1; h >= 0; h--) {
-        if (gpGame->bHoleSelected[h] && gPlayers[nPlayer].nStrokes[h] == nRel + Course_GetHolePar(h)) {
+        if (gpGame->bHoleSelected[h] && gPlayers[nPlayer].nStrokes[h] == nRel + GM_GetHoleIndexPar(h)) {
             n++;
         }
     }
@@ -122,7 +122,7 @@ int GameAnalysis_CountBogeysOrWorse(int nPlayer, int nRel) {
     int h;
     int n = 0;
     for (h = Game_CurHoleIndex() - 1; h >= 0; h--) {
-        if (gpGame->bHoleSelected[h] && gPlayers[nPlayer].nStrokes[h] > nRel + Course_GetHolePar(h)) {
+        if (gpGame->bHoleSelected[h] && gPlayers[nPlayer].nStrokes[h] > nRel + GM_GetHoleIndexPar(h)) {
             n++;
         }
     }

@@ -198,7 +198,7 @@ typedef struct CamSequence {
                                 //       11; 2 GM_Currently_SkillZoneMode (DynamicCam_ModeType)
     u8   b49;                   // 0x49  a bit mask
     u8   b4A;                   // 0x4A  a bit mask
-    s8   n4B;                   // 0x4B  one bit per value of Course_GetCurHolePar
+    s8   n4B;                   // 0x4B  one bit per value of GM_GetCurrentHolePar
     struct CamChoice* p4C;      // 0x4C  its shot choices (dyncam.h)
 } CamSequence;
 LAYOUT_ASSERT(CamSequence, 0x50);

@@ -146,8 +146,8 @@ u8 CTIP_CheckWeatherTrigger(void) {
 // of 500 yards or more (the hole's length from the player's tees).
 u8 CTIP_LongDistanceTeeShotTrigger(int nPlayer) {
     s32 nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
-    int nPar = Course_GetCurHolePar();
-    s32 nHoleYardage = fn_800D2C68(gSession.nTeeSet[nPlayer]);
+    int nPar = GM_GetCurrentHolePar();
+    s32 nHoleYardage = GM_GetCurrentHoleTeeDistance(gSession.nTeeSet[nPlayer]);
     if (nPar == 5 && nStrokes == 0 && nHoleYardage >= 500) {
         return 1;
     }
@@ -158,8 +158,8 @@ u8 CTIP_LongDistanceTeeShotTrigger(int nPlayer) {
 // 325 yards or less.
 u8 CTIP_MediumDistanceTeeShotTrigger(int nPlayer) {
     s32 nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
-    int nPar = Course_GetCurHolePar();
-    s32 nHoleYardage = fn_800D2C68(gSession.nTeeSet[nPlayer]);
+    int nPar = GM_GetCurrentHolePar();
+    s32 nHoleYardage = GM_GetCurrentHoleTeeDistance(gSession.nTeeSet[nPlayer]);
     if (nPar == 4 && nStrokes == 0 && nHoleYardage <= 325) {
         return 1;
     }
@@ -177,8 +177,8 @@ u8 CTIP_SpinnaShotTrigger(int nPlayer) {
 // 425 yards or more.
 u8 CTIP_TeeSpinnaShotTrigger(int nPlayer) {
     s32 nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
-    int nPar = Course_GetCurHolePar();
-    s32 nHoleYardage = fn_800D2C68(gSession.nTeeSet[nPlayer]);
+    int nPar = GM_GetCurrentHolePar();
+    s32 nHoleYardage = GM_GetCurrentHoleTeeDistance(gSession.nTeeSet[nPlayer]);
     if (nPar == 4 && nStrokes == 0 && nHoleYardage >= 425) {
         return 1;
     }

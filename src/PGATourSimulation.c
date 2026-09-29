@@ -155,7 +155,7 @@ void GM_PgaTourSim_SimRound(int nPlayer, SeasonEvent* pEvent, int nRound, int n,
                                      &gpSaveData[nPlayer].tour.field.nEntrants, uFlags & 1);
         GM_PgaTourSim_DetermineTargetScores(nPlayer, n);
     }
-    pEvent->nEventPar += (u16)fn_800D2FB4(gSession.nTeeSet[0]);
+    pEvent->nEventPar += (u16)GM_GetCurrentCourseTotalPar(gSession.nTeeSet[0]);
     nEntrants = GM_PgaTourSim_GetNumEntrants(nPlayer);
     for (i = 0; i < nEntrants; i++) {
         if (!GM_PgaTourSim_GetWasCutFromEntrantID(nPlayer, i) && (!GM_PgaTourSim_IsEntrantUser(nPlayer, i) || (uFlags & 2))) {
@@ -591,7 +591,7 @@ void GM_PgaTourSim_DetermineTargetScores(int nPlayer, int n) {
             aOrder[i] = nEntrant;
         }
     }
-    nRoundPar = fn_800D2FB4(gSession.nTeeSet[0]) * 4;
+    nRoundPar = GM_GetCurrentCourseTotalPar(gSession.nTeeSet[0]) * 4;
     nPar = nRoundPar + n;
     for (i = 0; i < nEntrants; i++) {
         nTarget = 8.0f * Misc_RandFuncg(0) + (18.0f + nPar);
@@ -778,25 +778,27 @@ int GM_PgaTourSim_GetRelativeScoreFromEntrantID(int nPlayer, int nEntrant, u8 b)
     nScore = GM_PgaTourSim_GetTotalScoreFromEntrantID(nPlayer, nEntrant, b);
     if (gSession.nGameType == 3 && gpSaveData[nPlayer].tour.nRound == 0) {
         for (i = 0; i < 4; i++) {
-            nScore -= fn_800D2F00(aCourses[i], 0);
+            nScore -= GM_GetTotalPar(aCourses[i], 0);
         }
     } else {
         for (i = 0; i < gpSaveData[nPlayer].tour.nRound; i++) {
-            nScore -= fn_800D2F00(aCourses[i], 0);
+            nScore -= GM_GetTotalPar(aCourses[i], 0);
         }
         if (gpSaveData[nPlayer].tour.nRound < 4) {
             nHoles = GetLastHoleToScore(nPlayer, nEntrant, b);
             for (i = 0; i < nHoles; i++) {
                 if (aCourses[gpSaveData[nPlayer].tour.nRound] == 22) {
-                    nCourse = fn_800D3118(22, i);
-                    nPar = fn_800D2ABC(nCourse, fn_800D315C(22, i) - 1);
+                    nCourse = GM_CourseInfo_GetCompilationCourse(22, i);
+                    nPar = GM_GetHolePar(nCourse, GM_CourseInfo_GetCompilationHole(22, i) - 1);
                 } else if (aCourses[gpSaveData[nPlayer].tour.nRound] >= 24
                            && aCourses[gpSaveData[nPlayer].tour.nRound] < 30) {
-                    nCourse = fn_800D3118(aCourses[gpSaveData[nPlayer].tour.nRound], i);
-                    nPar = fn_800D2ABC(nCourse,
-                                       fn_800D315C(aCourses[gpSaveData[nPlayer].tour.nRound], i) - 1);
+                    nCourse = GM_CourseInfo_GetCompilationCourse(aCourses[gpSaveData[nPlayer].tour.nRound],
+                            i);
+                    nPar = GM_GetHolePar(nCourse,
+                                       GM_CourseInfo_GetCompilationHole(
+                                               aCourses[gpSaveData[nPlayer].tour.nRound], i) - 1);
                 } else {
-                    nPar = fn_800D2ABC(aCourses[gpSaveData[nPlayer].tour.nRound], i);
+                    nPar = GM_GetHolePar(aCourses[gpSaveData[nPlayer].tour.nRound], i);
                 }
                 nScore -= nPar;
             }
@@ -982,9 +984,10 @@ void GM_PgaTourSim_SimEntrantScoresOnHole(int nPlayer, int nRound, int nEntrant,
     } else {
         pPro = &gPgaPros[pEntrantMC->nGolfer];
     }
-    nPar = Course_GetHolePar(nHole);
-    fRound = pPro->fPar3Avg * fn_800D31A4(3) + pPro->fPar4Avg * fn_800D31A4(4)
-           + pPro->fPar5Avg * fn_800D31A4(5);
+    nPar = GM_GetHoleIndexPar(nHole);
+    fRound = pPro->fPar3Avg * GM_CurrentCourseTotalParXHoles(3) + pPro->fPar4Avg
+            * GM_CurrentCourseTotalParXHoles(4)
+           + pPro->fPar5Avg * GM_CurrentCourseTotalParXHoles(5);
     fScale = 0.25f * pEntrantMC->nTargetScore / fRound;
     fPar3 = fScale * pPro->fPar3Avg;
     fPar4 = fScale * pPro->fPar4Avg;
@@ -1113,7 +1116,7 @@ void GM_PgaTourSim_SimEntrantStatsOnHole(int nPlayer, int nRound, int nEntrant, 
     } else {
         pPro = &gPgaPros[0];
     }
-    nPar = Course_GetHolePar(nHole);
+    nPar = GM_GetHoleIndexPar(nHole);
     nStrokes = pEntrant->aHoleStrokes[nHole];
 
     pStats->nHoles++;
@@ -1132,7 +1135,7 @@ void GM_PgaTourSim_SimEntrantStatsOnHole(int nPlayer, int nRound, int nEntrant, 
     } else if (nStrokes > nPar) {
         pStats->nBogeys++;
     }
-    if (nHole > 0 && nStrokes < nPar && pEntrant->aHoleStrokes[nHole - 1] > Course_GetHolePar(nHole - 1)) {
+    if (nHole > 0 && nStrokes < nPar && pEntrant->aHoleStrokes[nHole - 1] > GM_GetHoleIndexPar(nHole - 1)) {
         pStats->nBirdiesAfterBogey++;
     }
     switch (nPar) {
@@ -1176,15 +1179,15 @@ void GM_PgaTourSim_SimEntrantStatsOnHole(int nPlayer, int nRound, int nEntrant, 
     // one over 520 loses up to 50.
     fRandom = 30.0f * Misc_RandFuncg(0) + pPro->fDriveAvg;
     fDrive = (fRandom > 0.0f) ? fRandom : 0.0f;
-    if (fDrive > fn_800D2C30(nHole, 0)) {
-        fDrive = fn_800D2C30(nHole, 0);
+    if (fDrive > GM_GetHoleIndexTeeDistance(nHole, 0)) {
+        fDrive = GM_GetHoleIndexTeeDistance(nHole, 0);
     }
     if (fDrive > 520.0f) {
         fDrive -= 50.0f * Misc_RandFuncf(0);
     }
     nDrive = fDrive;
     pStats->nLongestDrive = ((u16)nDrive <= pStats->nLongestDrive) ? pStats->nLongestDrive : nDrive;
-    if (fn_800D3080(nHole)) {
+    if (GM_GetHoleIndexCountsForDrivingStat(nHole)) {
         pStats->nDrives++;
         pStats->nDriveDistance += (u16)nDrive;
     }

@@ -387,7 +387,7 @@ int GM_BestBallMode_GetTeamRelativeScore(int nPlayer, u8 bCurrent) {
     }
     for (h = 0; h < n; h++) {
         if (gpGame->bHoleSelected[h]) {
-            nPar += Course_GetHolePar(h);
+            nPar += GM_GetHoleIndexPar(h);
             nScore += GM_BestBallMode_GetTeamHoleScore(nPlayer, h);
         }
     }

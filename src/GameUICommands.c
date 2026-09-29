@@ -278,12 +278,12 @@ void  Gaud_RestartMusic(void);
 u8    GolfCamera_IsPostShotCamDone(View* pView);
 u8    GolfCamera_IsCameraTrackingPlayer(View* pView);
 void  fn_800C9038(int nView, f32* pLong, f32* pSide);    // GoBreakLine.c
-s32   fn_800D2B4C(int nHole);
-s32   fn_800D2D40(int nTeeSet);
-s32   fn_800D2DA0(int nTeeSet);
-s32   fn_800D2E00(int nTeeSet);
-s32   fn_800D2E60(void);
-s32   fn_800D2EB0(void);
+s32   GM_GetHoleIndexHandicap(int nHole);
+s32   GM_GetCurrentCourseTotalYardage(int nTeeSet);
+s32   GM_GetCurrentCourseFront9Yardage(int nTeeSet);
+s32   GM_GetCurrentCourseBack9Yardage(int nTeeSet);
+s32   GM_GetCurrentCourseFront9Par(void);
+s32   GM_GetCurrentCourseBack9Par(void);
 f32   GM_Earnings_GetCourseModifier(void);
 char* HoleContest_GetPlaceName(int nPlayer);
 s32   HoleContest_GetPlaceDistance(int nPlayer);
@@ -941,13 +941,13 @@ void GM_vIsPostShotCameraDone(MsgArg* pArgs, MsgArg* pResult) {
 // (from the tee set of player pArgs[1]).
 void GM_vScorecardGetPar(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[0].i == 18) {
-        pResult->i = fn_800D2E60();
+        pResult->i = GM_GetCurrentCourseFront9Par();
     } else if (pArgs[0].i == 19) {
-        pResult->i = fn_800D2EB0();
+        pResult->i = GM_GetCurrentCourseBack9Par();
     } else if (pArgs[0].i == 20) {
-        pResult->i = fn_800D2FB4(gSession.nTeeSet[pArgs[1].i]);
+        pResult->i = GM_GetCurrentCourseTotalPar(gSession.nTeeSet[pArgs[1].i]);
     } else {
-        pResult->i = Course_GetHolePar(pArgs[0].i);
+        pResult->i = GM_GetHoleIndexPar(pArgs[0].i);
     }
 }
 
@@ -1081,22 +1081,22 @@ void GM_vGetLiePercentage(MsgArg* pArgs, MsgArg* pResult) {
                   gSurfaceTypes[gPlayers[pArgs[0].i].ball.nSurface].f00);
 }
 
-// Message 35: hole pArgs[0]'s rating (fn_800D2B4C: the course table's nRating for that hole).
+// Message 35: hole pArgs[0]'s rating (GM_GetHoleIndexHandicap: the course table's nRating for that hole).
 void GM_vGetHoleRating(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_800D2B4C(pArgs[0].i);
+    pResult->i = GM_GetHoleIndexHandicap(pArgs[0].i);
 }
 
 // Message 36: hole pArgs[0]'s length from tee set pArgs[1]; "hole" 18 is the front nine, 19 the
 // back nine, 20 the round.
 void GM_vGetTeeYardage(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[0].i == 18) {
-        pResult->i = fn_800D2DA0(pArgs[1].i);
+        pResult->i = GM_GetCurrentCourseFront9Yardage(pArgs[1].i);
     } else if (pArgs[0].i == 19) {
-        pResult->i = fn_800D2E00(pArgs[1].i);
+        pResult->i = GM_GetCurrentCourseBack9Yardage(pArgs[1].i);
     } else if (pArgs[0].i == 20) {
-        pResult->i = fn_800D2D40(pArgs[1].i);
+        pResult->i = GM_GetCurrentCourseTotalYardage(pArgs[1].i);
     } else {
-        pResult->i = fn_800D2C30(pArgs[0].i, pArgs[1].i);
+        pResult->i = GM_GetHoleIndexTeeDistance(pArgs[0].i, pArgs[1].i);
     }
 }
 
@@ -1803,8 +1803,8 @@ void GM_vGM_NextHoleDetails(MsgArg* pArgs, MsgArg* pResult) {
     nHole = GM_GetNextSelectedHole();
 
     if (nHole != -1) {
-        nPar = Course_GetHolePar(nHole);
-        nLength = fn_800D2C30(nHole, gSession.nTeeSet[0]);
+        nPar = GM_GetHoleIndexPar(nHole);
+        nLength = GM_GetHoleIndexTeeDistance(nHole, gSession.nTeeSet[0]);
     }
     pResult->i = nHole;
     *(s32*)pArgs[0].p = nPar;

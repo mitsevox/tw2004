@@ -48,7 +48,7 @@ void GameModeStableford_Init(void) {
 // left is double bogey, which scores no better than giving up.
 u8 GameModeStableford_PlayerDoneHole(int nPlayer) {
     if (!Player_IsHoled(nPlayer) && !gPlayers[nPlayer].bPlayerCut &&
-        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] < Course_GetCurHolePar() + 1) {
+        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] < GM_GetCurrentHolePar() + 1) {
         return 0;
     }
     return 1;
@@ -206,7 +206,7 @@ void GameModeStableford_EndHole(void) {
     int i;
     int nDiff;
     nHole = Game_CurHoleIndex();
-    nPar = Course_GetCurHolePar();
+    nPar = GM_GetCurrentHolePar();
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if (!Player_IsHoled(i)) {
             gPlayers[(u32)i].nStrokes[nHole] = nPar + 2;

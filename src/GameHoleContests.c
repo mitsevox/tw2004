@@ -31,7 +31,7 @@ u8   gHoleContestDecided;           // the contest on this hole is decided (Hole
 u8   gHoleContestWon;               // a contest has a winner this round (HoleContest_RankResults), or
                                     // the hole in one was made
 
-u8   fn_800D304C(int nHole);    // a flag of the hole's course data (byte 0x35): the drive can count
+u8   GM_GetHoleIndexDrivingSideGame(int nHole);    // a flag of the hole's course data (byte 0x35): the drive can count
 u8   fn_800D0D54(int nPlayer);  // the shot started on fairway-class ground and ended on the fairway,
                                 // the green or in the cup (HoleScore.c)
 
@@ -70,23 +70,23 @@ u8 HoleContest_RoundHasContests(void) {
 }
 
 // Draws the contest holes at random among the round's 18 (Misc_RandFunc until one fits): the
-// longest drive on a par 4 or 5 whose course data allows it (fn_800D304C, byte 0x35); closest to
-// the pin on a par 3; and one round in five (20 in 100) the hole-in-one prize on another par 3. A
-// contest with no hole that fits gets -1.
+// longest drive on a par 4 or 5 whose course data allows it (GM_GetHoleIndexDrivingSideGame, byte
+// 0x35); closest to the pin on a par 3; and one round in five (20 in 100) the hole-in-one prize on
+// another par 3. A contest with no hole that fits gets -1.
 void HoleContest_DrawHoles(void) {
     u8 bFound;
     int i;
 
     bFound = 0;
     for (i = 0; i < 18; i++) {
-        if (Course_GetHolePar(i) > 3 && fn_800D304C(i)) {
+        if (GM_GetHoleIndexPar(i) > 3 && GM_GetHoleIndexDrivingSideGame(i)) {
             bFound = 1;
         }
     }
     if (bFound) {
         gHoleContestLongestDriveHole = Misc_RandFunc(0) % 18;
-        while (Course_GetHolePar(gHoleContestLongestDriveHole) == 3
-               || !fn_800D304C(gHoleContestLongestDriveHole)) {
+        while (GM_GetHoleIndexPar(gHoleContestLongestDriveHole) == 3
+               || !GM_GetHoleIndexDrivingSideGame(gHoleContestLongestDriveHole)) {
             gHoleContestLongestDriveHole = Misc_RandFunc(0) % 18;
         }
     } else {
@@ -95,13 +95,13 @@ void HoleContest_DrawHoles(void) {
 
     bFound = 0;
     for (i = 0; i < 18; i++) {
-        if (Course_GetHolePar(i) == 3) {
+        if (GM_GetHoleIndexPar(i) == 3) {
             bFound = 1;
         }
     }
     if (bFound) {
         gHoleContestClosestToPinHole = Misc_RandFunc(0) % 18;
-        while (Course_GetHolePar(gHoleContestClosestToPinHole) > 3) {
+        while (GM_GetHoleIndexPar(gHoleContestClosestToPinHole) > 3) {
             gHoleContestClosestToPinHole = Misc_RandFunc(0) % 18;
         }
     } else {
@@ -111,13 +111,13 @@ void HoleContest_DrawHoles(void) {
     if ((int)(Misc_RandFunc(0) % 100) < 20) {
         bFound = 0;
         for (i = 0; i < 18; i++) {
-            if (Course_GetHolePar(i) == 3 && i != gHoleContestClosestToPinHole) {
+            if (GM_GetHoleIndexPar(i) == 3 && i != gHoleContestClosestToPinHole) {
                 bFound = 1;
             }
         }
         if (bFound) {
             gHoleContestHoleInOneHole = Misc_RandFunc(0) % 18;
-            while (Course_GetHolePar(gHoleContestHoleInOneHole) > 3 || gHoleContestHoleInOneHole
+            while (GM_GetHoleIndexPar(gHoleContestHoleInOneHole) > 3 || gHoleContestHoleInOneHole
                    == gHoleContestClosestToPinHole) {
                 gHoleContestHoleInOneHole = Misc_RandFunc(0) % 18;
             }

@@ -56,10 +56,10 @@ u8 fn_800CF158(int nPlayer) {
                 if (!gPlayers[i].bPlayerCut) {
                     if (i == nPlayer) {
                         nMineStrokes = anTotal[i] + gPlayers[i].nStrokes[Game_CurHoleIndex()] + 1 -
-                                       Course_GetCurHolePar();
+                                       GM_GetCurrentHolePar();
                     } else {
                         nOther = anTotal[i] + gPlayers[i].nStrokes[Game_CurHoleIndex()]
-                                - Course_GetCurHolePar();
+                                - GM_GetCurrentHolePar();
                         if (gPlayers[i].ball.nLie != LIE_INCUP_e) {
                             nOther++;
                         }
@@ -163,9 +163,9 @@ u8 fn_800CF450(int nPlayer) {
             if (!gPlayers[i].bPlayerCut) {
                 if (i == nPlayer) {
                     nMineStrokes = anTotal[i] + gPlayers[i].nStrokes[Game_CurHoleIndex()] + 1 -
-                                   Course_GetCurHolePar();
+                                   GM_GetCurrentHolePar();
                 } else {
-                    nOther = anTotal[i] + gPlayers[i].nStrokes[Game_CurHoleIndex()] - Course_GetCurHolePar();
+                    nOther = anTotal[i] + gPlayers[i].nStrokes[Game_CurHoleIndex()] - GM_GetCurrentHolePar();
                     if (gPlayers[i].ball.nLie != LIE_INCUP_e) {
                         nOther++;
                     }
@@ -297,7 +297,7 @@ u32 fn_800CF904(int nPlayer) {
     }
     if (HighScoreRecords_CheckRecordGameSetting(3) && !gpGame->bInPlayoff && pBall->nLie != LIE_GREEN_e
         && pBall->nLie != LIE_FRINGE_e &&
-        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 <= Course_GetCurHolePar() - 2) {
+        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 <= GM_GetCurrentHolePar() - 2) {
         if (fn_800D1170(nPlayer, 0) + 1 > gSession.aCourseRecord[Game_GetCourse()].aRecord[3][0].nValue) {
             uFlags |= 0x8;
         }
@@ -315,19 +315,19 @@ u32 fn_800CF904(int nPlayer) {
         }
     }
     if (HighScoreRecords_CheckRecordGameSetting(5) && !gpGame->bInPlayoff && pBall->nLie == LIE_TEE_e
-        && Course_GetCurHolePar() >= 4) {
+        && GM_GetCurrentHolePar() >= 4) {
         if (fn_800D0FBC(nPlayer) + 1 > gSession.aCourseRecord[Game_GetCourse()].aRecord[5][0].nValue) {
             uFlags |= 0x20;
         }
     }
     if (HighScoreRecords_CheckRecordGameSetting(6) && !gpGame->bInPlayoff &&
-        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 <= Course_GetCurHolePar() - 2) {
+        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 <= GM_GetCurrentHolePar() - 2) {
         if (fn_800D06FC(nPlayer, 0, 0) + 1 > gSession.aCourseRecord[Game_GetCourse()].aRecord[6][0].nValue) {
             uFlags |= 0x40;
         }
     }
     if (HighScoreRecords_CheckRecordGameSetting(7) && !gpGame->bInPlayoff &&
-        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 <= Course_GetCurHolePar() - 1) {
+        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 <= GM_GetCurrentHolePar() - 1) {
         if (fn_800D0620(nPlayer, 0, 0) + 1 > gSession.aCourseRecord[Game_GetCourse()].aRecord[7][0].nValue) {
             uFlags |= 0x80;
         }
@@ -432,10 +432,10 @@ int fn_800CFFE4(int nPlayer) {
         return 0;
     }
     for (i = 0; i < Game_CurHoleIndex(); i++) {
-        nPar += Course_GetHolePar(i);
+        nPar += GM_GetHoleIndexPar(i);
         nStrokes += gPlayers[nPlayer].nStrokes[i];
     }
-    return (nStrokes - nPar) + gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 - Course_GetCurHolePar();
+    return (nStrokes - nPar) + gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 - GM_GetCurrentHolePar();
 }
 
 // gpGame->pfnGetPotentialLead (TW06: GetPotentialLead).
@@ -466,11 +466,11 @@ s32 fn_800D0098(int nPlayer) {
                 anTotal[i] = GM_GetGolferRelativeCumulativeScore(i, 0);
                 if (i == nPlayer) {
                     nMine = anTotal[i];
-                    nMine += gPlayers[i].nStrokes[Game_CurHoleIndex()] + 1 - Course_GetCurHolePar();
+                    nMine += gPlayers[i].nStrokes[Game_CurHoleIndex()] + 1 - GM_GetCurrentHolePar();
                 } else {
                     nOther = anTotal[i];
                     if (gPlayers[i].ball.nLie == LIE_INCUP_e) {
-                        nOther += gPlayers[i].nStrokes[Game_CurHoleIndex()] - Course_GetCurHolePar();
+                        nOther += gPlayers[i].nStrokes[Game_CurHoleIndex()] - GM_GetCurrentHolePar();
                     }
                     if (nOther < nBest) {
                         nBest = nOther;
@@ -635,7 +635,7 @@ int fn_800D0620(int nPlayer, u8 bCurrent, u8 bOnlyFlagged) {
     }
     for (; i >= 0; i--) {
         if (gpGame->bHoleSelected[i] && gPlayers[nPlayer].nStrokes[i] > 0 &&
-            gPlayers[nPlayer].nStrokes[i] <= Course_GetHolePar(i) - 1 &&
+            gPlayers[nPlayer].nStrokes[i] <= GM_GetHoleIndexPar(i) - 1 &&
             (gpGame->b16C[nPlayer][i] == 1 || !bOnlyFlagged)) {
             nCount++;
         }
@@ -654,7 +654,7 @@ int fn_800D06FC(int nPlayer, u8 bCurrent, u8 bOnlyFlagged) {
     }
     for (; i >= 0; i--) {
         if (gpGame->bHoleSelected[i] && gPlayers[nPlayer].nStrokes[i] > 0 &&
-            gPlayers[nPlayer].nStrokes[i] <= Course_GetHolePar(i) - 2 &&
+            gPlayers[nPlayer].nStrokes[i] <= GM_GetHoleIndexPar(i) - 2 &&
             (gpGame->b16C[nPlayer][i] == 1 || !bOnlyFlagged)) {
             nCount++;
         }
@@ -674,7 +674,7 @@ int fn_800D07D8(int nPlayer, u8 bCurrent) {
     }
     for (; i >= 0; i--) {
         if (gpGame->bHoleSelected[i]) {
-            if (gPlayers[nPlayer].nStrokes[i] <= 0 || gPlayers[nPlayer].nStrokes[i] > Course_GetHolePar(i)
+            if (gPlayers[nPlayer].nStrokes[i] <= 0 || gPlayers[nPlayer].nStrokes[i] > GM_GetHoleIndexPar(i)
                 - 1) {
                 break;
             }
@@ -695,7 +695,7 @@ int fn_800D089C(int nPlayer, u8 bCurrent) {
     }
     for (; i >= 0; i--) {
         if (gpGame->bHoleSelected[i]) {
-            if (gPlayers[nPlayer].nStrokes[i] <= 0 || gPlayers[nPlayer].nStrokes[i] > Course_GetHolePar(i)
+            if (gPlayers[nPlayer].nStrokes[i] <= 0 || gPlayers[nPlayer].nStrokes[i] > GM_GetHoleIndexPar(i)
                 - 2) {
                 break;
             }
@@ -741,7 +741,7 @@ f32 fn_800D0960(int nPlayer) {
 
 // The score the hole will finish on once the tap-in drops: strokes so far plus one, minus par.
 int Hole_ScoreAfterTapIn(int nPlayer) {
-    return gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 - Course_GetCurHolePar();
+    return gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 - GM_GetCurrentHolePar();
 }
 
 // Whether nobody took anything (mode points or nSkinsWon) on the last hole played before this one;
@@ -785,7 +785,7 @@ u8 fn_800D0BF8(int nPlayer, u8 bUnder, u8 bAnyLie) {
 
     pSurface = Ter_GetSupportingWorldMaterial(gPlayers[nPlayer].ball.pCourse, gPlayers[nPlayer].vBall);
     if (pSurface != NULL) {
-        nPar = Course_GetCurHolePar();
+        nPar = GM_GetCurrentHolePar();
         if (bAnyLie) {
             nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
             if (bUnder) {
@@ -828,7 +828,7 @@ int fn_800D0DC8(int nPlayer, int nToPar) {
     int i;
     for (i = 0; i < 18; i++) {
         if (gpGame->bHoleSelected[i]) {
-            if (gPlayers[nPlayer].nStrokes[i] - Course_GetHolePar(i) <= nToPar ||
+            if (gPlayers[nPlayer].nStrokes[i] - GM_GetHoleIndexPar(i) <= nToPar ||
                 (gPlayers[nPlayer].nStrokes[i] == 1 && nToPar < -3)) {
                 nCount++;
             }
@@ -843,7 +843,7 @@ int fn_800D0E74(int nPlayer) {
     int i;
     for (i = 0; i < 18; i++) {
         if (gpGame->bHoleSelected[i]) {
-            if (gPlayers[nPlayer].nStrokes[i] - Course_GetHolePar(i) >= 1) {
+            if (gPlayers[nPlayer].nStrokes[i] - GM_GetHoleIndexPar(i) >= 1) {
                 nCount++;
             }
         }
@@ -860,7 +860,7 @@ int fn_800D0F04(int nPlayer, int nToPar) {
     nRun = 0;
     for (i = 0; i < 18; i++) {
         if (gpGame->bHoleSelected[i]) {
-            if (gPlayers[nPlayer].nStrokes[i] - Course_GetHolePar(i) <= nToPar ||
+            if (gPlayers[nPlayer].nStrokes[i] - GM_GetHoleIndexPar(i) <= nToPar ||
                 (gPlayers[nPlayer].nStrokes[i] == 1 && nToPar < -3)) {
                 nRun++;
             } else {
@@ -899,7 +899,7 @@ int fn_800D10B0(int nPlayer) {
     for (i = 0; i < 18; i++) {
         if (gpGame->bHoleSelected[i] && gPlayers[nPlayer].bFairwayHit[i]) {
             nRun++;
-        } else if (Course_GetHolePar(i) != 3) {
+        } else if (GM_GetHoleIndexPar(i) != 3) {
             if (nRun > nBest) {
                 nBest = nRun;
             }

@@ -1621,10 +1621,10 @@ u8 DynamicCam_MatchCourse(CamSequence* pSequence) {
     return (pSequence->uCourses & (1 << Game_GetCourse())) != 0;
 }
 
-// The sequence is used on a hole of the current one's par: its n4B bit for Course_GetCurHolePar is
+// The sequence is used on a hole of the current one's par: its n4B bit for GM_GetCurrentHolePar is
 // set.
 u8 DynamicCam_MatchPars(CamSequence* pSequence) {
-    return (pSequence->n4B & (1 << Course_GetCurHolePar())) != 0;
+    return (pSequence->n4B & (1 << GM_GetCurrentHolePar())) != 0;
 }
 
 // Camera lie nBit is in the lie mask nMask (a sequence's b49 start lies or b4A end lies).

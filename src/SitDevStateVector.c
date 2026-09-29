@@ -163,7 +163,7 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
         _SetStateVecAndCondition(pValues, 30, Game_GetCourse(), pSetBits);
         _SetStateVecAndCondition(pValues, 83, GameModeDriverPGATour_GetCurrentEventID() + 1, pSetBits);
         _SetStateVecAndCondition(pValues, 62, nRound + 1, pSetBits);
-        _SetStateVecAndCondition(pValues, 7, Course_GetCurHolePar(), pSetBits);
+        _SetStateVecAndCondition(pValues, 7, GM_GetCurrentHolePar(), pSetBits);
         _SetStateVecAndCondition(pValues, 29, GM_IsPlayoff(), pSetBits);
         _SetStateVecAndCondition(pValues, 28, GM_GetNumHolesInRound(), pSetBits);
         _SetStateVecAndCondition(pValues, 31, fn_800D0AF4(), pSetBits);

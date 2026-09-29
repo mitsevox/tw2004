@@ -99,8 +99,8 @@ void Golfer_RegisterStatsHandler();
 void Golfer_UnregisterStatsHandler();
 void Session_RegisterRecordsHandler();
 void Session_UnregisterRecordsHandler();
-void fn_800D29EC();
-void fn_800D2A30();
+void GM_CourseInfo_RegisterStreamClients();
+void GM_CourseInfo_UnRegisterStreamClients();
 void EarningsInfo_RegisterStreamClients();
 void EarningsInfo_UnRegisterStreamClients();
 void PlayNow_RegisterStreamClients();
@@ -349,7 +349,7 @@ void fn_80014864(void) {
     Golfer_RegisterStatsHandler();
     Session_RegisterRecordsHandler();
     UI_vEATraxRegisterStreamClients();
-    fn_800D29EC();
+    GM_CourseInfo_RegisterStreamClients();
     PlayNow_RegisterStreamClients();
     EarningsInfo_RegisterStreamClients();
     GameMode4_RegisterStreamClients();
@@ -362,7 +362,7 @@ void fn_800148A8(void) {
     Golfer_UnregisterStatsHandler();
     Session_UnregisterRecordsHandler();
     UI_vEATraxUnRegisterStreamClients();
-    fn_800D2A30();
+    GM_CourseInfo_UnRegisterStreamClients();
     PlayNow_UnregisterStreamClients();
     EarningsInfo_UnRegisterStreamClients();
     GameMode4_UnregisterStreamClients();

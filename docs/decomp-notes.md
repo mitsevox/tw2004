@@ -166,7 +166,7 @@ They will be sorted into the sections below.
   (LadderMenu_GetNodePos 79.9 -> 100, LadderMenu_GetFirstAndCursorNodePos 67.1 -> 100).
 - **[verified] Operands that are both calls are evaluated right to left.** `fn(5) + fn(4)` calls `fn(4)`
   first; for arguments, `f(g(), h())` calls `h()` first. To call in source order, use a temporary.
-  CourseData fn_800D2F00, sweep_800D3208 (99.87 -> 100).
+  CourseData GM_GetTotalPar, sweep_800D3208 (99.87 -> 100).
 - **[verified] `x = f(); if (x == NULL) { while (x == NULL) {...} }` gives CodeWarrior's "test the result,
   then jump to the loop test" shape** (`cmplwi r3,0; bne end; b test`). StaticMemory StaticMem_Init 96.15 ->
   100 (mark it `// fake match` if the outer `if` is redundant in the source).

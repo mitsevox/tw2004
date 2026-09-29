@@ -206,7 +206,7 @@ void GameMode12_EndHole(void) {
         if (PLAYER(i)->nStrokes[Game_CurHoleIndex()] == 1) {
             fMult = 32.0f;
         } else {
-            switch (PLAYER(i)->nStrokes[Game_CurHoleIndex()] - Course_GetCurHolePar()) {
+            switch (PLAYER(i)->nStrokes[Game_CurHoleIndex()] - GM_GetCurrentHolePar()) {
             case -3:
                 fMult = 16.0f;
                 break;

@@ -147,13 +147,13 @@ extern Unk80188900 lbl_80188900[NUM_COURSE_DATA][5];   // (above)
 typedef struct HoleData {
     s32  nPar;                  // 0x00
     s32  nRating;               // 0x04  the hole's rating (UI message 35, GM_vGetHoleRating)
-    s32  n08;                   // 0x08  per tee set (fn_800D2B80): tee 3
+    s32  n08;                   // 0x08  per tee set (GM_GetHoleTeeDistance): tee 3
     s32  n0C;                   // 0x0C  tee 2
     s32  n10;                   // 0x10  tee 1
     s32  n14;                   // 0x14  tee 0
-    s32  nWindDir;              // 0x18  (fn_800D2CB0_HoleWindDir)
+    s32  nWindDir;              // 0x18  (GM_GetCurrentHolePrevailingWindDir)
     u8   unk1C[0x2C - 0x1C];
-    f32  fWindSpeed;            // 0x2C  (fn_800D2CF8_HoleWindSpeed)
+    f32  fWindSpeed;            // 0x2C  (GM_GetCurrentHolePrevailingWindSpeed)
     u8   unk30[4];
     u8   b34;                   // 0x34
     u8   b35;                   // 0x35
@@ -167,7 +167,7 @@ typedef struct CourseData {
     HoleData aHoles[18];        // 0x000
     struct {
         s32  n0;                // +0x0
-        s32  nPar;              // +0x4  the course's par from this tee set (fn_800D2F00)
+        s32  nPar;              // +0x4  the course's par from this tee set (GM_GetTotalPar)
         u8   unk8[8];
     } aTeeSets[4];              // 0x3F0
 } CourseData;
@@ -186,15 +186,15 @@ LAYOUT_ASSERT(BuiltRound, 0x24);
 extern BuiltRound lbl_801FA1F8[NUM_BUILT_ROUNDS];    // 0x801FA1F8
 extern CourseData lbl_801FA2F4[NUM_COURSE_DATA];     // 0x801FA2F4
 
-void fn_800D29E8(void);
-int  fn_800D2CB0_HoleWindDir(void);
-f32  fn_800D2CF8_HoleWindSpeed(void);
-s32  fn_800D2F00(int nCourse, int nTeeSet);    // a course's par from a tee set
-s32  fn_800D2FB4(s32 nTeeSet);          // the par of the round's 18 holes (the tee set is not used)
-u8   fn_800D3080(int nHole);
-int  fn_800D3118(int nRound, int nHole);    // a built round's course for a hole
-int  fn_800D315C(int nRound, int nHole);    // and its hole number (1-based)
-int  fn_800D31A4(int nPar);             // the number of the 18 holes with that par
+void GM_CourseInfo_DeInit(void);
+int  GM_GetCurrentHolePrevailingWindDir(void);
+f32  GM_GetCurrentHolePrevailingWindSpeed(void);
+s32  GM_GetTotalPar(int nCourse, int nTeeSet);    // a course's par from a tee set
+s32  GM_GetCurrentCourseTotalPar(s32 nTeeSet);          // the par of the round's 18 holes (the tee set is not used)
+u8   GM_GetHoleIndexCountsForDrivingStat(int nHole);
+int  GM_CourseInfo_GetCompilationCourse(int nRound, int nHole);    // a built round's course for a hole
+int  GM_CourseInfo_GetCompilationHole(int nRound, int nHole);    // and its hole number (1-based)
+int  GM_CurrentCourseTotalParXHoles(int nPar);             // the number of the 18 holes with that par
 
 // ---- the game manager ------------------------------------------------------------------------
 
@@ -244,9 +244,9 @@ void CalDate_ToStringMD(u16 nDate, char* pBuf);       // a date as month/day
 s32  CalDate_GetDay(u16 nDate);            // Calendar.c
 u32  CalDate_GetMonth(u16 nDate);            // Calendar.c (unsigned: callers compare it with cmplw)
 u16  CalDate_GetToday(void);                 // today's date
-int  fn_800D2ABC(int nCourse, int nHole);   // a hole's par on a course
-int  Course_GetHolePar(int nHole);            // a hole's par
-s32  fn_800D2C30(int nHole, int nTee);  // CourseData.c: a round hole's length from tee set nTee
+int  GM_GetHolePar(int nCourse, int nHole);   // a hole's par on a course
+int  GM_GetHoleIndexPar(int nHole);            // a hole's par
+s32  GM_GetHoleIndexTeeDistance(int nHole, int nTee);  // CourseData.c: a round hole's length from tee set nTee
 s32  GM_Earnings_TournamentPayout(int nTotal, int n, int nRow);  // Earnings.c: the prize for a finishing row
 void GM_Earnings_AwardMoney(int nPlayer, int nMoney, CourseMoneyTracking* pMoney);   // pMoney may be NULL
 int  GM_Earnings_GetStrokeWinnings(int nWinner, int nLoser, int nMargin, int* pPrize);

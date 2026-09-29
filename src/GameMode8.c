@@ -814,7 +814,7 @@ u8 SpeedGolf_OnBallAtRest(int nPlayer) {
             gPlayers[nPlayer].fDriveLength = fDist;
             gPlayers[nPlayer].nSGFlags |= 0x20;
             if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == 1) {
-                if ((gPlayers[nOther].nSGFlags & 0x20) && Course_GetCurHolePar() > 3) {
+                if ((gPlayers[nOther].nSGFlags & 0x20) && GM_GetCurrentHolePar() > 3) {
                     if (gPlayers[nPlayer].fDriveLength > gPlayers[nOther].fDriveLength) {
                         SpeedGolf_TradeEventPoints(nPlayer, 1);
                     } else if (gPlayers[nPlayer].fDriveLength < gPlayers[nOther].fDriveLength) {
@@ -824,7 +824,7 @@ u8 SpeedGolf_OnBallAtRest(int nPlayer) {
             }
         } else if (gPlayers[nPlayer].nSGFlags & 8) {
             if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == gPlayers[nPlayer].nC60 + 1 &&
-                Course_GetCurHolePar() > 3) {
+                GM_GetCurrentHolePar() > 3) {
                 if (gPlayers[nOther].uC48 & 0x03000002) {
                     if (fDist > gPlayers[nOther].fDriveLength) {
                         gPlayers[nOther].uC48 &= ~(u64)0x03000002;
@@ -849,7 +849,7 @@ u8 SpeedGolf_OnBallAtRest(int nPlayer) {
 void SpeedGolfPoints_ScoreHoleResult(int nPlayer, int nStrokes) {
     int nPar;
     int nUnder;
-    nPar = Course_GetCurHolePar();
+    nPar = GM_GetCurrentHolePar();
     nUnder = nPar - nStrokes;
     if (nUnder >= 0 && (gPlayers[nPlayer].nSGFlags & 0xC00)) {
         SpeedGolf_TradeEventPoints(nPlayer, 0x17);
@@ -1221,7 +1221,7 @@ void SpeedGolf_RunUpdate(int nPlayer) {
             } else {
                 gPlayers[nPlayer].ball.nState = 0;
                 Mem_cpy(&p->ballBefore, pBall, sizeof(Ball));
-                nPar = Course_GetCurHolePar();
+                nPar = GM_GetCurrentHolePar();
                 if (gPlayers[nPlayer].ball.nLie == LIE_GREEN_e) {
                     if (Game_GetMode() == 7) {
                         fDist = SpeedGolf_GroundDistance(p->vPreShot, pBall->vPos);

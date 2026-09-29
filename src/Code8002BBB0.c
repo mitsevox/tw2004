@@ -369,7 +369,7 @@ int Shot_GoverningAttribute(int nPlayer, int nClub, int nLie, int nKind) {
     if (nLie == 8 || nLie == 13 || nLie == 11 || nLie == 3 || nLie == 4 || nLie == 6 || nLie == 7) {
         return ATTR_RECOVERY;
     }
-    if (nKind == SHOT_TYPE_DRIVE_e && nClub < 13 && Course_GetCurHolePar() == 3) {
+    if (nKind == SHOT_TYPE_DRIVE_e && nClub < 13 && GM_GetCurrentHolePar() == 3) {
         return ATTR_BALL_STRIKING;
     }
     return ATTR_APPROACH;

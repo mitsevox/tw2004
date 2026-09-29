@@ -847,8 +847,8 @@ extern f32          gClubPowerStep[CLUB_MAX_e];      // 0x801875E8  reach gained
 int  Game_GetMode(void);                // 0x8000BED8
 int  Golfer_FindById(int nId);          // the gGolferTable row with that nModelID, -1 none
 void fn_8002EBA4(u8* pObj, u8 nValue);  // set byte 7 of the options (a7[0]) and apply it (Golfer.c)
-int  Course_GetCurHolePar(void);
-s32  fn_800D2C68(int nTee);             // CourseData.c: the current hole's value for tee set nTee
+int  GM_GetCurrentHolePar(void);
+s32  GM_GetCurrentHoleTeeDistance(int nTee);             // CourseData.c: the current hole's value for tee set nTee
 int  Lessons_GetShotKind(void);                 // shot kind override, 8 = none
 int  Lessons_GetClub(int nPlayer);          // club override, 26 = none
 int  Game_GetCurHoleNum(void);
