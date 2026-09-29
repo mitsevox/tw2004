@@ -60,7 +60,7 @@ void UI_ShowLoadingScreen(void);
 void UI_OnFrontEndStart(void);
 void UI_RestoreAfterMovie(void);
 f32 UI_GetDrawDepth(void);
-void fn_80013E30();
+void RC_vSetRenderCtxFrameBuffer();
 void UI_SetCurrentRenderCtxFrameBuffer(s32 p0);
 
 u8 gbUIFirstMenuDraw = 1;               // cleared on the first menu draw (UI_ClearFirstMenuDraw)
@@ -763,11 +763,12 @@ void LLMath_Add(f32* pA, f32* pB, f32* pOut) {
 }
 #endif
 
-// Make p0 (a GoFrameBuf) the current render context's frame buffer (GoRenderCtx_Gc.c fn_80013E30).
-// port: the frame buffer travels as an s32, and fn_80013E30 is declared here without parameters: EA
-//       passes the render-context slot as a third argument it ignores.
+// Make p0 (a GoFrameBuf) the current render context's frame buffer (GoRenderCtx_Gc.c
+// RC_vSetRenderCtxFrameBuffer). port: the frame buffer travels as an s32, and
+// RC_vSetRenderCtxFrameBuffer is declared here
+//       without parameters: EA passes the render-context slot as a third argument it ignores.
 void UI_SetCurrentRenderCtxFrameBuffer(s32 p0) {
-    fn_80013E30(*(s32*)((u8*)gppCurrentRenderCtx), p0, gppCurrentRenderCtx);
+    RC_vSetRenderCtxFrameBuffer(*(s32*)((u8*)gppCurrentRenderCtx), p0, gppCurrentRenderCtx);
 }
 
 TexEntry* UI_GetTexBankFirstTexture(TexBank* pBank) {

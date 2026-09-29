@@ -991,10 +991,10 @@ GoFrameBuf* FB_spCreateFrameBuffer(void);               // a new frame buffer wi
 void        FB_vReleaseFrameBuffer(GoFrameBuf* pBuf);   // free it
 void        FB_vSetDefaultFrameBuffer(GoFrameBuf* pBuf);   // the default size: 512 x 448, scale 1
 void        FB_vSetFrameBuffer(GoFrameBuf* pBuf, f32 f0, f32 f4, f32 fWidth, f32 fHeight, f32 f10, f32 f14);
-f32         fn_8001415C(GoFrameBuf* pBuf);   // GoRenderCtx_Gc.c: fHeight
-f32         fn_80014164(GoFrameBuf* pBuf);   // f4
-f32         fn_8001416C(GoFrameBuf* pBuf);   // fWidth
-f32         fn_80014174(GoFrameBuf* pBuf);   // f0
+f32         FB_fGetFrameBufferHeight(GoFrameBuf* pBuf); // GoRenderCtx_Gc.c: fHeight
+f32         FB_fGetFrameBufferOffsetY(GoFrameBuf* pBuf); // f4
+f32         FB_fGetFrameBufferWidth(GoFrameBuf* pBuf); // fWidth
+f32         FB_fGetFrameBufferOffsetX(GoFrameBuf* pBuf); // f0
 
 // ---- the parts of a render camera: lens (GoCamera.c), screen rectangle (GoViewport.c) ---------
 

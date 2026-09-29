@@ -178,7 +178,7 @@ the two structs are still declared separately).
 Camera fields (guesses from how the cull test uses them): `0x11C` view matrix (4x4 floats);
 `0x1F4` / `0x1F8` near and far clip distances; `0x204`-`0x210` and `0x214`-`0x220` two sets of four
 frustum edge-plane numbers, chosen by a mode argument (0 or 1). Why there are two sets is unknown
-(two aspect ratios? a tight and a loose view?). `fn_80013EA0` also reads the two clip distances.
+(two aspect ratios? a tight and a loose view?). `RenderState_SetClipZFromRenderCtx` also reads the two clip distances.
 
 The camera's sub-object (`cam->unk10`): field `0x0` is 0 for a perspective camera and non-zero for a
 flat one; `0xB4` / `0xB8` are the flat view's width and height (guess - the cull test halves them to

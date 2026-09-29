@@ -30,9 +30,9 @@ typedef struct {
 } RenderObj;
 
 typedef struct Camera {
-    /* 0x000 */ float a0[4];         // 0, 0, 0.5, 0 at setup (GoRenderCtx_Gc.c fn_80013E48)
+    /* 0x000 */ float a0[4];         // 0, 0, 0.5, 0 at setup (GoRenderCtx_Gc.c RC_vSetDefaultRenderCtx)
     /* 0x010 */ CamLens* unk10;
-    /* 0x014 */ float* pRect;        // its screen rectangle (camera.h RenderCamera; fn_80013E28 sets it)
+    /* 0x014 */ float* pRect;        // its screen rectangle (camera.h RenderCamera; RC_vSetRenderCtxViewport sets it)
     /* 0x018 */ GoFrameBuf* pBuf;    // its frame buffer (GoRenderCtx_Gc.c RC_spCreateRenderCtx)
     /* 0x01C */ char pad1C[0x40];
     /* 0x05C */ float m5C[4][4];     // camera space to the screen (GoDynObj.c DynObj_GetBallPixels divides by
@@ -49,8 +49,8 @@ typedef struct Camera {
                                      // RC_vUpdateRenderCtxScreenMatricesAndInfo, RC_vUpdate... below)
     /* 0x1E4 */ float f1E4;          // the rectangle's centre across (RC_vUpdate...)
     /* 0x1E8 */ float f1E8;          // 1 - its centre down (RC_vUpdate...)
-    /* 0x1EC */ float f1EC;          // 1.0 at setup (GoRenderCtx_Gc.c fn_80013E48)
-    /* 0x1F0 */ float f1F0;          // 16773216.0 at setup (fn_80013E48)
+    /* 0x1EC */ float f1EC;          // 1.0 at setup (GoRenderCtx_Gc.c RC_vSetDefaultRenderCtx)
+    /* 0x1F0 */ float f1F0;          // 16773216.0 at setup (RC_vSetDefaultRenderCtx)
     /* 0x1F4 */ float unk1F4;
     /* 0x1F8 */ float unk1F8;
     /* 0x1FC */ float f1FC;          // } RC_vUpdateRenderCtxScreenMatricesAndInfo
@@ -70,7 +70,7 @@ typedef struct Camera {
 } Camera;
 LAYOUT_ASSERT(Camera, 0x234);       // GoRenderCtx_Gc.c RC_spCreateRenderCtx allocates 0x234 bytes
 
-GoFrameBuf* fn_80013E40(Camera* pCamera);   // GoRenderCtx_Gc.c: the camera's frame buffer
+GoFrameBuf* RC_spGetRenderCtxFrameBuffer(Camera* pCamera); // GoRenderCtx_Gc.c: the camera's frame buffer
 
 Sphere* fn_800082F8(RenderObj* obj);
 void LLMath_mat44fltMultiply(float mtx[4][4], Vec4* src, Vec4* dst);   // VecMath.c: dst = src x mtx

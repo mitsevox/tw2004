@@ -24,7 +24,7 @@
 
 void  Character_SetOrientationVec(Character* pChar, f32* pDir, f32 f);
 void  GameModeSkillZoneBase_AddCup(f32 x, f32 y, f32 z);
-f32   fn_8001414C(u8* p);
+f32   VM_fGetViewportHeightOverWidth(u8* p);
 f32   Math_Tan(f32 x);           // tan
 void  Ter_BeginRender(void);
 void  Ter_RenderView(void* pHoleData, int nView);
@@ -374,7 +374,9 @@ void Ter_RenderView(void* pHoleData, int nView) {
     vToPin[1] = 0.0f;
     gTerRenderer.fGolferDistanceToCup = Math_Sqrt(Vec3_LengthSqClamped(vToPin));
     fTan = Math_Tan(0.5f * pLens->fFov);
-    fWideTan = Math_Tan(0.5f * (0.75f * pLens->fFov * fn_8001414C((u8*)RC_spGetCurrentRenderCtxViewport())));
+    fWideTan = Math_Tan(0.5f
+                        * (0.75f * pLens->fFov
+                           * VM_fGetViewportHeightOverWidth((u8*)RC_spGetCurrentRenderCtxViewport())));
     gTerRenderer.fCameraMinHalfFieldOfViewTan =
         (fTan <= fWideTan / ViewController_GetCameraControl(nView)->f54) ? fTan : fWideTan
                 / ViewController_GetCameraControl(nView)->f54;
@@ -2213,7 +2215,9 @@ void Ter_RenderGrass(void) {
         }
     }
     fTan = Math_Tan(0.5f * pLens->fFov);
-    fWideTan = Math_Tan(0.5f * (0.75f * pLens->fFov * fn_8001414C((u8*)RC_spGetCurrentRenderCtxViewport())));
+    fWideTan = Math_Tan(0.5f
+                        * (0.75f * pLens->fFov
+                           * VM_fGetViewportHeightOverWidth((u8*)RC_spGetCurrentRenderCtxViewport())));
     gTerRenderer.fCameraMinHalfFieldOfViewTan =
         (fTan <= fWideTan / ViewController_GetCameraControl(0)->f54) ? fTan : fWideTan
                 / ViewController_GetCameraControl(0)->f54;
@@ -2434,7 +2438,7 @@ f32 Ter_GetTimeInCycle(u32 n, f32 fPeriod) {
     return FRAME_TIME * (f32)(n % (u32)(FRAME_RATE * (0.5f / FRAME_RATE + fPeriod)));
 }
 
-void fn_80013D68();
+void RC_vUpdateRenderCtxScreen();
 void LF_ApplyFogToRenderState(void);
 void LF_UpdateFogColourForCamera();
 void LF_SetFogSettings(TerSettings* pSettings);
@@ -2459,7 +2463,7 @@ void RC_vUpdateCurrentRenderCtxTransformationMatrices(void) {
 // Works out the current render camera's screen values and projection again
 // (RC_vUpdateRenderCtxScreenMatricesAndInfo).
 void RC_UpdateCurrentScreenMatrices(void) {
-    fn_80013D68(*(s32*)((u8*)gppCurrentRenderCtx));
+    RC_vUpdateRenderCtxScreen(*(s32*)((u8*)gppCurrentRenderCtx));
 }
 
 // Updates the fog for this frame: blends the fog colour for the camera's heading

@@ -171,7 +171,7 @@ void fn_80012B2C(f32 x0, f32 x1);
 void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
 void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
 void fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY);
-void fn_800137D0(void* pCamera);
+void RC_vApplyRenderCtxToRenderState(void* pCamera);
 void fn_800162A8(void);
 void fn_80007254(void);
 u8   fn_80007258(void);
@@ -226,7 +226,7 @@ void LLVideo_DarkenScreen(int nFlags) {
         }
         fn_800162A8();
         fn_80006EDC();
-        fn_800137D0(RC_spGetCurrentRenderCtx());
+        RC_vApplyRenderCtxToRenderState(RC_spGetCurrentRenderCtx());
         // the original tests bBit0 here although both branches make the same call
         if (bBit0) {
             RenderState_SetScissor(0, 0, 512, 448);

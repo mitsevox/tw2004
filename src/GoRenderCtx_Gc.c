@@ -6,13 +6,13 @@
 #include "engine.h"
 #include "unsorted/cull.h"
 
-void fn_80013D58(Camera* pCamera);
-void fn_80013D68(Camera* pCamera);
-void fn_80013E28(Camera* pCamera, f32* pRect);
-void fn_80013E30(Camera* pCamera, GoFrameBuf* pBuf);
-void fn_80013E38(Camera* pCamera, CamLens* pLens);
-void fn_80013E48(Camera* pCamera);
-void fn_80013EA0(Camera* pCamera);
+void RC_vOnRenderCtxScreenUpdated(Camera* pCamera);
+void RC_vUpdateRenderCtxScreen(Camera* pCamera);
+void RC_vSetRenderCtxViewport(Camera* pCamera, f32* pRect);
+void RC_vSetRenderCtxFrameBuffer(Camera* pCamera, GoFrameBuf* pBuf);
+void RC_vSetRenderCtxCamera(Camera* pCamera, CamLens* pLens);
+void RC_vSetDefaultRenderCtx(Camera* pCamera);
+void RenderState_SetClipZFromRenderCtx(Camera* pCamera);
 void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
 void Mtx_OrthoScale(f32 (*pMtx)[4], f32 f1, f32 f2);   // matrix builders, not decompiled yet
 void Mtx_Perspective(f32 (*pMtx)[4], f32 f1, f32 f2, f32 f3, f32 f4, f32 f5);
@@ -28,16 +28,18 @@ void* gapCurrentRenderCtx[2];   // 8 bytes in the DOL (gnInputControlSet follows
 // This file's .sdata (camera.h).
 void** gppCurrentRenderCtx = gapCurrentRenderCtx;
 
-// Makes a render camera from a lens, a frame buffer and a screen rectangle.
+// Makes a render context (0x234 bytes, TW07's RC_SRenderCtx) from a lens (TW07's CA_SCamera), a
+// frame buffer and a screen rectangle: the identity model matrix, the default clear values, and the
+// screen matrices worked out.
 void* RC_spCreateRenderCtx(CamLens* pLens, GoFrameBuf* pBuf, f32* pRect) {
     Camera* pCamera;
 
     pCamera = StaticMem_Alloc(0x234, 2, 16, "GoRenderCtx_Gc.c", 96);
-    fn_80013E38(pCamera, pLens);
-    fn_80013E30(pCamera, pBuf);
-    fn_80013E28(pCamera, pRect);
-    fn_80013E48(pCamera);
-    fn_80013D68(pCamera);
+    RC_vSetRenderCtxCamera(pCamera, pLens);
+    RC_vSetRenderCtxFrameBuffer(pCamera, pBuf);
+    RC_vSetRenderCtxViewport(pCamera, pRect);
+    RC_vSetDefaultRenderCtx(pCamera);
+    RC_vUpdateRenderCtxScreen(pCamera);
     return pCamera;
 }
 
@@ -65,14 +67,14 @@ s32 LLMath_Transpose44();
 s32 LLMath_mat44fltMultiplyList();
 void RC_vSetCurrentRenderCtx(s32 v);
 void RC_vUpdateRenderCtxScreenMatricesAndInfo(Camera* pCamera);   // not decompiled yet
-void fn_80013DD0(u8* arg0, f32 (*arg1)[4]);
+void RC_vStoreRenderCtxTransformationMatrix(u8* arg0, f32 (*arg1)[4]);
 s32 LLMath_IdentifyMat();
-f32 fn_80014134(u8* p);
-f32 fn_8001413C(u8* p);
-f32 fn_80014144(u8* p);
-f32 fn_8001414C(u8* p);
-f32 fn_80014154(u8* p);
-f32 fn_8001417C(u8* p);
+f32 VM_fGetViewportHeightRatio(u8* p);
+f32 VM_fGetViewportWidthRatio(u8* p);
+f32 VM_fGetViewportOneOverHeightRatio(u8* p);
+f32 VM_fGetViewportHeightOverWidth(u8* p);
+f32 VM_fGetViewportOneOverWidthRatio(u8* p);
+f32 FB_fGetFrameBufferOneOverHeightRatio(u8* p);
 f32 fn_80014184(u8* p);
 f32 fn_8001418C(u8* p);
 
@@ -80,16 +82,21 @@ void RC_vReleaseRenderCtx(void* pCamera) {
     StaticMem_Free(pCamera);
 }
 
-void fn_800137D0(Camera* pCamera) {
+// Hands the render context's viewport and scissor rectangle to the renderer
+// (RenderState_SetViewport, flushed at once), then its near and far clip distances
+// (RenderState_SetClipZFromRenderCtx).
+void RC_vApplyRenderCtxToRenderState(Camera* pCamera) {
     RenderState_SetViewport(pCamera);
     RenderState_Flush();
-    fn_80013EA0(pCamera);
+    RenderState_SetClipZFromRenderCtx(pCamera);
 }
 
-// Draws a rectangle over the whole screen in pColour (r, g, b, a; NULL: the default grey), depth
-// test off. uFlags bit 0: keep DS_vEnableZBufferUpdate's setting; bit 1: pass 1 instead of 2 to the first
-// RenderState_SetRenderSurface (colour and alpha written instead of neither).
-void fn_80013808(f32* pColour, u32 uFlags) {
+// Clears the screen: draws a quad over all of it in the colour at the start of the render context
+// (its a0, r g b a; 0, 0, 0.5, 0 from RC_vSetDefaultRenderCtx), depth test off. uFlags bit 0: keep
+// DS_vEnableZBufferUpdate's setting (else depth writes off for the quad); bit 1: pass 1 instead of
+// 2 to the first RenderState_SetRenderSurface (colour and alpha written instead of neither). Depth
+// writes, z mode 3 and colour-only writes (8) are set afterwards.
+void RC_vClearRenderCtxScreen(f32* pColour, u32 uFlags) {
     f32 aXY[8];
 
     RenderView_SetUseCurrentMatrices(0);
@@ -117,8 +124,13 @@ void fn_80013808(f32* pColour, u32 uFlags) {
     RenderState_Flush();
 }
 
-// Works out the camera's screen values from its lens, screen rectangle and frame buffer, then its
-// projection (perspective, or flat when fn_80008378 says so) and the matrices made from it.
+// Works out the render context's screen values from its lens, screen rectangle and frame buffer:
+// tan of half the field of view (f224) and its inverse, the focal length in frame buffer pixels
+// (f1E0), the rectangle's centre, the near and far clip (unk1F4 scaled by f1E0 / 554.256, unk1F8),
+// and the sine and cosine of the half field of view across and down, and of double its tangent
+// (unk204..unk220; TW07's RC_fGetRenderCtxHalfFieldOfViewSinX and kin read them). Then the
+// projection m5C (perspective, or flat from the lens's fFlatWidth x fFlatHeight when fn_80008378
+// says the lens is not perspective), its transpose m9C, and world to screen mDC.
 void RC_vUpdateRenderCtxScreenMatricesAndInfo(Camera* pCamera) {
     CamLens* pLens;
     f32* pRect;
@@ -134,18 +146,18 @@ void RC_vUpdateRenderCtxScreenMatricesAndInfo(Camera* pCamera) {
     pBuf = pCamera->pBuf;
     pCamera->f224 = Math_Tan(CA_fGetCameraFieldOfView(pLens) * 0.5f);
     pCamera->f228 = 1.0f / pCamera->f224;
-    fn_8001415C(pBuf);
-    fn_8001416C(pBuf);
-    pCamera->f1E0 = pCamera->f228 * (VM_fGetViewportWidth(pRect) * fn_8001416C(pBuf) * 0.5f);
+    FB_fGetFrameBufferHeight(pBuf);
+    FB_fGetFrameBufferWidth(pBuf);
+    pCamera->f1E0 = pCamera->f228 * (VM_fGetViewportWidth(pRect) * FB_fGetFrameBufferWidth(pBuf) * 0.5f);
     pCamera->n22C = 0;
     pCamera->f230 = -(logf(pCamera->f1E0 * (1.0f / 554.256f)) * 1.442695f);
     pCamera->f1E4 = VM_fGetViewportLeft(pRect) + VM_fGetViewportWidth(pRect) * 0.5f;
     pCamera->f1E8 = 1.0f - (VM_fGetViewportTop(pRect) + VM_fGetViewportHeight(pRect) * 0.5f);
     pCamera->unk1F4 = pCamera->f1E0 * (fn_80014270((u8*)pLens) / 554.256f);
     pCamera->unk1F8 = fn_80014268((u8*)pLens);
-    pCamera->f1FC = pCamera->f224 * fn_80014154((u8*)pRect) * fn_8001418C((u8*)pBuf);
-    pCamera->f200 = fn_80014184((u8*)pBuf) * (fn_8001414C((u8*)pRect) *
-                    (pCamera->f224 * fn_80014144((u8*)pRect) * fn_8001417C((u8*)pBuf)));
+    pCamera->f1FC = pCamera->f224 * VM_fGetViewportOneOverWidthRatio((u8*)pRect) * fn_8001418C((u8*)pBuf);
+    pCamera->f200 = fn_80014184((u8*)pBuf) * (VM_fGetViewportHeightOverWidth((u8*)pRect) *
+                    (pCamera->f224 * VM_fGetViewportOneOverHeightRatio((u8*)pRect) * FB_fGetFrameBufferOneOverHeightRatio((u8*)pBuf)));
 
     aSrc[0] = 1.0f;
     aSrc[1] = pCamera->f1FC;
@@ -173,19 +185,22 @@ void RC_vUpdateRenderCtxScreenMatricesAndInfo(Camera* pCamera) {
     pCamera->unk220 = aDst[0];
 
     if (fn_80008378(pLens) == 0) {
-        f = pRect[2] * (1.0f / fn_80014134((u8*)pRect)) / pRect[3];
-        Mtx_Perspective(pCamera->m5C, pCamera->f228, 1.0f / fn_8001413C((u8*)pRect), f,
+        f = pRect[2] * (1.0f / VM_fGetViewportHeightRatio((u8*)pRect)) / pRect[3];
+        Mtx_Perspective(pCamera->m5C, pCamera->f228, 1.0f / VM_fGetViewportWidthRatio((u8*)pRect), f,
                     pCamera->unk1F4, pCamera->unk1F8);
     } else {
         Mtx_OrthoScale(mFlat, pLens->fFlatWidth, pLens->fFlatHeight);
-        f = pRect[2] * (1.0f / fn_80014134((u8*)pRect)) / pRect[3];
-        Mtx_PerspectiveDepthOverNear(mProj, 1.0f / fn_8001413C((u8*)pRect), f, pCamera->unk1F4, pCamera->unk1F8);
+        f = pRect[2] * (1.0f / VM_fGetViewportHeightRatio((u8*)pRect)) / pRect[3];
+        Mtx_PerspectiveDepthOverNear(mProj, 1.0f / VM_fGetViewportWidthRatio((u8*)pRect), f, pCamera->unk1F4, pCamera->unk1F8);
         LLMath_mat44fltMultiplyList(mProj, mFlat, pCamera->m5C, 4);
     }
     LLMath_Transpose44(pCamera->m5C, pCamera->m9C);
     LLMath_mat44fltMultiplyList(pCamera->m5C, pLens->m44, pCamera->mDC, 4);
 }
 
+// Rebuilds the matrices made from the model matrix at +0x1C: the lens's world-to-camera matrix with
+// it (viewMtx) and the world-to-screen matrix mDC with it (+0x19C), then viewMtx transposed (m15C).
+// With the identity model matrix (the byte at +0x1DC set) it copies the two instead of multiplying.
 void RC_vUpdateRenderCtxTransformationMatrices(void* pCamera) {
     u8* arg0 = pCamera;
 
@@ -199,7 +214,9 @@ void RC_vUpdateRenderCtxTransformationMatrices(void* pCamera) {
     LLMath_Transpose44(arg0 + 0x11C, arg0 + 0x15C);
 }
 
-void fn_80013D58(Camera* pCamera) {
+// Empty in this build: RC_vUpdateRenderCtxScreen calls it right after the screen matrices are
+// rebuilt.
+void RC_vOnRenderCtxScreenUpdated(Camera* pCamera) {
 }
 
 // Makes pCamera the current render camera (the one RC_spGetCurrentRenderCtx returns).
@@ -207,18 +224,23 @@ void RC_vSetCurrentRenderCtx(s32 v) {
     *(s32*)(gppCurrentRenderCtx + 0x0) = v;
 }
 
-void fn_80013D68(Camera* pCamera) {
+// Rebuilds the render context's screen values and matrices
+// (RC_vUpdateRenderCtxScreenMatricesAndInfo) after its lens, rectangle or frame buffer changed.
+void RC_vUpdateRenderCtxScreen(Camera* pCamera) {
     RC_vUpdateRenderCtxScreenMatricesAndInfo(pCamera);
-    fn_80013D58(pCamera);
+    RC_vOnRenderCtxScreenUpdated(pCamera);
 }
 
 // Gives the camera the model matrix pMtx (NULL: the identity).
 void RC_vSetRenderCtxTransformationMatrix(void* pCamera, f32 (*pMtx)[4]) {
-    fn_80013DD0(pCamera, pMtx);
+    RC_vStoreRenderCtxTransformationMatrix(pCamera, pMtx);
     RC_vUpdateRenderCtxTransformationMatrices(pCamera);
 }
 
-void fn_80013DD0(u8* arg0, f32 (*arg1)[4]) {
+// Stores the model matrix pMtx at +0x1C (NULL: the identity, and the flag at +0x1DC set so
+// RC_vUpdateRenderCtxTransformationMatrices copies instead of multiplying). Nothing is rebuilt
+// here.
+void RC_vStoreRenderCtxTransformationMatrix(u8* arg0, f32 (*arg1)[4]) {
     if (arg1 == NULL) {
         LLMath_IdentifyMat(arg0 + 0x1C);
         (*(s8*)((u8*)(arg0) + 0x1DC)) = 1;
@@ -228,24 +250,25 @@ void fn_80013DD0(u8* arg0, f32 (*arg1)[4]) {
     (*(s8*)((u8*)(arg0) + 0x1DC)) = 0;
 }
 
-void fn_80013E28(Camera* pCamera, f32* pRect) {
+void RC_vSetRenderCtxViewport(Camera* pCamera, f32* pRect) {
     pCamera->pRect = pRect;
 }
 
-void fn_80013E30(Camera* pCamera, GoFrameBuf* pBuf) {
+void RC_vSetRenderCtxFrameBuffer(Camera* pCamera, GoFrameBuf* pBuf) {
     pCamera->pBuf = pBuf;
 }
 
-void fn_80013E38(Camera* pCamera, CamLens* pLens) {
+void RC_vSetRenderCtxCamera(Camera* pCamera, CamLens* pLens) {
     pCamera->unk10 = pLens;
 }
 
-GoFrameBuf* fn_80013E40(Camera* pCamera) {
+GoFrameBuf* RC_spGetRenderCtxFrameBuffer(Camera* pCamera) {
     return pCamera->pBuf;
 }
 
-// Starts a new camera: the identity model matrix and its first values.
-void fn_80013E48(Camera* pCamera) {
+// A new render context's defaults: the identity model matrix, the clear colour a0 (0, 0, 0.5, 0;
+// RC_vClearRenderCtxScreen draws with it), f1EC 1.0 and f1F0 16773216.
+void RC_vSetDefaultRenderCtx(Camera* pCamera) {
     RC_vSetRenderCtxTransformationMatrix(pCamera, NULL);
     pCamera->a0[0] = 0.0f;
     pCamera->a0[1] = 0.0f;
@@ -255,8 +278,9 @@ void fn_80013E48(Camera* pCamera) {
     pCamera->f1F0 = 16773216.0f;
 }
 
-// Hands the camera's two values fn_80008360 and fn_80008368 to the renderer.
-void fn_80013EA0(Camera* pCamera) {
+// Hands the render context's near and far clip distances (fn_80008360, fn_80008368) to the renderer
+// (gRenderState.fNearZ, fFarZ).
+void RenderState_SetClipZFromRenderCtx(Camera* pCamera) {
     gRenderState.fNearZ = fn_80008360(pCamera);
     gRenderState.fFarZ = fn_80008368(pCamera);
 }
@@ -268,11 +292,11 @@ void RenderState_SetViewport(void* pCamera) {
     GoFrameBuf* pBuf;
 
     pRect = RC_spGetRenderCtxViewport(pCamera);
-    pBuf = fn_80013E40(pCamera);
-    gRenderState.fViewportLeft = fn_80014174(pBuf) + VM_fGetViewportLeft(pRect) * fn_8001416C(pBuf);
-    gRenderState.fViewportTop = fn_80014164(pBuf) + VM_fGetViewportTop(pRect) * fn_8001415C(pBuf);
-    gRenderState.fViewportWidth = VM_fGetViewportWidth(pRect) * fn_8001416C(pBuf);
-    gRenderState.fViewportHeight = VM_fGetViewportHeight(pRect) * fn_8001415C(pBuf);
+    pBuf = RC_spGetRenderCtxFrameBuffer(pCamera);
+    gRenderState.fViewportLeft = FB_fGetFrameBufferOffsetX(pBuf) + VM_fGetViewportLeft(pRect) * FB_fGetFrameBufferWidth(pBuf);
+    gRenderState.fViewportTop = FB_fGetFrameBufferOffsetY(pBuf) + VM_fGetViewportTop(pRect) * FB_fGetFrameBufferHeight(pBuf);
+    gRenderState.fViewportWidth = VM_fGetViewportWidth(pRect) * FB_fGetFrameBufferWidth(pBuf);
+    gRenderState.fViewportHeight = VM_fGetViewportHeight(pRect) * FB_fGetFrameBufferHeight(pBuf);
     gRenderState.fViewportNear = 0.0f;
     gRenderState.fViewportFar = 1.0f;
     gRenderState.uChanged |= 0x800;
@@ -302,43 +326,43 @@ void RenderState_SetDrawFlags(int a) {
     gRenderState.uChanged |= 0x20;
 }
 
-f32 fn_80014134(u8* p) {
+f32 VM_fGetViewportHeightRatio(u8* p) {
     return *(f32*)(p + 0x14);
 }
 
-f32 fn_8001413C(u8* p) {
+f32 VM_fGetViewportWidthRatio(u8* p) {
     return *(f32*)(p + 0x10);
 }
 
-f32 fn_80014144(u8* p) {
+f32 VM_fGetViewportOneOverHeightRatio(u8* p) {
     return *(f32*)(p + 0x2C);
 }
 
-f32 fn_8001414C(u8* p) {
+f32 VM_fGetViewportHeightOverWidth(u8* p) {
     return *(f32*)(p + 0x30);
 }
 
-f32 fn_80014154(u8* p) {
+f32 VM_fGetViewportOneOverWidthRatio(u8* p) {
     return *(f32*)(p + 0x28);
 }
 
-f32 fn_8001415C(GoFrameBuf* pBuf) {
+f32 FB_fGetFrameBufferHeight(GoFrameBuf* pBuf) {
     return pBuf->fHeight;
 }
 
-f32 fn_80014164(GoFrameBuf* pBuf) {
+f32 FB_fGetFrameBufferOffsetY(GoFrameBuf* pBuf) {
     return pBuf->f4;
 }
 
-f32 fn_8001416C(GoFrameBuf* pBuf) {
+f32 FB_fGetFrameBufferWidth(GoFrameBuf* pBuf) {
     return pBuf->fWidth;
 }
 
-f32 fn_80014174(GoFrameBuf* pBuf) {
+f32 FB_fGetFrameBufferOffsetX(GoFrameBuf* pBuf) {
     return pBuf->f0;
 }
 
-f32 fn_8001417C(u8* p) {
+f32 FB_fGetFrameBufferOneOverHeightRatio(u8* p) {
     return *(f32*)(p + 0x2C);
 }
 

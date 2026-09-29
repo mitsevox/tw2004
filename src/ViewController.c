@@ -21,7 +21,7 @@ void  CameraController_Idle(View* pView, int nPlayer);
 void  CA_vSetLookAtSide(CamLens* pLens, f32* pPos, f32* pAt, f32* pUp);
 void  Camera_SetCameraPositionAndTargetWithOffsetAndScale(CamLens* pLens, f32* pPos, f32* pAt, f32* pF5C, f32* pF50);
 void  Camera_SetCameraYawPitchRollAndPosition(CamLens* pLens, f32* pPos, f32* pAngles);
-void  fn_80013D68(void* pCamera);
+void  RC_vUpdateRenderCtxScreen(void* pCamera);
 void  VM_vUpdateInternalViewportRectData(f32* pRect);
 void  mat44flt_EulerAngles(f32 (*pMtx)[4], f32 fYaw, f32 fPitch, f32 fRoll);   // UMemPool.c
 void  LLMath_InvertNormalized(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: rotation+translation inverse
@@ -135,7 +135,7 @@ void ViewController_Update(int nView) {
                                                 CameraController_GetCameraOrigin(pCameraController),
                                                 CameraController_GetCameraLookPoint(pCameraController));
     }
-    fn_80013D68(pRenderContext);
+    RC_vUpdateRenderCtxScreen(pRenderContext);
     RC_vUpdateRenderCtxTransformationMatrices(pRenderContext);
 }
 
@@ -195,7 +195,7 @@ void ViewController_RestoreViewportRect(int nView) {
 s32 RC_GetCurrentFrameBuffer(void) {
     // port: RC_GetCurrentFrameBuffer (and UI_SetCurrentRenderCtxFrameBuffer's slot) are typed s32,
     //       but the value is the frame buffer
-    return (s32)fn_80013E40(*gppCurrentRenderCtx);
+    return (s32)RC_spGetRenderCtxFrameBuffer(*gppCurrentRenderCtx);
 }
 
 // Sets a viewport's rectangle (fractions of the frame buffer: 0, 0, 1, 1 is all of it) and

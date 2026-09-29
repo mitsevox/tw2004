@@ -186,9 +186,9 @@ void SF_vUpdateSunFlare(s32 nView) {
     Camera_GetCurrentLens();
     // port: RC_GetCurrentFrameBuffer is typed s32 in ViewController.c, but its value is a render
     //       context pointer
-    fn_8001416C((GoFrameBuf*)nCtx);
+    FB_fGetFrameBufferWidth((GoFrameBuf*)nCtx);
     VM_fGetViewportWidth(pRect);
-    fn_8001415C((GoFrameBuf*)nCtx);
+    FB_fGetFrameBufferHeight((GoFrameBuf*)nCtx);
     VM_fGetViewportHeight(pRect);
     pState = lbl_802813B8;
     if (pState->b1BF0) {

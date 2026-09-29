@@ -519,7 +519,7 @@ typedef struct RenderState {
                                 //          (RenderState_SetCameraMatrices); identity at reset;
                                 //          bit 0x100
     f32  fNearZ;                // 0x0B4  } a render camera's near and far distances, the fog's
-    f32  fFarZ;                 // 0x0B8  } nearz and farz (GoRenderCtx_Gc.c fn_80013EA0)
+    f32  fFarZ;                 // 0x0B8  } nearz and farz (GoRenderCtx_Gc.c RenderState_SetClipZFromRenderCtx)
     s32  nScissorLeft;          // 0x0BC  } the scissor rectangle in 512 x 448 screen pixels, both
     s32  nScissorRight;         // 0x0C0  } ends inclusive; bit 0x200 (RenderState_SetViewport;
     s32  nScissorTop;           // 0x0C4  } LLVideo.c RenderState_SetScissor takes left, top, right,

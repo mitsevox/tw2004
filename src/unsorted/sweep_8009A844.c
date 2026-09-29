@@ -28,11 +28,11 @@ void fn_8009A844(void* pCamera, u8* pIn, u8* pOut) {
     fTop = VM_fGetViewportTop(pRect);
     fHeight = VM_fGetViewportHeight(pRect);
     pDst[1] = pSrc[1] * fHeight + fTop;
-    pBuf = fn_80013E40(pCamera);
-    f0 = fn_80014174(pBuf);
-    fBufWidth = fn_8001416C(pBuf);
+    pBuf = RC_spGetRenderCtxFrameBuffer(pCamera);
+    f0 = FB_fGetFrameBufferOffsetX(pBuf);
+    fBufWidth = FB_fGetFrameBufferWidth(pBuf);
     pDst[0] = pDst[0] * fBufWidth + f0;
-    f4 = fn_80014164(pBuf);
-    fBufHeight = fn_8001415C(pBuf);
+    f4 = FB_fGetFrameBufferOffsetY(pBuf);
+    fBufHeight = FB_fGetFrameBufferHeight(pBuf);
     pDst[1] = pDst[1] * fBufHeight + f4;
 }

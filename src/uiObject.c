@@ -30,7 +30,7 @@ TexEntry*  gpUIObjRingTexture;          // "ring": the boost rings
 TexBank*   gpUIObjTexBank;              // the bank of the three textures
 f32        gUIObjLightRed;              // the light's red (0: nothing writes it)
 
-void fn_80013E38(u8* p, s32 v);  // GoRenderCtx_Gc.c
+void RC_vSetRenderCtxCamera(u8* p, s32 v); // GoRenderCtx_Gc.c
 void UI_Obj_InitModule(void);
 void UI_Obj_CloseModule(void);
 void UI_Obj_InitForRender(void);
@@ -398,10 +398,10 @@ void UI_Obj_DrawSpinModel(void) {
     fn_8006ED70();
 }
 
-// Make pLens the current render context's lens (GoRenderCtx_Gc.c fn_80013E38).
+// Make pLens the current render context's lens (GoRenderCtx_Gc.c RC_vSetRenderCtxCamera).
 void UI_Obj_SetCurrentRenderCtxLens(CamLens* pLens) {
-    // port: fn_80013E38 (GoRenderCtx_Gc.c, still sweep code) takes the lens as an s32
-    fn_80013E38((u8*)*gppCurrentRenderCtx, (s32)pLens);
+    // port: RC_vSetRenderCtxCamera (GoRenderCtx_Gc.c, still sweep code) takes the lens as an s32
+    RC_vSetRenderCtxCamera((u8*)*gppCurrentRenderCtx, (s32)pLens);
 }
 
 // Draw the mesh's current part, if it is used (UObject.c's Object_DrawMesh again).
