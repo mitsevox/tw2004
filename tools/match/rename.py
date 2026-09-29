@@ -128,10 +128,25 @@ def main():
         # our symbol, so it stays when our name changes
         return regex.sub(lambda m: m.group(0) if tw06_ref.search(text[max(0, m.start() - 40):m.start()])
                          else new, text)
+    trail = re.compile(r'^([^"\'\n]*?\S)(\s{2,})(//.*)$')
+
+    def keep_comment_column(before, after):
+        # a declaration's aligned trailing comment stays in its column when a name grows or shrinks
+        # (round 20: terrain.h's externs drifted); the code keeps at least one space before it
+        a, b = before.split('\n'), after.split('\n')
+        if len(a) != len(b):
+            return after
+        for i, (x, y) in enumerate(zip(a, b)):
+            mx, my = trail.match(x), trail.match(y)
+            if x != y and mx and my:
+                col = len(mx.group(1)) + len(mx.group(2))
+                b[i] = my.group(1) + ' ' * max(1, col - len(my.group(1))) + my.group(3)
+        return '\n'.join(b)
     for p, t in files.items():
         u = t
         for _, _, old, new in rows:
             u = sub_keeping_tw06(pat[old], new, u)
+        u = keep_comment_column(t, u)
         if u != t:
             changed += 1
             if not dry:
