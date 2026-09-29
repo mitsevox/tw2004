@@ -4,38 +4,44 @@
 #include "llpict.h"
 #include "core/startup.h"
 
-void fn_8002F898(u8* pSrc, u8* pDst, int nWidth, int nHeight);   // copies one plane
-void fn_8002FB98(LLPict* pPict);
-void fn_8002F56C(u8* pPlane, void* pWork, int nWidth, int nHeight);  // reorders one plane through pWork
+void Pict_TilePlane(u8* pSrc, u8* pDst, int nWidth, int nHeight);   // copies one plane
+void Pict_InitTextures(LLPict* pPict);
+void Pict_TilePlaneInPlace(u8* pPlane, void* pWork, int nWidth, int nHeight);  // reorders one plane through pWork
 
 void* gPictWorkBuffer;
 void** gpPictWorkBuffer = &gPictWorkBuffer;
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_80056204();
-void fn_80056208();
-void fn_8002F4FC(void);
-void fn_8002F540(void);
+void PictInt_InitModule();
+void PictInt_CloseModule();
+void Pict_InitModule(void);
+void Pict_CloseModule(void);
 void MAD_SetReadCallback();
 
-void fn_8002F4FC(void) {
+// At boot (gomainloop.c): starts LLPictInt.c (nothing to do) and allocates the 2048-byte work
+// buffer Pict_CreateFromMemory tiles pictures through (gPictWorkBuffer).
+void Pict_InitModule(void) {
     void* t1;
-    fn_80056204();
+    PictInt_InitModule();
     t1 = StaticMem_Alloc(2048, 2, 32, "LLPict_Gc.c", 68);
     *gpPictWorkBuffer = t1;
 }
 
-void fn_8002F540(void) {
-    fn_80056208();
+// At shutdown: closes LLPictInt.c (nothing to do) and frees the work buffer Pict_InitModule
+// allocated.
+void Pict_CloseModule(void) {
+    PictInt_CloseModule();
     StaticMem_Free(*gpPictWorkBuffer);
 }
 
 // ---- end of sweep code ----
 
-// fn_8002F898 in place: each band of four rows is copied to pWork first and tiled back from there.
-// The first 8 bytes are already where they belong.
-void fn_8002F56C(u8* pPlane, void* pWork, int nWidth, int nHeight) {
+// Pict_TilePlane in place: rearranges an nWidth x nHeight plane of bytes (nHeight a multiple of 4)
+// into GameCube I8 tile order. Each band of four rows (nWidth * 4 bytes: the 2048-byte work buffer
+// holds rows up to 512 wide) is copied to pWork first and tiled back from there; the first 8 bytes
+// are already where they belong.
+void Pict_TilePlaneInPlace(u8* pPlane, void* pWork, int nWidth, int nHeight) {
     int i;
     int y;
     int nOff;
@@ -54,7 +60,7 @@ void fn_8002F56C(u8* pPlane, void* pWork, int nWidth, int nHeight) {
 
 // Copies a plane of nWidth x nHeight bytes into GameCube I8 tile order: tiles of 8 x 4 bytes, each
 // row of a tile being 8 bytes of one source row.
-void fn_8002F898(u8* pSrc, u8* pDst, int nWidth, int nHeight) {
+void Pict_TilePlane(u8* pSrc, u8* pDst, int nWidth, int nHeight) {
     int i;
     int y;
     int nOff;
@@ -71,18 +77,21 @@ void fn_8002F898(u8* pSrc, u8* pDst, int nWidth, int nHeight) {
 }
 
 // Makes the picture's three planes into I8 textures (U and V at half the width and height).
-void fn_8002FB98(LLPict* pPict) {
-    GXInitTexObj(&pPict->aTex[0], fn_8003020C(pPict), pPict->nWidth, pPict->nHeight, 1, 0, 0, 0);
+void Pict_InitTextures(LLPict* pPict) {
+    GXInitTexObj(&pPict->aTex[0], Pict_GetPlaneY(pPict), pPict->nWidth, pPict->nHeight, 1, 0, 0, 0);
     GXInitTexObjLOD(&pPict->aTex[0], 0, 0, 0.0f, 0.0f, 0.0f, 0, 0, 0);
-    GXInitTexObj(&pPict->aTex[1], fn_800301F4(pPict), pPict->nWidth / 2, pPict->nHeight / 2, 1, 0, 0, 0);
+    GXInitTexObj(&pPict->aTex[1], Pict_GetPlaneU(pPict), pPict->nWidth / 2, pPict->nHeight / 2, 1, 0, 0, 0);
     GXInitTexObjLOD(&pPict->aTex[1], 0, 0, 0.0f, 0.0f, 0.0f, 0, 0, 0);
-    GXInitTexObj(&pPict->aTex[2], fn_800301D0(pPict), pPict->nWidth / 2, pPict->nHeight / 2, 1, 0, 0, 0);
+    GXInitTexObj(&pPict->aTex[2], Pict_GetPlaneV(pPict), pPict->nWidth / 2, pPict->nHeight / 2, 1, 0, 0, 0);
     GXInitTexObjLOD(&pPict->aTex[2], 0, 0, 0.0f, 0.0f, 0.0f, 0, 0, 0);
 }
 
-// Decodes a "MADk" file into a new picture and makes its textures (NULL: no file, or it did not
-// decode).
-LLPict* fn_8002FD00(u8* pData, u32 uSize) {
+// Decodes the "MADk" picture file at pData into a new picture ready to draw: PictInt_Decode, then
+// each plane tiled in place for the GPU (Pict_TilePlaneInPlace) and its textures made
+// (Pict_InitTextures). NULL when pData is NULL or the file does not decode (not MADk, or no memory
+// for the picture). uSize is not used. Used for the menus' pictures and the loading screens
+// (uiProcessPolygon.c, Code80090940.c); Pict_Free frees the picture.
+LLPict* Pict_CreateFromMemory(u8* pData, u32 uSize) {
     LLPict* pPict;
 
     if (pData == NULL) {
@@ -92,28 +101,35 @@ LLPict* fn_8002FD00(u8* pData, u32 uSize) {
     if (pPict == NULL) {
         return NULL;
     }
-    DCFlushRange(fn_8003020C(pPict), 1.5f * (pPict->nWidth * pPict->nHeight));
-    fn_8002F56C(fn_8003020C(pPict), *gpPictWorkBuffer, pPict->nWidth, pPict->nHeight);
-    fn_8002F56C(fn_800301F4(pPict), *gpPictWorkBuffer, pPict->nWidth / 2, pPict->nHeight / 2);
-    fn_8002F56C(fn_800301D0(pPict), *gpPictWorkBuffer, pPict->nWidth / 2, pPict->nHeight / 2);
-    DCFlushRange(fn_8003020C(pPict), 1.5f * (pPict->nWidth * pPict->nHeight));
-    fn_8002FB98(pPict);
+    DCFlushRange(Pict_GetPlaneY(pPict), 1.5f * (pPict->nWidth * pPict->nHeight));
+    Pict_TilePlaneInPlace(Pict_GetPlaneY(pPict), *gpPictWorkBuffer, pPict->nWidth, pPict->nHeight);
+    Pict_TilePlaneInPlace(Pict_GetPlaneU(pPict), *gpPictWorkBuffer, pPict->nWidth / 2, pPict->nHeight / 2);
+    Pict_TilePlaneInPlace(Pict_GetPlaneV(pPict), *gpPictWorkBuffer, pPict->nWidth / 2, pPict->nHeight / 2);
+    DCFlushRange(Pict_GetPlaneY(pPict), 1.5f * (pPict->nWidth * pPict->nHeight));
+    Pict_InitTextures(pPict);
     return pPict;
 }
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_8002FE70(LLPict* pPict) {
+// Frees a picture Pict_CreateFromMemory made, and its pixels; NULL does nothing.
+void Pict_Free(LLPict* pPict) {
     if (pPict != NULL) {
         StaticMem_Free(pPict->pPixels);
         StaticMem_Free(pPict);
     }
 }
 
-void fn_8002FEAC(void) {
+// Empty in this build. Called right after a picture is freed (uiProcessPolygon.c) and once a frame
+// after the menus free their marked pictures (gomainloop.c).
+void Pict_AfterFree(void) {
 }
 
-void fn_8002FEB0(LLPict* pPict, PictStream* pStream, void* (*pfnRead)(void* pArg), void* pArg) {
+// Sets a movie's picture and decoder up (LLVideo.c LLVideo_Create): no pixels or frame yet, a new
+// MAD decoder (0x50 bytes), and pfnRead(pArg) as the function the decoder reads the movie's MAD
+// files from. The read function is one global of the decoder code (MAD_SetReadCallback), so the
+// last movie opened reads for all.
+void Pict_OpenMovie(LLPict* pPict, PictStream* pStream, void* (*pfnRead)(void* pArg), void* pArg) {
     pPict->pPixels = NULL;
     pStream->pDecoder = StaticMem_Alloc(80, 1, 32, "LLPict_Gc.c", 278);
     pStream->pFrame = NULL;
@@ -123,8 +139,10 @@ void fn_8002FEB0(LLPict* pPict, PictStream* pStream, void* (*pfnRead)(void* pArg
 
 // ---- end of sweep code ----
 
-// Frees the picture's pixels and the stream's frame and decoder.
-void fn_8002FF38(LLPict* pPict, PictStream* pStream) {
+// Undoes Pict_OpenMovie (LLVideo.c LLVideo_Destroy): frees the picture's pixels, gives the held
+// frame back, closes the decoder (frees its frames) and frees it. The LLPict itself belongs to the
+// Video and is not freed.
+void Pict_CloseMovie(LLPict* pPict, PictStream* pStream) {
     if (pPict->pPixels != NULL) {
         StaticMem_Free(pPict->pPixels);
     }
@@ -137,13 +155,15 @@ void fn_8002FF38(LLPict* pPict, PictStream* pStream) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_8002FF94(LLPict* pPict, PictStream* pStream) {
+// Empty in this build. LLVideo_Start calls it when a movie starts playing.
+void Pict_StartMovie(LLPict* pPict, PictStream* pStream) {
 }
 
 // ---- end of sweep code ----
 
-// Sizes the picture to the stream's frame and allocates its planes.
-void fn_8002FF98(LLPict* pPict, PictStream* pStream) {
+// On a movie's first frame (LLVideo_UpdateAll): sizes the picture to the decoder's frame, allocates
+// its three planes (1.5 bytes a pixel) and draws the whole texture (f6C, f70 = 1).
+void Pict_SizeToMovie(LLPict* pPict, PictStream* pStream) {
     pPict->nWidth = pStream->pFrame->nWidth;
     pPict->nHeight = pStream->pFrame->nHeight;
     pPict->pPixels =
@@ -154,14 +174,18 @@ void fn_8002FF98(LLPict* pPict, PictStream* pStream) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-u8 fn_8003001C(LLPict* pPict, PictStream* pStream) {
+// The decoder has reached the movie's end (MAD_IsAtEnd). Always 0 in this game: MAD_ReadNextFile
+// never sets the end count (its EA bug), so LLVideo.c ends a movie only when it is starved.
+u8 Pict_IsMovieAtEnd(LLPict* pPict, PictStream* pStream) {
     return MAD_IsAtEnd(pStream->pDecoder);
 }
 
 // ---- end of sweep code ----
 
-// Takes the decoder's next frame, giving back the one held; 1 when there is one.
-u8 fn_80030040(LLPict* pPict, PictStream* pStream) {
+// Gives back the frame held and takes the decoder's next one (MAD_GetNextFrame, which reads the
+// next MAD file through the read function); 1 when there is one, 0 when the read found nothing or
+// the frame did not decode.
+u8 Pict_NextMovieFrame(LLPict* pPict, PictStream* pStream) {
     if (pStream->pFrame != NULL) {
         MAD_ReleaseFrame(pStream->pDecoder, pStream->pFrame);
     }
@@ -171,42 +195,52 @@ u8 fn_80030040(LLPict* pPict, PictStream* pStream) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_8003009C(LLPict* pPict, PictStream* pStream, int n2) {
+// Empty in this build. LLVideo_UpdateAll calls it with n2 = 0 on a movie's first frame, right after
+// Pict_SizeToMovie.
+void Pict_OnFirstMovieFrame(LLPict* pPict, PictStream* pStream, int n2) {
 }
 
 // ---- end of sweep code ----
 
-// Copies the stream's frame into the picture, plane by plane (U and V at half the width and
-// height), and hands the picture on to fn_8002FB98.
-void fn_800300A0(LLPict* pPict, PictStream* pStream) {
-    DCFlushRange(fn_8003024C(pStream->pFrame), pPict->nWidth * pPict->nHeight * 3 / 2);
-    fn_8002F898(fn_8003024C(pStream->pFrame), fn_8003020C(pPict), pPict->nWidth, pPict->nHeight);
-    fn_8002F898(fn_80030234(pStream->pFrame), fn_800301F4(pPict), pPict->nWidth / 2, pPict->nHeight / 2);
-    fn_8002F898(fn_80030214(pStream->pFrame), fn_800301D0(pPict), pPict->nWidth / 2, pPict->nHeight / 2);
-    DCFlushRange(fn_8003020C(pPict), pPict->nWidth * pPict->nHeight * 3 / 2);
-    fn_8002FB98(pPict);
+// Shows the decoder's current frame: copies its three planes into the picture in GameCube I8 tile
+// order (Pict_TilePlane; U and V at half the width and height) and makes the picture's textures
+// (Pict_InitTextures). LLVideo_UpdateAll calls it for each new frame.
+void Pict_CopyMovieFrame(LLPict* pPict, PictStream* pStream) {
+    DCFlushRange(PictFrame_GetPlaneY(pStream->pFrame), pPict->nWidth * pPict->nHeight * 3 / 2);
+    Pict_TilePlane(PictFrame_GetPlaneY(pStream->pFrame), Pict_GetPlaneY(pPict), pPict->nWidth,
+                   pPict->nHeight);
+    Pict_TilePlane(PictFrame_GetPlaneU(pStream->pFrame), Pict_GetPlaneU(pPict), pPict->nWidth / 2,
+                   pPict->nHeight / 2);
+    Pict_TilePlane(PictFrame_GetPlaneV(pStream->pFrame), Pict_GetPlaneV(pPict), pPict->nWidth / 2,
+                   pPict->nHeight / 2);
+    DCFlushRange(Pict_GetPlaneY(pPict), pPict->nWidth * pPict->nHeight * 3 / 2);
+    Pict_InitTextures(pPict);
 }
 
-u8* fn_800301D0(LLPict* pPict) {
+// The picture's V (Cr) plane: after Y and U, a quarter of Y's size.
+u8* Pict_GetPlaneV(LLPict* pPict) {
     return pPict->pPixels + pPict->nWidth * pPict->nHeight * 5 / 4;
 }
 
-u8* fn_800301F4(LLPict* pPict) {
+// The picture's U (Cb) plane: right after Y, a quarter of its size.
+u8* Pict_GetPlaneU(LLPict* pPict) {
     return pPict->pPixels + pPict->nWidth * pPict->nHeight;
 }
 
-u8* fn_8003020C(LLPict* pPict) {
+u8* Pict_GetPlaneY(LLPict* pPict) {
     return pPict->pPixels;
 }
 
-u8* fn_80030214(PictFrame* pFrame) {
+// A decoded frame's V (Cr) plane: after Y and U, a quarter of Y's size.
+u8* PictFrame_GetPlaneV(PictFrame* pFrame) {
     return pFrame->pPixels + ((u32)(pFrame->nWidth * pFrame->nHeight * 5) >> 2);
 }
 
-u8* fn_80030234(PictFrame* pFrame) {
+// A decoded frame's U (Cb) plane: right after Y, a quarter of its size.
+u8* PictFrame_GetPlaneU(PictFrame* pFrame) {
     return pFrame->pPixels + pFrame->nWidth * pFrame->nHeight;
 }
 
-u8* fn_8003024C(PictFrame* pFrame) {
+u8* PictFrame_GetPlaneY(PictFrame* pFrame) {
     return pFrame->pPixels;
 }

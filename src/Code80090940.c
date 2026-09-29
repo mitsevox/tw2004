@@ -29,7 +29,7 @@ UIFileEntry* UI_DecodeEntryPicture(int nEntry) {
     UI_RestoreMenuPictures();
     pEntry = gpFrontEnd->pFile->p8->apTables[gUIState.nPictureTable]->apEntries[nEntry];
     pData = pEntry->p4;
-    pEntry->p8 = (u8*)fn_8002FD00(pData->aData, pData->uSize);
+    pEntry->p8 = (u8*)Pict_CreateFromMemory(pData->aData, pData->uSize);
     return pEntry;
 }
 
@@ -44,7 +44,7 @@ void UI_FreeEntryPicture(int nEntry) {
     UIFileEntry* pEntry = gpFrontEnd->pFile->p8->apTables[gUIState.nPictureTable]->apEntries[nEntry];
 
     if (pEntry->p8 != NULL) {
-        fn_8002FE70((LLPict*)pEntry->p8);
+        Pict_Free((LLPict*)pEntry->p8);
     }
     pEntry->p8 = NULL;
 }
@@ -69,7 +69,7 @@ void UI_FreeMarkedEntryPictures(void) {
                     fn_80008380();
                 }
                 if (pEntry->p8 != NULL) {
-                    fn_8002FE70((LLPict*)pEntry->p8);
+                    Pict_Free((LLPict*)pEntry->p8);
                 }
                 pEntry->p8 = NULL;
                 bFreed = 1;

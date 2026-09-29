@@ -88,8 +88,8 @@ void fn_8002E258(void);
 void fn_8002E25C(void);
 void fn_8002F180(void);
 void fn_8002F32C(s32 nSurface);
-void fn_8002F4FC(void);
-void fn_8002F540(void);
+void Pict_InitModule(void);
+void Pict_CloseModule(void);
 void fn_80030254(void);
 void fn_800329CC(void);
 void fn_80032AEC(void);
@@ -457,7 +457,7 @@ void fn_8006C7A8(void) {
     fn_80093524();
     fn_800461A8();
     fn_8000C104();
-    fn_8002F4FC();
+    Pict_InitModule();
     fn_800757B8();
 }
 
@@ -490,7 +490,7 @@ void fn_8006C854(void) {
     fn_8000B63C();
     fn_80071890();
     fn_800081C4();
-    fn_8002F540();
+    Pict_CloseModule();
     AudMem_CloseModule();
     StaticMem_Checkpoint();
 }
@@ -1132,7 +1132,7 @@ void fn_8006D8E8(void) {
             }
         }
         UI_FreeMarkedEntryPictures();
-        fn_8002FEAC();
+        Pict_AfterFree();
         fn_80007260();
         Gaud_Monitor();
         if (!gSession.nSplitScreen && gSession.nGameType != 1) {

@@ -6,14 +6,18 @@
 void MAD_initdecode(u8* src, int motion, int quality);
 void MAD_decodemacroblock(u8* src_y, u8* src_cb, u8* src_cr, u8* dest_y, u8* dest_cb, u8* dest_cr, int width);
 
-void fn_80056204(void) {
+// Empty in this build. Pict_InitModule calls it at boot.
+void PictInt_InitModule(void) {
 }
 
-void fn_80056208(void) {
+// Empty in this build. Pict_CloseModule calls it at shutdown.
+void PictInt_CloseModule(void) {
 }
 
-// The picture in pFile, or NULL when it is not a MADk file or there is no memory. The file's
-// header is little-endian: it is swapped for the decode and swapped back after.
+// Decodes the 'MADk' key-frame picture in pFile into a new picture (three planes, Y then U and V,
+// decoded 16x16 pixels at a time), or NULL when it is not a MADk file or the LLPict cannot be
+// allocated (the pixels' allocation is not checked). The file's header is little-endian: it is
+// swapped for the decode and swapped back after.
 // port: the swaps assume a big-endian machine; a little-endian port reads the header as it is.
 LLPict* PictInt_Decode(PictFile* pFile) {
     LLPict* pPict;
@@ -45,9 +49,9 @@ LLPict* PictInt_Decode(PictFile* pFile) {
     pPict->f6C = 1.0f;
     pPict->f70 = 1.0f;
     pPict->pPixels = StaticMem_Alloc(pPict->nWidth * pPict->nHeight * 3 / 2, 1, 32, "LLPictInt.c", 150);
-    pY = fn_8003020C(pPict);
-    pU = fn_800301F4(pPict);
-    pV = fn_800301D0(pPict);
+    pY = Pict_GetPlaneY(pPict);
+    pU = Pict_GetPlaneU(pPict);
+    pV = Pict_GetPlaneV(pPict);
     for (y = 0; y < pFile->nHeight; y += 16) {
         // a block is 16x16 Y pixels and 8x8 U and V ones
         for (x = 0, xc = 0; x < pFile->nWidth; xc += 8, x += 16) {

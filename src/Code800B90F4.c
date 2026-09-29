@@ -40,7 +40,7 @@ void MAD_ReleaseFrame(MadDecoder* p, PictFrame* pFrame);
 void MAD_RemoveFrameFromLists(MadDecoder* p, PictFrame* pFrame);
 
 // Sets the function (and the argument it is given) that MAD_ReadNextFile takes the movie's MAD
-// files from; LLPict_Gc.c's movie set-up passes it on (fn_8002FEB0).
+// files from; LLPict_Gc.c's movie set-up passes it on (Pict_OpenMovie).
 void MAD_SetReadCallback(PictFile* (*pfnRead)(void* pArg), void* pArg) {
     gpfnMadRead = pfnRead;
     gpMadReadArg = pArg;
@@ -127,12 +127,12 @@ PictFrame* MAD_DecodeFrame(MadDecoder* p, PictFile* pFile) {
         }
         MAD_initdecode(pFile->aData, 0, pFile->n15);
         // a key frame has no reference: it gets its own Y plane for all three
-        pRefY = pRefU = pRefV = fn_8003024C(pFrame);
+        pRefY = pRefU = pRefV = PictFrame_GetPlaneY(pFrame);
     } else {
         if (p->pLast != NULL) {
-            pRefY = fn_8003024C(p->pLast);
-            pRefU = fn_80030234(p->pLast);
-            pRefV = fn_80030214(p->pLast);
+            pRefY = PictFrame_GetPlaneY(p->pLast);
+            pRefU = PictFrame_GetPlaneU(p->pLast);
+            pRefV = PictFrame_GetPlaneV(p->pLast);
         } else {
             return NULL;
         }
@@ -148,9 +148,9 @@ PictFrame* MAD_DecodeFrame(MadDecoder* p, PictFile* pFile) {
         }
         MAD_initdecode(pFile->aData, 1, pFile->n15);
     }
-    pY = fn_8003024C(pFrame);
-    pU = fn_80030234(pFrame);
-    pV = fn_80030214(pFrame);
+    pY = PictFrame_GetPlaneY(pFrame);
+    pU = PictFrame_GetPlaneU(pFrame);
+    pV = PictFrame_GetPlaneV(pFrame);
     for (y = 0; y < p->nHeight; y += 16) {
         // a block is 16x16 Y pixels and 8x8 U and V ones
         for (x = 0, xc = 0; x < p->nWidth; xc += 8, x += 16) {

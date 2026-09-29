@@ -413,15 +413,15 @@ void UI_LoadLoadingBarTexture(void) {
 // unless one is there.
 void UI_DecodeLoadingPicture(void) {
     if (gUILoadingScreen.pPicture == NULL) {
-        gUILoadingScreen.pPicture = fn_8002FD00(lbl_80281C04, lbl_801A25F0.uSize);
+        gUILoadingScreen.pPicture = Pict_CreateFromMemory(lbl_80281C04, lbl_801A25F0.uSize);
     }
 }
 
 // Free the loading screen's picture UI_DecodeLoadingPicture decoded, unless the session has flag 4.
 void UI_FreeLoadingPicture(void) {
     if (!(gSession.uFlags & 4) && gUILoadingScreen.pPicture != NULL) {
-        fn_8002FE70(gUILoadingScreen.pPicture);
-        fn_8002FEAC();
+        Pict_Free(gUILoadingScreen.pPicture);
+        Pict_AfterFree();
         gUILoadingScreen.pPicture = NULL;
     }
 }
@@ -589,11 +589,11 @@ void UI_ShowLoadingScreen(void) {
 void UI_FadeInLoadingScreen(int nFrames) {
     LLPict* pPict;
 
-    pPict = fn_8002FD00(lbl_80281C04, lbl_801A25F0.uSize);
+    pPict = Pict_CreateFromMemory(lbl_80281C04, lbl_801A25F0.uSize);
     UI_ShowPictureFadingIn(pPict, nFrames, 1.0f / 30.0f);
     fn_80008380();
-    fn_8002FE70(pPict);
-    fn_8002FEAC();
+    Pict_Free(pPict);
+    Pict_AfterFree();
 }
 
 // The demo's screen between holes (GoEntry.c calls it in the demo where it otherwise calls
@@ -608,14 +608,14 @@ void UI_ShowDemoLoadingScreen(void) {
 
     pEntry = gpFrontEnd->pFile->p8->apTables[gUIState.nPictureTable]->apEntries[0];
     pData = pEntry->p4;
-    pEntry->p8 = (u8*)fn_8002FD00(pData->aData, pData->uSize);
+    pEntry->p8 = (u8*)Pict_CreateFromMemory(pData->aData, pData->uSize);
     pPict = (LLPict*)pEntry->p8;
     fn_800760D8(pPict);
     UI_ShowPictureFadingIn(pPict, 30, 1.0f / 30.0f);
     fn_80008380();
-    fn_8002FE70((LLPict*)pEntry->p8);
+    Pict_Free((LLPict*)pEntry->p8);
     pEntry->p8 = NULL;
-    fn_8002FEAC();
+    Pict_AfterFree();
     for (; i < 600; i++) {
         fn_80007254();
     }
@@ -644,10 +644,10 @@ void UI_PlayStartUpMovies(void) {
         FE_MakeCameoMoviePath(szName, szPath);
         LLVideo_PlayFile(szPath, FE_IsMovieSkipPressed, 0, 0);
     }
-    pPict = fn_8002FD00(gpLegalPicture, gLegalPictureSize);
+    pPict = Pict_CreateFromMemory(gpLegalPicture, gLegalPictureSize);
     UI_ShowPictureFadingIn(pPict, 180, 1.0f / 30.0f);
     fn_80008380();
-    fn_8002FE70(pPict);
+    Pict_Free(pPict);
     StaticMem_Free(gpLegalPicture);
     gpLegalPicture = NULL;
 }

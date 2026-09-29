@@ -93,7 +93,7 @@ VideoChunk* LLVideo_QueueRemove(VideoQueue* pQueue) {
     return pChunk;
 }
 
-// The decoder's read call (fn_8002FEB0): takes the movie's next piece off the queue and returns
+// The decoder's read call (Pict_OpenMovie): takes the movie's next piece off the queue and returns
 // it copied into one new buffer. When the queue runs dry, the chunks taken so far are given back,
 // bStarved is set and NULL is returned.
 void* fn_800754C0(void* pArg) {
@@ -258,7 +258,7 @@ void fn_800757B8(void) {
 // Makes a movie (not yet in a slot or running), at 33 frames a second.
 Video* fn_80075800(void) {
     Video* pVideo = StaticMem_Alloc(sizeof(Video), 2, 0x40, "LLVideo.c", 0x5C1);
-    fn_8002FEB0(&pVideo->pict, &pVideo->stream, fn_800754C0, pVideo);
+    Pict_OpenMovie(&pVideo->pict, &pVideo->stream, fn_800754C0, pVideo);
     pVideo->nSlot = -1;
     pVideo->b1020 = 0;
     pVideo->bFirstFrame = 0;
@@ -276,7 +276,7 @@ void fn_800758B4(Video* pVideo) {
     if (pVideo->nSlot != -1) {
         fn_80075904(pVideo->nSlot, NULL);
     }
-    fn_8002FF38(&pVideo->pict, &pVideo->stream);
+    Pict_CloseMovie(&pVideo->pict, &pVideo->stream);
     StaticMem_Free(pVideo);
 }
 
@@ -330,7 +330,7 @@ void fn_80075A14_Start(Video* pVideo) {
     pVideo->nFrame = -1;
     pVideo->bEnded = 0;
     pVideo->bStarved = 0;
-    fn_8002FF94(&pVideo->pict, &pVideo->stream);
+    Pict_StartMovie(&pVideo->pict, &pVideo->stream);
     fn_80075A98_SetLastFrameTime(pVideo);
     fn_800752DC_PreloadQueue(pVideo);
 }
@@ -350,18 +350,18 @@ void fn_80075AD0_UpdateAll(void) {
         pVideo = gpVideoSlots->apVideo[i];
         if (pVideo != NULL && pVideo->b1020 && !pVideo->b1021 && fn_80075BF4_IsFrameDue(pVideo)) {
             fn_80075A98_SetLastFrameTime(pVideo);
-            if (pVideo->bStarved || fn_8003001C(&pVideo->pict, &pVideo->stream)) {
+            if (pVideo->bStarved || Pict_IsMovieAtEnd(&pVideo->pict, &pVideo->stream)) {
                 pVideo->bEnded = 1;
                 fn_8007599C_Stop(pVideo);
-            } else if (fn_80030040(&pVideo->pict, &pVideo->stream)) {
+            } else if (Pict_NextMovieFrame(&pVideo->pict, &pVideo->stream)) {
                 pVideo->nFrame++;
                 if (!pVideo->bFirstFrame) {
-                    fn_8002FF98(&pVideo->pict, &pVideo->stream);
+                    Pict_SizeToMovie(&pVideo->pict, &pVideo->stream);
                     pVideo->bFirstFrame = 1;
-                    fn_8003009C(&pVideo->pict, &pVideo->stream, 0);
+                    Pict_OnFirstMovieFrame(&pVideo->pict, &pVideo->stream, 0);
                     Aud_StartMovie();
                 }
-                fn_800300A0(&pVideo->pict, &pVideo->stream);
+                Pict_CopyMovieFrame(&pVideo->pict, &pVideo->stream);
             }
         }
     }

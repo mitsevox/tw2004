@@ -8,7 +8,7 @@
 #include "engine.h"
 
 typedef struct LLPict {
-    GXTexObj aTex[3];           // 0x00  the Y, U and V planes as I8 textures (fn_8002FB98)
+    GXTexObj aTex[3];           // 0x00  the Y, U and V planes as I8 textures (Pict_InitTextures)
     u8*  pPixels;               // 0x60  Y (nWidth * nHeight), then U and V (a quarter of that each)
     s32  nWidth;                // 0x64
     s32  nHeight;               // 0x68
@@ -75,7 +75,7 @@ LAYOUT_ASSERT(MadCode, 0x10);
 extern const MadCode gMadCoefCodes[95];   // the codes of the first table (entry 0 is not used)
 extern const MadCode gMadCoefCodesLong[128];  // the codes of the second table
 
-// What LLVideo.c hands LLPict_Gc.c for a movie: the decoder (fn_8002FEB0 makes it, 0x50 bytes)
+// What LLVideo.c hands LLPict_Gc.c for a movie: the decoder (Pict_OpenMovie makes it, 0x50 bytes)
 // and its current frame.
 typedef struct PictStream {
     void* pDecoder;             // 0x00
@@ -83,29 +83,29 @@ typedef struct PictStream {
 } PictStream;
 
 // LLPict_Gc.c: the planes of a picture and of a frame.
-u8*  fn_800301D0(LLPict* pPict);    // V
-u8*  fn_800301F4(LLPict* pPict);    // U
-u8*  fn_8003020C(LLPict* pPict);    // Y
-u8*  fn_80030214(PictFrame* pFrame);    // V
-u8*  fn_80030234(PictFrame* pFrame);    // U
-u8*  fn_8003024C(PictFrame* pFrame);    // Y
+u8*  Pict_GetPlaneV(LLPict* pPict);    // V
+u8*  Pict_GetPlaneU(LLPict* pPict);    // U
+u8*  Pict_GetPlaneY(LLPict* pPict);    // Y
+u8*  PictFrame_GetPlaneV(PictFrame* pFrame);    // V
+u8*  PictFrame_GetPlaneU(PictFrame* pFrame);    // U
+u8*  PictFrame_GetPlaneY(PictFrame* pFrame);    // Y
 // A movie's picture and decoder (LLVideo.c): pfnRead(pArg) hands the decoder its next data.
-void fn_8002FE70(LLPict* pPict);        // frees the picture and its pixels (NULL: nothing)
-void fn_8002FEAC(void);                 // empty
-void fn_8002FEB0(LLPict* pPict, PictStream* pStream, void* (*pfnRead)(void* pArg), void* pArg);
-void fn_8002FF38(LLPict* pPict, PictStream* pStream);
-void fn_8002FF94(LLPict* pPict, PictStream* pStream);                     // empty
-void fn_8002FF98(LLPict* pPict, PictStream* pStream);
-u8   fn_8003001C(LLPict* pPict, PictStream* pStream);
-u8   fn_80030040(LLPict* pPict, PictStream* pStream);
-void fn_8003009C(LLPict* pPict, PictStream* pStream, int n2);             // empty
-void fn_800300A0(LLPict* pPict, PictStream* pStream);
+void Pict_Free(LLPict* pPict);        // frees the picture and its pixels (NULL: nothing)
+void Pict_AfterFree(void);                 // empty
+void Pict_OpenMovie(LLPict* pPict, PictStream* pStream, void* (*pfnRead)(void* pArg), void* pArg);
+void Pict_CloseMovie(LLPict* pPict, PictStream* pStream);
+void Pict_StartMovie(LLPict* pPict, PictStream* pStream);                     // empty
+void Pict_SizeToMovie(LLPict* pPict, PictStream* pStream);
+u8   Pict_IsMovieAtEnd(LLPict* pPict, PictStream* pStream);
+u8   Pict_NextMovieFrame(LLPict* pPict, PictStream* pStream);
+void Pict_OnFirstMovieFrame(LLPict* pPict, PictStream* pStream, int n2);             // empty
+void Pict_CopyMovieFrame(LLPict* pPict, PictStream* pStream);
 
-// LLPict_Gc.c's work buffer for copying planes: points at a pointer fn_8002F4FC fills (2048 bytes).
+// LLPict_Gc.c's work buffer for copying planes: points at a pointer Pict_InitModule fills (2048 bytes).
 extern void** gpPictWorkBuffer;
 
 // A picture from a "MADk" file in memory (LLPict_Gc.c).
-LLPict* fn_8002FD00(u8* pData, u32 uSize);
+LLPict* Pict_CreateFromMemory(u8* pData, u32 uSize);
 
 // LLPictInt.c
 LLPict* PictInt_Decode(PictFile* pFile);
