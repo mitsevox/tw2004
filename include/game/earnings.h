@@ -106,12 +106,12 @@ typedef struct HoleGoal {
     s8   bEachHole;             // 0x08  checked after each hole (else only when the round is over)
     s8   aToPar[5];             // 0x09  holes finished at par, -1, -2, -3 and -5 or better (GameAnalysis_CountHoleScoresOrBetter)
     s8   aRun[5];               // 0x0E  the same as runs of holes in a row (GameAnalysis_CountStreakHoleScores)
-    s8   n13;                   // 0x13  holes counted by fn_800D0FBC (at most the course's
+    s8   n13;                   // 0x13  holes counted by GameAnalysis_CountTotalFairways (at most the course's
                                 //       GM_CurrentCourseTotalPar4andPar5Holes)
-    s8   n14;                   // 0x14  holes counted by fn_800D1170
-    s8   n15;                   // 0x15  the run fn_800D10B0 finds
-    s8   n16;                   // 0x16  the run fn_800D1250 finds
-    s8   n17;                   // 0x17  putts over the round (fn_800D1330)
+    s8   n14;                   // 0x14  holes counted by GameAnalysis_CountTotalGIRs
+    s8   n15;                   // 0x15  the run GameAnalysis_CountStreakFairways finds
+    s8   n16;                   // 0x16  the run GameAnalysis_CountStreakGIRs finds
+    s8   n17;                   // 0x17  putts over the round (GameAnalysis_CountTotalPutts)
     s8   nMaxStrokes;           // 0x18  the most strokes over the round (GM_GetPlayerRoundStrokes)
     u8   b19;                   // 0x19  counts on every hole; clear, only at the end (the full round's 18th
                                 //       hole, or after the round)

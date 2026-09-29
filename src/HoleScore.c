@@ -15,8 +15,8 @@ u8   GameAnalysis_GetFairwayDrive(int nPlayer);
 int  GameAnalysis_CountHoleScoresOrBetter(int nPlayer, int nToPar);
 int  GameAnalysis_CountHolesOverPar(int nPlayer);
 int  GameAnalysis_CountStreakHoleScores(int nPlayer, int nToPar);
-int  fn_800D1330(int nPlayer);
-void fn_800D1674(f32* pA, f32* pB, f32* pOut);
+int  GameAnalysis_CountTotalPutts(int nPlayer);
+void GameAnalysis_Vec3Sub(f32* pA, f32* pB, f32* pOut);
 void fn_800C8C3C(int nView, f32* pOut);   // GoBreakLine: a point kept per view
 
 // gpGame->pfnIsPuttForLead: whether holing this ball would put the player in the lead (the others'
@@ -269,10 +269,11 @@ u8 GameAnalysis_IsPredictedBallTrophy(int nPlayer) {
 // (HighScoreRecords_CheckRecordGameSetting) and, but for kinds 1 and 2, outside a playoff: 0x1 on
 // the last hole, the round would beat kind 0's with the tap-in; 0x2 the ball is on the tee; 0x4 on
 // the green or fringe, a putt of 3 x fA64 beats kind 2's; 0x8 off the green two under par or
-// better, one more of fn_800D1170 beats kind 3's; 0x10 on the last hole, the round's putts (one
-// more on the green or fringe) beat kind 4's; 0x20 on the tee of a par 4 or 5, one more of
-// fn_800D0FBC beats kind 5's; 0x40 and 0x80 two under / one under par or better, one more eagle
-// (GameAnalysis_NumEaglesSoFarThisRound) / birdie (GameAnalysis_NumBirdiesSoFarThisRound) beats kinds 6 / 7.
+// better, one more of GameAnalysis_CountTotalGIRs beats kind 3's; 0x10 on the last hole, the
+// round's putts (one more on the green or fringe) beat kind 4's; 0x20 on the tee of a par 4 or 5, one more of
+// GameAnalysis_CountTotalFairways beats kind 5's; 0x40 and 0x80 two under / one under par or
+// better, one more eagle (GameAnalysis_NumEaglesSoFarThisRound) / birdie
+// (GameAnalysis_NumBirdiesSoFarThisRound) beats kinds 6 / 7.
 u32 GameAnalysis_IsShotForRecord(int nPlayer) {
     Player* pPlayer = &gPlayers[nPlayer];
     u32 uFlags = 0;
@@ -300,7 +301,8 @@ u32 GameAnalysis_IsShotForRecord(int nPlayer) {
     if (HighScoreRecords_CheckRecordGameSetting(3) && !gpGame->bInPlayoff && pBall->nLie != LIE_GREEN_e
         && pBall->nLie != LIE_FRINGE_e &&
         gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 <= GM_GetCurrentHolePar() - 2) {
-        if (fn_800D1170(nPlayer, 0) + 1 > gSession.aCourseRecord[Game_GetCourse()].aRecord[3][0].nValue) {
+        if (GameAnalysis_CountTotalGIRs(nPlayer, 0) + 1
+            > gSession.aCourseRecord[Game_GetCourse()].aRecord[3][0].nValue) {
             uFlags |= 0x8;
         }
     }
@@ -318,7 +320,8 @@ u32 GameAnalysis_IsShotForRecord(int nPlayer) {
     }
     if (HighScoreRecords_CheckRecordGameSetting(5) && !gpGame->bInPlayoff && pBall->nLie == LIE_TEE_e
         && GM_GetCurrentHolePar() >= 4) {
-        if (fn_800D0FBC(nPlayer) + 1 > gSession.aCourseRecord[Game_GetCourse()].aRecord[5][0].nValue) {
+        if (GameAnalysis_CountTotalFairways(nPlayer) + 1
+            > gSession.aCourseRecord[Game_GetCourse()].aRecord[5][0].nValue) {
             uFlags |= 0x20;
         }
     }
@@ -614,7 +617,7 @@ int GameAnalysis_GetEstimatedLie(int nPlayer) {
 // now.
 f32 GameAnalysis_GetCurrentBallFlightDistance(int nPlayer) {
     f32 vDiff[3];
-    fn_800D1674(gPlayers[nPlayer].ball.vPos, gPlayers[nPlayer].ball.vStart, vDiff);
+    GameAnalysis_Vec3Sub(gPlayers[nPlayer].ball.vPos, gPlayers[nPlayer].ball.vStart, vDiff);
     vDiff[1] = 0.0f;
     return Math_Sqrt(Vec3_LengthSqClamped(vDiff));
 }
@@ -626,7 +629,7 @@ f32 GameAnalysis_GetPositionDistanceToPin(f32* pPos) {
     int nPin;
     if (pCourse == NULL) return 0.0f;
     nPin = Game_CurrentPinSet();
-    fn_800D1674(pPos, &pCourse->pin[nPin].x, vDiff);
+    GameAnalysis_Vec3Sub(pPos, &pCourse->pin[nPin].x, vDiff);
     vDiff[1] = 0.0f;
     return Math_Sqrt(Vec3_LengthSqClamped(vDiff));
 }
@@ -727,10 +730,11 @@ f32 GameAnalysis_GetPuttBreakAngle(int nPlayer) {
     f32 fAngle;
 
     fn_800C8C3C(gPlayers[nPlayer].nView[0], vView);
-    fn_800D1674(&gPlayers[nPlayer].ball.pCourse->pin[Game_CurrentPinSet()].x, gPlayers[nPlayer].ball.vStart,
+    GameAnalysis_Vec3Sub(&gPlayers[nPlayer].ball.pCourse->pin[Game_CurrentPinSet()].x,
+                         gPlayers[nPlayer].ball.vStart,
                 vToPin);
     vToPin[1] = 0.0f;
-    fn_800D1674(vView, gPlayers[nPlayer].ball.vStart, vToView);
+    GameAnalysis_Vec3Sub(vView, gPlayers[nPlayer].ball.vStart, vToView);
     vToView[1] = 0.0f;
     if ((f32)Math_Sqrt(Vec3_LengthSqClamped(vToPin)) > 0.0f) {
         LLMath_Normalize3(vToPin, vToPin);
@@ -895,7 +899,7 @@ int GameAnalysis_CountStreakHoleScores(int nPlayer, int nToPar) {
 }
 
 // The round's holes with bFairwayHit set (by position in the score block, TW06's fairways[]).
-int fn_800D0FBC(int nPlayer) {
+int GameAnalysis_CountTotalFairways(int nPlayer) {
     int nCount = 0;
     int i;
     for (i = 0; i < 18; i++) {
@@ -907,7 +911,7 @@ int fn_800D0FBC(int nPlayer) {
 }
 
 // The longest run of the round's holes with bFairwayHit set; a par 3 does not break it.
-int fn_800D10B0(int nPlayer) {
+int GameAnalysis_CountStreakFairways(int nPlayer) {
     int nRun;
     int nBest;
     int i;
@@ -929,9 +933,10 @@ int fn_800D10B0(int nPlayer) {
     return nBest;
 }
 
-// The round's holes with bGreenInReg set (TW06's gir[]); with bOnlyFlagged, only those whose
-// gpGame->b16C entry is 1.
-int fn_800D1170(int nPlayer, u8 bOnlyFlagged) {
+// The round's holes with bGreenInReg set (TW06's gir[]); with bOnlyFlagged (TW07's
+// onlyCompletedHoles, which there tests GM_PlayerHoledOut), only holes whose gpGame->b16C entry is
+// 1.
+int GameAnalysis_CountTotalGIRs(int nPlayer, u8 bOnlyFlagged) {
     int nCount = 0;
     int i;
     for (i = 0; i < 18; i++) {
@@ -944,7 +949,7 @@ int fn_800D1170(int nPlayer, u8 bOnlyFlagged) {
 }
 
 // The longest run of the round's holes with bGreenInReg set.
-int fn_800D1250(int nPlayer) {
+int GameAnalysis_CountStreakGIRs(int nPlayer) {
     int nRun;
     int nBest;
     int i;
@@ -967,7 +972,7 @@ int fn_800D1250(int nPlayer) {
 }
 
 // The player's putts over the round's holes.
-int fn_800D1330(int nPlayer) {
+int GameAnalysis_CountTotalPutts(int nPlayer) {
     int nPutts = 0;
     int i;
     for (i = 0; i < 18; i++) {
@@ -980,7 +985,7 @@ int fn_800D1330(int nPlayer) {
 
 // The wind's heading against the player's aim, by quarter: 2 within 45 degrees of the aim, 4 the
 // next quarter round, 1 the opposite quarter, 3 the last; 0 when the wind is 6 or less.
-int fn_800D13F4(int nPlayer) {
+int GameAnalysis_vGetPlayerWindDirection(int nPlayer) {
     f32 vWind[4];
     f32 fAim = gPlayers[nPlayer].fAim;
     f32 fAngle;
@@ -1012,7 +1017,7 @@ int fn_800D13F4(int nPlayer) {
 
 // The slope of the ground under the ball across the player's aim, in whole degrees (+-90 when the
 // ground's normal has no upward part); 0 with no ground or a normal not of length 1.
-int fn_800D1530(int nPlayer) {
+int GameAnalysis_GetSidehillLie(int nPlayer) {
     f32 vNormal[4];
     f32 vTurned[4];
     f32 fLength;
@@ -1049,7 +1054,7 @@ int fn_800D1530(int nPlayer) {
 
 // a - b into out (three floats)
 #ifdef __MWERKS__
-asm void fn_800D1674(register f32* pA, register f32* pB, register f32* pOut) {
+asm void GameAnalysis_Vec3Sub(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 1, 0
@@ -1063,7 +1068,7 @@ asm void fn_800D1674(register f32* pA, register f32* pB, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_800D1674(f32* pA, f32* pB, f32* pOut) {
+void GameAnalysis_Vec3Sub(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pA[0] - pB[0];
     pOut[1] = pA[1] - pB[1];
     pOut[2] = pA[2] - pB[2];

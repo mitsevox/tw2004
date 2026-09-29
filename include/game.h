@@ -220,12 +220,12 @@ int  GameAnalysis_GetPotentailRoundParScore(int nPlayer); // HoleScore.c
 f32  GameAnalysis_GetEstimatedDistanceToPin(int nPlayer); // HoleScore.c
 int  GameAnalysis_GetEstimatedLie(int nPlayer); // HoleScore.c
 f32  GameAnalysis_GetPuttBreakAngle(int nPlayer); // HoleScore.c
-int  fn_800D0FBC(int nPlayer);          // HoleScore.c
-int  fn_800D10B0(int nPlayer);          // HoleScore.c
-int  fn_800D1170(int nPlayer, u8 bOnlyFlagged);    // HoleScore.c
-int  fn_800D1250(int nPlayer);          // HoleScore.c
-int  fn_800D13F4(int nPlayer);          // HoleScore.c
-int  fn_800D1530(int nPlayer);          // HoleScore.c
+int  GameAnalysis_CountTotalFairways(int nPlayer); // HoleScore.c
+int  GameAnalysis_CountStreakFairways(int nPlayer); // HoleScore.c
+int  GameAnalysis_CountTotalGIRs(int nPlayer, u8 bOnlyFlagged); // HoleScore.c
+int  GameAnalysis_CountStreakGIRs(int nPlayer); // HoleScore.c
+int  GameAnalysis_vGetPlayerWindDirection(int nPlayer); // HoleScore.c
+int  GameAnalysis_GetSidehillLie(int nPlayer); // HoleScore.c
 s32  GM_GetNumHolesInRound(void);                 // GameUICommands.c
 int  GM_GetGolferRelativeCurrentScore(int nPlayer, u8 bCurrent);        // GameRound.c
 s32  GameModeBattle_GetClubLostOnLastHole(int nPlayer);          // GameModeBattle.c

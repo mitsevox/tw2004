@@ -99,7 +99,7 @@ u8    GameAnalysis_GetFairwayDrive(int nPlayer);
 int   GameAnalysis_CountHoleScoresOrBetter(int nPlayer, int nToPar);
 int   GameAnalysis_CountHolesOverPar(int nPlayer);
 int   GameAnalysis_CountStreakHoleScores(int nPlayer, int nToPar);
-int   fn_800D1330(int nPlayer);
+int   GameAnalysis_CountTotalPutts(int nPlayer);
 int   GM_CurrentCourseTotalPar4andPar5Holes(void);                                // CourseData.c
 u8    GM_Earnings_CheckEagleEveryPar5(int nPlayer, u8 bPreview);
 u8    GM_Earnings_CheckWinAllTournaments(int nPlayer, u8 bPreview);
@@ -777,12 +777,13 @@ void GM_Earnings_CheckShotGoals(int nPlayer, Ball* pBall, u8 bPreview) {
         // Flag 6: the hole's first stroke.
         if (Earnings_TestBit(gEarningsTable.aShotGoal[i].uFlags, 6) &&
             nAdj + 1 != gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()]) continue;
-        if (Earnings_TestBit(gEarningsTable.aShotGoal[i].uFlags, 7) && fn_800D1170(nPlayer, 0) < nAdj
+        if (Earnings_TestBit(gEarningsTable.aShotGoal[i].uFlags, 7)
+            && GameAnalysis_CountTotalGIRs(nPlayer, 0) < nAdj
             + 18) continue;
         if (Earnings_TestBit(gEarningsTable.aShotGoal[i].uFlags, 8)) {
             nHoles = GM_CurrentCourseTotalPar4andPar5Holes();
             if (nHoles < 10) continue;
-            if (nHoles + nAdj > fn_800D0FBC(nPlayer)) continue;
+            if (nHoles + nAdj > GameAnalysis_CountTotalFairways(nPlayer)) continue;
         }
         if (gEarningsTable.aShotGoal[i].nAward >= 23 && gEarningsTable.aShotGoal[i].nAward <= 38 &&
             (bPreview || !Earnings_IsTourAwardEarned(nPlayer, gEarningsTable.aShotGoal[i].nAward))) continue;
@@ -1128,16 +1129,16 @@ void GM_Earnings_CheckHoleGoals(int nPlayer, u8 bPreview, u8 bRoundOver) {
             if (nNeed > nHoles) {
                 nNeed = nHoles;
             }
-            if (nNeed > fn_800D0FBC(nPlayer)) continue;
+            if (nNeed > GameAnalysis_CountTotalFairways(nPlayer)) continue;
         }
         if (gEarningsTable.aHoleGoal[i].n14 != 0 &&
-            gEarningsTable.aHoleGoal[i].n14 > fn_800D1170(nPlayer, 0)) continue;
+            gEarningsTable.aHoleGoal[i].n14 > GameAnalysis_CountTotalGIRs(nPlayer, 0)) continue;
         if (gEarningsTable.aHoleGoal[i].n15 != 0 &&
-            gEarningsTable.aHoleGoal[i].n15 > fn_800D10B0(nPlayer)) continue;
+            gEarningsTable.aHoleGoal[i].n15 > GameAnalysis_CountStreakFairways(nPlayer)) continue;
         if (gEarningsTable.aHoleGoal[i].n16 != 0 &&
-            gEarningsTable.aHoleGoal[i].n16 > fn_800D1250(nPlayer)) continue;
+            gEarningsTable.aHoleGoal[i].n16 > GameAnalysis_CountStreakGIRs(nPlayer)) continue;
         if (gEarningsTable.aHoleGoal[i].n17 != 0 &&
-            gEarningsTable.aHoleGoal[i].n17 > fn_800D1330(nPlayer)) continue;
+            gEarningsTable.aHoleGoal[i].n17 > GameAnalysis_CountTotalPutts(nPlayer)) continue;
         if (gEarningsTable.aHoleGoal[i].nMaxStrokes != 0 &&
             gEarningsTable.aHoleGoal[i].nMaxStrokes < GM_GetPlayerRoundStrokes(nPlayer)) continue;
         if (gEarningsTable.aHoleGoal[i].nKind != 0) {
@@ -1882,13 +1883,13 @@ int HighScoreRecords_GetEndOfHoleRecord(int nPlayer, Ball* pBall, int a, u8 bCou
 // The end-of-round record checks (after the last hole, GM_Earnings_PayRoundGoals). In game mode 22 (the
 // long-drive contest) only record kind 9 (Player.nDriveScore); in the skill-zone modes only kind 8
 // (Player.nSkillZonePoints). Otherwise, outside "Random 18": the round's strokes (kind 0), its
-// greens in regulation (3, fn_800D1170), fairways hit (5, fn_800D0FBC), birdies or better (7),
-// eagles or better (6) and putts (4). Each kind only while HighScoreRecords_CheckRecordGameSetting
-// allows it. bSave writes a place in; with bAll only a new best (2 or 4) is listed, else any place;
-// a hit goes into gRoundRecordResults (the result) and gRoundRecordKinds (the kind). bCountStroke
-// counts the hole one stroke more while it checks. Returns how many were listed (gNumRecordHits): 0
-// in game mode 12, with mulligans on, with gSession.uFlags 0x4000, for a CPU player or one without
-// a profile.
+// greens in regulation (3, GameAnalysis_CountTotalGIRs), fairways hit (5,
+// GameAnalysis_CountTotalFairways), birdies or better (7), eagles or better (6) and putts (4). Each
+// kind only while HighScoreRecords_CheckRecordGameSetting allows it. bSave writes a place in; with
+// bAll only a new best (2 or 4) is listed, else any place; a hit goes into gRoundRecordResults (the
+// result) and gRoundRecordKinds (the kind). bCountStroke counts the hole one stroke more while it
+// checks. Returns how many were listed (gNumRecordHits): 0 in game mode 12, with mulligans on, with
+// gSession.uFlags 0x4000, for a CPU player or one without a profile.
 int HighScoreRecords_GetEndOfGameRecord(int nPlayer, int bSave, u8 bCountStroke, u8 bAll) {
     char szName[32];
     int nProfile;
@@ -1947,7 +1948,8 @@ int HighScoreRecords_GetEndOfGameRecord(int nPlayer, int bSave, u8 bCountStroke,
         }
     }
     if (HighScoreRecords_CheckRecordGameSetting(3)) {
-        nResult = HighScoreRecords_CheckRecord(3, fn_800D1170(nPlayer, 0), bSave, szName, nPlayer);
+        nResult = HighScoreRecords_CheckRecord(3, GameAnalysis_CountTotalGIRs(nPlayer, 0), bSave, szName,
+                                               nPlayer);
         if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
             gRoundRecordResults[gNumRecordHits] = nResult;
             gRoundRecordKinds[gNumRecordHits] = 3;
@@ -1955,7 +1957,8 @@ int HighScoreRecords_GetEndOfGameRecord(int nPlayer, int bSave, u8 bCountStroke,
         }
     }
     if (HighScoreRecords_CheckRecordGameSetting(5)) {
-        nResult = HighScoreRecords_CheckRecord(5, fn_800D0FBC(nPlayer), bSave, szName, nPlayer);
+        nResult = HighScoreRecords_CheckRecord(5, GameAnalysis_CountTotalFairways(nPlayer), bSave, szName,
+                                               nPlayer);
         if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
             gRoundRecordResults[gNumRecordHits] = nResult;
             gRoundRecordKinds[gNumRecordHits] = 5;

@@ -4913,3 +4913,11 @@ address	name	comment	by	date
 800D0DC8	GameAnalysis_CountHoleScoresOrBetter	keep	ru3 (replayed by orchestrator)	2026-09-29
 800D0E74	GameAnalysis_CountHolesOverPar	keep	ru3 (replayed by orchestrator)	2026-09-29
 800D0F04	GameAnalysis_CountStreakHoleScores	keep	ru3 (replayed by orchestrator)	2026-09-29
+800D0FBC	GameAnalysis_CountTotalFairways	keep	ru3 (replayed by orchestrator)	2026-09-29
+800D10B0	GameAnalysis_CountStreakFairways	keep	ru3 (replayed by orchestrator)	2026-09-29
+800D1170	GameAnalysis_CountTotalGIRs	rewrite	ru3 (replayed by orchestrator)	2026-09-29
+800D1250	GameAnalysis_CountStreakGIRs	keep	ru3 (replayed by orchestrator)	2026-09-29
+800D1330	GameAnalysis_CountTotalPutts	keep	ru3 (replayed by orchestrator)	2026-09-29
+800D13F4	GameAnalysis_vGetPlayerWindDirection	keep	ru3 (replayed by orchestrator)	2026-09-29
+800D1530	GameAnalysis_GetSidehillLie	keep	ru3 (replayed by orchestrator)	2026-09-29
+800D1674	GameAnalysis_Vec3Sub	keep	ru3 (replayed by orchestrator)	2026-09-29

@@ -179,12 +179,12 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
         _SetStateVecAndCondition(pValues, 14, nValue, pSetBits);
         _SetStateVecAndCondition(pValues, 33, GameAnalysis_CurrentBirdieStreak(nPlayer, 0), pSetBits);
         _SetStateVecAndCondition(pValues, 34, GameAnalysis_CurrentEagleStreak(nPlayer, 0), pSetBits);
-        _SetStateVecAndCondition(pValues, 35, fn_800D10B0(nPlayer), pSetBits);
-        _SetStateVecAndCondition(pValues, 36, fn_800D1250(nPlayer), pSetBits);
+        _SetStateVecAndCondition(pValues, 35, GameAnalysis_CountStreakFairways(nPlayer), pSetBits);
+        _SetStateVecAndCondition(pValues, 36, GameAnalysis_CountStreakGIRs(nPlayer), pSetBits);
         _SetStateVecAndCondition(pValues, 39, GameAnalysis_NumBirdiesSoFarThisRound(nPlayer, 0, 0), pSetBits);
         _SetStateVecAndCondition(pValues, 40, GameAnalysis_NumEaglesSoFarThisRound(nPlayer, 0, 0), pSetBits);
-        _SetStateVecAndCondition(pValues, 41, fn_800D0FBC(nPlayer), pSetBits);
-        _SetStateVecAndCondition(pValues, 42, fn_800D1170(nPlayer, 0), pSetBits);
+        _SetStateVecAndCondition(pValues, 41, GameAnalysis_CountTotalFairways(nPlayer), pSetBits);
+        _SetStateVecAndCondition(pValues, 42, GameAnalysis_CountTotalGIRs(nPlayer, 0), pSetBits);
         _SetStateVecAndCondition(pValues, 6, pPlayer->pChar->nSlot, pSetBits);
         _SetStateVecAndCondition(pValues, 13, fn_8002E8E4(pPlayer->nController), pSetBits);
         _SetStateVecAndCondition(pValues, 84, gSession.nGolfer[nPlayer] >= 30, pSetBits);
@@ -238,8 +238,8 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
         // yards to inches
         _SetStateVecAndCondition(pValues, 16, (s32)(36.0f * (pPlayer->vTarget[1] - pBall->vStart[1])),
                                  pSetBits);
-        _SetStateVecAndCondition(pValues, 66, fn_800D13F4(nPlayer), pSetBits);
-        _SetStateVecAndCondition(pValues, 67, fn_800D1530(nPlayer), pSetBits);
+        _SetStateVecAndCondition(pValues, 66, GameAnalysis_vGetPlayerWindDirection(nPlayer), pSetBits);
+        _SetStateVecAndCondition(pValues, 67, GameAnalysis_GetSidehillLie(nPlayer), pSetBits);
         _SetStateVecAndCondition(pValues, 80, (f32)pPlayer->nLongestPutt >= 10.0f / 3.0f, pSetBits);
         _SetStateVecAndCondition(pValues, 81, pPlayer->n308 & 2, pSetBits);
         _SetStateVecAndCondition(pValues, 82, pPlayer->n308 & 1, pSetBits);
