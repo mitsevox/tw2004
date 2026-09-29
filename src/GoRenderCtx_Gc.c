@@ -1,6 +1,15 @@
 // GoRenderCtx_Gc.c (EA's name, from its asserts; also in EA's 2002 source tree; TW06): the render
-// camera (lens, frame buffer, screen rectangle and the matrices made from them), the renderer's
-// screen state, and the pads' button masks.
+// context (TW07's RC_SRenderCtx, here the struct Camera): a lens (TW07's CA_SCamera, here CamLens),
+// a frame buffer and a screen rectangle, and the matrices made from them; which one is current;
+// clearing the screen and handing a render context's viewport and clip distances to the renderer.
+// Then GameCube copies of TW07's header inlines (GoCamera.h, GoFrameBuf.h, GoViewport.h getters),
+// renderer state setters and the 2D view's colour and quad helpers.
+// The last four functions and gauInputButtonMap are EA's LLInput.c, not this file: TW07's
+// legacy/ll/LLInput.c has Input_vSelectControlSet, Input_uiMap, Input_AnyPadPressed and
+// Input_vStopAllVibration in this order and with these signatures (two it has between them are
+// not in this build), and gauInputButtonMap starts a new 8-aligned block after this file's
+// "GoRenderCtx_Gc.c" string (its fake match note). TW07's RC_vInitModule and RC_vCloseModule
+// sit just before this file, in unsorted/sweep_800136F4.c.
 
 #include "game_types.h"
 #include "engine.h"
@@ -22,10 +31,12 @@ f32 CA_fGetCameraNearZ(u8* p);
 f32 Math_Tan(f32 x0);
 
 // This file's .sbss (engine.h), in reverse address order as the compiler lays it out.
-s8    gnInputControlSet;
-void* gapCurrentRenderCtx[2];   // 8 bytes in the DOL (gnInputControlSet follows at +8); only [0] is used
+s8    gnInputControlSet;        // the row of gauInputButtonMap in use (Input_vSelectControlSet)
+void* gapCurrentRenderCtx[2];   // [0]: the current render context (RC_vSetCurrentRenderCtx); 8
+                                // bytes in the DOL (gnInputControlSet follows at +8), [1] unused
 
-// This file's .sdata (camera.h).
+// This file's .sdata (camera.h). Points at gapCurrentRenderCtx[0]: RC_vSetCurrentRenderCtx and
+// RC_spGetCurrentRenderCtx go through it.
 void** gppCurrentRenderCtx = gapCurrentRenderCtx;
 
 // Makes a render context (0x234 bytes, TW07's RC_SRenderCtx) from a lens (TW07's CA_SCamera), a
@@ -96,7 +107,7 @@ void RC_vApplyRenderCtxToRenderState(Camera* pCamera) {
 // DS_vEnableZBufferUpdate's setting (else depth writes off for the quad); bit 1: pass 1 instead of
 // 2 to the first RenderState_SetRenderSurface (colour and alpha written instead of neither). Depth
 // writes, z mode 3 and colour-only writes (8) are set afterwards.
-void RC_vClearRenderCtxScreen(f32* pColour, u32 uFlags) {
+void RC_vClearRenderCtxScreen(Camera* pCamera, u32 uFlags) {
     f32 aXY[8];
 
     RenderView_SetUseCurrentMatrices(0);
@@ -115,7 +126,7 @@ void RC_vClearRenderCtxScreen(f32* pColour, u32 uFlags) {
     RenderView_MakeQuad(aXY, NULL, 0.0f, 0.0f, 1.0f, 1.0f);
     aXY[2] = 0.0f;
     aXY[6] = 0.0f;
-    RenderView_SetColor(pColour);
+    RenderView_SetColor(pCamera->a0);
     RenderView_DrawPrimitive(0xA1, aXY, NULL, NULL, 2);
     DS_vSetAlphaTestMode(0, 6, 0x80);
     DS_vSetZBufferMode(3);
@@ -450,8 +461,10 @@ f32 Math_Tan(f32 x0) {
 }
 
 // fake match: EA's table starts 8-aligned after the 17-byte "GoRenderCtx_Gc.c" (as TibExt.c's
-// lbl_80194758 after "TibExt.c"); plain u32 data is only 4-aligned. The functions from
-// Input_vSelectControlSet on came from sweeps and may be another file, which would explain it.
+// lbl_80194758 after "TibExt.c"); plain u32 data is only 4-aligned. The table and the functions
+// from Input_vSelectControlSet on are EA's LLInput.c (TW07), another file, which would explain it.
+// The pads' button masks, one row per control set (gnInputControlSet; only row 0 in this build),
+// indexed by button: Input_uiMap reads them.
 u32 gauInputButtonMap[][0xE8 / 4] __attribute__((aligned(8))) = {
     {
         0xFFFF, 0x800, 0x800, 0x100, 0x400, 0x100, 0x800, 0x100, 0x400, 0x20,

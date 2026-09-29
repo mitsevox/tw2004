@@ -1,6 +1,10 @@
-// GoCamera.c (EA's name, from its asserts; also in EA's 2002 source tree; TW06): a render camera's
-// lens (CamLens): its field of view, where it stands and what it looks at, as a camera-to-world
-// matrix (m4) and its inverse (m44).
+// GoCamera.c (EA's name, from its asserts; also in EA's 2002 source tree; TW06): a render
+// context's lens (TW07's CA_SCamera, here CamLens): its projection (perspective or flat), near and
+// far clip, field of view, and where it stands and what it looks at, as a camera-to-world matrix
+// (m4) and its inverse (m44), optionally with the world scaled around a point. TW07's GoCamera.c
+// has the first six named functions in this order (after its empty CA_vInitOnce and
+// CA_vCloseOnce, not in this file); the setters after them are GameCube copies of GoCamera.h's
+// inlines, and Camera_Subtract3 / Camera_Invert3 paired-single copies of LLMath's.
 
 #include "camera.h"
 
