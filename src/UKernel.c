@@ -20,8 +20,8 @@ void fn_8000E830(DynObj* pObj);
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);                   // identity
 void fn_8000C5A4(f32 (*pMtx)[4]);
 
-void fn_800646D0(UStreamObject* pObject);
-void fn_80064A0C(UStreamObject* pObject);
+void StaticCam_ParseFlybyCameraActor(UStreamObject* pObject);
+void StaticCam_ParseStaticCameraActor(UStreamObject* pObject);
 void Gaud_ActorDownloadCallback(UStreamObject* pObject, int n);
 void PlayNow_LoadBallSpot(void* pObj);
 
@@ -63,10 +63,10 @@ void fn_80048BDC(UStreamObject* pObject) {
                               sizeof(u32));
     switch (setup.pDef->n4) {
     case 200:
-        fn_800646D0(pObject);
+        StaticCam_ParseFlybyCameraActor(pObject);
         return;
     case 201:
-        fn_80064A0C(pObject);
+        StaticCam_ParseStaticCameraActor(pObject);
         return;
     case 5:
         fn_80034720(pObject);

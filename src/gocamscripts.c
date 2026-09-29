@@ -87,7 +87,7 @@ static f32 gocamscripts_StrippedFn(f32 x) {
 // time (b forces the frame) or while the ball holds still in slow motion
 // (CameraScript_DontUpdateCameraDuringSlowMo) only the colour fade runs; otherwise it eases the
 // ball-update rate fEC (1..2), places the cameras of the current and next shots (DynamicCam_ProcessScript for
-// shots of bA8 1, else the static camera, fn_80064F54), and either plays the current shot (its
+// shots of bA8 1, else the static camera, StaticCam_ProcessScript), and either plays the current shot (its
 // look-at point, field of view from f78 to f7C over f48, depth of field f88, blur f8C and f90, roll
 // f9C) or blends into the next one by its blend kind nBC (0, 1, 2/11/12, 3, 7, 13, 14, 15). For
 // shots of bA8 1 it keeps the camera above the ground, on the fairway and off the flagstick; then
@@ -143,13 +143,13 @@ void CamScript_RunScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, 
     if (pScript->pShot->bA8 == 1) {
         DynamicCam_ProcessScript(pScript->pShot, nPlayer, pScript, pScript->v0, pSub, vPrev, fTime);
     } else {
-        fn_80064F54(pScript->pShot, nPlayer, pScript->v0);
+        StaticCam_ProcessScript(pScript->pShot, nPlayer, pScript->v0);
     }
     if (pScript->pNextShot != NULL) {
         if (pScript->pNextShot->bA8 == 1) {
             DynamicCam_ProcessScript(pScript->pNextShot, nPlayer, pScript, pScript->v10, pSub, vPrev, fTime);
         } else {
-            fn_80064F54(pScript->pNextShot, nPlayer, pScript->v10);
+            StaticCam_ProcessScript(pScript->pNextShot, nPlayer, pScript->v10);
         }
     }
     if (pScript->pNextShot == NULL || pScript->nBC == 5 || pScript->nBC == 6 || pScript->nBC == 8
@@ -299,13 +299,13 @@ void CamScript_RunFEScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript
     if (pScript->pShot->bA8 == 1) {
         DynamicCam_ProcessScript(pScript->pShot, nPlayer, pScript, pScript->v0, pSub, vPrev, fTime);
     } else {
-        fn_80064F54(pScript->pShot, nPlayer, pScript->v0);
+        StaticCam_ProcessScript(pScript->pShot, nPlayer, pScript->v0);
     }
     if (pScript->pNextShot != NULL) {
         if (pScript->pNextShot->bA8 == 1) {
             DynamicCam_ProcessScript(pScript->pNextShot, nPlayer, pScript, pScript->v10, pSub, vPrev, fTime);
         } else {
-            fn_80064F54(pScript->pNextShot, nPlayer, pScript->v10);
+            StaticCam_ProcessScript(pScript->pNextShot, nPlayer, pScript->v10);
         }
     }
     if (pScript->pNextShot == NULL || pScript->nBC == 5 || pScript->nBC == 4) {
@@ -387,8 +387,8 @@ void CamScript_RunFEScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript
 }
 
 // The script frame of a fly-by camera (GolfCamera_ProcessFlyByCamera and the post-shot camera;
-// GoStaticCam.c's paths). When the current shot has a timed path (fn_80065424 of its nA4), the
-// camera flies along it (StaticCam_GetFlybyInformation) at the point the path's curve
+// GoStaticCam.c's paths). When the current shot has a timed path (StaticCam_GetFlybyTimeCurve of
+// its nA4), the camera flies along it (StaticCam_GetFlybyInformation) at the point the path's curve
 // (CamScript_fEvaluateCurve) gives for the share of its length the time has reached; at the end it
 // goes on to the next shot and its follow-on with a colour fade from CamTuning.v17C over f178, or
 // clears the script when there is none. Without a path the camera plays the shot or moves on the
@@ -412,7 +412,7 @@ void CamScript_RunFlybyCamera(int nPlayer, f32* pCam, f32* pSub, CamScript* pScr
         }
         return;
     }
-    pPath = fn_80065424(pScript->pShot->nA4);
+    pPath = StaticCam_GetFlybyTimeCurve(pScript->pShot->nA4);
     if (pPath != NULL) {
         fShare = pScript->fCamTime / pPath->fLength;
         if (fShare > 1.0f) {
@@ -449,9 +449,9 @@ void CamScript_RunFlybyCamera(int nPlayer, f32* pCam, f32* pSub, CamScript* pScr
         return;
     }
     LLMath_CopyVec(pCam, vPrev);
-    fn_80064F54(pScript->pShot, nPlayer, pScript->v0);
+    StaticCam_ProcessScript(pScript->pShot, nPlayer, pScript->v0);
     if (pScript->pNextShot != NULL) {
-        fn_80064F54(pScript->pNextShot, nPlayer, pScript->v10);
+        StaticCam_ProcessScript(pScript->pNextShot, nPlayer, pScript->v10);
     }
     if (pScript->pNextShot == NULL || pScript->nBC == 5 || pScript->nBC == 4) {
         Vec3Copy(pScript->v0, pCam);

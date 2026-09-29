@@ -58,7 +58,7 @@ typedef struct CamShot {
         } bits;
         f32 aArea[4];           // 0x50  a static camera (GoStaticCam.c): it is picked while the
                                 //       golfer or the ball is inside x aArea[0]..aArea[2],
-                                //       z aArea[1]..aArea[3] (fn_800659F4)
+                                //       z aArea[1]..aArea[3] (StaticCam_CheckHotZone)
     } u;
     f32  f60;                   // 0x60
     f32  f64;                   // 0x64
@@ -86,7 +86,7 @@ typedef struct CamShot {
     u8   bAB;                   // 0xAB
     u8   bAC;                   // 0xAC
     u8   bAD;                   // 0xAD
-    s8   nAE;                   // 0xAE  a static camera's record byte 0x1C (fn_80064A0C)
+    s8   nAE;                   // 0xAE  a static camera's record byte 0x1C (StaticCam_ParseStaticCameraActor)
     u8   bAF;                  // 0xAF
     u8   bB0;                   // 0xB0
     u8   bB1;                   // 0xB1
@@ -145,7 +145,7 @@ typedef struct FlyByKey {
 // A fly-by path's spline (0x2E0 bytes), from the 'CAMC' object.
 typedef struct FlyByPath {
     u32  u0;                    // 0x00
-    u32  uPath;                 // 0x04  the path it belongs to (CamShot.nA4; fn_80065424)
+    u32  uPath;                 // 0x04  the path it belongs to (CamShot.nA4; StaticCam_GetFlybyTimeCurve)
     f32  fLength;               // 0x08
     u32  nKeys;                 // 0x0C
     FlyByKey aKeys[20];         // 0x10
@@ -791,10 +791,10 @@ extern f32 gCatmullRomBasis[4][4];
 
 // ---- the static and fly-by cameras (GoStaticCam.c, 0x8006449C..) ----------------------------
 
-void     fn_80064F54(CamShot* pShot, int nPlayer, f32* pOut);   // the shot's position
+void     StaticCam_ProcessScript(CamShot* pShot, int nPlayer, f32* pOut);   // the shot's position
 CamShot* StaticCam_ChooseScript(int nPlayer, int nKind, u8 bNotKind5, CamShot* pNot);
 CamShot* StaticCam_GetFlyByCam(int nPath);        // a fly-by path's first shot (NULL past the 10th)
-FlyByPath* fn_80065424(u32 uPath);      // a fly-by path's timing curve (NULL: none)
+FlyByPath* StaticCam_GetFlybyTimeCurve(u32 uPath);      // a fly-by path's timing curve (NULL: none)
 void     StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32* pSub, f32* pFov,
                      int nPlayer, f32 fShare);
 

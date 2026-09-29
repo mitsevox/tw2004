@@ -1,8 +1,9 @@
 // GoStaticCam.c (EA's name, from its asserts; also in EA's 2002 source tree): the course's static
 // cameras and fly-by camera paths. The course data brings them as 'Cact' objects (UKernel.c hands
-// type 201 to fn_80064A0C, type 200 to fn_800646D0) and the paths' timing curves
-// as a 'CAMC' stream object (fn_800644F4). The golf cameras (GoGolfCam.c) pick a static camera
-// whose area holds the ball (StaticCam_ChooseScript) and fly along a path (StaticCam_GetFlyByCam, StaticCam_GetFlybyInformation).
+// type 201 to StaticCam_ParseStaticCameraActor, type 200 to StaticCam_ParseFlybyCameraActor) and
+// the paths' timing curves as a 'CAMC' stream object (StaticCam_LoadCAMCfromStream). The golf
+// cameras (GoGolfCam.c) pick a static camera whose area holds the ball (StaticCam_ChooseScript) and
+// fly along a path (StaticCam_GetFlyByCam, StaticCam_GetFlybyInformation).
 
 #include "game_types.h"
 #include "engine.h"
@@ -16,26 +17,29 @@ void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 a, f32 b, f32 c);      // a rotati
 void LLMath_mat44fltMultiply33(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // a vector through a matrix
 f32  CamScript_fGetDistanceBetweenSplinePoints(f32* pPos0, f32* pPos1, f32* pPos2, f32* pPos3);
 
-void fn_800644F4(UStreamObject* pObject);
+void StaticCam_LoadCAMCfromStream(UStreamObject* pObject);
 void StaticCam_Reset(void);
 void StaticCam_SetupFlybyCameraPointers(CamShot* pShot, CamShot** ppPrev, CamShot** ppNext, CamShot** ppAfter);
-u8   fn_800659F4(CamShot* pShot, int nPlayer);
-void fn_80065AFC(f32* pA, f32* pB, f32* pOut);
-void fn_80065B20(f32* pA, f32* pB, f32* pOut);
+u8   StaticCam_CheckHotZone(CamShot* pShot, int nPlayer);
+void StaticCam_Vec3Add(f32* pA, f32* pB, f32* pOut);
+void StaticCam_Vec3Sub(f32* pA, f32* pB, f32* pOut);
 
 StaticCams* lbl_80281E18;
 
-// Register the 'CAMC' stream handler.
-void fn_8006449C(void) {
-    Stream_RegisterLoadChunkCallback('CAMC', fn_800644F4);
+// Registers the 'CAMC' stream handler (StaticCam_LoadCAMCfromStream), the fly-by paths' timing
+// curves.
+void StaticCam_RegisterStreamClients(void) {
+    Stream_RegisterLoadChunkCallback('CAMC', StaticCam_LoadCAMCfromStream);
 }
 
-void fn_800644CC(void) {
+void StaticCam_UnRegisterStreamClients(void) {
     Stream_UnregisterLoadChunkCallback('CAMC');
 }
 
-// The 'CAMC' handler: the fly-by paths' timing curves, byte-swapped into a new table.
-void fn_800644F4(UStreamObject* pObject) {
+// The 'CAMC' stream handler: the fly-by paths' timing curves (FlyByPath, found by
+// StaticCam_GetFlybyTimeCurve), byte-swapped from the file (a two-word header into u1E5C and
+// nPaths, then each path and its 0x22-byte keys) into a table allocated here. Frees the object.
+void StaticCam_LoadCAMCfromStream(UStreamObject* pObject) {
     SwapField aHeader[2] = { { 4, 4 }, { 4, 4 } };
     SwapField aPath[4] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };
     SwapField aKey[3] = { { 0x20, 4 }, { 1, 1 }, { 1, 1 } };
@@ -63,8 +67,12 @@ void fn_800644F4(UStreamObject* pObject) {
     StaticMem_Free(pObject);
 }
 
-// A fly-by camera arrived (a 'Cact' object of type 200): the next one of aFlyBy.
-void fn_800646D0(UStreamObject* pObject) {
+// Takes a fly-by camera (a 'Cact' object of type 200, from UKernel.c) as the next shot of aFlyBy,
+// named "FlyBy Cam: <its number>": its position, field of view and look angles (degrees to
+// radians), time f20 and f34 (clamped to 0..1). p40 and p44 keep the next camera's number and its
+// own until StaticCam_GetFlyByCam links the paths; nA4 is its path (bAA 0 on path 9, else 1). The
+// count is not checked against aFlyBy's 30 slots. Frees the object.
+void StaticCam_ParseFlybyCameraActor(UStreamObject* pObject) {
     char szName[0x20];  // its size is unknown
     FlyByCamDef* pDef;
 
@@ -111,9 +119,12 @@ void fn_800646D0(UStreamObject* pObject) {
     StaticMem_Free(pObject);
 }
 
-// A static camera arrived (a 'Cact' object of type 201): the next one of aStatic. It looks from
-// its position along its three angles.
-void fn_80064A0C(UStreamObject* pObject) {
+// Takes a static camera (a 'Cact' object of type 201, from UKernel.c) as the next shot of aStatic,
+// named "Static Cam: <n>": its position, fields of view (degrees to radians), area (u.aArea), the
+// shot kinds it serves (nA4) and the rest of its StaticCamDef; heights 0 to 10000. Its look-at
+// point v30 is one unit from its position along its three angles (mat44flt_EulerAngles). The count
+// is not checked against aStatic's 10 slots. Frees the object.
+void StaticCam_ParseStaticCameraActor(UStreamObject* pObject) {
     f32 vAhead[4] = { 0.0f, 0.0f, 1.0f, 0.0f };
     char szName[0x20];  // its size is unknown
     f32 m[4][4];
@@ -158,26 +169,30 @@ void fn_80064A0C(UStreamObject* pObject) {
     pShot = &lbl_80281E18->aStatic[lbl_80281E18->nStatic];
     mat44flt_EulerAngles(m, pShot->v30[1], pShot->v30[0], pShot->v30[2]);
     LLMath_mat44fltMultiply33(m, vAhead, lbl_80281E18->aStatic[lbl_80281E18->nStatic].v30);
-    fn_80065AFC(lbl_80281E18->aStatic[lbl_80281E18->nStatic].v30,
+    StaticCam_Vec3Add(lbl_80281E18->aStatic[lbl_80281E18->nStatic].v30,
                 lbl_80281E18->aStatic[lbl_80281E18->nStatic].v20,
                 lbl_80281E18->aStatic[lbl_80281E18->nStatic].v30);
     lbl_80281E18->nStatic++;
     StaticMem_Free(pObject);
 }
 
+// Allocates the static cameras' state (gpStaticCams) and empties it (StaticCam_Reset). Called when
+// a round starts up (GO_vInitIG).
 void StaticCam_Init(void) {
     lbl_80281E18 = StaticMem_Alloc(sizeof(StaticCams), 2, 0, "GoStaticCam.c", 380);
     lbl_80281E18->pPaths = NULL;
     StaticCam_Reset();
 }
 
+// Empties the static cameras' state (StaticCam_Reset) and frees it.
 void StaticCam_DeInit(void) {
     StaticCam_Reset();
     StaticMem_Free(lbl_80281E18);
     lbl_80281E18 = NULL;
 }
 
-// Forget every camera and path.
+// Forgets every static and fly-by camera and path, and frees the paths' timing curves. The hole
+// loader calls it for each hole.
 void StaticCam_Reset(void) {
     lbl_80281E18->nStatic = 0;
     lbl_80281E18->nFlyBy = 0;
@@ -199,13 +214,15 @@ void StaticCam_Reset(void) {
     lbl_80281E18->nPaths = 0;
 }
 
-void fn_80064F54(CamShot* pShot, int nPlayer, f32* pOut) {
+// A static or fly-by shot's camera position: its v20, into pOut. nPlayer is not used.
+void StaticCam_ProcessScript(CamShot* pShot, int nPlayer, f32* pOut) {
     Vec3Copy(pShot->v20, pOut);
 }
 
-// A random static camera for shot kind nKind whose area holds one of nPlayer's ball positions,
-// other than pNot (bNotKind5: none with bAC 5). NULL except on course 12's hole index 10
-// (Game_GetCurHoleNum) for kind 0x20, so every other kind gets none.
+// A random static camera for shot kind nKind (a bit of its nA4) whose area holds one of nPlayer's
+// ball positions (StaticCam_CheckHotZone), other than pNot; with bNotKind5 (TW07's dontShowGolfer)
+// none whose look-at kind bAC is 5. Only on course 12 with Game_GetCurHoleNum 10 and for kind 0x20;
+// NULL otherwise and when none fits.
 CamShot* StaticCam_ChooseScript(int nPlayer, int nKind, u8 bNotKind5, CamShot* pNot) {
     int aFound[NUM_STATIC_CAMS];
     int* pFound;
@@ -220,7 +237,8 @@ CamShot* StaticCam_ChooseScript(int nPlayer, int nKind, u8 bNotKind5, CamShot* p
     for (i = 0; i < lbl_80281E18->nStatic; i++) {
         if (!lbl_80281E18->aStatic[i].bA9 && (nKind & lbl_80281E18->aStatic[i].nA4)
             && (!bNotKind5 || lbl_80281E18->aStatic[i].bAC != 5)
-            && fn_800659F4(&lbl_80281E18->aStatic[i], nPlayer) && pNot != &lbl_80281E18->aStatic[i]) {
+            && StaticCam_CheckHotZone(&lbl_80281E18->aStatic[i], nPlayer) && pNot
+                    != &lbl_80281E18->aStatic[i]) {
             *pFound++ = i;
             nFound++;
         }
@@ -232,9 +250,11 @@ CamShot* StaticCam_ChooseScript(int nPlayer, int nKind, u8 bNotKind5, CamShot* p
     return &lbl_80281E18->aStatic[aFound[i]];
 }
 
-// Fly-by path nPath's first shot. The first call after loading chains the fly-by cameras into their
-// paths (p40 the next shot, p44 the one before), finds each path's first shot and measures the
-// paths.
+// Fly-by path nPath's first shot (NULL for nPath 10 or more). The first call after loading links
+// the fly-by cameras into their paths (p40 the next shot, p44 the one before, by the numbers
+// StaticCam_ParseFlybyCameraActor kept), finds each path's first shot, sets each shot's f4C to its
+// segment's length (fn_800C79BC; 0 for the last) and adds them up per path; a path whose last
+// camera is marked -99 gets bAA 0 on all its cameras.
 CamShot* StaticCam_GetFlyByCam(int nPath) {
     u8 abEnds[NUM_FLYBY_PATHS];   // the path ends on a camera marked -99
     CamShot* pShot;
@@ -337,7 +357,7 @@ CamShot* StaticCam_GetFlyByCam(int nPath) {
 }
 
 // Fly-by path uPath's timing curve, or NULL.
-FlyByPath* fn_80065424(u32 uPath) {
+FlyByPath* StaticCam_GetFlybyTimeCurve(u32 uPath) {
     FlyByPath* pPaths;
     u32 i;
 
@@ -353,10 +373,12 @@ FlyByPath* fn_80065424(u32 uPath) {
     return NULL;
 }
 
-// Fly the camera along fly-by path nPath to share fShare of the path's length: step the spline in
-// 0.005 steps until the camera has gone far enough, then home in on the exact distance. The script
-// keeps the shot it is on (pShot), the share of that shot's segment (fA0) and the distance so far
-// (fA4).
+// Flies the camera along fly-by path nPath to share fShare of the path's length: pCam and pSub come
+// from fn_800C7480's spline through the v20 and v30 of the four shots around the current one
+// (StaticCam_SetupFlybyCameraPointers), *pFov starts at the view's lens and goes to fn_800C7480
+// with the shots' f78. It steps the spline 0.005 at a time until the camera has gone far enough,
+// then homes in on the exact distance. The script keeps the shot it is on (pShot, and pNextShot its
+// p40), the share of that shot's segment (fA0) and the distance so far (fA4).
 void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32* pSub, f32* pFov, int nPlayer,
                  f32 fShare) {
     f32 vLast[4];
@@ -412,7 +434,7 @@ void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32
             CamScript_SplineCamerasByPositionAndLook(pPrev->v20, pShot->v20, pNext->v20, pAfter->v20,
                                                      pPrev->v30, pShot->v30, pNext->v30,
                         pAfter->v30, pCam, pSub, pFov, pShot->f78, pNext->f78, fT);
-            fn_80065B20(pCam, vLast, vDiff);
+            StaticCam_Vec3Sub(pCam, vLast, vDiff);
             fDist += (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
             if (fTarget > fDist) {
                 LLMath_CopyVec(pCam, vLast);
@@ -451,7 +473,7 @@ void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32
             CamScript_SplineCamerasByPositionAndLook(pPrev->v20, pShot->v20, pNext->v20, pAfter->v20,
                                                      pPrev->v30, pShot->v30, pNext->v30,
                         pAfter->v30, pCam, pSub, pFov, pShot->f78, pNext->f78, fT);
-            fn_80065B20(pCam, vLast, vDiff);
+            StaticCam_Vec3Sub(pCam, vLast, vDiff);
             fDist = fLastDist + (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
             i++;
         } while (i < 4);
@@ -461,7 +483,7 @@ void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32
             CamScript_SplineCamerasByPositionAndLook(pPrev->v20, pShot->v20, pNext->v20, pAfter->v20,
                                                      pPrev->v30, pShot->v30, pNext->v30,
                         pAfter->v30, pCam, pSub, pFov, pShot->f78, pNext->f78, fT);
-            fn_80065B20(pCam, vLast, vDiff);
+            StaticCam_Vec3Sub(pCam, vLast, vDiff);
             fDist = fLastDist + (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
         } else if (fDist < fTarget) {
             fT = fT + (fHiT - fT) * ((fTarget - fDist) / (fHiDist - fDist));
@@ -479,7 +501,7 @@ void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32
             CamScript_SplineCamerasByPositionAndLook(pPrev->v20, pShot->v20, pNext->v20, pAfter->v20,
                                                      pPrev->v30, pShot->v30, pNext->v30,
                         pAfter->v30, pCam, pSub, pFov, pShot->f78, pNext->f78, fT);
-            fn_80065B20(pCam, vLast, vDiff);
+            StaticCam_Vec3Sub(pCam, vLast, vDiff);
             fDist = fLastDist + (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
         }
     }
@@ -517,8 +539,9 @@ void StaticCam_SetupFlybyCameraPointers(CamShot* pShot, CamShot** ppPrev, CamSho
     }
 }
 
-// nPlayer's vBall (tested first) or ball.vPos lies inside the shot's x/z area.
-u8 fn_800659F4(CamShot* pShot, int nPlayer) {
+// The static shot's area (x between u.aArea[0] and [2], z between [1] and [3], bounds excluded)
+// holds nPlayer's vBall (tested first) or ball.vPos.
+u8 StaticCam_CheckHotZone(CamShot* pShot, int nPlayer) {
     f32* pBallPos;
     f32* pVBall;
     int i;
@@ -546,7 +569,7 @@ u8 fn_800659F4(CamShot* pShot, int nPlayer) {
 
 // pOut gets pB + pA (three floats).
 #ifdef __MWERKS__
-asm void fn_80065AFC(register f32* pA, register f32* pB, register f32* pOut) {
+asm void StaticCam_Vec3Add(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 1, 0
@@ -560,7 +583,7 @@ asm void fn_80065AFC(register f32* pA, register f32* pB, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_80065AFC(f32* pA, f32* pB, f32* pOut) {
+void StaticCam_Vec3Add(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pB[0] + pA[0];
     pOut[1] = pB[1] + pA[1];
     pOut[2] = pB[2] + pA[2];
@@ -569,7 +592,7 @@ void fn_80065AFC(f32* pA, f32* pB, f32* pOut) {
 
 // pOut gets pA - pB (three floats).
 #ifdef __MWERKS__
-asm void fn_80065B20(register f32* pA, register f32* pB, register f32* pOut) {
+asm void StaticCam_Vec3Sub(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 1, 0
@@ -583,7 +606,7 @@ asm void fn_80065B20(register f32* pA, register f32* pB, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_80065B20(f32* pA, f32* pB, f32* pOut) {
+void StaticCam_Vec3Sub(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pA[0] - pB[0];
     pOut[1] = pA[1] - pB[1];
     pOut[2] = pA[2] - pB[2];

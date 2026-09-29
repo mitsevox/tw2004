@@ -60,7 +60,7 @@ Objects delivered by UStream
 | `TEO ` | fn_80045F74 | sweep | none seen | asm |
 | `BALL` | fn_80045FC8 | asm | none seen | asm |
 | `Cact` | fn_80048BDC | UKernel.c | none seen | asm; its type-10 objects go to PlayNow_LoadBallSpot (PlayNowMode.c), which reads a challenge's ball spot in place through `ChallengeSpotRecord` (`port:` note there) |
-| `CAMC` | fn_800644F4 | GoStaticCam.c | swapped: ByteSwap_Records | little-endian on disc |
+| `CAMC` | StaticCam_LoadCAMCfromStream | GoStaticCam.c | swapped: ByteSwap_Records | little-endian on disc |
 | `sscr` | SitDev_LoadScripts | SitDevFile.c | swapped: SitDev_SwapTables > ByteSwap_Records | little-endian on disc |
 | `BIO ` | FE_CharBios_LoadBIOfromStream | FE_Manager.c | none seen | asm |
 | `LITE` | FE_lite_vStreamCallback | FEgolferanim.c | swapped: ByteSwap_Records | little-endian on disc |

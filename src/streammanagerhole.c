@@ -120,8 +120,8 @@ void fn_800148A8(void);
 void fn_800148EC(void);
 void fn_800307C0();
 void fn_80030818();
-void fn_8006449C();
-void fn_800644CC();
+void StaticCam_RegisterStreamClients();
+void StaticCam_UnRegisterStreamClients();
 void fn_8011E468();
 void fn_8011E4A4();
 void fn_8001491C(void);
@@ -385,7 +385,7 @@ void fn_8001491C(void) {
     fn_80010284();
     fn_800307C0();
     fn_80046130();
-    fn_8006449C();
+    StaticCam_RegisterStreamClients();
     fn_8011E468();
 }
 
@@ -394,7 +394,7 @@ void fn_8001494C(void) {
     fn_80046174();
     fn_80030818();
     fn_800102B4();
-    fn_800644CC();
+    StaticCam_UnRegisterStreamClients();
 }
 
 // ---- end of sweep code ----

@@ -265,7 +265,7 @@ They will be sorted into the sections below.
   not help), and it matches inside iterator loops (hwsBurn HwsBurn_MarkOption). A `u8` flag argument computed
   before intervening float tests also goes in a local first (animblender SKABlender_BlendLinear 65.6 -> 98.2).
 - **[verified] A `switch` inside a loop lays out its case bodies in source order**, not case-value order
-  (GoStaticCam fn_800659F4).
+  (GoStaticCam StaticCam_CheckHotZone).
 - **[verified] `(uptr)` casts give the same code as `(u32)` for address arithmetic**: use them, they are
   64-bit safe (Terrain_HeightAt).
 - **[verified] An inlined helper keeps its own shape**: `&&` conditions in the inlined copy can match while
