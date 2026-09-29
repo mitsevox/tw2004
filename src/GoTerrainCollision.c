@@ -30,12 +30,12 @@ u8        lbl_80281DC0;
 void  Ter_FreeDropNetworkLoadCallback(TNetwork* pNet);
 u8    Ter_LieIsPreferred(u32 nClass);
 void  Ter_OOBNetworkLoadCallback(TNetwork* pNet);
-void  fn_8005097C(f32* pA, f32* pB, f32* pOut);           // a - b (paired-single assembly)
-void  fn_800509A0(f32* pSrc, f32* pDst);                  // negate (paired-single assembly)
-void  fn_800509BC(f32* pSrc, f32* pDst);                  // negate, four floats (paired-single assembly)
+void  Ter_Subtract3(f32* pA, f32* pB, f32* pOut);           // a - b (paired-single assembly)
+void  Ter_Negate3(f32* pSrc, f32* pDst);                  // negate (paired-single assembly)
+void  Ter_Negate(f32* pSrc, f32* pDst);                  // negate, four floats (paired-single assembly)
 
 // Every floor in this file goes through an inline (probably EA's wrapper around floorf):
-// fn_8004DCC4 matches only that way, and every other function matches either way.
+// Ter_GetTerrainLayers matches only that way, and every other function matches either way.
 static inline f32 Ter_Floor(f32 x) {
     return Math_Floor(x);
 }
@@ -49,7 +49,7 @@ static inline int Ter_GridCell(f32 fCells) {
 f32   Ter_GetHighestGroundTriangle(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef,
                                    f32 (**ppTri)[3],
                   s32* pTri);
-void  fn_80050794(CourseInfo* pCourse);
+void  Ter_ComputeHighestPointInEveryTriangle(CourseInfo* pCourse);
 f32   Ter_CalcLowestPlayableWorldHeight(CourseInfo* pCourse);
 f32   Ter_GetLowestGroundTriangle(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef,
                                   f32 (**ppTri)[3],
@@ -62,16 +62,20 @@ void  Ter_GetSupportingAndCoveringGroundTriangles(CourseInfo* pCourse, f32* pPos
                   TerPolyRef** ppRefHigh, f32* pHigh, f32 (**ppTriHigh)[3]);
 u8    Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
                                   SurfaceType** ppSurface, TerObject** ppObj);
-u8    fn_8004EB7C(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir, f32 fMax, f32* pHit,
+u8    Ter_CheckForWorldCollisionOneGrid(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir,
+                                        f32 fMax, f32* pHit,
                   f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj, u8* pbFlags);
-u8    fn_8004F43C(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir, f32 fMax, f32* pHit,
+u8    Ter_CheckForSolidWorldCollisionOneGrid(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo,
+                                             f32* pDir, f32 fMax, f32* pHit,
                   f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj);
-u8    fn_8004FCB4(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir, f32 fMax, f32* pHit,
+u8    Ter_CheckForGroundCollisionOneGrid(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo,
+                                         f32* pDir, f32 fMax, f32* pHit,
                   f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj);
-u8    fn_800504F4(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir, f32 fMax, f32* pHit,
+u8    Ter_CheckForObjectCollisionOneGrid(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo,
+                                         f32* pDir, f32 fMax, f32* pHit,
                   f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj);
-u8    fn_8004E0D4(f32* pFrom, f32* pDir, f32 fRange, f32* pCentre, f32 fRadius);
-int   fn_80050BD8(UObjMesh* pModel, int n);
+u8    Ter_LineSphereIntersection(f32* pFrom, f32* pDir, f32 fRange, f32* pCentre, f32 fRadius);
+int   TerCollision_GetMeshFlags(UObjMesh* pModel, int n);
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0f (0x80283288), before the constants Ter_LineTriangleIntersection uses first; its body is unknown.
@@ -101,13 +105,13 @@ u8 Ter_LineTriangleIntersection(f32* pFrom, f32* pDir, f32 fMax, f32 (*pTri)[3],
     Vec3Copy(pTri[0], vA);
     Vec3Copy(pTri[1], vB);
     Vec3Copy(pTri[2], vC);
-    fn_8005097C(vB, vA, vE1);
-    fn_8005097C(vC, vA, vE2);
+    Ter_Subtract3(vB, vA, vE1);
+    Ter_Subtract3(vC, vA, vE2);
     vec4flt_CrossProduct(pDir, vE2, vP);
     fDet = Vec3_Dot(vE1, vP);
     if (fDet > -0.00001f && fDet < 0.00001f) return 0;
     fInv = 1.0f / fDet;
-    fn_8005097C(pFrom, vA, vS);
+    Ter_Subtract3(pFrom, vA, vS);
     fU = fInv * Vec3_Dot(vS, vP);
     if (fU < 0.0f || fU > 1.0f) return 0;
     vec4flt_CrossProduct(vS, vE1, vQ);
@@ -222,7 +226,7 @@ void Ter_InitTGD(CourseInfo* pCourse) {
     gpGame->pPinPos = &lbl_801D3CB0.pCourse->pin[Game_CurrentPinSet()].x;
     lbl_80281DC8 = 0;
     lbl_80281DC4 = 0;
-    fn_80050794(lbl_801D3CB0.pCourse);
+    Ter_ComputeHighestPointInEveryTriangle(lbl_801D3CB0.pCourse);
     lbl_801D3CB0.pCourse->fFloor = Ter_CalcLowestPlayableWorldHeight(lbl_801D3CB0.pCourse);
 }
 
@@ -410,7 +414,7 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bH
                         if (bModels) {
                             pModel = fn_80034A20(pCourse->pObjects[*pObjRef].nPatch,
                                                  pCourse->pObjects[*pObjRef].nObjList);
-                            if (pModel != NULL && (fn_80050BD8(pModel, 0) & 0x40)) {
+                            if (pModel != NULL && (TerCollision_GetMeshFlags(pModel, 0) & 0x40)) {
                                 bObstructed = 1;
                             }
                         } else {
@@ -434,8 +438,8 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bH
                             if ((uFlags & 7)
                                 && (fTop > pVert[(uFlags >> 6) & 3][1]
                                     || aHeight[0] < pVert[(uFlags >> 4) & 3][1])
-                                && fn_80050A9C(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
-                                fn_800509D8(pVert, pPos, &fA, &fB, &fC);
+                                && Ter_PointInTriangleXZpY(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
+                                Ter_GetBarycentricCoords(pVert, pPos, &fA, &fB, &fC);
                                 fHeight = fA * pVert[0][1] + fB * pVert[1][1] + fC * pVert[2][1];
                                 if (fHeight > aHeight[0] && fHeight <= fTop) {
                                     aHeight[0] = fHeight;
@@ -453,8 +457,9 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bH
                                     if ((uFlags & 7)
                                         && (fTop > pVert[(uFlags >> 6) & 3][1]
                                             || aHeight[k] < pVert[(uFlags >> 4) & 3][1])
-                                        && fn_80050A9C(pVert[0], pVert[1], pVert[2], vPos[0], vPos[2])) {
-                                        fn_800509D8(pVert, vPos, &fA2, &fB2, &fC2);
+                                        && Ter_PointInTriangleXZpY(pVert[0], pVert[1], pVert[2], vPos[0],
+                                                vPos[2])) {
+                                        Ter_GetBarycentricCoords(pVert, vPos, &fA2, &fB2, &fC2);
                                         fHeight = fA2 * pVert[0][1] + fB2 * pVert[1][1] + fC2 * pVert[2][1];
                                         if (fHeight > aHeight[k] && fHeight <= fTop) {
                                             aHeight[k] = fHeight;
@@ -556,7 +561,7 @@ u8 Ter_SearchForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut) {
     fDist2 = LLMath_SquareDistanceBetween3(pOut, p->ball.vPos);
     if (fDist2 > 9.0f
         || (!bPreferred && pGround->nClass != gSurfaceTypes[p->ball.nSurface].nClass)) {
-        fn_8005097C(&pCourse->pin[Game_CurrentPinSet()].x, p->ball.vPos, vDir);
+        Ter_Subtract3(&pCourse->pin[Game_CurrentPinSet()].x, p->ball.vPos, vDir);
         LLMath_Normalize3(vDir, vDir);
         fHeading = atan2f(vDir[0], vDir[2]);
         fRadius = 1.0f;
@@ -735,8 +740,8 @@ f32 Ter_GetHighestGroundTriangle(CourseInfo* pCourse, f32* pPos, TerCell** ppCel
                 pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
                 for (j = pRef->nTris - 1; j >= 0; j--) {
                     if ((pFlags[2] & 7) && fBest < pVert[(pFlags[2] >> 4) & 3][1]
-                        && fn_80050A9C(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
-                        fn_800509D8(pVert, pPos, &fA, &fB, &fC);
+                        && Ter_PointInTriangleXZpY(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
+                        Ter_GetBarycentricCoords(pVert, pPos, &fA, &fB, &fC);
                         fHeight = fA * pVert[0][1] + fB * pVert[1][1] + fC * pVert[2][1];
                         if (fHeight > fBest) {
                             *ppCell = pCell;
@@ -791,8 +796,8 @@ f32 Ter_GetLowestGroundTriangle(CourseInfo* pCourse, f32* pPos, TerCell** ppCell
                 pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
                 for (j = pRef->nTris - 1; j >= 0; j--) {
                     if ((pFlags[2] & 7) && fBest > pVert[(pFlags[2] >> 6) & 3][1]
-                        && fn_80050A9C(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
-                        fn_800509D8(pVert, pPos, &fA, &fB, &fC);
+                        && Ter_PointInTriangleXZpY(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
+                        Ter_GetBarycentricCoords(pVert, pPos, &fA, &fB, &fC);
                         fHeight = fA * pVert[0][1] + fB * pVert[1][1] + fC * pVert[2][1];
                         if (fHeight < fBest) {
                             *ppCell = pCell;
@@ -848,8 +853,8 @@ f32 Ter_GetSupportingWorldTriangle(CourseInfo* pCourse, f32* pPos, TerCell** ppC
                     if ((pFlags[2] & 7)
                         && (pPos[1] > pVert[(pFlags[2] >> 6) & 3][1]
                             || fBest < pVert[(pFlags[2] >> 4) & 3][1])
-                        && fn_80050A9C(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
-                        fn_800509D8(pVert, pPos, &fA, &fB, &fC);
+                        && Ter_PointInTriangleXZpY(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
+                        Ter_GetBarycentricCoords(pVert, pPos, &fA, &fB, &fC);
                         fHeight = fA * pVert[0][1] + fB * pVert[1][1] + fC * pVert[2][1];
                         if (fHeight > fBest && fHeight <= pPos[1]) {
                             *ppCell = pCell;
@@ -907,8 +912,8 @@ f32 Ter_GetCoveringGroundTriangle(CourseInfo* pCourse, f32* pPos, TerCell** ppCe
                     if ((pFlags[2] & 7)
                         && (fBest > pVert[(pFlags[2] >> 6) & 3][1]
                             || pPos[1] < pVert[(pFlags[2] >> 4) & 3][1])
-                        && fn_80050A9C(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
-                        fn_800509D8(pVert, pPos, &fA, &fB, &fC);
+                        && Ter_PointInTriangleXZpY(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
+                        Ter_GetBarycentricCoords(pVert, pPos, &fA, &fB, &fC);
                         fHeight = fA * pVert[0][1] + fB * pVert[1][1] + fC * pVert[2][1];
                         if (fHeight < fBest && fHeight >= pPos[1]) {
                             *ppCell = pCell;
@@ -968,8 +973,8 @@ void Ter_GetSupportingAndCoveringGroundTriangles(CourseInfo* pCourse, f32* pPos,
                 for (j = pRef->nTris - 1; j >= 0; j--) {
                     if ((pFlags[2] & 7)
                         && (fHigh > pVert[(pFlags[2] >> 6) & 3][1] || fLow < pVert[(pFlags[2] >> 4) & 3][1])
-                        && fn_80050A9C(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
-                        fn_800509D8(pVert, pPos, &fA, &fB, &fC);
+                        && Ter_PointInTriangleXZpY(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
+                        Ter_GetBarycentricCoords(pVert, pPos, &fA, &fB, &fC);
                         fHeight = fA * pVert[0][1] + fB * pVert[1][1] + fC * pVert[2][1];
                         if (fHeight < fHigh && fHeight >= pPos[1]) {
                             *ppRefHigh = pRef;
@@ -1048,12 +1053,12 @@ f32 Ter_GetCoveringGroundHeightAndNormal(CourseInfo* pCourse, f32* pPos, f32* pN
         Vec3Copy(pTri[0], vA);
         Vec3Copy(pTri[1], vB);
         Vec3Copy(pTri[2], vC);
-        fn_8005097C(vA, vB, vAB);
-        fn_8005097C(vB, vC, vBC);
+        Ter_Subtract3(vA, vB, vAB);
+        Ter_Subtract3(vB, vC, vBC);
         vec4flt_CrossProduct(vAB, vBC, pNormal);
         LLMath_Normalize3(pNormal, pNormal);
         if (pNormal[1] < 0.0f) {
-            fn_800509A0(pNormal, pNormal);
+            Ter_Negate3(pNormal, pNormal);
         }
         return fHeight;     // fake match: a return of its own, so the other path skips the final fmr
     }
@@ -1077,12 +1082,12 @@ u8 Ter_GetSupportingGroundNormal(CourseInfo* pCourse, f32* pPos, f32* pNormal) {
         Vec3Copy(pTri[0], vA);
         Vec3Copy(pTri[1], vB);
         Vec3Copy(pTri[2], vC);
-        fn_8005097C(vA, vB, vAB);
-        fn_8005097C(vB, vC, vBC);
+        Ter_Subtract3(vA, vB, vAB);
+        Ter_Subtract3(vB, vC, vBC);
         vec4flt_CrossProduct(vAB, vBC, pNormal);
         LLMath_Normalize3(pNormal, pNormal);
         if (pNormal[1] < 0.0f) {
-            fn_800509A0(pNormal, pNormal);
+            Ter_Negate3(pNormal, pNormal);
         }
         return 1;
     }
@@ -1132,12 +1137,12 @@ f32 Ter_GetSupportingGroundData(CourseInfo* pCourse, f32* pPos, SurfaceType** pp
         Vec3Copy(pTri[0], vA);
         Vec3Copy(pTri[1], vB);
         Vec3Copy(pTri[2], vC);
-        fn_8005097C(vA, vB, vAB);
-        fn_8005097C(vB, vC, vBC);
+        Ter_Subtract3(vA, vB, vAB);
+        Ter_Subtract3(vB, vC, vBC);
         vec4flt_CrossProduct(vAB, vBC, pNormal);
         LLMath_Normalize3(pNormal, pNormal);
         if (pNormal[1] < 0.0f) {
-            fn_800509A0(pNormal, pNormal);
+            Ter_Negate3(pNormal, pNormal);
         }
         *ppSurface = &gSurfaceTypes[pRef->nSurface];
     } else {
@@ -1181,12 +1186,12 @@ void Ter_GetEnclosingGroundData(CourseInfo* pCourse, f32* pPos, f32* pLow, Surfa
         Vec3Copy(pTriLow[0], vA);
         Vec3Copy(pTriLow[1], vB);
         Vec3Copy(pTriLow[2], vC);
-        fn_8005097C(vA, vB, vAB);
-        fn_8005097C(vB, vC, vBC);
+        Ter_Subtract3(vA, vB, vAB);
+        Ter_Subtract3(vB, vC, vBC);
         vec4flt_CrossProduct(vAB, vBC, pNormalLow);
         LLMath_Normalize3(pNormalLow, pNormalLow);
         if (pNormalLow[1] < 0.0f) {
-            fn_800509A0(pNormalLow, pNormalLow);
+            Ter_Negate3(pNormalLow, pNormalLow);
         }
         *ppSurfaceLow = &gSurfaceTypes[pRefLow->nSurface];
     } else {
@@ -1196,12 +1201,12 @@ void Ter_GetEnclosingGroundData(CourseInfo* pCourse, f32* pPos, f32* pLow, Surfa
         Vec3Copy(pTriHigh[0], vA);
         Vec3Copy(pTriHigh[1], vB);
         Vec3Copy(pTriHigh[2], vC);
-        fn_8005097C(vA, vB, vAB2);
-        fn_8005097C(vB, vC, vBC2);
+        Ter_Subtract3(vA, vB, vAB2);
+        Ter_Subtract3(vB, vC, vBC2);
         vec4flt_CrossProduct(vAB2, vBC2, pNormalHigh);
         LLMath_Normalize3(pNormalHigh, pNormalHigh);
         if (pNormalHigh[1] < 0.0f) {
-            fn_800509A0(pNormalHigh, pNormalHigh);
+            Ter_Negate3(pNormalHigh, pNormalHigh);
         }
         *ppSurfaceHigh = &gSurfaceTypes[pRefHigh->nSurface];
     } else {
@@ -1212,7 +1217,7 @@ void Ter_GetEnclosingGroundData(CourseInfo* pCourse, f32* pPos, f32* pLow, Surfa
 // TW06: f32 Ter_GetSupportingWorldData(TGD_TerrainInfo*, f32*, TGD_MaterialInfo**, f32*). The
 // height of whatever supports a point (objects included), with its surface and upward normal;
 // TER_NO_GROUND and no surface when there is none.
-f32 fn_8004DBB0(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurface, f32* pNormal) {
+f32 Ter_GetSupportingWorldData(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurface, f32* pNormal) {
     f32 vA[4];
     f32 vB[4];
     f32 vC[4];
@@ -1228,12 +1233,12 @@ f32 fn_8004DBB0(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurface, f32* pN
         Vec3Copy(pTri[0], vA);
         Vec3Copy(pTri[1], vB);
         Vec3Copy(pTri[2], vC);
-        fn_8005097C(vA, vB, vAB);
-        fn_8005097C(vB, vC, vBC);
+        Ter_Subtract3(vA, vB, vAB);
+        Ter_Subtract3(vB, vC, vBC);
         vec4flt_CrossProduct(vAB, vBC, pNormal);
         LLMath_Normalize3(pNormal, pNormal);
         if (pNormal[1] < 0.0f) {
-            fn_800509A0(pNormal, pNormal);
+            Ter_Negate3(pNormal, pNormal);
         }
         *ppSurface = &gSurfaceTypes[pRef->nSurface];
     } else {
@@ -1245,7 +1250,7 @@ f32 fn_8004DBB0(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurface, f32* pN
 // TW06: u32 Ter_GetTerrainLayers(TGD_TerrainInfo*, f32*, TGD_MaterialInfo**, f32*, u32). Every
 // ground triangle over or under a point (x, z), up to nMax: their heights and surfaces, in the
 // order found. Returns how many.
-u32 fn_8004DCC4(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurfaces, f32* pHeights, u32 nMax) {
+u32 Ter_GetTerrainLayers(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurfaces, f32* pHeights, u32 nMax) {
     u32 uPinSet = 1 << Game_CurrentPinSet();
     u32 nFound = 0;
     int nX = (int)Ter_Floor((pPos[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
@@ -1273,8 +1278,9 @@ u32 fn_8004DCC4(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurfaces, f32* p
                 pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
                 pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
                 for (j = pRef->nTris - 1; j >= 0; j--) {
-                    if ((pFlags[2] & 7) && fn_80050A9C(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
-                        fn_800509D8(pVert, pPos, &fA, &fB, &fC);
+                    if ((pFlags[2] & 7)
+                        && Ter_PointInTriangleXZpY(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
+                        Ter_GetBarycentricCoords(pVert, pPos, &fA, &fB, &fC);
                         pHeights[nFound] = fA * pVert[0][1] + fB * pVert[1][1] + fC * pVert[2][1];
                         ppSurfaces[nFound] = &gSurfaceTypes[pRef->nSurface];
                         nFound++;
@@ -1293,7 +1299,7 @@ u32 fn_8004DCC4(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurfaces, f32* p
 
 // Mark in lbl_801D54A0 the objects of grid cell (nX, nZ) that the line from pFrom along pDir
 // passes within fRange of (entry 0 is always marked).
-void fn_8004DF10(CourseInfo* pCourse, f32* pFrom, f32* pDir, int nX, int nZ, f32 fRange) {
+void Ter_MarkObjectsNearLine(CourseInfo* pCourse, f32* pFrom, f32* pDir, int nX, int nZ, f32 fRange) {
     int i;
     u16* pRefs;
     TerCell* pCell;
@@ -1308,7 +1314,7 @@ void fn_8004DF10(CourseInfo* pCourse, f32* pFrom, f32* pDir, int nX, int nZ, f32
         pRefs = &pCourse->pObjRefs[pCell->nObjRefOffset];
         for (i = pCell->nObjRefs - 1; i >= 0; i--) {
             pObj = &pCourse->pObjects[*pRefs];
-            if (fn_8004E0D4(pFrom, pDir, fRange, pObj->vCentre, pObj->fRadius)) {
+            if (Ter_LineSphereIntersection(pFrom, pDir, fRange, pObj->vCentre, pObj->fRadius)) {
                 lbl_801D54A0[*pRefs] = 1;
             }
             pRefs++;
@@ -1318,7 +1324,7 @@ void fn_8004DF10(CourseInfo* pCourse, f32* pFrom, f32* pDir, int nX, int nZ, f32
 
 // TW06: bool Ter_LineSphereIntersection(f32*, f32*, f32, f32*, f32). Whether a sphere (centre,
 // radius) is within fRange of pFrom and either around it or ahead of it along pDir.
-u8 fn_8004E0D4(f32* pFrom, f32* pDir, f32 fRange, f32* pCentre, f32 fRadius) {
+u8 Ter_LineSphereIntersection(f32* pFrom, f32* pDir, f32 fRange, f32* pCentre, f32 fRadius) {
     f32 vTo[4];
     f32 vCentre[4];
     f32 fDist;
@@ -1327,7 +1333,7 @@ u8 fn_8004E0D4(f32* pFrom, f32* pDir, f32 fRange, f32* pCentre, f32 fRadius) {
     vCentre[1] = pCentre[1];
     vCentre[2] = pCentre[2];
     vCentre[3] = 1.0f;
-    fn_8005097C(vCentre, pFrom, vTo);
+    Ter_Subtract3(vCentre, pFrom, vTo);
     fDist = (f32)Math_Sqrt(Vec3_LengthSqClamped(vTo)) - fRadius;
     if (fDist > fRange) return 0;
     if (fDist < 0.0f) return 1;
@@ -1367,7 +1373,7 @@ u8 Ter_CheckForPinCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* p
     vTo[1] = pTo[1] - pCourse->pin[Game_CurrentPinSet()].y;
     vTo[2] = pTo[2] - pCourse->pin[Game_CurrentPinSet()].z;
     vTo[3] = 1.0f;
-    fn_8005097C(vTo, vFrom, vDelta);
+    Ter_Subtract3(vTo, vFrom, vDelta);
     Vec3Copy(vDelta, vFlat);
     vFlat[1] = 0.0f;
     vIn[0] = -vFrom[0];
@@ -1411,9 +1417,9 @@ u8 Ter_CheckForPinCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* p
 // TW06: bool Ter_CheckForWorldCollision(TGD_TerrainInfo*, s32, f32*, f32*, f32[4]*, f32[4]*,
 // TGD_MaterialInfo**, TGD_ObjectInstanceInfo**, u8*). The first thing the line from pFrom to pTo
 // hits: the pin, the ground or an object. Walks the grid cells the line crosses, testing each
-// cell's triangles (fn_8004EB7C) and keeping the hit nearest pFrom. The normal is turned to face
-// the line.
-u8 fn_8004E558(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
+// cell's triangles (Ter_CheckForWorldCollisionOneGrid) and keeping the hit nearest pFrom. The
+// normal is turned to face the line.
+u8 Ter_CheckForWorldCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
                SurfaceType** ppSurface, TerObject** ppObj, u8* pbFlags) {
     int nEndX;
     int nEndZ;
@@ -1484,7 +1490,7 @@ u8 fn_8004E558(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit
     if (nStepMinor > 0) {
         vEdge[nMinor] += pCourse->fGridCellSize[nMinor];
     }
-    fn_8005097C(pTo, pFrom, vDir);
+    Ter_Subtract3(pTo, pFrom, vDir);
     LLMath_Normalize3(vDir, vDir);
     LLMath_CopyVec(pFrom, vPos);
     for (;;) {
@@ -1512,8 +1518,9 @@ u8 fn_8004E558(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit
             }
         }
         fLen = LLMath_DistanceBetween3(vPos, vPrev);
-        fn_8004DF10(pCourse, vPrev, vDir, nCell[0], nCell[1], fLen);
-        if (fn_8004EB7C(pCourse, nCell[0], nCell[1], vPrev, vPos, vDir, fLen, vHit, vNormal, &pSurface, &pObj,
+        Ter_MarkObjectsNearLine(pCourse, vPrev, vDir, nCell[0], nCell[1], fLen);
+        if (Ter_CheckForWorldCollisionOneGrid(pCourse, nCell[0], nCell[1], vPrev, vPos, vDir, fLen, vHit,
+                                              vNormal, &pSurface, &pObj,
                         pbFlags)) {
             fDist = LLMath_SquareDistanceBetween3(pFrom, vHit);
             if (fDist < fBest) {
@@ -1534,7 +1541,7 @@ u8 fn_8004E558(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit
         }
     }
     if (fBest != 1000000.0f && Vec3_Dot(vDir, pNormal) > 0.0f) {
-        fn_800509BC(pNormal, pNormal);
+        Ter_Negate(pNormal, pNormal);
     }
     return fBest != 1000000.0f;
 }
@@ -1545,7 +1552,8 @@ u8 fn_8004E558(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit
 // for the cell's height test): the point, normal, surface, the object it belongs to (NULL for the
 // ground) and, when pbFlags is given, the triangle's flag bits. Only the objects marked in
 // lbl_801D54A0 are tested.
-u8 fn_8004EB7C(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir, f32 fMax, f32* pHit,
+u8 Ter_CheckForWorldCollisionOneGrid(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir,
+                                     f32 fMax, f32* pHit,
                f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj, u8* pbFlags) {
     f32 vHit[4];
     f32 vNormal[4];
@@ -1610,8 +1618,10 @@ u8 fn_8004EB7C(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* p
 }
 
 // TW06: bool Ter_CheckForSolidWorldCollision(...), the same parameters without the flags. As
-// fn_8004E558, but a ball passes through branches and leaves (fn_8004F43C).
-u8 fn_8004EE20(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
+// Ter_CheckForWorldCollision, but a ball passes through branches and leaves
+// (Ter_CheckForSolidWorldCollisionOneGrid).
+u8 Ter_CheckForSolidWorldCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit,
+                                   f32* pNormal,
                SurfaceType** ppSurface, TerObject** ppObj) {
     int nEndX;
     int nEndZ;
@@ -1682,7 +1692,7 @@ u8 fn_8004EE20(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit
     if (nStepMinor > 0) {
         vEdge[nMinor] += pCourse->fGridCellSize[nMinor];
     }
-    fn_8005097C(pTo, pFrom, vDir);
+    Ter_Subtract3(pTo, pFrom, vDir);
     LLMath_Normalize3(vDir, vDir);
     LLMath_CopyVec(pFrom, vPos);
     for (;;) {
@@ -1710,8 +1720,9 @@ u8 fn_8004EE20(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit
             }
         }
         fLen = LLMath_DistanceBetween3(vPos, vPrev);
-        fn_8004DF10(pCourse, vPrev, vDir, nCell[0], nCell[1], fLen);
-        if (fn_8004F43C(pCourse, nCell[0], nCell[1], vPrev, vPos, vDir, fLen, vHit, vNormal, &pSurface,
+        Ter_MarkObjectsNearLine(pCourse, vPrev, vDir, nCell[0], nCell[1], fLen);
+        if (Ter_CheckForSolidWorldCollisionOneGrid(pCourse, nCell[0], nCell[1], vPrev, vPos, vDir, fLen,
+                                                   vHit, vNormal, &pSurface,
                         &pObj)) {
             fDist = LLMath_SquareDistanceBetween3(pFrom, vHit);
             if (fDist < fBest) {
@@ -1732,15 +1743,16 @@ u8 fn_8004EE20(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit
         }
     }
     if (fBest != 1000000.0f && Vec3_Dot(vDir, pNormal) > 0.0f) {
-        fn_800509BC(pNormal, pNormal);
+        Ter_Negate(pNormal, pNormal);
     }
     return fBest != 1000000.0f;
 }
 
 // TW06: bool Ter_CheckForSolidWorldCollisionOneGrid(...), the same parameters without the flags.
-// As fn_8004EB7C, but surfaces with a negative bounce (branches and leaves, which a ball passes
-// through) do not count.
-u8 fn_8004F43C(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir, f32 fMax, f32* pHit,
+// As Ter_CheckForWorldCollisionOneGrid, but surfaces with a negative bounce (branches and leaves,
+// which a ball passes through) do not count.
+u8 Ter_CheckForSolidWorldCollisionOneGrid(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo,
+                                          f32* pDir, f32 fMax, f32* pHit,
                f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj) {
     f32 vHit[4];
     f32 vNormal[4];
@@ -1804,7 +1816,7 @@ u8 fn_8004F43C(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* p
 }
 // TW06: bool Ter_CheckForGroundCollision(TGD_TerrainInfo*, f32*, f32*, f32[4]*, f32[4]*,
 // TGD_MaterialInfo**, TGD_ObjectInstanceInfo**). The first ground the line from pFrom to pTo hits
-// (fn_8004FCB4 per cell); no pin and no objects.
+// (Ter_CheckForGroundCollisionOneGrid per cell); no pin and no objects.
 u8 Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
                                SurfaceType** ppSurface, TerObject** ppObj) {
     int nEndX;
@@ -1873,7 +1885,7 @@ u8 Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* p
     if (nStepMinor > 0) {
         vEdge[nMinor] += pCourse->fGridCellSize[nMinor];
     }
-    fn_8005097C(pTo, pFrom, vDir);
+    Ter_Subtract3(pTo, pFrom, vDir);
     LLMath_Normalize3(vDir, vDir);
     LLMath_CopyVec(pFrom, vPos);
     for (;;) {
@@ -1901,7 +1913,8 @@ u8 Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* p
             }
         }
         fLen = LLMath_DistanceBetween3(vPos, vPrev);
-        if (fn_8004FCB4(pCourse, nCell[0], nCell[1], vPrev, vPos, vDir, fLen, vHit, vNormal, &pSurface,
+        if (Ter_CheckForGroundCollisionOneGrid(pCourse, nCell[0], nCell[1], vPrev, vPos, vDir, fLen, vHit,
+                                               vNormal, &pSurface,
                         &pObj)) {
             fDist = LLMath_SquareDistanceBetween3(pFrom, vHit);
             if (fDist < fBest) {
@@ -1922,13 +1935,15 @@ u8 Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* p
         }
     }
     if (fBest != 1000000.0f && Vec3_Dot(vDir, pNormal) > 0.0f) {
-        fn_800509BC(pNormal, pNormal);
+        Ter_Negate(pNormal, pNormal);
     }
     return fBest != 1000000.0f;
 }
 
-// TW06: bool Ter_CheckForGroundCollisionOneGrid(...). As fn_8004F43C, the ground only (no objects).
-u8 fn_8004FCB4(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir, f32 fMax, f32* pHit,
+// TW06: bool Ter_CheckForGroundCollisionOneGrid(...). As Ter_CheckForSolidWorldCollisionOneGrid,
+// the ground only (no objects).
+u8 Ter_CheckForGroundCollisionOneGrid(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir,
+                                      f32 fMax, f32* pHit,
                f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj) {
     f32 vHit[4];
     f32 vNormal[4];
@@ -1990,8 +2005,9 @@ u8 fn_8004FCB4(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* p
     return 0;
 }
 // TW06: bool Ter_CheckForObjectCollision(...), the same parameters. The first object the line hits
-// (fn_800504F4 per cell).
-u8 fn_8004FF34(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal, SurfaceType** ppSurface,
+// (Ter_CheckForObjectCollisionOneGrid per cell).
+u8 Ter_CheckForObjectCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
+                               SurfaceType** ppSurface,
                TerObject** ppObj) {
     int nEndX;
     int nEndZ;
@@ -2059,7 +2075,7 @@ u8 fn_8004FF34(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNorma
     if (nStepMinor > 0) {
         vEdge[nMinor] += pCourse->fGridCellSize[nMinor];
     }
-    fn_8005097C(pTo, pFrom, vDir);
+    Ter_Subtract3(pTo, pFrom, vDir);
     LLMath_Normalize3(vDir, vDir);
     LLMath_CopyVec(pFrom, vPos);
     for (;;) {
@@ -2087,7 +2103,8 @@ u8 fn_8004FF34(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNorma
             }
         }
         fLen = LLMath_DistanceBetween3(vPos, vPrev);
-        if (fn_800504F4(pCourse, nCell[0], nCell[1], vPrev, vPos, vDir, fLen, vHit, vNormal, &pSurface,
+        if (Ter_CheckForObjectCollisionOneGrid(pCourse, nCell[0], nCell[1], vPrev, vPos, vDir, fLen, vHit,
+                                               vNormal, &pSurface,
                         &pObj)) {
             fDist = LLMath_SquareDistanceBetween3(pFrom, vHit);
             if (fDist < fBest) {
@@ -2108,14 +2125,15 @@ u8 fn_8004FF34(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNorma
         }
     }
     if (fBest != 1000000.0f && Vec3_Dot(vDir, pNormal) > 0.0f) {
-        fn_800509BC(pNormal, pNormal);
+        Ter_Negate(pNormal, pNormal);
     }
     return fBest != 1000000.0f;
 }
 
-// TW06: bool Ter_CheckForObjectCollisionOneGrid(...). As fn_8004F43C, objects only, plus ground
-// whose surface has flag 0x80.
-u8 fn_800504F4(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir, f32 fMax, f32* pHit,
+// TW06: bool Ter_CheckForObjectCollisionOneGrid(...). As Ter_CheckForSolidWorldCollisionOneGrid,
+// objects only, plus ground whose surface has flag 0x80.
+u8 Ter_CheckForObjectCollisionOneGrid(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir,
+                                      f32 fMax, f32* pHit,
                f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj) {
     f32 vHit[4];
     f32 vNormal[4];
@@ -2179,7 +2197,7 @@ u8 fn_800504F4(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* p
 // Mark the highest and lowest corner of every ground triangle whose flags are not 0 in those
 // flags (bits 4-5 and 6-7), using bit 3 to do each triangle once, then clear bit 3 again. TW06 has
 // the two halves as Ter_ComputeHighestPointInEveryTriangle and Ter_ClearVertexProcessedBit.
-void fn_80050794(CourseInfo* pCourse) {
+void Ter_ComputeHighestPointInEveryTriangle(CourseInfo* pCourse) {
     u8 uFlags;
     f32 (*pVert)[3];
     u32 i;
@@ -2250,7 +2268,7 @@ void fn_80050794(CourseInfo* pCourse) {
 
 // The difference a - b of two three-float vectors, into pOut.
 #ifdef __MWERKS__
-asm void fn_8005097C(register f32* pA, register f32* pB, register f32* pOut) {
+asm void Ter_Subtract3(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 1, 0
@@ -2264,7 +2282,7 @@ asm void fn_8005097C(register f32* pA, register f32* pB, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_8005097C(f32* pA, f32* pB, f32* pOut) {
+void Ter_Subtract3(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pA[0] - pB[0];
     pOut[1] = pA[1] - pB[1];
     pOut[2] = pA[2] - pB[2];
@@ -2273,7 +2291,7 @@ void fn_8005097C(f32* pA, f32* pB, f32* pOut) {
 
 // A three-float vector negated, into pOut.
 #ifdef __MWERKS__
-asm void fn_800509A0(register f32* pA, register f32* pOut) {
+asm void Ter_Negate3(register f32* pA, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 1, 0
@@ -2285,7 +2303,7 @@ asm void fn_800509A0(register f32* pA, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_800509A0(f32* pA, f32* pOut) {
+void Ter_Negate3(f32* pA, f32* pOut) {
     pOut[0] = -pA[0];
     pOut[1] = -pA[1];
     pOut[2] = -pA[2];
@@ -2294,7 +2312,7 @@ void fn_800509A0(f32* pA, f32* pOut) {
 
 // A four-float vector negated, into pOut.
 #ifdef __MWERKS__
-asm void fn_800509BC(register f32* pA, register f32* pOut) {
+asm void Ter_Negate(register f32* pA, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 0, 0
@@ -2306,7 +2324,7 @@ asm void fn_800509BC(register f32* pA, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_800509BC(f32* pA, f32* pOut) {
+void Ter_Negate(f32* pA, f32* pOut) {
     pOut[0] = -pA[0];
     pOut[1] = -pA[1];
     pOut[2] = -pA[2];
@@ -2316,7 +2334,7 @@ void fn_800509BC(f32* pA, f32* pOut) {
 
 // TW06: Ter_GetBarycentricCoords (an inline in goterrainutils.h there). The weights of a point
 // against a triangle's three corners, in the x-z plane.
-void fn_800509D8(f32 (*pTri)[3], f32* pPos, f32* pA, f32* pB, f32* pC) {
+void Ter_GetBarycentricCoords(f32 (*pTri)[3], f32* pPos, f32* pA, f32* pB, f32* pC) {
     f32 fX;
     f32 fZ;
     f32 fInv;
@@ -2332,7 +2350,7 @@ void fn_800509D8(f32 (*pTri)[3], f32* pPos, f32* pA, f32* pB, f32* pC) {
 
 // TW06: bool Ter_PointInTriangleXZpY(f32*, f32*, f32*, f32, f32, f32*). Whether (x, z) lies inside
 // the triangle abc seen from above, either way round; a flat (edge-on) triangle holds nothing.
-u8 fn_80050A9C(f32* pA, f32* pB, f32* pC, f32 fX, f32 fZ) {
+u8 Ter_PointInTriangleXZpY(f32* pA, f32* pB, f32* pC, f32 fX, f32 fZ) {
     f32 fABx = pB[0] - pA[0];
     f32 fABz = pB[2] - pA[2];
     f32 fBCx = pC[0] - pB[0];
@@ -2357,7 +2375,7 @@ u8 fn_80050A9C(f32* pA, f32* pB, f32* pC, f32 fX, f32 fZ) {
 // A flag byte of a course object's model (GoTerrain.c's Ter_GetMeshFlags reads the same bytes).
 // Ter_CheckObjectAndHazardObstruction finds the model with fn_80034A20 (from the object's nPatch
 // and nObjList) and tests bit 0x40 of byte n = 0.
-int fn_80050BD8(UObjMesh* pModel, int n) {
+int TerCollision_GetMeshFlags(UObjMesh* pModel, int n) {
     return pModel->pInfo->a24[n];
 }
 

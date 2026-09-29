@@ -1438,8 +1438,8 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, SurfaceType* pSurface) {
 
 // A ball on the ground: did it run into anything between last tick and this one? Out of
 // bounds (600 yd from the start) is a hazard. Within 10 ft of the pin the detailed test
-// (Ter_CheckForPinCollision) runs, elsewhere fn_8004FF34. On a hit: the landing events, the bounce, and a
-// nudge along the velocity. Returns 1 on a hit.
+// (Ter_CheckForPinCollision) runs, elsewhere Ter_CheckForObjectCollision. On a hit: the landing
+// events, the bounce, and a nudge along the velocity. Returns 1 on a hit.
 u8 fn_80053240(Ball* pBall, f32 fTicks) {
     f32          vHit[4];
     f32          vNormal[4];
@@ -1459,7 +1459,8 @@ u8 fn_80053240(Ball* pBall, f32 fTicks) {
     if (pBall->nSurface < 0 || pBall->nSurface >= 156) return 0;
     pSurface = &gSurfaceTypes[pBall->nSurface];
     if (LLMath_SquareDistanceBetween3(PIN(pBall), pBall->vPos) > 11.1111107f) {
-        if (!fn_8004FF34(pBall->pCourse, vFrom, vTo, vHit, vNormal, &pSurface, &pObj)) return 0;
+        if (!Ter_CheckForObjectCollision(pBall->pCourse, vFrom, vTo, vHit, vNormal, &pSurface,
+                                         &pObj)) return 0;
     } else {
         if (!Ter_CheckForPinCollision(pBall->pCourse, pBall->nPlayer, vFrom, vTo, vHit, vNormal, &pSurface,
                                       &pObj)) {
@@ -1901,13 +1902,13 @@ void Physics_StopBall(Ball* pBall) {
     }
 }
 
-// A ball in the air meets the ground. Out of bounds (600 yd) is a hazard. fn_8004E558 finds
+// A ball in the air meets the ground. Out of bounds (600 yd) is a hazard. Ter_CheckForWorldCollision finds
 // the hit; Physics_ProcessCollision handles it; landing events; the cup (surface 90) kills spin; the bounce
 // (Physics_HandleCollision) - on sand (class 6) the first landing point and impact are kept for the lie. On
 // a cup surface more than 2.5 in below the pin: holed. Then the ball flies on for the rest of the
-// tick (fn_8004EE20 for a second hit). Water (class 7 or 16): surfaces 47, 41 and 104 let a ball
-// that bounces up faster than 2.93 and moves on more than 1.71 x that (and over 5.87) skip, its
-// rise quartered; anything else is a hazard.
+// tick (Ter_CheckForSolidWorldCollision for a second hit). Water (class 7 or 16): surfaces 47, 41
+// and 104 let a ball that bounces up faster than 2.93 and moves on more than 1.71 x that (and over
+// 5.87) skip, its rise quartered; anything else is a hazard.
 u8 Physics_CheckTerrainCollisions(Ball* pBall, f32 fTicks) {
     f32          vHit[4];
     f32          vNormal[4];
@@ -1928,7 +1929,8 @@ u8 Physics_CheckTerrainCollisions(Ball* pBall, f32 fTicks) {
         Physics_OutOfBounds(pBall, 1);
         return 0;
     }
-    if (!fn_8004E558(pBall->pCourse, pBall->nPlayer, vFrom, vTo, vHit, vNormal, &pSurface, &pObj, &bOut)) {
+    if (!Ter_CheckForWorldCollision(pBall->pCourse, pBall->nPlayer, vFrom, vTo, vHit, vNormal, &pSurface,
+                                    &pObj, &bOut)) {
         return 0;
     }
     if (pSurface == NULL) return 0;
@@ -1975,7 +1977,8 @@ u8 Physics_CheckTerrainCollisions(Ball* pBall, f32 fTicks) {
         }
     }
     fn_8000C5D4(vTo, pBall->vVel, ((fTicks - 0.05f) * (1.0f - fFrac)) / 36.0f, vTo);
-    if (fn_8004EE20(pBall->pCourse, pBall->nPlayer, vFrom, vTo, vHit, vNormal, &pSurface, &pObj)) {
+    if (Ter_CheckForSolidWorldCollision(pBall->pCourse, pBall->nPlayer, vFrom, vTo, vHit, vNormal, &pSurface,
+                                        &pObj)) {
         Vec3Copy(pBall->vPos, pBall->vPrev);
         fn_8000C5D4(pBall->vPos, pBall->vVel, 9.25925906e-06f, pBall->vPos);
     } else {

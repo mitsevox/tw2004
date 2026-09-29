@@ -451,7 +451,7 @@ void fn_800A3348(Ball* pBall, int nPlayer) {
         if (pSurface->nClass == 7 || pSurface->nClass == 16) {
             gPlayers[nPlayer].b30E = 1;
         }
-        fn_8004DBB0(Ter_GetTGD(), vPos, &pGround, vNormal);
+        Ter_GetSupportingWorldData(Ter_GetTGD(), vPos, &pGround, vNormal);
         fDot = Vec3_Dot(gPlayers[nPlayer].ball.vVel, vNormal);
         if (fDot < 0.0f) {
             fDot *= -1.0f;

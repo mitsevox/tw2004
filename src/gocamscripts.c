@@ -2622,7 +2622,7 @@ f32 CamScript_GuessBestPlayableHeight(f32* pPos, SurfaceType** ppSurface) {
     pCourse = Ter_GetTGD();
     if (pCourse == NULL) return 0.0f;
     Vec3Copy(pPos, vPos);
-    nHeights = fn_8004DCC4(pCourse, vPos, aSurfaces, aHeights, 20);
+    nHeights = Ter_GetTerrainLayers(pCourse, vPos, aSurfaces, aHeights, 20);
     if (nHeights == 0) return TER_NO_GROUND;
     if (nHeights == 1) {
         fTop = aHeights[0];
@@ -2769,7 +2769,7 @@ u8 CamScript_KeepAboveGround(int nPlayer, f32* pNew, f32* pOld, u8 bCheckPath, u
     }
     if (pCourse == NULL) return 0;
     pCourse = Ter_GetTGD();    // fetched a second time (two calls in the original)
-    nHeights = fn_8004DCC4(pCourse, pNew, aSurfaces, aHeights, 20);
+    nHeights = Ter_GetTerrainLayers(pCourse, pNew, aSurfaces, aHeights, 20);
     if (nHeights == 0) {
         if (pbFound != NULL) {
             *pbFound = 0;

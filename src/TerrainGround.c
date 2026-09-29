@@ -177,8 +177,8 @@ f32 Ter_GetSupportingGroundTriangle(CourseInfo* pCourse, f32* pPos, TerCell** pp
                     if ((pFlags[2] & 7)
                         && (pPos[1] > pVert[(pFlags[2] >> 6) & 3][1]
                             || fBest < pVert[(pFlags[2] >> 4) & 3][1])
-                        && fn_80050A9C(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
-                        fn_800509D8(pVert, pPos, &fA, &fB, &fC);
+                        && Ter_PointInTriangleXZpY(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
+                        Ter_GetBarycentricCoords(pVert, pPos, &fA, &fB, &fC);
                         fHeight = fA * pVert[0][1] + fB * pVert[1][1] + fC * pVert[2][1];
                         if (fHeight > fBest && fHeight <= pPos[1]) {
                             *ppCell = pCell;

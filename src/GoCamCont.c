@@ -588,7 +588,8 @@ void CameraController_PostEvent(View* pView, int nKind, int nPlayer) {
         }
     }
     if (nKind == 7) {
-        if (!(fn_8004DBB0(Ter_GetTGD(), gPlayers[nPlayer].ball.vPos, &pSurface, vNormal) < -60000.0f)
+        if (!(Ter_GetSupportingWorldData(Ter_GetTGD(), gPlayers[nPlayer].ball.vPos, &pSurface, vNormal)
+              < -60000.0f)
             && pSurface != NULL && (pSurface->nClass == 7 || pSurface->nClass == 16)) {
             nKind = 10;
         }

@@ -103,7 +103,8 @@ typedef struct CourseInfo {
     u8     unk24[4];
     f32  (*pVerts)[3];          // 0x28  TW06: pVertexList
     u8*    pTriFlags;           // 0x2C  per vertex, for the triangle that ends there: bits 0-2 = 0 skip it;
-                                //       bit 3 done (fn_80050794); bits 4-5 / 6-7 its highest / lowest corner
+                                //       bit 3 done (Ter_ComputeHighestPointInEveryTriangle); bits
+                                //       4-5 / 6-7 its highest / lowest corner
     u8*    pLight;              // 0x30  per vertex: the light on the ground there, 0..255 (Ter_GetAmbientLight)
     TerCell* pGrid;             // 0x34  nGridWidth x nGridLength cells, row by row. TW06: pTerrainGrid (0x3C)
     CourseLightBlock* p38;      // 0x38  four optional blocks (NULL when absent); TW06 has its fog, sun,
@@ -284,28 +285,31 @@ f32  Ter_CheckForDropLocation(CourseInfo* pCourse, f32* pPos, u8 bOnDropSurface,
                               SurfaceType** ppSurface);   // whether a ball could be dropped at a point
 u8   Ter_IsValidDropSurface(s32 nSurface);
 u8   Ter_GetSupportingGroundNormal(CourseInfo* pCourse, f32* pPos, f32* pNormal);   // 0 with no ground
-u8   fn_80050A9C(f32* pA, f32* pB, f32* pC, f32 fX, f32 fZ);   // (x, z) lies inside the triangle
-void fn_800509D8(f32 (*pTri)[3], f32* pPos, f32* pA, f32* pB, f32* pC);   // a point's weights in a triangle
+u8   Ter_PointInTriangleXZpY(f32* pA, f32* pB, f32* pC, f32 fX, f32 fZ);   // (x, z) lies inside the triangle
+void Ter_GetBarycentricCoords(f32 (*pTri)[3], f32* pPos, f32* pA, f32* pB, f32* pC);   // a point's weights in a triangle
 f32  Ter_GetHighestGroundHeight(CourseInfo* pCourse, f32* pPos);   // ground height, -65536.1 if none
 f32  Ter_GetLowestGroundHeight(CourseInfo* pCourse, f32* pPos);   // ground height (GoTerrainCollision.c)
 // Every ground height under and over pPos (up to nMax), with its surface; returns how many.
-u32  fn_8004DCC4(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurfaces, f32* pHeights, u32 nMax);
+u32  Ter_GetTerrainLayers(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurfaces, f32* pHeights, u32 nMax);
 f32  Ter_GetSupportingGroundHeight(CourseInfo* pCourse, f32* pPos);   // ground height, -60000 and below if none
 f32  Ter_GetCoveringGroundHeightAndNormal(CourseInfo* pCourse, f32* pPos, f32* pNormal);   // covering ground height and normal
 SurfaceType* Ter_GetSupportingWorldMaterial(CourseInfo* pCourse, f32* pPos);   // the surface under a point
 f32  Ter_GetSupportingGroundData(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurface, f32* pNormal);
 // The same with objects included (TW06: Ter_GetSupportingWorldData); GoTerrainCollision.c.
-f32  fn_8004DBB0(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurface, f32* pNormal);
+f32  Ter_GetSupportingWorldData(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurface, f32* pNormal);
 void Ter_GetEnclosingGroundHeight(CourseInfo* pCourse, f32* pPos, f32* pLow, f32* pHigh);
 void Ter_GetEnclosingGroundData(CourseInfo* pCourse, f32* pPos, f32* pLow, SurfaceType** ppSurfaceLow,
                                 f32* pNormalLow, f32* pHigh, SurfaceType** ppSurfaceHigh, f32* pNormalHigh);
 u8   Ter_CheckForPinCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
                               SurfaceType** ppSurface, TerObject** ppObj);
-u8   fn_8004E558(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
+u8   Ter_CheckForWorldCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit,
+                                f32* pNormal,
                  SurfaceType** ppSurface, TerObject** ppObj, u8* pbFlags);   // the first thing a line hits
-u8   fn_8004EE20(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
+u8   Ter_CheckForSolidWorldCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit,
+                                     f32* pNormal,
                  SurfaceType** ppSurface, TerObject** ppObj);   // the same, through branches and leaves
-u8   fn_8004FF34(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal, SurfaceType** ppSurface,
+u8   Ter_CheckForObjectCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
+                                 SurfaceType** ppSurface,
                  TerObject** ppObj);   // the first object a line hits
 s32  fn_80050BEC(SurfaceType* pSurface);   // a surface's row in gSurfaceTypes, or -1
 
