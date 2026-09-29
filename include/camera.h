@@ -81,7 +81,7 @@ typedef struct CamShot {
                                 //       on (else both off); 3 calls GolfCamera_SetCameraMatrixMode(1)
     s32  nA4;                   // 0xA4
     u8   bA8;                   // 0xA8
-    u8   bA9;                   // 0xA9  another shot's p40 leads here (fn_80039C5C)
+    u8   bA9;                   // 0xA9  another shot's p40 leads here (DynamicCam_ParseCameraViewsFE)
     u8   bAA;                   // 0xAA
     u8   bAB;                   // 0xAB
     u8   bAC;                   // 0xAC
@@ -445,13 +445,13 @@ typedef struct CamTuning {
     f32  f168;                  // 0x168  the ground clearance for CamScript_KeepAboveGround
     f32  f16C;                  // 0x16C  the obstruction radius around the ball for the pre-shot routine
     f32  f170;                  // 0x170  a blend for CameraController_FadeIn / CameraController_FadeOut
-    f32  f174;                  // 0x174  fn_8003A148: how softly a camera eases in under its height limit
+    f32  f174;                  // 0x174  DynamicCam_ProcessScript: how softly a camera eases in under its height limit
     f32  f178;                  // 0x178
     f32  v17C[4];               // 0x17C
     f32  f18C;                  // 0x18C  fn_8003B534: the ball-flight camera closes in by this share of
                                 //        the height above the shot's f6C ...
     f32  f190;                  // 0x190  ... and backs off by this share of the height below its f68
-    f32  f194;                  // 0x194  fn_8003A148: how far a camera below its least height rises a frame
+    f32  f194;                  // 0x194  DynamicCam_ProcessScript: how far a camera below its least height rises a frame
     f32  f198;                  // 0x198  fn_8003B534: the least ball speed it follows the flight at
     f32  f19C;                  // 0x19C  the steepest a camera direction may tilt (fn_8003D810, radians)
     f32  f1A0;                  // 0x1A0

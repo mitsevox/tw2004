@@ -29,7 +29,8 @@ void fn_80038054(u8 a, int n, f32 f1, f32 f2);
 void fn_800457B8(int nPlayer, f32 f);
 f32  GameEffects_DepthOfFieldChange(f32 f);
 u8   CamScript_IsSecondViewShot(CamShot* pShot);
-void fn_8003A148(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pSub, f32* pPrev,
+void DynamicCam_ProcessScript(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pSub,
+                              f32* pPrev,
                  f32 fTime);
 void CamScript_SmoothTerrainHeight(CamScript* pScript, f32* pCam, u8 b, int nPlayer, f32 fMaxStep);
 f32  CamScript_AccelerateTime(CamScript* pScript, f32 fTime);
@@ -85,7 +86,7 @@ static f32 gocamscripts_StrippedFn(f32 x) {
 // hand-built shot19C, used when the camera is put back on the fairway). While paused or without
 // time (b forces the frame) or while the ball holds still in slow motion
 // (CameraScript_DontUpdateCameraDuringSlowMo) only the colour fade runs; otherwise it eases the
-// ball-update rate fEC (1..2), places the cameras of the current and next shots (fn_8003A148 for
+// ball-update rate fEC (1..2), places the cameras of the current and next shots (DynamicCam_ProcessScript for
 // shots of bA8 1, else the static camera, fn_80064F54), and either plays the current shot (its
 // look-at point, field of view from f78 to f7C over f48, depth of field f88, blur f8C and f90, roll
 // f9C) or blends into the next one by its blend kind nBC (0, 1, 2/11/12, 3, 7, 13, 14, 15). For
@@ -140,13 +141,13 @@ void CamScript_RunScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, 
     }
     pScript->fEC = pScript->fEC < 1.0f ? 1.0f : (pScript->fEC > 2.0f ? 2.0f : pScript->fEC);
     if (pScript->pShot->bA8 == 1) {
-        fn_8003A148(pScript->pShot, nPlayer, pScript, pScript->v0, pSub, vPrev, fTime);
+        DynamicCam_ProcessScript(pScript->pShot, nPlayer, pScript, pScript->v0, pSub, vPrev, fTime);
     } else {
         fn_80064F54(pScript->pShot, nPlayer, pScript->v0);
     }
     if (pScript->pNextShot != NULL) {
         if (pScript->pNextShot->bA8 == 1) {
-            fn_8003A148(pScript->pNextShot, nPlayer, pScript, pScript->v10, pSub, vPrev, fTime);
+            DynamicCam_ProcessScript(pScript->pNextShot, nPlayer, pScript, pScript->v10, pSub, vPrev, fTime);
         } else {
             fn_80064F54(pScript->pNextShot, nPlayer, pScript->v10);
         }
@@ -296,13 +297,13 @@ void CamScript_RunFEScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript
     pScript->fD8 = 0.0f;
     LLMath_CopyVec(pCam, vPrev);
     if (pScript->pShot->bA8 == 1) {
-        fn_8003A148(pScript->pShot, nPlayer, pScript, pScript->v0, pSub, vPrev, fTime);
+        DynamicCam_ProcessScript(pScript->pShot, nPlayer, pScript, pScript->v0, pSub, vPrev, fTime);
     } else {
         fn_80064F54(pScript->pShot, nPlayer, pScript->v0);
     }
     if (pScript->pNextShot != NULL) {
         if (pScript->pNextShot->bA8 == 1) {
-            fn_8003A148(pScript->pNextShot, nPlayer, pScript, pScript->v10, pSub, vPrev, fTime);
+            DynamicCam_ProcessScript(pScript->pNextShot, nPlayer, pScript, pScript->v10, pSub, vPrev, fTime);
         } else {
             fn_80064F54(pScript->pNextShot, nPlayer, pScript->v10);
         }
@@ -2036,7 +2037,7 @@ void CameraScript_InterpToNewScript(CamScript* pScript, CamShot* pShot, int nPla
         }
         if (nA != 5) {
             LLMath_CopyVec(pScript->v10, vPos);
-            fn_8003A148(pScript->pNextShot, nPlayer, pScript, vPos, pSub, pCam, 0.0f);
+            DynamicCam_ProcessScript(pScript->pNextShot, nPlayer, pScript, vPos, pSub, pCam, 0.0f);
             Vec3_Sub(vPos, pCam, vDiff);
             fDist = Math_Sqrt(Vec3_LengthSqClamped(vDiff));
             if (fDist / f1 > f2) {

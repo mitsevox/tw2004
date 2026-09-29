@@ -12,27 +12,27 @@
 DynCamTables* lbl_80281D88;
 
 u8   BitArray_TestBit(u32* pBits, int nBit);         // the bit is set
-void fn_80039884(u8* pSrc, u8* pDst, int nCount);
-void fn_800399E0(u8* pSrc, CamShot* pDst, u32 nCount);
-void fn_80039A48(u8* pSrc, DynCamSet* pDst, u32 nCount);
-void fn_80039B14(int nSize);
-void fn_80039C5C(int nSize);
-void fn_80039D0C(int nSequences);
-void fn_80039E58(void);
+void DynamicCam_CopySequenceData(u8* pSrc, u8* pDst, int nCount);
+void DynamicCam_CopyScriptData(u8* pSrc, CamShot* pDst, u32 nCount);
+void DynamicCam_CopyAnimPairData(u8* pSrc, DynCamSet* pDst, u32 nCount);
+void DynamicCam_ParseCameraViews(int nSize);
+void DynamicCam_ParseCameraViewsFE(int nSize);
+void DynamicCam_ParseCameraSeqs(int nSequences);
+void DynamicCam_ParseNextSeqs(void);
 u8   fn_8003C800(char* szName, CamSequence** ppSeq, CamShot** ppShot);
 void fn_8003DC30(f32* pA, f32* pB, f32* pOut);         // a + b
 void fn_8003DC54(f32* pA, f32* pB, f32* pOut);
 void Quat_RotateVector(f32* pTurn, f32* pVec, f32* pOut);     // the vector turned by it
-void fn_80039EB8(int nSize);
+void DynamicCam_ParseAnimPairs(int nSize);
 u8   fn_8003D0EC(CamSequence* pSequence, int nKind);
 u8   fn_8003D240(CamShot* pShot, int nKind);
 u8   fn_8003D294(CamShot* pShot);
-void fn_8003954C(void);
-void fn_80039550(void);
-void fn_80039554(UStreamObject* pObject);
-void fn_80039690(UStreamObject* pObject);
-void fn_80039754(UStreamObject* pObject);
-void fn_800397EC(UStreamObject* pObject);
+void DynamicCam_LoadFilesFromDisk(void);
+void DynamicCam_LoadFilesFromDiskFE(void);
+void DynamicCam_LoadCAMSfromStream(UStreamObject* pObject);
+void DynamicCam_LoadCAMVfromStream(UStreamObject* pObject);
+void DynamicCam_LoadCAMVfromStreamFE(UStreamObject* pObject);
+void DynamicCam_LoadCAMAfromStream(UStreamObject* pObject);
 void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CamScript* pScript, CamShot* pShot, f32* pCam,
                             f32* pSub);
 void Character_GetBonePos(Character* pChar, int nBone, f32* pPos);   // char.c: a bone's position
@@ -63,39 +63,56 @@ u8   fn_8003ABEC(CamChoice* pChoice, int nPlayer);
 void fn_8003DAC8(CamShot* pShot, int nPlayer, f32* pA, f32* pB);
 f32  CamScript_GetBallToPinPercent(int nPlayer, CamScript* pScript);     // gocamscripts.c
 
-// Registers the handlers of the camera files ('CAMS', 'CAMV', 'CAMA').
-void fn_80039454(void) {
-    Stream_RegisterLoadChunkCallback('CAMS', fn_80039554);
-    Stream_RegisterLoadChunkCallback('CAMV', fn_80039690);
-    Stream_RegisterLoadChunkCallback('CAMA', fn_800397EC);
+// Registers the stream handlers of a round's camera files: 'CAMS' the sequences
+// (DynamicCam_LoadCAMSfromStream), 'CAMV' the shots (DynamicCam_LoadCAMVfromStream), 'CAMA' the
+// anim pairs (DynamicCam_LoadCAMAfromStream). Called with the other in-game stream clients
+// (streammanagerhole.c).
+void DynamicCam_RegisterStreamClients(void) {
+    Stream_RegisterLoadChunkCallback('CAMS', DynamicCam_LoadCAMSfromStream);
+    Stream_RegisterLoadChunkCallback('CAMV', DynamicCam_LoadCAMVfromStream);
+    Stream_RegisterLoadChunkCallback('CAMA', DynamicCam_LoadCAMAfromStream);
 }
 
-void fn_800394AC(void) {
+// Unregisters the three handlers DynamicCam_RegisterStreamClients set, then calls
+// DynamicCam_LoadFilesFromDisk (empty in this build).
+void DynamicCam_UnRegisterStreamClients(void) {
     Stream_UnregisterLoadChunkCallback('CAMS');
     Stream_UnregisterLoadChunkCallback('CAMV');
     Stream_UnregisterLoadChunkCallback('CAMA');
-    fn_8003954C();
+    DynamicCam_LoadFilesFromDisk();
 }
 
-// The same for the other 'CAMV' handler alone.
-void fn_800394F0(void) {
-    Stream_RegisterLoadChunkCallback('CAMV', fn_80039754);
+// The front end's version: registers only the 'CAMV' shot file, handled by
+// DynamicCam_LoadCAMVfromStreamFE. Called with the front end's other stream clients
+// (streammanagerhole.c).
+void DynamicCam_RegisterStreamClientsFE(void) {
+    Stream_RegisterLoadChunkCallback('CAMV', DynamicCam_LoadCAMVfromStreamFE);
 }
 
-void fn_80039520(void) {
+// Unregisters the front end's 'CAMV' handler, then calls DynamicCam_LoadFilesFromDiskFE (empty in
+// this build).
+void DynamicCam_UnRegisterStreamClientsFE(void) {
     Stream_UnregisterLoadChunkCallback('CAMV');
-    fn_80039550();
+    DynamicCam_LoadFilesFromDiskFE();
 }
 
-void fn_8003954C(void) {
+// Empty in this build; DynamicCam_UnRegisterStreamClients calls it. TW07 has
+// DynamicCam_LoadFilesFromDisk in this place, a load of the camera files from disk instead of the
+// stream.
+void DynamicCam_LoadFilesFromDisk(void) {
 }
 
-void fn_80039550(void) {
+// Empty in this build; DynamicCam_UnRegisterStreamClientsFE calls it. TW07 has
+// DynamicCam_LoadFilesFromDiskFE in this place.
+void DynamicCam_LoadFilesFromDiskFE(void) {
 }
 
-// The stream handler for the sequence file: two counts (sequences, then choices), then the
-// sequences; takes them unless some are loaded already, and makes room for the choices.
-void fn_80039554(UStreamObject* pObject) {
+// The 'CAMS' stream handler, the sequence file: two counts (sequences, then shot choices for all of
+// them), then the sequences, each followed by its choices (DynamicCam_CopySequenceData). Each
+// 'CAMS' or 'CAMV' load counts n1C up (1, 2, then back to 1); the choices get their shots once both
+// files are in (DynamicCam_ParseCameraSeqs). Then the sequences' follow-ons become pointers
+// (DynamicCam_ParseNextSeqs). Frees the object; ignores it when sequences are loaded already.
+void DynamicCam_LoadCAMSfromStream(UStreamObject* pObject) {
     s32 nSequences;
     s32 nChoices;
     u8* pSrc;
@@ -117,14 +134,16 @@ void fn_80039554(UStreamObject* pObject) {
     lbl_80281D88->nSequences = 0;
     lbl_80281D88->nChoicesUsed = 0;
     pSrc = pObject->pData + 8;
-    fn_80039884(pSrc, (u8*)lbl_80281D88->pSequences, nSequences);
-    fn_80039D0C(nSequences);
-    fn_80039E58();
+    DynamicCam_CopySequenceData(pSrc, (u8*)lbl_80281D88->pSequences, nSequences);
+    DynamicCam_ParseCameraSeqs(nSequences);
+    DynamicCam_ParseNextSeqs();
     StaticMem_Free(pObject);
 }
 
-// The stream handler for the shot file: takes the shots unless some are loaded already.
-void fn_80039690(UStreamObject* pObject) {
+// The 'CAMV' stream handler in a round, the shot file: copies the shots (DynamicCam_CopyScriptData)
+// and sets them up (DynamicCam_ParseCameraViews). Counted in n1C like 'CAMS'. Frees the object;
+// ignores it when shots are loaded already.
+void DynamicCam_LoadCAMVfromStream(UStreamObject* pObject) {
     lbl_80281D88->n1C++;
     if (lbl_80281D88->n1C > 2) {
         lbl_80281D88->n1C = 1;
@@ -134,40 +153,43 @@ void fn_80039690(UStreamObject* pObject) {
         return;
     }
     lbl_80281D88->pShots = StaticMem_Alloc(pObject->uSize, 2, 0, "GoDynamicCam.c", 454);
-    fn_800399E0(pObject->pData, lbl_80281D88->pShots, pObject->uSize / sizeof(CamShot));
-    fn_80039B14(pObject->uSize);
+    DynamicCam_CopyScriptData(pObject->pData, lbl_80281D88->pShots, pObject->uSize / sizeof(CamShot));
+    DynamicCam_ParseCameraViews(pObject->uSize);
     StaticMem_Free(pObject);
 }
 
-// The stream handler for another shot file: the same, but the load is not counted and the shots
-// are not clamped (fn_80039C5C).
-void fn_80039754(UStreamObject* pObject) {
+// The front end's 'CAMV' handler: as DynamicCam_LoadCAMVfromStream, but not counted in n1C, and the
+// shots are set up by DynamicCam_ParseCameraViewsFE (no height limits, no sequences to resolve).
+void DynamicCam_LoadCAMVfromStreamFE(UStreamObject* pObject) {
     if (lbl_80281D88->pShots != NULL) {
         StaticMem_Free(pObject);
         return;
     }
     lbl_80281D88->pShots = StaticMem_Alloc(pObject->uSize, 2, 0, "GoDynamicCam.c", 495);
-    fn_800399E0(pObject->pData, lbl_80281D88->pShots, pObject->uSize / sizeof(CamShot));
-    fn_80039C5C(pObject->uSize);
+    DynamicCam_CopyScriptData(pObject->pData, lbl_80281D88->pShots, pObject->uSize / sizeof(CamShot));
+    DynamicCam_ParseCameraViewsFE(pObject->uSize);
     StaticMem_Free(pObject);
 }
 
-// The stream handler for the file of sets (a shot and four sequences each).
-void fn_800397EC(UStreamObject* pObject) {
+// The 'CAMA' stream handler, the anim pairs (DynCamSet: a golfer animation's name and the shot or
+// sequences to show for it; DynamicCamSearchForPairedSequence): copies them
+// (DynamicCam_CopyAnimPairData) and turns their indexes into pointers (DynamicCam_ParseAnimPairs).
+// Frees the object; ignores it when pairs are loaded already.
+void DynamicCam_LoadCAMAfromStream(UStreamObject* pObject) {
     if (lbl_80281D88->pSets != NULL) {
         StaticMem_Free(pObject);
         return;
     }
     lbl_80281D88->pSets = StaticMem_Alloc(pObject->uSize, 2, 0, "GoDynamicCam.c", 536);
-    fn_80039A48(pObject->pData, lbl_80281D88->pSets, pObject->uSize / sizeof(DynCamSet));
-    fn_80039EB8(pObject->uSize);
+    DynamicCam_CopyAnimPairData(pObject->pData, lbl_80281D88->pSets, pObject->uSize / sizeof(DynCamSet));
+    DynamicCam_ParseAnimPairs(pObject->uSize);
     StaticMem_Free(pObject);
 }
 
 // Copies nCount sequences from the file (little-endian) into pDst, swapping each value's bytes.
 // Each is followed in the file by its shot choices, which go into the choice block in turn; the
 // sequence's p4C gets the first of them. The file keeps a word where p4C goes.
-void fn_80039884(u8* pSrc, u8* pDst, int nCount) {
+void DynamicCam_CopySequenceData(u8* pSrc, u8* pDst, int nCount) {
     SwapField aSequence[] = {
         { 32, 1 },                                          // szName
         { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
@@ -197,7 +219,7 @@ void fn_80039884(u8* pSrc, u8* pDst, int nCount) {
 }
 
 // Copies nCount shots from the file (little-endian) into pDst, swapping each value's bytes.
-void fn_800399E0(u8* pSrc, CamShot* pDst, u32 nCount) {
+void DynamicCam_CopyScriptData(u8* pSrc, CamShot* pDst, u32 nCount) {
     SwapField aFormat[] = {
         { 32, 1 },                                          // szName
         { 16, 4 }, { 16, 4 },                               // v20, v30
@@ -212,8 +234,8 @@ void fn_800399E0(u8* pSrc, CamShot* pDst, u32 nCount) {
     ByteSwap_Records((void**)&pSrc, (void**)&pDst, aFormat, sizeof(aFormat) / sizeof(aFormat[0]), nCount);
 }
 
-// The same for nCount shot sets.
-void fn_80039A48(u8* pSrc, DynCamSet* pDst, u32 nCount) {
+// Copies nCount anim pairs (DynCamSet) from the file into pDst, swapping each value's bytes.
+void DynamicCam_CopyAnimPairData(u8* pSrc, DynCamSet* pDst, u32 nCount) {
     SwapField aFormat[] = {
         { 16, 1 },
         { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
@@ -225,15 +247,16 @@ void fn_80039A48(u8* pSrc, DynCamSet* pDst, u32 nCount) {
 }
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
-// 1.0f (0x80283068), before the 0.0f fn_80039B14 uses first; its body is unknown.
+// 1.0f (0x80283068), before the 0.0f DynamicCam_ParseCameraViews uses first; its body is unknown.
 static f32 GoDynamicCam_StrippedFn(f32 x) {
     return x + 1.0f;
 }
 
-// Sets up nSize bytes of freshly loaded shots, as fn_80039C5C does, and first keeps f68 at least
-// the ground clearance, f6C at least f68 and f8C within 0..0.49. Once the sequences are loaded
-// too, their choices are checked (fn_80039D0C).
-void fn_80039B14(int nSize) {
+// Sets up nSize bytes of shots just loaded in a round: as DynamicCam_ParseCameraViewsFE, and each
+// shot's least height f68 is kept at least CamTuning.f168, its most height f6C at least f68, and
+// f8C within 0..0.49. When the sequence file is in too (n1C is 2), the sequences' choices are
+// resolved (DynamicCam_ParseCameraSeqs).
+void DynamicCam_ParseCameraViews(int nSize) {
     int i;
 
     lbl_80281D88->nShots = 0;
@@ -257,14 +280,14 @@ void fn_80039B14(int nSize) {
         lbl_80281D88->pShots[i].f7C = lbl_80281D88->pShots[i].f78;
     }
     if (lbl_80281D88->n1C == 2) {
-        fn_80039D0C(lbl_80281D88->nSequences);
+        DynamicCam_ParseCameraSeqs(lbl_80281D88->nSequences);
     }
 }
 
-// Sets up nSize bytes of freshly loaded shots: turns each shot's follow-on index (p40) into a
-// pointer, NULL when it names the shot itself, and marks the follow-on; f6C and f7C start at f68
-// and f78.
-void fn_80039C5C(int nSize) {
+// Sets up nSize bytes of shots just loaded: turns each shot's follow-on index (p40) into a pointer,
+// NULL when it names the shot itself, and marks the follow-on (bA9: not picked on its own by
+// DynamicCam_ChooseScript); f6C and f7C start at f68 and f78.
+void DynamicCam_ParseCameraViewsFE(int nSize) {
     int i;
 
     lbl_80281D88->nShots = 0;
@@ -282,9 +305,11 @@ void fn_80039C5C(int nSize) {
     }
 }
 
-// Once both camera files are in (n1C is 2): turns each shot choice's shot index into a pointer, and
-// sets its b16 to 25 unless it is 13..22 and some choice of the same sequence is for that shot kind.
-void fn_80039D0C(int nSequences) {
+// Stores the sequence count and, once both the sequence and the shot file are in (n1C is 2),
+// resolves every sequence's shot choices: the shot index becomes a pointer, and the time trigger
+// (b16) becomes 25 (none) unless it is an event 13..22 that some choice of the same sequence
+// answers (its b14).
+void DynamicCam_ParseCameraSeqs(int nSequences) {
     int i;
     int j;
     int k;
@@ -320,7 +345,7 @@ void fn_80039D0C(int nSequences) {
 
 // Turns each sequence's follow-on index into a pointer; a sequence whose follow-on has no shot
 // choices follows itself.
-void fn_80039E58(void) {
+void DynamicCam_ParseNextSeqs(void) {
     int i;
 
     for (i = 0; i < lbl_80281D88->nSequences; i++) {
@@ -332,9 +357,9 @@ void fn_80039E58(void) {
     }
 }
 
-// Sets up nSize bytes of freshly loaded sets: each shot and sequence index becomes a pointer
-// (NULL for a negative index).
-void fn_80039EB8(int nSize) {
+// Sets up nSize bytes of anim pairs just loaded: each shot and sequence index becomes a pointer
+// into the loaded tables (NULL for a negative index).
+void DynamicCam_ParseAnimPairs(int nSize) {
     int i;
 
     lbl_80281D88->nSets = nSize / sizeof(DynCamSet);
@@ -368,7 +393,8 @@ void fn_80039EB8(int nSize) {
     }
 }
 
-// Allocates the dynamic cameras' tables, empty.
+// Allocates the dynamic cameras' tables (gpDynCam), empty: no shots, sequences, anim pairs or
+// choices.
 void DynamicCam_Init(void) {
     DynCamTables* pTables = StaticMem_Alloc(sizeof(DynCamTables), 2, 0, "GoDynamicCam.c", 938);
 
@@ -383,7 +409,8 @@ void DynamicCam_Init(void) {
     lbl_80281D88->nChoicesUsed = 0;
 }
 
-// Frees the dynamic cameras' tables.
+// Frees the loaded shots, sequences, anim pairs and choices and the tables themselves, and resets
+// the load count n1C.
 void DynamicCam_DeInit(void) {
     lbl_80281D88->nShots = 0;
     lbl_80281D88->nSequences = 0;
@@ -409,10 +436,22 @@ void DynamicCam_DeInit(void) {
     StaticMem_Free(lbl_80281D88);
 }
 
-// Places a shot's camera at pOut by its placement kind (bB1), then keeps it above the ground under
-// it (on course 12 when Game_GetCurHoleNum is 10, within 40 of the tee, fn_8004D5F0's height): at least
-// f68 above it, eased in under f6C. A kind 3 camera then moves a limited step from where it was.
-void fn_8003A148(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam, f32* pSub,
+// Places the camera at pOut for a shot by its tracking mode (bB1): 0 and 1 DynamicCam_TrackPercent,
+// 2, 3, 4 and 8 DynamicCam_TrackOffset, 5 and 6 DynamicCam_TrackBallVelocityLag (with the frame
+// time f), 7 DynamicCam_TrackBallVelocityTight, 9 DynamicCam_TrackFixed. Then keeps it between the
+// shot's least and most height (f68, f6C) over the ground: the ground is measured when
+// CameraScript_SnapToScript holds for a shot other than the script's next one (on course 12 with
+// Game_GetCurHoleNum 10, fn_8004D5F0's height within 40 of the player's tee; else
+// CamScript_GuessBestPlayableHeight, raised for a kind 4 shot that is neither a swing camera nor
+// tracks the golfer to the lower of the pin and the tee) and kept in the script's fD8; without
+// course data it is 0 (the shot's f68 on the CrAP screen, game type 3). A swing camera or one that
+// tracks the golfer takes its heights over the ball instead, at least CamTuning.f168. Too low,
+// modes 5 to 7 rise by CamTuning.f194 a call while they were too low already (never under
+// CamTuning.f168), the others jump to the least height; above the most height less CamTuning.f174
+// over fD8 it eases in softly. Mode 3 then lags: it moves from where it was by the distance beyond
+// half its f60, or less for a short move.
+void DynamicCam_ProcessScript(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam,
+                              f32* pSub,
                  f32 f) {
     f32 aOld[4];
     f32 aStep[4];

@@ -54,9 +54,9 @@ Objects delivered by UStream
 | `ter ` | fn_800342B4 | GoTerrain.c | none seen | asm |
 | `tgd ` | fn_800342F0 | GoTerrain.c | none seen | yes: the course's collision data; `Ter_InitTGD` (fn_8004B1EC, GoTerrainCollision.c) lays `CourseInfo` (ball.h) over it and turns its offsets into pointers in place (`TER_RELOCATE`, 32-bit); `TerCell`, `TerPolyRef`, `TerObject` and the vertex list are read in place |
 | `tLOD` | fn_800341A4 | GoTerrain.c | none seen | asm |
-| `CAMS` | fn_80039554 | GoDynamicCam.c | swapped: fn_80076158 | little-endian on disc |
-| `CAMV` (2) | fn_80039690, fn_80039754 | GoDynamicCam.c | swapped: fn_800399E0 > ByteSwap_Records | little-endian on disc |
-| `CAMA` | fn_800397EC | GoDynamicCam.c | swapped: fn_80039A48 > ByteSwap_Records | little-endian on disc |
+| `CAMS` | DynamicCam_LoadCAMSfromStream | GoDynamicCam.c | swapped: fn_80076158 | little-endian on disc |
+| `CAMV` (2) | DynamicCam_LoadCAMVfromStream, DynamicCam_LoadCAMVfromStreamFE | GoDynamicCam.c | swapped: DynamicCam_CopyScriptData > ByteSwap_Records | little-endian on disc |
+| `CAMA` | DynamicCam_LoadCAMAfromStream | GoDynamicCam.c | swapped: DynamicCam_CopyAnimPairData > ByteSwap_Records | little-endian on disc |
 | `TEO ` | fn_80045F74 | sweep | none seen | asm |
 | `BALL` | fn_80045FC8 | asm | none seen | asm |
 | `Cact` | fn_80048BDC | UKernel.c | none seen | asm; its type-10 objects go to PlayNow_LoadBallSpot (PlayNowMode.c), which reads a challenge's ball spot in place through `ChallengeSpotRecord` (`port:` note there) |

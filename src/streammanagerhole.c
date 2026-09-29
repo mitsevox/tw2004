@@ -51,8 +51,8 @@ void SkeletalObject_RegisterStreamClient();
 void SkeletalObject_UnregisterStreamClient();
 void MtaLib_Register();
 void MtaLib_Unregister();
-void fn_80039454();
-void fn_800394AC();
+void DynamicCam_RegisterStreamClients();
+void DynamicCam_UnRegisterStreamClients();
 void fn_80046130();
 void fn_80046174();
 void SitDev_vRegisterStreamClients();
@@ -75,8 +75,8 @@ void fn_8000B9E4();
 void fn_8000BA14();
 void Character_RegisterClubStreamClientFE();
 void Character_RegisterGolferStreamClientFE();
-void fn_800394F0();
-void fn_80039520();
+void DynamicCam_RegisterStreamClientsFE();
+void DynamicCam_UnRegisterStreamClientsFE();
 void FE_CharBios_RegisterStreamClients();
 void FE_Manager_RegisterStreamClients();
 void FE_CharBios_UnRegisterStreamClients();
@@ -216,7 +216,7 @@ void fn_80014590(void) {
 
 void fn_80014594(void) {
     fn_80010284();
-    fn_80039454();
+    DynamicCam_RegisterStreamClients();
     UI_RegisterStreamClients();
     fn_80046130();
     Character_RegisterClubStreamClientIG();
@@ -231,7 +231,7 @@ void fn_80014594(void) {
 
 void fn_800145E0(void) {
     fn_800102B4();
-    fn_800394AC();
+    DynamicCam_UnRegisterStreamClients();
     UI_UnregisterStreamClients();
     fn_80046174();
     Character_UnregisterClubStreamClient();
@@ -259,7 +259,7 @@ void fn_80014668(void) {
     Skalib_Register();
     MtaLib_Register();
     UI_RegisterStreamClients();
-    fn_800394F0();
+    DynamicCam_RegisterStreamClientsFE();
     FE_lite_vRegisterStreamClients();
     FE_CrAPBall_RegisterStreamClients();
     Character_RegisterGolferStreamClientFE();
@@ -278,7 +278,7 @@ void fn_800146C4(void) {
     Skalib_Unregister();
     MtaLib_Unregister();
     UI_UnregisterStreamClients();
-    fn_80039520();
+    DynamicCam_UnRegisterStreamClientsFE();
     fn_8000BA14();
     FE_CrAPBall_UnRegisterStreamClients();
     Character_UnregisterGolferStreamClient();
