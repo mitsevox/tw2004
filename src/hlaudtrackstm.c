@@ -75,7 +75,7 @@ u8 AddToAudStreamReadQueue(s32 hFile, u8* pDst, u32 uLen, u32 uOffset,
     AudStreamRead* pRead;
 
     bQueued = 0;
-    fn_800B59BC("AddToAudStreamReadQueue");
+    AudLock_LockReadQueue("AddToAudStreamReadQueue");
     if (gAudStreamReadQueue.queue.nCount + 1 <= gAudStreamReadQueue.queue.nMax) {
         pRead = UQueue_Push(&gAudStreamReadQueue.queue);
         pRead->hFile = hFile;
@@ -89,7 +89,7 @@ u8 AddToAudStreamReadQueue(s32 hFile, u8* pDst, u32 uLen, u32 uOffset,
         pRead->n19 = n19;
         pRead->bRestart = 0;
     }
-    fn_800B59EC("AddToAudStreamReadQueue");
+    AudLock_UnlockReadQueue("AddToAudStreamReadQueue");
     return bQueued;
 }
 
@@ -100,7 +100,7 @@ u8 Stm_QueueSilence(AudTrack* pTrack) {
     AudStreamRead* pRead;
 
     bQueued = 0;
-    fn_800B59BC("AddToAudStreamReadQueue");
+    AudLock_LockReadQueue("AddToAudStreamReadQueue");
     if (gAudStreamReadQueue.queue.nCount + 1 <= gAudStreamReadQueue.queue.nMax) {
         pRead = UQueue_Push(&gAudStreamReadQueue.queue);
         memset(pRead, 0, sizeof(AudStreamRead));
@@ -108,16 +108,16 @@ u8 Stm_QueueSilence(AudTrack* pTrack) {
         bQueued = 1;
         pRead->bRestart = 1;
     }
-    fn_800B59EC("AddToAudStreamReadQueue");
+    AudLock_UnlockReadQueue("AddToAudStreamReadQueue");
     return bQueued;
 }
 
 // The oldest read is done: take it off the queue so the next one can start.
 void RemoveFromAudStreamQueue(AudTrack* pTrack) {
-    fn_800B59BC("RemoveFromAudStreamQueue");
+    AudLock_LockReadQueue("RemoveFromAudStreamQueue");
     UQueue_Pop(&gAudStreamReadQueue.queue);
     gAudStreamReadQueue.bBusy = 0;
-    fn_800B59EC("RemoveFromAudStreamQueue");
+    AudLock_UnlockReadQueue("RemoveFromAudStreamQueue");
 }
 
 // Starts the oldest queued read, unless one is under way.
@@ -127,7 +127,7 @@ void ProcessAudStreamReadQueue(void) {
 
     bMore = 1;
     while (bMore) {
-        fn_800B59BC("ProcessAudStreamReadQueue");
+        AudLock_LockReadQueue("ProcessAudStreamReadQueue");
         if (gAudStreamReadQueue.queue.nCount != 0 && gAudStreamReadQueue.bBusy == 0) {
             gAudStreamReadQueue.bBusy = 1;
             pRead = (AudStreamRead*)gAudStreamReadQueue.queue.pRead;
@@ -140,7 +140,7 @@ void ProcessAudStreamReadQueue(void) {
         } else {
             bMore = 0;
         }
-        fn_800B59EC("ProcessAudStreamReadQueue");
+        AudLock_UnlockReadQueue("ProcessAudStreamReadQueue");
     }
 }
 
@@ -332,7 +332,7 @@ void ResetStreamPerf(AudTrack* pTrack) {
 // cancelled (none ever is: see below), gives its buffer back and clears its stream state
 // (ResetStreamPerf).
 void Stm_Exit(AudTrack* pTrack) {
-    fn_800B596C("Stm_Exit");
+    AudLock_Lock("Stm_Exit");
     // EA bug: the cancel looks for transfers owned by pTrack, but every transfer is queued with
     // AudDma_ToAram's last argument as its owner, 0 or 1 (Stm_SendBlockToVoices passes "last
     // channel"), so nothing is cancelled. A block DMA still queued for the freed track goes on
@@ -346,20 +346,20 @@ void Stm_Exit(AudTrack* pTrack) {
                              pTrack->pTmpl->data.pPlayList->nId);
     }
     ResetStreamPerf(pTrack);
-    fn_800B5994("Stm_Exit");
+    AudLock_Unlock("Stm_Exit");
 }
 
 // Starts a streamed track (Trk_Start), under the stream lock: primes it (PrimeStreamer) or, when it
 // is primed already (state 5), starts its voices. Nothing without a play list.
 void Stm_Start(AudTrack* pTrack) {
     if (pTrack->pTmpl->data.pPlayList == NULL) return;
-    fn_800B596C("Stm_Start");
+    AudLock_Lock("Stm_Start");
     if (pTrack->nState != 5) {
         PrimeStreamer(pTrack);
     } else {
         StartStreamVoices(pTrack);
     }
-    fn_800B5994("Stm_Start");
+    AudLock_Unlock("Stm_Start");
 }
 
 // Stops a streamed track (Trk_Stop): drops its waiting changes, and read id 0 makes the reads still
@@ -390,7 +390,7 @@ u8 Stm_Tick(AudTrack* pTrack) {
     u32 uThreshold;
 
     bFeed = 0;
-    fn_800B596C("Stm_Tick");
+    AudLock_Lock("Stm_Tick");
     pList = pTrack->pTmpl->data.pPlayList;
     if (DVDGetDriveStatus() == 0) {
         for (i = 0; i < pList->nChannels; i++) {
@@ -482,7 +482,7 @@ u8 Stm_Tick(AudTrack* pTrack) {
         }
     }
     ProcessAudStreamReadQueue();
-    fn_800B5994("Stm_Tick");
+    AudLock_Unlock("Stm_Tick");
     if (pTrack->nState == 2 && CheckQueue(pTrack)) {
         Stm_Start(pTrack);
     }
@@ -502,7 +502,7 @@ void Stm_SetPlayList(AudTrack* pTrack, u8 nPlayList) {
 
     nOld = 0;
     pTmpl = pTrack->pTmpl;
-    fn_800B596C("Stm_SetPlayList");
+    AudLock_Lock("Stm_SetPlayList");
     if (pTrack->nState > 2) {
         pTrack->u.stm.nNextPlayList = nPlayList;
     } else {
@@ -525,7 +525,7 @@ void Stm_SetPlayList(AudTrack* pTrack, u8 nPlayList) {
             pTmpl->n2 = pList->nChannels;
         }
     }
-    fn_800B5994("Stm_SetPlayList");
+    AudLock_Unlock("Stm_SetPlayList");
 }
 
 // Picks the stream to play (0xFFFE: a random one, not the last one again) and its length. While the
@@ -536,7 +536,7 @@ void Stm_SetStream(AudTrack* pTrack, u16 nStream, int nMode) {
     AudPlayList* pList;
 
     pTmpl = pTrack->pTmpl;
-    fn_800B596C("Stm_SetStream");
+    AudLock_Lock("Stm_SetStream");
     if (pTrack->nState > 2) {
         if (nMode != 1) {
             if (nMode == 2) {
@@ -563,7 +563,7 @@ void Stm_SetStream(AudTrack* pTrack, u16 nStream, int nMode) {
             pTrack->u.stm.pStream = Ses_GetStreamFromPlayList(pList, nStream, &pTrack->u.stm.uLength);
         }
     }
-    fn_800B5994("Stm_SetStream");
+    AudLock_Unlock("Stm_SetStream");
 }
 
 // Drops a streamed track's waiting play list and stream changes.

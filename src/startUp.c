@@ -87,7 +87,7 @@ void   AXSetMode(u32 uMode);
 u32    OSGetSoundMode(void);
 void   MIXSetSoundMode(u32 uMode);      // the output mode (mono, stereo, surround)
 void   AXRegisterCallback(void (*pfn)(void));  // the callback run after each audio frame
-void*  fn_800B5BD8(u32 uSize);
+void*  AudMem_Alloc(u32 uSize);
 void   AXSetVoiceSrcRatio(AXVPB* pVpb, f32 fRatio);     // the playback rate
 void   AXSetVoiceAdpcm(AXVPB* pVpb, u32* pCoefs);
 void   AXSetVoiceAdpcmLoop(AXVPB* pVpb, u16* pLoop);
@@ -407,7 +407,7 @@ u8 HwVoice_InitModule(void) {
     MIXInit();
     AXSetMode(0);
     MIXSetSoundMode(OSGetSoundMode());
-    gpHwVoices = fn_800B5BD8(NUM_VOICES * sizeof(Voice));
+    gpHwVoices = AudMem_Alloc(NUM_VOICES * sizeof(Voice));
     Mem_set(gpHwVoices, 0, NUM_VOICES * sizeof(Voice));
     for (i = 0; i < NUM_VOICES; i++) {
         HwVoice_Acquire(i);
@@ -757,7 +757,7 @@ void AudAram_ZeroBlockDone(u32 n) {
 // then the eight 0xFE00-byte stream buffers (AudAram_AllocStreamBuffer). Returns 1.
 u8 AudAram_InitModule(void) {
     gAudAramBase = GoARAM_Alloc(ARAM_HEAP_SIZE);
-    gpAudAramHeapRecords = fn_800B5BD8(sizeof(ARAMHeap) + 32 * sizeof(ARAMBlock));
+    gpAudAramHeapRecords = AudMem_Alloc(sizeof(ARAMHeap) + 32 * sizeof(ARAMBlock));
     gpAudAramHeap = GoARAM_HeapInit(ARAM_HEAP_SIZE, gAudAramBase, 32, gpAudAramHeapRecords);
     gAudAramZeroBlock = GoARAM_HeapAlloc(gpAudAramHeap, ARAM_ZERO_SIZE, 32);
     gpAudAramZeroBuffer = fn_800951A0(ARAM_ZERO_SIZE, 32, 1);

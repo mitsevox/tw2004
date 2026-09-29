@@ -10,7 +10,7 @@ void StaticMem_Shutdown();
 void Math_FreeLog2Table();
 void Input_vCloseOnce();
 void fn_80014590();
-void fn_800B5C34();
+void AudMem_CloseOnce();
 void GoARAM_Shutdown();
 
 void fn_80005590(void);
@@ -23,6 +23,6 @@ void fn_80005590(void) {
     StaticMem_Shutdown();
     Math_FreeLog2Table();
     GoARAM_Shutdown();
-    fn_800B5C34();
+    AudMem_CloseOnce();
     fn_800055D4();
 }

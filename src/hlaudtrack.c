@@ -49,7 +49,7 @@ u8 Trk_InitModule(void) {
     u8 i;
 
     bOk = 0;
-    gTrkPerfs = fn_800B5BD8(32 * sizeof(AudTrack));
+    gTrkPerfs = AudMem_Alloc(32 * sizeof(AudTrack));
     if (gTrkPerfs != NULL) {
         Mem_set(gTrkPerfs, 0, 32 * sizeof(AudTrack));
         for (i = 0; i < 32; i++) {

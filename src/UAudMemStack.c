@@ -1,15 +1,15 @@
 // UAudMemStack.c (EA's name, from its asserts; also in EA's 2002 source tree): the sound engine's
-// stack allocator. fn_800B5B80 takes 384 KB of main memory at boot, and fn_800B5BD8 hands out the
+// stack allocator. AudMem_Init takes 384 KB of main memory at boot, and AudMem_Alloc hands out the
 // voices, tracks and tables of the audio code from it, each block rounded up to 64 bytes.
 
 #include "core/audcontainers.h"
 
-void  fn_800B5B2C(UAudMemStack* pStack, void* p);
-void  fn_800B5B80(void);
-void  fn_800B5C30(void);
-void  fn_800B5C34(void);
-void  fn_800B5C38(void);
-void  fn_800B5C3C(void);
+void  AudMemStack_FreeTop(UAudMemStack* pStack, void* p);
+void  AudMem_Init(void);
+void  AudMem_InitOnce(void);
+void  AudMem_CloseOnce(void);
+void  AudMem_InitModule(void);
+void  AudMem_CloseModule(void);
 
 // Defined last-address-first: CodeWarrior lays out .bss in reverse order of definition.
 void* lbl_80282180;                     // the buffer of the sound engine's stack
@@ -17,7 +17,7 @@ UAudMemStack lbl_801F6660;              // the sound engine's stack
 UAudMemStackBlock lbl_801F6360[64];     // its table
 
 // Sets up a stack over [pMem, pMem + uSize). With no table given, the stack allocates its own.
-void fn_800B5A14(UAudMemStack* pStack, u8* pMem, u32 uSize, u32 nMaxBlocks, UAudMemStackBlock* pBlocks,
+void AudMemStack_Init(UAudMemStack* pStack, u8* pMem, u32 uSize, u32 nMaxBlocks, UAudMemStackBlock* pBlocks,
                  u32 nAlign) {
     pStack->pTop = pMem;
     pStack->pEnd = pMem + uSize;
@@ -38,7 +38,7 @@ void fn_800B5A14(UAudMemStack* pStack, u8* pMem, u32 uSize, u32 nMaxBlocks, UAud
 
 // Cuts a block of uSize bytes (rounded up to the alignment) from the top; NULL when the table or
 // the buffer is full.
-void* fn_800B5AAC(UAudMemStack* pStack, u32 uSize) {
+void* AudMemStack_AllocTop(UAudMemStack* pStack, u32 uSize) {
     UAudMemStackBlock* pBlock = &pStack->pBlocks[pStack->nBlocks];
 
     if (pStack->nBlocks + pStack->n14 >= pStack->nMaxBlocks) return NULL;
@@ -51,8 +51,9 @@ void* fn_800B5AAC(UAudMemStack* pStack, u32 uSize) {
     return pBlock->pMem;
 }
 
-// Gives back the block starting at p: the top drops by its size.
-void fn_800B5B2C(UAudMemStack* pStack, void* p) {
+// Gives back the block starting at p (found in the table): the top drops by its size, so only the
+// last block handed out can be given back without freeing live memory.
+void AudMemStack_FreeTop(UAudMemStack* pStack, void* p) {
     UAudMemStackBlock* pBlock = pStack->pBlocks;
     u32 i;
 
@@ -66,27 +67,37 @@ void fn_800B5B2C(UAudMemStack* pStack, void* p) {
     }
 }
 
-void fn_800B5B80(void) {
+// The sound engine's memory (the first step of Aud_InitOnce): 384 KB (0x60000) of main memory,
+// 64-byte aligned, as a stack of up to 64 blocks.
+void AudMem_Init(void) {
     lbl_80282180 = fn_800951A0(0x60000, 64, 0);
-    fn_800B5A14(&lbl_801F6660, lbl_80282180, 0x60000, 64, lbl_801F6360, 64);
+    AudMemStack_Init(&lbl_801F6660, lbl_80282180, 0x60000, 64, lbl_801F6360, 64);
 }
 
-void* fn_800B5BD8(u32 uSize) {
-    return fn_800B5AAC(&lbl_801F6660, uSize);
+// Takes uSize bytes (rounded up to 64) from the sound engine's memory; NULL when it is full.
+void* AudMem_Alloc(u32 uSize) {
+    return AudMemStack_AllocTop(&lbl_801F6660, uSize);
 }
 
-void fn_800B5C04(void* p) {
-    fn_800B5B2C(&lbl_801F6660, p);
+// Gives a block back to the sound engine's memory (AudMemStack_FreeTop: safe only for the last one
+// taken).
+void AudMem_Free(void* p) {
+    AudMemStack_FreeTop(&lbl_801F6660, p);
 }
 
-void fn_800B5C30(void) {
+// Empty in this build: the boot list fn_80005520 calls it just before GoARAM_Init.
+void AudMem_InitOnce(void) {
 }
 
-void fn_800B5C34(void) {
+// Empty in this build: the shut-down list fn_80005590 calls it just after GoARAM_Shutdown.
+void AudMem_CloseOnce(void) {
 }
 
-void fn_800B5C38(void) {
+// Empty in this build: the per-mode start-up fn_8006C7A8 calls it right after StaticMem_Reset.
+void AudMem_InitModule(void) {
 }
 
-void fn_800B5C3C(void) {
+// Empty in this build: the per-mode shut-down fn_8006C854 calls it just before
+// StaticMem_Checkpoint.
+void AudMem_CloseModule(void) {
 }

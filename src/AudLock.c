@@ -10,27 +10,34 @@
 OSMutex lbl_801F6344;                   // the stream lock
 OSSemaphore lbl_801F6338;               // the read-queue lock
 
-void fn_800B5934(void) {
+// Sets both locks up: the mutex free, the read-queue semaphore at 1. LLFileIO_Gc.c calls it once
+// its read thread is running (fn_80005EC0).
+void AudLock_Init(void) {
     OSInitMutex(&lbl_801F6344);
     OSInitSemaphore(&lbl_801F6338, 1);
 }
 
-void fn_800B596C(const char* szWho) {
+// Takes the mutex that the file system (its read thread, File_Open, File_Close, File_ReadAsyncEx),
+// the streamed tracks and the movie sound share. szWho names the caller; it is not used.
+void AudLock_Lock(const char* szWho) {
     OSLockMutex(&lbl_801F6344);
 }
 
-void fn_800B5994(const char* szWho) {
+// Gives the mutex back (szWho is not used).
+void AudLock_Unlock(const char* szWho) {
     OSUnlockMutex(&lbl_801F6344);
 }
 
-// Waits only while the semaphore is free: a count of 0 means it is already held, and the take is
-// skipped rather than blocking.
-void fn_800B59BC(const char* szWho) {
+// Takes the stream read queue's semaphore (hlaudtrackstm.c), but only when it is free: when it is
+// held (count 0) the caller goes on without it rather than blocking, and its
+// AudLock_UnlockReadQueue then raises the count to 2. szWho is not used.
+void AudLock_LockReadQueue(const char* szWho) {
     if (lbl_801F6338.nCount > 0) {
         OSWaitSemaphore(&lbl_801F6338);
     }
 }
 
-void fn_800B59EC(const char* szWho) {
+// Gives the read queue's semaphore back (szWho is not used).
+void AudLock_UnlockReadQueue(const char* szWho) {
     OSSignalSemaphore(&lbl_801F6338);
 }

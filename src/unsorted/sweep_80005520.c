@@ -17,7 +17,7 @@ void fn_80014524();
 void fn_8002F1D4();
 void fn_80095108();
 void Gaud_InitOnce();
-void fn_800B5C30();
+void AudMem_InitOnce();
 void GoARAM_Init();
 
 void fn_80005520(void);
@@ -26,7 +26,7 @@ void fn_80005520(void) {
     StaticMem_PreInit();
     fn_800071BC();
     fn_80095108();
-    fn_800B5C30();
+    AudMem_InitOnce();
     GoARAM_Init();
     Math_InitLog2Table();
     fn_8000B984();

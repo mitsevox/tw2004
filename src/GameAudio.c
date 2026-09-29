@@ -187,10 +187,10 @@ void Mov_Tick(void);
 
 u8   Voc_InitModule(void);                   // hlaudvoice.c
 u8   Aud_EmiInitOnce(void);                  // hlaudemitter.c; always 1
-u8   fn_800AF224(void);                      // AudReverb.c; always 1
+u8   Rvb_InitModule(void);                      // AudReverb.c; always 1
 void Aud_EmiCycle(void);                     // hlaudemitter.c
 void Aud_EmiExitSession(void);                   // hlaudemitter.c
-void fn_800B5B80(void);                   // UAudMemStack.c
+void AudMem_Init(void);                   // UAudMemStack.c
 void Aud_EmiSetTrackStep(u8 nId, u8 nTrack, u8 n, int bCheck);
 
 u8   Aud_MicInitOnce(void);
@@ -211,9 +211,9 @@ static f32 GameAudio_StrippedFn(f32 x) {
 u8 Aud_InitOnce(u8 nRate) {
     u8 bOk;
 
-    fn_800B5B80();
+    AudMem_Init();
     if ((bOk = HwVoice_InitModule()) && (bOk = AudDma_InitModule()) && (bOk = AudAram_InitModule())
-        && (bOk = fn_800AF224()) && (bOk = BootSound_InitModule()) && (bOk = Mas_InitModule())
+        && (bOk = Rvb_InitModule()) && (bOk = BootSound_InitModule()) && (bOk = Mas_InitModule())
         && (bOk = Ses_InitModule()) && (bOk = Emi_InitModule()) && (bOk = Trk_InitModule())
         && (bOk = Seq_InitModule()) && (bOk = Stm_InitModule()) && (bOk = Mic_InitModule())
         && (bOk = Voc_InitModule()) && (bOk = Mov_InitModule()) && (bOk = Aud_EmiInitOnce())

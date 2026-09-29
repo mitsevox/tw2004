@@ -11,10 +11,10 @@
 #include "core/startup.h"
 
 void Voc_PauseAll(void);
-u8   fn_800AF264(u8 a, u8 b);
-void fn_800AF2D8(void);
-void fn_800AF2DC(u8 b);
-void fn_800AF31C(u8 n);
+u8   Rvb_InitSession(u8 a, u8 b);
+void Rvb_ExitSession(void);
+void Rvb_Pause(u8 b);
+void Rvb_SetPreset(u8 n);
 
 void Ses_ResetModule(void);
 
@@ -38,13 +38,13 @@ AudBlock48* lbl_8028206C;
 u8 lbl_80282068;
 
 // Allocates and clears the listeners' 0x48-byte block (lbl_8028206C) from the sound engine's memory
-// (fn_800B5BD8), the listener step of Aud_InitOnce. Returns 0 when the memory is full, else 1.
+// (AudMem_Alloc), the listener step of Aud_InitOnce. Returns 0 when the memory is full, else 1.
 // Nothing reads the block in this build.
 u8 Mic_InitModule(void) {
     u8 bOk;
 
     bOk = 0;
-    lbl_8028206C = fn_800B5BD8(sizeof(AudBlock48));
+    lbl_8028206C = AudMem_Alloc(sizeof(AudBlock48));
     if (lbl_8028206C != NULL) {
         Mem_set(lbl_8028206C, 0, sizeof(AudBlock48));
         bOk = 1;
@@ -63,10 +63,10 @@ u8 Mic_InitSession(u8 a, u8 b, u8 nListeners) {
 void Mic_ExitSession(void) {
 }
 
-// Passes listener a's reverb preset n on to AudReverb.c (fn_800AF31C, empty in this build).
+// Passes listener a's reverb preset n on to AudReverb.c (Rvb_SetPreset, empty in this build).
 // Aud_MicSetRvbPreset calls it only when the preset changes.
 void Mic_SetRvbPreset(u8 a, u8 n) {
-    fn_800AF31C(n);
+    Rvb_SetPreset(n);
 }
 
 // DMA-done callback of Mov_SendSoundBlock while the movie plays: n is the channel of the finished
@@ -102,7 +102,7 @@ void Mov_Init(void) {
     request.pfnCallback = NULL;
     request.pUser = NULL;
     request.nIndex = 0;
-    fn_800B596C("Mov_Init");
+    AudLock_Lock("Mov_Init");
     lbl_801F1850.pLeft = Voc_Alloc(&request);
     lbl_801F1850.pRight = Voc_Alloc(&request);
     if (lbl_801F1850.pLeft != NULL && lbl_801F1850.pRight != NULL) {
@@ -114,13 +114,13 @@ void Mov_Init(void) {
         lbl_801F1850.nSendBlock = 0;
         lbl_801F1850.nState = 1;
     }
-    fn_800B5994("Mov_Init");
+    AudLock_Unlock("Mov_Init");
 }
 
 // Gives the movie's two voices back (Voc_Delete) and resets both rings; the state becomes 0 (off).
 // Holds the audio lock throughout.
 void Mov_Exit(void) {
-    fn_800B596C("Mov_Exit");
+    AudLock_Lock("Mov_Exit");
     if (lbl_801F1850.pLeft != NULL) {
         lbl_801F1850.pLeft->uAram = 0;
         Voc_Delete(lbl_801F1850.pLeft);
@@ -136,14 +136,14 @@ void Mov_Exit(void) {
     lbl_801F1850.nPlayBlock = 0;
     lbl_801F1850.nSendBlock = 0;
     lbl_801F1850.nState = 0;
-    fn_800B5994("Mov_Exit");
+    AudLock_Unlock("Mov_Exit");
 }
 
 // Starts both voices looping over their rings at 22050 Hz, panned hard left and right.
 void Mov_Start(void) {
     AudVoiceParams params;
 
-    fn_800B596C("Mov_Start");
+    AudLock_Lock("Mov_Start");
     Voc_StartStream(lbl_801F1850.pLeft, MOVIE_BLOCKS * MOVIE_BLOCK_SIZE, 22050, 1);
     Voc_StartStream(lbl_801F1850.pRight, MOVIE_BLOCKS * MOVIE_BLOCK_SIZE, 22050, 1);
     params.flags.n = 0;
@@ -157,7 +157,7 @@ void Mov_Start(void) {
     params.n7 = 0x7F;
     Voc_Render(lbl_801F1850.pRight, &params);
     lbl_801F1850.nState = 2;
-    fn_800B5994("Mov_Start");
+    AudLock_Unlock("Mov_Start");
 }
 
 // A chunk of the movie's sound came in (UStream.c's DSPM, VAGM and XADP chunks): each voice's
@@ -208,7 +208,7 @@ void Mov_SendSoundBlock(MovieSoundBlock* pBlock) {
 void Mov_Tick(void) {
     u32 uStart;
 
-    fn_800B596C("Mov_Tick");
+    AudLock_Lock("Mov_Tick");
     switch (lbl_801F1850.nState) {
     case 2:
         uStart = lbl_801F1850.nPlayBlock * MOVIE_BLOCK_SIZE;
@@ -221,13 +221,13 @@ void Mov_Tick(void) {
         }
         break;
     }
-    fn_800B5994("Mov_Tick");
+    AudLock_Unlock("Mov_Tick");
 }
 
 // Takes the one read buffer every streamed track shares (Ses_GetStreamBuffer hands it out) from the sound
 // engine's memory: Ses_GetStreamBufferSize bytes (0x10000).
 void Ses_AllocStreamBuffer(void) {
-    lbl_80282088 = fn_800B5BD8(Ses_GetStreamBufferSize(0));
+    lbl_80282088 = AudMem_Alloc(Ses_GetStreamBufferSize(0));
 }
 
 // The session's start-up step in Aud_InitOnce: clears the session's state (Ses_ResetModule) and
@@ -264,7 +264,7 @@ void Ses_Exit(void) {
     Trk_ExitSession();
     Emi_ExitSession();
     Mic_ExitSession();
-    fn_800AF2D8();
+    Rvb_ExitSession();
     AudAram_ExitSession();
     AudDma_ExitSession();
     HwVoice_ExitSession();
@@ -286,12 +286,12 @@ u8 Ses_Init(u8 a, u8 b, u8 nListeners) {
             AudAram_Free(lbl_80282074->uAram);
             lbl_80282074->uAram = 0;
         }
-        fn_800B5C04(lbl_80282074);
+        AudMem_Free(lbl_80282074);
         lbl_80282074 = NULL;
     }
     lbl_8028207C &= ~0x30;
     if ((bOk = HwVoice_InitSession()) && (bOk = AudDma_InitSession()) && (bOk = AudAram_InitSession()) &&
-        (bOk = fn_800AF264(a, b)) && (bOk = Mic_InitSession(a, b, nListeners)) &&
+        (bOk = Rvb_InitSession(a, b)) && (bOk = Mic_InitSession(a, b, nListeners)) &&
         (bOk = Emi_InitSession()) && (bOk = Trk_InitSession(a, b)) && (bOk = Voc_InitSession()) &&
         (bOk = Mas_InitSession())) {
         if (b == 0) {
@@ -300,7 +300,7 @@ u8 Ses_Init(u8 a, u8 b, u8 nListeners) {
                     AudAram_Free(lbl_80282078->uAram);
                     lbl_80282078->uAram = 0;
                 }
-                fn_800B5C04(lbl_80282078);
+                AudMem_Free(lbl_80282078);
                 lbl_80282078 = NULL;
             }
             lbl_8028207C = 0;
@@ -311,11 +311,11 @@ u8 Ses_Init(u8 a, u8 b, u8 nListeners) {
 }
 
 // Pauses (bPause 1) or resumes all voices (Voc_PauseAll; with bSpinupDelay the streamed voices stay
-// paused for Stm_Tick to resume), takes the reverb off while paused (fn_800AF2DC), and keeps the
+// paused for Stm_Tick to resume), takes the reverb off while paused (Rvb_Pause), and keeps the
 // state in bit 0x40 of lbl_8028207C: while it is set, Trk_Cycle ticks only some tracks.
 void Ses_Pause(u8 b) {
     Voc_PauseAll();
-    fn_800AF2DC(b);
+    Rvb_Pause(b);
     if (b) {
         lbl_8028207C |= 0x40;
     } else {
@@ -328,9 +328,9 @@ void Ses_Pause(u8 b) {
 void* Ses_AllocBankHdr(u32 uSize, u32 uMemory) {
     switch (uMemory) {
     case 0:
-        return lbl_80282078 = fn_800B5BD8(uSize);
+        return lbl_80282078 = AudMem_Alloc(uSize);
     case 1:
-        return lbl_80282074 = fn_800B5BD8(uSize);
+        return lbl_80282074 = AudMem_Alloc(uSize);
     }
     // fake match: EA bug: no return for any other memory (UStream.c passes only 0 and 1 here)
 }
@@ -450,7 +450,7 @@ void Ses_ProcessSampleData(u32 uMemory) {
 // file's header and returns where to load it; NULL when a header is already loaded.
 AudStreamFile* Ses_AllocStreamFileHdr(u32 uSize) {
     if (lbl_80282070 == NULL) {
-        return lbl_80282070 = fn_800B5BD8(uSize);
+        return lbl_80282070 = AudMem_Alloc(uSize);
     }
     return NULL;
 }

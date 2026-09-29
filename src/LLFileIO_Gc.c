@@ -72,7 +72,7 @@ void* fn_80005D10(void* pArg) {
     pReq = NULL;
     for (;;) {
         OSWaitSemaphore(&lbl_8019D540);
-        fn_800B596C("file_RequestDaemon");
+        AudLock_Lock("file_RequestDaemon");
         if (pReq != NULL && lbl_80281B84 >= 0) {
             if (pReq->pfnDone != NULL) {
                 if (pReq->b21) {
@@ -122,7 +122,7 @@ void* fn_80005D10(void* pArg) {
         if (pReq != NULL) {
             fn_80005C90(pReq);
         }
-        fn_800B5994("file_RequestDaemon");
+        AudLock_Unlock("file_RequestDaemon");
     }
 }
 
@@ -176,7 +176,7 @@ int fn_80005EC0(void) {
     OSCreateThread(&lbl_8019E550, fn_80005D10, NULL, lbl_8019D54C + sizeof(lbl_8019D54C),
                    sizeof(lbl_8019D54C), 15, 1);
     OSResumeThread(&lbl_8019E550);
-    fn_800B5934();
+    AudLock_Init();
     return 0;
 }
 
@@ -193,7 +193,7 @@ int fn_800060E0(const char* szName) {
 
     hFile = -1;
     fn_80005BE8(szName, szPath);
-    fn_800B596C("File_Open");
+    AudLock_Lock("File_Open");
     for (i = 0; i < 32; i++) {
         if (lbl_8019EAD0[i].nEntry == -1) {
             hFile = i;
@@ -228,7 +228,7 @@ int fn_800060E0(const char* szName) {
             lbl_80281B80++;
         }
     }
-    fn_800B5994("File_Open");
+    AudLock_Unlock("File_Open");
     return hFile;
 }
 
@@ -240,7 +240,7 @@ int fn_8000633C(int hFile) {
     int bClosed;
     int i;
 
-    fn_800B596C("File_Close");
+    AudLock_Lock("File_Close");
     // what walked the two queues here was compiled out (asserts, likely)
     for (i = 0; i < 2; i++) {
         pQueue = &lbl_8019E868[i];
@@ -260,7 +260,7 @@ int fn_8000633C(int hFile) {
         lbl_801A0350[hFile][0] = 0;
         lbl_80281B80--;
     }
-    fn_800B5994("File_Close");
+    AudLock_Unlock("File_Close");
     return 0;
 }
 
@@ -279,7 +279,7 @@ int File_ReadAsyncEx(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDon
     FileQueue* pQueue;
 
     fn_800B7490();
-    fn_800B596C("File_ReadAsyncEx");
+    AudLock_Lock("File_ReadAsyncEx");
     pPool = &lbl_8019E880[nPrio];
     pReq = pPool->pNext;
     if (pReq != (FileReq*)pPool) {
@@ -310,7 +310,7 @@ int File_ReadAsyncEx(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDon
             OSSignalSemaphore(&lbl_8019D540);
         }
     }
-    fn_800B5994("File_ReadAsyncEx");
+    AudLock_Unlock("File_ReadAsyncEx");
     return 0;
 }
 

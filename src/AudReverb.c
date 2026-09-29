@@ -1,6 +1,6 @@
-// AudReverb.c (our name): the sound's aux A effect. fn_800AF224 takes a 128 KB buffer for the
-// effects library's memory, fn_800AF144 switches between a high-quality reverb (two settings)
-// and a delay, and fn_800AF2DC takes the effect off or puts it back. Between uiObject.c and
+// AudReverb.c (our name): the sound's aux A effect. Rvb_InitModule takes a 128 KB buffer for the
+// effects library's memory, Rvb_SetMode switches between a high-quality reverb (two settings)
+// and a delay, and Rvb_Pause takes the effect off or puts it back. Between uiObject.c and
 // startUp.c.
 
 #include "game_types.h"
@@ -9,15 +9,15 @@
 #include "core/startup.h"
 #include "core/audcontainers.h"
 
-void* fn_800AF114(u32 uSize);
-void fn_800AF140(void* p);
-void fn_800AF144(s8 nMode);
-u8 fn_800AF224(void);
-u8 fn_800AF264(u8 nKind, u8 bOn);
-void fn_800AF2D8(void);
-void fn_800AF2DC(u8 bMute);
-void fn_800AF31C(void);
-void fn_800AF320(void);
+void* Rvb_FxAlloc(u32 uSize);
+void Rvb_FxFree(void* p);
+void Rvb_SetMode(s8 nMode);
+u8 Rvb_InitModule(void);
+u8 Rvb_InitSession(u8 nKind, u8 bOn);
+void Rvb_ExitSession(void);
+void Rvb_Pause(u8 bMute);
+void Rvb_SetPreset(void);
+void Rvb_Cycle(void);
 
 // The effects' settings: a 2.5 second reverb for mode 0, a 4 second one for mode 2, and for mode
 // 1 a delay of about half a second (499 and 501 ms left and right) with a little feedback.
@@ -33,17 +33,20 @@ void* lbl_802820E0;                     // the effect's state
 AXAuxCallback lbl_802820DC;             // the effect running
 u8* lbl_802820D8;                       // the effect memory's buffer
 
-// The effects library's allocator hooks: the effect memory, never freed piecemeal.
-void* fn_800AF114(u32 uSize) {
-    return fn_800B5AAC(&lbl_801F5D88, uSize);
+// The effects library's allocator hook (AXFXSetHooks): uSize bytes of the effect memory, which
+// Rvb_SetMode starts over at each change.
+void* Rvb_FxAlloc(u32 uSize) {
+    return AudMemStack_AllocTop(&lbl_801F5D88, uSize);
 }
 
-void fn_800AF140(void* p) {
+// The effects library's free hook: empty, as the effect memory is never freed piecemeal.
+void Rvb_FxFree(void* p) {
 }
 
-// Switch the effect to nMode: 1 the delay, 0 or 2 a reverb. The effect memory starts over each
-// time.
-void fn_800AF144(s8 nMode) {
+// Switches the aux A effect to nMode: 1 the delay, 0 the 2.5 s reverb, 2 the 4 s reverb. Nothing
+// when it is already in nMode; otherwise the effect memory starts over and the new effect is set up
+// and installed (only if its set-up succeeded) with interrupts off.
+void Rvb_SetMode(s8 nMode) {
     AXFX_REVERBHI* pReverb;
     int bEnabled;
     int bOk;
@@ -51,7 +54,7 @@ void fn_800AF144(s8 nMode) {
     if (nMode != lbl_80281490) {
         lbl_80281490 = nMode;
         bEnabled = OSDisableInterrupts();
-        fn_800B5A14(&lbl_801F5D88, lbl_802820D8, 0x20000, 32, lbl_801F5C08, 4);
+        AudMemStack_Init(&lbl_801F5D88, lbl_802820D8, 0x20000, 32, lbl_801F5C08, 4);
         if (lbl_80281490 == 1) {
             lbl_802820E0 = &lbl_8018EE00;
             lbl_802820DC = AXFXDelayCallback;
@@ -69,15 +72,19 @@ void fn_800AF144(s8 nMode) {
     }
 }
 
-u8 fn_800AF224(void) {
-    lbl_802820D8 = fn_800B5BD8(0x20000);
-    AXFXSetHooks(fn_800AF114, fn_800AF140);
+// The reverb's start-up step in Aud_InitOnce: takes the 128 KB effect memory from the sound
+// engine's memory and gives the effects library its allocator hooks. Always 1.
+u8 Rvb_InitModule(void) {
+    lbl_802820D8 = AudMem_Alloc(0x20000);
+    AXFXSetHooks(Rvb_FxAlloc, Rvb_FxFree);
     return 1;
 }
 
-// Pick the effect: the mode 0 reverb when bOn is 0, the mode 2 reverb for nKind 8 on hole index 2
-// (Game_GetCurHoleNum), otherwise the delay.
-u8 fn_800AF264(u8 nKind, u8 bOn) {
+// The reverb's step in Ses_Init: picks the session's effect (Rvb_SetMode). The 2.5 s reverb (mode
+// 0) in subsession 0 (the front end, play before a hole), the 4 s reverb (mode 2) in session 8
+// (course 7) on hole index 2 (Game_GetCurHoleNum), the delay (mode 1) on every other hole. Always
+// 1.
+u8 Rvb_InitSession(u8 nKind, u8 bOn) {
     s8 nHole;                           // fake match: EA keeps the hole index as a signed byte
     s8 nMode;
 
@@ -89,14 +96,17 @@ u8 fn_800AF264(u8 nKind, u8 bOn) {
     } else {
         nMode = 1;
     }
-    fn_800AF144(nMode);
+    Rvb_SetMode(nMode);
     return 1;
 }
 
-void fn_800AF2D8(void) {
+// The reverb's step in Ses_Exit: empty in this build.
+void Rvb_ExitSession(void) {
 }
 
-void fn_800AF2DC(u8 bMute) {
+// Takes the aux A effect off while the sound is paused (bMute set, Ses_Pause) and puts the running
+// one back after.
+void Rvb_Pause(u8 bMute) {
     if (bMute != 0) {
         AXRegisterAuxACallback(NULL, NULL);
         return;
@@ -104,8 +114,11 @@ void fn_800AF2DC(u8 bMute) {
     AXRegisterAuxACallback(lbl_802820DC, lbl_802820E0);
 }
 
-void fn_800AF31C(void) {
+// A listener's reverb preset (Mic_SetRvbPreset): empty in this build, so the presets change
+// nothing.
+void Rvb_SetPreset(void) {
 }
 
-void fn_800AF320(void) {
+// The reverb's per-frame step (Aud_EmiCycle, after Trk_Cycle and Voc_Cycle): empty in this build.
+void Rvb_Cycle(void) {
 }

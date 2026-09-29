@@ -231,8 +231,8 @@ void fn_800B28D4(Character* pChar, int a, int b);
 void fn_800B2FB0(Character* pChar, int a, int b);
 void fn_800B34F0(void);
 void fn_800B352C(void);
-void fn_800B5C38(void);
-void fn_800B5C3C(void);
+void AudMem_InitModule(void);
+void AudMem_CloseModule(void);
 void fn_800B655C(void);
 void fn_800B6560(void);
 void FE_CrAPBall_Init(void);
@@ -432,7 +432,7 @@ void fn_8006C7A8(void) {
 
     REPLAY_Init();
     StaticMem_Reset();
-    fn_800B5C38();
+    AudMem_InitModule();
     fn_800080D4();
     fn_8000B46C();
     UStream_Init();
@@ -496,7 +496,7 @@ void fn_8006C854(void) {
     fn_80071890();
     fn_800081C4();
     fn_8002F540();
-    fn_800B5C3C();
+    AudMem_CloseModule();
     StaticMem_Checkpoint();
 }
 
