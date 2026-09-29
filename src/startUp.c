@@ -1,10 +1,18 @@
-// startUp.c (EA's name, from its asserts; also in EA's 2002 source tree): the boot-time systems.
-// The sound voices (gpHwVoices: 50 wrappers around the hardware's voices, run from the mixer
-// callback HwVoice_MixerCallback), the audio-RAM heap and its DMA, the two built-in sounds, the boot-time
-// memory-card checks and the start-up UI commands (gStartupMessageHandlers), and the 'LEGL' stream (two
-// pictures; uiProcessPolygon.c shows the first at boot). It also holds a length estimate without a
-// square root (for AudTable.c) and the ball-against-object test (for Ball.c). The sound code
-// talks to the GameCube's audio libraries; see core/startup.h.
+// startUp.c (EA's name, from its asserts; in Golf\Entry\ in EA's 2002 source tree, in
+// Golf/UI Core/Startup/ in TW2005's): the boot-time systems.
+// - The sound's GameCube layer, under hlaudvoice.c's voices: the hardware voices (HwVoice_:
+//   gpHwVoices, NUM_VOICES wrappers around the AX library's voices, run from the mixer callback
+//   HwVoice_MixerCallback), the DMA into audio RAM (AudDma_), the sound's ARAM heap with its eight
+//   stream buffers (AudAram_) and the two built-in sounds (BootSound_). TW06 and TW07 have no
+//   counterpart: it is platform code.
+// - The boot-time memory-card checks (Startup_: a status per card, and the hint each sends the
+//   front end) and the start-up message handlers (gStartupMessageHandlers).
+// - The 'LEGL' stream: two legal-screen pictures (uiProcessPolygon.c shows the first at boot).
+//   TW07's startUp.c has only two functions, startup_RegisterStreamClients and
+//   startup_UnregisterStreamClients (empty there).
+// - A length estimate without a square root (for AudTable.c) and the ball-against-object test (for
+//   Ball.c).
+// The sound code talks to the GameCube's audio libraries; see core/startup.h.
 
 #include "core/startup.h"
 #include "core/goaram.h"
@@ -106,8 +114,8 @@ u8 lbl_8018F640[0x858] = {
 };
 
 // The two built-in sounds: where their data is, its size, its playback rate (16.16 fixed point:
-// 0.5 and 0.25) and its header, with the addresses counted from the data's start (BootSound_CopyToAram
-// rebases them into ARAM).
+// 0.5 and 0.25) and its header, with the addresses counted from the data's start
+// (BootSound_CopyToAram rebases them into ARAM).
 BootSound gBootSounds[2] = {
     {lbl_8018F040, 0x600, 0, 0x8000,
      {2, 0xBC9, 0x8002, 0,
@@ -119,48 +127,50 @@ BootSound gBootSounds[2] = {
       0x37, 0, 0, 0}},
 };
 
-s32 gStartupCardSlot = -1;          // } the slot and port the status reports reached; -1 to start
-s32 gStartupCardPort = -1;          // } again
-u8  gbStartupCardLoad = 1;           // cleared by Startup_SkipCardLoad, set by Startup_ReadCardStatus, tested by Startup_LoadFromCard
+s32 gStartupCardSlot = -1;      // } the slot and port the card checks and reports reached; -1 to
+s32 gStartupCardPort = -1;      // } start again
+u8  gbStartupCardLoad = 1;      // the boot-time load goes ahead: set by Startup_ReadCardStatus,
+                                // cleared by Startup_SkipCardLoad, tested by Startup_LoadFromCard
 
 // The rest is defined last-address-first: the compiler lays an object's uninitialised data out in
 // reverse.
 
-// The memory-card status table: for each port, gStartupCardSlotsPerPort[port] slots (always 1), each with the
-// status Startup_ReadCardStatus read (gStartupCardStatus), the status last reported
+// The memory-card status table: for each port, gStartupCardSlotsPerPort[port] slots (always 1),
+// each with the status Startup_ReadCardStatus read (gStartupCardStatus), the status last reported
 // (gStartupCardReportedStatus) and whether it has been reported (gbStartupCardReported).
 s32    gStartupCardStatus[MC_NUM_PORTS][MC_NUM_SLOTS];
 s32    gStartupCardReportedStatus[MC_NUM_PORTS][MC_NUM_SLOTS];
 s32    gbStartupCardReported[MC_NUM_PORTS][MC_NUM_SLOTS];
 s32    gStartupCardSlotsPerPort[MC_NUM_PORTS];
 
-void*  gpLegalPicture;            // the first 'LEGL' object's copy (Startup_LoadLegalPicture keeps two)
-void*  gpLegalPicture2;            // the second one's
-u32    gLegalPictureSize;            // the first one's size
-u32    gLegalPicture2Size;            // the second one's
-s32    gnLegalPictures;            // how many it has kept
-u8     gbStartupCardUserLoaded;            // Startup_LoadFromCard keeps a memory-card result here
+void*  gpLegalPicture;          // the first 'LEGL' object's copy (Startup_LoadLegalPicture keeps two)
+void*  gpLegalPicture2;         // the second one's (nothing reads it)
+u32    gLegalPictureSize;       // the first one's size
+u32    gLegalPicture2Size;      // the second one's
+s32    gnLegalPictures;         // how many it has kept, 0..2
+u8     gbStartupCardUserLoaded; // MC_LoadInitialUser's answer (Startup_LoadFromCard); never read
 // fake match: lbl_8028211C, lbl_80282114 and lbl_802820EC are never used by the game's code, but
 // the original's data has a word at each of these addresses (likely the globals of functions the
 // linker stripped); kept through the dead-stripping so the rest lines up. Types unknown.
 KEEP_UNUSED u32 lbl_8028211C;
-u16    gBootSoundVoice;            // the next voice BootSound_Play plays on
+u16    gBootSoundVoice;         // the voice BootSound_Play uses next
 KEEP_UNUSED u32 lbl_80282114;
 
-// The ARAM heap (AudAram_InitModule).
-u8     gbAudAramZeroDone;            // set when the silent block's DMA is done
-void*  gpAudAramHeapRecords;            // the heap's bookkeeping (0x2A4 bytes)
-u32    gAudAramStreamBuffers;            // the ARAM address of the eight 0xFE00-byte blocks
-void*  gpAudAramZeroBuffer;            // the zeroes DMA'd into the silent block, freed once it is done
-u32    gAudAramZeroBlock;            // the silent block's ARAM address
+// The sound's ARAM heap (AudAram_InitModule).
+u8     gbAudAramZeroDone;       // set when the silent block's DMA is done
+void*  gpAudAramHeapRecords;    // the heap's bookkeeping: its ARAMHeap and 32 ARAMBlock records
+u32    gAudAramStreamBuffers;   // the ARAM address of the eight 0xFE00-byte stream buffers
+void*  gpAudAramZeroBuffer;     // the zeroes DMA'd into the silent block, freed once it is done
+u32    gAudAramZeroBlock;       // the silent block's ARAM address
 u32    gAudAramBase;            // the heap's ARAM address
-ARAMHeap* gpAudAramHeap;         // the heap
-s32    gnAudAramStreamBuffersUsed;            // how many of the eight blocks are taken
-u32    gAudAramStreamBufferMask;            // which of them are taken
+ARAMHeap* gpAudAramHeap;        // the heap
+s32    gnAudAramStreamBuffersUsed;  // how many of the eight stream buffers are taken
+u32    gAudAramStreamBufferMask;    // which of them are taken (bit n: buffer n)
 KEEP_UNUSED u32 lbl_802820EC;
 
-Voice* gpHwVoices;            // the voices, NUM_VOICES of them
+Voice* gpHwVoices;              // the voices, NUM_VOICES of them (HwVoice_InitModule)
 
+// The start-up message handlers (Startup_InitGameMessages fills 0..22, all but 4; the last 7 are never set).
 MsgHandler gStartupMessageHandlers[30];
 
 // The mixer callback (registered by HwVoice_InitModule), run after every audio frame. For each
@@ -804,10 +814,10 @@ u32 AudAram_AllocStreamBuffer(void) {
     return uAddr;
 }
 
+// Give a stream buffer (AudAram_AllocStreamBuffer) back.
 // fake match: a per-function pragma (not EA's build setting): without propagation the shift keeps
 // its own register and the flags load is numbered after the divide, as in EA's code (Gemini).
 #pragma opt_propagation off
-// Give a stream buffer (AudAram_AllocStreamBuffer) back.
 void AudAram_FreeStreamBuffer(u32 uAddr) {
     u32 mask;
     u32 uBit = 1;
@@ -906,7 +916,7 @@ s32 Startup_ReadCardStatus(int nPort, int nSlot) {
             nStatus = 8;
         } else if (card.uFlags & MC_CARD_BROKEN) {
             nStatus = 9;
-        } else if (card.uFlags & 0x08) {
+        } else if (card.uFlags & MC_CARD_FORMATTED) {
             if (card.uFlags & MC_CARD_ENCODING) {
                 nStatus = 1;
             } else {
@@ -920,7 +930,7 @@ s32 Startup_ReadCardStatus(int nPort, int nSlot) {
                 MC_SetCurrentFileType(0);
                 nBlocks += nBlocks3;
                 nFiles = fn_8009D50C(nPort, nSlot) + fn_8009D3DC(nPort, nSlot);
-                if (fn_8009EE28(nPort, nSlot) == -18) {
+                if (fn_8009EE28(nPort, nSlot) == MC_ERR_BADDATA) {
                     nStatus = 10;
                 } else if (card.nFreeBlocks >= nBlocks && card.nFreeFiles >= nFiles) {
                     nStatus = 3;
@@ -969,6 +979,8 @@ void Startup_CheckCards(void) {
             switch (gStartupCardStatus[i][j]) {
             case 0:
                 // port 1's status 0 is reported only when port 0's is not 0
+                // EA bug: never true: the search gets to port 1 only when port 0's status is 0
+                // (every other port-0 status returns or jumps out first), so hint 0x8B is never sent.
                 if (i == 1 && gStartupCardStatus[0][0] != 0) {
                     gStartupCardSlot = j;
                     gStartupCardPort = i;
@@ -1195,7 +1207,8 @@ s32 Startup_GetCurrentCardStatus(s32* pnPort, s32* pnSlot) {
         return Startup_GetNextCardStatus(pnPort, pnSlot);
     }
     gbStartupCardReported[gStartupCardPort][gStartupCardSlot] = 1;
-    gStartupCardReportedStatus[gStartupCardPort][gStartupCardSlot] = gStartupCardStatus[gStartupCardPort][gStartupCardSlot];
+    gStartupCardReportedStatus[gStartupCardPort][gStartupCardSlot] =
+        gStartupCardStatus[gStartupCardPort][gStartupCardSlot];
     *pnPort = gStartupCardPort;
     *pnSlot = gStartupCardSlot;
     // EA bug: the port is used for both indexes; for port 1 this reads past the table (the word
