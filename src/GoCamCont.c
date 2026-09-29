@@ -121,10 +121,10 @@ void CameraController_Idle(View* pView, int nPlayer) {
         GolfCamera_ProcessGreenZoomToAimCamera(pView, nPlayer);
         break;
     case 3:
-        fn_800BF094(pView, nPlayer);
+        GolfCamera_ProcessElevatorCamera(pView, nPlayer);
         break;
     case 4:
-        fn_800BFE00(pView, nPlayer);
+        GolfCamera_ProcessGreenCamera(pView, nPlayer);
         break;
     case 5:
         fn_800C0414(pView, nPlayer);
@@ -139,7 +139,7 @@ void CameraController_Idle(View* pView, int nPlayer) {
         GolfCamera_ProcessPlaceBallCamera(pView, nPlayer);
         break;
     case 9:
-        fn_800BF658(pView, nPlayer);
+        GolfCamera_ProcessSpeedGolfRunCamera(pView, nPlayer);
         break;
     case 12:
         GolfCamera_ProcessSwingCamera(pView, nPlayer);
@@ -252,13 +252,13 @@ void CameraController_SetCameraMode(View* pView, int nCamera, int nPlayer, int n
         GolfCamera_InitElevatorCamera(pView, nPlayer);
         break;
     case 8:
-        fn_800BF110(pView, nPlayer);
+        GolfCamera_InitPlaceBallCamera(pView, nPlayer);
         break;
     case 9:
-        fn_800BF5E4(pView, nPlayer);
+        GolfCamera_InitSpeedGolfRunCamera(pView, nPlayer);
         break;
     case 4:
-        fn_800BFC80(pView, nPlayer);
+        GolfCamera_InitGreenCamera(pView, nPlayer);
         break;
     case 5:
         fn_800C0364(pView, nPlayer);

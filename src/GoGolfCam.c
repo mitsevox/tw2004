@@ -63,18 +63,21 @@ u8       Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, 
 
 // .bss and .sbss (one object each, so the reverse-order rule does not come into it).
 f32 lbl_801FA1E8[4];                                // the target the steep-slope camera last worked for
-GolfCamState* lbl_80282220;                         // the shared state (fn_800BD894)
+GolfCamState* lbl_80282220;                         // the shared state (GolfCamera_Init)
 
 s32 lbl_80281520 = -1;                              // the steep-slope camera's tries last time (-1: none yet)
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
-// 1.0f (0x802842C0), before the 0.0f and 10.0f fn_800BD894 uses first; its body is unknown.
+// 1.0f (0x802842C0), before the 0.0f and 10.0f GolfCamera_Init uses first; its body is unknown.
 static f32 GoGolfCam_StrippedFn(f32 x) {
     return x + 1.0f;
 }
 
-// Allocate the shared camera state: every flag off, each course's elevator height 10.
-void fn_800BD894(void) {
+// Allocate the golf cameras' shared state (lbl_80282220, 0x200 bytes of static memory) and reset
+// it: the special-camera flags (b54..b5C) off, fly-by route 0 (n60), each player's next special
+// swing camera kind 1 and each course's elevator camera height 10. Called when a round's systems
+// start (fn_80062E00).
+void GolfCamera_Init(void) {
     int i;
     lbl_80282220 = StaticMem_Alloc(0x200, 2, 0, "GoGolfCam.c", 164);
     lbl_80282220->b54 = 0;
@@ -96,12 +99,17 @@ void fn_800BD894(void) {
     }
 }
 
-void fn_800BDA04(void) {
+// Free the shared camera state GolfCamera_Init allocated (called when a round's systems stop,
+// fn_80062E20).
+void GolfCamera_DeInit(void) {
     StaticMem_Free(lbl_80282220);
     lbl_80282220 = NULL;
 }
 
-// Camera 0: the pre-flight sequence (the one after the current one when that is kind 1 -> 2), shot 2.
+// Camera 0, the shot-setup camera: the follow-on of the current sequence when that is a type-1
+// sequence followed by a type-2 one, else a new pre-flight sequence (type 2) for the ball's lie;
+// its kind-2 shot starts, as a cut unless the current shot is of type 1 (bAD) with nothing queued.
+// A colour fade in progress is restarted at stage 2.
 void GolfCamera_InitShotSetupCamera(View* pView, int nPlayer) {
     f32* pCam;
     f32* pSub;
@@ -146,10 +154,12 @@ void GolfCamera_ProcessShotSetupCamera(View* pView, int nPlayer) {
     CamScript_RunScript(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, gSession.fFrameTime);
 }
 
-// The zoom-to-aim camera: start from the current camera, with its height over the ground (the
-// lower ground height, else the higher, else the ball's) and the offsets of the last shot of the
-// current run (up to one of kind 6 or 8..10). Unless the golfer is in shot setup, the look-at point
-// moves along the current look direction to the aim point's distance.
+// Camera 1, the zoom-to-aim camera (the view flies out to look at the aim point): start from the
+// current camera, keeping its height over the ground (the lower ground height, else the higher,
+// else the ball's) and the offsets of the last shot of the current run (up to one of kind 6 or
+// 8..10; across and along swapped, one negated, for shots of type 0x15). Unless the golfer is in
+// shot setup, the look-at point moves along the current look direction to the aim point's distance.
+// Fires event 0x30.
 void GolfCamera_InitZoomToAimCamera(View* pView, int nPlayer) {
     f32 vAim[4];
     f32 v[4];
@@ -646,6 +656,9 @@ void GolfCamera_ProcessGreenZoomToAimCamera(View* pView, int nPlayer) {
     }
 }
 
+// Camera 19, the steep-slope camera (the view moved clear of a slope that hides the target): only
+// while a shot is running, the position is worked out (GolfCamera_ComputeSteepSlopeCamVectors) and
+// held as the hand-made shot "STEEPSLOPE CAM".
 void GolfCamera_InitSteepSlopeCamera(View* pView, int nPlayer) {
     if (pView->script.pShot != NULL) {
         GolfCamera_ComputeSteepSlopeCamVectors(pView, nPlayer);
@@ -655,6 +668,8 @@ void GolfCamera_InitSteepSlopeCamera(View* pView, int nPlayer) {
     }
 }
 
+// Camera 19's tick: the steep-slope position worked out again
+// (GolfCamera_ComputeSteepSlopeCamVectors), then the script's update.
 void GolfCamera_ProcessSteepSlopeCamera(View* pView, int nPlayer) {
     void* pCam;
     void* pSub;
@@ -664,7 +679,9 @@ void GolfCamera_ProcessSteepSlopeCamera(View* pView, int nPlayer) {
     CamScript_RunScript(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, gSession.fFrameTime);
 }
 
-// Camera 3, the elevator camera: the current view raised by the course's elevator height.
+// Camera 3, the elevator camera: while a shot is running, the current camera is recorded as the
+// hand-made shot "ELEVATOR CAM", raised by the course's elevator height (fElevatorHeight) and
+// blended to (kind 1) over the tuning's f94.
 void GolfCamera_InitElevatorCamera(View* pView, int nPlayer) {
     void* pCam;
     void* pSub;
@@ -680,8 +697,8 @@ void GolfCamera_InitElevatorCamera(View* pView, int nPlayer) {
     }
 }
 
-// Camera 3 (the elevator camera).
-void fn_800BF094(View* pView, int nPlayer) {
+// Camera 3's tick (the elevator camera): the script's per-frame update.
+void GolfCamera_ProcessElevatorCamera(View* pView, int nPlayer) {
     void* pCam;
     void* pSub;
     pCam = CameraController_GetCameraOrigin(pView);
@@ -689,8 +706,9 @@ void fn_800BF094(View* pView, int nPlayer) {
     CamScript_RunScript(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, gSession.fFrameTime);
 }
 
-// Camera 8: a 60-degree lens, no script.
-void fn_800BF110(View* pView, int nPlayer) {
+// Camera 8, the ball-placement camera (STATEFUNC_PlaceBallInit): a 60-degree lens and no shot or
+// sequence; script.n110 0 makes the first tick place the camera outright.
+void GolfCamera_InitPlaceBallCamera(View* pView, int nPlayer) {
     CameraController_GetCameraOrigin(pView);
     CameraController_GetCameraLookPoint(pView);
     CA_vSetCameraFieldOfView(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])),
@@ -735,7 +753,7 @@ void GolfCamera_ProcessPlaceBallCamera(View* pView, int nPlayer) {
             pView->script.fFadeTime += gSession.fFrameTime;
         }
         if (gSession.fFrameTime != 0.0f) {
-            fSin = Math_Sin(20.0f * PI / 180.0f);    // not DEG(20.0f): see fn_800BF658
+            fSin = Math_Sin(20.0f * PI / 180.0f);    // not DEG(20.0f): see GolfCamera_ProcessSpeedGolfRunCamera
             fCos = Math_Cos(20.0f * PI / 180.0f);
             fUp = 10.0f * fSin;
             fBack = 10.0f * fCos;
@@ -836,8 +854,9 @@ void GolfCamera_ProcessPlaceBallCamera(View* pView, int nPlayer) {
     }
 }
 
-// Camera 9: the same as camera 8.
-void fn_800BF5E4(View* pView, int nPlayer) {
+// Camera 9, speed golf's run to the ball (set by GameMode8.c): as camera 8's init, a 60-degree lens
+// and no shot or sequence.
+void GolfCamera_InitSpeedGolfRunCamera(View* pView, int nPlayer) {
     CameraController_GetCameraOrigin(pView);
     CameraController_GetCameraLookPoint(pView);
     CA_vSetCameraFieldOfView(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])),
@@ -857,11 +876,12 @@ s32 lbl_80191384[5] = {0};                          // frames since the last ste
 f32 lbl_80191398[4] = {1.0f, 0.0f, 0.0f, 0.0f};     // the x axis
 f32 lbl_801913A8[4] = {0.0f, 0.0f, 1.0f, 0.0f};     // the z axis
 
-// The first-person camera's tick (camera 9's process, after camera 8's): the eye at vPlacement
-// facing along fPlaceHeading, 1.4 over it (0.1 in water), bobbing and swaying in steps as long as
-// vCBC's x and z, with a rumble on each step for a human player. It looks ahead, at a height set by
-// the pad's stick (fA8C).
-void fn_800BF658(View* pView, int nPlayer) {
+// Camera 9's tick, speed golf's run to the ball in first person: the eye at vPlacement (the running
+// golfer), 1.4 over it (0.1 in water, blending by 0.1 a frame), bobbing and swaying in steps as
+// long as three times vCBC's x and z, with a rumble on each step for a human player. It looks ahead
+// along fPlaceHeading, up or down with the pad's stick (fA8C). The colour fade steps on while the
+// game is not paused.
+void GolfCamera_ProcessSpeedGolfRunCamera(View* pView, int nPlayer) {
     f32 vOld[4];
     f32 fAbove;
     f32* pCam;
@@ -998,10 +1018,11 @@ void fn_800BF658(View* pView, int nPlayer) {
     }
 }
 
-// Camera 4: the ball and the pin into the script (script.v0, v10), the current camera and a point
-// 1 along its look kept (v30, v40), a 30-degree lens; the turn (fCamTime) starts at 2 with button
-// 0x30 held, else at 0.
-void fn_800BFC80(View* pView, int nPlayer) {
+// Camera 4, the green camera (STATEFUNC_GreenInit and GreenMorphInit): the ball and the pin go into
+// the script (script.v0, v10) as the two ends it turns between, the current camera and a point 1
+// along its look are kept (v30, v40) to move in from, and the lens goes to 30 degrees. The turn
+// (fCamTime) starts at 2 with button 0x30 held, else at 0; f50..f58 back to 1.
+void GolfCamera_InitGreenCamera(View* pView, int nPlayer) {
     f32 v[4];
     f32* pCam;
     f32* pSub;
@@ -1042,7 +1063,7 @@ void fn_800BFC80(View* pView, int nPlayer) {
 // to v0/v10) while button 0x2E or 0x30 is held, and back out without. In place, those buttons
 // grow f54 and buttons 0x31/0x32 turn the camera round between the ball and the pin (fCamTime is
 // its angle, -2..2). The camera stays above the ground and over the ball.
-void fn_800BFE00(View* pView, int nPlayer) {
+void GolfCamera_ProcessGreenCamera(View* pView, int nPlayer) {
     f32 vOld[4];
     f32 vA[4];
     f32 vB[4];

@@ -2184,9 +2184,9 @@ void fn_80062DDC(f32* pA, f32* pB, f32* pOut) {
 #endif
 
 void fn_80062E00(void) {
-    fn_800BD894();
+    GolfCamera_Init();
 }
 
 void fn_80062E20(void) {
-    fn_800BDA04();
+    GolfCamera_DeInit();
 }

@@ -514,7 +514,7 @@ LAYOUT_ASSERT(CamTuning, 0x25C);
 
 extern CamTuning* lbl_80281F78;         // EA's file list has GoCamTuningVars
 
-// The golf cameras' shared state (0x200 bytes, allocated by fn_800BD894).
+// The golf cameras' shared state (0x200 bytes, allocated by GolfCamera_Init).
 typedef struct GolfCamState {
     f32     fElevatorHeight[21];    // 0x000  per course, added to the elevator shot's height
     u8      b54;                // 0x054
@@ -804,12 +804,12 @@ void   GolfCamera_InitShotSetupCamera(View* pView, int nPlayer);                
 void   GolfCamera_InitZoomToAimCamera(View* pView, int nPlayer);    // 1
 void   GolfCamera_InitGreenZoomToAimCamera(View* pView, int nPlayer); // 2
 void   GolfCamera_InitElevatorCamera(View* pView, int nPlayer);     // 3
-void   fn_800BFC80(View* pView, int nPlayer);                       // 4
+void   GolfCamera_InitGreenCamera(View* pView, int nPlayer);                       // 4
 void   fn_800C0364(View* pView, int nPlayer);                       // 5
 void   fn_800C0624(View* pView, int nPlayer);                       // 6
 void   fn_800C0744(View* pView, int nPlayer);                       // 7
-void   fn_800BF110(View* pView, int nPlayer);                       // 8
-void   fn_800BF5E4(View* pView, int nPlayer);                       // 9
+void   GolfCamera_InitPlaceBallCamera(View* pView, int nPlayer);                       // 8
+void   GolfCamera_InitSpeedGolfRunCamera(View* pView, int nPlayer);                       // 9
 void   fn_800C0880(View* pView, int nPlayer);                       // 10
 void   GolfCamera_InitPreShotCamera(View* pView, int nPlayer);      // 11
 void   GolfCamera_InitSwingCamera(View* pView, int nPlayer);        // 12
@@ -830,13 +830,13 @@ void   fn_800C3EB8(View* pView, int nPlayer);                       // 24
 void   GolfCamera_ProcessShotSetupCamera(View* pView, int nPlayer);                       // camera 0
 void   GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer); // 1
 void   GolfCamera_ProcessGreenZoomToAimCamera(View* pView, int nPlayer); // 2
-void   fn_800BF094(View* pView, int nPlayer);                       // 3
-void   fn_800BFE00(View* pView, int nPlayer);                       // 4
+void   GolfCamera_ProcessElevatorCamera(View* pView, int nPlayer);                       // 3
+void   GolfCamera_ProcessGreenCamera(View* pView, int nPlayer);                       // 4
 void   fn_800C0414(View* pView, int nPlayer);                       // 5
 void   fn_800C06C8(View* pView, int nPlayer);                       // 6
 void   fn_800C0804(View* pView, int nPlayer);                       // 7
 void   GolfCamera_ProcessPlaceBallCamera(View* pView, int nPlayer);                       // 8
-void   fn_800BF658(View* pView, int nPlayer);                       // 9
+void   GolfCamera_ProcessSpeedGolfRunCamera(View* pView, int nPlayer);                       // 9
 void   GolfCamera_ProcessFlyByCamera(View* pView, int nPlayer);                       // 10
 void   GolfCamera_ProcessPreShotCamera(View* pView, int nPlayer);                       // 11
 void   GolfCamera_ProcessSwingCamera(View* pView, int nPlayer);                       // 12
@@ -871,8 +871,8 @@ void   CameraController_LagSideVector(f32* pA, f32* pB, f32* pOut);   // the gre
 
 // ---- the golf cameras (GoGolfCam.c) ---------------------------------------------------------
 
-void   fn_800BD894(void);
-void   fn_800BDA04(void);
+void   GolfCamera_Init(void);
+void   GolfCamera_DeInit(void);
 void   fn_800C1790(View* pView, int nPlayer);
 u8     fn_800C441C(View* pView, int nPlayer);
 u8     GolfCamera_Choose3ScreenCam(View* pView, int nPlayer);
