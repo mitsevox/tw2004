@@ -528,10 +528,10 @@ void Seq_Check(AudTrackTmpl* pTmpl) {
                     }
                     break;
                 case 7:
-                    pList = fn_800A9564(pEvent->n4);
+                    pList = Ses_GetStreamPlayList(pEvent->n4);
                     break;
                 case 8:
-                    fn_800A9438(pList, pEvent->n4, NULL);
+                    Ses_GetStreamFromPlayList(pList, pEvent->n4, NULL);
                     break;
                 }
             }

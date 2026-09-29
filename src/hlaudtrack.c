@@ -397,10 +397,10 @@ void Trk_Render(AudTrack* pTrack) {
     fCurve = Mas_GetSubmix(pList->n3);
     fVolume = fn_800A85FC(pTrack->f44, fCurve);
     if (pTrack->bits.b.bSorted == 1) {
-        fn_800A9590(pSource, pTrack, fVolume);
+        TrkRender3D(pSource, pTrack, fVolume);
         return;
     }
-    fn_800A96DC(pSource, pTrack, fVolume);
+    TrkRenderStereo(pSource, pTrack, fVolume);
 }
 
 // Prepares a track template of a sound just loaded (Emi_CheckTemplate): a sequenced one's events

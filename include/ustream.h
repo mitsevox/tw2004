@@ -27,7 +27,7 @@ typedef struct UStreamChunk {
     u32  uFlags;                // 0x14  SHDR: the object's allocation flags (UStreamObject.uFlags)
     u32  uType;                 // 0x18  SHDR: the object's type ('ter ', 'txf ', ...); SONO: 'shdr' / 'samp'
     u32  uId;                   // 0x1C  SHDR: the object's id (UStreamObject.uId); SONO: which sound memory
-                                //       (2: fn_800A9374)
+                                //       (2: Ses_AllocStreamFileHdr)
     u32  uSize;                 // 0x20  SHDR: the object's (unpacked) size
     u8   unk24[0x34 - 0x24];
     int  nScriptLen;            // 0x34  SHDR: the first script's length; a 'Csac' has no scripts

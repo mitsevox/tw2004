@@ -63,9 +63,9 @@ void  Mov_SendSoundBlock(MovieSoundBlock* pBlock);                  // DSPM / VA
 void* Ses_AllocBankHdr(u32 uSize, int nMemory);
 void  Ses_ProcessArticulationData(u32 uMemory);
 void* Ses_AllocSampleAram(u32 uSize, u32 uType);
-void  fn_800A929C(u32 uType);
-void* fn_800A9374(u32 uSize);
-void  fn_800A93AC(void);
+void  Ses_ProcessSampleData(u32 uType);
+void* Ses_AllocStreamFileHdr(u32 uSize);
+void  Ses_ProcessStreamFileHdr(void);
 void  fn_8000E708(UStreamParams* p);
 
 static void UStream_ReadDone(int nBytes, int nError);
@@ -559,7 +559,7 @@ static void Stream_ParseBufs(void) {
                     switch (pChunk->uType) {
                     case TAG('s', 'h', 'd', 'r'):
                         if (pChunk->uId == 2) {
-                            gSoundHeader.pDst = fn_800A9374(pChunk->uSize);
+                            gSoundHeader.pDst = Ses_AllocStreamFileHdr(pChunk->uSize);
                         } else {
                             gSoundHeader.pDst = Ses_AllocBankHdr(pChunk->uSize, pChunk->uId);
                         }
@@ -598,13 +598,13 @@ static void Stream_ParseBufs(void) {
                         switch (gSoundHeader.uKind) {
                         case TAG('s', 'h', 'd', 'r'):
                             if (gSoundHeader.uMemory == 2) {
-                                fn_800A93AC();
+                                Ses_ProcessStreamFileHdr();
                             } else {
                                 Ses_ProcessArticulationData(gSoundHeader.uMemory);
                             }
                             break;
                         case TAG('s', 'a', 'm', 'p'):
-                            fn_800A929C(gSoundHeader.uMemory);
+                            Ses_ProcessSampleData(gSoundHeader.uMemory);
                             break;
                         }
                         gSoundHeader.uSize = 0;

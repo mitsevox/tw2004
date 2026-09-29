@@ -26,7 +26,7 @@ u8 lbl_80282095;
 u8 lbl_80282094;
 s32 lbl_80282090;
 s32 lbl_8028208C;
-u8* lbl_80282088;                       // the stream buffer (fn_800A942C)
+u8* lbl_80282088;                       // the stream buffer (Ses_GetStreamBuffer)
 s32 lbl_80282084;
 s32 lbl_80282080;
 u32 lbl_8028207C;                       // what is loaded: bits 0x04/0x08 bank 0 and its samples,
@@ -144,8 +144,8 @@ void Mov_Start(void) {
     AudVoiceParams params;
 
     fn_800B596C("Mov_Start");
-    fn_800AC7DC(lbl_801F1850.pLeft, MOVIE_BLOCKS * MOVIE_BLOCK_SIZE, 22050, 1);
-    fn_800AC7DC(lbl_801F1850.pRight, MOVIE_BLOCKS * MOVIE_BLOCK_SIZE, 22050, 1);
+    Voc_StartStream(lbl_801F1850.pLeft, MOVIE_BLOCKS * MOVIE_BLOCK_SIZE, 22050, 1);
+    Voc_StartStream(lbl_801F1850.pRight, MOVIE_BLOCKS * MOVIE_BLOCK_SIZE, 22050, 1);
     params.flags.n = 0;
     params.flags.b.bVolume = 1;
     params.nVolume = 0x2FFF;
@@ -224,10 +224,10 @@ void Mov_Tick(void) {
     fn_800B5994("Mov_Tick");
 }
 
-// Takes the one read buffer every streamed track shares (fn_800A942C hands it out) from the sound
-// engine's memory: fn_800A955C bytes (0x10000).
+// Takes the one read buffer every streamed track shares (Ses_GetStreamBuffer hands it out) from the sound
+// engine's memory: Ses_GetStreamBufferSize bytes (0x10000).
 void Ses_AllocStreamBuffer(void) {
-    lbl_80282088 = fn_800B5BD8(fn_800A955C(0));
+    lbl_80282088 = fn_800B5BD8(Ses_GetStreamBufferSize(0));
 }
 
 // The session's start-up step in Aud_InitOnce: clears the session's state (Ses_ResetModule) and
@@ -260,7 +260,7 @@ void Ses_ResetModule(void) {
 // not read.
 void Ses_Exit(void) {
     fn_800A86B8();
-    fn_800AC49C();
+    Voc_ExitSession();
     Trk_ExitSession();
     Emi_ExitSession();
     Mic_ExitSession();
@@ -292,7 +292,7 @@ u8 Ses_Init(u8 a, u8 b, u8 nListeners) {
     lbl_8028207C &= ~0x30;
     if ((bOk = HwVoice_InitSession()) && (bOk = AudDma_InitSession()) && (bOk = AudAram_InitSession()) &&
         (bOk = fn_800AF264(a, b)) && (bOk = Mic_InitSession(a, b, nListeners)) &&
-        (bOk = Emi_InitSession()) && (bOk = Trk_InitSession(a, b)) && (bOk = fn_800AC494()) &&
+        (bOk = Emi_InitSession()) && (bOk = Trk_InitSession(a, b)) && (bOk = Voc_InitSession()) &&
         (bOk = fn_800A86B0())) {
         if (b == 0) {
             if (lbl_80282078 != NULL) {
@@ -405,8 +405,11 @@ u32 Ses_AllocSampleAram(u32 uSize, u32 uMemory) {
     return pBank->uAram = AudAram_Alloc(uSize);
 }
 
-// A bank's samples are loaded: move the sample table's addresses into its ARAM block.
-void fn_800A929C(u32 uMemory) {
+// Bank uMemory's samples are in ARAM (UStream.c): moves each sample's start, end and loop addresses
+// (4-bit units, so plus uAram * 2) into the bank's ARAM block; a sample that does not loop (uC 0)
+// gets 0x8002 as its loop address. Sets bit 0x08 (bank 0) or 0x20 (bank 1) of lbl_8028207C, also
+// when the bank has no ARAM block.
+void Ses_ProcessSampleData(u32 uMemory) {
     AudBank* pBank;
     u8 i;
     u8 bBank0;
@@ -443,16 +446,19 @@ void fn_800A929C(u32 uMemory) {
     }
 }
 
-// Where UStream.c loads the stream file's header.
-AudStreamFile* fn_800A9374(u32 uSize) {
+// UStream.c's 'shdr' chunk with id 2: takes uSize bytes of the sound engine's memory for the stream
+// file's header and returns where to load it; NULL when a header is already loaded.
+AudStreamFile* Ses_AllocStreamFileHdr(u32 uSize) {
     if (lbl_80282070 == NULL) {
         return lbl_80282070 = fn_800B5BD8(uSize);
     }
     return NULL;
 }
 
-// The stream file's header is loaded: open the stream file and fix the play lists' offsets up.
-void fn_800A93AC(void) {
+// The stream file's header is loaded (UStream.c): opens the stream file ("/AudioStm_GC.sab") and
+// turns the play lists' stored offsets into pointers. Only once: nothing happens while the file is
+// open (lbl_80281468 not -1).
+void Ses_ProcessStreamFileHdr(void) {
     s32 hFile;
     u8* pLists;
     u32 i;
@@ -468,16 +474,20 @@ void fn_800A93AC(void) {
     }
 }
 
-u8* fn_800A942C(u32 uSize, u8 nPlayList) {
+// A streamed track's read buffer (Stm_SetPlayList): every play list gets the same shared buffer,
+// whatever the size.
+u8* Ses_GetStreamBuffer(u32 uSize, u8 nPlayList) {
     return lbl_80282088;
 }
 
-void fn_800A9434(u8* pBuffer, u32 uSize, u8 nPlayList) {
+// Gives a streamed track's read buffer back (Stm_Exit, Stm_SetPlayList): empty, as the one buffer
+// is shared and never freed.
+void Ses_FreeStreamBuffer(u8* pBuffer, u32 uSize, u8 nPlayList) {
 }
 
 // Stream nStream of a play list (the last one when it is past the end), and its length: up to
 // the next stream, the next play list's first, or the end of the file.
-AudStream* fn_800A9438(AudPlayList* pList, u16 nStream, u32* puLength) {
+AudStream* Ses_GetStreamFromPlayList(AudPlayList* pList, u16 nStream, u32* puLength) {
     AudStream* pStream;
     u32 uEnd;
 
@@ -489,7 +499,7 @@ AudStream* fn_800A9438(AudPlayList* pList, u16 nStream, u32* puLength) {
         if (nStream < (u16)(pList->nStreams - 1)) {
             uEnd = pStream[1].uOffset;
         } else if (pList->nIndex < lbl_80282070->nPlayLists - 1) {
-            uEnd = fn_800A9564(pList->nIndex + 1)->aStreams[0].uOffset;
+            uEnd = Ses_GetStreamPlayList(pList->nIndex + 1)->aStreams[0].uOffset;
         } else {
             uEnd = fn_800065B0(lbl_80281468);
         }
@@ -498,7 +508,9 @@ AudStream* fn_800A9438(AudPlayList* pList, u16 nStream, u32* puLength) {
     return pStream;
 }
 
-void fn_800A94F4(s16 nSound, u8 nTrack, u8 bOn) {
+// Turns reverb on (bOn 1) or off for track nTrack of sound nSound's template (bit 0x20 of the
+// track's n0, set: no reverb), so for every instance of the sound (Aud_SesTmplOvrTrackRvbMode).
+void Ses_TmplOvrTrackRvbMode(s16 nSound, u8 nTrack, u8 bOn) {
     AudTrackTmpl* pTrack;
 
     pTrack = &fn_800A85CC(nSound)->aTracks[nTrack];
@@ -509,11 +521,13 @@ void fn_800A94F4(s16 nSound, u8 nTrack, u8 bOn) {
     }
 }
 
-u32 fn_800A955C(u8 nPlayList) {
+// The read buffer size play list nPlayList needs: 0x10000 bytes for every one.
+u32 Ses_GetStreamBufferSize(u8 nPlayList) {
     return 0x10000;
 }
 
-AudPlayList* fn_800A9564(u8 nPlayList) {
+// Play list nPlayList of the stream file (the last one when it is past the end).
+AudPlayList* Ses_GetStreamPlayList(u8 nPlayList) {
     if (nPlayList >= lbl_80282070->nPlayLists) {
         nPlayList = lbl_80282070->nPlayLists - 1;
     }
@@ -521,7 +535,7 @@ AudPlayList* fn_800A9564(u8 nPlayList) {
 }
 
 // Sets a placed track's voices: volume, pan and doppler pitch from the sound's place.
-void fn_800A9590(AudSource* pSource, AudTrack* pTrack, f32 fVolume) {
+void TrkRender3D(AudSource* pSource, AudTrack* pTrack, f32 fVolume) {
     AudVoiceParams params;
     AudVoice** ppVoice;
     AudVoice** ppEnd;
@@ -549,7 +563,7 @@ void fn_800A9590(AudSource* pSource, AudTrack* pTrack, f32 fVolume) {
 
 // Sets a track's voices when the sound is not placed: a mono track in the centre, a stereo one's
 // channels left and right in turn.
-void fn_800A96DC(AudSource* pSource, AudTrack* pTrack, f32 fVolume) {
+void TrkRenderStereo(AudSource* pSource, AudTrack* pTrack, f32 fVolume) {
     AudVoiceParams params;
     AudVoice** ppVoice;
     AudVoice** ppEnd;

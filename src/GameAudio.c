@@ -2024,5 +2024,5 @@ void Aud_ExitSession(s32 n) {
 // Turns reverb on (bOn 1) or off for track nTrack of sound nSound's template, so for every instance
 // of that sound.
 void Aud_SesTmplOvrTrackRvbMode(s16 nSound, u8 nTrack, u8 bOn) {
-    fn_800A94F4(nSound, nTrack, bOn);
+    Ses_TmplOvrTrackRvbMode(nSound, nTrack, bOn);
 }

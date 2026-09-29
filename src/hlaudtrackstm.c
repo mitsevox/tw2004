@@ -61,7 +61,7 @@ void StartStreamVoices(AudTrack* pTrack) {
     fn_800A85FC(pTrack->f44, Mas_GetSubmix(pList->n3));
     bLoud = pList->n3 == 15;
     for (i = 0; i < pList->nChannels; i++) {
-        fn_800AC7DC(pTrack->apVoices[i], 0xFE00, pList->n4, bLoud);
+        Voc_StartStream(pTrack->apVoices[i], 0xFE00, pList->n4, bLoud);
     }
     pTrack->nState = 6;
 }
@@ -342,7 +342,8 @@ void Stm_Exit(AudTrack* pTrack) {
     //       be cancelled here.
     AudDma_CancelOwner(pTrack);
     if (pTrack->u.stm.pBuffer != NULL) {
-        fn_800A9434(pTrack->u.stm.pBuffer, pTrack->u.stm.uBufferSize, pTrack->pTmpl->data.pPlayList->nId);
+        Ses_FreeStreamBuffer(pTrack->u.stm.pBuffer, pTrack->u.stm.uBufferSize,
+                             pTrack->pTmpl->data.pPlayList->nId);
     }
     ResetStreamPerf(pTrack);
     fn_800B5994("Stm_Exit");
@@ -419,7 +420,7 @@ u8 Stm_Tick(AudTrack* pTrack) {
         ppVoice = pTrack->apVoices;
         if (*ppVoice == NULL) break;
         uOld = (*ppVoice)->uPlayPos;
-        bFeed = fn_800ACE38(*ppVoice, &uPos);
+        bFeed = Voc_CheckStreamHalfDone(*ppVoice, &uPos);
         if (uOld != 0) {
             pTrack->u.stm.uPlayed += (*ppVoice)->uPlayPos - uOld;
             if ((*ppVoice)->uPlayPos < uOld) {
@@ -505,7 +506,7 @@ void Stm_SetPlayList(AudTrack* pTrack, u8 nPlayList) {
     if (pTrack->nState > 2) {
         pTrack->u.stm.nNextPlayList = nPlayList;
     } else {
-        pList = fn_800A9564(nPlayList);
+        pList = Ses_GetStreamPlayList(nPlayList);
         if (pTrack->nState == 2) {
             pOld = pTmpl->data.pPlayList;
             nOld = pOld->nId;
@@ -513,11 +514,11 @@ void Stm_SetPlayList(AudTrack* pTrack, u8 nPlayList) {
             pOld = NULL;
         }
         if (pList != pOld) {
-            uSize = fn_800A955C(pList->nId);
+            uSize = Ses_GetStreamBufferSize(pList->nId);
             if (pTrack->u.stm.pBuffer != NULL) {
-                fn_800A9434(pTrack->u.stm.pBuffer, pTrack->u.stm.uBufferSize, nOld);
+                Ses_FreeStreamBuffer(pTrack->u.stm.pBuffer, pTrack->u.stm.uBufferSize, nOld);
             }
-            pBuffer = fn_800A942C(uSize, pList->nId);
+            pBuffer = Ses_GetStreamBuffer(uSize, pList->nId);
             pTmpl->data.pPlayList = pList;
             pTrack->u.stm.pBuffer = pBuffer;
             pTrack->u.stm.uBufferSize = uSize;
@@ -559,7 +560,7 @@ void Stm_SetStream(AudTrack* pTrack, u16 nStream, int nMode) {
                 }
                 pTrack->u.stm.nLastStream = nStream;
             }
-            pTrack->u.stm.pStream = fn_800A9438(pList, nStream, &pTrack->u.stm.uLength);
+            pTrack->u.stm.pStream = Ses_GetStreamFromPlayList(pList, nStream, &pTrack->u.stm.uLength);
         }
     }
     fn_800B5994("Stm_SetStream");

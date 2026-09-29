@@ -18,9 +18,9 @@ void HwVoice_OnVoiceFreed(void);                                 // startUp.c
 s16  HwVoice_GetVolume(u16 nVoice);                           // startUp.c
 u32  AudAram_AllocStreamBuffer(void);                                 // startUp.c
 
-void fn_800AC330(void);
-u8   fn_800AC6B0(AudVoiceRequest* pRequest, s16* pPriority);
-f32  fn_800ACEC4(f32 fA, f32 fB);
+void Voc_ResetModule(void);
+u8   VoicePowerCompare(AudVoiceRequest* pRequest, s16* pPriority);
+f32  audfrac_MulU(f32 fA, f32 fB);
 
 AudVoicePool lbl_801F19B8[1];
 
@@ -28,7 +28,7 @@ s32 lbl_802820B4;
 u8  lbl_802820B0;
 
 // Set the voice pool up: every voice free, numbered after its hardware voice.
-void fn_800AC330(void) {
+void Voc_ResetModule(void) {
     AudVoicePool* pPool = lbl_801F19B8;
     AudVoicePool* pEnd = lbl_801F19B8 + 1;
     UList* pList;
@@ -55,21 +55,28 @@ void fn_800AC330(void) {
     }
 }
 
+// The voices' start-up step in Aud_InitOnce: sets the voice pool up (Voc_ResetModule). Always 1.
 u8 Voc_InitModule(void) {
-    fn_800AC330();
+    Voc_ResetModule();
     return 1;
 }
 
-u8 fn_800AC494(void) {
+// The voices' step in Ses_Init: nothing to do. Always 1.
+u8 Voc_InitSession(void) {
     return 1;
 }
 
-void fn_800AC49C(void) {
+// The voices' step in Ses_Exit: empty in this build.
+void Voc_ExitSession(void) {
 }
 
-// Takes a voice for a request (NULL at priority 0 or when none can be had). With 8 or fewer free,
-// one on a list up to n4 whose playing volume the request beats is first stolen from its track:
-// deleted if a free voice is left, else reused (it then skips its first settings, bA_5).
+// Takes a voice for a request (Mov_Init, a sequenced note, a stream's StartStreamVoices); NULL at
+// priority 0 or when none can be had. With 8 or fewer free, the first voice on lists 0 to n4 (0 and
+// 1 when n4 is 2) that the request outranks (VoicePowerCompare, against its hardware voice's
+// volume) is stolen: its track is told (callback reason 1), then it is deleted if a free voice is
+// left, else taken over (it then skips its next Voc_Render, bA_5). A request with flag b12 also
+// gets an ARAM stream block (fn_800B06F4); without one the voice is deleted and NULL returned. The
+// voice goes on list n4.
 AudVoice* Voc_Alloc(AudVoiceRequest* pRequest) {
     AudVoicePool* pPool = lbl_801F19B8;
     AudVoice* pVoice = NULL;
@@ -92,7 +99,7 @@ AudVoice* Voc_Alloc(AudVoiceRequest* pRequest) {
             for (pCand = (AudVoice*)pList->pHead; pCand != NULL; pCand = (AudVoice*)pCand->link.pNext) {
                 // port: EA passes an argument HwVoice_GetVolume ignores
                 nVolume = ((s16 (*)(u16, int))HwVoice_GetVolume)(pCand->nHwVoice, 0);
-                if (fn_800AC6B0(pRequest, &nVolume)) {
+                if (VoicePowerCompare(pRequest, &nVolume)) {
                     pVoice = pCand;
                     break;
                 }
@@ -147,13 +154,15 @@ AudVoice* Voc_Alloc(AudVoiceRequest* pRequest) {
     return pVoice;
 }
 
-// Can this request take a voice playing at *pPriority?
-u8 fn_800AC6B0(AudVoiceRequest* pRequest, s16* pPriority) {
+// Does the request outrank a voice playing at volume *pPriority (Voc_Alloc's steal test)? Only a
+// strictly higher priority does.
+u8 VoicePowerCompare(AudVoiceRequest* pRequest, s16* pPriority) {
     return pRequest->nPriority > *pPriority;
 }
 
-// Sets a sequenced voice up to play its tone at pitch fPitch and volume nVolume; the params' a8
-// (when flagged) change the tone's attack and decay.
+// Sets a sequenced voice up to play its tone: the rate is picked at random between the tone's u4
+// and u8, times fPitch; its volume is nVolume (0-127). A params a8 flagged by b5 / b4 changes the
+// tone's attack / decay, for every voice that plays the tone. Voc_Render starts it.
 void Voc_Start(AudVoice* pVoice, AudVoiceParams* pParams, u8 nVolume, f32 fPitch) {
     u16 nHwVoice = pVoice->nHwVoice;
     AudSeqTone* pTone = pVoice->pTone;
@@ -169,7 +178,7 @@ void Voc_Start(AudVoice* pVoice, AudVoiceParams* pParams, u8 nVolume, f32 fPitch
             (*ppEnv)->nDecay = pParams->a8[1];
         }
     }
-    pVoice->uC = fn_800ACEC4(uRate, fPitch);
+    pVoice->uC = audfrac_MulU(uRate, fPitch);
     pVoice->n14 = nVolume;
     pVoice->flags.b.bA_0 = 1;
     HwVoice_SetSound(nHwVoice, pTone->pHeader);
@@ -178,9 +187,10 @@ void Voc_Start(AudVoice* pVoice, AudVoiceParams* pParams, u8 nVolume, f32 fPitch
     HwVoice_SetEnvelope(nHwVoice, (VoiceEnvelope*)ppEnv);
 }
 
-// Sets a streamed voice up to play uLen bytes of its ARAM buffer at nRate, looping: attack
-// 0x200, full sustain, release 0x10 with bLoud, else 0x80.
-void fn_800AC7DC(AudVoice* pVoice, u32 uLen, u32 nRate, u8 bLoud) {
+// Sets a streamed voice up (Mov_Start, StartStreamVoices) to loop over uLen bytes of its ARAM
+// buffer at nRate Hz: attack 0x200, full sustain, release 0x10 with bLoud (the movie's), else 0x80.
+// Voc_Render starts it.
+void Voc_StartStream(AudVoice* pVoice, u32 uLen, u32 nRate, u8 bLoud) {
     VoiceEnvelope env;
     SoundHeader hdr;
     u16 nHwVoice;
@@ -209,7 +219,9 @@ void fn_800AC7DC(AudVoice* pVoice, u32 uLen, u32 nRate, u8 bLoud) {
     HwVoice_SetEnvelope(nHwVoice, &env);
 }
 
-// Passes a voice's settings on to its hardware voice; a voice just set up is started first.
+// Passes a voice's settings (volume and both pans, pitch) on to its hardware voice. A voice just
+// set up (bA_0) is started first, with aux A on unless bA_6; a stolen voice skips one call (bA_5,
+// cleared here).
 void Voc_Render(AudVoice* pVoice, AudVoiceParams* pParams) {
     u16 nHwVoice = pVoice->nHwVoice;
     u32 uRate;
@@ -236,7 +248,7 @@ void Voc_Render(AudVoice* pVoice, AudVoiceParams* pParams) {
             HwVoice_SetPan(nHwVoice, pParams->n7, 3, bPlaying);
         }
         if (pParams->flags.b.bPitch) {
-            uRate = fn_800ACEC4(pVoice->uC, pParams->fPitch);
+            uRate = audfrac_MulU(pVoice->uC, pParams->fPitch);
             bSetRate = 1;
         }
         if (bSetRate) {
@@ -247,7 +259,8 @@ void Voc_Render(AudVoice* pVoice, AudVoiceParams* pParams) {
     }
 }
 
-// Pauses or resumes a voice's hardware voice.
+// Pauses (bPause 1) or resumes a voice's hardware voice. Nothing for NULL, or while bB_6 is set (a
+// streamed voice Voc_PauseAll left paused for Stm_Tick).
 void Voc_Pause(AudVoice* pVoice, u8 bPause) {
     if (pVoice != NULL && !pVoice->flags.b.bB_6) {
         HwVoice_Pause(pVoice->nHwVoice, bPause);
@@ -268,7 +281,8 @@ void Voc_Stop(AudVoice* pVoice) {
     }
 }
 
-// Stops a voice at once: it forgets its track and gives back its ARAM buffer.
+// Stops a voice for good (Voc_Stop) and forgets its track, so Voc_Cycle frees it without calling
+// back. A voice that owns an ARAM buffer (bA_4) is also paused and gives the buffer back.
 void Voc_Delete(AudVoice* pVoice) {
     Voc_Stop(pVoice);
     pVoice->pfnCallback = NULL;
@@ -368,7 +382,7 @@ void Voc_PauseAll(u8 bPause, u8 bStreams) {
 
 // Has a streamed voice crossed into the other half of its ARAM buffer since the last call? Then
 // *puPos gets the half it has just left, free to be refilled.
-u8 fn_800ACE38(AudVoice* pVoice, u32* puPos) {
+u8 Voc_CheckStreamHalfDone(AudVoice* pVoice, u32* puPos) {
     u32 uPos = HwVoice_GetPlayPos(pVoice->nHwVoice);
     u32 uAram = pVoice->uAram;
     u32 uHalf;
@@ -387,6 +401,8 @@ u8 fn_800ACE38(AudVoice* pVoice, u32* puPos) {
     return bCrossed;
 }
 
-f32 fn_800ACEC4(f32 fA, f32 fB) {
+// The engine's unsigned fraction product (EA's audfrac_MulU, a UAudFrac.h inline, here out of
+// line): a rate times a pitch factor.
+f32 audfrac_MulU(f32 fA, f32 fB) {
     return fA * fB;
 }

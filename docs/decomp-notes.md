@@ -281,7 +281,7 @@ They will be sorted into the sections below.
 - **[verified] `!(a ^ b)`** gives the original's `xor.` where `a == b` gives `cmpw` (u8 field vs int
   parameter; Glows fn_800985FC).
 - **[verified] The order of a for-loop's increments sets the order of the `addi`s** (hlaudmovie
-  fn_800A929C, AudTable Emi_UpdInstance).
+  Ses_ProcessSampleData, AudTable Emi_UpdInstance).
 - **[verified] A `(u8)` cast on each argument to an `int` parameter is computed once (CSE)**; a `u8`
   parameter masks at every call (Particle fn_80094534 91.3 -> 96.4).
 - **[verified] Read fields into locals before a run of matrix stores**, or CW reloads them after each store
@@ -290,7 +290,7 @@ They will be sorted into the sections below.
   expression inline as the argument (GoTerrain fn_80030A40 96.7 -> 100).
 - **[verified] `(int)` before a float-to-u8 conversion** gives `fctiwz` + `clrlwi` (GoComicCam fn_800B4108).
 - **[verified] Set every loop cursor and end pointer as plain statements at the head of the loop**, in the
-  original's order; an end pointer can double as the backward cursor (hlaudvoice fn_800AC330 78 -> 100).
+  original's order; an end pointer can double as the backward cursor (hlaudvoice Voc_ResetModule 78 -> 100).
 - **[verified] EA's message-list macro is `aMsgs[n] = x; n++;`**, not `aMsgs[n++] = x` (GameMode26
   GameMode26_ScoreShot, GameMode22 GameMode22_ScoreShot 91.4 -> 94.1). `PLAYER(i)->` instead of `gPlayers[i].` fixed both
   twins' loops (GameMode26_ClearPlayerStats, GameMode22_ClearPlayerStats, about 73 -> 100).

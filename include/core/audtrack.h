@@ -19,7 +19,7 @@ typedef struct AudVoice {
             u8 bA_4 : 1;        //        it owns uAram, given back when it stops (Voc_Delete)
             u8 unkA_3 : 2;
             u8 bA_1 : 1;        //        VoiceEndCB keeps the channel's event when it is set
-            u8 bA_0 : 1;        //        set up (Voc_Start, fn_800AC7DC), started by Voc_Render
+            u8 bA_0 : 1;        //        set up (Voc_Start, Voc_StartStream), started by Voc_Render
             u8 bStopped : 1;    // 0xB    Voc_Stop has stopped it and taken it off its list
             u8 bB_6 : 1;        //        paused; Stm_Tick resumes it once the drive is fine
             u8 unkB : 6;
@@ -29,7 +29,7 @@ typedef struct AudVoice {
     u32  uC;                    // 0xC
     s32  n10;                   // 0x10   the request's n4, and the pool list it is on: a voice with
                                 //        a lower one can be stolen
-    u8   n14;                   // 0x14   its own volume (0-127; fn_800A9590 scales it by 128)
+    u8   n14;                   // 0x14   its own volume (0-127; TrkRender3D scales it by 128)
     s8   n15;                   // 0x15   frames left before Voc_Cycle checks whether it has ended
     u8   unk16[0x18 - 0x16];
     struct AudSeqTone* pTone;   // 0x18   the tone a sequenced track plays on it
@@ -114,7 +114,7 @@ typedef struct AudStream {
     u32  uLoop;                 // 0x4    0xFFFFFFFF: it does not loop
 } AudStream;
 
-// A play list of streams (fn_800A9564 finds one by its number).
+// A play list of streams (Ses_GetStreamPlayList finds one by its number).
 typedef struct AudPlayList {
     u16  nStreams;              // 0x0
     u8   nId;                   // 0x2    the play list's number (bit 2 goes into the voice request)
@@ -125,8 +125,8 @@ typedef struct AudPlayList {
     AudStream aStreams[1];      // 0x8    nStreams of them
 } AudPlayList;
 
-// The stream file's header (/AudioStm_GC.sab, read by fn_800A9374): its play lists. On disc each
-// entry of apLists is an offset from the end of the array; fn_800A93AC turns them into pointers.
+// The stream file's header (/AudioStm_GC.sab, read by Ses_AllocStreamFileHdr): its play lists. On disc each
+// entry of apLists is an offset from the end of the array; Ses_ProcessStreamFileHdr turns them into pointers.
 typedef struct AudStreamFile {
     u8   unk0[0x4];
     u32  nPlayLists;            // 0x4
@@ -175,7 +175,7 @@ LAYOUT_ASSERT(AudSeqEvent, 0x8);
 // The template a track plays: one of a bank sound's tracks (AudSound.aTracks, 0x1C bytes).
 typedef struct AudTrackTmpl {
     u8   n0;                    // 0x0    0x01: events run one at a time (n67); 0x08: streamed;
-                                //        0x20: cleared and set by fn_800A94F4;
+                                //        0x20: cleared and set by Ses_TmplOvrTrackRvbMode;
                                 //        0x40/0x80: Emi_TrackCallback on free/on a variation change
     u8   n1;                    // 0x1    how the next variation is picked (AutoSelectVariation); 0: never
     u8   n2;                    // 0x2    its channel count (one voice each; for a streamed track,
@@ -211,7 +211,7 @@ typedef struct AudSound {
 } AudSound;
 
 // One entry of a bank's sample table (0x38 bytes). Its addresses are relative to the bank's ARAM
-// block, in 4-bit units; fn_800A929C adds the block's address.
+// block, in 4-bit units; Ses_ProcessSampleData adds the block's address.
 typedef struct AudSample {
     u32  u0;                    // 0x0
     u32  u4;                    // 0x4
@@ -303,7 +303,7 @@ typedef struct AudTrack {
     AudVoiceParams params;      // 0x30   its flags are cleared when the track starts
     f32  f40;                  // 0x40   from its template
     f32  f44;                   // 0x44   its volume
-    f32  f48;                   // 0x48   a volume (fn_800A9590 scales it); the second list is
+    f32  f48;                   // 0x48   a volume (TrkRender3D scales it); the second list is
                                 //        sorted on it, highest first
     f32  f4C;                   // 0x4C   its pitch, advanced by f50 every tick
     f32  f50;                   // 0x50
@@ -484,14 +484,14 @@ u8           fn_800A86B0(void);
 void         fn_800A86B8(void);
 
 // hlaudmovie.c
-u8*          fn_800A942C(u32 uSize, u8 nPlayList);                  // the stream buffer
-void         fn_800A9434(u8* pBuffer, u32 uSize, u8 nPlayList);     // give it back
-AudStream*   fn_800A9438(AudPlayList* pList, u16 nStream, u32* puLength);
-void         fn_800A94F4(s16 nSound, u8 nTrack, u8 bOn);
-u32          fn_800A955C(u8 nPlayList);                              // the buffer size it needs
-AudPlayList* fn_800A9564(u8 nPlayList);
-void         fn_800A9590(AudSource* pSource, AudTrack* pTrack, f32 fVolume);   // placed sounds
-void         fn_800A96DC(AudSource* pSource, AudTrack* pTrack, f32 fVolume);   // the others
+u8*          Ses_GetStreamBuffer(u32 uSize, u8 nPlayList);                  // the stream buffer
+void         Ses_FreeStreamBuffer(u8* pBuffer, u32 uSize, u8 nPlayList);     // give it back
+AudStream*   Ses_GetStreamFromPlayList(AudPlayList* pList, u16 nStream, u32* puLength);
+void         Ses_TmplOvrTrackRvbMode(s16 nSound, u8 nTrack, u8 bOn);
+u32          Ses_GetStreamBufferSize(u8 nPlayList);                              // the buffer size it needs
+AudPlayList* Ses_GetStreamPlayList(u8 nPlayList);
+void         TrkRender3D(AudSource* pSource, AudTrack* pTrack, f32 fVolume);   // placed sounds
+void         TrkRenderStereo(AudSource* pSource, AudTrack* pTrack, f32 fVolume);   // the others
 
 extern AudStreamQueue gAudStreamReadQueue;
 extern s32 lbl_80281468;                // the stream file (hlaudmovie.c opens "/AudioStm_GC.sab")
@@ -554,16 +554,16 @@ void Stm_SetPlayList(AudTrack* pTrack, u8 nPlayList);
 void Stm_SetStream(AudTrack* pTrack, u16 nStream, int nMode);
 
 // hlaudvoice.c
-u8   fn_800AC494(void);
-void fn_800AC49C(void);
+u8   Voc_InitSession(void);
+void Voc_ExitSession(void);
 AudVoice* Voc_Alloc(AudVoiceRequest* pRequest);
 void Voc_Start(AudVoice* pVoice, AudVoiceParams* pParams, u8 nVolume, f32 fPitch);
-void fn_800AC7DC(AudVoice* pVoice, u32 uLen, u32 nRate, u8 bLoud);
+void Voc_StartStream(AudVoice* pVoice, u32 uLen, u32 nRate, u8 bLoud);
 void Voc_Render(AudVoice* pVoice, AudVoiceParams* pParams);
 void Voc_Pause(AudVoice* pVoice, u8 bPause);
 void Voc_Stop(AudVoice* pVoice);     // let it end
 void Voc_Delete(AudVoice* pVoice);     // stop it now
-u8   fn_800ACE38(AudVoice* pVoice, u32* puPos);
+u8   Voc_CheckStreamHalfDone(AudVoice* pVoice, u32* puPos);
 
 // hlaudemitter.c
 void Aud_EmiTrkCB(u8 nId, u8 nBit, s32 n);
