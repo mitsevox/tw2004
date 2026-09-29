@@ -1,7 +1,8 @@
 """Wrap C code lines longer than lint's 110 columns at an argument comma (a rename that makes names
 longer pushes call lines over). The continuation lines up under the open parenthesis (or 8 past the
 statement's indent when that is too deep). Comment-only lines, preprocessor lines and lines holding a
-string or a // comment are left alone (reported instead).
+string or a // comment are left alone (reported instead). A macro's line (one ending in, or following,
+a continuation backslash) is never split: only the padding before its backslash is trimmed.
     python tools/match/wraplong.py <file:line> ...        e.g. from `lint.py --diff main`
     python tools/match/wraplong.py --from-lint [--diff REV]   every long-line finding of lint --diff REV
                                                           (default main; name.py passes HEAD)
@@ -119,6 +120,15 @@ def main():
                     else:
                         src[n - 1:n] = [l[:cut].rstrip(), pre + rest]
                     continue
+            if l.rstrip().endswith('\\') or (n > 1 and src[n - 2].rstrip().endswith('\\')):
+                # a macro's line: a plain break ends the macro there (round 20, Ball.c's
+                # BALL_LANDING_EVENTS). Only the padding before the continuation backslash may go.
+                m = re.match(r'(.*?\S)\s+\\\s*$', l)
+                if m and len(m.group(1)) + 2 <= LIMIT:
+                    src[n - 1] = m.group(1) + ' \\'
+                else:
+                    print(f'{f}:{n}: left alone (a macro line: wrap it by hand with a backslash)')
+                continue
             if s.startswith(('//', '#', '/*', '*')) or re.search(r'\S\s*//', l):
                 print(f'{f}:{n}: left alone (comment or preprocessor line, or a trailing comment)')
                 continue
