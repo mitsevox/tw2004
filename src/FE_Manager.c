@@ -135,18 +135,19 @@ void FE_Manager_FreeStreamMemory(void) {
 }
 
 // Has the stream loader hand 'BIO ' objects (the golfers' bios) to FE_CharBios_LoadBIOfromStream.
-// Called by the front end's stream-client registration (streammanagerhole.c fn_80014668).
+// Called by the front end's stream-client registration (streammanagerhole.c
+// StreamManagerFrontend_RegisterStreamClients).
 void FE_CharBios_RegisterStreamClients(void) {
     Stream_RegisterLoadChunkCallback(TAG('B', 'I', 'O', ' '), FE_CharBios_LoadBIOfromStream);
 }
 
 // Empty in this build. Called by the front end's stream-client registration (streammanagerhole.c
-// fn_80014668), right after FE_CharBios_RegisterStreamClients.
+// StreamManagerFrontend_RegisterStreamClients), right after FE_CharBios_RegisterStreamClients.
 void FE_Manager_RegisterStreamClients(void) {
 }
 
 // Stops the stream loader handing 'BIO ' objects to FE_CharBios_LoadBIOfromStream
-// (streammanagerhole.c fn_800146C4).
+// (streammanagerhole.c StreamManagerFrontend_UnregisterStreamClients).
 void FE_CharBios_UnRegisterStreamClients(void) {
     Stream_UnregisterLoadChunkCallback(TAG('B', 'I', 'O', ' '));
 }

@@ -9,13 +9,13 @@ void fn_8000724C();
 void StaticMem_Shutdown();
 void Math_FreeLog2Table();
 void Input_vCloseOnce();
-void fn_80014590();
+void StreamManager_CloseOnce();
 void AudMem_CloseOnce();
 void GoARAM_Shutdown();
 
 void fn_80005590(void);
 void fn_80005590(void) {
-    fn_80014590();
+    StreamManager_CloseOnce();
     fn_8000724C();
     UStream_FreeBuffers();
     fn_800060DC();

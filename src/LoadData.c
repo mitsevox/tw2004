@@ -112,8 +112,8 @@ void fn_8000BAE0(void) {
         }
     }
     fn_8000BA3C();
-    fn_80014544(nFile);
-    fn_800147A4();
+    StreamManager_AddLoadScreenFile(nFile);
+    StreamManagerLoadScreen_StreamFiles();
     fn_8000BEC8();
     fn_8000BA6C();
 }

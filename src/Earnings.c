@@ -159,13 +159,14 @@ void GM_Earnings_FreeStreamMemory(void) {
 }
 
 // Registers EarningsInfo_LoadERNFromStream as the loader of stream chunk 'ERN ' (the prize table);
-// the hole stream manager (fn_80014864) calls it. TW06: EarningsInfo::RegisterStreamClients (by
-// position).
+// the hole stream manager (StreamManagerGlobals_RegisterStreamClients) calls it. TW06:
+// EarningsInfo::RegisterStreamClients (by position).
 void EarningsInfo_RegisterStreamClients(void) {
     Stream_RegisterLoadChunkCallback('ERN ', EarningsInfo_LoadERNFromStream);
 }
 
-// Removes the 'ERN ' chunk loader again; the hole stream manager (fn_800148A8) calls it. TW06:
+// Removes the 'ERN ' chunk loader again; the hole stream manager
+// (StreamManagerGlobals_UnregisterStreamClients) calls it. TW06:
 // EarningsInfo::UnRegisterStreamClients (by position).
 void EarningsInfo_UnRegisterStreamClients(void) {
     Stream_UnregisterLoadChunkCallback('ERN ');

@@ -13,7 +13,7 @@ void Math_InitLog2Table();
 void fn_8000B984();
 void DS_vInitOnce();
 void Input_iInitModule();
-void fn_80014524();
+void StreamManager_InitOnce();
 void fn_8002F1D4();
 void fn_80095108();
 void Gaud_InitOnce();
@@ -37,6 +37,6 @@ void fn_80005520(void) {
     Session_Init();
     fn_8002F1D4();
     Gaud_InitOnce();
-    fn_80014524();
+    StreamManager_InitOnce();
     Input_iInitModule();
 }

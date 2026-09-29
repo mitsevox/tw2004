@@ -2934,7 +2934,7 @@ void GM_vIsProfileLoaded(MsgArg* pArgs, MsgArg* pResult) {
 // Front-end message 149: gFEState.bFirstTime, set by the front end's setup (FE_vOpenONCE): while it is
 // set, entering the menus plays the intro movie (GoEntry.c, which also passes it to
 // Gaud_StartFEMusic, TW07's firstTime) and the front end's files load without the loading screen
-// (fn_80014718).
+// (StreamManagerFrontend_StreamFiles).
 void GM_vGetFirstTimeInFE(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gFEState.bFirstTime;
 }

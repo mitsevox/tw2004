@@ -95,8 +95,8 @@ void GameModeDriverPGATour_FreeStreamMemory(void) {
 }
 
 // Registers the loaders of the tour's four stream objects: 'PGAc' the tournaments, 'PGAt' their
-// formats, 'PGAp' the 'PGAp' records and 'PGAn' the names. The hole stream manager (fn_80014864)
-// calls it.
+// formats, 'PGAp' the 'PGAp' records and 'PGAn' the names. The hole stream manager
+// (StreamManagerGlobals_RegisterStreamClients) calls it.
 void GameModeDriverPGATour_RegisterStreamClients(void) {
     Stream_RegisterLoadChunkCallback('PGAc', GameModeDriverPGATour_LoadPGAcFromStream);
     Stream_RegisterLoadChunkCallback('PGAt', GameModeDriverPGATour_LoadPGAtFromStream);
@@ -104,7 +104,8 @@ void GameModeDriverPGATour_RegisterStreamClients(void) {
     Stream_RegisterLoadChunkCallback('PGAn', GameModeDriverPGATour_Locale_PgaTourMode_LoadPGAnFromStream);
 }
 
-// Unregisters the four 'PGA' loaders of RegisterStreamClients (hole stream manager, fn_800148A8).
+// Unregisters the four 'PGA' loaders of RegisterStreamClients (hole stream manager,
+// StreamManagerGlobals_UnregisterStreamClients).
 void GameModeDriverPGATour_UnregisterStreamClients(void) {
     Stream_UnregisterLoadChunkCallback('PGAc');
     Stream_UnregisterLoadChunkCallback('PGAt');

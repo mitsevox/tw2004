@@ -8,8 +8,8 @@
 
 void fn_8006F438(void);
 void fn_800106A0(int n);                    // LLTexGrp.c
-void fn_8001491C(void);                     // streammanagerhole.c
-void fn_8001494C(void);                     // streammanagerhole.c
+void StreamManagerHole_RegisterStreamClients(void); // streammanagerhole.c
+void StreamManagerHole_UnregisterStreamClients(void); // streammanagerhole.c
 void StreamManagerHole_StreamFiles(void);   // streammanagerhole.c
 void fn_8006F4F0(void);
 void fn_8006F518(void);
@@ -28,9 +28,9 @@ void fn_8006F438(void) {
         fn_8006F4F0();
         fn_800106A0(1);
         fn_8000B4B0(1);
-        fn_8001491C();
+        StreamManagerHole_RegisterStreamClients();
         StreamManagerHole_StreamFiles();
-        fn_8001494C();
+        StreamManagerHole_UnregisterStreamClients();
         fn_800106A0(0);
         fn_8000B4B0(0);
         lbl_802811E8[0] = 1;

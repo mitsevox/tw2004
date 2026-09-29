@@ -352,8 +352,8 @@ extern LoadObjInfo lbl_801A25F0;
 extern u8* lbl_80281C04;                // the 'load' object's data (147700 bytes)
 extern struct UStreamObject* lbl_80281C0C;   // LoadData.c: a copy of the 'txf2' object with id 10000
 
-void fn_80014544(int n);                // add loading file n to stream list 2 (sprintf'd name)
-void fn_800147A4(void);                 // streammanagerhole.c
+void StreamManager_AddLoadScreenFile(int n); // add loading file n to stream list 2 (sprintf'd name)
+void StreamManagerLoadScreen_StreamFiles(void); // streammanagerhole.c
 void fn_80014DFC(s32 nChar, s32 nUnused);   // streammanagerhole.c: stream list 3 = one FEChars file
 // LLTex.c: points at a flag byte RenderState_SetConstantAlphaActive (Code80015470.c) sets; while
 // it is set, the shader objects' untextured stage takes its alpha from the constant colour, not

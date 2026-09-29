@@ -43,18 +43,18 @@ void fn_800137D0(void* pCamera);
 void fn_80013808(void* pCamera, int n, void** ppSlot);
 void RC_vSetCurrentRenderCtx(void* pCamera);        // the current render camera (lbl_80280DF0)
 void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
-void fn_80014594(void);
-void fn_800145E0(void);
-void fn_8001462C(void);
-void fn_80014668(void);
-void fn_800146C4(void);
-void fn_80014718(void);
-void fn_800147D4(void);
-void fn_80014804(void);
-void fn_80014834(void);
-void fn_80014864(void);
-void fn_800148A8(void);
-void fn_800148EC(void);
+void StreamManagerIngame_RegisterStreamClients(void);
+void StreamManagerIngame_UnregisterStreamClients(void);
+void StreamManagerIngame_StreamFiles(void);
+void StreamManagerFrontend_RegisterStreamClients(void);
+void StreamManagerFrontend_UnregisterStreamClients(void);
+void StreamManagerFrontend_StreamFiles(void);
+void StreamManagerStartup_RegisterStreamClients(void);
+void StreamManagerStartup_UnregisterStreamClients(void);
+void StreamManagerStartup_StreamFiles(void);
+void StreamManagerGlobals_RegisterStreamClients(void);
+void StreamManagerGlobals_UnregisterStreamClients(void);
+void StreamManagerGlobals_StreamFiles(void);
 void fn_80014A64(void);
 void DS_vInitModule(void);
 void DS_vCloseModule(void);
@@ -387,9 +387,9 @@ void fn_8006C69C(void) {
 
 void fn_8006C6F0(void) {
     fn_8006C7A8();
-    fn_80014864();
-    fn_800148EC();
-    fn_800148A8();
+    StreamManagerGlobals_RegisterStreamClients();
+    StreamManagerGlobals_StreamFiles();
+    StreamManagerGlobals_UnregisterStreamClients();
     fn_8006C854();
 }
 
@@ -547,11 +547,11 @@ void GO_vInitFE(void) {
     fn_8000B884();
     fn_80124B54();
     FE_vInitModule();
-    fn_80014668();
+    StreamManagerFrontend_RegisterStreamClients();
     Character_InitFE();
     FE_CrAPBall_Init();
-    fn_80014718();
-    fn_800146C4();
+    StreamManagerFrontend_StreamFiles();
+    StreamManagerFrontend_UnregisterStreamClients();
     Player_SetGolfer(0, 0, 0, 0, 0);
     nView = gPlayers[0].nView[0];
     CameraController_SetCameraMode(ViewController_GetCameraControl(nView), 0x17, 0, nView);
@@ -617,7 +617,7 @@ void GO_vInitIG(void) {
     Ter_Init();
     Aud_InitSession(1, 0, (gSession.nSplitScreen != 0) + 1, 0);
     fn_8006F608();
-    fn_80014594();
+    StreamManagerIngame_RegisterStreamClients();
     IG_InitGameMessages();
     fn_8005D3A8(1);
     GM_InitModule_PreDataStream();
@@ -631,8 +631,8 @@ void GO_vInitIG(void) {
     fn_8006DCA0(0);
     fn_80014A64();
     UI_LoadLoadingBarTexture();
-    fn_8001462C();
-    fn_800145E0();
+    StreamManagerIngame_StreamFiles();
+    StreamManagerIngame_UnregisterStreamClients();
     fn_80045660();
     TARGET_Init();
     AI_TargetsInit();
@@ -746,9 +746,9 @@ void fn_8006CEFC(void) {
     lbl_80281E54 = RC_spCreateRenderCtx(lbl_80281E60, lbl_80281E5C, lbl_80281E58);
     RC_vSetCurrentRenderCtx(lbl_80281E54);
     Startup_InitGameMessages();
-    fn_800147D4();
-    fn_80014834();
-    fn_80014804();
+    StreamManagerStartup_RegisterStreamClients();
+    StreamManagerStartup_StreamFiles();
+    StreamManagerStartup_UnregisterStreamClients();
     Player_SetGolfer(0, 0, 0, 0, 0);
     fn_8006DCA8(0, 0, 0, 4);
     fn_80037DD8();

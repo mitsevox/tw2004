@@ -36,9 +36,9 @@ StreamLists* gpStreamManagerLists = &gStreamManagerLists;
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_800143B8();
-void fn_80014524(void);
-void fn_80014590(void);
+void StreamManager_InitModule();
+void StreamManager_InitOnce(void);
+void StreamManager_CloseOnce(void);
 void Skalib_Register();
 void Skalib_Unregister();
 void fn_80010284();
@@ -63,14 +63,14 @@ void MC_RegisterStreamClients();
 void MC_UnRegisterStreamClients();
 void fn_800A295C();
 void fn_800A298C();
-void fn_80014594(void);
-void fn_800145E0(void);
+void StreamManagerIngame_RegisterStreamClients(void);
+void StreamManagerIngame_UnregisterStreamClients(void);
 void UI_InitLoadingBar(void);     // uiProcessPolygon.c: set up the loading screen
 void UI_DrawLoadingScreenAndProgressBar(int nMode);    // uiProcessPolygon.c: update the loading screen
 void UI_FreeLoadingPicture(void);     // uiProcessPolygon.c
 void UI_LoadLoadingBarTexture(void);     // uiProcessPolygon.c
 void fn_8001529C(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
-void fn_8001462C(void);
+void StreamManagerIngame_StreamFiles(void);
 void fn_8000B9E4();
 void fn_8000BA14();
 void Character_RegisterClubStreamClientFE();
@@ -87,14 +87,14 @@ void FE_CrAP_RegisterStreamClients();
 void FE_CrAP_UnRegisterStreamClients();
 void fn_80124A40();
 void fn_80124A70();
-void fn_80014668(void);
-void fn_800146C4(void);
-void fn_800147A4(void);
+void StreamManagerFrontend_RegisterStreamClients(void);
+void StreamManagerFrontend_UnregisterStreamClients(void);
+void StreamManagerLoadScreen_StreamFiles(void);
 void startup_RegisterStreamClients();
 void startup_UnregisterStreamClients();
-void fn_800147D4(void);
-void fn_80014804(void);
-void fn_80014834(void);
+void StreamManagerStartup_RegisterStreamClients(void);
+void StreamManagerStartup_UnregisterStreamClients(void);
+void StreamManagerStartup_StreamFiles(void);
 void Golfer_RegisterStatsHandler();
 void Golfer_UnregisterStatsHandler();
 void Session_RegisterRecordsHandler();
@@ -113,17 +113,17 @@ void GameMode4_RegisterStreamClients();
 void GameMode4_UnregisterStreamClients();
 void PGATourSimulation_OpenONCE();
 void PGATourSimulation_CloseONCE();
-void fn_80014864(void);
-void fn_800148A8(void);
-void fn_800148EC(void);
+void StreamManagerGlobals_RegisterStreamClients(void);
+void StreamManagerGlobals_UnregisterStreamClients(void);
+void StreamManagerGlobals_StreamFiles(void);
 void Ter_RegisterStreamClients();
 void Ter_UnRegisterStreamClients();
 void StaticCam_RegisterStreamClients();
 void StaticCam_UnRegisterStreamClients();
 void fn_8011E468();
 void fn_8011E4A4();
-void fn_8001491C(void);
-void fn_8001494C(void);
+void StreamManagerHole_RegisterStreamClients(void);
+void StreamManagerHole_UnregisterStreamClients(void);
 void fn_80014A60(void);
 void fn_80014DC0(void);
 void fn_80014DF8(void);
@@ -167,9 +167,12 @@ void fn_80014E98(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)
 void fn_80014F20(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
 void fn_80014FA8(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
 
-// Set up the stream lists: empty them all, then put the front end's files in list 1 and the
-// load-once and startup files in lists 4 and 5.
-void fn_800143B8(void) {
+// Set up the stream lists once at boot: empty all seven, put the front end's files in the front-end
+// list (1), LoadOnce.gcb in the globals list (4) and LoadOnce.gcb + startup.gcb in the startup list
+// (5), clear gStreamManagerCharAdded, then run the FE-character and hole managers' (empty) init
+// calls. Lists: 0 in game, 1 front end, 2 loading screen, 3 FE character, 4 globals, 5 startup, 6
+// hole.
+void StreamManager_InitModule(void) {
     int i;
 
     gpStreamManagerLists->aParams[0].nNumFiles = 0;
@@ -193,14 +196,17 @@ void fn_800143B8(void) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_80014524(void) {
-    fn_800143B8();
+// The stream manager's once-at-boot init (called from the game's init-once list): just
+// StreamManager_InitModule.
+void StreamManager_InitOnce(void) {
+    StreamManager_InitModule();
 }
 
 // ---- end of sweep code ----
 
-// Add loading file nFile (data/Load/Load<n>.gcb) to stream list 2.
-void fn_80014544(int nFile) {
+// Add loading-screen file nFile (data/Load/Load<nFile>.gcb) to the loading-screen stream list (2).
+// LoadData.c picks nFile for the course, empties list 2 first and streams it right after.
+void StreamManager_AddLoadScreenFile(int nFile) {
     char szName[0x40];   // size unknown: the frame allows 0x40..0x48 bytes
 
     sprintf(szName, gszStreamLoadScreenFileFmt, nFile);
@@ -209,10 +215,14 @@ void fn_80014544(int nFile) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_80014590(void) {
+// The stream manager's shutdown, called from the game's close-once list. Empty in this build.
+void StreamManager_CloseOnce(void) {
 }
 
-void fn_80014594(void) {
+// Register every stream handler the in-game files need (cameras, UI, dynamic objects, clubs,
+// animation libraries, golfers, skeletons, memory card, situations). GO_vInitIG calls it around
+// StreamManagerIngame_StreamFiles.
+void StreamManagerIngame_RegisterStreamClients(void) {
     fn_80010284();
     DynamicCam_RegisterStreamClients();
     UI_RegisterStreamClients();
@@ -227,7 +237,8 @@ void fn_80014594(void) {
     SitDev_vRegisterStreamClients();
 }
 
-void fn_800145E0(void) {
+// Unregister the handlers StreamManagerIngame_RegisterStreamClients registered.
+void StreamManagerIngame_UnregisterStreamClients(void) {
     fn_800102B4();
     DynamicCam_UnRegisterStreamClients();
     UI_UnregisterStreamClients();
@@ -242,7 +253,9 @@ void fn_800145E0(void) {
     SitDev_vUnregisterStreamClients();
 }
 
-void fn_8001462C(void) {
+// Read the in-game stream list (0) to the end, drawing the loading screen and its progress bar
+// while it streams.
+void StreamManagerIngame_StreamFiles(void) {
     UI_InitLoadingBar();
     fn_800150E0();
     do {
@@ -251,7 +264,9 @@ void fn_8001462C(void) {
     fn_800150B8();
 }
 
-void fn_80014668(void) {
+// Register every stream handler the front end's files need (FE golfer and club, animation
+// libraries, UI, FE cameras, CrAP, character bios, FE manager, EA Trax). Called by GO_vInitFE.
+void StreamManagerFrontend_RegisterStreamClients(void) {
     fn_80010284();
     Character_RegisterClubStreamClientFE();
     Skalib_Register();
@@ -270,7 +285,8 @@ void fn_80014668(void) {
     UI_vEATraxRegisterStreamClients();
 }
 
-void fn_800146C4(void) {
+// Unregister the handlers StreamManagerFrontend_RegisterStreamClients registered.
+void StreamManagerFrontend_UnregisterStreamClients(void) {
     fn_800102B4();
     Character_UnregisterClubStreamClient();
     Skalib_Unregister();
@@ -289,9 +305,9 @@ void fn_800146C4(void) {
 
 // ---- end of sweep code ----
 
-// Stream list 1 (the front end's files), with the loading screen unless the front end's bFirstTime
-// is set.
-void fn_80014718(void) {
+// Read the front end's stream list (1) to the end, with the loading screen unless the front end's
+// bFirstTime is set (the first time, it streams with no screen).
+void StreamManagerFrontend_StreamFiles(void) {
     if (gFEState.bFirstTime == 0) {
         UI_LoadLoadingBarTexture();
         UI_InitLoadingBar();
@@ -313,7 +329,9 @@ void fn_80014718(void) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_800147A4(void) {
+// Read the loading-screen stream list (2) to the end, with nothing drawn (it is the loading
+// screen's own picture). Called by LoadData.c.
+void StreamManagerLoadScreen_StreamFiles(void) {
     fn_8001518C();
     do {
 
@@ -321,23 +339,28 @@ void fn_800147A4(void) {
     fn_80015164();
 }
 
-void fn_800147D4(void) {
+// Register the stream handlers the startup files need: UI, memory card, startup and the globals'
+// (StreamManagerGlobals_RegisterStreamClients).
+void StreamManagerStartup_RegisterStreamClients(void) {
     fn_80010284();
     UI_RegisterStreamClients();
     MC_RegisterStreamClients();
     startup_RegisterStreamClients();
-    fn_80014864();
+    StreamManagerGlobals_RegisterStreamClients();
 }
 
-void fn_80014804(void) {
+// Unregister the handlers StreamManagerStartup_RegisterStreamClients registered.
+void StreamManagerStartup_UnregisterStreamClients(void) {
     fn_800102B4();
     UI_UnregisterStreamClients();
     MC_UnRegisterStreamClients();
     startup_UnregisterStreamClients();
-    fn_800148A8();
+    StreamManagerGlobals_UnregisterStreamClients();
 }
 
-void fn_80014834(void) {
+// Read the startup stream list (5: LoadOnce.gcb and startup.gcb) to the end, with no loading
+// screen.
+void StreamManagerStartup_StreamFiles(void) {
     fn_800151E4();
     do {
 
@@ -345,7 +368,11 @@ void fn_80014834(void) {
     fn_800151BC();
 }
 
-void fn_80014864(void) {
+// Register the stream handlers of the global data (golfer stats, records, EA Trax, course info,
+// Play Now, earnings, game modes, PGA Tour season). Called by
+// StreamManagerStartup_RegisterStreamClients and by gomainloop around
+// StreamManagerGlobals_StreamFiles.
+void StreamManagerGlobals_RegisterStreamClients(void) {
     Golfer_RegisterStatsHandler();
     Session_RegisterRecordsHandler();
     UI_vEATraxRegisterStreamClients();
@@ -358,7 +385,8 @@ void fn_80014864(void) {
     GameModeDriverRTE_RegisterStreamClients();
 }
 
-void fn_800148A8(void) {
+// Unregister the handlers StreamManagerGlobals_RegisterStreamClients registered.
+void StreamManagerGlobals_UnregisterStreamClients(void) {
     Golfer_UnregisterStatsHandler();
     Session_UnregisterRecordsHandler();
     UI_vEATraxUnRegisterStreamClients();
@@ -371,7 +399,9 @@ void fn_800148A8(void) {
     GameModeDriverRTE_UnregisterStreamClients();
 }
 
-void fn_800148EC(void) {
+// Read the globals stream list (4: LoadOnce.gcb) to the end, with no loading screen. It closes
+// through StreamManagerFrontend_CloseStreamFiles (every close is the same).
+void StreamManagerGlobals_StreamFiles(void) {
     fn_80015214();
     do {
 
@@ -379,7 +409,8 @@ void fn_800148EC(void) {
     fn_8001510C();
 }
 
-void fn_8001491C(void) {
+// Register the stream handlers a hole file needs (terrain, dynamic objects, static cameras).
+void StreamManagerHole_RegisterStreamClients(void) {
     fn_80010284();
     Ter_RegisterStreamClients();
     DynObj_RegisterStreamClients();
@@ -387,7 +418,8 @@ void fn_8001491C(void) {
     fn_8011E468();
 }
 
-void fn_8001494C(void) {
+// Unregister the handlers StreamManagerHole_RegisterStreamClients registered.
+void StreamManagerHole_UnregisterStreamClients(void) {
     fn_8011E4A4();
     DynObj_UnRegisterStreamClients();
     Ter_UnRegisterStreamClients();

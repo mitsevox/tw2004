@@ -74,12 +74,12 @@ typedef struct StreamLists {
     int  nStream;               // 0x119C  the open stream (Stream_OpenStreamFiles)
 } StreamLists;
 extern StreamLists* gpStreamManagerLists;
-extern char gszStreamLoadScreenFileFmt[]; // "data/Load/Load%d.gcb" (streammanagerhole.c fn_80014544)
+extern char gszStreamLoadScreenFileFmt[]; // "data/Load/Load%d.gcb" (streammanagerhole.c StreamManager_AddLoadScreenFile)
 extern char gszStreamFECharFileFmt[]; // "data/FEChars/%02dcharfe.gcb" (streammanagerhole.c fn_80014DFC)
-extern char gszStreamFrontendFile[]; // "data/FEnd/FEnd.gcb" (streammanagerhole.c fn_800143B8)
-extern char gszStreamFECharFile[]; // "FEChar.gcb" (fn_800143B8)
-extern char gszStreamLoadOnceFile[]; // "LoadOnce.gcb" (fn_800143B8)
-extern char gszStreamStartupFile[]; // "startup.gcb" (fn_800143B8)
+extern char gszStreamFrontendFile[]; // "data/FEnd/FEnd.gcb" (streammanagerhole.c StreamManager_InitModule)
+extern char gszStreamFECharFile[]; // "FEChar.gcb" (StreamManager_InitModule)
+extern char gszStreamLoadOnceFile[]; // "LoadOnce.gcb" (StreamManager_InitModule)
+extern char gszStreamStartupFile[]; // "startup.gcb" (StreamManager_InitModule)
 extern char gszStreamGlbDataFile[]; // "GlbData.gcb" (fn_80014A64)
 extern char gszStreamGlbCharFile[]; // "GlbChar.gcb" (fn_80014A64)
 extern char gszStreamCharFileFmt[]; // "data/Chars/%02dchar.gcb" (fn_80014A64)
