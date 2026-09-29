@@ -324,10 +324,10 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
     if (!Player_IsCPU(nPlayer)) {
         if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0, 0))
             && !Lessons_IsRunning()) {
-            fn_800C70F8(pV, 1);
+            GolfCamera_SetSkipFancyPreshotCams(pV, 1);
             if (!CameraController_IsFadeOn(pV)) {
                 CameraController_FadeOut(pV, 0.25f, (f32*)&vOffset);
-                fn_800C7080(pV);
+                GolfCamera_ForcePreShotEnding(pV);
             }
         }
     } else {
@@ -335,21 +335,22 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
             AI_RehearseShot(nPlayer, NULL, 0, CPU_TOLERANCE);
         }
         if (!Lessons_IsRunning() && Controller_AnyPadHasButtons(Controller_GetButtonMask(0, 0))) {
-            fn_800C70F8(pV, 1);
+            GolfCamera_SetSkipFancyPreshotCams(pV, 1);
             if (!CameraController_IsFadeOn(pV)) {
                 CameraController_FadeOut(pV, 0.25f, (f32*)&vOffset);
-                fn_800C7080(pV);
+                GolfCamera_ForcePreShotEnding(pV);
             }
         }
     }
     if (fn_80095780(gPlayers[nPlayer].pChar) != 10 && fn_80095780(gPlayers[nPlayer].pChar) != 1 &&
-        fn_800C6E88(pV, nPlayer)) {
+        GolfCamera_IsThereACameraGoingToBeTimeTriggered(pV, nPlayer)) {
         fn_80095744(gPlayers[nPlayer].pChar, 5);
         CharacterState_UpdateSKAState(gPlayers[nPlayer].pChar);
         CameraController_PostEvent(pV, 0x17, nPlayer);
     }
     if (CameraController_IsFadeOutDone(pV)
-        && (fn_800C6F7C(pV, nPlayer, 0.25f) || !fn_800C6E88(pV, nPlayer))) {
+        && (GolfCamera_IsPreShotCamReadyForFade(pV, nPlayer, 0.25f)
+            || !GolfCamera_IsThereACameraGoingToBeTimeTriggered(pV, nPlayer))) {
         if (bInHand) {
             if (fn_80095780(gPlayers[nPlayer].pChar) == 10) {
                 Physics_DropBall(&gPlayers[nPlayer].ball, gPlayers[nPlayer].vBall);
@@ -364,7 +365,7 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
         GOLFERSTATE_Switch(GS_SHOT_SETUP, nPlayer);
     }
     if (fn_80095780(gPlayers[nPlayer].pChar) != 10 && fn_80095780(gPlayers[nPlayer].pChar) != 1 &&
-        fn_800C6F7C(pV, nPlayer, 0.25f) && !CameraController_IsFadeOn(pV)) {
+        GolfCamera_IsPreShotCamReadyForFade(pV, nPlayer, 0.25f) && !CameraController_IsFadeOn(pV)) {
         CameraController_FadeOut(pV, 0.25f, (f32*)&vOffset);
     } else if ((fn_80095780(gPlayers[nPlayer].pChar) == 10 || fn_80095780(gPlayers[nPlayer].pChar) == 1) &&
                gPlayers[nPlayer].pChar->fAnimTime > gPlayers[nPlayer].pChar->fAnimEnd - 0.25f &&
@@ -429,7 +430,7 @@ void STATEFUNC_ShotSetupInit(int nPlayer) {
 
 // A human goes straight on to state 10 (the swing). A CPU rehearses its shot here, one frame at a
 // time, and moves on once the rehearsal is done, more than a second has passed (3 s in mode 11) and
-// fn_800C7100(view) agrees - or when its time is up: 4 s; in modes 6 and 7 (which wait while
+// GolfCamera_IsSetUpCameraDone(view) agrees - or when its time is up: 4 s; in modes 6 and 7 (which wait while
 // SpeedGolfPoints_HoleFinished) 1.5 s on the hole's first stroke and 3.5 s after. Out of time, an unfinished
 // rehearsal is finished (nRehearseState 3); then AI_ApplyError and state 10.
 void STATEFUNC_ShotSetupUpdate(int nPlayer) {
@@ -465,7 +466,7 @@ void STATEFUNC_ShotSetupUpdate(int nPlayer) {
             fMax = 4.0f;
             break;
         }
-        if ((bDone && gPlayers[nPlayer].fThinkTime > fMin && fn_800C7100(pView)) ||
+        if ((bDone && gPlayers[nPlayer].fThinkTime > fMin && GolfCamera_IsSetUpCameraDone(pView)) ||
             gPlayers[nPlayer].fThinkTime > fMax) {
             if (!bDone) {
                 gPlayers[nPlayer].nRehearseState = 3;
@@ -612,7 +613,7 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
         pV = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
         GolfCamera_ChooseSpecialSwing(pV, nPlayer);
         Gaud_SwingBallHit((u8)nPlayer);
-        if (fn_800C7138(pV) == 0) {
+        if (GolfCamera_GetSpecialSwingType(pV) == 0) {
             EVENT_Trigger(nPlayer, 0x3B, 0, 0);
         }
         if (gpGame->b283 != 0 &&
@@ -734,9 +735,9 @@ void STATEFUNC_ReplaySwingInit(int nPlayer) {
 
 // State 11: the swing animation in slow motion. Nothing more until it passes its ball-hit event
 // (2). Then in a replay the ball launches and it is state 12; otherwise once
-// GolfCamera_NumCompletedReplayCams(view) reaches fn_800C6B38(view) event 0xA fires, the ball
-// launches and it is state 12; before that the slow-mo camera advances (fn_800C5CEC) and one of two
-// swing blends restarts.
+// GolfCamera_NumCompletedReplayCams(view) reaches GolfCamera_HowManyReplaySwings(view) event 0xA
+// fires, the ball launches and it is state 12; before that the slow-mo camera advances
+// (fn_800C5CEC) and one of two swing blends restarts.
 void STATEFUNC_ReplaySwingUpdate(int nPlayer) {
     View* pV    = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
     u8    bSpecial = 0;
@@ -749,7 +750,7 @@ void STATEFUNC_ReplaySwingUpdate(int nPlayer) {
             SKEL_RelaxIK(gPlayers[nPlayer].pChar->pModel->pSkel);
             SW_vImpact(nPlayer);
             GOLFERSTATE_Switch(GS_SIMULATE, nPlayer);
-        } else if (GolfCamera_NumCompletedReplayCams(pV) >= fn_800C6B38(pV)) {
+        } else if (GolfCamera_NumCompletedReplayCams(pV) >= GolfCamera_HowManyReplaySwings(pV)) {
             EVENT_Trigger(nPlayer, 0xA, &gPlayers[nPlayer].ball, 1);
             GolfCamera_Choose3ScreenCam(pV, nPlayer);
             SKEL_RelaxIK(gPlayers[nPlayer].pChar->pModel->pSkel);
@@ -758,7 +759,7 @@ void STATEFUNC_ReplaySwingUpdate(int nPlayer) {
         } else {
             fn_800C5CEC(pV, nPlayer);
             GameEffects_SetSuperSlowMo(1, nPlayer, GolfCamera_ReplaySwingSpeed(pV));
-            if (GolfCamera_NumCompletedReplayCams(pV) >= fn_800C6B38(pV)) {
+            if (GolfCamera_NumCompletedReplayCams(pV) >= GolfCamera_HowManyReplaySwings(pV)) {
                 bSpecial = fn_800C5FE4(pV, nPlayer);
             }
             if (bSpecial) {
@@ -782,7 +783,7 @@ void STATEFUNC_ReplaySwingUpdate(int nPlayer) {
 void STATEFUNC_ReplaySwingExit(int nPlayer) {
     GameEffects_SetHalfTime(0, nPlayer);
     GameEffects_SetSuperSlowMo(0, nPlayer, 0.0f);
-    fn_800C6E14();
+    GolfCamera_DisableSlowMoSingCam();
     if (gSession.bReplay != 0) {
         EVENT_Trigger(nPlayer, 0x3B, 0, 0);
     } else {
@@ -1199,7 +1200,8 @@ void STATEFUNC_SimulateInit(int nPlayer) {
         Mem_cpy(&p->ballBefore, &p->ball, sizeof(Ball));
     }
     p->ballBefore.nPlayer = -1;
-    if (fn_80095780(gPlayers[nPlayer].pChar) != 11 && Lessons_AllowFlightCamera() && !fn_800C6CB0()) {
+    if (fn_80095780(gPlayers[nPlayer].pChar) != 11 && Lessons_AllowFlightCamera()
+        && !GolfCamera_bIs3ScreenCamOn()) {
         nView = gPlayers[nPlayer].nView[0];
         CameraController_SetCameraMode(ViewController_GetCameraControl(nView), 0xE, nPlayer, nView);
     }
@@ -1289,11 +1291,11 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
             if (gPlayers[nPlayer].ballBefore.nState != 0) {
                 gPlayers[nPlayer].ballBefore.nState = 1;
             }
-            if (fn_800C6D28()) {
-                fn_800C6DE4();
+            if (GolfCamera_IsMatrixCamActive()) {
+                GolfCamera_DisableMatrixCam();
             }
             if (GolfCamera_IsSuperZoomCamActive()) {
-                fn_800C6DFC();
+                GolfCamera_DisableSuperZoomCam();
             }
             REPLAY_Play(nPlayer);
             GOLFERSTATE_Switch(GS_REPLAY_SWING, nPlayer);
@@ -1303,11 +1305,11 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
     if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x19, 0)) &&
         !(gPlayers[nPlayer].uFlags & 8) && GM_PlayerTakeMulligan(nPlayer)) {
         REPLAY_Stop();
-        if (fn_800C6D28()) {
-            fn_800C6DE4();
+        if (GolfCamera_IsMatrixCamActive()) {
+            GolfCamera_DisableMatrixCam();
         }
         if (GolfCamera_IsSuperZoomCamActive()) {
-            fn_800C6DFC();
+            GolfCamera_DisableSuperZoomCam();
         }
     }
 }
@@ -1345,8 +1347,8 @@ void STATEFUNC_InTheHoleUpdate(int nPlayer) {
 
     if (lbl_80281E12 != 0) {
         lbl_80281E12 = 0;
-        fn_800C7168(pV, GM_ChooseRemoveBallState(nPlayer));
-        if (fn_800C7170(pV)) {
+        GolfCamera_SetPostShowRemoveBall(pV, GM_ChooseRemoveBallState(nPlayer));
+        if (GolfCamera_ShowPostRemoveBall(pV)) {
             GolfCamera_SetPostShowPostShotAnimations(pV, 1);
             return;
         }
@@ -1362,7 +1364,8 @@ void STATEFUNC_InTheHoleUpdate(int nPlayer) {
             }
         }
     }
-    if (fn_800C7170(pV) && pV->nCurCamera != 0x10 && pV->script.nFade != 1 && pV->script.nFade != 4) {
+    if (GolfCamera_ShowPostRemoveBall(pV) && pV->nCurCamera != 0x10 && pV->script.nFade != 1
+        && pV->script.nFade != 4) {
         gPlayers[nPlayer].uFlags |= 2;
         GOLFERSTATE_Switch(GS_FADE_TO_REMOVE_BALL, nPlayer);
         return;
@@ -1383,7 +1386,7 @@ void STATEFUNC_InTheHoleUpdate(int nPlayer) {
 void STATEFUNC_ConcededInit(int nPlayer) {
     Vec4  vOffset = {0.0f, 0.0f, 0.0f, 0.5f};
     View* pV      = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
-    fn_800C7178(pV, nPlayer);
+    GolfCamera_AbortAllSpecialSwings(pV, nPlayer);
     CameraController_SetCameraMode(pV, 0x19, nPlayer, gPlayers[nPlayer].nView[0]);
     if (pV->script.nFade == 1 || pV->script.nFade == 3 || pV->script.nFade == 4) {
         CameraController_FadeIn(pV, 0.25f, (f32*)&vOffset);

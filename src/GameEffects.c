@@ -105,12 +105,12 @@ GameEffects* GameEffects_ResetGameEffectTimeSettings(void) {
 
 // The game's time step for a frame that took fFrameTime seconds (the main loop asks once a frame,
 // fn_8006D8E8). FRAME_TIME when the fixed step is on or a single step is pending (the request is
-// used up), 0 while the golfer state is frozen, and 0 outright when fn_800C6CCC says so. Otherwise
-// the frame is rounded to whole 60 Hz ticks (0 to 3; a longer frame counts as 1), then scaled: to
-// 3/4 while the golf cameras' b56 is set (fn_800C6CB0) and the golfer has not passed animation tag
-// 2 (ComicCam_HasBallBeenHit); else doubled while the timed double speed runs (b9, until fC counts down below
-// 0); else doubled with double time and halved with half time (counting n28). Super slow motion
-// then multiplies it by fSlowMo.
+// used up), 0 while the golfer state is frozen, and 0 outright when GolfCamera_bIs3ScreenFreezeOn
+// says so. Otherwise the frame is rounded to whole 60 Hz ticks (0 to 3; a longer frame counts as
+// 1), then scaled: to 3/4 while the golf cameras' b56 is set (GolfCamera_bIs3ScreenCamOn) and the
+// golfer has not passed animation tag 2 (ComicCam_HasBallBeenHit); else doubled while the timed
+// double speed runs (b9, until fC counts down below 0); else doubled with double time and halved with half time (counting
+// n28). Super slow motion then multiplies it by fSlowMo.
 f32 GameEffects_AdjustTimeRate(f32 fFrameTime) {
     f32 fTicks = 1.0f;
     f32 fBest = 10000.0f;
@@ -128,7 +128,7 @@ f32 GameEffects_AdjustTimeRate(f32 fFrameTime) {
         }
         GameEffects_ClearSingleStep();
     }
-    if (fn_800C6CCC()) {
+    if (GolfCamera_bIs3ScreenFreezeOn()) {
         return 0.0f;
     }
     for (i = 0; i < 5; i++) {
@@ -140,7 +140,7 @@ f32 GameEffects_AdjustTimeRate(f32 fFrameTime) {
             break;
         }
     }
-    if (fn_800C6CB0()) {
+    if (GolfCamera_bIs3ScreenCamOn()) {
         if (!ComicCam_HasBallBeenHit()) {
             fTicks *= 0.75f;
         }

@@ -866,7 +866,7 @@ u8     CameraController_IsFadeOn(View* pView);             // script.nFade 1, 2 
 void   CameraController_HoldFadeColor(View* pView, f32* pVec);  // script.nFade 3: hold the colour pVec over the view
 void   CameraController_PostEvent(View* pView, int nKind, int nPlayer);
 void   CameraController_ResetAimMarkerInSwingCamera(View* pView, int nPlayer);
-u8     CameraController_bDontClearFrameBuffer(void);               // fn_800C6CB0's answer (gomainloop tests it)
+u8     CameraController_bDontClearFrameBuffer(void);               // GolfCamera_bIs3ScreenCamOn's answer (gomainloop tests it)
 void   CameraController_LagSideVector(f32* pA, f32* pB, f32* pOut);   // the green zoom-to-aim camera: View.v20 as pA and pOut
 
 // ---- the golf cameras (GoGolfCam.c) ---------------------------------------------------------
@@ -890,33 +890,33 @@ void   GolfCamera_CutToGolferDoneAnimatingCam(View* pView, int nPlayer);
 void   GolfCamera_SwitchCrAPCamera(View* pView, char* szName, int nShot, u8 bBlend, u8 bForce, int n6);
 u8     fn_800C6604(View* pView);
 void   GolfCamera_ChooseSpecialSwing(View* pView, int nPlayer);
-int    fn_800C6B38(View* pView);
+int    GolfCamera_HowManyReplaySwings(View* pView);
 f32    GolfCamera_ReplaySwingSpeed(View* pView);        // the slow-motion rate for the swing camera kind
-void   fn_800C6C8C(void);
-u8     fn_800C6CB0(void);
-u8     fn_800C6CCC(void);
-u8     fn_800C6D28(void);
+void   GolfCamera_RestartHole(void);
+u8     GolfCamera_bIs3ScreenCamOn(void);
+u8     GolfCamera_bIs3ScreenFreezeOn(void);
+u8     GolfCamera_IsMatrixCamActive(void);
 u8     GolfCamera_IsSuperZoomCamActive(void);
 u8     GolfCamera_IsSlowMoSwingCamActive(void);
 u8     GolfCamera_IsFreezeTimeActive(void);
-void   fn_800C6DE4(void);
-void   fn_800C6DFC(void);
-void   fn_800C6E14(void);
-void   fn_800C6E2C(void);
-u8     fn_800C6E88(View* pView, int nPlayer);
-u8     fn_800C6F7C(View* pView, int nPlayer, f32 fLeft);
-void   fn_800C7080(View* pView);
-void   fn_800C70F8(View* pView, int a);
-u8     fn_800C7100(View* pView);
-int    fn_800C7138(View* pView);
+void   GolfCamera_DisableMatrixCam(void);
+void   GolfCamera_DisableSuperZoomCam(void);
+void   GolfCamera_DisableSlowMoSingCam(void);
+void   GolfCamera_DisableHeartBeatCam(void);
+u8     GolfCamera_IsThereACameraGoingToBeTimeTriggered(View* pView, int nPlayer);
+u8     GolfCamera_IsPreShotCamReadyForFade(View* pView, int nPlayer, f32 fLeft);
+void   GolfCamera_ForcePreShotEnding(View* pView);
+void   GolfCamera_SetSkipFancyPreshotCams(View* pView, int a);
+u8     GolfCamera_IsSetUpCameraDone(View* pView);
+int    GolfCamera_GetSpecialSwingType(View* pView);
 void   GolfCamera_SetCameraMatrixMode(int a);
 u8     GolfCamera_IsScriptMatrixModeOn(void);
 void   GolfCamera_SetPostShowPostShotAnimations(View* pView, int a);
 u8     GolfCamera_ShowPostShotAnimations(View* pView);
-void   fn_800C7168(View* pView, int a);
-u8     fn_800C7170(View* pView);
-void   fn_800C7178(View* pView, int nPlayer);
-u8     fn_800C71A4(View* pView, int nPlayer);
+void   GolfCamera_SetPostShowRemoveBall(View* pView, int a);
+u8     GolfCamera_ShowPostRemoveBall(View* pView);
+void   GolfCamera_AbortAllSpecialSwings(View* pView, int nPlayer);
+u8     GolfCamera_IsBallFlightPaused(View* pView, int nPlayer);
 u8     GolfCamera_IsZoomCamDone(View* pView, int nPlayer);
 
 // ---- frame buffers (GoFrameBuf.c) -----------------------------------------------------------

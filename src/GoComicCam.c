@@ -427,7 +427,7 @@ u8 ComicCam_IsComicCamOver(f32* pRect, int nPlayer) {
 }
 
 // Is the comic camera moving on to its next panel (bNext)? EA calls that the frozen screen:
-// fn_800C6CCC asks.
+// GolfCamera_bIs3ScreenFreezeOn asks.
 u8 ComicCam_IsScreenFrozen(void) {
     return lbl_80282178->bNext;
 }

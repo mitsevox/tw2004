@@ -275,8 +275,8 @@ void  Gaud_Pause(int a);
 void  Gaud_PlayGameUISound(u8 a, int b);
 s32   Gaud_RewardCommentaryIsPlaying(void);
 void  Gaud_RestartMusic(void);
-u8    fn_800C6E44(View* pView);
-u8    fn_800C708C(View* pView);
+u8    GolfCamera_IsPostShotCamDone(View* pView);
+u8    GolfCamera_IsCameraTrackingPlayer(View* pView);
 void  fn_800C9038(int nView, f32* pLong, f32* pSide);    // GoBreakLine.c
 s32   fn_800D2B4C(int nHole);
 s32   fn_800D2D40(int nTeeSet);
@@ -907,8 +907,9 @@ void GM_vGetGolferUserMoney(MsgArg* pArgs, MsgArg* pResult) {
 
 // Message 27: whether the post-shot camera is done with player pArgs[0] (1; always for players 5
 // and up): 1 when he is not in a reaction animation (nCurState not 9, 11 or 12), or when the
-// camera's script has ended (fn_800C6E44) and either it is not tracking him (fn_800C708C) or his
-// animation is paused or has less than the camera tuning's f170 left.
+// camera's script has ended (GolfCamera_IsPostShotCamDone) and either it is not tracking him
+// (GolfCamera_IsCameraTrackingPlayer) or his animation is paused or has less than the camera
+// tuning's f170 left.
 void GM_vIsPostShotCameraDone(MsgArg* pArgs, MsgArg* pResult) {
     u8 bPostShotCamDone;        // the locals are TW07's
     u8 bCamTrackingPlayer;
@@ -920,8 +921,10 @@ void GM_vIsPostShotCameraDone(MsgArg* pArgs, MsgArg* pResult) {
         pResult->i = 1;
         return;
     }
-    bPostShotCamDone = fn_800C6E44(ViewController_GetCameraControl(gPlayers[pArgs[0].i].nView[0]));
-    bCamTrackingPlayer = fn_800C708C(ViewController_GetCameraControl(gPlayers[pArgs[0].i].nView[0]));
+    bPostShotCamDone = GolfCamera_IsPostShotCamDone(
+            ViewController_GetCameraControl(gPlayers[pArgs[0].i].nView[0]));
+    bCamTrackingPlayer = GolfCamera_IsCameraTrackingPlayer(
+            ViewController_GetCameraControl(gPlayers[pArgs[0].i].nView[0]));
     bAnimPaused = fn_80062C1C(gPlayers[pArgs[0].i].pChar);
     bNotReactionAnim = gPlayers[pArgs[0].i].pChar->nCurState != 9 &&
                        gPlayers[pArgs[0].i].pChar->nCurState != 11 &&

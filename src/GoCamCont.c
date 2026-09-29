@@ -696,10 +696,10 @@ void CameraController_SetShakeAmount(View* pView, f32 fF0, f32 fF4) {
 }
 
 // Whether the view's frame buffer is kept rather than cleared: the golf cameras' b56 flag
-// (fn_800C6CB0; 0 before they are set up). gomainloop.c then draws its full-screen quad with flags
-// 1 instead of 3.
+// (GolfCamera_bIs3ScreenCamOn; 0 before they are set up). gomainloop.c then draws its full-screen
+// quad with flags 1 instead of 3.
 u8 CameraController_bDontClearFrameBuffer(void) {
-    return fn_800C6CB0();
+    return GolfCamera_bIs3ScreenCamOn();
 }
 
 // Restarts the view's current shot: the script cuts to it again (blend 5), so its look-at point

@@ -261,8 +261,8 @@ void fn_8011E6E8(void) {
         lbl_80282514 = 1;
         return;
     }
-    // port: as in fn_8011E974, EA's GoGrass.c saw fn_800C6CB0 as returning int
-    if (((int (*)(void))fn_800C6CB0)() != 0) {
+    // port: as in fn_8011E974, EA's GoGrass.c saw GolfCamera_bIs3ScreenCamOn as returning int
+    if (((int (*)(void))GolfCamera_bIs3ScreenCamOn)() != 0) {
         return;
     }
     if (lbl_80281900->f3D4 != lbl_80281900->f3D8) {
@@ -297,9 +297,9 @@ void fn_8011E6E8(void) {
 }
 
 void fn_8011E974(void) {
-    // port: EA's GoGrass.c saw fn_800C6CB0 as returning int (its result is not masked here); it
+    // port: EA's GoGrass.c saw GolfCamera_bIs3ScreenCamOn as returning int (its result is not masked here); it
     //       returns u8
-    if (lbl_80281900->p370 != NULL && lbl_80281900->n3E0 != 0 && ((int (*)(void))fn_800C6CB0)() == 0) {
+    if (lbl_80281900->p370 != NULL && lbl_80281900->n3E0 != 0 && ((int (*)(void))GolfCamera_bIs3ScreenCamOn)() == 0) {
         fn_8011EF88();
         fn_8011F3AC();
         fn_8011F374();

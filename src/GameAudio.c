@@ -1059,7 +1059,7 @@ void Gaud_SwingBallHit(u8 nPlayer) {
     nIdSwing = pView->n0;
     nIdA = pView->n2;
     nIdB = pView->n3;
-    nKind = fn_800C7138(ViewController_GetCameraControl(pPlayer->nView[0]));
+    nKind = GolfCamera_GetSpecialSwingType(ViewController_GetCameraControl(pPlayer->nView[0]));
     bRestore = 1;
     nMode = Game_GetMode();
     if (fn_8006BEA4()) {
@@ -1470,7 +1470,7 @@ void Gaud_InitSpecialShot(u8 nPlayer) {
     u8 n;
 
     pView = &lbl_801F1790[0];
-    nKind = fn_800C7138(ViewController_GetCameraControl(0));
+    nKind = GolfCamera_GetSpecialSwingType(ViewController_GetCameraControl(0));
     bPlay = 1;
     n = 0;
     if (Game_GetMode() < 6 || Game_GetMode() > 8) {
@@ -1546,7 +1546,7 @@ void Gaud_UpdtSpecialShot(u8 nPlayer, u8 n) {
     GameAudioView* pView;
 
     pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
-    switch (fn_800C7138(ViewController_GetCameraControl(0))) {
+    switch (GolfCamera_GetSpecialSwingType(ViewController_GetCameraControl(0))) {
     case 4:
         n += 4;
         // fall through
@@ -1568,7 +1568,7 @@ void Gaud_ExitSpecialShot(u8 nPlayer) {
     int nKind;
 
     pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
-    nKind = fn_800C7138(ViewController_GetCameraControl(0));
+    nKind = GolfCamera_GetSpecialSwingType(ViewController_GetCameraControl(0));
     if (Game_GetMode() < 6 || Game_GetMode() > 8) {
         Aud_Mute(0, 0);
         Aud_EmiSetTrackStatus(pView->n2, 1, 0);

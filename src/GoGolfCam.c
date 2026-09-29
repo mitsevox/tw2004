@@ -31,7 +31,7 @@ void     ComicCam_StartComicCam(int a, View* pView, int nPlayer);
 u8       ComicCam_IsScreenFrozen(void);
 void     GolfCamera_ComputeSteepSlopeCamVectors(View* pView, int nPlayer);
 void     fn_800C5D64(View* pView, f32* pCam, f32* pSub, int nPlayer);
-u8       fn_800C708C(View* pView);
+u8       GolfCamera_IsCameraTrackingPlayer(View* pView);
 void     fn_80038010(u8 a, int n, f32* pVec);
 void     fn_800380A8(u8 a, f32* pVec, u8 b, int nSlot, f32 f1, f32 f2);
 int      CameraController_GetClippedGolfer(void);
@@ -2053,7 +2053,7 @@ void GolfCamera_ProcessBallFlightCamera(View* pView, int nPlayer) {
     RC_spGetRenderCtxViewport(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0]));
     Vec3Copy(pCam, vOld);
     CameraController_CheckForEvents(pView, nPlayer);
-    if (fn_800C6D28()) {
+    if (GolfCamera_IsMatrixCamActive()) {
         fTime = fn_800C54FC(pView, pCam, pSub, nPlayer);
     } else if (GolfCamera_IsSuperZoomCamActive()) {
         fTime = fn_800C5A70(pView, pCam, pSub, nPlayer);
@@ -2185,7 +2185,7 @@ void GolfCamera_ProcessBallFlightCamera(View* pView, int nPlayer) {
         pView->script.fFadeTime = 0.0f;
     }
     CamScript_RunScript(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, fTime);
-    if (fn_800C6D28() && gSession.nPaused == 0) {
+    if (GolfCamera_IsMatrixCamActive() && gSession.nPaused == 0) {
         fn_80038054(1, ViewController_GetCurrentViewControllerID(), 0.0f, lbl_80281F78->f64);
     }
 }
@@ -3230,8 +3230,8 @@ void fn_800C4FF0(View* pView, f32* pFrom, f32* pTo, int nPlayer) {
     pView->script.pNextShot->f4C = 1.0f;    // f4C is set just above; the original overwrites it
 }
 
-// The matrix camera's tick (the ball-flight camera runs it while fn_800C6D28): the screen effect
-// fn_80038054 (the tuning's f64); with no next shot, clear b54 (a freeze-time flag:
+// The matrix camera's tick (the ball-flight camera runs it while GolfCamera_IsMatrixCamActive): the
+// screen effect fn_80038054 (the tuning's f64); with no next shot, clear b54 (a freeze-time flag:
 // GolfCamera_IsFreezeTimeActive tests it), release the golfer's animation (SKATime_UnPause) and queue
 // the shot from before (the current shot's p44) as a hand-made shot. Returns the time to run the
 // script by: with the tuning's f60 set, f60 once every f60 seconds and 0 in between, else one
@@ -3441,9 +3441,9 @@ void fn_800C5CEC(View* pView, int nPlayer) {
 
 // Camera 13's next angle (its init and fn_800C5CEC call it): a cut to a random shot of kind 13
 // other than the current one (unless it would hide the golfer) while script.n110 is under
-// fn_800C6B38's count, then back to the shot it started from (kept in shot19C.p44). Swing camera
-// kinds 15 and 16 cut to a shot of kind 0x22 instead and set b59. The callers pass the view's
-// position and aim, but it fetches them again.
+// GolfCamera_HowManyReplaySwings's count, then back to the shot it started from (kept in
+// shot19C.p44). Swing camera kinds 15 and 16 cut to a shot of kind 0x22 instead and set b59. The
+// callers pass the view's position and aim, but it fetches them again.
 void fn_800C5D64(View* pView, f32* pViewCam, f32* pViewSub, int nPlayer) {
     CamShot* pShot;
     f32* pCam;
@@ -3463,7 +3463,7 @@ void fn_800C5D64(View* pView, f32* pViewCam, f32* pViewSub, int nPlayer) {
         if (pView->script.n110 == 0) {
             pView->shot19C.p44 = pView->script.pShot;
         }
-        if (pView->script.n110 >= fn_800C6B38(pView)) {
+        if (pView->script.n110 >= GolfCamera_HowManyReplaySwings(pView)) {
             pView->script.pShot = pView->shot19C.p44;
             pView->script.pNextShot = NULL;
             pView->script.fCamTime = 0.0f;
@@ -3744,7 +3744,10 @@ void GolfCamera_ChooseSpecialSwing(View* pView, int nPlayer) {
     }
 }
 
-int fn_800C6B38(View* pView) {
+// How many more replay angles the replay swing camera cuts to for the swing camera kind
+// (View.n260): 2 for kinds 2, 8 and 11, 1 for kind 5, none otherwise. STATEFUNC_ReplaySwingUpdate
+// replays the swing until script.n110 reaches it.
+int GolfCamera_HowManyReplaySwings(View* pView) {
     switch (pView->n260) {
     case 2:
     case 8:
@@ -3763,7 +3766,12 @@ int fn_800C6B38(View* pView) {
     return 0;
 }
 
-// The slow-motion rate for the swing camera kind.
+// The time rate the replay swing plays at (STATEFUNC_ReplaySwingInit and Update hand it to
+// GameEffects_SetSuperSlowMo), by the swing camera kind (View.n260): 0.5 for kind 2; for kinds 8,
+// 11 and 5, 0.5 at first, then 0.2, 0.65 and 0.2 once 2 (kind 5: 1) replay angles are done
+// (fn_800C4518); kinds 15 and 16 switch between 0.2 and 1.5 at the top of the backswing
+// (script.f10C); kind 7 the shared state's f64 while b5A (the heart beat camera) is on; 1
+// otherwise.
 f32 GolfCamera_ReplaySwingSpeed(View* pView) {
     switch (pView->n260) {
     case 2:
@@ -3807,19 +3815,24 @@ f32 GolfCamera_ReplaySwingSpeed(View* pView) {
     return 1.0f;
 }
 
-void fn_800C6C8C(void) {
-    fn_800C6DE4();
-    fn_800C6DFC();
+// Called when the hole is restarted (GM_RestartHole): turns the matrix camera and the super zoom
+// off (GolfCamera_DisableMatrixCam, GolfCamera_DisableSuperZoomCam).
+void GolfCamera_RestartHole(void) {
+    GolfCamera_DisableMatrixCam();
+    GolfCamera_DisableSuperZoomCam();
 }
 
-u8 fn_800C6CB0(void) {
+// The comic (3-screen) camera is on (the shared state's b56); 0 before the state exists.
+u8 GolfCamera_bIs3ScreenCamOn(void) {
     if (gGolfCamState == NULL) {
         return 0;
     }
     return gGolfCamState->b56;
 }
 
-u8 fn_800C6CCC(void) {
+// The comic camera is on (b56) and moving between panels (ComicCam_IsScreenFrozen); 0 before the
+// shared state exists. GameEffects_AdjustTimeRate stops time for it.
+u8 GolfCamera_bIs3ScreenFreezeOn(void) {
     int bOn;
     if (gGolfCamState == NULL) {
         return 0;
@@ -3831,13 +3844,17 @@ u8 fn_800C6CCC(void) {
     return bOn;
 }
 
-u8 fn_800C6D28(void) {
+// The matrix camera is running (b54) or the camera script's matrix mode is on (b55,
+// GolfCamera_SetCameraMatrixMode); 0 before the shared state exists. The ball-flight camera then
+// takes its time step from the matrix camera's tick.
+u8 GolfCamera_IsMatrixCamActive(void) {
     if (gGolfCamState == NULL) {
         return 0;
     }
     return gGolfCamState->b54 || gGolfCamState->b55;
 }
 
+// The super zoom is running (b58); 0 before the shared state exists.
 u8 GolfCamera_IsSuperZoomCamActive(void) {
     if (gGolfCamState == NULL) {
         return 0;
@@ -3845,6 +3862,8 @@ u8 GolfCamera_IsSuperZoomCamActive(void) {
     return gGolfCamState->b58;
 }
 
+// The slow-motion swing camera is on (b59, set when the replay camera cuts to shot kind 0x22 for
+// swing kinds 15 and 16); 0 before the shared state exists.
 u8 GolfCamera_IsSlowMoSwingCamActive(void) {
     if (gGolfCamState == NULL) {
         return 0;
@@ -3852,6 +3871,8 @@ u8 GolfCamera_IsSlowMoSwingCamActive(void) {
     return gGolfCamState->b59;
 }
 
+// Time is frozen for a camera: the matrix camera (b54), the super zoom (b58) or the camera script's
+// matrix mode (b55) is on; 0 before the shared state exists.
 u8 GolfCamera_IsFreezeTimeActive(void) {
     if (gGolfCamState == NULL) {
         return 0;
@@ -3862,31 +3883,38 @@ u8 GolfCamera_IsFreezeTimeActive(void) {
     return 0;
 }
 
-void fn_800C6DE4(void) {
+// Clear b54 (the matrix camera is running), if the shared state exists.
+void GolfCamera_DisableMatrixCam(void) {
     if (gGolfCamState != NULL) {
         gGolfCamState->b54 = 0;
     }
 }
 
-void fn_800C6DFC(void) {
+// Clear b58 (the super zoom is running), if the shared state exists.
+void GolfCamera_DisableSuperZoomCam(void) {
     if (gGolfCamState != NULL) {
         gGolfCamState->b58 = 0;
     }
 }
 
-void fn_800C6E14(void) {
+// Clear b59 (the slow-motion swing camera is on), if the shared state exists. EA's name spells
+// Swing as Sing.
+void GolfCamera_DisableSlowMoSingCam(void) {
     if (gGolfCamState != NULL) {
         gGolfCamState->b59 = 0;
     }
 }
 
-void fn_800C6E2C(void) {
+// Clear b5A (the heart beat camera is beating), if the shared state exists.
+void GolfCamera_DisableHeartBeatCam(void) {
     if (gGolfCamState != NULL) {
         gGolfCamState->b5A = 0;
     }
 }
 
-u8 fn_800C6E44(View* pView) {
+// Is the post-shot camera done (GM_vIsPostShotCameraDone): its one cut made (script.n110 is 1), no
+// next shot queued, and no current shot or one past its length (f4C).
+u8 GolfCamera_IsPostShotCamDone(View* pView) {
     if (pView->script.n110 == 1 && pView->script.pNextShot == NULL
         && (pView->script.pShot == NULL || pView->script.pShot->f4C < pView->script.fCamTime)) {
         return 1;
@@ -3894,7 +3922,11 @@ u8 fn_800C6E44(View* pView) {
     return 0;
 }
 
-u8 fn_800C6E88(View* pView, int nPlayer) {
+// Is a time-triggered camera still to come in the pre-shot sequence: the sequence (p74) has a shot
+// of kind 0x17 and it has not started yet (script.n110 under 1; GolfCamera_ProcessPreShotCamera
+// sets it when kind 0x17 starts). Never with the fancy pre-shot cameras skipped (b268 is 1,
+// GolfCamera_SetSkipFancyPreshotCams).
+u8 GolfCamera_IsThereACameraGoingToBeTimeTriggered(View* pView, int nPlayer) {
     if (pView->b268 == 1) {
         return 0;
     }
@@ -3904,6 +3936,7 @@ u8 fn_800C6E88(View* pView, int nPlayer) {
     return 0;
 }
 
+// Does the pre-shot sequence (p74) have a shot of the kind queued in script.nE0 (0x19 means none)?
 u8 GolfCamera_IsThereAPostPreShotCamera(View* pView, int nPlayer) {
     if (pView->script.nE0 != 0x19 && pView->p74 != NULL
         && DynamicCam_ChooseScriptInSequence(pView->p74, pView->script.nE0, NULL, NULL, NULL, NULL, NULL, nPlayer) != NULL) {
@@ -3912,18 +3945,21 @@ u8 GolfCamera_IsThereAPostPreShotCamera(View* pView, int nPlayer) {
     return 0;
 }
 
-// Is the camera ready to move on: yes with no sequence or no current shot, or once script.n114 is
-// set; no while fn_800C6E88 or GolfCamera_IsThereAPostPreShotCamera has a shot to go to; else when
-// less than fLeft is left on the next shot, or (with none) on both the current shot's f4C and
-// script.fE4 past script.f98.
-u8 fn_800C6F7C(View* pView, int nPlayer, f32 fLeft) {
+// Can the pre-shot camera start its fade, fLeft seconds before it ends (STATEFUNC_PreShotUpdate):
+// yes with no sequence or no current shot, or once script.n114 is set
+// (GolfCamera_ForcePreShotEnding); no while a time-triggered camera
+// (GolfCamera_IsThereACameraGoingToBeTimeTriggered) or a queued one
+// (GolfCamera_IsThereAPostPreShotCamera) is still to come; else when less than fLeft is left before
+// the next shot (GolfCamera_GetTimeToNextShot), or with none queued, when both the current shot's
+// length f4C and script.fE4 are within fLeft of script.f98.
+u8 GolfCamera_IsPreShotCamReadyForFade(View* pView, int nPlayer, f32 fLeft) {
     if (pView->p74 == NULL || pView->script.pShot == NULL) {
         return 1;
     }
     if (pView->script.n114 > 0) {
         return 1;
     }
-    if (fn_800C6E88(pView, nPlayer)) {
+    if (GolfCamera_IsThereACameraGoingToBeTimeTriggered(pView, nPlayer)) {
         return 0;
     }
     if (GolfCamera_IsThereAPostPreShotCamera(pView, nPlayer)) {
@@ -3939,11 +3975,15 @@ u8 fn_800C6F7C(View* pView, int nPlayer, f32 fLeft) {
     return 0;
 }
 
-void fn_800C7080(View* pView) {
+// End the pre-shot camera now: set script.n114, which GolfCamera_IsPreShotCamReadyForFade takes as
+// ready (STATEFUNC_PreShotUpdate).
+void GolfCamera_ForcePreShotEnding(View* pView) {
     pView->script.n114 = 1;
 }
 
-u8 fn_800C708C(View* pView) {
+// Does the next shot (else the current one) follow the golfer: its move kind bAC is one of 1..7
+// (fn_8003DC78)? 0 with neither.
+u8 GolfCamera_IsCameraTrackingPlayer(View* pView) {
     if (pView->script.pNextShot != NULL) {
         return fn_8003DC78(pView->script.pNextShot) != 0;
     }
@@ -3953,57 +3993,75 @@ u8 fn_800C708C(View* pView) {
     return 0;
 }
 
-void fn_800C70F8(View* pView, int a) {
+// Set b268, which skips the fancy pre-shot cameras (GolfCamera_InitPreShotCamera and
+// GolfCamera_IsThereACameraGoingToBeTimeTriggered read it); GM_PlayerTakeMulligan and
+// STATEFUNC_PreShotUpdate set it.
+void GolfCamera_SetSkipFancyPreshotCams(View* pView, int a) {
     pView->b268 = a;
 }
 
-// No current shot, no next one, or more than 5 seconds on this one.
-u8 fn_800C7100(View* pView) {
+// Is the shot set-up camera done (STATEFUNC_ShotSetupUpdate): no current shot, no next shot queued,
+// or more than 5 seconds on this one.
+u8 GolfCamera_IsSetUpCameraDone(View* pView) {
     if (pView->script.pShot == NULL || pView->script.pNextShot == NULL || pView->script.fCamTime > 5.0f) {
         return 1;
     }
     return 0;
 }
 
-int fn_800C7138(View* pView) {
+// The swing camera kind (View.n260) GolfCamera_ChooseSpecialSwing chose for this shot; the
+// special-shot audio (Gaud_InitSpecialShot and the rest) asks.
+int GolfCamera_GetSpecialSwingType(View* pView) {
     return pView->n260;
 }
 
+// Turn the camera script's matrix mode (b55) on or off; while on, GolfCamera_IsFreezeTimeActive
+// answers yes. Unlike the other setters it does not test for the shared state.
 void GolfCamera_SetCameraMatrixMode(int a) {
     gGolfCamState->b55 = a;
 }
 
+// The camera script's matrix mode (b55, GolfCamera_SetCameraMatrixMode).
 u8 GolfCamera_IsScriptMatrixModeOn(void) {
     return gGolfCamState->b55;
 }
 
+// Set b269: whether the golfer's post-shot animations are shown (GolfCamera_ShowPostShotAnimations
+// reads it).
 void GolfCamera_SetPostShowPostShotAnimations(View* pView, int a) {
     pView->b269 = a;
 }
 
+// Are the golfer's post-shot animations shown (b269, GolfCamera_SetPostShowPostShotAnimations)?
 u8 GolfCamera_ShowPostShotAnimations(View* pView) {
     return pView->b269;
 }
 
-void fn_800C7168(View* pView, int a) {
+// Set b26A (TW07: whether the post-shot ball removal is shown); STATEFUNC_InTheHoleUpdate sets it
+// and reads it back (GolfCamera_ShowPostRemoveBall).
+void GolfCamera_SetPostShowRemoveBall(View* pView, int a) {
     pView->b26A = a;
 }
 
-u8 fn_800C7170(View* pView) {
+// Is the post-shot ball removal shown (b26A, GolfCamera_SetPostShowRemoveBall)?
+u8 GolfCamera_ShowPostRemoveBall(View* pView) {
     return pView->b26A;
 }
 
-void fn_800C7178(View* pView, int nPlayer) {
+// Stop every special swing camera when a putt is conceded (STATEFUNC_ConcededInit): the comic
+// camera (fn_800C1790), the slow-motion swing, the matrix and the heart beat cameras.
+void GolfCamera_AbortAllSpecialSwings(View* pView, int nPlayer) {
     GolfCamera_TurnOffComicCam(pView, nPlayer);
-    fn_800C6E14();
-    fn_800C6DE4();
-    fn_800C6E2C();
+    GolfCamera_DisableSlowMoSingCam();
+    GolfCamera_DisableMatrixCam();
+    GolfCamera_DisableHeartBeatCam();
 }
 
-// Is the ball behind the camera (on the far side from where it looks), with a next (else current)
-// shot that fn_800C708C accepts? Never without a current shot, for shot kind 3 (bAD), or once
-// script.f98 passes 5.
-u8 fn_800C71A4(View* pView, int nPlayer) {
+// Should the ball's flight wait this frame (GM_SimulateBallMovement skips its physics steps when
+// gpGame->n294 is set): the ball is behind the camera on the flat (the look and to-ball directions'
+// dot product not above 0) and the camera follows the golfer (GolfCamera_IsCameraTrackingPlayer).
+// Never without a current shot, for a shot of kind 3 (bAD), or once script.f98 passes 5.
+u8 GolfCamera_IsBallFlightPaused(View* pView, int nPlayer) {
     f32 vLook[4];
     f32 vBall[4];
     if (pView->script.pShot == NULL) {
@@ -4028,7 +4086,7 @@ u8 fn_800C71A4(View* pView, int nPlayer) {
     if (Vec3_Dot(vLook, vBall) > 0.0f) {
         return 0;
     }
-    return fn_800C708C(pView);
+    return GolfCamera_IsCameraTrackingPlayer(pView);
 }
 
 // The golfer-done-animating cut has been made (script.n114, set by

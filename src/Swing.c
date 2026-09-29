@@ -983,12 +983,12 @@ void SW_vSetDisplayBoostUI(int nPlayer, int bDisplay) {
 // Each frame (gomainloop), draw the player's boost display (UI_Obj_RenderBoostUI in the player's
 // first view) while it has a power or spin boost, on any shot but a putt, when the display is
 // switched on (SW_vSetDisplayBoostUI), outside a replay, unpaused, and not while the golf camera's
-// fn_800C6CB0() flag is set.
+// GolfCamera_bIs3ScreenCamOn() flag is set.
 void SW_vUIRender2D(int nPlayer) {
     if ((gPlayers[nPlayer].swing.nPowerBoost > 0 || gPlayers[nPlayer].swing.nSpinBoost > 0) &&
         gPlayers[nPlayer].nShotKind != 0 && gPlayers[nPlayer].swing.bDrawBoostUI != 0 &&
         gSession.bReplay == 0 &&
-        gSession.nPaused == 0 && !fn_800C6CB0()) {
+        gSession.nPaused == 0 && !GolfCamera_bIs3ScreenCamOn()) {
         UI_Obj_RenderBoostUI(gPlayers[nPlayer].nView[0]);
     }
 }

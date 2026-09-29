@@ -625,7 +625,7 @@ u8 GM_PlayerTakeMulligan(int nPlayer) {
     if (gSession.bReplay) {
         REPLAY_Stop();
     }
-    fn_800C70F8(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 1);
+    GolfCamera_SetSkipFancyPreshotCams(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 1);
     fn_800957D8(gPlayers[nPlayer].pChar);
     CharacterState_ResetMorphState(gPlayers[nPlayer].pChar, 1);
     GOLFERSTATE_Switch(GS_SWING, nPlayer);
@@ -847,7 +847,7 @@ void GM_RestartHole(void) {
         GUI_HideAllToggleUI();
         GUI_Init();
         GameEffects_ResetGameEffectSettings();
-        fn_800C6C8C();
+        GolfCamera_RestartHole();
         for (i = 0; i < gSession.nNumPlayers; i++) {
             fn_800957D8(PLAYER(i)->pChar);
             CharacterState_ResetMorphState(PLAYER(i)->pChar, 1);
@@ -1191,7 +1191,8 @@ void GM_SimulateBallMovement(int nPlayer) {
     t0 = TI_sReadCounter(0);
     nUpdates = GameEffects_BallUpdatesThisFrame(nPlayer);
     if (gpGame->n294 != 0
-        && fn_800C71A4(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), nPlayer)) {
+        && GolfCamera_IsBallFlightPaused(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]),
+                                         nPlayer)) {
         nUpdates = 0;
     }
     for (i = 0; i < nUpdates; i++) {
