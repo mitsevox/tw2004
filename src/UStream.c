@@ -17,6 +17,7 @@
 #include "ustream.h"
 #include "endian.h"
 #include "core/startup.h"
+#include "core/audtrack.h"
 
 // ---- state -------------------------------------------------------------------------------
 // Everything here is private to the file. CodeWarrior lays out a file's static data in the
@@ -60,12 +61,6 @@ int gnNumHandlers = -1;           // 0x80280DB8 (.sdata): -1 until UStream_Init
 
 void  LLVideo_HandleChunk(void* pChunk);                             // MPG2
 void  Mov_SendSoundBlock(MovieSoundBlock* pBlock);                  // DSPM / VAGM / XADP
-void* Ses_AllocBankHdr(u32 uSize, int nMemory);
-void  Ses_ProcessArticulationData(u32 uMemory);
-void* Ses_AllocSampleAram(u32 uSize, u32 uType);
-void  Ses_ProcessSampleData(u32 uType);
-void* Ses_AllocStreamFileHdr(u32 uSize);
-void  Ses_ProcessStreamFileHdr(void);
 void  fn_8000E708(UStreamParams* p);
 
 static void UStream_ReadDone(int nBytes, int nError);
@@ -559,13 +554,14 @@ static void Stream_ParseBufs(void) {
                     switch (pChunk->uType) {
                     case TAG('s', 'h', 'd', 'r'):
                         if (pChunk->uId == 2) {
-                            gSoundHeader.pDst = Ses_AllocStreamFileHdr(pChunk->uSize);
+                            gSoundHeader.pDst = (u8*)Ses_AllocStreamFileHdr(pChunk->uSize);
                         } else {
                             gSoundHeader.pDst = Ses_AllocBankHdr(pChunk->uSize, pChunk->uId);
                         }
                         break;
                     case TAG('s', 'a', 'm', 'p'):
-                        gSoundHeader.pDst = Ses_AllocSampleAram(pChunk->uSize, pChunk->uId);
+                        // port: pDst holds the sample block's ARAM address, not a pointer
+                        gSoundHeader.pDst = (u8*)(uptr)Ses_AllocSampleAram(pChunk->uSize, pChunk->uId);
                         break;
                     default:
                         gSoundHeader.pDst = NULL;

@@ -125,14 +125,14 @@ LAYOUT_ASSERT(UILoadingScreen, 0x38);
 extern UILoadingScreen gUILoadingScreen;
 
 // A corner of a quad uiProcessPolygon.c UIPoly_UnpackVertex turns into draw arrays (uiArc.c builds
-// them too). Our name: f8..f10 go out as a position, f0/f4 as texture coordinates, au14 as a colour.
+// them too). Our name.
 typedef struct FEVertex {
-    f32 f0;                     // 0x00
-    f32 f4;                     // 0x04
-    f32 f8;                     // 0x08
-    f32 fC;                     // 0x0C
-    f32 f10;                    // 0x10
-    u8  au14[4];                // 0x14  red, green, blue, alpha
+    f32 fU;                     // 0x00  texture coordinates
+    f32 fV;                     // 0x04
+    f32 fX;                     // 0x08  position
+    f32 fY;                     // 0x0C
+    f32 fZ;                     // 0x10
+    u8  auColour[4];            // 0x14  red, green, blue, alpha
 } FEVertex;
 LAYOUT_ASSERT(FEVertex, 0x18);
 
@@ -256,9 +256,10 @@ LAYOUT_ASSERT(FEBio, 0x1F8);
 extern s32 gStartUnlockedGolfers[16];  // the golfers unlocked from the start (GM_vIsGolferUnlockedByDefault)
 
 #define FE_NUM_BIOS 29
-extern FEBio* gpFEBios;             // a copy of the 'BIO ' stream object's data (FE_CharBios_LoadBIOfromStream)
+extern FEBio* gpFEBios;           // a copy of the 'BIO ' stream object's data (FE_CharBios_LoadBIOfromStream)
 
-// The profile backups (FEState.p658) can be moved out to ARAM (FE_MoveBackupsToARAM) and back (FE_RestoreBackupsFromARAM).
+// The profile backups (FEState.p658) can be moved out to ARAM (FE_MoveBackupsToARAM) and back
+// (FE_RestoreBackupsFromARAM).
 #define FE_BACKUP_SIZE 0x41820  // the four slots' backups (4 x 0x10600) and 0x20 more
 extern u32 gFEBackupSize;       // their size
 extern u32 gFEBackupAramAddr;   // their ARAM address while they are there (0: not there)
@@ -484,7 +485,8 @@ struct TexEntry* UI_GetTexBankFirstTexture(struct TexBank* pBank);   // a bank's
 extern int gUILoadingBarBankSlot;                // the bank's slot
 extern struct TexBank*  gpUILoadingBarBank;
 extern struct TexEntry* gpUILoadingBarTexture;
-extern f32 gUILoadingBarTilePos[8][2];          // eight x, y points UI_InitLoadingBarTilePos sets, UI_DrawLoadingBarTile reads
+extern f32 gUILoadingBarTilePos[8][2];          // eight x, y points UI_InitLoadingBarTilePos sets,
+                                                // UI_DrawLoadingBarTile reads
 void FE_CrAP_TurnOnPart(s16 nPart, int b, int i);    // FE_CrAPDB.c
 int  FE_CrAP_GetNumEquippedItemsWithSponsor(s16 n);  // FE_CrAPDB.c: the profile's assets whose n2C is n
 s32  FE_CrAP_CollectSponsorshipItems(void);          // FE_CrAPDB.c: fill lbl_80282470; how many records
@@ -510,8 +512,9 @@ void FE_CrAP_UpdateUserAttributeMods(SaveProfile* pProfile);
 void FE_CrAP_RandomizeCategoryWithUndesirableTest(s16 nPart, int nChance);
 void FE_CrAP_RandomizeFace(SaveProfile* pProfile);
 void FE_CrAP_RandomizeAll(SaveProfile* pProfile);
-int  FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(SaveProfile* pProfile, s16 nPart, int nChance);    // a random b and choice of
-                                        // part nPart; returns the choice (FE_CrAP_RandomizeCrAPCategoryAndSubcategoryItem)
+// A random b and choice of part nPart; returns the choice
+// (FE_CrAP_RandomizeCrAPCategoryAndSubcategoryItem)
+int  FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(SaveProfile* pProfile, s16 nPart, int nChance);
 int  FE_CrAP_RandomizeCrAPCategoryAndSubcategoryItem(SaveProfile* pProfile, s16 nPart, int b, int nChance);
 u8   FE_bIsLicensedGolfer(int n);                // 16 of golfers 0..28: ball type 0 (Session_SetupProfiles)
 void FE_SetupSaleInfo(void);                 // pick the day's random assets (FE_CrAP_UpdateSaleInfo)
@@ -569,7 +572,14 @@ int  FE_GetLastCrAPAsset(void);
 void FE_SetLastCrAPCategory(int nPart);
 int  FE_GetLastCrAPCategory(void);
 void FE_ResetCrAPGolferFromPreview(void);
-void FE_CrAPBall_Render(u8 bTarget);   // Code800B90F4.c: the ball in the menu golfer's hand
+// Code800B90F4.c: the ball the Create-A-Player menu golfer holds.
+void FE_CrAPBall_RegisterStreamClients(void);     // its 'TEO ' models and 'BALF' logo bank
+void FE_CrAPBall_UnRegisterStreamClients(void);
+void FE_CrAPBall_Init(void);
+void FE_CrAPBall_Free(void);
+void FE_CrAPBall_MakeObjects(void);
+void FE_CrAPBall_SetLogo(char* szBall);           // the logo on it (NULL: none)
+void FE_CrAPBall_Render(u8 bTarget);              // the ball in the menu golfer's hand
 
 // ---- the logo editor (FE_LogoDesign.c) -------------------------------------------------------
 
@@ -589,17 +599,18 @@ extern s16* gpLogoClut;               // the palette: 256 colours, 1-bit alpha (
                                         // and 5-5-5 RGB; read signed (lha)
 extern u8 gbLogoClutLoaded;                 // the palette has been copied from "__LogoSquare"
 
-void FE_LogoDesign_SetCurrentLogoNumber(s32 n);                // pick the logo to edit (LogoEdit.nLogo)
-s32  FE_LogoDesign_GetCurrentLogoNumber(void);                 // which logo is edited
-void FE_LogoDesign_SetCurrentLogoMode(s32 nShape);           // set its shape
-void FE_LogoDesign_GetClutEntry(int nColor, u32* pR, u32* pG, u32* pB, u32* pA);  // a palette colour, 0-255 each
-void FE_LogoDesign_RefreshLogo(void);                 // mark the logo changed
-void FE_LogoDesign_SetLogoToPremadeTexture(char* pName);          // load the logo from a texture
-void FE_LogoDesign_SetPixel(int nX, int nY, int nColor);   // set a pixel
-LogoRecord* FE_LogoDesign_GetCurrentLogo(void);          // the logo being edited
-s16* FE_LogoDesign_GetClut(void);                 // the palette
-int  FE_LogoDesign_GetPixelColor(int nX, int nY, u32* pR, u32* pG, u32* pB, u32* pA);  // a pixel's colour index,
-                                        // and its colour as FE_LogoDesign_GetClutEntry gives it
+void FE_LogoDesign_SetCurrentLogoNumber(s32 n);           // pick the logo to edit (LogoEdit.nLogo)
+s32  FE_LogoDesign_GetCurrentLogoNumber(void);            // which logo is edited
+void FE_LogoDesign_SetCurrentLogoMode(s32 nShape);        // set its shape
+// A palette colour, 0-255 each
+void FE_LogoDesign_GetClutEntry(int nColor, u32* pR, u32* pG, u32* pB, u32* pA);
+void FE_LogoDesign_RefreshLogo(void);                     // mark the logo changed
+void FE_LogoDesign_SetLogoToPremadeTexture(char* pName);  // load the logo from a texture
+void FE_LogoDesign_SetPixel(int nX, int nY, int nColor);  // set a pixel
+LogoRecord* FE_LogoDesign_GetCurrentLogo(void);           // the logo being edited
+s16* FE_LogoDesign_GetClut(void);                         // the palette
+// A pixel's colour index, and its colour as FE_LogoDesign_GetClutEntry gives it
+int  FE_LogoDesign_GetPixelColor(int nX, int nY, u32* pR, u32* pG, u32* pB, u32* pA);
 // Copy pixels: bToTexture 0 from a texture into the logo, 1 from the logo into one.
 void FE_LogoDesign_CopyLogoTexturePixels(u8* pDst, u8* pSrc, int bToTexture, int nWidth, int nHeight);
 // The logo's pixels as a texture (in gLogoTexturePixels).
@@ -610,7 +621,7 @@ extern u8 gLogoTexturePixels[64 * 64];  // a logo's pixels laid out as a texture
 
 // ---- the UI's polygon element, loading screen and start-up movies (uiProcessPolygon.c) -------
 
-extern u8 gbUIFirstMenuDraw;         // UI_ClearFirstMenuDraw clears it; the front end's shutdown in game type 3
+extern u8 gbUIFirstMenuDraw;       // UI_ClearFirstMenuDraw clears it; the front end's shutdown in game type 3
                                 // sets it (uiProcessInterface.c UI_CloseInterface)
 void UI_FreeAllEntryPictures(void);
 void UI_ClearFirstMenuDraw(void);

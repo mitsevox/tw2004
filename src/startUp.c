@@ -462,12 +462,12 @@ u32 HwVoice_GetPlayPos(u16 nVoice) {
 void HwVoice_SetSound(u16 nVoice, SoundHeader* pHdr) {
     Voice* p = &gpHwVoices[nVoice];
     int bEnabled = OSDisableInterrupts();
-    p->n8 = pHdr->uC;
+    p->n8 = pHdr->bLoop;
     p->nA = 0;
-    p->uC = pHdr->u8;
-    p->u10 = pHdr->u4;
-    p->u14 = pHdr->u0;
-    if (pHdr->u0 < 0x106800) {
+    p->uC = pHdr->uLoop;
+    p->u10 = pHdr->uEnd;
+    p->u14 = pHdr->uStart;
+    if (pHdr->uStart < 0x106800) {
         p->flags.b.b6_40 = 1;
     } else {
         p->a18[0] = pHdr->a10[0];
@@ -812,8 +812,8 @@ void BootSound_CopyToAram(void) {
     u16 i;
     for (i = 0; i < 2; i++) {
         gBootSounds[i].uAram = AudAram_Alloc(gBootSounds[i].uSize);
-        gBootSounds[i].hdr.u0 += gBootSounds[i].uAram * 2;
-        gBootSounds[i].hdr.u4 += gBootSounds[i].uAram * 2;
+        gBootSounds[i].hdr.uStart += gBootSounds[i].uAram * 2;
+        gBootSounds[i].hdr.uEnd += gBootSounds[i].uAram * 2;
         AudDma_ToAram(gBootSounds[i].uAram, gBootSounds[i].pData, gBootSounds[i].uSize, NULL, 0);
     }
 }

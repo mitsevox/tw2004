@@ -302,8 +302,8 @@ void Emi_SetTrackStep(u8 nEntry, u8 nTrack, u8 n, int bCheck) {
     Trk_Step(pTrack, n, bCheck);
 }
 
-// Sets the volume (AudTrack.f44) of entry nEntry's track nTrack, starting the track if it has not
-// started.
+// Sets the volume (AudTrack.fVolume) of entry nEntry's track nTrack, starting the track if it has
+// not started.
 void Emi_SetTrackAttenuation(u8 nEntry, u8 nTrack, f32 fVolume) {
     AudSource* pSource;
     AudTrack* pTrack;
@@ -314,10 +314,10 @@ void Emi_SetTrackAttenuation(u8 nEntry, u8 nTrack, f32 fVolume) {
         pTrack = Trk_AllocPerf(pSource, &pSource->pSound->aTracks[nTrack], nTrack, 1.0f);
         if (pTrack == NULL) return;
     }
-    pTrack->f44 = fVolume;
+    pTrack->fVolume = fVolume;
 }
 
-// Sets the pitch (AudTrack.f4C) of entry nEntry's track nTrack, starting the track if it has not
+// Sets the pitch (AudTrack.fPitch) of entry nEntry's track nTrack, starting the track if it has not
 // started.
 void Emi_SetTrackPitchFactor(u8 nEntry, u8 nTrack, f32 fPitch) {
     AudSource* pSource;
@@ -329,7 +329,7 @@ void Emi_SetTrackPitchFactor(u8 nEntry, u8 nTrack, f32 fPitch) {
         pTrack = Trk_AllocPerf(pSource, &pSource->pSound->aTracks[nTrack], nTrack, 1.0f);
         if (pTrack == NULL) return;
     }
-    pTrack->f4C = fPitch;
+    pTrack->fPitch = fPitch;
 }
 
 // Prepares each sequenced track template of a sound just loaded from a bank (Trk_Check). n, the

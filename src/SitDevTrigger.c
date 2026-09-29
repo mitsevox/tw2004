@@ -28,21 +28,21 @@ void Gaud_StartPlaylist2Comment(int nSound, int a);
 u8   SitDev_InvokeCommentaryBank(SitDevAction* pAction, u8 nEvent);
 u8   SitDev_InvokeAction(SitDevAction* pAction, int nPlayer, u8 nEvent);
 u8   SitDev_SuppressAction(SitDevAction* pAction, int nFile, int nPlayer, u8 nEvent);
-void SitDev_TriggerResponse(SitDevEntry8* pDo, int nPlayer, u8 nEvent);
+void SitDev_TriggerResponse(SitDevResponse* pDo, int nPlayer, u8 nEvent);
 
 // Runs a matched situation's actions for the player (up to four, to the first 0xFFF0): each fires
 // by its percent chance unless SitDev_SuppressAction holds it back, a sound action through
 // SitDev_InvokeCommentaryBank, any other through SitDev_InvokeAction. nFile is the situation's
-// script file (b2's n5 field). Afterwards, when the prediction flags were set for this
+// script file (b2's nFileIndex field). Afterwards, when the prediction flags were set for this
 // run (gSitDevPredictionPending) and the last action tried played nothing, the prediction counts as
 // not voiced (gSitDevPredictionVoiced cleared); gSitDevPredictionPending is cleared either way.
-void SitDev_InvokeMultipleActions(SitDevEntry* pEntry, int nFile, int nPlayer, u8 nEvent) {
+void SitDev_InvokeMultipleActions(SitDevSituation* pEntry, int nFile, int nPlayer, u8 nEvent) {
     int i;
     SitDevAction* pAction;
     u8 bPlayed = 0;
     for (i = 0; i < 4; i++) {
         if (pEntry->aActions[i] == 0xFFF0) break;
-        pAction = &gpSitDevScripts->p18[pEntry->aActions[i]];
+        pAction = &gpSitDevScripts->pActions[pEntry->aActions[i]];
         if (pAction->nChance > Misc_RandFunc(1) % 100
             && !SitDev_SuppressAction(pAction, nFile, nPlayer, nEvent)) {
             if (pAction->bSound) {
@@ -85,7 +85,7 @@ u8 SitDev_InvokeCommentaryBank(SitDevAction* pAction, u8 nEvent) {
     return 0;
 }
 
-// A response action (bSound clear): its list names responses (p1C), and each plays through
+// A response action (bSound clear): its list names responses (pResponses), and each plays through
 // SitDev_TriggerResponse. A single response plays unless its kind has played or it is the last line
 // played (pE8; allowed at situation event 30). Otherwise, for each kind not played yet: a kind with
 // one response plays it unless it is the last line played; a kind with more draws one at random,
@@ -94,7 +94,7 @@ u8 SitDev_InvokeCommentaryBank(SitDevAction* pAction, u8 nEvent) {
 u8 SitDev_InvokeAction(SitDevAction* pAction, int nPlayer, u8 nEvent) {
     s32 anCount[14];
     s32 aaIndex[14][50];
-    SitDevEntry8* pDo;
+    SitDevResponse* pDo;
     int nKind;
     int nPick;
     int nStart;
@@ -104,7 +104,7 @@ u8 SitDev_InvokeAction(SitDevAction* pAction, int nPlayer, u8 nEvent) {
     u8 bPlayed = 0;
 
     if (pAction->aList[1] == 0xFFF0) {
-        pDo = &gpSitDevScripts->p1C[pAction->aList[0]];
+        pDo = &gpSitDevScripts->pResponses[pAction->aList[0]];
         if (pDo == gpSitDevData->pE8 && nEvent != 30) return 0;
         if (gpSitDevData->abPlayed[pDo->nKind]) return 0;
         SitDev_TriggerResponse(pDo, nPlayer, nEvent);
@@ -117,7 +117,7 @@ u8 SitDev_InvokeAction(SitDevAction* pAction, int nPlayer, u8 nEvent) {
     // Sort the entries not played yet by kind.
     for (i = 0; i < 50; i++) {
         if (pAction->aList[i] != 0xFFF0) {
-            nKind = gpSitDevScripts->p1C[pAction->aList[i] & 0x7FFF].nKind;
+            nKind = gpSitDevScripts->pResponses[pAction->aList[i] & 0x7FFF].nKind;
             if (!gpSitDevData->abPlayed[nKind]) {
                 aaIndex[nKind][anCount[nKind]] = i;
                 anCount[(u32)nKind]++;      // fake match: a second spelling of the index, not CSE'd
@@ -126,9 +126,9 @@ u8 SitDev_InvokeAction(SitDevAction* pAction, int nPlayer, u8 nEvent) {
     }
     for (nKind = 0; nKind < 14; nKind++) {
         if (anCount[nKind] == 1) {
-            if (&gpSitDevScripts->p1C[pAction->aList[aaIndex[nKind][0]]] != gpSitDevData->pE8) {
-                SitDev_TriggerResponse(&gpSitDevScripts->p1C[pAction->aList[aaIndex[nKind][0]]], nPlayer,
-                                       nEvent);
+            if (&gpSitDevScripts->pResponses[pAction->aList[aaIndex[nKind][0]]] != gpSitDevData->pE8) {
+                SitDev_TriggerResponse(&gpSitDevScripts->pResponses[pAction->aList[aaIndex[nKind][0]]],
+                                       nPlayer, nEvent);
                 bPlayed = 1;
                 gpSitDevData->abPlayed[nKind] = 1;
             }
@@ -151,14 +151,14 @@ u8 SitDev_InvokeAction(SitDevAction* pAction, int nPlayer, u8 nEvent) {
                     break;
                 }
             }
-            pDo = &gpSitDevScripts->p1C[pAction->aList[nEntry]];
+            pDo = &gpSitDevScripts->pResponses[pAction->aList[nEntry]];
             if (pDo == gpSitDevData->pE8) {
                 nPick++;
                 if (nPick == anCount[nKind]) {
                     nPick = 0;
                 }
                 nEntry = aaIndex[nKind][nPick];
-                pDo =&gpSitDevScripts->p1C[pAction->aList[nEntry] & 0x7FFF];
+                pDo =&gpSitDevScripts->pResponses[pAction->aList[nEntry] & 0x7FFF];
             }
             SitDev_TriggerResponse(pDo, nPlayer, nEvent);
             gpSitDevData->abPlayed[nKind] = 1;
@@ -199,7 +199,7 @@ u8 SitDev_SuppressAction(SitDevAction* pAction, int nFile, int nPlayer, u8 nEven
 // commentary back; 4 a GameBreaker for a player whose controller is 8 or lower (fn_8002E8B4): in
 // flight for argument 0, else scripted with it; 12 and 13 set the player's shot emotion
 // (fn_8006AAB4) or its predicted emotion (fn_8006ACE0) and note that the scripts did.
-void SitDev_TriggerResponse(SitDevEntry8* pDo, int nPlayer, u8 nEvent) {
+void SitDev_TriggerResponse(SitDevResponse* pDo, int nPlayer, u8 nEvent) {
     int bNot30;
     int nArg;
     switch (pDo->nKind) {
@@ -254,41 +254,42 @@ void SitDev_TriggerResponse(SitDevEntry8* pDo, int nPlayer, u8 nEvent) {
     }
 }
 
-// Clears the group flags (SitDevData.pD4, one byte per group, n10 of them), so every situation
-// group may fire again: at each shot set-up (situation event 3) and when the scripts load.
+// Clears the group flags (SitDevData.pGroupFlags, one byte per group, nGroups of them), so every
+// situation group may fire again: at each shot set-up (situation event 3) and when the scripts
+// load.
 void SitDev_ClearGroupFlags(void) {
     u32 i;
-    for (i = 0; i < gpSitDevScripts->n10; i++) {
-        gpSitDevData->pD4[i] = 0;
+    for (i = 0; i < gpSitDevScripts->nGroups; i++) {
+        gpSitDevData->pGroupFlags[i] = 0;
     }
 }
 
 // ---- sounds and music ----------------------------------------------------------------------
 
 // Keeps a commentary line for the end of a scripted GameBreaker the shot did not achieve
-// (gGameEffects.u48; GameEffects_EndGameBreaker plays it), unless one is kept already; not in mode
-// 11.
+// (gGameEffects.nPostGBNegLine; GameEffects_EndGameBreaker plays it), unless one is kept already;
+// not in mode 11.
 void GameEffects_SetPostGBNegativeCommentary(int nSound) {
-    if (Game_GetMode() != 11 && !gGameEffects.b47) {
-        gGameEffects.u48 = nSound;
-        gGameEffects.b47 = 1;
+    if (Game_GetMode() != 11 && !gGameEffects.bPostGBNegLine) {
+        gGameEffects.nPostGBNegLine = nSound;
+        gGameEffects.bPostGBNegLine = 1;
     }
 }
 
-// Keeps a crowd reaction (gGameEffects.nCrowdReaction) for the end of a scripted GameBreaker the
+// Keeps a crowd reaction (gGameEffects.nPostGBCrowdLevel) for the end of a scripted GameBreaker the
 // shot did not achieve (GameEffects_EndGameBreaker).
 void GameEffects_SetPostGBCrowdLevel(u8 nCrowdLevel) {
-    gGameEffects.bCrowdReactionSet = 1;
-    gGameEffects.nCrowdReaction = nCrowdLevel;
+    gGameEffects.bPostGBCrowdLevel = 1;
+    gGameEffects.nPostGBCrowdLevel = nCrowdLevel;
 }
 
-// Keeps a commentary line for the end of a GameBreaker that works (gGameEffects.u4C: a predicted
-// one, or a scripted one the shot achieved; GameEffects_EndGameBreaker plays it), unless one is
-// kept already; not in mode 11.
+// Keeps a commentary line for the end of a GameBreaker that works (gGameEffects.nPostGBLine: a
+// predicted one, or a scripted one the shot achieved; GameEffects_EndGameBreaker plays it), unless
+// one is kept already; not in mode 11.
 void GameEffects_SetPostGBCommentary(u16 uSound) {
-    if (Game_GetMode() != 11 && !gGameEffects.b4A) {
-        gGameEffects.u4C = uSound;
-        gGameEffects.b4A = 1;
+    if (Game_GetMode() != 11 && !gGameEffects.bPostGBLine) {
+        gGameEffects.nPostGBLine = uSound;
+        gGameEffects.bPostGBLine = 1;
     }
 }
 

@@ -110,7 +110,8 @@ void GameMsg_Send2Ints(int nMsg, int nA, int nB);    // send message nMsg with t
 void GameMsg_SendInt(int nMsg, int nValue);        // send message nMsg with one value (GameMsg_Send1)
 
 // What lbl_802811F0 points to (its code, around 0x8006F650, is not decompiled; fn_8006F608 clears
-// it). GameMode5's PlayNow_ForceWeather sets f18 and flags it in b1C; SitDevFile.c tests the flags.
+// it). GameMode5's PlayNow_ForceWeather sets f18 and flags it in b1C; SitDevStateVector.c tests
+// the flags.
 typedef struct Unk802811F0 {
     u32 uFlags;                 // 0x00  bit 0x2: fn_80035574
     u32 u04;                    // 0x04  bit 0x2: SitDev_WeatherEffectWasOn
@@ -227,9 +228,10 @@ int  fn_800D1530(int nPlayer);          // HoleScore.c
 s32  GM_GetNumHolesInRound(void);                 // GameUICommands.c
 int  GM_GetGolferRelativeCurrentScore(int nPlayer, u8 bCurrent);        // GameRound.c
 s32  GameModeBattle_GetClubLostOnLastHole(int nPlayer);          // GameModeBattle.c
-s32  GM_GetPotentialHoleResult(int nPlayer);          // SitDevFile.c: gpGame->pfnGetPotentialHoleResult
-s32  GM_GetCurrentEventLead(int nPlayer);          // SitDevFile.c: gpGame->pfnGetCurrentLead's answer
-u8   GM_IsPlayoff(void);                 // SitDevFile.c: gpGame->bInPlayoff
+// SitDevStateVector.c: what the game mode answers the commentary scripts' values with
+s32  GM_GetPotentialHoleResult(int nPlayer);    // gpGame->pfnGetPotentialHoleResult
+s32  GM_GetCurrentEventLead(int nPlayer);       // gpGame->pfnGetCurrentLead's answer
+u8   GM_IsPlayoff(void);                        // gpGame->bInPlayoff
 void CalDate_GetMDY(u16* pDate, s32* pMonth, s32* pDay, s32* pYear);
 void CalDate_SetMDY(u16* pDate, s32 nMonth, s32 nDay, u32 nYear);    // make a date
 void CalDate_AddDays(u16* pDate, s32 nDays);        // move a date on by nDays
@@ -314,14 +316,18 @@ typedef struct GameEffects {
     u8   bRumble;               // 0x44
     u8   nHeartbeats;           // 0x45
     u8   bPaused;               // 0x46
-    u8   b47;                   // 0x47  u48 holds a sound to stop
-    u16  u48;                   // 0x48
-    u8   b4A;                   // 0x4A  u4C holds a sound to stop
+    u8   bPostGBNegLine;        // 0x47  nPostGBNegLine is kept
+    u16  nPostGBNegLine;        // 0x48  the commentary line to play when a scripted GameBreaker
+                                //       ends without doing it (TW07 SetPostGBNegativeCommentary)
+    u8   bPostGBLine;           // 0x4A  nPostGBLine is kept
     u8   unk4B;
-    u16  u4C;                   // 0x4C
-    u8   bCrowdReactionSet;     // 0x4E  nCrowdReaction is set
-    u8   nCrowdReaction;        // 0x4F  the crowd reaction (Gaud_InitCrowdReactionSound) to play
-                                //       when a scripted GameBreaker ends without doing it
+    u16  nPostGBLine;           // 0x4C  the commentary line to play when a predicted GameBreaker
+                                //       ends, or a scripted one that worked (TW07
+                                //       SetPostGBCommentary)
+    u8   bPostGBCrowdLevel;     // 0x4E  nPostGBCrowdLevel is kept (set and cleared, never read)
+    u8   nPostGBCrowdLevel;     // 0x4F  the crowd reaction (Gaud_InitCrowdReactionSound) to play
+                                //       when a scripted GameBreaker ends without doing it (TW07
+                                //       SetPostGBCrowdLevel's crowdLevel)
     u32  uFlags;                // 0x50  bit 0x4000: an eagle on a par 5 counts
     f32  fUITimeFactor;         // 0x54  1 at setup; set by UI command 157 (GM_vSetUITimeFactor);
                                 //       nothing reads it
@@ -347,7 +353,7 @@ void GameEffects_SetSuperSlowMo(u8 bOn, int nPlayer, f32 fRate);
 f32  GameEffects_FieldOfViewChange(void);                 // the GameBreaker's field-of-view change
 u8   GameEffects_IsSlowDownSwingOn(int nPlayer);         // super slow motion is on (nPlayer unused)
 void GameEffects_Pause(int a);                // pause or resume a GameBreaker
-u8   GameEffects_IsLetterboxOn(void);                 // GoDynamicCam.c: the letterbox is up (predicted, or b19)
+u8   GameEffects_IsLetterboxOn(void);               // GoDynamicCam.c: the letterbox is up (predicted, or b19)
 
 // GameMode.c
 void GameEffects_SendMessage50(void);

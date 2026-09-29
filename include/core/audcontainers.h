@@ -17,7 +17,7 @@ LAYOUT_ASSERT(UListNode, 0x8);
 typedef struct UList {
     UListNode* pHead;           // 0x0
     UListNode* pTail;           // 0x4
-    u16        n8;              // 0x8    set by UList_Reset, never read here
+    u16        nSlots;          // 0x8    set by UList_Reset (TW07's nslots), never read here
     u16        nCount;          // 0xA    links in the list
 } UList;
 LAYOUT_ASSERT(UList, 0xC);
@@ -47,7 +47,7 @@ typedef struct UPool {
 } UPool;
 LAYOUT_ASSERT(UPool, 0x8);
 
-void       UList_Reset(UList* pList, u16 n8);
+void       UList_Reset(UList* pList, u16 nSlots);
 void       UList_PushHead(UList* pList, UListNode* pNode);
 void       UList_PushTail(UList* pList, UListNode* pNode);
 void       UList_InsertAt(UList* pList, UListNode* pNode, UListNode* pAt);
@@ -74,7 +74,9 @@ typedef struct UAudMemStack {
     u32                nMaxBlocks;  // 0x8    entries in pBlocks
     UAudMemStackBlock* pBlocks;     // 0xC
     u32                nBlocks;     // 0x10   blocks handed out
-    u32                n14;         // 0x14   cleared at set-up, counted against nMaxBlocks
+    u32                nBtmBlocks;  // 0x14   blocks cut from the bottom (TW07's AudMemStack_AllocBtm,
+                                    //        not in this build: 0), counted with nBlocks
+                                    //        against nMaxBlocks
     u32                nAlign;      // 0x18   a power of two
     u8                 bOwnBlocks;  // 0x1C   pBlocks was allocated by the stack itself
 } UAudMemStack;
@@ -85,12 +87,7 @@ void  AudMemStack_Init(UAudMemStack* pStack, u8* pMem, u32 uSize, u32 nMaxBlocks
 void* AudMemStack_AllocTop(UAudMemStack* pStack, u32 uSize);
 void  AudMemStack_FreeTop(UAudMemStack* pStack, void* p);
 
-// AudReverb.c's effect settings (initialised data; the effects library owns their layout).
-extern AXFX_REVERBHI gRvbReverbShort;      // the reverb for mode 0
-extern AXFX_DELAY gRvbDelay;         // the delay (mode 1)
-extern AXFX_REVERBHI gRvbReverbLong;      // the reverb for mode 2
-
-void*      AudMem_Alloc(u32 uSize);      // the sound engine's allocator
-void       AudMem_Free(void* p);        // gives back what AudMem_Alloc handed out
+void*      AudMem_Alloc(u32 uSize);  // the sound engine's allocator
+void       AudMem_Free(void* p);     // gives back what AudMem_Alloc handed out
 
 #endif

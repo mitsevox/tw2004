@@ -36,10 +36,10 @@ void Mov_Init(void) {
 
     request.nPriority = 0x3FFF;
     request.flags.n = 0;
-    request.n4 = 2;
-    request.flags.b.b14 = 1;
+    request.nStealLevel = 2;
+    request.flags.b.bNoReverb = 1;
     request.flags.b.b10 = 1;
-    request.flags.b.b9 = 1;
+    request.flags.b.bLoops = 1;
     request.pfnCallback = NULL;
     request.pUser = NULL;
     request.nIndex = 0;

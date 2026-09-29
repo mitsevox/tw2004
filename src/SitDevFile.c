@@ -1,10 +1,10 @@
 // SitDevFile.c (EA's name, from its asserts; TW06's and TW07's SitDevFile.c): loading the
 // situation scripts. SitDev_LoadScripts takes the hole stream's 'sscr' chunk: a header
-// (SitDevScripts, gpSitDevScripts) and its tables, the situations (p14; TW07's Situation), their
-// actions (p18; Action), the responses (p1C; Response) and 16-byte names (p20). The chunk is
-// little-endian: the first load byte-swaps it in place (the layouts below) and turns the header's
-// offsets into pointers. The scripts' run-time state is the block gpSitDevData points at
-// (SitDev.c).
+// (SitDevHeader, gpSitDevScripts) and its tables, the situations (pSituations; TW07's Situation),
+// their actions (pActions; Action), the responses (pResponses; Response) and 16-byte names
+// (pNames). The chunk is little-endian: the first load byte-swaps it in place (the layouts below)
+// and turns the header's offsets into pointers. The scripts' run-time state is the block
+// gpSitDevData points at (SitDev.c).
 
 #include "game_types.h"
 #include "engine.h"
@@ -28,7 +28,7 @@ SwapField gSitDevResponseSwap[4] = {
     {1, 1}, {1, 1}, {2, 2}, {4, 4},
 };
 
-SitDevScripts* gpSitDevScripts;    // the loaded scripts' header; NULL until the first load and
+SitDevHeader* gpSitDevScripts;    // the loaded scripts' header; NULL until the first load and
                                    // again after SitDev_vCloseModule
 
 void SitDev_BeginLoadScripts(void);
@@ -36,15 +36,15 @@ void SitDev_BeginLoadScripts(void);
 // ---- scripts -------------------------------------------------------------------------------
 
 void SitDev_SwapHeader(void);
-void SitDev_BindHeader(SitDevScripts* pScripts);
+void SitDev_BindHeader(SitDevHeader* pScripts);
 void SitDev_SwapTables(void);
 
 // The hole stream's 'sscr' chunk handler (SitDev_vRegisterStreamClients). Keeps the chunk
 // (SitDevData.pCC, freed at round end); the first time, takes its first word as the scripts' header
 // (gpSitDevScripts), byte-swaps the header (SitDev_SwapHeader), turns its offsets into pointers
 // (SitDev_BindHeader) and byte-swaps the tables (SitDev_SwapTables). Then allocates the group flags
-// (pD4, one byte per group, header n10) and clears them (SitDev_ClearGroupFlags).
-void SitDev_LoadScripts(SitDevScripts** ppScripts) {
+// (pGroupFlags, one byte per group, header nGroups) and clears them (SitDev_ClearGroupFlags).
+void SitDev_LoadScripts(SitDevHeader** ppScripts) {
     SitDev_BeginLoadScripts();
     gpSitDevData->pCC = ppScripts;
     if (gpSitDevScripts == NULL) {
@@ -53,7 +53,7 @@ void SitDev_LoadScripts(SitDevScripts** ppScripts) {
         SitDev_BindHeader(gpSitDevScripts);
         SitDev_SwapTables();
     }
-    gpSitDevData->pD4 = StaticMem_Alloc(gpSitDevScripts->n10, 2, 16, "SitDevFile.c", 105);
+    gpSitDevData->pGroupFlags = StaticMem_Alloc(gpSitDevScripts->nGroups, 2, 16, "SitDevFile.c", 105);
     SitDev_ClearGroupFlags();
 }
 
@@ -62,12 +62,13 @@ void SitDev_BeginLoadScripts(void) {
 }
 
 // Turns the header's four table offsets (from the header's start) into pointers: the situations
-// (p14), the actions (p18), the responses (p1C) and the names (p20, 16 bytes each, state value 86).
-void SitDev_BindHeader(SitDevScripts* pScripts) {
-    pScripts->p14 = (SitDevEntry*)((u8*)pScripts->p14 + (uptr)pScripts);
-    pScripts->p18 = (SitDevAction*)((u8*)pScripts->p18 + (uptr)pScripts);
-    pScripts->p1C = (SitDevEntry8*)((u8*)pScripts->p1C + (uptr)pScripts);
-    pScripts->p20 = pScripts->p20 + (uptr)pScripts;
+// (pSituations), the actions (pActions), the responses (pResponses) and the names (pNames, 16 bytes
+// each, state value 86).
+void SitDev_BindHeader(SitDevHeader* pScripts) {
+    pScripts->pSituations = (SitDevSituation*)((u8*)pScripts->pSituations + (uptr)pScripts);
+    pScripts->pActions = (SitDevAction*)((u8*)pScripts->pActions + (uptr)pScripts);
+    pScripts->pResponses = (SitDevResponse*)((u8*)pScripts->pResponses + (uptr)pScripts);
+    pScripts->pNames = pScripts->pNames + (uptr)pScripts;
 }
 
 // Byte-swaps the scripts' header (nine words, layout gSitDevHeaderSwap) in place.
@@ -77,52 +78,52 @@ void SitDev_SwapHeader(void) {
     ByteSwap_Records(&pSrc, &pDst, gSitDevHeaderSwap, 9, 1);
 }
 
-// Byte-swaps the scripts' tables in place: the situations (p14), actions (p18) and responses (p1C)
-// by their layouts (gSitDevSituationSwap, gSitDevActionSwap, gSitDevResponseSwap), and the p20
-// block. Then stores each situation's and response's b2 halfword back as its two bit-fields (the
-// low 11 bits and the top 5).
+// Byte-swaps the scripts' tables in place: the situations (pSituations), actions (pActions) and
+// responses (pResponses) by their layouts (gSitDevSituationSwap, gSitDevActionSwap,
+// gSitDevResponseSwap), and the pNames block. Then stores each situation's and response's b2
+// halfword back as its two bit-fields (the low 11 bits and the top 5).
 void SitDev_SwapTables(void) {
     void* pSrc;
     void* pDst;
-    SitDevEntry* pEntry;
+    SitDevSituation* pEntry;
     u32 i;
-    SitDevEntry8* pEntry8;
+    SitDevResponse* pEntry8;
     u16 uRaw;
-    if (gpSitDevScripts->nEntries != 0) {
-        pSrc = gpSitDevScripts->p14;
-        pDst = gpSitDevScripts->p14;
-        ByteSwap_Records(&pSrc, &pDst, gSitDevSituationSwap, 7, gpSitDevScripts->nEntries);
+    if (gpSitDevScripts->nSituations != 0) {
+        pSrc = gpSitDevScripts->pSituations;
+        pDst = gpSitDevScripts->pSituations;
+        ByteSwap_Records(&pSrc, &pDst, gSitDevSituationSwap, 7, gpSitDevScripts->nSituations);
     }
-    if (gpSitDevScripts->n04 != 0) {
-        pSrc = gpSitDevScripts->p18;
-        pDst = gpSitDevScripts->p18;
-        ByteSwap_Records(&pSrc, &pDst, gSitDevActionSwap, 5, gpSitDevScripts->n04);
+    if (gpSitDevScripts->nActions != 0) {
+        pSrc = gpSitDevScripts->pActions;
+        pDst = gpSitDevScripts->pActions;
+        ByteSwap_Records(&pSrc, &pDst, gSitDevActionSwap, 5, gpSitDevScripts->nActions);
     }
-    if (gpSitDevScripts->n08 != 0) {
+    if (gpSitDevScripts->nResponses != 0) {
         // fake match: pEntry8 carries the source pointer here (permuter find): it gives the i / pEntry8
         // registers of the second loop below
-        pEntry8 = gpSitDevScripts->p1C;
+        pEntry8 = gpSitDevScripts->pResponses;
         pSrc = pEntry8;
-        pDst = gpSitDevScripts->p1C;
-        ByteSwap_Records(&pSrc, &pDst, gSitDevResponseSwap, 4, gpSitDevScripts->n08);
+        pDst = gpSitDevScripts->pResponses;
+        ByteSwap_Records(&pSrc, &pDst, gSitDevResponseSwap, 4, gpSitDevScripts->nResponses);
     }
-    if (gpSitDevScripts->n0C != 0) {
-        pSrc = gpSitDevScripts->p20;
-        pDst = gpSitDevScripts->p20;
+    if (gpSitDevScripts->nNameWords != 0) {
+        pSrc = gpSitDevScripts->pNames;
+        pDst = gpSitDevScripts->pNames;
         // EA bug: the byte count and the value width are swapped, and the address of pDst is
         // passed for pDst (the call is shaped like ByteSwap_Records's)
-        BYTESWAP_SWAPDATA((u8**)&pSrc, (u8*)&pDst, 4, gpSitDevScripts->n0C * 4);
+        BYTESWAP_SWAPDATA((u8**)&pSrc, (u8*)&pDst, 4, gpSitDevScripts->nNameWords * 4);
     }
-    for (i = 0; i < gpSitDevScripts->nEntries; i++) {
-        pEntry = &gpSitDevScripts->p14[i];
+    for (i = 0; i < gpSitDevScripts->nSituations; i++) {
+        pEntry = &gpSitDevScripts->pSituations[i];
         uRaw = pEntry->b2.uRaw;
         pEntry->b2.s.n11 = uRaw & 0x7FF;
-        gpSitDevScripts->p14[i].b2.s.n5 = (uRaw >> 11) & 0x1F;
+        gpSitDevScripts->pSituations[i].b2.s.nFileIndex = (uRaw >> 11) & 0x1F;
     }
-    for (i = 0; i < gpSitDevScripts->n08; i++) {
-        pEntry8 = &gpSitDevScripts->p1C[i];
+    for (i = 0; i < gpSitDevScripts->nResponses; i++) {
+        pEntry8 = &gpSitDevScripts->pResponses[i];
         uRaw = pEntry8->b2.uRaw;
         pEntry8->b2.s.n11 = uRaw & 0x7FF;
-        gpSitDevScripts->p1C[i].b2.s.n5 = (uRaw >> 11) & 0x1F;
+        gpSitDevScripts->pResponses[i].b2.s.nFileIndex = (uRaw >> 11) & 0x1F;
     }
 }

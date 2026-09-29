@@ -56,8 +56,9 @@ void   MIXInitChannel(AXVPB* pVpb, u32 uMode, int nInput, int nAuxA, int nAuxB, 
 // A voice's state flags (the word at 0x4). The bSet... flags ask the mixer callback (HwVoice_MixerCallback)
 // to pass a changed setting on to the hardware on its next pass.
 typedef struct VoiceFlags {
-    u32  nState     : 3;        // 0x4  0, 1 set up (HwVoice_SetSound), 2 start asked for (HwVoice_StartOrRelease),
-                                //      3 playing, 6 released (HwVoice_StartOrRelease)
+    u32  nState     : 3;        // 0x4  0, 1 set up (HwVoice_SetSound), 2 start asked for
+                                //      (HwVoice_StartOrRelease), 3 playing, 6 released
+                                //      (HwVoice_StartOrRelease)
     u32  nEnvStage  : 2;        //      the envelope's stage: 0 attack, 1 decay, 2 sustain, 3 release
     u32  bSetInput  : 1;        //      n58 changed
     u32  bSetPan    : 1;        //      nPan changed
@@ -96,10 +97,10 @@ typedef struct VoiceEnvelope {
 // A sound's header (0x38 bytes): where its data sits in ARAM (in 4-bit units) and its ADPCM
 // decoder state, as HwVoice_SetSound copies it into a voice.
 typedef struct SoundHeader {
-    u32  u0;                    // 0x00  -> Voice.u14
-    u32  u4;                    // 0x04  -> Voice.u10
-    u32  u8;                    // 0x08  -> Voice.uC
-    u32  uC;                    // 0x0C  -> Voice.n8
+    u32  uStart;                // 0x00  -> Voice.u14: where it starts playing
+    u32  uEnd;                  // 0x04  -> Voice.u10: its last 4-bit unit
+    u32  uLoop;                 // 0x08  -> Voice.uC: where it loops back to
+    u32  bLoop;                 // 0x0C  -> Voice.n8: it loops
     u32  a10[8];                // 0x10  -> Voice.a18
     u16  n30;                   // 0x30  -> Voice.n3A
     u16  n32;                   // 0x32  -> Voice.n50
@@ -198,7 +199,8 @@ typedef struct BootSound {
     u32         uSize;          // 0x04
     u32         uAram;          // 0x08  where BootSound_CopyToAram put it
     u32         uC;             // 0x0C  -> Voice.u40
-    SoundHeader hdr;            // 0x10  u0 and u4 count from uAram until BootSound_CopyToAram rebases them
+    SoundHeader hdr;            // 0x10  uStart and uEnd count from uAram until BootSound_CopyToAram
+                                //       rebases them
 } BootSound;
 LAYOUT_ASSERT(BootSound, 0x48);
 
@@ -229,7 +231,7 @@ void Startup_FormatCard(s32 nPort, s32 nSlot);
 void Startup_DeleteSaveGame(s32 nPort, s32 nSlot);
 void Startup_LoadOptionsFromCard(void);
 
-// ---- the 'LEGL' pictures Startup_LoadLegalPicture keeps ----------------------------------------------------
+// ---- the 'LEGL' pictures Startup_LoadLegalPicture keeps -----------------------------------------
 
 extern void* gpLegalPicture;              // the first one's copy (uiProcessPolygon.c
                                         // UI_PlayStartUpMovies shows and frees it)

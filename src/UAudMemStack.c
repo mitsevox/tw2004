@@ -13,7 +13,7 @@ void AudMemStack_Init(UAudMemStack* pStack, u8* pMem, u32 uSize, u32 nMaxBlocks,
     pStack->pEnd = pMem + uSize;
     pStack->nMaxBlocks = nMaxBlocks;
     pStack->nBlocks = 0;
-    pStack->n14 = 0;
+    pStack->nBtmBlocks = 0;
     pStack->nAlign = nAlign;
     if (pBlocks == NULL) {
         pStack->pBlocks =
@@ -31,7 +31,7 @@ void AudMemStack_Init(UAudMemStack* pStack, u8* pMem, u32 uSize, u32 nMaxBlocks,
 void* AudMemStack_AllocTop(UAudMemStack* pStack, u32 uSize) {
     UAudMemStackBlock* pBlock = &pStack->pBlocks[pStack->nBlocks];
 
-    if (pStack->nBlocks + pStack->n14 >= pStack->nMaxBlocks) return NULL;
+    if (pStack->nBlocks + pStack->nBtmBlocks >= pStack->nMaxBlocks) return NULL;
     uSize = (uSize + (pStack->nAlign - 1)) & ~(pStack->nAlign - 1);
     if (pStack->pTop + uSize >= pStack->pEnd) return NULL;
     pBlock->pMem = pStack->pTop;

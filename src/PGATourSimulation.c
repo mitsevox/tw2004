@@ -379,18 +379,18 @@ void GM_PgaTourSim_CheckEndOfTournamentAward(int nPlayer, u8 bUser, u8 bFirst) {
         }
     }
     if (nAhead == 0) {
-        if (GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].a200[0])) {
+        if (GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].aMoneyListAward[0])) {
             PlayPGAAwardVideo(1, 1);
         }
-        GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].a200[1]);
-        GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].a200[2]);
+        GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].aMoneyListAward[1]);
+        GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].aMoneyListAward[2]);
     } else if (nAhead <= 4) {
-        if (GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].a200[1])) {
+        if (GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].aMoneyListAward[1])) {
             PlayPGAAwardVideo(3, 1);
         }
-        GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].a200[2]);
+        GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].aMoneyListAward[2]);
     } else if (nAhead <= 24) {
-        if (GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].a200[2])) {
+        if (GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].aMoneyListAward[2])) {
             PlayPGAAwardVideo(4, 1);
         }
     }

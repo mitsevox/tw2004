@@ -214,24 +214,24 @@ void UIArc_Draw(UIArc* pArc, s32 a, s32 b) {
             fCos = fCos2[0];
         }
         i++;
-        aVtx[0].f0 = fU0[0];
-        aVtx[0].f4 = fV0[0];
-        aVtx[0].f8 = fInnerX * fCos;
-        aVtx[0].fC = fInnerY * fSin2[0];
-        aVtx[0].f10 = 0.0f;
-        aVtx[0].au14[0] = fR[0];
-        aVtx[0].au14[1] = fG[0];
-        aVtx[0].au14[2] = fB[0];
-        aVtx[0].au14[3] = fA[0];
-        aVtx[1].f0 = fU1[0];
-        aVtx[1].f4 = fV1[0];
-        aVtx[1].f8 = fOuterX * fCos;
-        aVtx[1].fC = fOuterY * fSin2[0];
-        aVtx[1].f10 = 0.0f;
-        aVtx[1].au14[0] = fR[0];
-        aVtx[1].au14[1] = fG[0];
-        aVtx[1].au14[2] = fB[0];
-        aVtx[1].au14[3] = fA[0];
+        aVtx[0].fU = fU0[0];
+        aVtx[0].fV = fV0[0];
+        aVtx[0].fX = fInnerX * fCos;
+        aVtx[0].fY = fInnerY * fSin2[0];
+        aVtx[0].fZ = 0.0f;
+        aVtx[0].auColour[0] = fR[0];
+        aVtx[0].auColour[1] = fG[0];
+        aVtx[0].auColour[2] = fB[0];
+        aVtx[0].auColour[3] = fA[0];
+        aVtx[1].fU = fU1[0];
+        aVtx[1].fV = fV1[0];
+        aVtx[1].fX = fOuterX * fCos;
+        aVtx[1].fY = fOuterY * fSin2[0];
+        aVtx[1].fZ = 0.0f;
+        aVtx[1].auColour[0] = fR[0];
+        aVtx[1].auColour[1] = fG[0];
+        aVtx[1].auColour[2] = fB[0];
+        aVtx[1].auColour[3] = fA[0];
 
         // the colour and angle at the segment's far edge (and the next segment's near edge)
         if (pArc->uFlags & 0x20) {
@@ -265,24 +265,24 @@ void UIArc_Draw(UIArc* pArc, s32 a, s32 b) {
         }
         fSin2[0] = Math_Sin(fAngle);
         fCos2[0] = Math_Cos(fAngle);
-        aVtx[2].f0 = fU2[0];
-        aVtx[2].f4 = fV2[0];
-        aVtx[2].f8 = fOuterX * fCos2[0];
-        aVtx[2].fC = fOuterY * fSin2[0];
-        aVtx[2].f10 = 0.0f;
-        aVtx[2].au14[0] = fR[0];
-        aVtx[2].au14[1] = fG[0];
-        aVtx[2].au14[2] = fB[0];
-        aVtx[2].au14[3] = fA[0];
-        aVtx[3].f0 = fU3[0];
-        aVtx[3].f4 = fV3[0];
-        aVtx[3].f8 = fInnerX * fCos2[0];
-        aVtx[3].fC = fInnerY * fSin2[0];
-        aVtx[3].f10 = 0.0f;
-        aVtx[3].au14[0] = fR[0];
-        aVtx[3].au14[1] = fG[0];
-        aVtx[3].au14[2] = fB[0];
-        aVtx[3].au14[3] = fA[0];
+        aVtx[2].fU = fU2[0];
+        aVtx[2].fV = fV2[0];
+        aVtx[2].fX = fOuterX * fCos2[0];
+        aVtx[2].fY = fOuterY * fSin2[0];
+        aVtx[2].fZ = 0.0f;
+        aVtx[2].auColour[0] = fR[0];
+        aVtx[2].auColour[1] = fG[0];
+        aVtx[2].auColour[2] = fB[0];
+        aVtx[2].auColour[3] = fA[0];
+        aVtx[3].fU = fU3[0];
+        aVtx[3].fV = fV3[0];
+        aVtx[3].fX = fInnerX * fCos2[0];
+        aVtx[3].fY = fInnerY * fSin2[0];
+        aVtx[3].fZ = 0.0f;
+        aVtx[3].auColour[0] = fR[0];
+        aVtx[3].auColour[1] = fG[0];
+        aVtx[3].auColour[2] = fB[0];
+        aVtx[3].auColour[3] = fA[0];
 
         UIPoly_UnpackVertex(&aVtx[0], &aPos[0].x, aUV[0], aColour[0], vScale, vAdd);
         UIPoly_UnpackVertex(&aVtx[1], &aPos[1].x, aUV[1], aColour[1], vScale, vAdd);

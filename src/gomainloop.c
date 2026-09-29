@@ -9,6 +9,7 @@
 #include "core/memcard.h"
 #include "core/gbacable.h"
 #include "game/frontend.h"
+#include "frontend/fe.h"
 #include "llpict.h"
 
 void*       lbl_80281E60;
@@ -233,9 +234,6 @@ void AudMem_InitModule(void);
 void AudMem_CloseModule(void);
 void fn_800B655C(void);
 void fn_800B6560(void);
-void FE_CrAPBall_Init(void);
-void FE_CrAPBall_Free(void);
-void FE_CrAPBall_MakeObjects(void);
 void UI_EATraxDraw(void);
 void fn_800BA940(void);
 void fn_800BAA4C(void);

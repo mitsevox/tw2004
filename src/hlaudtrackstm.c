@@ -58,7 +58,7 @@ void StartStreamVoices(AudTrack* pTrack) {
     u8 i;
 
     pList = pTrack->pTmpl->data.pPlayList;
-    audfrac_Mul(pTrack->f44, Mas_GetSubmix(pList->n3));
+    audfrac_Mul(pTrack->fVolume, Mas_GetSubmix(pList->n3));
     bLoud = pList->n3 == 15;
     for (i = 0; i < pList->nChannels; i++) {
         Voc_StartStream(pTrack->apVoices[i], 0xFE00, pList->n4, bLoud);
@@ -87,7 +87,7 @@ u8 AddToAudStreamReadQueue(s32 hFile, u8* pDst, u32 uLen, u32 uOffset,
         pRead->pTrack = pTrack;
         pRead->nId = nId;
         pRead->n19 = n19;
-        pRead->bRestart = 0;
+        pRead->bSilence = 0;
     }
     AudLock_UnlockReadQueue("AddToAudStreamReadQueue");
     return bQueued;
@@ -106,7 +106,7 @@ u8 Stm_QueueSilence(AudTrack* pTrack) {
         memset(pRead, 0, sizeof(AudStreamRead));
         pRead->pTrack = pTrack;
         bQueued = 1;
-        pRead->bRestart = 1;
+        pRead->bSilence = 1;
     }
     AudLock_UnlockReadQueue("AddToAudStreamReadQueue");
     return bQueued;
@@ -131,7 +131,7 @@ void ProcessAudStreamReadQueue(void) {
         if (gAudStreamReadQueue.queue.nCount != 0 && gAudStreamReadQueue.bBusy == 0) {
             gAudStreamReadQueue.bBusy = 1;
             pRead = (AudStreamRead*)gAudStreamReadQueue.queue.pRead;
-            if (pRead->bRestart) {
+            if (pRead->bSilence) {
                 Stm_SendSilenceToVoices(pRead->pTrack);
             } else {
                 File_ReadAsyncEx(pRead->hFile, pRead->pDst, pRead->uLen, pRead->uOffset, pRead->pfnDone, 0,
@@ -266,12 +266,12 @@ void PrimeStreamer(AudTrack* pTrack) {
     if (pTrack->u.stm.pStream == NULL) return;
     request.flags.n = 0;
     request.nPriority = 0x3FFF;
-    request.n4 = 2;
+    request.nStealLevel = 2;
     request.pfnCallback = Trk_VoiceEndCB;
-    request.flags.b.b14 = 1;
+    request.flags.b.bNoReverb = 1;
     i = 0;
     request.pUser = pTrack;
-    request.flags.b.b12 = 1;
+    request.flags.b.bStream = 1;
     request.flags.b.b11 = (pList->nId >> 2) & 1;
     for (; i < pList->nChannels; i++) {
         request.nIndex = i;
@@ -286,10 +286,10 @@ void PrimeStreamer(AudTrack* pTrack) {
     pTrack->u.stm.uRead = 0;
     pTrack->u.stm.uFilled = 0;
     pTrack->u.stm.uPlayed = 0;
-    pTrack->bits.b.b7 = 0;
+    pTrack->bits.b.bNewVariation = 0;
     pTrack->nState = 4;
     pTrack->u.stm.nReadId = gStmLastReadId;
-    pTrack->n5D += pList->nChannels;
+    pTrack->nVoices += pList->nChannels;
     pTrack->u.stm.flags.n = 0;
     AddToAudStreamReadQueue(hFile, pTrack->u.stm.pBuffer,
                             (pTrack->u.stm.uBufferSize >> 1) * pList->nChannels,
@@ -394,8 +394,8 @@ u8 Stm_Tick(AudTrack* pTrack) {
     pList = pTrack->pTmpl->data.pPlayList;
     if (DVDGetDriveStatus() == 0) {
         for (i = 0; i < pList->nChannels; i++) {
-            if (pTrack->apVoices[i] != NULL && pTrack->apVoices[i]->flags.b.bB_6) {
-                pTrack->apVoices[i]->flags.b.bB_6 = 0;
+            if (pTrack->apVoices[i] != NULL && pTrack->apVoices[i]->flags.b.bHeld) {
+                pTrack->apVoices[i]->flags.b.bHeld = 0;
                 Voc_Pause(pTrack->apVoices[i], 0);
             }
         }
@@ -405,9 +405,9 @@ u8 Stm_Tick(AudTrack* pTrack) {
         uFull = pList->nChannels * 0x7F00;
         uFull = pTrack->u.stm.uLength <= uFull ? pTrack->u.stm.uLength : uFull;
         if (pTrack->u.stm.uFilled != 0 && pTrack->u.stm.uFilled >= uFull) {
-            if (pTrack->u.stm.flags.b.b6) {
+            if (pTrack->u.stm.flags.b.bHold) {
                 bFeed = 1;
-                pTrack->u.stm.flags.b.b6 = 0;
+                pTrack->u.stm.flags.b.bHold = 0;
                 pTrack->nState = 5;
             } else {
                 bFeed = 1;
@@ -453,10 +453,10 @@ u8 Stm_Tick(AudTrack* pTrack) {
         if (pTrack->u.stm.flags.b.bEnded) {
             if (Stm_QueueSilence(pTrack)) {
                 pTrack->u.stm.flags.b.bEnded = 0;
-                pTrack->u.stm.flags.b.b3 = 1;
+                pTrack->u.stm.flags.b.bSilenceQueued = 1;
             }
-        } else if (pTrack->u.stm.flags.b.b3) {
-            pTrack->u.stm.flags.b.b3 = 0;
+        } else if (pTrack->u.stm.flags.b.bSilenceQueued) {
+            pTrack->u.stm.flags.b.bSilenceQueued = 0;
             if (pTrack->u.stm.pStream->uLoop == 0xFFFFFFFF) {
                 Trk_StopAllVoices(pTrack, 1);
             } else {

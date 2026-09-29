@@ -83,15 +83,15 @@ static f32 fe_movies_StrippedFn(f32 x) {
 void UIPoly_TintVertex(FEVertex* pSrc, FEVertex* pDst, u8 bTint) {
     memcpy(pDst, pSrc, sizeof(FEVertex));
     if (bTint) {
-        pDst->au14[0] = gpUIPolyColourMul[0] * (pSrc->au14[0] + gpUIPolyColourAdd[0]);
-        pDst->au14[1] = gpUIPolyColourMul[1] * (pSrc->au14[1] + gpUIPolyColourAdd[1]);
-        pDst->au14[2] = gpUIPolyColourMul[2] * (pSrc->au14[2] + gpUIPolyColourAdd[2]);
-        pDst->au14[3] = gpUIPolyColourMul[3] * (pSrc->au14[3] + gpUIPolyColourAdd[3]);
+        pDst->auColour[0] = gpUIPolyColourMul[0] * (pSrc->auColour[0] + gpUIPolyColourAdd[0]);
+        pDst->auColour[1] = gpUIPolyColourMul[1] * (pSrc->auColour[1] + gpUIPolyColourAdd[1]);
+        pDst->auColour[2] = gpUIPolyColourMul[2] * (pSrc->auColour[2] + gpUIPolyColourAdd[2]);
+        pDst->auColour[3] = gpUIPolyColourMul[3] * (pSrc->auColour[3] + gpUIPolyColourAdd[3]);
     } else {
-        pDst->au14[0] = 0xFF;
-        pDst->au14[1] = 0xFF;
-        pDst->au14[2] = 0xFF;
-        pDst->au14[3] = gpUIPolyColourMul[3] * (pSrc->au14[3] + gpUIPolyColourAdd[3]);
+        pDst->auColour[0] = 0xFF;
+        pDst->auColour[1] = 0xFF;
+        pDst->auColour[2] = 0xFF;
+        pDst->auColour[3] = gpUIPolyColourMul[3] * (pSrc->auColour[3] + gpUIPolyColourAdd[3]);
     }
 }
 
@@ -174,22 +174,22 @@ void UIPoly_Draw(FEQuad* pQuad) {
     nColour = pQuad->nColour;
     if (gpFrontEnd->p14 != NULL && nColour < (s16)gpFrontEnd->p14->nCount && nColour != -1) {
         // the table's colours are alpha, blue, green, red
-        pQuad->aVtx[0].au14[3] = gpFrontEnd->p14->apEntries[nColour]->p8[0];
-        pQuad->aVtx[1].au14[3] = gpFrontEnd->p14->apEntries[nColour]->p8[0];
-        pQuad->aVtx[2].au14[3] = gpFrontEnd->p14->apEntries[nColour]->p8[0];
-        pQuad->aVtx[3].au14[3] = gpFrontEnd->p14->apEntries[nColour]->p8[0];
-        pQuad->aVtx[0].au14[2] = gpFrontEnd->p14->apEntries[nColour]->p8[1];
-        pQuad->aVtx[1].au14[2] = gpFrontEnd->p14->apEntries[nColour]->p8[1];
-        pQuad->aVtx[2].au14[2] = gpFrontEnd->p14->apEntries[nColour]->p8[1];
-        pQuad->aVtx[3].au14[2] = gpFrontEnd->p14->apEntries[nColour]->p8[1];
-        pQuad->aVtx[0].au14[1] = gpFrontEnd->p14->apEntries[nColour]->p8[2];
-        pQuad->aVtx[1].au14[1] = gpFrontEnd->p14->apEntries[nColour]->p8[2];
-        pQuad->aVtx[2].au14[1] = gpFrontEnd->p14->apEntries[nColour]->p8[2];
-        pQuad->aVtx[3].au14[1] = gpFrontEnd->p14->apEntries[nColour]->p8[2];
-        pQuad->aVtx[0].au14[0] = gpFrontEnd->p14->apEntries[nColour]->p8[3];
-        pQuad->aVtx[1].au14[0] = gpFrontEnd->p14->apEntries[nColour]->p8[3];
-        pQuad->aVtx[2].au14[0] = gpFrontEnd->p14->apEntries[nColour]->p8[3];
-        pQuad->aVtx[3].au14[0] = gpFrontEnd->p14->apEntries[nColour]->p8[3];
+        pQuad->aVtx[0].auColour[3] = gpFrontEnd->p14->apEntries[nColour]->p8[0];
+        pQuad->aVtx[1].auColour[3] = gpFrontEnd->p14->apEntries[nColour]->p8[0];
+        pQuad->aVtx[2].auColour[3] = gpFrontEnd->p14->apEntries[nColour]->p8[0];
+        pQuad->aVtx[3].auColour[3] = gpFrontEnd->p14->apEntries[nColour]->p8[0];
+        pQuad->aVtx[0].auColour[2] = gpFrontEnd->p14->apEntries[nColour]->p8[1];
+        pQuad->aVtx[1].auColour[2] = gpFrontEnd->p14->apEntries[nColour]->p8[1];
+        pQuad->aVtx[2].auColour[2] = gpFrontEnd->p14->apEntries[nColour]->p8[1];
+        pQuad->aVtx[3].auColour[2] = gpFrontEnd->p14->apEntries[nColour]->p8[1];
+        pQuad->aVtx[0].auColour[1] = gpFrontEnd->p14->apEntries[nColour]->p8[2];
+        pQuad->aVtx[1].auColour[1] = gpFrontEnd->p14->apEntries[nColour]->p8[2];
+        pQuad->aVtx[2].auColour[1] = gpFrontEnd->p14->apEntries[nColour]->p8[2];
+        pQuad->aVtx[3].auColour[1] = gpFrontEnd->p14->apEntries[nColour]->p8[2];
+        pQuad->aVtx[0].auColour[0] = gpFrontEnd->p14->apEntries[nColour]->p8[3];
+        pQuad->aVtx[1].auColour[0] = gpFrontEnd->p14->apEntries[nColour]->p8[3];
+        pQuad->aVtx[2].auColour[0] = gpFrontEnd->p14->apEntries[nColour]->p8[3];
+        pQuad->aVtx[3].auColour[0] = gpFrontEnd->p14->apEntries[nColour]->p8[3];
     }
     UIPoly_TintVertex(&pQuad->aVtx[0], &aVtx[0], bTint);
     UIPoly_TintVertex(&pQuad->aVtx[1], &aVtx[1], bTint);
@@ -234,18 +234,18 @@ void UIPoly_Draw(FEQuad* pQuad) {
 // Unpack pVtx into four-float arrays: its position (w 1), its texture coordinates (then 0, 1) and
 // its colour, which is then scaled by pScale and offset by pAdd.
 void UIPoly_UnpackVertex(FEVertex* pVtx, f32* pPos, f32* pUV, f32* pColour, f32* pScale, f32* pAdd) {
-    pPos[0] = pVtx->f8;
-    pPos[1] = pVtx->fC;
-    pPos[2] = pVtx->f10;
+    pPos[0] = pVtx->fX;
+    pPos[1] = pVtx->fY;
+    pPos[2] = pVtx->fZ;
     pPos[3] = 1.0f;
-    pUV[0] = pVtx->f0;
-    pUV[1] = pVtx->f4;
+    pUV[0] = pVtx->fU;
+    pUV[1] = pVtx->fV;
     pUV[2] = 0.0f;
     pUV[3] = 1.0f;
-    pColour[0] = pVtx->au14[0];
-    pColour[1] = pVtx->au14[1];
-    pColour[2] = pVtx->au14[2];
-    pColour[3] = pVtx->au14[3];
+    pColour[0] = pVtx->auColour[0];
+    pColour[1] = pVtx->auColour[1];
+    pColour[2] = pVtx->auColour[2];
+    pColour[3] = pVtx->auColour[3];
     LLMath_MultiplyVec(pColour, pScale, pColour);
     LLMath_Add(pColour, pAdd, pColour);
 }
@@ -309,42 +309,42 @@ void UIPoly_ProcessMessage(FEQuad* pQuad, int nMsg, u32 bSplit, FEMsgArg* pArgs)
                                                                   pQuad->nA, 0, 0);
         break;
     case 0:
-        pQuad->aVtx[pArgs[0].n].f8 = pArgs[1].f;
-        pQuad->aVtx[pArgs[0].n].fC = pArgs[2].f;
-        pQuad->aVtx[pArgs[0].n].f10 = pArgs[3].f;
+        pQuad->aVtx[pArgs[0].n].fX = pArgs[1].f;
+        pQuad->aVtx[pArgs[0].n].fY = pArgs[2].f;
+        pQuad->aVtx[pArgs[0].n].fZ = pArgs[3].f;
         break;
     case 1:
-        pQuad->aVtx[pArgs[0].n].f0 = pArgs[1].f;
-        pQuad->aVtx[pArgs[0].n].f4 = pArgs[2].f;
+        pQuad->aVtx[pArgs[0].n].fU = pArgs[1].f;
+        pQuad->aVtx[pArgs[0].n].fV = pArgs[2].f;
         break;
     case 3:
         if (pArgs[0].n == -1) {
-            pQuad->aVtx[0].au14[3] = pArgs[1].n;
-            pQuad->aVtx[1].au14[3] = pArgs[1].n;
-            pQuad->aVtx[2].au14[3] = pArgs[1].n;
-            pQuad->aVtx[3].au14[3] = pArgs[1].n;
+            pQuad->aVtx[0].auColour[3] = pArgs[1].n;
+            pQuad->aVtx[1].auColour[3] = pArgs[1].n;
+            pQuad->aVtx[2].auColour[3] = pArgs[1].n;
+            pQuad->aVtx[3].auColour[3] = pArgs[1].n;
         } else {
-            pQuad->aVtx[pArgs[0].n].au14[3] = pArgs[1].n;
+            pQuad->aVtx[pArgs[0].n].auColour[3] = pArgs[1].n;
         }
         break;
     case 2:
         if (pArgs[0].n == -1) {
-            pQuad->aVtx[0].au14[0] = pArgs[1].n;
-            pQuad->aVtx[0].au14[1] = pArgs[2].n;
-            pQuad->aVtx[0].au14[2] = pArgs[3].n;
-            pQuad->aVtx[1].au14[0] = pArgs[1].n;
-            pQuad->aVtx[1].au14[1] = pArgs[2].n;
-            pQuad->aVtx[1].au14[2] = pArgs[3].n;
-            pQuad->aVtx[2].au14[0] = pArgs[1].n;
-            pQuad->aVtx[2].au14[1] = pArgs[2].n;
-            pQuad->aVtx[2].au14[2] = pArgs[3].n;
-            pQuad->aVtx[3].au14[0] = pArgs[1].n;
-            pQuad->aVtx[3].au14[1] = pArgs[2].n;
-            pQuad->aVtx[3].au14[2] = pArgs[3].n;
+            pQuad->aVtx[0].auColour[0] = pArgs[1].n;
+            pQuad->aVtx[0].auColour[1] = pArgs[2].n;
+            pQuad->aVtx[0].auColour[2] = pArgs[3].n;
+            pQuad->aVtx[1].auColour[0] = pArgs[1].n;
+            pQuad->aVtx[1].auColour[1] = pArgs[2].n;
+            pQuad->aVtx[1].auColour[2] = pArgs[3].n;
+            pQuad->aVtx[2].auColour[0] = pArgs[1].n;
+            pQuad->aVtx[2].auColour[1] = pArgs[2].n;
+            pQuad->aVtx[2].auColour[2] = pArgs[3].n;
+            pQuad->aVtx[3].auColour[0] = pArgs[1].n;
+            pQuad->aVtx[3].auColour[1] = pArgs[2].n;
+            pQuad->aVtx[3].auColour[2] = pArgs[3].n;
         } else {
-            pQuad->aVtx[pArgs[0].n].au14[0] = pArgs[1].n;
-            pQuad->aVtx[pArgs[0].n].au14[1] = pArgs[2].n;
-            pQuad->aVtx[pArgs[0].n].au14[2] = pArgs[3].n;
+            pQuad->aVtx[pArgs[0].n].auColour[0] = pArgs[1].n;
+            pQuad->aVtx[pArgs[0].n].auColour[1] = pArgs[2].n;
+            pQuad->aVtx[pArgs[0].n].auColour[2] = pArgs[3].n;
         }
         break;
     case 5:

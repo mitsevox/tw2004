@@ -65,8 +65,8 @@ void GameEffects_InitGameEffectSettings(void) {
 // Every effect off (at each hole's start and restart, the scorecards, and the swing and shot
 // states' inits): the time effects (GameEffects_ResetGameEffectTimeSettings), pause and rumble. A
 // GameBreaker still up ends at once, with its end event (0x3E scripted, 0x40 predicted) and UI
-// message 50; the spin window and the waiting commentary line u4C are cleared, and every player's
-// pad stops vibrating.
+// message 50; the spin window and the waiting commentary line (bPostGBLine) are cleared, and
+// every player's pad stops vibrating.
 void GameEffects_ResetGameEffectSettings(void) {
     int i;
     GameEffects_ResetGameEffectTimeSettings();
@@ -83,7 +83,7 @@ void GameEffects_ResetGameEffectSettings(void) {
     gGameEffects.bGameBreaker = 0;
     gGameEffects.bSpinWindowDone = 0;
     gGameEffects.b19 = 0;
-    gGameEffects.b4A = 0;
+    gGameEffects.bPostGBLine = 0;
     for (i = 0; i < gSession.nNumPlayers; i++) {
         if (fn_8002E898_IsPad(gSession.nController[i])) {
             Input_vStopVibration(gSession.nController[i]);
@@ -444,11 +444,12 @@ void GameEffects_InFlightGameBreakerTrigger(int nPlayer) {
 }
 
 // Ends a GameBreaker as the shot finishes (STATEFUNC_SimulateUpdate): the letterbox starts closing
-// (fGBTime held to 0.8 at most). A predicted one: end event 0x40, the waiting commentary line u4C
-// (if any) plays, and crowd reaction 3. A scripted one: end event 0x3E; if the shot did it
-// (GameEffects_ScriptedGBDidIt), line u4C and crowd reaction 3, else the other waiting line u48 and
-// crowd reaction n4F (b4E cleared); u48's slot is freed either way. nPlayer is not read: the
-// GameBreaker's own player is used.
+// (fGBTime held to 0.8 at most). A predicted one: end event 0x40, the waiting commentary line
+// nPostGBLine (if any) plays, and crowd reaction 3. A scripted one: end event 0x3E; if the shot did
+// it (GameEffects_ScriptedGBDidIt), line nPostGBLine and crowd reaction 3, else the other waiting
+// line nPostGBNegLine and crowd reaction nPostGBCrowdLevel (bPostGBCrowdLevel cleared);
+// nPostGBNegLine's slot is freed either way. nPlayer is not read: the GameBreaker's own player is
+// used.
 void GameEffects_EndGameBreaker(int nPlayer) {
     if (gGameEffects.bGameBreaker) {
         gGameEffects.bClosing = 1;
@@ -458,28 +459,28 @@ void GameEffects_EndGameBreaker(int nPlayer) {
         switch (gGameEffects.nGBType) {
         case 1:
             EVENT_Trigger(gGameEffects.nPlayer, 0x40, 0, -1);
-            if (gGameEffects.b4A) {
-                Gaud_StartRegularComment(gGameEffects.u4C, 0);
-                gGameEffects.b4A = 0;
+            if (gGameEffects.bPostGBLine) {
+                Gaud_StartRegularComment(gGameEffects.nPostGBLine, 0);
+                gGameEffects.bPostGBLine = 0;
             }
             Gaud_InitCrowdReactionSound(3, 1);
             return;
         case 0:
             EVENT_Trigger(gGameEffects.nPlayer, 0x3E, 0, -1);
             if (GameEffects_ScriptedGBDidIt(&gPlayers[gGameEffects.nPlayer].ball, gGameEffects.nPlayer, 0)) {
-                if (gGameEffects.b4A) {
-                    Gaud_StartRegularComment(gGameEffects.u4C, 0);
-                    gGameEffects.b4A = 0;
+                if (gGameEffects.bPostGBLine) {
+                    Gaud_StartRegularComment(gGameEffects.nPostGBLine, 0);
+                    gGameEffects.bPostGBLine = 0;
                 }
                 Gaud_InitCrowdReactionSound(3, 1);
             } else {
-                if (gGameEffects.b47) {
-                    Gaud_StartRegularComment(gGameEffects.u48, 0);
+                if (gGameEffects.bPostGBNegLine) {
+                    Gaud_StartRegularComment(gGameEffects.nPostGBNegLine, 0);
                 }
-                Gaud_InitCrowdReactionSound(gGameEffects.nCrowdReaction, 1);
-                gGameEffects.bCrowdReactionSet = 0;
+                Gaud_InitCrowdReactionSound(gGameEffects.nPostGBCrowdLevel, 1);
+                gGameEffects.bPostGBCrowdLevel = 0;
             }
-            gGameEffects.b47 = 0;
+            gGameEffects.bPostGBNegLine = 0;
             break;
         }
     }

@@ -22,13 +22,13 @@ int SitDev_GetPGARank(int nPlayer);
 u16 SitDev_TranslateGameMode(int nMode);
 u32 SitDev_GetCommentaryZones(f32* pPos);
 
-u8 SitDev_CompareConditions(SitDevEntry* pEntry, int nTest, SitDevData* pData, int nValue);
+u8 SitDev_CompareConditions(SitDevSituation* pEntry, int nTest, SitDevData* pData, int nValue);
 
 // Whether every condition of a situation holds for the player: for each state value n whose bit is
 // set in auTests, in order, the situation's next test compares value n (SitDev_CompareConditions).
-// Value 86 is special: its argument picks one of the 16-byte names at p20, which must be the
+// Value 86 is special: its argument picks one of the 16-byte names at pNames, which must be the
 // golfer's last animation clip (Character.szLastClip).
-u8 SitDev_ConditionsMatch(SitDevEntry* pEntry, SitDevData* pData, int nPlayer) {
+u8 SitDev_ConditionsMatch(SitDevSituation* pEntry, SitDevData* pData, int nPlayer) {
     int nWord;
     int nBit;
     int nTest = 0;
@@ -39,7 +39,7 @@ u8 SitDev_ConditionsMatch(SitDevEntry* pEntry, SitDevData* pData, int nPlayer) {
             if (pEntry->auTests[nWord] & (1 << nBit)) {
                 if (nValue == 86) {
                     bTrue = strcmp(gPlayers[nPlayer].pChar->szLastClip,
-                                   (char*)gpSitDevScripts->p20 + pEntry->aArg[nTest++] * 16) == 0;
+                                   (char*)gpSitDevScripts->pNames + pEntry->aArg[nTest++] * 16) == 0;
                 } else {
                     bTrue = SitDev_CompareConditions(pEntry, nTest++, pData, nValue);
                 }
@@ -53,7 +53,7 @@ u8 SitDev_ConditionsMatch(SitDevEntry* pEntry, SitDevData* pData, int nPlayer) {
 // Test nTest of the situation against state value nValue, by the test's operator (aOp): 0 always
 // true, 1 equal to the argument, 2 not equal, 3 the value greater, 4 the value less, 5 any bit in
 // common. Values lbl_80193188 marks are compared as signed 16-bit. An unknown operator fails.
-u8 SitDev_CompareConditions(SitDevEntry* pEntry, int nTest, SitDevData* pData, int nValue) {
+u8 SitDev_CompareConditions(SitDevSituation* pEntry, int nTest, SitDevData* pData, int nValue) {
     if (lbl_80193188[nValue]) {
         switch (pEntry->aOp[nTest]) {
         case 0:

@@ -22,8 +22,8 @@ SitDevData* gpSitDevData = &gSitDevData;    // every SitDev file reaches it thro
 void SitDev_SetupStateVector(int nPlayer, u8 nEvent);
 void SitDev_ClearCupBevelFlag(void);
 void SitDev_ClearEmotionStates(void);
-u8   SitDev_ConditionsMatch(SitDevEntry* pEntry, SitDevData* pData, int nPlayer);
-void SitDev_InvokeMultipleActions(SitDevEntry* pEntry, int nFile, int nPlayer, u8 nEvent);
+u8   SitDev_ConditionsMatch(SitDevSituation* pEntry, SitDevData* pData, int nPlayer);
+void SitDev_InvokeMultipleActions(SitDevSituation* pEntry, int nFile, int nPlayer, u8 nEvent);
 void SitDev_Vec3Sub(f32* pA, f32* pB, f32* pOut);
 
 // .sbss, defined in reverse address order
@@ -48,13 +48,13 @@ void SitDev_vInitModule(void) {
 }
 
 // Round end (fn_8006CDC4): frees the commentary scripts' buffers (SitDevData pD0 when set, pCC,
-// pD4) and forgets the loaded scripts (gpSitDevScripts).
+// pGroupFlags) and forgets the loaded scripts (gpSitDevScripts).
 void SitDev_vCloseModule(void) {
     if (gpSitDevData->pD0 != NULL) {
         StaticMem_Free(gpSitDevData->pD0);
     }
     StaticMem_Free(gpSitDevData->pCC);
-    StaticMem_Free(gpSitDevData->pD4);
+    StaticMem_Free(gpSitDevData->pGroupFlags);
     gpSitDevScripts = NULL;
 }
 
@@ -158,19 +158,19 @@ void SitDev_QueueEvent(int nPlayer, int a, u8 nEvent) {
 }
 
 // Each frame of play (gomainloop.c, after SitDev_ThrowBallHitDelayedEvent): runs the scripts for
-// the events queued this frame, then empties the queue. For each situation (p14), in order: it
-// needs a queued event of its kind (any, for kind 0) whose player is the first queued event's; then
-// state value 0 is set again to the hole number (not for script file 22), and if its conditions
-// hold (SitDev_ConditionsMatch) and its group (n0; 0 for none) has not fired, the group is marked
-// and its actions run (SitDev_InvokeMultipleActions) for that player. A situation for event 29 that
-// tests value 64 (what the look-ahead ball hit) sets the prediction flags (gSitDevPredictionVoiced,
-// gSitDevPredictionPending) first. Afterwards, when an event 33 (the shot is over) was seen and the
-// scripts set no emotion for its player (gSitDevEmotionSet), the player's shot outcome is recorded
-// as 5 (fn_8006AAB4).
+// the events queued this frame, then empties the queue. For each situation (pSituations), in order:
+// it needs a queued event of its kind (any, for kind 0) whose player is the first queued event's;
+// then state value 0 is set again to the hole number (not for script file 22), and if its
+// conditions hold (SitDev_ConditionsMatch) and its group (nGroup; 0 for none) has not fired, the
+// group is marked and its actions run (SitDev_InvokeMultipleActions) for that player. A situation
+// for event 29 that tests value 64 (what the look-ahead ball hit) sets the prediction flags
+// (gSitDevPredictionVoiced, gSitDevPredictionPending) first. Afterwards, when an event 33 (the shot
+// is over) was seen and the scripts set no emotion for its player (gSitDevEmotionSet), the player's
+// shot outcome is recorded as 5 (fn_8006AAB4).
 void SitDev_ProcessEventQueue(void) {
     int i;
     int j;
-    SitDevEntry* pEntry;
+    SitDevSituation* pEntry;
     int nEmotionPlayer;
     SitDevEvent* pEvent;
     SitDevData* pData;
@@ -181,9 +181,9 @@ void SitDev_ProcessEventQueue(void) {
     if (gpSitDevData->n13C == 0) {
         return;
     }
-    pEntry = gpSitDevScripts->p14;
+    pEntry = gpSitDevScripts->pSituations;
     // fake match: a signed compare here, an unsigned one in SitDevFile.c's SitDev_SwapTables
-    for (i = 0; i < (int)gpSitDevScripts->nEntries; i++, pEntry++) {
+    for (i = 0; i < (int)gpSitDevScripts->nSituations; i++, pEntry++) {
         pData = gpSitDevData;
         bFound = 0;
         for (j = 0; j < pData->n13C; j++) {
@@ -198,19 +198,19 @@ void SitDev_ProcessEventQueue(void) {
             }
         }
         if (bFound) {
-            if (pEntry->b2.s.n5 != 22) {
+            if (pEntry->b2.s.nFileIndex != 22) {
                 _SetStateVecAndCondition(gpSitDevData->aValue, 0, Game_CurHoleIndex() + 1, pData->aSetBits);
             }
             if (SitDev_ConditionsMatch(pEntry, gpSitDevData, pEvent->nPlayer) &&
-                (pEntry->n0 == 0 || !gpSitDevData->pD4[pEntry->n0])) {
-                gpSitDevData->pD4[pEntry->n0] = 1;
+                (pEntry->nGroup == 0 || !gpSitDevData->pGroupFlags[pEntry->nGroup])) {
+                gpSitDevData->pGroupFlags[pEntry->nGroup] = 1;
                 nEvent = gpSitDevData->aEvents[j].nEvent;
                 if (nEvent == 29 && (pEntry->auTests[2] & 1)) {
                     gSitDevPredictionVoiced = 1;
                     gSitDevPredictionPending = 1;
                 }
-                SitDev_InvokeMultipleActions(pEntry, pEntry->b2.s.n5, gpSitDevData->aEvents[j].nPlayer,
-                                             nEvent);
+                SitDev_InvokeMultipleActions(pEntry, pEntry->b2.s.nFileIndex,
+                                             gpSitDevData->aEvents[j].nPlayer, nEvent);
             }
         }
     }

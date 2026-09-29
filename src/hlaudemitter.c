@@ -362,8 +362,8 @@ void Aud_EmiSetTrackAttenuation(u8 nId, u8 nTrack, f32 fVolume) {
     }
 }
 
-// Sets the pitch factor (AudTrack.f4C; tracks start at 1.0) of track nTrack of emitter instance nId
-// (Emi_SetTrackPitchFactor), if the instance is alive.
+// Sets the pitch factor (AudTrack.fPitch; tracks start at 1.0) of track nTrack of emitter instance
+// nId (Emi_SetTrackPitchFactor), if the instance is alive.
 void Aud_EmiSetTrackPitchFactor(u8 nId, u8 nTrack, f32 fPitch) {
     if (Aud_CheckEmitterInstance(nId) != NULL) {
         Emi_SetTrackPitchFactor(nId, nTrack, fPitch);

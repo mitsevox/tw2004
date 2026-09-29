@@ -186,7 +186,8 @@ void vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut);   // cross product
 // One level of a texture (12 bytes; char.c Character_SwapTexEntries byte-swaps four of them).
 typedef struct TexMip {
     u32  uPixels;               // 0x0  where its pixels start in the bank's p18
-    s16  nC;                    // 0x4  its size in 16-byte units (fn_80045FC8, FE_CrAPBall_SetLogo copy nC * 16)
+    s16  nC;                    // 0x4  its size in 16-byte units (fn_80045FC8, FE_CrAPBall_SetLogo
+                                //      copy nC * 16)
     u8   unk6[0x8 - 0x6];
     s16  n8;                    // 0x8  TX_spParseTextureGroupFromStream adds the bank's n28 to it
     u8   unkA[0xC - 0xA];
@@ -199,7 +200,8 @@ typedef struct TexEntry {
     u16  nHeight;               // 0x3A
     s16  nPalette;              // 0x3C  its row in the bank's pC
     u16  n3E;                   // 0x3E  its row in the bank's p10 (ShaderObjectsData fn_800740F4)
-    s8   b40;                   // 0x40  0: char.c Character_SwapTexEntries decodes the name and pairs the texture
+    s8   b40;                   // 0x40  0: char.c Character_SwapTexEntries decodes the name and
+                                //       pairs the texture
     s8   n41;                   // 0x41  (fn_80045FC8)
     u8   unk42[0x46 - 0x42];
     s8   b46;                   // 0x46  bit 0: clamp in s, bit 1: clamp in t (else repeat)
@@ -534,8 +536,8 @@ typedef struct RenderState {
     s32  nF4;                   // 0x0F4  }
     s32  nF8;                   // 0x0F8  }
     s32  nClipMode;             // 0x0FC  GX clip mode; 0 at reset; bit 0x400
-    TexBank*  pTexBank;         // 0x100  } the texture of the next draw (RenderState_SetBankTexture: the swing
-    TexEntry* pTexEntry;        // 0x104  } trail's, the logo editor's)
+    TexBank*  pTexBank;         // 0x100  } the texture of the next draw (RenderState_SetBankTexture:
+    TexEntry* pTexEntry;        // 0x104  } the swing trail's, the logo editor's)
     struct GxTexture* pTex108;  // 0x108  or this texture (fn_8002A608)
     struct LLPict* pPict10C;    // 0x10C  or this picture (LLVideo.c RenderState_SetPicture: a movie's)
     u32  uChanged;              // 0x110  which groups changed (the bits above)
@@ -745,8 +747,8 @@ typedef struct ParticleSystem {
 LAYOUT_ASSERT(ParticleSystem, 0xAC);
 
 // A shader object (our name; 0x28 bytes): a mesh a module fills and draws each frame through the
-// shader-object hooks of its row of lbl_80188E88 (Skin.c's SD_InitShaderObject sets it up, SD_FreeShaderObject
-// frees it, SD_FillShaderObject fills it, SD_DrawShaderObject draws it).
+// shader-object hooks of its row of lbl_80188E88 (Skin.c's SD_InitShaderObject sets it up,
+// SD_FreeShaderObject frees it, SD_FillShaderObject fills it, SD_DrawShaderObject draws it).
 typedef struct ShaderObject ShaderObject;
 
 typedef struct ShaderObjectHooks {
@@ -1473,7 +1475,7 @@ void fn_800B5918(const f32* pSrc, f32* pDst);   // GoShaderObject_Rain_Gc.c: cop
 // Normalises three floats and returns the length (0: a near-zero vector, copied as it is).
 f32  LLMath_NormalizeReturnLength3(f32* pSrc, f32* pDst);
 f32  LLMath_DistanceBetween3(f32* pA, f32* pB);  // three-float distance
-void Gaud_StartRegularComment(int nSound, int a);      // SitDevFile.c: Gaud_StartComment(0, nSound, a)
+void Gaud_StartRegularComment(int nSound, int a);      // SitDevTrigger.c: Gaud_StartComment(0, nSound, a)
 void BreakLine_Reset(int nView);
 // The EA Sports Bio, game side (EASportsBio.c; TW06's names)
 void EASBio_SetGamePlayState(u8 bFlag);

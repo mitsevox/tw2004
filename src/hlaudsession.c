@@ -141,7 +141,8 @@ void* Ses_AllocBankHdr(u32 uSize, u32 uMemory) {
     case 1:
         return gSesBank1 = AudMem_Alloc(uSize);
     }
-    // fake match: EA bug: no return for any other memory (UStream.c passes only 0 and 1 here)
+    // EA bug: no return for any other memory (UStream.c passes the chunk's id: 0 or 1 here)
+    // port: return NULL for any other
 }
 
 // Bank uMemory's header is loaded (UStream.c): turns its stored offsets into pointers: the group

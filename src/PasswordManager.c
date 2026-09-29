@@ -217,7 +217,7 @@ void PasswordManager_SetDefaults(void) {
         lbl_80281DF4->aTourAward[i].bWon = 0;
     }
     for (i = 0; i < 3; i++) {
-        lbl_80281DF4->a200[i].bWon = 0;
+        lbl_80281DF4->aMoneyListAward[i].bWon = 0;
     }
     // EA bug: runs past the 75 awards, as in SaveProfile_InitNew.
     for (i = 0; i < 118; i++) {
@@ -353,7 +353,7 @@ void SaveProfile_InitNew(SaveProfile* pProfile) {
         pProfile->aTourAward[i].bWon = 0;
     }
     for (i = 0; i < 3; i++) {
-        pProfile->a200[i].bWon = 0;
+        pProfile->aMoneyListAward[i].bWon = 0;
     }
     // EA bug: 118 (the real-time event count) runs past the 75 awards into aLadderAward and
     // aAward, which are cleared anyway.

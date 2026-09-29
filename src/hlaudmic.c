@@ -10,10 +10,8 @@
 #include "core/audtrack.h"
 #include "core/startup.h"
 
-void Rvb_SetPreset(u8 nPreset);         // AudReverb.c
-
 // Defined last-address-first, as CodeWarrior lays out .sbss.
-AudBlock48* gMicData;                   // the listeners' block (nothing reads it)
+AudMicBlock* gMicData;                  // the listeners' block (nothing reads it)
 u8 gMicCount;                           // listeners in the session, one per view
 
 // Allocates and clears the listeners' 0x48-byte block (gMicData) from the sound engine's memory
@@ -23,9 +21,9 @@ u8 Mic_InitModule(void) {
     u8 bOk;
 
     bOk = 0;
-    gMicData = AudMem_Alloc(sizeof(AudBlock48));
+    gMicData = AudMem_Alloc(sizeof(AudMicBlock));
     if (gMicData != NULL) {
-        Mem_set(gMicData, 0, sizeof(AudBlock48));
+        Mem_set(gMicData, 0, sizeof(AudMicBlock));
         bOk = 1;
     }
     return bOk;

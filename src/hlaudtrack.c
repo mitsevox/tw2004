@@ -14,7 +14,7 @@
 #include "core/audtrack.h"
 
 UList gTrkPerfLists[2];                // the tracks in use: [0] in start order, [1] placed ones
-                                        // sorted on f48, loudest first (InsertSortWorldPerf)
+                                        // sorted on fDistAttn, loudest first (InsertSortWorldPerf)
 
 AudTrack* gTrkPerfs;                    // the 32 tracks (Trk_InitModule)
 UPool gTrkPerfPool;                     // the free ones
@@ -29,8 +29,8 @@ void TrkRender3D(AudSource* pSource, AudTrack* pTrack, f32 fVolume) {
 
     ppVoice = pTrack->apVoices;
     ppEnd = &pTrack->apVoices[pTrack->pTmpl->n2];
-    fVolume = audfrac_Mul(pTrack->f48, fVolume);
-    fPitch = audfrac_Mul(pSource->fPitch, pTrack->f4C);
+    fVolume = audfrac_Mul(pTrack->fDistAttn, fVolume);
+    fPitch = audfrac_Mul(pSource->fPitch, pTrack->fPitch);
     params.flags.n = 0;
     params.flags.b.bVolume = 1;
     params.flags.b.bPitch = 1;
@@ -38,7 +38,7 @@ void TrkRender3D(AudSource* pSource, AudTrack* pTrack, f32 fVolume) {
     for (; ppVoice < ppEnd; ppVoice++) {
         pVoice = *ppVoice;
         if (pVoice != NULL) {
-            params.nVolume = audfrac_Mul(fVolume, pVoice->n14 << 7);
+            params.nVolume = audfrac_Mul(fVolume, pVoice->nVolume << 7);
             params.nPan = 64.0f * pSource->fPan + 64.0f;
             params.n7 = 64.0f * pSource->f68 + 64.0f;
             Voc_Render(pVoice, &params);
@@ -65,11 +65,11 @@ void TrkRenderStereo(AudSource* pSource, AudTrack* pTrack, f32 fVolume) {
     bRight = 0;
     bMono = nChannels == 1;
     params.flags.b.bPitch = 1;
-    params.fPitch = pTrack->f4C;
+    params.fPitch = pTrack->fPitch;
     for (; ppVoice < ppEnd; ppVoice++) {
         pVoice = *ppVoice;
         if (pVoice != NULL) {
-            params.nVolume = audfrac_Mul(pVoice->n14 << 7, fVolume);
+            params.nVolume = audfrac_Mul(pVoice->nVolume << 7, fVolume);
             params.nPan = bMono ? 0x40 : bRight ? 0x7F : 0;
             params.n7 = 0x7F;
             Voc_Render(pVoice, &params);
@@ -78,9 +78,9 @@ void TrkRenderStereo(AudSource* pSource, AudTrack* pTrack, f32 fVolume) {
     }
 }
 
-// Puts a placed (3D) track into the sorted track list, on f48, its distance attenuation (TW07's
-// distAttn), loudest first: before the first quieter track, else at the end. Trk_AllocPerf steals
-// from the quiet end.
+// Puts a placed (3D) track into the sorted track list, on fDistAttn, its distance attenuation
+// (TW07's distAttn), loudest first: before the first quieter track, else at the end. Trk_AllocPerf
+// steals from the quiet end.
 void InsertSortWorldPerf(AudTrack* pTrack) {
     AudTrack* pAt;
     UList* pList;
@@ -91,7 +91,7 @@ void InsertSortWorldPerf(AudTrack* pTrack) {
         UList_PushTail(pList, &pTrack->link);
     }
     while (pAt != NULL) {
-        if (pAt->f48 < pTrack->f48) {
+        if (pAt->fDistAttn < pTrack->fDistAttn) {
             UList_InsertAt(pList, &pTrack->link, &pAt->link);
             return;
         }
@@ -131,7 +131,7 @@ u8 Trk_InitModule(void) {
 
 // A new sound session (Ses_Init): frees every track in both lists and returns 1. The session
 // numbers are not used. TW07 has the loop as Trk_FreeAllPerfs.
-u8 Trk_InitSession(u8 a, u8 b) {
+u8 Trk_InitSession(u8 nSession, u8 nSubsession) {
     s32 i;
     UList* pList;
     AudTrack* pTrack;
@@ -196,11 +196,11 @@ void Trk_Cycle(void) {
 
 // Takes a track from the pool for channel nChannel of a source and sets it up (state 1, allocated;
 // volume and pitch 1, no pitch ramp) in the plain list or, for a placed source, the sorted one;
-// then Seq_Init or Stm_Init. fPriority is the distance attenuation (TW07's distAttn). When the pool
-// is empty it steals the quietest sorted track: for a placed source only one quieter than fPriority
+// then Seq_Init or Stm_Init. fDistAttn is the distance attenuation (TW07's distAttn). When the pool
+// is empty it steals the quietest sorted track: for a placed source only one quieter than fDistAttn
 // that is past state 1 and not streamed, for any other source the last one. Returns NULL when there
 // is none to take.
-AudTrack* Trk_AllocPerf(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f32 fPriority) {
+AudTrack* Trk_AllocPerf(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f32 fDistAttn) {
     UPool* const pPool = &gTrkPerfPool;
     s32 bSorted;
     UList* pList;
@@ -213,7 +213,7 @@ AudTrack* Trk_AllocPerf(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f3
         if (gTrkPerfLists[1].nCount == 0) return NULL;
         if (bSorted == 1) {
             while (pTrack != NULL) {
-                if (pTrack->nState != 1 && !(pTrack->pTmpl->n0 & 8) && pTrack->f48 < fPriority) break;
+                if (pTrack->nState != 1 && !(pTrack->pTmpl->n0 & 8) && pTrack->fDistAttn < fDistAttn) break;
                 pTrack = (AudTrack*)pTrack->link.pPrev;
             }
         }
@@ -228,13 +228,13 @@ AudTrack* Trk_AllocPerf(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f3
     pTrack->pSource = pSource;
     pSource->apTracks[nChannel] = pTrack;
     pTrack->f40 = pTmpl->fC;
-    pTrack->f44 = 1.0f;
-    pTrack->f48 = fPriority;
-    pTrack->f4C = 1.0f;
-    pTrack->f50 = 0.0f;
+    pTrack->fVolume = 1.0f;
+    pTrack->fDistAttn = fDistAttn;
+    pTrack->fPitch = 1.0f;
+    pTrack->fPitchRamp = 0.0f;
     pTrack->nChannel = nChannel;
     pTrack->nState = 1;
-    pTrack->n5D = 0;
+    pTrack->nVoices = 0;
     pTrack->bits.n = 0;
     pTrack->bits.b.bSorted = bSorted;
     pTrack->bits.b.b5 = pSource->nSound >= 0;
@@ -290,14 +290,14 @@ s32 Trk_FreePerf(AudTrack* pTrack) {
 }
 
 // Called by Emi_UpdInstance for each track of a source: starts, stops or restarts channel nChannel
-// as its distance attenuation fPriority changes. Nothing while the track is stopped and waiting
+// as its distance attenuation fDistAttn changes. Nothing while the track is stopped and waiting
 // (state 2). At 0 or below a playing track stops; above 0 an idle one starts (allocated first when
 // there is none). Templates with n0 & 4 (and not 1) are switched by hand: bOn and bOff are the
 // caller's start and stop requests, and bOn on a playing one restarts it unless n0 & 0x10 is set. A
 // sequenced track stopped and started in one go keeps its variation and set. A playing placed track
-// that neither starts nor stops is re-sorted on the new fPriority.
+// that neither starts nor stops is re-sorted on the new fDistAttn.
 void Trk_UpdatePerf(AudSource* pSource, AudTrack* pTrack, AudTrackTmpl* pTmpl, u8 nChannel, u8 bOn,
-                 u8 bOff, f32 fPriority) {
+                 u8 bOff, f32 fDistAttn) {
     u8 bPlaying;
     u8 bManual;
     u8 bRetrigger;
@@ -315,7 +315,7 @@ void Trk_UpdatePerf(AudSource* pSource, AudTrack* pTrack, AudTrackTmpl* pTmpl, u
     bManual = (pTmpl->n0 & 4) && !(pTmpl->n0 & 1);
     bRetrigger = (pTmpl->n0 & 0x10) == 0;
     bUpdate = bPlaying;
-    bAudible = fPriority > 0.0f;
+    bAudible = fDistAttn > 0.0f;
     bStart = bAudible &&
              ((!bPlaying && ((!bRetrigger && (!bManual || (bManual && bOn && !bOff))) ||
                              (bRetrigger && (!bManual || (bManual && bOn))))) ||
@@ -336,7 +336,7 @@ void Trk_UpdatePerf(AudSource* pSource, AudTrack* pTrack, AudTrackTmpl* pTmpl, u
     if (bStart) {
         bUpdate = 0;
         if (pTrack == NULL) {
-            pTrack = Trk_AllocPerf(pSource, pTmpl, nChannel, fPriority);
+            pTrack = Trk_AllocPerf(pSource, pTmpl, nChannel, fDistAttn);
         }
         if (pTrack != NULL) {
             Trk_Start(pTrack);
@@ -347,7 +347,7 @@ void Trk_UpdatePerf(AudSource* pSource, AudTrack* pTrack, AudTrackTmpl* pTmpl, u
         pTrack->u.seq.n68 = nCarryRange;
     }
     if (bUpdate && pTrack->bits.b.bSorted == 1) {
-        pTrack->f48 = fPriority;
+        pTrack->fDistAttn = fDistAttn;
         UList_DeleteAt(&gTrkPerfLists[1], &pTrack->link);
         InsertSortWorldPerf(pTrack);
     }
@@ -401,7 +401,7 @@ void Trk_StopAllVoices(AudTrack* pTrack, int bNow) {
             }
         }
         pTrack->nState = 2;
-        pTrack->n5D = 0;
+        pTrack->nVoices = 0;
         return;
     }
     if (pTrack->nState != 3) {
@@ -420,10 +420,11 @@ void Trk_StopAllVoices(AudTrack* pTrack, int bNow) {
     }
 }
 
-// Advances a track by one frame: its pitch (f4C) by its pitch ramp (f50), then its sequencer
-// (Seq_Tick) or stream (Stm_Tick). Returns 0 once it has stopped, for Trk_Cycle to free it.
+// Advances a track by one frame: its pitch (fPitch) by its pitch ramp (fPitchRamp), then its
+// sequencer (Seq_Tick) or stream (Stm_Tick). Returns 0 once it has stopped, for Trk_Cycle to free
+// it.
 u8 Trk_Tick(AudTrack* pTrack) {
-    pTrack->f4C += pTrack->f50;
+    pTrack->fPitch += pTrack->fPitchRamp;
     return !(pTrack->pTmpl->n0 & 8) ? Seq_Tick(pTrack) : Stm_Tick(pTrack);
 }
 
@@ -443,8 +444,8 @@ void Trk_SetVariationRange(AudTrack* pTrack, u8 n) {
     Seq_SetVariationRange(pTrack, n);
 }
 
-// Once a frame after its tick: the track's volume (f44) times its submix's (Mas_GetSubmix of the
-// play list's or bank's curve) goes with the track to TrkRender3D for placed (sorted) tracks or
+// Once a frame after its tick: the track's volume (fVolume) times its submix's (Mas_GetSubmix of
+// the play list's or bank's curve) goes with the track to TrkRender3D for placed (sorted) tracks or
 // TrkRenderStereo for the others, which set each voice (TW07 inlines both here). Nothing for a
 // template without data.
 void Trk_Render(AudTrack* pTrack) {
@@ -457,7 +458,7 @@ void Trk_Render(AudTrack* pTrack) {
     pList = pTrack->pTmpl->data.pPlayList;
     if (pList == NULL) return;
     fCurve = Mas_GetSubmix(pList->n3);
-    fVolume = audfrac_Mul(pTrack->f44, fCurve);
+    fVolume = audfrac_Mul(pTrack->fVolume, fCurve);
     if (pTrack->bits.b.bSorted == 1) {
         TrkRender3D(pSource, pTrack, fVolume);
         return;
@@ -481,7 +482,7 @@ void Trk_VoiceEndCB(AudVoice* pVoice, int nReason) {
 
     pTrack = pVoice->pUser;
     pTrack->apVoices[(u8)pVoice->nIndex] = NULL;
-    if (--pTrack->n5D == 0 && pTrack->nState == 3) {
+    if (--pTrack->nVoices == 0 && pTrack->nState == 3) {
         pTrack->nState = 2;
     }
 }

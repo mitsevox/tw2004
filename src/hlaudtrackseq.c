@@ -55,7 +55,7 @@ void AutoSelectVariation(AudTrack* pTrack) {
 
 // The sequenced voices' end callback (OnKeyOn's): Trk_VoiceEndCB first, then the channel forgets
 // its note, unless the voice was stolen (nReason 1, from Voc_Alloc) while playing a looping tone
-// (bA_1, the request's loop flag): CheckForStolenLoopers plays that note again.
+// (bLoops, the request's loop flag): CheckForStolenLoopers plays that note again.
 void VoiceEndCB(AudVoice* pVoice, int nReason) {
     AudTrack* pTrack;
     u8 nChannel;
@@ -63,7 +63,7 @@ void VoiceEndCB(AudVoice* pVoice, int nReason) {
     pTrack = pVoice->pUser;
     nChannel = pVoice->nIndex;
     Trk_VoiceEndCB(pVoice, nReason);
-    if (nReason != 1 || !pVoice->flags.b.bA_1) {
+    if (nReason != 1 || !pVoice->flags.b.bLoops) {
         pTrack->u.seq.apEvents[nChannel] = NULL;
     }
 }
@@ -93,9 +93,9 @@ void OnNoOp(AudSeqEvent* pEvent, AudTrack* pTrack) {
 }
 
 // Event 1, the end of a variation. A looping template (n0 & 2) goes on, unless the track is
-// stopping: a new variation when it picks them (n1, AutoSelectVariation), from event n3 of it, b7
-// telling Seq_Tick to fetch the new events, and Emi_TrackCallback with 1 when the template asks (n0
-// & 0x80). Any other template's track stops (state 3).
+// stopping: a new variation when it picks them (n1, AutoSelectVariation), from event n3 of it,
+// bNewVariation telling Seq_Tick to fetch the new events, and Emi_TrackCallback with 1 when the
+// template asks (n0 & 0x80). Any other template's track stops (state 3).
 void OnEnd(AudSeqEvent* pEvent, AudTrack* pTrack) {
     AudTrackTmpl* pTmpl;
 
@@ -106,7 +106,7 @@ void OnEnd(AudSeqEvent* pEvent, AudTrack* pTrack) {
                 AutoSelectVariation(pTrack);
             }
             pTrack->u.seq.n66 = pEvent->n3;
-            pTrack->bits.b.b7 = 1;
+            pTrack->bits.b.bNewVariation = 1;
             if (pTmpl->n0 & 0x80) {
                 Emi_TrackCallback(pTrack->pSource, pTmpl->n6, 1);
             }
@@ -117,9 +117,9 @@ void OnEnd(AudSeqEvent* pEvent, AudTrack* pTrack) {
 }
 
 // Event 2, a note: tone n3 of the bank at velocity n4, its volume n4 << 7 through the track's
-// distance attenuation (f48) and the bank's submix; nothing when that is 0. From the channel after
-// the last note's, it takes the first channel that is free (no voice, and no stolen looping note
-// waiting to be played again) or whose voice has a lower steal level or is ending (level 0),
+// distance attenuation (fDistAttn) and the bank's submix; nothing when that is 0. From the channel
+// after the last note's, it takes the first channel that is free (no voice, and no stolen looping
+// note waiting to be played again) or whose voice has a lower steal level or is ending (level 0),
 // deleting that voice; none, no note. Looping tones ask for steal level 1, others 0; outside
 // session 0, sound 1's track 0 asks 2. The voice starts with the track's pending settings (pitch 1
 // unless one is set), which are then cleared.
@@ -138,25 +138,25 @@ void OnKeyOn(AudSeqEvent* pEvent, AudTrack* pTrack) {
 
     // fake match: the (u8) changes nothing; it gives EA's instruction order.
     pTone = Ses_GetInstrumentTone(pTmpl->data.pBank, (u8)pEvent->n3);
-    fAttn = audfrac_Mul(pTrack->f48, Mas_GetSubmix(pTmpl->data.pBank->n3));
+    fAttn = audfrac_Mul(pTrack->fDistAttn, Mas_GetSubmix(pTmpl->data.pBank->n3));
     nVolume = audfrac_Mul((f32)(pEvent->n4 << 7), fAttn);
     bLoops = pTone->n10 & 1;
     if (nVolume == 0) return;
     if (pTone == NULL) return;
     nChannel = pTrack->u.seq.n65;
-    request.n4 = bLoops != 0;
+    request.nStealLevel = bLoops != 0;
     if (!Ses_IsSessionZero() && pTrack->pSource->nSound == 1 && pTrack->nChannel == 0) {
-        request.n4 = 2;
+        request.nStealLevel = 2;
     }
     for (i = 0; i < pTmpl->n2;) {
         pVoice = pTrack->apVoices[nChannel];
         if (pVoice == NULL) {
             if (pTrack->u.seq.apEvents[nChannel] == NULL) break;
-        } else if (request.n4 > pVoice->n10 || pVoice->n10 == 0) {
+        } else if (request.nStealLevel > pVoice->nStealLevel || pVoice->nStealLevel == 0) {
             Voc_Delete(pVoice);
             pTrack->u.seq.apEvents[nChannel] = NULL;
             pTrack->apVoices[nChannel] = NULL;
-            pTrack->n5D--;
+            pTrack->nVoices--;
             break;
         }
         nChannel++;
@@ -172,8 +172,8 @@ void OnKeyOn(AudSeqEvent* pEvent, AudTrack* pTrack) {
     request.pUser = pTrack;
     request.nIndex = nChannel;
     request.flags.n = 0;
-    request.flags.b.b14 = (pTrack->pSource->pSound->n3 & 4) || (pTrack->pTmpl->n0 & 0x20);
-    request.flags.b.b9 = bLoops;
+    request.flags.b.bNoReverb = (pTrack->pSource->pSound->n3 & 4) || (pTrack->pTmpl->n0 & 0x20);
+    request.flags.b.bLoops = bLoops;
     request.nPriority = nVolume;
     request.n2 = 0x40;
     request.n3 = 0x7F;
@@ -184,7 +184,7 @@ void OnKeyOn(AudSeqEvent* pEvent, AudTrack* pTrack) {
         f = pParams->fPitch;
     }
     Voc_Start(pVoice, pParams, pEvent->n4, f);
-    pTrack->n5D++;
+    pTrack->nVoices++;
     pTrack->apVoices[nChannel] = pVoice;
     pTrack->u.seq.apEvents[nChannel] = pEvent;
     pTrack->u.seq.n65 = nChannel;
@@ -228,8 +228,8 @@ void OnKeyOff(AudSeqEvent* pEvent, AudTrack* pTrack) {
 void OnPitchBend(AudSeqEvent* pEvent, AudTrack* pTrack) {
 }
 
-// Event 5: sets the pitch ramp (f50, added to the pitch every frame) of the source's track n3
-// (0xFF: this track) to n4 / 65536, allocating that track when the source has none.
+// Event 5: sets the pitch ramp (fPitchRamp, added to the pitch every frame) of the source's track
+// n3 (0xFF: this track) to n4 / 65536, allocating that track when the source has none.
 void OnPitchRamp(AudSeqEvent* pEvent, AudTrack* pTrack) {
     AudTrack* pTarget;
     AudSource* pSource;
@@ -242,11 +242,11 @@ void OnPitchRamp(AudSeqEvent* pEvent, AudTrack* pTrack) {
         pSource = pTrack->pSource;
         pTarget = pSource->apTracks[n];
         if (pTarget == NULL) {
-            pTarget = Trk_AllocPerf(pSource, &pSource->pSound->aTracks[n], n, pTrack->f48);
+            pTarget = Trk_AllocPerf(pSource, &pSource->pSound->aTracks[n], n, pTrack->fDistAttn);
         }
     }
     if (pTarget != NULL) {
-        pTarget->f50 = (u32)pEvent->n4 / 65536.0f;
+        pTarget->fPitchRamp = (u32)pEvent->n4 / 65536.0f;
     }
 }
 
@@ -277,7 +277,7 @@ void OnTrackSetPlayList(AudSeqEvent* pEvent, AudTrack* pTrack) {
     nPlayList = pEvent->n4;
     pTarget = pSource->apTracks[n];
     if (pTarget == NULL) {
-        pTarget = Trk_AllocPerf(pSource, &pSource->pSound->aTracks[n], n, pTrack->f48);
+        pTarget = Trk_AllocPerf(pSource, &pSource->pSound->aTracks[n], n, pTrack->fDistAttn);
     }
     if (pTarget != NULL) {
         Stm_SetPlayList(pTarget, nPlayList);
@@ -297,7 +297,7 @@ void OnTrackSetStream(AudSeqEvent* pEvent, AudTrack* pTrack) {
     nStream = pEvent->n4;
     pTarget = pSource->apTracks[n];
     if (pTarget == NULL) {
-        pTarget = Trk_AllocPerf(pSource, &pSource->pSound->aTracks[n], n, pTrack->f48);
+        pTarget = Trk_AllocPerf(pSource, &pSource->pSound->aTracks[n], n, pTrack->fDistAttn);
     }
     if (pTarget != NULL) {
         Stm_SetStream(pTarget, nStream, 0);
@@ -310,20 +310,21 @@ void OnModPitch(AudSeqEvent* pEvent, AudTrack* pTrack) {
     pTrack->params.flags.b.bPitch = 1;
 }
 
-// Event 10: the next note's envelope volume a8[n3] (n3 0 or 1) = n4; b5 or b4 says which was set.
+// Event 10: the next note's envelope value anAdsr[n3] (n3 0 attack, 1 decay) = n4; bAttack or
+// bDecay says which was set.
 void OnModADSRVol(AudSeqEvent* pEvent, AudTrack* pTrack) {
     u8 n;
 
     n = pEvent->n3;
-    pTrack->params.a8[n] = pEvent->n4;
-    pTrack->params.flags.b.b5 = n == 0;
-    pTrack->params.flags.b.b4 = n == 1;
+    pTrack->params.anAdsr[n] = pEvent->n4;
+    pTrack->params.flags.b.bAttack = n == 0;
+    pTrack->params.flags.b.bDecay = n == 1;
 }
 
-// Event 11: the next note's start offset (nC) = n4.
+// Event 11: the next note's start offset (nStartOffset) = n4.
 void OnModStartOffset(AudSeqEvent* pEvent, AudTrack* pTrack) {
-    pTrack->params.nC = pEvent->n4;
-    pTrack->params.flags.b.bC = 1;
+    pTrack->params.nStartOffset = pEvent->n4;
+    pTrack->params.flags.b.bStartOffset = 1;
 }
 
 // Event 12: empty here (TW07's OnRvbWetAttn has a body).
@@ -361,7 +362,7 @@ void ResetSequencerPerf(AudTrack* pTrack) {
     AudTrackTmpl* pTmpl;
 
     pTmpl = pTrack->pTmpl;
-    pTrack->n62 = 0;
+    pTrack->nWait = 0;
     pTrack->u.seq.n64 = 0;
     pTrack->u.seq.n65 = 0;
     pTrack->u.seq.n66 = (pTmpl->n0 & 1) ? 0xFF : 0;
@@ -383,7 +384,7 @@ void Seq_Start(AudTrack* pTrack) {
     AudTrackTmpl* pTmpl;
 
     pTmpl = pTrack->pTmpl;
-    pTrack->n62 = 0;
+    pTrack->nWait = 0;
     pTrack->u.seq.n66 = (pTmpl->n0 & 1) ? 0xFF : 0;
     pTrack->nState = 6;
     pTrack->u.seq.n69 = 0;
@@ -400,9 +401,9 @@ void Seq_Stop(AudTrack* pTrack) {
 // Ticks a sequenced track once a frame (Trk_Tick). A stopping track (state 3) runs nothing and
 // returns 1, a stopped one returns 0. A stepped template (n0 & 1) runs only the event Seq_Step
 // asked for, at once, after picking a new variation when it picks them (n1). Any other waits out
-// each event's delay (n62 counts the frames) and runs the ones that are due; after a looping End
-// event (b7) it fetches the new variation's events, and past the variation's last event the track
-// is stopping. On every 16th audio frame it plays stolen looping notes again
+// each event's delay (nWait counts the frames) and runs the ones that are due; after a looping End
+// event (bNewVariation) it fetches the new variation's events, and past the variation's last event
+// the track is stopping. On every 16th audio frame it plays stolen looping notes again
 // (CheckForStolenLoopers). Returns 0 once the track has stopped.
 u8 Seq_Tick(AudTrack* pTrack) {
     AudTrackTmpl* pTmpl;
@@ -431,17 +432,17 @@ u8 Seq_Tick(AudTrack* pTrack) {
     } else {
         SetVarCmdBounds(pTrack, &pEvent, &pEnd);
         while (pEvent < pEnd) {
-            if (pTrack->n62 < pEvent->n0) {
-                pTrack->n62++;
+            if (pTrack->nWait < pEvent->n0) {
+                pTrack->nWait++;
                 break;
             }
             gSeqCmdHandlers[pEvent->nType](pEvent, pTrack);
-            if (pTrack->bits.b.b7) {
-                pTrack->bits.b.b7 = 0;
+            if (pTrack->bits.b.bNewVariation) {
+                pTrack->bits.b.bNewVariation = 0;
                 SetVarCmdBounds(pTrack, &pEvent, &pEnd);
-                pTrack->n62 = pEvent->n0;
+                pTrack->nWait = pEvent->n0;
             } else {
-                pTrack->n62 = 0;
+                pTrack->nWait = 0;
                 pTrack->u.seq.n66++;
                 pEvent++;
             }
@@ -494,7 +495,7 @@ void Seq_SetVariationRange(AudTrack* pTrack, u8 n) {
     pTrack->u.seq.n68 = n;
     if (pTmpl->n1 != 0) {
         AutoSelectVariation(pTrack);
-        pTrack->n62 = 0;
+        pTrack->nWait = 0;
         pTrack->u.seq.n66 = (pTmpl->n0 & 1) ? 0xFF : 0;
         pTrack->u.seq.n67 = 0xFF;
     }

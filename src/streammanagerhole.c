@@ -81,8 +81,6 @@ void FE_CharBios_RegisterStreamClients();
 void FE_Manager_RegisterStreamClients();
 void FE_CharBios_UnRegisterStreamClients();
 void FE_lite_vRegisterStreamClients();
-void FE_CrAPBall_RegisterStreamClients();
-void FE_CrAPBall_UnRegisterStreamClients();
 void UI_vEATraxRegisterStreamClients();
 void UI_vEATraxUnRegisterStreamClients();
 void FE_CrAP_RegisterStreamClients();

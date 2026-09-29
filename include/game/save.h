@@ -255,7 +255,8 @@ typedef struct SaveProfile {
     u8   bActive;               // 0x00000  1: the slot holds a profile; payouts are scaled and
                                 //          awards given only then
     char szName[0x1C - 0x1];    // 0x00001  the profile's name, compared with the record holders'
-    u8   aGolferUnlocked[30];   // 0x0001C  per golfer (UserInfo_UnlockGolfer sets, UserInfo_IsGolferAvailable tests)
+    u8   aGolferUnlocked[30];   // 0x0001C  per golfer (UserInfo_UnlockGolfer sets,
+                                //          UserInfo_IsGolferAvailable tests)
     u8   aCourseUnlocked[23];   // 0x0003A  per course
     u8   aRewardUnlocked[0x64 - 0x51];  // 0x00051  per reward (UserInfo_UnlockReward sets); the
                                 //          "THEKITCHENSINK" code (0x80056568) sets the first 18
@@ -302,12 +303,14 @@ typedef struct SaveProfile {
                                 //          trophies (both awarded by
                                 //          GM_PgaTourSim_CheckEndOfTournamentAward;
                                 //          TrophyRoom_GetTourTrophy reads their days)
-    Award a200[3];              // 0x00200  the player's career winnings first, in the top 5 and in
-                                //          the top 25 of the tour
-                                //          (GM_PgaTourSim_CheckEndOfTournamentAward)
+    Award aMoneyListAward[3];   // 0x00200  the player's career winnings first, in the top 5 and in
+                                //          the top 25 of the tour's money list
+                                //          (GM_PgaTourSim_CheckEndOfTournamentAward; TW07
+                                //          AwardInfoPGAMoneyList)
     Award aRTEAward[75];        // 0x0020C  per real-time event id. TW06: rteEventAwardInfo
-    Award aLadderAward[25];     // 0x00338  per ladder event (LadderedMode.c); UserInfo_GetNumLadderEventsWon's earnings
-                                //          rating counts the won ones
+    Award aLadderAward[25];     // 0x00338  per ladder event (LadderedMode.c);
+                                //          UserInfo_GetNumLadderEventsWon's earnings rating counts
+                                //          the won ones
     Award aAward[39];           // 0x0039C  the trophy balls (GM_Earnings_AwardTrophyBall): 0..22
                                 //          count in GM_GetGameProgress, 23..38 (the PGA TOUR and
                                 //          career awards) in GM_GetBonusProgress
@@ -375,7 +378,8 @@ typedef struct SaveProfile {
     SponsorSlot aSponsor[11];   // 0x1054C  the sponsorship slots; cleared by the profile setup;
                                 //          FE_CrAP_IsItemLocked's lock kinds 10 (a sponsor signed) and 11
                                 //          (so many slots signed) read them
-    u8   a10578[4];             // 0x10578  par-5 holes 71..74, as a5004: eagled (UserInfo_GetPar5EagleStat's kind 0)
+    u8   a10578[4];             // 0x10578  par-5 holes 71..74, as a5004: eagled
+                                //          (UserInfo_GetPar5EagleStat's kind 0)
     s32  a1057C[4];             // 0x1057C  and their eagle dates, as a504C (kind 1)
     u8   unk1058C[0x10600 - 0x1058C];
 } SaveProfile;
@@ -425,14 +429,17 @@ u8   UserInfo_IsGolferAvailable(int nProfile, int nGolfer);        // the golfer
 void UserInfo_UnlockCourse(int nProfile, int nCourse);        // unlock a course (aCourseUnlocked)
 u8   UserInfo_IsCourseUnlocked(int nProfile, int nCourse);        // whether a course is unlocked
 void UserInfo_UnlockReward(int nProfile, int nReward);        // unlock a reward
-void UserInfo_UnlockCourseSlot21(int nProfile);                     // set aCourseUnlocked[21] (no event)
+void UserInfo_UnlockCourseSlot21(int nProfile);     // set aCourseUnlocked[21] (no event)
 u8   UserInfo_IsCourseSlot21Unlocked(int nProfile);
-void UserInfo_UnlockCourseSlot22(int nProfile);                     // and for aCourseUnlocked[22]
+void UserInfo_UnlockCourseSlot22(int nProfile);     // and for aCourseUnlocked[22]
 u8   UserInfo_IsCourseSlot22Unlocked(int nProfile);
-int  UserInfo_GetNumLadderEventsWon(int nProfile);                     // how many ladder events the profile has won
-void FE_CrAP_AddCustomAnimation(SaveProfile* pProfile, int nKind, char* pName);  // add pName to list nKind
-void FE_CrAP_RemoveCustomAnimation(SaveProfile* pProfile, int nKind, char* pName);  // take pName out of list nKind
-u8   FE_CrAP_IsCustomAnimationSelected(SaveProfile* pProfile, int nKind, char* pName);  // pName is in list nKind (0..2)
+int  UserInfo_GetNumLadderEventsWon(int nProfile);  // how many ladder events the profile has won
+// Add pName to list nKind
+void FE_CrAP_AddCustomAnimation(SaveProfile* pProfile, int nKind, char* pName);
+// Take pName out of list nKind
+void FE_CrAP_RemoveCustomAnimation(SaveProfile* pProfile, int nKind, char* pName);
+// pName is in list nKind (0..2)
+u8   FE_CrAP_IsCustomAnimationSelected(SaveProfile* pProfile, int nKind, char* pName);
 void FE_SetStartingSponsor(s16 n);            // sign lbl_80281DF0 with sponsor n
 int  FE_GetStartingSponsor(void);             // lbl_80281DF0's sponsor (callers take it without extsh)
 

@@ -136,7 +136,6 @@ void LI_ResetLights(void);
 void LI_SetObjectLights(UObject* pObj);
 void RenderState_SetScissor(int nX, int nY, int nWidth, int nHeight);
 void SKN_BeginFrame(void);
-void FE_CrAPBall_SetLogo(char* szBall);
 void Character_ExecuteTextureSwapFE(Character* pChar);
 char* fn_800484E0(int i);
 void fn_80035600(void);

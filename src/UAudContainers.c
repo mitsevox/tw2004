@@ -11,7 +11,7 @@
 void UList_Reset(UList* pList, u16 nSlots) {
     pList->pHead = NULL;
     pList->pTail = NULL;
-    pList->n8 = nSlots;
+    pList->nSlots = nSlots;
     pList->nCount = 0;
 }
 

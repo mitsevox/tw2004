@@ -14,23 +14,27 @@ typedef struct AudVoice {
     union {
         struct {
             u8 bHalf : 1;       // 0xA    which half of its ARAM buffer the next stream block fills
-            u8 bA_6 : 1;        //        no reverb: Voc_Render starts it with aux A off
-            u8 bA_5 : 1;        //        Voc_Render skips its next settings (and clears it)
-            u8 bA_4 : 1;        //        it owns uAram, given back when it stops (Voc_Delete)
-            u8 unkA_3 : 2;
-            u8 bA_1 : 1;        //        VoiceEndCB keeps the channel's event when it is set
-            u8 bA_0 : 1;        //        set up (Voc_Start, Voc_StartStream), started by Voc_Render
+            u8 bNoReverb : 1;   //        Voc_Render starts it with aux A (reverb) off
+            u8 bSkipRender : 1; //        stolen: Voc_Render skips its next settings (and clears it)
+            u8 bStream : 1;     //        it owns uAram, given back when it stops (Voc_Delete)
+            u8 unkA_3 : 2;      //        the request's b11 and b10
+            u8 bLoops : 1;      //        its tone loops: VoiceEndCB keeps the channel's note to play
+                                //        again when the voice is stolen
+            u8 bStart : 1;      //        set up (Voc_Start, Voc_StartStream), started by Voc_Render
             u8 bStopped : 1;    // 0xB    Voc_Stop has stopped it and taken it off its list
-            u8 bB_6 : 1;        //        paused; Stm_Tick resumes it once the drive is fine
+            u8 bHeld : 1;       //        a stream voice Voc_PauseAll left paused; Stm_Tick resumes
+                                //        it once the drive is fine
             u8 unkB : 6;
         } b;
-        u16 n;                  //        cleared as a whole when the voice is freed (Voc_Cycle)
+        u16 n;                  //        the request's flags (Voc_Alloc); cleared as a whole when
+                                //        the voice is freed (Voc_Cycle)
     } flags;                    // 0xA
-    u32  uC;                    // 0xC
-    s32  n10;                   // 0x10   the request's n4, and the pool list it is on: a voice with
-                                //        a lower one can be stolen
-    u8   n14;                   // 0x14   its own volume (0-127; TrkRender3D scales it by 128)
-    s8   n15;                   // 0x15   frames left before Voc_Cycle checks whether it has ended
+    u32  uRate;                 // 0xC    its playback rate (Voc_Start, Voc_StartStream); Voc_Render
+                                //        sends it times the track's pitch
+    s32  nStealLevel;           // 0x10   the request's, and the pool list it is on (0 once it is
+                                //        ending): a request with a higher one can steal it
+    u8   nVolume;               // 0x14   its own volume (0-127; TrkRender3D scales it by 128)
+    s8   nEndDelay;             // 0x15   frames left before Voc_Cycle checks whether it has ended
     u8   unk16[0x18 - 0x16];
     struct AudSeqTone* pTone;   // 0x18   the tone a sequenced track plays on it
     void (*pfnCallback)(struct AudVoice* pVoice, int nReason);  // 0x1C   the request's
@@ -49,14 +53,14 @@ LAYOUT_ASSERT(AudVoice, 0x40);
 // The sound engine's voices (gVocCores, a single pool).
 typedef struct AudVoicePool {
     AudVoice aVoices[AUD_NUM_VOICES];   // 0x000
-    UList    aLists[3];         // 0xC80  the voices in use, by their n10
+    UList    aLists[3];         // 0xC80  the voices in use, by their nStealLevel
     UPool    free;              // 0xCA4  the free voices
 } AudVoicePool;
 LAYOUT_ASSERT(AudVoicePool, 0xCAC);
 
 extern AudVoicePool gVocCores[1];
-extern u8  gVocInUse;                // the voices in use, counted by Voc_Cycle
-extern s32 gVocPauseOrder;                // flipped by each pause: the order Voc_PauseAll goes through
+extern u8  gVocInUse;       // the voices in use, counted by Voc_Cycle
+extern s32 gVocPauseOrder;  // flipped by each pause: the order Voc_PauseAll goes through
 
 // Settings for a voice; the flags say which fields are set. Voc_Render sets them on a voice;
 // a sequenced track's events change its own copy (AudTrack 0x30), handed to Voc_Start with each
@@ -66,16 +70,18 @@ typedef struct AudVoiceParams {
     s16  nVolume;               // 0x4
     u8   nPan;                  // 0x6    0 left, 0x40 centre, 0x7F right
     u8   n7;                    // 0x7    a second pan (Panning3D's front/back), 0x7F for a movie
-    u8   a8[2];                 // 0x8    from an event, by its n3
+    u8   anAdsr[2];             // 0x8    envelope values for the tone: [0] attack, [1] decay
+                                //        (event 10, OnModADSRVol)
     u8   unkA[0xC - 0xA];
-    u16  nC;                    // 0xC
+    u16  nStartOffset;          // 0xC    where the note starts (event 11, OnModStartOffset); not
+                                //        read in this build
     union {
         struct {
             u8 bVolume : 1;     //        nVolume, nPan and n7 are set
             u8 bPitch : 1;      //        fPitch is set
-            u8 b5 : 1;          //        a8 was last set at index 0
-            u8 b4 : 1;          //        a8 was last set at index 1
-            u8 bC : 1;          //        nC is set
+            u8 bAttack : 1;     //        anAdsr[0] is set (the last one set)
+            u8 bDecay : 1;      //        anAdsr[1] is set (the last one set)
+            u8 bStartOffset : 1; //       nStartOffset is set
             u8 unk0 : 3;
         } b;
         u8 n;                   //        cleared as a whole first
@@ -89,19 +95,21 @@ typedef struct AudVoiceRequest {
     s16  nPriority;             // 0x0    a sequenced note asks with its volume
     u8   n2;                    // 0x2
     u8   n3;                    // 0x3
-    s32  n4;                    // 0x4    how hard the voice is to steal (becomes AudVoice n10)
+    s32  nStealLevel;           // 0x4    how hard the voice is to steal (0-2; becomes
+                                //        AudVoice.nStealLevel)
     union {
         struct {
             u16 unk15 : 1;
-            u16 b14 : 1;
+            u16 bNoReverb : 1;  //        aux A (reverb) off: streams, movies, and notes of sounds
+                                //        with n3 & 4 or templates with n0 & 0x20
             u16 unk13 : 1;
-            u16 b12 : 1;
+            u16 bStream : 1;    //        Voc_Alloc gives the voice an ARAM stream buffer
             u16 b11 : 1;        //        bit 2 of the play list's number
             u16 b10 : 1;        //        set for a movie's voices (Mov_Init)
-            u16 b9 : 1;         //        the tone loops (set for a movie's voices too)
+            u16 bLoops : 1;     //        the tone loops (set for a movie's voices too)
             u16 unk0 : 9;
         } b;
-        u16 n;                  //        cleared as a whole first
+        u16 n;                  //        cleared as a whole first; copied into AudVoice.flags
     } flags;                    // 0x8
     void (*pfnCallback)(struct AudVoice* pVoice, int nReason);  // 0xC   called when the voice ends
     void* pUser;                // 0x10   the track
@@ -137,10 +145,12 @@ typedef struct AudStreamFile {
 typedef union AudTrackStmFlags {
     struct {
         u8 bStarved : 1;        // its voices are paused because the reads fell behind
-        u8 b6 : 1;              // when the buffer is full: hold (state 5) instead of playing
+        u8 bHold : 1;           // when the buffer is full: hold (state 5) instead of playing;
+                                // never set in this build
         u8 unk5 : 1;
         u8 bEnded : 1;          // the stream ended and does not loop
-        u8 b3 : 1;              // a refill was queued after the stream ended
+        u8 bSilenceQueued : 1;  // the silence after the end is queued (Stm_QueueSilence); the
+                                // next refill stops the voices
         u8 unk0 : 3;
     } b;
     u8 n;
@@ -174,9 +184,13 @@ LAYOUT_ASSERT(AudSeqEvent, 0x8);
 
 // The template a track plays: one of a bank sound's tracks (AudSound.aTracks, 0x1C bytes).
 typedef struct AudTrackTmpl {
-    u8   n0;                    // 0x0    0x01: events run one at a time (n67); 0x08: streamed;
-                                //        0x20: cleared and set by Ses_TmplOvrTrackRvbMode;
-                                //        0x40/0x80: Emi_TrackCallback on free/on a variation change
+    u8   n0;                    // 0x0    0x01 stepped: runs only the event Seq_Step asks for (n67);
+                                //        0x02 loops (OnEnd goes on to a new variation); 0x04
+                                //        switched by hand (Trk_UpdatePerf's bOn / bOff; not with
+                                //        0x01); 0x08 streamed; 0x10 no restart while playing;
+                                //        0x20 reverb off (Ses_TmplOvrTrackRvbMode sets and clears
+                                //        it); 0x40 / 0x80 Emi_TrackCallback on free / on a
+                                //        variation change
     u8   n1;                    // 0x1    how the next variation is picked (AutoSelectVariation); 0: never
     u8   n2;                    // 0x2    its channel count (one voice each; for a streamed track,
                                 //        its play list's)
@@ -233,8 +247,8 @@ typedef struct AudGroup {
     AudGroupEntry aEntries[1];  // 0x4    nEntries of them
 } AudGroup;
 
-// A sound bank as loaded (UStream.c reads it; Ses_ProcessArticulationData fixes its offsets up). Two can be loaded
-// at once: gSesBank0 (bank 0) and gSesBank1 (bank 1).
+// A sound bank as loaded (UStream.c reads it; Ses_ProcessArticulationData fixes its offsets up).
+// Two can be loaded at once: gSesBank0 (bank 0) and gSesBank1 (bank 1).
 typedef struct AudBank {
     u8   unk0[0x4];
     u32  uAram;                 // 0x4    its samples' ARAM block (Ses_AllocSampleAram), 0: none
@@ -272,8 +286,9 @@ typedef struct AudTrackStm {
 // A track's flags (AudTrack 0x5C), cleared as a byte when it is allocated.
 typedef union AudTrackFlags {
     struct {
-        u8 b7 : 1;
-        u8 bSorted : 1;         // in the second list, the one sorted on f48
+        u8 bNewVariation : 1;   // a looping End event moved to a new variation: Seq_Tick
+                                // fetches its events (OnEnd)
+        u8 bSorted : 1;         // in the second list, the one sorted on fDistAttn
         u8 b5 : 1;              // its source's nSound was not negative
         u8 bDetached : 1;       // taken out of its source's apTracks
         u8 bTicked : 1;         // an allocated track (state 1) is freed on its second tick
@@ -302,20 +317,21 @@ typedef struct AudTrack {
     struct AudSource* pSource;  // 0x2C   the sound source the track plays for
     AudVoiceParams params;      // 0x30   its flags are cleared when the track starts
     f32  f40;                  // 0x40   from its template
-    f32  f44;                   // 0x44   its volume
-    f32  f48;                   // 0x48   a volume (TrkRender3D scales it); the second list is
-                                //        sorted on it, highest first
-    f32  f4C;                   // 0x4C   its pitch, advanced by f50 every tick
-    f32  f50;                   // 0x50
+    f32  fVolume;               // 0x44   its volume (Aud_EmiSetTrackAttenuation), 1 at the start
+    f32  fDistAttn;             // 0x48   its distance attenuation (TW07's distAttn; TrkRender3D
+                                //        scales by it); the second list is sorted on it, highest
+                                //        first
+    f32  fPitch;                // 0x4C   its pitch factor, 1 at the start
+    f32  fPitchRamp;            // 0x50   added to fPitch every tick (event 5, OnPitchRamp)
     u8   nIndex;                // 0x54   its slot in the pool
     u8   nChannel;              // 0x55   its slot in its source's apTracks
     u8   unk56[2];
     s32  nState;                // 0x58   1 allocated, 2 stopped, 3 stopping, 4 filling, 5 filled,
                                 //        6 playing (streamed tracks)
     AudTrackFlags bits;         // 0x5C
-    u8   n5D;                   // 0x5D   its voices still playing
+    u8   nVoices;               // 0x5D   its voices still playing
     u8   unk5E[0x62 - 0x5E];
-    u16  n62;                   // 0x62   sequenced tracks: ticks waited for the next event
+    u16  nWait;                 // 0x62   sequenced tracks: ticks waited for the next event
     union {
         AudTrackStm stm;        // 0x64   streamed tracks (pTmpl->n0 & 8)
         AudTrackSeq seq;        // 0x64   sequenced tracks
@@ -386,13 +402,14 @@ LAYOUT_ASSERT(AudEmitters, 0xD8);
 
 extern AudEmitters lbl_801F2668;
 
-// The two track lists: [0] in start order, [1] sorted on f48, highest first.
+// The two track lists: [0] in start order, [1] sorted on fDistAttn, highest first.
 extern UList gTrkPerfLists[2];
-extern UPool gTrkPerfPool;              // the free tracks
-extern AudTrack* gTrkPerfs;          // the pool's memory
+extern UPool gTrkPerfPool;   // the free tracks
+extern AudTrack* gTrkPerfs;  // the pool's memory
 
-// A disc read waiting in the stream read queue (gAudStreamReadQueue). bRestart marks a request to refill
-// the whole buffer (Stm_SendSilenceToVoices) instead of a read.
+// A disc read waiting in the stream read queue (gAudStreamReadQueue). bSilence marks a request
+// (Stm_QueueSilence) to send a block of silence to the track's voices (Stm_SendSilenceToVoices)
+// instead of a read.
 typedef struct AudStreamRead {
     s32  hFile;                 // 0x0
     u8*  pDst;                  // 0x4
@@ -402,7 +419,7 @@ typedef struct AudStreamRead {
     AudTrack* pTrack;           // 0x14
     u8   nId;                   // 0x18
     u8   n19;                   // 0x19
-    u8   bRestart;              // 0x1A
+    u8   bSilence;              // 0x1A
 } AudStreamRead;
 LAYOUT_ASSERT(AudStreamRead, 0x1C);
 
@@ -431,35 +448,33 @@ typedef struct MovieSound {
 } MovieSound;
 LAYOUT_ASSERT(MovieSound, 0x18);
 
-// A 0x48-byte block Mic_InitModule allocates and clears (gMicData); nothing reads it yet.
-typedef struct AudBlock48 {
+// The listeners' 0x48-byte block (hlaudmic.c's gMicData): Mic_InitModule allocates and clears it;
+// nothing reads it in this build.
+typedef struct AudMicBlock {
     u8   unk0[0x48];
-} AudBlock48;
+} AudMicBlock;
 
-extern AudSource* lbl_80282058;         // AudTable.c's table
-extern u8 gMicCount;                 // the number of listeners (hlaudmic.c)
-extern f32 gMasSubmixVolumes[32];            // the volume of each curve (Mas_GetSubmix; HLAudMaster.c)
-extern s32 gMasMuteMask;                // one bit per curve: 1 = muted (Mas_IsChanMuted; HLAudMaster.c)
-extern f32 gMasTickRateScale;                // Mas_SetTickRate's rate, Mas_GetUpdateRateScale's result (HLAudMaster.c)
-extern s32 gSesSession;                // Ses_IsSessionZero says whether it is 0 (hlaudsession.c)
-extern AudStreamFile* gSesStreamFileHdr;     // the stream file's header (hlaudsession.c)
-extern AudBank* gSesBank1;           // bank 1 (hlaudsession.c)
-extern AudBank* gSesBank0;           // bank 0 (hlaudsession.c)
-extern u32 gSesFlags;                // what is loaded (hlaudsession.c): 0x01 set up, 0x04/0x08
-                                        // bank 0 and its samples, 0x10/0x20 bank 1 and its samples;
-                                        // the tracks tick when 0xD is set, only some when 0x40 is
-extern u32 lbl_80282018;                // the sequencer re-triggers notes when its low 4 bits are 0
+extern AudSource* lbl_80282058;           // AudTable.c's table
+extern u8 gMicCount;                      // the number of listeners (hlaudmic.c)
+extern f32 gMasSubmixVolumes[32];         // the volume of each curve (Mas_GetSubmix; HLAudMaster.c)
+extern s32 gMasMuteMask;                  // one bit per curve: 1 = muted (Mas_IsChanMuted; HLAudMaster.c)
+extern f32 gMasTickRateScale;             // Mas_SetTickRate's rate, Mas_GetUpdateRateScale's
+                                          // result (HLAudMaster.c)
+extern s32 gSesSession;                   // Ses_IsSessionZero says whether it is 0 (hlaudsession.c)
+extern AudStreamFile* gSesStreamFileHdr;  // the stream file's header (hlaudsession.c)
+extern AudBank* gSesBank1;                // bank 1 (hlaudsession.c)
+extern AudBank* gSesBank0;                // bank 0 (hlaudsession.c)
+extern u32 gSesFlags;                     // what is loaded (hlaudsession.c): 0x01 set up, 0x04/0x08
+                                          // bank 0 and its samples, 0x10/0x20 bank 1 and its samples;
+                                          // the tracks tick when 0xD is set, only some when 0x40 is
+extern u32 lbl_80282018;                  // the sequencer re-triggers notes when its low 4 bits are 0
 
 // The audio locks (AudLock.c): the name is EA's label for who holds them.
-void AudLock_Init(void);                 // set both locks up
-void AudLock_Lock(const char* szWho);    // take the stream lock
-void AudLock_Unlock(const char* szWho);    // give it back
+void AudLock_Init(void);                          // set both locks up
+void AudLock_Lock(const char* szWho);             // take the stream lock
+void AudLock_Unlock(const char* szWho);           // give it back
 void AudLock_LockReadQueue(const char* szWho);    // take the read-queue lock
-void AudLock_UnlockReadQueue(const char* szWho);    // give it back
-
-// The sound engine's memory (UAudMem.c).
-void* AudMem_Alloc(u32 uSize);
-void  AudMem_Free(void* p);
+void AudLock_UnlockReadQueue(const char* szWho);  // give it back
 
 // AudTable.c
 u8             Emi_InitModule(void);
@@ -487,31 +502,42 @@ void         Mas_ExitSession(void);
 u8           Mic_InitSession(u8 nSession, u8 nSubsession, u8 nListeners);
 void         Mic_ExitSession(void);
 
+// AudReverb.c
+void         Rvb_SetPreset(u8 nPreset);         // a listener's reverb preset (empty in this build)
+
 // hlaudsession.c
-u8*          Ses_GetStreamBuffer(u32 uSize, u8 nPlayList);                  // the stream buffer
-void         Ses_FreeStreamBuffer(u8* pBuffer, u32 uSize, u8 nPlayList);     // give it back
+u8*          Ses_GetStreamBuffer(u32 uSize, u8 nPlayList);                // the stream buffer
+void         Ses_FreeStreamBuffer(u8* pBuffer, u32 uSize, u8 nPlayList);  // give it back
 AudStream*   Ses_GetStreamFromPlayList(AudPlayList* pList, u16 nStream, u32* puLength);
 void         Ses_TmplOvrTrackRvbMode(s16 nSound, u8 nTrack, u8 bOn);
-u32          Ses_GetStreamBufferSize(u8 nPlayList);                              // the buffer size it needs
+u32          Ses_GetStreamBufferSize(u8 nPlayList);                       // the buffer size it needs
 AudPlayList* Ses_GetStreamPlayList(u8 nPlayList);
+// The sound data UStream.c loads (its 'SONO' chunks): where each header or sample block goes, and
+// the step once it is in.
+void*        Ses_AllocBankHdr(u32 uSize, u32 uMemory);                    // bank 0 or 1's header
+void         Ses_ProcessArticulationData(u32 uMemory);
+u32          Ses_AllocSampleAram(u32 uSize, u32 uMemory);                 // an ARAM address
+void         Ses_ProcessSampleData(u32 uMemory);
+AudStreamFile* Ses_AllocStreamFileHdr(u32 uSize);                         // NULL: one is loaded already
+void         Ses_ProcessStreamFileHdr(void);
 
 extern AudStreamQueue gAudStreamReadQueue;
-extern s32 gSesStreamFile;                // the stream file (hlaudsession.c opens "/AudioStm_GC.sab")
-extern u8 gStmLastReadId;                 // the last read id handed out (hlaudtrackstm.c)
-extern AudTrack* gStmDmaTrack;          // the track whose block is being DMA'd (hlaudtrackstm.c)
+extern s32 gSesStreamFile;      // the stream file (hlaudsession.c opens "/AudioStm_GC.sab")
+extern u8 gStmLastReadId;       // the last read id handed out (hlaudtrackstm.c)
+extern AudTrack* gStmDmaTrack;  // the track whose block is being DMA'd (hlaudtrackstm.c)
 
 // hlaudtrack.c
 void TrkRender3D(AudSource* pSource, AudTrack* pTrack, f32 fVolume);   // placed sounds
 void TrkRenderStereo(AudSource* pSource, AudTrack* pTrack, f32 fVolume);   // the others
 void InsertSortWorldPerf(AudTrack* pTrack);
 u8   Trk_InitModule(void);
-u8   Trk_InitSession(u8 a, u8 b);          // Ses_Init's a and b, unused
+u8   Trk_InitSession(u8 nSession, u8 nSubsession);  // Ses_Init's; not read
 void Trk_ExitSession(void);
 void Trk_Cycle(void);
-AudTrack* Trk_AllocPerf(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f32 fPriority);
+AudTrack* Trk_AllocPerf(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f32 fDistAttn);
 s32  Trk_FreePerf(AudTrack* pTrack);
 void Trk_UpdatePerf(AudSource* pSource, AudTrack* pTrack, AudTrackTmpl* pTmpl, u8 nChannel, u8 bOn,
-                 u8 bOff, f32 fPriority);
+                 u8 bOff, f32 fDistAttn);
 void Trk_Start(AudTrack* pTrack);
 void Trk_Stop(AudTrack* pTrack);
 void Trk_StopAllVoices(AudTrack* pTrack, int bNow);
@@ -565,17 +591,19 @@ void Voc_Start(AudVoice* pVoice, AudVoiceParams* pParams, u8 nVolume, f32 fPitch
 void Voc_StartStream(AudVoice* pVoice, u32 uLen, u32 nRate, u8 bLoud);
 void Voc_Render(AudVoice* pVoice, AudVoiceParams* pParams);
 void Voc_Pause(AudVoice* pVoice, u8 bPause);
-void Voc_Stop(AudVoice* pVoice);     // let it end
-void Voc_Delete(AudVoice* pVoice);     // stop it now
+void Voc_Stop(AudVoice* pVoice);    // let it end
+void Voc_Delete(AudVoice* pVoice);  // stop it now
 u8   Voc_CheckStreamHalfDone(AudVoice* pVoice, u32* puPos);
 
 // hlaudemitter.c
 void Aud_EmiTrkCB(u8 nId, u8 nBit, s32 n);
-int  Aud_EmiInitSession(void);                 // Aud_EmiDel on every instance in use, emitters emptied
+int  Aud_EmiInitSession(void);      // Aud_EmiDel on every instance in use, emitters emptied
 void Aud_EmiDel(u8 nId);
-void Aud_EmiAliasSetTrackStatus(s16 nEmitter, u8 nTrack, u8 bOn);   // for every instance of an emitter: Aud_EmiSetTrackStatus
-void Aud_EmiAliasSetTrackVarRange(s16 nEmitter, u8 nTrack, u8 n);     // Aud_EmiSetTrackVarRange
-void Aud_EmiAliasSetTrackStep(s16 nEmitter, u8 nTrack, u8 n, int bCheck);   // Aud_EmiSetTrackStep
-void Aud_EmiAliasSetTrackAttenuation(s16 nEmitter, u8 nTrack, f32 fVolume);        // Aud_EmiSetTrackAttenuation
+// For every instance of an emitter: Aud_EmiSetTrackStatus, Aud_EmiSetTrackVarRange,
+// Aud_EmiSetTrackStep, Aud_EmiSetTrackAttenuation.
+void Aud_EmiAliasSetTrackStatus(s16 nEmitter, u8 nTrack, u8 bOn);
+void Aud_EmiAliasSetTrackVarRange(s16 nEmitter, u8 nTrack, u8 n);
+void Aud_EmiAliasSetTrackStep(s16 nEmitter, u8 nTrack, u8 n, int bCheck);
+void Aud_EmiAliasSetTrackAttenuation(s16 nEmitter, u8 nTrack, f32 fVolume);
 
 #endif

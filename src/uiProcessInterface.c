@@ -67,12 +67,12 @@ int  fn_8001005C(TexBank* pBank, u64 uHash);       // LLTex.c: the texture's ind
 TexEntry* fn_800107E4(TexBank* pBank, int nTex);  // LLTexGrp.c
 void UI_ReportUISError(s32 nLevel, const char* szFile, s32 nLine, const char* szMsg);
 void UI_ScreenDrawDebug(u16 uGroup, u16 uScreen, s32 n);
-void UI_BlankProcess1(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4);
-void UI_BlankProcess2(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4);
-void UI_BlankProcess3(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4);
-void UI_BlankProcess4(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4);
-void UI_BlankProcess5(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4);
-void UI_BlankProcess6(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4);
+void UI_BlankProcess1(void* pVar, s32 nMsg, s32 nParams, s32* pParams, s32 nReturnAddr);
+void UI_BlankProcess2(void* pVar, s32 nMsg, s32 nParams, s32* pParams, s32 nReturnAddr);
+void UI_BlankProcess3(void* pVar, s32 nMsg, s32 nParams, s32* pParams, s32 nReturnAddr);
+void UI_BlankProcess4(void* pVar, s32 nMsg, s32 nParams, s32* pParams, s32 nReturnAddr);
+void UI_BlankProcess5(void* pVar, s32 nMsg, s32 nParams, s32* pParams, s32 nReturnAddr);
+void UI_BlankProcess6(void* pVar, s32 nMsg, s32 nParams, s32* pParams, s32 nReturnAddr);
 
 // Whether the UI has shut down after its exit fade (gbUIClosed, set by UI_UpdateInterface);
 // gomainloop's main loop stops on it.
@@ -706,27 +706,27 @@ void UI_RefreshFileEntries(void) {
 }
 
 // The studio's plugin 1 (UISPluginFncT, UI_OpenInterface): empty, as Madden 2003's _BlankProcess.
-void UI_BlankProcess1(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
+void UI_BlankProcess1(void* pVar, s32 nMsg, s32 nParams, s32* pParams, s32 nReturnAddr) {
 }
 
 // The studio's plugin 2 (UISPluginFncT, UI_OpenInterface): empty, as Madden 2003's _BlankProcess.
-void UI_BlankProcess2(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
+void UI_BlankProcess2(void* pVar, s32 nMsg, s32 nParams, s32* pParams, s32 nReturnAddr) {
 }
 
 // The studio's plugin 3 (UISPluginFncT, UI_OpenInterface): empty, as Madden 2003's _BlankProcess.
-void UI_BlankProcess3(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
+void UI_BlankProcess3(void* pVar, s32 nMsg, s32 nParams, s32* pParams, s32 nReturnAddr) {
 }
 
 // The studio's plugin 4 (UISPluginFncT, UI_OpenInterface): empty, as Madden 2003's _BlankProcess.
-void UI_BlankProcess4(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
+void UI_BlankProcess4(void* pVar, s32 nMsg, s32 nParams, s32* pParams, s32 nReturnAddr) {
 }
 
 // The studio's plugin 5 (UISPluginFncT, UI_OpenInterface): empty, as Madden 2003's _BlankProcess.
-void UI_BlankProcess5(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
+void UI_BlankProcess5(void* pVar, s32 nMsg, s32 nParams, s32* pParams, s32 nReturnAddr) {
 }
 
 // The studio's plugin 6 (UISPluginFncT, UI_OpenInterface): empty, as Madden 2003's _BlankProcess.
-void UI_BlankProcess6(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
+void UI_BlankProcess6(void* pVar, s32 nMsg, s32 nParams, s32* pParams, s32 nReturnAddr) {
 }
 
 // Set the current text context's line spacing (UFontContext.fLineSpacing): word-wrapped lines are
