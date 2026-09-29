@@ -176,7 +176,7 @@ int fn_8000BDF8(char* pName, TexBank** ppBank, TexEntry** ppTex) {
 }
 
 void fn_8000BEC8(void) {
-    lbl_80280DF8->aParams[2].nNumFiles = 0;
+    gpStreamManagerLists->aParams[2].nNumFiles = 0;
 }
 
 int Game_GetMode(void) {

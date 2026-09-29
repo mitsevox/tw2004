@@ -1906,13 +1906,13 @@ void FE_ResetCrAPGolferFromPreview(void) {
 }
 
 // Open the stream of stream list 3, the front-end golfer file fn_80014DFC puts there, and keep it
-// in lbl_80280DF8->nStream.
+// in gpStreamManagerLists->nStream.
 void FE_OpenGolferStream(void) {
-    lbl_80280DF8->nStream = Stream_OpenStreamFiles(&lbl_80280DF8->aParams[3]);
+    gpStreamManagerLists->nStream = Stream_OpenStreamFiles(&gpStreamManagerLists->aParams[3]);
 }
 
 void FE_CloseGolferStream(void) {
-    UStream_Close(lbl_80280DF8->nStream);
+    UStream_Close(gpStreamManagerLists->nStream);
 }
 
 // Four floats: pOut gets pA minus pB.

@@ -13,26 +13,26 @@
 #include "llpict.h"
 #include "unsorted/cull.h"
 
-char lbl_80186BD8[] = "data/FEnd/FEnd.gcb";
-char lbl_80186BEC[] = "FEChar.gcb";
-char lbl_80186BF8[] = "LoadOnce.gcb";
-char lbl_80186C08[] = "startup.gcb";
-char lbl_80186C14[] = "data/Load/Load%d.gcb";
-char lbl_80186C2C[] = "data/%s/";
-char lbl_80186C38[] = "/hole.hog";
-char lbl_80186C44[] = "GlbData.gcb";
-char lbl_80186C50[] = "GlbChar.gcb";
-char lbl_80186C5C[] = "data/Chars/%02dchar.gcb";
-char lbl_80186C74[] = "malesac.gcb";
-char lbl_80186C80[] = "femsac.gcb";
-char lbl_80186C8C[] = "data/CharSac/%02dchrsac.gcb";
-char lbl_80186CA8[] = "data/FEChars/%02dcharfe.gcb";
+char gszStreamFrontendFile[] = "data/FEnd/FEnd.gcb";
+char gszStreamFECharFile[] = "FEChar.gcb";
+char gszStreamLoadOnceFile[] = "LoadOnce.gcb";
+char gszStreamStartupFile[] = "startup.gcb";
+char gszStreamLoadScreenFileFmt[] = "data/Load/Load%d.gcb";
+char gszStreamCourseDirFmt[] = "data/%s/";
+char gszStreamHoleFileName[] = "/hole.hog";
+char gszStreamGlbDataFile[] = "GlbData.gcb";
+char gszStreamGlbCharFile[] = "GlbChar.gcb";
+char gszStreamCharFileFmt[] = "data/Chars/%02dchar.gcb";
+char gszStreamMaleSacFile[] = "malesac.gcb";
+char gszStreamFemaleSacFile[] = "femsac.gcb";
+char gszStreamCharSacFileFmt[] = "data/CharSac/%02dchrsac.gcb";
+char gszStreamFECharFileFmt[] = "data/FEChars/%02dcharfe.gcb";
 
 // Defined here, last address first (CodeWarrior lays out .bss in reverse).
-u8          lbl_801A48C8[0x38];
-StreamLists lbl_801A3728;
+u8          gStreamManagerCharAdded[0x38];
+StreamLists gStreamManagerLists;
 
-StreamLists* lbl_80280DF8 = &lbl_801A3728;
+StreamLists* gpStreamManagerLists = &gStreamManagerLists;
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -172,20 +172,20 @@ void fn_80014FA8(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)
 void fn_800143B8(void) {
     int i;
 
-    lbl_80280DF8->aParams[0].nNumFiles = 0;
-    lbl_80280DF8->aParams[1].nNumFiles = 0;
-    lbl_80280DF8->aParams[2].nNumFiles = 0;
-    lbl_80280DF8->aParams[3].nNumFiles = 0;
-    lbl_80280DF8->aParams[4].nNumFiles = 0;
-    lbl_80280DF8->aParams[5].nNumFiles = 0;
-    lbl_80280DF8->aParams[6].nNumFiles = 0;
-    fn_80014FA8(lbl_80186BD8, fn_80014E6C, fn_80014E84);
-    fn_80014FA8(lbl_80186BEC, fn_80014E6C, fn_80014E84);
-    fn_80014F20(lbl_80186BF8, fn_80014E78, fn_80014E90);
-    fn_80014E98(lbl_80186BF8, fn_80014E78, fn_80014E90);
-    fn_80014E98(lbl_80186C08, fn_80014E78, fn_80014E90);
+    gpStreamManagerLists->aParams[0].nNumFiles = 0;
+    gpStreamManagerLists->aParams[1].nNumFiles = 0;
+    gpStreamManagerLists->aParams[2].nNumFiles = 0;
+    gpStreamManagerLists->aParams[3].nNumFiles = 0;
+    gpStreamManagerLists->aParams[4].nNumFiles = 0;
+    gpStreamManagerLists->aParams[5].nNumFiles = 0;
+    gpStreamManagerLists->aParams[6].nNumFiles = 0;
+    fn_80014FA8(gszStreamFrontendFile, fn_80014E6C, fn_80014E84);
+    fn_80014FA8(gszStreamFECharFile, fn_80014E6C, fn_80014E84);
+    fn_80014F20(gszStreamLoadOnceFile, fn_80014E78, fn_80014E90);
+    fn_80014E98(gszStreamLoadOnceFile, fn_80014E78, fn_80014E90);
+    fn_80014E98(gszStreamStartupFile, fn_80014E78, fn_80014E90);
     for (i = 0; i < 30; i++) {
-        lbl_801A48C8[i] = 0;
+        gStreamManagerCharAdded[i] = 0;
     }
     fn_80014DF8();
     fn_80014A60();
@@ -203,7 +203,7 @@ void fn_80014524(void) {
 void fn_80014544(int nFile) {
     char szName[0x40];   // size unknown: the frame allows 0x40..0x48 bytes
 
-    sprintf(szName, lbl_80186C14, nFile);
+    sprintf(szName, gszStreamLoadScreenFileFmt, nFile);
     fn_80015030(szName, fn_80014E70, fn_80014E88);
 }
 
@@ -411,9 +411,9 @@ void StreamManagerHole_StreamFiles(void) {
     } else {
         szCourse = GM_GetCourseName();
         szHole = GameManager_GetHoleName(Game_GetCurHoleNum());
-        sprintf(szPath, lbl_80186C2C, szCourse);
+        sprintf(szPath, gszStreamCourseDirFmt, szCourse);
         strcat(szPath, szHole);
-        strcat(szPath, lbl_80186C38);
+        strcat(szPath, gszStreamHoleFileName);
         fn_8001529C(szPath, fn_80014E7C, fn_80014E94);
     }
     fn_8001526C();
@@ -441,14 +441,14 @@ void fn_80014A64(void) {
 
     gSacReloading = 0;
     fn_800153BC();
-    fn_80015334(lbl_80186C44, fn_80014E78, fn_80014E90);
-    fn_80015334(lbl_80186C50, fn_80014E68, fn_80014E80);
+    fn_80015334(gszStreamGlbDataFile, fn_80014E78, fn_80014E90);
+    fn_80015334(gszStreamGlbCharFile, fn_80014E68, fn_80014E80);
     for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
-        sprintf(szName, lbl_80186C5C, Character_GetGolferModelID(nPlayer) + 1);
+        sprintf(szName, gszStreamCharFileFmt, Character_GetGolferModelID(nPlayer) + 1);
         fn_80015334(szName, fn_80014E68, fn_80014E80);
     }
     for (i = 0; i < 30; i++) {
-        lbl_801A48C8[i] = 0;
+        gStreamManagerCharAdded[i] = 0;
     }
 }
 
@@ -460,13 +460,13 @@ void fn_80014BB4(void) {
 
     fn_800153BC();
     if (Skalib_HasOverlays(0) != 0) {
-        fn_80015334(lbl_80186C74, fn_80014E78, fn_80014E90);
+        fn_80015334(gszStreamMaleSacFile, fn_80014E78, fn_80014E90);
     }
     if (Skalib_HasOverlays(1) != 0) {
-        fn_80015334(lbl_80186C80, fn_80014E78, fn_80014E90);
+        fn_80015334(gszStreamFemaleSacFile, fn_80014E78, fn_80014E90);
     }
     for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
-        sprintf(szName, lbl_80186C8C, Character_GetGolferModelID(nPlayer) + 1);
+        sprintf(szName, gszStreamCharSacFileFmt, Character_GetGolferModelID(nPlayer) + 1);
         fn_80015334(szName, fn_80014E68, fn_80014E80);
     }
 }
@@ -484,9 +484,9 @@ void fn_80014C9C(void) {
     fn_800153BC();
     nSlot = Skalib_CurSlot();
     if (nSlot == 0) {
-        fn_80015334(lbl_80186C74, fn_80014E78, fn_80014E90);
+        fn_80015334(gszStreamMaleSacFile, fn_80014E78, fn_80014E90);
     } else {
-        fn_80015334(lbl_80186C80, fn_80014E78, fn_80014E90);
+        fn_80015334(gszStreamFemaleSacFile, fn_80014E78, fn_80014E90);
     }
     pSlot = &gLibSlots[nSlot];
     for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
@@ -497,7 +497,7 @@ void fn_80014C9C(void) {
             }
         }
         if (i < pSlot->nOverlays) {
-            sprintf(szName, lbl_80186C8C, nModel + 1);
+            sprintf(szName, gszStreamCharSacFileFmt, nModel + 1);
             fn_80015334(szName, fn_80014E68, fn_80014E80);
         }
     }
@@ -524,7 +524,7 @@ void fn_80014DFC(s32 nChar, s32 nUnused) {   // port: FEgolferanim.c passes a se
     char szName[0x100];  // size unknown: the frame allows up to 0x100 bytes
 
     fn_80015454();
-    sprintf(szName, lbl_80186CA8, nChar + 1);
+    sprintf(szName, gszStreamFECharFileFmt, nChar + 1);
     gpCrAPState->pB8->nStreamedId = -1;
     fn_800153CC(szName, fn_80014E74, fn_80014E8C);
 }
@@ -573,140 +573,140 @@ void fn_80014E94(void* pArg) {
 
 // Add a file to stream list 5, with the calls made when it is opened and closed.
 void fn_80014E98(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*)) {
-    strcpy(lbl_80280DF8->aParams[5].aszName[lbl_80280DF8->aParams[5].nNumFiles], szName);
-    lbl_80280DF8->aParams[5].apfnOpened[lbl_80280DF8->aParams[5].nNumFiles] = pfnOpened;
-    lbl_80280DF8->aParams[5].apfnClosed[lbl_80280DF8->aParams[5].nNumFiles] = pfnClosed;
-    lbl_80280DF8->aParams[5].nNumFiles++;
+    strcpy(gpStreamManagerLists->aParams[5].aszName[gpStreamManagerLists->aParams[5].nNumFiles], szName);
+    gpStreamManagerLists->aParams[5].apfnOpened[gpStreamManagerLists->aParams[5].nNumFiles] = pfnOpened;
+    gpStreamManagerLists->aParams[5].apfnClosed[gpStreamManagerLists->aParams[5].nNumFiles] = pfnClosed;
+    gpStreamManagerLists->aParams[5].nNumFiles++;
 }
 
 // The same for list 4.
 void fn_80014F20(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*)) {
-    strcpy(lbl_80280DF8->aParams[4].aszName[lbl_80280DF8->aParams[4].nNumFiles], szName);
-    lbl_80280DF8->aParams[4].apfnOpened[lbl_80280DF8->aParams[4].nNumFiles] = pfnOpened;
-    lbl_80280DF8->aParams[4].apfnClosed[lbl_80280DF8->aParams[4].nNumFiles] = pfnClosed;
-    lbl_80280DF8->aParams[4].nNumFiles++;
+    strcpy(gpStreamManagerLists->aParams[4].aszName[gpStreamManagerLists->aParams[4].nNumFiles], szName);
+    gpStreamManagerLists->aParams[4].apfnOpened[gpStreamManagerLists->aParams[4].nNumFiles] = pfnOpened;
+    gpStreamManagerLists->aParams[4].apfnClosed[gpStreamManagerLists->aParams[4].nNumFiles] = pfnClosed;
+    gpStreamManagerLists->aParams[4].nNumFiles++;
 }
 
 // The same for list 1.
 void fn_80014FA8(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*)) {
-    strcpy(lbl_80280DF8->aParams[1].aszName[lbl_80280DF8->aParams[1].nNumFiles], szName);
-    lbl_80280DF8->aParams[1].apfnOpened[lbl_80280DF8->aParams[1].nNumFiles] = pfnOpened;
-    lbl_80280DF8->aParams[1].apfnClosed[lbl_80280DF8->aParams[1].nNumFiles] = pfnClosed;
-    lbl_80280DF8->aParams[1].nNumFiles++;
+    strcpy(gpStreamManagerLists->aParams[1].aszName[gpStreamManagerLists->aParams[1].nNumFiles], szName);
+    gpStreamManagerLists->aParams[1].apfnOpened[gpStreamManagerLists->aParams[1].nNumFiles] = pfnOpened;
+    gpStreamManagerLists->aParams[1].apfnClosed[gpStreamManagerLists->aParams[1].nNumFiles] = pfnClosed;
+    gpStreamManagerLists->aParams[1].nNumFiles++;
 }
 
 // The same for list 2.
 void fn_80015030(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*)) {
-    strcpy(lbl_80280DF8->aParams[2].aszName[lbl_80280DF8->aParams[2].nNumFiles], szName);
-    lbl_80280DF8->aParams[2].apfnOpened[lbl_80280DF8->aParams[2].nNumFiles] = pfnOpened;
-    lbl_80280DF8->aParams[2].apfnClosed[lbl_80280DF8->aParams[2].nNumFiles] = pfnClosed;
-    lbl_80280DF8->aParams[2].nNumFiles++;
+    strcpy(gpStreamManagerLists->aParams[2].aszName[gpStreamManagerLists->aParams[2].nNumFiles], szName);
+    gpStreamManagerLists->aParams[2].apfnOpened[gpStreamManagerLists->aParams[2].nNumFiles] = pfnOpened;
+    gpStreamManagerLists->aParams[2].apfnClosed[gpStreamManagerLists->aParams[2].nNumFiles] = pfnClosed;
+    gpStreamManagerLists->aParams[2].nNumFiles++;
 }
 
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_800150B8(void) {
-    UStream_Close(lbl_80280DF8->nStream);
+    UStream_Close(gpStreamManagerLists->nStream);
 }
 
 void fn_800150E0(void) {
     s32 t0;
-    t0 = Stream_OpenStreamFiles(&lbl_80280DF8->aParams[0]);
-    lbl_80280DF8->nStream = t0;
+    t0 = Stream_OpenStreamFiles(&gpStreamManagerLists->aParams[0]);
+    gpStreamManagerLists->nStream = t0;
 }
 
 void fn_8001510C(void) {
-    UStream_Close(lbl_80280DF8->nStream);
+    UStream_Close(gpStreamManagerLists->nStream);
 }
 
 void fn_80015134(void) {
     s32 t0;
-    t0 = Stream_OpenStreamFiles(&lbl_80280DF8->aParams[1]);
-    lbl_80280DF8->nStream = t0;
+    t0 = Stream_OpenStreamFiles(&gpStreamManagerLists->aParams[1]);
+    gpStreamManagerLists->nStream = t0;
 }
 
 void fn_80015164(void) {
-    UStream_Close(lbl_80280DF8->nStream);
+    UStream_Close(gpStreamManagerLists->nStream);
 }
 
 void fn_8001518C(void) {
     s32 t0;
-    t0 = Stream_OpenStreamFiles(&lbl_80280DF8->aParams[2]);
-    lbl_80280DF8->nStream = t0;
+    t0 = Stream_OpenStreamFiles(&gpStreamManagerLists->aParams[2]);
+    gpStreamManagerLists->nStream = t0;
 }
 
 void fn_800151BC(void) {
-    UStream_Close(lbl_80280DF8->nStream);
+    UStream_Close(gpStreamManagerLists->nStream);
 }
 
 void fn_800151E4(void) {
     s32 t0;
-    t0 = Stream_OpenStreamFiles(&lbl_80280DF8->aParams[5]);
-    lbl_80280DF8->nStream = t0;
+    t0 = Stream_OpenStreamFiles(&gpStreamManagerLists->aParams[5]);
+    gpStreamManagerLists->nStream = t0;
 }
 
 void fn_80015214(void) {
     s32 t0;
-    t0 = Stream_OpenStreamFiles(&lbl_80280DF8->aParams[4]);
-    lbl_80280DF8->nStream = t0;
+    t0 = Stream_OpenStreamFiles(&gpStreamManagerLists->aParams[4]);
+    gpStreamManagerLists->nStream = t0;
 }
 
 void fn_80015244(void) {
-    UStream_Close(lbl_80280DF8->nStream);
+    UStream_Close(gpStreamManagerLists->nStream);
 }
 
 void fn_8001526C(void) {
     s32 t0;
-    t0 = Stream_OpenStreamFiles(&lbl_80280DF8->aParams[6]);
-    lbl_80280DF8->nStream = t0;
+    t0 = Stream_OpenStreamFiles(&gpStreamManagerLists->aParams[6]);
+    gpStreamManagerLists->nStream = t0;
 }
 
 // ---- end of sweep code ----
 
 // The same for list 6.
 void fn_8001529C(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*)) {
-    strcpy(lbl_80280DF8->aParams[6].aszName[lbl_80280DF8->aParams[6].nNumFiles], szName);
-    lbl_80280DF8->aParams[6].apfnOpened[lbl_80280DF8->aParams[6].nNumFiles] = pfnOpened;
-    lbl_80280DF8->aParams[6].apfnClosed[lbl_80280DF8->aParams[6].nNumFiles] = pfnClosed;
-    lbl_80280DF8->aParams[6].nNumFiles++;
+    strcpy(gpStreamManagerLists->aParams[6].aszName[gpStreamManagerLists->aParams[6].nNumFiles], szName);
+    gpStreamManagerLists->aParams[6].apfnOpened[gpStreamManagerLists->aParams[6].nNumFiles] = pfnOpened;
+    gpStreamManagerLists->aParams[6].apfnClosed[gpStreamManagerLists->aParams[6].nNumFiles] = pfnClosed;
+    gpStreamManagerLists->aParams[6].nNumFiles++;
 }
 
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_80015324(void) {
-    lbl_80280DF8->aParams[6].nNumFiles = 0;
+    gpStreamManagerLists->aParams[6].nNumFiles = 0;
 }
 
 // ---- end of sweep code ----
 
 // The same for list 0.
 void fn_80015334(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*)) {
-    strcpy(lbl_80280DF8->aParams[0].aszName[lbl_80280DF8->aParams[0].nNumFiles], szName);
-    lbl_80280DF8->aParams[0].apfnOpened[lbl_80280DF8->aParams[0].nNumFiles] = pfnOpened;
-    lbl_80280DF8->aParams[0].apfnClosed[lbl_80280DF8->aParams[0].nNumFiles] = pfnClosed;
-    lbl_80280DF8->aParams[0].nNumFiles++;
+    strcpy(gpStreamManagerLists->aParams[0].aszName[gpStreamManagerLists->aParams[0].nNumFiles], szName);
+    gpStreamManagerLists->aParams[0].apfnOpened[gpStreamManagerLists->aParams[0].nNumFiles] = pfnOpened;
+    gpStreamManagerLists->aParams[0].apfnClosed[gpStreamManagerLists->aParams[0].nNumFiles] = pfnClosed;
+    gpStreamManagerLists->aParams[0].nNumFiles++;
 }
 
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_800153BC(void) {
-    lbl_80280DF8->aParams[0].nNumFiles = 0;
+    gpStreamManagerLists->aParams[0].nNumFiles = 0;
 }
 
 // ---- end of sweep code ----
 
 // The same for list 3.
 void fn_800153CC(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*)) {
-    strcpy(lbl_80280DF8->aParams[3].aszName[lbl_80280DF8->aParams[3].nNumFiles], szName);
-    lbl_80280DF8->aParams[3].apfnOpened[lbl_80280DF8->aParams[3].nNumFiles] = pfnOpened;
-    lbl_80280DF8->aParams[3].apfnClosed[lbl_80280DF8->aParams[3].nNumFiles] = pfnClosed;
-    lbl_80280DF8->aParams[3].nNumFiles++;
+    strcpy(gpStreamManagerLists->aParams[3].aszName[gpStreamManagerLists->aParams[3].nNumFiles], szName);
+    gpStreamManagerLists->aParams[3].apfnOpened[gpStreamManagerLists->aParams[3].nNumFiles] = pfnOpened;
+    gpStreamManagerLists->aParams[3].apfnClosed[gpStreamManagerLists->aParams[3].nNumFiles] = pfnClosed;
+    gpStreamManagerLists->aParams[3].nNumFiles++;
 }
 
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_80015454(void) {
-    lbl_80280DF8->aParams[3].nNumFiles = 0;
+    gpStreamManagerLists->aParams[3].nNumFiles = 0;
 }
 
 // The current hole's number on its course (Game_CurHoleIndex gives its 0..17 place in the round).
