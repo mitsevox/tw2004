@@ -60,7 +60,7 @@ void Kernel_FreeObjectMem(void* p) {
 // Ter_TeeLoadCallback / Ter_PinLoadCallback (6 continues when that answers nonzero), 7 is a particle emitter
 // (fn_8009943C), 8 is dropped, 9 is a sound (Gaud_ActorDownloadCallback), 10 the Play Now ball
 // spot. Any other type becomes a dynamic object: its 'aRSL' resource list is resolved into model
-// references, its handler found by type (fn_800499B0), and the stream object is freed.
+// references, its handler found by type (DynObj_GetTypeHandler), and the stream object is freed.
 void Kernel_DownloadActors(UStreamObject* pObject) {
     DynObjSetup setup;
     TagRecord* pChunk;
