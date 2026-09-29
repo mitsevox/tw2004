@@ -190,7 +190,8 @@ void GM_CourseInfo_DeInit(void);
 int  GM_GetCurrentHolePrevailingWindDir(void);
 f32  GM_GetCurrentHolePrevailingWindSpeed(void);
 s32  GM_GetTotalPar(int nCourse, int nTeeSet);    // a course's par from a tee set
-s32  GM_GetCurrentCourseTotalPar(s32 nTeeSet);          // the par of the round's 18 holes (the tee set is not used)
+s32  GM_GetCurrentCourseTotalPar(s32 nTeeSet);          // the par of the round's 18 holes (the tee set is not
+                                                        // used)
 u8   GM_GetHoleIndexCountsForDrivingStat(int nHole);
 int  GM_CourseInfo_GetCompilationCourse(int nRound, int nHole);    // a built round's course for a hole
 int  GM_CourseInfo_GetCompilationHole(int nRound, int nHole);    // and its hole number (1-based)
@@ -246,7 +247,8 @@ u32  CalDate_GetMonth(u16 nDate);            // Calendar.c (unsigned: callers co
 u16  CalDate_GetToday(void);                 // today's date
 int  GM_GetHolePar(int nCourse, int nHole);   // a hole's par on a course
 int  GM_GetHoleIndexPar(int nHole);            // a hole's par
-s32  GM_GetHoleIndexTeeDistance(int nHole, int nTee);  // CourseData.c: a round hole's length from tee set nTee
+s32  GM_GetHoleIndexTeeDistance(int nHole, int nTee);  // CourseData.c: a round hole's length from tee set
+                                                       // nTee
 s32  GM_Earnings_TournamentPayout(int nTotal, int n, int nRow);  // Earnings.c: the prize for a finishing row
 void GM_Earnings_AwardMoney(int nPlayer, int nMoney, CourseMoneyTracking* pMoney);   // pMoney may be NULL
 int  GM_Earnings_GetStrokeWinnings(int nWinner, int nLoser, int nMargin, int* pPrize);

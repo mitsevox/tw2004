@@ -39,7 +39,8 @@ typedef struct DynObjAnimalDef {
     f32  a20[5];                // 0x20  -> DynObjAnimal.a178
     f32  f34;                   // 0x34  -> DynObjAnimal.f194
     f32  f38;                   // 0x38  -> DynObjAnimal.f198
-    f32  aAngles[3];            // 0x3C  its rotation, in degrees (given to mat44flt_EulerAngles as 0x40, 0x3C, 0x44)
+    f32  aAngles[3];            // 0x3C  its rotation, in degrees (given to mat44flt_EulerAngles as 0x40,
+                                //       0x3C, 0x44)
 } DynObjAnimalDef;
 
 // The stream object an object's model comes from (a view of UStreamObject: its +4 is the model).
@@ -81,8 +82,8 @@ typedef struct DynObjSetup {
     DynObjNames* pC;            // 0x0C
 } DynObjSetup;
 
-// Two bytes UKernel.c's Kernel_PostPairToObject records on an object (DynObj.a138), or in gKernelOverflowSlots when
-// the object's four are taken.
+// Two bytes UKernel.c's Kernel_PostPairToObject records on an object (DynObj.a138), or in
+// gKernelOverflowSlots when the object's four are taken.
 typedef struct DynObjPair {
     u8   b0;                    // 0x0
     u8   b1;                    // 0x1
@@ -94,13 +95,15 @@ typedef struct UObjMeshInfo {
     u8   unk2[0x4 - 0x2];
     s32  n4;                    // 0x04  not 0: a chunk follows; fn_8000799C passes n4 * 2 to fn_80007658
     u8   unk8[0x24 - 0x8];
-    s8   a24[0x54 - 0x24];      // 0x24  Object_GetMeshFlags, GoTerrain.c Ter_GetMeshFlags (length unknown, at most this)
+    s8   a24[0x54 - 0x24];      // 0x24  Object_GetMeshFlags, GoTerrain.c Ter_GetMeshFlags (length unknown, at
+                                //       most this)
     f32  f54;                   // 0x54  scales a terrain object's mipmap bias (GoTerrain.c fn_80035560)
     f32  v58[3];                // 0x58  copied to UObjModel.v2C by type 0's setup; with f64 the
                                 //       bounding sphere GoTerrain.c's fn_800354C4 returns
     f32  f64;                   // 0x64  copied to UObjModel.f5C by type 0's setup
-    f32  a68[8];                // 0x68  a terrain object's bounds (GoTerrain.c fn_80035508, Ter_AddPatchObjects):
-                                //       its centre [0..2], a radius [3] and a height [7]
+    f32  a68[8];                // 0x68  a terrain object's bounds (GoTerrain.c fn_80035508,
+                                //       Ter_AddPatchObjects): its centre [0..2], a radius [3] and a height
+                                //       [7]
     s16  n88;                   // 0x88  the type of the mesh's parts (LLObj_Gc.c fn_80007658)
     u8   unk8A[0x8B - 0x8A];
     u8   b8B;                   // 0x8B  bit 1: a terrain object drawn without z writes (GoTerrain.c
@@ -232,7 +235,8 @@ typedef struct UObject {
     s8   n104;                  // 0x104  the level of detail drawn (Object_GetLod)
     u8   unk105;
     s16  n106;                  // 0x106
-    s32  n108;                  // 0x108  goes to Object_GetMeshAlternative when drawn; the animals set it each frame
+    s32  n108;                  // 0x108  goes to Object_GetMeshAlternative when drawn; the animals set it
+                                //        each frame
     f32  f10C;                  // 0x10C  0.5 at setup; the animals set it each frame
     u8   unk110[0x118 - 0x110];
 } UObject;
@@ -245,8 +249,9 @@ typedef struct DynObj {
     struct DynObj* pNext;       // 0x128  the next object in UKernel.c's list
     u8   unk12C[0x130 - 0x12C];
     DynObjHandler pfnHandler;   // 0x130  its type's message handler
-    s32  n134;                  // 0x134  its id (Kernel_FindObjectById finds it by this); 0 once Kernel_ReleaseObject ran,
-                                //        then Kernel_SweepDeadObjects's sweeps set -1 and free it
+    s32  n134;                  // 0x134  its id (Kernel_FindObjectById finds it by this); 0 once
+                                //        Kernel_ReleaseObject ran, then Kernel_SweepDeadObjects's sweeps set
+                                //        -1 and free it
     DynObjPair a138[4];         // 0x138  pairs Kernel_PostPairToObject records (b0 == 0: free)
     u16  n140;                  // 0x140
     s16  n142;                  // 0x142
@@ -405,9 +410,12 @@ LAYOUT_ASSERT(GoDynObjMgr, 0xAB0);
 
 extern GoDynObjMgr* gpDynObjState;
 extern s32  gAltShotPartner[4];            // GoDynObj.c: each player's partner in game mode 21
-extern char gGolfBallLogoTextureNames[27][13];       // GoDynObj.c: 27 names (DynObj_GetGolfBallLogoIndex finds one)
-extern char gGolfBallLogoSlotNames[4][13];        // GoDynObj.c: each player's ball logo texture ("logoea", ...)
-extern f32  gGolfBallScale;               // 1.0: scales the ball's radius (DynObj_GetBallPixels); owner unknown
+extern char gGolfBallLogoTextureNames[27][13];       // GoDynObj.c: 27 names (DynObj_GetGolfBallLogoIndex
+                                                     // finds one)
+extern char gGolfBallLogoSlotNames[4][13];        // GoDynObj.c: each player's ball logo texture ("logoea",
+                                                  // ...)
+extern f32  gGolfBallScale;               // 1.0: scales the ball's radius (DynObj_GetBallPixels); owner
+                                          // unknown
 
 // UKernel.c's list of the objects, first and last, the last id given out (DynObj.n134), a bit
 // mask of the used entries of gKernelOverflowSlots (Kernel_PostPairToOverflowSlot; 16 at most), and two
@@ -423,11 +431,13 @@ extern UMemPool* gKernelLargeObjectPool;
 void fn_800075CC(UObjModelRoot* pRoot);    // frees a model fn_800073B4 made
 
 // GoDynObj.c
-void DynObj_PitchMarkAdd(f32* pPos, int nPlayer);  // a fast ball low over class 3 ground leaves a 'TEO ' 10005
+void DynObj_PitchMarkAdd(f32* pPos, int nPlayer);  // a fast ball low over class 3 ground leaves a 'TEO '
+                                                   // 10005
 void DynObj_ShotDivotHoleAdd(f32* pPos, int nPlayer);  // put the player's 'TEO ' 10001 object at pPos
 void DynObj_DivotAdd(f32* pPos, int nPlayer);  // put the player's 'TEO ' 10002 object at pPos
 void DynObj_TeeStruck(int nPlayer);             // launch the player's 'TEO ' 10004 object
-int  DynObj_GetGolfBallLogoIndex(const char* szName);   // the index of the name among gGolfBallLogoTextureNames's 27 (-1: none)
+int  DynObj_GetGolfBallLogoIndex(const char* szName);   // the index of the name among
+                                                        // gGolfBallLogoTextureNames's 27 (-1: none)
 
 // UKernel.c, UObject.c. The UObject functions take the object part (&DynObj.obj).
 DynObj* Kernel_GetFirstObject(void);                                  // the first object
@@ -450,7 +460,8 @@ void Object_Draw(UObject* pObj);
 void Kernel_BroadcastMessage(int nMsg, void* pArg, void* pArg2);     // sends nMsg to every object with id > 0
 
 // GoDynObjBase.c
-int  DynObjBase_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2);  // type 0's handler, types 2/11's default
+// type 0's handler, types 2/11's default
+int  DynObjBase_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2);
 DynObjHandler DynObj_GetTypeHandler(int nType);
 
 // GoDynObjTypes.c: the handlers of types 6 and 9.

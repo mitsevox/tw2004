@@ -105,7 +105,8 @@ typedef struct CourseInfo {
     u8*    pTriFlags;           // 0x2C  per vertex, for the triangle that ends there: bits 0-2 = 0 skip it;
                                 //       bit 3 done (Ter_ComputeHighestPointInEveryTriangle); bits
                                 //       4-5 / 6-7 its highest / lowest corner
-    u8*    pLight;              // 0x30  per vertex: the light on the ground there, 0..255 (Ter_GetAmbientLight)
+    u8*    pLight;              // 0x30  per vertex: the light on the ground there, 0..255
+                                //       (Ter_GetAmbientLight)
     TerCell* pGrid;             // 0x34  nGridWidth x nGridLength cells, row by row. TW06: pTerrainGrid (0x3C)
     CourseLightBlock* p38;      // 0x38  four optional blocks (NULL when absent); TW06 has its fog, sun,
     struct CourseGlowBlock* p3C;    // 0x3C    sky and lighting data in the same place. fn_800A27FC uses
@@ -113,9 +114,11 @@ typedef struct CourseInfo {
     CourseLightBlock* p44;      // 0x44
     TerObject* pObjects;        // 0x48  the course objects. TW06: pObjectInstanceTable (0x54)
     TerPolyRef* pPolyRefs;      // 0x4C  TW06: pPolygonReferenceList (at 0x58 there)
-    u16*   pObjRefs;            // 0x50  per cell, the objects in it (indices). TW06: pObjectReferenceList (0x5C)
+    u16*   pObjRefs;            // 0x50  per cell, the objects in it (indices). TW06: pObjectReferenceList
+                                //       (0x5C)
     u8     unk54[0x60 - 0x54];
-    f32    v60[3];              // 0x60  the hole's own gSession.f5B3C..f5B44 when not all 0 (Ter_CourseLoadCallback)
+    f32    v60[3];              // 0x60  the hole's own gSession.f5B3C..f5B44 when not all 0
+                                //       (Ter_CourseLoadCallback)
     f32    fFloor;              // 0x6C  a ball in the air above this with no ground under it is still in play
     PinPos pin[4];              // 0x70  the hole's four pin positions: gpGame->nPinSet[] picks one
     PinPos tee[4];              // 0xB0  the tee of each tee set (gSession.nTeeSet[])
@@ -154,7 +157,8 @@ typedef struct Ball {
     f32  fSpinX;                // 0x58  spin input x 15. TW06: sideSpinOverride
     f32  fSpinY;                // 0x5C  TW06: forwardSpinOverride
     f32  fClosest;              // 0x60  closest approach to the pin so far. TW06: closestToCupThisShot
-    s32  nState;                // 0x64  physicsBallState_t: 0 dead, 1 waiting, 2 flying, 3/4 rolling, 5 out (OB or water)
+    s32  nState;                // 0x64  physicsBallState_t: 0 dead, 1 waiting, 2 flying, 3/4 rolling, 5 out
+                                //       (OB or water)
     s32  nLie;                  // 0x68  Lie_t: 12 in the cup, 16 out of bounds (also water here)
     s32  nLieAngle;             // 0x6C  the UI can ask it (message 19,
                                 //       GM_vGetPlayerCurrentLieAngle); only ever set to 0. TW06
@@ -168,7 +172,8 @@ typedef struct Ball {
     s32  nSolidCollideCount;    // 0x84  TW06: solidCollideCount
     SurfaceType* pHitSurface;   // 0x88  what it last hit. TW06: pLastCollisionSurface
     TerObject* pHitObject;      // 0x8C  the object it last hit. TW06: pLastCollisionObject
-    HitObject* pHitActor;       // 0x90  the world object it last hit (Physics_CheckDynObjCollisions). TW06: pLastCollisionActor
+    HitObject* pHitActor;       // 0x90  the world object it last hit (Physics_CheckDynObjCollisions). TW06:
+                                //       pLastCollisionActor
     s32  nPlayer;               // 0x94  -1 when nobody's. TW06: playerID
     u8   bHoled;                // 0x98  TW06: PBF_InHole
     u8   b99;                   // 0x99
@@ -178,7 +183,8 @@ typedef struct Ball {
     u8   unk9D[0xA0 - 0x9D];
     f32  vFirstSandPos[3];      // 0xA0  where it first landed in sand. TW06: firstSandPosition
     f32  fAC;                   // 0xAC  ticks spent with no ground under a rolling ball
-    f32  fFirstSandVMag;        // 0xB0  how hard it landed there (sqrt of Physics_HandleCollision's result). TW06: firstSandVMag
+    f32  fFirstSandVMag;        // 0xB0  how hard it landed there (sqrt of Physics_HandleCollision's result).
+                                //       TW06: firstSandVMag
     f32  fLastDistFromInitShotPos; // 0xB4  distance from the start at the last stall check. TW06: same name
     f32  fTimeSinceLastCheck;   // 0xB8  time since the last stall check. TW06: same name
 } Ball;
@@ -249,19 +255,23 @@ typedef struct CourseLoader {
 LAYOUT_ASSERT(CourseLoader, 0x8);
 
 CourseInfo* Ter_GetTGD(void);          // the current hole's terrain data
-u8   Network_RegisterLoadNetworkCallback(int nChunk, void (*pfn)(u8*));   // 0x8000C0B4: pfn gets the hole's chunk nChunk
+u8   Network_RegisterLoadNetworkCallback(int nChunk, void (*pfn)(u8*));   // 0x8000C0B4: pfn gets the hole's
+                                                                          // chunk nChunk
 void Network_CloseModule(void);                 // network count 0, loader count -1
 void Network_InitModule(void);                 // register the 'Cnet' handler, clear the loaders
 s32  wn_PnPoly(f32* pPos, TNetwork* pNet, s32 nNodes);   // point in outline. TW06: wn_PnPoly
 // The segment from pFrom to pTo crosses the outline (in x and z); pHit gets the nearest crossing.
 u8   Network_LineNetworkIntersection(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes, f32* pHit);
-u8   Network_RayNetworkDoesIntersect(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes);   // the ray crosses the outline
+// the ray crosses the outline
+u8   Network_RayNetworkDoesIntersect(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes);
 s32  Ter_iNumOOBNetworksLoaded(void);
 
 // target.c: placing the ball (TW06's PlaceBall_* functions, names not proven here)
-u8   PlaceBall_IsValidDropLocation(f32* pPos);            // a ball may be placed here. TW06: PlaceBall_IsValidDropLocation?
+u8   PlaceBall_IsValidDropLocation(f32* pPos);            // a ball may be placed here. TW06:
+                                                          // PlaceBall_IsValidDropLocation?
 u8   PlaceBall_CheckInBounds(f32* pPos);            // the point is in bounds. TW06: PlaceBall_CheckInBounds?
-TNetwork* PlaceBall_GetPlaceBallNetwork(void);            // the hole's placement outline (lbl_80281E30), if any
+TNetwork* PlaceBall_GetPlaceBallNetwork(void);            // the hole's placement outline (lbl_80281E30), if
+                                                          // any
 f32  CamScript_GuessBestPlayableHeight(f32* pPos, SurfaceType** ppSurface);   // 0x800447DC
 
 // TerrainGround.c (our name): the ground under a point or a quad
@@ -287,13 +297,16 @@ f32  Ter_CheckForDropLocation(CourseInfo* pCourse, f32* pPos, u8 bOnDropSurface,
 u8   Ter_IsValidDropSurface(s32 nSurface);
 u8   Ter_GetSupportingGroundNormal(CourseInfo* pCourse, f32* pPos, f32* pNormal);   // 0 with no ground
 u8   Ter_PointInTriangleXZpY(f32* pA, f32* pB, f32* pC, f32 fX, f32 fZ);   // (x, z) lies inside the triangle
-void Ter_GetBarycentricCoords(f32 (*pTri)[3], f32* pPos, f32* pA, f32* pB, f32* pC);   // a point's weights in a triangle
+// a point's weights in a triangle
+void Ter_GetBarycentricCoords(f32 (*pTri)[3], f32* pPos, f32* pA, f32* pB, f32* pC);
 f32  Ter_GetHighestGroundHeight(CourseInfo* pCourse, f32* pPos);   // ground height, -65536.1 if none
 f32  Ter_GetLowestGroundHeight(CourseInfo* pCourse, f32* pPos);   // ground height (GoTerrainCollision.c)
 // Every ground height under and over pPos (up to nMax), with its surface; returns how many.
 u32  Ter_GetTerrainLayers(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurfaces, f32* pHeights, u32 nMax);
-f32  Ter_GetSupportingGroundHeight(CourseInfo* pCourse, f32* pPos);   // ground height, -60000 and below if none
-f32  Ter_GetCoveringGroundHeightAndNormal(CourseInfo* pCourse, f32* pPos, f32* pNormal);   // covering ground height and normal
+f32  Ter_GetSupportingGroundHeight(CourseInfo* pCourse, f32* pPos);   // ground height, -60000 and below if
+                                                                      // none
+// covering ground height and normal
+f32  Ter_GetCoveringGroundHeightAndNormal(CourseInfo* pCourse, f32* pPos, f32* pNormal);
 SurfaceType* Ter_GetSupportingWorldMaterial(CourseInfo* pCourse, f32* pPos);   // the surface under a point
 f32  Ter_GetSupportingGroundData(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurface, f32* pNormal);
 // The same with objects included (TW06: Ter_GetSupportingWorldData); GoTerrainCollision.c.
@@ -326,8 +339,10 @@ void Physics_SetSimulating(u8 bOn);        // rehearsals and look-aheads: no sou
 void Physics_SetSimFullCup(u8 b);
 f32  Physics_EstimatePuttPower(f32 fDist);            // putt power for a distance
 f32  Physics_EstimateShotDistance100(int nKind, int nClub); // a club's table reach for a shot kind
-f32  Physics_EstimateShotPower(f32 fDist, Ball* pBall, int nKind, int nClub);   // chip power from the ball's lie
-f32  Physics_GetLiePowerPercentage(Ball* pBall);          // the ball's f70 + its surface's f00; 1 without either
+// chip power from the ball's lie
+f32  Physics_EstimateShotPower(f32 fDist, Ball* pBall, int nKind, int nClub);
+f32  Physics_GetLiePowerPercentage(Ball* pBall);          // the ball's f70 + its surface's f00; 1 without
+                                                          // either
 void Physics_ThrowBall(Ball* pBall, f32* pDir, f32 fSpeed, f32* pFrom);
 void Physics_ShotImpact(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int nTrajectory, f32* pA, f32* pB);
 void Physics_InitShotData(Ball* pBall);
@@ -341,7 +356,8 @@ void Physics_SetGreenSpeedByType(int n);
 void Physics_SetFairwaySpeedByType(int n);
 void Physics_SetRoughLengthByType(int n);
 void Wind_SetPhysicsWind(int nDir, f32 fSpeed);
-f32  Wind_GetPhysicsWindVelocity(f32* pOut);               // the wind's speed; its vector (direction x speed) into pOut
+f32  Wind_GetPhysicsWindVelocity(f32* pOut);               // the wind's speed; its vector (direction x speed)
+                                                           // into pOut
 void Wind_InitForHole(void);
 void Ball_RotatePair(f32* pA, f32* pB, f32 fSin, f32 fCos);   // turns the pair (*pA, *pB) by an angle
 

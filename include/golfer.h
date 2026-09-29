@@ -485,10 +485,12 @@ typedef struct GameOptions {
                                 //       menu sets 0, 2 or 3, several modes 4 while they run
     s32  nWind;                 // 0x10  0..3 calm..gusty, 4+ none
     s32  n14;                   // 0x14  0..2; only the menus set and read it (messages 231, 243)
-    s32  nGreenSpeed;           // 0x18  0..2 (default 1), applied by Physics_SetGreenSpeedByType (gGreenSpeedSetting)
-    s32  nRough;                // 0x1C  0..2 (default 1), applied by Physics_SetRoughLengthByType (gRoughSetting)
-    s32  nFairwaySpeed;         // 0x20  0..2, applied by Physics_SetFairwaySpeedByType (gFairwaySetting); the defaults
-                                //       leave it alone
+    s32  nGreenSpeed;           // 0x18  0..2 (default 1), applied by Physics_SetGreenSpeedByType
+                                //       (gGreenSpeedSetting)
+    s32  nRough;                // 0x1C  0..2 (default 1), applied by Physics_SetRoughLengthByType
+                                //       (gRoughSetting)
+    s32  nFairwaySpeed;         // 0x20  0..2, applied by Physics_SetFairwaySpeedByType (gFairwaySetting); the
+                                //       defaults leave it alone
     u8   a24[8];                // 0x24  on/off options, default on: [0] caddie tips (CaddieTips.c),
                                 //       [1] the putting tip, [2] the putt's break line
                                 //       (GoBreakLine.c), [3] and [5] only the menus read, [4] only
@@ -848,7 +850,8 @@ int  Game_GetMode(void);                // 0x8000BED8
 int  Golfer_FindById(int nId);          // the gGolferTable row with that nModelID, -1 none
 void fn_8002EBA4(u8* pObj, u8 nValue);  // set byte 7 of the options (a7[0]) and apply it (Golfer.c)
 int  GM_GetCurrentHolePar(void);
-s32  GM_GetCurrentHoleTeeDistance(int nTee);             // CourseData.c: the current hole's value for tee set nTee
+s32  GM_GetCurrentHoleTeeDistance(int nTee);             // CourseData.c: the current hole's value for tee set
+                                                         // nTee
 int  Lessons_GetShotKind(void);                 // shot kind override, 8 = none
 int  Lessons_GetClub(int nPlayer);          // club override, 26 = none
 int  Game_GetCurHoleNum(void);

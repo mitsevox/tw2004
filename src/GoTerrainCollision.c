@@ -550,7 +550,8 @@ u8 Ter_SearchForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut) {
     if (bPreferred) {
         fDist = LLMath_DistanceBetween3(gBallPreferredLieSpot[nPlayer], p->ball.vPos);
         fDropDist = LLMath_DistanceBetween3(gBallDropSpot[nPlayer], p->ball.vPos);
-        if ((p->ball.vStart[0] != gBallPreferredLieSpot[nPlayer][0] || p->ball.vStart[1] != gBallPreferredLieSpot[nPlayer][1]
+        if ((p->ball.vStart[0] != gBallPreferredLieSpot[nPlayer][0] || p->ball.vStart[1]
+             != gBallPreferredLieSpot[nPlayer][1]
              || p->ball.vStart[2] != gBallPreferredLieSpot[nPlayer][2])
             && fDist - fDropDist < 10.0f) {
             LLMath_CopyVec(gBallPreferredLieSpot[nPlayer], pOut);
