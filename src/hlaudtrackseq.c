@@ -2,7 +2,7 @@
 // hlaudtrack.c and hlaudtrackstm.c): the sequencer, the tracks that play events instead of a
 // stream. A template holds sets of variations of events; each tick the track waits out the next
 // event's delay, then runs it through the handler table fn_800AAD18 fills (lbl_801F1880). Notes
-// take a voice per channel, stealing one when all are busy. Its extent is its data: fn_800AA744 is
+// take a voice per channel, stealing one when all are busy. Its extent is its data: OnKeyOn is
 // the first to use its .sdata2 block (0x80283FD8-0x80283FF8), and its handlers run up to
 // 0x800AAD14.
 
@@ -10,9 +10,11 @@
 
 AudSeqHandler lbl_801F1880[13];
 
-// Picks a track's next variation, the way its template's n1 says: 4 and up in order, 2 at random
-// but not the same twice, 3 at random but not the one the template played last, others at random.
-void fn_800AA4BC(AudTrack* pTrack) {
+// Picks a sequenced track's next variation the way its template's n1 says: 4 and up the next in
+// order, 2 at random but not the same one twice, 3 at random but not the one the template played
+// last (n9), others at random; the pick wraps below n7. A template with a single variation (n4 0 or
+// 1) always plays 0. A set forced on the template (nA, not 0xFF) becomes the track's set first.
+void AutoSelectVariation(AudTrack* pTrack) {
     AudTrackTmpl* pTmpl;
     u8 nNext;
 
@@ -48,9 +50,10 @@ void fn_800AA4BC(AudTrack* pTrack) {
     pTmpl->n9 = nNext;
 }
 
-// A note's voice has ended: the channel is free again, and forgets its note unless the voice
-// asks to keep it (nReason 1 with bA_1 set).
-void fn_800AA5A0(AudVoice* pVoice, int nReason) {
+// The sequenced voices' end callback (OnKeyOn's): Trk_VoiceEndCB first, then the channel forgets
+// its note, unless the voice was stolen (nReason 1, from Voc_Alloc) while playing a looping tone
+// (bA_1, the request's loop flag): CheckForStolenLoopers plays that note again.
+void VoiceEndCB(AudVoice* pVoice, int nReason) {
     AudTrack* pTrack;
     u8 nChannel;
 
@@ -62,8 +65,9 @@ void fn_800AA5A0(AudVoice* pVoice, int nReason) {
     }
 }
 
-// Plays again every note whose voice was taken from it.
-void fn_800AA618(AudTrack* pTrack) {
+// Plays again each note whose looping voice was stolen: a channel with no voice that still holds
+// its note (VoiceEndCB keeps it). Seq_Tick calls it on every 16th audio frame.
+void CheckForStolenLoopers(AudTrack* pTrack) {
     AudVoice** ppVoice;
     AudVoice** ppEnd;
     AudSeqEvent** ppEvent;
@@ -76,25 +80,27 @@ void fn_800AA618(AudTrack* pTrack) {
         pEvent = *ppEvent;
         if (*ppVoice == NULL && pEvent != NULL) {
             *ppEvent = NULL;
-            fn_800AA744(pEvent, pTrack);
+            OnKeyOn(pEvent, pTrack);
         }
     }
 }
 
-// Events that do nothing.
-void fn_800AA694(AudSeqEvent* pEvent, AudTrack* pTrack) {
+// Event 0: does nothing.
+void OnNoOp(AudSeqEvent* pEvent, AudTrack* pTrack) {
 }
 
-// Event: the end of a variation. Templates with n0 & 2 go on to the next variation (the event's
-// n3 is where to resume); the others stop.
-void fn_800AA698(AudSeqEvent* pEvent, AudTrack* pTrack) {
+// Event 1, the end of a variation. A looping template (n0 & 2) goes on, unless the track is
+// stopping: a new variation when it picks them (n1, AutoSelectVariation), from event n3 of it, b7
+// telling Seq_Tick to fetch the new events, and Emi_TrackCallback with 1 when the template asks (n0
+// & 0x80). Any other template's track stops (state 3).
+void OnEnd(AudSeqEvent* pEvent, AudTrack* pTrack) {
     AudTrackTmpl* pTmpl;
 
     pTmpl = pTrack->pTmpl;
     if (pTmpl->n0 & 2) {
         if (pTrack->nState != 3) {
             if (pTmpl->n1 != 0) {
-                fn_800AA4BC(pTrack);
+                AutoSelectVariation(pTrack);
             }
             pTrack->u.seq.n66 = pEvent->n3;
             pTrack->bits.b.b7 = 1;
@@ -107,9 +113,14 @@ void fn_800AA698(AudSeqEvent* pEvent, AudTrack* pTrack) {
     }
 }
 
-// Event: a note. Its tone is the event's n3, its loudness the event's n4 through the track's
-// volume; it takes the next free channel, stealing a voice that is easier to steal if none is.
-void fn_800AA744(AudSeqEvent* pEvent, AudTrack* pTrack) {
+// Event 2, a note: tone n3 of the bank at velocity n4, its volume n4 << 7 through the track's
+// distance attenuation (f48) and the bank's submix; nothing when that is 0. From the channel after
+// the last note's, it takes the first channel that is free (no voice, and no stolen looping note
+// waiting to be played again) or whose voice has a lower steal level or is ending (level 0),
+// deleting that voice; none, no note. Looping tones ask for steal level 1, others 0; outside
+// session 0, sound 1's track 0 asks 2. The voice starts with the track's pending settings (pitch 1
+// unless one is set), which are then cleared.
+void OnKeyOn(AudSeqEvent* pEvent, AudTrack* pTrack) {
     AudTrackTmpl* pTmpl = pTrack->pTmpl;
     f32 fAttn;
     s16 nVolume;
@@ -152,7 +163,7 @@ void fn_800AA744(AudSeqEvent* pEvent, AudTrack* pTrack) {
         i++;
     }
     if (i >= pTmpl->n2) return;
-    request.pfnCallback = fn_800AA5A0;
+    request.pfnCallback = VoiceEndCB;
     pParams = &pTrack->params;
     f = 1.0f;
     request.pUser = pTrack;
@@ -184,8 +195,8 @@ void fn_800AA744(AudSeqEvent* pEvent, AudTrack* pTrack) {
 // order.
 static inline u8 fn_800AA9EC_Read(s8 n) { return n; }
 
-// Event: lets the voices playing tone n3 end, starting from the channel of the last note.
-void fn_800AA9EC(AudSeqEvent* pEvent, AudTrack* pTrack) {
+// Event 3: lets the voices playing tone n3 end, starting from the channel of the last note.
+void OnKeyOff(AudSeqEvent* pEvent, AudTrack* pTrack) {
     AudSeqTone* pTone;
     AudTrackTmpl* pTmpl;
     s8 nChannel;
@@ -210,12 +221,13 @@ void fn_800AA9EC(AudSeqEvent* pEvent, AudTrack* pTrack) {
     }
 }
 
-void fn_800AAAA0(AudSeqEvent* pEvent, AudTrack* pTrack) {
+// Event 4: empty (TW07's is too).
+void OnPitchBend(AudSeqEvent* pEvent, AudTrack* pTrack) {
 }
 
-// Event: sets the rate (n4 / 65536) of the source's track n3 (0xFF: this track), starting that
-// track if it is not playing.
-void fn_800AAAA4(AudSeqEvent* pEvent, AudTrack* pTrack) {
+// Event 5: sets the pitch ramp (f50, added to the pitch every frame) of the source's track n3
+// (0xFF: this track) to n4 / 65536, allocating that track when the source has none.
+void OnPitchRamp(AudSeqEvent* pEvent, AudTrack* pTrack) {
     AudTrack* pTarget;
     AudSource* pSource;
     u8 n;
@@ -235,8 +247,8 @@ void fn_800AAAA4(AudSeqEvent* pEvent, AudTrack* pTrack) {
     }
 }
 
-// An event handler: sets a bit (the event's n3) in one of the track's source's two masks.
-void fn_800AAB48(AudSeqEvent* pEvent, AudTrack* pTrack) {
+// Event 6: switches the source's track n3 on (n4 non-zero: its bit in u0) or off (its bit in u1).
+void OnTrackStatus(AudSeqEvent* pEvent, AudTrack* pTrack) {
     AudSource* pSource;
     u8 uBit;
 
@@ -249,8 +261,9 @@ void fn_800AAB48(AudSeqEvent* pEvent, AudTrack* pTrack) {
     pSource->u1 |= uBit;
 }
 
-// Event: gives the source's streamed track n3 play list n4, starting the track if needed.
-void fn_800AAB8C(AudSeqEvent* pEvent, AudTrack* pTrack) {
+// Event 7: gives the source's streamed track n3 play list n4 (Stm_SetPlayList), allocating that
+// track when the source has none.
+void OnTrackSetPlayList(AudSeqEvent* pEvent, AudTrack* pTrack) {
     int n;
     AudSource* pSource;
     AudTrack* pTarget;
@@ -268,8 +281,9 @@ void fn_800AAB8C(AudSeqEvent* pEvent, AudTrack* pTrack) {
     }
 }
 
-// Event: the same with stream n4.
-void fn_800AAC00(AudSeqEvent* pEvent, AudTrack* pTrack) {
+// Event 8: gives the source's streamed track n3 stream n4 (Stm_SetStream, mode 0), allocating that
+// track when the source has none.
+void OnTrackSetStream(AudSeqEvent* pEvent, AudTrack* pTrack) {
     int n;
     AudSource* pSource;
     AudTrack* pTarget;
@@ -287,13 +301,14 @@ void fn_800AAC00(AudSeqEvent* pEvent, AudTrack* pTrack) {
     }
 }
 
-// Events: set a voice setting for the next note.
-void fn_800AAC78(AudSeqEvent* pEvent, AudTrack* pTrack) {
+// Event 9: the next note's pitch, n4 / 65536.
+void OnModPitch(AudSeqEvent* pEvent, AudTrack* pTrack) {
     pTrack->params.fPitch = (u32)pEvent->n4 / 65536.0f;
     pTrack->params.flags.b.bPitch = 1;
 }
 
-void fn_800AACBC(AudSeqEvent* pEvent, AudTrack* pTrack) {
+// Event 10: the next note's envelope volume a8[n3] (n3 0 or 1) = n4; b5 or b4 says which was set.
+void OnModADSRVol(AudSeqEvent* pEvent, AudTrack* pTrack) {
     u8 n;
 
     n = pEvent->n3;
@@ -302,29 +317,31 @@ void fn_800AACBC(AudSeqEvent* pEvent, AudTrack* pTrack) {
     pTrack->params.flags.b.b4 = n == 1;
 }
 
-void fn_800AACF8(AudSeqEvent* pEvent, AudTrack* pTrack) {
+// Event 11: the next note's start offset (nC) = n4.
+void OnModStartOffset(AudSeqEvent* pEvent, AudTrack* pTrack) {
     pTrack->params.nC = pEvent->n4;
     pTrack->params.flags.b.bC = 1;
 }
 
-void fn_800AAD14(AudSeqEvent* pEvent, AudTrack* pTrack) {
+// Event 12: empty here (TW07's OnRvbWetAttn has a body).
+void OnRvbWetAttn(AudSeqEvent* pEvent, AudTrack* pTrack) {
 }
 
 // Fills the event handler table.
 u8 fn_800AAD18(void) {
-    lbl_801F1880[0] = fn_800AA694;
-    lbl_801F1880[1] = fn_800AA698;
-    lbl_801F1880[2] = fn_800AA744;
-    lbl_801F1880[3] = fn_800AA9EC;
-    lbl_801F1880[4] = fn_800AAAA0;
-    lbl_801F1880[5] = fn_800AAAA4;
-    lbl_801F1880[6] = fn_800AAB48;
-    lbl_801F1880[7] = fn_800AAB8C;
-    lbl_801F1880[8] = fn_800AAC00;
-    lbl_801F1880[9] = fn_800AAC78;
-    lbl_801F1880[10] = fn_800AACBC;
-    lbl_801F1880[11] = fn_800AACF8;
-    lbl_801F1880[12] = fn_800AAD14;
+    lbl_801F1880[0] = OnNoOp;
+    lbl_801F1880[1] = OnEnd;
+    lbl_801F1880[2] = OnKeyOn;
+    lbl_801F1880[3] = OnKeyOff;
+    lbl_801F1880[4] = OnPitchBend;
+    lbl_801F1880[5] = OnPitchRamp;
+    lbl_801F1880[6] = OnTrackStatus;
+    lbl_801F1880[7] = OnTrackSetPlayList;
+    lbl_801F1880[8] = OnTrackSetStream;
+    lbl_801F1880[9] = OnModPitch;
+    lbl_801F1880[10] = OnModADSRVol;
+    lbl_801F1880[11] = OnModStartOffset;
+    lbl_801F1880[12] = OnRvbWetAttn;
     return 1;
 }
 
@@ -361,7 +378,7 @@ void fn_800AAE90(AudTrack* pTrack) {
     pTrack->nState = 6;
     pTrack->u.seq.n69 = 0;
     if (pTmpl->n1 != 0) {
-        fn_800AA4BC(pTrack);
+        AutoSelectVariation(pTrack);
     }
 }
 
@@ -383,7 +400,7 @@ u8 fn_800AAEFC(AudTrack* pTrack) {
         nNext = pTrack->u.seq.n67;
         if (nNext != 0xFF) {
             if (pTmpl->n1 != 0) {
-                fn_800AA4BC(pTrack);
+                AutoSelectVariation(pTrack);
             }
             pTrack->u.seq.n66 = nNext;
             {
@@ -417,7 +434,7 @@ u8 fn_800AAEFC(AudTrack* pTrack) {
         }
     }
     if (!(lbl_80282018 & 0xF)) {
-        fn_800AA618(pTrack);
+        CheckForStolenLoopers(pTrack);
     }
     return pTrack->nState != 2;
 }
@@ -456,7 +473,7 @@ void fn_800AB14C(AudTrack* pTrack, u8 n) {
     pTmpl = pTrack->pTmpl;
     pTrack->u.seq.n68 = n;
     if (pTmpl->n1 != 0) {
-        fn_800AA4BC(pTrack);
+        AutoSelectVariation(pTrack);
         pTrack->n62 = 0;
         pTrack->u.seq.n66 = (pTmpl->n0 & 1) ? 0xFF : 0;
         pTrack->u.seq.n67 = 0xFF;

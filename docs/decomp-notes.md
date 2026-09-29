@@ -468,7 +468,7 @@ They will be sorted into the sections below.
   decomp.me user (https://decomp.me/scratch/SOh7Q). The three changes each do nothing or worse
   alone; leversweep.py has them as levers and finds the combination.
 - **[verified] A cast that changes nothing still changes the code:** `(u8)` on a u8 field read reorders
-  CodeWarrior's instructions and registers (hlaudtrackseq fn_800AA744, fn_800AAAA4: 2 diffs -> 0
+  CodeWarrior's instructions and registers (hlaudtrackseq OnKeyOn, OnPitchRamp: 2 diffs -> 0
   each; the permuter found `& 0xFFu` and `(unsigned int)`, which also work). Label it `// fake match:`.
 - **[verified] An identity read inside a declaration's initializer** (`int n = fn_X_Read(p->n38);`)
   fixes a register order that the same read as a statement does not (hwsBurn HwsBurn_CopyEntries: 5 diffs ->

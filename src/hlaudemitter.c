@@ -414,7 +414,7 @@ void Aud_EmiAliasSetTrackAttenuation(s16 nEmitter, u8 nTrack, f32 fVolume) {
 }
 
 // A track of instance nId reports back (AudTable.c's Emi_TrackCallback): n 0 when the track was
-// freed (Trk_FreePerf), 1 from a sequencer event (fn_800AA698). Marks track nBit not playing
+// freed (Trk_FreePerf), 1 from a sequencer event (OnEnd). Marks track nBit not playing
 // (Aud_EmiGetTrackStatus) and passes the report on to the instance's callback (Aud_EmiAdd's
 // pfnCallback), when it has one.
 void Aud_EmiTrkCB(u8 nId, u8 nBit, s32 n) {

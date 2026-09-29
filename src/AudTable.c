@@ -344,7 +344,7 @@ void Emi_CheckTemplate(AudSound* pSound, u16 n) {
 
 // Passes a track's report on to the emitter instance of this entry (the same number), through
 // Aud_EmiTrkCB: n 0 when the track was freed (Trk_FreePerf), 1 from a sequencer event
-// (fn_800AA698).
+// (OnEnd).
 void Emi_TrackCallback(AudSource* pSource, u8 nTrack, s32 n) {
     Aud_EmiTrkCB((u8)(pSource - lbl_80282058), nTrack, n);
 }

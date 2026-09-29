@@ -374,7 +374,7 @@ golfers (0x1C..), 23 courses (0x3A..) and 18 rewards (0x51..) and TOUR card leve
 Leads and loose ends
 --------------------
 
-- `fn_800AACBC` (15 instructions, C bit-fields): **does not settle GC/2.0 vs GC/2.5.** The C is known
+- `OnModADSRVol` (15 instructions, C bit-fields): **does not settle GC/2.0 vs GC/2.5.** The C is known
   (read the index byte into a local, store into a byte table, set two 1-bit fields from `index == 0`
   and `index == 1`) and matches exactly, but GC/2.0, 2.5 and 2.6 all produce the same bytes for it.
   Not yet added to the project. Two larger bit-packing functions remain untested: `fn_800B8984`, `MAD_ReadNextFile`.
@@ -404,7 +404,7 @@ Suggested next steps
    `<Module>_GetInterface()`; shared error codes 2 = bad argument, 3 = wrong state,
    6 = not initialised.
 4. **Add the already-solved small functions** to the project: the linked-list family at
-   `0x8000B508` and `fn_800AACBC`.
+   `0x8000B508` and `OnModADSRVol`.
 
 Project conventions
 -------------------

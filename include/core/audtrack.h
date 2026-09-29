@@ -18,7 +18,7 @@ typedef struct AudVoice {
             u8 bA_5 : 1;        //        Voc_Render skips its next settings (and clears it)
             u8 bA_4 : 1;        //        it owns uAram, given back when it stops (Voc_Delete)
             u8 unkA_3 : 2;
-            u8 bA_1 : 1;        //        fn_800AA5A0 keeps the channel's event when it is set
+            u8 bA_1 : 1;        //        VoiceEndCB keeps the channel's event when it is set
             u8 bA_0 : 1;        //        set up (Voc_Start, fn_800AC7DC), started by Voc_Render
             u8 bStopped : 1;    // 0xB    Voc_Stop has stopped it and taken it off its list
             u8 bB_6 : 1;        //        paused; Stm_Tick resumes it once the drive is fine
@@ -177,7 +177,7 @@ typedef struct AudTrackTmpl {
     u8   n0;                    // 0x0    0x01: events run one at a time (n67); 0x08: streamed;
                                 //        0x20: cleared and set by fn_800A94F4;
                                 //        0x40/0x80: Emi_TrackCallback on free/on a variation change
-    u8   n1;                    // 0x1    how the next variation is picked (fn_800AA4BC); 0: never
+    u8   n1;                    // 0x1    how the next variation is picked (AutoSelectVariation); 0: never
     u8   n2;                    // 0x2    its channel count (one voice each; for a streamed track,
                                 //        its play list's)
     u8   n3;                    // 0x3    events per variation
@@ -205,7 +205,7 @@ typedef struct AudSound {
     u8   unk1[0x3 - 0x1];
     u8   n3;                    // 0x3    bit 0: placed in the world (distance, pan and doppler),
                                 //        its tracks go in the sorted list; bit 1: no doppler;
-                                //        bit 2: see fn_800AA744
+                                //        bit 2: see OnKeyOn
     f32  f4;                    // 0x4    placed sounds: how far away it is heard
     AudTrackTmpl aTracks[1];    // 0x8    nTracks of them
 } AudSound;
@@ -327,8 +327,8 @@ LAYOUT_ASSERT(AudTrack, 0x8C);
 // channel of its sound, and where it is heard.
 typedef struct AudSource {
     u8   u0;                    // 0x0    tracks switched on, a bit each (hlaudemitter.c; the
-                                //        sequencer's event fn_800AAB48 sets bits too)
-    u8   u1;                    // 0x1    tracks switched off (and fn_800AAB48, for events whose n4 is 0)
+                                //        sequencer's event OnTrackStatus sets bits too)
+    u8   u1;                    // 0x1    tracks switched off (and OnTrackStatus, for events whose n4 is 0)
     u16  uChanged;              // 0x2    bits 0-7: that track's auParams was set; 0x200: u0 / u1
     u32  auParams[8];           // 0x4    each track's controller value (Aud_EmiSetControllerInt;
                                 //        streamed tracks: PreprocessControllers)
@@ -523,10 +523,10 @@ f32  Mas_GetSubmix(u8 nCurve);
 u8   Mas_IsChanMuted(u8 nCurve);
 
 // hlaudtrackseq.c
-void fn_800AA4BC(AudTrack* pTrack);
-void fn_800AA5A0(AudVoice* pVoice, int nReason);
-void fn_800AA618(AudTrack* pTrack);
-void fn_800AA744(AudSeqEvent* pEvent, AudTrack* pTrack);
+void AutoSelectVariation(AudTrack* pTrack);
+void VoiceEndCB(AudVoice* pVoice, int nReason);
+void CheckForStolenLoopers(AudTrack* pTrack);
+void OnKeyOn(AudSeqEvent* pEvent, AudTrack* pTrack);
 void fn_800AAE08(AudTrack* pTrack);
 void fn_800AB0CC(AudTrack* pTrack, AudSeqEvent** ppEvent, AudSeqEvent** ppEnd);
 AudSeqTone* fn_800AB384(AudSeqBank* pBank, u8 nTone);
