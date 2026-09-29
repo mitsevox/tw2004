@@ -256,7 +256,10 @@ void FE_LogoDesign_CopyLogoTexturePixels(u8* pDst, u8* pSrc, int bToTexture, int
 
 u8 gLogoTexturePixels[64 * 64];
 
-u8* fn_8010FF5C(u8* pLogo, int nWidth, int nHeight) {
+// Logo pLogo (nWidth x nHeight colour indexes) laid out as a texture in gLogoTexturePixels
+// (FE_LogoDesign_CopyLogoTexturePixels), which it returns: one buffer shared by every call, so each
+// call overwrites the last (char_tex_manager.c, for a created golfer's user logo).
+u8* FE_LogoDesign_GetLogoAsTexture(u8* pLogo, int nWidth, int nHeight) {
     FE_LogoDesign_CopyLogoTexturePixels(gLogoTexturePixels, pLogo, 1, nWidth, nHeight);
     return gLogoTexturePixels;
 }

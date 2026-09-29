@@ -17,8 +17,8 @@ int sGetUserTextureIdx(u64 uHash) {
 }
 
 // The pixels of the created golfer's logo n (0..4 of pChoices) for a texture named "_usrtextr<n>",
-// laid out as a texture by fn_8010FF5C (64x64 for a square logo, else 128x32, in one shared
-// buffer); NULL for any other texture.
+// laid out as a texture by FE_LogoDesign_GetLogoAsTexture (64x64 for a square logo, else 128x32, in
+// one shared buffer); NULL for any other texture.
 u8* sGetUserLogoTexturePtr(u64 uHash, SkinChoices* pChoices) {
     int nLogo;
     int nWidth;
@@ -33,7 +33,7 @@ u8* sGetUserLogoTexturePtr(u64 uHash, SkinChoices* pChoices) {
         nWidth = 128;
         nHeight = 32;
     }
-    return fn_8010FF5C(pChoices->aLogo[nLogo].aPixels, nWidth, nHeight);
+    return FE_LogoDesign_GetLogoAsTexture(pChoices->aLogo[nLogo].aPixels, nWidth, nHeight);
 }
 
 // The palette for a texture named "_usrtextr<n>" (n 0..4): the logo palette every user logo shares

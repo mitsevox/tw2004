@@ -3682,3 +3682,4 @@ address	name	comment	by	date
 800BA6CC	UI_EATraxGetTextOffsetY	rewrite	rq4 (replayed by orchestrator)	2026-09-28
 800BA700	UI_EATraxGetTextOffsetX	rewrite	rq4 (replayed by orchestrator)	2026-09-28
 800BA734	UI_EATraxShowSong	rewrite	rq4 (replayed by orchestrator)	2026-09-28
+8010FF5C	FE_LogoDesign_GetLogoAsTexture	add	orchestrator	2026-09-29

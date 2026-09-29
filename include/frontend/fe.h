@@ -578,10 +578,10 @@ int  FE_LogoDesign_GetPixelColor(int nX, int nY, u32* pR, u32* pG, u32* pB, u32*
                                         // and its colour as FE_LogoDesign_GetClutEntry gives it
 void FE_LogoDesign_CopyLogoTexturePixels(u8* pDst, u8* pSrc, int bToTexture, int nWidth, int nHeight);  // copy pixels:
                                         // 0 from a texture into the logo, 1 from the logo into one
-u8*  fn_8010FF5C(u8* pLogo, int nWidth, int nHeight);   // the logo's pixels as a texture (in
+u8*  FE_LogoDesign_GetLogoAsTexture(u8* pLogo, int nWidth, int nHeight);   // the logo's pixels as a texture (in
                                         // gLogoTexturePixels)
 
-extern u8 gLogoTexturePixels[64 * 64];        // a logo's pixels laid out as a texture (fn_8010FF5C);
+extern u8 gLogoTexturePixels[64 * 64];        // a logo's pixels laid out as a texture (FE_LogoDesign_GetLogoAsTexture);
                                         // 64 x 64 or 128 x 32
 
 // ---- the front end's movies (uiProcessPolygon.c) -------------------------------------------------------
