@@ -1,7 +1,7 @@
 // startUp.c (EA's name, from its asserts; also in EA's 2002 source tree): the boot-time systems.
-// The sound voices (lbl_802820E8: 50 wrappers around the hardware's voices, run from the mixer
+// The sound voices (gpHwVoices: 50 wrappers around the hardware's voices, run from the mixer
 // callback HwVoice_MixerCallback), the audio-RAM heap and its DMA, the two built-in sounds, the boot-time
-// memory-card checks and the start-up UI commands (lbl_801F5DA8), and the 'LEGL' stream (two
+// memory-card checks and the start-up UI commands (gStartUpUICommands), and the 'LEGL' stream (two
 // pictures; uiProcessPolygon.c shows the first at boot). It also holds a length estimate without a
 // square root (for AudTable.c) and the ball-against-object test (for Ball.c). The sound code
 // talks to the GameCube's audio libraries; see core/startup.h.
@@ -108,7 +108,7 @@ u8 lbl_8018F640[0x858] = {
 // The two built-in sounds: where their data is, its size, its playback rate (16.16 fixed point:
 // 0.5 and 0.25) and its header, with the addresses counted from the data's start (BootSound_CopyToAram
 // rebases them into ARAM).
-BootSound lbl_8018FE98[2] = {
+BootSound gBootSounds[2] = {
     {lbl_8018F040, 0x600, 0, 0x8000,
      {2, 0xBC9, 0x8002, 0,
       {0x024302E8, 0x0C3BF9E6, 0x0807FE3A, 0x0E9DF887, 0x00420786, 0x0CC7FA46, 0x0A2FFD3B, 0x0E53F921},
@@ -119,49 +119,49 @@ BootSound lbl_8018FE98[2] = {
       0x37, 0, 0, 0}},
 };
 
-s32 lbl_80281498 = -1;          // } the slot and port the status reports reached; -1 to start
-s32 lbl_8028149C = -1;          // } again
-u8  lbl_802814A0 = 1;           // cleared by BootCard_SkipLoad, set by BootCard_ReadStatus, tested by BootCard_LoadAtBoot
+s32 gBootCardSlot = -1;          // } the slot and port the status reports reached; -1 to start
+s32 gBootCardPort = -1;          // } again
+u8  gbBootCardLoad = 1;           // cleared by BootCard_SkipLoad, set by BootCard_ReadStatus, tested by BootCard_LoadAtBoot
 
 // The rest is defined last-address-first: the compiler lays an object's uninitialised data out in
 // reverse.
 
-// The memory-card status table: for each port, lbl_80282138[port] slots (always 1), each with the
-// status BootCard_ReadStatus read (lbl_80282150), the status last reported (lbl_80282148) and whether it
-// has been reported (lbl_80282140).
-s32    lbl_80282150[MC_NUM_PORTS][MC_NUM_SLOTS];
-s32    lbl_80282148[MC_NUM_PORTS][MC_NUM_SLOTS];
-s32    lbl_80282140[MC_NUM_PORTS][MC_NUM_SLOTS];
-s32    lbl_80282138[MC_NUM_PORTS];
+// The memory-card status table: for each port, gBootCardSlotsPerPort[port] slots (always 1), each with the
+// status BootCard_ReadStatus read (gBootCardStatus), the status last reported (gBootCardReportedStatus) and whether it
+// has been reported (gbBootCardReported).
+s32    gBootCardStatus[MC_NUM_PORTS][MC_NUM_SLOTS];
+s32    gBootCardReportedStatus[MC_NUM_PORTS][MC_NUM_SLOTS];
+s32    gbBootCardReported[MC_NUM_PORTS][MC_NUM_SLOTS];
+s32    gBootCardSlotsPerPort[MC_NUM_PORTS];
 
-void*  lbl_80282134;            // the first 'LEGL' object's copy (Startup_LoadLegalPicture keeps two)
-void*  lbl_80282130;            // the second one's
-u32    lbl_8028212C;            // the first one's size
-u32    lbl_80282128;            // the second one's
-s32    lbl_80282124;            // how many it has kept
-u8     lbl_80282120;            // BootCard_LoadAtBoot keeps a memory-card result here
+void*  gpStartUpPicture;            // the first 'LEGL' object's copy (Startup_LoadLegalPicture keeps two)
+void*  gpStartUpPicture2;            // the second one's
+u32    gStartUpPictureSize;            // the first one's size
+u32    gStartUpPicture2Size;            // the second one's
+s32    gnStartUpPictures;            // how many it has kept
+u8     gbBootCardUserLoaded;            // BootCard_LoadAtBoot keeps a memory-card result here
 // fake match: lbl_8028211C, lbl_80282114 and lbl_802820EC are never used by the game's code, but
 // the original's data has a word at each of these addresses (likely the globals of functions the
 // linker stripped); kept through the dead-stripping so the rest lines up. Types unknown.
 KEEP_UNUSED u32 lbl_8028211C;
-u16    lbl_80282118;            // the next voice BootSound_Play plays on
+u16    gBootSoundVoice;            // the next voice BootSound_Play plays on
 KEEP_UNUSED u32 lbl_80282114;
 
 // The ARAM heap (AudAram_InitModule).
-u8     lbl_80282110;            // set when the silent block's DMA is done
-void*  lbl_8028210C;            // the heap's bookkeeping (0x2A4 bytes)
-u32    lbl_80282108;            // the ARAM address of the eight 0xFE00-byte blocks
-void*  lbl_80282104;            // the zeroes DMA'd into the silent block, freed once it is done
-u32    lbl_80282100;            // the silent block's ARAM address
-u32    lbl_802820FC;            // the heap's ARAM address
-ARAMHeap* lbl_802820F8;         // the heap
-s32    lbl_802820F4;            // how many of the eight blocks are taken
-u32    lbl_802820F0;            // which of them are taken
+u8     gbAudAramZeroDone;            // set when the silent block's DMA is done
+void*  gpAudAramHeapRecords;            // the heap's bookkeeping (0x2A4 bytes)
+u32    gAudAramStreamBuffers;            // the ARAM address of the eight 0xFE00-byte blocks
+void*  gpAudAramZeroBuffer;            // the zeroes DMA'd into the silent block, freed once it is done
+u32    gAudAramZeroBlock;            // the silent block's ARAM address
+u32    gAudAramBase;            // the heap's ARAM address
+ARAMHeap* gpAudAramHeap;         // the heap
+s32    gnAudAramStreamBuffersUsed;            // how many of the eight blocks are taken
+u32    gAudAramStreamBufferMask;            // which of them are taken
 KEEP_UNUSED u32 lbl_802820EC;
 
-Voice* lbl_802820E8;            // the voices, NUM_VOICES of them
+Voice* gpHwVoices;            // the voices, NUM_VOICES of them
 
-MsgHandler lbl_801F5DA8[30];
+MsgHandler gStartUpUICommands[30];
 
 // The mixer callback (registered by HwVoice_InitModule), run after every audio frame. For each
 // voice: ask for a lost hardware voice back after its wait; stop and reset a playing one whose
@@ -179,7 +179,7 @@ void HwVoice_MixerCallback(void) {
     AXVPB* pVpb;
     u32* pDst;
     u32* pSrc;
-    p = lbl_802820E8;
+    p = gpHwVoices;
     for (i = 0; i < NUM_VOICES; i++, p++) {
         bMoved = 0;
         if (p->flags.b.bLost) {
@@ -352,7 +352,7 @@ void HwVoice_DroppedCallback(void* pVpb) {
     u16 i;
     Voice* p;
     for (i = 0; i < NUM_VOICES; i++) {
-        p = &lbl_802820E8[i];
+        p = &gpHwVoices[i];
         if (p->pVpb == pVpb) {
             p->flags.b.bLost = 1;
             p->flags.b.n6_7F8 = 0xFF;
@@ -365,7 +365,7 @@ void HwVoice_DroppedCallback(void* pVpb) {
 // Take a hardware voice for voice nVoice; returns whether one was free.
 u8 HwVoice_Acquire(s16 nVoice) {
     AXVPB* pVpb = AXAcquireVoice(1, HwVoice_DroppedCallback, nVoice);
-    Voice* p = &lbl_802820E8[nVoice];
+    Voice* p = &gpHwVoices[nVoice];
     if (pVpb) {
         p->pVpb = pVpb;
         AXSetVoiceSrcType(pVpb, 1);
@@ -375,7 +375,7 @@ u8 HwVoice_Acquire(s16 nVoice) {
 
 // Reset a voice: silent, centred, all flags clear.
 void HwVoice_Reset(s16 nVoice) {
-    Voice* p = &lbl_802820E8[nVoice];
+    Voice* p = &gpHwVoices[nVoice];
     p->flags.u = 0;
     p->n56 = 0;
     p->n58 = VOLUME_MIN;
@@ -397,8 +397,8 @@ u8 HwVoice_InitModule(void) {
     MIXInit();
     AXSetMode(0);
     MIXSetSoundMode(OSGetSoundMode());
-    lbl_802820E8 = fn_800B5BD8(NUM_VOICES * sizeof(Voice));
-    Mem_set(lbl_802820E8, 0, NUM_VOICES * sizeof(Voice));
+    gpHwVoices = fn_800B5BD8(NUM_VOICES * sizeof(Voice));
+    Mem_set(gpHwVoices, 0, NUM_VOICES * sizeof(Voice));
     for (i = 0; i < NUM_VOICES; i++) {
         HwVoice_Acquire(i);
         HwVoice_Reset(i);
@@ -422,13 +422,13 @@ void HwVoice_ExitSession(void) {
 
 // Whether a voice is free: idle, and not waiting to get its hardware voice back.
 u8 HwVoice_IsFree(u16 nVoice) {
-    Voice* p = &lbl_802820E8[nVoice];
+    Voice* p = &gpHwVoices[nVoice];
     return (p->flags.b.nState == 0 || p->flags.b.nState == 1) && !p->flags.b.bLost;
 }
 
 // Start a set-up voice (bOn), or release a playing one into its envelope's release.
 void HwVoice_StartOrRelease(u16 nVoice, u8 bOn) {
-    Voice* p = &lbl_802820E8[nVoice];
+    Voice* p = &gpHwVoices[nVoice];
     int bEnabled = OSDisableInterrupts();
     if (bOn) {
         if (p->flags.b.nState == 1) {
@@ -448,7 +448,7 @@ void HwVoice_StartOrRelease(u16 nVoice, u8 bOn) {
 
 // Pause a started voice (a released one is silenced instead), or resume it.
 void HwVoice_Pause(u16 nVoice, u8 bPause) {
-    Voice* p = &lbl_802820E8[nVoice];
+    Voice* p = &gpHwVoices[nVoice];
     int bEnabled = OSDisableInterrupts();
     if (p->flags.b.nState >= 2) {
         if (bPause) {
@@ -467,7 +467,7 @@ void HwVoice_Pause(u16 nVoice, u8 bPause) {
 
 // Where a voice is in its sound, in bytes of ARAM: from the hardware once it plays.
 u32 HwVoice_GetPlayPos(u16 nVoice) {
-    Voice* p = &lbl_802820E8[nVoice];
+    Voice* p = &gpHwVoices[nVoice];
     if (p->flags.b.nState <= 2) {
         return p->u14 >> 1;
     }
@@ -483,7 +483,7 @@ u32 HwVoice_GetPlayPos(u16 nVoice) {
 // flagged b6_40 instead: it plays as AX voice type 1, and the mixer resets it rather than start it
 // until HwVoice_SetStreamDecoder or HwVoice_SetMovieDecoder has passed its coefficients on.
 void HwVoice_SetSound(u16 nVoice, SoundHeader* pHdr) {
-    Voice* p = &lbl_802820E8[nVoice];
+    Voice* p = &gpHwVoices[nVoice];
     int bEnabled = OSDisableInterrupts();
     p->n8 = pHdr->uC;
     p->nA = 0;
@@ -513,14 +513,14 @@ void HwVoice_SetSound(u16 nVoice, SoundHeader* pHdr) {
 
 // A voice's volume as last set (0..0x3FFF, HwVoice_SetVolume).
 s16 HwVoice_GetVolume(u16 nVoice) {
-    return lbl_802820E8[nVoice].n56;
+    return gpHwVoices[nVoice].n56;
 }
 
 // Set a voice's volume, clamped to 0..0x3FFF; its dB value (HwVoice_VolumeToDb) goes to the mixer
 // on the next pass. a and b are not used (callers pass 0, and hlaudvoice.c Voc_Render its
 // bPlaying).
 void HwVoice_SetVolume(u16 nVoice, s16 nVolume, int a, int b) {
-    Voice* p = &lbl_802820E8[nVoice];
+    Voice* p = &gpHwVoices[nVoice];
     int bEnabled = OSDisableInterrupts();
     if (nVolume < 0) {
         nVolume = 0;
@@ -556,7 +556,7 @@ s16 HwVoice_VolumeToDb(s16 nVolume) {
 // Set a voice's pan (mode 2; hlaudvoice.c also sends mode 3, which does nothing here). bPlaying is
 // not used: the caller passes it to every voice setter.
 void HwVoice_SetPan(u16 nVoice, u8 nPan, int nMode, int bPlaying) {
-    Voice* p = &lbl_802820E8[nVoice];
+    Voice* p = &gpHwVoices[nVoice];
     int bEnabled = OSDisableInterrupts();
     if (nMode == 2) {
         p->flags.b.bSetPan = 1;
@@ -568,7 +568,7 @@ void HwVoice_SetPan(u16 nVoice, u8 nPan, int nMode, int bPlaying) {
 // Set a voice's playback rate, 16.16 fixed point (0x10000 plays the sound at its own rate); 0 or
 // the rate it has already is ignored. a is not used (hlaudvoice.c Voc_Render passes its bPlaying).
 void HwVoice_SetRate(u16 nVoice, u32 u, int a) {
-    Voice* p = &lbl_802820E8[nVoice];
+    Voice* p = &gpHwVoices[nVoice];
     int bEnabled = OSDisableInterrupts();
     if (p->u40 != u && u != 0) {
         p->u40 = u;
@@ -579,7 +579,7 @@ void HwVoice_SetRate(u16 nVoice, u32 u, int a) {
 
 // Set a voice's envelope; a zero attack, decay or release becomes the fastest.
 void HwVoice_SetEnvelope(u16 nVoice, VoiceEnvelope* pEnv) {
-    Voice* p = &lbl_802820E8[nVoice];
+    Voice* p = &gpHwVoices[nVoice];
     int bEnabled = OSDisableInterrupts();
     p->env = *pEnv;
     // fake match: each test is on the step the mixer takes (the field times 16 or 0x1000), and
@@ -599,7 +599,7 @@ void HwVoice_SetEnvelope(u16 nVoice, VoiceEnvelope* pEnv) {
 // Turn a voice's reverb send (aux A) on at -15 dB when either flag is set, else off. The callers
 // pass one flag twice.
 void HwVoice_SetReverb(u16 nVoice, u8 bA, u8 bB) {
-    Voice* p = &lbl_802820E8[nVoice];
+    Voice* p = &gpHwVoices[nVoice];
     int bEnabled = OSDisableInterrupts();
     if (bA || bB) {
         p->nAuxA = -150;
@@ -616,7 +616,7 @@ void HwVoice_SetReverb(u16 nVoice, u8 bA, u8 bB) {
 // A streamed sound's first chunk (nBuffer 0, the first half of its ARAM buffer) sets the voice's
 // decoder: the chunk's coefficients and its first frame's header, also used when it loops.
 void HwVoice_SetStreamDecoder(u16 nVoice, StreamChunk* pChunk, u32 uSize, int nBuffer) {
-    Voice* p = &lbl_802820E8[nVoice];
+    Voice* p = &gpHwVoices[nVoice];
     if (nBuffer == 0) {
         u8 nHeader = pChunk->aData[0];
         int bEnabled = OSDisableInterrupts();
@@ -641,7 +641,7 @@ void HwVoice_SetStreamDecoder(u16 nVoice, StreamChunk* pChunk, u32 uSize, int nB
 // Set a movie voice's decoder from a block of the movie's sound: channel 0 (left) or 1 (right).
 // nMode 0 also sets the header used when it loops.
 void HwVoice_SetMovieDecoder(u16 nVoice, MovieSoundBlock* pBlock, int nChannel, int nMode) {
-    Voice* p = &lbl_802820E8[nVoice];
+    Voice* p = &gpHwVoices[nVoice];
     int bEnabled = OSDisableInterrupts();
     u32* pCoefs;
     u16 nHeader;
@@ -739,51 +739,51 @@ void AudDma_CacheBeforeTransfer(void* p, u32 uLen, int nDir) {
 
 // AudAram_InitModule's DMA callback: the silent block is filled, its zero buffer can go.
 void AudAram_ZeroBlockDone(u32 n) {
-    lbl_80282110 = 1;
+    gbAudAramZeroDone = 1;
 }
 
 // Aud_InitOnce's step for the sound's ARAM: take ARAM_HEAP_SIZE bytes for its heap, put a silent
 // block of ARAM_ZERO_SIZE bytes at the start (DMA'd from a zeroed buffer; AudAram_ZeroBlockDone),
 // then the eight 0xFE00-byte stream buffers (AudAram_AllocStreamBuffer). Returns 1.
 u8 AudAram_InitModule(void) {
-    lbl_802820FC = GoARAM_Alloc(ARAM_HEAP_SIZE);
-    lbl_8028210C = fn_800B5BD8(sizeof(ARAMHeap) + 32 * sizeof(ARAMBlock));
-    lbl_802820F8 = GoARAM_HeapInit(ARAM_HEAP_SIZE, lbl_802820FC, 32, lbl_8028210C);
-    lbl_80282100 = GoARAM_HeapAlloc(lbl_802820F8, ARAM_ZERO_SIZE, 32);
-    lbl_80282104 = fn_800951A0(ARAM_ZERO_SIZE, 32, 1);
-    Mem_set(lbl_80282104, 0, ARAM_ZERO_SIZE);
-    AudDma_ToAram(lbl_80282100, lbl_80282104, ARAM_ZERO_SIZE, AudAram_ZeroBlockDone, 0);
-    lbl_80282108 = GoARAM_HeapAlloc(lbl_802820F8, 0x7F000, 32);
+    gAudAramBase = GoARAM_Alloc(ARAM_HEAP_SIZE);
+    gpAudAramHeapRecords = fn_800B5BD8(sizeof(ARAMHeap) + 32 * sizeof(ARAMBlock));
+    gpAudAramHeap = GoARAM_HeapInit(ARAM_HEAP_SIZE, gAudAramBase, 32, gpAudAramHeapRecords);
+    gAudAramZeroBlock = GoARAM_HeapAlloc(gpAudAramHeap, ARAM_ZERO_SIZE, 32);
+    gpAudAramZeroBuffer = fn_800951A0(ARAM_ZERO_SIZE, 32, 1);
+    Mem_set(gpAudAramZeroBuffer, 0, ARAM_ZERO_SIZE);
+    AudDma_ToAram(gAudAramZeroBlock, gpAudAramZeroBuffer, ARAM_ZERO_SIZE, AudAram_ZeroBlockDone, 0);
+    gAudAramStreamBuffers = GoARAM_HeapAlloc(gpAudAramHeap, 0x7F000, 32);
     return 1;
 }
 
 // Ses_Init's step for the ARAM heap: free the silent block's zero buffer if its DMA is done.
 // Returns 1.
 u8 AudAram_InitSession(void) {
-    if (lbl_80282110) {
-        lbl_80282110 = 0;
-        fn_8009527C(lbl_80282104);
+    if (gbAudAramZeroDone) {
+        gbAudAramZeroDone = 0;
+        fn_8009527C(gpAudAramZeroBuffer);
     }
     return 1;
 }
 
 // The sound session exit's step for the ARAM heap: the same as AudAram_InitSession.
 void AudAram_ExitSession(void) {
-    if (lbl_80282110) {
-        lbl_80282110 = 0;
-        fn_8009527C(lbl_80282104);
+    if (gbAudAramZeroDone) {
+        gbAudAramZeroDone = 0;
+        fn_8009527C(gpAudAramZeroBuffer);
     }
 }
 
 // Take uSize bytes (rounded up to 32) from the sound's ARAM heap, 32-byte aligned; returns the ARAM
 // address.
 u32 AudAram_Alloc(u32 uSize) {
-    return GoARAM_HeapAlloc(lbl_802820F8, (uSize + 31) & ~31, 32);
+    return GoARAM_HeapAlloc(gpAudAramHeap, (uSize + 31) & ~31, 32);
 }
 
 // Give an AudAram_Alloc block back.
 void AudAram_Free(u32 uAddr) {
-    GoARAM_HeapFree(lbl_802820F8, uAddr);
+    GoARAM_HeapFree(gpAudAramHeap, uAddr);
 }
 
 // Take the first free one of the eight 0xFE00-byte stream buffers (Voc_Alloc, for a streamed
@@ -791,10 +791,10 @@ void AudAram_Free(u32 uAddr) {
 u32 AudAram_AllocStreamBuffer(void) {
     u32 uAddr;
     u32 uBit = 1;
-    for (uAddr = lbl_80282108; uAddr < lbl_80282108 + 0x7F000; uAddr += 0xFE00) {
-        if (!(lbl_802820F0 & uBit)) {
-            lbl_802820F0 |= uBit;
-            lbl_802820F4++;
+    for (uAddr = gAudAramStreamBuffers; uAddr < gAudAramStreamBuffers + 0x7F000; uAddr += 0xFE00) {
+        if (!(gAudAramStreamBufferMask & uBit)) {
+            gAudAramStreamBufferMask |= uBit;
+            gnAudAramStreamBuffersUsed++;
             return uAddr;
         }
         uBit <<= 1;
@@ -811,10 +811,10 @@ u32 AudAram_AllocStreamBuffer(void) {
 void AudAram_FreeStreamBuffer(u32 uAddr) {
     u32 mask;
     u32 uBit = 1;
-    uAddr -= lbl_80282108;
+    uAddr -= gAudAramStreamBuffers;
     mask = uBit << (uAddr / 0xFE00);
-    lbl_802820F0 &= ~mask;
-    lbl_802820F4--;
+    gAudAramStreamBufferMask &= ~mask;
+    gnAudAramStreamBuffersUsed--;
 }
 #pragma opt_propagation reset
 
@@ -834,10 +834,10 @@ u8 BootSound_InitModule(void) {
 void BootSound_CopyToAram(void) {
     u16 i;
     for (i = 0; i < 2; i++) {
-        lbl_8018FE98[i].uAram = AudAram_Alloc(lbl_8018FE98[i].uSize);
-        lbl_8018FE98[i].hdr.u0 += lbl_8018FE98[i].uAram * 2;
-        lbl_8018FE98[i].hdr.u4 += lbl_8018FE98[i].uAram * 2;
-        AudDma_ToAram(lbl_8018FE98[i].uAram, lbl_8018FE98[i].pData, lbl_8018FE98[i].uSize, NULL, 0);
+        gBootSounds[i].uAram = AudAram_Alloc(gBootSounds[i].uSize);
+        gBootSounds[i].hdr.u0 += gBootSounds[i].uAram * 2;
+        gBootSounds[i].hdr.u4 += gBootSounds[i].uAram * 2;
+        AudDma_ToAram(gBootSounds[i].uAram, gBootSounds[i].pData, gBootSounds[i].uSize, NULL, 0);
     }
 }
 
@@ -848,46 +848,46 @@ void BootSound_Play(u8 nSound) {
     env.nSustain = 0xF;
     env.nDecay = 0;
     env.nRelease = 0x200;
-    HwVoice_SetSound(lbl_80282118, &lbl_8018FE98[nSound].hdr);
-    HwVoice_SetVolume(lbl_80282118, 0x3FFF, 0, 0);
-    HwVoice_SetRate(lbl_80282118, lbl_8018FE98[nSound].uC, 0);
-    HwVoice_SetEnvelope(lbl_80282118, &env);
-    HwVoice_StartOrRelease(lbl_80282118, 1);
-    HwVoice_SetReverb(lbl_80282118, 1, 1);
-    if (++lbl_80282118 >= NUM_VOICES) {
-        lbl_80282118 = 0;
+    HwVoice_SetSound(gBootSoundVoice, &gBootSounds[nSound].hdr);
+    HwVoice_SetVolume(gBootSoundVoice, 0x3FFF, 0, 0);
+    HwVoice_SetRate(gBootSoundVoice, gBootSounds[nSound].uC, 0);
+    HwVoice_SetEnvelope(gBootSoundVoice, &env);
+    HwVoice_StartOrRelease(gBootSoundVoice, 1);
+    HwVoice_SetReverb(gBootSoundVoice, 1, 1);
+    if (++gBootSoundVoice >= NUM_VOICES) {
+        gBootSoundVoice = 0;
     }
 }
 
 // Start-up UI command 19's work: skip the boot-time load (BootCard_LoadAtBoot then only sends hint
-// 0x86) until the next card check (BootCard_ReadStatus) sets lbl_802814A0 again.
+// 0x86) until the next card check (BootCard_ReadStatus) sets gbBootCardLoad again.
 void BootCard_SkipLoad(void) {
-    lbl_802814A0 = 0;
+    gbBootCardLoad = 0;
 }
 
 // Start-up UI command 6's work, the boot-time load: when BootCard_SkipLoad has cleared
-// lbl_802814A0, only send hint 0x86 (the one MC_LoadOptionsFromFirstCardFound sends when it finds
+// gbBootCardLoad, only send hint 0x86 (the one MC_LoadOptionsFromFirstCardFound sends when it finds
 // no save); else load the options from the first card with a good save, then the last user
-// (MC_LoadInitialUser; its answer goes to lbl_80282120, which nothing reads).
+// (MC_LoadInitialUser; its answer goes to gbBootCardUserLoaded, which nothing reads).
 void BootCard_LoadAtBoot(void) {
     MsgArg arg;
-    if (!lbl_802814A0) {
+    if (!gbBootCardLoad) {
         Mem_set(&arg, 0, sizeof(arg));
         UISDoHint(gpFrontEnd->pHandler, 0x86, 1, (s32*)&arg);
         return;
     }
     MC_Connect();
     MC_LoadOptionsFromFirstCardFound();
-    lbl_80282120 = MC_LoadInitialUser();
+    gbBootCardUserLoaded = MC_LoadInitialUser();
     MC_Disconnect();
 }
 
-// The status of the card in nPort, nSlot for the status table (lbl_80282150): 0 no card, 7 not a
+// The status of the card in nPort, nSlot for the status table (gBootCardStatus): 0 no card, 7 not a
 // memory card, 6 a sector size other than 0x2000, 8 an I/O error, 9 broken, 1 unformatted or with
 // an encoding error, 10 its save file is damaged (fn_8009EE28 answers MC_ERR_BADDATA), 3 when it
 // has the free blocks and directory entries a save needs (the game's save and the EA Sports Bio:
 // save kinds 0 and 3, and the new files fn_8009D3DC and fn_8009D50C count), else 2. Also sets
-// lbl_802814A0 (the boot-time load goes ahead).
+// gbBootCardLoad (the boot-time load goes ahead).
 s32 BootCard_ReadStatus(int nPort, int nSlot) {
     MCCardState card;
     CardPos pos;
@@ -895,7 +895,7 @@ s32 BootCard_ReadStatus(int nPort, int nSlot) {
     s32 nBlocks;
     s32 nBlocks3;
     s32 nFiles;
-    lbl_802814A0 = 1;
+    gbBootCardLoad = 1;
     MC_GetMC(&card, nPort, nSlot);
     if (card.uFlags & MC_CARD_PRESENT) {
         if (card.uFlags & MC_CARD_WRONGDEVICE) {
@@ -935,7 +935,7 @@ s32 BootCard_ReadStatus(int nPort, int nSlot) {
 
 // Start-up UI command 1's work: check both cards from scratch, every status marked not yet reported
 // (the multitap test gives a port one slot either way), and send the front end the hint for the
-// first card that needs one, keeping its port and slot in lbl_8028149C and lbl_80281498: status 1
+// first card that needs one, keeping its port and slot in gBootCardPort and gBootCardSlot: status 1
 // hint 0x83, 2 0x82, 6 0x87, 7 0x88, 8 0x89, 9 0x8A, 10 and 11 0x8C. Status 0 is passed over (its
 // 0x8B case, for port 1 when port 0's status is not 0, is never reached: the search gets to port 1
 // only when port 0's status is 0). Any other status (3: a card ready for the save) ends the search
@@ -946,82 +946,82 @@ void BootCard_CheckAll(void) {
     int n;
     u8 bFound;
     MC_Connect();
-    lbl_80281498 = -1;
-    lbl_8028149C = -1;
+    gBootCardSlot = -1;
+    gBootCardPort = -1;
     for (i = 0; i < MC_NUM_PORTS; i++) {
-        lbl_80282140[i][0] = 0;
+        gbBootCardReported[i][0] = 0;
         if (MC_IsMultitapPluggedIn(i)) {
-            lbl_80282138[i] = n = 1;
+            gBootCardSlotsPerPort[i] = n = 1;
         } else {
-            lbl_80282138[i] = n = 1;
+            gBootCardSlotsPerPort[i] = n = 1;
         }
         for (j = 0; j < n; j++) {
-            lbl_80282150[i][j] = 0;
+            gBootCardStatus[i][j] = 0;
         }
         for (j = 0; j < n; j++) {
-            lbl_80282150[i][j] = BootCard_ReadStatus(i, j);
-            lbl_80282148[i][j] = lbl_80282150[i][j];
+            gBootCardStatus[i][j] = BootCard_ReadStatus(i, j);
+            gBootCardReportedStatus[i][j] = gBootCardStatus[i][j];
         }
     }
     bFound = 0;
     for (i = 0; i < MC_NUM_PORTS; i++) {
         for (j = 0; j < MC_NUM_SLOTS; j++) {
-            switch (lbl_80282150[i][j]) {
+            switch (gBootCardStatus[i][j]) {
             case 0:
                 // port 1's status 0 is reported only when port 0's is not 0
-                if (i == 1 && lbl_80282150[0][0] != 0) {
-                    lbl_80281498 = j;
-                    lbl_8028149C = i;
+                if (i == 1 && gBootCardStatus[0][0] != 0) {
+                    gBootCardSlot = j;
+                    gBootCardPort = i;
                     Startup_SendSlotBEmptyMsg();
                     MC_Disconnect();
                     return;
                 }
                 break;
             case 1:
-                lbl_80281498 = j;
-                lbl_8028149C = i;
+                gBootCardSlot = j;
+                gBootCardPort = i;
                 BootCard_HintUnformatted();
                 MC_Disconnect();
                 return;
             case 10:
-                lbl_80281498 = j;
-                lbl_8028149C = i;
+                gBootCardSlot = j;
+                gBootCardPort = i;
                 Startup_SendSaveDamagedMsg();
                 MC_Disconnect();
                 return;
             case 6:
-                lbl_80281498 = j;
-                lbl_8028149C = i;
+                gBootCardSlot = j;
+                gBootCardPort = i;
                 BootCard_HintWrongSectorSize();
                 MC_Disconnect();
                 return;
             case 7:
-                lbl_80281498 = j;
-                lbl_8028149C = i;
+                gBootCardSlot = j;
+                gBootCardPort = i;
                 BootCard_HintNotMemoryCard();
                 MC_Disconnect();
                 return;
             case 8:
-                lbl_80281498 = j;
-                lbl_8028149C = i;
+                gBootCardSlot = j;
+                gBootCardPort = i;
                 BootCard_HintIoError();
                 MC_Disconnect();
                 return;
             case 9:
-                lbl_80281498 = j;
-                lbl_8028149C = i;
+                gBootCardSlot = j;
+                gBootCardPort = i;
                 BootCard_HintBroken();
                 MC_Disconnect();
                 return;
             case 11:
-                lbl_80281498 = j;
-                lbl_8028149C = i;
+                gBootCardSlot = j;
+                gBootCardPort = i;
                 BootCard_HintStatus11();
                 MC_Disconnect();
                 return;
             case 2:
-                lbl_80281498 = j;
-                lbl_8028149C = i;
+                gBootCardSlot = j;
+                gBootCardPort = i;
                 Startup_SendCardFullMsg();
                 MC_Disconnect();
                 return;
@@ -1037,13 +1037,13 @@ void BootCard_CheckAll(void) {
     }
 done:
     MC_Disconnect();
-    lbl_80281498 = j;
-    lbl_8028149C = i;
+    gBootCardSlot = j;
+    gBootCardPort = i;
     if (bFound) {
         Startup_SendCardReadyMsg();
     } else {
-        lbl_80281498 = -1;
-        lbl_8028149C = -1;
+        gBootCardSlot = -1;
+        gBootCardPort = -1;
         Startup_SendNoCardsMsg();
     }
 }
@@ -1150,17 +1150,17 @@ void Startup_UpdateCardStatuses(void) {
         } else {
             n = 1;
         }
-        if (lbl_80282138[i] != n) {
-            lbl_80282138[i] = n;
-            lbl_80282150[i][0] = 0;
-            lbl_80282148[i][0] = 0;
-            lbl_80282140[i][0] = 0;
+        if (gBootCardSlotsPerPort[i] != n) {
+            gBootCardSlotsPerPort[i] = n;
+            gBootCardStatus[i][0] = 0;
+            gBootCardReportedStatus[i][0] = 0;
+            gbBootCardReported[i][0] = 0;
         }
         for (j = 0; j < n; j++) {
-            lbl_80282150[i][j] = BootCard_ReadStatus(i, j);
-            if (lbl_80282148[i][j] != lbl_80282150[i][j]) {
-                lbl_80282148[i][j] = lbl_80282150[i][j];
-                lbl_80282140[i][j] = 0;
+            gBootCardStatus[i][j] = BootCard_ReadStatus(i, j);
+            if (gBootCardReportedStatus[i][j] != gBootCardStatus[i][j]) {
+                gBootCardReportedStatus[i][j] = gBootCardStatus[i][j];
+                gbBootCardReported[i][j] = 0;
             }
         }
     }
@@ -1178,30 +1178,30 @@ u8 Startup_AreAllSlotsEmpty(void) {
             n = 1;
         }
         for (j = 0; j < n; j++) {
-            if (lbl_80282150[i][j] != 0) return 0;
+            if (gBootCardStatus[i][j] != 0) return 0;
         }
     }
     return 1;
 }
 
-// Re-read the statuses, then report again the card the reports reached (port lbl_8028149C, slot
-// lbl_80281498): mark it reported, answer its port and slot (the slot from 0) and return its
+// Re-read the statuses, then report again the card the reports reached (port gBootCardPort, slot
+// gBootCardSlot): mark it reported, answer its port and slot (the slot from 0) and return its
 // status. 5 when every status is 0; when no card has been reported yet, Startup_GetNextCardStatus's
 // answer. Start-up command 9. (The EA bug in its last test is labelled where it happens.)
 s32 Startup_GetCurrentCardStatus(s32* pnPort, s32* pnSlot) {
     Startup_UpdateCardStatuses();
     if (Startup_AreAllSlotsEmpty()) return 5;
-    if (lbl_8028149C == -1 || lbl_80281498 == -1) {
+    if (gBootCardPort == -1 || gBootCardSlot == -1) {
         return Startup_GetNextCardStatus(pnPort, pnSlot);
     }
-    lbl_80282140[lbl_8028149C][lbl_80281498] = 1;
-    lbl_80282148[lbl_8028149C][lbl_80281498] = lbl_80282150[lbl_8028149C][lbl_80281498];
-    *pnPort = lbl_8028149C;
-    *pnSlot = lbl_80281498;
+    gbBootCardReported[gBootCardPort][gBootCardSlot] = 1;
+    gBootCardReportedStatus[gBootCardPort][gBootCardSlot] = gBootCardStatus[gBootCardPort][gBootCardSlot];
+    *pnPort = gBootCardPort;
+    *pnSlot = gBootCardSlot;
     // EA bug: the port is used for both indexes; for port 1 this reads past the table (the word
     // after it, lbl_80282158).
-    if (lbl_80282150[lbl_8028149C][lbl_8028149C] == 0 && Startup_AreAllSlotsEmpty()) return 5;
-    return lbl_80282150[lbl_8028149C][lbl_80281498];
+    if (gBootCardStatus[gBootCardPort][gBootCardPort] == 0 && Startup_AreAllSlotsEmpty()) return 5;
+    return gBootCardStatus[gBootCardPort][gBootCardSlot];
 }
 
 // Re-read the statuses, then report the first card not yet reported: mark it reported, note it as
@@ -1216,29 +1216,29 @@ s32 Startup_GetNextCardStatus(s32* pnPort, s32* pnSlot) {
     Startup_UpdateCardStatuses();
     if (Startup_AreAllSlotsEmpty()) return 5;
     for (i = 0; i < MC_NUM_PORTS; i++) {
-        n = lbl_80282138[i];
+        n = gBootCardSlotsPerPort[i];
         for (j = 0; j < n; j++) {
-            if (lbl_80282140[i][j] == 0) {
-                lbl_8028149C = i;
-                lbl_80281498 = j;
-                lbl_80282140[i][j] = 1;
-                lbl_80282148[i][j] = lbl_80282150[i][j];
+            if (gbBootCardReported[i][j] == 0) {
+                gBootCardPort = i;
+                gBootCardSlot = j;
+                gbBootCardReported[i][j] = 1;
+                gBootCardReportedStatus[i][j] = gBootCardStatus[i][j];
                 *pnPort = i;
                 *pnSlot = j;
                 if (n > 1) {
                     (*pnSlot)++;
                 }
-                return lbl_80282150[i][j];
+                return gBootCardStatus[i][j];
             }
         }
     }
-    lbl_80281498 = -1;
-    lbl_8028149C = -1;
+    gBootCardSlot = -1;
+    gBootCardPort = -1;
     return 4;
 }
 
-// Continue the card search: find the next port and slot after the one found last (lbl_8028149C,
-// lbl_80281498) whose status is not 0, note it, and answer its port and slot (the slot counts from
+// Continue the card search: find the next port and slot after the one found last (gBootCardPort,
+// gBootCardSlot) whose status is not 0, note it, and answer its port and slot (the slot counts from
 // 1 here). Returns whether there is one. It also sets every port's slot count to 1 again. Start-up
 // command 3.
 int Startup_FindNextCardWithStatus(s32* pnPort, s32* pnSlot) {
@@ -1247,20 +1247,20 @@ int Startup_FindNextCardWithStatus(s32* pnPort, s32* pnSlot) {
     s32 n;
     for (i = 0; i < MC_NUM_PORTS; i++) {
         if (MC_IsMultitapPluggedIn(i)) {
-            lbl_80282138[i] = n = 1;
+            gBootCardSlotsPerPort[i] = n = 1;
         } else {
-            lbl_80282138[i] = n = 1;
+            gBootCardSlotsPerPort[i] = n = 1;
         }
         for (j = 0; j < n; j++) {
-            if (lbl_80282150[i][j] != 0 &&
-                (i > lbl_8028149C || (i == lbl_8028149C && j > lbl_80281498))) {
+            if (gBootCardStatus[i][j] != 0 &&
+                (i > gBootCardPort || (i == gBootCardPort && j > gBootCardSlot))) {
                 *pnPort = i;
                 *pnSlot = j;
                 if (n == 1) {
                     (*pnSlot)++;
                 }
-                lbl_8028149C = i;
-                lbl_80281498 = j;
+                gBootCardPort = i;
+                gBootCardSlot = j;
                 return 1;
             }
         }
@@ -1272,8 +1272,8 @@ int Startup_FindNextCardWithStatus(s32* pnPort, s32* pnSlot) {
 // (Startup_FindNextCardWithStatus, which continues it). Returns whether there is one. Start-up
 // command 2.
 int Startup_FindFirstCardWithStatus(s32* pnPort, s32* pnSlot) {
-    lbl_80281498 = -1;
-    lbl_8028149C = -1;
+    gBootCardSlot = -1;
+    gBootCardPort = -1;
     return Startup_FindNextCardWithStatus(pnPort, pnSlot);
 }
 
@@ -1309,7 +1309,7 @@ void Startup_Update(void) {
 // Register the stream handler for the 'LEGL' (legal screen) pictures, Startup_LoadLegalPicture, and
 // start its count again.
 void startup_RegisterStreamClients(void) {
-    lbl_80282124 = 0;
+    gnStartUpPictures = 0;
     Stream_RegisterLoadChunkCallback('LEGL', Startup_LoadLegalPicture);
 }
 
@@ -1323,16 +1323,16 @@ void startup_UnregisterStreamClients(void) {
 // gets 128 more).
 void Startup_LoadLegalPicture(UStreamObject* pObject) {
     s32 nPad = 128 - (s32)pObject->uSize % 128;
-    if (lbl_80282124 == 0) {
-        lbl_8028212C = pObject->uSize + nPad;
-        lbl_80282134 = StaticMem_Alloc(lbl_8028212C, 2, 16, "startUp.c", 882);
-        Mem_cpy(lbl_80282134, pObject->pData, lbl_8028212C);
-        lbl_80282124++;
-    } else if (lbl_80282124 == 1) {
-        lbl_80282128 = pObject->uSize + nPad;
-        lbl_80282130 = StaticMem_Alloc(lbl_80282128, 2, 16, "startUp.c", 891);
-        Mem_cpy(lbl_80282130, pObject->pData, lbl_80282128);
-        lbl_80282124++;
+    if (gnStartUpPictures == 0) {
+        gStartUpPictureSize = pObject->uSize + nPad;
+        gpStartUpPicture = StaticMem_Alloc(gStartUpPictureSize, 2, 16, "startUp.c", 882);
+        Mem_cpy(gpStartUpPicture, pObject->pData, gStartUpPictureSize);
+        gnStartUpPictures++;
+    } else if (gnStartUpPictures == 1) {
+        gStartUpPicture2Size = pObject->uSize + nPad;
+        gpStartUpPicture2 = StaticMem_Alloc(gStartUpPicture2Size, 2, 16, "startUp.c", 891);
+        Mem_cpy(gpStartUpPicture2, pObject->pData, gStartUpPicture2Size);
+        gnStartUpPictures++;
     }
     StaticMem_Free(pObject);
 }
@@ -1348,27 +1348,27 @@ void Startup_LoadOptionsFromCard(void) {
     int n;
     u8 bFound;
     MC_Connect();
-    lbl_80281498 = -1;
-    lbl_8028149C = -1;
+    gBootCardSlot = -1;
+    gBootCardPort = -1;
     for (i = 0; i < MC_NUM_PORTS; i++) {
-        lbl_80282140[i][0] = 0;
+        gbBootCardReported[i][0] = 0;
         if (MC_IsMultitapPluggedIn(i)) {
-            lbl_80282138[i] = n = 1;
+            gBootCardSlotsPerPort[i] = n = 1;
         } else {
-            lbl_80282138[i] = n = 1;
+            gBootCardSlotsPerPort[i] = n = 1;
         }
         for (j = 0; j < n; j++) {
-            lbl_80282150[i][j] = 0;
+            gBootCardStatus[i][j] = 0;
         }
         for (j = 0; j < n; j++) {
-            lbl_80282150[i][j] = BootCard_ReadStatus(i, j);
-            lbl_80282148[i][j] = lbl_80282150[i][j];
+            gBootCardStatus[i][j] = BootCard_ReadStatus(i, j);
+            gBootCardReportedStatus[i][j] = gBootCardStatus[i][j];
         }
     }
     bFound = 0;
     for (i = 0; i < MC_NUM_PORTS; i++) {
         for (j = 0; j < MC_NUM_SLOTS; j++) {
-            switch (lbl_80282150[i][j]) {
+            switch (gBootCardStatus[i][j]) {
             case 0:
             case 1:
             case 2:
@@ -1378,8 +1378,8 @@ void Startup_LoadOptionsFromCard(void) {
             case 9:
             case 10:
             case 11:
-                lbl_80281498 = j;
-                lbl_8028149C = i;
+                gBootCardSlot = j;
+                gBootCardPort = i;
                 fn_80110458(0);
                 MC_Disconnect();
                 break;
@@ -1393,8 +1393,8 @@ void Startup_LoadOptionsFromCard(void) {
     }
 done:
     MC_Disconnect();
-    lbl_80281498 = j;
-    lbl_8028149C = i;
+    gBootCardSlot = j;
+    gBootCardPort = i;
     if (bFound) {
         MC_Connect();
         if (MC_LoadOptionsFromFirstCardFound() == 0) {
@@ -1404,8 +1404,8 @@ done:
         }
         MC_Disconnect();
     } else {
-        lbl_80281498 = -1;
-        lbl_8028149C = -1;
+        gBootCardSlot = -1;
+        gBootCardPort = -1;
     }
 }
 
@@ -1585,38 +1585,38 @@ void Startup_Vec3Sub(f32* pA, f32* pB, f32* pOut) {
 
 // The UI commands while the session's game type is 1 (start-up): run command nCmd's handler.
 void Startup_RunGameMessage(int nCmd, MsgArg* pArgs, MsgArg* pResult) {
-    lbl_801F5DA8[nCmd](pArgs, pResult);
+    gStartUpUICommands[nCmd](pArgs, pResult);
 }
 
-// Fill in the start-up UI command table (lbl_801F5DA8): commands 0..22, command 4 left empty
+// Fill in the start-up UI command table (gStartUpUICommands): commands 0..22, command 4 left empty
 // (NULL). Called once when start-up begins (gomainloop.c fn_8006CEFC).
 void Startup_InitGameMessages(void) {
     int i;
     for (i = 0; i < 23; i++) {
-        lbl_801F5DA8[i] = NULL;
+        gStartUpUICommands[i] = NULL;
     }
-    lbl_801F5DA8[0] = GM_vStartupGetBlocksNeeded;
-    lbl_801F5DA8[1] = GM_vStartupCheckCards;
-    lbl_801F5DA8[2] = GM_vStartupFindFirstCard;
-    lbl_801F5DA8[3] = GM_vStartupFindNextCard;
-    lbl_801F5DA8[5] = GM_vStartupFadeToBlack;
-    lbl_801F5DA8[6] = GM_vStartupLoadFromCard;
-    lbl_801F5DA8[7] = GM_vStartupFormatCard;
-    lbl_801F5DA8[8] = GM_vStartupGetNextCardStatus;
-    lbl_801F5DA8[9] = GM_vStartupGetCurrentCardStatus;
-    lbl_801F5DA8[10] = GM_vStartupPlaySound;
-    lbl_801F5DA8[11] = GM_vStartupMessage11_Return0;
-    lbl_801F5DA8[12] = GM_vStartupMessage12_Empty;
-    lbl_801F5DA8[13] = GM_vStartupMessage13_Empty;
-    lbl_801F5DA8[14] = GM_vStartupMessage14_Return1;
-    lbl_801F5DA8[15] = GM_vStartupGetFilesNeeded;
-    lbl_801F5DA8[16] = GM_vStartupEndGameLoop;
-    lbl_801F5DA8[17] = GM_vStartupDeleteSaveGame;
-    lbl_801F5DA8[18] = GM_vStartupFormatHadIOError;
-    lbl_801F5DA8[19] = GM_vStartupSkipCardLoad;
-    lbl_801F5DA8[20] = GM_vStartupLoadOptionsCheckDisc;
-    lbl_801F5DA8[21] = GM_vStartupChangeDisc;
-    lbl_801F5DA8[22] = GM_vStartupGetDiscChangeStatus;
+    gStartUpUICommands[0] = GM_vStartupGetBlocksNeeded;
+    gStartUpUICommands[1] = GM_vStartupCheckCards;
+    gStartUpUICommands[2] = GM_vStartupFindFirstCard;
+    gStartUpUICommands[3] = GM_vStartupFindNextCard;
+    gStartUpUICommands[5] = GM_vStartupFadeToBlack;
+    gStartUpUICommands[6] = GM_vStartupLoadFromCard;
+    gStartUpUICommands[7] = GM_vStartupFormatCard;
+    gStartUpUICommands[8] = GM_vStartupGetNextCardStatus;
+    gStartUpUICommands[9] = GM_vStartupGetCurrentCardStatus;
+    gStartUpUICommands[10] = GM_vStartupPlaySound;
+    gStartUpUICommands[11] = GM_vStartupMessage11_Return0;
+    gStartUpUICommands[12] = GM_vStartupMessage12_Empty;
+    gStartUpUICommands[13] = GM_vStartupMessage13_Empty;
+    gStartUpUICommands[14] = GM_vStartupMessage14_Return1;
+    gStartUpUICommands[15] = GM_vStartupGetFilesNeeded;
+    gStartUpUICommands[16] = GM_vStartupEndGameLoop;
+    gStartUpUICommands[17] = GM_vStartupDeleteSaveGame;
+    gStartUpUICommands[18] = GM_vStartupFormatHadIOError;
+    gStartUpUICommands[19] = GM_vStartupSkipCardLoad;
+    gStartUpUICommands[20] = GM_vStartupLoadOptionsCheckDisc;
+    gStartUpUICommands[21] = GM_vStartupChangeDisc;
+    gStartUpUICommands[22] = GM_vStartupGetDiscChangeStatus;
 }
 
 // Command 0: the card space the game's save and the EA Sports Bio need (fn_8009D390) on the card at

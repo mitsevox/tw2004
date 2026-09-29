@@ -1,5 +1,5 @@
 // startup.h (our name): the types and data of startUp.c, the boot-time systems: the sound voices
-// (lbl_802820E8, 50 of them, each wrapping one hardware voice) and the audio-RAM (ARAM) heap.
+// (gpHwVoices, 50 of them, each wrapping one hardware voice) and the audio-RAM (ARAM) heap.
 //
 // port: almost everything here drives the GameCube's audio hardware through Nintendo's libraries
 //       (AX voices, the MIX mixer, ARAM DMA, the CPU data cache). A PC build keeps the voice table
@@ -219,9 +219,9 @@ LAYOUT_ASSERT(CardPos, 0xC);
 
 // ---- the 'LEGL' pictures Startup_LoadLegalPicture keeps ----------------------------------------------------
 
-extern void* lbl_80282134;              // the first one's copy (uiProcessPolygon.c
+extern void* gpStartUpPicture;              // the first one's copy (uiProcessPolygon.c
                                         // UI_PlayStartUpMovies shows and frees it)
-extern u32   lbl_8028212C;              // its size
+extern u32   gStartUpPictureSize;              // its size
 
 // ---- the hardware voices, as the sound engine (hlaudvoice.c) uses them -----------------------------
 
