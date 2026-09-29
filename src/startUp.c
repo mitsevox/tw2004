@@ -28,13 +28,13 @@ void   HwVoice_SetRate(u16 nVoice, u32 u, int a);
 void   HwVoice_SetEnvelope(u16 nVoice, VoiceEnvelope* pEnv);
 void   HwVoice_SetReverb(u16 nVoice, u8 bA, u8 bB);
 void   AudAram_ZeroBlockDone(u32 n);
-s32    BootCard_ReadStatus(int nPort, int nSlot);
-void   BootCard_HintWrongSectorSize(void);
-void   BootCard_HintNotMemoryCard(void);
-void   BootCard_HintIoError(void);
-void   BootCard_HintBroken(void);
-void   BootCard_HintStatus11(void);
-void   BootCard_HintUnformatted(void);
+s32    Startup_ReadCardStatus(int nPort, int nSlot);
+void   Startup_HintCardWrongSectorSize(void);
+void   Startup_HintCardNotMemoryCard(void);
+void   Startup_HintCardIoError(void);
+void   Startup_HintCardBroken(void);
+void   Startup_HintCardStatus11(void);
+void   Startup_HintCardUnformatted(void);
 void   Startup_SendNoCardsMsg(void);
 void   Startup_SendSlotBEmptyMsg(void);
 void   Startup_SendCardReadyMsg(void);
@@ -121,14 +121,14 @@ BootSound gBootSounds[2] = {
 
 s32 gBootCardSlot = -1;          // } the slot and port the status reports reached; -1 to start
 s32 gBootCardPort = -1;          // } again
-u8  gbBootCardLoad = 1;           // cleared by BootCard_SkipLoad, set by BootCard_ReadStatus, tested by BootCard_LoadAtBoot
+u8  gbBootCardLoad = 1;           // cleared by Startup_SkipCardLoad, set by Startup_ReadCardStatus, tested by Startup_LoadFromCard
 
 // The rest is defined last-address-first: the compiler lays an object's uninitialised data out in
 // reverse.
 
 // The memory-card status table: for each port, gBootCardSlotsPerPort[port] slots (always 1), each with the
-// status BootCard_ReadStatus read (gBootCardStatus), the status last reported (gBootCardReportedStatus) and whether it
-// has been reported (gbBootCardReported).
+// status Startup_ReadCardStatus read (gBootCardStatus), the status last reported
+// (gBootCardReportedStatus) and whether it has been reported (gbBootCardReported).
 s32    gBootCardStatus[MC_NUM_PORTS][MC_NUM_SLOTS];
 s32    gBootCardReportedStatus[MC_NUM_PORTS][MC_NUM_SLOTS];
 s32    gbBootCardReported[MC_NUM_PORTS][MC_NUM_SLOTS];
@@ -139,7 +139,7 @@ void*  gpStartUpPicture2;            // the second one's
 u32    gStartUpPictureSize;            // the first one's size
 u32    gStartUpPicture2Size;            // the second one's
 s32    gnStartUpPictures;            // how many it has kept
-u8     gbBootCardUserLoaded;            // BootCard_LoadAtBoot keeps a memory-card result here
+u8     gbBootCardUserLoaded;            // Startup_LoadFromCard keeps a memory-card result here
 // fake match: lbl_8028211C, lbl_80282114 and lbl_802820EC are never used by the game's code, but
 // the original's data has a word at each of these addresses (likely the globals of functions the
 // linker stripped); kept through the dead-stripping so the rest lines up. Types unknown.
@@ -859,17 +859,17 @@ void BootSound_Play(u8 nSound) {
     }
 }
 
-// Start-up UI command 19's work: skip the boot-time load (BootCard_LoadAtBoot then only sends hint
-// 0x86) until the next card check (BootCard_ReadStatus) sets gbBootCardLoad again.
-void BootCard_SkipLoad(void) {
+// Start-up message 19's work: skip the boot-time load (Startup_LoadFromCard then only sends hint
+// 0x86) until the next card check (Startup_ReadCardStatus) sets gbBootCardLoad again.
+void Startup_SkipCardLoad(void) {
     gbBootCardLoad = 0;
 }
 
-// Start-up UI command 6's work, the boot-time load: when BootCard_SkipLoad has cleared
+// Start-up message 6's work, the boot-time load: when Startup_SkipCardLoad has cleared
 // gbBootCardLoad, only send hint 0x86 (the one MC_LoadOptionsFromFirstCardFound sends when it finds
 // no save); else load the options from the first card with a good save, then the last user
 // (MC_LoadInitialUser; its answer goes to gbBootCardUserLoaded, which nothing reads).
-void BootCard_LoadAtBoot(void) {
+void Startup_LoadFromCard(void) {
     MsgArg arg;
     if (!gbBootCardLoad) {
         Mem_set(&arg, 0, sizeof(arg));
@@ -888,7 +888,7 @@ void BootCard_LoadAtBoot(void) {
 // has the free blocks and directory entries a save needs (the game's save and the EA Sports Bio:
 // save kinds 0 and 3, and the new files fn_8009D3DC and fn_8009D50C count), else 2. Also sets
 // gbBootCardLoad (the boot-time load goes ahead).
-s32 BootCard_ReadStatus(int nPort, int nSlot) {
+s32 Startup_ReadCardStatus(int nPort, int nSlot) {
     MCCardState card;
     CardPos pos;
     s32 nStatus = 0;
@@ -933,14 +933,14 @@ s32 BootCard_ReadStatus(int nPort, int nSlot) {
     return nStatus;
 }
 
-// Start-up UI command 1's work: check both cards from scratch, every status marked not yet reported
+// Start-up message 1's work: check both cards from scratch, every status marked not yet reported
 // (the multitap test gives a port one slot either way), and send the front end the hint for the
 // first card that needs one, keeping its port and slot in gBootCardPort and gBootCardSlot: status 1
 // hint 0x83, 2 0x82, 6 0x87, 7 0x88, 8 0x89, 9 0x8A, 10 and 11 0x8C. Status 0 is passed over (its
-// 0x8B case, for port 1 when port 0's status is not 0, is never reached: the search gets to port 1
-// only when port 0's status is 0). Any other status (3: a card ready for the save) ends the search
-// with hint 0x80; when no card stops it, hint 0x81, and the port and slot go back to -1.
-void BootCard_CheckAll(void) {
+// hint 0x8B is never sent: see the EA bug below). Any other status (3: a card ready for the save)
+// ends the search with hint 0x80; when no card stops it, hint 0x81, and the port and slot go back
+// to -1.
+void Startup_CheckCards(void) {
     int i;
     int j;
     int n;
@@ -959,7 +959,7 @@ void BootCard_CheckAll(void) {
             gBootCardStatus[i][j] = 0;
         }
         for (j = 0; j < n; j++) {
-            gBootCardStatus[i][j] = BootCard_ReadStatus(i, j);
+            gBootCardStatus[i][j] = Startup_ReadCardStatus(i, j);
             gBootCardReportedStatus[i][j] = gBootCardStatus[i][j];
         }
     }
@@ -980,7 +980,7 @@ void BootCard_CheckAll(void) {
             case 1:
                 gBootCardSlot = j;
                 gBootCardPort = i;
-                BootCard_HintUnformatted();
+                Startup_HintCardUnformatted();
                 MC_Disconnect();
                 return;
             case 10:
@@ -992,31 +992,31 @@ void BootCard_CheckAll(void) {
             case 6:
                 gBootCardSlot = j;
                 gBootCardPort = i;
-                BootCard_HintWrongSectorSize();
+                Startup_HintCardWrongSectorSize();
                 MC_Disconnect();
                 return;
             case 7:
                 gBootCardSlot = j;
                 gBootCardPort = i;
-                BootCard_HintNotMemoryCard();
+                Startup_HintCardNotMemoryCard();
                 MC_Disconnect();
                 return;
             case 8:
                 gBootCardSlot = j;
                 gBootCardPort = i;
-                BootCard_HintIoError();
+                Startup_HintCardIoError();
                 MC_Disconnect();
                 return;
             case 9:
                 gBootCardSlot = j;
                 gBootCardPort = i;
-                BootCard_HintBroken();
+                Startup_HintCardBroken();
                 MC_Disconnect();
                 return;
             case 11:
                 gBootCardSlot = j;
                 gBootCardPort = i;
-                BootCard_HintStatus11();
+                Startup_HintCardStatus11();
                 MC_Disconnect();
                 return;
             case 2:
@@ -1051,49 +1051,49 @@ done:
 // The messages below have no values: their one value is cleared and not counted.
 
 // Hint 0x87 to the front end: the card's sector size is not 0x2000 (status 6).
-void BootCard_HintWrongSectorSize(void) {
+void Startup_HintCardWrongSectorSize(void) {
     MsgArg arg;
     Mem_set(&arg, 0, sizeof(arg));
     UISDoHint(gpFrontEnd->pHandler, 0x87, 0, (s32*)&arg);
 }
 
 // Hint 0x88 to the front end: the device in the slot is not a memory card (status 7).
-void BootCard_HintNotMemoryCard(void) {
+void Startup_HintCardNotMemoryCard(void) {
     MsgArg arg;
     Mem_set(&arg, 0, sizeof(arg));
     UISDoHint(gpFrontEnd->pHandler, 0x88, 0, (s32*)&arg);
 }
 
 // Hint 0x89 to the front end: the card has an I/O error (status 8).
-void BootCard_HintIoError(void) {
+void Startup_HintCardIoError(void) {
     MsgArg arg;
     Mem_set(&arg, 0, sizeof(arg));
     UISDoHint(gpFrontEnd->pHandler, 0x89, 0, (s32*)&arg);
 }
 
 // Hint 0x8A to the front end: the card is broken (status 9).
-void BootCard_HintBroken(void) {
+void Startup_HintCardBroken(void) {
     MsgArg arg;
     Mem_set(&arg, 0, sizeof(arg));
     UISDoHint(gpFrontEnd->pHandler, 0x8A, 0, (s32*)&arg);
 }
 
 // Hint 0x8C to the front end for status 11, the hint status 10 (a damaged save) also sends.
-// BootCard_ReadStatus never answers 11, so nothing reaches this in this build.
-void BootCard_HintStatus11(void) {
+// Startup_ReadCardStatus never answers 11, so nothing reaches this in this build.
+void Startup_HintCardStatus11(void) {
     MsgArg arg;
     Mem_set(&arg, 0, sizeof(arg));
     UISDoHint(gpFrontEnd->pHandler, 0x8C, 0, (s32*)&arg);
 }
 
 // Hint 0x83 to the front end: the card is unformatted or has an encoding error (status 1).
-void BootCard_HintUnformatted(void) {
+void Startup_HintCardUnformatted(void) {
     MsgArg arg;
     Mem_set(&arg, 0, sizeof(arg));
     UISDoHint(gpFrontEnd->pHandler, 0x83, 0, (s32*)&arg);
 }
 
-// The start-up card check's message 0x81 to the front end: no card in either slot (BootCard_CheckAll
+// The start-up card check's message 0x81 to the front end: no card in either slot (Startup_CheckCards
 // sends it when every card status is 0).
 void Startup_SendNoCardsMsg(void) {
     MsgArg arg;
@@ -1102,7 +1102,7 @@ void Startup_SendNoCardsMsg(void) {
 }
 
 // The start-up card check's message 0x8B to the front end, meant for port 1 (slot B) empty while
-// port 0 has a card. Never sent: BootCard_CheckAll tests for it only after port 0's status was found to
+// port 0 has a card. Never sent: Startup_CheckCards tests for it only after port 0's status was found to
 // be 0 (every other status of port 0 returns or leaves the loops first).
 void Startup_SendSlotBEmptyMsg(void) {
     MsgArg arg;
@@ -1111,8 +1111,8 @@ void Startup_SendSlotBEmptyMsg(void) {
 }
 
 // The start-up card check's message 0x80 to the front end: a card is ready for the save
-// (BootCard_CheckAll: status 3, formatted with room for the game's save and the EA Sports Bio; also 4, 5
-// or out of range, which BootCard_ReadStatus never gives).
+// (Startup_CheckCards: status 3, formatted with room for the game's save and the EA Sports Bio; also 4, 5
+// or out of range, which Startup_ReadCardStatus never gives).
 void Startup_SendCardReadyMsg(void) {
     MsgArg arg;
     Mem_set(&arg, 0, sizeof(arg));
@@ -1128,15 +1128,15 @@ void Startup_SendCardFullMsg(void) {
 }
 
 // The start-up card check's message 0x8C to the front end: the card's save file is damaged (status
-// 10: neither the save file nor its backup is a good save, MC_ERR_BADDATA). BootCard_HintStatus11 sends the
-// same message for status 11.
+// 10: neither the save file nor its backup is a good save, MC_ERR_BADDATA).
+// Startup_HintCardStatus11 sends the same message for status 11.
 void Startup_SendSaveDamagedMsg(void) {
     MsgArg arg;
     Mem_set(&arg, 0, sizeof(arg));
     UISDoHint(gpFrontEnd->pHandler, 0x8C, 0, (s32*)&arg);
 }
 
-// Re-read every card's status (BootCard_ReadStatus) into the status table; a status that changed is marked
+// Re-read every card's status (Startup_ReadCardStatus) into the status table; a status that changed is marked
 // not yet reported, and a port whose slot count changed has its entries cleared first. Here and in
 // Startup_AreAllSlotsEmpty and Startup_FindNextCardWithStatus EA tests for a multitap
 // (MC_IsMultitapPluggedIn) but gives the port one slot either way.
@@ -1157,7 +1157,7 @@ void Startup_UpdateCardStatuses(void) {
             gbBootCardReported[i][0] = 0;
         }
         for (j = 0; j < n; j++) {
-            gBootCardStatus[i][j] = BootCard_ReadStatus(i, j);
+            gBootCardStatus[i][j] = Startup_ReadCardStatus(i, j);
             if (gBootCardReportedStatus[i][j] != gBootCardStatus[i][j]) {
                 gBootCardReportedStatus[i][j] = gBootCardStatus[i][j];
                 gbBootCardReported[i][j] = 0;
@@ -1206,9 +1206,9 @@ s32 Startup_GetCurrentCardStatus(s32* pnPort, s32* pnSlot) {
 
 // Re-read the statuses, then report the first card not yet reported: mark it reported, note it as
 // the card the reports reached, answer its port and slot (the slot from 0; from 1 only on a port
-// with more than one slot, which never happens here) and return its status (BootCard_ReadStatus's numbers).
-// 4 when every card has been reported (the reports start again from the top), 5 when every status
-// is 0. Start-up command 8.
+// with more than one slot, which never happens here) and return its status
+// (Startup_ReadCardStatus's numbers). 4 when every card has been reported (the reports start again
+// from the top), 5 when every status is 0. Start-up command 8.
 s32 Startup_GetNextCardStatus(s32* pnPort, s32* pnSlot) {
     s32 n;
     int i;
@@ -1337,7 +1337,7 @@ void Startup_LoadLegalPicture(UStreamObject* pObject) {
     StaticMem_Free(pObject);
 }
 
-// Build the card status table from scratch (as BootCard_CheckAll does, without its messages), then look
+// Build the card status table from scratch (as Startup_CheckCards does, without its messages), then look
 // for a card with status 3 (formatted, room for the saves) or out of range. Found: load the options
 // from the first card with a good save (MC_LoadOptionsFromFirstCardFound) and note in DiscCheck.c
 // (fn_80110458) whether that worked, 1 or 0. Each card passed on the way notes 0 first. Not found:
@@ -1361,7 +1361,7 @@ void Startup_LoadOptionsFromCard(void) {
             gBootCardStatus[i][j] = 0;
         }
         for (j = 0; j < n; j++) {
-            gBootCardStatus[i][j] = BootCard_ReadStatus(i, j);
+            gBootCardStatus[i][j] = Startup_ReadCardStatus(i, j);
             gBootCardReportedStatus[i][j] = gBootCardStatus[i][j];
         }
     }
@@ -1638,10 +1638,10 @@ void GM_vStartupGetBlocksNeeded(MsgArg* pArgs, MsgArg* pResult) {
     MC_Disconnect();
 }
 
-// Command 1: the start-up card check (BootCard_CheckAll): build the card status table and send the
+// Command 1: the start-up card check (Startup_CheckCards): build the card status table and send the
 // start-up UI the message for the first card that needs one.
 void GM_vStartupCheckCards(MsgArg* pArgs, MsgArg* pResult) {
-    BootCard_CheckAll();
+    Startup_CheckCards();
 }
 
 // Command 2: start the card search (Startup_FindFirstCardWithStatus). The port and slot found go to
@@ -1660,17 +1660,17 @@ void GM_vStartupFadeToBlack(MsgArg* pArgs, MsgArg* pResult) {
     gUIState.bFadeToBlack = 1;
 }
 
-// Command 6 (BootCard_LoadAtBoot): load the options from the first card with a good save, then the last
+// Command 6 (Startup_LoadFromCard): load the options from the first card with a good save, then the last
 // user (MC_LoadInitialUser). When no card status has been read since command 19, it only sends the
 // start-up UI message 0x86 (no save found).
 void GM_vStartupLoadFromCard(MsgArg* pArgs, MsgArg* pResult) {
-    BootCard_LoadAtBoot();
+    Startup_LoadFromCard();
 }
 
-// Command 19 (BootCard_SkipLoad): make command 6 skip the card and only report no save found (message
+// Command 19 (Startup_SkipCardLoad): make command 6 skip the card and only report no save found (message
 // 0x86), until a card's status is read again.
 void GM_vStartupSkipCardLoad(MsgArg* pArgs, MsgArg* pResult) {
-    BootCard_SkipLoad();
+    Startup_SkipCardLoad();
 }
 
 // Command 7: format the card at port pArgs[0], slot pArgs[1] (Startup_FormatCard; the result goes

@@ -3786,3 +3786,13 @@ address	name	comment	by	date
 800B0E84	BootCard_HintBroken	add	rr2 (replayed by orchestrator)	2026-09-29
 800B0EC8	BootCard_HintStatus11	add	rr2 (replayed by orchestrator)	2026-09-29
 800B0F0C	BootCard_HintUnformatted	add	rr2 (replayed by orchestrator)	2026-09-29
+800B0954	Startup_SkipCardLoad	rewrite	rr2 (replayed by orchestrator)	2026-09-29
+800B0960	Startup_LoadFromCard	rewrite	rr2 (replayed by orchestrator)	2026-09-29
+800B09C8	Startup_ReadCardStatus	keep	rr2 (replayed by orchestrator)	2026-09-29
+800B0B1C	Startup_CheckCards	rewrite	rr2 (replayed by orchestrator)	2026-09-29
+800B0DB8	Startup_HintCardWrongSectorSize	keep	rr2 (replayed by orchestrator)	2026-09-29
+800B0DFC	Startup_HintCardNotMemoryCard	keep	rr2 (replayed by orchestrator)	2026-09-29
+800B0E40	Startup_HintCardIoError	keep	rr2 (replayed by orchestrator)	2026-09-29
+800B0E84	Startup_HintCardBroken	keep	rr2 (replayed by orchestrator)	2026-09-29
+800B0EC8	Startup_HintCardStatus11	keep	rr2 (replayed by orchestrator)	2026-09-29
+800B0F0C	Startup_HintCardUnformatted	keep	rr2 (replayed by orchestrator)	2026-09-29
