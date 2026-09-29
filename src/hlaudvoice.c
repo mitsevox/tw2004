@@ -1,7 +1,11 @@
-// hlaudvoice.c (TW06's name, by structure: golf/audio/engine/hl/hlaudvoice.c, the file after
-// hlaudtrackstm.c): the sound engine's voices. Each wraps one of startUp.c's hardware voices; a
-// track takes one per channel (Voc_Alloc) and is called back when it ends. Its extent is its
-// data: it is the first to use the .bss at 0x801F19B8 and the .sdata2 block 0x80283FF8-0x80284008.
+// hlaudvoice.c (TW06's golf/audio/engine/hl/hlaudvoice.c, the file after hlaudtrackstm.c; TW07's
+// HLAudVoice.c has these Voc_ functions in the same order): the sound engine's voices. Each wraps
+// one of startUp.c's hardware voices; a track (or the movie sound) takes one per channel
+// (Voc_Alloc), stealing a quieter one when few are free, and is called back when it ends. The
+// voices in use sit on three lists by how hard they are to steal; Voc_Cycle frees the ended ones
+// each frame. audfrac_MulU at the end is an out-of-line copy of a UAudFrac.h inline (TW07). Its
+// extent is its data: it is the first to use the .bss at 0x801F19B8 and the .sdata2 block
+// 0x80283FF8-0x80284008.
 
 #include "core/audtrack.h"
 #include "core/startup.h"
@@ -22,10 +26,10 @@ void Voc_ResetModule(void);
 u8   VoicePowerCompare(AudVoiceRequest* pRequest, s16* pPriority);
 f32  audfrac_MulU(f32 fA, f32 fB);
 
-AudVoicePool gVocCores[1];
+AudVoicePool gVocCores[1];              // the voices, their lists and free pool (EA: TVoCore)
 
-s32 gVocPauseOrder;
-u8  gVocInUse;
+s32 gVocPauseOrder;                     // flipped by each pause: 1 walks the voices forwards
+u8  gVocInUse;                          // voices in use, counted by Voc_Cycle
 
 // Set the voice pool up: every voice free, numbered after its hardware voice.
 void Voc_ResetModule(void) {
@@ -75,8 +79,8 @@ void Voc_ExitSession(void) {
 // 1 when n4 is 2) that the request outranks (VoicePowerCompare, against its hardware voice's
 // volume) is stolen: its track is told (callback reason 1), then it is deleted if a free voice is
 // left, else taken over (it then skips its next Voc_Render, bA_5). A request with flag b12 also
-// gets an ARAM stream block (fn_800B06F4); without one the voice is deleted and NULL returned. The
-// voice goes on list n4.
+// gets an ARAM stream block (AudAram_AllocStreamBuffer); without one the voice is deleted and NULL
+// returned. The voice goes on list n4.
 AudVoice* Voc_Alloc(AudVoiceRequest* pRequest) {
     AudVoicePool* pPool = gVocCores;
     AudVoice* pVoice = NULL;

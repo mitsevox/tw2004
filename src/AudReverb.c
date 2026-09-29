@@ -1,7 +1,9 @@
-// AudReverb.c (our name): the sound's aux A effect. Rvb_InitModule takes a 128 KB buffer for the
-// effects library's memory, Rvb_SetMode switches between a high-quality reverb (two settings)
-// and a delay, and Rvb_Pause takes the effect off or puts it back. Between uiObject.c and
-// startUp.c.
+// AudReverb.c (our name; EA's own, if the GameCube build had one, is not known): the sound's aux A
+// effect, run by the effects library. Rvb_InitModule takes a 128 KB buffer for the library's
+// memory, each session picks its effect (Rvb_InitSession: a high-quality reverb, short or long,
+// or a delay) and Rvb_Pause takes the effect off while the sound is paused. It has a step for each
+// of the sound engine's calls (session start and end, listener preset, frame), the empty ones
+// included. Between uiObject.c and startUp.c.
 
 #include "game_types.h"
 #include "platform.h"
@@ -13,10 +15,10 @@ void* Rvb_FxAlloc(u32 uSize);
 void Rvb_FxFree(void* p);
 void Rvb_SetMode(s8 nMode);
 u8 Rvb_InitModule(void);
-u8 Rvb_InitSession(u8 nKind, u8 bOn);
+u8 Rvb_InitSession(u8 nSession, u8 nSubsession);
 void Rvb_ExitSession(void);
 void Rvb_Pause(u8 bMute);
-void Rvb_SetPreset(void);
+void Rvb_SetPreset(u8 nPreset);
 void Rvb_Cycle(void);
 
 // The effects' settings: a 2.5 second reverb for mode 0, a 4 second one for mode 2, and for mode
@@ -26,12 +28,12 @@ AXFX_DELAY gRvbDelay = { {0}, {499, 501, 10}, {15, 15, 0}, {100, 100, 0} };
 AXFX_REVERBHI gRvbReverbLong = { {0}, 0, 0.9f, 1.0f, 4.0f, 0.2f, 0.0f, 0.5f };
 
 // Uninitialised data, defined last-first (CodeWarrior lays it out in reverse).
-UAudMemStack gRvbMemStack;              // the effect memory
-UAudMemStackBlock gRvbMemBlocks[32];     // the effect memory's blocks
-s8 gRvbMode = -1;                   // the mode set up (-1: none yet)
-void* gRvbFxState;                     // the effect's state
-AXAuxCallback gRvbFxCallback;             // the effect running
-u8* gRvbFxMemory;                       // the effect memory's buffer
+UAudMemStack gRvbMemStack;              // the effect memory, a stack over gRvbFxMemory
+UAudMemStackBlock gRvbMemBlocks[32];    // its block table
+s8 gRvbMode = -1;                       // the mode set up (-1: none yet)
+void* gRvbFxState;                      // the running effect's settings (one of the three above)
+AXAuxCallback gRvbFxCallback;           // the running effect's aux A callback
+u8* gRvbFxMemory;                       // the effect memory's 128 KB buffer
 
 // The effects library's allocator hook (AXFXSetHooks): uSize bytes of the effect memory, which
 // Rvb_SetMode starts over at each change.
@@ -80,18 +82,18 @@ u8 Rvb_InitModule(void) {
     return 1;
 }
 
-// The reverb's step in Ses_Init: picks the session's effect (Rvb_SetMode). The 2.5 s reverb (mode
-// 0) in subsession 0 (the front end, play before a hole), the 4 s reverb (mode 2) in session 8
-// (course 7) on hole index 2 (Game_GetCurHoleNum), the delay (mode 1) on every other hole. Always
-// 1.
-u8 Rvb_InitSession(u8 nKind, u8 bOn) {
+// The reverb's step in Ses_Init, given its session and subsession: picks the session's effect
+// (Rvb_SetMode). The 2.5 s reverb (mode 0) in subsession 0 (the front end, play before a hole),
+// the 4 s reverb (mode 2) in session 8 (course 7) on hole index 2 (Game_GetCurHoleNum), the delay
+// (mode 1) on every other hole. Always 1.
+u8 Rvb_InitSession(u8 nSession, u8 nSubsession) {
     s8 nHole;                           // fake match: EA keeps the hole index as a signed byte
     s8 nMode;
 
     nHole = Game_GetCurHoleNum();
-    if (bOn == 0) {
+    if (nSubsession == 0) {
         nMode = 0;
-    } else if (nKind == 8 && nHole == 2) {
+    } else if (nSession == 8 && nHole == 2) {
         nMode = 2;
     } else {
         nMode = 1;
@@ -115,8 +117,8 @@ void Rvb_Pause(u8 bMute) {
 }
 
 // A listener's reverb preset (Mic_SetRvbPreset): empty in this build, so the presets change
-// nothing.
-void Rvb_SetPreset(void) {
+// nothing. nPreset is not read.
+void Rvb_SetPreset(u8 nPreset) {
 }
 
 // The reverb's per-frame step (Aud_EmiCycle, after Trk_Cycle and Voc_Cycle): empty in this build.

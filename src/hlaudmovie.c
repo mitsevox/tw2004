@@ -1,41 +1,50 @@
-// hlaudmovie.c (TW06's golf/audio/engine/hl/hlaudmovie.c; Mov_Exit is paired with TW06's, and
-// Mov_Init, Mov_Start and Mov_Tick are EA's names from the strings they hand to the audio lock):
-// the movie player's sound, which plays each chunk of a movie's stereo sound on two voices, and
-// the sound engine's setup around it: the sound banks and the stream file (loaded through
-// UStream.c) and the stream buffer. Its extent is proven by its data: HLAudMaster.c before it
-// ends its .sdata at 0x80281464 and its .sbss at 0x80282065 (each followed by padding to this
-// file's 8-aligned start: 0x80281468, 0x80282068), and InsertSortWorldPerf after it is the first
-// to use the next file's .bss (0x801F1868).
+// hlaudmovie.c (our name for what is, by TW06's file list and TW07's functions, three EA files
+// in link order, which is alphabetical here as for the files around it: TW06 hl/hlaudmic.c,
+// hl/hlaudmovie.c and hl/hlaudsession.c):
+// - the listeners (EA: microphones), TW07 HLAudMic.c's Mic_ functions: their count per session
+//   and a reverb preset each;
+// - the movie player's sound (Mov_, EA's names from the strings they hand to the audio lock),
+//   which plays each chunk of a movie's stereo sound on two voices;
+// - the session (TW07 HLAudSession.c's Ses_ functions): starting, pausing and ending the sound
+//   engine's sessions, the sound banks and the stream file loaded through UStream.c, and the
+//   stream buffer;
+// - TrkRender3D and TrkRenderStereo, which TW07 has at the start of HLAudTrack.c, just before
+//   InsertSortWorldPerf (our hlaudtrack.c's first function).
+// Its extent is proven by its data: HLAudMaster.c before it ends its .sdata at 0x80281464 and its
+// .sbss at 0x80282065 (each followed by padding to this file's 8-aligned start: 0x80281468,
+// 0x80282068), and InsertSortWorldPerf after it is the first to use the next file's .bss
+// (0x801F1868).
 
 #include "core/audtrack.h"
 #include "core/startup.h"
 
-void Voc_PauseAll(void);
-u8   Rvb_InitSession(u8 a, u8 b);
+void Voc_PauseAll(u8 bPause, u8 bStreams);      // hlaudvoice.c
+u8   Rvb_InitSession(u8 nSession, u8 nSubsession);      // AudReverb.c
 void Rvb_ExitSession(void);
-void Rvb_Pause(u8 b);
-void Rvb_SetPreset(u8 n);
+void Rvb_Pause(u8 bMute);
+void Rvb_SetPreset(u8 nPreset);
 
 void Ses_ResetModule(void);
 
-s32 gSesStreamFile = -1;                  // the stream file (audtrack.h)
+s32 gSesStreamFile = -1;                // the stream file's handle, -1 until it is opened
 
-MovieSound gMovieSound;
+MovieSound gMovieSound;                 // the movie's two voices and their rings
 
-u8 gSesUnread95;
+// Defined last-address-first, like the rest of the file's .sbss.
+u8 gSesUnread95;                        // these four: cleared by Ses_ResetModule, read nowhere
 u8 gSesUnread94;
 s32 gSesUnread90;
 s32 gSesUnread8C;
-u8* gSesStreamBuffer;                       // the stream buffer (Ses_GetStreamBuffer)
-s32 gSesSubsession;
+u8* gSesStreamBuffer;                   // the read buffer all streamed tracks share
+s32 gSesSubsession;                     // the session's ids, as Ses_Init was given them
 s32 gSesSession;
-u32 gSesFlags;                       // what is loaded: bits 0x04/0x08 bank 0 and its samples,
-                                        // 0x10/0x20 bank 1 and its samples
-AudBank* gSesBank0;
+u32 gSesFlags;                          // 0x01 set up, 0x04/0x08 bank 0 and its samples loaded,
+                                        // 0x10/0x20 bank 1 and its samples, 0x40 paused
+AudBank* gSesBank0;                     // the two sound banks' headers
 AudBank* gSesBank1;
-AudStreamFile* gSesStreamFileHdr;
-AudBlock48* gMicData;
-u8 gMicCount;
+AudStreamFile* gSesStreamFileHdr;       // the stream file's header
+AudBlock48* gMicData;                   // the listeners' block (nothing reads it)
+u8 gMicCount;                           // listeners in the session, one per view
 
 // Allocates and clears the listeners' 0x48-byte block (gMicData) from the sound engine's memory
 // (AudMem_Alloc), the listener step of Aud_InitOnce. Returns 0 when the memory is full, else 1.
@@ -54,7 +63,7 @@ u8 Mic_InitModule(void) {
 
 // A session's listeners (Ses_Init): stores nListeners, one per view, which AudTable.c's 3D sound
 // reads (gMicCount). The session and subsession ids are not read. Always 1.
-u8 Mic_InitSession(u8 a, u8 b, u8 nListeners) {
+u8 Mic_InitSession(u8 nSession, u8 nSubsession, u8 nListeners) {
     gMicCount = nListeners;
     return 1;
 }
@@ -63,17 +72,17 @@ u8 Mic_InitSession(u8 a, u8 b, u8 nListeners) {
 void Mic_ExitSession(void) {
 }
 
-// Passes listener a's reverb preset n on to AudReverb.c (Rvb_SetPreset, empty in this build).
-// Aud_MicSetRvbPreset calls it only when the preset changes.
-void Mic_SetRvbPreset(u8 a, u8 n) {
-    Rvb_SetPreset(n);
+// Passes listener nMic's reverb preset nPreset on to AudReverb.c (Rvb_SetPreset, empty in this
+// build). Aud_MicSetRvbPreset calls it only when the preset changes.
+void Mic_SetRvbPreset(u8 nMic, u8 nPreset) {
+    Rvb_SetPreset(nPreset);
 }
 
-// DMA-done callback of Mov_SendSoundBlock while the movie plays: n is the channel of the finished
-// transfer (0 left, 1 right). The left one's arrival counts the block as sent and moves nSendBlock
-// on round the ring.
-void Mov_BlockSentCB(u32 n) {
-    if (gMovieSound.nState == 2 && n == 0) {
+// DMA-done callback of Mov_SendSoundBlock while the movie plays: nChannel is the channel of the
+// finished transfer (0 left, 1 right). The left one's arrival counts the block as sent and moves
+// nSendBlock on round the ring.
+void Mov_BlockSentCB(u32 nChannel) {
+    if (gMovieSound.nState == 2 && nChannel == 0) {
         gMovieSound.uSent += MOVIE_BLOCK_SIZE;
         if (++gMovieSound.nSendBlock >= MOVIE_BLOCKS) {
             gMovieSound.nSendBlock = 0;
@@ -87,7 +96,7 @@ u8 Mov_InitModule(void) {
 }
 
 // Takes the movie's two voices (left, right; priority 0x3FFF, list 2, looping) and places their
-// rings of MOVIE_BLOCKS blocks in ARAM: the left one at fn_800B0790's address (0x4400), the right
+// rings of MOVIE_BLOCKS blocks in ARAM: the left one at AudAram_GetMovieBuffer's address (0x4400), the right
 // one after it. With both voices the state becomes 1 (filling before the start); without, it stays
 // 0 (off). Holds the audio lock throughout.
 void Mov_Init(void) {
@@ -161,8 +170,8 @@ void Mov_Start(void) {
 }
 
 // A chunk of the movie's sound came in (UStream.c's DSPM, VAGM and XADP chunks): each voice's
-// decoder is set from it (fn_800B0338) and each channel is DMA'd into the next block of its voice's
-// ring. Nothing while off (state 0). Before the start (state 1) the blocks advance here; while
+// decoder is set from it (HwVoice_SetMovieDecoder) and each channel is DMA'd into the next block of
+// its voice's ring. Nothing while off (state 0). Before the start (state 1) the blocks advance here; while
 // playing, Mov_BlockSentCB advances them when the left channel's DMA is done.
 void Mov_SendSoundBlock(MovieSoundBlock* pBlock) {
     int nMode;
@@ -256,8 +265,8 @@ void Ses_ResetModule(void) {
 
 // Ends a sound session (Aud_ExitSession): the master, voice, track, emitter, listener and reverb
 // session steps (most empty in this build), then startUp.c's: the boot DMA buffer freed if still
-// held (fn_800B0660) and every hardware voice stopped (fn_800AFB50). The subsession id EA passes is
-// not read.
+// held (AudAram_ExitSession) and every hardware voice stopped (HwVoice_ExitSession). The subsession
+// id EA passes is not read.
 void Ses_Exit(void) {
     Mas_ExitSession();
     Voc_ExitSession();
@@ -270,17 +279,17 @@ void Ses_Exit(void) {
     HwVoice_ExitSession();
 }
 
-// Starts a sound session (Aud_InitSession): a is the session (0 the front end, 1 play, the course +
-// 1 on a hole), b the subsession (1 on a hole), nListeners one per view. Bank 1 is always dropped
-// (its ARAM block and header freed); then startUp.c's, the reverb's, listeners', emitters',
-// tracks', voices' and master's session steps run in turn, each only if the one before succeeded.
-// When they all succeed, b == 0 drops bank 0 as well and clears the loaded bits, and bit 0x01 of
-// gSesFlags (set up) is set. Returns 0 when a step failed, else 1.
-u8 Ses_Init(u8 a, u8 b, u8 nListeners) {
+// Starts a sound session (Aud_InitSession): nSession is 0 for the front end, 1 for play, the
+// course + 1 on a hole; nSubsession is 1 on a hole; nListeners one per view. Bank 1 is always
+// dropped (its ARAM block and header freed); then startUp.c's, the reverb's, listeners',
+// emitters', tracks', voices' and master's session steps run in turn, each only if the one before
+// succeeded. When they all succeed, nSubsession 0 drops bank 0 as well and clears the loaded bits,
+// and bit 0x01 of gSesFlags (set up) is set. Returns 0 when a step failed, else 1.
+u8 Ses_Init(u8 nSession, u8 nSubsession, u8 nListeners) {
     u8 bOk;
 
-    gSesSession = a;
-    gSesSubsession = b;
+    gSesSession = nSession;
+    gSesSubsession = nSubsession;
     if (gSesBank1 != NULL) {
         if (gSesBank1->uAram != 0) {
             AudAram_Free(gSesBank1->uAram);
@@ -291,10 +300,11 @@ u8 Ses_Init(u8 a, u8 b, u8 nListeners) {
     }
     gSesFlags &= ~0x30;
     if ((bOk = HwVoice_InitSession()) && (bOk = AudDma_InitSession()) && (bOk = AudAram_InitSession()) &&
-        (bOk = Rvb_InitSession(a, b)) && (bOk = Mic_InitSession(a, b, nListeners)) &&
-        (bOk = Emi_InitSession()) && (bOk = Trk_InitSession(a, b)) && (bOk = Voc_InitSession()) &&
+        (bOk = Rvb_InitSession(nSession, nSubsession)) &&
+        (bOk = Mic_InitSession(nSession, nSubsession, nListeners)) && (bOk = Emi_InitSession()) &&
+        (bOk = Trk_InitSession(nSession, nSubsession)) && (bOk = Voc_InitSession()) &&
         (bOk = Mas_InitSession())) {
-        if (b == 0) {
+        if (nSubsession == 0) {
             if (gSesBank0 != NULL) {
                 if (gSesBank0->uAram != 0) {
                     AudAram_Free(gSesBank0->uAram);
@@ -313,10 +323,10 @@ u8 Ses_Init(u8 a, u8 b, u8 nListeners) {
 // Pauses (bPause 1) or resumes all voices (Voc_PauseAll; with bSpinupDelay the streamed voices stay
 // paused for Stm_Tick to resume), takes the reverb off while paused (Rvb_Pause), and keeps the
 // state in bit 0x40 of gSesFlags: while it is set, Trk_Cycle ticks only some tracks.
-void Ses_Pause(u8 b) {
-    Voc_PauseAll();
-    Rvb_Pause(b);
-    if (b) {
+void Ses_Pause(u8 bPause, u8 bSpinupDelay) {
+    Voc_PauseAll(bPause, bSpinupDelay);
+    Rvb_Pause(bPause);
+    if (bPause) {
         gSesFlags |= 0x40;
     } else {
         gSesFlags &= ~0x40;

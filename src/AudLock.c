@@ -1,14 +1,16 @@
-// AudLock.c (our name): the sound engine's two locks. A mutex guards the streams (movie audio takes
-// it around each of its steps) and a one-count semaphore guards the stream read queue. Every lock
-// call passes a string naming its caller ("Mov_Tick"); the retail build ignores it.
+// AudLock.c (our name): the sound engine's two locks. A mutex that the file system (LLFileIO_Gc.c's
+// read thread, File_Open, File_Close, File_ReadAsyncEx) shares with the streamed tracks and the
+// movie sound, each taking it around a whole step, and a one-count semaphore that guards the
+// stream read queue (hlaudtrackstm.c). Every lock call passes a string naming its caller
+// ("Mov_Tick", "File_Open"); this build ignores it.
 
 #include "game_types.h"
 #include "platform.h"
 #include "core/audtrack.h"
 
 // Defined last-first: CodeWarrior lays .bss out in reverse order.
-OSMutex gAudLockMutex;                   // the stream lock
-OSSemaphore gAudLockReadQueueSem;               // the read-queue lock
+OSMutex gAudLockMutex;                  // the file and stream lock
+OSSemaphore gAudLockReadQueueSem;       // the read-queue lock
 
 // Sets both locks up: the mutex free, the read-queue semaphore at 1. LLFileIO_Gc.c calls it once
 // its read thread is running (fn_80005EC0).

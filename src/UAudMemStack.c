@@ -1,6 +1,11 @@
 // UAudMemStack.c (EA's name, from its asserts; also in EA's 2002 source tree): the sound engine's
-// stack allocator. AudMem_Init takes 384 KB of main memory at boot, and AudMem_Alloc hands out the
-// voices, tracks and tables of the audio code from it, each block rounded up to 64 bytes.
+// stack allocator (AudMemStack_, TW07's names) and, after it, the sound engine's memory on top of
+// it (AudMem_, which TW07 and TW06 keep in their own UAudMem.c / uaudmem.c). AudMem_Init takes
+// 384 KB of main memory at boot, and AudMem_Alloc hands out the voices, tracks and tables of the
+// audio code from it, each block rounded up to 64 bytes. Blocks come off the top, and giving one
+// back lowers the top by its size, so they must be given back last-first (AudReverb.c runs its
+// own stack the same way). The four empty AudMem_ steps at the end are called by the boot,
+// shut-down and per-mode lists.
 
 #include "core/audcontainers.h"
 
@@ -12,9 +17,9 @@ void  AudMem_InitModule(void);
 void  AudMem_CloseModule(void);
 
 // Defined last-address-first: CodeWarrior lays out .bss in reverse order of definition.
-void* gAudMemBuffer;                     // the buffer of the sound engine's stack
+void* gAudMemBuffer;                    // the buffer of the sound engine's stack (0x60000 bytes)
 UAudMemStack gAudMemStack;              // the sound engine's stack
-UAudMemStackBlock gAudMemBlocks[64];     // its table
+UAudMemStackBlock gAudMemBlocks[64];    // its block table
 
 // Sets up a stack over [pMem, pMem + uSize). With no table given, the stack allocates its own.
 void AudMemStack_Init(UAudMemStack* pStack, u8* pMem, u32 uSize, u32 nMaxBlocks, UAudMemStackBlock* pBlocks,

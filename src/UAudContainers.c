@@ -1,15 +1,17 @@
-// UAudContainers.c (our name, after TW06's golf/audio/engine/utils/uaudcontainers.c, whose list,
-// queue and pool functions these match in order and shape): the sound engine's containers, a
-// doubly linked list (UList), a ring-buffer queue (UQueue, the stream read requests) and a pool of
-// fixed-size blocks (UPool, the voices and tracks). See core/audcontainers.h.
+// UAudContainers.c (EA's name: TW06's golf/audio/engine/utils/uaudcontainers.c, TW07's
+// UAudContainers.c, whose UList_, UQueue_ and UPool_ functions these are, in the same order and
+// shape; TW07's UStack_ and UBuff_ functions are not in this build): the sound engine's
+// containers, a doubly linked list (UList), a ring-buffer queue (UQueue, the stream read
+// requests) and a pool of fixed-size blocks (UPool, the voices and tracks). See
+// core/audcontainers.h.
 
 #include "core/audcontainers.h"
 
-// Empties a list that holds up to nSlots links (the n8 given; stored, never checked).
-void UList_Reset(UList* pList, u16 n8) {
+// Empties a list that holds up to nSlots links (stored, never checked).
+void UList_Reset(UList* pList, u16 nSlots) {
     pList->pHead = NULL;
     pList->pTail = NULL;
-    pList->n8 = n8;
+    pList->n8 = nSlots;
     pList->nCount = 0;
 }
 
