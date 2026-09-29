@@ -6,7 +6,7 @@
 #include "golfer.h"
 #include "game.h"
 
-u8  lbl_80282240;
+u8  gbTestingHoleEnd;
 
 f32  GameAnalysis_GetInitialDistanceToPin(int nPlayer);
 f32  GameAnalysis_GetPositionDistanceToPin(f32* pPos);
@@ -516,7 +516,7 @@ s32 GameAnalysis_GetPotentialEventLead(int nPlayer) {
 }
 
 // Whether holing the ball now would finish the hole: puts the ball in the cup with one more stroke,
-// asks the mode (gpGame->pfnHoleFinished) with lbl_80282240 set, so the match modes do not count
+// asks the mode (gpGame->pfnHoleFinished) with gbTestingHoleEnd set, so the match modes do not count
 // the asking player's own side as done, then puts both back.
 u8 GameAnalysis_ShotWouldEndHole(int nPlayer) {
     int nLie;
@@ -527,9 +527,9 @@ u8 GameAnalysis_ShotWouldEndHole(int nPlayer) {
     gPlayers[nPlayer].ball.nLie = LIE_INCUP_e;
     nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
     gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()]++;
-    lbl_80282240 = 1;
+    gbTestingHoleEnd = 1;
     bFinished = gpGame->pfnHoleFinished(nPlayer, 1) != 0;
-    lbl_80282240 = 0;
+    gbTestingHoleEnd = 0;
     gPlayers[nPlayer].ball.nLie = nLie;
     gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] = nStrokes;
     return bFinished;

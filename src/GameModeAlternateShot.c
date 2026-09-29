@@ -253,7 +253,7 @@ void GameModeAlternateShot_EndGolferTurn(int nPlayer) {
 
 // Whether the hole is over (bCheck is not used): both teams holed out; or one team holed out and
 // the other can no longer beat its score; or can at best tie it when a tie would lose the match
-// (the holed team is ahead by the holes left, this one included). While lbl_80282240 is set, a
+// (the holed team is ahead by the holes left, this one included). While gbTestingHoleEnd is set, a
 // holed team's own players (nPlayer) do not end it this way.
 u8 GameModeAlternateShot_HoleFinished(int nPlayer, u8 bCheck) {
     int nLeft;
@@ -261,12 +261,12 @@ u8 GameModeAlternateShot_HoleFinished(int nPlayer, u8 bCheck) {
     if (GameModeAlternateShot_TeamDone(0) && GameModeAlternateShot_TeamDone(1)) {
         return 1;
     }
-    if (GameModeAlternateShot_TeamDone(0) && (!lbl_80282240 || (u32)nPlayer > 1)) {
+    if (GameModeAlternateShot_TeamDone(0) && (!gbTestingHoleEnd || (u32)nPlayer > 1)) {
         if (GameModeAlternateShot_TeamBestPossibleScore(0) < GameModeAlternateShot_TeamBestPossibleScore(1)) {
             return 1;
         }
     }
-    if (GameModeAlternateShot_TeamDone(1) && (!lbl_80282240 || (u32)(nPlayer - 2) > 1)) {
+    if (GameModeAlternateShot_TeamDone(1) && (!gbTestingHoleEnd || (u32)(nPlayer - 2) > 1)) {
         if (GameModeAlternateShot_TeamBestPossibleScore(1) < GameModeAlternateShot_TeamBestPossibleScore(0)) {
             return 1;
         }
@@ -277,7 +277,7 @@ u8 GameModeAlternateShot_HoleFinished(int nPlayer, u8 bCheck) {
             nLeft++;
         }
     }
-    if (GameModeAlternateShot_TeamDone(0) && (!lbl_80282240 || (u32)nPlayer > 1)) {
+    if (GameModeAlternateShot_TeamDone(0) && (!gbTestingHoleEnd || (u32)nPlayer > 1)) {
         if (nLeft + GameModeAlternateShot_TeamMatchWins(1) == GameModeAlternateShot_TeamMatchWins(0)) {
             if (GameModeAlternateShot_TeamBestPossibleScore(0) <=
                 GameModeAlternateShot_TeamBestPossibleScore(1)) {
@@ -285,7 +285,7 @@ u8 GameModeAlternateShot_HoleFinished(int nPlayer, u8 bCheck) {
             }
         }
     }
-    if (GameModeAlternateShot_TeamDone(1) && (!lbl_80282240 || (u32)(nPlayer - 2) > 1)) {
+    if (GameModeAlternateShot_TeamDone(1) && (!gbTestingHoleEnd || (u32)(nPlayer - 2) > 1)) {
         if (nLeft + GameModeAlternateShot_TeamMatchWins(0) == GameModeAlternateShot_TeamMatchWins(1)) {
             if (GameModeAlternateShot_TeamBestPossibleScore(1) <=
                 GameModeAlternateShot_TeamBestPossibleScore(0)) {

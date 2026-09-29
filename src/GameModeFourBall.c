@@ -271,7 +271,7 @@ int GameModeFourBall_GetPlayerTeam(int nPlayer) {
 // Whether the hole is over (pfnHoleFinished; bCheck is not read): both teams done or either
 // conceded; or one team done and the other can no longer beat its best possible score, or can at
 // best tie it while the done team is dormie (ahead by as many holes as are left, this one
-// included). While lbl_80282240 is set, a done team's own player (nPlayer) does not end it these
+// included). While gbTestingHoleEnd is set, a done team's own player (nPlayer) does not end it these
 // last two ways.
 u8 GameModeFourBall_HoleFinished(int nPlayer, u8 bCheck) {
     int nLeft;
@@ -282,12 +282,12 @@ u8 GameModeFourBall_HoleFinished(int nPlayer, u8 bCheck) {
     if (GameModeFourBall_TeamConceded(0) || GameModeFourBall_TeamConceded(1)) {
         return 1;
     }
-    if (GameModeFourBall_TeamDone(0) && (!lbl_80282240 || (u32)nPlayer > 1)) {
+    if (GameModeFourBall_TeamDone(0) && (!gbTestingHoleEnd || (u32)nPlayer > 1)) {
         if (GameModeFourBall_TeamBestPossibleScore(0) < GameModeFourBall_TeamBestPossibleScore(1)) {
             return 1;
         }
     }
-    if (GameModeFourBall_TeamDone(1) && (!lbl_80282240 || (u32)(nPlayer - 2) > 1)) {
+    if (GameModeFourBall_TeamDone(1) && (!gbTestingHoleEnd || (u32)(nPlayer - 2) > 1)) {
         if (GameModeFourBall_TeamBestPossibleScore(1) < GameModeFourBall_TeamBestPossibleScore(0)) {
             return 1;
         }
@@ -298,14 +298,14 @@ u8 GameModeFourBall_HoleFinished(int nPlayer, u8 bCheck) {
             nLeft++;
         }
     }
-    if (GameModeFourBall_TeamDone(0) && (!lbl_80282240 || (u32)nPlayer > 1)) {
+    if (GameModeFourBall_TeamDone(0) && (!gbTestingHoleEnd || (u32)nPlayer > 1)) {
         if (nLeft + GameModeFourBall_TeamMatchWins(1) == GameModeFourBall_TeamMatchWins(0)) {
             if (GameModeFourBall_TeamBestPossibleScore(0) <= GameModeFourBall_TeamBestPossibleScore(1)) {
                 return 1;
             }
         }
     }
-    if (GameModeFourBall_TeamDone(1) && (!lbl_80282240 || (u32)(nPlayer - 2) > 1)) {
+    if (GameModeFourBall_TeamDone(1) && (!gbTestingHoleEnd || (u32)(nPlayer - 2) > 1)) {
         if (nLeft + GameModeFourBall_TeamMatchWins(0) == GameModeFourBall_TeamMatchWins(1)) {
             if (GameModeFourBall_TeamBestPossibleScore(1) <= GameModeFourBall_TeamBestPossibleScore(0)) {
                 return 1;

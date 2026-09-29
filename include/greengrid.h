@@ -1,5 +1,5 @@
 // greengrid.h (our name): GoGreenGrid.c's state, the grid drawn over the putting green
-// (lbl_801E3068, 0x118 bytes, reached through lbl_802813C0). Per view: a mesh object and its
+// (gGreenGrid, 0x118 bytes, reached through gpGreenGrid). Per view: a mesh object and its
 // vertex arrays, the grid's corner and direction, and the ground heights sampled so far.
 
 #ifndef GREENGRID_H
@@ -32,6 +32,6 @@ typedef struct GreenGrid {
 } GreenGrid;
 LAYOUT_ASSERT(GreenGrid, 0x118);
 
-extern GreenGrid* lbl_802813C0;
+extern GreenGrid* gpGreenGrid;
 
 #endif

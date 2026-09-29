@@ -6,8 +6,8 @@
 #include "camera.h"
 #include "breakline.h"
 
-u8 lbl_8028222C;
-BreakLine* lbl_80282228;
+u8 gbBreakLineOn;
+BreakLine* gpBreakLine;
 
 void SD_InitShaderObject(void* pMesh, int n, s32* pDesc);    // Skin.c: sets up a mesh object
 void SD_FreeShaderObject(void* pMesh);         // Skin.c: frees a mesh object
@@ -23,21 +23,21 @@ static f32 GoBreakLine_StrippedFn(f32 x) {
     return x + 1.0f;
 }
 
-// Allocates the break line's state (lbl_80282228) at start-up and sets its fade from alpha 27 at
+// Allocates the break line's state (gpBreakLine) at start-up and sets its fade from alpha 27 at
 // the ball (fAB30) to 0 at the end (fAB34), with fAB38 20 and fAB3C 0.009, which nothing in this
 // file reads.
 void BreakLine_InitModule(void) {
-    lbl_80282228 = StaticMem_Alloc(sizeof(BreakLine), 2, 16, "GoBreakLine.c", 93);
-    lbl_80282228->fAB30 = 27.0f;
-    lbl_80282228->fAB34 = 0.0f;
-    lbl_80282228->fAB38 = 20.0f;
-    lbl_80282228->fAB3C = 0.009f;
+    gpBreakLine = StaticMem_Alloc(sizeof(BreakLine), 2, 16, "GoBreakLine.c", 93);
+    gpBreakLine->fAB30 = 27.0f;
+    gpBreakLine->fAB34 = 0.0f;
+    gpBreakLine->fAB38 = 20.0f;
+    gpBreakLine->fAB3C = 0.009f;
 }
 
 // Frees the break line's state (BreakLine_InitModule's allocation).
 void BreakLine_CloseModule(void) {
-    StaticMem_Free(lbl_80282228);
-    lbl_80282228 = NULL;
+    StaticMem_Free(gpBreakLine);
+    gpBreakLine = NULL;
 }
 
 // Sets the line up for a hole: its settings, a mesh per view, the "brkline" texture and the pin.
@@ -47,46 +47,46 @@ void BreakLine_InitForHole(void) {
     s32 desc[2];
     u64 uHash;
 
-    lbl_80282228->fAAE0 = 0.02f;
-    lbl_80282228->fAAE4 = 4.0f;
-    lbl_80282228->nAAEC = 5;
-    lbl_80282228->fAB0C = 0.01f;
-    lbl_80282228->fAB10 = -800.0f;
-    lbl_80282228->fAB14 = 0.0f;
-    lbl_80282228->fAB18 = 100.0f;
-    lbl_80282228->fAB1C = 0.024f;
-    lbl_80282228->anColor[0] = 0x80;
-    lbl_80282228->anColor[1] = 0x80;
-    lbl_80282228->anColor[2] = 0x80;
-    lbl_80282228->anColor[3] = 0x33;
+    gpBreakLine->fAAE0 = 0.02f;
+    gpBreakLine->fAAE4 = 4.0f;
+    gpBreakLine->nAAEC = 5;
+    gpBreakLine->fAB0C = 0.01f;
+    gpBreakLine->fAB10 = -800.0f;
+    gpBreakLine->fAB14 = 0.0f;
+    gpBreakLine->fAB18 = 100.0f;
+    gpBreakLine->fAB1C = 0.024f;
+    gpBreakLine->anColor[0] = 0x80;
+    gpBreakLine->anColor[1] = 0x80;
+    gpBreakLine->anColor[2] = 0x80;
+    gpBreakLine->anColor[3] = 0x33;
     desc[0] = gSession.nSplitScreen ? 450 : 900;
     desc[1] = 1;
-    SD_InitShaderObject(lbl_80282228->aMesh[0], 5, desc);
+    SD_InitShaderObject(gpBreakLine->aMesh[0], 5, desc);
     if (gSession.nSplitScreen) {
-        SD_InitShaderObject(lbl_80282228->aMesh[1], 5, desc);
+        SD_InitShaderObject(gpBreakLine->aMesh[1], 5, desc);
     }
     uHash = fn_8000BEE4("brkline");
-    fn_800102DC(uHash, &lbl_80282228->pBank, &lbl_80282228->pTex);
-    LLMath_CopyVec(&pCourse->pin[nPin].x, lbl_80282228->vPin);
-    lbl_80282228->abSkip[0] = 1;
-    lbl_80282228->anVerts[0] = 0;
+    fn_800102DC(uHash, &gpBreakLine->pBank, &gpBreakLine->pTex);
+    LLMath_CopyVec(&pCourse->pin[nPin].x, gpBreakLine->vPin);
+    gpBreakLine->abSkip[0] = 1;
+    gpBreakLine->anVerts[0] = 0;
     if (gSession.nSplitScreen) {
-        lbl_80282228->abSkip[1] = 1;
-        lbl_80282228->anVerts[1] = 0;
+        gpBreakLine->abSkip[1] = 1;
+        gpBreakLine->anVerts[1] = 0;
     }
-    lbl_8028222C = 0;
+    gbBreakLineOn = 0;
 }
 
-// Frees the meshes BreakLine_InitForHole made (one per view) and turns the line off (lbl_8028222C).
+// Frees the meshes BreakLine_InitForHole made (one per view) and turns the line off (gbBreakLineOn).
 void BreakLine_CloseAfterHole(void) {
-    SD_FreeShaderObject(lbl_80282228->aMesh[0]);
+    SD_FreeShaderObject(gpBreakLine->aMesh[0]);
     if (gSession.nSplitScreen) {
-        SD_FreeShaderObject(lbl_80282228->aMesh[1]);
+        SD_FreeShaderObject(gpBreakLine->aMesh[1]);
     }
-    lbl_8028222C = 0;
+    gbBreakLineOn = 0;
 }
 
-// Steps view nView's line (BreakLine_Render) while the line is on (lbl_8028222C) and its player, a
+// Steps view nView's line (BreakLine_Render) while the line is on (gbBreakLineOn) and its player, a
 // human, stands over a putt within 75 of the hole with the target (vTarget) within an inch of the
 // pin (EA's test; distances in yards). A view's first call after the line is set up only clears
 // its abSkip.
@@ -94,16 +94,16 @@ void BreakLine_Update(int nView) {
     int nPlayer = ViewController_GetActivePlayerNumber(nView);
     f32 fDist;
 
-    fDist = LLMath_DistanceBetween3(lbl_80282228->vPin, gPlayers[nPlayer].vTarget);
+    fDist = LLMath_DistanceBetween3(gpBreakLine->vPin, gPlayers[nPlayer].vTarget);
     fDist *= 36.0f;                     // yards to inches
     if (fDist <= 1.0f &&
         gPlayers[nPlayer].nShotKind == 0 && gPlayers[nPlayer].swing.nState == 0 &&
-        gPlayers[nPlayer].fDistance < 75.0f && !Player_IsCPU(nPlayer) && lbl_8028222C) {
-        if (!lbl_80282228->abSkip[nView]) {
+        gPlayers[nPlayer].fDistance < 75.0f && !Player_IsCPU(nPlayer) && gbBreakLineOn) {
+        if (!gpBreakLine->abSkip[nView]) {
             BreakLine_Render(nView);
             return;
         }
-        lbl_80282228->abSkip[nView] = 0;
+        gpBreakLine->abSkip[nView] = 0;
     }
 }
 
@@ -128,34 +128,34 @@ void BreakLine_Render(int nView) {
     int i;
 
     if (gSession.options.a24[2]) {
-        LLMath_DistanceBetween3(lbl_80282228->vPin, gPlayers[nPlayer].vTarget);
+        LLMath_DistanceBetween3(gpBreakLine->vPin, gPlayers[nPlayer].vTarget);
         RenderState_SetCameraMatrices();
         RenderState_SetBlendFactors(4, 5);
         DS_vSetAlphaTestMode(0, 6, 0x80);
         DS_vEnableZBufferUpdate(0);
-        RenderState_SetBankTexture(lbl_80282228->pBank, lbl_80282228->pTex);
+        RenderState_SetBankTexture(gpBreakLine->pBank, gpBreakLine->pTex);
         RenderState_SetDrawFlags(0x70);
         RenderState_SetClipMode(0);
         RenderState_Flush();
-        fDist = LLMath_DistanceBetween3(lbl_80282228->aBall[nView].vPos, lbl_80282228->vPin);
-        if (lbl_80282228->abA91C[nView]) {
-            if ((lbl_80282228->aBall[nView].nState == 2 || lbl_80282228->aBall[nView].nState == 3 ||
-                 lbl_80282228->aBall[nView].nState == 4) && fDist > 0.001f) {
+        fDist = LLMath_DistanceBetween3(gpBreakLine->aBall[nView].vPos, gpBreakLine->vPin);
+        if (gpBreakLine->abA91C[nView]) {
+            if ((gpBreakLine->aBall[nView].nState == 2 || gpBreakLine->aBall[nView].nState == 3 ||
+                 gpBreakLine->aBall[nView].nState == 4) && fDist > 0.001f) {
                 Physics_SetSimulating(1);
-                Physics_TimedSimulation(&lbl_80282228->aBall[nView], lbl_80282228->fAAE0,
-                                        lbl_80282228->fAAE4);
+                Physics_TimedSimulation(&gpBreakLine->aBall[nView], gpBreakLine->fAAE0,
+                                        gpBreakLine->fAAE4);
                 Physics_SetSimulating(0);
-                fDist = LLMath_SquareDistanceBetween3(lbl_80282228->aBall[nView].vPos,
-                                    &lbl_80282228->aBall[nView].pCourse->pin[Game_CurrentPinSet()].x);
-                if (fDist < lbl_80282228->afAAD4[nView]) {
-                    lbl_80282228->afAAD4[nView] = fDist;
-                    LLMath_CopyVec(lbl_80282228->aBall[nView].vPos, lbl_80282228->aViewPoint[nView]);
-                } else if (!lbl_80282228->abAADC[nView]) {
-                    EVENT_Trigger(nPlayer, 0x29, lbl_80282228->aBall[nView].vPrev, 0);
-                    lbl_80282228->abAADC[nView] = 1;
+                fDist = LLMath_SquareDistanceBetween3(gpBreakLine->aBall[nView].vPos,
+                                    &gpBreakLine->aBall[nView].pCourse->pin[Game_CurrentPinSet()].x);
+                if (fDist < gpBreakLine->afAAD4[nView]) {
+                    gpBreakLine->afAAD4[nView] = fDist;
+                    LLMath_CopyVec(gpBreakLine->aBall[nView].vPos, gpBreakLine->aViewPoint[nView]);
+                } else if (!gpBreakLine->abAADC[nView]) {
+                    EVENT_Trigger(nPlayer, 0x29, gpBreakLine->aBall[nView].vPrev, 0);
+                    gpBreakLine->abAADC[nView] = 1;
                 }
                 // The ball's heading on the ground, as an angle about y from the z axis.
-                BreakLine_Vec4Sub(lbl_80282228->aBall[nView].vPos, lbl_80282228->aBall[nView].vPrev, vDir);
+                BreakLine_Vec4Sub(gpBreakLine->aBall[nView].vPos, gpBreakLine->aBall[nView].vPrev, vDir);
                 vDir[1] = 0.0f;
                 // EA bug: tests y, just cleared, where z was surely meant
                 if (vDir[0] != 0.0f || vDir[1] != 0.0f) {
@@ -167,76 +167,76 @@ void BreakLine_Render(int nView) {
                 fSin = Math_Sin(fAngle);
                 fCos = Math_Cos(fAngle);
                 // Turn the new pair of vertices to the heading and move them to the ball.
-                for (i = lbl_80282228->anVerts[nView]; i <= lbl_80282228->anVerts[nView] + 1; i++) {
-                    fX = lbl_80282228->aVert[nView][i][0];
-                    fZ = fX * fCos + lbl_80282228->aVert[nView][i][2] * fSin;
-                    lbl_80282228->aVert[nView][i][0] = fX * -fSin + lbl_80282228->aVert[nView][i][2] * fCos;
-                    lbl_80282228->aVert[nView][i][2] = fZ;
+                for (i = gpBreakLine->anVerts[nView]; i <= gpBreakLine->anVerts[nView] + 1; i++) {
+                    fX = gpBreakLine->aVert[nView][i][0];
+                    fZ = fX * fCos + gpBreakLine->aVert[nView][i][2] * fSin;
+                    gpBreakLine->aVert[nView][i][0] = fX * -fSin + gpBreakLine->aVert[nView][i][2] * fCos;
+                    gpBreakLine->aVert[nView][i][2] = fZ;
                 }
-                BreakLine_Vec3Add(lbl_80282228->aVert[nView][lbl_80282228->anVerts[nView]],
-                            lbl_80282228->aBall[nView].vPos,
-                            lbl_80282228->aVert[nView][lbl_80282228->anVerts[nView]]);
-                BreakLine_Vec3Add(lbl_80282228->aVert[nView][lbl_80282228->anVerts[nView] + 1],
-                            lbl_80282228->aBall[nView].vPos,
-                            lbl_80282228->aVert[nView][lbl_80282228->anVerts[nView] + 1]);
-                fAlpha = lbl_80282228->fAB30;
+                BreakLine_Vec3Add(gpBreakLine->aVert[nView][gpBreakLine->anVerts[nView]],
+                            gpBreakLine->aBall[nView].vPos,
+                            gpBreakLine->aVert[nView][gpBreakLine->anVerts[nView]]);
+                BreakLine_Vec3Add(gpBreakLine->aVert[nView][gpBreakLine->anVerts[nView] + 1],
+                            gpBreakLine->aBall[nView].vPos,
+                            gpBreakLine->aVert[nView][gpBreakLine->anVerts[nView] + 1]);
+                fAlpha = gpBreakLine->fAB30;
                 if (fAlpha < 0.0f) {
                     fAlpha = 0.0f;
                 }
-                if (lbl_80282228->anVerts[nView] != 0) {
-                    for (i = 0; i <= lbl_80282228->anVerts[nView]; i += 2) {
-                        lbl_80282228->aColor[nView][i][3] = fAlpha - (f32)i *
-                            ((fAlpha - lbl_80282228->fAB34) / (f32)lbl_80282228->anVerts[nView]);
-                        lbl_80282228->aColor[nView][i + 1][3] = fAlpha - (f32)i *
-                            ((fAlpha - lbl_80282228->fAB34) / (f32)lbl_80282228->anVerts[nView]);
+                if (gpBreakLine->anVerts[nView] != 0) {
+                    for (i = 0; i <= gpBreakLine->anVerts[nView]; i += 2) {
+                        gpBreakLine->aColor[nView][i][3] = fAlpha - (f32)i *
+                            ((fAlpha - gpBreakLine->fAB34) / (f32)gpBreakLine->anVerts[nView]);
+                        gpBreakLine->aColor[nView][i + 1][3] = fAlpha - (f32)i *
+                            ((fAlpha - gpBreakLine->fAB34) / (f32)gpBreakLine->anVerts[nView]);
                     }
                 }
-                lbl_80282228->anVerts[nView] += 2;
-                lbl_80282228->anAAF0[nView]++;
-                if (lbl_80282228->anAAF0[nView] == lbl_80282228->nAAEC + 1) {
-                    Vec3Copy(lbl_80282228->aVert[nView][lbl_80282228->anVerts[nView] - 2],
-                             lbl_80282228->aVert[nView][lbl_80282228->anVerts[nView]]);
-                    Vec3Copy(lbl_80282228->aVert[nView][lbl_80282228->anVerts[nView] - 1],
-                             lbl_80282228->aVert[nView][lbl_80282228->anVerts[nView] + 1]);
-                    lbl_80282228->anVerts[nView] += 2;
+                gpBreakLine->anVerts[nView] += 2;
+                gpBreakLine->anAAF0[nView]++;
+                if (gpBreakLine->anAAF0[nView] == gpBreakLine->nAAEC + 1) {
+                    Vec3Copy(gpBreakLine->aVert[nView][gpBreakLine->anVerts[nView] - 2],
+                             gpBreakLine->aVert[nView][gpBreakLine->anVerts[nView]]);
+                    Vec3Copy(gpBreakLine->aVert[nView][gpBreakLine->anVerts[nView] - 1],
+                             gpBreakLine->aVert[nView][gpBreakLine->anVerts[nView] + 1]);
+                    gpBreakLine->anVerts[nView] += 2;
                 }
-                if (lbl_80282228->anAAF0[nView] > lbl_80282228->nAAEC) {
-                    lbl_80282228->anAAF0[nView] = 1;
+                if (gpBreakLine->anAAF0[nView] > gpBreakLine->nAAEC) {
+                    gpBreakLine->anAAF0[nView] = 1;
                 }
                 // EA bug: a misplaced parenthesis compares the split-screen test's truth value with
                 // 450, so in split screen the line is never stopped at its length
-                if ((!gSession.nSplitScreen && lbl_80282228->anVerts[nView] + 2 >= 900) ||
-                    (gSession.nSplitScreen && lbl_80282228->anVerts[nView] + 2) >= 450) {
-                    lbl_80282228->abA91C[nView] = 0;
+                if ((!gSession.nSplitScreen && gpBreakLine->anVerts[nView] + 2 >= 900) ||
+                    (gSession.nSplitScreen && gpBreakLine->anVerts[nView] + 2) >= 450) {
+                    gpBreakLine->abA91C[nView] = 0;
                 }
             } else {
-                EVENT_Trigger(nPlayer, 0x28, lbl_80282228->aBall[nView].vPos, 0);
-                lbl_80282228->abA91C[nView] = 0;
-                if (!lbl_80282228->abAADC[nView]) {
-                    EVENT_Trigger(nPlayer, 0x29, lbl_80282228->aBall[nView].vPos, 0);
-                    lbl_80282228->abAADC[nView] = 1;
+                EVENT_Trigger(nPlayer, 0x28, gpBreakLine->aBall[nView].vPos, 0);
+                gpBreakLine->abA91C[nView] = 0;
+                if (!gpBreakLine->abAADC[nView]) {
+                    EVENT_Trigger(nPlayer, 0x29, gpBreakLine->aBall[nView].vPos, 0);
+                    gpBreakLine->abAADC[nView] = 1;
                 }
             }
         }
-        if (lbl_80282228->anVerts[nView] > 2) {
-            for (i = 0; i < lbl_80282228->anVerts[nView]; i++) {
+        if (gpBreakLine->anVerts[nView] > 2) {
+            for (i = 0; i < gpBreakLine->anVerts[nView]; i++) {
                 aIndex[i] = i;
             }
-            desc.desc.n0 = lbl_80282228->anVerts[nView];
-            desc.desc.nVerts = lbl_80282228->anVerts[nView];
+            desc.desc.n0 = gpBreakLine->anVerts[nView];
+            desc.desc.nVerts = gpBreakLine->anVerts[nView];
             desc.desc.pDraw = NULL;
             desc.desc.pIndices = aIndex;
-            desc.desc.pPos = lbl_80282228->aVert[nView][0];
-            desc.desc.pColour = lbl_80282228->aColor[nView][0];
-            desc.desc.pUV = lbl_80282228->aUV[nView][0];
-            desc.af18[0] = lbl_80282228->fAB10;
-            desc.af18[1] = lbl_80282228->fAB14;
-            desc.af18[2] = lbl_80282228->fAB18;
-            desc.af18[3] = 1.0f / lbl_80282228->fAB18;
+            desc.desc.pPos = gpBreakLine->aVert[nView][0];
+            desc.desc.pColour = gpBreakLine->aColor[nView][0];
+            desc.desc.pUV = gpBreakLine->aUV[nView][0];
+            desc.af18[0] = gpBreakLine->fAB10;
+            desc.af18[1] = gpBreakLine->fAB14;
+            desc.af18[2] = gpBreakLine->fAB18;
+            desc.af18[3] = 1.0f / gpBreakLine->fAB18;
             nFrame = gSession.nFrameCount;
             SD_SetShaderTypeParameters(5, &nFrame);
-            SD_FillShaderObject((ShaderObject*)lbl_80282228->aMesh[nView], &desc, 1);
-            SD_DrawShaderObject(lbl_80282228->aMesh[nView]);
+            SD_FillShaderObject((ShaderObject*)gpBreakLine->aMesh[nView], &desc, 1);
+            SD_DrawShaderObject(gpBreakLine->aMesh[nView]);
         }
         DS_vSetAlphaTestMode(1, 6, 0x80);
         DS_vEnableZBufferUpdate(1);
@@ -247,7 +247,7 @@ void BreakLine_Render(int nView) {
 // Copies view nView's point of the line closest to the cup into pOut: where the rolling ball copy
 // came nearest the pin (BreakLine_Render keeps it), the ball's start until the line moves.
 void BreakLine_GetClosestPointToCupPos(int nView, f32* pOut) {
-    LLMath_CopyVec(lbl_80282228->aViewPoint[nView], pOut);
+    LLMath_CopyVec(gpBreakLine->aViewPoint[nView], pOut);
 }
 
 // fake match: EA reads the player through an inline; written in place, pPlayer is allocated r29, not r31
@@ -266,43 +266,43 @@ void BreakLine_Reset(int nView) {
 
     pPlayer = fn_800C8C70_Read(nView);
     if (pPlayer->nShotKind == 0 && pPlayer->fDistance < 75.0f && pPlayer->fDistance > 0.0f) {
-        lbl_80282228->abA91C[nView] = 1;
-        lbl_80282228->abSkip[nView] = 1;
-        lbl_80282228->anVerts[nView] = 0;
-        lbl_8028222C = 1;
-        Mem_cpy(&lbl_80282228->aBall[nView], &pPlayer->ball, sizeof(Ball));
-        LLMath_CopyVec(lbl_80282228->aBall[nView].vPos, lbl_80282228->aViewPoint[nView]);
-        lbl_80282228->afAAD4[nView] = 1000000.0f;
-        lbl_80282228->abAADC[nView] = 0;
+        gpBreakLine->abA91C[nView] = 1;
+        gpBreakLine->abSkip[nView] = 1;
+        gpBreakLine->anVerts[nView] = 0;
+        gbBreakLineOn = 1;
+        Mem_cpy(&gpBreakLine->aBall[nView], &pPlayer->ball, sizeof(Ball));
+        LLMath_CopyVec(gpBreakLine->aBall[nView].vPos, gpBreakLine->aViewPoint[nView]);
+        gpBreakLine->afAAD4[nView] = 1000000.0f;
+        gpBreakLine->abAADC[nView] = 0;
         fPower = Physics_EstimatePuttPower(pPlayer->fDistance);
-        lbl_80282228->anAAF0[nView] = 0;
+        gpBreakLine->anAAF0[nView] = 0;
         for (i = 0; i < BREAKLINE_POINTS; i++) {
-            lbl_80282228->aVert[nView][i * 2][0] = 0.0f;
-            lbl_80282228->aVert[nView][i * 2][1] = 0.0f;
-            lbl_80282228->aVert[nView][i * 2][2] = lbl_80282228->fAB1C;
-            lbl_80282228->aVert[nView][i * 2 + 1][0] = 0.0f;
-            lbl_80282228->aVert[nView][i * 2 + 1][1] = 0.0f;
-            lbl_80282228->aVert[nView][i * 2 + 1][2] = -lbl_80282228->fAB1C;
-            lbl_80282228->aColor[nView][i * 2][0] = lbl_80282228->anColor[0];
-            lbl_80282228->aColor[nView][i * 2][1] = lbl_80282228->anColor[1];
-            lbl_80282228->aColor[nView][i * 2][2] = lbl_80282228->anColor[2];
-            lbl_80282228->aColor[nView][i * 2][3] = lbl_80282228->anColor[3];
-            lbl_80282228->aColor[nView][i * 2 + 1][0] = lbl_80282228->anColor[0];
-            lbl_80282228->aColor[nView][i * 2 + 1][1] = lbl_80282228->anColor[1];
-            lbl_80282228->aColor[nView][i * 2 + 1][2] = lbl_80282228->anColor[2];
-            lbl_80282228->aColor[nView][i * 2 + 1][3] = lbl_80282228->anColor[3];
-            lbl_80282228->aUV[nView][i * 2][0] = (f32)nTex / (f32)lbl_80282228->nAAEC;
-            lbl_80282228->aUV[nView][i * 2][1] = 0.0f;
-            lbl_80282228->aUV[nView][i * 2 + 1][0] = (f32)nTex / (f32)lbl_80282228->nAAEC;
-            lbl_80282228->aUV[nView][i * 2 + 1][1] = 1.0f;
+            gpBreakLine->aVert[nView][i * 2][0] = 0.0f;
+            gpBreakLine->aVert[nView][i * 2][1] = 0.0f;
+            gpBreakLine->aVert[nView][i * 2][2] = gpBreakLine->fAB1C;
+            gpBreakLine->aVert[nView][i * 2 + 1][0] = 0.0f;
+            gpBreakLine->aVert[nView][i * 2 + 1][1] = 0.0f;
+            gpBreakLine->aVert[nView][i * 2 + 1][2] = -gpBreakLine->fAB1C;
+            gpBreakLine->aColor[nView][i * 2][0] = gpBreakLine->anColor[0];
+            gpBreakLine->aColor[nView][i * 2][1] = gpBreakLine->anColor[1];
+            gpBreakLine->aColor[nView][i * 2][2] = gpBreakLine->anColor[2];
+            gpBreakLine->aColor[nView][i * 2][3] = gpBreakLine->anColor[3];
+            gpBreakLine->aColor[nView][i * 2 + 1][0] = gpBreakLine->anColor[0];
+            gpBreakLine->aColor[nView][i * 2 + 1][1] = gpBreakLine->anColor[1];
+            gpBreakLine->aColor[nView][i * 2 + 1][2] = gpBreakLine->anColor[2];
+            gpBreakLine->aColor[nView][i * 2 + 1][3] = gpBreakLine->anColor[3];
+            gpBreakLine->aUV[nView][i * 2][0] = (f32)nTex / (f32)gpBreakLine->nAAEC;
+            gpBreakLine->aUV[nView][i * 2][1] = 0.0f;
+            gpBreakLine->aUV[nView][i * 2 + 1][0] = (f32)nTex / (f32)gpBreakLine->nAAEC;
+            gpBreakLine->aUV[nView][i * 2 + 1][1] = 1.0f;
             nTex++;
-            if (nTex > lbl_80282228->nAAEC) {
+            if (nTex > gpBreakLine->nAAEC) {
                 nTex = 0;
             }
         }
         Physics_SetSimulating(1);
-        lbl_80282228->aBall[nView].nState = 0;
-        Physics_ShotImpact(&lbl_80282228->aBall[nView], pPlayer->nClub, pPlayer->nShotKind, fPower,
+        gpBreakLine->aBall[nView].nState = 0;
+        Physics_ShotImpact(&gpBreakLine->aBall[nView], pPlayer->nClub, pPlayer->nShotKind, fPower,
                     pPlayer->fAim, 1, pPlayer->vLaunchA, pPlayer->vLaunchB);
         Physics_SetSimulating(0);
     }

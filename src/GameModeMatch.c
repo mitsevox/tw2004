@@ -148,7 +148,7 @@ s32 GameModeMatch_GetHonors(int nPlayer) {
 // Mode 1's hole-over test (pfnHoleFinished). Over when both players have holed out, or when one has
 // and the other can no longer halve the hole or, with the holed player dormie (ahead by as many
 // holes as are left, this one included), can no longer win it; unless bCheck only asks, the other's
-// score then gets a stroke for the putt they did not take. While lbl_80282240 is set, nPlayer's own
+// score then gets a stroke for the putt they did not take. While gbTestingHoleEnd is set, nPlayer's own
 // holed ball does not count.
 u8 GameModeMatch_HoleFinished(int nPlayer, u8 bCheck) {
     int nLeft;
@@ -156,7 +156,7 @@ u8 GameModeMatch_HoleFinished(int nPlayer, u8 bCheck) {
     if (Player_IsHoled(0) && Player_IsHoled(1)) {
         return 1;
     }
-    if (Player_IsHoled(0) && (!lbl_80282240 || nPlayer != 0)) {
+    if (Player_IsHoled(0) && (!gbTestingHoleEnd || nPlayer != 0)) {
         if (gPlayers[0].nStrokes[Game_CurHoleIndex()] <= gPlayers[1].nStrokes[Game_CurHoleIndex()]) {
             if (!bCheck) {
                 gPlayers[1].nStrokes[Game_CurHoleIndex()]++;
@@ -164,7 +164,7 @@ u8 GameModeMatch_HoleFinished(int nPlayer, u8 bCheck) {
             return 1;
         }
     }
-    if (Player_IsHoled(1) && (!lbl_80282240 || nPlayer != 1)) {
+    if (Player_IsHoled(1) && (!gbTestingHoleEnd || nPlayer != 1)) {
         if (gPlayers[1].nStrokes[Game_CurHoleIndex()] <= gPlayers[0].nStrokes[Game_CurHoleIndex()]) {
             if (!bCheck) {
                 gPlayers[0].nStrokes[Game_CurHoleIndex()]++;
@@ -178,7 +178,7 @@ u8 GameModeMatch_HoleFinished(int nPlayer, u8 bCheck) {
             nLeft++;
         }
     }
-    if (Player_IsHoled(0) && (!lbl_80282240 || nPlayer != 0) &&
+    if (Player_IsHoled(0) && (!gbTestingHoleEnd || nPlayer != 0) &&
         gPlayers[0].nHolesWon == gPlayers[1].nHolesWon + nLeft) {
         if (gPlayers[0].nStrokes[Game_CurHoleIndex()] <= gPlayers[1].nStrokes[Game_CurHoleIndex()] + 1) {
             if (!bCheck) {
@@ -187,7 +187,7 @@ u8 GameModeMatch_HoleFinished(int nPlayer, u8 bCheck) {
             return 1;
         }
     }
-    if (Player_IsHoled(1) && (!lbl_80282240 || nPlayer != 1) &&
+    if (Player_IsHoled(1) && (!gbTestingHoleEnd || nPlayer != 1) &&
         gPlayers[1].nHolesWon == gPlayers[0].nHolesWon + nLeft) {
         if (gPlayers[1].nStrokes[Game_CurHoleIndex()] <= gPlayers[0].nStrokes[Game_CurHoleIndex()] + 1) {
             if (!bCheck) {

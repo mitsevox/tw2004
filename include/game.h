@@ -594,7 +594,7 @@ void GameMode4_Init(void);                 // mode 4 (LadderedMode.c)
 int  GM_BestBallMode_GetTeamHoleScore(int nPlayer, int nHole);   // GameModeBestBall.c
 
 // GameModeMatch.c: match play, which the other two-player modes build on
-extern u8  lbl_80282240;                // the hole-finished test excuses the holed side's own players
+extern u8  gbTestingHoleEnd;            // the hole-finished test excuses the holed side's own players
 void GameModeMatch_SetupNextGolfer(void);
 s32  GameModeMatch_GetHonors(int nPlayer);
 u8   GameModeMatch_HoleFinished(int nPlayer, u8 bCheck);

@@ -1,4 +1,4 @@
-// breakline.h (our name): GoBreakLine.c's state, the putt's break line (lbl_80282228, 0xAB40
+// breakline.h (our name): GoBreakLine.c's state, the putt's break line (gpBreakLine, 0xAB40
 // bytes, allocated by BreakLine_InitModule). Only the fields read so far.
 
 #ifndef BREAKLINE_H
@@ -50,8 +50,8 @@ typedef struct BreakLine {
 } BreakLine;
 LAYOUT_ASSERT(BreakLine, 0xAB40);
 
-extern BreakLine* lbl_80282228;
-extern u8 lbl_8028222C;         // the line is on
+extern BreakLine* gpBreakLine;
+extern u8 gbBreakLineOn;        // the line is on
 
 void BreakLine_Render(int nView);
 void BreakLine_GetClosestPointToCupPos(int nView, f32* pOut);
