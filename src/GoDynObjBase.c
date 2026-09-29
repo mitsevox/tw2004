@@ -1,6 +1,7 @@
-// GoDynObjBase.c (our name): the course's dynamic objects, type 0 and the types' table. Type 0's
-// message handler (DynObjBase_MessageHandler) is also types 2 and 11's default;
-// DynObj_GetTypeHandler finds a type's handler. Type 2 is an object that turns at a steady speed.
+// GoDynObjBase.c (our name; TW06's and TW07's file lists name no file for it): the course's dynamic
+// objects (dynobj.h): type 0, the base type, whose message handler (DynObjBase_MessageHandler) is
+// also the default of types 2 and 11; type 2, an object that turns at a steady speed
+// (DynObjTurning_*); and the table of the types' handlers (DynObj_GetTypeHandler).
 
 #include "dynobj.h"
 #include "camera.h"

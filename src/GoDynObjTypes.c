@@ -1,7 +1,8 @@
-// GoDynObjTypes.c (our name): two more types of the course's dynamic objects (dynobj.h), types 6
-// (DynObjType6_MessageHandler) and 9 (DynObjType9_MessageHandler, which has no model to draw). Both
-// set up their object the way type 0 does (fn_80049514), without the definition's flags. Its
-// constant block is 0x80283280-0x80283288.
+// GoDynObjTypes.c (our name; TW06's and TW07's file lists name no file for it): two more types of
+// the course's dynamic objects (dynobj.h): type 6 (DynObjType6_MessageHandler), a model that is
+// drawn and does nothing else, and type 9 (DynObjType9_MessageHandler), which has no model to
+// draw. Both set up their object the way type 0 does (fn_80049514), without the definition's
+// flags. Its constant block is 0x80283280-0x80283288.
 
 #include "dynobj.h"
 

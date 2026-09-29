@@ -1,7 +1,9 @@
-// GoDynObj.c (EA's name, from its asserts; also in EA's 2002 source tree): the course's own objects
-// around the dynamic objects (dynobj.h): the 'TEO ' and 'BALL' stream handlers, the models of the
-// 'TEO ' objects, per-player objects, and when they are drawn (GoDynObjMgr, gpDynObjState). Partly
-// decompiled.
+// GoDynObj.c (EA's name, from its asserts; TW06 golf/hi-rendering/godynobj.c, TW07 GoDynObj.c):
+// the course's own objects around the dynamic objects (dynobj.h): the 'TEO ' and 'BALL' stream
+// handlers (the 'TEO ' models, the players' ball logos), each player's ball with its logo, shadow
+// and marker and when they are drawn, the pitch marks, divots and divot holes, the tee that flies
+// when struck, and the target games' target models. Its state is gpDynObjState (GoDynObjMgr).
+// DynObj_LoadTeoModel and DynObj_FreeTeoModel are still sweep code.
 
 #include "dynobj.h"
 #include "character.h"
@@ -11,6 +13,7 @@
 #include "game.h"
 #include "unsorted/cull.h"
 
+// The 27 ball logos' texture names, by the profile's logo index (DynObj_GetGolfBallLogoIndex).
 char gGolfBallLogoTextureNames[27][13] = {
     "LogoBENHapex",
     "LogoCALLhxb",
@@ -40,10 +43,13 @@ char gGolfBallLogoTextureNames[27][13] = {
     "LogoNIKEoneT",
     "LogoCYBM",
 };
+// Each player's ball logo texture, which DynObj_LoadBallLogos overwrites with the chosen logo.
 char gGolfBallLogoSlotNames[4][13] = {"logoea", "logonike", "logotitl", "logostrt"};
 
+// The ball models' scale (DynObj_DrawGolfBalls) and its radius's (DynObj_GetBallPixels); 1.0.
 f32 gGolfBallScale = 1.0f;
 
+// The file's state: allocated by DynObj_InitModule, freed by DynObj_CloseModule.
 GoDynObjMgr* gpDynObjState;
 
 void DynObj_LoadBallLogos(UStreamObject* pObject);   // the 'BALL' stream handler
@@ -170,6 +176,7 @@ void DynObj_InitModule(void) {
 }
 
 // Defined after DynObj_InitModule so that its "GoDynObj.c" comes first in .data, as in the original.
+// Each player's partner in game mode 21 (alternate shot), for DynObj_bAltShotDrawBall.
 s32 gAltShotPartner[4] = {1, 0, 3, 2};
 
 void DynObj_CloseModule(void) {

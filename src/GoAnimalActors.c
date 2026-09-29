@@ -1,11 +1,13 @@
 // GoAnimalActors.c (TW06's golf/hi-rendering/goanimalactors.c; our spelling): the animals on the
-// course (ActAnimal_*). The unit covers the file's certain core, whose functions share its
-// constant block (0x80283218-0x80283280).
+// course (ActAnimal_*), dynamic objects of type 11 (dynobj.h) that walk their route and animate
+// their pose. The unit covers the file's certain core, whose functions share its constant block
+// (0x80283218-0x80283280).
 
 #include "dynobj.h"
 #include "ball.h"
 #include "camera.h"
 
+// The six pose changes ActAnimal_Update steps an animal through (AnimalStep).
 AnimalStep gAnimalPoseSteps[6] = {
     { 0, 3, 1, 0.5f, 0.0f },
     { 1, 3, 2, 1.0f, 0.0f },

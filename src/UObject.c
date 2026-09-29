@@ -1,6 +1,7 @@
-// UObject.c (EA's name, from its asserts; also in EA's 2002 source tree): a drawable object (dynobj.h):
-// three matrices and a model with up to four levels of detail. Every dynamic object of the course
-// holds one (DynObj.obj).
+// UObject.c (EA's name, from its asserts; TW06/TW07 legacy/lib/uobject.c): a drawable object
+// (dynobj.h): three matrices and a model with up to four levels of detail (Object_*). Every
+// dynamic object of the course holds one (DynObj.obj); the front end's ball and UI objects use
+// them too.
 
 #include "dynobj.h"
 #include "camera.h"
