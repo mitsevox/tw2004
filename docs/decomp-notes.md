@@ -1037,7 +1037,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   Per function: GameMode23 `GameModeDriverPGATour_StartGamePreData` needs the local, its neighbour `fn_800EFA9C` does not.
 - **[verified] Pointer-to-index with `mulhwu` is a byte difference divided by `sizeof`.**
   `p - base` divides signed (`mulhw; srawi`); `((u8*)p - (u8*)base) / sizeof(T)` divides
-  unsigned (`mulhwu; srwi.`), because `sizeof` is unsigned (GoTerrainCollision `fn_80050BEC`,
+  unsigned (`mulhwu; srwi.`), because `sizeof` is unsigned (GoTerrainCollision `MaterialTypes_getMaterialID`,
   82.69% -> 100).
 - **[verified] In a leaf loop, reading a field each time instead of a local copy moves the
   volatile registers**, though the field is still loaded once (GoTerrainCollision

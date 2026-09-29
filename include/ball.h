@@ -312,7 +312,7 @@ u8   Ter_CheckForSolidWorldCollision(CourseInfo* pCourse, int nPlayer, f32* pFro
 u8   Ter_CheckForObjectCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
                                  SurfaceType** ppSurface,
                  TerObject** ppObj);   // the first object a line hits
-s32  fn_80050BEC(SurfaceType* pSurface);   // a surface's row in gSurfaceTypes, or -1
+s32  MaterialTypes_getMaterialID(SurfaceType* pSurface);   // a surface's row in gSurfaceTypes, or -1
 
 // ---- the ball (Ball.c) ----------------------------------------------------------------------
 

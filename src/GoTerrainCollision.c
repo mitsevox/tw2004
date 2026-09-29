@@ -2388,7 +2388,7 @@ int TerCollision_GetMeshFlags(UObjMesh* pModel, int n) {
 
 // TW06: s32 MaterialTypes::getMaterialID(const TGD_MaterialInfo*). A surface's row in
 // gSurfaceTypes, or -1.
-s32 fn_80050BEC(SurfaceType* pSurface) {
+s32 MaterialTypes_getMaterialID(SurfaceType* pSurface) {
     s32 n;
 
     if (pSurface == NULL) return -1;

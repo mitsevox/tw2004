@@ -438,7 +438,7 @@ static inline f32 Ball_Clamp(f32 x, f32 fLo, f32 fHi) {
         if ((pSurface)->u34 & 0x10) {                                                              \
             EVENT_Trigger((pBall)->nPlayer, 0x25, (pBall), !gSimulating);                            \
         }                                                                                          \
-        if (fn_80050BEC(pSurface) == 90) {                                                         \
+        if (MaterialTypes_getMaterialID(pSurface) == 90) {                                         \
             EVENT_Trigger((pBall)->nPlayer, 0x26, (pBall), !gSimulating);                            \
         } else if (pObj) {                                                                         \
             EVENT_Trigger((pBall)->nPlayer, 0x24, (pBall), !gSimulating);                            \
@@ -1136,7 +1136,7 @@ void Physics_BallRollingandSlipping(Ball* pBall, f32 fTicks) {
     SurfaceType* pSurface;
     f32          fPull, fDot, fFric;
     if (!Physics_GetSurfaceInfo(pBall, &pSurface, vNormal)) return;
-    pBall->nSurface = fn_80050BEC(pSurface);
+    pBall->nSurface = MaterialTypes_getMaterialID(pSurface);
     LLMath_Normalize3(vNormal, vNormal);
     fPull = 1.0f - pSurface->f14;
     if (pSurface->nClass == 3) {
@@ -1429,7 +1429,7 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, SurfaceType* pSurface) {
         }
         if (pBall->nState != 4) {
             pBall->nState   = 4;
-            pBall->nSurface = fn_80050BEC(pSurface);
+            pBall->nSurface = MaterialTypes_getMaterialID(pSurface);
         }
     }
     fT  = -fJ;
@@ -1531,7 +1531,7 @@ void Physics_SetLie(Ball* pBall, SurfaceType* pSurface) {
     int          nLuck;
     f32          f;
     u32          rSign;
-    pBall->nSurface = fn_80050BEC(pSurface);
+    pBall->nSurface = MaterialTypes_getMaterialID(pSurface);
     uLuck = 0;
     if (pBall->nPlayer >= 0 && pBall->nPlayer <= 3) {
         nLuck = (s8)Golfer_GetAttribute(&gPlayers[pBall->nPlayer], ATTR_LUCK, ATTR_TOTAL);
@@ -1965,7 +1965,7 @@ u8 Physics_CheckTerrainCollisions(Ball* pBall, f32 fTicks) {
     if ((pSurface->u34 & 0x10) && pSurface->f0C < 0.0f && bOut <= 1) return 0;
     if (!Physics_ProcessCollision(pBall, vHit, vNormal, pSurface, pObj, &fFrac, fTicks)) return 0;
     BALL_LANDING_EVENTS(pBall, pSurface, pObj);
-    nIndex = fn_80050BEC(pSurface);
+    nIndex = MaterialTypes_getMaterialID(pSurface);
     if (nIndex == 90) {
         pBall->vSpin[0] = 0.0f;
         pBall->vSpin[1] = 0.0f;
@@ -2013,7 +2013,7 @@ u8 Physics_CheckTerrainCollisions(Ball* pBall, f32 fTicks) {
         Vec3Copy(vTo, pBall->vPos);
     }
     if (pSurface->nClass == 7 || pSurface->nClass == 16) {
-        nIndex = fn_80050BEC(pSurface);
+        nIndex = MaterialTypes_getMaterialID(pSurface);
         if ((nIndex == 47 || nIndex == 41 || nIndex == 104) && pBall->vVel[1] > 2.9333334f) {
             fAcross = Math_Sqrt(pBall->vVel[0] * pBall->vVel[0] + pBall->vVel[2] * pBall->vVel[2]);
             if (fAcross > 1.71f * pBall->vVel[1] && fAcross > 5.86666679f) {
@@ -2121,7 +2121,7 @@ void Physics_BallRolling(Ball* pBall, f32 fTicks) {
     f32          fTurn, fZ, fX, fLen, fAngle, fK, fV, fRough;
     u8           bFlip;
     if (!Physics_GetSurfaceInfo(pBall, &pSurface, vNormal)) return;
-    pBall->nSurface = fn_80050BEC(pSurface);
+    pBall->nSurface = MaterialTypes_getMaterialID(pSurface);
     if (pSurface->nClass == 12 || pSurface->nClass == 18 ||
         (pBall->nSurface == 90 && LLMath_DistanceBetween3(pBall->vPos, PIN(pBall)) < 2.0f)) {
         if (pBall->pCourse->pin[Game_CurrentPinSet()].y - pBall->vPos[1] > 0.055555556f) {
@@ -2272,7 +2272,7 @@ f32 Physics_GetBallAltitude(Ball* pBall) {
             return 0.0f;
         }
     }
-    pBall->nSurface = fn_80050BEC(pSurface);
+    pBall->nSurface = MaterialTypes_getMaterialID(pSurface);
     return pBall->vPos[1] - fHeight;
 }
 

@@ -4794,3 +4794,4 @@ address	name	previous_name	tier	codes	evidence	purpose	proposed_by	reviewed_by	d
 800349CC	Ter_DrawHoleView	fn_800349CC	T3	E6	gomainloop calls it per view; Ter_BeginRender, Ter_RenderView, Ter_EndRender when a hole is loaded	draws the hole's terrain in a view	rt6 (replayed by orchestrator)		2026-09-29
 80034A20	Ter_GetObjectListModel	fn_80034A20	T3	E6	walks the hole data's node tree to a patch's object list	returns a patch's object-list model	rt6 (replayed by orchestrator)		2026-09-29
 80034AE4	Ter_RenderGrass	fn_80034AE4	T3	E6	GoGrass.c calls it; builds and draws the grass patch list	draws the grass patches	rt6 (replayed by orchestrator)		2026-09-29
+80050BEC	MaterialTypes_getMaterialID	fn_80050BEC	T2	E2	TW07 PS3 function-symbols MaterialTypes::getMaterialID(TGD_MaterialInfo const*), size 0x40; the same one surface-pointer parameter and s32 result: the surface's row in the table or -1	a surface's row in gSurfaceTypes	rt2 (replayed by orchestrator)		2026-09-29

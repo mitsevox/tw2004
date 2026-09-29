@@ -4717,3 +4717,4 @@ address	name	comment	by	date
 800349CC	Ter_DrawHoleView	add	rt6 (replayed by orchestrator)	2026-09-29
 80034A20	Ter_GetObjectListModel	keep	rt6 (replayed by orchestrator)	2026-09-29
 80034AE4	Ter_RenderGrass	keep	rt6 (replayed by orchestrator)	2026-09-29
+80050BEC	MaterialTypes_getMaterialID	keep	rt2 (replayed by orchestrator)	2026-09-29
