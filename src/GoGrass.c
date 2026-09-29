@@ -722,7 +722,7 @@ void fn_8011F7F8(void) {
             pSphere->y = 0.5f * (lbl_80281900->f3B8 + (pTile->f4 + pTile->f8));
             pSphere->z = 1.25f + (2.5f * (f32)nZ + (f32)lbl_80281900->n16);
             nCull = fn_80007CE8((RenderObj*)&lbl_80260360, RC_spGetCurrentRenderCtx(),
-                                0, ViewController_GetCameraControl(lbl_801D3CB0.iCurrentViewContext)->f54);
+                                0, ViewController_GetCameraControl(gTerrainRendererMgr.iCurrentViewContext)->f54);
             if (nCull == 2) {
                 continue;
             }

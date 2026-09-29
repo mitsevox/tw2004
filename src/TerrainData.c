@@ -321,7 +321,7 @@ u8 Network_RayNetworkDoesIntersect(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNo
 
 // TW06: Ter_TerrainGameDataMgr::GetTGD.
 CourseInfo* Ter_GetTGD(void) {
-    return lbl_801D3CB0.pCourse;
+    return gTerrainRendererMgr.pCourse;
 }
 
 // An object's combined rotation: rows 0..2 of its third matrix (UObject.m80) become its second

@@ -8,7 +8,7 @@
 
 #include "game_types.h"
 #include "platform.h"
-#include "terrain.h"   // the terrain manager (lbl_801D3CB0)
+#include "terrain.h"   // the terrain manager (gTerrainRendererMgr)
 #include "materialtypes.h"   // SurfaceType
 
 extern SurfaceType gSurfaceTypes[NUM_SURFACE_TYPES];   // 0x8017E9B8

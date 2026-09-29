@@ -116,7 +116,7 @@ typedef struct TerWaveData {
 // The data of the 'tLOD' chunk (Ter_LODLoadCallback); only two values are read.
 typedef struct TerLODData {
     u8   unk0[0xC];
-    f32  fC;                    // 0xC  } made whole numbers into lbl_802810E4 and lbl_802810E8
+    f32  fC;                    // 0xC  } made whole numbers into gTerLODDataNear and gTerLODDataFar
     f32  f10;                   // 0x10 }
 } TerLODData;
 
@@ -160,7 +160,7 @@ typedef struct Ter_TerrainRendererMgr {
     s32          iLOD2Begin;                    // 0x1134
     f32          fDetailMipmapBias;             // 0x1138
     f32          fLakeSurfaceMipmapBias;        // 0x113C
-    f32          fDefaultObjectMipmapBias[3];   // 0x1140  a row of lbl_801876D8 (Ter_SetCourseMipmapBias)
+    f32          fDefaultObjectMipmapBias[3];   // 0x1140  a row of gTerCourseMipmapBias (Ter_SetCourseMipmapBias)
     u8           bObjectTestMode;               // 0x114C
     u8           unk114D[3];
     s32          iCurrentViewContext;           // 0x1150  a view number (ViewController_GetCameraControl)
@@ -210,7 +210,7 @@ typedef struct TerSettings {
 } TerSettings;
 LAYOUT_ASSERT(TerSettings, 0x54);
 
-extern Ter_TerrainRendererMgr lbl_801D3CB0;
+extern Ter_TerrainRendererMgr gTerrainRendererMgr;
 extern TerSettings* lbl_802811E0;    // Code8006F154.c: points at lbl_801D70A8
 extern TerSettings lbl_801D70A8;
 // A step of a crowd member's move from one pose state to another (0x14 bytes; Ter_AnimateObjects): when its
@@ -223,26 +223,26 @@ typedef struct TerPoseStep {
     f32  f10;                   // 0x10
 } TerPoseStep;
 
-extern TerPoseStep lbl_801877E0[6]; // Ter_AnimateObjects: for objects without bit 0x40 of word 3
-extern TerPoseStep lbl_80187858[2]; // Ter_AnimateObjects: for objects with it
-extern f32 lbl_80281D60;           // Ter_vInitModule's random number, 0..1, stepped once per object
-extern s32 lbl_801D3A30[5][32];     // [n][k]: how many of k's lowest n bits are set (Ter_vInitModule);
+extern TerPoseStep gTerCrowdPoseSteps[6]; // Ter_AnimateObjects: for objects without bit 0x40 of word 3
+extern TerPoseStep gTerCrowdPoseStepsFlag40[2]; // Ter_AnimateObjects: for objects with it
+extern f32 gTerTreePeriodRandom;           // Ter_vInitModule's random number, 0..1, stepped once per object
+extern s32 gTerLowBitCounts[5][32];     // [n][k]: how many of k's lowest n bits are set (Ter_vInitModule);
                                     // Ter_DrawPatchGround picks a ground's mesh by it
 
 void fn_8006F334(TerSettings* pSettings);   // Code8006F154.c: the default colours
-extern f32 lbl_801876D8[21][3];     // rows Ter_SetCourseMipmapBias copies into fDefaultObjectMipmapBias
-extern f32 lbl_802810C8;
-extern s8  lbl_802810CC;
-extern u8  lbl_802810EC;            // } 1: Ter_DrawPanoramaList draws object list 0, list 2
-extern u8  lbl_802810ED;            // }
-extern s32 lbl_80281D64;            // how many of list 2's last objects Ter_DrawPanoramaList leaves out
-extern s32 lbl_802810D0;            // } Ter_SetLODPlanes's arguments (the LOD planes); 26 and 16 once
-extern s32 lbl_802810D4;            // } unloaded, else set by Ter_LODStepsFromDistances from the 'tLOD' chunk
-extern f32 lbl_802810D8;            // }
-extern s32 lbl_802810DC;            // }
-extern s32 lbl_802810E0;            // }
-extern s32 lbl_802810E4;            // } from the 'tLOD' chunk (Ter_LODLoadCallback); -1 until then
-extern s32 lbl_802810E8;            // }
+extern f32 gTerCourseMipmapBias[21][3];     // rows Ter_SetCourseMipmapBias copies into fDefaultObjectMipmapBias
+extern f32 gTerLastObjectAlpha;
+extern s8  gTerLastZWrite;
+extern u8  gTerDrawPanoramaList0;            // } 1: Ter_DrawPanoramaList draws object list 0, list 2
+extern u8  gTerDrawPanoramaList2;            // }
+extern s32 gTerPanoramaList2HiddenCount;            // how many of list 2's last objects Ter_DrawPanoramaList leaves out
+extern s32 gTerLOD0Steps;            // } Ter_SetLODPlanes's arguments (the LOD planes); 26 and 16 once
+extern s32 gTerLOD1Steps;            // } unloaded, else set by Ter_LODStepsFromDistances from the 'tLOD' chunk
+extern f32 gTerLODStepSize;            // }
+extern s32 gTerLOD1OverlapSteps;            // }
+extern s32 gTerLOD2OverlapSteps;            // }
+extern s32 gTerLODDataNear;            // } from the 'tLOD' chunk (Ter_LODLoadCallback); -1 until then
+extern s32 gTerLODDataFar;            // }
 
 // GoTerrain.c
 void Ter_vCloseModule(void);             // frees the terrain
