@@ -198,7 +198,7 @@ typedef struct UIText {
 // UI_RunGameMessage): each runs the handler for message nMsg of its table.
 void FE_RunGameMessage(int nMsg, MsgArg* pArgs, MsgArg* pResult);    // the menus (FE_MessageTable.c)
 void IG_RunGameMessage(int nMsg, MsgArg* pArgs, MsgArg* pResult);    // a round (GameUICommands.c)
-void Startup_RunGameMessage(int nCmd, MsgArg* pArgs, MsgArg* pResult);    // start-up (startUp.c)
+void Startup_RunGameMessage(int nCmd, MsgArg* pArgs, MsgArg* pResult);    // start-up (Code800B1D3C.c)
 
 extern MsgHandler gStartupMessageHandlers[30];     // start-up's handlers (Startup_InitGameMessages fills 0..22)
 void GM_vGetDiscChangeStatus(MsgArg* pArgs, MsgArg* pResult);  // FE_MessageTable.c; start-up's command 22 too

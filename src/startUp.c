@@ -6,12 +6,12 @@
 //   stream buffers (AudAram_) and the two built-in sounds (BootSound_). TW06 and TW07 have no
 //   counterpart: it is platform code.
 // - The boot-time memory-card checks (Startup_: a status per card, and the hint each sends the
-//   front end) and the start-up message handlers (gStartupMessageHandlers).
+//   front end); the start-up UI commands that run them are in Code800B1D3C.c.
 // - The 'LEGL' stream: two legal-screen pictures (uiProcessPolygon.c shows the first at boot).
 //   TW07's startUp.c has only two functions, startup_RegisterStreamClients and
 //   startup_UnregisterStreamClients (empty there).
-// - A length estimate without a square root (for AudTable.c) and the ball-against-object test (for
-//   Ball.c).
+// Linked after it: UAudVector.c (the sound engine's vector length estimate), Code800B1AA8.c (the
+// ball-against-object test) and Code800B1D3C.c (the start-up UI commands).
 // The sound code talks to the GameCube's audio libraries; see core/startup.h.
 
 #include "core/startup.h"
@@ -21,8 +21,6 @@
 #include "game/frontend.h"
 #include "frontend/uistudio.h"
 #include "frontend/fe.h"
-#include "ball.h"
-#include "dynobj.h"
 
 void   HwVoice_MixerCallback(void);
 void   HwVoice_DroppedCallback(void* pVpb);
@@ -50,33 +48,7 @@ void   Startup_SendCardFullMsg(void);
 void   Startup_SendSaveDamagedMsg(void);
 void   Startup_UpdateCardStatuses(void);
 u8     Startup_AreAllSlotsEmpty(void);
-s32    Startup_GetNextCardStatus(s32* pnPort, s32* pnSlot);
-int    Startup_FindNextCardWithStatus(s32* pnPort, s32* pnSlot);
 void   Startup_LoadLegalPicture(UStreamObject* pObject);
-void   Startup_Vec3Add(f32* pA, f32* pB, f32* pOut);
-void   Startup_Vec3Sub(f32* pA, f32* pB, f32* pOut);
-void   GM_vStartupGetBlocksNeeded(MsgArg* pArgs, MsgArg* pResult);
-void   GM_vStartupCheckCards(MsgArg* pArgs, MsgArg* pResult);
-void   GM_vStartupFindFirstCard(MsgArg* pArgs, MsgArg* pResult);
-void   GM_vStartupFindNextCard(MsgArg* pArgs, MsgArg* pResult);
-void   GM_vStartupFadeToBlack(MsgArg* pArgs, MsgArg* pResult);
-void   GM_vStartupLoadFromCard(MsgArg* pArgs, MsgArg* pResult);
-void   GM_vStartupSkipCardLoad(MsgArg* pArgs, MsgArg* pResult);
-void   GM_vStartupFormatCard(MsgArg* pArgs, MsgArg* pResult);
-void   GM_vStartupGetNextCardStatus(MsgArg* pArgs, MsgArg* pResult);
-void   GM_vStartupGetCurrentCardStatus(MsgArg* pArgs, MsgArg* pResult);
-void   GM_vStartupPlaySound(MsgArg* pArgs, MsgArg* pResult);
-void   GM_vStartupFormatHadIOError(MsgArg* pArgs, MsgArg* pResult);
-void   GM_vStartupMessage11_Return0(MsgArg* pArgs, MsgArg* pResult);
-void   GM_vStartupMessage12_Empty(MsgArg* pArgs, MsgArg* pResult);
-void   GM_vStartupMessage13_Empty(MsgArg* pArgs, MsgArg* pResult);
-void   GM_vStartupMessage14_Return1(MsgArg* pArgs, MsgArg* pResult);
-void   GM_vStartupGetFilesNeeded(MsgArg* pArgs, MsgArg* pResult);
-void   GM_vStartupEndGameLoop(MsgArg* pArgs, MsgArg* pResult);
-void   GM_vStartupDeleteSaveGame(MsgArg* pArgs, MsgArg* pResult);
-void   GM_vStartupLoadOptionsCheckDisc(MsgArg* pArgs, MsgArg* pResult);
-void   GM_vStartupChangeDisc(MsgArg* pArgs, MsgArg* pResult);
-void   GM_vStartupGetDiscChangeStatus(MsgArg* pArgs, MsgArg* pResult);
 
 // port: the GameCube's audio and ARAM libraries and their set-up.
 void   AIInit(u8* pStack);
@@ -99,8 +71,6 @@ void   MIXSetSPan(AXVPB* pVpb, int nSPan);
 void   MIXMute(AXVPB* pVpb);
 void   MIXUnMute(AXVPB* pVpb);
 void   MIXUpdateSettings(void);         // MIX: pass the settings to the hardware
-void   audfrac_Swap(f32* pV1, f32* pV2);
-void   audvec2_Set(f32* dest, f32 x, f32 y);
 
 // The save kinds (a table of functions at lbl_8018C7D8).
 s32    MC_CallActionFnMemoryRequired(CardPos* pPos);      // the picked save kind's size on that card
@@ -169,9 +139,6 @@ u32    gAudAramStreamBufferMask;    // which of them are taken (bit n: buffer n)
 KEEP_UNUSED u32 lbl_802820EC;
 
 Voice* gpHwVoices;              // the voices, NUM_VOICES of them (HwVoice_InitModule)
-
-// The start-up message handlers (Startup_InitGameMessages fills 0..22, all but 4; the last 7 are never set).
-MsgHandler gStartupMessageHandlers[30];
 
 // The mixer callback (registered by HwVoice_InitModule), run after every audio frame. For each
 // voice: ask for a lost hardware voice back after its wait; stop and reset a playing one whose
@@ -1420,368 +1387,4 @@ done:
         gStartupCardSlot = -1;
         gStartupCardPort = -1;
     }
-}
-
-// Estimate the length of the 2D vector v without a square root. With x the longer side and y the
-// shorter (both made positive): x + 31/128 y when y is at most half of x, else (106 x + 75 y) /
-// 128.
-f32 audvec2_ApproxLength(f32* v) {
-    f32 x = v[0];
-    f32 y = v[1];
-    f32 fSum;
-    f32 fDiff;
-    if (x < 0.0f) {
-        x = -x;
-    }
-    if (y < 0.0f) {
-        y = -y;
-    }
-    if (y > x) {
-        audfrac_Swap(&x, &y);
-    }
-    if (y > 0.5f * x) {
-        fSum = x + y;
-        fDiff = x - y;
-        fSum = 32.0f * y + (x + (2.0f * fSum + (64.0f * fSum + 8.0f * fSum)));
-        y = fDiff;
-        x = (1.0f / 128.0f) * fSum;
-    }
-    return x + 0.25f * y - 0.0078125f * y;
-}
-
-// The same estimate for the 3D vector v: the length of (v[2], the length of (v[0], v[1])).
-// AudTable.c's Distance3D measures a sound's distance with it.
-f32 audvec3_ApproxLength(f32* v) {
-    f32 tmpv[2];
-    f32 tmp;
-
-    tmp = audvec2_ApproxLength(v);
-    audvec2_Set(tmpv, v[2], tmp);
-    return audvec2_ApproxLength(tmpv);
-}
-
-// Swap the floats *pV1 and *pV2.
-void audfrac_Swap(f32* pV1, f32* pV2) {
-    f32 temp;
-
-    temp = *pV2;
-    *pV2 = *pV1;
-    *pV1 = temp;
-}
-
-void audvec2_Set(f32* dest, f32 x, f32 y) {
-    dest[0] = x;
-    dest[1] = y;
-}
-
-// Whether the ball can hit the object; every object can.
-u32 DynObj_CanBallHit(UObject* pObj, f32* pPos) {
-    return 1;
-}
-
-// An object's bounding sphere: its centre (the object's position plus its first LOD mesh's sphere
-// centre) into pCenter and its radius into pRadius; either may be NULL.
-void DynObj_GetBoundingSphere(DynObj* pObj, f32* pCenter, f32* pRadius) {
-    UObjMesh* pMesh = pObj->obj.pModel->apLod[0];
-    if (pCenter != NULL) {
-        Startup_Vec3Add(pObj->obj.m80[3], pMesh->pInfo->v58, pCenter);
-    }
-    if (pRadius != NULL) {
-        *pRadius = pMesh->pInfo->f64;
-    }
-}
-
-// Did the ball, moving from pFrom to pTo, hit an object? Of the dynamic objects with flag 8 whose
-// bounding sphere, grown by the ball's radius (in yards), holds pTo, take the one nearest pFrom:
-// tell it (its handler, message 12, with the player number), and give the hit point on its sphere,
-// the sphere's normal there and the object (each output may be NULL). Returns whether there was
-// one.
-u8 DynObj_FindBallHit(int nPlayer, f32* pTo, f32* pFrom, f32* pHit, f32* pNormal, HitObject** ppWhat) {
-    f32 vNormal[3];
-    f32 vCenter[4];     // fake match: three floats are used; the frame has room for four
-    f32 fRadius;
-    f32 fBest;
-    f32 fDX;
-    f32 fDY;
-    f32 fDZ;
-    f32 fFlat;
-    f32 fReach;
-    f32 fDist;
-    DynObj* pObj;
-    DynObj* pBest = NULL;
-
-    for (pObj = fn_80048E44(); pObj != NULL; pObj = pObj->pNext) {
-        if (pObj->uFlags & 8) {
-            DynObj_GetBoundingSphere(pObj, vCenter, &fRadius);
-            fDZ = pTo[2] - vCenter[2];
-            fDX = pTo[0] - vCenter[0];
-            fFlat = fDX * fDX + fDZ * fDZ;
-            fDist = Math_Sqrt(fFlat);
-            fReach = gRealBallRadiusIn / 36.0f + fRadius;
-            if (fDist < fReach) {
-                fDY = pTo[1] - vCenter[1];
-                if ((f32)Math_Sqrt(fDY * fDY + fFlat) < fReach && DynObj_CanBallHit(&pObj->obj, pTo)) {
-                    fDist = LLMath_DistanceBetween3(pFrom, vCenter);
-                    if (pBest == NULL || fDist < fBest) {
-                        fBest = fDist;
-                        pBest = pObj;
-                    }
-                }
-            }
-        }
-    }
-    if (pBest != NULL) {
-        // port: the player number goes through the handler's pointer argument
-        pBest->pfnHandler(12, pBest, (void*)nPlayer, NULL);
-        DynObj_GetBoundingSphere(pBest, vCenter, &fRadius);
-        Startup_Vec3Sub(pTo, vCenter, vNormal);
-        LLMath_Normalize3(vNormal, vNormal);
-        if (pHit != NULL) {
-            fn_8000C5D4(vCenter, vNormal, fRadius, pHit);
-        }
-        if (pNormal != NULL) {
-            Vec3Copy(vNormal, pNormal);
-        }
-        if (ppWhat != NULL) {
-            *ppWhat = (HitObject*)pBest;    // HitObject is Ball.c's view of a DynObj
-        }
-        return 1;
-    }
-    return 0;
-}
-
-// a + b into out (three floats)
-#ifdef __MWERKS__
-asm void Startup_Vec3Add(register f32* pA, register f32* pB, register f32* pOut) {
-    nofralloc
-    psq_l  f0, 0(pA), 0, 0
-    psq_l  f1, 8(pA), 1, 0
-    psq_l  f2, 0(pB), 0, 0
-    psq_l  f3, 8(pB), 1, 0
-    ps_add f2, f2, f0
-    ps_add f3, f3, f1
-    psq_st f2, 0(pOut), 0, 0
-    psq_st f3, 8(pOut), 1, 0
-    blr
-}
-#else
-// port: untested, the plain-C version for compilers without paired singles.
-void Startup_Vec3Add(f32* pA, f32* pB, f32* pOut) {
-    pOut[0] = pB[0] + pA[0];
-    pOut[1] = pB[1] + pA[1];
-    pOut[2] = pB[2] + pA[2];
-}
-#endif
-
-// a - b into out (three floats)
-#ifdef __MWERKS__
-asm void Startup_Vec3Sub(register f32* pA, register f32* pB, register f32* pOut) {
-    nofralloc
-    psq_l  f0, 0(pA), 0, 0
-    psq_l  f1, 8(pA), 1, 0
-    psq_l  f2, 0(pB), 0, 0
-    psq_l  f3, 8(pB), 1, 0
-    ps_sub f2, f0, f2
-    ps_sub f3, f1, f3
-    psq_st f2, 0(pOut), 0, 0
-    psq_st f3, 8(pOut), 1, 0
-    blr
-}
-#else
-// port: untested, the plain-C version for compilers without paired singles.
-void Startup_Vec3Sub(f32* pA, f32* pB, f32* pOut) {
-    pOut[0] = pA[0] - pB[0];
-    pOut[1] = pA[1] - pB[1];
-    pOut[2] = pA[2] - pB[2];
-}
-#endif
-
-// The UI commands while the session's game type is 1 (start-up): run command nCmd's handler.
-void Startup_RunGameMessage(int nCmd, MsgArg* pArgs, MsgArg* pResult) {
-    gStartupMessageHandlers[nCmd](pArgs, pResult);
-}
-
-// Fill in the start-up UI command table (gStartupMessageHandlers): commands 0..22, command 4 left empty
-// (NULL). Called once when start-up begins (gomainloop.c fn_8006CEFC).
-void Startup_InitGameMessages(void) {
-    int i;
-    for (i = 0; i < 23; i++) {
-        gStartupMessageHandlers[i] = NULL;
-    }
-    gStartupMessageHandlers[0] = GM_vStartupGetBlocksNeeded;
-    gStartupMessageHandlers[1] = GM_vStartupCheckCards;
-    gStartupMessageHandlers[2] = GM_vStartupFindFirstCard;
-    gStartupMessageHandlers[3] = GM_vStartupFindNextCard;
-    gStartupMessageHandlers[5] = GM_vStartupFadeToBlack;
-    gStartupMessageHandlers[6] = GM_vStartupLoadFromCard;
-    gStartupMessageHandlers[7] = GM_vStartupFormatCard;
-    gStartupMessageHandlers[8] = GM_vStartupGetNextCardStatus;
-    gStartupMessageHandlers[9] = GM_vStartupGetCurrentCardStatus;
-    gStartupMessageHandlers[10] = GM_vStartupPlaySound;
-    gStartupMessageHandlers[11] = GM_vStartupMessage11_Return0;
-    gStartupMessageHandlers[12] = GM_vStartupMessage12_Empty;
-    gStartupMessageHandlers[13] = GM_vStartupMessage13_Empty;
-    gStartupMessageHandlers[14] = GM_vStartupMessage14_Return1;
-    gStartupMessageHandlers[15] = GM_vStartupGetFilesNeeded;
-    gStartupMessageHandlers[16] = GM_vStartupEndGameLoop;
-    gStartupMessageHandlers[17] = GM_vStartupDeleteSaveGame;
-    gStartupMessageHandlers[18] = GM_vStartupFormatHadIOError;
-    gStartupMessageHandlers[19] = GM_vStartupSkipCardLoad;
-    gStartupMessageHandlers[20] = GM_vStartupLoadOptionsCheckDisc;
-    gStartupMessageHandlers[21] = GM_vStartupChangeDisc;
-    gStartupMessageHandlers[22] = GM_vStartupGetDiscChangeStatus;
-}
-
-// Command 0: the card space the game's save and the EA Sports Bio need (fn_8009D390) on the card at
-// port pArgs[0], slot pArgs[1]. The slot counts from 1 here; both are kept at 0 or above.
-void GM_vStartupGetBlocksNeeded(MsgArg* pArgs, MsgArg* pResult) {
-    s32 nPort = pArgs[0].i;
-    s32 nSlot = pArgs[1].i;
-    if (nSlot > 0) {
-        nSlot--;
-    }
-    if (nPort < 0) {
-        nPort = 0;
-    }
-    if (nSlot < 0) {
-        nSlot = 0;
-    }
-    MC_Connect();
-    pResult->i = fn_8009D390(nPort, nSlot);
-    MC_Disconnect();
-}
-
-// Command 1: the start-up card check (Startup_CheckCards): build the card status table and send the
-// start-up UI the message for the first card that needs one.
-void GM_vStartupCheckCards(MsgArg* pArgs, MsgArg* pResult) {
-    Startup_CheckCards();
-}
-
-// Command 2: start the card search (Startup_FindFirstCardWithStatus). The port and slot found go to
-// the addresses in pArgs[0] and pArgs[1]; answers whether one was found.
-void GM_vStartupFindFirstCard(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = (u8)Startup_FindFirstCardWithStatus(pArgs[0].p, pArgs[1].p);
-}
-
-// Command 3: continue the card search (Startup_FindNextCardWithStatus), as command 2.
-void GM_vStartupFindNextCard(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = (u8)Startup_FindNextCardWithStatus(pArgs[0].p, pArgs[1].p);
-}
-
-// Command 5: start the fade to black (gUIState.bFadeToBlack).
-void GM_vStartupFadeToBlack(MsgArg* pArgs, MsgArg* pResult) {
-    gUIState.bFadeToBlack = 1;
-}
-
-// Command 6 (Startup_LoadFromCard): load the options from the first card with a good save, then the last
-// user (MC_LoadInitialUser). When no card status has been read since command 19, it only sends the
-// start-up UI message 0x86 (no save found).
-void GM_vStartupLoadFromCard(MsgArg* pArgs, MsgArg* pResult) {
-    Startup_LoadFromCard();
-}
-
-// Command 19 (Startup_SkipCardLoad): make command 6 skip the card and only report no save found (message
-// 0x86), until a card's status is read again.
-void GM_vStartupSkipCardLoad(MsgArg* pArgs, MsgArg* pResult) {
-    Startup_SkipCardLoad();
-}
-
-// Command 7: format the card at port pArgs[0], slot pArgs[1] (Startup_FormatCard; the result goes
-// to the UI as message 0x84).
-void GM_vStartupFormatCard(MsgArg* pArgs, MsgArg* pResult) {
-    Startup_FormatCard(pArgs[0].i, pArgs[1].i);
-}
-
-// Command 8: report the next card status not yet reported (Startup_GetNextCardStatus). Its port and
-// slot go to the addresses in pArgs[0] and pArgs[1].
-void GM_vStartupGetNextCardStatus(MsgArg* pArgs, MsgArg* pResult) {
-    MC_Connect();
-    pResult->i = Startup_GetNextCardStatus(pArgs[0].p, pArgs[1].p);
-    MC_Disconnect();
-}
-
-// Command 9: report again the card the reports reached (Startup_GetCurrentCardStatus). Its port and
-// slot go to the addresses in pArgs[0] and pArgs[1].
-void GM_vStartupGetCurrentCardStatus(MsgArg* pArgs, MsgArg* pResult) {
-    MC_Connect();
-    pResult->i = Startup_GetCurrentCardStatus(pArgs[0].p, pArgs[1].p);
-    MC_Disconnect();
-}
-
-// Command 10: play built-in sound 0 when pArgs[0] is 2, else built-in sound 1
-// (Aud_PlayBuiltInSound).
-void GM_vStartupPlaySound(MsgArg* pArgs, MsgArg* pResult) {
-    if (pArgs[0].i == 2) {
-        Aud_PlayBuiltInSound(0);
-        return;
-    }
-    Aud_PlayBuiltInSound(1);
-}
-
-// Command 18: whether a format of the card at port pArgs[0], slot pArgs[1] failed with an I/O error
-// (MCCardState.b94).
-void GM_vStartupFormatHadIOError(MsgArg* pArgs, MsgArg* pResult) {
-    MCCardState state;
-    MC_GetMC(&state, pArgs[0].i, pArgs[1].i);
-    pResult->i = state.b94;
-}
-
-// Command 11 of the start-up table (Startup_InitGameMessages): answers 0.
-void GM_vStartupMessage11_Return0(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = 0;
-}
-
-// Command 12 of the start-up table (Startup_InitGameMessages): empty.
-void GM_vStartupMessage12_Empty(MsgArg* pArgs, MsgArg* pResult) {
-}
-
-// Command 13 of the start-up table (Startup_InitGameMessages): empty.
-void GM_vStartupMessage13_Empty(MsgArg* pArgs, MsgArg* pResult) {
-}
-
-// Command 14 of the start-up table (Startup_InitGameMessages): answers 1.
-void GM_vStartupMessage14_Return1(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = 1;
-}
-
-// Command 15: how many new files a save of the game needs on the card at port pArgs[0], slot
-// pArgs[1] (fn_8009D3DC: 1 when the save file or its backup is not on it yet, else 0).
-void GM_vStartupGetFilesNeeded(MsgArg* pArgs, MsgArg* pResult) {
-    MC_Connect();
-    pResult->i = fn_8009D3DC(pArgs[0].i, pArgs[1].i);
-    MC_Disconnect();
-}
-
-// Command 16: end start-up's main loop (gSession.nC 2, which gomainloop.c fn_8006D01C checks each
-// frame), as the menus' GM_vEndGameLoop.
-void GM_vStartupEndGameLoop(MsgArg* pArgs, MsgArg* pResult) {
-    gSession.nC = 2;
-}
-
-// Command 17: delete the game's save from the card at port pArgs[0], slot pArgs[1]
-// (Startup_DeleteSaveGame; the result goes to the UI as message 0x8D).
-void GM_vStartupDeleteSaveGame(MsgArg* pArgs, MsgArg* pResult) {
-    Startup_DeleteSaveGame(pArgs[0].i, pArgs[1].i);
-}
-
-// Command 20: load the options from a card (Startup_LoadOptionsFromCard), then answer 1 when the
-// disc in the drive is not disc 1 (fn_8011027C) and no options were loaded (fn_80110460 answers the
-// flag Startup_LoadOptionsFromCard left), else 0.
-void GM_vStartupLoadOptionsCheckDisc(MsgArg* pArgs, MsgArg* pResult) {
-    Startup_LoadOptionsFromCard();
-    if (fn_8011027C() && !fn_80110460()) {
-        pResult->i = 1;
-    } else {
-        pResult->i = 0;
-    }
-}
-
-// Command 21: ask for the other disc and wait for it.
-void GM_vStartupChangeDisc(MsgArg* pArgs, MsgArg* pResult) {
-    fn_801102AC();
-}
-
-// Command 22: the disc change's progress, as the menus' GM_vGetDiscChangeStatus answers it.
-void GM_vStartupGetDiscChangeStatus(MsgArg* pArgs, MsgArg* pResult) {
-    GM_vGetDiscChangeStatus(pArgs, pResult);
 }

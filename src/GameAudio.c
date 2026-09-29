@@ -1996,7 +1996,7 @@ void Aud_CycleMovie(void) {
     Mov_Tick();
 }
 
-// Plays built-in sound nSound (startUp.c's BootSound_Play; its command 10 plays 0 or 1).
+// Plays built-in sound nSound (startUp.c's BootSound_Play; start-up command 10 plays 0 or 1).
 void Aud_PlayBuiltInSound(u8 nSound) {
     BootSound_Play(nSound);
 }

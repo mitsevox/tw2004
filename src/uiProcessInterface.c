@@ -119,7 +119,7 @@ void UI_RelocateFile(FrontEnd* pFE) {
 
 // The studio's message callback (UISMessageFncT, registered by UI_OpenInterface): runs UI command
 // nCmd with the addresses of its arguments and its answer, by the session's game type: start-up (1)
-// through startUp.c's handlers (Startup_RunGameMessage), the menus (3) through FE_RunGameMessage, a round (4
+// through the start-up handlers (Startup_RunGameMessage), the menus (3) through FE_RunGameMessage, a round (4
 // to 8) through IG_RunGameMessage; other game types drop it. The group, screen and argument count
 // are not used.
 void UI_RunGameMessage(s32 nCmd, s32 nGroup, s32 nScreen, s32 nParams, s32 nArgsAddr, s32 nResultAddr) {

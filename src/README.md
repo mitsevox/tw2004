@@ -257,7 +257,7 @@ The ball's flight, bounce and roll, in yards and seconds, against the surface ta
 | MaterialTypes.c | T6/T7 | data only: the surface table `gSurfaceTypes` |
 | Ball.c | ours | flight, roll, collision, the cup, simulation (`Physics_*`, `Ball_*`) |
 | Wind.c | T7 | the wind |
-| startUp.c | EA | (also) the ball-against-object test Ball.c uses; see [Audio](#audio) |
+| Code800B1AA8.c | ph | the ball against the dynamic objects' bounding spheres (`DynObj_FindBallHit`, for Ball.c) |
 
 ### Golfers
 
@@ -424,6 +424,7 @@ round) answer. The menu screens themselves run on the [EA UI Studio library](#ea
 | uiText.c | ours | a UI text element |
 | uiTransform.c | EA | the UI's transform stack |
 | uiObject.c | T7 | 3D objects the in-round UI draws: the power boost and spin display |
+| Code800B1D3C.c | ph | the start-up UI commands (23 slots): card checks, built-in sounds, the disc change |
 | uiEATrax.c | T03/T7 | the EA Trax music display (song names sliding in) |
 | Code800B90F4.c | ph | MAD picture frame lists (for rcmp_mad_codec.c); the ball models and logo on the Create-A-Player golfer (`'TEO '`, `'BALF'`) |
 | uiArc.c | ours | a UI arc or circle element |
@@ -479,7 +480,8 @@ boot-time voice code in `startUp.c` right after and AudLock.c, UAudMemStack.c an
 | hlaudemitter.c | T6 | 256 emitter instances |
 | UAudContainers.c | T6 | list, queue and pool containers |
 | AudReverb.c | ours | the aux A effect: reverb or delay |
-| startUp.c | EA | boot-time systems: 50 hardware voice wrappers, the mixer callback, ARAM heap, built-in sounds, boot memory-card checks, the start-up UI commands, the `'LEGL'` pictures |
+| startUp.c | EA | boot-time systems: 50 hardware voice wrappers, the mixer callback, ARAM heap, built-in sounds, boot memory-card checks, the `'LEGL'` pictures |
+| UAudVector.c | T7 | the sound engine's vector length estimate without a square root (AudTable.c's distances) |
 | AudLock.c | ours | the sound engine's mutex and semaphore |
 | UAudMemStack.c | EA | the sound engine's stack allocator |
 | UAudMem.c | T7 | the sound engine's memory: 384 KB of main memory run as a stack |

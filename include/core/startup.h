@@ -217,6 +217,18 @@ typedef struct CardPos {
 } CardPos;
 LAYOUT_ASSERT(CardPos, 0xC);
 
+// The card checks, run by the start-up UI commands (Code800B1D3C.c).
+void Startup_SkipCardLoad(void);
+void Startup_LoadFromCard(void);
+void Startup_CheckCards(void);
+s32  Startup_GetCurrentCardStatus(s32* pnPort, s32* pnSlot);
+s32  Startup_GetNextCardStatus(s32* pnPort, s32* pnSlot);
+int  Startup_FindNextCardWithStatus(s32* pnPort, s32* pnSlot);
+int  Startup_FindFirstCardWithStatus(s32* pnPort, s32* pnSlot);
+void Startup_FormatCard(s32 nPort, s32 nSlot);
+void Startup_DeleteSaveGame(s32 nPort, s32 nSlot);
+void Startup_LoadOptionsFromCard(void);
+
 // ---- the 'LEGL' pictures Startup_LoadLegalPicture keeps ----------------------------------------------------
 
 extern void* gpLegalPicture;              // the first one's copy (uiProcessPolygon.c
