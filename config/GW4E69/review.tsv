@@ -4538,3 +4538,8 @@ address	name	comment	by	date
 80049A14	DynObjTurning_Init	add	rt3 (replayed by orchestrator)	2026-09-29
 80049A54	DynObjTurning_Update	rewrite	rt3 (replayed by orchestrator)	2026-09-29
 80049ACC	DynObjTurning_MessageHandler	add	rt3 (replayed by orchestrator)	2026-09-29
+8004ABBC	DynObjType6_Init	rewrite	rt3 (replayed by orchestrator)	2026-09-29
+8004AD54	DynObjType6_MessageHandler	add	rt3 (replayed by orchestrator)	2026-09-29
+8004ADDC	DynObjType9_Init	keep	rt3 (replayed by orchestrator)	2026-09-29
+8004AF28	DynObjType9_Update	keep	rt3 (replayed by orchestrator)	2026-09-29
+8004AF2C	DynObjType9_MessageHandler	add	rt3 (replayed by orchestrator)	2026-09-29

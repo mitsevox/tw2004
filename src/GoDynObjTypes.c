@@ -1,15 +1,16 @@
 // GoDynObjTypes.c (our name): two more types of the course's dynamic objects (dynobj.h), types 6
-// (fn_8004AD54) and 9 (fn_8004AF2C, which has no model to draw). Both set up their object the way
-// type 0 does (fn_80049514), without the definition's flags. Its constant block is
-// 0x80283280-0x80283288.
+// (DynObjType6_MessageHandler) and 9 (DynObjType9_MessageHandler, which has no model to draw). Both
+// set up their object the way type 0 does (fn_80049514), without the definition's flags. Its
+// constant block is 0x80283280-0x80283288.
 
 #include "dynobj.h"
 
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);                                           // identity
 void UObject_ComposeRotation(f32 (*pMtx)[4]);
 
-// Type 6's message 2: set the object up from its definition, with no flags and n14E at -1.
-void fn_8004ABBC(DynObj* pObj, DynObjSetup* pSetup) {
+// Type 6's message 2: sets the object up from its definition as type 0 does, but with no flags (so
+// the flag tests below never hold), n14E at -1, and the model of the setup's first entry (or none).
+void DynObjType6_Init(DynObj* pObj, DynObjSetup* pSetup) {
     int nFlags = 0;
     DynObjNames* pNames;
     DynObjDef* pDef;
@@ -78,12 +79,14 @@ void fn_8004ABBC(DynObj* pObj, DynObjSetup* pSetup) {
     pObj->f158 = 0.0f;
 }
 
-int fn_8004AD54(int nMsg, DynObj* pObj, void* pArg, void* pArg2) {
+// Type 6's message handler: 1 its size, 2 DynObjType6_Init, 3 draws its model (if any); 6 and every
+// other message answer 0.
+int DynObjType6_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2) {
     switch (nMsg) {
     case 1:
         return sizeof(DynObj);
     case 2:
-        fn_8004ABBC(pObj, pArg);
+        DynObjType6_Init(pObj, pArg);
         return 0;
     case 6:
         return 0;
@@ -98,7 +101,7 @@ int fn_8004AD54(int nMsg, DynObj* pObj, void* pArg, void* pArg2) {
 }
 
 // Type 9's message 2: as type 6's, but with no model and n14E from the definition.
-void fn_8004ADDC(DynObj* pObj, DynObjSetup* pSetup) {
+void DynObjType9_Init(DynObj* pObj, DynObjSetup* pSetup) {
     DynObjNames* pNames;
     DynObjDef* pDef;
 
@@ -151,18 +154,20 @@ void fn_8004ADDC(DynObj* pObj, DynObjSetup* pSetup) {
 }
 
 // Type 9's message 6, the per-frame update: nothing to do.
-void fn_8004AF28(DynObj* pObj, void* pArg) {
+void DynObjType9_Update(DynObj* pObj, void* pArg) {
 }
 
-int fn_8004AF2C(int nMsg, DynObj* pObj, void* pArg, void* pArg2) {
+// Type 9's message handler (an object with no model, never drawn): 1 its size, 2 DynObjType9_Init,
+// 6 DynObjType9_Update; any other -1.
+int DynObjType9_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2) {
     switch (nMsg) {
     case 1:
         return sizeof(DynObj);
     case 2:
-        fn_8004ADDC(pObj, pArg);
+        DynObjType9_Init(pObj, pArg);
         return 0;
     case 6:
-        fn_8004AF28(pObj, pArg);
+        DynObjType9_Update(pObj, pArg);
         return 0;
     default:
         return -1;

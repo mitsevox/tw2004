@@ -454,8 +454,8 @@ int  DynObjBase_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2);
 DynObjHandler DynObj_GetTypeHandler(int nType);
 
 // GoDynObjTypes.c: the handlers of types 6 and 9.
-int  fn_8004AD54(int nMsg, DynObj* pObj, void* pArg, void* pArg2);
-int  fn_8004AF2C(int nMsg, DynObj* pObj, void* pArg, void* pArg2);
+int  DynObjType6_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2);
+int  DynObjType9_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2);
 
 // GoAnimalActors.c: type 11's handler (the animals).
 int  fn_8004AAEC(int nMsg, DynObj* pObj, void* pArg, void* pArg2);

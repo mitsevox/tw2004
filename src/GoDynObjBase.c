@@ -145,9 +145,9 @@ DynObjHandler DynObj_GetTypeHandler(int nType) {
     case 2:
         return DynObjTurning_MessageHandler;
     case 6:
-        return fn_8004AD54;
+        return DynObjType6_MessageHandler;
     case 9:
-        return fn_8004AF2C;
+        return DynObjType9_MessageHandler;
     case 11:
         return fn_8004AAEC;
     default:
