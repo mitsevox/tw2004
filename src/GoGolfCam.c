@@ -58,7 +58,7 @@ f32      fn_800D04AC(int nPlayer);                      // Swing.c's declaration
 f32      GolfCamera_UpdateMatrixCamera(View* pView, f32* pCam, f32* pSub, int nPlayer);
 f32      GolfCamera_UpdateSuperZoomCamera(View* pView, f32* pCam, f32* pSub, int nPlayer);
 u8       GameEffects_IsPredictedGameBreakerOn(void);
-u8       Grass_IsLoaded(void);                         // (sweep code) lbl_80281900's +0x370 is nonzero
+u8       Grass_IsLoaded(void);                         // (sweep code) gpGrassMgr's +0x370 is nonzero
 void     Character_AlignCharacterForShotImpact(Character* pChar);                 // char.c
 void     SKATime_Pause(u8* pAnim);                        // set the player's pause bit (0x2)
 u8       GolfCamera_ZoomCamGetStartAndEndVecs(View* pView, int nPlayer, f32* pSub, f32* pAim, f32* pCam);

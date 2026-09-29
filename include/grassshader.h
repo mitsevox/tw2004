@@ -123,7 +123,7 @@ typedef struct GrassBufferDesc {
 } GrassBufferDesc;
 LAYOUT_ASSERT(GrassBuffer, 0x4C);
 
-// GoGrass.c's state (*lbl_80281900). Only the fields the decompiled code uses; its size is not known.
+// GoGrass.c's state (*gpGrassMgr). Only the fields the decompiled code uses; its size is not known.
 typedef struct GrassManager {
     TexEntry*    pTex;          // 0x00  } the grass texture named by n3A4 (akgrass1..4), found by
     TexBank*     pBank;         // 0x04  } GrassRender_vBuildAndUploadOneTimeData
@@ -221,25 +221,25 @@ typedef struct GrassManager {
     f32          f41C;          // 0x41C  0.025
 } GrassManager;
 
-extern GrassManager lbl_802603B0;
-extern GrassManager* lbl_80281900;
-extern s32 lbl_80282514;        // cleared when the grass is freed (Grass_DeInitForHole)
-extern void* lbl_80282510;      // the grass's 256x256 texture buffer (Grass_CreateTopTexture)
-extern GXTexObj lbl_8026038C;   // its texture
+extern GrassManager gGrassMgr;
+extern GrassManager* gpGrassMgr;
+extern s32 gbGrassFrameSkipped; // cleared when the grass is freed (Grass_DeInitForHole)
+extern void* gpGrassTopTexBuf;  // the grass's 256x256 texture buffer (Grass_CreateTopTexture)
+extern GXTexObj gGrassTopTexObj; // its texture
 
 // The mesh Grass_BuildVisibleList culls each grass cell with: its bounding sphere is set to the cell's before
 // the test. A full UObjMesh (0x2C bytes), so it is not small data.
-extern UObjMesh     lbl_80260360;
-extern UObjMeshInfo lbl_802602C0;
+extern UObjMesh     gGrassCellMesh;
+extern UObjMeshInfo gGrassCellMeshInfo;
 
 void SD_vSetGrassParamsOnce(f32* pUnused0, f32* pUnused1, f32 (*a2)[4], f32* p8, f32 (*b2)[4],
                             f32 (*a16)[4], f32 fA, f32 fB);
 
 // The grass parameters GoGrass.c hands over once per hole (SD_vSetGrassParamsOnce).
-extern f32 lbl_802607D0[16][4];
-extern f32 lbl_802608D0[4];
-extern f32 lbl_802608E0[8];
-extern f32 lbl_80260900[2][4];
-extern f32 lbl_80260920[2][4];
+extern f32 SD_gavGrassSway[16][4];
+extern f32 SD_gafGrassSwayStep[4];
+extern f32 SD_gafGrassRowOffset[8];
+extern f32 SD_gafGrassFade[2][4];
+extern f32 SD_gafGrassTexGen[2][4];
 
 #endif

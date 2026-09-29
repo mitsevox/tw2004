@@ -12,11 +12,11 @@
 
 // .bss in reverse address order (CodeWarrior lays it out last-defined-first)
 SD_SShaderTypeData_Grass_Static SD_gGrassTypeData;
-f32 lbl_80260920[2][4];
-f32 lbl_80260900[2][4];
-f32 lbl_802608E0[8];
-f32 lbl_802608D0[4];
-f32 lbl_802607D0[16][4];
+f32 SD_gafGrassTexGen[2][4];
+f32 SD_gafGrassFade[2][4];
+f32 SD_gafGrassRowOffset[8];
+f32 SD_gafGrassSwayStep[4];
+f32 SD_gavGrassSway[16][4];
 
 SD_SShaderTypeData_Grass_Static* SD_gpGrassTypeData = &SD_gGrassTypeData;
 
@@ -435,20 +435,20 @@ void SD_vSetGrassParamsOnce(f32* pUnused0, f32* pUnused1, f32 (*a2)[4], f32* p8,
     // port: pUnused0 and pUnused1 are passed by the only caller and never read
     int i;
     for (i = 0; i < 2; i++) {
-        LLMath_CopyVec(a2[i], lbl_80260920[i]);
+        LLMath_CopyVec(a2[i], SD_gafGrassTexGen[i]);
     }
     for (i = 0; i < 2; i++) {
-        LLMath_CopyVec(b2[i], lbl_80260900[i]);
+        LLMath_CopyVec(b2[i], SD_gafGrassFade[i]);
     }
     for (i = 0; i < 8; i++) {
-        lbl_802608E0[i] = p8[i];
+        SD_gafGrassRowOffset[i] = p8[i];
     }
-    lbl_802608D0[0] = fA;
-    lbl_802608D0[1] = 1.0f / 16.0f;
-    lbl_802608D0[2] = fB;
-    lbl_802608D0[3] = 16.0f;
+    SD_gafGrassSwayStep[0] = fA;
+    SD_gafGrassSwayStep[1] = 1.0f / 16.0f;
+    SD_gafGrassSwayStep[2] = fB;
+    SD_gafGrassSwayStep[3] = 16.0f;
     for (i = 0; i < 16; i++) {
-        LLMath_CopyVec(a16[i], lbl_802607D0[i]);
+        LLMath_CopyVec(a16[i], SD_gavGrassSway[i]);
     }
 }
 
@@ -530,21 +530,21 @@ void SD_vShaderObject_Grass_Static_Render(SD_SShaderObject_Static* pObject) {
         for (nInRow = 0; nInRow < nRow; nInRow++, nDone++) {
             fFade = fDist + (fPerX * (pVert[0].f - pParams->a04[0]) +
                              fPerZ * (pVert[2].f - pParams->a04[1]));
-            fFade = fFade * lbl_80260900[1][3] + lbl_80260900[0][3];
+            fFade = fFade * SD_gafGrassFade[1][3] + SD_gafGrassFade[0][3];
             if (fFade < 0.0f) {
                 fFade = 0.0f;
             }
             if (fFade > 1.0f) {
                 fFade = 1.0f;
             }
-            fShade = fInvScale * ((pVert[nAxis].f - fBase) + lbl_802608E0[pVert[3].b[0]]);
+            fShade = fInvScale * ((pVert[nAxis].f - fBase) + SD_gafGrassRowOffset[pVert[3].b[0]]);
             nAlpha = 255.0f * pParams->a10[nSet] * fFade;
-            fTexS = pVert[0].f * lbl_80260920[1][0] + lbl_80260920[0][0];
-            fTexT = pVert[2].f * lbl_80260920[1][1] + lbl_80260920[0][1];
+            fTexS = pVert[0].f * SD_gafGrassTexGen[1][0] + SD_gafGrassTexGen[0][0];
+            fTexT = pVert[2].f * SD_gafGrassTexGen[1][1] + SD_gafGrassTexGen[0][1];
             for (nPass = 0; nPass < 2; nPass++) {
                 if (nPass == 1) {
-                    GrassShader_GXPosition3f32(pVert[0].f + lbl_802607D0[nWind][0], pVert[1].f + pParams->f20,
-                                pVert[2].f + lbl_802607D0[nWind][2]);
+                    GrassShader_GXPosition3f32(pVert[0].f + SD_gavGrassSway[nWind][0], pVert[1].f + pParams->f20,
+                                pVert[2].f + SD_gavGrassSway[nWind][2]);
                     fBladeT = 0.025f;
                     nWind = (nWind + 1) & 15;
                 } else {

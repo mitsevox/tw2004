@@ -9,19 +9,19 @@
 #include "gx.h"
 
 // .bss, reverse address order.
-// fake match: EA's .bss has 4 zero bytes before lbl_802603B0 and 0x10 after lbl_802602C0's 0x90
-// (lbl_80260360 on a 32-byte boundary), which these types alone do not make; the aligned
+// fake match: EA's .bss has 4 zero bytes before gGrassMgr and 0x10 after gGrassCellMeshInfo's 0x90
+// (gGrassCellMesh on a 32-byte boundary), which these types alone do not make; the aligned
 // attributes stand in for them (a larger EA type, or objects no code uses).
-GrassManager lbl_802603B0 __attribute__((aligned(8)));
-GXTexObj lbl_8026038C;
-UObjMesh lbl_80260360 __attribute__((aligned(32)));
-UObjMeshInfo lbl_802602C0;
+GrassManager gGrassMgr __attribute__((aligned(8)));
+GXTexObj gGrassTopTexObj;
+UObjMesh gGrassCellMesh __attribute__((aligned(32)));
+UObjMeshInfo gGrassCellMeshInfo;
 
-GrassManager* lbl_80281900 = &lbl_802603B0;
+GrassManager* gpGrassMgr = &gGrassMgr;
 
 // This file's .sbss (grassshader.h), in reverse address order as the compiler lays it out.
-s32   lbl_80282514;
-void* lbl_80282510;
+s32   gbGrassFrameSkipped;
+void* gpGrassTopTexBuf;
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -74,12 +74,12 @@ void Grass_ReleaseQueued(void);
 void Grass_FreeBuffers(void);
 
 // The grass's draw data.
-char lbl_80194598[4][8] = {"akgras1", "akgras2", "akgras3", "akgras4"}; // textures, by n3A4
-f32 lbl_801945B8[4] = {0.21f, 0.31f, 0.1f, 1.0f};                          // a colour (Grass_RenderTopTexture)
-f32 lbl_801945C8[8] = {0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f};  // the unit square's corners
-f32 lbl_801945E8[4] = {0.5f, 0.5f, 0.5f, 0.5f};                            // a colour (Grass_DrawTopTextureDebug)
-f32 lbl_801945F8[8] = {0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 0.5f, 1.0f, 1.0f};  // (Grass_DrawTopTextureDebug)
-f32 lbl_80194618[8] = {0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f};  // (Grass_DrawTopTextureDebug)
+char gGrassTextureNames[4][8] = {"akgras1", "akgras2", "akgras3", "akgras4"}; // textures, by n3A4
+f32 gGrassTopClearColor[4] = {0.21f, 0.31f, 0.1f, 1.0f};                   // a colour (Grass_RenderTopTexture)
+f32 gGrassTopQuad[8] = {0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f}; // the unit square's corners
+f32 gGrassDebugColor[4] = {0.5f, 0.5f, 0.5f, 0.5f};                        // a colour (Grass_DrawTopTextureDebug)
+f32 gGrassDebugQuadPos[8] = {0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 0.5f, 1.0f, 1.0f}; // (Grass_DrawTopTextureDebug)
+f32 gGrassDebugQuadUV[8] = {0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f}; // (Grass_DrawTopTextureDebug)
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0f (0x80284A30), before the 4.9f Grass_InitModule uses first; its body is unknown.
@@ -91,55 +91,55 @@ static f32 GoGrass_StrippedFn(f32 x) {
 // registered for network chunk 6, the manager's settings get their defaults (sway, fade, grid, the
 // eight row offsets in af168), its 256 x 256 texture is set up, and gbGrassFrameSkipped is cleared.
 void Grass_InitModule(void) {
-    lbl_80281900->p370 = NULL;
-    lbl_80281900->n1C = 0;
+    gpGrassMgr->p370 = NULL;
+    gpGrassMgr->n1C = 0;
     // port: Grass_LoadNetworkData takes the chunk as a GrassChunk*
     Network_RegisterLoadNetworkCallback(6, (void (*)(u8*))Grass_LoadNetworkData);
-    lbl_80281900->n3DC = 1;
-    lbl_80281900->n3E0 = 1;
-    lbl_80281900->n3F0 = 1;
-    lbl_80281900->f3E8 = 4.9f;
-    lbl_80281900->f3D0 = 128.0f;
-    lbl_80281900->f3BC = 128.0f;
-    lbl_80281900->f3C0 = 128.0f;
-    lbl_80281900->f3C4 = 1.5f;
-    lbl_80281900->f3C8 = 2.6f;
-    lbl_80281900->nC0 = 10;
-    lbl_80281900->f3D4 = 2.5914f;
-    lbl_80281900->f3D8 = 2.5914f;
-    lbl_80281900->f3A8 = 2.5f;
-    lbl_80281900->f3AC = 2.5f;
-    lbl_80281900->f3B0 = 500.0f;
-    lbl_80281900->f3B4 = 0.6f;
-    lbl_80281900->f3B8 = 0.13f;
-    lbl_80281900->n3CC = 0;
-    lbl_80281900->n10 = 0;
-    lbl_80281900->n104 = 0;
-    lbl_80281900->n100 = 0;
-    lbl_80281900->f3EC = 0.0f;
-    lbl_80281900->f3FC = 0.0f;
-    lbl_80281900->f400 = -0.36f;
-    lbl_80281900->n3E4 = 1;
-    lbl_80281900->f40C = 0.78f;
-    lbl_80281900->f410 = 0.16f;
-    lbl_80281900->f414 = 0.0f;
-    lbl_80281900->f418 = 0.025f;
-    lbl_80281900->f41C = 0.025f;
-    lbl_80281900->n3A4 = 0;
-    lbl_80281900->n14 = -500;
-    lbl_80281900->n16 = -500;
-    lbl_80281900->n18 = 1000;
-    lbl_80281900->n1A = 1000;
-    lbl_80281900->af168[0] = 1.19f;
-    lbl_80281900->af168[1] = 0.168f;
-    lbl_80281900->af168[2] = 0.49f;
-    lbl_80281900->af168[3] = 0.308f;
-    lbl_80281900->af168[4] = 0.981f;
-    lbl_80281900->af168[5] = 0.06f;
-    lbl_80281900->af168[6] = 0.685f;
-    lbl_80281900->af168[7] = 0.272f;
-    fn_8002A528(&lbl_80281900->tex80, 256, 256, fn_8002A624(), NULL, 6, 0, 0, 0);
-    lbl_80282514 = 0;
+    gpGrassMgr->n3DC = 1;
+    gpGrassMgr->n3E0 = 1;
+    gpGrassMgr->n3F0 = 1;
+    gpGrassMgr->f3E8 = 4.9f;
+    gpGrassMgr->f3D0 = 128.0f;
+    gpGrassMgr->f3BC = 128.0f;
+    gpGrassMgr->f3C0 = 128.0f;
+    gpGrassMgr->f3C4 = 1.5f;
+    gpGrassMgr->f3C8 = 2.6f;
+    gpGrassMgr->nC0 = 10;
+    gpGrassMgr->f3D4 = 2.5914f;
+    gpGrassMgr->f3D8 = 2.5914f;
+    gpGrassMgr->f3A8 = 2.5f;
+    gpGrassMgr->f3AC = 2.5f;
+    gpGrassMgr->f3B0 = 500.0f;
+    gpGrassMgr->f3B4 = 0.6f;
+    gpGrassMgr->f3B8 = 0.13f;
+    gpGrassMgr->n3CC = 0;
+    gpGrassMgr->n10 = 0;
+    gpGrassMgr->n104 = 0;
+    gpGrassMgr->n100 = 0;
+    gpGrassMgr->f3EC = 0.0f;
+    gpGrassMgr->f3FC = 0.0f;
+    gpGrassMgr->f400 = -0.36f;
+    gpGrassMgr->n3E4 = 1;
+    gpGrassMgr->f40C = 0.78f;
+    gpGrassMgr->f410 = 0.16f;
+    gpGrassMgr->f414 = 0.0f;
+    gpGrassMgr->f418 = 0.025f;
+    gpGrassMgr->f41C = 0.025f;
+    gpGrassMgr->n3A4 = 0;
+    gpGrassMgr->n14 = -500;
+    gpGrassMgr->n16 = -500;
+    gpGrassMgr->n18 = 1000;
+    gpGrassMgr->n1A = 1000;
+    gpGrassMgr->af168[0] = 1.19f;
+    gpGrassMgr->af168[1] = 0.168f;
+    gpGrassMgr->af168[2] = 0.49f;
+    gpGrassMgr->af168[3] = 0.308f;
+    gpGrassMgr->af168[4] = 0.981f;
+    gpGrassMgr->af168[5] = 0.06f;
+    gpGrassMgr->af168[6] = 0.685f;
+    gpGrassMgr->af168[7] = 0.272f;
+    fn_8002A528(&gpGrassMgr->tex80, 256, 256, fn_8002A624(), NULL, 6, 0, 0, 0);
+    gbGrassFrameSkipped = 0;
 }
 
 // Empty in this build: the round's shutdown (fn_8006CDC4) calls it, the partner of
@@ -152,19 +152,19 @@ void Grass_CloseModule(void) {
 // are freed and gbGrassFrameSkipped cleared. The network chunk count is reset either way.
 void Grass_DeInitForHole(void) {
     int i;
-    if (lbl_80281900->p370 != NULL) {
+    if (gpGrassMgr->p370 != NULL) {
         fn_80008380();
-        for (i = 0; i < lbl_80281900->anF8[lbl_80281900->n100]; i++) {
-            Grass_QueueRelease(lbl_80281900->apF0[lbl_80281900->n100][i]);
+        for (i = 0; i < gpGrassMgr->anF8[gpGrassMgr->n100]; i++) {
+            Grass_QueueRelease(gpGrassMgr->apF0[gpGrassMgr->n100][i]);
         }
         Grass_ReleaseQueued();
-        StaticMem_Free(lbl_80281900->p370);
-        lbl_80281900->p370 = NULL;
+        StaticMem_Free(gpGrassMgr->p370);
+        gpGrassMgr->p370 = NULL;
         Grass_FreeBuffers();
         Grass_ReleaseTopCamera();
-        lbl_80282514 = 0;
+        gbGrassFrameSkipped = 0;
     }
-    lbl_80281900->n1C = 0;
+    gpGrassMgr->n1C = 0;
 }
 
 // The 'gras' stream chunk gets its loader (Grass_LoadStreamFile), only when fn_80112B80 says the
@@ -188,13 +188,13 @@ void Grass_UnRegisterStreamClients(void) {
 // place. The first chunk's data gives f3B8 (the blade height) and n3A4 (which akgras texture).
 void Grass_LoadNetworkData(GrassChunk* pChunk) {
     u8* pData;
-    lbl_80281900->a48[lbl_80281900->n1C] = pChunk;
-    lbl_80281900->a20[lbl_80281900->n1C] = (GrassChunkData*)((u8*)(pChunk + 1) + pChunk->n2 * 0x30);
-    pData = (u8*)lbl_80281900->a20[lbl_80281900->n1C];
+    gpGrassMgr->a48[gpGrassMgr->n1C] = pChunk;
+    gpGrassMgr->a20[gpGrassMgr->n1C] = (GrassChunkData*)((u8*)(pChunk + 1) + pChunk->n2 * 0x30);
+    pData = (u8*)gpGrassMgr->a20[gpGrassMgr->n1C];
     BYTESWAP_SWAPDATA(&pData, pData, 8, 4);
-    lbl_80281900->f3B8 = lbl_80281900->a20[0]->f4;
-    lbl_80281900->n3A4 = lbl_80281900->a20[0]->n0;
-    lbl_80281900->n1C = lbl_80281900->n1C + 1;
+    gpGrassMgr->f3B8 = gpGrassMgr->a20[0]->f4;
+    gpGrassMgr->n3A4 = gpGrassMgr->a20[0]->n0;
+    gpGrassMgr->n1C = gpGrassMgr->n1C + 1;
 }
 
 // The 'gras' stream handler: the hole's grass file is loaded. Its header gives the grid (defaults
@@ -206,7 +206,7 @@ void Grass_LoadStreamFile(UStreamObject* pObject) {
     s32 n;
     int i;
 
-    lbl_80281900->p370 = pObject;
+    gpGrassMgr->p370 = pObject;
     pCur = pObject->pData;
     Grass_AllocBuffers();
     Grass_CreateTopCamera();
@@ -215,25 +215,25 @@ void Grass_LoadStreamFile(UStreamObject* pObject) {
     pBase = pCur;
     pCur += nSkip;
     if (((GrassFileHeader*)pCur)->uVersion == 100) {
-        lbl_80281900->n14 = ((GrassFileHeader*)pCur)->n6;
-        lbl_80281900->n16 = ((GrassFileHeader*)pCur)->n8;
-        lbl_80281900->n18 = ((GrassFileHeader*)pCur)->nA;
+        gpGrassMgr->n14 = ((GrassFileHeader*)pCur)->n6;
+        gpGrassMgr->n16 = ((GrassFileHeader*)pCur)->n8;
+        gpGrassMgr->n18 = ((GrassFileHeader*)pCur)->nA;
     } else {
-        lbl_80281900->n14 = -500;
-        lbl_80281900->n16 = -500;
-        lbl_80281900->n18 = 400;
+        gpGrassMgr->n14 = -500;
+        gpGrassMgr->n16 = -500;
+        gpGrassMgr->n18 = 400;
     }
     n = ((GrassFileHeader*)pCur)->n0;
     pCur += sizeof(GrassFileHeader);
-    lbl_80281900->n1A = n / lbl_80281900->n18;
-    lbl_80281900->p8 = (s16*)pCur;
+    gpGrassMgr->n1A = n / gpGrassMgr->n18;
+    gpGrassMgr->p8 = (s16*)pCur;
     pCur += n * 2;
-    lbl_80281900->n10 = *(s32*)pCur;
-    lbl_80281900->pC = (GrassTile*)(pCur + 0x10);
+    gpGrassMgr->n10 = *(s32*)pCur;
+    gpGrassMgr->pC = (GrassTile*)(pCur + 0x10);
     // port: the file's offsets are made into 32-bit addresses in place
-    for (i = 0; i < lbl_80281900->n10; i++) {
-        lbl_80281900->pC[i].au10[0] += (u32)pBase;
-        lbl_80281900->pC[i].au10[1] += (u32)pBase;
+    for (i = 0; i < gpGrassMgr->n10; i++) {
+        gpGrassMgr->pC[i].au10[0] += (u32)pBase;
+        gpGrassMgr->pC[i].au10[1] += (u32)pBase;
     }
 }
 
@@ -263,48 +263,48 @@ void Grass_UpdateView(void) {
     f32 fSin;
     f32 fCos;
 
-    if (lbl_80281900->p370 == NULL) {
+    if (gpGrassMgr->p370 == NULL) {
         return;
     }
-    if (lbl_80281900->n3DC == 0) {
+    if (gpGrassMgr->n3DC == 0) {
         return;
     }
-    if (lbl_80282514 == 0) {
-        lbl_80282514 = 1;
+    if (gbGrassFrameSkipped == 0) {
+        gbGrassFrameSkipped = 1;
         return;
     }
     // port: as in Grass_Render, EA's GoGrass.c saw GolfCamera_bIs3ScreenCamOn as returning int
     if (((int (*)(void))GolfCamera_bIs3ScreenCamOn)() != 0) {
         return;
     }
-    if (lbl_80281900->f3D4 != lbl_80281900->f3D8) {
+    if (gpGrassMgr->f3D4 != gpGrassMgr->f3D8) {
         for (i = 0; i < 8; i++) {
-            lbl_80281900->af168[i] = lbl_80281900->f3D4 * Misc_RandFuncf(1);
+            gpGrassMgr->af168[i] = gpGrassMgr->f3D4 * Misc_RandFuncf(1);
         }
-        lbl_80281900->f3D8 = lbl_80281900->f3D4;
+        gpGrassMgr->f3D8 = gpGrassMgr->f3D4;
     }
     Grass_ReleaseQueued();
     Grass_BuildVisibleList();
     Grass_AimTopCamera();
-    if (lbl_80281900->n3E4 != 0) {
+    if (gpGrassMgr->n3E4 != 0) {
         Grass_RenderTopTexture();
     }
-    fSin = Math_Sin(lbl_80281900->f40C);
-    fCos = Math_Cos(lbl_80281900->f40C);
+    fSin = Math_Sin(gpGrassMgr->f40C);
+    fCos = Math_Cos(gpGrassMgr->f40C);
     for (i = 0; i < 16; i++) {
-        vPoint[0] = fCos * lbl_80281900->f41C *
-                    Math_Sin(lbl_80281900->f414 + 2.0f * PI * ((f32)i / 16.0f));
+        vPoint[0] = fCos * gpGrassMgr->f41C *
+                    Math_Sin(gpGrassMgr->f414 + 2.0f * PI * ((f32)i / 16.0f));
         vPoint[1] = 0.0f;
-        vPoint[2] = fSin * lbl_80281900->f41C *
-                    Math_Sin(lbl_80281900->f414 + 2.0f * PI * ((f32)i / 16.0f));
+        vPoint[2] = fSin * gpGrassMgr->f41C *
+                    Math_Sin(gpGrassMgr->f414 + 2.0f * PI * ((f32)i / 16.0f));
         vPoint[3] = 0.0f;
-        LLMath_CopyVec(vPoint, lbl_80281900->av230[i]);
+        LLMath_CopyVec(vPoint, gpGrassMgr->av230[i]);
     }
-    lbl_80281900->f228 = 16.0f * lbl_80281900->f410 * fCos;
-    lbl_80281900->f22C = 16.0f * lbl_80281900->f410 * fSin;
-    lbl_80281900->f414 = lbl_80281900->f414 + 60.0f * (lbl_80281900->f418 * gSession.fFrameTime);
-    if (lbl_80281900->f414 > 2.0f * PI) {
-        lbl_80281900->f414 = lbl_80281900->f414 - 2.0f * PI;
+    gpGrassMgr->f228 = 16.0f * gpGrassMgr->f410 * fCos;
+    gpGrassMgr->f22C = 16.0f * gpGrassMgr->f410 * fSin;
+    gpGrassMgr->f414 = gpGrassMgr->f414 + 60.0f * (gpGrassMgr->f418 * gSession.fFrameTime);
+    if (gpGrassMgr->f414 > 2.0f * PI) {
+        gpGrassMgr->f414 = gpGrassMgr->f414 - 2.0f * PI;
     }
 }
 
@@ -315,11 +315,11 @@ void Grass_UpdateView(void) {
 void Grass_Render(void) {
     // port: EA's GoGrass.c saw GolfCamera_bIs3ScreenCamOn as returning int (its result is not masked here); it
     //       returns u8
-    if (lbl_80281900->p370 != NULL && lbl_80281900->n3E0 != 0 && ((int (*)(void))GolfCamera_bIs3ScreenCamOn)() == 0) {
+    if (gpGrassMgr->p370 != NULL && gpGrassMgr->n3E0 != 0 && ((int (*)(void))GolfCamera_bIs3ScreenCamOn)() == 0) {
         Grass_BeginRender();
         Grass_DrawBuffers();
         Grass_EndRender();
-        if (lbl_80281900->n3CC != 0) {
+        if (gpGrassMgr->n3CC != 0) {
             Grass_DrawTopTextureDebug();
         }
     }
@@ -328,26 +328,26 @@ void Grass_Render(void) {
 // The grass's overhead camera (at load, Grass_LoadStreamFile): a flat 20 x 20 lens drawing into a
 // 256 x 256 frame buffer, for the top texture.
 void Grass_CreateTopCamera(void) {
-    lbl_80281900->pLens = CA_spCreateCamera();
-    lbl_80281900->pFrameBuf = FB_spCreateFrameBuffer();
-    lbl_80281900->pRect = VM_spCreateViewport();
-    FB_vSetFrameBuffer(lbl_80281900->pFrameBuf, 0.0f, 0.0f, 256.0f, 256.0f, 1.0f, 1.0f);
-    VM_vSetViewportRect(lbl_80281900->pRect, 0.0f, 0.0f, 1.0f, 1.0f);
-    fn_800B3438(lbl_80281900->pRect, 1.0f, 1.0f);
-    CA_vInitCamera(lbl_80281900->pLens);
-    fn_80076A0C_SetType(lbl_80281900->pLens, 1);
-    fn_80076948(lbl_80281900->pLens, 20.0f, 20.0f);
-    lbl_80281900->pCamera =
-        RC_spCreateRenderCtx(lbl_80281900->pLens, lbl_80281900->pFrameBuf, lbl_80281900->pRect);
+    gpGrassMgr->pLens = CA_spCreateCamera();
+    gpGrassMgr->pFrameBuf = FB_spCreateFrameBuffer();
+    gpGrassMgr->pRect = VM_spCreateViewport();
+    FB_vSetFrameBuffer(gpGrassMgr->pFrameBuf, 0.0f, 0.0f, 256.0f, 256.0f, 1.0f, 1.0f);
+    VM_vSetViewportRect(gpGrassMgr->pRect, 0.0f, 0.0f, 1.0f, 1.0f);
+    fn_800B3438(gpGrassMgr->pRect, 1.0f, 1.0f);
+    CA_vInitCamera(gpGrassMgr->pLens);
+    fn_80076A0C_SetType(gpGrassMgr->pLens, 1);
+    fn_80076948(gpGrassMgr->pLens, 20.0f, 20.0f);
+    gpGrassMgr->pCamera =
+        RC_spCreateRenderCtx(gpGrassMgr->pLens, gpGrassMgr->pFrameBuf, gpGrassMgr->pRect);
 }
 
 // The partner of Grass_CreateTopCamera: its frame buffer, lens, viewport and render context are
 // released.
 void Grass_ReleaseTopCamera(void) {
-    FB_vReleaseFrameBuffer(lbl_80281900->pFrameBuf);
-    CA_vReleaseCamera(lbl_80281900->pLens);
-    VM_vReleaseViewport(lbl_80281900->pRect);
-    RC_vReleaseRenderCtx(lbl_80281900->pCamera);
+    FB_vReleaseFrameBuffer(gpGrassMgr->pFrameBuf);
+    CA_vReleaseCamera(gpGrassMgr->pLens);
+    VM_vReleaseViewport(gpGrassMgr->pRect);
+    RC_vReleaseRenderCtx(gpGrassMgr->pCamera);
 }
 
 // Points the overhead lens straight down from height f3B0 (500) at the visible grass: over the
@@ -359,32 +359,32 @@ void Grass_AimTopCamera(void) {
     f32 fZ;
 
     Camera_GetCurrentLens();
-    fX = 0.5f * lbl_80281900->pLens->fFlatWidth + lbl_80281900->fMinX;
-    fZ = 0.5f * lbl_80281900->pLens->fFlatHeight + lbl_80281900->fMinZ;
+    fX = 0.5f * gpGrassMgr->pLens->fFlatWidth + gpGrassMgr->fMinX;
+    fZ = 0.5f * gpGrassMgr->pLens->fFlatHeight + gpGrassMgr->fMinZ;
     aEye[0] = fX;
-    aEye[1] = lbl_80281900->f3B0;
+    aEye[1] = gpGrassMgr->f3B0;
     aEye[2] = fZ;
     aEye[3] = 1.0f;
     aAt[0] = fX;
-    aAt[1] = lbl_80281900->f3B0 - 1.0f;
+    aAt[1] = gpGrassMgr->f3B0 - 1.0f;
     aAt[2] = fZ;
     aAt[3] = 1.0f;
-    CA_vSetLookAt(lbl_80281900->pLens, aEye, aAt);
+    CA_vSetLookAt(gpGrassMgr->pLens, aEye, aAt);
 }
 
 // The grass's 256 x 256 top texture: its buffer (allocated here, GoGrass.c line 1311) and texture
 // object. fn_80112D20 calls it when the grass is on.
 void Grass_CreateTopTexture(void) {
-    lbl_80282510 = StaticMem_Alloc(GXGetTexBufferSize(256, 256, 4, 0, 0), 2, 32, "GoGrass.c", 1311);
-    GXInitTexObj(&lbl_8026038C, lbl_80282510, 256, 256, 4, 0, 0, 0);
+    gpGrassTopTexBuf = StaticMem_Alloc(GXGetTexBufferSize(256, 256, 4, 0, 0), 2, 32, "GoGrass.c", 1311);
+    GXInitTexObj(&gGrassTopTexObj, gpGrassTopTexBuf, 256, 256, 4, 0, 0, 0);
 }
 
 // The partner of Grass_CreateTopTexture (fn_80112DA0): the buffer is freed if there is one.
 void Grass_FreeTopTexture(void) {
-    if (lbl_80282510 != NULL) {
-        StaticMem_Free(lbl_80282510);
+    if (gpGrassTopTexBuf != NULL) {
+        StaticMem_Free(gpGrassTopTexBuf);
     }
-    lbl_80282510 = NULL;
+    gpGrassTopTexBuf = NULL;
 }
 
 // The embedded frame buffer's 256 x 256 corner is copied into the top texture and the texture cache
@@ -392,7 +392,7 @@ void Grass_FreeTopTexture(void) {
 void Grass_CopyTopTexture(void) {
     GXSetTexCopySrc(0, 0, 256, 256);
     GXSetTexCopyDst(256, 256, 4, 0);
-    GXCopyTex(lbl_80282510, 0);
+    GXCopyTex(gpGrassTopTexBuf, 0);
     GXPixModeSync();
     GXInvalidateTexAll();
 }
@@ -406,7 +406,7 @@ void Grass_RenderTopTexture(void) {
     void* pCamera;
 
     pCamera = RC_spGetCurrentRenderCtx();
-    RC_vSetCurrentRenderCtx(lbl_80281900->pCamera);
+    RC_vSetCurrentRenderCtx(gpGrassMgr->pCamera);
     DS_vEnableZBufferUpdate(0);
     DS_vSetZBufferMode(7);
     DS_vSetAlphaTestMode(0, 6, 128);
@@ -422,11 +422,11 @@ void Grass_RenderTopTexture(void) {
     RenderState_Flush();
     RenderView_SetUseCurrentMatrices(0);
     RenderState_SetDrawFlags(0);
-    RenderView_SetColor(lbl_801945B8);
+    RenderView_SetColor(gGrassTopClearColor);
     DS_vEnableZBufferUpdate(0);
     DS_vSetAlphaTestMode(0, 6, 128);
     RenderState_Flush();
-    RenderView_DrawPrimitive(161, lbl_801945C8, 0, lbl_801945C8, 2);
+    RenderView_DrawPrimitive(161, gGrassTopQuad, 0, gGrassTopQuad, 2);
     nOld = Ter_SetManageZUpdate(0);
     Ter_RenderGrass();
     Ter_SetManageZUpdate(nOld);
@@ -451,10 +451,10 @@ void Grass_RenderTopTexture(void) {
 void Grass_DrawTopTextureDebug(void) {
     RenderView_SetUseCurrentMatrices(0);
     RenderState_SetDrawFlags(16);
-    RenderView_SetColor(lbl_801945E8);
+    RenderView_SetColor(gGrassDebugColor);
     DS_vEnableZBufferUpdate(0);
     DS_vSetAlphaTestMode(0, 6, 128);
-    GXLoadTexObj(&lbl_8026038C, 0);
+    GXLoadTexObj(&gGrassTopTexObj, 0);
     GXSetNumTexGens(1);
     GXSetTevOrder(0, 0, 0, 4);
     GXSetNumTevStages(1);
@@ -464,7 +464,7 @@ void Grass_DrawTopTextureDebug(void) {
     GXSetTevAlphaOp(0, 0, 0, 1, 1, 0);
     DS_vSetZBufferMode(7);
     RenderState_Flush();
-    RenderView_DrawPrimitive(161, lbl_801945F8, 0, lbl_80194618, 2);
+    RenderView_DrawPrimitive(161, gGrassDebugQuadPos, 0, gGrassDebugQuadUV, 2);
     DS_vSetZBufferMode(3);
     DS_vEnableZBufferUpdate(1);
     DS_vSetAlphaTestMode(1, 6, 128);
@@ -491,13 +491,13 @@ void Grass_BeginRender(void) {
 // f3C4), the colours, then hands them to SD_vSetGrassParamsOnce. Called every time the grass is
 // drawn (Grass_BeginRender), despite its name.
 void GrassRender_vBuildAndUploadOneTimeData(void) {
-    u64 uHash = fn_8000BEE4(lbl_80194598[lbl_80281900->n3A4]);
+    u64 uHash = fn_8000BEE4(gGrassTextureNames[gpGrassMgr->n3A4]);
     f32 fX;
     f32 fZ;
 
-    fn_800102DC(uHash, &lbl_80281900->pBank, &lbl_80281900->pTex);
-    fn_800738DC(lbl_80281900->pBank, lbl_80281900->pTex, 1);
-    GXLoadTexObj(&lbl_8026038C, 2);
+    fn_800102DC(uHash, &gpGrassMgr->pBank, &gpGrassMgr->pTex);
+    fn_800738DC(gpGrassMgr->pBank, gpGrassMgr->pTex, 1);
+    GXLoadTexObj(&gGrassTopTexObj, 2);
     GXSetNumTexGens(2);
     GXSetNumTevStages(3);
     GXSetTevOrder(0, 1, 2, 4);
@@ -515,35 +515,35 @@ void GrassRender_vBuildAndUploadOneTimeData(void) {
     GXSetTevColorOp(2, 0, 0, 0, 1, 0);
     GXSetTevAlphaIn(2, 7, 4, 5, 7);
     GXSetTevAlphaOp(2, 0, 0, 1, 1, 0);
-    fX = lbl_80281900->pLens->m4[3][0] - 0.5f * lbl_80281900->pLens->fFlatWidth;
-    fZ = lbl_80281900->pLens->m4[3][2] - 0.5f * lbl_80281900->pLens->fFlatHeight;
-    lbl_80281900->af108[0][0] = 1.0f + fX / lbl_80281900->pLens->fFlatWidth;
-    lbl_80281900->af108[0][1] = 1.0f + fZ / lbl_80281900->pLens->fFlatHeight;
-    lbl_80281900->af108[0][2] = 1.0f;
-    lbl_80281900->af108[0][3] = 1.0f;
-    lbl_80281900->af108[1][0] = -1.0f / lbl_80281900->pLens->fFlatWidth;
-    lbl_80281900->af108[1][1] = -1.0f / lbl_80281900->pLens->fFlatHeight;
-    lbl_80281900->af108[1][2] = 0.0f;
-    lbl_80281900->af108[1][3] = 0.0f;
-    lbl_80281900->af148[0][0] = 0.0f;
-    lbl_80281900->af148[0][1] = 0.0f;
-    lbl_80281900->af148[0][2] = 0.0f;
-    lbl_80281900->af148[0][3] = 1.0f + lbl_80281900->f3C8;
-    lbl_80281900->af148[1][0] = 1.0f;
-    lbl_80281900->af148[1][1] = 1.0f;
-    lbl_80281900->af148[1][2] = 1.0f;
-    lbl_80281900->af148[1][3] = -1.0f / lbl_80281900->f3C4;
-    lbl_80281900->af218[0] = lbl_80281900->f3C0 * lbl_80281900->f3F8 / 255.0f;
-    lbl_80281900->af218[1] = lbl_80281900->f3C0 * lbl_80281900->f3F8 / 255.0f;
-    lbl_80281900->af218[2] = lbl_80281900->f3C0 * lbl_80281900->f3F8 / 255.0f;
-    lbl_80281900->af218[3] = 0.5f;
-    lbl_80281900->af208[0] = lbl_80281900->f3BC / 255.0f;
-    lbl_80281900->af208[1] = lbl_80281900->f3BC / 255.0f;
-    lbl_80281900->af208[2] = lbl_80281900->f3BC / 255.0f;
-    lbl_80281900->af208[3] = 0.5f;
-    SD_vSetGrassParamsOnce(lbl_80281900->af208, lbl_80281900->af218, lbl_80281900->af108,
-                           lbl_80281900->af168, lbl_80281900->af148, lbl_80281900->av230,
-                           lbl_80281900->f228, lbl_80281900->f22C);
+    fX = gpGrassMgr->pLens->m4[3][0] - 0.5f * gpGrassMgr->pLens->fFlatWidth;
+    fZ = gpGrassMgr->pLens->m4[3][2] - 0.5f * gpGrassMgr->pLens->fFlatHeight;
+    gpGrassMgr->af108[0][0] = 1.0f + fX / gpGrassMgr->pLens->fFlatWidth;
+    gpGrassMgr->af108[0][1] = 1.0f + fZ / gpGrassMgr->pLens->fFlatHeight;
+    gpGrassMgr->af108[0][2] = 1.0f;
+    gpGrassMgr->af108[0][3] = 1.0f;
+    gpGrassMgr->af108[1][0] = -1.0f / gpGrassMgr->pLens->fFlatWidth;
+    gpGrassMgr->af108[1][1] = -1.0f / gpGrassMgr->pLens->fFlatHeight;
+    gpGrassMgr->af108[1][2] = 0.0f;
+    gpGrassMgr->af108[1][3] = 0.0f;
+    gpGrassMgr->af148[0][0] = 0.0f;
+    gpGrassMgr->af148[0][1] = 0.0f;
+    gpGrassMgr->af148[0][2] = 0.0f;
+    gpGrassMgr->af148[0][3] = 1.0f + gpGrassMgr->f3C8;
+    gpGrassMgr->af148[1][0] = 1.0f;
+    gpGrassMgr->af148[1][1] = 1.0f;
+    gpGrassMgr->af148[1][2] = 1.0f;
+    gpGrassMgr->af148[1][3] = -1.0f / gpGrassMgr->f3C4;
+    gpGrassMgr->af218[0] = gpGrassMgr->f3C0 * gpGrassMgr->f3F8 / 255.0f;
+    gpGrassMgr->af218[1] = gpGrassMgr->f3C0 * gpGrassMgr->f3F8 / 255.0f;
+    gpGrassMgr->af218[2] = gpGrassMgr->f3C0 * gpGrassMgr->f3F8 / 255.0f;
+    gpGrassMgr->af218[3] = 0.5f;
+    gpGrassMgr->af208[0] = gpGrassMgr->f3BC / 255.0f;
+    gpGrassMgr->af208[1] = gpGrassMgr->f3BC / 255.0f;
+    gpGrassMgr->af208[2] = gpGrassMgr->f3BC / 255.0f;
+    gpGrassMgr->af208[3] = 0.5f;
+    SD_vSetGrassParamsOnce(gpGrassMgr->af208, gpGrassMgr->af218, gpGrassMgr->af108,
+                           gpGrassMgr->af168, gpGrassMgr->af148, gpGrassMgr->av230,
+                           gpGrassMgr->f228, gpGrassMgr->f22C);
     RenderState_Flush();
 }
 
@@ -565,34 +565,34 @@ void Grass_DrawBuffers(void) {
     s32 nBuffers;
     CamLens* pLens = Camera_GetCurrentLens();
 
-    nBuffers = lbl_80281900->anF8[lbl_80281900->n100];
+    nBuffers = gpGrassMgr->anF8[gpGrassMgr->n100];
     LLMath_CopyVec(pLens->m4[2], vDir);
     vDir[1] = 0.0f;
     if (vDir[0] != 0.0f || vDir[1] != 0.0f || vDir[2] != 0.0f) {
         LLMath_Normalize3(vDir, vDir);
     }
     if (vDir[2] < 0.0f) {
-        lbl_80281900->n360 = 0;
+        gpGrassMgr->n360 = 0;
     } else {
-        lbl_80281900->n360 = 1;
+        gpGrassMgr->n360 = 1;
     }
     if (vDir[0] < 0.0f) {
-        lbl_80281900->n364 = 0;
+        gpGrassMgr->n364 = 0;
     } else {
-        lbl_80281900->n364 = 1;
+        gpGrassMgr->n364 = 1;
     }
-    lbl_80281900->f358 = fabs(vDir[2]);
-    lbl_80281900->f35C = fabs(vDir[0]);
-    lbl_80281900->f354 = lbl_80281900->f3B4;
-    lbl_80281900->f348 = lbl_80281900->f3D0;
-    lbl_80281900->f368 = lbl_80281900->f3B8;
+    gpGrassMgr->f358 = fabs(vDir[2]);
+    gpGrassMgr->f35C = fabs(vDir[0]);
+    gpGrassMgr->f354 = gpGrassMgr->f3B4;
+    gpGrassMgr->f348 = gpGrassMgr->f3D0;
+    gpGrassMgr->f368 = gpGrassMgr->f3B8;
     for (nPass = 0; nPass < 2; nPass++) {
         for (i = 0; i < nBuffers; i++) {
-            pBuffer = lbl_80281900->apF0[lbl_80281900->n100][i];
-            lbl_80281900->f34C = pBuffer->f0;
-            lbl_80281900->f350 = pBuffer->f4;
-            lbl_80281900->n36C = nPass;
-            SD_SetShaderTypeParameters(17, &lbl_80281900->f348);
+            pBuffer = gpGrassMgr->apF0[gpGrassMgr->n100][i];
+            gpGrassMgr->f34C = pBuffer->f0;
+            gpGrassMgr->f350 = pBuffer->f4;
+            gpGrassMgr->n36C = nPass;
+            SD_SetShaderTypeParameters(17, &gpGrassMgr->f348);
             fn_800082CC((UObjMeshPart*)pBuffer->a14);
         }
     }
@@ -614,55 +614,55 @@ void Grass_PlaceCell(int nX, int nZ, int nCull, f32 f) {
     s32 nCur;
     int nTile;
 
-    nTile = lbl_80281900->p8[nX + nZ * lbl_80281900->n18];
-    fX = 2.5f * (f32)nX + (f32)lbl_80281900->n14;
-    fZ = 2.5f * (f32)nZ + (f32)lbl_80281900->n16;
-    nCur = lbl_80281900->n100;
+    nTile = gpGrassMgr->p8[nX + nZ * gpGrassMgr->n18];
+    fX = 2.5f * (f32)nX + (f32)gpGrassMgr->n14;
+    fZ = 2.5f * (f32)nZ + (f32)gpGrassMgr->n16;
+    nCur = gpGrassMgr->n100;
     bFound = 0;
-    for (i = 0; i < lbl_80281900->anF8[1 - nCur] && !bFound; i++) {
-        pOld = lbl_80281900->apF0[1 - nCur][i];
+    for (i = 0; i < gpGrassMgr->anF8[1 - nCur] && !bFound; i++) {
+        pOld = gpGrassMgr->apF0[1 - nCur][i];
         if (fX == pOld->f0 && fZ == pOld->f4) {
             pBuffer = pOld;
             bFound = 1;
         }
     }
     if (!bFound) {
-        pBuffer = Grass_TakeFreeBuffer((lbl_80281900->pC[nTile].n0 * 32 + 0x580) / 16);
+        pBuffer = Grass_TakeFreeBuffer((gpGrassMgr->pC[nTile].n0 * 32 + 0x580) / 16);
         if (pBuffer == NULL) {
             return;
         }
         pBuffer->f0 = fX;
         pBuffer->f4 = fZ;
-        pBuffer->p48 = &lbl_80281900->pC[nTile];
+        pBuffer->p48 = &gpGrassMgr->pC[nTile];
         desc.pTile = pBuffer->p48;
         desc.pVerts = pBuffer->p40;
         desc.nVerts = pBuffer->n44;
         desc.fX = pBuffer->f0;
         desc.fZ = pBuffer->f4;
-        desc.f14 = lbl_80281900->f3B8;
+        desc.f14 = gpGrassMgr->f3B8;
         fn_8000827C((UObjMeshPart*)pBuffer->a14, NULL, 17, &desc);
     }
     pBuffer->b10 = 1;
     pBuffer->f8 = f;
     pBuffer->nC = 1;
     if (pBuffer->nC == 1) {
-        lbl_80281900->n404++;
+        gpGrassMgr->n404++;
     } else {
-        lbl_80281900->n408++;
+        gpGrassMgr->n408++;
     }
-    lbl_80281900->apF0[nCur][lbl_80281900->anF8[nCur]] = pBuffer;
-    lbl_80281900->anF8[nCur]++;
-    if (pBuffer->f0 < lbl_80281900->fMinX) {
-        lbl_80281900->fMinX = pBuffer->f0;
+    gpGrassMgr->apF0[nCur][gpGrassMgr->anF8[nCur]] = pBuffer;
+    gpGrassMgr->anF8[nCur]++;
+    if (pBuffer->f0 < gpGrassMgr->fMinX) {
+        gpGrassMgr->fMinX = pBuffer->f0;
     }
-    if (pBuffer->f0 > lbl_80281900->fMaxX) {
-        lbl_80281900->fMaxX = pBuffer->f0;
+    if (pBuffer->f0 > gpGrassMgr->fMaxX) {
+        gpGrassMgr->fMaxX = pBuffer->f0;
     }
-    if (pBuffer->f4 < lbl_80281900->fMinZ) {
-        lbl_80281900->fMinZ = pBuffer->f4;
+    if (pBuffer->f4 < gpGrassMgr->fMinZ) {
+        gpGrassMgr->fMinZ = pBuffer->f4;
     }
-    if (pBuffer->f4 > lbl_80281900->fMaxZ) {
-        lbl_80281900->fMaxZ = pBuffer->f4;
+    if (pBuffer->f4 > gpGrassMgr->fMaxZ) {
+        gpGrassMgr->fMaxZ = pBuffer->f4;
     }
 }
 
@@ -693,38 +693,38 @@ void Grass_BuildVisibleList(void) {
     f32 fCellX;
 
     pLens = Camera_GetCurrentLens();
-    lbl_80281900->n100 = 1 - lbl_80281900->n100;
-    lbl_80281900->anF8[lbl_80281900->n100] = 0;
-    nOther = 1 - lbl_80281900->n100;
-    lbl_80281900->fMinX = 10000.0f;
-    lbl_80281900->fMaxX = -10000.0f;
-    lbl_80281900->fMinZ = 10000.0f;
-    lbl_80281900->fMaxZ = -10000.0f;
-    for (i = 0; i < lbl_80281900->anF8[nOther]; i++) {
-        lbl_80281900->apF0[nOther][i]->b10 = 0;
+    gpGrassMgr->n100 = 1 - gpGrassMgr->n100;
+    gpGrassMgr->anF8[gpGrassMgr->n100] = 0;
+    nOther = 1 - gpGrassMgr->n100;
+    gpGrassMgr->fMinX = 10000.0f;
+    gpGrassMgr->fMaxX = -10000.0f;
+    gpGrassMgr->fMinZ = 10000.0f;
+    gpGrassMgr->fMaxZ = -10000.0f;
+    for (i = 0; i < gpGrassMgr->anF8[nOther]; i++) {
+        gpGrassMgr->apF0[nOther][i]->b10 = 0;
     }
-    lbl_80281900->n404 = 0;
-    lbl_80281900->n408 = 0;
-    nRadius = 1.0f + lbl_80281900->f3E8 / 2.5f;
+    gpGrassMgr->n404 = 0;
+    gpGrassMgr->n408 = 0;
+    nRadius = 1.0f + gpGrassMgr->f3E8 / 2.5f;
     Vec3Copy(pLens->m4[2], vLook);
     Vec3Copy(vLook, vFlat);
     if (vLook[0] != 0.0f || vLook[1] != 0.0f || vLook[2] != 0.0f) {
         LLMath_Normalize3(vLook, vLook);
     }
-    lbl_80281900->f3F8 =
-        (vLook[1] - lbl_80281900->f400) / (lbl_80281900->f3FC - lbl_80281900->f400);
-    if (lbl_80281900->f3F8 < 0.0f) {
-        lbl_80281900->f3F8 = 0.0f;
+    gpGrassMgr->f3F8 =
+        (vLook[1] - gpGrassMgr->f400) / (gpGrassMgr->f3FC - gpGrassMgr->f400);
+    if (gpGrassMgr->f3F8 < 0.0f) {
+        gpGrassMgr->f3F8 = 0.0f;
     }
-    if (lbl_80281900->f3F8 > 1.0f) {
-        lbl_80281900->f3F8 = 1.0f;
+    if (gpGrassMgr->f3F8 > 1.0f) {
+        gpGrassMgr->f3F8 = 1.0f;
     }
     vFlat[1] = 0.0f;
     if (vFlat[0] != 0.0f || vFlat[1] != 0.0f || vFlat[2] != 0.0f) {
         LLMath_Normalize3(vFlat, vFlat);
     }
     LLMath_CopyVec(pLens->m4[3], vPos);
-    LLMath_Scale(lbl_80281900->f3EC, vFlat, vAhead);
+    LLMath_Scale(gpGrassMgr->f3EC, vFlat, vAhead);
     Grass_Vec3Add(vAhead, vPos, vCentre);
     if (vCentre[0] < 0.0f) {
         fX = vCentre[0] - (2.5f - (f32)fabs(Grass_Fmod(vCentre[0], 2.5f)));
@@ -736,29 +736,29 @@ void Grass_BuildVisibleList(void) {
     } else {
         fZ = vCentre[2] - (f32)fabs(Grass_Fmod(vCentre[2], 2.5f));
     }
-    nCellX = (fX - (f32)lbl_80281900->n14) / 2.5f;
-    nCellZ = (fZ - (f32)lbl_80281900->n16) / 2.5f;
-    lbl_80260360.pInfo = &lbl_802602C0;
-    pSphere = Grass_GetObjBoundingSphere((RenderObj*)&lbl_80260360);
+    nCellX = (fX - (f32)gpGrassMgr->n14) / 2.5f;
+    nCellZ = (fZ - (f32)gpGrassMgr->n16) / 2.5f;
+    gGrassCellMesh.pInfo = &gGrassCellMeshInfo;
+    pSphere = Grass_GetObjBoundingSphere((RenderObj*)&gGrassCellMesh);
     for (nX = nCellX - nRadius; nX <= nCellX + nRadius; nX++) {
         fCellX = 2.5f * (f32)nX;
         for (nZ = nCellZ - nRadius; nZ <= nCellZ + nRadius; nZ++) {
-            if (nX < 0 || nX >= lbl_80281900->n18 || nZ < 0 || nZ >= lbl_80281900->n1A) {
+            if (nX < 0 || nX >= gpGrassMgr->n18 || nZ < 0 || nZ >= gpGrassMgr->n1A) {
                 continue;
             }
-            if (lbl_80281900->p8[nX + nZ * lbl_80281900->n18] == -1) {
+            if (gpGrassMgr->p8[nX + nZ * gpGrassMgr->n18] == -1) {
                 continue;
             }
-            pTile = &lbl_80281900->pC[lbl_80281900->p8[nX + nZ * lbl_80281900->n18]];
+            pTile = &gpGrassMgr->pC[gpGrassMgr->p8[nX + nZ * gpGrassMgr->n18]];
             // the cell's sphere: its centre, and the radius over half its height and the
             // 1.25 x 1.25 half cell
             pSphere->radius = Math_Sqrt(
-                3.125f + (0.5f * (pTile->f8 + lbl_80281900->f3B8 - pTile->f4)) *
-                             (0.5f * (pTile->f8 + lbl_80281900->f3B8 - pTile->f4)));
-            pSphere->x = 1.25f + ((f32)lbl_80281900->n14 + fCellX);
-            pSphere->y = 0.5f * (lbl_80281900->f3B8 + (pTile->f4 + pTile->f8));
-            pSphere->z = 1.25f + (2.5f * (f32)nZ + (f32)lbl_80281900->n16);
-            nCull = fn_80007CE8((RenderObj*)&lbl_80260360, RC_spGetCurrentRenderCtx(),
+                3.125f + (0.5f * (pTile->f8 + gpGrassMgr->f3B8 - pTile->f4)) *
+                             (0.5f * (pTile->f8 + gpGrassMgr->f3B8 - pTile->f4)));
+            pSphere->x = 1.25f + ((f32)gpGrassMgr->n14 + fCellX);
+            pSphere->y = 0.5f * (gpGrassMgr->f3B8 + (pTile->f4 + pTile->f8));
+            pSphere->z = 1.25f + (2.5f * (f32)nZ + (f32)gpGrassMgr->n16);
+            nCull = fn_80007CE8((RenderObj*)&gGrassCellMesh, RC_spGetCurrentRenderCtx(),
                                 0, ViewController_GetCameraControl(gTerRenderer.iCurrentViewContext)->f54);
             if (nCull == 2) {
                 continue;
@@ -768,11 +768,11 @@ void Grass_BuildVisibleList(void) {
         }
     }
     // port: Grass_CompareFarthestFirst compares two GrassBuffer pointers' f8 (the larger first)
-    qsort(lbl_80281900->apF0[lbl_80281900->n100], lbl_80281900->anF8[lbl_80281900->n100], 4,
+    qsort(gpGrassMgr->apF0[gpGrassMgr->n100], gpGrassMgr->anF8[gpGrassMgr->n100], 4,
           (s32 (*)(const void*, const void*))Grass_CompareFarthestFirst);
-    for (i = 0; i < lbl_80281900->anF8[nOther]; i++) {
-        if (lbl_80281900->apF0[nOther][i]->b10 == 0) {
-            Grass_QueueRelease(lbl_80281900->apF0[nOther][i]);
+    for (i = 0; i < gpGrassMgr->anF8[nOther]; i++) {
+        if (gpGrassMgr->apF0[nOther][i]->b10 == 0) {
+            Grass_QueueRelease(gpGrassMgr->apF0[nOther][i]);
         }
     }
 }
@@ -781,9 +781,9 @@ void Grass_BuildVisibleList(void) {
 void Grass_AddFreeBuffer(GrassBuffer* pBuffer) {
     int i;
     for (i = 0; i < 16; i++) {
-        if (lbl_80281900->apDC[i] == NULL) {
-            lbl_80281900->apDC[i] = pBuffer;
-            lbl_80281900->nE8 = lbl_80281900->nE8 + 1;
+        if (gpGrassMgr->apDC[i] == NULL) {
+            gpGrassMgr->apDC[i] = pBuffer;
+            gpGrassMgr->nE8 = gpGrassMgr->nE8 + 1;
             return;
         }
     }
@@ -791,8 +791,8 @@ void Grass_AddFreeBuffer(GrassBuffer* pBuffer) {
 
 // Pushes pBuffer on the apD8 stack.
 void Grass_QueueRelease(GrassBuffer* pBuffer) {
-    lbl_80281900->apD8[lbl_80281900->nE4] = pBuffer;
-    lbl_80281900->nE4 = lbl_80281900->nE4 + 1;
+    gpGrassMgr->apD8[gpGrassMgr->nE4] = pBuffer;
+    gpGrassMgr->nE4 = gpGrassMgr->nE4 + 1;
 }
 
 // Takes the smallest free buffer holding at least nSize vertices out of the free slots (NULL if
@@ -803,19 +803,19 @@ GrassBuffer* Grass_TakeFreeBuffer(s32 nSize) {
     GrassBuffer* pBest = NULL;
     GrassBuffer* pBuffer;
 
-    if (lbl_80281900->nE8 == 0) {
+    if (gpGrassMgr->nE8 == 0) {
         return NULL;
     }
     for (i = 0; i < 16; i++) {
-        pBuffer = lbl_80281900->apDC[i];
+        pBuffer = gpGrassMgr->apDC[i];
         if (pBuffer != NULL && pBuffer->n44 >= nSize && (pBest == NULL || pBuffer->n44 < pBest->n44)) {
             nBest = i;
             pBest = pBuffer;
         }
     }
     if (pBest != NULL) {
-        lbl_80281900->nE8--;
-        lbl_80281900->apDC[nBest] = NULL;
+        gpGrassMgr->nE8--;
+        gpGrassMgr->apDC[nBest] = NULL;
         return pBest;
     }
     return NULL;
@@ -824,10 +824,10 @@ GrassBuffer* Grass_TakeFreeBuffer(s32 nSize) {
 // Empties the release queue: each buffer's shader object is closed (fn_80008248) and the buffer
 // goes back to the free slots.
 void Grass_ReleaseQueued(void) {
-    while (lbl_80281900->nE4 != 0) {
-        fn_80008248((UObjMeshPart*)lbl_80281900->apD8[lbl_80281900->nE4 - 1]->a14);
-        Grass_AddFreeBuffer(lbl_80281900->apD8[lbl_80281900->nE4 - 1]);
-        lbl_80281900->nE4 = lbl_80281900->nE4 - 1;
+    while (gpGrassMgr->nE4 != 0) {
+        fn_80008248((UObjMeshPart*)gpGrassMgr->apD8[gpGrassMgr->nE4 - 1]->a14);
+        Grass_AddFreeBuffer(gpGrassMgr->apD8[gpGrassMgr->nE4 - 1]);
+        gpGrassMgr->nE4 = gpGrassMgr->nE4 - 1;
     }
 }
 
@@ -841,30 +841,30 @@ s32 Grass_AllocBuffers(void) {
     s32 nSize;
     int i;
 
-    lbl_80281900->nE4 = 0;
-    lbl_80281900->nE8 = 16;
-    lbl_80281900->nE0 = 16;
-    lbl_80281900->anF8[0] = 0;
-    lbl_80281900->anF8[1] = 0;
-    lbl_80281900->pEC = StaticMem_Alloc(16 * sizeof(GrassBuffer), 2, 16, "GoGrass.c", 3707);
-    lbl_80281900->apF0[0] = StaticMem_Alloc(16 * sizeof(GrassBuffer*), 2, 16, "GoGrass.c", 3709);
-    lbl_80281900->apF0[1] = StaticMem_Alloc(16 * sizeof(GrassBuffer*), 2, 16, "GoGrass.c", 3711);
-    lbl_80281900->apD8 = StaticMem_Alloc(16 * sizeof(GrassBuffer*), 2, 16, "GoGrass.c", 3714);
-    lbl_80281900->apDC = StaticMem_Alloc(16 * sizeof(GrassBuffer*), 2, 16, "GoGrass.c", 3716);
+    gpGrassMgr->nE4 = 0;
+    gpGrassMgr->nE8 = 16;
+    gpGrassMgr->nE0 = 16;
+    gpGrassMgr->anF8[0] = 0;
+    gpGrassMgr->anF8[1] = 0;
+    gpGrassMgr->pEC = StaticMem_Alloc(16 * sizeof(GrassBuffer), 2, 16, "GoGrass.c", 3707);
+    gpGrassMgr->apF0[0] = StaticMem_Alloc(16 * sizeof(GrassBuffer*), 2, 16, "GoGrass.c", 3709);
+    gpGrassMgr->apF0[1] = StaticMem_Alloc(16 * sizeof(GrassBuffer*), 2, 16, "GoGrass.c", 3711);
+    gpGrassMgr->apD8 = StaticMem_Alloc(16 * sizeof(GrassBuffer*), 2, 16, "GoGrass.c", 3714);
+    gpGrassMgr->apDC = StaticMem_Alloc(16 * sizeof(GrassBuffer*), 2, 16, "GoGrass.c", 3716);
     nBytes = 16 * sizeof(GrassBuffer) + 4 * (16 * sizeof(GrassBuffer*));
-    for (i = 0; i < lbl_80281900->nE0; i++) {
+    for (i = 0; i < gpGrassMgr->nE0; i++) {
         if (i < 4) {
             nVerts = 600;
         } else {
             nVerts = 450;
         }
         nSize = nVerts * 16;
-        lbl_80281900->pEC[i].p40 = StaticMem_Alloc(nSize, 2, 16, "GoGrass.c", 3729);
+        gpGrassMgr->pEC[i].p40 = StaticMem_Alloc(nSize, 2, 16, "GoGrass.c", 3729);
         nBytes += nSize;
-        lbl_80281900->pEC[i].n44 = nVerts;
+        gpGrassMgr->pEC[i].n44 = nVerts;
     }
-    for (i = 0; i < lbl_80281900->nE0; i++) {
-        lbl_80281900->apDC[i] = &lbl_80281900->pEC[i];
+    for (i = 0; i < gpGrassMgr->nE0; i++) {
+        gpGrassMgr->apDC[i] = &gpGrassMgr->pEC[i];
     }
     return nBytes;
 }
@@ -874,21 +874,21 @@ s32 Grass_AllocBuffers(void) {
 // The partner of Grass_AllocBuffers: each buffer's vertices, then the lists and the buffers.
 void Grass_FreeBuffers(void) {
     int i;
-    for (i = 0; i < lbl_80281900->nE0; i++) {
-        StaticMem_Free(lbl_80281900->pEC[i].p40);
+    for (i = 0; i < gpGrassMgr->nE0; i++) {
+        StaticMem_Free(gpGrassMgr->pEC[i].p40);
     }
-    StaticMem_Free(lbl_80281900->apF0[0]);
-    StaticMem_Free(lbl_80281900->apF0[1]);
-    StaticMem_Free(lbl_80281900->pEC);
-    StaticMem_Free(lbl_80281900->apDC);
-    StaticMem_Free(lbl_80281900->apD8);
+    StaticMem_Free(gpGrassMgr->apF0[0]);
+    StaticMem_Free(gpGrassMgr->apF0[1]);
+    StaticMem_Free(gpGrassMgr->pEC);
+    StaticMem_Free(gpGrassMgr->apDC);
+    StaticMem_Free(gpGrassMgr->apD8);
 }
 
 s32 Grass_IsLoaded(void);
 
 // Whether the hole has its grass file loaded (GoGolfCam asks, for the lie-based camera height).
 s32 Grass_IsLoaded(void) {
-    return lbl_80281900->p370 != NULL;
+    return gpGrassMgr->p370 != NULL;
 }
 
 // fmod for floats: the remainder of fX / fM.
