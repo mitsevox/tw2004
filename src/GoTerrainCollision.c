@@ -1,9 +1,12 @@
-// GoTerrainCollision.c (TW06's goterraincollision.c): the course's ground as collision data
+// GoTerrainCollision.c (TW06's goterraincollision.c; TW07 splits it into GoTerrainCollision.c,
+// GoTerrainCollision_Headgate.c and GoTerrainUtils.c): the course's ground as collision data
 // (CourseInfo, TW06's TGD_TerrainInfo): the free-drop and out-of-bounds networks, the drop
-// checks, heights, normals and surfaces under a point, and the ball's collision tests against the
-// ground, the pin and the course objects. The ground is triangle strips found through a grid;
-// each triangle's surface is a row of gSurfaceTypes. The file starts at 0x8004AFA0 (the code from
-// there on shares one constant pool) and ends where Ball.c begins.
+// checks, the ambient light, heights, normals and surfaces under a point, and the ball's collision
+// tests against the ground, the pin and the course objects. The ground is triangle strips found
+// through a grid; each triangle's surface is a row of gSurfaceTypes. It ends with small helpers
+// (vector differences and negations, the point-in-triangle and barycentric tests, a surface's
+// row). The file starts at 0x8004AFA0 (the code from there on shares one constant pool) and ends
+// where Ball.c begins.
 
 #include "golfer.h"
 #include "game.h"
@@ -19,13 +22,14 @@
 #define TER_RELOCATE(pCourse, field) ((pCourse)->field = (void*)((u8*)(pCourse) + BE32(&(pCourse)->field)))
 
 // .bss and .sbss in reverse address order (CodeWarrior lays them out backwards).
-u8        gTerObjectMarks[MAX_OBJECTS];
-TNetwork* gTerOOBNetworks[MAX_OOB_NETWORKS];
-TNetwork* gTerFreeDropNetworks[MAX_FREE_DROP_NETWORKS];
-TerBox    gTerCupGeometryBounds[NUM_CUP_POSITIONS];
-s32       gTerNumOOBNetworks;
-s32       gTerNumFreeDropNetworks;
-u8        gTerUse3DCupGeometry;
+u8        gTerObjectMarks[MAX_OBJECTS];         // 1: a course object near the line being tested
+                                                  // (Ter_MarkObjectsNearLine; entry 0 always 1)
+TNetwork* gTerOOBNetworks[MAX_OOB_NETWORKS];      // the hole's out-of-bounds outlines
+TNetwork* gTerFreeDropNetworks[MAX_FREE_DROP_NETWORKS];    // the hole's free-drop outlines
+TerBox    gTerCupGeometryBounds[NUM_CUP_POSITIONS];        // per pin position: its cup geometry's box
+s32       gTerNumOOBNetworks;                     // outlines in gTerOOBNetworks
+s32       gTerNumFreeDropNetworks;                // outlines in gTerFreeDropNetworks
+u8        gTerUse3DCupGeometry;                   // 1: the course has cup geometry (Ter_InitTGD)
 
 void  Ter_FreeDropNetworkLoadCallback(TNetwork* pNet);
 u8    Ter_LieIsPreferred(u32 nClass);
@@ -216,8 +220,10 @@ void Ter_InitTGD(CourseInfo* pCourse) {
         nPinSet = Game_CurrentPinSet();
         for (k = 0; k < NUM_CUP_POSITIONS; k++) {
             gpGame->nPinSet[Game_CurHoleIndex()] = k;
-            lbl_801D3CB0.pCourse->pin[k].x = (gTerCupGeometryBounds[k].vMin[0] + gTerCupGeometryBounds[k].vMax[0]) / 2.0f;
-            lbl_801D3CB0.pCourse->pin[k].z = (gTerCupGeometryBounds[k].vMin[2] + gTerCupGeometryBounds[k].vMax[2]) / 2.0f;
+            lbl_801D3CB0.pCourse->pin[k].x
+                = (gTerCupGeometryBounds[k].vMin[0] + gTerCupGeometryBounds[k].vMax[0]) / 2.0f;
+            lbl_801D3CB0.pCourse->pin[k].z
+                = (gTerCupGeometryBounds[k].vMin[2] + gTerCupGeometryBounds[k].vMax[2]) / 2.0f;
             lbl_801D3CB0.pCourse->pin[k].y = gTerCupGeometryBounds[k].vMax[1];
             lbl_801D3CB0.pCourse->pin[k].w = 1.0f;
         }

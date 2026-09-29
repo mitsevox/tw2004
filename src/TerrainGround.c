@@ -1,7 +1,9 @@
-// TerrainGround.c (our name): the ground under a point on the course's terrain grid: the
-// supporting triangle and its height, and the surface type there. Split out of AnimStream's
-// extent: its own .sdata2 block (0x80284460-0x80284478) and its callers (GoTerrainCollision,
-// Golfer, emotion, GameEffects) show it is terrain code, not animation streaming.
+// TerrainGround.c (our name; TW07 has these three in GoTerrainUtils.c and
+// GoTerrainCollision_Headgate.c): the ground on the course's terrain grid: the ground strips under
+// a quad (for the shadows), the supporting triangle under a point and its height, and the surface
+// type there. Split out of AnimStream's extent: its own .sdata2 block (0x80284460-0x80284478) and
+// its callers (GoTerrainCollision, Golfer, emotion, GameEffects) show it is terrain code, not
+// animation streaming.
 
 #include "golfer.h"
 #include "game.h"

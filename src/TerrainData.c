@@ -1,7 +1,9 @@
-// TerrainData.c (our name): the hole's networks, the outlines on the course (free-drop areas,
-// out of bounds, the situation zones), which arrive as 'Cnet' stream objects and are handed to
-// the systems that registered for their kind (Network_RegisterLoadNetworkCallback). Also the outline tests
-// (point inside, segment crossing; TW06's wn_PnPoly) and a few small vector helpers. The file
+// TerrainData.c (our name; its network functions are TW07's UNetwork.c, in the same order): the
+// hole's networks, the outlines on the course (free-drop areas, out of bounds, the situation
+// zones), which arrive as 'Cnet' stream objects and are handed to the systems that registered for
+// their type (Network_RegisterLoadNetworkCallback). Also the outline tests (point inside,
+// wn_PnPoly; segment and ray crossings) and, at the end, code of other units: the course data's
+// getter (TW07's GoTerrain_TGD.c), a UObject matrix product and two vector helpers. The file
 // starts where the texture code's .bss ends, padded to 0x801A2A00, and its constants start the
 // .sdata2 block after urandom.c's.
 
@@ -11,10 +13,10 @@
 void LLMath_mat44fltMultiplyList33(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // VecMath.c
 
 // The globals, in reverse address order (CodeWarrior lays them out last-defined-first).
-int gNetworkCount;                       // how many networks gNetworks holds
-TNetwork* gNetworks[32];             // the hole's networks, in the order they came
-CourseLoader gNetworkLoaders[8];
-int gNetworkLoaderCount = -1;                  // loaders registered; -1: the 'Cnet' handler calls none
+int gNetworkCount;                      // how many networks gNetworks holds
+TNetwork* gNetworks[32];                // the hole's networks, in the order they came
+CourseLoader gNetworkLoaders[8];        // (network type, loader), Network_RegisterLoadNetworkCallback
+int gNetworkLoaderCount = -1;           // loaders registered; -1: Network_DownloadDataPNB calls none
 
 void Network_FreeDownloadData(UStreamObject* pObject);
 void Network_DownloadDataPNB(UStreamObject* pObject);
