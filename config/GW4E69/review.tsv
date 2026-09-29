@@ -4016,3 +4016,5 @@ address	name	comment	by	date
 800BD7E8	GameEffects_SetPostGBCommentary	rewrite	rr6 (replayed by orchestrator)	2026-09-29
 800BD83C	Gaud_StartRegularComment	add	rr6 (replayed by orchestrator)	2026-09-29
 800BD868	Gaud_StartPlaylist2Comment	add	rr6 (replayed by orchestrator)	2026-09-29
+800B1CF4	DynObj_Vec3Add	keep	sp2 (claude-opus-5-5)	2026-09-29
+800B1D18	DynObj_Vec3Sub	keep	sp2 (claude-opus-5-5)	2026-09-29

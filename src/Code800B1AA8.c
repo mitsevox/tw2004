@@ -8,8 +8,8 @@
 #include "ball.h"
 #include "dynobj.h"
 
-void   Startup_Vec3Add(f32* pA, f32* pB, f32* pOut);
-void   Startup_Vec3Sub(f32* pA, f32* pB, f32* pOut);
+void   DynObj_Vec3Add(f32* pA, f32* pB, f32* pOut);
+void   DynObj_Vec3Sub(f32* pA, f32* pB, f32* pOut);
 
 // Whether the ball can hit the object; every object can.
 u32 DynObj_CanBallHit(UObject* pObj, f32* pPos) {
@@ -21,7 +21,7 @@ u32 DynObj_CanBallHit(UObject* pObj, f32* pPos) {
 void DynObj_GetBoundingSphere(DynObj* pObj, f32* pCenter, f32* pRadius) {
     UObjMesh* pMesh = pObj->obj.pModel->apLod[0];
     if (pCenter != NULL) {
-        Startup_Vec3Add(pObj->obj.m80[3], pMesh->pInfo->v58, pCenter);
+        DynObj_Vec3Add(pObj->obj.m80[3], pMesh->pInfo->v58, pCenter);
     }
     if (pRadius != NULL) {
         *pRadius = pMesh->pInfo->f64;
@@ -71,7 +71,7 @@ u8 DynObj_FindBallHit(int nPlayer, f32* pTo, f32* pFrom, f32* pHit, f32* pNormal
         // port: the player number goes through the handler's pointer argument
         pBest->pfnHandler(12, pBest, (void*)nPlayer, NULL);
         DynObj_GetBoundingSphere(pBest, vCenter, &fRadius);
-        Startup_Vec3Sub(pTo, vCenter, vNormal);
+        DynObj_Vec3Sub(pTo, vCenter, vNormal);
         LLMath_Normalize3(vNormal, vNormal);
         if (pHit != NULL) {
             fn_8000C5D4(vCenter, vNormal, fRadius, pHit);
@@ -89,7 +89,7 @@ u8 DynObj_FindBallHit(int nPlayer, f32* pTo, f32* pFrom, f32* pHit, f32* pNormal
 
 // a + b into out (three floats)
 #ifdef __MWERKS__
-asm void Startup_Vec3Add(register f32* pA, register f32* pB, register f32* pOut) {
+asm void DynObj_Vec3Add(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 1, 0
@@ -103,7 +103,7 @@ asm void Startup_Vec3Add(register f32* pA, register f32* pB, register f32* pOut)
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void Startup_Vec3Add(f32* pA, f32* pB, f32* pOut) {
+void DynObj_Vec3Add(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pB[0] + pA[0];
     pOut[1] = pB[1] + pA[1];
     pOut[2] = pB[2] + pA[2];
@@ -112,7 +112,7 @@ void Startup_Vec3Add(f32* pA, f32* pB, f32* pOut) {
 
 // a - b into out (three floats)
 #ifdef __MWERKS__
-asm void Startup_Vec3Sub(register f32* pA, register f32* pB, register f32* pOut) {
+asm void DynObj_Vec3Sub(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 1, 0
@@ -126,7 +126,7 @@ asm void Startup_Vec3Sub(register f32* pA, register f32* pB, register f32* pOut)
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void Startup_Vec3Sub(f32* pA, f32* pB, f32* pOut) {
+void DynObj_Vec3Sub(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pA[0] - pB[0];
     pOut[1] = pA[1] - pB[1];
     pOut[2] = pA[2] - pB[2];
