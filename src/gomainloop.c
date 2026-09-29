@@ -166,7 +166,7 @@ void fn_8006F64C(void);
 void fn_8007185C(void);
 void fn_80071890(void);
 void fn_800718C4(void);
-void fn_800757B8(void);
+void LLVideo_InitModule(void);
 void fn_800763B4(void);
 void fn_800763B8(void);
 void VM_vInitModule(void);
@@ -458,7 +458,7 @@ void fn_8006C7A8(void) {
     fn_800461A8();
     fn_8000C104();
     Pict_InitModule();
-    fn_800757B8();
+    LLVideo_InitModule();
 }
 
 // Shuts down what fn_8006C7A8 started.

@@ -14,7 +14,7 @@ VideoSlots* gpVideoSlots = &gVideoSlots;
 u8 gbVideoFrameWasOpen;
 
 u8   LLVideo_UpdateStream(Video* pVideo, int* pnQueued);
-void fn_800752DC_PreloadQueue(Video* pVideo);
+void LLVideo_PreloadQueue(Video* pVideo);
 void LLVideo_ChunkAddBufferRef(VideoChunk* pChunk);
 void LLVideo_ChunkReleaseBuffer(VideoChunk* pChunk);
 void LLVideo_QueueReset(VideoQueue* pQueue);
@@ -24,12 +24,15 @@ int  LLVideo_QueueGetCount(VideoQueue* pQueue);
 u8   LLVideo_QueueIsEmpty(VideoQueue* pQueue);
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
-// 1.0f (0x80283A50), before the 0.0f, 0.1f and 0.5f fn_800755F0 uses first; its body is unknown.
+// 1.0f (0x80283A50), before the 0.0f, 0.1f and 0.5f LLVideo_DarkenScreen uses first; its body is unknown.
 static f32 LLVideo_StrippedFn(f32 x) {
     return x + 1.0f;
 }
 
-// Runs the stream loader once; pnQueued, if given, gets how many chunks are now queued.
+// Runs the stream loader once (UStream_Update, which hands each MPG2 chunk read to
+// LLVideo_HandleChunk); pnQueued, if given, gets how many chunks are now queued. Returns 0 once the
+// stream has nothing left to do: no stream open, or the file read to its end and no buffer still in
+// use (queued chunks hold theirs).
 u8 LLVideo_UpdateStream(Video* pVideo, int* pnQueued) {
     u8 bRet = UStream_Update();
     if (pnQueued != NULL) {
@@ -38,8 +41,9 @@ u8 LLVideo_UpdateStream(Video* pVideo, int* pnQueued) {
     return bRet;
 }
 
-// Runs the stream loader until 16 chunks are queued (before the movie starts).
-void fn_800752DC_PreloadQueue(Video* pVideo) {
+// Runs the stream loader until 16 chunks are queued, before the movie starts (LLVideo_Start). The
+// loader's end is not checked: a movie of fewer than 16 chunks would never get past it.
+void LLVideo_PreloadQueue(Video* pVideo) {
     int nQueued;
     do {
         LLVideo_UpdateStream(pVideo, &nQueued);
@@ -67,7 +71,9 @@ void LLVideo_QueueReset(VideoQueue* pQueue) {
     }
 }
 
-// Queues a chunk (its stream buffer stays in use meanwhile); returns the slot it went in.
+// Queues a chunk at the head of the ring (its stream buffer stays in use meanwhile,
+// LLVideo_ChunkAddBufferRef); returns the slot it went in. A full queue (1024 chunks) is not
+// tested: the oldest chunk would be overwritten.
 int LLVideo_QueueAdd(VideoQueue* pQueue, VideoChunk* pChunk) {
     int nSlot = pQueue->nHead;
     pQueue->nHead++;
@@ -93,10 +99,11 @@ VideoChunk* LLVideo_QueueRemove(VideoQueue* pQueue) {
     return pChunk;
 }
 
-// The decoder's read call (Pict_OpenMovie): takes the movie's next piece off the queue and returns
-// it copied into one new buffer. When the queue runs dry, the chunks taken so far are given back,
-// bStarved is set and NULL is returned.
-void* fn_800754C0(void* pArg) {
+// The movie decoder's read function (Pict_OpenMovie passes it; MAD_ReadNextFile calls it): takes
+// the movie's next MAD file off the queue (a chunk and the nMore chunks after it) and returns it
+// copied into one new buffer, which MAD_GetNextFrame frees. When the queue runs dry first, the
+// chunks taken so far are given back (the file is lost), bStarved is set and NULL is returned.
+void* LLVideo_ReadNextFile(void* pArg) {
     Video* pVideo = pArg;
     VideoChunk* apChunk[32];            // size unknown: the stack frame has room for 33
     u8* pData;
@@ -134,13 +141,13 @@ void* fn_800754C0(void* pArg) {
     return pData;
 }
 
-void   fn_800757B8(void);
-Video* fn_80075800(void);
+void   LLVideo_InitModule(void);
+Video* LLVideo_Create(void);
 void   LLVideo_SetFrameRate(Video* pVideo, int nRate);
-void   fn_800758B4(Video* pVideo);
-Video* fn_80075904(int nSlot, Video* pVideo);
-void   fn_8007599C_Stop(Video* pVideo);
-void   fn_80075A14_Start(Video* pVideo);
+void   LLVideo_Destroy(Video* pVideo);
+Video* LLVideo_SetSlot(int nSlot, Video* pVideo);
+void   LLVideo_Stop(Video* pVideo);
+void   LLVideo_Start(Video* pVideo);
 void   fn_80075A98_SetLastFrameTime(Video* pVideo);
 void   fn_80075AD0_UpdateAll(void);
 u8     fn_80075BF4_IsFrameDue(Video* pVideo);
@@ -184,10 +191,12 @@ void fn_800760D8(LLPict* pPict);
 void fn_800760F4(f32* pUV, LLPict* pPict);
 void fn_80076128(s32 p0);
 
-// Draws a full-screen black quad (alpha 0.5) for one frame, two when nFlags bit 0 is set. With
-// bit 1 it first fades to black over 30 frames (alpha 0.1 each, 0.5 for the last two), then runs
-// again with bit 0 alone.
-void fn_800755F0(int nFlags) {
+// Draws a full-screen black quad (alpha 0.5) over the screen for one frame, two when nFlags bit 0
+// is set. With bit 1 it first fades to black over 30 frames (alpha 0.1 each, 0.5 for the last two),
+// then runs again with bit 0 alone. Bit 0 also picks which of LLDisp_Gc.c's two frame hooks runs
+// (fn_80007254 or fn_80007260, both empty). Used before a movie (LLVideo_PlayFile) and after it
+// (LLVideo_RunPlayback, 6: the fade, then one frame).
+void LLVideo_DarkenScreen(int nFlags) {
     f32 xy[8];
     f32 colour[4];
     int bFade;
@@ -243,22 +252,24 @@ void fn_800755F0(int nFlags) {
         fn_800083A0();
     }
     if (bFade) {
-        fn_800755F0(bBit0);
+        LLVideo_DarkenScreen(bBit0);
     }
 }
 
-// Empties every slot.
-void fn_800757B8(void) {
+// At boot (gomainloop.c): empties every movie slot.
+void LLVideo_InitModule(void) {
     s32 i;
     for (i = 0; i < NUM_VIDEO_SLOTS; i++) {
         gpVideoSlots->apVideo[i] = NULL;
     }
 }
 
-// Makes a movie (not yet in a slot or running), at 33 frames a second.
-Video* fn_80075800(void) {
+// Makes a movie: the Video (0x10B0 bytes) with its picture and MAD decoder (Pict_OpenMovie, reading
+// through LLVideo_ReadNextFile), in no slot, not running, at 33 frames a second. LLVideo_Destroy
+// frees it.
+Video* LLVideo_Create(void) {
     Video* pVideo = StaticMem_Alloc(sizeof(Video), 2, 0x40, "LLVideo.c", 0x5C1);
-    Pict_OpenMovie(&pVideo->pict, &pVideo->stream, fn_800754C0, pVideo);
+    Pict_OpenMovie(&pVideo->pict, &pVideo->stream, LLVideo_ReadNextFile, pVideo);
     pVideo->nSlot = -1;
     pVideo->b1020 = 0;
     pVideo->bFirstFrame = 0;
@@ -266,22 +277,25 @@ Video* fn_80075800(void) {
     return pVideo;
 }
 
-// Sets the frame rate.
+// Sets the movie to nRate frames a second (fFrameTime = 1 / nRate seconds, LLVideo_IsFrameDue's
+// step).
 void LLVideo_SetFrameRate(Video* pVideo, int nRate) {
     pVideo->fFrameTime = 1.0f / nRate;
 }
 
-// Frees a movie, taking it out of its slot first.
-void fn_800758B4(Video* pVideo) {
+// Frees a movie LLVideo_Create made: takes it out of its slot, closes its picture and decoder
+// (Pict_CloseMovie) and frees it.
+void LLVideo_Destroy(Video* pVideo) {
     if (pVideo->nSlot != -1) {
-        fn_80075904(pVideo->nSlot, NULL);
+        LLVideo_SetSlot(pVideo->nSlot, NULL);
     }
     Pict_CloseMovie(&pVideo->pict, &pVideo->stream);
     StaticMem_Free(pVideo);
 }
 
-// Puts a movie (or NULL) in a slot; returns the movie that was there.
-Video* fn_80075904(int nSlot, Video* pVideo) {
+// Puts pVideo (or NULL) in slot nSlot (0..7) and returns the movie that was there, which no longer
+// has a slot (nSlot -1). UStream.c's MPG2 chunks find their movie by slot (LLVideo_HandleChunk).
+Video* LLVideo_SetSlot(int nSlot, Video* pVideo) {
     Video* pOld = gpVideoSlots->apVideo[nSlot];
     if (pOld != NULL) {
         pOld->nSlot = -1;
@@ -302,8 +316,9 @@ void LLVideo_HandleChunk(VideoChunk* pChunk) {
     LLVideo_ChunkReleaseBuffer(pChunk);
 }
 
-// Stops a running movie and gives back every chunk it still holds.
-void fn_8007599C_Stop(Video* pVideo) {
+// Stops a running movie: ends its sound (Aud_ExitMovie), stops queueing its chunks and gives back
+// every chunk it still holds. Nothing when it is not running.
+void LLVideo_Stop(Video* pVideo) {
     if (pVideo->b1020) {
         Aud_ExitMovie();
         pVideo->b1020 = 0;
@@ -317,8 +332,11 @@ void fn_8007599C_Stop(Video* pVideo) {
     }
 }
 
-// Starts a movie: waits for the sound side, then reads ahead until 16 chunks are queued.
-void fn_80075A14_Start(Video* pVideo) {
+// Starts a movie: waits until the game's commentary, ambient and music streams are idle
+// (Gaud_GetStreamingStatus), sets the movie's sound up (Aud_InitMovie), empties the queue, marks
+// the movie running with no frame yet, then reads ahead until 16 chunks are queued
+// (LLVideo_PreloadQueue).
+void LLVideo_Start(Video* pVideo) {
     do {
         Gaud_Cycle();
     } while (Gaud_GetStreamingStatus());
@@ -332,7 +350,7 @@ void fn_80075A14_Start(Video* pVideo) {
     pVideo->bStarved = 0;
     Pict_StartMovie(&pVideo->pict, &pVideo->stream);
     fn_80075A98_SetLastFrameTime(pVideo);
-    fn_800752DC_PreloadQueue(pVideo);
+    LLVideo_PreloadQueue(pVideo);
 }
 
 // The next frame is timed from now.
@@ -352,7 +370,7 @@ void fn_80075AD0_UpdateAll(void) {
             fn_80075A98_SetLastFrameTime(pVideo);
             if (pVideo->bStarved || Pict_IsMovieAtEnd(&pVideo->pict, &pVideo->stream)) {
                 pVideo->bEnded = 1;
-                fn_8007599C_Stop(pVideo);
+                LLVideo_Stop(pVideo);
             } else if (Pict_NextMovieFrame(&pVideo->pict, &pVideo->stream)) {
                 pVideo->nFrame++;
                 if (!pVideo->bFirstFrame) {
@@ -430,7 +448,7 @@ void fn_80075DEC_RunPlayback(Video* pVideo, u8 (*pfnStop)(Video* pVideo, int nAr
 
     fn_80075C48();
     fn_80075C88();
-    fn_80075A14_Start(pVideo);
+    LLVideo_Start(pVideo);
     tFrame = TI_sReadCounter(0);
     nLastFrame = -1;
     bFirst = 1;
@@ -442,11 +460,11 @@ void fn_80075DEC_RunPlayback(Video* pVideo, u8 (*pfnStop)(Video* pVideo, int nAr
             fn_80075AD0_UpdateAll();
             if (pfnStop != NULL && pfnStop(pVideo, nArg)) {
                 UStream_Stop();
-                fn_8007599C_Stop(pVideo);
+                LLVideo_Stop(pVideo);
             }
             if (fn_800760A8_HasEnded(pVideo)) {
                 UStream_Stop();
-                fn_8007599C_Stop(pVideo);
+                LLVideo_Stop(pVideo);
             }
             if (nLastFrame == fn_800760A0_GetFrame(pVideo)) {
                 continue;
@@ -473,14 +491,14 @@ void fn_80075DEC_RunPlayback(Video* pVideo, u8 (*pfnStop)(Video* pVideo, int nAr
         fn_800083A0();
         fn_80008380();
     } while (!bDone);
-    fn_8007599C_Stop(pVideo);
-    fn_800755F0(6);
+    LLVideo_Stop(pVideo);
+    LLVideo_DarkenScreen(6);
     fn_80075D58();
     fn_80075C68();
 }
 
 // Plays the movie file pName in slot 0 (fn_80075DEC_RunPlayback) after drawing the screen black
-// (fn_800755F0).
+// (LLVideo_DarkenScreen).
 void LLVideo_PlayFile(const char* pName, u8 (*pfnStop)(Video* pVideo, int nArg), int nArg, int nFlags) {
     int nStream;
     Video* pVideo;
@@ -490,15 +508,15 @@ void LLVideo_PlayFile(const char* pName, u8 (*pfnStop)(Video* pVideo, int nArg),
         fn_80006FE8();
     }
     UI_EATraxShowSong(0, 0);
-    fn_800755F0(nFlags | 1);
+    LLVideo_DarkenScreen(nFlags | 1);
     nStream = Stream_OpenStreamFile(pName);
     if (nStream != -1) {
         UStream_SetAutoRead(1);
-        pVideo = fn_80075800();
-        fn_80075904(0, pVideo);
+        pVideo = LLVideo_Create();
+        LLVideo_SetSlot(0, pVideo);
         fn_80075DEC_RunPlayback(pVideo, pfnStop, nArg);
         UStream_SetAutoRead(0);
-        fn_800758B4(pVideo);
+        LLVideo_Destroy(pVideo);
         UStream_Close(nStream);
     }
 }

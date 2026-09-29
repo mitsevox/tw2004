@@ -37,7 +37,7 @@ typedef struct VideoQueue {
 LAYOUT_ASSERT(VideoQueue, 0x100C);
 
 // A movie being played (0x10B0 bytes; LLVideo_HandleChunk finds it by the chunk's stream number). Its
-// decoder reads the queued chunks through fn_800754C0 and decodes into pict.
+// decoder reads the queued chunks through LLVideo_ReadNextFile and decodes into pict.
 typedef struct Video {
     PictStream stream;                  // 0x000  the decoder and its current frame (LLPict_Gc.c)
     VideoQueue queue;                   // 0x008
@@ -60,7 +60,7 @@ LAYOUT_ASSERT(Video, 0x10B0);
 // The movies being played (gVideoSlots, 0x28 bytes, reached through gpVideoSlots).
 #define NUM_VIDEO_SLOTS 8
 typedef struct VideoSlots {
-    Video* apVideo[NUM_VIDEO_SLOTS];    // 0x00  fn_80075904 puts a movie in a slot
+    Video* apVideo[NUM_VIDEO_SLOTS];    // 0x00  LLVideo_SetSlot puts a movie in a slot
     int    n20;                         // 0x20  FO_eGetCurrentAddMode()'s value while a movie shows
                                         //       (fn_80075C88 saves it, fn_80075D58 puts it back)
     u8     pad24[4];
