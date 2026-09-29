@@ -618,7 +618,7 @@ int fn_80011D0C(LLFont* pFont, UFontContext* pCtx, u8 bDraw, char* sz) {
         return 0;
     }
     nLines = 0;
-    fLine = pCtx->fB4 * (pFont->f00 * pCtx->f80);
+    fLine = pCtx->fLineSpacing * (pFont->f00 * pCtx->f80);
     pCtx->f70 = pCtx->a8C[2] * pCtx->f70 + pCtx->a8C[0];
     pCtx->f74 = pCtx->a8C[3] * pCtx->f74 + pCtx->a8C[1];
     if (sz == NULL) {

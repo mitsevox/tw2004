@@ -58,17 +58,17 @@ char* gTourTrophyTitles[4] = {
 };
 
 // FE message 605: tour trophy pArgs[0] (0..3: Rookie of the Year, Player of the Year, the money
-// leader and the scoring leader; the profile's a1C0[12..15]). Returns whether it is won, writes its
-// title and the day it was won (empty while not).
+// leader and the scoring leader; the profile's aTourAward[12..15]). Returns whether it is won,
+// writes its title and the day it was won (empty while not).
 void TrophyRoom_GetTourTrophy(MsgArg* pArgs, MsgArg* pResult) {
     s32 nTrophy = pArgs[0].i;
     char* szName = ((MsgString*)pArgs[1].p)->pStr;
     char* szDate = ((MsgString*)pArgs[2].p)->pStr;
 
-    pResult->i = FE_GetCurrentProfile()->a1C0[nTrophy + 12].bWon;
+    pResult->i = FE_GetCurrentProfile()->aTourAward[nTrophy + 12].bWon;
     strcpy(szName, gTourTrophyTitles[nTrophy]);
     if (pResult->i) {
-        CalDate_ToString(FE_GetCurrentProfile()->a1C0[nTrophy + 12].nDate, szDate);
+        CalDate_ToString(FE_GetCurrentProfile()->aTourAward[nTrophy + 12].nDate, szDate);
         return;
     }
     szDate[0] = '\0';

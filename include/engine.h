@@ -1150,7 +1150,8 @@ typedef struct UFontContext {
     u8    uA8;                    // 0xA8
     s32   nAC;                    // 0xAC
     f32   fB0;                    // 0xB0
-    f32   fB4;                    // 0xB4
+    f32   fLineSpacing;           // 0xB4  word-wrapped lines are this many font heights apart
+                                  //       (1 normal; UI_SetTextLineSpacing)
     f32   fB8;                    // 0xB8
     f32   fBC;                    // 0xBC
     f32   fC0;                    // 0xC0
@@ -1371,6 +1372,7 @@ void Input_vEmulateDPad(u8 bOn);               // the main stick also presses th
 void Input_vVibrateBuzz(int nController, int bOn);         // rumble on or off
 void Input_vVibrateWave(int nController, int nStrength);   // rumble strength
 void Input_vStopVibration(int nController);      // rumble off
+void Input_vSetVibrationStatus(int nController, int bEnable);   // rumble allowed or not
 void Input_vUpdate(void);                 // read the controllers
 u8*  Input_sGetStickInfo(int nController);      // the pad's state: stick bytes at +0, +2, +3
 u32  Input_ReadControlPad(int nController);      // buttons: held << 16 | pressed this frame

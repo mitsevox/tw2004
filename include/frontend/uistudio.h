@@ -237,7 +237,9 @@ typedef struct UISVector_t {
 
 // The callbacks the game hands the studio (uiProcessInterface.c sets them). Parameters come from
 // the studio's calls, or where noted from the game's own callback.
-typedef void UISMessageFncT(s32 nCmd, s32 n1, s32 n2, s32 n3, s32 n4, s32 n5);  // the game's UI_RunGameMessage
+// The game's UI_RunGameMessage (Madden 2003's UISCallbackMessageFnc): command nCmd of screen
+// (nGroup, nScreen) with nParams arguments; the arguments' and the answer's addresses as words.
+typedef void UISMessageFncT(s32 nCmd, s32 nGroup, s32 nScreen, s32 nParams, s32 nArgsAddr, s32 nResultAddr);
 // Returns the screen's UI file, still unfixed (the game's UI_ResLoad, which ignores the group).
 typedef void* UISResLoadFncT(u16 uGroup, u16 uScreen);
 typedef void UISResUnloadFncT(u16 uGroup, u16 uScreen, void* pData);
@@ -246,8 +248,10 @@ typedef void UISTransformFncT(int nOp, void* pDesc);            // the game's UI
 typedef UISVectorT UISLocalizeFncT();
 typedef void UISScreenActivatedFncT(u16 uGroup, u16 uScreen);
 typedef void UISScreenDrawDebugFncT(u16 uGroup, u16 uScreen, s32 n);
-// The table at UISInfoT.Plugins: pVar is the handler's variable in the screen file.
-typedef void UISPluginFncT(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4);
+// The table at UISInfoT.Plugins (Madden 2003's _BlankProcess(pObjData, ProcessID, nParam, pParam,
+// pReturn)): pVar is the handler's variable in the screen file, nMsg the message, then nParams
+// arguments at pParams and the answer's address as a word.
+typedef void UISPluginFncT(void* pVar, s32 nMsg, s32 nParams, s32* pParams, s32 nReturnAddr);
 
 typedef struct UISPlugin_t {
     UISPluginFncT* pFnc;            // 0x00

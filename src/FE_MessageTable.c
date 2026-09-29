@@ -24,6 +24,7 @@
 #include "game/frontend.h"
 #include "frontend/fe.h"
 #include "core/memcard.h"
+#include "core/gbacable.h"
 #include "charstate.h"
 #include "trax.h"
 #include "core/gameaudio.h"
@@ -61,9 +62,6 @@ void Lessons_StartFromMenu(void);                 // GameMode11.c
 void GameModeDriverPGATour_PrepareForTeeOff(void);                 // GameModeDriverPGATour.c
 u8*  GameMode26_StartEvent(void);                 // CharSliders.c
 void GameMode22_StartEvent(void);                 // GameMode22.c
-s32  Gba_GetState(void);                 // gbacable.c
-void Gba_MarkUnlocksGranted(void);                 // gbacable.c
-void Gba_UnlockProfileRewards(void);                 // gbacable.c
 s32  fn_801255C4(s32* pPos);            // EASportsBio.c
 u8   PasswordManager_TestPassword(char* szCode);  // PasswordManager.c
 void GameMode22_SetNumDrives(s32 n);                // GameMode22.c: sets gGameMode22.nDrives
@@ -89,17 +87,6 @@ void Gaud_PlayUISound(int n);
 void TrophyRoom_GetTourWinStatus(MsgArg* pArgs, MsgArg* pResult);
 void TrophyRoom_GetPlayerOfMonthStatus(MsgArg* pArgs, MsgArg* pResult);
 void TrophyRoom_GetRTEAwardStatus(MsgArg* pArgs, MsgArg* pResult);
-void Gba_Init(void);
-void Gba_SetState(s32 v);
-s32  Gba_GetCashToMove(void);
-void Gba_SetCashToMove(s32 n);
-s32  Gba_GetCashOnGba(void);
-s32  Gba_GetGbaStat(void);
-s32  Gba_IsReadPending(void);
-void Gba_SetReadPending(s32 v);
-void Gba_SetUndoTransfer(s32 v);
-s32  Gba_IsUndoTransfer(void);
-void Gba_StepPorts(s32 nCmd, s32 nArg);
 
 // The other files' message handlers in the table (the Create-A-Player screens, the logo editor,
 // the PGA TOUR screens, the stats screen, the EA Sports Bio...).
@@ -1617,7 +1604,7 @@ void GM_vFEMessage31_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 32: whether controller pArgs[0]'s buttons reach the menu UI (pArgs[1] nonzero:
-// yes), through gUIState.a30 (UI_SetControllerEnabled), which uiProcessInterface.c's
+// yes), through gUIState.abInputEnabled (UI_SetControllerEnabled), which uiProcessInterface.c's
 // UI_ReadControllers tests.
 void GM_vSetControllerInputEnabled(MsgArg* pArgs, MsgArg* pResult) {
     UI_SetControllerEnabled(pArgs[0].i, (u8)pArgs[1].i);
@@ -1781,7 +1768,7 @@ void GM_vIsGolferAvailable(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = (s8)FE_spGetGolfer(pArgs[0].i)->bAvailable;
 }
 
-// Front-end message 48: whether controller pArgs[0] is plugged in (gUIState.a1); 9
+// Front-end message 48: whether controller pArgs[0] is plugged in (gUIState.abPluggedIn); 9
 // (CONTROLLER_CPU) always answers 1.
 void GM_vIsControllerPluggedIn(MsgArg* pArgs, MsgArg* pResult) {
     s32 n;
@@ -1791,7 +1778,7 @@ void GM_vIsControllerPluggedIn(MsgArg* pArgs, MsgArg* pResult) {
         pResult->i = 1;
         return;
     }
-    pResult->i = gUIState.a1[n];
+    pResult->i = gUIState.abPluggedIn[n];
 }
 
 // Front-end message 49: 1 when the memory card in port pArgs[0], slot pArgs[1] is formatted
@@ -1846,11 +1833,11 @@ void GM_vMCIsMultitapPluggedIn(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 53: asks for pArgs[0] to be handed back to the menu UI a little later:
-// uiProcessInterface.c counts three UI updates (gUIDelayedHint.n0) and then sends it as hint 0x23.
-// The menus' twin of GM_vIG_MCfunction.
+// uiProcessInterface.c counts three UI updates (gUIDelayedHint.nFrames) and then sends it as hint
+// 0x23. The menus' twin of GM_vIG_MCfunction.
 void GM_vMCfunction(MsgArg* pArgs, MsgArg* pResult) {
-    gUIDelayedHint.n4 = pArgs[0].i;
-    gUIDelayedHint.n0 = 0;
+    gUIDelayedHint.nValue = pArgs[0].i;
+    gUIDelayedHint.nFrames = 0;
 }
 
 // Front-end message 54: saves the options and records to the memory card in port pArgs[0], slot
@@ -5687,10 +5674,10 @@ void GM_vGbaCancelLink(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 629: the Game Boy Advance link's unlocks, once per profile. When bit 1 of the
-// current profile's a10548 is still clear (the bit also unlocks the Create-A-Player items of lock
-// kind 2, FE_Manager.c FE_CrAP_IsItemLocked): the last course (22) and rewards 0..17 are unlocked
-// (Gba_UnlockProfileRewards), gbacable.c's gGbaUnlocksGranted is set (Gba_MarkUnlocksGranted), the
-// bit is set and the answer is 1. Else 0.
+// current profile's aUserFlags is still clear (the bit also unlocks the Create-A-Player items of
+// lock kind 2, FE_Manager.c FE_CrAP_IsItemLocked): the last course (22) and rewards 0..17 are
+// unlocked (Gba_UnlockProfileRewards), gbacable.c's gGbaUnlocksGranted is set
+// (Gba_MarkUnlocksGranted), the bit is set and the answer is 1. Else 0.
 void GM_vGbaGrantUnlocks(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
 
@@ -5745,11 +5732,12 @@ void GM_vGbaGetLinkState(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 623: reads what the Game Boy Advance holds into the words pArgs[0..4] point at:
-// its cash (request 0x70, GbaChannel.u68), then its four stats (requests 0xB0 with 0..3: the best
-// round, holes in one, longest drive, longest putt; GbaChannel.n70). It stops once a command fails
-// (link state 18) or no link state is set (-1). Then gbacable.c's gGbaReadPending is cleared, and if
-// gGbaUndoTransfer is set a link state of 7 becomes 12 (send the cash back) and 9 becomes 13 (copy the
-// stats into the profile) and gGbaUndoTransfer is cleared; nothing in this build sets gGbaUndoTransfer.
+// its cash (request 0x70, GbaChannel.uGbaCash), then its four stats (requests 0xB0 with 0..3: the
+// best round, holes in one, longest drive, longest putt; GbaChannel.nGbaStat). It stops once a
+// command fails (link state 18) or no link state is set (-1). Then gbacable.c's gGbaReadPending is
+// cleared, and if gGbaUndoTransfer is set a link state of 7 becomes 12 (send the cash back) and 9
+// becomes 13 (copy the stats into the profile) and gGbaUndoTransfer is cleared; nothing in this
+// build sets gGbaUndoTransfer.
 void GM_vGbaReadCashAndStats(MsgArg* pArgs, MsgArg* pResult) {
     u32 i;
 
@@ -5776,7 +5764,7 @@ void GM_vGbaReadCashAndStats(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 624: adds the word pArgs[0] points at to the cash to move between the Game Boy
-// Advance and the profile (GbaChannel.n6C of the port in use) and answers the new amount.
+// Advance and the profile (GbaChannel.nCashToMove of the port in use) and answers the new amount.
 void GM_vGbaAddCashToMove(MsgArg* pArgs, MsgArg* pResult) {
     s32 n;
 
@@ -5800,8 +5788,8 @@ void GM_vGbaIsReadPending(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = Gba_IsReadPending();
 }
 
-// Front-end message 653: the cash the Game Boy Advance holds, as last read (GbaChannel.u68 of the
-// port in use).
+// Front-end message 653: the cash the Game Boy Advance holds, as last read (GbaChannel.uGbaCash of
+// the port in use).
 void GM_vGbaGetGbaCash(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = Gba_GetCashOnGba();
 }

@@ -474,8 +474,8 @@ void TrophyRoom_GetTourWinStatus(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Trophy room, kind 1 of GM_vTrophyRoomGetStatus's award messages: Player of the Month award
-// pArgs[2] (a month, SaveProfile.a1C0) of profile slot pArgs[1]: "Player of the Month" into the
-// text pArgs[4], icon 0 into *pArgs[5] and, when won, the day won into the text pArgs[3] (else
+// pArgs[2] (a month, SaveProfile.aTourAward) of profile slot pArgs[1]: "Player of the Month" into
+// the text pArgs[4], icon 0 into *pArgs[5] and, when won, the day won into the text pArgs[3] (else
 // empty). Gives whether it was won.
 void TrophyRoom_GetPlayerOfMonthStatus(MsgArg* pArgs, MsgArg* pResult) {
     int nPlayer = pArgs[1].i;
@@ -486,9 +486,9 @@ void TrophyRoom_GetPlayerOfMonthStatus(MsgArg* pArgs, MsgArg* pResult) {
 
     strcpy(((MsgString*)pArgs[4].p)->pStr, "Player of the Month");
     *pOut = 0;
-    bWon = gpSaveData[nPlayer].a1C0[n].bWon;
+    bWon = gpSaveData[nPlayer].aTourAward[n].bWon;
     if (bWon) {
-        CalDate_ToString(gpSaveData[nPlayer].a1C0[n].nDate, szDate);
+        CalDate_ToString(gpSaveData[nPlayer].aTourAward[n].nDate, szDate);
     } else {
         szDate[0] = '\0';
     }

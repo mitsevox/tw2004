@@ -23,11 +23,11 @@
 
 // Per 'txf2' texture bank (lbl_801A26DC): nonzero marks the bank's gUITxf2BankState at the menus'
 // shutdown (uiProcessInterface.c UI_CloseInterface); nothing in this build writes it.
-u32 gUITxf2BankMarkOnExit[FE_NUM_801D8890];
-// Per 'txf2' texture bank: UI_FreeTxf2BankPixels frees a bank's pixels before a movie when its n4
-// is positive (nothing sets it positive in this build).
-FE801D8890 gUITxf2BankState[FE_NUM_801D8890];
-FE801D8858 gUILoadingScreen;            // the loading screen and its progress bar (UI_InitLoadingBar)
+u32 gUITxf2BankMarkOnExit[UI_NUM_TXF2_BANKS];
+// Per 'txf2' texture bank: UI_FreeTxf2BankPixels frees a bank's pixels before a movie when its
+// nFreeBeforeMovie is positive (nothing sets it positive in this build).
+UITxf2BankState gUITxf2BankState[UI_NUM_TXF2_BANKS];
+UILoadingScreen gUILoadingScreen;       // the loading screen and its progress bar (UI_InitLoadingBar)
 f32 gUILoadingBarTilePos[8][2];         // the bar's tiles' x, y (UI_InitLoadingBarTilePos)
 
 f32* gpUIPolyColourAdd;                 // } the UI studio's colour add and multiply, taken by
@@ -95,16 +95,16 @@ void UIPoly_TintVertex(FEVertex* pSrc, FEVertex* pDst, u8 bTint) {
     }
 }
 
-// Draw pQuad, a polygon element of the menu UI. With a UI file entry (n2 its table, n0 its entry;
-// n2 -1: none) it is textured: a texture entry (flag 1) binds its texture (in the menus, game type
-// 3, the first texture of 'txf2' bank n0; else the entry's texture in the bank its name picks,
-// UI_GetTextureBankIndex) and keeps its corner colours only with n8 bit 0 (else they are white,
-// alpha kept); a picture entry (flag 2) binds its decoded picture, and the texture coordinates are
-// scaled to the part of the texture the picture fills. Colour-table colour n4 (not -1) replaces the corners'
-// colours first. The colours are tinted by the UI studio's multiply and add, scaled by the
-// transform's colour level and offset; the corners go through the current UI transform, a
-// perspective divide by the view distance, and are put at the front end's draw depth. Nothing is
-// drawn when all four corners are transparent.
+// Draw pQuad, a polygon element of the menu UI. With a UI file entry (nTable its table, nEntry its
+// entry; nTable -1: none) it is textured: a texture entry (flag 1) binds its texture (in the menus,
+// game type 3, the first texture of 'txf2' bank nEntry; else the entry's texture in the bank its
+// name picks, UI_GetTextureBankIndex) and keeps its corner colours only with nFlags bit 0 (else
+// they are white, alpha kept); a picture entry (flag 2) binds its decoded picture, and the texture
+// coordinates are scaled to the part of the texture the picture fills. Colour-table colour nColour
+// (not -1) replaces the corners' colours first. The colours are tinted by the UI studio's multiply
+// and add, scaled by the transform's colour level and offset; the corners go through the current UI
+// transform, a perspective divide by the view distance, and are put at the front end's draw depth.
+// Nothing is drawn when all four corners are transparent.
 void UIPoly_Draw(FEQuad* pQuad) {
     FEVertex aVtx[4];
     Vec4 aPos[4];
@@ -138,12 +138,12 @@ void UIPoly_Draw(FEQuad* pQuad) {
     gpUIPolyColourMul = &UISGetColorMultipler()->r;
     gpUIPolyColourAdd = &UISGetColorAdditive()->r;
     bTint = 1;
-    if (pQuad->n2 != -1) {
-        pEntry = gpFrontEnd->pFile->p8->apTables[pQuad->n2]->apEntries[pQuad->n0];
+    if (pQuad->nTable != -1) {
+        pEntry = gpFrontEnd->pFile->p8->apTables[pQuad->nTable]->apEntries[pQuad->nEntry];
         szName = pEntry->szC;
         if (pEntry->u0 & 1) {
             if (gSession.nGameType == 3) {
-                pBank = lbl_801A26DC[pQuad->n0];
+                pBank = lbl_801A26DC[pQuad->nEntry];
                 pTex = UI_GetTexBankFirstTexture(pBank);
                 RenderState_SetBankTexture(pBank, pTex);
             } else {
@@ -151,7 +151,7 @@ void UIPoly_Draw(FEQuad* pQuad) {
                 nBank = UI_GetTextureBankIndex(szName);
                 RenderState_SetBankTexture(gpFrontEnd->p8->ap4[nBank], pEntry->p4);
             }
-            if (!(pQuad->n8 & 1)) {
+            if (!(pQuad->nFlags & 1)) {
                 bTint = 0;
             }
         } else if (pEntry->u0 & 2) {
@@ -171,7 +171,7 @@ void UIPoly_Draw(FEQuad* pQuad) {
     vAdd[1] = pAdd->f50[1];
     vAdd[2] = pAdd->f50[2];
     vAdd[3] = pAdd->f5C;
-    nColour = pQuad->n4;
+    nColour = pQuad->nColour;
     if (gpFrontEnd->p14 != NULL && nColour < (s16)gpFrontEnd->p14->nCount && nColour != -1) {
         // the table's colours are alpha, blue, green, red
         pQuad->aVtx[0].au14[3] = gpFrontEnd->p14->apEntries[nColour]->p8[0];
@@ -199,7 +199,7 @@ void UIPoly_Draw(FEQuad* pQuad) {
     UIPoly_UnpackVertex(&aVtx[1], &aPos[1].x, aUV[1], aColour[1], vScale, vAdd);
     UIPoly_UnpackVertex(&aVtx[2], &aPos[2].x, aUV[2], aColour[2], vScale, vAdd);
     UIPoly_UnpackVertex(&aVtx[3], &aPos[3].x, aUV[3], aColour[3], vScale, vAdd);
-    if (pQuad->n2 != -1 && (pEntry->u0 & 2)) {
+    if (pQuad->nTable != -1 && (pEntry->u0 & 2)) {
         // a picture fills only part of its texture
         UI_GetPictureUVScale(vPictUV, pPict);
         aUV[0][0] *= vPictUV[0];
@@ -223,7 +223,7 @@ void UIPoly_Draw(FEQuad* pQuad) {
     RenderState_Flush();
     if (aColour[0][3] != 0.0f || aColour[1][3] != 0.0f || aColour[2][3] != 0.0f
         || aColour[3][3] != 0.0f) {
-        if (pQuad->n2 == -1) {
+        if (pQuad->nTable == -1) {
             RenderView_DrawPrimitive(0xA0, &aOut[0].x, aColour[0], NULL, 4);
         } else {
             RenderView_DrawPrimitive(0xA0, &aOut[0].x, aColour[0], aUV[0], 4);
@@ -296,7 +296,8 @@ void UIPoly_ProcessMessage(FEQuad* pQuad, int nMsg, u32 bSplit, FEMsgArg* pArgs)
     switch (nMsg) {
     case -1:
         // port: EA passes arguments UI_LoadEntryPicture ignores
-        ((void (*)(s16, s16, s16, int, int))UI_LoadEntryPicture)(pQuad->n2, pQuad->n0, pQuad->nA, 0, 0);
+        ((void (*)(s16, s16, s16, int, int))UI_LoadEntryPicture)(pQuad->nTable, pQuad->nEntry,
+                                                               pQuad->nA, 0, 0);
         break;
     case -2:
         // port: EA passes arguments UIPoly_Draw ignores
@@ -304,7 +305,8 @@ void UIPoly_ProcessMessage(FEQuad* pQuad, int nMsg, u32 bSplit, FEMsgArg* pArgs)
         break;
     case -3:
         // port: EA passes arguments UI_ReleaseEntryPicture ignores
-        ((void (*)(s16, s16, s16, int, int))UI_ReleaseEntryPicture)(pQuad->n2, pQuad->n0, pQuad->nA, 0, 0);
+        ((void (*)(s16, s16, s16, int, int))UI_ReleaseEntryPicture)(pQuad->nTable, pQuad->nEntry,
+                                                                  pQuad->nA, 0, 0);
         break;
     case 0:
         pQuad->aVtx[pArgs[0].n].f8 = pArgs[1].f;
@@ -347,16 +349,16 @@ void UIPoly_ProcessMessage(FEQuad* pQuad, int nMsg, u32 bSplit, FEMsgArg* pArgs)
         break;
     case 5:
         if (pArgs[0].n != -1) {
-            nOld = pQuad->n0;
+            nOld = pQuad->nEntry;
             if (bSplit == 1) {
-                pQuad->n0 = pArgs[0].n;
-                pQuad->n2 = (u32)pArgs[0].n >> 16;
+                pQuad->nEntry = pArgs[0].n;
+                pQuad->nTable = (u32)pArgs[0].n >> 16;
             } else {
-                pQuad->n0 = pArgs[1].n;
-                pQuad->n2 = pArgs[0].n;
+                pQuad->nEntry = pArgs[1].n;
+                pQuad->nTable = pArgs[0].n;
             }
-            // fake match: a no-op; the original compares the old n0 with the new one here
-            if (nOld == pQuad->n0) {
+            // fake match: a no-op; the original compares the old nEntry with the new one here
+            if (nOld == pQuad->nEntry) {
                 return;
             }
         }
@@ -407,20 +409,20 @@ void UI_LoadLoadingBarTexture(void) {
     gpUILoadingBarTexture = UI_GetTexBankFirstTexture(gpUILoadingBarBank);
 }
 
-// Decode the loading screen's picture from the 'load' object's data into gUILoadingScreen.p30,
+// Decode the loading screen's picture from the 'load' object's data into gUILoadingScreen.pPicture,
 // unless one is there.
 void UI_DecodeLoadingPicture(void) {
-    if (gUILoadingScreen.p30 == NULL) {
-        gUILoadingScreen.p30 = fn_8002FD00(lbl_80281C04, lbl_801A25F0.uSize);
+    if (gUILoadingScreen.pPicture == NULL) {
+        gUILoadingScreen.pPicture = fn_8002FD00(lbl_80281C04, lbl_801A25F0.uSize);
     }
 }
 
 // Free the loading screen's picture UI_DecodeLoadingPicture decoded, unless the session has flag 4.
 void UI_FreeLoadingPicture(void) {
-    if (!(gSession.uFlags & 4) && gUILoadingScreen.p30 != NULL) {
-        fn_8002FE70(gUILoadingScreen.p30);
+    if (!(gSession.uFlags & 4) && gUILoadingScreen.pPicture != NULL) {
+        fn_8002FE70(gUILoadingScreen.pPicture);
         fn_8002FEAC();
-        gUILoadingScreen.p30 = NULL;
+        gUILoadingScreen.pPicture = NULL;
     }
 }
 
@@ -432,58 +434,59 @@ void UI_FreeLoadingBarTexture(void) {
 }
 
 // Set the loading screen up (gUILoadingScreen), unless the session has flag 4 or it is running
-// already (b18): the clock now (TI_sRead), no bar tile shown yet (n1C -1), no time passed; n14 the
-// number of players when a round is being set up (game type 4), else 0; the seconds per bar tile
-// (fC, and the first tile's time f4) (4.83 * n14 + 3.1) / 8. Then decode the loading picture
-// (UI_DecodeLoadingPicture).
+// already (bRunning): the clock now (TI_sRead), no bar tile shown yet (nLastTile -1), no time
+// passed; nNumPlayers the number of players when a round is being set up (game type 4), else 0; the
+// seconds per bar tile (fTileSecs, and the first tile's time fNextTile) (4.83 * nNumPlayers + 3.1)
+// / 8. Then decode the loading picture (UI_DecodeLoadingPicture).
 void UI_InitLoadingBar(void) {
-    if (!(gSession.uFlags & 4) && !gUILoadingScreen.b18) {
-        gUILoadingScreen.b18 = 1;
-        gUILoadingScreen.n1C = -1;
-        gUILoadingScreen.f10 = 0.0f;
-        gUILoadingScreen.u20 = TI_sRead();
+    if (!(gSession.uFlags & 4) && !gUILoadingScreen.bRunning) {
+        gUILoadingScreen.bRunning = 1;
+        gUILoadingScreen.nLastTile = -1;
+        gUILoadingScreen.fElapsed = 0.0f;
+        gUILoadingScreen.uLastTime = TI_sRead();
         gUILoadingScreen.n0 = 0;
         if (gSession.nGameType == 4) {
-            gUILoadingScreen.n14 = gSession.nNumPlayers;
+            gUILoadingScreen.nNumPlayers = gSession.nNumPlayers;
         } else {
-            gUILoadingScreen.n14 = 0;
+            gUILoadingScreen.nNumPlayers = 0;
         }
-        gUILoadingScreen.fC = gUILoadingScreen.f4 = (4.83f * gUILoadingScreen.n14 + 3.1f) / 8.0f;
-        gUILoadingScreen.f8 = 0.0f;
+        gUILoadingScreen.fTileSecs = gUILoadingScreen.fNextTile =
+            (4.83f * gUILoadingScreen.nNumPlayers + 3.1f) / 8.0f;
+        gUILoadingScreen.fNextRedraw = 0.0f;
         UI_DecodeLoadingPicture();
     }
 }
 
 // One step of the loading screen while something streams in (streammanagerhole.c calls it between
-// stream updates), unless the session has flag 4. The seconds since the last step are added to f10.
-// Until f10 passes f4 the screen is redrawn only every 2 seconds (f8); a redraw draws the loading
-// picture over the whole screen and the bar tiles shown so far (0 to n1C, at most 8) in one frame.
-// When f10 passes f4 (or no tile is shown yet) the next tile is shown (UI_ShowLoadingBarTile) and
-// f4 moves on by fC. nMode 1 ends it: every tile not yet shown is shown, a frame each, and b18 is
-// cleared.
+// stream updates), unless the session has flag 4. The seconds since the last step are added to
+// fElapsed. Until fElapsed passes fNextTile the screen is redrawn only every 2 seconds
+// (fNextRedraw); a redraw draws the loading picture over the whole screen and the bar tiles shown
+// so far (0 to nLastTile, at most 8) in one frame. When fElapsed passes fNextTile (or no tile is
+// shown yet) the next tile is shown (UI_ShowLoadingBarTile) and fNextTile moves on by fTileSecs.
+// nMode 1 ends it: every tile not yet shown is shown, a frame each, and bRunning is cleared.
 void UI_DrawLoadingScreenAndProgressBar(int nMode) {
     f32 fSecs;
     int i;
 
     if (gSession.uFlags & 4) return;
     if (nMode == 1) {
-        gUILoadingScreen.b18 = 0;
+        gUILoadingScreen.bRunning = 0;
     }
-    gUILoadingScreen.u28 = TI_sRead();
-    fSecs = fn_8006E118(gUILoadingScreen.u28, gUILoadingScreen.u20);
-    gUILoadingScreen.u20 = gUILoadingScreen.u28;
-    gUILoadingScreen.f10 += fabsf(fSecs);
-    if (nMode != 1 && gUILoadingScreen.f10 <= gUILoadingScreen.f4) {
-        if (gUILoadingScreen.f10 > gUILoadingScreen.f8) {
-            gUILoadingScreen.f8 += 2.0f;
+    gUILoadingScreen.uTime = TI_sRead();
+    fSecs = fn_8006E118(gUILoadingScreen.uTime, gUILoadingScreen.uLastTime);
+    gUILoadingScreen.uLastTime = gUILoadingScreen.uTime;
+    gUILoadingScreen.fElapsed += fabsf(fSecs);
+    if (nMode != 1 && gUILoadingScreen.fElapsed <= gUILoadingScreen.fNextTile) {
+        if (gUILoadingScreen.fElapsed > gUILoadingScreen.fNextRedraw) {
+            gUILoadingScreen.fNextRedraw += 2.0f;
         } else {
             return;
         }
     }
     fn_80006EDC();
-    UI_DrawFullScreenPicture(gUILoadingScreen.p30, 1.0f);
-    if (gUILoadingScreen.n1C >= 0) {
-        for (i = 0; i <= gUILoadingScreen.n1C; i++) {
+    UI_DrawFullScreenPicture(gUILoadingScreen.pPicture, 1.0f);
+    if (gUILoadingScreen.nLastTile >= 0) {
+        for (i = 0; i <= gUILoadingScreen.nLastTile; i++) {
             if (i >= 8) break;
             UI_DrawLoadingBarTile(i);
         }
@@ -493,24 +496,24 @@ void UI_DrawLoadingScreenAndProgressBar(int nMode) {
     fn_80007254();
     Gaud_Cycle();
     fn_80008380();
-    if (gUILoadingScreen.f10 > gUILoadingScreen.f4 || gUILoadingScreen.n1C == -1) {
-        if (gUILoadingScreen.f10 > gUILoadingScreen.f4) {
-            gUILoadingScreen.f4 += gUILoadingScreen.fC;
+    if (gUILoadingScreen.fElapsed > gUILoadingScreen.fNextTile || gUILoadingScreen.nLastTile == -1) {
+        if (gUILoadingScreen.fElapsed > gUILoadingScreen.fNextTile) {
+            gUILoadingScreen.fNextTile += gUILoadingScreen.fTileSecs;
         }
-        if (++gUILoadingScreen.n1C >= 8) return;
-        UI_ShowLoadingBarTile(gUILoadingScreen.n1C);
+        if (++gUILoadingScreen.nLastTile >= 8) return;
+        UI_ShowLoadingBarTile(gUILoadingScreen.nLastTile);
     }
     if (nMode == 1) {
-        if (gUILoadingScreen.n1C < 0) {
-            gUILoadingScreen.n1C = 0;
+        if (gUILoadingScreen.nLastTile < 0) {
+            gUILoadingScreen.nLastTile = 0;
         }
-        if (gUILoadingScreen.n1C > 7) {
-            gUILoadingScreen.n1C = 7;
+        if (gUILoadingScreen.nLastTile > 7) {
+            gUILoadingScreen.nLastTile = 7;
         }
-        for (i = gUILoadingScreen.n1C + 1; i < 8; i++) {
+        for (i = gUILoadingScreen.nLastTile + 1; i < 8; i++) {
             UI_ShowLoadingBarTile(i);
         }
-        gUILoadingScreen.b18 = 0;
+        gUILoadingScreen.bRunning = 0;
     }
 }
 
@@ -601,9 +604,9 @@ void UI_ShowDemoLoadingScreen(void) {
     int i = 0;
     LLPict* pPict;
     UIFileEntry* pEntry;
-    UIMovieData* pData;
+    UIPictureData* pData;
 
-    pEntry = gpFrontEnd->pFile->p8->apTables[gUIState.n3C]->apEntries[0];
+    pEntry = gpFrontEnd->pFile->p8->apTables[gUIState.nPictureTable]->apEntries[0];
     pData = pEntry->p4;
     pEntry->p8 = (u8*)fn_8002FD00(pData->aData, pData->uSize);
     pPict = (LLPict*)pEntry->p8;
@@ -703,13 +706,13 @@ void UI_DrawFullScreenPicture(LLPict* pPict, f32 fAlpha) {
 }
 
 // Before a movie (FE_Manager.c FE_PreMovieSetup): free the pixel data (fn_8000FFAC) of each 'txf2'
-// texture bank whose gUITxf2BankState n4 is positive, waiting for the GPU first. Nothing in this
-// build makes n4 positive (FE_Manager.c only clears it), so nothing is freed.
+// texture bank whose gUITxf2BankState nFreeBeforeMovie is positive, waiting for the GPU first.
+// Nothing in this build makes it positive (FE_Manager.c only clears it), so nothing is freed.
 void UI_FreeTxf2BankPixels(void) {
     int i;
 
-    for (i = 0; i < FE_NUM_801D8890; i++) {
-        if (gUITxf2BankState[i].n4 > 0) {
+    for (i = 0; i < UI_NUM_TXF2_BANKS; i++) {
+        if (gUITxf2BankState[i].nFreeBeforeMovie > 0) {
             fn_80008380();
             fn_8000FFAC(lbl_801A26DC[i]);
         }

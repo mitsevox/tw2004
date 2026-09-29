@@ -214,7 +214,7 @@ void PasswordManager_SetDefaults(void) {
         lbl_80281DF4->aC8[i].award.bWon = 0;
     }
     for (i = 0; i < 16; i++) {
-        lbl_80281DF4->a1C0[i].bWon = 0;
+        lbl_80281DF4->aTourAward[i].bWon = 0;
     }
     for (i = 0; i < 3; i++) {
         lbl_80281DF4->a200[i].bWon = 0;
@@ -350,7 +350,7 @@ void SaveProfile_InitNew(SaveProfile* pProfile) {
         pProfile->aC8[i].award.bWon = 0;
     }
     for (i = 0; i < 16; i++) {
-        pProfile->a1C0[i].bWon = 0;
+        pProfile->aTourAward[i].bWon = 0;
     }
     for (i = 0; i < 3; i++) {
         pProfile->a200[i].bWon = 0;
@@ -403,7 +403,7 @@ void SaveProfile_InitNew(SaveProfile* pProfile) {
     pProfile->nGolferBallType = 0;
     pProfile->nGolferOutfit = -1;
     GM_PgaTourSim_ClearAllSeasons(&pProfile->tour);
-    BitArray_ClearArray(pProfile->a10548, 2);
+    BitArray_ClearArray(pProfile->aUserFlags, 2);
     FE_CrAP_InitCrAPInfo(pProfile);
     if (lbl_80281DF0.bSigned) {
         pProfile->aSponsor[0].bSigned = 1;

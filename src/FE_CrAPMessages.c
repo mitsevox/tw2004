@@ -712,23 +712,24 @@ void GM_vGetDPadHeld(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Menu message 503: set (pArgs[1] nonzero) or clear bit pArgs[0] of the profile's a10548 flags.
+// Menu message 503: set (pArgs[1] nonzero) or clear bit pArgs[0] of the profile's flags
+// (aUserFlags).
 void GM_vSetProfileFlag(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     s32 bSet = pArgs[1].i;
     s32 nBit = pArgs[0].i;
 
     if (bSet) {
-        BitArray_SetBit(pProfile->a10548, nBit);
+        BitArray_SetBit(pProfile->aUserFlags, nBit);
     } else {
-        BitArray_ClearBit(pProfile->a10548, nBit);
+        BitArray_ClearBit(pProfile->aUserFlags, nBit);
     }
 }
 
-// Menu message 504: bit pArgs[0] of the profile's a10548 flags (GM_vSetProfileFlag sets them).
+// Menu message 504: bit pArgs[0] of the profile's flags (aUserFlags; GM_vSetProfileFlag sets them).
 void GM_vGetProfileFlag(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
-    pResult->i = BitArray_TestBit(pProfile->a10548, pArgs[0].i);
+    pResult->i = BitArray_TestBit(pProfile->aUserFlags, pArgs[0].i);
 }
 
 // Menu message 507: five lines naming the newly unlocked assets (aAssetNew, offered for the current

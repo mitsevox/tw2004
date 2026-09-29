@@ -7,8 +7,6 @@
 void fn_8002F898(u8* pSrc, u8* pDst, int nWidth, int nHeight);   // copies one plane
 void fn_8002FB98(LLPict* pPict);
 void fn_8002F56C(u8* pPlane, void* pWork, int nWidth, int nHeight);  // reorders one plane through pWork
-PictFrame* MAD_GetNextFrame(void* pDecoder, int n);                  // the decoder's next frame, or NULL
-void MAD_ReleaseFrame(void* pDecoder, PictFrame* pFrame);            // gives a frame back
 
 void* lbl_80281D58;
 void** lbl_802810C0 = &lbl_80281D58;
@@ -20,8 +18,6 @@ void fn_80056208();
 void fn_8002F4FC(void);
 void fn_8002F540(void);
 void MAD_SetReadCallback();
-void MAD_InitDecoder();
-s32 MAD_CloseDecoder();
 
 void fn_8002F4FC(void) {
     void* t1;
@@ -157,8 +153,6 @@ void fn_8002FF98(LLPict* pPict, PictStream* pStream) {
 }
 
 // ---- sweep code (not yet cleaned up) ----
-
-u8 MAD_IsAtEnd(u8* p0);
 
 u8 fn_8003001C(LLPict* pPict, PictStream* pStream) {
     return MAD_IsAtEnd(pStream->pDecoder);

@@ -10,7 +10,6 @@
 #include "pad.h"
 
 void fn_8001437C(void);
-void Input_vSetVibrationStatus(int nController, int bEnable);
 int  Input_ScaleStickAxis(int nValue, int nDeadZone, int nMax);
 int  Input_ScaleTrigger(int nValue, int nDeadZone, int nMax);
 void Input_ScaleAnalog(PadStatus* pStatus, PadAnalog* pAnalog);

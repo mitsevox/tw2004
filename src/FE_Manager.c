@@ -98,8 +98,9 @@ static f32 FE_Manager_StrippedFn(f32 x) {
 
 // Sets the front end's state up once, at start-up (gomainloop fn_8006C720): no player slot loaded
 // or CPU, no backup rows (aBackup -1), no profile backups (p658), no movie queued, the menus' start
-// mode (nMode) -1; b0F, b10 and b18 set, b11 and n1C cleared. Then the points uiProcessPolygon.c draws at
-// (UI_InitLoadingBarTilePos) and gUILoadingScreen's picture.
+// mode (nMode) -1; bFirstTime, b10 and bTourCardWithheld set, bDemoStarting and nMCRewardMoney
+// cleared. Then the points uiProcessPolygon.c draws the loading bar's tiles at
+// (UI_InitLoadingBarTilePos) and no loading picture (gUILoadingScreen).
 void FE_vOpenONCE(void) {
     int i;
     for (i = 0; i < 5; i++) {
@@ -117,7 +118,7 @@ void FE_vOpenONCE(void) {
     gFEState.nMovieFree = 0;
     gFEState.p658 = NULL;
     UI_InitLoadingBarTilePos();
-    gUILoadingScreen.p30 = NULL;
+    gUILoadingScreen.pPicture = NULL;
 }
 
 // Frees the golfers' bios (gpFEBios, the copy FE_CharBios_LoadBIOfromStream made), if there are
@@ -325,8 +326,8 @@ void FE_vCloseModule(void) {
 }
 
 // Allocates the profile the menus work on (gpFEProfile), cleared: slot 0, the slot's own profile
-// (not the working copy), n1 -1; clears every gUITxf2BankState entry and gUILoadingScreen (b18, its
-// picture); keeps the hashes of the logo textures "__LogoSquare" and "__LogoRect".
+// (not the working copy), n1 -1; clears every gUITxf2BankState entry and gUILoadingScreen
+// (bRunning, its picture); keeps the hashes of the logo textures "__LogoSquare" and "__LogoRect".
 void FE_InitManager(void) {
     int i;
     gpFEProfile = StaticMem_Alloc(sizeof(FEProfile), 2, 16, "FE_Manager.c", 1035);
@@ -335,13 +336,13 @@ void FE_InitManager(void) {
     gpFEProfile->bEditingCopy = 0;
     gpFEProfile->nSlot = 0;
     gpFEProfile->n1 = -1;
-    for (i = 0; i < FE_NUM_801D8890; i++) {
+    for (i = 0; i < UI_NUM_TXF2_BANKS; i++) {
         gUITxf2BankState[i].b0 = 0;
-        gUITxf2BankState[i].n4 = 0;
+        gUITxf2BankState[i].nFreeBeforeMovie = 0;
         gUITxf2BankState[i].b1 = 0;
     }
-    gUILoadingScreen.b18 = 0;
-    gUILoadingScreen.p30 = NULL;
+    gUILoadingScreen.bRunning = 0;
+    gUILoadingScreen.pPicture = NULL;
     gpFEProfile->uSquareHash = fn_8000BEE4("__LogoSquare");
     gpFEProfile->uRectHash = fn_8000BEE4("__LogoRect");
     gpFEProfile->bAllGolfersPickable = 0;
@@ -607,7 +608,7 @@ void FE_CrAP_UpdateSaleInfo(int a, int b) {
 // of the session's flags or cheat bit 0 (PasswordManager_IsPasswordEntered(0)). The asset gives a
 // lock kind (FE_CrAP_GetPartGMLockIDByAssetNum) and a value n (FE_CrAP_GetPartGMLockValByAssetNum).
 // Unlocked by kind:
-//   0 bit n of aAssetOwned (bought)       2 bit 1 of a10548 (UserInfo_GetUserFlag)
+//   0 bit n of aAssetOwned (bought)       2 bit 1 of aUserFlags (UserInfo_GetUserFlag)
 //   6 cheat bit n + 1 (codes "A".."E")    7 award aC8[n] won; 8 n of those 31 won
 //   9 PGA TOUR season n reached           10 sponsor n's code entered
 //                                            (PasswordManager_IsSponsorshipPasswordEntered) or signed
@@ -617,7 +618,7 @@ void FE_CrAP_UpdateSaleInfo(int a, int b) {
 //   19 the best medal (0) in challenge group n; 20 n challenge groups counted (EA bug there)
 //   21 award n; 22 n of the first 23      23 award 23 + n (a bonus trophy ball)
 //   24 n bonus trophy balls, but the count never runs (EA bug there)
-//   25 a1C0[12 + n]; 26 n of a1C0[12..15] 27 TOUR card level n
+//   25 aTourAward[12 + n]; 26 n of aTourAward[12..15] 27 TOUR card level n
 // Kinds 3 and 13 are always locked; -1, 4, 28 and the rest never.
 u8 FE_CrAP_IsItemLocked(s32 nAsset, SaveProfile* pProfile) {
     int aBits[5] = {1, 2, 3, 4, 5};
@@ -783,12 +784,12 @@ u8 FE_CrAP_IsItemLocked(s32 nAsset, SaveProfile* pProfile) {
         }
         break;
     case 25:
-        bLocked = !pProfile->a1C0[n + 12].bWon;
+        bLocked = !pProfile->aTourAward[n + 12].bWon;
         break;
     case 26:
         bLocked = 1;
         for (i = 12; i < 16; i++) {
-            if (pProfile->a1C0[i].bWon) {
+            if (pProfile->aTourAward[i].bWon) {
                 nCount++;
             }
         }

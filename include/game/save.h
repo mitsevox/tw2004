@@ -173,7 +173,7 @@ LAYOUT_ASSERT(SponsorSlot, 4);
 #define LOGO_RECT   1
 
 // A saved user logo (0x1022 bytes): the profile holds five and the logo editor (FE_LogoDesign.c,
-// FE_LogoDesign_GetCurrentLogo) edits the one its LogoEdit.n0 names.
+// FE_LogoDesign_GetCurrentLogo) edits the one its LogoEdit.nLogo names.
 typedef struct LogoRecord {
     u8   aPixels[0x1000];       // 0x0000  64 x 64 or 128 x 32 colour indexes
     char szName[0x20];          // 0x1000
@@ -195,15 +195,16 @@ LAYOUT_ASSERT(SkinChoice, 8);
 // or the skin from it; SkinPart_ApplyClubChoices gives the other six skins theirs;
 // char_tex_manager.c puts its logos on the model.
 typedef struct SkinChoices {
-    // Three name lists of the created golfer (fe_craputils.c FE_CrAP_AddCustomAnimation adds, FE_CrAP_RemoveCustomAnimation removes,
-    // FE_CrAP_IsCustomAnimationSelected looks up): lists 0 and 1 hold up to 8 names with a count, list 2 one name (its
-    // count is 0 or 1).
-    s8   n0;                    // 0x000  names in a1
-    char a1[8][0x10];           // 0x001
-    s8   n81;                   // 0x081  names in a82
-    char a82[8][0x10];          // 0x082
-    s8   n102;                  // 0x102  1: sz103 is set
-    char sz103[0x10];           // 0x103
+    // The created golfer's three custom animation lists (fe_craputils.c FE_CrAP_AddCustomAnimation,
+    // FE_CrAP_RemoveCustomAnimation, FE_CrAP_IsCustomAnimationSelected; skalib.c
+    // AnimLib_ApplyCustomAnims plays them): lists 0 and 1 hold up to 8 animation names with a
+    // count, list 2 one name (its count is 0 or 1).
+    s8   nCustomAnims0;         // 0x000  names in aszCustomAnims0
+    char aszCustomAnims0[8][0x10];  // 0x001  list 0: group 5 style 7's reactions
+    s8   nCustomAnims1;         // 0x081  names in aszCustomAnims1
+    char aszCustomAnims1[8][0x10];  // 0x082  list 1: group 5 style 1's reactions
+    s8   nCustomAnims2;         // 0x102  1: szCustomAnim2 is set
+    char szCustomAnim2[0x10];   // 0x103  list 2: group 0's clip
     s8   bLeftHanded;           // 0x113  the created golfer is left-handed
                                 //        (FE_SetProfileLeftHanded; FEgolferanim.c hands it on with
                                 //        FE_CRAPSetHandednessForScreen)
@@ -294,7 +295,7 @@ typedef struct SaveProfile {
     s32  nBogeys;               // 0x000C0  1 over
     s32  nDoubleBogeys;         // 0x000C4  2 or more over
     TourWin aC8[31];           // 0x000C8  one per PGA TOUR tournament
-    Award a1C0[16];            // 0x001C0  the won ones count for GM_GetBonusProgress. 0..11: Player
+    Award aTourAward[16];       // 0x001C0  the won ones count for GM_GetBonusProgress. 0..11: Player
                                 //          of the Month, per month (the tour's month money leader,
                                 //          nMonthWinnings; FE_PGATourMessages.c
                                 //          TrophyRoom_GetPlayerOfMonthStatus); 12..15: the four
@@ -368,8 +369,9 @@ typedef struct SaveProfile {
                                 //          TrophyRoom_CountEventsInMonth counts the nonzero ones
                                 //          in a month; no C code here writes it
     u8   unk10546[0x10548 - 0x10546];
-    u32  a10548[1];             // 0x10548  a bit array: FE_CrAPMessages.c's GM_vGetProfileFlag tests
-                                //          bit n; UserInfo_GetUserFlag tests one (bit 1 for FE_Manager)
+    u32  aUserFlags[1];         // 0x10548  flag bits (UserInfo_SetUserFlag / UserInfo_GetUserFlag;
+                                //          menu messages 503 / 504); bit 1: the Game Boy Advance
+                                //          link's unlocks were given (GM_vGbaGrantUnlocks)
     SponsorSlot aSponsor[11];   // 0x1054C  the sponsorship slots; cleared by the profile setup;
                                 //          FE_CrAP_IsItemLocked's lock kinds 10 (a sponsor signed) and 11
                                 //          (so many slots signed) read them
@@ -392,11 +394,14 @@ LAYOUT_ASSERT(SaveRecords, 0x4C2C);
 extern SaveProfile* gpSaveData;
 extern SaveProfile* lbl_80281DF4;       // unlocks that hold for every profile (the cheat codes set them)
 extern SponsorSlot lbl_80281DF0;        // a new profile's first sponsor (see SponsorSlot)
-extern u32 gPasswordEnteredBits[8];             // a bit array the code at 0x80056480 keeps; FE_CrAP_IsItemLocked's lock
-                                        // kind 6 tests bits 1..5 of it
-extern u32 gSponsorPasswordBits[16];            // a bit array the cheat codes of gSponsorPasswords set (PasswordManager_IsSponsorshipPasswordEntered)
-extern s32 gStartLockedGolfers[14];            // the golfers GM_GetGameProgress counts as unlockable
-extern s32 gStartLockedCourses[6];             // the courses GM_GetGameProgress counts as unlockable
+extern u32 gPasswordEnteredBits[8];     // the cheat codes entered, one bit each (0..6;
+                                        // PasswordManager_IsPasswordEntered);
+                                        // FE_CrAP_IsItemLocked's lock kind 6 tests bits 1..5
+extern u32 gSponsorPasswordBits[16];    // the sponsors' cheat codes entered, one bit each
+                                        // (gSponsorPasswords;
+                                        // PasswordManager_IsSponsorshipPasswordEntered)
+extern s32 gStartLockedGolfers[14];     // the golfers GM_GetGameProgress counts as unlockable
+extern s32 gStartLockedCourses[6];      // the courses GM_GetGameProgress counts as unlockable
 
 // The password manager (0x80056480-0x80057F18; TW06's passwordmanager.cpp)
 void PasswordManager_SetDefaults(void);
@@ -414,8 +419,8 @@ u8   GM_Earnings_GiveAwardToUser(int nPlayer, Award* pAward);
 extern char gszNoLogoName[];     // "NoLogoName": a user logo's name until one is given
 void FE_CrAP_InitCrAPInfo(SaveProfile* pProfile);
 void UserInfo_UnlockGolfer(int nProfile, int nGolfer);        // unlock a golfer for the profile
-void UserInfo_SetUserFlag(SaveProfile* pProfile, int nBit, u8 bSet);    // set or clear bit nBit of a10548
-u8   UserInfo_GetUserFlag(SaveProfile* pProfile, int nBit);  // bit nBit of pProfile->a10548
+void UserInfo_SetUserFlag(SaveProfile* pProfile, int nBit, u8 bSet);    // set or clear bit nBit of aUserFlags
+u8   UserInfo_GetUserFlag(SaveProfile* pProfile, int nBit);  // bit nBit of pProfile->aUserFlags
 u8   UserInfo_IsGolferAvailable(int nProfile, int nGolfer);        // the golfer is unlocked for the profile
 void UserInfo_UnlockCourse(int nProfile, int nCourse);        // unlock a course (aCourseUnlocked)
 u8   UserInfo_IsCourseUnlocked(int nProfile, int nCourse);        // whether a course is unlocked

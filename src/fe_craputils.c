@@ -115,18 +115,18 @@ void UserInfo_UnlockGolfer(int nProfile, int nGolfer) {
     EVENT_Trigger(nProfile, 0x42, NULL, -1);
 }
 
-// Sets (bSet) or clears flag bit nBit of the profile's a10548. Bit 1 records that the Game Boy
+// Sets (bSet) or clears flag bit nBit of the profile's aUserFlags. Bit 1 records that the Game Boy
 // Advance link's unlocks were given (GM_vGbaGrantUnlocks).
 void UserInfo_SetUserFlag(SaveProfile* pProfile, int nBit, u8 bSet) {
     if (bSet) {
-        BitArray_SetBit(pProfile->a10548, nBit);
+        BitArray_SetBit(pProfile->aUserFlags, nBit);
     } else {
-        BitArray_ClearBit(pProfile->a10548, nBit);
+        BitArray_ClearBit(pProfile->aUserFlags, nBit);
     }
 }
 
 u8 UserInfo_GetUserFlag(SaveProfile* pProfile, int nBit) {
-    return BitArray_TestBit(pProfile->a10548, nBit);
+    return BitArray_TestBit(pProfile->aUserFlags, nBit);
 }
 
 // 1 when golfer nGolfer can be played with save profile nProfile: one of the first 30 that the
@@ -196,69 +196,71 @@ int UserInfo_GetNumLadderEventsWon(int nProfile) {
 }
 
 // Adds animation pName to the created golfer's custom animation list nKind (the entry of part 13 it
-// belongs to): lists 0 and 1 (choices.a1, a82) take up to 8 names and ignore more; list 2 holds one
-// name (sz103), which this replaces and switches on (n102 = 1). Called when a part 13 asset is
-// turned on (sTurnOnAnimation).
+// belongs to): lists 0 and 1 (choices.aszCustomAnims0, aszCustomAnims1) take up to 8 names and
+// ignore more; list 2 holds one name (szCustomAnim2), which this replaces and switches on
+// (nCustomAnims2 = 1). Called when a part 13 asset is turned on (sTurnOnAnimation).
 void FE_CrAP_AddCustomAnimation(SaveProfile* pProfile, int nKind, char* pName) {
     switch (nKind) {
     case 2:
-        strcpy(pProfile->choices.sz103, pName);
-        pProfile->choices.n102 = 1;
+        strcpy(pProfile->choices.szCustomAnim2, pName);
+        pProfile->choices.nCustomAnims2 = 1;
         break;
     case 0:
-        if (pProfile->choices.n0 < 8) {
-            strcpy(pProfile->choices.a1[pProfile->choices.n0], pName);
-            pProfile->choices.n0++;
+        if (pProfile->choices.nCustomAnims0 < 8) {
+            strcpy(pProfile->choices.aszCustomAnims0[pProfile->choices.nCustomAnims0], pName);
+            pProfile->choices.nCustomAnims0++;
         }
         break;
     case 1:
-        if (pProfile->choices.n81 < 8) {
-            strcpy(pProfile->choices.a82[pProfile->choices.n81], pName);
-            pProfile->choices.n81++;
+        if (pProfile->choices.nCustomAnims1 < 8) {
+            strcpy(pProfile->choices.aszCustomAnims1[pProfile->choices.nCustomAnims1], pName);
+            pProfile->choices.nCustomAnims1++;
         }
         break;
     }
 }
 
 // Takes animation pName out of the created golfer's custom animation list nKind: in lists 0 and 1
-// the names after it move up one; list 2 is simply switched off (n102 = 0) whatever pName is. A
-// name not in the list changes nothing.
+// the names after it move up one; list 2 is simply switched off (nCustomAnims2 = 0) whatever pName
+// is. A name not in the list changes nothing.
 void FE_CrAP_RemoveCustomAnimation(SaveProfile* pProfile, int nKind, char* pName) {
     int nFound;
     int i;
 
     switch (nKind) {
     case 2:
-        pProfile->choices.n102 = 0;
+        pProfile->choices.nCustomAnims2 = 0;
         break;
     case 0:
         nFound = -1;
-        for (i = 0; i < pProfile->choices.n0; i++) {
-            if (strcmp(pName, pProfile->choices.a1[i]) == 0) {
+        for (i = 0; i < pProfile->choices.nCustomAnims0; i++) {
+            if (strcmp(pName, pProfile->choices.aszCustomAnims0[i]) == 0) {
                 nFound = i;
                 break;
             }
         }
         if (nFound >= 0) {
-            for (; nFound < pProfile->choices.n0 - 1; nFound++) {
-                strcpy(pProfile->choices.a1[nFound], pProfile->choices.a1[nFound + 1]);
+            for (; nFound < pProfile->choices.nCustomAnims0 - 1; nFound++) {
+                strcpy(pProfile->choices.aszCustomAnims0[nFound],
+                       pProfile->choices.aszCustomAnims0[nFound + 1]);
             }
-            pProfile->choices.n0--;
+            pProfile->choices.nCustomAnims0--;
         }
         break;
     case 1:
         nFound = -1;
-        for (i = 0; i < pProfile->choices.n81; i++) {
-            if (strcmp(pName, pProfile->choices.a82[i]) == 0) {
+        for (i = 0; i < pProfile->choices.nCustomAnims1; i++) {
+            if (strcmp(pName, pProfile->choices.aszCustomAnims1[i]) == 0) {
                 nFound = i;
                 break;
             }
         }
         if (nFound >= 0) {
-            for (; nFound < pProfile->choices.n81 - 1; nFound++) {
-                strcpy(pProfile->choices.a82[nFound], pProfile->choices.a82[nFound + 1]);
+            for (; nFound < pProfile->choices.nCustomAnims1 - 1; nFound++) {
+                strcpy(pProfile->choices.aszCustomAnims1[nFound],
+                       pProfile->choices.aszCustomAnims1[nFound + 1]);
             }
-            pProfile->choices.n81--;
+            pProfile->choices.nCustomAnims1--;
         }
         break;
     }
@@ -271,23 +273,23 @@ u8 FE_CrAP_IsCustomAnimationSelected(SaveProfile* pProfile, int nKind, char* pNa
 
     switch (nKind) {
     case 0:
-        for (i = 0; i < pProfile->choices.n0; i++) {
-            if (strcmp(pProfile->choices.a1[i], pName) == 0) {
+        for (i = 0; i < pProfile->choices.nCustomAnims0; i++) {
+            if (strcmp(pProfile->choices.aszCustomAnims0[i], pName) == 0) {
                 return 1;
             }
         }
         break;
     case 1:
-        for (i = 0; i < pProfile->choices.n81; i++) {
-            if (strcmp(pProfile->choices.a82[i], pName) == 0) {
+        for (i = 0; i < pProfile->choices.nCustomAnims1; i++) {
+            if (strcmp(pProfile->choices.aszCustomAnims1[i], pName) == 0) {
                 return 1;
             }
         }
         break;
     case 2:
         // the list's one name, compared once per entry counted
-        for (i = 0; i < pProfile->choices.n102; i++) {
-            if (strcmp(pProfile->choices.sz103, pName) == 0) {
+        for (i = 0; i < pProfile->choices.nCustomAnims2; i++) {
+            if (strcmp(pProfile->choices.szCustomAnim2, pName) == 0) {
                 return 1;
             }
         }

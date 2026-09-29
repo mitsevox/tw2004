@@ -10,9 +10,10 @@
 #include "gx.h"
 
 // An entry of a table in the UI file's second list; u0 is the entry's kind. In the colour table
-// (kind 0x10, UI_FindColorTable) p8 points at four bytes, alpha first (uiText.c). UI_ResolveFileEntries resolves
-// kind 1 to a texture and kind 2 to a named record (p4). Movie entries (uiProcessPolygon.c) use the same
-// shape: flags 1 a texture (p4 its data), 2 a movie (p8 its LLPict).
+// (kind 0x10, UI_FindColorTable) p8 points at four bytes, alpha first (uiText.c).
+// UI_ResolveFileEntries resolves kind 1 to a texture (p4) and kind 2, a picture entry, to its
+// record in the picture list (p4, a UIPictureData). The polygon element (uiProcessPolygon.c) reads
+// u0 as flags: 1 a texture (p4 its data), 2 a picture (p8 its decoded LLPict, Code80090940.c).
 typedef struct UIFileEntry {
     u32  u0;                    // 0x0
     void* p4;                   // 0x4
@@ -20,13 +21,13 @@ typedef struct UIFileEntry {
     char szC[4];                // 0xC  its name (UI_GetTextureBankIndex reads it); the length is not known
 } UIFileEntry;
 
-// A movie entry's data (UIFileEntry.p4; our name): uSize bytes of a picture file at aData, which
-// UI_DecodeEntryPicture turns into the entry's LLPict.
-typedef struct UIMovieData {
+// A picture entry's record in the picture list (UIFileEntry.p4; our name): uSize bytes of a picture
+// file at aData, which UI_DecodeEntryPicture turns into the entry's LLPict.
+typedef struct UIPictureData {
     u8   unk0[0x1C];
     u32  uSize;                 // 0x1C
     u8   aData[1];              // 0x20  uSize of them
-} UIMovieData;
+} UIPictureData;
 
 typedef struct UIColorTable {
     s32  nCount;                // 0x0  read as an s16
@@ -61,8 +62,9 @@ typedef struct UIFile {
     UIFileTables* p8;           // 0x8  its tables
 } UIFile;
 
-// The block at FrontEnd.pC: a count, then pointers to records that each start with a name;
-// UI_ResolveFileEntries gives a UI file entry of kind 2 the record of its name.
+// The picture list at FrontEnd.pC ('GRPS' / 'MPCS', UI_GetPictureList): a count, then pointers to
+// records (UIPictureData) that each start with a name; UI_ResolveFileEntries gives a UI file entry
+// of kind 2 the record of its name.
 typedef struct UINamedList {
     u32   nCount;               // 0x0
     char* apNames[1];           // 0x4  nCount of them
@@ -72,7 +74,8 @@ typedef struct FrontEnd {
     UIFile* pFile;              // 0x0
     void* pHandler;             // 0x4  where GameMessages.c sends its messages (UISProcessHint)
     struct UILoaded* p8;        // 0x8  the texture banks UI_FreeTextureBanks frees (UI_CloseInterface)
-    UINamedList* pC;            // 0xC  a block uiLoadFile.c frees (UI_FreeMenuPictures)
+    UINamedList* pC;            // 0xC  the picture list (UI_GetPictureList); uiLoadFile.c
+                                //      frees it (UI_FreeMenuPictures)
     u32*  p10;                  // 0x10  the fonts table UI_FreeFonts frees (UI_CloseInterface)
     UIColorTable* p14;          // 0x14  the colours UIText.n8 picks from (uiText.c), NULL: none
     f32   f18;                  // 0x18  set to 1 when a round starts (gomainloop fn_8006DC20)
@@ -270,11 +273,14 @@ void UIArc_ProcessMessage(UIArc* pArc, int nMsg, s32 n, MsgArg* pArgs);         
 // uiProcessInterface.c: start the front end with the UI set szSet ("frontend", "ingame" or
 // "startup").
 FrontEnd* UI_OpenInterface(char* szSet);
+// uiProcessInterface.c: run the UI once a frame and draw it (gomainloop.c passes 1 to both).
+void UI_UpdateInterface(u32 uEvent);
+void UI_DrawInterface(s32 nTicks);
 
 // uiProcessInterface.c: for a UI name starting "tu", 1 in a lesson and -1 otherwise; else 0.
 int UI_GetTextureBankIndex(const char* szName);
 
-// Code80090940.c: the movie entries' pictures (uiProcessPolygon.c).
+// Code80090940.c: the picture entries' pictures (the polygon element, uiProcessPolygon.c).
 UIFileEntry* UI_DecodeEntryPicture(int nEntry);   // make entry nEntry's picture
 void UI_MarkEntryPictureForFree(int nEntry);           // mark entry nEntry (flag 0x10) to be freed
 

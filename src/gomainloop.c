@@ -7,6 +7,7 @@
 #include "psmgr.h"
 #include "lighting.h"
 #include "core/memcard.h"
+#include "core/gbacable.h"
 #include "game/frontend.h"
 #include "llpict.h"
 
@@ -18,7 +19,6 @@ u8          lbl_80281E50;
 
 // The other systems' start-up, shut-down and per-frame calls, from their files (most are not
 // decompiled yet; the types are from the calls here).
-u8   OSGetResetButtonState(void);
 void fn_80007254(void);
 void fn_80007260(void);
 void fn_800080D0(void);
@@ -183,8 +183,6 @@ void FE_vRenderGolferAllPhase2(void);
 void FE_vFreeUnusedCharacters(void);
 u8   FE_IsGolferRenderAllowed(void);
 u8   UI_IsClosed(void);
-void UI_DrawInterface(int n);
-void UI_UpdateInterface(int n);
 void UI_vInitModule(void);
 void UI_SendPendingMessages(void);
 void UI_vCloseModule(void);
@@ -277,9 +275,6 @@ void fn_8011E170(void);
 void fn_8011E3B0(void);
 void fn_8011E6E8(void);
 void fn_8011E974(void);
-void Gba_PollLink(void);
-s32  Gba_GetState(void);
-void Gba_UpdateLinkState(void);
 void EASBio_InitOnce(void);
 void fn_80124B54(void);
 void fn_801250C0(void);

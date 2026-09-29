@@ -101,6 +101,10 @@ void OSTicksToCalendarTime(s64 nTicks, OSCalendarTime* pTime);
 u32  OSGetTick(void);           // the low 32 bits of the time base
 void OSReport(const char* pFmt, ...);   // debug print (nothing in the retail build)
 void OSPanic(const char* pFile, int nLine, const char* pFmt, ...);   // print and halt
+int  OSGetResetButtonState(void);  // the console's reset button is held
+// Reset the console: nReset 0 restart, 1 hot reset, 2 shut down; bForceMenu: to the
+// system menu.
+void OSResetSystem(int nReset, u32 uResetCode, int bForceMenu);
 
 // Threads wait on a queue; a mutex is owned by one thread, a semaphore counts.
 typedef struct OSThread {

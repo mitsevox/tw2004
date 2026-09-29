@@ -9,9 +9,10 @@
 
 // A song of the 'TRAX' stream object (0x180 bytes; FE_MessageTable.c reads sz0 and szSong too).
 typedef struct TraxTrack {
-    char sz0[0x80];             // 0x000  shown first
-    char szSong[0x80];          // 0x080  shown in quotes
-    char sz100[0x80];           // 0x100
+    char sz0[0x80];             // 0x000  the first line shown, above the song's name (the menus
+                                //        list it with the name, GM_vGetEATraxTrack)
+    char szSong[0x80];          // 0x080  the song's name, shown in quotes
+    char sz100[0x80];           // 0x100  the third line shown, below the song's name
 } TraxTrack;
 LAYOUT_ASSERT(TraxTrack, 0x180);
 

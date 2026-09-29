@@ -144,7 +144,6 @@ void Character_UpdateAnimation(Character* pChar, int a, f32 f);
 void SKN_PoseCharacter(Character* pChar, int n);
 void LF_LoadCurrentLights(void);
 void FE_CrAP_EquipDefaults(void);
-void FE_CrAPBall_Render(int n);
 void SkinPart_SetChangeAllCopies(u8 b);
 void fn_8010B098(void* p);
 void fn_8010B9BC(void);
@@ -1886,12 +1885,13 @@ int FE_GetLastCrAPCategory(void) {
 }
 
 // Whether the menu golfer is updated and drawn this frame (gomainloop): the golfer shown is ready
-// (bLoaded) and bHidden, b88, gbUICloseRequested, gUIState.bFadeToBlack and .b49 are all 0.
+// (bLoaded) and bHidden, b88, gbUICloseRequested, gUIState.bFadeToBlack and .bHideMenuGolfer
+// are all 0.
 u8 FE_IsGolferRenderAllowed(void) {
     u8 bResult = 0;
 
     if (gpCrAPState->pB4->bLoaded && gpCrAPState->bHidden == 0 && gpCrAPState->b88 == 0
-        && gbUICloseRequested == 0 && gUIState.bFadeToBlack == 0 && gUIState.b49 == 0) {
+        && gbUICloseRequested == 0 && gUIState.bFadeToBlack == 0 && gUIState.bHideMenuGolfer == 0) {
         bResult = 1;
     }
     return bResult;

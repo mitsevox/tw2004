@@ -2359,16 +2359,17 @@ void AnimLib_SetLeafClipsByName(LibOverlay* pOv, int nSlot, int nGroup, int nClu
 }
 
 // Applies player n's custom animations (the three lists of gpSaveData[n].choices the
-// Create-a-Player screen fills) to the overlay: list 0 (a1) replaces the reactions of group 5 style
-// 7, list 1 (a82) those of group 5 style 1 (both club class 2, the default leaf), and list 2
-// (sz103, one name) the clips of group 0, style 0, club 0, key 0 (AnimLib_SetLeafClipsByName).
+// Create-a-Player screen fills) to the overlay: list 0 (aszCustomAnims0) replaces the reactions of
+// group 5 style 7, list 1 (aszCustomAnims1) those of group 5 style 1 (both club class 2, the
+// default leaf), and list 2 (szCustomAnim2, one name) the clips of group 0, style 0, club 0, key 0
+// (AnimLib_SetLeafClipsByName).
 void AnimLib_ApplyCustomAnims(LibOverlay* pOv, int nSlot, s32 n) {
-    AnimLib_SetLeafClipsByName(pOv, nSlot, 5, 2, 7, -1, gpSaveData[n].choices.a1[0],
-                               gpSaveData[n].choices.n0);
-    AnimLib_SetLeafClipsByName(pOv, nSlot, 5, 2, 1, -1, gpSaveData[n].choices.a82[0],
-                               gpSaveData[n].choices.n81);
-    AnimLib_SetLeafClipsByName(pOv, nSlot, 0, 0, 0, 0, gpSaveData[n].choices.sz103,
-                               gpSaveData[n].choices.n102);
+    AnimLib_SetLeafClipsByName(pOv, nSlot, 5, 2, 7, -1, gpSaveData[n].choices.aszCustomAnims0[0],
+                               gpSaveData[n].choices.nCustomAnims0);
+    AnimLib_SetLeafClipsByName(pOv, nSlot, 5, 2, 1, -1, gpSaveData[n].choices.aszCustomAnims1[0],
+                               gpSaveData[n].choices.nCustomAnims1);
+    AnimLib_SetLeafClipsByName(pOv, nSlot, 0, 0, 0, 0, gpSaveData[n].choices.szCustomAnim2,
+                               gpSaveData[n].choices.nCustomAnims2);
 }
 
 // The working overlay library loaded for the character in slot 0 or 1, or NULL (AnimStream sets up

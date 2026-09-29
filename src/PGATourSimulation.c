@@ -347,12 +347,12 @@ void GM_PgaTourSim_SimTournamentWinner(int nPlayer) {
 // nMajorWins; the win streak goes up with a win and back to 0 when the player plays and does not
 // win. Leading every pro's career winnings, being in the top 5 or in the top 25 wins the a200
 // career-money awards (all three, the last two, the last one), the highest one's movie playing the
-// first time it is won. After the season's last tournament: a1C0[12] two or more wins in the first
-// season, [13] leading the Player of the Year points, [14] leading the season's winnings, [15]
-// leading the scoring average with 15 tournaments or more. When a month ends (the next tournament
-// ends in another month, or the season is over), no pro ahead of the player's winnings for the
-// month (nMonthWinnings) wins that month's award a1C0[month - 1], and every golfer's month winnings
-// start again.
+// first time it is won. After the season's last tournament: aTourAward[12] two or more wins in the
+// first season, [13] leading the Player of the Year points, [14] leading the season's winnings,
+// [15] leading the scoring average with 15 tournaments or more. When a month ends (the next
+// tournament ends in another month, or the season is over), no pro ahead of the player's winnings
+// for the month (nMonthWinnings) wins that month's award aTourAward[month - 1], and every golfer's
+// month winnings start again.
 void GM_PgaTourSim_CheckEndOfTournamentAward(int nPlayer, u8 bUser, u8 bFirst) {
     int i;
     s32 nAhead;
@@ -399,15 +399,15 @@ void GM_PgaTourSim_CheckEndOfTournamentAward(int nPlayer, u8 bUser, u8 bFirst) {
     if (nNext == -1) {
         if (gpSaveData[nPlayer].tour.nSeason == 0
             && pStats->nSeasonWins > 1
-            && GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].a1C0[12])) {
+            && GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].aTourAward[12])) {
             PlayPGAAwardVideo(12, 2);
         }
         if (GM_PgaTourSim_IsLeaderForStat(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_PLAYER_OF_YEAR_POINTS)
-            && GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].a1C0[13])) {
+            && GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].aTourAward[13])) {
             PlayPGAAwardVideo(11, 1);
         }
         if (GM_PgaTourSim_IsLeaderForStat(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_SEASON_WINNINGS)
-            && GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].a1C0[14])) {
+            && GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].aTourAward[14])) {
             if ((Misc_RandFunc(0) & 1) == 0) {
                 PlayPGAAwardVideo(5, 1);
             } else {
@@ -416,7 +416,7 @@ void GM_PgaTourSim_CheckEndOfTournamentAward(int nPlayer, u8 bUser, u8 bFirst) {
         }
         if (pStats->nEvents >= 15
             && GM_PgaTourSim_IsLeaderForStat(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_SCORING)
-            && GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].a1C0[15])) {
+            && GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].aTourAward[15])) {
             PlayPGAAwardVideo(6, 2);
         }
     }
@@ -431,7 +431,7 @@ void GM_PgaTourSim_CheckEndOfTournamentAward(int nPlayer, u8 bUser, u8 bFirst) {
         }
         if (i == PGA_NUM_PROS
             && GM_Earnings_GiveAwardToUser(nPlayer,
-                                           &gpSaveData[nPlayer].a1C0[CalDate_GetMonth(
+                                           &gpSaveData[nPlayer].aTourAward[CalDate_GetMonth(
                                                    GameModeDriverPGATour_GetEndDate(
                                         gpSaveData[nPlayer].tour.nEvent)) - 1])) {
             PlayPGAAwardVideo(14, 6);

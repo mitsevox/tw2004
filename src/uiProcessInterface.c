@@ -24,8 +24,8 @@ u8 gbUICloseRequested;          // the exit fade is black: UI_UpdateInterface cl
 u8 gbPausedWithoutScoreCard;    // GameUICommands.c GM_vPauseGame: the scorecard was not up; not read
 
 // .bss, reverse address order (declared in frontend/fe.h)
-FE801D880C gUIDelayedHint;      // a value a message hands back to the UI as a hint 3 frames later
-FEScreen gUIState;              // the UI's controller input, exit fade and movie entries' table
+UIDelayedHint gUIDelayedHint;   // a value a message hands back to the UI as a hint 3 frames later
+UIState gUIState;               // the UI's controller input, exit fade and picture table
 
 // Per controller: frames Controller_GetButtonMask(0x20, 1)'s button has been held in play; past 10
 // UI_ReadControllers sends GUI_SendButtonHeld.
@@ -160,8 +160,9 @@ static f32 uiProcessInterface_StrippedFn(f32 x) {
 // (UISDrawObjects) with alpha blending, no depth writes and an alpha test, in the UI's 512 x 448
 // coordinates (fn_80016B6C) and with word-wrapped text at 0.85 line spacing
 // (UI_SetTextLineSpacing), then put the render state back. In the menus it first clears
-// gbUIFirstMenuDraw (UI_ClearFirstMenuDraw). Then it steps gUIDelayedHint: n0 counts 0 to 2, one a
-// frame, and past 2 goes back to -1 while n4 is sent to the UI as hint 0x23 (the menus) or 0x24 (a round).
+// gbUIFirstMenuDraw (UI_ClearFirstMenuDraw). Then it steps gUIDelayedHint: nFrames counts 0 to 2,
+// one a frame, and past 2 goes back to -1 while nValue is sent to the UI as hint 0x23 (the menus)
+// or 0x24 (a round).
 void UI_DrawInterface(s32 nTicks) {
     s32 aArgs[1];
 
@@ -189,12 +190,12 @@ void UI_DrawInterface(s32 nTicks) {
         DS_vSetAlphaTestMode(1, 6, 0x80);
         DS_vSetZBufferMode(3);
         RenderState_Flush();
-        if (gUIDelayedHint.n0 <= 2 && gUIDelayedHint.n0 >= 0) {
-            gUIDelayedHint.n0++;
-        } else if (gUIDelayedHint.n0 > 2) {
-            gUIDelayedHint.n0 = -1;
+        if (gUIDelayedHint.nFrames <= 2 && gUIDelayedHint.nFrames >= 0) {
+            gUIDelayedHint.nFrames++;
+        } else if (gUIDelayedHint.nFrames > 2) {
+            gUIDelayedHint.nFrames = -1;
             Mem_set(aArgs, 0, sizeof(aArgs));
-            aArgs[0] = gUIDelayedHint.n4;
+            aArgs[0] = gUIDelayedHint.nValue;
             if (gSession.nGameType == 3) {
                 UISProcessHint(gpFrontEnd->pHandler, 0x23, 1, aArgs);
             }
@@ -206,10 +207,10 @@ void UI_DrawInterface(s32 nTicks) {
     }
 }
 
-// Let controller n's buttons reach the UI (b 1) or not (0): gUIState.a30 (front-end message 32,
-// GM_vSetControllerInputEnabled; UI_vInitModule enables all four).
+// Let controller n's buttons reach the UI (b 1) or not (0): gUIState.abInputEnabled (front-end
+// message 32, GM_vSetControllerInputEnabled; UI_vInitModule enables all four).
 void UI_SetControllerEnabled(s32 n, s32 b) {
-    gUIState.a30[n] = b;
+    gUIState.abInputEnabled[n] = b;
 }
 
 // Once a frame (from UI_UpdateInterface): read the controllers for the UI. The main stick works the
@@ -217,10 +218,11 @@ void UI_SetControllerEnabled(s32 n, s32 b) {
 // (4 to 8, not paused) nothing is read while any player's view has a script fade running or held
 // (script.nFade 1 to 4) with a camera other than 0x15. Each plugged-in controller's buttons (the
 // stick's directions folded into the D-pad bits) are compared with last frame's: a button held 9
-// frames counts as pressed again. gUIState.nNumPluggedIn counts the controllers plugged in, n34 the frames
-// with none. In the menus, the two-player modes 7 (speed golf on points) and 26 (the long-drive
-// race) with fewer than two controllers (mode 7: and no CPU player in slot 0 or 1) send hint 0x34,
-// block the buttons (b40) and hide the menu golfer (b49), putting gpCrAPState->bHidden aside in
+// frames counts as pressed again. gUIState.nNumPluggedIn counts the controllers plugged in,
+// nFramesNoPad the frames with none. In the menus, the two-player modes 7 (speed golf on points)
+// and 26 (the long-drive race) with fewer than two controllers (mode 7: and no CPU player in slot 0
+// or 1) send hint 0x34, block the buttons (bButtonsBlocked) and hide the menu golfer
+// (bHideMenuGolfer), putting gpCrAPState->bHidden aside in
 // gSavedCrAPHidden; otherwise, with any controller in, hint 0x2D lifts that and puts bHidden back.
 // Unless blocked, fading out (bFadeToBlack) or a movie is queued, each enabled controller's newly
 // pressed buttons send their gUIButtonEvents event (UISProcessEvent; in play not while nPaused is 2
@@ -269,13 +271,13 @@ void UI_ReadControllers(void) {
     pPressed = aPressed;
     for (i = 0; i < 4; i++) {
         if (Input_bDoesPadExist(i)) {
-            gUIState.a1[i] = 1;
+            gUIState.abPluggedIn[i] = 1;
             gUIState.nFramesNoPad = 0;
             gUIState.nNumPluggedIn++;
         } else {
-            gUIState.a1[i] = 0;
+            gUIState.abPluggedIn[i] = 0;
         }
-        if (gUIState.a1[i]) {
+        if (gUIState.abPluggedIn[i]) {
             pButtons[i] = Input_ReadControlPad(i);
             if (pButtons[i] & 0x40000) {
                 pButtons[i] |= 4;
@@ -289,17 +291,17 @@ void UI_ReadControllers(void) {
             if (pButtons[i] & 0x10000) {
                 pButtons[i] |= 1;
             }
-            if (gUIState.a8[i] != pButtons[i]) {
-                gUIState.a18[i] = 0;
-            } else if (gUIState.a18[i] > 8) {
-                gUIState.a18[i] = 0;
-                gUIState.a8[i] = 0;
+            if (gUIState.auLastButtons[i] != pButtons[i]) {
+                gUIState.anHeldFrames[i] = 0;
+            } else if (gUIState.anHeldFrames[i] > 8) {
+                gUIState.anHeldFrames[i] = 0;
+                gUIState.auLastButtons[i] = 0;
             }
-            gUIState.a18[i]++;
-            pPressed[i] = pButtons[i] & ~gUIState.a8[i];
-            gUIState.a8[i] = pButtons[i];
+            gUIState.anHeldFrames[i]++;
+            pPressed[i] = pButtons[i] & ~gUIState.auLastButtons[i];
+            gUIState.auLastButtons[i] = pButtons[i];
         }
-        gUIState.a28[i] = gUIState.a1[i];
+        gUIState.abPluggedInLast[i] = gUIState.abPluggedIn[i];
     }
     if (gUIState.nNumPluggedIn == 0) {
         gUIState.nFramesNoPad++;
@@ -311,9 +313,9 @@ void UI_ReadControllers(void) {
             gpCrAPState->bHidden = gSavedCrAPHidden;
             gSavedCrAPHidden = -1;
         }
-        gUIState.b49 = 0;
+        gUIState.bHideMenuGolfer = 0;
         UISProcessHint(gpFrontEnd->pHandler, 0x2D, 1, aArgs);
-        gUIState.b40 = 0;
+        gUIState.bButtonsBlocked = 0;
     }
     if (((Game_GetMode() == 7 && !gFEState.aCPU[0] && !gFEState.aCPU[1]) ||
          Game_GetMode() == 0x1A) &&
@@ -322,13 +324,13 @@ void UI_ReadControllers(void) {
             gSavedCrAPHidden = gpCrAPState->bHidden;
         }
         UISProcessHint(gpFrontEnd->pHandler, 0x34, 1, aArgs);
-        gUIState.b40 = 1;
-        gUIState.b49 = 1;
+        gUIState.bButtonsBlocked = 1;
+        gUIState.bHideMenuGolfer = 1;
     }
     aArgs[0] = 0;
-    if (gUIState.bFadeToBlack == 0 && FE_movieIsQueueEmpty() && gUIState.b40 == 0) {
+    if (gUIState.bFadeToBlack == 0 && FE_movieIsQueueEmpty() && gUIState.bButtonsBlocked == 0) {
         for (k = 0; k < 4; k++) {
-            if (gUIState.a1[k] && gUIState.a30[k]) {
+            if (gUIState.abPluggedIn[k] && gUIState.abInputEnabled[k]) {
                 if (gSession.nGameType != 6 || (gSession.nPaused != 2 && gSession.nPaused != 3)) {
                     pEvent = gUIButtonEvents;
                     for (j = 0; j < UI_NUM_BUTTON_EVENTS; j++) {
@@ -414,7 +416,7 @@ void UI_FindColorTable(FrontEnd* pFE) {
 // Resolve the UI file's entries by name. Kind 1, outside the menus: the texture of that name (p4)
 // in the texture bank UI_GetTextureBankIndex picks, left alone when that is -1. Kind 2, while the
 // picture list (pFE->pC) is loaded: the picture record of the same name (p4), its decoded picture
-// (p8) cleared, and gUIState.n3C notes the table (the movie entries' table).
+// (p8) cleared, and gUIState.nPictureTable notes that table.
 void UI_ResolveFileEntries(FrontEnd* pFE) {
     u32 k;
     UIColorTable* pTable;
@@ -439,7 +441,7 @@ void UI_ResolveFileEntries(FrontEnd* pFE) {
                     }
                 }
             } else if (pEntry->u0 == 2 && pFE->pC != NULL) {
-                gUIState.n3C = i;
+                gUIState.nPictureTable = i;
                 for (k = 0; k < pFE->pC->nCount; k++) {
                     if (strcmp(pEntry->szC, pFE->pC->apNames[k]) == 0) {
                         pEntry->p4 = pFE->pC->apNames[k];
@@ -493,8 +495,8 @@ FrontEnd* UI_OpenInterface(char* szSet) {
     gUIState.abAssigned[3] = 0;
     gUIState.bFadeToBlack = 0;
     gUIState.fFade = 0.0f;
-    gUIDelayedHint.n4 = 0;
-    gUIDelayedHint.n0 = -1;
+    gUIDelayedHint.nValue = 0;
+    gUIDelayedHint.nFrames = -1;
     UI_RelocateFile(gpFrontEnd);
     UI_ResolveFileEntries(gpFrontEnd);
     UI_FindColorTable(gpFrontEnd);
@@ -550,7 +552,7 @@ void UI_CloseInterface(FrontEnd* pFE) {
     if (gSession.nGameType == 1 && gSession.nC == 0) {
         UI_PlayStartUpMovies();
     } else if (gSession.nGameType == 3) {
-        for (i = 0; i < FE_NUM_801D8890; i++) {
+        for (i = 0; i < UI_NUM_TXF2_BANKS; i++) {
             if (gUITxf2BankMarkOnExit[i] != 0) {
                 gUITxf2BankState[i].b0 = 1;
                 gUITxf2BankState[i].b1 = 0;
@@ -582,12 +584,12 @@ void UI_vInitModule(void) {
     UI_ResetLoadedFiles();
     gUIState.nFramesNoPad = 0;
     gUIState.nNumPluggedIn = 0;
-    gUIState.b49 = 0;
-    gUIState.b40 = 0;
+    gUIState.bHideMenuGolfer = 0;
+    gUIState.bButtonsBlocked = 0;
     for (i = 0; i < 4; i++) {
-        gUIState.a18[i] = 0;
+        gUIState.anHeldFrames[i] = 0;
         gUIState.abAssigned[i] = 0;
-        gUIState.a30[i] = 1;
+        gUIState.abInputEnabled[i] = 1;
     }
     gUIState.b48 = 0;
     UI_EATraxReset();
@@ -727,13 +729,13 @@ void UI_BlankProcess5(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
 void UI_BlankProcess6(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
 }
 
-// Set the current text context's line spacing (UFontContext.fB4): word-wrapped lines are fB4 times
-// the font's height apart (LLFont.c fn_80011D0C); 1 is normal, UI_DrawInterface draws the UI at
-// 0.85.
+// Set the current text context's line spacing (UFontContext.fLineSpacing): word-wrapped lines are
+// that many times the font's height apart (LLFont.c fn_80011D0C); 1 is normal, UI_DrawInterface
+// draws the UI at 0.85.
 void UI_SetTextLineSpacing(f32 fSpacing) {
     UFontContext* pCtx;
     pCtx = FO_spGetCurrentPacket();
-    pCtx->fB4 = fSpacing;
+    pCtx->fLineSpacing = fSpacing;
 }
 
 // The texture in pBank whose name hashes to uHash. A name not in the bank gives index 0x80000000,

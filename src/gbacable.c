@@ -5,8 +5,9 @@
 // - one word at a time over Nintendo's GBA library (core/gba.h): GbaWriteOnline, GbaReadOnline.
 //   These and GbaReadContext, GbaOpen, GbaSetport and GbaCommunication are EA's names, from its
 //   OSReport text; so are the command names (FROMGC_..., FROMGBA_...).
-// - each port's link steps (GbaChannel.n0: 0 wait for a GBA, 1 handshake and open, 2 linked, 3 send
-//   our context, 4 the contexts differ), moved on by Gba_StepPorts; Gba_ReadPads probes the ports.
+// - each port's link steps (GbaChannel.nStep: 0 wait for a GBA, 1 handshake and open, 2 linked,
+//   3 send our context, 4 the contexts differ), moved on by Gba_StepPorts; Gba_ReadPads probes the
+//   ports.
 // - the link state (Gba_SetState lists it) that Gba_UpdateLinkState runs once a frame, and the
 //   getters and setters FE_MessageTable.c's GM_vGba* handlers call (menu messages 592-594, 611,
 //   612, 623, 624, 629, 633, 653, 654, 748).
@@ -111,17 +112,18 @@ u32 Gba_CalcCheckByte(u32 uValue) {
 
 // Unlinks every port (step 0) and makes its key (uKey): 0x40 + the port in the top byte, then 0xDF
 // for ports 1 and 3, then 0x8F for ports 2 and 3, then the check byte of those two
-// (Gba_CalcCheckByte). Also clears n4C, n50 and the new-pad-word flag n64, marks the probe result
-// u5C as SI_ERROR_UNKNOWN (0x40), and sets link state 0x12 once per port. Called by Gba_Init.
+// (Gba_CalcCheckByte). Also clears nHandshakeCode, n50 and the new-pad-word flag bNewPadWord, marks
+// the probe result uProbe as SI_ERROR_UNKNOWN (0x40), and sets link state 0x12 once per port.
+// Called by Gba_Init.
 void Gba_InitChannels(void) {
     int i;
 
     for (i = 0; i < GBA_NUM_CHANNELS; i++) {
-        gGbaChannels[i].n0 = 0;
+        gGbaChannels[i].nStep = 0;
         Gba_SetState(0x12);
-        gGbaChannels[i].u5C = 0x40;
-        gGbaChannels[i].n64 = 0;
-        gGbaChannels[i].n4C = 0;
+        gGbaChannels[i].uProbe = 0x40;
+        gGbaChannels[i].bNewPadWord = 0;
+        gGbaChannels[i].nHandshakeCode = 0;
         gGbaChannels[i].n50 = 0;
         gGbaChannels[i].uKey = (i + 0x40) << 24;
         gGbaChannels[i].uKey |= (i % 2 ? 0xDF : 0) << 16;
@@ -133,8 +135,8 @@ void Gba_InitChannels(void) {
 
 // The first step of the handshake (GbaReadContext): waits up to 100 ms for the GBA's status to be
 // exactly 0x28 (GBA_JSTAT_PSF1 | GBA_JSTAT_SEND: a word waiting), then reads that word, the code
-// the GBA answers with, into n4C. 1: read; 0: a status call or the read failed, or the wait ran
-// out.
+// the GBA answers with, into nHandshakeCode. 1: read; 0: a status call or the read failed, or the
+// wait ran out.
 s32 Gba_ReadHandshakeCode(s32 nChan) {
     u32 uWord;
     u32 uStart = OSGetTick();
@@ -153,7 +155,7 @@ s32 Gba_ReadHandshakeCode(s32 nChan) {
     if (GBARead(nChan, (u8*)&uWord, &gGbaChannels[nChan].uStatus) != 0) {
         return 0;
     }
-    gGbaChannels[nChan].n4C = uWord;
+    gGbaChannels[nChan].nHandshakeCode = uWord;
     return 1;
 }
 
@@ -277,7 +279,8 @@ s32 GbaReadContext(s32 nChan) {
         return 0;
     }
     pCh = &gGbaChannels[nChan];
-    if (memcmp(&pCh->n4C, gGbaDiscID, 4) != 0 && gGbaChannels[nChan].n4C != 0x42545745) {
+    if (memcmp(&pCh->nHandshakeCode, gGbaDiscID, 4) != 0
+        && gGbaChannels[nChan].nHandshakeCode != 0x42545745) {
         return 0;
     }
     if (Gba_SendGameCode(nChan) == 0) {
@@ -329,19 +332,19 @@ void GbaOpen(s32 nChan) {
             gGbaChannels[nChan].sent.uStart = gGbaInitTick;
             gGbaChannels[nChan].sent.b2 = gGbaChannels[nChan].got.b2;
             gGbaChannels[nChan].sent.nC = gGbaChannels[nChan].got.nC;
-            gGbaChannels[nChan].u48 = OSGetTick();
-            *pSentTick = gGbaChannels[nChan].u48;
-            pCh->n0 = 3;
+            gGbaChannels[nChan].uContextTick = OSGetTick();
+            *pSentTick = gGbaChannels[nChan].uContextTick;
+            pCh->nStep = 3;
         } else {
             if (memcmp(&pCh->got, &pCh->sent, sizeof(GbaContext)) == 0 &&
-                (uOld == *pSentTick || uOld == gGbaChannels[nChan].u48)) {
+                (uOld == *pSentTick || uOld == gGbaChannels[nChan].uContextTick)) {
                 *pSentTick = uOld;
                 bSame = 1;
-                gGbaChannels[nChan].u48 = uOld;
+                gGbaChannels[nChan].uContextTick = uOld;
             }
             if (!bSame) {
                 bOther = 1;
-                pCh->n0 = 4;
+                pCh->nStep = 4;
             }
         }
     }
@@ -361,8 +364,8 @@ void GbaOpen(s32 nChan) {
                 OSReport("GbaOpen: An error occurred in reading (chan=%d).\n", nChan);
             }
         } else {
-            gGbaChannels[nChan].u48 = uCmd;
-            gGbaChannels[nChan].n0 = 2;
+            gGbaChannels[nChan].uContextTick = uCmd;
+            gGbaChannels[nChan].nStep = 2;
             OSReport("GbaOpen: Channel %d is connected!\n", nChan);
             Gba_SetState(4);
         }
@@ -383,15 +386,16 @@ void Gba_ResetAndOpen(s32 nChan) {
 }
 
 // Port step 2 (linked), once a poll ("GbaCommunication"): asks for the GBA's pad word (0x10000000,
-// FROMGC_REQUEST_PADDATA; the answer 0x20xxxxxx goes into u58 with n64 set), sends it every port's
-// key (uKey, "POSITION DATA"), then runs request nCmd, each answer a 24-bit value under a reply
-// byte: 0x70 reads the cash on the GBA into u68; 0x90 does that and, if there is some, asks the GBA
-// to hand over n6C of it (FROMGC_REQUEST_CASHXFER), n6C becoming the amount it confirms; 0xD0 sends
-// n6C of cash to the GBA (FROMGC_REQUEST_CASH2GBA), n6C becoming the amount it confirms; 0xB0 sends
-// the current profile's stat nStat (0 best round, 1 holes in one, 2 longest drive, 3 longest putt,
-// else 0) and puts the GBA's value of it in n70; 0x71 and 0xD3 ask the GBA to save its cash and its
-// stats; 0xD1 reads its unlock mask into n74 (nothing sends 0xD1 in this build); 0 sends nothing
-// more. A failed command unlinks the port (step 0) and sets link state 0x12.
+// FROMGC_REQUEST_PADDATA; the answer 0x20xxxxxx goes into uPadWord with bNewPadWord set), sends it
+// every port's key (uKey, "POSITION DATA"), then runs request nCmd, each answer a 24-bit value
+// under a reply byte: 0x70 reads the cash on the GBA into uGbaCash; 0x90 does that and, if there is
+// some, asks the GBA to hand over nCashToMove of it (FROMGC_REQUEST_CASHXFER), nCashToMove becoming
+// the amount it confirms; 0xD0 sends nCashToMove of cash to the GBA (FROMGC_REQUEST_CASH2GBA),
+// nCashToMove becoming the amount it confirms; 0xB0 sends the current profile's stat nStat (0 best
+// round, 1 holes in one, 2 longest drive, 3 longest putt, else 0) and puts the GBA's value of it in
+// nGbaStat; 0x71 and 0xD3 ask the GBA to save its cash and its stats; 0xD1 reads its unlock mask
+// into nUnlockMask (nothing sends 0xD1 in this build); 0 sends nothing more. A failed command
+// unlinks the port (step 0) and sets link state 0x12.
 void GbaCommunication(s32 nChan, s32 nCmd, s32 nStat) {
     u32 uCmd = 0x10000000;
     u32 uWord;
@@ -401,25 +405,25 @@ void GbaCommunication(s32 nChan, s32 nCmd, s32 nStat) {
     if (GbaWriteOnline(nChan, &uCmd) == 0) {
         OSReport("GbaCommunication: An error occurred to command 'FROMGC_REQUEST_PADDATA' (chan=%d).\n",
                  nChan);
-        gGbaChannels[nChan].n0 = 0;
+        gGbaChannels[nChan].nStep = 0;
         Gba_SetState(0x12);
         return;
     }
     if (GbaReadOnline(nChan, &uWord) == 0 || uWord >> 24 != 0x20) {
         OSReport("GbaCommunication: An error occurred in reading 'FROMGBA_PADDATA' (chan=%d).\n", nChan);
-        gGbaChannels[nChan].n0 = 0;
+        gGbaChannels[nChan].nStep = 0;
         Gba_SetState(0x12);
         return;
     }
-    gGbaChannels[nChan].n64 = 0;
-    gGbaChannels[nChan].u58 = uWord;
-    gGbaChannels[nChan].n64 = 1;
+    gGbaChannels[nChan].bNewPadWord = 0;
+    gGbaChannels[nChan].uPadWord = uWord;
+    gGbaChannels[nChan].bNewPadWord = 1;
     for (i = 0; i < GBA_NUM_CHANNELS; i++) {
         if (GbaWriteOnline(nChan, &gGbaChannels[i].uKey) == 0) {
             OSReport("GbaCommunication: POSITION DATA: An error occurred in writing the %d(th) part of %d "
                      "(chan=%d).\n",
                      i + 1, GBA_NUM_CHANNELS, nChan);
-            gGbaChannels[nChan].n0 = 0;
+            gGbaChannels[nChan].nStep = 0;
             Gba_SetState(0x12);
             return;
         }
@@ -434,58 +438,58 @@ void GbaCommunication(s32 nChan, s32 nCmd, s32 nStat) {
         if (GbaWriteOnline(nChan, &uCmd) == 0) {
             OSReport("GbaCommunication: An error occurred to command 'FROMGC_REQUEST_CASHDATA' (chan=%d).\n",
                      nChan);
-            gGbaChannels[nChan].n0 = 0;
+            gGbaChannels[nChan].nStep = 0;
             Gba_SetState(0x12);
             return;
         }
         if (GbaReadOnline(nChan, &uWord) == 0 || uWord >> 24 != 0x80) {
             OSReport("GbaCommunication: An error occurred in reading 'FROMGBA_CASHDATA' (chan=%d).\n", nChan);
-            gGbaChannels[nChan].n0 = 0;
+            gGbaChannels[nChan].nStep = 0;
             Gba_SetState(0x12);
             return;
         }
-        gGbaChannels[nChan].u68 = uWord & 0xFFFFFF;
+        gGbaChannels[nChan].uGbaCash = uWord & 0xFFFFFF;
         if (nCmd == 0x70U) {    // EA compared unsigned here (cmplwi), unlike the switch
             break;
         }
-        if (gGbaChannels[nChan].u68 == 0) {
+        if (gGbaChannels[nChan].uGbaCash == 0) {
             OSReport("No cash available for transfer from GBA.\n");
             break;
         }
-        uCmd = gGbaChannels[nChan].n6C | 0x90000000;
+        uCmd = gGbaChannels[nChan].nCashToMove | 0x90000000;
         if (GbaWriteOnline(nChan, &uCmd) == 0) {
             OSReport("GbaCommunication: An error occurred to command 'FROMGC_REQUEST_CASHXFER' (chan=%d).\n",
                      nChan);
-            gGbaChannels[nChan].n0 = 0;
+            gGbaChannels[nChan].nStep = 0;
             Gba_SetState(0x12);
             return;
         }
         if (GbaReadOnline(nChan, &uWord) == 0 || uWord >> 24 != 0xA0) {
             OSReport("GbaCommunication: An error occurred in reading 'FROMGBA_CASHXFER_CONFIRM' (chan=%d).\n",
                      nChan);
-            gGbaChannels[nChan].n0 = 0;
+            gGbaChannels[nChan].nStep = 0;
             Gba_SetState(0x12);
             return;
         }
-        gGbaChannels[nChan].n6C = uWord & 0xFFFFFF;
+        gGbaChannels[nChan].nCashToMove = uWord & 0xFFFFFF;
         break;
     case 0xD0:
-        uCmd = gGbaChannels[nChan].n6C | 0xD0000000;
+        uCmd = gGbaChannels[nChan].nCashToMove | 0xD0000000;
         if (GbaWriteOnline(nChan, &uCmd) == 0) {
             OSReport("GbaCommunication: An error occurred to command 'FROMGC_REQUEST_CASH2GBA' (chan=%d).\n",
                      nChan);
-            gGbaChannels[nChan].n0 = 0;
+            gGbaChannels[nChan].nStep = 0;
             Gba_SetState(0x12);
             return;
         }
         if (GbaReadOnline(nChan, &uWord) == 0 || uWord >> 24 != 0xE0) {
             OSReport("GbaCommunication: An error occurred in reading 'FROMGBA_CASH2GBA_CONFIRM' (chan=%d).\n",
                      nChan);
-            gGbaChannels[nChan].n0 = 0;
+            gGbaChannels[nChan].nStep = 0;
             Gba_SetState(0x12);
             return;
         }
-        gGbaChannels[nChan].n6C = uWord & 0xFFFFFF;
+        gGbaChannels[nChan].nCashToMove = uWord & 0xFFFFFF;
         break;
     case 0xB0:
         // EA keeps the stat number in nWhich and reuses nStat for the stat's value.
@@ -511,32 +515,32 @@ void GbaCommunication(s32 nChan, s32 nCmd, s32 nStat) {
         if (GbaWriteOnline(nChan, &uCmd) == 0) {
             OSReport("GbaCommunication: An error occurred to command 'FROMGC_REQUEST_STATS' (chan=%d).\n",
                      nChan);
-            gGbaChannels[nChan].n0 = 0;
+            gGbaChannels[nChan].nStep = 0;
             Gba_SetState(0x12);
             return;
         }
         if (GbaReadOnline(nChan, &uWord) == 0 || uWord >> 24 != nWhich + 0xC0) {
             OSReport("GbaCommunication: An error occurred in reading 'FROMGBA_STAT_TRANSFER' (chan=%d).\n",
                      nChan);
-            gGbaChannels[nChan].n0 = 0;
+            gGbaChannels[nChan].nStep = 0;
             Gba_SetState(0x12);
             return;
         }
-        gGbaChannels[nChan].n70 = uWord & 0xFFFFFF;
+        gGbaChannels[nChan].nGbaStat = uWord & 0xFFFFFF;
         break;
     case 0x71:
         uCmd = 0x71000000;
         if (GbaWriteOnline(nChan, &uCmd) == 0) {
             OSReport("GbaCommunication: An error occurred to command 'FROMGC_REQUEST_SAVE_CASH' (chan=%d).\n",
                      nChan);
-            gGbaChannels[nChan].n0 = 0;
+            gGbaChannels[nChan].nStep = 0;
             Gba_SetState(0x12);
             return;
         }
         if (GbaReadOnline(nChan, &uWord) == 0 || uWord >> 24 != 0x81) {
             OSReport("GbaCommunication: An error occurred in reading 'FROMGBA_CASH_SAVED' (chan=%d).\n",
                      nChan);
-            gGbaChannels[nChan].n0 = 0;
+            gGbaChannels[nChan].nStep = 0;
             Gba_SetState(0x12);
             return;
         }
@@ -546,14 +550,14 @@ void GbaCommunication(s32 nChan, s32 nCmd, s32 nStat) {
         if (GbaWriteOnline(nChan, &uCmd) == 0) {
             OSReport("GbaCommunication: An error occurred to command 'FROMGC_REQUEST_SAVE_STAT' (chan=%d).\n",
                      nChan);
-            gGbaChannels[nChan].n0 = 0;
+            gGbaChannels[nChan].nStep = 0;
             Gba_SetState(0x12);
             return;
         }
         if (GbaReadOnline(nChan, &uWord) == 0 || uWord >> 24 != 0xD4) {
             OSReport("GbaCommunication: An error occurred in reading 'FROMGBA_STAT_SAVED' (chan=%d).\n",
                      nChan);
-            gGbaChannels[nChan].n0 = 0;
+            gGbaChannels[nChan].nStep = 0;
             Gba_SetState(0x12);
             return;
         }
@@ -564,18 +568,18 @@ void GbaCommunication(s32 nChan, s32 nCmd, s32 nStat) {
             OSReport(
                 "GbaCommunication: An error occurred to command 'FROMGC_REQUEST_UNLOCKMASK' (chan=%d).\n",
                 nChan);
-            gGbaChannels[nChan].n0 = 0;
+            gGbaChannels[nChan].nStep = 0;
             Gba_SetState(0x12);
             return;
         }
         if (GbaReadOnline(nChan, &uWord) == 0 || uWord >> 24 != 0xD2) {
             OSReport("GbaCommunication: An error occurred in reading 'FROMGBA_UNLOCKMASK' (chan=%d).\n",
                      nChan);
-            gGbaChannels[nChan].n0 = 0;
+            gGbaChannels[nChan].nStep = 0;
             Gba_SetState(0x12);
             return;
         }
-        gGbaChannels[nChan].n74 = uWord & 0xFFFFFF;
+        gGbaChannels[nChan].nUnlockMask = uWord & 0xFFFFFF;
         break;
     }
 }
@@ -589,7 +593,7 @@ void GbaSetport(s32 nChan) {
 
     if (GbaWriteOnline(nChan, &uCmd) == 0) {
         OSReport("GbaSetport: An error occurred to command 'FROMGC_SETPORT' (chan=%d).\n", nChan);
-        gGbaChannels[nChan].n0 = 0;
+        gGbaChannels[nChan].nStep = 0;
         Gba_SetState(0x12);
         return;
     }
@@ -597,7 +601,7 @@ void GbaSetport(s32 nChan) {
         if (GbaWriteOnline(nChan, (u32*)((u8*)&gGbaChannels[nChan].sent + i)) == 0) {
             OSReport("GbaSetport: An error occurred in writing  the %d(th) part of %d (chan=%d).\n", i + 1,
                      sizeof(GbaContext), nChan);
-            gGbaChannels[nChan].n0 = 0;
+            gGbaChannels[nChan].nStep = 0;
             Gba_SetState(0x12);
             return;
         }
@@ -605,12 +609,12 @@ void GbaSetport(s32 nChan) {
     for (i = 0; i < sizeof(GbaContext); i += 4) {
         if (GbaReadOnline(nChan, (u32*)((u8*)&gGbaChannels[nChan].got + i)) == 0) {
             OSReport("GbaSetport: An error occurred in reading (chan=%d).\n", nChan);
-            gGbaChannels[nChan].n0 = 0;
+            gGbaChannels[nChan].nStep = 0;
             Gba_SetState(0x12);
             return;
         }
     }
-    gGbaChannels[nChan].n0 = 2;
+    gGbaChannels[nChan].nStep = 2;
     OSReport("GbaSetPort: Channel %d is connected!\n", nChan);
     Gba_SetState(4);
 }
@@ -623,20 +627,20 @@ void Gba_SendContextDiffer(s32 nChan) {
 
     if (GbaWriteOnline(nChan, &uCmd) == 0) {
         OSReport("GbaSetport: An error occurred to command 'FROMGC_CONTEXT_DIFFER' (chan=%d).\n", nChan);
-        gGbaChannels[nChan].n0 = 0;
+        gGbaChannels[nChan].nStep = 0;
         Gba_SetState(0x10);
     } else {
-        gGbaChannels[nChan].n0 = 0;
+        gGbaChannels[nChan].nStep = 0;
         Gba_SetState(0x10);
     }
 }
 
-// Moves each port's link on one step (GbaChannel.n0); nCmd and nArg are the request a linked port
-// runs (GbaCommunication's nCmd and nStat; 0: none). A port whose last probe (u5C, Gba_ReadPads)
-// found no GBA (SI_GBA, 0x40000), or any port but gGbaPortInUse while that is set, is unlinked.
-// Steps: 0 waits up to 800 ms (keeping the sound and the disc-error screen going) for the GBA to
-// answer a status call, then goes to step 1 with link state 2 and makes the port gGbaPortInUse; 1
-// Gba_ResetAndOpen; 2 GbaCommunication; 3 GbaSetport; 4 Gba_SendContextDiffer.
+// Moves each port's link on one step (GbaChannel.nStep); nCmd and nArg are the request a linked
+// port runs (GbaCommunication's nCmd and nStat; 0: none). A port whose last probe (uProbe,
+// Gba_ReadPads) found no GBA (SI_GBA, 0x40000), or any port but gGbaPortInUse while that is set, is
+// unlinked. Steps: 0 waits up to 800 ms (keeping the sound and the disc-error screen going) for the
+// GBA to answer a status call, then goes to step 1 with link state 2 and makes the port
+// gGbaPortInUse; 1 Gba_ResetAndOpen; 2 GbaCommunication; 3 GbaSetport; 4 Gba_SendContextDiffer.
 void Gba_StepPorts(s32 nCmd, s32 nArg) {
     GbaChannel* pCh;
     s32 nChan = 0;
@@ -646,11 +650,11 @@ void Gba_StepPorts(s32 nCmd, s32 nArg) {
 
     do {
         pCh = &gGbaChannels[nChan];
-        if (pCh->u5C != 0x40000 || (gGbaPortInUse != -1 && gGbaPortInUse != nChan)) {
-            pCh->n4C = 0;
-            pCh->n0 = 0;
+        if (pCh->uProbe != 0x40000 || (gGbaPortInUse != -1 && gGbaPortInUse != nChan)) {
+            pCh->nHandshakeCode = 0;
+            pCh->nStep = 0;
         } else {
-            switch (pCh->n0) {
+            switch (pCh->nStep) {
             case 0:
                 uStart = OSGetTick();
                 pStatus = &pCh->uStatus;
@@ -660,7 +664,7 @@ void Gba_StepPorts(s32 nCmd, s32 nArg) {
                     nErr = GBAGetStatus(nChan, pStatus);
                 } while (nErr != 0 && OSGetTick() - uStart < GBA_TICKS_PER_MS * 800);
                 if (nErr == 0) {
-                    pCh->n0 = 1;
+                    pCh->nStep = 1;
                     Gba_SetState(2);
                     gGbaPortInUse = nChan;
                 }
@@ -686,18 +690,19 @@ void Gba_StepPorts(s32 nCmd, s32 nArg) {
     } while (nChan < GBA_NUM_CHANNELS);
 }
 
-// fake match: EA takes the probe's slot through an inline; &pCh->u5C in place allocates pType r25, not r30
+// fake match: EA takes the probe's slot through an inline; &pCh->uProbe in place allocates pType
+// r25, not r30
 static inline u32* fn_80123E34_Read(GbaChannel* pCh) {
-    return &pCh->u5C;
+    return &pCh->uProbe;
 }
 
 // Reads the pads into gGbaPads (nothing else reads them). On a linked port, a new pad word from the
-// GBA (u58, n64 set) whose check byte holds replaces the port's buttons with the GBA's d-pad (bits
-// 20-23: right, left, up, down, as the pad's right, left, up and down bits). A port in step 0 with
-// no GBA transfer running (GBAGetProcessStatus not GBA_BUSY) is probed (SIProbe into u5C): with no
-// port in use the probe is repeated for up to 800 ms until it finds a GBA (SI_GBA), else ports
-// other than the one in use are probed once. Unlinked ports whose last probe gave
-// SI_ERROR_NO_RESPONSE (8) or SI_ERROR_UNKNOWN (0x40) are reset (PADReset).
+// GBA (uPadWord, bNewPadWord set) whose check byte holds replaces the port's buttons with the GBA's
+// d-pad (bits 20-23: right, left, up, down, as the pad's right, left, up and down bits). A port in
+// step 0 with no GBA transfer running (GBAGetProcessStatus not GBA_BUSY) is probed (SIProbe into
+// uProbe): with no port in use the probe is repeated for up to 800 ms until it finds a GBA
+// (SI_GBA), else ports other than the one in use are probed once. Unlinked ports whose last probe
+// gave SI_ERROR_NO_RESPONSE (8) or SI_ERROR_UNKNOWN (0x40) are reset (PADReset).
 void Gba_ReadPads(void) {
     int nChan;
     u32 uReset = 0;
@@ -716,18 +721,19 @@ void Gba_ReadPads(void) {
         pCh = &gGbaChannels[nChan];
         pPad = &gGbaPads[nChan];
         pMask = &gGbaPadResetBits[nChan];
-        if (pCh->n0 == 2) {
-            if (pCh->n64 != 0) {
-                if ((u8)pCh->u58 == Gba_CalcCheckByte(((pCh->u58 >> 16) & 0xFF) | (pCh->u58 & 0xFF00))) {
-                    uKey = pCh->u58;
+        if (pCh->nStep == 2) {
+            if (pCh->bNewPadWord != 0) {
+                if ((u8)pCh->uPadWord
+                    == Gba_CalcCheckByte(((pCh->uPadWord >> 16) & 0xFF) | (pCh->uPadWord & 0xFF00))) {
+                    uKey = pCh->uPadWord;
                     pPad->uButtons = (((uKey >> 23) & 1) ? 4 : 0) |
                                      ((((uKey >> 22) & 1) ? 8 : 0) |
                                       ((((uKey >> 20) & 1) ? 2 : 0) | ((uKey >> 21) & 1)));
                 }
             }
-            pCh->n64 = 0;
+            pCh->bNewPadWord = 0;
         } else {
-            if (pCh->n0 == 0 && GBAGetProcessStatus(nChan, &uProc) != 2) {
+            if (pCh->nStep == 0 && GBAGetProcessStatus(nChan, &uProc) != 2) {
                 if (gGbaPortInUse == -1) {
                     uStart = OSGetTick();
                     pType = fn_80123E34_Read(pCh);
@@ -737,10 +743,10 @@ void Gba_ReadPads(void) {
                         *pType = SIProbe(nChan);
                     } while (*pType != 0x40000 && OSGetTick() - uStart < GBA_TICKS_PER_MS * 800);
                 } else if (nChan != gGbaPortInUse) {
-                    pCh->u5C = SIProbe(nChan);
+                    pCh->uProbe = SIProbe(nChan);
                 }
             }
-            if (pCh->u5C == 8 || pCh->u5C == 0x40) {
+            if (pCh->uProbe == 8 || pCh->uProbe == 0x40) {
                 uReset |= *pMask;
             }
         }
@@ -752,9 +758,6 @@ void Gba_ReadPads(void) {
 }
 
 // ---- the link's setup, its poll and state, and the menus' getters and setters ----
-
-s32 OSGetResetButtonState();
-s32 OSResetSystem(s32, s32, s32);
 
 // Sets the link code up (GM_vGbaStartLink): keeps the disc's ID (gGbaDiscID) and the start tick
 // (gGbaInitTick), unlinks every port and makes its key (Gba_InitChannels), and starts the GBA
@@ -831,35 +834,35 @@ void Gba_UnlockProfileRewards(void) {
     gGbaRewardsUnlocked = 1;
 }
 
-// The cash to move between the GBA and the profile: n6C of the port in use. With no port in use
-// (gGbaPortInUse -1) it indexes gGbaChannels[-1]: the bytes before the array (TibExt.c's card
+// The cash to move between the GBA and the profile: nCashToMove of the port in use. With no port in
+// use (gGbaPortInUse -1) it indexes gGbaChannels[-1]: the bytes before the array (TibExt.c's card
 // state, its file name at 0x38).
 s32 Gba_GetCashToMove(void) {
-    return gGbaChannels[gGbaPortInUse].n6C;
+    return gGbaChannels[gGbaPortInUse].nCashToMove;
 }
 
-// Sets the cash to move (n6C of the port in use). With no port in use (gGbaPortInUse -1) it indexes
-// gGbaChannels[-1]: it writes into TibExt.c's card state (its file name at 0x38).
+// Sets the cash to move (nCashToMove of the port in use). With no port in use (gGbaPortInUse -1) it
+// indexes gGbaChannels[-1]: it writes into TibExt.c's card state (its file name at 0x38).
 void Gba_SetCashToMove(s32 n) {
-    gGbaChannels[gGbaPortInUse].n6C = n;
+    gGbaChannels[gGbaPortInUse].nCashToMove = n;
 }
 
-// Zeroes the cash to move (n6C of the port in use). With no port in use (gGbaPortInUse -1) it
-// indexes gGbaChannels[-1]: it writes into TibExt.c's card state.
+// Zeroes the cash to move (nCashToMove of the port in use). With no port in use (gGbaPortInUse -1)
+// it indexes gGbaChannels[-1]: it writes into TibExt.c's card state.
 void Gba_ClearCashToMove(void) {
-    gGbaChannels[gGbaPortInUse].n6C = 0;
+    gGbaChannels[gGbaPortInUse].nCashToMove = 0;
 }
 
-// The cash the GBA holds, as last read (u68 of the port in use, request 0x70 or 0x90). With no port
-// in use (gGbaPortInUse -1) it indexes gGbaChannels[-1]: TibExt.c's card state.
+// The cash the GBA holds, as last read (uGbaCash of the port in use, request 0x70 or 0x90). With no
+// port in use (gGbaPortInUse -1) it indexes gGbaChannels[-1]: TibExt.c's card state.
 s32 Gba_GetCashOnGba(void) {
-    return gGbaChannels[gGbaPortInUse].u68;
+    return gGbaChannels[gGbaPortInUse].uGbaCash;
 }
 
-// The GBA's value of the stat last sent (n70 of the port in use, request 0xB0). With no port in use
-// (gGbaPortInUse -1) it indexes gGbaChannels[-1]: TibExt.c's card state.
+// The GBA's value of the stat last sent (nGbaStat of the port in use, request 0xB0). With no port
+// in use (gGbaPortInUse -1) it indexes gGbaChannels[-1]: TibExt.c's card state.
 s32 Gba_GetGbaStat(void) {
-    return gGbaChannels[gGbaPortInUse].n70;
+    return gGbaChannels[gGbaPortInUse].nGbaStat;
 }
 
 // Raises (1, link state 0xC) or clears the request that Gba_UpdateLinkState's state 5 sends: the

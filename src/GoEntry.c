@@ -13,7 +13,6 @@ void VISetBlack(int bBlack);
 void VIFlush(void);
 void VIWaitForRetrace(void);
 int  PADRecalibrate(u32 uMask);
-s32  OSResetSystem(s32, s32, s32);
 
 // The systems the loop starts and steps (gomainloop.c and others; types from the calls here).
 void fn_8006C6F0(void);

@@ -59,12 +59,12 @@ void FE_LogoDesign_CloseModule(void) {
 // The logo editor works on the profile's user logo n (0..4) from now on; it is marked changed so
 // its texture is redrawn (GM_vSelectLogo).
 void FE_LogoDesign_SetCurrentLogoNumber(s32 n) {
-    gpLogoEdit->n0 = n;
+    gpLogoEdit->nLogo = n;
     gpLogoEdit->bDirty = 1;
 }
 
 s32 FE_LogoDesign_GetCurrentLogoNumber(void) {
-    return gpLogoEdit->n0;
+    return gpLogoEdit->nLogo;
 }
 
 // Sets the logo editor's shape (LOGO_SQUARE: 64 x 64, LOGO_RECT: 128 x 32) and marks the logo
@@ -200,12 +200,12 @@ void FE_LogoDesign_LoadClut(void) {
 }
 
 // The logo being edited: the menus' own copy while bEditingCopy is set, else the profile's user
-// logo that LogoEdit.n0 names.
+// logo that LogoEdit.nLogo names.
 LogoRecord* FE_LogoDesign_GetCurrentLogo(void) {
     if (gpFEProfile->bEditingCopy) {
         return &gpFEProfile->logoCopy;
     }
-    return &FE_GetCurrentProfile()->choices.aLogo[gpLogoEdit->n0];
+    return &FE_GetCurrentProfile()->choices.aLogo[gpLogoEdit->nLogo];
 }
 
 // The logo palette (CLUT): 256 colours of 16 bits (see FE_LogoDesign_GetClutEntry).

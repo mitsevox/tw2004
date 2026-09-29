@@ -1476,8 +1476,8 @@ f32 GM_GetGameProgress(SaveProfile* pProfile) {
 }
 
 // The bonus part of the profile's completion score (GM_GetGameProgress adds it): a point for each
-// real-time event won; half a point for each of awards 23..38 won, each of the 16 a1C0 awards won
-// and each all-time record held.
+// real-time event won; half a point for each of awards 23..38 won, each of the 16 aTourAward awards
+// won and each all-time record held.
 f32 GM_GetBonusProgress(SaveProfile* pProfile) {
     f32 f = 0.0f;
     int i;
@@ -1492,12 +1492,12 @@ f32 GM_GetBonusProgress(SaveProfile* pProfile) {
         }
     }
     for (i = 0; i < 12; i++) {
-        if (pProfile->a1C0[i].bWon) {
+        if (pProfile->aTourAward[i].bWon) {
             f += 0.5f;
         }
     }
     for (i = 12; i < 16; i++) {
-        if (pProfile->a1C0[i].bWon) {
+        if (pProfile->aTourAward[i].bWon) {
             f += 0.5f;
         }
     }

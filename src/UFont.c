@@ -103,7 +103,7 @@ void UFont_ResetContext(void) {
     pCtx->n6C = 1;
     pCtx->nAC = 0;
     pCtx->fB0 = 1.0f;
-    pCtx->fB4 = 1.0f;
+    pCtx->fLineSpacing = 1.0f;
     pCtx->fB8 = 0.0f;
     pCtx->fBC = 0.5f;
     pCtx->fC0 = 0.5f;

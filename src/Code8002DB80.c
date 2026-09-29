@@ -46,10 +46,6 @@ void Player_SetGolfer(int nPlayer, int nGolfer, int nController, u32 uBag, int b
 
 void Golfer_TableSetup(void);
 
-// ---- small queries ------------------------------------------------------------------------------
-
-void Input_vSetVibrationStatus(int nPad, u8 nValue);
-
 // ---- setting up the players ---------------------------------------------------------------------
 
 #define BAG_ALL      0x03FFFFFF     // every club

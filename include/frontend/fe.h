@@ -34,7 +34,8 @@ typedef struct FEState {
     u8  bFirstTime;             // 0x00F  the menus' first start (TW07 firstTime): the intro movie
                                 //        plays and the front end loads without the loading
                                 //        screen; set by FE_vOpenONCE and front-end message 150
-    u8  b10;                    // 0x010  set by FE_vOpenONCE
+    u8  b10;                    // 0x010  a flag of the menu scripts (front-end messages 333 /
+                                //        334 read and set it); set by FE_vOpenONCE
     u8  bDemoStarting;          // 0x011  the menus start the demo (GM_vStartDemo); cleared as a
                                 //        game starts (FE_vExitUI)
     u8  unk12[2];
@@ -61,54 +62,67 @@ extern FEState gFEState;
 // (also for one that is not available).
 extern f32 gFELockedGolferShade;        // uiProcessPolygon.c's (= 0.25f); nothing in this build reads it
 
-// The front end's screen state (gUIState, 0x4C bytes). Only what the cleaned code reads.
-typedef struct FEScreen {
+// The UI's controller input and fade state (gUIState, 0x4C bytes; our name). Only what the
+// cleaned code reads.
+typedef struct UIState {
     u8  bFadeToBlack;           // 0x00  the fade to black runs (set when the round or the menus
                                 //       are left; uiProcessInterface.c draws it and clears it)
-    u8  a1[4];                  // 0x01  per controller: plugged in (UI_ReadControllers); read by a menu
-                                //       message (GM_vIsControllerPluggedIn: 1 for index 9)
+    u8  abPluggedIn[4];         // 0x01  per controller: plugged in (UI_ReadControllers); read by a
+                                //       menu message (GM_vIsControllerPluggedIn: 1 for index 9)
     u8  unk5[3];
-    u32 a8[4];                  // 0x08  per controller: the buttons held last frame (UI_ReadControllers)
-    u32 a18[4];                 // 0x18  per controller: frames the same buttons have been held,
+    u32 auLastButtons[4];       // 0x08  per controller: the buttons held last frame, cleared when
+                                //       they have been held past 8 frames (so they count as
+                                //       pressed again)
+    u32 anHeldFrames[4];        // 0x18  per controller: frames the same buttons have been held,
                                 //       restarted past 8; cleared by UI_vInitModule
-    u8  a28[4];                 // 0x28  per controller: a1 as of the last frame
+    u8  abPluggedInLast[4];     // 0x28  per controller: abPluggedIn, copied at the end of each
+                                //       UI_ReadControllers; nothing reads it
     u8  abAssigned[4];          // 0x2C  per controller: given to a player (GM_vSetPlayerController;
                                 //       GM_vIsControllerAssigned reads it)
-    u8  a30[4];                 // 0x30  set to 1 by UI_vInitModule; UI_SetControllerEnabled sets one
+    u8  abInputEnabled[4];      // 0x30  per controller: its buttons reach the UI
+                                //       (UI_SetControllerEnabled; UI_vInitModule enables all four)
     s32 nFramesNoPad;           // 0x34  frames with no controller plugged in (UI_ReadControllers)
-    s32 nNumPluggedIn;          // 0x38  controllers plugged in, counted every frame (UI_ReadControllers;
-                                //       GM_vGetNumControllersPluggedIn)
-    s32 n3C;                    // 0x3C  the UI file table holding the movie entries (UI_ResolveFileEntries)
-    u8  b40;                    // 0x40  cleared by UI_vInitModule
+    s32 nNumPluggedIn;          // 0x38  controllers plugged in, counted every frame
+                                //       (UI_ReadControllers; GM_vGetNumControllersPluggedIn)
+    s32 nPictureTable;          // 0x3C  the UI file table holding the picture entries (kind 2;
+                                //       UI_ResolveFileEntries)
+    u8  bButtonsBlocked;        // 0x40  no button reaches the UI: a two-player mode (7 or 26) in
+                                //       the menus has too few controllers (UI_ReadControllers)
     u8  unk41[0x44 - 0x41];
     f32 fFade;                  // 0x44  the fade to black before a movie, 0 to 1
-    u8  b48;                    // 0x48  cleared by UI_vInitModule
-    u8  b49;                    // 0x49  FEgolferanim.c's FE_IsGolferRenderAllowed tests it
+    u8  b48;                    // 0x48  cleared by UI_vInitModule; nothing else uses it
+    u8  bHideMenuGolfer;        // 0x49  set with bButtonsBlocked: the menu golfer is not drawn
+                                //       (FEgolferanim.c FE_IsGolferRenderAllowed)
     u8  unk4A[0x4C - 0x4A];
-} FEScreen;
-LAYOUT_ASSERT(FEScreen, 0x4C);
+} UIState;
+LAYOUT_ASSERT(UIState, 0x4C);
 
-extern FEScreen gUIState;
+extern UIState gUIState;
 
-// gUILoadingScreen (0x38 bytes), also used by the code at 0x8009170C. Only what the cleaned code reads.
-typedef struct FE801D8858 {
-    s32 n0;                     // 0x00  } UI_InitLoadingBar sets them up
-    f32 f4;                     // 0x04  }
-    f32 f8;                     // 0x08  }
-    f32 fC;                     // 0x0C  }
-    f32 f10;                    // 0x10  }
-    s32 n14;                    // 0x14  the number of players in game type 4, else 0
-    u8  b18;                    // 0x18  set once UI_InitLoadingBar has set it up
+// The loading screen and its bar of eight tiles (gUILoadingScreen, 0x38 bytes; our name):
+// uiProcessPolygon.c UI_InitLoadingBar sets it up and UI_DrawLoadingScreenAndProgressBar steps it;
+// FE_Manager.c clears bRunning and pPicture. Only what the cleaned code reads.
+typedef struct UILoadingScreen {
+    s32 n0;                     // 0x00  set to 0 by UI_InitLoadingBar; nothing reads it
+    f32 fNextTile;              // 0x04  when fElapsed passes it the next tile is shown and it moves
+                                //       on by fTileSecs (it starts at fTileSecs)
+    f32 fNextRedraw;            // 0x08  until a tile is due the screen is redrawn only when
+                                //       fElapsed passes it, which moves it on 2 seconds
+    f32 fTileSecs;              // 0x0C  seconds per tile: (4.83 * nNumPlayers + 3.1) / 8
+    f32 fElapsed;               // 0x10  seconds since it was set up
+    s32 nNumPlayers;            // 0x14  the number of players in game type 4, else 0
+    u8  bRunning;               // 0x18  set up and running (UI_InitLoadingBar does nothing while set)
     u8  unk19[0x1C - 0x19];
-    s32 n1C;                    // 0x1C
-    u64 u20;                    // 0x20  TI_sRead's clock when it was set up, then at the last update
-    u64 u28;                    // 0x28  TI_sRead's clock at this update (UI_DrawLoadingScreenAndProgressBar)
-    struct LLPict* p30;         // 0x30  a picture decoded from the 'load' object (UI_DecodeLoadingPicture)
+    s32 nLastTile;              // 0x1C  the last tile shown (-1: none yet; up to 8)
+    u64 uLastTime;              // 0x20  TI_sRead's clock when it was set up, then at the last step
+    u64 uTime;                  // 0x28  TI_sRead's clock at this step
+    struct LLPict* pPicture;    // 0x30  the loading picture, decoded from the 'load' object
+                                //       (UI_DecodeLoadingPicture)
     u8  unk34[0x38 - 0x34];
-} FE801D8858;
-LAYOUT_ASSERT(FE801D8858, 0x38);
+} UILoadingScreen;
+LAYOUT_ASSERT(UILoadingScreen, 0x38);
 
-extern FE801D8858 gUILoadingScreen;
+extern UILoadingScreen gUILoadingScreen;
 
 // A corner of a quad uiProcessPolygon.c UIPoly_UnpackVertex turns into draw arrays (uiArc.c builds
 // them too). Our name: f8..f10 go out as a position, f0/f4 as texture coordinates, au14 as a colour.
@@ -125,12 +139,13 @@ LAYOUT_ASSERT(FEVertex, 0x18);
 // A textured quad of the front end that uiProcessPolygon.c UIPoly_ProcessMessage takes messages
 // for. Our name; only what the cleaned code reads (its size is not known).
 typedef struct FEQuad {
-    s16 n0;                     // 0x00  } with n2, an index pair into the UI file (UI_LoadEntryPicture)
-    s16 n2;                     // 0x02  }
-    s16 n4;                     // 0x04  its colour in the front end's colour table (-1: none)
+    s16 nEntry;                 // 0x00  } its UI file entry: entry nEntry of table nTable (-1:
+    s16 nTable;                 // 0x02  } none, untextured); message 5 sets them
+    s16 nColour;                // 0x04  its colour in the front end's colour table (-1: none)
     u8  unk6[0x8 - 0x6];
-    s16 n8;                     // 0x08  bit 0: a texture keeps its tint (UIPoly_Draw)
-    s16 nA;                     // 0x0A
+    s16 nFlags;                 // 0x08  bit 0: a texture keeps the corners' colours (UIPoly_Draw)
+    s16 nA;                     // 0x0A  passed to UI_LoadEntryPicture / UI_ReleaseEntryPicture,
+                                //       which ignore it
     FEVertex aVtx[4];           // 0x0C  the corners (UIPoly_Draw draws them)
 } FEQuad;
 
@@ -151,30 +166,36 @@ void UIPoly_ProcessMessage(FEQuad* pQuad, int nMsg, u32 bSplit, FEMsgArg* pArgs)
 extern f32* gpUIPolyColourMul;
 extern f32* gpUIPolyColourAdd;
 
-// gUIDelayedHint (0xC bytes), also read by uiProcessInterface.c. A menu message sets n4 and clears n0.
-typedef struct FE801D880C {
-    s32 n0;                     // 0x0  0..2; uiProcessInterface.c sets it to -1
-    s32 n4;                     // 0x4
+// A value handed back to the UI as a hint a few frames later (gUIDelayedHint, 0xC bytes; our
+// name): front-end message 53 (GM_vMCfunction) and round command 84 (GM_vIG_MCfunction) set it,
+// uiProcessInterface.c UI_DrawInterface counts the frames and sends it.
+typedef struct UIDelayedHint {
+    s32 nFrames;                // 0x0  -1: nothing waiting; the command sets 0, UI_DrawInterface
+                                //      counts it up each frame; past 2 it sends nValue, back to -1
+    s32 nValue;                 // 0x4  sent with hint 0x23 in the menus, 0x24 in a round
     u8  unk8[4];
-} FE801D880C;
-LAYOUT_ASSERT(FE801D880C, 0xC);
+} UIDelayedHint;
+LAYOUT_ASSERT(UIDelayedHint, 0xC);
 
-extern FE801D880C gUIDelayedHint;
+extern UIDelayedHint gUIDelayedHint;
 
-// One of 200 entries (gUITxf2BankState); uiProcessInterface.c sets them from gUITxf2BankMarkOnExit.
-typedef struct FE801D8890 {
-    u8  b0;                     // 0x0
-    u8  b1;                     // 0x1
+// The state of one 'txf2' texture bank (gUITxf2BankState, one per bank of lbl_801A26DC; our name).
+typedef struct UITxf2BankState {
+    u8  b0;                     // 0x0  set (and b1 cleared) at the menus' shutdown for the banks
+                                //      gUITxf2BankMarkOnExit marks; cleared by FE_InitManager;
+                                //      nothing reads it
+    u8  b1;                     // 0x1  only cleared (with b0)
     u8  unk2[2];
-    s32 n4;                     // 0x4
-} FE801D8890;
-LAYOUT_ASSERT(FE801D8890, 0x8);
+    s32 nFreeBeforeMovie;       // 0x4  > 0: the bank's pixels are freed before a movie
+                                //      (UI_FreeTxf2BankPixels); only ever cleared in this build
+} UITxf2BankState;
+LAYOUT_ASSERT(UITxf2BankState, 0x8);
 
-#define FE_NUM_801D8890 200
-extern FE801D8890 gUITxf2BankState[FE_NUM_801D8890];
+#define UI_NUM_TXF2_BANKS 200
+extern UITxf2BankState gUITxf2BankState[UI_NUM_TXF2_BANKS];
 // One word per gUITxf2BankState entry: nonzero sets that entry's b0 (and clears its b1) when the front
 // end is shut down in game type 3 (uiProcessInterface.c UI_CloseInterface).
-extern u32 gUITxf2BankMarkOnExit[FE_NUM_801D8890];
+extern u32 gUITxf2BankMarkOnExit[UI_NUM_TXF2_BANKS];
 
 // The profile being worked on in the menus (gpFEProfile points to it; 0x11708 bytes, allocated
 // and cleared by FE_InitManager).
@@ -232,15 +253,15 @@ typedef struct FEBio {
 } FEBio;
 LAYOUT_ASSERT(FEBio, 0x1F8);
 
-extern s32 gStartUnlockedGolfers[16];            // golfer ids GM_vIsGolferUnlockedByDefault counts as unlocked
+extern s32 gStartUnlockedGolfers[16];  // the golfers unlocked from the start (GM_vIsGolferUnlockedByDefault)
 
 #define FE_NUM_BIOS 29
 extern FEBio* gpFEBios;             // a copy of the 'BIO ' stream object's data (FE_CharBios_LoadBIOfromStream)
 
 // The profile backups (FEState.p658) can be moved out to ARAM (FE_MoveBackupsToARAM) and back (FE_RestoreBackupsFromARAM).
-#define FE_BACKUP_SIZE 0x41820          // the four slots' backups (4 x 0x10600) and 0x20 more
-extern u32 gFEBackupSize;                // their size
-extern u32 gFEBackupAramAddr;                // their ARAM address while they are there (0: not there)
+#define FE_BACKUP_SIZE 0x41820  // the four slots' backups (4 x 0x10600) and 0x20 more
+extern u32 gFEBackupSize;       // their size
+extern u32 gFEBackupAramAddr;   // their ARAM address while they are there (0: not there)
 
 // ---- the golfers animated on menu screens (FEgolferanim.c) -----------------------------------
 
@@ -480,7 +501,7 @@ void FE_SendHint10Args(int nMsg, s32 nA, s32 nB, s32 nC, s32 nD, s32 nE, s32 nF,
                  s32 nJ);
 SaveProfile* FE_GetCurrentProfile(void);         // the profile being worked on
 u8   FE_CrAP_IsItemLocked(s32 nAsset, SaveProfile* pProfile);  // the asset is locked (FE_Manager.c)
-int  FE_DateToInt(int a, int b, int c);  // a date (month, day, year from fn_8011E020) packed
+int  FE_DateToInt(int nMonth, int nDay, int nYear);  // nDay * 1000000 + nMonth * 10000 + nYear
 int  FE_GetCurrUserID(void);                 // its player slot
 u8   FE_movieIsQueueEmpty(void);
 int  FE_GetSaleIDFromSaleCategory(int n);                // -1, -2, -3 to 0, 1, 2; anything else to 0
@@ -500,7 +521,7 @@ void FE_BackupProfileClaimRow(int nSlot);
 void FE_BackupProfile(int nSlot);
 void FE_SwapBackupRows(int a, int b);         // swap backup rows a and b (p658)
 GolferRecord* FE_spGetGolfer(int nGolfer); // a golfer's record (created golfers: the profile's)
-void FE_IntToDate(int n, int* pA, int* pB, int* pC);     // unpack n = b * 1000000 + a * 10000 + c
+void FE_IntToDate(int nDate, int* pMonth, int* pDay, int* pYear);  // unpack FE_DateToInt's number
 void FE_vExitUI(void);
 void Gaud_StopMusic(void);                 // (0x800A75B4) FE_Manager.c calls it after queueing a movie
 
@@ -548,6 +569,7 @@ int  FE_GetLastCrAPAsset(void);
 void FE_SetLastCrAPCategory(int nPart);
 int  FE_GetLastCrAPCategory(void);
 void FE_ResetCrAPGolferFromPreview(void);
+void FE_CrAPBall_Render(u8 bTarget);   // Code800B90F4.c: the ball in the menu golfer's hand
 
 // ---- the logo editor (FE_LogoDesign.c) -------------------------------------------------------
 
@@ -555,7 +577,8 @@ void FE_ResetCrAPGolferFromPreview(void);
 
 // The logo being edited (12 bytes, allocated by FE_LogoDesign_InitModule).
 typedef struct LogoEdit {
-    s32 n0;                     // 0x0  which logo: FE_LogoDesign_GetCurrentLogo picks its 0x1022-byte record by it
+    s32 nLogo;                  // 0x0  the user logo edited (0..4): SkinChoices.aLogo[nLogo]
+                                //      (FE_LogoDesign_GetCurrentLogo)
     s32 nShape;                 // 0x4  LOGO_SQUARE or LOGO_RECT
     u8  bDirty;                 // 0x8  changed since it was last copied into its texture
 } LogoEdit;
@@ -566,7 +589,7 @@ extern s16* gpLogoClut;               // the palette: 256 colours, 1-bit alpha (
                                         // and 5-5-5 RGB; read signed (lha)
 extern u8 gbLogoClutLoaded;                 // the palette has been copied from "__LogoSquare"
 
-void FE_LogoDesign_SetCurrentLogoNumber(s32 n);                // pick the logo to edit (LogoEdit.n0)
+void FE_LogoDesign_SetCurrentLogoNumber(s32 n);                // pick the logo to edit (LogoEdit.nLogo)
 s32  FE_LogoDesign_GetCurrentLogoNumber(void);                 // which logo is edited
 void FE_LogoDesign_SetCurrentLogoMode(s32 nShape);           // set its shape
 void FE_LogoDesign_GetClutEntry(int nColor, u32* pR, u32* pG, u32* pB, u32* pA);  // a palette colour, 0-255 each

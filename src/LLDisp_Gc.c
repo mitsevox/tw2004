@@ -36,8 +36,6 @@ void VIWaitForRetrace(void);
 void GXSetBreakPtCallback(void (*pCallback)(void));
 void GXSetDispCopyGamma(int eGamma);
 int  PADRecalibrate(u32 uMask);
-s32  OSResetSystem(s32, s32, s32);
-int  OSGetResetButtonState(void);
 int  OSEnableInterrupts(void);
 int  DVDCancelAll(void);
 void AISetStreamVolLeft(u8 uVol);

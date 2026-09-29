@@ -1596,11 +1596,11 @@ void GM_vIG_MCGetNumReplays(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Asks for pArgs[0] to be handed back to the UI a little later (command 84): uiProcessInterface.c
-// counts three UI updates (gUIDelayedHint.n0), then sends it to the UI as hint 0x24 in a round (0x23
-// in the menus). The menus' GM_vMCfunction does the same.
+// counts three UI updates (gUIDelayedHint.nFrames), then sends it to the UI as hint 0x24 in a round
+// (0x23 in the menus). The menus' GM_vMCfunction does the same.
 void GM_vIG_MCfunction(MsgArg* pArgs, MsgArg* pResult) {
-    gUIDelayedHint.n4 = pArgs[0].i;
-    gUIDelayedHint.n0 = 0;
+    gUIDelayedHint.nValue = pArgs[0].i;
+    gUIDelayedHint.nFrames = 0;
 }
 
 // Formats the card in port pArgs[0], slot pArgs[1] (command 85); MC_FormatCard's result.
