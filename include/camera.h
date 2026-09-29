@@ -176,18 +176,18 @@ extern StaticCams* lbl_80281E18;
 // A camera sequence (DynamicCam's, 0x50 bytes): the shots a camera plan steps through, and the
 // conditions it is picked on. Its shot choices (CamChoice) are in dyncam.h.
 typedef struct CamSequence {
-    char szName[0x20];          // 0x00  "DEF..." for a default sequence (fn_8003CAFC)
+    char szName[0x20];          // 0x00  "DEF..." for a default sequence (DynamicCam_IsDefualtSeq)
     struct CamSequence* p20;   // 0x20  the sequence that follows (an index in the file)
     f32  f24;                   // 0x24  fn_8003D0BC: picked for values from this ...
     f32  f28;                   // 0x28  ... to this
-    f32  f2C;                   // 0x2C  fn_8003CD6C: picked for values from this ...
+    f32  f2C;                   // 0x2C  DynamicCam_MatchHeightDiff: picked for values from this ...
     f32  f30;                   // 0x30  ... to this
-    f32  f34;                   // 0x34  its weight when several fit (fn_8003BDBC)
+    f32  f34;                   // 0x34  its weight when several fit (DynamicCam_ChooseSequence)
     f32  f38;                   // 0x38  its length
     s32  nChoices;              // 0x3C  how many shot choices p4C holds
     u32  uCourses;              // 0x40  one bit per course it is used on
     u8   b44;                   // 0x44  its kind
-    u8   b45;                   // 0x45  the clubs it is for (fn_8003CBE8)
+    u8   b45;                   // 0x45  the clubs it is for (DynamicCam_MatchSeqClub)
     u8   b46;                   // 0x46  6: the ball-flight camera keeps one for shot kind 5
     u8   b47;                   // 0x47  0 humans, 1 CPU players, 2 not in a replay, 3 in a replay,
                                 //       4 in a replay or a CPU player (fn_8003CEEC); the swing camera
@@ -244,7 +244,7 @@ typedef struct CamScript {
     s32  nD0;                   // 0xD0
     f32  fD4;                   // 0xD4  the camera's speed when the script moves to the next shot
                                 //       (CamScript_RunScript)
-    f32  fD8;                   // 0xD8  camera 8: the ground height it follows (fn_8003B534 measures
+    f32  fD8;                   // 0xD8  camera 8: the ground height it follows (DynamicCam_TrackBallVelocityTight measures
                                 //       the ball's height over it)
     f32  fDC;                   // 0xDC
     s32  nE0;                   // 0xE0  a shot kind for DynamicCam_ChooseScriptInSequence (25 = none)
@@ -432,9 +432,9 @@ typedef struct CamTuning {
     f32  f144;                  // 0x144  CameraScript_LagTargetPoint: the look-at point's level
                                 //        share of the way a frame
     f32  f148;                  // 0x148  ... and its height's
-    f32  f14C;                  // 0x14C  } fn_8003B028: how fast a following camera closes the
+    f32  f14C;                  // 0x14C  } DynamicCam_TrackBallVelocityLag: how fast a following camera closes the
     f32  f150;                  // 0x150  } distance and the angle to its target, per 60th
-    f32  f154;                  // 0x154  fn_8003B028: they ease in over this much of CamScript.fCamTime
+    f32  f154;                  // 0x154  DynamicCam_TrackBallVelocityLag: they ease in over this much of CamScript.fCamTime
     f32  f158;                  // 0x158  CameraScript_LagBallFlight: the aim eases in over this
                                 //        much of CamScript.f88
     f32  f15C;                  // 0x15C  CameraScript_InterpToNewScript puts it in CamScript.f88 (0 for
@@ -448,11 +448,11 @@ typedef struct CamTuning {
     f32  f174;                  // 0x174  DynamicCam_ProcessScript: how softly a camera eases in under its height limit
     f32  f178;                  // 0x178
     f32  v17C[4];               // 0x17C
-    f32  f18C;                  // 0x18C  fn_8003B534: the ball-flight camera closes in by this share of
+    f32  f18C;                  // 0x18C  DynamicCam_TrackBallVelocityTight: the ball-flight camera closes in by this share of
                                 //        the height above the shot's f6C ...
     f32  f190;                  // 0x190  ... and backs off by this share of the height below its f68
     f32  f194;                  // 0x194  DynamicCam_ProcessScript: how far a camera below its least height rises a frame
-    f32  f198;                  // 0x198  fn_8003B534: the least ball speed it follows the flight at
+    f32  f198;                  // 0x198  DynamicCam_TrackBallVelocityTight: the least ball speed it follows the flight at
     f32  f19C;                  // 0x19C  the steepest a camera direction may tilt (fn_8003D810, radians)
     f32  f1A0;                  // 0x1A0
     f32  f1A4;                 // 0x1A4  DynamicCam_ChoosePreFlightSequence: the obstruction test's slope
@@ -500,7 +500,7 @@ typedef struct CamTuning {
     f32  f230;                  // 0x230  ... and falling towards the shot's f68
     f32  f234;                  // 0x234
     f32  f238;                  // 0x238
-    f32  f23C;                  // 0x23C  placement kind 8 (GoDynamicCam.c fn_8003ADF8): past this
+    f32  f23C;                  // 0x23C  placement kind 8 (GoDynamicCam.c DynamicCam_TrackOffset): past this
                                 //        distance the camera's offset is scaled from f240 ...
     f32  f240;                  // 0x240
     f32  f244;                  // 0x244  ... down to f248 at this distance and beyond
@@ -714,13 +714,13 @@ void   fn_8006A8D4(void* pCamera, f32* pX, f32* pY);
 // ---- camera shots and sequences (0x8003A7C8..) ----------------------------------------------
 
 CamShot* DynamicCam_ChooseScript(int nPlayer, int nKind, CamShot* pShot);
-u8       fn_8003A76C(CamShot* pShot);    // the shot is one of kinds 1, 3, 13, 28..34 or 40..45
+u8       DynamicCam_bIsSwingCamera(CamShot* pShot);    // the shot is one of kinds 1, 3, 13, 28..34 or 40..45
 CamShot* DynamicCam_ChooseScriptByName(char* szName);     // the shot with this name (case ignored), or NULL
 // A shot of kind nKind from the sequence, picked at random, and its blend values (each out
 // pointer may be NULL).
 CamShot* DynamicCam_ChooseScriptInSequence(CamSequence* pSequence, int nKind, int* pA, f32* pF1, f32* pF2,
                      int* pB, f32* pF3, int nPlayer);
-CamSequence* fn_8003BDBC(int nPlayer, int nLie, int nClass, int nKind, u8 a, f32 fDist);
+CamSequence* DynamicCam_ChooseSequence(int nPlayer, int nLie, int nClass, int nKind, u8 a, f32 fDist);
 CamSequence* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind);
 // The sequence and shot named after the golfer's clip (with b, Character.p1790 first).
 u8       DynamicCam_ChoosePairedSequenceOrCamera(int nPlayer, u8 b, CamSequence** ppSeq, CamShot** ppShot);

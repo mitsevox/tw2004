@@ -18,7 +18,7 @@ typedef struct CamChoice {
     u8   b14;                   // 0x14  the shot kind it is for (9: any kind but 23)
     u8   b15;                   // 0x15  the blend's first kind (nA)
     u8   b16;                   // 0x16  its second (nB)
-    u8   b17;                    // 0x17  only for some golfers (fn_8003ABEC)
+    u8   b17;                    // 0x17  only for some golfers (DynamicCam_CanUseScriptOnThisModel)
     u32  aNoHoles[12];          // 0x18  one bit per hole of every course (course * 18 + hole): not
                                 //       used there
 } CamChoice;
@@ -27,7 +27,7 @@ LAYOUT_ASSERT(CamChoice, 0x48);
 // A shot and four sequences (0x28 bytes; DynCamTables.pSets), each an index in the file, -1 for
 // none.
 typedef struct DynCamSet {
-    char szName[0x10];          // 0x00  fn_8003C800 finds a set by it (case ignored)
+    char szName[0x10];          // 0x00  DynamicCamSearchForPairedSequence finds a set by it (case ignored)
     CamShot* pShot;             // 0x10  kind 13: the set gives this shot
     CamSequence* p14;           // 0x14  } kind 14: the set gives one of these three at random
     CamSequence* p18;           // 0x18  }
@@ -55,8 +55,8 @@ typedef struct DynCamTables {
 LAYOUT_ASSERT(DynCamTables, 0x28);
 
 extern DynCamTables* lbl_80281D88;
-extern s32 lbl_80187988[20];            // fn_8003CB80's table
-extern s32 lbl_801879D8[17];            // fn_8003CBD4's table
+extern s32 lbl_80187988[20];            // DynamicCam_MaterialToCameraLie's table
+extern s32 lbl_801879D8[17];            // DynamicCam_BallLieToCameraLie's table
 
 // GoDynamicCam.c: register and unregister the camera files' stream handlers.
 void DynamicCam_RegisterStreamClients(void);

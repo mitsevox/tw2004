@@ -1951,10 +1951,10 @@ void GolfCamera_InitBallFlightCamera(View* pView, int nPlayer) {
         && pView->p74->p20->b44 == 4 && fn_8003D7A0(pView->p74->p20, nPlayer)) {
         pView->p74 = pView->p74->p20;
     } else {
-        pView->p74 = fn_8003BDBC(nPlayer, nLie, nClass, 4, 1, fDist);
+        pView->p74 = DynamicCam_ChooseSequence(nPlayer, nLie, nClass, 4, 1, fDist);
     }
     if (gPlayers[nPlayer].nShotKind == 5 && (pView->p74 == NULL || pView->p74->b46 != 6)) {
-        pSeq = fn_8003BDBC(nPlayer, nLie, nClass, 4, 0, fDist);
+        pSeq = DynamicCam_ChooseSequence(nPlayer, nLie, nClass, 4, 0, fDist);
         if (pSeq != NULL && pSeq->b46 == 6) {
             pView->p74 = pSeq;
         }
@@ -3548,8 +3548,8 @@ void GolfCamera_UnZoomGreenCamera(View* pView, int nPlayer) {
 // The reaction camera once the ball stops (GolfCamera_InitPostShotCamera,
 // GolfCamera_InitInHoleCamera): the paired sequence or camera
 // (DynamicCam_ChoosePairedSequenceOrCamera), else a sequence for the ball's lie, the surface class
-// and the shot's flat distance (fn_8003BDBC); from the sequence shot kind 9, else the kind asked
-// for (script.nC4), else 5, and the sequence becomes the view's p74. The camera cuts to the shot
+// and the shot's flat distance (DynamicCam_ChooseSequence); from the sequence shot kind 9, else the
+// kind asked for (script.nC4), else 5, and the sequence becomes the view's p74. The camera cuts to the shot
 // with the blend the sequence gives. a is not used (TW07's takes two arguments).
 void GolfCamera_ChooseReactionCam(View* pView, int nPlayer, int a) {
     f32* pCam = CameraController_GetCameraOrigin(pView);
@@ -3575,7 +3575,7 @@ void GolfCamera_ChooseReactionCam(View* pView, int nPlayer, int a) {
     v[1] = 0.0f;
     fDist = Math_Sqrt(Vec3_LengthSqClamped(v));
     if (!DynamicCam_ChoosePairedSequenceOrCamera(nPlayer, 1, &pSeq, &pShot) && pShot == NULL) {
-        pSeq = fn_8003BDBC(nPlayer, nLie, nClass, 15, 1, fDist);
+        pSeq = DynamicCam_ChooseSequence(nPlayer, nLie, nClass, 15, 1, fDist);
     }
     if (pSeq != NULL && pShot == NULL) {
         pShot = DynamicCam_ChooseScriptInSequence(pSeq, 9, &nA, &f1, &f2, &nB, &f3, nPlayer);

@@ -232,7 +232,7 @@ void CamScript_RunScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, 
                     && !GM_Currently_SkillZoneMode()) {
             CamScript_PutBackOnFairway(pScript, pCam, pSub, nPlayer, pShot, vPrev);
         }
-        if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 12 && !fn_8003A76C(pScript->pShot)) {
+        if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 12 && !DynamicCam_bIsSwingCamera(pScript->pShot)) {
             CamScript_CheckFlagCollision(pScript, pCam, pSub, nPlayer, pShot, vPrev);
         }
     }
