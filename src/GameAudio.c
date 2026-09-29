@@ -215,7 +215,7 @@ u8 Aud_InitOnce(u8 nRate) {
     if ((bOk = HwVoice_InitModule()) && (bOk = AudDma_InitModule()) && (bOk = AudAram_InitModule())
         && (bOk = fn_800AF224()) && (bOk = BootSound_InitModule()) && (bOk = fn_800A8604())
         && (bOk = fn_800A8D2C()) && (bOk = Emi_InitModule()) && (bOk = Trk_InitModule())
-        && (bOk = Seq_InitModule()) && (bOk = fn_800ABBC8()) && (bOk = fn_800A8754())
+        && (bOk = Seq_InitModule()) && (bOk = Stm_InitModule()) && (bOk = fn_800A8754())
         && (bOk = Voc_InitModule()) && (bOk = fn_800A8824()) && (bOk = Aud_EmiInitOnce())
         && (bOk = Aud_MicInitOnce())) {
         BootSound_CopyToAram();

@@ -817,7 +817,7 @@ Added 2026-09-27 (from the ledgers solved that night; each ledger has the full s
   order; writing one result into an existing local first and re-reading the array reorders them
   (BreakLine_Render's rotation: `fZ = fX*c + v[2]*s; v[0] = fX*-s + v[2]*c; v[2] = fZ;`, exact).
 - **[verified] The late `void*` parameter copy also fixes argument-setup order** (hlaudtrackstm
-  fn_800AB860 84.5 -> 100: memset's `li r4,0` ahead of its size).
+  Stm_SendSilenceToVoices 84.5 -> 100: memset's `li r4,0` ahead of its size).
 - **[verified, fake-match class] A dead value that survives to register allocation changes
   register choice and the final schedule**: `(s64)x` leaves a dead `srawi` until the post-RA
   peephole (UISEvent fn_80165B90 exact; swept on 10 other near-misses: nothing).

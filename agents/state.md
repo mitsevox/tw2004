@@ -88,7 +88,7 @@ the kept-copy class); GR_BuildGridRenderData 99.22. rasim.py now models spills /
 kept-copy source form not found (3 rounds): parked until the endgame unless new evidence. Levers:
 decomp-notes "New from round 7".
 Round 6 (5 lanes, 11:40-13:25 CDT) merged: Earnings, LLDynTex, hwsBurn, GoBreakLine
-linked; exact also hlaudtrackstm fn_800AB860, UISEvent fn_80165B90 (labelled s64 fake). Dead asserts: no
+linked; exact also hlaudtrackstm Stm_SendSilenceToVoices, UISEvent fn_80165B90 (labelled s64 fake). Dead asserts: no
 effect (findings). UIS = Tiburon's IStudio: one library flag set ties the per-file flags (not applied yet:
 owner's call); NASCAR 2005 GC DWARF fetched (docs/reference-builds/nascar2005-gc): no IStudio. r6-big broke
 /dev/null (rm, against the brief); restored by the orchestrator. Levers: decomp-notes "New from round 6".

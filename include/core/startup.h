@@ -140,7 +140,7 @@ typedef struct Voice {
 } Voice;
 LAYOUT_ASSERT(Voice, 0x68);
 
-// One 0x8000-byte chunk of a streamed sound (fn_800AB72C): the decoder's coefficients, then the
+// One 0x8000-byte chunk of a streamed sound (Stm_SendBlockToVoices): the decoder's coefficients, then the
 // ADPCM data it DMAs into one half of the voice's ARAM buffer. The data's first byte is its first
 // frame's header (predictor and scale).
 typedef struct StreamChunk {

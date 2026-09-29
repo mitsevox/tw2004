@@ -12,19 +12,20 @@ int  File_ReadAsyncEx(s32 hFile, u8* pDst, u32 uLen, u32 uOffset,
                  void (*pfnDone)(void* pDst, int nBytes, AudTrack* pTrack, u8 nId), int n,
                  AudTrack* pTrack, u8 nId, int n19);                 // read from disc, not waiting
 
-void fn_800AB860(AudTrack* pTrack);
-void fn_800ABC54(AudTrack* pTrack);
+void Stm_SendSilenceToVoices(AudTrack* pTrack);
+void ResetStreamPerf(AudTrack* pTrack);
 void Stm_FlushQueue(AudTrack* pTrack);
-s32  fn_800AC328(void);
+s32  Stm_GetStreamFile(void);
 void RemoveFromAudStreamQueue(AudTrack* pTrack);
-void fn_800AB99C(void* pDst, int nBytes, AudTrack* pTrack, u8 nId);
+void Stm_ReadDoneCB(void* pDst, int nBytes, AudTrack* pTrack, u8 nId);
 
 // .bss/.sbss in reverse address order
 AudStreamQueue lbl_801F18B8;
 AudTrack* lbl_802820AC;
 u8 lbl_802820A8;
 
-// Applies a play list or stream change that came in while the track was busy.
+// Applies the play list and stream changes that came in while the track was busy (Stm_SetPlayList,
+// Stm_SetStream). Returns 1 when it applied one; Stm_Tick then starts the stopped track again.
 u8 CheckQueue(AudTrack* pTrack) {
     u8 bChanged;
 
@@ -44,7 +45,9 @@ u8 CheckQueue(AudTrack* pTrack) {
     return bChanged;
 }
 
-// Starts the voices on what is in their ARAM buffers.
+// The buffer is primed: starts each channel's voice looping over its whole ARAM buffer (0xFE00
+// bytes, both halves) at the play list's sample rate, with the short release for volume curve 15,
+// and marks the track playing (state 6). The submix volume it works out first is not used.
 void StartStreamVoices(AudTrack* pTrack) {
     AudPlayList* pList;
     u8 bLoud;
@@ -59,8 +62,9 @@ void StartStreamVoices(AudTrack* pTrack) {
     pTrack->nState = 6;
 }
 
-// Queues a disc read; returns 0 when the queue is full.
-u8 fn_800AB4C0(s32 hFile, u8* pDst, u32 uLen, u32 uOffset,
+// Queues a disc read of uLen bytes at uOffset of hFile into pDst; pfnDone gets the track and nId
+// when it is done (ProcessAudStreamReadQueue starts it). Returns 0 when the queue is full.
+u8 AddToAudStreamReadQueue(s32 hFile, u8* pDst, u32 uLen, u32 uOffset,
                void (*pfnDone)(void* pDst, int nBytes, AudTrack* pTrack, u8 nId), AudTrack* pTrack,
                u8 nId, u8 n19) {
     u8 bQueued;
@@ -85,8 +89,9 @@ u8 fn_800AB4C0(s32 hFile, u8* pDst, u32 uLen, u32 uOffset,
     return bQueued;
 }
 
-// Queues a refill of the track's whole buffer; returns 0 when the queue is full.
-u8 fn_800AB570(AudTrack* pTrack) {
+// Queues, in place of a read, a block of silence for every voice (Stm_SendSilenceToVoices), once a
+// stream that does not loop has been sent in full. Returns 0 when the queue is full.
+u8 Stm_QueueSilence(AudTrack* pTrack) {
     u8 bQueued;
     AudStreamRead* pRead;
 
@@ -123,7 +128,7 @@ void ProcessAudStreamReadQueue(void) {
             lbl_801F18B8.bBusy = 1;
             pRead = (AudStreamRead*)lbl_801F18B8.queue.pRead;
             if (pRead->bRestart) {
-                fn_800AB860(pRead->pTrack);
+                Stm_SendSilenceToVoices(pRead->pTrack);
             } else {
                 File_ReadAsyncEx(pRead->hFile, pRead->pDst, pRead->uLen, pRead->uOffset, pRead->pfnDone, 0,
                             pRead->pTrack, pRead->nId, pRead->n19);
@@ -135,9 +140,11 @@ void ProcessAudStreamReadQueue(void) {
     }
 }
 
-// DMAs one block per channel from the buffer into the voices' ARAM buffers, into the half each
-// voice is not playing, and flips the halves. pfnDone(1) comes with the last channel's DMA.
-void fn_800AB72C(AudTrack* pTrack, void (*pfnDone)(u32 bLast), u32 uStep, u8 bSkipEmpty) {
+// DMAs one 0x8000-byte chunk per channel from the track's buffer into its voice's ARAM buffer, into
+// the half the voice is not playing, and flips the halves; the chunks lie uStep apart (0: all
+// channels get the same one). Channels without a voice are skipped. pfnDone(1) comes with the last
+// channel's DMA; the track waits for it in lbl_802820AC.
+void Stm_SendBlockToVoices(AudTrack* pTrack, void (*pfnDone)(u32 bLast), u32 uStep, u8 bSkipEmpty) {
     u8 i;
     u8* pSrc;
     AudPlayList* pList;
@@ -162,8 +169,9 @@ void fn_800AB72C(AudTrack* pTrack, void (*pfnDone)(u32 bLast), u32 uStep, u8 bSk
     }
 }
 
-// The refill's DMA callback.
-void fn_800AB818(u32 bLast) {
+// DMA callback of a silence block (Stm_SendSilenceToVoices): counts it as filled; after the last
+// channel it frees the read queue for the next request.
+void Stm_SilenceDmaDoneCB(u32 bLast) {
     AudTrack* pTrack;
 
     pTrack = lbl_802820AC;
@@ -174,19 +182,21 @@ void fn_800AB818(u32 bLast) {
     }
 }
 
-// Queued by fn_800AB570 once a stream that does not loop has ended: clears the chunk and DMAs it
-// (silence) into each voice's free half, with no step (fn_800AB72C).
-void fn_800AB860(AudTrack* pTrack) {
+// Run by ProcessAudStreamReadQueue for Stm_QueueSilence's request: clears one chunk of the buffer
+// and DMAs it (silence) into the free half of every voice.
+void Stm_SendSilenceToVoices(AudTrack* pTrack) {
     // fake match: the parameter copied through void* (decomp-notes "EA's late parameter copy") puts
     // the memset's 0 before its size, as in EA's schedule
     AudTrack* pCopy = (AudTrack*)(void*)pTrack;
 
     Mem_set(pCopy->u.stm.pBuffer, 0, sizeof(StreamChunk));
-    fn_800AB72C(pCopy, fn_800AB818, 0, 0);
+    Stm_SendBlockToVoices(pCopy, Stm_SilenceDmaDoneCB, 0, 0);
 }
 
-// At the stream's end: loop back, or mark it ended when it does not loop.
-void fn_800AB8B4(AudTrack* pTrack) {
+// Once the whole stream has been sent to ARAM (uFilled up to uLength): a stream that does not loop
+// is marked ended (bEnded, for Stm_Tick), a looping one counts its sent and played bytes from 0
+// again.
+void Stm_CheckStreamEnd(AudTrack* pTrack) {
     if (pTrack->u.stm.uFilled < pTrack->u.stm.uLength) return;
     if (pTrack->u.stm.pStream->uLoop == 0xFFFFFFFF) {
         pTrack->u.stm.flags.b.bEnded = 1;
@@ -196,21 +206,22 @@ void fn_800AB8B4(AudTrack* pTrack) {
     pTrack->u.stm.uPlayed = 0;
 }
 
-// A block's DMA callback.
-void fn_800AB8FC(u32 bLast) {
+// DMA callback of a stream block (Stm_ReadDoneCB): counts it as filled; after the last channel it
+// checks for the stream's end (Stm_CheckStreamEnd) and frees the read queue for the next read.
+void Stm_BlockDmaDoneCB(u32 bLast) {
     AudTrack* pTrack;
 
     pTrack = lbl_802820AC;
     pTrack->u.stm.uFilled += 0x8000;
     if (bLast) {
-        fn_800AB8B4(pTrack);
+        Stm_CheckStreamEnd(pTrack);
         lbl_802820AC = NULL;
         RemoveFromAudStreamQueue(pTrack);
     }
 }
 
 // Moves the read position past a block, back to the loop point at the stream's end.
-void fn_800AB958(AudTrack* pTrack, u32 uLen) {
+void Stm_AdvanceReadPos(AudTrack* pTrack, u32 uLen) {
     u32 uLoop;
 
     pTrack->u.stm.uRead += uLen;
@@ -223,18 +234,22 @@ void fn_800AB958(AudTrack* pTrack, u32 uLen) {
 
 // A disc read of nBytes into pDst is done: DMA it to the voices, unless the track moved on
 // meanwhile. The file reader calls it with the request's buffer, length, track and id.
-void fn_800AB99C(void* pDst, int nBytes, AudTrack* pTrack, u8 nId) {
+void Stm_ReadDoneCB(void* pDst, int nBytes, AudTrack* pTrack, u8 nId) {
     if (pTrack->u.stm.nReadId != nId || pTrack->pTmpl == NULL || pTrack->pTmpl->data.pPlayList == NULL ||
         pTrack->u.stm.pStream == NULL) {
         RemoveFromAudStreamQueue(pTrack);
         return;
     }
-    fn_800AB958(pTrack, nBytes);
-    fn_800AB72C(pTrack, fn_800AB8FC, 0x8000, 1);
+    Stm_AdvanceReadPos(pTrack, nBytes);
+    Stm_SendBlockToVoices(pTrack, Stm_BlockDmaDoneCB, 0x8000, 1);
 }
 
-// Takes a voice per channel and queues the first read.
-void fn_800ABA28(AudTrack* pTrack) {
+// Primes a streamed track (Stm_Start): takes a voice per channel (steal level 2, the stream flags,
+// Trk_VoiceEndCB), gives the track a new read id (never 0), clears its counts, marks it filling
+// (state 4) and queues the read of the stream's first half-buffer per channel. Nothing without a
+// play list or stream, or when it is primed already (state 5); when a voice cannot be had it stops
+// there, keeping the voices it took.
+void PrimeStreamer(AudTrack* pTrack) {
     AudPlayList* pList;
     s32 hFile;
     AudVoiceRequest request;
@@ -242,7 +257,7 @@ void fn_800ABA28(AudTrack* pTrack) {
     AudVoice* pVoice;
 
     pList = pTrack->pTmpl->data.pPlayList;
-    hFile = fn_800AC328();
+    hFile = Stm_GetStreamFile();
     if (pList == NULL || pTrack->nState == 5) return;
     if (pTrack->u.stm.pStream == NULL) return;
     request.flags.n = 0;
@@ -272,24 +287,26 @@ void fn_800ABA28(AudTrack* pTrack) {
     pTrack->u.stm.nReadId = lbl_802820A8;
     pTrack->n5D += pList->nChannels;
     pTrack->u.stm.flags.n = 0;
-    fn_800AB4C0(hFile, pTrack->u.stm.pBuffer, (pTrack->u.stm.uBufferSize >> 1) * pList->nChannels,
-                pTrack->u.stm.pStream->uOffset, fn_800AB99C, pTrack, pTrack->u.stm.nReadId, 0);
+    AddToAudStreamReadQueue(hFile, pTrack->u.stm.pBuffer, (pTrack->u.stm.uBufferSize >> 1) * pList->nChannels,
+                pTrack->u.stm.pStream->uOffset, Stm_ReadDoneCB, pTrack, pTrack->u.stm.nReadId, 0);
 }
 
-// Sets up the read queue (the module's start-up).
-u8 fn_800ABBC8(void) {
+// Sets up the stream read queue at start-up: 8 empty requests, none under way. Always returns 1.
+u8 Stm_InitModule(void) {
     Mem_set(lbl_801F18B8.aReads, 0, sizeof(lbl_801F18B8.aReads));
     fn_800AE00C(&lbl_801F18B8.queue, lbl_801F18B8.aReads, 8, sizeof(AudStreamRead));
     lbl_801F18B8.bBusy = 0;
     return 1;
 }
 
-void fn_800ABC34(AudTrack* pTrack) {
-    fn_800ABC54(pTrack);
+// A new streamed track (Trk_AllocPerf): clears its stream state (ResetStreamPerf).
+void Stm_Init(AudTrack* pTrack) {
+    ResetStreamPerf(pTrack);
 }
 
-// Clears a track's stream state.
-void fn_800ABC54(AudTrack* pTrack) {
+// Clears a track's stream state: no stream, no buffer, every count 0, no play list or stream change
+// waiting (0xFF / 0xFFFF), read id 0.
+void ResetStreamPerf(AudTrack* pTrack) {
     pTrack->u.stm.pStream = NULL;
     pTrack->u.stm.pBuffer = NULL;
     pTrack->u.stm.uBufferSize = 0;
@@ -305,35 +322,46 @@ void fn_800ABC54(AudTrack* pTrack) {
     pTrack->u.stm.flags.n = 0;
 }
 
+// A freed streamed track (Trk_FreePerf): under the stream lock, cancels its ARAM transfers, gives
+// its buffer back and clears its stream state (ResetStreamPerf).
 void Stm_Exit(AudTrack* pTrack) {
     fn_800B596C("Stm_Exit");
     AudDma_CancelOwner(pTrack);
     if (pTrack->u.stm.pBuffer != NULL) {
         fn_800A9434(pTrack->u.stm.pBuffer, pTrack->u.stm.uBufferSize, pTrack->pTmpl->data.pPlayList->nId);
     }
-    fn_800ABC54(pTrack);
+    ResetStreamPerf(pTrack);
     fn_800B5994("Stm_Exit");
 }
 
+// Starts a streamed track (Trk_Start), under the stream lock: primes it (PrimeStreamer) or, when it
+// is primed already (state 5), starts its voices. Nothing without a play list.
 void Stm_Start(AudTrack* pTrack) {
     if (pTrack->pTmpl->data.pPlayList == NULL) return;
     fn_800B596C("Stm_Start");
     if (pTrack->nState != 5) {
-        fn_800ABA28(pTrack);
+        PrimeStreamer(pTrack);
     } else {
         StartStreamVoices(pTrack);
     }
     fn_800B5994("Stm_Start");
 }
 
+// Stops a streamed track (Trk_Stop): drops its waiting changes, and read id 0 makes the reads still
+// under way be ignored (Stm_ReadDoneCB).
 void Stm_Stop(AudTrack* pTrack) {
     Stm_FlushQueue(pTrack);
     pTrack->u.stm.nReadId = 0;
 }
 
-// Once a frame: resume voices after a disc error, start the voices once the buffer is full, pause
-// them when the reads fall behind, queue the next read, and apply waiting changes. Returns
-// whether the track is past starting.
+// Once a frame (Trk_Tick), under the stream lock: resumes the voices paused by a disc error once
+// the drive is fine; a filling track (state 4) starts its voices once its first blocks are in ARAM;
+// a playing or stopping one counts the bytes played and pauses its voices while playing is about to
+// catch up with the data sent (bStarved), resuming them after. When the voices start and each time
+// a half of their ARAM buffers is free, it queues silence after a stream that has ended, stops the
+// voices once that silence is in (a stream that does not loop), or, unless stopping, queues the
+// next read. Then it starts the queued reads, and a stopped track with a waiting change
+// (CheckQueue) is started again. Returns 0 once the track has stopped.
 u8 Stm_Tick(AudTrack* pTrack) {
     u8 bFed;
     AudPlayList* pList;
@@ -408,7 +436,7 @@ u8 Stm_Tick(AudTrack* pTrack) {
     }
     if (bFed) {
         if (pTrack->u.stm.flags.b.bEnded) {
-            if (fn_800AB570(pTrack)) {
+            if (Stm_QueueSilence(pTrack)) {
                 pTrack->u.stm.flags.b.bEnded = 0;
                 pTrack->u.stm.flags.b.b3 = 1;
             }
@@ -421,7 +449,7 @@ u8 Stm_Tick(AudTrack* pTrack) {
             }
         } else if (pTrack->nState != 3) {
             u32 uRemaining; // fake match: separate read length keeps the original register allocation
-            s32 hFile = fn_800AC328();
+            s32 hFile = Stm_GetStreamFile();
             // fake match: the cap first and the three volatile reads (same values) keep EA's load
             // order; otherwise the last scheduling pass lifts the cap's shift above uReadPos's load
             u32 uCap = pList->nChannels << 15;
@@ -434,7 +462,8 @@ u8 Stm_Tick(AudTrack* pTrack) {
             if (uCap <= uLen) {
                 uLen = uCap;
             }
-            fn_800AB4C0(hFile, pBuffer, uLen, uOffset, fn_800AB99C, pTrack, pTrack->u.stm.nReadId, 0);
+            AddToAudStreamReadQueue(hFile, pBuffer, uLen, uOffset, Stm_ReadDoneCB, pTrack,
+                                    pTrack->u.stm.nReadId, 0);
         }
     }
     ProcessAudStreamReadQueue();
@@ -445,7 +474,9 @@ u8 Stm_Tick(AudTrack* pTrack) {
     return pTrack->nState != 2;
 }
 
-// Switches the track to another play list; while it plays, the change waits for the next start.
+// Switches a streamed track to play list nPlayList; while it is busy (state 3 and up) the change
+// waits (CheckQueue). A new play list takes a new buffer and is written into the template itself,
+// with its channel count, so it holds for every track of that sound.
 void Stm_SetPlayList(AudTrack* pTrack, u8 nPlayList) {
     AudTrackTmpl* pTmpl;
     u8 nOld;
@@ -482,8 +513,9 @@ void Stm_SetPlayList(AudTrack* pTrack, u8 nPlayList) {
     fn_800B5994("Stm_SetPlayList");
 }
 
-// Picks the stream to play (0xFFFE: a random one, not the last one again); while the track plays,
-// nMode 1 cancels any waiting change and nMode 2 stops the track first.
+// Picks the stream to play (0xFFFE: a random one, not the last one again) and its length. While the
+// track is busy (state 3 and up) the stream waits for the next start: nMode 0 as is, 2 after
+// letting the voices end; nMode 1 instead cancels every waiting change.
 void Stm_SetStream(AudTrack* pTrack, u16 nStream, int nMode) {
     AudTrackTmpl* pTmpl;
     AudPlayList* pList;
@@ -519,12 +551,13 @@ void Stm_SetStream(AudTrack* pTrack, u16 nStream, int nMode) {
     fn_800B5994("Stm_SetStream");
 }
 
+// Drops a streamed track's waiting play list and stream changes.
 void Stm_FlushQueue(AudTrack* pTrack) {
     pTrack->u.stm.nNextPlayList = 0xFF;
     pTrack->u.stm.nNextStream = 0xFFFF;
 }
 
-// The stream file.
-s32 fn_800AC328(void) {
+// The stream file's handle (hlaudmovie.c opens /AudioStm_GC.sab).
+s32 Stm_GetStreamFile(void) {
     return lbl_80281468;
 }

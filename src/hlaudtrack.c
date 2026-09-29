@@ -57,7 +57,7 @@ u8 Trk_InitModule(void) {
         fn_800ADE70(&lbl_801F1868[1], 32);
         bOk = Seq_InitModule();
         if (bOk) {
-            bOk = fn_800ABBC8();
+            bOk = Stm_InitModule();
         }
     }
     return bOk;
@@ -182,7 +182,7 @@ AudTrack* Trk_AllocPerf(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f3
     if (!(pTmpl->n0 & 8)) {
         Seq_Init(pTrack);
     } else {
-        fn_800ABC34(pTrack);
+        Stm_Init(pTrack);
     }
     return pTrack;
 }

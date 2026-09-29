@@ -252,7 +252,7 @@ typedef struct AudBank {
     AudSound* apSounds[1];      // 0x34   nSounds of them; offsets from the array's end on disc
 } AudBank;
 
-// A streamed track's own fields (AudTrack 0x64), cleared by fn_800ABC54.
+// A streamed track's own fields (AudTrack 0x64), cleared by ResetStreamPerf.
 typedef struct AudTrackStm {
     AudStream* pStream;         // 0x64   the stream playing
     u8*  pBuffer;               // 0x68   the read buffer (0x8000 bytes per channel and half)
@@ -392,7 +392,7 @@ extern UPool lbl_80282098;              // the free tracks
 extern AudTrack* lbl_802820A0;          // the pool's memory
 
 // A disc read waiting in the stream read queue (lbl_801F18B8). bRestart marks a request to refill
-// the whole buffer (fn_800AB860) instead of a read.
+// the whole buffer (Stm_SendSilenceToVoices) instead of a read.
 typedef struct AudStreamRead {
     s32  hFile;                 // 0x0
     u8*  pDst;                  // 0x4
@@ -544,8 +544,8 @@ u8   Ses_IsSessionZero(void);
 f32  Mas_GetUpdateRateScale(void);
 
 // hlaudtrackstm.c
-u8   fn_800ABBC8(void);
-void fn_800ABC34(AudTrack* pTrack);
+u8   Stm_InitModule(void);
+void Stm_Init(AudTrack* pTrack);
 void Stm_Exit(AudTrack* pTrack);
 void Stm_Start(AudTrack* pTrack);
 void Stm_Stop(AudTrack* pTrack);
