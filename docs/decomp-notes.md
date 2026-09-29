@@ -322,7 +322,7 @@ They will be sorted into the sections below.
   GoRenderCtx RenderState_SetViewport). `f = call(); f *= c;` puts the call result first in `fmuls`; `call() * c` puts
   the constant first (GoCamCont CameraController_LagSideVector, TexAnimManager fn_80076C20).
 - **[verified] A switch's compare tree shows its empty cases**: add `case 0: case 3: break;` to get it
-  (GoAnimalActors fn_8004A578, GoLighting fn_8006E7A4); a one-case switch with default gives `beq A; b B`
+  (GoAnimalActors ActAnimal_Update, GoLighting fn_8006E7A4); a one-case switch with default gives `beq A; b B`
   where if/else gives `bne` (CharAnim UpdateSKAState).
 - **[verified] A field reloaded at every use of a small formula** means EA used a macro, not an inline
   (GoAnimalActors ANIMAL_WAVE 94.4 -> 98.3).

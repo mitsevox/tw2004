@@ -149,7 +149,7 @@ DynObjHandler DynObj_GetTypeHandler(int nType) {
     case 9:
         return DynObjType9_MessageHandler;
     case 11:
-        return fn_8004AAEC;
+        return ActAnimal_MessageHandler;
     default:
         return NULL;
     }

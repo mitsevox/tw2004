@@ -32,7 +32,7 @@ typedef struct DynObjTurningDef {
     f32  fSpeed;                // 0x1C  degrees a second
 } DynObjTurningDef;
 
-// Type 11's definition (GoAnimalActors.c fn_8004A24C): a DynObjDef and the animal's settings.
+// Type 11's definition (GoAnimalActors.c ActAnimal_Init): a DynObjDef and the animal's settings.
 typedef struct DynObjAnimalDef {
     DynObjDef base;             // 0x00
     f32  f1C;                   // 0x1C  -> DynObjAnimal.f16C (and twice it f174)
@@ -45,7 +45,7 @@ typedef struct DynObjAnimalDef {
 // The stream object an object's model comes from (a view of UStreamObject: its +4 is the model).
 typedef struct DynObjModelRef {
     u8*  pData;                 // 0x00  UStreamObject.pData; an animal's route follows a 12-byte
-                                //       header in it (fn_8004A24C)
+                                //       header in it (ActAnimal_Init)
     struct UObjModel* p4;       // 0x04  goes to Object_Init
 } DynObjModelRef;
 
@@ -151,7 +151,7 @@ typedef struct UObjMesh {
     s32  n28;                   // 0x28
 } UObjMesh;
 
-// What UObjModel.p10 points to (our view): a mesh tree at 0xEC (GoAnimalActors.c fn_8004ABB4).
+// What UObjModel.p10 points to (our view): a mesh tree at 0xEC (GoAnimalActors.c ActAnimal_GetRootMesh).
 // One of its four array sets (0x38 bytes; LLObj_Gc.c): set 0 is the model's own, sets 1-3 copies of
 // set 0's arrays that fn_80007824 makes.
 typedef struct UObjArraySet {
@@ -188,7 +188,7 @@ LAYOUT_ASSERT(UObjModelRoot, 0xF0); // fn_800073B4 puts the meshes at 0xF0
 // A UObject's model (UObject.pModel).
 typedef struct UObjModel {
     u8   unk0[0x10];
-    UObjModelRoot* p10;         // 0x10  (GoAnimalActors.c fn_8004A24C)
+    UObjModelRoot* p10;         // 0x10  (GoAnimalActors.c ActAnimal_Init)
     UObjMesh* apLod[6];         // 0x14  its levels of detail (the first four all the same: it has
                                 //       none); UObject3D.c fn_80045D80 fills the first three from
                                 //       its mesh group and clears the last three
@@ -220,7 +220,7 @@ typedef struct UObject {
     f32  m40[4][4];             // 0x040  identity at setup
     f32  m80[4][4];             // 0x080  identity at setup; m80[3] is the position (x, y, z, 1)
     u8   unkC0[0xDC - 0xC0];
-    s32  nDC;                   // 0x0DC  (GoAnimalActors.c fn_8004ABB4)
+    s32  nDC;                   // 0x0DC  (GoAnimalActors.c ActAnimal_GetRootMesh)
     u8   unkE0[4];
     f32  fE4;                   // 0x0E4  the model's f5C
     u8   unkE8[0xF0 - 0xE8];
@@ -293,7 +293,7 @@ typedef struct AnimalRoute {
 // Type 11 (GoAnimalActors.c): an animal.
 typedef struct DynObjAnimal {
     DynObj base;                // 0x000
-    f32  f16C;                  // 0x16C  } divided by the route's length (fn_8004A14C)
+    f32  f16C;                  // 0x16C  } divided by the route's length (ActAnimal_ScaleSpeedsByRouteLength)
     f32  f170;                  // 0x170
     f32  f174;                  // 0x174  }
     f32  a178[5];               // 0x178  from its definition's a20
@@ -306,9 +306,9 @@ typedef struct DynObjAnimal {
     s32  n1A4;                  // 0x1A4  0..4, from its model's mesh bits (4: no model)
     AnimalRoute* pRoute;        // 0x1A8  NULL: it stands at its definition's position
     u32  n1AC;                  // 0x1AC  } its pose, copied to its UObject's n108 and f10C before it
-    u32  n1B0;                  // 0x1B0  }   is drawn; n1B0 the pose it is heading for (fn_8004A578)
+    u32  n1B0;                  // 0x1B0  }   is drawn; n1B0 the pose it is heading for (ActAnimal_Update)
     f32  f1B4;                  // 0x1B4  }
-    u32  n1B8;                  // 0x1B8  frames counted (fn_8004A578)
+    u32  n1B8;                  // 0x1B8  frames counted (ActAnimal_Update)
     u8   b1BC;                  // 0x1BC
     u8   b1BD;                  // 0x1BD  set when its route's first point with ground under it is
                                 //        less than 0.5 above the ground (and f198 was given)
@@ -458,7 +458,7 @@ int  DynObjType6_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2)
 int  DynObjType9_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2);
 
 // GoAnimalActors.c: type 11's handler (the animals).
-int  fn_8004AAEC(int nMsg, DynObj* pObj, void* pArg, void* pArg2);
+int  ActAnimal_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2);
 
 // LLObj_Gc.c: how a mesh is clipped against the camera (3: off screen, not drawn).
 int  fn_80007B2C(UObjMesh* pMesh, void* pCamera, f32 a, f32 fSize, f32 c);

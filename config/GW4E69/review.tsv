@@ -4543,3 +4543,11 @@ address	name	comment	by	date
 8004ADDC	DynObjType9_Init	keep	rt3 (replayed by orchestrator)	2026-09-29
 8004AF28	DynObjType9_Update	keep	rt3 (replayed by orchestrator)	2026-09-29
 8004AF2C	DynObjType9_MessageHandler	add	rt3 (replayed by orchestrator)	2026-09-29
+80049B40	ActAnimal_SetWorldMatrix	keep	rt3 (replayed by orchestrator)	2026-09-29
+8004A14C	ActAnimal_ScaleSpeedsByRouteLength	keep	rt3 (replayed by orchestrator)	2026-09-29
+8004A24C	ActAnimal_Init	keep	rt3 (replayed by orchestrator)	2026-09-29
+8004A578	ActAnimal_Update	keep	rt3 (replayed by orchestrator)	2026-09-29
+8004AAEC	ActAnimal_MessageHandler	rewrite	rt3 (replayed by orchestrator)	2026-09-29
+8004AB90	ActAnimal_GetMeshFlags	rewrite	rt3 (replayed by orchestrator)	2026-09-29
+8004ABA4	ActAnimal_GetMeshAlternative	keep	rt3 (replayed by orchestrator)	2026-09-29
+8004ABB4	ActAnimal_GetRootMesh	none	rt3 (replayed by orchestrator)	2026-09-29

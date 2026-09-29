@@ -20,11 +20,11 @@ void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation m
 void UObject_ComposeRotation(f32 (*pMtx)[4]);
 void ActAnimal_SetWorldMatrix(DynObjAnimal* pAnimal, f32 f);
 f32  Ter_GetTimeInCycle(u32 n, f32 fPeriod);                   // GoTerrain.c
-int  fn_8004AB90(UObjMesh* pMesh, int i);
-UObjMesh* fn_8004ABA4(UObjMesh* pMesh, int i);
-UObjMesh* fn_8004ABB4(UObjModelRoot* pRoot);
-void fn_8004A24C(DynObjAnimal* pAnimal, DynObjSetup* pSetup);  // message 2: sets it up
-void fn_8004A578(DynObjAnimal* pAnimal, void* pArg);            // message 6: pArg holds the frame
+int  ActAnimal_GetMeshFlags(UObjMesh* pMesh, int i);
+UObjMesh* ActAnimal_GetMeshAlternative(UObjMesh* pMesh, int i);
+UObjMesh* ActAnimal_GetRootMesh(UObjModelRoot* pRoot);
+void ActAnimal_Init(DynObjAnimal* pAnimal, DynObjSetup* pSetup);  // message 2: sets it up
+void ActAnimal_Update(DynObjAnimal* pAnimal, void* pArg);            // message 6: pArg holds the frame
                                                                 // time's bits
 
 // Places the animal on its route at f194 (0..1 round it): a spline through the four points around
@@ -170,7 +170,7 @@ void ActAnimal_SetWorldMatrix(DynObjAnimal* pAnimal, f32 fDt) {
 }
 
 // Divides f16C and f174 by the length of the animal's route (once round its points).
-void fn_8004A14C(DynObjAnimal* pAnimal) {
+void ActAnimal_ScaleSpeedsByRouteLength(DynObjAnimal* pAnimal) {
     f32 vStep[4];
     f32 fLength = 0.0f;
     AnimalNode* pNode;
@@ -196,7 +196,7 @@ void fn_8004A14C(DynObjAnimal* pAnimal) {
 // Message 2: sets the animal up from its definition (type 0's setup first), picks its n1A4 from
 // its model's mesh bits and its route from the second stream object, then places it: along the
 // route, or at the definition's position raised by f198.
-void fn_8004A24C(DynObjAnimal* pAnimal, DynObjSetup* pSetup) {
+void ActAnimal_Init(DynObjAnimal* pAnimal, DynObjSetup* pSetup) {
     f32 vPos[4];
     DynObjModel* pModel;
     int i;
@@ -236,11 +236,11 @@ void fn_8004A24C(DynObjAnimal* pAnimal, DynObjSetup* pSetup) {
         pRef = NULL;
     }
     if (pRef != NULL) {
-        pMesh = fn_8004ABB4(pRef->p4->p10);
-        pMesh = fn_8004ABA4(pMesh, 0);
-        pMesh = fn_8004ABA4(pMesh, 0);
-        nBitsA = fn_8004AB90(pMesh, 0);
-        nBitsB = fn_8004AB90(pMesh, 2);
+        pMesh = ActAnimal_GetRootMesh(pRef->p4->p10);
+        pMesh = ActAnimal_GetMeshAlternative(pMesh, 0);
+        pMesh = ActAnimal_GetMeshAlternative(pMesh, 0);
+        nBitsA = ActAnimal_GetMeshFlags(pMesh, 0);
+        nBitsB = ActAnimal_GetMeshFlags(pMesh, 2);
         if (nBitsA & 1) {
             if (nBitsA & 2) {
                 pAnimal->n1A4 = 2;
@@ -300,7 +300,7 @@ void fn_8004A24C(DynObjAnimal* pAnimal, DynObjSetup* pSetup) {
         pAnimal->base.obj.m80[3][1] = pDef->base.aPos[1] + pAnimal->f198;
         pAnimal->base.obj.m80[3][2] = pDef->base.aPos[2];
     }
-    fn_8004A14C(pAnimal);
+    ActAnimal_ScaleSpeedsByRouteLength(pAnimal);
 }
 
 // A wave from 0 to 1 and back, fRate times a second, at frame nFrame (our macro: EA's code reads
@@ -311,7 +311,7 @@ void fn_8004A24C(DynObjAnimal* pAnimal, DynObjSetup* pSetup) {
 // Message 6, the per-frame update: moves the animal along its route, speeds it up or slows it
 // down (b1BC: moving), counts down its moving (f190) and resting (f18C) times, and animates its
 // pose (n1AC, blended by f1B4) by its kind n1A4.
-void fn_8004A578(DynObjAnimal* pAnimal, void* pArg) {
+void ActAnimal_Update(DynObjAnimal* pAnimal, void* pArg) {
     f32 fDt;
     f32 fDiff;
     f32 fMaxA;
@@ -458,16 +458,18 @@ void fn_8004A578(DynObjAnimal* pAnimal, void* pArg) {
     }
 }
 
-// Type 11's message handler; other messages go to type 0's.
-int fn_8004AAEC(int nMsg, DynObj* pObj, void* pArg, void* pArg2) {
+// Type 11's message handler (the animals): 1 its size, 2 ActAnimal_Init, 6 ActAnimal_Update, 3
+// draws it with its pose (n1AC as the model's alternative, f1B4 as its blend); the rest as type 0
+// (DynObjBase_MessageHandler).
+int ActAnimal_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2) {
     switch (nMsg) {
     case 1:
         return sizeof(DynObjAnimal);
     case 2:
-        fn_8004A24C((DynObjAnimal*)pObj, pArg);
+        ActAnimal_Init((DynObjAnimal*)pObj, pArg);
         return 0;
     case 6:
-        fn_8004A578((DynObjAnimal*)pObj, pArg);
+        ActAnimal_Update((DynObjAnimal*)pObj, pArg);
         return 0;
     case 3:
         if (pObj->obj.pModel != NULL) {
@@ -482,15 +484,15 @@ int fn_8004AAEC(int nMsg, DynObj* pObj, void* pArg, void* pArg2) {
 }
 
 // The same as UObject.c's Object_GetMeshFlags, compiled into this file too.
-int fn_8004AB90(UObjMesh* pMesh, int i) {
+int ActAnimal_GetMeshFlags(UObjMesh* pMesh, int i) {
     return pMesh->pInfo->a24[i];
 }
 
 // The same as UObject.c's Object_GetMeshAlternative, compiled into this file too.
-UObjMesh* fn_8004ABA4(UObjMesh* pMesh, int i) {
+UObjMesh* ActAnimal_GetMeshAlternative(UObjMesh* pMesh, int i) {
     return pMesh->p8[i];
 }
 
-UObjMesh* fn_8004ABB4(UObjModelRoot* pRoot) {
+UObjMesh* ActAnimal_GetRootMesh(UObjModelRoot* pRoot) {
     return pRoot->pMesh;
 }
