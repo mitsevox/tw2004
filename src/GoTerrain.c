@@ -3,8 +3,13 @@
 // the course data ('tgd ', with the tee and pin positions) and the LOD distances ('tLOD'); each
 // view, sorts the patches and objects into draw lists by distance and level of detail and draws
 // them in passes; animates the objects (trees, the crowd, the flag in the wind); draws the grass
-// patches for GoGrass.c. The file ends with small setters of the renderer's state (RenderState),
-// which share its constant pool.
+// patches for GoGrass.c. After the renderer come small functions of other systems (TW07 has most
+// of them as header inlines): the renderer's state setters (RenderState: fog, blend, clip, constant
+// alpha, draw flags), the current render context (RC_, GoRenderCtx.h), the light and fog
+// environment and the fog made from its settings (LF_, GoLightFogEnv.h), LLMath_Subtract3 and
+// LLMath_Subtract, the terrain model tree's accessors (Ter_GetMesh*), the sun flare's setters (SF_),
+// Weather_IsRaining, and last three functions of TW07's CharRend.c (CharacterRender_*), which may be
+// a unit of their own before Skin.c.
 
 #include "golfer.h"
 #include "ball.h"
@@ -2429,8 +2434,6 @@ f32 Ter_GetTimeInCycle(u32 n, f32 fPeriod) {
     return FRAME_TIME * (f32)(n % (u32)(FRAME_RATE * (0.5f / FRAME_RATE + fPeriod)));
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
 void fn_80013D68();
 void LF_ApplyFogToRenderState(void);
 void LF_UpdateFogColourForCamera();
@@ -2467,8 +2470,6 @@ void LF_UpdateFog(void) {
     LF_ApplyFogToRenderState();
 }
 
-// ---- end of sweep code ----
-
 // Takes the current light set's fog settings (colours round the compass, fog distance) as the ones
 // the fog is made from (LF_SetFogSettings).
 void LF_UseCurrentFogSettings(void) {
@@ -2504,11 +2505,8 @@ void LF_ApplyFogToRenderState(void) {
     RenderState_SetFogEnd(4.15f * (10.0f + lbl_802811E0->f50));
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
 void fn_8006F154();
-extern s32 lbl_80281B88;
-void CharacterRender_SetCurrentBuffer(s32 arg0);
+void CharacterRender_SetCurrentBuffer(s32 iBuffer);
 void CharacterRender_StartNewFrame(void);
 
 // Blends the fog colour for the current camera's heading (fn_8006F154). The current render context
@@ -2517,8 +2515,6 @@ void LF_UpdateFogColourForCamera(void) {
     RC_spGetCurrentRenderCtx();
     fn_8006F154();
 }
-
-// ---- end of sweep code ----
 
 // Takes a copy of the fog settings (colours round the compass, turn, fog distance) that the fog
 // colour and distances are made from (lbl_802811E0).
@@ -2573,15 +2569,11 @@ void LLMath_Subtract(f32* pA, f32* pB, f32* pOut) {
 }
 #endif
 
-// ---- sweep code (not yet cleaned up) ----
-
 // Sets the lens's far clip distance (fAC, which fn_80014268 reads). Ter_DrawFarClipPatches and
 // GoGreenGrid.c push it out for a draw and put it back.
 void Camera_SetLensFarClip(u8* p, f32 v) {
     *(f32*)(p + 0xAC) = v;
 }
-
-// ---- end of sweep code ----
 
 // The next mesh after pNode among its parent's children (p14).
 UObjMesh* Ter_GetMeshNext(UObjMesh* pNode) {
@@ -2612,8 +2604,6 @@ s32 Ter_GetMeshChildCount(UObjMesh* pNode) {
 UObjMesh* Ter_GetHoleModelRoot(u8* pHoleData) {
     return *(UObjMesh**)(pHoleData + 0xEC);
 }
-
-// ---- sweep code (not yet cleaned up) ----
 
 // A terrain object's bounds (pInfo->a68): its centre [0..2], a radius [3] and a height [7].
 f32* Ter_GetMeshBounds(UObjMesh* pMesh) {
@@ -2675,14 +2665,14 @@ void SF_vSetSunColor(f32* p0) {
 // gomainloop.c passes the video field's parity (lbl_80281B88 & 1) each frame outside start-up; when
 // the value equals that parity, which with that one caller is always, the stored value flips
 // instead. Nothing reads it in this build.
-void CharacterRender_SetCurrentBuffer(s32 arg0) {
-    s32 var_r3;
+void CharacterRender_SetCurrentBuffer(s32 iBuffer) {
+    s32 iNew;
 
-    var_r3 = arg0;
-    if (var_r3 == (s32) (lbl_80281B88 & 1)) {
-        var_r3 = gCharRendCurrentBuffer ^ 1;
+    iNew = iBuffer;
+    if (iNew == (s32)(lbl_80281B88 & 1)) {
+        iNew = gCharRendCurrentBuffer ^ 1;
     }
-    gCharRendCurrentBuffer = var_r3;
+    gCharRendCurrentBuffer = iNew;
 }
 
 // Starts a frame of character drawing: empty in this build (and in TW07). Character_PreRenderAll
@@ -2701,5 +2691,3 @@ void CharacterRender_RenderSetup(void) {
     RenderState_SetBlendFactors(4, 5);
     RenderState_Flush();
 }
-
-// ---- end of sweep code ----
