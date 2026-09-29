@@ -258,7 +258,7 @@ u8 Ses_Init(u8 a, u8 b, u8 nListeners) {
     lbl_8028207C &= ~0x30;
     if ((bOk = HwVoice_InitSession()) && (bOk = AudDma_InitSession()) && (bOk = AudAram_InitSession()) &&
         (bOk = fn_800AF264(a, b)) && (bOk = fn_800A87A4(a, b, nListeners)) &&
-        (bOk = Emi_InitSession()) && (bOk = fn_800A9A50(a, b)) && (bOk = fn_800AC494()) &&
+        (bOk = Emi_InitSession()) && (bOk = Trk_InitSession(a, b)) && (bOk = fn_800AC494()) &&
         (bOk = fn_800A86B0())) {
         if (b == 0) {
             if (lbl_80282078 != NULL) {

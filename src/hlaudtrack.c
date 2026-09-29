@@ -12,7 +12,9 @@ UList lbl_801F1868[2];
 AudTrack* lbl_802820A0;
 UPool lbl_80282098;
 
-// Puts a track in the sorted list, before the first one of lower priority.
+// Puts a placed (3D) track into the sorted track list, on f48, its distance attenuation (TW07's
+// distAttn), loudest first: before the first quieter track, else at the end. Trk_AllocPerf steals
+// from the quiet end.
 void InsertSortWorldPerf(AudTrack* pTrack) {
     AudTrack* pAt;
     UList* pList;
@@ -35,7 +37,9 @@ void InsertSortWorldPerf(AudTrack* pTrack) {
     }
 }
 
-// Sets up the track pool and the two lists, then the sequencer and the streamer.
+// Sets the tracks up at start-up (Aud_InitOnce): 32 tracks from the audio memory stack, numbered
+// and idle, their free pool and the two track lists, then the sequencer (Seq_InitModule) and the
+// streamer (Stm_InitModule). Returns 0 when a step fails.
 u8 Trk_InitModule(void) {
     u8 bOk;
     u8 i;
@@ -59,8 +63,9 @@ u8 Trk_InitModule(void) {
     return bOk;
 }
 
-// Frees every track.
-u8 fn_800A9A50(u8 a, u8 b) {
+// A new sound session (Ses_Init): frees every track in both lists and returns 1. The session
+// numbers are not used. TW07 has the loop as Trk_FreeAllPerfs.
+u8 Trk_InitSession(u8 a, u8 b) {
     s32 i;
     UList* pList;
     AudTrack* pTrack;
@@ -80,11 +85,15 @@ u8 fn_800A9A50(u8 a, u8 b) {
     return 1;
 }
 
+// Empty (TW07's is too); called when hlaudmovie.c tears the sound session down.
 void Trk_ExitSession(void) {
 }
 
-// Ticks every track: one that was allocated but never started is freed on its second tick, one
-// whose tick says it has ended is freed, the others are rendered.
+// Once a frame (Aud_EmiCycle), when the engine is set up and bank 0 and its samples are loaded (0xD
+// in lbl_8028207C): walks both track lists. A track allocated but never started (state 1) is freed
+// on its second frame; any other is ticked (Trk_Tick) and rendered (Trk_Render), or freed once its
+// tick says it has stopped. While the sound is paused (0x40) only the tracks on volume curve 0
+// tick, and not those of sound 8.
 void Trk_Cycle(void) {
     s32 i;
     UList* pList;
@@ -119,9 +128,12 @@ void Trk_Cycle(void) {
     } while (i < 2);
 }
 
-// Allocates a track for channel nChannel of a source. When the pool is empty, a sorted source
-// steals the lowest-priority sorted track below fPriority that is not streamed or unstarted; an
-// unsorted source takes the last sorted track.
+// Takes a track from the pool for channel nChannel of a source and sets it up (state 1, allocated;
+// volume and pitch 1, no pitch ramp) in the plain list or, for a placed source, the sorted one;
+// then Seq_Init or Stm_Init. fPriority is the distance attenuation (TW07's distAttn). When the pool
+// is empty it steals the quietest sorted track: for a placed source only one quieter than fPriority
+// that is past state 1 and not streamed, for any other source the last one. Returns NULL when there
+// is none to take.
 AudTrack* Trk_AllocPerf(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f32 fPriority) {
     UPool* const pPool = &lbl_80282098;
     s32 bSorted;
@@ -175,7 +187,10 @@ AudTrack* Trk_AllocPerf(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f3
     return pTrack;
 }
 
-// Frees a track: stops its voices at once and gives it back to the pool.
+// Frees a track: takes it out of its source, deletes its voices at once, resets its sequencer
+// (Seq_Exit) or stream (Stm_Exit) state, tells the emitter (Emi_TrackCallback with 0) when the
+// template asks for it (n0 & 0x40), and gives it back to the pool. NULL is ignored. Always returns
+// 0 (TW07's returns a TPerf*).
 s32 Trk_FreePerf(AudTrack* pTrack) {
     UPool* pPool;
     UList* pList;
@@ -208,9 +223,13 @@ s32 Trk_FreePerf(AudTrack* pTrack) {
     return 0;
 }
 
-// Starts, stops or restarts channel nChannel of a source as its priority changes. A track at
-// priority 0 or less is stopped; one that becomes audible is started. bOn and bOff are the
-// caller's requests, which only count for the templates flagged 0x04 (and not 0x01).
+// Called by Emi_UpdInstance for each track of a source: starts, stops or restarts channel nChannel
+// as its distance attenuation fPriority changes. Nothing while the track is stopped and waiting
+// (state 2). At 0 or below a playing track stops; above 0 an idle one starts (allocated first when
+// there is none). Templates with n0 & 4 (and not 1) are switched by hand: bOn and bOff are the
+// caller's start and stop requests, and bOn on a playing one restarts it unless n0 & 0x10 is set. A
+// sequenced track stopped and started in one go keeps its variation and set. A playing placed track
+// that neither starts nor stops is re-sorted on the new fPriority.
 void Trk_UpdatePerf(AudSource* pSource, AudTrack* pTrack, AudTrackTmpl* pTmpl, u8 nChannel, u8 bOn,
                  u8 bOff, f32 fPriority) {
     u8 bPlaying;
@@ -268,7 +287,8 @@ void Trk_UpdatePerf(AudSource* pSource, AudTrack* pTrack, AudTrackTmpl* pTmpl, u
     }
 }
 
-// Starts a track.
+// Starts a track: clears its pending voice settings, then starts it as a sequenced (Seq_Start) or a
+// streamed (Stm_Start) track.
 void Trk_Start(AudTrack* pTrack) {
     pTrack->params.flags.n = 0;
     if (!(pTrack->pTmpl->n0 & 8)) {
@@ -278,7 +298,9 @@ void Trk_Start(AudTrack* pTrack) {
     Stm_Start(pTrack);
 }
 
-// Stops a track: its voices end on their own, and it leaves its source.
+// Stops a track: a filling or playing one (state 4 and up) lets its voices end, any other is marked
+// stopped (state 2); it leaves its source, and its sequencer (Seq_Stop) or stream (Stm_Stop) is
+// stopped. Trk_Cycle frees it once its tick reports it stopped.
 void Trk_Stop(AudTrack* pTrack) {
     if (pTrack->nState > 3) {
         Trk_StopAllVoices(pTrack, 0);
@@ -332,25 +354,33 @@ void Trk_StopAllVoices(AudTrack* pTrack, int bNow) {
     }
 }
 
-// Advances a track by one tick; returns 0 once it has ended.
+// Advances a track by one frame: its pitch (f4C) by its pitch ramp (f50), then its sequencer
+// (Seq_Tick) or stream (Stm_Tick). Returns 0 once it has stopped, for Trk_Cycle to free it.
 u8 Trk_Tick(AudTrack* pTrack) {
     pTrack->f4C += pTrack->f50;
     return !(pTrack->pTmpl->n0 & 8) ? fn_800AAEFC(pTrack) : Stm_Tick(pTrack);
 }
 
+// Asks a sequenced track to run event n next (Seq_Step); with bCheck (TW07's debounce), not when it
+// is on that event already.
 void Trk_Step(AudTrack* pTrack, u8 n, u8 bCheck) {
     fn_800AB118(pTrack, n, bCheck);
 }
 
+// Sets a sequenced track's variation (Seq_SelectVariation).
 void Trk_SelectVariation(AudTrack* pTrack, u8 n) {
-    fn_800AA444(pTrack, n);
+    Seq_SelectVariation(pTrack, n);
 }
 
+// Switches a sequenced track to set n of its variations (Seq_SetVariationRange).
 void Trk_SetVariationRange(AudTrack* pTrack, u8 n) {
     fn_800AB14C(pTrack, n);
 }
 
-// Renders a track: its volume through its curve, then its pan and volume per voice.
+// Once a frame after its tick: the track's volume (f44) times its submix's (Mas_GetSubmix of the
+// play list's or bank's curve) goes with the track to hlaudmovie.c's render for placed (sorted)
+// tracks or its stereo render for the others, which set each voice (TW07 inlines TrkRender3D and
+// TrkRenderStereo here). Nothing for a template without data.
 void Trk_Render(AudTrack* pTrack) {
     AudSource* pSource;
     AudPlayList* pList;
@@ -369,13 +399,17 @@ void Trk_Render(AudTrack* pTrack) {
     fn_800A96DC(pSource, pTrack, fVolume);
 }
 
-void fn_800AA3D4(AudTrackTmpl* pTmpl) {
+// Prepares a track template of a sound just loaded (Emi_CheckTemplate): a sequenced one's events
+// through Seq_Check; a streamed one needs nothing.
+void Trk_Check(AudTrackTmpl* pTmpl) {
     if (!(pTmpl->n0 & 8)) {
         fn_800AB1B8(pTmpl);
     }
 }
 
-// A voice's end callback: it leaves its track, and a stopping track with no voices left is stopped.
+// A voice's end callback (streamed voices take it directly, sequenced ones through VoiceEndCB): the
+// voice leaves its track, and a stopping track (state 3) whose last voice has ended is stopped
+// (state 2).
 void Trk_VoiceEndCB(AudVoice* pVoice, int nReason) {
     AudTrack* pTrack;
 
@@ -386,11 +420,14 @@ void Trk_VoiceEndCB(AudVoice* pVoice, int nReason) {
     }
 }
 
-void fn_800AA444(AudTrack* pTrack, u8 n) {
+// Sets a sequenced track's variation (u.seq.n64). TW07's inline from HLAudTrackSeq.h, compiled out
+// of line here.
+void Seq_SelectVariation(AudTrack* pTrack, u8 n) {
     pTrack->u.seq.n64 = n;
 }
 
-// Curve nCurve's volume (lbl_801F17D0), 0 while its bit in lbl_80282060 is set (muted).
+// Submix nCurve's volume (the volume curve a play list or bank names), 0 while it is muted. TW07's
+// inline from HLAudMaster.h, compiled out of line here.
 f32 Mas_GetSubmix(u8 nCurve) {
     if (Mas_IsChanMuted(nCurve)) {
         return 0.0f;
@@ -398,6 +435,7 @@ f32 Mas_GetSubmix(u8 nCurve) {
     return lbl_801F17D0[nCurve];
 }
 
+// Whether submix nCurve is muted (its bit in HLAudMaster.c's mute mask).
 u8 Mas_IsChanMuted(u8 nCurve) {
     return (lbl_80282060 & (1 << nCurve)) != 0;
 }

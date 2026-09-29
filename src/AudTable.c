@@ -332,13 +332,13 @@ void Emi_SetTrackPitchFactor(u8 nEntry, u8 nTrack, f32 fPitch) {
     pTrack->f4C = fPitch;
 }
 
-// Prepares each sequenced track template of a sound just loaded from a bank (fn_800AA3D4). n, the
+// Prepares each sequenced track template of a sound just loaded from a bank (Trk_Check). n, the
 // sound's number in the bank, is not used.
 void Emi_CheckTemplate(AudSound* pSound, u16 n) {
     u8 i;
 
     for (i = 0; i < pSound->nTracks; i++) {
-        fn_800AA3D4(&pSound->aTracks[i]);
+        Trk_Check(&pSound->aTracks[i]);
     }
 }
 

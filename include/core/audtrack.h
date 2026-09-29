@@ -501,7 +501,7 @@ extern AudTrack* lbl_802820AC;          // the track whose block is being DMA'd 
 // hlaudtrack.c
 void InsertSortWorldPerf(AudTrack* pTrack);
 u8   Trk_InitModule(void);
-u8   fn_800A9A50(u8 a, u8 b);          // Ses_Init's a and b, unused
+u8   Trk_InitSession(u8 a, u8 b);          // Ses_Init's a and b, unused
 void Trk_ExitSession(void);
 void Trk_Cycle(void);
 AudTrack* Trk_AllocPerf(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f32 fPriority);
@@ -516,9 +516,9 @@ void Trk_Step(AudTrack* pTrack, u8 n, u8 bCheck);
 void Trk_SelectVariation(AudTrack* pTrack, u8 n);
 void Trk_SetVariationRange(AudTrack* pTrack, u8 n);
 void Trk_Render(AudTrack* pTrack);
-void fn_800AA3D4(AudTrackTmpl* pTmpl);
+void Trk_Check(AudTrackTmpl* pTmpl);
 void Trk_VoiceEndCB(AudVoice* pVoice, int nReason);
-void fn_800AA444(AudTrack* pTrack, u8 n);
+void Seq_SelectVariation(AudTrack* pTrack, u8 n);
 f32  Mas_GetSubmix(u8 nCurve);
 u8   Mas_IsChanMuted(u8 nCurve);
 
