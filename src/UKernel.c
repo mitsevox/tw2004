@@ -1,19 +1,23 @@
-// UKernel.c (EA's name, from its asserts; also in EA's 2002 source tree; TW06): the kernel's list
-// of the course's dynamic objects (dynobj.h), chained through DynObj.pNext from gKernelFirstObject to
-// gKernelLastObject.
+// UKernel.c (EA's name: its StaticMem_Alloc passes "UKernel.c"; TW07's legacy/specif/UKernel.c
+// holds Kernel_DownloadActors, Kernel_InitModule and Kernel_CloseModule in this order; TW06 has
+// legacy\specif\ukernel.c): the kernel of the course's dynamic objects (actors, dynobj.h). It turns
+// each 'Cact' actor chunk into a dynamic object or hands it to its own system, keeps the objects in
+// a list chained through DynObj.pNext (gKernelFirstObject to gKernelLastObject) with ids and two
+// node pools, sends them messages, frees the released ones, and stores the (a, b) pairs the actor
+// byte-code posts to them (four per object, then gKernelOverflowSlots).
 
 #include "dynobj.h"
 #include "terrain.h"
 #include "psmgr.h"
 
-DynObjSlot gKernelOverflowSlots[32];
+DynObjSlot gKernelOverflowSlots[32];      // pairs that did not fit on their object (16 used)
 
-DynObj* gKernelFirstObject;
-DynObj* gKernelLastObject;
-s32 gKernelLastObjectId;
-u32 gKernelOverflowSlotMask;
-UMemPool* gKernelSmallObjectPool;
-UMemPool* gKernelLargeObjectPool;
+DynObj* gKernelFirstObject;               // the object list's head
+DynObj* gKernelLastObject;                // and its tail
+s32 gKernelLastObjectId;                  // the last id given out (DynObj.n134)
+u32 gKernelOverflowSlotMask;              // bit n: gKernelOverflowSlots[n] is taken
+UMemPool* gKernelSmallObjectPool;         // 400-byte nodes
+UMemPool* gKernelLargeObjectPool;         // 528-byte nodes
 
 DynObj* Kernel_CreateObject(DynObjSetup* pSetup);
 void fn_8000E830(DynObj* pObj);
@@ -316,8 +320,8 @@ int Kernel_PostPairToObject(DynObj* pObj, int a, int b, int bOverflow) {
     return 0;
 }
 
-// Stores (a, b) on every live object whose actor id n140 (the actor chunk's id) is nKey; nothing
-// when a is 126. The actor byte-code's opcode 56 (fn_8000EA1C).
+// Stores (a, b) on every object with an id (n134 not 0) whose actor id n140 (the actor chunk's id)
+// is nKey; nothing when a is 126. The actor byte-code's opcode 56 (fn_8000EA1C).
 void Kernel_PostPairByActorId(int nKey, int a, int b) {
     DynObj* pObj;
 
@@ -333,8 +337,8 @@ void Kernel_PostPairByActorId(int nKey, int a, int b) {
     }
 }
 
-// Stores (a, b) on every live object whose byte n147 (set from its definition's n18) is nKey; no
-// 126 test. The actor byte-code's opcode 57.
+// Stores (a, b) on every object with an id (n134 not 0) whose byte n147 (set from its definition's
+// n18) is nKey; no 126 test. The actor byte-code's opcode 57.
 void Kernel_PostPairByKey147(int nKey, int a, int b) {
     DynObj* pObj;
 
@@ -345,7 +349,8 @@ void Kernel_PostPairByKey147(int nKey, int a, int b) {
     }
 }
 
-// Stores (a, b) on every live object whose byte n148 is nKey. The actor byte-code's opcode 58.
+// Stores (a, b) on every object with an id (n134 not 0) whose byte n148 is nKey. The actor
+// byte-code's opcode 58.
 void Kernel_PostPairByKey148(int nKey, int a, int b) {
     DynObj* pObj;
 

@@ -1,6 +1,11 @@
-// CourseData.c (our name): the course table read from the disc ('CRI ' chunk: every course's 18
-// holes with their par, wind and per-tee values) and the built rounds ('CMPS' chunk: 18 holes
-// picked from other courses), with the par and hole lookups the round, the tour and the HUD use.
+// CourseData.c (our file name; EA's is CourseInfo.c: TW07's golf/gamemode/CourseInfo.c holds these
+// functions in this order, from GM_CourseInfo_RegisterStreamClients to
+// GM_CurrentCourseTotalPar4andPar5Holes, and TW06 has golf\gamemode\courseinfo.c): the course table
+// read from the disc ('CRI ' chunk, gCourseInfo: every course's 18 holes with their par, handicap,
+// length from each of four tees, prevailing wind and side-game flags, and each tee set's par) and
+// the compilation rounds ('CMPS' chunk, gCompilationCourses: Tiger's Dream 18 and Compilation 1..6,
+// 18 holes picked from other courses), with the par, length and hole lookups the round, the PGA
+// Tour, the scorecard and the wind use.
 
 #include "game_types.h"
 #include "game.h"
@@ -21,8 +26,8 @@ u8   GM_GetHoleIndexDrivingSideGame(int nHole);
 int  GM_CourseInfo_MapCompilationCourse(int nRound);
 int  GM_CurrentCourseTotalPar4andPar5Holes(void);
 
-CourseData gCourseInfo[NUM_COURSE_DATA];
-BuiltRound gCompilationCourses[NUM_BUILT_ROUNDS];
+CourseData gCourseInfo[NUM_COURSE_DATA];            // the course table, from the 'CRI ' chunk
+BuiltRound gCompilationCourses[NUM_BUILT_ROUNDS];   // the compilation rounds, from 'CMPS'
 
 // The course table's close, called by GM_DeInitModule with the other units' stream frees: empty
 // (the 'CRI ' and 'CMPS' tables are static arrays, nothing to free).
@@ -69,7 +74,7 @@ int GM_GetCurrentHolePar(void) {
 }
 
 // The handicap (stroke index) of the round's hole nHole (0..17): the course table's field nRating,
-// which the scorecard shows (GM_vGetHoleRating).
+// which UI message 35 (GM_vGetHoleRating) answers as the hole's rating.
 s32 GM_GetHoleIndexHandicap(int nHole) {
     return gCourseInfo[gpGame->nHoleCourse[nHole]].aHoles[gpGame->nHoleNum[nHole]].nRating;
 }
@@ -258,6 +263,7 @@ int GM_CurrentCourseTotalPar4andPar5Holes(void) {
 
 // Data order: after GM_CourseInfo_MapCompilationCourse's jump table in .data; "Skillz" and "NA"
 // land in .sdata.
+// Each course's name, by course number (the menus and the ladder copy it).
 char* gCourseNames[NUM_COURSES] = {
     "Pebble Beach",
     "Princeville Resort",

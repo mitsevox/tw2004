@@ -31,7 +31,8 @@ u8   gHoleContestDecided;           // the contest on this hole is decided (Hole
 u8   gHoleContestWon;               // a contest has a winner this round (HoleContest_RankResults), or
                                     // the hole in one was made
 
-u8   GM_GetHoleIndexDrivingSideGame(int nHole);    // a flag of the hole's course data (byte 0x35): the drive can count
+// a flag of the hole's course data (byte 0x35): the drive can count
+u8   GM_GetHoleIndexDrivingSideGame(int nHole);
 u8   fn_800D0D54(int nPlayer);  // the shot started on fairway-class ground and ended on the fairway,
                                 // the green or in the cup (HoleScore.c)
 

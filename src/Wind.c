@@ -1,8 +1,10 @@
 // Wind.c (EA's name: TW07's Golf/Physics/Wind.c holds the same functions in this order, from
-// Wind_vInitModule and Wind_vCloseModule (both empty; gomainloop calls Wind_vInitModule and Wind_vCloseModule
-// at module init and close) to Wind_GetDirection; TW06 has golf/physics/wind.c): split off Ball.c
-// at 0x80055F14. Its .sbss starts on the 8-aligned address after Ball.c's padding at
-// 0x80281DE5..0x80281DE8 and its .sdata2 after the padding at 0x80283584..0x80283588.
+// Wind_vInitModule and Wind_vCloseModule (both empty, called at module init and close) to
+// Wind_GetDirection; only TW07's Wind_SetPhysicsWindSpeed has no copy here; TW06 has
+// golf/physics/wind.c): the wind of the ball's flight, a direction (one of eight, gWindDirs) and a
+// speed, set for each hole by Wind_InitForHole. Split off Ball.c at 0x80055F14. Its .sbss starts
+// on the 8-aligned address after Ball.c's padding at 0x80281DE5..0x80281DE8 and its .sdata2 after
+// the padding at 0x80283584..0x80283588.
 
 #include "ball.h"
 #include "game.h"
