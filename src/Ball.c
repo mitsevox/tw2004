@@ -397,16 +397,16 @@ s32 gTurfSpeed = 2;
 // options +0x1C (ROUGH LENGTH?), 0..2: class-5 friction x 0.7, 1, 1.3
 s32 gRoughSetting = 1;
 // .bss: defined in reverse address order.
-f32 lbl_801D58C8[4][4];
-f32 lbl_801D5888[4][4];
+f32 gBallPreferredLieSpot[4][4];
+f32 gBallDropSpot[4][4];
 // .sbss: defined in reverse address order.
-u8  lbl_80281DE4;                          // the two ground heights below are current
-f32 lbl_80281DE0;                         // ground height under the ball
-f32 lbl_80281DDC;                         // the other ground height (Ter_GetEnclosingGroundData)
+u8  gBallGroundValid;                          // the two ground heights below are current
+f32 gBallGroundHeight;                         // ground height under the ball
+f32 gBallGroundHeight2;                         // the other ground height (Ter_GetEnclosingGroundData)
 s32 gFairwaySetting;                      // 0..2: class-2 friction x 1.0 / 0.9 / 0.8
 // options +0x18 (GREEN SPEED?), 0..2: green friction x 1, 0.9, 0.8
 s32 gGreenSpeedSetting;
-u8  lbl_80281DD2;
+u8  gNoRandomRolls;
 u8  gSimFullCup;                          // a sim that still gets the cup pull and near-cup gravity
                                           // (state 15, look-ahead)
 u8  gSimulating;                          // 0x80281DD0  a rehearsal: no sounds or effects
@@ -929,8 +929,8 @@ void Physics_ShotImpact(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim,
     }
     pBall->f70 = 0.0f;
     if (pBall->nPlayer >= 0 && pBall->nPlayer <= 3) {
-        Vec3Copy(pBall->vPos, lbl_801D5888[pBall->nPlayer]);
-        Vec3Copy(pBall->vPos, lbl_801D58C8[pBall->nPlayer]);
+        Vec3Copy(pBall->vPos, gBallDropSpot[pBall->nPlayer]);
+        Vec3Copy(pBall->vPos, gBallPreferredLieSpot[pBall->nPlayer]);
     }
     if (pBall->nPlayer >= 0) {
         EVENT_Trigger(pBall->nPlayer, 10, pBall, !gSimulating);
@@ -1058,23 +1058,23 @@ u8 Physics_GetSurfaceInfo(Ball* pBall, SurfaceType** ppSurface, f32* pNormal) {
     f32          vNormal2[4];
     f32          fDrop;
     int          nPlayer;
-    Ter_GetEnclosingGroundData(pBall->pCourse, pBall->vPos, &lbl_80281DE0, &pSurface, vNormal, &lbl_80281DDC,
+    Ter_GetEnclosingGroundData(pBall->pCourse, pBall->vPos, &gBallGroundHeight, &pSurface, vNormal, &gBallGroundHeight2,
                                &pSurface2, vNormal2);
-    lbl_80281DE4 = 1;
-    if (lbl_80281DE0 < -60000.0f) {
-        if (!Ball_NoGround(lbl_80281DDC)) {
-            fDrop = lbl_80281DDC - pBall->vPos[1];
+    gBallGroundValid = 1;
+    if (gBallGroundHeight < -60000.0f) {
+        if (!Ball_NoGround(gBallGroundHeight2)) {
+            fDrop = gBallGroundHeight2 - pBall->vPos[1];
         }
-        if (lbl_80281DDC < -60000.0f || fDrop > 0.028f) {
+        if (gBallGroundHeight2 < -60000.0f || fDrop > 0.028f) {
             nPlayer = Ball_Owner(pBall);
-            if (lbl_80281DDC < -60000.0f && pBall->fAC < 2.0f && !GM_IsBallOOB(nPlayer, pBall)) {
+            if (gBallGroundHeight2 < -60000.0f && pBall->fAC < 2.0f && !GM_IsBallOOB(nPlayer, pBall)) {
                 // EA bug: meant as a range check (nSurface >= 156); as written any valid surface
                 // becomes 109 and one past the table is kept and read below
                 if (pBall->nSurface < 0 || pBall->nSurface < 156) {
                     pBall->nSurface = 109;
                 }
                 pSurface = &gSurfaceTypes[pBall->nSurface];
-                lbl_80281DE0 = pBall->vPrev[1] - BALL_RADIUS - 0.0013888889f;
+                gBallGroundHeight = pBall->vPrev[1] - BALL_RADIUS - 0.0013888889f;
                 pBall->fAC += 1.0f;
                 vNormal[0] = 0.0f;
                 vNormal[1] = 1.0f;
@@ -1317,7 +1317,7 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, SurfaceType* pSurface) {
         fRest = 0.5f;
     }
     if (fRest < 0.0f) {
-        if (!(gSimulating || lbl_80281DD2 || pBall->nPlayer == 4 ||
+        if (!(gSimulating || gNoRandomRolls || pBall->nPlayer == 4 ||
               (pBall->nPlayer >= 0 && pBall->nPlayer <= 3 && gPlayers[pBall->nPlayer].bPerfect))) {
             fK = 1.0f - 2.0f * Misc_RandFuncf(0);
             fK -= 0.005f * (s8)Golfer_GetAttribute(&gPlayers[pBall->nPlayer], ATTR_LUCK, ATTR_TOTAL);
@@ -1488,7 +1488,7 @@ u8 fn_80053240(Ball* pBall, f32 fTicks) {
 }
 
 // The lie from the surface class, with LUCK (0..110, players 0..3) in the rolls; a sim or
-// lbl_80281DD2 rolls 0 (the kind result):
+// gNoRandomRolls rolls 0 (the kind result):
 //   1, 2: lie 1.  3, 18: lie 9 (green).  4: lie 10.  7, 16: lie 13.  8: lie 11.
 //   5 (rough): surface 145 is lie 4; else a coin flip, forced good when (r & 127) < LUCK/2 -
 //     good: lie 3 / surface 27 (never on course 6); bad: lie 4 / surface 28.
@@ -1534,7 +1534,7 @@ void Ball_SetLie(Ball* pBall, SurfaceType* pSurface) {
             pBall->nLie = LIE_ROUGH_e;
             break;
         }
-        if (gSimulating || lbl_80281DD2) {
+        if (gSimulating || gNoRandomRolls) {
             r = 0;
         } else {
             r = Misc_RandFunc(0);
@@ -1558,7 +1558,7 @@ void Ball_SetLie(Ball* pBall, SurfaceType* pSurface) {
         }
         break;
     case 11:
-        if (gSimulating || lbl_80281DD2) {
+        if (gSimulating || gNoRandomRolls) {
             r = 0;
         } else {
             r = Misc_RandFunc(0);
@@ -1572,7 +1572,7 @@ void Ball_SetLie(Ball* pBall, SurfaceType* pSurface) {
         break;
     case 6:
     case 20:
-        if (gSimulating || lbl_80281DD2) {
+        if (gSimulating || gNoRandomRolls) {
             r = 0;
         } else {
             r = Misc_RandFunc(0);
@@ -1638,7 +1638,7 @@ void Ball_SetLie(Ball* pBall, SurfaceType* pSurface) {
     if (pBall->nSurface >= 0 && pBall->nSurface < 156) {
         pLie = &gSurfaceTypes[pBall->nSurface];
         if (pLie->f04) {
-            if (gSimulating || lbl_80281DD2) {
+            if (gSimulating || gNoRandomRolls) {
                 f = 0.0f;
                 rSign = 0;
             } else {
@@ -1665,7 +1665,7 @@ static inline f32 Ball_SpinKeep(Ball* pBall) {
 
 // The ball has hit something (a surface, or an object as surface 13). A tree (class 17) tilts
 // the hit normal by 12..19 degrees on two axes - negative unless the roll's low 5 bits are 0,
-// so almost always negative; a sim, lbl_80281DD2, slot 4 or a perfect shot rolls 0 (+12, +12).
+// so almost always negative; a sim, gNoRandomRolls, slot 4 or a perfect shot rolls 0 (+12, +12).
 // The ball is put at the hit point (backed off along its velocity on a solid surface), a
 // fraction of the tick used is returned in *pFrac, a surface-108 hit is a hazard, and gravity is
 // given back for the part of the tick not flown. First bounce of a shot in flight: event 0x1D,
@@ -1679,7 +1679,7 @@ u8 Physics_ProcessCollision(Ball* pBall, f32* pHit, f32* pNormal, SurfaceType* p
     int nA, nB;
     f32 fPrev, fNow, fBack, fAngle, fS, fC;
     if (pSurface->nClass == 17) {
-        if (gSimulating || lbl_80281DD2 || pBall->nPlayer == 4 ||
+        if (gSimulating || gNoRandomRolls || pBall->nPlayer == 4 ||
             (pBall->nPlayer >= 0 && pBall->nPlayer <= 3 && gPlayers[pBall->nPlayer].bPerfect)) {
             r = 0;
         } else {
@@ -1838,12 +1838,12 @@ void Physics_FixBallHeight(Ball* pBall, u8 bSettle, f32 fTicks) {
     if (pBall->bHoled || pBall->nState == 2) return;
     bRetried = 0;
     for (;;) {
-        if (!lbl_80281DE4) {
-            Ter_GetEnclosingGroundHeight(pBall->pCourse, pBall->vPos, &lbl_80281DE0, &lbl_80281DDC);
+        if (!gBallGroundValid) {
+            Ter_GetEnclosingGroundHeight(pBall->pCourse, pBall->vPos, &gBallGroundHeight, &gBallGroundHeight2);
         }
-        fGround = lbl_80281DE0;
+        fGround = gBallGroundHeight;
         if (fGround < -60000.0f) {
-            fGround = lbl_80281DDC;
+            fGround = gBallGroundHeight2;
             if (fGround < -60000.0f) {
                 Physics_OutOfBounds(pBall, 1);
                 return;
@@ -1854,12 +1854,12 @@ void Physics_FixBallHeight(Ball* pBall, u8 bSettle, f32 fTicks) {
             return;
         }
         if (pBall->vPos[1] - fGround > 0.0466666669f) {
-            if (pBall->nSurface != 98 && !(lbl_80281DDC < -60000.0f)
-                && lbl_80281DDC - pBall->vPos[1] <= 0.07f) {
-                fGround = lbl_80281DDC;
+            if (pBall->nSurface != 98 && !(gBallGroundHeight2 < -60000.0f)
+                && gBallGroundHeight2 - pBall->vPos[1] <= 0.07f) {
+                fGround = gBallGroundHeight2;
             } else if (!bRetried) {
                 bRetried     = 1;
-                lbl_80281DE4 = 0;
+                gBallGroundValid = 0;
                 continue;
             } else if (!bSettle) {
                 pBall->nState = 2;
@@ -2257,7 +2257,7 @@ f32 Physics_GetBallAltitude(Ball* pBall) {
 // and its closest approach to the pin.
 void Physics_QuickSimulate(Ball* pBall, f32 fTicks) {
     f32 fDist;
-    lbl_80281DE4 = 0;
+    gBallGroundValid = 0;
     switch (pBall->nState) {
     case 2:
         Ball_FlightStep(pBall, fTicks);
@@ -2294,7 +2294,7 @@ void Physics_QuickSimulate(Ball* pBall, f32 fTicks) {
         }
     }
 done:
-    lbl_80281DE4 = 0;
+    gBallGroundValid = 0;
     if (pBall->bHoled || pBall->nState == 1 || pBall->nState == 5) {
         pBall->fSpeed = 0.0f;
     } else {
@@ -2322,10 +2322,10 @@ int Physics_Simulate(Ball* pBall, int nMs) {
             Ter_CheckForDropLocation(pBall->pCourse, pBall->vPos, 0, &bA, &bB, NULL);
         }
         if (bA) {
-            Vec3Copy(pBall->vPos, lbl_801D5888[pBall->nPlayer]);
+            Vec3Copy(pBall->vPos, gBallDropSpot[pBall->nPlayer]);
         }
         if (bB) {
-            Vec3Copy(pBall->vPos, lbl_801D58C8[pBall->nPlayer]);
+            Vec3Copy(pBall->vPos, gBallPreferredLieSpot[pBall->nPlayer]);
         }
     }
     return 0;
@@ -2370,8 +2370,8 @@ u8 Physics_DropBall(Ball* pBall, f32* pPos) {
     Ball_SetLie(pBall, pSurface);
     pBall->f70 = 0.5f * pBall->f70;
     if (pBall->nPlayer >= 0 && pBall->nPlayer <= 3) {
-        Vec3Copy(pBall->vPos, lbl_801D5888[pBall->nPlayer]);
-        Vec3Copy(pBall->vPos, lbl_801D58C8[pBall->nPlayer]);
+        Vec3Copy(pBall->vPos, gBallDropSpot[pBall->nPlayer]);
+        Vec3Copy(pBall->vPos, gBallPreferredLieSpot[pBall->nPlayer]);
     }
     return 1;
 }
@@ -2450,14 +2450,14 @@ u8 Physics_InitBall(Ball* pBall, f32* pPos, int nPlayer) {
     pBall->vPos[1] = 0.027777778f + (BALL_RADIUS + fGround);
     LLMath_CopyVec(pPos, pBall->vPrev);
     if (nPlayer >= 0 && nPlayer <= 3) {
-        LLMath_CopyVec(pPos, lbl_801D58C8[nPlayer]);
-        LLMath_CopyVec(pPos, lbl_801D5888[nPlayer]);
+        LLMath_CopyVec(pPos, gBallPreferredLieSpot[nPlayer]);
+        LLMath_CopyVec(pPos, gBallDropSpot[nPlayer]);
     }
     return 0;
 }
 
 void fn_80055C1C(u8 b) {
-    lbl_80281DD2 = b;
+    gNoRandomRolls = b;
 }
 
 // Course setting (0..4, else 2).
@@ -2530,8 +2530,8 @@ void fn_80055D3C(void) {
 
 void fn_80055D54(void) {
     gTurfSpeed = 2;
-    lbl_80281DE4 = 0;
-    lbl_80281DD2 = 0;
+    gBallGroundValid = 0;
+    gNoRandomRolls = 0;
 }
 
 void fn_80055D6C(void) {

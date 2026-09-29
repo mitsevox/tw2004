@@ -234,8 +234,8 @@ extern TerBox   gTerCupGeometryBounds[NUM_CUP_POSITIONS];  // the 3D cup geometr
 extern TNetwork* gTerFreeDropNetworks[MAX_FREE_DROP_NETWORKS];
 extern TNetwork* gTerOOBNetworks[MAX_OOB_NETWORKS];
 extern u8        gTerObjectMarks[MAX_OBJECTS];        // objects near the current line
-extern f32       lbl_801D5888[4][4];  // per player: the last spot where the ball could be dropped
-extern f32       lbl_801D58C8[4][4];  // per player: the last such spot with a preferred lie
+extern f32       gBallDropSpot[4][4];  // per player: the last spot where the ball could be dropped
+extern f32       gBallPreferredLieSpot[4][4];  // per player: the last such spot with a preferred lie
 extern u8        gTerUse3DCupGeometry;        // the cup is real geometry
 extern s32       gTerNumFreeDropNetworks;        // free-drop networks loaded
 extern s32       gTerNumOOBNetworks;        // out-of-bounds networks loaded

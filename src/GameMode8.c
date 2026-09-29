@@ -1401,7 +1401,7 @@ void SpeedGolf_RunUpdate(int nPlayer) {
                 if (Input_ReadControlPad(gPlayers[nPlayer].nController)
                     & Controller_GetButtonMask(0x23, 0)) {
                     if (gPlayers[nPlayer].ball.nState != 1) {
-                        Physics_DropBall(pBall, lbl_801D5888[nPlayer]);
+                        Physics_DropBall(pBall, gBallDropSpot[nPlayer]);
                         gPlayers[nPlayer].ball.nState = 1;
                     }
                 } else {

@@ -515,8 +515,8 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bH
 
 // TW06: bool Ter_SearchForDropLocation(s32, bool, bool, f32*), with the ring search that TW06 split
 // out as Ter_SearchAreaForDropLocation written inline. Where a player's ball is to be
-// dropped (pOut): the last good drop spot (lbl_801D5888), or with bPreferred the last spot with a
-// preferred lie (lbl_801D58C8) when that is not the shot's own start and is less than 10 yards
+// dropped (pOut): the last good drop spot (gBallDropSpot), or with bPreferred the last spot with a
+// preferred lie (gBallPreferredLieSpot) when that is not the shot's own start and is less than 10 yards
 // further away. If the spot is over 3 yards off, or (not preferred) on another class of surface
 // than the ball, search rings of 1 to 4 yards around the ball, every 45 degrees starting towards
 // the pin, for a drop on the same class, else the nearest. Returns 0 when the spot is where the
@@ -548,17 +548,17 @@ u8 Ter_SearchForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut) {
         bPreferred = 0;                 // past the pin
     }
     if (bPreferred) {
-        fDist = LLMath_DistanceBetween3(lbl_801D58C8[nPlayer], p->ball.vPos);
-        fDropDist = LLMath_DistanceBetween3(lbl_801D5888[nPlayer], p->ball.vPos);
-        if ((p->ball.vStart[0] != lbl_801D58C8[nPlayer][0] || p->ball.vStart[1] != lbl_801D58C8[nPlayer][1]
-             || p->ball.vStart[2] != lbl_801D58C8[nPlayer][2])
+        fDist = LLMath_DistanceBetween3(gBallPreferredLieSpot[nPlayer], p->ball.vPos);
+        fDropDist = LLMath_DistanceBetween3(gBallDropSpot[nPlayer], p->ball.vPos);
+        if ((p->ball.vStart[0] != gBallPreferredLieSpot[nPlayer][0] || p->ball.vStart[1] != gBallPreferredLieSpot[nPlayer][1]
+             || p->ball.vStart[2] != gBallPreferredLieSpot[nPlayer][2])
             && fDist - fDropDist < 10.0f) {
-            LLMath_CopyVec(lbl_801D58C8[nPlayer], pOut);
+            LLMath_CopyVec(gBallPreferredLieSpot[nPlayer], pOut);
         } else {
-            LLMath_CopyVec(lbl_801D5888[nPlayer], pOut);
+            LLMath_CopyVec(gBallDropSpot[nPlayer], pOut);
         }
     } else {
-        LLMath_CopyVec(lbl_801D5888[nPlayer], pOut);
+        LLMath_CopyVec(gBallDropSpot[nPlayer], pOut);
     }
     vPos[0] = pOut[0];
     vPos[1] = 1000000.0f;
