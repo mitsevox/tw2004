@@ -1,7 +1,13 @@
 // streammanagerhole.c (our name, after TW06's golf/streaming/streammanagerhole.cpp; the 2003 game
-// is C): the stream file lists (front end, startup, in game, characters, loading screens, the
-// hole) and their loads, the lists of stream handlers each part registers and unregisters, and
-// (from 0x80015470) the renderer's state cache, the 2D view and the vertex output.
+// is C, and this one file holds what TW06/TW07 split into StreamManager, StreamManagerBase and one
+// StreamManager<Part>.cpp per part): the stream manager. gStreamManagerLists holds seven file
+// lists, one per part of the game: 0 in game (GlbData, GlbChar, the golfers' character and sac
+// files), 1 front end (FEnd.gcb, FEChar.gcb), 2 loading screen (Load<n>.gcb), 3 FE character
+// (one FEChars file), 4 globals (LoadOnce.gcb), 5 startup (LoadOnce.gcb, startup.gcb), 6 the hole
+// (hole.hog). Per part: the stream handlers it registers and unregisters around its load, the
+// files it adds, its open / stream-to-the-end / close, and its (empty) file-opened and
+// file-closed callbacks. The file ends with Game_GetCurHoleNum (0x80015464); the renderer's state
+// cache from 0x80015470 on is Code80015470.c.
 
 #include "ustream.h"
 #include "camera.h"
@@ -13,6 +19,8 @@
 #include "llpict.h"
 #include "unsorted/cull.h"
 
+// The file names the parts add to their lists (the Fmt ones go through sprintf; the course
+// directory and hole name build the hole's data/<course>/<hole>/hole.hog).
 char gszStreamFrontendFile[] = "data/FEnd/FEnd.gcb";
 char gszStreamFECharFile[] = "FEChar.gcb";
 char gszStreamLoadOnceFile[] = "LoadOnce.gcb";
@@ -29,12 +37,16 @@ char gszStreamCharSacFileFmt[] = "data/CharSac/%02dchrsac.gcb";
 char gszStreamFECharFileFmt[] = "data/FEChars/%02dcharfe.gcb";
 
 // Defined here, last address first (CodeWarrior lays out .bss in reverse).
+// gStreamManagerCharAdded: 30 flag bytes (of 0x38) that StreamManager_InitModule and
+// StreamManagerIngame_SetupFileStream clear and nothing in this build reads (TW07's StreamManager
+// has SetCharAdded / IsCharAdded). gStreamManagerLists: the seven file lists (0 in game .. 6 hole,
+// see the top of the file) and the stream open on one of them.
 u8          gStreamManagerCharAdded[0x38];
 StreamLists gStreamManagerLists;
 
+// Every list add, open, close and clear goes through this pointer (FEgolferanim.c and LoadData.c
+// too).
 StreamLists* gpStreamManagerLists = &gStreamManagerLists;
-
-// ---- sweep code (not yet cleaned up) ----
 
 void StreamManager_InitModule();
 void StreamManager_InitOnce(void);
@@ -69,7 +81,8 @@ void UI_InitLoadingBar(void);     // uiProcessPolygon.c: set up the loading scre
 void UI_DrawLoadingScreenAndProgressBar(int nMode);    // uiProcessPolygon.c: update the loading screen
 void UI_FreeLoadingPicture(void);     // uiProcessPolygon.c
 void UI_LoadLoadingBarTexture(void);     // uiProcessPolygon.c
-void StreamManagerHole_AddStreamFileName(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
+void StreamManagerHole_AddStreamFileName(const char* szName, void (*pfnOpened)(void*),
+                                         void (*pfnClosed)(void*));
 void StreamManagerIngame_StreamFiles(void);
 void fn_8000B9E4();
 void fn_8000BA14();
@@ -89,7 +102,6 @@ void fn_80124A40();
 void fn_80124A70();
 void StreamManagerFrontend_RegisterStreamClients(void);
 void StreamManagerFrontend_UnregisterStreamClients(void);
-void StreamManagerLoadScreen_StreamFiles(void);
 void startup_RegisterStreamClients();
 void startup_UnregisterStreamClients();
 void StreamManagerStartup_RegisterStreamClients(void);
@@ -137,9 +149,12 @@ void StreamManagerIngame_EndStreamCallbackIGChar(void* pArg);
 void StreamManagerFrontend_EndStreamCallback(void* pArg);
 void StreamManagerLoadScreen_EndStreamCallback(void* pArg);
 void StreamManagerFEChar_EndStreamCallback(void* pArg);
-void StreamManagerFEChar_AddStreamFileName(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
-void StreamManagerLoadScreen_AddStreamFileName(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
-void StreamManagerIngame_AddStreamFileName(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
+void StreamManagerFEChar_AddStreamFileName(const char* szName, void (*pfnOpened)(void*),
+                                           void (*pfnClosed)(void*));
+void StreamManagerLoadScreen_AddStreamFileName(const char* szName, void (*pfnOpened)(void*),
+                                               void (*pfnClosed)(void*));
+void StreamManagerIngame_AddStreamFileName(const char* szName, void (*pfnOpened)(void*),
+                                           void (*pfnClosed)(void*));
 u32  Skalib_CurSlot(void);          // skalib.c
 int  Skalib_HasOverlays(int nSlot); // skalib.c
 void StreamManagerGlobals_EndStreamCallback(void* pArg);
@@ -160,8 +175,6 @@ void StreamManagerHole_OpenStreamFiles(void);
 void StreamManagerHole_ClearStreamFileNames(void);
 void StreamManagerIngame_ClearStreamFileNames(void);
 void StreamManagerFEChar_ClearStreamFileNames(void);
-
-// ---- end of sweep code ----
 
 void StreamManagerStartup_AddStreamFileName(const char* szName, void (*pfnOpened)(void*),
                                             void (*pfnClosed)(void*));
@@ -202,15 +215,11 @@ void StreamManager_InitModule(void) {
     StreamManagerHole_InitModule();
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
 // The stream manager's once-at-boot init (called from the game's init-once list): just
 // StreamManager_InitModule.
 void StreamManager_InitOnce(void) {
     StreamManager_InitModule();
 }
-
-// ---- end of sweep code ----
 
 // Add loading-screen file nFile (data/Load/Load<nFile>.gcb) to the loading-screen stream list (2).
 // LoadData.c picks nFile for the course, empties list 2 first and streams it right after.
@@ -221,8 +230,6 @@ void StreamManager_AddLoadScreenFile(int nFile) {
     StreamManagerLoadScreen_AddStreamFileName(szName, StreamManagerLoadScreen_BeginStreamCallback,
                 StreamManagerLoadScreen_EndStreamCallback);
 }
-
-// ---- sweep code (not yet cleaned up) ----
 
 // The stream manager's shutdown, called from the game's close-once list. Empty in this build.
 void StreamManager_CloseOnce(void) {
@@ -312,8 +319,6 @@ void StreamManagerFrontend_UnregisterStreamClients(void) {
     UI_vEATraxUnRegisterStreamClients();
 }
 
-// ---- end of sweep code ----
-
 // Read the front end's stream list (1) to the end, with the loading screen unless the front end's
 // bFirstTime is set (the first time, it streams with no screen).
 void StreamManagerFrontend_StreamFiles(void) {
@@ -335,8 +340,6 @@ void StreamManagerFrontend_StreamFiles(void) {
         UI_FreeLoadingPicture();
     }
 }
-
-// ---- sweep code (not yet cleaned up) ----
 
 // Read the loading-screen stream list (2) to the end, with nothing drawn (it is the loading
 // screen's own picture). Called by LoadData.c.
@@ -436,8 +439,6 @@ void StreamManagerHole_UnregisterStreamClients(void) {
     StaticCam_UnRegisterStreamClients();
 }
 
-// ---- end of sweep code ----
-
 // Stream the current hole's file (data/<course>/<hole>/hole.hog, or the session's override) as
 // list 6, updating the loading screen until it is all read.
 void StreamManagerHole_StreamFiles(void) {
@@ -468,14 +469,10 @@ void StreamManagerHole_StreamFiles(void) {
     UI_FreeLoadingPicture();
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
 // Called by StreamManager_InitModule; empty in this build. Named for its place beside the hole
 // manager's functions.
 void StreamManagerHole_InitModule(void) {
 }
-
-// ---- end of sweep code ----
 
 // Refill the in-game stream list (0) with GlbData.gcb, GlbChar.gcb and every player's golfer's
 // character file (data/Chars/<model + 1>char.gcb), clear gSacReloading and gStreamManagerCharAdded.
@@ -562,8 +559,6 @@ void StreamManagerIngame_SetupCurSlotSacFiles(void) {
     }
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
 // Read the in-game stream list (0) to the end, drawing the loading screen, which the caller has
 // already set up (StreamManagerIngame_StreamFiles also inits it). Called by Character_LoadSacFiles
 // and Character_ReloadSacFiles.
@@ -580,12 +575,11 @@ void StreamManagerIngame_StreamSacFiles(void) {
 void StreamManagerFEChar_InitModule(void) {
 }
 
-// ---- end of sweep code ----
-
 // Make the FE character stream list (3) hold only character nChar's front-end file
-// (data/FEChars/<nChar + 1>charfe.gcb), and mark the CrAP golfer as not yet streamed (nStreamedId =
-// -1). Called by FE_StreamFunc_SkinInit.
-void StreamManagerFEChar_SetupFileStream(s32 nChar, s32 nUnused) { // port: FEgolferanim.c passes a second argument this ignores
+// (data/FEChars/<nChar + 1>charfe.gcb), and mark the CrAP golfer as not yet streamed
+// (nStreamedId = -1). Called by FE_StreamFunc_SkinInit.
+// port: FEgolferanim.c passes a second argument this ignores (nUnused).
+void StreamManagerFEChar_SetupFileStream(s32 nChar, s32 nUnused) {
     char szName[0x100];  // size unknown: the frame allows up to 0x100 bytes
 
     StreamManagerFEChar_ClearStreamFileNames();
@@ -594,8 +588,6 @@ void StreamManagerFEChar_SetupFileStream(s32 nChar, s32 nUnused) { // port: FEgo
     StreamManagerFEChar_AddStreamFileName(szName, StreamManagerFEChar_BeginStreamCallback,
                                           StreamManagerFEChar_EndStreamCallback);
 }
-
-// ---- sweep code (not yet cleaned up) ----
 
 // The stream opened callback of the in-game character files (GlbChar.gcb, data/Chars, data/CharSac)
 // (UStream calls it when the file is opened). Empty in this build.
@@ -657,8 +649,6 @@ void StreamManagerGlobals_EndStreamCallback(void* pArg) {
 void StreamManagerHole_EndStreamCallback(void* pArg) {
 }
 
-// ---- end of sweep code ----
-
 // Add file szName to the startup stream list (5), with the calls UStream makes when it is opened
 // and closed. No bounds check: the list holds 8 files.
 void StreamManagerStartup_AddStreamFileName(const char* szName, void (*pfnOpened)(void*),
@@ -698,8 +688,6 @@ void StreamManagerLoadScreen_AddStreamFileName(const char* szName, void (*pfnOpe
     gpStreamManagerLists->aParams[2].apfnClosed[gpStreamManagerLists->aParams[2].nNumFiles] = pfnClosed;
     gpStreamManagerLists->aParams[2].nNumFiles++;
 }
-
-// ---- sweep code (not yet cleaned up) ----
 
 // Close the open stream (gpStreamManagerLists->nStream) after the in-game list (0) has streamed.
 void StreamManagerIngame_CloseStreamFiles(void) {
@@ -770,8 +758,6 @@ void StreamManagerHole_OpenStreamFiles(void) {
     gpStreamManagerLists->nStream = t0;
 }
 
-// ---- end of sweep code ----
-
 // Add file szName to the hole stream list (6), with the calls UStream makes when it is opened and
 // closed. No bounds check: the list holds 8 files.
 void StreamManagerHole_AddStreamFileName(const char* szName, void (*pfnOpened)(void*),
@@ -782,13 +768,9 @@ void StreamManagerHole_AddStreamFileName(const char* szName, void (*pfnOpened)(v
     gpStreamManagerLists->aParams[6].nNumFiles++;
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
 void StreamManagerHole_ClearStreamFileNames(void) {
     gpStreamManagerLists->aParams[6].nNumFiles = 0;
 }
-
-// ---- end of sweep code ----
 
 // Add file szName to the in-game stream list (0), with the calls UStream makes when it is opened
 // and closed. No bounds check: the list holds 8 files.
@@ -800,13 +782,9 @@ void StreamManagerIngame_AddStreamFileName(const char* szName, void (*pfnOpened)
     gpStreamManagerLists->aParams[0].nNumFiles++;
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
 void StreamManagerIngame_ClearStreamFileNames(void) {
     gpStreamManagerLists->aParams[0].nNumFiles = 0;
 }
-
-// ---- end of sweep code ----
 
 // Add file szName to the FE character stream list (3), with the calls UStream makes when it is
 // opened and closed. No bounds check: the list holds 8 files.
@@ -818,8 +796,6 @@ void StreamManagerFEChar_AddStreamFileName(const char* szName, void (*pfnOpened)
     gpStreamManagerLists->aParams[3].nNumFiles++;
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
 void StreamManagerFEChar_ClearStreamFileNames(void) {
     gpStreamManagerLists->aParams[3].nNumFiles = 0;
 }
@@ -828,5 +804,3 @@ void StreamManagerFEChar_ClearStreamFileNames(void) {
 int Game_GetCurHoleNum(void) {
     return gpGame->nCurHoleNum;
 }
-
-// ---- end of sweep code ----
