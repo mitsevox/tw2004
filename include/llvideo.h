@@ -43,7 +43,7 @@ typedef struct Video {
     VideoQueue queue;                   // 0x008
     u8         unk1014[4];
     VideoChunk* p1018;                 // 0x1018 a chunk, given back when the movie stops
-    int        nSlot;                   // 0x101C its slot in lbl_80281200, -1 when it has none
+    int        nSlot;                   // 0x101C its slot in gpVideoSlots, -1 when it has none
     u8         b1020;                   // 0x1020 set while the movie runs: chunks are queued
     u8         b1021;                   // 0x1021 set: fn_80075AD0_UpdateAll skips the movie
     u8         bEnded;                  // 0x1022 the decoder ran out (fn_800760A8_HasEnded)
@@ -57,7 +57,7 @@ typedef struct Video {
 } Video;
 LAYOUT_ASSERT(Video, 0x10B0);
 
-// The movies being played (lbl_801D7120, 0x28 bytes, reached through lbl_80281200).
+// The movies being played (gVideoSlots, 0x28 bytes, reached through gpVideoSlots).
 #define NUM_VIDEO_SLOTS 8
 typedef struct VideoSlots {
     Video* apVideo[NUM_VIDEO_SLOTS];    // 0x00  fn_80075904 puts a movie in a slot
@@ -66,8 +66,8 @@ typedef struct VideoSlots {
     u8     pad24[4];
 } VideoSlots;
 LAYOUT_ASSERT(VideoSlots, 0x28);
-extern VideoSlots* lbl_80281200;
-extern u8 lbl_80281EB8;                 // fn_80007258()'s value when the last movie started
+extern VideoSlots* gpVideoSlots;
+extern u8 gbVideoFrameWasOpen;                 // fn_80007258()'s value when the last movie started
 
 // Play the movie file pName; pfnStop(pVideo, nArg) nonzero stops it early.
 void LLVideo_PlayFile(const char* pName, u8 (*pfnStop)(Video* pVideo, int nArg), int nArg, int nFlags);

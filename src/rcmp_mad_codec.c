@@ -19,10 +19,10 @@
 u8* maddataptr;                 // the next coded byte
 u32 madshiftreg;                // the bit buffer, next bit at the top
 s32 madbitcount;                // bits left in madshiftreg
-s32 lbl_802821AC;               // 0: a key frame, 1: coded against a reference
-s32 lbl_802821A8;               // the decoder's tables are built
+s32 gMadMotion;               // 0: a key frame, 1: coded against a reference
+s32 gbMadTablesBuilt;               // the decoder's tables are built
 
-const MadCode lbl_80183C78[95] = {
+const MadCode gMadCoefCodes[95] = {
     {2, 0xFE00, 0, 0x8000}, {3, 0x1, 0, 0xC000}, {3, 0x3FF, 0, 0xE000}, {4, 0x401, 0, 0x6000},
     {4, 0x7FF, 0, 0x7000}, {5, 0x2, 0, 0x4000}, {5, 0x3FE, 0, 0x4800}, {5, 0x801, 0, 0x5000},
     {5, 0xBFF, 0, 0x5800}, {6, 0x3, 0, 0x2800}, {6, 0x3FD, 0, 0x2C00}, {6, 0xC01, 0, 0x3800},
@@ -48,7 +48,7 @@ const MadCode lbl_80183C78[95] = {
     {13, 0x4BFF, 0, 0x1A8}, {13, 0x4C01, 0, 0x190}, {13, 0x4FFF, 0, 0x198}, {13, 0x5001, 0, 0x170},
     {13, 0x53FF, 0, 0x178}, {13, 0x5401, 0, 0x160}, {13, 0x57FF, 0, 0x168},
 };
-const MadCode lbl_80184268[128] = {
+const MadCode gMadCoefCodesLong[128] = {
     {6, 0xC, 0, 0xD000}, {6, 0x3F4, 0, 0xD400}, {6, 0xD, 0, 0xC800}, {6, 0x3F3, 0, 0xCC00},
     {6, 0xE, 0, 0xC000}, {6, 0x3F2, 0, 0xC400}, {6, 0xF, 0, 0xB800}, {6, 0x3F1, 0, 0xBC00},
     {6, 0x406, 0, 0xB000}, {6, 0x7FA, 0, 0xB400}, {6, 0x407, 0, 0xA800}, {6, 0x7F9, 0, 0xAC00},
@@ -84,7 +84,7 @@ const MadCode lbl_80184268[128] = {
 };
 
 // MPEG-1's default intra quantizer matrix
-const s32 lbl_80184A68[64] = {
+const s32 gMadIntraQuant[64] = {
     8,  16, 19, 22, 26, 27, 29, 34,
     16, 16, 22, 24, 27, 29, 34, 37,
     19, 22, 26, 27, 29, 34, 34, 38,
@@ -96,7 +96,7 @@ const s32 lbl_80184A68[64] = {
 };
 
 // the scaled IDCT's factors for each coefficient (0x2000 = 1.0)
-s32 lbl_80190FE0[64] = {
+s32 idctprescale[64] = {
     0x2000, 0x1712, 0x187E, 0x1B37, 0x2000, 0x28BA, 0x3B21, 0x73FC,
     0x1712, 0x10A2, 0x11A8, 0x139F, 0x1712, 0x1D5D, 0x2AA1, 0x539F,
     0x187E, 0x11A8, 0x12BF, 0x14D4, 0x187E, 0x1F2C, 0x2D41, 0x58C5,
@@ -107,23 +107,23 @@ s32 lbl_80190FE0[64] = {
     0x73FC, 0x539F, 0x58C5, 0x62A3, 0x73FC, 0x939F, 0xD650, 0x1A463,
 };
 // the scan order of a block's coefficients
-const s32 lbl_80184B68[64] = {
+const s32 gMadScanOrder[64] = {
     0,  8,  1,  2,  9,  16, 24, 17, 10, 3,  4,  11, 18, 25, 32, 40,
     33, 26, 19, 12, 5,  6,  13, 20, 27, 34, 41, 48, 56, 49, 42, 35,
     28, 21, 14, 7,  15, 22, 29, 36, 43, 50, 57, 58, 51, 44, 37, 30,
     23, 31, 38, 45, 52, 59, 60, 53, 46, 39, 47, 54, 61, 62, 55, 63,
 };
 
-s32 lbl_801F8358[64];           // a block's coefficients
-s32 lbl_801F8258[64];           // the inverse DCT's first pass
+s32 idctinput[64];           // a block's coefficients
+s32 gMadIdctColumns[64];           // the inverse DCT's first pass
 u32 madvlctbl1[512];            // } the coefficient codes: the first 9 bits index
-u32 lbl_801F7658[256];          // } madvlctbl1; longer codes continue in these two
-u32 lbl_801F7258[256];          // }
+u32 madvlctbl2[256];          // } madvlctbl1; longer codes continue in these two
+u32 madvlctbl3[256];          // }
 u32 madvlctbl4[64];             // looked up by the buffer's top 6 bits
 s32 madquant[64];               // the quantizer for this picture
-s32 lbl_801F6C58[256];          // a macroblock's 16x16 Y block
-s32 lbl_801F6A58[2][64];        // a macroblock's U and V blocks
-u8 lbl_801F6858[512];           // a pixel value's clamp to 0..255, by its low 9 bits
+s32 gMadLumaBlock[256];          // a macroblock's 16x16 Y block
+s32 gMadChromaBlocks[2][64];        // a macroblock's U and V blocks
+u8 gMadClamp[512];           // a pixel value's clamp to 0..255, by its low 9 bits
 
 void madinit(void);
 u32 fn_800B8984(u8* pData, int nBytes);
@@ -162,7 +162,7 @@ void madinit(void) {
         } else if (n > 127) {
             n = 127;
         }
-        lbl_801F6858[i & 0x1FF] = n + 128;
+        gMadClamp[i & 0x1FF] = n + 128;
     }
 
     // the first 9 bits: the escape and end-of-block prefixes, and where longer codes continue
@@ -178,9 +178,9 @@ void madinit(void) {
     }
 
     for (i = 1; i < 95; i++) {
-        nCode = lbl_80183C78[i].nCode;
-        nLen = lbl_80183C78[i].nLen;
-        nValue = lbl_80183C78[i].nValue;
+        nCode = gMadCoefCodes[i].nCode;
+        nLen = gMadCoefCodes[i].nLen;
+        nValue = gMadCoefCodes[i].nValue;
         if (nCode & 0xFC00) {
             // up to 9 bits: every 9-bit index that starts with the code
             nIndex = nCode >> 7;
@@ -190,28 +190,28 @@ void madinit(void) {
                 madvlctbl1[nIndex + j] = uEntry;
             }
         } else {
-            // six zero bits first: the next 8 bits index lbl_801F7258
+            // six zero bits first: the next 8 bits index madvlctbl3
             nIndex = nCode >> 2;
             nBits = nLen - 6;
             nCount = 1 << (8 - nBits);
             uEntry = fn_800B769C_Read(MAD_ENTRY(nBits, nValue));
             for (j = 0; j < nCount; j++) {
-                lbl_801F7258[nIndex + j] = uEntry;
+                madvlctbl3[nIndex + j] = uEntry;
             }
         }
     }
 
     for (i = 0; i < 128; i++) {
-        nCode = lbl_80184268[i].nCode;
-        nLen = lbl_80184268[i].nLen;
-        nValue2 = lbl_80184268[i].nValue;
+        nCode = gMadCoefCodesLong[i].nCode;
+        nLen = gMadCoefCodesLong[i].nLen;
+        nValue2 = gMadCoefCodesLong[i].nValue;
         if (!(nCode & 0x8000)) {
             nBits = nLen - 1;
             nIndex = nCode >> 7;
             nCount = 1 << (8 - nBits);
             uEntry = fn_800B769C_Read(MAD_ENTRY(nBits, nValue2));
             for (j = 0; j < nCount; j++) {
-                lbl_801F7658[nIndex + j] = uEntry;
+                madvlctbl2[nIndex + j] = uEntry;
             }
         } else {
             nBits = nLen + 2;
@@ -219,7 +219,7 @@ void madinit(void) {
             nCount = 1 << (8 - nBits);
             uEntry = fn_800B769C_Read(MAD_ENTRY(nBits, nValue2));
             for (j = 0; j < nCount; j++) {
-                lbl_801F7258[nIndex + j] = uEntry;
+                madvlctbl3[nIndex + j] = uEntry;
             }
         }
     }
@@ -232,7 +232,7 @@ void madinit(void) {
         madvlctbl4[32 + i] = ((u32)(i + 1) << 22) | 6;
         madvlctbl4[48 + i] = ((u32)(i - 16) << 22) | 6;
     }
-    lbl_802821A8 = 1;
+    gbMadTablesBuilt = 1;
 }
 
 // Drop the top `bits` bits of the buffer, refilling 16 at a time.
@@ -253,19 +253,19 @@ s32 getdelta(void) {
     return nCode >> 22;
 }
 
-// Fill an 8x8 block (rows stride words apart) with lbl_801F8358[0].
+// Fill an 8x8 block (rows stride words apart) with idctinput[0].
 void dcblock(s32* dest, int stride) {
     int i;
 
     for (i = 0; i < 8; i++) {
-        dest[0] = lbl_801F8358[0];
-        dest[1] = lbl_801F8358[0];
-        dest[2] = lbl_801F8358[0];
-        dest[3] = lbl_801F8358[0];
-        dest[4] = lbl_801F8358[0];
-        dest[5] = lbl_801F8358[0];
-        dest[6] = lbl_801F8358[0];
-        dest[7] = lbl_801F8358[0];
+        dest[0] = idctinput[0];
+        dest[1] = idctinput[0];
+        dest[2] = idctinput[0];
+        dest[3] = idctinput[0];
+        dest[4] = idctinput[0];
+        dest[5] = idctinput[0];
+        dest[6] = idctinput[0];
+        dest[7] = idctinput[0];
         dest += stride;
     }
 }
@@ -306,27 +306,27 @@ void getchroma(const u8* src, int stride, s32* dest, int correction) {
     }
 }
 
-// A 16x16 block of 16.16 values back to pixels, clamped through lbl_801F6858.
+// A 16x16 block of 16.16 values back to pixels, clamped through gMadClamp.
 void setluma(const s32* src, u8* dest, int stride) {
     int i;
 
     for (i = 0; i < 16; i++) {
-        dest[0] = lbl_801F6858[(src[0] >> 16) & 0x1FF];
-        dest[1] = lbl_801F6858[(src[1] >> 16) & 0x1FF];
-        dest[2] = lbl_801F6858[(src[2] >> 16) & 0x1FF];
-        dest[3] = lbl_801F6858[(src[3] >> 16) & 0x1FF];
-        dest[4] = lbl_801F6858[(src[4] >> 16) & 0x1FF];
-        dest[5] = lbl_801F6858[(src[5] >> 16) & 0x1FF];
-        dest[6] = lbl_801F6858[(src[6] >> 16) & 0x1FF];
-        dest[7] = lbl_801F6858[(src[7] >> 16) & 0x1FF];
-        dest[8] = lbl_801F6858[(src[8] >> 16) & 0x1FF];
-        dest[9] = lbl_801F6858[(src[9] >> 16) & 0x1FF];
-        dest[10] = lbl_801F6858[(src[10] >> 16) & 0x1FF];
-        dest[11] = lbl_801F6858[(src[11] >> 16) & 0x1FF];
-        dest[12] = lbl_801F6858[(src[12] >> 16) & 0x1FF];
-        dest[13] = lbl_801F6858[(src[13] >> 16) & 0x1FF];
-        dest[14] = lbl_801F6858[(src[14] >> 16) & 0x1FF];
-        dest[15] = lbl_801F6858[(src[15] >> 16) & 0x1FF];
+        dest[0] = gMadClamp[(src[0] >> 16) & 0x1FF];
+        dest[1] = gMadClamp[(src[1] >> 16) & 0x1FF];
+        dest[2] = gMadClamp[(src[2] >> 16) & 0x1FF];
+        dest[3] = gMadClamp[(src[3] >> 16) & 0x1FF];
+        dest[4] = gMadClamp[(src[4] >> 16) & 0x1FF];
+        dest[5] = gMadClamp[(src[5] >> 16) & 0x1FF];
+        dest[6] = gMadClamp[(src[6] >> 16) & 0x1FF];
+        dest[7] = gMadClamp[(src[7] >> 16) & 0x1FF];
+        dest[8] = gMadClamp[(src[8] >> 16) & 0x1FF];
+        dest[9] = gMadClamp[(src[9] >> 16) & 0x1FF];
+        dest[10] = gMadClamp[(src[10] >> 16) & 0x1FF];
+        dest[11] = gMadClamp[(src[11] >> 16) & 0x1FF];
+        dest[12] = gMadClamp[(src[12] >> 16) & 0x1FF];
+        dest[13] = gMadClamp[(src[13] >> 16) & 0x1FF];
+        dest[14] = gMadClamp[(src[14] >> 16) & 0x1FF];
+        dest[15] = gMadClamp[(src[15] >> 16) & 0x1FF];
         src += 16;
         dest += stride;
     }
@@ -337,14 +337,14 @@ void setchroma(const s32* src, u8* dest, int stride) {
     int i;
 
     for (i = 0; i < 8; i++) {
-        dest[0] = lbl_801F6858[(src[0] >> 16) & 0x1FF];
-        dest[1] = lbl_801F6858[(src[1] >> 16) & 0x1FF];
-        dest[2] = lbl_801F6858[(src[2] >> 16) & 0x1FF];
-        dest[3] = lbl_801F6858[(src[3] >> 16) & 0x1FF];
-        dest[4] = lbl_801F6858[(src[4] >> 16) & 0x1FF];
-        dest[5] = lbl_801F6858[(src[5] >> 16) & 0x1FF];
-        dest[6] = lbl_801F6858[(src[6] >> 16) & 0x1FF];
-        dest[7] = lbl_801F6858[(src[7] >> 16) & 0x1FF];
+        dest[0] = gMadClamp[(src[0] >> 16) & 0x1FF];
+        dest[1] = gMadClamp[(src[1] >> 16) & 0x1FF];
+        dest[2] = gMadClamp[(src[2] >> 16) & 0x1FF];
+        dest[3] = gMadClamp[(src[3] >> 16) & 0x1FF];
+        dest[4] = gMadClamp[(src[4] >> 16) & 0x1FF];
+        dest[5] = gMadClamp[(src[5] >> 16) & 0x1FF];
+        dest[6] = gMadClamp[(src[6] >> 16) & 0x1FF];
+        dest[7] = gMadClamp[(src[7] >> 16) & 0x1FF];
         src += 8;
         dest += stride;
     }
@@ -355,16 +355,16 @@ void setchroma(const s32* src, u8* dest, int stride) {
 void MAD_initdecode(u8* src, int motion, int quality) {
     int i;
 
-    if (lbl_802821A8 == 0) {
+    if (gbMadTablesBuilt == 0) {
         madinit();
     }
     madshiftreg = (fn_800B8984(src, 2) << 16) | fn_800B8984(src + 2, 2);
     madbitcount = 32;
     maddataptr = src + 4;
-    lbl_802821AC = motion;
-    madquant[0] = fn_800B8A04(lbl_80184A68[0] << 16, lbl_80190FE0[0]);
+    gMadMotion = motion;
+    madquant[0] = fn_800B8A04(gMadIntraQuant[0] << 16, idctprescale[0]);
     for (i = 1; i < 64; i++) {
-        madquant[i] = fn_800B8A04((quality * lbl_80184A68[i]) << 13, lbl_80190FE0[i]);
+        madquant[i] = fn_800B8A04((quality * gMadIntraQuant[i]) << 13, idctprescale[i]);
     }
 }
 
@@ -382,7 +382,7 @@ void MAD_decodemacroblock(u8* src_y, u8* src_cb, u8* src_cr, u8* dest_y, u8* des
     int nOffset;
 
     nHalf = width >> 1;
-    if (lbl_802821AC == 0) {
+    if (gMadMotion == 0) {
         uPattern = 0;
     } else if (!(madshiftreg & 0xC0000000)) {
         uPattern = 0;
@@ -404,67 +404,67 @@ void MAD_decodemacroblock(u8* src_y, u8* src_cb, u8* src_cr, u8* dest_y, u8* des
     }
     if (!(uPattern & 1)) {
         if (madvlcdecode() == 1) {
-            dcblock(&lbl_801F6C58[0], 16);
+            dcblock(&gMadLumaBlock[0], 16);
         } else {
-            idctcompute(&lbl_801F6C58[0], 16);
+            idctcompute(&gMadLumaBlock[0], 16);
         }
     } else {
         nAdd = getdelta() * 2 - 128;
-        getluma(src_y, width, &lbl_801F6C58[0], nAdd);
+        getluma(src_y, width, &gMadLumaBlock[0], nAdd);
     }
     if (!(uPattern & 2)) {
         if (madvlcdecode() == 1) {
-            dcblock(&lbl_801F6C58[8], 16);
+            dcblock(&gMadLumaBlock[8], 16);
         } else {
-            idctcompute(&lbl_801F6C58[8], 16);
+            idctcompute(&gMadLumaBlock[8], 16);
         }
     } else {
         nAdd = getdelta() * 2 - 128;
-        getluma(src_y + 8, width, &lbl_801F6C58[8], nAdd);
+        getluma(src_y + 8, width, &gMadLumaBlock[8], nAdd);
     }
     if (!(uPattern & 4)) {
         if (madvlcdecode() == 1) {
-            dcblock(&lbl_801F6C58[128], 16);
+            dcblock(&gMadLumaBlock[128], 16);
         } else {
-            idctcompute(&lbl_801F6C58[128], 16);
+            idctcompute(&gMadLumaBlock[128], 16);
         }
     } else {
         nAdd = getdelta() * 2 - 128;
-        getluma(src_y + width * 8, width, &lbl_801F6C58[128], nAdd);
+        getluma(src_y + width * 8, width, &gMadLumaBlock[128], nAdd);
     }
     if (!(uPattern & 8)) {
         if (madvlcdecode() == 1) {
-            dcblock(&lbl_801F6C58[136], 16);
+            dcblock(&gMadLumaBlock[136], 16);
         } else {
-            idctcompute(&lbl_801F6C58[136], 16);
+            idctcompute(&gMadLumaBlock[136], 16);
         }
     } else {
         nAdd = getdelta() * 2 - 128;
-        getluma(src_y + width * 8 + 8, width, &lbl_801F6C58[136], nAdd);
+        getluma(src_y + width * 8 + 8, width, &gMadLumaBlock[136], nAdd);
     }
     if (!(uPattern & 0x10)) {
         if (madvlcdecode() == 1) {
-            dcblock(lbl_801F6A58[0], 8);
+            dcblock(gMadChromaBlocks[0], 8);
         } else {
-            idctcompute(lbl_801F6A58[0], 8);
+            idctcompute(gMadChromaBlocks[0], 8);
         }
     } else {
         nAdd = getdelta() * 2 - 128;
-        getchroma(src_cb, nHalf, lbl_801F6A58[0], nAdd);
+        getchroma(src_cb, nHalf, gMadChromaBlocks[0], nAdd);
     }
     if (!(uPattern & 0x20)) {
         if (madvlcdecode() == 1) {
-            dcblock(lbl_801F6A58[1], 8);
+            dcblock(gMadChromaBlocks[1], 8);
         } else {
-            idctcompute(lbl_801F6A58[1], 8);
+            idctcompute(gMadChromaBlocks[1], 8);
         }
     } else {
         nAdd = getdelta() * 2 - 128;
-        getchroma(src_cr, nHalf, lbl_801F6A58[1], nAdd);
+        getchroma(src_cr, nHalf, gMadChromaBlocks[1], nAdd);
     }
-    setluma(lbl_801F6C58, dest_y, width);
-    setchroma(lbl_801F6A58[0], dest_cb, nHalf);
-    setchroma(lbl_801F6A58[1], dest_cr, nHalf);
+    setluma(gMadLumaBlock, dest_y, width);
+    setchroma(gMadChromaBlocks[0], dest_cb, nHalf);
+    setchroma(gMadChromaBlocks[1], dest_cr, nHalf);
 }
 
 // nBytes bytes at pData, little-endian.
@@ -500,7 +500,7 @@ void fn_800B8A2C(int nBits) {
     }
 }
 
-// Decode one block's coefficients into lbl_801F8358, dequantized, in natural order. The result
+// Decode one block's coefficients into idctinput, dequantized, in natural order. The result
 // is one past the last coefficient's scan position: 1 when there is only the DC one.
 int madvlcdecode(void) {
     u32 uCode;
@@ -511,11 +511,11 @@ int madvlcdecode(void) {
     s32* p;
 
     nDC = (s32)madshiftreg >> 24;
-    lbl_801F8358[0] = nDC * madquant[0];
+    idctinput[0] = nDC * madquant[0];
     fn_800B8A2C(8);
     // fake match: the 63 words cleared three per pass; a loop of single stores unrolls 9-way, not
     // EA's 21 stores x 3
-    p = &lbl_801F8358[1];
+    p = &idctinput[1];
     for (i = 0; i < 21; i++) {
         p[0] = 0;
         p[1] = 0;
@@ -530,11 +530,11 @@ int madvlcdecode(void) {
             if (!(nLen & 0x20)) {
                 if (!(nLen & 0x10)) {
                     fn_800B8A2C(9);
-                    uCode = lbl_801F7658[madshiftreg >> 24];
+                    uCode = madvlctbl2[madshiftreg >> 24];
                     nLen = uCode & 0xFF;
                 } else {
                     fn_800B8A2C(6);
-                    uCode = lbl_801F7258[madshiftreg >> 24];
+                    uCode = madvlctbl3[madshiftreg >> 24];
                     nLen = uCode & 0xFF;
                 }
             } else if (!(nLen & 0x10)) {
@@ -550,8 +550,8 @@ int madvlcdecode(void) {
         }
         fn_800B8A2C(nLen);
         n += (uCode >> 16) & 0x3F;
-        i = lbl_80184B68[n++];
-        lbl_801F8358[i] = ((s32)uCode >> 22) * madquant[i];
+        i = gMadScanOrder[n++];
+        idctinput[i] = ((s32)uCode >> 22) * madquant[i];
     }
 }
 
@@ -666,22 +666,22 @@ void IdctRow(s32* src, s32* dest) {
     dest[7] = e0 - z13;
 }
 
-// The inverse DCT of lbl_801F8358 into an 8x8 block (rows stride words apart).
+// The inverse DCT of idctinput into an 8x8 block (rows stride words apart).
 void idctcompute(s32* dest, int stride) {
-    IdctColumn(&lbl_801F8358[0], &lbl_801F8258[0]);
-    IdctColumn(&lbl_801F8358[8], &lbl_801F8258[1]);
-    IdctColumn(&lbl_801F8358[16], &lbl_801F8258[2]);
-    IdctColumn(&lbl_801F8358[24], &lbl_801F8258[3]);
-    IdctColumn(&lbl_801F8358[32], &lbl_801F8258[4]);
-    IdctColumn(&lbl_801F8358[40], &lbl_801F8258[5]);
-    IdctColumn(&lbl_801F8358[48], &lbl_801F8258[6]);
-    IdctColumn(&lbl_801F8358[56], &lbl_801F8258[7]);
-    IdctRow(&lbl_801F8258[0], dest);
-    IdctRow(&lbl_801F8258[8], dest + stride);
-    IdctRow(&lbl_801F8258[16], dest + stride * 2);
-    IdctRow(&lbl_801F8258[24], dest + stride * 3);
-    IdctRow(&lbl_801F8258[32], dest + stride * 4);
-    IdctRow(&lbl_801F8258[40], dest + stride * 5);
-    IdctRow(&lbl_801F8258[48], dest + stride * 6);
-    IdctRow(&lbl_801F8258[56], dest + stride * 7);
+    IdctColumn(&idctinput[0], &gMadIdctColumns[0]);
+    IdctColumn(&idctinput[8], &gMadIdctColumns[1]);
+    IdctColumn(&idctinput[16], &gMadIdctColumns[2]);
+    IdctColumn(&idctinput[24], &gMadIdctColumns[3]);
+    IdctColumn(&idctinput[32], &gMadIdctColumns[4]);
+    IdctColumn(&idctinput[40], &gMadIdctColumns[5]);
+    IdctColumn(&idctinput[48], &gMadIdctColumns[6]);
+    IdctColumn(&idctinput[56], &gMadIdctColumns[7]);
+    IdctRow(&gMadIdctColumns[0], dest);
+    IdctRow(&gMadIdctColumns[8], dest + stride);
+    IdctRow(&gMadIdctColumns[16], dest + stride * 2);
+    IdctRow(&gMadIdctColumns[24], dest + stride * 3);
+    IdctRow(&gMadIdctColumns[32], dest + stride * 4);
+    IdctRow(&gMadIdctColumns[40], dest + stride * 5);
+    IdctRow(&gMadIdctColumns[48], dest + stride * 6);
+    IdctRow(&gMadIdctColumns[56], dest + stride * 7);
 }

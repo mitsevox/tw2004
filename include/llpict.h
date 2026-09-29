@@ -72,8 +72,8 @@ typedef struct MadCode {
 } MadCode;
 LAYOUT_ASSERT(MadCode, 0x10);
 
-extern const MadCode lbl_80183C78[95];   // the codes of the first table (entry 0 is not used)
-extern const MadCode lbl_80184268[128];  // the codes of the second table
+extern const MadCode gMadCoefCodes[95];   // the codes of the first table (entry 0 is not used)
+extern const MadCode gMadCoefCodesLong[128];  // the codes of the second table
 
 // What LLVideo.c hands LLPict_Gc.c for a movie: the decoder (fn_8002FEB0 makes it, 0x50 bytes)
 // and its current frame.
@@ -102,7 +102,7 @@ void fn_8003009C(LLPict* pPict, PictStream* pStream, int n2);             // emp
 void fn_800300A0(LLPict* pPict, PictStream* pStream);
 
 // LLPict_Gc.c's work buffer for copying planes: points at a pointer fn_8002F4FC fills (2048 bytes).
-extern void** lbl_802810C0;
+extern void** gpPictWorkBuffer;
 
 // A picture from a "MADk" file in memory (LLPict_Gc.c).
 LLPict* fn_8002FD00(u8* pData, u32 uSize);

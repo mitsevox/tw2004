@@ -8,8 +8,8 @@ void fn_8002F898(u8* pSrc, u8* pDst, int nWidth, int nHeight);   // copies one p
 void fn_8002FB98(LLPict* pPict);
 void fn_8002F56C(u8* pPlane, void* pWork, int nWidth, int nHeight);  // reorders one plane through pWork
 
-void* lbl_80281D58;
-void** lbl_802810C0 = &lbl_80281D58;
+void* gPictWorkBuffer;
+void** gpPictWorkBuffer = &gPictWorkBuffer;
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -23,12 +23,12 @@ void fn_8002F4FC(void) {
     void* t1;
     fn_80056204();
     t1 = StaticMem_Alloc(2048, 2, 32, "LLPict_Gc.c", 68);
-    *lbl_802810C0 = t1;
+    *gpPictWorkBuffer = t1;
 }
 
 void fn_8002F540(void) {
     fn_80056208();
-    StaticMem_Free(*lbl_802810C0);
+    StaticMem_Free(*gpPictWorkBuffer);
 }
 
 // ---- end of sweep code ----
@@ -93,9 +93,9 @@ LLPict* fn_8002FD00(u8* pData, u32 uSize) {
         return NULL;
     }
     DCFlushRange(fn_8003020C(pPict), 1.5f * (pPict->nWidth * pPict->nHeight));
-    fn_8002F56C(fn_8003020C(pPict), *lbl_802810C0, pPict->nWidth, pPict->nHeight);
-    fn_8002F56C(fn_800301F4(pPict), *lbl_802810C0, pPict->nWidth / 2, pPict->nHeight / 2);
-    fn_8002F56C(fn_800301D0(pPict), *lbl_802810C0, pPict->nWidth / 2, pPict->nHeight / 2);
+    fn_8002F56C(fn_8003020C(pPict), *gpPictWorkBuffer, pPict->nWidth, pPict->nHeight);
+    fn_8002F56C(fn_800301F4(pPict), *gpPictWorkBuffer, pPict->nWidth / 2, pPict->nHeight / 2);
+    fn_8002F56C(fn_800301D0(pPict), *gpPictWorkBuffer, pPict->nWidth / 2, pPict->nHeight / 2);
     DCFlushRange(fn_8003020C(pPict), 1.5f * (pPict->nWidth * pPict->nHeight));
     fn_8002FB98(pPict);
     return pPict;

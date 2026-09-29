@@ -8,10 +8,10 @@
 #include "camera.h"
 #include "terrain.h"
 
-VideoSlots lbl_801D7120;
-VideoSlots* lbl_80281200 = &lbl_801D7120;
+VideoSlots gVideoSlots;
+VideoSlots* gpVideoSlots = &gVideoSlots;
 
-u8 lbl_80281EB8;
+u8 gbVideoFrameWasOpen;
 
 u8   LLVideo_UpdateStream(Video* pVideo, int* pnQueued);
 void fn_800752DC_PreloadQueue(Video* pVideo);
@@ -251,7 +251,7 @@ void fn_800755F0(int nFlags) {
 void fn_800757B8(void) {
     s32 i;
     for (i = 0; i < NUM_VIDEO_SLOTS; i++) {
-        lbl_80281200->apVideo[i] = NULL;
+        gpVideoSlots->apVideo[i] = NULL;
     }
 }
 
@@ -282,11 +282,11 @@ void fn_800758B4(Video* pVideo) {
 
 // Puts a movie (or NULL) in a slot; returns the movie that was there.
 Video* fn_80075904(int nSlot, Video* pVideo) {
-    Video* pOld = lbl_80281200->apVideo[nSlot];
+    Video* pOld = gpVideoSlots->apVideo[nSlot];
     if (pOld != NULL) {
         pOld->nSlot = -1;
     }
-    lbl_80281200->apVideo[nSlot] = pVideo;
+    gpVideoSlots->apVideo[nSlot] = pVideo;
     if (pVideo != NULL) {
         pVideo->nSlot = nSlot;
     }
@@ -295,7 +295,7 @@ Video* fn_80075904(int nSlot, Video* pVideo) {
 
 // UStream.c hands over an MPG2 chunk: it is queued if its movie is running, else given back.
 void LLVideo_HandleChunk(VideoChunk* pChunk) {
-    Video* pVideo = lbl_80281200->apVideo[pChunk->nSlot];
+    Video* pVideo = gpVideoSlots->apVideo[pChunk->nSlot];
     if (pVideo != NULL && pVideo->b1020) {
         LLVideo_QueueAdd(&pVideo->queue, pChunk);
     }
@@ -347,7 +347,7 @@ void fn_80075AD0_UpdateAll(void) {
     s32 i;
     Aud_CycleMovie();
     for (i = 0; i < NUM_VIDEO_SLOTS; i++) {
-        pVideo = lbl_80281200->apVideo[i];
+        pVideo = gpVideoSlots->apVideo[i];
         if (pVideo != NULL && pVideo->b1020 && !pVideo->b1021 && fn_80075BF4_IsFrameDue(pVideo)) {
             fn_80075A98_SetLastFrameTime(pVideo);
             if (pVideo->bStarved || fn_8003001C(&pVideo->pict, &pVideo->stream)) {
@@ -395,7 +395,7 @@ void fn_80075C88(void) {
     fn_80016B54(512, 448, 1.0f, 1.0f);
     fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
     RenderView_SetColor(NULL);
-    lbl_80281200->n20 = FO_eGetCurrentAddMode();
+    gpVideoSlots->n20 = FO_eGetCurrentAddMode();
     FO_vSetCurrentAddMode(1);
     fn_80012B2C(1.0f, 1.0f);
     fn_80076128(10);
@@ -406,7 +406,7 @@ void fn_80075D58(void) {
     fn_80008380();
     fn_80006EDC();
     fn_80012B2C(1.0f, 1.0f);
-    FO_vSetCurrentAddMode(lbl_80281200->n20);
+    FO_vSetCurrentAddMode(gpVideoSlots->n20);
     DS_vEnableZBufferUpdate(1);
     DS_vSetAlphaTestMode(0, 6, 0x80);
     DS_vSetZBufferMode(3);
@@ -485,8 +485,8 @@ void LLVideo_PlayFile(const char* pName, u8 (*pfnStop)(Video* pVideo, int nArg),
     int nStream;
     Video* pVideo;
 
-    lbl_80281EB8 = fn_80007258();
-    if (lbl_80281EB8) {
+    gbVideoFrameWasOpen = fn_80007258();
+    if (gbVideoFrameWasOpen) {
         fn_80006FE8();
     }
     UI_EATraxShowSong(0, 0);
