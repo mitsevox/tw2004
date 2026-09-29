@@ -23,6 +23,9 @@ own files in its pass; the rest come here.
 | startUp.c Startup_CheckCards | hint 0x8B (card slot B empty) can never be sent: port 1 is only reached when port 0's status is 0, and that case tests port 0's status != 0 | round 18 (rr2) |
 | hlaudtrackstm.c Stm_Exit | cancels its DMAs with the track as owner, but AudDma_ToAram's owner is always 0 or 1: the cancel never matches, so a queued block DMA writes into ARAM buffers just freed and its callback counts into the freed track | round 18 (rr4) |
 | UAudContainers.c UList_InsertAt | an insert at the tail (not also the head) links after it, not in front: InsertSortWorldPerf leaves a higher-priority track at the tail, where Trk_AllocPerf steals first | round 18 (rr5) |
+| gocamscripts.c CamScript_CircleCameras | fA8 (the roll) blends by fT (0..2) instead of fShare: the roll runs on to twice the difference and snaps back when the blend ends | round 19 (rs6) |
+| rcmp_mad_codec.c madinit | `for (i = -256; i < 255; ...)` never writes gMadClamp[255] (.bss zero): a block value of +255 becomes pixel 0 (black) while +128..+254 become 255 | round 19 (rs2) |
+| hlaudsession.c Ses_AllocBankHdr | the missing return (was labelled "fake match: EA bug") is EA's own form: now `EA bug:` + `port: return NULL` | round 19 (rs1, relabelled) |
 
 ## Open: behaviour proven possible, needs data or intent to settle
 | Where | What | What settles it |
@@ -71,6 +74,11 @@ own files in its pass; the rest come here.
 | SitDevTrigger.c SitDev_InvokeMultipleActions | bPlayed is the last action's: an earlier line that played can still clear gSitDevPredictionVoiced | intent only |
 | SitDev.c / SitDevCommentaryZones.c | the event queue and the zone list (10 slots each) have no bounds check | the scripts' data |
 | SitDevTrigger.c SitDev_InvokeCommentaryBank | `% nLeft` with an empty list divides by zero | the commentary banks' data |
+| GoGolfCam.c GolfCamera_ChooseReactionCam | tests ball.nSurface >= 0 but reads gSurfaceTypes[ballBefore.nSurface] | whether ballBefore.nSurface can be negative while ball.nSurface is not |
+| GoDynamicCam.c ChooseSequence / ChoosePreFlightSequence | `uRand % (int)(1000 * fTotal)` divides by zero if the weights add up to under 0.001 | the camera data |
+| GoStaticCam.c Parse*CameraActor | no check against the 10 static / 30 fly-by slots | the course camera data |
+| LLVideo.c LLVideo_PreloadQueue / ReadNextFile / QueueAdd | ignores the stream's end (a movie under 16 chunks loops forever); apChunk[32] vs nMore up to 255; no full-queue check (1024) | the movie data |
+| LLVideo.c (MAD_IsAtEnd always 0) | a movie ends only when starved: also mid-movie if the disc falls behind | already labelled at MAD_ReadNextFile |
 
 ## Dropped (checked: harmless or not a bug)
 AnimStream_AssignSlots / StartRead (streaming is never on: AnimStream_Init clears bOn);

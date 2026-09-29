@@ -647,3 +647,45 @@ only FE and IG), Ses_GetInstrumentTone, Mas_GetUpdateRateScale (always 1), Ses_I
 Ses_ProcessArticulationData, Voc_StartStream, Voc_ResetModule, the empty AudMem_* steps,
 SitDev_BindHeader, SitDev_BeginLoadScripts, SitDev_Weather* (bit 1 probably rain),
 Gaud_StartPlaylist2Comment.
+
+## Round 19 (rs1-rs6) leftovers
+MOVIES and CAMERAS are DONE (LLPict_Gc, LLVideo, LLPictInt, rcmp_mad_codec, GoGolfCam, CamSpline,
+GoComicCam, GoCamTuningVars, GoDynamicCam, GoStaticCam, gocamscripts, GoCamCont). EA's own spellings kept:
+CamScript_IngoreCameraCollisionSurface, IsDefualtSeq. Replay: rs5's globals.tsv had a row with no tab
+(fixed copy in scratch r19/); the replay helper now skips the slow reference refresh with NOREFS=1
+(one refresh per round, scratch replay_r19.sh).
+File names (owner's call; nothing moved): our rcmp_mad_codec.c is EA's maddec.c / maddeca.c / madidct.c
+(TW06 PDB; NFSMW's rcmp package keeps rcmp_mad_codec.cpp apart; a second static discardbits at
+0x800B8A2C means maddeca.c is its own file; the .sbss pad at 0x802821BC-C0 marks a boundary), and EA's
+rcmp_mad_codec.c is Code800B90F4.c's first part (its "rcmp_mad_codec.c" string, MAD_AllocFrame /
+MAD_GetNextFrame). unsorted/sweep_80097E98.c's fn_80097E98 = TW07 CameraTuning_Close (frees gpCamTuning;
+declares it `extern s32`). FO_vSetCurrentColor sits in LLVideo.c's range though TW07 has it in UFont.c.
+Still open (headers): camera.h CamShot = TW07 CameraScript_t (f78 / f7C fov start / end over f48, f88 depth
+of field, f8C / f90 blur, f94 / f98 shake amount / speed, f9C roll, f70 / f74 look-at side / up offsets,
+f60 / f64 distance-or-share / side offset, f68 / f6C min / max height, bAA shows the golfer, bAB blend kind,
+bAC look-at kind, bAD state / shot kind, bAF / bB0 tracking points (16: at the ball), bB1 tracking mode,
+bB2 height reference); CamScript (v0 / v10 current / next camera positions, a20[0..3] / [4..7] look-at
+points, fA8 roll, nBC blend kind, nC4 requested event, fF0 / fF4 shake length / intensity, fEC ball-update
+rate, fF8 blend share, nD0 arc direction, nE0 / fE4 time-trigger event / time, fDC lag angle, bCF fairway
+fix running, bE8 no ground, n110 completed replay cams, n114 final-cut flag, f8C moves on to pNextShot);
+CamSequence (b44 state, b46 shot type, b49 / b4A start / end lie masks, f24..f28 distance range, f2C..f30
+pin height over ball); View (v20 side vector, n260 special swing kind, b268 skip fancy pre-shot cams, b269
+show post-shot anims, b26A post-shot ball removal); GolfCamState (maybe TW06 GolfCamManager_t: f64 heart
+beat slow-mo rate, b54 matrix, b55 matrix mode, b56 comic, b58 super zoom, b59 slow-mo swing, b5A heart
+beat, b5D, n60 fly-by route); camera.h f154 comment; dyncam.h CamChoice = TW07 CameraEventTrigger_t (b14
+event, b15 interp type, f0 time, f4 max speed, b16 cut event, f8 its time), DynCamSet = CameraAnimPairs_t,
+DynCamTables = TW06 DynamicCamManager_t; comiccam.h bNext = frozen screen; camera.h long lines (80, 757,
+~774 CamSpline prototypes); llvideo.h:65 long; Video p1018 always NULL, b1021 never 1, b1020 running, bEnded
+= stopped starved; LLPict f6C / f70 far-corner texture coordinates; PictStream.pDecoder is MadDecoder*;
+MAD_SetReadCallback / MAD_initdecode / MAD_decodemacroblock into llpict.h (retype fn_8002FEB0 /
+LLVideo_ReadNextFile's reader chain first); RenderState_SetScissor / SetPicture / RenderView_MakePictUV /
+FO_vSetCurrentColor into engine.h (local copies in FEgolferanim.c, uiText.c, GoGrass.c, shadow.c,
+ScreenClear.c, uiEATrax.c differ); gMadCoefCodes externs misaligned; local prototypes left: hlaudvoice.c
+HwVoice_*, GameAudio.c Mas_ / Mic_ / Ses_ / Mov_ (Ses_Init(nSession, nSubsession)), SitDev.c, char.c
+SitDev_SetupClubCondition (says SitDevFile.c), hlaudtrackstm.c File_ReadAsyncEx; AudTrackSeq n64..n69.
+Least-sure names: GolfCamera_Choose3ShotCam, GreenRoll (camera 5), the camera 24 names,
+GolfCamera_IsThereACameraGoingToBeTimeTriggered, GolfCamera_ZoomGreenCamera / UnZoomGreenCamera,
+GolfCamera_CreateReplayCamera, GolfCamera_ChooseSuperSwing, GolfCamera_IsSetUpCameraDone,
+CameraController_ResetAimMarkerInSwingCamera, CamScript_LerpFixedTargetCameras, DynamicCam_LoadFilesFromDisk(FE),
+DynamicCam_bIsSwingCamera, StaticCam_ProcessScript, madvlctbl2 / 3, idctprescale / idctinput,
+Pict_AfterFree / StartMovie / OnFirstMovieFrame, LLVideo_Begin/EndPlayback, LLVideo_DarkenScreen.
