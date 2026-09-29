@@ -2,7 +2,8 @@
 longer pushes call lines over). The continuation lines up under the open parenthesis (or 8 past the
 statement's indent when that is too deep). Comment-only lines, preprocessor lines and lines holding a
 string or a // comment are left alone (reported instead). A macro's line (one ending in, or following,
-a continuation backslash) is never split: only the padding before its backslash is trimmed.
+a continuation backslash) is never split: only the padding before its backslash is trimmed (back to its neighbours' column
+when the code fits).
     python tools/match/wraplong.py <file:line> ...        e.g. from `lint.py --diff main`
     python tools/match/wraplong.py --from-lint [--diff REV]   every long-line finding of lint --diff REV
                                                           (default main; name.py passes HEAD)
@@ -124,8 +125,11 @@ def main():
                 # a macro's line: a plain break ends the macro there (round 20, Ball.c's
                 # BALL_LANDING_EVENTS). Only the padding before the continuation backslash may go.
                 m = re.match(r'(.*?\S)\s+\\\s*$', l)
+                cols = [len(x.rstrip()) - 1 for x in src[max(0, n - 4):n + 3]
+                        if x.rstrip().endswith('\\') and len(x.rstrip()) <= LIMIT]
+                col = max(set(cols), key=cols.count) if cols else 0   # the neighbours' usual column
                 if m and len(m.group(1)) + 2 <= LIMIT:
-                    src[n - 1] = m.group(1) + ' \\'
+                    src[n - 1] = m.group(1).ljust(max(col, len(m.group(1)) + 1)) + '\\'
                 else:
                     print(f'{f}:{n}: left alone (a macro line: wrap it by hand with a backslash)')
                 continue
