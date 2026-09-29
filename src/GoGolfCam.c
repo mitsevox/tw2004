@@ -1,7 +1,14 @@
-// GoGolfCam.c (EA's name, from its asserts): the golf cameras (TW06's GolfCamera_*). Each camera
-// mode has an init, called by CameraController_SetCameraMode, and a per-frame process, called by
-// CameraController_Idle; both drive the view's camera script. The shared camera state
-// (gGolfCamState) is allocated here, with a per-course elevator camera height.
+// GoGolfCam.c (EA's name, from its asserts; TW06 and TW07 golf/cameras/GoGolfCam.c): the golf
+// cameras, EA's GolfCamera_*. Each camera mode (View.nCurCamera) has an init, called by
+// CameraController_SetCameraMode, and a per-frame process, called by CameraController_Idle; both
+// drive the view's camera script (gocamscripts.c). The modes: 0 shot setup, 1 zoom to the aim
+// point, 2 the same on the green, 3 elevator, 4 green, 5 putt preview (TW07's green roll), 6
+// reverse putt, 7 knee cam, 8 ball placement, 9 speed golf's run to the ball, 10 hole fly-by, 11
+// pre-shot, 12 swing, 13 slow-motion swing replay, 14 ball flight, 15 post-shot, 16 ball in the
+// hole, 17 scorecard, 18 tutorial wait, 19 steep slope, 20 3-screen comic, 21 heartbeat, 22
+// shutter, 23 front end (create-a-player), 24 golfer bone (unused). Also here: the special swing
+// cameras picked at the hit (View.n260: matrix, super zoom, swing replays, comic, heartbeat,
+// shutter) and the shared camera state (gGolfCamState), with a per-course elevator camera height.
 
 #include "golfer.h"
 #include "ball.h"
@@ -62,10 +69,10 @@ u8       Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, 
                                      SurfaceType** ppSurface, TerObject** ppObj);
 
 // .bss and .sbss (one object each, so the reverse-order rule does not come into it).
-f32 gSteepSlopeCamLastTarget[4];                                // the target the steep-slope camera last worked for
-GolfCamState* gGolfCamState;                         // the shared state (GolfCamera_Init)
+f32 gSteepSlopeCamLastTarget[4];    // the target the steep-slope camera last worked for
+GolfCamState* gGolfCamState;        // the shared state (GolfCamera_Init)
 
-s32 gSteepSlopeCamLastTries = -1;                              // the steep-slope camera's tries last time (-1: none yet)
+s32 gSteepSlopeCamLastTries = -1;   // the steep-slope camera's tries last time (-1: none yet)
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0f (0x802842C0), before the 0.0f and 10.0f GolfCamera_Init uses first; its body is unknown.
@@ -867,16 +874,18 @@ void GolfCamera_InitSpeedGolfRunCamera(View* pView, int nPlayer) {
     pView->p74 = NULL;
 }
 
-// The first-person camera's state, per player, and two axes GolfCamera_ZoomCamGetStartAndEndVecs
-// uses. Defined here, after the functions that use the file's string literals, so the .data comes
-// out in the original's order.
-f32 gSpeedGolfRunCamBob[5] = {0};                          // the step's bob, 0..16
-f32 gSpeedGolfRunCamSway[5] = {8.0f, 8.0f, 8.0f, 8.0f};     // the sideways sway, 0..16
-f32 gSpeedGolfRunCamEyeHeight[5] = {1.0f, 1.0f, 1.0f, 1.0f};     // the eye height: 1 standing, 0 in water
+// Speed golf's first-person run camera's state (camera 9), per player, and two axes
+// GolfCamera_ZoomCamGetStartAndEndVecs uses. Defined here, after the functions that use the file's
+// string literals, so the .data comes out in the original's order.
+f32 gSpeedGolfRunCamBob[5] = {0};                               // the step's bob, 0..16
+f32 gSpeedGolfRunCamSway[5] = {8.0f, 8.0f, 8.0f, 8.0f};         // the sideways sway, 0..16
+f32 gSpeedGolfRunCamEyeHeight[5] = {1.0f, 1.0f, 1.0f, 1.0f};    // eye height blend: 1 standing
+                                                                //   (1.4 up), 0 in water (0.1 up)
 s32 gSpeedGolfRunCamSwaySide[5] = {0};                          // which side the sway is on
-s32 gSpeedGolfRunCamRumble[5] = {0};                          // frames since the last step's rumble (-1: waiting)
-f32 gGolfCamAxisX[4] = {1.0f, 0.0f, 0.0f, 0.0f};     // the x axis
-f32 gGolfCamAxisZ[4] = {0.0f, 0.0f, 1.0f, 0.0f};     // the z axis
+s32 gSpeedGolfRunCamRumble[5] = {0};    // the step rumble: -1 armed for the next step, else
+                                        // frames since it started (it stops at 2)
+f32 gGolfCamAxisX[4] = {1.0f, 0.0f, 0.0f, 0.0f};                // the x axis
+f32 gGolfCamAxisZ[4] = {0.0f, 0.0f, 1.0f, 0.0f};                // the z axis
 
 // Camera 9's tick, speed golf's run to the ball in first person: the eye at vPlacement (the running
 // golfer), 1.4 over it (0.1 in water, blending by 0.1 a frame), bobbing and swaying in steps as
@@ -920,7 +929,8 @@ void GolfCamera_ProcessSpeedGolfRunCamera(View* pView, int nPlayer) {
             pCam[0] = gPlayers[nPlayer].vPlacement[0];
             pCam[2] = gPlayers[nPlayer].vPlacement[2];
             pCam[1] = (1.4f + gPlayers[nPlayer].vPlacement[1]) * gSpeedGolfRunCamEyeHeight[nPlayer]
-                      + (0.1f + gPlayers[nPlayer].vPlacement[1]) * (1.0f - gSpeedGolfRunCamEyeHeight[nPlayer]);
+                      + (0.1f + gPlayers[nPlayer].vPlacement[1])
+                            * (1.0f - gSpeedGolfRunCamEyeHeight[nPlayer]);
             CamScript_KeepAboveGround(nPlayer, pCam, vOld, 1, NULL, &fAbove, NULL, lbl_80281F78->f168);
             pSurface = Ter_GetSupportingWorldMaterial(gPlayers[nPlayer].ball.pCourse, pCam);
             if (pSurface != NULL) {
@@ -942,7 +952,8 @@ void GolfCamera_ProcessSpeedGolfRunCamera(View* pView, int nPlayer) {
             if (gSpeedGolfRunCamRumble[nPlayer] >= 0) {
                 gSpeedGolfRunCamRumble[nPlayer]++;
             }
-            if ((gSpeedGolfRunCamRumble[nPlayer] >= 2 || gSpeedGolfRunCamRumble[nPlayer] < 0) && !Player_IsCPU(nPlayer)) {
+            if ((gSpeedGolfRunCamRumble[nPlayer] >= 2 || gSpeedGolfRunCamRumble[nPlayer] < 0)
+                && !Player_IsCPU(nPlayer)) {
                 Input_vVibrateBuzz(gPlayers[nPlayer].nController, 0);
             }
             if (nClass != 7) {
@@ -962,8 +973,8 @@ void GolfCamera_ProcessSpeedGolfRunCamera(View* pView, int nPlayer) {
                     }
                 } else {
                     pCam[1] += 0.5f - (gSpeedGolfRunCamBob[nPlayer] - 8.0f) / 16.0f;
-                    if (gSpeedGolfRunCamBob[nPlayer] > 14.0f && fStep > 0.1f && gSpeedGolfRunCamRumble[nPlayer] == -1
-                        && !Player_IsCPU(nPlayer)) {
+                    if (gSpeedGolfRunCamBob[nPlayer] > 14.0f && fStep > 0.1f
+                        && gSpeedGolfRunCamRumble[nPlayer] == -1 && !Player_IsCPU(nPlayer)) {
                         Input_vVibrateBuzz(gPlayers[nPlayer].nController, 1);
                         gSpeedGolfRunCamRumble[nPlayer] = 0;
                     }
@@ -1010,7 +1021,8 @@ void GolfCamera_ProcessSpeedGolfRunCamera(View* pView, int nPlayer) {
             }
             // the height just worked out is replaced: the stick tilts the view up and down
             pSub[1] = (4.0f * gPlayers[nPlayer].fA8C + pCam[1]) * gSpeedGolfRunCamEyeHeight[nPlayer]
-                      + (2.0f + pCam[1] + gPlayers[nPlayer].fA8C) * (1.0f - gSpeedGolfRunCamEyeHeight[nPlayer]);
+                      + (2.0f + pCam[1] + gPlayers[nPlayer].fA8C)
+                            * (1.0f - gSpeedGolfRunCamEyeHeight[nPlayer]);
             pSub[0] = pCam[0] - fX / 3.0f;
             pSub[2] = pCam[2] - fZ / 3.0f;
             if (pView->script.n110 == 0) {
@@ -2889,7 +2901,8 @@ void GolfCamera_ComputeSteepSlopeCamVectors(View* pView, int nPlayer) {
         nMax = lbl_80281F78->n1DC;
     } else if (LLMath_SquareDistanceBetween3(gSteepSlopeCamLastTarget, pTarget) > 0.1f) {
         fn_800B5918(pTarget, gSteepSlopeCamLastTarget);
-        nMax = (gSteepSlopeCamLastTries + 1 <= lbl_80281F78->n1DC) ? gSteepSlopeCamLastTries + 1 : lbl_80281F78->n1DC;
+        nMax = (gSteepSlopeCamLastTries + 1 <= lbl_80281F78->n1DC) ? gSteepSlopeCamLastTries + 1
+                                                                   : lbl_80281F78->n1DC;
     } else {
         nMax = gSteepSlopeCamLastTries;
     }
