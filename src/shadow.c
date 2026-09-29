@@ -372,7 +372,8 @@ void fn_800B28D4(Character* pChar, int nView, u8 bFlat) {
     fn_800B281C();
     RenderState_SetScissor(1, 1, p->nWidth - 1, p->nHeight - 1);
     RenderState_Flush();
-    ((void (*)(int))CharacterRender_RenderSetup)(2); // port: EA passes an argument CharacterRender_RenderSetup ignores
+    ((void (*)(int))CharacterRender_RenderSetup)(2); // port: EA passes an argument
+                                                     // CharacterRender_RenderSetup ignores
     SKN_DrawCharacter(pChar, 2);
     fn_800B2470();
     fn_80016B54(0x200, 0x1C0, 1.0f, 1.0f);

@@ -33,7 +33,8 @@ u8   gHoleContestWon;               // a contest has a winner this round (HoleCo
 
 // a flag of the hole's course data (byte 0x35): the drive can count
 u8   GM_GetHoleIndexDrivingSideGame(int nHole);
-u8   GameAnalysis_GetFairwayDrive(int nPlayer); // the shot started on fairway-class ground and ended on the fairway,
+u8   GameAnalysis_GetFairwayDrive(int nPlayer); // the shot started on fairway-class ground and ended on the
+                                                // fairway,
                                 // the green or in the cup (HoleScore.c)
 
 u8   HoleContest_RoundHasContests(void);

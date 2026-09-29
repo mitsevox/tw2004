@@ -74,8 +74,10 @@ typedef struct StreamLists {
     int  nStream;               // 0x119C  the open stream (Stream_OpenStreamFiles)
 } StreamLists;
 extern StreamLists* gpStreamManagerLists;
-extern char gszStreamLoadScreenFileFmt[]; // "data/Load/Load%d.gcb" (streammanagerhole.c StreamManager_AddLoadScreenFile)
-extern char gszStreamFECharFileFmt[]; // "data/FEChars/%02dcharfe.gcb" (streammanagerhole.c StreamManagerFEChar_SetupFileStream)
+extern char gszStreamLoadScreenFileFmt[]; // "data/Load/Load%d.gcb" (streammanagerhole.c
+                                          // StreamManager_AddLoadScreenFile)
+extern char gszStreamFECharFileFmt[]; // "data/FEChars/%02dcharfe.gcb" (streammanagerhole.c
+                                      // StreamManagerFEChar_SetupFileStream)
 extern char gszStreamFrontendFile[]; // "data/FEnd/FEnd.gcb" (streammanagerhole.c StreamManager_InitModule)
 extern char gszStreamFECharFile[]; // "FEChar.gcb" (StreamManager_InitModule)
 extern char gszStreamLoadOnceFile[]; // "LoadOnce.gcb" (StreamManager_InitModule)

@@ -1,6 +1,7 @@
 // lighting.h (our name): the scene's light sets. goballfx.c (TW06's name for the file) keeps four
 // sets of lights and a pointer to the current one (lbl_80281380); GoTerrain.c chooses the current
-// set (LF_vSetCurrentLightFogEnvironment) and hands it to the renderer. The lights themselves are GoLighting.c's objects.
+// set (LF_vSetCurrentLightFogEnvironment) and hands it to the renderer. The lights themselves are
+// GoLighting.c's objects.
 
 #ifndef LIGHTING_H
 #define LIGHTING_H
@@ -47,9 +48,9 @@ LAYOUT_ASSERT(LightGroup, 0x38);
 
 // One set of lights (0x8C bytes).
 typedef struct LightSet {
-    TerSettings settings;       // 0x00  the terrain colours: LF_UseCurrentFogSettings copies them to the renderer's
-                                //       (LF_SetFogSettings), LF_ResetCurrentFogSettings resets them
-                                //       (fn_8006F334)
+    TerSettings settings;       // 0x00  the terrain colours: LF_UseCurrentFogSettings copies them to the
+                                //       renderer's (LF_SetFogSettings), LF_ResetCurrentFogSettings resets
+                                //       them (fn_8006F334)
     LightGroup group;           // 0x54
 } LightSet;
 LAYOUT_ASSERT(LightSet, 0x8C);
@@ -57,7 +58,8 @@ LAYOUT_ASSERT(LightSet, 0x8C);
 // lbl_801D9278, reached through lbl_80281380 (0x238 bytes).
 typedef struct LightSets {
     LightSet aSet[NUM_LIGHT_SETS];  // 0x000
-    LightSet* pCur;             // 0x230  the set in use (LF_vSetCurrentLightFogEnvironment picks it, LF_spGetCurrentLightFogEnvironment reads it)
+    LightSet* pCur;             // 0x230  the set in use (LF_vSetCurrentLightFogEnvironment picks it,
+                                //        LF_spGetCurrentLightFogEnvironment reads it)
     u8   unk234[4];
 } LightSets;
 LAYOUT_ASSERT(LightSets, 0x238);

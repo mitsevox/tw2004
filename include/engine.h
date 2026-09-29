@@ -354,7 +354,8 @@ extern struct UStreamObject* lbl_80281C0C;   // LoadData.c: a copy of the 'txf2'
 
 void StreamManager_AddLoadScreenFile(int n); // add loading file n to stream list 2 (sprintf'd name)
 void StreamManagerLoadScreen_StreamFiles(void); // streammanagerhole.c
-void StreamManagerFEChar_SetupFileStream(s32 nChar, s32 nUnused); // streammanagerhole.c: stream list 3 = one FEChars file
+void StreamManagerFEChar_SetupFileStream(s32 nChar, s32 nUnused); // streammanagerhole.c: stream list 3 = one
+                                                                  // FEChars file
 // LLTex.c: points at a flag byte RenderState_SetConstantAlphaActive (Code80015470.c) sets; while
 // it is set, the shader objects' untextured stage takes its alpha from the constant colour, not
 // the vertex colour (GoShaderObjectCommon_ShaderObjectsData_Gc.c fn_800740F4).
@@ -518,8 +519,8 @@ typedef struct RenderState {
     f32  mProjection[4][4];     // 0x074  } render context's m15C (rows 0 and 2 negated) and m9C
                                 //          (RenderState_SetCameraMatrices); identity at reset;
                                 //          bit 0x100
-    f32  fNearZ;                // 0x0B4  } a render camera's near and far distances, the fog's
-    f32  fFarZ;                 // 0x0B8  } nearz and farz (GoRenderCtx_Gc.c RenderState_SetClipZFromRenderCtx)
+    f32  fNearZ;                // 0x0B4  } a render camera's near and far distances, the fog's nearz
+    f32  fFarZ;                 // 0x0B8  } and farz (GoRenderCtx_Gc.c RenderState_SetClipZFromRenderCtx)
     s32  nScissorLeft;          // 0x0BC  } the scissor rectangle in 512 x 448 screen pixels, both
     s32  nScissorRight;         // 0x0C0  } ends inclusive; bit 0x200 (RenderState_SetViewport;
     s32  nScissorTop;           // 0x0C4  } LLVideo.c RenderState_SetScissor takes left, top, right,
@@ -1398,7 +1399,8 @@ void RenderView_MakePictUV(f32* pUV, struct LLPict* pPict);  // a quad's UVs cov
 void FO_vSetCurrentColor(s32 nColor);           // the next strings' colour (TW07: in UFont.c)
 void fn_800BA74C(u8 bFade);             // ScreenClear.c: a black screen for 1, 2 or 30 frames
 u32  Input_uiMap(int nButton, u8 bShift);                // a button's mask (bShift: moved up 16 bits)
-extern s8   gnInputControlSet;          // GoRenderCtx_Gc.c: the row of gauInputButtonMap in use (Input_vSelectControlSet)
+extern s8   gnInputControlSet;          // GoRenderCtx_Gc.c: the row of gauInputButtonMap in use
+                                        // (Input_vSelectControlSet)
 extern u32  gauInputButtonMap[][0xE8 / 4]; // GoRenderCtx_Gc.c: rows of button masks, by button
 u8   Input_AnyPadPressed(u32 uMask);                    // any pad pressed these buttons
 

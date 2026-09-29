@@ -25,7 +25,8 @@ typedef struct BreakLine {
     s32  anVerts[2];            // 0xA928  per view: the vertices laid so far (BreakLine_Render)
     u8   unkA930[0xA93C - 0xA930];
     Ball aBall[2];              // 0xA93C  per view: a copy of the player's ball, rolled by the line
-    f32  aViewPoint[2][4];      // 0xAAB4  per view: where the ball started (BreakLine_GetClosestPointToCupPos hands it out)
+    f32  aViewPoint[2][4];      // 0xAAB4  per view: where the ball started (BreakLine_GetClosestPointToCupPos
+                                //         hands it out)
     f32  afAAD4[2];             // 0xAAD4  per view: 1000000 at the start
     u8   abAADC[2];             // 0xAADC  per view: cleared at the start
     u8   unkAADE[0xAAE0 - 0xAADE];

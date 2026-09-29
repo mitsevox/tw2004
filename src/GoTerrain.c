@@ -55,7 +55,8 @@ void  Ter_SetZWrite(int n);
 void  RenderState_ChangeDrawFlags(u32 uClear, u32 uSet);
 void  RC_vUpdateCurrentRenderCtxTransformationMatrices(void);
 void  RC_UpdateCurrentScreenMatrices(void);
-void  Camera_SetLensFarClip(u8* p, f32 v); // sets the lens's far clip distance, fAC (CA_fGetCameraFarZ reads it)
+void  Camera_SetLensFarClip(u8* p, f32 v); // sets the lens's far clip distance, fAC (CA_fGetCameraFarZ reads
+                                           // it)
 f32   CA_fGetCameraFarZ(u8* p);
 void  Ter_SetLODPlanes(Ter_LODPlane* pPlanes, f32 fStep, s32 a, s32 b, s32 c, s32 d);
 void  Ter_DrawPatchGround(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s32 n20, u8* pbFirst,

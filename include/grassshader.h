@@ -134,10 +134,12 @@ typedef struct GrassManager {
     s16          n16;           // 0x16  from a version-100 file's header, else -500
     s16          n18;           // 0x18  from a version-100 file's header, else 400
     s16          n1A;           // 0x1A  the header's n0 / n18
-    s32          n1C;           // 0x1C  the chunks added (Grass_LoadNetworkData); cleared when the grass is freed
+    s32          n1C;           // 0x1C  the chunks added (Grass_LoadNetworkData); cleared when the grass is
+                                //       freed
     struct GrassChunkData* a20[10];   // 0x20  each chunk's data, byte-swapped in place
     struct GrassChunk*     a48[10];   // 0x48  the chunks
-    void*        pCamera;       // 0x70  the grass's render camera, made from the three below (Grass_CreateTopCamera)
+    void*        pCamera;       // 0x70  the grass's render camera, made from the three below
+                                //       (Grass_CreateTopCamera)
     CamLens*     pLens;         // 0x74  a flat lens, 20 x 20
     GoFrameBuf*  pFrameBuf;     // 0x78  256 x 256
     f32*         pRect;         // 0x7C  its screen rectangle
@@ -148,9 +150,10 @@ typedef struct GrassManager {
     f32          fMaxZ;         // 0xBC  }
     s32          nC0;           // 0xC0  10 at start
     u8           unkC4[0xD8 - 0xC4];
-    GrassBuffer** apD8;         // 0xD8  a stack of buffers (Grass_QueueRelease pushes, Grass_ReleaseQueued empties)
-    GrassBuffer** apDC;         // 0xDC  16 free buffers (Grass_AddFreeBuffer puts one back, Grass_TakeFreeBuffer
-                                //       takes the best fit)
+    GrassBuffer** apD8;         // 0xD8  a stack of buffers (Grass_QueueRelease pushes, Grass_ReleaseQueued
+                                //       empties)
+    GrassBuffer** apDC;         // 0xDC  16 free buffers (Grass_AddFreeBuffer puts one back,
+                                //       Grass_TakeFreeBuffer takes the best fit)
     s32          nE0;           // 0xE0  the records at pEC
     u32          nE4;           // 0xE4  apD8's depth
     u32          nE8;           // 0xE8  apDC's used slots

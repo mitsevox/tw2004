@@ -20,7 +20,8 @@ void SD_FreeShaderObject(void* pMesh);
 void SD_DrawShaderObject(u8* pMesh);
 void RC_vUpdateCurrentRenderCtxTransformationMatrices(void);
 void RC_UpdateCurrentScreenMatrices(void);
-void Camera_SetLensFarClip(u8* p, f32 v); // sets the lens's far clip distance, fAC (CA_fGetCameraFarZ reads it)
+void Camera_SetLensFarClip(u8* p, f32 v); // sets the lens's far clip distance, fAC (CA_fGetCameraFarZ reads
+                                          // it)
 f32  CA_fGetCameraFarZ(u8* p);
 
 void GR_Vec4Sub(f32* pA, f32* pB, f32* pOut);
