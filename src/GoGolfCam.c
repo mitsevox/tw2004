@@ -2324,7 +2324,7 @@ void GolfCamera_ProcessPostShotCamera(View* pView, int nPlayer) {
 }
 
 // Camera 16, the ball-in-the-hole camera: the sequence is kept (p78) and shot kind 8 asked for
-// (fn_80063CF0). Once the golfer's plan is ready (bPlanReady 1): the reaction camera when the
+// (CameraController_PostEvent). Once the golfer's plan is ready (bPlanReady 1): the reaction camera when the
 // post-shot animations show, else after 2 s of the current shot the cut to the golfer, else it
 // tries again on the next tick (script.n110 0: the process calls this until it has run). Before
 // that, the reaction camera only with the animations shown or the golfer taking the ball out
@@ -2375,7 +2375,8 @@ void GolfCamera_ProcessInHoleCamera(View* pView, int nPlayer) {
 }
 
 // Camera 17, the scorecard camera (the hole or the game is over: GameMode.c): fade in, over the
-// tuning's f170, when a colour fade is running or held (fn_80063C7C, fn_80063C90).
+// tuning's f170, when a colour fade is running or held (CameraController_IsFadeOutDone,
+// CameraController_IsFadeOn).
 void GolfCamera_InitScoreCardCamera(View* pView, int nPlayer) {
     f32 v[4] = {0.0f, 0.0f, 0.0f, 0.5f};
     if (CameraController_IsFadeOutDone(pView) || CameraController_IsFadeOn(pView)) {
@@ -2383,7 +2384,7 @@ void GolfCamera_InitScoreCardCamera(View* pView, int nPlayer) {
     }
 }
 
-// Camera 17's tick: the camera stays put; only the colour fade (fn_8003F2E0) steps on, one fixed
+// Camera 17's tick: the camera stays put; only the colour fade (CamScript_Fade) steps on, one fixed
 // frame (FRAME_TIME) a call, paused or not.
 void GolfCamera_ProcessScoreCardCamera(View* pView, int nPlayer) {
     CamScript_Fade(&pView->script, FRAME_TIME);
@@ -2622,7 +2623,7 @@ void GolfCamera_SwitchCrAPCamera(View* pView, char* szName, int nShot, u8 bBlend
 }
 
 // Camera 24, the golfer bone camera (nothing in this build switches to it): shot kind 10 started
-// from its beginning (fn_8006351C).
+// from its beginning (CameraController_StartScriptOfKind).
 void GolfCamera_InitGolferBoneCamera(View* pView, int nPlayer) {
     CameraController_StartScriptOfKind(pView, nPlayer, 10);
 }
@@ -2851,8 +2852,8 @@ u8 GolfCamera_SteepSlopeCamCheckCollision(View* pView, int nPlayer) {
 // (STATEFUNC_ElevatorInit asks)? Never with the putter. With the tuning's bCheckSlope on: only when
 // the target is steep from the ball (GolfCamera_SteepSlopeCamCheckSlope), and then yes. Otherwise
 // yes when the tuning's bCheckTerrain finds the ground in the way
-// (GolfCamera_SteepSlopeCamCheckCollision) or the target is off screen (fn_800635D0: not 0.1 in
-// from the edges).
+// (GolfCamera_SteepSlopeCamCheckCollision) or the target is off screen
+// (CameraController_TargetIsOnScreen: not 0.1 in from the edges).
 u8 GolfCamera_NeedSteepSlopeCam(View* pView, int nPlayer) {
     u8 bMove;
     if (gPlayers[nPlayer].nClub == CLUB_PUTTER_e) {
@@ -3442,7 +3443,7 @@ void GolfCamera_PickNextSwingReplayCam(View* pView, int nPlayer) {
     GolfCamera_CreateReplayCamera(pView, pCam, pSub, nPlayer);
 }
 
-// The replay swing camera's (mode 13) next shot, from its init (fn_800C14B0) and
+// The replay swing camera's (mode 13) next shot, from its init (GolfCamera_InitReplaySwingCamera) and
 // GolfCamera_PickNextSwingReplayCam: while script.n110 is under GolfCamera_HowManyReplaySwings, cut
 // to another shot of kind 13 (DynamicCam_ChooseScript, passing the current one) unless it would
 // hide the golfer; after that, back to the shot it started from (kept in shot19C.p44). Swing camera
@@ -3790,7 +3791,7 @@ int GolfCamera_HowManyReplaySwings(View* pView) {
 // The time rate the replay swing plays at (STATEFUNC_ReplaySwingInit and Update hand it to
 // GameEffects_SetSuperSlowMo), by the swing camera kind (View.n260): 0.5 for kind 2; for kinds 8,
 // 11 and 5, 0.5 at first, then 0.2, 0.65 and 0.2 once 2 (kind 5: 1) replay angles are done
-// (fn_800C4518); kinds 15 and 16 switch between 0.2 and 1.5 at the top of the backswing
+// (GolfCamera_NumCompletedReplayCams); kinds 15 and 16 switch between 0.2 and 1.5 at the top of the backswing
 // (script.f10C); kind 7 the shared state's f64 while b5A (the heart beat camera) is on; 1
 // otherwise.
 f32 GolfCamera_ReplaySwingSpeed(View* pView) {
@@ -4070,7 +4071,7 @@ u8 GolfCamera_ShowPostRemoveBall(View* pView) {
 }
 
 // Stop every special swing camera when a putt is conceded (STATEFUNC_ConcededInit): the comic
-// camera (fn_800C1790), the slow-motion swing, the matrix and the heart beat cameras.
+// camera (GolfCamera_TurnOffComicCam), the slow-motion swing, the matrix and the heart beat cameras.
 void GolfCamera_AbortAllSpecialSwings(View* pView, int nPlayer) {
     GolfCamera_TurnOffComicCam(pView, nPlayer);
     GolfCamera_DisableSlowMoSingCam();
@@ -4111,7 +4112,7 @@ u8 GolfCamera_IsBallFlightPaused(View* pView, int nPlayer) {
 }
 
 // The golfer-done-animating cut has been made (script.n114, set by
-// GolfCamera_CutToGolferDoneAnimatingCam); fn_800637C4 asks in camera modes 15 and 16.
+// GolfCamera_CutToGolferDoneAnimatingCam); CameraController_HideGolfer asks in camera modes 15 and 16.
 u8 GolfCamera_IsGolferDoneAnimating(View* pView) {
     return pView->script.n114 != 0;
 }

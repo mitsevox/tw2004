@@ -24,7 +24,7 @@ u8   StaticCam_CheckHotZone(CamShot* pShot, int nPlayer);
 void StaticCam_Vec3Add(f32* pA, f32* pB, f32* pOut);
 void StaticCam_Vec3Sub(f32* pA, f32* pB, f32* pOut);
 
-StaticCams* lbl_80281E18;
+StaticCams* gpStaticCams;
 
 // Registers the 'CAMC' stream handler (StaticCam_LoadCAMCfromStream), the fly-by paths' timing
 // curves.
@@ -49,17 +49,17 @@ void StaticCam_LoadCAMCfromStream(UStreamObject* pObject) {
     u32 j;
 
     pSrc = pObject->pData;
-    pDst = &lbl_80281E18->u1E5C;
+    pDst = &gpStaticCams->u1E5C;
     ByteSwap_Records(&pSrc, &pDst, aHeader, 2, 1);
-    if (lbl_80281E18->nPaths != 0) {
-        lbl_80281E18->pPaths =
-            StaticMem_Alloc(lbl_80281E18->nPaths * sizeof(FlyByPath), 2, 0, "GoStaticCam.c", 190);
+    if (gpStaticCams->nPaths != 0) {
+        gpStaticCams->pPaths =
+            StaticMem_Alloc(gpStaticCams->nPaths * sizeof(FlyByPath), 2, 0, "GoStaticCam.c", 190);
     }
-    for (i = 0; i < lbl_80281E18->nPaths; i++) {
-        pDst = &lbl_80281E18->pPaths[i];
+    for (i = 0; i < gpStaticCams->nPaths; i++) {
+        pDst = &gpStaticCams->pPaths[i];
         ByteSwap_Records(&pSrc, &pDst, aPath, 4, 1);
-        for (j = 0; j < lbl_80281E18->pPaths[i].nKeys; j++) {
-            pDst = &lbl_80281E18->pPaths[i].aKeys[j];
+        for (j = 0; j < gpStaticCams->pPaths[i].nKeys; j++) {
+            pDst = &gpStaticCams->pPaths[i].aKeys[j];
             ByteSwap_Records(&pSrc, &pDst, aKey, 3, 1);
             pSrc = (u8*)pSrc + 2;   // the keys are 0x22 bytes in the file
         }
@@ -76,46 +76,46 @@ void StaticCam_ParseFlybyCameraActor(UStreamObject* pObject) {
     char szName[0x20];  // its size is unknown
     FlyByCamDef* pDef;
 
-    lbl_80281E18->bLinked = 0;
+    gpStaticCams->bLinked = 0;
     pDef = (FlyByCamDef*)pObject->pData;
     sprintf(szName, "FlyBy Cam: %d", pDef->nId);
-    strcpy(lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].szName, szName);
-    lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].bAD = 0;
-    lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].bA8 = 0;
+    strcpy(gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].szName, szName);
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].bAD = 0;
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].bA8 = 0;
     if (pDef->f34 < 0.0f) {
         pDef->f34 = 0.0f;
     } else if (pDef->f34 > 1.0f) {
         pDef->f34 = 1.0f;
     }
-    lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].f4C = pDef->f34;
-    lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].f70 = 0.0f;
-    lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].f74 = 0.0f;
-    lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].v20[0] = pDef->aPos[0];
-    lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].v20[1] = pDef->aPos[1];
-    lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].v20[2] = pDef->aPos[2];
-    lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].f78 = PI * (pDef->fFov / 180.0f);
-    lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].bAB = 3;
-    lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].f48 = pDef->f20;
-    lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].bAC = 24;
-    lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].bA9 = 1;
-    lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].v30[0] = PI * (pDef->aLook[0] / 180.0f);
-    lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].v30[1] = PI * (pDef->aLook[1] / 180.0f);
-    lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].v30[2] = PI * (pDef->aLook[2] / 180.0f);
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].f4C = pDef->f34;
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].f70 = 0.0f;
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].f74 = 0.0f;
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].v20[0] = pDef->aPos[0];
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].v20[1] = pDef->aPos[1];
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].v20[2] = pDef->aPos[2];
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].f78 = PI * (pDef->fFov / 180.0f);
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].bAB = 3;
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].f48 = pDef->f20;
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].bAC = 24;
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].bA9 = 1;
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].v30[0] = PI * (pDef->aLook[0] / 180.0f);
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].v30[1] = PI * (pDef->aLook[1] / 180.0f);
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].v30[2] = PI * (pDef->aLook[2] / 180.0f);
     // port: p40 and p44 hold the next camera's number and this one's until StaticCam_GetFlyByCam links them
-    lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].p40 = (CamShot*)(uptr)(s32)pDef->nNext;
-    lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].p44 = (CamShot*)(uptr)(s32)pDef->nId;
-    lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].bB2 = 0;
-    lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].f80 = 0.0f;
-    lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].nA4 = pDef->nPath;
-    lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].f88 = 0.0f;
-    lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].f8C = 0.0f;
-    lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].nA0 = 1;
-    if (lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].nA4 != 9) {
-        lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].bAA = 1;
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].p40 = (CamShot*)(uptr)(s32)pDef->nNext;
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].p44 = (CamShot*)(uptr)(s32)pDef->nId;
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].bB2 = 0;
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].f80 = 0.0f;
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].nA4 = pDef->nPath;
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].f88 = 0.0f;
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].f8C = 0.0f;
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].nA0 = 1;
+    if (gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].nA4 != 9) {
+        gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].bAA = 1;
     } else {
-        lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].bAA = 0;
+        gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].bAA = 0;
     }
-    lbl_80281E18->nFlyBy++;
+    gpStaticCams->nFlyBy++;
     StaticMem_Free(pObject);
 }
 
@@ -132,86 +132,86 @@ void StaticCam_ParseStaticCameraActor(UStreamObject* pObject) {
     CamShot* pShot;
 
     pDef = (StaticCamDef*)pObject->pData;
-    sprintf(szName, "Static Cam: %d", lbl_80281E18->nStatic);
-    strcpy(lbl_80281E18->aStatic[lbl_80281E18->nStatic].szName, szName);
-    lbl_80281E18->aStatic[lbl_80281E18->nStatic].bAD = 38;
-    lbl_80281E18->aStatic[lbl_80281E18->nStatic].bA8 = 0;
-    lbl_80281E18->aStatic[lbl_80281E18->nStatic].f4C = pDef->f34;
-    lbl_80281E18->aStatic[lbl_80281E18->nStatic].f70 = 0.0f;
-    lbl_80281E18->aStatic[lbl_80281E18->nStatic].f74 = 0.0f;
-    lbl_80281E18->aStatic[lbl_80281E18->nStatic].v20[0] = pDef->aPos[0];
-    lbl_80281E18->aStatic[lbl_80281E18->nStatic].v20[1] = pDef->aPos[1];
-    lbl_80281E18->aStatic[lbl_80281E18->nStatic].v20[2] = pDef->aPos[2];
-    lbl_80281E18->aStatic[lbl_80281E18->nStatic].f78 = PI * (pDef->fFov / 180.0f);
-    lbl_80281E18->aStatic[lbl_80281E18->nStatic].f7C = PI * (pDef->f2C / 180.0f);
-    lbl_80281E18->aStatic[lbl_80281E18->nStatic].p40 = NULL;
-    lbl_80281E18->aStatic[lbl_80281E18->nStatic].bAB = 5;
-    lbl_80281E18->aStatic[lbl_80281E18->nStatic].f48 = pDef->f30;
-    lbl_80281E18->aStatic[lbl_80281E18->nStatic].nAE = pDef->n1C;
-    lbl_80281E18->aStatic[lbl_80281E18->nStatic].bA9 = 0;
-    lbl_80281E18->aStatic[lbl_80281E18->nStatic].u.aArea[0] = pDef->aArea[0];
-    lbl_80281E18->aStatic[lbl_80281E18->nStatic].u.aArea[1] = pDef->aArea[1];
-    lbl_80281E18->aStatic[lbl_80281E18->nStatic].u.aArea[2] = pDef->aArea[2];
-    lbl_80281E18->aStatic[lbl_80281E18->nStatic].u.aArea[3] = pDef->aArea[3];
-    lbl_80281E18->aStatic[lbl_80281E18->nStatic].bAC = pDef->n20;
-    lbl_80281E18->aStatic[lbl_80281E18->nStatic].bB2 = 0;
-    lbl_80281E18->aStatic[lbl_80281E18->nStatic].f80 = 0.0f;
-    lbl_80281E18->aStatic[lbl_80281E18->nStatic].bAA = 1;
-    lbl_80281E18->aStatic[lbl_80281E18->nStatic].f88 = pDef->f54;
-    lbl_80281E18->aStatic[lbl_80281E18->nStatic].f8C = 0.0f;
-    lbl_80281E18->aStatic[lbl_80281E18->nStatic].f68 = 0.0f;
-    lbl_80281E18->aStatic[lbl_80281E18->nStatic].f6C = 10000.0f;
-    lbl_80281E18->aStatic[lbl_80281E18->nStatic].nA0 = pDef->n58;
-    lbl_80281E18->aStatic[lbl_80281E18->nStatic].nA4 = pDef->nKinds;
-    lbl_80281E18->aStatic[lbl_80281E18->nStatic].v30[0] = PI * (pDef->aAngle[0] / 180.0f);
-    lbl_80281E18->aStatic[lbl_80281E18->nStatic].v30[1] = PI * (pDef->aAngle[1] / 180.0f);
-    lbl_80281E18->aStatic[lbl_80281E18->nStatic].v30[2] = PI * (pDef->aAngle[2] / 180.0f);
-    pShot = &lbl_80281E18->aStatic[lbl_80281E18->nStatic];
+    sprintf(szName, "Static Cam: %d", gpStaticCams->nStatic);
+    strcpy(gpStaticCams->aStatic[gpStaticCams->nStatic].szName, szName);
+    gpStaticCams->aStatic[gpStaticCams->nStatic].bAD = 38;
+    gpStaticCams->aStatic[gpStaticCams->nStatic].bA8 = 0;
+    gpStaticCams->aStatic[gpStaticCams->nStatic].f4C = pDef->f34;
+    gpStaticCams->aStatic[gpStaticCams->nStatic].f70 = 0.0f;
+    gpStaticCams->aStatic[gpStaticCams->nStatic].f74 = 0.0f;
+    gpStaticCams->aStatic[gpStaticCams->nStatic].v20[0] = pDef->aPos[0];
+    gpStaticCams->aStatic[gpStaticCams->nStatic].v20[1] = pDef->aPos[1];
+    gpStaticCams->aStatic[gpStaticCams->nStatic].v20[2] = pDef->aPos[2];
+    gpStaticCams->aStatic[gpStaticCams->nStatic].f78 = PI * (pDef->fFov / 180.0f);
+    gpStaticCams->aStatic[gpStaticCams->nStatic].f7C = PI * (pDef->f2C / 180.0f);
+    gpStaticCams->aStatic[gpStaticCams->nStatic].p40 = NULL;
+    gpStaticCams->aStatic[gpStaticCams->nStatic].bAB = 5;
+    gpStaticCams->aStatic[gpStaticCams->nStatic].f48 = pDef->f30;
+    gpStaticCams->aStatic[gpStaticCams->nStatic].nAE = pDef->n1C;
+    gpStaticCams->aStatic[gpStaticCams->nStatic].bA9 = 0;
+    gpStaticCams->aStatic[gpStaticCams->nStatic].u.aArea[0] = pDef->aArea[0];
+    gpStaticCams->aStatic[gpStaticCams->nStatic].u.aArea[1] = pDef->aArea[1];
+    gpStaticCams->aStatic[gpStaticCams->nStatic].u.aArea[2] = pDef->aArea[2];
+    gpStaticCams->aStatic[gpStaticCams->nStatic].u.aArea[3] = pDef->aArea[3];
+    gpStaticCams->aStatic[gpStaticCams->nStatic].bAC = pDef->n20;
+    gpStaticCams->aStatic[gpStaticCams->nStatic].bB2 = 0;
+    gpStaticCams->aStatic[gpStaticCams->nStatic].f80 = 0.0f;
+    gpStaticCams->aStatic[gpStaticCams->nStatic].bAA = 1;
+    gpStaticCams->aStatic[gpStaticCams->nStatic].f88 = pDef->f54;
+    gpStaticCams->aStatic[gpStaticCams->nStatic].f8C = 0.0f;
+    gpStaticCams->aStatic[gpStaticCams->nStatic].f68 = 0.0f;
+    gpStaticCams->aStatic[gpStaticCams->nStatic].f6C = 10000.0f;
+    gpStaticCams->aStatic[gpStaticCams->nStatic].nA0 = pDef->n58;
+    gpStaticCams->aStatic[gpStaticCams->nStatic].nA4 = pDef->nKinds;
+    gpStaticCams->aStatic[gpStaticCams->nStatic].v30[0] = PI * (pDef->aAngle[0] / 180.0f);
+    gpStaticCams->aStatic[gpStaticCams->nStatic].v30[1] = PI * (pDef->aAngle[1] / 180.0f);
+    gpStaticCams->aStatic[gpStaticCams->nStatic].v30[2] = PI * (pDef->aAngle[2] / 180.0f);
+    pShot = &gpStaticCams->aStatic[gpStaticCams->nStatic];
     mat44flt_EulerAngles(m, pShot->v30[1], pShot->v30[0], pShot->v30[2]);
-    LLMath_mat44fltMultiply33(m, vAhead, lbl_80281E18->aStatic[lbl_80281E18->nStatic].v30);
-    StaticCam_Vec3Add(lbl_80281E18->aStatic[lbl_80281E18->nStatic].v30,
-                lbl_80281E18->aStatic[lbl_80281E18->nStatic].v20,
-                lbl_80281E18->aStatic[lbl_80281E18->nStatic].v30);
-    lbl_80281E18->nStatic++;
+    LLMath_mat44fltMultiply33(m, vAhead, gpStaticCams->aStatic[gpStaticCams->nStatic].v30);
+    StaticCam_Vec3Add(gpStaticCams->aStatic[gpStaticCams->nStatic].v30,
+                gpStaticCams->aStatic[gpStaticCams->nStatic].v20,
+                gpStaticCams->aStatic[gpStaticCams->nStatic].v30);
+    gpStaticCams->nStatic++;
     StaticMem_Free(pObject);
 }
 
 // Allocates the static cameras' state (gpStaticCams) and empties it (StaticCam_Reset). Called when
 // a round starts up (GO_vInitIG).
 void StaticCam_Init(void) {
-    lbl_80281E18 = StaticMem_Alloc(sizeof(StaticCams), 2, 0, "GoStaticCam.c", 380);
-    lbl_80281E18->pPaths = NULL;
+    gpStaticCams = StaticMem_Alloc(sizeof(StaticCams), 2, 0, "GoStaticCam.c", 380);
+    gpStaticCams->pPaths = NULL;
     StaticCam_Reset();
 }
 
 // Empties the static cameras' state (StaticCam_Reset) and frees it.
 void StaticCam_DeInit(void) {
     StaticCam_Reset();
-    StaticMem_Free(lbl_80281E18);
-    lbl_80281E18 = NULL;
+    StaticMem_Free(gpStaticCams);
+    gpStaticCams = NULL;
 }
 
 // Forgets every static and fly-by camera and path, and frees the paths' timing curves. The hole
 // loader calls it for each hole.
 void StaticCam_Reset(void) {
-    lbl_80281E18->nStatic = 0;
-    lbl_80281E18->nFlyBy = 0;
-    lbl_80281E18->bLinked = 0;
-    lbl_80281E18->apPath[0] = NULL;
-    lbl_80281E18->apPath[1] = NULL;
-    lbl_80281E18->apPath[2] = NULL;
-    lbl_80281E18->apPath[3] = NULL;
-    lbl_80281E18->apPath[4] = NULL;
-    lbl_80281E18->apPath[5] = NULL;
-    lbl_80281E18->apPath[6] = NULL;
-    lbl_80281E18->apPath[7] = NULL;
-    lbl_80281E18->apPath[8] = NULL;
-    lbl_80281E18->apPath[9] = NULL;
-    if (lbl_80281E18->pPaths != NULL) {
-        StaticMem_Free(lbl_80281E18->pPaths);
+    gpStaticCams->nStatic = 0;
+    gpStaticCams->nFlyBy = 0;
+    gpStaticCams->bLinked = 0;
+    gpStaticCams->apPath[0] = NULL;
+    gpStaticCams->apPath[1] = NULL;
+    gpStaticCams->apPath[2] = NULL;
+    gpStaticCams->apPath[3] = NULL;
+    gpStaticCams->apPath[4] = NULL;
+    gpStaticCams->apPath[5] = NULL;
+    gpStaticCams->apPath[6] = NULL;
+    gpStaticCams->apPath[7] = NULL;
+    gpStaticCams->apPath[8] = NULL;
+    gpStaticCams->apPath[9] = NULL;
+    if (gpStaticCams->pPaths != NULL) {
+        StaticMem_Free(gpStaticCams->pPaths);
     }
-    lbl_80281E18->pPaths = NULL;
-    lbl_80281E18->nPaths = 0;
+    gpStaticCams->pPaths = NULL;
+    gpStaticCams->nPaths = 0;
 }
 
 // A static or fly-by shot's camera position: its v20, into pOut. nPlayer is not used.
@@ -234,11 +234,11 @@ CamShot* StaticCam_ChooseScript(int nPlayer, int nKind, u8 bNotKind5, CamShot* p
         return NULL;
     }
     pFound = aFound;
-    for (i = 0; i < lbl_80281E18->nStatic; i++) {
-        if (!lbl_80281E18->aStatic[i].bA9 && (nKind & lbl_80281E18->aStatic[i].nA4)
-            && (!bNotKind5 || lbl_80281E18->aStatic[i].bAC != 5)
-            && StaticCam_CheckHotZone(&lbl_80281E18->aStatic[i], nPlayer) && pNot
-                    != &lbl_80281E18->aStatic[i]) {
+    for (i = 0; i < gpStaticCams->nStatic; i++) {
+        if (!gpStaticCams->aStatic[i].bA9 && (nKind & gpStaticCams->aStatic[i].nA4)
+            && (!bNotKind5 || gpStaticCams->aStatic[i].bAC != 5)
+            && StaticCam_CheckHotZone(&gpStaticCams->aStatic[i], nPlayer) && pNot
+                    != &gpStaticCams->aStatic[i]) {
             *pFound++ = i;
             nFound++;
         }
@@ -247,14 +247,14 @@ CamShot* StaticCam_ChooseScript(int nPlayer, int nKind, u8 bNotKind5, CamShot* p
         return NULL;
     }
     i = Misc_RandFunc(1) % nFound;
-    return &lbl_80281E18->aStatic[aFound[i]];
+    return &gpStaticCams->aStatic[aFound[i]];
 }
 
 // Fly-by path nPath's first shot (NULL for nPath 10 or more). The first call after loading links
 // the fly-by cameras into their paths (p40 the next shot, p44 the one before, by the numbers
 // StaticCam_ParseFlybyCameraActor kept), finds each path's first shot, sets each shot's f4C to its
-// segment's length (fn_800C79BC; 0 for the last) and adds them up per path; a path whose last
-// camera is marked -99 gets bAA 0 on all its cameras.
+// segment's length (CamScript_fGetDistanceBetweenSplinePoints; 0 for the last) and adds them up per
+// path; a path whose last camera is marked -99 gets bAA 0 on all its cameras.
 CamShot* StaticCam_GetFlyByCam(int nPath) {
     u8 abEnds[NUM_FLYBY_PATHS];   // the path ends on a camera marked -99
     CamShot* pShot;
@@ -275,52 +275,52 @@ CamShot* StaticCam_GetFlyByCam(int nPath) {
     abEnds[7] = 0;
     abEnds[8] = 0;
     abEnds[9] = 0;
-    if (!lbl_80281E18->bLinked) {
-        for (i = 0; i < lbl_80281E18->nFlyBy; i++) {
+    if (!gpStaticCams->bLinked) {
+        for (i = 0; i < gpStaticCams->nFlyBy; i++) {
             bFound = 0;
-            for (j = 0; j < lbl_80281E18->nFlyBy; j++) {
-                if (lbl_80281E18->aFlyBy[i].p40 == lbl_80281E18->aFlyBy[j].p44) {
+            for (j = 0; j < gpStaticCams->nFlyBy; j++) {
+                if (gpStaticCams->aFlyBy[i].p40 == gpStaticCams->aFlyBy[j].p44) {
                     bFound = 1;
-                    lbl_80281E18->aFlyBy[i].p40 = &lbl_80281E18->aFlyBy[j];
+                    gpStaticCams->aFlyBy[i].p40 = &gpStaticCams->aFlyBy[j];
                     break;
                 }
             }
             if (!bFound) {
-                if ((s32)(uptr)lbl_80281E18->aFlyBy[i].p40 == -99) {
-                    abEnds[lbl_80281E18->aFlyBy[i].nA4] = 1;
+                if ((s32)(uptr)gpStaticCams->aFlyBy[i].p40 == -99) {
+                    abEnds[gpStaticCams->aFlyBy[i].nA4] = 1;
                 }
-                lbl_80281E18->aFlyBy[i].p40 = NULL;
+                gpStaticCams->aFlyBy[i].p40 = NULL;
             }
         }
-        for (i = 0; i < lbl_80281E18->nFlyBy; i++) {
+        for (i = 0; i < gpStaticCams->nFlyBy; i++) {
             bFound = 0;
-            for (j = 0; j < lbl_80281E18->nFlyBy; j++) {
-                if (&lbl_80281E18->aFlyBy[i] == lbl_80281E18->aFlyBy[j].p40
-                    && lbl_80281E18->aFlyBy[i].nA4 == lbl_80281E18->aFlyBy[j].nA4) {
+            for (j = 0; j < gpStaticCams->nFlyBy; j++) {
+                if (&gpStaticCams->aFlyBy[i] == gpStaticCams->aFlyBy[j].p40
+                    && gpStaticCams->aFlyBy[i].nA4 == gpStaticCams->aFlyBy[j].nA4) {
                     bFound = 1;
-                    lbl_80281E18->aFlyBy[i].p44 = &lbl_80281E18->aFlyBy[j];
+                    gpStaticCams->aFlyBy[i].p44 = &gpStaticCams->aFlyBy[j];
                     break;
                 }
             }
             if (!bFound) {
-                lbl_80281E18->aFlyBy[i].p44 = NULL;
-                lbl_80281E18->aFlyBy[i].bA9 = 0;
+                gpStaticCams->aFlyBy[i].p44 = NULL;
+                gpStaticCams->aFlyBy[i].bA9 = 0;
             }
         }
-        for (i = 0; i < lbl_80281E18->nFlyBy; i++) {
-            if (!lbl_80281E18->aFlyBy[i].bAD && !lbl_80281E18->aFlyBy[i].bA9
-                && lbl_80281E18->aFlyBy[i].p40 != NULL) {
-                lbl_80281E18->apPath[lbl_80281E18->aFlyBy[i].nA4] = &lbl_80281E18->aFlyBy[i];
+        for (i = 0; i < gpStaticCams->nFlyBy; i++) {
+            if (!gpStaticCams->aFlyBy[i].bAD && !gpStaticCams->aFlyBy[i].bA9
+                && gpStaticCams->aFlyBy[i].p40 != NULL) {
+                gpStaticCams->apPath[gpStaticCams->aFlyBy[i].nA4] = &gpStaticCams->aFlyBy[i];
             }
-            if (abEnds[lbl_80281E18->aFlyBy[i].nA4]) {
-                lbl_80281E18->aFlyBy[i].bAA = 0;
+            if (abEnds[gpStaticCams->aFlyBy[i].nA4]) {
+                gpStaticCams->aFlyBy[i].bAA = 0;
             }
         }
         for (i = 0; i < NUM_FLYBY_PATHS; i++) {
-            if (lbl_80281E18->apPath[i] != NULL) {
-                lbl_80281E18->afPathLength[i] = 0.0f;
-                if (lbl_80281E18->apPath != NULL) {   // always true: apPath is an array
-                    for (pShot = lbl_80281E18->apPath[i]; pShot->p40 != NULL && pShot->p40->nA4 == i;
+            if (gpStaticCams->apPath[i] != NULL) {
+                gpStaticCams->afPathLength[i] = 0.0f;
+                if (gpStaticCams->apPath != NULL) {   // always true: apPath is an array
+                    for (pShot = gpStaticCams->apPath[i]; pShot->p40 != NULL && pShot->p40->nA4 == i;
                          pShot = pShot->p40) {
                         // StaticCam_SetupFlybyCameraPointers's body
                         if (pShot->p44 != NULL) {
@@ -340,7 +340,7 @@ CamShot* StaticCam_GetFlyByCam(int nPath) {
                         }
                         pShot->f4C = CamScript_fGetDistanceBetweenSplinePoints(pPrev->v20, pShot->v20,
                                 pNext->v20, pAfter->v20);
-                        lbl_80281E18->afPathLength[i] += pShot->f4C;
+                        gpStaticCams->afPathLength[i] += pShot->f4C;
                     }
                     if (pShot != NULL) {
                         pShot->f4C = 0.0f;
@@ -348,12 +348,12 @@ CamShot* StaticCam_GetFlyByCam(int nPath) {
                 }
             }
         }
-        lbl_80281E18->bLinked = 1;
+        gpStaticCams->bLinked = 1;
     }
     if (nPath >= NUM_FLYBY_PATHS) {
         return NULL;
     }
-    return lbl_80281E18->apPath[nPath];
+    return gpStaticCams->apPath[nPath];
 }
 
 // Fly-by path uPath's timing curve, or NULL.
@@ -361,12 +361,12 @@ FlyByPath* StaticCam_GetFlybyTimeCurve(u32 uPath) {
     FlyByPath* pPaths;
     u32 i;
 
-    pPaths = lbl_80281E18->pPaths;
+    pPaths = gpStaticCams->pPaths;
     if (pPaths == NULL) {
         return NULL;
     }
-    for (i = 0; i < lbl_80281E18->nPaths; i++) {
-        if (uPath == lbl_80281E18->pPaths[i].uPath) {
+    for (i = 0; i < gpStaticCams->nPaths; i++) {
+        if (uPath == gpStaticCams->pPaths[i].uPath) {
             return &pPaths[i];
         }
     }
@@ -374,11 +374,12 @@ FlyByPath* StaticCam_GetFlybyTimeCurve(u32 uPath) {
 }
 
 // Flies the camera along fly-by path nPath to share fShare of the path's length: pCam and pSub come
-// from fn_800C7480's spline through the v20 and v30 of the four shots around the current one
-// (StaticCam_SetupFlybyCameraPointers), *pFov starts at the view's lens and goes to fn_800C7480
-// with the shots' f78. It steps the spline 0.005 at a time until the camera has gone far enough,
-// then homes in on the exact distance. The script keeps the shot it is on (pShot, and pNextShot its
-// p40), the share of that shot's segment (fA0) and the distance so far (fA4).
+// from CamScript_SplineCamerasByPositionAndLook's spline through the v20 and v30 of the four shots
+// around the current one (StaticCam_SetupFlybyCameraPointers), *pFov starts at the view's lens and goes to
+// CamScript_SplineCamerasByPositionAndLook with the shots' f78. It steps the spline 0.005 at a time
+// until the camera has gone far enough, then homes in on the exact distance. The script keeps the
+// shot it is on (pShot, and pNextShot its p40), the share of that shot's segment (fA0) and the
+// distance so far (fA4).
 void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32* pSub, f32* pFov, int nPlayer,
                  f32 fShare) {
     f32 vLast[4];
@@ -406,7 +407,7 @@ void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32
     pShot = pScript->pShot;
     fLastT = fT;
     fLastDist = fDist;
-    fTarget = fShare * lbl_80281E18->afPathLength[nPath];
+    fTarget = fShare * gpStaticCams->afPathLength[nPath];
     StaticCam_SetupFlybyCameraPointers(pShot, &pPrev, &pNext, &pAfter);
     LLMath_CopyVec(pCam, vLast);
     *pFov = CA_fGetCameraFieldOfView(

@@ -171,7 +171,7 @@ typedef struct StaticCams {
 } StaticCams;
 LAYOUT_ASSERT(StaticCams, 0x1E68);
 
-extern StaticCams* lbl_80281E18;
+extern StaticCams* gpStaticCams;
 
 // A camera sequence (DynamicCam's, 0x50 bytes): the shots a camera plan steps through, and the
 // conditions it is picked on. Its shot choices (CamChoice) are in dyncam.h.

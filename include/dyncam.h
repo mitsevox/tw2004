@@ -54,9 +54,9 @@ typedef struct DynCamTables {
 } DynCamTables;
 LAYOUT_ASSERT(DynCamTables, 0x28);
 
-extern DynCamTables* lbl_80281D88;
-extern s32 lbl_80187988[20];            // DynamicCam_MaterialToCameraLie's table
-extern s32 lbl_801879D8[17];            // DynamicCam_BallLieToCameraLie's table
+extern DynCamTables* gpDynCam;
+extern s32 gMaterialToCamLies[20];            // DynamicCam_MaterialToCameraLie's table
+extern s32 gBallLieToCamLies[17];            // DynamicCam_BallLieToCameraLie's table
 
 // GoDynamicCam.c: register and unregister the camera files' stream handlers.
 void DynamicCam_RegisterStreamClients(void);

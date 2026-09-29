@@ -1,6 +1,6 @@
 // GoDynamicCam.c (EA's name, from its asserts; also in EA's 2002 source tree; TW06): the dynamic
 // cameras. Loads the camera shots, sequences and shot choices from the camera files into
-// lbl_80281D88's tables, and picks the sequence and shot that fit a golfer's situation (club,
+// gpDynCam's tables, and picks the sequence and shot that fit a golfer's situation (club,
 // shot kind, course and hole, game mode).
 
 #include "golfer.h"
@@ -9,7 +9,7 @@
 #include "frontend/fe.h"
 #include "endian.h"
 
-DynCamTables* lbl_80281D88;
+DynCamTables* gpDynCam;
 
 u8   BitArray_TestBit(u32* pBits, int nBit);         // the bit is set
 void DynamicCam_CopySequenceData(u8* pSrc, u8* pDst, int nCount);
@@ -121,11 +121,11 @@ void DynamicCam_LoadCAMSfromStream(UStreamObject* pObject) {
     s32 nChoices;
     u8* pSrc;
 
-    lbl_80281D88->n1C++;
-    if (lbl_80281D88->n1C > 2) {
-        lbl_80281D88->n1C = 1;
+    gpDynCam->n1C++;
+    if (gpDynCam->n1C > 2) {
+        gpDynCam->n1C = 1;
     }
-    if (lbl_80281D88->pSequences != NULL) {
+    if (gpDynCam->pSequences != NULL) {
         StaticMem_Free(pObject);
         return;
     }
@@ -133,12 +133,12 @@ void DynamicCam_LoadCAMSfromStream(UStreamObject* pObject) {
     BYTESWAP_SWAPDATA(&pSrc, (u8*)&nSequences, sizeof(nSequences), 4);
     pSrc = pObject->pData + 4;
     BYTESWAP_SWAPDATA(&pSrc, (u8*)&nChoices, sizeof(nChoices), 4);
-    lbl_80281D88->pSequences = StaticMem_Alloc(nSequences * sizeof(CamSequence), 2, 0, "GoDynamicCam.c", 403);
-    lbl_80281D88->pChoices = StaticMem_Alloc(nChoices * sizeof(CamChoice), 2, 0, "GoDynamicCam.c", 404);
-    lbl_80281D88->nSequences = 0;
-    lbl_80281D88->nChoicesUsed = 0;
+    gpDynCam->pSequences = StaticMem_Alloc(nSequences * sizeof(CamSequence), 2, 0, "GoDynamicCam.c", 403);
+    gpDynCam->pChoices = StaticMem_Alloc(nChoices * sizeof(CamChoice), 2, 0, "GoDynamicCam.c", 404);
+    gpDynCam->nSequences = 0;
+    gpDynCam->nChoicesUsed = 0;
     pSrc = pObject->pData + 8;
-    DynamicCam_CopySequenceData(pSrc, (u8*)lbl_80281D88->pSequences, nSequences);
+    DynamicCam_CopySequenceData(pSrc, (u8*)gpDynCam->pSequences, nSequences);
     DynamicCam_ParseCameraSeqs(nSequences);
     DynamicCam_ParseNextSeqs();
     StaticMem_Free(pObject);
@@ -148,16 +148,16 @@ void DynamicCam_LoadCAMSfromStream(UStreamObject* pObject) {
 // and sets them up (DynamicCam_ParseCameraViews). Counted in n1C like 'CAMS'. Frees the object;
 // ignores it when shots are loaded already.
 void DynamicCam_LoadCAMVfromStream(UStreamObject* pObject) {
-    lbl_80281D88->n1C++;
-    if (lbl_80281D88->n1C > 2) {
-        lbl_80281D88->n1C = 1;
+    gpDynCam->n1C++;
+    if (gpDynCam->n1C > 2) {
+        gpDynCam->n1C = 1;
     }
-    if (lbl_80281D88->pShots != NULL) {
+    if (gpDynCam->pShots != NULL) {
         StaticMem_Free(pObject);
         return;
     }
-    lbl_80281D88->pShots = StaticMem_Alloc(pObject->uSize, 2, 0, "GoDynamicCam.c", 454);
-    DynamicCam_CopyScriptData(pObject->pData, lbl_80281D88->pShots, pObject->uSize / sizeof(CamShot));
+    gpDynCam->pShots = StaticMem_Alloc(pObject->uSize, 2, 0, "GoDynamicCam.c", 454);
+    DynamicCam_CopyScriptData(pObject->pData, gpDynCam->pShots, pObject->uSize / sizeof(CamShot));
     DynamicCam_ParseCameraViews(pObject->uSize);
     StaticMem_Free(pObject);
 }
@@ -165,12 +165,12 @@ void DynamicCam_LoadCAMVfromStream(UStreamObject* pObject) {
 // The front end's 'CAMV' handler: as DynamicCam_LoadCAMVfromStream, but not counted in n1C, and the
 // shots are set up by DynamicCam_ParseCameraViewsFE (no height limits, no sequences to resolve).
 void DynamicCam_LoadCAMVfromStreamFE(UStreamObject* pObject) {
-    if (lbl_80281D88->pShots != NULL) {
+    if (gpDynCam->pShots != NULL) {
         StaticMem_Free(pObject);
         return;
     }
-    lbl_80281D88->pShots = StaticMem_Alloc(pObject->uSize, 2, 0, "GoDynamicCam.c", 495);
-    DynamicCam_CopyScriptData(pObject->pData, lbl_80281D88->pShots, pObject->uSize / sizeof(CamShot));
+    gpDynCam->pShots = StaticMem_Alloc(pObject->uSize, 2, 0, "GoDynamicCam.c", 495);
+    DynamicCam_CopyScriptData(pObject->pData, gpDynCam->pShots, pObject->uSize / sizeof(CamShot));
     DynamicCam_ParseCameraViewsFE(pObject->uSize);
     StaticMem_Free(pObject);
 }
@@ -180,12 +180,12 @@ void DynamicCam_LoadCAMVfromStreamFE(UStreamObject* pObject) {
 // (DynamicCam_CopyAnimPairData) and turns their indexes into pointers (DynamicCam_ParseAnimPairs).
 // Frees the object; ignores it when pairs are loaded already.
 void DynamicCam_LoadCAMAfromStream(UStreamObject* pObject) {
-    if (lbl_80281D88->pSets != NULL) {
+    if (gpDynCam->pSets != NULL) {
         StaticMem_Free(pObject);
         return;
     }
-    lbl_80281D88->pSets = StaticMem_Alloc(pObject->uSize, 2, 0, "GoDynamicCam.c", 536);
-    DynamicCam_CopyAnimPairData(pObject->pData, lbl_80281D88->pSets, pObject->uSize / sizeof(DynCamSet));
+    gpDynCam->pSets = StaticMem_Alloc(pObject->uSize, 2, 0, "GoDynamicCam.c", 536);
+    DynamicCam_CopyAnimPairData(pObject->pData, gpDynCam->pSets, pObject->uSize / sizeof(DynCamSet));
     DynamicCam_ParseAnimPairs(pObject->uSize);
     StaticMem_Free(pObject);
 }
@@ -211,15 +211,15 @@ void DynamicCam_CopySequenceData(u8* pSrc, u8* pDst, int nCount) {
         ByteSwap_Records((void**)&pSrc, (void**)&pDst, aSequence, sizeof(aSequence) / sizeof(aSequence[0]),
                          1);
         // pDst is now at the sequence's p4C
-        *(CamChoice**)pDst = &lbl_80281D88->pChoices[lbl_80281D88->nChoicesUsed];
+        *(CamChoice**)pDst = &gpDynCam->pChoices[gpDynCam->nChoicesUsed];
         pSrc += sizeof(CamChoice*);
         pDst += sizeof(CamChoice*);
-        pChoice = &lbl_80281D88->pChoices[lbl_80281D88->nChoicesUsed];
+        pChoice = &gpDynCam->pChoices[gpDynCam->nChoicesUsed];
         ByteSwap_Records((void**)&pSrc, (void**)&pChoice, aChoice, sizeof(aChoice) / sizeof(aChoice[0]),
-                    lbl_80281D88->pSequences[i].nChoices);
-        lbl_80281D88->nChoicesUsed += lbl_80281D88->pSequences[i].nChoices;
+                    gpDynCam->pSequences[i].nChoices);
+        gpDynCam->nChoicesUsed += gpDynCam->pSequences[i].nChoices;
     }
-    lbl_80281D88->nSequences = nCount;
+    gpDynCam->nSequences = nCount;
 }
 
 // Copies nCount shots from the file (little-endian) into pDst, swapping each value's bytes.
@@ -263,28 +263,28 @@ static f32 GoDynamicCam_StrippedFn(f32 x) {
 void DynamicCam_ParseCameraViews(int nSize) {
     int i;
 
-    lbl_80281D88->nShots = 0;
-    lbl_80281D88->nShots = nSize / sizeof(CamShot);
-    for (i = 0; i < lbl_80281D88->nShots; i++) {
+    gpDynCam->nShots = 0;
+    gpDynCam->nShots = nSize / sizeof(CamShot);
+    for (i = 0; i < gpDynCam->nShots; i++) {
         // port: the file keeps an index in the pointer field
-        if (i == (s32)lbl_80281D88->pShots[i].p40) {
-            lbl_80281D88->pShots[i].p40 = NULL;
+        if (i == (s32)gpDynCam->pShots[i].p40) {
+            gpDynCam->pShots[i].p40 = NULL;
         } else {
-            lbl_80281D88->pShots[i].p40 = &lbl_80281D88->pShots[(s32)lbl_80281D88->pShots[i].p40];
-            lbl_80281D88->pShots[i].p40->bA9 = 1;
+            gpDynCam->pShots[i].p40 = &gpDynCam->pShots[(s32)gpDynCam->pShots[i].p40];
+            gpDynCam->pShots[i].p40->bA9 = 1;
         }
-        if (lbl_80281D88->pShots[i].f68 < gpCamTuning->f168) {
-            lbl_80281D88->pShots[i].f68 = gpCamTuning->f168;
+        if (gpDynCam->pShots[i].f68 < gpCamTuning->f168) {
+            gpDynCam->pShots[i].f68 = gpCamTuning->f168;
         }
-        if (lbl_80281D88->pShots[i].f6C < lbl_80281D88->pShots[i].f68) {
-            lbl_80281D88->pShots[i].f6C = lbl_80281D88->pShots[i].f68;
+        if (gpDynCam->pShots[i].f6C < gpDynCam->pShots[i].f68) {
+            gpDynCam->pShots[i].f6C = gpDynCam->pShots[i].f68;
         }
-        lbl_80281D88->pShots[i].f8C = (lbl_80281D88->pShots[i].f8C < 0.0f) ? 0.0f
-            : ((lbl_80281D88->pShots[i].f8C > 0.49f) ? 0.49f : lbl_80281D88->pShots[i].f8C);
-        lbl_80281D88->pShots[i].f7C = lbl_80281D88->pShots[i].f78;
+        gpDynCam->pShots[i].f8C = (gpDynCam->pShots[i].f8C < 0.0f) ? 0.0f
+            : ((gpDynCam->pShots[i].f8C > 0.49f) ? 0.49f : gpDynCam->pShots[i].f8C);
+        gpDynCam->pShots[i].f7C = gpDynCam->pShots[i].f78;
     }
-    if (lbl_80281D88->n1C == 2) {
-        DynamicCam_ParseCameraSeqs(lbl_80281D88->nSequences);
+    if (gpDynCam->n1C == 2) {
+        DynamicCam_ParseCameraSeqs(gpDynCam->nSequences);
     }
 }
 
@@ -294,18 +294,18 @@ void DynamicCam_ParseCameraViews(int nSize) {
 void DynamicCam_ParseCameraViewsFE(int nSize) {
     int i;
 
-    lbl_80281D88->nShots = 0;
-    lbl_80281D88->nShots = nSize / sizeof(CamShot);
-    for (i = 0; i < lbl_80281D88->nShots; i++) {
+    gpDynCam->nShots = 0;
+    gpDynCam->nShots = nSize / sizeof(CamShot);
+    for (i = 0; i < gpDynCam->nShots; i++) {
         // port: the file keeps an index in the pointer field
-        if (i == (s32)lbl_80281D88->pShots[i].p40) {
-            lbl_80281D88->pShots[i].p40 = NULL;
+        if (i == (s32)gpDynCam->pShots[i].p40) {
+            gpDynCam->pShots[i].p40 = NULL;
         } else {
-            lbl_80281D88->pShots[i].p40 = &lbl_80281D88->pShots[(s32)lbl_80281D88->pShots[i].p40];
-            lbl_80281D88->pShots[i].p40->bA9 = 1;
+            gpDynCam->pShots[i].p40 = &gpDynCam->pShots[(s32)gpDynCam->pShots[i].p40];
+            gpDynCam->pShots[i].p40->bA9 = 1;
         }
-        lbl_80281D88->pShots[i].f6C = lbl_80281D88->pShots[i].f68;
-        lbl_80281D88->pShots[i].f7C = lbl_80281D88->pShots[i].f78;
+        gpDynCam->pShots[i].f6C = gpDynCam->pShots[i].f68;
+        gpDynCam->pShots[i].f7C = gpDynCam->pShots[i].f78;
     }
 }
 
@@ -319,28 +319,28 @@ void DynamicCam_ParseCameraSeqs(int nSequences) {
     int k;
     u8 bFound;
 
-    lbl_80281D88->nSequences = nSequences;
-    if (lbl_80281D88->n1C != 2) {
+    gpDynCam->nSequences = nSequences;
+    if (gpDynCam->n1C != 2) {
         return;
     }
-    for (i = 0; i < lbl_80281D88->nSequences; i++) {
-        for (j = 0; j < lbl_80281D88->pSequences[i].nChoices; j++) {
+    for (i = 0; i < gpDynCam->nSequences; i++) {
+        for (j = 0; j < gpDynCam->pSequences[i].nChoices; j++) {
             // port: the file keeps an index in the pointer field
-            lbl_80281D88->pSequences[i].p4C[j].p10 =
-                &lbl_80281D88->pShots[(s32)lbl_80281D88->pSequences[i].p4C[j].p10];
-            if (lbl_80281D88->pSequences[i].p4C[j].b16 < 13 || lbl_80281D88->pSequences[i].p4C[j].b16 > 22) {
-                lbl_80281D88->pSequences[i].p4C[j].b16 = 25;
+            gpDynCam->pSequences[i].p4C[j].p10 =
+                &gpDynCam->pShots[(s32)gpDynCam->pSequences[i].p4C[j].p10];
+            if (gpDynCam->pSequences[i].p4C[j].b16 < 13 || gpDynCam->pSequences[i].p4C[j].b16 > 22) {
+                gpDynCam->pSequences[i].p4C[j].b16 = 25;
             }
-            if (lbl_80281D88->pSequences[i].p4C[j].b16 >= 13 &&
-                lbl_80281D88->pSequences[i].p4C[j].b16 <= 22) {
+            if (gpDynCam->pSequences[i].p4C[j].b16 >= 13 &&
+                gpDynCam->pSequences[i].p4C[j].b16 <= 22) {
                 bFound = 0;
-                for (k = 0; k < lbl_80281D88->pSequences[i].nChoices; k++) {
-                    if (lbl_80281D88->pSequences[i].p4C[j].b16 == lbl_80281D88->pSequences[i].p4C[k].b14) {
+                for (k = 0; k < gpDynCam->pSequences[i].nChoices; k++) {
+                    if (gpDynCam->pSequences[i].p4C[j].b16 == gpDynCam->pSequences[i].p4C[k].b14) {
                         bFound = 1;
                     }
                 }
                 if (!bFound) {
-                    lbl_80281D88->pSequences[i].p4C[j].b16 = 25;
+                    gpDynCam->pSequences[i].p4C[j].b16 = 25;
                 }
             }
         }
@@ -352,11 +352,11 @@ void DynamicCam_ParseCameraSeqs(int nSequences) {
 void DynamicCam_ParseNextSeqs(void) {
     int i;
 
-    for (i = 0; i < lbl_80281D88->nSequences; i++) {
+    for (i = 0; i < gpDynCam->nSequences; i++) {
         // port: the file keeps an index in the pointer field
-        lbl_80281D88->pSequences[i].p20 = &lbl_80281D88->pSequences[(s32)lbl_80281D88->pSequences[i].p20];
-        if (lbl_80281D88->pSequences[i].p20->nChoices <= 0) {
-            lbl_80281D88->pSequences[i].p20 = &lbl_80281D88->pSequences[i];
+        gpDynCam->pSequences[i].p20 = &gpDynCam->pSequences[(s32)gpDynCam->pSequences[i].p20];
+        if (gpDynCam->pSequences[i].p20->nChoices <= 0) {
+            gpDynCam->pSequences[i].p20 = &gpDynCam->pSequences[i];
         }
     }
 }
@@ -366,33 +366,33 @@ void DynamicCam_ParseNextSeqs(void) {
 void DynamicCam_ParseAnimPairs(int nSize) {
     int i;
 
-    lbl_80281D88->nSets = nSize / sizeof(DynCamSet);
-    for (i = 0; i < lbl_80281D88->nSets; i++) {
+    gpDynCam->nSets = nSize / sizeof(DynCamSet);
+    for (i = 0; i < gpDynCam->nSets; i++) {
         // port: the file keeps indexes in the pointer fields
-        if ((s32)lbl_80281D88->pSets[i].pShot >= 0) {
-            lbl_80281D88->pSets[i].pShot = &lbl_80281D88->pShots[(s32)lbl_80281D88->pSets[i].pShot];
+        if ((s32)gpDynCam->pSets[i].pShot >= 0) {
+            gpDynCam->pSets[i].pShot = &gpDynCam->pShots[(s32)gpDynCam->pSets[i].pShot];
         } else {
-            lbl_80281D88->pSets[i].pShot = NULL;
+            gpDynCam->pSets[i].pShot = NULL;
         }
-        if ((s32)lbl_80281D88->pSets[i].p14 >= 0) {
-            lbl_80281D88->pSets[i].p14 = &lbl_80281D88->pSequences[(s32)lbl_80281D88->pSets[i].p14];
+        if ((s32)gpDynCam->pSets[i].p14 >= 0) {
+            gpDynCam->pSets[i].p14 = &gpDynCam->pSequences[(s32)gpDynCam->pSets[i].p14];
         } else {
-            lbl_80281D88->pSets[i].p14 = NULL;
+            gpDynCam->pSets[i].p14 = NULL;
         }
-        if ((s32)lbl_80281D88->pSets[i].p18 >= 0) {
-            lbl_80281D88->pSets[i].p18 = &lbl_80281D88->pSequences[(s32)lbl_80281D88->pSets[i].p18];
+        if ((s32)gpDynCam->pSets[i].p18 >= 0) {
+            gpDynCam->pSets[i].p18 = &gpDynCam->pSequences[(s32)gpDynCam->pSets[i].p18];
         } else {
-            lbl_80281D88->pSets[i].p18 = NULL;
+            gpDynCam->pSets[i].p18 = NULL;
         }
-        if ((s32)lbl_80281D88->pSets[i].p1C >= 0) {
-            lbl_80281D88->pSets[i].p1C = &lbl_80281D88->pSequences[(s32)lbl_80281D88->pSets[i].p1C];
+        if ((s32)gpDynCam->pSets[i].p1C >= 0) {
+            gpDynCam->pSets[i].p1C = &gpDynCam->pSequences[(s32)gpDynCam->pSets[i].p1C];
         } else {
-            lbl_80281D88->pSets[i].p1C = NULL;
+            gpDynCam->pSets[i].p1C = NULL;
         }
-        if ((s32)lbl_80281D88->pSets[i].p20 >= 0) {
-            lbl_80281D88->pSets[i].p20 = &lbl_80281D88->pSequences[(s32)lbl_80281D88->pSets[i].p20];
+        if ((s32)gpDynCam->pSets[i].p20 >= 0) {
+            gpDynCam->pSets[i].p20 = &gpDynCam->pSequences[(s32)gpDynCam->pSets[i].p20];
         } else {
-            lbl_80281D88->pSets[i].p20 = NULL;
+            gpDynCam->pSets[i].p20 = NULL;
         }
     }
 }
@@ -402,42 +402,42 @@ void DynamicCam_ParseAnimPairs(int nSize) {
 void DynamicCam_Init(void) {
     DynCamTables* pTables = StaticMem_Alloc(sizeof(DynCamTables), 2, 0, "GoDynamicCam.c", 938);
 
-    lbl_80281D88 = pTables;
+    gpDynCam = pTables;
     pTables->pSequences = NULL;
-    lbl_80281D88->pShots = NULL;
-    lbl_80281D88->pSets = NULL;
-    lbl_80281D88->pChoices = NULL;
-    lbl_80281D88->nShots = 0;
-    lbl_80281D88->nSequences = 0;
-    lbl_80281D88->nSets = 0;
-    lbl_80281D88->nChoicesUsed = 0;
+    gpDynCam->pShots = NULL;
+    gpDynCam->pSets = NULL;
+    gpDynCam->pChoices = NULL;
+    gpDynCam->nShots = 0;
+    gpDynCam->nSequences = 0;
+    gpDynCam->nSets = 0;
+    gpDynCam->nChoicesUsed = 0;
 }
 
 // Frees the loaded shots, sequences, anim pairs and choices and the tables themselves, and resets
 // the load count n1C.
 void DynamicCam_DeInit(void) {
-    lbl_80281D88->nShots = 0;
-    lbl_80281D88->nSequences = 0;
-    lbl_80281D88->nSets = 0;
-    lbl_80281D88->nChoicesUsed = 0;
-    if (lbl_80281D88->pSequences != NULL) {
-        StaticMem_Free(lbl_80281D88->pSequences);
-        lbl_80281D88->pSequences = NULL;
+    gpDynCam->nShots = 0;
+    gpDynCam->nSequences = 0;
+    gpDynCam->nSets = 0;
+    gpDynCam->nChoicesUsed = 0;
+    if (gpDynCam->pSequences != NULL) {
+        StaticMem_Free(gpDynCam->pSequences);
+        gpDynCam->pSequences = NULL;
     }
-    if (lbl_80281D88->pShots != NULL) {
-        StaticMem_Free(lbl_80281D88->pShots);
-        lbl_80281D88->pShots = NULL;
+    if (gpDynCam->pShots != NULL) {
+        StaticMem_Free(gpDynCam->pShots);
+        gpDynCam->pShots = NULL;
     }
-    if (lbl_80281D88->pSets != NULL) {
-        StaticMem_Free(lbl_80281D88->pSets);
-        lbl_80281D88->pSets = NULL;
+    if (gpDynCam->pSets != NULL) {
+        StaticMem_Free(gpDynCam->pSets);
+        gpDynCam->pSets = NULL;
     }
-    if (lbl_80281D88->pChoices != NULL) {
-        StaticMem_Free(lbl_80281D88->pChoices);
-        lbl_80281D88->pChoices = NULL;
+    if (gpDynCam->pChoices != NULL) {
+        StaticMem_Free(gpDynCam->pChoices);
+        gpDynCam->pChoices = NULL;
     }
-    lbl_80281D88->n1C = 0;
-    StaticMem_Free(lbl_80281D88);
+    gpDynCam->n1C = 0;
+    StaticMem_Free(gpDynCam);
 }
 
 // Places the camera at pOut for a shot by its tracking mode (bB1): 0 and 1 DynamicCam_TrackPercent,
@@ -636,27 +636,27 @@ CamShot* DynamicCam_ChooseScript(int nPlayer, int nKind, CamShot* pShot) {
     int nCount = 0;
     int i;
 
-    for (i = 0; i < lbl_80281D88->nShots; i++) {
+    for (i = 0; i < gpDynCam->nShots; i++) {
         if (nCount >= 50) break;
-        if (DynamicCam_MatchScriptStateType(&lbl_80281D88->pShots[i], nKind)
-            && DynamicCam_MatchPlayer(&lbl_80281D88->pShots[i])
-            && !lbl_80281D88->pShots[i].bA9 && &lbl_80281D88->pShots[i] != pShot) {
+        if (DynamicCam_MatchScriptStateType(&gpDynCam->pShots[i], nKind)
+            && DynamicCam_MatchPlayer(&gpDynCam->pShots[i])
+            && !gpDynCam->pShots[i].bA9 && &gpDynCam->pShots[i] != pShot) {
             *pPick++ = i;
             nCount++;
         }
     }
     if (nCount == 0) return NULL;
     i = Misc_RandFunc(1) % nCount;
-    return &lbl_80281D88->pShots[aPick[i]];
+    return &gpDynCam->pShots[aPick[i]];
 }
 
 // The shot with this name (case ignored), or NULL.
 CamShot* DynamicCam_ChooseScriptByName(char* szName) {
     int i;
 
-    for (i = 0; i < lbl_80281D88->nShots; i++) {
-        if (stricmp(szName, lbl_80281D88->pShots[i].szName) == 0) {
-            return &lbl_80281D88->pShots[i];
+    for (i = 0; i < gpDynCam->nShots; i++) {
+        if (stricmp(szName, gpDynCam->pShots[i].szName) == 0) {
+            return &gpDynCam->pShots[i];
         }
     }
     return NULL;
@@ -739,7 +739,7 @@ u8 DynamicCam_CanUseScriptOnThisModel(CamChoice* pChoice, int nPlayer) {
 
 // Tracking modes 0 and 1: the camera at share f60 of the way from the shot's first point
 // (DynamicCam_GetLocation for bAF) to its second (bB0), the way flattened for mode 0, then f64
-// sideways (the other way when fn_800453C8 holds for the shot), then its height from
+// sideways (the other way when CameraScript_FlipCameraForLefty holds for the shot), then its height from
 // DynamicCam_AddHeightOffset. A shot with a point of kind 0 (the ball) or 23 waits for a frame in
 // which the ball updates (GameEffects_BallUpdatesThisFrame).
 void DynamicCam_TrackPercent(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam,
@@ -772,9 +772,10 @@ void DynamicCam_TrackPercent(CamShot* pShot, int nPlayer, CamScript* pScript, f3
 // (bAF) to its second (bB0), level for modes 2 and 3, then f64 sideways (both as
 // DynamicCam_CalculateFlippedOffsets flips them), then its height from DynamicCam_AddHeightOffset.
 // For mode 8 its level offset from pSub (its height becoming pSub's) is scaled from CamTuning.f240
-// down to f248 as the distance fn_80044F58 gives (never less than the most seen, kept in the
-// script's f100) goes from CamTuning.f23C to f244; when CameraScript_SnapToScript holds, f100 just
-// takes the distance. Waits, like DynamicCam_TrackPercent, for a ball update when a point is the ball.
+// down to f248 as the distance CamScript_GetBallToPinPercent gives (never less than the most seen,
+// kept in the script's f100) goes from CamTuning.f23C to f244; when CameraScript_SnapToScript
+// holds, f100 just takes the distance. Waits, like DynamicCam_TrackPercent, for a ball update when
+// a point is the ball.
 void DynamicCam_TrackOffset(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam,
                             f32* pSub) {
     f32 vFrom[4];
@@ -1237,25 +1238,25 @@ CamSequence* DynamicCam_ChooseSequence(int nPlayer, int nLie, int nClass, int nK
         return NULL;
     }
     fHeight = pCourse->pin[nPinSet].y - gPlayers[nPlayer].vBall[1];
-    for (i = 0; i < lbl_80281D88->nSequences; i++) {
+    for (i = 0; i < gpDynCam->nSequences; i++) {
         if (nPicked >= 50) {
             break;
         }
-        if (lbl_80281D88->pSequences[i].nChoices > 0) {
-            if (DynamicCam_IsDefualtSeq(&lbl_80281D88->pSequences[i], nKind) &&
-                DynamicCam_MatchCourse(&lbl_80281D88->pSequences[i])) {
+        if (gpDynCam->pSequences[i].nChoices > 0) {
+            if (DynamicCam_IsDefualtSeq(&gpDynCam->pSequences[i], nKind) &&
+                DynamicCam_MatchCourse(&gpDynCam->pSequences[i])) {
                 nDefault = i;
-            } else if (DynamicCam_MatchStateType(&lbl_80281D88->pSequences[i], nKind) &&
-                       DynamicCam_MatchSeqClub(&lbl_80281D88->pSequences[i], nPlayer) &&
-                       DynamicCam_MatchSeqShot(&lbl_80281D88->pSequences[i], nPlayer, a) &&
-                       DynamicCam_MatchPlayerType(&lbl_80281D88->pSequences[i], nPlayer) &&
-                       DynamicCam_MatchCourse(&lbl_80281D88->pSequences[i]) &&
-                       DynamicCam_MatchPars(&lbl_80281D88->pSequences[i]) &&
-                       DynamicCam_MatchLies(lbl_80281D88->pSequences[i].b49, nTee) &&
-                       DynamicCam_MatchLies(lbl_80281D88->pSequences[i].b4A, nClassBit) &&
-                       DynamicCam_MatchHeightDiff(&lbl_80281D88->pSequences[i], nPlayer, fHeight) &&
-                       DynamicCam_ModeType(&lbl_80281D88->pSequences[i])) {
-                pSeq = &lbl_80281D88->pSequences[i];
+            } else if (DynamicCam_MatchStateType(&gpDynCam->pSequences[i], nKind) &&
+                       DynamicCam_MatchSeqClub(&gpDynCam->pSequences[i], nPlayer) &&
+                       DynamicCam_MatchSeqShot(&gpDynCam->pSequences[i], nPlayer, a) &&
+                       DynamicCam_MatchPlayerType(&gpDynCam->pSequences[i], nPlayer) &&
+                       DynamicCam_MatchCourse(&gpDynCam->pSequences[i]) &&
+                       DynamicCam_MatchPars(&gpDynCam->pSequences[i]) &&
+                       DynamicCam_MatchLies(gpDynCam->pSequences[i].b49, nTee) &&
+                       DynamicCam_MatchLies(gpDynCam->pSequences[i].b4A, nClassBit) &&
+                       DynamicCam_MatchHeightDiff(&gpDynCam->pSequences[i], nPlayer, fHeight) &&
+                       DynamicCam_ModeType(&gpDynCam->pSequences[i])) {
+                pSeq = &gpDynCam->pSequences[i];
                 if (fDist >= pSeq->f24 && fDist <= pSeq->f28 && pSeq->nChoices > 0) {
                     anPicked[nPicked] = i;
                     nPicked++;
@@ -1265,12 +1266,12 @@ CamSequence* DynamicCam_ChooseSequence(int nPlayer, int nLie, int nClass, int nK
     }
     if (nPicked == 0) {
         if (nDefault >= 0) {
-            return &lbl_80281D88->pSequences[nDefault];
+            return &gpDynCam->pSequences[nDefault];
         }
-        for (i = 0; i < lbl_80281D88->nSequences; i++) {
-            if (DynamicCam_IsDefualtSeq(&lbl_80281D88->pSequences[i], nKind) &&
-                lbl_80281D88->pSequences[i].nChoices > 0) {
-                return &lbl_80281D88->pSequences[i];
+        for (i = 0; i < gpDynCam->nSequences; i++) {
+            if (DynamicCam_IsDefualtSeq(&gpDynCam->pSequences[i], nKind) &&
+                gpDynCam->pSequences[i].nChoices > 0) {
+                return &gpDynCam->pSequences[i];
             }
         }
         return NULL;
@@ -1278,16 +1279,16 @@ CamSequence* DynamicCam_ChooseSequence(int nPlayer, int nLie, int nClass, int nK
     uRand = Misc_RandFunc(1);
     fTotal = 0.0f;
     for (i = 0; i < nPicked; i++) {
-        fTotal += lbl_80281D88->pSequences[anPicked[i]].f34;
+        fTotal += gpDynCam->pSequences[anPicked[i]].f34;
     }
     nRoll = uRand % (int)(1000.0f * fTotal);
     for (i = 0; i < nPicked; i++) {
-        if ((f32)(nRoll - nSum) < 1000.0f * lbl_80281D88->pSequences[anPicked[i]].f34) {
-            return &lbl_80281D88->pSequences[anPicked[i]];
+        if ((f32)(nRoll - nSum) < 1000.0f * gpDynCam->pSequences[anPicked[i]].f34) {
+            return &gpDynCam->pSequences[anPicked[i]];
         }
-        nSum += (int)(1000.0f * lbl_80281D88->pSequences[anPicked[i]].f34);
+        nSum += (int)(1000.0f * gpDynCam->pSequences[anPicked[i]].f34);
     }
-    return &lbl_80281D88->pSequences[anPicked[0]];
+    return &gpDynCam->pSequences[anPicked[0]];
 }
 
 // DynamicCam_ChooseSequence's pick for the pre-flight cameras: state nKind (3 becomes 28 when an
@@ -1328,24 +1329,24 @@ CamSequence* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind
                                                           0, 0.0f, 1, gpCamTuning->f1A4)) {
         nKind = 28;
     }
-    for (i = 0; i < lbl_80281D88->nSequences; i++) {
+    for (i = 0; i < gpDynCam->nSequences; i++) {
         if (nPicked >= 50) {
             break;
         }
-        if (lbl_80281D88->pSequences[i].nChoices > 0) {
-            if (DynamicCam_IsDefualtSeq(&lbl_80281D88->pSequences[i], nKind) &&
-                DynamicCam_MatchCourse(&lbl_80281D88->pSequences[i])) {
+        if (gpDynCam->pSequences[i].nChoices > 0) {
+            if (DynamicCam_IsDefualtSeq(&gpDynCam->pSequences[i], nKind) &&
+                DynamicCam_MatchCourse(&gpDynCam->pSequences[i])) {
                 nDefault = i;
-            } else if (DynamicCam_MatchStateType(&lbl_80281D88->pSequences[i], nKind) &&
-                       DynamicCam_MatchSeqClub(&lbl_80281D88->pSequences[i], nPlayer) &&
-                       DynamicCam_MatchSeqShot(&lbl_80281D88->pSequences[i], nPlayer, 1) &&
-                       DynamicCam_MatchPlayerType(&lbl_80281D88->pSequences[i], nPlayer) &&
-                       DynamicCam_MatchDistToPin(&lbl_80281D88->pSequences[i], nPlayer, fPinDist) &&
-                       DynamicCam_MatchCourse(&lbl_80281D88->pSequences[i]) &&
-                       DynamicCam_MatchPars(&lbl_80281D88->pSequences[i]) &&
-                       DynamicCam_MatchHeightDiff(&lbl_80281D88->pSequences[i], nPlayer, fHeight) &&
-                       DynamicCam_ModeType(&lbl_80281D88->pSequences[i]) &&
-                       DynamicCam_MatchLies(lbl_80281D88->pSequences[i].b49, nTee)) {
+            } else if (DynamicCam_MatchStateType(&gpDynCam->pSequences[i], nKind) &&
+                       DynamicCam_MatchSeqClub(&gpDynCam->pSequences[i], nPlayer) &&
+                       DynamicCam_MatchSeqShot(&gpDynCam->pSequences[i], nPlayer, 1) &&
+                       DynamicCam_MatchPlayerType(&gpDynCam->pSequences[i], nPlayer) &&
+                       DynamicCam_MatchDistToPin(&gpDynCam->pSequences[i], nPlayer, fPinDist) &&
+                       DynamicCam_MatchCourse(&gpDynCam->pSequences[i]) &&
+                       DynamicCam_MatchPars(&gpDynCam->pSequences[i]) &&
+                       DynamicCam_MatchHeightDiff(&gpDynCam->pSequences[i], nPlayer, fHeight) &&
+                       DynamicCam_ModeType(&gpDynCam->pSequences[i]) &&
+                       DynamicCam_MatchLies(gpDynCam->pSequences[i].b49, nTee)) {
                 anPicked[nPicked] = i;
                 nPicked++;
             }
@@ -1353,15 +1354,15 @@ CamSequence* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind
     }
     if (nPicked == 0) {
         if (nDefault >= 0) {
-            return &lbl_80281D88->pSequences[nDefault];
+            return &gpDynCam->pSequences[nDefault];
         }
         if (nKind == 28) {
             nKind = 3;
         }
-        for (i = 0; i < lbl_80281D88->nSequences; i++) {
-            if (DynamicCam_IsDefualtSeq(&lbl_80281D88->pSequences[i], nKind) &&
-                lbl_80281D88->pSequences[i].nChoices > 0) {
-                return &lbl_80281D88->pSequences[i];
+        for (i = 0; i < gpDynCam->nSequences; i++) {
+            if (DynamicCam_IsDefualtSeq(&gpDynCam->pSequences[i], nKind) &&
+                gpDynCam->pSequences[i].nChoices > 0) {
+                return &gpDynCam->pSequences[i];
             }
         }
         return NULL;
@@ -1369,16 +1370,16 @@ CamSequence* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind
     uRand = Misc_RandFunc(1);
     fTotal = 0.0f;
     for (i = 0; i < nPicked; i++) {
-        fTotal += lbl_80281D88->pSequences[anPicked[i]].f34;
+        fTotal += gpDynCam->pSequences[anPicked[i]].f34;
     }
     nRoll = uRand % (int)(1000.0f * fTotal);
     for (i = 0; i < nPicked; i++) {
-        if ((f32)(nRoll - nSum) < 1000.0f * lbl_80281D88->pSequences[anPicked[i]].f34) {
-            return &lbl_80281D88->pSequences[anPicked[i]];
+        if ((f32)(nRoll - nSum) < 1000.0f * gpDynCam->pSequences[anPicked[i]].f34) {
+            return &gpDynCam->pSequences[anPicked[i]];
         }
-        nSum += (int)(1000.0f * lbl_80281D88->pSequences[anPicked[i]].f34);
+        nSum += (int)(1000.0f * gpDynCam->pSequences[anPicked[i]].f34);
     }
-    return &lbl_80281D88->pSequences[anPicked[0]];
+    return &gpDynCam->pSequences[anPicked[0]];
 }
 
 // The anim pair named szName (an animation's name, case ignored) gives a sequence (*ppSeq) or a
@@ -1389,31 +1390,31 @@ u8 DynamicCamSearchForPairedSequence(char* szName, CamSequence** ppSeq, CamShot*
     int i;
     u32 nPick;
 
-    for (i = 0; i < lbl_80281D88->nSets; i++) {
-        if (stricmp(lbl_80281D88->pSets[i].szName, szName) != 0) {
+    for (i = 0; i < gpDynCam->nSets; i++) {
+        if (stricmp(gpDynCam->pSets[i].szName, szName) != 0) {
             continue;
         }
-        if (lbl_80281D88->pSets[i].p20 != NULL && lbl_80281D88->pSets[i].p20->nChoices > 0 &&
+        if (gpDynCam->pSets[i].p20 != NULL && gpDynCam->pSets[i].p20->nChoices > 0 &&
             Misc_RandFunc(1) % 100 > 60) {
-            *ppSeq = lbl_80281D88->pSets[i].p20;
+            *ppSeq = gpDynCam->pSets[i].p20;
             return 1;
         }
-        if (lbl_80281D88->pSets[i].nKind == 14) {
+        if (gpDynCam->pSets[i].nKind == 14) {
             nPick = Misc_RandFunc(1) % 3;
-            if (nPick == 0 && lbl_80281D88->pSets[i].p14 != NULL) {
-                *ppSeq = lbl_80281D88->pSets[i].p14;
+            if (nPick == 0 && gpDynCam->pSets[i].p14 != NULL) {
+                *ppSeq = gpDynCam->pSets[i].p14;
                 return 1;
             }
-            if (nPick == 1 && lbl_80281D88->pSets[i].p18 != NULL) {
-                *ppSeq = lbl_80281D88->pSets[i].p18;
+            if (nPick == 1 && gpDynCam->pSets[i].p18 != NULL) {
+                *ppSeq = gpDynCam->pSets[i].p18;
                 return 1;
             }
-            if (lbl_80281D88->pSets[i].p1C != NULL) {
-                *ppSeq = lbl_80281D88->pSets[i].p1C;
+            if (gpDynCam->pSets[i].p1C != NULL) {
+                *ppSeq = gpDynCam->pSets[i].p1C;
                 return 1;
             }
-        } else if (lbl_80281D88->pSets[i].nKind == 13) {
-            *ppShot = lbl_80281D88->pSets[i].pShot;
+        } else if (gpDynCam->pSets[i].nKind == 13) {
+            *ppShot = gpDynCam->pSets[i].pShot;
             return 1;
         }
     }
@@ -1465,8 +1466,8 @@ u8 DynamicCam_IsDefualtSeq(CamSequence* pSequence, int nKind) {
     return 1;
 }
 
-s32 lbl_80187988[20] = {0, 1, 2, 6, 2, 3, 4, 5, 3, 3, 3, 3, 6, 3, 3, 3, 5, 3, 6, 7};
-s32 lbl_801879D8[17] = {1, 2, 2, 3, 3, 3, 4, 4, 4, 6, 2, 3, 6, 5, 5, 5, 7};
+s32 gMaterialToCamLies[20] = {0, 1, 2, 6, 2, 3, 4, 5, 3, 3, 3, 3, 6, 3, 3, 3, 5, 3, 6, 7};
+s32 gBallLieToCamLies[17] = {1, 2, 2, 3, 3, 3, 4, 4, 4, 6, 2, 3, 6, 5, 5, 5, 7};
 
 // The camera lie for end lie n (0..19), from gMaterialToCamLies; 0 for any other n. Lie 1 depends
 // on the ball: 1 when it lies on lie 0, else 2.
@@ -1481,13 +1482,13 @@ s32 DynamicCam_MaterialToCameraLie(u32 n, int nPlayer) {
         }
         return nRet;
     }
-    return lbl_80187988[n];
+    return gMaterialToCamLies[n];
 }
 
 // The camera lie for ball lie n, from gBallLieToCamLies (17 entries; n is not checked). nPlayer is
 // not used.
 s32 DynamicCam_BallLieToCameraLie(int n, int nPlayer) {
-    return lbl_801879D8[n];
+    return gBallLieToCamLies[n];
 }
 
 // The sequence suits the player's club: b45 picks the clubs (0 any, 1 woods, 2 5..9 irons,
@@ -1904,8 +1905,8 @@ void DynamicCam_GetSmoothBallLocation(CamScript* pScript, CamShot* pShot, int nP
 }
 
 // The shot's side offset f64 into *pA and its distance f60 into *pB (each when not NULL; nothing
-// for a NULL shot). When fn_800453C8 holds for the player and the shot one of them changes sign:
-// the side (-f64), or the distance (-f60) for a shot with a point of kind 21
+// for a NULL shot). When CameraScript_FlipCameraForLefty holds for the player and the shot one of
+// them changes sign: the side (-f64), or the distance (-f60) for a shot with a point of kind 21
 // (DynamicCam_GetLocation).
 void DynamicCam_CalculateFlippedOffsets(CamShot* pShot, int nPlayer, f32* pA, f32* pB) {
     if (pShot != NULL) {
