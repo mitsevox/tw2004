@@ -1,5 +1,8 @@
 // GoCamTuningVars.c (EA's name, from its asserts): the camera tuning values (camera.h's
-// CamTuning), allocated and set once by CameraTuning_Init.
+// CamTuning), allocated and set to fixed values by CameraTuning_Init. TW07's file also has the
+// tuning-variable registration (CreateGlobalCameraTuningVariables, not found in this build) and
+// CameraTuning_Close, which here sits just after CameraTuning_Init but is filed as
+// unsorted/sweep_80097E98.c's fn_80097E98.
 
 #include "game_types.h"
 #include "engine.h"
@@ -7,6 +10,8 @@
 
 void CameraTuning_Init(void);
 
+// The camera tuning values every camera file reads (CamTuning), allocated and set by
+// CameraTuning_Init.
 CamTuning* gpCamTuning;
 
 // Allocate the camera tuning values (gpCamTuning) and set each to its fixed value; run when the

@@ -1,5 +1,9 @@
-// CamSpline.c (our name): the spline paths the scripted, static and dynamic cameras move along
-// (a Catmull-Rom basis matrix in gCatmullRomBasis applied with VecMath.c's LLMath_mat44fltMultiply).
+// CamSpline.c (our name; TW07 has these functions, under the same names, in EA's
+// Shared/Cameras/CamUtils.c): the path helpers of the camera scripts, static cameras and fly-bys.
+// Catmull-Rom splines through four points (gCatmullRomBasis applied with VecMath.c's
+// LLMath_mat44fltMultiply) for the camera's position, look angles and field of view, a spline
+// segment's length, the time step of an accelerating fly-by, a fly-by's Hermite curve, a point
+// between two points and a point swung on an arc around a centre.
 
 #include "game_types.h"
 #include "engine.h"
@@ -9,6 +13,7 @@
 f32  CamScript_fGetDistanceBetweenSplinePoints(f32* p0, f32* p1, f32* p2, f32* p3);
 void CamUtils_Vec3Sub(f32* pA, f32* pB, f32* pOut);
 
+// The Catmull-Rom basis matrix: times (1, t, t^2, t^3) it gives the four points' weights.
 f32 gCatmullRomBasis[4][4] = {
     { 0.0f, 1.0f, 0.0f, 0.0f },
     { -0.5f, 0.0f, 0.5f, 0.0f },
@@ -138,20 +143,20 @@ void CamScript_SplineCamerasByPosition(f32* p0, f32* p1, f32* p2, f32* p3, f32* 
     Vec3Copy(&vOut.x, pOut);
 }
 
-// The fly-by time step fF (TW07: timeStep) while the fly-by speeds up: the rate goes linearly from
-// fA to fB (rate0, rate1) over the first fD (accelParam) share of fC (time1), and the step is fF
-// times rate / fB. From fE (currentTime) past that, or with fD 0, the step is fF; a 0 step stays 0.
-// CamScript_AccelerateTime calls it.
-f32 CamScript_GetFlybyTimeStep(f32 fA, f32 fB, f32 fC, f32 fD, f32 fE, f32 fF) {
+// The fly-by time step fStep while the fly-by speeds up: the rate goes linearly from fRate0 to
+// fRate1 over the first fAccel share of fTime1, and the step is fStep times rate / fRate1. From
+// fCurTime past that, or with fAccel 0, the step is fStep; a 0 step stays 0 (parameters after
+// TW07's rate0, rate1, time1, accelParam, currentTime, timeStep). CamScript_AccelerateTime calls it.
+f32 CamScript_GetFlybyTimeStep(f32 fRate0, f32 fRate1, f32 fTime1, f32 fAccel, f32 fCurTime, f32 fStep) {
     f32 fEnd;
 
-    if (0.0f == fF) {
+    if (0.0f == fStep) {
         return 0.0f;
     }
-    if (0.0f == fD || fE >= (fEnd = fD * fC)) {
-        return fF;
+    if (0.0f == fAccel || fCurTime >= (fEnd = fAccel * fTime1)) {
+        return fStep;
     }
-    return fF * (((fE / fEnd) * (fB - fA) + fA) / fB);
+    return fStep * (((fCurTime / fEnd) * (fRate1 - fRate0) + fRate0) / fRate1);
 }
 
 // The length of the spline between p1 and p2, added up over 32 straight steps.

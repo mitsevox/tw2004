@@ -1277,7 +1277,8 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
         } else {
             CameraScript_LagTargetPoint(nPlayer, pOut, pCam, vAim, pShot, pScript, fTime, gpCamTuning->fE4);
         }
-        CameraScript_KeepPointInView(nPlayer, pCam, pOut, gPlayers[nPlayer].ball.vPos, pScript, gpCamTuning->fE4);
+        CameraScript_KeepPointInView(nPlayer, pCam, pOut, gPlayers[nPlayer].ball.vPos, pScript,
+                                     gpCamTuning->fE4);
         break;
     case 15:
         Vec3Copy(gPlayers[nPlayer].ball.vPos, pOut);
@@ -1376,7 +1377,8 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
                 CameraScript_OffsetLookVector(pOut, pCam, pShot->f74, pShot->f70);
             }
         } else {
-            CameraScript_LagTargetPoint(nPlayer, pOut, pCam, vBone10, pShot, pScript, fTime, gpCamTuning->fE8);
+            CameraScript_LagTargetPoint(nPlayer, pOut, pCam, vBone10, pShot, pScript, fTime,
+                                        gpCamTuning->fE8);
         }
         break;
     case 10:
@@ -1636,7 +1638,8 @@ void CameraScript_LagBallFlight(int nPlayer, f32* pOut, f32* pCam, CamShot* pSho
     if (pScript->bCF) {
         CameraScript_KeepPointInView(nPlayer, pCam, pOut, vAim, pScript, gpCamTuning->fE4);
     } else {
-        CameraScript_KeepPointInView(nPlayer, pCam, pOut, gPlayers[nPlayer].ball.vPos, pScript, gpCamTuning->fE4);
+        CameraScript_KeepPointInView(nPlayer, pCam, pOut, gPlayers[nPlayer].ball.vPos, pScript,
+                                     gpCamTuning->fE4);
     }
 }
 

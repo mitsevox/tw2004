@@ -1,6 +1,9 @@
-// GoComicCam.c (EA's name, from its asserts; also in EA's 2002 source tree): the comic-book camera,
-// which shows the shot in panels on screen, one after another (the state at gpComicCam,
-// comiccam.h). Layout 0 is three panels side by side, layout 1 a 3x3 grid filled in a random order.
+// GoComicCam.c (EA's name, from its asserts; also in EA's 2002 source tree; TW07 has the same 15
+// ComicCam_* functions in the same order): the comic-book camera, a special swing camera that shows
+// the shot in panels on screen, one after another (the state at gpComicCam, comiccam.h). The golf
+// cameras' 3-screen camera (mode 20: GolfCamera_Init3ScreenCamera, GolfCamera_Process3ScreenCamera)
+// starts and runs it. Layout 0 (EA's 3-screen mode) is three panels side by side, layout 1 (the
+// 9-screen rapid mode) a 3x3 grid filled in a random order.
 
 #include "golfer.h"
 #include "comiccam.h"
@@ -20,6 +23,8 @@ u8   ComicCam_IsComicCamOver(f32* pRect, int nPlayer);
 u8   ComicCam_IsScreenFrozen(void);
 void ComicCam_CheckForCameraSwitch(View* pView, int nPlayer);
 
+// The comic camera's state (ComicCam), allocated by ComicCam_InitComicCam and freed by
+// ComicCam_CloseComicCam.
 ComicCam* gpComicCam;
 
 // Allocate the comic camera's state (gpComicCam) when a round's systems start (GO_vInitIG).
