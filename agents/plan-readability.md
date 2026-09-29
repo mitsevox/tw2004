@@ -58,6 +58,10 @@ still missing, including the comment review those rounds skipped. No separate ba
 - Compiler-flag audit: per-unit flags grouped by library; one-file outliers marked as likely fake
   matches.
 - Fake-match rework (matching lanes): replace labelled fakes with EA's form where one is found.
+- Misfiled units (owner, 2026-09-29: "we can go back at the end and tackle them"): every item in
+  agents/findings/misfiled-units.md, proven ones moved, strong ones pinned and moved, weak ones settled
+  or dropped with evidence. Until then nothing is moved: after each round the orchestrator appends
+  the lanes' misfiled-unit findings to that list.
 
 ## Pacing
 
