@@ -77,7 +77,15 @@ lane while the others avoid those call sites. Rotate unit lists between rounds (
 - Parity counts never rise: `typeaudit.py --count`, `symaudit.py --count`, whole-file `lint.py`.
 - A unit is DONE when every function is exact, its data is in C and it is linked (Matching).
 - Naming lanes hand in batch files; the orchestrator replays them on main with `tools/match/name.py`
-  (merging their branches conflicts on callers in other files).
+  (merging their branches conflicts on callers in other files). The replay (2026-09-29, after rounds
+  of silent losses): `tools/agents/check_batches.py` on EVERY lane's files together before anything
+  is replayed (malformed rows, one name given twice, a name main already has); then per lane
+  `tools/agents/replay_lane.sh`, which stops on a refused row, a failed rename, a conflict or a build
+  that is not OK, and ends with `tools/agents/lanediff.py`: every lane line main does not have.
+  A lane is merged only when lanediff's lines are each carried over or explained in the round's log.
+- Lint covers headers too (long lines; `tools/match/wraphdr.py` rewraps comments). A failure or rule
+  slip a lane reports is either fixed at its cause (tool, prompt, rule) before the next round or put
+  to the owner; it is never reported as "minor" and passed over.
 
 ## Pacing (measure, don't guess)
 
