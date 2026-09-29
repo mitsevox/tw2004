@@ -77,8 +77,9 @@ typedef struct CamShot {
     f32  f94;                   // 0x94
     f32  f98;                   // 0x98
     f32  f9C;                   // 0x9C
-    s32  nA0;                   // 0xA0  CameraScript_InterpToNewScript: 0 GameEffects_SetHalfTime on, 2 GameEffects_SetDoubleTime
-                                //       on (else both off); 3 calls GolfCamera_SetCameraMatrixMode(1)
+    s32  nA0;                   // 0xA0  CameraScript_InterpToNewScript: 0 GameEffects_SetHalfTime on, 2
+                                //       GameEffects_SetDoubleTime on (else both off); 3 calls
+                                //       GolfCamera_SetCameraMatrixMode(1)
     s32  nA4;                   // 0xA4
     u8   bA8;                   // 0xA8
     u8   bA9;                   // 0xA9  another shot's p40 leads here (DynamicCam_ParseCameraViewsFE)
@@ -189,8 +190,8 @@ typedef struct CamSequence {
     u8   b44;                   // 0x44  its kind
     u8   b45;                   // 0x45  the clubs it is for (DynamicCam_MatchSeqClub)
     u8   b46;                   // 0x46  6: the ball-flight camera keeps one for shot kind 5
-    u8   b47;                   // 0x47  0 humans, 1 CPU players, 2 not in a replay, 3 in a replay,
-                                //       4 in a replay or a CPU player (DynamicCam_MatchPlayerType); the swing camera
+    u8   b47;                   // 0x47  0 humans, 1 CPU players, 2 not in a replay, 3 in a replay, 4 in a
+                                //       replay or a CPU player (DynamicCam_MatchPlayerType); the swing camera
                                 //       starts its shot with blend 5, time 0 when it is nonzero
     u8   b48;                   // 0x48  0 single-view play outside modes 9 and 11 and
                                 //       GM_Currently_SkillZoneMode; 1 split screen or modes 9 and
@@ -218,7 +219,8 @@ typedef struct CamScript {
     f32  fCamTime;              // 0x80  time on this camera
     f32  f84;                   // 0x84  fCamTime before this frame's step (CamScript_RunScript)
     f32  f88;                   // 0x88  a second clock, stepped with fCamTime
-    f32  f8C;                   // 0x8C  how long the next shot lasts (its f48; CameraController_StartScriptOfKind)
+    f32  f8C;                   // 0x8C  how long the next shot lasts (its f48;
+                                //       CameraController_StartScriptOfKind)
     f32  fFadeTime;             // 0x90  the fade's time so far (stepped by the frame time)
     f32  fFadeLength;           // 0x94  and its length
     f32  f98;                   // 0x98
@@ -228,13 +230,15 @@ typedef struct CamScript {
     f32  fA4;                   // 0xA4
     f32  fA8;                   // 0xA8  the current shot's f9C (CamScript_RunScript)
     CamShot* pShot;             // 0xAC  the current shot
-    CamShot* pNextShot;         // 0xB0  the next one (the current shot's p40; CameraController_StartScriptOfKind)
+    CamShot* pNextShot;         // 0xB0  the next one (the current shot's p40;
+                                //       CameraController_StartScriptOfKind)
     CamShot* pB4;               // 0xB4  where SwitchCrAPCamera records the current camera
     CamShot* pB8;               // 0xB8  the shot before (GolfCamera_CutToGolferDoneAnimatingCam)
     s32  nBC;                   // 0xBC  the next shot's kind (its bAB; CameraController_StartScriptOfKind)
     s32  nFade;                 // 0xC0  the screen fade (CamScript_Fade): 0 none, 1 fading up to vFadeColor
                                 //       (CameraController_FadeOut), 2 fading away (FadeIn), 3 held
-                                //       (CameraController_HoldFadeColor), 4 kept after 1 ends, 5 after 2 ends (then 0)
+                                //       (CameraController_HoldFadeColor), 4 kept after 1 ends, 5 after 2 ends
+                                //       (then 0)
     s32  nC4;                   // 0xC4  the shot kind asked for
     s32  nC8;                   // 0xC8  the shot kind last started
     u8   bCC;                   // 0xCC
@@ -244,8 +248,9 @@ typedef struct CamScript {
     s32  nD0;                   // 0xD0
     f32  fD4;                   // 0xD4  the camera's speed when the script moves to the next shot
                                 //       (CamScript_RunScript)
-    f32  fD8;                   // 0xD8  camera 8: the ground height it follows (DynamicCam_TrackBallVelocityTight measures
-                                //       the ball's height over it)
+    f32  fD8;                   // 0xD8  camera 8: the ground height it follows
+                                //       (DynamicCam_TrackBallVelocityTight measures the ball's height over
+                                //       it)
     f32  fDC;                   // 0xDC
     s32  nE0;                   // 0xE0  a shot kind for DynamicCam_ChooseScriptInSequence (25 = none)
     f32  fE4;                   // 0xE4
@@ -359,8 +364,8 @@ typedef struct CamTuning {
     f32  f84;                   // 0x084  how long the super zoom's first shot lasts
     f32  f88;                   // 0x088
     f32  f8C;                   // 0x08C
-    f32  f90;                   // 0x090  CameraController_CheckForEvents switches to camera 2 while the ball is below this
-                                //        height (and falling, not yet bounced)
+    f32  f90;                   // 0x090  CameraController_CheckForEvents switches to camera 2 while the ball
+                                //        is below this height (and falling, not yet bounced)
     f32  f94;                   // 0x094  the elevator camera's first blend value
     f32  f98;                   // 0x098  camera 8: 1 - this is its height's share of the move a frame
     f32  f9C;                   // 0x09C  the swing camera: the least shot power for one
@@ -432,9 +437,10 @@ typedef struct CamTuning {
     f32  f144;                  // 0x144  CameraScript_LagTargetPoint: the look-at point's level
                                 //        share of the way a frame
     f32  f148;                  // 0x148  ... and its height's
-    f32  f14C;                  // 0x14C  } DynamicCam_TrackBallVelocityLag: how fast a following camera closes the
-    f32  f150;                  // 0x150  } distance and the angle to its target, per 60th
-    f32  f154;                  // 0x154  DynamicCam_TrackBallVelocityLag: they ease in over this much of CamScript.fCamTime
+    f32  f14C;                  // 0x14C  } DynamicCam_TrackBallVelocityLag: how fast a following camera
+    f32  f150;                  // 0x150  } closes the distance and the angle to its target, per 60th
+    f32  f154;                  // 0x154  DynamicCam_TrackBallVelocityLag: they ease in over this much of
+                                //        CamScript.fCamTime
     f32  f158;                  // 0x158  CameraScript_LagBallFlight: the aim eases in over this
                                 //        much of CamScript.f88
     f32  f15C;                  // 0x15C  CameraScript_InterpToNewScript puts it in CamScript.f88 (0 for
@@ -445,24 +451,29 @@ typedef struct CamTuning {
     f32  f168;                  // 0x168  the ground clearance for CamScript_KeepAboveGround
     f32  f16C;                  // 0x16C  the obstruction radius around the ball for the pre-shot routine
     f32  f170;                  // 0x170  a blend for CameraController_FadeIn / CameraController_FadeOut
-    f32  f174;                  // 0x174  DynamicCam_ProcessScript: how softly a camera eases in under its height limit
+    f32  f174;                  // 0x174  DynamicCam_ProcessScript: how softly a camera eases in under its
+                                //        height limit
     f32  f178;                  // 0x178
     f32  v17C[4];               // 0x17C
-    f32  f18C;                  // 0x18C  DynamicCam_TrackBallVelocityTight: the ball-flight camera closes in by this share of
-                                //        the height above the shot's f6C ...
+    f32  f18C;                  // 0x18C  DynamicCam_TrackBallVelocityTight: the ball-flight camera closes in
+                                //        by this share of the height above the shot's f6C ...
     f32  f190;                  // 0x190  ... and backs off by this share of the height below its f68
-    f32  f194;                  // 0x194  DynamicCam_ProcessScript: how far a camera below its least height rises a frame
-    f32  f198;                  // 0x198  DynamicCam_TrackBallVelocityTight: the least ball speed it follows the flight at
-    f32  f19C;                  // 0x19C  the steepest a camera direction may tilt (DynamicCam_ClampBallVelocity, radians)
+    f32  f194;                  // 0x194  DynamicCam_ProcessScript: how far a camera below its least height
+                                //        rises a frame
+    f32  f198;                  // 0x198  DynamicCam_TrackBallVelocityTight: the least ball speed it follows
+                                //        the flight at
+    f32  f19C;                  // 0x19C  the steepest a camera direction may tilt
+                                //        (DynamicCam_ClampBallVelocity, radians)
     f32  f1A0;                  // 0x1A0
     f32  f1A4;                 // 0x1A4  DynamicCam_ChoosePreFlightSequence: the obstruction test's slope
     f32  f1A8;                  // 0x1A8  CamScript_RunScript: how fast CamScript.fEC follows the
                                 //        ball's updates per frame
     f32  f1AC;                  // 0x1AC
     f32  f1B0;                  // 0x1B0
-    f32  f1B4;                  // 0x1B4  } CameraController_CameraCollision (GoCamCont.c), flat directions: the least cosine
-    f32  f1B8;                  // 0x1B8  } from the camera's motion (f1B4) and from its look (f1B8) to the
-    f32  f1BC;                  // 0x1BC  } object; the most the camera may move in a frame (f1BC)
+    f32  f1B4;                  // 0x1B4  } CameraController_CameraCollision (GoCamCont.c), flat directions:
+    f32  f1B8;                  // 0x1B8  } the least cosine from the camera's motion (f1B4) and from its look
+    f32  f1BC;                  // 0x1BC  } (f1B8) to the object; the most the camera may move in a frame
+                                //        } (f1BC)
     s32  n1C0;                  // 0x1C0  nonzero enables camera 19
     s32  n1C4;                  // 0x1C4
     s32  bCheckSlope;           // 0x1C8  GolfCamera_NeedSteepSlopeCam tests the slope to the target
@@ -483,7 +494,8 @@ typedef struct CamTuning {
                                 //        the horizontal (degrees)
     f32  fMaxPitchDown;         // 0x1FC  and below it
     f32  f200;                  // 0x200  } the camera shake CameraController_Idle starts on the swing's
-    f32  f204;                  // 0x204  } events 5..14: CamScript.fF4 and fF0 (CameraController_SetShakeAmount)
+    f32  f204;                  // 0x204  } events 5..14: CamScript.fF4 and fF0
+                                //        } (CameraController_SetShakeAmount)
     f32  f208;                 // 0x208  times lbl_801D5010[view]: the alpha of GoPostFx fn_80039358's
                                 //        black cover
     f32  f20C;                 // 0x20C  camera 4: the most View.f54 grows to
@@ -724,7 +736,8 @@ CamSequence* DynamicCam_ChooseSequence(int nPlayer, int nLie, int nClass, int nK
 CamSequence* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind);
 // The sequence and shot named after the golfer's clip (with b, Character.p1790 first).
 u8       DynamicCam_ChoosePairedSequenceOrCamera(int nPlayer, u8 b, CamSequence** ppSeq, CamShot** ppShot);
-u8       DynamicCam_IsValidFlightSequence(CamSequence* pSequence, int nPlayer);   // it suits the player's club and shot
+// it suits the player's club and shot
+u8       DynamicCam_IsValidFlightSequence(CamSequence* pSequence, int nPlayer);
 u8     CamScript_DoesScriptTrackGolfer(CamShot* pShot);     // the shot's bAC is 1..6 or 7
 // The ball's position, or the script's v70 when the ball is by the pin (with bKeep v70 follows it).
 void   DynamicCam_GetSmoothBallLocation(CamScript* pScript, CamShot* pShot, int nPlayer, f32* pOut, u8 bKeep);
@@ -754,7 +767,8 @@ void     CamScript_GetCameraOnFairwayPos(CamScript* pScript, f32* pOut, f32* pCa
                      CamShot* pShot, f32* pSub, f32* pHeight);
 void     CamScript_PutBackOnFairway(CamScript* pScript, f32* pCam, f32* pSub, int nPlayer, CamShot* pShot,
                                     f32* pPrev);
-f32      CamScript_EstimateBallFlightPercent(int nPlayer, CamScript* pScript);   // how far the ball's flight has run
+// how far the ball's flight has run
+f32      CamScript_EstimateBallFlightPercent(int nPlayer, CamScript* pScript);
 u8       CamScript_SkipLookBackCam(CamScript* pScript, CamShot* pShot, int nPlayer);
 void     CameraScript_UpdateLandingEstimate(CamScript* pScript, int nPlayer);
 u8       CameraScript_IsDefaultSwingCam(CamShot* pShot, int nPlayer, f32* pCam);
@@ -771,18 +785,22 @@ void     CA_vUpdateInternalFieldOfViewData(CamLens* pLens);
 
 // ---- camera script helpers (CamSpline.c, 0x800C7480..)-------------------------------------
 
-// Both write a point into pOut: CamUtils_vGetPositionBetweenTwoPoints goes fDist along the direction from pA to pB (its y
-// cleared unless bKeepY, normalised unless bRaw), then fSide across the flattened direction;
-// CamUtils_vCalcArcPosition swings around pC from pA towards pB at share fT (nDir: 0 the short way round, 1 angle
-// decreasing, else increasing).
-void   CamUtils_vGetPositionBetweenTwoPoints(f32* pA, f32* pB, u8 bKeepY, u8 bRaw, f32* pOut, f32 fDist, f32 fSide);
+// Both write a point into pOut: CamUtils_vGetPositionBetweenTwoPoints goes fDist along the
+// direction from pA to pB (its y cleared unless bKeepY, normalised unless bRaw), then fSide across
+// the flattened direction; CamUtils_vCalcArcPosition swings around pC from pA towards pB at share
+// fT (nDir: 0 the short way round, 1 angle decreasing, else increasing).
+void   CamUtils_vGetPositionBetweenTwoPoints(f32* pA, f32* pB, u8 bKeepY, u8 bRaw, f32* pOut, f32 fDist,
+                                             f32 fSide);
 void   CamUtils_vCalcArcPosition(f32* pA, f32* pB, f32* pC, int nDir, f32* pOut, f32 fT);
 // The splined camera (CamScript_SplineCameras): the camera position on the spline through pPos0..3,
 // the look angles on the one through pLook0..3 (each unwrapped to within half a turn of the one
 // before), and the field of view between fFov1 and fFov2, at share fT between the middle two.
-void   CamScript_SplineCamerasByPositionAndLook(f32* pPos0, f32* pPos1, f32* pPos2, f32* pPos3, f32* pLook0, f32* pLook1, f32* pLook2,
-                   f32* pLook3, f32* pCam, f32* pSub, f32* pFov, f32 fFov1, f32 fFov2, f32 fT);
-void   CamScript_SplineCamerasByPosition(f32* p0, f32* p1, f32* p2, f32* p3, f32* pOut, f32 fT);   // a point on the spline
+void   CamScript_SplineCamerasByPositionAndLook(f32* pPos0, f32* pPos1, f32* pPos2, f32* pPos3,
+                                                f32* pLook0, f32* pLook1, f32* pLook2, f32* pLook3,
+                                                f32* pCam, f32* pSub, f32* pFov, f32 fFov1, f32 fFov2,
+                                                f32 fT);
+// a point on the spline
+void   CamScript_SplineCamerasByPosition(f32* p0, f32* p1, f32* p2, f32* p3, f32* pOut, f32 fT);
 f32    CamScript_GetFlybyTimeStep(f32 fA, f32 fB, f32 fC, f32 fD, f32 fE, f32 fF);
 // The value of a fly-by path's curve at time fT (CamScript_RunFlybyCamera).
 f32    CamScript_fEvaluateCurve(FlyByPath* pPath, f32 fT);
@@ -857,17 +875,23 @@ void   GolfCamera_ProcessGolferBoneCamera(View* pView, int nPlayer);            
 
 void   CameraController_SetCameraMode(View* pView, int nCamera, int nPlayer, int nView);
 void   CameraController_ResetCameraState(View* pView);
-void   CameraController_CameraCollision(int nView, f32* pBounds);    // the view's camera is inside an object's bounds
+void   CameraController_CameraCollision(int nView, f32* pBounds);    // the view's camera is inside an
+                                                                     // object's bounds
 void   CameraController_FadeIn(View* pView, f32 fTime, f32* pVec);
 void   CameraController_FadeOut(View* pView, f32 fTime, f32* pVec);
-u8     CameraController_IsFadeDone(View* pView);             // script.nFade 3, 4 or 5: a colour fade held or ending
+u8     CameraController_IsFadeDone(View* pView);             // script.nFade 3, 4 or 5: a colour fade held or
+                                                             // ending
 u8     CameraController_IsFadeOutDone(View* pView);             // script.nFade 4: kept after fading up
-u8     CameraController_IsFadeOn(View* pView);             // script.nFade 1, 2 or 4: a colour fade running or held
-void   CameraController_HoldFadeColor(View* pView, f32* pVec);  // script.nFade 3: hold the colour pVec over the view
+u8     CameraController_IsFadeOn(View* pView);             // script.nFade 1, 2 or 4: a colour fade running or
+                                                           // held
+void   CameraController_HoldFadeColor(View* pView, f32* pVec);  // script.nFade 3: hold the colour pVec over
+                                                                // the view
 void   CameraController_PostEvent(View* pView, int nKind, int nPlayer);
 void   CameraController_ResetAimMarkerInSwingCamera(View* pView, int nPlayer);
-u8     CameraController_bDontClearFrameBuffer(void);               // GolfCamera_bIs3ScreenCamOn's answer (gomainloop tests it)
-void   CameraController_LagSideVector(f32* pA, f32* pB, f32* pOut);   // the green zoom-to-aim camera: View.v20 as pA and pOut
+u8     CameraController_bDontClearFrameBuffer(void);               // GolfCamera_bIs3ScreenCamOn's answer
+                                                                   // (gomainloop tests it)
+void   CameraController_LagSideVector(f32* pA, f32* pB, f32* pOut);   // the green zoom-to-aim camera:
+                                                                      // View.v20 as pA and pOut
 
 // ---- the golf cameras (GoGolfCam.c) ---------------------------------------------------------
 

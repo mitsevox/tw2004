@@ -62,7 +62,8 @@ LAYOUT_ASSERT(Video, 0x10B0);
 typedef struct VideoSlots {
     Video* apVideo[NUM_VIDEO_SLOTS];    // 0x00  LLVideo_SetSlot puts a movie in a slot
     int    n20;                         // 0x20  FO_eGetCurrentAddMode()'s value while a movie shows
-                                        //       (LLVideo_SetupRender saves it, LLVideo_RestoreRender puts it back)
+                                        //       (LLVideo_SetupRender saves it, LLVideo_RestoreRender puts it
+                                        //       back)
     u8     pad24[4];
 } VideoSlots;
 LAYOUT_ASSERT(VideoSlots, 0x28);

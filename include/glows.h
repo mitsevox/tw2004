@@ -24,7 +24,8 @@ LAYOUT_ASSERT(GlowTable, 0x70);
 
 extern GlowTable lbl_801D99D0;
 
-// The glows queued for drawing (lbl_80281F80): fn_8009B260 adds one, ColGlow_RenderAllGlowInCurrentList draws them all.
+// The glows queued for drawing (lbl_80281F80): fn_8009B260 adds one,
+// ColGlow_RenderAllGlowInCurrentList draws them all.
 #define NUM_GLOW_QUEUE 160
 
 typedef struct GlowQueued {
@@ -54,8 +55,8 @@ LAYOUT_ASSERT(GlowQueue, 0x1E10);
 extern GlowQueue lbl_801D9A68[1];
 extern GlowQueue* lbl_80281F80;
 
-// What ColGlow_RenderAllGlowInCurrentList hands the glow mesh (our name): Skin.c's SD_FillShaderObject passes it on, fn_80098884
-// copies it and fn_8009884C draws the queue with it.
+// What ColGlow_RenderAllGlowInCurrentList hands the glow mesh (our name): Skin.c's
+// SD_FillShaderObject passes it on, fn_80098884 copies it and fn_8009884C draws the queue with it.
 typedef struct GlowDrawDesc {
     GlowQueue* pQueue;          // 0x0
     s32  bFirst;                // 0x4  1 on the first pass, 0 on the second (fn_8009884C: bOnTop =
@@ -83,8 +84,8 @@ typedef struct SunFlrView {
     s32  nC;                    // 0x0C  576
     SunFlrPart aPart[4];        // 0x10  the first two are cleared at set-up
     f32  af90[2];               // 0x90  fn_8009A754's result, one per video field
-    f32  f98;                   // 0x98  } where RC_vComputeRenderCtxWorldToPrimitiveCoordinate puts lbl_802813B8->v4 on the view's
-    f32  f9C;                   // 0x9C  } screen
+    f32  f98;                   // 0x98  } where RC_vComputeRenderCtxWorldToPrimitiveCoordinate puts
+    f32  f9C;                   // 0x9C  } lbl_802813B8->v4 on the view's screen
     f32  fA0;                   // 0xA0  }
     u8   bA4;                   // 0xA4  RC_vComputeRenderCtxWorldToPrimitiveCoordinate's result
     u8   bA5;                   // 0xA5  set to 1 at set-up (SF_vInitModule)

@@ -243,9 +243,40 @@ def ub_check(path, lines):
             if text in m.group(3):
                 i = int(m.group(2))
                 near = lines[i - 1] + (lines[i - 2] if i > 1 else '')
-                if 'fake match' not in near:
+                # EA's own form, labelled (the label and its port: line may sit just above)
+                ea = ' '.join(lines[max(0, i - 4):i])
+                if 'fake match' not in near and 'EA bug:' not in ea:
                     hits.append((i, name, lines[i - 1].strip()))
     return hits
+
+
+def header_long_lines(rev):
+    """(include path, line, columns) for every header line past 110 columns: all of them without
+    rev, else only the lines added or changed since rev's merge base (working tree included)."""
+    import subprocess
+    if rev is None:
+        return [(h.relative_to(ROOT).as_posix(), i, len(l))
+                for h in sorted((ROOT / 'include').rglob('*.h'))
+                for i, l in enumerate(h.read_text(encoding='utf-8', errors='replace').split('\n'), 1)
+                if len(l.rstrip('\r')) > 110]
+    base = subprocess.run(['git', 'merge-base', rev, 'HEAD'], cwd=ROOT,
+                          capture_output=True, text=True).stdout.strip() or rev
+    out = subprocess.run(['git', 'diff', '-U0', base, '--', 'include'], cwd=ROOT,
+                         capture_output=True, text=True).stdout
+    res, cur, ln = [], None, 0
+    for l in out.splitlines():
+        if l.startswith('+++ '):
+            cur = l[6:] if l != '+++ /dev/null' else None
+            continue
+        m = re.match(r'@@ -\S+ \+(\d+)', l)
+        if m:
+            ln = int(m.group(1))
+            continue
+        if l.startswith('+') and cur:
+            if len(l) - 1 > 110:
+                res.append((cur, ln, len(l) - 1))
+            ln += 1
+    return res
 
 
 def changed_lines(rev):
@@ -373,6 +404,11 @@ def main():
         else:
             for ln, n, msg in hits:
                 print('%s:%d: %s: %s' % (f.name, ln, n, msg[:100]))
+    # headers: long lines only (the C style rules above are for .c files); with --diff, only the
+    # lines changed since rev. Headers slipped past lint until 2026-09-29.
+    for f, ln, n in header_long_lines(rev):
+        print('%s:%d: long-line: %d columns' % (f, ln, n))
+        total += 1
     if '--compile' in sys.argv:
         units = touched_units(rev) if rev else None
         hits = compile_units(units) if units else []

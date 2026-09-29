@@ -12,8 +12,8 @@ typedef struct ComicPanel {
     f32  f4;                    // 0x04
     s32  nNext;                 // 0x08  the panel shown after this one, -1 for the last
     f32  fTop;                  // 0x0C  } where it sits on screen, in fractions of the screen
-    f32  fLeft;                 // 0x10  }   (ComicCam_SetViewportToSize hands them to VM_vSetViewportRect as x, y, w, h)
-    f32  fWidth;                // 0x14  }
+    f32  fLeft;                 // 0x10  } (ComicCam_SetViewportToSize hands them to VM_vSetViewportRect as x,
+    f32  fWidth;                // 0x14  } y, w, h)
     f32  fHeight;               // 0x18  }
     f32  f1C;                   // 0x1C
     f32  fTime;                 // 0x20  how long it stays (copied to ComicCam.a24/a4C)
@@ -24,7 +24,8 @@ LAYOUT_ASSERT(ComicPanel, 0x28);
 typedef struct ComicCam {
     s32  nPanel;                // 0x000  the current panel
     s32  nPlayer;               // 0x004
-    s32  n8;                    // 0x008  counts to 2: ComicCam_UpdateComicCam draws the whole screen until then
+    s32  n8;                    // 0x008  counts to 2: ComicCam_UpdateComicCam draws the whole screen until
+                                //        then
     f32  fTime;                 // 0x00C  time on the current panel
     s32  n10;                   // 0x010  frames into the move to the next panel
     u8   bNext;                 // 0x014  moving on to the next panel

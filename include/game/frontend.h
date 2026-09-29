@@ -90,9 +90,11 @@ typedef struct UIButtonEvent {
 } UIButtonEvent;
 #define UI_NUM_BUTTON_EVENTS 16
 extern UIButtonEvent gUIButtonEvents[UI_NUM_BUTTON_EVENTS];
-extern s32 gUIButtonHeldFrames[8];     // per controller (0..3): frames Controller_GetButtonMask(0x20, 1)'s button is held
+extern s32 gUIButtonHeldFrames[8];     // per controller (0..3): frames Controller_GetButtonMask(0x20, 1)'s
+                                       // button is held
                                 // in game type 6; past 10 GUI_SendButtonHeld runs
-extern s8 gSavedCrAPHidden;         // CrAPState.bHidden put aside while UI_ReadControllers's lone-player UI is up (-1: none)
+extern s8 gSavedCrAPHidden;         // CrAPState.bHidden put aside while UI_ReadControllers's lone-player UI
+                                    // is up (-1: none)
 
 // What uiLoadFile.c's stream handlers loaded (gUITextureBanks): up to five objects, freed together
 // by UI_FreeTextureBanks.
@@ -200,7 +202,8 @@ void FE_RunGameMessage(int nMsg, MsgArg* pArgs, MsgArg* pResult);    // the menu
 void IG_RunGameMessage(int nMsg, MsgArg* pArgs, MsgArg* pResult);    // a round (GameUICommands.c)
 void Startup_RunGameMessage(int nCmd, MsgArg* pArgs, MsgArg* pResult);    // start-up (Code800B1D3C.c)
 
-extern MsgHandler gStartupMessageHandlers[30];     // start-up's handlers (Startup_InitGameMessages fills 0..22)
+extern MsgHandler gStartupMessageHandlers[30];     // start-up's handlers (Startup_InitGameMessages fills
+                                                   // 0..22)
 void GM_vGetDiscChangeStatus(MsgArg* pArgs, MsgArg* pResult);  // FE_MessageTable.c; start-up's command 22 too
 
 // The round's handlers (GameUICommands.c): IG_InitGameMessages fills the table. Entries 0 and 119 stay
@@ -218,7 +221,8 @@ void GM_vMCHadIOError(MsgArg* pArgs, MsgArg* pResult);
 void GM_vMCGetSaveNeeds(MsgArg* pArgs, MsgArg* pResult);
 
 extern u8 gbPausedWithoutScoreCard;         // set by the pause handler (GameUICommands.c GM_vPauseGame)
-extern u8 gbUICloseRequested;         // (uiProcessInterface.c) FEgolferanim.c's FE_IsGolferRenderAllowed tests it
+extern u8 gbUICloseRequested;         // (uiProcessInterface.c) FEgolferanim.c's FE_IsGolferRenderAllowed
+                                      // tests it
 
 // Four floats a UI element passes down its transform stack, copied as one struct; uiProcessPolygon.c's
 // UIPoly_Draw scales its quad's colours by them / 511.
