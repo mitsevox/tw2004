@@ -194,7 +194,7 @@ typedef struct AudTrackTmpl {
         AudPlayList* pPlayList; // 0x14   streamed tracks; its n3 is the track's volume curve
         AudSeqBank* pBank;      //        sequenced tracks; the same n3
     } data;                     //        on disc an offset into the bank's data, made a pointer
-                                //        by fn_800A8FFC
+                                //        by Ses_ProcessArticulationData
     AudSeqEvent* pEvents;       // 0x18   [n8][n7][n3]; on disc an offset too
 } AudTrackTmpl;
 LAYOUT_ASSERT(AudTrackTmpl, 0x1C);
@@ -233,14 +233,14 @@ typedef struct AudGroup {
     AudGroupEntry aEntries[1];  // 0x4    nEntries of them
 } AudGroup;
 
-// A sound bank as loaded (UStream.c reads it; fn_800A8FFC fixes its offsets up). Two can be loaded
+// A sound bank as loaded (UStream.c reads it; Ses_ProcessArticulationData fixes its offsets up). Two can be loaded
 // at once: lbl_80282078 (bank 0) and lbl_80282074 (bank 1).
 typedef struct AudBank {
     u8   unk0[0x4];
-    u32  uAram;                 // 0x4    its samples' ARAM block (fn_800A925C), 0: none
+    u32  uAram;                 // 0x4    its samples' ARAM block (Ses_AllocSampleAram), 0: none
     u8   unk8[0xC - 0x8];
     u32  nSamples;              // 0xC
-    AudSample* pSamples;        // 0x10   set by fn_800A8FFC
+    AudSample* pSamples;        // 0x10   set by Ses_ProcessArticulationData
     u32  n14;                   // 0x14   the size of the data the tracks' data.pPlayList point into
     u32  nGroups;               // 0x18
     AudGroup** ppGroups;        // 0x1C   an offset from the bank on disc
@@ -415,7 +415,7 @@ typedef struct AudStreamQueue {
 LAYOUT_ASSERT(AudStreamQueue, 0xFC);
 
 // The movie player's sound (hlaudmovie.c): two voices, left and right, each playing a ring of ten
-// blocks in ARAM that fn_800A8AD4 fills as the movie's sound chunks come in.
+// blocks in ARAM that Mov_SendSoundBlock fills as the movie's sound chunks come in.
 #define MOVIE_BLOCK_SIZE 0x2FC0         // one channel's ADPCM data per block (MovieSoundBlock)
 #define MOVIE_BLOCKS     10
 
@@ -431,7 +431,7 @@ typedef struct MovieSound {
 } MovieSound;
 LAYOUT_ASSERT(MovieSound, 0x18);
 
-// A 0x48-byte block fn_800A8754 allocates and clears (lbl_8028206C); nothing reads it yet.
+// A 0x48-byte block Mic_InitModule allocates and clears (lbl_8028206C); nothing reads it yet.
 typedef struct AudBlock48 {
     u8   unk0[0x48];
 } AudBlock48;

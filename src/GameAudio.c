@@ -17,8 +17,8 @@
 
 // hlaudmovie.c
 void fn_800A874C(s32 n);
-void fn_800A87B4(u8 a, u8 n);
-void fn_800A8F68(u8 b);
+void Mic_SetRvbPreset(u8 a, u8 n);
+void Ses_Pause(u8 b);
 void fn_800A8700(u8 n);
 void Mas_SetSubmixChan(u8 nCurve, f32 fVolume);
 void Mas_SetSubmixAll(u8 nCurves, f32* pVolumes);
@@ -175,10 +175,10 @@ void BootSound_Play(u8 nSound);
 // hlaudmovie.c
 u8   fn_800A8604(void);
 void fn_800A86BC(u8 nRate);
-u8   fn_800A8754(void);
-u8   fn_800A8824(void);
-u8   fn_800A8D2C(void);
-void fn_800A8D88(void);
+u8   Mic_InitModule(void);
+u8   Mov_InitModule(void);
+u8   Ses_InitModule(void);
+void Ses_Exit(void);
 u8   Ses_Init(u8 a, u8 b, u8 nListeners);
 void Mov_Init(void);
 void Mov_Exit(void);
@@ -214,9 +214,9 @@ u8 Aud_InitOnce(u8 nRate) {
     fn_800B5B80();
     if ((bOk = HwVoice_InitModule()) && (bOk = AudDma_InitModule()) && (bOk = AudAram_InitModule())
         && (bOk = fn_800AF224()) && (bOk = BootSound_InitModule()) && (bOk = fn_800A8604())
-        && (bOk = fn_800A8D2C()) && (bOk = Emi_InitModule()) && (bOk = Trk_InitModule())
-        && (bOk = Seq_InitModule()) && (bOk = Stm_InitModule()) && (bOk = fn_800A8754())
-        && (bOk = Voc_InitModule()) && (bOk = fn_800A8824()) && (bOk = Aud_EmiInitOnce())
+        && (bOk = Ses_InitModule()) && (bOk = Emi_InitModule()) && (bOk = Trk_InitModule())
+        && (bOk = Seq_InitModule()) && (bOk = Stm_InitModule()) && (bOk = Mic_InitModule())
+        && (bOk = Voc_InitModule()) && (bOk = Mov_InitModule()) && (bOk = Aud_EmiInitOnce())
         && (bOk = Aud_MicInitOnce())) {
         BootSound_CopyToAram();
         fn_800A86BC(nRate);
@@ -228,7 +228,7 @@ u8 Aud_InitOnce(u8 nRate) {
 // Pauses (b 1) or resumes (b 0) all sound. b2 is TW07's spinupDelay: the disc-error check
 // (Code800B7210.c's fn_800B7490) passes 1, this file 0; nothing here reads it.
 void Aud_Pause(u8 b, u8 b2) {
-    fn_800A8F68(b);
+    Ses_Pause(b);
 }
 
 // Sets the master mute mask: bLow mutes the low 16 channels, bHigh the high 16 (TW07 calls them
@@ -283,12 +283,12 @@ void Aud_MicExitSession(void) {
     lbl_80282020 = 0;
 }
 
-// Gives listener nIndex reverb preset nValue, passing it on to hlaudmovie.c (fn_800A87B4) only when
+// Gives listener nIndex reverb preset nValue, passing it on to hlaudmovie.c (Mic_SetRvbPreset) only when
 // it changes. Gaud_InitHole uses preset 17 on course 7's hole index 2.
 void Aud_MicSetRvbPreset(u8 nIndex, u8 nValue) {
     if (lbl_80282024[nIndex] != nValue) {
         lbl_80282024[nIndex] = nValue;
-        fn_800A87B4(nIndex, nValue);
+        Mic_SetRvbPreset(nIndex, nValue);
     }
 }
 
@@ -2013,12 +2013,12 @@ s32 Aud_InitSession(u8 a, u8 b, u8 nListeners, int nUnused) {
 }
 
 // Ends a sound session: the emitters' and listeners' session end, then hlaudmovie.c's
-// (fn_800A8D88). n is TW07's subsessID.
+// (Ses_Exit). n is TW07's subsessID.
 void Aud_ExitSession(s32 n) {
     Aud_EmiExitSession();
     Aud_MicExitSession();
-    // port: EA passes an argument fn_800A8D88 ignores
-    ((void (*)(s32))fn_800A8D88)(n);
+    // port: EA passes an argument Ses_Exit ignores
+    ((void (*)(s32))Ses_Exit)(n);
 }
 
 // Turns reverb on (bOn 1) or off for track nTrack of sound nSound's template, so for every instance

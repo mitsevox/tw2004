@@ -59,10 +59,10 @@ int gnNumHandlers = -1;           // 0x80280DB8 (.sdata): -1 until UStream_Init
 // ---- other files' functions -----------------------------------------------------------
 
 void  LLVideo_HandleChunk(void* pChunk);                             // MPG2
-void  fn_800A8AD4(MovieSoundBlock* pBlock);                  // DSPM / VAGM / XADP
-void* fn_800A8FB4(u32 uSize, int nMemory);
-void  fn_800A8FFC(u32 uMemory);
-void* fn_800A925C(u32 uSize, u32 uType);
+void  Mov_SendSoundBlock(MovieSoundBlock* pBlock);                  // DSPM / VAGM / XADP
+void* Ses_AllocBankHdr(u32 uSize, int nMemory);
+void  Ses_ProcessArticulationData(u32 uMemory);
+void* Ses_AllocSampleAram(u32 uSize, u32 uType);
 void  fn_800A929C(u32 uType);
 void* fn_800A9374(u32 uSize);
 void  fn_800A93AC(void);
@@ -552,7 +552,7 @@ static void Stream_ParseBufs(void) {
             case TAG('D', 'S', 'P', 'M'):
             case TAG('V', 'A', 'G', 'M'):
             case TAG('X', 'A', 'D', 'P'):
-                fn_800A8AD4((MovieSoundBlock*)pChunk);
+                Mov_SendSoundBlock((MovieSoundBlock*)pChunk);
                 break;
             case TAG('S', 'O', 'N', 'O'):
                 if (pChunk->uSubTag == TAG('S', 'H', 'D', 'R')) {
@@ -561,11 +561,11 @@ static void Stream_ParseBufs(void) {
                         if (pChunk->uId == 2) {
                             gSoundHeader.pDst = fn_800A9374(pChunk->uSize);
                         } else {
-                            gSoundHeader.pDst = fn_800A8FB4(pChunk->uSize, pChunk->uId);
+                            gSoundHeader.pDst = Ses_AllocBankHdr(pChunk->uSize, pChunk->uId);
                         }
                         break;
                     case TAG('s', 'a', 'm', 'p'):
-                        gSoundHeader.pDst = fn_800A925C(pChunk->uSize, pChunk->uId);
+                        gSoundHeader.pDst = Ses_AllocSampleAram(pChunk->uSize, pChunk->uId);
                         break;
                     default:
                         gSoundHeader.pDst = NULL;
@@ -600,7 +600,7 @@ static void Stream_ParseBufs(void) {
                             if (gSoundHeader.uMemory == 2) {
                                 fn_800A93AC();
                             } else {
-                                fn_800A8FFC(gSoundHeader.uMemory);
+                                Ses_ProcessArticulationData(gSoundHeader.uMemory);
                             }
                             break;
                         case TAG('s', 'a', 'm', 'p'):

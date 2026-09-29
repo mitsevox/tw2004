@@ -150,7 +150,7 @@ typedef struct StreamChunk {
 } StreamChunk;
 LAYOUT_ASSERT(StreamChunk, 0x8000);
 
-// One block of a movie's stereo sound (fn_800A8AD4): each channel's coefficients, then each
+// One block of a movie's stereo sound (Mov_SendSoundBlock): each channel's coefficients, then each
 // channel's 0x2FC0 bytes of ADPCM data.
 typedef struct MovieSoundBlock {
     u8   unk0[0x1A];

@@ -97,7 +97,7 @@ LLFontFile uGlyphs/u18/uBitmap are now s32 (their u prefix: audit rename); Earni
 shadow awaits its own name (audit).
 Round 5 (5 lanes, mwcc-debugger on all 80 non-exact functions, 09:35-11:00
 CDT) merged 2026-09-26 ~11:10 CDT: uiText, GoTerrain, HLAudMaster + hlaudmovie (split) linked; exact
-Particle fn_800951A0, Grass Static_Render, LLTex fn_8000EA1C, SW_vImpact, hlaudmovie fn_800A8AD4
+Particle fn_800951A0, Grass Static_Render, LLTex fn_8000EA1C, SW_vImpact, hlaudmovie Mov_SendSoundBlock
 (labelled fake), uiText UIText_Draw, GoTerrain x2. Every lane wrote its debugger readings into the
 ledgers; the levers are in docs/decomp-notes.md "New from round 5". Gemini round 4 (findings only)
 merged. Worktrees r5-* can be reused. Follow-up leads: parameter order vs argument schedule (ledgers

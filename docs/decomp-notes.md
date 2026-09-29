@@ -839,7 +839,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
 - **[verified] The allocator's levels**: a variable with more than 28 remaining neighbours cannot be
   placed on the first level and jumps to the top (takes r31). One temp more or fewer is the lever.
   hwsBurn HwsBurn_CopySetOptions (`nAlign + *pOffset` makes a temp: pBurn 29 neighbours, r31 not r25);
-  hlaudmovie fn_800A8AD4 (a use of pBlock in one more branch gave it the 29th: exact).
+  hlaudmovie Mov_SendSoundBlock (a use of pBlock in one more branch gave it the 29th: exact).
 - **[verified] The frontend numbers its temps above every declared local**, so a local EA orders
   above a frontend temp cannot get there by declaration order; writing the expression at each use
   (the frontend makes the temp) can. Swing SW_vImpact: pLaunchA/B locals -> `gPlayers[nPlayer].vLaunchA/B`

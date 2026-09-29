@@ -16,7 +16,7 @@ void fn_800AF2D8(void);
 void fn_800AF2DC(u8 b);
 void fn_800AF31C(u8 n);
 
-void fn_800A8D54(void);
+void Ses_ResetModule(void);
 
 s32 lbl_80281468 = -1;                  // the stream file (audtrack.h)
 
@@ -37,7 +37,10 @@ AudStreamFile* lbl_80282070;
 AudBlock48* lbl_8028206C;
 u8 lbl_80282068;
 
-u8 fn_800A8754(void) {
+// Allocates and clears the listeners' 0x48-byte block (lbl_8028206C) from the sound engine's memory
+// (fn_800B5BD8), the listener step of Aud_InitOnce. Returns 0 when the memory is full, else 1.
+// Nothing reads the block in this build.
+u8 Mic_InitModule(void) {
     u8 bOk;
 
     bOk = 0;
@@ -49,20 +52,27 @@ u8 fn_800A8754(void) {
     return bOk;
 }
 
-u8 fn_800A87A4(u8 a, u8 b, u8 nListeners) {
+// A session's listeners (Ses_Init): stores nListeners, one per view, which AudTable.c's 3D sound
+// reads (lbl_80282068). The session and subsession ids are not read. Always 1.
+u8 Mic_InitSession(u8 a, u8 b, u8 nListeners) {
     lbl_80282068 = nListeners;
     return 1;
 }
 
-void fn_800A87B0(void) {
+// The listeners' step in Ses_Exit: empty in this build.
+void Mic_ExitSession(void) {
 }
 
-void fn_800A87B4(u8 a, u8 n) {
+// Passes listener a's reverb preset n on to AudReverb.c (fn_800AF31C, empty in this build).
+// Aud_MicSetRvbPreset calls it only when the preset changes.
+void Mic_SetRvbPreset(u8 a, u8 n) {
     fn_800AF31C(n);
 }
 
-// The ARAM transfer of a block is done: the next chunk goes into the next block of the ring.
-void fn_800A87D8(u32 n) {
+// DMA-done callback of Mov_SendSoundBlock while the movie plays: n is the channel of the finished
+// transfer (0 left, 1 right). The left one's arrival counts the block as sent and moves nSendBlock
+// on round the ring.
+void Mov_BlockSentCB(u32 n) {
     if (lbl_801F1850.nState == 2 && n == 0) {
         lbl_801F1850.uSent += MOVIE_BLOCK_SIZE;
         if (++lbl_801F1850.nSendBlock >= MOVIE_BLOCKS) {
@@ -71,11 +81,15 @@ void fn_800A87D8(u32 n) {
     }
 }
 
-u8 fn_800A8824(void) {
+// The movie sound's start-up step in Aud_InitOnce: nothing to set up. Always 1.
+u8 Mov_InitModule(void) {
     return 1;
 }
 
-// Takes the two voices and gives them their ARAM blocks.
+// Takes the movie's two voices (left, right; priority 0x3FFF, list 2, looping) and places their
+// rings of MOVIE_BLOCKS blocks in ARAM: the left one at fn_800B0790's address (0x4400), the right
+// one after it. With both voices the state becomes 1 (filling before the start); without, it stays
+// 0 (off). Holds the audio lock throughout.
 void Mov_Init(void) {
     AudVoiceRequest request;
 
@@ -103,6 +117,8 @@ void Mov_Init(void) {
     fn_800B5994("Mov_Init");
 }
 
+// Gives the movie's two voices back (Voc_Delete) and resets both rings; the state becomes 0 (off).
+// Holds the audio lock throughout.
 void Mov_Exit(void) {
     fn_800B596C("Mov_Exit");
     if (lbl_801F1850.pLeft != NULL) {
@@ -144,8 +160,11 @@ void Mov_Start(void) {
     fn_800B5994("Mov_Start");
 }
 
-// A chunk of the movie's sound came in: each channel goes into the next block of its voice's ring.
-void fn_800A8AD4(MovieSoundBlock* pBlock) {
+// A chunk of the movie's sound came in (UStream.c's DSPM, VAGM and XADP chunks): each voice's
+// decoder is set from it (fn_800B0338) and each channel is DMA'd into the next block of its voice's
+// ring. Nothing while off (state 0). Before the start (state 1) the blocks advance here; while
+// playing, Mov_BlockSentCB advances them when the left channel's DMA is done.
+void Mov_SendSoundBlock(MovieSoundBlock* pBlock) {
     int nMode;
     u8* pDataL;
     u8* pDataR;
@@ -173,10 +192,10 @@ void fn_800A8AD4(MovieSoundBlock* pBlock) {
     } else {
         // fake match: pBlock->aDataL instead of pDataL (same address) keeps pBlock live into this
         // branch: its 29th allocator neighbour puts it in r30 ahead of the &lbl_801F1850 temp.
-        AudDma_ToAram(uLeft, pBlock->aDataL, MOVIE_BLOCK_SIZE, fn_800A87D8, 0);
-        AudDma_ToAram(uRight, pDataR, MOVIE_BLOCK_SIZE, fn_800A87D8, 1);
+        AudDma_ToAram(uLeft, pBlock->aDataL, MOVIE_BLOCK_SIZE, Mov_BlockSentCB, 0);
+        AudDma_ToAram(uRight, pDataR, MOVIE_BLOCK_SIZE, Mov_BlockSentCB, 1);
     }
-    // Before the start nothing plays, so the blocks advance here instead of in fn_800A87D8.
+    // Before the start nothing plays, so the blocks advance here instead of in Mov_BlockSentCB.
     if (lbl_801F1850.nState == 1) {
         lbl_801F1850.uSent += MOVIE_BLOCK_SIZE;
         if (++lbl_801F1850.nSendBlock >= MOVIE_BLOCKS) {
@@ -205,17 +224,23 @@ void Mov_Tick(void) {
     fn_800B5994("Mov_Tick");
 }
 
-void fn_800A8D00(void) {
+// Takes the one read buffer every streamed track shares (fn_800A942C hands it out) from the sound
+// engine's memory: fn_800A955C bytes (0x10000).
+void Ses_AllocStreamBuffer(void) {
     lbl_80282088 = fn_800B5BD8(fn_800A955C(0));
 }
 
-u8 fn_800A8D2C(void) {
-    fn_800A8D54();
-    fn_800A8D00();
+// The session's start-up step in Aud_InitOnce: clears the session's state (Ses_ResetModule) and
+// takes the stream buffer. Always 1, even when the buffer could not be had.
+u8 Ses_InitModule(void) {
+    Ses_ResetModule();
+    Ses_AllocStreamBuffer();
     return 1;
 }
 
-void fn_800A8D54(void) {
+// Clears the session's state: no banks, no stream file header, nothing loaded, no ids, no stream
+// buffer.
+void Ses_ResetModule(void) {
     lbl_80282070 = NULL;
     lbl_80282074 = NULL;
     lbl_80282078 = NULL;
@@ -229,19 +254,28 @@ void fn_800A8D54(void) {
     lbl_80282095 = 0;
 }
 
-void fn_800A8D88(void) {
+// Ends a sound session (Aud_ExitSession): the master, voice, track, emitter, listener and reverb
+// session steps (most empty in this build), then startUp.c's: the boot DMA buffer freed if still
+// held (fn_800B0660) and every hardware voice stopped (fn_800AFB50). The subsession id EA passes is
+// not read.
+void Ses_Exit(void) {
     fn_800A86B8();
     fn_800AC49C();
     Trk_ExitSession();
     Emi_ExitSession();
-    fn_800A87B0();
+    Mic_ExitSession();
     fn_800AF2D8();
     AudAram_ExitSession();
     AudDma_ExitSession();
     HwVoice_ExitSession();
 }
 
-// Sets the sound engine up; b == 0 also drops bank 0. Each step must succeed for the next to run.
+// Starts a sound session (Aud_InitSession): a is the session (0 the front end, 1 play, the course +
+// 1 on a hole), b the subsession (1 on a hole), nListeners one per view. Bank 1 is always dropped
+// (its ARAM block and header freed); then startUp.c's, the reverb's, listeners', emitters',
+// tracks', voices' and master's session steps run in turn, each only if the one before succeeded.
+// When they all succeed, b == 0 drops bank 0 as well and clears the loaded bits, and bit 0x01 of
+// lbl_8028207C (set up) is set. Returns 0 when a step failed, else 1.
 u8 Ses_Init(u8 a, u8 b, u8 nListeners) {
     u8 bOk;
 
@@ -257,7 +291,7 @@ u8 Ses_Init(u8 a, u8 b, u8 nListeners) {
     }
     lbl_8028207C &= ~0x30;
     if ((bOk = HwVoice_InitSession()) && (bOk = AudDma_InitSession()) && (bOk = AudAram_InitSession()) &&
-        (bOk = fn_800AF264(a, b)) && (bOk = fn_800A87A4(a, b, nListeners)) &&
+        (bOk = fn_800AF264(a, b)) && (bOk = Mic_InitSession(a, b, nListeners)) &&
         (bOk = Emi_InitSession()) && (bOk = Trk_InitSession(a, b)) && (bOk = fn_800AC494()) &&
         (bOk = fn_800A86B0())) {
         if (b == 0) {
@@ -276,7 +310,10 @@ u8 Ses_Init(u8 a, u8 b, u8 nListeners) {
     return bOk;
 }
 
-void fn_800A8F68(u8 b) {
+// Pauses (bPause 1) or resumes all voices (Voc_PauseAll; with bSpinupDelay the streamed voices stay
+// paused for Stm_Tick to resume), takes the reverb off while paused (fn_800AF2DC), and keeps the
+// state in bit 0x40 of lbl_8028207C: while it is set, Trk_Cycle ticks only some tracks.
+void Ses_Pause(u8 b) {
     Voc_PauseAll();
     fn_800AF2DC(b);
     if (b) {
@@ -286,8 +323,9 @@ void fn_800A8F68(u8 b) {
     }
 }
 
-// Where UStream.c loads a bank's header: memory 0 is bank 0, 1 bank 1.
-void* fn_800A8FB4(u32 uSize, u32 uMemory) {
+// UStream.c's 'shdr' chunk for bank uMemory (0 or 1): takes uSize bytes of the sound engine's
+// memory for the bank's header and returns where to load it.
+void* Ses_AllocBankHdr(u32 uSize, u32 uMemory) {
     switch (uMemory) {
     case 0:
         return lbl_80282078 = fn_800B5BD8(uSize);
@@ -297,8 +335,11 @@ void* fn_800A8FB4(u32 uSize, u32 uMemory) {
     // fake match: EA bug: no return for any other memory (UStream.c passes only 0 and 1 here)
 }
 
-// A bank's header is loaded: turn its offsets into pointers.
-void fn_800A8FFC(u32 uMemory) {
+// Bank uMemory's header is loaded (UStream.c): turns its stored offsets into pointers: the group
+// table and each group's sample entries, the sample table, and each sound's tracks (their play list
+// or sequence bank, and their events); each sound is then checked (Emi_CheckTemplate). Sets bit
+// 0x04 (bank 0) or 0x10 (bank 1) of lbl_8028207C.
+void Ses_ProcessArticulationData(u32 uMemory) {
     AudBank* pBank;
     u8 i;
     u8* pSounds;
@@ -351,8 +392,9 @@ void fn_800A8FFC(u32 uMemory) {
     }
 }
 
-// Where UStream.c loads a bank's samples: an ARAM block.
-u32 fn_800A925C(u32 uSize, u32 uMemory) {
+// UStream.c's 'samp' chunk: takes an ARAM block of uSize bytes for bank uMemory's samples (0 is
+// bank 0, anything else bank 1) and returns its ARAM address, where the samples are DMA'd.
+u32 Ses_AllocSampleAram(u32 uSize, u32 uMemory) {
     AudBank* pBank;
 
     if (uMemory == 0) {
