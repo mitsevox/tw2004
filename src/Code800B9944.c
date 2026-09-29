@@ -36,7 +36,7 @@ void FE_CrAPBall_LoadBALF(UStreamObject* pObject);
 void FE_CrAPBall_LoadTEO(UStreamObject* pObject);
 void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);                   // identity
-void fn_8000C5A4(f32 (*pMtx)[4]);
+void UObject_ComposeRotation(f32 (*pMtx)[4]);
 void LLMath_mat44fltMultiplyList(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void LLMath_mat44fltMultiplyList33(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void Character_GetBonePos(Character* pChar, int nBone, f32* pPos);
@@ -165,7 +165,7 @@ void FE_CrAPBall_DrawObject(UObject* pObj, f32 (*mBone)[4], f32 (*mScale)[4], f3
     LLMath_CopyMat44(pObj->m80, m80);
     LLMath_mat44fltMultiplyList33(mBone, pObj->m0, pObj->m0, 3);
     LLMath_mat44fltMultiplyList33(mScale, pObj->m40, pObj->m40, 3);
-    fn_8000C5A4(pObj->m0);
+    UObject_ComposeRotation(pObj->m0);
     LLMath_CopyVec(pPos, pObj->m80[3]);
     pObj->m80[3][3] = 1.0f;
     LLMath_mat44fltMultiplyList(gpCrAPState->mC0, pObj->m80, pObj->m80, 4);

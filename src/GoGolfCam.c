@@ -2639,10 +2639,10 @@ void GolfCamera_ProcessGolferBoneCamera(View* pView, int nPlayer) {
     pSub = CameraController_GetCameraLookPoint(pView);
     m = Character_GetBoneMatrix(gPlayers[nPlayer].pChar, 10);
     LLMath_CopyVec(m[3], pSub);
-    fn_8000C5D4(pSub, m[1], 0.1f, pSub);
+    LLMath_AddScale3(pSub, m[1], 0.1f, pSub);
     Vec3_Scale(0.5f, m[2], pCam);
     GolfCam_Vec3Add(m[3], pCam, pCam);
-    fn_8000C5D4(pCam, m[1], 0.1f, pCam);
+    LLMath_AddScale3(pCam, m[1], 0.1f, pCam);
     pCam[3] = 1.0f;
     GolfCam_Vec3Negate(m[0], pView->v20);
 }
@@ -2706,7 +2706,7 @@ u8 GolfCamera_ZoomCamGetStartAndEndVecs(View* pView, int nPlayer, f32* pSub, f32
     if (!PlaceBall_CheckInBounds(pCam)) {
         pNet = PlaceBall_GetPlaceBallNetwork();
         if (pNet != NULL) {
-            if (fn_8000C3C8(pCam, pAim, pNet, pNet->nNumNodes, vHit)) {
+            if (Network_LineNetworkIntersection(pCam, pAim, pNet, pNet->nNumNodes, vHit)) {
                 bMoved = 1;
                 pCam[0] = vHit[0];
                 pCam[2] = vHit[2];
@@ -2936,7 +2936,7 @@ void GolfCamera_ComputeSteepSlopeCamVectors(View* pView, int nPlayer) {
         bUp = 0;
     }
     fBack = gpCamTuning->f1D8;
-    fn_8000C5D4(vBase, vDir, -fBack, vCam);
+    LLMath_AddScale3(vBase, vDir, -fBack, vCam);
     fn_800B5918(pView->v0, vOldCam);
     fn_800B5918(pView->v10, vOldSub);
     i = 0;
@@ -2954,7 +2954,7 @@ void GolfCamera_ComputeSteepSlopeCamVectors(View* pView, int nPlayer) {
         CameraController_BallIsOnScreen(nPlayer);
         if (bHit || bClear) {
             fBack += gpCamTuning->f1D4;
-            fn_8000C5D4(vBase, vDir, -fBack, vCam);
+            LLMath_AddScale3(vBase, vDir, -fBack, vCam);
             if (bUp) {
                 vCam[1] -= gpCamTuning->f1D0;
             } else {

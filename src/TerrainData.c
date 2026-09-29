@@ -1,6 +1,6 @@
 // TerrainData.c (our name): the hole's networks, the outlines on the course (free-drop areas,
 // out of bounds, the situation zones), which arrive as 'Cnet' stream objects and are handed to
-// the systems that registered for their kind (Course_RegisterLoader). Also the outline tests
+// the systems that registered for their kind (Network_RegisterLoadNetworkCallback). Also the outline tests
 // (point inside, segment crossing; TW06's wn_PnPoly) and a few small vector helpers. The file
 // starts where the texture code's .bss ends, padded to 0x801A2A00, and its constants start the
 // .sdata2 block after urandom.c's.
@@ -16,14 +16,14 @@ TNetwork* lbl_801A2A40[32];             // the hole's networks, in the order the
 CourseLoader lbl_801A2A00[8];
 int lbl_80280DB0 = -1;                  // loaders registered; -1: the 'Cnet' handler calls none
 
-void fn_8000BF8C(UStreamObject* pObject);
-void fn_8000BF9C(UStreamObject* pObject);
-f32  fn_8000C244(f32* pA, f32* pB, f32* pP);
-u8   fn_8000C278(f32* pA, f32* pB, f32* pC, f32* pD, f32* pOut);
-u8   fn_8000C328(f32* pA, f32* pB, f32* pC, f32* pD);
+void Network_FreeDownloadData(UStreamObject* pObject);
+void Network_DownloadDataPNB(UStreamObject* pObject);
+f32  isLeft(f32* pA, f32* pB, f32* pP);
+u8   Network_LineIntersection(f32* pA, f32* pB, f32* pC, f32* pD, f32* pOut);
+u8   Network_RayIntersection(f32* pA, f32* pB, f32* pC, f32* pD);
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
-// 0.0f (0x80282AF0), before the 1.0f / 3.0f fn_8000BF20 uses first; its body is unknown.
+// 0.0f (0x80282AF0), before the 1.0f / 3.0f Network_GetNodeGroundHeight uses first; its body is unknown.
 static f32 TerrainData_StrippedFn(f32 x) {
     if (x < 0.0f) {
         return 0.0f;
@@ -31,8 +31,10 @@ static f32 TerrainData_StrippedFn(f32 x) {
     return x;
 }
 
-// The ground height under a node, from a point a third of a unit above it; 0 if there is none.
-f32 fn_8000BF20(const f32* pPos) {
+// The ground height under a network node: the supporting ground under a point a third of a unit
+// above it. 0 when no course is loaded or there is no ground there. Network_DownloadDataPNB puts
+// nodes stored at height 0 on the ground with it.
+f32 Network_GetNodeGroundHeight(const f32* pPos) {
     f32 v[4];
     CourseInfo* pCourse;
     f32 fHeight;
@@ -51,14 +53,17 @@ f32 fn_8000BF20(const f32* pPos) {
     return 0.0f;
 }
 
-// A network object is released: one network fewer.
-void fn_8000BF8C(UStreamObject* pObject) {
+// A network stream object is released (Network_DownloadDataPNB installs this as its release
+// function): one network fewer in the hole's list.
+void Network_FreeDownloadData(UStreamObject* pObject) {
     lbl_80281C10 = lbl_80281C10 - 1;
 }
 
-// The 'Cnet' handler: keep the object (unless it is already kept), put its nodes on the ground
-// where their height is 0, and hand the network to the loaders of its kind.
-void fn_8000BF9C(UStreamObject* pObject) {
+// The 'Cnet' stream handler (Network_InitModule registers it): keeps the object unless it is
+// already kept, adds its network (after a 12-byte header) to the hole's list, puts nodes stored at
+// height 0 on the ground, and hands the network to every loader registered for its type
+// (TNetwork.nExportType).
+void Network_DownloadDataPNB(UStreamObject* pObject) {
     TNetwork* pNet;
     int i;
     TNetNode* pNode;
@@ -67,14 +72,14 @@ void fn_8000BF9C(UStreamObject* pObject) {
         fn_8000B830(pObject);
         return;
     }
-    pObject->pfn8 = fn_8000BF8C;
+    pObject->pfn8 = Network_FreeDownloadData;
     fn_8000B4B8(pObject);
     pNet = (TNetwork*)(pObject->pData + 0xC);   // after a 12-byte header
     lbl_801A2A40[lbl_80281C10++] = pNet;
     pNode = pNet->aNodes;
     for (i = 0; i < pNet->nNumNodes; i++) {
         if (!pNode->vPos[1]) {
-            pNode->vPos[1] = fn_8000BF20(pNode->vPos);
+            pNode->vPos[1] = Network_GetNodeGroundHeight(pNode->vPos);
         }
         pNode++;
     }
@@ -85,7 +90,10 @@ void fn_8000BF9C(UStreamObject* pObject) {
     }
 }
 
-u8 Course_RegisterLoader(int nChunk, void (*pfn)(u8*)) {
+// Registers pfn as the loader for networks of type nChunk (TNetwork.nExportType):
+// Network_DownloadDataPNB hands it every network of that type as it arrives. At most 8 loaders;
+// returns 0 when they are full. TW07's version also takes should-load and post-load callbacks.
+u8 Network_RegisterLoadNetworkCallback(int nChunk, void (*pfn)(u8*)) {
     if (lbl_80280DB0 >= 8) {
         return 0;
     }
@@ -94,19 +102,23 @@ u8 Course_RegisterLoader(int nChunk, void (*pfn)(u8*)) {
     return 1;
 }
 
-void fn_8000C0F0(void) {
+// Shuts the networks down (gomainloop.c's shut-down list): forgets the hole's networks, and a
+// loader count of -1 stops Network_DownloadDataPNB from calling any loader.
+void Network_CloseModule(void) {
     lbl_80281C10 = 0;
     lbl_80280DB0 = -1;
 }
 
-void fn_8000C104(void) {
-    Stream_RegisterLoadChunkCallback(TAG('C', 'n', 'e', 't'), fn_8000BF9C);
+// Starts the networks (gomainloop.c's start-up list): registers Network_DownloadDataPNB for 'Cnet'
+// stream objects, with no networks and no loaders yet.
+void Network_InitModule(void) {
+    Stream_RegisterLoadChunkCallback(TAG('C', 'n', 'e', 't'), Network_DownloadDataPNB);
     lbl_80281C10 = 0;
     lbl_80280DB0 = 0;
 }
 
 // The winding number of the outline around pPos, in x and z: nonzero when pPos is inside.
-s32 fn_8000C140(f32* pPos, TNetwork* pNet, s32 nNodes) {
+s32 wn_PnPoly(f32* pPos, TNetwork* pNet, s32 nNodes) {
     s32 i;
     s32 nWinding = 0;
     int nCur = 0;
@@ -125,11 +137,11 @@ s32 fn_8000C140(f32* pPos, TNetwork* pNet, s32 nNodes) {
             pB = pNet->aNodes[nNext].vPos;
         }
         if (pA[2] <= pPos[2]) {
-            if (pB[2] > pPos[2] && fn_8000C244(pA, pB, pPos) > 0.0f) {
+            if (pB[2] > pPos[2] && isLeft(pA, pB, pPos) > 0.0f) {
                 nWinding++;
             }
         } else {
-            if (pB[2] <= pPos[2] && fn_8000C244(pA, pB, pPos) < 0.0f) {
+            if (pB[2] <= pPos[2] && isLeft(pA, pB, pPos) < 0.0f) {
                 nWinding--;
             }
         }
@@ -144,12 +156,12 @@ s32 fn_8000C140(f32* pPos, TNetwork* pNet, s32 nNodes) {
 
 // Which side of the line from a to b the point p is on (x and z): above 0 left, below 0 right.
 // TW06: isLeft.
-f32 fn_8000C244(f32* pA, f32* pB, f32* pP) {
+f32 isLeft(f32* pA, f32* pB, f32* pP) {
     return (pB[0] - pA[0]) * (pP[2] - pA[2]) - (pP[0] - pA[0]) * (pB[2] - pA[2]);
 }
 
 // Where the segments a-b and c-d cross, in x and z (pOut's x and z); 0 if they do not.
-u8 fn_8000C278(f32* pA, f32* pB, f32* pC, f32* pD, f32* pOut) {
+u8 Network_LineIntersection(f32* pA, f32* pB, f32* pC, f32* pD, f32* pOut) {
     f32 fT1;
     f32 fT2;
     f32 fBx;
@@ -191,8 +203,9 @@ u8 fn_8000C278(f32* pA, f32* pB, f32* pC, f32* pD, f32* pOut) {
     return 1;
 }
 
-// The ray from a through b crosses the segment c-d (x and z).
-u8 fn_8000C328(f32* pA, f32* pB, f32* pC, f32* pD) {
+// Whether the ray from a through b crosses the segment c-d, in x and z (TW07's version also returns
+// the point).
+u8 Network_RayIntersection(f32* pA, f32* pB, f32* pC, f32* pD) {
     f32 fT1;
     f32 fT2;
     f32 fAx;
@@ -231,7 +244,10 @@ u8 fn_8000C328(f32* pA, f32* pB, f32* pC, f32* pD) {
     return 1;
 }
 
-u8 fn_8000C3C8(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes, f32* pHit) {
+// Whether the segment from pFrom to pTo crosses the outline pNet (nNodes edges, walked from node 0
+// along its links), and in pHit's x and z the crossing nearest pFrom. Ter_CollisionWithOOBNetwork
+// and the golf camera use it.
+u8 Network_LineNetworkIntersection(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes, f32* pHit) {
     s32 i;
     f32 fBest = 100000000.0f;
     int nCur = 0;
@@ -254,7 +270,7 @@ u8 fn_8000C3C8(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes, f32* pHit) {
             nNext = pNet->aNodes[nCur].aLinks[1];
             pB = pNet->aNodes[nNext].vPos;
         }
-        if (fn_8000C278(pFrom, pTo, pA, pB, v)) {
+        if (Network_LineIntersection(pFrom, pTo, pA, pB, v)) {
             fDx = v[0] - pFrom[0];
             fDz = v[2] - pFrom[2];
             fDist = fDx * fDx;      // fake match: the squares as statements, so they do not fuse
@@ -273,7 +289,9 @@ u8 fn_8000C3C8(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes, f32* pHit) {
     return bHit;
 }
 
-u8 fn_8000C4E0(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes) {
+// Whether the ray from pFrom through pTo crosses any edge of the outline pNet (nNodes edges, walked
+// from node 0 along its links). The camera scripts use it.
+u8 Network_RayNetworkDoesIntersect(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes) {
     s32 i;
     int nCur = 0;
     int nPrev = -1;
@@ -290,7 +308,7 @@ u8 fn_8000C4E0(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes) {
             nNext = pNet->aNodes[nCur].aLinks[1];
             pB = pNet->aNodes[nNext].vPos;
         }
-        if (fn_8000C328(pFrom, pTo, pA, pB)) {
+        if (Network_RayIntersection(pFrom, pTo, pA, pB)) {
             return 1;
         }
         nPrev = nCur;
@@ -304,13 +322,16 @@ CourseInfo* Ter_GetTGD(void) {
     return lbl_801D3CB0.pCourse;
 }
 
-// Rows 4..6 of the matrix block times rows 0..2, into rows 8..10.
-void fn_8000C5A4(f32 (*pMtx)[4]) {
+// An object's combined rotation: rows 0..2 of its third matrix (UObject.m80) become its second
+// matrix's rows (m40) times its first (m0), 3x3 parts only (LLMath_mat44fltMultiplyList33); the
+// position row m80[3] is left alone. pMtx is the object's m0.
+void UObject_ComposeRotation(f32 (*pMtx)[4]) {
     LLMath_mat44fltMultiplyList33(pMtx + 4, pMtx, pMtx + 8, 3);
 }
 
+// Adds f times pB to pA, into pOut: three floats (paired-single assembly).
 #ifdef __MWERKS__
-asm void fn_8000C5D4(register f32* pA, register f32* pB, register f32 f, register f32* pOut) {
+asm void LLMath_AddScale3(register f32* pA, register f32* pB, register f32 f, register f32* pOut) {
     nofralloc
     fmr       f4, f
     psq_l     f0, 0(pA), 0, 0
@@ -325,7 +346,7 @@ asm void fn_8000C5D4(register f32* pA, register f32* pB, register f32 f, registe
 }
 #else
 // port: the plain-C version for compilers without paired singles.
-void fn_8000C5D4(f32* pA, f32* pB, f32 f, f32* pOut) {
+void LLMath_AddScale3(f32* pA, f32* pB, f32 f, f32* pOut) {
     pOut[0] = pA[0] + f * pB[0];
     pOut[1] = pA[1] + f * pB[1];
     pOut[2] = pA[2] + f * pB[2];

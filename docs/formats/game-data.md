@@ -150,7 +150,7 @@ u32 count (26), then records of 562 bytes:
 CPU aim points (a course chunk, loader `AI_TargetsLoad`)
 ---------------------------------------------------------
 
-Registered with `Course_RegisterLoader(0, AI_TargetsLoad)`, so it is chunk kind 0 of whatever
+Registered with `Network_RegisterLoadNetworkCallback(0, AI_TargetsLoad)`, so it is chunk kind 0 of whatever
 container the course loader walks (not yet traced to a file). Per hole:
 
     0x00 s16 ?

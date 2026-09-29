@@ -170,7 +170,7 @@ void Legacy_Quat_BuildFromPitch(f32 fAngle, f32* pOut); // the quaternion of a r
 void Legacy_Quat_BuildFromRoll(f32 fAngle, f32* pOut); // the quaternion of a rotation by -fAngle about x
 void Quat_IdentifyForMul(f32* pQ);              // the identity quaternion (0, 0, 0, 1)
 f32  Math_Sqrtf(f32 x);                // square root (Skeleton.c); x itself when x <= 0
-void fn_8000C5D4(f32* pA, f32* pB, f32 f, f32* pOut);   // out = a + f x b
+void LLMath_AddScale3(f32* pA, f32* pB, f32 f, f32* pOut);   // out = a + f x b
 f32  Vec3_Dot(f32* pA, f32* pB);     // dot product
 f32  Math_Acos(f32 x);                // arc cosine
 void LLMath_Scale(f32 f, f32* pIn, f32* pOut);   // scale a vector (four floats)

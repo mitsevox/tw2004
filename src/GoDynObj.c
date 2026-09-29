@@ -58,7 +58,7 @@ void fn_80048584(UObject* pObj, s8 nLod);
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);                   // identity
 int  CameraController_GetClippedGolfer(void);
 void fn_8004858C(f32* pOut, f32 fTurn, f32 fTilt);
-void fn_8000C5A4(f32 (*pMtx)[4]);
+void UObject_ComposeRotation(f32 (*pMtx)[4]);
 void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
 void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);
 void LLMath_mat44fltMultiplyList(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
@@ -447,7 +447,7 @@ void fn_80046C34(f32* pPos, int nPlayer) {
             }
         } else {
             LLMath_CopyVec(vPos, lbl_80281DA0->apRing[lbl_80281DA0->nRing]->obj.m80[3]);
-            fn_8000C5A4(lbl_80281DA0->apRing[lbl_80281DA0->nRing]->obj.m0);
+            UObject_ComposeRotation(lbl_80281DA0->apRing[lbl_80281DA0->nRing]->obj.m0);
         }
         lbl_80281DA0->nRing = lbl_80281DA0->nRing + 1;
         lbl_80281DA0->nRing = lbl_80281DA0->nRing % 10;
@@ -500,7 +500,7 @@ void fn_80046E1C(f32* pPos, int nPlayer) {
     LLMath_mat44fltMultiplyList(lbl_80281DA0->apPlayer[nPlayer]->obj.m0, mTurn, mObj, 4);
     LLMath_CopyMat44(mObj, lbl_80281DA0->apPlayer[nPlayer]->obj.m0);
     LLMath_CopyVec(vPos, lbl_80281DA0->apPlayer[nPlayer]->obj.m80[3]);
-    fn_8000C5A4(lbl_80281DA0->apPlayer[nPlayer]->obj.m0);
+    UObject_ComposeRotation(lbl_80281DA0->apPlayer[nPlayer]->obj.m0);
 }
 
 // Draws a 'TEO ' model (10006 + the target's kind) at each target of the target games.
@@ -733,12 +733,12 @@ void fn_8004731C(u8* pState) {
                 LLMath_Scale(fGrow, pLogoB->m40[2], pLogoB->m40[2]);
             }
         }
-        fn_8000C5A4(pBall->m0);
+        UObject_ComposeRotation(pBall->m0);
         if (pLogoA != NULL) {
-            fn_8000C5A4(pLogoA->m0);
+            UObject_ComposeRotation(pLogoA->m0);
         }
         if (pLogoB != NULL) {
-            fn_8000C5A4(pLogoB->m0);
+            UObject_ComposeRotation(pLogoB->m0);
         }
         if (fn_80046A54(i)) {
             pState[i] = 1;
@@ -832,7 +832,7 @@ void fn_80047A24(f32* pPos, int nPlayer) {
     } else {
         LLMath_IdentifyMat(pB->pF0->obj.m0);
         LLMath_CopyVec(pB->v20, pB->pF0->obj.m80[3]);
-        fn_8000C5A4(pB->pF0->obj.m0);
+        UObject_ComposeRotation(pB->pF0->obj.m0);
     }
 }
 
@@ -872,7 +872,7 @@ void fn_80047C24(int nPlayer) {
         mat44flt_EulerAngles(pB->mB0, pB->fC, 0.0f, 0.0f);
         LLMath_mat44fltMultiplyList(pB->pF0->obj.m0, pB->mB0, mTmp, 4);
         LLMath_CopyMat44(mTmp, pB->pF0->obj.m0);
-        fn_8000C5A4(pB->pF0->obj.m0);
+        UObject_ComposeRotation(pB->pF0->obj.m0);
         LLMath_CopyVec(pB->v20, pB->v30);
         fn_8004858C(pB->v40, pB->fC, lbl_80281DA0->fAA0);
         LLMath_Scale(lbl_80281DA0->fA98 * (0.5f * Misc_RandFuncf(1) + 0.5f), pB->v40, pB->v40);
@@ -908,7 +908,7 @@ void fn_80047C24(int nPlayer) {
     LLMath_IdentifyMat(pB->mB0);
     mat44flt_EulerAngles(pB->mB0, pB->fC + pB->v50[0], pB->v50[1], pB->v50[2]);
     LLMath_CopyMat34(pB->mB0, pB->pF0->obj.m0);
-    fn_8000C5A4(pB->pF0->obj.m0);
+    UObject_ComposeRotation(pB->pF0->obj.m0);
     LLMath_CopyVec(pB->v30, pB->pF0->obj.m80[3]);
     pB->pF0->obj.m80[3][3] = 1.0f;
 }
@@ -954,7 +954,7 @@ void DynObj_TeeAdd(f32* pPos, int nPlayer, u8 bReset) {
         LLMath_IdentifyMat(pA->mB4);
         LLMath_CopyVec(pA->v20, pA->v30);
         LLMath_CopyVec(pA->v20, pA->pF4->obj.m80[3]);
-        fn_8000C5A4(pA->pF4->obj.m0);
+        UObject_ComposeRotation(pA->pF4->obj.m0);
         return;
     }
     if (bReset) {
@@ -985,7 +985,7 @@ void DynObj_TeeAdd(f32* pPos, int nPlayer, u8 bReset) {
     LLMath_CopyMat34(pA->mB4, pA->pF4->obj.m0);
     LLMath_CopyVec(pA->v20, pA->v30);
     LLMath_CopyVec(pA->v20, pA->pF4->obj.m80[3]);
-    fn_8000C5A4(pA->pF4->obj.m0);
+    UObject_ComposeRotation(pA->pF4->obj.m0);
 }
 
 void fn_8004816C(int nPlayer) {
@@ -1013,7 +1013,7 @@ void fn_80048184(int nPlayer) {
             mat44flt_EulerAngles(pA->mB4, pA->fC, 0.0f, 0.0f);
             LLMath_mat44fltMultiplyList(pA->pF4->obj.m0, pA->mB4, mTmp, 4);
             LLMath_CopyMat44(mTmp, pA->pF4->obj.m0);
-            fn_8000C5A4(pA->pF4->obj.m0);
+            UObject_ComposeRotation(pA->pF4->obj.m0);
             LLMath_CopyVec(pA->v20, pA->v30);
             fn_8004858C(pA->v40, pA->fC, lbl_80281DA0->fA9C);
             LLMath_Scale(lbl_80281DA0->fA94 * Misc_RandFuncf(1), pA->v40, pA->v40);
@@ -1049,14 +1049,14 @@ void fn_80048184(int nPlayer) {
         LLMath_IdentifyMat(pA->mB4);
         mat44flt_EulerAngles(pA->mB4, pA->fC + pA->v50[0], pA->v50[1], pA->v50[2]);
         LLMath_CopyMat34(pA->mB4, pA->pF4->obj.m0);
-        fn_8000C5A4(pA->pF4->obj.m0);
+        UObject_ComposeRotation(pA->pF4->obj.m0);
         LLMath_CopyVec(pA->v30, pA->pF4->obj.m80[3]);
         pA->pF4->obj.m80[3][3] = 1.0f;
     } else {
         LLMath_IdentifyMat(pA->mB4);
         mat44flt_EulerAngles(pA->mB4, pA->v50[0], pA->v50[1], pA->v50[2]);
         LLMath_CopyMat34(pA->mB4, pA->pF4->obj.m0);
-        fn_8000C5A4(pA->pF4->obj.m0);
+        UObject_ComposeRotation(pA->pF4->obj.m0);
         LLMath_CopyVec(pA->v30, pA->pF4->obj.m80[3]);
         pA->pF4->obj.m80[3][3] = 1.0f;
     }

@@ -900,7 +900,7 @@ void DynamicCam_TrackBallVelocityLag(CamShot* pShot, int nPlayer, CamScript* pSc
     } else {
         fDist = pShot->f60;
     }
-    fn_8000C5D4(aFrom, aBallDir, fDist, aTarget);
+    LLMath_AddScale3(aFrom, aBallDir, fDist, aTarget);
     DynamicCam_AddOffset(aTarget, aBallDir, pScript, pShot, nPlayer, pShot->f64, fY);
     if (CameraScript_SnapToScript(pScript, pShot)) {
         Vec3Copy(aTarget, pOut);
@@ -1015,7 +1015,7 @@ void DynamicCam_TrackBallVelocityTight(CamShot* pShot, int nPlayer, CamScript* p
     } else {
         fDist = pShot->f60;
     }
-    fn_8000C5D4(vFrom, vDir, fDist, vPos);
+    LLMath_AddScale3(vFrom, vDir, fDist, vPos);
     DynamicCam_AddOffset(vPos, vDir, pScript, pShot, nPlayer, pShot->f64, fY);
     Vec3Copy(vPos, pOut);
 }

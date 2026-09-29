@@ -23,14 +23,14 @@ void SitDev_NetworkLoadCallback(u8* pChunk) {
 }
 
 // State value 79 (for the look-ahead ball's position): the bits of every commentary zone the point
-// is inside (fn_8000C140, the outline test) OR'd together; a zone's bits are the u32 right after
+// is inside (wn_PnPoly, the outline test) OR'd together; a zone's bits are the u32 right after
 // its outline's last node. 0 when the hole has no zones.
 u32 SitDev_GetCommentaryZones(f32* pPos) {
     int i;
     u32 uBits = 0;
     if (gSitDevNumCommentaryZones == 0) return 0;
     for (i = 0; i < gSitDevNumCommentaryZones; i++) {
-        if (fn_8000C140(pPos, &gSitDevCommentaryZones[i]->net, gSitDevCommentaryZones[i]->net.nNumNodes)) {
+        if (wn_PnPoly(pPos, &gSitDevCommentaryZones[i]->net, gSitDevCommentaryZones[i]->net.nNumNodes)) {
             uBits |= *(u32*)&gSitDevCommentaryZones[i]->net.aNodes[gSitDevCommentaryZones[i]->net.nNumNodes];
         }
     }

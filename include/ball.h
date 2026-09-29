@@ -249,13 +249,13 @@ typedef struct CourseLoader {
 LAYOUT_ASSERT(CourseLoader, 0x8);
 
 CourseInfo* Ter_GetTGD(void);          // the current hole's terrain data
-u8   Course_RegisterLoader(int nChunk, void (*pfn)(u8*));   // 0x8000C0B4: pfn gets the hole's chunk nChunk
-void fn_8000C0F0(void);                 // network count 0, loader count -1
-void fn_8000C104(void);                 // register the 'Cnet' handler, clear the loaders
-s32  fn_8000C140(f32* pPos, TNetwork* pNet, s32 nNodes);   // point in outline. TW06: wn_PnPoly
+u8   Network_RegisterLoadNetworkCallback(int nChunk, void (*pfn)(u8*));   // 0x8000C0B4: pfn gets the hole's chunk nChunk
+void Network_CloseModule(void);                 // network count 0, loader count -1
+void Network_InitModule(void);                 // register the 'Cnet' handler, clear the loaders
+s32  wn_PnPoly(f32* pPos, TNetwork* pNet, s32 nNodes);   // point in outline. TW06: wn_PnPoly
 // The segment from pFrom to pTo crosses the outline (in x and z); pHit gets the nearest crossing.
-u8   fn_8000C3C8(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes, f32* pHit);
-u8   fn_8000C4E0(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes);   // the ray crosses the outline
+u8   Network_LineNetworkIntersection(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes, f32* pHit);
+u8   Network_RayNetworkDoesIntersect(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes);   // the ray crosses the outline
 s32  Ter_iNumOOBNetworksLoaded(void);
 
 // target.c: placing the ball (TW06's PlaceBall_* functions, names not proven here)
@@ -265,7 +265,8 @@ TNetwork* PlaceBall_GetPlaceBallNetwork(void);            // the hole's placemen
 f32  CamScript_GuessBestPlayableHeight(f32* pPos, SurfaceType** ppSurface);   // 0x800447DC
 
 // TerrainGround.c (our name): the ground under a point or a quad
-int  fn_800CB950(CourseInfo* pCourse, f32* pA, f32* pB, f32* pC, f32* pD, TerPolyRef* pList, int nMax,
+int  Ter_GetGroundPolyList(CourseInfo* pCourse, f32* pA, f32* pB, f32* pC, f32* pD, TerPolyRef* pList,
+                           int nMax,
                  u32 uSkip);   // the ground strips under a quad, as runs of triangles
 // The ground triangle under a point: its height there, the grid cell, the strip, the triangle's
 // first vertex and its number in the strip. Probably TW06's Ter_GetSupportingGroundTriangle.

@@ -3093,9 +3093,9 @@ void Character_GetBallOnFingerPosition(Character* pChar, f32* pPos) {
     Vec3Copy(pMtx[0], vAxis);
     LLMath_Normalize3(vAxis, vAxis);
     if (Character_IsLeftHanded(pChar)) {
-        fn_8000C5D4(pPos, vAxis, 0.05f, pPos);
+        LLMath_AddScale3(pPos, vAxis, 0.05f, pPos);
     } else {
-        fn_8000C5D4(pPos, vAxis, -0.05f, pPos);
+        LLMath_AddScale3(pPos, vAxis, -0.05f, pPos);
     }
 }
 
@@ -3115,9 +3115,9 @@ void Character_GetTeeInHandPositionAndRot(Character* pChar, f32* pPos, f32* pAng
         Vec3Copy(pMtx[0], vAxis);
         LLMath_Normalize3(vAxis, vAxis);
         if (Character_IsLeftHanded(pChar)) {
-            fn_8000C5D4(pPos, vAxis, -0.000625f, pPos);
+            LLMath_AddScale3(pPos, vAxis, -0.000625f, pPos);
         } else {
-            fn_8000C5D4(pPos, vAxis, 0.000625f, pPos);
+            LLMath_AddScale3(pPos, vAxis, 0.000625f, pPos);
         }
         Quat_ExtractEulerAngles(pChar->pModel->pPoses[CharModel_GetBoneIndexMapped(pChar->pModel, 0x15)].q0,
                                 &pAngles[0], &pAngles[1],

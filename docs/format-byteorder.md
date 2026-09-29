@@ -39,7 +39,7 @@ Objects delivered by UStream
 |---|---|---|---|---|
 | `txf2` | fn_8000BCA0 | asm | none seen | asm |
 | `load` | fn_8000BA94 | asm | none seen | asm |
-| `Cnet` | fn_8000BF9C | asm | none seen | asm; dispatches the course's sub-chunks to the loaders registered with `Course_RegisterLoader` (below) |
+| `Cnet` | Network_DownloadDataPNB | asm | none seen | asm; dispatches the course's sub-chunks to the loaders registered with `Network_RegisterLoadNetworkCallback` (below) |
 | `txf ` | fn_80010180 | asm | none seen | asm; `TXG ` texture groups, [formats/txg-textures.md](formats/txg-textures.md) |
 | `sfn ` | fn_800125BC | sweep | none seen | asm |
 | `SAC ` | Character_LoadSacFromStream | char.c (sweep block) | swapped: AnimLib_MergeOverlay > SKA_SwapClip > fn_80076158 | little-endian on disc; `port:` notes at the handler and at the swap in AnimLib_MergeOverlay (a little-endian port does not swap) |
@@ -91,7 +91,7 @@ Objects delivered by UStream
 The course file's sub-chunks (`Cnet`)
 -------------------------------------
 
-`Course_RegisterLoader(n, fn)` adds a loader to the table (`lbl_801A2A00`) that the `Cnet` handler
+`Network_RegisterLoadNetworkCallback(n, fn)` adds a loader to the table (`lbl_801A2A00`) that the `Cnet` handler
 walks; each loader gets its sub-chunk's bytes.
 
 | Sub-chunk | Loader | Unit | Swap | Overlay |

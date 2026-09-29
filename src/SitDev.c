@@ -43,7 +43,7 @@ void SitDev_vInitModule(void) {
     Mem_set(gpSitDevData, 0, sizeof(SitDevData));
     gpSitDevData->pE8 = NULL;
     gpSitDevData->n13C = 0;
-    Course_RegisterLoader(5, SitDev_NetworkLoadCallback);
+    Network_RegisterLoadNetworkCallback(5, SitDev_NetworkLoadCallback);
     SitDev_ClearBallThatWasHit();
 }
 

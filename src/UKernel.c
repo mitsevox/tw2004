@@ -18,7 +18,7 @@ UMemPool* lbl_80281DA8;
 DynObj* fn_80049018(DynObjSetup* pSetup);
 void fn_8000E830(DynObj* pObj);
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);                   // identity
-void fn_8000C5A4(f32 (*pMtx)[4]);
+void UObject_ComposeRotation(f32 (*pMtx)[4]);
 
 void StaticCam_ParseFlybyCameraActor(UStreamObject* pObject);
 void StaticCam_ParseStaticCameraActor(UStreamObject* pObject);
@@ -423,7 +423,7 @@ void fn_80049514(DynObj* pObj, DynObjSetup* pSetup) {
     }
     LLMath_IdentifyMat(pObj->obj.m0);
     LLMath_IdentifyMat(pObj->obj.m40);
-    fn_8000C5A4(pObj->obj.m0);
+    UObject_ComposeRotation(pObj->obj.m0);
     pObj->obj.m80[3][0] = pDef->aPos[0];
     pObj->obj.m80[3][1] = pDef->aPos[1];
     pObj->obj.m80[3][2] = pDef->aPos[2];

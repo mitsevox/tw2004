@@ -309,7 +309,7 @@ They will be sorted into the sections below.
 - **[verified] A counted skip loop written counting down** gives CW's ctr loop with no index register
   (Grass_Gc Static_Render 92.5 -> 96.5).
 - **[verified] Float tests: `if (f)` / `!f` put the value first in `fcmpu`**; `f != 0.0f` and `0.0f != f`
-  both put the zero first (GoTerrain fn_800342F0, TerrainData fn_8000BF9C, GoPostFx fn_80039358). A float
+  both put the zero first (GoTerrain fn_800342F0, TerrainData Network_DownloadDataPNB, GoPostFx fn_80039358). A float
   `!(x < c)` gives a plain `blt` where `x >= c` gives `cror` (GoCamCont CameraController_PostEvent).
 - **[verified] Pointer plus integer always puts the pointer first in `add`**; adding as integers
   (`(u8*)(n + (uptr)p)`) flips it (UMemPool fn_8000AFA0, marked fake match).
@@ -878,7 +878,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   Character_PlaceFeetOnGround 3 -> 0 (an `fH` local), UISApi fn_80168FC8 7 -> 0.
 - **[verified] The opposite also happens: route subexpressions through EXISTING multiply-assigned
   locals**; fresh single-assignment locals are copied back into the expression and change nothing.
-  TerrainData fn_8000C278 4 -> 0; Ball Physics_HandleCollision 92 -> 31 aligned diffs.
+  TerrainData Network_LineIntersection 4 -> 0; Ball Physics_HandleCollision 92 -> 31 aligned diffs.
 - **[verified] Random declaration orders followed by a move/swap climb** find gains that greedy climbs
   record as "none": GoShaderObject_Particle fn_80094B84 130 -> 10 (then 0 with a `pAge` local).
 - **[verified] A string pool in `.rodata`** needs `-str reuse,readonly` on the unit (UISEvent: its

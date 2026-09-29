@@ -74,7 +74,7 @@ u8 DynObj_FindBallHit(int nPlayer, f32* pTo, f32* pFrom, f32* pHit, f32* pNormal
         DynObj_Vec3Sub(pTo, vCenter, vNormal);
         LLMath_Normalize3(vNormal, vNormal);
         if (pHit != NULL) {
-            fn_8000C5D4(vCenter, vNormal, fRadius, pHit);
+            LLMath_AddScale3(vCenter, vNormal, fRadius, pHit);
         }
         if (pNormal != NULL) {
             Vec3Copy(vNormal, pNormal);

@@ -44,7 +44,7 @@ void SW_vGetCurrentSpin(int nPlayer, f32* pfSide, f32* pfForward);   // Swing.c:
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);                          // identity
 void LLMath_mat44fltMultiplyList33(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // VecMath.c
 void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);          // copy a matrix
-void fn_8000C5A4(f32 (*pMtx)[4]);
+void UObject_ComposeRotation(f32 (*pMtx)[4]);
 void UI_Obj_DrawSpinModel(void);
 void UI_Obj_DrawMesh(UObjMesh* pMesh);
 void LI_LoadLightGroup(LightGroup* pGroup);   // Skin.c: load the group's lights (fn_8006E7A4)
@@ -351,7 +351,7 @@ void UI_Obj_RenderBoostUI(int nObj) {
             LLMath_CopyMat44(gpUIObjModel->m80, mSave80);
             LLMath_mat44fltMultiplyList33(mRot, gpUIObjModel->m0, gpUIObjModel->m0, 3);
             LLMath_mat44fltMultiplyList33(mScale, gpUIObjModel->m40, gpUIObjModel->m40, 3);
-            fn_8000C5A4(gpUIObjModel->m0);
+            UObject_ComposeRotation(gpUIObjModel->m0);
             LLMath_CopyVec(vPos, gpUIObjModel->m80[3]);
             gpUIObjModel->m80[3][3] = 1.0f;
             UI_Obj_DrawSpinModel();

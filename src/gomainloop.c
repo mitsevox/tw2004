@@ -454,7 +454,7 @@ void fn_8006C7A8(void) {
     fn_8006F14C();
     fn_80093524();
     fn_800461A8();
-    fn_8000C104();
+    Network_InitModule();
     Pict_InitModule();
     LLVideo_InitModule();
 }
@@ -462,7 +462,7 @@ void fn_8006C7A8(void) {
 // Shuts down what fn_8006C7A8 started.
 void fn_8006C854(void) {
     Aud_ExitSession(0);
-    fn_8000C0F0();
+    Network_CloseModule();
     fn_80046264();
     fn_80093580();
     fn_8006F150();

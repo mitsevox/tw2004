@@ -132,8 +132,8 @@ u8 Ter_LineTriangleIntersection(f32* pFrom, f32* pDir, f32 fMax, f32 (*pTri)[3],
 // out-of-bounds (network type 1) and free-drop (network type 4) networks and forget the old ones.
 // Called when the game's systems start.
 void Ter_Init(void) {
-    Course_RegisterLoader(1, (void (*)(u8*))Ter_OOBNetworkLoadCallback);
-    Course_RegisterLoader(4, (void (*)(u8*))Ter_FreeDropNetworkLoadCallback);
+    Network_RegisterLoadNetworkCallback(1, (void (*)(u8*))Ter_OOBNetworkLoadCallback);
+    Network_RegisterLoadNetworkCallback(4, (void (*)(u8*))Ter_FreeDropNetworkLoadCallback);
     lbl_80281DC8 = 0;
     lbl_80281DC4 = 0;
 }
@@ -249,7 +249,7 @@ u8 Ter_PointInFreeDropNetwork(f32* pPos) {
 
     if (lbl_80281DC4 == 0) return 0;
     for (i = 0; i < lbl_80281DC4; i++) {
-        if (fn_8000C140(pPos, lbl_801D5428[i], lbl_801D5428[i]->nNumNodes)) return 1;
+        if (wn_PnPoly(pPos, lbl_801D5428[i], lbl_801D5428[i]->nNumNodes)) return 1;
     }
     return 0;
 }
@@ -273,7 +273,7 @@ u8 Ter_PointInOOBNetwork(f32* pPos) {
 
     if (lbl_80281DC8 == 0) return 1;
     for (i = 0; i < lbl_80281DC8; i++) {
-        if (fn_8000C140(pPos, lbl_801D548C[i], lbl_801D548C[i]->nNumNodes)) return 1;
+        if (wn_PnPoly(pPos, lbl_801D548C[i], lbl_801D548C[i]->nNumNodes)) return 1;
     }
     return 0;
 }
@@ -285,7 +285,8 @@ u8 Ter_CollisionWithOOBNetwork(f32* pFrom, f32* pTo, f32* pHit) {
 
     if (lbl_80281DC8 == 0) return 0;
     for (i = 0; i < lbl_80281DC8; i++) {
-        if (fn_8000C3C8(pFrom, pTo, lbl_801D548C[i], lbl_801D548C[i]->nNumNodes, pHit)) return 1;
+        if (Network_LineNetworkIntersection(pFrom, pTo, lbl_801D548C[i], lbl_801D548C[i]->nNumNodes,
+                                            pHit)) return 1;
     }
     return 0;
 }

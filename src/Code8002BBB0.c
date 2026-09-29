@@ -28,7 +28,7 @@ u8       gAITargetsLoaded;              // 0x80281D40
 
 void AI_TargetsInit(void) {
     gAITargetsLoaded = 0;
-    Course_RegisterLoader(0, AI_TargetsLoad);
+    Network_RegisterLoadNetworkCallback(0, AI_TargetsLoad);
     AI_TargetsClear();
 }
 

@@ -157,7 +157,7 @@ Functions still unnamed or named from TW06:
 | `8011E0AC` | `RTClock_GetDateTimeString` | `RTClock_GetDateTimeString` | strong | Xbox anchor(1) |
 | `8011EFE4` | `GrassRender_vBuildAndUploadOneTimeData` | `GrassRender_vBuildAndUploadOneTimeData` | strong | Xbox anchor(1) |
 | `801220D4` | `TibExtMemAlloc` | `TibExtMemAlloc` | strong | both builds: Xbox anchor(1), PS2 xbox:anchor(1) |
-| `8000C140` | `fn_8000C140` | `wn_PnPoly` | medium | PS2 nbr(r7,2) |
+| `8000C140` | `wn_PnPoly` | `wn_PnPoly` | medium | PS2 nbr(r7,2) |
 | `8000C594` | `Ter_GetTGD` | `Ter_TerrainGameDataMgr::GetTGD` | medium | PS2 calls(r0,8) |
 | `8001966C` | `Character_AlignCharacterForShotImpact` | `Character_AlignCharacterForShotImpact` | medium | PS2 nbr(r1,2) |
 | `8001FCF4` | `SKA_Update` | `SKA_Update` | medium | PS2 nbr(r4,2) |

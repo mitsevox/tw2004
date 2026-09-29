@@ -2304,9 +2304,9 @@ void CamScript_CheckOutOfBounds(CamScript* pScript, f32* pCam, f32* pSub, int nP
     }
     if (!bEarly && (b || pScript->f98 > 0.5f)) {
         pNet = PlaceBall_GetPlaceBallNetwork();
-        if (pNet != NULL && fn_8000C140(pCam, pNet, pNet->nNumNodes) == 0) {
+        if (pNet != NULL && wn_PnPoly(pCam, pNet, pNet->nNumNodes) == 0) {
             Vec3_Add(gPlayers[nPlayer].ball.vVel, gPlayers[nPlayer].ball.vPos, vNext);
-            if (!fn_8000C4E0(gPlayers[nPlayer].ball.vPos, vNext, pNet, pNet->nNumNodes)) {
+            if (!Network_RayNetworkDoesIntersect(gPlayers[nPlayer].ball.vPos, vNext, pNet, pNet->nNumNodes)) {
                 CamScript_PutBackOnFairway(pScript, pCam, pSub, nPlayer, pSaved, pPrev);
             }
         }

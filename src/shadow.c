@@ -516,7 +516,7 @@ void fn_800B2FB0(Character* pChar, int nView, u8 bFlat) {
     if (pCourse == NULL) {
         return;
     }
-    nList = fn_800CB950(pCourse, aQuad[0], aQuad[1], aQuad[2], aQuad[3], aList, 0x200, 0x60);
+    nList = Ter_GetGroundPolyList(pCourse, aQuad[0], aQuad[1], aQuad[2], aQuad[3], aList, 0x200, 0x60);
     RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
     fn_80035294();
     RenderState_SetViewport(RC_spGetCurrentRenderCtx());

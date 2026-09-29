@@ -17,7 +17,7 @@ AnimalStep lbl_80187DF0[6] = {
 
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);                       // identity
 void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
-void fn_8000C5A4(f32 (*pMtx)[4]);
+void UObject_ComposeRotation(f32 (*pMtx)[4]);
 void ActAnimal_SetWorldMatrix(DynObjAnimal* pAnimal, f32 f);
 f32  Ter_GetTimeInCycle(u32 n, f32 fPeriod);                   // GoTerrain.c
 int  fn_8004AB90(UObjMesh* pMesh, int i);
@@ -166,7 +166,7 @@ void ActAnimal_SetWorldMatrix(DynObjAnimal* pAnimal, f32 fDt) {
         }
         mat44flt_EulerAngles(pAnimal->base.obj.m0, fA, fB, fC);
     }
-    fn_8000C5A4(pAnimal->base.obj.m0);
+    UObject_ComposeRotation(pAnimal->base.obj.m0);
 }
 
 // Divides f16C and f174 by the length of the animal's route (once round its points).
@@ -292,7 +292,7 @@ void fn_8004A24C(DynObjAnimal* pAnimal, DynObjSetup* pSetup) {
                          * (PI / 180.0f),
                 pDef->aAngles[2] * (PI / 180.0f));
     LLMath_IdentifyMat(pAnimal->base.obj.m40);
-    fn_8000C5A4(pAnimal->base.obj.m0);
+    UObject_ComposeRotation(pAnimal->base.obj.m0);
     if (pAnimal->pRoute != NULL) {
         ActAnimal_SetWorldMatrix(pAnimal, 0.0f);
     } else {

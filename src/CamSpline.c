@@ -276,7 +276,7 @@ void CamUtils_vGetPositionBetweenTwoPoints(f32* pA, f32* pB, u8 bKeepY, u8 bRaw,
     if (!bRaw && (0.0f != aDir[0] || 0.0f != aDir[1] || 0.0f != aDir[2])) {
         LLMath_Normalize3(aDir, aDir);
     }
-    fn_8000C5D4(pA, aDir, fDist, pOut);
+    LLMath_AddScale3(pA, aDir, fDist, pOut);
     aDir[1] = 0.0f;
     if (0.0f != aDir[0] || 0.0f != aDir[1] || 0.0f != aDir[2]) {
         LLMath_Normalize3(aDir, aDir);

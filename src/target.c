@@ -50,7 +50,7 @@ void TARGET_Init(void) {
     u64 textureID;
     int i;
 
-    Course_RegisterLoader(3, fn_8006A7A8);
+    Network_RegisterLoadNetworkCallback(3, fn_8006A7A8);
     lbl_80281E30 = NULL;
     textureID = fn_8000BEE4("tball");
     fn_800102DC(textureID, &lbl_80281E3C, &lbl_80281E40);
@@ -625,7 +625,7 @@ void PlaceBall_ResetMomentums(int nPlayer) {
 // outline, a point outside it still counts when some in-bounds outline holds it.
 u8 PlaceBall_CheckInBounds(f32* pPos) {
     if (lbl_80281E30 != NULL) {
-        if (fn_8000C140(pPos, lbl_80281E30, lbl_80281E30->nNumNodes)) {
+        if (wn_PnPoly(pPos, lbl_80281E30, lbl_80281E30->nNumNodes)) {
             return 1;
         }
         if (Ter_iNumOOBNetworksLoaded() > 0) {

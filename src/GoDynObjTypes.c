@@ -6,7 +6,7 @@
 #include "dynobj.h"
 
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);                                           // identity
-void fn_8000C5A4(f32 (*pMtx)[4]);
+void UObject_ComposeRotation(f32 (*pMtx)[4]);
 
 // Type 6's message 2: set the object up from its definition, with no flags and n14E at -1.
 void fn_8004ABBC(DynObj* pObj, DynObjSetup* pSetup) {
@@ -66,7 +66,7 @@ void fn_8004ABBC(DynObj* pObj, DynObjSetup* pSetup) {
     }
     LLMath_IdentifyMat(pObj->obj.m0);
     LLMath_IdentifyMat(pObj->obj.m40);
-    fn_8000C5A4(pObj->obj.m0);
+    UObject_ComposeRotation(pObj->obj.m0);
     pObj->obj.m80[3][0] = pDef->aPos[0];
     pObj->obj.m80[3][1] = pDef->aPos[1];
     pObj->obj.m80[3][2] = pDef->aPos[2];
@@ -138,7 +138,7 @@ void fn_8004ADDC(DynObj* pObj, DynObjSetup* pSetup) {
     fn_800486F4(&pObj->obj,NULL, 0);
     LLMath_IdentifyMat(pObj->obj.m0);
     LLMath_IdentifyMat(pObj->obj.m40);
-    fn_8000C5A4(pObj->obj.m0);
+    UObject_ComposeRotation(pObj->obj.m0);
     pObj->obj.m80[3][0] = pDef->aPos[0];
     pObj->obj.m80[3][1] = pDef->aPos[1];
     pObj->obj.m80[3][2] = pDef->aPos[2];

@@ -93,7 +93,7 @@ void fn_8011E170(void) {
     lbl_80281900->p370 = NULL;
     lbl_80281900->n1C = 0;
     // port: fn_8011E4D8 takes the chunk as a GrassChunk*
-    Course_RegisterLoader(6, (void (*)(u8*))fn_8011E4D8);
+    Network_RegisterLoadNetworkCallback(6, (void (*)(u8*))fn_8011E4D8);
     lbl_80281900->n3DC = 1;
     lbl_80281900->n3E0 = 1;
     lbl_80281900->n3F0 = 1;
