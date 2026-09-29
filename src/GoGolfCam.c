@@ -21,10 +21,10 @@ CamLens* Camera_GetLens(void* pCamera);                    // the render camera'
 void     RC_UpdateCurrentScreenMatrices(void);
 u8       CameraController_TargetIsOnScreen(int nPlayer);
 u8       ComicCam_UpdateComicCam(View* pView, int nPlayer, f32 fFrameTime);
-void     fn_800C73B8(f32* pA, f32* pB, f32* pOut);
+void     GolfCam_Vec3Add(f32* pA, f32* pB, f32* pOut);
 void     GolfCam_Vec3Sub(f32* pA, f32* pB, f32* pOut);
-void     fn_800C7400(f32* pA, f32* pOut);
-f32      fn_800C741C(Character* pChar, u64 uEvent);
+void     GolfCam_Vec3Negate(f32* pA, f32* pOut);
+f32      GolfCam_GetBlendTagTime(Character* pChar, u64 uEvent);
 void     GolfCamera_ChooseReactionCam(View* pView, int nPlayer, int a);
 void     CameraController_StartScriptOfKind(View* pView, int nPlayer, int nCamera);
 void     ComicCam_StartComicCam(int a, View* pView, int nPlayer);
@@ -39,14 +39,14 @@ void     mat44flt_EulerAngles(f32 (*m)[4], f32 a, f32 b, f32 c);  // a rotation 
 void     LLMath_mat44fltMultiply33(f32 (*m)[4], f32* pIn, f32* pOut);  // a vector through a matrix
 void     CameraController_BallIsOnScreen(int nPlayer);
 void     GolfCamera_ClampLookAngle(f32* pFrom, f32* pTo, f32* pOut);
-int      fn_800C4D2C(f32* pFrom, f32* pTo, f32* pOut, f32 fMax);
+int      GolfCamera_LimitPositionChange(f32* pFrom, f32* pTo, f32* pOut, f32 fMax);
 // The segment crosses the outline (at pHit).
 u8       fn_8004B6F8(f32* pFrom, f32* pTo, f32* pHit);
 f32      Camera_GetLensFovScale(CamLens* pLens);            // char.c: the lens's fB0
 void     fn_80038054(u8 a, int n, f32 f1, f32 f2);
 CamShot* GolfCamera_GetAlternateSwingCamera(int nFirst, int nPlayer);
 void     fn_800C5EC0(View* pView, f32* pCam, f32* pSub, int nPlayer);
-f32      fn_800C7394(View* pView);
+f32      GolfCamera_GetTimeToNextShot(View* pView);
 void     Quat_RotateVector(f32* pQuat, f32* pIn, f32* pOut);  // rotate a vector by a quaternion
 u8       fn_8006BEA4(void);                             // emotion.c: a scripted GameBreaker's letterbox is up
 void     Gaud_InitSpecialShot(u8 nPlayer);
@@ -56,7 +56,7 @@ void     CameraController_CheckForEvents(View* pView, int nPlayer);
 f32      fn_800D04AC(int nPlayer);                      // Swing.c's declaration
 f32      fn_800C54FC(View* pView, f32* pCam, f32* pSub, int nPlayer);
 f32      fn_800C5A70(View* pView, f32* pCam, f32* pSub, int nPlayer);
-u8       fn_800C7450(void);
+u8       GameEffects_IsPredictedGameBreakerOn(void);
 u8       fn_8012022C(void);                            // (sweep code) lbl_80281900's +0x370 is nonzero
 void     Character_AlignCharacterForShotImpact(Character* pChar);                 // char.c
 void     SKATime_Pause(u8* pAnim);                        // set the player's pause bit (0x2)
@@ -224,7 +224,7 @@ void GolfCamera_InitZoomToAimCamera(View* pView, int nPlayer) {
         }
         GolfCam_Vec3Sub(vAim, pCam, v);
         Vec3_Scale(Math_Sqrt(Vec3_LengthSqClamped(v)), vDir, vDir);
-        fn_800C73B8(pCam, vDir, pSub);
+        GolfCam_Vec3Add(pCam, vDir, pSub);
     }
     EVENT_Trigger(nPlayer, 0x30, NULL, -1);
 }
@@ -292,7 +292,7 @@ void GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer) {
         }
         fSlow /= lbl_80281F78->f18;
         Vec3_Scale(fSlow, vCreep, vCreep);
-        fn_800C73B8(pCam, vCreep, pCam);
+        GolfCam_Vec3Add(pCam, vCreep, pCam);
         fDist = 0.0f;
     } else if (fDist > lbl_80281F78->f24 && Vec3_Dot(vMove, vAimMove) > 0.0f
                && pView->script.f108 >= 0.0f) {
@@ -320,7 +320,7 @@ void GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer) {
             LLMath_Normalize3(vMove, vMove);
         }
         Vec3_Scale(fSlow, vMove, vMove);
-        fn_800C73B8(vMove, pCam, pCam);
+        GolfCam_Vec3Add(vMove, pCam, pCam);
         fAmount = lbl_80281F78->f1C * (1.0f - fBase / fSpeed);
         if (fAmount < 0.0f) {
             fAmount = 0.0f;
@@ -487,7 +487,7 @@ void GolfCamera_InitGreenZoomToAimCamera(View* pView, int nPlayer) {
             }
             GolfCam_Vec3Sub(vAim, pCam, v);
             Vec3_Scale(Math_Sqrt(Vec3_LengthSqClamped(v)), vDir, vDir);
-            fn_800C73B8(pCam, vDir, pSub);
+            GolfCam_Vec3Add(pCam, vDir, pSub);
         }
         EVENT_Trigger(nPlayer, 0x30, NULL, -1);
         Vec3Copy(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0]))->m4[0],
@@ -572,7 +572,7 @@ void GolfCamera_ProcessGreenZoomToAimCamera(View* pView, int nPlayer) {
             }
             fSlow /= lbl_80281F78->f48;
             Vec3_Scale(fSlow, vCreep, vCreep);
-            fn_800C73B8(pCam, vCreep, pCam);
+            GolfCam_Vec3Add(pCam, vCreep, pCam);
             if (pCam[1] < pView->shot19C.f68 + fHeight) {
                 pCam[1] += lbl_80281F78->f40;
                 if (pCam[1] > pView->shot19C.f68 + fHeight) {
@@ -618,7 +618,7 @@ void GolfCamera_ProcessGreenZoomToAimCamera(View* pView, int nPlayer) {
                 LLMath_Normalize3(vMove, vMove);
             }
             Vec3_Scale(fSlow, vMove, vMove);
-            fn_800C73B8(vMove, pCam, pCam);
+            GolfCam_Vec3Add(vMove, pCam, pCam);
             fSlow = lbl_80281F78->f1C * (1.0f - fBase / fSpeed);
             if (fSlow < 0.0f) {
                 fSlow = 0.0f;
@@ -1060,7 +1060,7 @@ void GolfCamera_InitGreenCamera(View* pView, int nPlayer) {
         if (v[0] != 0.0f || v[1] != 0.0f || v[2] != 0.0f) {
             LLMath_Normalize3(v, v);
         }
-        fn_800C73B8(pCam, v, v);
+        GolfCam_Vec3Add(pCam, v, v);
         LLMath_CopyVec(v, pView->v40);
         LLMath_CopyVec(gPlayers[nPlayer].ball.vPos, pView->script.v0);
         LLMath_CopyVec(&pCourse->pin[nPinSet].x, pView->script.v10);
@@ -1244,7 +1244,7 @@ void GolfCamera_ProcessGreenRollCamera(View* pView, int nPlayer) {
             }
             t = 1.0f - pView->script.fCamTime / fTime;
             Vec3_Scale(fOut * (t * t), vDir, vDir);
-            fn_800C73B8(vDir, gPlayers[nPlayer].ballBefore.vPos, pCam);
+            GolfCam_Vec3Add(vDir, gPlayers[nPlayer].ballBefore.vPos, pCam);
         } else {
             Vec3Copy(gPlayers[nPlayer].ballBefore.vPos, pCam);
         }
@@ -1782,7 +1782,7 @@ void GolfCamera_InitHeartBeatCamera(View* pView, int nPlayer) {
     pView->script.f108 = 0.0f;
     gGolfCamState->b5A = 1;
     CameraController_FadeIn(pView, lbl_80281F78->fC4, v);
-    fRate = (FRAME_RATE * (fn_800C741C(gPlayers[nPlayer].pChar, 2) - fStart))
+    fRate = (FRAME_RATE * (GolfCam_GetBlendTagTime(gPlayers[nPlayer].pChar, 2) - fStart))
           / (FRAME_RATE * (lbl_80281F78->fC4 * (lbl_80281F78->nBeatFrames * (lbl_80281F78->nBeats + 1))
                        + (lbl_80281F78->nBeats * lbl_80281F78->fC8
                           + lbl_80281F78->nBeats * lbl_80281F78->fCC)));
@@ -1894,7 +1894,7 @@ void GolfCamera_ProcessShutterCamera(View* pView, int nPlayer) {
         CamScript_RunScript(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, FRAME_TIME);
         pView->script.f108 += gSession.fFrameTime;
         pView->script.f10C += gSession.fFrameTime;
-        fSwing = fn_800C741C(gPlayers[nPlayer].pChar, 2) - fStart;
+        fSwing = GolfCam_GetBlendTagTime(gPlayers[nPlayer].pChar, 2) - fStart;
         if (pView->script.n110 == 0 && pView->script.f10C > fSwing / 3.0f) {
             pView->script.f108 = -0.15f;
             pView->script.n110++;
@@ -1945,7 +1945,7 @@ void GolfCamera_InitBallFlightCamera(View* pView, int nPlayer) {
         GolfCam_Vec3Sub(gPlayers[nPlayer].vTarget, gPlayers[nPlayer].vBall, vAim);
         LLMath_Normalize3(vAim, vAim);
         Vec3_Scale(fDist, vAim, vAim);
-        fn_800C73B8(vAim, gPlayers[nPlayer].vBall, pView->script.v50);
+        GolfCam_Vec3Add(vAim, gPlayers[nPlayer].vBall, pView->script.v50);
     }
     if (pView->p74 != NULL && pView->p74->b44 == 3 && pView->p74->p20 != pView->p74 && pView->p74->p20 != NULL
         && pView->p74->p20->b44 == 4 && fn_8003D7A0(pView->p74->p20, nPlayer)) {
@@ -2019,11 +2019,11 @@ void GolfCamera_InitBallFlightCamera(View* pView, int nPlayer) {
 }
 
 // The ball-flight camera's tick: when the current shot has run its time (or, once, when
-// fn_800C7450's GameBreaker comes on), pick the next one: for a CPU player or in a replay a static
-// camera for the ball's state, else the sequence's latest kind-0x18 choice the flight has reached,
-// else a shot of the kind asked for. Some cuts (type 5) wait for the golfer's animation 14, which
-// is started first. While the matrix camera or the super zoom runs, its tick (fn_800C54FC,
-// fn_800C5A70) gives the script's time step.
+// GameEffects_IsPredictedGameBreakerOn's GameBreaker comes on), pick the next one: for a CPU player
+// or in a replay a static camera for the ball's state, else the sequence's latest kind-0x18 choice
+// the flight has reached, else a shot of the kind asked for. Some cuts (type 5) wait for the
+// golfer's animation 14, which is started first. While the matrix camera or the super zoom runs,
+// its tick (fn_800C54FC, fn_800C5A70) gives the script's time step.
 void GolfCamera_ProcessBallFlightCamera(View* pView, int nPlayer) {
     f32 vOld[4];
     f32 f1;
@@ -2061,7 +2061,7 @@ void GolfCamera_ProcessBallFlightCamera(View* pView, int nPlayer) {
         fTime = gSession.fFrameTime;
     }
     if (gSession.fFrameTime != 0.0f && !pView->script.bCF
-        && ((!gGolfCamState->b5D && fn_800C7450())
+        && ((!gGolfCamState->b5D && GameEffects_IsPredictedGameBreakerOn())
             || ((pView->script.pShot == NULL || pView->script.fCamTime > pView->script.pShot->f4C)
                 && (pView->script.pNextShot == NULL || pView->p80 != pView->script.pShot)))) {
         if (gSession.bReplay || Player_IsCPU(nPlayer)) {
@@ -2145,20 +2145,20 @@ void GolfCamera_ProcessBallFlightCamera(View* pView, int nPlayer) {
                             if (pAltShot == NULL) {
                                 CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, nA,
                                                                f1, f2, nB, f3);
-                                if (fn_800C7450()) {
+                                if (GameEffects_IsPredictedGameBreakerOn()) {
                                     gGolfCamState->b5D = 1;
                                 }
                             } else {
                                 CameraScript_InterpToNewScript(&pView->script, pAltShot, nPlayer, pCam, pSub,
                                                                nA, f1, f2, nB, f3);
-                                if (fn_800C7450()) {
+                                if (GameEffects_IsPredictedGameBreakerOn()) {
                                     gGolfCamState->b5D = 1;
                                 }
                             }
                         } else {
                             CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, nA, f1,
                                                            f2, nB, f3);
-                            if (fn_800C7450()) {
+                            if (GameEffects_IsPredictedGameBreakerOn()) {
                                 gGolfCamState->b5D = 1;
                             }
                         }
@@ -2171,7 +2171,7 @@ void GolfCamera_ProcessBallFlightCamera(View* pView, int nPlayer) {
                     CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, nA, f1, f2,
                                                    nB, f3);
                     pView->script.nC8 = pView->script.nC4;
-                    if (fn_800C7450()) {
+                    if (GameEffects_IsPredictedGameBreakerOn()) {
                         gGolfCamState->b5D = 1;
                     }
                 }
@@ -2306,7 +2306,7 @@ void GolfCamera_ProcessPostShotCamera(View* pView, int nPlayer) {
             pView->script.bCF = 0;
             mat44flt_EulerAngles(m, pSub[1], pSub[0], pSub[2]);
             LLMath_mat44fltMultiply33(m, v, pSub);
-            fn_800C73B8(pSub, pCam, pSub);
+            GolfCam_Vec3Add(pSub, pCam, pSub);
             CameraScript_RecordCurrentCam(&pView->shot19C, pCam, pSub, nPlayer, &pView->script, 0);
             pView->script.pShot = &pView->shot19C;
             pView->script.pShot->bAD = 5;
@@ -2640,10 +2640,10 @@ void GolfCamera_ProcessGolferBoneCamera(View* pView, int nPlayer) {
     LLMath_CopyVec(m[3], pSub);
     fn_8000C5D4(pSub, m[1], 0.1f, pSub);
     Vec3_Scale(0.5f, m[2], pCam);
-    fn_800C73B8(m[3], pCam, pCam);
+    GolfCam_Vec3Add(m[3], pCam, pCam);
     fn_8000C5D4(pCam, m[1], 0.1f, pCam);
     pCam[3] = 1.0f;
-    fn_800C7400(m[0], pView->v20);
+    GolfCam_Vec3Negate(m[0], pView->v20);
 }
 
 // The zoom-to-aim camera's positions. pAim: out from the ball towards the target by the shot's
@@ -2675,7 +2675,7 @@ u8 GolfCamera_ZoomCamGetStartAndEndVecs(View* pView, int nPlayer, f32* pSub, f32
         LLMath_Normalize3(vDir, vDir);
     }
     Vec3_Scale(pView->shot19C.f60, vDir, vOff);
-    fn_800C73B8(pBall, vOff, pAim);
+    GolfCam_Vec3Add(pBall, vOff, pAim);
     pAim[0] += pView->shot19C.f64 * -Vec3_Dot(vDir, gGolfCamAxisZ);
     pAim[2] += pView->shot19C.f64 * Vec3_Dot(vDir, gGolfCamAxisX);
     pAim[1] = pView->shot19C.v30[1];
@@ -2813,8 +2813,10 @@ int GolfCamera_NumCompletedReplayCams(View* pView) {
     return pView->script.n110;
 }
 
-// Is the target too steep from the ball: |dy / dx| at least fUp going up, fDown going down.
-u8 fn_800C4520(View* pView, int nPlayer, f32 fUp, f32 fDown) {
+// Is the player's target steep from the ball: the slope |dy / dx| (the height change over the x
+// difference alone, not the flat distance) at least fUp when the target is higher, fDown when it is
+// lower. 0 when the x difference is under 1e-6.
+u8 GolfCamera_SteepSlopeCamCheckSlope(View* pView, int nPlayer, f32 fUp, f32 fDown) {
     f32 dx = gPlayers[nPlayer].vTarget[0] - gPlayers[nPlayer].ball.vPos[0];
     f32 dy = gPlayers[nPlayer].vTarget[1] - gPlayers[nPlayer].ball.vPos[1];
     f32 fSlope;
@@ -2834,7 +2836,8 @@ u8 fn_800C4520(View* pView, int nPlayer, f32 fUp, f32 fDown) {
     return 1;
 }
 
-// Is anything in the way between the view and the player's target?
+// Does the ground (Ter_CheckForGroundCollision) lie between the view's camera position (v0) and the
+// player's target?
 u8 GolfCamera_SteepSlopeCamCheckCollision(View* pView, int nPlayer) {
     f32 vHit[4];
     f32 vNormal[4];
@@ -2844,8 +2847,12 @@ u8 GolfCamera_SteepSlopeCamCheckCollision(View* pView, int nPlayer) {
                                        vHit, vNormal, &pSurface, &pObj);
 }
 
-// Should the view be moved: never on a putt; else by the tuning's slope and terrain tests, and when
-// CameraController_TargetIsOnScreen fails.
+// Does the aim view need the steep-slope camera (mode 0x13) instead of the elevator camera
+// (STATEFUNC_ElevatorInit asks)? Never with the putter. With the tuning's bCheckSlope on: only when
+// the target is steep from the ball (GolfCamera_SteepSlopeCamCheckSlope), and then yes. Otherwise
+// yes when the tuning's bCheckTerrain finds the ground in the way
+// (GolfCamera_SteepSlopeCamCheckCollision) or the target is off screen (fn_800635D0: not 0.1 in
+// from the edges).
 u8 GolfCamera_NeedSteepSlopeCam(View* pView, int nPlayer) {
     u8 bMove;
     if (gPlayers[nPlayer].nClub == CLUB_PUTTER_e) {
@@ -2853,7 +2860,8 @@ u8 GolfCamera_NeedSteepSlopeCam(View* pView, int nPlayer) {
     }
     bMove = 0;
     if (lbl_80281F78->bCheckSlope) {
-        bMove = fn_800C4520(pView, nPlayer, lbl_80281F78->fSlopeUp, lbl_80281F78->fSlopeDown);
+        bMove = GolfCamera_SteepSlopeCamCheckSlope(pView, nPlayer, lbl_80281F78->fSlopeUp,
+                                                   lbl_80281F78->fSlopeDown);
         if (!bMove) {
             return 0;
         }
@@ -2960,8 +2968,8 @@ void GolfCamera_ComputeSteepSlopeCamVectors(View* pView, int nPlayer) {
         i++;
     }
     gSteepSlopeCamLastTries = i;
-    fn_800C4D2C(vOldCam, pView->v0, pView->v0, lbl_80281F78->f1F0);
-    fn_800C4D2C(vOldSub, pView->v10, pView->v10, lbl_80281F78->f1F4);
+    GolfCamera_LimitPositionChange(vOldCam, pView->v0, pView->v0, lbl_80281F78->f1F0);
+    GolfCamera_LimitPositionChange(vOldSub, pView->v10, pView->v10, lbl_80281F78->f1F4);
     GolfCamera_ClampLookAngle(pView->v0, pView->v10, pView->v10);
 }
 
@@ -3019,12 +3027,12 @@ void GolfCamera_ClampLookAngle(f32* pFrom, f32* pTo, f32* pOut) {
         Quat_BuildFromVector(vAxis, vQuat);
         v[3] = 0.0f;
         Quat_RotateVector(vQuat, v, vOut);
-        fn_800C73B8(pFrom, vOut, pOut);
+        GolfCam_Vec3Add(pFrom, vOut, pOut);
     }
 }
 
 // Move pOut from pFrom towards pTo by at most fMax; nonzero if it had to stop short.
-int fn_800C4D2C(f32* pFrom, f32* pTo, f32* pOut, f32 fMax) {
+int GolfCamera_LimitPositionChange(f32* pFrom, f32* pTo, f32* pOut, f32 fMax) {
     int bClamped = 0;
     f32 v[4];
     f32 vStep[4];
@@ -3033,7 +3041,7 @@ int fn_800C4D2C(f32* pFrom, f32* pTo, f32* pOut, f32 fMax) {
     fDist = Math_Sqrt(Vec3_LengthSqClamped(v));
     if (fDist > fMax && fDist > 1e-6f) {
         Vec3_Scale(fMax / fDist, v, vStep);
-        fn_800C73B8(pFrom, vStep, pOut);
+        GolfCam_Vec3Add(pFrom, vStep, pOut);
         bClamped = 1;
     } else {
         Vec3Copy(pTo, pOut);
@@ -3056,8 +3064,10 @@ CamShot* GolfCamera_GetAlternateSwingCamera(int nFirst, int nPlayer) {
     return NULL;
 }
 
-// Cycle through shots 1..5 (GolfCamera_GetAlternateSwingCamera, skipping 3) when there is no next shot or it is of kind
-// 6, 8, 9 or 10; with none, go back to the saved shot p80.
+// The alternate-swing button (GM_CheckForShotChanges): when no blend to a next shot is under way,
+// or it is of blend kind 6, 8, 9 or 10 (script.nBC), step n264 through 1..5 and cut to that
+// alternate swing camera (GolfCamera_GetAlternateSwingCamera); at 3, or with none, go back to the
+// saved shot p80.
 void GolfCamera_vSwitchToNextAlternateSwingCamera(View* pView, int nPlayer) {
     f32* pCam;
     f32* pSub;
@@ -3103,7 +3113,7 @@ void fn_800C4FF0(View* pView, f32* pFrom, f32* pTo, int nPlayer) {
     LLMath_CopyVec(pFrom, vFrom);
     GolfCam_Vec3Sub(pTo, vFrom, v);
     v[1] = 0.0f;
-    fn_800C73B8(pTo, v, v);
+    GolfCam_Vec3Add(pTo, v, v);
     v[1] = vFrom[1];
     Mem_set(&gGolfCamState->shot6C, 0, sizeof(CamShot) * 2);
     strcpy(gGolfCamState->shot6C.szName, szName);
@@ -3283,7 +3293,7 @@ void fn_800C56B4(View* pView, f32* pFrom, f32* pTo, int nPlayer) {
     LLMath_CopyVec(pFrom, vFrom);
     GolfCam_Vec3Sub(pTo, vFrom, v);
     v[1] = 0.0f;
-    fn_800C73B8(pTo, v, v);
+    GolfCam_Vec3Add(pTo, v, v);
     v[1] = vFrom[1];
     strcpy(gGolfCamState->shot6C.szName, szName);
     if (pView->n260 == 13) {
@@ -3920,7 +3930,7 @@ u8 fn_800C6F7C(View* pView, int nPlayer, f32 fLeft) {
         return 0;
     }
     if (pView->script.pNextShot != NULL) {
-        return fn_800C7394(pView) < fLeft;
+        return GolfCamera_GetTimeToNextShot(pView) < fLeft;
     }
     if (pView->script.pShot->f4C - pView->script.f98 < fLeft
         && pView->script.fE4 - pView->script.f98 < fLeft) {
@@ -4021,11 +4031,16 @@ u8 fn_800C71A4(View* pView, int nPlayer) {
     return fn_800C708C(pView);
 }
 
-u8 fn_800C72DC(View* pView) {
+// The golfer-done-animating cut has been made (script.n114, set by
+// GolfCamera_CutToGolferDoneAnimatingCam); fn_800637C4 asks in camera modes 15 and 16.
+u8 GolfCamera_IsGolferDoneAnimating(View* pView) {
     return pView->script.n114 != 0;
 }
 
-void fn_800C72F0(void) {
+// Clear the shared state's special camera flags b54..b5B (the matrix camera, the script's matrix
+// mode, the comic camera, the super zoom, the slow-motion swing, the heart beat and the rest), if
+// the state exists. The hole loader (fn_8006F518) calls it.
+void GolfCamera_ResetSpecialCameraStates(void) {
     if (gGolfCamState != NULL) {
         gGolfCamState->b54 = 0;
         gGolfCamState->b55 = 0;
@@ -4038,8 +4053,10 @@ void fn_800C72F0(void) {
     }
 }
 
-// Cameras 1 and 2 are done once script.f108 reaches 1; the others at once.
-u8 fn_800C7340(View* pView, int nPlayer) {
+// Is the zoom-to-aim camera done (STATEFUNC_ZoomUpdate): in modes 1 and 2
+// (GolfCamera_InitZoomToAimCamera, GolfCamera_InitGreenZoomToAimCamera) once script.f108 reaches 1;
+// in any other mode at once.
+u8 GolfCamera_IsZoomCamDone(View* pView, int nPlayer) {
     if (pView->nCurCamera == 1) {
         return pView->script.f108 >= 1.0f;
     }
@@ -4049,8 +4066,9 @@ u8 fn_800C7340(View* pView, int nPlayer) {
     return 1;
 }
 
-// The time left on the current shot (0 when there is no next one).
-f32 fn_800C7394(View* pView) {
+// The time left before the camera script moves on to its next shot (script.f8C less fCamTime); 0
+// with no next shot queued.
+f32 GolfCamera_GetTimeToNextShot(View* pView) {
     if (pView->script.pNextShot == NULL) {
         return 0.0f;
     }
@@ -4059,7 +4077,7 @@ f32 fn_800C7394(View* pView) {
 
 // Adds two vectors (three floats) into pOut.
 #ifdef __MWERKS__
-asm void fn_800C73B8(register f32* pA, register f32* pB, register f32* pOut) {
+asm void GolfCam_Vec3Add(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 1, 0
@@ -4073,7 +4091,7 @@ asm void fn_800C73B8(register f32* pA, register f32* pB, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_800C73B8(f32* pA, f32* pB, f32* pOut) {
+void GolfCam_Vec3Add(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pB[0] + pA[0];
     pOut[1] = pB[1] + pA[1];
     pOut[2] = pB[2] + pA[2];
@@ -4105,7 +4123,7 @@ void GolfCam_Vec3Sub(f32* pA, f32* pB, f32* pOut) {
 
 // Negates a vector (three floats) into pOut.
 #ifdef __MWERKS__
-asm void fn_800C7400(register f32* pA, register f32* pOut) {
+asm void GolfCam_Vec3Negate(register f32* pA, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 1, 0
@@ -4117,7 +4135,7 @@ asm void fn_800C7400(register f32* pA, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_800C7400(f32* pA, f32* pOut) {
+void GolfCam_Vec3Negate(f32* pA, f32* pOut) {
     pOut[0] = -pA[0];
     pOut[1] = -pA[1];
     pOut[2] = -pA[2];
@@ -4125,15 +4143,16 @@ void fn_800C7400(f32* pA, f32* pOut) {
 #endif
 
 // An animation event's time in the character's blend tree (0 without a character).
-f32 fn_800C741C(Character* pChar, u64 uEvent) {
+f32 GolfCam_GetBlendTagTime(Character* pChar, u64 uEvent) {
     if (pChar == NULL) {
         return 0.0f;
     }
     return SKABlender_GetTagTime(&pChar->blend, uEvent);
 }
 
-// A predicted game breaker is on.
-u8 fn_800C7450(void) {
+// GameEffects.h's inline (TW07), out of line here: a GameBreaker is on and it is a predicted one
+// (nGBType 1). The ball-flight camera asks.
+u8 GameEffects_IsPredictedGameBreakerOn(void) {
     int bOn = 0;
     if (gGameEffects.bGameBreaker && gGameEffects.nGBType == 1) {
         bOn = 1;

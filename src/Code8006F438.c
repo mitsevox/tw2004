@@ -57,7 +57,7 @@ void UI_InitForHole();
 void fn_8009B894();
 void fn_800A2E68();
 void fn_800B26DC();
-void fn_800C72F0();
+void GolfCamera_ResetSpecialCameraStates();
 void fn_800C8134();
 void GM_InitForHole();
 s32 fn_80010608(s32);
@@ -101,7 +101,7 @@ void fn_8006F518(void) {
     UI_InitForHole();
     fn_80037E50();
     fn_800B26DC();
-    fn_800C72F0();
+    GolfCamera_ResetSpecialCameraStates();
     fn_8006F604();
 }
 

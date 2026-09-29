@@ -466,7 +466,7 @@ typedef struct CamTuning {
     s32  n1C0;                  // 0x1C0  nonzero enables camera 19
     s32  n1C4;                  // 0x1C4
     s32  bCheckSlope;           // 0x1C8  GolfCamera_NeedSteepSlopeCam tests the slope to the target
-                                //        (fn_800C4520)
+                                //        (GolfCamera_SteepSlopeCamCheckSlope)
     s32  bCheckTerrain;         // 0x1CC  and the ground in between (GolfCamera_SteepSlopeCamCheckCollision)
     f32  f1D0;                  // 0x1D0  the steep-slope camera: height step per try (down going
                                 //        up, up going down)
@@ -917,7 +917,7 @@ void   fn_800C7168(View* pView, int a);
 u8     fn_800C7170(View* pView);
 void   fn_800C7178(View* pView, int nPlayer);
 u8     fn_800C71A4(View* pView, int nPlayer);
-u8     fn_800C7340(View* pView, int nPlayer);
+u8     GolfCamera_IsZoomCamDone(View* pView, int nPlayer);
 
 // ---- frame buffers (GoFrameBuf.c) -----------------------------------------------------------
 

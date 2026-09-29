@@ -804,8 +804,8 @@ void STATEFUNC_ZoomInit(int nPlayer) {
 }
 
 // State 3: held while button 8 is down (the caddie keeps updating). Buttons 9/10, 30 and 11..14
-// fire events 0xD/0xE, 0xF and 0x12..0x15; once fn_800C7340 reports (flag from the enter) message
-// 0x67 is posted, once.
+// fire events 0xD/0xE, 0xF and 0x12..0x15; once GolfCamera_IsZoomCamDone reports (flag from the
+// enter) message 0x67 is posted, once.
 void STATEFUNC_ZoomUpdate(int nPlayer) {
     Caddie_Update(nPlayer);
     if (!(Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(8, 1))) {
@@ -838,7 +838,7 @@ void STATEFUNC_ZoomUpdate(int nPlayer) {
     }
     TARGET_UpdateMomentums(nPlayer);
     if (lbl_80281E11 != 0) {
-        if (fn_800C7340(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), nPlayer)) {
+        if (GolfCamera_IsZoomCamDone(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), nPlayer)) {
             GameMsg_SendInt(0x67, nPlayer);
             lbl_80281E11 = 0;
         }

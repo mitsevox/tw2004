@@ -12,7 +12,7 @@
 #include "camera.h"
 #include "unsorted/cull.h"
 
-u8   fn_800C72DC(View* pView);
+u8   GolfCamera_IsGolferDoneAnimating(View* pView);
 u8   CameraController_PointIsOnScreen(int nPlayer, f32* pPos, f32 fMargin);
 u8   CameraController_HideGolfer(int nPlayer, int nView);
 void CameraController_SetShakeAmount(View* pView, f32 fF0, f32 fF4);
@@ -406,14 +406,15 @@ int CameraController_GetClippedShadow(void) {
 // Whether view nView hides the player's golfer: the view is the player's own (his nView[0], and
 // ViewController_GetActivePlayerNumber gives it to him) and either its current shot does not show
 // the golfer (bAA 0) and neither does the next shot it blends to (unless blend kind 5), or the
-// camera is in mode 15 or 16 and fn_800C72DC holds; with no shot, only in camera mode 4.
+// camera is in mode 15 or 16 and GolfCamera_IsGolferDoneAnimating holds; with no shot, only in camera mode 4.
 u8 CameraController_HideGolfer(int nPlayer, int nView) {
     View* pView;
 
     if (gPlayers[nPlayer].nView[0] == nView && ViewController_GetActivePlayerNumber(nView) == nPlayer) {
         pView = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
         if (pView->script.pShot != NULL) {
-            if ((pView->nCurCamera == 15 || pView->nCurCamera == 16) && fn_800C72DC(pView)) {
+            if ((pView->nCurCamera == 15 || pView->nCurCamera == 16)
+                && GolfCamera_IsGolferDoneAnimating(pView)) {
                 return 1;
             }
             if (pView->script.pShot->bAA == 0) {
