@@ -1,8 +1,12 @@
 // GoShaderObject_Grass_Gc.c (our name, after TW06's goshaderobject_grass_xbox.c and its _Gc
 // siblings): the grass shader object, one row of the shader object table. Builds the shells of
 // grass over the hole's terrain into a vertex buffer (the GrassPacket calls) and draws them through
-// GX. GoGrass.c hands it the grass parameters once per hole (SD_vSetGrassParamsOnce).
-// The builder (SD_vShaderObject_Grass_Static_Init) is a draft.
+// GX. Shader type 17: GoGrass.c builds one object per visible grid cell from the cell's file
+// record (SD_vShaderObject_Grass_Static_Init: two shell sets, along x and along z, ten rows each,
+// each with a forward and a reverse vertex run), and before each draw passes the cell's position
+// and which set and run to draw (SD_vShaderObject_Grass_Type_SetParameters). Each time the grass is
+// drawn GrassRender_vBuildAndUploadOneTimeData hands over the shared parameters
+// (SD_vSetGrassParamsOnce): the top texture's mapping, the fade, the row offsets and the sway.
 
 #include "grassshader.h"
 #include "camera.h"
@@ -11,12 +15,14 @@
 #include "charstate.h"
 
 // .bss in reverse address order (CodeWarrior lays it out last-defined-first)
+// The type's data (its record pool, parameters and the packet builder's state), then the
+// parameters SD_vSetGrassParamsOnce keeps for SD_vShaderObject_Grass_Static_Render.
 SD_SShaderTypeData_Grass_Static SD_gGrassTypeData;
-f32 SD_gafGrassTexGen[2][4];
-f32 SD_gafGrassFade[2][4];
-f32 SD_gafGrassRowOffset[8];
-f32 SD_gafGrassSwayStep[4];
-f32 SD_gavGrassSway[16][4];
+f32 SD_gafGrassTexGen[2][4];    // the top texture's s, t = [0][0..1] + x, z * [1][0..1]
+f32 SD_gafGrassFade[2][4];      // the fade = [0][3] + distance * [1][3], held to 0..1
+f32 SD_gafGrassRowOffset[8];    // added to the blade texture's s, by a vertex's row % 8
+f32 SD_gafGrassSwayStep[4];     // the sway step along x, 1/16, along z, 16: never read
+f32 SD_gavGrassSway[16][4];     // the 16 sway offsets of the upper vertices, taken in turn
 
 SD_SShaderTypeData_Grass_Static* SD_gpGrassTypeData = &SD_gGrassTypeData;
 
@@ -30,8 +36,7 @@ void GrassPacket_ClipPointAt(f32* pA, f32* pB, f32* pOut, int bAlongZ, f32 fAt);
 void GrassPacket_vFlushRow(void);
 void GrassPacket_vAddVert(f32* pPos, int nInRow);
 void GrassPacket_GetRowPoint(f32 (*aPoints)[3], u8* aFlags, f32* pOut, u16 nIndex, u8 nStep, u8* pFlag,
-                             int bAlongX,
-                 f32 fAt);
+                             int bAlongX, f32 fAt);
 void GrassPacket_vBeginPacket(GrassWord** ppStart);
 void SD_vShaderObject_Grass_Static_Render(SD_SShaderObject_Static* pObject);
 GrassWord* GrassPacket_pGetNextAvailableVertSlot(void);
@@ -354,8 +359,7 @@ void GrassPacket_vAddVert(f32* pPos, int nInRow) {
 // step of 0, & 4 otherwise. A nonzero flag makes SD_vShaderObject_Grass_Static_Init switch its
 // strip side.
 void GrassPacket_GetRowPoint(f32 (*aPoints)[3], u8* aFlags, f32* pOut, u16 nIndex, u8 nStep, u8* pFlag,
-                             int bAlongX,
-                 f32 fAt) {
+                             int bAlongX, f32 fAt) {
     u16 nOther = 1 + nIndex + nStep;
     f32 fT;
     f32 fLen;
@@ -543,8 +547,9 @@ void SD_vShaderObject_Grass_Static_Render(SD_SShaderObject_Static* pObject) {
             fTexT = pVert[2].f * SD_gafGrassTexGen[1][1] + SD_gafGrassTexGen[0][1];
             for (nPass = 0; nPass < 2; nPass++) {
                 if (nPass == 1) {
-                    GrassShader_GXPosition3f32(pVert[0].f + SD_gavGrassSway[nWind][0], pVert[1].f + pParams->f20,
-                                pVert[2].f + SD_gavGrassSway[nWind][2]);
+                    GrassShader_GXPosition3f32(pVert[0].f + SD_gavGrassSway[nWind][0],
+                                               pVert[1].f + pParams->f20,
+                                               pVert[2].f + SD_gavGrassSway[nWind][2]);
                     fBladeT = 0.025f;
                     nWind = (nWind + 1) & 15;
                 } else {

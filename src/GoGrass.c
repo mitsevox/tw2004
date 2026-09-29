@@ -1,5 +1,13 @@
-// GoGrass.c (EA's name, from its asserts; TW06): not yet decompiled; the sweep code below is the
-// matched small functions.
+// GoGrass.c (EA's name, from its asserts; TW06 has gograss.c): the grass manager, the tufts of
+// grass drawn near the camera. It loads the hole's grass file (the 'gras' stream chunk: a grid of
+// 2.5 x 2.5 cells over the hole, each cell pointing at a record of shell rows) and keeps 16 vertex
+// buffers of built grass. Each frame, per view (gomainloop, one full-screen view only), before the
+// hole is drawn: the grid cells around the point ahead of the camera that are in view get a buffer,
+// built by the grass shader object (GoShaderObject_Grass_Gc.c, shader type 17) and sorted farthest
+// first, and the terrain's grass is rendered from above into a 256 x 256 texture (Ter_RenderGrass)
+// that colours the blades. After the hole is drawn the buffers are drawn with the shader's
+// parameters (sway, fade with distance). fn_80112B80 turns the grass off in split screen and with
+// four players (three on course 14's hole 11).
 
 #include "game_types.h"
 #include "platform.h"
@@ -12,18 +20,16 @@
 // fake match: EA's .bss has 4 zero bytes before gGrassMgr and 0x10 after gGrassCellMeshInfo's 0x90
 // (gGrassCellMesh on a 32-byte boundary), which these types alone do not make; the aligned
 // attributes stand in for them (a larger EA type, or objects no code uses).
-GrassManager gGrassMgr __attribute__((aligned(8)));
-GXTexObj gGrassTopTexObj;
-UObjMesh gGrassCellMesh __attribute__((aligned(32)));
-UObjMeshInfo gGrassCellMeshInfo;
+GrassManager gGrassMgr __attribute__((aligned(8)));    // the grass manager (TW06: Grass_SGrassMgr)
+GXTexObj gGrassTopTexObj;                                // the top texture (Grass_CreateTopTexture)
+UObjMesh gGrassCellMesh __attribute__((aligned(32)));   // culls each grid cell's bounding sphere
+UObjMeshInfo gGrassCellMeshInfo;                         // gGrassCellMesh's info (the sphere)
 
 GrassManager* gpGrassMgr = &gGrassMgr;
 
 // This file's .sbss (grassshader.h), in reverse address order as the compiler lays it out.
-s32   gbGrassFrameSkipped;
-void* gpGrassTopTexBuf;
-
-// ---- sweep code (not yet cleaned up) ----
+s32   gbGrassFrameSkipped;  // set once Grass_UpdateView has skipped the first frame after load
+void* gpGrassTopTexBuf;     // the 256 x 256 top texture's pixels (Grass_CreateTopTexture)
 
 void Grass_InitModule(void);
 void Grass_UpdateView(void);
@@ -74,12 +80,16 @@ void Grass_ReleaseQueued(void);
 void Grass_FreeBuffers(void);
 
 // The grass's draw data.
-char gGrassTextureNames[4][8] = {"akgras1", "akgras2", "akgras3", "akgras4"}; // textures, by n3A4
-f32 gGrassTopClearColor[4] = {0.21f, 0.31f, 0.1f, 1.0f};                   // a colour (Grass_RenderTopTexture)
-f32 gGrassTopQuad[8] = {0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f}; // the unit square's corners
-f32 gGrassDebugColor[4] = {0.5f, 0.5f, 0.5f, 0.5f};                        // a colour (Grass_DrawTopTextureDebug)
-f32 gGrassDebugQuadPos[8] = {0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 0.5f, 1.0f, 1.0f}; // (Grass_DrawTopTextureDebug)
-f32 gGrassDebugQuadUV[8] = {0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f}; // (Grass_DrawTopTextureDebug)
+// the blade textures, picked by n3A4 (GrassRender_vBuildAndUploadOneTimeData)
+char gGrassTextureNames[4][8] = {"akgras1", "akgras2", "akgras3", "akgras4"};
+// the top texture's background colour (Grass_RenderTopTexture)
+f32 gGrassTopClearColor[4] = {0.21f, 0.31f, 0.1f, 1.0f};
+// the full-view quad's corners, its positions and texture coordinates (Grass_RenderTopTexture)
+f32 gGrassTopQuad[8] = {0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f};
+// Grass_DrawTopTextureDebug's colour, the quad's positions and its texture coordinates
+f32 gGrassDebugColor[4] = {0.5f, 0.5f, 0.5f, 0.5f};
+f32 gGrassDebugQuadPos[8] = {0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 0.5f, 1.0f, 1.0f};
+f32 gGrassDebugQuadUV[8] = {0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f};
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0f (0x80284A30), before the 4.9f Grass_InitModule uses first; its body is unknown.
@@ -313,9 +323,10 @@ void Grass_UpdateView(void) {
 // (Grass_DrawBuffers), states back (Grass_EndRender), and the top texture's debug view when n3CC is
 // set (never, in this build).
 void Grass_Render(void) {
-    // port: EA's GoGrass.c saw GolfCamera_bIs3ScreenCamOn as returning int (its result is not masked here); it
-    //       returns u8
-    if (gpGrassMgr->p370 != NULL && gpGrassMgr->n3E0 != 0 && ((int (*)(void))GolfCamera_bIs3ScreenCamOn)() == 0) {
+    // port: EA's GoGrass.c saw GolfCamera_bIs3ScreenCamOn as returning int (its result is not
+    //       masked here); it returns u8
+    if (gpGrassMgr->p370 != NULL && gpGrassMgr->n3E0 != 0 &&
+        ((int (*)(void))GolfCamera_bIs3ScreenCamOn)() == 0) {
         Grass_BeginRender();
         Grass_DrawBuffers();
         Grass_EndRender();
@@ -831,8 +842,6 @@ void Grass_ReleaseQueued(void) {
     }
 }
 
-// ---- end of sweep code ----
-
 // Makes the 16 grass buffers and their lists, all free: the first four hold 600 vertices, the rest
 // 450. Returns the bytes allocated.
 s32 Grass_AllocBuffers(void) {
@@ -869,8 +878,6 @@ s32 Grass_AllocBuffers(void) {
     return nBytes;
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
 // The partner of Grass_AllocBuffers: each buffer's vertices, then the lists and the buffers.
 void Grass_FreeBuffers(void) {
     int i;
@@ -884,8 +891,6 @@ void Grass_FreeBuffers(void) {
     StaticMem_Free(gpGrassMgr->apD8);
 }
 
-s32 Grass_IsLoaded(void);
-
 // Whether the hole has its grass file loaded (GoGolfCam asks, for the lie-based camera height).
 s32 Grass_IsLoaded(void) {
     return gpGrassMgr->p370 != NULL;
@@ -896,7 +901,7 @@ f32 Grass_Fmod(f32 fX, f32 fM) {
     return fmod(fX, fM);
 }
 
-// pOut = pB + pA, three floats (paired singles).
+// Adds the three floats of pA and pB into pOut, with paired singles.
 #ifdef __MWERKS__
 asm void Grass_Vec3Add(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
@@ -923,5 +928,3 @@ void Grass_Vec3Add(f32* pA, f32* pB, f32* pOut) {
 Sphere* Grass_GetObjBoundingSphere(RenderObj* pObj) {
     return &pObj->data->bounds;
 }
-
-// ---- end of sweep code ----
