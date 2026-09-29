@@ -1,4 +1,9 @@
-// SitDevMisc.c (EA file, TW06/TW07): own unit, its .sbss is padded to 8 at 0x80282201..0x80282208
+// SitDevMisc.c (EA's name: TW06's and TW07's Golf\SitDev\SitDevMisc.c; TW07 has these functions
+// in this order): the commentary scripts' odds and ends. The struck ball they watch
+// (SitDev_SetBallHitTime at the hit; each frame SitDev_ThrowBallHitDelayedEvent raises event 75
+// 48 frames in and notes the cup bevel), the emotion flags response kinds 12 and 13 set, drawing
+// from a response list without repeats, and two values the scripts test (the tour event place
+// band, the game mode bit). Own unit; its .sbss is padded to 8 at 0x80282201..0x80282208.
 
 #include "game_types.h"
 #include "engine.h"
@@ -8,18 +13,20 @@
 #include "game/modes/pgatoursim.h"
 #include "game/modes/pgatour.h"
 
+// Per game mode: the number of the scripts' mode bit (SitDev_TranslateGameMode), -1 for none.
 s32 gSitDevGameModeBits[28] = {
     0, 1, 2, 3, 4, 5, -1, -1, -1, -1, -1, 6, -1, -1, -1, -1, -1, -1, 7, 8, 9, 10, 11, 12, 13, 14,
     -1, 0,
 };
 
 // Defined here, last address first (CodeWarrior lays out .sbss in reverse).
-u8    gSitDevCupBevelFlag;     // 0x80282200  the watched ball has reached surface 105
-Ball* gSitDevBallThatWasHit;     // 0x802821FC  the watched ball, NULL for none
-u32   gSitDevBallHitTime;     // 0x802821F8  gSession.nFrameCount when it started
+u8    gSitDevCupBevelFlag;      // 0x80282200  the watched ball has lain on surface 105 (the cup
+                                //             bevel) this shot
+Ball* gSitDevBallThatWasHit;    // 0x802821FC  the watched ball, NULL for none
+u32   gSitDevBallHitTime;       // 0x802821F8  gSession.nFrameCount when it was struck
 
-s32 gSitDevPredictedEmotionSet[5];
-s32 gSitDevEmotionSet[5];
+s32 gSitDevPredictedEmotionSet[5];  // per player: 1 when response kind 13 set the predicted emotion
+s32 gSitDevEmotionSet[5];           // per player: 1 when response kind 12 set the shot's emotion
 
 // ---- the watched ball ----------------------------------------------------------------------
 
@@ -76,8 +83,9 @@ void SitDev_SetBallHitTime(Ball* pBall) {
     gSitDevBallHitTime = gSession.nFrameCount;
 }
 
-// Forgets, for all five players, that the scripts set the shot's emotion (gSitDevEmotionSet, response
-// kind 12) or its predicted emotion (gSitDevPredictedEmotionSet, kind 13): situation events 2, 3 and 25.
+// Forgets, for all five players, that the scripts set the shot's emotion (gSitDevEmotionSet,
+// response kind 12) or its predicted emotion (gSitDevPredictedEmotionSet, kind 13): situation
+// events 2, 3 and 25.
 void SitDev_ClearEmotionStates(void) {
     int i;
     for (i = 0; i < 5; i++) {
@@ -167,8 +175,8 @@ int SitDev_GetPGARank(int nPlayer) {
     return nRank <= 25 ? 2 : 3;
 }
 
-// The game mode as the scripts' mode bit (state value 54): 1 << gSitDevGameModeBits[nMode], 0 for a mode
-// the table gives -1.
+// The game mode as the scripts' mode bit (state value 54): 1 << gSitDevGameModeBits[nMode], 0 for
+// a mode the table gives -1.
 u16 SitDev_TranslateGameMode(int nMode) {
     s32 nBit = gSitDevGameModeBits[nMode];
     return nBit == -1 ? 0 : 1 << nBit;

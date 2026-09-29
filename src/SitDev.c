@@ -1,9 +1,11 @@
 // SitDev.c (EA's name: TW07's Golf\SitDev\SitDev.c has these functions in this order): the core
 // of the commentary scripts ("situation development"). The state block every SitDev file reaches
 // through gpSitDevData, set up at round start and freed at round end, the loaders of a hole's
-// commentary zones and scripts, and the queue of events the situation scripts (SitDevFile.c) react
-// to: event.c's handlers queue each moment of a shot (SitDev_QueueEvent), and
-// SitDev_ProcessEventQueue runs every script whose event came up, then empties the queue.
+// commentary zones and scripts, and the queue of events the situation scripts (SitDevFile.c loads
+// them) react to: event.c's handlers queue each moment of a shot (SitDev_QueueEvent), and
+// SitDev_ProcessEventQueue runs every script whose event came up, then empties the queue. It ends
+// with _SetStateVecAndCondition, which stores each state value the scripts test (TW07 has it as an
+// inline in SitDevStateVector.h), and a vector subtract.
 
 #include "game_types.h"
 #include "engine.h"
@@ -21,13 +23,18 @@ void SitDev_SetupStateVector(int nPlayer, u8 nEvent);
 void SitDev_ClearCupBevelFlag(void);
 void SitDev_ClearEmotionStates(void);
 u8   SitDev_ConditionsMatch(SitDevEntry* pEntry, SitDevData* pData, int nPlayer);
-void SitDev_InvokeMultipleActions(SitDevEntry* pEntry, int nSit, int nPlayer, u8 nEvent);
+void SitDev_InvokeMultipleActions(SitDevEntry* pEntry, int nFile, int nPlayer, u8 nEvent);
 void SitDev_Vec3Sub(f32* pA, f32* pB, f32* pOut);
 
 // .sbss, defined in reverse address order
-u8 gSitDevBreaklinePassedCupQueued;    // event 26 has been queued since the last event 2 or 3
-u8 gSitDevPredictionPending;
-u8 gSitDevPredictionVoiced;
+u8 gSitDevBreaklinePassedCupQueued;    // situation event 26 (the putt's break line passed the cup)
+                                       // has been queued since the last event 2 or 3
+u8 gSitDevPredictionPending;    // set as a situation for event 29 (the look-ahead ball's first
+                                // bounce) that tests value 64 runs; SitDev_InvokeMultipleActions
+                                // clears it after the run
+u8 gSitDevPredictionVoiced;     // such a situation's actions played something: a line about where
+                                // the look-ahead ball lands. State value 87 is it and a lie class
+                                // other than gSitDevPredictedHitClass. Cleared at every shot set-up
 
 // Round start (GO_vInitIG): clears the commentary scripts' state block (SitDevData: no line played,
 // no events queued), registers the loader for a hole's commentary zones (course chunk 5,
@@ -51,7 +58,8 @@ void SitDev_vCloseModule(void) {
     gpSitDevScripts = NULL;
 }
 
-// Before a hole loads (fn_8006F4F0): no commentary zones yet (the count SitDev_NetworkLoadCallback adds to).
+// Before a hole loads (fn_8006F4F0): no commentary zones yet (the count
+// SitDev_NetworkLoadCallback adds to).
 void SitDev_vInitBeforeHole(void) {
     gSitDevNumCommentaryZones = 0;
 }
@@ -74,13 +82,14 @@ void SitDev_vUnregisterStreamClients(void) {
 // nothing); event.c's handlers call it, and a is not read. Some events are filtered: 30 (the
 // flyover) is dropped in custom, random, dream and regional rounds; 27 (a tree hit) once the ball
 // has collided; 26 (the putt's break line passed the cup) after the first since the last event 2 or
-// 3. Event 3 (the shot set-up) also clears the prediction flag (gSitDevPredictionVoiced), the group flags
-// (SitDev_ClearGroupFlags), the cup bevel flag and the watched ball, then goes on as event 2 (a turn begins:
-// 26 may come again), then as event 25 (just before the swing): the emotion states are cleared, and
-// the event is dropped when an event 8, 9, 10 or 11 is queued already. The first event of a frame
-// fills in the state values for its player (SitDev_SetupStateVector); for events 20 and 29 (the
-// look-ahead ball worked out, its first bounce) values 18 and 19 then become the level distance, in
-// inches, from the shot's start to the look-ahead ball.
+// 3. Event 3 (the shot set-up) also clears the prediction flag (gSitDevPredictionVoiced), the
+// group flags (SitDev_ClearGroupFlags), the cup bevel flag and the watched ball, then goes on as
+// event 2 (a turn begins: 26 may come again), then as event 25 (just before the swing): the emotion
+// states are cleared, and the event is dropped when an event 8, 9, 10 or 11 is queued already. The
+// queue's ten slots are not checked. The first event of a frame fills in the state values for its
+// player (SitDev_SetupStateVector); for events 20 and 29 (the look-ahead ball worked out, its first
+// bounce) values 18 and 19 then become the level distance, in inches, from the shot's start to the
+// look-ahead ball.
 void SitDev_QueueEvent(int nPlayer, int a, u8 nEvent) {
     int nWho;
     SitDevEvent* pEvent;
@@ -154,20 +163,21 @@ void SitDev_QueueEvent(int nPlayer, int a, u8 nEvent) {
 // state value 0 is set again to the hole number (not for script file 22), and if its conditions
 // hold (SitDev_ConditionsMatch) and its group (n0; 0 for none) has not fired, the group is marked
 // and its actions run (SitDev_InvokeMultipleActions) for that player. A situation for event 29 that
-// tests value 64 (what the look-ahead ball hit) sets the prediction flags (gSitDevPredictionVoiced, gSitDevPredictionPending) first.
-// Afterwards, when an event 33 (the shot is over) was seen and the scripts set no emotion for its
-// player (gSitDevEmotionSet), the player's shot outcome is recorded as 5 (fn_8006AAB4).
+// tests value 64 (what the look-ahead ball hit) sets the prediction flags (gSitDevPredictionVoiced,
+// gSitDevPredictionPending) first. Afterwards, when an event 33 (the shot is over) was seen and the
+// scripts set no emotion for its player (gSitDevEmotionSet), the player's shot outcome is recorded
+// as 5 (fn_8006AAB4).
 void SitDev_ProcessEventQueue(void) {
     int i;
     int j;
     SitDevEntry* pEntry;
-    int nPlayer33;
+    int nEmotionPlayer;
     SitDevEvent* pEvent;
     SitDevData* pData;
     u8 bFound;
     u8 nEvent;
 
-    nPlayer33 = 5;
+    nEmotionPlayer = 5;
     if (gpSitDevData->n13C == 0) {
         return;
     }
@@ -179,7 +189,7 @@ void SitDev_ProcessEventQueue(void) {
         for (j = 0; j < pData->n13C; j++) {
             pEvent = &pData->aEvents[j];
             if (pEvent->nEvent == 33) {
-                nPlayer33 = pEvent->nPlayer;
+                nEmotionPlayer = pEvent->nPlayer;
             }
             if ((pEntry->nEvent == pEvent->nEvent || pEntry->nEvent == 0) &&
                 pEvent->nPlayer == pData->aEvents[0].nPlayer) {
@@ -204,8 +214,8 @@ void SitDev_ProcessEventQueue(void) {
             }
         }
     }
-    if (nPlayer33 != 5 && gSitDevEmotionSet[nPlayer33] == 0) {
-        fn_8006AAB4(nPlayer33, 5);
+    if (nEmotionPlayer != 5 && gSitDevEmotionSet[nEmotionPlayer] == 0) {
+        fn_8006AAB4(nEmotionPlayer, 5);
     }
     gpSitDevData->n13C = 0;
 }

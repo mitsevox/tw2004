@@ -1,4 +1,7 @@
-// SitDevCommentaryZones.c (EA file, TW06/TW07): own unit, its .sbss starts 8-aligned at 0x80282210
+// SitDevCommentaryZones.c (EA's name: TW06's and TW07's SitDevCommentaryZones.c; these two are
+// TW07's first and last functions there): a hole's commentary zones, outlines that course chunk
+// 5 brings, and the test of which of them a point is in (state value 79). Own unit; its .sbss
+// starts 8-aligned at 0x80282210.
 
 #include "game_types.h"
 #include "engine.h"
@@ -8,8 +11,8 @@
 #include "game/modes/pgatoursim.h"
 #include "game/modes/pgatour.h"
 
-SitDevZone* gSitDevCommentaryZones[10];
-s32 gSitDevNumCommentaryZones;
+SitDevZone* gSitDevCommentaryZones[10];    // the hole's zones, as loaded
+s32 gSitDevNumCommentaryZones;             // how many; zeroed before each hole loads
 
 // The course loader for chunk 5 of a hole (registered by SitDev_vInitModule): adds the chunk, one
 // commentary zone (its outline network, then its bits), to the hole's zones. The ten slots of

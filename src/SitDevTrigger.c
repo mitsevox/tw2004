@@ -1,4 +1,10 @@
-// SitDevTrigger.c (EA file, TW06/TW07): own unit, its .data starts at 0x801912D0 (4 pad bytes at 0x801912CC)
+// SitDevTrigger.c (EA's name: TW06's and TW07's SitDevTrigger.c; TW07 has these functions in this
+// order): running a matched situation's actions. Each action fires by its chance unless it is held
+// back; a sound action plays a line drawn from its bank, any other plays its responses, one per
+// kind: commentary lines, crowd reactions, GameBreakers, the golfer's emotions. Its tail is the
+// inlines it uses from TW07's GameEffects.h and GameAudio.h: the lines and crowd reaction kept for
+// a GameBreaker's end, and two commentary playlists. Own unit; its .data starts at 0x801912D0 (4
+// pad bytes at 0x801912CC).
 
 #include "game_types.h"
 #include "engine.h"
@@ -13,7 +19,7 @@ int SitDev_NumEntriesUnused(u16* pList, int nCount);
 u32 SitDev_ChooseRandomResponseNoRepeat(u16* pList, int nCount, int nLeft, u32 nPick);
 
 void GameEffects_SetPostGBNegativeCommentary(int nSound);
-void GameEffects_SetPostGBCrowdLevel(u8 nMusic);
+void GameEffects_SetPostGBCrowdLevel(u8 nCrowdLevel);
 void GameEffects_SetPostGBCommentary(u16 uSound);
 void Gaud_StartPlaylist2Comment(int nSound, int a);
 
@@ -21,16 +27,16 @@ void Gaud_StartPlaylist2Comment(int nSound, int a);
 
 u8   SitDev_InvokeCommentaryBank(SitDevAction* pAction, u8 nEvent);
 u8   SitDev_InvokeAction(SitDevAction* pAction, int nPlayer, u8 nEvent);
-u8   SitDev_SuppressAction(SitDevAction* pAction, int nSit, int nPlayer, u8 nEvent);
+u8   SitDev_SuppressAction(SitDevAction* pAction, int nFile, int nPlayer, u8 nEvent);
 void SitDev_TriggerResponse(SitDevEntry8* pDo, int nPlayer, u8 nEvent);
 
 // Runs a matched situation's actions for the player (up to four, to the first 0xFFF0): each fires
 // by its percent chance unless SitDev_SuppressAction holds it back, a sound action through
-// SitDev_InvokeCommentaryBank, any other through SitDev_InvokeAction. nSit is the situation's
-// script file (the top five bits of b2). Afterwards, when the prediction flags were set for this
-// run (gSitDevPredictionPending) and the last action tried played nothing, the prediction counts as not voiced
-// (gSitDevPredictionVoiced cleared); gSitDevPredictionPending is cleared either way.
-void SitDev_InvokeMultipleActions(SitDevEntry* pEntry, int nSit, int nPlayer, u8 nEvent) {
+// SitDev_InvokeCommentaryBank, any other through SitDev_InvokeAction. nFile is the situation's
+// script file (b2's n5 field). Afterwards, when the prediction flags were set for this
+// run (gSitDevPredictionPending) and the last action tried played nothing, the prediction counts as
+// not voiced (gSitDevPredictionVoiced cleared); gSitDevPredictionPending is cleared either way.
+void SitDev_InvokeMultipleActions(SitDevEntry* pEntry, int nFile, int nPlayer, u8 nEvent) {
     int i;
     SitDevAction* pAction;
     u8 bPlayed = 0;
@@ -38,7 +44,7 @@ void SitDev_InvokeMultipleActions(SitDevEntry* pEntry, int nSit, int nPlayer, u8
         if (pEntry->aActions[i] == 0xFFF0) break;
         pAction = &gpSitDevScripts->p18[pEntry->aActions[i]];
         if (pAction->nChance > Misc_RandFunc(1) % 100
-            && !SitDev_SuppressAction(pAction, nSit, nPlayer, nEvent)) {
+            && !SitDev_SuppressAction(pAction, nFile, nPlayer, nEvent)) {
             if (pAction->bSound) {
                 bPlayed = SitDev_InvokeCommentaryBank(pAction, nEvent);
             } else {
@@ -168,16 +174,16 @@ u8 SitDev_InvokeAction(SitDevAction* pAction, int nPlayer, u8 nEvent) {
 // (PlayNow_IsChallengeRunning; file 22 only for a ball not on lie 0). Situation events 20 and 31
 // while a GameBreaker is up, except script file 2. Commentary actions (kinds 1 and 2) during a
 // replay, in modes 6 to 8, when GM_Currently_SkillZoneMode says so, and in mode 11.
-u8 SitDev_SuppressAction(SitDevAction* pAction, int nSit, int nPlayer, u8 nEvent) {
+u8 SitDev_SuppressAction(SitDevAction* pAction, int nFile, int nPlayer, u8 nEvent) {
     int nMode = Game_GetMode();
-    if (nSit == 22 || nSit == 21) {
+    if (nFile == 22 || nFile == 21) {
         if (gpGame->bCustomRound || gpGame->bRandom18 || gpGame->bDream18 || gpGame->nRegionalRound) return 1;
         if (PlayNow_IsChallengeRunning()) {
-            if (nSit == 21) return 1;
-            if (nSit == 22 && gPlayers[nPlayer].ball.nLie != 0) return 1;
+            if (nFile == 21) return 1;
+            if (nFile == 22 && gPlayers[nPlayer].ball.nLie != 0) return 1;
         }
     }
-    if (gGameEffects.bGameBreaker && (nEvent == 20 || nEvent == 31) && nSit != 2) return 1;
+    if (gGameEffects.bGameBreaker && (nEvent == 20 || nEvent == 31) && nFile != 2) return 1;
     if (pAction->nKind != 1 && pAction->nKind != 2) return 0;
     if (gSession.bReplay || (u32)(nMode - 6) <= 2 || GM_Currently_SkillZoneMode()) return 1;
     if (!PlayNow_IsChallengeRunning() && nMode != 11) return 0;
@@ -271,9 +277,9 @@ void GameEffects_SetPostGBNegativeCommentary(int nSound) {
 
 // Keeps a crowd reaction (gGameEffects.nCrowdReaction) for the end of a scripted GameBreaker the
 // shot did not achieve (GameEffects_EndGameBreaker).
-void GameEffects_SetPostGBCrowdLevel(u8 nMusic) {
+void GameEffects_SetPostGBCrowdLevel(u8 nCrowdLevel) {
     gGameEffects.bCrowdReactionSet = 1;
-    gGameEffects.nCrowdReaction = nMusic;
+    gGameEffects.nCrowdReaction = nCrowdLevel;
 }
 
 // Keeps a commentary line for the end of a GameBreaker that works (gGameEffects.u4C: a predicted

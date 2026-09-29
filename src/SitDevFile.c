@@ -1,7 +1,10 @@
-// SitDevFile.c (EA's name, from its asserts; TW06): a watcher that follows the ball after a shot
-// (an event 48 frames in, a call when it reaches surface 105), the loading of the situation
-// scripts (gpSitDevScripts; their state is in the block gpSitDevData points at, sitdev.h), the values
-// the scripts test, and running the scripts' actions (commentary lines, sounds, music).
+// SitDevFile.c (EA's name, from its asserts; TW06's and TW07's SitDevFile.c): loading the
+// situation scripts. SitDev_LoadScripts takes the hole stream's 'sscr' chunk: a header
+// (SitDevScripts, gpSitDevScripts) and its tables, the situations (p14; TW07's Situation), their
+// actions (p18; Action), the responses (p1C; Response) and 16-byte names (p20). The chunk is
+// little-endian: the first load byte-swaps it in place (the layouts below) and turns the header's
+// offsets into pointers. The scripts' run-time state is the block gpSitDevData points at
+// (SitDev.c).
 
 #include "game_types.h"
 #include "engine.h"
@@ -11,6 +14,7 @@
 #include "game/modes/pgatoursim.h"
 #include "game/modes/pgatour.h"
 
+// The byte-swap layouts (ByteSwap_Records) of the header, a situation, an action and a response.
 SwapField gSitDevHeaderSwap[9] = {
     {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4},
 };
@@ -24,7 +28,8 @@ SwapField gSitDevResponseSwap[4] = {
     {1, 1}, {1, 1}, {2, 2}, {4, 4},
 };
 
-SitDevScripts* gpSitDevScripts;
+SitDevScripts* gpSitDevScripts;    // the loaded scripts' header; NULL until the first load and
+                                   // again after SitDev_vCloseModule
 
 void SitDev_BeginLoadScripts(void);
 
@@ -73,9 +78,9 @@ void SitDev_SwapHeader(void) {
 }
 
 // Byte-swaps the scripts' tables in place: the situations (p14), actions (p18) and responses (p1C)
-// by their layouts (gSitDevSituationSwap, gSitDevActionSwap, gSitDevResponseSwap), and the p20 block. Then stores each
-// situation's and response's b2 halfword back as its two bit-fields (the low 11 bits and the top
-// 5).
+// by their layouts (gSitDevSituationSwap, gSitDevActionSwap, gSitDevResponseSwap), and the p20
+// block. Then stores each situation's and response's b2 halfword back as its two bit-fields (the
+// low 11 bits and the top 5).
 void SitDev_SwapTables(void) {
     void* pSrc;
     void* pDst;

@@ -1,4 +1,10 @@
-// SitDevStateVector.c (EA file, TW06/TW07): own unit, its .sbss starts 8-aligned at 0x80282218
+// SitDevStateVector.c (EA's name: TW06's and TW07's SitDevStateVector.c; TW07 has
+// SitDev_ConditionsMatch, SitDev_SetupClubCondition, SitDev_SetupStateVector, modifyFinalLie and
+// modifyInitialLie in this order): the state vector, the values the scripts test (the round, the
+// golfer, the shot, the ball, the hole), filled in at each frame's first situation event, and the
+// test of a situation's conditions against it. Its tail: the weather-change value and the game
+// mode's answers the vector asks for (GM_ functions TW07 has as inlines). Own unit; its .sbss
+// starts 8-aligned at 0x80282218.
 
 #include "game_types.h"
 #include "engine.h"
@@ -8,7 +14,8 @@
 #include "game/modes/pgatoursim.h"
 #include "game/modes/pgatour.h"
 
-u32 gSitDevPredictedHitClass;
+u32 gSitDevPredictedHitClass;   // at situation event 29 (the look-ahead ball's first bounce): the
+                                // class of what that ball hit (state value 64)
 
 u8  SitDev_GetCupBevelFlag(void);
 int SitDev_GetPGARank(int nPlayer);
@@ -148,8 +155,9 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
     case 26:
     case 30:
         nMode = Game_GetMode();
-        _SetStateVecAndCondition(pValues, 1, (int)nMode, pSetBits);                  // fake match: (int) re-masks
-        _SetStateVecAndCondition(pValues, 54, (int)SitDev_TranslateGameMode(nMode), pSetBits);    // fake match: (int) re-masks
+        // fake match: the (int) casts of the next two values re-mask them
+        _SetStateVecAndCondition(pValues, 1, (int)nMode, pSetBits);
+        _SetStateVecAndCondition(pValues, 54, (int)SitDev_TranslateGameMode(nMode), pSetBits);
         _SetStateVecAndCondition(pValues, 60, GM_OnFirstSelectedHole(), pSetBits);
         _SetStateVecAndCondition(pValues, 0, Game_GetCurHoleNum() + 1, pSetBits);
         _SetStateVecAndCondition(pValues, 30, Game_GetCourse(), pSetBits);
@@ -284,7 +292,8 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
         nValue = SurfaceType_IsValid(nSurface) ? gSurfaceTypes[pBall->nSurface].nClass : -1;
         modifyFinalLie(&nValue, pBall->nSurface, pBall, pPlayer);
         _SetStateVecAndCondition(pValues, 22, nValue, pSetBits);
-        _SetStateVecAndCondition(pValues, 87, gSitDevPredictionVoiced && gSitDevPredictedHitClass != nValue, pSetBits);
+        _SetStateVecAndCondition(pValues, 87, gSitDevPredictionVoiced && gSitDevPredictedHitClass != nValue,
+                                 pSetBits);
         _SetStateVecAndCondition(pValues, 25, (s32)(36.0f * pBall->fClosest), pSetBits);
         _SetStateVecAndCondition(pValues, 26, (s32)(36.0f * fn_800D04E0(nPlayer)), pSetBits);
         nValue = fn_800D0514(nPlayer);
