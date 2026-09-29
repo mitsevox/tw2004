@@ -1142,7 +1142,7 @@ void Ter_DrawFarClipPatches(void) {
     }
     if (bAny) {
         Ter_SetZWrite(0);
-        pLens = ((Camera*)*lbl_80280DF0)->unk10;
+        pLens = ((Camera*)*gppCurrentRenderCtx)->unk10;
         fAC = fn_80014268((u8*)pLens);
         Camera_SetLensFarClip((u8*)pLens, 25.0f + fAC);
         RC_UpdateCurrentScreenMatrices();
@@ -2441,25 +2441,25 @@ void LF_SetFogSettings(TerSettings* pSettings);
 
 // Gives the current render camera the model matrix pMtx (NULL: the identity).
 void RC_vSetCurrentRenderCtxTransformationMatrix(f32 (*pMtx)[4]) {
-    RC_vSetRenderCtxTransformationMatrix(*lbl_80280DF0, pMtx);
+    RC_vSetRenderCtxTransformationMatrix(*gppCurrentRenderCtx, pMtx);
 }
 
 // The current render context's viewport, its screen rectangle as fractions of the frame buffer
 // (RC_spGetRenderCtxViewport).
 f32* RC_spGetCurrentRenderCtxViewport(void) {
-    return RC_spGetRenderCtxViewport(*(void**)lbl_80280DF0);
+    return RC_spGetRenderCtxViewport(*(void**)gppCurrentRenderCtx);
 }
 
 // Works out the current render context's transformation matrices again
 // (RC_vUpdateRenderCtxTransformationMatrices).
 void RC_vUpdateCurrentRenderCtxTransformationMatrices(void) {
-    RC_vUpdateRenderCtxTransformationMatrices(*(void**)lbl_80280DF0);
+    RC_vUpdateRenderCtxTransformationMatrices(*(void**)gppCurrentRenderCtx);
 }
 
 // Works out the current render camera's screen values and projection again
 // (RC_vUpdateRenderCtxScreenMatricesAndInfo).
 void RC_UpdateCurrentScreenMatrices(void) {
-    fn_80013D68(*(s32*)((u8*)lbl_80280DF0));
+    fn_80013D68(*(s32*)((u8*)gppCurrentRenderCtx));
 }
 
 // Updates the fog for this frame: blends the fog colour for the camera's heading

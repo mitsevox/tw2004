@@ -3711,7 +3711,7 @@ f32 Camera_GetLensFovScale(CamLens* pLens) {
 
 // The current render camera's lens.
 CamLens* Camera_GetCurrentLens(void) {
-    return Camera_GetLens(*lbl_80280DF0);
+    return Camera_GetLens(*gppCurrentRenderCtx);
 }
 
 // The time into the clip of its SKA tag (timed event) uEvent, 0 when the clip has none. Tag 2 is

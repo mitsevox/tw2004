@@ -322,7 +322,7 @@ void RenderState_SetTexCoordGen(s32 nCoord, s32 nFunc, s32 nSrc, s32 nMtx) {
 // The current render context: the render camera being drawn with, as RC_vSetCurrentRenderCtx set
 // it.
 void* RC_spGetCurrentRenderCtx(void) {
-    return *lbl_80280DF0;
+    return *gppCurrentRenderCtx;
 }
 
 // Loads TEV constant colour 0 with the alpha nAlpha (RenderState_Apply: nConstantAlpha

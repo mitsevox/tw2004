@@ -401,7 +401,7 @@ void UI_Obj_DrawSpinModel(void) {
 // Make pLens the current render context's lens (GoRenderCtx_Gc.c fn_80013E38).
 void UI_Obj_SetCurrentRenderCtxLens(CamLens* pLens) {
     // port: fn_80013E38 (GoRenderCtx_Gc.c, still sweep code) takes the lens as an s32
-    fn_80013E38((u8*)*lbl_80280DF0, (s32)pLens);
+    fn_80013E38((u8*)*gppCurrentRenderCtx, (s32)pLens);
 }
 
 // Draw the mesh's current part, if it is used (UObject.c's Object_DrawMesh again).

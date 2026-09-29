@@ -22,11 +22,11 @@ f32 fn_80014270(u8* p);
 f32 Math_Tan(f32 x0);
 
 // This file's .sbss (engine.h), in reverse address order as the compiler lays it out.
-s8    lbl_80281C98;
-void* lbl_80281C90[2];          // 8 bytes in the DOL (lbl_80281C98 follows at +8); only [0] is used
+s8    gnInputControlSet;
+void* gapCurrentRenderCtx[2];   // 8 bytes in the DOL (gnInputControlSet follows at +8); only [0] is used
 
 // This file's .sdata (camera.h).
-void** lbl_80280DF0 = lbl_80281C90;
+void** gppCurrentRenderCtx = gapCurrentRenderCtx;
 
 // Makes a render camera from a lens, a frame buffer and a screen rectangle.
 void* RC_spCreateRenderCtx(CamLens* pLens, GoFrameBuf* pBuf, f32* pRect) {
@@ -204,7 +204,7 @@ void fn_80013D58(Camera* pCamera) {
 
 // Makes pCamera the current render camera (the one RC_spGetCurrentRenderCtx returns).
 void RC_vSetCurrentRenderCtx(s32 v) {
-    *(s32*)(lbl_80280DF0 + 0x0) = v;
+    *(s32*)(gppCurrentRenderCtx + 0x0) = v;
 }
 
 void fn_80013D68(Camera* pCamera) {
@@ -428,7 +428,7 @@ f32 Math_Tan(f32 x0) {
 // fake match: EA's table starts 8-aligned after the 17-byte "GoRenderCtx_Gc.c" (as TibExt.c's
 // lbl_80194758 after "TibExt.c"); plain u32 data is only 4-aligned. The functions from
 // fn_800142A4 on came from sweeps and may be another file, which would explain it.
-u32 lbl_80186AF0[][0xE8 / 4] __attribute__((aligned(8))) = {
+u32 gauInputButtonMap[][0xE8 / 4] __attribute__((aligned(8))) = {
     {
         0xFFFF, 0x800, 0x800, 0x100, 0x400, 0x100, 0x800, 0x100, 0x400, 0x20,
         0x40, 0x1, 0x2, 0x8, 0x4, 0x1, 0x2, 0x8, 0x4, 0x40,
@@ -440,15 +440,15 @@ u32 lbl_80186AF0[][0xE8 / 4] __attribute__((aligned(8))) = {
 };
 
 void fn_800142A4(s8 v) {
-    lbl_80281C98 = v;
+    gnInputControlSet = v;
 }
 
 // A button's mask in the row in use; bShift moves it up 16 bits.
 u32 Controller_GetButtonMask(int nButton, u8 bShift) {
     if (bShift) {
-        return lbl_80186AF0[lbl_80281C98][nButton] << 16;
+        return gauInputButtonMap[gnInputControlSet][nButton] << 16;
     }
-    return lbl_80186AF0[lbl_80281C98][nButton];
+    return gauInputButtonMap[gnInputControlSet][nButton];
 }
 
 // Whether any of the four pads has any of the buttons in uMask (0: any button at all).

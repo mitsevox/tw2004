@@ -703,9 +703,9 @@ typedef struct RenderCamera {
                                 //       fractions of the frame buffer (RC_spGetRenderCtxViewport)
 } RenderCamera;
 
-// Points at the slot holding the current render camera (lbl_80281C90): RC_spGetCurrentRenderCtx reads it,
+// Points at the slot holding the current render camera (gapCurrentRenderCtx): RC_spGetCurrentRenderCtx reads it,
 // RC_vSetCurrentRenderCtx sets it.
-extern void** lbl_80280DF0;
+extern void** gppCurrentRenderCtx;
 
 // GoTerrain.c: gives the current render camera the model matrix pMtx (NULL: the identity), through
 // RC_vSetRenderCtxTransformationMatrix.

@@ -1394,8 +1394,8 @@ void RenderView_MakePictUV(f32* pUV, struct LLPict* pPict);  // a quad's UVs cov
 void FO_vSetCurrentColor(s32 nColor);           // the next strings' colour (TW07: in UFont.c)
 void fn_800BA74C(u8 bFade);             // ScreenClear.c: a black screen for 1, 2 or 30 frames
 u32  Controller_GetButtonMask(int nButton, u8 bShift);   // a button's mask (bShift: moved up 16 bits)
-extern s8   lbl_80281C98;               // GoRenderCtx_Gc.c: the row of lbl_80186AF0 in use (fn_800142A4)
-extern u32  lbl_80186AF0[][0xE8 / 4];   // GoRenderCtx_Gc.c: rows of button masks, by button
+extern s8   gnInputControlSet;          // GoRenderCtx_Gc.c: the row of gauInputButtonMap in use (fn_800142A4)
+extern u32  gauInputButtonMap[][0xE8 / 4]; // GoRenderCtx_Gc.c: rows of button masks, by button
 u8   Controller_AnyPadHasButtons(u32 uMask);            // any pad pressed these buttons
 
 // ---- events, sound, effects ------------------------------------------------------------------

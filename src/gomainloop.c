@@ -41,7 +41,7 @@ void fn_800136F4(void);
 void fn_80013718(void);
 void fn_800137D0(void* pCamera);
 void fn_80013808(void* pCamera, int n, void** ppSlot);
-void RC_vSetCurrentRenderCtx(void* pCamera);        // the current render camera (lbl_80280DF0)
+void RC_vSetCurrentRenderCtx(void* pCamera);        // the current render camera (gppCurrentRenderCtx)
 void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
 void StreamManagerIngame_RegisterStreamClients(void);
 void StreamManagerIngame_UnregisterStreamClients(void);
@@ -1181,11 +1181,11 @@ void fn_8006DC48(void) {
 }
 
 void fn_8006DC4C(int n) {
-    fn_80013808(*lbl_80280DF0, n, lbl_80280DF0);
+    fn_80013808(*gppCurrentRenderCtx, n, gppCurrentRenderCtx);
 }
 
 void fn_8006DC78(void) {
-    fn_800137D0(*lbl_80280DF0);
+    fn_800137D0(*gppCurrentRenderCtx);
 }
 
 void fn_8006DCA0(int n) {

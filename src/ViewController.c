@@ -195,7 +195,7 @@ void ViewController_RestoreViewportRect(int nView) {
 s32 RC_GetCurrentFrameBuffer(void) {
     // port: RC_GetCurrentFrameBuffer (and UI_SetCurrentRenderCtxFrameBuffer's slot) are typed s32,
     //       but the value is the frame buffer
-    return (s32)fn_80013E40(*lbl_80280DF0);
+    return (s32)fn_80013E40(*gppCurrentRenderCtx);
 }
 
 // Sets a viewport's rectangle (fractions of the frame buffer: 0, 0, 1, 1 is all of it) and
