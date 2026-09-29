@@ -20,9 +20,9 @@ SitDevData* gpSitDevData = &gSitDevData;    // every SitDev file reaches it thro
 void SitDev_SetupStateVector(int nPlayer, u8 nEvent);
 void SitDev_ClearCupBevelFlag(void);
 void SitDev_ClearEmotionStates(void);
-u8   fn_800BB7AC(SitDevEntry* pEntry, SitDevData* pData, int nPlayer);
+u8   SitDev_ConditionsMatch(SitDevEntry* pEntry, SitDevData* pData, int nPlayer);
 void fn_800BCD68(SitDevEntry* pEntry, int nSit, int nPlayer, u8 nEvent);
-void fn_80067B5C(f32* pA, f32* pB, f32* pOut);
+void SitDev_Vec3Sub(f32* pA, f32* pB, f32* pOut);
 
 // .sbss, defined in reverse address order
 u8 lbl_80281E2A;    // event 26 has been queued since the last event 2 or 3
@@ -70,7 +70,17 @@ void SitDev_vUnregisterStreamClients(void) {
     Stream_UnregisterLoadChunkCallback('sscr');
 }
 
-// Queue event nEvent for nPlayer (0xFF: player 0; below 0: nobody).
+// Queues situation event nEvent for nPlayer (0xFF means player 0; a negative player queues
+// nothing); event.c's handlers call it, and a is not read. Some events are filtered: 30 (the
+// flyover) is dropped in custom, random, dream and regional rounds; 27 (a tree hit) once the ball
+// has collided; 26 (the putt's break line passed the cup) after the first since the last event 2 or
+// 3. Event 3 (the shot set-up) also clears the prediction flag (lbl_80281E28), the group flags
+// (fn_800BD74C), the cup bevel flag and the watched ball, then goes on as event 2 (a turn begins:
+// 26 may come again), then as event 25 (just before the swing): the emotion states are cleared, and
+// the event is dropped when an event 8, 9, 10 or 11 is queued already. The first event of a frame
+// fills in the state values for its player (SitDev_SetupStateVector); for events 20 and 29 (the
+// look-ahead ball worked out, its first bounce) values 18 and 19 then become the level distance, in
+// inches, from the shot's start to the look-ahead ball.
 void SitDev_QueueEvent(int nPlayer, int a, u8 nEvent) {
     int nWho;
     SitDevEvent* pEvent;
@@ -129,16 +139,24 @@ void SitDev_QueueEvent(int nPlayer, int a, u8 nEvent) {
     if (gpSitDevData->n13C == 1) {
         SitDev_SetupStateVector(nWho, nEvent);
         if (nEvent == 20 || nEvent == 29) {
-            fn_80067B5C(gPlayers[nPlayer].ballBefore.vPos, gPlayers[nPlayer].ball.vStart, vDiff);
+            SitDev_Vec3Sub(gPlayers[nPlayer].ballBefore.vPos, gPlayers[nPlayer].ball.vStart, vDiff);
             vDiff[1] = 0.0f;
             nInches = 36.0f * (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
-            SitDev_SetStateValue(gpSitDevData->aValue, 18, nInches, gpSitDevData->aSetBits);
-            SitDev_SetStateValue(gpSitDevData->aValue, 19, nInches, gpSitDevData->aSetBits);
+            _SetStateVecAndCondition(gpSitDevData->aValue, 18, nInches, gpSitDevData->aSetBits);
+            _SetStateVecAndCondition(gpSitDevData->aValue, 19, nInches, gpSitDevData->aSetBits);
         }
     }
 }
 
-// Run the scripts for this frame's events, then empty the queue.
+// Each frame of play (gomainloop.c, after SitDev_ThrowBallHitDelayedEvent): runs the scripts for
+// the events queued this frame, then empties the queue. For each situation (p14), in order: it
+// needs a queued event of its kind (any, for kind 0) whose player is the first queued event's; then
+// state value 0 is set again to the hole number (not for script file 22), and if its conditions
+// hold (SitDev_ConditionsMatch) and its group (n0; 0 for none) has not fired, the group is marked
+// and its actions run (fn_800BCD68) for that player. A situation for event 29 that tests value 64
+// (what the look-ahead ball hit) sets the prediction flags (lbl_80281E28, lbl_80281E29) first.
+// Afterwards, when an event 33 (the shot is over) was seen and the scripts set no emotion for its
+// player (lbl_801FA198), the player's shot outcome is recorded as 5 (fn_8006AAB4).
 void SitDev_ProcessEventQueue(void) {
     int i;
     int j;
@@ -171,9 +189,9 @@ void SitDev_ProcessEventQueue(void) {
         }
         if (bFound) {
             if (pEntry->b2.s.n5 != 22) {
-                SitDev_SetStateValue(gpSitDevData->aValue, 0, Game_CurHoleIndex() + 1, pData->aSetBits);
+                _SetStateVecAndCondition(gpSitDevData->aValue, 0, Game_CurHoleIndex() + 1, pData->aSetBits);
             }
-            if (fn_800BB7AC(pEntry, gpSitDevData, pEvent->nPlayer) &&
+            if (SitDev_ConditionsMatch(pEntry, gpSitDevData, pEvent->nPlayer) &&
                 (pEntry->n0 == 0 || !gpSitDevData->pD4[pEntry->n0])) {
                 gpSitDevData->pD4[pEntry->n0] = 1;
                 nEvent = gpSitDevData->aEvents[j].nEvent;
@@ -191,15 +209,16 @@ void SitDev_ProcessEventQueue(void) {
     gpSitDevData->n13C = 0;
 }
 
-// Stores value nIndex of the situation state vector and marks it as set.
-void SitDev_SetStateValue(u16* pValues, int nIndex, u16 uValue, u32* pSetBits) {
+// Stores state value nIndex (pValues[nIndex] = uValue) and sets its bit in pSetBits, the bits
+// SitDev_SetupStateVector clears.
+void _SetStateVecAndCondition(u16* pValues, int nIndex, u16 uValue, u32* pSetBits) {
     pValues[nIndex] = (int)uValue;  // fake match: the no-op widening only moves the store in the schedule
     pSetBits[nIndex / 32] |= 1 << (nIndex % 32);
 }
 
 // Three floats: pOut gets pA minus pB.
 #ifdef __MWERKS__
-asm void fn_80067B5C(register f32* pA, register f32* pB, register f32* pOut) {
+asm void SitDev_Vec3Sub(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 1, 0
@@ -213,7 +232,7 @@ asm void fn_80067B5C(register f32* pA, register f32* pB, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_80067B5C(f32* pA, f32* pB, f32* pOut) {
+void SitDev_Vec3Sub(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pA[0] - pB[0];
     pOut[1] = pA[1] - pB[1];
     pOut[2] = pA[2] - pB[2];

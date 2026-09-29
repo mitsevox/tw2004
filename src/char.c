@@ -119,7 +119,7 @@ void  Character_GolferStreamCallbackIG(UStreamObject* pObject);
 void  Character_GolferStreamCallbackFE(UStreamObject* pObject);
 void  SkeletalObject_StreamCallback(UStreamObject* pObject);
 void  Character_ResetBlenders(Character* pChar);
-void  fn_800BBADC(int nValue);         // SitDevFile.c
+void  SitDev_SetupClubCondition(int nValue);         // SitDevFile.c
 void  Character_GetBonePos_FromIndex(Character* pChar, int nBone, f32* pPos);
 u8    Character_IsGolfer(Character* pChar);
 f32   Character_ComputeMaxVisableDistance(Character* pChar, int bSplitScreen);
@@ -2594,13 +2594,13 @@ void Character_SelectGameShotType(Character* pChar, int nKind) {
 // Sets the character's club (Player.nClub, CLUB_DRIVER1_e to CLUB_PUTTER_e) and, through
 // Character_SelectClub, its club class: 0 the drivers, 1 the fairway woods, 3 irons 1-5, 4 irons
 // 6-9, 5 the wedges, 2 the putter. The club also goes to the situation device's state
-// (fn_800BBADC). Nothing for NULL.
+// (SitDev_SetupClubCondition). Nothing for NULL.
 void Character_SelectGameClub(Character* pChar, int nClub) {
     // per club: what Character_SelectClub gets
     int aClass[26] = {0, 0, 0, 0, 0, 0, 1, 1, 1, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 2};
 
     if (pChar != NULL) {
-        fn_800BBADC(nClub);
+        SitDev_SetupClubCondition(nClub);
         pChar->nClub = nClub;
         Character_SelectClub(pChar, aClass[nClub]);
     }

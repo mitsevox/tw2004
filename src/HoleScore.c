@@ -146,7 +146,7 @@ u8 fn_800CF450(int nPlayer) {
     }
     nLeft = GM_GetNumHolesRemainingInRound();
     if (nKind == 0) {
-        if (nLeft != 1 && !fn_800BCD50()) {
+        if (nLeft != 1 && !GM_IsPlayoff()) {
             return 0;
         }
         nBest = 1000;
@@ -442,8 +442,8 @@ int fn_800CFFE4(int nPlayer) {
 // The player's lead (strokes, or holes or skins by the scoring kind GM_GetScoringType) once this hole's
 // ball drops, 0 when playing alone. Kind 0 (strokes): the best other round total, with a holed
 // ball's score on this hole, less the player's total with the tap-in; players who missed the cut
-// are left out. Kinds 1 and 2: the lead from fn_800BCCF8, moved by fn_800BCCCC's value: 3 no
-// change, 2 up one (kind 2: up this hole's skin), 0 down the same.
+// are left out. Kinds 1 and 2: the lead from GM_GetCurrentEventLead, moved by
+// GM_GetPotentialHoleResult's value: 3 no change, 2 up one (kind 2: up this hole's skin), 0 down the same.
 s32 fn_800D0098(int nPlayer) {
     int anTotal[4];   // one per player set up, as in fn_800CFE74
     int i;
@@ -480,8 +480,8 @@ s32 fn_800D0098(int nPlayer) {
         }
         return nBest - nMine;
     } else if (nKind == 1) {
-        nLead = fn_800BCCF8(nPlayer);
-        nHole = fn_800BCCCC(nPlayer);
+        nLead = GM_GetCurrentEventLead(nPlayer);
+        nHole = GM_GetPotentialHoleResult(nPlayer);
         if (nHole == 3) {
             return nLead;
         }
@@ -493,8 +493,8 @@ s32 fn_800D0098(int nPlayer) {
         }
         return nLead;
     } else if (nKind == 2) {
-        nLead = fn_800BCCF8(nPlayer);
-        nHole = fn_800BCCCC(nPlayer);
+        nLead = GM_GetCurrentEventLead(nPlayer);
+        nHole = GM_GetPotentialHoleResult(nPlayer);
         if (nHole == 3) {
             return nLead;
         }

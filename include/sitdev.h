@@ -19,7 +19,7 @@ typedef struct SitDevEvent {
 
 // The block gpSitDevData points at (gSitDevData, 0x140 bytes).
 typedef struct SitDevData {
-    u16   aValue[SITDEV_NUM_VALUES];            // 0x000  set through SitDev_SetStateValue
+    u16   aValue[SITDEV_NUM_VALUES];            // 0x000  set through _SetStateVecAndCondition
     u32   aSetBits[SITDEV_NUM_VALUES / 32];     // 0x0C0  bit n: aValue[n] has been set
     void* pCC;                                  // 0x0CC  SitDev_LoadScripts' argument; freed by SitDev_vCloseModule
     void* pD0;                                  // 0x0D0  freed by SitDev_vCloseModule when set
@@ -47,7 +47,7 @@ typedef union SitDevBits {
 } SitDevBits;
 
 // An entry of the scripts' first table (SitDevScripts.p14, 0x30 bytes; 0x80067710 runs them).
-// Its conditions (fn_800BB7AC): for each bit n set in auTests, in order, test k compares
+// Its conditions (SitDev_ConditionsMatch): for each bit n set in auTests, in order, test k compares
 // SitDevData.aValue[n] with aArg[k] by aOp[k].
 typedef struct SitDevEntry {
     u8         n0;              // 0x00  its SitDevData.pD4 byte (runs once); 0: none
@@ -113,7 +113,7 @@ extern u8 lbl_80281E28;             // cleared by fn_800BCD68 when lbl_80281E29 
 extern u32 lbl_80282218;            // the class of what the ball last hit, kept by SitDev_SetupStateVector (kind 29)
 extern u8 lbl_80281E29;             // cleared by fn_800BCD68 after every run
 
-// Per value: nonzero when the scripts compare it as signed (fn_800BB8A8).
+// Per value: nonzero when the scripts compare it as signed (SitDev_CompareConditions).
 extern u8 lbl_80193188[88];
 
 // Per game mode: the bit SitDev_TranslateGameMode returns for it, -1 for none.
@@ -124,7 +124,7 @@ extern s32 lbl_801FA198[5];         // per player; cleared by SitDev_ClearEmotio
 extern s32 lbl_801FA1AC[5];         // per player; 1: SitDev_PredictedEmotionAvailable is true
 
 // Store uValue in pValues[nIndex] and set bit nIndex of pSetBits.
-void SitDev_SetStateValue(u16* pValues, int nIndex, u16 uValue, u32* pSetBits);
+void _SetStateVecAndCondition(u16* pValues, int nIndex, u16 uValue, u32* pSetBits);
 
 void SitDev_QueueEvent(int nPlayer, int a, u8 nEvent);    // event.c's handlers call it for most events
 

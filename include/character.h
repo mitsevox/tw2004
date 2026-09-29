@@ -689,7 +689,7 @@ typedef struct Character {
                                 //        (the swing sets 2, the ball hit), then sets it to -1
     u8    unk5D0[0x1614 - 0x5D0];
     char  szLastClip[16];       // 0x1614  the name of the clip CharacterState_AddSKABlendData played
-                                //         last; the situation scripts test it (fn_800BB7AC)
+                                //         last; the situation scripts test it (SitDev_ConditionsMatch)
     Clip* pBlend;               // 0x1624
     f32   fBackswing;           // 0x1628  how far along the backswing is, 0..1 (pBlend's fCC, copied every
                                 //         frame of the backswing; the swing's power is its square root)

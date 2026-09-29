@@ -191,7 +191,7 @@ headers 69 (phase 3, not started).
   (needs a data-file convention), sun-flare 7 KB (owner unclear). The rest (~276 KB) waits on its
   owners linking: streammanagerhole 87 KB, skalib 51 KB, Golfer ~53 KB, Earnings 11 KB.
 - PsBallFx: 8.3 KB of `.data` tables at 0x8018C868-0x8018E978 still unowned (values needed).
-- SitDev split: fn_800BCB88..fn_800BCD5C left in SitDevStateVector without data proof; tables at
+- SitDev split: SitDev_GetWeatherChangeCondition..GM_GetCurrentRound left in SitDevStateVector without data proof; tables at
   0x801910F8-0x80191230 unowned.
 - `src/unsorted/` (31 tiny units, 2.2 KB, all linked): place them in their home files with TW07 file
   order + neighbour references; sweep_80155F40 (critical regions) is C library code -> sdk category;

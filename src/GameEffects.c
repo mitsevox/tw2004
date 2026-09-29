@@ -25,7 +25,7 @@ void  GameEffects_RenderScriptedGB(void);
 void  GameEffects_DrawLetterBoxes(f32 fHeight);
 // szName: a profile's name
 int   HighScoreRecords_CheckRecord(int a, int b, int c, char* szName, int nPlayer);
-u8    fn_800BCD24(int nPlayer);
+u8    GM_IsPuttForWin(int nPlayer);
 
 GameEffects gGameEffects;   // the effects state (game.h; GameManager, GoGolfCam and others read it)
 
@@ -315,7 +315,7 @@ void GameEffects_ScriptedGameBreakerBallHitTrigger(int nPlayer) {
 // the aim point and the ball on the green; then any of: a putt that would score an eagle or better,
 // a distance to the pin (fn_800D0478) that makes record kind 2's list
 // (HighScoreRecords_CheckRecord), a putt for the lead (GM_IsPuttForLead) or for the win
-// (fn_800BCD24, the mode's pfnIsPuttForWin), a birdie putt when fn_800D0620 gives 11, or an eagle
+// (GM_IsPuttForWin, the mode's pfnIsPuttForWin), a birdie putt when fn_800D0620 gives 11, or an eagle
 // putt when fn_800D089C gives 1 (birdie and eagle by Hole_ScoreAfterTapIn).
 int GameEffects_IsScriptedGameBreaker(int nPlayer) {
     int bPossible = 0;
@@ -345,7 +345,7 @@ int GameEffects_IsScriptedGameBreaker(int nPlayer) {
         bPossible = 1;
     } else if (gPlayers[nPlayer].ball.nLie == LIE_GREEN_e && GM_IsPuttForLead(nPlayer)) {
         bPossible = 1;
-    } else if (gPlayers[nPlayer].ball.nLie == LIE_GREEN_e && fn_800BCD24(nPlayer)) {
+    } else if (gPlayers[nPlayer].ball.nLie == LIE_GREEN_e && GM_IsPuttForWin(nPlayer)) {
         bPossible = 1;
     } else if (gPlayers[nPlayer].ball.nLie == LIE_GREEN_e && fn_800D0620(nPlayer, 0, 0) == 11 &&
                Hole_ScoreAfterTapIn(nPlayer) < 0) {

@@ -113,7 +113,7 @@ void GameMsg_SendInt(int nMsg, int nValue);        // send message nMsg with one
 // it). GameMode5's PlayNow_ForceWeather sets f18 and flags it in b1C; SitDevFile.c tests the flags.
 typedef struct Unk802811F0 {
     u32 uFlags;                 // 0x00  bit 0x2: fn_80035574
-    u32 u04;                    // 0x04  bit 0x2: fn_800BCC38
+    u32 u04;                    // 0x04  bit 0x2: SitDev_WeatherEffectWasOn
     s32 n08;                    // 0x08
     s32 n0C;                    // 0x0C
     s32 n10;                    // 0x10
@@ -227,9 +227,9 @@ int  fn_800D1530(int nPlayer);          // HoleScore.c
 s32  GM_GetNumHolesInRound(void);                 // GameUICommands.c
 int  GM_GetGolferRelativeCurrentScore(int nPlayer, u8 bCurrent);        // GameRound.c
 s32  GameModeBattle_GetClubLostOnLastHole(int nPlayer);          // GameModeBattle.c
-s32  fn_800BCCCC(int nPlayer);          // SitDevFile.c: gpGame->pfnGetPotentialHoleResult
-s32  fn_800BCCF8(int nPlayer);          // SitDevFile.c: gpGame->pfnGetCurrentLead's answer
-u8   fn_800BCD50(void);                 // SitDevFile.c: gpGame->bInPlayoff
+s32  GM_GetPotentialHoleResult(int nPlayer);          // SitDevFile.c: gpGame->pfnGetPotentialHoleResult
+s32  GM_GetCurrentEventLead(int nPlayer);          // SitDevFile.c: gpGame->pfnGetCurrentLead's answer
+u8   GM_IsPlayoff(void);                 // SitDevFile.c: gpGame->bInPlayoff
 void CalDate_GetMDY(u16* pDate, s32* pMonth, s32* pDay, s32* pYear);
 void CalDate_SetMDY(u16* pDate, s32 nMonth, s32 nDay, u32 nYear);    // make a date
 void CalDate_AddDays(u16* pDate, s32 nDays);        // move a date on by nDays
