@@ -190,7 +190,7 @@ u8   Aud_EmiInitOnce(void);                  // hlaudemitter.c; always 1
 u8   Rvb_InitModule(void);                      // AudReverb.c; always 1
 void Aud_EmiCycle(void);                     // hlaudemitter.c
 void Aud_EmiExitSession(void);                   // hlaudemitter.c
-void AudMem_Init(void);                   // UAudMemStack.c
+void AudMem_Init(void);                   // UAudMem.c
 void Aud_EmiSetTrackStep(u8 nId, u8 nTrack, u8 n, int bCheck);
 
 u8   Aud_MicInitOnce(void);

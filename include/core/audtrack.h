@@ -457,7 +457,7 @@ void AudLock_Unlock(const char* szWho);    // give it back
 void AudLock_LockReadQueue(const char* szWho);    // take the read-queue lock
 void AudLock_UnlockReadQueue(const char* szWho);    // give it back
 
-// The audio memory stack (UAudMemStack.c).
+// The sound engine's memory (UAudMem.c).
 void* AudMem_Alloc(u32 uSize);
 void  AudMem_Free(void* p);
 

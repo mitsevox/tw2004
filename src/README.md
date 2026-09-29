@@ -464,7 +464,7 @@ Also: `hlaudmovie.c` (a movie's sound), `uiProcessPolygon.c`, `Code800B90F4.c` (
 EA's sound engine: a table of playing sounds, emitters placed in the world, tracks that are
 either sequenced or streamed from disc, voices on the GameCube's hardware, and the game's side
 that drives it all. The block sits at 0x800A3E3C-0x800AF324 (uiObject.c among it), with the
-boot-time voice code in `startUp.c` right after and AudLock.c / UAudMemStack.c a little later. Headers: `include/core/gameaudio.h`, `audtrack.h`, `audcontainers.h`, `startup.h`.
+boot-time voice code in `startUp.c` right after and AudLock.c, UAudMemStack.c and UAudMem.c a little later. Headers: `include/core/gameaudio.h`, `audtrack.h`, `audcontainers.h`, `startup.h`.
 
 | File | Name | What it is |
 |---|---|---|
@@ -481,7 +481,8 @@ boot-time voice code in `startUp.c` right after and AudLock.c / UAudMemStack.c a
 | AudReverb.c | ours | the aux A effect: reverb or delay |
 | startUp.c | EA | boot-time systems: 50 hardware voice wrappers, the mixer callback, ARAM heap, built-in sounds, boot memory-card checks, the start-up UI commands, the `'LEGL'` pictures |
 | AudLock.c | ours | the sound engine's mutex and semaphore |
-| UAudMemStack.c | EA | the sound engine's 384 KB stack allocator |
+| UAudMemStack.c | EA | the sound engine's stack allocator |
+| UAudMem.c | T7 | the sound engine's memory: 384 KB of main memory run as a stack |
 
 ### Save data
 

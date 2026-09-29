@@ -1018,6 +1018,7 @@ config.libs = [
             Object(Matching, "GoComicCam.c"),
             Object(Matching, "GoShaderObject_Rain_Gc.c"),
             Object(Matching, "UAudMemStack.c"),
+            Object(Matching, "UAudMem.c"),
             Object(Matching, "GoARAM.c"),
             Object(Matching, "DiscError.c"),
             Object(Matching, "Code800B7210.c"),

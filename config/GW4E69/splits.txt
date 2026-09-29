@@ -943,8 +943,11 @@ AudLock.c:
 	.bss        start:0x801F6338 end:0x801F6360
 
 UAudMemStack.c:
-	.text       start:0x800B5A14 end:0x800B5C40
+	.text       start:0x800B5A14 end:0x800B5B80
 	.data       start:0x8018FFA8 end:0x8018FFB8
+
+UAudMem.c:
+	.text       start:0x800B5B80 end:0x800B5C40
 	.bss        start:0x801F6360 end:0x801F6680
 	.sbss       start:0x80282180 end:0x80282188
 

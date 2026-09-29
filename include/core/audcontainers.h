@@ -83,6 +83,7 @@ LAYOUT_ASSERT(UAudMemStack, 0x20);
 void  AudMemStack_Init(UAudMemStack* pStack, u8* pMem, u32 uSize, u32 nMaxBlocks, UAudMemStackBlock* pBlocks,
                   u32 nAlign);
 void* AudMemStack_AllocTop(UAudMemStack* pStack, u32 uSize);
+void  AudMemStack_FreeTop(UAudMemStack* pStack, void* p);
 
 // AudReverb.c's effect settings (initialised data; the effects library owns their layout).
 extern AXFX_REVERBHI gRvbReverbShort;      // the reverb for mode 0
