@@ -41,6 +41,11 @@ the naming pass. Details and evidence: agents/findings/2026-09-27-naming-leads.m
 | UKernel.c Kernel_InitObjectFromDef (0x80049514, type 0's setup) is called only by GoDynObjBase.c and GoAnimalActors.c: GoDynObjBase.c's? TW07's UKernel.c has only DownloadActors / InitModule / CloseModule | weak | yes | round 20 (rt4) |
 | GoDynObj.c's Character_IsTagSet (0x80048574) and Object_SetLod (0x80048584) sit away from char.c / UObject.c (header inlines?); DynObj_InitModuleEmpty / CloseModuleEmpty (0x800486EC / F0) sit right before UObject.c (its module hooks?) | weak | yes | round 20 (rt3) |
 | GoDynObjBase.c / GoDynObjTypes.c: no EA file in TW06 or TW07; TW06's golf/hi-rendering/gomiscactors.c could hold types 6 and 9 (nothing proves it) | weak | yes | round 20 (rt3) |
+| HoleScore.c = EA's AnalysisUtilities.c: every function is in TW07's golf/gamemode/AnalysisUtilities.c in the same order (TW06: golf/gamemode/analysisutilities.c) | proven | yes | round 21 (ru3) |
+| GoTerrain.c 0x800355E0..0x80035640 (CharacterRender_SetCurrentBuffer / StartNewFrame / RenderSetup, gCharRendCurrentBuffer) = EA's CharRend.c: TW07 golf/animation/CharRend.c in this order (only SetSkinType missing); Skin.c starts at 0x80035640 | strong | yes | round 21 (ru2) |
+| GoRenderCtx_Gc.c 0x800142A4 to its end + .data gauInputButtonMap (0x80186AF0) = EA's LLInput.c: TW07 legacy/ll/LLInput.c has Input_vSelectControlSet, Input_uiMap, Input_AnyPadPressed, Input_vStopAllVibration in this order with these signatures; the table's 8-byte alignment (existing fake-match note) marks the boundary | strong | yes | round 21 (ru6) |
+| unsorted/sweep_800136F4.c = GoRenderCtx_Gc.c's RC_vInitModule (calls RC_vSetCurrentRenderCtx(0), TW07's inline) and RC_vCloseModule (empty), right before RC_spCreateRenderCtx as in TW07's order | strong | no | round 21 (ru6) |
+| streammanagerhole.c's last function Game_GetCurHoleNum (a gpGame accessor): no TW06 / TW07 name or file ties it to the stream manager | weak | yes | round 21 (ru5) |
 | src/unsorted/: 28 sweep files, 23 not through the pass; place each in its home file (TW07 order + neighbour references; sweep_80155F40 is C library code, sweep_800055D8 is main()) | - | 5 of 28 | plan-readability.md |
 
 ## Done

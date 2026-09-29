@@ -728,3 +728,56 @@ DivotHide), DynObj_PitchMarkAdd, DynObjBase_TakeAmount, DynObjType6_* / 9_*, Ker
 Kernel_PostPairByKey147 / 148, GM_GetHoleIndexDrivingSideGame, GM_GetCurrentHoleSplitScreenLowDetail,
 isLeft, UObject_ComposeRotation, Network_RayIntersection, Ter_DrawFarClipPatches,
 gTerCrowdPoseStepsFlag40, gTerUnreadToggle, nHeightRef, nTrackMode, bFairwayFix.
+
+## Round 21 (ru1-ru6) leftovers
+DONE: GoTerrain (all 97; ru2), HoleScore, GoBreakLine, GoGreenGrid (ru3), GoGrass,
+GoShaderObject_Grass_Gc (ru4), streammanagerhole (ru5), GoRenderCtx_Gc, GoCamera (ru6). EA's names:
+GameAnalysis_* (TW07 AnalysisUtilities.c, incl. EA's GameAnalysis_GetPotentailRoundParScore),
+BreakLine_* / GR_* (TW07), StreamManager<Part>_* (TW07 golf/streaming, list 2 LoadScreen ours),
+RC_* / VM_ / FB_ / CA_ (TW07 GoRenderCtx), Input_* (TW07 LLInput.c), CharacterRender_* (TW07 CharRend.c).
+Owner decisions applied (ru1): CamShot / CamScript nInterpType (EA's term); File_ReadAsyncEx one
+prototype in engine.h matching LLFileIO_Gc.c, hlaudtrackstm.c casts with a `port:` note.
+Found: moving GameAudio.c's six startUp.c prototypes (HwVoice_InitModule, AudDma_InitModule,
+AudAram_InitModule, BootSound_InitModule, BootSound_CopyToAram, BootSound_Play) into core/startup.h
+changes GameAudio.o's code (Aud_InitOnce clrlwi. r3 vs r0, 99.68%; Aud_PlayBuiltInSound 87.5%), after
+the session block or at the header's end alike: the declarations' place is part of the match, so
+the local block is EA's form as far as we know; next header lane: leave it, add a one-line note why.
+Name clash across builds: TW07's GameAnalysis_CountTotalHoleScores / CountBogeysOrWorse match
+HoleScore.c 0x800D0DC8 / 0x800D0E74 (named T3 GameAnalysis_CountHoleScoresOrBetter /
+CountHolesOverPar), but GameAnalysis.c already has both names from TW06 on other bodies (count back
+from the current hole; its CountTotalHoleScores reads like TW07's CountExactHoleScores): TW06 (2005)
+is the nearer build; settle with the TW06 PDB export (owner, later). Pairing file error:
+2026-09-27-name-pairing.tsv gives 80014E90 / 80014E94 as the hole Begin/End callbacks; the code
+passes 80014E7C / 80014E94 with the hole file, 80014E90 is Globals' end. docs/tw06-names.md row
+800768E0 (CA_vUpdateInternalFieldOfViewData) is CA_vSetDefaultCamera: row corrected.
+Pipeline: check_batches printed the new-name count as "rows" (a lane took it for skipped rows):
+now both. Every lane listed long lines in files it does not own instead of rewrapping (the round 21
+rule held); one orchestrator rewrap pass after the replays.
+Still open (headers): terrain.h TerSettings holds the FOG settings (f44..f4C -> RenderState.c30 the
+fog colour, f50 -> fFogStart / fFogEnd via LF_ApplyFogToRenderState; terrain.h "the colour", "four
+colours" and lighting.h:50 "the terrain colours" say fog; maybe EA's LF_ type); cull.h Camera
+(TW07 RC_SRenderCtx): a0 clear colour, unk10 the lens, pad1C model matrix (0x1DC its identity flag),
+0x19C model-to-screen matrix, unk1F4 / unk1F8 near / far clip (code_800082F8.c fn_80008360 / 68 =
+RC_fGetRenderCtxNearZClip / FarZClip), unk204..210 sin / cos of the half field of view across / down
+(RC_fGetRenderCtxHalfFieldOfViewSinX/SinY/CosX/CosY), 0x214..0x220 the same for twice the tangent;
+code_800082F8.c fn_80008378 = the lens's projection mode (CA_EProjectionMode); camera.h CamLens fA8 /
+fAC = NearZ / FarZ, GoFrameBuf f0 / f4 OffsetX / Y, f10 / f14 width / height ratio; GoTerrain.c
+fn_800354B4 = TW07 CA_vSetCameraFarZ; grassshader.h: SD_vSetGrassParamsOnce runs every grass draw
+(not once per hole), line 128 "akgrass1..4" is "akgras1".."akgras4", SD_gafGrassSwayStep written
+never read, GrassManager f348 params n360 / n364 = a18[0..1], f358 / f35C = a10[0..1]; golfer.h
+b16C[5][18] likely "holed out" (TW07 GM_PlayerHoledOut at that point; medium); breakline.h aViewPoint
+= the point closest to the cup so far, afAAD4 its squared distance, abAADC event 0x29 sent, abA91C
+the view's ball copy still simulated, anAAF0 texture step counter, abSkip also set by BreakLine_Reset;
+prototypes that differ from their definitions: GoGrass.c:54 Ter_SetManageZUpdate (s32 vs u8),
+GoGolfCam.c:61 Grass_IsLoaded (u8 vs s32), gomainloop.c:43 RC_vClearRenderCtxScreen (3 parameters,
+the definition takes (Camera*, u32): brief's `port:` treatment), uiProcessPolygon.c:770 passes an
+extra argument to RC_vSetRenderCtxFrameBuffer; camera leftovers (ru1): CamShot f48 / f4C (f48's
+"how long the shot lasts" looks wrong: CamScript.f8C takes the next shot's f48 as the blend length),
+nA4 (two meanings), f84 / f8C / f90 (GoPostFx: TW07 dof / blur), CamScript f88 / f104..f10C / n110 /
+n114; type renames to TW06 names (unconfirmed).
+Least-sure names: Weather_IsRaining, SF_vSetSunPosition, LF_UpdateFog, Ter_DrawMeshCurrentPart,
+Grass_DrawTopTextureDebug, Grass_LoadNetworkData, GrassPacket_ClipPointAt / GetRowPoint,
+Grass_UpdateView, the two empty StreamManager InitModule stubs, the Globals callbacks
+0x80014E78 / 0x80014E90, StreamManagerLoadScreen_*, GameAnalysis_GetFairwayDrive,
+GameAnalysis_CurrentShotGIR, BreakLine_GetCaddyTipInfo, RC_vOnRenderCtxScreenUpdated,
+VM_fGetViewportHeightRatio / WidthRatio, Camera_Subtract3 / Camera_Invert3, RC_vClearRenderCtxScreen.

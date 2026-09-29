@@ -191,7 +191,7 @@ Functions still unnamed or named from TW06:
 | `80072ED8` | `fn_80072ED8` | `SKATime_Update` | medium | PS2 nbr2(r0,2) |
 | `80073108` | `fn_80073108` | `SKATime_Idle` | medium | PS2 anchor(1)+graph |
 | `80076400` | `fn_80076400` | `CA_spCreateCamera` | medium | PS2 nbr(r1,2) |
-| `800768E0` | `fn_800768E0` | `CA_vUpdateInternalFieldOfViewData` | medium | PS2 nbr(r2,2) |
+| `800768E0` | `CA_vSetDefaultCamera` | `CA_vUpdateInternalFieldOfViewData` | wrong | PS2 nbr(r2,2); TW07's GoCamera order and signature make it CA_vSetDefaultCamera (round 21, ru6) |
 | `80077A80` | `FE_spGetGolfer` | `FE_spGetGolfer` | medium | PS2 calls(r0,1) |
 | `80078A2C` | `FE_CrAP_RandomizeCategoryWithUndesirableTest` | `FE_CrAP_RandomizeCategoryWithUndesirableTest` | medium | Xbox nbr(r1,2) |
 | `80091EE8` | `UI_PlayStartUpMovies` | `FE_movieFade` | medium | PS2 nbr(r0,2) |
