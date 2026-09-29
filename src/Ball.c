@@ -383,7 +383,8 @@ u8     Physics_ProcessCollision(Ball* pBall, f32* pHit, f32* pNormal, SurfaceTyp
 u8     fn_80053240(Ball* pBall, f32 fTicks);
 // the bounce; returns the impact
 f32    Physics_HandleCollision(Ball* pBall, f32* pNormal, SurfaceType* pSurface);
-void   DynObj_GetBoundingSphere(HitObject* pObj, f32* pPos, f32* pRadius);   // the flagstick's position and radius
+// the flagstick's position and radius
+void   DynObj_GetBoundingSphere(HitObject* pObj, f32* pPos, f32* pRadius);
 u8     Physics_CheckTerrainCollisions(Ball* pBall, f32 fTicks);
 void   Ball_GroundContact(Ball* pBall, f32 fTicks);
 void   Physics_BallRollingandSlipping(Ball* pBall, f32 fTicks);

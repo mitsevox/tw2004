@@ -75,8 +75,8 @@ typedef struct FEScreen {
     u8  abAssigned[4];          // 0x2C  per controller: given to a player (GM_vSetPlayerController;
                                 //       GM_vIsControllerAssigned reads it)
     u8  a30[4];                 // 0x30  set to 1 by UI_vInitModule; UI_SetControllerEnabled sets one
-    s32 nFramesNoPad;           // 0x34  frames with no controller plugged in (fn_8008F820)
-    s32 nNumPluggedIn;          // 0x38  controllers plugged in, counted every frame (fn_8008F820;
+    s32 nFramesNoPad;           // 0x34  frames with no controller plugged in (UI_ReadControllers)
+    s32 nNumPluggedIn;          // 0x38  controllers plugged in, counted every frame (UI_ReadControllers;
                                 //       GM_vGetNumControllersPluggedIn)
     s32 n3C;                    // 0x3C  the UI file table holding the movie entries (UI_ResolveFileEntries)
     u8  b40;                    // 0x40  cleared by UI_vInitModule

@@ -91,8 +91,8 @@ void   MIXSetSPan(AXVPB* pVpb, int nSPan);
 void   MIXMute(AXVPB* pVpb);
 void   MIXUnMute(AXVPB* pVpb);
 void   MIXUpdateSettings(void);         // MIX: pass the settings to the hardware
-void   audfrac_Swap(f32* pA, f32* pB);   // swap two floats
-void   audvec2_Set(f32* v, f32 x, f32 y);
+void   audfrac_Swap(f32* pV1, f32* pV2);
+void   audvec2_Set(f32* dest, f32 x, f32 y);
 
 // The save kinds (a table of functions at lbl_8018C7D8).
 s32    MC_CallActionFnMemoryRequired(CardPos* pPos);      // the picked save kind's size on that card
@@ -1223,24 +1223,24 @@ int Startup_FindFirstCardWithStatus(s32* pnPort, s32* pnSlot) {
 // Format the card at a port and slot (MC_FormatCard), look at it again (fn_8009DCEC) and send the
 // result to the start-up UI as message 0x84 (0 when it worked, else a negative error code).
 // Start-up command 7.
-void Startup_FormatCard(s32 a, s32 b) {
+void Startup_FormatCard(s32 nPort, s32 nSlot) {
     MsgArg arg;
-    s32 n = MC_FormatCard(a, b);
-    fn_8009DCEC(a, b);
+    s32 nResult = MC_FormatCard(nPort, nSlot);
+    fn_8009DCEC(nPort, nSlot);
     Mem_set(&arg, 0, sizeof(arg));
-    arg.i = n;
+    arg.i = nResult;
     UISDoHint(gpFrontEnd->pHandler, 0x84, 1, (s32*)&arg);
 }
 
 // Delete the game's save from the card at a port and slot (MC_DeleteSaveGame), look at the card
 // again (fn_8009DCEC) and send the result to the start-up UI as message 0x8D (0 when it worked,
 // else a negative error code). Start-up command 17.
-void Startup_DeleteSaveGame(s32 a, s32 b) {
+void Startup_DeleteSaveGame(s32 nPort, s32 nSlot) {
     MsgArg arg;
-    s32 n = MC_DeleteSaveGame(a, b);
-    fn_8009DCEC(a, b);
+    s32 nResult = MC_DeleteSaveGame(nPort, nSlot);
+    fn_8009DCEC(nPort, nSlot);
     Mem_set(&arg, 0, sizeof(arg));
-    arg.i = n;
+    arg.i = nResult;
     UISDoHint(gpFrontEnd->pHandler, 0x8D, 1, (s32*)&arg);
 }
 
@@ -1352,56 +1352,56 @@ done:
     }
 }
 
-// Estimate the length of the 2D vector v without a square root. With a the longer side and b the
-// shorter (both made positive): a + 31/128 b when b is at most half of a, else (106 a + 75 b) /
+// Estimate the length of the 2D vector v without a square root. With x the longer side and y the
+// shorter (both made positive): x + 31/128 y when y is at most half of x, else (106 x + 75 y) /
 // 128.
 f32 audvec2_ApproxLength(f32* v) {
-    f32 a = v[0];
-    f32 b = v[1];
-    f32 s;
-    f32 d;
-    if (a < 0.0f) {
-        a = -a;
+    f32 x = v[0];
+    f32 y = v[1];
+    f32 fSum;
+    f32 fDiff;
+    if (x < 0.0f) {
+        x = -x;
     }
-    if (b < 0.0f) {
-        b = -b;
+    if (y < 0.0f) {
+        y = -y;
     }
-    if (b > a) {
-        audfrac_Swap(&a, &b);
+    if (y > x) {
+        audfrac_Swap(&x, &y);
     }
-    if (b > 0.5f * a) {
-        s = a + b;
-        d = a - b;
-        s = 32.0f * b + (a + (2.0f * s + (64.0f * s + 8.0f * s)));
-        b = d;
-        a = (1.0f / 128.0f) * s;
+    if (y > 0.5f * x) {
+        fSum = x + y;
+        fDiff = x - y;
+        fSum = 32.0f * y + (x + (2.0f * fSum + (64.0f * fSum + 8.0f * fSum)));
+        y = fDiff;
+        x = (1.0f / 128.0f) * fSum;
     }
-    return a + 0.25f * b - 0.0078125f * b;
+    return x + 0.25f * y - 0.0078125f * y;
 }
 
 // The same estimate for the 3D vector v: the length of (v[2], the length of (v[0], v[1])).
 // AudTable.c's Distance3D measures a sound's distance with it.
 f32 audvec3_ApproxLength(f32* v) {
-    f32 aFlat[2];
-    f32 fFlat;
+    f32 tmpv[2];
+    f32 tmp;
 
-    fFlat = audvec2_ApproxLength(v);
-    audvec2_Set(aFlat, v[2], fFlat);
-    return audvec2_ApproxLength(aFlat);
+    tmp = audvec2_ApproxLength(v);
+    audvec2_Set(tmpv, v[2], tmp);
+    return audvec2_ApproxLength(tmpv);
 }
 
-// Swap the floats *pA and *pB.
-void audfrac_Swap(f32* pA, f32* pB) {
-    f32 f;
+// Swap the floats *pV1 and *pV2.
+void audfrac_Swap(f32* pV1, f32* pV2) {
+    f32 temp;
 
-    f = *pB;
-    *pB = *pA;
-    *pA = f;
+    temp = *pV2;
+    *pV2 = *pV1;
+    *pV1 = temp;
 }
 
-void audvec2_Set(f32* v, f32 x, f32 y) {
-    v[0] = x;
-    v[1] = y;
+void audvec2_Set(f32* dest, f32 x, f32 y) {
+    dest[0] = x;
+    dest[1] = y;
 }
 
 // Whether the ball can hit the object; every object can.
