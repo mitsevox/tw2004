@@ -181,7 +181,7 @@ void STATEFUNC_PreShotInit(int nPlayer) {
     Ball* pBall;
     int   nView, k;
 
-    fn_80062F1C(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]));
+    CameraController_ResetCameraState(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]));
     nView = gPlayers[nPlayer].nView[0];
     CameraController_SetCameraMode(ViewController_GetCameraControl(nView), 0x19, nPlayer, nView);
     gpGame->pfnPreShotInit(nPlayer);
@@ -254,8 +254,8 @@ void STATEFUNC_PreShotInit(int nPlayer) {
 // rides in the hand, and once it fires the ball is set down (on the tee: 2 units up and teed);
 // events 0x10 and 0x11 drive fn_800A3CB0/fn_800A3D6C/fn_800A3DF4. A ball still moving is stepped.
 // Button 0 (any pad for a CPU) starts a fade out; a CPU also rehearses here once its ball is still.
-// Once fn_80063C7C(view) holds (and the camera allows) the ball is put in place and it is state 2;
-// after 10 s on a camera it is state 2 anyway.
+// Once CameraController_IsFadeOutDone(view) holds (and the camera allows) the ball is put in place
+// and it is state 2; after 10 s on a camera it is state 2 anyway.
 void STATEFUNC_PreShotUpdate(int nPlayer) {
     Vec4    vOffset = {0.0f, 0.0f, 0.0f, 0.5f};
     u8      bInHand = 0;
@@ -325,7 +325,7 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
         if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0, 0))
             && !Lessons_IsRunning()) {
             fn_800C70F8(pV, 1);
-            if (!fn_80063C90(pV)) {
+            if (!CameraController_IsFadeOn(pV)) {
                 CameraController_FadeOut(pV, 0.25f, (f32*)&vOffset);
                 fn_800C7080(pV);
             }
@@ -336,7 +336,7 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
         }
         if (!Lessons_IsRunning() && Controller_AnyPadHasButtons(Controller_GetButtonMask(0, 0))) {
             fn_800C70F8(pV, 1);
-            if (!fn_80063C90(pV)) {
+            if (!CameraController_IsFadeOn(pV)) {
                 CameraController_FadeOut(pV, 0.25f, (f32*)&vOffset);
                 fn_800C7080(pV);
             }
@@ -346,9 +346,10 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
         fn_800C6E88(pV, nPlayer)) {
         fn_80095744(gPlayers[nPlayer].pChar, 5);
         CharacterState_UpdateSKAState(gPlayers[nPlayer].pChar);
-        fn_80063CF0(pV, 0x17, nPlayer);
+        CameraController_PostEvent(pV, 0x17, nPlayer);
     }
-    if (fn_80063C7C(pV) && (fn_800C6F7C(pV, nPlayer, 0.25f) || !fn_800C6E88(pV, nPlayer))) {
+    if (CameraController_IsFadeOutDone(pV)
+        && (fn_800C6F7C(pV, nPlayer, 0.25f) || !fn_800C6E88(pV, nPlayer))) {
         if (bInHand) {
             if (fn_80095780(gPlayers[nPlayer].pChar) == 10) {
                 Physics_DropBall(&gPlayers[nPlayer].ball, gPlayers[nPlayer].vBall);
@@ -363,11 +364,11 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
         GOLFERSTATE_Switch(GS_SHOT_SETUP, nPlayer);
     }
     if (fn_80095780(gPlayers[nPlayer].pChar) != 10 && fn_80095780(gPlayers[nPlayer].pChar) != 1 &&
-        fn_800C6F7C(pV, nPlayer, 0.25f) && !fn_80063C90(pV)) {
+        fn_800C6F7C(pV, nPlayer, 0.25f) && !CameraController_IsFadeOn(pV)) {
         CameraController_FadeOut(pV, 0.25f, (f32*)&vOffset);
     } else if ((fn_80095780(gPlayers[nPlayer].pChar) == 10 || fn_80095780(gPlayers[nPlayer].pChar) == 1) &&
                gPlayers[nPlayer].pChar->fAnimTime > gPlayers[nPlayer].pChar->fAnimEnd - 0.25f &&
-               !fn_80063C90(pV)) {
+               !CameraController_IsFadeOn(pV)) {
         CameraController_FadeOut(pV, 0.25f, (f32*)&vOffset);
     }
 }
@@ -648,7 +649,8 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
                 fn_80062CB0(gPlayers[nPlayer].nUISlot, 1);
             }
             TARGET_ResetMomentums(nPlayer);
-            fn_800642D0_ReapplyCurrentShot(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]),
+            CameraController_ResetAimMarkerInSwingCamera(
+                    ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]),
                                            nPlayer);
             GUI_ToggleUI(nPlayer, 1);
         } else {
@@ -997,12 +999,12 @@ void STATEFUNC_GreenWatchRollUpdate(int nPlayer) {
     }
     nSteps = GameEffects_BallUpdatesThisFrame(nPlayer);
     if (gPlayers[nPlayer].ballBefore.nState == 1 || gPlayers[nPlayer].ballBefore.nState == 5) {
-        if (fn_80063C50(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]))) {
+        if (CameraController_IsFadeDone(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]))) {
             GOLFERSTATE_Pop(nPlayer);
         }
         return;
     }
-    if (fn_80063C50(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]))) {
+    if (CameraController_IsFadeDone(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]))) {
         GOLFERSTATE_Pop(nPlayer);
         return;
     }
@@ -1011,11 +1013,12 @@ void STATEFUNC_GreenWatchRollUpdate(int nPlayer) {
         Physics_Simulate(&gPlayers[nPlayer].ballBefore, 20);
         fn_80050D24_SetSimulating(0);
         if (gPlayers[nPlayer].ballBefore.nState == 1 || gPlayers[nPlayer].ballBefore.nState == 5) {
-            if (!fn_80063C90(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]))) {
+            if (!CameraController_IsFadeOn(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]))) {
                 CameraController_FadeOut(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]),
                                          0.25f, (f32*)&vOffset);
             }
-        } else if (!fn_80063C90(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0])) && pCourse
+        } else if (!CameraController_IsFadeOn(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]))
+                   && pCourse
                    != NULL) {
             int nPinSet = Game_CurrentPinSet();
             if (gPlayers[nPlayer].ballBefore.fClosest < 0.5f ||
@@ -1442,14 +1445,14 @@ void STATEFUNC_ShowYardageUpdate(int nPlayer) {
     }
     if (GUI_CheckMessageQue()) return;
     if (!GUI_IsPostShotUIAnimating(nPlayer)) {
-        if (fn_80063C7C(pV)) {
+        if (CameraController_IsFadeOutDone(pV)) {
             if (gPlayers[nPlayer].bPenaltyShot != 0) {
                 GM_ReplaceOOBBall(nPlayer);
             }
             GM_EndOfGolferTurn(nPlayer);
             return;
         }
-        if (fn_80063C90(pV)) return;
+        if (CameraController_IsFadeOn(pV)) return;
         if (!fn_800C6604(pV) && fn_80095780(gPlayers[nPlayer].pChar) == 9) {
             if (!(fn_80062C28(gPlayers[nPlayer].pChar) >= lbl_80281F78->f170 / 2.0f ||
                   pV->script.f98 > 1.0f)) {
@@ -1544,16 +1547,18 @@ void STATEFUNC_FadeToTapInUpdate(int nPlayer) {
         Vec3Copy(vSaved, gPlayers[nPlayer].vBall);
         gPlayers[nPlayer].nController = nController;
     }
-    if (fn_80063C50(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]))) {
+    if (CameraController_IsFadeDone(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]))) {
         if (gPlayers[nPlayer].bRehearsalDone != 0) {
-            fn_80063CBC(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), (f32*)&vOffset);
+            CameraController_HoldFadeColor(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]),
+                                           (f32*)&vOffset);
             GOLFERSTATE_Switch(GS_TAP_IN, nPlayer);
             gPlayers[nPlayer].bPlanReady = 1;
         } else {
             if (gPlayers[nPlayer].bPlanReady == 0) {
                 GM_EndOfGolferTurn(nPlayer);
             }
-            fn_80063CBC(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), (f32*)&vOffset);
+            CameraController_HoldFadeColor(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]),
+                                           (f32*)&vOffset);
         }
     }
     fn_80050D2C(0);
@@ -1625,8 +1630,9 @@ void STATEFUNC_FadeToRemoveBallInit(int nPlayer) {
 
 void STATEFUNC_FadeToRemoveBallUpdate(int nPlayer) {
     Vec4 vOffset = {0.0f, 0.0f, 0.0f, 0.5f};
-    if (fn_80063C50(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]))) {
-        fn_80063CBC(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), (f32*)&vOffset);
+    if (CameraController_IsFadeDone(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]))) {
+        CameraController_HoldFadeColor(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]),
+                                       (f32*)&vOffset);
         GOLFERSTATE_Switch(GS_REMOVE_BALL, nPlayer);
     }
 }
@@ -1756,7 +1762,7 @@ void STATEFUNC_WaitInit(int nPlayer) {
 }
 
 void STATEFUNC_WaitUpdate(int nPlayer) {
-    fn_80063C90(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]));
+    CameraController_IsFadeOn(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]));
 }
 
 // State 20: the hole flyover. Event 0x4A, camera 10 full screen with a fade in on this player's

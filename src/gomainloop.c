@@ -146,7 +146,7 @@ void fn_8005D348(void);
 void fn_8005D3A8(s8 nState);
 void fn_80062E00(void);
 void fn_80062E20(void);
-int  fn_80063758(void);
+int  CameraController_GetClippedShadow(void);
 void StaticCam_Init(void);
 void StaticCam_DeInit(void);
 void EVENT_InitForGame(void);
@@ -496,13 +496,14 @@ void fn_8006C854(void) {
 }
 
 // Makes view nView's camera the current render camera and applies it, then draws the full-screen
-// quad (fn_8006DC4C) with flags 3 in a round for views 0 and 1 while fn_800642B0 is 0, else 1.
+// quad (fn_8006DC4C) with flags 3 in a round for views 0 and 1 while
+// CameraController_bDontClearFrameBuffer is 0, else 1.
 void fn_8006C8EC(int nView) {
     ViewController_SetCurrentViewController(nView);
     RC_vSetCurrentRenderCtx(ViewController_GetRenderContext(nView));
     fn_8006DC78();
     RC_ApplyCurrentViewport();
-    if (nView < 2 && !fn_800642B0() && gSession.nGameType == 6) {
+    if (nView < 2 && !CameraController_bDontClearFrameBuffer() && gSession.nGameType == 6) {
         fn_8006DC4C(3);
         return;
     }
@@ -903,7 +904,8 @@ void fn_8006D27C(void) {
         if (!gSession.b11 && nView < 2) {
             for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
                 Character_ClipTest(gPlayers[nPlayer].pChar, nPlayer);
-                if (Character_GetShadowClipResult(gPlayers[nPlayer].pChar) != 2 && nPlayer != fn_80063758()
+                if (Character_GetShadowClipResult(gPlayers[nPlayer].pChar) != 2 && nPlayer
+                    != CameraController_GetClippedShadow()
                     && !(gPlayers[nPlayer].pChar->uCharFlags & 0x40)
                     && !(gPlayers[nPlayer].pChar->uCharFlags & 1)) {
                     fn_800B28D4(gPlayers[nPlayer].pChar, 0, 0);
@@ -918,7 +920,8 @@ void fn_8006D27C(void) {
         if (!gSession.b11 && nView < 2) {
             for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
                 Character_ClipTest(gPlayers[nPlayer].pChar, nPlayer);
-                if (Character_GetShadowClipResult(gPlayers[nPlayer].pChar) != 2 && nPlayer != fn_80063758()
+                if (Character_GetShadowClipResult(gPlayers[nPlayer].pChar) != 2 && nPlayer
+                    != CameraController_GetClippedShadow()
                     && !(gPlayers[nPlayer].pChar->uCharFlags & 0x40)
                     && !(gPlayers[nPlayer].pChar->uCharFlags & 1)) {
                     fn_800B2FB0(gPlayers[nPlayer].pChar, 0, 0);

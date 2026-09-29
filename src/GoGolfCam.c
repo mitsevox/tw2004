@@ -12,14 +12,14 @@
 
 CamLens* Camera_GetLens(void* pCamera);                    // the render camera's lens
 void     RC_UpdateCurrentScreenMatrices(void);
-u8       fn_800635D0(int nPlayer);
+u8       CameraController_TargetIsOnScreen(int nPlayer);
 u8       fn_800B36F4(View* pView, int nPlayer, f32 fFrameTime);
 void     fn_800C73B8(f32* pA, f32* pB, f32* pOut);
 void     GolfCam_Vec3Sub(f32* pA, f32* pB, f32* pOut);
 void     fn_800C7400(f32* pA, f32* pOut);
 f32      fn_800C741C(Character* pChar, u64 uEvent);
 void     GolfCamera_ChooseReactionCam(View* pView, int nPlayer, int a);
-void     fn_8006351C(View* pView, int nPlayer, int nCamera);
+void     CameraController_StartScriptOfKind(View* pView, int nPlayer, int nCamera);
 void     fn_800B3550(int a, View* pView, int nPlayer);
 u8       fn_800B4908(void);
 void     GolfCamera_ComputeSteepSlopeCamVectors(View* pView, int nPlayer);
@@ -27,10 +27,10 @@ void     fn_800C5D64(View* pView, f32* pCam, f32* pSub, int nPlayer);
 u8       fn_800C708C(View* pView);
 void     fn_80038010(u8 a, int n, f32* pVec);
 void     fn_800380A8(u8 a, f32* pVec, u8 b, int nSlot, f32 f1, f32 f2);
-int      fn_800636EC(void);
+int      CameraController_GetClippedGolfer(void);
 void     mat44flt_EulerAngles(f32 (*m)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
 void     LLMath_mat44fltMultiply33(f32 (*m)[4], f32* pIn, f32* pOut);  // a vector through a matrix
-void     fn_800636B4(int nPlayer);
+void     CameraController_BallIsOnScreen(int nPlayer);
 void     GolfCamera_ClampLookAngle(f32* pFrom, f32* pTo, f32* pOut);
 int      fn_800C4D2C(f32* pFrom, f32* pTo, f32* pOut, f32 fMax);
 // The segment crosses the outline (at pHit).
@@ -45,7 +45,7 @@ u8       fn_8006BEA4(void);                             // emotion.c: a scripted
 void     Gaud_InitSpecialShot(u8 nPlayer);
 void     fn_80039344(int nView, f32 f);                 // a per-view float (Swing.c's declaration)
 f32      Math_Tan(f32 x);                            // tan, as a float
-void     fn_800638B8(View* pView, int nPlayer);
+void     CameraController_CheckForEvents(View* pView, int nPlayer);
 f32      fn_800D04AC(int nPlayer);                      // Swing.c's declaration
 f32      fn_800C54FC(View* pView, f32* pCam, f32* pSub, int nPlayer);
 f32      fn_800C5A70(View* pView, f32* pCam, f32* pSub, int nPlayer);
@@ -642,7 +642,7 @@ void GolfCamera_ProcessGreenZoomToAimCamera(View* pView, int nPlayer) {
             vSide[1] = 0.0f;
             vSide[2] = -vDiff[0];
         }
-        fn_80063F08(pView->v20, vSide, pView->v20);
+        CameraController_LagSideVector(pView->v20, vSide, pView->v20);
     }
 }
 
@@ -1771,7 +1771,7 @@ void GolfCamera_ProcessHeartBeatCamera(View* pView, int nPlayer) {
             } else if (pView->script.nFade == 0 || pView->script.nFade == 4
                        || pView->script.nFade == 3) {
                 pView->script.f108 += FRAME_TIME;
-                fn_80063CBC(pView, v);
+                CameraController_HoldFadeColor(pView, v);
             }
         }
         CamScript_RunScript(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, FRAME_TIME);
@@ -1993,7 +1993,7 @@ void GolfCamera_ProcessBallFlightCamera(View* pView, int nPlayer) {
     f3 = 0.0f;
     RC_spGetRenderCtxViewport(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0]));
     Vec3Copy(pCam, vOld);
-    fn_800638B8(pView, nPlayer);
+    CameraController_CheckForEvents(pView, nPlayer);
     if (fn_800C6D28()) {
         fTime = fn_800C54FC(pView, pCam, pSub, nPlayer);
     } else if (GolfCamera_IsSuperZoomCamActive()) {
@@ -2147,7 +2147,7 @@ void GolfCamera_InitPostShotCamera(View* pView, int nPlayer) {
     pView->script.n110 = 0;
     pView->p78 = pView->p74;
     if (pView->script.nC4 != 6 && pView->script.nC4 != 8 && pView->script.nC4 != 10) {
-        fn_80063CF0(pView, 5, nPlayer);
+        CameraController_PostEvent(pView, 5, nPlayer);
     }
     pView->script.n114 = 0;
     if ((pView->script.nC4 != 10 && gPlayers[nPlayer].ball.nLie != 6 && gPlayers[nPlayer].ball.nLie != 7
@@ -2222,7 +2222,8 @@ void GolfCamera_ProcessPostShotCamera(View* pView, int nPlayer) {
     if ((fn_80062C1C(gPlayers[nPlayer].pChar) || fn_80062C10(gPlayers[nPlayer].pChar))
         && fn_80095780(gPlayers[nPlayer].pChar) == 9
         && (pView->script.pShot == NULL
-            || (pView->script.pShot->bAA && pView->script.pShot->bAD && nPlayer != fn_800636EC()))) {
+            || (pView->script.pShot->bAA && pView->script.pShot->bAD && nPlayer
+                != CameraController_GetClippedGolfer()))) {
         if (GM_ShowPostShotCrowdFlyby()) {
             pShot = StaticCam_GetFlyByCam(9);
         }
@@ -2271,7 +2272,7 @@ void GolfCamera_InitInHoleCamera(View* pView, int nPlayer) {
     pView->p78 = pView->p74;
     pView->script.n110 = 0;        // 0 and then 1, as in the original
     pView->script.n110 = 1;
-    fn_80063CF0(pView, 8, nPlayer);
+    CameraController_PostEvent(pView, 8, nPlayer);
     if (gPlayers[nPlayer].bPlanReady == 1) {
         if (GolfCamera_ShowPostShotAnimations(pView)) {
             GolfCamera_ChooseReactionCam(pView, nPlayer, 1);
@@ -2310,10 +2311,10 @@ void GolfCamera_ProcessInHoleCamera(View* pView, int nPlayer) {
 }
 
 // Camera 17: fade in (over the tuning's f170) while a colour fade is running or held
-// (fn_80063C7C, fn_80063C90).
+// (CameraController_IsFadeOutDone, CameraController_IsFadeOn).
 void fn_800C3478(View* pView, int nPlayer) {
     f32 v[4] = {0.0f, 0.0f, 0.0f, 0.5f};
-    if (fn_80063C7C(pView) || fn_80063C90(pView)) {
+    if (CameraController_IsFadeOutDone(pView) || CameraController_IsFadeOn(pView)) {
         CameraController_FadeIn(pView, lbl_80281F78->f170, v);
     }
 }
@@ -2330,7 +2331,7 @@ void fn_800C34F8(View* pView, int nPlayer) {
 void GolfCamera_InitTutorialWaitCamera(View* pView, int nPlayer) {
     f32 v[4] = {0.0f, 0.0f, 0.0f, 0.5f};
     char szName[] = "TUTORIAL WAIT";
-    if (fn_80063C7C(pView)) {
+    if (CameraController_IsFadeOutDone(pView)) {
         CameraController_FadeIn(pView, lbl_80281F78->f170, v);
     }
     ViewController_GetIndexedViewController(gPlayers[nPlayer].nView[0])->bFlagOut = 0;
@@ -2557,7 +2558,7 @@ void GolfCamera_SwitchCrAPCamera(View* pView, char* szName, int nShot, u8 bBlend
 
 // Camera 24.
 void fn_800C3EB8(View* pView, int nPlayer) {
-    fn_8006351C(pView, nPlayer, 10);
+    CameraController_StartScriptOfKind(pView, nPlayer, 10);
 }
 
 // Camera 24: on the golfer's bone 10, 0.5 out along its z axis (0.1 up its y axis), looking back
@@ -2764,7 +2765,7 @@ u8 GolfCamera_SteepSlopeCamCheckCollision(View* pView, int nPlayer) {
 }
 
 // Should the view be moved: never on a putt; else by the tuning's slope and terrain tests, and when
-// fn_800635D0 fails.
+// CameraController_TargetIsOnScreen fails.
 u8 GolfCamera_NeedSteepSlopeCam(View* pView, int nPlayer) {
     u8 bMove;
     if (gPlayers[nPlayer].nClub == CLUB_PUTTER_e) {
@@ -2781,7 +2782,7 @@ u8 GolfCamera_NeedSteepSlopeCam(View* pView, int nPlayer) {
         bMove = GolfCamera_SteepSlopeCamCheckCollision(pView, nPlayer);
     }
     if (!bMove) {
-        bMove = fn_800635D0(nPlayer) == 0;
+        bMove = CameraController_TargetIsOnScreen(nPlayer) == 0;
     }
     return bMove;
 }
@@ -2860,7 +2861,7 @@ void GolfCamera_ComputeSteepSlopeCamVectors(View* pView, int nPlayer) {
         RC_UpdateCurrentScreenMatrices();
         RC_vUpdateRenderCtxTransformationMatrices(RC_spGetCurrentRenderCtx());
         bHit = Ter_CheckForGroundCollision(pBall->pCourse, vCam, vTarget, vHit, vNormal, &pSurface, &pObj);
-        fn_800636B4(nPlayer);
+        CameraController_BallIsOnScreen(nPlayer);
         if (bHit || bClear) {
             fBack += lbl_80281F78->f1D4;
             fn_8000C5D4(vBase, vDir, -fBack, vCam);

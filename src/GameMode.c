@@ -435,10 +435,11 @@ u8 GM_CheckForBallOOB(int nPlayer) {
             } else {
                 GUI_StartPostShotUI(2, nPlayer, 0.0f);
             }
-            fn_80063CF0(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 6, nPlayer);
+            CameraController_PostEvent(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 6,
+                                       nPlayer);
             return 1;
         }
-        fn_80063CF0(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 6, nPlayer);
+        CameraController_PostEvent(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 6, nPlayer);
         return 0;
     }
     gPlayers[nPlayer].nOBCount = 0;
@@ -1056,7 +1057,7 @@ void GM_CheckForShotChanges(int nPlayer) {
 void GM_DoPostShotInHoleUI(int nPlayer) {
     View* pView = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
     f32   vOffset[4] = {0.0f, 0.0f, 0.0f, 0.5f};
-    if ((gPlayers[nPlayer].uFlags & 8) && fn_80063C7C(pView)) {
+    if ((gPlayers[nPlayer].uFlags & 8) && CameraController_IsFadeOutDone(pView)) {
         GM_EndOfGolferTurn(nPlayer);
         fn_80062D0C(nPlayer);
         return;
@@ -1065,11 +1066,11 @@ void GM_DoPostShotInHoleUI(int nPlayer) {
         return;
     }
     if (!GUI_IsPostShotUIAnimating(nPlayer)) {
-        if (fn_80063C7C(pView)) {
+        if (CameraController_IsFadeOutDone(pView)) {
             GM_EndOfGolferTurn(nPlayer);
             return;
         }
-        if (fn_80063C90(pView)) {
+        if (CameraController_IsFadeOn(pView)) {
             return;
         }
         fn_80062B78(nPlayer);
@@ -1269,7 +1270,7 @@ void GM_SimulateBallMovement(int nPlayer) {
 // requests of GameMessages.c: the controller-pulled check is stubbed out in this build.
 void GM_CheckControllerPulled(void) {
     if (gpGame->pfnCheckControllerPulled()) {
-        if (!fn_80063C90(ViewController_GetCameraControl(gPlayers[0].nView[0]))) {
+        if (!CameraController_IsFadeOn(ViewController_GetCameraControl(gPlayers[0].nView[0]))) {
             GUI_DetectControllerPull();
         }
     }

@@ -601,7 +601,7 @@ void Lessons_Update(void) {
         }
         break;
     case 18:
-        if (fn_80063C7C(ViewController_GetCameraControl(gPlayers[0].nView[0]))) {
+        if (CameraController_IsFadeOutDone(ViewController_GetCameraControl(gPlayers[0].nView[0]))) {
             gLessonStep = gLessonNextStep;
         }
         break;
@@ -875,7 +875,7 @@ void Lessons_Update(void) {
         }
         // falls through
     case 19:
-        if (fn_80063C7C(ViewController_GetCameraControl(gPlayers[0].nView[0]))) {
+        if (CameraController_IsFadeOutDone(ViewController_GetCameraControl(gPlayers[0].nView[0]))) {
             nView = gPlayers[0].nView[0];
             CameraController_SetCameraMode(ViewController_GetCameraControl(nView), 18, 0, nView);
             if (gLessonNum == 12) {

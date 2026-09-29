@@ -208,17 +208,17 @@ LAYOUT_ASSERT(CamSequence, 0x50);
 typedef struct CamScript {
     f32  v0[4];                 // 0x00  camera 4 puts the ball here
     f32  v10[4];                // 0x10  and the pin here
-    f32  a20[8];                // 0x20  cleared with the rest by fn_80062E40
+    f32  a20[8];                // 0x20  cleared with the rest by CameraController_InitOneCamera
     f32  vFadeColor[4];         // 0x40  the screen fade's colour, its alpha [3] the most it reaches
     f32  v50[4];                // 0x50  the ball-flight camera: where the shot should land (the aim, at
                                 //       the club's full distance)
     f32  v60[4];                // 0x60  CamScript_RunScript: how far the camera moved this frame (0 when
                                 //       CameraScript_SnapToScript holds)
-    f32  v70[4];                // 0x70  (0, 0, 0, 1) when the view is set up (fn_80062E40)
+    f32  v70[4];                // 0x70  (0, 0, 0, 1) when the view is set up (CameraController_InitOneCamera)
     f32  fCamTime;              // 0x80  time on this camera
     f32  f84;                   // 0x84  fCamTime before this frame's step (CamScript_RunScript)
     f32  f88;                   // 0x88  a second clock, stepped with fCamTime
-    f32  f8C;                   // 0x8C  how long the next shot lasts (its f48; fn_8006351C)
+    f32  f8C;                   // 0x8C  how long the next shot lasts (its f48; CameraController_StartScriptOfKind)
     f32  fFadeTime;             // 0x90  the fade's time so far (stepped by the frame time)
     f32  fFadeLength;           // 0x94  and its length
     f32  f98;                   // 0x98
@@ -228,13 +228,13 @@ typedef struct CamScript {
     f32  fA4;                   // 0xA4
     f32  fA8;                   // 0xA8  the current shot's f9C (CamScript_RunScript)
     CamShot* pShot;             // 0xAC  the current shot
-    CamShot* pNextShot;         // 0xB0  the next one (the current shot's p40; fn_8006351C)
+    CamShot* pNextShot;         // 0xB0  the next one (the current shot's p40; CameraController_StartScriptOfKind)
     CamShot* pB4;               // 0xB4  where SwitchCrAPCamera records the current camera
     CamShot* pB8;               // 0xB8  the shot before (GolfCamera_CutToGolferDoneAnimatingCam)
-    s32  nBC;                   // 0xBC  the next shot's kind (its bAB; fn_8006351C)
+    s32  nBC;                   // 0xBC  the next shot's kind (its bAB; CameraController_StartScriptOfKind)
     s32  nFade;                 // 0xC0  the screen fade (CamScript_Fade): 0 none, 1 fading up to vFadeColor
                                 //       (CameraController_FadeOut), 2 fading away (FadeIn), 3 held
-                                //       (fn_80063CBC), 4 kept after 1 ends, 5 after 2 ends (then 0)
+                                //       (CameraController_HoldFadeColor), 4 kept after 1 ends, 5 after 2 ends (then 0)
     s32  nC4;                   // 0xC4  the shot kind asked for
     s32  nC8;                   // 0xC8  the shot kind last started
     u8   bCC;                   // 0xCC
@@ -252,7 +252,7 @@ typedef struct CamScript {
     u8   bE8;                   // 0xE8
     u8   unkE9[0xEC - 0xE9];
     f32  fEC;                   // 0xEC
-    f32  fF0;                   // 0xF0  } set together by fn_800642A4
+    f32  fF0;                   // 0xF0  } set together by CameraController_SetShakeAmount
     f32  fF4;                   // 0xF4  }
     f32  fF8;                   // 0xF8
     u8   unkFC[0x100 - 0xFC];
@@ -359,7 +359,7 @@ typedef struct CamTuning {
     f32  f84;                   // 0x084  how long the super zoom's first shot lasts
     f32  f88;                   // 0x088
     f32  f8C;                   // 0x08C
-    f32  f90;                   // 0x090  fn_800638B8 switches to camera 2 while the ball is below this
+    f32  f90;                   // 0x090  CameraController_CheckForEvents switches to camera 2 while the ball is below this
                                 //        height (and falling, not yet bounced)
     f32  f94;                   // 0x094  the elevator camera's first blend value
     f32  f98;                   // 0x098  camera 8: 1 - this is its height's share of the move a frame
@@ -460,7 +460,7 @@ typedef struct CamTuning {
                                 //        ball's updates per frame
     f32  f1AC;                  // 0x1AC
     f32  f1B0;                  // 0x1B0
-    f32  f1B4;                  // 0x1B4  } fn_80063920 (GoCamCont.c), flat directions: the least cosine
+    f32  f1B4;                  // 0x1B4  } CameraController_CameraCollision (GoCamCont.c), flat directions: the least cosine
     f32  f1B8;                  // 0x1B8  } from the camera's motion (f1B4) and from its look (f1B8) to the
     f32  f1BC;                  // 0x1BC  } object; the most the camera may move in a frame (f1BC)
     s32  n1C0;                  // 0x1C0  nonzero enables camera 19
@@ -483,7 +483,7 @@ typedef struct CamTuning {
                                 //        the horizontal (degrees)
     f32  fMaxPitchDown;         // 0x1FC  and below it
     f32  f200;                  // 0x200  } the camera shake CameraController_Idle starts on the swing's
-    f32  f204;                  // 0x204  } events 5..14: CamScript.fF4 and fF0 (fn_800642A4)
+    f32  f204;                  // 0x204  } events 5..14: CamScript.fF4 and fF0 (CameraController_SetShakeAmount)
     f32  f208;                 // 0x208  times lbl_801D5010[view]: the alpha of GoPostFx fn_80039358's
                                 //        black cover
     f32  f20C;                 // 0x20C  camera 4: the most View.f54 grows to
@@ -708,7 +708,7 @@ int    ViewController_GetCurrentViewControllerID(void);
 void   VM_vSetViewportRect(f32* pViewport, f32 fLeft, f32 fTop, f32 fWidth, f32 fHeight);
 // A world position on screen (0..1 across and down; pZ, if not NULL, gets a third value). Returns
 // 1 when the point is in front of the camera (clip w below 0), else 0.
-u8     fn_8006434C(void* pCamera, f32* pPos, f32* pX, f32* pY, f32* pZ);
+u8     RC_vComputeRenderCtxWorldToPrimitiveCoordinate(void* pCamera, f32* pPos, f32* pX, f32* pY, f32* pZ);
 void   fn_8006A8D4(void* pCamera, f32* pX, f32* pY);
 
 // ---- camera shots and sequences (0x8003A7C8..) ----------------------------------------------
@@ -856,18 +856,18 @@ void   fn_800C3EDC(View* pView, int nPlayer);                       // 24
 // ---- the camera controller (0x80062F38..) ---------------------------------------------------
 
 void   CameraController_SetCameraMode(View* pView, int nCamera, int nPlayer, int nView);
-void   fn_80062F1C(View* pView);
-void   fn_80063920(int nView, f32* pBounds);    // the view's camera is inside an object's bounds
+void   CameraController_ResetCameraState(View* pView);
+void   CameraController_CameraCollision(int nView, f32* pBounds);    // the view's camera is inside an object's bounds
 void   CameraController_FadeIn(View* pView, f32 fTime, f32* pVec);
 void   CameraController_FadeOut(View* pView, f32 fTime, f32* pVec);
-u8     fn_80063C50(View* pView);             // script.nFade 3, 4 or 5: a colour fade held or ending
-u8     fn_80063C7C(View* pView);             // script.nFade 4: kept after fading up
-u8     fn_80063C90(View* pView);             // script.nFade 1, 2 or 4: a colour fade running or held
-void   fn_80063CBC(View* pView, f32* pVec);  // script.nFade 3: hold the colour pVec over the view
-void   fn_80063CF0(View* pView, int nKind, int nPlayer);
-void   fn_800642D0_ReapplyCurrentShot(View* pView, int nPlayer);
-u8     fn_800642B0(void);               // fn_800C6CB0's answer (gomainloop tests it)
-void   fn_80063F08(f32* pA, f32* pB, f32* pOut);   // the green zoom-to-aim camera: View.v20 as pA and pOut
+u8     CameraController_IsFadeDone(View* pView);             // script.nFade 3, 4 or 5: a colour fade held or ending
+u8     CameraController_IsFadeOutDone(View* pView);             // script.nFade 4: kept after fading up
+u8     CameraController_IsFadeOn(View* pView);             // script.nFade 1, 2 or 4: a colour fade running or held
+void   CameraController_HoldFadeColor(View* pView, f32* pVec);  // script.nFade 3: hold the colour pVec over the view
+void   CameraController_PostEvent(View* pView, int nKind, int nPlayer);
+void   CameraController_ResetAimMarkerInSwingCamera(View* pView, int nPlayer);
+u8     CameraController_bDontClearFrameBuffer(void);               // fn_800C6CB0's answer (gomainloop tests it)
+void   CameraController_LagSideVector(f32* pA, f32* pB, f32* pOut);   // the green zoom-to-aim camera: View.v20 as pA and pOut
 
 // ---- the golf cameras (GoGolfCam.c) ---------------------------------------------------------
 

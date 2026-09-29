@@ -310,17 +310,17 @@ They will be sorted into the sections below.
   (Grass_Gc Static_Render 92.5 -> 96.5).
 - **[verified] Float tests: `if (f)` / `!f` put the value first in `fcmpu`**; `f != 0.0f` and `0.0f != f`
   both put the zero first (GoTerrain fn_800342F0, TerrainData fn_8000BF9C, GoPostFx fn_80039358). A float
-  `!(x < c)` gives a plain `blt` where `x >= c` gives `cror` (GoCamCont fn_80063CF0).
+  `!(x < c)` gives a plain `blt` where `x >= c` gives `cror` (GoCamCont CameraController_PostEvent).
 - **[verified] Pointer plus integer always puts the pointer first in `add`**; adding as integers
   (`(u8*)(n + (uptr)p)`) flips it (UMemPool fn_8000AFA0, marked fake match).
 - **[verified] Early exits:** `if (A || B) return;` compiles B as `bcond; b exit` while separate ifs
-  branch straight out (GoCamCont fn_80063920); a `blt` to a return block placed after the fall-through
+  branch straight out (GoCamCont CameraController_CameraCollision); a `blt` to a return block placed after the fall-through
   code is a `goto` to a label after that code (char GetTerrainHeightAndNormal); a duplicated tail is
   written twice (`if (n < 30) { if (x) return 1; return t; } return t;`, fe_craputils UserInfo_IsGolferAvailable).
 - **[verified] `b = b != 0;`** before a test reproduces `clrlwi; neg; or; srwi.` (char Character_PreRenderAll).
 - **[verified] Two calls multiplied: the right-hand one runs first** (`f(a) * f(b)`; Skeleton SKEL_ItterateIKChain,
   GoRenderCtx RenderState_SetViewport). `f = call(); f *= c;` puts the call result first in `fmuls`; `call() * c` puts
-  the constant first (GoCamCont fn_80063F08, TexAnimManager fn_80076C20).
+  the constant first (GoCamCont CameraController_LagSideVector, TexAnimManager fn_80076C20).
 - **[verified] A switch's compare tree shows its empty cases**: add `case 0: case 3: break;` to get it
   (GoAnimalActors fn_8004A578, GoLighting fn_8006E7A4); a one-case switch with default gives `beq A; b B`
   where if/else gives `bne` (CharAnim UpdateSKAState).

@@ -205,7 +205,7 @@ void TARGET_RenderBallTarget(int nPlayer) {
     // the club's range (1..100)
     fn_80012C84_SetFlags(0);
     fn_8006A9AC(aText);
-    fn_8006434C(pCamera, vPos, &fX, &fY, NULL);
+    RC_vComputeRenderCtxWorldToPrimitiveCoordinate(pCamera, vPos, &fX, &fY, NULL);
     fn_8006A8D4(pCamera, &fX, &fY);
     fRise = vPos[1] - gPlayers[nPlayer].vBall[1];
     fShare = 100.0f * (gPlayers[nPlayer].fDistance
@@ -257,9 +257,9 @@ void TARGET_RenderBallTarget(int nPlayer) {
         aShadow[i][2] = vPos[2] + aShadowQuad[i][2];
         aShadow[i][3] = 1.0f;
     }
-    bOnScreen = fn_8006434C(pCamera, aMarker[0], &fX1, &fY, NULL);
+    bOnScreen = RC_vComputeRenderCtxWorldToPrimitiveCoordinate(pCamera, aMarker[0], &fX1, &fY, NULL);
     fn_8006A8D4(pCamera, &fX1, &fY);
-    bOnScreen &= fn_8006434C(pCamera, aMarker[1], &fX2, &fY, NULL);
+    bOnScreen &= RC_vComputeRenderCtxWorldToPrimitiveCoordinate(pCamera, aMarker[1], &fX2, &fY, NULL);
     fn_8006A8D4(pCamera, &fX2, &fY);
     fX = 0.5f * (fX1 + fX2);
 
@@ -1105,7 +1105,7 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
         } else {
             fn_8006A9AC(lbl_801887DC);
         }
-        fn_8006434C(pCamera, vPos, &fX, &fY, NULL);
+        RC_vComputeRenderCtxWorldToPrimitiveCoordinate(pCamera, vPos, &fX, &fY, NULL);
         fn_8006A8D4(pCamera, &fX, &fY);
         fY -= 3.0f * fn_8006A9FC();
         if (fY < 3.0f * fn_8006A9FC()) {

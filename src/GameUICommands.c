@@ -2647,8 +2647,8 @@ void GM_vAddRemoveClub(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Command 180: asks for the other disc and loads the hole again: player 0's view runs camera script
-// 3 (fn_80063CBC, zero vector), the golfer waits (GS_WAIT), the other disc is asked for and waited
-// on (fn_801102AC), the characters' texture files are reopened, a hole load is requested
+// 3 (CameraController_HoldFadeColor, zero vector), the golfer waits (GS_WAIT), the other disc is
+// asked for and waited on (fn_801102AC), the characters' texture files are reopened, a hole load is requested
 // (fn_8006F4B4) and the view's camera script goes back to 0. The result is always 0.
 void IG_vSwapDiscReloadHole(MsgArg* pArgs, MsgArg* pResult) {
     View* pView = ViewController_GetCameraControl(gPlayers[0].nView[0]);
@@ -2656,7 +2656,7 @@ void IG_vSwapDiscReloadHole(MsgArg* pArgs, MsgArg* pResult) {
 
     pResult->i = 0;
     if (pResult->i == 0) {
-        fn_80063CBC(pView, vZero);
+        CameraController_HoldFadeColor(pView, vZero);
         GOLFERSTATE_Set(GS_WAIT, 0);
         fn_801102AC();
         Character_ReopenTextureFiles();

@@ -578,7 +578,7 @@ void fn_80031154(Ter_PatchReference* pPatch, s32 nFirstObject) {
             }
             fDistanceSquared = fHeight * fHeight + fXZ * fXZ;
             if (fDistanceSquared <= 0.0f) {
-                fn_80063920(lbl_801D3CB0.iCurrentViewContext, pBounds);
+                CameraController_CameraCollision(lbl_801D3CB0.iCurrentViewContext, pBounds);
             }
             bHide = 0;
             if ((uFlags2 & 0x80) && fDistanceSquared > lbl_801D3CB0.fDistanceCullFrameYardsSquared) {

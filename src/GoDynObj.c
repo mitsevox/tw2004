@@ -56,7 +56,7 @@ void fn_80093DB8(Ball* pBall, int nPlayer);    // GoObjShadow.c
 void BFX_vRender(Ball* pBall, int nPlayer);    // GoObjShadow.c
 void fn_80048584(UObject* pObj, s8 nLod);
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);                   // identity
-int  fn_800636EC(void);
+int  CameraController_GetClippedGolfer(void);
 void fn_8004858C(f32* pOut, f32 fTurn, f32 fTilt);
 void fn_8000C5A4(f32 (*pMtx)[4]);
 void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
@@ -360,7 +360,7 @@ u8 fn_80046928(int nPlayer) {
     if (!DynObj_bAltShotDrawBall(nPlayer)) {
         return 0;
     }
-    if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 18 && nPlayer == fn_800636EC()) {
+    if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 18 && nPlayer == CameraController_GetClippedGolfer()) {
         return 0;
     }
     return 1;

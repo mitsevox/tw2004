@@ -14,7 +14,7 @@ ViewController gViewControllers[4];
 ViewController* gpCurViewController;               // the current view's controller
 int gCurViewControllerID;                           // the current view
 
-void  fn_80062E40(View* pView);                     // set up a camera controller
+void  CameraController_InitOneCamera(View* pView);                     // set up a camera controller
 void  fn_80038010(u8 a, int n, f32* pVec);
 void  fn_80038054(u8 a, int n, f32 f1, f32 f2);
 void  CameraController_Idle(View* pView, int nPlayer);
@@ -76,7 +76,7 @@ void ViewController_Init(int nView, f32 fLeft, f32 fTop, f32 fWidth, f32 fHeight
     // port: RC_GetCurrentFrameBuffer is typed s32, but its value is the frame buffer
     pViewController->pCamera =
         RC_spCreateRenderCtx(pLens, (GoFrameBuf*)RC_GetCurrentFrameBuffer(), pViewport);
-    fn_80062E40(&pViewController->view);
+    CameraController_InitOneCamera(&pViewController->view);
     pViewController->nPlayer = 5;
     pViewController->bActive = 1;
     fn_80038010(0, nView, NULL);

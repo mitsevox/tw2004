@@ -382,11 +382,11 @@ void EVENT_Idle(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
 // Event 28 (Ball.c: the ball tops its arc), only for the real ball (nArg 1) and unless a lesson
-// blocks it: camera event 1 for the player's view (fn_80063CF0), emotion event 3 (fn_8006ACF8), and
-// fn_80095744 with 13 on the golfer's character, which that function ignores.
+// blocks it: camera event 1 for the player's view (CameraController_PostEvent), emotion event 3
+// (fn_8006ACF8), and fn_80095744 with 13 on the golfer's character, which that function ignores.
 void EVENT_TopOfArc(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1 && !Lessons_OnEvent(nPlayer, 28)) {
-        fn_80063CF0(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 1, nPlayer);
+        CameraController_PostEvent(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 1, nPlayer);
         fn_8006ACF8(nPlayer, 3);
         fn_80095744(gPlayers[nPlayer].pChar, 13);
     }
@@ -408,7 +408,7 @@ void EVENT_FirstBounce(int nPlayer, int nEvent, void* pData, int nArg) {
         if (!Lessons_OnEvent(nPlayer, 29)) {
             SitDev_QueueEvent(nPlayer, 2, 28);
         }
-        fn_80063CF0(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 3, nPlayer);
+        CameraController_PostEvent(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 3, nPlayer);
         fn_8006ACF8(nPlayer, 2);
         if (Player_IsController8(nPlayer)) {
             EVENT_FirstBounceController8(nPlayer);
@@ -427,7 +427,7 @@ void EVENT_FirstBounce(int nPlayer, int nEvent, void* pData, int nArg) {
 // view. Nothing in this build fires the event.
 void EVENT_NonFirstBounce(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1) {
-        fn_80063CF0(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 30, nPlayer);
+        CameraController_PostEvent(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 30, nPlayer);
     }
 }
 
@@ -435,7 +435,7 @@ void EVENT_NonFirstBounce(int nPlayer, int nEvent, void* pData, int nArg) {
 // camera event 31 for the player's view, the spin window closed and the boost display hidden.
 void EVENT_LastBounceForSpinna(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1) {
-        fn_80063CF0(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 31, nPlayer);
+        CameraController_PostEvent(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 31, nPlayer);
         SW_vCloseSpinWindow(nPlayer);
         SW_vSetDisplayBoostUI(nPlayer, 0);
     }
@@ -463,7 +463,7 @@ void EVENT_BallStop(int nPlayer, int nEvent, void* pData, int nArg) {
 // the player's view, emotion event 4, Gaud_BallInCup and commentary situation event 9.
 void EVENT_InHole(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1) {
-        fn_80063CF0(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 8, nPlayer);
+        CameraController_PostEvent(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 8, nPlayer);
         fn_8006ACF8(nPlayer, 4);
         Gaud_BallInCup(nPlayer);
         SitDev_QueueEvent(nPlayer, 2, 9);
@@ -475,7 +475,7 @@ void EVENT_InHole(int nPlayer, int nEvent, void* pData, int nArg) {
 // commentary situation event 8.
 void EVENT_OutOfBounds(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1 && !Lessons_OnEvent(nPlayer, 34)) {
-        fn_80063CF0(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 6, nPlayer);
+        CameraController_PostEvent(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 6, nPlayer);
         SitDev_QueueEvent(nPlayer, 2, 8);
     }
 }
@@ -670,7 +670,7 @@ void EVENT_SpecialSwingEnded(int nPlayer, int nEvent, void* pData, int nArg) {
 void EVENT_BallPredictionDone(int nPlayer, int nEvent, void* pData, int nArg) {
     SitDev_QueueEvent(nPlayer, 2, 20);
     if (gPlayers[nPlayer].ballBefore.nLie == LIE_INCUP_e) {
-        fn_80063CF0(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 11, nPlayer);
+        CameraController_PostEvent(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 11, nPlayer);
     }
 }
 
@@ -861,7 +861,7 @@ void EVENT_Trigger(int nPlayer, int nEvent, void* pData, int nArg) {
 // (AI_SimAbort).
 void Collision(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1) {
-        fn_80063CF0(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 7, nPlayer);
+        CameraController_PostEvent(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), 7, nPlayer);
         Gaud_BallBounce(nPlayer);
         fn_800A3348(pData, nPlayer);
         fn_8006ACF8(nPlayer, 1);

@@ -565,7 +565,7 @@ void SpeedGolf_CountdownInit(int nPlayer) {
     fn_800957D8(gPlayers[nPlayer].pChar);
     fn_80095744(gPlayers[nPlayer].pChar, 5);
     Emotion_UpdatePlayerEmotion(nPlayer);
-    fn_80062F1C(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]));
+    CameraController_ResetCameraState(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]));
     i = gPlayers[nPlayer].nView[0];
     CameraController_SetCameraMode(ViewController_GetCameraControl(i), 12, nPlayer, i);
     gPlayers[nPlayer].nC54 = 74;
@@ -1900,13 +1900,13 @@ u8 SpeedGolf_RenderBallTarget(int nPlayer) {
 
 // The pfnCheckControllerPulled of modes 6, 7 and 8, which GM_CheckControllerPulled asks (TW06's
 // CheckControllerPulled): 1 during the countdown (nSGFlags bit 1) once under 71 frames are left,
-// and otherwise unless player 0's view is in a colour fade (fn_80063C90).
+// and otherwise unless player 0's view is in a colour fade (CameraController_IsFadeOn).
 u8 SpeedGolf_CheckControllerPulled(void) {
     if (gPlayers[0].nSGFlags & 2) {
         if (gPlayers[0].nC54 < 71) {
             return 1;
         }
-    } else if (!fn_80063C90(ViewController_GetCameraControl(gPlayers[0].nView[0]))) {
+    } else if (!CameraController_IsFadeOn(ViewController_GetCameraControl(gPlayers[0].nView[0]))) {
         return 1;
     }
     return 0;

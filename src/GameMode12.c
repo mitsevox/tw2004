@@ -106,7 +106,8 @@ void GameMode12_BallLanded(int nPlayer) {
         GameMode12_GetSurfacePrize(gGameMode12Surface, &nPoints, &nMeter, &nMult);
         nHits = GameMode12_CountSurfaceHits(nPlayer, gGameMode12Surface);
         if (!SurfaceUsedUp(&nPoints, nHits)) {
-            fn_8006434C(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0]),
+            RC_vComputeRenderCtxWorldToPrimitiveCoordinate(
+                    ViewController_GetRenderContext(gPlayers[nPlayer].nView[0]),
                         gPlayers[nPlayer].ball.vPrev,
                         &x, &y, 0);
             fn_8006A8D4(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0]), &x, &y);

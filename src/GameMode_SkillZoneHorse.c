@@ -218,7 +218,8 @@ void GameModeSkillZoneHorse_CheckShotAwards(int nPlayer) {
                     gPlayers[nPlayer].nSkillZonePoints = 0;
                 }
                 if (!gSession.bReplay) {
-                    fn_8006434C(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0]),
+                    RC_vComputeRenderCtxWorldToPrimitiveCoordinate(
+                            ViewController_GetRenderContext(gPlayers[nPlayer].nView[0]),
                                 gPlayers[nPlayer].ball.vPrev, &x, &y,
                                 0);
                     fn_8006A8D4(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0]), &x, &y);

@@ -254,7 +254,7 @@ void UI_ReadControllers(void) {
     if (gSession.nGameType >= 4 && gSession.nGameType <= 8 && gSession.nPaused == 0) {
         for (i = 0; i < gSession.nNumPlayers; i++) {
             pView = ViewController_GetCameraControl(gPlayers[i].nView[0]);
-            if ((fn_80063C90(pView) || pView->script.nFade == 3) && pView->nCurCamera != 0x15) {
+            if ((CameraController_IsFadeOn(pView) || pView->script.nFade == 3) && pView->nCurCamera != 0x15) {
                 return;
             }
         }

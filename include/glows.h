@@ -83,10 +83,10 @@ typedef struct SunFlrView {
     s32  nC;                    // 0x0C  576
     SunFlrPart aPart[4];        // 0x10  the first two are cleared at set-up
     f32  af90[2];               // 0x90  fn_8009A754's result, one per video field
-    f32  f98;                   // 0x98  } where fn_8006434C puts lbl_802813B8->v4 on the view's
+    f32  f98;                   // 0x98  } where RC_vComputeRenderCtxWorldToPrimitiveCoordinate puts lbl_802813B8->v4 on the view's
     f32  f9C;                   // 0x9C  } screen
     f32  fA0;                   // 0xA0  }
-    u8   bA4;                   // 0xA4  fn_8006434C's result
+    u8   bA4;                   // 0xA4  RC_vComputeRenderCtxWorldToPrimitiveCoordinate's result
     u8   bA5;                   // 0xA5  set to 1 at set-up (SF_vInitModule)
     u8   unkA6[0xA8 - 0xA6];
 } SunFlrView;

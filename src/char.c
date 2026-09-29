@@ -209,7 +209,7 @@ void  fn_80035604(void);                // GoTerrain.c
 void  SKN_DrawCharacter(Character* pChar, u32 uFlags);
 void  SKN_PoseCharacter(Character* pChar, int n);
 void  SKN_BeginFrame(void);                // Skin.c
-int   fn_800636EC(void);                // GoCamCont.c
+int   CameraController_GetClippedGolfer(void);                // GoCamCont.c
 void  fn_8010BF68(void);
 void  fn_8010BFE0(void);
 void  fn_80112C64(int n);
@@ -2156,8 +2156,8 @@ void Character_ClipTest(Character* pChar, int nPlayer) {
 // Each frame before drawing: every character loses bit 0x1000 of uCharFlags, and one with bit 2
 // (the flagstick, GoDynObj.c) gets bit 1 (hidden) while the current view has the flag out. Then
 // every character whose body or shadow is in view (nClipResult or nShadowClipResult not 2), that is
-// not the player fn_800636EC names, has none of bits 0x1000, 0x40 and 1 of uCharFlags and is not
-// posed yet (bPosed 0) gets its skins posed on its model (SKN_PoseCharacter).
+// not the player CameraController_GetClippedGolfer names, has none of bits 0x1000, 0x40 and 1 of
+// uCharFlags and is not posed yet (bPosed 0) gets its skins posed on its model (SKN_PoseCharacter).
 void Character_PreRenderAll(void) {
     int i;
     int iPlayer2Clip;
@@ -2167,7 +2167,7 @@ void Character_PreRenderAll(void) {
     fn_80035600();
     SKN_BeginFrame();
     for (i = 0; i < gNumCharacters; i++) {
-        iPlayer2Clip = fn_800636EC();
+        iPlayer2Clip = CameraController_GetClippedGolfer();
         gCharacters[i]->uCharFlags &= ~0x1000;
         if (gCharacters[i]->uCharFlags & 2) {
             if (ViewController_GetCurrentViewController()->bFlagOut) {
@@ -2189,9 +2189,9 @@ void Character_PreRenderAll(void) {
 }
 
 // Draws every character (SKN_DrawCharacter with uFlags) that is in view (nClipResult not 2), is not
-// the player fn_800636EC names, is neither hidden (bit 1 of uCharFlags) nor without its textures
-// (bit 0x40), and, when uFlags has bit 4, is a golfer. fn_80035604 first; nothing when no character
-// is made.
+// the player CameraController_GetClippedGolfer names, is neither hidden (bit 1 of uCharFlags) nor
+// without its textures (bit 0x40), and, when uFlags has bit 4, is a golfer. fn_80035604 first;
+// nothing when no character is made.
 void Character_RenderAll(u32 uFlags) {
     int i;
     int iPlayer2Clip;
@@ -2199,7 +2199,7 @@ void Character_RenderAll(u32 uFlags) {
     if (gNumCharacters != 0) {
         fn_80035604();
         for (i = 0; i < gNumCharacters; i++) {
-            iPlayer2Clip = fn_800636EC();
+            iPlayer2Clip = CameraController_GetClippedGolfer();
             if (Character_GetClipResult(gCharacters[i]) != 2 && iPlayer2Clip != gCharacters[i]->nPlayer &&
                 !(gCharacters[i]->uCharFlags & 0x41) &&
                 (Character_IsGolfer(gCharacters[i]) || (uFlags & 4) == 0)) {
