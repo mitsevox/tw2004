@@ -8,9 +8,9 @@
 #include "game/modes/pgatoursim.h"
 #include "game/modes/pgatour.h"
 
-int fn_800BB218(u16* pList, int nCount);
-int fn_800BB248(u16* pList, int nCount);
-u32 fn_800BB334(u16* pList, int nCount, int nLeft, u32 nPick);
+int SitDev_NumEntries(u16* pList, int nCount);
+int SitDev_NumEntriesUnused(u16* pList, int nCount);
+u32 SitDev_ChooseRandomResponseNoRepeat(u16* pList, int nCount, int nLeft, u32 nPick);
 
 void fn_800BD77C(int nSound);
 void fn_800BD7D0(u8 nMusic);
@@ -54,9 +54,9 @@ u8 fn_800BCE70(SitDevAction* pAction, u8 nEvent) {
     u32 nSound;
     int bNot30;
     if (gpSitDevData->abPlayed[pAction->nKind]) return 0;
-    nCount = fn_800BB218(pAction->aList, 50);
-    nLeft = fn_800BB248(pAction->aList, nCount);
-    nSound = fn_800BB334(pAction->aList, nCount, nLeft, Misc_RandFunc(1) % nLeft);
+    nCount = SitDev_NumEntries(pAction->aList, 50);
+    nLeft = SitDev_NumEntriesUnused(pAction->aList, nCount);
+    nSound = SitDev_ChooseRandomResponseNoRepeat(pAction->aList, nCount, nLeft, Misc_RandFunc(1) % nLeft);
     bNot30 = nEvent != 30;
     if (!GameEffects_SkipOtherCommentary()) {
         fn_800BD83C(nSound, bNot30);

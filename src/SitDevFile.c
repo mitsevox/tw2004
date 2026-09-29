@@ -26,49 +26,57 @@ SwapField lbl_80191210[4] = {
 
 SitDevScripts* lbl_80282208;
 
-void fn_800BB4B0(void);
+void SitDev_BeginLoadScripts(void);
 
 // ---- scripts -------------------------------------------------------------------------------
 
-void fn_800BB4E8(void);
-void fn_800BB4B4(SitDevScripts* pScripts);
-void fn_800BB52C(void);
+void SitDev_SwapHeader(void);
+void SitDev_BindHeader(SitDevScripts* pScripts);
+void SitDev_SwapTables(void);
 
-// Take the loaded scripts (the first time, byte-swap them and fix up their pointers) and allocate
-// their per-entry bytes.
+// The hole stream's 'sscr' chunk handler (SitDev_vRegisterStreamClients). Keeps the chunk
+// (SitDevData.pCC, freed at round end); the first time, takes its first word as the scripts' header
+// (lbl_80282208), byte-swaps the header (SitDev_SwapHeader), turns its offsets into pointers
+// (SitDev_BindHeader) and byte-swaps the tables (SitDev_SwapTables). Then allocates the group flags
+// (pD4, one byte per group, header n10) and clears them (fn_800BD74C).
 void SitDev_LoadScripts(SitDevScripts** ppScripts) {
-    fn_800BB4B0();
+    SitDev_BeginLoadScripts();
     gpSitDevData->pCC = ppScripts;
     if (lbl_80282208 == NULL) {
         lbl_80282208 = *ppScripts;
-        fn_800BB4E8();
-        fn_800BB4B4(lbl_80282208);
-        fn_800BB52C();
+        SitDev_SwapHeader();
+        SitDev_BindHeader(lbl_80282208);
+        SitDev_SwapTables();
     }
     gpSitDevData->pD4 = StaticMem_Alloc(lbl_80282208->n10, 2, 16, "SitDevFile.c", 105);
     fn_800BD74C();
 }
 
-void fn_800BB4B0(void) {
+// Empty in this build; SitDev_LoadScripts calls it first.
+void SitDev_BeginLoadScripts(void) {
 }
 
-// The header's table offsets are from its start.
-void fn_800BB4B4(SitDevScripts* pScripts) {
+// Turns the header's four table offsets (from the header's start) into pointers: the situations
+// (p14), the actions (p18), the responses (p1C) and the names (p20, 16 bytes each, state value 86).
+void SitDev_BindHeader(SitDevScripts* pScripts) {
     pScripts->p14 = (SitDevEntry*)((u8*)pScripts->p14 + (uptr)pScripts);
     pScripts->p18 = (SitDevAction*)((u8*)pScripts->p18 + (uptr)pScripts);
     pScripts->p1C = (SitDevEntry8*)((u8*)pScripts->p1C + (uptr)pScripts);
     pScripts->p20 = pScripts->p20 + (uptr)pScripts;
 }
 
-// Byte-swap the header in place.
-void fn_800BB4E8(void) {
+// Byte-swaps the scripts' header (nine words, layout lbl_80191168) in place.
+void SitDev_SwapHeader(void) {
     void* pSrc = lbl_80282208;
     void* pDst = lbl_80282208;
     ByteSwap_Records(&pSrc, &pDst, lbl_80191168, 9, 1);
 }
 
-// Byte-swap the tables in place, then put the bit-fields of the p14 and p1C entries in order.
-void fn_800BB52C(void) {
+// Byte-swaps the scripts' tables in place: the situations (p14), actions (p18) and responses (p1C)
+// by their layouts (lbl_801911B0, lbl_801911E8, lbl_80191210), and the p20 block. Then stores each
+// situation's and response's b2 halfword back as its two bit-fields (the low 11 bits and the top
+// 5).
+void SitDev_SwapTables(void) {
     void* pSrc;
     void* pDst;
     SitDevEntry* pEntry;

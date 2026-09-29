@@ -23,30 +23,36 @@ s32 lbl_801FA198[5];
 
 // ---- the watched ball ----------------------------------------------------------------------
 
-void fn_800BB0DC(void);
+void SitDev_ClearCupBevelFlag(void);
 
-void fn_800BB0A8(void) {
-    fn_800BB0DC();
+// A mulligan (GM_PlayerTakeMulligan): clears the cup bevel flag (SitDev_ClearCupBevelFlag), so the
+// retaken shot can queue situation event 34 again. TW07's is empty.
+void SitDev_OnMulligan(void) {
+    SitDev_ClearCupBevelFlag();
 }
 
-// Stop watching the ball.
-void fn_800BB0C8(void) {
+// Stops watching the struck ball (SitDev_SetBallHitTime starts): at round start
+// (SitDev_vInitModule) and at every shot set-up (situation event 3).
+void SitDev_ClearBallThatWasHit(void) {
     lbl_802821FC = NULL;
 }
 
-// Whether the ball has reached surface 105 (see fn_800BB0E8).
-u8 fn_800BB0D4(void) {
+// Whether the watched ball has lain on surface 105, the cup bevel, this shot
+// (SitDev_ThrowBallHitDelayedEvent sets the flag): state value 95.
+u8 SitDev_GetCupBevelFlag(void) {
     return lbl_80282200;
 }
 
-void fn_800BB0DC(void) {
+// Clears the cup bevel flag: at every shot set-up (situation event 3) and for a mulligan.
+void SitDev_ClearCupBevelFlag(void) {
     lbl_80282200 = 0;
 }
 
-// Per frame while a ball is watched: 48 frames after it was hit, while it is flying or rolling,
-// trigger event 0x4B for its player; the first time it lands on surface 105, call
-// SitDev_QueueEvent(player, 0, 0x22).
-void fn_800BB0E8(void) {
+// Every frame from gomainloop.c (fn_8006D8E8), for the watched ball (nothing when none): while it
+// flies or rolls (nState 2..4), exactly 48 frames after it was hit it triggers event 75
+// (EVENT_BallHitDelayed: situation event 31); the first time it lies on surface 105 (the cup bevel)
+// it queues situation event 34 and sets the cup bevel flag.
+void SitDev_ThrowBallHitDelayedEvent(void) {
     if (lbl_802821FC == NULL) return;
     switch (lbl_802821FC->nState) {
     case 2:
@@ -63,13 +69,16 @@ void fn_800BB0E8(void) {
     }
 }
 
-// Start watching a ball: remember it and the frame it was hit on.
-void fn_800BB1A8(Ball* pBall) {
+// Starts watching a ball as it is struck (EVENT_HitBall): remembers it and the frame
+// (gSession.nFrameCount) for SitDev_ThrowBallHitDelayedEvent.
+void SitDev_SetBallHitTime(Ball* pBall) {
     lbl_802821FC = pBall;
     lbl_802821F8 = gSession.nFrameCount;
 }
 
-void fn_800BB1C0(void) {
+// Forgets, for all five players, that the scripts set the shot's emotion (lbl_801FA198, response
+// kind 12) or its predicted emotion (lbl_801FA1AC, kind 13): situation events 2, 3 and 25.
+void SitDev_ClearEmotionStates(void) {
     int i;
     for (i = 0; i < 5; i++) {
         lbl_801FA198[i] = 0;
@@ -77,7 +86,9 @@ void fn_800BB1C0(void) {
     }
 }
 
-u8 fn_800BB1F8(int nPlayer) {
+// Whether the scripts set the player's predicted emotion this shot (response kind 13):
+// GM_SimulateBallMovement starts a post-shot reaction only then.
+u8 SitDev_PredictedEmotionAvailable(int nPlayer) {
     return lbl_801FA1AC[nPlayer] == 1;
 }
 
@@ -86,8 +97,9 @@ u8 fn_800BB1F8(int nPlayer) {
 // A list of nCount u16 values used as a deck: the top bit marks one already drawn, 0xFFF0 is an
 // empty slot.
 
-// The slots in use.
-int fn_800BB218(u16* pList, int nCount) {
+// The entries of the first nCount of a list that are in use (not 0xFFF0, the empty mark); an
+// action's sound list (fn_800BCE70).
+int SitDev_NumEntries(u16* pList, int nCount) {
     int i;
     int nUsed = 0;
     for (i = 0; i < nCount; i++) {
@@ -98,8 +110,9 @@ int fn_800BB218(u16* pList, int nCount) {
     return nUsed;
 }
 
-// The values not drawn yet; when every one is drawn, put them all back and return nCount.
-int fn_800BB248(u16* pList, int nCount) {
+// The entries of the list not drawn yet (bit 15 clear). When every one is drawn, the marks of all
+// nCount are cleared and nCount is returned.
+int SitDev_NumEntriesUnused(u16* pList, int nCount) {
     int nLeft = 0;
     int i;
     u16* p = pList;
@@ -120,8 +133,9 @@ int fn_800BB248(u16* pList, int nCount) {
     return nLeft;
 }
 
-// Draw the nPick'th value not drawn yet (nLeft: fn_800BB248's count) and mark it drawn.
-u32 fn_800BB334(u16* pList, int nCount, int nLeft, u32 nPick) {
+// Draws the nPick'th entry not drawn yet (bit 15 clear), marks it drawn and returns it; nPick
+// itself when there are not that many. nLeft (SitDev_NumEntriesUnused's count) is not read.
+u32 SitDev_ChooseRandomResponseNoRepeat(u16* pList, int nCount, int nLeft, u32 nPick) {
     int i;
     u32 n = 0;
     for (i = 0; i < nCount; i++) {
@@ -138,9 +152,10 @@ u32 fn_800BB334(u16* pList, int nCount, int nLeft, u32 nPick) {
     return nPick;
 }
 
-// The player's place in the PGA Tour event (1 outside mode 23) as a band: 0 for the top 3,
-// 1 for the top 10, 2 for the top 25, 3 below.
-int fn_800BB37C(int nPlayer) {
+// The player's place in the tour event as a band for the scripts (state value 94): 0 the top 3, 1
+// the top 10, 2 the top 25, 3 below. The place comes from GM_PgaTourSim_GetScoreRankFromEntrantID
+// in game mode 23 and is 1 in any other mode.
+int SitDev_GetPGARank(int nPlayer) {
     int nRank;
     if (Game_GetMode() == 23) {
         nRank = GM_PgaTourSim_GetScoreRankFromEntrantID(nPlayer, 0);
@@ -152,8 +167,9 @@ int fn_800BB37C(int nPlayer) {
     return nRank <= 25 ? 2 : 3;
 }
 
-// The game mode's bit (lbl_801910F8), 0 for a mode without one.
-u16 fn_800BB3F8(int nMode) {
+// The game mode as the scripts' mode bit (state value 54): 1 << lbl_801910F8[nMode], 0 for a mode
+// the table gives -1.
+u16 SitDev_TranslateGameMode(int nMode) {
     s32 nBit = lbl_801910F8[nMode];
     return nBit == -1 ? 0 : 1 << nBit;
 }

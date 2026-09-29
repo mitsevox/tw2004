@@ -61,7 +61,7 @@ Objects delivered by UStream
 | `BALL` | fn_80045FC8 | asm | none seen | asm |
 | `Cact` | fn_80048BDC | UKernel.c | none seen | asm; its type-10 objects go to PlayNow_LoadBallSpot (PlayNowMode.c), which reads a challenge's ball spot in place through `ChallengeSpotRecord` (`port:` note there) |
 | `CAMC` | fn_800644F4 | GoStaticCam.c | swapped: ByteSwap_Records | little-endian on disc |
-| `sscr` | SitDev_LoadScripts | SitDevFile.c | swapped: fn_800BB52C > ByteSwap_Records | little-endian on disc |
+| `sscr` | SitDev_LoadScripts | SitDevFile.c | swapped: SitDev_SwapTables > ByteSwap_Records | little-endian on disc |
 | `BIO ` | FE_CharBios_LoadBIOfromStream | FE_Manager.c | none seen | asm |
 | `LITE` | FE_lite_vStreamCallback | FEgolferanim.c | swapped: ByteSwap_Records | little-endian on disc |
 | `DATS`, `TXFS`, `FONS`, `GRPS`, `MPCS` | UI_StreamLoadFile, UI_StreamLoadTextures, UI_StreamLoadFonts, UI_StreamLoadPictures (two tags) | uiLoadFile.c | none seen | asm |

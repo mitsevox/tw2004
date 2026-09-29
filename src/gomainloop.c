@@ -243,7 +243,7 @@ void fn_800BA940(void);
 void fn_800BAA4C(void);
 void fn_800BAA50(int nPlayer);
 void fn_800BAB80(int nPlayer);
-void fn_800BB0E8(void);
+void SitDev_ThrowBallHitDelayedEvent(void);
 void BreakLine_InitModule(void);
 void fn_800C8108(void);
 void AnimStream_Update(void);
@@ -1115,7 +1115,7 @@ void fn_8006D8E8(void) {
             break;
         case 6:
             fn_8006D27C();
-            fn_800BB0E8();
+            SitDev_ThrowBallHitDelayedEvent();
             SitDev_ProcessEventQueue();
             break;
         case 1:

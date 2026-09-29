@@ -33,7 +33,7 @@ void  GM_Earnings_PayHoledGoals(int nPlayer);
 void  GM_CheckBallForUIHints(int nPlayer);
 u8    OnlineGolf_bIsOnlineGame(void);
 void  GM_RecordBonusShotStats(int nPlayer);
-void  fn_800BB0A8(void);
+void  SitDev_OnMulligan(void);
 void  REPLAY_Restore(int nPlayer);
 
 u8    GM_bIsZoomButtonPressed(int nPlayer);
@@ -41,7 +41,7 @@ u8    GM_bIsElevatorCamButtonPressed(int nPlayer);
 u8    GM_bIsAltSwingButtonPressed(int nPlayer);
 u8    GM_bIsMidholeFlybyButtonPressed(int nPlayer);
 
-u8    fn_800BB1F8(int nPlayer);
+u8    SitDev_PredictedEmotionAvailable(int nPlayer);
 
 int   GM_vGetAllTimeRecordsHeld(SaveProfile* pProfile);
 f32   GM_GetBonusProgress(SaveProfile* pProfile);
@@ -613,7 +613,7 @@ u8 GM_PlayerTakeMulligan(int nPlayer) {
         }
         gPlayers[nPlayer].bMulliganUsed = 1;
     }
-    fn_800BB0A8();
+    SitDev_OnMulligan();
     GUI_HideAllHelpTips();
     fn_800335F8(1);
     Gaud_StopComment();
@@ -1170,11 +1170,11 @@ int GM_ChooseRemoveBallState(int nPlayer) {
 // Each frame of a shot: the ball's physics steps for this frame (GameEffects_BallUpdatesThisFrame;
 // none when the mode has n294 and the ball is behind the camera), then on one screen the look-ahead
 // copy (ballBefore) runs on within a budget of 0.83 ms minus what the real ball took, until it
-// comes to rest (event 0x3C and its outcome recorded). Then, when fn_800BB1F8 allows and the mode
-// has post-shot reactions: a scripted reaction (uFlags bit 0) starts animation 9 once the ball
-// passes the saved distance (fEEC, with bit 2); otherwise, for outcomes 8 and 9, once per shot when
-// the ball is 2 to 5.5 from the pin and near the closest it got, a look-ahead holed at par or
-// better starts it half the time and a look-ahead miss that came within 0.2 always does.
+// comes to rest (event 0x3C and its outcome recorded). Then, when SitDev_PredictedEmotionAvailable
+// allows and the mode has post-shot reactions: a scripted reaction (uFlags bit 0) starts animation
+// 9 once the ball passes the saved distance (fEEC, with bit 2); otherwise, for outcomes 8 and 9,
+// once per shot when the ball is 2 to 5.5 from the pin and near the closest it got, a look-ahead
+// holed at par or better starts it half the time and a look-ahead miss that came within 0.2 always does.
 void GM_SimulateBallMovement(int nPlayer) {
     int nSteps = 0;
     u64 t0;
@@ -1229,7 +1229,7 @@ void GM_SimulateBallMovement(int nPlayer) {
         }
         fn_80050D2C(0);
         fn_80050D24_SetSimulating(0);
-        if (fn_800BB1F8(nPlayer)) {
+        if (SitDev_PredictedEmotionAvailable(nPlayer)) {
             nResult = fn_8006AA9C(nPlayer);
             bReact  = nResult == 8 || nResult == 9;
             bOn     = GM_IsValidPostShotGameType();

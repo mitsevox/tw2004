@@ -10,9 +10,9 @@
 
 u32 lbl_80282218;
 
-u8  fn_800BB0D4(void);
-int fn_800BB37C(int nPlayer);
-u16 fn_800BB3F8(int nMode);
+u8  SitDev_GetCupBevelFlag(void);
+int SitDev_GetPGARank(int nPlayer);
+u16 SitDev_TranslateGameMode(int nMode);
 u32 SitDev_GetCommentaryZones(f32* pPos);
 
 u8 fn_800BB8A8(SitDevEntry* pEntry, int nTest, SitDevData* pData, int nValue);
@@ -143,7 +143,7 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
     case 30:
         nMode = Game_GetMode();
         SitDev_SetStateValue(pValues, 1, (int)nMode, pSetBits);                  // fake match: (int) re-masks
-        SitDev_SetStateValue(pValues, 54, (int)fn_800BB3F8(nMode), pSetBits);    // fake match: (int) re-masks
+        SitDev_SetStateValue(pValues, 54, (int)SitDev_TranslateGameMode(nMode), pSetBits);    // fake match: (int) re-masks
         SitDev_SetStateValue(pValues, 60, GM_OnFirstSelectedHole(), pSetBits);
         SitDev_SetStateValue(pValues, 0, Game_GetCurHoleNum() + 1, pSetBits);
         SitDev_SetStateValue(pValues, 30, Game_GetCourse(), pSetBits);
@@ -208,7 +208,7 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
     case 32:
     case 33:
     case 34:
-        SitDev_SetStateValue(pValues, 95, fn_800BB0D4(), pSetBits);
+        SitDev_SetStateValue(pValues, 95, SitDev_GetCupBevelFlag(), pSetBits);
         SitDev_SetStateValue(pValues, 43, pPlayer->bBunkerThisHole && !pPlayer->bMulliganUsed, pSetBits);
         SitDev_SetStateValue(pValues, 44, pPlayer->b311 && !pPlayer->bMulliganUsed, pSetBits);
         SitDev_SetStateValue(pValues, 49, fn_800BCD24(nPlayer), pSetBits);
@@ -229,7 +229,7 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
         SitDev_SetStateValue(pValues, 81, pPlayer->n308 & 2, pSetBits);
         SitDev_SetStateValue(pValues, 82, pPlayer->n308 & 1, pSetBits);
         SitDev_SetStateValue(pValues, 47, fn_800CFD58(nPlayer), pSetBits);
-        SitDev_SetStateValue(pValues, 94, fn_800BB37C(nPlayer), pSetBits);
+        SitDev_SetStateValue(pValues, 94, SitDev_GetPGARank(nPlayer), pSetBits);
     case 5:
     case 7:
     case 15:

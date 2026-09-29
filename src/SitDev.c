@@ -18,8 +18,8 @@ SitDevData* gpSitDevData = &gSitDevData;    // every SitDev file reaches it thro
 
 
 void SitDev_SetupStateVector(int nPlayer, u8 nEvent);
-void fn_800BB0DC(void);
-void fn_800BB1C0(void);
+void SitDev_ClearCupBevelFlag(void);
+void SitDev_ClearEmotionStates(void);
 u8   fn_800BB7AC(SitDevEntry* pEntry, SitDevData* pData, int nPlayer);
 void fn_800BCD68(SitDevEntry* pEntry, int nSit, int nPlayer, u8 nEvent);
 void fn_80067B5C(f32* pA, f32* pB, f32* pOut);
@@ -31,13 +31,13 @@ u8 lbl_80281E28;
 
 // Round start (GO_vInitIG): clears the commentary scripts' state block (SitDevData: no line played,
 // no events queued), registers the loader for a hole's commentary zones (course chunk 5,
-// fn_800BB6DC) and stops watching any ball (fn_800BB0C8).
+// SitDev_NetworkLoadCallback) and stops watching any ball (SitDev_ClearBallThatWasHit).
 void SitDev_vInitModule(void) {
     Mem_set(gpSitDevData, 0, sizeof(SitDevData));
     gpSitDevData->pE8 = NULL;
     gpSitDevData->n13C = 0;
-    Course_RegisterLoader(5, fn_800BB6DC);
-    fn_800BB0C8();
+    Course_RegisterLoader(5, SitDev_NetworkLoadCallback);
+    SitDev_ClearBallThatWasHit();
 }
 
 // Round end (fn_8006CDC4): frees the commentary scripts' buffers (SitDevData pD0 when set, pCC,
@@ -51,7 +51,7 @@ void SitDev_vCloseModule(void) {
     lbl_80282208 = NULL;
 }
 
-// Before a hole loads (fn_8006F4F0): no commentary zones yet (the count fn_800BB6DC adds to).
+// Before a hole loads (fn_8006F4F0): no commentary zones yet (the count SitDev_NetworkLoadCallback adds to).
 void SitDev_vInitBeforeHole(void) {
     lbl_80282210 = 0;
 }
@@ -105,15 +105,15 @@ void SitDev_QueueEvent(int nPlayer, int a, u8 nEvent) {
     case 3:
         lbl_80281E28 = 0;
         fn_800BD74C();
-        fn_800BB0DC();
-        fn_800BB0C8();
-        fn_800BB1C0();
+        SitDev_ClearCupBevelFlag();
+        SitDev_ClearBallThatWasHit();
+        SitDev_ClearEmotionStates();
         // fall through
     case 2:
         lbl_80281E2A = 0;
         // fall through
     case 25:
-        fn_800BB1C0();
+        SitDev_ClearEmotionStates();
         for (i = 0; i < gpSitDevData->n13C; i++) {
             if (gpSitDevData->aEvents[i].nEvent == 8 || gpSitDevData->aEvents[i].nEvent == 9 ||
                 gpSitDevData->aEvents[i].nEvent == 10 || gpSitDevData->aEvents[i].nEvent == 11) {
@@ -154,7 +154,7 @@ void SitDev_ProcessEventQueue(void) {
         return;
     }
     pEntry = lbl_80282208->p14;
-    // fake match: a signed compare here, an unsigned one in SitDevFile.c's fn_800BB52C
+    // fake match: a signed compare here, an unsigned one in SitDevFile.c's SitDev_SwapTables
     for (i = 0; i < (int)lbl_80282208->nEntries; i++, pEntry++) {
         pData = gpSitDevData;
         bFound = 0;

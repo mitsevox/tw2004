@@ -156,7 +156,7 @@ void EVENT_PracticeSwing(int nPlayer, int nEvent, void* pData, int nArg) {
 // Event 10 (Ball.c: the ball is struck), only for the real ball (nArg 1; 0 is the AI's simulated
 // ball): in the demo (session flag 0x4000) of mode 26 the demo's timer restarts (fn_8009A16C); then
 // the mode's ball-hit hook (gpGame->pfnHitBall), the lessons (their crowd sound), the swing effect
-// at the ball (fn_800A31E0), SitDev starts watching the ball (fn_800BB1A8), commentary situation
+// at the ball (fn_800A31E0), SitDev starts watching the ball (SitDev_SetBallHitTime), commentary situation
 // event 5, and GameMode26's split-screen flag (GameMode26_NoteSplitScreenShot, which ignores the
 // player).
 void EVENT_HitBall(int nPlayer, int nEvent, void* pData, int nArg) {
@@ -167,7 +167,7 @@ void EVENT_HitBall(int nPlayer, int nEvent, void* pData, int nArg) {
         gpGame->pfnHitBall(nPlayer);
         Lessons_OnEvent(nPlayer, 10);
         fn_800A31E0(pData, nPlayer);
-        fn_800BB1A8(&gPlayers[nPlayer].ball);
+        SitDev_SetBallHitTime(&gPlayers[nPlayer].ball);
         SitDev_QueueEvent(nPlayer, 2, 5);
         GameMode26_NoteSplitScreenShot(nPlayer);
     }

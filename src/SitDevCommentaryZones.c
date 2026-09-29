@@ -11,13 +11,17 @@
 SitDevZone* lbl_801FA1C0[10];
 s32 lbl_80282210;
 
-// Course loader for chunk 5 of a hole: one more situation zone.
-void fn_800BB6DC(u8* pChunk) {
+// The course loader for chunk 5 of a hole (registered by SitDev_vInitModule): adds the chunk, one
+// commentary zone (its outline network, then its bits), to the hole's zones. The ten slots of
+// lbl_801FA1C0 are not checked.
+void SitDev_NetworkLoadCallback(u8* pChunk) {
     lbl_801FA1C0[lbl_80282210] = (SitDevZone*)pChunk;
     lbl_80282210++;
 }
 
-// The bits of every zone the point is in (0 when the hole has none).
+// State value 79 (for the look-ahead ball's position): the bits of every commentary zone the point
+// is inside (fn_8000C140, the outline test) OR'd together; a zone's bits are the u32 right after
+// its outline's last node. 0 when the hole has no zones.
 u32 SitDev_GetCommentaryZones(f32* pPos) {
     int i;
     u32 uBits = 0;

@@ -36,7 +36,7 @@ LAYOUT_ASSERT(SitDevData, 0x140);
 extern SitDevData  gSitDevData;
 extern SitDevData* gpSitDevData;    // 0x802811B8 (.sdata): &gSitDevData
 
-// A halfword the loader rewrites (fn_800BB52C): on disc its two bit-fields are in the other bit
+// A halfword the loader rewrites (SitDev_SwapTables): on disc its two bit-fields are in the other bit
 // order, so it reads the raw value and stores its low 11 bits and its top 5 bits back as fields.
 typedef union SitDevBits {
     u16 uRaw;
@@ -66,7 +66,7 @@ typedef struct SitDevAction {
     u8         unk2;
     u8         bSound;          // 0x03  nonzero: play a sound from aList (fn_800BCE70), else run
                                 //       p1C entries (fn_800BCF84)
-    u16        aList[50];       // 0x04  a deck (fn_800BB218..fn_800BB334); 0xFFF0 ends
+    u16        aList[50];       // 0x04  a deck (SitDev_NumEntries..SitDev_ChooseRandomResponseNoRepeat); 0xFFF0 ends
 } SitDevAction;
 
 // An entry of the scripts' third table (SitDevScripts.p1C, 8 bytes): one thing to do.
@@ -78,7 +78,7 @@ typedef struct SitDevEntry8 {
 } SitDevEntry8;
 
 // The situation scripts' header (lbl_80282208): the block whose address is the first word of
-// SitDev_LoadScripts' argument. fn_800BB4B4 turns the offsets at 0x14..0x20 into pointers.
+// SitDev_LoadScripts' argument. SitDev_BindHeader turns the offsets at 0x14..0x20 into pointers.
 typedef struct SitDevScripts {
     u32   nEntries;             // 0x00  entries at p14 (0x80067710)
     u32   n04;                  // 0x04  entries at p18
@@ -92,7 +92,7 @@ typedef struct SitDevScripts {
 } SitDevScripts;
 
 extern SitDevScripts* lbl_80282208; // 0x80282208 (.sbss), NULL until the scripts are loaded
-extern s32 lbl_80282210;            // 0x80282210 (.sbss): entries in use in lbl_801FA1C0 (fn_800BB6DC)
+extern s32 lbl_80282210;            // 0x80282210 (.sbss): entries in use in lbl_801FA1C0 (SitDev_NetworkLoadCallback)
 
 // The byte-swap layouts of the header and the p14, p18 and p1C entries (ByteSwap_Records).
 extern SwapField lbl_80191168[9];
@@ -100,7 +100,7 @@ extern SwapField lbl_801911B0[7];
 extern SwapField lbl_801911E8[5];
 extern SwapField lbl_80191210[4];
 
-// A situation zone, from chunk 5 of the hole's data (fn_800BB6DC): an outline (with its
+// A situation zone, from chunk 5 of the hole's data (SitDev_NetworkLoadCallback): an outline (with its
 // net.nNumNodes nodes), and then the zone's bits (a u32 right after the last node).
 typedef struct SitDevZone {
     TNetwork net;               // 0x0
@@ -116,12 +116,12 @@ extern u8 lbl_80281E29;             // cleared by fn_800BCD68 after every run
 // Per value: nonzero when the scripts compare it as signed (fn_800BB8A8).
 extern u8 lbl_80193188[88];
 
-// Per game mode: the bit fn_800BB3F8 returns for it, -1 for none.
+// Per game mode: the bit SitDev_TranslateGameMode returns for it, -1 for none.
 extern s32 lbl_801910F8[28];
 
 void fn_800BD74C(void);             // clear SitDevData.pD4
-extern s32 lbl_801FA198[5];         // per player; cleared by fn_800BB1C0
-extern s32 lbl_801FA1AC[5];         // per player; 1: fn_800BB1F8 is true
+extern s32 lbl_801FA198[5];         // per player; cleared by SitDev_ClearEmotionStates
+extern s32 lbl_801FA1AC[5];         // per player; 1: SitDev_PredictedEmotionAvailable is true
 
 // Store uValue in pValues[nIndex] and set bit nIndex of pSetBits.
 void SitDev_SetStateValue(u16* pValues, int nIndex, u16 uValue, u32* pSetBits);
@@ -129,9 +129,9 @@ void SitDev_SetStateValue(u16* pValues, int nIndex, u16 uValue, u32* pSetBits);
 void SitDev_QueueEvent(int nPlayer, int a, u8 nEvent);    // event.c's handlers call it for most events
 
 // SitDevFile.c
-void fn_800BB0C8(void);
-void fn_800BB1A8(struct Ball* pBall);
+void SitDev_ClearBallThatWasHit(void);
+void SitDev_SetBallHitTime(struct Ball* pBall);
 void SitDev_LoadScripts(SitDevScripts** ppScripts); // the 'sscr' stream handler
-void fn_800BB6DC(u8* pChunk);                   // the course loader for chunk 5
+void SitDev_NetworkLoadCallback(u8* pChunk);                   // the course loader for chunk 5
 
 #endif
