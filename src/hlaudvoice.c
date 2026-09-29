@@ -22,22 +22,22 @@ void Voc_ResetModule(void);
 u8   VoicePowerCompare(AudVoiceRequest* pRequest, s16* pPriority);
 f32  audfrac_MulU(f32 fA, f32 fB);
 
-AudVoicePool lbl_801F19B8[1];
+AudVoicePool gVocCores[1];
 
-s32 lbl_802820B4;
-u8  lbl_802820B0;
+s32 gVocPauseOrder;
+u8  gVocInUse;
 
 // Set the voice pool up: every voice free, numbered after its hardware voice.
 void Voc_ResetModule(void) {
-    AudVoicePool* pPool = lbl_801F19B8;
-    AudVoicePool* pEnd = lbl_801F19B8 + 1;
+    AudVoicePool* pPool = gVocCores;
+    AudVoicePool* pEnd = gVocCores + 1;
     UList* pList;
     UList* pListEnd;
     AudVoice* pVoice;
     AudVoice* pVoiceEnd;
     u16 nVoice;
 
-    Mem_set(pPool, 0, sizeof(lbl_801F19B8));
+    Mem_set(pPool, 0, sizeof(gVocCores));
     for (; pPool < pEnd; pPool++) {
         pList = pPool->aLists;
         pVoice = pPool->aVoices;
@@ -78,7 +78,7 @@ void Voc_ExitSession(void) {
 // gets an ARAM stream block (fn_800B06F4); without one the voice is deleted and NULL returned. The
 // voice goes on list n4.
 AudVoice* Voc_Alloc(AudVoiceRequest* pRequest) {
-    AudVoicePool* pPool = lbl_801F19B8;
+    AudVoicePool* pPool = gVocCores;
     AudVoice* pVoice = NULL;
     u8 bStolen = 0;
     UList* pList;
@@ -273,8 +273,8 @@ void Voc_Stop(AudVoice* pVoice) {
     if (!pVoice->flags.b.bStopped) {
         HwVoice_StartOrRelease(pVoice->nHwVoice, 0);
         if (pVoice->n10 > 0) {
-            UList_DeleteAt(&lbl_801F19B8->aLists[pVoice->n10], &pVoice->link);
-            UList_PushHead(&lbl_801F19B8->aLists[0], &pVoice->link);
+            UList_DeleteAt(&gVocCores->aLists[pVoice->n10], &pVoice->link);
+            UList_PushHead(&gVocCores->aLists[0], &pVoice->link);
             pVoice->n10 = 0;
         }
         pVoice->flags.b.bStopped = 1;
@@ -301,12 +301,12 @@ void Voc_Delete(AudVoice* pVoice) {
 // Once a frame: frees the ended voices whose hardware voice is done (telling their track), and counts
 // the voices in use.
 void Voc_Cycle(void) {
-    AudVoicePool* pPool = lbl_801F19B8;
-    AudVoicePool* pEnd = lbl_801F19B8 + 1;
+    AudVoicePool* pPool = gVocCores;
+    AudVoicePool* pEnd = gVocCores + 1;
     AudVoice* pVoice;
     AudVoice* pNext;
 
-    lbl_802820B0 = AUD_NUM_VOICES;
+    gVocInUse = AUD_NUM_VOICES;
     for (; pPool < pEnd; pPool++) {
         for (pVoice = (AudVoice*)pPool->aLists[0].pHead; pVoice != NULL; pVoice = pNext) {
             pNext = (AudVoice*)pVoice->link.pNext;
@@ -337,25 +337,25 @@ void Voc_Cycle(void) {
                 pVoice->n15--;
             }
         }
-        lbl_802820B0 -= (u8)pPool->free.nFree;
+        gVocInUse -= (u8)pPool->free.nFree;
     }
 }
 
 // Pause (bPause) or resume every voice. Resuming leaves the streamed voices (bA_4) paused when
 // bStreams is set, for Stm_Tick to resume. Each pause flips the order the voices are gone through.
 void Voc_PauseAll(u8 bPause, u8 bStreams) {
-    AudVoicePool* pPool = lbl_801F19B8;
-    AudVoicePool* pEnd = lbl_801F19B8 + 1;
+    AudVoicePool* pPool = gVocCores;
+    AudVoicePool* pEnd = gVocCores + 1;
     AudVoice* pVoice;
     AudVoice* pVoiceEnd;
 
     if (bPause) {
-        lbl_802820B4 = 1 - lbl_802820B4;
+        gVocPauseOrder = 1 - gVocPauseOrder;
     }
     for (; pPool < pEnd; pPool++) {
         pVoice = pPool->aVoices;
         pVoiceEnd = pPool->aVoices + AUD_NUM_VOICES;
-        if (lbl_802820B4 != 0) {
+        if (gVocPauseOrder != 0) {
             for (; pVoice < pVoiceEnd; pVoice++) {
                 if (bPause) {
                     HwVoice_Pause(pVoice->nHwVoice, 1);

@@ -21,22 +21,22 @@ void Rvb_Cycle(void);
 
 // The effects' settings: a 2.5 second reverb for mode 0, a 4 second one for mode 2, and for mode
 // 1 a delay of about half a second (499 and 501 ms left and right) with a little feedback.
-AXFX_REVERBHI lbl_8018EC20 = { {0}, 0, 0.5f, 1.0f, 2.5f, 0.6f, 0.0f, 0.5f };
-AXFX_DELAY lbl_8018EE00 = { {0}, {499, 501, 10}, {15, 15, 0}, {100, 100, 0} };
-AXFX_REVERBHI lbl_8018EE60 = { {0}, 0, 0.9f, 1.0f, 4.0f, 0.2f, 0.0f, 0.5f };
+AXFX_REVERBHI gRvbReverbShort = { {0}, 0, 0.5f, 1.0f, 2.5f, 0.6f, 0.0f, 0.5f };
+AXFX_DELAY gRvbDelay = { {0}, {499, 501, 10}, {15, 15, 0}, {100, 100, 0} };
+AXFX_REVERBHI gRvbReverbLong = { {0}, 0, 0.9f, 1.0f, 4.0f, 0.2f, 0.0f, 0.5f };
 
 // Uninitialised data, defined last-first (CodeWarrior lays it out in reverse).
-UAudMemStack lbl_801F5D88;              // the effect memory
-UAudMemStackBlock lbl_801F5C08[32];     // the effect memory's blocks
-s8 lbl_80281490 = -1;                   // the mode set up (-1: none yet)
-void* lbl_802820E0;                     // the effect's state
-AXAuxCallback lbl_802820DC;             // the effect running
-u8* lbl_802820D8;                       // the effect memory's buffer
+UAudMemStack gRvbMemStack;              // the effect memory
+UAudMemStackBlock gRvbMemBlocks[32];     // the effect memory's blocks
+s8 gRvbMode = -1;                   // the mode set up (-1: none yet)
+void* gRvbFxState;                     // the effect's state
+AXAuxCallback gRvbFxCallback;             // the effect running
+u8* gRvbFxMemory;                       // the effect memory's buffer
 
 // The effects library's allocator hook (AXFXSetHooks): uSize bytes of the effect memory, which
 // Rvb_SetMode starts over at each change.
 void* Rvb_FxAlloc(u32 uSize) {
-    return AudMemStack_AllocTop(&lbl_801F5D88, uSize);
+    return AudMemStack_AllocTop(&gRvbMemStack, uSize);
 }
 
 // The effects library's free hook: empty, as the effect memory is never freed piecemeal.
@@ -51,22 +51,22 @@ void Rvb_SetMode(s8 nMode) {
     int bEnabled;
     int bOk;
 
-    if (nMode != lbl_80281490) {
-        lbl_80281490 = nMode;
+    if (nMode != gRvbMode) {
+        gRvbMode = nMode;
         bEnabled = OSDisableInterrupts();
-        AudMemStack_Init(&lbl_801F5D88, lbl_802820D8, 0x20000, 32, lbl_801F5C08, 4);
-        if (lbl_80281490 == 1) {
-            lbl_802820E0 = &lbl_8018EE00;
-            lbl_802820DC = AXFXDelayCallback;
-            bOk = AXFXDelayInit(&lbl_8018EE00);
+        AudMemStack_Init(&gRvbMemStack, gRvbFxMemory, 0x20000, 32, gRvbMemBlocks, 4);
+        if (gRvbMode == 1) {
+            gRvbFxState = &gRvbDelay;
+            gRvbFxCallback = AXFXDelayCallback;
+            bOk = AXFXDelayInit(&gRvbDelay);
         } else {
-            pReverb = (lbl_80281490 == 0) ? &lbl_8018EC20 : &lbl_8018EE60;
-            lbl_802820E0 = pReverb;
-            lbl_802820DC = AXFXReverbHiCallback;
+            pReverb = (gRvbMode == 0) ? &gRvbReverbShort : &gRvbReverbLong;
+            gRvbFxState = pReverb;
+            gRvbFxCallback = AXFXReverbHiCallback;
             bOk = AXFXReverbHiInit(pReverb);
         }
         if (bOk == 1) {
-            AXRegisterAuxACallback(lbl_802820DC, lbl_802820E0);
+            AXRegisterAuxACallback(gRvbFxCallback, gRvbFxState);
         }
         OSRestoreInterrupts(bEnabled);
     }
@@ -75,7 +75,7 @@ void Rvb_SetMode(s8 nMode) {
 // The reverb's start-up step in Aud_InitOnce: takes the 128 KB effect memory from the sound
 // engine's memory and gives the effects library its allocator hooks. Always 1.
 u8 Rvb_InitModule(void) {
-    lbl_802820D8 = AudMem_Alloc(0x20000);
+    gRvbFxMemory = AudMem_Alloc(0x20000);
     AXFXSetHooks(Rvb_FxAlloc, Rvb_FxFree);
     return 1;
 }
@@ -111,7 +111,7 @@ void Rvb_Pause(u8 bMute) {
         AXRegisterAuxACallback(NULL, NULL);
         return;
     }
-    AXRegisterAuxACallback(lbl_802820DC, lbl_802820E0);
+    AXRegisterAuxACallback(gRvbFxCallback, gRvbFxState);
 }
 
 // A listener's reverb preset (Mic_SetRvbPreset): empty in this build, so the presets change

@@ -85,9 +85,9 @@ void  AudMemStack_Init(UAudMemStack* pStack, u8* pMem, u32 uSize, u32 nMaxBlocks
 void* AudMemStack_AllocTop(UAudMemStack* pStack, u32 uSize);
 
 // AudReverb.c's effect settings (initialised data; the effects library owns their layout).
-extern AXFX_REVERBHI lbl_8018EC20;      // the reverb for mode 0
-extern AXFX_DELAY lbl_8018EE00;         // the delay (mode 1)
-extern AXFX_REVERBHI lbl_8018EE60;      // the reverb for mode 2
+extern AXFX_REVERBHI gRvbReverbShort;      // the reverb for mode 0
+extern AXFX_DELAY gRvbDelay;         // the delay (mode 1)
+extern AXFX_REVERBHI gRvbReverbLong;      // the reverb for mode 2
 
 void*      AudMem_Alloc(u32 uSize);      // the sound engine's allocator
 void       AudMem_Free(void* p);        // gives back what AudMem_Alloc handed out

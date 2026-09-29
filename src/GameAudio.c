@@ -246,7 +246,7 @@ void Aud_Mute(u8 bLow, u8 bHigh) {
     Mas_SetSubmixMuteAll(nMask);
 }
 
-// Stores sound output mode n (HLAudMaster.c's lbl_80282064: 2 from start-up, and GameAudio passes 2
+// Stores sound output mode n (HLAudMaster.c's gMasOutputMode: 2 from start-up, and GameAudio passes 2
 // again). Nothing in this build reads it.
 void Aud_SetOutputmode(u8 n) {
     Mas_SetOutputMode(n);

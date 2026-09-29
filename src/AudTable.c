@@ -164,7 +164,7 @@ void Doppler3D(AudSource* pSource) {
     if ((uFlags & 2) || !(uFlags & 1)) {
         fPitch = 1.0f;
     } else {
-        if (lbl_80282068 >= 2 && pSource->afDist[1] < pSource->afDist[0]) {
+        if (gMicCount >= 2 && pSource->afDist[1] < pSource->afDist[0]) {
             fDist = pSource->afDist[1];
         }
         fSpeed = 32.0f * (pSource->fDist - fDist);
@@ -185,7 +185,7 @@ void Panning3D(AudSource* pSource) {
     f32 fPan;
     f32 f68;
 
-    if (lbl_80282068 < 2 && (pSource->pSound->n3 & 1)) {
+    if (gMicCount < 2 && (pSource->pSound->n3 & 1)) {
         fInv = pSource->afDist[0] > 0.0f ? 1.0f / pSource->afDist[0] : 0.0f;
         fPan = audfrac_Mul(-pSource->aPos[0][0], fInv);
         f68 = audfrac_Mul(pSource->aPos[0][2], fInv);
@@ -207,7 +207,7 @@ f32 Distance3D(AudSource* pSource, f32 (*aPos)[3]) {
     f32 fDist;
 
     fNearest = 32768.0f;
-    for (i = 0; i < lbl_80282068; i++) {
+    for (i = 0; i < gMicCount; i++) {
         fDist = audvec3_ApproxLength(pSource->aPos[i]);
         pSource->afDist[i] = fDist;
         if (fNearest > fDist) {

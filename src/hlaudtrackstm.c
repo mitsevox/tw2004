@@ -574,5 +574,5 @@ void Stm_FlushQueue(AudTrack* pTrack) {
 
 // The stream file's handle (hlaudmovie.c opens /AudioStm_GC.sab).
 s32 Stm_GetStreamFile(void) {
-    return lbl_80281468;
+    return gSesStreamFile;
 }

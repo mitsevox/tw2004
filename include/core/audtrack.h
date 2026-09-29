@@ -46,7 +46,7 @@ LAYOUT_ASSERT(AudVoice, 0x40);
 
 #define AUD_NUM_VOICES 50
 
-// The sound engine's voices (lbl_801F19B8, a single pool).
+// The sound engine's voices (gVocCores, a single pool).
 typedef struct AudVoicePool {
     AudVoice aVoices[AUD_NUM_VOICES];   // 0x000
     UList    aLists[3];         // 0xC80  the voices in use, by their n10
@@ -54,9 +54,9 @@ typedef struct AudVoicePool {
 } AudVoicePool;
 LAYOUT_ASSERT(AudVoicePool, 0xCAC);
 
-extern AudVoicePool lbl_801F19B8[1];
-extern u8  lbl_802820B0;                // the voices in use, counted by Voc_Cycle
-extern s32 lbl_802820B4;                // flipped by each pause: the order Voc_PauseAll goes through
+extern AudVoicePool gVocCores[1];
+extern u8  gVocInUse;                // the voices in use, counted by Voc_Cycle
+extern s32 gVocPauseOrder;                // flipped by each pause: the order Voc_PauseAll goes through
 
 // Settings for a voice; the flags say which fields are set. Voc_Render sets them on a voice;
 // a sequenced track's events change its own copy (AudTrack 0x30), handed to Voc_Start with each
@@ -234,7 +234,7 @@ typedef struct AudGroup {
 } AudGroup;
 
 // A sound bank as loaded (UStream.c reads it; Ses_ProcessArticulationData fixes its offsets up). Two can be loaded
-// at once: lbl_80282078 (bank 0) and lbl_80282074 (bank 1).
+// at once: gSesBank0 (bank 0) and gSesBank1 (bank 1).
 typedef struct AudBank {
     u8   unk0[0x4];
     u32  uAram;                 // 0x4    its samples' ARAM block (Ses_AllocSampleAram), 0: none
@@ -431,21 +431,21 @@ typedef struct MovieSound {
 } MovieSound;
 LAYOUT_ASSERT(MovieSound, 0x18);
 
-// A 0x48-byte block Mic_InitModule allocates and clears (lbl_8028206C); nothing reads it yet.
+// A 0x48-byte block Mic_InitModule allocates and clears (gMicData); nothing reads it yet.
 typedef struct AudBlock48 {
     u8   unk0[0x48];
 } AudBlock48;
 
 extern AudSource* lbl_80282058;         // AudTable.c's table
-extern u8 lbl_80282068;                 // the number of listeners (hlaudmovie.c)
-extern f32 lbl_801F17D0[32];            // the volume of each curve (Mas_GetSubmix; HLAudMaster.c)
-extern s32 lbl_80282060;                // one bit per curve: 1 = muted (Mas_IsChanMuted; HLAudMaster.c)
-extern f32 lbl_80281460;                // Mas_SetTickRate's rate, Mas_GetUpdateRateScale's result (HLAudMaster.c)
-extern s32 lbl_80282080;                // Ses_IsSessionZero says whether it is 0 (hlaudmovie.c)
-extern AudStreamFile* lbl_80282070;     // the stream file's header (hlaudmovie.c)
-extern AudBank* lbl_80282074;           // bank 1 (hlaudmovie.c)
-extern AudBank* lbl_80282078;           // bank 0 (hlaudmovie.c)
-extern u32 lbl_8028207C;                // what is loaded (hlaudmovie.c): 0x01 set up, 0x04/0x08
+extern u8 gMicCount;                 // the number of listeners (hlaudmovie.c)
+extern f32 gMasSubmixVolumes[32];            // the volume of each curve (Mas_GetSubmix; HLAudMaster.c)
+extern s32 gMasMuteMask;                // one bit per curve: 1 = muted (Mas_IsChanMuted; HLAudMaster.c)
+extern f32 gMasTickRateScale;                // Mas_SetTickRate's rate, Mas_GetUpdateRateScale's result (HLAudMaster.c)
+extern s32 gSesSession;                // Ses_IsSessionZero says whether it is 0 (hlaudmovie.c)
+extern AudStreamFile* gSesStreamFileHdr;     // the stream file's header (hlaudmovie.c)
+extern AudBank* gSesBank1;           // bank 1 (hlaudmovie.c)
+extern AudBank* gSesBank0;           // bank 0 (hlaudmovie.c)
+extern u32 gSesFlags;                // what is loaded (hlaudmovie.c): 0x01 set up, 0x04/0x08
                                         // bank 0 and its samples, 0x10/0x20 bank 1 and its samples;
                                         // the tracks tick when 0xD is set, only some when 0x40 is
 extern u32 lbl_80282018;                // the sequencer re-triggers notes when its low 4 bits are 0
@@ -494,7 +494,7 @@ void         TrkRender3D(AudSource* pSource, AudTrack* pTrack, f32 fVolume);   /
 void         TrkRenderStereo(AudSource* pSource, AudTrack* pTrack, f32 fVolume);   // the others
 
 extern AudStreamQueue gAudStreamReadQueue;
-extern s32 lbl_80281468;                // the stream file (hlaudmovie.c opens "/AudioStm_GC.sab")
+extern s32 gSesStreamFile;                // the stream file (hlaudmovie.c opens "/AudioStm_GC.sab")
 extern u8 gStmLastReadId;                 // the last read id handed out (hlaudtrackstm.c)
 extern AudTrack* gStmDmaTrack;          // the track whose block is being DMA'd (hlaudtrackstm.c)
 

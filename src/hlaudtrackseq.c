@@ -549,7 +549,7 @@ u32 Aud_RandomBelow(u32 nRange) {
 
 // Whether the sound session Ses_Init set up is session 0 (OnKeyOn).
 u8 Ses_IsSessionZero(void) {
-    return lbl_80282080 == 0;
+    return gSesSession == 0;
 }
 
 // Tone nTone of a sequencer bank (the instrument a sequenced template plays).
@@ -560,5 +560,5 @@ AudSeqTone* Ses_GetInstrumentTone(AudSeqBank* pBank, u8 nTone) {
 // The audio update rate given at start-up over 60 (Aud_InitOnce is passed 60, so 1): Seq_Check
 // scales event delays by it.
 f32 Mas_GetUpdateRateScale(void) {
-    return lbl_80281460;
+    return gMasTickRateScale;
 }

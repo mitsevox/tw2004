@@ -94,7 +94,7 @@ void Trk_ExitSession(void) {
 }
 
 // Once a frame (Aud_EmiCycle), when the engine is set up and bank 0 and its samples are loaded (0xD
-// in lbl_8028207C): walks both track lists. A track allocated but never started (state 1) is freed
+// in gSesFlags): walks both track lists. A track allocated but never started (state 1) is freed
 // on its second frame; any other is ticked (Trk_Tick) and rendered (Trk_Render), or freed once its
 // tick says it has stopped. While the sound is paused (0x40) only the tracks on volume curve 0
 // tick, and not those of sound 8.
@@ -105,7 +105,7 @@ void Trk_Cycle(void) {
     AudTrackTmpl* pTmpl;
 
     pList = gTrkPerfLists;
-    if ((lbl_8028207C & 0xD) != 0xD) return;
+    if ((gSesFlags & 0xD) != 0xD) return;
     i = 0;
     do {
         pTrack = (AudTrack*)pList->pHead;
@@ -117,7 +117,7 @@ void Trk_Cycle(void) {
                 } else {
                     pTrack->bits.b.bTicked = 1;
                 }
-            } else if (!(lbl_8028207C & 0x40) ||
+            } else if (!(gSesFlags & 0x40) ||
                        (pTmpl->data.pPlayList->n3 == 0 && pTrack->pSource->nSound != 8)) {
                 if (Trk_Tick(pTrack)) {
                     Trk_Render(pTrack);
@@ -436,10 +436,10 @@ f32 Mas_GetSubmix(u8 nCurve) {
     if (Mas_IsChanMuted(nCurve)) {
         return 0.0f;
     }
-    return lbl_801F17D0[nCurve];
+    return gMasSubmixVolumes[nCurve];
 }
 
 // Whether submix nCurve is muted (its bit in HLAudMaster.c's mute mask).
 u8 Mas_IsChanMuted(u8 nCurve) {
-    return (lbl_80282060 & (1 << nCurve)) != 0;
+    return (gMasMuteMask & (1 << nCurve)) != 0;
 }

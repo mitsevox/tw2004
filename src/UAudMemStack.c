@@ -12,9 +12,9 @@ void  AudMem_InitModule(void);
 void  AudMem_CloseModule(void);
 
 // Defined last-address-first: CodeWarrior lays out .bss in reverse order of definition.
-void* lbl_80282180;                     // the buffer of the sound engine's stack
-UAudMemStack lbl_801F6660;              // the sound engine's stack
-UAudMemStackBlock lbl_801F6360[64];     // its table
+void* gAudMemBuffer;                     // the buffer of the sound engine's stack
+UAudMemStack gAudMemStack;              // the sound engine's stack
+UAudMemStackBlock gAudMemBlocks[64];     // its table
 
 // Sets up a stack over [pMem, pMem + uSize). With no table given, the stack allocates its own.
 void AudMemStack_Init(UAudMemStack* pStack, u8* pMem, u32 uSize, u32 nMaxBlocks, UAudMemStackBlock* pBlocks,
@@ -70,19 +70,19 @@ void AudMemStack_FreeTop(UAudMemStack* pStack, void* p) {
 // The sound engine's memory (the first step of Aud_InitOnce): 384 KB (0x60000) of main memory,
 // 64-byte aligned, as a stack of up to 64 blocks.
 void AudMem_Init(void) {
-    lbl_80282180 = fn_800951A0(0x60000, 64, 0);
-    AudMemStack_Init(&lbl_801F6660, lbl_80282180, 0x60000, 64, lbl_801F6360, 64);
+    gAudMemBuffer = fn_800951A0(0x60000, 64, 0);
+    AudMemStack_Init(&gAudMemStack, gAudMemBuffer, 0x60000, 64, gAudMemBlocks, 64);
 }
 
 // Takes uSize bytes (rounded up to 64) from the sound engine's memory; NULL when it is full.
 void* AudMem_Alloc(u32 uSize) {
-    return AudMemStack_AllocTop(&lbl_801F6660, uSize);
+    return AudMemStack_AllocTop(&gAudMemStack, uSize);
 }
 
 // Gives a block back to the sound engine's memory (AudMemStack_FreeTop: safe only for the last one
 // taken).
 void AudMem_Free(void* p) {
-    AudMemStack_FreeTop(&lbl_801F6660, p);
+    AudMemStack_FreeTop(&gAudMemStack, p);
 }
 
 // Empty in this build: the boot list fn_80005520 calls it just before GoARAM_Init.
