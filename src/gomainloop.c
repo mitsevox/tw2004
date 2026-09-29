@@ -119,8 +119,8 @@ void DynObj_CloseModule(void);
 void DynObj_UpdateDynamicObjects(void);
 void DynObj_RenderDynamicObjects(s32 nView);
 void DynObj_RenderBalls(int nView);
-void fn_800486EC(void);
-void fn_800486F0(void);
+void DynObj_InitModuleEmpty(void);
+void DynObj_CloseModuleEmpty(void);
 void fn_80048DD0(void);
 void fn_80048E7C(void);
 void fn_8004950C(void);
@@ -448,7 +448,7 @@ void fn_8006C7A8(void) {
     Misc_InitModule(uSeed);
     fn_80055F14();
     fn_80045D18();
-    fn_800486EC();
+    DynObj_InitModuleEmpty();
     fn_8004950C();
     fn_8006E2A4();
     fn_8006F14C();
@@ -469,7 +469,7 @@ void fn_8006C854(void) {
     fn_8006E424();
     fn_80049510();
     fn_80045D5C();
-    fn_800486F0();
+    DynObj_CloseModuleEmpty();
     fn_80055F18();
     Misc_CloseModule();
     Legacy_Character_CloseModule();

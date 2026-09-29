@@ -1626,8 +1626,8 @@ int FE_CrAP_GetClubSkinsForAsset(CrAPAsset* pAsset, Skin** apSkins) {
 }
 
 // A part 12 asset of the category "balls": pass its ball's name (its first set variant) to
-// FE_QueueBallChange and store the ball's index (fn_800484F4) in the profile's nGolferOutfit; 1 when done.
-// 0 for any other asset, or when there is no menu golfer with club skins.
+// FE_QueueBallChange and store the ball's index (DynObj_GetGolfBallLogoIndex) in the profile's
+// nGolferOutfit; 1 when done. 0 for any other asset, or when there is no menu golfer with club skins.
 u8 FE_CrAP_TryBallSwappingAsset(CrAPAsset* pAsset) {
     char szName[16];                    // the size is unknown (the frame allows up to 20)
     char* szCategory;
@@ -1644,7 +1644,7 @@ u8 FE_CrAP_TryBallSwappingAsset(CrAPAsset* pAsset) {
     if (stricmp(szCategory, "balls") == 0) {
         SKA_UnpackSwappedName(&pAsset->aSetVariant[0], szName);
         FE_QueueBallChange(szName);
-        nBall = fn_800484F4(szName);
+        nBall = DynObj_GetGolfBallLogoIndex(szName);
         FE_GetCurrentProfile()->nGolferOutfit = nBall;
         return 1;
     }

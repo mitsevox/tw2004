@@ -340,7 +340,7 @@ extern DynObjSlot lbl_801D5228[32];
 
 // GoDynObj.c's two records per player (our names; 0x104 and 0x100 bytes, GoDynObjMgr.aA and aB).
 typedef struct GoDynObjPlayerA {
-    u8   b0;                    // 0x00  set by DynObj_TeeAdd; fn_80048184 moves pF4 while it is set
+    u8   b0;                    // 0x00  set by DynObj_TeeAdd; DynObj_UpdateTee moves pF4 while it is set
     u8   unk1[0xC - 0x1];
     f32  fC;                    // 0x0C  its heading once launched
     f32  f10;                   // 0x10  time in flight
@@ -350,7 +350,7 @@ typedef struct GoDynObjPlayerA {
     f32  v40[4];                // 0x40  its launch velocity
     f32  v50[4];                // 0x50  its turn angles so far (STATEFUNC_PreShotUpdate fills them) ...
     f32  v60[4];                // 0x60  ... and how fast they grow
-    u8   b70;                   // 0x70  set by fn_8004816C: launch it
+    u8   b70;                   // 0x70  set by DynObj_TeeStruck: launch it
     u8   unk71[0xB4 - 0x71];
     f32  mB4[4][4];             // 0xB4  its rotation
     DynObj* pF4;                // 0xF4  a 'TEO ' 10004 object (DynObj_TeeAdd)
@@ -361,21 +361,21 @@ typedef struct GoDynObjPlayerA {
 LAYOUT_ASSERT(GoDynObjPlayerA, 0x104);
 
 typedef struct GoDynObjPlayerB {
-    u8   b0;                    // 0x00  set by fn_80047A24; fn_80047C24 moves pF0 while it is set
+    u8   b0;                    // 0x00  set by DynObj_DivotAdd; DynObj_UpdateDivot moves pF0 while it is set
     u8   unk1[0xC - 0x1];
     f32  fC;                    // 0x0C  minus the player's aim when placed
     f32  f10;                   // 0x10  time in flight
     u8   unk14[0x20 - 0x14];
-    f32  v20[4];                // 0x20  where fn_80047A24 put pF0 (x, y, z, 1)
+    f32  v20[4];                // 0x20  where DynObj_DivotAdd put pF0 (x, y, z, 1)
     f32  v30[4];                // 0x30  where it is now
     f32  v40[4];                // 0x40  its launch velocity
     f32  v50[4];                // 0x50  its turn angles so far ...
     f32  v60[4];                // 0x60  ... and how fast they grow
     u8   unk70[0xB0 - 0x70];
     f32  mB0[4][4];             // 0xB0  its rotation
-    DynObj* pF0;                // 0xF0  a 'TEO ' 10002 object (fn_80047A24), given up by fn_80047BC0
+    DynObj* pF0;                // 0xF0  a 'TEO ' 10002 object (DynObj_DivotAdd), given up by DynObj_DivotHide
     u8   bF4;                   // 0xF4  pF0 is in use
-    u8   bF5;                   // 0xF5  set by fn_80047A24
+    u8   bF5;                   // 0xF5  set by DynObj_DivotAdd
     u8   unkF6[0x100 - 0xF6];
 } GoDynObjPlayerB;
 LAYOUT_ASSERT(GoDynObjPlayerB, 0x100);
@@ -385,7 +385,7 @@ LAYOUT_ASSERT(GoDynObjPlayerB, 0x100);
 typedef struct GoDynObjMgr {
     GoDynObjPlayerA aA[5];      // 0x000
     GoDynObjPlayerB aB[5];      // 0x514
-    DynObj* apPlayer[5];        // 0xA14  one object per player (fn_80047B6C gives it up)
+    DynObj* apPlayer[5];        // 0xA14  one object per player (DynObj_ShotDivotHoleHide gives it up)
     DynObj* apRing[10];         // 0xA28  ten objects used in turn ...
     s32  nRing;                 // 0xA50  ... the next one
     UObject* pTeo10000;         // 0xA54  'TEO ' 10000
@@ -405,9 +405,9 @@ LAYOUT_ASSERT(GoDynObjMgr, 0xAB0);
 
 extern GoDynObjMgr* lbl_80281DA0;
 extern s32  lbl_80187D38[4];            // GoDynObj.c: each player's partner in game mode 21
-extern char lbl_80187B98[27][13];       // GoDynObj.c: 27 names (fn_800484F4 finds one)
+extern char lbl_80187B98[27][13];       // GoDynObj.c: 27 names (DynObj_GetGolfBallLogoIndex finds one)
 extern char lbl_80187CF8[4][13];        // GoDynObj.c: each player's ball logo texture ("logoea", ...)
-extern f32  lbl_80281128;               // 1.0: scales the ball's radius (fn_8004787C); owner unknown
+extern f32  lbl_80281128;               // 1.0: scales the ball's radius (DynObj_GetBallPixels); owner unknown
 
 // UKernel.c's list of the objects, first and last, the last id given out (DynObj.n134), a bit
 // mask of the used entries of lbl_801D5228 (fn_80049230; 16 at most), and two node pools (400-
@@ -425,9 +425,9 @@ void fn_800075CC(UObjModelRoot* pRoot);    // frees a model fn_800073B4 made
 // GoDynObj.c
 void DynObj_PitchMarkAdd(f32* pPos, int nPlayer);  // a fast ball low over class 3 ground leaves a 'TEO ' 10005
 void DynObj_ShotDivotHoleAdd(f32* pPos, int nPlayer);  // put the player's 'TEO ' 10001 object at pPos
-void fn_80047A24(f32* pPos, int nPlayer);  // put the player's 'TEO ' 10002 object at pPos
-void fn_8004816C(int nPlayer);             // launch the player's 'TEO ' 10004 object
-int  fn_800484F4(const char* szName);   // the index of the name among lbl_80187B98's 27 (-1: none)
+void DynObj_DivotAdd(f32* pPos, int nPlayer);  // put the player's 'TEO ' 10002 object at pPos
+void DynObj_TeeStruck(int nPlayer);             // launch the player's 'TEO ' 10004 object
+int  DynObj_GetGolfBallLogoIndex(const char* szName);   // the index of the name among lbl_80187B98's 27 (-1: none)
 
 // UKernel.c, UObject.c. The UObject functions take the object part (&DynObj.obj).
 DynObj* fn_80048E44(void);                                  // the first object

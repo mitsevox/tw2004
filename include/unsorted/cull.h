@@ -35,7 +35,7 @@ typedef struct Camera {
     /* 0x014 */ float* pRect;        // its screen rectangle (camera.h RenderCamera; fn_80013E28 sets it)
     /* 0x018 */ GoFrameBuf* pBuf;    // its frame buffer (GoRenderCtx_Gc.c RC_spCreateRenderCtx)
     /* 0x01C */ char pad1C[0x40];
-    /* 0x05C */ float m5C[4][4];     // camera space to the screen (GoDynObj.c fn_8004787C divides by w)
+    /* 0x05C */ float m5C[4][4];     // camera space to the screen (GoDynObj.c DynObj_GetBallPixels divides by w)
     /* 0x09C */ float m9C[4][4];     // the projection: RenderState_SetCameraMatrices (Code80016198.c)
                                      // copies it to gRenderState.mProjection
     /* 0x0DC */ float mDC[4][4];     // world to the screen (GoCamCont.c

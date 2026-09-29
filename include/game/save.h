@@ -343,7 +343,8 @@ typedef struct SaveProfile {
     u8   unk54C3[5];
     u64  aGolferNames[6];       // 0x054C8  -> PlayerProfile.aNames
     s8   nGolferOutfit;         // 0x054F8  -> PlayerProfile.nOutfit; FE_CrAP_TryBallSwappingAsset
-                                //          stores a ball's index there (fn_800484F4, -1: none)
+                                //          stores a ball's index there
+                                //       (DynObj_GetGolfBallLogoIndex, -1: none)
     u8   nGolferBallType;       // 0x054F9  -> PlayerProfile.nBallType
     u8   unk54FA[0x5500 - 0x54FA];
     // The created golfer's look: the body's parts and sets (FE_CrAP_SaveBodySkinChoices), its six

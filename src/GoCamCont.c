@@ -195,7 +195,8 @@ void CameraController_Idle(View* pView, int nPlayer) {
     }
     if (gPlayers[nPlayer].pChar != NULL && gSession.nGameType != 3) {
         for (i = 0; i <= 9; i++) {
-            if (fn_80048574(gPlayers[nPlayer].pChar, i + 5) && fn_80062BB0(gPlayers[nPlayer].pChar, i + 5)) {
+            if (Character_IsTagSet(gPlayers[nPlayer].pChar, i + 5)
+                && fn_80062BB0(gPlayers[nPlayer].pChar, i + 5)) {
                 fn_80062B98(gPlayers[nPlayer].pChar, i + 5);
                 CameraController_SetShakeAmount(pView, gpCamTuning->f204, gpCamTuning->f200);
                 Gaud_CameraShake(nPlayer, 0);

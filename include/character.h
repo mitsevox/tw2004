@@ -917,7 +917,7 @@ void  SKEL_SetSkinningMatrices(CharModel* pModel, f32 (*pMatrices)[4][4], s32 nM
 void  SKEL_SetDefaultWorld2BoneMatrices(CharModel* pModel, f32 (*pMatrices)[4][4]);
 void  SKEL_UpdateSkinningMatrix(CharModel* pModel, f32 (*pMtx)[4], int nBone);
 void  SKEL_UpdateAllSkinningMatrices(CharModel* pModel);
-int   fn_80048574(Character* pChar, u64 uEvent);    // the character's animation has event uEvent
+int   Character_IsTagSet(Character* pChar, u64 uEvent);    // the character's animation has event uEvent
 // CharAnim.c: bFidgeting is not 1 (both callers mask the result).
 u8    CharacterState_IsNotFidgeting(Character* pChar);
 void  SKABlender_BlendLinear(SKABlendNode* pNode, CharModel* pModel, f32 fTime);

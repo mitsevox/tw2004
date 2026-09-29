@@ -271,7 +271,7 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
         return;
     }
     if (fn_80095780(gPlayers[nPlayer].pChar) == 10) {
-        if (fn_80048574(gPlayers[nPlayer].pChar, 3)) {
+        if (Character_IsTagSet(gPlayers[nPlayer].pChar, 3)) {
             if (fn_80062BB0(gPlayers[nPlayer].pChar, 3)) {
                 fn_80062B98(gPlayers[nPlayer].pChar, 3);
                 if (!Physics_SetBallPosition(&gPlayers[nPlayer].ball, gPlayers[nPlayer].ball.vPos)) {
@@ -282,13 +282,13 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
                 bInHand = 1;
             }
         }
-    } else if (fn_80048574(gPlayers[nPlayer].pChar, 0x10)) {
+    } else if (Character_IsTagSet(gPlayers[nPlayer].pChar, 0x10)) {
         if (fn_80062BB0(gPlayers[nPlayer].pChar, 0x10)) {
             Character_GetBallOnFingerPosition(gPlayers[nPlayer].pChar, vHand);
             fn_80062B98(gPlayers[nPlayer].pChar, 0x10);
             fn_800A3CB0(vHand, nPlayer);
         }
-    } else if (fn_80048574(gPlayers[nPlayer].pChar, 0x11)) {
+    } else if (Character_IsTagSet(gPlayers[nPlayer].pChar, 0x11)) {
         if (fn_80062BB0(gPlayers[nPlayer].pChar, 0x11)) {
             fn_80062B98(gPlayers[nPlayer].pChar, 0x11);
             fn_800A3DF4(nPlayer);
@@ -297,7 +297,7 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
             fn_800A3D6C(vHand, nPlayer);
         }
     }
-    if (gPlayers[nPlayer].ball.nLie == 0 && fn_80048574(gPlayers[nPlayer].pChar, 3)) {
+    if (gPlayers[nPlayer].ball.nLie == 0 && Character_IsTagSet(gPlayers[nPlayer].pChar, 3)) {
         if (fn_80062BB0(gPlayers[nPlayer].pChar, 3)) {
             fn_80062B98(gPlayers[nPlayer].pChar, 3);
             gPlayers[nPlayer].ball.vPos[1] += 2.0f;
@@ -554,13 +554,13 @@ void STATEFUNC_SwingInit(int nPlayer) {
         DynObj_TeeAdd(&gPlayers[nPlayer].ball, nPlayer, 1);
         for (i = 0; i < gSession.nNumPlayers; i++) {
             pBall = &PLAYER(i)->ball;
-            fn_80047B6C(pBall, i);
-            fn_80047BC0(pBall, i);
+            DynObj_ShotDivotHoleHide(pBall, i);
+            DynObj_DivotHide(pBall, i);
         }
     }
     pOwnBall = &gPlayers[nPlayer].ball;
-    fn_80047B6C(pOwnBall, nPlayer);
-    fn_80047BC0(pOwnBall, nPlayer);
+    DynObj_ShotDivotHoleHide(pOwnBall, nPlayer);
+    DynObj_DivotHide(pOwnBall, nPlayer);
     gPlayers[nPlayer].bUsedMulligan = 0;
     gPlayers[nPlayer].bPlanReady = 0;
     gPlayers[nPlayer].uFlags     = 0;
@@ -719,8 +719,8 @@ void STATEFUNC_ReplaySwingInit(int nPlayer) {
         DynObj_TeeAdd(&gPlayers[nPlayer].ball, nPlayer, 1);
     }
     pBall = &gPlayers[nPlayer].ball;
-    fn_80047B6C(pBall, nPlayer);
-    fn_80047BC0(pBall, nPlayer);
+    DynObj_ShotDivotHoleHide(pBall, nPlayer);
+    DynObj_DivotHide(pBall, nPlayer);
     if (gSession.bReplay != 0) {
         GameEffects_ResetGameEffectSettings();
     } else {
@@ -744,7 +744,7 @@ void STATEFUNC_ReplaySwingUpdate(int nPlayer) {
     GameEffects_SetSuperSlowMo(1, nPlayer,
                                GolfCamera_ReplaySwingSpeed(
                                        ViewController_GetCameraControl(gPlayers[nPlayer].nView[0])));
-    if (!fn_80048574(gPlayers[nPlayer].pChar, 2) ||
+    if (!Character_IsTagSet(gPlayers[nPlayer].pChar, 2) ||
         Character_GetTagTime(gPlayers[nPlayer].pChar, 2) < gPlayers[nPlayer].pChar->fAnimTime) {
         if (gSession.bReplay) {
             SKEL_RelaxIK(gPlayers[nPlayer].pChar->pModel->pSkel);
@@ -1602,7 +1602,7 @@ void STATEFUNC_TapInUpdate(int nPlayer) {
     if (pV->script.nFade == 1) return;
     if (pV->script.nFade == 4) return;
     if (pV->script.nFade == 3) return;
-    if (fn_80048574(pChar, 2)) {
+    if (Character_IsTagSet(pChar, 2)) {
         if (!fn_80062BB0(pChar, 2)) return;
         fn_80062B98(pChar, 2);
         nController  = gPlayers[nPlayer].nController;
@@ -1698,7 +1698,7 @@ void STATEFUNC_RemoveBallUpdate(int nPlayer) {
             }
         }
     } else if (gSession.fFrameTime > 0.0f) {
-        if (fn_80048574(gPlayers[nPlayer].pChar, 4) && fn_80062BB0(gPlayers[nPlayer].pChar, 4)) {
+        if (Character_IsTagSet(gPlayers[nPlayer].pChar, 4) && fn_80062BB0(gPlayers[nPlayer].pChar, 4)) {
             Player* p     = &gPlayers[nPlayer];
             Ball*   pB    = &p->ball;
             f32*    pPrev = p->ball.vPrev;
@@ -1720,7 +1720,7 @@ void STATEFUNC_RemoveBallUpdate(int nPlayer) {
                 }
             }
         }
-        if (fn_80048574(gPlayers[nPlayer].pChar, 3) && fn_80062BB0(gPlayers[nPlayer].pChar, 3)) {
+        if (Character_IsTagSet(gPlayers[nPlayer].pChar, 3) && fn_80062BB0(gPlayers[nPlayer].pChar, 3)) {
             f32 fT4 = Character_GetTagTime(gPlayers[nPlayer].pChar, 4);
             if (Character_GetTagTime(gPlayers[nPlayer].pChar, 3) > fT4) {
                 s32 nState = gPlayers[nPlayer].ballBefore.nState;

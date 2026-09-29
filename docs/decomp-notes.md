@@ -271,7 +271,7 @@ They will be sorted into the sections below.
 - **[verified] An inlined helper keeps its own shape**: `&&` conditions in the inlined copy can match while
   the real function needs nested ifs (GoStaticCam fn_8006509C / fn_8006596C).
 - **[verified] Stores after a divide-by-w are scheduled z first**: write `z = 0` before x and y (GoDynObj
-  fn_8004787C).
+  DynObj_GetBallPixels).
 - **[verified] A `u8` function returning an `int` local** gives the `li; li; clrlwi` join; a `u8` local lets
   CW use `bnelr` (LLDynTex fn_8010BF3C 80 -> 100).
 - **[verified] A parameter reused as the running pointer** is the parameter itself, not a new local (char
@@ -455,7 +455,7 @@ They will be sorted into the sections below.
   padding before it goes missing (OSThread: f64 array for 8-byte alignment).
 - **[verified] Some register rotations need a type change AND a declaration move together;** each alone
   scores no better, so one-change sweeps miss them. Sweep the pair (type x declaration order): GameMode26
-  GameMode26_ScoreShot 39 diffs -> 0 (parameter as `PlayerNumber_t`, nLead after nLength), GoDynObj fn_8004731C
+  GameMode26_ScoreShot 39 diffs -> 0 (parameter as `PlayerNumber_t`, nLead after nLength), GoDynObj DynObj_DrawGolfBalls
   38 -> 0 (`s32 i`, pLogoA before pLogoB).
 - **[verified] A list walked with a signed index gets folded into one walking pointer; EA's code keeps the
   list start and a byte offset apart.** The cast in the index, `list[(u32)i]`, brings EA's form back;
@@ -1232,7 +1232,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   parameter: the function takes something in r3 it never reads (`fn_80051124(Ball*, f32, f32*)`).
 - **[verified] 64-bit arguments skip r4.** `fn(handle, 0, k)` sites where the original sets r5 and
   r6 but never r4 are `fn(handle, (unsigned long long)k)`: a 64-bit integer goes in an aligned
-  register pair (r5:r6). The animation-event lookups (`Character_GetTagTime`, `fn_80048574`,
+  register pair (r5:r6). The animation-event lookups (`Character_GetTagTime`, `Character_IsTagSet`,
   `fn_80062BB0`, `fn_80062B98`) take the 64-bit event id that `fn_8000BEE4` hashes.
 - **[verified] A function that returns its pointer argument** keeps r3 untouched and works on a
   copy in another register (`mr r6, r3`); a `void` function advances r3 directly.

@@ -54,24 +54,24 @@ int  GameModeSkillZoneBase_GetCupCount(void);                 // GameModeReplay.
 void GameModeSkillZoneBase_GetCupPosition(int i, f32* pOut);     // GameModeReplay.c: target i's position
 void fn_80093DB8(Ball* pBall, int nPlayer);    // GoObjShadow.c
 void BFX_vRender(Ball* pBall, int nPlayer);    // GoObjShadow.c
-void fn_80048584(UObject* pObj, s8 nLod);
+void Object_SetLod(UObject* pObj, s8 nLod);
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);                   // identity
 int  CameraController_GetClippedGolfer(void);
-void fn_8004858C(f32* pOut, f32 fTurn, f32 fTilt);
+void DynObj_LaunchDirection(f32* pOut, f32 fTurn, f32 fTilt);
 void UObject_ComposeRotation(f32 (*pMtx)[4]);
 void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
 void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);
 void LLMath_mat44fltMultiplyList(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void LLMath_CopyMat34(f32 (*pSrc)[4], f32 (*pDst)[4]);        // copies three rows
-void fn_80048680(f32* pA, f32* pB, f32* pOut);
-void fn_800486A4(f32* pA, f32* pB, f32* pOut);
-void fn_800486C8(f32* pA, f32* pB, f32* pOut);
+void GoDynObj_Vec3Sub(f32* pA, f32* pB, f32* pOut);
+void GoDynObj_Vec4Add(f32* pA, f32* pB, f32* pOut);
+void GoDynObj_Vec3Add(f32* pA, f32* pB, f32* pOut);
 void DynObj_DrawBallMarkers(void);
-void fn_8004731C(u8* pState);
-f32  fn_8004787C(int nPlayer);
+void DynObj_DrawGolfBalls(u8* pState);
+f32  DynObj_GetBallPixels(int nPlayer);
 void Quat_QuatToMatrix(f32* pQ, f32 (*pMtx)[4]);         // Quaternion.c: to a matrix
-void fn_80047C24(int nPlayer);
-void fn_80048184(int nPlayer);
+void DynObj_UpdateDivot(int nPlayer);
+void DynObj_UpdateTee(int nPlayer);
 int  fn_8001005C(TexBank* pBank, u64 uHash);       // LLTex.c: the texture's index, or 0x80000000
 
 // ---- sweep code (not yet cleaned up) ----
@@ -301,8 +301,8 @@ void DynObj_UpdateDynamicObjects(void) {
     // port: the frame time goes through the message's pointer argument as its bits
     fn_80048F68(6, *(void**)&gSession.fFrameTime, NULL);
     for (i = 0; i < gSession.nNumPlayers; i++) {
-        fn_80047C24(i);
-        fn_80048184(i);
+        DynObj_UpdateDivot(i);
+        DynObj_UpdateTee(i);
     }
 }
 
@@ -380,10 +380,10 @@ u8 DynObj_bDrawBall(int nPlayer) {
 // Whether nPlayer's ball shadow is drawn: not in state 1 while the swing clip's tag 3 is set, not
 // in state 18 while tag 4 is set, and not when DynObj_bAltShotDrawBall says no.
 u8 DynObj_bDrawShadow(int nPlayer) {
-    if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 1 && fn_80048574(gPlayers[nPlayer].pChar, 3)) {
+    if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 1 && Character_IsTagSet(gPlayers[nPlayer].pChar, 3)) {
         return 0;
     }
-    if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 18 && fn_80048574(gPlayers[nPlayer].pChar, 4)) {
+    if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 18 && Character_IsTagSet(gPlayers[nPlayer].pChar, 4)) {
         return 0;
     }
     if (!DynObj_bAltShotDrawBall(nPlayer)) {
@@ -414,7 +414,7 @@ void DynObj_RenderBalls(int nView) {
     fn_80035308();
     fn_800352E4();
     RenderState_Flush();
-    fn_8004731C(aState);
+    DynObj_DrawGolfBalls(aState);
     RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
     if (gSession.nSplitScreen == 0) {
         DynObj_DrawBallMarkers();
@@ -530,7 +530,7 @@ void DynObj_DrawTargetModels(s32 nView) {
         GameModeSkillZoneBase_GetCupPosition(i, vPos);
         nKind = gpGame->pfnGreenType(ViewController_GetActivePlayerNumber(nView), i);
         if (lbl_80281DA0->apTeo10006[nKind] != NULL) {
-            fn_80048584(lbl_80281DA0->apTeo10006[nKind], 0);
+            Object_SetLod(lbl_80281DA0->apTeo10006[nKind], 0);
             LLMath_IdentifyMat(lbl_80281DA0->apTeo10006[nKind]->m80);
             LLMath_CopyVec(vPos, lbl_80281DA0->apTeo10006[nKind]->m80[3]);
             fn_80048894(lbl_80281DA0->apTeo10006[nKind]);
@@ -565,7 +565,7 @@ void DynObj_DrawTargetOverlays(s32 nView) {
             break;
         }
         if (nModel != -1 && lbl_80281DA0->apTeo10020[nModel] != NULL) {
-            fn_80048584(lbl_80281DA0->apTeo10020[nModel], 0);
+            Object_SetLod(lbl_80281DA0->apTeo10020[nModel], 0);
             LLMath_IdentifyMat(lbl_80281DA0->apTeo10020[nModel]->m80);
             LLMath_CopyVec(vPos, lbl_80281DA0->apTeo10020[nModel]->m80[3]);
             fn_80048894(lbl_80281DA0->apTeo10020[nModel]);
@@ -603,8 +603,8 @@ void DynObj_DrawBallMarkers(void) {
 // and 10040+i when the player has a logo. A flying or rolling ball turns by its spin; the level of
 // detail follows the camera's distance (over 50: 2, over 10: 1); the ball is flattened to the
 // view's aspect and sunk into the ground by the surface's lie, and grown when it looks small on
-// screen. pState[i] is set when DynObj_bDrawShadow picks player i.
-void fn_8004731C(u8* pState) {
+// screen (DynObj_GetBallPixels). pState[i] is set when DynObj_bDrawShadow picks player i.
+void DynObj_DrawGolfBalls(u8* pState) {
     f32 aSpin[4];
     f32 aTurn[4];
     f32 aRot[4];
@@ -661,28 +661,28 @@ void fn_8004731C(u8* pState) {
         }
         fDist = LLMath_SquareDistanceBetween3(Camera_GetCurrentLens()->m4[3], gPlayers[i].ball.vPos);
         if (fDist > 2500.0f) {
-            fn_80048584(pBall, 2);
+            Object_SetLod(pBall, 2);
             if (pLogoA != NULL) {
-                fn_80048584(pLogoA, 2);
+                Object_SetLod(pLogoA, 2);
             }
             if (pLogoB != NULL) {
-                fn_80048584(pLogoB, 2);
+                Object_SetLod(pLogoB, 2);
             }
         } else if (fDist > 100.0f) {
-            fn_80048584(pBall, 1);
+            Object_SetLod(pBall, 1);
             if (pLogoA != NULL) {
-                fn_80048584(pLogoA, 1);
+                Object_SetLod(pLogoA, 1);
             }
             if (pLogoB != NULL) {
-                fn_80048584(pLogoB, 1);
+                Object_SetLod(pLogoB, 1);
             }
         } else {
-            fn_80048584(pBall, 0);
+            Object_SetLod(pBall, 0);
             if (pLogoA != NULL) {
-                fn_80048584(pLogoA, 0);
+                Object_SetLod(pLogoA, 0);
             }
             if (pLogoB != NULL) {
-                fn_80048584(pLogoB, 0);
+                Object_SetLod(pLogoB, 0);
             }
         }
         LLMath_IdentifyMat(pBall->m40);
@@ -725,7 +725,7 @@ void fn_8004731C(u8* pState) {
                 pLogoB->m80[3][1] -= 2.0f * (fSink * gRealBallRadiusIn / 36.0f);
             }
         }
-        fSize = fn_8004787C(i);
+        fSize = DynObj_GetBallPixels(i);
         if (fSize < 0.01f) {
             fSize = 0.01f;
         }
@@ -774,9 +774,9 @@ void fn_8004731C(u8* pState) {
     }
 }
 
-// How big nPlayer's ball looks on screen: the distance between the points its radius above and
-// below its centre land on, on a 512 x 448 screen.
-f32 fn_8004787C(int nPlayer) {
+// How big nPlayer's ball looks on screen, in pixels: the distance between the points its radius
+// above and below its centre land on, on a 512 x 448 screen.
+f32 DynObj_GetBallPixels(int nPlayer) {
     Vec4 vPos;
     f32 vDiff[4];
     Vec4 vAbove;
@@ -810,13 +810,13 @@ f32 fn_8004787C(int nPlayer) {
     vBottom.z = 0.0f;
     vBottom.x = 256.0f * (1.0f + vBottom.x);
     vBottom.y = 224.0f * (1.0f + vBottom.y);
-    fn_80048680(&vTop.x, &vBottom.x, vDiff);
+    GoDynObj_Vec3Sub(&vTop.x, &vBottom.x, vDiff);
     return (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
 }
 
-// Puts the player's 'TEO ' 10002 object at pPos, facing against the aim; the first time it is made
-// (as a type 0 object, flag 0x200).
-void fn_80047A24(f32* pPos, int nPlayer) {
+// Puts the player's divot ('TEO ' 10002) at pPos, facing against the aim, to be thrown by
+// DynObj_UpdateDivot; the first time it is made (a type 0 object, flag 0x200).
+void DynObj_DivotAdd(f32* pPos, int nPlayer) {
     DynObjDef def;
     DynObjSetup setup;
     DynObjModel model;
@@ -857,8 +857,9 @@ void fn_80047A24(f32* pPos, int nPlayer) {
     }
 }
 
-// Gives up the player's object.
-void fn_80047B6C(Ball* pBall, int nPlayer) {
+// Gives up the player's divot hole (DynObj_ShotDivotHoleAdd). pBall is not read (GameMode11.c
+// passes NULL).
+void DynObj_ShotDivotHoleHide(Ball* pBall, int nPlayer) {
     if (lbl_80281DA0->apPlayer[nPlayer] != NULL) {
         fn_800491C4(lbl_80281DA0->apPlayer[nPlayer]);
         fn_800490EC();
@@ -866,7 +867,8 @@ void fn_80047B6C(Ball* pBall, int nPlayer) {
     }
 }
 
-void fn_80047BC0(Ball* pBall, int nPlayer) {
+// Gives up the player's divot (DynObj_DivotAdd). pBall is not read (GameMode11.c passes NULL).
+void DynObj_DivotHide(Ball* pBall, int nPlayer) {
     if (lbl_80281DA0->aB[nPlayer].bF4) {
         fn_800491C4(lbl_80281DA0->aB[nPlayer].pF0);
         fn_800490EC();
@@ -875,9 +877,9 @@ void fn_80047BC0(Ball* pBall, int nPlayer) {
     }
 }
 
-// Flies the player's 'TEO ' 10002 object (fn_80047A24) off its spot: launched once with a random
-// speed and spin, then carried by its velocity, the wind and gravity until it lands.
-void fn_80047C24(int nPlayer) {
+// Flies the player's divot (DynObj_DivotAdd) off its spot: launched once with a random speed and
+// spin, then carried by its velocity, the wind and gravity until it lands.
+void DynObj_UpdateDivot(int nPlayer) {
     f32 mTmp[4][4];
     f32 vMove[4];
     f32 vWind[4];
@@ -895,7 +897,7 @@ void fn_80047C24(int nPlayer) {
         LLMath_CopyMat44(mTmp, pB->pF0->obj.m0);
         UObject_ComposeRotation(pB->pF0->obj.m0);
         LLMath_CopyVec(pB->v20, pB->v30);
-        fn_8004858C(pB->v40, pB->fC, lbl_80281DA0->fAA0);
+        DynObj_LaunchDirection(pB->v40, pB->fC, lbl_80281DA0->fAA0);
         LLMath_Scale(lbl_80281DA0->fA98 * (0.5f * Misc_RandFuncf(1) + 0.5f), pB->v40, pB->v40);
         pB->v40[3] = pB->v40[1];
         pB->bF5 = 0;
@@ -915,17 +917,17 @@ void fn_80047C24(int nPlayer) {
     pB->f10 += gSession.fFrameTime;
     Wind_Get(vWind);
     LLMath_Scale(0.48888f * 0.3f, vWind, vWind);
-    fn_800486C8(vWind, pB->v40, vMove);
+    GoDynObj_Vec3Add(vWind, pB->v40, vMove);
     Vec3_Scale(pB->f10, vMove, vMove);
     vMove[1] = vMove[1] + -4.9f * pB->f10 * pB->f10;
-    fn_800486C8(vMove, pB->v20, pB->v30);
+    GoDynObj_Vec3Add(vMove, pB->v20, pB->v30);
     pB->b0 = 1;
     fGround = Ter_GetLowestGroundHeight(Ter_GetTGD(), pB->v30);
     if (pB->v30[1] < fGround) {
         pB->v30[1] = 0.01f + fGround;
         pB->b0 = 0;
     }
-    fn_800486A4(pB->v60, pB->v50, pB->v50);
+    GoDynObj_Vec4Add(pB->v60, pB->v50, pB->v50);
     LLMath_IdentifyMat(pB->mB0);
     mat44flt_EulerAngles(pB->mB0, pB->fC + pB->v50[0], pB->v50[1], pB->v50[2]);
     LLMath_CopyMat34(pB->mB0, pB->pF0->obj.m0);
@@ -935,8 +937,9 @@ void fn_80047C24(int nPlayer) {
 }
 
 
-// Puts the player's 'TEO ' 10004 object at pPos (raised by fAAC), the first time making it (a type
-// 0 object with no flags); after that its turn angles wind back to 0 (at once with bReset).
+// Puts the player's tee ('TEO ' 10004) at pPos (raised by fAAC), the first time making it (a type 0
+// object with no flags); after that its turn angles wind back to 0 (at once with bReset, EA's
+// bSnap).
 void DynObj_TeeAdd(f32* pPos, int nPlayer, u8 bReset) {
     DynObjDef def;
     DynObjSetup setup;
@@ -1009,14 +1012,14 @@ void DynObj_TeeAdd(f32* pPos, int nPlayer, u8 bReset) {
     UObject_ComposeRotation(pA->pF4->obj.m0);
 }
 
-void fn_8004816C(int nPlayer) {
+void DynObj_TeeStruck(int nPlayer) {
     lbl_80281DA0->aA[nPlayer].b70 = 1;
 }
 
-// Flies the player's 'TEO ' 10004 object (DynObj_TeeAdd) once fn_8004816C launched it: a random
-// heading, speed and spin, then its velocity, the wind and gravity until it lands. Until then it
-// stays where it was put.
-void fn_80048184(int nPlayer) {
+// Flies the player's tee (DynObj_TeeAdd) once DynObj_TeeStruck knocked it: a random heading, speed
+// and spin, then its velocity, the wind and gravity until it lands. Until then it stays where it
+// was put.
+void DynObj_UpdateTee(int nPlayer) {
     f32 mTmp[4][4];
     f32 vMove[4];
     f32 vWind[4];
@@ -1036,7 +1039,7 @@ void fn_80048184(int nPlayer) {
             LLMath_CopyMat44(mTmp, pA->pF4->obj.m0);
             UObject_ComposeRotation(pA->pF4->obj.m0);
             LLMath_CopyVec(pA->v20, pA->v30);
-            fn_8004858C(pA->v40, pA->fC, lbl_80281DA0->fA9C);
+            DynObj_LaunchDirection(pA->v40, pA->fC, lbl_80281DA0->fA9C);
             LLMath_Scale(lbl_80281DA0->fA94 * Misc_RandFuncf(1), pA->v40, pA->v40);
             pA->v40[3] = pA->v40[1];
             pA->bF9 = 0;
@@ -1056,17 +1059,17 @@ void fn_80048184(int nPlayer) {
         pA->f10 += gSession.fFrameTime;
         Wind_Get(vWind);
         LLMath_Scale(0.48888f, vWind, vWind);
-        fn_800486C8(vWind, pA->v40, vMove);
+        GoDynObj_Vec3Add(vWind, pA->v40, vMove);
         Vec3_Scale(pA->f10, vMove, vMove);
         vMove[1] = vMove[1] + -4.9f * pA->f10 * pA->f10;
-        fn_800486C8(vMove, pA->v20, pA->v30);
+        GoDynObj_Vec3Add(vMove, pA->v20, pA->v30);
         pA->b0 = 1;
         fGround = Ter_GetLowestGroundHeight(Ter_GetTGD(), pA->v30);
         if (pA->v30[1] < fGround) {
             pA->v30[1] = 0.01f + fGround;
             pA->b0 = 0;
         }
-        fn_800486A4(pA->v60, pA->v50, pA->v50);
+        GoDynObj_Vec4Add(pA->v60, pA->v50, pA->v50);
         LLMath_IdentifyMat(pA->mB4);
         mat44flt_EulerAngles(pA->mB4, pA->fC + pA->v50[0], pA->v50[1], pA->v50[2]);
         LLMath_CopyMat34(pA->mB4, pA->pF4->obj.m0);
@@ -1083,12 +1086,12 @@ void fn_80048184(int nPlayer) {
     }
 }
 
-char* fn_800484E0(int i) {
+char* DynObj_GetGolfBallLogoTextureName(int i) {
     return lbl_80187B98[i];
 }
 
-// The index of the name in lbl_80187B98 (case ignored), or -1.
-int fn_800484F4(const char* szName) {
+// The index of the name in lbl_80187B98 (case ignored), or -1 (also for NULL).
+int DynObj_GetGolfBallLogoIndex(const char* szName) {
     int i;
 
     if (szName == NULL) {
@@ -1102,17 +1105,18 @@ int fn_800484F4(const char* szName) {
     return -1;
 }
 
-int fn_80048574(Character* pChar, u64 uEvent) {
+int Character_IsTagSet(Character* pChar, u64 uEvent) {
     return pChar->aTags[uEvent].bSet;
 }
 
 // Sets the level of detail the object is drawn with.
-void fn_80048584(UObject* pObj, s8 nLod) {
+void Object_SetLod(UObject* pObj, s8 nLod) {
     pObj->n104 = nLod;
 }
 
-// A direction (x, y, z, 0): straight up tilted by fTilt, towards the heading fTurn.
-void fn_8004858C(f32* pOut, f32 fTurn, f32 fTilt) {
+// A direction (x, y, z, 0): straight up tilted by fTilt, towards the heading fTurn. The launch
+// direction of DynObj_UpdateDivot and DynObj_UpdateTee.
+void DynObj_LaunchDirection(f32* pOut, f32 fTurn, f32 fTilt) {
     f32 fSinTilt;
     f32 fCosTilt;
     f32 fSinTurn;
@@ -1142,7 +1146,7 @@ void fn_8004858C(f32* pOut, f32 fTurn, f32 fTilt) {
 
 // a - b into out (three floats)
 #ifdef __MWERKS__
-asm void fn_80048680(register f32* pA, register f32* pB, register f32* pOut) {
+asm void GoDynObj_Vec3Sub(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 1, 0
@@ -1156,7 +1160,7 @@ asm void fn_80048680(register f32* pA, register f32* pB, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_80048680(f32* pA, f32* pB, f32* pOut) {
+void GoDynObj_Vec3Sub(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pA[0] - pB[0];
     pOut[1] = pA[1] - pB[1];
     pOut[2] = pA[2] - pB[2];
@@ -1165,7 +1169,7 @@ void fn_80048680(f32* pA, f32* pB, f32* pOut) {
 
 // a + b into out (four floats)
 #ifdef __MWERKS__
-asm void fn_800486A4(register f32* pA, register f32* pB, register f32* pOut) {
+asm void GoDynObj_Vec4Add(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 0, 0
@@ -1179,7 +1183,7 @@ asm void fn_800486A4(register f32* pA, register f32* pB, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_800486A4(f32* pA, f32* pB, f32* pOut) {
+void GoDynObj_Vec4Add(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pB[0] + pA[0];
     pOut[1] = pB[1] + pA[1];
     pOut[2] = pB[2] + pA[2];
@@ -1189,7 +1193,7 @@ void fn_800486A4(f32* pA, f32* pB, f32* pOut) {
 
 // a + b into out (three floats)
 #ifdef __MWERKS__
-asm void fn_800486C8(register f32* pA, register f32* pB, register f32* pOut) {
+asm void GoDynObj_Vec3Add(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 1, 0
@@ -1203,15 +1207,18 @@ asm void fn_800486C8(register f32* pA, register f32* pB, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_800486C8(f32* pA, f32* pB, f32* pOut) {
+void GoDynObj_Vec3Add(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pB[0] + pA[0];
     pOut[1] = pB[1] + pA[1];
     pOut[2] = pB[2] + pA[2];
 }
 #endif
 
-void fn_800486EC(void) {
+// Empty in this build; gomainloop.c's start-up calls it (DynObj_CloseModuleEmpty is its shut-down
+// twin).
+void DynObj_InitModuleEmpty(void) {
 }
 
-void fn_800486F0(void) {
+// Empty in this build; gomainloop.c's shut-down calls it (the twin of DynObj_InitModuleEmpty).
+void DynObj_CloseModuleEmpty(void) {
 }

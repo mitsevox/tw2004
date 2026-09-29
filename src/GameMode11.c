@@ -453,7 +453,7 @@ char* Lessons_GetAnimName(void) {
 // the golfer after a failed try (steps 8..11). In lesson 7 (the putt) the default target is aimed
 // at, the shot prepared, the putt line reset, the golfer lined up and the swing reset (and
 // animation 1 played, unless after a failed try). The boost and spin flags clear, the step becomes
-// 7, and fn_80047B6C / fn_80047BC0 are called with no ball.
+// 7, and DynObj_ShotDivotHoleHide / DynObj_DivotHide are called with no ball.
 void Lessons_StartTry(void) {
     Lessons_ShowSwingHint(0, 0);
     GUI_ShowLessonText(-1);
@@ -479,8 +479,8 @@ void Lessons_StartTry(void) {
     gLessonSpinUsed = 0;
     gLessonBoostUsed = 0;
     gLessonStep = 7;
-    fn_80047B6C(NULL, 0);
-    fn_80047BC0(NULL, 0);
+    DynObj_ShotDivotHoleHide(NULL, 0);
+    DynObj_DivotHide(NULL, 0);
 }
 
 // After a re-plan (pfnResetShot): player 0's target is picked again (the default one for a putt,

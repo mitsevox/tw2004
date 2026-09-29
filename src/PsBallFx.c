@@ -392,7 +392,7 @@ void fn_800A30E4(int nKind, Ball* pBall, int nPlayer, u8 bFlight, f32 fValue) {
 
 // Nothing for club 25 or on ground a ball can't stop on (f1C not 0.375). Otherwise the swing
 // effect of the surface under the ball, on some lies and surfaces (a club above 8, shot kind 1
-// or 4) the player's 'TEO ' objects at the ball, and fn_8004816C on lie 0.
+// or 4) the player's 'TEO ' objects at the ball, and DynObj_TeeStruck on lie 0.
 void fn_800A31E0(Ball* pBall, int nPlayer) {
     f32 vPos[4];
     f32 vNormal[4];
@@ -419,10 +419,10 @@ void fn_800A31E0(Ball* pBall, int nPlayer) {
         gPlayers[nPlayer].nClub > 8 &&
         (gPlayers[nPlayer].nShotKind == 1 || gPlayers[nPlayer].nShotKind == 4)) {
         DynObj_ShotDivotHoleAdd(pBall->vPos, nPlayer);
-        fn_80047A24(pBall->vPos, nPlayer);
+        DynObj_DivotAdd(pBall->vPos, nPlayer);
     }
     if (gPlayers[nPlayer].ball.nLie == 0) {
-        fn_8004816C(nPlayer);
+        DynObj_TeeStruck(nPlayer);
     }
 }
 

@@ -13,7 +13,7 @@
 
 extern SurfaceType gSurfaceTypes[NUM_SURFACE_TYPES];   // 0x8017E9B8
 extern const f32 gRealBallRadiusIn;     // 0x80283300  0.84: a real golf ball, in inches
-extern const f32 lbl_80283304;          // 0.7056 (0.84 squared); GoDynObj.c fn_8004731C
+extern const f32 lbl_80283304;          // 0.7056 (0.84 squared); GoDynObj.c DynObj_DrawGolfBalls
 
 // A point on the course: x, y (up), z, and w = 1.
 typedef struct PinPos {
@@ -345,8 +345,8 @@ f32  Wind_Get(f32* pOut);               // the wind's speed; its vector (directi
 void Wind_Generate(void);
 void Ball_RotatePair(f32* pA, f32* pB, f32 fSin, f32 fCos);   // turns the pair (*pA, *pB) by an angle
 
-void fn_80047B6C(Ball* pBall, int nPlayer);
-void fn_80047BC0(Ball* pBall, int nPlayer);
+void DynObj_ShotDivotHoleHide(Ball* pBall, int nPlayer);
+void DynObj_DivotHide(Ball* pBall, int nPlayer);
 // An effect at the ball (the target games): PsBallFx.c starts effect nKind's emitters whose
 // threshold fValue reaches, pointing along the ball's flight (bFlight) or the player's aim.
 void fn_800A30E4(int nKind, Ball* pBall, int nPlayer, u8 bFlight, f32 fValue);

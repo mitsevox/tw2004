@@ -137,7 +137,7 @@ void LI_SetObjectLights(UObject* pObj);
 void RenderState_SetScissor(int nX, int nY, int nWidth, int nHeight);
 void SKN_BeginFrame(void);
 void Character_ExecuteTextureSwapFE(Character* pChar);
-char* fn_800484E0(int i);
+char* DynObj_GetGolfBallLogoTextureName(int i);
 void fn_80035600(void);
 void Character_UpdateAnimation(Character* pChar, int a, f32 f);
 void SKN_PoseCharacter(Character* pChar, int n);
@@ -664,7 +664,7 @@ void FE_vUpdateGolferAll(void) {
             if (gpCrAPState->fFadeOutTime < 0.0f) {
                 if ((gpCrAPState->nRenderState == 2 && gpCrAPState->nTempRenderState != 1)
                     || gpCrAPState->nTempRenderState == 2) {
-                    if (fn_800484F4(gpCrAPState->szQueuedBall) >= 0) {
+                    if (DynObj_GetGolfBallLogoIndex(gpCrAPState->szQueuedBall) >= 0) {
                         FE_CrAPBall_SetLogo(gpCrAPState->szQueuedBall);
                     } else {
                         FE_CrAPBall_SetLogo(NULL);
@@ -878,12 +878,13 @@ void FE_vUpdateGolferAll(void) {
         fn_80008380();
         if (gpCrAPState->pB4->nGolferId == 7 || gpCrAPState->pB4->nGolferId == 29) {
             if (FE_GetCurrentProfile()->nGolferOutfit >= 0) {
-                FE_CrAPBall_SetLogo(fn_800484E0(FE_GetCurrentProfile()->nGolferOutfit));
+                FE_CrAPBall_SetLogo(DynObj_GetGolfBallLogoTextureName(FE_GetCurrentProfile()->nGolferOutfit));
             } else {
                 FE_CrAPBall_SetLogo(NULL);
             }
         } else {
-            FE_CrAPBall_SetLogo(fn_800484E0(gGolferTable[gpCrAPState->pB4->nGolferId].nOutfit));
+            FE_CrAPBall_SetLogo(
+                    DynObj_GetGolfBallLogoTextureName(gGolferTable[gpCrAPState->pB4->nGolferId].nOutfit));
         }
         gpCrAPState->b87 = 0;
         Character_ExecuteTextureSwapFE(pChar);
