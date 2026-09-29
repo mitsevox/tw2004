@@ -23,8 +23,6 @@ s32 lbl_80281B80;                       // how many files are open
 void fn_80005BE8(const char* szSrc, char* szDst);
 void fn_80005C48(s32 nResult, DVDFileInfo* pInfo);
 void fn_800060DC(void);
-int  File_ReadAsyncEx(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(int nBytes, int nError),
-                 u8 nPrio, s32 n1C, u8 b20, u8 b21);
 
 // Copies a file path in the disc's form: letters upper case, backslashes as slashes.
 void fn_80005BE8(const char* szSrc, char* szDst) {

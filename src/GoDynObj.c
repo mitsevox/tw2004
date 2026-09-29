@@ -241,29 +241,29 @@ void DynObj_InitForHole(void) {
             pFlag->uCharFlags |= 0x40;
         }
     }
-    gpDynObjState->fA94 = 7.0f;
-    gpDynObjState->fA98 = 10.5f;
-    gpDynObjState->fA9C = 0.3f;
-    gpDynObjState->fAA0 = 0.7f;
-    gpDynObjState->fAA4 = 1.5f;
-    gpDynObjState->fAA8 = 0.6f;
-    gpDynObjState->fAAC = -0.05169f;
+    gpDynObjState->fTeeSpeed = 7.0f;
+    gpDynObjState->fDivotSpeed = 10.5f;
+    gpDynObjState->fTeeTilt = 0.3f;
+    gpDynObjState->fDivotTilt = 0.7f;
+    gpDynObjState->fTeeSpin = 1.5f;
+    gpDynObjState->fDivotSpin = 0.6f;
+    gpDynObjState->fTeeRaise = -0.05169f;
     for (i = 0; i < gSession.nNumPlayers; i++) {
-        gpDynObjState->aB[i].bF4 = 0;
-        gpDynObjState->aA[i].bF8 = 0;
-        gpDynObjState->apPlayer[i] = NULL;
+        gpDynObjState->aDivot[i].bF4 = 0;
+        gpDynObjState->aTee[i].bF8 = 0;
+        gpDynObjState->apDivotHole[i] = NULL;
     }
-    gpDynObjState->apRing[0] = NULL;
-    gpDynObjState->apRing[1] = NULL;
-    gpDynObjState->apRing[2] = NULL;
-    gpDynObjState->apRing[3] = NULL;
-    gpDynObjState->apRing[4] = NULL;
-    gpDynObjState->apRing[5] = NULL;
-    gpDynObjState->apRing[6] = NULL;
-    gpDynObjState->apRing[7] = NULL;
-    gpDynObjState->apRing[8] = NULL;
-    gpDynObjState->apRing[9] = NULL;
-    gpDynObjState->nRing = 0;
+    gpDynObjState->apPitchMark[0] = NULL;
+    gpDynObjState->apPitchMark[1] = NULL;
+    gpDynObjState->apPitchMark[2] = NULL;
+    gpDynObjState->apPitchMark[3] = NULL;
+    gpDynObjState->apPitchMark[4] = NULL;
+    gpDynObjState->apPitchMark[5] = NULL;
+    gpDynObjState->apPitchMark[6] = NULL;
+    gpDynObjState->apPitchMark[7] = NULL;
+    gpDynObjState->apPitchMark[8] = NULL;
+    gpDynObjState->apPitchMark[9] = NULL;
+    gpDynObjState->nNextPitchMark = 0;
 }
 
 // Frees the 'TEO ' models DynObj_InitForHole made.
@@ -450,7 +450,7 @@ void DynObj_PitchMarkAdd(f32* pPos, int nPlayer) {
     fGround = Ter_GetSupportingGroundData(Ter_GetTGD(), vPos, &pSurface, vNormal);
     if (TER_NO_GROUND != fGround && pSurface->nClass == 3 && fGround - pPos[1] < 0.02f &&
         (f32)Math_Sqrt(Vec3_LengthSqClamped(gPlayers[nPlayer].ball.vVel)) >= 10.0f) {
-        if (gpDynObjState->apRing[gpDynObjState->nRing] == NULL) {
+        if (gpDynObjState->apPitchMark[gpDynObjState->nNextPitchMark] == NULL) {
             // EA bug: def.n1A is never set, and type 0's setup copies it to DynObj.n14E
             def.n0 = 0;
             def.n4 = 0;
@@ -467,14 +467,14 @@ void DynObj_PitchMarkAdd(f32* pPos, int nPlayer) {
             setup.pC = NULL;
             nId = Kernel_CreateObjectId(&setup);
             if (nId != -2) {
-                gpDynObjState->apRing[gpDynObjState->nRing] = Kernel_FindObjectById(nId);
+                gpDynObjState->apPitchMark[gpDynObjState->nNextPitchMark] = Kernel_FindObjectById(nId);
             }
         } else {
-            LLMath_CopyVec(vPos, gpDynObjState->apRing[gpDynObjState->nRing]->obj.m80[3]);
-            UObject_ComposeRotation(gpDynObjState->apRing[gpDynObjState->nRing]->obj.m0);
+            LLMath_CopyVec(vPos, gpDynObjState->apPitchMark[gpDynObjState->nNextPitchMark]->obj.m80[3]);
+            UObject_ComposeRotation(gpDynObjState->apPitchMark[gpDynObjState->nNextPitchMark]->obj.m0);
         }
-        gpDynObjState->nRing = gpDynObjState->nRing + 1;
-        gpDynObjState->nRing = gpDynObjState->nRing % 10;
+        gpDynObjState->nNextPitchMark = gpDynObjState->nNextPitchMark + 1;
+        gpDynObjState->nNextPitchMark = gpDynObjState->nNextPitchMark % 10;
     }
 }
 
@@ -497,7 +497,7 @@ void DynObj_ShotDivotHoleAdd(f32* pPos, int nPlayer) {
     vPos[2] = pPos[2];
     vPos[3] = 1.0f;
     fGround = Ter_GetSupportingGroundData(Ter_GetTGD(), vPos, &pSurface, vNormal);
-    if (gpDynObjState->apPlayer[nPlayer] == NULL) {
+    if (gpDynObjState->apDivotHole[nPlayer] == NULL) {
         // EA bug: def.n1A is never set, and type 0's setup copies it to DynObj.n14E
         vPos[1] = 0.01f + fGround;
         def.n0 = 0;
@@ -515,16 +515,16 @@ void DynObj_ShotDivotHoleAdd(f32* pPos, int nPlayer) {
         setup.pC = NULL;
         nId = Kernel_CreateObjectId(&setup);
         if (nId != -2) {
-            gpDynObjState->apPlayer[nPlayer] = Kernel_FindObjectById(nId);
+            gpDynObjState->apDivotHole[nPlayer] = Kernel_FindObjectById(nId);
         }
     }
     LLMath_IdentifyMat(mTurn);
-    LLMath_IdentifyMat(gpDynObjState->apPlayer[nPlayer]->obj.m0);
+    LLMath_IdentifyMat(gpDynObjState->apDivotHole[nPlayer]->obj.m0);
     mat44flt_EulerAngles(mTurn, -gPlayers[nPlayer].fAim, 0.0f, 0.0f);
-    LLMath_mat44fltMultiplyList(gpDynObjState->apPlayer[nPlayer]->obj.m0, mTurn, mObj, 4);
-    LLMath_CopyMat44(mObj, gpDynObjState->apPlayer[nPlayer]->obj.m0);
-    LLMath_CopyVec(vPos, gpDynObjState->apPlayer[nPlayer]->obj.m80[3]);
-    UObject_ComposeRotation(gpDynObjState->apPlayer[nPlayer]->obj.m0);
+    LLMath_mat44fltMultiplyList(gpDynObjState->apDivotHole[nPlayer]->obj.m0, mTurn, mObj, 4);
+    LLMath_CopyMat44(mObj, gpDynObjState->apDivotHole[nPlayer]->obj.m0);
+    LLMath_CopyVec(vPos, gpDynObjState->apDivotHole[nPlayer]->obj.m80[3]);
+    UObject_ComposeRotation(gpDynObjState->apDivotHole[nPlayer]->obj.m0);
 }
 
 // Draws a 'TEO ' model (10006 + the target's kind) at each target of the target games.
@@ -723,7 +723,7 @@ void DynObj_DrawGolfBalls(u8* pState) {
             pLogoB->m80[3][3] = 1.0f;
         }
         if (gPlayers[i].ball.nState != 2 && gPlayers[i].ball.nSurface >= 0) {
-            fSink = 1.0f - (gPlayers[i].ball.f70 + gSurfaceTypes[gPlayers[i].ball.nSurface].f00);
+            fSink = 1.0f - (gPlayers[i].ball.fLieModifier + gSurfaceTypes[gPlayers[i].ball.nSurface].f00);
             pBall->m80[3][1] -= 2.0f * (fSink * gRealBallRadiusIn / 36.0f);
             if (pLogoA != NULL) {
                 pLogoA->m80[3][1] -= 2.0f * (fSink * gRealBallRadiusIn / 36.0f);
@@ -827,7 +827,7 @@ void DynObj_DivotAdd(f32* pPos, int nPlayer) {
     DynObjDef def;
     DynObjSetup setup;
     DynObjModel model;
-    GoDynObjPlayerB* pB = &gpDynObjState->aB[nPlayer];
+    GoDynObjDivot* pB = &gpDynObjState->aDivot[nPlayer];
     s32 nId;
 
     pB->v20[0] = pPos[0];
@@ -867,20 +867,20 @@ void DynObj_DivotAdd(f32* pPos, int nPlayer) {
 // Gives up the player's divot hole (DynObj_ShotDivotHoleAdd). pBall is not read (GameMode11.c
 // passes NULL).
 void DynObj_ShotDivotHoleHide(Ball* pBall, int nPlayer) {
-    if (gpDynObjState->apPlayer[nPlayer] != NULL) {
-        Kernel_ReleaseObject(gpDynObjState->apPlayer[nPlayer]);
+    if (gpDynObjState->apDivotHole[nPlayer] != NULL) {
+        Kernel_ReleaseObject(gpDynObjState->apDivotHole[nPlayer]);
         Kernel_SweepDeadObjects();
-        gpDynObjState->apPlayer[nPlayer] = NULL;
+        gpDynObjState->apDivotHole[nPlayer] = NULL;
     }
 }
 
 // Gives up the player's divot (DynObj_DivotAdd). pBall is not read (GameMode11.c passes NULL).
 void DynObj_DivotHide(Ball* pBall, int nPlayer) {
-    if (gpDynObjState->aB[nPlayer].bF4) {
-        Kernel_ReleaseObject(gpDynObjState->aB[nPlayer].pF0);
+    if (gpDynObjState->aDivot[nPlayer].bF4) {
+        Kernel_ReleaseObject(gpDynObjState->aDivot[nPlayer].pF0);
         Kernel_SweepDeadObjects();
-        gpDynObjState->aB[nPlayer].pF0 = NULL;
-        gpDynObjState->aB[nPlayer].bF4 = 0;
+        gpDynObjState->aDivot[nPlayer].pF0 = NULL;
+        gpDynObjState->aDivot[nPlayer].bF4 = 0;
     }
 }
 
@@ -890,7 +890,7 @@ void DynObj_UpdateDivot(int nPlayer) {
     f32 mTmp[4][4];
     f32 vMove[4];
     f32 vWind[4];
-    GoDynObjPlayerB* pB = &gpDynObjState->aB[nPlayer];
+    GoDynObjDivot* pB = &gpDynObjState->aDivot[nPlayer];
     f32 fRange;
     f32 fGround;
 
@@ -904,17 +904,17 @@ void DynObj_UpdateDivot(int nPlayer) {
         LLMath_CopyMat44(mTmp, pB->pF0->obj.m0);
         UObject_ComposeRotation(pB->pF0->obj.m0);
         LLMath_CopyVec(pB->v20, pB->v30);
-        DynObj_LaunchDirection(pB->v40, pB->fC, gpDynObjState->fAA0);
-        LLMath_Scale(gpDynObjState->fA98 * (0.5f * Misc_RandFuncf(1) + 0.5f), pB->v40, pB->v40);
+        DynObj_LaunchDirection(pB->v40, pB->fC, gpDynObjState->fDivotTilt);
+        LLMath_Scale(gpDynObjState->fDivotSpeed * (0.5f * Misc_RandFuncf(1) + 0.5f), pB->v40, pB->v40);
         pB->v40[3] = pB->v40[1];
         pB->bF5 = 0;
         pB->b0 = 1;
         pB->f10 = 0.0f;
-        fRange = gpDynObjState->fAA8;
+        fRange = gpDynObjState->fDivotSpin;
         pB->v60[0] = fRange * Misc_RandFuncf(1) - 0.5f * fRange;
-        fRange = gpDynObjState->fAA8;
+        fRange = gpDynObjState->fDivotSpin;
         pB->v60[1] = fRange * Misc_RandFuncf(1) - 0.5f * fRange;
-        fRange = gpDynObjState->fAA8;
+        fRange = gpDynObjState->fDivotSpin;
         pB->v60[2] = fRange * Misc_RandFuncf(1) - 0.5f * fRange;
         pB->v50[0] = 0.0f;
         pB->v50[1] = 0.0f;
@@ -944,19 +944,19 @@ void DynObj_UpdateDivot(int nPlayer) {
 }
 
 
-// Puts the player's tee ('TEO ' 10004) at pPos (raised by fAAC), the first time making it (a type 0
-// object with no flags); after that its turn angles wind back to 0 (at once with bReset, EA's
-// bSnap).
+// Puts the player's tee ('TEO ' 10004) at pPos (raised by fTeeRaise), the first time making it (a
+// type 0 object with no flags); after that its turn angles wind back to 0 (at once with bReset,
+// EA's bSnap).
 void DynObj_TeeAdd(f32* pPos, int nPlayer, u8 bReset) {
     DynObjDef def;
     DynObjSetup setup;
     DynObjModel model;
-    GoDynObjPlayerA* pA = &gpDynObjState->aA[nPlayer];
+    GoDynObjTee* pA = &gpDynObjState->aTee[nPlayer];
     s32 nId;
     int i;
 
     pA->v20[0] = pPos[0];
-    pA->v20[1] = pPos[1] + gpDynObjState->fAAC;
+    pA->v20[1] = pPos[1] + gpDynObjState->fTeeRaise;
     pA->v20[2] = pPos[2];
     pA->v20[3] = 1.0f;
     pA->bF9 = 1;
@@ -1020,7 +1020,7 @@ void DynObj_TeeAdd(f32* pPos, int nPlayer, u8 bReset) {
 }
 
 void DynObj_TeeStruck(int nPlayer) {
-    gpDynObjState->aA[nPlayer].b70 = 1;
+    gpDynObjState->aTee[nPlayer].b70 = 1;
 }
 
 // Flies the player's tee (DynObj_TeeAdd) once DynObj_TeeStruck knocked it: a random heading, speed
@@ -1030,7 +1030,7 @@ void DynObj_UpdateTee(int nPlayer) {
     f32 mTmp[4][4];
     f32 vMove[4];
     f32 vWind[4];
-    GoDynObjPlayerA* pA = &gpDynObjState->aA[nPlayer];
+    GoDynObjTee* pA = &gpDynObjState->aTee[nPlayer];
     f32 fRange;
     f32 fGround;
 
@@ -1046,17 +1046,17 @@ void DynObj_UpdateTee(int nPlayer) {
             LLMath_CopyMat44(mTmp, pA->pF4->obj.m0);
             UObject_ComposeRotation(pA->pF4->obj.m0);
             LLMath_CopyVec(pA->v20, pA->v30);
-            DynObj_LaunchDirection(pA->v40, pA->fC, gpDynObjState->fA9C);
-            LLMath_Scale(gpDynObjState->fA94 * Misc_RandFuncf(1), pA->v40, pA->v40);
+            DynObj_LaunchDirection(pA->v40, pA->fC, gpDynObjState->fTeeTilt);
+            LLMath_Scale(gpDynObjState->fTeeSpeed * Misc_RandFuncf(1), pA->v40, pA->v40);
             pA->v40[3] = pA->v40[1];
             pA->bF9 = 0;
             pA->b0 = 1;
             pA->f10 = 0.0f;
-            fRange = gpDynObjState->fAA4;
+            fRange = gpDynObjState->fTeeSpin;
             pA->v60[0] = fRange * Misc_RandFuncf(1) - 0.5f * fRange;
-            fRange = gpDynObjState->fAA4;
+            fRange = gpDynObjState->fTeeSpin;
             pA->v60[1] = fRange * Misc_RandFuncf(1) - 0.5f * fRange;
-            fRange = gpDynObjState->fAA4;
+            fRange = gpDynObjState->fTeeSpin;
             pA->v60[2] = fRange * Misc_RandFuncf(1) - 0.5f * fRange;
             pA->v50[0] = 0.0f;
             pA->v50[1] = 0.0f;

@@ -628,10 +628,10 @@ f32 Physics_EstimateShotPower(f32 fDist, Ball* pBall, int nKind, int nClub) {
 }
 
 // The share of the launch speed the lie keeps: the surface's launch factor (+0x00) plus the ball's
-// random lie quality (f70, from Physics_SetLie); 1 without a ball or a surface.
+// random lie quality (fLieModifier, from Physics_SetLie); 1 without a ball or a surface.
 f32 Physics_GetLiePowerPercentage(Ball* pBall) {
     if (pBall != NULL && pBall->nSurface >= 0) {
-        return pBall->f70 + gSurfaceTypes[pBall->nSurface].f00;
+        return pBall->fLieModifier + gSurfaceTypes[pBall->nSurface].f00;
     }
     return 1.0f;
 }
@@ -872,7 +872,7 @@ u8 Physics_GetShotData(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, 
         fSpin = pSurface->f08;
         break;
     }
-    fKeep += pBall->f70;
+    fKeep += pBall->fLieModifier;
     fKeep = 0.0125f * (1.0f - fKeep) * gClubStep[nClub] + fKeep;
     if (nKind == SHOT_TYPE_CHIP_e
         && (nLie == LIE_ROUGH_HIGH_e || nLie == LIE_ROUGH_e || nLie == LIE_THICK_ROUGH_e)) {
@@ -916,8 +916,8 @@ void Physics_ThrowBall(Ball* pBall, f32* pDir, f32 fSpeed, f32* pFrom) {
     pBall->nSolidCollideCount      = 0;
     pBall->nCollideCount      = 0;
     pBall->bGotFirstSandPos    = 0;
-    pBall->b99      = 1;
-    pBall->b9B      = 1;
+    pBall->bLanded  = 1;
+    pBall->bSpinApplied = 1;
     pBall->bHitTopArc      = 1;
 }
 
@@ -940,17 +940,17 @@ void Physics_ShotImpact(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim,
         return;
     }
     if (nKind == SHOT_TYPE_PUTT_e || nClub == CLUB_PUTTER_e) {
-        pBall->b99    = 1;
-        pBall->b9B    = 1;
+        pBall->bLanded = 1;
+        pBall->bSpinApplied = 1;
         pBall->bHitTopArc    = 1;
         pBall->nState = 3;
     } else {
-        pBall->b99    = 0;
-        pBall->b9B    = 0;
+        pBall->bLanded = 0;
+        pBall->bSpinApplied = 0;
         pBall->bHitTopArc    = 0;
         pBall->nState = 2;
     }
-    pBall->f70 = 0.0f;
+    pBall->fLieModifier = 0.0f;
     if (pBall->nPlayer >= 0 && pBall->nPlayer <= 3) {
         Vec3Copy(pBall->vPos, gBallDropSpot[pBall->nPlayer]);
         Vec3Copy(pBall->vPos, gBallPreferredLieSpot[pBall->nPlayer]);
@@ -1658,7 +1658,7 @@ void Physics_SetLie(Ball* pBall, SurfaceType* pSurface) {
         break;
     }
     pBall->nLieAngle = 0;
-    pBall->f70 = 0.0f;
+    pBall->fLieModifier = 0.0f;
     if (pBall->nSurface >= 0 && pBall->nSurface < 156) {
         pLie = &gSurfaceTypes[pBall->nSurface];
         if (pLie->f04) {
@@ -1676,7 +1676,7 @@ void Physics_SetLie(Ball* pBall, SurfaceType* pSurface) {
             if (rSign & 1) {
                 f = -f;
             }
-            pBall->f70 = f;
+            pBall->fLieModifier = f;
         }
     }
 }
@@ -1761,9 +1761,9 @@ u8 Physics_ProcessCollision(Ball* pBall, f32* pHit, f32* pNormal, SurfaceType* p
     }
     pBall->pHitSurface = pSurface;
     pBall->pHitObject  = pObj;
-    if (pSurface->f0C >= 0.0f && !pBall->b99 && pBall->nPlayer >= 0 && pBall->nState == 2) {
-        if (!pBall->b99) {
-            pBall->b99 = 1;
+    if (pSurface->f0C >= 0.0f && !pBall->bLanded && pBall->nPlayer >= 0 && pBall->nState == 2) {
+        if (!pBall->bLanded) {
+            pBall->bLanded = 1;
             EVENT_Trigger(pBall->nPlayer, 0x1D, pBall, !gSimulating);
         }
         if (pBall->fSpinX != 0.0f || pBall->fSpinY != 0.0f) {
@@ -1782,7 +1782,7 @@ u8 Physics_ProcessCollision(Ball* pBall, f32* pHit, f32* pNormal, SurfaceType* p
             Ball_RotatePair(&vSpin[0], &vSpin[2], fS, fC);
             Vec3Copy(vSpin, pBall->vSpin);
         }
-        pBall->b9B = 1;
+        pBall->bSpinApplied = 1;
         EVENT_Trigger(pBall->nPlayer, 0x1F, pBall, !gSimulating);
     }
     return 1;
@@ -2375,7 +2375,7 @@ void Physics_TimedSimulation(Ball* pBall, f32 fSeconds, f32 fTick) {
 }
 
 // Put the ball on the ground at a point: find the ground under it (from 2 in up), sit the ball
-// on it (radius + 0.05 in), placed, with the lie of the surface there and f70 halved.
+// on it (radius + 0.05 in), placed, with the lie of the surface there and fLieModifier halved.
 u8 Physics_DropBall(Ball* pBall, f32* pPos) {
     f32          v[4];
     SurfaceType* pSurface;
@@ -2395,7 +2395,7 @@ u8 Physics_DropBall(Ball* pBall, f32* pPos) {
     pBall->nState = 0;
     pBall->bHoled = 0;
     Physics_SetLie(pBall, pSurface);
-    pBall->f70 = 0.5f * pBall->f70;
+    pBall->fLieModifier = 0.5f * pBall->fLieModifier;
     if (pBall->nPlayer >= 0 && pBall->nPlayer <= 3) {
         Vec3Copy(pBall->vPos, gBallDropSpot[pBall->nPlayer]);
         Vec3Copy(pBall->vPos, gBallPreferredLieSpot[pBall->nPlayer]);
@@ -2445,15 +2445,15 @@ u8 Physics_InitBall(Ball* pBall, f32* pPos, int nPlayer) {
     pBall->nLie          = LIE_TEE_e;
     pBall->nLieAngle     = 0;
     pBall->fHeight       = 0.0f;
-    pBall->f70           = 0.0f;
+    pBall->fLieModifier  = 0.0f;
     pBall->nStartSurface = 45;
     pBall->nSurface      = 45;
     pBall->nPlayer       = nPlayer;
     pBall->nSolidCollideCount           = 0;
     pBall->nCollideCount           = 0;
     pBall->bHoled        = 0;
-    pBall->b99           = 0;
-    pBall->b9B           = 0;
+    pBall->bLanded       = 0;
+    pBall->bSpinApplied  = 0;
     pBall->bHitTopArc           = 0;
     pBall->fSpeed        = 0.0f;
     pBall->vSpin[0]      = 0.0f;

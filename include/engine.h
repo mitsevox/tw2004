@@ -1109,6 +1109,10 @@ int  fn_8000633C(int hFile);            // file close
 // Reads uLen bytes at uOffset into pDst without waiting; pfnDone is called when it is done.
 // Returns 0, even when no request was free and the read was dropped.
 int  fn_80006444(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(int nBytes, int nError));
+// The same read queued at priority nPrio (0 or 1). The reader calls pfnDone(nBytes, 0) when b21
+// is set, else pfnDone(pDst, nBytes, n1C, b20) (the stream tracks: the track and the read id).
+int  File_ReadAsyncEx(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(int nBytes, int nError),
+                      u8 nPrio, s32 n1C, u8 b20, u8 b21);
 u32  fn_800065B0(int hFile);            // file size
 // LLFileIO_Gc.c: read a whole file into a new block aligned to nAlign, waiting (and retrying)
 // until the disc gives it; its size goes to *puSize. NULL if no memory is free.

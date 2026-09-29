@@ -15,12 +15,12 @@ typedef struct CamChoice {
     f32  fTimeTriggerTime;      // 0x08  when nTimeTrigger fires
     f32  fC;                    // 0x0C  event 0x18: the ball-flight camera takes it once the flight has
                                 //       run this far (CamScript_EstimateBallFlightPercent)
-    CamShot* p10;               // 0x10  the shot (an index in the file)
+    CamShot* pShot;             // 0x10  the shot it plays (an index in the file)
     u8   nEvent;                // 0x14  the camera event it is for (9: any event but 23)
-    u8   nInterpType;           // 0x15  how the script blends into the shot (CamShot.nBlendKind)
+    u8   nInterpType;           // 0x15  how the script blends into the shot (CamShot.nInterpType)
     u8   nTimeTrigger;          // 0x16  the camera event started at fTimeTriggerTime (13..22; else
                                 //       25, none, on load)
-    u8   b17;                    // 0x17  only for some golfers (DynamicCam_CanUseScriptOnThisModel)
+    u8   bModelLimited;         // 0x17  only for some golfer models (DynamicCam_CanUseScriptOnThisModel)
     u32  aNoHoles[12];          // 0x18  one bit per hole of every course (course * 18 + hole): not
                                 //       used there
 } CamChoice;
@@ -50,7 +50,7 @@ typedef struct DynCamTables {
     s32          nShots;        // 0x10
     s32          nSequences;    // 0x14
     s32          nSets;         // 0x18
-    s32          n1C;           // 0x1C  counts the sequence and shot loads, 1..2
+    s32          nFilesLoaded;  // 0x1C  counts the sequence and shot loads, 1..2 (at 2 both are in)
     s32          nChoicesUsed;  // 0x20
     u8           unk24[4];
 } DynCamTables;

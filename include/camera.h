@@ -69,7 +69,7 @@ typedef struct CamShot {
     f32  fLookUpOffset;         // 0x74  } (CameraScript_OffsetLookVector)
     f32  fFovStart;             // 0x78  } the field of view at the start and the end of the shot
     f32  fFovEnd;               // 0x7C  } (over f48; in degrees in the files)
-    f32  f80;                   // 0x80
+    f32  fHeightOffset;         // 0x80  added to the camera's height (DynamicCam_AddHeightOffset)
     f32  f84;                   // 0x84
     f32  fDepthOfField;         // 0x88  CamScript_RunScript hands it (plus
                                 //       GameEffects_DepthOfFieldChange of it) to fn_800457B8
@@ -82,10 +82,11 @@ typedef struct CamShot {
                                 //       GameEffects_SetDoubleTime on (else both off); 3 calls
                                 //       GolfCamera_SetCameraMatrixMode(1)
     s32  nA4;                   // 0xA4
-    u8   bA8;                   // 0xA8
+    u8   bDynamic;              // 0xA8  played by the dynamic camera (DynamicCam_ProcessScript); 0: by
+                                //       the static camera (StaticCam_ProcessScript)
     u8   bA9;                   // 0xA9  another shot's p40 leads here (DynamicCam_ParseCameraViewsFE)
     u8   bShowGolfer;           // 0xAA  the golfer is drawn in this shot
-    u8   nBlendKind;            // 0xAB  how the script moves into it (CamScript.nBlendKind: 0 a plain
+    u8   nInterpType;           // 0xAB  how the script moves into it (CamScript.nInterpType: 0 a plain
                                 //       blend, 1 fixed target, 13 share of the flight, 15 share
                                 //       to the pin, ...; CamScript_RunScript)
     u8   nLookAtKind;           // 0xAC  what it looks at (CamScript_GetLookAtPoint: 0 the ball,
@@ -226,17 +227,18 @@ typedef struct CamScript {
                                 //       CameraScript_SnapToScript holds)
     f32  v70[4];                // 0x70  (0, 0, 0, 1) when the view is set up (CameraController_InitOneCamera)
     f32  fCamTime;              // 0x80  time on this camera
-    f32  f84;                   // 0x84  fCamTime before this frame's step (CamScript_RunScript)
+    f32  fPrevCamTime;          // 0x84  fCamTime before this frame's step (CamScript_RunScript)
     f32  f88;                   // 0x88  a second clock, stepped with fCamTime
     f32  f8C;                   // 0x8C  how long the next shot lasts (its f48;
                                 //       CameraController_StartScriptOfKind)
     f32  fFadeTime;             // 0x90  the fade's time so far (stepped by the frame time)
     f32  fFadeLength;           // 0x94  and its length
-    f32  f98;                   // 0x98
-    f32  f9C;                   // 0x9C  CamScript_GetLookAtPoint hands it to
-                                //       CameraScript_CalculateShoulderShake (f98 at its end)
-    f32  fA0;                   // 0xA0
-    f32  fA4;                   // 0xA4
+    f32  fScriptTime;           // 0x98  time on the current script (0 when a new one starts; TW07's
+                                //       scriptTime)
+    f32  fPrevScriptTime;       // 0x9C  fScriptTime before this frame's step: CamScript_GetLookAtPoint
+                                //       takes the shoulder shake at it off, and adds the one at fScriptTime
+    f32  fSegmentShare;         // 0xA0  } a fly-by: the share of the current shot's spline segment and
+    f32  fFlyByDist;            // 0xA4  } the distance flown so far (GoStaticCam.c)
     f32  fRoll;                 // 0xA8  the camera's roll: the current shot's fRoll, blended
                                 //       (CamScript_RunScript)
     CamShot* pShot;             // 0xAC  the current shot
@@ -244,17 +246,18 @@ typedef struct CamScript {
                                 //       CameraController_StartScriptOfKind)
     CamShot* pB4;               // 0xB4  where SwitchCrAPCamera records the current camera
     CamShot* pB8;               // 0xB8  the shot before (GolfCamera_CutToGolferDoneAnimatingCam)
-    s32  nBlendKind;            // 0xBC  how the script blends into the next shot (its
-                                //       nBlendKind; CameraController_StartScriptOfKind)
+    s32  nInterpType;           // 0xBC  how the script blends into the next shot (its
+                                //       nInterpType; CameraController_StartScriptOfKind)
     s32  nFade;                 // 0xC0  the screen fade (CamScript_Fade): 0 none, 1 fading up to vFadeColor
                                 //       (CameraController_FadeOut), 2 fading away (FadeIn), 3 held
                                 //       (CameraController_HoldFadeColor), 4 kept after 1 ends, 5 after 2 ends
                                 //       (then 0)
     s32  nRequestedEvent;       // 0xC4  the camera event asked for (CameraController_StartScriptOfKind)
     s32  nC8;                   // 0xC8  the shot kind last started
-    u8   bCC;                   // 0xCC
-    u8   bCD;                   // 0xCD
-    u8   bCE;                   // 0xCE
+    u8   bBlendPending;         // 0xCC  a blend into a new shot started and has not stepped a frame yet
+    u8   bCD;                   // 0xCD  set for a cut (interp type 5) to a shot looking at the ball;
+                                //       nothing reads it
+    u8   bCE;                   // 0xCE  set by every new script, never cleared in this build
     u8   bFairwayFix;           // 0xCF  the camera was put back on the fairway (a point of kind
                                 //       16, DynamicCam_GetLocation)
     s32  nArcDir;               // 0xD0  the way round an arced blend swings (CamUtils_vCalcArcPosition)
@@ -265,7 +268,7 @@ typedef struct CamScript {
                                 //       it)
     f32  fLagAngle;             // 0xDC  how far the look direction may trail its target
                                 //       (CameraScript_KeepPointInView)
-    s32  nTriggerKind;          // 0xE0  } a shot kind started once f98 passes fTriggerTime
+    s32  nTriggerKind;          // 0xE0  } a shot kind started once fScriptTime passes fTriggerTime
     f32  fTriggerTime;          // 0xE4  } (DynamicCam_ChooseScriptInSequence; 25 = none)
     u8   bNoGround;             // 0xE8  no ground was found under the camera
                                 //       (CamScript_SmoothTerrainHeight)
@@ -274,10 +277,10 @@ typedef struct CamScript {
                                 //       GameEffects_BallUpdatesThisFrame by CamTuning.f1A8
     f32  fShakeTime;            // 0xF0  } the camera shake: time left and how far
     f32  fShakeAmount;          // 0xF4  } (CameraController_SetShakeAmount)
-    f32  fBlendShare;           // 0xF8  the blend's share so far (never goes back; 1 ends blend
-                                //       kinds 13 and 15)
+    f32  fBlendShare;           // 0xF8  the blend's share so far (never goes back; 1 ends interp
+                                //       types 13 and 15)
     u8   unkFC[0x100 - 0xFC];
-    f32  f100;                  // 0x100
+    f32  fMaxBallToPin;         // 0x100  tracking mode 8: the largest CamScript_GetBallToPinPercent so far
     f32  f104;                  // 0x104
     f32  f108;                  // 0x108
     f32  f10C;                  // 0x10C
@@ -458,9 +461,9 @@ typedef struct CamTuning {
     f32  f148;                  // 0x148  ... and its height's
     f32  f14C;                  // 0x14C  } DynamicCam_TrackBallVelocityLag: how fast a following camera
     f32  f150;                  // 0x150  } closes the distance and the angle to its target, per 60th
-    f32  f154;                  // 0x154  DynamicCam_TrackBallVelocityLag: while CamScript.f98 is
+    f32  f154;                  // 0x154  DynamicCam_TrackBallVelocityLag: while CamScript.fScriptTime is
                                 //        under this, both are scaled by ((f154 - fCamTime) / f154)
-                                //        squared, over f14C (tested on f98, eased by fCamTime)
+                                //        squared, over f14C (tested on fScriptTime, eased by fCamTime)
     f32  f158;                  // 0x158  CameraScript_LagBallFlight: the aim eases in over this
                                 //        much of CamScript.f88
     f32  f15C;                  // 0x15C  CameraScript_InterpToNewScript puts it in CamScript.f88 (0 for
@@ -552,13 +555,15 @@ typedef struct GolfCamState {
     u8      bMatrixCam;         // 0x054  the matrix camera is running (freezes time)
     u8      bScriptMatrixMode;  // 0x055  the camera script's matrix mode (freezes time)
     u8      bComicCam;          // 0x056  the comic (3-screen) camera is on
-    u8      b57;                // 0x057
+    u8      b57;                // 0x057  only ever cleared in this build
     u8      bSuperZoomCam;      // 0x058  the super zoom is running (freezes time)
     u8      bSlowMoSwingCam;    // 0x059  the slow-motion swing camera is on
     u8      bHeartBeatCam;      // 0x05A  the heart beat camera is beating
-    u8      b5B;                // 0x05B  set by the shutter camera
-    u8      b5C;                // 0x05C
-    u8      b5D;                // 0x05D  cleared by the swing camera
+    u8      bShutterCam;        // 0x05B  the shutter camera was started (GolfCamera_InitShutterCamera;
+                                //        the swing camera clears it; nothing reads it)
+    u8      b5C;                // 0x05C  only ever cleared in this build
+    u8      bGameBreakerCamPicked; // 0x05D  a shot was picked while the GameBreaker is predicted (until
+                                //        then one is picked at once); the swing camera clears it
     u8      unk5E[2];
     s32     nFlyByRoute;        // 0x060  the fly-by route (StaticCam_GetFlyByCam)
     f32     fHeartBeatSlowMo;   // 0x064  camera 7's slow-motion rate while bHeartBeatCam is set
@@ -703,8 +708,8 @@ typedef struct RenderCamera {
                                 //       fractions of the frame buffer (RC_spGetRenderCtxViewport)
 } RenderCamera;
 
-// Points at the slot holding the current render camera (gapCurrentRenderCtx): RC_spGetCurrentRenderCtx reads it,
-// RC_vSetCurrentRenderCtx sets it.
+// Points at the slot holding the current render camera (gapCurrentRenderCtx):
+// RC_spGetCurrentRenderCtx reads it, RC_vSetCurrentRenderCtx sets it.
 extern void** gppCurrentRenderCtx;
 
 // GoTerrain.c: gives the current render camera the model matrix pMtx (NULL: the identity), through
@@ -1000,7 +1005,8 @@ f32         FB_fGetFrameBufferOffsetX(GoFrameBuf* pBuf); // f0
 
 CamLens* CA_spCreateCamera(void);                     // a new lens
 void     CA_vReleaseCamera(CamLens* pLens);           // free it
-void     Camera_SetCameraPositionAndTarget(CamLens* pLens, f32* pPos, f32* pTarget); // aims the lens from pPos at pTarget
+void     Camera_SetCameraPositionAndTarget(CamLens* pLens, f32* pPos, f32* pTarget); // aims the lens from
+                                                                                     // pPos at pTarget
 void     CA_vSetDefaultCamera(CamLens* pLens);
 void     CA_vSetCameraFlatSize(CamLens* pLens, f32 fB4, f32 fB8); // sets fB4 and fB8
 void     CA_vSetCameraProjectionMode(CamLens* pLens, s32 nType);  // sets nType

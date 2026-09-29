@@ -48,12 +48,12 @@ void CameraController_InitOneCamera(View* pView) {
     pView->f58 = 1.0f;
     pView->nCurCamera = 25;
     pView->script.fCamTime = 0.0f;
-    pView->script.f98 = 0.0f;
+    pView->script.fScriptTime = 0.0f;
     pView->script.fFadeTime = 0.0f;
     pView->script.pShot = NULL;
     pView->script.pNextShot = NULL;
     pView->script.nFade = 0;
-    pView->script.bCC = 0;
+    pView->script.bBlendPending = 0;
     pView->script.bFairwayFix = 0;
     pView->script.bNoGround = 0;
     pView->script.pB4 = &pView->shot19C;
@@ -326,7 +326,7 @@ void CameraController_StartScriptOfKind(View* pView, int nPlayer, int nKind) {
     if (pShot != NULL) {
         pView->script.pNextShot = pShot->p40;
         if (pShot->p40 != NULL) {
-            pView->script.nBlendKind = pShot->p40->nBlendKind;
+            pView->script.nInterpType = pShot->p40->nInterpType;
             pView->script.f8C = pShot->p40->f48;
         }
     }
@@ -406,7 +406,7 @@ int CameraController_GetClippedShadow(void) {
 
 // Whether view nView hides the player's golfer: the view is the player's own (his nView[0], and
 // ViewController_GetActivePlayerNumber gives it to him) and either its current shot does not show
-// the golfer (bShowGolfer 0) and neither does the next shot it blends to (unless blend kind 5), or the
+// the golfer (bShowGolfer 0) and neither does the next shot it blends to (unless interp type 5), or the
 // camera is in mode 15 or 16 and GolfCamera_IsGolferDoneAnimating holds; with no shot, only in camera mode 4.
 u8 CameraController_HideGolfer(int nPlayer, int nView) {
     View* pView;
@@ -420,7 +420,7 @@ u8 CameraController_HideGolfer(int nPlayer, int nView) {
             }
             if (pView->script.pShot->bShowGolfer == 0) {
                 if (pView->script.pNextShot == NULL || pView->script.pNextShot->bShowGolfer == 0
-                    || pView->script.nBlendKind == 5) {
+                    || pView->script.nInterpType == 5) {
                     return 1;
                 }
             }
@@ -583,7 +583,7 @@ void CameraController_PostEvent(View* pView, int nKind, int nPlayer) {
             pView->shot19C.p40 = pShot;
             CameraScript_InterpToNewScript(&pView->script, &pView->shot19C, nPlayer, pPos, pAt, 5, 0.0f,
                                            100.0f, 25, 0.0f);
-            pView->script.nBlendKind = 5;
+            pView->script.nInterpType = 5;
             pView->script.f8C = 0.3f;
             CameraController_FadeOut(pView, 0.3f, vGrey);
         }

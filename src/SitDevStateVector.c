@@ -302,7 +302,8 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
         _SetStateVecAndCondition(pValues, 27, nValue, pSetBits);
         // the lie, in percent (Physics_GetLiePowerPercentage inlined)
         nValue = SurfaceType_IsValid(pBall->nStartSurface) ?
-                 (u32)(100.0f * (pBall->f70 + gSurfaceTypes[*(volatile s32*)&pBall->nStartSurface].f00)) :
+                 (u32)(100.0f
+                       * (pBall->fLieModifier + gSurfaceTypes[*(volatile s32*)&pBall->nStartSurface].f00)) :
                  100;   // fake match: reload
         _SetStateVecAndCondition(pValues, 58, nValue, pSetBits);
         _SetStateVecAndCondition(pValues, 59, nValue, pSetBits);

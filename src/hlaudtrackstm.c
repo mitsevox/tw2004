@@ -12,10 +12,6 @@
 #include "core/audtrack.h"
 #include "core/startup.h"
 
-int  File_ReadAsyncEx(s32 hFile, u8* pDst, u32 uLen, u32 uOffset,
-                 void (*pfnDone)(void* pDst, int nBytes, AudTrack* pTrack, u8 nId), int n,
-                 AudTrack* pTrack, u8 nId, int n19);                 // read from disc, not waiting
-
 void Stm_SendSilenceToVoices(AudTrack* pTrack);
 void ResetStreamPerf(AudTrack* pTrack);
 void Stm_FlushQueue(AudTrack* pTrack);
@@ -134,8 +130,11 @@ void ProcessAudStreamReadQueue(void) {
             if (pRead->bSilence) {
                 Stm_SendSilenceToVoices(pRead->pTrack);
             } else {
-                File_ReadAsyncEx(pRead->hFile, pRead->pDst, pRead->uLen, pRead->uOffset, pRead->pfnDone, 0,
-                            pRead->pTrack, pRead->nId, pRead->n19);
+                // port: EA passes a (pDst, nBytes, pTrack, nId) callback and the track pointer where
+                // File_ReadAsyncEx takes void (*)(int nBytes, int nError) and an s32 (n1C)
+                File_ReadAsyncEx(pRead->hFile, pRead->pDst, pRead->uLen, pRead->uOffset,
+                                 (void (*)(int, int))pRead->pfnDone, 0, (s32)pRead->pTrack, pRead->nId,
+                                 pRead->n19);
             }
         } else {
             bMore = 0;

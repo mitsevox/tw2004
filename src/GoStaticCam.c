@@ -83,7 +83,7 @@ void StaticCam_ParseFlybyCameraActor(UStreamObject* pObject) {
     sprintf(szName, "FlyBy Cam: %d", pDef->nId);
     strcpy(gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].szName, szName);
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].nStateType = 0;
-    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].bA8 = 0;
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].bDynamic = 0;
     if (pDef->f34 < 0.0f) {
         pDef->f34 = 0.0f;
     } else if (pDef->f34 > 1.0f) {
@@ -96,7 +96,7 @@ void StaticCam_ParseFlybyCameraActor(UStreamObject* pObject) {
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].v20[1] = pDef->aPos[1];
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].v20[2] = pDef->aPos[2];
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].fFovStart = PI * (pDef->fFov / 180.0f);
-    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].nBlendKind = 3;
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].nInterpType = 3;
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].f48 = pDef->f20;
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].nLookAtKind = 24;
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].bA9 = 1;
@@ -107,7 +107,7 @@ void StaticCam_ParseFlybyCameraActor(UStreamObject* pObject) {
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].p40 = (CamShot*)(uptr)(s32)pDef->nNext;
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].p44 = (CamShot*)(uptr)(s32)pDef->nId;
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].nHeightRef = 0;
-    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].f80 = 0.0f;
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].fHeightOffset = 0.0f;
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].nA4 = pDef->nPath;
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].fDepthOfField = 0.0f;
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].f8C = 0.0f;
@@ -137,7 +137,7 @@ void StaticCam_ParseStaticCameraActor(UStreamObject* pObject) {
     sprintf(szName, "Static Cam: %d", gpStaticCams->nStatic);
     strcpy(gpStaticCams->aStatic[gpStaticCams->nStatic].szName, szName);
     gpStaticCams->aStatic[gpStaticCams->nStatic].nStateType = 38;
-    gpStaticCams->aStatic[gpStaticCams->nStatic].bA8 = 0;
+    gpStaticCams->aStatic[gpStaticCams->nStatic].bDynamic = 0;
     gpStaticCams->aStatic[gpStaticCams->nStatic].f4C = pDef->f34;
     gpStaticCams->aStatic[gpStaticCams->nStatic].fLookSideOffset = 0.0f;
     gpStaticCams->aStatic[gpStaticCams->nStatic].fLookUpOffset = 0.0f;
@@ -147,7 +147,7 @@ void StaticCam_ParseStaticCameraActor(UStreamObject* pObject) {
     gpStaticCams->aStatic[gpStaticCams->nStatic].fFovStart = PI * (pDef->fFov / 180.0f);
     gpStaticCams->aStatic[gpStaticCams->nStatic].fFovEnd = PI * (pDef->f2C / 180.0f);
     gpStaticCams->aStatic[gpStaticCams->nStatic].p40 = NULL;
-    gpStaticCams->aStatic[gpStaticCams->nStatic].nBlendKind = 5;
+    gpStaticCams->aStatic[gpStaticCams->nStatic].nInterpType = 5;
     gpStaticCams->aStatic[gpStaticCams->nStatic].f48 = pDef->f30;
     gpStaticCams->aStatic[gpStaticCams->nStatic].nAE = pDef->n1C;
     gpStaticCams->aStatic[gpStaticCams->nStatic].bA9 = 0;
@@ -157,7 +157,7 @@ void StaticCam_ParseStaticCameraActor(UStreamObject* pObject) {
     gpStaticCams->aStatic[gpStaticCams->nStatic].u.aArea[3] = pDef->aArea[3];
     gpStaticCams->aStatic[gpStaticCams->nStatic].nLookAtKind = pDef->n20;
     gpStaticCams->aStatic[gpStaticCams->nStatic].nHeightRef = 0;
-    gpStaticCams->aStatic[gpStaticCams->nStatic].f80 = 0.0f;
+    gpStaticCams->aStatic[gpStaticCams->nStatic].fHeightOffset = 0.0f;
     gpStaticCams->aStatic[gpStaticCams->nStatic].bShowGolfer = 1;
     gpStaticCams->aStatic[gpStaticCams->nStatic].fDepthOfField = pDef->f54;
     gpStaticCams->aStatic[gpStaticCams->nStatic].f8C = 0.0f;
@@ -380,8 +380,8 @@ FlyByPath* StaticCam_GetFlybyTimeCurve(u32 uPath) {
 // around the current one (StaticCam_SetupFlybyCameraPointers), *pFov starts at the view's lens and goes to
 // CamScript_SplineCamerasByPositionAndLook with the shots' fFovStart. It steps the spline 0.005 at a time
 // until the camera has gone far enough, then homes in on the exact distance. The script keeps the
-// shot it is on (pShot, and pNextShot its p40), the share of that shot's segment (fA0) and the
-// distance so far (fA4).
+// shot it is on (pShot, and pNextShot its p40), the share of that shot's segment (fSegmentShare)
+// and the distance so far (fFlyByDist).
 void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32* pSub, f32* pFov, int nPlayer,
                  f32 fShare) {
     f32 vLast[4];
@@ -404,8 +404,8 @@ void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32
     f32 fHiT;
     int i;
 
-    fDist = pScript->fA4;
-    fT = pScript->fA0;
+    fDist = pScript->fFlyByDist;
+    fT = pScript->fSegmentShare;
     pShot = pScript->pShot;
     fLastT = fT;
     fLastDist = fDist;
@@ -510,8 +510,8 @@ void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32
     }
     pScript->pShot = pShot;
     pScript->pNextShot = pShot->p40;
-    pScript->fA4 = fDist;
-    pScript->fA0 = fT;
+    pScript->fFlyByDist = fDist;
+    pScript->fSegmentShare = fT;
 }
 
 // The four shots a fly-by spline runs through around pShot: the one before (pShot itself at the

@@ -260,12 +260,12 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
     Vec4    vOffset = {0.0f, 0.0f, 0.0f, 0.5f};
     u8      bInHand = 0;
     View*   pV;
-    GoDynObjPlayerA* pSlot;
+    GoDynObjTee* pSlot;
     int     nSteps, i;
     f32     vHand[4];
 
     pV    = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
-    pSlot = &gpDynObjState->aA[nPlayer];
+    pSlot = &gpDynObjState->aTee[nPlayer];
     if (pV->nCurCamera != 11 && pV->nCurCamera != 0 && gpGame->pfnOKToShoot(nPlayer)) {
         GOLFERSTATE_Switch(GS_SHOT_SETUP, nPlayer);
         return;
@@ -1459,7 +1459,7 @@ void STATEFUNC_ShowYardageUpdate(int nPlayer) {
         if (CameraController_IsFadeOn(pV)) return;
         if (!GolfCamera_IsPostShotCamFinalCutDone(pV) && fn_80095780(gPlayers[nPlayer].pChar) == 9) {
             if (!(fn_80062C28(gPlayers[nPlayer].pChar) >= gpCamTuning->f170 / 2.0f ||
-                  pV->script.f98 > 1.0f)) {
+                  pV->script.fScriptTime > 1.0f)) {
                 return;
             }
         }

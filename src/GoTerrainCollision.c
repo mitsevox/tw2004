@@ -2384,7 +2384,7 @@ u8 Ter_PointInTriangleXZpY(f32* pA, f32* pB, f32* pC, f32 fX, f32 fZ) {
 // Ter_CheckObjectAndHazardObstruction finds the model with Ter_GetObjectListModel (from the object's nPatch
 // and nObjList) and tests bit 0x40 of byte n = 0.
 int TerCollision_GetMeshFlags(UObjMesh* pModel, int n) {
-    return pModel->pInfo->a24[n];
+    return pModel->pInfo->aFlags[n];
 }
 
 // TW06: s32 MaterialTypes::getMaterialID(const TGD_MaterialInfo*). A surface's row in

@@ -167,7 +167,7 @@ UObjMesh* Object_GetMeshAlternative(UObjMesh* pMesh, int i) {
 }
 
 int Object_GetMeshFlags(UObjMesh* pMesh, int i) {
-    return pMesh->pInfo->a24[i];
+    return pMesh->pInfo->aFlags[i];
 }
 
 // The level of detail drawn.

@@ -19,7 +19,8 @@ extern u8  lbl_8028227C;                // the split-screen choice (GM_SetSplitS
 extern Replay gReplayData;              // 0x801D6030
 
 #define NUM_COURSES 30
-extern char* gCourseNames[NUM_COURSES]; // each course's name ("Pebble Beach", ...)
+extern char* gCourseNames[NUM_COURSES]; // each course's name ("Pebble Beach", ...), by course number;
+                                        // the menus show it (a replay's, a bio's course)
 
 // The replay recorder's buffer (our name; 0x15260 bytes, made by REPLAY_InitModule at the start of a
 // round): what REPLAY_Save saves before a shot besides gReplayData, put back when it replays.
@@ -146,19 +147,23 @@ extern Unk80188900 lbl_80188900[NUM_COURSE_DATA][5];   // (above)
 // One hole of the course table (0x38 bytes).
 typedef struct HoleData {
     s32  nPar;                  // 0x00
-    s32  nRating;               // 0x04  the hole's rating (UI message 35, GM_vGetHoleRating)
-    s32  n08;                   // 0x08  per tee set (GM_GetHoleTeeDistance): tee 3
-    s32  n0C;                   // 0x0C  tee 2
-    s32  n10;                   // 0x10  tee 1
-    s32  n14;                   // 0x14  tee 0
+    s32  nHandicap;             // 0x04  the hole's handicap, its stroke index (GM_GetHoleIndexHandicap;
+                                //       UI message 35, GM_vGetHoleRating, shows it as the rating)
+    s32  nYardsTee3;            // 0x08  the hole's length in yards from each tee (GM_GetHoleTeeDistance):
+    s32  nYardsTee2;            // 0x0C  tee 3 down to tee 0
+    s32  nYardsTee1;            // 0x10
+    s32  nYardsTee0;            // 0x14
     s32  nWindDir;              // 0x18  (GM_GetCurrentHolePrevailingWindDir)
-    u8   unk1C[0x2C - 0x1C];
+    u8   unk1C[0x2C - 0x1C];    // 0x1C  not read in this build (TW07's holes have four drive
+                                //       distances, GM_GetHoleDriveDistance1..4SideGame)
     f32  fWindSpeed;            // 0x2C  (GM_GetCurrentHolePrevailingWindSpeed)
     u8   unk30[4];
-    u8   b34;                   // 0x34
-    u8   b35;                   // 0x35
-    u8   unk36;
-    u8   b37;                   // 0x37  checked at the end of a PGA Tour hole
+    u8   bSplitScreenLowDetail; // 0x34  drawn cut down in split screen
+                                //       (GM_GetCurrentHoleSplitScreenLowDetail)
+    u8   bDrivingSideGame;      // 0x35  can hold the longest-drive contest (GM_GetHoleIndexDrivingSideGame)
+    u8   unk36;                 // 0x36  not read in this build (TW07: GM_GetHoleClosestPinSideGame next)
+    u8   bCountsForDrivingStat; // 0x37  its drive counts for the driving-distance stats
+                                //       (GM_GetHoleIndexCountsForDrivingStat; the PGA Tour checks it)
 } HoleData;
 LAYOUT_ASSERT(HoleData, 0x38);
 
@@ -166,7 +171,8 @@ LAYOUT_ASSERT(HoleData, 0x38);
 typedef struct CourseData {
     HoleData aHoles[18];        // 0x000
     struct {
-        s32  n0;                // +0x0
+        s32  n0;                // +0x0  not read in this build (TW07 has GM_GetRating / GM_GetSlope
+                                //       per tee set)
         s32  nPar;              // +0x4  the course's par from this tee set (GM_GetTotalPar)
         u8   unk8[8];
     } aTeeSets[4];              // 0x3F0
@@ -205,12 +211,17 @@ int  GameAnalysis_IsPuttFor(int nPlayer); // HoleScore.c
 u8   GameAnalysis_IsPuttForLead(int nPlayer); // gpGame->pfnIsPuttForLead: holing this ball takes the lead
 u8   GameAnalysis_IsPuttForWin(int nPlayer); // gpGame->pfnIsPuttForWin: holing this ball wins
 s32  GameAnalysis_GetCurrentEventLead(int nPlayer); // gpGame->pfnGetCurrentLead: the lead so far
-s32  GameAnalysis_GetPotentialEventLead(int nPlayer); // gpGame->pfnGetPotentialLead: the lead if this ball drops
-s32  GameAnalysis_GetPotentialHoleResult(int nPlayer); // gpGame->pfnGetPotentialHoleResult: how the hole ends if it drops
-int  GameAnalysis_NumBirdiesSoFarThisRound(int nPlayer, u8 bCurrent, u8 bOnlyFlagged); // holes under par so far
-int  GameAnalysis_NumEaglesSoFarThisRound(int nPlayer, u8 bCurrent, u8 bOnlyFlagged); // two under par or better so far
+s32  GameAnalysis_GetPotentialEventLead(int nPlayer); // gpGame->pfnGetPotentialLead: the lead if this ball
+                                                      // drops
+s32  GameAnalysis_GetPotentialHoleResult(int nPlayer); // gpGame->pfnGetPotentialHoleResult: how the hole ends
+                                                       // if it drops
+int  GameAnalysis_NumBirdiesSoFarThisRound(int nPlayer, u8 bCurrent, u8 bOnlyFlagged); // holes under par so
+                                                                                       // far
+int  GameAnalysis_NumEaglesSoFarThisRound(int nPlayer, u8 bCurrent, u8 bOnlyFlagged); // two under par or
+                                                                                      // better so far
 int  GameAnalysis_CurrentBirdieStreak(int nPlayer, u8 bCurrent); // the current run of holes under par
-int  GameAnalysis_CurrentEagleStreak(int nPlayer, u8 bCurrent); // the current run of holes two under par or better
+int  GameAnalysis_CurrentEagleStreak(int nPlayer, u8 bCurrent); // the current run of holes two under par or
+                                                                // better
 u8   GameAnalysis_LastHoleWasTied(void); // nobody took anything on the last hole played
 u8   GameAnalysis_IsPredictedBallRecord(int nPlayer); // HoleScore.c
 u8   GameAnalysis_IsPredictedBallTrophy(int nPlayer); // HoleScore.c

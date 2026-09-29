@@ -118,17 +118,18 @@ void DynamicCam_LoadFilesFromDiskFE(void) {
 
 // The 'CAMS' stream handler, the sequence file: two counts (sequences, then shot choices for all of
 // them), then the sequences, each followed by its choices (DynamicCam_CopySequenceData). Each
-// 'CAMS' or 'CAMV' load counts n1C up (1, 2, then back to 1); the choices get their shots once both
-// files are in (DynamicCam_ParseCameraSeqs). Then the sequences' follow-ons become pointers
-// (DynamicCam_ParseNextSeqs). Frees the object; ignores it when sequences are loaded already.
+// 'CAMS' or 'CAMV' load counts nFilesLoaded up (1, 2, then back to 1); the choices get their shots
+// once both files are in (DynamicCam_ParseCameraSeqs). Then the sequences' follow-ons become
+// pointers (DynamicCam_ParseNextSeqs). Frees the object; ignores it when sequences are loaded
+// already.
 void DynamicCam_LoadCAMSfromStream(UStreamObject* pObject) {
     s32 nSequences;
     s32 nChoices;
     u8* pSrc;
 
-    gpDynCam->n1C++;
-    if (gpDynCam->n1C > 2) {
-        gpDynCam->n1C = 1;
+    gpDynCam->nFilesLoaded++;
+    if (gpDynCam->nFilesLoaded > 2) {
+        gpDynCam->nFilesLoaded = 1;
     }
     if (gpDynCam->pSequences != NULL) {
         StaticMem_Free(pObject);
@@ -150,12 +151,12 @@ void DynamicCam_LoadCAMSfromStream(UStreamObject* pObject) {
 }
 
 // The 'CAMV' stream handler in a round, the shot file: copies the shots (DynamicCam_CopyScriptData)
-// and sets them up (DynamicCam_ParseCameraViews). Counted in n1C like 'CAMS'. Frees the object;
-// ignores it when shots are loaded already.
+// and sets them up (DynamicCam_ParseCameraViews). Counted in nFilesLoaded like 'CAMS'. Frees the
+// object; ignores it when shots are loaded already.
 void DynamicCam_LoadCAMVfromStream(UStreamObject* pObject) {
-    gpDynCam->n1C++;
-    if (gpDynCam->n1C > 2) {
-        gpDynCam->n1C = 1;
+    gpDynCam->nFilesLoaded++;
+    if (gpDynCam->nFilesLoaded > 2) {
+        gpDynCam->nFilesLoaded = 1;
     }
     if (gpDynCam->pShots != NULL) {
         StaticMem_Free(pObject);
@@ -167,8 +168,9 @@ void DynamicCam_LoadCAMVfromStream(UStreamObject* pObject) {
     StaticMem_Free(pObject);
 }
 
-// The front end's 'CAMV' handler: as DynamicCam_LoadCAMVfromStream, but not counted in n1C, and the
-// shots are set up by DynamicCam_ParseCameraViewsFE (no height limits, no sequences to resolve).
+// The front end's 'CAMV' handler: as DynamicCam_LoadCAMVfromStream, but not counted in
+// nFilesLoaded, and the shots are set up by DynamicCam_ParseCameraViewsFE (no height limits, no
+// sequences to resolve).
 void DynamicCam_LoadCAMVfromStreamFE(UStreamObject* pObject) {
     if (gpDynCam->pShots != NULL) {
         StaticMem_Free(pObject);
@@ -263,8 +265,8 @@ static f32 GoDynamicCam_StrippedFn(f32 x) {
 
 // Sets up nSize bytes of shots just loaded in a round: as DynamicCam_ParseCameraViewsFE, and each
 // shot's least height fMinHeight is kept at least CamTuning.f168, its most height fMaxHeight at
-// least fMinHeight, and f8C within 0..0.49. When the sequence file is in too (n1C is 2), the
-// sequences' choices are resolved (DynamicCam_ParseCameraSeqs).
+// least fMinHeight, and f8C within 0..0.49. When the sequence file is in too (nFilesLoaded is 2),
+// the sequences' choices are resolved (DynamicCam_ParseCameraSeqs).
 void DynamicCam_ParseCameraViews(int nSize) {
     int i;
 
@@ -288,7 +290,7 @@ void DynamicCam_ParseCameraViews(int nSize) {
             : ((gpDynCam->pShots[i].f8C > 0.49f) ? 0.49f : gpDynCam->pShots[i].f8C);
         gpDynCam->pShots[i].fFovEnd = gpDynCam->pShots[i].fFovStart;
     }
-    if (gpDynCam->n1C == 2) {
+    if (gpDynCam->nFilesLoaded == 2) {
         DynamicCam_ParseCameraSeqs(gpDynCam->nSequences);
     }
 }
@@ -314,10 +316,10 @@ void DynamicCam_ParseCameraViewsFE(int nSize) {
     }
 }
 
-// Stores the sequence count and, once both the sequence and the shot file are in (n1C is 2),
-// resolves every sequence's shot choices: the shot index becomes a pointer, and the time trigger
-// (b16) becomes 25 (none) unless it is an event 13..22 that some choice of the same sequence
-// answers (its b14).
+// Stores the sequence count and, once both the sequence and the shot file are in (nFilesLoaded is
+// 2), resolves every sequence's shot choices: the shot index becomes a pointer, and the time
+// trigger (nTimeTrigger) becomes 25 (none) unless it is an event 13..22 that some choice of the
+// same sequence answers (its nEvent).
 void DynamicCam_ParseCameraSeqs(int nSequences) {
     int i;
     int j;
@@ -325,14 +327,14 @@ void DynamicCam_ParseCameraSeqs(int nSequences) {
     u8 bFound;
 
     gpDynCam->nSequences = nSequences;
-    if (gpDynCam->n1C != 2) {
+    if (gpDynCam->nFilesLoaded != 2) {
         return;
     }
     for (i = 0; i < gpDynCam->nSequences; i++) {
         for (j = 0; j < gpDynCam->pSequences[i].nChoices; j++) {
             // port: the file keeps an index in the pointer field
-            gpDynCam->pSequences[i].pChoices[j].p10 =
-                &gpDynCam->pShots[(s32)gpDynCam->pSequences[i].pChoices[j].p10];
+            gpDynCam->pSequences[i].pChoices[j].pShot =
+                &gpDynCam->pShots[(s32)gpDynCam->pSequences[i].pChoices[j].pShot];
             if (gpDynCam->pSequences[i].pChoices[j].nTimeTrigger < 13
                 || gpDynCam->pSequences[i].pChoices[j].nTimeTrigger > 22) {
                 gpDynCam->pSequences[i].pChoices[j].nTimeTrigger = 25;
@@ -421,7 +423,7 @@ void DynamicCam_Init(void) {
 }
 
 // Frees the loaded shots, sequences, anim pairs and choices and the tables themselves, and resets
-// the load count n1C.
+// the load count nFilesLoaded.
 void DynamicCam_DeInit(void) {
     gpDynCam->nShots = 0;
     gpDynCam->nSequences = 0;
@@ -443,7 +445,7 @@ void DynamicCam_DeInit(void) {
         StaticMem_Free(gpDynCam->pChoices);
         gpDynCam->pChoices = NULL;
     }
-    gpDynCam->n1C = 0;
+    gpDynCam->nFilesLoaded = 0;
     StaticMem_Free(gpDynCam);
 }
 
@@ -673,9 +675,9 @@ CamShot* DynamicCam_ChooseScriptByName(char* szName) {
 // but 23), picked at random from the first 50 that may be used on this hole
 // (DynamicCam_CanUseScriptOnThisHole) and by this golfer (DynamicCam_CanUseScriptOnThisModel);
 // failing that, from the first 50 for the event at all. The choice's blend goes to the out pointers
-// that are not NULL (TW07's names): *pA its interpolation kind (b15), *pF1 its time (f0), *pF2 its
-// speed (f4), *pB the event that cuts it short (b16) and *pF3 when (f8). NULL for a NULL sequence
-// or when no choice answers the event.
+// that are not NULL (TW07's names): *pA its interpolation kind (nInterpType), *pF1 its time
+// (fInterpTime), *pF2 its speed (fMaxSpeed), *pB the event that cuts it short (nTimeTrigger) and
+// *pF3 when (fTimeTriggerTime). NULL for a NULL sequence or when no choice answers the event.
 CamShot* DynamicCam_ChooseScriptInSequence(CamSequence* pSequence, int nKind, int* pA, f32* pF1, f32* pF2, int* pB, f32* pF3,
                      int nPlayer) {
     int aPick[50];
@@ -720,7 +722,7 @@ CamShot* DynamicCam_ChooseScriptInSequence(CamSequence* pSequence, int nKind, in
     if (pF3 != NULL) {
         *pF3 = pSequence->pChoices[aPick[nPick]].fTimeTriggerTime;
     }
-    return pSequence->pChoices[aPick[nPick]].p10;
+    return pSequence->pChoices[aPick[nPick]].pShot;
 }
 
 // The choice may be used on the current hole: its aNoHoles bit for Game_GetCourse() * 18 +
@@ -730,12 +732,12 @@ u8 DynamicCam_CanUseScriptOnThisHole(CamChoice* pChoice) {
     return 1;
 }
 
-// The choice suits the player's golfer: a choice marked b17 is only for golfer models 0, 1, 8, 10,
-// 12..15 and 17.
+// The choice suits the player's golfer: a choice marked bModelLimited is only for golfer models 0,
+// 1, 8, 10, 12..15 and 17.
 u8 DynamicCam_CanUseScriptOnThisModel(CamChoice* pChoice, int nPlayer) {
     int nModel = gPlayers[nPlayer].golfer.nModelID;
 
-    if (pChoice->b17) {
+    if (pChoice->bModelLimited) {
         if (nModel == 0 || nModel == 1 || nModel == 8 || nModel == 10 || nModel == 12 || nModel == 13
             || nModel == 14 || nModel == 15 || nModel == 17) {
             return 1;
@@ -781,9 +783,9 @@ void DynamicCam_TrackPercent(CamShot* pShot, int nPlayer, CamScript* pScript, f3
 // DynamicCam_CalculateFlippedOffsets flips them), then its height from DynamicCam_AddHeightOffset.
 // For mode 8 its level offset from pSub (its height becoming pSub's) is scaled from CamTuning.f240
 // down to f248 as the distance CamScript_GetBallToPinPercent gives (never less than the most seen,
-// kept in the script's f100) goes from CamTuning.f23C to f244; when CameraScript_SnapToScript
-// holds, f100 just takes the distance. Waits, like DynamicCam_TrackPercent, for a ball update when
-// a point is the ball.
+// kept in the script's fMaxBallToPin) goes from CamTuning.f23C to f244; when
+// CameraScript_SnapToScript holds, fMaxBallToPin just takes the distance. Waits, like
+// DynamicCam_TrackPercent, for a ball update when a point is the ball.
 void DynamicCam_TrackOffset(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam,
                             f32* pSub) {
     f32 vFrom[4];
@@ -811,10 +813,10 @@ void DynamicCam_TrackOffset(CamShot* pShot, int nPlayer, CamScript* pScript, f32
     if (pShot->nTrackMode == 8) {
         fFar = CamScript_GetBallToPinPercent(nPlayer, pScript);
         if (!CameraScript_SnapToScript(pScript, pShot)) {
-            if (fFar > pScript->f100) {
-                pScript->f100 = fFar;
+            if (fFar > pScript->fMaxBallToPin) {
+                pScript->fMaxBallToPin = fFar;
             }
-            fFar = pScript->f100;
+            fFar = pScript->fMaxBallToPin;
             DynamicCam_Vec3Sub(pOut, pSub, vOff);
             vOff[1] = 0.0f;
             if (fFar > gpCamTuning->f23C) {
@@ -828,7 +830,7 @@ void DynamicCam_TrackOffset(CamShot* pShot, int nPlayer, CamScript* pScript, f32
                 DynamicCam_Vec3Add(vOff, pSub, pOut);
             }
         } else {
-            pScript->f100 = fFar;
+            pScript->fMaxBallToPin = fFar;
         }
     }
     DynamicCam_AddHeightOffset(pOut, pScript, pShot, nPlayer, fY);
@@ -842,11 +844,11 @@ void DynamicCam_TrackOffset(CamShot* pShot, int nPlayer, CamScript* pScript, f32
 // sideways (DynamicCam_AddOffset); the heights are the current shot's while the next shot has the
 // same mode. When CameraScript_SnapToScript holds the camera jumps there. Otherwise it closes the
 // distance to the ball (CamTuning.f14C) and turns round the ball towards the target (f150) by a
-// share per NTSC frame of the frame time f, scaled while the script's f98 is under CamTuning.f154
-// (by ((f154 - fCamTime) / f154) squared over f14C), times the script's f8C when its nBlendKind is 4, less
-// for a ball slower than CamTuning.f198 and while the script's second clock f88 is under f158;
-// while f88 is under CamTuning.f15C only part of the target's height is taken (the share to the
-// power f160).
+// share per NTSC frame of the frame time f, scaled while the script's fScriptTime is under
+// CamTuning.f154 (by ((f154 - fCamTime) / f154) squared over f14C), times the script's f8C when its
+// nInterpType is 4, less for a ball slower than CamTuning.f198 and while the script's second clock
+// f88 is under f158; while f88 is under CamTuning.f15C only part of the target's height is taken
+// (the share to the power f160).
 void DynamicCam_TrackBallVelocityLag(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam,
                                      f32* pSub,
                  f32 f) {
@@ -914,14 +916,14 @@ void DynamicCam_TrackBallVelocityLag(CamShot* pShot, int nPlayer, CamScript* pSc
     fFrames = f / (1.0f / 59.94f);
     fMove = gpCamTuning->f14C * fFrames;
     fTurn = gpCamTuning->f150 * fFrames;
-    if (pScript->f98 < gpCamTuning->f154) {
+    if (pScript->fScriptTime < gpCamTuning->f154) {
         fT = (gpCamTuning->f154 - pScript->fCamTime) / gpCamTuning->f154;
         fT *= fT;
         fEase = (1.0f / gpCamTuning->f14C) * fT;
         fMove *= fEase;
         fTurn *= fEase;
     }
-    if (pScript->nBlendKind == 4) {
+    if (pScript->nInterpType == 4) {
         fMove *= pScript->f8C;
         fTurn *= pScript->f8C;
     }
@@ -1738,14 +1740,14 @@ void DynamicCam_AddOffset(f32* pPos, f32* pDir, CamScript* pScript, CamShot* pSh
 
 // Sets the camera's height pPos[1] by the shot's nHeightRef (0: left alone): 1 between the golfer's feet
 // (bones 0x39 and 0x47), 2 the waist (bone 1), 3 the head (bone 0xA), 4 fY (the height before), 5
-// and 7 the ball (DynamicCam_GetSmoothBallLocation), 6 the pin; then the shot's f80 above that.
-// Kind 7 follows the ball smoothly: when CameraScript_SnapToScript holds it takes that height and
-// the script's f104 the shot's fMinHeight; otherwise, once per ball update this frame (none: it stays at
-// fY), it steps from the script's v70 towards the ball and takes a share of the way from the last
-// height: CamTuning.f22C while the ball rises (f104 keeping its height over the script's ground
-// fD8), and on the way down f230 near the ground (under the shot's fMinHeight, at least 0.15) blending to
-// f22C at the height f104. Early on (the script's f98 under CamTuning.fD4) the share is larger, all
-// of the way at the start.
+// and 7 the ball (DynamicCam_GetSmoothBallLocation), 6 the pin; then the shot's fHeightOffset above
+// that. Kind 7 follows the ball smoothly: when CameraScript_SnapToScript holds it takes that height
+// and the script's f104 the shot's fMinHeight; otherwise, once per ball update this frame (none: it
+// stays at fY), it steps from the script's v70 towards the ball and takes a share of the way from
+// the last height: CamTuning.f22C while the ball rises (f104 keeping its height over the script's
+// ground fD8), and on the way down f230 near the ground (under the shot's fMinHeight, at least
+// 0.15) blending to f22C at the height f104. Early on (the script's fScriptTime under
+// CamTuning.fD4) the share is larger, all of the way at the start.
 void DynamicCam_AddHeightOffset(f32* pPos, CamScript* pScript, CamShot* pShot, int nPlayer, f32 fY) {
     f32 vBone47[4];
     f32 vBone39[4];
@@ -1800,7 +1802,7 @@ void DynamicCam_AddHeightOffset(f32* pPos, CamScript* pScript, CamShot* pShot, i
         }
         break;
     }
-    pPos[1] += pShot->f80;
+    pPos[1] += pShot->fHeightOffset;
     if (pShot->nHeightRef != 7) {
         return;
     }
@@ -1817,7 +1819,7 @@ void DynamicCam_AddHeightOffset(f32* pPos, CamScript* pScript, CamShot* pShot, i
         Vec3_Scale((f32)(i + 1) / (f32)nSteps, vOff, vOff);
         DynamicCam_Vec3Add(pScript->v70, vOff, vStep);
         pPos[1] = vStep[1];
-        pPos[1] += pShot->f80;
+        pPos[1] += pShot->fHeightOffset;
         fLow = pShot->fMinHeight;
         if (fLow <= 0.15f) {
             fLow = 0.15f;
@@ -1836,8 +1838,8 @@ void DynamicCam_AddHeightOffset(f32* pPos, CamScript* pScript, CamShot* pShot, i
                         gpCamTuning->f230;
             }
         }
-        if (pScript->f98 < gpCamTuning->fD4) {
-            dSmooth = Math_Sqrt((f32)Math_Sqrt(pScript->f98 / gpCamTuning->fD4));
+        if (pScript->fScriptTime < gpCamTuning->fD4) {
+            dSmooth = Math_Sqrt((f32)Math_Sqrt(pScript->fScriptTime / gpCamTuning->fD4));
             fEase = 1.0f - (f32)dSmooth * (1.0f - fEase);
         }
         pPos[1] = fEase * (pPos[1] - fY) + fY;

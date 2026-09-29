@@ -95,9 +95,10 @@ typedef struct UObjMeshInfo {
     u8   unk2[0x4 - 0x2];
     s32  n4;                    // 0x04  not 0: a chunk follows; fn_8000799C passes n4 * 2 to fn_80007658
     u8   unk8[0x24 - 0x8];
-    s8   a24[0x54 - 0x24];      // 0x24  Object_GetMeshFlags, GoTerrain.c Ter_GetMeshFlags (length unknown, at
+    s8   aFlags[0x54 - 0x24];   // 0x24  Object_GetMeshFlags, GoTerrain.c Ter_GetMeshFlags (length unknown, at
                                 //       most this)
-    f32  f54;                   // 0x54  scales a terrain object's mipmap bias (GoTerrain.c Ter_GetMeshMipmapBiasScale)
+    f32  f54;                   // 0x54  scales a terrain object's mipmap bias (GoTerrain.c
+                                //       Ter_GetMeshMipmapBiasScale)
     f32  v58[3];                // 0x58  copied to UObjModel.v2C by type 0's setup; with f64 the
                                 //       bounding sphere GoTerrain.c's Ter_GetMeshBoundingSphere returns
     f32  f64;                   // 0x64  copied to UObjModel.f5C by type 0's setup
@@ -143,7 +144,8 @@ typedef struct UObjMesh {
     u8   unk4[4];
     struct UObjMesh** p8;       // 0x08  alternatives, by UObject.n108 (Object_GetMeshAlternative); a terrain
                                 //       mesh's children (Ter_GetMeshChild)
-    struct UObjMesh* pC;        // 0x0C  in a terrain patch's ground: the mesh drawn for it (Ter_GetGroundDrawMesh)
+    struct UObjMesh* pC;        // 0x0C  in a terrain patch's ground: the mesh drawn for it
+                                //       (Ter_GetGroundDrawMesh)
     struct UObjMesh* p10;       // 0x10  its first child, the rest by p14 (pInfo->n0 of them; LLObj_Gc.c
                                 //       fn_80007524)
     struct UObjMesh* p14;       // 0x14  the next terrain mesh of a list (Ter_GetMeshNext); a patch's
@@ -345,8 +347,9 @@ LAYOUT_ASSERT(DynObjSlot, 0xC);
 
 extern DynObjSlot gKernelOverflowSlots[32];
 
-// GoDynObj.c's two records per player (our names; 0x104 and 0x100 bytes, GoDynObjMgr.aA and aB).
-typedef struct GoDynObjPlayerA {
+// GoDynObj.c's two records per player (our names; 0x104 and 0x100 bytes, GoDynObjMgr.aTee and
+// aDivot): the tee the ball sits on, knocked flying by the shot, and the divot a shot throws up.
+typedef struct GoDynObjTee {
     u8   b0;                    // 0x00  set by DynObj_TeeAdd; DynObj_UpdateTee moves pF4 while it is set
     u8   unk1[0xC - 0x1];
     f32  fC;                    // 0x0C  its heading once launched
@@ -360,14 +363,14 @@ typedef struct GoDynObjPlayerA {
     u8   b70;                   // 0x70  set by DynObj_TeeStruck: launch it
     u8   unk71[0xB4 - 0x71];
     f32  mB4[4][4];             // 0xB4  its rotation
-    DynObj* pF4;                // 0xF4  a 'TEO ' 10004 object (DynObj_TeeAdd)
+    DynObj* pF4;                // 0xF4  the tee, a 'TEO ' 10004 object (DynObj_TeeAdd)
     u8   bF8;                   // 0xF8  pF4 is in use
     u8   bF9;                   // 0xF9  set by DynObj_TeeAdd
     u8   unkFA[0x104 - 0xFA];
-} GoDynObjPlayerA;
-LAYOUT_ASSERT(GoDynObjPlayerA, 0x104);
+} GoDynObjTee;
+LAYOUT_ASSERT(GoDynObjTee, 0x104);
 
-typedef struct GoDynObjPlayerB {
+typedef struct GoDynObjDivot {
     u8   b0;                    // 0x00  set by DynObj_DivotAdd; DynObj_UpdateDivot moves pF0 while it is set
     u8   unk1[0xC - 0x1];
     f32  fC;                    // 0x0C  minus the player's aim when placed
@@ -380,33 +383,37 @@ typedef struct GoDynObjPlayerB {
     f32  v60[4];                // 0x60  ... and how fast they grow
     u8   unk70[0xB0 - 0x70];
     f32  mB0[4][4];             // 0xB0  its rotation
-    DynObj* pF0;                // 0xF0  a 'TEO ' 10002 object (DynObj_DivotAdd), given up by DynObj_DivotHide
+    DynObj* pF0;                // 0xF0  the divot, a 'TEO ' 10002 object (DynObj_DivotAdd), given up by
+                                //       DynObj_DivotHide
     u8   bF4;                   // 0xF4  pF0 is in use
     u8   bF5;                   // 0xF5  set by DynObj_DivotAdd
     u8   unkF6[0x100 - 0xF6];
-} GoDynObjPlayerB;
-LAYOUT_ASSERT(GoDynObjPlayerB, 0x100);
+} GoDynObjDivot;
+LAYOUT_ASSERT(GoDynObjDivot, 0x100);
 
 // GoDynObj.c's state (0xAB0 bytes, gpDynObjState, allocated by DynObj_InitModule): per-player records
 // and objects, and the models of the 'TEO ' stream objects (DynObj_InitForHole makes them).
 typedef struct GoDynObjMgr {
-    GoDynObjPlayerA aA[5];      // 0x000
-    GoDynObjPlayerB aB[5];      // 0x514
-    DynObj* apPlayer[5];        // 0xA14  one object per player (DynObj_ShotDivotHoleHide gives it up)
-    DynObj* apRing[10];         // 0xA28  ten objects used in turn ...
-    s32  nRing;                 // 0xA50  ... the next one
+    GoDynObjTee aTee[5];        // 0x000
+    GoDynObjDivot aDivot[5];    // 0x514
+    DynObj* apDivotHole[5];     // 0xA14  each player's divot hole, 'TEO ' 10001 (DynObj_ShotDivotHoleAdd;
+                                //       DynObj_ShotDivotHoleHide gives it up)
+    DynObj* apPitchMark[10];    // 0xA28  the pitch marks, 'TEO ' 10005 (DynObj_PitchMarkAdd), used
+                                //       in turn ...
+    s32  nNextPitchMark;        // 0xA50  ... the next one
     UObject* pTeo10000;         // 0xA54  'TEO ' 10000
     UObject* apTeo10030[4];     // 0xA58  'TEO ' 10030..10033
     UObject* apTeo10040[4];     // 0xA68  'TEO ' 10040..10043
     UObject* apTeo10020[3];     // 0xA78  'TEO ' 10020..10022, only with GM_Currently_SkillZoneMode
     UObject* apTeo10006[4];     // 0xA84  'TEO ' 10006..10009, only with GM_Currently_SkillZoneMode
-    f32  fA94;                  // 0xA94
-    f32  fA98;                  // 0xA98
-    f32  fA9C;                  // 0xA9C
-    f32  fAA0;                  // 0xAA0
-    f32  fAA4;                  // 0xAA4
-    f32  fAA8;                  // 0xAA8
-    f32  fAAC;                  // 0xAAC
+    // the tee's and the divot's flight when struck (DynObj_InitModule sets them)
+    f32  fTeeSpeed;             // 0xA94  7: the tee's top launch speed (times a random 0..1)
+    f32  fDivotSpeed;           // 0xA98  10.5: the divot's (times a random 0.5..1)
+    f32  fTeeTilt;              // 0xA9C  0.3: the tee's launch tilt (DynObj_LaunchDirection's fTilt)
+    f32  fDivotTilt;            // 0xAA0  0.7: the divot's
+    f32  fTeeSpin;              // 0xAA4  1.5: the tee's spin range (each turn rate random in +-half)
+    f32  fDivotSpin;            // 0xAA8  0.6: the divot's
+    f32  fTeeRaise;             // 0xAAC  -0.05169: how far above the spot DynObj_TeeAdd puts the tee
 } GoDynObjMgr;
 LAYOUT_ASSERT(GoDynObjMgr, 0xAB0);
 
@@ -433,11 +440,11 @@ extern UMemPool* gKernelLargeObjectPool;
 void fn_800075CC(UObjModelRoot* pRoot);    // frees a model fn_800073B4 made
 
 // GoDynObj.c
-void DynObj_PitchMarkAdd(f32* pPos, int nPlayer);  // a fast ball low over class 3 ground leaves a 'TEO '
-                                                   // 10005
-void DynObj_ShotDivotHoleAdd(f32* pPos, int nPlayer);  // put the player's 'TEO ' 10001 object at pPos
-void DynObj_DivotAdd(f32* pPos, int nPlayer);  // put the player's 'TEO ' 10002 object at pPos
-void DynObj_TeeStruck(int nPlayer);             // launch the player's 'TEO ' 10004 object
+void DynObj_PitchMarkAdd(f32* pPos, int nPlayer);  // a fast ball landing on the green (class 3)
+                                                   // leaves a pitch mark ('TEO ' 10005)
+void DynObj_ShotDivotHoleAdd(f32* pPos, int nPlayer);  // put the player's divot hole ('TEO ' 10001) at pPos
+void DynObj_DivotAdd(f32* pPos, int nPlayer);  // put the player's divot ('TEO ' 10002) at pPos
+void DynObj_TeeStruck(int nPlayer);             // knock the player's tee ('TEO ' 10004) flying
 int  DynObj_GetGolfBallLogoIndex(const char* szName);   // the index of the name among
                                                         // gGolfBallLogoTextureNames's 27 (-1: none)
 

@@ -12,7 +12,7 @@
 // TGD_MaterialInfo, the same size; its field names (after "TW06:") agree with what the code here
 // does with each field.
 typedef struct SurfaceType {
-    f32  f00;                   // 0x00  launch: share of the speed kept; + the ball's f70
+    f32  f00;                   // 0x00  launch: share of the speed kept; + the ball's fLieModifier
                                 //       (Physics_GetLiePowerPercentage). TW06: impactV
     f32  f04;                   // 0x04  lie: size of the random lie quality (Physics_SetLie).
                                 //       TW06: impactV_Modifier

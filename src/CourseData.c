@@ -73,24 +73,24 @@ int GM_GetCurrentHolePar(void) {
     return gCourseInfo[Game_GetCourse()].aHoles[Game_GetCurHoleNum()].nPar;
 }
 
-// The handicap (stroke index) of the round's hole nHole (0..17): the course table's field nRating,
-// which UI message 35 (GM_vGetHoleRating) answers as the hole's rating.
+// The handicap (stroke index) of the round's hole nHole (0..17): the course table's field
+// nHandicap, which UI message 35 (GM_vGetHoleRating) answers as the hole's rating.
 s32 GM_GetHoleIndexHandicap(int nHole) {
-    return gCourseInfo[gpGame->nHoleCourse[nHole]].aHoles[gpGame->nHoleNum[nHole]].nRating;
+    return gCourseInfo[gpGame->nHoleCourse[nHole]].aHoles[gpGame->nHoleNum[nHole]].nHandicap;
 }
 
-// Hole nHole's length (yards) on course nCourse from tee nTee (0..3: fields n14, n10, n0C, n08); 0
-// for any other tee.
+// Hole nHole's length (yards) on course nCourse from tee nTee (0..3: fields nYardsTee0, nYardsTee1,
+// nYardsTee2, nYardsTee3); 0 for any other tee.
 s32 GM_GetHoleTeeDistance(int nCourse, int nHole, int nTee) {
     switch (nTee) {
     case 0:
-        return gCourseInfo[nCourse].aHoles[nHole].n14;
+        return gCourseInfo[nCourse].aHoles[nHole].nYardsTee0;
     case 1:
-        return gCourseInfo[nCourse].aHoles[nHole].n10;
+        return gCourseInfo[nCourse].aHoles[nHole].nYardsTee1;
     case 2:
-        return gCourseInfo[nCourse].aHoles[nHole].n0C;
+        return gCourseInfo[nCourse].aHoles[nHole].nYardsTee2;
     case 3:
-        return gCourseInfo[nCourse].aHoles[nHole].n08;
+        return gCourseInfo[nCourse].aHoles[nHole].nYardsTee3;
     }
     return 0;
 }
@@ -193,22 +193,22 @@ s32 GM_GetCurrentCourseTotalPar(s32 nTeeSet) {
 }
 
 // Whether the current hole asks for the cut-down drawing in two-player split screen: its
-// course-table byte 0x34 (b34). The round's frame then sets gSession.b11, which skips the terrain
-// objects' sort and level fades and the golfers' morph blending.
+// course-table byte 0x34 (bSplitScreenLowDetail). The round's frame then sets gSession.b11, which
+// skips the terrain objects' sort and level fades and the golfers' morph blending.
 u8 GM_GetCurrentHoleSplitScreenLowDetail(void) {
-    return gCourseInfo[Game_GetCourse()].aHoles[Game_GetCurHoleNum()].b34;
+    return gCourseInfo[Game_GetCourse()].aHoles[Game_GetCurHoleNum()].bSplitScreenLowDetail;
 }
 
 // Whether the round's hole nHole (0..17) can hold the longest-drive contest (course-table byte
-// 0x35, b35); HoleContest_DrawHoles also needs a par 4 or 5.
+// 0x35, bDrivingSideGame); HoleContest_DrawHoles also needs a par 4 or 5.
 u8 GM_GetHoleIndexDrivingSideGame(int nHole) {
-    return gCourseInfo[gpGame->nHoleCourse[nHole]].aHoles[gpGame->nHoleNum[nHole]].b35;
+    return gCourseInfo[gpGame->nHoleCourse[nHole]].aHoles[gpGame->nHoleNum[nHole]].bDrivingSideGame;
 }
 
 // Whether the round's hole nHole's drive counts for the driving-distance stats (course-table byte
-// 0x37, b37): the PGA Tour's end of hole and its simulated players both check it.
+// 0x37, bCountsForDrivingStat): the PGA Tour's end of hole and its simulated players both check it.
 u8 GM_GetHoleIndexCountsForDrivingStat(int nHole) {
-    return gCourseInfo[gpGame->nHoleCourse[nHole]].aHoles[gpGame->nHoleNum[nHole]].b37;
+    return gCourseInfo[gpGame->nHoleCourse[nHole]].aHoles[gpGame->nHoleNum[nHole]].bCountsForDrivingStat;
 }
 
 // Which row of the 'CMPS' compilation table a built round uses: course 22 (Tiger's Dream 18) row 0,

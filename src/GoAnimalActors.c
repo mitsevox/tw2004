@@ -487,7 +487,7 @@ int ActAnimal_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2) {
 
 // The same as UObject.c's Object_GetMeshFlags, compiled into this file too.
 int ActAnimal_GetMeshFlags(UObjMesh* pMesh, int i) {
-    return pMesh->pInfo->a24[i];
+    return pMesh->pInfo->aFlags[i];
 }
 
 // The same as UObject.c's Object_GetMeshAlternative, compiled into this file too.

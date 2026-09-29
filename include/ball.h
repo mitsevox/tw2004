@@ -164,7 +164,9 @@ typedef struct Ball {
                                 //       GM_vGetPlayerCurrentLieAngle); only ever set to 0. TW06
                                 //       has five lie fields here (initialLie, lie, lieAngle,
                                 //       lieModifier, lieReadOffset); this game has three
-    f32  f70;                   // 0x70  added to a surface's value
+    f32  fLieModifier;          // 0x70  the random lie quality (Physics_SetLie: up to +- the surface's
+                                //       f04, less with LUCK), added to its f00 at launch. TW06:
+                                //       lieModifier (next after lieAngle)
     s32  nSurface;              // 0x74  surface type under the ball (90 = the cup). TW06: surfaceID
     s32  nStartSurface;         // 0x78  surface at the start of the shot. TW06: initialSurfaceID
     CourseInfo* pCourse;        // 0x7C  TW06: pTerrainData (TGD_TerrainInfo*)
@@ -176,9 +178,12 @@ typedef struct Ball {
                                 //       pLastCollisionActor
     s32  nPlayer;               // 0x94  -1 when nobody's. TW06: playerID
     u8   bHoled;                // 0x98  TW06: PBF_InHole
-    u8   b99;                   // 0x99
-    u8   bHitTopArc;            // 0x9A  set when the ball starts coming down. TW06: PBF_HitTopArc
-    u8   b9B;                   // 0x9B
+    u8   bLanded;               // 0x99  first bounce on a solid surface done (event 0x1D); 1 from the
+                                //       start for a putt or a placed ball
+    u8   bHitTopArc;            // 0x9A  set when the ball starts coming down (a putt starts with it
+                                //       set). TW06: PBF_HitTopArc
+    u8   bSpinApplied;          // 0x9B  the spin-stick input went into the spin at that bounce
+                                //       (event 0x1F); 1 from the start for a putt
     u8   bGotFirstSandPos;      // 0x9C  landed in sand (class 6) this shot. TW06: PBF_GotFirstSandPos
     u8   unk9D[0xA0 - 0x9D];
     f32  vFirstSandPos[3];      // 0xA0  where it first landed in sand. TW06: firstSandPosition
@@ -255,8 +260,8 @@ typedef struct CourseLoader {
 LAYOUT_ASSERT(CourseLoader, 0x8);
 
 CourseInfo* Ter_GetTGD(void);          // the current hole's terrain data
-u8   Network_RegisterLoadNetworkCallback(int nChunk, void (*pfn)(u8*));   // 0x8000C0B4: pfn gets the hole's
-                                                                          // chunk nChunk
+u8   Network_RegisterLoadNetworkCallback(int nChunk, void (*pfn)(u8*));   // 0x8000C0B4: pfn gets each
+                                                                          // network of nExportType nChunk
 void Network_CloseModule(void);                 // network count 0, loader count -1
 void Network_InitModule(void);                 // register the 'Cnet' handler, clear the loaders
 s32  wn_PnPoly(f32* pPos, TNetwork* pNet, s32 nNodes);   // point in outline. TW06: wn_PnPoly
@@ -341,8 +346,8 @@ f32  Physics_EstimatePuttPower(f32 fDist);            // putt power for a distan
 f32  Physics_EstimateShotDistance100(int nKind, int nClub); // a club's table reach for a shot kind
 // chip power from the ball's lie
 f32  Physics_EstimateShotPower(f32 fDist, Ball* pBall, int nKind, int nClub);
-f32  Physics_GetLiePowerPercentage(Ball* pBall);          // the ball's f70 + its surface's f00; 1 without
-                                                          // either
+f32  Physics_GetLiePowerPercentage(Ball* pBall);          // the ball's fLieModifier + its surface's f00; 1
+                                                          // without either
 void Physics_ThrowBall(Ball* pBall, f32* pDir, f32 fSpeed, f32* pFrom);
 void Physics_ShotImpact(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int nTrajectory, f32* pA, f32* pB);
 void Physics_InitShotData(Ball* pBall);

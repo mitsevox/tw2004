@@ -1648,10 +1648,10 @@ void Gaud_FireQuickCheer(void) {
 
 // The crowd's rising anticipation as the ball in flight comes within 40 of the pin (emotion.c
 // fn_8006BB5C): tracks 4 and 5 of both crowd emitters, after stopping the crowd reaction unless
-// ball.b99 is set. Not during the GameBreaker or in a mode without a crowd.
+// ball.bLanded is set. Not during the GameBreaker or in a mode without a crowd.
 void Gaud_InitTopOfArcBuildup(void) {
     if (lbl_8028202F || !lbl_80282040) return;
-    if (gPlayers[lbl_80282278].ball.b99 == 0) {
+    if (gPlayers[lbl_80282278].ball.bLanded == 0) {
         Gaud_ExitCrowdReactionSound();
     }
     Aud_EmiSetTrackStatus(lbl_8028141C, 4, 1);

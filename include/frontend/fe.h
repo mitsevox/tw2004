@@ -532,8 +532,6 @@ void Gaud_StopMusic(void);                 // (0x800A75B4) FE_Manager.c calls it
 
 void FE_InitGameMessages(void);                 // fill the table
 void MC_SetCurrentFileType(int n);      // sets lbl_80281FFC
-extern char* gCourseNames[30];          // per course: a string the menus show (a replay's course
-                                        // picks it)
 extern s32 lbl_80281FFC;                // set by MC_SetCurrentFileType: the lbl_8018C7D8 set (memcard.h) the
                                         // menus' memory-card messages use
 

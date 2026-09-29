@@ -1073,10 +1073,10 @@ void GM_vGetModeValue(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Message 34: the lie of player pArgs[0]'s ball as a percentage: the surface's share of speed kept
-// (f00) plus ball.f70 times RECOVERY / 100, times 100.
+// (f00) plus ball.fLieModifier times RECOVERY / 100, times 100.
 void GM_vGetLiePercentage(MsgArg* pArgs, MsgArg* pResult) {
     pResult->f = 100.0f *
-                 (0.01f * (gPlayers[pArgs[0].i].ball.f70 *
+                 (0.01f * (gPlayers[pArgs[0].i].ball.fLieModifier *
                            (s8)Golfer_GetAttribute(&gPlayers[pArgs[0].i], ATTR_RECOVERY, ATTR_TOTAL)) +
                   gSurfaceTypes[gPlayers[pArgs[0].i].ball.nSurface].f00);
 }
