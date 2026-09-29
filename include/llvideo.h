@@ -42,11 +42,14 @@ typedef struct Video {
     PictStream stream;                  // 0x000  the decoder and its current frame (LLPict_Gc.c)
     VideoQueue queue;                   // 0x008
     u8         unk1014[4];
-    VideoChunk* p1018;                 // 0x1018 a chunk, given back when the movie stops
+    VideoChunk* p1018;                  // 0x1018 a chunk given back when the movie stops; only ever
+                                        //        set to NULL in this build
     int        nSlot;                   // 0x101C its slot in gpVideoSlots, -1 when it has none
-    u8         b1020;                   // 0x1020 set while the movie runs: chunks are queued
-    u8         b1021;                   // 0x1021 set: LLVideo_UpdateAll skips the movie
-    u8         bEnded;                  // 0x1022 the decoder ran out (LLVideo_HasEnded)
+    u8         bRunning;                // 0x1020 set while the movie runs: chunks are queued
+    u8         b1021;                   // 0x1021 set: LLVideo_UpdateAll skips the movie (only ever
+                                        //        cleared in this build)
+    u8         bEnded;                  // 0x1022 the movie is over: the queue ran dry (bStarved) or
+                                        //        the decoder reached its end (LLVideo_HasEnded)
     u8         bStarved;                // 0x1023 the queue ran dry while reading
     LLPict     pict;                    // 0x1024 the picture the frames are copied into
     u64        tLast;                   // 0x1098 when the last frame was due (TI_sReadCounter(0))

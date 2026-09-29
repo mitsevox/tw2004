@@ -134,7 +134,6 @@ void SKN_DrawCharacterParts(Character* pChar);
 void SKN_DrawClubParts(Character* pChar);
 void LI_ResetLights(void);
 void LI_SetObjectLights(UObject* pObj);
-void RenderState_SetScissor(int nX, int nY, int nWidth, int nHeight);
 void SKN_BeginFrame(void);
 void Character_ExecuteTextureSwapFE(Character* pChar);
 char* DynObj_GetGolfBallLogoTextureName(int i);

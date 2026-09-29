@@ -61,7 +61,7 @@ void ComicCam_StartComicCam(int nKind, View* pView, int nPlayer) {
         nShot = 0x2B;
         break;
     }
-    gpComicCam->bNext = 0;
+    gpComicCam->bScreenFrozen = 0;
     gpComicCam->n8 = 0;
     gpComicCam->nKind = nKind;
     gpComicCam->bDone = 0;
@@ -92,18 +92,18 @@ u8 ComicCam_UpdateComicCam(View* pView, int nPlayer, f32 fFrameTime) {
         }
         gpComicCam->n8 = gpComicCam->n8 + 1;
     }
-    if (gpComicCam->bNext && gSession.nPaused == 0) {
+    if (gpComicCam->bScreenFrozen && gSession.nPaused == 0) {
         gpComicCam->n10++;
         ComicCam_PerformFadeOuts(pPanel, pRect, fFrameTime);
         if (gpComicCam->n10 > 2) {
-            gpComicCam->bNext = 0;
+            gpComicCam->bScreenFrozen = 0;
             ComicCam_SetViewportToSize(pRect, pPanel->fTop, pPanel->fLeft, pPanel->fWidth, pPanel->fHeight);
             ComicCam_CheckForCameraSwitch(pView, nPlayer);
         }
-    } else if (gpComicCam->bNext && gSession.nPaused != 0) {
+    } else if (gpComicCam->bScreenFrozen && gSession.nPaused != 0) {
         gpComicCam->n10 = -2;
     }
-    if (!gpComicCam->bNext) {
+    if (!gpComicCam->bScreenFrozen) {
         ComicCam_ModeSpecificUpdate(pPanel, pRect, nPlayer, fFrameTime);
         ComicCam_PerformTransition(pPanel, pView, fFrameTime);
         ComicCam_PerformFadeOuts(pPanel, pRect, fFrameTime);
@@ -112,7 +112,7 @@ u8 ComicCam_UpdateComicCam(View* pView, int nPlayer, f32 fFrameTime) {
             gpComicCam->a4C[gpComicCam->nPanel] = pPanel->fTime;
             gpComicCam->a24[gpComicCam->nPanel] = pPanel->fTime;
             if (pPanel->nNext >= 0) {
-                gpComicCam->bNext = 1;
+                gpComicCam->bScreenFrozen = 1;
                 gpComicCam->nPanel = pPanel->nNext;
                 gpComicCam->fTime = 0.0f;
                 gpComicCam->n10 = 0;
@@ -252,7 +252,7 @@ void ComicCam_PerformFadeOuts(ComicPanel* pPanel, f32* pRect, f32 fFrameTime) {
             aColour[3] = aColour[3] < 0.0f ? 0.0f : (aColour[3] > 0.5f ? 0.5f : aColour[3]);
             gpComicCam->a24[i] = gpComicCam->a24[i] - fFrameTime;
             fn_80038624(aColour);
-            if (gpComicCam->bNext && gpComicCam->a24[i] <= 0.0f) {
+            if (gpComicCam->bScreenFrozen && gpComicCam->a24[i] <= 0.0f) {
                 gpComicCam->a24[i] += fFrameTime;
             }
         }
@@ -431,10 +431,10 @@ u8 ComicCam_IsComicCamOver(f32* pRect, int nPlayer) {
     }
 }
 
-// Is the comic camera moving on to its next panel (bNext)? EA calls that the frozen screen:
+// Is the comic camera moving on to its next panel (bScreenFrozen)? EA calls that the frozen screen:
 // GolfCamera_bIs3ScreenFreezeOn asks.
 u8 ComicCam_IsScreenFrozen(void) {
-    return gpComicCam->bNext;
+    return gpComicCam->bScreenFrozen;
 }
 
 // Move the camera on for the current panel: layout 0 to shot 0x28 + the panel, layout 1 to the next
@@ -462,7 +462,7 @@ void ComicCam_CheckForCameraSwitch(View* pView, int nPlayer) {
         if (gpComicCam->nShown % 9 == 0) {
             pShot = pView->script.pShot;
             if (pShot != NULL) {
-                nShot = pShot->bAD + 1;
+                nShot = pShot->nStateType + 1;
                 if (nShot > 0x2D) {
                     nShot = 0x2B;
                 }

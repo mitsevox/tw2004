@@ -324,9 +324,9 @@ void Trk_UpdatePerf(AudSource* pSource, AudTrack* pTrack, AudTrackTmpl* pTmpl, u
             (bAudible && bPlaying && bManual &&
              ((!bRetrigger && bOff && !bOn) || (bRetrigger && (bOn || bOff))));
     if (bStop && bStart && !(pTmpl->n0 & 8)) {
-        nCarryVar = pTrack->u.seq.n64;
+        nCarryVar = pTrack->u.seq.nVariation;
         bCarryOver = 1;
-        nCarryRange = pTrack->u.seq.n68;
+        nCarryRange = pTrack->u.seq.nVarSet;
     }
     if (bStop) {
         Trk_Stop(pTrack);
@@ -343,8 +343,8 @@ void Trk_UpdatePerf(AudSource* pSource, AudTrack* pTrack, AudTrackTmpl* pTmpl, u
         }
     }
     if (bCarryOver && pTrack != NULL) {
-        pTrack->u.seq.n64 = nCarryVar;
-        pTrack->u.seq.n68 = nCarryRange;
+        pTrack->u.seq.nVariation = nCarryVar;
+        pTrack->u.seq.nVarSet = nCarryRange;
     }
     if (bUpdate && pTrack->bits.b.bSorted == 1) {
         pTrack->fDistAttn = fDistAttn;
@@ -487,10 +487,10 @@ void Trk_VoiceEndCB(AudVoice* pVoice, int nReason) {
     }
 }
 
-// Sets a sequenced track's variation (u.seq.n64). TW07's inline from HLAudTrackSeq.h, compiled out
-// of line here.
+// Sets a sequenced track's variation (u.seq.nVariation). TW07's inline from HLAudTrackSeq.h,
+// compiled out of line here.
 void Seq_SelectVariation(AudTrack* pTrack, u8 n) {
-    pTrack->u.seq.n64 = n;
+    pTrack->u.seq.nVariation = n;
 }
 
 // Submix nCurve's volume (the volume curve a play list or bank names), 0 while it is muted. TW07's

@@ -28,7 +28,8 @@ typedef struct ComicCam {
                                 //        then
     f32  fTime;                 // 0x00C  time on the current panel
     s32  n10;                   // 0x010  frames into the move to the next panel
-    u8   bNext;                 // 0x014  moving on to the next panel
+    u8   bScreenFrozen;         // 0x014  moving on to the next panel (EA: the frozen screen,
+                                //        ComicCam_IsScreenFrozen)
     u8   bDone;                 // 0x015  the last panel has been reached (kind 0)
     u8   unk16[2];
     s32  nKind;                 // 0x018  0 or 1: which layout ComicCam_StartComicCam set up

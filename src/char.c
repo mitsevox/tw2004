@@ -119,7 +119,7 @@ void  Character_GolferStreamCallbackIG(UStreamObject* pObject);
 void  Character_GolferStreamCallbackFE(UStreamObject* pObject);
 void  SkeletalObject_StreamCallback(UStreamObject* pObject);
 void  Character_ResetBlenders(Character* pChar);
-void  SitDev_SetupClubCondition(int nValue);         // SitDevFile.c
+void  SitDev_SetupClubCondition(int nValue);         // SitDevStateVector.c
 void  Character_GetBonePos_FromIndex(Character* pChar, int nBone, f32* pPos);
 u8    Character_IsGolfer(Character* pChar);
 f32   Character_ComputeMaxVisableDistance(Character* pChar, int bSplitScreen);

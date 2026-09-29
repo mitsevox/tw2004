@@ -15,7 +15,7 @@
 u8   GolfCamera_IsGolferDoneAnimating(View* pView);
 u8   CameraController_PointIsOnScreen(int nPlayer, f32* pPos, f32 fMargin);
 u8   CameraController_HideGolfer(int nPlayer, int nView);
-void CameraController_SetShakeAmount(View* pView, f32 fF0, f32 fF4);
+void CameraController_SetShakeAmount(View* pView, f32 fTime, f32 fAmount);
 void CameraController_Vec3Sub(f32* pA, f32* pB, f32* pOut);
 void Quat_RotateVector(f32* pQuat, f32* pIn, f32* pOut);      // Quaternion.c: a vector turned by it
 void ViewController_SetCurrentViewController(int nView);    // ViewController.c: sets the current view
@@ -54,24 +54,24 @@ void CameraController_InitOneCamera(View* pView) {
     pView->script.pNextShot = NULL;
     pView->script.nFade = 0;
     pView->script.bCC = 0;
-    pView->script.bCF = 0;
-    pView->script.bE8 = 0;
+    pView->script.bFairwayFix = 0;
+    pView->script.bNoGround = 0;
     pView->script.pB4 = &pView->shot19C;
-    pView->script.fF0 = 0.0f;
+    pView->script.fShakeTime = 0.0f;
     pView->p78 = NULL;
     pView->p7C = NULL;
     pView->p80 = NULL;
     pView->p74 = NULL;
-    pView->n260 = 0;
+    pView->nSpecialSwingType = 0;
     pView->bFade = 0;
     for (i = 0; i < 4; i++) {
-        pView->script.v0[i] = 0.0f;
+        pView->script.vCamPos[i] = 0.0f;
     }
     for (i = 0; i < 4; i++) {
-        pView->script.v10[i] = 0.0f;
+        pView->script.vNextCamPos[i] = 0.0f;
     }
     for (i = 0; i < 8; i++) {
-        pView->script.a20[i] = 0.0f;
+        pView->script.aLookAt[i] = 0.0f;
     }
     pView->script.v70[0] = 0.0f;
     pView->script.v70[1] = 0.0f;
@@ -79,13 +79,13 @@ void CameraController_InitOneCamera(View* pView) {
     pView->script.v70[3] = 1.0f;
 }
 
-// Forgets the view's camera sequences (p74, p78, p7C) and shot p80, and clears b268.
+// Forgets the view's camera sequences (p74, p78, p7C) and shot p80, and clears bSkipFancyPreshotCams.
 void CameraController_ResetCameraState(View* pView) {
     pView->p78 = NULL;
     pView->p7C = NULL;
     pView->p80 = NULL;
     pView->p74 = NULL;
-    pView->b268 = 0;
+    pView->bSkipFancyPreshotCams = 0;
 }
 
 // The view's camera controller, every frame: runs the current camera mode's process (mode 25, no
@@ -99,10 +99,10 @@ void CameraController_Idle(View* pView, int nPlayer) {
     int nMove;
 
     if (pView->nCurCamera != 2) {
-        pView->v20[0] = 0.0f;
-        pView->v20[1] = 0.0f;
-        pView->v20[2] = 0.0f;
-        pView->v20[3] = 0.0f;
+        pView->vSide[0] = 0.0f;
+        pView->vSide[1] = 0.0f;
+        pView->vSide[2] = 0.0f;
+        pView->vSide[3] = 0.0f;
     }
     switch (pView->nCurCamera) {
     case 10:
@@ -203,16 +203,16 @@ void CameraController_Idle(View* pView, int nPlayer) {
             }
         }
     }
-    if (pView->script.fF0 > 0.0f && gSession.fFrameTime > 0.0f) {
+    if (pView->script.fShakeTime > 0.0f && gSession.fFrameTime > 0.0f) {
         CameraController_ShakeCamera(pView);
-        pView->script.fF0 -= gSession.fFrameTime;
+        pView->script.fShakeTime -= gSession.fFrameTime;
     }
-    if ((f32)Math_Sqrt(Vec4_LengthSqClamped(pView->v20)) == 0.0f) {
+    if ((f32)Math_Sqrt(Vec4_LengthSqClamped(pView->vSide)) == 0.0f) {
         CameraController_ComputeCurrentSideVector(pView);
-        if ((f32)Math_Sqrt(Vec4_LengthSqClamped(pView->v20)) == 0.0f) {
-            pView->v20[0] = 1.0f;
-            pView->v20[1] = 0.0f;
-            pView->v20[2] = 0.0f;
+        if ((f32)Math_Sqrt(Vec4_LengthSqClamped(pView->vSide)) == 0.0f) {
+            pView->vSide[0] = 1.0f;
+            pView->vSide[1] = 0.0f;
+            pView->vSide[2] = 0.0f;
         }
     }
     if (pView->bFade) {
@@ -326,7 +326,7 @@ void CameraController_StartScriptOfKind(View* pView, int nPlayer, int nKind) {
     if (pShot != NULL) {
         pView->script.pNextShot = pShot->p40;
         if (pShot->p40 != NULL) {
-            pView->script.nBC = pShot->p40->bAB;
+            pView->script.nBlendKind = pShot->p40->nBlendKind;
             pView->script.f8C = pShot->p40->f48;
         }
     }
@@ -406,7 +406,7 @@ int CameraController_GetClippedShadow(void) {
 
 // Whether view nView hides the player's golfer: the view is the player's own (his nView[0], and
 // ViewController_GetActivePlayerNumber gives it to him) and either its current shot does not show
-// the golfer (bAA 0) and neither does the next shot it blends to (unless blend kind 5), or the
+// the golfer (bShowGolfer 0) and neither does the next shot it blends to (unless blend kind 5), or the
 // camera is in mode 15 or 16 and GolfCamera_IsGolferDoneAnimating holds; with no shot, only in camera mode 4.
 u8 CameraController_HideGolfer(int nPlayer, int nView) {
     View* pView;
@@ -418,9 +418,9 @@ u8 CameraController_HideGolfer(int nPlayer, int nView) {
                 && GolfCamera_IsGolferDoneAnimating(pView)) {
                 return 1;
             }
-            if (pView->script.pShot->bAA == 0) {
-                if (pView->script.pNextShot == NULL || pView->script.pNextShot->bAA == 0
-                    || pView->script.nBC == 5) {
+            if (pView->script.pShot->bShowGolfer == 0) {
+                if (pView->script.pNextShot == NULL || pView->script.pNextShot->bShowGolfer == 0
+                    || pView->script.nBlendKind == 5) {
                     return 1;
                 }
             }
@@ -469,7 +469,7 @@ void CameraController_CameraCollision(int nView, f32* pBounds) {
     if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_SIMULATE) {   // fake match: (s8), see game.h
         return;
     }
-    if (pView->script.pShot != NULL && pView->script.pShot->bAD == 3) {
+    if (pView->script.pShot != NULL && pView->script.pShot->nStateType == 3) {
         return;
     }
     if (pView->script.pNextShot != NULL) {
@@ -557,12 +557,12 @@ void CameraController_HoldFadeColor(View* pView, f32* pVec) {
     LLMath_CopyVec(pVec, pView->script.vFadeColor);
 }
 
-// Posts camera event nKind to the view: it becomes the view's requested event (CamScript.nC4).
-// Without a club (25) only events 0, 5, 8, 11 and 23 are taken. Event 12 first holds the current
-// camera (recorded into shot19C) for 0.3 while the view fades to grey (alpha 0.5), then goes on to
-// a kind-12 shot chosen for the player; event 7 becomes 10 when the ball lies on surface class 7 or
-// 16. While event 12 waits only 5, 8 and 10 replace it; 6 is never taken; 2 and 3 do not replace
-// 7, nor 7 them.
+// Posts camera event nKind to the view: it becomes the view's requested event
+// (CamScript.nRequestedEvent). Without a club (25) only events 0, 5, 8, 11 and 23 are taken. Event
+// 12 first holds the current camera (recorded into shot19C) for 0.3 while the view fades to grey
+// (alpha 0.5), then goes on to a kind-12 shot chosen for the player; event 7 becomes 10 when the
+// ball lies on surface class 7 or 16. While event 12 waits only 5, 8 and 10 replace it; 6 is never
+// taken; 2 and 3 do not replace 7, nor 7 them.
 void CameraController_PostEvent(View* pView, int nKind, int nPlayer) {
     f32* pPos = CameraController_GetCameraOrigin(pView);
     f32* pAt = CameraController_GetCameraLookPoint(pView);
@@ -576,14 +576,14 @@ void CameraController_PostEvent(View* pView, int nKind, int nPlayer) {
         && nKind != 23) {
         return;
     }
-    if (nKind == 12 && pView->script.nC4 != 12) {
+    if (nKind == 12 && pView->script.nRequestedEvent != 12) {
         pShot = DynamicCam_ChooseScript(nPlayer, 12, NULL);
         if (pShot != NULL) {
             CameraScript_RecordCurrentCam(&pView->shot19C, pPos, pAt, nPlayer, &pView->script, 0);
             pView->shot19C.p40 = pShot;
             CameraScript_InterpToNewScript(&pView->script, &pView->shot19C, nPlayer, pPos, pAt, 5, 0.0f,
                                            100.0f, 25, 0.0f);
-            pView->script.nBC = 5;
+            pView->script.nBlendKind = 5;
             pView->script.f8C = 0.3f;
             CameraController_FadeOut(pView, 0.3f, vGrey);
         }
@@ -595,7 +595,7 @@ void CameraController_PostEvent(View* pView, int nKind, int nPlayer) {
             nKind = 10;
         }
     }
-    nAsked = pView->script.nC4;
+    nAsked = pView->script.nRequestedEvent;
     if (nAsked == 12 && nKind != 8 && nKind != 5 && nKind != 6 && nKind != 10) {
         return;
     }
@@ -604,14 +604,14 @@ void CameraController_PostEvent(View* pView, int nKind, int nPlayer) {
     }
     if (nKind == 3 || nKind == 2) {
         if (nAsked != 7) {
-            pView->script.nC4 = nKind;
+            pView->script.nRequestedEvent = nKind;
         }
     } else if (nKind == 7) {
         if (nAsked != 3 && nAsked != 2) {
-            pView->script.nC4 = nKind;
+            pView->script.nRequestedEvent = nKind;
         }
     } else {
-        pView->script.nC4 = nKind;
+        pView->script.nRequestedEvent = nKind;
     }
 }
 
@@ -656,8 +656,8 @@ void CameraController_LagSideVector(f32* pA, f32* pB, f32* pOut) {
     Quat_RotateVector(qTurn, vA, pOut);
 }
 
-// The view's side vector v20: square to its flat look direction (v0 to v10) and turned about that
-// direction by the script's roll fA8 (0 without a shot).
+// The view's side vector vSide: square to its flat look direction (v0 to v10) and turned about that
+// direction by the script's roll fRoll (0 without a shot).
 void CameraController_ComputeCurrentSideVector(View* pView) {
     f32 vDir[4];
     f32 vUp[4] = {0.0f, 1.0f, 0.0f, 0.0f};
@@ -674,30 +674,30 @@ void CameraController_ComputeCurrentSideVector(View* pView) {
     }
     vec4flt_CrossProduct(vUp, vDir, vSide);
     if (pView->script.pShot == NULL) {
-        pView->script.fA8 = 0.0f;
+        pView->script.fRoll = 0.0f;
     }
-    Vec3_Scale(pView->script.fA8, vDir, vDir);
+    Vec3_Scale(pView->script.fRoll, vDir, vDir);
     Quat_BuildFromVector(vDir, qTurn);
     vSide[3] = 0.0f;
-    Quat_RotateVector(qTurn, vSide, pView->v20);
+    Quat_RotateVector(qTurn, vSide, pView->vSide);
 }
 
 // Shakes the camera: moves its position a random amount, up to half the shake strength (the
-// script's fF4, CameraController_SetShakeAmount) each way.
+// script's fShakeAmount, CameraController_SetShakeAmount) each way.
 void CameraController_ShakeCamera(View* pView) {
-    pView->v0[0] += pView->script.fF4 * (Misc_RandFuncf(0) - 0.5f);
-    pView->v0[1] += pView->script.fF4 * (Misc_RandFuncf(0) - 0.5f);
-    pView->v0[2] += pView->script.fF4 * (Misc_RandFuncf(0) - 0.5f);
+    pView->v0[0] += pView->script.fShakeAmount * (Misc_RandFuncf(0) - 0.5f);
+    pView->v0[1] += pView->script.fShakeAmount * (Misc_RandFuncf(0) - 0.5f);
+    pView->v0[2] += pView->script.fShakeAmount * (Misc_RandFuncf(0) - 0.5f);
 }
 
-// Starts a camera shake lasting fF0 (the script's fF0, counted down by CameraController_Idle) at
-// strength fF4 (fF4).
-void CameraController_SetShakeAmount(View* pView, f32 fF0, f32 fF4) {
-    pView->script.fF0 = fF0;
-    pView->script.fF4 = fF4;
+// Starts a camera shake lasting fTime (the script's fShakeTime, counted down by
+// CameraController_Idle) at strength fAmount (fShakeAmount).
+void CameraController_SetShakeAmount(View* pView, f32 fTime, f32 fAmount) {
+    pView->script.fShakeTime = fTime;
+    pView->script.fShakeAmount = fAmount;
 }
 
-// Whether the view's frame buffer is kept rather than cleared: the golf cameras' b56 flag
+// Whether the view's frame buffer is kept rather than cleared: the golf cameras' bComicCam flag
 // (GolfCamera_bIs3ScreenCamOn; 0 before they are set up). gomainloop.c then draws its full-screen
 // quad with flags 1 instead of 3.
 u8 CameraController_bDontClearFrameBuffer(void) {

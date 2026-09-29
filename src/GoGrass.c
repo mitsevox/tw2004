@@ -48,7 +48,6 @@ void fn_8011EBF8(void);
 void fn_8011EC2C(void);
 void RC_vSetCurrentRenderCtx(void* pCamera);   // makes it the current render camera
 void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
-void RenderState_SetScissor(int nX, int nY, int nWidth, int nHeight);
 void fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY);
 void RC_ApplyCurrentViewport(void);
 void fn_80016948(void);

@@ -148,7 +148,14 @@ void _SetStateVecAndCondition(u16* pValues, int nIndex, u16 uValue, u32* pSetBit
 
 void SitDev_QueueEvent(int nPlayer, int a, u8 nEvent);    // event.c's handlers call it for most events
 
+// SitDevStateVector.c
+void SitDev_SetupStateVector(int nPlayer, u8 nKind);
+u8   SitDev_ConditionsMatch(SitDevSituation* pEntry, SitDevData* pData, int nPlayer);
+// SitDevTrigger.c
+void SitDev_InvokeMultipleActions(SitDevSituation* pEntry, int nFile, int nPlayer, u8 nEvent);
 // SitDevMisc.c
+void SitDev_ClearCupBevelFlag(void);
+void SitDev_ClearEmotionStates(void);
 void SitDev_ClearBallThatWasHit(void);
 void SitDev_SetBallHitTime(struct Ball* pBall);
 // SitDevFile.c

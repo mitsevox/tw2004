@@ -15,13 +15,6 @@
 #include "core/gameaudio.h"
 #include "core/audtrack.h"
 
-// HLAudMaster.c, hlaudmic.c, hlaudsession.c, startUp.c
-void Mas_SetSubmixMuteAll(s32 n);
-void Mic_SetRvbPreset(u8 a, u8 n);
-void Ses_Pause(u8 bPause, u8 bSpinupDelay);
-void Mas_SetOutputMode(u8 n);
-void Mas_SetSubmixChan(u8 nCurve, f32 fVolume);
-void Mas_SetSubmixAll(u8 nCurves, f32* pVolumes);
 
 // hlaudemitter.c
 void Aud_EmiSetTrackStatus(u8 nId, u8 nTrack, u8 bOn);
@@ -171,19 +164,6 @@ u8   AudAram_InitModule(void);
 u8   BootSound_InitModule(void);
 void BootSound_CopyToAram(void);
 void BootSound_Play(u8 nSound);
-
-// HLAudMaster.c, hlaudmic.c, hlaudmovie.c, hlaudsession.c
-u8   Mas_InitModule(void);
-void Mas_SetTickRate(u8 nRate);
-u8   Mic_InitModule(void);
-u8   Mov_InitModule(void);
-u8   Ses_InitModule(void);
-void Ses_Exit(void);
-u8   Ses_Init(u8 a, u8 b, u8 nListeners);
-void Mov_Init(void);
-void Mov_Exit(void);
-void Mov_Start(void);
-void Mov_Tick(void);
 
 u8   Voc_InitModule(void);                   // hlaudvoice.c
 u8   Aud_EmiInitOnce(void);                  // hlaudemitter.c; always 1
@@ -1459,10 +1439,10 @@ void Gaud_ExitCamZoom(u8 nPlayer) {
     Aud_EmiSetTrackStatus(pView->n3, 0, 0);
 }
 
-// A special swing camera starts (camera 0's kind, View.n260). Outside speed golf (modes 6 to 8) it
-// mutes the high channels and, by kind, plays a swoosh (a variation range of track 1 on view 0's
-// emitters 2 and 3), the slow-motion sound or kind 7's sounds; lbl_80282034 tells Gaud_SwingBallHit what
-// to play on the next swing sounds.
+// A special swing camera starts (camera 0's kind, View.nSpecialSwingType). Outside speed golf
+// (modes 6 to 8) it mutes the high channels and, by kind, plays a swoosh (a variation range of
+// track 1 on view 0's emitters 2 and 3), the slow-motion sound or kind 7's sounds; lbl_80282034
+// tells Gaud_SwingBallHit what to play on the next swing sounds.
 void Gaud_InitSpecialShot(u8 nPlayer) {
     GameAudioView* pView;
     int nKind;

@@ -4,10 +4,6 @@
 
 #include "llpict.h"
 
-void MAD_initdecode(u8* src, int motion, int quality);
-void MAD_decodemacroblock(u8* src_y, u8* src_cb, u8* src_cr, u8* dest_y, u8* dest_cb, u8* dest_cr,
-                          int width);
-
 // Empty in this build. Pict_InitModule calls it at boot.
 void PictInt_InitModule(void) {
 }
@@ -48,8 +44,8 @@ LLPict* PictInt_Decode(PictFile* pFile) {
     MAD_initdecode(pFile->aData, 0, pFile->n15);
     pPict->nWidth = pFile->nWidth;
     pPict->nHeight = pFile->nHeight;
-    pPict->f6C = 1.0f;
-    pPict->f70 = 1.0f;
+    pPict->fMaxU = 1.0f;
+    pPict->fMaxV = 1.0f;
     pPict->pPixels = StaticMem_Alloc(pPict->nWidth * pPict->nHeight * 3 / 2, 1, 32, "LLPictInt.c", 150);
     pY = Pict_GetPlaneY(pPict);
     pU = Pict_GetPlaneU(pPict);

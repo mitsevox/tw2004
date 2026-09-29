@@ -40,8 +40,6 @@ void LLMath_Add(f32* pA, f32* pB, f32* pOut);
 void UI_DrawFullScreenPicture(LLPict* pPict, f32 fAlpha);    // draws the picture at that alpha
 void UI_ShowPictureFadingIn(LLPict* pPict, int nFrames, f32 fStep);
 s32  RC_GetCurrentFrameBuffer(void);                 // ViewController.c
-void RenderState_SetPicture(LLPict* pPict);        // LLVideo.c
-void RenderView_MakePictUV(f32* pUV, LLPict* pPict);  // LLVideo.c
 void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
 void LLMath_MultiplyVec(f32* pA, f32* pB, f32* pOut);     // pOut = pA * pB, element by element
 void UIPoly_Draw(FEQuad* pQuad);
@@ -732,11 +730,11 @@ f32 UI_GetDrawDepth(void) {
     return 0.0f;
 }
 
-// The texture coordinates of pPict's far corner (f6C, f70: how much of its texture the picture
+// The texture coordinates of pPict's far corner (fMaxU, fMaxV: how much of its texture the picture
 // fills), then 0 and 1.
 void UI_GetPictureUVScale(f32* pOut, LLPict* pPict) {
-    pOut[0] = pPict->f6C;
-    pOut[1] = pPict->f70;
+    pOut[0] = pPict->fMaxU;
+    pOut[1] = pPict->fMaxV;
     pOut[2] = 0.0f;
     pOut[3] = 1.0f;
 }

@@ -23,19 +23,19 @@ void AutoSelectVariation(AudTrack* pTrack) {
 
     pTmpl = pTrack->pTmpl;
     if (pTmpl->n4 <= 1) {
-        pTrack->u.seq.n64 = 0;
+        pTrack->u.seq.nVariation = 0;
         return;
     }
     if (pTmpl->nA != 0xFF) {
-        pTrack->u.seq.n68 = pTmpl->nA;
+        pTrack->u.seq.nVarSet = pTmpl->nA;
     }
     if (pTmpl->n1 >= 4) {
-        nNext = pTrack->u.seq.n64 + 1;
+        nNext = pTrack->u.seq.nVariation + 1;
     } else {
         nNext = Aud_RandomBelow(pTmpl->n7);
         switch (pTmpl->n1) {
         case 2:
-            if (nNext == pTrack->u.seq.n64) {
+            if (nNext == pTrack->u.seq.nVariation) {
                 nNext++;
             }
             break;
@@ -49,7 +49,7 @@ void AutoSelectVariation(AudTrack* pTrack) {
     if (nNext >= pTmpl->n7) {
         nNext -= pTmpl->n7;
     }
-    pTrack->u.seq.n64 = nNext;
+    pTrack->u.seq.nVariation = nNext;
     pTmpl->n9 = nNext;
 }
 
@@ -105,7 +105,7 @@ void OnEnd(AudSeqEvent* pEvent, AudTrack* pTrack) {
             if (pTmpl->n1 != 0) {
                 AutoSelectVariation(pTrack);
             }
-            pTrack->u.seq.n66 = pEvent->n3;
+            pTrack->u.seq.nNextEvent = pEvent->n3;
             pTrack->bits.b.bNewVariation = 1;
             if (pTmpl->n0 & 0x80) {
                 Emi_TrackCallback(pTrack->pSource, pTmpl->n6, 1);
@@ -143,7 +143,7 @@ void OnKeyOn(AudSeqEvent* pEvent, AudTrack* pTrack) {
     bLoops = pTone->n10 & 1;
     if (nVolume == 0) return;
     if (pTone == NULL) return;
-    nChannel = pTrack->u.seq.n65;
+    nChannel = pTrack->u.seq.nNextChannel;
     request.nStealLevel = bLoops != 0;
     if (!Ses_IsSessionZero() && pTrack->pSource->nSound == 1 && pTrack->nChannel == 0) {
         request.nStealLevel = 2;
@@ -187,9 +187,9 @@ void OnKeyOn(AudSeqEvent* pEvent, AudTrack* pTrack) {
     pTrack->nVoices++;
     pTrack->apVoices[nChannel] = pVoice;
     pTrack->u.seq.apEvents[nChannel] = pEvent;
-    pTrack->u.seq.n65 = nChannel;
-    if (++pTrack->u.seq.n65 >= pTmpl->n2) {
-        pTrack->u.seq.n65 = 0;
+    pTrack->u.seq.nNextChannel = nChannel;
+    if (++pTrack->u.seq.nNextChannel >= pTmpl->n2) {
+        pTrack->u.seq.nNextChannel = 0;
     }
     pParams->flags.n = 0;
 }
@@ -209,7 +209,7 @@ void OnKeyOff(AudSeqEvent* pEvent, AudTrack* pTrack) {
     pTmpl = pTrack->pTmpl;
     pTone = Ses_GetInstrumentTone(pTmpl->data.pBank, pEvent->n3);
     if (pTone == NULL) return;
-    nChannel = fn_800AA9EC_Read(pTrack->u.seq.n65) - 1;
+    nChannel = fn_800AA9EC_Read(pTrack->u.seq.nNextChannel) - 1;
     if (nChannel < 0) {
         nChannel = 0;
     }
@@ -363,11 +363,11 @@ void ResetSequencerPerf(AudTrack* pTrack) {
 
     pTmpl = pTrack->pTmpl;
     pTrack->nWait = 0;
-    pTrack->u.seq.n64 = 0;
-    pTrack->u.seq.n65 = 0;
-    pTrack->u.seq.n66 = (pTmpl->n0 & 1) ? 0xFF : 0;
-    pTrack->u.seq.n67 = 0xFF;
-    pTrack->u.seq.n68 = 0;
+    pTrack->u.seq.nVariation = 0;
+    pTrack->u.seq.nNextChannel = 0;
+    pTrack->u.seq.nNextEvent = (pTmpl->n0 & 1) ? 0xFF : 0;
+    pTrack->u.seq.nStepEvent = 0xFF;
+    pTrack->u.seq.nVarSet = 0;
     pTrack->u.seq.n69 = 0;
     Mem_set(pTrack->u.seq.apEvents, 0, sizeof(pTrack->u.seq.apEvents));
 }
@@ -385,7 +385,7 @@ void Seq_Start(AudTrack* pTrack) {
 
     pTmpl = pTrack->pTmpl;
     pTrack->nWait = 0;
-    pTrack->u.seq.n66 = (pTmpl->n0 & 1) ? 0xFF : 0;
+    pTrack->u.seq.nNextEvent = (pTmpl->n0 & 1) ? 0xFF : 0;
     pTrack->nState = 6;
     pTrack->u.seq.n69 = 0;
     if (pTmpl->n1 != 0) {
@@ -395,7 +395,7 @@ void Seq_Start(AudTrack* pTrack) {
 
 // Stops a sequenced track's events (Trk_Stop): it moves past its last one.
 void Seq_Stop(AudTrack* pTrack) {
-    pTrack->u.seq.n66 = pTrack->pTmpl->n3;
+    pTrack->u.seq.nNextEvent = pTrack->pTmpl->n3;
 }
 
 // Ticks a sequenced track once a frame (Trk_Tick). A stopping track (state 3) runs nothing and
@@ -415,19 +415,20 @@ u8 Seq_Tick(AudTrack* pTrack) {
     if (pTrack->nState == 3) return 1;
     if (pTrack->nState == 2) return 0;
     if (pTmpl->n0 & 1) {
-        nNext = pTrack->u.seq.n67;
+        nNext = pTrack->u.seq.nStepEvent;
         if (nNext != 0xFF) {
             if (pTmpl->n1 != 0) {
                 AutoSelectVariation(pTrack);
             }
-            pTrack->u.seq.n66 = nNext;
+            pTrack->u.seq.nNextEvent = nNext;
             {
                 // fake match: its own local (pEvent's address is taken below, so it lives on the stack)
-                AudSeqEvent* pNext = pTmpl->pEvents + pTrack->u.seq.n64 * pTmpl->n3 + pTrack->u.seq.n66;
+                AudSeqEvent* pNext = pTmpl->pEvents + pTrack->u.seq.nVariation * pTmpl->n3
+                        + pTrack->u.seq.nNextEvent;
 
                 gSeqCmdHandlers[pNext->nType](pNext, pTrack);
             }
-            pTrack->u.seq.n67 = 0xFF;
+            pTrack->u.seq.nStepEvent = 0xFF;
         }
     } else {
         SetVarCmdBounds(pTrack, &pEvent, &pEnd);
@@ -443,10 +444,10 @@ u8 Seq_Tick(AudTrack* pTrack) {
                 pTrack->nWait = pEvent->n0;
             } else {
                 pTrack->nWait = 0;
-                pTrack->u.seq.n66++;
+                pTrack->u.seq.nNextEvent++;
                 pEvent++;
             }
-            if (pTrack->u.seq.n66 == pTmpl->n3) {
+            if (pTrack->u.seq.nNextEvent == pTmpl->n3) {
                 pTrack->nState = 3;
             }
         }
@@ -457,7 +458,8 @@ u8 Seq_Tick(AudTrack* pTrack) {
     return pTrack->nState != 2;
 }
 
-// *ppEvent: the track's next event (n66) in its variation (n64 of set n68); *ppEnd: the end of that
+// *ppEvent: the track's next event (nNextEvent) in its variation (nVariation of set
+// nVarSet); *ppEnd: the end of that
 // variation.
 void SetVarCmdBounds(AudTrack* pTrack, AudSeqEvent** ppEvent, AudSeqEvent** ppEnd) {
     AudSeqEvent* pVariation;
@@ -467,9 +469,9 @@ void SetVarCmdBounds(AudTrack* pTrack, AudSeqEvent** ppEvent, AudSeqEvent** ppEn
 
     pTmpl = pTrack->pTmpl;
     nEvents = pTmpl->n3;
-    pVariation = &pTmpl->pEvents[nEvents * (pTrack->u.seq.n64 + pTrack->u.seq.n68 * pTmpl->n7)];
+    pVariation = &pTmpl->pEvents[nEvents * (pTrack->u.seq.nVariation + pTrack->u.seq.nVarSet * pTmpl->n7)];
     pEnd = pVariation + nEvents;
-    pVariation += pTrack->u.seq.n66;
+    pVariation += pTrack->u.seq.nNextEvent;
     *ppEvent = pVariation;
     *ppEnd = pEnd;
 }
@@ -480,9 +482,9 @@ void Seq_Step(AudTrack* pTrack, u8 n, u8 bCheck) {
     AudTrackTmpl* pTmpl;
 
     pTmpl = pTrack->pTmpl;
-    if (bCheck && n == pTrack->u.seq.n66) return;
+    if (bCheck && n == pTrack->u.seq.nNextEvent) return;
     if (n < pTmpl->n3) {
-        pTrack->u.seq.n67 = n;
+        pTrack->u.seq.nStepEvent = n;
     }
 }
 
@@ -492,12 +494,12 @@ void Seq_SetVariationRange(AudTrack* pTrack, u8 n) {
     AudTrackTmpl* pTmpl;
 
     pTmpl = pTrack->pTmpl;
-    pTrack->u.seq.n68 = n;
+    pTrack->u.seq.nVarSet = n;
     if (pTmpl->n1 != 0) {
         AutoSelectVariation(pTrack);
         pTrack->nWait = 0;
-        pTrack->u.seq.n66 = (pTmpl->n0 & 1) ? 0xFF : 0;
-        pTrack->u.seq.n67 = 0xFF;
+        pTrack->u.seq.nNextEvent = (pTmpl->n0 & 1) ? 0xFF : 0;
+        pTrack->u.seq.nStepEvent = 0xFF;
     }
 }
 

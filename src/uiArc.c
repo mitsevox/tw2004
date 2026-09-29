@@ -20,7 +20,6 @@ void UIPoly_UnpackVertex(FEVertex* pVtx, f32* pPos, f32* pUV, f32* pColour, f32*
 void UI_GetPictureUVScale(f32* pOut, LLPict* pPict);
 f32  UI_GetDrawDepth(void);
 f32* UITransform_GetViewParams(void);   // uiTransform.c
-void RenderState_SetPicture(LLPict* pPict);        // LLVideo.c
 
 // The UI studio's colour add and multiply as of the last UIArc_Draw (like uiProcessPolygon.c's
 // gpUIPolyColourAdd, gpUIPolyColourMul); nothing reads them.

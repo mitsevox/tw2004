@@ -107,7 +107,7 @@ VideoChunk* LLVideo_QueueRemove(VideoQueue* pQueue) {
 // the movie's next MAD file off the queue (a chunk and the nMore chunks after it) and returns it
 // copied into one new buffer, which MAD_GetNextFrame frees. When the queue runs dry first, the
 // chunks taken so far are given back (the file is lost), bStarved is set and NULL is returned.
-void* LLVideo_ReadNextFile(void* pArg) {
+PictFile* LLVideo_ReadNextFile(void* pArg) {
     Video* pVideo = pArg;
     VideoChunk* apChunk[32];            // size unknown: the stack frame has room for 33
     u8* pData;
@@ -142,7 +142,7 @@ void* LLVideo_ReadNextFile(void* pArg) {
         pDst += apChunk[i]->uSize;
         LLVideo_ChunkReleaseBuffer(apChunk[i]);
     }
-    return pData;
+    return (PictFile*)pData;
 }
 
 void   LLVideo_InitModule(void);
@@ -190,10 +190,6 @@ void LLVideo_SetupRender(void);
 void LLVideo_RestoreRender(void);
 int  LLVideo_GetFrame(Video* pVideo);
 u8   LLVideo_HasEnded(Video* pVideo);
-void RenderState_SetScissor(int nLeft, int nTop, int nRight, int nBottom);
-void RenderState_SetPicture(LLPict* pPict);
-void RenderView_MakePictUV(f32* pUV, LLPict* pPict);
-void FO_vSetCurrentColor(s32 nColor);
 
 // Draws a full-screen black quad (alpha 0.5) over the screen for one frame, two when nFlags bit 0
 // is set. With bit 1 it first fades to black over 30 frames (alpha 0.1 each, 0.5 for the last two),
@@ -275,7 +271,7 @@ Video* LLVideo_Create(void) {
     Video* pVideo = StaticMem_Alloc(sizeof(Video), 2, 0x40, "LLVideo.c", 0x5C1);
     Pict_OpenMovie(&pVideo->pict, &pVideo->stream, LLVideo_ReadNextFile, pVideo);
     pVideo->nSlot = -1;
-    pVideo->b1020 = 0;
+    pVideo->bRunning = 0;
     pVideo->bFirstFrame = 0;
     LLVideo_SetFrameRate(pVideo, 33);
     return pVideo;
@@ -314,7 +310,7 @@ Video* LLVideo_SetSlot(int nSlot, Video* pVideo) {
 // UStream.c hands over an MPG2 chunk: it is queued if its movie is running, else given back.
 void LLVideo_HandleChunk(VideoChunk* pChunk) {
     Video* pVideo = gpVideoSlots->apVideo[pChunk->nSlot];
-    if (pVideo != NULL && pVideo->b1020) {
+    if (pVideo != NULL && pVideo->bRunning) {
         LLVideo_QueueAdd(&pVideo->queue, pChunk);
     }
     LLVideo_ChunkReleaseBuffer(pChunk);
@@ -323,9 +319,9 @@ void LLVideo_HandleChunk(VideoChunk* pChunk) {
 // Stops a running movie: ends its sound (Aud_ExitMovie), stops queueing its chunks and gives back
 // every chunk it still holds. Nothing when it is not running.
 void LLVideo_Stop(Video* pVideo) {
-    if (pVideo->b1020) {
+    if (pVideo->bRunning) {
         Aud_ExitMovie();
-        pVideo->b1020 = 0;
+        pVideo->bRunning = 0;
         if (pVideo->p1018 != NULL) {
             LLVideo_ChunkReleaseBuffer(pVideo->p1018);
             pVideo->p1018 = NULL;
@@ -347,7 +343,7 @@ void LLVideo_Start(Video* pVideo) {
     Aud_InitMovie();
     LLVideo_QueueReset(&pVideo->queue);
     pVideo->p1018 = NULL;
-    pVideo->b1020 = 1;
+    pVideo->bRunning = 1;
     pVideo->b1021 = 0;
     pVideo->nFrame = -1;
     pVideo->bEnded = 0;
@@ -376,7 +372,7 @@ void LLVideo_UpdateAll(void) {
     Aud_CycleMovie();
     for (i = 0; i < NUM_VIDEO_SLOTS; i++) {
         pVideo = gpVideoSlots->apVideo[i];
-        if (pVideo != NULL && pVideo->b1020 && !pVideo->b1021 && LLVideo_IsFrameDue(pVideo)) {
+        if (pVideo != NULL && pVideo->bRunning && !pVideo->b1021 && LLVideo_IsFrameDue(pVideo)) {
             LLVideo_SetLastFrameTime(pVideo);
             if (pVideo->bStarved || Pict_IsMovieAtEnd(&pVideo->pict, &pVideo->stream)) {
                 pVideo->bEnded = 1;
@@ -584,15 +580,15 @@ void RenderState_SetPicture(LLPict* pPict) {
 }
 
 // Fills the texture coordinates of a two-corner screen quad (RenderView_MakeQuad's layout, four
-// floats a corner) for drawing pPict: (0, 0) to (f6C, f70), the part of its texture the picture
+// floats a corner) for drawing pPict: (0, 0) to (fMaxU, fMaxV), the part of its texture the picture
 // covers.
 void RenderView_MakePictUV(f32* pUV, LLPict* pPict) {
     pUV[0] = 0.0f;
     pUV[1] = 0.0f;
     pUV[2] = 0.0f;
     pUV[3] = 1.0f;
-    pUV[4] = pPict->f6C;
-    pUV[5] = pPict->f70;
+    pUV[4] = pPict->fMaxU;
+    pUV[5] = pPict->fMaxV;
     pUV[6] = 0.0f;
     pUV[7] = 1.0f;
 }

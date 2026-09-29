@@ -12,8 +12,8 @@ typedef struct LLPict {
     u8*  pPixels;               // 0x60  Y (nWidth * nHeight), then U and V (a quarter of that each)
     s32  nWidth;                // 0x64
     s32  nHeight;               // 0x68
-    f32  f6C;                   // 0x6C
-    f32  f70;                   // 0x70
+    f32  fMaxU;                 // 0x6C  } the far corner's texture coordinates: how much of the
+    f32  fMaxV;                 // 0x70  } texture the picture covers (1.0; RenderView_MakePictUV)
 } LLPict;
 LAYOUT_ASSERT(LLPict, 0x74);
 
@@ -62,6 +62,13 @@ void MAD_CloseDecoder(MadDecoder* p);                       // free its frames
 u8   MAD_IsAtEnd(MadDecoder* p);                            // the movie has ended
 PictFrame* MAD_GetNextFrame(MadDecoder* p, PictFile* pFile);  // the next frame, or NULL
 void MAD_ReleaseFrame(MadDecoder* p, PictFrame* pFrame);    // give a frame back
+// rcmp_mad_codec.c: the function every movie's MAD files are read from (one for all movies)
+void MAD_SetReadCallback(PictFile* (*pfnRead)(void* pArg), void* pArg);
+// maddec.c: start a picture (motion 0: a key frame, 1: coded against the reference), then decode
+// one macroblock into dest_y / dest_cb / dest_cr (src_*: the reference, NULL for a key frame)
+void MAD_initdecode(u8* src, int motion, int quality);
+void MAD_decodemacroblock(u8* src_y, u8* src_cb, u8* src_cr, u8* dest_y, u8* dest_cb, u8* dest_cr,
+                          int width);
 
 // One coefficient code of the MAD codec (maddec.c's madinit builds its lookup tables from these).
 typedef struct MadCode {
@@ -72,7 +79,7 @@ typedef struct MadCode {
 } MadCode;
 LAYOUT_ASSERT(MadCode, 0x10);
 
-extern const MadCode gMadCoefCodes[95];   // the codes of the first table (entry 0 is not used)
+extern const MadCode gMadCoefCodes[95];       // the codes of the first table (entry 0 is not used)
 extern const MadCode gMadCoefCodesLong[128];  // the codes of the second table
 
 // The MAD block decoder's state its three files share: maddec.c's bit reader, code tables and
@@ -90,7 +97,7 @@ extern s32 idctinput[64];      // madidct.c: a block's coefficients, dequantized
 // What LLVideo.c hands LLPict_Gc.c for a movie: the decoder (Pict_OpenMovie makes it, 0x50 bytes)
 // and its current frame.
 typedef struct PictStream {
-    void* pDecoder;             // 0x00
+    MadDecoder* pDecoder;       // 0x00  Pict_OpenMovie allocates it
     PictFrame* pFrame;          // 0x04
 } PictStream;
 
@@ -104,7 +111,8 @@ u8*  PictFrame_GetPlaneY(PictFrame* pFrame);    // Y
 // A movie's picture and decoder (LLVideo.c): pfnRead(pArg) hands the decoder its next data.
 void Pict_Free(LLPict* pPict);        // frees the picture and its pixels (NULL: nothing)
 void Pict_AfterFree(void);                 // empty
-void Pict_OpenMovie(LLPict* pPict, PictStream* pStream, void* (*pfnRead)(void* pArg), void* pArg);
+void Pict_OpenMovie(LLPict* pPict, PictStream* pStream, PictFile* (*pfnRead)(void* pArg),
+                    void* pArg);
 void Pict_CloseMovie(LLPict* pPict, PictStream* pStream);
 void Pict_StartMovie(LLPict* pPict, PictStream* pStream);                     // empty
 void Pict_SizeToMovie(LLPict* pPict, PictStream* pStream);

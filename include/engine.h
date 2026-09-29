@@ -1386,6 +1386,11 @@ void fn_800141CC(void);                 // GoRenderCtx_Gc.c: the default vertex 
 void RenderView_MakeQuad(f32* pXY, f32* pUV, f32 x0, f32 y0, f32 x1, f32 y1);
 void RenderView_SetUseCurrentMatrices(int a);
 void RenderView_DrawPrimitive(int a, f32* pXY, f32* pColour, f32* pUV, int c);
+// LLVideo.c's render helpers (the movies and the menus draw pictures with them).
+void RenderState_SetScissor(int nLeft, int nTop, int nRight, int nBottom);  // both edges inclusive
+void RenderState_SetPicture(struct LLPict* pPict);           // texture the next draw with pPict
+void RenderView_MakePictUV(f32* pUV, struct LLPict* pPict);  // a quad's UVs covering pPict
+void FO_vSetCurrentColor(s32 nColor);           // the next strings' colour (TW07: in UFont.c)
 void fn_800BA74C(u8 bFade);             // ScreenClear.c: a black screen for 1, 2 or 30 frames
 u32  Controller_GetButtonMask(int nButton, u8 bShift);   // a button's mask (bShift: moved up 16 bits)
 extern s8   lbl_80281C98;               // GoRenderCtx_Gc.c: the row of lbl_80186AF0 in use (fn_800142A4)

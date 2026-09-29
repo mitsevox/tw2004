@@ -7,25 +7,27 @@
 
 #include "camera.h"
 
-// One shot a sequence can choose (0x48 bytes; CamSequence.p4C points at nChoices of them).
+// One shot a sequence can choose (0x48 bytes; TW07's CameraEventTrigger_t; CamSequence.pChoices
+// points at nChoices of them).
 typedef struct CamChoice {
-    f32  f0;                    // 0x00  the blend's first time (CameraScript_InterpToNewScript's f1)
-    f32  f4;                    // 0x04  its second (f2)
-    f32  f8;                    // 0x08  its third (f3)
-    f32  fC;                    // 0x0C  kind 0x18: the ball-flight camera takes it once the flight has
+    f32  fInterpTime;           // 0x00  } CameraScript_InterpToNewScript's blend time and the
+    f32  fMaxSpeed;             // 0x04  } camera's top speed on the way
+    f32  fTimeTriggerTime;      // 0x08  when nTimeTrigger fires
+    f32  fC;                    // 0x0C  event 0x18: the ball-flight camera takes it once the flight has
                                 //       run this far (CamScript_EstimateBallFlightPercent)
     CamShot* p10;               // 0x10  the shot (an index in the file)
-    u8   b14;                   // 0x14  the shot kind it is for (9: any kind but 23)
-    u8   b15;                   // 0x15  the blend's first kind (nA)
-    u8   b16;                   // 0x16  its second (nB)
+    u8   nEvent;                // 0x14  the camera event it is for (9: any event but 23)
+    u8   nInterpType;           // 0x15  how the script blends into the shot (CamShot.nBlendKind)
+    u8   nTimeTrigger;          // 0x16  the camera event started at fTimeTriggerTime (13..22; else
+                                //       25, none, on load)
     u8   b17;                    // 0x17  only for some golfers (DynamicCam_CanUseScriptOnThisModel)
     u32  aNoHoles[12];          // 0x18  one bit per hole of every course (course * 18 + hole): not
                                 //       used there
 } CamChoice;
 LAYOUT_ASSERT(CamChoice, 0x48);
 
-// A shot and four sequences (0x28 bytes; DynCamTables.pSets), each an index in the file, -1 for
-// none.
+// An anim pair (0x28 bytes; TW07's CameraAnimPairs_t; DynCamTables.pSets): a golfer animation's
+// name and a shot and four sequences, each an index in the file, -1 for none.
 typedef struct DynCamSet {
     char szName[0x10];          // 0x00  DynamicCamSearchForPairedSequence finds a set by it (case ignored)
     CamShot* pShot;             // 0x10  kind 13: the set gives this shot

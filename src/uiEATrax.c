@@ -31,7 +31,6 @@ f32 UI_EATraxGetTextOffsetX(void);
 void FO_vSetCurrentAddMode(s32 v);
 void fn_80012B9C(f32 fX, f32 fY);
 void UFont_SetFont(s32 nFont);
-void FO_vSetCurrentColor(s32 n);
 
 // Reset the EA Trax song display: hidden, song 0, no logo (-1), font 2 in game type 10, else 1.
 // uiProcessInterface.c calls it when it resets the UI.

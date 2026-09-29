@@ -19,11 +19,6 @@ SitDevData gSitDevData;                     // the commentary scripts' state (Si
 SitDevData* gpSitDevData = &gSitDevData;    // every SitDev file reaches it through this
 
 
-void SitDev_SetupStateVector(int nPlayer, u8 nEvent);
-void SitDev_ClearCupBevelFlag(void);
-void SitDev_ClearEmotionStates(void);
-u8   SitDev_ConditionsMatch(SitDevSituation* pEntry, SitDevData* pData, int nPlayer);
-void SitDev_InvokeMultipleActions(SitDevSituation* pEntry, int nFile, int nPlayer, u8 nEvent);
 void SitDev_Vec3Sub(f32* pA, f32* pB, f32* pOut);
 
 // .sbss, defined in reverse address order

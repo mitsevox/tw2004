@@ -23,8 +23,6 @@ void fn_80012B9C(f32 fX, f32 fY);
 void fn_80012C84_SetFlags(s32 uFlags);                           // 1/2: the alignment
 void fn_80012CB4_SetWordWrapBox(f32 fX, f32 fY, f32 fW, f32 fH);
 
-void RenderState_SetScissor(s32 nX, s32 nY, s32 nW, s32 nH);
-
 void UIText_SetFontShadowColour(f32* pColor);
 void UIText_SetFontShadowOffset(f32 fX, f32 fY);
 void UIText_SetFontAlignPoint(f32 fX, f32 fY);

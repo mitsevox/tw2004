@@ -20,8 +20,6 @@
 PictFile* (*gpfnMadRead)(void* pArg);   // reads the movie's next MAD file (MAD_SetReadCallback)
 void* gpMadReadArg;             // what the read function is given
 
-void MAD_initdecode(u8* src, int motion, int quality);
-void MAD_decodemacroblock(u8* src_y, u8* src_cb, u8* src_cr, u8* dest_y, u8* dest_cb, u8* dest_cr, int width);
 u32 MAD_GetFileKind(PictFile* pFile);
 void MAD_FreeFile(PictFile* pFile);
 void MAD_AddFrameToList(PictFrame** apList, PictFrame* pFrame);

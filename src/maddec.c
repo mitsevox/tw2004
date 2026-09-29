@@ -134,7 +134,6 @@ u8 gMadClamp[512];              // a value (-256..255, by its low 9 bits) clampe
 void madinit(void);
 u32 MAD_ReadLittleEndian(u8* pData, int nBytes);
 s32 MAD_FixedMul(s32 a, s32 b);
-void MAD_decodemacroblock(u8* src_y, u8* src_cb, u8* src_cr, u8* dest_y, u8* dest_cb, u8* dest_cr, int width);
 int madvlcdecode(void);
 void idctcompute(s32* dest, int stride);
 

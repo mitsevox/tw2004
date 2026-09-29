@@ -184,7 +184,7 @@ LAYOUT_ASSERT(AudSeqEvent, 0x8);
 
 // The template a track plays: one of a bank sound's tracks (AudSound.aTracks, 0x1C bytes).
 typedef struct AudTrackTmpl {
-    u8   n0;                    // 0x0    0x01 stepped: runs only the event Seq_Step asks for (n67);
+    u8   n0;                    // 0x0    0x01 stepped: runs only the event Seq_Step asks for (nStepEvent);
                                 //        0x02 loops (OnEnd goes on to a new variation); 0x04
                                 //        switched by hand (Trk_UpdatePerf's bOn / bOff; not with
                                 //        0x01); 0x08 streamed; 0x10 no restart while playing;
@@ -198,7 +198,7 @@ typedef struct AudTrackTmpl {
     u16  n4;                    // 0x4    0 or 1: a single variation
     u8   n6;                    // 0x6    passed to Emi_TrackCallback
     u8   n7;                    // 0x7    variations per set
-    u8   n8;                    // 0x8    sets (the track's n68 picks one)
+    u8   n8;                    // 0x8    sets (the track's nVarSet picks one)
     u8   n9;                    // 0x9    the variation picked last
     u8   nA;                    // 0xA    0xFF, or the set to use (set by Emi_SetTrackVarRangeTmpl)
     u8   unkB;
@@ -299,12 +299,12 @@ typedef union AudTrackFlags {
 
 // A sequenced track's own fields (AudTrack 0x64), reset by ResetSequencerPerf.
 typedef struct AudTrackSeq {
-    u8   n64;                   // 0x64   its variation
-    u8   n65;                   // 0x65   the channel the next note tries first
-    u8   n66;                   // 0x66   the next event in the variation (n3: done)
-    u8   n67;                   // 0x67   0xFF, or the event to run next (templates with n0 & 1)
-    u8   n68;                   // 0x68   its set of variations
-    u8   n69;                   // 0x69
+    u8   nVariation;            // 0x64   its variation
+    u8   nNextChannel;          // 0x65   the channel the next note tries first
+    u8   nNextEvent;            // 0x66   the next event in the variation (n3: done)
+    u8   nStepEvent;            // 0x67   0xFF, or the event to run next (templates with n0 & 1)
+    u8   nVarSet;               // 0x68   its set of variations
+    u8   n69;                   // 0x69   only ever cleared in this build
     u8   unk6A[0x6C - 0x6A];
     AudSeqEvent* apEvents[8];   // 0x6C   the note playing on each channel
 } AudTrackSeq;
@@ -605,5 +605,24 @@ void Aud_EmiAliasSetTrackStatus(s16 nEmitter, u8 nTrack, u8 bOn);
 void Aud_EmiAliasSetTrackVarRange(s16 nEmitter, u8 nTrack, u8 n);
 void Aud_EmiAliasSetTrackStep(s16 nEmitter, u8 nTrack, u8 n, int bCheck);
 void Aud_EmiAliasSetTrackAttenuation(s16 nEmitter, u8 nTrack, f32 fVolume);
+
+// HLAudMaster.c, hlaudmic.c, hlaudmovie.c, hlaudsession.c: module start-up and GameAudio.c's controls
+u8   Mas_InitModule(void);
+void Mas_SetTickRate(u8 nRate);
+void Mas_SetOutputMode(u8 nMode);
+void Mas_SetSubmixChan(u8 nCurve, f32 fVolume);
+void Mas_SetSubmixAll(u8 nCurves, f32* pVolumes);
+void Mas_SetSubmixMuteAll(s32 uMask);
+u8   Mic_InitModule(void);
+void Mic_SetRvbPreset(u8 nMic, u8 nPreset);
+u8   Ses_InitModule(void);
+u8   Ses_Init(u8 nSession, u8 nSubsession, u8 nListeners);
+void Ses_Exit(void);
+void Ses_Pause(u8 bPause, u8 bSpinupDelay);
+u8   Mov_InitModule(void);
+void Mov_Init(void);
+void Mov_Exit(void);
+void Mov_Start(void);
+void Mov_Tick(void);
 
 #endif

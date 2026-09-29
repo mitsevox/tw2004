@@ -72,7 +72,7 @@ void StaticCam_LoadCAMCfromStream(UStreamObject* pObject) {
 // Takes a fly-by camera (a 'Cact' object of type 200, from UKernel.c) as the next shot of aFlyBy,
 // named "FlyBy Cam: <its number>": its position, field of view and look angles (degrees to
 // radians), time f20 and f34 (clamped to 0..1). p40 and p44 keep the next camera's number and its
-// own until StaticCam_GetFlyByCam links the paths; nA4 is its path (bAA 0 on path 9, else 1). The
+// own until StaticCam_GetFlyByCam links the paths; nA4 is its path (bShowGolfer 0 on path 9, else 1). The
 // count is not checked against aFlyBy's 30 slots. Frees the object.
 void StaticCam_ParseFlybyCameraActor(UStreamObject* pObject) {
     char szName[0x20];  // its size is unknown
@@ -82,7 +82,7 @@ void StaticCam_ParseFlybyCameraActor(UStreamObject* pObject) {
     pDef = (FlyByCamDef*)pObject->pData;
     sprintf(szName, "FlyBy Cam: %d", pDef->nId);
     strcpy(gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].szName, szName);
-    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].bAD = 0;
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].nStateType = 0;
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].bA8 = 0;
     if (pDef->f34 < 0.0f) {
         pDef->f34 = 0.0f;
@@ -90,15 +90,15 @@ void StaticCam_ParseFlybyCameraActor(UStreamObject* pObject) {
         pDef->f34 = 1.0f;
     }
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].f4C = pDef->f34;
-    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].f70 = 0.0f;
-    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].f74 = 0.0f;
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].fLookSideOffset = 0.0f;
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].fLookUpOffset = 0.0f;
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].v20[0] = pDef->aPos[0];
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].v20[1] = pDef->aPos[1];
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].v20[2] = pDef->aPos[2];
-    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].f78 = PI * (pDef->fFov / 180.0f);
-    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].bAB = 3;
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].fFovStart = PI * (pDef->fFov / 180.0f);
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].nBlendKind = 3;
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].f48 = pDef->f20;
-    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].bAC = 24;
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].nLookAtKind = 24;
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].bA9 = 1;
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].v30[0] = PI * (pDef->aLook[0] / 180.0f);
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].v30[1] = PI * (pDef->aLook[1] / 180.0f);
@@ -106,16 +106,16 @@ void StaticCam_ParseFlybyCameraActor(UStreamObject* pObject) {
     // port: p40 and p44 hold the next camera's number and this one's until StaticCam_GetFlyByCam links them
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].p40 = (CamShot*)(uptr)(s32)pDef->nNext;
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].p44 = (CamShot*)(uptr)(s32)pDef->nId;
-    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].bB2 = 0;
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].nHeightRef = 0;
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].f80 = 0.0f;
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].nA4 = pDef->nPath;
-    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].f88 = 0.0f;
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].fDepthOfField = 0.0f;
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].f8C = 0.0f;
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].nA0 = 1;
     if (gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].nA4 != 9) {
-        gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].bAA = 1;
+        gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].bShowGolfer = 1;
     } else {
-        gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].bAA = 0;
+        gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].bShowGolfer = 0;
     }
     gpStaticCams->nFlyBy++;
     StaticMem_Free(pObject);
@@ -136,18 +136,18 @@ void StaticCam_ParseStaticCameraActor(UStreamObject* pObject) {
     pDef = (StaticCamDef*)pObject->pData;
     sprintf(szName, "Static Cam: %d", gpStaticCams->nStatic);
     strcpy(gpStaticCams->aStatic[gpStaticCams->nStatic].szName, szName);
-    gpStaticCams->aStatic[gpStaticCams->nStatic].bAD = 38;
+    gpStaticCams->aStatic[gpStaticCams->nStatic].nStateType = 38;
     gpStaticCams->aStatic[gpStaticCams->nStatic].bA8 = 0;
     gpStaticCams->aStatic[gpStaticCams->nStatic].f4C = pDef->f34;
-    gpStaticCams->aStatic[gpStaticCams->nStatic].f70 = 0.0f;
-    gpStaticCams->aStatic[gpStaticCams->nStatic].f74 = 0.0f;
+    gpStaticCams->aStatic[gpStaticCams->nStatic].fLookSideOffset = 0.0f;
+    gpStaticCams->aStatic[gpStaticCams->nStatic].fLookUpOffset = 0.0f;
     gpStaticCams->aStatic[gpStaticCams->nStatic].v20[0] = pDef->aPos[0];
     gpStaticCams->aStatic[gpStaticCams->nStatic].v20[1] = pDef->aPos[1];
     gpStaticCams->aStatic[gpStaticCams->nStatic].v20[2] = pDef->aPos[2];
-    gpStaticCams->aStatic[gpStaticCams->nStatic].f78 = PI * (pDef->fFov / 180.0f);
-    gpStaticCams->aStatic[gpStaticCams->nStatic].f7C = PI * (pDef->f2C / 180.0f);
+    gpStaticCams->aStatic[gpStaticCams->nStatic].fFovStart = PI * (pDef->fFov / 180.0f);
+    gpStaticCams->aStatic[gpStaticCams->nStatic].fFovEnd = PI * (pDef->f2C / 180.0f);
     gpStaticCams->aStatic[gpStaticCams->nStatic].p40 = NULL;
-    gpStaticCams->aStatic[gpStaticCams->nStatic].bAB = 5;
+    gpStaticCams->aStatic[gpStaticCams->nStatic].nBlendKind = 5;
     gpStaticCams->aStatic[gpStaticCams->nStatic].f48 = pDef->f30;
     gpStaticCams->aStatic[gpStaticCams->nStatic].nAE = pDef->n1C;
     gpStaticCams->aStatic[gpStaticCams->nStatic].bA9 = 0;
@@ -155,14 +155,14 @@ void StaticCam_ParseStaticCameraActor(UStreamObject* pObject) {
     gpStaticCams->aStatic[gpStaticCams->nStatic].u.aArea[1] = pDef->aArea[1];
     gpStaticCams->aStatic[gpStaticCams->nStatic].u.aArea[2] = pDef->aArea[2];
     gpStaticCams->aStatic[gpStaticCams->nStatic].u.aArea[3] = pDef->aArea[3];
-    gpStaticCams->aStatic[gpStaticCams->nStatic].bAC = pDef->n20;
-    gpStaticCams->aStatic[gpStaticCams->nStatic].bB2 = 0;
+    gpStaticCams->aStatic[gpStaticCams->nStatic].nLookAtKind = pDef->n20;
+    gpStaticCams->aStatic[gpStaticCams->nStatic].nHeightRef = 0;
     gpStaticCams->aStatic[gpStaticCams->nStatic].f80 = 0.0f;
-    gpStaticCams->aStatic[gpStaticCams->nStatic].bAA = 1;
-    gpStaticCams->aStatic[gpStaticCams->nStatic].f88 = pDef->f54;
+    gpStaticCams->aStatic[gpStaticCams->nStatic].bShowGolfer = 1;
+    gpStaticCams->aStatic[gpStaticCams->nStatic].fDepthOfField = pDef->f54;
     gpStaticCams->aStatic[gpStaticCams->nStatic].f8C = 0.0f;
-    gpStaticCams->aStatic[gpStaticCams->nStatic].f68 = 0.0f;
-    gpStaticCams->aStatic[gpStaticCams->nStatic].f6C = 10000.0f;
+    gpStaticCams->aStatic[gpStaticCams->nStatic].fMinHeight = 0.0f;
+    gpStaticCams->aStatic[gpStaticCams->nStatic].fMaxHeight = 10000.0f;
     gpStaticCams->aStatic[gpStaticCams->nStatic].nA0 = pDef->n58;
     gpStaticCams->aStatic[gpStaticCams->nStatic].nA4 = pDef->nKinds;
     gpStaticCams->aStatic[gpStaticCams->nStatic].v30[0] = PI * (pDef->aAngle[0] / 180.0f);
@@ -223,7 +223,7 @@ void StaticCam_ProcessScript(CamShot* pShot, int nPlayer, f32* pOut) {
 
 // A random static camera for shot kind nKind (a bit of its nA4) whose area holds one of nPlayer's
 // ball positions (StaticCam_CheckHotZone), other than pNot; with bNotKind5 (TW07's dontShowGolfer)
-// none whose look-at kind bAC is 5. Only on course 12 with Game_GetCurHoleNum 10 and for kind 0x20;
+// none whose look-at kind nLookAtKind is 5. Only on course 12 with Game_GetCurHoleNum 10 and for kind 0x20;
 // NULL otherwise and when none fits.
 CamShot* StaticCam_ChooseScript(int nPlayer, int nKind, u8 bNotKind5, CamShot* pNot) {
     int aFound[NUM_STATIC_CAMS];
@@ -238,7 +238,7 @@ CamShot* StaticCam_ChooseScript(int nPlayer, int nKind, u8 bNotKind5, CamShot* p
     pFound = aFound;
     for (i = 0; i < gpStaticCams->nStatic; i++) {
         if (!gpStaticCams->aStatic[i].bA9 && (nKind & gpStaticCams->aStatic[i].nA4)
-            && (!bNotKind5 || gpStaticCams->aStatic[i].bAC != 5)
+            && (!bNotKind5 || gpStaticCams->aStatic[i].nLookAtKind != 5)
             && StaticCam_CheckHotZone(&gpStaticCams->aStatic[i], nPlayer) && pNot
                     != &gpStaticCams->aStatic[i]) {
             *pFound++ = i;
@@ -256,7 +256,7 @@ CamShot* StaticCam_ChooseScript(int nPlayer, int nKind, u8 bNotKind5, CamShot* p
 // the fly-by cameras into their paths (p40 the next shot, p44 the one before, by the numbers
 // StaticCam_ParseFlybyCameraActor kept), finds each path's first shot, sets each shot's f4C to its
 // segment's length (CamScript_fGetDistanceBetweenSplinePoints; 0 for the last) and adds them up per
-// path; a path whose last camera is marked -99 gets bAA 0 on all its cameras.
+// path; a path whose last camera is marked -99 gets bShowGolfer 0 on all its cameras.
 CamShot* StaticCam_GetFlyByCam(int nPath) {
     u8 abEnds[NUM_FLYBY_PATHS];   // the path ends on a camera marked -99
     CamShot* pShot;
@@ -310,12 +310,12 @@ CamShot* StaticCam_GetFlyByCam(int nPath) {
             }
         }
         for (i = 0; i < gpStaticCams->nFlyBy; i++) {
-            if (!gpStaticCams->aFlyBy[i].bAD && !gpStaticCams->aFlyBy[i].bA9
+            if (!gpStaticCams->aFlyBy[i].nStateType && !gpStaticCams->aFlyBy[i].bA9
                 && gpStaticCams->aFlyBy[i].p40 != NULL) {
                 gpStaticCams->apPath[gpStaticCams->aFlyBy[i].nA4] = &gpStaticCams->aFlyBy[i];
             }
             if (abEnds[gpStaticCams->aFlyBy[i].nA4]) {
-                gpStaticCams->aFlyBy[i].bAA = 0;
+                gpStaticCams->aFlyBy[i].bShowGolfer = 0;
             }
         }
         for (i = 0; i < NUM_FLYBY_PATHS; i++) {
@@ -378,7 +378,7 @@ FlyByPath* StaticCam_GetFlybyTimeCurve(u32 uPath) {
 // Flies the camera along fly-by path nPath to share fShare of the path's length: pCam and pSub come
 // from CamScript_SplineCamerasByPositionAndLook's spline through the v20 and v30 of the four shots
 // around the current one (StaticCam_SetupFlybyCameraPointers), *pFov starts at the view's lens and goes to
-// CamScript_SplineCamerasByPositionAndLook with the shots' f78. It steps the spline 0.005 at a time
+// CamScript_SplineCamerasByPositionAndLook with the shots' fFovStart. It steps the spline 0.005 at a time
 // until the camera has gone far enough, then homes in on the exact distance. The script keeps the
 // shot it is on (pShot, and pNextShot its p40), the share of that shot's segment (fA0) and the
 // distance so far (fA4).
@@ -417,7 +417,7 @@ void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32
     if (0.0f == fTarget) {
         CamScript_SplineCamerasByPositionAndLook(pPrev->v20, pShot->v20, pNext->v20, pAfter->v20, pPrev->v30,
                                                  pShot->v30, pNext->v30,
-                    pAfter->v30, pCam, pSub, pFov, pShot->f78, pNext->f78, fT);
+                    pAfter->v30, pCam, pSub, pFov, pShot->fFovStart, pNext->fFovStart, fT);
     } else {
         while (fTarget > fDist) {
             fLastT = fT;
@@ -436,7 +436,7 @@ void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32
             }
             CamScript_SplineCamerasByPositionAndLook(pPrev->v20, pShot->v20, pNext->v20, pAfter->v20,
                                                      pPrev->v30, pShot->v30, pNext->v30,
-                        pAfter->v30, pCam, pSub, pFov, pShot->f78, pNext->f78, fT);
+                        pAfter->v30, pCam, pSub, pFov, pShot->fFovStart, pNext->fFovStart, fT);
             StaticCam_Vec3Sub(pCam, vLast, vDiff);
             fDist += (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
             if (fTarget > fDist) {
@@ -475,7 +475,7 @@ void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32
             }
             CamScript_SplineCamerasByPositionAndLook(pPrev->v20, pShot->v20, pNext->v20, pAfter->v20,
                                                      pPrev->v30, pShot->v30, pNext->v30,
-                        pAfter->v30, pCam, pSub, pFov, pShot->f78, pNext->f78, fT);
+                        pAfter->v30, pCam, pSub, pFov, pShot->fFovStart, pNext->fFovStart, fT);
             StaticCam_Vec3Sub(pCam, vLast, vDiff);
             fDist = fLastDist + (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
             i++;
@@ -485,7 +485,7 @@ void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32
             fT = fEnd;
             CamScript_SplineCamerasByPositionAndLook(pPrev->v20, pShot->v20, pNext->v20, pAfter->v20,
                                                      pPrev->v30, pShot->v30, pNext->v30,
-                        pAfter->v30, pCam, pSub, pFov, pShot->f78, pNext->f78, fT);
+                        pAfter->v30, pCam, pSub, pFov, pShot->fFovStart, pNext->fFovStart, fT);
             StaticCam_Vec3Sub(pCam, vLast, vDiff);
             fDist = fLastDist + (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
         } else if (fDist < fTarget) {
@@ -503,7 +503,7 @@ void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32
             }
             CamScript_SplineCamerasByPositionAndLook(pPrev->v20, pShot->v20, pNext->v20, pAfter->v20,
                                                      pPrev->v30, pShot->v30, pNext->v30,
-                        pAfter->v30, pCam, pSub, pFov, pShot->f78, pNext->f78, fT);
+                        pAfter->v30, pCam, pSub, pFov, pShot->fFovStart, pNext->fFovStart, fT);
             StaticCam_Vec3Sub(pCam, vLast, vDiff);
             fDist = fLastDist + (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
         }

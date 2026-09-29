@@ -16,9 +16,6 @@ void** gpPictWorkBuffer = &gPictWorkBuffer;     // every use of the work buffer 
 
 void PictInt_InitModule(void);
 void PictInt_CloseModule(void);
-// rcmp_mad_codec.c; declared without its parameters: it takes a PictFile* (*)(void*) reader, and
-// Pict_OpenMovie passes LLVideo.c's void* (*)(void*) one
-void MAD_SetReadCallback();
 
 // At boot (gomainloop.c): starts LLPictInt.c (nothing to do) and allocates the 2048-byte work
 // buffer Pict_CreateFromMemory tiles pictures through (gPictWorkBuffer).
@@ -126,7 +123,8 @@ void Pict_AfterFree(void) {
 // MAD decoder (0x50 bytes), and pfnRead(pArg) as the function the decoder reads the movie's MAD
 // files from. The read function is one global of the decoder code (MAD_SetReadCallback), so the
 // last movie opened reads for all.
-void Pict_OpenMovie(LLPict* pPict, PictStream* pStream, void* (*pfnRead)(void* pArg), void* pArg) {
+void Pict_OpenMovie(LLPict* pPict, PictStream* pStream, PictFile* (*pfnRead)(void* pArg),
+                    void* pArg) {
     pPict->pPixels = NULL;
     pStream->pDecoder = StaticMem_Alloc(80, 1, 32, "LLPict_Gc.c", 278);
     pStream->pFrame = NULL;
@@ -159,8 +157,8 @@ void Pict_SizeToMovie(LLPict* pPict, PictStream* pStream) {
     pPict->nHeight = pStream->pFrame->nHeight;
     pPict->pPixels =
         StaticMem_Alloc(pPict->nWidth * pPict->nHeight * 3 / 2, 1, 32, "LLPict_Gc.c", 346);
-    pPict->f6C = 1.0f;
-    pPict->f70 = 1.0f;
+    pPict->fMaxU = 1.0f;
+    pPict->fMaxV = 1.0f;
 }
 
 // The decoder has reached the movie's end (MAD_IsAtEnd). Always 0 in this game: MAD_ReadNextFile

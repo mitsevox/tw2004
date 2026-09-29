@@ -240,6 +240,17 @@ extern u32   gLegalPictureSize;              // its size
 // ---- the hardware voices, as the sound engine (hlaudvoice.c) uses them -----------------------------
 
 void HwVoice_Pause(u16 nVoice, u8 bPause);
+void HwVoice_StartOrRelease(u16 nVoice, u8 bOn);
+void HwVoice_SetSound(u16 nVoice, SoundHeader* pHdr);
+void HwVoice_SetEnvelope(u16 nVoice, VoiceEnvelope* pEnv);
+void HwVoice_SetVolume(u16 nVoice, s16 nVolume, int a, int b);
+void HwVoice_SetPan(u16 nVoice, u8 nPan, int nMode, int bPlaying);
+void HwVoice_SetRate(u16 nVoice, u32 u, int a);
+void HwVoice_SetReverb(u16 nVoice, u8 bA, u8 bB);
+u8   HwVoice_IsFree(u16 nVoice);
+void HwVoice_OnVoiceFreed(void);
+s16  HwVoice_GetVolume(u16 nVoice);
+u32  AudAram_AllocStreamBuffer(void);                // an ARAM stream buffer
 void AudAram_FreeStreamBuffer(u32 uAddr);            // give an ARAM buffer back
 
 #endif
