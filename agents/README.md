@@ -74,6 +74,10 @@ lane while the others avoid those call sites. Rotate unit lists between rounds (
 ## Gates and invariants
 
 - `main.dol: OK` after every merge; only exact 100% counts; no function loses its exact match.
+- CI on main is checked after every push (GitHub Actions "Build"); a red run is fixed before the next
+  round. It was red from 2026-09-29 00:24 to 14:10 UTC unseen (a file-case rename left a stale object
+  in CI's build cache; fixed by tools/build/prune_stale.py in the workflow). After renaming, splitting
+  or folding a unit, run `python tools/build/prune_stale.py` locally too.
 - Parity counts never rise: `typeaudit.py --count`, `symaudit.py --count`, whole-file `lint.py`.
 - A unit is DONE when every function is exact, its data is in C and it is linked (Matching).
 - Naming lanes hand in batch files; the orchestrator replays them on main with `tools/match/name.py`

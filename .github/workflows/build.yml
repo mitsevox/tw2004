@@ -64,6 +64,9 @@ jobs:
         # The container's compiler and binutils packages are older than this project's pinned
         # versions, so configure.py downloads its own, the same as a local build.
         python configure.py --map --version ${{ matrix.version }}
+        # The cached build folder keeps old units' objects; wibo's case-blind file lookup then writes
+        # a renamed unit into its old-case object (uiobject.c -> uiObject.c broke every build).
+        python tools/build/prune_stale.py
         ninja all_source progress build/${{ matrix.version }}/report.json
 
     # Upload map files
