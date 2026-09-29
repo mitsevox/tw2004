@@ -8,7 +8,7 @@
 #include "game/modes/pgatoursim.h"
 #include "game/modes/pgatour.h"
 
-u32 lbl_80282218;
+u32 gSitDevPredictedHitClass;
 
 u8  SitDev_GetCupBevelFlag(void);
 int SitDev_GetPGARank(int nPlayer);
@@ -32,7 +32,7 @@ u8 SitDev_ConditionsMatch(SitDevEntry* pEntry, SitDevData* pData, int nPlayer) {
             if (pEntry->auTests[nWord] & (1 << nBit)) {
                 if (nValue == 86) {
                     bTrue = strcmp(gPlayers[nPlayer].pChar->szLastClip,
-                                   (char*)lbl_80282208->p20 + pEntry->aArg[nTest++] * 16) == 0;
+                                   (char*)gpSitDevScripts->p20 + pEntry->aArg[nTest++] * 16) == 0;
                 } else {
                     bTrue = SitDev_CompareConditions(pEntry, nTest++, pData, nValue);
                 }
@@ -284,7 +284,7 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
         nValue = SurfaceType_IsValid(nSurface) ? gSurfaceTypes[pBall->nSurface].nClass : -1;
         modifyFinalLie(&nValue, pBall->nSurface, pBall, pPlayer);
         _SetStateVecAndCondition(pValues, 22, nValue, pSetBits);
-        _SetStateVecAndCondition(pValues, 87, lbl_80281E28 && lbl_80282218 != nValue, pSetBits);
+        _SetStateVecAndCondition(pValues, 87, gSitDevPredictionVoiced && gSitDevPredictedHitClass != nValue, pSetBits);
         _SetStateVecAndCondition(pValues, 25, (s32)(36.0f * pBall->fClosest), pSetBits);
         _SetStateVecAndCondition(pValues, 26, (s32)(36.0f * fn_800D04E0(nPlayer)), pSetBits);
         nValue = fn_800D0514(nPlayer);
@@ -301,7 +301,7 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
         nValue = pBefore->pHitSurface == NULL ? 0 : pBefore->pHitSurface->nClass;
         _SetStateVecAndCondition(pValues, 64, nValue, pSetBits);
         if (nKind == 29) {
-            lbl_80282218 = nValue;
+            gSitDevPredictedHitClass = nValue;
         }
         _SetStateVecAndCondition(pValues, 79, SitDev_GetCommentaryZones(pBefore->vPos), pSetBits);
         _SetStateVecAndCondition(pValues, 75, SW_fGetBoostMagnitude(nPlayer), pSetBits);

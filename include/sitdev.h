@@ -77,7 +77,7 @@ typedef struct SitDevEntry8 {
     u32        n4;              // 0x04  its argument (a sound, a music, ...)
 } SitDevEntry8;
 
-// The situation scripts' header (lbl_80282208): the block whose address is the first word of
+// The situation scripts' header (gpSitDevScripts): the block whose address is the first word of
 // SitDev_LoadScripts' argument. SitDev_BindHeader turns the offsets at 0x14..0x20 into pointers.
 typedef struct SitDevScripts {
     u32   nEntries;             // 0x00  entries at p14 (0x80067710)
@@ -91,14 +91,14 @@ typedef struct SitDevScripts {
     u8*   p20;                  // 0x20
 } SitDevScripts;
 
-extern SitDevScripts* lbl_80282208; // 0x80282208 (.sbss), NULL until the scripts are loaded
-extern s32 lbl_80282210;            // 0x80282210 (.sbss): entries in use in lbl_801FA1C0 (SitDev_NetworkLoadCallback)
+extern SitDevScripts* gpSitDevScripts; // 0x80282208 (.sbss), NULL until the scripts are loaded
+extern s32 gSitDevNumCommentaryZones;            // 0x80282210 (.sbss): entries in use in gSitDevCommentaryZones (SitDev_NetworkLoadCallback)
 
 // The byte-swap layouts of the header and the p14, p18 and p1C entries (ByteSwap_Records).
-extern SwapField lbl_80191168[9];
-extern SwapField lbl_801911B0[7];
-extern SwapField lbl_801911E8[5];
-extern SwapField lbl_80191210[4];
+extern SwapField gSitDevHeaderSwap[9];
+extern SwapField gSitDevSituationSwap[7];
+extern SwapField gSitDevActionSwap[5];
+extern SwapField gSitDevResponseSwap[4];
 
 // A situation zone, from chunk 5 of the hole's data (SitDev_NetworkLoadCallback): an outline (with its
 // net.nNumNodes nodes), and then the zone's bits (a u32 right after the last node).
@@ -106,22 +106,22 @@ typedef struct SitDevZone {
     TNetwork net;               // 0x0
 } SitDevZone;
 
-extern SitDevZone* lbl_801FA1C0[10];    // the hole's zones
-extern s32 lbl_80282210;                // how many
+extern SitDevZone* gSitDevCommentaryZones[10];    // the hole's zones
+extern s32 gSitDevNumCommentaryZones;                // how many
 
-extern u8 lbl_80281E28;             // cleared by SitDev_InvokeMultipleActions when lbl_80281E29 is set and nothing played
-extern u32 lbl_80282218;            // the class of what the ball last hit, kept by SitDev_SetupStateVector (kind 29)
-extern u8 lbl_80281E29;             // cleared by SitDev_InvokeMultipleActions after every run
+extern u8 gSitDevPredictionVoiced;             // cleared by SitDev_InvokeMultipleActions when gSitDevPredictionPending is set and nothing played
+extern u32 gSitDevPredictedHitClass;            // the class of what the ball last hit, kept by SitDev_SetupStateVector (kind 29)
+extern u8 gSitDevPredictionPending;             // cleared by SitDev_InvokeMultipleActions after every run
 
 // Per value: nonzero when the scripts compare it as signed (SitDev_CompareConditions).
 extern u8 lbl_80193188[88];
 
 // Per game mode: the bit SitDev_TranslateGameMode returns for it, -1 for none.
-extern s32 lbl_801910F8[28];
+extern s32 gSitDevGameModeBits[28];
 
 void SitDev_ClearGroupFlags(void);             // clear SitDevData.pD4
-extern s32 lbl_801FA198[5];         // per player; cleared by SitDev_ClearEmotionStates
-extern s32 lbl_801FA1AC[5];         // per player; 1: SitDev_PredictedEmotionAvailable is true
+extern s32 gSitDevEmotionSet[5];         // per player; cleared by SitDev_ClearEmotionStates
+extern s32 gSitDevPredictedEmotionSet[5];         // per player; 1: SitDev_PredictedEmotionAvailable is true
 
 // Store uValue in pValues[nIndex] and set bit nIndex of pSetBits.
 void _SetStateVecAndCondition(u16* pValues, int nIndex, u16 uValue, u32* pSetBits);

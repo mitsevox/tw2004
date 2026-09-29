@@ -25,9 +25,9 @@ void SitDev_InvokeMultipleActions(SitDevEntry* pEntry, int nSit, int nPlayer, u8
 void SitDev_Vec3Sub(f32* pA, f32* pB, f32* pOut);
 
 // .sbss, defined in reverse address order
-u8 lbl_80281E2A;    // event 26 has been queued since the last event 2 or 3
-u8 lbl_80281E29;
-u8 lbl_80281E28;
+u8 gSitDevBreaklinePassedCupQueued;    // event 26 has been queued since the last event 2 or 3
+u8 gSitDevPredictionPending;
+u8 gSitDevPredictionVoiced;
 
 // Round start (GO_vInitIG): clears the commentary scripts' state block (SitDevData: no line played,
 // no events queued), registers the loader for a hole's commentary zones (course chunk 5,
@@ -41,19 +41,19 @@ void SitDev_vInitModule(void) {
 }
 
 // Round end (fn_8006CDC4): frees the commentary scripts' buffers (SitDevData pD0 when set, pCC,
-// pD4) and forgets the loaded scripts (lbl_80282208).
+// pD4) and forgets the loaded scripts (gpSitDevScripts).
 void SitDev_vCloseModule(void) {
     if (gpSitDevData->pD0 != NULL) {
         StaticMem_Free(gpSitDevData->pD0);
     }
     StaticMem_Free(gpSitDevData->pCC);
     StaticMem_Free(gpSitDevData->pD4);
-    lbl_80282208 = NULL;
+    gpSitDevScripts = NULL;
 }
 
 // Before a hole loads (fn_8006F4F0): no commentary zones yet (the count SitDev_NetworkLoadCallback adds to).
 void SitDev_vInitBeforeHole(void) {
-    lbl_80282210 = 0;
+    gSitDevNumCommentaryZones = 0;
 }
 
 // Registers SitDev_LoadScripts as the loader of the hole stream's 'sscr' chunks (the commentary
@@ -74,7 +74,7 @@ void SitDev_vUnregisterStreamClients(void) {
 // nothing); event.c's handlers call it, and a is not read. Some events are filtered: 30 (the
 // flyover) is dropped in custom, random, dream and regional rounds; 27 (a tree hit) once the ball
 // has collided; 26 (the putt's break line passed the cup) after the first since the last event 2 or
-// 3. Event 3 (the shot set-up) also clears the prediction flag (lbl_80281E28), the group flags
+// 3. Event 3 (the shot set-up) also clears the prediction flag (gSitDevPredictionVoiced), the group flags
 // (SitDev_ClearGroupFlags), the cup bevel flag and the watched ball, then goes on as event 2 (a turn begins:
 // 26 may come again), then as event 25 (just before the swing): the emotion states are cleared, and
 // the event is dropped when an event 8, 9, 10 or 11 is queued already. The first event of a frame
@@ -107,20 +107,20 @@ void SitDev_QueueEvent(int nPlayer, int a, u8 nEvent) {
         }
         break;
     case 26:
-        if (lbl_80281E2A) {
+        if (gSitDevBreaklinePassedCupQueued) {
             return;
         }
-        lbl_80281E2A = 1;
+        gSitDevBreaklinePassedCupQueued = 1;
         break;
     case 3:
-        lbl_80281E28 = 0;
+        gSitDevPredictionVoiced = 0;
         SitDev_ClearGroupFlags();
         SitDev_ClearCupBevelFlag();
         SitDev_ClearBallThatWasHit();
         SitDev_ClearEmotionStates();
         // fall through
     case 2:
-        lbl_80281E2A = 0;
+        gSitDevBreaklinePassedCupQueued = 0;
         // fall through
     case 25:
         SitDev_ClearEmotionStates();
@@ -154,9 +154,9 @@ void SitDev_QueueEvent(int nPlayer, int a, u8 nEvent) {
 // state value 0 is set again to the hole number (not for script file 22), and if its conditions
 // hold (SitDev_ConditionsMatch) and its group (n0; 0 for none) has not fired, the group is marked
 // and its actions run (SitDev_InvokeMultipleActions) for that player. A situation for event 29 that
-// tests value 64 (what the look-ahead ball hit) sets the prediction flags (lbl_80281E28, lbl_80281E29) first.
+// tests value 64 (what the look-ahead ball hit) sets the prediction flags (gSitDevPredictionVoiced, gSitDevPredictionPending) first.
 // Afterwards, when an event 33 (the shot is over) was seen and the scripts set no emotion for its
-// player (lbl_801FA198), the player's shot outcome is recorded as 5 (fn_8006AAB4).
+// player (gSitDevEmotionSet), the player's shot outcome is recorded as 5 (fn_8006AAB4).
 void SitDev_ProcessEventQueue(void) {
     int i;
     int j;
@@ -171,9 +171,9 @@ void SitDev_ProcessEventQueue(void) {
     if (gpSitDevData->n13C == 0) {
         return;
     }
-    pEntry = lbl_80282208->p14;
+    pEntry = gpSitDevScripts->p14;
     // fake match: a signed compare here, an unsigned one in SitDevFile.c's SitDev_SwapTables
-    for (i = 0; i < (int)lbl_80282208->nEntries; i++, pEntry++) {
+    for (i = 0; i < (int)gpSitDevScripts->nEntries; i++, pEntry++) {
         pData = gpSitDevData;
         bFound = 0;
         for (j = 0; j < pData->n13C; j++) {
@@ -196,15 +196,15 @@ void SitDev_ProcessEventQueue(void) {
                 gpSitDevData->pD4[pEntry->n0] = 1;
                 nEvent = gpSitDevData->aEvents[j].nEvent;
                 if (nEvent == 29 && (pEntry->auTests[2] & 1)) {
-                    lbl_80281E28 = 1;
-                    lbl_80281E29 = 1;
+                    gSitDevPredictionVoiced = 1;
+                    gSitDevPredictionPending = 1;
                 }
                 SitDev_InvokeMultipleActions(pEntry, pEntry->b2.s.n5, gpSitDevData->aEvents[j].nPlayer,
                                              nEvent);
             }
         }
     }
-    if (nPlayer33 != 5 && lbl_801FA198[nPlayer33] == 0) {
+    if (nPlayer33 != 5 && gSitDevEmotionSet[nPlayer33] == 0) {
         fn_8006AAB4(nPlayer33, 5);
     }
     gpSitDevData->n13C = 0;

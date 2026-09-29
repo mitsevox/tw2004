@@ -28,15 +28,15 @@ void SitDev_TriggerResponse(SitDevEntry8* pDo, int nPlayer, u8 nEvent);
 // by its percent chance unless SitDev_SuppressAction holds it back, a sound action through
 // SitDev_InvokeCommentaryBank, any other through SitDev_InvokeAction. nSit is the situation's
 // script file (the top five bits of b2). Afterwards, when the prediction flags were set for this
-// run (lbl_80281E29) and the last action tried played nothing, the prediction counts as not voiced
-// (lbl_80281E28 cleared); lbl_80281E29 is cleared either way.
+// run (gSitDevPredictionPending) and the last action tried played nothing, the prediction counts as not voiced
+// (gSitDevPredictionVoiced cleared); gSitDevPredictionPending is cleared either way.
 void SitDev_InvokeMultipleActions(SitDevEntry* pEntry, int nSit, int nPlayer, u8 nEvent) {
     int i;
     SitDevAction* pAction;
     u8 bPlayed = 0;
     for (i = 0; i < 4; i++) {
         if (pEntry->aActions[i] == 0xFFF0) break;
-        pAction = &lbl_80282208->p18[pEntry->aActions[i]];
+        pAction = &gpSitDevScripts->p18[pEntry->aActions[i]];
         if (pAction->nChance > Misc_RandFunc(1) % 100
             && !SitDev_SuppressAction(pAction, nSit, nPlayer, nEvent)) {
             if (pAction->bSound) {
@@ -46,10 +46,10 @@ void SitDev_InvokeMultipleActions(SitDevEntry* pEntry, int nSit, int nPlayer, u8
             }
         }
     }
-    if (lbl_80281E29 && !bPlayed) {
-        lbl_80281E28 = 0;
+    if (gSitDevPredictionPending && !bPlayed) {
+        gSitDevPredictionVoiced = 0;
     }
-    lbl_80281E29 = 0;
+    gSitDevPredictionPending = 0;
 }
 
 // A sound action: unless one of its kind (nKind) has played, draws a line from its list
@@ -98,7 +98,7 @@ u8 SitDev_InvokeAction(SitDevAction* pAction, int nPlayer, u8 nEvent) {
     u8 bPlayed = 0;
 
     if (pAction->aList[1] == 0xFFF0) {
-        pDo = &lbl_80282208->p1C[pAction->aList[0]];
+        pDo = &gpSitDevScripts->p1C[pAction->aList[0]];
         if (pDo == gpSitDevData->pE8 && nEvent != 30) return 0;
         if (gpSitDevData->abPlayed[pDo->nKind]) return 0;
         SitDev_TriggerResponse(pDo, nPlayer, nEvent);
@@ -111,7 +111,7 @@ u8 SitDev_InvokeAction(SitDevAction* pAction, int nPlayer, u8 nEvent) {
     // Sort the entries not played yet by kind.
     for (i = 0; i < 50; i++) {
         if (pAction->aList[i] != 0xFFF0) {
-            nKind = lbl_80282208->p1C[pAction->aList[i] & 0x7FFF].nKind;
+            nKind = gpSitDevScripts->p1C[pAction->aList[i] & 0x7FFF].nKind;
             if (!gpSitDevData->abPlayed[nKind]) {
                 aaIndex[nKind][anCount[nKind]] = i;
                 anCount[(u32)nKind]++;      // fake match: a second spelling of the index, not CSE'd
@@ -120,8 +120,8 @@ u8 SitDev_InvokeAction(SitDevAction* pAction, int nPlayer, u8 nEvent) {
     }
     for (nKind = 0; nKind < 14; nKind++) {
         if (anCount[nKind] == 1) {
-            if (&lbl_80282208->p1C[pAction->aList[aaIndex[nKind][0]]] != gpSitDevData->pE8) {
-                SitDev_TriggerResponse(&lbl_80282208->p1C[pAction->aList[aaIndex[nKind][0]]], nPlayer,
+            if (&gpSitDevScripts->p1C[pAction->aList[aaIndex[nKind][0]]] != gpSitDevData->pE8) {
+                SitDev_TriggerResponse(&gpSitDevScripts->p1C[pAction->aList[aaIndex[nKind][0]]], nPlayer,
                                        nEvent);
                 bPlayed = 1;
                 gpSitDevData->abPlayed[nKind] = 1;
@@ -145,14 +145,14 @@ u8 SitDev_InvokeAction(SitDevAction* pAction, int nPlayer, u8 nEvent) {
                     break;
                 }
             }
-            pDo = &lbl_80282208->p1C[pAction->aList[nEntry]];
+            pDo = &gpSitDevScripts->p1C[pAction->aList[nEntry]];
             if (pDo == gpSitDevData->pE8) {
                 nPick++;
                 if (nPick == anCount[nKind]) {
                     nPick = 0;
                 }
                 nEntry = aaIndex[nKind][nPick];
-                pDo =&lbl_80282208->p1C[pAction->aList[nEntry] & 0x7FFF];
+                pDo =&gpSitDevScripts->p1C[pAction->aList[nEntry] & 0x7FFF];
             }
             SitDev_TriggerResponse(pDo, nPlayer, nEvent);
             gpSitDevData->abPlayed[nKind] = 1;
@@ -239,11 +239,11 @@ void SitDev_TriggerResponse(SitDevEntry8* pDo, int nPlayer, u8 nEvent) {
         break;
     case 12:
         fn_8006AAB4(nPlayer, pDo->n4);
-        lbl_801FA198[nPlayer] = 1;
+        gSitDevEmotionSet[nPlayer] = 1;
         break;
     case 13:
         fn_8006ACE0(nPlayer, pDo->n4);
-        lbl_801FA1AC[nPlayer] = 1;
+        gSitDevPredictedEmotionSet[nPlayer] = 1;
         break;
     }
 }
@@ -252,7 +252,7 @@ void SitDev_TriggerResponse(SitDevEntry8* pDo, int nPlayer, u8 nEvent) {
 // group may fire again: at each shot set-up (situation event 3) and when the scripts load.
 void SitDev_ClearGroupFlags(void) {
     u32 i;
-    for (i = 0; i < lbl_80282208->n10; i++) {
+    for (i = 0; i < gpSitDevScripts->n10; i++) {
         gpSitDevData->pD4[i] = 0;
     }
 }

@@ -8,18 +8,18 @@
 #include "game/modes/pgatoursim.h"
 #include "game/modes/pgatour.h"
 
-s32 lbl_801910F8[28] = {
+s32 gSitDevGameModeBits[28] = {
     0, 1, 2, 3, 4, 5, -1, -1, -1, -1, -1, 6, -1, -1, -1, -1, -1, -1, 7, 8, 9, 10, 11, 12, 13, 14,
     -1, 0,
 };
 
 // Defined here, last address first (CodeWarrior lays out .sbss in reverse).
-u8    lbl_80282200;     // 0x80282200  the watched ball has reached surface 105
-Ball* lbl_802821FC;     // 0x802821FC  the watched ball, NULL for none
-u32   lbl_802821F8;     // 0x802821F8  gSession.nFrameCount when it started
+u8    gSitDevCupBevelFlag;     // 0x80282200  the watched ball has reached surface 105
+Ball* gSitDevBallThatWasHit;     // 0x802821FC  the watched ball, NULL for none
+u32   gSitDevBallHitTime;     // 0x802821F8  gSession.nFrameCount when it started
 
-s32 lbl_801FA1AC[5];
-s32 lbl_801FA198[5];
+s32 gSitDevPredictedEmotionSet[5];
+s32 gSitDevEmotionSet[5];
 
 // ---- the watched ball ----------------------------------------------------------------------
 
@@ -34,18 +34,18 @@ void SitDev_OnMulligan(void) {
 // Stops watching the struck ball (SitDev_SetBallHitTime starts): at round start
 // (SitDev_vInitModule) and at every shot set-up (situation event 3).
 void SitDev_ClearBallThatWasHit(void) {
-    lbl_802821FC = NULL;
+    gSitDevBallThatWasHit = NULL;
 }
 
 // Whether the watched ball has lain on surface 105, the cup bevel, this shot
 // (SitDev_ThrowBallHitDelayedEvent sets the flag): state value 95.
 u8 SitDev_GetCupBevelFlag(void) {
-    return lbl_80282200;
+    return gSitDevCupBevelFlag;
 }
 
 // Clears the cup bevel flag: at every shot set-up (situation event 3) and for a mulligan.
 void SitDev_ClearCupBevelFlag(void) {
-    lbl_80282200 = 0;
+    gSitDevCupBevelFlag = 0;
 }
 
 // Every frame from gomainloop.c (fn_8006D8E8), for the watched ball (nothing when none): while it
@@ -53,43 +53,43 @@ void SitDev_ClearCupBevelFlag(void) {
 // (EVENT_BallHitDelayed: situation event 31); the first time it lies on surface 105 (the cup bevel)
 // it queues situation event 34 and sets the cup bevel flag.
 void SitDev_ThrowBallHitDelayedEvent(void) {
-    if (lbl_802821FC == NULL) return;
-    switch (lbl_802821FC->nState) {
+    if (gSitDevBallThatWasHit == NULL) return;
+    switch (gSitDevBallThatWasHit->nState) {
     case 2:
     case 3:
     case 4:
-        if (48.0f == (f32)(gSession.nFrameCount - lbl_802821F8)) {
-            EVENT_Trigger(lbl_802821FC->nPlayer, 0x4B, NULL, -1);
+        if (48.0f == (f32)(gSession.nFrameCount - gSitDevBallHitTime)) {
+            EVENT_Trigger(gSitDevBallThatWasHit->nPlayer, 0x4B, NULL, -1);
         }
         break;
     }
-    if (lbl_802821FC->nSurface == 105 && !lbl_80282200) {
-        SitDev_QueueEvent(lbl_802821FC->nPlayer, 0, 0x22);
-        lbl_80282200 = 1;
+    if (gSitDevBallThatWasHit->nSurface == 105 && !gSitDevCupBevelFlag) {
+        SitDev_QueueEvent(gSitDevBallThatWasHit->nPlayer, 0, 0x22);
+        gSitDevCupBevelFlag = 1;
     }
 }
 
 // Starts watching a ball as it is struck (EVENT_HitBall): remembers it and the frame
 // (gSession.nFrameCount) for SitDev_ThrowBallHitDelayedEvent.
 void SitDev_SetBallHitTime(Ball* pBall) {
-    lbl_802821FC = pBall;
-    lbl_802821F8 = gSession.nFrameCount;
+    gSitDevBallThatWasHit = pBall;
+    gSitDevBallHitTime = gSession.nFrameCount;
 }
 
-// Forgets, for all five players, that the scripts set the shot's emotion (lbl_801FA198, response
-// kind 12) or its predicted emotion (lbl_801FA1AC, kind 13): situation events 2, 3 and 25.
+// Forgets, for all five players, that the scripts set the shot's emotion (gSitDevEmotionSet, response
+// kind 12) or its predicted emotion (gSitDevPredictedEmotionSet, kind 13): situation events 2, 3 and 25.
 void SitDev_ClearEmotionStates(void) {
     int i;
     for (i = 0; i < 5; i++) {
-        lbl_801FA198[i] = 0;
-        lbl_801FA1AC[i] = 0;
+        gSitDevEmotionSet[i] = 0;
+        gSitDevPredictedEmotionSet[i] = 0;
     }
 }
 
 // Whether the scripts set the player's predicted emotion this shot (response kind 13):
 // GM_SimulateBallMovement starts a post-shot reaction only then.
 u8 SitDev_PredictedEmotionAvailable(int nPlayer) {
-    return lbl_801FA1AC[nPlayer] == 1;
+    return gSitDevPredictedEmotionSet[nPlayer] == 1;
 }
 
 // ---- picking without repeats ---------------------------------------------------------------
@@ -167,9 +167,9 @@ int SitDev_GetPGARank(int nPlayer) {
     return nRank <= 25 ? 2 : 3;
 }
 
-// The game mode as the scripts' mode bit (state value 54): 1 << lbl_801910F8[nMode], 0 for a mode
+// The game mode as the scripts' mode bit (state value 54): 1 << gSitDevGameModeBits[nMode], 0 for a mode
 // the table gives -1.
 u16 SitDev_TranslateGameMode(int nMode) {
-    s32 nBit = lbl_801910F8[nMode];
+    s32 nBit = gSitDevGameModeBits[nMode];
     return nBit == -1 ? 0 : 1 << nBit;
 }

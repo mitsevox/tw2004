@@ -8,15 +8,15 @@
 #include "game/modes/pgatoursim.h"
 #include "game/modes/pgatour.h"
 
-SitDevZone* lbl_801FA1C0[10];
-s32 lbl_80282210;
+SitDevZone* gSitDevCommentaryZones[10];
+s32 gSitDevNumCommentaryZones;
 
 // The course loader for chunk 5 of a hole (registered by SitDev_vInitModule): adds the chunk, one
 // commentary zone (its outline network, then its bits), to the hole's zones. The ten slots of
-// lbl_801FA1C0 are not checked.
+// gSitDevCommentaryZones are not checked.
 void SitDev_NetworkLoadCallback(u8* pChunk) {
-    lbl_801FA1C0[lbl_80282210] = (SitDevZone*)pChunk;
-    lbl_80282210++;
+    gSitDevCommentaryZones[gSitDevNumCommentaryZones] = (SitDevZone*)pChunk;
+    gSitDevNumCommentaryZones++;
 }
 
 // State value 79 (for the look-ahead ball's position): the bits of every commentary zone the point
@@ -25,10 +25,10 @@ void SitDev_NetworkLoadCallback(u8* pChunk) {
 u32 SitDev_GetCommentaryZones(f32* pPos) {
     int i;
     u32 uBits = 0;
-    if (lbl_80282210 == 0) return 0;
-    for (i = 0; i < lbl_80282210; i++) {
-        if (fn_8000C140(pPos, &lbl_801FA1C0[i]->net, lbl_801FA1C0[i]->net.nNumNodes)) {
-            uBits |= *(u32*)&lbl_801FA1C0[i]->net.aNodes[lbl_801FA1C0[i]->net.nNumNodes];
+    if (gSitDevNumCommentaryZones == 0) return 0;
+    for (i = 0; i < gSitDevNumCommentaryZones; i++) {
+        if (fn_8000C140(pPos, &gSitDevCommentaryZones[i]->net, gSitDevCommentaryZones[i]->net.nNumNodes)) {
+            uBits |= *(u32*)&gSitDevCommentaryZones[i]->net.aNodes[gSitDevCommentaryZones[i]->net.nNumNodes];
         }
     }
     return uBits;
