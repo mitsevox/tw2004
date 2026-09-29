@@ -89,7 +89,7 @@ s32       Ter_GetMeshDrawFlags(UObjMesh* pMesh);
 // .bss and .sbss in reverse address order
 Ter_TerrainRendererMgr gTerRenderer;   // the terrain renderer's state
 s32 gTerLowBitCounts[5][32];        // [n][k]: how many of k's lowest n bits are set
-s32 gTerUnreadToggle;               // written by CharacterRender_SetCurrentBuffer, read nowhere
+s32 gCharRendCurrentBuffer;         // written by CharacterRender_SetCurrentBuffer, read nowhere
 s32 gTerPanoramaList2HiddenCount;   // Ter_DrawPanoramaList leaves out list 2's last this-many
 f32 gTerTreePeriodRandom;           // Ter_vInitModule's pseudo-random number, 0..1
 
@@ -2680,9 +2680,9 @@ void CharacterRender_SetCurrentBuffer(s32 arg0) {
 
     var_r3 = arg0;
     if (var_r3 == (s32) (lbl_80281B88 & 1)) {
-        var_r3 = gTerUnreadToggle ^ 1;
+        var_r3 = gCharRendCurrentBuffer ^ 1;
     }
-    gTerUnreadToggle = var_r3;
+    gCharRendCurrentBuffer = var_r3;
 }
 
 // Starts a frame of character drawing: empty in this build (and in TW07). Character_PreRenderAll
