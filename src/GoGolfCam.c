@@ -1,7 +1,7 @@
 // GoGolfCam.c (EA's name, from its asserts): the golf cameras (TW06's GolfCamera_*). Each camera
 // mode has an init, called by CameraController_SetCameraMode, and a per-frame process, called by
 // CameraController_Idle; both drive the view's camera script. The shared camera state
-// (lbl_80282220) is allocated here, with a per-course elevator camera height.
+// (gGolfCamState) is allocated here, with a per-course elevator camera height.
 
 #include "golfer.h"
 #include "ball.h"
@@ -62,10 +62,10 @@ u8       Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, 
                                      SurfaceType** ppSurface, TerObject** ppObj);
 
 // .bss and .sbss (one object each, so the reverse-order rule does not come into it).
-f32 lbl_801FA1E8[4];                                // the target the steep-slope camera last worked for
-GolfCamState* lbl_80282220;                         // the shared state (GolfCamera_Init)
+f32 gSteepSlopeCamLastTarget[4];                                // the target the steep-slope camera last worked for
+GolfCamState* gGolfCamState;                         // the shared state (GolfCamera_Init)
 
-s32 lbl_80281520 = -1;                              // the steep-slope camera's tries last time (-1: none yet)
+s32 gSteepSlopeCamLastTries = -1;                              // the steep-slope camera's tries last time (-1: none yet)
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0f (0x802842C0), before the 0.0f and 10.0f GolfCamera_Init uses first; its body is unknown.
@@ -73,37 +73,37 @@ static f32 GoGolfCam_StrippedFn(f32 x) {
     return x + 1.0f;
 }
 
-// Allocate the golf cameras' shared state (lbl_80282220, 0x200 bytes of static memory) and reset
+// Allocate the golf cameras' shared state (gGolfCamState, 0x200 bytes of static memory) and reset
 // it: the special-camera flags (b54..b5C) off, fly-by route 0 (n60), each player's next special
 // swing camera kind 1 and each course's elevator camera height 10. Called when a round's systems
 // start (fn_80062E00).
 void GolfCamera_Init(void) {
     int i;
-    lbl_80282220 = StaticMem_Alloc(0x200, 2, 0, "GoGolfCam.c", 164);
-    lbl_80282220->b54 = 0;
-    lbl_80282220->b55 = 0;
-    lbl_80282220->b56 = 0;
-    lbl_80282220->b57 = 0;
-    lbl_80282220->b58 = 0;
-    lbl_80282220->b59 = 0;
-    lbl_80282220->b5A = 0;
-    lbl_80282220->b5B = 0;
-    lbl_80282220->n60 = 0;
-    lbl_80282220->b5C = 0;
-    lbl_80282220->f68 = 0.0f;
+    gGolfCamState = StaticMem_Alloc(0x200, 2, 0, "GoGolfCam.c", 164);
+    gGolfCamState->b54 = 0;
+    gGolfCamState->b55 = 0;
+    gGolfCamState->b56 = 0;
+    gGolfCamState->b57 = 0;
+    gGolfCamState->b58 = 0;
+    gGolfCamState->b59 = 0;
+    gGolfCamState->b5A = 0;
+    gGolfCamState->b5B = 0;
+    gGolfCamState->n60 = 0;
+    gGolfCamState->b5C = 0;
+    gGolfCamState->f68 = 0.0f;
     for (i = 0; i < 5; i++) {
-        lbl_80282220->n1EC[i] = 1;
+        gGolfCamState->n1EC[i] = 1;
     }
     for (i = 0; i < 21; i++) {
-        lbl_80282220->fElevatorHeight[i] = 10.0f;
+        gGolfCamState->fElevatorHeight[i] = 10.0f;
     }
 }
 
 // Free the shared camera state GolfCamera_Init allocated (called when a round's systems stop,
 // fn_80062E20).
 void GolfCamera_DeInit(void) {
-    StaticMem_Free(lbl_80282220);
-    lbl_80282220 = NULL;
+    StaticMem_Free(gGolfCamState);
+    gGolfCamState = NULL;
 }
 
 // Camera 0, the shot-setup camera: the follow-on of the current sequence when that is a type-1
@@ -124,7 +124,7 @@ void GolfCamera_InitShotSetupCamera(View* pView, int nPlayer) {
     pCam = CameraController_GetCameraOrigin(pView);
     pSub = CameraController_GetCameraLookPoint(pView);
     pView->script.bCF = 0;
-    lbl_80282220->f68 = 0.0f;
+    gGolfCamState->f68 = 0.0f;
     nLie = gPlayers[nPlayer].ball.nLie;
     pSeq = pView->p74;
     if (pSeq != NULL && pSeq->b44 == 1 && pSeq->p20 != pSeq && pSeq->p20 != NULL && pSeq->p20->b44 == 2) {
@@ -339,7 +339,7 @@ void GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer) {
         }
     }
     // before setting off, far from the goal: rise to the course's elevator height
-    if (pView->shot19C.f68 < lbl_80282220->fElevatorHeight[Game_GetCourse()] && pView->script.f108 < 0.0f
+    if (pView->shot19C.f68 < gGolfCamState->fElevatorHeight[Game_GetCourse()] && pView->script.f108 < 0.0f
         && fDist > 20.0f) {
         pView->shot19C.f68 += 0.25f * (FRAME_RATE * gSession.fFrameTime);
     } else if (pView->script.f108 < 0.0f) {
@@ -691,7 +691,7 @@ void GolfCamera_InitElevatorCamera(View* pView, int nPlayer) {
     if (pView->script.pShot != NULL) {
         CameraScript_RecordCurrentCam(&pView->shot19C, pCam, pSub, nPlayer, &pView->script, 0);
         strcpy(pView->shot19C.szName, "ELEVATOR CAM");
-        pView->shot19C.v20[1] += lbl_80282220->fElevatorHeight[Game_GetCourse()];
+        pView->shot19C.v20[1] += gGolfCamState->fElevatorHeight[Game_GetCourse()];
         pView->shot19C.bAC = 9;
         CameraScript_InterpToNewScript(&pView->script, &pView->shot19C, nPlayer, pCam, pSub, 1,
                                        lbl_80281F78->f94, 100.0f, 0x19, 0.0f);
@@ -870,13 +870,13 @@ void GolfCamera_InitSpeedGolfRunCamera(View* pView, int nPlayer) {
 // The first-person camera's state, per player, and two axes GolfCamera_ZoomCamGetStartAndEndVecs
 // uses. Defined here, after the functions that use the file's string literals, so the .data comes
 // out in the original's order.
-f32 lbl_80191334[5] = {0};                          // the step's bob, 0..16
-f32 lbl_80191348[5] = {8.0f, 8.0f, 8.0f, 8.0f};     // the sideways sway, 0..16
-f32 lbl_8019135C[5] = {1.0f, 1.0f, 1.0f, 1.0f};     // the eye height: 1 standing, 0 in water
-s32 lbl_80191370[5] = {0};                          // which side the sway is on
-s32 lbl_80191384[5] = {0};                          // frames since the last step's rumble (-1: waiting)
-f32 lbl_80191398[4] = {1.0f, 0.0f, 0.0f, 0.0f};     // the x axis
-f32 lbl_801913A8[4] = {0.0f, 0.0f, 1.0f, 0.0f};     // the z axis
+f32 gSpeedGolfRunCamBob[5] = {0};                          // the step's bob, 0..16
+f32 gSpeedGolfRunCamSway[5] = {8.0f, 8.0f, 8.0f, 8.0f};     // the sideways sway, 0..16
+f32 gSpeedGolfRunCamEyeHeight[5] = {1.0f, 1.0f, 1.0f, 1.0f};     // the eye height: 1 standing, 0 in water
+s32 gSpeedGolfRunCamSwaySide[5] = {0};                          // which side the sway is on
+s32 gSpeedGolfRunCamRumble[5] = {0};                          // frames since the last step's rumble (-1: waiting)
+f32 gGolfCamAxisX[4] = {1.0f, 0.0f, 0.0f, 0.0f};     // the x axis
+f32 gGolfCamAxisZ[4] = {0.0f, 0.0f, 1.0f, 0.0f};     // the z axis
 
 // Camera 9's tick, speed golf's run to the ball in first person: the eye at vPlacement (the running
 // golfer), 1.4 over it (0.1 in water, blending by 0.1 a frame), bobbing and swaying in steps as
@@ -919,8 +919,8 @@ void GolfCamera_ProcessSpeedGolfRunCamera(View* pView, int nPlayer) {
             fZ = fBack * fCos;
             pCam[0] = gPlayers[nPlayer].vPlacement[0];
             pCam[2] = gPlayers[nPlayer].vPlacement[2];
-            pCam[1] = (1.4f + gPlayers[nPlayer].vPlacement[1]) * lbl_8019135C[nPlayer]
-                      + (0.1f + gPlayers[nPlayer].vPlacement[1]) * (1.0f - lbl_8019135C[nPlayer]);
+            pCam[1] = (1.4f + gPlayers[nPlayer].vPlacement[1]) * gSpeedGolfRunCamEyeHeight[nPlayer]
+                      + (0.1f + gPlayers[nPlayer].vPlacement[1]) * (1.0f - gSpeedGolfRunCamEyeHeight[nPlayer]);
             CamScript_KeepAboveGround(nPlayer, pCam, vOld, 1, NULL, &fAbove, NULL, lbl_80281F78->f168);
             pSurface = Ter_GetSupportingWorldMaterial(gPlayers[nPlayer].ball.pCourse, pCam);
             if (pSurface != NULL) {
@@ -930,19 +930,19 @@ void GolfCamera_ProcessSpeedGolfRunCamera(View* pView, int nPlayer) {
             }
             // down to the water line in water (classes 7 and 16), back up out of it
             if (nClass == 7 || nClass == 16) {
-                lbl_8019135C[nPlayer] -= 0.1f;
+                gSpeedGolfRunCamEyeHeight[nPlayer] -= 0.1f;
             } else {
-                lbl_8019135C[nPlayer] += 0.1f;
+                gSpeedGolfRunCamEyeHeight[nPlayer] += 0.1f;
             }
-            if (lbl_8019135C[nPlayer] > 1.0f) {
-                lbl_8019135C[nPlayer] = 1.0f;
-            } else if (lbl_8019135C[nPlayer] < 0.0f) {
-                lbl_8019135C[nPlayer] = 0.0f;
+            if (gSpeedGolfRunCamEyeHeight[nPlayer] > 1.0f) {
+                gSpeedGolfRunCamEyeHeight[nPlayer] = 1.0f;
+            } else if (gSpeedGolfRunCamEyeHeight[nPlayer] < 0.0f) {
+                gSpeedGolfRunCamEyeHeight[nPlayer] = 0.0f;
             }
-            if (lbl_80191384[nPlayer] >= 0) {
-                lbl_80191384[nPlayer]++;
+            if (gSpeedGolfRunCamRumble[nPlayer] >= 0) {
+                gSpeedGolfRunCamRumble[nPlayer]++;
             }
-            if ((lbl_80191384[nPlayer] >= 2 || lbl_80191384[nPlayer] < 0) && !Player_IsCPU(nPlayer)) {
+            if ((gSpeedGolfRunCamRumble[nPlayer] >= 2 || gSpeedGolfRunCamRumble[nPlayer] < 0) && !Player_IsCPU(nPlayer)) {
                 Input_vVibrateBuzz(gPlayers[nPlayer].nController, 0);
             }
             if (nClass != 7) {
@@ -950,39 +950,39 @@ void GolfCamera_ProcessSpeedGolfRunCamera(View* pView, int nPlayer) {
                 fStep = (f32)Math_Sqrt((f32)(pow(3.0f * gPlayers[nPlayer].vCBC[2], 2.0)
                                                 + pow(3.0f * gPlayers[nPlayer].vCBC[0], 2.0)))
                         / (FRAME_RATE / 60.0f);
-                lbl_80191334[nPlayer] += fStep;
-                lbl_80191348[nPlayer] += fStep;
-                if (lbl_80191334[nPlayer] > 16.0f) {
-                    lbl_80191334[nPlayer] -= 16.0f;
+                gSpeedGolfRunCamBob[nPlayer] += fStep;
+                gSpeedGolfRunCamSway[nPlayer] += fStep;
+                if (gSpeedGolfRunCamBob[nPlayer] > 16.0f) {
+                    gSpeedGolfRunCamBob[nPlayer] -= 16.0f;
                 }
-                if (lbl_80191334[nPlayer] < 8.0f) {
-                    pCam[1] += lbl_80191334[nPlayer] / 16.0f;
-                    if (lbl_80191334[nPlayer] < 3.0f && !Player_IsCPU(nPlayer)) {
-                        lbl_80191384[nPlayer] = -1;
+                if (gSpeedGolfRunCamBob[nPlayer] < 8.0f) {
+                    pCam[1] += gSpeedGolfRunCamBob[nPlayer] / 16.0f;
+                    if (gSpeedGolfRunCamBob[nPlayer] < 3.0f && !Player_IsCPU(nPlayer)) {
+                        gSpeedGolfRunCamRumble[nPlayer] = -1;
                     }
                 } else {
-                    pCam[1] += 0.5f - (lbl_80191334[nPlayer] - 8.0f) / 16.0f;
-                    if (lbl_80191334[nPlayer] > 14.0f && fStep > 0.1f && lbl_80191384[nPlayer] == -1
+                    pCam[1] += 0.5f - (gSpeedGolfRunCamBob[nPlayer] - 8.0f) / 16.0f;
+                    if (gSpeedGolfRunCamBob[nPlayer] > 14.0f && fStep > 0.1f && gSpeedGolfRunCamRumble[nPlayer] == -1
                         && !Player_IsCPU(nPlayer)) {
                         Input_vVibrateBuzz(gPlayers[nPlayer].nController, 1);
-                        lbl_80191384[nPlayer] = 0;
+                        gSpeedGolfRunCamRumble[nPlayer] = 0;
                     }
                 }
-                if (lbl_80191348[nPlayer] > 16.0f) {
-                    lbl_80191348[nPlayer] -= 16.0f;
-                    lbl_80191370[nPlayer] ^= 1;
+                if (gSpeedGolfRunCamSway[nPlayer] > 16.0f) {
+                    gSpeedGolfRunCamSway[nPlayer] -= 16.0f;
+                    gSpeedGolfRunCamSwaySide[nPlayer] ^= 1;
                 }
-                if (lbl_80191370[nPlayer] == 0) {
-                    if (lbl_80191348[nPlayer] < 8.0f) {
-                        fSway = 0.7f * (lbl_80191348[nPlayer] / 16.0f);
+                if (gSpeedGolfRunCamSwaySide[nPlayer] == 0) {
+                    if (gSpeedGolfRunCamSway[nPlayer] < 8.0f) {
+                        fSway = 0.7f * (gSpeedGolfRunCamSway[nPlayer] / 16.0f);
                     } else {
-                        fSway = 0.7f * (0.5f - (lbl_80191348[nPlayer] - 8.0f) / 16.0f);
+                        fSway = 0.7f * (0.5f - (gSpeedGolfRunCamSway[nPlayer] - 8.0f) / 16.0f);
                     }
                 } else {
-                    if (lbl_80191348[nPlayer] < 8.0f) {
-                        fSway = 0.7f * -(lbl_80191348[nPlayer] / 16.0f);
+                    if (gSpeedGolfRunCamSway[nPlayer] < 8.0f) {
+                        fSway = 0.7f * -(gSpeedGolfRunCamSway[nPlayer] / 16.0f);
                     } else {
-                        fSway = 0.7f * -(0.5f - (lbl_80191348[nPlayer] - 8.0f) / 16.0f);
+                        fSway = 0.7f * -(0.5f - (gSpeedGolfRunCamSway[nPlayer] - 8.0f) / 16.0f);
                     }
                 }
                 pCam[0] += fSway * fCos;
@@ -1009,8 +1009,8 @@ void GolfCamera_ProcessSpeedGolfRunCamera(View* pView, int nPlayer) {
                 pSub[1] = fY;
             }
             // the height just worked out is replaced: the stick tilts the view up and down
-            pSub[1] = (4.0f * gPlayers[nPlayer].fA8C + pCam[1]) * lbl_8019135C[nPlayer]
-                      + (2.0f + pCam[1] + gPlayers[nPlayer].fA8C) * (1.0f - lbl_8019135C[nPlayer]);
+            pSub[1] = (4.0f * gPlayers[nPlayer].fA8C + pCam[1]) * gSpeedGolfRunCamEyeHeight[nPlayer]
+                      + (2.0f + pCam[1] + gPlayers[nPlayer].fA8C) * (1.0f - gSpeedGolfRunCamEyeHeight[nPlayer]);
             pSub[0] = pCam[0] - fX / 3.0f;
             pSub[2] = pCam[2] - fZ / 3.0f;
             if (pView->script.n110 == 0) {
@@ -1305,13 +1305,13 @@ void GolfCamera_ProcessKneeCamera(View* pView, int nPlayer) {
 }
 
 // Camera 10, the hole fly-by (STATEFUNC_InitialFlyByInit and MidHoleFlyByInit): the script starts
-// on the first shot of fly-by route lbl_80282220->n60 (StaticCam_GetFlyByCam), its follow-on
+// on the first shot of fly-by route gGolfCamState->n60 (StaticCam_GetFlyByCam), its follow-on
 // queued; with none, no shot.
 void GolfCamera_InitFlyByCamera(View* pView, int nPlayer) {
     CamShot* pShot;
     s32 n;
-    n = lbl_80282220->n60;  // fake match: read before the store below, in the original's order
-    lbl_80282220->f68 = 0.0f;
+    n = gGolfCamState->n60;  // fake match: read before the store below, in the original's order
+    gGolfCamState->f68 = 0.0f;
     pShot = StaticCam_GetFlyByCam(n);
     if (pShot != NULL) {
         pView->script.pShot = pShot;
@@ -1365,7 +1365,7 @@ void GolfCamera_InitPreShotCamera(View* pView, int nPlayer) {
     f32* pSub = CameraController_GetCameraLookPoint(pView);
     int nB = 0x19;
     f32 f3 = 0.0f;
-    lbl_80282220->f68 = 0.0f;
+    gGolfCamState->f68 = 0.0f;
     pView->script.bCF = 0;
     nLie = gPlayers[nPlayer].ball.nLie;
     pView->p74 = NULL;
@@ -1465,12 +1465,12 @@ void GolfCamera_InitSwingCamera(View* pView, int nPlayer) {
     pSub = CameraController_GetCameraLookPoint(pView);
     pOldSeq = pView->p74;
     pView->script.bCF = 0;
-    lbl_80282220->f68 = 0.0f;
-    lbl_80282220->b5D = 0;
+    gGolfCamState->f68 = 0.0f;
+    gGolfCamState->b5D = 0;
     GolfCamera_TurnOffComicCam(pView, nPlayer);
     pView->n260 = 0;
-    lbl_80282220->b5A = 0;
-    lbl_80282220->b5B = 0;
+    gGolfCamState->b5A = 0;
+    gGolfCamState->b5B = 0;
     nLie = gPlayers[nPlayer].ball.nLie;
     if (pView->p7C != NULL && !gSession.bReplay) {
         pView->p74 = pView->p7C;
@@ -1656,7 +1656,7 @@ void GolfCamera_InitReplaySwingCamera(View* pView, int nPlayer) {
     pView->script.n110 = 0;
     pView->script.n114 = 0;
     pView->script.fCamTime = 0.0f;
-    lbl_80282220->f68 = 0.0f;
+    gGolfCamState->f68 = 0.0f;
     fn_800C5D64(pView, pCam, pSub, nPlayer);
 }
 
@@ -1704,7 +1704,7 @@ void GolfCamera_Init3ScreenCamera(View* pView, int nPlayer) {
     } else {
         fn_800B3550(0, pView, nPlayer);
     }
-    lbl_80282220->b56 = 1;
+    gGolfCamState->b56 = 1;
 }
 
 // Camera 20's tick: when the comic camera's own tick (GoComicCam) says it is done, the comic camera
@@ -1732,7 +1732,7 @@ void GolfCamera_Process3ScreenCamera(View* pView, int nPlayer) {
 // when the special swings are stopped.
 void GolfCamera_TurnOffComicCam(View* pView, int nPlayer) {
     int nView = gPlayers[nPlayer].nView[0];
-    if (lbl_80282220->b56) {
+    if (gGolfCamState->b56) {
         VM_vSetViewportRect(RC_spGetRenderCtxViewport(ViewController_GetRenderContext(nView)), 0.0f, 0.0f,
                             1.0f, 1.0f);
         RC_UpdateCurrentScreenMatrices();
@@ -1741,8 +1741,8 @@ void GolfCamera_TurnOffComicCam(View* pView, int nPlayer) {
         RenderState_SetViewport(RC_spGetCurrentRenderCtx());
         RenderState_SetCameraMatrices();
         RenderState_Flush();
-        lbl_80282220->b56 = 0;
-        lbl_80282220->b57 = 0;
+        gGolfCamState->b56 = 0;
+        gGolfCamState->b57 = 0;
     }
 }
 
@@ -1766,14 +1766,14 @@ void GolfCamera_InitHeartBeatCamera(View* pView, int nPlayer) {
     }
     pView->script.n110 = 0;
     pView->script.f108 = 0.0f;
-    lbl_80282220->b5A = 1;
+    gGolfCamState->b5A = 1;
     CameraController_FadeIn(pView, lbl_80281F78->fC4, v);
     fRate = (FRAME_RATE * (fn_800C741C(gPlayers[nPlayer].pChar, 2) - fStart))
           / (FRAME_RATE * (lbl_80281F78->fC4 * (lbl_80281F78->nBeatFrames * (lbl_80281F78->nBeats + 1))
                        + (lbl_80281F78->nBeats * lbl_80281F78->fC8
                           + lbl_80281F78->nBeats * lbl_80281F78->fCC)));
     GameEffects_SetSuperSlowMo(1, nPlayer, fRate);
-    lbl_80282220->f64 = fRate;
+    gGolfCamState->f64 = fRate;
 }
 
 // Camera 21: the heartbeats. While b5A is set, each beat (every nBeatFrames steps of script.n110, nBeats
@@ -1785,10 +1785,10 @@ void GolfCamera_ProcessHeartBeatCamera(View* pView, int nPlayer) {
     CamShot* pShot = NULL;
     f32 v[4] = {0.0f, 0.0f, 0.0f, 0.5f};
     if (gSession.nPaused == 0) {
-        if (lbl_80282220->b5A) {
+        if (gGolfCamState->b5A) {
             if (pView->script.nFade == 5) {
                 if (pView->script.n110 >= lbl_80281F78->nBeats * lbl_80281F78->nBeatFrames) {
-                    lbl_80282220->b5A = 0;
+                    gGolfCamState->b5A = 0;
                 } else if ((pView->script.n110 + 1) % lbl_80281F78->nBeatFrames == 0) {
                     CameraController_FadeOut(pView, lbl_80281F78->fC8, v);
                 } else {
@@ -1842,7 +1842,7 @@ void GolfCamera_InitShutterCamera(View* pView, int nPlayer) {
     pView->script.n110 = 0;
     pView->script.f108 = 0.0f;
     pView->script.f10C = 0.0f;
-    lbl_80282220->b5B = 1;
+    gGolfCamState->b5B = 1;
     pView->script.f10C = 0.0f;     // stored twice, as in the original
     GameEffects_SetSuperSlowMo(1, nPlayer, 1.0f);
 }
@@ -1983,14 +1983,14 @@ void GolfCamera_InitBallFlightCamera(View* pView, int nPlayer) {
     }
     pView->script.pB8 = NULL;
     if (GolfCamera_ChooseImpactMatrixCam(pView, nPlayer)) {
-        lbl_80282220->b54 = 1;
+        gGolfCamState->b54 = 1;
         Character_AlignCharacterForShotImpact(gPlayers[nPlayer].pChar);
         SKATime_Pause(gPlayers[nPlayer].pChar->anim);
         fn_800C4FF0(pView, pCam, pSub, nPlayer);
         pView->script.f108 = 0.0f;
         EVENT_Trigger(nPlayer, 0x32, NULL, -1);
     } else if (GolfCamera_ChooseSuperZoomCam(pView, nPlayer)) {
-        lbl_80282220->b58 = 1;
+        gGolfCamState->b58 = 1;
         SKATime_Pause(gPlayers[nPlayer].pChar->anim);
         fn_800C56B4(pView, pCam, pSub, nPlayer);
         EVENT_Trigger(nPlayer, 0x39, NULL, -1);
@@ -2047,7 +2047,7 @@ void GolfCamera_ProcessBallFlightCamera(View* pView, int nPlayer) {
         fTime = gSession.fFrameTime;
     }
     if (gSession.fFrameTime != 0.0f && !pView->script.bCF
-        && ((!lbl_80282220->b5D && fn_800C7450())
+        && ((!gGolfCamState->b5D && fn_800C7450())
             || ((pView->script.pShot == NULL || pView->script.fCamTime > pView->script.pShot->f4C)
                 && (pView->script.pNextShot == NULL || pView->p80 != pView->script.pShot)))) {
         if (gSession.bReplay || Player_IsCPU(nPlayer)) {
@@ -2132,20 +2132,20 @@ void GolfCamera_ProcessBallFlightCamera(View* pView, int nPlayer) {
                                 CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, nA,
                                                                f1, f2, nB, f3);
                                 if (fn_800C7450()) {
-                                    lbl_80282220->b5D = 1;
+                                    gGolfCamState->b5D = 1;
                                 }
                             } else {
                                 CameraScript_InterpToNewScript(&pView->script, pAltShot, nPlayer, pCam, pSub,
                                                                nA, f1, f2, nB, f3);
                                 if (fn_800C7450()) {
-                                    lbl_80282220->b5D = 1;
+                                    gGolfCamState->b5D = 1;
                                 }
                             }
                         } else {
                             CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, nA, f1,
                                                            f2, nB, f3);
                             if (fn_800C7450()) {
-                                lbl_80282220->b5D = 1;
+                                gGolfCamState->b5D = 1;
                             }
                         }
                         pView->script.nC8 = pView->script.nC4;
@@ -2158,7 +2158,7 @@ void GolfCamera_ProcessBallFlightCamera(View* pView, int nPlayer) {
                                                    nB, f3);
                     pView->script.nC8 = pView->script.nC4;
                     if (fn_800C7450()) {
-                        lbl_80282220->b5D = 1;
+                        gGolfCamState->b5D = 1;
                     }
                 }
             } else {
@@ -2386,52 +2386,52 @@ void GolfCamera_InitTutorialWaitCamera(View* pView, int nPlayer) {
         CameraController_FadeIn(pView, lbl_80281F78->f170, v);
     }
     ViewController_GetIndexedViewController(gPlayers[nPlayer].nView[0])->bFlagOut = 0;
-    strcpy(lbl_80282220->shot6C.szName, szName);
-    lbl_80282220->shot6C.p40 = &lbl_80282220->shot6C;
-    lbl_80282220->shot6C.f60 = 15.0f;
-    lbl_80282220->shot6C.f64 = 0.0f;
-    lbl_80282220->shot6C.f70 = 0.0f;
-    lbl_80282220->shot6C.f74 = 2.0f;
-    lbl_80282220->shot6C.f68 = 2.0f;
-    lbl_80282220->shot6C.f6C = 20.0f;
-    lbl_80282220->shot6C.f78 = 40.0f * PI / 180.0f;    // not DEG(40.0f): that rounds one bit lower
-    lbl_80282220->shot6C.f7C = lbl_80282220->shot6C.f78;
-    lbl_80282220->shot6C.f80 = 0.0f;
-    lbl_80282220->shot6C.f9C = 0.0f;
-    lbl_80282220->shot6C.f84 = 0.0f;
-    lbl_80282220->shot6C.bA8 = 1;
-    lbl_80282220->shot6C.bAA = 0;
-    lbl_80282220->shot6C.bAC = 10;
-    lbl_80282220->shot6C.bB1 = 2;
-    lbl_80282220->shot6C.bB2 = 0;
-    lbl_80282220->shot6C.bAF = 10;
-    lbl_80282220->shot6C.bB0 = 1;
-    lbl_80282220->shot6C.bAD = 5;
-    lbl_80282220->shot6C.p44 = NULL;
-    strcpy(lbl_80282220->shot12C.szName, szName);
-    lbl_80282220->shot12C.p40 = NULL;
-    lbl_80282220->shot12C.f60 = -15.0f;
-    lbl_80282220->shot12C.f64 = 0.0f;
-    lbl_80282220->shot12C.f70 = 0.0f;
-    lbl_80282220->shot12C.f74 = 2.0f;
-    lbl_80282220->shot12C.f68 = 2.0f;
-    lbl_80282220->shot12C.f6C = 20.0f;
-    lbl_80282220->shot12C.f78 = 40.0f * PI / 180.0f;
-    lbl_80282220->shot12C.f7C = lbl_80282220->shot12C.f78;
-    lbl_80282220->shot12C.f80 = 0.0f;
-    lbl_80282220->shot12C.f9C = 0.0f;
-    lbl_80282220->shot12C.f84 = 0.0f;
-    lbl_80282220->shot12C.bA8 = 1;
-    lbl_80282220->shot12C.bAA = 0;
-    lbl_80282220->shot12C.bAC = 10;
-    lbl_80282220->shot12C.bB1 = 2;
-    lbl_80282220->shot12C.bB2 = 0;
-    lbl_80282220->shot12C.bAF = 10;
-    lbl_80282220->shot12C.bB0 = 1;
-    lbl_80282220->shot12C.bAD = 5;
-    lbl_80282220->shot12C.p44 = NULL;
-    pView->script.pShot = &lbl_80282220->shot6C;
-    pView->script.pNextShot = &lbl_80282220->shot12C;
+    strcpy(gGolfCamState->shot6C.szName, szName);
+    gGolfCamState->shot6C.p40 = &gGolfCamState->shot6C;
+    gGolfCamState->shot6C.f60 = 15.0f;
+    gGolfCamState->shot6C.f64 = 0.0f;
+    gGolfCamState->shot6C.f70 = 0.0f;
+    gGolfCamState->shot6C.f74 = 2.0f;
+    gGolfCamState->shot6C.f68 = 2.0f;
+    gGolfCamState->shot6C.f6C = 20.0f;
+    gGolfCamState->shot6C.f78 = 40.0f * PI / 180.0f;    // not DEG(40.0f): that rounds one bit lower
+    gGolfCamState->shot6C.f7C = gGolfCamState->shot6C.f78;
+    gGolfCamState->shot6C.f80 = 0.0f;
+    gGolfCamState->shot6C.f9C = 0.0f;
+    gGolfCamState->shot6C.f84 = 0.0f;
+    gGolfCamState->shot6C.bA8 = 1;
+    gGolfCamState->shot6C.bAA = 0;
+    gGolfCamState->shot6C.bAC = 10;
+    gGolfCamState->shot6C.bB1 = 2;
+    gGolfCamState->shot6C.bB2 = 0;
+    gGolfCamState->shot6C.bAF = 10;
+    gGolfCamState->shot6C.bB0 = 1;
+    gGolfCamState->shot6C.bAD = 5;
+    gGolfCamState->shot6C.p44 = NULL;
+    strcpy(gGolfCamState->shot12C.szName, szName);
+    gGolfCamState->shot12C.p40 = NULL;
+    gGolfCamState->shot12C.f60 = -15.0f;
+    gGolfCamState->shot12C.f64 = 0.0f;
+    gGolfCamState->shot12C.f70 = 0.0f;
+    gGolfCamState->shot12C.f74 = 2.0f;
+    gGolfCamState->shot12C.f68 = 2.0f;
+    gGolfCamState->shot12C.f6C = 20.0f;
+    gGolfCamState->shot12C.f78 = 40.0f * PI / 180.0f;
+    gGolfCamState->shot12C.f7C = gGolfCamState->shot12C.f78;
+    gGolfCamState->shot12C.f80 = 0.0f;
+    gGolfCamState->shot12C.f9C = 0.0f;
+    gGolfCamState->shot12C.f84 = 0.0f;
+    gGolfCamState->shot12C.bA8 = 1;
+    gGolfCamState->shot12C.bAA = 0;
+    gGolfCamState->shot12C.bAC = 10;
+    gGolfCamState->shot12C.bB1 = 2;
+    gGolfCamState->shot12C.bB2 = 0;
+    gGolfCamState->shot12C.bAF = 10;
+    gGolfCamState->shot12C.bB0 = 1;
+    gGolfCamState->shot12C.bAD = 5;
+    gGolfCamState->shot12C.p44 = NULL;
+    pView->script.pShot = &gGolfCamState->shot6C;
+    pView->script.pNextShot = &gGolfCamState->shot12C;
     pView->script.nBC = 7;
     pView->script.f8C = 40.0f;
     pView->script.nD0 = 1;
@@ -2446,8 +2446,8 @@ void GolfCamera_ProcessTutorialWaitCamera(View* pView, int nPlayer) {
     pSub = CameraController_GetCameraLookPoint(pView);
     CamScript_RunScript(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, gSession.fFrameTime);
     if (pView->script.pNextShot == NULL) {
-        pView->script.pShot = &lbl_80282220->shot6C;
-        pView->script.pNextShot = &lbl_80282220->shot12C;
+        pView->script.pShot = &gGolfCamState->shot6C;
+        pView->script.pNextShot = &gGolfCamState->shot12C;
         pView->script.nBC = 7;
         pView->script.f8C = 40.0f;
         pView->script.nD0 = 1;
@@ -2662,8 +2662,8 @@ u8 GolfCamera_ZoomCamGetStartAndEndVecs(View* pView, int nPlayer, f32* pSub, f32
     }
     Vec3_Scale(pView->shot19C.f60, vDir, vOff);
     fn_800C73B8(pBall, vOff, pAim);
-    pAim[0] += pView->shot19C.f64 * -Vec3_Dot(vDir, lbl_801913A8);
-    pAim[2] += pView->shot19C.f64 * Vec3_Dot(vDir, lbl_80191398);
+    pAim[0] += pView->shot19C.f64 * -Vec3_Dot(vDir, gGolfCamAxisZ);
+    pAim[2] += pView->shot19C.f64 * Vec3_Dot(vDir, gGolfCamAxisX);
     pAim[1] = pView->shot19C.v30[1];
     GolfCam_Vec3Sub(vTarget, pAim, vBack);
     vBack[1] = 0.0f;
@@ -2884,14 +2884,14 @@ void GolfCamera_ComputeSteepSlopeCamVectors(View* pView, int nPlayer) {
     pTarget = gPlayers[nPlayer].vTarget;
     LLMath_CopyVec(pTarget, vTarget);
     pBall = &gPlayers[nPlayer].ball;
-    if (lbl_80281520 == -1) {
-        fn_800B5918(pTarget, lbl_801FA1E8);
+    if (gSteepSlopeCamLastTries == -1) {
+        fn_800B5918(pTarget, gSteepSlopeCamLastTarget);
         nMax = lbl_80281F78->n1DC;
-    } else if (LLMath_SquareDistanceBetween3(lbl_801FA1E8, pTarget) > 0.1f) {
-        fn_800B5918(pTarget, lbl_801FA1E8);
-        nMax = (lbl_80281520 + 1 <= lbl_80281F78->n1DC) ? lbl_80281520 + 1 : lbl_80281F78->n1DC;
+    } else if (LLMath_SquareDistanceBetween3(gSteepSlopeCamLastTarget, pTarget) > 0.1f) {
+        fn_800B5918(pTarget, gSteepSlopeCamLastTarget);
+        nMax = (gSteepSlopeCamLastTries + 1 <= lbl_80281F78->n1DC) ? gSteepSlopeCamLastTries + 1 : lbl_80281F78->n1DC;
     } else {
-        nMax = lbl_80281520;
+        nMax = gSteepSlopeCamLastTries;
     }
     nTries = (nMax > 2) ? nMax : 2;
     vBase[0] = lbl_80281F78->f1E8 + gPlayers[nPlayer].ball.vPos[0];
@@ -2939,12 +2939,12 @@ void GolfCamera_ComputeSteepSlopeCamVectors(View* pView, int nPlayer) {
         } else {
             bClear = 1;
         }
-        if (bClear && i >= lbl_80281520 - 2) {
+        if (bClear && i >= gSteepSlopeCamLastTries - 2) {
             bDone = 1;
         }
         i++;
     }
-    lbl_80281520 = i;
+    gSteepSlopeCamLastTries = i;
     fn_800C4D2C(vOldCam, pView->v0, pView->v0, lbl_80281F78->f1F0);
     fn_800C4D2C(vOldSub, pView->v10, pView->v10, lbl_80281F78->f1F4);
     GolfCamera_ClampLookAngle(pView->v0, pView->v10, pView->v10);
@@ -3090,68 +3090,68 @@ void fn_800C4FF0(View* pView, f32* pFrom, f32* pTo, int nPlayer) {
     v[1] = 0.0f;
     fn_800C73B8(pTo, v, v);
     v[1] = vFrom[1];
-    Mem_set(&lbl_80282220->shot6C, 0, sizeof(CamShot) * 2);
-    strcpy(lbl_80282220->shot6C.szName, szName);
-    Vec3Copy(vFrom, lbl_80282220->shot6C.v20);
-    Vec3Copy(pTo, lbl_80282220->shot6C.v30);
-    lbl_80282220->shot6C.p40 = NULL;
-    lbl_80282220->shot6C.f60 = 0.0f;
-    lbl_80282220->shot6C.f64 = 0.0f;
-    lbl_80282220->shot6C.f70 = 0.0f;
-    lbl_80282220->shot6C.f74 = 0.0f;
-    lbl_80282220->shot6C.f68 = 0.2f;
-    lbl_80282220->shot6C.f6C = 20.0f;
+    Mem_set(&gGolfCamState->shot6C, 0, sizeof(CamShot) * 2);
+    strcpy(gGolfCamState->shot6C.szName, szName);
+    Vec3Copy(vFrom, gGolfCamState->shot6C.v20);
+    Vec3Copy(pTo, gGolfCamState->shot6C.v30);
+    gGolfCamState->shot6C.p40 = NULL;
+    gGolfCamState->shot6C.f60 = 0.0f;
+    gGolfCamState->shot6C.f64 = 0.0f;
+    gGolfCamState->shot6C.f70 = 0.0f;
+    gGolfCamState->shot6C.f74 = 0.0f;
+    gGolfCamState->shot6C.f68 = 0.2f;
+    gGolfCamState->shot6C.f6C = 20.0f;
     fChange = GameEffects_FieldOfViewChange();
-    lbl_80282220->shot6C.f78 =
+    gGolfCamState->shot6C.f78 =
         CA_fGetCameraFieldOfView(
                 Camera_GetLens(ViewController_GetIndexedViewController(gPlayers[nPlayer].nView[0])->pCamera))
                         - fChange;
-    lbl_80282220->shot6C.f7C = lbl_80282220->shot6C.f78;
-    lbl_80282220->shot6C.f80 = 0.0f;
-    lbl_80282220->shot6C.f4C = 1.0f;
-    lbl_80282220->shot6C.f9C = 0.0f;
-    lbl_80282220->shot6C.f84 = 0.0f;
-    lbl_80282220->shot6C.bA8 = 0;
-    lbl_80282220->shot6C.bAA = 1;
-    lbl_80282220->shot6C.bAC = 0x18;
-    lbl_80282220->shot6C.bB1 = 9;
-    lbl_80282220->shot6C.bB2 = 0;
-    lbl_80282220->shot6C.bAD = 3;
-    lbl_80282220->shot6C.p44 = pView->script.pShot;
-    lbl_80282220->shot6C.f8C = 0.0f;
+    gGolfCamState->shot6C.f7C = gGolfCamState->shot6C.f78;
+    gGolfCamState->shot6C.f80 = 0.0f;
+    gGolfCamState->shot6C.f4C = 1.0f;
+    gGolfCamState->shot6C.f9C = 0.0f;
+    gGolfCamState->shot6C.f84 = 0.0f;
+    gGolfCamState->shot6C.bA8 = 0;
+    gGolfCamState->shot6C.bAA = 1;
+    gGolfCamState->shot6C.bAC = 0x18;
+    gGolfCamState->shot6C.bB1 = 9;
+    gGolfCamState->shot6C.bB2 = 0;
+    gGolfCamState->shot6C.bAD = 3;
+    gGolfCamState->shot6C.p44 = pView->script.pShot;
+    gGolfCamState->shot6C.f8C = 0.0f;
     pShot = DynamicCam_ChooseScript(nPlayer, 0x22, NULL);
     if (pShot != NULL) {
-        Mem_cpy(&lbl_80282220->shot12C, pShot, sizeof(CamShot));
-        lbl_80282220->shot12C.p40 = NULL;
-        lbl_80282220->shot12C.p44 = pView->script.pShot;
-        lbl_80282220->shot12C.bAD = 3;
-        lbl_80282220->shot12C.f8C = 0.0f;
-        lbl_80282220->shot12C.f4C = 1.0f;
+        Mem_cpy(&gGolfCamState->shot12C, pShot, sizeof(CamShot));
+        gGolfCamState->shot12C.p40 = NULL;
+        gGolfCamState->shot12C.p44 = pView->script.pShot;
+        gGolfCamState->shot12C.bAD = 3;
+        gGolfCamState->shot12C.f8C = 0.0f;
+        gGolfCamState->shot12C.f4C = 1.0f;
     } else {
-        strcpy(lbl_80282220->shot12C.szName, szName);
-        Vec3Copy(v, lbl_80282220->shot12C.v20);
-        Vec3Copy(pTo, lbl_80282220->shot12C.v30);
-        lbl_80282220->shot12C.p40 = NULL;
-        lbl_80282220->shot12C.f60 = 0.0f;
-        lbl_80282220->shot12C.f64 = 0.0f;
-        lbl_80282220->shot12C.f70 = 0.0f;
-        lbl_80282220->shot12C.f74 = 0.0f;
-        lbl_80282220->shot12C.f68 = 0.2f;
-        lbl_80282220->shot12C.f6C = 20.0f;
-        lbl_80282220->shot12C.f78 = lbl_80282220->shot6C.f78;
-        lbl_80282220->shot12C.f7C = lbl_80282220->shot12C.f78;
-        lbl_80282220->shot12C.f80 = 0.0f;
-        lbl_80282220->shot12C.f4C = 1.0f;
-        lbl_80282220->shot12C.f9C = 0.0f;
-        lbl_80282220->shot12C.f84 = 0.0f;
-        lbl_80282220->shot12C.bA8 = 0;
-        lbl_80282220->shot12C.bAA = 1;
-        lbl_80282220->shot12C.bAC = 0x18;
-        lbl_80282220->shot12C.bB1 = 9;
-        lbl_80282220->shot12C.bB2 = 0;
-        lbl_80282220->shot12C.bAD = 3;
-        lbl_80282220->shot12C.p44 = pView->script.pShot;
-        lbl_80282220->shot12C.f8C = 0.0f;
+        strcpy(gGolfCamState->shot12C.szName, szName);
+        Vec3Copy(v, gGolfCamState->shot12C.v20);
+        Vec3Copy(pTo, gGolfCamState->shot12C.v30);
+        gGolfCamState->shot12C.p40 = NULL;
+        gGolfCamState->shot12C.f60 = 0.0f;
+        gGolfCamState->shot12C.f64 = 0.0f;
+        gGolfCamState->shot12C.f70 = 0.0f;
+        gGolfCamState->shot12C.f74 = 0.0f;
+        gGolfCamState->shot12C.f68 = 0.2f;
+        gGolfCamState->shot12C.f6C = 20.0f;
+        gGolfCamState->shot12C.f78 = gGolfCamState->shot6C.f78;
+        gGolfCamState->shot12C.f7C = gGolfCamState->shot12C.f78;
+        gGolfCamState->shot12C.f80 = 0.0f;
+        gGolfCamState->shot12C.f4C = 1.0f;
+        gGolfCamState->shot12C.f9C = 0.0f;
+        gGolfCamState->shot12C.f84 = 0.0f;
+        gGolfCamState->shot12C.bA8 = 0;
+        gGolfCamState->shot12C.bAA = 1;
+        gGolfCamState->shot12C.bAC = 0x18;
+        gGolfCamState->shot12C.bB1 = 9;
+        gGolfCamState->shot12C.bB2 = 0;
+        gGolfCamState->shot12C.bAD = 3;
+        gGolfCamState->shot12C.p44 = pView->script.pShot;
+        gGolfCamState->shot12C.f8C = 0.0f;
     }
     switch (pView->n260) {
     case 1:
@@ -3166,8 +3166,8 @@ void fn_800C4FF0(View* pView, f32* pFrom, f32* pTo, int nPlayer) {
         break;
     }
     if (nOrder == 0) {
-        pView->script.pShot = &lbl_80282220->shot6C;
-        pView->script.pNextShot = &lbl_80282220->shot12C;
+        pView->script.pShot = &gGolfCamState->shot6C;
+        pView->script.pNextShot = &gGolfCamState->shot12C;
         pView->script.f8C = lbl_80281F78->f5C;
         pView->script.nBC = 2;
         if (CameraScript_FlipCameraForLefty(nPlayer, NULL)) {
@@ -3176,8 +3176,8 @@ void fn_800C4FF0(View* pView, f32* pFrom, f32* pTo, int nPlayer) {
             pView->script.nD0 = 1;
         }
     } else if (nOrder == 1) {
-        pView->script.pShot = &lbl_80282220->shot12C;
-        pView->script.pNextShot = &lbl_80282220->shot6C;
+        pView->script.pShot = &gGolfCamState->shot12C;
+        pView->script.pNextShot = &gGolfCamState->shot6C;
         pView->script.f8C = lbl_80281F78->f5C;
         pView->script.nBC = 2;
         if (CameraScript_FlipCameraForLefty(nPlayer, NULL)) {
@@ -3186,8 +3186,8 @@ void fn_800C4FF0(View* pView, f32* pFrom, f32* pTo, int nPlayer) {
             pView->script.nD0 = 1;
         }
     } else {
-        pView->script.pShot = &lbl_80282220->shot6C;
-        pView->script.pNextShot = &lbl_80282220->shot12C;
+        pView->script.pShot = &gGolfCamState->shot6C;
+        pView->script.pNextShot = &gGolfCamState->shot12C;
         pView->script.nBC = 7;
         pView->script.f8C = 2.0f * lbl_80281F78->f5C;
         if (CameraScript_FlipCameraForLefty(nPlayer, NULL)) {
@@ -3218,7 +3218,7 @@ f32 fn_800C54FC(View* pView, f32* pCam, f32* pSub, int nPlayer) {
         fn_80038054(1, ViewController_GetCurrentViewControllerID(), 0.0f, lbl_80281F78->f64);
     }
     if (pView->script.pNextShot == NULL) {
-        lbl_80282220->b54 = 0;
+        gGolfCamState->b54 = 0;
         SKATime_UnPause(gPlayers[nPlayer].pChar->anim);
         EVENT_Trigger(nPlayer, 0x33, NULL, -1);
         EVENT_Trigger(nPlayer, 0x3B, NULL, 1);
@@ -3270,66 +3270,66 @@ void fn_800C56B4(View* pView, f32* pFrom, f32* pTo, int nPlayer) {
     v[1] = 0.0f;
     fn_800C73B8(pTo, v, v);
     v[1] = vFrom[1];
-    strcpy(lbl_80282220->shot6C.szName, szName);
+    strcpy(gGolfCamState->shot6C.szName, szName);
     if (pView->n260 == 13) {
-        Vec3Copy(pFrom, lbl_80282220->shot6C.v20);
+        Vec3Copy(pFrom, gGolfCamState->shot6C.v20);
     } else {
-        Vec3Copy(v, lbl_80282220->shot6C.v20);
+        Vec3Copy(v, gGolfCamState->shot6C.v20);
     }
-    Vec3Copy(pTo, lbl_80282220->shot6C.v30);
-    lbl_80282220->shot6C.p40 = NULL;
-    lbl_80282220->shot6C.f60 = 0.0f;
-    lbl_80282220->shot6C.f64 = 0.0f;
-    lbl_80282220->shot6C.f70 = 0.0f;
-    lbl_80282220->shot6C.f74 = 0.0f;
-    lbl_80282220->shot6C.f68 = 0.2f;
-    lbl_80282220->shot6C.f6C = 20.0f;
-    lbl_80282220->shot6C.f78 = lbl_80281F78->f7C;
-    lbl_80282220->shot6C.f7C = lbl_80282220->shot6C.f78;
-    lbl_80282220->shot6C.f80 = 0.0f;
-    lbl_80282220->shot6C.f4C = 0.1f;
-    lbl_80282220->shot6C.f9C = -2.0f * PI;
-    lbl_80282220->shot6C.f84 = 0.0f;
-    lbl_80282220->shot6C.bA8 = 0;
-    lbl_80282220->shot6C.bAA = 1;
-    lbl_80282220->shot6C.bAC = 0x18;
-    lbl_80282220->shot6C.bB1 = 9;
-    lbl_80282220->shot6C.bB2 = 0;
-    lbl_80282220->shot6C.bAD = 3;
-    lbl_80282220->shot6C.p44 = pView->script.pShot;
-    strcpy(lbl_80282220->shot12C.szName, szName);
-    Vec3Copy(lbl_80282220->shot6C.v20, lbl_80282220->shot12C.v20);
-    Vec3Copy(pTo, lbl_80282220->shot12C.v30);
-    lbl_80282220->shot12C.p40 = NULL;
-    lbl_80282220->shot12C.f60 = 0.0f;
-    lbl_80282220->shot12C.f64 = 0.0f;
-    lbl_80282220->shot12C.f70 = 0.0f;
-    lbl_80282220->shot12C.f74 = 0.0f;
-    lbl_80282220->shot12C.f68 = 0.2f;
-    lbl_80282220->shot12C.f6C = 20.0f;
+    Vec3Copy(pTo, gGolfCamState->shot6C.v30);
+    gGolfCamState->shot6C.p40 = NULL;
+    gGolfCamState->shot6C.f60 = 0.0f;
+    gGolfCamState->shot6C.f64 = 0.0f;
+    gGolfCamState->shot6C.f70 = 0.0f;
+    gGolfCamState->shot6C.f74 = 0.0f;
+    gGolfCamState->shot6C.f68 = 0.2f;
+    gGolfCamState->shot6C.f6C = 20.0f;
+    gGolfCamState->shot6C.f78 = lbl_80281F78->f7C;
+    gGolfCamState->shot6C.f7C = gGolfCamState->shot6C.f78;
+    gGolfCamState->shot6C.f80 = 0.0f;
+    gGolfCamState->shot6C.f4C = 0.1f;
+    gGolfCamState->shot6C.f9C = -2.0f * PI;
+    gGolfCamState->shot6C.f84 = 0.0f;
+    gGolfCamState->shot6C.bA8 = 0;
+    gGolfCamState->shot6C.bAA = 1;
+    gGolfCamState->shot6C.bAC = 0x18;
+    gGolfCamState->shot6C.bB1 = 9;
+    gGolfCamState->shot6C.bB2 = 0;
+    gGolfCamState->shot6C.bAD = 3;
+    gGolfCamState->shot6C.p44 = pView->script.pShot;
+    strcpy(gGolfCamState->shot12C.szName, szName);
+    Vec3Copy(gGolfCamState->shot6C.v20, gGolfCamState->shot12C.v20);
+    Vec3Copy(pTo, gGolfCamState->shot12C.v30);
+    gGolfCamState->shot12C.p40 = NULL;
+    gGolfCamState->shot12C.f60 = 0.0f;
+    gGolfCamState->shot12C.f64 = 0.0f;
+    gGolfCamState->shot12C.f70 = 0.0f;
+    gGolfCamState->shot12C.f74 = 0.0f;
+    gGolfCamState->shot12C.f68 = 0.2f;
+    gGolfCamState->shot12C.f6C = 20.0f;
     fChange = GameEffects_FieldOfViewChange();
     lbl_80281F78->f80
             = CA_fGetCameraFieldOfView(
                     Camera_GetLens(
                             ViewController_GetIndexedViewController(gPlayers[nPlayer].nView[0])->pCamera))
             - fChange;
-    lbl_80282220->shot12C.f78 = lbl_80281F78->f80;
-    lbl_80282220->shot12C.f7C = lbl_80282220->shot12C.f78;
-    lbl_80282220->shot12C.f80 = 0.0f;
-    lbl_80282220->shot12C.f4C = 0.1f;
-    lbl_80282220->shot12C.f9C = 0.0f;
-    lbl_80282220->shot12C.f84 = 0.0f;
-    lbl_80282220->shot12C.bA8 = 0;
-    lbl_80282220->shot12C.bAA = 1;
-    lbl_80282220->shot12C.bAC = 0x18;
-    lbl_80282220->shot12C.bB1 = 9;
-    lbl_80282220->shot12C.bB2 = 0;
-    lbl_80282220->shot12C.bAD = 3;
-    lbl_80282220->shot12C.p44 = pView->script.pShot;
+    gGolfCamState->shot12C.f78 = lbl_80281F78->f80;
+    gGolfCamState->shot12C.f7C = gGolfCamState->shot12C.f78;
+    gGolfCamState->shot12C.f80 = 0.0f;
+    gGolfCamState->shot12C.f4C = 0.1f;
+    gGolfCamState->shot12C.f9C = 0.0f;
+    gGolfCamState->shot12C.f84 = 0.0f;
+    gGolfCamState->shot12C.bA8 = 0;
+    gGolfCamState->shot12C.bAA = 1;
+    gGolfCamState->shot12C.bAC = 0x18;
+    gGolfCamState->shot12C.bB1 = 9;
+    gGolfCamState->shot12C.bB2 = 0;
+    gGolfCamState->shot12C.bAD = 3;
+    gGolfCamState->shot12C.p44 = pView->script.pShot;
     pTune = lbl_80281F78;
     fn_80038054(1, ViewController_GetCurrentViewControllerID(), pTune->f8C, pTune->f88);
-    pView->script.pShot = &lbl_80282220->shot6C;
-    pView->script.pNextShot = &lbl_80282220->shot12C;
+    pView->script.pShot = &gGolfCamState->shot6C;
+    pView->script.pNextShot = &gGolfCamState->shot12C;
     pView->script.f8C = lbl_80281F78->f84;
     pView->script.nBC = 1;
     pView->script.fCamTime = 0.0f;
@@ -3358,15 +3358,15 @@ f32 fn_800C5A70(View* pView, f32* pCam, f32* pSub, int nPlayer) {
         fn_80038054(1, ViewController_GetCurrentViewControllerID(), pTune->f8C, pTune->f88);
     }
     if (pView->script.pNextShot == NULL && pView->script.fCamTime > 0.05f) {
-        lbl_80282220->b58 = 0;
+        gGolfCamState->b58 = 0;
         SKATime_UnPause(gPlayers[nPlayer].pChar->anim);
         EVENT_Trigger(nPlayer, 0x3A, NULL, -1);
         EVENT_Trigger(nPlayer, 0x3B, NULL, 1);
         if (pView->script.pShot != NULL) {
-            lbl_80282220->shot6C.f78 = lbl_80281F78->f80;
-            lbl_80282220->shot6C.f7C = lbl_80281F78->f80;
-            lbl_80282220->shot12C.f78 = lbl_80281F78->f80;
-            lbl_80282220->shot12C.f7C = lbl_80281F78->f80;
+            gGolfCamState->shot6C.f78 = lbl_80281F78->f80;
+            gGolfCamState->shot6C.f7C = lbl_80281F78->f80;
+            gGolfCamState->shot12C.f78 = lbl_80281F78->f80;
+            gGolfCamState->shot12C.f7C = lbl_80281F78->f80;
         }
         // EA bug: the script's pShot was tested for NULL just above, but is read here without a test.
         pShot = pView->script.pShot->p44;
@@ -3388,15 +3388,15 @@ f32 fn_800C5A70(View* pView, f32* pCam, f32* pSub, int nPlayer) {
         t = pView->script.fCamTime / pView->script.f8C;
         t *= t;
         f = t * (lbl_80281F78->f80 - lbl_80281F78->f7C) + lbl_80281F78->f7C;
-        lbl_80282220->shot6C.f78 = f;
-        lbl_80282220->shot6C.f7C = f;
-        lbl_80282220->shot12C.f78 = f;
-        lbl_80282220->shot12C.f7C = f;
+        gGolfCamState->shot6C.f78 = f;
+        gGolfCamState->shot6C.f7C = f;
+        gGolfCamState->shot12C.f78 = f;
+        gGolfCamState->shot12C.f7C = f;
     } else if (pView->script.pShot != NULL) {
-        lbl_80282220->shot6C.f78 = lbl_80281F78->f80;
-        lbl_80282220->shot6C.f7C = lbl_80281F78->f80;
-        lbl_80282220->shot12C.f78 = lbl_80281F78->f80;
-        lbl_80282220->shot12C.f7C = lbl_80281F78->f80;
+        gGolfCamState->shot6C.f78 = lbl_80281F78->f80;
+        gGolfCamState->shot6C.f7C = lbl_80281F78->f80;
+        gGolfCamState->shot12C.f78 = lbl_80281F78->f80;
+        gGolfCamState->shot12C.f7C = lbl_80281F78->f80;
     }
     if (gSession.nPaused == 0) {
         fTime = FRAME_TIME;
@@ -3433,7 +3433,7 @@ void fn_800C5D64(View* pView, f32* pViewCam, f32* pViewSub, int nPlayer) {
             pView->script.f8C = 1.0f;
         }
         pView->script.f10C = 0.0f;
-        lbl_80282220->b59 = 1;
+        gGolfCamState->b59 = 1;
     } else {
         if (pView->script.n110 == 0) {
             pView->shot19C.p44 = pView->script.pShot;
@@ -3665,8 +3665,8 @@ void GolfCamera_ChooseSpecialSwing(View* pView, int nPlayer) {
     } else if (gPlayers[nPlayer].nShotKind != 1) {
         bSwingCam = 0;
     } else if (!CameraScript_IsDefaultSwingCam(pView->script.pShot, nPlayer, pCam) && Player_IsCPU(nPlayer)
-               && (lbl_80282220->n1EC[nPlayer] == 1 || lbl_80282220->n1EC[nPlayer] == 6
-                   || lbl_80282220->n1EC[nPlayer] == 10 || lbl_80282220->n1EC[nPlayer] == 11)) {
+               && (gGolfCamState->n1EC[nPlayer] == 1 || gGolfCamState->n1EC[nPlayer] == 6
+                   || gGolfCamState->n1EC[nPlayer] == 10 || gGolfCamState->n1EC[nPlayer] == 11)) {
         bSwingCam = 0;
     } else if (fPower >= lbl_80281F78->f9C) {
         bSwingCam = 1;
@@ -3676,38 +3676,38 @@ void GolfCamera_ChooseSpecialSwing(View* pView, int nPlayer) {
             pView->n260 = 11;
         } else if (fPower > lbl_80281F78->fA4) {
             if ((f32)(s32)(Misc_RandFunc(1) % 100) < lbl_80281F78->fB0) {
-                pView->n260 = lbl_80282220->n1EC[nPlayer];
-                lbl_80282220->n1EC[nPlayer]++;
-                if (lbl_80282220->n1EC[nPlayer] >= 12) {
-                    lbl_80282220->n1EC[nPlayer] = 1;
+                pView->n260 = gGolfCamState->n1EC[nPlayer];
+                gGolfCamState->n1EC[nPlayer]++;
+                if (gGolfCamState->n1EC[nPlayer] >= 12) {
+                    gGolfCamState->n1EC[nPlayer] = 1;
                 }
             }
         } else if (fPower > lbl_80281F78->fA0) {
             if ((f32)(s32)(Misc_RandFunc(1) % 100) < lbl_80281F78->fAC) {
-                pView->n260 = lbl_80282220->n1EC[nPlayer];
-                lbl_80282220->n1EC[nPlayer]++;
-                if (lbl_80282220->n1EC[nPlayer] >= 12) {
-                    lbl_80282220->n1EC[nPlayer] = 1;
+                pView->n260 = gGolfCamState->n1EC[nPlayer];
+                gGolfCamState->n1EC[nPlayer]++;
+                if (gGolfCamState->n1EC[nPlayer] >= 12) {
+                    gGolfCamState->n1EC[nPlayer] = 1;
                 }
             }
         } else if (fPower > lbl_80281F78->f9C) {
             if ((f32)(s32)(Misc_RandFunc(1) % 100) < lbl_80281F78->fA8) {
-                pView->n260 = lbl_80282220->n1EC[nPlayer];
-                lbl_80282220->n1EC[nPlayer]++;
-                if (lbl_80282220->n1EC[nPlayer] >= 12) {
-                    lbl_80282220->n1EC[nPlayer] = 1;
+                pView->n260 = gGolfCamState->n1EC[nPlayer];
+                gGolfCamState->n1EC[nPlayer]++;
+                if (gGolfCamState->n1EC[nPlayer] >= 12) {
+                    gGolfCamState->n1EC[nPlayer] = 1;
                 }
             }
         }
         if (pView->n260 == 11 && (gPlayers[nPlayer].ball.nLie != 0 || !(u8)bShortClub)) {
             pView->n260 = 1;
-            lbl_80282220->n1EC[nPlayer] = 2;
+            gGolfCamState->n1EC[nPlayer] = 2;
         }
         if (fn_8006BEA4() && Misc_RandFunc(1) % 100 > 50) {
             pView->n260 = 7;
-            lbl_80282220->n1EC[nPlayer] = 8;
-            if (lbl_80282220->n1EC[nPlayer] >= 12) {
-                lbl_80282220->n1EC[nPlayer] = 1;
+            gGolfCamState->n1EC[nPlayer] = 8;
+            if (gGolfCamState->n1EC[nPlayer] >= 12) {
+                gGolfCamState->n1EC[nPlayer] = 1;
             }
         }
         if (pView->n260 != 0) {
@@ -3772,8 +3772,8 @@ f32 GolfCamera_ReplaySwingSpeed(View* pView) {
     case 9:
         return 1.0f;
     case 7:
-        if (lbl_80282220->b5A) {
-            return lbl_80282220->f64;
+        if (gGolfCamState->b5A) {
+            return gGolfCamState->f64;
         }
         return 1.0f;
     case 3:     // the default, but listed in the original (its own entry in the jump table)
@@ -3788,76 +3788,76 @@ void fn_800C6C8C(void) {
 }
 
 u8 fn_800C6CB0(void) {
-    if (lbl_80282220 == NULL) {
+    if (gGolfCamState == NULL) {
         return 0;
     }
-    return lbl_80282220->b56;
+    return gGolfCamState->b56;
 }
 
 u8 fn_800C6CCC(void) {
     int bOn;
-    if (lbl_80282220 == NULL) {
+    if (gGolfCamState == NULL) {
         return 0;
     }
     bOn = 0;
-    if (lbl_80282220->b56 && fn_800B4908()) {
+    if (gGolfCamState->b56 && fn_800B4908()) {
         bOn = 1;
     }
     return bOn;
 }
 
 u8 fn_800C6D28(void) {
-    if (lbl_80282220 == NULL) {
+    if (gGolfCamState == NULL) {
         return 0;
     }
-    return lbl_80282220->b54 || lbl_80282220->b55;
+    return gGolfCamState->b54 || gGolfCamState->b55;
 }
 
 u8 GolfCamera_IsSuperZoomCamActive(void) {
-    if (lbl_80282220 == NULL) {
+    if (gGolfCamState == NULL) {
         return 0;
     }
-    return lbl_80282220->b58;
+    return gGolfCamState->b58;
 }
 
 u8 GolfCamera_IsSlowMoSwingCamActive(void) {
-    if (lbl_80282220 == NULL) {
+    if (gGolfCamState == NULL) {
         return 0;
     }
-    return lbl_80282220->b59;
+    return gGolfCamState->b59;
 }
 
 u8 GolfCamera_IsFreezeTimeActive(void) {
-    if (lbl_80282220 == NULL) {
+    if (gGolfCamState == NULL) {
         return 0;
     }
-    if (lbl_80282220->b54 || lbl_80282220->b58 || lbl_80282220->b55) {
+    if (gGolfCamState->b54 || gGolfCamState->b58 || gGolfCamState->b55) {
         return 1;
     }
     return 0;
 }
 
 void fn_800C6DE4(void) {
-    if (lbl_80282220 != NULL) {
-        lbl_80282220->b54 = 0;
+    if (gGolfCamState != NULL) {
+        gGolfCamState->b54 = 0;
     }
 }
 
 void fn_800C6DFC(void) {
-    if (lbl_80282220 != NULL) {
-        lbl_80282220->b58 = 0;
+    if (gGolfCamState != NULL) {
+        gGolfCamState->b58 = 0;
     }
 }
 
 void fn_800C6E14(void) {
-    if (lbl_80282220 != NULL) {
-        lbl_80282220->b59 = 0;
+    if (gGolfCamState != NULL) {
+        gGolfCamState->b59 = 0;
     }
 }
 
 void fn_800C6E2C(void) {
-    if (lbl_80282220 != NULL) {
-        lbl_80282220->b5A = 0;
+    if (gGolfCamState != NULL) {
+        gGolfCamState->b5A = 0;
     }
 }
 
@@ -3945,11 +3945,11 @@ int fn_800C7138(View* pView) {
 }
 
 void GolfCamera_SetCameraMatrixMode(int a) {
-    lbl_80282220->b55 = a;
+    gGolfCamState->b55 = a;
 }
 
 u8 GolfCamera_IsScriptMatrixModeOn(void) {
-    return lbl_80282220->b55;
+    return gGolfCamState->b55;
 }
 
 void GolfCamera_SetPostShowPostShotAnimations(View* pView, int a) {
@@ -4011,15 +4011,15 @@ u8 fn_800C72DC(View* pView) {
 }
 
 void fn_800C72F0(void) {
-    if (lbl_80282220 != NULL) {
-        lbl_80282220->b54 = 0;
-        lbl_80282220->b55 = 0;
-        lbl_80282220->b56 = 0;
-        lbl_80282220->b57 = 0;
-        lbl_80282220->b58 = 0;
-        lbl_80282220->b59 = 0;
-        lbl_80282220->b5A = 0;
-        lbl_80282220->b5B = 0;
+    if (gGolfCamState != NULL) {
+        gGolfCamState->b54 = 0;
+        gGolfCamState->b55 = 0;
+        gGolfCamState->b56 = 0;
+        gGolfCamState->b57 = 0;
+        gGolfCamState->b58 = 0;
+        gGolfCamState->b59 = 0;
+        gGolfCamState->b5A = 0;
+        gGolfCamState->b5B = 0;
     }
 }
 
