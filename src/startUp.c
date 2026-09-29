@@ -1,7 +1,7 @@
 // startUp.c (EA's name, from its asserts; also in EA's 2002 source tree): the boot-time systems.
 // The sound voices (gpHwVoices: 50 wrappers around the hardware's voices, run from the mixer
 // callback HwVoice_MixerCallback), the audio-RAM heap and its DMA, the two built-in sounds, the boot-time
-// memory-card checks and the start-up UI commands (gStartUpUICommands), and the 'LEGL' stream (two
+// memory-card checks and the start-up UI commands (gStartupMessageHandlers), and the 'LEGL' stream (two
 // pictures; uiProcessPolygon.c shows the first at boot). It also holds a length estimate without a
 // square root (for AudTable.c) and the ball-against-object test (for Ball.c). The sound code
 // talks to the GameCube's audio libraries; see core/startup.h.
@@ -119,27 +119,27 @@ BootSound gBootSounds[2] = {
       0x37, 0, 0, 0}},
 };
 
-s32 gBootCardSlot = -1;          // } the slot and port the status reports reached; -1 to start
-s32 gBootCardPort = -1;          // } again
-u8  gbBootCardLoad = 1;           // cleared by Startup_SkipCardLoad, set by Startup_ReadCardStatus, tested by Startup_LoadFromCard
+s32 gStartupCardSlot = -1;          // } the slot and port the status reports reached; -1 to start
+s32 gStartupCardPort = -1;          // } again
+u8  gbStartupCardLoad = 1;           // cleared by Startup_SkipCardLoad, set by Startup_ReadCardStatus, tested by Startup_LoadFromCard
 
 // The rest is defined last-address-first: the compiler lays an object's uninitialised data out in
 // reverse.
 
-// The memory-card status table: for each port, gBootCardSlotsPerPort[port] slots (always 1), each with the
-// status Startup_ReadCardStatus read (gBootCardStatus), the status last reported
-// (gBootCardReportedStatus) and whether it has been reported (gbBootCardReported).
-s32    gBootCardStatus[MC_NUM_PORTS][MC_NUM_SLOTS];
-s32    gBootCardReportedStatus[MC_NUM_PORTS][MC_NUM_SLOTS];
-s32    gbBootCardReported[MC_NUM_PORTS][MC_NUM_SLOTS];
-s32    gBootCardSlotsPerPort[MC_NUM_PORTS];
+// The memory-card status table: for each port, gStartupCardSlotsPerPort[port] slots (always 1), each with the
+// status Startup_ReadCardStatus read (gStartupCardStatus), the status last reported
+// (gStartupCardReportedStatus) and whether it has been reported (gbStartupCardReported).
+s32    gStartupCardStatus[MC_NUM_PORTS][MC_NUM_SLOTS];
+s32    gStartupCardReportedStatus[MC_NUM_PORTS][MC_NUM_SLOTS];
+s32    gbStartupCardReported[MC_NUM_PORTS][MC_NUM_SLOTS];
+s32    gStartupCardSlotsPerPort[MC_NUM_PORTS];
 
-void*  gpStartUpPicture;            // the first 'LEGL' object's copy (Startup_LoadLegalPicture keeps two)
-void*  gpStartUpPicture2;            // the second one's
-u32    gStartUpPictureSize;            // the first one's size
-u32    gStartUpPicture2Size;            // the second one's
-s32    gnStartUpPictures;            // how many it has kept
-u8     gbBootCardUserLoaded;            // Startup_LoadFromCard keeps a memory-card result here
+void*  gpLegalPicture;            // the first 'LEGL' object's copy (Startup_LoadLegalPicture keeps two)
+void*  gpLegalPicture2;            // the second one's
+u32    gLegalPictureSize;            // the first one's size
+u32    gLegalPicture2Size;            // the second one's
+s32    gnLegalPictures;            // how many it has kept
+u8     gbStartupCardUserLoaded;            // Startup_LoadFromCard keeps a memory-card result here
 // fake match: lbl_8028211C, lbl_80282114 and lbl_802820EC are never used by the game's code, but
 // the original's data has a word at each of these addresses (likely the globals of functions the
 // linker stripped); kept through the dead-stripping so the rest lines up. Types unknown.
@@ -161,7 +161,7 @@ KEEP_UNUSED u32 lbl_802820EC;
 
 Voice* gpHwVoices;            // the voices, NUM_VOICES of them
 
-MsgHandler gStartUpUICommands[30];
+MsgHandler gStartupMessageHandlers[30];
 
 // The mixer callback (registered by HwVoice_InitModule), run after every audio frame. For each
 // voice: ask for a lost hardware voice back after its wait; stop and reset a playing one whose
@@ -860,34 +860,34 @@ void BootSound_Play(u8 nSound) {
 }
 
 // Start-up message 19's work: skip the boot-time load (Startup_LoadFromCard then only sends hint
-// 0x86) until the next card check (Startup_ReadCardStatus) sets gbBootCardLoad again.
+// 0x86) until the next card check (Startup_ReadCardStatus) sets gbStartupCardLoad again.
 void Startup_SkipCardLoad(void) {
-    gbBootCardLoad = 0;
+    gbStartupCardLoad = 0;
 }
 
 // Start-up message 6's work, the boot-time load: when Startup_SkipCardLoad has cleared
-// gbBootCardLoad, only send hint 0x86 (the one MC_LoadOptionsFromFirstCardFound sends when it finds
+// gbStartupCardLoad, only send hint 0x86 (the one MC_LoadOptionsFromFirstCardFound sends when it finds
 // no save); else load the options from the first card with a good save, then the last user
-// (MC_LoadInitialUser; its answer goes to gbBootCardUserLoaded, which nothing reads).
+// (MC_LoadInitialUser; its answer goes to gbStartupCardUserLoaded, which nothing reads).
 void Startup_LoadFromCard(void) {
     MsgArg arg;
-    if (!gbBootCardLoad) {
+    if (!gbStartupCardLoad) {
         Mem_set(&arg, 0, sizeof(arg));
         UISDoHint(gpFrontEnd->pHandler, 0x86, 1, (s32*)&arg);
         return;
     }
     MC_Connect();
     MC_LoadOptionsFromFirstCardFound();
-    gbBootCardUserLoaded = MC_LoadInitialUser();
+    gbStartupCardUserLoaded = MC_LoadInitialUser();
     MC_Disconnect();
 }
 
-// The status of the card in nPort, nSlot for the status table (gBootCardStatus): 0 no card, 7 not a
+// The status of the card in nPort, nSlot for the status table (gStartupCardStatus): 0 no card, 7 not a
 // memory card, 6 a sector size other than 0x2000, 8 an I/O error, 9 broken, 1 unformatted or with
 // an encoding error, 10 its save file is damaged (fn_8009EE28 answers MC_ERR_BADDATA), 3 when it
 // has the free blocks and directory entries a save needs (the game's save and the EA Sports Bio:
 // save kinds 0 and 3, and the new files fn_8009D3DC and fn_8009D50C count), else 2. Also sets
-// gbBootCardLoad (the boot-time load goes ahead).
+// gbStartupCardLoad (the boot-time load goes ahead).
 s32 Startup_ReadCardStatus(int nPort, int nSlot) {
     MCCardState card;
     CardPos pos;
@@ -895,7 +895,7 @@ s32 Startup_ReadCardStatus(int nPort, int nSlot) {
     s32 nBlocks;
     s32 nBlocks3;
     s32 nFiles;
-    gbBootCardLoad = 1;
+    gbStartupCardLoad = 1;
     MC_GetMC(&card, nPort, nSlot);
     if (card.uFlags & MC_CARD_PRESENT) {
         if (card.uFlags & MC_CARD_WRONGDEVICE) {
@@ -935,7 +935,7 @@ s32 Startup_ReadCardStatus(int nPort, int nSlot) {
 
 // Start-up message 1's work: check both cards from scratch, every status marked not yet reported
 // (the multitap test gives a port one slot either way), and send the front end the hint for the
-// first card that needs one, keeping its port and slot in gBootCardPort and gBootCardSlot: status 1
+// first card that needs one, keeping its port and slot in gStartupCardPort and gStartupCardSlot: status 1
 // hint 0x83, 2 0x82, 6 0x87, 7 0x88, 8 0x89, 9 0x8A, 10 and 11 0x8C. Status 0 is passed over (its
 // hint 0x8B is never sent: see the EA bug below). Any other status (3: a card ready for the save)
 // ends the search with hint 0x80; when no card stops it, hint 0x81, and the port and slot go back
@@ -946,82 +946,82 @@ void Startup_CheckCards(void) {
     int n;
     u8 bFound;
     MC_Connect();
-    gBootCardSlot = -1;
-    gBootCardPort = -1;
+    gStartupCardSlot = -1;
+    gStartupCardPort = -1;
     for (i = 0; i < MC_NUM_PORTS; i++) {
-        gbBootCardReported[i][0] = 0;
+        gbStartupCardReported[i][0] = 0;
         if (MC_IsMultitapPluggedIn(i)) {
-            gBootCardSlotsPerPort[i] = n = 1;
+            gStartupCardSlotsPerPort[i] = n = 1;
         } else {
-            gBootCardSlotsPerPort[i] = n = 1;
+            gStartupCardSlotsPerPort[i] = n = 1;
         }
         for (j = 0; j < n; j++) {
-            gBootCardStatus[i][j] = 0;
+            gStartupCardStatus[i][j] = 0;
         }
         for (j = 0; j < n; j++) {
-            gBootCardStatus[i][j] = Startup_ReadCardStatus(i, j);
-            gBootCardReportedStatus[i][j] = gBootCardStatus[i][j];
+            gStartupCardStatus[i][j] = Startup_ReadCardStatus(i, j);
+            gStartupCardReportedStatus[i][j] = gStartupCardStatus[i][j];
         }
     }
     bFound = 0;
     for (i = 0; i < MC_NUM_PORTS; i++) {
         for (j = 0; j < MC_NUM_SLOTS; j++) {
-            switch (gBootCardStatus[i][j]) {
+            switch (gStartupCardStatus[i][j]) {
             case 0:
                 // port 1's status 0 is reported only when port 0's is not 0
-                if (i == 1 && gBootCardStatus[0][0] != 0) {
-                    gBootCardSlot = j;
-                    gBootCardPort = i;
+                if (i == 1 && gStartupCardStatus[0][0] != 0) {
+                    gStartupCardSlot = j;
+                    gStartupCardPort = i;
                     Startup_SendSlotBEmptyMsg();
                     MC_Disconnect();
                     return;
                 }
                 break;
             case 1:
-                gBootCardSlot = j;
-                gBootCardPort = i;
+                gStartupCardSlot = j;
+                gStartupCardPort = i;
                 Startup_HintCardUnformatted();
                 MC_Disconnect();
                 return;
             case 10:
-                gBootCardSlot = j;
-                gBootCardPort = i;
+                gStartupCardSlot = j;
+                gStartupCardPort = i;
                 Startup_SendSaveDamagedMsg();
                 MC_Disconnect();
                 return;
             case 6:
-                gBootCardSlot = j;
-                gBootCardPort = i;
+                gStartupCardSlot = j;
+                gStartupCardPort = i;
                 Startup_HintCardWrongSectorSize();
                 MC_Disconnect();
                 return;
             case 7:
-                gBootCardSlot = j;
-                gBootCardPort = i;
+                gStartupCardSlot = j;
+                gStartupCardPort = i;
                 Startup_HintCardNotMemoryCard();
                 MC_Disconnect();
                 return;
             case 8:
-                gBootCardSlot = j;
-                gBootCardPort = i;
+                gStartupCardSlot = j;
+                gStartupCardPort = i;
                 Startup_HintCardIoError();
                 MC_Disconnect();
                 return;
             case 9:
-                gBootCardSlot = j;
-                gBootCardPort = i;
+                gStartupCardSlot = j;
+                gStartupCardPort = i;
                 Startup_HintCardBroken();
                 MC_Disconnect();
                 return;
             case 11:
-                gBootCardSlot = j;
-                gBootCardPort = i;
+                gStartupCardSlot = j;
+                gStartupCardPort = i;
                 Startup_HintCardStatus11();
                 MC_Disconnect();
                 return;
             case 2:
-                gBootCardSlot = j;
-                gBootCardPort = i;
+                gStartupCardSlot = j;
+                gStartupCardPort = i;
                 Startup_SendCardFullMsg();
                 MC_Disconnect();
                 return;
@@ -1037,13 +1037,13 @@ void Startup_CheckCards(void) {
     }
 done:
     MC_Disconnect();
-    gBootCardSlot = j;
-    gBootCardPort = i;
+    gStartupCardSlot = j;
+    gStartupCardPort = i;
     if (bFound) {
         Startup_SendCardReadyMsg();
     } else {
-        gBootCardSlot = -1;
-        gBootCardPort = -1;
+        gStartupCardSlot = -1;
+        gStartupCardPort = -1;
         Startup_SendNoCardsMsg();
     }
 }
@@ -1150,17 +1150,17 @@ void Startup_UpdateCardStatuses(void) {
         } else {
             n = 1;
         }
-        if (gBootCardSlotsPerPort[i] != n) {
-            gBootCardSlotsPerPort[i] = n;
-            gBootCardStatus[i][0] = 0;
-            gBootCardReportedStatus[i][0] = 0;
-            gbBootCardReported[i][0] = 0;
+        if (gStartupCardSlotsPerPort[i] != n) {
+            gStartupCardSlotsPerPort[i] = n;
+            gStartupCardStatus[i][0] = 0;
+            gStartupCardReportedStatus[i][0] = 0;
+            gbStartupCardReported[i][0] = 0;
         }
         for (j = 0; j < n; j++) {
-            gBootCardStatus[i][j] = Startup_ReadCardStatus(i, j);
-            if (gBootCardReportedStatus[i][j] != gBootCardStatus[i][j]) {
-                gBootCardReportedStatus[i][j] = gBootCardStatus[i][j];
-                gbBootCardReported[i][j] = 0;
+            gStartupCardStatus[i][j] = Startup_ReadCardStatus(i, j);
+            if (gStartupCardReportedStatus[i][j] != gStartupCardStatus[i][j]) {
+                gStartupCardReportedStatus[i][j] = gStartupCardStatus[i][j];
+                gbStartupCardReported[i][j] = 0;
             }
         }
     }
@@ -1178,30 +1178,30 @@ u8 Startup_AreAllSlotsEmpty(void) {
             n = 1;
         }
         for (j = 0; j < n; j++) {
-            if (gBootCardStatus[i][j] != 0) return 0;
+            if (gStartupCardStatus[i][j] != 0) return 0;
         }
     }
     return 1;
 }
 
-// Re-read the statuses, then report again the card the reports reached (port gBootCardPort, slot
-// gBootCardSlot): mark it reported, answer its port and slot (the slot from 0) and return its
+// Re-read the statuses, then report again the card the reports reached (port gStartupCardPort, slot
+// gStartupCardSlot): mark it reported, answer its port and slot (the slot from 0) and return its
 // status. 5 when every status is 0; when no card has been reported yet, Startup_GetNextCardStatus's
 // answer. Start-up command 9. (The EA bug in its last test is labelled where it happens.)
 s32 Startup_GetCurrentCardStatus(s32* pnPort, s32* pnSlot) {
     Startup_UpdateCardStatuses();
     if (Startup_AreAllSlotsEmpty()) return 5;
-    if (gBootCardPort == -1 || gBootCardSlot == -1) {
+    if (gStartupCardPort == -1 || gStartupCardSlot == -1) {
         return Startup_GetNextCardStatus(pnPort, pnSlot);
     }
-    gbBootCardReported[gBootCardPort][gBootCardSlot] = 1;
-    gBootCardReportedStatus[gBootCardPort][gBootCardSlot] = gBootCardStatus[gBootCardPort][gBootCardSlot];
-    *pnPort = gBootCardPort;
-    *pnSlot = gBootCardSlot;
+    gbStartupCardReported[gStartupCardPort][gStartupCardSlot] = 1;
+    gStartupCardReportedStatus[gStartupCardPort][gStartupCardSlot] = gStartupCardStatus[gStartupCardPort][gStartupCardSlot];
+    *pnPort = gStartupCardPort;
+    *pnSlot = gStartupCardSlot;
     // EA bug: the port is used for both indexes; for port 1 this reads past the table (the word
     // after it, lbl_80282158).
-    if (gBootCardStatus[gBootCardPort][gBootCardPort] == 0 && Startup_AreAllSlotsEmpty()) return 5;
-    return gBootCardStatus[gBootCardPort][gBootCardSlot];
+    if (gStartupCardStatus[gStartupCardPort][gStartupCardPort] == 0 && Startup_AreAllSlotsEmpty()) return 5;
+    return gStartupCardStatus[gStartupCardPort][gStartupCardSlot];
 }
 
 // Re-read the statuses, then report the first card not yet reported: mark it reported, note it as
@@ -1216,29 +1216,29 @@ s32 Startup_GetNextCardStatus(s32* pnPort, s32* pnSlot) {
     Startup_UpdateCardStatuses();
     if (Startup_AreAllSlotsEmpty()) return 5;
     for (i = 0; i < MC_NUM_PORTS; i++) {
-        n = gBootCardSlotsPerPort[i];
+        n = gStartupCardSlotsPerPort[i];
         for (j = 0; j < n; j++) {
-            if (gbBootCardReported[i][j] == 0) {
-                gBootCardPort = i;
-                gBootCardSlot = j;
-                gbBootCardReported[i][j] = 1;
-                gBootCardReportedStatus[i][j] = gBootCardStatus[i][j];
+            if (gbStartupCardReported[i][j] == 0) {
+                gStartupCardPort = i;
+                gStartupCardSlot = j;
+                gbStartupCardReported[i][j] = 1;
+                gStartupCardReportedStatus[i][j] = gStartupCardStatus[i][j];
                 *pnPort = i;
                 *pnSlot = j;
                 if (n > 1) {
                     (*pnSlot)++;
                 }
-                return gBootCardStatus[i][j];
+                return gStartupCardStatus[i][j];
             }
         }
     }
-    gBootCardSlot = -1;
-    gBootCardPort = -1;
+    gStartupCardSlot = -1;
+    gStartupCardPort = -1;
     return 4;
 }
 
-// Continue the card search: find the next port and slot after the one found last (gBootCardPort,
-// gBootCardSlot) whose status is not 0, note it, and answer its port and slot (the slot counts from
+// Continue the card search: find the next port and slot after the one found last (gStartupCardPort,
+// gStartupCardSlot) whose status is not 0, note it, and answer its port and slot (the slot counts from
 // 1 here). Returns whether there is one. It also sets every port's slot count to 1 again. Start-up
 // command 3.
 int Startup_FindNextCardWithStatus(s32* pnPort, s32* pnSlot) {
@@ -1247,20 +1247,20 @@ int Startup_FindNextCardWithStatus(s32* pnPort, s32* pnSlot) {
     s32 n;
     for (i = 0; i < MC_NUM_PORTS; i++) {
         if (MC_IsMultitapPluggedIn(i)) {
-            gBootCardSlotsPerPort[i] = n = 1;
+            gStartupCardSlotsPerPort[i] = n = 1;
         } else {
-            gBootCardSlotsPerPort[i] = n = 1;
+            gStartupCardSlotsPerPort[i] = n = 1;
         }
         for (j = 0; j < n; j++) {
-            if (gBootCardStatus[i][j] != 0 &&
-                (i > gBootCardPort || (i == gBootCardPort && j > gBootCardSlot))) {
+            if (gStartupCardStatus[i][j] != 0 &&
+                (i > gStartupCardPort || (i == gStartupCardPort && j > gStartupCardSlot))) {
                 *pnPort = i;
                 *pnSlot = j;
                 if (n == 1) {
                     (*pnSlot)++;
                 }
-                gBootCardPort = i;
-                gBootCardSlot = j;
+                gStartupCardPort = i;
+                gStartupCardSlot = j;
                 return 1;
             }
         }
@@ -1272,8 +1272,8 @@ int Startup_FindNextCardWithStatus(s32* pnPort, s32* pnSlot) {
 // (Startup_FindNextCardWithStatus, which continues it). Returns whether there is one. Start-up
 // command 2.
 int Startup_FindFirstCardWithStatus(s32* pnPort, s32* pnSlot) {
-    gBootCardSlot = -1;
-    gBootCardPort = -1;
+    gStartupCardSlot = -1;
+    gStartupCardPort = -1;
     return Startup_FindNextCardWithStatus(pnPort, pnSlot);
 }
 
@@ -1309,7 +1309,7 @@ void Startup_Update(void) {
 // Register the stream handler for the 'LEGL' (legal screen) pictures, Startup_LoadLegalPicture, and
 // start its count again.
 void startup_RegisterStreamClients(void) {
-    gnStartUpPictures = 0;
+    gnLegalPictures = 0;
     Stream_RegisterLoadChunkCallback('LEGL', Startup_LoadLegalPicture);
 }
 
@@ -1323,16 +1323,16 @@ void startup_UnregisterStreamClients(void) {
 // gets 128 more).
 void Startup_LoadLegalPicture(UStreamObject* pObject) {
     s32 nPad = 128 - (s32)pObject->uSize % 128;
-    if (gnStartUpPictures == 0) {
-        gStartUpPictureSize = pObject->uSize + nPad;
-        gpStartUpPicture = StaticMem_Alloc(gStartUpPictureSize, 2, 16, "startUp.c", 882);
-        Mem_cpy(gpStartUpPicture, pObject->pData, gStartUpPictureSize);
-        gnStartUpPictures++;
-    } else if (gnStartUpPictures == 1) {
-        gStartUpPicture2Size = pObject->uSize + nPad;
-        gpStartUpPicture2 = StaticMem_Alloc(gStartUpPicture2Size, 2, 16, "startUp.c", 891);
-        Mem_cpy(gpStartUpPicture2, pObject->pData, gStartUpPicture2Size);
-        gnStartUpPictures++;
+    if (gnLegalPictures == 0) {
+        gLegalPictureSize = pObject->uSize + nPad;
+        gpLegalPicture = StaticMem_Alloc(gLegalPictureSize, 2, 16, "startUp.c", 882);
+        Mem_cpy(gpLegalPicture, pObject->pData, gLegalPictureSize);
+        gnLegalPictures++;
+    } else if (gnLegalPictures == 1) {
+        gLegalPicture2Size = pObject->uSize + nPad;
+        gpLegalPicture2 = StaticMem_Alloc(gLegalPicture2Size, 2, 16, "startUp.c", 891);
+        Mem_cpy(gpLegalPicture2, pObject->pData, gLegalPicture2Size);
+        gnLegalPictures++;
     }
     StaticMem_Free(pObject);
 }
@@ -1348,27 +1348,27 @@ void Startup_LoadOptionsFromCard(void) {
     int n;
     u8 bFound;
     MC_Connect();
-    gBootCardSlot = -1;
-    gBootCardPort = -1;
+    gStartupCardSlot = -1;
+    gStartupCardPort = -1;
     for (i = 0; i < MC_NUM_PORTS; i++) {
-        gbBootCardReported[i][0] = 0;
+        gbStartupCardReported[i][0] = 0;
         if (MC_IsMultitapPluggedIn(i)) {
-            gBootCardSlotsPerPort[i] = n = 1;
+            gStartupCardSlotsPerPort[i] = n = 1;
         } else {
-            gBootCardSlotsPerPort[i] = n = 1;
+            gStartupCardSlotsPerPort[i] = n = 1;
         }
         for (j = 0; j < n; j++) {
-            gBootCardStatus[i][j] = 0;
+            gStartupCardStatus[i][j] = 0;
         }
         for (j = 0; j < n; j++) {
-            gBootCardStatus[i][j] = Startup_ReadCardStatus(i, j);
-            gBootCardReportedStatus[i][j] = gBootCardStatus[i][j];
+            gStartupCardStatus[i][j] = Startup_ReadCardStatus(i, j);
+            gStartupCardReportedStatus[i][j] = gStartupCardStatus[i][j];
         }
     }
     bFound = 0;
     for (i = 0; i < MC_NUM_PORTS; i++) {
         for (j = 0; j < MC_NUM_SLOTS; j++) {
-            switch (gBootCardStatus[i][j]) {
+            switch (gStartupCardStatus[i][j]) {
             case 0:
             case 1:
             case 2:
@@ -1378,8 +1378,8 @@ void Startup_LoadOptionsFromCard(void) {
             case 9:
             case 10:
             case 11:
-                gBootCardSlot = j;
-                gBootCardPort = i;
+                gStartupCardSlot = j;
+                gStartupCardPort = i;
                 fn_80110458(0);
                 MC_Disconnect();
                 break;
@@ -1393,8 +1393,8 @@ void Startup_LoadOptionsFromCard(void) {
     }
 done:
     MC_Disconnect();
-    gBootCardSlot = j;
-    gBootCardPort = i;
+    gStartupCardSlot = j;
+    gStartupCardPort = i;
     if (bFound) {
         MC_Connect();
         if (MC_LoadOptionsFromFirstCardFound() == 0) {
@@ -1404,8 +1404,8 @@ done:
         }
         MC_Disconnect();
     } else {
-        gBootCardSlot = -1;
-        gBootCardPort = -1;
+        gStartupCardSlot = -1;
+        gStartupCardPort = -1;
     }
 }
 
@@ -1585,38 +1585,38 @@ void Startup_Vec3Sub(f32* pA, f32* pB, f32* pOut) {
 
 // The UI commands while the session's game type is 1 (start-up): run command nCmd's handler.
 void Startup_RunGameMessage(int nCmd, MsgArg* pArgs, MsgArg* pResult) {
-    gStartUpUICommands[nCmd](pArgs, pResult);
+    gStartupMessageHandlers[nCmd](pArgs, pResult);
 }
 
-// Fill in the start-up UI command table (gStartUpUICommands): commands 0..22, command 4 left empty
+// Fill in the start-up UI command table (gStartupMessageHandlers): commands 0..22, command 4 left empty
 // (NULL). Called once when start-up begins (gomainloop.c fn_8006CEFC).
 void Startup_InitGameMessages(void) {
     int i;
     for (i = 0; i < 23; i++) {
-        gStartUpUICommands[i] = NULL;
+        gStartupMessageHandlers[i] = NULL;
     }
-    gStartUpUICommands[0] = GM_vStartupGetBlocksNeeded;
-    gStartUpUICommands[1] = GM_vStartupCheckCards;
-    gStartUpUICommands[2] = GM_vStartupFindFirstCard;
-    gStartUpUICommands[3] = GM_vStartupFindNextCard;
-    gStartUpUICommands[5] = GM_vStartupFadeToBlack;
-    gStartUpUICommands[6] = GM_vStartupLoadFromCard;
-    gStartUpUICommands[7] = GM_vStartupFormatCard;
-    gStartUpUICommands[8] = GM_vStartupGetNextCardStatus;
-    gStartUpUICommands[9] = GM_vStartupGetCurrentCardStatus;
-    gStartUpUICommands[10] = GM_vStartupPlaySound;
-    gStartUpUICommands[11] = GM_vStartupMessage11_Return0;
-    gStartUpUICommands[12] = GM_vStartupMessage12_Empty;
-    gStartUpUICommands[13] = GM_vStartupMessage13_Empty;
-    gStartUpUICommands[14] = GM_vStartupMessage14_Return1;
-    gStartUpUICommands[15] = GM_vStartupGetFilesNeeded;
-    gStartUpUICommands[16] = GM_vStartupEndGameLoop;
-    gStartUpUICommands[17] = GM_vStartupDeleteSaveGame;
-    gStartUpUICommands[18] = GM_vStartupFormatHadIOError;
-    gStartUpUICommands[19] = GM_vStartupSkipCardLoad;
-    gStartUpUICommands[20] = GM_vStartupLoadOptionsCheckDisc;
-    gStartUpUICommands[21] = GM_vStartupChangeDisc;
-    gStartUpUICommands[22] = GM_vStartupGetDiscChangeStatus;
+    gStartupMessageHandlers[0] = GM_vStartupGetBlocksNeeded;
+    gStartupMessageHandlers[1] = GM_vStartupCheckCards;
+    gStartupMessageHandlers[2] = GM_vStartupFindFirstCard;
+    gStartupMessageHandlers[3] = GM_vStartupFindNextCard;
+    gStartupMessageHandlers[5] = GM_vStartupFadeToBlack;
+    gStartupMessageHandlers[6] = GM_vStartupLoadFromCard;
+    gStartupMessageHandlers[7] = GM_vStartupFormatCard;
+    gStartupMessageHandlers[8] = GM_vStartupGetNextCardStatus;
+    gStartupMessageHandlers[9] = GM_vStartupGetCurrentCardStatus;
+    gStartupMessageHandlers[10] = GM_vStartupPlaySound;
+    gStartupMessageHandlers[11] = GM_vStartupMessage11_Return0;
+    gStartupMessageHandlers[12] = GM_vStartupMessage12_Empty;
+    gStartupMessageHandlers[13] = GM_vStartupMessage13_Empty;
+    gStartupMessageHandlers[14] = GM_vStartupMessage14_Return1;
+    gStartupMessageHandlers[15] = GM_vStartupGetFilesNeeded;
+    gStartupMessageHandlers[16] = GM_vStartupEndGameLoop;
+    gStartupMessageHandlers[17] = GM_vStartupDeleteSaveGame;
+    gStartupMessageHandlers[18] = GM_vStartupFormatHadIOError;
+    gStartupMessageHandlers[19] = GM_vStartupSkipCardLoad;
+    gStartupMessageHandlers[20] = GM_vStartupLoadOptionsCheckDisc;
+    gStartupMessageHandlers[21] = GM_vStartupChangeDisc;
+    gStartupMessageHandlers[22] = GM_vStartupGetDiscChangeStatus;
 }
 
 // Command 0: the card space the game's save and the EA Sports Bio need (fn_8009D390) on the card at

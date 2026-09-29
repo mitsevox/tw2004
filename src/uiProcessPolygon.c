@@ -641,12 +641,12 @@ void UI_PlayStartUpMovies(void) {
         FE_MakeCameoMoviePath(szName, szPath);
         LLVideo_PlayFile(szPath, FE_IsMovieSkipPressed, 0, 0);
     }
-    pPict = fn_8002FD00(gpStartUpPicture, gStartUpPictureSize);
+    pPict = fn_8002FD00(gpLegalPicture, gLegalPictureSize);
     UI_ShowPictureFadingIn(pPict, 180, 1.0f / 30.0f);
     fn_80008380();
     fn_8002FE70(pPict);
-    StaticMem_Free(gpStartUpPicture);
-    gpStartUpPicture = NULL;
+    StaticMem_Free(gpLegalPicture);
+    gpLegalPicture = NULL;
 }
 
 // Show pPict over the whole screen for nFrames frames, a frame each (with the audio stepped and the

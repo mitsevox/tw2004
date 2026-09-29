@@ -219,9 +219,9 @@ LAYOUT_ASSERT(CardPos, 0xC);
 
 // ---- the 'LEGL' pictures Startup_LoadLegalPicture keeps ----------------------------------------------------
 
-extern void* gpStartUpPicture;              // the first one's copy (uiProcessPolygon.c
+extern void* gpLegalPicture;              // the first one's copy (uiProcessPolygon.c
                                         // UI_PlayStartUpMovies shows and frees it)
-extern u32   gStartUpPictureSize;              // its size
+extern u32   gLegalPictureSize;              // its size
 
 // ---- the hardware voices, as the sound engine (hlaudvoice.c) uses them -----------------------------
 
