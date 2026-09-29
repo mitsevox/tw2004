@@ -104,7 +104,7 @@ typedef struct UObjMeshInfo {
     s16  n88;                   // 0x88  the type of the mesh's parts (LLObj_Gc.c fn_80007658)
     u8   unk8A[0x8B - 0x8A];
     u8   b8B;                   // 0x8B  bit 1: a terrain object drawn without z writes (GoTerrain.c
-                                //       fn_80035554, fn_80033308); passed on in UObjPartDesc.u0A
+                                //       fn_80035554, Ter_SetObjectRenderState); passed on in UObjPartDesc.u0A
     s16  n8C;                   // 0x8C  how many parts UObjMesh.p18 holds (fn_80007658)
     u16  u8E;                   // 0x8E  (fn_80007658)
 } UObjMeshInfo;
@@ -132,7 +132,7 @@ typedef struct UObjPartDesc {
 
 // One level of detail of a UObjModel. The terrain's hole data is a tree of them (GoTerrain.c,
 // Ter_GetMeshNext..fn_80035500): the root holds a mesh per patch in its p8[1], a patch's p8[0] is its
-// ground and its p8[1] holds its object lists, whose meshes are the objects' (fn_80034A20).
+// ground and its p8[1] holds its object lists, whose meshes are the objects' (Ter_GetObjectListModel).
 typedef struct UObjMesh {
     UObjMeshInfo* pInfo;        // 0x00
     u8   unk4[4];
@@ -145,7 +145,7 @@ typedef struct UObjMesh {
                                 //       ground's is its objects (Ter_PatchReference.pObjects)
     struct UObjMeshPart* p18;   // 0x18  Object_DrawMesh passes entry n28 to fn_800082CC
     u8   a1C[0x20 - 0x1C];      // 0x1C  nonzero: entry i of p18 is used
-    u32  n20;                   // 0x20  a word: GoTerrain.c fn_80032B7C draws a ground's extra meshes
+    u32  n20;                   // 0x20  a word: GoTerrain.c Ter_DrawPatchGround draws a ground's extra meshes
                                 //       only when it is not 0
     s32  n24;                   // 0x24  0 when built (LLObj_Gc.c fn_8000799C)
     s32  n28;                   // 0x28

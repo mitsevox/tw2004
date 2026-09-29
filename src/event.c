@@ -16,8 +16,8 @@
 u32 gEventIdleSeconds;                      // seconds counted by EVENT_Idle (event 26) this round
 
 void Character_InitNewClubAndShotType(int nPlayer);
-void fn_80033704(u16 nPatch, u16 nObject);
-void fn_8003349C(f32 fPercentage, f32 fDuration, f32 fDelay);
+void Ter_SetObjectHit(u16 nPatch, u16 nObject);
+void Ter_StartCrowdAnimation(f32 fPercentage, f32 fDuration, f32 fDelay);
 void Physics_SetSpin(Ball* pBall, f32 fX, f32 fY);
 void SW_vSetDisplayBoostUI(int nPlayer, int bDisplay);
 void SW_vGetCurrentSpin(int nPlayer, f32* pfSide, f32* pfForward);
@@ -548,17 +548,17 @@ void EVENT_PlayerEmotionUpdated(int nPlayer, int nEvent, void* pData, int nArg) 
         if (nA == 0) {
             switch (nB) {
             case 0:
-                fn_8003349C(0.3f, 3.0f, 0.0f);
+                Ter_StartCrowdAnimation(0.3f, 3.0f, 0.0f);
                 break;
             case 1:
-                fn_8003349C(0.5f, 6.0f, 0.0f);
+                Ter_StartCrowdAnimation(0.5f, 6.0f, 0.0f);
                 break;
             case 2:
-                fn_8003349C(0.8f, 8.0f, 0.0f);
+                Ter_StartCrowdAnimation(0.8f, 8.0f, 0.0f);
                 break;
             case 3:     // EA lists case 3 with the default (it sets CW's compare tree)
             default:
-                fn_8003349C(1.0f, 10.0f, 0.0f);
+                Ter_StartCrowdAnimation(1.0f, 10.0f, 0.0f);
                 break;
             }
         }
@@ -579,9 +579,9 @@ void EVENT_SpinWindowFinished(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
 // Event 44 (Swing.c: the backswing starts): the crowd stops animating and its objects go back to
-// rest (fn_800335F8).
+// rest (Ter_StopCrowdAnimation).
 void EVENT_BeganBackswing(int nPlayer, int nEvent, void* pData, int nArg) {
-    fn_800335F8(0);
+    Ter_StopCrowdAnimation(0);
 }
 
 // Event 46 (Swing.c: spin is added while the ball flies): Gaud_Spina, then the lessons are told
@@ -854,7 +854,7 @@ void EVENT_Trigger(int nPlayer, int nEvent, void* pData, int nArg) {
 // The landings, events 35..38 (EVENT_Collision the ground, EVENT_CollisionObject a course object,
 // EVENT_CollisionTree a tree, EVENT_CollisionPin the flagstick). For the real ball (nArg 1): camera
 // event 7 for the player's view, Gaud_BallBounce, the surface's collision effect (fn_800A3348),
-// emotion event 1; on an object that object's n1C (fn_80033704) and Player.bHitObject set; on the
+// emotion event 1; on an object that object's n1C (Ter_SetObjectHit) and Player.bHitObject set; on the
 // flagstick Player.bHitPin set and Gaud_BallHitPole; commentary situation event 27 for a tree, 16
 // for an object or a tree, 21 for the flagstick; then the game mode's landing hook
 // (gpGame->pfnBallCollision). For the AI's simulated ball, hitting an object aborts the simulation
@@ -866,7 +866,7 @@ void Collision(int nPlayer, int nEvent, void* pData, int nArg) {
         fn_800A3348(pData, nPlayer);
         fn_8006ACF8(nPlayer, 1);
         if (nEvent == 36 && gPlayers[nPlayer].ball.pHitObject != NULL) {
-            fn_80033704(gPlayers[nPlayer].ball.pHitObject->nPatch,
+            Ter_SetObjectHit(gPlayers[nPlayer].ball.pHitObject->nPatch,
                         gPlayers[nPlayer].ball.pHitObject->nObjList);
         }
         if (nEvent == 38) {

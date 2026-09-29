@@ -159,7 +159,7 @@ void REPLAY_Stop(void) {
 }
 
 // Puts back what REPLAY_Save saved before nPlayer's shot (the player whole, his save profile, the
-// record tables and the UI queues), then fn_800335F8(1).
+// record tables and the UI queues), then Ter_StopCrowdAnimation(1).
 void REPLAY_Restore(int nPlayer) {
     if (gReplayData.bF10) {
         Mem_cpy(&gPlayers[nPlayer], &gReplayData.player, sizeof(Player));
@@ -178,7 +178,7 @@ void REPLAY_Restore(int nPlayer) {
         lbl_8028228C = lbl_80281E48->aQueueCount[10];
         lbl_80282288 = lbl_80281E48->aQueueCount[11];
         gPlayers[nPlayer].swing.unk630 = 0;
-        fn_800335F8(1);
+        Ter_StopCrowdAnimation(1);
     }
 }
 

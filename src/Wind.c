@@ -12,7 +12,7 @@
 #include "engine.h"
 
 int    GameMode4_GetCurrentEvent(void);
-void   fn_800348DC(void);
+void   Ter_UpdateFlagForWind(void);
 
 f32 gWindDirs[8][4] = {                          // 0x80187EF8  unit vectors, 45 degrees apart
     {0.0f, 0.0f, 1.0f, 0.0f},
@@ -57,14 +57,14 @@ f32 Wind_GetPhysicsSpeed(void) {
 }
 
 // Sets the wind: direction nDir (0..7, gWindDirs) and speed fSpeed (0 or less is stored as 0.1),
-// then turns the course's flag to it (fn_800348DC).
+// then turns the course's flag to it (Ter_UpdateFlagForWind).
 void Wind_SetPhysicsWind(int nDir, f32 fSpeed) {
     gWindDir   = nDir;
     gWindSpeed = fSpeed;
     if (fSpeed <= 0.0f) {
         gWindSpeed = 0.1f;
     }
-    fn_800348DC();
+    Ter_UpdateFlagForWind();
 }
 
 // The hole's wind: the one authored in the course table; none when the wind is off; or, when the

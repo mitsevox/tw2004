@@ -61,7 +61,7 @@ void GolfCamera_ResetSpecialCameraStates();
 void fn_800C8134();
 void GM_InitForHole();
 s32 fn_80010608(s32);
-s32 fn_8003467C();
+s32 Ter_UnloadHole();
 s32 DynObj_DeInitForHole();
 s32 Kernel_RemoveAllObjects();
 void SW_vDeInitForHole(void);
@@ -114,7 +114,7 @@ void fn_8006F568(void) {
     AnimStream_WaitForRead();
     if ((u8) *lbl_802811E8 != 0) {
         fn_8011E3B4();
-        fn_8003467C();
+        Ter_UnloadHole();
         DynObj_DeInitForHole();
         StaticCam_Reset();
         fn_80098C28();

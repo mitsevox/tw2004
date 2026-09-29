@@ -92,10 +92,10 @@ void fn_8002F32C(s32 nSurface);
 void Pict_InitModule(void);
 void Pict_CloseModule(void);
 void Ter_vInitModule(void);
-void fn_800329CC(void);
-void fn_80032AEC(void);
-void fn_80033744(void);
-void fn_800349CC(int nView);
+void Ter_DrawPostDrawPatches(void);
+void Ter_DrawPostDrawObjects(void);
+void Ter_AnimateObjects(void);
+void Ter_DrawHoleView(int nView);
 void fn_800350B4(f32 f);
 void fn_800350D0(f32 f);
 void fn_800350EC(u8 r, u8 g, u8 b);
@@ -847,7 +847,7 @@ void fn_8006D27C(void) {
     }
     fn_80093AD4();
     Character_UpdateAll(gSession.fFrameTime);
-    fn_80033744();
+    Ter_AnimateObjects();
     DynObj_UpdateDynamicObjects();
     fn_80099344(gSession.fFrameTime);
     fn_800B2724();
@@ -863,7 +863,7 @@ void fn_8006D27C(void) {
             if (!gSession.nSplitScreen && !gSession.b11 && nView < 2) {
                 fn_8011E6E8();
             }
-            fn_800349CC(nView);
+            Ter_DrawHoleView(nView);
             if (nState != GS_GREEN_MORPH) {
                 fn_8009BE08(nView);
                 fn_8009C914(nView);
@@ -945,10 +945,10 @@ void fn_8006D27C(void) {
         }
         fn_80039358(nView);
         if (nView < 2) {
-            fn_800329CC();
+            Ter_DrawPostDrawPatches();
         }
         if (nView < 2) {
-            fn_80032AEC();
+            Ter_DrawPostDrawObjects();
         }
         fn_8006DF28();
         if (nView < 2) {

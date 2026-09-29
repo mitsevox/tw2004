@@ -53,7 +53,7 @@ typedef struct Ter_ObjectReference {
 } Ter_ObjectReference;
 LAYOUT_ASSERT(Ter_ObjectReference, 0x30);
 
-// An object in a draw list (0x20 bytes; TW06: Ter_ObjectDrawData, the same size); fn_80032F88 draws a
+// An object in a draw list (0x20 bytes; TW06: Ter_ObjectDrawData, the same size); Ter_DrawObjectList draws a
 // list of them.
 typedef struct Ter_ObjectDrawData {
     struct UObjMesh* pObject;   // 0x00  its model (Ter_AddObjectDraw). TW06: pObject
@@ -75,11 +75,11 @@ LAYOUT_ASSERT(Ter_ObjectDrawData, 0x20);
 // Found by patch: iPatchFirstObjectInstanceIndex[patch] + the object's number in it.
 typedef struct Ter_ObjectState {
     f32  f0;                    // 0x00  Ter_vInitModule: fTreeMinPeriod plus a random share of fTreeDiffPeriod
-    f32  f4;                    // 0x04  handed to row 2 or 3 of SD_SetShaderTypeParameters (fn_80032F88), 0.5 the rest;
+    f32  f4;                    // 0x04  handed to row 2 or 3 of SD_SetShaderTypeParameters (Ter_DrawObjectList), 0.5 the rest;
                                 //       fTreeOverdrive at first
     f32  f8;                    // 0x08
     s32  nC;                    // 0x0C
-    f32  f10;                   // 0x10  } fn_800335F8 resets f14 to f10, or to 0 with n18
+    f32  f10;                   // 0x10  } Ter_StopCrowdAnimation resets f14 to f10, or to 0 with n18
     f32  f14;                   // 0x14  }
     s32  n18;                   // 0x18
     s32  n1C;                   // 0x1C
@@ -98,8 +98,8 @@ typedef struct Ter_LODPlane {
 } Ter_LODPlane;
 LAYOUT_ASSERT(Ter_LODPlane, 8);
 
-// The data of the chunks fn_80034720 and fn_800347B4 are given (by UKernel.c): the position of one
-// tee or one pin.
+// The data of the chunks Ter_TeeLoadCallback and Ter_PinLoadCallback are given (by UKernel.c): the
+// position of one tee or one pin.
 typedef struct TerPosData {
     u8   unk0[0x10];
     f32  vPos[3];               // 0x10
@@ -113,7 +113,7 @@ typedef struct TerWaveData {
     u32  nFrame;                // 0x10  gSession.nFrameCount
 } TerWaveData;
 
-// The data of the 'tLOD' chunk (fn_800341A4); only two values are read.
+// The data of the 'tLOD' chunk (Ter_LODLoadCallback); only two values are read.
 typedef struct TerLODData {
     u8   unk0[0xC];
     f32  fC;                    // 0xC  } made whole numbers into lbl_802810E4 and lbl_802810E8
@@ -160,7 +160,7 @@ typedef struct Ter_TerrainRendererMgr {
     s32          iLOD2Begin;                    // 0x1134
     f32          fDetailMipmapBias;             // 0x1138
     f32          fLakeSurfaceMipmapBias;        // 0x113C
-    f32          fDefaultObjectMipmapBias[3];   // 0x1140  a row of lbl_801876D8 (fn_80034648)
+    f32          fDefaultObjectMipmapBias[3];   // 0x1140  a row of lbl_801876D8 (Ter_SetCourseMipmapBias)
     u8           bObjectTestMode;               // 0x114C
     u8           unk114D[3];
     s32          iCurrentViewContext;           // 0x1150  a view number (ViewController_GetCameraControl)
@@ -170,7 +170,7 @@ typedef struct Ter_TerrainRendererMgr {
     f32          fTreeDiffPeriod;               // 0x1160
     f32          fTreeNoisePeriodScale;         // 0x1164
     f32          fTreeNoiseAmplitudeScale;      // 0x1168
-    f32          fCrowdAnimationDelayedStartTimer;      // 0x116C  -1 after fn_800335F8
+    f32          fCrowdAnimationDelayedStartTimer;      // 0x116C  -1 after Ter_StopCrowdAnimation
     f32          fCrowdAnimationDelayedStartPercentage; // 0x1170  GameManager's crowd flyby wants 0.5
     f32          fCrowdAnimationDelayedStartDuration;   // 0x1174
     f32          fCrowdAnimationCountdown;      // 0x1178  GameManager's crowd flyby wants 5
@@ -190,7 +190,7 @@ typedef struct Ter_TerrainRendererMgr {
     u8           unk11AD[3];
     s32          eTerrainFilterMin;             // 0x11B0
     s32          eTerrainFilterMag;             // 0x11B4
-    s32          eObjectFilterMin;              // 0x11B8  } passed on to fn_80032F88, which does not
+    s32          eObjectFilterMin;              // 0x11B8  } passed on to Ter_DrawObjectList, which does not
     s32          eObjectFilterMag;              // 0x11BC  } read them
     Ter_PatchReference* xpGrassPatchList;       // 0x11C0
     s32          iNumGrassPatches;              // 0x11C4
@@ -213,7 +213,7 @@ LAYOUT_ASSERT(TerSettings, 0x54);
 extern Ter_TerrainRendererMgr lbl_801D3CB0;
 extern TerSettings* lbl_802811E0;    // Code8006F154.c: points at lbl_801D70A8
 extern TerSettings lbl_801D70A8;
-// A step of a crowd member's move from one pose state to another (0x14 bytes; fn_80033744): when its
+// A step of a crowd member's move from one pose state to another (0x14 bytes; Ter_AnimateObjects): when its
 // states are n0 and n4, f4 is eased toward fC, and once there it goes to state n8 with f4 = f10.
 typedef struct TerPoseStep {
     s32  n0;                    // 0x00
@@ -223,39 +223,39 @@ typedef struct TerPoseStep {
     f32  f10;                   // 0x10
 } TerPoseStep;
 
-extern TerPoseStep lbl_801877E0[6]; // fn_80033744: for objects without bit 0x40 of word 3
-extern TerPoseStep lbl_80187858[2]; // fn_80033744: for objects with it
+extern TerPoseStep lbl_801877E0[6]; // Ter_AnimateObjects: for objects without bit 0x40 of word 3
+extern TerPoseStep lbl_80187858[2]; // Ter_AnimateObjects: for objects with it
 extern f32 lbl_80281D60;           // Ter_vInitModule's random number, 0..1, stepped once per object
 extern s32 lbl_801D3A30[5][32];     // [n][k]: how many of k's lowest n bits are set (Ter_vInitModule);
-                                    // fn_80032B7C picks a ground's mesh by it
+                                    // Ter_DrawPatchGround picks a ground's mesh by it
 
 void fn_8006F334(TerSettings* pSettings);   // Code8006F154.c: the default colours
-extern f32 lbl_801876D8[21][3];     // rows fn_80034648 copies into fDefaultObjectMipmapBias
+extern f32 lbl_801876D8[21][3];     // rows Ter_SetCourseMipmapBias copies into fDefaultObjectMipmapBias
 extern f32 lbl_802810C8;
 extern s8  lbl_802810CC;
-extern u8  lbl_802810EC;            // } 1: fn_80033F94 draws object list 0, list 2
+extern u8  lbl_802810EC;            // } 1: Ter_DrawPanoramaList draws object list 0, list 2
 extern u8  lbl_802810ED;            // }
-extern s32 lbl_80281D64;            // how many of list 2's last objects fn_80033F94 leaves out
+extern s32 lbl_80281D64;            // how many of list 2's last objects Ter_DrawPanoramaList leaves out
 extern s32 lbl_802810D0;            // } Ter_SetLODPlanes's arguments (the LOD planes); 26 and 16 once
 extern s32 lbl_802810D4;            // } unloaded, else set by Ter_LODStepsFromDistances from the 'tLOD' chunk
 extern f32 lbl_802810D8;            // }
 extern s32 lbl_802810DC;            // }
 extern s32 lbl_802810E0;            // }
-extern s32 lbl_802810E4;            // } from the 'tLOD' chunk (fn_800341A4); -1 until then
+extern s32 lbl_802810E4;            // } from the 'tLOD' chunk (Ter_LODLoadCallback); -1 until then
 extern s32 lbl_802810E8;            // }
 
 // GoTerrain.c
 void Ter_vCloseModule(void);             // frees the terrain
-void fn_800335F8(u8 bReset);
-f32  fn_800336E4(void);
-f32  fn_800336F4(void);
+void Ter_StopCrowdAnimation(u8 bReset);
+f32  Ter_GetCrowdAnimationCountdown(void);
+f32  Ter_GetCrowdAnimationDelayedStartPercentage(void);
 f32  Math_Floor(f32 x);            // floor
-void fn_80034720(struct UStreamObject* pObject);   // a tee's position (TerPosData)
-u8   fn_800347B4(struct UStreamObject* pObject);   // a pin's position (TerPosData)
+void Ter_TeeLoadCallback(struct UStreamObject* pObject);   // a tee's position (TerPosData)
+u8   Ter_PinLoadCallback(struct UStreamObject* pObject);   // a pin's position (TerPosData)
 void RenderState_SetBlendFactors(int a, int b);     // renderer state: n10 and n14
 void RenderState_SetConstantAlphaOn(u8 b);             // renderer state
 void RenderState_SetConstantAlpha(u8 b);             // renderer state
 void RenderState_SetClipMode(int a);            // renderer state: nFC
-struct UObjMesh* fn_80034A20(u16 nPatch, u16 nObjList);    // a course object's model
+struct UObjMesh* Ter_GetObjectListModel(u16 nPatch, u16 nObjList);    // a course object's model
 
 #endif

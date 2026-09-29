@@ -42,7 +42,7 @@ void  Gaud_SwingBallHit(u8 nPlayer);
 void  TARGET_ResetMomentums(int nPlayer);
 f32   fn_800D04AC(int nPlayer);
 void  ViewController_SaveViewportRect(int nView);
-void  fn_8003349C(f32 a, f32 b, f32 c);
+void  Ter_StartCrowdAnimation(f32 a, f32 b, f32 c);
 void  GM_ClearShotBonusStats(int nPlayer);
 void  PlaceBall_ResetMomentums(int nPlayer);
 void  fn_80062D98(void);
@@ -1806,7 +1806,7 @@ void STATEFUNC_InitialFlyByInit(int nPlayer) {
     Character_AlignShotWithTarget(nPlayer, 1, 1);
     fn_800957D8(gPlayers[nPlayer].pChar);
     fn_80095744(gPlayers[nPlayer].pChar, 1);
-    fn_8003349C(1.0f, 12.0f, 0.1f);
+    Ter_StartCrowdAnimation(1.0f, 12.0f, 0.1f);
     GameEffects_ResetGameEffectSettings();
     for (i = 0; i < gNumPlayersSetUp; i++) {
         ViewController_GetIndexedViewController(gPlayers[i].nView[0])->bFlagOut = 0;

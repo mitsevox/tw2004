@@ -57,7 +57,7 @@ void Kernel_FreeObjectMem(void* p) {
 
 // The 'Cact' stream handler: one actor (dynamic object) of the hole arrived. By its type (the
 // 'tACT' data's n4): 200 and 201 are fly-by and static cameras (StaticCam), 5 and 6 go to
-// fn_80034720 / fn_800347B4 (6 continues when that answers nonzero), 7 is a particle emitter
+// Ter_TeeLoadCallback / Ter_PinLoadCallback (6 continues when that answers nonzero), 7 is a particle emitter
 // (fn_8009943C), 8 is dropped, 9 is a sound (Gaud_ActorDownloadCallback), 10 the Play Now ball
 // spot. Any other type becomes a dynamic object: its 'aRSL' resource list is resolved into model
 // references, its handler found by type (fn_800499B0), and the stream object is freed.
@@ -76,10 +76,10 @@ void Kernel_DownloadActors(UStreamObject* pObject) {
         StaticCam_ParseStaticCameraActor(pObject);
         return;
     case 5:
-        fn_80034720(pObject);
+        Ter_TeeLoadCallback(pObject);
         return;
     case 6:
-        if (!fn_800347B4(pObject)) return;
+        if (!Ter_PinLoadCallback(pObject)) return;
         break;
     case 7:
         fn_8009943C((PsEmitterRecord*)pObject->pData, pObject->uSize);

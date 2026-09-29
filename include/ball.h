@@ -70,7 +70,7 @@ typedef struct CourseLights {
     CourseLight aLight[5];      // 0x10
 } CourseLights;
 
-// The optional block at CourseInfo.p3C: what fn_800342F0 hands the glows (glows.h) when a hole is
+// The optional block at CourseInfo.p3C: what Ter_CourseLoadCallback hands the glows (glows.h) when a hole is
 // loaded; without it the glows get 0.8, 0.8, 0.4 / 0, 150, -400 / 1.
 typedef struct CourseGlowBlock {
     f32  v0[3];                 // 0x00  to fn_80035590 (GlowState.v4), and gSession.f5B3C..f5B44
@@ -115,7 +115,7 @@ typedef struct CourseInfo {
     TerPolyRef* pPolyRefs;      // 0x4C  TW06: pPolygonReferenceList (at 0x58 there)
     u16*   pObjRefs;            // 0x50  per cell, the objects in it (indices). TW06: pObjectReferenceList (0x5C)
     u8     unk54[0x60 - 0x54];
-    f32    v60[3];              // 0x60  the hole's own gSession.f5B3C..f5B44 when not all 0 (fn_800342F0)
+    f32    v60[3];              // 0x60  the hole's own gSession.f5B3C..f5B44 when not all 0 (Ter_CourseLoadCallback)
     f32    fFloor;              // 0x6C  a ball in the air above this with no ground under it is still in play
     PinPos pin[4];              // 0x70  the hole's four pin positions: gpGame->nPinSet[] picks one
     PinPos tee[4];              // 0xB0  the tee of each tee set (gSession.nTeeSet[])

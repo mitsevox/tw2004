@@ -419,7 +419,7 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bH
                     fDist = (f32)Math_Sqrt(fDx * fDx + fDz * fDz) - fObjRadius;
                     if (fDist < fRadius || (fObjRadius > 4.0f && fDist < fWide)) {
                         if (bModels) {
-                            pModel = fn_80034A20(pCourse->pObjects[*pObjRef].nPatch,
+                            pModel = Ter_GetObjectListModel(pCourse->pObjects[*pObjRef].nPatch,
                                                  pCourse->pObjects[*pObjRef].nObjList);
                             if (pModel != NULL && (TerCollision_GetMeshFlags(pModel, 0) & 0x40)) {
                                 bObstructed = 1;
@@ -2380,7 +2380,7 @@ u8 Ter_PointInTriangleXZpY(f32* pA, f32* pB, f32* pC, f32 fX, f32 fZ) {
 }
 
 // A flag byte of a course object's model (GoTerrain.c's Ter_GetMeshFlags reads the same bytes).
-// Ter_CheckObjectAndHazardObstruction finds the model with fn_80034A20 (from the object's nPatch
+// Ter_CheckObjectAndHazardObstruction finds the model with Ter_GetObjectListModel (from the object's nPatch
 // and nObjList) and tests bit 0x40 of byte n = 0.
 int TerCollision_GetMeshFlags(UObjMesh* pModel, int n) {
     return pModel->pInfo->a24[n];

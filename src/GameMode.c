@@ -616,7 +616,7 @@ u8 GM_PlayerTakeMulligan(int nPlayer) {
     }
     SitDev_OnMulligan();
     GUI_HideAllHelpTips();
-    fn_800335F8(1);
+    Ter_StopCrowdAnimation(1);
     Gaud_StopComment();
     REPLAY_Restore(nPlayer);
     gPlayers[nPlayer].bUsedMulligan = 1;
@@ -798,7 +798,7 @@ int GM_ShowPostShotAnimation(int nPlayer) {
 // Whether the post-shot camera cuts to the crowd flyby: the crowd animation's countdown is at least
 // 5 and its delayed-start percentage at least 0.5.
 u8 GM_ShowPostShotCrowdFlyby(void) {
-    if (fn_800336E4() >= 5.0f && fn_800336F4() >= 0.5f) {
+    if (Ter_GetCrowdAnimationCountdown() >= 5.0f && Ter_GetCrowdAnimationDelayedStartPercentage() >= 0.5f) {
         return 1;
     }
     return 0;

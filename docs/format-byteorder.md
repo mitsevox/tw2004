@@ -51,9 +51,9 @@ Objects delivered by UStream
 | `BNK ` | ClipBank_OnLoaded | skalib.c | swapped later | the handler only stashes the file; `ClipBank_Install` > `ClipBank_Load` swaps it (`ClipBank_SwapHeader`, SKA_SwapClip per clip); yes: `ClipBank` is used in place, its clip offsets turned into 32-bit pointers. `port:` notes at the swap calls |
 | `stat` | Golfer_OnStatsLoaded | Golfer.c | swapped: Golfer_TableByteSwap > fn_80076158 | yes: copied over `gGolferTable[34]` (`GolferRecord`); only 0x98..0x140 of each record is swapped, in 8-byte units; the u32 at 0x90 is not. A `port:` note at the swap call |
 | `rcrd` | Session_OnRecordsLoaded | Golfer.c | none seen | yes: copied straight over `gSession.aCourseRecord`, big-endian; a `port:` note there (a little-endian port converts the records field by field) |
-| `ter ` | fn_800342B4 | GoTerrain.c | none seen | asm |
-| `tgd ` | fn_800342F0 | GoTerrain.c | none seen | yes: the course's collision data; `Ter_InitTGD` (Ter_InitTGD, GoTerrainCollision.c) lays `CourseInfo` (ball.h) over it and turns its offsets into pointers in place (`TER_RELOCATE`, 32-bit); `TerCell`, `TerPolyRef`, `TerObject` and the vertex list are read in place |
-| `tLOD` | fn_800341A4 | GoTerrain.c | none seen | asm |
+| `ter ` | Ter_HoleDataLoadCallback | GoTerrain.c | none seen | asm |
+| `tgd ` | Ter_CourseLoadCallback | GoTerrain.c | none seen | yes: the course's collision data; `Ter_InitTGD` (Ter_InitTGD, GoTerrainCollision.c) lays `CourseInfo` (ball.h) over it and turns its offsets into pointers in place (`TER_RELOCATE`, 32-bit); `TerCell`, `TerPolyRef`, `TerObject` and the vertex list are read in place |
+| `tLOD` | Ter_LODLoadCallback | GoTerrain.c | none seen | asm |
 | `CAMS` | DynamicCam_LoadCAMSfromStream | GoDynamicCam.c | swapped: fn_80076158 | little-endian on disc |
 | `CAMV` (2) | DynamicCam_LoadCAMVfromStream, DynamicCam_LoadCAMVfromStreamFE | GoDynamicCam.c | swapped: DynamicCam_CopyScriptData > ByteSwap_Records | little-endian on disc |
 | `CAMA` | DynamicCam_LoadCAMAfromStream | GoDynamicCam.c | swapped: DynamicCam_CopyAnimPairData > ByteSwap_Records | little-endian on disc |

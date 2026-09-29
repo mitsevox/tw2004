@@ -214,7 +214,7 @@ void GameModeSkillZoneBase_GetCupPosition(int i, f32* pOut) {
 }
 
 // Adds a target at (x, y, z) (w = 1) to the end of the target games' list and counts it. In a
-// target game (GM_Currently_SkillZoneMode) each pin position the course stream brings (fn_800347B4,
+// target game (GM_Currently_SkillZoneMode) each pin position the course stream brings (Ter_PinLoadCallback,
 // GoTerrain.c) becomes a target. Nothing checks the list's 40 entries.
 void GameModeSkillZoneBase_AddCup(f32 x, f32 y, f32 z) {
     gSkillZoneCups[gSkillZoneNumCups][0] = x;

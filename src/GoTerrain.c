@@ -37,7 +37,7 @@ void  Ter_AddObjectDraw(Ter_ObjectDrawData* pDraw, s32* pCount, s32 nUnused, UOb
 void  Ter_DrawPatchPass(int nRenderPass);
 void  Ter_DrawFarClipPatches(void);
 void  Ter_DrawObjects(void);
-void  fn_80033F94(void* pHoleData, u32 nList);
+void  Ter_DrawPanoramaList(void* pHoleData, u32 nList);
 void  fn_8003546C(f32* pA, f32* pB, f32* pOut);
 f32   Camera_GetLensFovScale(CamLens* pLens);
 f32   Ter_GetTimeInCycle(u32 n, f32 fPeriod);
@@ -51,21 +51,22 @@ void  RC_UpdateCurrentScreenMatrices(void);
 void  fn_800354B4(u8* p, f32 v);        // sets the lens's far clip distance, fAC (fn_80014268 reads it)
 f32   fn_80014268(u8* p);
 void  Ter_SetLODPlanes(Ter_LODPlane* pPlanes, f32 fStep, s32 a, s32 b, s32 c, s32 d);
-void  fn_80032B7C(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s32 n20, u8* pbFirst, u8 b1,
+void  Ter_DrawPatchGround(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s32 n20, u8* pbFirst,
+                          u8 b1,
                   u8 b2, f32 fNear, f32 fFar);
-void  fn_80032F88(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s32 eFilterMag);
-void  fn_800341A4(UStreamObject* pObject);
-void  fn_800342B4(UStreamObject* pObject);
-void  fn_800342F0(UStreamObject* pObject);
+void  Ter_DrawObjectList(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s32 eFilterMag);
+void  Ter_LODLoadCallback(UStreamObject* pObject);
+void  Ter_HoleDataLoadCallback(UStreamObject* pObject);
+void  Ter_CourseLoadCallback(UStreamObject* pObject);
 void  fn_80035584(s32 v);
 void  fn_80035590(f32* p0);
 void  fn_800355B8(f32* p0);
-void  fn_80034648(int n);
+void  Ter_SetCourseMipmapBias(int n);
 void  fn_80035514(u8* pObject);
-void  fn_800332F4(void);
+void  Ter_ResetObjectRenderState(void);
 u8    fn_8003505C(u8 b);
 f32*  fn_80035508(UObjMesh* pMesh);
-u8    fn_80033308(Ter_ObjectDrawData* pDraw, u8 bForce);
+u8    Ter_SetObjectRenderState(Ter_ObjectDrawData* pDraw, u8 bForce);
 void  LLMath_IdentifyMat(f32 (*pMtx)[4]);  // identity matrix
 void  fn_80035370(void);
 void  fn_80034CAC(int nRenderPass);
@@ -247,9 +248,9 @@ void Ter_vCloseModule(void) {
 // (Ter_HoleDataLoadCallback), 'tgd ' the course data (Ter_CourseLoadCallback), 'tLOD' the LOD
 // distances (Ter_LODLoadCallback).
 void Ter_RegisterStreamClients(void) {
-    Stream_RegisterLoadChunkCallback('ter ', fn_800342B4);
-    Stream_RegisterLoadChunkCallback('tgd ', fn_800342F0);
-    Stream_RegisterLoadChunkCallback('tLOD', fn_800341A4);
+    Stream_RegisterLoadChunkCallback('ter ', Ter_HoleDataLoadCallback);
+    Stream_RegisterLoadChunkCallback('tgd ', Ter_CourseLoadCallback);
+    Stream_RegisterLoadChunkCallback('tLOD', Ter_LODLoadCallback);
 }
 
 // Unregisters the 'ter ' and 'tgd ' chunk loaders; 'tLOD' stays registered.
@@ -358,7 +359,7 @@ void Ter_RenderView(void* pHoleData, int nView) {
                 / ViewController_GetCameraControl(nView)->f54;
     RenderState_Flush();
     if (!lbl_801D3CB0.bObjectTestMode) {
-        fn_80033F94(pHoleData, 0);
+        Ter_DrawPanoramaList(pHoleData, 0);
     }
     Ter_BuildPatchLists(pHoleData);
     Ter_SortObjects();
@@ -368,7 +369,7 @@ void Ter_RenderView(void* pHoleData, int nView) {
     Ter_DrawPatchPass(0);
     Ter_DrawFarClipPatches();
     if (!lbl_801D3CB0.bObjectTestMode) {
-        fn_80033F94(pHoleData, 2);
+        Ter_DrawPanoramaList(pHoleData, 2);
     }
     Ter_DrawPatchPass(1);
     Ter_DrawPatchPass(2);
@@ -1071,14 +1072,15 @@ void Ter_DrawPatchPass(int nRenderPass) {
                     for (pPatch =
                              lbl_801D3CB0.pSortedPatchList[nRenderPass][nList][(u32)nClip];
                          pPatch != NULL; pPatch = pPatch->pNext[nList]) {
-                        fn_80032B7C(pPatch->pGround, nClip, nList, pPatch->n1C, pPatch->n18, pPatch->n20,
+                        Ter_DrawPatchGround(pPatch->pGround, nClip, nList, pPatch->n1C, pPatch->n18,
+                                            pPatch->n20,
                                     &bFirst, 0, 0, pPatch->fDistance,
                                     pPatch->fDistance + 2.0f * pPatch->fBoundingRadius);
                     }
                 }
             }
         }
-        fn_80032F88(lbl_801D3CB0.pDeferredItemsList, lbl_801D3CB0.iDeferredItems,
+        Ter_DrawObjectList(lbl_801D3CB0.pDeferredItemsList, lbl_801D3CB0.iDeferredItems,
                     lbl_801D3CB0.eTerrainFilterMin, lbl_801D3CB0.eTerrainFilterMag);
         lbl_801D3CB0.iDeferredItems = 0;
         DS_vSetAlphaTestMode(1, 6, 1);
@@ -1089,7 +1091,7 @@ void Ter_DrawPatchPass(int nRenderPass) {
 }
 
 // Turns z writes on or off, only while the terrain manages them (boManageZUpdate), and remembers
-// the setting in lbl_802810CC (fn_80033308 compares against it).
+// the setting in lbl_802810CC (Ter_SetObjectRenderState compares against it).
 void Ter_SetZWrite(int n) {
     if (lbl_801D3CB0.boManageZUpdate) {
         DS_vEnableZBufferUpdate(n);
@@ -1147,7 +1149,8 @@ void Ter_DrawFarClipPatches(void) {
                          lbl_801D3CB0.pSortedPatchList[0][3][(u32)nClip];
                      pPatch != NULL; pPatch = pPatch->pNext[3]) {
                     if (!gSession.nSplitScreen || !(pPatch->n1C & 8)) {
-                        fn_80032B7C(pPatch->pGround, nClip, 3, pPatch->n1C, pPatch->n18, pPatch->n20, &bFirst,
+                        Ter_DrawPatchGround(pPatch->pGround, nClip, 3, pPatch->n1C, pPatch->n18, pPatch->n20,
+                                            &bFirst,
                                     0, 0, pPatch->fDistance,
                                     pPatch->fDistance + 2.0f * pPatch->fBoundingRadius);
                     }
@@ -1164,10 +1167,11 @@ void Ter_DrawFarClipPatches(void) {
 // Draws the opaque object list, then the translucent one (objects fading between two levels of
 // detail) if it has any, both with the object filters; alpha test back to reference 128.
 void Ter_DrawObjects(void) {
-    fn_80032F88(lbl_801D3CB0.pOpaqueObjectList, lbl_801D3CB0.iOpaqueObjects, lbl_801D3CB0.eObjectFilterMin,
+    Ter_DrawObjectList(lbl_801D3CB0.pOpaqueObjectList, lbl_801D3CB0.iOpaqueObjects,
+                       lbl_801D3CB0.eObjectFilterMin,
                 lbl_801D3CB0.eObjectFilterMag);
     if (lbl_801D3CB0.iTranslucentObjects != 0) {
-        fn_80032F88(lbl_801D3CB0.pTranslucentObjectList, lbl_801D3CB0.iTranslucentObjects,
+        Ter_DrawObjectList(lbl_801D3CB0.pTranslucentObjectList, lbl_801D3CB0.iTranslucentObjects,
                     lbl_801D3CB0.eObjectFilterMin, lbl_801D3CB0.eObjectFilterMag);
     }
     DS_vSetAlphaTestMode(1, 6, 128);
@@ -1175,7 +1179,7 @@ void Ter_DrawObjects(void) {
 }
 
 // Draws the post-draw terrain patches, each in every pass (bits 0..2 of n1C) it takes part in.
-void fn_800329CC(void) {
+void Ter_DrawPostDrawPatches(void) {
     u8 bFirst = 1;
     int i;
     int nPass;
@@ -1198,7 +1202,7 @@ void fn_800329CC(void) {
         RenderState_Flush();
         for (nPass = 0, nPassBit = 1; nPass <= 2; nPass++, nPassBit <<= 1) {
             if (nPassBit & lbl_801D3CB0.pPostDrawTerrainList[i].n1C) {
-                fn_80032B7C(lbl_801D3CB0.pPostDrawTerrainList[i].pGround,
+                Ter_DrawPatchGround(lbl_801D3CB0.pPostDrawTerrainList[i].pGround,
                             lbl_801D3CB0.pPostDrawTerrainList[i].eClipMethod, nPass,
                             lbl_801D3CB0.pPostDrawTerrainList[i].n1C,
                             lbl_801D3CB0.pPostDrawTerrainList[i].n18,
@@ -1212,12 +1216,16 @@ void fn_800329CC(void) {
     Ter_EndRender();
 }
 
-void fn_80032AEC(void) {
+// Draws the post-draw objects, then the nearby ones (fading in as the camera nears) without z
+// writes. gomainloop calls it after a view's scene, for views 0 and 1.
+void Ter_DrawPostDrawObjects(void) {
     Ter_BeginRender();
-    fn_80032F88(lbl_801D3CB0.pPostDrawItemsList, lbl_801D3CB0.iPostDrawItems, lbl_801D3CB0.eObjectFilterMin,
+    Ter_DrawObjectList(lbl_801D3CB0.pPostDrawItemsList, lbl_801D3CB0.iPostDrawItems,
+                       lbl_801D3CB0.eObjectFilterMin,
                 lbl_801D3CB0.eObjectFilterMag);
     Ter_SetZWrite(0);
-    fn_80032F88(lbl_801D3CB0.pNearbyObjectList, lbl_801D3CB0.iNearbyObjects, lbl_801D3CB0.eObjectFilterMin,
+    Ter_DrawObjectList(lbl_801D3CB0.pNearbyObjectList, lbl_801D3CB0.iNearbyObjects,
+                       lbl_801D3CB0.eObjectFilterMin,
                 lbl_801D3CB0.eObjectFilterMag);
     Ter_SetZWrite(1);
     RenderState_SetConstantAlphaOn(0);
@@ -1234,7 +1242,8 @@ void fn_80032AEC(void) {
 // CameraController_IsFlybyDone is 0 for the view, one with ground bit 0x80 is left out. *pbFirst
 // tracks a renderer state switched by fFar; b2 keeps it, the bit 0x10 deferred mesh and the raised
 // mesh out. b1 is not read.
-void fn_80032B7C(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s32 n20, u8* pbFirst, u8 b1,
+void Ter_DrawPatchGround(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s32 n20, u8* pbFirst,
+                         u8 b1,
                  u8 b2, f32 fNear, f32 fFar) {
     f32 mRaise[4][4];
     u8 bFirst;
@@ -1345,11 +1354,10 @@ static inline void Ter_FlagBits(u32 uFlags) {
 // Draws nCount objects of a draw list, switching the renderer state only when it changes from one
 // object to the next: the clip method, the mipmap bias, and the flags (0x40, fog 0x20, and 0x10 for
 // shader types other than 1 and 3) unless the object sets its own. Objects whose state word 0 has
-// bit 0x1 hand their f4 to row 2 or 3 of SD_SetShaderTypeParameters (by shader type); without bit 0x2 its
-// swing
-// about 0.5 is cut by up to fTreeDampingMaxForce up close, less with distance (not at all from the
-// squared distance fTreeDampingDistance on). The filters are not read.
-void fn_80032F88(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s32 eFilterMag) {
+// bit 0x1 hand their f4 to row 2 or 3 of SD_SetShaderTypeParameters (by shader type); without bit
+// 0x2 its swing about 0.5 is cut by up to fTreeDampingMaxForce up close, less with distance (not at
+// all from the squared distance fTreeDampingDistance on). The filters are not read.
+void Ter_DrawObjectList(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s32 eFilterMag) {
     f32 fWave2;
     f32 fWave3;
     Ter_ObjectDrawData* pDraw;
@@ -1366,7 +1374,7 @@ void fn_80032F88(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s32 eFil
     u8 bNewShaded;
     f32 fDamp;
 
-    fn_800332F4();
+    Ter_ResetObjectRenderState();
     for (i = 0; i < nCount; i++) {
         pDraw = &pList[i];
         iObject = pDraw->iGlobalObjectIndex;
@@ -1400,7 +1408,7 @@ void fn_80032F88(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s32 eFil
             bForce = 0;
             bDirty = 1;
         }
-        if (fn_80033308(pDraw, 0)) {
+        if (Ter_SetObjectRenderState(pDraw, 0)) {
             bDirty = 1;
         }
         if ((lbl_801D3CB0.pObjectStateList[iObject].a20[0] & 1)
@@ -1449,7 +1457,9 @@ void fn_80032F88(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s32 eFil
     }
 }
 
-void fn_800332F4(void) {
+// Forgets the last object's z write and alpha (lbl_802810CC, lbl_802810C8), so that
+// Ter_SetObjectRenderState sets the next object up in full.
+void Ter_ResetObjectRenderState(void) {
     lbl_802810CC = -1;
     lbl_802810C8 = -1.0f;
 }
@@ -1457,7 +1467,7 @@ void fn_800332F4(void) {
 // Sets the renderer up for an object's draw, unless its alpha and z writes are those of the last one
 // (lbl_802810C8, lbl_802810CC) and bForce is clear; returns whether it did. An opaque object gets
 // the mesh's own blend flags and z writes, a faded one draws with its alpha.
-u8 fn_80033308(Ter_ObjectDrawData* pDraw, u8 bForce) {
+u8 Ter_SetObjectRenderState(Ter_ObjectDrawData* pDraw, u8 bForce) {
     f32 fAlpha = pDraw->fAlpha;
     s32 nRef;
     u32 uFlags;
@@ -1493,10 +1503,10 @@ u8 fn_80033308(Ter_ObjectDrawData* pDraw, u8 bForce) {
     return 0;
 }
 
-// Starts the crowd's animation: after fDelay seconds when that is above 0 (fn_80033744 counts it
+// Starts the crowd's animation: after fDelay seconds when that is above 0 (Ter_AnimateObjects counts it
 // down, then calls here again), otherwise now, for fDuration, each crowd object from a
 // pseudo-random point of its cycle. EA passes the share of the crowd that starts, but sets it to 1.
-void fn_8003349C(f32 fPercentage, f32 fDuration, f32 fDelay) {
+void Ter_StartCrowdAnimation(f32 fPercentage, f32 fDuration, f32 fDelay) {
     f32 fRand = 0.0f;
     int i;
 
@@ -1537,7 +1547,7 @@ void fn_8003349C(f32 fPercentage, f32 fDuration, f32 fDelay) {
 
 // Stops the crowd's animation and puts every object with bits 0 and 1 of a20[0] back: n1C to 0,
 // and f14 to f10, or with bReset f14 and n18 to 0.
-void fn_800335F8(u8 bReset) {
+void Ter_StopCrowdAnimation(u8 bReset) {
     int i;
 
     lbl_801D3CB0.fCrowdAnimationDelayedStartTimer = -1.0f;
@@ -1568,16 +1578,17 @@ void fn_800335F8(u8 bReset) {
     }
 }
 
-f32 fn_800336E4(void) {
+f32 Ter_GetCrowdAnimationCountdown(void) {
     return lbl_801D3CB0.fCrowdAnimationCountdown;
 }
 
-f32 fn_800336F4(void) {
+f32 Ter_GetCrowdAnimationDelayedStartPercentage(void) {
     return lbl_801D3CB0.fCrowdAnimationDelayedStartPercentage;
 }
 
-// Sets object nObject of patch nPatch's n1C to 1 when bit 0 of its a20[3] is set.
-void fn_80033704(u16 nPatch, u16 nObject) {
+// The ball hit object nObject of patch nPatch (event.c): its state's n1C becomes 1 when bit 0x1 of
+// its word 3 is set (Ter_AnimateObjects then raises that object).
+void Ter_SetObjectHit(u16 nPatch, u16 nObject) {
     Ter_ObjectState* pState =
         &lbl_801D3CB0.pObjectStateList[lbl_801D3CB0.iPatchFirstObjectInstanceIndex[nPatch] + nObject];
 
@@ -1606,7 +1617,7 @@ TerPoseStep lbl_80187858[2] = {
 // the next one through lbl_801877E0 (lbl_80187858 with bit 0x40 of word 3); bit 0x1 of word 3 rises
 // to 1 once n1C is 1; the trees sway by their period with noise.
 // fake match: `3 == n18` in the two pose-step tests (register order; found by the permuter).
-void fn_80033744(void) {
+void Ter_AnimateObjects(void) {
     f32 fTime;
     s32 i;
     s32 v;
@@ -1629,14 +1640,14 @@ void fn_80033744(void) {
     if (lbl_801D3CB0.fCrowdAnimationDelayedStartTimer > 0.0f) {
         lbl_801D3CB0.fCrowdAnimationDelayedStartTimer -= fTime;
         if (lbl_801D3CB0.fCrowdAnimationDelayedStartTimer <= 0.0f) {
-            fn_8003349C(lbl_801D3CB0.fCrowdAnimationDelayedStartPercentage,
+            Ter_StartCrowdAnimation(lbl_801D3CB0.fCrowdAnimationDelayedStartPercentage,
                         lbl_801D3CB0.fCrowdAnimationDelayedStartDuration, 0.0f);
         }
     }
     if (lbl_801D3CB0.fCrowdAnimationCountdown > 0.0f) {
         lbl_801D3CB0.fCrowdAnimationCountdown -= fTime;
         if (lbl_801D3CB0.fCrowdAnimationCountdown <= 0.0f) {
-            fn_800335F8(0);
+            Ter_StopCrowdAnimation(0);
         }
     }
     for (i = 0; i < TER_NUM_OBJECTS; i++) {
@@ -1822,7 +1833,7 @@ void fn_80033744(void) {
 // Draws object list nList of the hole data (0 before the patches, 2 after them) when its switch is
 // on, as panorama items: each object that is not off screen, except (list 0) objects 0-1 or 2-3 by
 // lbl_802811F0's flag 0x2, (list 2) the last lbl_80281D64, and in split screen those with flag 8.
-void fn_80033F94(void* pHoleData, u32 nList) {
+void Ter_DrawPanoramaList(void* pHoleData, u32 nList) {
     UObjMesh* pRoot;
     UObjMesh* pList;
     UObjMesh* pMesh;
@@ -1874,7 +1885,7 @@ void fn_80033F94(void* pHoleData, u32 nList) {
                 pMesh = Ter_GetMeshNext(pMesh);
             }
         }
-        fn_80032F88(lbl_801D3CB0.pPanoramaItemsList, nItems, lbl_801D3CB0.eTerrainFilterMin,
+        Ter_DrawObjectList(lbl_801D3CB0.pPanoramaItemsList, nItems, lbl_801D3CB0.eTerrainFilterMin,
                     lbl_801D3CB0.eTerrainFilterMag);
         Ter_SetZWrite(1);
         RenderState_Flush();
@@ -1883,7 +1894,7 @@ void fn_80033F94(void* pHoleData, u32 nList) {
 
 // The 'tLOD' chunk arrived: two values, made whole numbers and, when the second is the larger and
 // both are at least lbl_802810DC x lbl_802810D8, turned into lbl_802810D0 and lbl_802810D4.
-void fn_800341A4(UStreamObject* pObject) {
+void Ter_LODLoadCallback(UStreamObject* pObject) {
     TerLODData* pData = (TerLODData*)pObject->pData;
     s32 nRem;
 
@@ -1910,18 +1921,20 @@ void fn_800341A4(UStreamObject* pObject) {
     }
 }
 
-// The 'ter ' chunk arrived.
-void fn_800342B4(UStreamObject* pObject) {
+// The 'ter ' chunk arrived: keeps it (pCurrentHoleDataStreamData) and its hole data
+// (pCurrentHoleData, from fn_800073B4) for drawing.
+void Ter_HoleDataLoadCallback(UStreamObject* pObject) {
     lbl_801D3CB0.pCurrentHoleDataStreamData = pObject;
     lbl_801D3CB0.pCurrentHoleData = fn_800073B4(pObject->pData, 0);
 }
 
-// The course chunk: clears the pin and tee positions (fn_80034720 and fn_800347B4 fill them), readies
-// the collision data, fills light sets 2, 0 and 1 from the hole's lights and makes set 3 current, and
-// hands the glows the course's values (p3C, or defaults). The light vector gSession.f5B3C..f5B48 is
-// the hole's own (v60) when it has one, else the glows' vector; it is raised to at least its
-// distance across the ground and made at least 2000 long.
-void fn_800342F0(UStreamObject* pObject) {
+// The 'tgd ' (course) chunk arrived: clears the pin and tee positions (Ter_TeeLoadCallback and
+// Ter_PinLoadCallback fill them), readies the collision data, fills light sets 2, 0 and 1 from the
+// hole's lights and makes set 3 current, and hands the glows the course's values (p3C, or
+// defaults). The light vector gSession.f5B3C..f5B48 is the hole's own (v60) when it has one, else
+// the glows' vector; it is raised to at least its distance across the ground and made at least 2000
+// long.
+void Ter_CourseLoadCallback(UStreamObject* pObject) {
     f32 v18[4];
     f32 v8[4];
     int i;
@@ -2007,18 +2020,22 @@ void fn_800342F0(UStreamObject* pObject) {
     if (i >= 21) {
         i = 0;
     }
-    fn_80034648(i);
+    Ter_SetCourseMipmapBias(i);
 }
 
-void fn_80034648(int n) {
+// Sets the three levels of detail's object mipmap biases (fDefaultObjectMipmapBias) from course n's
+// row of lbl_801876D8.
+void Ter_SetCourseMipmapBias(int n) {
     lbl_801D3CB0.fDefaultObjectMipmapBias[0] = lbl_801876D8[n][0];
     lbl_801D3CB0.fDefaultObjectMipmapBias[1] = lbl_801876D8[n][1];
     lbl_801D3CB0.fDefaultObjectMipmapBias[2] = lbl_801876D8[n][2];
 }
 
-// Unloads the terrain.
-void fn_8003467C(void) {
-    fn_800335F8(1);
+// Unloads the hole's terrain (the hole loader, Code8006F438.c): stops the crowd, frees the 'ter '
+// and 'tgd ' chunks, and puts the LOD settings back to their defaults (no 'tLOD' chunk, steps 26
+// and 16).
+void Ter_UnloadHole(void) {
+    Ter_StopCrowdAnimation(1);
     if (lbl_801D3CB0.pCurrentHoleData != NULL) {
         fn_800075CC(lbl_801D3CB0.pCurrentHoleData);
         lbl_801D3CB0.pCurrentHoleData = NULL;
@@ -2036,7 +2053,7 @@ void fn_8003467C(void) {
 }
 
 // A tee's position arrived: into its row of the course's tees, if the course is loaded.
-void fn_80034720(UStreamObject* pObject) {
+void Ter_TeeLoadCallback(UStreamObject* pObject) {
     TerPosData* pTee = (TerPosData*)pObject->pData;
 
     if (lbl_801D3CB0.pCourse != NULL) {
@@ -2051,7 +2068,7 @@ void fn_80034720(UStreamObject* pObject) {
 // A pin position arrived (UKernel.c hands it on). With GM_Currently_SkillZoneMode set it goes to
 // GameModeSkillZoneBase_AddCup; otherwise a pin the course already has (w not 0) is copied into the
 // chunk, and a missing one is taken from it.
-u8 fn_800347B4(UStreamObject* pObject) {
+u8 Ter_PinLoadCallback(UStreamObject* pObject) {
     TerPosData* pPin = (TerPosData*)pObject->pData;
 
     if (lbl_801D3CB0.pCourse != NULL) {
@@ -2074,7 +2091,7 @@ u8 fn_800347B4(UStreamObject* pObject) {
 
 // The flag follows the wind: it turns to face it and plays "flagcalm" below 5, "flagbrzy" below
 // 13, else "flagwind".
-void fn_800348DC(void) {
+void Ter_UpdateFlagForWind(void) {
     f32 vWind[3];
     f32 fSpeed = Wind_GetPhysicsWindVelocity(vWind);
     Character* pFlag = SkeletalObject_FindObject(100);
@@ -2101,7 +2118,9 @@ void fn_800348DC(void) {
     }
 }
 
-void fn_800349CC(int n) {
+// Draws the loaded hole's terrain in view n (gomainloop, once per view); nothing before a 'ter '
+// chunk has arrived.
+void Ter_DrawHoleView(int n) {
     if (lbl_801D3CB0.pCurrentHoleData != NULL) {
         Ter_BeginRender();
         Ter_RenderView(lbl_801D3CB0.pCurrentHoleData, n);
@@ -2111,7 +2130,7 @@ void fn_800349CC(int n) {
 
 // The model of object list nObjList of patch nPatch: node 1 of the hole data's tree holds one node
 // per patch, and a patch's node 1 holds, in its node 0, its object lists. NULL when out of range.
-UObjMesh* fn_80034A20(u16 nPatch, u16 nObjList) {
+UObjMesh* Ter_GetObjectListModel(u16 nPatch, u16 nObjList) {
     UObjMesh* pModel = NULL;
     UObjMesh* pNode;
 
@@ -2132,7 +2151,7 @@ UObjMesh* fn_80034A20(u16 nPatch, u16 nObjList) {
 // and look direction, the flat distance to the nearest ball and the smaller half field of view's
 // tangent (view 0's), then builds the grass list (fn_80034F28) and draws it (fn_80034CAC,
 // fn_80034DE4).
-void fn_80034AE4(void) {
+void Ter_RenderGrass(void) {
     int i;
     void* pHoleData = lbl_801D3CB0.pCurrentHoleData;
     CamLens* pLens = Camera_GetCurrentLens();
@@ -2179,8 +2198,8 @@ void fn_80034AE4(void) {
 
 // Draws the grass patches of render pass nRenderPass that take part in the first pass (bit 0 of
 // n1C), from the end of the list, one clip method at a time.
-// fake match: the one-pass loop over the passes (as in fn_800329CC) keeps the pass bit in a register
-// for the `and.` test of bit 0.
+// fake match: the one-pass loop over the passes (as in Ter_DrawPostDrawPatches) keeps the pass bit
+// in a register for the `and.` test of bit 0.
 void fn_80034CAC(int nRenderPass) {
     u8 bFirst = 1;
     int i;
@@ -2209,7 +2228,8 @@ void fn_80034CAC(int nRenderPass) {
                 pPatch = &lbl_801D3CB0.xpGrassPatchList[i];
                 if (pPatch->eClipMethod == nClip && pPatch->iRenderPass == nRenderPass
                     && (pPatch->n1C & nPassBit)) {
-                    fn_80032B7C(pPatch->pGround, nClip, nPass, pPatch->n1C, pPatch->n18, pPatch->n20, &bFirst,
+                    Ter_DrawPatchGround(pPatch->pGround, nClip, nPass, pPatch->n1C, pPatch->n18, pPatch->n20,
+                                        &bFirst,
                                 0, 1, pPatch->fDistance, pPatch->fDistance + 2.0f * pPatch->fBoundingRadius);
                 }
             }
@@ -2248,7 +2268,8 @@ void fn_80034DE4(void) {
         for (i = lbl_801D3CB0.iNumGrassPatches - 1; i >= 0; i--) {
             pPatch = &lbl_801D3CB0.xpGrassPatchList[i];
             if (pPatch->eClipMethod == nClip && (pPatch->n1C & 0x80)) {
-                fn_80032B7C(pPatch->pGround, nClip, 3, pPatch->n1C, pPatch->n18, pPatch->n20, &bFirst, 0,
+                Ter_DrawPatchGround(pPatch->pGround, nClip, 3, pPatch->n1C, pPatch->n18, pPatch->n20,
+                                    &bFirst, 0,
                             1, pPatch->fDistance, pPatch->fDistance + 2.0f * pPatch->fBoundingRadius);
             }
         }
@@ -2273,7 +2294,7 @@ void fn_80034F28(void* pUnused) {
     f32 fDist;
     s32 nClip;
 
-    // pUnused: the one caller, fn_80034AE4, passes the hole data, which this function does not read
+    // pUnused: the one caller, Ter_RenderGrass, passes the hole data, which this function does not read
     pCamera = RC_spGetCurrentRenderCtx();
     lbl_801D3CB0.iNumGrassPatches = 0;
     pGrass = lbl_801D3CB0.xpGrassPatchList;

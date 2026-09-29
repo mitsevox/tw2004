@@ -309,7 +309,7 @@ They will be sorted into the sections below.
 - **[verified] A counted skip loop written counting down** gives CW's ctr loop with no index register
   (Grass_Gc Static_Render 92.5 -> 96.5).
 - **[verified] Float tests: `if (f)` / `!f` put the value first in `fcmpu`**; `f != 0.0f` and `0.0f != f`
-  both put the zero first (GoTerrain fn_800342F0, TerrainData Network_DownloadDataPNB, GoPostFx fn_80039358). A float
+  both put the zero first (GoTerrain Ter_CourseLoadCallback, TerrainData Network_DownloadDataPNB, GoPostFx fn_80039358). A float
   `!(x < c)` gives a plain `blt` where `x >= c` gives `cror` (GoCamCont CameraController_PostEvent).
 - **[verified] Pointer plus integer always puts the pointer first in `add`**; adding as integers
   (`(u8*)(n + (uptr)p)`) flips it (UMemPool fn_8000AFA0, marked fake match).
@@ -408,7 +408,7 @@ They will be sorted into the sections below.
   (UStream_Update 98.8 -> 99.8, File_ReadAsyncEx 93.8 -> 99.6).
 - **[verified] An expression passed to an inline is substituted at each use of the parameter**, so the
   original can build the same value twice and take its bits apart again. Routing it through a static
-  inline reproduces that (GoTerrain fn_80032F88 89.2 -> 99.45).
+  inline reproduces that (GoTerrain Ter_DrawObjectList 89.2 -> 99.45).
 - **[verified] Runs of written-out zero stores were loops in EA's source:** the compiler unrolls a small
   constant loop fully, with other registers than hand-written stores (SitDev_SetupStateVector 23 diffs ->
   exact with two `for` loops).
@@ -845,7 +845,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   (the frontend makes the temp) can. Swing SW_vImpact: pLaunchA/B locals -> `gPlayers[nPlayer].vLaunchA/B`
   at each call, 6 -> 0.
 - **[verified] A callee's parameter order sets its callers' argument schedule**, even when every
-  register stays the same. GoTerrain fn_80032B7C 98.46 -> 100 and Ter_BuildObjectDrawLists 83.6 -> 100 from
+  register stays the same. GoTerrain Ter_DrawPatchGround 98.46 -> 100 and Ter_BuildObjectDrawLists 83.6 -> 100 from
   Ter_AddObjectDraw's parameters in Ter_ObjectDrawData's field order. Worth a look wherever a ledger says
   "argument order" (PictInt_Decode, Stm_Tick, fn_80006A98, fn_8009A708, UISApi/UISEvent).
 - **[verified] File-wide `opt_propagation off` keeps consecutive `x |= c` statements separate**
