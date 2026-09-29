@@ -45029,5 +45029,21 @@
 "matched_functions": 7647,
 "total_functions": 7647,
 "exact": 7647
+},
+{
+"commit": "d115694",
+"sha": "d115694e961fda9b35d3f31a427920f96c667b54",
+"time": 1790694754,
+"subject": "CI: remove build outputs no rule makes before building (tools/build/prune_stale.py). The uiobject.c -> uiObject.c rename left uiobject.o in CI's cached build folder; wibo's case-blind lookup kept writing into it, objdiff could not find uiObject.o, and every main build failed since 2026-09-29 00:24 UTC. agents/README.md: CI is checked after every push",
+"report": true,
+"matched_code": 1550724,
+"complete_code": 1550724,
+"matched_data": 862643,
+"complete_data": 1078855,
+"total_code": 1550724,
+"total_data": 1078855,
+"matched_functions": 7647,
+"total_functions": 7647,
+"exact": 7647
 }
 ]
