@@ -1,5 +1,5 @@
 #!/bin/bash
-# replay_lane.sh <lane> <base> <gfirst|glast> <globals.tsv|-> <batch.tsv>...
+# replay_lane.sh <lane> <base> <gfirst|glast> <globals.tsv[,globals2.tsv...]|-> <batch.tsv>...
 # Replays one lane's work on main (the orchestrator's step; agents/README.md):
 #   0. check_batches.py on the lane's files: a malformed row or a name clash stops everything;
 #   1. the globals file (before or after the batches) with rename.py, then each name.py batch, each
@@ -14,17 +14,19 @@
 set -u
 cd "$(git rev-parse --show-toplevel)"
 L=$1; B=$2; ORD=$3; G=$4; shift 4
+GS=(); [ "$G" = - ] || IFS=, read -ra GS <<< "$G"   # several globals files: comma-separated, in order
 START=$(git rev-parse HEAD)
 stop() { echo "STOPPED: $*"; exit 1; }
 ok() { sha1sum -c config/GW4E69/build.sha1 >/dev/null 2>&1 || stop "build not OK after $1"; }
-FILES=("$@"); [ "$G" = - ] || FILES+=("$G")
+FILES=("$@" "${GS[@]}")
 python tools/agents/check_batches.py "${FILES[@]}" || stop "check_batches.py found problems"
 glob() {
-  [ "$G" = - ] && return
-  out=$(python tools/match/rename.py "$G" 2>&1) || { echo "$out" | tail -5; stop "rename.py refused $G"; }
-  echo "$out" | tail -1
-  ninja >/dev/null 2>&1; ok globals
-  git add -A && git commit -q -m "globals: $L's data names (replayed by orchestrator)"
+  for g in "${GS[@]}"; do
+    out=$(python tools/match/rename.py "$g" 2>&1) || { echo "$out" | tail -5; stop "rename.py refused $g"; }
+    echo "$out" | tail -1
+    ninja >/dev/null 2>&1; ok "$g"
+    git add -A && git commit -q -m "globals: $L's data names, $(basename "$g" .tsv) (replayed by orchestrator)"
+  done
 }
 [ "$ORD" = gfirst ] && glob
 for b in "$@"; do
@@ -35,8 +37,7 @@ for b in "$@"; do
   git add -A && git commit -q -m "names: $L $(basename "$b" .tsv) (replayed by orchestrator)"
 done
 [ "$ORD" = glast ] && glob
-if [ "$G" = - ]; then out=$(BASE=$B tools/agents/merge_lane.sh "$L" 2>&1)
-else out=$(BASE=$B tools/agents/merge_lane.sh "$L" "$G" 2>&1); fi
+out=$(BASE=$B tools/agents/merge_lane.sh "$L" "${GS[@]}" 2>&1)
 echo "$out" | tail -8
 echo "$out" | grep -q CONFLICTS && stop "hand-edit conflicts: resolve them (merge_pick.py), then refs, wraplong, build, lanediff"
 [ -n "${NOREFS:-}" ] || python tools/match/rename.py config/GW4E69/name_sources.tsv --refs-only 2>&1 | tail -1
@@ -44,5 +45,5 @@ for i in $(seq 1 12); do python tools/match/wraplong.py --from-lint --diff HEAD 
 python tools/match/wraphdr.py --from-lint --diff HEAD
 ninja >/dev/null 2>&1; ok merge
 echo "build OK; lint since start: $(python tools/match/lint.py --diff $START 2>&1 | tail -1)"
-if [ "$G" = - ]; then python tools/agents/lanediff.py "$L"; else python tools/agents/lanediff.py "$L" "$G"; fi
+python tools/agents/lanediff.py "$L" "${GS[@]}"
 exit 0
