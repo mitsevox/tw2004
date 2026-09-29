@@ -1,12 +1,15 @@
 // hlaudtrack.c (TW06's name: golf/audio/engine/hl/hlaudtrack.c; TW07's HLAudTrack.c has the same
-// functions in the same order, plus Trk_ExitModule, Trk_FreeAllPerfs and Trk_SetTempo): the sound
+// functions in the same order, from TrkRender3D and TrkRenderStereo (inline only in TW07, out of
+// line here) on, plus Trk_ExitModule, Trk_FreeAllPerfs and Trk_SetTempo): the sound
 // engine's tracks, "perfs" to EA. A pool of 32 tracks, each playing one track of a sound source's
 // sound, either sequenced (hlaudtrackseq.c) or streamed from disc (hlaudtrackstm.c): allocated,
 // started, ticked and rendered once a frame (Trk_Cycle), stopped and freed. The tracks of placed
 // (3D) sources sit in a list sorted on their distance attenuation, so the quietest can be stolen
 // when the pool runs out. Its last three functions are header inlines of TW07's compiled out of
-// line (Seq_SelectVariation, Mas_GetSubmix, Mas_IsChanMuted). Its extent is its data: it is the
-// first to use the .bss at 0x801F1868 and the only user of the .sdata2 block 0x80283FD0-0x80283FD8.
+// line (Seq_SelectVariation, Mas_GetSubmix, Mas_IsChanMuted). Its extent: it starts with
+// TrkRender3D (0x800A9590, TW07's first function), whose constants open its .sdata2 block
+// 0x80283FC0-0x80283FD8 (only this file uses it), and InsertSortWorldPerf is the first to use its
+// .bss at 0x801F1868.
 
 #include "core/audtrack.h"
 
@@ -15,6 +18,65 @@ UList gTrkPerfLists[2];                // the tracks in use: [0] in start order,
 
 AudTrack* gTrkPerfs;                    // the 32 tracks (Trk_InitModule)
 UPool gTrkPerfPool;                     // the free ones
+
+// Sets a placed track's voices: volume, pan and doppler pitch from the sound's place.
+void TrkRender3D(AudSource* pSource, AudTrack* pTrack, f32 fVolume) {
+    AudVoiceParams params;
+    AudVoice** ppVoice;
+    AudVoice** ppEnd;
+    AudVoice* pVoice;
+    f32 fPitch;
+
+    ppVoice = pTrack->apVoices;
+    ppEnd = &pTrack->apVoices[pTrack->pTmpl->n2];
+    fVolume = audfrac_Mul(pTrack->f48, fVolume);
+    fPitch = audfrac_Mul(pSource->fPitch, pTrack->f4C);
+    params.flags.n = 0;
+    params.flags.b.bVolume = 1;
+    params.flags.b.bPitch = 1;
+    params.fPitch = fPitch;
+    for (; ppVoice < ppEnd; ppVoice++) {
+        pVoice = *ppVoice;
+        if (pVoice != NULL) {
+            params.nVolume = audfrac_Mul(fVolume, pVoice->n14 << 7);
+            params.nPan = 64.0f * pSource->fPan + 64.0f;
+            params.n7 = 64.0f * pSource->f68 + 64.0f;
+            Voc_Render(pVoice, &params);
+        }
+    }
+}
+
+// Sets a track's voices when the sound is not placed: a mono track in the centre, a stereo one's
+// channels left and right in turn.
+void TrkRenderStereo(AudSource* pSource, AudTrack* pTrack, f32 fVolume) {
+    AudVoiceParams params;
+    AudVoice** ppVoice;
+    AudVoice** ppEnd;
+    AudVoice* pVoice;
+    u8 bMono;
+    s8 bRight;
+    u8 nChannels;
+
+    nChannels = pTrack->pTmpl->n2;
+    params.flags.n = 0;
+    ppVoice = pTrack->apVoices;
+    ppEnd = &pTrack->apVoices[nChannels];
+    params.flags.b.bVolume = 1;
+    bRight = 0;
+    bMono = nChannels == 1;
+    params.flags.b.bPitch = 1;
+    params.fPitch = pTrack->f4C;
+    for (; ppVoice < ppEnd; ppVoice++) {
+        pVoice = *ppVoice;
+        if (pVoice != NULL) {
+            params.nVolume = audfrac_Mul(pVoice->n14 << 7, fVolume);
+            params.nPan = bMono ? 0x40 : bRight ? 0x7F : 0;
+            params.n7 = 0x7F;
+            Voc_Render(pVoice, &params);
+        }
+        bRight ^= 1;
+    }
+}
 
 // Puts a placed (3D) track into the sorted track list, on f48, its distance attenuation (TW07's
 // distAttn), loudest first: before the first quieter track, else at the end. Trk_AllocPerf steals
@@ -89,7 +151,7 @@ u8 Trk_InitSession(u8 a, u8 b) {
     return 1;
 }
 
-// Empty (TW07's is too); called when hlaudmovie.c tears the sound session down.
+// Empty (TW07's is too); called when hlaudsession.c tears the sound session down.
 void Trk_ExitSession(void) {
 }
 
@@ -382,9 +444,9 @@ void Trk_SetVariationRange(AudTrack* pTrack, u8 n) {
 }
 
 // Once a frame after its tick: the track's volume (f44) times its submix's (Mas_GetSubmix of the
-// play list's or bank's curve) goes with the track to hlaudmovie.c's render for placed (sorted)
-// tracks or its stereo render for the others, which set each voice (TW07 inlines TrkRender3D and
-// TrkRenderStereo here). Nothing for a template without data.
+// play list's or bank's curve) goes with the track to TrkRender3D for placed (sorted) tracks or
+// TrkRenderStereo for the others, which set each voice (TW07 inlines both here). Nothing for a
+// template without data.
 void Trk_Render(AudTrack* pTrack) {
     AudSource* pSource;
     AudPlayList* pList;

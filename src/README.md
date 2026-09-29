@@ -472,7 +472,9 @@ boot-time voice code in `startUp.c` right after and AudLock.c, UAudMemStack.c an
 | GameAudio.c | ours | the game's side: starts the engine, drives emitters for course, mode and pin |
 | AudTable.c | ours | 256 playing sounds; 3D volume, pan and doppler |
 | HLAudMaster.c | T7 | master settings: 32 submix volumes and mutes |
-| hlaudmovie.c | T6 | a movie's stereo sound; sound banks, stream file and buffer |
+| hlaudmic.c | T6 | listeners: their count and reverb preset |
+| hlaudmovie.c | T6 | a movie's stereo sound on two voices |
+| hlaudsession.c | T6 | sessions; sound banks, stream file and buffer |
 | hlaudtrack.c | T6 | 32 tracks, priority list for stealing |
 | hlaudtrackseq.c | T6 | the sequencer (event-played tracks) |
 | hlaudtrackstm.c | T6 | streamed tracks (music, long sounds) through ARAM |

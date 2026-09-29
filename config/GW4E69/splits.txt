@@ -853,19 +853,26 @@ HLAudMaster.c:
 	.sbss       start:0x80282060 end:0x80282068
 	.sdata2     start:0x80283FB0 end:0x80283FC0
 
+hlaudmic.c:
+	.text       start:0x800A8754 end:0x800A87D8
+	.sbss       start:0x80282068 end:0x80282070
+
 hlaudmovie.c:
-	.text       start:0x800A8754 end:0x800A9808
-	.data       start:0x8018EB30 end:0x8018EB78
+	.text       start:0x800A87D8 end:0x800A8D00
+	.data       start:0x8018EB30 end:0x8018EB60
 	.bss        start:0x801F1850 end:0x801F1868
+
+hlaudsession.c:
+	.text       start:0x800A8D00 end:0x800A9590
+	.data       start:0x8018EB60 end:0x8018EB78
 	.sdata      start:0x80281468 end:0x80281470
-	.sbss       start:0x80282068 end:0x80282098
-	.sdata2     start:0x80283FC0 end:0x80283FD0
+	.sbss       start:0x80282070 end:0x80282098
 
 hlaudtrack.c:
-	.text       start:0x800A9808 end:0x800AA4BC
+	.text       start:0x800A9590 end:0x800AA4BC
 	.bss        start:0x801F1868 end:0x801F1880
 	.sbss       start:0x80282098 end:0x802820A8
-	.sdata2     start:0x80283FD0 end:0x80283FD8
+	.sdata2     start:0x80283FC0 end:0x80283FD8
 
 hlaudtrackseq.c:
 	.text       start:0x800AA4BC end:0x800AB3A4

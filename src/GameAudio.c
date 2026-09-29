@@ -15,7 +15,7 @@
 #include "core/gameaudio.h"
 #include "core/audtrack.h"
 
-// hlaudmovie.c
+// HLAudMaster.c, hlaudmic.c, hlaudsession.c, startUp.c
 void Mas_SetSubmixMuteAll(s32 n);
 void Mic_SetRvbPreset(u8 a, u8 n);
 void Ses_Pause(u8 bPause, u8 bSpinupDelay);
@@ -82,7 +82,7 @@ u8   Gaud_GetAmbientStmStatus(void);
 void Gaud_InitWindSound(int n);
 void Gaud_InitTreeSound(int n);
 
-// Each volume curve's volume (Gaud_ReInit hands them to hlaudmovie.c).
+// Each volume curve's volume (Gaud_ReInit hands them to HLAudMaster.c).
 f32 lbl_8018E988[32] = {
     0.3f, 0.7f, 0.8f, 1.0f, 0.7f, 0.4f, 1.0f, 1.0f,
     1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.7f, 0.7f, 0.4f,
@@ -172,7 +172,7 @@ u8   BootSound_InitModule(void);
 void BootSound_CopyToAram(void);
 void BootSound_Play(u8 nSound);
 
-// hlaudmovie.c
+// HLAudMaster.c, hlaudmic.c, hlaudmovie.c, hlaudsession.c
 u8   Mas_InitModule(void);
 void Mas_SetTickRate(u8 nRate);
 u8   Mic_InitModule(void);
@@ -284,7 +284,7 @@ void Aud_MicExitSession(void) {
     lbl_80282020 = 0;
 }
 
-// Gives listener nIndex reverb preset nValue, passing it on to hlaudmovie.c (Mic_SetRvbPreset) only when
+// Gives listener nIndex reverb preset nValue, passing it on to hlaudmic.c (Mic_SetRvbPreset) only when
 // it changes. Gaud_InitHole uses preset 17 on course 7's hole index 2.
 void Aud_MicSetRvbPreset(u8 nIndex, u8 nValue) {
     if (lbl_80282024[nIndex] != nValue) {
@@ -2003,7 +2003,7 @@ void Aud_PlayBuiltInSound(u8 nSound) {
 
 // Starts a sound session (the front end, or a hole: GoEntry.c passes the course + 1, 1 and one
 // listener per view): frees every emitter instance, sets the listener count and starts the session
-// in hlaudmovie.c (Ses_Init). a and b are TW07's sessionID and subsessID; nUnused (TW07: options)
+// in hlaudsession.c (Ses_Init). a and b are TW07's sessionID and subsessID; nUnused (TW07: options)
 // is not read. Always 1.
 s32 Aud_InitSession(u8 a, u8 b, u8 nListeners, int nUnused) {
     Aud_EmiInitSession();
@@ -2013,7 +2013,7 @@ s32 Aud_InitSession(u8 a, u8 b, u8 nListeners, int nUnused) {
     return 1;
 }
 
-// Ends a sound session: the emitters' and listeners' session end, then hlaudmovie.c's
+// Ends a sound session: the emitters' and listeners' session end, then hlaudsession.c's
 // (Ses_Exit). n is TW07's subsessID.
 void Aud_ExitSession(s32 n) {
     Aud_EmiExitSession();

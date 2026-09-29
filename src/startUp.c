@@ -389,7 +389,7 @@ u8 HwVoice_InitSession(void) {
     return 1;
 }
 
-// The sound session's exit step (hlaudmovie.c) for the hardware voices: release every voice.
+// The sound session's exit step (hlaudsession.c) for the hardware voices: release every voice.
 void HwVoice_ExitSession(void) {
     u16 i;
     for (i = 0; i < NUM_VOICES; i++) {

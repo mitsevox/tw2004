@@ -437,15 +437,15 @@ typedef struct AudBlock48 {
 } AudBlock48;
 
 extern AudSource* lbl_80282058;         // AudTable.c's table
-extern u8 gMicCount;                 // the number of listeners (hlaudmovie.c)
+extern u8 gMicCount;                 // the number of listeners (hlaudmic.c)
 extern f32 gMasSubmixVolumes[32];            // the volume of each curve (Mas_GetSubmix; HLAudMaster.c)
 extern s32 gMasMuteMask;                // one bit per curve: 1 = muted (Mas_IsChanMuted; HLAudMaster.c)
 extern f32 gMasTickRateScale;                // Mas_SetTickRate's rate, Mas_GetUpdateRateScale's result (HLAudMaster.c)
-extern s32 gSesSession;                // Ses_IsSessionZero says whether it is 0 (hlaudmovie.c)
-extern AudStreamFile* gSesStreamFileHdr;     // the stream file's header (hlaudmovie.c)
-extern AudBank* gSesBank1;           // bank 1 (hlaudmovie.c)
-extern AudBank* gSesBank0;           // bank 0 (hlaudmovie.c)
-extern u32 gSesFlags;                // what is loaded (hlaudmovie.c): 0x01 set up, 0x04/0x08
+extern s32 gSesSession;                // Ses_IsSessionZero says whether it is 0 (hlaudsession.c)
+extern AudStreamFile* gSesStreamFileHdr;     // the stream file's header (hlaudsession.c)
+extern AudBank* gSesBank1;           // bank 1 (hlaudsession.c)
+extern AudBank* gSesBank0;           // bank 0 (hlaudsession.c)
+extern u32 gSesFlags;                // what is loaded (hlaudsession.c): 0x01 set up, 0x04/0x08
                                         // bank 0 and its samples, 0x10/0x20 bank 1 and its samples;
                                         // the tracks tick when 0xD is set, only some when 0x40 is
 extern u32 lbl_80282018;                // the sequencer re-triggers notes when its low 4 bits are 0
@@ -483,22 +483,26 @@ f32          audfrac_Mul(f32 fVolume, f32 fCurve);
 u8           Mas_InitSession(void);
 void         Mas_ExitSession(void);
 
-// hlaudmovie.c
+// hlaudmic.c
+u8           Mic_InitSession(u8 nSession, u8 nSubsession, u8 nListeners);
+void         Mic_ExitSession(void);
+
+// hlaudsession.c
 u8*          Ses_GetStreamBuffer(u32 uSize, u8 nPlayList);                  // the stream buffer
 void         Ses_FreeStreamBuffer(u8* pBuffer, u32 uSize, u8 nPlayList);     // give it back
 AudStream*   Ses_GetStreamFromPlayList(AudPlayList* pList, u16 nStream, u32* puLength);
 void         Ses_TmplOvrTrackRvbMode(s16 nSound, u8 nTrack, u8 bOn);
 u32          Ses_GetStreamBufferSize(u8 nPlayList);                              // the buffer size it needs
 AudPlayList* Ses_GetStreamPlayList(u8 nPlayList);
-void         TrkRender3D(AudSource* pSource, AudTrack* pTrack, f32 fVolume);   // placed sounds
-void         TrkRenderStereo(AudSource* pSource, AudTrack* pTrack, f32 fVolume);   // the others
 
 extern AudStreamQueue gAudStreamReadQueue;
-extern s32 gSesStreamFile;                // the stream file (hlaudmovie.c opens "/AudioStm_GC.sab")
+extern s32 gSesStreamFile;                // the stream file (hlaudsession.c opens "/AudioStm_GC.sab")
 extern u8 gStmLastReadId;                 // the last read id handed out (hlaudtrackstm.c)
 extern AudTrack* gStmDmaTrack;          // the track whose block is being DMA'd (hlaudtrackstm.c)
 
 // hlaudtrack.c
+void TrkRender3D(AudSource* pSource, AudTrack* pTrack, f32 fVolume);   // placed sounds
+void TrkRenderStereo(AudSource* pSource, AudTrack* pTrack, f32 fVolume);   // the others
 void InsertSortWorldPerf(AudTrack* pTrack);
 u8   Trk_InitModule(void);
 u8   Trk_InitSession(u8 a, u8 b);          // Ses_Init's a and b, unused

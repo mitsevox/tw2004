@@ -177,7 +177,7 @@ void AudDma_CancelOwner(void* pOwner);
 void AudDma_CacheAfterTransfer(void* p, u32 uLen, int nDir);
 void AudDma_CacheBeforeTransfer(void* p, u32 uLen, int nDir);
 
-// startUp.c, called by the sound engine (hlaudmovie.c).
+// startUp.c, called by the sound engine (hlaudsession.c, hlaudmovie.c).
 u8   HwVoice_InitSession(void);
 void HwVoice_ExitSession(void);
 u32  HwVoice_GetPlayPos(u16 nVoice);                   // where the voice is playing in ARAM
