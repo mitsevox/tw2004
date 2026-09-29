@@ -1,7 +1,13 @@
-// gocamscripts.c (TW06's golf/cameras/gocamscripts.c; the CameraScript_ / CamScript_ functions): the
-// camera scripts. A view's script moves the camera from shot to shot (the shots and sequences
-// GoDynamicCam.c picks), keeps it above the ground and on the fairway, and aims it at the ball
-// and the pin. The unit covers the file's certain core; its edges are still open.
+// gocamscripts.c (TW06's golf/cameras/gocamscripts.c, TW07's GoCamScripts.c: the CameraScript_ and
+// CamScript_ functions, in TW07's order): the camera scripts. A view's script (CamScript) plays a
+// camera shot (CamShot; the shots and sequences GoDynamicCam.c picks) and blends into the next one
+// (straight, turning, splined, arced or circling moves, picked by the next shot's blend kind); it
+// aims the camera at the ball, the golfer, the pin or the aim marker with lag and shoulder shake,
+// keeps it above the ground, off the flagstick and on the fairway, and runs the view's colour fade.
+// The file ends with small helpers TW07 has as header inlines, compiled here as functions
+// (CamScript_DoesScriptTrackBall from GoCamScripts.h, CA_vSetCameraFieldOfView from GoCamera.h,
+// the GameEffects_ half-time, double-time and GameBreaker switches from GameEffects.h), and the
+// file's own paired-single Vec3_Sub and Vec3_Add.
 
 #include "golfer.h"
 #include "game.h"
@@ -1132,6 +1138,9 @@ void CamScript_CircleCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScri
             fn_80038054(1, gPlayers[nPlayer].nView[0], f90, f);
         }
     }
+    // EA bug: the roll blends by fT (0..2), not fShare like everything else: with shots of
+    // different roll (f9C) it runs on to twice the difference, then snaps back to the current
+    // shot's roll when the blend ends (CamScript_RunScript drops the next shot of a kind-7 blend)
     pScript->fA8 = fT * (pNext->f9C - pShot->f9C) + pShot->f9C;
 }
 
@@ -3018,8 +3027,6 @@ void GameEffects_SetDoubleTime(u8 bOn, int nPlayer) {
     }
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
 u8 GameEffects_IsGameBreakerOn(void) {
     return gGameEffects.bGameBreaker;
 }
@@ -3038,5 +3045,3 @@ u8 CamScript_DoesScriptTrackBall(CamShot* pShot) {
     }
     return 0;
 }
-
-// ---- end of sweep code ----

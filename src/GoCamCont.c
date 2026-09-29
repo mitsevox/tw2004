@@ -1,6 +1,11 @@
-// GoCamCont.c (TW06's golf/cameras/gocamcont.c; our spelling): the camera controller of each view
-// (View, TW06's CameraController): picking the camera mode (CameraController_SetCameraMode), its idle state and the
-// small setters and tests the camera code uses.
+// GoCamCont.c (TW06's golf/cameras/gocamcont.c, TW07's GoCamCont.c, the CameraController_
+// functions in TW07's order): the camera controller of each view (View, TW07's
+// CameraController_t): setting it up, its frame (CameraController_Idle runs the current camera
+// mode's process from GoGolfCam.c), switching camera modes (CameraController_SetCameraMode),
+// camera events that ask for shots (CameraController_PostEvent), the colour fades, camera shake,
+// the on-screen tests, which golfer the current view hides, and putting a camera that runs into
+// an object back on the fairway. RC_vComputeRenderCtxWorldToPrimitiveCoordinate, a GoRenderCtx.h
+// inline in TW07, is compiled here as a function.
 
 #include "golfer.h"
 #include "game.h"
@@ -178,7 +183,8 @@ void CameraController_Idle(View* pView, int nPlayer) {
     case 25:
         nMove = pView->script.nFade;
         if (gSession.nPaused == 0) {
-            CamScript_Fade(&pView->script, FRAME_TIME);   // port: one NTSC frame a call, not gSession.fFrameTime
+            // port: one NTSC frame a call, not gSession.fFrameTime
+            CamScript_Fade(&pView->script, FRAME_TIME);
             // A colour fade held in state 4 (after fading up) stays on instead of ending.
             if (nMove == 4 && pView->script.nFade == 0) {
                 pView->script.nFade = 4;
@@ -550,15 +556,16 @@ void CameraController_HoldFadeColor(View* pView, f32* pVec) {
 }
 
 // Posts camera event nKind to the view: it becomes the view's requested event (CamScript.nC4).
-// Without a club (25) only events 0, 5, 8, 11 and 23 are taken. Event 12 first records the current
-// camera and blends from it into a kind-12 shot chosen for the player, fading the view to grey
-// (alpha 0.5) over 0.3; event 7 becomes 10 when the ball lies on surface class 7 or 16. While event
-// 12 waits only 5, 8 and 10 replace it; 6 is never taken; 2 and 3 do not replace 7, nor 7 them.
+// Without a club (25) only events 0, 5, 8, 11 and 23 are taken. Event 12 first holds the current
+// camera (recorded into shot19C) for 0.3 while the view fades to grey (alpha 0.5), then goes on to
+// a kind-12 shot chosen for the player; event 7 becomes 10 when the ball lies on surface class 7 or
+// 16. While event 12 waits only 5, 8 and 10 replace it; 6 is never taken; 2 and 3 do not replace
+// 7, nor 7 them.
 void CameraController_PostEvent(View* pView, int nKind, int nPlayer) {
     f32* pPos = CameraController_GetCameraOrigin(pView);
     f32* pAt = CameraController_GetCameraLookPoint(pView);
     f32 vNormal[4];
-    f32 vSpeed[4] = {0.1f, 0.1f, 0.1f, 0.5f};
+    f32 vGrey[4] = {0.1f, 0.1f, 0.1f, 0.5f};
     SurfaceType* pSurface;
     CamShot* pShot;
     int nAsked;
@@ -576,7 +583,7 @@ void CameraController_PostEvent(View* pView, int nKind, int nPlayer) {
                                            100.0f, 25, 0.0f);
             pView->script.nBC = 5;
             pView->script.f8C = 0.3f;
-            CameraController_FadeOut(pView, 0.3f, vSpeed);
+            CameraController_FadeOut(pView, 0.3f, vGrey);
         }
     }
     if (nKind == 7) {
