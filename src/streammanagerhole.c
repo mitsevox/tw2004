@@ -92,8 +92,8 @@ void fn_80124A70();
 void fn_80014668(void);
 void fn_800146C4(void);
 void fn_800147A4(void);
-void fn_800B160C();
-void fn_800B1644();
+void startup_RegisterStreamClients();
+void startup_UnregisterStreamClients();
 void fn_800147D4(void);
 void fn_80014804(void);
 void fn_80014834(void);
@@ -327,7 +327,7 @@ void fn_800147D4(void) {
     fn_80010284();
     UI_RegisterStreamClients();
     MC_RegisterStreamClients();
-    fn_800B160C();
+    startup_RegisterStreamClients();
     fn_80014864();
 }
 
@@ -335,7 +335,7 @@ void fn_80014804(void) {
     fn_800102B4();
     UI_UnregisterStreamClients();
     MC_UnRegisterStreamClients();
-    fn_800B1644();
+    startup_UnregisterStreamClients();
     fn_800148A8();
 }
 

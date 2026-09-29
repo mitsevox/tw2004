@@ -332,7 +332,7 @@ typedef struct AudSource {
     u16  uChanged;              // 0x2    bits 0-7: that track's auParams was set; 0x200: u0 / u1
     u32  auParams[8];           // 0x4    each track's controller value (Aud_EmiSetControllerInt;
                                 //        streamed tracks: PreprocessControllers)
-    f32  aPos[2][3];            // 0x24   where it is from each listener (fn_800B1A40 measures it)
+    f32  aPos[2][3];            // 0x24   where it is from each listener (audvec3_ApproxLength measures it)
     AudSound* pSound;           // 0x3C
     s16  nSound;                // 0x40   its number (fn_800A85CC)
     u8   unk42[0x44 - 0x42];

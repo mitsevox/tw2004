@@ -223,8 +223,8 @@ void Gaud_InitFE(void);
 void Gaud_ExitFE(void);
 void Aud_InitSession(int a, int b, u8 c, int d);
 void UI_Obj_CloseModule(void);
-void fn_800B1608(void);
-void fn_800B1D78(void);
+void Startup_Update(void);
+void Startup_InitGameMessages(void);
 void fn_800B2724(void);
 void fn_800B2734(void);
 void fn_800B28D4(Character* pChar, int a, int b);
@@ -751,7 +751,7 @@ void fn_8006CEFC(void) {
     lbl_80281E58 = VM_spCreateViewport();
     lbl_80281E54 = RC_spCreateRenderCtx(lbl_80281E60, lbl_80281E5C, lbl_80281E58);
     RC_vSetCurrentRenderCtx(lbl_80281E54);
-    fn_800B1D78();
+    Startup_InitGameMessages();
     fn_800147D4();
     fn_80014834();
     fn_80014804();
@@ -1091,7 +1091,7 @@ void fn_8006D8E8(void) {
             CharacterTex_TextureLoader();
         }
         if (gSession.nGameType == 1) {
-            fn_800B1608();
+            Startup_Update();
         } else {
             fn_8005D2F8();
         }

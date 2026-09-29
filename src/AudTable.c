@@ -9,7 +9,7 @@
 
 #include "core/audtrack.h"
 
-f32  fn_800B1A40(f32* pVec);                     // its length
+f32  audvec3_ApproxLength(f32* pVec);                     // its length
 
 void FreeAllPerfs(AudSource* pSource);
 f32  Attenuation3D(f32 fDist, f32 fScale);
@@ -208,7 +208,7 @@ f32 Distance3D(AudSource* pSource, f32 (*aPos)[3]) {
 
     fNearest = 32768.0f;
     for (i = 0; i < lbl_80282068; i++) {
-        fDist = fn_800B1A40(pSource->aPos[i]);
+        fDist = audvec3_ApproxLength(pSource->aPos[i]);
         pSource->afDist[i] = fDist;
         if (fNearest > fDist) {
             fNearest = fDist;

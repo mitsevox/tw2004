@@ -35,18 +35,18 @@ void   fn_800B0E40(void);
 void   fn_800B0E84(void);
 void   fn_800B0EC8(void);
 void   fn_800B0F0C(void);
-void   fn_800B0F50(void);
-void   fn_800B0F94(void);
-void   fn_800B0FD8(void);
-void   fn_800B101C(void);
-void   fn_800B1060(void);
-void   fn_800B10A4(void);
-u8     fn_800B1180(void);
-s32    fn_800B12FC(s32* pnPort, s32* pnSlot);
-int    fn_800B13FC(s32* pnPort, s32* pnSlot);
-void   fn_800B166C(UStreamObject* pObject);
-void   fn_800B1CF4(f32* pA, f32* pB, f32* pOut);
-void   fn_800B1D18(f32* pA, f32* pB, f32* pOut);
+void   Startup_SendNoCardsMsg(void);
+void   Startup_SendSlotBEmptyMsg(void);
+void   Startup_SendCardReadyMsg(void);
+void   Startup_SendCardFullMsg(void);
+void   Startup_SendSaveDamagedMsg(void);
+void   Startup_UpdateCardStatuses(void);
+u8     Startup_AreAllSlotsEmpty(void);
+s32    Startup_GetNextCardStatus(s32* pnPort, s32* pnSlot);
+int    Startup_FindNextCardWithStatus(s32* pnPort, s32* pnSlot);
+void   Startup_LoadLegalPicture(UStreamObject* pObject);
+void   Startup_Vec3Add(f32* pA, f32* pB, f32* pOut);
+void   Startup_Vec3Sub(f32* pA, f32* pB, f32* pOut);
 void   fn_800B1F20(MsgArg* pArgs, MsgArg* pResult);
 void   fn_800B1F9C(MsgArg* pArgs, MsgArg* pResult);
 void   fn_800B1FBC(MsgArg* pArgs, MsgArg* pResult);
@@ -91,8 +91,8 @@ void   MIXSetSPan(AXVPB* pVpb, int nSPan);
 void   MIXMute(AXVPB* pVpb);
 void   MIXUnMute(AXVPB* pVpb);
 void   MIXUpdateSettings(void);         // MIX: pass the settings to the hardware
-void   fn_800B1A88(f32* pA, f32* pB);   // swap two floats
-void   fn_800B1A9C(f32* v, f32 x, f32 y);
+void   audfrac_Swap(f32* pA, f32* pB);   // swap two floats
+void   audvec2_Set(f32* v, f32 x, f32 y);
 
 // The save kinds (a table of functions at lbl_8018C7D8).
 s32    MC_CallActionFnMemoryRequired(CardPos* pPos);      // the picked save kind's size on that card
@@ -134,7 +134,7 @@ s32    lbl_80282148[MC_NUM_PORTS][MC_NUM_SLOTS];
 s32    lbl_80282140[MC_NUM_PORTS][MC_NUM_SLOTS];
 s32    lbl_80282138[MC_NUM_PORTS];
 
-void*  lbl_80282134;            // the first 'LEGL' object's copy (fn_800B166C keeps two)
+void*  lbl_80282134;            // the first 'LEGL' object's copy (Startup_LoadLegalPicture keeps two)
 void*  lbl_80282130;            // the second one's
 u32    lbl_8028212C;            // the first one's size
 u32    lbl_80282128;            // the second one's
@@ -837,8 +837,8 @@ void fn_800B0960(void) {
     MC_Disconnect();
 }
 
-// The status of the card in nPort, nSlot for the status table (fn_800B10A4): 0 no card, 7 not a
-// memory card, 6 a sector size other than 0x2000, 8 an I/O error, 9 broken, 1 not usable (flag
+// The status of the card in nPort, nSlot for the status table (Startup_UpdateCardStatuses): 0 no
+// card, 7 not a memory card, 6 a sector size other than 0x2000, 8 an I/O error, 9 broken, 1 not usable (flag
 // 0x08 clear, or an encoding error), 10 when fn_8009EE28 fails with -18, 3 when the card has the
 // blocks and directory entries the save needs (save kinds 0 and 3, fn_8009D3DC + fn_8009D50C),
 // and 2 when it has not.
@@ -922,7 +922,7 @@ void fn_800B0B1C(void) {
                 if (i == 1 && lbl_80282150[0][0] != 0) {
                     lbl_80281498 = j;
                     lbl_8028149C = i;
-                    fn_800B0F94();
+                    Startup_SendSlotBEmptyMsg();
                     MC_Disconnect();
                     return;
                 }
@@ -936,7 +936,7 @@ void fn_800B0B1C(void) {
             case 10:
                 lbl_80281498 = j;
                 lbl_8028149C = i;
-                fn_800B1060();
+                Startup_SendSaveDamagedMsg();
                 MC_Disconnect();
                 return;
             case 6:
@@ -972,7 +972,7 @@ void fn_800B0B1C(void) {
             case 2:
                 lbl_80281498 = j;
                 lbl_8028149C = i;
-                fn_800B101C();
+                Startup_SendCardFullMsg();
                 MC_Disconnect();
                 return;
             case 3:
@@ -990,11 +990,11 @@ done:
     lbl_80281498 = j;
     lbl_8028149C = i;
     if (bFound) {
-        fn_800B0FD8();
+        Startup_SendCardReadyMsg();
     } else {
         lbl_80281498 = -1;
         lbl_8028149C = -1;
-        fn_800B0F50();
+        Startup_SendNoCardsMsg();
     }
 }
 
@@ -1036,39 +1036,54 @@ void fn_800B0F0C(void) {
     UISDoHint(gpFrontEnd->pHandler, 0x83, 0, (s32*)&arg);
 }
 
-void fn_800B0F50(void) {
+// The start-up card check's message 0x81 to the front end: no card in either slot (fn_800B0B1C
+// sends it when every card status is 0).
+void Startup_SendNoCardsMsg(void) {
     MsgArg arg;
     Mem_set(&arg, 0, sizeof(arg));
     UISDoHint(gpFrontEnd->pHandler, 0x81, 0, (s32*)&arg);
 }
 
-void fn_800B0F94(void) {
+// The start-up card check's message 0x8B to the front end, meant for port 1 (slot B) empty while
+// port 0 has a card. Never sent: fn_800B0B1C tests for it only after port 0's status was found to
+// be 0 (every other status of port 0 returns or leaves the loops first).
+void Startup_SendSlotBEmptyMsg(void) {
     MsgArg arg;
     Mem_set(&arg, 0, sizeof(arg));
     UISDoHint(gpFrontEnd->pHandler, 0x8B, 0, (s32*)&arg);
 }
 
-void fn_800B0FD8(void) {
+// The start-up card check's message 0x80 to the front end: a card is ready for the save
+// (fn_800B0B1C: status 3, formatted with room for the game's save and the EA Sports Bio; also 4, 5
+// or out of range, which fn_800B09C8 never gives).
+void Startup_SendCardReadyMsg(void) {
     MsgArg arg;
     Mem_set(&arg, 0, sizeof(arg));
     UISDoHint(gpFrontEnd->pHandler, 0x80, 0, (s32*)&arg);
 }
 
-void fn_800B101C(void) {
+// The start-up card check's message 0x82 to the front end: a formatted card without the free blocks
+// or directory entries the game's save and the EA Sports Bio need (status 2).
+void Startup_SendCardFullMsg(void) {
     MsgArg arg;
     Mem_set(&arg, 0, sizeof(arg));
     UISDoHint(gpFrontEnd->pHandler, 0x82, 0, (s32*)&arg);
 }
 
-void fn_800B1060(void) {
+// The start-up card check's message 0x8C to the front end: the card's save file is damaged (status
+// 10: neither the save file nor its backup is a good save, MC_ERR_BADDATA). fn_800B0EC8 sends the
+// same message for status 11.
+void Startup_SendSaveDamagedMsg(void) {
     MsgArg arg;
     Mem_set(&arg, 0, sizeof(arg));
     UISDoHint(gpFrontEnd->pHandler, 0x8C, 0, (s32*)&arg);
 }
 
-// Read every card's status; a changed status is marked not yet reported. Here and in fn_800B1180
-// and fn_800B13FC EA tests for a multitap (MC_IsMultitapPluggedIn) but gives the port one slot either way.
-void fn_800B10A4(void) {
+// Re-read every card's status (fn_800B09C8) into the status table; a status that changed is marked
+// not yet reported, and a port whose slot count changed has its entries cleared first. Here and in
+// Startup_AreAllSlotsEmpty and Startup_FindNextCardWithStatus EA tests for a multitap
+// (MC_IsMultitapPluggedIn) but gives the port one slot either way.
+void Startup_UpdateCardStatuses(void) {
     int j;
     int i;
     s32 n;
@@ -1094,8 +1109,8 @@ void fn_800B10A4(void) {
     }
 }
 
-// Whether every status is 0.
-u8 fn_800B1180(void) {
+// Whether every card status is 0: no card in any port.
+u8 Startup_AreAllSlotsEmpty(void) {
     int i;
     int j;
     s32 n;
@@ -1112,13 +1127,15 @@ u8 fn_800B1180(void) {
     return 1;
 }
 
-// Report the card the reports reached again, re-reading the statuses first; 5 when every status
-// is 0.
-s32 fn_800B120C(s32* pnPort, s32* pnSlot) {
-    fn_800B10A4();
-    if (fn_800B1180()) return 5;
+// Re-read the statuses, then report again the card the reports reached (port lbl_8028149C, slot
+// lbl_80281498): mark it reported, answer its port and slot (the slot from 0) and return its
+// status. 5 when every status is 0; when no card has been reported yet, Startup_GetNextCardStatus's
+// answer. Start-up command 9. (The EA bug in its last test is labelled where it happens.)
+s32 Startup_GetCurrentCardStatus(s32* pnPort, s32* pnSlot) {
+    Startup_UpdateCardStatuses();
+    if (Startup_AreAllSlotsEmpty()) return 5;
     if (lbl_8028149C == -1 || lbl_80281498 == -1) {
-        return fn_800B12FC(pnPort, pnSlot);
+        return Startup_GetNextCardStatus(pnPort, pnSlot);
     }
     lbl_80282140[lbl_8028149C][lbl_80281498] = 1;
     lbl_80282148[lbl_8028149C][lbl_80281498] = lbl_80282150[lbl_8028149C][lbl_80281498];
@@ -1126,17 +1143,21 @@ s32 fn_800B120C(s32* pnPort, s32* pnSlot) {
     *pnSlot = lbl_80281498;
     // EA bug: the port is used for both indexes; for port 1 this reads past the table (the word
     // after it, lbl_80282158).
-    if (lbl_80282150[lbl_8028149C][lbl_8028149C] == 0 && fn_800B1180()) return 5;
+    if (lbl_80282150[lbl_8028149C][lbl_8028149C] == 0 && Startup_AreAllSlotsEmpty()) return 5;
     return lbl_80282150[lbl_8028149C][lbl_80281498];
 }
 
-// Report the first status not yet reported (4 when there is none, 5 when every status is 0).
-s32 fn_800B12FC(s32* pnPort, s32* pnSlot) {
+// Re-read the statuses, then report the first card not yet reported: mark it reported, note it as
+// the card the reports reached, answer its port and slot (the slot from 0; from 1 only on a port
+// with more than one slot, which never happens here) and return its status (fn_800B09C8's numbers).
+// 4 when every card has been reported (the reports start again from the top), 5 when every status
+// is 0. Start-up command 8.
+s32 Startup_GetNextCardStatus(s32* pnPort, s32* pnSlot) {
     s32 n;
     int i;
     int j;
-    fn_800B10A4();
-    if (fn_800B1180()) return 5;
+    Startup_UpdateCardStatuses();
+    if (Startup_AreAllSlotsEmpty()) return 5;
     for (i = 0; i < MC_NUM_PORTS; i++) {
         n = lbl_80282138[i];
         for (j = 0; j < n; j++) {
@@ -1159,9 +1180,11 @@ s32 fn_800B12FC(s32* pnPort, s32* pnSlot) {
     return 4;
 }
 
-// Find the next port and slot after the last one found that has a status; returns whether there
-// is one.
-int fn_800B13FC(s32* pnPort, s32* pnSlot) {
+// Continue the card search: find the next port and slot after the one found last (lbl_8028149C,
+// lbl_80281498) whose status is not 0, note it, and answer its port and slot (the slot counts from
+// 1 here). Returns whether there is one. It also sets every port's slot count to 1 again. Start-up
+// command 3.
+int Startup_FindNextCardWithStatus(s32* pnPort, s32* pnSlot) {
     int i;
     int j;
     s32 n;
@@ -1188,14 +1211,19 @@ int fn_800B13FC(s32* pnPort, s32* pnSlot) {
     return 0;
 }
 
-// Start a search from the beginning (fn_800B13FC continues it).
-int fn_800B14E4(s32* pnPort, s32* pnSlot) {
+// Start the card search from the top: the first port and slot whose status is not 0
+// (Startup_FindNextCardWithStatus, which continues it). Returns whether there is one. Start-up
+// command 2.
+int Startup_FindFirstCardWithStatus(s32* pnPort, s32* pnSlot) {
     lbl_80281498 = -1;
     lbl_8028149C = -1;
-    return fn_800B13FC(pnPort, pnSlot);
+    return Startup_FindNextCardWithStatus(pnPort, pnSlot);
 }
 
-void fn_800B1510(s32 a, s32 b) {
+// Format the card at a port and slot (MC_FormatCard), look at it again (fn_8009DCEC) and send the
+// result to the start-up UI as message 0x84 (0 when it worked, else a negative error code).
+// Start-up command 7.
+void Startup_FormatCard(s32 a, s32 b) {
     MsgArg arg;
     s32 n = MC_FormatCard(a, b);
     fn_8009DCEC(a, b);
@@ -1204,7 +1232,10 @@ void fn_800B1510(s32 a, s32 b) {
     UISDoHint(gpFrontEnd->pHandler, 0x84, 1, (s32*)&arg);
 }
 
-void fn_800B158C(s32 a, s32 b) {
+// Delete the game's save from the card at a port and slot (MC_DeleteSaveGame), look at the card
+// again (fn_8009DCEC) and send the result to the start-up UI as message 0x8D (0 when it worked,
+// else a negative error code). Start-up command 17.
+void Startup_DeleteSaveGame(s32 a, s32 b) {
     MsgArg arg;
     s32 n = MC_DeleteSaveGame(a, b);
     fn_8009DCEC(a, b);
@@ -1213,21 +1244,27 @@ void fn_800B158C(s32 a, s32 b) {
     UISDoHint(gpFrontEnd->pHandler, 0x8D, 1, (s32*)&arg);
 }
 
-void fn_800B1608(void) {
+// Start-up's per-frame update: the main loop (gomainloop.c fn_8006D8E8) calls it each frame of game
+// type 1, in place of fn_8005D2F8. Empty in this build.
+void Startup_Update(void) {
 }
 
-void fn_800B160C(void) {
+// Register the stream handler for the 'LEGL' (legal screen) pictures, Startup_LoadLegalPicture, and
+// start its count again.
+void startup_RegisterStreamClients(void) {
     lbl_80282124 = 0;
-    Stream_RegisterLoadChunkCallback('LEGL', fn_800B166C);
+    Stream_RegisterLoadChunkCallback('LEGL', Startup_LoadLegalPicture);
 }
 
-void fn_800B1644(void) {
+void startup_UnregisterStreamClients(void) {
     Stream_UnregisterLoadChunkCallback('LEGL');
 }
 
-// The 'LEGL' handler: keep a copy of the first two objects, free each. A copy's size is rounded up
-// to 128 bytes (a size already a multiple of 128 gets 128 more).
-void fn_800B166C(UStreamObject* pObject) {
+// The 'LEGL' stream handler: keep a copy of the first two objects (the legal screen pictures;
+// uiProcessPolygon.c UI_PlayStartUpMovies shows the first after the start-up movies and frees it)
+// and free each object. A copy's size is rounded up to 128 bytes (a size already a multiple of 128
+// gets 128 more).
+void Startup_LoadLegalPicture(UStreamObject* pObject) {
     s32 nPad = 128 - (s32)pObject->uSize % 128;
     if (lbl_80282124 == 0) {
         lbl_8028212C = pObject->uSize + nPad;
@@ -1243,10 +1280,12 @@ void fn_800B166C(UStreamObject* pObject) {
     StaticMem_Free(pObject);
 }
 
-// fn_800B0B1C without the messages: build the status table from scratch, then look for the first
-// status that is 3 or out of range and, when there is one, load from the card
-// (MC_LoadOptionsFromFirstCardFound).
-void fn_800B1748(void) {
+// Build the card status table from scratch (as fn_800B0B1C does, without its messages), then look
+// for a card with status 3 (formatted, room for the saves) or out of range. Found: load the options
+// from the first card with a good save (MC_LoadOptionsFromFirstCardFound) and note in DiscCheck.c
+// (fn_80110458) whether that worked, 1 or 0. Each card passed on the way notes 0 first. Not found:
+// the reports start again from the top. Start-up command 20.
+void Startup_LoadOptionsFromCard(void) {
     int i;
     int j;
     int n;
@@ -1313,9 +1352,10 @@ done:
     }
 }
 
-// Estimate the length of the vector (v[0], v[1]) without a square root, from its longer side a
-// and its shorter side b.
-f32 fn_800B1960(f32* v) {
+// Estimate the length of the 2D vector v without a square root. With a the longer side and b the
+// shorter (both made positive): a + 31/128 b when b is at most half of a, else (106 a + 75 b) /
+// 128.
+f32 audvec2_ApproxLength(f32* v) {
     f32 a = v[0];
     f32 b = v[1];
     f32 s;
@@ -1327,7 +1367,7 @@ f32 fn_800B1960(f32* v) {
         b = -b;
     }
     if (b > a) {
-        fn_800B1A88(&a, &b);
+        audfrac_Swap(&a, &b);
     }
     if (b > 0.5f * a) {
         s = a + b;
@@ -1339,17 +1379,19 @@ f32 fn_800B1960(f32* v) {
     return a + 0.25f * b - 0.0078125f * b;
 }
 
-// The same estimate for the 3D vector v: the length of (v[2], length of (v[0], v[1])).
-f32 fn_800B1A40(f32* v) {
+// The same estimate for the 3D vector v: the length of (v[2], the length of (v[0], v[1])).
+// AudTable.c's Distance3D measures a sound's distance with it.
+f32 audvec3_ApproxLength(f32* v) {
     f32 aFlat[2];
     f32 fFlat;
 
-    fFlat = fn_800B1960(v);
-    fn_800B1A9C(aFlat, v[2], fFlat);
-    return fn_800B1960(aFlat);
+    fFlat = audvec2_ApproxLength(v);
+    audvec2_Set(aFlat, v[2], fFlat);
+    return audvec2_ApproxLength(aFlat);
 }
 
-void fn_800B1A88(f32* pA, f32* pB) {
+// Swap the floats *pA and *pB.
+void audfrac_Swap(f32* pA, f32* pB) {
     f32 f;
 
     f = *pB;
@@ -1357,32 +1399,34 @@ void fn_800B1A88(f32* pA, f32* pB) {
     *pA = f;
 }
 
-void fn_800B1A9C(f32* v, f32 x, f32 y) {
+void audvec2_Set(f32* v, f32 x, f32 y) {
     v[0] = x;
     v[1] = y;
 }
 
 // Whether the ball can hit the object; every object can.
-u32 fn_800B1AA8(UObject* pObj, f32* pPos) {
+u32 DynObj_CanBallHit(UObject* pObj, f32* pPos) {
     return 1;
 }
 
-// Where an object's bounding sphere is (its position plus its mesh's sphere centre) and its radius.
-void fn_800B1AB0(DynObj* pObj, f32* pCenter, f32* pRadius) {
+// An object's bounding sphere: its centre (the object's position plus its first LOD mesh's sphere
+// centre) into pCenter and its radius into pRadius; either may be NULL.
+void DynObj_GetBoundingSphere(DynObj* pObj, f32* pCenter, f32* pRadius) {
     UObjMesh* pMesh = pObj->obj.pModel->apLod[0];
     if (pCenter != NULL) {
-        fn_800B1CF4(pObj->obj.m80[3], pMesh->pInfo->v58, pCenter);
+        Startup_Vec3Add(pObj->obj.m80[3], pMesh->pInfo->v58, pCenter);
     }
     if (pRadius != NULL) {
         *pRadius = pMesh->pInfo->f64;
     }
 }
 
-// Did the ball, moving from pFrom to pTo, hit an object? Of the objects whose sphere (grown by the
-// ball's radius, in yards) holds pTo, take the one nearest pFrom: tell it (message 12), and give
-// the hit point on its sphere, the sphere's normal there and the object. Returns whether there was
+// Did the ball, moving from pFrom to pTo, hit an object? Of the dynamic objects with flag 8 whose
+// bounding sphere, grown by the ball's radius (in yards), holds pTo, take the one nearest pFrom:
+// tell it (its handler, message 12, with the player number), and give the hit point on its sphere,
+// the sphere's normal there and the object (each output may be NULL). Returns whether there was
 // one.
-u8 fn_800B1B18(int nPlayer, f32* pTo, f32* pFrom, f32* pHit, f32* pNormal, HitObject** ppWhat) {
+u8 DynObj_FindBallHit(int nPlayer, f32* pTo, f32* pFrom, f32* pHit, f32* pNormal, HitObject** ppWhat) {
     f32 vNormal[3];
     f32 vCenter[4];     // fake match: three floats are used; the frame has room for four
     f32 fRadius;
@@ -1398,7 +1442,7 @@ u8 fn_800B1B18(int nPlayer, f32* pTo, f32* pFrom, f32* pHit, f32* pNormal, HitOb
 
     for (pObj = fn_80048E44(); pObj != NULL; pObj = pObj->pNext) {
         if (pObj->uFlags & 8) {
-            fn_800B1AB0(pObj, vCenter, &fRadius);
+            DynObj_GetBoundingSphere(pObj, vCenter, &fRadius);
             fDZ = pTo[2] - vCenter[2];
             fDX = pTo[0] - vCenter[0];
             fFlat = fDX * fDX + fDZ * fDZ;
@@ -1406,7 +1450,7 @@ u8 fn_800B1B18(int nPlayer, f32* pTo, f32* pFrom, f32* pHit, f32* pNormal, HitOb
             fReach = gRealBallRadiusIn / 36.0f + fRadius;
             if (fDist < fReach) {
                 fDY = pTo[1] - vCenter[1];
-                if ((f32)Math_Sqrt(fDY * fDY + fFlat) < fReach && fn_800B1AA8(&pObj->obj, pTo)) {
+                if ((f32)Math_Sqrt(fDY * fDY + fFlat) < fReach && DynObj_CanBallHit(&pObj->obj, pTo)) {
                     fDist = LLMath_DistanceBetween3(pFrom, vCenter);
                     if (pBest == NULL || fDist < fBest) {
                         fBest = fDist;
@@ -1419,8 +1463,8 @@ u8 fn_800B1B18(int nPlayer, f32* pTo, f32* pFrom, f32* pHit, f32* pNormal, HitOb
     if (pBest != NULL) {
         // port: the player number goes through the handler's pointer argument
         pBest->pfnHandler(12, pBest, (void*)nPlayer, NULL);
-        fn_800B1AB0(pBest, vCenter, &fRadius);
-        fn_800B1D18(pTo, vCenter, vNormal);
+        DynObj_GetBoundingSphere(pBest, vCenter, &fRadius);
+        Startup_Vec3Sub(pTo, vCenter, vNormal);
         LLMath_Normalize3(vNormal, vNormal);
         if (pHit != NULL) {
             fn_8000C5D4(vCenter, vNormal, fRadius, pHit);
@@ -1438,7 +1482,7 @@ u8 fn_800B1B18(int nPlayer, f32* pTo, f32* pFrom, f32* pHit, f32* pNormal, HitOb
 
 // a + b into out (three floats)
 #ifdef __MWERKS__
-asm void fn_800B1CF4(register f32* pA, register f32* pB, register f32* pOut) {
+asm void Startup_Vec3Add(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 1, 0
@@ -1452,7 +1496,7 @@ asm void fn_800B1CF4(register f32* pA, register f32* pB, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_800B1CF4(f32* pA, f32* pB, f32* pOut) {
+void Startup_Vec3Add(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pB[0] + pA[0];
     pOut[1] = pB[1] + pA[1];
     pOut[2] = pB[2] + pA[2];
@@ -1461,7 +1505,7 @@ void fn_800B1CF4(f32* pA, f32* pB, f32* pOut) {
 
 // a - b into out (three floats)
 #ifdef __MWERKS__
-asm void fn_800B1D18(register f32* pA, register f32* pB, register f32* pOut) {
+asm void Startup_Vec3Sub(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 1, 0
@@ -1475,7 +1519,7 @@ asm void fn_800B1D18(register f32* pA, register f32* pB, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_800B1D18(f32* pA, f32* pB, f32* pOut) {
+void Startup_Vec3Sub(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pA[0] - pB[0];
     pOut[1] = pA[1] - pB[1];
     pOut[2] = pA[2] - pB[2];
@@ -1483,12 +1527,13 @@ void fn_800B1D18(f32* pA, f32* pB, f32* pOut) {
 #endif
 
 // The UI commands while the session's game type is 1 (start-up): run command nCmd's handler.
-void fn_800B1D3C(int nCmd, MsgArg* pArgs, MsgArg* pResult) {
+void Startup_RunGameMessage(int nCmd, MsgArg* pArgs, MsgArg* pResult) {
     lbl_801F5DA8[nCmd](pArgs, pResult);
 }
 
-// Fill in the start-up UI command table.
-void fn_800B1D78(void) {
+// Fill in the start-up UI command table (lbl_801F5DA8): commands 0..22, command 4 left empty
+// (NULL). Called once when start-up begins (gomainloop.c fn_8006CEFC).
+void Startup_InitGameMessages(void) {
     int i;
     for (i = 0; i < 23; i++) {
         lbl_801F5DA8[i] = NULL;
@@ -1543,12 +1588,12 @@ void fn_800B1F9C(MsgArg* pArgs, MsgArg* pResult) {
 
 // Command 2: start a search for a card (the port and slot found go to the values' addresses).
 void fn_800B1FBC(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = (u8)fn_800B14E4(pArgs[0].p, pArgs[1].p);
+    pResult->i = (u8)Startup_FindFirstCardWithStatus(pArgs[0].p, pArgs[1].p);
 }
 
 // Command 3: continue the search.
 void fn_800B1FFC(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = (u8)fn_800B13FC(pArgs[0].p, pArgs[1].p);
+    pResult->i = (u8)Startup_FindNextCardWithStatus(pArgs[0].p, pArgs[1].p);
 }
 
 // Command 5.
@@ -1568,20 +1613,20 @@ void fn_800B206C(MsgArg* pArgs, MsgArg* pResult) {
 
 // Command 7.
 void fn_800B208C(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800B1510(pArgs[0].i, pArgs[1].i);
+    Startup_FormatCard(pArgs[0].i, pArgs[1].i);
 }
 
 // Command 8: report the next card status not yet reported.
 void fn_800B20B8(MsgArg* pArgs, MsgArg* pResult) {
     MC_Connect();
-    pResult->i = fn_800B12FC(pArgs[0].p, pArgs[1].p);
+    pResult->i = Startup_GetNextCardStatus(pArgs[0].p, pArgs[1].p);
     MC_Disconnect();
 }
 
 // Command 9: report the card the reports reached again.
 void fn_800B2104(MsgArg* pArgs, MsgArg* pResult) {
     MC_Connect();
-    pResult->i = fn_800B120C(pArgs[0].p, pArgs[1].p);
+    pResult->i = Startup_GetCurrentCardStatus(pArgs[0].p, pArgs[1].p);
     MC_Disconnect();
 }
 
@@ -1633,13 +1678,13 @@ void fn_800B223C(MsgArg* pArgs, MsgArg* pResult) {
 
 // Command 17.
 void fn_800B2250(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800B158C(pArgs[0].i, pArgs[1].i);
+    Startup_DeleteSaveGame(pArgs[0].i, pArgs[1].i);
 }
 
 // Command 20: rebuild the card statuses; answers 1 when the disc in the drive is not disc 1 and
 // fn_80110460 answers 0.
 void fn_800B227C(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800B1748();
+    Startup_LoadOptionsFromCard();
     if (fn_8011027C() && !fn_80110460()) {
         pResult->i = 1;
     } else {

@@ -68,7 +68,7 @@ Objects delivered by UStream
 | `MCI `, `MCB ` | fn_8009EB30, fn_8009EB38 | MC_Gc.c | none seen | the handlers only keep the object |
 | `eagm` | fn_800A1D4C | MC.c | none seen | asm |
 | `sfxd` | fn_800A29B4 | asm | none seen | asm |
-| `LEGL` | fn_800B166C | startUp.c | none seen | asm |
+| `LEGL` | Startup_LoadLegalPicture | startUp.c | none seen | asm |
 | `TEO ` | FE_CrAPBall_LoadTEO | sweep | none seen | asm (a second `TEO ` handler) |
 | `BALF` | FE_CrAPBall_LoadBALF | sweep | none seen | asm |
 | `TRAX`, `TRXT` | UI_vEATraxLoadfromStream, UI_vEATraxLoadLogoFromStream | sweep | none seen | asm |

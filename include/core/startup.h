@@ -217,7 +217,7 @@ typedef struct CardPos {
 } CardPos;
 LAYOUT_ASSERT(CardPos, 0xC);
 
-// ---- the 'LEGL' pictures fn_800B166C keeps ----------------------------------------------------
+// ---- the 'LEGL' pictures Startup_LoadLegalPicture keeps ----------------------------------------------------
 
 extern void* lbl_80282134;              // the first one's copy (uiProcessPolygon.c
                                         // UI_PlayStartUpMovies shows and frees it)

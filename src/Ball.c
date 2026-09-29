@@ -376,14 +376,14 @@ f32    Ball_DistanceToPin(f32* pPos);
 void   Physics_ForceBallInHole(Ball* pBall);
 void   Ball_SimSeconds(Ball* pBall, f32 fSeconds, f32 fTick);
 
-u8     fn_800B1B18(int nPlayer, f32* pTo, f32* pFrom, f32* pHit, f32* pNormal, HitObject** ppWhat);
+u8     DynObj_FindBallHit(int nPlayer, f32* pTo, f32* pFrom, f32* pHit, f32* pNormal, HitObject** ppWhat);
 u8     fn_80053E98(Ball* pBall, void* pv, f32* pHit, f32* pNormal);
 u8     Physics_ProcessCollision(Ball* pBall, f32* pHit, f32* pNormal, SurfaceType* pSurface, TerObject* pObj,
                                 f32* pFrac, f32 fTicks);
 u8     fn_80053240(Ball* pBall, f32 fTicks);
 // the bounce; returns the impact
 f32    Physics_HandleCollision(Ball* pBall, f32* pNormal, SurfaceType* pSurface);
-void   fn_800B1AB0(HitObject* pObj, f32* pPos, f32* pRadius);   // the flagstick's position and radius
+void   DynObj_GetBoundingSphere(HitObject* pObj, f32* pPos, f32* pRadius);   // the flagstick's position and radius
 u8     Physics_CheckTerrainCollisions(Ball* pBall, f32 fTicks);
 void   Ball_GroundContact(Ball* pBall, f32 fTicks);
 void   Physics_BallRollingandSlipping(Ball* pBall, f32 fTicks);
@@ -1775,7 +1775,7 @@ u8 fn_80053E98(Ball* pBall, void* pv, f32* pHit, f32* pNormal) {
     if (0.0f != pObj->fSway) return 0;
     fDist2 = (pHit[0] - pBall->vPos[0]) * (pHit[0] - pBall->vPos[0])
              + (pHit[2] - pBall->vPos[2]) * (pHit[2] - pBall->vPos[2]);
-    fn_800B1AB0(pObj, vPole, &fRadius);
+    DynObj_GetBoundingSphere(pObj, vPole, &fRadius);
     if (fRadius < 0.027777778f || fDist2 >= fRadius * fRadius + 0.444444478f) return 0;
     fDZ = vPole[2] - pBall->vPos[2];
     if (fabsf(fDZ) > 0.222222224f) return 0;
@@ -1799,7 +1799,7 @@ u8 fn_80053E98(Ball* pBall, void* pv, f32* pHit, f32* pNormal) {
     return 1;
 }
 
-// Did the ball hit something (a tree, an object) between last tick and this one? fn_800B1B18
+// Did the ball hit something (a tree, an object) between last tick and this one? DynObj_FindBallHit
 // sweeps the path, fn_80053E98 and Physics_ProcessCollision decide; then event 0x27 and the bounce off it
 // as surface 13. Returns 1 on a hit.
 u8 fn_80054040(Ball* pBall, f32 fTicks) {
@@ -1814,7 +1814,7 @@ u8 fn_80054040(Ball* pBall, f32 fTicks) {
     vFrom[1] -= BALL_RADIUS;
     Vec3Copy(pBall->vPos, vTo);
     vTo[1] -= BALL_RADIUS;
-    if (!fn_800B1B18(pBall->nPlayer, vTo, vFrom, vHit, vNormal, &pWhat)) return 0;
+    if (!DynObj_FindBallHit(pBall->nPlayer, vTo, vFrom, vHit, vNormal, &pWhat)) return 0;
     if (!fn_80053E98(pBall, pWhat, vHit, vNormal)) return 0;
     pSurface = &gSurfaceTypes[13];
     if (!Physics_ProcessCollision(pBall, vHit, vNormal, pSurface, NULL, &fFrac, fTicks)) return 0;

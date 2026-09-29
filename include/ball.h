@@ -122,7 +122,7 @@ typedef struct CourseInfo {
     CourseLights lights;        // 0x100 the hole's lights (goballfx.c fn_800935CC, PsMgr.c fn_800A27FC)
 } CourseInfo;
 
-// An object in the world the ball can hit (a tree, a building, the flagstick), as fn_800B1B18
+// An object in the world the ball can hit (a tree, a building, the flagstick), as DynObj_FindBallHit
 // reports it. Only the fields Ball.c reads are known; its size is not.
 typedef struct HitObject {
     u8   unk0[0x140];
