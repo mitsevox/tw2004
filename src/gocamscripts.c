@@ -1034,8 +1034,9 @@ void CamScript_SplineCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScri
 }
 
 // Blend kinds 2, 11 and 12: the point looked at moves on the straight line between the two shots'
-// look-at points; the camera follows the curve fn_800C7E50 makes through the two positions (kind
-// nD0), set up by CamScript_PickArcDirection on the blend's first frame.
+// look-at points; the camera swings round it from the one position to the other (fn_800C7E50, the
+// way round nD0 that CamScript_PickArcDirection picks on the blend's first frame); field of view,
+// depth of field, blur and roll blend by the share (CameraScript_GetSmoothTimeParam).
 void CamScript_ArcCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime) {
     f32 vMove[4];
     f32 vPos[4];
@@ -1079,9 +1080,9 @@ void CamScript_ArcCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript,
     pScript->fA8 = fT * (pNext->f9C - pShot->f9C) + pShot->f9C;
 }
 
-// Blend kind 7: there and back. The share runs to 1 at the blend's middle and back to 0; the
-// point looked at and the camera's curve (fn_800C7E50, kind nD0: 1 going, 2 coming back) follow
-// it. fA8 blends by the doubled share itself.
+// Blend kind 7: there and back. The share runs to 1 at the blend's middle and back to 0; the point
+// looked at, the camera's swing (fn_800C7E50, way round nD0: 1 going, 2 coming back), the field of
+// view, depth of field and blur follow it; the roll (fA8) blends by the doubled share instead.
 void CamScript_CircleCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime) {
     f32 vMove[4];
     f32 vPos[4];
@@ -1134,10 +1135,11 @@ void CamScript_CircleCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScri
     pScript->fA8 = fT * (pNext->f9C - pShot->f9C) + pShot->f9C;
 }
 
-// Picks the side (nD0: 1 or 2, 0 for neither) of a curved move between the two shots. For next-shot
-// kinds 12 and 11 the side follows CameraScript_FlipCameraForLefty; otherwise each side's curve
-// midpoint (fn_800C7E50, through the halfway point of the two look-at points) is tested against the
-// in-bounds outlines, and the side whose point alone is inside is taken.
+// Picks the way round (nD0: 1 or 2, 0 for either) of an arced move between the two shots. For blend
+// kind 12 it is 2 for a left-handed golfer (CameraScript_FlipCameraForLefty), else 1; kind 11 the
+// other way. Otherwise each way's curve midpoint (fn_800C7E50, round the halfway point of the two
+// look-at points) is tested against the in-bounds outlines (Ter_PointInOOBNetwork), and the way
+// whose point alone is inside is taken.
 void CamScript_PickArcDirection(CamScript* pScript, f32* pSub, int nPlayer, f32* pPrev, f32 fTime) {
     f32 vSide1[4];
     f32 vSide2[4];
@@ -1190,10 +1192,18 @@ void CamScript_PickArcDirection(CamScript* pScript, f32* pSub, int nPlayer, f32*
     }
 }
 
-// Where the camera looks for the shot's bAC, into pOut: the pin (kind 0 in golfer state 18), the
-// ball, Player.vBall, bones of the golfer, the tee, the aim; the look-at point is moved by the
-// shot's f74 up and f70 sideways (CameraScript_OffsetLookVector), and by CameraScript_CalculateShoulderShake's offset before and after.
-// CameraScript_SnapToScript decides between setting the point outright and easing it there.
+// Where the camera looks, by the shot's look-at kind bAC, into pOut: 0 the ball in flight (lagged
+// by CameraScript_LagBallFlight after the first frame; the pin in golfer state 18), 23 ahead of the
+// ball along its velocity (f70 level, f74 up), 13 and 15 the ball (13 the ground under it, its
+// height eased), 14 the ball at the camera's height, 1 Player.vBall, 2 and 3 halfway between the
+// golfer's bones 0x39 and 0x47, 4 and 5 bone 1, 6 and 7 bone 10 (3, 5 and 7 lagged by
+// CameraScript_LagTargetPoint), 9 the aim (Player.vTargetCopy, lagged by
+// CameraScript_LagAimMarker), 10 the pin, 11 the player's tee, 22 and 24 the shot's v30. Most
+// points are raised by the shot's f74 and moved f70 sideways (CameraScript_OffsetLookVector; the
+// other way for a lefty where CameraScript_FlipCameraForLefty says so). The shoulder shake
+// (CameraScript_CalculateShoulderShake) at the script's time f9C is taken off first (not on the
+// shot's first frame) and the one at f98 added last. On the first frame (CameraScript_SnapToScript)
+// points are set outright rather than eased.
 void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam, CamScript* pScript,
                               f32* pVec, f32 fTime) {
     f32 vPos[4];
@@ -1524,13 +1534,15 @@ void CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* pShot
     }
 }
 
-// The look-at point following the ball, one step per ball update this frame: the aim moves from
-// the script's v70 towards the ball (DynamicCam_GetSmoothBallLocation) at its CameraScript_GetBallHeightWithMaxHeight height, moved by the shot's
-// f74 and f70; during a fairway fix (bCF) a steep look down is limited (as in
-// CamScript_GetLookAtPoint). pOut eases towards it by a share that grows with the distance
-// (CamTuning.f138, f13C) and eases in over the move (fD4, f158); its height eases in by f15C/f160
-// and slows near the ground once the ball comes down. Then the aim lags by fE4 (CameraScript_KeepPointInView). pVec
-// is not read.
+// The look-at point following the ball in flight, one step per ball update this frame: the aim
+// moves from the script's v70 towards the ball (DynamicCam_GetSmoothBallLocation) at its
+// CameraScript_GetBallHeightWithMaxHeight height, raised by the shot's f74 and moved f70 sideways;
+// during a fairway fix (bCF) a steep look down (more than 1 in 5) is limited, as in
+// CamScript_GetLookAtPoint. pOut eases towards the aim by a share that grows with the distance
+// (CamTuning.f138 over f13C), starts at 1 and settles over the script's first CamTuning.fD4 of f98,
+// and grows in over f158 of f88; its height eases in over f15C of f88 (power f160) and slows near
+// the ground once the ball has passed the top of its arc (f140). Then the aim lags by CamTuning.fE4
+// (CameraScript_KeepPointInView). pVec is not read.
 void CameraScript_LagBallFlight(int nPlayer, f32* pOut, f32* pCam, CamShot* pShot, CamScript* pScript, f32* pVec,
                  f32 fTime) {
     f32 vMove[4];
@@ -1688,10 +1700,11 @@ void CameraScript_OffsetLookVector(f32* pPos, f32* pTarget, f32 fUp, f32 fSide) 
     pPos[2] += fSide * vDir[0];
 }
 
-// Records the camera as it is now into pShot ("ON THE FLY CAM"): positioned at pCam, looking at
-// pSub (bAC 24), with the lens's field of view (less GameEffects_FieldOfViewChange, except with
-// bView1: the player's second view) and the current shot's bAD, nA0, f88 and fn_80038054 values
-// (f8C, f90). The script is left with no next shot.
+// Records the camera as it is now into pShot ("ON THE FLY CAM"): placed at pCam, looking at pSub
+// (look-at kind bAC 24, shot kind bAD 4), with the lens's field of view (less
+// GameEffects_FieldOfViewChange, except with bView1: the player's second view, nView[1], TW07's
+// PIP), the script's roll fA8, and the current shot's kind bAD, nA0, depth of field f88 and blur
+// f8C and f90 (none without a current shot). The script is left with no next shot.
 void CameraScript_RecordCurrentCam(CamShot* pShot, f32* pCam, f32* pSub, int nPlayer, CamScript* pScript,
                                    u8 bView1) {
     char szName[] = "ON THE FLY CAM";
@@ -1836,10 +1849,13 @@ void CameraScript_UpdateLandingEstimate(CamScript* pScript, int nPlayer) {
     }
 }
 
-// Moves the script on to pShot (its next shot): the next shot's positions become the current
-// ones, pShot's follow-on (p40) the next shot, with its length and kind (the new shot's own when
-// its bAD is 0). Unless the move is a blend (bCC), the landing estimate is refreshed and the script
-// runs one frame at once. Kinds 6, 8, 9 and 10 are dropped outside golfer states 10 and 11.
+// Moves the script on to pShot (its next shot): the next shot's camera and look-at positions become
+// the current ones, pShot's follow-on (p40) the next shot, with its length and blend kind (pShot's
+// own when pShot is a fly-by shot, bAD 0, whose time carries over); shots marked 16 (bAF, bB0)
+// start or end at the ball. Unless the move is a blend (bCC), the landing estimate is refreshed and
+// the script runs one frame at once. Blend kinds 6, 8, 9 and 10 are dropped outside golfer states
+// 10 and 11. In single-view play a change of the shot's nA0 sets half time, double time and the
+// camera matrix mode as CameraScript_InterpToNewScript does.
 void CameraScript_GoToNewScript(CamScript* pScript, CamShot* pShot, int nPlayer, f32* pCam, f32* pSub,
                                 CamShot* pSaved) {
     s32 nOldA0 = pScript->pShot->nA0;
@@ -1921,12 +1937,14 @@ void CameraScript_GoToNewScript(CamScript* pScript, CamShot* pShot, int nPlayer,
     }
 }
 
-// Starts pShot on the script. Blend kind nA 4 (the swing camera's cut) takes it outright unless
-// the current shot is a kind-3 shot that is not the default swing camera; a blend with time f1
-// makes pShot the next shot (first recording the current camera into pB4 when both shots are
-// script shots), its length f1 at least the move's distance over speed f2; otherwise pShot and
-// its follow-on start at once. nB and f3 go to nE0/fE4; single-view play sets GameEffects_SetHalfTime,
-// GameEffects_SetDoubleTime and GolfCamera_SetCameraMatrixMode from the shot's nA0.
+// Starts pShot on the script with blend kind nA (TW07's interpType) over time f1 (interpTime) at
+// speed f2 at most (maxSpeed). Kind 4 (the swing camera's cut) takes it outright unless the current
+// shot is a kind-3 shot that is not the default swing camera; a blend with time f1 makes pShot the
+// next shot (when a blend is already running, the current camera is first recorded into pB4 and the
+// blend starts from there), its length f1 at least the move's distance over speed f2; otherwise
+// pShot and its follow-on start at once. nB and f3 (TW07's timeTrigger event and time) go to nE0
+// and fE4; in single-view play the shot's nA0 sets half time (0), double time (2) or neither, and
+// camera matrix mode for 3.
 void CameraScript_InterpToNewScript(CamScript* pScript, CamShot* pShot, int nPlayer, f32* pCam, f32* pSub,
                                     int nA, f32 f1, f32 f2, int nB, f32 f3) {
     f32 vDiff[4];
@@ -2200,8 +2218,9 @@ u8 CameraScript_IsDefaultSwingCam(CamShot* pShot, int nPlayer, f32* pCam) {
     return 0;
 }
 
-// The script's shot, or else its next one (unless the next kind is 5), has bAC 0 or 13 while the
-// ball makes no update this frame.
+// The camera holds still this frame: the ball makes no update this frame (slow motion) and the
+// current shot, or the next one being blended to (not blend kind 5), looks at the ball (bAC 0 or
+// 13). 0 without a current shot.
 u8 CameraScript_DontUpdateCameraDuringSlowMo(CamScript* pScript, int nPlayer) {
     if (pScript->pShot == NULL) {
         return 0;
@@ -2449,10 +2468,12 @@ void CamScript_CheckFlagCollision(CamScript* pScript, f32* pCam, f32* pSub, int 
     }
 }
 
-// Moves the camera to a spot on the fairway (CamScript_GetCameraOnFairwayPos) and makes pShot a still shot there: it
-// looks at the ball (bAC 0) at the tuning's field of view (f114), f68 CamTuning.f10C and f6C 1000,
-// with no wobble (f94), fn_800457B8 value (f88) or fn_80038054 effect (f8C, f90). The script cuts to it (blend 5) with the ground height fD8 at the spot (the
-// course's floor at least), and the lens takes the new field of view at once.
+// Moves the camera to a spot on the fairway (CamScript_GetCameraOnFairwayPos) and makes pShot a
+// still shot there, recorded from the camera (CameraScript_RecordCurrentCam): it looks at the ball
+// (bAC 0) at the tuning's field of view (CamTuning.f114), at least CamTuning.f10C over the ground
+// (f68; f6C 1000), with no shake (f94), depth of field (f88) or blur (f8C, f90). The script cuts to
+// it (blend 5) with the ground height fD8 at the spot (the course's floor at least) and marks the
+// fairway fix (bCF); the lens takes the new field of view at once.
 void CamScript_PutBackOnFairway(CamScript* pScript, f32* pCam, f32* pSub, int nPlayer, CamShot* pShot,
                                 f32* pPrev) {
     f32 fHeight;
