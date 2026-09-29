@@ -186,7 +186,7 @@ void vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut);   // cross product
 // One level of a texture (12 bytes; char.c Character_SwapTexEntries byte-swaps four of them).
 typedef struct TexMip {
     u32  uPixels;               // 0x0  where its pixels start in the bank's p18
-    s16  nC;                    // 0x4  its size in 16-byte units (fn_80045FC8, FE_CrAPBall_SetLogo
+    s16  nC;                    // 0x4  its size in 16-byte units (DynObj_LoadBallLogos, FE_CrAPBall_SetLogo
                                 //      copy nC * 16)
     u8   unk6[0x8 - 0x6];
     s16  n8;                    // 0x8  TX_spParseTextureGroupFromStream adds the bank's n28 to it
@@ -202,7 +202,7 @@ typedef struct TexEntry {
     u16  n3E;                   // 0x3E  its row in the bank's p10 (ShaderObjectsData fn_800740F4)
     s8   b40;                   // 0x40  0: char.c Character_SwapTexEntries decodes the name and
                                 //       pairs the texture
-    s8   n41;                   // 0x41  (fn_80045FC8)
+    s8   n41;                   // 0x41  (DynObj_LoadBallLogos)
     u8   unk42[0x46 - 0x42];
     s8   b46;                   // 0x46  bit 0: clamp in s, bit 1: clamp in t (else repeat)
     u8   b47;                   // 0x47  bit 0: the next texture goes with it (char.c Character_LoadTextures);

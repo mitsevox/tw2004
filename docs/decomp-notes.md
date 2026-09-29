@@ -260,7 +260,7 @@ They will be sorted into the sections below.
 - **[verified] Two null tests that each go straight to the exit are two `return`s, not `||`** (`beq end;
   lwz; cmplwi; beq end`; animblender SKABlendData_Shutdown 98.8 -> 100).
 - **[verified] Keep a call result in a named local when it is an index, a compare operand or an argument
-  inside an iterator loop.** It sets the `mulli`/`add` order (GoDynObj fn_80045FC8, also for `Rand % n`
+  inside an iterator loop.** It sets the `mulli`/`add` order (GoDynObj DynObj_LoadBallLogos, also for `Rand % n`
   in GoStaticCam fn_80064F7C) and the `cmplw` operand order (char Character_GolferStreamCallbackIG; swapping the operands does
   not help), and it matches inside iterator loops (hwsBurn HwsBurn_MarkOption). A `u8` flag argument computed
   before intervening float tests also goes in a local first (animblender SKABlender_BlendLinear 65.6 -> 98.2).
@@ -349,7 +349,7 @@ They will be sorted into the sections below.
   inline helper hands its index back by `mr`; the same loop written in the caller gets `li` (UISEvent
   fn_80165D2C, fn_80165D90).
 - **[verified] `int` and `s32` allocate differently, in both directions**: an `s32` parameter where `int`
-  fails (GoDynObj fn_80046FDC 94 -> 100), `int` locals where `s32` fails (GM_vGetPar5EagleDate 92 -> 100).
+  fails (GoDynObj DynObj_DrawTargetModels 94 -> 100), `int` locals where `s32` fails (GM_vGetPar5EagleDate 92 -> 100).
 - **[verified] Block-scoped locals per switch case** allocate differently from one function-level local
   (EventInfo PGATourPopup_GetRow_EventInProgress); case labels merged into `default` (`case 3: default:`) reshape the compare
   tree or jump table (event EVENT_PlayerEmotionUpdated, NextShotType), and extra empty cases make the tree test a value

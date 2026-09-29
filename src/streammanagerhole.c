@@ -53,8 +53,8 @@ void MtaLib_Register();
 void MtaLib_Unregister();
 void DynamicCam_RegisterStreamClients();
 void DynamicCam_UnRegisterStreamClients();
-void fn_80046130();
-void fn_80046174();
+void DynObj_RegisterStreamClients();
+void DynObj_UnRegisterStreamClients();
 void SitDev_vRegisterStreamClients();
 void SitDev_vUnregisterStreamClients();
 void UI_RegisterStreamClients();
@@ -216,7 +216,7 @@ void fn_80014594(void) {
     fn_80010284();
     DynamicCam_RegisterStreamClients();
     UI_RegisterStreamClients();
-    fn_80046130();
+    DynObj_RegisterStreamClients();
     Character_RegisterClubStreamClientIG();
     Skalib_Register();
     MtaLib_Register();
@@ -231,7 +231,7 @@ void fn_800145E0(void) {
     fn_800102B4();
     DynamicCam_UnRegisterStreamClients();
     UI_UnregisterStreamClients();
-    fn_80046174();
+    DynObj_UnRegisterStreamClients();
     Character_UnregisterClubStreamClient();
     Skalib_Unregister();
     MtaLib_Unregister();
@@ -382,14 +382,14 @@ void fn_800148EC(void) {
 void fn_8001491C(void) {
     fn_80010284();
     fn_800307C0();
-    fn_80046130();
+    DynObj_RegisterStreamClients();
     StaticCam_RegisterStreamClients();
     fn_8011E468();
 }
 
 void fn_8001494C(void) {
     fn_8011E4A4();
-    fn_80046174();
+    DynObj_UnRegisterStreamClients();
     fn_80030818();
     fn_800102B4();
     StaticCam_UnRegisterStreamClients();

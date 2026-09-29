@@ -62,7 +62,7 @@ void fn_800C8134();
 void GM_InitForHole();
 s32 fn_80010608(s32);
 s32 fn_8003467C();
-s32 fn_80046664();
+s32 DynObj_DeInitForHole();
 s32 fn_80048EF4();
 void SW_vDeInitForHole(void);
 s32 StaticCam_Reset();
@@ -115,7 +115,7 @@ void fn_8006F568(void) {
     if ((u8) *lbl_802811E8 != 0) {
         fn_8011E3B4();
         fn_8003467C();
-        fn_80046664();
+        DynObj_DeInitForHole();
         StaticCam_Reset();
         fn_80098C28();
         var_r31 = 0;

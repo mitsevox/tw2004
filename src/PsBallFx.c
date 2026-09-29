@@ -418,7 +418,7 @@ void fn_800A31E0(Ball* pBall, int nPlayer) {
          pSurface->nClass == 11) &&
         gPlayers[nPlayer].nClub > 8 &&
         (gPlayers[nPlayer].nShotKind == 1 || gPlayers[nPlayer].nShotKind == 4)) {
-        fn_80046E1C(pBall->vPos, nPlayer);
+        DynObj_ShotDivotHoleAdd(pBall->vPos, nPlayer);
         fn_80047A24(pBall->vPos, nPlayer);
     }
     if (gPlayers[nPlayer].ball.nLie == 0) {
@@ -427,7 +427,7 @@ void fn_800A31E0(Ball* pBall, int nPlayer) {
 }
 
 // The ball hit a surface: if a ball may stop on it, the surface's collision effect and the game
-// mode's, with the ball's speed into the ground as the value, and the trail; then fn_80046C34
+// mode's, with the ball's speed into the ground as the value, and the trail; then DynObj_PitchMarkAdd
 // (skipped only for a surface a ball can't stop on).
 void fn_800A3348(Ball* pBall, int nPlayer) {
     f32 vPos[4];
@@ -460,7 +460,7 @@ void fn_800A3348(Ball* pBall, int nPlayer) {
         fn_800A30E4(gpGame->pfnTriggerSplash(nPlayer), pBall, nPlayer, 1, fDot);
         PsBallFx_TriggerTrail(pBall, nPlayer);
     }
-    fn_80046C34(pBall->vPos, nPlayer);
+    DynObj_PitchMarkAdd(pBall->vPos, nPlayer);
 }
 
 // Extend sand trail nTrail to the ball once it has moved on (squared distance 0.001): a pair of

@@ -114,11 +114,11 @@ void fn_80045660(void);
 void fn_80045848(int nPlayer);
 void fn_80045D18(void);
 void fn_80045D5C(void);
-void fn_800461A8(void);
-void fn_80046264(void);
-void fn_800467B4(void);
-void fn_80046828(s32 nView);
-void fn_80046B8C(int nView);
+void DynObj_InitModule(void);
+void DynObj_CloseModule(void);
+void DynObj_UpdateDynamicObjects(void);
+void DynObj_RenderDynamicObjects(s32 nView);
+void DynObj_RenderBalls(int nView);
 void fn_800486EC(void);
 void fn_800486F0(void);
 void fn_80048DD0(void);
@@ -453,7 +453,7 @@ void fn_8006C7A8(void) {
     fn_8006E2A4();
     fn_8006F14C();
     fn_80093524();
-    fn_800461A8();
+    DynObj_InitModule();
     Network_InitModule();
     Pict_InitModule();
     LLVideo_InitModule();
@@ -463,7 +463,7 @@ void fn_8006C7A8(void) {
 void fn_8006C854(void) {
     Aud_ExitSession(0);
     Network_CloseModule();
-    fn_80046264();
+    DynObj_CloseModule();
     fn_80093580();
     fn_8006F150();
     fn_8006E424();
@@ -847,7 +847,7 @@ void fn_8006D27C(void) {
     fn_80093AD4();
     Character_UpdateAll(gSession.fFrameTime);
     fn_80033744();
-    fn_800467B4();
+    DynObj_UpdateDynamicObjects();
     fn_80099344(gSession.fFrameTime);
     fn_800B2724();
     for (i = 0; i < 4; i++) {
@@ -870,9 +870,9 @@ void fn_8006D27C(void) {
             if (nState != GS_GREEN_MORPH) {
                 BreakLine_Update(nView);
             }
-            fn_80046828(nView);
+            DynObj_RenderDynamicObjects(nView);
             if (nState != GS_GREEN_MORPH) {
-                fn_80046B8C(nView);
+                DynObj_RenderBalls(nView);
             }
             ViewController_GetRenderContext(nView);
             fn_80099BA0();

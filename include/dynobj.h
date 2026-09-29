@@ -380,7 +380,7 @@ typedef struct GoDynObjPlayerB {
 } GoDynObjPlayerB;
 LAYOUT_ASSERT(GoDynObjPlayerB, 0x100);
 
-// GoDynObj.c's state (0xAB0 bytes, lbl_80281DA0, allocated by fn_800461A8): per-player records
+// GoDynObj.c's state (0xAB0 bytes, lbl_80281DA0, allocated by DynObj_InitModule): per-player records
 // and objects, and the models of the 'TEO ' stream objects (DynObj_InitForHole makes them).
 typedef struct GoDynObjMgr {
     GoDynObjPlayerA aA[5];      // 0x000
@@ -423,8 +423,8 @@ extern UMemPool* lbl_80281DA8;
 void fn_800075CC(UObjModelRoot* pRoot);    // frees a model fn_800073B4 made
 
 // GoDynObj.c
-void fn_80046C34(f32* pPos, int nPlayer);  // a fast ball low over class 3 ground leaves a 'TEO ' 10005
-void fn_80046E1C(f32* pPos, int nPlayer);  // put the player's 'TEO ' 10001 object at pPos
+void DynObj_PitchMarkAdd(f32* pPos, int nPlayer);  // a fast ball low over class 3 ground leaves a 'TEO ' 10005
+void DynObj_ShotDivotHoleAdd(f32* pPos, int nPlayer);  // put the player's 'TEO ' 10001 object at pPos
 void fn_80047A24(f32* pPos, int nPlayer);  // put the player's 'TEO ' 10002 object at pPos
 void fn_8004816C(int nPlayer);             // launch the player's 'TEO ' 10004 object
 int  fn_800484F4(const char* szName);   // the index of the name among lbl_80187B98's 27 (-1: none)

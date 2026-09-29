@@ -46,10 +46,10 @@ f32 lbl_80281128 = 1.0f;
 
 GoDynObjMgr* lbl_80281DA0;
 
-void fn_80045FC8(UStreamObject* pObject);   // the 'BALL' stream handler
-void fn_80046FDC(s32 nView);
-void fn_800470B0(s32 nView);
-void fn_80047208(u8* aState);
+void DynObj_LoadBallLogos(UStreamObject* pObject);   // the 'BALL' stream handler
+void DynObj_DrawTargetModels(s32 nView);
+void DynObj_DrawTargetOverlays(s32 nView);
+void DynObj_DrawBallShadows(u8* aState);
 int  GameModeSkillZoneBase_GetCupCount(void);                 // GameModeReplay.c: the target count
 void GameModeSkillZoneBase_GetCupPosition(int i, f32* pOut);     // GameModeReplay.c: target i's position
 void fn_80093DB8(Ball* pBall, int nPlayer);    // GoObjShadow.c
@@ -66,7 +66,7 @@ void LLMath_CopyMat34(f32 (*pSrc)[4], f32 (*pDst)[4]);        // copies three ro
 void fn_80048680(f32* pA, f32* pB, f32* pOut);
 void fn_800486A4(f32* pA, f32* pB, f32* pOut);
 void fn_800486C8(f32* pA, f32* pB, f32* pOut);
-void fn_80047290(void);
+void DynObj_DrawBallMarkers(void);
 void fn_8004731C(u8* pState);
 f32  fn_8004787C(int nPlayer);
 void Quat_QuatToMatrix(f32* pQ, f32 (*pMtx)[4]);         // Quaternion.c: to a matrix
@@ -76,13 +76,15 @@ int  fn_8001005C(TexBank* pBank, u64 uHash);       // LLTex.c: the texture's ind
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_800460F8(UStreamObject* arg0);
-void fn_80045F74(UStreamObject* arg0);
+void DynObj_FreeTeoModel(UStreamObject* arg0);
+void DynObj_LoadTeoModel(UStreamObject* arg0);
 
-void fn_80045F74(UStreamObject* arg0) {
+// The 'TEO ' stream handler: unless the object is already loaded, builds its model (fn_80045D80)
+// into the stream object's word 4 and sets DynObj_FreeTeoModel as its free handler.
+void DynObj_LoadTeoModel(UStreamObject* arg0) {
     if (fn_8000B508(arg0) == 0) {
         (*(UObjModel**)((u8*)(arg0) + 4)) = fn_80045D80(arg0->pData);
-        (*(void (**)(UStreamObject*))((u8*)(arg0) + 8)) = fn_800460F8;
+        (*(void (**)(UStreamObject*))((u8*)(arg0) + 8)) = DynObj_FreeTeoModel;
         fn_8000B4B8(arg0);
     }
 }
@@ -92,7 +94,7 @@ void fn_80045F74(UStreamObject* arg0) {
 // The 'BALL' stream handler: a bank of ball logos. Each player's chosen logo (its profile's byte
 // 0x38, from lbl_80187B98's names) is copied over the pixels of that player's logo texture
 // ("logoea", "logonike", ...), then the bank is freed.
-void fn_80045FC8(UStreamObject* pObject) {
+void DynObj_LoadBallLogos(UStreamObject* pObject) {
     u64 uLogo;
     u64 uSlot;
     TexBank* pSlotBank;
@@ -124,7 +126,9 @@ void fn_80045FC8(UStreamObject* pObject) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_800460F8(UStreamObject* arg0) {
+// Frees a 'TEO ' object's model (the handler DynObj_LoadTeoModel sets): the model's root, then the
+// record itself.
+void DynObj_FreeTeoModel(UStreamObject* arg0) {
     void* temp_r31;
 
     temp_r31 = (*(void**)((u8*)(arg0) + 4));
@@ -134,18 +138,18 @@ void fn_800460F8(UStreamObject* arg0) {
 
 // ---- end of sweep code ----
 
-void fn_80046130(void) {
-    Stream_RegisterLoadChunkCallback('TEO ', fn_80045F74);
-    Stream_RegisterLoadChunkCallback('BALL', fn_80045FC8);
+void DynObj_RegisterStreamClients(void) {
+    Stream_RegisterLoadChunkCallback('TEO ', DynObj_LoadTeoModel);
+    Stream_RegisterLoadChunkCallback('BALL', DynObj_LoadBallLogos);
 }
 
-void fn_80046174(void) {
+void DynObj_UnRegisterStreamClients(void) {
     Stream_UnregisterLoadChunkCallback('TEO ');
     Stream_UnregisterLoadChunkCallback('BALL');
 }
 
-// Allocates the state; no 'TEO ' models yet.
-void fn_800461A8(void) {
+// Allocates the file's state (lbl_80281DA0); no 'TEO ' models yet. Called once at start-up.
+void DynObj_InitModule(void) {
     lbl_80281DA0 = StaticMem_Alloc(sizeof(GoDynObjMgr), 2, 16, "GoDynObj.c", 283);
     lbl_80281DA0->pTeo10000 = NULL;
     lbl_80281DA0->apTeo10030[0] = NULL;
@@ -165,10 +169,10 @@ void fn_800461A8(void) {
     lbl_80281DA0->apTeo10006[3] = NULL;
 }
 
-// Defined after fn_800461A8 so that its "GoDynObj.c" comes first in .data, as in the original.
+// Defined after DynObj_InitModule so that its "GoDynObj.c" comes first in .data, as in the original.
 s32 lbl_80187D38[4] = {1, 0, 3, 2};
 
-void fn_80046264(void) {
+void DynObj_CloseModule(void) {
     StaticMem_Free(lbl_80281DA0);
 }
 
@@ -255,8 +259,8 @@ void DynObj_InitForHole(void) {
     lbl_80281DA0->nRing = 0;
 }
 
-// Frees the 'TEO ' models.
-void fn_80046664(void) {
+// Frees the 'TEO ' models DynObj_InitForHole made.
+void DynObj_DeInitForHole(void) {
     int i;
 
     if (lbl_80281DA0->pTeo10000 != NULL) {
@@ -289,8 +293,9 @@ void fn_80046664(void) {
     }
 }
 
-// The per-frame update: message 6 to every object, with the frame time, then each player's.
-void fn_800467B4(void) {
+// The per-frame update: message 6 to every object, with the frame time, then each player's flying
+// divot (DynObj_UpdateDivot) and tee (DynObj_UpdateTee).
+void DynObj_UpdateDynamicObjects(void) {
     int i;
 
     // port: the frame time goes through the message's pointer argument as its bits
@@ -301,8 +306,9 @@ void fn_800467B4(void) {
     }
 }
 
-// Draws every object (message 3), and with GM_Currently_SkillZoneMode the targets' 'TEO ' models.
-void fn_80046828(int nView) {
+// Draws every object (message 3) for view nView, and in the target games
+// (GM_Currently_SkillZoneMode) the targets' 'TEO ' models.
+void DynObj_RenderDynamicObjects(int nView) {
     RenderState_SetBlendFactors(4, 5);
     DS_vSetAlphaTestMode(1, 6, 0x80);
     DS_vSetZBufferMode(3);
@@ -312,12 +318,13 @@ void fn_80046828(int nView) {
     RenderState_Flush();
     fn_80048F68(3, NULL, NULL);
     if (GM_Currently_SkillZoneMode()) {
-        fn_80046FDC(nView);
-        fn_800470B0(nView);
+        DynObj_DrawTargetModels(nView);
+        DynObj_DrawTargetOverlays(nView);
     }
 }
 
-// 0 in game mode 21 while the player is in state 19 and the partner is not.
+// 0 in game mode 21 (alternate shot) while the player is in state 19 and the partner (lbl_80187D38)
+// is not; else 1.
 u8 DynObj_bAltShotDrawBall(int nPlayer) {
     if (Game_GetMode() == 21 && (s8)GOLFERSTATE_GetCurrentState(nPlayer) == 19 &&
         (s8)GOLFERSTATE_GetCurrentState(lbl_80187D38[nPlayer]) != 19) {
@@ -327,7 +334,7 @@ u8 DynObj_bAltShotDrawBall(int nPlayer) {
 }
 
 // fake match: stands in for a function the original linker stripped. Its constants (10.0, 0.5,
-// 1.0, 0.0) are still in this file's pool ahead of fn_80046928's; its body is unknown.
+// 1.0, 0.0) are still in this file's pool ahead of DynObj_bDrawBall's; its body is unknown.
 static f32 GoDynObj_StrippedFn(f32 x) {
     x += 10.0f;
     x += 0.5f;
@@ -338,7 +345,11 @@ static f32 GoDynObj_StrippedFn(f32 x) {
     return x;
 }
 
-u8 fn_80046928(int nPlayer) {
+// Whether nPlayer's ball is drawn: on lie 16 not when its surface is unknown or of class 7, 15 or
+// 16 (7 and 16: water) or it is over 0.5 up; not on lies 0, 9 or 12 while the player is in state
+// 19, not when DynObj_bAltShotDrawBall says no, and not in state 18 when the camera clips this
+// golfer.
+u8 DynObj_bDrawBall(int nPlayer) {
     int nLie = gPlayers[nPlayer].ball.nLie;
     u32 nClass;
 
@@ -366,7 +377,9 @@ u8 fn_80046928(int nPlayer) {
     return 1;
 }
 
-u8 fn_80046A54(int nPlayer) {
+// Whether nPlayer's ball shadow is drawn: not in state 1 while the swing clip's tag 3 is set, not
+// in state 18 while tag 4 is set, and not when DynObj_bAltShotDrawBall says no.
+u8 DynObj_bDrawShadow(int nPlayer) {
     if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 1 && fn_80048574(gPlayers[nPlayer].pChar, 3)) {
         return 0;
     }
@@ -379,7 +392,9 @@ u8 fn_80046A54(int nPlayer) {
     return 1;
 }
 
-u8 fn_80046B1C(int nPlayer) {
+// 1 when nPlayer's ball lies on lie 9, the player is in state 19 and DynObj_bAltShotDrawBall allows
+// it.
+u8 DynObj_bDrawMarker(int nPlayer) {
     if (gPlayers[nPlayer].ball.nLie == 9 &&(s8)GOLFERSTATE_GetCurrentState(nPlayer) == 19 &&
         DynObj_bAltShotDrawBall(nPlayer)) {
         return 1;
@@ -387,7 +402,9 @@ u8 fn_80046B1C(int nPlayer) {
     return 0;
 }
 
-void fn_80046B8C(int nView) {
+// Draws the players' balls for view nView; outside split screen also the ball markers and, unless
+// the view's player is in state 9, the shadows DynObj_DrawGolfBalls picked.
+void DynObj_RenderBalls(int nView) {
     u8 aState[8];
 
     RenderState_SetBlendFactors(4, 5);
@@ -400,16 +417,16 @@ void fn_80046B8C(int nView) {
     fn_8004731C(aState);
     RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
     if (gSession.nSplitScreen == 0) {
-        fn_80047290();
+        DynObj_DrawBallMarkers();
         if ((s8)GOLFERSTATE_GetCurrentState(ViewController_GetActivePlayerNumber(nView)) != 9) {
-            fn_80047208(aState);
+            DynObj_DrawBallShadows(aState);
         }
     }
 }
 
-// A ball moving at 10 or more just above ground of class 3 leaves a 'TEO ' 10005 object at pPos:
-// ten are used in turn.
-void fn_80046C34(f32* pPos, int nPlayer) {
+// A ball landing on the green (surface class 3) at 10 or more leaves a pitch mark ('TEO ' 10005
+// object) at pPos: ten are used in turn.
+void DynObj_PitchMarkAdd(f32* pPos, int nPlayer) {
     DynObjDef def;
     DynObjSetup setup;
     DynObjModel model;
@@ -454,9 +471,9 @@ void fn_80046C34(f32* pPos, int nPlayer) {
     }
 }
 
-// Puts the player's 'TEO ' 10001 object on the ground at pPos, turned to the player's aim; the
-// first time it is made (a type 0 object, flags 0xC00).
-void fn_80046E1C(f32* pPos, int nPlayer) {
+// Puts the player's divot hole ('TEO ' 10001) on the ground at pPos, turned to the player's aim;
+// the first time it is made (a type 0 object, flags 0xC00).
+void DynObj_ShotDivotHoleAdd(f32* pPos, int nPlayer) {
     f32 mTurn[4][4];
     f32 mObj[4][4];
     DynObjDef def;
@@ -504,7 +521,7 @@ void fn_80046E1C(f32* pPos, int nPlayer) {
 }
 
 // Draws a 'TEO ' model (10006 + the target's kind) at each target of the target games.
-void fn_80046FDC(s32 nView) {
+void DynObj_DrawTargetModels(s32 nView) {
     f32 vPos[4];
     int i;
     int nKind;
@@ -521,8 +538,9 @@ void fn_80046FDC(s32 nView) {
     }
 }
 
-// The same with the 'TEO ' 10020..10022 models, for the target kinds 0, 2 and 3.
-void fn_800470B0(s32 nView) {
+// The same as DynObj_DrawTargetModels with the 'TEO ' 10020..10022 models, for the target kinds 0,
+// 2 and 3, drawn without alpha test or z-buffer writes.
+void DynObj_DrawTargetOverlays(s32 nView) {
     f32 vPos[4];
     int i;
     int nModel;
@@ -558,7 +576,9 @@ void fn_800470B0(s32 nView) {
     RenderState_Flush();
 }
 
-void fn_80047208(u8* aState) {
+// Draws the ball shadow of each player whose flag in aState is set (DynObj_DrawGolfBalls sets
+// them).
+void DynObj_DrawBallShadows(u8* aState) {
     int i;
 
     for (i = 0; i < gSession.nNumPlayers; i++) {
@@ -568,11 +588,12 @@ void fn_80047208(u8* aState) {
     }
 }
 
-void fn_80047290(void) {
+// Draws the ball marker (BFX_vRender) of each player DynObj_bDrawMarker picks.
+void DynObj_DrawBallMarkers(void) {
     int i;
 
     for (i = 0; i < gSession.nNumPlayers; i++) {
-        if (fn_80046B1C(i)) {
+        if (DynObj_bDrawMarker(i)) {
             BFX_vRender(&PLAYER(i)->ball, i);
         }
     }
@@ -582,7 +603,7 @@ void fn_80047290(void) {
 // and 10040+i when the player has a logo. A flying or rolling ball turns by its spin; the level of
 // detail follows the camera's distance (over 50: 2, over 10: 1); the ball is flattened to the
 // view's aspect and sunk into the ground by the surface's lie, and grown when it looks small on
-// screen. pState[i] is set when fn_80046A54 picks player i.
+// screen. pState[i] is set when DynObj_bDrawShadow picks player i.
 void fn_8004731C(u8* pState) {
     f32 aSpin[4];
     f32 aTurn[4];
@@ -601,7 +622,7 @@ void fn_8004731C(u8* pState) {
     pBall = lbl_80281DA0->pTeo10000;
     for (i = 0; i < gSession.nNumPlayers; i++) {
         pState[i] = 0;
-        if (!fn_80046928(i)) {
+        if (!DynObj_bDrawBall(i)) {
             continue;
         }
         if ((s8)gSession.aProfile[i].nOutfit >= 0) {
@@ -740,7 +761,7 @@ void fn_8004731C(u8* pState) {
         if (pLogoB != NULL) {
             UObject_ComposeRotation(pLogoB->m0);
         }
-        if (fn_80046A54(i)) {
+        if (DynObj_bDrawShadow(i)) {
             pState[i] = 1;
         }
         fn_80048894(pBall);

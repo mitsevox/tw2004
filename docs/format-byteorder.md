@@ -57,8 +57,8 @@ Objects delivered by UStream
 | `CAMS` | DynamicCam_LoadCAMSfromStream | GoDynamicCam.c | swapped: fn_80076158 | little-endian on disc |
 | `CAMV` (2) | DynamicCam_LoadCAMVfromStream, DynamicCam_LoadCAMVfromStreamFE | GoDynamicCam.c | swapped: DynamicCam_CopyScriptData > ByteSwap_Records | little-endian on disc |
 | `CAMA` | DynamicCam_LoadCAMAfromStream | GoDynamicCam.c | swapped: DynamicCam_CopyAnimPairData > ByteSwap_Records | little-endian on disc |
-| `TEO ` | fn_80045F74 | sweep | none seen | asm |
-| `BALL` | fn_80045FC8 | asm | none seen | asm |
+| `TEO ` | DynObj_LoadTeoModel | sweep | none seen | asm |
+| `BALL` | DynObj_LoadBallLogos | asm | none seen | asm |
 | `Cact` | fn_80048BDC | UKernel.c | none seen | asm; its type-10 objects go to PlayNow_LoadBallSpot (PlayNowMode.c), which reads a challenge's ball spot in place through `ChallengeSpotRecord` (`port:` note there) |
 | `CAMC` | StaticCam_LoadCAMCfromStream | GoStaticCam.c | swapped: ByteSwap_Records | little-endian on disc |
 | `sscr` | SitDev_LoadScripts | SitDevFile.c | swapped: SitDev_SwapTables > ByteSwap_Records | little-endian on disc |
