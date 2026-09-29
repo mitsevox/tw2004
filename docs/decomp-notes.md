@@ -1416,7 +1416,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
 - **[verified] A float parameter reused as the running value.** When the original's product
   lands in a different callee-saved register than ours and the operands of `fmuls` are swapped
   (`f1, f0` vs `f0, f1`), the source overwrote the parameter: `fSeconds *= 60.0f; do { ...
-  fSeconds -= fTick; } while (fSeconds > 0)` rather than a new `fLeft` local. (`Ball_SimSeconds`.)
+  fSeconds -= fTick; } while (fSeconds > 0)` rather than a new `fLeft` local. (`Physics_TimedSimulation_local`.)
 - **[verified] `a*a + b*b`** becomes `fmuls` + `fmadds` only when written with the right-hand
   square first in evaluation order, i.e. `dx*dx + dz*dz` where `dz` was computed first; a fused
   `x + y*z` shows up as `fmadds` where the original has separate `fmuls`/`fadds` - use a

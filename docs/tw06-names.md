@@ -230,7 +230,7 @@ Functions we had named by hand, with their TW06 equivalents (our names kept):
 | `80054340` | `Ball_Stop` | `Physics_StopBall` | strong | Xbox nbr(r2,4) |
 | `80054450` | `Ball_Collide` | `Physics_CheckTerrainCollisions` | strong | Xbox anchor(3) |
 | `80054AB0` | `Physics_ApplySuperSucka` | `Physics_CupDynamics` | strong | Xbox anchor(4) |
-| `80054D28` | `Ball_GroundContact` | `Physics_BallRolling` | strong | Xbox anchor(9) |
+| `80054D28` | `Physics_BallRolling` | `Physics_BallRolling` | strong | Xbox anchor(9) |
 | `8005A080` | `Swing_LoadTuning` | `SW_vUIInit` | strong | both builds: Xbox anchor(2), PS2 anchor(2) |
 | `8005AEE0` | `Swing_Launch` | `SW_vImpact` | strong | PS2 nbr(r5,3) |
 | `8005D278` | `SwingStack_Top` | `GOLFERSTATE_GetCurrentState` | strong | PS2 nbr(r2,3) |

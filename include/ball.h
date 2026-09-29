@@ -333,13 +333,13 @@ void Physics_ShotImpact(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim,
 void Physics_InitShotData(Ball* pBall);
 int  Physics_Simulate(Ball* pBall, int nMs);
 u8   Physics_DropBall(Ball* pBall, f32* pPos);          // put the ball on the ground at a point
-void fn_8005585C_SimForTime(Ball* pBall, f32 fSeconds, f32 fTick);
+void Physics_TimedSimulation(Ball* pBall, f32 fSeconds, f32 fTick);
 u8   Physics_SetBallPosition(Ball* pBall, f32* pPos);
 u8   Physics_InitBall(Ball* pBall, f32* pPos, int nPlayer);  // a fresh ball for a player at a point
-void fn_80055C1C(u8 b);
-void fn_80055C40(int n);
-void fn_80055CAC(int n);
-void fn_80055CD0(int n);
+void Physics_SetNoRandomRolls(u8 b);
+void Physics_SetGreenSpeedByType(int n);
+void Physics_SetFairwaySpeedByType(int n);
+void Physics_SetRoughLengthByType(int n);
 void Wind_SetPhysicsWind(int nDir, f32 fSpeed);
 f32  Wind_GetPhysicsWindVelocity(f32* pOut);               // the wind's speed; its vector (direction x speed) into pOut
 void Wind_InitForHole(void);

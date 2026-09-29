@@ -745,7 +745,7 @@ u8 RC_vComputeRenderCtxWorldToPrimitiveCoordinate(void* pCamera, f32* pPos, f32*
     return bInFront;
 }
 
-// a - b into out, three floats; the same helper as Ball.c's fn_80055EA0.
+// a - b into out, three floats; the same helper as Ball.c's Ball_Vec3Sub.
 #ifdef __MWERKS__
 asm void CameraController_Vec3Sub(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc

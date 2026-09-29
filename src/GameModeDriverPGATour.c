@@ -172,8 +172,8 @@ void GameModeDriverPGATour_StartGamePreData(void) {
 // players play its tee set, the course is the round's course (round gpGame->nDC), every hole uses
 // the round's pin position (profile 0's tour.nRound), and the round's nGreenSpeed replaces
 // options.nGreenSpeed, the green speed (the old value kept in gPgaSavedOptions18, never read back),
-// and is applied (fn_80055C40). The tee set is written back to the format unchanged; the original
-// has that store.
+// and is applied (Physics_SetGreenSpeedByType). The tee set is written back to the format
+// unchanged; the original has that store.
 void GameModeDriverPGATour_SetTournament(s32 i) {
     PlayerNumber_t nPlayer = PLR_1_e;
     TourEvent* pEvent = &gPgaData.aTourEvent[i];
@@ -196,7 +196,7 @@ void GameModeDriverPGATour_SetTournament(s32 i) {
     gPgaSavedOptions18 = gSession.options.nGreenSpeed;
     gSession.options.nGreenSpeed =
         (u8)gPgaData.aTourEvent[i].aRound[gpSaveData[nPlayer].tour.nRound].nGreenSpeed;
-    fn_80055C40(gSession.options.nGreenSpeed);
+    Physics_SetGreenSpeedByType(gSession.options.nGreenSpeed);
 }
 
 // A round of the current tournament is about to start (front-end message GM_vStartEventCheckDisc).

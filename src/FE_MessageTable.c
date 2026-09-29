@@ -4079,7 +4079,8 @@ void GM_vSetOptionN14(MsgArg* pArgs, MsgArg* pResult) {
 
 // Front-end message 232: the green speed option (options.nGreenSpeed) from the menu's choice
 // pArgs[0]: 1, 2, 3 give 0, 1, 2 (another choice keeps the old value), then applied at once
-// (fn_80055C40 sets gGreenSpeedSetting, which the ball's roll reads). Message 244 reads it back.
+// (Physics_SetGreenSpeedByType sets gGreenSpeedSetting, which the ball's roll reads). Message 244
+// reads it back.
 void GM_vSetGreenSpeedOption(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 1:
@@ -4092,12 +4093,13 @@ void GM_vSetGreenSpeedOption(MsgArg* pArgs, MsgArg* pResult) {
         gSession.options.nGreenSpeed = 2;
         break;
     }
-    fn_80055C40(gSession.options.nGreenSpeed);
+    Physics_SetGreenSpeedByType(gSession.options.nGreenSpeed);
 }
 
 // Front-end message 375: the fairway speed option (options.nFairwaySpeed) from the menu's choice
 // pArgs[0]: 1, 2, 3 give 0, 1, 2 (another choice keeps the old value), then applied at once
-// (fn_80055CAC sets gFairwaySetting, which the ball's roll reads). Message 374 reads it back.
+// (Physics_SetFairwaySpeedByType sets gFairwaySetting, which the ball's roll reads). Message 374
+// reads it back.
 void GM_vSetFairwaySpeedOption(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
     case 1:
@@ -4110,7 +4112,7 @@ void GM_vSetFairwaySpeedOption(MsgArg* pArgs, MsgArg* pResult) {
         gSession.options.nFairwaySpeed = 2;
         break;
     }
-    fn_80055CAC(gSession.options.nFairwaySpeed);
+    Physics_SetFairwaySpeedByType(gSession.options.nFairwaySpeed);
 }
 
 // Front-end message 600: the green grid option (options.bPuttingGrid: the grid on the green shows
@@ -4576,7 +4578,7 @@ void GM_vBackupProfileClaimRow(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 261: the rough option (options.nRough) from the menu's choice pArgs[0]: 1, 2, 3
-// give 0, 1, 2 (another choice keeps the old value), then applied at once (fn_80055CD0 sets
+// give 0, 1, 2 (another choice keeps the old value), then applied at once (Physics_SetRoughLengthByType sets
 // gRoughSetting, which the ball's roll reads). Message 262 reads it back.
 void GM_vSetRoughOption(MsgArg* pArgs, MsgArg* pResult) {
     switch (pArgs[0].i) {
@@ -4590,7 +4592,7 @@ void GM_vSetRoughOption(MsgArg* pArgs, MsgArg* pResult) {
         gSession.options.nRough = 2;
         break;
     }
-    fn_80055CD0(gSession.options.nRough);
+    Physics_SetRoughLengthByType(gSession.options.nRough);
 }
 
 // Front-end message 262: the rough option (options.nRough) as the menu's choice: 0, 1, 2 answer 1,

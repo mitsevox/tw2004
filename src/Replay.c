@@ -9,9 +9,9 @@ Replay gReplayData;
 
 ReplayBuffer* lbl_80281E48;
 
-int  fn_80055CA4(void);                 // Ball.c
-int  fn_80055CC8(void);                 // Ball.c
-int  fn_80055D34(void);                 // Ball.c
+int  Physics_GetGreenSpeedType(void);                 // Ball.c
+int  Physics_GetFairwaySpeedType(void);                 // Ball.c
+int  Physics_GetRoughLengthType(void);                 // Ball.c
 int  Wind_GetPhysicsDirection(void);                 // Ball.c: the wind's direction
 f32  Wind_GetPhysicsSpeed(void);                 // Ball.c: the wind's speed
 f32  fn_8006C630(void);                 // gomainloop.c
@@ -80,9 +80,9 @@ void REPLAY_Save(int nPlayer) {
         }
     }
     gReplayData.nWeatherAmount = 100.0f * fn_8006C630();
-    gReplayData.nF1A = fn_80055CA4();
-    gReplayData.nF1C = fn_80055CC8();
-    gReplayData.nF1E = fn_80055D34();
+    gReplayData.nF1A = Physics_GetGreenSpeedType();
+    gReplayData.nF1C = Physics_GetFairwaySpeedType();
+    gReplayData.nF1E = Physics_GetRoughLengthType();
     gReplayData.fF08 = 0.0f;
     gReplayData.fF0C = 0.0f;
     gSession.bReplay = 0;

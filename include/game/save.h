@@ -243,9 +243,9 @@ typedef struct Replay {
                                 //        for options 1..3 (GameModeReplay.c)
     s16    nWindDir;            // 0xF16
     s16    nWindSpeed;          // 0xF18
-    s16    nF1A;                // 0xF1A  -> fn_80055C40
-    s16    nF1C;                // 0xF1C  -> fn_80055CAC
-    s16    nF1E;                // 0xF1E  -> fn_80055CD0
+    s16    nF1A;                // 0xF1A  -> Physics_SetGreenSpeedByType
+    s16    nF1C;                // 0xF1C  -> Physics_SetFairwaySpeedByType
+    s16    nF1E;                // 0xF1E  -> Physics_SetRoughLengthByType
     s16    nStrokes;            // 0xF20  strokes on the hole before the shot
 } Replay;
 LAYOUT_ASSERT(Replay, 0xF28);

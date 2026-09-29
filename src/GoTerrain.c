@@ -2444,7 +2444,7 @@ void fn_80035440(TerSettings* pSettings) {
     Mem_cpy(lbl_802811E0, pSettings, sizeof(TerSettings));
 }
 
-// a - b into out, three floats; the same helper as Ball.c's fn_80055EA0.
+// a - b into out, three floats; the same helper as Ball.c's Ball_Vec3Sub.
 #ifdef __MWERKS__
 asm void fn_8003546C(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc

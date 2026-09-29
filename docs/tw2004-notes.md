@@ -273,7 +273,7 @@ swing meter's per-player state as `SwingData` at player+0x3D4.
 
 `src/Ball.c` (our name; `0x80050C2C`-`0x8005620C`) is the ball physics, linked NonMatching:
 `Ball_Holed`, `Physics_GetDistanceToCup`, `Physics_ApplySuperSucka` written (instruction-count exact; three
-register numbers off in the pull). `Ball_GroundContact`, `Ball_Collide` and `Physics_SetLie` are
+register numbers off in the pull). `Physics_BallRolling`, `Ball_Collide` and `Physics_SetLie` are
 named and read. The Python transcription
 `tools/research/ctrl_dump.py` extracts every object from every `.hog` / `.gcb` on disc 1 to
 its declared size, which is the proof the reading is right. Full format:

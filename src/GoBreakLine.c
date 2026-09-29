@@ -137,7 +137,8 @@ void BreakLine_Render(int nView) {
             if ((lbl_80282228->aBall[nView].nState == 2 || lbl_80282228->aBall[nView].nState == 3 ||
                  lbl_80282228->aBall[nView].nState == 4) && fDist > 0.001f) {
                 Physics_SetSimulating(1);
-                fn_8005585C_SimForTime(&lbl_80282228->aBall[nView], lbl_80282228->fAAE0, lbl_80282228->fAAE4);
+                Physics_TimedSimulation(&lbl_80282228->aBall[nView], lbl_80282228->fAAE0,
+                                        lbl_80282228->fAAE4);
                 Physics_SetSimulating(0);
                 fDist = LLMath_SquareDistanceBetween3(lbl_80282228->aBall[nView].vPos,
                                     &lbl_80282228->aBall[nView].pCourse->pin[Game_CurrentPinSet()].x);

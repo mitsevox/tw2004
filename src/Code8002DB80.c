@@ -582,6 +582,6 @@ void Options_SetDefaults(GameOptions* pOpt) {
         pOpt->abTrackOn[1][0]  = 1;
         fn_8002EBA4((u8*)pOpt, 0);
     }
-    fn_80055C40(pOpt->nGreenSpeed);
-    fn_80055CD0(pOpt->nRough);
+    Physics_SetGreenSpeedByType(pOpt->nGreenSpeed);
+    Physics_SetRoughLengthByType(pOpt->nRough);
 }

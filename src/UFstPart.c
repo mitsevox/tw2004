@@ -632,7 +632,7 @@ void fn_80099EA4(PsEmitter* pEmitter) {
     lbl_80281F88 = pEmitter;
 }
 
-// b + a into out (three floats); the same as Ball.c's fn_80055E7C.
+// b + a into out (three floats); the same as Ball.c's Ball_Vec3Add.
 #ifdef __MWERKS__
 asm void fn_80099EB4(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc

@@ -360,13 +360,13 @@ The ball physics (`src/Ball.c`, our name; `0x80050C2C`-`0x8005620C`) works in **
 the rest of the game - we first read it as metres, but every constant in it is a whole number of
 inches (1/36). The ball it rolls has radius 0.92 in (a real one is 0.84); the cup constant is
 3.86 in (a real cup is 4.25). The cup is **real geometry**: it is a depression in the green mesh
-with its own surface kinds (12 and 18, type 90), and `Ball_GroundContact` (`0x80054D28`)
+with its own surface kinds (12 and 18, type 90), and `Physics_BallRolling` (`0x80054D28`)
 declares the ball holed when it is on one of those and more than **2 inches** below the pin's
 height. No speed test, no capture radius: the ball has to physically fall in. `Ball_Holed` then
 parks it 3 in down in the cup.
 
 **There is a pull, though.** `Physics_ApplySuperSucka` (`0x80054AB0`, in C at the original instruction
-count) runs from the rolling step (`Ball_GroundContact`, state 4) every tick, for every *real*
+count) runs from the rolling step (`Physics_BallRolling`, state 4) every tick, for every *real*
 ball, human or CPU. **It is skipped in simulations** (`gSimulating`) unless `gSimFullCup` is set -
 so the CPU's shot rehearsal and the caddie's putt read run *without* it, while the state-15
 rehearsal (the gimme's tap-in) and the look-ahead ball get it (corrected
@@ -642,7 +642,7 @@ The ball in flight (`Ball_Tick`, `Physics_BallFlying` and helpers, in C)
 
 **Each tick** (`Ball_Tick`; a tick is one 20 ms step of the real ball, the same step the
 rehearsals use): the state's own step runs - in the air (`Physics_BallFlying`), rolling
-(`fn_80052268`) or bouncing (`Ball_GroundContact`) - then the ball moves by velocity / 36. A
+(`fn_80052268`) or bouncing (`Physics_BallRolling`) - then the ball moves by velocity / 36. A
 ball still in play is kept on the ground (`fn_8005418C`) or collided with the ground
 (`Ball_Collide`), then swept against trees and objects (`Physics_CheckDynObjCollisions`: event 0x27, and a bounce
 off it as surface 13). **Stall check:** every 4 seconds' worth of ticks the ball must have moved
@@ -673,7 +673,7 @@ a typo for `n >= 156`. A ball in the air with no ground under it within 8 ft of 
 down on the other ground height (`fn_80055324`); elsewhere it stays in play while above the
 course floor (`CourseInfo.fFloor`) and is a hazard below it.
 
-Skidding and rolling: how a putt breaks (`fn_80052268`, `Ball_GroundContact`)
+Skidding and rolling: how a putt breaks (`fn_80052268`, `Physics_BallRolling`)
 ----------------------------------------------------------------------------
 
 A ball on the ground is **skidding** (state 3) until its spin catches up with its speed, then
@@ -684,7 +684,7 @@ the course settings below, accelerates the ball; the velocity is kept on the pla
 speed; friction (1.5 x surface `+0x18` x the normal force, same settings) builds roll spin.
 When 0.84 x the spin reaches the speed, it is rolling.
 
-**Roll** (`Ball_GroundContact`, 99%), every tick:
+**Roll** (`Physics_BallRolling`, 99%), every tick:
 
 1. **Holed** if it is on a cup surface (class 12 or 18, or surface 90 within 2 yd of the pin)
    and more than 2 in below the pin. That is the only "in" test.

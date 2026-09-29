@@ -485,9 +485,9 @@ typedef struct GameOptions {
                                 //       menu sets 0, 2 or 3, several modes 4 while they run
     s32  nWind;                 // 0x10  0..3 calm..gusty, 4+ none
     s32  n14;                   // 0x14  0..2; only the menus set and read it (messages 231, 243)
-    s32  nGreenSpeed;           // 0x18  0..2 (default 1), applied by fn_80055C40 (gGreenSpeedSetting)
-    s32  nRough;                // 0x1C  0..2 (default 1), applied by fn_80055CD0 (gRoughSetting)
-    s32  nFairwaySpeed;         // 0x20  0..2, applied by fn_80055CAC (gFairwaySetting); the defaults
+    s32  nGreenSpeed;           // 0x18  0..2 (default 1), applied by Physics_SetGreenSpeedByType (gGreenSpeedSetting)
+    s32  nRough;                // 0x1C  0..2 (default 1), applied by Physics_SetRoughLengthByType (gRoughSetting)
+    s32  nFairwaySpeed;         // 0x20  0..2, applied by Physics_SetFairwaySpeedByType (gFairwaySetting); the defaults
                                 //       leave it alone
     u8   a24[8];                // 0x24  on/off options, default on: [0] caddie tips (CaddieTips.c),
                                 //       [1] the putting tip, [2] the putt's break line

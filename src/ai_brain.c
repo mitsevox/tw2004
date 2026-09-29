@@ -263,9 +263,9 @@ u8 AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance) {
         gSimAborted = 0;
         Physics_SetSimulating(1);
         if (bFast) {
-            fn_8005585C_SimForTime(&gSimBall, 0.1f, 1.0f);
+            Physics_TimedSimulation(&gSimBall, 0.1f, 1.0f);
         } else {
-            fn_8005585C_SimForTime(&gSimBall, 0.2f, 1.0f);
+            Physics_TimedSimulation(&gSimBall, 0.2f, 1.0f);
         }
         Physics_SetSimulating(0);
         if (gSimAborted) {

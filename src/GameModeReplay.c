@@ -57,13 +57,13 @@ void GameModeReplay_Init(void) {
 }
 
 // Mode 10's hole start (pfnLoadHole): the saved wind (direction and speed) and the saved course
-// settings nF1A, nF1C (the fairway setting) and nF1E go back in (fn_80055C40, fn_80055CAC,
-// fn_80055CD0).
+// settings nF1A, nF1C (the fairway setting) and nF1E go back in (Physics_SetGreenSpeedByType,
+// Physics_SetFairwaySpeedByType, Physics_SetRoughLengthByType).
 void GameModeReplay_LoadHole(void) {
     Wind_SetPhysicsWind(gReplayData.nWindDir, gReplayData.nWindSpeed);
-    fn_80055C40(gReplayData.nF1A);
-    fn_80055CAC(gReplayData.nF1C);
-    fn_80055CD0(gReplayData.nF1E);
+    Physics_SetGreenSpeedByType(gReplayData.nF1A);
+    Physics_SetFairwaySpeedByType(gReplayData.nF1C);
+    Physics_SetRoughLengthByType(gReplayData.nF1E);
 }
 
 // Mode 10's hole restart (pfnRestartHole): the saved weather is forced again

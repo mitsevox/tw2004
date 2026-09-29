@@ -131,10 +131,10 @@ void Lessons_HighlightHudItem(int nItem, int bOn);
 // Mode 11 starts (pfnInit): its callbacks; the yardage, the stroke limit, gimmes, the flyovers
 // (b27F, b280), setup tips, the re-plan button, the flight-camera toggles and in-flight replays
 // off, with b275, b27B..b27D, bAllowGameBreakers and b28A; n290, nC, n10 and b276 (re-plan as the
-// swing begins) set to 1; the ball's random rolls off (fn_80055C1C: lies and bounces come out as in
-// a simulation). The options the lessons change are saved and set: commentary level 4, the putting
-// grid off, power boost and spin on. Random stream 0 is seeded with 69, so the lessons play the
-// same each time.
+// swing begins) set to 1; the ball's random rolls off (Physics_SetNoRandomRolls: lies and bounces
+// come out as in a simulation). The options the lessons change are saved and set: commentary level
+// 4, the putting grid off, power boost and spin on. Random stream 0 is seeded with 69, so the
+// lessons play the same each time.
 void Lessons_Init(void) {
     gpGame->pfnInit = Lessons_Init;
     gpGame->pfnShutdown = Lessons_Shutdown;
@@ -165,7 +165,7 @@ void Lessons_Init(void) {
     gpGame->nC = 1;
     gpGame->n10 = 1;
     gpGame->b276 = 1;
-    fn_80055C1C(1);
+    Physics_SetNoRandomRolls(1);
     gLessonSavedCommentLevel = gSession.options.a0[4];
     gLessonSavedPuttGrid = gSession.options.bPuttingGrid;
     gLessonSavedBoost = gSession.options.bBoostEnabled;
@@ -227,7 +227,7 @@ void Lessons_Shutdown(void) {
     Session* pSession;
     gSession.options.nWeather = gLessonSavedOptionC;
     gSession.options.nWind = gLessonSavedWind;
-    fn_80055C1C(0);
+    Physics_SetNoRandomRolls(0);
     // fake match: &gSession re-taken inside the first store after the call, as the original
     // recomputes it
     (pSession = &gSession)->options.a0[4] = gLessonSavedCommentLevel;

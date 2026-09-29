@@ -7,7 +7,7 @@
 #include "psmgr.h"
 #include "core/startup.h"
 
-void fn_80055C24(int n);        // Ball.c
+void Physics_SetWetScaleByType(int n);        // Ball.c
 void fn_800B24E0(f32 f);        // shadow.c
 
 Unk802811F0 lbl_801D7100;
@@ -169,7 +169,7 @@ void fn_8006F650(void) {
 }
 
 // Applies lbl_802811F0's flags: bit 0 calls fn_800B24E0 with 1; bit 1 starts effects 0 (with f18
-// kept to 0.1..1), 2 and 1 and calls fn_80055C24 with whether f18 is under 0.5; bit 4 starts
+// kept to 0.1..1), 2 and 1 and calls Physics_SetWetScaleByType with whether f18 is under 0.5; bit 4 starts
 // effect 3.
 void fn_8006FB10(void) {
     f32 fAmount;
@@ -183,9 +183,9 @@ void fn_8006FB10(void) {
         fn_800A2A80(2, NULL, 2);
         fn_800A2A80(1, NULL, 2);
         if (lbl_802811F0->f18 < 0.5f) {
-            fn_80055C24(1);
+            Physics_SetWetScaleByType(1);
         } else {
-            fn_80055C24(0);
+            Physics_SetWetScaleByType(0);
         }
     }
     if (lbl_802811F0->uFlags & 0x10) {
@@ -194,7 +194,7 @@ void fn_8006FB10(void) {
 }
 
 // Ends fn_8006FB10's flags: keeps them in u04; bit 1 stops effects 0, 2 and 1 and calls
-// fn_80055C24 with 2, bit 4 stops effect 3; clears bits 0, 1, 2 and 4 (bit 0's fn_800B24E0 call
+// Physics_SetWetScaleByType with 2, bit 4 stops effect 3; clears bits 0, 1, 2 and 4 (bit 0's fn_800B24E0 call
 // is not undone).
 void fn_8006FBF8(void) {
     lbl_802811F0->b1C = 0;
@@ -206,7 +206,7 @@ void fn_8006FBF8(void) {
         fn_800A2B34(0);
         fn_800A2B34(2);
         fn_800A2B34(1);
-        fn_80055C24(2);
+        Physics_SetWetScaleByType(2);
         lbl_802811F0->uFlags &= ~2;
     }
     if (lbl_802811F0->uFlags & 4) {
