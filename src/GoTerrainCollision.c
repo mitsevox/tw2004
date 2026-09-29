@@ -19,13 +19,13 @@
 #define TER_RELOCATE(pCourse, field) ((pCourse)->field = (void*)((u8*)(pCourse) + BE32(&(pCourse)->field)))
 
 // .bss and .sbss in reverse address order (CodeWarrior lays them out backwards).
-u8        lbl_801D54A0[MAX_OBJECTS];
-TNetwork* lbl_801D548C[MAX_OOB_NETWORKS];
-TNetwork* lbl_801D5428[MAX_FREE_DROP_NETWORKS];
-TerBox    lbl_801D53A8[NUM_CUP_POSITIONS];
-s32       lbl_80281DC8;
-s32       lbl_80281DC4;
-u8        lbl_80281DC0;
+u8        gTerObjectMarks[MAX_OBJECTS];
+TNetwork* gTerOOBNetworks[MAX_OOB_NETWORKS];
+TNetwork* gTerFreeDropNetworks[MAX_FREE_DROP_NETWORKS];
+TerBox    gTerCupGeometryBounds[NUM_CUP_POSITIONS];
+s32       gTerNumOOBNetworks;
+s32       gTerNumFreeDropNetworks;
+u8        gTerUse3DCupGeometry;
 
 void  Ter_FreeDropNetworkLoadCallback(TNetwork* pNet);
 u8    Ter_LieIsPreferred(u32 nClass);
@@ -134,8 +134,8 @@ u8 Ter_LineTriangleIntersection(f32* pFrom, f32* pDir, f32 fMax, f32 (*pTri)[3],
 void Ter_Init(void) {
     Network_RegisterLoadNetworkCallback(1, (void (*)(u8*))Ter_OOBNetworkLoadCallback);
     Network_RegisterLoadNetworkCallback(4, (void (*)(u8*))Ter_FreeDropNetworkLoadCallback);
-    lbl_80281DC8 = 0;
-    lbl_80281DC4 = 0;
+    gTerNumOOBNetworks = 0;
+    gTerNumFreeDropNetworks = 0;
 }
 
 // TW06: void Ter_InitTGD(TGD_TerrainInfo*). Get a course's collision data ready once it is loaded:
@@ -172,39 +172,39 @@ void Ter_InitTGD(CourseInfo* pCourse) {
     if (pCourse->p40 != NULL) {
         TER_RELOCATE(pCourse, p40);
     }
-    lbl_80281DC0 = 0;
+    gTerUse3DCupGeometry = 0;
     for (k = 0; k < NUM_CUP_POSITIONS; k++) {
-        lbl_801D53A8[k].vMin[0] = 1000000.0f;
-        lbl_801D53A8[k].vMin[1] = 1000000.0f;
-        lbl_801D53A8[k].vMin[2] = 1000000.0f;
-        lbl_801D53A8[k].vMax[0] = -1000000.0f;
-        lbl_801D53A8[k].vMax[1] = -1000000.0f;
-        lbl_801D53A8[k].vMax[2] = -1000000.0f;
+        gTerCupGeometryBounds[k].vMin[0] = 1000000.0f;
+        gTerCupGeometryBounds[k].vMin[1] = 1000000.0f;
+        gTerCupGeometryBounds[k].vMin[2] = 1000000.0f;
+        gTerCupGeometryBounds[k].vMax[0] = -1000000.0f;
+        gTerCupGeometryBounds[k].vMax[1] = -1000000.0f;
+        gTerCupGeometryBounds[k].vMax[2] = -1000000.0f;
     }
     for (i = 0; i < pCourse->nPolyRefs; i++) {
         nBit = 1;
         for (k = 0; k < NUM_CUP_POSITIONS; k++) {
             if (nBit == (pCourse->pPolyRefs[i].u4 & 0xF)) {
-                lbl_80281DC0 = 1;
+                gTerUse3DCupGeometry = 1;
                 pVert = &pCourse->pVerts[TER_FIRST_VERTEX(&pCourse->pPolyRefs[i])];
                 for (j = 0; j < pCourse->pPolyRefs[i].nTris + 2; j++) {
-                    if (pVert[0][0] < lbl_801D53A8[k].vMin[0]) {
-                        lbl_801D53A8[k].vMin[0] = pVert[0][0];
+                    if (pVert[0][0] < gTerCupGeometryBounds[k].vMin[0]) {
+                        gTerCupGeometryBounds[k].vMin[0] = pVert[0][0];
                     }
-                    if (pVert[0][1] < lbl_801D53A8[k].vMin[1]) {
-                        lbl_801D53A8[k].vMin[1] = pVert[0][1];
+                    if (pVert[0][1] < gTerCupGeometryBounds[k].vMin[1]) {
+                        gTerCupGeometryBounds[k].vMin[1] = pVert[0][1];
                     }
-                    if (pVert[0][2] < lbl_801D53A8[k].vMin[2]) {
-                        lbl_801D53A8[k].vMin[2] = pVert[0][2];
+                    if (pVert[0][2] < gTerCupGeometryBounds[k].vMin[2]) {
+                        gTerCupGeometryBounds[k].vMin[2] = pVert[0][2];
                     }
-                    if (pVert[0][0] > lbl_801D53A8[k].vMax[0]) {
-                        lbl_801D53A8[k].vMax[0] = pVert[0][0];
+                    if (pVert[0][0] > gTerCupGeometryBounds[k].vMax[0]) {
+                        gTerCupGeometryBounds[k].vMax[0] = pVert[0][0];
                     }
-                    if (pVert[0][1] > lbl_801D53A8[k].vMax[1]) {
-                        lbl_801D53A8[k].vMax[1] = pVert[0][1];
+                    if (pVert[0][1] > gTerCupGeometryBounds[k].vMax[1]) {
+                        gTerCupGeometryBounds[k].vMax[1] = pVert[0][1];
                     }
-                    if (pVert[0][2] > lbl_801D53A8[k].vMax[2]) {
-                        lbl_801D53A8[k].vMax[2] = pVert[0][2];
+                    if (pVert[0][2] > gTerCupGeometryBounds[k].vMax[2]) {
+                        gTerCupGeometryBounds[k].vMax[2] = pVert[0][2];
                     }
                     pVert++;
                 }
@@ -212,20 +212,20 @@ void Ter_InitTGD(CourseInfo* pCourse) {
             nBit <<= 1;
         }
     }
-    if (lbl_80281DC0) {
+    if (gTerUse3DCupGeometry) {
         nPinSet = Game_CurrentPinSet();
         for (k = 0; k < NUM_CUP_POSITIONS; k++) {
             gpGame->nPinSet[Game_CurHoleIndex()] = k;
-            lbl_801D3CB0.pCourse->pin[k].x = (lbl_801D53A8[k].vMin[0] + lbl_801D53A8[k].vMax[0]) / 2.0f;
-            lbl_801D3CB0.pCourse->pin[k].z = (lbl_801D53A8[k].vMin[2] + lbl_801D53A8[k].vMax[2]) / 2.0f;
-            lbl_801D3CB0.pCourse->pin[k].y = lbl_801D53A8[k].vMax[1];
+            lbl_801D3CB0.pCourse->pin[k].x = (gTerCupGeometryBounds[k].vMin[0] + gTerCupGeometryBounds[k].vMax[0]) / 2.0f;
+            lbl_801D3CB0.pCourse->pin[k].z = (gTerCupGeometryBounds[k].vMin[2] + gTerCupGeometryBounds[k].vMax[2]) / 2.0f;
+            lbl_801D3CB0.pCourse->pin[k].y = gTerCupGeometryBounds[k].vMax[1];
             lbl_801D3CB0.pCourse->pin[k].w = 1.0f;
         }
         gpGame->nPinSet[Game_CurHoleIndex()] = nPinSet;
     }
     gpGame->pPinPos = &lbl_801D3CB0.pCourse->pin[Game_CurrentPinSet()].x;
-    lbl_80281DC8 = 0;
-    lbl_80281DC4 = 0;
+    gTerNumOOBNetworks = 0;
+    gTerNumFreeDropNetworks = 0;
     Ter_ComputeHighestPointInEveryTriangle(lbl_801D3CB0.pCourse);
     lbl_801D3CB0.pCourse->fFloor = Ter_CalcLowestPlayableWorldHeight(lbl_801D3CB0.pCourse);
 }
@@ -233,23 +233,23 @@ void Ter_InitTGD(CourseInfo* pCourse) {
 // TW06: bool Ter_Use3DCupGeometry(void). Whether the cup is real geometry the ball drops into;
 // without it, GameRound.c holes a ball that stops within half a yard of the pin.
 u8 Ter_Use3DCupGeometry(void) {
-    return lbl_80281DC0;
+    return gTerUse3DCupGeometry;
 }
 
 // Network type 4's load callback (Ter_Init registers it): adds a loaded free-drop outline to the
 // hole's list. No check against MAX_FREE_DROP_NETWORKS.
 void Ter_FreeDropNetworkLoadCallback(TNetwork* pNet) {
-    lbl_801D5428[lbl_80281DC4] = pNet;
-    lbl_80281DC4++;
+    gTerFreeDropNetworks[gTerNumFreeDropNetworks] = pNet;
+    gTerNumFreeDropNetworks++;
 }
 
 // TW06: bool Ter_PointInFreeDropNetwork(f32*). Whether a point is inside a free-drop area.
 u8 Ter_PointInFreeDropNetwork(f32* pPos) {
     int i;
 
-    if (lbl_80281DC4 == 0) return 0;
-    for (i = 0; i < lbl_80281DC4; i++) {
-        if (wn_PnPoly(pPos, lbl_801D5428[i], lbl_801D5428[i]->nNumNodes)) return 1;
+    if (gTerNumFreeDropNetworks == 0) return 0;
+    for (i = 0; i < gTerNumFreeDropNetworks; i++) {
+        if (wn_PnPoly(pPos, gTerFreeDropNetworks[i], gTerFreeDropNetworks[i]->nNumNodes)) return 1;
     }
     return 0;
 }
@@ -257,13 +257,13 @@ u8 Ter_PointInFreeDropNetwork(f32* pPos) {
 // Network type 1's load callback (Ter_Init registers it): adds a loaded out-of-bounds outline to
 // the hole's list. No check against MAX_OOB_NETWORKS.
 void Ter_OOBNetworkLoadCallback(TNetwork* pNet) {
-    lbl_801D548C[lbl_80281DC8] = pNet;
-    lbl_80281DC8++;
+    gTerOOBNetworks[gTerNumOOBNetworks] = pNet;
+    gTerNumOOBNetworks++;
 }
 
 // TW06: s32 Ter_iNumOOBNetworksLoaded(void).
 s32 Ter_iNumOOBNetworksLoaded(void) {
-    return lbl_80281DC8;
+    return gTerNumOOBNetworks;
 }
 
 // TW06: bool Ter_PointInOOBNetwork(f32*). Whether a point is inside one of the outlines; a course
@@ -271,9 +271,9 @@ s32 Ter_iNumOOBNetworksLoaded(void) {
 u8 Ter_PointInOOBNetwork(f32* pPos) {
     int i;
 
-    if (lbl_80281DC8 == 0) return 1;
-    for (i = 0; i < lbl_80281DC8; i++) {
-        if (wn_PnPoly(pPos, lbl_801D548C[i], lbl_801D548C[i]->nNumNodes)) return 1;
+    if (gTerNumOOBNetworks == 0) return 1;
+    for (i = 0; i < gTerNumOOBNetworks; i++) {
+        if (wn_PnPoly(pPos, gTerOOBNetworks[i], gTerOOBNetworks[i]->nNumNodes)) return 1;
     }
     return 0;
 }
@@ -283,9 +283,9 @@ u8 Ter_PointInOOBNetwork(f32* pPos) {
 u8 Ter_CollisionWithOOBNetwork(f32* pFrom, f32* pTo, f32* pHit) {
     int i;
 
-    if (lbl_80281DC8 == 0) return 0;
-    for (i = 0; i < lbl_80281DC8; i++) {
-        if (Network_LineNetworkIntersection(pFrom, pTo, lbl_801D548C[i], lbl_801D548C[i]->nNumNodes,
+    if (gTerNumOOBNetworks == 0) return 0;
+    for (i = 0; i < gTerNumOOBNetworks; i++) {
+        if (Network_LineNetworkIntersection(pFrom, pTo, gTerOOBNetworks[i], gTerOOBNetworks[i]->nNumNodes,
                                             pHit)) return 1;
     }
     return 0;
@@ -1298,7 +1298,7 @@ u32 Ter_GetTerrainLayers(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurface
     return 0;
 }
 
-// Mark in lbl_801D54A0 the objects of grid cell (nX, nZ) that the line from pFrom along pDir
+// Mark in gTerObjectMarks the objects of grid cell (nX, nZ) that the line from pFrom along pDir
 // passes within fRange of (entry 0 is always marked).
 void Ter_MarkObjectsNearLine(CourseInfo* pCourse, f32* pFrom, f32* pDir, int nX, int nZ, f32 fRange) {
     int i;
@@ -1306,9 +1306,9 @@ void Ter_MarkObjectsNearLine(CourseInfo* pCourse, f32* pFrom, f32* pDir, int nX,
     TerCell* pCell;
     TerObject* pObj;
 
-    lbl_801D54A0[0] = 1;
+    gTerObjectMarks[0] = 1;
     for (i = 1; i < MAX_OBJECTS; i++) {
-        lbl_801D54A0[i] = 0;
+        gTerObjectMarks[i] = 0;
     }
     if (nX >= 0 && nX < pCourse->nGridWidth && nZ >= 0 && nZ < pCourse->nGridLength) {
         pCell = &pCourse->pGrid[nX + nZ * pCourse->nGridWidth];
@@ -1316,7 +1316,7 @@ void Ter_MarkObjectsNearLine(CourseInfo* pCourse, f32* pFrom, f32* pDir, int nX,
         for (i = pCell->nObjRefs - 1; i >= 0; i--) {
             pObj = &pCourse->pObjects[*pRefs];
             if (Ter_LineSphereIntersection(pFrom, pDir, fRange, pObj->vCentre, pObj->fRadius)) {
-                lbl_801D54A0[*pRefs] = 1;
+                gTerObjectMarks[*pRefs] = 1;
             }
             pRefs++;
         }
@@ -1552,7 +1552,7 @@ u8 Ter_CheckForWorldCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32*
 // grid cell (nX, nZ) that the line from pFrom along pDir meets before fMax (pTo is the line's end,
 // for the cell's height test): the point, normal, surface, the object it belongs to (NULL for the
 // ground) and, when pbFlags is given, the triangle's flag bits. Only the objects marked in
-// lbl_801D54A0 are tested.
+// gTerObjectMarks are tested.
 u8 Ter_CheckForWorldCollisionOneGrid(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir,
                                      f32 fMax, f32* pHit,
                f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj, u8* pbFlags) {
@@ -1585,7 +1585,7 @@ u8 Ter_CheckForWorldCollisionOneGrid(CourseInfo* pCourse, int nX, int nZ, f32* p
         for (i = (pCell->uRefs & 0xFFF) - 1; i >= 0; i--) {
             if (pRef->u4 != 0 && (!(pRef->u4 & uPinSet) || ((pRef->u4 & 0x10) && gSession.nSplitScreen))) {
                 pRef++;
-            } else if (lbl_801D54A0[pRef->n2] == 0) {
+            } else if (gTerObjectMarks[pRef->n2] == 0) {
                 pRef++;
             } else {
                 pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
@@ -1784,7 +1784,7 @@ u8 Ter_CheckForSolidWorldCollisionOneGrid(CourseInfo* pCourse, int nX, int nZ, f
         for (i = (pCell->uRefs & 0xFFF) - 1; i >= 0; i--) {
             if (pRef->u4 != 0 && (!(pRef->u4 & uPinSet) || ((pRef->u4 & 0x10) && gSession.nSplitScreen))) {
                 pRef++;
-            } else if (lbl_801D54A0[pRef->n2] == 0) {
+            } else if (gTerObjectMarks[pRef->n2] == 0) {
                 pRef++;
             } else if (gSurfaceTypes[pRef->nSurface].f0C < 0.0f) {
                 pRef++;

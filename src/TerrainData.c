@@ -11,10 +11,10 @@
 void LLMath_mat44fltMultiplyList33(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // VecMath.c
 
 // The globals, in reverse address order (CodeWarrior lays them out last-defined-first).
-int lbl_80281C10;                       // how many networks lbl_801A2A40 holds
-TNetwork* lbl_801A2A40[32];             // the hole's networks, in the order they came
-CourseLoader lbl_801A2A00[8];
-int lbl_80280DB0 = -1;                  // loaders registered; -1: the 'Cnet' handler calls none
+int gNetworkCount;                       // how many networks gNetworks holds
+TNetwork* gNetworks[32];             // the hole's networks, in the order they came
+CourseLoader gNetworkLoaders[8];
+int gNetworkLoaderCount = -1;                  // loaders registered; -1: the 'Cnet' handler calls none
 
 void Network_FreeDownloadData(UStreamObject* pObject);
 void Network_DownloadDataPNB(UStreamObject* pObject);
@@ -56,7 +56,7 @@ f32 Network_GetNodeGroundHeight(const f32* pPos) {
 // A network stream object is released (Network_DownloadDataPNB installs this as its release
 // function): one network fewer in the hole's list.
 void Network_FreeDownloadData(UStreamObject* pObject) {
-    lbl_80281C10 = lbl_80281C10 - 1;
+    gNetworkCount = gNetworkCount - 1;
 }
 
 // The 'Cnet' stream handler (Network_InitModule registers it): keeps the object unless it is
@@ -75,7 +75,7 @@ void Network_DownloadDataPNB(UStreamObject* pObject) {
     pObject->pfn8 = Network_FreeDownloadData;
     fn_8000B4B8(pObject);
     pNet = (TNetwork*)(pObject->pData + 0xC);   // after a 12-byte header
-    lbl_801A2A40[lbl_80281C10++] = pNet;
+    gNetworks[gNetworkCount++] = pNet;
     pNode = pNet->aNodes;
     for (i = 0; i < pNet->nNumNodes; i++) {
         if (!pNode->vPos[1]) {
@@ -83,9 +83,9 @@ void Network_DownloadDataPNB(UStreamObject* pObject) {
         }
         pNode++;
     }
-    for (i = 0; i < lbl_80280DB0; i++) {
-        if (pNet->nExportType == lbl_801A2A00[i].nChunk) {
-            lbl_801A2A00[i].pfn((u8*)pNet);
+    for (i = 0; i < gNetworkLoaderCount; i++) {
+        if (pNet->nExportType == gNetworkLoaders[i].nChunk) {
+            gNetworkLoaders[i].pfn((u8*)pNet);
         }
     }
 }
@@ -94,27 +94,27 @@ void Network_DownloadDataPNB(UStreamObject* pObject) {
 // Network_DownloadDataPNB hands it every network of that type as it arrives. At most 8 loaders;
 // returns 0 when they are full. TW07's version also takes should-load and post-load callbacks.
 u8 Network_RegisterLoadNetworkCallback(int nChunk, void (*pfn)(u8*)) {
-    if (lbl_80280DB0 >= 8) {
+    if (gNetworkLoaderCount >= 8) {
         return 0;
     }
-    lbl_801A2A00[lbl_80280DB0].nChunk = nChunk;
-    lbl_801A2A00[lbl_80280DB0++].pfn = pfn;
+    gNetworkLoaders[gNetworkLoaderCount].nChunk = nChunk;
+    gNetworkLoaders[gNetworkLoaderCount++].pfn = pfn;
     return 1;
 }
 
 // Shuts the networks down (gomainloop.c's shut-down list): forgets the hole's networks, and a
 // loader count of -1 stops Network_DownloadDataPNB from calling any loader.
 void Network_CloseModule(void) {
-    lbl_80281C10 = 0;
-    lbl_80280DB0 = -1;
+    gNetworkCount = 0;
+    gNetworkLoaderCount = -1;
 }
 
 // Starts the networks (gomainloop.c's start-up list): registers Network_DownloadDataPNB for 'Cnet'
 // stream objects, with no networks and no loaders yet.
 void Network_InitModule(void) {
     Stream_RegisterLoadChunkCallback(TAG('C', 'n', 'e', 't'), Network_DownloadDataPNB);
-    lbl_80281C10 = 0;
-    lbl_80280DB0 = 0;
+    gNetworkCount = 0;
+    gNetworkLoaderCount = 0;
 }
 
 // The winding number of the outline around pPos, in x and z: nonzero when pPos is inside.

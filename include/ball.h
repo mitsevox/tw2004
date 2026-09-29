@@ -230,15 +230,15 @@ typedef struct TerBox {
 #define MAX_OBJECTS 1000        // course objects a line test can mark
 #define TER_NO_GROUND -65536.125f   // the height the ground lookups return when nothing is under the point
 
-extern TerBox   lbl_801D53A8[NUM_CUP_POSITIONS];  // the 3D cup geometry of each pin position
-extern TNetwork* lbl_801D5428[MAX_FREE_DROP_NETWORKS];
-extern TNetwork* lbl_801D548C[MAX_OOB_NETWORKS];
-extern u8        lbl_801D54A0[MAX_OBJECTS];        // objects near the current line
+extern TerBox   gTerCupGeometryBounds[NUM_CUP_POSITIONS];  // the 3D cup geometry of each pin position
+extern TNetwork* gTerFreeDropNetworks[MAX_FREE_DROP_NETWORKS];
+extern TNetwork* gTerOOBNetworks[MAX_OOB_NETWORKS];
+extern u8        gTerObjectMarks[MAX_OBJECTS];        // objects near the current line
 extern f32       lbl_801D5888[4][4];  // per player: the last spot where the ball could be dropped
 extern f32       lbl_801D58C8[4][4];  // per player: the last such spot with a preferred lie
-extern u8        lbl_80281DC0;        // the cup is real geometry
-extern s32       lbl_80281DC4;        // free-drop networks loaded
-extern s32       lbl_80281DC8;        // out-of-bounds networks loaded
+extern u8        gTerUse3DCupGeometry;        // the cup is real geometry
+extern s32       gTerNumFreeDropNetworks;        // free-drop networks loaded
+extern s32       gTerNumOOBNetworks;        // out-of-bounds networks loaded
 
 // A handler for the hole's networks ('Cnet' stream objects, TerrainData.c): pfn gets each
 // network whose nExportType is nChunk.
