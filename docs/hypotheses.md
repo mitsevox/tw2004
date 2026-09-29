@@ -456,7 +456,7 @@ check in the ball code.
   it should normally drop. Why 2003's sometimes did not cannot be shown from the 2004 disc.
 - **The "straight in" read is not decided separately.** It is the same rehearsal, the real
   physics. The HUD gets two numbers in feet (how far left or right of the hole to aim, and how far
-  past or short) from `fn_800C9038`, and the wording ("straight in") is made from them in the
+  past or short) from `BreakLine_GetCaddyTipInfo`, and the wording ("straight in") is made from them in the
   front-end, not in `main.dol`. What makes a correct "straight in" read miss is the **stroke**:
   every human swing gets a hidden random wobble (`Swing_MeterError`: +-15 stick units added to the
   x of both the top and the impact samples, x scaled by 0.03 on a putt). Even a perfect stick

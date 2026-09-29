@@ -21,10 +21,10 @@ void RC_UpdateCurrentScreenMatrices(void);
 void Camera_SetLensFarClip(u8* p, f32 v); // sets the lens's far clip distance, fAC (fn_80014268 reads it)
 f32  fn_80014268(u8* p);
 
-void fn_8009CB78(f32* pA, f32* pB, f32* pOut);
+void GR_Vec4Sub(f32* pA, f32* pB, f32* pOut);
 void GR_BuildGridRenderData(s32 nView);
-u8   fn_8009BD24(int nPlayer);
-u8   fn_8009BD94(int nPlayer);
+u8   GR_ShouldDrawGrid(int nPlayer);
+u8   GR_PlayerIsTargetingGreen(int nPlayer);
 
 GreenGrid lbl_801E3068;
 GreenGrid* lbl_802813C0 = &lbl_801E3068;
@@ -37,6 +37,9 @@ static f32 GoGreenGrid_StrippedFn(f32 x) {
     return x + 1.0f;
 }
 
+// Sets the grid up at start-up (GO_vInitIG): for each view (two in split screen) a mesh and buffers
+// for 256 vertices (128) and 16 rows (8) of heights; cells of 1 x 1, four columns, its colour and
+// the "gridpt" texture.
 void GR_vInit(void) {
     s32 desc[2];
     int i;
@@ -80,14 +83,17 @@ void GR_vInit(void) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_8009B894(void);
+void GR_vInitForHole(void);
 
-void fn_8009B894(void) {
+// The grid's per-hole set-up, called in the per-hole list just before BreakLine_InitForHole; empty
+// in this build.
+void GR_vInitForHole(void) {
 }
 
 // ---- end of sweep code ----
 
-void fn_8009B898(void) {
+// Frees each view's grid mesh and buffers (GR_vInit's), in gomainloop's shut-down.
+void GR_vClose(void) {
     int nViews = gSession.nSplitScreen ? 2 : 1;
     int i;
     for (i = 0; i < nViews; i++) {
@@ -100,9 +106,10 @@ void fn_8009B898(void) {
     }
 }
 
-// Lays the view's grid out for its player's target: with the putter it runs from beyond the pin
-// back past the ball (at most 8 or 16 rows), otherwise it is a square of nCols x nCols points.
-void fn_8009B970(int nView) {
+// Lays the view's grid out for its player's target and starts its height sampling over: with the
+// putter it runs from beyond the pin back past the ball (at most 8 or 16 rows), otherwise it is a
+// square of nCols x nCols points.
+void GR_ResetGreenGrid(int nView) {
     // fake match: an s32 (long) copy of nView, kept in its own register, for the
     // ViewController_GetActivePlayerNumber calls
     s32 nViewCopy;
@@ -114,20 +121,20 @@ void fn_8009B970(int nView) {
     f32 fDist;
     f32 fLen;
     nViewCopy = nView;
-    if (!fn_8009BD24(ViewController_GetActivePlayerNumber(nViewCopy))) {
+    if (!GR_ShouldDrawGrid(ViewController_GetActivePlayerNumber(nViewCopy))) {
         return;
     }
     LLMath_CopyVec(PLAYER(ViewController_GetActivePlayerNumber(nViewCopy))->vTarget,
                    lbl_802813C0->aTarget[nView]);
     lbl_802813C0->anDone[nView] = 0;
-    fn_8009CB78(PLAYER(ViewController_GetActivePlayerNumber(nViewCopy))->vTarget,
+    GR_Vec4Sub(PLAYER(ViewController_GetActivePlayerNumber(nViewCopy))->vTarget,
                 PLAYER(ViewController_GetActivePlayerNumber(nViewCopy))->ball.vPos,
                 lbl_802813C0->aDir[nView]);
     lbl_802813C0->aDir[nView][1] = 0.0f;
     fDist = (f32)Math_Sqrt(Vec3_LengthSqClamped(lbl_802813C0->aDir[nView]));
     LLMath_Normalize3(lbl_802813C0->aDir[nView], lbl_802813C0->aDir[nView]);
     if (PLAYER(ViewController_GetActivePlayerNumber(nViewCopy))->nClub == CLUB_PUTTER_e) {
-        fn_8009CB78(&Ter_GetTGD()->pin[Game_CurrentPinSet()].x,
+        GR_Vec4Sub(&Ter_GetTGD()->pin[Game_CurrentPinSet()].x,
                     PLAYER(ViewController_GetActivePlayerNumber(nViewCopy))->ball.vPos,
                     vPin);
         vPin[1] = 0.0f;
@@ -159,18 +166,20 @@ void fn_8009B970(int nView) {
 
 // Whether the grid shows for the player: never with GM_Currently_SkillZoneMode; with the putter when
 // options.bPuttingGrid is set; otherwise when the player's ground (nSurface) is of a class that
-// fn_8009BD94 lists.
-u8 fn_8009BD24(int nPlayer) {
+// GR_PlayerIsTargetingGreen lists.
+u8 GR_ShouldDrawGrid(int nPlayer) {
     if (GM_Currently_SkillZoneMode()) {
         return 0;
     }
     if (gPlayers[nPlayer].nClub == CLUB_PUTTER_e) {
         return gSession.options.bPuttingGrid;
     }
-    return fn_8009BD94(nPlayer);
+    return GR_PlayerIsTargetingGreen(nPlayer);
 }
 
-u8 fn_8009BD94(int nPlayer) {
+// Whether the ground under the player's target (Player.nSurface) is of class 3 (green), 4 (fringe),
+// 12 (the cup) or 18 (green).
+u8 GR_PlayerIsTargetingGreen(int nPlayer) {
     int bOn = 0;
     int nSurface;
     nSurface = gPlayers[nPlayer].nSurface;
@@ -186,7 +195,7 @@ u8 fn_8009BD94(int nPlayer) {
 // Samples the ground height under up to four more of the view's grid points (a frame's share),
 // first laying the grid out again if the player's target has moved. Points on ground of class 12
 // are lifted by a ninth.
-void fn_8009BE08(int nView) {
+void GR_UpdateGreenGrid(int nView) {
     int n;
     int nRow;
     int nCol;
@@ -203,7 +212,7 @@ void fn_8009BE08(int nView) {
     f32 fDirX;
     f32 fDirZ;
     nViewCopy = nView;
-    if (!fn_8009BD24(ViewController_GetActivePlayerNumber(nViewCopy))) {
+    if (!GR_ShouldDrawGrid(ViewController_GetActivePlayerNumber(nViewCopy))) {
         return;
     }
     if (lbl_802813C0->aTarget[nView][0] != PLAYER(ViewController_GetActivePlayerNumber(nViewCopy))->vTarget[0]
@@ -211,7 +220,7 @@ void fn_8009BE08(int nView) {
                 != PLAYER(ViewController_GetActivePlayerNumber(nViewCopy))->vTarget[1]
         || lbl_802813C0->aTarget[nView][2]
                 != PLAYER(ViewController_GetActivePlayerNumber(nViewCopy))->vTarget[2]) {
-        fn_8009B970(nView);
+        GR_ResetGreenGrid(nView);
     }
     fDirX = lbl_802813C0->aDir[nView][0];
     fDirZ = lbl_802813C0->aDir[nView][2];
@@ -413,7 +422,7 @@ void GR_BuildGridRenderData(s32 nView) {
 
 // Draws the view's grid once every point has been sampled: only for a human player standing over
 // the ball (set-up, aiming and green cameras, or the swing before it starts).
-void fn_8009C914(int nView) {
+void GR_DrawGreenGrid(int nView) {
     // fake match: an s32 (long) copy of nView, kept in its own register, for the
     // ViewController_GetActivePlayerNumber calls
     s32 nViewCopy;
@@ -424,7 +433,7 @@ void fn_8009C914(int nView) {
     int nPlayer;
     int nState;
     nViewCopy = nView;
-    if (!fn_8009BD24(ViewController_GetActivePlayerNumber(nView))) {
+    if (!GR_ShouldDrawGrid(ViewController_GetActivePlayerNumber(nView))) {
         return;
     }
     nPlayer = ViewController_GetActivePlayerNumber(nViewCopy);
@@ -497,7 +506,7 @@ void fn_8009C914(int nView) {
 
 // a - b into out (four floats)
 #ifdef __MWERKS__
-asm void fn_8009CB78(register f32* pA, register f32* pB, register f32* pOut) {
+asm void GR_Vec4Sub(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 0, 0
@@ -511,7 +520,7 @@ asm void fn_8009CB78(register f32* pA, register f32* pB, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_8009CB78(f32* pA, f32* pB, f32* pOut) {
+void GR_Vec4Sub(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pA[0] - pB[0];
     pOut[1] = pA[1] - pB[1];
     pOut[2] = pA[2] - pB[2];

@@ -211,9 +211,9 @@ void GLW_vCloseModule(void);
 void GLW_vUpdateGlows(int nView);
 void GLW_vRenderGlows(int nView);
 void fn_8009B134(void);
-void fn_8009B898(void);
-void fn_8009BE08(int nView);
-void fn_8009C914(int nView);
+void GR_vClose(void);
+void GR_UpdateGreenGrid(int nView);
+void GR_DrawGreenGrid(int nView);
 void fn_800A2064(void);
 void fn_800A2E14(void);
 void fn_800A3A84(void);
@@ -241,7 +241,7 @@ void fn_800BAA50(int nPlayer);
 void fn_800BAB80(int nPlayer);
 void SitDev_ThrowBallHitDelayedEvent(void);
 void BreakLine_InitModule(void);
-void fn_800C8108(void);
+void BreakLine_CloseModule(void);
 void AnimStream_Update(void);
 u8   GM_GetCurrentHoleSplitScreenLowDetail(void);
 void GameEffects_InitGameEffectSettings(void);
@@ -686,14 +686,14 @@ void fn_8006CDC4(void) {
     Grass_CloseModule();
     fn_800A2E14();
     fn_80093D14();
-    fn_800C8108();
+    BreakLine_CloseModule();
     if (TI_bCounterIsRunning(1)) {
         TI_sStopCounter(1);
     }
     SitDev_vCloseModule();
     fn_8006DCA4(0);
     Players_Reset();
-    fn_8009B898();
+    GR_vClose();
     BS_vClose();
     fn_8009CC88();
     if (gSession.nSplitScreen) {
@@ -865,8 +865,8 @@ void fn_8006D27C(void) {
             }
             Ter_DrawHoleView(nView);
             if (nState != GS_GREEN_MORPH) {
-                fn_8009BE08(nView);
-                fn_8009C914(nView);
+                GR_UpdateGreenGrid(nView);
+                GR_DrawGreenGrid(nView);
             }
             if (nState != GS_GREEN_MORPH) {
                 BreakLine_Update(nView);

@@ -277,7 +277,7 @@ s32   Gaud_RewardCommentaryIsPlaying(void);
 void  Gaud_RestartMusic(void);
 u8    GolfCamera_IsPostShotCamDone(View* pView);
 u8    GolfCamera_IsCameraTrackingPlayer(View* pView);
-void  fn_800C9038(int nView, f32* pLong, f32* pSide);    // GoBreakLine.c
+void  BreakLine_GetCaddyTipInfo(int nView, f32* pLong, f32* pSide); // GoBreakLine.c
 s32   GM_GetHoleIndexHandicap(int nHole);
 s32   GM_GetCurrentCourseTotalYardage(int nTeeSet);
 s32   GM_GetCurrentCourseFront9Yardage(int nTeeSet);
@@ -1245,11 +1245,11 @@ void GM_vIsGolferCPU(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-// Message 55: the caddie's putt read for player pArgs[0]'s view (fn_800C9038): how far past or
+// Message 55: the caddie's putt read for player pArgs[0]'s view (BreakLine_GetCaddyTipInfo): how far past or
 // short, and how far to the side, into the floats pArgs[1] and pArgs[2] point to.
 void GM_vGetPuttHelp(MsgArg* pArgs, MsgArg* pResult) {
     // port: the studio passes the addresses of the two answers as 32-bit words
-    fn_800C9038(gPlayers[pArgs[0].i].nView[0], (f32*)pArgs[1].i, (f32*)pArgs[2].i);
+    BreakLine_GetCaddyTipInfo(gPlayers[pArgs[0].i].nView[0], (f32*)pArgs[1].i, (f32*)pArgs[2].i);
 }
 
 // A tournament entrant in a profile: GetEntrantMCPtr's body (PGATourSimulation.c), pasted in.

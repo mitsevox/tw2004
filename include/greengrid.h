@@ -20,7 +20,7 @@ typedef struct GreenGrid {
     f32  aCorner[2][4];         // 0x080  the grid's first point (x, -, z)
     f32  aDir[2][4];            // 0x0A0  unit direction from the ball to the target, flat
     f32  aTarget[2][4];         // 0x0C0  the target the grid was laid out for
-    s32  anDone[2];             // 0x0E0  grid points sampled so far (fn_8009BE08, 4 a frame)
+    s32  anDone[2];             // 0x0E0  grid points sampled so far (GR_UpdateGreenGrid, 4 a frame)
     s32  nCols;                 // 0x0E8  points across (4)
     s32  anRows[2];             // 0x0EC  points along, per view
     f32  fCellW;                // 0x0F4  spacing across

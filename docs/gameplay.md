@@ -538,7 +538,7 @@ same way: it launches a putt at your *current* aim with the computed power, runs
 physics without randomness, and draws 450 samples of the trail, recomputing only once your aim
 has been still for less than an inch of movement.
 
-**What the tip hands the HUD** (`fn_800C9038`, read; reached through a front-end callback table
+**What the tip hands the HUD** (`BreakLine_GetCaddyTipInfo`, read; reached through a front-end callback table
 set up in `IG_InitGameMessages`): two numbers in **feet**, both measured from the ball-to-pin line. One is
 how far left or right of the hole the solved aim point sits (the break); the other is how far
 past or short of the hole it sits (the pace). -999 means not ready, 999 means gave up. The words

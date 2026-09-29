@@ -468,7 +468,7 @@ void Lessons_StartTry(void) {
         AI_DefaultTarget(0);
         Shot_Prepare(0, 1);
         BreakLine_Reset(gPlayers[0].nView[0]);
-        fn_8009B970(gPlayers[0].nView[0]);
+        GR_ResetGreenGrid(gPlayers[0].nView[0]);
         Character_AlignShotWithTarget(0, 1, 1);
         fn_800957D8(gPlayers[0].pChar);
         SW_vInitSwing(0);
@@ -498,7 +498,7 @@ void Lessons_AfterReplan(int nPlayer) {
     gPlayers[0].nShotKind = nShotKind;
     gPlayers[0].nClub = nClub;
     BreakLine_Reset(gPlayers[0].nView[0]);
-    fn_8009B970(gPlayers[0].nView[0]);
+    GR_ResetGreenGrid(gPlayers[0].nView[0]);
     Character_AlignShotWithTarget(0, 1, 1);
     fn_800957D8(gPlayers[0].pChar);
     fn_80095744(gPlayers[0].pChar, 5);

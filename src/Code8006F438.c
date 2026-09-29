@@ -54,11 +54,11 @@ void DynObj_InitForHole();
 void fn_8006F604(void);
 void fn_8006F650();
 void UI_InitForHole();
-void fn_8009B894();
+void GR_vInitForHole();
 void fn_800A2E68();
 void fn_800B26DC();
 void GolfCamera_ResetSpecialCameraStates();
-void fn_800C8134();
+void BreakLine_InitForHole();
 void GM_InitForHole();
 s32 fn_80010608(s32);
 s32 Ter_UnloadHole();
@@ -69,7 +69,7 @@ s32 StaticCam_Reset();
 s32 fn_8006FBF8();
 s32 fn_80098C28();
 s32 fn_800A2B34(s32);
-s32 fn_800C830C();
+s32 BreakLine_CloseAfterHole();
 void AnimStream_WaitForRead(void);
 s32 Grass_DeInitForHole();
 void fn_8006F568(void);
@@ -90,8 +90,8 @@ void fn_8006F4F0(void) {
 }
 
 void fn_8006F518(void) {
-    fn_8009B894();
-    fn_800C8134();
+    GR_vInitForHole();
+    BreakLine_InitForHole();
     fn_8002BC6C();
     Character_PreHoleInit();
     DynObj_InitForHole();
@@ -109,7 +109,7 @@ void fn_8006F568(void) {
     s32 var_r31;
 
     fn_8006FBF8();
-    fn_800C830C();
+    BreakLine_CloseAfterHole();
     SW_vDeInitForHole();
     AnimStream_WaitForRead();
     if ((u8) *lbl_802811E8 != 0) {

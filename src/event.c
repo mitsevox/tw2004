@@ -317,7 +317,7 @@ void EVENT_NextStance(int nPlayer, int nEvent, void* pData, int nArg) {
 void EVENT_RotateRight(int nPlayer, int nEvent, void* pData, int nArg) {
     if (!Lessons_OnEvent(nPlayer, 19)) {
         fn_80069104(nPlayer);
-        fn_8009B970(gPlayers[nPlayer].nView[0]);
+        GR_ResetGreenGrid(gPlayers[nPlayer].nView[0]);
     }
 }
 
@@ -326,7 +326,7 @@ void EVENT_RotateRight(int nPlayer, int nEvent, void* pData, int nArg) {
 void EVENT_RotateLeft(int nPlayer, int nEvent, void* pData, int nArg) {
     if (!Lessons_OnEvent(nPlayer, 18)) {
         fn_800690C0(nPlayer);
-        fn_8009B970(gPlayers[nPlayer].nView[0]);
+        GR_ResetGreenGrid(gPlayers[nPlayer].nView[0]);
     }
 }
 

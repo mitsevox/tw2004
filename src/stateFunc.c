@@ -218,7 +218,7 @@ void STATEFUNC_PreShotInit(int nPlayer) {
     fn_80045824(nPlayer);
     SW_vClearBoosts(nPlayer);
     BreakLine_Reset(gPlayers[nPlayer].nView[0]);
-    fn_8009B970(gPlayers[nPlayer].nView[0]);
+    GR_ResetGreenGrid(gPlayers[nPlayer].nView[0]);
     if (gPlayers[nPlayer].ball.nLie == 0) {
         DynObj_TeeAdd(&gPlayers[nPlayer].ball, nPlayer, 1);
     }
@@ -640,7 +640,7 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
             }
             Shot_Prepare(nPlayer, 1);
             BreakLine_Reset(gPlayers[nPlayer].nView[0]);
-            fn_8009B970(gPlayers[nPlayer].nView[0]);
+            GR_ResetGreenGrid(gPlayers[nPlayer].nView[0]);
             Character_AlignShotWithTarget(nPlayer, 1, 1);
             fn_800957D8(gPlayers[nPlayer].pChar);
             fn_80095744(gPlayers[nPlayer].pChar, 5);

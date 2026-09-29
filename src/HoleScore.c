@@ -17,7 +17,7 @@ int  GameAnalysis_CountHolesOverPar(int nPlayer);
 int  GameAnalysis_CountStreakHoleScores(int nPlayer, int nToPar);
 int  GameAnalysis_CountTotalPutts(int nPlayer);
 void GameAnalysis_Vec3Sub(f32* pA, f32* pB, f32* pOut);
-void fn_800C8C3C(int nView, f32* pOut);   // GoBreakLine: a point kept per view
+void BreakLine_GetClosestPointToCupPos(int nView, f32* pOut); // GoBreakLine: a point kept per view
 
 // gpGame->pfnIsPuttForLead: whether holing this ball would put the player in the lead (the others'
 // balls not yet holed counting one more stroke). Strokes (scoring kind 0): only when not leading
@@ -721,7 +721,7 @@ int GameAnalysis_CurrentEagleStreak(int nPlayer, u8 bCurrent) {
 
 // The putt's break angle (radians): from the shot's start, along the ground, the angle from the
 // direction of the pin to that of the break line's point closest to the cup in the player's view
-// (fn_800C8C3C); negative when the cross product's y is below 0.
+// (BreakLine_GetClosestPointToCupPos); negative when the cross product's y is below 0.
 f32 GameAnalysis_GetPuttBreakAngle(int nPlayer) {
     f32 vView[4];
     f32 vToPin[4];
@@ -729,7 +729,7 @@ f32 GameAnalysis_GetPuttBreakAngle(int nPlayer) {
     f32 fCos;
     f32 fAngle;
 
-    fn_800C8C3C(gPlayers[nPlayer].nView[0], vView);
+    BreakLine_GetClosestPointToCupPos(gPlayers[nPlayer].nView[0], vView);
     GameAnalysis_Vec3Sub(&gPlayers[nPlayer].ball.pCourse->pin[Game_CurrentPinSet()].x,
                          gPlayers[nPlayer].ball.vStart,
                 vToPin);

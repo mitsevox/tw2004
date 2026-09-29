@@ -12,9 +12,9 @@ BreakLine* lbl_80282228;
 void SD_InitShaderObject(void* pMesh, int n, s32* pDesc);    // Skin.c: sets up a mesh object
 void SD_FreeShaderObject(void* pMesh);         // Skin.c: frees a mesh object
 void SD_DrawShaderObject(u8* pMesh);           // Skin.c
-void fn_800C9310(f32* pA, f32* pB, f32* pOut);
-void fn_800C9334(f32* pA, f32* pB, f32* pOut);
-void fn_800C9358(f32* pA, f32* pB, f32* pOut);
+void BreakLine_Vec3Add(f32* pA, f32* pB, f32* pOut);
+void BreakLine_Vec4Sub(f32* pA, f32* pB, f32* pOut);
+void BreakLine_Vec3Sub(f32* pA, f32* pB, f32* pOut);
 void SD_SetShaderTypeParameters(int nRow, void* pData);   // GoTerrain.c: calls row nRow's function with pData
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
@@ -23,6 +23,9 @@ static f32 GoBreakLine_StrippedFn(f32 x) {
     return x + 1.0f;
 }
 
+// Allocates the break line's state (lbl_80282228) at start-up and sets its fade from alpha 27 at
+// the ball (fAB30) to 0 at the end (fAB34), with fAB38 20 and fAB3C 0.009, which nothing in this
+// file reads.
 void BreakLine_InitModule(void) {
     lbl_80282228 = StaticMem_Alloc(sizeof(BreakLine), 2, 16, "GoBreakLine.c", 93);
     lbl_80282228->fAB30 = 27.0f;
@@ -31,13 +34,14 @@ void BreakLine_InitModule(void) {
     lbl_80282228->fAB3C = 0.009f;
 }
 
-void fn_800C8108(void) {
+// Frees the break line's state (BreakLine_InitModule's allocation).
+void BreakLine_CloseModule(void) {
     StaticMem_Free(lbl_80282228);
     lbl_80282228 = NULL;
 }
 
 // Sets the line up for a hole: its settings, a mesh per view, the "brkline" texture and the pin.
-void fn_800C8134(void) {
+void BreakLine_InitForHole(void) {
     CourseInfo* pCourse = Ter_GetTGD();
     int nPin = Game_CurrentPinSet();
     s32 desc[2];
@@ -73,7 +77,8 @@ void fn_800C8134(void) {
     lbl_8028222C = 0;
 }
 
-void fn_800C830C(void) {
+// Frees the meshes BreakLine_InitForHole made (one per view) and turns the line off (lbl_8028222C).
+void BreakLine_CloseAfterHole(void) {
     SD_FreeShaderObject(lbl_80282228->aMesh[0]);
     if (gSession.nSplitScreen) {
         SD_FreeShaderObject(lbl_80282228->aMesh[1]);
@@ -150,7 +155,7 @@ void BreakLine_Render(int nView) {
                     lbl_80282228->abAADC[nView] = 1;
                 }
                 // The ball's heading on the ground, as an angle about y from the z axis.
-                fn_800C9334(lbl_80282228->aBall[nView].vPos, lbl_80282228->aBall[nView].vPrev, vDir);
+                BreakLine_Vec4Sub(lbl_80282228->aBall[nView].vPos, lbl_80282228->aBall[nView].vPrev, vDir);
                 vDir[1] = 0.0f;
                 // EA bug: tests y, just cleared, where z was surely meant
                 if (vDir[0] != 0.0f || vDir[1] != 0.0f) {
@@ -168,10 +173,10 @@ void BreakLine_Render(int nView) {
                     lbl_80282228->aVert[nView][i][0] = fX * -fSin + lbl_80282228->aVert[nView][i][2] * fCos;
                     lbl_80282228->aVert[nView][i][2] = fZ;
                 }
-                fn_800C9310(lbl_80282228->aVert[nView][lbl_80282228->anVerts[nView]],
+                BreakLine_Vec3Add(lbl_80282228->aVert[nView][lbl_80282228->anVerts[nView]],
                             lbl_80282228->aBall[nView].vPos,
                             lbl_80282228->aVert[nView][lbl_80282228->anVerts[nView]]);
-                fn_800C9310(lbl_80282228->aVert[nView][lbl_80282228->anVerts[nView] + 1],
+                BreakLine_Vec3Add(lbl_80282228->aVert[nView][lbl_80282228->anVerts[nView] + 1],
                             lbl_80282228->aBall[nView].vPos,
                             lbl_80282228->aVert[nView][lbl_80282228->anVerts[nView] + 1]);
                 fAlpha = lbl_80282228->fAB30;
@@ -239,8 +244,9 @@ void BreakLine_Render(int nView) {
     }
 }
 
-// View nView's point.
-void fn_800C8C3C(int nView, f32* pOut) {
+// Copies view nView's point of the line closest to the cup into pOut: where the rolling ball copy
+// came nearest the pin (BreakLine_Render keeps it), the ball's start until the line moves.
+void BreakLine_GetClosestPointToCupPos(int nView, f32* pOut) {
     LLMath_CopyVec(lbl_80282228->aViewPoint[nView], pOut);
 }
 
@@ -306,7 +312,7 @@ void BreakLine_Reset(int nView) {
 // point lies along the line from the ball, and how far to the side of that line (the sign gives
 // the side). 0, 0 in split screen or when the points coincide; -999 when there is no tip, 999
 // when the caddie gave up.
-void fn_800C9038(int nView, f32* pLong, f32* pSide) {
+void BreakLine_GetCaddyTipInfo(int nView, f32* pLong, f32* pSide) {
     int nPlayer = ViewController_GetActivePlayerNumber(nView);
     int nPin = Game_CurrentPinSet();
     CourseInfo* pCourse = Ter_GetTGD();
@@ -377,9 +383,9 @@ void fn_800C9038(int nView, f32* pLong, f32* pSide) {
         *pSide = 0.0f;
         return;
     }
-    fn_800C9358(vHole, vBall, vToHole);
+    BreakLine_Vec3Sub(vHole, vBall, vToHole);
     LLMath_Normalize3(vToHole, vToHole);
-    fn_800C9358(vAim, vBall, vToAim);
+    BreakLine_Vec3Sub(vAim, vBall, vToAim);
     LLMath_Normalize3(vToAim, vToAim);
     fDot = Vec3_Dot(vToHole, vToAim);
     if (0.0f == fDot) {
@@ -403,7 +409,7 @@ void fn_800C9038(int nView, f32* pLong, f32* pSide) {
 
 // a + b into out (three floats)
 #ifdef __MWERKS__
-asm void fn_800C9310(register f32* pA, register f32* pB, register f32* pOut) {
+asm void BreakLine_Vec3Add(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 1, 0
@@ -417,7 +423,7 @@ asm void fn_800C9310(register f32* pA, register f32* pB, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_800C9310(f32* pA, f32* pB, f32* pOut) {
+void BreakLine_Vec3Add(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pB[0] + pA[0];
     pOut[1] = pB[1] + pA[1];
     pOut[2] = pB[2] + pA[2];
@@ -426,7 +432,7 @@ void fn_800C9310(f32* pA, f32* pB, f32* pOut) {
 
 // a - b into out (four floats)
 #ifdef __MWERKS__
-asm void fn_800C9334(register f32* pA, register f32* pB, register f32* pOut) {
+asm void BreakLine_Vec4Sub(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 0, 0
@@ -440,7 +446,7 @@ asm void fn_800C9334(register f32* pA, register f32* pB, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_800C9334(f32* pA, f32* pB, f32* pOut) {
+void BreakLine_Vec4Sub(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pA[0] - pB[0];
     pOut[1] = pA[1] - pB[1];
     pOut[2] = pA[2] - pB[2];
@@ -450,7 +456,7 @@ void fn_800C9334(f32* pA, f32* pB, f32* pOut) {
 
 // a - b into out (three floats)
 #ifdef __MWERKS__
-asm void fn_800C9358(register f32* pA, register f32* pB, register f32* pOut) {
+asm void BreakLine_Vec3Sub(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 1, 0
@@ -464,7 +470,7 @@ asm void fn_800C9358(register f32* pA, register f32* pB, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_800C9358(f32* pA, f32* pB, f32* pOut) {
+void BreakLine_Vec3Sub(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pA[0] - pB[0];
     pOut[1] = pA[1] - pB[1];
     pOut[2] = pA[2] - pB[2];
