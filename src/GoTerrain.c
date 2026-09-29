@@ -47,8 +47,8 @@ f32   Ter_GetTimeInCycle(u32 n, f32 fPeriod);
 void  SD_SetShaderTypeParameters(int nRow, void* pData);
 s32   Ter_CompareObjectDistance(const void* pA, const void* pB);
 void  Ter_SetZWrite(int n);
-void  fn_80035170(u32 uClear, u32 uSet);
-void  fn_80035294(void);
+void  RenderState_ChangeDrawFlags(u32 uClear, u32 uSet);
+void  RC_vUpdateCurrentRenderCtxTransformationMatrices(void);
 void  RC_UpdateCurrentScreenMatrices(void);
 void  fn_800354B4(u8* p, f32 v);        // sets the lens's far clip distance, fAC (fn_80014268 reads it)
 f32   fn_80014268(u8* p);
@@ -66,14 +66,14 @@ void  fn_800355B8(f32* p0);
 void  Ter_SetCourseMipmapBias(int n);
 void  fn_80035514(u8* pObject);
 void  Ter_ResetObjectRenderState(void);
-u8    fn_8003505C(u8 b);
+u8    Ter_SetManageZUpdate(u8 b);
 f32*  fn_80035508(UObjMesh* pMesh);
 u8    Ter_SetObjectRenderState(Ter_ObjectDrawData* pDraw, u8 bForce);
 void  LLMath_IdentifyMat(f32 (*pMtx)[4]);  // identity matrix
-void  fn_80035370(void);
-void  fn_80034CAC(int nRenderPass);
-void  fn_80034DE4(void);
-void  fn_80034F28(void* pUnused);
+void  LF_SetCurrentDefaultLights(void);
+void  Ter_DrawGrassPatches(int nRenderPass);
+void  Ter_DrawGrassPatchesPass3(void);
+void  Ter_BuildGrassPatchList(void* pUnused);
 void  fn_80035490(f32* pA, f32* pB, f32* pOut);
 
 UObjMesh* Ter_GetMeshNext(UObjMesh* pNode);
@@ -218,7 +218,7 @@ void Ter_vInitModule(void) {
     gTerRenderer.eTerrainFilterMag = 1;
     gTerRenderer.fCrowdFullMaxDistanceFromGolfer = 60.0f;
     gTerRenderer.fCrowdHalfMaxDistanceFromGolfer = 350.0f;
-    fn_8003505C(1);
+    Ter_SetManageZUpdate(1);
     for (n = 0; n < 5; n++) {
         for (k = 0; k < 32; k++) {
             nBits = 0;
@@ -300,8 +300,8 @@ void Ter_BeginRender(void) {
     DS_vSetAlphaTestMode(1, 6, 1);
     DS_vSetZBufferMode(3);
     LF_vSetCurrentLightFogEnvironment(2);
-    fn_80035308();
-    fn_800352E4();
+    LF_UseCurrentFogSettings();
+    LF_UpdateFog();
     RenderState_SetDrawFlags(0x70);
     RenderState_SetViewport(RC_spGetCurrentRenderCtx());
     RenderState_Flush();
@@ -369,7 +369,7 @@ void Ter_RenderView(void* pHoleData, int nView) {
     vToPin[1] = 0.0f;
     gTerRenderer.fGolferDistanceToCup = Math_Sqrt(Vec3_LengthSqClamped(vToPin));
     fTan = Math_Tan(0.5f * pLens->fFov);
-    fWideTan = Math_Tan(0.5f * (0.75f * pLens->fFov * fn_8001414C((u8*)fn_8003526C())));
+    fWideTan = Math_Tan(0.5f * (0.75f * pLens->fFov * fn_8001414C((u8*)RC_spGetCurrentRenderCtxViewport())));
     gTerRenderer.fCameraMinHalfFieldOfViewTan =
         (fTan <= fWideTan / ViewController_GetCameraControl(nView)->f54) ? fTan : fWideTan
                 / ViewController_GetCameraControl(nView)->f54;
@@ -1140,7 +1140,7 @@ void Ter_DrawFarClipPatches(void) {
         fAC = fn_80014268((u8*)pLens);
         fn_800354B4((u8*)pLens, 25.0f + fAC);
         RC_UpdateCurrentScreenMatrices();
-        fn_80035294();
+        RC_vUpdateCurrentRenderCtxTransformationMatrices();
         RenderState_SetCameraMatrices();
         RenderState_SetCameraMatrices();
         RenderState_SetCameraMatrices();
@@ -1501,7 +1501,7 @@ u8 Ter_SetObjectRenderState(Ter_ObjectDrawData* pDraw, u8 bForce) {
     if (fAlpha != gTerLastObjectAlpha || (s8)bZWrite != gTerLastZWrite || bForce) {
         if (1.0f == fAlpha) {
             DS_vSetAlphaTestMode(1, 6, nRef);
-            fn_80035170(0x40, ((uFlags & 0x40) ? 0x40 : 0)
+            RenderState_ChangeDrawFlags(0x40, ((uFlags & 0x40) ? 0x40 : 0)
                                   | (((uFlags & 0x10) ? 0x10 : 0) | ((uFlags & 0x20) ? 0x20 : 0)));
             Ter_SetZWrite(bZWrite);
             RenderState_SetConstantAlphaOn(0);
@@ -1985,8 +1985,8 @@ void Ter_CourseLoadCallback(UStreamObject* pObject) {
     fn_800935CC(&gTerRenderer.pCourse->lights);
     fn_80093900(gTerRenderer.pCourse->p38);
     LF_vSetCurrentLightFogEnvironment(3);
-    fn_80035370();
-    fn_8003534C();
+    LF_SetCurrentDefaultLights();
+    LF_ResetCurrentFogSettings();
     pGlow = gTerRenderer.pCourse->p3C;
     if (pGlow != NULL) {
         v18[0] = pGlow->v10[0];
@@ -2169,8 +2169,8 @@ UObjMesh* Ter_GetObjectListModel(u16 nPatch, u16 nObjList) {
 
 // Draws the grass patches (GoGrass.c calls it): sets the renderer up, takes the camera's position
 // and look direction, the flat distance to the nearest ball and the smaller half field of view's
-// tangent (view 0's), then builds the grass list (fn_80034F28) and draws it (fn_80034CAC,
-// fn_80034DE4).
+// tangent (view 0's), then builds the grass list (Ter_BuildGrassPatchList) and draws it
+// (Ter_DrawGrassPatches, Ter_DrawGrassPatchesPass3).
 void Ter_RenderGrass(void) {
     int i;
     void* pHoleData = gTerRenderer.pCurrentHoleData;
@@ -2206,21 +2206,22 @@ void Ter_RenderGrass(void) {
         }
     }
     fTan = Math_Tan(0.5f * pLens->fFov);
-    fWideTan = Math_Tan(0.5f * (0.75f * pLens->fFov * fn_8001414C((u8*)fn_8003526C())));
+    fWideTan = Math_Tan(0.5f * (0.75f * pLens->fFov * fn_8001414C((u8*)RC_spGetCurrentRenderCtxViewport())));
     gTerRenderer.fCameraMinHalfFieldOfViewTan =
         (fTan <= fWideTan / ViewController_GetCameraControl(0)->f54) ? fTan : fWideTan
                 / ViewController_GetCameraControl(0)->f54;
     RenderState_Flush();
-    fn_80034F28(pHoleData);
-    fn_80034CAC(0);
-    fn_80034DE4();
+    Ter_BuildGrassPatchList(pHoleData);
+    Ter_DrawGrassPatches(0);
+    Ter_DrawGrassPatchesPass3();
 }
 
-// Draws the grass patches of render pass nRenderPass that take part in the first pass (bit 0 of
-// n1C), from the end of the list, one clip method at a time.
+// Draws the grass list's patches of render pass nRenderPass that take part in the first pass (bit 0
+// of n1C), from the end of the list, one clip method at a time (clip mode 0 for method 0, 1 for 1
+// and 2); then alpha test back on and z writes on. Ter_RenderGrass calls it with 0.
 // fake match: the one-pass loop over the passes (as in Ter_DrawPostDrawPatches) keeps the pass bit
 // in a register for the `and.` test of bit 0.
-void fn_80034CAC(int nRenderPass) {
+void Ter_DrawGrassPatches(int nRenderPass) {
     u8 bFirst = 1;
     int i;
     Ter_PatchReference* pPatch;
@@ -2261,9 +2262,10 @@ void fn_80034CAC(int nRenderPass) {
     RenderState_Flush();
 }
 
-// Draws the grass patches in list 0x80 of n1C (pass 3), from the end of the list, one clip method
-// at a time.
-void fn_80034DE4(void) {
+// Draws the grass list's patches in list 0x80 of n1C as pass 3 with z writes off, from the end of
+// the list, one clip method at a time; then alpha test and z writes back on. Ter_RenderGrass calls
+// it after Ter_DrawGrassPatches.
+void Ter_DrawGrassPatchesPass3(void) {
     u8 bFirst = 1;
     int i;
     s32 nClip;
@@ -2300,11 +2302,11 @@ void fn_80034DE4(void) {
     RenderState_Flush();
 }
 
-// Builds the grass list: every patch of this frame in render pass 0's fourth list (bit 0x80 of
-// n1C) or whose ground's pC node (fn_8003556C) has flag 8 of byte 3, and whose pC node is not off
-// screen, is copied to xpGrassPatchList with that clip method and its distance from the camera
-// (less its radius, at least 0).
-void fn_80034F28(void* pUnused) {
+// Builds the grass list: every patch of this frame in list 0x80 of n1C, or whose ground's drawn
+// mesh (Ter_GetGroundDrawMesh) has flag 8 in flag byte 3, and whose drawn mesh is not off screen
+// (clip method 3), is copied to xpGrassPatchList with that clip method and its distance from the
+// camera less its radius (at least 0).
+void Ter_BuildGrassPatchList(void* pUnused) {
     Ter_PatchReference* pPatch;
     void* pCamera;
     Ter_PatchReference* pGrass;
@@ -2343,7 +2345,7 @@ void fn_80034F28(void* pUnused) {
 }
 
 // Sets boManageZUpdate and returns what it was.
-u8 fn_8003505C(u8 b) {
+u8 Ter_SetManageZUpdate(u8 b) {
     u8 bOld = gTerRenderer.boManageZUpdate;
 
     gTerRenderer.boManageZUpdate = b;
@@ -2364,17 +2366,21 @@ void RenderState_SetConstantAlphaOn(u8 b) {
     gRenderState.uChanged |= 0x80;
 }
 
-void fn_800350B4(f32 f) {
+// Sets the fog's end distance, applied with the next RenderState_Apply.
+void RenderState_SetFogEnd(f32 f) {
     gRenderState.fFogEnd = f;
     gRenderState.uChanged |= 0x8;
 }
 
-void fn_800350D0(f32 f) {
+// Sets the fog's start distance, applied with the next RenderState_Apply.
+void RenderState_SetFogStart(f32 f) {
     gRenderState.fFogStart = f;
     gRenderState.uChanged |= 0x8;
 }
 
-void fn_800350EC(u8 r, u8 g, u8 b) {
+// Sets the fog colour (0..255 each; its alpha is always 0x80), applied with the next
+// RenderState_Apply.
+void RenderState_SetFogColour(u8 r, u8 g, u8 b) {
     gRenderState.c30.r = r;
     gRenderState.c30.g = g;
     gRenderState.c30.b = b;
@@ -2401,7 +2407,9 @@ void RenderState_SetConstantAlpha(u8 b) {
     gRenderState.uChanged |= 0x80;
 }
 
-void fn_80035170(u32 uClear, u32 uSet) {
+// Clears the draw flags uClear, then sets uSet (uDrawFlags: 0x10 textured, 0x20 fog, 0x40 blended),
+// applied with the next RenderState_Apply.
+void RenderState_ChangeDrawFlags(u32 uClear, u32 uSet) {
     gRenderState.uDrawFlags &= ~uClear;
     gRenderState.uDrawFlags |= uSet;
     gRenderState.uChanged |= 0x20;
@@ -2430,11 +2438,15 @@ void RC_vSetCurrentRenderCtxTransformationMatrix(f32 (*pMtx)[4]) {
     RC_vSetRenderCtxTransformationMatrix(*lbl_80280DF0, pMtx);
 }
 
-f32* fn_8003526C(void) {
+// The current render context's viewport, its screen rectangle as fractions of the frame buffer
+// (RC_spGetRenderCtxViewport).
+f32* RC_spGetCurrentRenderCtxViewport(void) {
     return RC_spGetRenderCtxViewport(*(void**)lbl_80280DF0);
 }
 
-void fn_80035294(void) {
+// Works out the current render context's transformation matrices again
+// (RC_vUpdateRenderCtxTransformationMatrices).
+void RC_vUpdateCurrentRenderCtxTransformationMatrices(void) {
     RC_vUpdateRenderCtxTransformationMatrices(*(void**)lbl_80280DF0);
 }
 
@@ -2444,15 +2456,19 @@ void RC_UpdateCurrentScreenMatrices(void) {
     fn_80013D68(*(s32*)((u8*)lbl_80280DF0));
 }
 
-void fn_800352E4(void) {
+// Updates the fog for this frame: blends the fog colour for the camera's heading
+// (LF_UpdateFogColourForCamera), then hands the fog colour and distances to the renderer
+// (LF_ApplyFogToRenderState).
+void LF_UpdateFog(void) {
     fn_8003541C();
     fn_80035398();
 }
 
 // ---- end of sweep code ----
 
-// Takes the current light set's terrain colours as the current settings (fn_80035440).
-void fn_80035308(void) {
+// Takes the current light set's fog settings (colours round the compass, fog distance) as the ones
+// the fog is made from (LF_SetFogSettings).
+void LF_UseCurrentFogSettings(void) {
     fn_80035440(&LF_spGetCurrentLightFogEnvironment()->settings);
 }
 
@@ -2465,20 +2481,23 @@ void LF_vSetCurrentLightFogEnvironment(s32 nSet) {
     lbl_80281380->pCur = &lbl_80281380->aSet[nSet];
 }
 
-// Resets the current light set's terrain colours to the defaults.
-void fn_8003534C(void) {
+// Resets the current light set's fog settings to the defaults (fn_8006F334: one grey-blue all
+// round, no turn).
+void LF_ResetCurrentFogSettings(void) {
     fn_8006F334(&LF_spGetCurrentLightFogEnvironment()->settings);
 }
 
-void fn_80035370(void) {
+// Gives the current light set's light group the default lights (fn_8006EDC0).
+// Ter_CourseLoadCallback calls it for set 3.
+void LF_SetCurrentDefaultLights(void) {
     fn_8006EDC0(&LF_spGetCurrentLightFogEnvironment()->group);
 }
 
 // Hands the renderer the colour and the two distances made from the current settings.
 void fn_80035398(void) {
-    fn_800350EC(lbl_802811E0->f44, lbl_802811E0->f48, lbl_802811E0->f4C);
-    fn_800350D0(0.375f * lbl_802811E0->f50);
-    fn_800350B4(4.15f * (10.0f + lbl_802811E0->f50));
+    RenderState_SetFogColour(lbl_802811E0->f44, lbl_802811E0->f48, lbl_802811E0->f4C);
+    RenderState_SetFogStart(0.375f * lbl_802811E0->f50);
+    RenderState_SetFogEnd(4.15f * (10.0f + lbl_802811E0->f50));
 }
 
 // ---- sweep code (not yet cleaned up) ----
@@ -2609,7 +2628,7 @@ f32 fn_80035560(UObjMesh* pMesh) {
     return pMesh->pInfo->f54;
 }
 
-// The ground's pC node: fn_80034F28 tests its flags and bounds for the grass list.
+// The ground's pC node: Ter_BuildGrassPatchList tests its flags and bounds for the grass list.
 UObjMesh* fn_8003556C(UObjMesh* pGround) {
     return pGround->pC;
 }
@@ -2645,7 +2664,7 @@ void fn_80035600(void) {
 
 void fn_80035604(void) {
     RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
-    fn_80035294();
+    RC_vUpdateCurrentRenderCtxTransformationMatrices();
     RenderState_SetCameraMatrices();
     RenderState_SetBlendFactors(4, 5);
     RenderState_Flush();

@@ -96,9 +96,9 @@ void Ter_DrawPostDrawPatches(void);
 void Ter_DrawPostDrawObjects(void);
 void Ter_AnimateObjects(void);
 void Ter_DrawHoleView(int nView);
-void fn_800350B4(f32 f);
-void fn_800350D0(f32 f);
-void fn_800350EC(u8 r, u8 g, u8 b);
+void RenderState_SetFogEnd(f32 f);
+void RenderState_SetFogStart(f32 f);
+void RenderState_SetFogColour(u8 r, u8 g, u8 b);
 void fn_800355E0(s32 nField);
 void SKN_DrawBoneTris(int nView);
 void RC_ApplyCurrentViewport(void);
@@ -516,9 +516,9 @@ void fn_8006C968(void) {
 
     DS_vEnableZBufferUpdate(1);
     RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 8, 1);
-    fn_800350D0(46.875f);
-    fn_800350B4(560.25f);
-    fn_800350EC(fRG, fRG, fB);
+    RenderState_SetFogStart(46.875f);
+    RenderState_SetFogEnd(560.25f);
+    RenderState_SetFogColour(fRG, fRG, fB);
     RenderState_Flush();
 }
 

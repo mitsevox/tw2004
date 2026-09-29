@@ -506,7 +506,8 @@ typedef struct RenderState {
     u8   bConstantAlpha;        // 0x01D  } is on; bit 0x80
     u8   unk1E[0x20 - 0x1E];
     u32  uDrawFlags;            // 0x020  bit 0x10 textured, 0x20 fog on, 0x40 blended; 0x70 at
-                                //        reset; bit 0x20 (RenderState_SetDrawFlags, fn_80035170)
+                                //        reset; bit 0x20 (RenderState_SetDrawFlags,
+                                //       RenderState_ChangeDrawFlags)
     s32  nFogType;              // 0x024  } the fog: type (2, GX_FOG_LIN, at reset), start and end
     f32  fFogStart;             // 0x028  } distances (100 and 2048 at reset; fn_80035398 makes
     f32  fFogEnd;               // 0x02C  } them and c30 from lbl_802811E0); bit 0x8, with c30,

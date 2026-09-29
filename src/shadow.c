@@ -20,7 +20,7 @@ void fn_800B26DC(void);
 void fn_800B2724(void);
 void fn_800B2DB0(f32* pCentre, f32 (*pQuad)[4], f32 fHalfX, f32 fHalfZ);
 void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
-void fn_80035294(void);                 // GoTerrain.c
+void RC_vUpdateCurrentRenderCtxTransformationMatrices(void); // GoTerrain.c
 void RC_UpdateCurrentScreenMatrices(void);
 void fn_80035604(void);                 // GoTerrain.c
 void SKN_DrawCharacter(Character* pChar, u32 uFlags);
@@ -517,7 +517,7 @@ void fn_800B2FB0(Character* pChar, int nView, u8 bFlat) {
     }
     nList = Ter_GetGroundPolyList(pCourse, aQuad[0], aQuad[1], aQuad[2], aQuad[3], aList, 0x200, 0x60);
     RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
-    fn_80035294();
+    RC_vUpdateCurrentRenderCtxTransformationMatrices();
     RenderState_SetViewport(RC_spGetCurrentRenderCtx());
     RenderState_SetDrawFlags(0x70);
     RenderState_SetCameraMatrices();

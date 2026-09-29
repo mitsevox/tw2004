@@ -44,8 +44,8 @@ void fn_800A27FC(f32 fDir, f32 fPoint) {
     if (Ter_GetTGD()->p44 != NULL) {
         LF_vSetCurrentLightFogEnvironment(2);
         fn_80093900(Ter_GetTGD()->p44);
-        fn_80035308();
-        fn_800352E4();
+        LF_UseCurrentFogSettings();
+        LF_UpdateFog();
     }
 }
 

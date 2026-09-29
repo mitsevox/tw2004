@@ -197,9 +197,9 @@ void SKN_DrawCharacter(Character* pChar, u32 uFlags) {
         SKN_GetCharPosition(pChar, vPos);
         LF_SetCurrentBrightness(0.5f * Ter_GetAmbientLight(Ter_GetTGD(), vPos) + 0.5f);
         LF_LoadCurrentLights();
-        fn_80035308();
+        LF_UseCurrentFogSettings();
     }
-    fn_800352E4();
+    LF_UpdateFog();
     LI_SetObjectLights(NULL);
     if (uShadow) {
         nMode = 2;

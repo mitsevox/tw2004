@@ -1022,7 +1022,7 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
 
     // the marker's height: kept where the camera can see it (within 3/4 of its field of view)
     fHalfFov = CA_fGetCameraFieldOfView(Camera_GetCurrentLens());
-    fHalfFov = 0.75f * fHalfFov * fn_8001414C((u8*)fn_8003526C());
+    fHalfFov = 0.75f * fHalfFov * fn_8001414C((u8*)RC_spGetCurrentRenderCtxViewport());
     fn_8006A964(pView->v10, pView->v0, vDir);
     if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
         LLMath_Normalize3(vDir, vDir);

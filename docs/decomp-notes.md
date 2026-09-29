@@ -362,7 +362,7 @@ They will be sorted into the sections below.
   initialised locals load at entry; pass a global struct field by value directly, not through a local
   (streammanagerhole RenderState_Apply).
 - **[verified] A local pointer to the array element flips `cmpw` operands** where swapping the `==`
-  operands doesn't (GoTerrain fn_80034DE4); `if (x) return 0; return 1;` in a `u8` function gives
+  operands doesn't (GoTerrain Ter_DrawGrassPatchesPass3); `if (x) return 0; return 1;` in a `u8` function gives
   `cntlzw; srwi` where `return x == 0;` adds a mask (hwsRender_Gc fn_80112B80).
 - **[verified] EA's abs is `(v + (v >> 31)) ^ (v >> 31)`** (`srawi; add; xor`); MWCC's `__abs` gives
   `xor; subf` (ShaderObjectsData fn_80074628).

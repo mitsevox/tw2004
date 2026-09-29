@@ -712,7 +712,7 @@ extern void** lbl_80280DF0;
 void   RC_vSetCurrentRenderCtxTransformationMatrix(f32 (*pMtx)[4]);
 // GoRenderCtx_Gc.c: gives the camera the model matrix pMtx (NULL: the identity).
 void   RC_vSetRenderCtxTransformationMatrix(void* pCamera, f32 (*pMtx)[4]);
-f32*   fn_8003526C(void);               // GoTerrain.c: the current render camera's screen rectangle
+f32*   RC_spGetCurrentRenderCtxViewport(void); // GoTerrain.c: the current render camera's screen rectangle
 
 ViewController* ViewController_GetCurrentViewController(void);     // the current view (gpCurViewController)
 ViewController* ViewController_GetIndexedViewController(int nView);

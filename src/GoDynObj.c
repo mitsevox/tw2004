@@ -320,8 +320,8 @@ void DynObj_RenderDynamicObjects(int nView) {
     DS_vSetAlphaTestMode(1, 6, 0x80);
     DS_vSetZBufferMode(3);
     LF_vSetCurrentLightFogEnvironment(1);
-    fn_80035308();
-    fn_800352E4();
+    LF_UseCurrentFogSettings();
+    LF_UpdateFog();
     RenderState_Flush();
     Kernel_BroadcastMessage(3, NULL, NULL);
     if (GM_Currently_SkillZoneMode()) {
@@ -418,8 +418,8 @@ void DynObj_RenderBalls(int nView) {
     DS_vSetAlphaTestMode(1, 6, 0x80);
     DS_vSetZBufferMode(3);
     LF_vSetCurrentLightFogEnvironment(1);
-    fn_80035308();
-    fn_800352E4();
+    LF_UseCurrentFogSettings();
+    LF_UpdateFog();
     RenderState_Flush();
     DynObj_DrawGolfBalls(aState);
     RC_vSetCurrentRenderCtxTransformationMatrix(NULL);

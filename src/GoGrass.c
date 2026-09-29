@@ -51,7 +51,7 @@ void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, in
 void fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY);
 void RC_ApplyCurrentViewport(void);
 void fn_80016948(void);
-s32  fn_8003505C(s32 n);           // sets a value, returns the old one
+s32  Ter_SetManageZUpdate(s32 n);  // sets a value, returns the old one
 void Ter_RenderGrass(void);
 void RenderState_SetClipMode();
 void RC_UpdateCurrentScreenMatrices();
@@ -401,9 +401,9 @@ void fn_8011EC84(void) {
     DS_vSetAlphaTestMode(0, 6, 128);
     RenderState_Flush();
     RenderView_DrawPrimitive(161, lbl_801945C8, 0, lbl_801945C8, 2);
-    nOld = fn_8003505C(0);
+    nOld = Ter_SetManageZUpdate(0);
     Ter_RenderGrass();
-    fn_8003505C(nOld);
+    Ter_SetManageZUpdate(nOld);
     fn_8011EC2C();
     RC_vSetCurrentRenderCtx(pCamera);
     RenderState_SetViewport(RC_spGetCurrentRenderCtx());

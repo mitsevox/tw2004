@@ -47,8 +47,8 @@ LAYOUT_ASSERT(LightGroup, 0x38);
 
 // One set of lights (0x8C bytes).
 typedef struct LightSet {
-    TerSettings settings;       // 0x00  the terrain colours: fn_80035308 copies them to the renderer's
-                                //       (fn_80035440), fn_8003534C resets them (fn_8006F334)
+    TerSettings settings;       // 0x00  the terrain colours: LF_UseCurrentFogSettings copies them to the renderer's
+                                //       (fn_80035440), LF_ResetCurrentFogSettings resets them (fn_8006F334)
     LightGroup group;           // 0x54
 } LightSet;
 LAYOUT_ASSERT(LightSet, 0x8C);
@@ -113,9 +113,9 @@ void fn_8006EDC0(LightGroup* pGroup);               // the default lights
 
 LightSet* LF_spGetCurrentLightFogEnvironment(void);    // lbl_80281380->pCur
 void LF_vSetCurrentLightFogEnvironment(s32 nSet);     // make aSet[nSet] the current set
-void fn_8003534C(void);         // reset the current set's terrain colours to the defaults
-void fn_80035308(void);
-void fn_800352E4(void);
+void LF_ResetCurrentFogSettings(void); // reset the current set's terrain colours to the defaults
+void LF_UseCurrentFogSettings(void);
+void LF_UpdateFog(void);
 
 void fn_80093524(void);         // create the lights of every set, and use set 0
 void fn_80093580(void);         // and free them

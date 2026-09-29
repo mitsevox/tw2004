@@ -32,7 +32,7 @@ void fn_80093524(void) {
     }
     LF_vSetCurrentLightFogEnvironment(0);
     LF_LoadCurrentLights();
-    fn_80035308();
+    LF_UseCurrentFogSettings();
 }
 
 void fn_80093580(void) {

@@ -912,7 +912,7 @@ void FE_vUpdateGolferAll(void) {
         }
         LF_LoadCurrentLights();
     }
-    fn_80035308();
+    LF_UseCurrentFogSettings();
 }
 
 // The golfer's first render pass, before the menu is drawn, when he is shown (bLoaded, not hidden
@@ -1314,7 +1314,7 @@ void FE_lite_vStreamCallback(UStreamObject* pObject) {
                      aLightElemDef, sizeof(aLightElemDef) / sizeof(aLightElemDef[0]), gFEGolferLights->nLights);
     LF_vSetCurrentLightFogEnvironment(0);
     fn_800935CC(gFEGolferLights);
-    fn_8003534C();
+    LF_ResetCurrentFogSettings();
     StaticMem_Free(pObject);
 }
 

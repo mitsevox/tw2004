@@ -50,7 +50,7 @@ void UI_Obj_DrawMesh(UObjMesh* pMesh);
 void LI_LoadLightGroup(LightGroup* pGroup);   // Skin.c: load the group's lights (fn_8006E7A4)
 void fn_8006EADC(UObject* pObj);        // GoLighting.c: light the object
 void fn_8006ED70(void);                 // GoLighting.c
-void fn_80035294(void);                 // GoTerrain.c
+void RC_vUpdateCurrentRenderCtxTransformationMatrices(void); // GoTerrain.c
 
 f32 gUIObjLightGreen = 0.05f;           // the light's green
 f32 gUIObjLightBlue = 0.476f;           // the light's blue
@@ -390,7 +390,7 @@ void UI_Obj_DrawSpinModel(void) {
     RenderState_SetConstantAlpha(255.0f * gUIObjAlpha);
     RenderState_Flush();
     RC_vSetCurrentRenderCtxTransformationMatrix(gpUIObjModel->m80);
-    fn_80035294();
+    RC_vUpdateCurrentRenderCtxTransformationMatrices();
     RenderState_SetCameraMatrices();
     RenderState_SetClipMode(1);
     RenderState_Flush();
