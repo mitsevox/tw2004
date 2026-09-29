@@ -817,14 +817,14 @@ void   GolfCamera_InitReplaySwingCamera(View* pView, int nPlayer);              
 void   GolfCamera_InitBallFlightCamera(View* pView, int nPlayer);   // 14
 void   GolfCamera_InitPostShotCamera(View* pView, int nPlayer);     // 15
 void   GolfCamera_InitInHoleCamera(View* pView, int nPlayer);       // 16
-void   fn_800C3478(View* pView, int nPlayer);                       // 17
+void   GolfCamera_InitScoreCardCamera(View* pView, int nPlayer);                       // 17
 void   GolfCamera_InitTutorialWaitCamera(View* pView, int nPlayer); // 18
 void   GolfCamera_InitSteepSlopeCamera(View* pView, int nPlayer);   // 19
 void   GolfCamera_Init3ScreenCamera(View* pView, int nPlayer);                       // 20
 void   GolfCamera_InitHeartBeatCamera(View* pView, int nPlayer);    // 21
 void   GolfCamera_InitShutterCamera(View* pView, int nPlayer);      // 22
 void   GolfCamera_InitFECamera(View* pView, int nPlayer);                       // 23
-void   fn_800C3EB8(View* pView, int nPlayer);                       // 24
+void   GolfCamera_InitGolferBoneCamera(View* pView, int nPlayer);                       // 24
 
 // ... and their per-frame updates (GoGolfCam.c), one per mode, run by CameraController_Idle.
 void   GolfCamera_ProcessShotSetupCamera(View* pView, int nPlayer);                       // camera 0
@@ -844,14 +844,14 @@ void   GolfCamera_ProcessReplaySwingCamera(View* pView, int nPlayer);           
 void   GolfCamera_ProcessBallFlightCamera(View* pView, int nPlayer); // 14
 void   GolfCamera_ProcessPostShotCamera(View* pView, int nPlayer);  // 15
 void   GolfCamera_ProcessInHoleCamera(View* pView, int nPlayer);    // 16
-void   fn_800C34F8(View* pView, int nPlayer);                       // 17
+void   GolfCamera_ProcessScoreCardCamera(View* pView, int nPlayer);                       // 17
 void   GolfCamera_ProcessTutorialWaitCamera(View* pView, int nPlayer);                       // 18
 void   GolfCamera_ProcessSteepSlopeCamera(View* pView, int nPlayer); // 19
 void   GolfCamera_Process3ScreenCamera(View* pView, int nPlayer);                       // 20
 void   GolfCamera_ProcessHeartBeatCamera(View* pView, int nPlayer); // 21
 void   GolfCamera_ProcessShutterCamera(View* pView, int nPlayer);                       // 22
 void   GolfCamera_ProcessFECamera(View* pView, int nPlayer);                       // 23
-void   fn_800C3EDC(View* pView, int nPlayer);                       // 24
+void   GolfCamera_ProcessGolferBoneCamera(View* pView, int nPlayer);                       // 24
 
 // ---- the camera controller (0x80062F38..) ---------------------------------------------------
 
@@ -874,11 +874,11 @@ void   CameraController_LagSideVector(f32* pA, f32* pB, f32* pOut);   // the gre
 void   GolfCamera_Init(void);
 void   GolfCamera_DeInit(void);
 void   GolfCamera_TurnOffComicCam(View* pView, int nPlayer);
-u8     fn_800C441C(View* pView, int nPlayer);
+u8     GolfCamera_Choose3ShotCam(View* pView, int nPlayer);
 u8     GolfCamera_Choose3ScreenCam(View* pView, int nPlayer);
 u8     GolfCamera_ChooseHeartBeatCam(View* pView, int nPlayer);
 u8     GolfCamera_ChooseShutterCam(View* pView, int nPlayer);
-int    fn_800C4518(View* pView);
+int    GolfCamera_NumCompletedReplayCams(View* pView);
 u8     GolfCamera_NeedSteepSlopeCam(View* pView, int nPlayer);
 void   GolfCamera_vSwitchToNextAlternateSwingCamera(View* pView, int nPlayer);
 void   fn_800C5CEC(View* pView, int nPlayer);

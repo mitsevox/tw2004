@@ -53,9 +53,9 @@ u8       fn_800C7450(void);
 u8       fn_8012022C(void);                            // (sweep code) lbl_80281900's +0x370 is nonzero
 void     Character_AlignCharacterForShotImpact(Character* pChar);                 // char.c
 void     SKATime_Pause(u8* pAnim);                        // set the player's pause bit (0x2)
-u8       fn_800C3FC0(View* pView, int nPlayer, f32* pSub, f32* pAim, f32* pCam);
-u8       fn_800C43C0(View* pView, int nPlayer);
-u8       fn_800C44F4(View* pView, int nPlayer);
+u8       GolfCamera_ZoomCamGetStartAndEndVecs(View* pView, int nPlayer, f32* pSub, f32* pAim, f32* pCam);
+u8       GolfCamera_ChooseImpactMatrixCam(View* pView, int nPlayer);
+u8       GolfCamera_ChooseSuperZoomCam(View* pView, int nPlayer);
 void     fn_800C4FF0(View* pView, f32* pFrom, f32* pTo, int nPlayer);
 void     fn_800C56B4(View* pView, f32* pFrom, f32* pTo, int nPlayer);
 u8       Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
@@ -222,12 +222,12 @@ void GolfCamera_InitZoomToAimCamera(View* pView, int nPlayer) {
     EVENT_Trigger(nPlayer, 0x30, NULL, -1);
 }
 
-// The zoom-to-aim camera's tick: fly the camera to the goal fn_800C3FC0 works out, fast at first
-// and slowing over the tuning's f8, with GoPostFx's screen effect (fn_80038054) set by its speed
-// while it moves. script.f108 runs from below 0 (not set off yet) to 1 (arrived); on the way the
-// height blends from the aim's ground plus the shot's f68 to the tuning's f14 over View.script.fD8
-// (the ground at the target) in the second half. Arrived, it creeps on towards the goal and eases
-// its height.
+// The zoom-to-aim camera's tick: fly the camera to the goal GolfCamera_ZoomCamGetStartAndEndVecs
+// works out, fast at first and slowing over the tuning's f8, with GoPostFx's screen effect
+// (fn_80038054) set by its speed while it moves. script.f108 runs from below 0 (not set off yet) to
+// 1 (arrived); on the way the height blends from the aim's ground plus the shot's f68 to the
+// tuning's f14 over View.script.fD8 (the ground at the target) in the second half. Arrived, it
+// creeps on towards the goal and eases its height.
 void GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer) {
     f32 vMove[4];
     f32 vGoal[4];
@@ -259,7 +259,7 @@ void GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer) {
     pSub = CameraController_GetCameraLookPoint(pView);
     Vec3Copy(pCam, vOld);
     LLMath_CopyVec(gPlayers[nPlayer].vTargetCopy, vTarget);
-    bMirror = fn_800C3FC0(pView, nPlayer, pCam, vAim, vGoal);
+    bMirror = GolfCamera_ZoomCamGetStartAndEndVecs(pView, nPlayer, pCam, vAim, vGoal);
     pCourse = Ter_GetTGD();
     fBase = lbl_80281F78->f0;
     fSlow = lbl_80281F78->f8;
@@ -488,10 +488,11 @@ void GolfCamera_InitGreenZoomToAimCamera(View* pView, int nPlayer) {
     }
 }
 
-// The green zoom-to-aim camera's tick: fly the camera to the goal fn_800C3FC0 works out, fast at
-// first and slowing over the tuning's f30, rising to a height that keeps the pin in the lens, with
-// the screen effect fn_80038054 stronger the faster it moves. Arrived (script.f108 1), it creeps on
-// towards the goal and settles its height. The aim marker lags behind.
+// The green zoom-to-aim camera's tick: fly the camera to the goal
+// GolfCamera_ZoomCamGetStartAndEndVecs works out, fast at first and slowing over the tuning's f30,
+// rising to a height that keeps the pin in the lens, with the screen effect fn_80038054 stronger
+// the faster it moves. Arrived (script.f108 1), it creeps on towards the goal and settles its
+// height. The aim marker lags behind.
 void GolfCamera_ProcessGreenZoomToAimCamera(View* pView, int nPlayer) {
     f32 vMove[4];
     f32 vGoal[4];
@@ -524,7 +525,7 @@ void GolfCamera_ProcessGreenZoomToAimCamera(View* pView, int nPlayer) {
     if (gSession.nPaused == 0) {
         LLMath_CopyVec(gPlayers[nPlayer].vTargetCopy, vTarget);
         Vec3Copy(pCam, vOld);
-        fn_800C3FC0(pView, nPlayer, pCam, vAim, vGoal);
+        GolfCamera_ZoomCamGetStartAndEndVecs(pView, nPlayer, pCam, vAim, vGoal);
         pCourse = Ter_GetTGD();
         fBase = lbl_80281F78->f34;
         fSlow = lbl_80281F78->f30;
@@ -866,8 +867,9 @@ void GolfCamera_InitSpeedGolfRunCamera(View* pView, int nPlayer) {
     pView->p74 = NULL;
 }
 
-// The first-person camera's state, per player, and two axes fn_800C3FC0 uses. Defined here, after
-// the functions that use the file's string literals, so the .data comes out in the original's order.
+// The first-person camera's state, per player, and two axes GolfCamera_ZoomCamGetStartAndEndVecs
+// uses. Defined here, after the functions that use the file's string literals, so the .data comes
+// out in the original's order.
 f32 lbl_80191334[5] = {0};                          // the step's bob, 0..16
 f32 lbl_80191348[5] = {8.0f, 8.0f, 8.0f, 8.0f};     // the sideways sway, 0..16
 f32 lbl_8019135C[5] = {1.0f, 1.0f, 1.0f, 1.0f};     // the eye height: 1 standing, 0 in water
@@ -1980,14 +1982,14 @@ void GolfCamera_InitBallFlightCamera(View* pView, int nPlayer) {
         }
     }
     pView->script.pB8 = NULL;
-    if (fn_800C43C0(pView, nPlayer)) {
+    if (GolfCamera_ChooseImpactMatrixCam(pView, nPlayer)) {
         lbl_80282220->b54 = 1;
         Character_AlignCharacterForShotImpact(gPlayers[nPlayer].pChar);
         SKATime_Pause(gPlayers[nPlayer].pChar->anim);
         fn_800C4FF0(pView, pCam, pSub, nPlayer);
         pView->script.f108 = 0.0f;
         EVENT_Trigger(nPlayer, 0x32, NULL, -1);
-    } else if (fn_800C44F4(pView, nPlayer)) {
+    } else if (GolfCamera_ChooseSuperZoomCam(pView, nPlayer)) {
         lbl_80282220->b58 = 1;
         SKATime_Pause(gPlayers[nPlayer].pChar->anim);
         fn_800C56B4(pView, pCam, pSub, nPlayer);
@@ -2307,7 +2309,12 @@ void GolfCamera_ProcessPostShotCamera(View* pView, int nPlayer) {
     }
 }
 
-// Camera 16, the in-the-hole camera.
+// Camera 16, the ball-in-the-hole camera: the sequence is kept (p78) and shot kind 8 asked for
+// (fn_80063CF0). Once the golfer's plan is ready (bPlanReady 1): the reaction camera when the
+// post-shot animations show, else after 2 s of the current shot the cut to the golfer, else it
+// tries again on the next tick (script.n110 0: the process calls this until it has run). Before
+// that, the reaction camera only with the animations shown or the golfer taking the ball out
+// (GS_REMOVE_BALL).
 void GolfCamera_InitInHoleCamera(View* pView, int nPlayer) {
     CameraController_GetCameraOrigin(pView);
     CameraController_GetCameraLookPoint(pView);
@@ -2353,17 +2360,18 @@ void GolfCamera_ProcessInHoleCamera(View* pView, int nPlayer) {
     CamScript_RunScript(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, gSession.fFrameTime);
 }
 
-// Camera 17: fade in (over the tuning's f170) while a colour fade is running or held
-// (CameraController_IsFadeOutDone, CameraController_IsFadeOn).
-void fn_800C3478(View* pView, int nPlayer) {
+// Camera 17, the scorecard camera (the hole or the game is over: GameMode.c): fade in, over the
+// tuning's f170, when a colour fade is running or held (fn_80063C7C, fn_80063C90).
+void GolfCamera_InitScoreCardCamera(View* pView, int nPlayer) {
     f32 v[4] = {0.0f, 0.0f, 0.0f, 0.5f};
     if (CameraController_IsFadeOutDone(pView) || CameraController_IsFadeOn(pView)) {
         CameraController_FadeIn(pView, lbl_80281F78->f170, v);
     }
 }
 
-// Camera 17: only the colour fade (CamScript_Fade) steps on, one fixed frame (FRAME_TIME) at a time.
-void fn_800C34F8(View* pView, int nPlayer) {
+// Camera 17's tick: the camera stays put; only the colour fade (fn_8003F2E0) steps on, one fixed
+// frame (FRAME_TIME) a call, paused or not.
+void GolfCamera_ProcessScoreCardCamera(View* pView, int nPlayer) {
     CamScript_Fade(&pView->script, FRAME_TIME);
     pView->script.fFadeTime += FRAME_TIME;
 }
@@ -2599,14 +2607,16 @@ void GolfCamera_SwitchCrAPCamera(View* pView, char* szName, int nShot, u8 bBlend
     }
 }
 
-// Camera 24.
-void fn_800C3EB8(View* pView, int nPlayer) {
+// Camera 24, the golfer bone camera (nothing in this build switches to it): shot kind 10 started
+// from its beginning (fn_8006351C).
+void GolfCamera_InitGolferBoneCamera(View* pView, int nPlayer) {
     CameraController_StartScriptOfKind(pView, nPlayer, 10);
 }
 
-// Camera 24: on the golfer's bone 10, 0.5 out along its z axis (0.1 up its y axis), looking back
-// at the bone; v20 is its x axis, negated.
-void fn_800C3EDC(View* pView, int nPlayer) {
+// Camera 24's tick: the camera 0.5 out along the golfer's bone 10's z axis and 0.1 up its y axis,
+// looking at the bone (0.1 up its y axis); the view's v20 is the bone's x axis, negated. The script
+// is not run.
+void GolfCamera_ProcessGolferBoneCamera(View* pView, int nPlayer) {
     f32* pCam;
     f32* pSub;
     f32 (*m)[4];
@@ -2627,7 +2637,7 @@ void fn_800C3EDC(View* pView, int nPlayer) {
 // tuning's distance (f4, or f38 on a putt) scaled for the lens, closer in when the ball is near
 // the target. When pCam is out of bounds it is pulled in to the boundary, or mirrored through the
 // ball (returns 1). pCam never ends up past pAim.
-u8 fn_800C3FC0(View* pView, int nPlayer, f32* pSub, f32* pAim, f32* pCam) {
+u8 GolfCamera_ZoomCamGetStartAndEndVecs(View* pView, int nPlayer, f32* pSub, f32* pAim, f32* pCam) {
     f32 vTarget[4];
     f32 vDir[4];
     f32 vOff[4];
@@ -2719,7 +2729,9 @@ u8 fn_800C3FC0(View* pView, int nPlayer, f32* pSub, f32* pAim, f32* pCam) {
     return bMoved;
 }
 
-u8 fn_800C43C0(View* pView, int nPlayer) {
+// Is the special swing camera (View.n260) one of the matrix camera kinds 1, 6 and 10? The
+// ball-flight camera then starts the matrix camera at impact.
+u8 GolfCamera_ChooseImpactMatrixCam(View* pView, int nPlayer) {
     CameraController_GetCameraOrigin(pView);
     if (pView->n260 == 1) {
         return 1;
@@ -2730,7 +2742,10 @@ u8 fn_800C43C0(View* pView, int nPlayer) {
     return pView->n260 == 10;
 }
 
-u8 fn_800C441C(View* pView, int nPlayer) {
+// Is the special swing camera (View.n260) one of the swing-replay kinds 2, 5, 8, 11, 15 and 16?
+// After the hit, these (like the 3-screen, heartbeat and shutter kinds) send the golfer to the
+// slow-motion swing replay (GS_REPLAY_SWING).
+u8 GolfCamera_Choose3ShotCam(View* pView, int nPlayer) {
     CameraController_GetCameraOrigin(pView);
     if (pView->n260 == 2) {
         return 1;
@@ -2750,6 +2765,8 @@ u8 fn_800C441C(View* pView, int nPlayer) {
     return pView->n260 == 16;
 }
 
+// Is the special swing camera (View.n260) the 3-screen comic camera, kind 4 or 9 (9 with the other
+// panel layout)?
 u8 GolfCamera_Choose3ScreenCam(View* pView, int nPlayer) {
     if (pView->n260 == 4) {
         return 1;
@@ -2757,22 +2774,28 @@ u8 GolfCamera_Choose3ScreenCam(View* pView, int nPlayer) {
     return pView->n260 == 9;
 }
 
+// Is the special swing camera (View.n260) the heartbeat camera, kind 7?
 u8 GolfCamera_ChooseHeartBeatCam(View* pView, int nPlayer) {
     return pView->n260 == 7;
 }
 
+// Is the special swing camera (View.n260) the shutter camera, kind 3?
 u8 GolfCamera_ChooseShutterCam(View* pView, int nPlayer) {
     return pView->n260 == 3;
 }
 
-u8 fn_800C44F4(View* pView, int nPlayer) {
+// Is the special swing camera (View.n260) the super zoom, kind 13 or 14 (13 zooms in from the
+// camera's own side)? The ball-flight camera then starts it at impact.
+u8 GolfCamera_ChooseSuperZoomCam(View* pView, int nPlayer) {
     if (pView->n260 == 13) {
         return 1;
     }
     return pView->n260 == 14;
 }
 
-int fn_800C4518(View* pView) {
+// How many shots of the slow-motion swing replay have run (script.n110);
+// STATEFUNC_ReplaySwingUpdate launches the ball once it reaches the replay's planned count.
+int GolfCamera_NumCompletedReplayCams(View* pView) {
     return pView->script.n110;
 }
 
@@ -3721,17 +3744,17 @@ f32 GolfCamera_ReplaySwingSpeed(View* pView) {
     case 2:
         return 0.5f;
     case 8:
-        if (fn_800C4518(pView) >= 2) {
+        if (GolfCamera_NumCompletedReplayCams(pView) >= 2) {
             return 0.2f;
         }
         return 0.5f;
     case 11:
-        if (fn_800C4518(pView) >= 2) {
+        if (GolfCamera_NumCompletedReplayCams(pView) >= 2) {
             return 0.65f;
         }
         return 0.5f;
     case 5:
-        if (fn_800C4518(pView) >= 1) {
+        if (GolfCamera_NumCompletedReplayCams(pView) >= 1) {
             return 0.2f;
         }
         return 0.5f;

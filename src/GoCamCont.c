@@ -157,7 +157,7 @@ void CameraController_Idle(View* pView, int nPlayer) {
         GolfCamera_ProcessInHoleCamera(pView, nPlayer);
         break;
     case 17:
-        fn_800C34F8(pView, nPlayer);
+        GolfCamera_ProcessScoreCardCamera(pView, nPlayer);
         break;
     case 18:
         GolfCamera_ProcessTutorialWaitCamera(pView, nPlayer);
@@ -166,7 +166,7 @@ void CameraController_Idle(View* pView, int nPlayer) {
         GolfCamera_ProcessFECamera(pView, nPlayer);
         break;
     case 24:
-        fn_800C3EDC(pView, nPlayer);
+        GolfCamera_ProcessGolferBoneCamera(pView, nPlayer);
         break;
     case 19:
         GolfCamera_ProcessSteepSlopeCamera(pView, nPlayer);
@@ -285,7 +285,7 @@ void CameraController_SetCameraMode(View* pView, int nCamera, int nPlayer, int n
         GolfCamera_InitInHoleCamera(pView, nPlayer);
         break;
     case 17:
-        fn_800C3478(pView, nPlayer);
+        GolfCamera_InitScoreCardCamera(pView, nPlayer);
         break;
     case 18:
         GolfCamera_InitTutorialWaitCamera(pView, nPlayer);
@@ -294,7 +294,7 @@ void CameraController_SetCameraMode(View* pView, int nCamera, int nPlayer, int n
         GolfCamera_InitFECamera(pView, nPlayer);
         break;
     case 24:
-        fn_800C3EB8(pView, nPlayer);
+        GolfCamera_InitGolferBoneCamera(pView, nPlayer);
         break;
     case 19:
         GolfCamera_InitSteepSlopeCamera(pView, nPlayer);

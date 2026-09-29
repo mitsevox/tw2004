@@ -616,7 +616,7 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
             EVENT_Trigger(nPlayer, 0x3B, 0, 0);
         }
         if (gpGame->b283 != 0 &&
-            (fn_800C441C(pV, nPlayer) || GolfCamera_Choose3ScreenCam(pV, nPlayer) ||
+            (GolfCamera_Choose3ShotCam(pV, nPlayer) || GolfCamera_Choose3ScreenCam(pV, nPlayer) ||
              GolfCamera_ChooseHeartBeatCam(pV, nPlayer) || GolfCamera_ChooseShutterCam(pV, nPlayer))) {
             GOLFERSTATE_Switch(GS_REPLAY_SWING, nPlayer);
         } else {
@@ -733,9 +733,10 @@ void STATEFUNC_ReplaySwingInit(int nPlayer) {
 }
 
 // State 11: the swing animation in slow motion. Nothing more until it passes its ball-hit event
-// (2). Then in a replay the ball launches and it is state 12; otherwise once fn_800C4518(view)
-// reaches fn_800C6B38(view) event 0xA fires, the ball launches and it is state 12; before that the
-// slow-mo camera advances (fn_800C5CEC) and one of two swing blends restarts.
+// (2). Then in a replay the ball launches and it is state 12; otherwise once
+// GolfCamera_NumCompletedReplayCams(view) reaches fn_800C6B38(view) event 0xA fires, the ball
+// launches and it is state 12; before that the slow-mo camera advances (fn_800C5CEC) and one of two
+// swing blends restarts.
 void STATEFUNC_ReplaySwingUpdate(int nPlayer) {
     View* pV    = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
     u8    bSpecial = 0;
@@ -748,7 +749,7 @@ void STATEFUNC_ReplaySwingUpdate(int nPlayer) {
             SKEL_RelaxIK(gPlayers[nPlayer].pChar->pModel->pSkel);
             SW_vImpact(nPlayer);
             GOLFERSTATE_Switch(GS_SIMULATE, nPlayer);
-        } else if (fn_800C4518(pV) >= fn_800C6B38(pV)) {
+        } else if (GolfCamera_NumCompletedReplayCams(pV) >= fn_800C6B38(pV)) {
             EVENT_Trigger(nPlayer, 0xA, &gPlayers[nPlayer].ball, 1);
             GolfCamera_Choose3ScreenCam(pV, nPlayer);
             SKEL_RelaxIK(gPlayers[nPlayer].pChar->pModel->pSkel);
@@ -757,7 +758,7 @@ void STATEFUNC_ReplaySwingUpdate(int nPlayer) {
         } else {
             fn_800C5CEC(pV, nPlayer);
             GameEffects_SetSuperSlowMo(1, nPlayer, GolfCamera_ReplaySwingSpeed(pV));
-            if (fn_800C4518(pV) >= fn_800C6B38(pV)) {
+            if (GolfCamera_NumCompletedReplayCams(pV) >= fn_800C6B38(pV)) {
                 bSpecial = fn_800C5FE4(pV, nPlayer);
             }
             if (bSpecial) {
