@@ -334,7 +334,7 @@ typedef struct AudSource {
                                 //        streamed tracks: PreprocessControllers)
     f32  aPos[2][3];            // 0x24   where it is from each listener (audvec3_ApproxLength measures it)
     AudSound* pSound;           // 0x3C
-    s16  nSound;                // 0x40   its number (fn_800A85CC)
+    s16  nSound;                // 0x40   its number (Ses_GetEmitterTemplateFromID)
     u8   unk42[0x44 - 0x42];
     AudTrack* apTracks[8];      // 0x44   one per track of the sound
     f32  fPan;                  // 0x64   -1 left to 1 right
@@ -440,7 +440,7 @@ extern AudSource* lbl_80282058;         // AudTable.c's table
 extern u8 lbl_80282068;                 // the number of listeners (hlaudmovie.c)
 extern f32 lbl_801F17D0[32];            // the volume of each curve (Mas_GetSubmix; HLAudMaster.c)
 extern s32 lbl_80282060;                // one bit per curve: 1 = muted (Mas_IsChanMuted; HLAudMaster.c)
-extern f32 lbl_80281460;                // fn_800A86BC's rate, Mas_GetUpdateRateScale's result (HLAudMaster.c)
+extern f32 lbl_80281460;                // Mas_SetTickRate's rate, Mas_GetUpdateRateScale's result (HLAudMaster.c)
 extern s32 lbl_80282080;                // Ses_IsSessionZero says whether it is 0 (hlaudmovie.c)
 extern AudStreamFile* lbl_80282070;     // the stream file's header (hlaudmovie.c)
 extern AudBank* lbl_80282074;           // bank 1 (hlaudmovie.c)
@@ -478,10 +478,10 @@ void           Emi_CheckTemplate(AudSound* pSound, u16 n);
 void           Emi_TrackCallback(AudSource* pSource, u8 nTrack, s32 n);
 
 // HLAudMaster.c
-AudSound*    fn_800A85CC(s16 nSound);
-f32          fn_800A85FC(f32 fVolume, f32 fCurve);
-u8           fn_800A86B0(void);
-void         fn_800A86B8(void);
+AudSound*    Ses_GetEmitterTemplateFromID(s16 nSound);
+f32          audfrac_Mul(f32 fVolume, f32 fCurve);
+u8           Mas_InitSession(void);
+void         Mas_ExitSession(void);
 
 // hlaudmovie.c
 u8*          Ses_GetStreamBuffer(u32 uSize, u8 nPlayList);                  // the stream buffer

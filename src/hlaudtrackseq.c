@@ -138,8 +138,8 @@ void OnKeyOn(AudSeqEvent* pEvent, AudTrack* pTrack) {
 
     // fake match: the (u8) changes nothing; it gives EA's instruction order.
     pTone = Ses_GetInstrumentTone(pTmpl->data.pBank, (u8)pEvent->n3);
-    fAttn = fn_800A85FC(pTrack->f48, Mas_GetSubmix(pTmpl->data.pBank->n3));
-    nVolume = fn_800A85FC((f32)(pEvent->n4 << 7), fAttn);
+    fAttn = audfrac_Mul(pTrack->f48, Mas_GetSubmix(pTmpl->data.pBank->n3));
+    nVolume = audfrac_Mul((f32)(pEvent->n4 << 7), fAttn);
     bLoops = pTone->n10 & 1;
     if (nVolume == 0) return;
     if (pTone == NULL) return;
@@ -518,7 +518,7 @@ void Seq_Check(AudTrackTmpl* pTmpl) {
         for (j = 0; j < pTmpl->n7; j++) {
             pEvent = &pTmpl->pEvents[pTmpl->n3 * (j + i * pTmpl->n7)];
             for (k = 0; k < pTmpl->n3; k++, pEvent++) {
-                pEvent->n0 = fn_800A85FC(pEvent->n0, fRateScale);
+                pEvent->n0 = audfrac_Mul(pEvent->n0, fRateScale);
                 switch (pEvent->nType) {
                 case 6:
                     break;

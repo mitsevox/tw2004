@@ -4,21 +4,21 @@
 // data: its .sdata (0x80281460) and .sbss (0x80282060-0x80282065) each end in padding to the next
 // file's 8-aligned start, which one file's packed globals cannot leave, and Mic_InitModule after it
 // is the first to use the next file's .sbss.
-// fn_800A85CC and fn_800A85FC come before the Mas_ functions and have no data of their own:
+// Ses_GetEmitterTemplateFromID and audfrac_Mul come before the Mas_ functions and have no data of their own:
 // kept here, as nothing places them elsewhere.
 
 #include "core/audtrack.h"
 #include "core/startup.h"
 
-f32 lbl_80281460 = 1.0f;                // fn_800A86BC's rate
+f32 lbl_80281460 = 1.0f;                // Mas_SetTickRate's rate
 
 f32 lbl_801F17D0[32];
 
 u8 lbl_80282064;
 s32 lbl_80282060;
 
-// A sound by its number: bank 0's from 0 up, bank 1's from -1 down.
-AudSound* fn_800A85CC(s16 nSound) {
+// A sound (EA: an emitter template) by its number: bank 0's from 0 up, bank 1's from -1 down.
+AudSound* Ses_GetEmitterTemplateFromID(s16 nSound) {
     AudBank* pBank;
 
     if (nSound >= 0) {
@@ -30,11 +30,15 @@ AudSound* fn_800A85CC(s16 nSound) {
     return pBank->apSounds[nSound];
 }
 
-f32 fn_800A85FC(f32 fVolume, f32 fCurve) {
+// The engine's fraction product (EA's audfrac_Mul, a UAudFrac.h inline, here out of line): volumes
+// and attenuations times each other.
+f32 audfrac_Mul(f32 fVolume, f32 fCurve) {
     return fVolume * fCurve;
 }
 
-u8 fn_800A8604(void) {
+// The master's start-up step in Aud_InitOnce: every submix channel at full volume (1.0), none
+// muted, output mode 2. Always 1.
+u8 Mas_InitModule(void) {
     s32 i;
 
     lbl_80282064 = 2;
@@ -45,29 +49,39 @@ u8 fn_800A8604(void) {
     return 1;
 }
 
-u8 fn_800A86B0(void) {
+// The master's step in Ses_Init: nothing to do. Always 1.
+u8 Mas_InitSession(void) {
     return 1;
 }
 
-void fn_800A86B8(void) {
+// The master's step in Ses_Exit: empty in this build.
+void Mas_ExitSession(void) {
 }
 
-void fn_800A86BC(u8 nRate) {
+// Scales the sequencer's event delays (read through fn_800AB39C) for nRate engine ticks a second:
+// nRate / 60, so 1.0 at 60, which is what Aud_InitOnce is always given.
+void Mas_SetTickRate(u8 nRate) {
     lbl_80281460 = nRate != 60 ? nRate / 60.0f : 1.0f;
 }
 
-void fn_800A8700(u8 n) {
+// Stores the sound output mode (Aud_SetOutputmode; 2 from Mas_InitModule). Nothing in this build
+// reads it.
+void Mas_SetOutputMode(u8 n) {
     lbl_80282064 = n;
 }
 
+// Sets submix channel nCurve's volume (0..31, 1.0 full), which scales every track played through it
+// (Mas_GetSubmix).
 void Mas_SetSubmixChan(u8 nCurve, f32 fVolume) {
     lbl_801F17D0[nCurve] = fVolume;
 }
 
+// Sets the volumes of submix channels 0..nCurves-1 from pVolumes.
 void Mas_SetSubmixAll(u8 nCurves, f32* pVolumes) {
     Mem_cpy(lbl_801F17D0, pVolumes, nCurves * sizeof(f32));
 }
 
-void fn_800A874C(s32 n) {
+// Sets the mute mask: bit n set mutes submix channel n (Mas_IsChanMuted).
+void Mas_SetSubmixMuteAll(s32 n) {
     lbl_80282060 = n;
 }

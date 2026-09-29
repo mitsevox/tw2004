@@ -44,14 +44,14 @@ void Voc_ResetModule(void) {
         pVoiceEnd = pPool->aVoices + AUD_NUM_VOICES;
         pListEnd = pList + 3;
         for (; pList < pListEnd; pList++) {
-            fn_800ADE70(pList, AUD_NUM_VOICES);
+            UList_Reset(pList, AUD_NUM_VOICES);
         }
         nVoice = 0;
         for (; pVoice < pVoiceEnd; pVoice++) {
             pVoice->nHwVoice = nVoice++;
             pVoice->n10 = -1;
         }
-        fn_800AE0DC(&pPool->free, pPool->aVoices, AUD_NUM_VOICES, sizeof(AudVoice));
+        UPool_Init(&pPool->free, pPool->aVoices, AUD_NUM_VOICES, sizeof(AudVoice));
     }
 }
 
@@ -113,7 +113,7 @@ AudVoice* Voc_Alloc(AudVoiceRequest* pRequest) {
                     pVoice = NULL;
                 } else {
                     HwVoice_StartOrRelease(pVoice->nHwVoice, 0);
-                    fn_800ADF6C(pList, &pVoice->link);
+                    UList_DeleteAt(pList, &pVoice->link);
                     bStolen = 1;
                 }
                 break;
@@ -121,7 +121,7 @@ AudVoice* Voc_Alloc(AudVoiceRequest* pRequest) {
         }
     }
     if (pPool->free.nFree != 0) {
-        pVoice = fn_800AE1AC(&pPool->free);
+        pVoice = UPool_Alloc(&pPool->free);
     }
     if (pVoice != NULL) {
         pVoice->n10 = pRequest->n4;
@@ -149,7 +149,7 @@ AudVoice* Voc_Alloc(AudVoiceRequest* pRequest) {
             }
             pVoice->uPlayPos = pVoice->uAram;
         }
-        fn_800ADEC8(&pPool->aLists[pRequest->n4], &pVoice->link);
+        UList_PushTail(&pPool->aLists[pRequest->n4], &pVoice->link);
     }
     return pVoice;
 }
@@ -273,8 +273,8 @@ void Voc_Stop(AudVoice* pVoice) {
     if (!pVoice->flags.b.bStopped) {
         HwVoice_StartOrRelease(pVoice->nHwVoice, 0);
         if (pVoice->n10 > 0) {
-            fn_800ADF6C(&lbl_801F19B8->aLists[pVoice->n10], &pVoice->link);
-            fn_800ADE88(&lbl_801F19B8->aLists[0], &pVoice->link);
+            UList_DeleteAt(&lbl_801F19B8->aLists[pVoice->n10], &pVoice->link);
+            UList_PushHead(&lbl_801F19B8->aLists[0], &pVoice->link);
             pVoice->n10 = 0;
         }
         pVoice->flags.b.bStopped = 1;
@@ -312,8 +312,8 @@ void Voc_Cycle(void) {
             pNext = (AudVoice*)pVoice->link.pNext;
             if (pVoice->n15 <= 0) {
                 if (HwVoice_IsFree(pVoice->nHwVoice)) {
-                    fn_800ADF6C(&pPool->aLists[0], &pVoice->link);
-                    fn_800AE1DC(&pPool->free, pVoice);
+                    UList_DeleteAt(&pPool->aLists[0], &pVoice->link);
+                    UPool_Free(&pPool->free, pVoice);
                     // port: EA passes arguments HwVoice_OnVoiceFreed (empty) ignores
                     ((void (*)(u16, int))HwVoice_OnVoiceFreed)(pVoice->nHwVoice, pVoice->flags.b.bA_1 != 0);
                     if (pVoice->flags.b.bA_4) {

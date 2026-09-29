@@ -58,7 +58,7 @@ void StartStreamVoices(AudTrack* pTrack) {
     u8 i;
 
     pList = pTrack->pTmpl->data.pPlayList;
-    fn_800A85FC(pTrack->f44, Mas_GetSubmix(pList->n3));
+    audfrac_Mul(pTrack->f44, Mas_GetSubmix(pList->n3));
     bLoud = pList->n3 == 15;
     for (i = 0; i < pList->nChannels; i++) {
         Voc_StartStream(pTrack->apVoices[i], 0xFE00, pList->n4, bLoud);
@@ -77,7 +77,7 @@ u8 AddToAudStreamReadQueue(s32 hFile, u8* pDst, u32 uLen, u32 uOffset,
     bQueued = 0;
     fn_800B59BC("AddToAudStreamReadQueue");
     if (gAudStreamReadQueue.queue.nCount + 1 <= gAudStreamReadQueue.queue.nMax) {
-        pRead = fn_800AE03C(&gAudStreamReadQueue.queue);
+        pRead = UQueue_Push(&gAudStreamReadQueue.queue);
         pRead->hFile = hFile;
         bQueued = 1;
         pRead->pDst = pDst;
@@ -102,7 +102,7 @@ u8 Stm_QueueSilence(AudTrack* pTrack) {
     bQueued = 0;
     fn_800B59BC("AddToAudStreamReadQueue");
     if (gAudStreamReadQueue.queue.nCount + 1 <= gAudStreamReadQueue.queue.nMax) {
-        pRead = fn_800AE03C(&gAudStreamReadQueue.queue);
+        pRead = UQueue_Push(&gAudStreamReadQueue.queue);
         memset(pRead, 0, sizeof(AudStreamRead));
         pRead->pTrack = pTrack;
         bQueued = 1;
@@ -115,7 +115,7 @@ u8 Stm_QueueSilence(AudTrack* pTrack) {
 // The oldest read is done: take it off the queue so the next one can start.
 void RemoveFromAudStreamQueue(AudTrack* pTrack) {
     fn_800B59BC("RemoveFromAudStreamQueue");
-    fn_800AE084(&gAudStreamReadQueue.queue);
+    UQueue_Pop(&gAudStreamReadQueue.queue);
     gAudStreamReadQueue.bBusy = 0;
     fn_800B59EC("RemoveFromAudStreamQueue");
 }
@@ -300,7 +300,7 @@ void PrimeStreamer(AudTrack* pTrack) {
 // Sets up the stream read queue at start-up: 8 empty requests, none under way. Always returns 1.
 u8 Stm_InitModule(void) {
     Mem_set(gAudStreamReadQueue.aReads, 0, sizeof(gAudStreamReadQueue.aReads));
-    fn_800AE00C(&gAudStreamReadQueue.queue, gAudStreamReadQueue.aReads, 8, sizeof(AudStreamRead));
+    UQueue_Reset(&gAudStreamReadQueue.queue, gAudStreamReadQueue.aReads, 8, sizeof(AudStreamRead));
     gAudStreamReadQueue.bBusy = 0;
     return 1;
 }

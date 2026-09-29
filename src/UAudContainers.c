@@ -5,8 +5,8 @@
 
 #include "core/audcontainers.h"
 
-// Empties a list.
-void fn_800ADE70(UList* pList, u16 n8) {
+// Empties a list that holds up to nSlots links (the n8 given; stored, never checked).
+void UList_Reset(UList* pList, u16 n8) {
     pList->pHead = NULL;
     pList->pTail = NULL;
     pList->n8 = n8;
@@ -14,7 +14,7 @@ void fn_800ADE70(UList* pList, u16 n8) {
 }
 
 // Adds a link at the head of a list.
-void fn_800ADE88(UList* pList, UListNode* pNode) {
+void UList_PushHead(UList* pList, UListNode* pNode) {
     if (pList->nCount != 0) {
         pList->pHead->pPrev = pNode;
     } else {
@@ -27,7 +27,7 @@ void fn_800ADE88(UList* pList, UListNode* pNode) {
 }
 
 // Adds a link at the tail of a list.
-void fn_800ADEC8(UList* pList, UListNode* pNode) {
+void UList_PushTail(UList* pList, UListNode* pNode) {
     if (pList->nCount != 0) {
         pList->pTail->pNext = pNode;
     } else {
@@ -39,14 +39,17 @@ void fn_800ADEC8(UList* pList, UListNode* pNode) {
     pList->nCount++;
 }
 
-// Puts a link in front of pAt; at the tail it goes after pAt, as the last link.
-void fn_800ADF08(UList* pList, UListNode* pNode, UListNode* pAt) {
+// Puts a link in front of pAt.
+// EA bug: when pAt is the tail (and not also the head) the link goes after it (UList_PushTail)
+// instead: InsertSortWorldPerf (hlaudtrack.c), inserting a track in front of the first one of lower
+// priority, then leaves the higher-priority track at the tail, where Trk_AllocPerf steals first.
+void UList_InsertAt(UList* pList, UListNode* pNode, UListNode* pAt) {
     UListNode* pPrev;
 
     if (pAt == pList->pHead) {
-        fn_800ADE88(pList, pNode);
+        UList_PushHead(pList, pNode);
     } else if (pAt == pList->pTail) {
-        fn_800ADEC8(pList, pNode);
+        UList_PushTail(pList, pNode);
     } else {
         pPrev = pAt->pPrev;
         pNode->pPrev = pPrev;
@@ -58,7 +61,7 @@ void fn_800ADF08(UList* pList, UListNode* pNode, UListNode* pAt) {
 }
 
 // Takes a link out of a list.
-void fn_800ADF6C(UList* pList, UListNode* pNode) {
+void UList_DeleteAt(UList* pList, UListNode* pNode) {
     if (pNode == pList->pTail) {
         if (pNode->pPrev != NULL) {
             pList->pTail = pNode->pPrev;
@@ -83,7 +86,7 @@ void fn_800ADF6C(UList* pList, UListNode* pNode) {
 }
 
 // Sets up an empty queue over a buffer of nMax items.
-void fn_800AE00C(UQueue* pQueue, void* pBuffer, u16 nMax, s32 nItemSize) {
+void UQueue_Reset(UQueue* pQueue, void* pBuffer, u16 nMax, s32 nItemSize) {
     pQueue->pBase = pBuffer;
     pQueue->pEnd = (u8*)pBuffer + nMax * nItemSize;
     pQueue->pWrite = pBuffer;
@@ -94,7 +97,7 @@ void fn_800AE00C(UQueue* pQueue, void* pBuffer, u16 nMax, s32 nItemSize) {
 }
 
 // Adds an item and returns its slot for the caller to fill. It does not check for a full queue.
-void* fn_800AE03C(UQueue* pQueue) {
+void* UQueue_Push(UQueue* pQueue) {
     u8* pItem;
 
     pItem = pQueue->pWrite;
@@ -107,7 +110,7 @@ void* fn_800AE03C(UQueue* pQueue) {
 }
 
 // Takes the oldest item, or returns NULL when the queue is empty.
-void* fn_800AE084(UQueue* pQueue) {
+void* UQueue_Pop(UQueue* pQueue) {
     u8* pItem;
 
     if (pQueue->nCount - 1 < 0) return NULL;
@@ -121,7 +124,7 @@ void* fn_800AE084(UQueue* pQueue) {
 }
 
 // Cuts pMem into nBlocks blocks of nBlockSize bytes and chains them all as free.
-void fn_800AE0DC(UPool* pPool, void* pMem, u32 nBlocks, u32 nBlockSize) {
+void UPool_Init(UPool* pPool, void* pMem, u32 nBlocks, u32 nBlockSize) {
     UPoolNode* pNode;
     u32 i;
     u8* pNext;
@@ -139,7 +142,7 @@ void fn_800AE0DC(UPool* pPool, void* pMem, u32 nBlocks, u32 nBlockSize) {
 }
 
 // Takes a free block, or returns NULL when none is left.
-void* fn_800AE1AC(UPool* pPool) {
+void* UPool_Alloc(UPool* pPool) {
     UPoolNode* pNode;
 
     pNode = pPool->head.pNext;
@@ -150,7 +153,7 @@ void* fn_800AE1AC(UPool* pPool) {
 }
 
 // Gives a block back to the pool.
-void fn_800AE1DC(UPool* pPool, void* pBlock) {
+void UPool_Free(UPool* pPool, void* pBlock) {
     ((UPoolNode*)pBlock)->pNext = pPool->head.pNext;
     pPool->head.pNext = pBlock;
     pPool->nFree++;

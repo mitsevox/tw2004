@@ -16,10 +16,10 @@
 #include "core/audtrack.h"
 
 // hlaudmovie.c
-void fn_800A874C(s32 n);
+void Mas_SetSubmixMuteAll(s32 n);
 void Mic_SetRvbPreset(u8 a, u8 n);
 void Ses_Pause(u8 b);
-void fn_800A8700(u8 n);
+void Mas_SetOutputMode(u8 n);
 void Mas_SetSubmixChan(u8 nCurve, f32 fVolume);
 void Mas_SetSubmixAll(u8 nCurves, f32* pVolumes);
 
@@ -173,8 +173,8 @@ void BootSound_CopyToAram(void);
 void BootSound_Play(u8 nSound);
 
 // hlaudmovie.c
-u8   fn_800A8604(void);
-void fn_800A86BC(u8 nRate);
+u8   Mas_InitModule(void);
+void Mas_SetTickRate(u8 nRate);
 u8   Mic_InitModule(void);
 u8   Mov_InitModule(void);
 u8   Ses_InitModule(void);
@@ -213,13 +213,13 @@ u8 Aud_InitOnce(u8 nRate) {
 
     fn_800B5B80();
     if ((bOk = HwVoice_InitModule()) && (bOk = AudDma_InitModule()) && (bOk = AudAram_InitModule())
-        && (bOk = fn_800AF224()) && (bOk = BootSound_InitModule()) && (bOk = fn_800A8604())
+        && (bOk = fn_800AF224()) && (bOk = BootSound_InitModule()) && (bOk = Mas_InitModule())
         && (bOk = Ses_InitModule()) && (bOk = Emi_InitModule()) && (bOk = Trk_InitModule())
         && (bOk = Seq_InitModule()) && (bOk = Stm_InitModule()) && (bOk = Mic_InitModule())
         && (bOk = Voc_InitModule()) && (bOk = Mov_InitModule()) && (bOk = Aud_EmiInitOnce())
         && (bOk = Aud_MicInitOnce())) {
         BootSound_CopyToAram();
-        fn_800A86BC(nRate);
+        Mas_SetTickRate(nRate);
         bOk = 1;
     }
     return bOk;
@@ -243,13 +243,13 @@ void Aud_Mute(u8 bLow, u8 bHigh) {
     if (bHigh) {
         nMask |= 0xFFFF0000;
     }
-    fn_800A874C(nMask);
+    Mas_SetSubmixMuteAll(nMask);
 }
 
 // Stores sound output mode n (HLAudMaster.c's lbl_80282064: 2 from start-up, and GameAudio passes 2
 // again). Nothing in this build reads it.
 void Aud_SetOutputmode(u8 n) {
-    fn_800A8700(n);
+    Mas_SetOutputMode(n);
 }
 
 // Sets the volume of submix (curve) nCurve, 0..31, 1.0 being full (Mas_SetSubmixChan); every track

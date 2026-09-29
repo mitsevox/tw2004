@@ -17,7 +17,7 @@ LAYOUT_ASSERT(UListNode, 0x8);
 typedef struct UList {
     UListNode* pHead;           // 0x0
     UListNode* pTail;           // 0x4
-    u16        n8;              // 0x8    set by fn_800ADE70, never read here
+    u16        n8;              // 0x8    set by UList_Reset, never read here
     u16        nCount;          // 0xA    links in the list
 } UList;
 LAYOUT_ASSERT(UList, 0xC);
@@ -26,8 +26,8 @@ LAYOUT_ASSERT(UList, 0xC);
 typedef struct UQueue {
     u8*  pBase;                 // 0x0    the buffer
     u8*  pEnd;                  // 0x4    one past its end
-    u8*  pRead;                 // 0x8    the oldest item, taken by fn_800AE084
-    u8*  pWrite;                // 0xC    where fn_800AE03C puts the next item
+    u8*  pRead;                 // 0x8    the oldest item, taken by UQueue_Pop
+    u8*  pWrite;                // 0xC    where UQueue_Push puts the next item
     u16  nMax;                  // 0x10   items the buffer holds
     u16  nCount;                // 0x12   items in the queue
     s32  nItemSize;             // 0x14
@@ -47,17 +47,17 @@ typedef struct UPool {
 } UPool;
 LAYOUT_ASSERT(UPool, 0x8);
 
-void       fn_800ADE70(UList* pList, u16 n8);
-void       fn_800ADE88(UList* pList, UListNode* pNode);
-void       fn_800ADEC8(UList* pList, UListNode* pNode);
-void       fn_800ADF08(UList* pList, UListNode* pNode, UListNode* pAt);
-void       fn_800ADF6C(UList* pList, UListNode* pNode);
-void       fn_800AE00C(UQueue* pQueue, void* pBuffer, u16 nMax, s32 nItemSize);
-void*      fn_800AE03C(UQueue* pQueue);
-void*      fn_800AE084(UQueue* pQueue);
-void       fn_800AE0DC(UPool* pPool, void* pMem, u32 nBlocks, u32 nBlockSize);
-void*      fn_800AE1AC(UPool* pPool);
-void       fn_800AE1DC(UPool* pPool, void* pBlock);
+void       UList_Reset(UList* pList, u16 n8);
+void       UList_PushHead(UList* pList, UListNode* pNode);
+void       UList_PushTail(UList* pList, UListNode* pNode);
+void       UList_InsertAt(UList* pList, UListNode* pNode, UListNode* pAt);
+void       UList_DeleteAt(UList* pList, UListNode* pNode);
+void       UQueue_Reset(UQueue* pQueue, void* pBuffer, u16 nMax, s32 nItemSize);
+void*      UQueue_Push(UQueue* pQueue);
+void*      UQueue_Pop(UQueue* pQueue);
+void       UPool_Init(UPool* pPool, void* pMem, u32 nBlocks, u32 nBlockSize);
+void*      UPool_Alloc(UPool* pPool);
+void       UPool_Free(UPool* pPool, void* pBlock);
 
 // UAudMemStack.c: a stack allocator. Blocks are cut from the top of one buffer, and each one is
 // recorded in a table so it can be given back by its address.

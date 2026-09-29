@@ -259,7 +259,7 @@ void Ses_ResetModule(void) {
 // held (fn_800B0660) and every hardware voice stopped (fn_800AFB50). The subsession id EA passes is
 // not read.
 void Ses_Exit(void) {
-    fn_800A86B8();
+    Mas_ExitSession();
     Voc_ExitSession();
     Trk_ExitSession();
     Emi_ExitSession();
@@ -293,7 +293,7 @@ u8 Ses_Init(u8 a, u8 b, u8 nListeners) {
     if ((bOk = HwVoice_InitSession()) && (bOk = AudDma_InitSession()) && (bOk = AudAram_InitSession()) &&
         (bOk = fn_800AF264(a, b)) && (bOk = Mic_InitSession(a, b, nListeners)) &&
         (bOk = Emi_InitSession()) && (bOk = Trk_InitSession(a, b)) && (bOk = Voc_InitSession()) &&
-        (bOk = fn_800A86B0())) {
+        (bOk = Mas_InitSession())) {
         if (b == 0) {
             if (lbl_80282078 != NULL) {
                 if (lbl_80282078->uAram != 0) {
@@ -513,7 +513,7 @@ AudStream* Ses_GetStreamFromPlayList(AudPlayList* pList, u16 nStream, u32* puLen
 void Ses_TmplOvrTrackRvbMode(s16 nSound, u8 nTrack, u8 bOn) {
     AudTrackTmpl* pTrack;
 
-    pTrack = &fn_800A85CC(nSound)->aTracks[nTrack];
+    pTrack = &Ses_GetEmitterTemplateFromID(nSound)->aTracks[nTrack];
     if (bOn == 0) {
         pTrack->n0 |= 0x20;
     } else {
@@ -544,8 +544,8 @@ void TrkRender3D(AudSource* pSource, AudTrack* pTrack, f32 fVolume) {
 
     ppVoice = pTrack->apVoices;
     ppEnd = &pTrack->apVoices[pTrack->pTmpl->n2];
-    fVolume = fn_800A85FC(pTrack->f48, fVolume);
-    fPitch = fn_800A85FC(pSource->fPitch, pTrack->f4C);
+    fVolume = audfrac_Mul(pTrack->f48, fVolume);
+    fPitch = audfrac_Mul(pSource->fPitch, pTrack->f4C);
     params.flags.n = 0;
     params.flags.b.bVolume = 1;
     params.flags.b.bPitch = 1;
@@ -553,7 +553,7 @@ void TrkRender3D(AudSource* pSource, AudTrack* pTrack, f32 fVolume) {
     for (; ppVoice < ppEnd; ppVoice++) {
         pVoice = *ppVoice;
         if (pVoice != NULL) {
-            params.nVolume = fn_800A85FC(fVolume, pVoice->n14 << 7);
+            params.nVolume = audfrac_Mul(fVolume, pVoice->n14 << 7);
             params.nPan = 64.0f * pSource->fPan + 64.0f;
             params.n7 = 64.0f * pSource->f68 + 64.0f;
             Voc_Render(pVoice, &params);
@@ -584,7 +584,7 @@ void TrkRenderStereo(AudSource* pSource, AudTrack* pTrack, f32 fVolume) {
     for (; ppVoice < ppEnd; ppVoice++) {
         pVoice = *ppVoice;
         if (pVoice != NULL) {
-            params.nVolume = fn_800A85FC(pVoice->n14 << 7, fVolume);
+            params.nVolume = audfrac_Mul(pVoice->n14 << 7, fVolume);
             params.nPan = bMono ? 0x40 : bRight ? 0x7F : 0;
             params.n7 = 0x7F;
             Voc_Render(pVoice, &params);

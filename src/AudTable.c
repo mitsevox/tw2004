@@ -54,7 +54,7 @@ AudSource* Emi_AddInstance(u8 nEntry, s16 nSound) {
     AudSound* pSound;
     AudSource* pSource;
 
-    pSound = fn_800A85CC(nSound);
+    pSound = Ses_GetEmitterTemplateFromID(nSound);
     pSource = &lbl_80282058[nEntry];
     Mem_set(pSource, 0, sizeof(AudSource));
     pSource->nSound = nSound;
@@ -132,16 +132,16 @@ f32 Attenuation3D(f32 fDist, f32 fScale) {
     f32 f;
     f32 fVolume;
 
-    f = fn_800A85FC(fDist, fScale);
+    f = audfrac_Mul(fDist, fScale);
     if (f > 5.0f) {
-        fVolume = 0.25f - fn_800A85FC(f - 5.0f, 3276.0f / 65536.0f);
+        fVolume = 0.25f - audfrac_Mul(f - 5.0f, 3276.0f / 65536.0f);
         if (fVolume < 0.0f) {
             fVolume = 0.0f;
         }
     } else {
         fVolume = 1.0f;
         if (f > 2.0f) {
-            fVolume -= fn_800A85FC(f - 2.0f, 0.25f);
+            fVolume -= audfrac_Mul(f - 2.0f, 0.25f);
         }
     }
     return fVolume;
@@ -187,8 +187,8 @@ void Panning3D(AudSource* pSource) {
 
     if (lbl_80282068 < 2 && (pSource->pSound->n3 & 1)) {
         fInv = pSource->afDist[0] > 0.0f ? 1.0f / pSource->afDist[0] : 0.0f;
-        fPan = fn_800A85FC(-pSource->aPos[0][0], fInv);
-        f68 = fn_800A85FC(pSource->aPos[0][2], fInv);
+        fPan = audfrac_Mul(-pSource->aPos[0][0], fInv);
+        f68 = audfrac_Mul(pSource->aPos[0][2], fInv);
         fPan = fPan < -1.0f ? -1.0f : fPan > 1.0f ? 1.0f : fPan;
         f68 = f68 < -1.0f ? -1.0f : f68 > 1.0f ? 1.0f : f68;
         pSource->fPan = fPan;
@@ -284,7 +284,7 @@ void Emi_SetTrackVarRange(u8 nEntry, u8 nTrack, u8 n) {
 // Sets the variation range that sound nSound's track nTrack uses (its template's nA), for every
 // entry that plays it.
 void Emi_SetTrackVarRangeTmpl(s16 nSound, u8 nTrack, u8 n) {
-    fn_800A85CC(nSound)->aTracks[nTrack].nA = n;
+    Ses_GetEmitterTemplateFromID(nSound)->aTracks[nTrack].nA = n;
 }
 
 // Asks entry nEntry's track nTrack to play step n next (with bCheck, not when it is the current

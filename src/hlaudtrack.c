@@ -26,15 +26,15 @@ void InsertSortWorldPerf(AudTrack* pTrack) {
     pAt = (AudTrack*)gTrkPerfLists[1].pHead;
     pList = &gTrkPerfLists[1];
     if (pAt == NULL) {
-        fn_800ADEC8(pList, &pTrack->link);
+        UList_PushTail(pList, &pTrack->link);
     }
     while (pAt != NULL) {
         if (pAt->f48 < pTrack->f48) {
-            fn_800ADF08(pList, &pTrack->link, &pAt->link);
+            UList_InsertAt(pList, &pTrack->link, &pAt->link);
             return;
         }
         if (pAt->link.pNext == NULL) {
-            fn_800ADEC8(pList, &pTrack->link);
+            UList_PushTail(pList, &pTrack->link);
             return;
         }
         pAt = (AudTrack*)pAt->link.pNext;
@@ -56,9 +56,9 @@ u8 Trk_InitModule(void) {
             gTrkPerfs[i].nIndex = i;
             gTrkPerfs[i].nState = 0;
         }
-        fn_800AE0DC(&gTrkPerfPool, gTrkPerfs, 32, sizeof(AudTrack));
-        fn_800ADE70(&gTrkPerfLists[0], 32);
-        fn_800ADE70(&gTrkPerfLists[1], 32);
+        UPool_Init(&gTrkPerfPool, gTrkPerfs, 32, sizeof(AudTrack));
+        UList_Reset(&gTrkPerfLists[0], 32);
+        UList_Reset(&gTrkPerfLists[1], 32);
         bOk = Seq_InitModule();
         if (bOk) {
             bOk = Stm_InitModule();
@@ -161,7 +161,7 @@ AudTrack* Trk_AllocPerf(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f3
             return NULL;
         }
     }
-    pTrack = fn_800AE1AC(pPool);
+    pTrack = UPool_Alloc(pPool);
     pTrack->pTmpl = pTmpl;
     pTrack->pSource = pSource;
     pSource->apTracks[nChannel] = pTrack;
@@ -179,7 +179,7 @@ AudTrack* Trk_AllocPerf(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f3
     pTrack->params.flags.n = 0;
     Mem_set(pTrack->apVoices, 0, sizeof(pTrack->apVoices));
     if (bSorted == 0) {
-        fn_800ADEC8(pList, &pTrack->link);
+        UList_PushTail(pList, &pTrack->link);
     } else {
         InsertSortWorldPerf(pTrack);
     }
@@ -222,8 +222,8 @@ s32 Trk_FreePerf(AudTrack* pTrack) {
     pTrack->pTmpl = NULL;
     pTrack->nState = 0;
     pTrack->pSource = NULL;
-    fn_800ADF6C(pList, &pTrack->link);
-    fn_800AE1DC(pPool, pTrack);
+    UList_DeleteAt(pList, &pTrack->link);
+    UPool_Free(pPool, pTrack);
     return 0;
 }
 
@@ -286,7 +286,7 @@ void Trk_UpdatePerf(AudSource* pSource, AudTrack* pTrack, AudTrackTmpl* pTmpl, u
     }
     if (bUpdate && pTrack->bits.b.bSorted == 1) {
         pTrack->f48 = fPriority;
-        fn_800ADF6C(&gTrkPerfLists[1], &pTrack->link);
+        UList_DeleteAt(&gTrkPerfLists[1], &pTrack->link);
         InsertSortWorldPerf(pTrack);
     }
 }
@@ -395,7 +395,7 @@ void Trk_Render(AudTrack* pTrack) {
     pList = pTrack->pTmpl->data.pPlayList;
     if (pList == NULL) return;
     fCurve = Mas_GetSubmix(pList->n3);
-    fVolume = fn_800A85FC(pTrack->f44, fCurve);
+    fVolume = audfrac_Mul(pTrack->f44, fCurve);
     if (pTrack->bits.b.bSorted == 1) {
         TrkRender3D(pSource, pTrack, fVolume);
         return;
