@@ -126,8 +126,8 @@ s32 gMadChromaBlocks[2][64];        // a macroblock's U and V blocks
 u8 gMadClamp[512];           // a pixel value's clamp to 0..255, by its low 9 bits
 
 void madinit(void);
-u32 fn_800B8984(u8* pData, int nBytes);
-s32 fn_800B8A04(s32 a, s32 b);
+u32 MAD_ReadLittleEndian(u8* pData, int nBytes);
+s32 MAD_FixedMul(s32 a, s32 b);
 void MAD_decodemacroblock(u8* src_y, u8* src_cb, u8* src_cr, u8* dest_y, u8* dest_cb, u8* dest_cr, int width);
 int madvlcdecode(void);
 void idctcompute(s32* dest, int stride);
@@ -240,20 +240,23 @@ void discardbits(int bits) {
     madshiftreg <<= bits;
     madbitcount -= bits;
     if (madbitcount < 16) {
-        madshiftreg |= fn_800B8984(maddataptr, 2) << (16 - madbitcount);
+        madshiftreg |= MAD_ReadLittleEndian(maddataptr, 2) << (16 - madbitcount);
         madbitcount += 16;
         maddataptr += 2;
     }
 }
 
-// The code at the top of the buffer: its entry's low byte is its length in bits.
+// Reads one delta code from the bit buffer (madvlctbl4, by its top 6 bits): a 0 bit is 0; a 1 bit
+// and five more are 1..16 or -16..-1. MAD_decodemacroblock reads a macroblock's motion (x, then y)
+// and a reference block's level change with it.
 s32 getdelta(void) {
     s32 nCode = madvlctbl4[madshiftreg >> 26];
     discardbits(nCode & 0xFF);
     return nCode >> 22;
 }
 
-// Fill an 8x8 block (rows stride words apart) with idctinput[0].
+// Fills an 8x8 block (rows stride words apart) with the DC value idctinput[0]: what the inverse DCT
+// gives a block whose only coefficient is the DC one (madvlcdecode returned 1), without running it.
 void dcblock(s32* dest, int stride) {
     int i;
 
@@ -270,7 +273,9 @@ void dcblock(s32* dest, int stride) {
     }
 }
 
-// An 8x8 block of pixels into a 16-wide block of 16.16 values, correction added to each.
+// Copies an 8x8 block of reference pixels (rows stride bytes apart) into the 16-wide luma block as
+// 16.16 values, correction added to each (MAD_decodemacroblock passes a delta x 2 - 128: the
+// block's level change, and the -128 that centres pixels on 0).
 void getluma(const u8* src, int stride, s32* dest, int correction) {
     int i;
 
@@ -288,7 +293,7 @@ void getluma(const u8* src, int stride, s32* dest, int correction) {
     }
 }
 
-// The same into an 8-wide block.
+// getluma for a U or V block: into an 8-wide block.
 void getchroma(const u8* src, int stride, s32* dest, int correction) {
     int i;
 
@@ -306,7 +311,8 @@ void getchroma(const u8* src, int stride, s32* dest, int correction) {
     }
 }
 
-// A 16x16 block of 16.16 values back to pixels, clamped through gMadClamp.
+// Turns the 16x16 luma block of 16.16 values (centred on 0) back into pixels 0..255 through
+// gMadClamp, rows stride bytes apart.
 void setluma(const s32* src, u8* dest, int stride) {
     int i;
 
@@ -332,7 +338,7 @@ void setluma(const s32* src, u8* dest, int stride) {
     }
 }
 
-// An 8x8 block of 16.16 values back to pixels.
+// setluma for a U or V block: 8x8.
 void setchroma(const s32* src, u8* dest, int stride) {
     int i;
 
@@ -350,21 +356,24 @@ void setchroma(const s32* src, u8* dest, int stride) {
     }
 }
 
-// Start a picture: src is its coded data, motion 0 for a key frame and 1 for one coded against
-// a reference, quality the picture's quality.
+// Starts decoding a picture: builds the tables on first use (madinit), loads the first 32 bits of
+// src (its coded data) into the bit buffer and keeps motion (0 a key frame, 1 coded against a
+// reference). quality scales MPEG-1's intra matrix into madquant (gMadIntraQuant[i] x quality / 8),
+// with the IDCT's factors folded in (idctprescale); the DC coefficient's step does not change with
+// quality (it is the quality-8 one).
 void MAD_initdecode(u8* src, int motion, int quality) {
     int i;
 
     if (gbMadTablesBuilt == 0) {
         madinit();
     }
-    madshiftreg = (fn_800B8984(src, 2) << 16) | fn_800B8984(src + 2, 2);
+    madshiftreg = (MAD_ReadLittleEndian(src, 2) << 16) | MAD_ReadLittleEndian(src + 2, 2);
     madbitcount = 32;
     maddataptr = src + 4;
     gMadMotion = motion;
-    madquant[0] = fn_800B8A04(gMadIntraQuant[0] << 16, idctprescale[0]);
+    madquant[0] = MAD_FixedMul(gMadIntraQuant[0] << 16, idctprescale[0]);
     for (i = 1; i < 64; i++) {
-        madquant[i] = fn_800B8A04((quality * gMadIntraQuant[i]) << 13, idctprescale[i]);
+        madquant[i] = MAD_FixedMul((quality * gMadIntraQuant[i]) << 13, idctprescale[i]);
     }
 }
 
@@ -467,8 +476,9 @@ void MAD_decodemacroblock(u8* src_y, u8* src_cb, u8* src_cr, u8* dest_y, u8* des
     setchroma(gMadChromaBlocks[1], dest_cr, nHalf);
 }
 
-// nBytes bytes at pData, little-endian.
-u32 fn_800B8984(u8* pData, int nBytes) {
+// Reads nBytes (1 to 4) bytes at pData as a little-endian number; 0 for any other count. The bit
+// buffer's refills read 2 at a time.
+u32 MAD_ReadLittleEndian(u8* pData, int nBytes) {
     if (nBytes == 1) {
         return pData[0];
     }
@@ -484,17 +494,18 @@ u32 fn_800B8984(u8* pData, int nBytes) {
     return 0;
 }
 
-// a * b in 16.16 fixed point, rounded.
-s32 fn_800B8A04(s32 a, s32 b) {
+// a * b in 16.16 fixed point, rounded (through a 64-bit product).
+s32 MAD_FixedMul(s32 a, s32 b) {
     return ((s64)a * b + 0x8000) >> 16;
 }
 
-// The same as discardbits.
-void fn_800B8A2C(int nBits) {
+// The same as discardbits: madvlcdecode's own copy. NFSMW's maddeca.cpp (EA's rcmp package) keeps a
+// static discardbits beside madvlcdecode, so this is EA's discardbits of another source file.
+void MAD_DiscardBitsVlc(int nBits) {
     madshiftreg <<= nBits;
     madbitcount -= nBits;
     if (madbitcount < 16) {
-        madshiftreg |= fn_800B8984(maddataptr, 2) << (16 - madbitcount);
+        madshiftreg |= MAD_ReadLittleEndian(maddataptr, 2) << (16 - madbitcount);
         madbitcount += 16;
         maddataptr += 2;
     }
@@ -512,7 +523,7 @@ int madvlcdecode(void) {
 
     nDC = (s32)madshiftreg >> 24;
     idctinput[0] = nDC * madquant[0];
-    fn_800B8A2C(8);
+    MAD_DiscardBitsVlc(8);
     // fake match: the 63 words cleared three per pass; a loop of single stores unrolls 9-way, not
     // EA's 21 stores x 3
     p = &idctinput[1];
@@ -529,26 +540,26 @@ int madvlcdecode(void) {
         if (nLen > 9) {
             if (!(nLen & 0x20)) {
                 if (!(nLen & 0x10)) {
-                    fn_800B8A2C(9);
+                    MAD_DiscardBitsVlc(9);
                     uCode = madvlctbl2[madshiftreg >> 24];
                     nLen = uCode & 0xFF;
                 } else {
-                    fn_800B8A2C(6);
+                    MAD_DiscardBitsVlc(6);
                     uCode = madvlctbl3[madshiftreg >> 24];
                     nLen = uCode & 0xFF;
                 }
             } else if (!(nLen & 0x10)) {
                 // escape: the run and level follow as they are
-                fn_800B8A2C(6);
+                MAD_DiscardBitsVlc(6);
                 uCode = madshiftreg;
                 nLen = 16;
             } else {
                 // end of block
-                fn_800B8A2C(2);
+                MAD_DiscardBitsVlc(2);
                 return n;
             }
         }
-        fn_800B8A2C(nLen);
+        MAD_DiscardBitsVlc(nLen);
         n += (uCode >> 16) & 0x3F;
         i = gMadScanOrder[n++];
         idctinput[i] = ((s32)uCode >> 22) * madquant[i];
@@ -592,16 +603,16 @@ void IdctColumn(s32* src, s32* dest) {
     // register note: z13 and z5 are reused for the later sums (z13: the odd sum, then o0; z5: t12,
     // then o1), which gives EA's register allocation
     z13 = z13 + z11;
-    z5 = fn_800B8A04(z10 + z12, 0x61F8);
-    t10 = z5 + fn_800B8A04(z10, 0x8A8C);
-    t11 = fn_800B8A04(t11, 0xB505);
-    z5 = fn_800B8A04(z12, 0x14E7B) - z5;
+    z5 = MAD_FixedMul(z10 + z12, 0x61F8);
+    t10 = z5 + MAD_FixedMul(z10, 0x8A8C);
+    t11 = MAD_FixedMul(t11, 0xB505);
+    z5 = MAD_FixedMul(z12, 0x14E7B) - z5;
     z13 = z13 + z5;
     z5 = z5 + t11;
     o2 = t11 + t10;
     e0 = src[0] + src[4];
     e1 = src[0] - src[4];
-    t = fn_800B8A04(src[2] - src[6], 0xB505);
+    t = MAD_FixedMul(src[2] - src[6], 0xB505);
     e2 = e1 - t;
     e1 = e1 + t;
     s = src[2] + src[6] + t;
@@ -641,16 +652,16 @@ void IdctRow(s32* src, s32* dest) {
     t11 = z11 - z13;
     // register note: z13 and z5 reused as in IdctColumn
     z13 = z13 + z11;
-    z5 = fn_800B8A04(z10 + z12, 0x61F8);
-    t10 = z5 + fn_800B8A04(z10, 0x8A8C);
-    t11 = fn_800B8A04(t11, 0xB505);
-    z5 = fn_800B8A04(z12, 0x14E7B) - z5;
+    z5 = MAD_FixedMul(z10 + z12, 0x61F8);
+    t10 = z5 + MAD_FixedMul(z10, 0x8A8C);
+    t11 = MAD_FixedMul(t11, 0xB505);
+    z5 = MAD_FixedMul(z12, 0x14E7B) - z5;
     z13 = z13 + z5;
     z5 = z5 + t11;
     o2 = t11 + t10;
     e0 = src[0] + src[4];
     e1 = src[0] - src[4];
-    t = fn_800B8A04(src[2] - src[6], 0xB505);
+    t = MAD_FixedMul(src[2] - src[6], 0xB505);
     e2 = e1 - t;
     e1 = e1 + t;
     s = src[2] + src[6] + t;

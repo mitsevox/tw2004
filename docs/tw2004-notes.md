@@ -377,7 +377,7 @@ Leads and loose ends
 - `OnModADSRVol` (15 instructions, C bit-fields): **does not settle GC/2.0 vs GC/2.5.** The C is known
   (read the index byte into a local, store into a byte table, set two 1-bit fields from `index == 0`
   and `index == 1`) and matches exactly, but GC/2.0, 2.5 and 2.6 all produce the same bytes for it.
-  Not yet added to the project. Two larger bit-packing functions remain untested: `fn_800B8984`, `MAD_ReadNextFile`.
+  Not yet added to the project. Two larger bit-packing functions remain untested: `MAD_ReadLittleEndian`, `MAD_ReadNextFile`.
 - `fn_8000B508`, `fn_8000B54C`, `fn_8000B70C`: linked-list search family (head pointer at
   `0x80281BFC`, `next` at `0xC`, two ID fields at `0x1C` and `0x20`). C for `fn_8000B70C` already
   produces matching bytes; not yet added to the project.
