@@ -110,8 +110,8 @@ LAYOUT_ASSERT(FE801D8858, 0x38);
 
 extern FE801D8858 gUILoadingScreen;
 
-// A corner of a quad uiProcessPolygon.c UIPoly_UnpackVertex turns into draw arrays (uiArc.c builds them too). Our
-// name: f8..f10 go out as a position, f0/f4 as texture coordinates, au14 as a colour.
+// A corner of a quad uiProcessPolygon.c UIPoly_UnpackVertex turns into draw arrays (uiArc.c builds
+// them too). Our name: f8..f10 go out as a position, f0/f4 as texture coordinates, au14 as a colour.
 typedef struct FEVertex {
     f32 f0;                     // 0x00
     f32 f4;                     // 0x04
@@ -122,8 +122,8 @@ typedef struct FEVertex {
 } FEVertex;
 LAYOUT_ASSERT(FEVertex, 0x18);
 
-// A textured quad of the front end that uiProcessPolygon.c UIPoly_ProcessMessage takes messages for. Our name; only
-// what the cleaned code reads (its size is not known).
+// A textured quad of the front end that uiProcessPolygon.c UIPoly_ProcessMessage takes messages
+// for. Our name; only what the cleaned code reads (its size is not known).
 typedef struct FEQuad {
     s16 n0;                     // 0x00  } with n2, an index pair into the UI file (UI_LoadEntryPicture)
     s16 n2;                     // 0x02  }
@@ -142,7 +142,8 @@ typedef union FEMsgArg {
 
 void FE_InitGolferTextures(void);  // FEgolferanim.c (FE_Manager.c, uiProcessInterface.c call it)
 
-// uiProcessPolygon.c: the quads' message handler (the studio's handler 0, uiProcessInterface.c UI_OpenInterface).
+// uiProcessPolygon.c: the quads' message handler (the studio's handler 0, uiProcessInterface.c
+// UI_OpenInterface).
 void UIPoly_ProcessMessage(FEQuad* pQuad, int nMsg, u32 bSplit, FEMsgArg* pArgs);
 
 // Four floats each, set by uiProcessPolygon.c UIPoly_Draw: UIPoly_TintVertex tints a vertex colour to
@@ -456,8 +457,8 @@ void FE_MakeCameoMoviePath(char* pName, char* pPath);   // "data/movies/cameos/<
 // A movie's skip test for LLVideo.c's LLVideo_PlayFile (whose arguments it ignores): any button.
 u8   FE_IsMovieSkipPressed(struct Video* pVideo, int nArg);
 
-// uiProcessPolygon.c: the texture bank loaded from LoadData.c's 'txf2' copy (UI_LoadLoadingBarTexture), its slot and its
-// first texture.
+// uiProcessPolygon.c: the texture bank loaded from LoadData.c's 'txf2' copy
+// (UI_LoadLoadingBarTexture), its slot and its first texture.
 struct TexEntry* UI_GetTexBankFirstTexture(struct TexBank* pBank);   // a bank's first texture
 extern int gUILoadingBarBankSlot;                // the bank's slot
 extern struct TexBank*  gpUILoadingBarBank;
@@ -576,15 +577,15 @@ LogoRecord* FE_LogoDesign_GetCurrentLogo(void);          // the logo being edite
 s16* FE_LogoDesign_GetClut(void);                 // the palette
 int  FE_LogoDesign_GetPixelColor(int nX, int nY, u32* pR, u32* pG, u32* pB, u32* pA);  // a pixel's colour index,
                                         // and its colour as FE_LogoDesign_GetClutEntry gives it
-void FE_LogoDesign_CopyLogoTexturePixels(u8* pDst, u8* pSrc, int bToTexture, int nWidth, int nHeight);  // copy pixels:
-                                        // 0 from a texture into the logo, 1 from the logo into one
-u8*  FE_LogoDesign_GetLogoAsTexture(u8* pLogo, int nWidth, int nHeight);   // the logo's pixels as a texture (in
-                                        // gLogoTexturePixels)
+// Copy pixels: bToTexture 0 from a texture into the logo, 1 from the logo into one.
+void FE_LogoDesign_CopyLogoTexturePixels(u8* pDst, u8* pSrc, int bToTexture, int nWidth, int nHeight);
+// The logo's pixels as a texture (in gLogoTexturePixels).
+u8*  FE_LogoDesign_GetLogoAsTexture(u8* pLogo, int nWidth, int nHeight);
 
-extern u8 gLogoTexturePixels[64 * 64];        // a logo's pixels laid out as a texture (FE_LogoDesign_GetLogoAsTexture);
-                                        // 64 x 64 or 128 x 32
+extern u8 gLogoTexturePixels[64 * 64];  // a logo's pixels laid out as a texture
+                                        // (FE_LogoDesign_GetLogoAsTexture); 64 x 64 or 128 x 32
 
-// ---- the front end's movies (uiProcessPolygon.c) -------------------------------------------------------
+// ---- the UI's polygon element, loading screen and start-up movies (uiProcessPolygon.c) -------
 
 extern u8 gbUIFirstMenuDraw;         // UI_ClearFirstMenuDraw clears it; the front end's shutdown in game type 3
                                 // sets it (uiProcessInterface.c UI_CloseInterface)

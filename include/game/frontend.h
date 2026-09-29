@@ -154,8 +154,8 @@ void GM_vSetupPlayers(MsgArg* pArgs, MsgArg* pResult);  // FE_MessageTable.c: FE
 // A menu UI arc (uiArc.c): nSegments pieces from fStart to fEnd degrees, shaded from colour
 // colorA to colorB. Only what the code reads so far.
 typedef struct UIArc {
-    s16  n0;                    // 0x00  } passed to uiProcessPolygon.c's UI_LoadEntryPicture and UI_ReleaseEntryPicture
-    s16  n2;                    // 0x02  } (-1: none)
+    s16  n0;                    // 0x00  } passed to uiProcessPolygon.c's UI_LoadEntryPicture and
+    s16  n2;                    // 0x02  } UI_ReleaseEntryPicture (-1: none)
     u8   unk4[4];
     u16  u8;                    // 0x08
     u16  uFlags;                // 0x0A
