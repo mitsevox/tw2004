@@ -1,13 +1,17 @@
-// GoBreakLine.c (EA's name, from its asserts): the putt's break line, a line on the green from the
-// ball that shows how the putt will break (BreakLine, breakline.h).
+// GoBreakLine.c (EA's name, from its asserts; TW07 golf/hi-rendering/GoBreakLine.c): the putt's
+// break line, a line on the green from the ball that shows how the putt will break (BreakLine,
+// breakline.h). When the player stands over a putt, a copy of the ball is launched with the
+// putt's power for the distance and stepped a little each frame, laying a textured strip behind
+// it; the point where it came nearest the cup is kept for GameAnalysis_GetPuttBreakAngle. Also the
+// caddie's putt read in feet (BreakLine_GetCaddyTipInfo).
 
 #include "golfer.h"
 #include "game.h"
 #include "camera.h"
 #include "breakline.h"
 
-u8 gbBreakLineOn;
-BreakLine* gpBreakLine;
+u8 gbBreakLineOn;            // a line was started (BreakLine_Reset); BreakLine_Update steps it
+BreakLine* gpBreakLine;      // the line's state, allocated by BreakLine_InitModule
 
 void SD_InitShaderObject(void* pMesh, int n, s32* pDesc);    // Skin.c: sets up a mesh object
 void SD_FreeShaderObject(void* pMesh);         // Skin.c: frees a mesh object

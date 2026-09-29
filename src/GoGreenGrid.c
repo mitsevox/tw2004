@@ -1,6 +1,8 @@
-// GoGreenGrid.c (EA's name, from its asserts; TW06): the grid drawn over the putting green. It is
-// laid out from the target back towards the ball, the ground height under each point is sampled a
-// few points a frame, and the lines are built into a mesh per view.
+// GoGreenGrid.c (EA's name, from its asserts; TW06; TW07 golf/hi-rendering/GoGreenGrid.c): the grid
+// drawn over the putting green (and around a target on the green or fringe). It is laid out from
+// the target back towards the ball (GR_ResetGreenGrid), the ground height under each point is
+// sampled a few points a frame (GR_UpdateGreenGrid), and the lines are built into a mesh per view
+// and drawn (GR_DrawGreenGrid).
 
 #include "game_types.h"
 #include "game.h"
@@ -26,8 +28,8 @@ void GR_BuildGridRenderData(s32 nView);
 u8   GR_ShouldDrawGrid(int nPlayer);
 u8   GR_PlayerIsTargetingGreen(int nPlayer);
 
-GreenGrid gGreenGrid;
-GreenGrid* gpGreenGrid = &gGreenGrid;
+GreenGrid gGreenGrid;                   // the grid's state
+GreenGrid* gpGreenGrid = &gGreenGrid;   // every GR_ function reads the grid through it
 TexBank*  gpGreenGridTexBank;   // the "gridpt" texture's bank
 TexEntry* gpGreenGridTex;       // and the texture
 
@@ -81,16 +83,10 @@ void GR_vInit(void) {
     fn_800102DC(fn_8000BEE4("gridpt"), &gpGreenGridTexBank, &gpGreenGridTex);
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
-void GR_vInitForHole(void);
-
 // The grid's per-hole set-up, called in the per-hole list just before BreakLine_InitForHole; empty
 // in this build.
 void GR_vInitForHole(void) {
 }
-
-// ---- end of sweep code ----
 
 // Frees each view's grid mesh and buffers (GR_vInit's), in gomainloop's shut-down.
 void GR_vClose(void) {

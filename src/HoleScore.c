@@ -1,11 +1,17 @@
-// HoleScore.c (our name; TW06's golf/gamemode/analysisutilities.c, medium evidence: TW06 names
-// GameAnalysis_IsPuttFor GameAnalysis_IsPuttFor): per-player round analysis for the situation
-// scripts, the earnings and the game modes: distances to the pin, the ground the shot started from,
-// and counts and streaks of holes by score against par.
+// HoleScore.c (our name; EA's file is golf/gamemode/AnalysisUtilities.c: TW07 lists every function
+// here in that file in the same order, and TW06 names GameAnalysis_IsPuttFor): per-player analysis
+// of the round for the situation scripts, the earnings, the records and the game modes. Whether a
+// putt is for the lead or the win and what the hole or round would come to if the ball dropped;
+// the distances to the pin and the ground the shot started from; counts and streaks of holes by
+// score against par, fairways, greens in regulation and putts; the putt's break angle, the wind
+// against the aim and the sidehill slope.
 
 #include "golfer.h"
 #include "game.h"
 
+// Set only while GameAnalysis_ShotWouldEndHole asks the mode whether the hole is over:
+// GameModeMatch, GameModeFourBall and GameModeAlternateShot then do not count the asking player's
+// own side as done.
 u8  gbTestingHoleEnd;
 
 f32  GameAnalysis_GetInitialDistanceToPin(int nPlayer);
@@ -17,7 +23,7 @@ int  GameAnalysis_CountHolesOverPar(int nPlayer);
 int  GameAnalysis_CountStreakHoleScores(int nPlayer, int nToPar);
 int  GameAnalysis_CountTotalPutts(int nPlayer);
 void GameAnalysis_Vec3Sub(f32* pA, f32* pB, f32* pOut);
-void BreakLine_GetClosestPointToCupPos(int nView, f32* pOut); // GoBreakLine: a point kept per view
+void BreakLine_GetClosestPointToCupPos(int nView, f32* pOut);   // GoBreakLine.c
 
 // gpGame->pfnIsPuttForLead: whether holing this ball would put the player in the lead (the others'
 // balls not yet holed counting one more stroke). Strokes (scoring kind 0): only when not leading
@@ -270,9 +276,9 @@ u8 GameAnalysis_IsPredictedBallTrophy(int nPlayer) {
 // the last hole, the round would beat kind 0's with the tap-in; 0x2 the ball is on the tee; 0x4 on
 // the green or fringe, a putt of 3 x fA64 beats kind 2's; 0x8 off the green two under par or
 // better, one more of GameAnalysis_CountTotalGIRs beats kind 3's; 0x10 on the last hole, the
-// round's putts (one more on the green or fringe) beat kind 4's; 0x20 on the tee of a par 4 or 5, one more of
-// GameAnalysis_CountTotalFairways beats kind 5's; 0x40 and 0x80 two under / one under par or
-// better, one more eagle (GameAnalysis_NumEaglesSoFarThisRound) / birdie
+// round's putts (one more on the green or fringe) beat kind 4's; 0x20 on the tee of a par 4 or 5,
+// one more of GameAnalysis_CountTotalFairways beats kind 5's; 0x40 and 0x80 two under / one under
+// par or better, one more eagle (GameAnalysis_NumEaglesSoFarThisRound) / birdie
 // (GameAnalysis_NumBirdiesSoFarThisRound) beats kinds 6 / 7.
 u32 GameAnalysis_IsShotForRecord(int nPlayer) {
     Player* pPlayer = &gPlayers[nPlayer];
