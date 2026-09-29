@@ -15,7 +15,7 @@ u32 lbl_80281DB0;
 UMemPool* lbl_80281DAC;
 UMemPool* lbl_80281DA8;
 
-DynObj* fn_80049018(DynObjSetup* pSetup);
+DynObj* Kernel_CreateObject(DynObjSetup* pSetup);
 void fn_8000E830(DynObj* pObj);
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);                   // identity
 void UObject_ComposeRotation(f32 (*pMtx)[4]);
@@ -25,12 +25,12 @@ void StaticCam_ParseStaticCameraActor(UStreamObject* pObject);
 void Gaud_ActorDownloadCallback(UStreamObject* pObject, int n);
 void PlayNow_LoadBallSpot(void* pObj);
 
-void fn_80048B70(void* p);
-void fn_80048BDC(UStreamObject* pObject);
+void Kernel_FreeObjectMem(void* p);
+void Kernel_DownloadActors(UStreamObject* pObject);
 
 // Memory for an object of nSize bytes: a node of the small or the large pool while one is free,
 // else from the heap.
-void* fn_80048AF4_DynObjAlloc(int nSize) {
+void* Kernel_AllocObjectMem(int nSize) {
     if (nSize < 400 && lbl_80281DAC->nFree != 0) {
         return AllocPoolMem(lbl_80281DAC);
     }
@@ -41,7 +41,7 @@ void* fn_80048AF4_DynObjAlloc(int nSize) {
 }
 
 // Gives an object's memory back to the pool it came from, or to the heap.
-void fn_80048B70(void* p) {
+void Kernel_FreeObjectMem(void* p) {
     if ((u8*)p > (u8*)lbl_80281DAC && (u8*)p < lbl_80281DAC->pEnd) {
         ReturnPoolMem(lbl_80281DAC, p);
     } else if ((u8*)p > (u8*)lbl_80281DA8 && (u8*)p < lbl_80281DA8->pEnd) {
@@ -51,10 +51,13 @@ void fn_80048B70(void* p) {
     }
 }
 
-// The 'Cact' stream handler: an object's definition arrived. Some types are handed to their own
-// systems (the tee and pin positions, types 7, 9, 10, 200 and 201; type 8 is dropped); the others
-// get their stream objects looked up and become a dynamic object, and the stream object is freed.
-void fn_80048BDC(UStreamObject* pObject) {
+// The 'Cact' stream handler: one actor (dynamic object) of the hole arrived. By its type (the
+// 'tACT' data's n4): 200 and 201 are fly-by and static cameras (StaticCam), 5 and 6 go to
+// fn_80034720 / fn_800347B4 (6 continues when that answers nonzero), 7 is a particle emitter
+// (fn_8009943C), 8 is dropped, 9 is a sound (Gaud_ActorDownloadCallback), 10 the Play Now ball
+// spot. Any other type becomes a dynamic object: its 'aRSL' resource list is resolved into model
+// references, its handler found by type (fn_800499B0), and the stream object is freed.
+void Kernel_DownloadActors(UStreamObject* pObject) {
     DynObjSetup setup;
     TagRecord* pChunk;
     int i;
@@ -106,13 +109,14 @@ void fn_80048BDC(UStreamObject* pObject) {
     setup.pC = (DynObjNames*)pObject;
     pObject->pData = (u8*)setup.pModel;
     pObject->pfn8 = NULL;
-    pObject->uUnk4 = fn_800490B8(&setup);
+    pObject->uUnk4 = Kernel_CreateObjectId(&setup);
     StaticMem_Free(pObject);
 }
 
-// Sets the kernel up: the 'Cact' stream handler, the two node pools and an empty list.
-void fn_80048DD0(void) {
-    Stream_RegisterLoadChunkCallback('Cact', fn_80048BDC);
+// Sets the kernel up when a round starts (GO_vInitIG): the 'Cact' handler (Kernel_DownloadActors),
+// the two node pools (256 nodes each of 400 and 528 bytes) and an empty object list.
+void Kernel_InitModule(void) {
+    Stream_RegisterLoadChunkCallback('Cact', Kernel_DownloadActors);
     lbl_80281DAC = CreateMemPool(256, 400, 2, 16);
     lbl_80281DA8 = CreateMemPool(256, 528, 2, 16);
     lbl_80281DBC = NULL;
@@ -121,11 +125,12 @@ void fn_80048DD0(void) {
     lbl_80281DB0 = 0;
 }
 
-DynObj* fn_80048E44(void) {
+DynObj* Kernel_GetFirstObject(void) {
     return lbl_80281DBC;
 }
 
-DynObj* fn_80048E4C(int nId) {
+// The dynamic object whose id (n134, given by Kernel_CreateObject) is nId; NULL when none has it.
+DynObj* Kernel_FindObjectById(int nId) {
     DynObj* pObj;
 
     for (pObj = lbl_80281DBC; pObj != NULL; pObj = pObj->pNext) {
@@ -136,43 +141,46 @@ DynObj* fn_80048E4C(int nId) {
     return NULL;
 }
 
-// Shuts the kernel down: every object with an id gives it up (flag 0x10000000 set first), the
-// list is swept twice (fn_800490EC) and the pools are freed.
-void fn_80048E7C(void) {
+// Shuts the kernel down at a round's end: every object with an id gives it up (flag 0x10000000 set
+// first, Kernel_ReleaseObject), the list is swept twice (Kernel_SweepDeadObjects: marked, then
+// freed) and the two pools are deleted.
+void Kernel_CloseModule(void) {
     DynObj* pObj;
 
     for (pObj = lbl_80281DBC; pObj != NULL; pObj = pObj->pNext) {
         if (pObj->n134 != 0) {
             pObj->uFlags |= 0x10000000;
-            fn_800491C4(pObj);
+            Kernel_ReleaseObject(pObj);
         }
     }
-    fn_800490EC();
-    fn_800490EC();
+    Kernel_SweepDeadObjects();
+    Kernel_SweepDeadObjects();
     lbl_80281DB4 = 0;
     DeleteMemPool(lbl_80281DAC);
     DeleteMemPool(lbl_80281DA8);
 }
 
-// The same, keeping the pools, and the list starts over empty.
-void fn_80048EF4(void) {
+// Removes every dynamic object as Kernel_CloseModule does, but keeps the pools and starts the list,
+// the ids and the overflow slots over; called by fn_8006F568.
+void Kernel_RemoveAllObjects(void) {
     DynObj* pObj;
 
     for (pObj = lbl_80281DBC; pObj != NULL; pObj = pObj->pNext) {
         if (pObj->n134 != 0) {
             pObj->uFlags |= 0x10000000;
-            fn_800491C4(pObj);
+            Kernel_ReleaseObject(pObj);
         }
     }
-    fn_800490EC();
-    fn_800490EC();
+    Kernel_SweepDeadObjects();
+    Kernel_SweepDeadObjects();
     lbl_80281DBC = NULL;
     lbl_80281DB8 = NULL;
     lbl_80281DB4 = 0;
     lbl_80281DB0 = 0;
 }
 
-void fn_80048F68(int nMsg, void* pArg, void* pArg2) {
+// Sends message nMsg with pArg and pArg2 to the handler of every live object (id above 0).
+void Kernel_BroadcastMessage(int nMsg, void* pArg, void* pArg2) {
     DynObj* pObj;
 
     for (pObj = lbl_80281DBC; pObj != NULL; pObj = pObj->pNext) {
@@ -182,7 +190,9 @@ void fn_80048F68(int nMsg, void* pArg, void* pArg2) {
     }
 }
 
-void fn_80048FEC(DynObj* pObj) {
+// Links the new object in at the end of the kernel's list (its pNext cleared); Kernel_CreateObject
+// calls it.
+void Kernel_AppendObject(DynObj* pObj) {
     if (lbl_80281DB8 != NULL) {
         lbl_80281DB8->pNext = pObj;
         lbl_80281DB8 = pObj;
@@ -195,8 +205,8 @@ void fn_80048FEC(DynObj* pObj) {
 
 // A new object: its handler gives its size (message 1), then sets it up (message 2), and it gets
 // the next id and goes at the end of the list. NULL when there was no memory.
-DynObj* fn_80049018(DynObjSetup* pSetup) {
-    DynObj* pObj = fn_80048AF4_DynObjAlloc(pSetup->pfnHandler(1, NULL, NULL, NULL));
+DynObj* Kernel_CreateObject(DynObjSetup* pSetup) {
+    DynObj* pObj = Kernel_AllocObjectMem(pSetup->pfnHandler(1, NULL, NULL, NULL));
 
     if (pObj == NULL) {
         return NULL;
@@ -204,13 +214,13 @@ DynObj* fn_80049018(DynObjSetup* pSetup) {
     pObj->pfnHandler = pSetup->pfnHandler;
     pObj->n134 = ++lbl_80281DB4;
     pObj->pfnHandler(2, pObj, pSetup, NULL);
-    fn_80048FEC(pObj);
+    Kernel_AppendObject(pObj);
     return pObj;
 }
 
-// The id of a new object (fn_80049018), or -2 when none could be made.
-s32 fn_800490B8(DynObjSetup* pSetup) {
-    DynObj* pObj = fn_80049018(pSetup);
+// The id of a new object (Kernel_CreateObject), or -2 when none could be made.
+s32 Kernel_CreateObjectId(DynObjSetup* pSetup) {
+    DynObj* pObj = Kernel_CreateObject(pSetup);
 
     if (pObj != NULL) {
         return pObj->n134;
@@ -220,7 +230,7 @@ s32 fn_800490B8(DynObjSetup* pSetup) {
 
 // Sweeps the list: an object that gave up its id (0) is marked -1, and one already marked is shut
 // down (message 5), taken out of the list and freed.
-void fn_800490EC(void) {
+void Kernel_SweepDeadObjects(void) {
     DynObj* pNext;
     DynObj* pPrev = NULL;
     DynObj* pObj;
@@ -244,7 +254,7 @@ void fn_800490EC(void) {
                 if (pAfter == NULL) {
                     lbl_80281DB8 = pPrev;
                 }
-                fn_80048B70(pObj);
+                Kernel_FreeObjectMem(pObj);
             } else {
                 pObj->n134 = -1;
             }
@@ -254,9 +264,9 @@ void fn_800490EC(void) {
     }
 }
 
-// Takes the object's id away (n134 = 0), first passing its p160 to fn_8000EA1C unless p160 is
-// NULL or flag 0x20000000 is set.
-void fn_800491C4(DynObj* pObj) {
+// Marks the object for removal: its id n134 becomes 0 (Kernel_SweepDeadObjects frees it later),
+// first running its p160 byte-code (fn_8000EA1C) unless p160 is NULL or flag 0x20000000 is set.
+void Kernel_ReleaseObject(DynObj* pObj) {
     if (pObj->n134 != 0) {
         if (!(pObj->uFlags & 0x20000000) && pObj->p160 != NULL) {
             fn_8000EA1C(pObj->p160, !(pObj->uFlags & 0x10000000), -1, pObj);
@@ -266,7 +276,7 @@ void fn_800491C4(DynObj* pObj) {
 }
 
 // Takes a free entry of lbl_801D5228 for the object and the pair (a, b). 0 when all 16 are taken.
-int fn_80049230(DynObj* pObj, int a, int b) {
+int Kernel_PostPairToOverflowSlot(DynObj* pObj, int a, int b) {
     DynObjSlot* pSlot;
     u32 uBit;
 
@@ -290,7 +300,7 @@ int fn_80049230(DynObj* pObj, int a, int b) {
 
 // Records the pair (a, b) on the object, in its first free pair; when all four are taken and
 // bOverflow is set, in lbl_801D5228 instead. 0 when it could not be recorded.
-int fn_80049298(DynObj* pObj, int a, int b, int bOverflow) {
+int Kernel_PostPairToObject(DynObj* pObj, int a, int b, int bOverflow) {
     int i = 0;
 
     do {
@@ -301,13 +311,14 @@ int fn_80049298(DynObj* pObj, int a, int b, int bOverflow) {
         }
     } while (++i < 4);
     if (bOverflow) {
-        return fn_80049230(pObj, a, b);
+        return Kernel_PostPairToOverflowSlot(pObj, a, b);
     }
     return 0;
 }
 
-// Records (a, b) on every object with an id whose n140 is nKey (a = 126: none).
-void fn_80049304(int nKey, int a, int b) {
+// Stores (a, b) on every live object whose actor id n140 (the actor chunk's id) is nKey; nothing
+// when a is 126. The actor byte-code's opcode 56 (fn_8000EA1C).
+void Kernel_PostPairByActorId(int nKey, int a, int b) {
     DynObj* pObj;
 
     switch (a) {
@@ -316,36 +327,38 @@ void fn_80049304(int nKey, int a, int b) {
     default:
         for (pObj = lbl_80281DBC; pObj != NULL; pObj = pObj->pNext) {
             if (pObj->n140 == nKey && pObj->n134 != 0) {
-                fn_80049298(pObj, a, b, 1);
+                Kernel_PostPairToObject(pObj, a, b, 1);
             }
         }
     }
 }
 
-// The same, without the 126 test, for every object whose n147 is nKey.
-void fn_8004939C(int nKey, int a, int b) {
+// Stores (a, b) on every live object whose byte n147 (set from its definition's n18) is nKey; no
+// 126 test. The actor byte-code's opcode 57.
+void Kernel_PostPairByKey147(int nKey, int a, int b) {
     DynObj* pObj;
 
     for (pObj = lbl_80281DBC; pObj != NULL; pObj = pObj->pNext) {
         if (pObj->n147 == nKey && pObj->n134 != 0) {
-            fn_80049298(pObj, a, b, 1);
+            Kernel_PostPairToObject(pObj, a, b, 1);
         }
     }
 }
 
-// The same for every object whose n148 is nKey.
-void fn_80049424(int nKey, int a, int b) {
+// Stores (a, b) on every live object whose byte n148 is nKey. The actor byte-code's opcode 58.
+void Kernel_PostPairByKey148(int nKey, int a, int b) {
     DynObj* pObj;
 
     for (pObj = lbl_80281DBC; pObj != NULL; pObj = pObj->pNext) {
         if (pObj->n148 == nKey && pObj->n134 != 0) {
-            fn_80049298(pObj, a, b, 1);
+            Kernel_PostPairToObject(pObj, a, b, 1);
         }
     }
 }
 
-// Asks the first object whose n140 is nKey for its value nWhat (message 9); 0 when there is none.
-int fn_800494AC(int nKey, uptr nWhat) {
+// Asks the first object whose actor id n140 is nKey for its value nWhat (message 9); 0 when there
+// is none.
+int Kernel_QueryActorById(int nKey, uptr nWhat) {
     DynObj* pObj;
 
     for (pObj = lbl_80281DBC; pObj != NULL; pObj = pObj->pNext) {
@@ -356,15 +369,17 @@ int fn_800494AC(int nKey, uptr nWhat) {
     return 0;
 }
 
-void fn_8004950C(void) {
+// The kernel's one-time init at startup (fn_8006C7A8): empty in this build.
+void Kernel_InitOnStartup(void) {
 }
 
-void fn_80049510(void) {
+// The kernel's one-time close at shutdown (fn_8006C854): empty in this build.
+void Kernel_CloseOnShutdown(void) {
 }
 
 // Type 0's message 2: sets the object up from its definition (its flags, n147 and n14E too); a
 // model's size is taken from its first level of detail.
-void fn_80049514(DynObj* pObj, DynObjSetup* pSetup) {
+void Kernel_InitObjectFromDef(DynObj* pObj, DynObjSetup* pSetup) {
     int nFlags = 0;
     DynObjNames* pNames;
     DynObjDef* pDef;

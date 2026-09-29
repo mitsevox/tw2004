@@ -98,7 +98,7 @@ LAYOUT_ASSERT(CamShot, 0xC0);
 
 // ---- the course's static and fly-by cameras (GoStaticCam.c) ----------------------------------
 // A course's 'Cact' objects of type 201 are static cameras, those of type 200 fly-by cameras
-// (UKernel.c's fn_80048BDC hands them over); each becomes a CamShot. The fly-by cameras are
+// (UKernel.c's Kernel_DownloadActors hands them over); each becomes a CamShot. The fly-by cameras are
 // chained into up to 10 paths, and a 'CAMC' stream object brings a spline table per path.
 // The type names below are ours, from the shots' names ("Static Cam: %d", "FlyBy Cam: %d").
 

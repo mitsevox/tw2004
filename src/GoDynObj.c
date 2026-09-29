@@ -306,7 +306,7 @@ void DynObj_UpdateDynamicObjects(void) {
     int i;
 
     // port: the frame time goes through the message's pointer argument as its bits
-    fn_80048F68(6, *(void**)&gSession.fFrameTime, NULL);
+    Kernel_BroadcastMessage(6, *(void**)&gSession.fFrameTime, NULL);
     for (i = 0; i < gSession.nNumPlayers; i++) {
         DynObj_UpdateDivot(i);
         DynObj_UpdateTee(i);
@@ -323,7 +323,7 @@ void DynObj_RenderDynamicObjects(int nView) {
     fn_80035308();
     fn_800352E4();
     RenderState_Flush();
-    fn_80048F68(3, NULL, NULL);
+    Kernel_BroadcastMessage(3, NULL, NULL);
     if (GM_Currently_SkillZoneMode()) {
         DynObj_DrawTargetModels(nView);
         DynObj_DrawTargetOverlays(nView);
@@ -465,9 +465,9 @@ void DynObj_PitchMarkAdd(f32* pPos, int nPlayer) {
             setup.pModel->aEntries[0].u.pRef = (DynObjModelRef*)fn_8000B70C('TEO ', 10005);
             setup.pfnHandler = DynObj_GetTypeHandler(setup.pDef->n4);
             setup.pC = NULL;
-            nId = fn_800490B8(&setup);
+            nId = Kernel_CreateObjectId(&setup);
             if (nId != -2) {
-                gpDynObjState->apRing[gpDynObjState->nRing] = fn_80048E4C(nId);
+                gpDynObjState->apRing[gpDynObjState->nRing] = Kernel_FindObjectById(nId);
             }
         } else {
             LLMath_CopyVec(vPos, gpDynObjState->apRing[gpDynObjState->nRing]->obj.m80[3]);
@@ -513,9 +513,9 @@ void DynObj_ShotDivotHoleAdd(f32* pPos, int nPlayer) {
         setup.pModel->aEntries[0].u.pRef = (DynObjModelRef*)fn_8000B70C('TEO ', 10001);
         setup.pfnHandler = DynObj_GetTypeHandler(setup.pDef->n4);
         setup.pC = NULL;
-        nId = fn_800490B8(&setup);
+        nId = Kernel_CreateObjectId(&setup);
         if (nId != -2) {
-            gpDynObjState->apPlayer[nPlayer] = fn_80048E4C(nId);
+            gpDynObjState->apPlayer[nPlayer] = Kernel_FindObjectById(nId);
         }
     }
     LLMath_IdentifyMat(mTurn);
@@ -852,9 +852,9 @@ void DynObj_DivotAdd(f32* pPos, int nPlayer) {
         setup.pModel->aEntries[0].u.pRef = (DynObjModelRef*)fn_8000B70C('TEO ', 10002);
         setup.pfnHandler = DynObj_GetTypeHandler(setup.pDef->n4);
         setup.pC = NULL;
-        nId = fn_800490B8(&setup);
+        nId = Kernel_CreateObjectId(&setup);
         if (nId != -2) {
-            pB->pF0 = fn_80048E4C(nId);
+            pB->pF0 = Kernel_FindObjectById(nId);
         }
         pB->bF4 = 1;
     } else {
@@ -868,8 +868,8 @@ void DynObj_DivotAdd(f32* pPos, int nPlayer) {
 // passes NULL).
 void DynObj_ShotDivotHoleHide(Ball* pBall, int nPlayer) {
     if (gpDynObjState->apPlayer[nPlayer] != NULL) {
-        fn_800491C4(gpDynObjState->apPlayer[nPlayer]);
-        fn_800490EC();
+        Kernel_ReleaseObject(gpDynObjState->apPlayer[nPlayer]);
+        Kernel_SweepDeadObjects();
         gpDynObjState->apPlayer[nPlayer] = NULL;
     }
 }
@@ -877,8 +877,8 @@ void DynObj_ShotDivotHoleHide(Ball* pBall, int nPlayer) {
 // Gives up the player's divot (DynObj_DivotAdd). pBall is not read (GameMode11.c passes NULL).
 void DynObj_DivotHide(Ball* pBall, int nPlayer) {
     if (gpDynObjState->aB[nPlayer].bF4) {
-        fn_800491C4(gpDynObjState->aB[nPlayer].pF0);
-        fn_800490EC();
+        Kernel_ReleaseObject(gpDynObjState->aB[nPlayer].pF0);
+        Kernel_SweepDeadObjects();
         gpDynObjState->aB[nPlayer].pF0 = NULL;
         gpDynObjState->aB[nPlayer].bF4 = 0;
     }
@@ -977,9 +977,9 @@ void DynObj_TeeAdd(f32* pPos, int nPlayer, u8 bReset) {
         setup.pModel->aEntries[0].u.pRef = (DynObjModelRef*)fn_8000B70C('TEO ', 10004);
         setup.pfnHandler = DynObj_GetTypeHandler(setup.pDef->n4);
         setup.pC = NULL;
-        nId = fn_800490B8(&setup);
+        nId = Kernel_CreateObjectId(&setup);
         if (nId != -2) {
-            pA->pF4 = fn_80048E4C(nId);
+            pA->pF4 = Kernel_FindObjectById(nId);
         }
         pA->bF8 = 1;
         LLMath_IdentifyMat(pA->mB4);

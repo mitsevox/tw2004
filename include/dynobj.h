@@ -13,7 +13,7 @@
 typedef int (*DynObjHandler)(int nMsg, struct DynObj* pObj, void* pArg, void* pArg2);
 
 // An object's definition in the course data: its 'tACT' chunk from the chunk's id on
-// (fn_80048BDC; TagRecord).
+// (Kernel_DownloadActors; TagRecord).
 typedef struct DynObjDef {
     s32  n0;                    // 0x00  the chunk's id -> DynObj.n140
     u8   n4;                    // 0x04  its type (DynObj_GetTypeHandler) -> DynObj.n146
@@ -49,7 +49,7 @@ typedef struct DynObjModelRef {
     struct UObjModel* p4;       // 0x04  goes to Object_Init
 } DynObjModelRef;
 
-// One stream object an object's 'aRSL' chunk names, found by UKernel.c's fn_80048BDC.
+// One stream object an object's 'aRSL' chunk names, found by UKernel.c's Kernel_DownloadActors.
 typedef struct DynObjModelEntry {
     u32  uType;                 // 0x0  the stream object's type
     union {
@@ -73,7 +73,7 @@ typedef struct DynObjNames {
     u8*  p30;                   // 0x30  -> DynObj.p164
 } DynObjNames;
 
-// What a type's message 2 gets (fn_80049018 asks its handler for the object's size first).
+// What a type's message 2 gets (Kernel_CreateObject asks its handler for the object's size first).
 typedef struct DynObjSetup {
     DynObjHandler pfnHandler;   // 0x00
     DynObjModel* pModel;        // 0x04
@@ -81,7 +81,7 @@ typedef struct DynObjSetup {
     DynObjNames* pC;            // 0x0C
 } DynObjSetup;
 
-// Two bytes UKernel.c's fn_80049298 records on an object (DynObj.a138), or in lbl_801D5228 when
+// Two bytes UKernel.c's Kernel_PostPairToObject records on an object (DynObj.a138), or in lbl_801D5228 when
 // the object's four are taken.
 typedef struct DynObjPair {
     u8   b0;                    // 0x0
@@ -245,9 +245,9 @@ typedef struct DynObj {
     struct DynObj* pNext;       // 0x128  the next object in UKernel.c's list
     u8   unk12C[0x130 - 0x12C];
     DynObjHandler pfnHandler;   // 0x130  its type's message handler
-    s32  n134;                  // 0x134  its id (fn_80048E4C finds it by this); 0 once fn_800491C4 ran,
-                                //        then fn_800490EC's sweeps set -1 and free it
-    DynObjPair a138[4];         // 0x138  pairs fn_80049298 records (b0 == 0: free)
+    s32  n134;                  // 0x134  its id (Kernel_FindObjectById finds it by this); 0 once Kernel_ReleaseObject ran,
+                                //        then Kernel_SweepDeadObjects's sweeps set -1 and free it
+    DynObjPair a138[4];         // 0x138  pairs Kernel_PostPairToObject records (b0 == 0: free)
     u16  n140;                  // 0x140
     s16  n142;                  // 0x142
     s16  n144;                  // 0x144
@@ -261,7 +261,7 @@ typedef struct DynObj {
     u32  uFlags;                // 0x154
     f32  f158;                  // 0x158
     u8*  p15C;                  // 0x15C  } scripts run by fn_8000EA1C (p15C when n144 drops,
-    u8*  p160;                  // 0x160  }  p160 by fn_800491C4)
+    u8*  p160;                  // 0x160  }  p160 by Kernel_ReleaseObject)
     u8*  p164;                  // 0x164  }
     s32  n168;                  // 0x168
 } DynObj;
@@ -327,7 +327,7 @@ typedef struct AnimalStep {
 } AnimalStep;
 extern AnimalStep gAnimalPoseSteps[6];
 
-// One entry of UKernel.c's lbl_801D5228 (12 bytes), taken by fn_80049230.
+// One entry of UKernel.c's lbl_801D5228 (12 bytes), taken by Kernel_PostPairToOverflowSlot.
 typedef struct DynObjSlot {
     DynObjPair pair;            // 0x00
     s16  n2;                    // 0x02  600 when taken
@@ -410,8 +410,8 @@ extern char gGolfBallLogoSlotNames[4][13];        // GoDynObj.c: each player's b
 extern f32  gGolfBallScale;               // 1.0: scales the ball's radius (DynObj_GetBallPixels); owner unknown
 
 // UKernel.c's list of the objects, first and last, the last id given out (DynObj.n134), a bit
-// mask of the used entries of lbl_801D5228 (fn_80049230; 16 at most), and two node pools (400-
-// and 528-byte nodes).
+// mask of the used entries of lbl_801D5228 (Kernel_PostPairToOverflowSlot; 16 at most), and two
+// node pools (400- and 528-byte nodes).
 extern DynObj* lbl_80281DBC;
 extern DynObj* lbl_80281DB8;
 extern s32 lbl_80281DB4;
@@ -430,24 +430,24 @@ void DynObj_TeeStruck(int nPlayer);             // launch the player's 'TEO ' 10
 int  DynObj_GetGolfBallLogoIndex(const char* szName);   // the index of the name among gGolfBallLogoTextureNames's 27 (-1: none)
 
 // UKernel.c, UObject.c. The UObject functions take the object part (&DynObj.obj).
-DynObj* fn_80048E44(void);                                  // the first object
-DynObj* fn_80048E4C(int nId);                               // the object with this id, or NULL
-void fn_80048FEC(DynObj* pObj);                             // adds it at the end of the list
-s32  fn_800490B8(DynObjSetup* pSetup);                      // a new object's id, -2 when none
-void fn_800490EC(void);                                     // sweeps out the objects given up
-void fn_800491C4(DynObj* pObj);
-void fn_80049514(DynObj* pObj, DynObjSetup* pSetup);    // type 0's message 2
-void fn_80049304(int nKey, int a, int b);   // records (a, b) on every object whose n140 is nKey
-void fn_8004939C(int nKey, int a, int b);   // ... whose n147 is nKey
-void fn_80049424(int nKey, int a, int b);   // ... whose n148 is nKey
-int  fn_800494AC(int nKey, uptr nWhat);     // asks the first object whose n140 is nKey (message 9)
+DynObj* Kernel_GetFirstObject(void);                                  // the first object
+DynObj* Kernel_FindObjectById(int nId);                               // the object with this id, or NULL
+void Kernel_AppendObject(DynObj* pObj);                             // adds it at the end of the list
+s32  Kernel_CreateObjectId(DynObjSetup* pSetup);                      // a new object's id, -2 when none
+void Kernel_SweepDeadObjects(void);                                     // sweeps out the objects given up
+void Kernel_ReleaseObject(DynObj* pObj);
+void Kernel_InitObjectFromDef(DynObj* pObj, DynObjSetup* pSetup);    // type 0's message 2
+void Kernel_PostPairByActorId(int nKey, int a, int b);   // records (a, b) on every object whose n140 is nKey
+void Kernel_PostPairByKey147(int nKey, int a, int b);   // ... whose n147 is nKey
+void Kernel_PostPairByKey148(int nKey, int a, int b);   // ... whose n148 is nKey
+int  Kernel_QueryActorById(int nKey, uptr nWhat);     // asks the first object whose n140 is nKey (message 9)
 void Object_Init(UObject* pObj, UObjModel* pModel, u32 uFlags);
 UObject* Object_Create(UObjModel* pModel);
 void Object_Free(UObject* pObj);
 void Object_Destroy(UObject* pObj);
 void Object_Draw(UObject* pObj);
 
-void fn_80048F68(int nMsg, void* pArg, void* pArg2);     // sends nMsg to every object with id > 0
+void Kernel_BroadcastMessage(int nMsg, void* pArg, void* pArg2);     // sends nMsg to every object with id > 0
 
 // GoDynObjBase.c
 int  DynObjBase_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2);  // type 0's handler, types 2/11's default

@@ -326,21 +326,21 @@ int fn_8000EA1C(u8* pCode, int nArg, int nPush, DynObj* pObj) {
                 if (b == 0) {
                     a = pObj->pfnHandler(9, pObj, (void*)a, NULL);
                 } else if (b >= 0) {
-                    a = fn_800494AC(b, a);
+                    a = Kernel_QueryActorById(b, a);
                 }
                 break;
             case 56:
                 if (c == 0) {
-                    fn_80049304(pObj->n140, b, a);
+                    Kernel_PostPairByActorId(pObj->n140, b, a);
                 } else {
-                    fn_80049304(c, b, a);
+                    Kernel_PostPairByActorId(c, b, a);
                 }
                 continue;
             case 58:
-                fn_80049424(c, b, a);
+                Kernel_PostPairByKey148(c, b, a);
                 continue;
             case 57:
-                fn_8004939C(c, b, a);
+                Kernel_PostPairByKey147(c, b, a);
                 continue;
             case 60:
                 fn_8000E948(c, b, a);

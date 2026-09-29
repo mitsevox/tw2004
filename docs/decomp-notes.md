@@ -224,7 +224,7 @@ They will be sorted into the sections below.
 - **[verified] A lone flag test before a non-void return is `if (flag) return X; return X;`** (the void
   rule above, for value returns; FE_CrAPDB FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum 88.7 -> 94.0).
 - **[verified] `!(u & bit)` as an argument gives `rlwinm; cntlzw; srwi 5`; `(u & bit) == 0` gives
-  `extrwi; xori`** (UKernel fn_800491C4 91.9 -> 100).
+  `extrwi; xori`** (UKernel Kernel_ReleaseObject 91.9 -> 100).
 - **[verified] `x * (1.0f / 512.0f)` puts the constant first in `fmuls`; `x / 512.0f` puts x first**
   (uiText UIText_Draw 97.0 -> 98.7).
 - **[verified] `(old & 0xFFFFFF) | (v << 24)` gives `slwi` + `rlwimi` into old; the other operand order
@@ -253,7 +253,7 @@ They will be sorted into the sections below.
   `f(n) + 1 < rec`, not `rec > f(n) + 1`, when the original calls first (HoleScore fn_800CF904 78.7 ->
   98.8).
 - **[verified] `do {} while (++i < 4)`** for a 4-step loop with no ctr and the test at the bottom (UKernel
-  fn_80049298 80.5 -> 100).
+  Kernel_PostPairToObject 80.5 -> 100).
 - **[verified] A struct's size can be proved by a `Mem_cpy` of it** (CamScript 0x118).
 - **[verified] `li r3/r4` missing before a call is not a missing argument**: CW reuses a still-live
   argument register (char Character_SetClubsAndClothes).

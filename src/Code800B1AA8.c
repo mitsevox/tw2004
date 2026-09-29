@@ -47,7 +47,7 @@ u8 DynObj_FindBallHit(int nPlayer, f32* pTo, f32* pFrom, f32* pHit, f32* pNormal
     DynObj* pObj;
     DynObj* pBest = NULL;
 
-    for (pObj = fn_80048E44(); pObj != NULL; pObj = pObj->pNext) {
+    for (pObj = Kernel_GetFirstObject(); pObj != NULL; pObj = pObj->pNext) {
         if (pObj->uFlags & 8) {
             DynObj_GetBoundingSphere(pObj, vCenter, &fRadius);
             fDZ = pTo[2] - vCenter[2];

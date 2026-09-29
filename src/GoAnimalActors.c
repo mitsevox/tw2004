@@ -211,7 +211,7 @@ void ActAnimal_Init(DynObjAnimal* pAnimal, DynObjSetup* pSetup) {
     f32 fGround;
     f32 fY;
 
-    fn_80049514(&pAnimal->base, pSetup);
+    Kernel_InitObjectFromDef(&pAnimal->base, pSetup);
     pDef = (DynObjAnimalDef*)pSetup->pDef;
     pAnimal->f16C = pDef->f1C;
     pAnimal->f170 = 0.0f;

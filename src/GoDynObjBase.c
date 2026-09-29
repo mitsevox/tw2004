@@ -13,7 +13,7 @@ void LLMath_mat44fltMultiplyList(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4],
 void UObject_ComposeRotation(f32 (*pMtx)[4]);
 int  DynObjTurning_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2);
 
-// Sets flag 0x04000000 once; the first time, with bNotify, also gives the object up (fn_800491C4).
+// Sets flag 0x04000000 once; the first time, with bNotify, also gives the object up (Kernel_ReleaseObject).
 // 1: it was set now; nUnused is not read.
 int DynObjBase_SetRemoved(DynObj* pObj, u8 bNotify, int nUnused) {
     u32 uFlags = pObj->uFlags;
@@ -23,7 +23,7 @@ int DynObjBase_SetRemoved(DynObj* pObj, u8 bNotify, int nUnused) {
     }
     pObj->uFlags = uFlags | 0x04000000;
     if (bNotify) {
-        fn_800491C4(pObj);
+        Kernel_ReleaseObject(pObj);
     }
     return 1;
 }
@@ -80,17 +80,17 @@ int DynObjBase_GetValue(DynObj* pObj, u32 nWhat) {
     }
 }
 
-// Type 0's message handler, and the default of types 2 and 11: 1 its size, 2 set up (fn_80049514),
-// 3 draw (flag 0x200: hidden while the flagstick is out; 0x400: no z-buffer writes; 0x800: no alpha
-// test), 4 remove (DynObjBase_SetRemoved), 5 destroy, 6 update (nothing), 7 answers 1, 8 and 10
-// DynObjBase_TakeAmount, 9 DynObjBase_GetValue, 11 its heading (atan2 of aRot), 12 answers 0; any
-// other -1.
+// Type 0's message handler, and the default of types 2 and 11: 1 its size, 2 set up
+// (Kernel_InitObjectFromDef), 3 draw (flag 0x200: hidden while the flagstick is out; 0x400: no
+// z-buffer writes; 0x800: no alpha test), 4 remove (DynObjBase_SetRemoved), 5 destroy, 6 update
+// (nothing), 7 answers 1, 8 and 10 DynObjBase_TakeAmount, 9 DynObjBase_GetValue, 11 its heading
+// (atan2 of aRot), 12 answers 0; any other -1.
 int DynObjBase_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2) {
     switch (nMsg) {
     case 1:
         return sizeof(DynObj);
     case 2:
-        fn_80049514(pObj, pArg);
+        Kernel_InitObjectFromDef(pObj, pArg);
         return 0;
     case 3:
         // flag 0x200: not while the flagstick is out
@@ -156,12 +156,12 @@ DynObjHandler DynObj_GetTypeHandler(int nType) {
     }
 }
 
-// Type 2's message 2: sets up the object as type 0 does (fn_80049514), then takes its turning speed
-// from its definition.
+// Type 2's message 2: sets up the object as type 0 does (Kernel_InitObjectFromDef), then takes its
+// turning speed from its definition.
 void DynObjTurning_Init(DynObjTurning* pObj, DynObjSetup* pSetup) {
     DynObjTurningDef* pDef = (DynObjTurningDef*)pSetup->pDef;
 
-    fn_80049514(&pObj->base, pSetup);
+    Kernel_InitObjectFromDef(&pObj->base, pSetup);
     pObj->fSpeed = pDef->fSpeed;
 }
 

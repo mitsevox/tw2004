@@ -63,7 +63,7 @@ void GM_InitForHole();
 s32 fn_80010608(s32);
 s32 fn_8003467C();
 s32 DynObj_DeInitForHole();
-s32 fn_80048EF4();
+s32 Kernel_RemoveAllObjects();
 void SW_vDeInitForHole(void);
 s32 StaticCam_Reset();
 s32 fn_8006FBF8();
@@ -123,7 +123,7 @@ void fn_8006F568(void) {
             fn_800A2B34(var_r31);
             var_r31 += 1;
         } while (var_r31 < 4);
-        fn_80048EF4();
+        Kernel_RemoveAllObjects();
         fn_80010608(1);
         fn_8000B68C(1);
         *lbl_802811E8 = 0;

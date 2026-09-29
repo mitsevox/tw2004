@@ -686,7 +686,7 @@ void Gaud_Monitor(void) {
     }
 }
 
-// Starts a sound actor of the course as it loads (UKernel.c fn_80048BDC). Its nKind is also the
+// Starts a sound actor of the course as it loads (UKernel.c Kernel_DownloadActors). Its nKind is also the
 // emitter its instances join, so the Aud_EmiAlias calls drive them together (0 the wind and rain, 1
 // the trees); n goes to Aud_EmiAdd's n24. Kinds 0, 3 and 5 play as a pair of instances lbl_80281450
 // either side of the listener (kind 0 only once, lbl_80282042), the others at the object. Kinds

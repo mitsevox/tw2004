@@ -55,7 +55,7 @@ typedef struct ChallengeSpot {
     f32 fZ;                     // 0x8
 } ChallengeSpot;
 
-// A course object of type 10, handed to PlayNow_LoadBallSpot by the course loader (fn_80048BDC):
+// A course object of type 10, handed to PlayNow_LoadBallSpot by the course loader (Kernel_DownloadActors):
 // the spot where challenge nChallenge (1-based) places the ball.
 typedef struct ChallengeSpotRecord {
     u8  unk0[0x10];

@@ -105,7 +105,7 @@ void PlayNow_Shutdown(void) {
 void PlayNow_DeInit(void) {
 }
 
-// A course object of type 10, from the 'Cact' handler (fn_80048BDC): the spot where challenge
+// A course object of type 10, from the 'Cact' handler (Kernel_DownloadActors): the spot where challenge
 // nChallenge (1-based; 84 and up are ignored) places the ball is copied into gPlayNowBallSpots, and
 // the object is freed.
 void PlayNow_LoadBallSpot(void* pObj) {

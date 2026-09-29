@@ -54,7 +54,7 @@ typedef struct PsEmitter {
 } PsEmitter;
 LAYOUT_ASSERT(PsEmitter, 0x1A8);
 
-// A type 7 actor's stream record (our name; UKernel.c's fn_80048BDC hands it to fn_8009943C): a
+// A type 7 actor's stream record (our name; UKernel.c's Kernel_DownloadActors hands it to fn_8009943C): a
 // particle emitter placed in the course. 0xF0 bytes, or 0xFC with the last three fields. Each
 // field goes to the ParticleParams field named after it.
 typedef struct PsEmitterRecord {
