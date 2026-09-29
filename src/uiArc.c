@@ -20,7 +20,7 @@ void UIPoly_UnpackVertex(FEVertex* pVtx, f32* pPos, f32* pUV, f32* pColour, f32*
 void UI_GetPictureUVScale(f32* pOut, LLPict* pPict);
 f32  UI_GetDrawDepth(void);
 f32* UITransform_GetViewParams(void);   // uiTransform.c
-void fn_800760D8(LLPict* pPict);        // LLVideo.c
+void RenderState_SetPicture(LLPict* pPict);        // LLVideo.c
 
 // The UI studio's colour add and multiply as of the last UIArc_Draw (like uiProcessPolygon.c's
 // gpUIPolyColourAdd, gpUIPolyColourMul); nothing reads them.
@@ -124,7 +124,7 @@ void UIArc_Draw(UIArc* pArc, s32 a, s32 b) {
             }
         } else if (pEntry->u0 & 2) {
             pPict = (LLPict*)pEntry->p8;
-            fn_800760D8(pPict);
+            RenderState_SetPicture(pPict);
         }
         RenderState_SetDrawFlags(0x50);
     } else {

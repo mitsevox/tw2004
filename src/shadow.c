@@ -32,7 +32,7 @@ void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: copy a 4
 void LLMath_InvertNormalized(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: inverts a rotation+translation
 void CA_vSetDefaultScalingVectors(CamLens* pLens);
 f32  Math_Tan(f32 x);                // tan, as a float
-void fn_800760B0(int nX, int nY, int nWidth, int nHeight);
+void RenderState_SetScissor(int nX, int nY, int nWidth, int nHeight);
 void LLMath_mat44fltMultiplyList(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void fn_800B2470(void);
 void fn_800B281C(void);
@@ -369,9 +369,9 @@ void fn_800B28D4(Character* pChar, int nView, u8 bFlat) {
     DS_vEnableZBufferUpdate(0);
     DS_vSetAlphaTestMode(0, 6, 0x80);
     DS_vSetZBufferMode(7);
-    fn_800760B0(0, 0, p->nWidth, p->nHeight);
+    RenderState_SetScissor(0, 0, p->nWidth, p->nHeight);
     fn_800B281C();
-    fn_800760B0(1, 1, p->nWidth - 1, p->nHeight - 1);
+    RenderState_SetScissor(1, 1, p->nWidth - 1, p->nHeight - 1);
     RenderState_Flush();
     ((void (*)(int))fn_80035604)(2);   // port: EA passes an argument fn_80035604 ignores
     SKN_DrawCharacter(pChar, 2);
@@ -381,7 +381,7 @@ void fn_800B28D4(Character* pChar, int nView, u8 bFlat) {
     DS_vSetAlphaTestMode(1, 6, 0x80);
     DS_vSetZBufferMode(3);
     RenderState_SetRenderSurface(0, 0x200, 0x1C0, lbl_80281B88 & 1, 8, 1);
-    fn_800760B0(0, 0, 0x200, 0x1C0);
+    RenderState_SetScissor(0, 0, 0x200, 0x1C0);
     RC_vSetCurrentRenderCtx(pOldCamera);
     RenderState_SetViewport(RC_spGetCurrentRenderCtx());
     RenderState_Flush();

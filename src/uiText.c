@@ -23,7 +23,7 @@ void fn_80012B9C(f32 fX, f32 fY);
 void fn_80012C84_SetFlags(s32 uFlags);                           // 1/2: the alignment
 void fn_80012CB4_SetWordWrapBox(f32 fX, f32 fY, f32 fW, f32 fH);
 
-void fn_800760B0(s32 nX, s32 nY, s32 nW, s32 nH);
+void RenderState_SetScissor(s32 nX, s32 nY, s32 nW, s32 nH);
 
 void UIText_SetFontShadowColour(f32* pColor);
 void UIText_SetFontShadowOffset(f32 fX, f32 fY);
@@ -180,7 +180,7 @@ void UIText_Draw(UIText* pText) {
     fn_80012C84_SetFlags(uFlags);
     if (0.0f != aColor[3]) {
         UFont_DrawString(szText, 0.0f, 0.0f);
-        fn_800760B0(0, 0, 0x200, 0x1C0);
+        RenderState_SetScissor(0, 0, 0x200, 0x1C0);
         RenderState_Flush();
     }
 }

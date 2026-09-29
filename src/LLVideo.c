@@ -148,9 +148,9 @@ void   LLVideo_Destroy(Video* pVideo);
 Video* LLVideo_SetSlot(int nSlot, Video* pVideo);
 void   LLVideo_Stop(Video* pVideo);
 void   LLVideo_Start(Video* pVideo);
-void   fn_80075A98_SetLastFrameTime(Video* pVideo);
-void   fn_80075AD0_UpdateAll(void);
-u8     fn_80075BF4_IsFrameDue(Video* pVideo);
+void   LLVideo_SetLastFrameTime(Video* pVideo);
+void   LLVideo_UpdateAll(void);
+u8     LLVideo_IsFrameDue(Video* pVideo);
 
 // GameAudio.c
 u8   Gaud_GetStreamingStatus(void);
@@ -180,16 +180,16 @@ int  UStream_Stop(void);
 int  UStream_Close(int nStream);
 void UI_EATraxShowSong(int n, s8 nTrack);
 
-void fn_80075C48(void);
-void fn_80075C68(void);
-void fn_80075C88(void);
-void fn_80075D58(void);
-int  fn_800760A0_GetFrame(Video* pVideo);
-u8   fn_800760A8_HasEnded(Video* pVideo);
-void fn_800760B0(int nX, int nY, int nWidth, int nHeight);
-void fn_800760D8(LLPict* pPict);
-void fn_800760F4(f32* pUV, LLPict* pPict);
-void fn_80076128(s32 p0);
+void LLVideo_BeginPlayback(void);
+void LLVideo_EndPlayback(void);
+void LLVideo_SetupRender(void);
+void LLVideo_RestoreRender(void);
+int  LLVideo_GetFrame(Video* pVideo);
+u8   LLVideo_HasEnded(Video* pVideo);
+void RenderState_SetScissor(int nX, int nY, int nWidth, int nHeight);
+void RenderState_SetPicture(LLPict* pPict);
+void RenderView_MakePictUV(f32* pUV, LLPict* pPict);
+void FO_vSetCurrentColor(s32 p0);
 
 // Draws a full-screen black quad (alpha 0.5) over the screen for one frame, two when nFlags bit 0
 // is set. With bit 1 it first fades to black over 30 frames (alpha 0.1 each, 0.5 for the last two),
@@ -229,9 +229,9 @@ void LLVideo_DarkenScreen(int nFlags) {
         fn_800137D0(RC_spGetCurrentRenderCtx());
         // the original tests bBit0 here although both branches make the same call
         if (bBit0) {
-            fn_800760B0(0, 0, 512, 448);
+            RenderState_SetScissor(0, 0, 512, 448);
         } else {
-            fn_800760B0(0, 0, 512, 448);
+            RenderState_SetScissor(0, 0, 512, 448);
         }
         RenderState_SetBlendFactors(4, 5);
         RenderView_SetUseCurrentMatrices(0);
@@ -349,25 +349,31 @@ void LLVideo_Start(Video* pVideo) {
     pVideo->bEnded = 0;
     pVideo->bStarved = 0;
     Pict_StartMovie(&pVideo->pict, &pVideo->stream);
-    fn_80075A98_SetLastFrameTime(pVideo);
+    LLVideo_SetLastFrameTime(pVideo);
     LLVideo_PreloadQueue(pVideo);
 }
 
-// The next frame is timed from now.
-void fn_80075A98_SetLastFrameTime(Video* pVideo) {
+// Stamps now (TI_sReadCounter(0)) as the movie's last frame time; LLVideo_IsFrameDue measures from
+// it.
+void LLVideo_SetLastFrameTime(Video* pVideo) {
     pVideo->tLast = TI_sReadCounter(0);
 }
 
-// Runs every movie once: each one whose next frame is due decodes it into its picture; one whose
-// data ran out is stopped.
-void fn_80075AD0_UpdateAll(void) {
+// Runs every movie once (each pass of LLVideo_RunPlayback): each running movie whose next frame is
+// due takes the decoder's next frame into its picture (Pict_NextMovieFrame, Pict_CopyMovieFrame;
+// the first frame also sizes the picture and starts the movie's sound, Aud_StartMovie). A movie
+// whose read found the queue dry (bStarved) is stopped and marked ended at its next due frame. The
+// end test beside it (Pict_IsMovieAtEnd) always answers 0 (MAD_ReadNextFile's EA bug,
+// Code800B90F4.c), so a movie ends only when it is starved: normally once the stream has delivered
+// the whole file, but also mid-movie if the disc falls behind the decoder.
+void LLVideo_UpdateAll(void) {
     Video* pVideo;
     s32 i;
     Aud_CycleMovie();
     for (i = 0; i < NUM_VIDEO_SLOTS; i++) {
         pVideo = gpVideoSlots->apVideo[i];
-        if (pVideo != NULL && pVideo->b1020 && !pVideo->b1021 && fn_80075BF4_IsFrameDue(pVideo)) {
-            fn_80075A98_SetLastFrameTime(pVideo);
+        if (pVideo != NULL && pVideo->b1020 && !pVideo->b1021 && LLVideo_IsFrameDue(pVideo)) {
+            LLVideo_SetLastFrameTime(pVideo);
             if (pVideo->bStarved || Pict_IsMovieAtEnd(&pVideo->pict, &pVideo->stream)) {
                 pVideo->bEnded = 1;
                 LLVideo_Stop(pVideo);
@@ -385,42 +391,49 @@ void fn_80075AD0_UpdateAll(void) {
     }
 }
 
-// The movie's next frame is due.
-u8 fn_80075BF4_IsFrameDue(Video* pVideo) {
+// 1 once the movie's frame time (fFrameTime seconds) has passed since its last frame (tLast).
+u8 LLVideo_IsFrameDue(Video* pVideo) {
     if (fn_8006E118(TI_sReadCounter(0), pVideo->tLast) < pVideo->fFrameTime) {
         return 0;
     }
     return 1;
 }
 
-void fn_80075C48(void) {
+// LLVideo_RunPlayback's first call: calls LLDisp_Gc.c's fn_80007254, which is empty in this build.
+void LLVideo_BeginPlayback(void) {
     fn_80007254();
 }
 
-void fn_80075C68(void) {
+// LLVideo_RunPlayback's last call: calls LLDisp_Gc.c's fn_80007254, which is empty in this build.
+void LLVideo_EndPlayback(void) {
     fn_80007254();
 }
 
-// Sets the renderer up for full-screen movie frames (512 x 448); fn_80075D58 puts it back.
-void fn_80075C88(void) {
+// Sets the renderer up for full-screen movie frames: a 512 x 448 render surface, textured draws
+// with no depth writes or test and no alpha test, the scissor and view over the whole screen, no
+// colour. Saves the font add mode (gVideoSlots.n20) and sets add mode 1, fn_80012B2C(1, 1) and text
+// colour 10 on the current font packet. LLVideo_RestoreRender puts it back.
+void LLVideo_SetupRender(void) {
     fn_80008380();
     RenderState_SetRenderSurface(0, 512, 448, 0, 8, 1);
     RenderState_SetDrawFlags(0x10);
     DS_vEnableZBufferUpdate(0);
     DS_vSetAlphaTestMode(0, 6, 0x80);
     DS_vSetZBufferMode(7);
-    fn_800760B0(0, 0, 512, 448);
+    RenderState_SetScissor(0, 0, 512, 448);
     fn_80016B54(512, 448, 1.0f, 1.0f);
     fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
     RenderView_SetColor(NULL);
     gpVideoSlots->n20 = FO_eGetCurrentAddMode();
     FO_vSetCurrentAddMode(1);
     fn_80012B2C(1.0f, 1.0f);
-    fn_80076128(10);
+    FO_vSetCurrentColor(10);
 }
 
-// Puts the renderer back after a movie.
-void fn_80075D58(void) {
+// Puts the renderer back after a movie (undoes LLVideo_SetupRender): the saved font add mode, depth
+// writes on, depth compare GX_LEQUAL, the whole-screen view, drawn through one frame (fn_80006EDC
+// to fn_80006FE8).
+void LLVideo_RestoreRender(void) {
     fn_80008380();
     fn_80006EDC();
     fn_80012B2C(1.0f, 1.0f);
@@ -436,9 +449,13 @@ void fn_80075D58(void) {
     fn_80008380();
 }
 
-// Plays a movie until its data runs out, showing each new frame full screen, at most 33 times a
-// second. pfnStop(pVideo, nArg), if given, is asked every frame whether to stop early.
-void fn_80075DEC_RunPlayback(Video* pVideo, u8 (*pfnStop)(Video* pVideo, int nArg), int nArg) {
+// Plays a movie full screen: sets the renderer up, starts the movie, and each pass runs the stream
+// loader and the movies (LLVideo_UpdateAll), draws the movie's picture as a full-screen quad and
+// waits for 1/33 s and the retrace. pfnStop(pVideo, nArg), if given, is asked each pass; it or the
+// movie's end stops the stream and the movie, and the loop ends once the stream loader has nothing
+// left (LLVideo_UpdateStream). Then fades to black (LLVideo_DarkenScreen(6)) and puts the renderer
+// back.
+void LLVideo_RunPlayback(Video* pVideo, u8 (*pfnStop)(Video* pVideo, int nArg), int nArg) {
     f32 xy[8];
     f32 uv[8];
     u64 tFrame;
@@ -446,8 +463,8 @@ void fn_80075DEC_RunPlayback(Video* pVideo, u8 (*pfnStop)(Video* pVideo, int nAr
     u8 bDone;
     int nLastFrame;
 
-    fn_80075C48();
-    fn_80075C88();
+    LLVideo_BeginPlayback();
+    LLVideo_SetupRender();
     LLVideo_Start(pVideo);
     tFrame = TI_sReadCounter(0);
     nLastFrame = -1;
@@ -457,30 +474,30 @@ void fn_80075DEC_RunPlayback(Video* pVideo, u8 (*pfnStop)(Video* pVideo, int nAr
         if (!LLVideo_UpdateStream(pVideo, NULL)) {
             bDone = 1;
         } else {
-            fn_80075AD0_UpdateAll();
+            LLVideo_UpdateAll();
             if (pfnStop != NULL && pfnStop(pVideo, nArg)) {
                 UStream_Stop();
                 LLVideo_Stop(pVideo);
             }
-            if (fn_800760A8_HasEnded(pVideo)) {
+            if (LLVideo_HasEnded(pVideo)) {
                 UStream_Stop();
                 LLVideo_Stop(pVideo);
             }
-            if (nLastFrame == fn_800760A0_GetFrame(pVideo)) {
+            if (nLastFrame == LLVideo_GetFrame(pVideo)) {
                 continue;
             }
-            nLastFrame = fn_800760A0_GetFrame(pVideo);
+            nLastFrame = LLVideo_GetFrame(pVideo);
             fn_80006EDC();
             fn_800162A8();
-            fn_800760B0(0, 0, 512, 448);
+            RenderState_SetScissor(0, 0, 512, 448);
             RenderState_Flush();
             if (bFirst) {
                 RenderView_MakeQuad(xy, NULL, 0.0f, 0.0f, 1.0f, 1.0f);
-                fn_800760F4(uv, &pVideo->pict);
+                RenderView_MakePictUV(uv, &pVideo->pict);
                 bFirst = 0;
             }
         }
-        fn_800760D8(&pVideo->pict);
+        RenderState_SetPicture(&pVideo->pict);
         RenderState_Flush();
         RenderView_DrawPrimitive(0xA1, xy, 0, uv, 2);
         while (fn_8006E118(TI_sReadCounter(0), tFrame) < 1.0f / 33.0f) {
@@ -493,12 +510,14 @@ void fn_80075DEC_RunPlayback(Video* pVideo, u8 (*pfnStop)(Video* pVideo, int nAr
     } while (!bDone);
     LLVideo_Stop(pVideo);
     LLVideo_DarkenScreen(6);
-    fn_80075D58();
-    fn_80075C68();
+    LLVideo_RestoreRender();
+    LLVideo_EndPlayback();
 }
 
-// Plays the movie file pName in slot 0 (fn_80075DEC_RunPlayback) after drawing the screen black
-// (LLVideo_DarkenScreen).
+// Plays the movie file pName full screen until it ends or pfnStop(pVideo, nArg) says so
+// (LLVideo_RunPlayback), in slot 0. First ends a frame left open, hides the EA Trax song and draws
+// the screen black (LLVideo_DarkenScreen(nFlags | 1): nFlags bit 1 fades). Nothing more when the
+// file does not open. The front end's intro, credits and bio movies.
 void LLVideo_PlayFile(const char* pName, u8 (*pfnStop)(Video* pVideo, int nArg), int nArg, int nFlags) {
     int nStream;
     Video* pVideo;
@@ -514,7 +533,7 @@ void LLVideo_PlayFile(const char* pName, u8 (*pfnStop)(Video* pVideo, int nArg),
         UStream_SetAutoRead(1);
         pVideo = LLVideo_Create();
         LLVideo_SetSlot(0, pVideo);
-        fn_80075DEC_RunPlayback(pVideo, pfnStop, nArg);
+        LLVideo_RunPlayback(pVideo, pfnStop, nArg);
         UStream_SetAutoRead(0);
         LLVideo_Destroy(pVideo);
         UStream_Close(nStream);
@@ -532,19 +551,20 @@ u8 LLVideo_QueueIsEmpty(VideoQueue* pQueue) {
 }
 
 // The number of the last frame decoded (0 for the first; -1 before it).
-int fn_800760A0_GetFrame(Video* pVideo) {
+int LLVideo_GetFrame(Video* pVideo) {
     return pVideo->nFrame;
 }
 
-// The decoder has run out.
-u8 fn_800760A8_HasEnded(Video* pVideo) {
+// The movie has ended: LLVideo_UpdateAll found it starved and stopped it (bEnded).
+u8 LLVideo_HasEnded(Video* pVideo) {
     return pVideo->bEnded;
 }
 
-// Sets the renderer's scissor rectangle in screen pixels (bit 0x200): left, top, then right and
-// bottom, both inclusive (RenderState.nBC..nC8; Code80015470.c passes GXSetScissor right - left + 1).
-// The parameters named nWidth and nHeight are the right and bottom edges.
-void fn_800760B0(int nX, int nY, int nWidth, int nHeight) {
+// Sets the renderer's scissor rectangle in 512 x 448 screen pixels: left, top, then right and
+// bottom, both edges inclusive (gRenderState.nScissorLeft..nScissorBottom, changed bit 0x200;
+// Code80015470.c passes GXSetScissor right - left + 1). The two parameters named nWidth and nHeight
+// are the right and bottom edges.
+void RenderState_SetScissor(int nX, int nY, int nWidth, int nHeight) {
     gRenderState.nScissorLeft = nX;
     gRenderState.nScissorTop = nY;
     gRenderState.nScissorRight = nWidth;
@@ -552,14 +572,17 @@ void fn_800760B0(int nX, int nY, int nWidth, int nHeight) {
     gRenderState.uChanged |= 0x200;
 }
 
-// The next draw uses this picture.
-void fn_800760D8(LLPict* pPict) {
+// The next draw is textured with pPict (gRenderState.pPict10C, flag 4): a movie's frame or a menu
+// picture.
+void RenderState_SetPicture(LLPict* pPict) {
     gRenderState.pPict10C = pPict;
     gRenderState.uFlags |= 4;
 }
 
-// Fills the texture coordinates for drawing a picture (RenderView_DrawPrimitive).
-void fn_800760F4(f32* pUV, LLPict* pPict) {
+// Fills the texture coordinates of a two-corner screen quad (RenderView_MakeQuad's layout, four
+// floats a corner) for drawing pPict: (0, 0) to (f6C, f70), the part of its texture the picture
+// covers.
+void RenderView_MakePictUV(f32* pUV, LLPict* pPict) {
     pUV[0] = 0.0f;
     pUV[1] = 0.0f;
     pUV[2] = 0.0f;
@@ -572,7 +595,10 @@ void fn_800760F4(f32* pUV, LLPict* pPict) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_80076128(s32 p0) {
+// Sets the colour the next strings are drawn in: an index into LLFont.c's colour table
+// (lbl_80186A80), 0x12 for the current packet's own RGB (u5C). TW07's name; in TW07 it lives in
+// UFont.c.
+void FO_vSetCurrentColor(s32 p0) {
     UFontContext* pCtx;
     pCtx = FO_spGetCurrentPacket();
     pCtx->nA4 = p0;

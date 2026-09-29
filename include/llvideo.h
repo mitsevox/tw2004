@@ -45,8 +45,8 @@ typedef struct Video {
     VideoChunk* p1018;                 // 0x1018 a chunk, given back when the movie stops
     int        nSlot;                   // 0x101C its slot in gpVideoSlots, -1 when it has none
     u8         b1020;                   // 0x1020 set while the movie runs: chunks are queued
-    u8         b1021;                   // 0x1021 set: fn_80075AD0_UpdateAll skips the movie
-    u8         bEnded;                  // 0x1022 the decoder ran out (fn_800760A8_HasEnded)
+    u8         b1021;                   // 0x1021 set: LLVideo_UpdateAll skips the movie
+    u8         bEnded;                  // 0x1022 the decoder ran out (LLVideo_HasEnded)
     u8         bStarved;                // 0x1023 the queue ran dry while reading
     LLPict     pict;                    // 0x1024 the picture the frames are copied into
     u64        tLast;                   // 0x1098 when the last frame was due (TI_sReadCounter(0))
@@ -62,7 +62,7 @@ LAYOUT_ASSERT(Video, 0x10B0);
 typedef struct VideoSlots {
     Video* apVideo[NUM_VIDEO_SLOTS];    // 0x00  LLVideo_SetSlot puts a movie in a slot
     int    n20;                         // 0x20  FO_eGetCurrentAddMode()'s value while a movie shows
-                                        //       (fn_80075C88 saves it, fn_80075D58 puts it back)
+                                        //       (LLVideo_SetupRender saves it, LLVideo_RestoreRender puts it back)
     u8     pad24[4];
 } VideoSlots;
 LAYOUT_ASSERT(VideoSlots, 0x28);

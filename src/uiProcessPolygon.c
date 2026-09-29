@@ -40,8 +40,8 @@ void LLMath_Add(f32* pA, f32* pB, f32* pOut);
 void UI_DrawFullScreenPicture(LLPict* pPict, f32 fAlpha);    // draws the picture at that alpha
 void UI_ShowPictureFadingIn(LLPict* pPict, int nFrames, f32 fStep);
 s32  RC_GetCurrentFrameBuffer(void);                 // ViewController.c
-void fn_800760D8(LLPict* pPict);        // LLVideo.c
-void fn_800760F4(f32* pUV, LLPict* pPict);  // LLVideo.c
+void RenderState_SetPicture(LLPict* pPict);        // LLVideo.c
+void RenderView_MakePictUV(f32* pUV, LLPict* pPict);  // LLVideo.c
 void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
 void LLMath_MultiplyVec(f32* pA, f32* pB, f32* pOut);     // pOut = pA * pB, element by element
 void UIPoly_Draw(FEQuad* pQuad);
@@ -156,7 +156,7 @@ void UIPoly_Draw(FEQuad* pQuad) {
             }
         } else if (pEntry->u0 & 2) {
             pPict = (LLPict*)pEntry->p8;
-            fn_800760D8(pPict);
+            RenderState_SetPicture(pPict);
         }
         RenderState_SetDrawFlags(0x50);
     } else {
@@ -610,7 +610,7 @@ void UI_ShowDemoLoadingScreen(void) {
     pData = pEntry->p4;
     pEntry->p8 = (u8*)Pict_CreateFromMemory(pData->aData, pData->uSize);
     pPict = (LLPict*)pEntry->p8;
-    fn_800760D8(pPict);
+    RenderState_SetPicture(pPict);
     UI_ShowPictureFadingIn(pPict, 30, 1.0f / 30.0f);
     fn_80008380();
     Pict_Free((LLPict*)pEntry->p8);
@@ -683,7 +683,7 @@ void UI_DrawFullScreenPicture(LLPict* pPict, f32 fAlpha) {
     GoFrameBuf frameBuf;
     s32 nOld;
 
-    fn_800760D8(pPict);
+    RenderState_SetPicture(pPict);
     RenderState_SetBlendFactors(4, 5);
     RenderState_SetDrawFlags(0x50);
     DS_vSetAlphaTestMode(0, 6, 0x80);
@@ -699,7 +699,7 @@ void UI_DrawFullScreenPicture(LLPict* pPict, f32 fAlpha) {
     afColour[2] = 0.5f;
     afColour[3] = 0.5f * fAlpha;
     RenderView_MakeQuad(NULL, afXY, 0.0f, 0.0f, 1.0f, 1.0f);
-    fn_800760F4(afUV, pPict);
+    RenderView_MakePictUV(afUV, pPict);
     RenderView_SetColor(afColour);
     RenderView_DrawPrimitive(0xA1, afXY, 0, afUV, 2);
     UI_SetCurrentRenderCtxFrameBuffer(nOld);

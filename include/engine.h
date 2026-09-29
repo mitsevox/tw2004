@@ -519,7 +519,7 @@ typedef struct RenderState {
     f32  fFarZ;                 // 0x0B8  } nearz and farz (GoRenderCtx_Gc.c fn_80013EA0)
     s32  nScissorLeft;          // 0x0BC  } the scissor rectangle in 512 x 448 screen pixels, both
     s32  nScissorRight;         // 0x0C0  } ends inclusive; bit 0x200 (RenderState_SetViewport;
-    s32  nScissorTop;           // 0x0C4  } LLVideo.c fn_800760B0 takes left, top, right,
+    s32  nScissorTop;           // 0x0C4  } LLVideo.c RenderState_SetScissor takes left, top, right,
     s32  nScissorBottom;        // 0x0C8  } bottom)
     f32  fViewportLeft;         // 0x0CC  } a render camera's screen rectangle in frame buffer
     f32  fViewportTop;          // 0x0D0  } units, then the depth range 0 to 1; bit 0x800
@@ -537,7 +537,7 @@ typedef struct RenderState {
     TexBank*  pTexBank;         // 0x100  } the texture of the next draw (RenderState_SetBankTexture: the swing
     TexEntry* pTexEntry;        // 0x104  } trail's, the logo editor's)
     struct GxTexture* pTex108;  // 0x108  or this texture (fn_8002A608)
-    struct LLPict* pPict10C;    // 0x10C  or this picture (LLVideo.c fn_800760D8: a movie's)
+    struct LLPict* pPict10C;    // 0x10C  or this picture (LLVideo.c RenderState_SetPicture: a movie's)
     u32  uChanged;              // 0x110  which groups changed (the bits above)
     u32  uFlags;                // 0x114  bit 1: pTexBank/pTexEntry are set; bit 2: pTex108 is;
                                 //        bit 4: pPict10C is

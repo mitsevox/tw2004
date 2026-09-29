@@ -134,7 +134,7 @@ void SKN_DrawCharacterParts(Character* pChar);
 void SKN_DrawClubParts(Character* pChar);
 void LI_ResetLights(void);
 void LI_SetObjectLights(UObject* pObj);
-void fn_800760B0(int nX, int nY, int nWidth, int nHeight);
+void RenderState_SetScissor(int nX, int nY, int nWidth, int nHeight);
 void SKN_BeginFrame(void);
 void FE_CrAPBall_SetLogo(char* szBall);
 void Character_ExecuteTextureSwapFE(Character* pChar);
@@ -1075,7 +1075,7 @@ void FE_RenderGolfer(u8 bFull) {
         DS_vSetZBufferMode(3);
         RenderState_Flush();
         if (gpCrAPState->nScreenKind == 3) {
-            fn_800760B0(0, 0, 512, 448.0f * lbl_80281348);
+            RenderState_SetScissor(0, 0, 512, 448.0f * lbl_80281348);
         }
         RenderState_Flush();
         if (gpCrAPState->nRenderState == 0) {

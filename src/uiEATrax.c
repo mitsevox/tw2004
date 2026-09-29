@@ -30,7 +30,7 @@ f32 UI_EATraxGetTextOffsetX(void);
 void FO_vSetCurrentAddMode(s32 v);
 void fn_80012B9C(f32 fX, f32 fY);
 void UFont_SetFont(s32 nFont);
-void fn_80076128(s32 n);
+void FO_vSetCurrentColor(s32 n);
 
 // Reset the EA Trax song display: hidden, song 0, no logo (-1), font 2 in game type 10, else 1.
 // uiProcessInterface.c calls it when it resets the UI.
@@ -208,7 +208,7 @@ void UI_EATraxDrawSongNames(void) {
     UFont_DrawString(gEATraxSongs[nTrack].sz100, UI_EATraxGetBoxLeft() + UI_EATraxGetTextOffsetX(),
                 0.058f + (UI_EATraxGetBoxTop() + UI_EATraxGetTextOffsetY()));
     FO_vSetCurrentAddMode(0);
-    fn_80076128(11);
+    FO_vSetCurrentColor(11);
 }
 
 // The text's offset down from the box's top: 0.025.
