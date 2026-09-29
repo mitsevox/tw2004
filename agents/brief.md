@@ -56,7 +56,9 @@ if things are going well.
   `// fake match:` comment.
 - **Edit C and headers only with the editor tools.** For one edit repeated in many places, save a
   Python script with the Write tool, run it, read the whole `git diff`, and name it in your report.
-  No sed / heredocs / `python -c` / `python -` on anything, scratch scripts included.
+  No sed / heredocs / `python -c` / `python -` on C, headers or anything else in the repository.
+  Your own scratch DATA files (batch tsvs, notes) may be edited through the shell (owner,
+  2026-09-29); scratch scripts that change the repository stay editor-written and saved.
 - **Float constants: EA's exact expression** (`1.0f/72.0f`, `59.94f/60.0f`), never a rounded
   decimal: objdiff masks constant values; `constcheck.py` does not.
 - **Names and comments depend on your role.** Naming lanes (the current phase, roles/naming.md) name
