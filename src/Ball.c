@@ -1,9 +1,13 @@
-// Ball.c (our name): the ball's flight and roll. No assert names this file (the leaked list's
-// PsBallFx.c is elsewhere). Units are yards and seconds. Many constants are inches or miles per
-// hour converted to yards (INCHES, MPH): the original's float bits are exactly those quotients,
-// not the rounded decimals. The cup is real geometry (surface classes 12/18, surface type 90): the
-// ball is holed when it has dropped below the pin height. What is written up in docs/gameplay.md
-// is the near-cup pull below.
+// Ball.c (our name; EA's Physics.c, Golf/Physics/ in TW07: its functions run here in TW07's
+// order, Physics_ForceBallInHole to Physics_CloseModule, with the few small helpers TW07 inlines
+// at the end; Wind.c follows): the ball's flight, bounce and roll, the shot tables that turn club,
+// shot kind and power into a launch, the drop and the course settings (turf, green, fairway,
+// rough). No assert names this file (the leaked list's PsBallFx.c is elsewhere). Units are yards
+// and seconds. Many constants are inches or miles per hour converted to yards (INCHES, MPH): the
+// original's float bits are exactly those quotients, not the rounded decimals. The cup is real
+// geometry (surface classes 12/18, surface type 90): the ball is holed when it is on a cup surface
+// more than 2 in (rolling) or 2.5 in (landing) below the pin. The pull toward the cup
+// (Physics_ApplySuperSucka) is written up in docs/gameplay.md.
 
 #include "golfer.h"
 #include "physics.h"
@@ -397,16 +401,19 @@ s32 gTurfSpeed = 2;
 // options +0x1C (ROUGH LENGTH?), 0..2: class-5 friction x 0.7, 1, 1.3
 s32 gRoughSetting = 1;
 // .bss: defined in reverse address order.
+// Per player 0..3: the ball's last position over ground Ter_CheckForDropLocation calls a preferred
+// lie, and its last position on a good drop spot (Physics_Simulate, each step; both also set at a
+// strike, a drop and a new ball). A drop (GoTerrainCollision.c, GameMode8.c) goes back to one.
 f32 gBallPreferredLieSpot[4][4];
 f32 gBallDropSpot[4][4];
 // .sbss: defined in reverse address order.
-u8  gBallGroundValid;                          // the two ground heights below are current
-f32 gBallGroundHeight;                         // ground height under the ball
-f32 gBallGroundHeight2;                         // the other ground height (Ter_GetEnclosingGroundData)
+u8  gBallGroundValid;                     // the two ground heights below are current
+f32 gBallGroundHeight;                    // ground height under the ball
+f32 gBallGroundHeight2;                   // the other ground height (Ter_GetEnclosingGroundData)
 s32 gFairwaySetting;                      // 0..2: class-2 friction x 1.0 / 0.9 / 0.8
 // options +0x18 (GREEN SPEED?), 0..2: green friction x 1, 0.9, 0.8
 s32 gGreenSpeedSetting;
-u8  gNoRandomRolls;
+u8  gNoRandomRolls;                       // lie, bounce and tree rolls come out 0 (the lessons)
 u8  gSimFullCup;                          // a sim that still gets the cup pull and near-cup gravity
                                           // (state 15, look-ahead)
 u8  gSimulating;                          // 0x80281DD0  a rehearsal: no sounds or effects
@@ -580,9 +587,6 @@ f32 Physics_EstimateShotDistance100(int nKind, int nClub) {
     return 1.0f;
 }
 
-// Power for a distance with a club: the row's 11 distances are power 0.1 to 1.1, interpolated,
-// plus the difference between the table's surface and the one under the ball (a surface that
-// is not a stopping surface counts as 14); 1.1 beyond the row.
 // A row's distance at column i (an accessor in the original: reading the array directly gives
 // different registers).
 static inline f32 ClubRow_Dist(const ClubRow* pRow, int i) {
@@ -1078,8 +1082,8 @@ u8 Physics_GetSurfaceInfo(Ball* pBall, SurfaceType** ppSurface, f32* pNormal) {
     f32          vNormal2[4];
     f32          fDrop;
     int          nPlayer;
-    Ter_GetEnclosingGroundData(pBall->pCourse, pBall->vPos, &gBallGroundHeight, &pSurface, vNormal, &gBallGroundHeight2,
-                               &pSurface2, vNormal2);
+    Ter_GetEnclosingGroundData(pBall->pCourse, pBall->vPos, &gBallGroundHeight, &pSurface, vNormal,
+                               &gBallGroundHeight2, &pSurface2, vNormal2);
     gBallGroundValid = 1;
     if (gBallGroundHeight < -60000.0f) {
         if (!Ball_NoGround(gBallGroundHeight2)) {
@@ -1859,7 +1863,8 @@ void Physics_FixBallHeight(Ball* pBall, u8 bSettle, f32 fTicks) {
     bRetried = 0;
     for (;;) {
         if (!gBallGroundValid) {
-            Ter_GetEnclosingGroundHeight(pBall->pCourse, pBall->vPos, &gBallGroundHeight, &gBallGroundHeight2);
+            Ter_GetEnclosingGroundHeight(pBall->pCourse, pBall->vPos, &gBallGroundHeight,
+                                         &gBallGroundHeight2);
         }
         fGround = gBallGroundHeight;
         if (fGround < -60000.0f) {
