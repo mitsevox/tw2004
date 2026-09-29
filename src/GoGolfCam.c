@@ -761,7 +761,7 @@ void GolfCamera_ProcessPlaceBallCamera(View* pView, int nPlayer) {
             pView->script.fFadeTime += gSession.fFrameTime;
         }
         if (gSession.fFrameTime != 0.0f) {
-            fSin = Math_Sin(20.0f * PI / 180.0f);    // not DEG(20.0f): see GolfCamera_ProcessSpeedGolfRunCamera
+            fSin = Math_Sin(20.0f * PI / 180.0f);    // not DEG(20.0f): see camera 9's tick
             fCos = Math_Cos(20.0f * PI / 180.0f);
             fUp = 10.0f * fSin;
             fBack = 10.0f * fCos;

@@ -1,7 +1,12 @@
-// GoDynamicCam.c (EA's name, from its asserts; also in EA's 2002 source tree; TW06): the dynamic
-// cameras. Loads the camera shots, sequences and shot choices from the camera files into
-// gpDynCam's tables, and picks the sequence and shot that fit a golfer's situation (club,
-// shot kind, course and hole, game mode).
+// GoDynamicCam.c (EA's name, from its asserts; also in EA's 2002 source tree, TW06 and TW07's
+// golf/cameras, whose function order ours follows): the dynamic cameras. Loads the camera files
+// from the stream into gpDynCam's tables: 'CAMV' the shots (TW07's scripts or views), 'CAMS' the
+// sequences with their shot choices (TW07's event triggers), 'CAMA' the anim pairs (the shot or
+// sequences to show for a golfer animation). Picks the sequence for a moment of the shot by its
+// state, club, shot type, lies, course, par, player and game mode (DynamicCam_ChooseSequence), a
+// shot from it for a camera event (DynamicCam_ChooseScriptInSequence), and places the camera for
+// a shot each frame by its tracking mode (DynamicCam_ProcessScript and the DynamicCam_Track*
+// functions). The camera scripts (gocamscripts.c) and golf cameras (GoGolfCam.c) drive it.
 
 #include "golfer.h"
 #include "game.h"
@@ -9,7 +14,7 @@
 #include "frontend/fe.h"
 #include "endian.h"
 
-DynCamTables* gpDynCam;
+DynCamTables* gpDynCam;    // the loaded shots, sequences, anim pairs and choices (DynamicCam_Init)
 
 u8   BitArray_TestBit(u32* pBits, int nBit);         // the bit is set
 void DynamicCam_CopySequenceData(u8* pSrc, u8* pDst, int nCount);
@@ -1466,6 +1471,9 @@ u8 DynamicCam_IsDefualtSeq(CamSequence* pSequence, int nKind) {
     return 1;
 }
 
+// The camera lie for each end lie (DynamicCam_MaterialToCameraLie; entry 1 is decided there by the
+// ball's lie) and for each ball lie (DynamicCam_BallLieToCameraLie). A sequence's b49 and b4A
+// hold one bit per camera lie.
 s32 gMaterialToCamLies[20] = {0, 1, 2, 6, 2, 3, 4, 5, 3, 3, 3, 3, 6, 3, 3, 3, 5, 3, 6, 7};
 s32 gBallLieToCamLies[17] = {1, 2, 2, 3, 3, 3, 4, 4, 4, 6, 2, 3, 6, 5, 5, 5, 7};
 

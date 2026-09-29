@@ -109,8 +109,8 @@ GameEffects* GameEffects_ResetGameEffectTimeSettings(void) {
 // says so. Otherwise the frame is rounded to whole 60 Hz ticks (0 to 3; a longer frame counts as
 // 1), then scaled: to 3/4 while the golf cameras' b56 is set (GolfCamera_bIs3ScreenCamOn) and the
 // golfer has not passed animation tag 2 (ComicCam_HasBallBeenHit); else doubled while the timed
-// double speed runs (b9, until fC counts down below 0); else doubled with double time and halved with half time (counting
-// n28). Super slow motion then multiplies it by fSlowMo.
+// double speed runs (b9, until fC counts down below 0); else doubled with double time and halved
+// with half time (counting n28). Super slow motion then multiplies it by fSlowMo.
 f32 GameEffects_AdjustTimeRate(f32 fFrameTime) {
     f32 fTicks = 1.0f;
     f32 fBest = 10000.0f;

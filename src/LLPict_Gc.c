@@ -9,7 +9,7 @@
 
 void Pict_TilePlane(u8* pSrc, u8* pDst, int nWidth, int nHeight);
 void Pict_InitTextures(LLPict* pPict);
-void Pict_TilePlaneInPlace(u8* pPlane, void* pWork, int nWidth, int nHeight);  // reorders one plane through pWork
+void Pict_TilePlaneInPlace(u8* pPlane, void* pWork, int nWidth, int nHeight);
 
 void* gPictWorkBuffer;          // 2048 bytes from Pict_InitModule: a band of four rows being tiled
 void** gpPictWorkBuffer = &gPictWorkBuffer;     // every use of the work buffer goes through it

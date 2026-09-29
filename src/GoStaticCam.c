@@ -1,9 +1,11 @@
-// GoStaticCam.c (EA's name, from its asserts; also in EA's 2002 source tree): the course's static
-// cameras and fly-by camera paths. The course data brings them as 'Cact' objects (UKernel.c hands
-// type 201 to StaticCam_ParseStaticCameraActor, type 200 to StaticCam_ParseFlybyCameraActor) and
-// the paths' timing curves as a 'CAMC' stream object (StaticCam_LoadCAMCfromStream). The golf
-// cameras (GoGolfCam.c) pick a static camera whose area holds the ball (StaticCam_ChooseScript) and
-// fly along a path (StaticCam_GetFlyByCam, StaticCam_GetFlybyInformation).
+// GoStaticCam.c (EA's name, from its asserts; also in EA's 2002 source tree, TW06 and TW07's
+// golf/cameras, whose function order ours follows): the course's static cameras and fly-by camera
+// paths. The course data brings them as 'Cact' objects (UKernel.c hands type 201 to
+// StaticCam_ParseStaticCameraActor, type 200 to StaticCam_ParseFlybyCameraActor) and the paths'
+// timing curves as a 'CAMC' stream object (StaticCam_LoadCAMCfromStream). The golf cameras
+// (GoGolfCam.c) pick a static camera whose area holds the ball (StaticCam_ChooseScript; in this
+// build only on one hole, course 12's Game_GetCurHoleNum 10) and fly along a path
+// (StaticCam_GetFlyByCam, StaticCam_GetFlybyInformation).
 
 #include "game_types.h"
 #include "engine.h"
@@ -24,7 +26,7 @@ u8   StaticCam_CheckHotZone(CamShot* pShot, int nPlayer);
 void StaticCam_Vec3Add(f32* pA, f32* pB, f32* pOut);
 void StaticCam_Vec3Sub(f32* pA, f32* pB, f32* pOut);
 
-StaticCams* gpStaticCams;
+StaticCams* gpStaticCams;  // the static and fly-by cameras and paths (StaticCam_Init)
 
 // Registers the 'CAMC' stream handler (StaticCam_LoadCAMCfromStream), the fly-by paths' timing
 // curves.
