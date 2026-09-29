@@ -129,8 +129,8 @@ void Ter_Init(void);
 void fn_80055D3C(void);
 void fn_80055D54(void);
 void fn_80055D6C(void);
-void fn_80055F14(void);
-void fn_80055F18(void);
+void Wind_vInitModule(void);
+void Wind_vCloseModule(void);
 void fn_800563C4(void);
 void fn_80056454(void);
 void GOLFERSTATE_OpenONCE(void);
@@ -446,7 +446,7 @@ void fn_8006C7A8(void) {
     uSeed = Misc_CreateRandomSeed();
     gSession.nSeed = uSeed;
     Misc_InitModule(uSeed);
-    fn_80055F14();
+    Wind_vInitModule();
     fn_80045D18();
     DynObj_InitModuleEmpty();
     fn_8004950C();
@@ -470,7 +470,7 @@ void fn_8006C854(void) {
     fn_80049510();
     fn_80045D5C();
     DynObj_CloseModuleEmpty();
-    fn_80055F18();
+    Wind_vCloseModule();
     Misc_CloseModule();
     Legacy_Character_CloseModule();
     TI_vCloseModule();

@@ -267,7 +267,7 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
         _SetStateVecAndCondition(pValues, 9, pPlayer->nPutts[nHole], pSetBits);
         _SetStateVecAndCondition(pValues, 32, SitDev_GetWeatherChangeCondition(), pSetBits);
         _SetStateVecAndCondition(pValues, 11, gSession.options.nWeather, pSetBits);
-        _SetStateVecAndCondition(pValues, 12, (s32)Wind_Get(NULL), pSetBits);
+        _SetStateVecAndCondition(pValues, 12, (s32)Wind_GetPhysicsWindVelocity(NULL), pSetBits);
 
         // the class of where the shot started
         // fake match: the original reloads the surface for the index (volatile at that one use)

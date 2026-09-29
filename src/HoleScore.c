@@ -968,7 +968,7 @@ int fn_800D13F4(int nPlayer) {
     f32 fAim = gPlayers[nPlayer].fAim;
     f32 fAngle;
 
-    if (Wind_Get(vWind) > 6.0f) {
+    if (Wind_GetPhysicsWindVelocity(vWind) > 6.0f) {
         fAngle = atan2f(-vWind[0], vWind[2]) - fAim;
         while (fAngle < 0.0f) {
             fAngle += 2.0f * PI;

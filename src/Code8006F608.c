@@ -75,7 +75,7 @@ void fn_8006F650(void) {
     if (gSession.nSplitScreen || (gSession.uFlags & 0x4000)) {
         lbl_802811F0->uFlags |= 1;
     } else {
-        if (Wind_Get(NULL) > 6.0f && gSession.options.nWind != 0) {
+        if (Wind_GetPhysicsWindVelocity(NULL) > 6.0f && gSession.options.nWind != 0) {
             if (Game_GetCourse() == 0 || Game_GetCourse() == 1 || Game_GetCourse() == 2 ||
                 Game_GetCourse() == 6) {
                 lbl_802811F0->uFlags |= 0x10;

@@ -845,7 +845,7 @@ void GM_vGetPlayerWindDirection(MsgArg* pArgs, MsgArg* pResult) {
     f32 vWind[3];
     f32 fAngle;
 
-    Wind_Get(vWind);
+    Wind_GetPhysicsWindVelocity(vWind);
     fAngle = atan2f(-vWind[0], vWind[2]) - fAim;
     while (fAngle < 0.0f) {
         fAngle += TWOPI;
@@ -856,9 +856,9 @@ void GM_vGetPlayerWindDirection(MsgArg* pArgs, MsgArg* pResult) {
     pResult->f = 8.0f * (fAngle / TWOPI);
 }
 
-// Message 21: the wind's speed (Wind_Get).
+// Message 21: the wind's speed (Wind_GetPhysicsWindVelocity).
 void GM_vGetPlayerWindSpeed(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = Wind_Get(NULL);
+    pResult->i = Wind_GetPhysicsWindVelocity(NULL);
 }
 
 // Message 22: the round's scoring method (GM_GetScoringType: gpGame->nScoringType).

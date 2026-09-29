@@ -981,7 +981,7 @@ void Ball_FlightStep(Ball* pBall, f32 fTicks) {
     f32 vPin[4];
     f32 fDrag, fSpeed2, fSpin, fSpeed, fLift, fLen, fInto, fExtra, fHeight, fK, fX, fZ;
 
-    Wind_Get(vWind);
+    Wind_GetPhysicsWindVelocity(vWind);
     if (Player_IsCPU(pBall->nPlayer)) {
         vWind[0] = Ball_Clamp(vWind[0], -15.0f, 15.0f);
         vWind[1] = Ball_Clamp(vWind[1], -15.0f, 15.0f);

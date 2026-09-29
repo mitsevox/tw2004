@@ -14,8 +14,8 @@ void fn_801164F8(f32* pA, f32* pB, f32* pOut);
 void fn_8011651C(f32* pA, f32* pB, f32* pOut);
 void Quat_RotateVector(f32* pQuat, f32* pIn, f32* pOut);           // Quaternion.c: a vector turned by it
 void Quat_ExtractEulerAngles(f32* pQ, f32* pA, f32* pB, f32* pC);        // Quaternion.c: a rotation as angles
-f32  fn_80055F80(void);                     // Ball.c
-void fn_800561CC(f32* pOut);                // Ball.c: the wind's direction
+f32  Wind_GetPhysicsSpeed(void);                     // Ball.c
+void Wind_GetDirection(f32* pOut);                // Ball.c: the wind's direction
 void SKEL_TransformBones(CharModel* pModel, u32* auBits);
 f32  fn_80116304(u32 nFrame, f32 fPhase, f32 fStrength);
 f32  fn_80116468(void);
@@ -574,7 +574,7 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
 
     // Where the wind blows from.
     if (lbl_802824F8->nB4 == 0) {
-        fn_800561CC(vWind);
+        Wind_GetDirection(vWind);
     } else {
         // A fixed direction in the model's root space (1 is the same as 5).
         if (lbl_802824F8->nB4 == 2) {
@@ -894,12 +894,12 @@ f32 fn_80116304(u32 nFrame, f32 fPhase, f32 fStrength) {
     return 1.0f - lbl_802824F8->f90 * (fOne - fSway);
 }
 
-// The strength the chains sway with: the settings' nB8, or fn_80055F80's when it is -1; at least 5.
+// The strength the chains sway with: the settings' nB8, or Wind_GetPhysicsSpeed's when it is -1; at least 5.
 f32 fn_80116468(void) {
     f32 fStrength;
 
     if (lbl_802824F8->nB8 == -1) {
-        fStrength = fn_80055F80();
+        fStrength = Wind_GetPhysicsSpeed();
     } else if (lbl_802824F8->nB8 == -1) {
         fStrength = 0.0f;
     } else {

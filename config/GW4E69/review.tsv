@@ -4551,3 +4551,11 @@ address	name	comment	by	date
 8004AB90	ActAnimal_GetMeshFlags	rewrite	rt3 (replayed by orchestrator)	2026-09-29
 8004ABA4	ActAnimal_GetMeshAlternative	keep	rt3 (replayed by orchestrator)	2026-09-29
 8004ABB4	ActAnimal_GetRootMesh	none	rt3 (replayed by orchestrator)	2026-09-29
+80055F14	Wind_vInitModule	add	rt4 (replayed by orchestrator)	2026-09-29
+80055F18	Wind_vCloseModule	add	rt4 (replayed by orchestrator)	2026-09-29
+80055F1C	Wind_GetPhysicsWindVelocity	rewrite	rt4 (replayed by orchestrator)	2026-09-29
+80055F78	Wind_GetPhysicsDirection	none	rt4 (replayed by orchestrator)	2026-09-29
+80055F80	Wind_GetPhysicsSpeed	none	rt4 (replayed by orchestrator)	2026-09-29
+80055F88	Wind_SetPhysicsWind	rewrite	rt4 (replayed by orchestrator)	2026-09-29
+80055FC8	Wind_InitForHole	rewrite	rt4 (replayed by orchestrator)	2026-09-29
+800561CC	Wind_GetDirection	keep	rt4 (replayed by orchestrator)	2026-09-29

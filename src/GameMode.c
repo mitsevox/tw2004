@@ -196,7 +196,7 @@ void GM_InitForHole(void) {
     ViewController_TurnOnViewController(2, 0);
     ViewController_TurnOnViewController(3, 0);
     GM_InitBallsToTee();
-    Wind_Generate();
+    Wind_InitForHole();
     gpGame->pfnLoadHole();
     GameEffects_ResetGameEffectSettings();
     GUI_Init();

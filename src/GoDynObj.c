@@ -922,7 +922,7 @@ void DynObj_UpdateDivot(int nPlayer) {
         return;
     }
     pB->f10 += gSession.fFrameTime;
-    Wind_Get(vWind);
+    Wind_GetPhysicsWindVelocity(vWind);
     LLMath_Scale(0.48888f * 0.3f, vWind, vWind);
     GoDynObj_Vec3Add(vWind, pB->v40, vMove);
     Vec3_Scale(pB->f10, vMove, vMove);
@@ -1064,7 +1064,7 @@ void DynObj_UpdateTee(int nPlayer) {
             return;
         }
         pA->f10 += gSession.fFrameTime;
-        Wind_Get(vWind);
+        Wind_GetPhysicsWindVelocity(vWind);
         LLMath_Scale(0.48888f, vWind, vWind);
         GoDynObj_Vec3Add(vWind, pA->v40, vMove);
         Vec3_Scale(pA->f10, vMove, vMove);

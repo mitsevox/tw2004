@@ -26,24 +26,24 @@ u8 CTIP_FlopShotTrigger(int nPlayer);
 void GUI_ShowSwingTip(u8 nKind, int nTip);   // GameUI.c: show a tip (1 full, 2 short)
 
 // The general wind tip's test (tip 0, two short versions): true for any shot but a putt when the
-// wind's speed (Wind_Get) is over 6.
+// wind's speed (Wind_GetPhysicsWindVelocity) is over 6.
 u8 CTIP_CheckGeneralWindTrigger(int nPlayer) {
     if (gPlayers[nPlayer].nShotKind == 0) return 0;
-    return Wind_Get(NULL) > 6.0f;
+    return Wind_GetPhysicsWindVelocity(NULL) > 6.0f;
 }
 
 // The into-the-wind tip's test (tip 2, four short versions): a shot other than a putt, in a wind
-// over 6 whose vector (Wind_Get) lies 135 to 225 degrees off the aim (the angle measured like the
-// aim's, from +z).
+// over 6 whose vector (Wind_GetPhysicsWindVelocity) lies 135 to 225 degrees off the aim (the angle
+// measured like the aim's, from +z).
 u8 CTIP_CheckIntoWindTrigger(int nPlayer) {
     f32 fAim;
     f32 fAngle;
     f32 vWind[4];
 
     if (gPlayers[nPlayer].nShotKind == 0) return 0;
-    if (Wind_Get(NULL) > 6.0f) {
+    if (Wind_GetPhysicsWindVelocity(NULL) > 6.0f) {
         fAim = gPlayers[nPlayer].fAim;
-        Wind_Get(vWind);
+        Wind_GetPhysicsWindVelocity(vWind);
         fAngle = (f32)atan2(-vWind[0], vWind[2]) - fAim;
         while (fAngle < 0.0f) {
             fAngle += TWOPI;
@@ -67,9 +67,9 @@ u8 CTIP_CheckWithWindTrigger(int nPlayer) {
     f32 vWind[4];
 
     if (gPlayers[nPlayer].nShotKind == 0) return 0;
-    if (Wind_Get(NULL) > 6.0f) {
+    if (Wind_GetPhysicsWindVelocity(NULL) > 6.0f) {
         fAim = gPlayers[nPlayer].fAim;
-        Wind_Get(vWind);
+        Wind_GetPhysicsWindVelocity(vWind);
         fAngle = (f32)atan2(-vWind[0], vWind[2]) - fAim;
         while (fAngle < 0.0f) {
             fAngle += TWOPI;

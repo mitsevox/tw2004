@@ -266,7 +266,7 @@ typedef struct DynChainSettings {
     f32  f98;                   // 0x98  } fStrength goes from 0 to 35
     s32  an9C[6];               // 0x9C  per chain kind (DynChain.n10): fn_80115348 sways it
     s32  nB4;                   // 0xB4  fn_80115348's wind direction: 0 the wind's, else a fixed one
-    s32  nB8;                   // 0xB8  the strength fn_80116468 gives; -1: fn_80055F80's
+    s32  nB8;                   // 0xB8  the strength fn_80116468 gives; -1: Wind_GetPhysicsSpeed's
     s32  nBC;                   // 0xBC
 } DynChainSettings;
 LAYOUT_ASSERT(DynChainSettings, 0xC0);

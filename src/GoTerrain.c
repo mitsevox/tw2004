@@ -2061,7 +2061,7 @@ u8 fn_800347B4(UStreamObject* pObject) {
 // 13, else "flagwind".
 void fn_800348DC(void) {
     f32 vWind[3];
-    f32 fSpeed = Wind_Get(vWind);
+    f32 fSpeed = Wind_GetPhysicsWindVelocity(vWind);
     Character* pFlag = SkeletalObject_FindObject(100);
 
     if (pFlag != NULL) {

@@ -1,5 +1,5 @@
 // Wind.c (EA's name: TW07's Golf/Physics/Wind.c holds the same functions in this order, from
-// Wind_vInitModule and Wind_vCloseModule (both empty; gomainloop calls fn_80055F14 and fn_80055F18
+// Wind_vInitModule and Wind_vCloseModule (both empty; gomainloop calls Wind_vInitModule and Wind_vCloseModule
 // at module init and close) to Wind_GetDirection; TW06 has golf/physics/wind.c): split off Ball.c
 // at 0x80055F14. Its .sbss starts on the 8-aligned address after Ball.c's padding at
 // 0x80281DE5..0x80281DE8 and its .sdata2 after the padding at 0x80283584..0x80283588.
@@ -27,14 +27,17 @@ f32 gWindDirs[8][4] = {                          // 0x80187EF8  unit vectors, 45
 s32 gWindDir;                             // 0x80281DEC  0..7
 f32 gWindSpeed;                           // 0x80281DE8
 
-void fn_80055F14(void) {
+// Wind module init, called by the main loop's module init: empty in this build.
+void Wind_vInitModule(void) {
 }
 
-void fn_80055F18(void) {
+// Wind module close, called by the main loop's module close: empty in this build.
+void Wind_vCloseModule(void) {
 }
 
-// The wind: its speed, and (when asked) its vector - the direction's unit vector x speed.
-f32 Wind_Get(f32* pOut) {
+// The wind's speed, and (when pOut is not NULL) its velocity: the direction's unit vector times the
+// speed.
+f32 Wind_GetPhysicsWindVelocity(f32* pOut) {
     if (pOut != NULL) {
         f32 v[4];
         LLMath_Scale(gWindSpeed, gWindDirs[gWindDir], v);
@@ -43,16 +46,17 @@ f32 Wind_Get(f32* pOut) {
     return gWindSpeed;
 }
 
-int fn_80055F78(void) {
+int Wind_GetPhysicsDirection(void) {
     return gWindDir;
 }
 
-f32 fn_80055F80(void) {
+f32 Wind_GetPhysicsSpeed(void) {
     return gWindSpeed;
 }
 
-// Set the wind (a speed of 0 or less is stored as 0.1) and tell fn_800348DC.
-void Wind_Set(int nDir, f32 fSpeed) {
+// Sets the wind: direction nDir (0..7, gWindDirs) and speed fSpeed (0 or less is stored as 0.1),
+// then turns the course's flag to it (fn_800348DC).
+void Wind_SetPhysicsWind(int nDir, f32 fSpeed) {
     gWindDir   = nDir;
     gWindSpeed = fSpeed;
     if (fSpeed <= 0.0f) {
@@ -61,10 +65,13 @@ void Wind_Set(int nDir, f32 fSpeed) {
     fn_800348DC();
 }
 
-// The hole's wind: the authored one, none with the wind off, or - when the hole has none - one
-// rolled from the wind setting (courses 6 and 15 at least 2, except in mode 4 without a
-// challenge): speed 0..6, 2..12, 5..20 or 12..31, direction one of eight.
-void Wind_Generate(void) {
+// The hole's wind: the one authored in the course table; none when the wind is off; or, when the
+// hole has none authored (direction 0 and speed 0), one rolled from the wind setting
+// (gSession.options.nWind 0..3). On Royal Birkdale and St Andrews (courses 6 and 15) the setting is
+// raised to 2 (from 0 or 1) or 3 (from 2 or 3), except on the ladder's (mode 4) first event
+// (GameMode4_GetCurrentEvent 0). Speed by setting: 0..6, 2..12, 5..20 or 12..31; direction one of
+// eight at random.
+void Wind_InitForHole(void) {
     int n      = fn_800D2CB0_HoleWindDir();
     f32 fSpeed = fn_800D2CF8_HoleWindSpeed();
     if (gpGame->bNoWind) {
@@ -100,10 +107,10 @@ void Wind_Generate(void) {
         }
         n = Misc_RandFunc(0) % 8;
     }
-    Wind_Set(n, fSpeed);
+    Wind_SetPhysicsWind(n, fSpeed);
 }
 
 // The wind's direction as a unit vector.
-void fn_800561CC(f32* pOut) {
+void Wind_GetDirection(f32* pOut) {
     LLMath_CopyVec(gWindDirs[gWindDir], pOut);
 }

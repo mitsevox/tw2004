@@ -60,7 +60,7 @@ void GameModeReplay_Init(void) {
 // settings nF1A, nF1C (the fairway setting) and nF1E go back in (fn_80055C40, fn_80055CAC,
 // fn_80055CD0).
 void GameModeReplay_LoadHole(void) {
-    Wind_Set(gReplayData.nWindDir, gReplayData.nWindSpeed);
+    Wind_SetPhysicsWind(gReplayData.nWindDir, gReplayData.nWindSpeed);
     fn_80055C40(gReplayData.nF1A);
     fn_80055CAC(gReplayData.nF1C);
     fn_80055CD0(gReplayData.nF1E);

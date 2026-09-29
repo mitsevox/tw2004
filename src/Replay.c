@@ -12,8 +12,8 @@ ReplayBuffer* lbl_80281E48;
 int  fn_80055CA4(void);                 // Ball.c
 int  fn_80055CC8(void);                 // Ball.c
 int  fn_80055D34(void);                 // Ball.c
-int  fn_80055F78(void);                 // Ball.c: the wind's direction
-f32  fn_80055F80(void);                 // Ball.c: the wind's speed
+int  Wind_GetPhysicsDirection(void);                 // Ball.c: the wind's direction
+f32  Wind_GetPhysicsSpeed(void);                 // Ball.c: the wind's speed
 f32  fn_8006C630(void);                 // gomainloop.c
 
 void REPLAY_InitModule(void) {
@@ -68,8 +68,8 @@ void REPLAY_Save(int nPlayer) {
     gReplayData.nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
     gReplayData.nTeeSet = gSession.nTeeSet[nPlayer];
     gReplayData.nPinSet = Game_CurrentPinSet();
-    gReplayData.nWindDir = fn_80055F78();
-    gReplayData.nWindSpeed = fn_80055F80();
+    gReplayData.nWindDir = Wind_GetPhysicsDirection();
+    gReplayData.nWindSpeed = Wind_GetPhysicsSpeed();
     nMode = gSession.options.nWeather;
     gReplayData.nWeather = nMode;
     if (nMode == 2) {

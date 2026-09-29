@@ -665,7 +665,7 @@ void fn_800A3CB0(f32* pPos, int nPlayer) {
     f32 vWind[4];
     int nView = gPlayers[nPlayer].nView[0];
 
-    Wind_Get(vWind);
+    Wind_GetPhysicsWindVelocity(vWind);
     LLMath_Scale(0.1f, vWind, vWind);
     Vec3Copy(pPos, lbl_8018CA98[15].v80);
     Vec3Copy(vWind, lbl_8018CA98[15].vA0);

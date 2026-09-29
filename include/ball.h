@@ -340,9 +340,9 @@ void fn_80055C1C(u8 b);
 void fn_80055C40(int n);
 void fn_80055CAC(int n);
 void fn_80055CD0(int n);
-void Wind_Set(int nDir, f32 fSpeed);
-f32  Wind_Get(f32* pOut);               // the wind's speed; its vector (direction x speed) into pOut
-void Wind_Generate(void);
+void Wind_SetPhysicsWind(int nDir, f32 fSpeed);
+f32  Wind_GetPhysicsWindVelocity(f32* pOut);               // the wind's speed; its vector (direction x speed) into pOut
+void Wind_InitForHole(void);
 void Ball_RotatePair(f32* pA, f32* pB, f32 fSin, f32 fCos);   // turns the pair (*pA, *pB) by an angle
 
 void DynObj_ShotDivotHoleHide(Ball* pBall, int nPlayer);
