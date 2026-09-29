@@ -47,28 +47,28 @@ int    Startup_FindNextCardWithStatus(s32* pnPort, s32* pnSlot);
 void   Startup_LoadLegalPicture(UStreamObject* pObject);
 void   Startup_Vec3Add(f32* pA, f32* pB, f32* pOut);
 void   Startup_Vec3Sub(f32* pA, f32* pB, f32* pOut);
-void   fn_800B1F20(MsgArg* pArgs, MsgArg* pResult);
-void   fn_800B1F9C(MsgArg* pArgs, MsgArg* pResult);
-void   fn_800B1FBC(MsgArg* pArgs, MsgArg* pResult);
-void   fn_800B1FFC(MsgArg* pArgs, MsgArg* pResult);
-void   fn_800B203C(MsgArg* pArgs, MsgArg* pResult);
-void   fn_800B204C(MsgArg* pArgs, MsgArg* pResult);
-void   fn_800B206C(MsgArg* pArgs, MsgArg* pResult);
-void   fn_800B208C(MsgArg* pArgs, MsgArg* pResult);
-void   fn_800B20B8(MsgArg* pArgs, MsgArg* pResult);
-void   fn_800B2104(MsgArg* pArgs, MsgArg* pResult);
-void   fn_800B2150(MsgArg* pArgs, MsgArg* pResult);
-void   fn_800B218C(MsgArg* pArgs, MsgArg* pResult);
-void   fn_800B21D0(MsgArg* pArgs, MsgArg* pResult);
-void   fn_800B21DC(MsgArg* pArgs, MsgArg* pResult);
-void   fn_800B21E0(MsgArg* pArgs, MsgArg* pResult);
-void   fn_800B21E4(MsgArg* pArgs, MsgArg* pResult);
-void   fn_800B21F0(MsgArg* pArgs, MsgArg* pResult);
-void   fn_800B223C(MsgArg* pArgs, MsgArg* pResult);
-void   fn_800B2250(MsgArg* pArgs, MsgArg* pResult);
-void   fn_800B227C(MsgArg* pArgs, MsgArg* pResult);
-void   fn_800B22D4(MsgArg* pArgs, MsgArg* pResult);
-void   fn_800B22F4(MsgArg* pArgs, MsgArg* pResult);
+void   GM_vStartupGetBlocksNeeded(MsgArg* pArgs, MsgArg* pResult);
+void   GM_vStartupCheckCards(MsgArg* pArgs, MsgArg* pResult);
+void   GM_vStartupFindFirstCard(MsgArg* pArgs, MsgArg* pResult);
+void   GM_vStartupFindNextCard(MsgArg* pArgs, MsgArg* pResult);
+void   GM_vStartupFadeToBlack(MsgArg* pArgs, MsgArg* pResult);
+void   GM_vStartupLoadFromCard(MsgArg* pArgs, MsgArg* pResult);
+void   GM_vStartupSkipCardLoad(MsgArg* pArgs, MsgArg* pResult);
+void   GM_vStartupFormatCard(MsgArg* pArgs, MsgArg* pResult);
+void   GM_vStartupGetNextCardStatus(MsgArg* pArgs, MsgArg* pResult);
+void   GM_vStartupGetCurrentCardStatus(MsgArg* pArgs, MsgArg* pResult);
+void   GM_vStartupPlaySound(MsgArg* pArgs, MsgArg* pResult);
+void   GM_vStartupFormatHadIOError(MsgArg* pArgs, MsgArg* pResult);
+void   GM_vStartupMessage11_Return0(MsgArg* pArgs, MsgArg* pResult);
+void   GM_vStartupMessage12_Empty(MsgArg* pArgs, MsgArg* pResult);
+void   GM_vStartupMessage13_Empty(MsgArg* pArgs, MsgArg* pResult);
+void   GM_vStartupMessage14_Return1(MsgArg* pArgs, MsgArg* pResult);
+void   GM_vStartupGetFilesNeeded(MsgArg* pArgs, MsgArg* pResult);
+void   GM_vStartupEndGameLoop(MsgArg* pArgs, MsgArg* pResult);
+void   GM_vStartupDeleteSaveGame(MsgArg* pArgs, MsgArg* pResult);
+void   GM_vStartupLoadOptionsCheckDisc(MsgArg* pArgs, MsgArg* pResult);
+void   GM_vStartupChangeDisc(MsgArg* pArgs, MsgArg* pResult);
+void   GM_vStartupGetDiscChangeStatus(MsgArg* pArgs, MsgArg* pResult);
 
 // port: the GameCube's audio and ARAM libraries and their set-up.
 void   AIInit(u8* pStack);
@@ -1538,33 +1538,33 @@ void Startup_InitGameMessages(void) {
     for (i = 0; i < 23; i++) {
         lbl_801F5DA8[i] = NULL;
     }
-    lbl_801F5DA8[0] = fn_800B1F20;
-    lbl_801F5DA8[1] = fn_800B1F9C;
-    lbl_801F5DA8[2] = fn_800B1FBC;
-    lbl_801F5DA8[3] = fn_800B1FFC;
-    lbl_801F5DA8[5] = fn_800B203C;
-    lbl_801F5DA8[6] = fn_800B204C;
-    lbl_801F5DA8[7] = fn_800B208C;
-    lbl_801F5DA8[8] = fn_800B20B8;
-    lbl_801F5DA8[9] = fn_800B2104;
-    lbl_801F5DA8[10] = fn_800B2150;
-    lbl_801F5DA8[11] = fn_800B21D0;
-    lbl_801F5DA8[12] = fn_800B21DC;
-    lbl_801F5DA8[13] = fn_800B21E0;
-    lbl_801F5DA8[14] = fn_800B21E4;
-    lbl_801F5DA8[15] = fn_800B21F0;
-    lbl_801F5DA8[16] = fn_800B223C;
-    lbl_801F5DA8[17] = fn_800B2250;
-    lbl_801F5DA8[18] = fn_800B218C;
-    lbl_801F5DA8[19] = fn_800B206C;
-    lbl_801F5DA8[20] = fn_800B227C;
-    lbl_801F5DA8[21] = fn_800B22D4;
-    lbl_801F5DA8[22] = fn_800B22F4;
+    lbl_801F5DA8[0] = GM_vStartupGetBlocksNeeded;
+    lbl_801F5DA8[1] = GM_vStartupCheckCards;
+    lbl_801F5DA8[2] = GM_vStartupFindFirstCard;
+    lbl_801F5DA8[3] = GM_vStartupFindNextCard;
+    lbl_801F5DA8[5] = GM_vStartupFadeToBlack;
+    lbl_801F5DA8[6] = GM_vStartupLoadFromCard;
+    lbl_801F5DA8[7] = GM_vStartupFormatCard;
+    lbl_801F5DA8[8] = GM_vStartupGetNextCardStatus;
+    lbl_801F5DA8[9] = GM_vStartupGetCurrentCardStatus;
+    lbl_801F5DA8[10] = GM_vStartupPlaySound;
+    lbl_801F5DA8[11] = GM_vStartupMessage11_Return0;
+    lbl_801F5DA8[12] = GM_vStartupMessage12_Empty;
+    lbl_801F5DA8[13] = GM_vStartupMessage13_Empty;
+    lbl_801F5DA8[14] = GM_vStartupMessage14_Return1;
+    lbl_801F5DA8[15] = GM_vStartupGetFilesNeeded;
+    lbl_801F5DA8[16] = GM_vStartupEndGameLoop;
+    lbl_801F5DA8[17] = GM_vStartupDeleteSaveGame;
+    lbl_801F5DA8[18] = GM_vStartupFormatHadIOError;
+    lbl_801F5DA8[19] = GM_vStartupSkipCardLoad;
+    lbl_801F5DA8[20] = GM_vStartupLoadOptionsCheckDisc;
+    lbl_801F5DA8[21] = GM_vStartupChangeDisc;
+    lbl_801F5DA8[22] = GM_vStartupGetDiscChangeStatus;
 }
 
-// Command 0: fn_8009D390's count for the game's save and the EA Sports Bio on the card at a port
-// and slot (values 0 and 1; the slot counts from 1, and both are kept at 0 or above).
-void fn_800B1F20(MsgArg* pArgs, MsgArg* pResult) {
+// Command 0: the card space the game's save and the EA Sports Bio need (fn_8009D390) on the card at
+// port pArgs[0], slot pArgs[1]. The slot counts from 1 here; both are kept at 0 or above.
+void GM_vStartupGetBlocksNeeded(MsgArg* pArgs, MsgArg* pResult) {
     s32 nPort = pArgs[0].i;
     s32 nSlot = pArgs[1].i;
     if (nSlot > 0) {
@@ -1581,57 +1581,66 @@ void fn_800B1F20(MsgArg* pArgs, MsgArg* pResult) {
     MC_Disconnect();
 }
 
-// Command 1.
-void fn_800B1F9C(MsgArg* pArgs, MsgArg* pResult) {
+// Command 1: the start-up card check (fn_800B0B1C): build the card status table and send the
+// start-up UI the message for the first card that needs one.
+void GM_vStartupCheckCards(MsgArg* pArgs, MsgArg* pResult) {
     fn_800B0B1C();
 }
 
-// Command 2: start a search for a card (the port and slot found go to the values' addresses).
-void fn_800B1FBC(MsgArg* pArgs, MsgArg* pResult) {
+// Command 2: start the card search (Startup_FindFirstCardWithStatus). The port and slot found go to
+// the addresses in pArgs[0] and pArgs[1]; answers whether one was found.
+void GM_vStartupFindFirstCard(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = (u8)Startup_FindFirstCardWithStatus(pArgs[0].p, pArgs[1].p);
 }
 
-// Command 3: continue the search.
-void fn_800B1FFC(MsgArg* pArgs, MsgArg* pResult) {
+// Command 3: continue the card search (Startup_FindNextCardWithStatus), as command 2.
+void GM_vStartupFindNextCard(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = (u8)Startup_FindNextCardWithStatus(pArgs[0].p, pArgs[1].p);
 }
 
-// Command 5.
-void fn_800B203C(MsgArg* pArgs, MsgArg* pResult) {
+// Command 5: start the fade to black (gUIState.bFadeToBlack).
+void GM_vStartupFadeToBlack(MsgArg* pArgs, MsgArg* pResult) {
     gUIState.bFadeToBlack = 1;
 }
 
-// Command 6.
-void fn_800B204C(MsgArg* pArgs, MsgArg* pResult) {
+// Command 6 (fn_800B0960): load the options from the first card with a good save, then the last
+// user (MC_LoadInitialUser). When no card status has been read since command 19, it only sends the
+// start-up UI message 0x86 (no save found).
+void GM_vStartupLoadFromCard(MsgArg* pArgs, MsgArg* pResult) {
     fn_800B0960();
 }
 
-// Command 19.
-void fn_800B206C(MsgArg* pArgs, MsgArg* pResult) {
+// Command 19 (fn_800B0954): make command 6 skip the card and only report no save found (message
+// 0x86), until a card's status is read again.
+void GM_vStartupSkipCardLoad(MsgArg* pArgs, MsgArg* pResult) {
     fn_800B0954();
 }
 
-// Command 7.
-void fn_800B208C(MsgArg* pArgs, MsgArg* pResult) {
+// Command 7: format the card at port pArgs[0], slot pArgs[1] (Startup_FormatCard; the result goes
+// to the UI as message 0x84).
+void GM_vStartupFormatCard(MsgArg* pArgs, MsgArg* pResult) {
     Startup_FormatCard(pArgs[0].i, pArgs[1].i);
 }
 
-// Command 8: report the next card status not yet reported.
-void fn_800B20B8(MsgArg* pArgs, MsgArg* pResult) {
+// Command 8: report the next card status not yet reported (Startup_GetNextCardStatus). Its port and
+// slot go to the addresses in pArgs[0] and pArgs[1].
+void GM_vStartupGetNextCardStatus(MsgArg* pArgs, MsgArg* pResult) {
     MC_Connect();
     pResult->i = Startup_GetNextCardStatus(pArgs[0].p, pArgs[1].p);
     MC_Disconnect();
 }
 
-// Command 9: report the card the reports reached again.
-void fn_800B2104(MsgArg* pArgs, MsgArg* pResult) {
+// Command 9: report again the card the reports reached (Startup_GetCurrentCardStatus). Its port and
+// slot go to the addresses in pArgs[0] and pArgs[1].
+void GM_vStartupGetCurrentCardStatus(MsgArg* pArgs, MsgArg* pResult) {
     MC_Connect();
     pResult->i = Startup_GetCurrentCardStatus(pArgs[0].p, pArgs[1].p);
     MC_Disconnect();
 }
 
-// Command 10.
-void fn_800B2150(MsgArg* pArgs, MsgArg* pResult) {
+// Command 10: play built-in sound 0 when pArgs[0] is 2, else built-in sound 1
+// (Aud_PlayBuiltInSound).
+void GM_vStartupPlaySound(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[0].i == 2) {
         Aud_PlayBuiltInSound(0);
         return;
@@ -1639,51 +1648,56 @@ void fn_800B2150(MsgArg* pArgs, MsgArg* pResult) {
     Aud_PlayBuiltInSound(1);
 }
 
-// Command 18: byte b94 of the state of the card at a port and slot.
-void fn_800B218C(MsgArg* pArgs, MsgArg* pResult) {
+// Command 18: whether a format of the card at port pArgs[0], slot pArgs[1] failed with an I/O error
+// (MCCardState.b94).
+void GM_vStartupFormatHadIOError(MsgArg* pArgs, MsgArg* pResult) {
     MCCardState state;
     MC_GetMC(&state, pArgs[0].i, pArgs[1].i);
     pResult->i = state.b94;
 }
 
-// Command 11.
-void fn_800B21D0(MsgArg* pArgs, MsgArg* pResult) {
+// Command 11 of the start-up table (Startup_InitGameMessages): answers 0.
+void GM_vStartupMessage11_Return0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-// Command 12.
-void fn_800B21DC(MsgArg* pArgs, MsgArg* pResult) {
+// Command 12 of the start-up table (Startup_InitGameMessages): empty.
+void GM_vStartupMessage12_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Command 13.
-void fn_800B21E0(MsgArg* pArgs, MsgArg* pResult) {
+// Command 13 of the start-up table (Startup_InitGameMessages): empty.
+void GM_vStartupMessage13_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Command 14.
-void fn_800B21E4(MsgArg* pArgs, MsgArg* pResult) {
+// Command 14 of the start-up table (Startup_InitGameMessages): answers 1.
+void GM_vStartupMessage14_Return1(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 1;
 }
 
-// Command 15.
-void fn_800B21F0(MsgArg* pArgs, MsgArg* pResult) {
+// Command 15: how many new files a save of the game needs on the card at port pArgs[0], slot
+// pArgs[1] (fn_8009D3DC: 1 when the save file or its backup is not on it yet, else 0).
+void GM_vStartupGetFilesNeeded(MsgArg* pArgs, MsgArg* pResult) {
     MC_Connect();
     pResult->i = fn_8009D3DC(pArgs[0].i, pArgs[1].i);
     MC_Disconnect();
 }
 
-// Command 16.
-void fn_800B223C(MsgArg* pArgs, MsgArg* pResult) {
+// Command 16: end start-up's main loop (gSession.nC 2, which gomainloop.c fn_8006D01C checks each
+// frame), as the menus' GM_vEndGameLoop.
+void GM_vStartupEndGameLoop(MsgArg* pArgs, MsgArg* pResult) {
     gSession.nC = 2;
 }
 
-// Command 17.
-void fn_800B2250(MsgArg* pArgs, MsgArg* pResult) {
+// Command 17: delete the game's save from the card at port pArgs[0], slot pArgs[1]
+// (Startup_DeleteSaveGame; the result goes to the UI as message 0x8D).
+void GM_vStartupDeleteSaveGame(MsgArg* pArgs, MsgArg* pResult) {
     Startup_DeleteSaveGame(pArgs[0].i, pArgs[1].i);
 }
 
-// Command 20: rebuild the card statuses; answers 1 when the disc in the drive is not disc 1 and
-// fn_80110460 answers 0.
-void fn_800B227C(MsgArg* pArgs, MsgArg* pResult) {
+// Command 20: load the options from a card (Startup_LoadOptionsFromCard), then answer 1 when the
+// disc in the drive is not disc 1 (fn_8011027C) and no options were loaded (fn_80110460 answers the
+// flag Startup_LoadOptionsFromCard left), else 0.
+void GM_vStartupLoadOptionsCheckDisc(MsgArg* pArgs, MsgArg* pResult) {
     Startup_LoadOptionsFromCard();
     if (fn_8011027C() && !fn_80110460()) {
         pResult->i = 1;
@@ -1693,11 +1707,11 @@ void fn_800B227C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Command 21: ask for the other disc and wait for it.
-void fn_800B22D4(MsgArg* pArgs, MsgArg* pResult) {
+void GM_vStartupChangeDisc(MsgArg* pArgs, MsgArg* pResult) {
     fn_801102AC();
 }
 
-// Command 22.
-void fn_800B22F4(MsgArg* pArgs, MsgArg* pResult) {
+// Command 22: the disc change's progress, as the menus' GM_vGetDiscChangeStatus answers it.
+void GM_vStartupGetDiscChangeStatus(MsgArg* pArgs, MsgArg* pResult) {
     GM_vGetDiscChangeStatus(pArgs, pResult);
 }
