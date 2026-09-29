@@ -159,7 +159,7 @@ void Voc_Start(AudVoice* pVoice, AudVoiceParams* pParams, u8 nVolume, f32 fPitch
     AudSeqTone* pTone = pVoice->pTone;
     VoiceEnvelope* pEnv = pTone->pEnv;
     VoiceEnvelope** ppEnv = &pEnv;  // fake match: the original keeps &pEnv in a register
-    u32 uRate = pTone->u4 + fn_800AB32C(pTone->u8 - pTone->u4);
+    u32 uRate = pTone->u4 + Aud_RandomBelow(pTone->u8 - pTone->u4);
 
     if (pParams->flags.n != 0) {
         if (pParams->flags.b.b5) {

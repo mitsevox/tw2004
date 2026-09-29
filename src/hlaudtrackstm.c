@@ -504,7 +504,7 @@ void Stm_SetStream(AudTrack* pTrack, u16 nStream, int nMode) {
         pList = pTmpl->data.pPlayList;
         if (pList != NULL) {
             if (nStream == 0xFFFE) {
-                nStream = fn_800AB32C(pList->nStreams);
+                nStream = Aud_RandomBelow(pList->nStreams);
                 if (nStream == pTrack->u.stm.nLastStream) {
                     nStream++;
                     if (nStream >= pList->nStreams) {

@@ -156,7 +156,7 @@ typedef struct AudSeqTone {
 } AudSeqTone;
 LAYOUT_ASSERT(AudSeqTone, 0x14);
 
-// The tones a sequenced track plays (fn_800AB384 picks one).
+// The tones a sequenced track plays (Ses_GetInstrumentTone picks one).
 typedef struct AudSeqBank {
     u8   unk0[0x3];
     u8   n3;                    // 0x3    its volume curve, as in AudPlayList
@@ -165,7 +165,7 @@ typedef struct AudSeqBank {
 
 // A sequencer event (8 bytes). Its handler is lbl_801F1880[nType].
 typedef struct AudSeqEvent {
-    u16  n0;                    // 0x0    ticks to wait before it runs (scaled by fn_800AB1B8)
+    u16  n0;                    // 0x0    ticks to wait before it runs (scaled by Seq_Check)
     u8   nType;                 // 0x2
     u8   n3;                    // 0x3
     s32  n4;                    // 0x4
@@ -282,7 +282,7 @@ typedef union AudTrackFlags {
     u8 n;
 } AudTrackFlags;
 
-// A sequenced track's own fields (AudTrack 0x64), reset by fn_800AAE08.
+// A sequenced track's own fields (AudTrack 0x64), reset by ResetSequencerPerf.
 typedef struct AudTrackSeq {
     u8   n64;                   // 0x64   its variation
     u8   n65;                   // 0x65   the channel the next note tries first
@@ -345,7 +345,7 @@ typedef struct AudSource {
 } AudSource;
 LAYOUT_ASSERT(AudSource, 0x7C);
 
-// The sequencer's event handlers, by event type (filled by fn_800AAD18).
+// The sequencer's event handlers, by event type (filled by Seq_InitModule).
 typedef void (*AudSeqHandler)(AudSeqEvent* pEvent, AudTrack* pTrack);
 extern AudSeqHandler lbl_801F1880[13];
 
@@ -440,8 +440,8 @@ extern AudSource* lbl_80282058;         // AudTable.c's table
 extern u8 lbl_80282068;                 // the number of listeners (hlaudmovie.c)
 extern f32 lbl_801F17D0[32];            // the volume of each curve (Mas_GetSubmix; HLAudMaster.c)
 extern s32 lbl_80282060;                // one bit per curve: 1 = muted (Mas_IsChanMuted; HLAudMaster.c)
-extern f32 lbl_80281460;                // fn_800A86BC's rate, fn_800AB39C's result (HLAudMaster.c)
-extern s32 lbl_80282080;                // fn_800AB374 says whether it is 0 (hlaudmovie.c)
+extern f32 lbl_80281460;                // fn_800A86BC's rate, Mas_GetUpdateRateScale's result (HLAudMaster.c)
+extern s32 lbl_80282080;                // Ses_IsSessionZero says whether it is 0 (hlaudmovie.c)
 extern AudStreamFile* lbl_80282070;     // the stream file's header (hlaudmovie.c)
 extern AudBank* lbl_80282074;           // bank 1 (hlaudmovie.c)
 extern AudBank* lbl_80282078;           // bank 0 (hlaudmovie.c)
@@ -527,21 +527,21 @@ void AutoSelectVariation(AudTrack* pTrack);
 void VoiceEndCB(AudVoice* pVoice, int nReason);
 void CheckForStolenLoopers(AudTrack* pTrack);
 void OnKeyOn(AudSeqEvent* pEvent, AudTrack* pTrack);
-void fn_800AAE08(AudTrack* pTrack);
-void fn_800AB0CC(AudTrack* pTrack, AudSeqEvent** ppEvent, AudSeqEvent** ppEnd);
-AudSeqTone* fn_800AB384(AudSeqBank* pBank, u8 nTone);
-u8   fn_800AAD18(void);
-void fn_800AADE8(AudTrack* pTrack);
-void fn_800AAE70(AudTrack* pTrack);
-void fn_800AAE90(AudTrack* pTrack);
-void fn_800AAEEC(AudTrack* pTrack);
-u8   fn_800AAEFC(AudTrack* pTrack);
-void fn_800AB118(AudTrack* pTrack, u8 n, u8 bCheck);
-void fn_800AB14C(AudTrack* pTrack, u8 n);
-void fn_800AB1B8(AudTrackTmpl* pTmpl);
-u32  fn_800AB32C(u32 nRange);           // a random number below nRange
-u8   fn_800AB374(void);
-f32  fn_800AB39C(void);
+void ResetSequencerPerf(AudTrack* pTrack);
+void SetVarCmdBounds(AudTrack* pTrack, AudSeqEvent** ppEvent, AudSeqEvent** ppEnd);
+AudSeqTone* Ses_GetInstrumentTone(AudSeqBank* pBank, u8 nTone);
+u8   Seq_InitModule(void);
+void Seq_Init(AudTrack* pTrack);
+void Seq_Exit(AudTrack* pTrack);
+void Seq_Start(AudTrack* pTrack);
+void Seq_Stop(AudTrack* pTrack);
+u8   Seq_Tick(AudTrack* pTrack);
+void Seq_Step(AudTrack* pTrack, u8 n, u8 bCheck);
+void Seq_SetVariationRange(AudTrack* pTrack, u8 n);
+void Seq_Check(AudTrackTmpl* pTmpl);
+u32  Aud_RandomBelow(u32 nRange);           // a random number below nRange
+u8   Ses_IsSessionZero(void);
+f32  Mas_GetUpdateRateScale(void);
 
 // hlaudtrackstm.c
 u8   fn_800ABBC8(void);

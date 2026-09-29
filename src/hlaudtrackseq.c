@@ -1,7 +1,7 @@
 // hlaudtrackseq.c (TW06's name, by structure: golf/audio/engine/hl/hlaudtrackseq.c, between
 // hlaudtrack.c and hlaudtrackstm.c): the sequencer, the tracks that play events instead of a
 // stream. A template holds sets of variations of events; each tick the track waits out the next
-// event's delay, then runs it through the handler table fn_800AAD18 fills (lbl_801F1880). Notes
+// event's delay, then runs it through the handler table Seq_InitModule fills (lbl_801F1880). Notes
 // take a voice per channel, stealing one when all are busy. Its extent is its data: OnKeyOn is
 // the first to use its .sdata2 block (0x80283FD8-0x80283FF8), and its handlers run up to
 // 0x800AAD14.
@@ -29,7 +29,7 @@ void AutoSelectVariation(AudTrack* pTrack) {
     if (pTmpl->n1 >= 4) {
         nNext = pTrack->u.seq.n64 + 1;
     } else {
-        nNext = fn_800AB32C(pTmpl->n7);
+        nNext = Aud_RandomBelow(pTmpl->n7);
         switch (pTmpl->n1) {
         case 2:
             if (nNext == pTrack->u.seq.n64) {
@@ -134,7 +134,7 @@ void OnKeyOn(AudSeqEvent* pEvent, AudTrack* pTrack) {
     f32 f;
 
     // fake match: the (u8) changes nothing; it gives EA's instruction order.
-    pTone = fn_800AB384(pTmpl->data.pBank, (u8)pEvent->n3);
+    pTone = Ses_GetInstrumentTone(pTmpl->data.pBank, (u8)pEvent->n3);
     fAttn = fn_800A85FC(pTrack->f48, Mas_GetSubmix(pTmpl->data.pBank->n3));
     nVolume = fn_800A85FC((f32)(pEvent->n4 << 7), fAttn);
     bLoops = pTone->n10 & 1;
@@ -142,7 +142,7 @@ void OnKeyOn(AudSeqEvent* pEvent, AudTrack* pTrack) {
     if (pTone == NULL) return;
     nChannel = pTrack->u.seq.n65;
     request.n4 = bLoops != 0;
-    if (!fn_800AB374() && pTrack->pSource->nSound == 1 && pTrack->nChannel == 0) {
+    if (!Ses_IsSessionZero() && pTrack->pSource->nSound == 1 && pTrack->nChannel == 0) {
         request.n4 = 2;
     }
     for (i = 0; i < pTmpl->n2;) {
@@ -204,7 +204,7 @@ void OnKeyOff(AudSeqEvent* pEvent, AudTrack* pTrack) {
     AudVoice* pVoice;
 
     pTmpl = pTrack->pTmpl;
-    pTone = fn_800AB384(pTmpl->data.pBank, pEvent->n3);
+    pTone = Ses_GetInstrumentTone(pTmpl->data.pBank, pEvent->n3);
     if (pTone == NULL) return;
     nChannel = fn_800AA9EC_Read(pTrack->u.seq.n65) - 1;
     if (nChannel < 0) {
@@ -327,8 +327,9 @@ void OnModStartOffset(AudSeqEvent* pEvent, AudTrack* pTrack) {
 void OnRvbWetAttn(AudSeqEvent* pEvent, AudTrack* pTrack) {
 }
 
-// Fills the event handler table.
-u8 fn_800AAD18(void) {
+// Fills the sequencer's event handler table, by event type (0 OnNoOp .. 12 OnRvbWetAttn). Always
+// returns 1. Trk_InitModule and Aud_InitOnce both call it.
+u8 Seq_InitModule(void) {
     lbl_801F1880[0] = OnNoOp;
     lbl_801F1880[1] = OnEnd;
     lbl_801F1880[2] = OnKeyOn;
@@ -345,12 +346,15 @@ u8 fn_800AAD18(void) {
     return 1;
 }
 
-void fn_800AADE8(AudTrack* pTrack) {
-    fn_800AAE08(pTrack);
+// A new sequenced track (Trk_AllocPerf): resets its sequencer fields (ResetSequencerPerf).
+void Seq_Init(AudTrack* pTrack) {
+    ResetSequencerPerf(pTrack);
 }
 
-// Resets a track's sequencer fields.
-void fn_800AAE08(AudTrack* pTrack) {
+// Clears a track's sequencer fields: no wait, variation 0 of set 0, the first channel, the first
+// event (0xFF for a stepped template, n0 & 1: it waits for Seq_Step), no step asked for, no notes
+// held.
+void ResetSequencerPerf(AudTrack* pTrack) {
     AudTrackTmpl* pTmpl;
 
     pTmpl = pTrack->pTmpl;
@@ -364,12 +368,15 @@ void fn_800AAE08(AudTrack* pTrack) {
     Mem_set(pTrack->u.seq.apEvents, 0, sizeof(pTrack->u.seq.apEvents));
 }
 
-void fn_800AAE70(AudTrack* pTrack) {
-    fn_800AAE08(pTrack);
+// A freed sequenced track (Trk_FreePerf): resets its sequencer fields (ResetSequencerPerf).
+void Seq_Exit(AudTrack* pTrack) {
+    ResetSequencerPerf(pTrack);
 }
 
-// Starts a sequenced track.
-void fn_800AAE90(AudTrack* pTrack) {
+// Starts a sequenced track (Trk_Start): from its first event (none for a stepped template, n0 & 1,
+// which waits for Seq_Step), playing (state 6), with a new variation when the template picks them
+// (n1).
+void Seq_Start(AudTrack* pTrack) {
     AudTrackTmpl* pTmpl;
 
     pTmpl = pTrack->pTmpl;
@@ -382,12 +389,19 @@ void fn_800AAE90(AudTrack* pTrack) {
     }
 }
 
-void fn_800AAEEC(AudTrack* pTrack) {
+// Stops a sequenced track's events (Trk_Stop): it moves past its last one.
+void Seq_Stop(AudTrack* pTrack) {
     pTrack->u.seq.n66 = pTrack->pTmpl->n3;
 }
 
-// Ticks a sequenced track: runs its events that are due. Returns 0 once it has stopped.
-u8 fn_800AAEFC(AudTrack* pTrack) {
+// Ticks a sequenced track once a frame (Trk_Tick). A stopping track (state 3) runs nothing and
+// returns 1, a stopped one returns 0. A stepped template (n0 & 1) runs only the event Seq_Step
+// asked for, at once, after picking a new variation when it picks them (n1). Any other waits out
+// each event's delay (n62 counts the frames) and runs the ones that are due; after a looping End
+// event (b7) it fetches the new variation's events, and past the variation's last event the track
+// is stopping. On every 16th audio frame it plays stolen looping notes again
+// (CheckForStolenLoopers). Returns 0 once the track has stopped.
+u8 Seq_Tick(AudTrack* pTrack) {
     AudTrackTmpl* pTmpl;
     u8 nNext;
     AudSeqEvent* pEvent;
@@ -412,7 +426,7 @@ u8 fn_800AAEFC(AudTrack* pTrack) {
             pTrack->u.seq.n67 = 0xFF;
         }
     } else {
-        fn_800AB0CC(pTrack, &pEvent, &pEnd);
+        SetVarCmdBounds(pTrack, &pEvent, &pEnd);
         while (pEvent < pEnd) {
             if (pTrack->n62 < pEvent->n0) {
                 pTrack->n62++;
@@ -421,7 +435,7 @@ u8 fn_800AAEFC(AudTrack* pTrack) {
             lbl_801F1880[pEvent->nType](pEvent, pTrack);
             if (pTrack->bits.b.b7) {
                 pTrack->bits.b.b7 = 0;
-                fn_800AB0CC(pTrack, &pEvent, &pEnd);
+                SetVarCmdBounds(pTrack, &pEvent, &pEnd);
                 pTrack->n62 = pEvent->n0;
             } else {
                 pTrack->n62 = 0;
@@ -439,8 +453,9 @@ u8 fn_800AAEFC(AudTrack* pTrack) {
     return pTrack->nState != 2;
 }
 
-// The track's next event and the end of its variation.
-void fn_800AB0CC(AudTrack* pTrack, AudSeqEvent** ppEvent, AudSeqEvent** ppEnd) {
+// *ppEvent: the track's next event (n66) in its variation (n64 of set n68); *ppEnd: the end of that
+// variation.
+void SetVarCmdBounds(AudTrack* pTrack, AudSeqEvent** ppEvent, AudSeqEvent** ppEnd) {
     AudSeqEvent* pVariation;
     AudSeqEvent* pEnd;
     u8 nEvents;
@@ -455,8 +470,9 @@ void fn_800AB0CC(AudTrack* pTrack, AudSeqEvent** ppEvent, AudSeqEvent** ppEnd) {
     *ppEnd = pEnd;
 }
 
-// Asks for event n next (templates with n0 & 1); with bCheck, not if it is the current one.
-void fn_800AB118(AudTrack* pTrack, u8 n, u8 bCheck) {
+// Asks a stepped template's track (n0 & 1) to run event n of its variation next (n below n3); with
+// bCheck (TW07's debounce), not when it is on that event already.
+void Seq_Step(AudTrack* pTrack, u8 n, u8 bCheck) {
     AudTrackTmpl* pTmpl;
 
     pTmpl = pTrack->pTmpl;
@@ -466,8 +482,9 @@ void fn_800AB118(AudTrack* pTrack, u8 n, u8 bCheck) {
     }
 }
 
-// Switches a track to set n of its variations.
-void fn_800AB14C(AudTrack* pTrack, u8 n) {
+// Switches a sequenced track to set n of its variations. A template that picks its variations (n1)
+// picks one in the new set and starts it over from its first event, with no step waiting.
+void Seq_SetVariationRange(AudTrack* pTrack, u8 n) {
     AudTrackTmpl* pTmpl;
 
     pTmpl = pTrack->pTmpl;
@@ -480,9 +497,11 @@ void fn_800AB14C(AudTrack* pTrack, u8 n) {
     }
 }
 
-// Prepares a template's events once: scales every delay by the tempo (fn_800AB39C), gives
-// looping templates' zero-delay notes a delay of 60, and resolves the play list and stream events.
-void fn_800AB1B8(AudTrackTmpl* pTmpl) {
+// Prepares a loaded template's events once (Trk_Check): every event's delay is scaled by the update
+// rate (Mas_GetUpdateRateScale), a looping template's (n0 & 2) End events without a delay get 60,
+// and each stream event's stream is looked up in the play list of the play list event before it
+// (the result is not kept).
+void Seq_Check(AudTrackTmpl* pTmpl) {
     s8 k;
     s8 j;
     s8 i;
@@ -491,7 +510,7 @@ void fn_800AB1B8(AudTrackTmpl* pTmpl) {
     f32 fTempo;
 
     pList = NULL;
-    fTempo = fn_800AB39C();
+    fTempo = Mas_GetUpdateRateScale();
     for (i = 0; i < pTmpl->n8; i++) {
         for (j = 0; j < pTmpl->n7; j++) {
             pEvent = &pTmpl->pEvents[pTmpl->n3 * (j + i * pTmpl->n7)];
@@ -517,21 +536,26 @@ void fn_800AB1B8(AudTrackTmpl* pTmpl) {
     }
 }
 
-u32 fn_800AB32C(u32 nRange) {
+// A random number from 0 to nRange - 1 (Misc_RandFunc(1)); 0 when nRange is 0.
+u32 Aud_RandomBelow(u32 nRange) {
     if (nRange != 0) {
         return Misc_RandFunc(1) % nRange;
     }
     return 0;
 }
 
-u8 fn_800AB374(void) {
+// Whether the sound session Ses_Init set up is session 0 (OnKeyOn).
+u8 Ses_IsSessionZero(void) {
     return lbl_80282080 == 0;
 }
 
-AudSeqTone* fn_800AB384(AudSeqBank* pBank, u8 nTone) {
+// Tone nTone of a sequencer bank (the instrument a sequenced template plays).
+AudSeqTone* Ses_GetInstrumentTone(AudSeqBank* pBank, u8 nTone) {
     return &pBank->aTones[nTone];
 }
 
-f32 fn_800AB39C(void) {
+// The audio update rate given at start-up over 60 (Aud_InitOnce is passed 60, so 1): Seq_Check
+// scales event delays by it.
+f32 Mas_GetUpdateRateScale(void) {
     return lbl_80281460;
 }

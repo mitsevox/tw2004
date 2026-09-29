@@ -55,7 +55,7 @@ u8 Trk_InitModule(void) {
         fn_800AE0DC(&lbl_80282098, lbl_802820A0, 32, sizeof(AudTrack));
         fn_800ADE70(&lbl_801F1868[0], 32);
         fn_800ADE70(&lbl_801F1868[1], 32);
-        bOk = fn_800AAD18();
+        bOk = Seq_InitModule();
         if (bOk) {
             bOk = fn_800ABBC8();
         }
@@ -180,7 +180,7 @@ AudTrack* Trk_AllocPerf(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f3
         InsertSortWorldPerf(pTrack);
     }
     if (!(pTmpl->n0 & 8)) {
-        fn_800AADE8(pTrack);
+        Seq_Init(pTrack);
     } else {
         fn_800ABC34(pTrack);
     }
@@ -208,7 +208,7 @@ s32 Trk_FreePerf(AudTrack* pTrack) {
     }
     Trk_StopAllVoices(pTrack, 1);
     if (!(pTrack->pTmpl->n0 & 8)) {
-        fn_800AAE70(pTrack);
+        Seq_Exit(pTrack);
     } else {
         Stm_Exit(pTrack);
     }
@@ -292,7 +292,7 @@ void Trk_UpdatePerf(AudSource* pSource, AudTrack* pTrack, AudTrackTmpl* pTmpl, u
 void Trk_Start(AudTrack* pTrack) {
     pTrack->params.flags.n = 0;
     if (!(pTrack->pTmpl->n0 & 8)) {
-        fn_800AAE90(pTrack);
+        Seq_Start(pTrack);
         return;
     }
     Stm_Start(pTrack);
@@ -312,7 +312,7 @@ void Trk_Stop(AudTrack* pTrack) {
         pTrack->bits.b.bDetached = 1;
     }
     if (!(pTrack->pTmpl->n0 & 8)) {
-        fn_800AAEEC(pTrack);
+        Seq_Stop(pTrack);
         return;
     }
     Stm_Stop(pTrack);
@@ -358,13 +358,13 @@ void Trk_StopAllVoices(AudTrack* pTrack, int bNow) {
 // (Seq_Tick) or stream (Stm_Tick). Returns 0 once it has stopped, for Trk_Cycle to free it.
 u8 Trk_Tick(AudTrack* pTrack) {
     pTrack->f4C += pTrack->f50;
-    return !(pTrack->pTmpl->n0 & 8) ? fn_800AAEFC(pTrack) : Stm_Tick(pTrack);
+    return !(pTrack->pTmpl->n0 & 8) ? Seq_Tick(pTrack) : Stm_Tick(pTrack);
 }
 
 // Asks a sequenced track to run event n next (Seq_Step); with bCheck (TW07's debounce), not when it
 // is on that event already.
 void Trk_Step(AudTrack* pTrack, u8 n, u8 bCheck) {
-    fn_800AB118(pTrack, n, bCheck);
+    Seq_Step(pTrack, n, bCheck);
 }
 
 // Sets a sequenced track's variation (Seq_SelectVariation).
@@ -374,7 +374,7 @@ void Trk_SelectVariation(AudTrack* pTrack, u8 n) {
 
 // Switches a sequenced track to set n of its variations (Seq_SetVariationRange).
 void Trk_SetVariationRange(AudTrack* pTrack, u8 n) {
-    fn_800AB14C(pTrack, n);
+    Seq_SetVariationRange(pTrack, n);
 }
 
 // Once a frame after its tick: the track's volume (f44) times its submix's (Mas_GetSubmix of the
@@ -403,7 +403,7 @@ void Trk_Render(AudTrack* pTrack) {
 // through Seq_Check; a streamed one needs nothing.
 void Trk_Check(AudTrackTmpl* pTmpl) {
     if (!(pTmpl->n0 & 8)) {
-        fn_800AB1B8(pTmpl);
+        Seq_Check(pTmpl);
     }
 }
 
