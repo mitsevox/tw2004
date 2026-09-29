@@ -4,181 +4,76 @@ Tiger Woods PGA Tour 2004
 [![Code progress](https://decomp.dev/mitsevox/tw2004.svg?mode=shield&measure=code&label=Code)](https://decomp.dev/mitsevox/tw2004)
 [![Functions](https://decomp.dev/mitsevox/tw2004.svg?mode=shield&measure=functions&label=Functions)](https://decomp.dev/mitsevox/tw2004)
 
-A work-in-progress decompilation and asset-format research project for
-Tiger Woods PGA Tour 2004 (GameCube).
+A matching decompilation of Tiger Woods PGA Tour 2004 for the GameCube: C source that compiles
+back to a byte-identical copy of the retail `main.dol`. The aim is EA's code as EA wrote it. A PC
+port and mods will start from that code later.
 
-This repository does **not** contain any game assets or assembly whatsoever.
-An existing copy of the game is required.
+This repository contains no game assets, no game code binaries and no official SDK files. You need
+your own copy of the game to build it.
 
-Supported versions:
-
-- `GW4E69`: Rev 0 (USA), Disc 1 and Disc 2
-
-`main.dol` is byte-identical on both discs
-(SHA-1 `bbbc55485e51973931dee169e7bf87bc7379223f`), so there is one code target.
-The discs differ only in which course data they carry.
+Supported version: `GW4E69`, Rev 0 (USA). `main.dol` is identical on Disc 1 and Disc 2
+(SHA-1 `bbbc55485e51973931dee169e7bf87bc7379223f`), so either disc works.
 
 Status
 ======
 
-Last updated 2026-09-23.
+**The match is complete.** All 7,647 functions are byte-exact and all 460 units link from C;
+the build reproduces the retail `main.dol` exactly.
 
-- Builds byte-identical to the retail `main.dol`.
-- Matched code: **26.1%** (404,100 of 1,550,720 bytes), **3,714 of 7,647 functions** (48.6%).
-  Counting partial matches: 29.7%.
-  - EA's code (the game and EA's engine libraries, 83% of the executable): **14.4%** matched,
-    2,806 of 6,608 functions.
-  - Nintendo SDK, C library and debugger (the other 17%): **82.6%** matched, 908 of 1,039
-    functions. Most of it is source shared by other GameCube decompilations (Metroid Prime,
-    Final Fantasy Crystal Chronicles, The Wind Waker, Twilight Princess, Melee, Sonic Heroes,
-    Gauntlet: Dark Legacy); see the
-    `CREDITS.md` / `README.md` in each `extern/` folder.
-- Game code in C so far: the swing and its state machine (`Swing.c`), golfer attributes and the
-  CPU's shot planning (`Golfer.c`), ball physics (`Ball.c`, 63 of 68 functions exact), the
-  animation library (`skalib.c`), the asset stream decompressor (`UStream.c`), and about 2,370
-  small functions (accessors, setters, call wrappers and short functions decompiled with m2c) in
-  `unsorted/sweep_*` files, pending their real file names.
-- Named: about 1,480 functions, 123 of them carried over from Tiger Woods PGA Tour 06 symbol files
-  (`docs/tw06-names.md`). About 6,170 are still `fn_ADDRESS`.
-- Compiler: CodeWarrior GC/2.5, `-O4,p`. See `docs/compiler.md`.
-- Asset formats: the CTRL container (`.hog`/`.gcb`/`.ngc`, with an extractor), course textures
-  (exported to PNG) and animation libraries decoded; the rest inventoried. See `docs/formats`.
-- Gameplay: nine gameplay hypotheses tested against the code (`docs/hypotheses.md`), with the
-  mechanics written up in plain English in `docs/gameplay.md` (swing error, CPU putting, the
-  cup pull, lucky shots, lies, wind, bounces).
-- Gecko codes (`tools/codes/`): a widescreen pop-in fix, an always-pool-cue gimme (confirmed in
-  game), and a no-lucky-shots code (untested).
+The project is now in its **readability** phase: making every file understandable to a person
+reading it cold, with real names, correct comments and readable locals
+([`agents/plan-readability.md`](agents/plan-readability.md)). As of 2026-09-29, of the 6,641
+functions in EA's code:
 
-Roadmap
-=======
+- 5,548 are named (EA's own name where a related build confirms it, otherwise read from the code);
+- 4,912 (74.0%) have been reviewed in the pass;
+- 154 of 279 source files are fully through it.
 
-The project runs on two tracks.
+Live numbers: the [progress page](https://mitsevox.github.io/tw2004/) and
+[decomp.dev](https://decomp.dev/mitsevox/tw2004).
 
-Track A: Code decompilation (`main.dol`)
-----------------------------------------
+What's here
+===========
 
-1. **Core systems and engine loop** - Metrowerks runtime, Dolphin SDK, GX rendering
-   pipeline, ARAM audio streamer, filesystem / DVD manager.
-2. **Gameplay logic and physics simulation** - analog swing mechanics, trajectory
-   physics, collision, putting / caddy solver, golfer stat math, UI state machines.
-
-Work proceeds bottom-up. The ladder is a priority order, not a dependency chain:
-anything not yet decompiled is linked from the original binary.
-
-| Level | Layer | Contents |
-|------:|-------|----------|
-| 5 | Game systems and AI | Caddy tips, commentary triggers, scorecard state |
-| 4 | Game mechanics and event handlers | Swing input scaling, ball / cup collision, lie penalties |
-| 3 | Core physics simulation | Ball flight integration, green normal queries, wind / drag |
-| 2 | Math and geometry primitives | Vector, matrix, spline interpolation |
-| 1 | EA engine services | Asset loaders (`.hog` / `.gcb`), renderer, animation, audio, UI, saves |
-| 0 | Runtime and Dolphin SDK | Memory allocators, CodeWarrior runtime, OS / GX |
-
-Before climbing: **discovery** - compiler identification, SDK auto-matching, splits,
-and a strings / constants survey. The binary ships without symbols, so the contents
-of levels 2-5 are hypotheses until the code is located. Level 1 loaders are the
-bridge to Track B: each loader decompiled is a file format documented.
-
-Track B: Asset reverse engineering (disc data)
-----------------------------------------------
-
-3. **Shared global assets** - character models, animation skeletons, clothing
-   textures, audio containers, sound banks, fonts.
-4. **Course file formats (Disc 1 and Disc 2)** - terrain meshes, green elevation
-   grids, spline paths, skyboxes.
-
-Format notes live in [`docs/formats`](docs/formats/README.md). Compiler findings live in [`docs/compiler.md`](docs/compiler.md).
-
-How to match a function, step by step: [`docs/workflow.md`](docs/workflow.md) (scripts in `tools/match/`).
-Knowledge base: [`docs/tw2004-notes.md`](docs/tw2004-notes.md) (what we know about this game) and
-[`docs/decomp-notes.md`](docs/decomp-notes.md) (general CodeWarrior / GameCube pitfalls and good practice).
-What happened when, and why: [`docs/journal.md`](docs/journal.md).
-Gameplay predictions to check against the source as it emerges: [`docs/hypotheses.md`](docs/hypotheses.md).
-What the shot code actually does (AI targeting and error, human swing forgiveness, the RNG):
-[`docs/gameplay.md`](docs/gameplay.md).
-
-Project structure
-=================
-
-- `configure.py` - Project configuration and generator script.
-- `config/GW4E69` - decomp-toolkit configuration (`config.yml`, `symbols.txt`, `splits.txt`).
-- `config/GW4E69/build.sha1` - SHA-1 hashes for each built artifact, for final verification.
-- `orig/GW4E69` - Disc 1 image. Ignored by `.gitignore`.
-- `orig/GW4E69_disc2` - Disc 2 image (Track B only). Ignored by `.gitignore`.
-- `src/`, `include/` - Decompiled C/C++ source and headers (Track A).
-- `docs/formats` - File format documentation (Track B).
-- `docs/*.md` - decomp-toolkit reference docs inherited from the project template.
-- `tools/` - Build scripts shared between decomp-toolkit projects.
-- `tools/research/` - Our own analysis scripts (not part of the build).
-- `build/`, `extracted/` - Generated output. Ignored by `.gitignore`.
-
-Dependencies
-============
-
-Windows
---------
-
-On Windows, it's **highly recommended** to use native tooling. WSL or msys2 are **not** required.
-
-- Install [Python](https://www.python.org/downloads/) and add it to `%PATH%`.
-- Download [ninja](https://github.com/ninja-build/ninja/releases) and add it to `%PATH%`.
-  - Quick install via pip: `pip install ninja`
-
-macOS
-------
-
-- Install [ninja](https://github.com/ninja-build/ninja/wiki/Pre-built-Ninja-packages):
-
-  ```sh
-  brew install ninja
-  ```
-
-[wibo](https://github.com/decompals/wibo), a minimal 32-bit Windows binary wrapper, will be automatically downloaded and used.
-
-Linux
-------
-
-- Install [ninja](https://github.com/ninja-build/ninja/wiki/Pre-built-Ninja-packages).
-
-[wibo](https://github.com/decompals/wibo), a minimal 32-bit Windows binary wrapper, will be automatically downloaded and used.
+- `src/`, `include/`: the game's C source and headers. Start with
+  [`src/README.md`](src/README.md), the map of the code by subsystem (boot and main loop,
+  rendering, cameras, ball physics, golfers, the round and game modes, front end, audio, saves).
+- `extern/`: the Nintendo SDK, C library, Metrowerks runtime and debugger, built from public
+  GameCube decompilations (credits in each folder's `CREDITS.md` / `README.md`).
+- `config/GW4E69/`: decomp-toolkit configuration (symbols, splits) and
+  `name_sources.tsv`, the evidence behind every name.
+- `docs/`: see [`docs/README.md`](docs/README.md) for the index and how far to trust each file.
+  Highlights: [`docs/style.md`](docs/style.md) (how the C must read),
+  [`docs/decomp-notes.md`](docs/decomp-notes.md) (the CodeWarrior rulebook),
+  [`docs/formats/`](docs/formats/README.md) (the game's data file formats),
+  [`docs/gameplay.md`](docs/gameplay.md) (gameplay logic read from the code; not yet audited).
+- `tools/`: build, matching and naming scripts; `tools/codes/` has Gecko codes (an
+  always-pool-cue gimme and a no-lucky-shots code, untested). A confirmed widescreen culling fix is
+  in [`docs/tw2004-notes.md`](docs/tw2004-notes.md), "Frustum setup and widescreen codes".
+- `agents/`: how the work is organised and where it stands ([`agents/state.md`](agents/state.md)).
 
 Building
 ========
 
-- Clone the repository:
+Needs Python 3 and [ninja](https://github.com/ninja-build/ninja). On Linux and macOS,
+[wibo](https://github.com/decompals/wibo) is downloaded automatically to run the compiler.
 
-  ```sh
-  git clone https://github.com/mitsevox/tw2004.git
-  ```
+1. Put your disc image (ISO/GCM, RVZ, WIA, WBFS, CISO, NFS, GCZ or TGC) in `orig/GW4E69/`, or the
+   extracted `main.dol` at `orig/GW4E69/sys/main.dol`.
+2. Run:
 
-- Copy your Disc 1 image to `orig/GW4E69`.
-  - Supported formats: ISO (GCM), RVZ, WIA, WBFS, CISO, NFS, GCZ, TGC
-  - Either disc works for building; Disc 2 is only needed for asset research.
+   ```sh
+   python configure.py
+   ninja
+   ```
 
-- Configure:
+The build must end with `build/GW4E69/main.dol: OK`. Every command beyond that is in
+[`docs/workflow.md`](docs/workflow.md).
 
-  ```sh
-  python configure.py
-  ```
-
-- Build:
-
-  ```sh
-  ninja
-  ```
-
-Diffing
+Credits
 =======
 
-Once the initial build succeeds, an `objdiff.json` should exist in the project root.
-
-Download the latest release from [encounter/objdiff](https://github.com/encounter/objdiff). Under project settings, set `Project directory`. The configuration should be loaded automatically.
-
-![](assets/objdiff.png)
-
-References
-==========
-
-- [decomp-toolkit](https://github.com/encounter/decomp-toolkit) / [dtk-template](https://github.com/encounter/dtk-template) (this project's scaffold)
-- [Discord: GC/Wii Decompilation](https://discord.gg/hKx3FJJgrV)
-- [objdiff](https://github.com/encounter/objdiff), [decomp.me](https://decomp.me), [decomp.dev](https://decomp.dev)
+Built on [decomp-toolkit](https://github.com/encounter/decomp-toolkit) and
+[objdiff](https://github.com/encounter/objdiff). The SDK and runtime code in `extern/` comes from
+other GameCube decompilations (Metroid Prime, Final Fantasy Crystal Chronicles, The Wind Waker,
+Twilight Princess, Pikmin 2, Sonic Heroes, Gauntlet: Dark Legacy); see each folder's credits.
