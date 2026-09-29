@@ -1,9 +1,13 @@
-// hlaudtrackstm.c (our name, after TW06's golf/audio/engine/hl/hlaudtrackstm.c; the names of the
-// functions that hand a name string to the audio locks are EA's own, from those strings, and
-// Stm_Stop, Stm_FlushQueue, CheckQueue and StartStreamVoices are TW07's):
-// the streamed tracks of the sound engine (music and long sounds read from disc). Each track reads
-// its stream into a main-memory buffer through a queue of disc reads (gAudStreamReadQueue), DMAs each
-// block into its voices' ARAM buffers, and keeps the reads ahead of what the voices play.
+// hlaudtrackstm.c (TW06's name: golf/audio/engine/hl/hlaudtrackstm.c; TW07's HLAudTrackStm.c
+// streams another way, through stream channels and SNDStatusCallback): the streamed tracks of the
+// sound engine (music and long sounds read from disc, /AudioStm_GC.sab). Each track reads its
+// stream into a main-memory buffer through a queue of disc reads (gAudStreamReadQueue), DMAs each
+// block into the half of its voices' ARAM buffers they are not playing, and keeps the reads ahead
+// of what the voices play, pausing them when the reads fall behind. A stream that does not loop
+// ends with a block of silence. The functions that hand their name to the audio locks carry EA's own names
+// (AddToAudStreamReadQueue, Stm_Tick, ...); CheckQueue, StartStreamVoices, PrimeStreamer,
+// ResetStreamPerf, Stm_InitModule, Stm_Init, Stm_Stop and Stm_FlushQueue are TW07's; the rest are
+// read from the code.
 
 #include "core/audtrack.h"
 #include "core/startup.h"
@@ -20,9 +24,9 @@ void RemoveFromAudStreamQueue(AudTrack* pTrack);
 void Stm_ReadDoneCB(void* pDst, int nBytes, AudTrack* pTrack, u8 nId);
 
 // .bss/.sbss in reverse address order
-AudStreamQueue gAudStreamReadQueue;
-AudTrack* gStmDmaTrack;
-u8 gStmLastReadId;
+AudStreamQueue gAudStreamReadQueue;    // the disc reads waiting, one under way at a time
+AudTrack* gStmDmaTrack;                 // the track whose blocks are being DMA'd to ARAM
+u8 gStmLastReadId;                      // the last read id handed out (never 0)
 
 // Applies the play list and stream changes that came in while the track was busy (Stm_SetPlayList,
 // Stm_SetStream). Returns 1 when it applied one; Stm_Tick then starts the stopped track again.
@@ -65,8 +69,8 @@ void StartStreamVoices(AudTrack* pTrack) {
 // Queues a disc read of uLen bytes at uOffset of hFile into pDst; pfnDone gets the track and nId
 // when it is done (ProcessAudStreamReadQueue starts it). Returns 0 when the queue is full.
 u8 AddToAudStreamReadQueue(s32 hFile, u8* pDst, u32 uLen, u32 uOffset,
-               void (*pfnDone)(void* pDst, int nBytes, AudTrack* pTrack, u8 nId), AudTrack* pTrack,
-               u8 nId, u8 n19) {
+                           void (*pfnDone)(void* pDst, int nBytes, AudTrack* pTrack, u8 nId),
+                           AudTrack* pTrack, u8 nId, u8 n19) {
     u8 bQueued;
     AudStreamRead* pRead;
 
@@ -287,8 +291,10 @@ void PrimeStreamer(AudTrack* pTrack) {
     pTrack->u.stm.nReadId = gStmLastReadId;
     pTrack->n5D += pList->nChannels;
     pTrack->u.stm.flags.n = 0;
-    AddToAudStreamReadQueue(hFile, pTrack->u.stm.pBuffer, (pTrack->u.stm.uBufferSize >> 1) * pList->nChannels,
-                pTrack->u.stm.pStream->uOffset, Stm_ReadDoneCB, pTrack, pTrack->u.stm.nReadId, 0);
+    AddToAudStreamReadQueue(hFile, pTrack->u.stm.pBuffer,
+                            (pTrack->u.stm.uBufferSize >> 1) * pList->nChannels,
+                            pTrack->u.stm.pStream->uOffset, Stm_ReadDoneCB, pTrack,
+                            pTrack->u.stm.nReadId, 0);
 }
 
 // Sets up the stream read queue at start-up: 8 empty requests, none under way. Always returns 1.
@@ -322,10 +328,18 @@ void ResetStreamPerf(AudTrack* pTrack) {
     pTrack->u.stm.flags.n = 0;
 }
 
-// A freed streamed track (Trk_FreePerf): under the stream lock, cancels its ARAM transfers, gives
-// its buffer back and clears its stream state (ResetStreamPerf).
+// A freed streamed track (Trk_FreePerf): under the stream lock, asks for its ARAM transfers to be
+// cancelled (none ever is: see below), gives its buffer back and clears its stream state
+// (ResetStreamPerf).
 void Stm_Exit(AudTrack* pTrack) {
     fn_800B596C("Stm_Exit");
+    // EA bug: the cancel looks for transfers owned by pTrack, but every transfer is queued with
+    // AudDma_ToAram's last argument as its owner, 0 or 1 (Stm_SendBlockToVoices passes "last
+    // channel"), so nothing is cancelled. A block DMA still queued for the freed track goes on
+    // into the ARAM buffers Voc_Delete has just given back, and its callback still counts into
+    // the freed track through gStmDmaTrack.
+    // port: queue the stream DMAs with the track as owner (and "last channel" apart) so they can
+    //       be cancelled here.
     AudDma_CancelOwner(pTrack);
     if (pTrack->u.stm.pBuffer != NULL) {
         fn_800A9434(pTrack->u.stm.pBuffer, pTrack->u.stm.uBufferSize, pTrack->pTmpl->data.pPlayList->nId);
@@ -363,7 +377,7 @@ void Stm_Stop(AudTrack* pTrack) {
 // next read. Then it starts the queued reads, and a stopped track with a waiting change
 // (CheckQueue) is started again. Returns 0 once the track has stopped.
 u8 Stm_Tick(AudTrack* pTrack) {
-    u8 bFed;
+    u8 bFeed;
     AudPlayList* pList;
     AudVoice** ppVoice;
     int i;
@@ -374,7 +388,7 @@ u8 Stm_Tick(AudTrack* pTrack) {
     u32 uPos;
     u32 uThreshold;
 
-    bFed = 0;
+    bFeed = 0;
     fn_800B596C("Stm_Tick");
     pList = pTrack->pTmpl->data.pPlayList;
     if (DVDGetDriveStatus() == 0) {
@@ -391,11 +405,11 @@ u8 Stm_Tick(AudTrack* pTrack) {
         uFull = pTrack->u.stm.uLength <= uFull ? pTrack->u.stm.uLength : uFull;
         if (pTrack->u.stm.uFilled != 0 && pTrack->u.stm.uFilled >= uFull) {
             if (pTrack->u.stm.flags.b.b6) {
-                bFed = 1;
+                bFeed = 1;
                 pTrack->u.stm.flags.b.b6 = 0;
                 pTrack->nState = 5;
             } else {
-                bFed = 1;
+                bFeed = 1;
                 StartStreamVoices(pTrack);
             }
         }
@@ -405,14 +419,14 @@ u8 Stm_Tick(AudTrack* pTrack) {
         ppVoice = pTrack->apVoices;
         if (*ppVoice == NULL) break;
         uOld = (*ppVoice)->uPlayPos;
-        bFed = fn_800ACE38(*ppVoice, &uPos);
+        bFeed = fn_800ACE38(*ppVoice, &uPos);
         if (uOld != 0) {
             pTrack->u.stm.uPlayed += (*ppVoice)->uPlayPos - uOld;
             if ((*ppVoice)->uPlayPos < uOld) {
                 pTrack->u.stm.uPlayed += 0xFE00;
             }
         }
-        if (bFed) break;
+        if (bFeed) break;
         uThreshold = pTrack->u.stm.uFilled >> 15;
         uThreshold /= pList->nChannels;
         bBehind = 0;
@@ -434,7 +448,7 @@ u8 Stm_Tick(AudTrack* pTrack) {
         }
         break;
     }
-    if (bFed) {
+    if (bFeed) {
         if (pTrack->u.stm.flags.b.bEnded) {
             if (Stm_QueueSilence(pTrack)) {
                 pTrack->u.stm.flags.b.bEnded = 0;

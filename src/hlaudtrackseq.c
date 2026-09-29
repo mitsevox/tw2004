@@ -1,14 +1,17 @@
-// hlaudtrackseq.c (TW06's name, by structure: golf/audio/engine/hl/hlaudtrackseq.c, between
-// hlaudtrack.c and hlaudtrackstm.c): the sequencer, the tracks that play events instead of a
-// stream. A template holds sets of variations of events; each tick the track waits out the next
-// event's delay, then runs it through the handler table Seq_InitModule fills (gSeqCmdHandlers). Notes
-// take a voice per channel, stealing one when all are busy. Its extent is its data: OnKeyOn is
-// the first to use its .sdata2 block (0x80283FD8-0x80283FF8), and its handlers run up to
-// 0x800AAD14.
+// hlaudtrackseq.c (TW06's name: golf/audio/engine/hl/hlaudtrackseq.c; TW07's HLAudTrackSeq.c has
+// its functions in the same order): the sequencer, the tracks that play events (EA's track
+// commands) instead of a stream. A template holds sets of variations of events; each frame the
+// track waits out the next event's delay, then runs it through the handler table Seq_InitModule
+// fills (gSeqCmdHandlers, OnNoOp .. OnRvbWetAttn). A stepped template (n0 & 1) runs only the
+// events it is asked for (Seq_Step). Notes take a voice per channel, stealing one when all are
+// busy. ResetSequencerPerf and SetVarCmdBounds, inlines in TW07, are functions here; four small
+// helpers sit at its end (Aud_RandomBelow, Ses_IsSessionZero, Ses_GetInstrumentTone,
+// Mas_GetUpdateRateScale). Its extent is its data: OnKeyOn is the first to use its .sdata2 block
+// (0x80283FD8-0x80283FF8), and its handlers run up to 0x800AAD14.
 
 #include "core/audtrack.h"
 
-AudSeqHandler gSeqCmdHandlers[13];
+AudSeqHandler gSeqCmdHandlers[13];     // the event handlers by event type (Seq_InitModule)
 
 // Picks a sequenced track's next variation the way its template's n1 says: 4 and up the next in
 // order, 2 at random but not the same one twice, 3 at random but not the one the template played
@@ -507,15 +510,15 @@ void Seq_Check(AudTrackTmpl* pTmpl) {
     s8 i;
     AudPlayList* pList;
     AudSeqEvent* pEvent;
-    f32 fTempo;
+    f32 fRateScale;
 
     pList = NULL;
-    fTempo = Mas_GetUpdateRateScale();
+    fRateScale = Mas_GetUpdateRateScale();
     for (i = 0; i < pTmpl->n8; i++) {
         for (j = 0; j < pTmpl->n7; j++) {
             pEvent = &pTmpl->pEvents[pTmpl->n3 * (j + i * pTmpl->n7)];
             for (k = 0; k < pTmpl->n3; k++, pEvent++) {
-                pEvent->n0 = fn_800A85FC(pEvent->n0, fTempo);
+                pEvent->n0 = fn_800A85FC(pEvent->n0, fRateScale);
                 switch (pEvent->nType) {
                 case 6:
                     break;

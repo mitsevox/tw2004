@@ -1,16 +1,20 @@
-// hlaudtrack.c (TW06's name, by structure: golf/audio/engine/hl/hlaudtrack.c, the file before
-// hlaudtrackseq.c and hlaudtrackstm.c): the sound engine's tracks. A pool of 32 tracks, each
-// playing one channel of a sound source, either sequenced (hlaudtrackseq.c) or streamed from disc
-// (hlaudtrackstm.c). The tracks of 3D sources sit in a list sorted on their priority, so the
-// quietest can be stolen when the pool runs out. Its extent is its data: it is the first to use
-// the .bss at 0x801F1868 and the only user of the .sdata2 block 0x80283FD0-0x80283FD8.
+// hlaudtrack.c (TW06's name: golf/audio/engine/hl/hlaudtrack.c; TW07's HLAudTrack.c has the same
+// functions in the same order, plus Trk_ExitModule, Trk_FreeAllPerfs and Trk_SetTempo): the sound
+// engine's tracks, "perfs" to EA. A pool of 32 tracks, each playing one track of a sound source's
+// sound, either sequenced (hlaudtrackseq.c) or streamed from disc (hlaudtrackstm.c): allocated,
+// started, ticked and rendered once a frame (Trk_Cycle), stopped and freed. The tracks of placed
+// (3D) sources sit in a list sorted on their distance attenuation, so the quietest can be stolen
+// when the pool runs out. Its last three functions are header inlines of TW07's compiled out of
+// line (Seq_SelectVariation, Mas_GetSubmix, Mas_IsChanMuted). Its extent is its data: it is the
+// first to use the .bss at 0x801F1868 and the only user of the .sdata2 block 0x80283FD0-0x80283FD8.
 
 #include "core/audtrack.h"
 
-UList gTrkPerfLists[2];
+UList gTrkPerfLists[2];                // the tracks in use: [0] in start order, [1] placed ones
+                                        // sorted on f48, loudest first (InsertSortWorldPerf)
 
-AudTrack* gTrkPerfs;
-UPool gTrkPerfPool;
+AudTrack* gTrkPerfs;                    // the 32 tracks (Trk_InitModule)
+UPool gTrkPerfPool;                     // the free ones
 
 // Puts a placed (3D) track into the sorted track list, on f48, its distance attenuation (TW07's
 // distAttn), loudest first: before the first quieter track, else at the end. Trk_AllocPerf steals
@@ -233,42 +237,42 @@ s32 Trk_FreePerf(AudTrack* pTrack) {
 void Trk_UpdatePerf(AudSource* pSource, AudTrack* pTrack, AudTrackTmpl* pTmpl, u8 nChannel, u8 bOn,
                  u8 bOff, f32 fPriority) {
     u8 bPlaying;
-    u8 bSwitch;
+    u8 bManual;
     u8 bRetrigger;
-    u8 bResort;
+    u8 bUpdate;
     u8 bAudible;
     u8 bStart;
     u8 bStop;
-    u8 bKeep;
-    u8 n64;
-    u8 n68;
+    u8 bCarryOver;
+    u8 nCarryVar;
+    u8 nCarryRange;
 
-    bKeep = 0;
+    bCarryOver = 0;
     if (pTrack != NULL && pTrack->nState == 2) return;
     bPlaying = pTrack != NULL && pTrack->nState > 2;
-    bSwitch = (pTmpl->n0 & 4) && !(pTmpl->n0 & 1);
+    bManual = (pTmpl->n0 & 4) && !(pTmpl->n0 & 1);
     bRetrigger = (pTmpl->n0 & 0x10) == 0;
-    bResort = bPlaying;
+    bUpdate = bPlaying;
     bAudible = fPriority > 0.0f;
     bStart = bAudible &&
-             ((!bPlaying && ((!bRetrigger && (!bSwitch || (bSwitch && bOn && !bOff))) ||
-                             (bRetrigger && (!bSwitch || (bSwitch && bOn))))) ||
-              (bPlaying && bRetrigger && bSwitch && bOn));
+             ((!bPlaying && ((!bRetrigger && (!bManual || (bManual && bOn && !bOff))) ||
+                             (bRetrigger && (!bManual || (bManual && bOn))))) ||
+              (bPlaying && bRetrigger && bManual && bOn));
     bStop = (!bAudible && bPlaying) ||
-            (bAudible && bPlaying && bSwitch &&
+            (bAudible && bPlaying && bManual &&
              ((!bRetrigger && bOff && !bOn) || (bRetrigger && (bOn || bOff))));
     if (bStop && bStart && !(pTmpl->n0 & 8)) {
-        n64 = pTrack->u.seq.n64;
-        bKeep = 1;
-        n68 = pTrack->u.seq.n68;
+        nCarryVar = pTrack->u.seq.n64;
+        bCarryOver = 1;
+        nCarryRange = pTrack->u.seq.n68;
     }
     if (bStop) {
         Trk_Stop(pTrack);
         pTrack = NULL;
-        bResort = 0;
+        bUpdate = 0;
     }
     if (bStart) {
-        bResort = 0;
+        bUpdate = 0;
         if (pTrack == NULL) {
             pTrack = Trk_AllocPerf(pSource, pTmpl, nChannel, fPriority);
         }
@@ -276,11 +280,11 @@ void Trk_UpdatePerf(AudSource* pSource, AudTrack* pTrack, AudTrackTmpl* pTmpl, u
             Trk_Start(pTrack);
         }
     }
-    if (bKeep && pTrack != NULL) {
-        pTrack->u.seq.n64 = n64;
-        pTrack->u.seq.n68 = n68;
+    if (bCarryOver && pTrack != NULL) {
+        pTrack->u.seq.n64 = nCarryVar;
+        pTrack->u.seq.n68 = nCarryRange;
     }
-    if (bResort && pTrack->bits.b.bSorted == 1) {
+    if (bUpdate && pTrack->bits.b.bSorted == 1) {
         pTrack->f48 = fPriority;
         fn_800ADF6C(&gTrkPerfLists[1], &pTrack->link);
         InsertSortWorldPerf(pTrack);
