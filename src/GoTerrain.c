@@ -2590,7 +2590,7 @@ f32* Ter_GetMeshBoundingSphere(UObjMesh* pNode) {
     return pNode->pInfo->v58;
 }
 
-// A flag byte of the node (a24); this file reads bytes 0-3.
+// A flag byte of the node (aFlags); this file reads bytes 0-3.
 s32 Ter_GetMeshFlags(UObjMesh* pNode, s32 n) {
     return pNode->pInfo->aFlags[n];
 }
