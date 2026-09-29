@@ -65,7 +65,7 @@ back; a hand check of 30 A/B pairs on real fn_ functions: agents/findings/2026-0
 Codes in the output follow docs/style.md: E2b = TW07 name, E2 = TW06 name, E1 = EA's text, then the
 machine lines above. Every proposal is a CANDIDATE for the audit process (docs/style.md "Where names
 and comments come from"), never a rename.
-Not scored: IStudio (UIS*, UIStudio), rcmp_mad_codec and runtime/MSL units (lane n2 names them from
+Not scored: IStudio (UIS*, UIStudio), the MAD decoder (maddec*, madidct) and runtime/MSL units (lane n2 names them from
 Madden 2003 / NFSMW); they are counted separately (--all includes them)."""
 import collections, json, math, pathlib, random, re, statistics, sys
 
@@ -74,7 +74,7 @@ import callgraph as cg  # noqa: E402
 
 ROOT = cg.ROOT
 REF = ROOT / 'docs/reference-builds'
-SKIP = re.compile(r'^(UIS\w*|UIStudio|rcmp_mad_codec|runtime/.*|src/MSL_C/.*)$')
+SKIP = re.compile(r'^(UIS\w*|UIStudio|maddeca?|madidct|runtime/.*|src/MSL_C/.*)$')
 
 # ---------------------------------------------------------------------------------------- types
 FLOAT = re.compile(r'\b(float|double|f32|f64|real32|real64)\b')

@@ -456,7 +456,9 @@ The movie player (intro, credits, golfer bios) and EA's MAD picture and movie fo
 | LLPict_Gc.c | EA | a MAD picture/movie frame into I8 textures; the decoder's frames |
 | LLVideo.c | EA | the movie player: MPG2 chunks queued for the decoder |
 | LLPictInt.c | EA | decodes a `"MADk"` picture file |
-| rcmp_mad_codec.c | EA | the MAD decoder: block decoder, inverse DCT, frames |
+| maddec.c | EA | the MAD block decoder: bit reader, code tables, macroblocks |
+| maddeca.c | EA | the MAD decoder's coefficient (run and level) decoder |
+| madidct.c | EA | the MAD decoder's inverse DCT |
 
 Also: `hlaudmovie.c` (a movie's sound), `uiProcessPolygon.c`, `Code800B90F4.c` (frame lists).
 

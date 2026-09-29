@@ -1,5 +1,5 @@
 // LLPictInt.c (EA's name, from its asserts; also in TW06 and EA's 2002 source tree): decodes a
-// "MADk" picture file (EA's MAD codec, rcmp_mad_codec.c) into a new picture, 16x16 pixels at a
+// "MADk" picture file (EA's MAD codec, maddec.c) into a new picture, 16x16 pixels at a
 // time, for LLPict_Gc.c; and that file's module start and stop hooks, empty in this build.
 
 #include "llpict.h"

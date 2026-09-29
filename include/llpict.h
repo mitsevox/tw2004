@@ -63,7 +63,7 @@ u8   MAD_IsAtEnd(MadDecoder* p);                            // the movie has end
 PictFrame* MAD_GetNextFrame(MadDecoder* p, PictFile* pFile);  // the next frame, or NULL
 void MAD_ReleaseFrame(MadDecoder* p, PictFrame* pFrame);    // give a frame back
 
-// One coefficient code of the MAD codec (rcmp_mad_codec.c builds its lookup tables from these).
+// One coefficient code of the MAD codec (maddec.c's madinit builds its lookup tables from these).
 typedef struct MadCode {
     s32  nLen;                  // 0x00  the code's length in bits
     s32  nValue;                // 0x04  the level in bits 0-9 (signed), the run in bits 10-15
@@ -74,6 +74,18 @@ LAYOUT_ASSERT(MadCode, 0x10);
 
 extern const MadCode gMadCoefCodes[95];   // the codes of the first table (entry 0 is not used)
 extern const MadCode gMadCoefCodesLong[128];  // the codes of the second table
+
+// The MAD block decoder's state its three files share: maddec.c's bit reader, code tables and
+// quantizer, which madvlcdecode (maddeca.c) reads, and madidct.c's coefficient block, which
+// madvlcdecode fills and maddec.c's dcblock reads.
+extern u8* maddataptr;         // maddec.c: the next coded byte
+extern u32 madshiftreg;        // maddec.c: the bit buffer, next bit at the top
+extern s32 madbitcount;        // maddec.c: bits left in madshiftreg
+extern u32 madvlctbl1[512];    // maddec.c: the coefficient codes by their first 9 bits,
+extern u32 madvlctbl2[256];    // then after nine zero bits
+extern u32 madvlctbl3[256];    // and after six
+extern s32 madquant[64];       // maddec.c: the quantizer for this picture
+extern s32 idctinput[64];      // madidct.c: a block's coefficients, dequantized
 
 // What LLVideo.c hands LLPict_Gc.c for a movie: the decoder (Pict_OpenMovie makes it, 0x50 bytes)
 // and its current frame.

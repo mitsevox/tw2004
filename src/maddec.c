@@ -1,20 +1,22 @@
-// rcmp_mad_codec.c (our name for now; EA's rcmp_mad_codec.c is the next unit, see below): the core
-// of EA's MAD picture and movie decoder: the bit reader, the coefficient decoder (MPEG-1-style run
-// and level codes), the inverse DCT and the macroblock decoder, which MAD_DecodeFrame
-// (Code800B90F4.c) and PictInt_Decode (LLPictInt.c) run 16x16 pixels at a time.
+// maddec.c (EA's name: TW06's PDB puts madinit..MAD_decodemacroblock in Golf\rcmp\maddec.c, and
+// NFSMW's copy of EA's rcmp package has them, in this order, in maddec.cpp): the core of EA's MAD
+// picture and movie decoder: the bit reader, the decoder's tables and the macroblock decoder, which
+// MAD_DecodeFrame (rcmp_mad_codec.c) and PictInt_Decode (LLPictInt.c) run 16x16 pixels at a time.
+// A block's coefficients are decoded by madvlcdecode (maddeca.c) and turned back into pixels by
+// idctcompute (madidct.c).
 //
 // A MAD file is a picture: 'MADk' a key frame, 'MADm' and 'MADe' frames coded against the last
 // key or 'MADm' frame. The coded data is read 16 bits at a time, little-endian, into a 32-bit
 // bit buffer.
 //
-// File name: EA's only "rcmp_mad_codec.c" string tags the frame allocations of the code after this
-// unit (Code800B90F4.c, 0x800B90F4..0x800B9944: MAD_AllocFrame, MAD_GetNextFrame), and the .sbss
-// pad at 0x802821BC..0x802821C0 puts a unit boundary between that code's globals and this file's.
-// EA's rcmp package as NFSMW links it has rcmp_mad_codec.cpp apart from maddec.cpp, maddeca.cpp and
-// madidct.cpp, and TW06's PDB puts these functions in maddec.c (madinit..MAD_decodemacroblock),
-// maddeca.c (madvlcdecode; NFSMW's maddeca.cpp also has its own static discardbits, our
-// MAD_DiscardBitsVlc) and madidct.c (IdctColumn, IdctRow, idctcompute): this file is EA's three,
-// not its rcmp_mad_codec.c.
+// MAD_ReadLittleEndian and MAD_FixedMul come last, after MAD_decodemacroblock, and serve all three
+// files (maddeca.c's discardbits reads through the first, madidct.c's passes multiply with the
+// second): most likely helpers of a shared header that the compiler emitted once, at the end of
+// the first file using them (NFSMW's maddec.cpp inlines realcore getm.inl, MAD_ReadLittleEndian's
+// job, in discardbits and MAD_initdecode; neither is known by name).
+// Data: the decoder's whole .sbss (the bit reader, 0x802821A8..0x802821C0, padded after
+// maddataptr), its .bss up to 0x801F8258 (madidct.c's after), the codes and the intra matrix
+// (.rodata up to 0x80184B68; maddeca.c's scan order after) and idctprescale (.data).
 
 #include "engine.h"
 #include "dynobj.h"
@@ -119,17 +121,8 @@ s32 idctprescale[64] = {
     0x3B21, 0x2AA1, 0x2D41, 0x3249, 0x3B21, 0x4B42, 0x6D41, 0xD650,
     0x73FC, 0x539F, 0x58C5, 0x62A3, 0x73FC, 0x939F, 0xD650, 0x1A463,
 };
-// the scan order of a block's coefficients (the zigzag, transposed): scan position -> index
-const s32 gMadScanOrder[64] = {
-    0,  8,  1,  2,  9,  16, 24, 17, 10, 3,  4,  11, 18, 25, 32, 40,
-    33, 26, 19, 12, 5,  6,  13, 20, 27, 34, 41, 48, 56, 49, 42, 35,
-    28, 21, 14, 7,  15, 22, 29, 36, 43, 50, 57, 58, 51, 44, 37, 30,
-    23, 31, 38, 45, 52, 59, 60, 53, 46, 39, 47, 54, 61, 62, 55, 63,
-};
 
-s32 idctinput[64];              // a block's coefficients, dequantized (madvlcdecode)
-s32 gMadIdctColumns[64];        // the inverse DCT's first pass (IdctColumn), read back as rows
-u32 madvlctbl1[512];            // } the coefficient codes: the first 9 bits index madvlctbl1;
+u32 madvlctbl1[512];           // } the coefficient codes: the first 9 bits index madvlctbl1;
 u32 madvlctbl2[256];            // } longer codes continue in madvlctbl2 (after nine zero bits)
 u32 madvlctbl3[256];            // } and madvlctbl3 (after six)
 u32 madvlctbl4[64];             // the delta codes (getdelta), by the buffer's top 6 bits
@@ -513,202 +506,4 @@ u32 MAD_ReadLittleEndian(u8* pData, int nBytes) {
 // a * b in 16.16 fixed point, rounded (through a 64-bit product).
 s32 MAD_FixedMul(s32 a, s32 b) {
     return ((s64)a * b + 0x8000) >> 16;
-}
-
-// The same as discardbits: madvlcdecode's own copy. NFSMW's maddeca.cpp (EA's rcmp package) keeps a
-// static discardbits beside madvlcdecode, so this is EA's discardbits of another source file.
-void MAD_DiscardBitsVlc(int nBits) {
-    madshiftreg <<= nBits;
-    madbitcount -= nBits;
-    if (madbitcount < 16) {
-        madshiftreg |= MAD_ReadLittleEndian(maddataptr, 2) << (16 - madbitcount);
-        madbitcount += 16;
-        maddataptr += 2;
-    }
-}
-
-// Decode one block's coefficients into idctinput, dequantized, in natural order. The result
-// is one past the last coefficient's scan position: 1 when there is only the DC one.
-int madvlcdecode(void) {
-    u32 uCode;
-    int nLen;
-    int n;
-    int i;
-    int nDC;
-    s32* p;
-
-    nDC = (s32)madshiftreg >> 24;
-    idctinput[0] = nDC * madquant[0];
-    MAD_DiscardBitsVlc(8);
-    // fake match: the 63 words cleared three per pass; a loop of single stores unrolls 9-way, not
-    // EA's 21 stores x 3
-    p = &idctinput[1];
-    for (i = 0; i < 21; i++) {
-        p[0] = 0;
-        p[1] = 0;
-        p[2] = 0;
-        p += 3;
-    }
-    n = 1;
-    while (1) {
-        uCode = madvlctbl1[madshiftreg >> 23];
-        nLen = uCode & 0xFF;
-        if (nLen > 9) {
-            if (!(nLen & 0x20)) {
-                if (!(nLen & 0x10)) {
-                    MAD_DiscardBitsVlc(9);
-                    uCode = madvlctbl2[madshiftreg >> 24];
-                    nLen = uCode & 0xFF;
-                } else {
-                    MAD_DiscardBitsVlc(6);
-                    uCode = madvlctbl3[madshiftreg >> 24];
-                    nLen = uCode & 0xFF;
-                }
-            } else if (!(nLen & 0x10)) {
-                // escape: the run and level follow as they are
-                MAD_DiscardBitsVlc(6);
-                uCode = madshiftreg;
-                nLen = 16;
-            } else {
-                // end of block
-                MAD_DiscardBitsVlc(2);
-                return n;
-            }
-        }
-        MAD_DiscardBitsVlc(nLen);
-        n += (uCode >> 16) & 0x3F;
-        i = gMadScanOrder[n++];
-        idctinput[i] = ((s32)uCode >> 22) * madquant[i];
-    }
-}
-
-// The inverse DCT's first pass: eight coefficients in, a column of dest (8 apart) out.
-void IdctColumn(s32* src, s32* dest) {
-    s32 t10;
-    s32 z11;
-    s32 z13;
-    s32 z5;
-    s32 t11;
-    s32 o2;
-    s32 z10;
-    s32 e0;
-    s32 e1;
-    s32 z12;
-    s32 e3;
-    s32 e2;
-    s32 t;
-    s32 s;
-
-    if ((src[1] | src[2] | src[3] | src[4] | src[5] | src[6] | src[7]) == 0) {
-        // only the DC coefficient: the column is flat
-        dest[0] = src[0];
-        dest[8] = src[0];
-        dest[16] = src[0];
-        dest[24] = src[0];
-        dest[32] = src[0];
-        dest[40] = src[0];
-        dest[48] = src[0];
-        dest[56] = src[0];
-        return;
-    }
-    z10 = src[5] - src[3];
-    z12 = src[1] - src[7];
-    z11 = src[1] + src[7];
-    z13 = src[5] + src[3];
-    t11 = z11 - z13;
-    // register note: z13 and z5 are reused for the later sums (z13: the odd sum, then o0; z5: t12,
-    // then o1), which gives EA's register allocation
-    z13 = z13 + z11;
-    z5 = MAD_FixedMul(z10 + z12, 0x61F8);
-    t10 = z5 + MAD_FixedMul(z10, 0x8A8C);
-    t11 = MAD_FixedMul(t11, 0xB505);
-    z5 = MAD_FixedMul(z12, 0x14E7B) - z5;
-    z13 = z13 + z5;
-    z5 = z5 + t11;
-    o2 = t11 + t10;
-    e0 = src[0] + src[4];
-    e1 = src[0] - src[4];
-    t = MAD_FixedMul(src[2] - src[6], 0xB505);
-    e2 = e1 - t;
-    e1 = e1 + t;
-    s = src[2] + src[6] + t;
-    e3 = e0 - s;
-    e0 = e0 + s;
-    dest[0] = e0 + z13;
-    dest[8] = e1 + z5;
-    dest[16] = e2 + o2;
-    dest[24] = e3 + t10;
-    dest[32] = e3 - t10;
-    dest[40] = e2 - o2;
-    dest[48] = e1 - z5;
-    dest[56] = e0 - z13;
-}
-
-// The second pass: a row of the first pass's output into eight 16.16 values.
-void IdctRow(s32* src, s32* dest) {
-    s32 t10;
-    s32 z11;
-    s32 z13;
-    s32 z5;
-    s32 t11;
-    s32 o2;
-    s32 z10;
-    s32 e0;
-    s32 e1;
-    s32 z12;
-    s32 e3;
-    s32 e2;
-    s32 t;
-    s32 s;
-
-    z10 = src[5] - src[3];
-    z11 = src[1] + src[7];
-    z12 = src[1] - src[7];
-    z13 = src[5] + src[3];
-    t11 = z11 - z13;
-    // register note: z13 and z5 reused as in IdctColumn
-    z13 = z13 + z11;
-    z5 = MAD_FixedMul(z10 + z12, 0x61F8);
-    t10 = z5 + MAD_FixedMul(z10, 0x8A8C);
-    t11 = MAD_FixedMul(t11, 0xB505);
-    z5 = MAD_FixedMul(z12, 0x14E7B) - z5;
-    z13 = z13 + z5;
-    z5 = z5 + t11;
-    o2 = t11 + t10;
-    e0 = src[0] + src[4];
-    e1 = src[0] - src[4];
-    t = MAD_FixedMul(src[2] - src[6], 0xB505);
-    e2 = e1 - t;
-    e1 = e1 + t;
-    s = src[2] + src[6] + t;
-    e3 = e0 - s;
-    e0 = e0 + s;
-    dest[0] = e0 + z13;
-    dest[1] = e1 + z5;
-    dest[2] = e2 + o2;
-    dest[3] = e3 + t10;
-    dest[4] = e3 - t10;
-    dest[5] = e2 - o2;
-    dest[6] = e1 - z5;
-    dest[7] = e0 - z13;
-}
-
-// The inverse DCT of idctinput into an 8x8 block (rows stride words apart).
-void idctcompute(s32* dest, int stride) {
-    IdctColumn(&idctinput[0], &gMadIdctColumns[0]);
-    IdctColumn(&idctinput[8], &gMadIdctColumns[1]);
-    IdctColumn(&idctinput[16], &gMadIdctColumns[2]);
-    IdctColumn(&idctinput[24], &gMadIdctColumns[3]);
-    IdctColumn(&idctinput[32], &gMadIdctColumns[4]);
-    IdctColumn(&idctinput[40], &gMadIdctColumns[5]);
-    IdctColumn(&idctinput[48], &gMadIdctColumns[6]);
-    IdctColumn(&idctinput[56], &gMadIdctColumns[7]);
-    IdctRow(&gMadIdctColumns[0], dest);
-    IdctRow(&gMadIdctColumns[8], dest + stride);
-    IdctRow(&gMadIdctColumns[16], dest + stride * 2);
-    IdctRow(&gMadIdctColumns[24], dest + stride * 3);
-    IdctRow(&gMadIdctColumns[32], dest + stride * 4);
-    IdctRow(&gMadIdctColumns[40], dest + stride * 5);
-    IdctRow(&gMadIdctColumns[48], dest + stride * 6);
-    IdctRow(&gMadIdctColumns[56], dest + stride * 7);
 }

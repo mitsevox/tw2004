@@ -777,7 +777,7 @@ Added 2026-09-27 (from the ledgers solved that night; each ledger has the full s
 - **[verified, EA form] A byte swap in C, mask first**, `((v & 0xFF000000) >> 24) | ((v & 0xFF0000)
   >> 8) | ((v & 0xFF00) << 8) | ((v & 0xFF) << 24)`, stays rlwinm/rlwimi through allocation and the
   post-RA peephole makes it `stwbrx`: LLPictInt PictInt_Decode 93.26 -> 100 (the shift-first
-  spelling is not recognised at one swap). Mask-first also fixed rcmp_mad_codec fn_800B769C's
+  spelling is not recognised at one swap). Mask-first also fixed maddec fn_800B769C's
   `MAD_ENTRY` (`((u32)v & 0x3FF) << 22`).
 - **[verified, EA form] CodeWarrior's cast-lvalue post-increment keeps a moving cursor**:
   `pSection = ((TexSection*)p)++;` is not folded by the IRO (`((char*)p) += n` and helpers are):
