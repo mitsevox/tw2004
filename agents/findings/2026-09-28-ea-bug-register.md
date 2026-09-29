@@ -25,11 +25,18 @@ own files in its pass; the rest come here.
 | UAudContainers.c UList_InsertAt | an insert at the tail (not also the head) links after it, not in front: InsertSortWorldPerf leaves a higher-priority track at the tail, where Trk_AllocPerf steals first | round 18 (rr5) |
 | gocamscripts.c CamScript_CircleCameras | fA8 (the roll) blends by fT (0..2) instead of fShare: the roll runs on to twice the difference and snaps back when the blend ends | round 19 (rs6) |
 | rcmp_mad_codec.c madinit | `for (i = -256; i < 255; ...)` never writes gMadClamp[255] (.bss zero): a block value of +255 becomes pixel 0 (black) while +128..+254 become 255 | round 19 (rs2) |
+| GoTerrain.c Ter_vCloseModule | StaticMem_Free(pCourse) frees the 'tgd ' chunk's pData, which UStream.c:224 sets past the stream object's header: StaticMem_Free reads the two words before it as block start and size, so it frees the wrong range (Ter_UnloadHole frees pCourseStreamData, the right pointer); harmless only if Ter_UnloadHole ran first; `port:` free pCourseStreamData | round 20 (rt6) |
 | hlaudsession.c Ses_AllocBankHdr | the missing return (was labelled "fake match: EA bug") is EA's own form: now `EA bug:` + `port: return NULL` | round 19 (rs1, relabelled) |
 
 ## Open: behaviour proven possible, needs data or intent to settle
 | Where | What | What settles it |
 |---|---|---|
+| GoTerrain.c Ter_vCloseModule path | whether close is ever reached with a course still loaded (then the labelled wrong free bites) | the shutdown path from the front end / reset |
+| GoTerrain.c Ter_LODLoadCallback | adds the remainder of the step where rounding up would add (step - remainder): a value not a multiple stays one (the comment says so) | the real 'tLOD' values |
+| GoTerrain.c Ter_vCloseModule / Ter_UnRegisterStreamClients | xpGrassPatchList never freed; 'tLOD' left registered (both in the comments) | whether close / unregister ever runs outside shutdown |
+| GoTerrainCollision.c Ter_FreeDropNetworkLoadCallback / Ter_OOBNetworkLoadCallback | store with no MAX_FREE_DROP_NETWORKS / MAX_OOB_NETWORKS check (TW07's are 0x80 bytes, ours 0x14) | the largest outline count per hole in the course files |
+| Ball.c Physics_GetFeetAngle_ForwardBackward | a flat normal (|y| < 1e-6) takes the +-90 degree sign from x like the RightLeft version (copy-paste?) | a caller that can pass a vertical ground normal |
+| GoDynamicCam.c:914 DynamicCam_TrackBallVelocityLag | tests `f98 < f154` but eases by (f154 - fCamTime) / f154 squared: grows again if fCamTime passes f154 while f98 is under it | whether f98 and fCamTime can drift apart (f98 reset alone at gocamscripts.c:1949) |
 | GameModeDriverRTE.c GameModeDriverRTE_EndGame | calls gRTEChallengeEndGame unchecked; NULL (and aChallenge[-1] at line 266) only for an event with bOff or nChallenge 0 | the disc's 'RTEc' data; whether the calendar can start such an event |
 | GameModeDriverPGATour.c GetCourses | aTourEvent[nTourEvent - 1] with nTourEvent 0 (other functions test for 0) | the 'PGAc' tournament data |
 | PlayNowMode.c PlayNow_LoadBallSpot | gPlayNowBallSpots[-1] for a type-10 object with challenge 0 | the course files' 'Cact' type-10 objects |

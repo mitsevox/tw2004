@@ -71,7 +71,7 @@ Functions still unnamed or named from TW06:
 | `80044BD4` | `CamScript_KeepAboveGround` | `CamScript_KeepAboveGround` | strong | PS2 nbr2(r8,4) |
 | `80045038` | `CameraScript_WillGolferBeOccludedInThisView` | `CameraScript_WillGolferBeOccludedInThisView` | strong | PS2 nbr(r4,3) |
 | `80045908` | `DF_vDrawBufferToScreen` | `DF_vDrawBufferToScreen` | strong | PS2 anchor(3) |
-| `80048AF4` | `Kernel_InitModule` | `Kernel_InitModule` | strong | PS2 anchor(1) |
+| `80048AF4` | `Kernel_AllocObjectMem` | `Kernel_InitModule` | wrong | PS2 anchor(1); the code allocates an object (round 20, rt4): EA's Kernel_InitModule is 0x80048DD0 (registers 'Cact', creates the pools; TW07 order) |
 | `80049B40` | `ActAnimal_SetWorldMatrix` | `ActAnimal_SetWorldMatrix` | strong | Xbox anchor(5) |
 | `8004B5A8` | `Ter_PointInFreeDropNetwork` | `Ter_PointInFreeDropNetwork` | strong | PS2 nbr(r8,4) |
 | `8004B664` | `Ter_PointInOOBNetwork` | `Ter_PointInOOBNetwork` | strong | PS2 nbr(r5,4) |

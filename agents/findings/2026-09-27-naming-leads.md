@@ -689,3 +689,42 @@ GolfCamera_CreateReplayCamera, GolfCamera_ChooseSuperSwing, GolfCamera_IsSetUpCa
 CameraController_ResetAimMarkerInSwingCamera, CamScript_LerpFixedTargetCameras, DynamicCam_LoadFilesFromDisk(FE),
 DynamicCam_bIsSwingCamera, StaticCam_ProcessScript, madvlctbl2 / 3, idctprescale / idctinput,
 Pict_AfterFree / StartMovie / OnFirstMovieFrame, LLVideo_Begin/EndPlayback, LLVideo_DarkenScreen.
+
+## Round 20 (rt1-rt6) leftovers
+DONE: GoTerrainCollision, TerrainData, TerrainGround (rt2), GoDynObj, GoDynObjBase, GoDynObjTypes,
+GoAnimalActors, UObject (rt3), CourseData, UKernel, Wind (rt4), Ball (rt5), GoTerrain 0x80030254..
+0x80034AE4 (rt6; 49 left from 0x80034CAC: next round). EA's names: Physics_* (TW07 Physics.c),
+GM_* / GM_CourseInfo_* (TW07 CourseInfo.c), Network_* / wn_PnPoly (TW07 UNetwork.c), DynObj_* (TW07
+GoDynObj.c), Wind_* (TW07 Wind.c), MaterialTypes_getMaterialID (TW07 MaterialTypes::getMaterialID).
+TW06 names taken from earlier comments that quote the TW06 Xbox PDB with signatures
+(Ter_LineTriangleIntersection, Ter_GetSupportingAndCoveringGroundTriangles, Ter_LineSphereIntersection,
+the four *OneGrid walkers, Ter_GetBarycentricCoords): the PDB's function list is not in docs/, so
+these cannot be re-checked in the repo (owner question: export it). docs/tw06-names.md's
+80048AF4 = Kernel_InitModule was wrong (it allocates; the init is 0x80048DD0): row corrected.
+Pipeline: wraplong split a macro line (Ball.c BALL_LANDING_EVENTS) and broke the build: fixed
+(afb91b2 / dbdf43e); lanes rewrapped header lines their renames lengthened (include/ is the header
+lane's): round 21 rule, lanes list them and the orchestrator rewraps once; rename.py leaves extern /
+prototype trailing comments out of column (terrain.h rt6 globals, fixed by hand): tool fix pending.
+rt1 edited one of its repo-changing scripts with a heredoc (the saved script was re-run clean).
+Still open (headers): ball.h Ball.f70 = the random lie quality (Physics_SetLie; added to the launch
+factor by Physics_GetLiePowerPercentage), b99 / bHitTopArc 1 for a putt 0 for a full shot
+(Physics_ShotImpact), b9B set when the first bounce hands the spin-stick input to the ball (event
+0x1F); ball.h:252 Network_RegisterLoadNetworkCallback's pfn gets the network type
+(TNetwork.nExportType), not a chunk; dynobj.h GoDynObjPlayerA = the tee record ('TEO ' 10004, b70
+struck), GoDynObjPlayerB = the divot record (10002), GoDynObjMgr.apPlayer = divot holes, apRing =
+the ten pitch marks, fA94..fAAC the tee / divot throw tuning, the three "'TEO ' 1000x object"
+prototype comments, UObjMeshInfo.a24 flag bytes; game.h HoleData nRating = EA's handicap, n08..n14
+hole length from tees 3..0, b34 split-screen low detail, b35 longest-drive contest, b37 counts for
+driving stats, unk1C..0x2B maybe TW07 DriveDistanceNSideGame, aTeeSets[].n0 maybe rating / slope;
+gCourseNames declared twice (fe.h:535 [30], game.h:22 [NUM_COURSES]); camera leftovers (rt1): CamShot
+f48 / f4C / f80 / f84 / f8C / f90 / nA4 / bA8, CamScript f84..fA4 / bCC..bCE / f100..f10C / n110 /
+n114, GolfCamState b57 / b5B..b5D, CamChoice p10 / b17, DynCamTables n1C; nBlendKind vs EA's
+interpType (owner style call); type renames to TW06 names not done (unconfirmed pairing);
+GameAudio.c's startUp.c prototype block (needs startup.h); File_ReadAsyncEx: hlaudtrackstm.c's local
+copy differs from LLFileIO_Gc.c's definition (callback type and parameters): needs a decision.
+Least-sure names: Physics_CheckObjectCollisions (C pairing), Physics_GetDistanceToCup /
+ApplySuperSucka (order only), Ball_Vec3DotMul, the divot trio (DivotAdd / ShotDivotHoleHide /
+DivotHide), DynObj_PitchMarkAdd, DynObjBase_TakeAmount, DynObjType6_* / 9_*, Kernel_CloseModule,
+Kernel_PostPairByKey147 / 148, GM_GetHoleIndexDrivingSideGame, GM_GetCurrentHoleSplitScreenLowDetail,
+isLeft, UObject_ComposeRotation, Network_RayIntersection, Ter_DrawFarClipPatches,
+gTerCrowdPoseStepsFlag40, gTerUnreadToggle, nHeightRef, nTrackMode, bFairwayFix.

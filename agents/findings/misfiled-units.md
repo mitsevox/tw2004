@@ -17,7 +17,7 @@ the naming pass. Details and evidence: agents/findings/2026-09-27-naming-leads.m
 | TibExt.c's tail = EA's SharedFileIOCallbacks.c | proven | no | matching-era audit |
 | Code8009A928.c = EA's GlowMgr.c | proven | no | matching-era audit |
 | Code8009AA28.c = EA's SunFlr.c | proven | no | matching-era audit |
-| Ball.c = EA's Physics.c + Wind.c | strong | no | matching-era audit |
+| Ball.c = EA's Physics.c + Wind.c (Wind.c split off; see the round 20 row) | strong | yes | matching-era audit |
 | particles.c = the OS heap + LLTime | strong | no | matching-era audit |
 | goballfx.c = EA's GoLightFogEnv.c | strong | no | matching-era audit |
 | OBFData.c = weather code (name open) | strong | no | matching-era audit |
@@ -34,6 +34,13 @@ the naming pass. Details and evidence: agents/findings/2026-09-27-naming-leads.m
 | gInterruptsOffDepth / gpInterruptsOffDepth defined in uiEATrax.c's data, used by LLDisp_Gc.c | weak | yes | round 17 (rq4) |
 | Code80090940.c: which neighbour it belongs to (no data of its own) | weak | yes | round 17 (rq4) |
 | Placeholder names to settle: Code800B1AA8.c (ball-against-object test), Code800B1D3C.c (start-up UI commands), the Create-A-Player ball unit | weak | yes | 2026-09-29 splits |
+| Ball.c = EA's Physics.c (Wind.c already split off at 0x80055F14): its 58 functions follow TW07's Physics.c order exactly, Physics_ForceBallInHole .. Physics_CloseModule, then the small rotate / sin-cos / vector helpers TW07 inlines there. Rename to Physics.c; the start may be 0x80050BEC (GoTerrainCollision.c's MaterialTypes_getMaterialID sits right before, TW07 Physics_GetSurfaceID) or stay at 0x80050C2C (TW06 names it MaterialTypes::getMaterialID) | proven (name), weak (start) | yes | round 20 (rt5, rt2) |
+| CourseData.c = EA's CourseInfo.c: TW07 golf/gamemode/CourseInfo.c has these functions in this order; TW06 lists golf\gamemode\courseinfo.c | proven | yes | round 20 (rt4) |
+| TerrainData.c's network code = EA's UNetwork.c (TW07 order: Network_FreeDownloadData .. Network_RayNetworkDoesIntersect); its tail belongs elsewhere: Ter_GetTGD (TW07 GoTerrain_TGD.c), UObject_ComposeRotation (only the object files call it), LLMath_AddScale3 / Vec3_Dot (math inlines) | strong | yes | round 20 (rt2) |
+| TerrainGround.c's three functions are TW07 GoTerrainUtils.c / GoTerrainCollision_Headgate.c: the GoTerrainCollision group | weak | yes | round 20 (rt2) |
+| UKernel.c Kernel_InitObjectFromDef (0x80049514, type 0's setup) is called only by GoDynObjBase.c and GoAnimalActors.c: GoDynObjBase.c's? TW07's UKernel.c has only DownloadActors / InitModule / CloseModule | weak | yes | round 20 (rt4) |
+| GoDynObj.c's Character_IsTagSet (0x80048574) and Object_SetLod (0x80048584) sit away from char.c / UObject.c (header inlines?); DynObj_InitModuleEmpty / CloseModuleEmpty (0x800486EC / F0) sit right before UObject.c (its module hooks?) | weak | yes | round 20 (rt3) |
+| GoDynObjBase.c / GoDynObjTypes.c: no EA file in TW06 or TW07; TW06's golf/hi-rendering/gomiscactors.c could hold types 6 and 9 (nothing proves it) | weak | yes | round 20 (rt3) |
 | src/unsorted/: 28 sweep files, 23 not through the pass; place each in its home file (TW07 order + neighbour references; sweep_80155F40 is C library code, sweep_800055D8 is main()) | - | 5 of 28 | plan-readability.md |
 
 ## Done
