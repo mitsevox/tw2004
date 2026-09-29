@@ -4018,3 +4018,33 @@ address	name	comment	by	date
 800BD868	Gaud_StartPlaylist2Comment	add	rr6 (replayed by orchestrator)	2026-09-29
 800B1CF4	DynObj_Vec3Add	keep	sp2 (claude-opus-5-5)	2026-09-29
 800B1D18	DynObj_Vec3Sub	keep	sp2 (claude-opus-5-5)	2026-09-29
+8003F194	CamScript_GetFlybyCamRate	rewrite	rs6 (replayed by orchestrator)	2026-09-29
+8003F2E0	CamScript_Fade	rewrite	rs6 (replayed by orchestrator)	2026-09-29
+8003F518	CamScript_LerpCameras	rewrite	rs6 (replayed by orchestrator)	2026-09-29
+8003F790	CameraScript_GetSmoothTimeParam	rewrite	rs6 (replayed by orchestrator)	2026-09-29
+8003F7EC	CamScript_LerpPercentOfFlightCameras	rewrite	rs6 (replayed by orchestrator)	2026-09-29
+8003FAA0	CamScript_LerpPercentToPinCameras	rewrite	rs6 (replayed by orchestrator)	2026-09-29
+8003FD54	CamScript_LerpFixedTargetCameras	rewrite	rs6 (replayed by orchestrator)	2026-09-29
+80044768	CamScript_GetNearestAIPoint	rewrite	rs6 (replayed by orchestrator)	2026-09-29
+80044AA8	CamScript_PlayableSurface	keep	rs6 (replayed by orchestrator)	2026-09-29
+80044B0C	CamScript_GetSupportingHeight	keep	rs6 (replayed by orchestrator)	2026-09-29
+80044B70	CamScript_GetCoveringHeight	keep	rs6 (replayed by orchestrator)	2026-09-29
+80044E2C	CamScript_IngoreCameraCollisionSurface	rewrite	rs6 (replayed by orchestrator)	2026-09-29
+80044E74	CamScript_IsSecondViewShot	rewrite	rs6 (replayed by orchestrator)	2026-09-29
+80044EA8	CamScript_EstimateBallFlightPercent	rewrite	rs6 (replayed by orchestrator)	2026-09-29
+80044F58	CamScript_GetBallToPinPercent	keep	rs6 (replayed by orchestrator)	2026-09-29
+800451A8	CamScript_SkipLookBackCam	rewrite	rs6 (replayed by orchestrator)	2026-09-29
+800453C8	CameraScript_FlipCameraForLefty	add	rs6 (replayed by orchestrator)	2026-09-29
+80045470	CA_vSetCameraFieldOfView	add	rs6 (replayed by orchestrator)	2026-09-29
+80045494	GameEffects_SetHalfTime	rewrite	rs6 (replayed by orchestrator)	2026-09-29
+80045558	GameEffects_SetDoubleTime	rewrite	rs6 (replayed by orchestrator)	2026-09-29
+8004560C	GameEffects_IsGameBreakerOn	none	rs6 (replayed by orchestrator)	2026-09-29
+8004561C	GameEffects_IsDoubleTimeOn	none	rs6 (replayed by orchestrator)	2026-09-29
+8004562C	CamScript_DoesScriptTrackBall	add	rs6 (replayed by orchestrator)	2026-09-29
+8003DCE8	CamScript_RunScript	rewrite	rs6 (replayed by orchestrator)	2026-09-29
+8003E624	CamScript_RunFEScript	rewrite	rs6 (replayed by orchestrator)	2026-09-29
+8003EA50	CamScript_RunFlybyCamera	rewrite	rs6 (replayed by orchestrator)	2026-09-29
+8003EE68	CamScript_SmoothTerrainHeight	keep	rs6 (replayed by orchestrator)	2026-09-29
+8003F064	CamScript_AccelerateTime	rewrite	rs6 (replayed by orchestrator)	2026-09-29
+8004017C	CamScript_LerpSwingToBallFlightCameras	rewrite	rs6 (replayed by orchestrator)	2026-09-29
+8004048C	CamScript_SplineCameras	rewrite	rs6 (replayed by orchestrator)	2026-09-29

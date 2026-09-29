@@ -77,7 +77,7 @@ typedef struct CamShot {
     f32  f94;                   // 0x94
     f32  f98;                   // 0x98
     f32  f9C;                   // 0x9C
-    s32  nA0;                   // 0xA0  CameraScript_InterpToNewScript: 0 fn_80045494 on, 2 fn_80045558
+    s32  nA0;                   // 0xA0  CameraScript_InterpToNewScript: 0 GameEffects_SetHalfTime on, 2 GameEffects_SetDoubleTime
                                 //       on (else both off); 3 calls GolfCamera_SetCameraMatrixMode(1)
     s32  nA4;                   // 0xA4
     u8   bA8;                   // 0xA8
@@ -232,7 +232,7 @@ typedef struct CamScript {
     CamShot* pB4;               // 0xB4  where SwitchCrAPCamera records the current camera
     CamShot* pB8;               // 0xB8  the shot before (GolfCamera_CutToGolferDoneAnimatingCam)
     s32  nBC;                   // 0xBC  the next shot's kind (its bAB; fn_8006351C)
-    s32  nFade;                 // 0xC0  the screen fade (fn_8003F2E0): 0 none, 1 fading up to vFadeColor
+    s32  nFade;                 // 0xC0  the screen fade (CamScript_Fade): 0 none, 1 fading up to vFadeColor
                                 //       (CameraController_FadeOut), 2 fading away (FadeIn), 3 held
                                 //       (fn_80063CBC), 4 kept after 1 ends, 5 after 2 ends (then 0)
     s32  nC4;                   // 0xC4  the shot kind asked for
@@ -401,7 +401,7 @@ typedef struct CamTuning {
     f32  fFC;                  // 0x0FC  CameraScript_IsDefaultSwingCam: the least dot product of the
                                 //        camera's and the aim's level directions from the ball
     f32  f100;                  // 0x100  CamScript_UpdateFairwayCam: moves on only from this level
-                                //        distance to the spot fn_80044768 picks ...
+                                //        distance to the spot CamScript_GetNearestAIPoint picks ...
     f32  f104;                  // 0x104  ... after this long on the camera ...
     f32  f108;                  // 0x108  ... and while the ball heads away from the camera (a dot
                                 //        product at most this)
@@ -730,7 +730,7 @@ u8     fn_8003DC78(CamShot* pShot);     // the shot's bAC is 1..6 or 7
 void   DynamicCam_GetSmoothBallLocation(CamScript* pScript, CamShot* pShot, int nPlayer, f32* pOut, u8 bKeep);
 // 0 when gSession.nGameType is 3, else Character_IsLeftHanded of the player's golfer (Player.pChar)
 // as a flag; the shot is not read.
-u8     fn_800453C8(int nPlayer, CamShot* pShot);
+u8     CameraScript_FlipCameraForLefty(int nPlayer, CamShot* pShot);
 
 // ---- the camera scripts (gocamscripts.c, 0x8003DCE8..) ----------------------------------------
 
@@ -742,7 +742,7 @@ void     CamScript_RunFEScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pSc
                      f32 fTime);
 void     CamScript_RunFlybyCamera(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, u8 b,
                      f32 fTime);
-void     fn_8003F2E0(CamScript* pScript, f32 fTime);
+void     CamScript_Fade(CamScript* pScript, f32 fTime);
 void     CameraScript_RecordCurrentCam(CamShot* pShot, f32* pCam, f32* pSub, int nPlayer, CamScript* pScript,
                                        u8 bView1);
 void     CameraScript_InterpToNewScript(CamScript* pScript, CamShot* pShot, int nPlayer, f32* pCam, f32* pSub,
@@ -754,8 +754,8 @@ void     CamScript_GetCameraOnFairwayPos(CamScript* pScript, f32* pOut, f32* pCa
                      CamShot* pShot, f32* pSub, f32* pHeight);
 void     CamScript_PutBackOnFairway(CamScript* pScript, f32* pCam, f32* pSub, int nPlayer, CamShot* pShot,
                                     f32* pPrev);
-f32      fn_80044EA8(int nPlayer, CamScript* pScript);   // how far the ball's flight has run
-u8       fn_800451A8(CamScript* pScript, CamShot* pShot, int nPlayer);
+f32      CamScript_EstimateBallFlightPercent(int nPlayer, CamScript* pScript);   // how far the ball's flight has run
+u8       CamScript_SkipLookBackCam(CamScript* pScript, CamShot* pShot, int nPlayer);
 void     CameraScript_UpdateLandingEstimate(CamScript* pScript, int nPlayer);
 u8       CameraScript_IsDefaultSwingCam(CamShot* pShot, int nPlayer, f32* pCam);
 // Keep pNew above the ground (by fClearance); the out values are optional (NULL): pbFound any
@@ -763,8 +763,8 @@ u8       CameraScript_IsDefaultSwingCam(CamShot* pShot, int nPlayer, f32* pCam);
 u8       CamScript_KeepAboveGround(int nPlayer, f32* pNew, f32* pOld, u8 bCheckPath, u8* pbFound,
                                    f32* pfGround, u8* pbRaised, f32 fClearance);
 u8       CameraScript_WillGolferBeOccludedInThisView(int nPlayer, CamShot* pShot, CamScript* pScript);
-void     fn_80045470(CamLens* pLens, f32 fFov);   // sets the lens's field of view
-u8       fn_8004562C(CamShot* pShot);             // the shot's bAC is 0, 13..15 or 23
+void     CA_vSetCameraFieldOfView(CamLens* pLens, f32 fFov);   // sets the lens's field of view
+u8       CamScript_DoesScriptTrackBall(CamShot* pShot);             // the shot's bAC is 0, 13..15 or 23
 
 // GoCamera.c: works out the lens's fB0 from its field of view.
 void     CA_vUpdateInternalFieldOfViewData(CamLens* pLens);

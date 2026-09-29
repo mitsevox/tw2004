@@ -13,7 +13,7 @@ typedef struct CamChoice {
     f32  f4;                    // 0x04  its second (f2)
     f32  f8;                    // 0x08  its third (f3)
     f32  fC;                    // 0x0C  kind 0x18: the ball-flight camera takes it once the flight has
-                                //       run this far (fn_80044EA8)
+                                //       run this far (CamScript_EstimateBallFlightPercent)
     CamShot* p10;               // 0x10  the shot (an index in the file)
     u8   b14;                   // 0x14  the shot kind it is for (9: any kind but 23)
     u8   b15;                   // 0x15  the blend's first kind (nA)

@@ -38,7 +38,7 @@ void CA_vReleaseCamera(CamLens* pLens) {
 // the 1.0 and 0.0 CA_vSetLookAt uses first; its body is unknown, this one only reproduces the order.
 static void GoCamera_StrippedFn(CamLens* pLens) {
     fn_800769C0(pLens, 0.1f, 4096.0f);
-    fn_80045470(pLens, DEG(60.0f));
+    CA_vSetCameraFieldOfView(pLens, DEG(60.0f));
     fn_80076948(pLens, 20.0f, 20.0f);
 }
 
@@ -162,7 +162,7 @@ void Camera_SetCameraPositionAndTargetWithOffsetAndScale(CamLens* pLens, f32* pP
 void CA_vInitCamera(CamLens* pLens) {
     fn_80076A0C_SetType(pLens, 0);
     fn_800769C0(pLens, 0.1f, 4096.0f);
-    fn_80045470(pLens, DEG(60.0f));
+    CA_vSetCameraFieldOfView(pLens, DEG(60.0f));
     CA_vSetMatrix(pLens, NULL);
     fn_80076948(pLens, 20.0f, 20.0f);
 }

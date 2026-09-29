@@ -341,7 +341,8 @@ void fn_8006B2C4(int nPlayer, u8 bBefore) {
         lbl_801D5F78[nPlayer].n14 = 4;
         return;
     }
-    if (fn_8004560C() && (!fn_8006BEA4() || GameEffects_ScriptedGBDidIt(pBall, nPlayer, bBefore))) {
+    if (GameEffects_IsGameBreakerOn()
+        && (!fn_8006BEA4() || GameEffects_ScriptedGBDidIt(pBall, nPlayer, bBefore))) {
         if (bBefore) {
             lbl_801D5F78[nPlayer].n10 = 3;
             lbl_801D5F78[nPlayer].nC = 0;

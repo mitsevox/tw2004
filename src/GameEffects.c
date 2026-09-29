@@ -10,7 +10,7 @@
 // gGameEffects (game.h). The small helpers it calls (GameEffects_IsFixedTimeStepOn,
 // _IsSingleStepPending, _ClearSingleStep, _StartOfSlowMoFrame, _IsHalfTimeOn, _SendMessage50,
 // _Vec3Sub, GM_IsPuttForLead) are defined at the top of GameMode.c; half and double time are
-// switched in gocamscripts.c (fn_80045494, fn_80045558).
+// switched in gocamscripts.c (GameEffects_SetHalfTime, GameEffects_SetDoubleTime).
 
 #include "golfer.h"
 #include "game.h"
@@ -299,8 +299,8 @@ void GameEffects_ScriptedGameBreakerBallHitTrigger(int nPlayer) {
         fDist = AI_MaxDistance(nPlayer, gPlayers[nPlayer].nShotKind, gPlayers[nPlayer].nClub);
         fDist *= Physics_GetLiePowerPercentage(&gPlayers[nPlayer].ball);
         fDist *= SW_vGetShotPower(nPlayer);
-        fn_80045494(0, nPlayer);
-        fn_80045558(0, nPlayer);
+        GameEffects_SetHalfTime(0, nPlayer);
+        GameEffects_SetDoubleTime(0, nPlayer);
         pView = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
         pView->p74 = fn_8003BDBC(nPlayer, nLie, 3, 0xC, 1, fDist);
         gGameEffects.b19 = 1;
@@ -417,13 +417,13 @@ void GameEffects_InFlightGameBreakerTrigger(int nPlayer) {
             gGameEffects.nPlayer = nPlayer;
             gGameEffects.bPaused = 0;
             gGameEffects.nHeartbeats = 0;
-            fn_80045494(0, nPlayer);
-            fn_80045558(0, nPlayer);
+            GameEffects_SetHalfTime(0, nPlayer);
+            GameEffects_SetDoubleTime(0, nPlayer);
             pView = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
             pSeq = fn_8003BDBC(nPlayer, nLie, nClass, 0xB, 1, fDist);
             pShot = DynamicCam_ChooseScriptInSequence(pSeq, 0, &nKind, &fTime, &f2, &nB, &f3, nPlayer);
             if (pShot != NULL && pView->script.pShot != pShot && pView->script.pNextShot != pShot &&
-                !fn_800451A8(&pView->script, pShot, nPlayer)) {
+                !CamScript_SkipLookBackCam(&pView->script, pShot, nPlayer)) {
                 if (nKind == 5 && fn_8003DC78(pShot)) {
                     if (gPlayers[nPlayer].nShotKind != SHOT_TYPE_PUTT_e &&
                         fn_80095780(gPlayers[nPlayer].pChar) != 9) {
@@ -521,24 +521,24 @@ void GameEffects_RenderPredictedGB(void) {
     if (!Player_IsCPU(gGameEffects.nPlayer)) {
         if (gPlayers[gGameEffects.nPlayer].nShotKind == SHOT_TYPE_PUTT_e) {
             if (fDist < 2.0f && !gGameEffects.bClosing) {
-                fn_80045494(1, gGameEffects.nPlayer);
+                GameEffects_SetHalfTime(1, gGameEffects.nPlayer);
             } else {
-                fn_80045494(0, pGE->nPlayer);
+                GameEffects_SetHalfTime(0, pGE->nPlayer);
             }
         } else if (fDist < 4.0f && !gGameEffects.bClosing) {
-            fn_80045494(1, pGE->nPlayer);
+            GameEffects_SetHalfTime(1, pGE->nPlayer);
         } else {
-            fn_80045494(0, pGE->nPlayer);
+            GameEffects_SetHalfTime(0, pGE->nPlayer);
         }
     } else {
-        fn_80045494(0, pGE->nPlayer);
+        GameEffects_SetHalfTime(0, pGE->nPlayer);
     }
     GameEffects_DrawLetterBoxes(fHeight);
     if (gGameEffects.bClosing) {
         gGameEffects.fGBTime -= gSession.fFrameTime;
         if (gGameEffects.fGBTime < 0.0f) {
             gGameEffects.bGameBreaker = 0;
-            fn_80045494(0, pGE->nPlayer);
+            GameEffects_SetHalfTime(0, pGE->nPlayer);
         }
     } else {
         gGameEffects.fGBTime += gSession.fFrameTime;

@@ -765,7 +765,7 @@ Added 2026-09-27 (from the ledgers solved that night; each ledger has the full s
   (char MtaLib_SwapAndLink 2 -> 0).
 - **[verified, EA form] A float join set by if/else into a named block local**, then stored and
   clamped in place (`{ f32 f; if (c) f = E; else f = 0.0f; v[3] = f; } v[3] = v[3] < 0.0f ? ..`):
-  gocamscripts fn_8003F2E0 8 -> 0 (store-to-load forwarding gives EA's `frsp`).
+  gocamscripts CamScript_Fade 8 -> 0 (store-to-load forwarding gives EA's `frsp`).
 
 *Types, forms and floats*
 
@@ -1211,7 +1211,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
 - **[verified] A callee that ignores r3, called while r3 still holds the caller's first
   parameter, takes that parameter.** `Lessons_GetShape()` -> `(nPlayer)` (Golfer
   `AI_FaceVector` 99.72% -> 100). Likewise a callee starting `clrlwi. r0, r3, 24` has a `u8`
-  first parameter, and its callers pass a `u8` without `clrlwi` (Swing `fn_80045494/5558`).
+  first parameter, and its callers pass a `u8` without `clrlwi` (Swing `GameEffects_SetHalfTime/5558`).
 - **[verified] `fn(15, (u8)a, b)` and `fn(15, a & 0xFF, b)` differ for an int parameter `a`.**
   The original's `mr r0, r3; clrlwi r4, r0, 24` comes from `a & 0xFF` (or a `u8` parameter passed
   on); `(u8)a` gives `clrlwi r4, r3, 24` (GameMode11 `Lessons_ShowSwingHint`, 57.9% -> 100).

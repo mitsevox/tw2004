@@ -1425,9 +1425,9 @@ void Character_AlignShotWithTarget(int nPlayer, u8 a, u8 b);
 void Character_PrepareForRendering(int nPlayer);
 void Vec3_Scale(f32 f, f32* pIn, f32* pOut);   // scale a vector (paired singles)
 
-void fn_80045494(u8 bOn, int nPlayer);
-void fn_80045558(u8 bOn, int nPlayer);
-u8   fn_8004560C(void);
+void GameEffects_SetHalfTime(u8 bOn, int nPlayer);
+void GameEffects_SetDoubleTime(u8 bOn, int nPlayer);
+u8   GameEffects_IsGameBreakerOn(void);
 typedef void (*EventHandler)(int nPlayer, int nEvent, void* pData, int nArg);   // event.c's table
 // Through the event table gEventHandlers. pData: the ball, a position, or NULL; nArg goes to the
 // handler (the landings: 1 the real ball, else the AI's simulated one; most callers pass -1).

@@ -681,10 +681,10 @@ int GM_DoPreshotAnimation(int nPlayer) {
 // out of bounds, on a surface without u34 bit 0, in water (class 7/16), or on a slope steeper than
 // 0.1 with the ground more than 0.2 below the ball. With session flags 0x4000 and 0x8000 both set:
 // only when holed, from surface 16, or for outcomes 1 and 2. Then: with bPlanReady only for outcome
-// 2; always when fn_8004560C says so or animation 9 is playing; with a scripted reaction (uFlags
-// bit 0) when the character has one (p1790). Otherwise by the outcome (fn_8006AA9C, 0..4): after a
-// putt 80%, always, always, 70%, 90%, else 50%; after other shots 35%, always, always, 70%, 90%,
-// else 50%.
+// 2; always when GameEffects_IsGameBreakerOn says so or animation 9 is playing; with a scripted
+// reaction (uFlags bit 0) when the character has one (p1790). Otherwise by the outcome
+// (fn_8006AA9C, 0..4): after a putt 80%, always, always, 70%, 90%, else 50%; after other shots 35%,
+// always, always, 70%, 90%, else 50%.
 int GM_ShowPostShotAnimation(int nPlayer) {
     f32          vPos[4];
     f32          vNormA[4];
@@ -764,7 +764,7 @@ int GM_ShowPostShotAnimation(int nPlayer) {
     if (gPlayers[nPlayer].bPlanReady) {
         return nResult == 2;
     }
-    if (fn_8004560C()) {
+    if (GameEffects_IsGameBreakerOn()) {
         return 1;
     }
     if (fn_80095780(gPlayers[nPlayer].pChar) == 9 || fn_80095798(gPlayers[nPlayer].pChar) == 9) {

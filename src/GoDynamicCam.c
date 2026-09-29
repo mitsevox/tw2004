@@ -61,7 +61,7 @@ u8   fn_8003D0BC(CamSequence* pSequence, int nPlayer, f32 f);
 u8   fn_8003AB94(CamChoice* pChoice);
 u8   fn_8003ABEC(CamChoice* pChoice, int nPlayer);
 void fn_8003DAC8(CamShot* pShot, int nPlayer, f32* pA, f32* pB);
-f32  fn_80044F58(int nPlayer, CamScript* pScript);     // gocamscripts.c
+f32  CamScript_GetBallToPinPercent(int nPlayer, CamScript* pScript);     // gocamscripts.c
 
 // Registers the handlers of the camera files ('CAMS', 'CAMV', 'CAMA').
 void fn_80039454(void) {
@@ -686,8 +686,8 @@ u8 fn_8003ABEC(CamChoice* pChoice, int nPlayer) {
 
 // The camera's position for a shot between two points: DynamicCam_GetLocation's points for the
 // shot's bAF and bB0, turned into a position by the shot's f60 and f64 (f64 the other way when
-// fn_800453C8 holds; level unless bB1), then DynamicCam_AddHeightOffset. A shot with a point of kind 0 or 23
-// waits for a frame in which the ball moves.
+// CameraScript_FlipCameraForLefty holds; level unless bB1), then DynamicCam_AddHeightOffset. A shot
+// with a point of kind 0 or 23 waits for a frame in which the ball moves.
 void fn_8003AC50(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam, f32* pSub) {
     f32 vFrom[4];
     f32 vTo[4];
@@ -700,12 +700,12 @@ void fn_8003AC50(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
     DynamicCam_GetLocation(pShot->bAF, nPlayer, vFrom, pScript, pShot, pCam, pSub);
     DynamicCam_GetLocation(pShot->bB0, nPlayer, vTo, pScript, pShot, pCam, pSub);
     if (pShot->bB1 == 0) {
-        if (fn_800453C8(nPlayer, pShot)) {
+        if (CameraScript_FlipCameraForLefty(nPlayer, pShot)) {
             fn_800C7D14(vFrom, vTo, 0, 1, pOut, pShot->f60, -pShot->f64);
         } else {
             fn_800C7D14(vFrom, vTo, 0, 1, pOut, pShot->f60, pShot->f64);
         }
-    } else if (fn_800453C8(nPlayer, pShot)) {
+    } else if (CameraScript_FlipCameraForLefty(nPlayer, pShot)) {
         fn_800C7D14(vFrom, vTo, 1, 1, pOut, pShot->f60, -pShot->f64);
     } else {
         fn_800C7D14(vFrom, vTo, 1, 1, pOut, pShot->f60, pShot->f64);
@@ -714,9 +714,9 @@ void fn_8003AC50(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
 }
 
 // As fn_8003AC50, with the distance and side from fn_8003DAC8 (level for bB1 2 and 3). For bB1 8,
-// the camera's level offset from pSub is scaled from CamTuning.f240 to f248 as fn_80044F58's
-// distance (never less than the most seen, pScript->f100) goes from f23C to f244, unless
-// CameraScript_SnapToScript holds.
+// the camera's level offset from pSub is scaled from CamTuning.f240 to f248 as
+// CamScript_GetBallToPinPercent's distance (never less than the most seen, pScript->f100) goes from
+// f23C to f244, unless CameraScript_SnapToScript holds.
 void fn_8003ADF8(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam, f32* pSub) {
     f32 vFrom[4];
     f32 vTo[4];
@@ -741,7 +741,7 @@ void fn_8003ADF8(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
         fn_800C7D14(vFrom, vTo, 1, 0, pOut, fDist, fSide);
     }
     if (pShot->bB1 == 8) {
-        fFar = fn_80044F58(nPlayer, pScript);
+        fFar = CamScript_GetBallToPinPercent(nPlayer, pScript);
         if (!CameraScript_SnapToScript(pScript, pShot)) {
             if (fFar > pScript->f100) {
                 pScript->f100 = fFar;
@@ -1810,11 +1810,11 @@ void DynamicCam_GetSmoothBallLocation(CamScript* pScript, CamShot* pShot, int nP
     }
 }
 
-// The shot's f64 and f60 into *pA and *pB; when fn_800453C8 holds for the player one of them
-// changes sign: (-f64, f60), or (f64, -f60) for a shot with bAF or bB0 set to 21.
+// The shot's f64 and f60 into *pA and *pB; when CameraScript_FlipCameraForLefty holds for the
+// player one of them changes sign: (-f64, f60), or (f64, -f60) for a shot with bAF or bB0 set to 21.
 void fn_8003DAC8(CamShot* pShot, int nPlayer, f32* pA, f32* pB) {
     if (pShot != NULL) {
-        if (fn_800453C8(nPlayer, pShot)) {
+        if (CameraScript_FlipCameraForLefty(nPlayer, pShot)) {
             if (pShot->bAF == 21 || pShot->bB0 == 21) {
                 if (pA != NULL) {
                     *pA = pShot->f64;

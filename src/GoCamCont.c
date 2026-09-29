@@ -172,7 +172,7 @@ void CameraController_Idle(View* pView, int nPlayer) {
     case 25:
         nMove = pView->script.nFade;
         if (gSession.nPaused == 0) {
-            fn_8003F2E0(&pView->script, FRAME_TIME);   // port: one NTSC frame a call, not gSession.fFrameTime
+            CamScript_Fade(&pView->script, FRAME_TIME);   // port: one NTSC frame a call, not gSession.fFrameTime
             // A colour fade held in state 4 (after fading up) stays on instead of ending.
             if (nMove == 4 && pView->script.nFade == 0) {
                 pView->script.nFade = 4;
@@ -488,7 +488,7 @@ void fn_80063920(int nView, f32* pBounds) {
     CamScript_PutBackOnFairway(&pView->script, pPos, pAt, nPlayer, &pView->shot19C, pPos);
 }
 
-// Colour fade state 2 (fn_8003F2E0): the colour pVec over the view, its alpha falling from pVec[3]
+// Colour fade state 2 (CamScript_Fade): the colour pVec over the view, its alpha falling from pVec[3]
 // to 0 over fTime.
 void CameraController_FadeIn(View* pView, f32 fTime, f32* pVec) {
     pView->script.nFade = 2;
@@ -497,7 +497,7 @@ void CameraController_FadeIn(View* pView, f32 fTime, f32* pVec) {
     pView->script.fFadeLength = fTime;
 }
 
-// Colour fade state 1 (fn_8003F2E0): the colour pVec over the view, its alpha rising from 0 to
+// Colour fade state 1 (CamScript_Fade): the colour pVec over the view, its alpha rising from 0 to
 // pVec[3] over fTime.
 void CameraController_FadeOut(View* pView, f32 fTime, f32* pVec) {
     pView->script.nFade = 1;

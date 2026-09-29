@@ -693,7 +693,8 @@ void fn_800BF094(View* pView, int nPlayer) {
 void fn_800BF110(View* pView, int nPlayer) {
     CameraController_GetCameraOrigin(pView);
     CameraController_GetCameraLookPoint(pView);
-    fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])), DEG(60.0f));
+    CA_vSetCameraFieldOfView(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])),
+                             DEG(60.0f));
     pView->script.n110 = 0;
     pView->p74 = NULL;
     pView->script.pShot = NULL;
@@ -730,7 +731,7 @@ void GolfCamera_ProcessPlaceBallCamera(View* pView, int nPlayer) {
         Vec3Copy(pCam, vOld);
         nPinSet = Game_CurrentPinSet();
         if (gSession.nPaused == 0) {
-            fn_8003F2E0(&pView->script, gSession.fFrameTime);
+            CamScript_Fade(&pView->script, gSession.fFrameTime);
             pView->script.fFadeTime += gSession.fFrameTime;
         }
         if (gSession.fFrameTime != 0.0f) {
@@ -839,7 +840,8 @@ void GolfCamera_ProcessPlaceBallCamera(View* pView, int nPlayer) {
 void fn_800BF5E4(View* pView, int nPlayer) {
     CameraController_GetCameraOrigin(pView);
     CameraController_GetCameraLookPoint(pView);
-    fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])), DEG(60.0f));
+    CA_vSetCameraFieldOfView(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])),
+                             DEG(60.0f));
     pView->script.n110 = 0;
     pView->script.pShot = NULL;
     pView->p74 = NULL;
@@ -882,7 +884,7 @@ void fn_800BF658(View* pView, int nPlayer) {
         Vec3Copy(pCam, vOld);
         Game_CurrentPinSet();
         if (gSession.nPaused == 0) {
-            fn_8003F2E0(&pView->script, gSession.fFrameTime);
+            CamScript_Fade(&pView->script, gSession.fFrameTime);
             pView->script.fFadeTime += gSession.fFrameTime;
         }
         if (gSession.fFrameTime != 0.0f) {
@@ -1031,7 +1033,8 @@ void fn_800BFC80(View* pView, int nPlayer) {
         pView->shot19C.f68 = gPlayers[nPlayer].ball.vPos[1];
         pView->script.pShot = NULL;
         pView->script.pNextShot = NULL;
-        fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])), DEG(30.0f));
+        CA_vSetCameraFieldOfView(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])),
+                                 DEG(30.0f));
     }
 }
 
@@ -1154,7 +1157,8 @@ void fn_800C0364(View* pView, int nPlayer) {
         Vec3Copy(&pCourse->pin[nPinSet].x, pSub);
         pView->script.pShot = NULL;
         pView->script.pNextShot = NULL;
-        fn_80045470(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])), DEG(30.0f));
+        CA_vSetCameraFieldOfView(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])),
+                                 DEG(30.0f));
         pView->script.fCamTime = 0.0f;
     }
 }
@@ -1206,7 +1210,7 @@ void fn_800C0414(View* pView, int nPlayer) {
             Vec3Copy(gPlayers[nPlayer].ballBefore.vPos, pCam);
         }
         pCam[1] = lbl_80281F78->f4C + gPlayers[nPlayer].ballBefore.vPos[1];
-        fn_8003F2E0(&pView->script, gSession.fFrameTime);
+        CamScript_Fade(&pView->script, gSession.fFrameTime);
         pView->script.fFadeTime += gSession.fFrameTime;
         pView->script.fCamTime += gSession.fFrameTime;
         CamScript_KeepAboveGround(nPlayer, pCam, vOld, 1, NULL, NULL, NULL, lbl_80281F78->f168);
@@ -2018,7 +2022,7 @@ void GolfCamera_ProcessBallFlightCamera(View* pView, int nPlayer) {
             // the latest kind-0x18 choice the flight has already reached
             fBest = 0.0f;
             nBest = -1;
-            fNow = fn_80044EA8(nPlayer, &pView->script);
+            fNow = CamScript_EstimateBallFlightPercent(nPlayer, &pView->script);
             pSeq = pView->p74;
             if (pSeq != NULL) {
                 for (i = 0; i < pSeq->nChoices; i++) {
@@ -2065,7 +2069,7 @@ void GolfCamera_ProcessBallFlightCamera(View* pView, int nPlayer) {
                     }
                 }
             }
-            if (!fn_800451A8(&pView->script, pShot, nPlayer)) {
+            if (!CamScript_SkipLookBackCam(&pView->script, pShot, nPlayer)) {
                 if (nA == 5 && fn_8003DC78(pShot) && gPlayers[nPlayer].nShotKind != 0
                     && fn_80095780(gPlayers[nPlayer].pChar) != 9) {
                     // a cut: only once the golfer is in animation 14
@@ -2185,12 +2189,12 @@ void GolfCamera_InitPostShotCamera(View* pView, int nPlayer) {
     }
 }
 
-// Camera 15, the post-shot camera. For a held hand-made shot (script.bCF) of a kind fn_8004562C
-// accepts, f74 eases (1 in 100 a frame) towards the camera's flat distance to the ball / 30, kept
-// to 0.5..5; for kind 10 the shot's height creeps up while it is less than 1 over the ground at the
-// ball. Once the golfer's animation 9 is under way, the crowd flyby or the cut to the golfer. When a
-// fly-by shot (bAD 0) runs out, hold the camera as a hand-made shot looking along m's z axis (m
-// built from pSub's three values).
+// Camera 15, the post-shot camera. For a held hand-made shot (script.bCF) of a kind
+// CamScript_DoesScriptTrackBall accepts, f74 eases (1 in 100 a frame) towards the camera's flat
+// distance to the ball / 30, kept to 0.5..5; for kind 10 the shot's height creeps up while it is
+// less than 1 over the ground at the ball. Once the golfer's animation 9 is under way, the crowd
+// flyby or the cut to the golfer. When a fly-by shot (bAD 0) runs out, hold the camera as a
+// hand-made shot looking along m's z axis (m built from pSub's three values).
 void GolfCamera_ProcessPostShotCamera(View* pView, int nPlayer) {
     f32 m[4][4];
     f32 vDelta[4];
@@ -2202,7 +2206,7 @@ void GolfCamera_ProcessPostShotCamera(View* pView, int nPlayer) {
     if (pView->script.n110 != 1) {
         GolfCamera_InitPostShotCamera(pView, nPlayer);
     }
-    if (pView->script.bCF && fn_8004562C(pView->script.pShot)) {
+    if (pView->script.bCF && CamScript_DoesScriptTrackBall(pView->script.pShot)) {
         GolfCam_Vec3Sub(pCam, gPlayers[nPlayer].ball.vPos, vDelta);
         vDelta[1] = 0.0f;
         fDist = (f32)Math_Sqrt(Vec3_LengthSqClamped(vDelta)) / 30.0f;
@@ -2314,9 +2318,9 @@ void fn_800C3478(View* pView, int nPlayer) {
     }
 }
 
-// Camera 17: only the colour fade (fn_8003F2E0) steps on, one fixed frame (FRAME_TIME) at a time.
+// Camera 17: only the colour fade (CamScript_Fade) steps on, one fixed frame (FRAME_TIME) at a time.
 void fn_800C34F8(View* pView, int nPlayer) {
-    fn_8003F2E0(&pView->script, FRAME_TIME);
+    CamScript_Fade(&pView->script, FRAME_TIME);
     pView->script.fFadeTime += FRAME_TIME;
 }
 
@@ -3099,7 +3103,7 @@ void fn_800C4FF0(View* pView, f32* pFrom, f32* pTo, int nPlayer) {
         pView->script.pNextShot = &lbl_80282220->shot12C;
         pView->script.f8C = lbl_80281F78->f5C;
         pView->script.nBC = 2;
-        if (fn_800453C8(nPlayer, NULL)) {
+        if (CameraScript_FlipCameraForLefty(nPlayer, NULL)) {
             pView->script.nD0 = 2;
         } else {
             pView->script.nD0 = 1;
@@ -3109,7 +3113,7 @@ void fn_800C4FF0(View* pView, f32* pFrom, f32* pTo, int nPlayer) {
         pView->script.pNextShot = &lbl_80282220->shot6C;
         pView->script.f8C = lbl_80281F78->f5C;
         pView->script.nBC = 2;
-        if (fn_800453C8(nPlayer, NULL)) {
+        if (CameraScript_FlipCameraForLefty(nPlayer, NULL)) {
             pView->script.nD0 = 1;
         } else {
             pView->script.nD0 = 1;
@@ -3119,7 +3123,7 @@ void fn_800C4FF0(View* pView, f32* pFrom, f32* pTo, int nPlayer) {
         pView->script.pNextShot = &lbl_80282220->shot12C;
         pView->script.nBC = 7;
         pView->script.f8C = 2.0f * lbl_80281F78->f5C;
-        if (fn_800453C8(nPlayer, NULL)) {
+        if (CameraScript_FlipCameraForLefty(nPlayer, NULL)) {
             pView->script.nD0 = 2;
         } else {
             pView->script.nD0 = 1;

@@ -777,7 +777,7 @@ void STATEFUNC_ReplaySwingUpdate(int nPlayer) {
 }
 
 void STATEFUNC_ReplaySwingExit(int nPlayer) {
-    fn_80045494(0, nPlayer);
+    GameEffects_SetHalfTime(0, nPlayer);
     GameEffects_SetSuperSlowMo(0, nPlayer, 0.0f);
     fn_800C6E14();
     if (gSession.bReplay != 0) {
@@ -1211,7 +1211,7 @@ void STATEFUNC_SimulateInit(int nPlayer) {
 // (fn_80062DCC) passes 0.5: GM_PlayerTookShot, the replay stops, holed -> state 13, else state 14.
 // Before that a ball that has come to rest sets the latch (a tap-in, flag 8, becomes LIE_INCUP_e).
 // The swing phase keeps running (the spin window); buttons 22/23 (any pad for a CPU) drive
-// fn_80045558/fn_80045494. A live human outside split screen (and not while
+// GameEffects_SetDoubleTime/GameEffects_SetHalfTime. A live human outside split screen (and not while
 // GUI_IsPausedOrPostShotUIAnimating or Lessons_IsRunning): button 24 with a replay recorded (and the game
 // allowing it) replays the shot (REPLAY_Play, state 11); button 25 with the mulligan allowed takes
 // the shot back.
@@ -1250,7 +1250,7 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
     }
     SW_vUpdateSwing(nPlayer);
     fn_8006BB5C(nPlayer);
-    if (gpGame->b286 != 0 && !fn_8004560C()) {
+    if (gpGame->b286 != 0 && !GameEffects_IsGameBreakerOn()) {
         if (Player_IsCPU(nPlayer)) {
             if (Controller_AnyPadHasButtons(Controller_GetButtonMask(0x16, 1))) {
                 bA = 1;
@@ -1267,11 +1267,11 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
                 }
             }
         }
-        fn_80045558(bA, nPlayer);
+        GameEffects_SetDoubleTime(bA, nPlayer);
         if (bA) {
             bB = 0;
         }
-        fn_80045494(bB, nPlayer);
+        GameEffects_SetHalfTime(bB, nPlayer);
     }
     if (Player_IsCPU(nPlayer)) return;
     if (gSession.nSplitScreen != 0) return;
@@ -1310,8 +1310,8 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
 
 void STATEFUNC_SimulateExit(int nPlayer) {
     View* pViewObj = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
-    fn_80045558(0, nPlayer);
-    fn_80045494(0, nPlayer);
+    GameEffects_SetDoubleTime(0, nPlayer);
+    GameEffects_SetHalfTime(0, nPlayer);
     REPLAY_RecordStop();
     fn_80062CE0(0);
     SW_KillVibration(nPlayer);

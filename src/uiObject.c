@@ -227,7 +227,7 @@ void UI_Obj_RenderBoostUI(int nObj) {
     pLens = Camera_GetCurrentLens();
     CA_vInitCamera(gpUIObjLens);
     CA_vSetLookAt(gpUIObjLens, aEye, gUIObjLookAtTarget);
-    fn_80045470(gpUIObjLens, 0.00879646f);
+    CA_vSetCameraFieldOfView(gpUIObjLens, 0.00879646f);
     UI_Obj_SetCurrentRenderCtxLens(gpUIObjLens);
     RC_UpdateCurrentScreenMatrices();
     RC_vUpdateRenderCtxTransformationMatrices(RC_spGetCurrentRenderCtx());
