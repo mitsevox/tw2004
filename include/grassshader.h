@@ -185,7 +185,7 @@ typedef struct GrassManager {
     s32          n364;          // 0x364  0 when its x is below 0, else 1
     f32          f368;          // 0x368  f3B8
     s32          n36C;          // 0x36C  the pass (0 or 1)
-    void*        p370;          // 0x370  an allocation; set while the grass is on (fn_8012022C)
+    void*        p370;          // 0x370  an allocation; set while the grass is on (Grass_IsLoaded)
     u8           unk374[0x3A4 - 0x374];
     s32          n3A4;          // 0x3A4  the last chunk's GrassChunkData.n0
     // 0x3A8..0x420: values Grass_InitModule sets at start (given there).

@@ -26,10 +26,11 @@ void SD_vShaderObject_Grass_Type_SetParameters(void* pParams);
 void SD_vShaderObject_Grass_Static_Init(SD_SShaderObject_Static* pObject, GrassBufferDesc* pDesc);
 void GrassPacket_vAddVerts(GrassWord* pVerts, int nVerts);
 s32 GrassPacket_iEndPacket(void);
-void fn_80120AB4(f32* pA, f32* pB, f32* pOut, int bAlongZ, f32 fAt);
+void GrassPacket_ClipPointAt(f32* pA, f32* pB, f32* pOut, int bAlongZ, f32 fAt);
 void GrassPacket_vFlushRow(void);
 void GrassPacket_vAddVert(f32* pPos, int nInRow);
-void fn_80120C2C(f32 (*aPoints)[3], u8* aFlags, f32* pOut, u16 nIndex, u8 nStep, u8* pFlag, int bAlongX,
+void GrassPacket_GetRowPoint(f32 (*aPoints)[3], u8* aFlags, f32* pOut, u16 nIndex, u8 nStep, u8* pFlag,
+                             int bAlongX,
                  f32 fAt);
 void GrassPacket_vBeginPacket(GrassWord** ppStart);
 void SD_vShaderObject_Grass_Static_Render(SD_SShaderObject_Static* pObject);
@@ -37,10 +38,10 @@ GrassWord* GrassPacket_pGetNextAvailableVertSlot(void);
 void GrassPacket_vSetNewRow(void);
 void GrassPacket_vSetBuffer(GrassWord* pBuffer, int nVerts);
 void SD_vShaderObject_Grass_Static_Close(SD_SShaderObject_Static* pObject);
-void fn_801213F0(void);
-void fn_801213F4(f32 fS, f32 fT);
-void fn_80121404(s32 nR, s32 nG, s32 nB, s32 nA);
-void fn_8012141C(f32 fX, f32 fY, f32 fZ);
+void GrassShader_GXEnd(void);
+void GrassShader_GXTexCoord2f32(f32 fS, f32 fT);
+void GrassShader_GXColor4u8(s32 nR, s32 nG, s32 nB, s32 nA);
+void GrassShader_GXPosition3f32(f32 fX, f32 fY, f32 fZ);
 
 // fake match: puts 1.0f first in the constant pool, where EA's file has it (a stripped function
 // used it). Unused, so the linker strips it.
@@ -57,6 +58,9 @@ void SD_vShaderObject_Grass_Type_Close(void) {
     DeleteMemPool(SD_gpGrassTypeData->pPool);
 }
 
+// The grass type's parameters (shader table row 17): Grass_DrawBuffers passes the manager's
+// GrassParams (at f348) before each buffer is drawn; SD_vShaderObject_Grass_Static_Render reads
+// them.
 void SD_vShaderObject_Grass_Type_SetParameters(void* pParams) {
     SD_gpGrassTypeData->pParams = pParams;
 }
@@ -171,7 +175,7 @@ void SD_vShaderObject_Grass_Static_Init(SD_SShaderObject_Static* pObject, GrassB
             bFirst = 1;
             bStart = 1;
             if (pCur != pEnd) {
-                fn_80120C2C(pVerts, pTriFlags, afPoint, *pCur, uStep, &bFlag, nSet, fAt);
+                GrassPacket_GetRowPoint(pVerts, pTriFlags, afPoint, *pCur, uStep, &bFlag, nSet, fAt);
             }
             for (i = 0; i < nPrev; i++) {
                 if (pNewEnd != pNext && *pOld == *pNewEnd && *pOldStep == uNewStep) {
@@ -180,7 +184,7 @@ void SD_vShaderObject_Grass_Static_Init(SD_SShaderObject_Static* pObject, GrassB
                     pNewEnd++;
                     uNewStep = BitArray_TestBit(pBits, nNewBit);
                 } else {
-                    fn_80120C2C(pVerts, pTriFlags, afNew, *pOld, *pOldStep, &bNewFlag, nSet, fAt);
+                    GrassPacket_GetRowPoint(pVerts, pTriFlags, afNew, *pOld, *pOldStep, &bNewFlag, nSet, fAt);
                     while (pCur != pEnd && afPoint[nAxis] <= afNew[nAxis]) {
                         if (afPoint[nAxis] == afNew[nAxis]) {
                             if (*pCur > *pOld) {
@@ -204,7 +208,8 @@ void SD_vShaderObject_Grass_Static_Init(SD_SShaderObject_Static* pObject, GrassB
                         nBit++;
                         if (pCur != pEnd) {
                             uStep = BitArray_TestBit(pBits, nBit);
-                            fn_80120C2C(pVerts, pTriFlags, afPoint, *pCur, uStep, &bFlag, nSet, fAt);
+                            GrassPacket_GetRowPoint(pVerts, pTriFlags, afPoint, *pCur, uStep, &bFlag, nSet,
+                                                    fAt);
                         }
                     }
                     GrassPacket_vAddVert(afNew, bFirst);
@@ -236,7 +241,7 @@ void SD_vShaderObject_Grass_Static_Init(SD_SShaderObject_Static* pObject, GrassB
                 nBit++;
                 if (pCur != pEnd) {
                     uStep = BitArray_TestBit(pBits, nBit);
-                    fn_80120C2C(pVerts, pTriFlags, afPoint, *pCur, uStep, &bFlag, nSet, fAt);
+                    GrassPacket_GetRowPoint(pVerts, pTriFlags, afPoint, *pCur, uStep, &bFlag, nSet, fAt);
                 }
             }
             pRows = pNext;
@@ -250,11 +255,11 @@ void SD_vShaderObject_Grass_Static_Init(SD_SShaderObject_Static* pObject, GrassB
                 pFirst = SD_gpGrassTypeData->aShells[nRow].pStart;
                 pLast = GrassPacket_pGetNextAvailableVertSlot();
                 if (pFirst[nAxis].f < fLo) {
-                    fn_80120AB4(&pFirst[0].f, &pFirst[4].f, afClip, nSet, fLo);
+                    GrassPacket_ClipPointAt(&pFirst[0].f, &pFirst[4].f, afClip, nSet, fLo);
                     fn_800B5918(afClip, &pFirst[0].f);
                 }
                 if (pLast[nAxis - 4].f > fHi) {
-                    fn_80120AB4(&pLast[-8].f, &pLast[-4].f, afClip, nSet, fHi);
+                    GrassPacket_ClipPointAt(&pLast[-8].f, &pLast[-4].f, afClip, nSet, fHi);
                     fn_800B5918(afClip, &pLast[-4].f);
                     if (pLast[-5].b[3] != 0 && pLast[-1].b[3] == 0) {
                         pLast[-5].b[2] = 1;
@@ -288,7 +293,8 @@ s32 GrassPacket_iEndPacket(void) {
 
 // The point on the segment pA-pB at fAt along x (bAlongZ clear) or along z: y is interpolated, the
 // other axis taken from pA. A segment with no length there gives pA itself.
-void fn_80120AB4(f32* pA, f32* pB, f32* pOut, int bAlongZ, f32 fAt) {
+// SD_vShaderObject_Grass_Static_Init clips a row's end vertices to the tile with it.
+void GrassPacket_ClipPointAt(f32* pA, f32* pB, f32* pOut, int bAlongZ, f32 fAt) {
     f32 fFrom;
     f32 fTo;
     f32 fT;
@@ -343,9 +349,12 @@ void GrassPacket_vAddVert(f32* pPos, int nInRow) {
     SD_gpGrassTypeData->pCur += 4;
 }
 
-// The point at fAt between points nIndex and nIndex + nStep + 1 of aPoints, along z (bAlongX clear)
-// or along x, and that point's flag: bit 2 for a step of 0, bit 4 otherwise.
-void fn_80120C2C(f32 (*aPoints)[3], u8* aFlags, f32* pOut, u16 nIndex, u8 nStep, u8* pFlag, int bAlongX,
+// The point at fAt on the terrain edge from point nIndex to nIndex + nStep + 1 of aPoints, along z
+// (bAlongX clear) or along x, and in *pFlag that point's triangle flag: aFlags[nIndex] & 2 for a
+// step of 0, & 4 otherwise. A nonzero flag makes SD_vShaderObject_Grass_Static_Init switch its
+// strip side.
+void GrassPacket_GetRowPoint(f32 (*aPoints)[3], u8* aFlags, f32* pOut, u16 nIndex, u8 nStep, u8* pFlag,
+                             int bAlongX,
                  f32 fAt) {
     u16 nOther = 1 + nIndex + nStep;
     f32 fT;
@@ -417,8 +426,10 @@ void SD_vShaderObject_Grass_Static_Close(SD_SShaderObject_Static* pObject) {
     ReturnPoolMem(SD_gpGrassTypeData->pPool, pObject->pData);
 }
 
-// GoGrass.c hands over the hole's grass parameters: copies of its vectors and eight floats, and
-// fA/fB with 1/16 and 16 beside them.
+// GrassRender_vBuildAndUploadOneTimeData hands over the grass shader's parameters each time the
+// grass is drawn: the top texture's coordinate offset and scale (a2), the fade with distance (b2:
+// [0][3] + distance * [1][3]), the eight row offsets (p8), the 16 sway offsets (a16), and fA / fB
+// (the sway step along x and z) with 1/16 and 16 beside them, which nothing reads.
 void SD_vSetGrassParamsOnce(f32* pUnused0, f32* pUnused1, f32 (*a2)[4], f32* p8, f32 (*b2)[4],
                             f32 (*a16)[4], f32 fA, f32 fB) {
     // port: pUnused0 and pUnused1 are passed by the only caller and never read
@@ -532,42 +543,45 @@ void SD_vShaderObject_Grass_Static_Render(SD_SShaderObject_Static* pObject) {
             fTexT = pVert[2].f * lbl_80260920[1][1] + lbl_80260920[0][1];
             for (nPass = 0; nPass < 2; nPass++) {
                 if (nPass == 1) {
-                    fn_8012141C(pVert[0].f + lbl_802607D0[nWind][0], pVert[1].f + pParams->f20,
+                    GrassShader_GXPosition3f32(pVert[0].f + lbl_802607D0[nWind][0], pVert[1].f + pParams->f20,
                                 pVert[2].f + lbl_802607D0[nWind][2]);
                     fBladeT = 0.025f;
                     nWind = (nWind + 1) & 15;
                 } else {
-                    fn_8012141C(pVert[0].f, pVert[1].f, pVert[2].f);
+                    GrassShader_GXPosition3f32(pVert[0].f, pVert[1].f, pVert[2].f);
                     fBladeT = 1.0f;
                 }
-                fn_80121404(0x80, 0x80, 0x80, nAlpha);
-                fn_801213F4(fShade, fBladeT);
-                fn_801213F4(fTexS, fTexT);
+                GrassShader_GXColor4u8(0x80, 0x80, 0x80, nAlpha);
+                GrassShader_GXTexCoord2f32(fShade, fBladeT);
+                GrassShader_GXTexCoord2f32(fTexS, fTexT);
             }
             pVert += 4;
         }
-        fn_801213F0();
+        GrassShader_GXEnd();
     }
 }
 
-// GX's small inline calls, compiled out of line into this file: the end of a primitive (nothing to
-// do), then writes to the graphics FIFO of a texture coordinate, a colour and a position.
-void fn_801213F0(void) {
+// The GX primitive's end, the SDK's GXEnd inline compiled out of line: nothing to do.
+void GrassShader_GXEnd(void) {
 }
 
-void fn_801213F4(f32 fS, f32 fT) {
+// The SDK's GXTexCoord2f32 inline compiled out of line: a texture coordinate (s, t) to the graphics
+// FIFO.
+void GrassShader_GXTexCoord2f32(f32 fS, f32 fT) {
     *(f32*)0xCC008000 = fS;
     *(f32*)0xCC008000 = fT;
 }
 
-void fn_80121404(s32 nR, s32 nG, s32 nB, s32 nA) {
+// The SDK's GXColor4u8 inline compiled out of line: a colour (r, g, b, a) to the graphics FIFO.
+void GrassShader_GXColor4u8(s32 nR, s32 nG, s32 nB, s32 nA) {
     *(volatile u8*)0xCC008000 = nR;
     *(volatile u8*)0xCC008000 = nG;
     *(volatile u8*)0xCC008000 = nB;
     *(volatile u8*)0xCC008000 = nA;
 }
 
-void fn_8012141C(f32 fX, f32 fY, f32 fZ) {
+// The SDK's GXPosition3f32 inline compiled out of line: a position (x, y, z) to the graphics FIFO.
+void GrassShader_GXPosition3f32(f32 fX, f32 fY, f32 fZ) {
     *(f32*)0xCC008000 = fX;
     *(f32*)0xCC008000 = fY;
     *(f32*)0xCC008000 = fZ;

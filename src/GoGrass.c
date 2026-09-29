@@ -37,9 +37,9 @@ void Grass_BeginRender(void);
 void Grass_EndRender(void);
 void Grass_DrawBuffers(void);
 void Grass_PlaceCell(int nX, int nZ, int nCull, f32 f);
-f32 fn_80120244(f32 fX, f32 fM);
-void fn_80120268(f32* pA, f32* pB, f32* pOut);
-Sphere* fn_8012028C(RenderObj* pObj);
+f32 Grass_Fmod(f32 fX, f32 fM);
+void Grass_Vec3Add(f32* pA, f32* pB, f32* pOut);
+Sphere* Grass_GetObjBoundingSphere(RenderObj* pObj);
 int fn_80007CE8(RenderObj* pObj, Camera* pCamera, int nMode, f32 fScale);   // LLObj_Gc.c
 void SD_SetShaderTypeParameters(int nRow, void* pData);   // GoTerrain.c: calls row nRow's function with pData
 void Grass_Render(void);
@@ -725,21 +725,21 @@ void Grass_BuildVisibleList(void) {
     }
     LLMath_CopyVec(pLens->m4[3], vPos);
     LLMath_Scale(lbl_80281900->f3EC, vFlat, vAhead);
-    fn_80120268(vAhead, vPos, vCentre);
+    Grass_Vec3Add(vAhead, vPos, vCentre);
     if (vCentre[0] < 0.0f) {
-        fX = vCentre[0] - (2.5f - (f32)fabs(fn_80120244(vCentre[0], 2.5f)));
+        fX = vCentre[0] - (2.5f - (f32)fabs(Grass_Fmod(vCentre[0], 2.5f)));
     } else {
-        fX = vCentre[0] - (f32)fabs(fn_80120244(vCentre[0], 2.5f));
+        fX = vCentre[0] - (f32)fabs(Grass_Fmod(vCentre[0], 2.5f));
     }
     if (vCentre[2] < 0.0f) {
-        fZ = vCentre[2] - (2.5f - (f32)fabs(fn_80120244(vCentre[2], 2.5f)));
+        fZ = vCentre[2] - (2.5f - (f32)fabs(Grass_Fmod(vCentre[2], 2.5f)));
     } else {
-        fZ = vCentre[2] - (f32)fabs(fn_80120244(vCentre[2], 2.5f));
+        fZ = vCentre[2] - (f32)fabs(Grass_Fmod(vCentre[2], 2.5f));
     }
     nCellX = (fX - (f32)lbl_80281900->n14) / 2.5f;
     nCellZ = (fZ - (f32)lbl_80281900->n16) / 2.5f;
     lbl_80260360.pInfo = &lbl_802602C0;
-    pSphere = fn_8012028C((RenderObj*)&lbl_80260360);
+    pSphere = Grass_GetObjBoundingSphere((RenderObj*)&lbl_80260360);
     for (nX = nCellX - nRadius; nX <= nCellX + nRadius; nX++) {
         fCellX = 2.5f * (f32)nX;
         for (nZ = nCellZ - nRadius; nZ <= nCellZ + nRadius; nZ++) {
@@ -884,20 +884,21 @@ void Grass_FreeBuffers(void) {
     StaticMem_Free(lbl_80281900->apD8);
 }
 
-s32 fn_8012022C(void);
+s32 Grass_IsLoaded(void);
 
-s32 fn_8012022C(void) {
+// Whether the hole has its grass file loaded (GoGolfCam asks, for the lie-based camera height).
+s32 Grass_IsLoaded(void) {
     return lbl_80281900->p370 != NULL;
 }
 
 // fmod for floats: the remainder of fX / fM.
-f32 fn_80120244(f32 fX, f32 fM) {
+f32 Grass_Fmod(f32 fX, f32 fM) {
     return fmod(fX, fM);
 }
 
-// b + a into out (three floats)
+// pOut = pB + pA, three floats (paired singles).
 #ifdef __MWERKS__
-asm void fn_80120268(register f32* pA, register f32* pB, register f32* pOut) {
+asm void Grass_Vec3Add(register f32* pA, register f32* pB, register f32* pOut) {
     nofralloc
     psq_l  f0, 0(pA), 0, 0
     psq_l  f1, 8(pA), 1, 0
@@ -911,7 +912,7 @@ asm void fn_80120268(register f32* pA, register f32* pB, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_80120268(f32* pA, f32* pB, f32* pOut) {
+void Grass_Vec3Add(f32* pA, f32* pB, f32* pOut) {
     pOut[0] = pB[0] + pA[0];
     pOut[1] = pB[1] + pA[1];
     pOut[2] = pB[2] + pA[2];
@@ -919,7 +920,7 @@ void fn_80120268(f32* pA, f32* pB, f32* pOut) {
 #endif
 
 // The object's bounding sphere.
-Sphere* fn_8012028C(RenderObj* pObj) {
+Sphere* Grass_GetObjBoundingSphere(RenderObj* pObj) {
     return &pObj->data->bounds;
 }
 

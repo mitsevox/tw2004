@@ -58,7 +58,7 @@ f32      fn_800D04AC(int nPlayer);                      // Swing.c's declaration
 f32      GolfCamera_UpdateMatrixCamera(View* pView, f32* pCam, f32* pSub, int nPlayer);
 f32      GolfCamera_UpdateSuperZoomCamera(View* pView, f32* pCam, f32* pSub, int nPlayer);
 u8       GameEffects_IsPredictedGameBreakerOn(void);
-u8       fn_8012022C(void);                            // (sweep code) lbl_80281900's +0x370 is nonzero
+u8       Grass_IsLoaded(void);                         // (sweep code) lbl_80281900's +0x370 is nonzero
 void     Character_AlignCharacterForShotImpact(Character* pChar);                 // char.c
 void     SKATime_Pause(u8* pAnim);                        // set the player's pause bit (0x2)
 u8       GolfCamera_ZoomCamGetStartAndEndVecs(View* pView, int nPlayer, f32* pSub, f32* pAim, f32* pCam);
@@ -1462,7 +1462,7 @@ void GolfCamera_ProcessPreShotCamera(View* pView, int nPlayer) {
 // one already saved (p7C), else the follow-on (type 3) of a type-1 or type-2 sequence, or a new one
 // for the lie; outside a replay the pick is saved (p7C, p78). The shot: outside a replay the saved
 // one (p80, or alternate n264), else the sequence's kind-9 shot, which a human's big height
-// difference to the target (over 10 up or down: alternates 4 and 2) or, with fn_8012022C, lies 3..5
+// difference to the target (over 10 up or down: alternates 4 and 2) or, with Grass_IsLoaded, lies 3..5
 // without club 2 (alternate 5) can replace. A shot that would hide the golfer is swapped for one
 // from sequence 0x1C, split screen skips to the chain's last shot, and golfer animation 11 takes
 // the paired sequence or camera. It starts as a cut unless the view comes from camera 0 with a
@@ -1558,7 +1558,7 @@ void GolfCamera_InitSwingCamera(View* pView, int nPlayer) {
                 }
             }
         }
-        if (fn_8012022C() && (nLie == 3 || nLie == 4 || nLie == 5) && gPlayers[nPlayer].nClub != 2) {
+        if (Grass_IsLoaded() && (nLie == 3 || nLie == 4 || nLie == 5) && gPlayers[nPlayer].nClub != 2) {
             pShot = GolfCamera_GetAlternateSwingCamera(5, nPlayer);
             if (pShot == NULL) {
                 pShot = pView->p80;
