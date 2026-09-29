@@ -8,11 +8,11 @@
 #include "golfer.h"
 
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);                   // identity
-void fn_800488B4(UObject* pObj);
-void fn_80048A84(UObjMesh* pMesh);
-UObjMesh* fn_80048AC4(UObjMesh* pMesh, int i);
-int  fn_80048AD4(UObjMesh* pMesh, int i);
-int  fn_80048AE8(UObject* pObj);
+void Object_Render(UObject* pObj);
+void Object_DrawMesh(UObjMesh* pMesh);
+UObjMesh* Object_GetMeshAlternative(UObjMesh* pMesh, int i);
+int  Object_GetMeshFlags(UObjMesh* pMesh, int i);
+int  Object_GetLod(UObject* pObj);
 f32  fn_8001414C(u8* p);
 f32  Math_Tan(f32 f);
 void Ter_GetAmbientLight(CourseInfo* pCourse, f32* pPos);  // the ground's light at pPos
@@ -24,7 +24,7 @@ void LI_ResetLights(void);
 
 // Sets the object up: the three matrices to identity, the model and flags; a model whose levels of
 // detail differ gets flag 4 and a level-of-detail scale from its size.
-void fn_800486F4(UObject* pObj, UObjModel* pModel, u32 uFlags) {
+void Object_Init(UObject* pObj, UObjModel* pModel, u32 uFlags) {
     f32 fScale;
 
     LLMath_IdentifyMat(pObj->m0);
@@ -57,36 +57,38 @@ void fn_800486F4(UObject* pObj, UObjModel* pModel, u32 uFlags) {
     pObj->n106 = 0;
 }
 
-void fn_80048804(UObject* pObj) {
+// Empty in this build; called before an object is freed (Object_Free, GoDynObjBase.c).
+void Object_Destroy(UObject* pObj) {
 }
 
-// A new object of the model, from the heap.
-UObject* fn_80048808(UObjModel* pModel) {
+// A new object of the model, from the heap (freed by Object_Free).
+UObject* Object_Create(UObjModel* pModel) {
     UObject* pObj = StaticMem_Alloc(sizeof(UObject), 2, 1, "UObject.c", 368);
 
-    fn_800486F4(pObj, pModel, 0);
+    Object_Init(pObj, pModel, 0);
     return pObj;
 }
 
-// Frees an object fn_80048808 made.
-void fn_80048860(UObject* pObj) {
-    fn_80048804(pObj);
+// Frees an object Object_Create made.
+void Object_Free(UObject* pObj) {
+    Object_Destroy(pObj);
     StaticMem_Free(pObj);
 }
 
-void fn_80048894(UObject* pObj) {
-    fn_800488B4(pObj);
+void Object_Draw(UObject* pObj) {
+    Object_Render(pObj);
 }
 
 // fake match: stands in for a function the original linker stripped. The file's pool has 1.0 before
-// fn_800488B4's 0.75 (0x802831F0, 0x802831F4); its body is unknown, this one only reproduces the order.
+// Object_Render's 0.75 (0x802831F0, 0x802831F4); its body is unknown, this one only reproduces the order.
 static f32 UObject_StrippedFn(f32 x) {
     return x + 1.0f;
 }
 
 // Draws the object: its level of detail's mesh, unless fn_80007B2C finds it off screen (3); lit by
-// the ground under it (outside game type 3) when its mesh asks for it.
-void fn_800488B4(UObject* pObj) {
+// the ground under it (outside game type 3) when its mesh's flag byte 2 has bit 4, else with the
+// alternative mesh n108 and shader value f10C when flag byte 0 asks for them.
+void Object_Render(UObject* pObj) {
     int bLit;
     int nFlags0;
     int nClip;
@@ -99,7 +101,7 @@ void fn_800488B4(UObject* pObj) {
     f32 fLod;
     f32 fTemp;
 
-    nLod = fn_80048AE8(pObj);
+    nLod = Object_GetLod(pObj);
     pMesh = pObj->pModel->apLod[nLod];
     fFov = Camera_GetCurrentLens()->fFov;
     fMax = 0.75f * fFov * fn_8001414C((u8*)fn_8003526C());
@@ -112,8 +114,8 @@ void fn_800488B4(UObject* pObj) {
     fFov = Math_Tan(0.5f * fTemp);
     nClip = fn_80007B2C(pMesh, RC_spGetCurrentRenderCtx(), 0.0f, fFov, 1.0f);
     if (nClip == 3) return;
-    nFlags0 = fn_80048AD4(pMesh, 0);
-    nFlags2 = fn_80048AD4(pMesh, 2);
+    nFlags0 = Object_GetMeshFlags(pMesh, 0);
+    nFlags2 = Object_GetMeshFlags(pMesh, 2);
     bLit = nFlags2 & 4;
     if (bLit) {
         if (gSession.nGameType != 3) {
@@ -124,7 +126,7 @@ void fn_800488B4(UObject* pObj) {
         LI_SetObjectLights(pObj);
     } else if (nFlags0 & 1) {
         if ((nFlags0 & 2) || (nFlags2 & 1) || (nFlags2 & 2)) {
-            pMesh = fn_80048AC4(pMesh, *pN108);
+            pMesh = Object_GetMeshAlternative(pMesh, *pN108);
         }
         RenderState_Flush();
         fLod = pObj->f10C;
@@ -145,28 +147,29 @@ void fn_800488B4(UObject* pObj) {
         break;
     }
     RenderState_Flush();
-    fn_80048A84(pMesh);
+    Object_DrawMesh(pMesh);
     if (bLit) {
         LI_ResetLights();
     }
 }
 
-void fn_80048A84(UObjMesh* pMesh) {
+// Draws the mesh's part n28 (fn_800082CC) when a1C marks it used.
+void Object_DrawMesh(UObjMesh* pMesh) {
     if (pMesh->a1C[pMesh->n28] != 0) {
         fn_800082CC(&pMesh->p18[pMesh->n28]);
     }
 }
 
 // Mesh i of the level of detail's alternatives.
-UObjMesh* fn_80048AC4(UObjMesh* pMesh, int i) {
+UObjMesh* Object_GetMeshAlternative(UObjMesh* pMesh, int i) {
     return pMesh->p8[i];
 }
 
-int fn_80048AD4(UObjMesh* pMesh, int i) {
+int Object_GetMeshFlags(UObjMesh* pMesh, int i) {
     return pMesh->pInfo->a24[i];
 }
 
 // The level of detail drawn.
-int fn_80048AE8(UObject* pObj) {
+int Object_GetLod(UObject* pObj) {
     return pObj->n104;
 }

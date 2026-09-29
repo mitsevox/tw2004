@@ -464,7 +464,7 @@ They will be sorted into the sections below.
 - **[verified] Late constant load in `c * x` (fmuls const,x):** write the min or ternary into its own
   temp; `0.5f * fTemp` alone still hoists the lfs above it. An unrelated statement between the temp
   and the multiply holds the load back. Here that was taking the address of a field used later
-  (`p = &pObj->n108`, read as `*p` below): UObject fn_800488B4 exact, found by an anonymous
+  (`p = &pObj->n108`, read as `*p` below): UObject Object_Render exact, found by an anonymous
   decomp.me user (https://decomp.me/scratch/SOh7Q). The three changes each do nothing or worse
   alone; leversweep.py has them as levers and finds the combination.
 - **[verified] A cast that changes nothing still changes the code:** `(u8)` on a u8 field read reorders

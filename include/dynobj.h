@@ -1,6 +1,6 @@
 // dynobj.h (our name): the course's dynamic objects (GoDynObj.c) and their types. Each type has
 // a message handler, found by the type number (fn_800499B0): message 1 asks the size of the
-// type's object, 2 sets one up from its definition, 3 runs fn_80048894 on its object part (when
+// type's object, 2 sets one up from its definition, 3 runs Object_Draw on its object part (when
 // it has a model), 6 is the per-frame update. Only what the code reads so far.
 
 #ifndef DYNOBJ_H
@@ -46,7 +46,7 @@ typedef struct DynObjAnimalDef {
 typedef struct DynObjModelRef {
     u8*  pData;                 // 0x00  UStreamObject.pData; an animal's route follows a 12-byte
                                 //       header in it (fn_8004A24C)
-    struct UObjModel* p4;       // 0x04  goes to fn_800486F4
+    struct UObjModel* p4;       // 0x04  goes to Object_Init
 } DynObjModelRef;
 
 // One stream object an object's 'aRSL' chunk names, found by UKernel.c's fn_80048BDC.
@@ -94,7 +94,7 @@ typedef struct UObjMeshInfo {
     u8   unk2[0x4 - 0x2];
     s32  n4;                    // 0x04  not 0: a chunk follows; fn_8000799C passes n4 * 2 to fn_80007658
     u8   unk8[0x24 - 0x8];
-    s8   a24[0x54 - 0x24];      // 0x24  fn_80048AD4, GoTerrain.c Ter_GetMeshFlags (length unknown, at most this)
+    s8   a24[0x54 - 0x24];      // 0x24  Object_GetMeshFlags, GoTerrain.c Ter_GetMeshFlags (length unknown, at most this)
     f32  f54;                   // 0x54  scales a terrain object's mipmap bias (GoTerrain.c fn_80035560)
     f32  v58[3];                // 0x58  copied to UObjModel.v2C by type 0's setup; with f64 the
                                 //       bounding sphere GoTerrain.c's fn_800354C4 returns
@@ -136,14 +136,14 @@ typedef struct UObjPartDesc {
 typedef struct UObjMesh {
     UObjMeshInfo* pInfo;        // 0x00
     u8   unk4[4];
-    struct UObjMesh** p8;       // 0x08  alternatives, by UObject.n108 (fn_80048AC4); a terrain
+    struct UObjMesh** p8;       // 0x08  alternatives, by UObject.n108 (Object_GetMeshAlternative); a terrain
                                 //       mesh's children (Ter_GetMeshChild)
     struct UObjMesh* pC;        // 0x0C  in a terrain patch's ground: the mesh drawn for it (fn_8003556C)
     struct UObjMesh* p10;       // 0x10  its first child, the rest by p14 (pInfo->n0 of them; LLObj_Gc.c
                                 //       fn_80007524)
     struct UObjMesh* p14;       // 0x14  the next terrain mesh of a list (Ter_GetMeshNext); a patch's
                                 //       ground's is its objects (Ter_PatchReference.pObjects)
-    struct UObjMeshPart* p18;   // 0x18  fn_80048A84 passes entry n28 to fn_800082CC
+    struct UObjMeshPart* p18;   // 0x18  Object_DrawMesh passes entry n28 to fn_800082CC
     u8   a1C[0x20 - 0x1C];      // 0x1C  nonzero: entry i of p18 is used
     u32  n20;                   // 0x20  a word: GoTerrain.c fn_80032B7C draws a ground's extra meshes
                                 //       only when it is not 0
@@ -213,7 +213,7 @@ void fn_80008248(UObjMeshPart* pPart);
 void fn_8000827C(UObjMeshPart* pPart, UObjArraySet* pSet, int nType, void* pArg);
 void fn_800082CC(UObjMeshPart* pPart);
 
-// UObject.c's object (0x118 bytes, fn_80048808 allocates one; a DynObj holds one at +0x10): three
+// UObject.c's object (0x118 bytes, Object_Create allocates one; a DynObj holds one at +0x10): three
 // matrices and a model drawn with them.
 typedef struct UObject {
     f32  m0[4][4];              // 0x000  identity at setup
@@ -229,10 +229,10 @@ typedef struct UObject {
     u32  uFlags;                // 0x0F8  bit 2: the model has levels of detail
     f32  fFC;                   // 0x0FC  0.5 / the model's f5C, kept to 0.1..2.5
     f32  f100;                  // 0x100
-    s8   n104;                  // 0x104  the level of detail drawn (fn_80048AE8)
+    s8   n104;                  // 0x104  the level of detail drawn (Object_GetLod)
     u8   unk105;
     s16  n106;                  // 0x106
-    s32  n108;                  // 0x108  goes to fn_80048AC4 when drawn; the animals set it each frame
+    s32  n108;                  // 0x108  goes to Object_GetMeshAlternative when drawn; the animals set it each frame
     f32  f10C;                  // 0x10C  0.5 at setup; the animals set it each frame
     u8   unk110[0x118 - 0x110];
 } UObject;
@@ -241,7 +241,7 @@ LAYOUT_ASSERT(UObject, 0x118);
 // A dynamic object (0x16C bytes for type 0; a type may add fields after it).
 typedef struct DynObj {
     f32  aRot[4];               // 0x000  a rotation, set to (0, 0, 0, 1)
-    UObject obj;                // 0x010  what is drawn (fn_800486F4 sets it up)
+    UObject obj;                // 0x010  what is drawn (Object_Init sets it up)
     struct DynObj* pNext;       // 0x128  the next object in UKernel.c's list
     u8   unk12C[0x130 - 0x12C];
     DynObjHandler pfnHandler;   // 0x130  its type's message handler
@@ -441,11 +441,11 @@ void fn_80049304(int nKey, int a, int b);   // records (a, b) on every object wh
 void fn_8004939C(int nKey, int a, int b);   // ... whose n147 is nKey
 void fn_80049424(int nKey, int a, int b);   // ... whose n148 is nKey
 int  fn_800494AC(int nKey, uptr nWhat);     // asks the first object whose n140 is nKey (message 9)
-void fn_800486F4(UObject* pObj, UObjModel* pModel, u32 uFlags);
-UObject* fn_80048808(UObjModel* pModel);
-void fn_80048860(UObject* pObj);
-void fn_80048804(UObject* pObj);
-void fn_80048894(UObject* pObj);
+void Object_Init(UObject* pObj, UObjModel* pModel, u32 uFlags);
+UObject* Object_Create(UObjModel* pModel);
+void Object_Free(UObject* pObj);
+void Object_Destroy(UObject* pObj);
+void Object_Draw(UObject* pObj);
 
 void fn_80048F68(int nMsg, void* pArg, void* pArg2);     // sends nMsg to every object with id > 0
 

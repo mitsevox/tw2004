@@ -416,10 +416,10 @@ void fn_80049514(DynObj* pObj, DynObjSetup* pSetup) {
     }
     if (pModel != NULL) {
         pModel->p4->f5C = pModel->p4->apLod[0]->pInfo->f64;
-        fn_800486F4(&pObj->obj, pModel->p4, nFlags);
+        Object_Init(&pObj->obj, pModel->p4, nFlags);
         Vec3Copy(pObj->obj.pModel->apLod[0]->pInfo->v58, pObj->obj.pModel->v2C);
     } else {
-        fn_800486F4(&pObj->obj, NULL, nFlags);
+        Object_Init(&pObj->obj, NULL, nFlags);
     }
     LLMath_IdentifyMat(pObj->obj.m0);
     LLMath_IdentifyMat(pObj->obj.m40);

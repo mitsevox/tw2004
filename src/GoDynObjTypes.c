@@ -60,9 +60,9 @@ void fn_8004ABBC(DynObj* pObj, DynObjSetup* pSetup) {
         nFlags |= 0x40;
     }
     if (pModel != NULL) {
-        fn_800486F4(&pObj->obj,pModel->p4, nFlags);
+        Object_Init(&pObj->obj,pModel->p4, nFlags);
     } else {
-        fn_800486F4(&pObj->obj,NULL, nFlags);
+        Object_Init(&pObj->obj,NULL, nFlags);
     }
     LLMath_IdentifyMat(pObj->obj.m0);
     LLMath_IdentifyMat(pObj->obj.m40);
@@ -89,7 +89,7 @@ int fn_8004AD54(int nMsg, DynObj* pObj, void* pArg, void* pArg2) {
         return 0;
     case 3:
         if (pObj->obj.pModel != NULL) {
-            fn_80048894(&pObj->obj);
+            Object_Draw(&pObj->obj);
         }
         return 0;
     default:
@@ -135,7 +135,7 @@ void fn_8004ADDC(DynObj* pObj, DynObjSetup* pSetup) {
     if (pObj->uFlags & 0x400) {
         pObj->uFlags |= 0x02000000;
     }
-    fn_800486F4(&pObj->obj,NULL, 0);
+    Object_Init(&pObj->obj,NULL, 0);
     LLMath_IdentifyMat(pObj->obj.m0);
     LLMath_IdentifyMat(pObj->obj.m40);
     UObject_ComposeRotation(pObj->obj.m0);

@@ -473,7 +473,7 @@ int fn_8004AAEC(int nMsg, DynObj* pObj, void* pArg, void* pArg2) {
         if (pObj->obj.pModel != NULL) {
             pObj->obj.n108 = ((DynObjAnimal*)pObj)->n1AC;
             pObj->obj.f10C = ((DynObjAnimal*)pObj)->f1B4;
-            fn_80048894(&pObj->obj);
+            Object_Draw(&pObj->obj);
         }
         return 0;
     default:
@@ -481,12 +481,12 @@ int fn_8004AAEC(int nMsg, DynObj* pObj, void* pArg, void* pArg2) {
     }
 }
 
-// The same as UObject.c's fn_80048AD4, compiled into this file too.
+// The same as UObject.c's Object_GetMeshFlags, compiled into this file too.
 int fn_8004AB90(UObjMesh* pMesh, int i) {
     return pMesh->pInfo->a24[i];
 }
 
-// The same as UObject.c's fn_80048AC4, compiled into this file too.
+// The same as UObject.c's Object_GetMeshAlternative, compiled into this file too.
 UObjMesh* fn_8004ABA4(UObjMesh* pMesh, int i) {
     return pMesh->p8[i];
 }

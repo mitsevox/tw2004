@@ -106,7 +106,7 @@ void UI_Obj_InitModule(void) {
 // shuts down).
 void UI_Obj_CloseModule(void) {
     if (gpUIObjModel != NULL) {
-        fn_80048860(gpUIObjModel);
+        Object_Free(gpUIObjModel);
     }
     gpUIObjModel = NULL;
     CA_vReleaseCamera(gpUIObjLens);
@@ -117,7 +117,7 @@ void UI_Obj_CloseModule(void) {
 // port: a 'TEO ' object's UStreamObject.uUnk4 holds its model (see Code800B9944.c FE_CrAPBall_MakeObjects).
 void UI_Obj_InitForRender(void) {
     if (gpUIObjModel == NULL) {
-        gpUIObjModel = fn_80048808((UObjModel*)fn_8000B70C('TEO ', 10003)->uUnk4);
+        gpUIObjModel = Object_Create((UObjModel*)fn_8000B70C('TEO ', 10003)->uUnk4);
     }
 }
 
@@ -404,7 +404,7 @@ void UI_Obj_SetCurrentRenderCtxLens(CamLens* pLens) {
     fn_80013E38((u8*)*lbl_80280DF0, (s32)pLens);
 }
 
-// Draw the mesh's current part, if it is used (UObject.c's fn_80048A84 again).
+// Draw the mesh's current part, if it is used (UObject.c's Object_DrawMesh again).
 void UI_Obj_DrawMesh(UObjMesh* pMesh) {
     if (pMesh->a1C[pMesh->n28] != 0) {
         fn_800082CC(&pMesh->p18[pMesh->n28]);

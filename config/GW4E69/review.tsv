@@ -4520,3 +4520,13 @@ address	name	comment	by	date
 800486C8	GoDynObj_Vec3Add	keep	rt3 (replayed by orchestrator)	2026-09-29
 800486EC	DynObj_InitModuleEmpty	add	rt3 (replayed by orchestrator)	2026-09-29
 800486F0	DynObj_CloseModuleEmpty	add	rt3 (replayed by orchestrator)	2026-09-29
+800486F4	Object_Init	keep	rt3 (replayed by orchestrator)	2026-09-29
+80048804	Object_Destroy	add	rt3 (replayed by orchestrator)	2026-09-29
+80048808	Object_Create	rewrite	rt3 (replayed by orchestrator)	2026-09-29
+80048860	Object_Free	rewrite	rt3 (replayed by orchestrator)	2026-09-29
+80048894	Object_Draw	none	rt3 (replayed by orchestrator)	2026-09-29
+800488B4	Object_Render	rewrite	rt3 (replayed by orchestrator)	2026-09-29
+80048A84	Object_DrawMesh	add	rt3 (replayed by orchestrator)	2026-09-29
+80048AC4	Object_GetMeshAlternative	keep	rt3 (replayed by orchestrator)	2026-09-29
+80048AD4	Object_GetMeshFlags	none	rt3 (replayed by orchestrator)	2026-09-29
+80048AE8	Object_GetLod	keep	rt3 (replayed by orchestrator)	2026-09-29

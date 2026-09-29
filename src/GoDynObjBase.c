@@ -94,7 +94,7 @@ int fn_80049820(int nMsg, DynObj* pObj, void* pArg, void* pArg2) {
             if (pObj->uFlags & 0x800) {
                 DS_vSetAlphaTestMode(0, 6, 0x80);
             }
-            fn_80048894(&pObj->obj);
+            Object_Draw(&pObj->obj);
             if (pObj->uFlags & 0x400) {
                 DS_vEnableZBufferUpdate(1);
                 RenderState_Flush();
@@ -108,7 +108,7 @@ int fn_80049820(int nMsg, DynObj* pObj, void* pArg, void* pArg2) {
         }
         return 0;
     case 5:
-        fn_80048804(&pObj->obj);
+        Object_Destroy(&pObj->obj);
         return 0;
     case 4:
         return fn_800496E0(pObj, 1, 1);

@@ -106,15 +106,15 @@ void FE_CrAPBall_Init(void) {
 // closes.
 void FE_CrAPBall_Free(void) {
     if (gpCrAPBallTeo10000 != NULL) {
-        fn_80048860(gpCrAPBallTeo10000);
+        Object_Free(gpCrAPBallTeo10000);
     }
     gpCrAPBallTeo10000 = NULL;
     if (gpCrAPBallTeo10030 != NULL) {
-        fn_80048860(gpCrAPBallTeo10030);
+        Object_Free(gpCrAPBallTeo10030);
     }
     gpCrAPBallTeo10030 = NULL;
     if (gpCrAPBallTeo10040 != NULL) {
-        fn_80048860(gpCrAPBallTeo10040);
+        Object_Free(gpCrAPBallTeo10040);
     }
     gpCrAPBallTeo10040 = NULL;
     if (gpCrAPBallLogoBank != NULL) {
@@ -136,19 +136,19 @@ void FE_CrAPBall_MakeObjects(void) {
     if (gpCrAPBallTeo10000 == NULL) {
         pObject = fn_8000B70C('TEO ', 10000);
         if (pObject != NULL) {
-            gpCrAPBallTeo10000 = fn_80048808((UObjModel*)pObject->uUnk4);
+            gpCrAPBallTeo10000 = Object_Create((UObjModel*)pObject->uUnk4);
         }
     }
     if (gpCrAPBallTeo10030 == NULL) {
         pObject = fn_8000B70C('TEO ', 10030);
         if (pObject != NULL) {
-            gpCrAPBallTeo10030 = fn_80048808((UObjModel*)pObject->uUnk4);
+            gpCrAPBallTeo10030 = Object_Create((UObjModel*)pObject->uUnk4);
         }
     }
     if (gpCrAPBallTeo10040 == NULL) {
         pObject = fn_8000B70C('TEO ', 10040);
         if (pObject != NULL) {
-            gpCrAPBallTeo10040 = fn_80048808((UObjModel*)pObject->uUnk4);
+            gpCrAPBallTeo10040 = Object_Create((UObjModel*)pObject->uUnk4);
         }
     }
 }
@@ -170,7 +170,7 @@ void FE_CrAPBall_DrawObject(UObject* pObj, f32 (*mBone)[4], f32 (*mScale)[4], f3
     pObj->m80[3][3] = 1.0f;
     LLMath_mat44fltMultiplyList(gpCrAPState->mC0, pObj->m80, pObj->m80, 4);
     LLMath_IdentifyMat(pObj->m0);
-    fn_80048894(pObj);
+    Object_Draw(pObj);
     LLMath_CopyMat44(m0, pObj->m0);
     LLMath_CopyMat44(m40, pObj->m40);
     LLMath_CopyMat44(m80, pObj->m80);

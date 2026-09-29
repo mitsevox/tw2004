@@ -184,7 +184,7 @@ void DynObj_InitForHole(void) {
     Character* pFlag;
 
     if (lbl_80281DA0->pTeo10000 == NULL) {
-        lbl_80281DA0->pTeo10000 = fn_80048808(((DynObjModelRef*)fn_8000B70C('TEO ', 10000))->p4);
+        lbl_80281DA0->pTeo10000 = Object_Create(((DynObjModelRef*)fn_8000B70C('TEO ', 10000))->p4);
         lbl_80281DA0->pTeo10000->uFlags |= 1;
         lbl_80281DA0->pTeo10000->uFlags |= 0x10;
     }
@@ -192,7 +192,7 @@ void DynObj_InitForHole(void) {
         if (lbl_80281DA0->apTeo10030[i] == NULL) {
             nId = i + 10030;
             if (fn_8000B54C('TEO ', nId)) {
-                lbl_80281DA0->apTeo10030[i] = fn_80048808(((DynObjModelRef*)fn_8000B70C('TEO ', nId))->p4);
+                lbl_80281DA0->apTeo10030[i] = Object_Create(((DynObjModelRef*)fn_8000B70C('TEO ', nId))->p4);
             }
         }
     }
@@ -200,7 +200,7 @@ void DynObj_InitForHole(void) {
         if (lbl_80281DA0->apTeo10040[i] == NULL) {
             nId = i + 10040;
             if (fn_8000B54C('TEO ', nId)) {
-                lbl_80281DA0->apTeo10040[i] = fn_80048808(((DynObjModelRef*)fn_8000B70C('TEO ', nId))->p4);
+                lbl_80281DA0->apTeo10040[i] = Object_Create(((DynObjModelRef*)fn_8000B70C('TEO ', nId))->p4);
             }
         }
     }
@@ -210,7 +210,7 @@ void DynObj_InitForHole(void) {
                 nId = i + 10006;
                 if (fn_8000B54C('TEO ', nId)) {
                     lbl_80281DA0->apTeo10006[i] =
-                        fn_80048808(((DynObjModelRef*)fn_8000B70C('TEO ', nId))->p4);
+                        Object_Create(((DynObjModelRef*)fn_8000B70C('TEO ', nId))->p4);
                 }
             }
         }
@@ -219,7 +219,7 @@ void DynObj_InitForHole(void) {
                 nId = i + 10020;
                 if (fn_8000B54C('TEO ', nId)) {
                     lbl_80281DA0->apTeo10020[i] =
-                        fn_80048808(((DynObjModelRef*)fn_8000B70C('TEO ', nId))->p4);
+                        Object_Create(((DynObjModelRef*)fn_8000B70C('TEO ', nId))->p4);
                 }
             }
         }
@@ -264,30 +264,30 @@ void DynObj_DeInitForHole(void) {
     int i;
 
     if (lbl_80281DA0->pTeo10000 != NULL) {
-        fn_80048860(lbl_80281DA0->pTeo10000);
+        Object_Free(lbl_80281DA0->pTeo10000);
     }
     lbl_80281DA0->pTeo10000 = NULL;
     for (i = 0; i < 4; i++) {
         if (lbl_80281DA0->apTeo10030[i] != NULL) {
-            fn_80048860(lbl_80281DA0->apTeo10030[i]);
+            Object_Free(lbl_80281DA0->apTeo10030[i]);
         }
         lbl_80281DA0->apTeo10030[i] = NULL;
     }
     for (i = 0; i < 4; i++) {
         if (lbl_80281DA0->apTeo10040[i] != NULL) {
-            fn_80048860(lbl_80281DA0->apTeo10040[i]);
+            Object_Free(lbl_80281DA0->apTeo10040[i]);
         }
         lbl_80281DA0->apTeo10040[i] = NULL;
     }
     for (i = 0; i < 3; i++) {
         if (lbl_80281DA0->apTeo10020[i] != NULL) {
-            fn_80048860(lbl_80281DA0->apTeo10020[i]);
+            Object_Free(lbl_80281DA0->apTeo10020[i]);
         }
         lbl_80281DA0->apTeo10020[i] = NULL;
     }
     for (i = 0; i < 4; i++) {
         if (lbl_80281DA0->apTeo10006[i] != NULL) {
-            fn_80048860(lbl_80281DA0->apTeo10006[i]);
+            Object_Free(lbl_80281DA0->apTeo10006[i]);
         }
         lbl_80281DA0->apTeo10006[i] = NULL;
     }
@@ -533,7 +533,7 @@ void DynObj_DrawTargetModels(s32 nView) {
             Object_SetLod(lbl_80281DA0->apTeo10006[nKind], 0);
             LLMath_IdentifyMat(lbl_80281DA0->apTeo10006[nKind]->m80);
             LLMath_CopyVec(vPos, lbl_80281DA0->apTeo10006[nKind]->m80[3]);
-            fn_80048894(lbl_80281DA0->apTeo10006[nKind]);
+            Object_Draw(lbl_80281DA0->apTeo10006[nKind]);
         }
     }
 }
@@ -568,7 +568,7 @@ void DynObj_DrawTargetOverlays(s32 nView) {
             Object_SetLod(lbl_80281DA0->apTeo10020[nModel], 0);
             LLMath_IdentifyMat(lbl_80281DA0->apTeo10020[nModel]->m80);
             LLMath_CopyVec(vPos, lbl_80281DA0->apTeo10020[nModel]->m80[3]);
-            fn_80048894(lbl_80281DA0->apTeo10020[nModel]);
+            Object_Draw(lbl_80281DA0->apTeo10020[nModel]);
         }
     }
     DS_vSetAlphaTestMode(1, 6, 0x80);
@@ -764,12 +764,12 @@ void DynObj_DrawGolfBalls(u8* pState) {
         if (DynObj_bDrawShadow(i)) {
             pState[i] = 1;
         }
-        fn_80048894(pBall);
+        Object_Draw(pBall);
         if (pLogoA != NULL) {
-            fn_80048894(pLogoA);
+            Object_Draw(pLogoA);
         }
         if (pLogoB != NULL) {
-            fn_80048894(pLogoB);
+            Object_Draw(pLogoB);
         }
     }
 }
