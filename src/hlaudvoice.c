@@ -6,16 +6,16 @@
 #include "core/audtrack.h"
 #include "core/startup.h"
 
-void fn_800AFBD8(u16 nVoice, u8 bOn);   // startUp.c
-void fn_800AFDC8(u16 nVoice, SoundHeader* pHdr);        // startUp.c
-void fn_800B0114(u16 nVoice, VoiceEnvelope* pEnv);      // startUp.c
-void fn_800AFEF4(u16 nVoice, s16 nVolume, int a, int b); // startUp.c
-void fn_800B0034(u16 nVoice, u8 nPan, int nMode, int bPlaying);        // startUp.c
-void fn_800B00A4(u16 nVoice, u32 u, int a);             // startUp.c
-void fn_800B01B4(u16 nVoice, u8 bA, u8 bB);             // startUp.c
-u8   fn_800AFB98(u16 nVoice);                           // startUp.c
-void fn_800B0430(void);                                 // startUp.c
-s16  fn_800AFEDC(u16 nVoice);                           // startUp.c
+void HwVoice_StartOrRelease(u16 nVoice, u8 bOn);   // startUp.c
+void HwVoice_SetSound(u16 nVoice, SoundHeader* pHdr);        // startUp.c
+void HwVoice_SetEnvelope(u16 nVoice, VoiceEnvelope* pEnv);      // startUp.c
+void HwVoice_SetVolume(u16 nVoice, s16 nVolume, int a, int b); // startUp.c
+void HwVoice_SetPan(u16 nVoice, u8 nPan, int nMode, int bPlaying);        // startUp.c
+void HwVoice_SetRate(u16 nVoice, u32 u, int a);             // startUp.c
+void HwVoice_SetReverb(u16 nVoice, u8 bA, u8 bB);             // startUp.c
+u8   HwVoice_IsFree(u16 nVoice);                           // startUp.c
+void HwVoice_OnVoiceFreed(void);                                 // startUp.c
+s16  HwVoice_GetVolume(u16 nVoice);                           // startUp.c
 u32  fn_800B06F4(void);                                 // startUp.c
 
 void fn_800AC330(void);
@@ -90,8 +90,8 @@ AudVoice* Voc_Alloc(AudVoiceRequest* pRequest) {
         }
         for (; pList < pListEnd; pList++) {
             for (pCand = (AudVoice*)pList->pHead; pCand != NULL; pCand = (AudVoice*)pCand->link.pNext) {
-                // port: EA passes an argument fn_800AFEDC ignores
-                nVolume = ((s16 (*)(u16, int))fn_800AFEDC)(pCand->nHwVoice, 0);
+                // port: EA passes an argument HwVoice_GetVolume ignores
+                nVolume = ((s16 (*)(u16, int))HwVoice_GetVolume)(pCand->nHwVoice, 0);
                 if (fn_800AC6B0(pRequest, &nVolume)) {
                     pVoice = pCand;
                     break;
@@ -105,7 +105,7 @@ AudVoice* Voc_Alloc(AudVoiceRequest* pRequest) {
                     Voc_Delete(pVoice);
                     pVoice = NULL;
                 } else {
-                    fn_800AFBD8(pVoice->nHwVoice, 0);
+                    HwVoice_StartOrRelease(pVoice->nHwVoice, 0);
                     fn_800ADF6C(pList, &pVoice->link);
                     bStolen = 1;
                 }
@@ -172,10 +172,10 @@ void Voc_Start(AudVoice* pVoice, AudVoiceParams* pParams, u8 nVolume, f32 fPitch
     pVoice->uC = fn_800ACEC4(uRate, fPitch);
     pVoice->n14 = nVolume;
     pVoice->flags.b.bA_0 = 1;
-    fn_800AFDC8(nHwVoice, pTone->pHeader);
+    HwVoice_SetSound(nHwVoice, pTone->pHeader);
     // EA bug: hands over the address of the pointer, so the voice's envelope is the pointer's bits;
     // the tone's own envelope (changed above, for every voice that plays it) is never used.
-    fn_800B0114(nHwVoice, (VoiceEnvelope*)ppEnv);
+    HwVoice_SetEnvelope(nHwVoice, (VoiceEnvelope*)ppEnv);
 }
 
 // Sets a streamed voice up to play uLen bytes of its ARAM buffer at nRate, looping: attack
@@ -205,8 +205,8 @@ void fn_800AC7DC(AudVoice* pVoice, u32 uLen, u32 nRate, u8 bLoud) {
     hdr.u4 -= 1;
     hdr.u8 = hdr.u0;
     pVoice->uC = (f32)pVoice->uC * 2.048f;
-    fn_800AFDC8(nHwVoice, &hdr);
-    fn_800B0114(nHwVoice, &env);
+    HwVoice_SetSound(nHwVoice, &hdr);
+    HwVoice_SetEnvelope(nHwVoice, &env);
 }
 
 // Passes a voice's settings on to its hardware voice; a voice just set up is started first.
@@ -221,8 +221,8 @@ void Voc_Render(AudVoice* pVoice, AudVoiceParams* pParams) {
         uRate = pVoice->uC;
         if (pVoice->flags.b.bA_0) {
             bReverb = !pVoice->flags.b.bA_6;
-            fn_800AFBD8(nHwVoice, 1);
-            fn_800B01B4(nHwVoice, bReverb, bReverb);
+            HwVoice_StartOrRelease(nHwVoice, 1);
+            HwVoice_SetReverb(nHwVoice, bReverb, bReverb);
             bPlaying = 0;
             pVoice->flags.b.bA_0 = 0;
             bSetRate = 1;
@@ -231,16 +231,16 @@ void Voc_Render(AudVoice* pVoice, AudVoiceParams* pParams) {
             bSetRate = 0;
         }
         if (pParams->flags.b.bVolume) {
-            fn_800AFEF4(nHwVoice, pParams->nVolume, 0, bPlaying);
-            fn_800B0034(nHwVoice, pParams->nPan, 2, bPlaying);
-            fn_800B0034(nHwVoice, pParams->n7, 3, bPlaying);
+            HwVoice_SetVolume(nHwVoice, pParams->nVolume, 0, bPlaying);
+            HwVoice_SetPan(nHwVoice, pParams->nPan, 2, bPlaying);
+            HwVoice_SetPan(nHwVoice, pParams->n7, 3, bPlaying);
         }
         if (pParams->flags.b.bPitch) {
             uRate = fn_800ACEC4(pVoice->uC, pParams->fPitch);
             bSetRate = 1;
         }
         if (bSetRate) {
-            fn_800B00A4(nHwVoice, uRate, bPlaying);
+            HwVoice_SetRate(nHwVoice, uRate, bPlaying);
         }
     } else {
         pVoice->flags.b.bA_5 = 0;
@@ -250,7 +250,7 @@ void Voc_Render(AudVoice* pVoice, AudVoiceParams* pParams) {
 // Pauses or resumes a voice's hardware voice.
 void Voc_Pause(AudVoice* pVoice, u8 bPause) {
     if (pVoice != NULL && !pVoice->flags.b.bB_6) {
-        fn_800AFCBC(pVoice->nHwVoice, bPause);
+        HwVoice_Pause(pVoice->nHwVoice, bPause);
     }
 }
 
@@ -258,7 +258,7 @@ void Voc_Pause(AudVoice* pVoice, u8 bPause) {
 // it once the hardware voice is done.
 void Voc_Stop(AudVoice* pVoice) {
     if (!pVoice->flags.b.bStopped) {
-        fn_800AFBD8(pVoice->nHwVoice, 0);
+        HwVoice_StartOrRelease(pVoice->nHwVoice, 0);
         if (pVoice->n10 > 0) {
             fn_800ADF6C(&lbl_801F19B8->aLists[pVoice->n10], &pVoice->link);
             fn_800ADE88(&lbl_801F19B8->aLists[0], &pVoice->link);
@@ -297,11 +297,11 @@ void Voc_Cycle(void) {
         for (pVoice = (AudVoice*)pPool->aLists[0].pHead; pVoice != NULL; pVoice = pNext) {
             pNext = (AudVoice*)pVoice->link.pNext;
             if (pVoice->n15 <= 0) {
-                if (fn_800AFB98(pVoice->nHwVoice)) {
+                if (HwVoice_IsFree(pVoice->nHwVoice)) {
                     fn_800ADF6C(&pPool->aLists[0], &pVoice->link);
                     fn_800AE1DC(&pPool->free, pVoice);
-                    // port: EA passes arguments fn_800B0430 (empty) ignores
-                    ((void (*)(u16, int))fn_800B0430)(pVoice->nHwVoice, pVoice->flags.b.bA_1 != 0);
+                    // port: EA passes arguments HwVoice_OnVoiceFreed (empty) ignores
+                    ((void (*)(u16, int))HwVoice_OnVoiceFreed)(pVoice->nHwVoice, pVoice->flags.b.bA_1 != 0);
                     if (pVoice->flags.b.bA_4) {
                         pVoice->flags.b.bHalf = 0;
                         if (pVoice->uAram != 0) {
@@ -344,22 +344,22 @@ void Voc_PauseAll(u8 bPause, u8 bStreams) {
         if (lbl_802820B4 != 0) {
             for (; pVoice < pVoiceEnd; pVoice++) {
                 if (bPause) {
-                    fn_800AFCBC(pVoice->nHwVoice, 1);
+                    HwVoice_Pause(pVoice->nHwVoice, 1);
                 } else if (bStreams && pVoice->flags.b.bA_4) {
                     pVoice->flags.b.bB_6 = 1;
                 } else {
-                    fn_800AFCBC(pVoice->nHwVoice, 0);
+                    HwVoice_Pause(pVoice->nHwVoice, 0);
                 }
             }
         } else {
             // pVoiceEnd itself walks back from the last voice
             for (pVoiceEnd--; pPool->aVoices <= pVoiceEnd; pVoiceEnd--) {
                 if (bPause) {
-                    fn_800AFCBC(pVoiceEnd->nHwVoice, 1);
+                    HwVoice_Pause(pVoiceEnd->nHwVoice, 1);
                 } else if (bStreams && pVoiceEnd->flags.b.bA_4) {
                     pVoiceEnd->flags.b.bB_6 = 1;
                 } else {
-                    fn_800AFCBC(pVoiceEnd->nHwVoice, 0);
+                    HwVoice_Pause(pVoiceEnd->nHwVoice, 0);
                 }
             }
         }
@@ -369,7 +369,7 @@ void Voc_PauseAll(u8 bPause, u8 bStreams) {
 // Has a streamed voice crossed into the other half of its ARAM buffer since the last call? Then
 // *puPos gets the half it has just left, free to be refilled.
 u8 fn_800ACE38(AudVoice* pVoice, u32* puPos) {
-    u32 uPos = fn_800AFD8C(pVoice->nHwVoice);
+    u32 uPos = HwVoice_GetPlayPos(pVoice->nHwVoice);
     u32 uAram = pVoice->uAram;
     u32 uHalf;
     u8 bCrossed = 0;

@@ -53,11 +53,11 @@ void   MIXInitChannel(AXVPB* pVpb, u32 uMode, int nInput, int nAuxA, int nAuxB, 
 #define NUM_VOICES 50
 #define VOLUME_MIN (-904)               // -90.4 dB: silent
 
-// A voice's state flags (the word at 0x4). The bSet... flags ask the mixer callback (fn_800AF324)
+// A voice's state flags (the word at 0x4). The bSet... flags ask the mixer callback (HwVoice_MixerCallback)
 // to pass a changed setting on to the hardware on its next pass.
 typedef struct VoiceFlags {
-    u32  nState     : 3;        // 0x4  0, 1 set up (fn_800AFDC8), 2 start asked for (fn_800AFBD8),
-                                //      3 playing, 6 released (fn_800AFBD8)
+    u32  nState     : 3;        // 0x4  0, 1 set up (HwVoice_SetSound), 2 start asked for (HwVoice_StartOrRelease),
+                                //      3 playing, 6 released (HwVoice_StartOrRelease)
     u32  nEnvStage  : 2;        //      the envelope's stage: 0 attack, 1 decay, 2 sustain, 3 release
     u32  bSetInput  : 1;        //      n58 changed
     u32  bSetPan    : 1;        //      nPan changed
@@ -66,14 +66,14 @@ typedef struct VoiceFlags {
     u32  bSetAuxA   : 1;        //      nAuxA changed
     u32  bSetAdpcm  : 1;        //      a18..n3E changed
     u32  bSetLoop   : 1;        //      n50..n54 changed
-    u32  bStart     : 1;        //      start playing (fn_800AFBD8)
-    u32  bRelease   : 1;        //      go to the envelope's release (fn_800AFBD8)
+    u32  bStart     : 1;        //      start playing (HwVoice_StartOrRelease)
+    u32  bRelease   : 1;        //      go to the envelope's release (HwVoice_StartOrRelease)
     u32  n5_03      : 2;        //      passes left before a pause mutes, then stops, the voice
-    u32  bResume    : 1;        // 0x6  undo a pause (fn_800AFCBC)
+    u32  bResume    : 1;        // 0x6  undo a pause (HwVoice_Pause)
     u32  b6_40      : 1;
     u32  b6_20      : 1;        //      aux A (reverb) on
     u32  b6_10      : 1;
-    u32  bLost      : 1;        //      the hardware took the voice away (fn_800AF93C)
+    u32  bLost      : 1;        //      the hardware took the voice away (HwVoice_DroppedCallback)
     u32  n6_7F8     : 8;        //      passes to wait before asking for it back
     u32  unk7       : 3;
 } VoiceFlags;
@@ -85,7 +85,7 @@ typedef union VoiceFlagWord {
 
 // A voice's volume envelope (the word at 0x60). The level (n64, 0..0xFFFF) climbs by
 // nAttack * 16 each pass to full, falls by nDecay * 0x1000 to nSustain * 0x1000 + 0xFFF, and after
-// a release falls by nRelease * 16 to silence (fn_800AF324).
+// a release falls by nRelease * 16 to silence (HwVoice_MixerCallback).
 typedef struct VoiceEnvelope {
     u32  nAttack    : 12;       // 0x60
     u32  nDecay     : 4;        // 0x61
@@ -94,7 +94,7 @@ typedef struct VoiceEnvelope {
 } VoiceEnvelope;
 
 // A sound's header (0x38 bytes): where its data sits in ARAM (in 4-bit units) and its ADPCM
-// decoder state, as fn_800AFDC8 copies it into a voice.
+// decoder state, as HwVoice_SetSound copies it into a voice.
 typedef struct SoundHeader {
     u32  u0;                    // 0x00  -> Voice.u14
     u32  u4;                    // 0x04  -> Voice.u10
@@ -109,7 +109,7 @@ typedef struct SoundHeader {
 LAYOUT_ASSERT(SoundHeader, 0x38);
 
 // 0x08..0x53 is copied word by word into the hardware voice at 0x1A6 when the voice starts
-// (fn_800AF324).
+// (HwVoice_MixerCallback).
 typedef struct Voice {
     AXVPB*        pVpb;         // 0x00
     VoiceFlagWord flags;        // 0x04
@@ -117,7 +117,7 @@ typedef struct Voice {
     u16           nA;           // 0x0A
     u32           uC;           // 0x0C
     u32           u10;          // 0x10
-    u32           u14;          // 0x14  the start, in 4-bit units (fn_800AFD8C halves it)
+    u32           u14;          // 0x14  the start, in 4-bit units (HwVoice_GetPlayPos halves it)
     u32           a18[8];       // 0x18  the ADPCM decoder's coefficients (copied word by word)
     u16           n38;          // 0x38
     u16           n3A;          // 0x3A  the first ADPCM frame's header (predictor and scale)
@@ -129,7 +129,7 @@ typedef struct Voice {
     u16           n52;          // 0x52
     u16           n54;          // 0x54
     s16           n56;          // 0x56  volume, 0..0x3FFF
-    s16           n58;          // 0x58  n56 in dB x 10 (fn_800AFF9C)
+    s16           n58;          // 0x58  n56 in dB x 10 (HwVoice_VolumeToDb)
     s16           nAuxA;        // 0x5A  aux A level, dB x 10
     u8            nPan;         // 0x5C  0 left .. 127 right
     u8            nSPan;        // 0x5D  surround pan
@@ -170,7 +170,7 @@ typedef struct MovieSoundBlock {
 // DMA nLen bytes from main memory to ARAM; pfnDone(n) is called when it is done. Returns 1.
 int fn_800B044C(u32 uAram, void* pSrc, int nLen, void (*pfnDone)(u32 n), int n);
 // Hand a streamed block's ADPCM header to voice nVoice (only for the buffer's first half).
-void fn_800B0268(u16 nVoice, StreamChunk* pChunk, u32 uSize, int nBuffer);
+void HwVoice_SetStreamDecoder(u16 nVoice, StreamChunk* pChunk, u32 uSize, int nBuffer);
 // Cancel the ARAM transfers queued for pOwner.
 void fn_800B04CC(void* pOwner);
 // The CPU cache work around a DMA of uLen bytes at p (nDir as ARQRequest.type); GoARAM.c uses them too.
@@ -178,10 +178,10 @@ void fn_800B04EC(void* p, u32 uLen, int nDir);
 void fn_800B051C(void* p, u32 uLen, int nDir);
 
 // startUp.c, called by the sound engine (hlaudmovie.c).
-u8   fn_800AFB48(void);
-void fn_800AFB50(void);
-u32  fn_800AFD8C(u16 nVoice);                   // where the voice is playing in ARAM
-void fn_800B0338(u16 nVoice, MovieSoundBlock* pBlock, int nChannel, int nMode);
+u8   HwVoice_InitSession(void);
+void HwVoice_ExitSession(void);
+u32  HwVoice_GetPlayPos(u16 nVoice);                   // where the voice is playing in ARAM
+void HwVoice_SetMovieDecoder(u16 nVoice, MovieSoundBlock* pBlock, int nChannel, int nMode);
 u8   fn_800B0440(void);
 void fn_800B0448(void);
 u8   fn_800B0624(void);
@@ -225,7 +225,7 @@ extern u32   lbl_8028212C;              // its size
 
 // ---- the hardware voices, as the sound engine (hlaudvoice.c) uses them -----------------------------
 
-void fn_800AFCBC(u16 nVoice, u8 bPause);
+void HwVoice_Pause(u16 nVoice, u8 bPause);
 void fn_800B0748(u32 uAddr);            // give an ARAM buffer back
 
 #endif

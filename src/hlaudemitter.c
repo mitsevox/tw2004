@@ -18,7 +18,7 @@ void vec4flt_Zero3(f32* pVec);
 void Aud_EmiSet3DPos(u8 nId, f32* pPos, f32* pLast, u8 nView);
 void Voc_Cycle(void);                 // hlaudvoice.c
 void fn_800AF320(void);
-void fn_800B0434(void);                 // startUp.c
+void HwVoice_Cycle(void);                 // startUp.c
 
 AudInstance lbl_801F2740[256];
 AudEmitters lbl_801F2668;
@@ -97,7 +97,7 @@ void Aud_EmiCycle(void) {
     Trk_Cycle();
     Voc_Cycle();
     fn_800AF320();
-    fn_800B0434();
+    HwVoice_Cycle();
     lbl_80282018++;
 }
 

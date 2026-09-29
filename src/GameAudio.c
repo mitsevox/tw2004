@@ -165,7 +165,7 @@ u8 lbl_80282024[4];                     // 4 bytes in the original; Aud_MicInitO
 u8 lbl_80282020;
 
 // startUp.c: the sound engine's start-up steps, each nonzero when it worked
-u8   fn_800AFAB0(void);
+u8   HwVoice_InitModule(void);
 u8   fn_800B0438(void);
 u8   fn_800B0568(void);
 u8   fn_800B0798(void);
@@ -212,7 +212,7 @@ u8 Aud_InitOnce(u8 nRate) {
     u8 bOk;
 
     fn_800B5B80();
-    if ((bOk = fn_800AFAB0()) && (bOk = fn_800B0438()) && (bOk = fn_800B0568())
+    if ((bOk = HwVoice_InitModule()) && (bOk = fn_800B0438()) && (bOk = fn_800B0568())
         && (bOk = fn_800AF224()) && (bOk = fn_800B0798()) && (bOk = fn_800A8604())
         && (bOk = fn_800A8D2C()) && (bOk = Emi_InitModule()) && (bOk = Trk_InitModule())
         && (bOk = fn_800AAD18()) && (bOk = fn_800ABBC8()) && (bOk = fn_800A8754())

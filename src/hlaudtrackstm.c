@@ -153,7 +153,7 @@ void fn_800AB72C(AudTrack* pTrack, void (*pfnDone)(u32 bLast), u32 uStep, u8 bSk
         pVoice = pTrack->apVoices[i];
         if ((!bSkipEmpty || pVoice != NULL) && pVoice != NULL) {
             uAram = pVoice->uAram + pVoice->flags.b.bHalf * 0x7F00;
-            fn_800B0268(pVoice->nHwVoice, (StreamChunk*)pSrc, 0x8000, pVoice->flags.b.bHalf);
+            HwVoice_SetStreamDecoder(pVoice->nHwVoice, (StreamChunk*)pSrc, 0x8000, pVoice->flags.b.bHalf);
             fn_800B044C(uAram, pSrc + 0x100, 0x7F00, pfnDone, i == nChannels - 1);
             pSrc += uStep;
             pVoice->flags.b.bHalf ^= 1;

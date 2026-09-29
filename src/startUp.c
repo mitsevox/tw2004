@@ -1,6 +1,6 @@
 // startUp.c (EA's name, from its asserts; also in EA's 2002 source tree): the boot-time systems.
 // The sound voices (lbl_802820E8: 50 wrappers around the hardware's voices, run from the mixer
-// callback fn_800AF324), the audio-RAM heap and its DMA, the two built-in sounds, the boot-time
+// callback HwVoice_MixerCallback), the audio-RAM heap and its DMA, the two built-in sounds, the boot-time
 // memory-card checks and the start-up UI commands (lbl_801F5DA8), and the 'LEGL' stream (two
 // pictures; uiProcessPolygon.c shows the first at boot). It also holds a length estimate without a
 // square root (for AudTable.c) and the ball-against-object test (for Ball.c). The sound code
@@ -16,17 +16,17 @@
 #include "ball.h"
 #include "dynobj.h"
 
-void   fn_800AF324(void);
-void   fn_800AF93C(void* pVpb);
-u8     fn_800AF9BC(s16 nVoice);
-void   fn_800AFA2C(s16 nVoice);
-void   fn_800AFBD8(u16 nVoice, u8 bOn);
-void   fn_800AFDC8(u16 nVoice, SoundHeader* pHdr);
-void   fn_800AFEF4(u16 nVoice, s16 nVolume, int a, int b);
-s16    fn_800AFF9C(s16 nVolume);
-void   fn_800B00A4(u16 nVoice, u32 u, int a);
-void   fn_800B0114(u16 nVoice, VoiceEnvelope* pEnv);
-void   fn_800B01B4(u16 nVoice, u8 bA, u8 bB);
+void   HwVoice_MixerCallback(void);
+void   HwVoice_DroppedCallback(void* pVpb);
+u8     HwVoice_Acquire(s16 nVoice);
+void   HwVoice_Reset(s16 nVoice);
+void   HwVoice_StartOrRelease(u16 nVoice, u8 bOn);
+void   HwVoice_SetSound(u16 nVoice, SoundHeader* pHdr);
+void   HwVoice_SetVolume(u16 nVoice, s16 nVolume, int a, int b);
+s16    HwVoice_VolumeToDb(s16 nVolume);
+void   HwVoice_SetRate(u16 nVoice, u32 u, int a);
+void   HwVoice_SetEnvelope(u16 nVoice, VoiceEnvelope* pEnv);
+void   HwVoice_SetReverb(u16 nVoice, u8 bA, u8 bB);
 void   fn_800B055C(u32 n);
 s32    fn_800B09C8(int nPort, int nSlot);
 void   fn_800B0DB8(void);
@@ -163,10 +163,13 @@ Voice* lbl_802820E8;            // the voices, NUM_VOICES of them
 
 MsgHandler lbl_801F5DA8[30];
 
-// The mixer callback, run after every audio frame: for each voice, ask for a lost hardware voice
-// back, pass changed settings on to the hardware, start, release, pause and resume it, and step
-// its volume envelope.
-void fn_800AF324(void) {
+// The mixer callback (registered by HwVoice_InitModule), run after every audio frame. For each
+// voice: ask for a lost hardware voice back after its wait; stop and reset a playing one whose
+// position is more than 0x40000 nibbles before its end address (or past it: the difference is
+// unsigned) while above nibble 0x8800; pass changed settings on to the hardware; reset one whose
+// hardware voice has stopped (states 3, 4 and 6); start, release, pause and resume it; step its
+// volume envelope.
+void HwVoice_MixerCallback(void) {
     s16 i;
     Voice* p;
     u8 bMoved;
@@ -182,19 +185,19 @@ void fn_800AF324(void) {
         if (p->flags.b.bLost) {
             p->flags.b.n6_7F8--;
             if (p->flags.b.n6_7F8 != 0) continue;
-            if (fn_800AF9BC(i)) {
-                fn_800AFA2C(i);
+            if (HwVoice_Acquire(i)) {
+                HwVoice_Reset(i);
                 p->flags.b.bLost = 0;
             } else {
                 p->flags.b.n6_7F8 = 0xFF;
             }
         }
-        // port: both reads are a u32 at a 2-byte boundary (see fn_800AFD8C).
+        // port: both reads are a u32 at a 2-byte boundary (see HwVoice_GetPlayPos).
         pVpb = p->pVpb;
         if (pVpb->n146 != 0 && *(u32*)&pVpb->n1AE - *(u32*)&pVpb->n1B2 > 0x40000 &&
             *(u32*)&pVpb->n1B2 > 0x8800) {
             AXSetVoiceState(pVpb, 0);
-            fn_800AFA2C(i);
+            HwVoice_Reset(i);
         }
         if (p->flags.b.bSetPan) {
             p->flags.b.bSetPan = 0;
@@ -225,13 +228,13 @@ void fn_800AF324(void) {
         }
         if ((p->flags.b.nState == 3 || p->flags.b.nState == 4 || p->flags.b.nState == 6) &&
             p->pVpb->n146 == 0) {
-            fn_800AFA2C(i);
+            HwVoice_Reset(i);
         }
         if (p->flags.b.bStart) {
             if (!bMoved && p->u40 != 0) {
                 pVpb = p->pVpb;
                 if (p->flags.b.b6_40 && !p->flags.b.b6_10) {
-                    fn_800AFA2C(i);
+                    HwVoice_Reset(i);
                 } else {
                     // port: 0x4C bytes copied as words to a 2-byte boundary.
                     pDst = (u32*)&pVpb->n1A6;
@@ -345,7 +348,7 @@ void fn_800AF324(void) {
 
 // The hardware dropped a voice (to play one of higher priority): mark ours lost and stop it. The
 // mixer callback asks for it back after 255 passes.
-void fn_800AF93C(void* pVpb) {
+void HwVoice_DroppedCallback(void* pVpb) {
     u16 i;
     Voice* p;
     for (i = 0; i < NUM_VOICES; i++) {
@@ -360,8 +363,8 @@ void fn_800AF93C(void* pVpb) {
 }
 
 // Take a hardware voice for voice nVoice; returns whether one was free.
-u8 fn_800AF9BC(s16 nVoice) {
-    AXVPB* pVpb = AXAcquireVoice(1, fn_800AF93C, nVoice);
+u8 HwVoice_Acquire(s16 nVoice) {
+    AXVPB* pVpb = AXAcquireVoice(1, HwVoice_DroppedCallback, nVoice);
     Voice* p = &lbl_802820E8[nVoice];
     if (pVpb) {
         p->pVpb = pVpb;
@@ -371,7 +374,7 @@ u8 fn_800AF9BC(s16 nVoice) {
 }
 
 // Reset a voice: silent, centred, all flags clear.
-void fn_800AFA2C(s16 nVoice) {
+void HwVoice_Reset(s16 nVoice) {
     Voice* p = &lbl_802820E8[nVoice];
     p->flags.u = 0;
     p->n56 = 0;
@@ -383,8 +386,10 @@ void fn_800AFA2C(s16 nVoice) {
     MIXInitChannel(p->pVpb, 0, VOLUME_MIN, VOLUME_MIN, VOLUME_MIN, 64, 127, 0);
 }
 
-// Start the audio hardware and the voice table.
-u8 fn_800AFAB0(void) {
+// Aud_InitOnce's first step: start the audio libraries (AI, ARQ, AX, MIX; the mixer's sound mode
+// from the console's setting) and the voice table, NUM_VOICES voices, each given a hardware voice
+// and reset, then register HwVoice_MixerCallback. Returns 1.
+u8 HwVoice_InitModule(void) {
     s16 i;
     AIInit(NULL);
     ARQInit();
@@ -395,32 +400,34 @@ u8 fn_800AFAB0(void) {
     lbl_802820E8 = fn_800B5BD8(NUM_VOICES * sizeof(Voice));
     Mem_set(lbl_802820E8, 0, NUM_VOICES * sizeof(Voice));
     for (i = 0; i < NUM_VOICES; i++) {
-        fn_800AF9BC(i);
-        fn_800AFA2C(i);
+        HwVoice_Acquire(i);
+        HwVoice_Reset(i);
     }
-    AXRegisterCallback(fn_800AF324);
+    AXRegisterCallback(HwVoice_MixerCallback);
     return 1;
 }
 
-u8 fn_800AFB48(void) {
+// Ses_Init's step for the hardware voices: nothing to set up; returns 1.
+u8 HwVoice_InitSession(void) {
     return 1;
 }
 
-void fn_800AFB50(void) {
+// The sound session's exit step (hlaudmovie.c) for the hardware voices: release every voice.
+void HwVoice_ExitSession(void) {
     u16 i;
     for (i = 0; i < NUM_VOICES; i++) {
-        fn_800AFBD8(i, 0);
+        HwVoice_StartOrRelease(i, 0);
     }
 }
 
 // Whether a voice is free: idle, and not waiting to get its hardware voice back.
-u8 fn_800AFB98(u16 nVoice) {
+u8 HwVoice_IsFree(u16 nVoice) {
     Voice* p = &lbl_802820E8[nVoice];
     return (p->flags.b.nState == 0 || p->flags.b.nState == 1) && !p->flags.b.bLost;
 }
 
 // Start a set-up voice (bOn), or release a playing one into its envelope's release.
-void fn_800AFBD8(u16 nVoice, u8 bOn) {
+void HwVoice_StartOrRelease(u16 nVoice, u8 bOn) {
     Voice* p = &lbl_802820E8[nVoice];
     int bEnabled = OSDisableInterrupts();
     if (bOn) {
@@ -440,13 +447,13 @@ void fn_800AFBD8(u16 nVoice, u8 bOn) {
 }
 
 // Pause a started voice (a released one is silenced instead), or resume it.
-void fn_800AFCBC(u16 nVoice, u8 bPause) {
+void HwVoice_Pause(u16 nVoice, u8 bPause) {
     Voice* p = &lbl_802820E8[nVoice];
     int bEnabled = OSDisableInterrupts();
     if (p->flags.b.nState >= 2) {
         if (bPause) {
             if (p->flags.b.nState == 6) {
-                fn_800AFEF4(nVoice, 0, 0, 0);
+                HwVoice_SetVolume(nVoice, 0, 0, 0);
             } else {
                 p->flags.b.n5_03 = 2;
                 p->flags.b.bResume = 0;
@@ -459,7 +466,7 @@ void fn_800AFCBC(u16 nVoice, u8 bPause) {
 }
 
 // Where a voice is in its sound, in bytes of ARAM: from the hardware once it plays.
-u32 fn_800AFD8C(u16 nVoice) {
+u32 HwVoice_GetPlayPos(u16 nVoice) {
     Voice* p = &lbl_802820E8[nVoice];
     if (p->flags.b.nState <= 2) {
         return p->u14 >> 1;
@@ -470,8 +477,12 @@ u32 fn_800AFD8C(u16 nVoice) {
     return *(u32*)&p->pVpb->n1B2 >> 1;
 }
 
-// Set a voice up to play a sound.
-void fn_800AFDC8(u16 nVoice, SoundHeader* pHdr) {
+// Set a voice up to play the sound pHdr describes (state 1, for HwVoice_StartOrRelease to start):
+// its ARAM addresses and loop settings and, for a sound whose start is at nibble 0x106800 (ARAM
+// byte 0x83400) or above, its ADPCM coefficients and first frame header. One that starts below is
+// flagged b6_40 instead: it plays as AX voice type 1, and the mixer resets it rather than start it
+// until HwVoice_SetStreamDecoder or HwVoice_SetMovieDecoder has passed its coefficients on.
+void HwVoice_SetSound(u16 nVoice, SoundHeader* pHdr) {
     Voice* p = &lbl_802820E8[nVoice];
     int bEnabled = OSDisableInterrupts();
     p->n8 = pHdr->uC;
@@ -500,12 +511,15 @@ void fn_800AFDC8(u16 nVoice, SoundHeader* pHdr) {
     OSRestoreInterrupts(bEnabled);
 }
 
-s16 fn_800AFEDC(u16 nVoice) {
+// A voice's volume as last set (0..0x3FFF, HwVoice_SetVolume).
+s16 HwVoice_GetVolume(u16 nVoice) {
     return lbl_802820E8[nVoice].n56;
 }
 
-// Set a voice's volume, clamped to 0..0x3FFF.
-void fn_800AFEF4(u16 nVoice, s16 nVolume, int a, int b) {
+// Set a voice's volume, clamped to 0..0x3FFF; its dB value (HwVoice_VolumeToDb) goes to the mixer
+// on the next pass. a and b are not used (callers pass 0, and hlaudvoice.c Voc_Render its
+// bPlaying).
+void HwVoice_SetVolume(u16 nVoice, s16 nVolume, int a, int b) {
     Voice* p = &lbl_802820E8[nVoice];
     int bEnabled = OSDisableInterrupts();
     if (nVolume < 0) {
@@ -515,14 +529,14 @@ void fn_800AFEF4(u16 nVoice, s16 nVolume, int a, int b) {
     }
     if (p->n56 != nVolume) {
         p->n56 = nVolume;
-        p->n58 = fn_800AFF9C(nVolume);
+        p->n58 = HwVoice_VolumeToDb(nVolume);
         p->flags.b.bSetInput = 1;
     }
     OSRestoreInterrupts(bEnabled);
 }
 
 // A volume (0..0x3FFF) in dB x 10, for the mixer: each halving takes 6 dB off, down to VOLUME_MIN.
-s16 fn_800AFF9C(s16 nVolume) {
+s16 HwVoice_VolumeToDb(s16 nVolume) {
     s16 nDb;
     f32 fDb;
     nVolume >>= 1;
@@ -541,7 +555,7 @@ s16 fn_800AFF9C(s16 nVolume) {
 
 // Set a voice's pan (mode 2; hlaudvoice.c also sends mode 3, which does nothing here). bPlaying is
 // not used: the caller passes it to every voice setter.
-void fn_800B0034(u16 nVoice, u8 nPan, int nMode, int bPlaying) {
+void HwVoice_SetPan(u16 nVoice, u8 nPan, int nMode, int bPlaying) {
     Voice* p = &lbl_802820E8[nVoice];
     int bEnabled = OSDisableInterrupts();
     if (nMode == 2) {
@@ -551,7 +565,9 @@ void fn_800B0034(u16 nVoice, u8 nPan, int nMode, int bPlaying) {
     OSRestoreInterrupts(bEnabled);
 }
 
-void fn_800B00A4(u16 nVoice, u32 u, int a) {
+// Set a voice's playback rate, 16.16 fixed point (0x10000 plays the sound at its own rate); 0 or
+// the rate it has already is ignored. a is not used (hlaudvoice.c Voc_Render passes its bPlaying).
+void HwVoice_SetRate(u16 nVoice, u32 u, int a) {
     Voice* p = &lbl_802820E8[nVoice];
     int bEnabled = OSDisableInterrupts();
     if (p->u40 != u && u != 0) {
@@ -562,7 +578,7 @@ void fn_800B00A4(u16 nVoice, u32 u, int a) {
 }
 
 // Set a voice's envelope; a zero attack, decay or release becomes the fastest.
-void fn_800B0114(u16 nVoice, VoiceEnvelope* pEnv) {
+void HwVoice_SetEnvelope(u16 nVoice, VoiceEnvelope* pEnv) {
     Voice* p = &lbl_802820E8[nVoice];
     int bEnabled = OSDisableInterrupts();
     p->env = *pEnv;
@@ -580,8 +596,9 @@ void fn_800B0114(u16 nVoice, VoiceEnvelope* pEnv) {
     OSRestoreInterrupts(bEnabled);
 }
 
-// Aux A (the reverb send) on at -15 dB, or off.
-void fn_800B01B4(u16 nVoice, u8 bA, u8 bB) {
+// Turn a voice's reverb send (aux A) on at -15 dB when either flag is set, else off. The callers
+// pass one flag twice.
+void HwVoice_SetReverb(u16 nVoice, u8 bA, u8 bB) {
     Voice* p = &lbl_802820E8[nVoice];
     int bEnabled = OSDisableInterrupts();
     if (bA || bB) {
@@ -598,7 +615,7 @@ void fn_800B01B4(u16 nVoice, u8 bA, u8 bB) {
 
 // A streamed sound's first chunk (nBuffer 0, the first half of its ARAM buffer) sets the voice's
 // decoder: the chunk's coefficients and its first frame's header, also used when it loops.
-void fn_800B0268(u16 nVoice, StreamChunk* pChunk, u32 uSize, int nBuffer) {
+void HwVoice_SetStreamDecoder(u16 nVoice, StreamChunk* pChunk, u32 uSize, int nBuffer) {
     Voice* p = &lbl_802820E8[nVoice];
     if (nBuffer == 0) {
         u8 nHeader = pChunk->aData[0];
@@ -623,7 +640,7 @@ void fn_800B0268(u16 nVoice, StreamChunk* pChunk, u32 uSize, int nBuffer) {
 
 // Set a movie voice's decoder from a block of the movie's sound: channel 0 (left) or 1 (right).
 // nMode 0 also sets the header used when it loops.
-void fn_800B0338(u16 nVoice, MovieSoundBlock* pBlock, int nChannel, int nMode) {
+void HwVoice_SetMovieDecoder(u16 nVoice, MovieSoundBlock* pBlock, int nChannel, int nMode) {
     Voice* p = &lbl_802820E8[nVoice];
     int bEnabled = OSDisableInterrupts();
     u32* pCoefs;
@@ -656,10 +673,13 @@ void fn_800B0338(u16 nVoice, MovieSoundBlock* pBlock, int nChannel, int nMode) {
     OSRestoreInterrupts(bEnabled);
 }
 
-void fn_800B0430(void) {
+// Called by Voc_Cycle for each voice it frees (with the hardware voice and a flag, which this build
+// does not take); empty.
+void HwVoice_OnVoiceFreed(void) {
 }
 
-void fn_800B0434(void) {
+// Once a frame, from Aud_EmiCycle after Voc_Cycle; empty in this build.
+void HwVoice_Cycle(void) {
 }
 
 u8 fn_800B0438(void) {
@@ -809,12 +829,12 @@ void fn_800B0858(u8 nSound) {
     env.nSustain = 0xF;
     env.nDecay = 0;
     env.nRelease = 0x200;
-    fn_800AFDC8(lbl_80282118, &lbl_8018FE98[nSound].hdr);
-    fn_800AFEF4(lbl_80282118, 0x3FFF, 0, 0);
-    fn_800B00A4(lbl_80282118, lbl_8018FE98[nSound].uC, 0);
-    fn_800B0114(lbl_80282118, &env);
-    fn_800AFBD8(lbl_80282118, 1);
-    fn_800B01B4(lbl_80282118, 1, 1);
+    HwVoice_SetSound(lbl_80282118, &lbl_8018FE98[nSound].hdr);
+    HwVoice_SetVolume(lbl_80282118, 0x3FFF, 0, 0);
+    HwVoice_SetRate(lbl_80282118, lbl_8018FE98[nSound].uC, 0);
+    HwVoice_SetEnvelope(lbl_80282118, &env);
+    HwVoice_StartOrRelease(lbl_80282118, 1);
+    HwVoice_SetReverb(lbl_80282118, 1, 1);
     if (++lbl_80282118 >= NUM_VOICES) {
         lbl_80282118 = 0;
     }

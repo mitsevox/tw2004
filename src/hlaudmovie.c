@@ -165,8 +165,8 @@ void fn_800A8AD4(MovieSoundBlock* pBlock) {
     pDataR = pDataL + MOVIE_BLOCK_SIZE;
     uLeft = lbl_801F1850.pLeft->uAram + lbl_801F1850.nSendBlock * MOVIE_BLOCK_SIZE;
     uRight = lbl_801F1850.pRight->uAram + lbl_801F1850.nSendBlock * MOVIE_BLOCK_SIZE;
-    fn_800B0338(lbl_801F1850.pLeft->nHwVoice, pBlock, 0, nMode);
-    fn_800B0338(lbl_801F1850.pRight->nHwVoice, pBlock, 1, nMode);
+    HwVoice_SetMovieDecoder(lbl_801F1850.pLeft->nHwVoice, pBlock, 0, nMode);
+    HwVoice_SetMovieDecoder(lbl_801F1850.pRight->nHwVoice, pBlock, 1, nMode);
     if (lbl_801F1850.nState == 1) {
         fn_800B044C(uLeft, pDataL, MOVIE_BLOCK_SIZE, NULL, 0);
         fn_800B044C(uRight, pDataR, MOVIE_BLOCK_SIZE, NULL, 1);
@@ -193,7 +193,7 @@ void Mov_Tick(void) {
     switch (lbl_801F1850.nState) {
     case 2:
         uStart = lbl_801F1850.nPlayBlock * MOVIE_BLOCK_SIZE;
-        if (fn_800AFD8C(lbl_801F1850.pLeft->nHwVoice) - lbl_801F1850.pLeft->uAram - uStart >=
+        if (HwVoice_GetPlayPos(lbl_801F1850.pLeft->nHwVoice) - lbl_801F1850.pLeft->uAram - uStart >=
             MOVIE_BLOCK_SIZE) {
             lbl_801F1850.uPlayed += MOVIE_BLOCK_SIZE;
             if (++lbl_801F1850.nPlayBlock >= MOVIE_BLOCKS) {
@@ -238,7 +238,7 @@ void fn_800A8D88(void) {
     fn_800AF2D8();
     fn_800B0660();
     fn_800B0448();
-    fn_800AFB50();
+    HwVoice_ExitSession();
 }
 
 // Sets the sound engine up; b == 0 also drops bank 0. Each step must succeed for the next to run.
@@ -256,7 +256,7 @@ u8 Ses_Init(u8 a, u8 b, u8 nListeners) {
         lbl_80282074 = NULL;
     }
     lbl_8028207C &= ~0x30;
-    if ((bOk = fn_800AFB48()) && (bOk = fn_800B0440()) && (bOk = fn_800B0624()) &&
+    if ((bOk = HwVoice_InitSession()) && (bOk = fn_800B0440()) && (bOk = fn_800B0624()) &&
         (bOk = fn_800AF264(a, b)) && (bOk = fn_800A87A4(a, b, nListeners)) &&
         (bOk = Emi_InitSession()) && (bOk = fn_800A9A50(a, b)) && (bOk = fn_800AC494()) &&
         (bOk = fn_800A86B0())) {

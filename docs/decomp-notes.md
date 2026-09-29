@@ -979,7 +979,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   keeps them in saved registers; `t = g(); f(t, p->x, p->y);` calls first (FE_LogoDesign
   `FE_LogoDesign_LoadClut`, 76.2 -> 100).
 - **[verified] Shift the parameter once.** `(s16)(n >> 1)` written at three uses scored 90.7;
-  `n >>= 1;` then plain uses gave the original's `extsh` then `srawi`/`extsh.` (startUp `fn_800AFF9C`).
+  `n >>= 1;` then plain uses gave the original's `extsh` then `srawi`/`extsh.` (startUp `HwVoice_VolumeToDb`).
 - **[verified] A pointer local to a global struct**, `T* p = &gX; p->a++; ...`, can be what the
   original did even though the address could be reused anyway (PGATour `GameModeDriverPGATour_PrepareForTeeOff`, 80.5 -> 100
   with its other locals).
@@ -1120,9 +1120,9 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   `rlwimi`/`stb`, and `lhz`/`sth` for a field that crosses a byte). A single `stw 0` over the whole
   word needs a union with a `u32` member (startUp voice flags). A test written on the shifted value,
   `if (p->nAttack * 16 == 0)`, gives an in-place `rlwinm.` mask test where `== 0` gives `extrwi.`
-  (startUp `fn_800B0114`).
+  (startUp `HwVoice_SetEnvelope`).
 - **[verified] A `u8` return changes the epilogue order.** `return p != NULL;` as `int` restores r31
-  after the `srwi`; as `u8` before it, like the original (startUp `fn_800AF9BC`).
+  after the `srwi`; as `u8` before it, like the original (startUp `HwVoice_Acquire`).
 
 - **[verified] `int` vs `s32` matters for parameters too.** PGATour `fn_800EE6A0(s32 nPlayer)` is
   exact; as `(int nPlayer)` it gives `addis r3, r4, 1; add r3, r3, r29` instead of the original's
