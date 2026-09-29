@@ -144,7 +144,7 @@ locals (TerrainData, Ball); random declaration orders + a climb find gains greed
 float registers (lead, not kept).
 
 **Biggest blockers** by link gain per function: Golfer AI_ChooseTarget (98.53%, registers only:
-agents/tried/AI_ChooseTarget.md), Ball Physics_HandleCollision, Earnings x2, startUp fn_800B0748,
+agents/tried/AI_ChooseTarget.md), Ball Physics_HandleCollision, Earnings x2, startUp AudAram_FreeStreamBuffer,
 gocamscripts x2, skalib (52 KB data, 5 left), rcmp fn_800B769C/fn_800B8618. One function from
 linking: SunFlr_Gc (fn_8009A708), uiProcessInterface (UI_ReadControllers), hwsBurn (HwsBurn_CopySetOptions, 1
 instruction). Every attempt is in agents/tried/<fn>.md; new rules in docs/decomp-notes.md.

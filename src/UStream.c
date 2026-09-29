@@ -589,7 +589,7 @@ static void Stream_ParseBufs(void) {
                             break;
                         case TAG('s', 'a', 'm', 'p'):
                             // port: for sample data pDst holds an ARAM address, not a pointer
-                            fn_800B044C((u32)(uptr)pDst, pSrc, uCopy, UStream_NullCallback, 0);
+                            AudDma_ToAram((u32)(uptr)pDst, pSrc, uCopy, UStream_NullCallback, 0);
                             break;
                         }
                     }

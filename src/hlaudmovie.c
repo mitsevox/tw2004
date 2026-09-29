@@ -92,7 +92,7 @@ void Mov_Init(void) {
     lbl_801F1850.pLeft = Voc_Alloc(&request);
     lbl_801F1850.pRight = Voc_Alloc(&request);
     if (lbl_801F1850.pLeft != NULL && lbl_801F1850.pRight != NULL) {
-        lbl_801F1850.pLeft->uAram = fn_800B0790();
+        lbl_801F1850.pLeft->uAram = AudAram_GetMovieBuffer();
         lbl_801F1850.pRight->uAram = lbl_801F1850.pLeft->uAram + MOVIE_BLOCKS * MOVIE_BLOCK_SIZE;
         lbl_801F1850.uPlayed = 0;
         lbl_801F1850.uSent = 0;
@@ -168,13 +168,13 @@ void fn_800A8AD4(MovieSoundBlock* pBlock) {
     HwVoice_SetMovieDecoder(lbl_801F1850.pLeft->nHwVoice, pBlock, 0, nMode);
     HwVoice_SetMovieDecoder(lbl_801F1850.pRight->nHwVoice, pBlock, 1, nMode);
     if (lbl_801F1850.nState == 1) {
-        fn_800B044C(uLeft, pDataL, MOVIE_BLOCK_SIZE, NULL, 0);
-        fn_800B044C(uRight, pDataR, MOVIE_BLOCK_SIZE, NULL, 1);
+        AudDma_ToAram(uLeft, pDataL, MOVIE_BLOCK_SIZE, NULL, 0);
+        AudDma_ToAram(uRight, pDataR, MOVIE_BLOCK_SIZE, NULL, 1);
     } else {
         // fake match: pBlock->aDataL instead of pDataL (same address) keeps pBlock live into this
         // branch: its 29th allocator neighbour puts it in r30 ahead of the &lbl_801F1850 temp.
-        fn_800B044C(uLeft, pBlock->aDataL, MOVIE_BLOCK_SIZE, fn_800A87D8, 0);
-        fn_800B044C(uRight, pDataR, MOVIE_BLOCK_SIZE, fn_800A87D8, 1);
+        AudDma_ToAram(uLeft, pBlock->aDataL, MOVIE_BLOCK_SIZE, fn_800A87D8, 0);
+        AudDma_ToAram(uRight, pDataR, MOVIE_BLOCK_SIZE, fn_800A87D8, 1);
     }
     // Before the start nothing plays, so the blocks advance here instead of in fn_800A87D8.
     if (lbl_801F1850.nState == 1) {
@@ -236,8 +236,8 @@ void fn_800A8D88(void) {
     Emi_ExitSession();
     fn_800A87B0();
     fn_800AF2D8();
-    fn_800B0660();
-    fn_800B0448();
+    AudAram_ExitSession();
+    AudDma_ExitSession();
     HwVoice_ExitSession();
 }
 
@@ -249,21 +249,21 @@ u8 Ses_Init(u8 a, u8 b, u8 nListeners) {
     lbl_80282084 = b;
     if (lbl_80282074 != NULL) {
         if (lbl_80282074->uAram != 0) {
-            fn_800B06CC(lbl_80282074->uAram);
+            AudAram_Free(lbl_80282074->uAram);
             lbl_80282074->uAram = 0;
         }
         fn_800B5C04(lbl_80282074);
         lbl_80282074 = NULL;
     }
     lbl_8028207C &= ~0x30;
-    if ((bOk = HwVoice_InitSession()) && (bOk = fn_800B0440()) && (bOk = fn_800B0624()) &&
+    if ((bOk = HwVoice_InitSession()) && (bOk = AudDma_InitSession()) && (bOk = AudAram_InitSession()) &&
         (bOk = fn_800AF264(a, b)) && (bOk = fn_800A87A4(a, b, nListeners)) &&
         (bOk = Emi_InitSession()) && (bOk = fn_800A9A50(a, b)) && (bOk = fn_800AC494()) &&
         (bOk = fn_800A86B0())) {
         if (b == 0) {
             if (lbl_80282078 != NULL) {
                 if (lbl_80282078->uAram != 0) {
-                    fn_800B06CC(lbl_80282078->uAram);
+                    AudAram_Free(lbl_80282078->uAram);
                     lbl_80282078->uAram = 0;
                 }
                 fn_800B5C04(lbl_80282078);
@@ -360,7 +360,7 @@ u32 fn_800A925C(u32 uSize, u32 uMemory) {
     } else {
         pBank = lbl_80282074;
     }
-    return pBank->uAram = fn_800B0698(uSize);
+    return pBank->uAram = AudAram_Alloc(uSize);
 }
 
 // A bank's samples are loaded: move the sample table's addresses into its ARAM block.

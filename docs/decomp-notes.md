@@ -1187,7 +1187,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
 ### Function calls and parameters
 
 - **[verified] A parameter's type moves saved registers, in the callee and in callers.** startUp
-  `fn_800B044C`: `u32 uLen` -> `int nLen` (98.75 -> 100). PGATour `GameModeDriverPGATour_SimCurrentTournament`: the callee's
+  `AudDma_ToAram`: `u32 uLen` -> `int nLen` (98.75 -> 100). PGATour `GameModeDriverPGATour_SimCurrentTournament`: the callee's
   prototype `GameModeDriverPGATour_GetCurrentBracket(PlayerNumber_t)` -> `(s32)` fixed the CALLER (98.65 -> 100; `int` did not).
 - **[verified] A leftover argument can be an old value still in r4.** GameRound `GM_ClearDataForNewGame`:
   `GM_ClearGameBonusStats(i, 0)` was really `GM_ClearGameBonusStats(i)`; the callee sets r4 itself, and the original's r4 = 0

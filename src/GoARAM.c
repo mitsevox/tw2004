@@ -430,7 +430,7 @@ void GoARAM_WaitTransfer(ARAMTransfer* pTransfer) {
     do {
     } while (GoARAM_GetTransferState(pTransfer) != 2);
     // port: the main-memory address is kept as a u32, as the ARQ library takes it
-    fn_800B04EC((void*)pTransfer->uMain, pTransfer->uLength, pTransfer->nType);
+    AudDma_CacheAfterTransfer((void*)pTransfer->uMain, pTransfer->uLength, pTransfer->nType);
     fn_80007368();
     GoARAM_ReleaseTransfer(pTransfer);
     fn_80007328();
@@ -438,14 +438,14 @@ void GoARAM_WaitTransfer(ARAMTransfer* pTransfer) {
 
 // Starts copying uSize bytes from pSrc to ARAM address uAram; GoARAM_WaitTransfer waits for it.
 ARAMTransfer* GoARAM_CopyToAram(void* pSrc, u32 uAram, u32 uSize) {
-    fn_800B051C(pSrc, uSize, 0);
+    AudDma_CacheBeforeTransfer(pSrc, uSize, 0);
     // port: the ARQ library takes addresses as u32
     return GoARAM_QueueTransfer((u32)pSrc, uAram, uSize, 0, 1, NULL, 0, 0);
 }
 
 // Starts copying uSize bytes from ARAM address uAram to pDst; GoARAM_WaitTransfer waits for it.
 ARAMTransfer* GoARAM_CopyFromAram(void* pDst, u32 uAram, u32 uSize) {
-    fn_800B051C(pDst, uSize, 1);
+    AudDma_CacheBeforeTransfer(pDst, uSize, 1);
     // port: the ARQ library takes addresses as u32
     return GoARAM_QueueTransfer(uAram, (u32)pDst, uSize, 1, 1, NULL, 0, 0);
 }

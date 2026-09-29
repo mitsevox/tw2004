@@ -154,7 +154,7 @@ void fn_800AB72C(AudTrack* pTrack, void (*pfnDone)(u32 bLast), u32 uStep, u8 bSk
         if ((!bSkipEmpty || pVoice != NULL) && pVoice != NULL) {
             uAram = pVoice->uAram + pVoice->flags.b.bHalf * 0x7F00;
             HwVoice_SetStreamDecoder(pVoice->nHwVoice, (StreamChunk*)pSrc, 0x8000, pVoice->flags.b.bHalf);
-            fn_800B044C(uAram, pSrc + 0x100, 0x7F00, pfnDone, i == nChannels - 1);
+            AudDma_ToAram(uAram, pSrc + 0x100, 0x7F00, pfnDone, i == nChannels - 1);
             pSrc += uStep;
             pVoice->flags.b.bHalf ^= 1;
         }
@@ -307,7 +307,7 @@ void fn_800ABC54(AudTrack* pTrack) {
 
 void Stm_Exit(AudTrack* pTrack) {
     fn_800B596C("Stm_Exit");
-    fn_800B04CC(pTrack);
+    AudDma_CancelOwner(pTrack);
     if (pTrack->u.stm.pBuffer != NULL) {
         fn_800A9434(pTrack->u.stm.pBuffer, pTrack->u.stm.uBufferSize, pTrack->pTmpl->data.pPlayList->nId);
     }

@@ -166,11 +166,11 @@ u8 lbl_80282020;
 
 // startUp.c: the sound engine's start-up steps, each nonzero when it worked
 u8   HwVoice_InitModule(void);
-u8   fn_800B0438(void);
-u8   fn_800B0568(void);
-u8   fn_800B0798(void);
-void fn_800B07A0(void);
-void fn_800B0858(u8 nSound);
+u8   AudDma_InitModule(void);
+u8   AudAram_InitModule(void);
+u8   BootSound_InitModule(void);
+void BootSound_CopyToAram(void);
+void BootSound_Play(u8 nSound);
 
 // hlaudmovie.c
 u8   fn_800A8604(void);
@@ -212,13 +212,13 @@ u8 Aud_InitOnce(u8 nRate) {
     u8 bOk;
 
     fn_800B5B80();
-    if ((bOk = HwVoice_InitModule()) && (bOk = fn_800B0438()) && (bOk = fn_800B0568())
-        && (bOk = fn_800AF224()) && (bOk = fn_800B0798()) && (bOk = fn_800A8604())
+    if ((bOk = HwVoice_InitModule()) && (bOk = AudDma_InitModule()) && (bOk = AudAram_InitModule())
+        && (bOk = fn_800AF224()) && (bOk = BootSound_InitModule()) && (bOk = fn_800A8604())
         && (bOk = fn_800A8D2C()) && (bOk = Emi_InitModule()) && (bOk = Trk_InitModule())
         && (bOk = fn_800AAD18()) && (bOk = fn_800ABBC8()) && (bOk = fn_800A8754())
         && (bOk = Voc_InitModule()) && (bOk = fn_800A8824()) && (bOk = Aud_EmiInitOnce())
         && (bOk = Aud_MicInitOnce())) {
-        fn_800B07A0();
+        BootSound_CopyToAram();
         fn_800A86BC(nRate);
         bOk = 1;
     }
@@ -1995,9 +1995,9 @@ void Aud_CycleMovie(void) {
     Mov_Tick();
 }
 
-// Plays built-in sound nSound (startUp.c's fn_800B0858; its command 10 plays 0 or 1).
+// Plays built-in sound nSound (startUp.c's BootSound_Play; its command 10 plays 0 or 1).
 void Aud_PlayBuiltInSound(u8 nSound) {
-    fn_800B0858(nSound);
+    BootSound_Play(nSound);
 }
 
 // Starts a sound session (the front end, or a hole: GoEntry.c passes the course + 1, 1 and one

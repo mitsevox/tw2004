@@ -27,14 +27,14 @@ s16    HwVoice_VolumeToDb(s16 nVolume);
 void   HwVoice_SetRate(u16 nVoice, u32 u, int a);
 void   HwVoice_SetEnvelope(u16 nVoice, VoiceEnvelope* pEnv);
 void   HwVoice_SetReverb(u16 nVoice, u8 bA, u8 bB);
-void   fn_800B055C(u32 n);
-s32    fn_800B09C8(int nPort, int nSlot);
-void   fn_800B0DB8(void);
-void   fn_800B0DFC(void);
-void   fn_800B0E40(void);
-void   fn_800B0E84(void);
-void   fn_800B0EC8(void);
-void   fn_800B0F0C(void);
+void   AudAram_ZeroBlockDone(u32 n);
+s32    BootCard_ReadStatus(int nPort, int nSlot);
+void   BootCard_HintWrongSectorSize(void);
+void   BootCard_HintNotMemoryCard(void);
+void   BootCard_HintIoError(void);
+void   BootCard_HintBroken(void);
+void   BootCard_HintStatus11(void);
+void   BootCard_HintUnformatted(void);
 void   Startup_SendNoCardsMsg(void);
 void   Startup_SendSlotBEmptyMsg(void);
 void   Startup_SendCardReadyMsg(void);
@@ -106,7 +106,7 @@ u8 lbl_8018F640[0x858] = {
 };
 
 // The two built-in sounds: where their data is, its size, its playback rate (16.16 fixed point:
-// 0.5 and 0.25) and its header, with the addresses counted from the data's start (fn_800B07A0
+// 0.5 and 0.25) and its header, with the addresses counted from the data's start (BootSound_CopyToAram
 // rebases them into ARAM).
 BootSound lbl_8018FE98[2] = {
     {lbl_8018F040, 0x600, 0, 0x8000,
@@ -121,13 +121,13 @@ BootSound lbl_8018FE98[2] = {
 
 s32 lbl_80281498 = -1;          // } the slot and port the status reports reached; -1 to start
 s32 lbl_8028149C = -1;          // } again
-u8  lbl_802814A0 = 1;           // cleared by fn_800B0954, set by fn_800B09C8, tested by fn_800B0960
+u8  lbl_802814A0 = 1;           // cleared by BootCard_SkipLoad, set by BootCard_ReadStatus, tested by BootCard_LoadAtBoot
 
 // The rest is defined last-address-first: the compiler lays an object's uninitialised data out in
 // reverse.
 
 // The memory-card status table: for each port, lbl_80282138[port] slots (always 1), each with the
-// status fn_800B09C8 read (lbl_80282150), the status last reported (lbl_80282148) and whether it
+// status BootCard_ReadStatus read (lbl_80282150), the status last reported (lbl_80282148) and whether it
 // has been reported (lbl_80282140).
 s32    lbl_80282150[MC_NUM_PORTS][MC_NUM_SLOTS];
 s32    lbl_80282148[MC_NUM_PORTS][MC_NUM_SLOTS];
@@ -139,15 +139,15 @@ void*  lbl_80282130;            // the second one's
 u32    lbl_8028212C;            // the first one's size
 u32    lbl_80282128;            // the second one's
 s32    lbl_80282124;            // how many it has kept
-u8     lbl_80282120;            // fn_800B0960 keeps a memory-card result here
+u8     lbl_80282120;            // BootCard_LoadAtBoot keeps a memory-card result here
 // fake match: lbl_8028211C, lbl_80282114 and lbl_802820EC are never used by the game's code, but
 // the original's data has a word at each of these addresses (likely the globals of functions the
 // linker stripped); kept through the dead-stripping so the rest lines up. Types unknown.
 KEEP_UNUSED u32 lbl_8028211C;
-u16    lbl_80282118;            // the next voice fn_800B0858 plays on
+u16    lbl_80282118;            // the next voice BootSound_Play plays on
 KEEP_UNUSED u32 lbl_80282114;
 
-// The ARAM heap (fn_800B0568).
+// The ARAM heap (AudAram_InitModule).
 u8     lbl_80282110;            // set when the silent block's DMA is done
 void*  lbl_8028210C;            // the heap's bookkeeping (0x2A4 bytes)
 u32    lbl_80282108;            // the ARAM address of the eight 0xFE00-byte blocks
@@ -682,32 +682,39 @@ void HwVoice_OnVoiceFreed(void) {
 void HwVoice_Cycle(void) {
 }
 
-u8 fn_800B0438(void) {
+// Aud_InitOnce's step between the voices and the ARAM heap, next to the DMA functions: nothing to
+// set up in this build; returns 1.
+u8 AudDma_InitModule(void) {
     return 1;
 }
 
-u8 fn_800B0440(void) {
+// Ses_Init's step between the voices and the ARAM heap: nothing to set up in this build; returns 1.
+u8 AudDma_InitSession(void) {
     return 1;
 }
 
-void fn_800B0448(void) {
+// The sound session exit's step between the ARAM heap and the voices; empty in this build.
+void AudDma_ExitSession(void) {
 }
 
-// DMA nLen bytes from main memory to ARAM; pfnDone is called when it is done.
-int fn_800B044C(u32 uAram, void* pSrc, int nLen, void (*pfnDone)(u32 n), int n) {
-    fn_800B051C(pSrc, nLen, 0);
+// DMA nLen bytes at pSrc into ARAM at uAram, the CPU cache written back first; pfnDone(n) is called
+// when it is done (NULL: no call), and n is also the transfer's owner for AudDma_CancelOwner.
+// Returns 1.
+int AudDma_ToAram(u32 uAram, void* pSrc, int nLen, void (*pfnDone)(u32 n), int n) {
+    AudDma_CacheBeforeTransfer(pSrc, nLen, 0);
     GoARAM_QueueTransfer((u32)pSrc, uAram, nLen, 0, 1, pfnDone, n, 3);  // port: the ARQ library takes addresses as u32
-    fn_800B04EC(pSrc, nLen, 0);
+    AudDma_CacheAfterTransfer(pSrc, nLen, 0);
     return 1;
 }
 
-void fn_800B04CC(void* pOwner) {
+// Cancel the queued ARAM transfers whose owner is pOwner (AudDma_ToAram's n).
+void AudDma_CancelOwner(void* pOwner) {
     GoARAM_CancelTransfers((u32)pOwner);  // port: the ARQ library keeps owners as u32
 }
 
 // After a DMA between main memory and ARAM: when the data came into main memory (nDir 1), drop
 // the CPU cache over it so the CPU reads the new bytes.
-void fn_800B04EC(void* p, u32 uLen, int nDir) {
+void AudDma_CacheAfterTransfer(void* p, u32 uLen, int nDir) {
     switch (nDir) {
     case 0:
         break;
@@ -719,7 +726,7 @@ void fn_800B04EC(void* p, u32 uLen, int nDir) {
 
 // Before a DMA: going out (nDir 0), write the cache back so the DMA sees the data; coming in,
 // drop the cache over the destination.
-void fn_800B051C(void* p, u32 uLen, int nDir) {
+void AudDma_CacheBeforeTransfer(void* p, u32 uLen, int nDir) {
     switch (nDir) {
     case 0:
         DCStoreRange(p, uLen);
@@ -730,26 +737,29 @@ void fn_800B051C(void* p, u32 uLen, int nDir) {
     }
 }
 
-// The DMA callback of fn_800B0568.
-void fn_800B055C(u32 n) {
+// AudAram_InitModule's DMA callback: the silent block is filled, its zero buffer can go.
+void AudAram_ZeroBlockDone(u32 n) {
     lbl_80282110 = 1;
 }
 
-// Set up the ARAM heap: a silent block at its start, then the eight blocks of fn_800B06F4.
-u8 fn_800B0568(void) {
+// Aud_InitOnce's step for the sound's ARAM: take ARAM_HEAP_SIZE bytes for its heap, put a silent
+// block of ARAM_ZERO_SIZE bytes at the start (DMA'd from a zeroed buffer; AudAram_ZeroBlockDone),
+// then the eight 0xFE00-byte stream buffers (AudAram_AllocStreamBuffer). Returns 1.
+u8 AudAram_InitModule(void) {
     lbl_802820FC = GoARAM_Alloc(ARAM_HEAP_SIZE);
     lbl_8028210C = fn_800B5BD8(sizeof(ARAMHeap) + 32 * sizeof(ARAMBlock));
     lbl_802820F8 = GoARAM_HeapInit(ARAM_HEAP_SIZE, lbl_802820FC, 32, lbl_8028210C);
     lbl_80282100 = GoARAM_HeapAlloc(lbl_802820F8, ARAM_ZERO_SIZE, 32);
     lbl_80282104 = fn_800951A0(ARAM_ZERO_SIZE, 32, 1);
     Mem_set(lbl_80282104, 0, ARAM_ZERO_SIZE);
-    fn_800B044C(lbl_80282100, lbl_80282104, ARAM_ZERO_SIZE, fn_800B055C, 0);
+    AudDma_ToAram(lbl_80282100, lbl_80282104, ARAM_ZERO_SIZE, AudAram_ZeroBlockDone, 0);
     lbl_80282108 = GoARAM_HeapAlloc(lbl_802820F8, 0x7F000, 32);
     return 1;
 }
 
-// Free the DMA buffer once the DMA is done.
-u8 fn_800B0624(void) {
+// Ses_Init's step for the ARAM heap: free the silent block's zero buffer if its DMA is done.
+// Returns 1.
+u8 AudAram_InitSession(void) {
     if (lbl_80282110) {
         lbl_80282110 = 0;
         fn_8009527C(lbl_80282104);
@@ -757,24 +767,28 @@ u8 fn_800B0624(void) {
     return 1;
 }
 
-void fn_800B0660(void) {
+// The sound session exit's step for the ARAM heap: the same as AudAram_InitSession.
+void AudAram_ExitSession(void) {
     if (lbl_80282110) {
         lbl_80282110 = 0;
         fn_8009527C(lbl_80282104);
     }
 }
 
-// Allocate ARAM, 32-byte aligned; returns the address.
-u32 fn_800B0698(u32 uSize) {
+// Take uSize bytes (rounded up to 32) from the sound's ARAM heap, 32-byte aligned; returns the ARAM
+// address.
+u32 AudAram_Alloc(u32 uSize) {
     return GoARAM_HeapAlloc(lbl_802820F8, (uSize + 31) & ~31, 32);
 }
 
-void fn_800B06CC(u32 uAddr) {
+// Give an AudAram_Alloc block back.
+void AudAram_Free(u32 uAddr) {
     GoARAM_HeapFree(lbl_802820F8, uAddr);
 }
 
-// Take the first free 0xFE00-byte ARAM block; returns its address.
-u32 fn_800B06F4(void) {
+// Take the first free one of the eight 0xFE00-byte stream buffers (Voc_Alloc, for a streamed
+// voice); returns its ARAM address.
+u32 AudAram_AllocStreamBuffer(void) {
     u32 uAddr;
     u32 uBit = 1;
     for (uAddr = lbl_80282108; uAddr < lbl_80282108 + 0x7F000; uAddr += 0xFE00) {
@@ -793,7 +807,8 @@ u32 fn_800B06F4(void) {
 // fake match: a per-function pragma (not EA's build setting): without propagation the shift keeps
 // its own register and the flags load is numbered after the divide, as in EA's code (Gemini).
 #pragma opt_propagation off
-void fn_800B0748(u32 uAddr) {
+// Give a stream buffer (AudAram_AllocStreamBuffer) back.
+void AudAram_FreeStreamBuffer(u32 uAddr) {
     u32 mask;
     u32 uBit = 1;
     uAddr -= lbl_80282108;
@@ -803,27 +818,31 @@ void fn_800B0748(u32 uAddr) {
 }
 #pragma opt_propagation reset
 
-int fn_800B0790(void) {
+// The ARAM address of the movie sound's buffers, a fixed 0x4400 (not from the heap): Mov_Init puts
+// the left channel there and the right after it.
+int AudAram_GetMovieBuffer(void) {
     return 0x4400;
 }
 
-u8 fn_800B0798(void) {
+// Aud_InitOnce's step next to the built-in sounds' code: nothing to set up in this build; returns 1
+// (BootSound_CopyToAram copies the sounds once every step has succeeded).
+u8 BootSound_InitModule(void) {
     return 1;
 }
 
 // Copy the two built-in sounds to ARAM and point their headers there.
-void fn_800B07A0(void) {
+void BootSound_CopyToAram(void) {
     u16 i;
     for (i = 0; i < 2; i++) {
-        lbl_8018FE98[i].uAram = fn_800B0698(lbl_8018FE98[i].uSize);
+        lbl_8018FE98[i].uAram = AudAram_Alloc(lbl_8018FE98[i].uSize);
         lbl_8018FE98[i].hdr.u0 += lbl_8018FE98[i].uAram * 2;
         lbl_8018FE98[i].hdr.u4 += lbl_8018FE98[i].uAram * 2;
-        fn_800B044C(lbl_8018FE98[i].uAram, lbl_8018FE98[i].pData, lbl_8018FE98[i].uSize, NULL, 0);
+        AudDma_ToAram(lbl_8018FE98[i].uAram, lbl_8018FE98[i].pData, lbl_8018FE98[i].uSize, NULL, 0);
     }
 }
 
 // Play built-in sound nSound on the next voice in turn, at full volume with reverb.
-void fn_800B0858(u8 nSound) {
+void BootSound_Play(u8 nSound) {
     VoiceEnvelope env;
     env.nAttack = 0x400;
     env.nSustain = 0xF;
@@ -840,11 +859,17 @@ void fn_800B0858(u8 nSound) {
     }
 }
 
-void fn_800B0954(void) {
+// Start-up UI command 19's work: skip the boot-time load (BootCard_LoadAtBoot then only sends hint
+// 0x86) until the next card check (BootCard_ReadStatus) sets lbl_802814A0 again.
+void BootCard_SkipLoad(void) {
     lbl_802814A0 = 0;
 }
 
-void fn_800B0960(void) {
+// Start-up UI command 6's work, the boot-time load: when BootCard_SkipLoad has cleared
+// lbl_802814A0, only send hint 0x86 (the one MC_LoadOptionsFromFirstCardFound sends when it finds
+// no save); else load the options from the first card with a good save, then the last user
+// (MC_LoadInitialUser; its answer goes to lbl_80282120, which nothing reads).
+void BootCard_LoadAtBoot(void) {
     MsgArg arg;
     if (!lbl_802814A0) {
         Mem_set(&arg, 0, sizeof(arg));
@@ -857,12 +882,13 @@ void fn_800B0960(void) {
     MC_Disconnect();
 }
 
-// The status of the card in nPort, nSlot for the status table (Startup_UpdateCardStatuses): 0 no
-// card, 7 not a memory card, 6 a sector size other than 0x2000, 8 an I/O error, 9 broken, 1 not usable (flag
-// 0x08 clear, or an encoding error), 10 when fn_8009EE28 fails with -18, 3 when the card has the
-// blocks and directory entries the save needs (save kinds 0 and 3, fn_8009D3DC + fn_8009D50C),
-// and 2 when it has not.
-s32 fn_800B09C8(int nPort, int nSlot) {
+// The status of the card in nPort, nSlot for the status table (lbl_80282150): 0 no card, 7 not a
+// memory card, 6 a sector size other than 0x2000, 8 an I/O error, 9 broken, 1 unformatted or with
+// an encoding error, 10 its save file is damaged (fn_8009EE28 answers MC_ERR_BADDATA), 3 when it
+// has the free blocks and directory entries a save needs (the game's save and the EA Sports Bio:
+// save kinds 0 and 3, and the new files fn_8009D3DC and fn_8009D50C count), else 2. Also sets
+// lbl_802814A0 (the boot-time load goes ahead).
+s32 BootCard_ReadStatus(int nPort, int nSlot) {
     MCCardState card;
     CardPos pos;
     s32 nStatus = 0;
@@ -907,10 +933,14 @@ s32 fn_800B09C8(int nPort, int nSlot) {
     return nStatus;
 }
 
-// Build the memory-card status table from scratch (every card marked not yet reported) and send
-// the message for the first status that has one (0x8C for both 10 and 11); message 0x80 when a
-// status is 3 or out of range first, 0x81 when no status sends one.
-void fn_800B0B1C(void) {
+// Start-up UI command 1's work: check both cards from scratch, every status marked not yet reported
+// (the multitap test gives a port one slot either way), and send the front end the hint for the
+// first card that needs one, keeping its port and slot in lbl_8028149C and lbl_80281498: status 1
+// hint 0x83, 2 0x82, 6 0x87, 7 0x88, 8 0x89, 9 0x8A, 10 and 11 0x8C. Status 0 is passed over (its
+// 0x8B case, for port 1 when port 0's status is not 0, is never reached: the search gets to port 1
+// only when port 0's status is 0). Any other status (3: a card ready for the save) ends the search
+// with hint 0x80; when no card stops it, hint 0x81, and the port and slot go back to -1.
+void BootCard_CheckAll(void) {
     int i;
     int j;
     int n;
@@ -929,7 +959,7 @@ void fn_800B0B1C(void) {
             lbl_80282150[i][j] = 0;
         }
         for (j = 0; j < n; j++) {
-            lbl_80282150[i][j] = fn_800B09C8(i, j);
+            lbl_80282150[i][j] = BootCard_ReadStatus(i, j);
             lbl_80282148[i][j] = lbl_80282150[i][j];
         }
     }
@@ -950,7 +980,7 @@ void fn_800B0B1C(void) {
             case 1:
                 lbl_80281498 = j;
                 lbl_8028149C = i;
-                fn_800B0F0C();
+                BootCard_HintUnformatted();
                 MC_Disconnect();
                 return;
             case 10:
@@ -962,31 +992,31 @@ void fn_800B0B1C(void) {
             case 6:
                 lbl_80281498 = j;
                 lbl_8028149C = i;
-                fn_800B0DB8();
+                BootCard_HintWrongSectorSize();
                 MC_Disconnect();
                 return;
             case 7:
                 lbl_80281498 = j;
                 lbl_8028149C = i;
-                fn_800B0DFC();
+                BootCard_HintNotMemoryCard();
                 MC_Disconnect();
                 return;
             case 8:
                 lbl_80281498 = j;
                 lbl_8028149C = i;
-                fn_800B0E40();
+                BootCard_HintIoError();
                 MC_Disconnect();
                 return;
             case 9:
                 lbl_80281498 = j;
                 lbl_8028149C = i;
-                fn_800B0E84();
+                BootCard_HintBroken();
                 MC_Disconnect();
                 return;
             case 11:
                 lbl_80281498 = j;
                 lbl_8028149C = i;
-                fn_800B0EC8();
+                BootCard_HintStatus11();
                 MC_Disconnect();
                 return;
             case 2:
@@ -1020,43 +1050,50 @@ done:
 
 // The messages below have no values: their one value is cleared and not counted.
 
-void fn_800B0DB8(void) {
+// Hint 0x87 to the front end: the card's sector size is not 0x2000 (status 6).
+void BootCard_HintWrongSectorSize(void) {
     MsgArg arg;
     Mem_set(&arg, 0, sizeof(arg));
     UISDoHint(gpFrontEnd->pHandler, 0x87, 0, (s32*)&arg);
 }
 
-void fn_800B0DFC(void) {
+// Hint 0x88 to the front end: the device in the slot is not a memory card (status 7).
+void BootCard_HintNotMemoryCard(void) {
     MsgArg arg;
     Mem_set(&arg, 0, sizeof(arg));
     UISDoHint(gpFrontEnd->pHandler, 0x88, 0, (s32*)&arg);
 }
 
-void fn_800B0E40(void) {
+// Hint 0x89 to the front end: the card has an I/O error (status 8).
+void BootCard_HintIoError(void) {
     MsgArg arg;
     Mem_set(&arg, 0, sizeof(arg));
     UISDoHint(gpFrontEnd->pHandler, 0x89, 0, (s32*)&arg);
 }
 
-void fn_800B0E84(void) {
+// Hint 0x8A to the front end: the card is broken (status 9).
+void BootCard_HintBroken(void) {
     MsgArg arg;
     Mem_set(&arg, 0, sizeof(arg));
     UISDoHint(gpFrontEnd->pHandler, 0x8A, 0, (s32*)&arg);
 }
 
-void fn_800B0EC8(void) {
+// Hint 0x8C to the front end for status 11, the hint status 10 (a damaged save) also sends.
+// BootCard_ReadStatus never answers 11, so nothing reaches this in this build.
+void BootCard_HintStatus11(void) {
     MsgArg arg;
     Mem_set(&arg, 0, sizeof(arg));
     UISDoHint(gpFrontEnd->pHandler, 0x8C, 0, (s32*)&arg);
 }
 
-void fn_800B0F0C(void) {
+// Hint 0x83 to the front end: the card is unformatted or has an encoding error (status 1).
+void BootCard_HintUnformatted(void) {
     MsgArg arg;
     Mem_set(&arg, 0, sizeof(arg));
     UISDoHint(gpFrontEnd->pHandler, 0x83, 0, (s32*)&arg);
 }
 
-// The start-up card check's message 0x81 to the front end: no card in either slot (fn_800B0B1C
+// The start-up card check's message 0x81 to the front end: no card in either slot (BootCard_CheckAll
 // sends it when every card status is 0).
 void Startup_SendNoCardsMsg(void) {
     MsgArg arg;
@@ -1065,7 +1102,7 @@ void Startup_SendNoCardsMsg(void) {
 }
 
 // The start-up card check's message 0x8B to the front end, meant for port 1 (slot B) empty while
-// port 0 has a card. Never sent: fn_800B0B1C tests for it only after port 0's status was found to
+// port 0 has a card. Never sent: BootCard_CheckAll tests for it only after port 0's status was found to
 // be 0 (every other status of port 0 returns or leaves the loops first).
 void Startup_SendSlotBEmptyMsg(void) {
     MsgArg arg;
@@ -1074,8 +1111,8 @@ void Startup_SendSlotBEmptyMsg(void) {
 }
 
 // The start-up card check's message 0x80 to the front end: a card is ready for the save
-// (fn_800B0B1C: status 3, formatted with room for the game's save and the EA Sports Bio; also 4, 5
-// or out of range, which fn_800B09C8 never gives).
+// (BootCard_CheckAll: status 3, formatted with room for the game's save and the EA Sports Bio; also 4, 5
+// or out of range, which BootCard_ReadStatus never gives).
 void Startup_SendCardReadyMsg(void) {
     MsgArg arg;
     Mem_set(&arg, 0, sizeof(arg));
@@ -1091,7 +1128,7 @@ void Startup_SendCardFullMsg(void) {
 }
 
 // The start-up card check's message 0x8C to the front end: the card's save file is damaged (status
-// 10: neither the save file nor its backup is a good save, MC_ERR_BADDATA). fn_800B0EC8 sends the
+// 10: neither the save file nor its backup is a good save, MC_ERR_BADDATA). BootCard_HintStatus11 sends the
 // same message for status 11.
 void Startup_SendSaveDamagedMsg(void) {
     MsgArg arg;
@@ -1099,7 +1136,7 @@ void Startup_SendSaveDamagedMsg(void) {
     UISDoHint(gpFrontEnd->pHandler, 0x8C, 0, (s32*)&arg);
 }
 
-// Re-read every card's status (fn_800B09C8) into the status table; a status that changed is marked
+// Re-read every card's status (BootCard_ReadStatus) into the status table; a status that changed is marked
 // not yet reported, and a port whose slot count changed has its entries cleared first. Here and in
 // Startup_AreAllSlotsEmpty and Startup_FindNextCardWithStatus EA tests for a multitap
 // (MC_IsMultitapPluggedIn) but gives the port one slot either way.
@@ -1120,7 +1157,7 @@ void Startup_UpdateCardStatuses(void) {
             lbl_80282140[i][0] = 0;
         }
         for (j = 0; j < n; j++) {
-            lbl_80282150[i][j] = fn_800B09C8(i, j);
+            lbl_80282150[i][j] = BootCard_ReadStatus(i, j);
             if (lbl_80282148[i][j] != lbl_80282150[i][j]) {
                 lbl_80282148[i][j] = lbl_80282150[i][j];
                 lbl_80282140[i][j] = 0;
@@ -1169,7 +1206,7 @@ s32 Startup_GetCurrentCardStatus(s32* pnPort, s32* pnSlot) {
 
 // Re-read the statuses, then report the first card not yet reported: mark it reported, note it as
 // the card the reports reached, answer its port and slot (the slot from 0; from 1 only on a port
-// with more than one slot, which never happens here) and return its status (fn_800B09C8's numbers).
+// with more than one slot, which never happens here) and return its status (BootCard_ReadStatus's numbers).
 // 4 when every card has been reported (the reports start again from the top), 5 when every status
 // is 0. Start-up command 8.
 s32 Startup_GetNextCardStatus(s32* pnPort, s32* pnSlot) {
@@ -1300,7 +1337,7 @@ void Startup_LoadLegalPicture(UStreamObject* pObject) {
     StaticMem_Free(pObject);
 }
 
-// Build the card status table from scratch (as fn_800B0B1C does, without its messages), then look
+// Build the card status table from scratch (as BootCard_CheckAll does, without its messages), then look
 // for a card with status 3 (formatted, room for the saves) or out of range. Found: load the options
 // from the first card with a good save (MC_LoadOptionsFromFirstCardFound) and note in DiscCheck.c
 // (fn_80110458) whether that worked, 1 or 0. Each card passed on the way notes 0 first. Not found:
@@ -1324,7 +1361,7 @@ void Startup_LoadOptionsFromCard(void) {
             lbl_80282150[i][j] = 0;
         }
         for (j = 0; j < n; j++) {
-            lbl_80282150[i][j] = fn_800B09C8(i, j);
+            lbl_80282150[i][j] = BootCard_ReadStatus(i, j);
             lbl_80282148[i][j] = lbl_80282150[i][j];
         }
     }
@@ -1601,10 +1638,10 @@ void GM_vStartupGetBlocksNeeded(MsgArg* pArgs, MsgArg* pResult) {
     MC_Disconnect();
 }
 
-// Command 1: the start-up card check (fn_800B0B1C): build the card status table and send the
+// Command 1: the start-up card check (BootCard_CheckAll): build the card status table and send the
 // start-up UI the message for the first card that needs one.
 void GM_vStartupCheckCards(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800B0B1C();
+    BootCard_CheckAll();
 }
 
 // Command 2: start the card search (Startup_FindFirstCardWithStatus). The port and slot found go to
@@ -1623,17 +1660,17 @@ void GM_vStartupFadeToBlack(MsgArg* pArgs, MsgArg* pResult) {
     gUIState.bFadeToBlack = 1;
 }
 
-// Command 6 (fn_800B0960): load the options from the first card with a good save, then the last
+// Command 6 (BootCard_LoadAtBoot): load the options from the first card with a good save, then the last
 // user (MC_LoadInitialUser). When no card status has been read since command 19, it only sends the
 // start-up UI message 0x86 (no save found).
 void GM_vStartupLoadFromCard(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800B0960();
+    BootCard_LoadAtBoot();
 }
 
-// Command 19 (fn_800B0954): make command 6 skip the card and only report no save found (message
+// Command 19 (BootCard_SkipLoad): make command 6 skip the card and only report no save found (message
 // 0x86), until a card's status is read again.
 void GM_vStartupSkipCardLoad(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800B0954();
+    BootCard_SkipLoad();
 }
 
 // Command 7: format the card at port pArgs[0], slot pArgs[1] (Startup_FormatCard; the result goes

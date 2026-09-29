@@ -165,40 +165,40 @@ typedef struct MovieSoundBlock {
 // ---- the ARAM heap ----------------------------------------------------------------------------
 
 #define ARAM_HEAP_SIZE 0x3FC000
-#define ARAM_ZERO_SIZE 0x400            // the silent block at the start of the heap (fn_800B0568)
+#define ARAM_ZERO_SIZE 0x400            // the silent block at the start of the heap (AudAram_InitModule)
 
 // DMA nLen bytes from main memory to ARAM; pfnDone(n) is called when it is done. Returns 1.
-int fn_800B044C(u32 uAram, void* pSrc, int nLen, void (*pfnDone)(u32 n), int n);
+int AudDma_ToAram(u32 uAram, void* pSrc, int nLen, void (*pfnDone)(u32 n), int n);
 // Hand a streamed block's ADPCM header to voice nVoice (only for the buffer's first half).
 void HwVoice_SetStreamDecoder(u16 nVoice, StreamChunk* pChunk, u32 uSize, int nBuffer);
 // Cancel the ARAM transfers queued for pOwner.
-void fn_800B04CC(void* pOwner);
+void AudDma_CancelOwner(void* pOwner);
 // The CPU cache work around a DMA of uLen bytes at p (nDir as ARQRequest.type); GoARAM.c uses them too.
-void fn_800B04EC(void* p, u32 uLen, int nDir);
-void fn_800B051C(void* p, u32 uLen, int nDir);
+void AudDma_CacheAfterTransfer(void* p, u32 uLen, int nDir);
+void AudDma_CacheBeforeTransfer(void* p, u32 uLen, int nDir);
 
 // startUp.c, called by the sound engine (hlaudmovie.c).
 u8   HwVoice_InitSession(void);
 void HwVoice_ExitSession(void);
 u32  HwVoice_GetPlayPos(u16 nVoice);                   // where the voice is playing in ARAM
 void HwVoice_SetMovieDecoder(u16 nVoice, MovieSoundBlock* pBlock, int nChannel, int nMode);
-u8   fn_800B0440(void);
-void fn_800B0448(void);
-u8   fn_800B0624(void);
-void fn_800B0660(void);
-u32  fn_800B0698(u32 uSize);                    // take an ARAM block
-void fn_800B06CC(u32 uAddr);                    // give it back
-int  fn_800B0790(void);
+u8   AudDma_InitSession(void);
+void AudDma_ExitSession(void);
+u8   AudAram_InitSession(void);
+void AudAram_ExitSession(void);
+u32  AudAram_Alloc(u32 uSize);                    // take an ARAM block
+void AudAram_Free(u32 uAddr);                    // give it back
+int  AudAram_GetMovieBuffer(void);
 
 // ---- the built-in sounds ----------------------------------------------------------------------
 
-// One of the two sounds in startUp.c's own data, copied to ARAM at boot (fn_800B07A0).
+// One of the two sounds in startUp.c's own data, copied to ARAM at boot (BootSound_CopyToAram).
 typedef struct BootSound {
     void*       pData;          // 0x00  in main memory
     u32         uSize;          // 0x04
-    u32         uAram;          // 0x08  where fn_800B07A0 put it
+    u32         uAram;          // 0x08  where BootSound_CopyToAram put it
     u32         uC;             // 0x0C  -> Voice.u40
-    SoundHeader hdr;            // 0x10  u0 and u4 count from uAram until fn_800B07A0 rebases them
+    SoundHeader hdr;            // 0x10  u0 and u4 count from uAram until BootSound_CopyToAram rebases them
 } BootSound;
 LAYOUT_ASSERT(BootSound, 0x48);
 
@@ -209,7 +209,7 @@ extern u8    lbl_8018F640[0x858];   // } DOL's own data (split before startUp.c'
 
 // A card port and slot (core/memcard.h), as the save-kind functions (MC_CallActionFnMemoryRequired)
 // take them.
-// 12 bytes: the size fn_800B09C8's stack frame proves; the last word is never read there.
+// 12 bytes: the size BootCard_ReadStatus's stack frame proves; the last word is never read there.
 typedef struct CardPos {
     s32  nPort;                 // 0x0
     s32  nSlot;                 // 0x4
@@ -226,6 +226,6 @@ extern u32   lbl_8028212C;              // its size
 // ---- the hardware voices, as the sound engine (hlaudvoice.c) uses them -----------------------------
 
 void HwVoice_Pause(u16 nVoice, u8 bPause);
-void fn_800B0748(u32 uAddr);            // give an ARAM buffer back
+void AudAram_FreeStreamBuffer(u32 uAddr);            // give an ARAM buffer back
 
 #endif

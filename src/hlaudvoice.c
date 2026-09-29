@@ -16,7 +16,7 @@ void HwVoice_SetReverb(u16 nVoice, u8 bA, u8 bB);             // startUp.c
 u8   HwVoice_IsFree(u16 nVoice);                           // startUp.c
 void HwVoice_OnVoiceFreed(void);                                 // startUp.c
 s16  HwVoice_GetVolume(u16 nVoice);                           // startUp.c
-u32  fn_800B06F4(void);                                 // startUp.c
+u32  AudAram_AllocStreamBuffer(void);                                 // startUp.c
 
 void fn_800AC330(void);
 u8   fn_800AC6B0(AudVoiceRequest* pRequest, s16* pPriority);
@@ -133,9 +133,9 @@ AudVoice* Voc_Alloc(AudVoiceRequest* pRequest) {
         }
         if (pRequest->flags.b.b12) {
             if (pVoice->uAram != 0) {
-                fn_800B0748(pVoice->uAram);
+                AudAram_FreeStreamBuffer(pVoice->uAram);
             }
-            pVoice->uAram = fn_800B06F4();
+            pVoice->uAram = AudAram_AllocStreamBuffer();
             if (pVoice->uAram == 0) {
                 Voc_Delete(pVoice);
                 return NULL;
@@ -277,7 +277,7 @@ void Voc_Delete(AudVoice* pVoice) {
     if (pVoice->flags.b.bA_4) {
         Voc_Pause(pVoice, 1);
         if (pVoice->uAram != 0) {
-            fn_800B0748(pVoice->uAram);
+            AudAram_FreeStreamBuffer(pVoice->uAram);
             pVoice->uAram = 0;
             pVoice->uPlayPos = 0;
         }
@@ -305,7 +305,7 @@ void Voc_Cycle(void) {
                     if (pVoice->flags.b.bA_4) {
                         pVoice->flags.b.bHalf = 0;
                         if (pVoice->uAram != 0) {
-                            fn_800B0748(pVoice->uAram);
+                            AudAram_FreeStreamBuffer(pVoice->uAram);
                             pVoice->uAram = 0;
                             pVoice->uPlayPos = 0;
                         }
