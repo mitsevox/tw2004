@@ -338,7 +338,7 @@ u8   fn_8000BD80(char* pName, u8** ppPixels);   // a texture's pixels by name; 0
 // Find a texture by name: its bank's index, or -1 (bank and entry NULL).
 int  fn_8000BDF8(char* pName, TexBank** ppBank, TexEntry** ppTex);
 
-// What LoadData.c keeps of the 'load' stream object (fe_movies.c shows it): its data is copied
+// What LoadData.c keeps of the 'load' stream object (uiProcessPolygon.c shows it): its data is copied
 // into the buffer at lbl_80281C04.
 typedef struct LoadObjInfo {
     u8   unk0[0x1C];

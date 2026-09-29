@@ -420,19 +420,17 @@ round) answer. The menu screens themselves run on the [EA UI Studio library](#ea
 | uiLoadFile.c | EA | loads the menu UI's files |
 | uiProcessInterface.c | EA | runs the UI: controllers, commands, fades, number formatting |
 | Code80090940.c | ph | pictures of the movie entries in the UI file table |
-| fe_movies.c | T6 (a guess from the filemap) | the front end's movies, loading-screen tiles, quads |
+| uiProcessPolygon.c | T7 | the UI's polygon element, the loading screen and its progress bar, the start-up movies |
 | uiText.c | ours | a UI text element |
 | uiTransform.c | EA | the UI's transform stack |
-| uiobject.c | T6 | 3D objects the in-round UI draws: the power boost and spin display |
-| Trax.c | ours | the EA Trax music display (song names sliding in) |
+| uiObject.c | T7 | 3D objects the in-round UI draws: the power boost and spin display |
+| uiEATrax.c | T03/T7 | the EA Trax music display (song names sliding in) |
 | Code800B90F4.c | ph | MAD picture frame lists (for rcmp_mad_codec.c); the ball models and logo on the Create-A-Player golfer (`'TEO '`, `'BALF'`) |
 | uiArc.c | ours | a UI arc or circle element |
 | FE_CrAPDB.c | EA | the Create-A-Player database (`'CR_A'`, `'CR_S'`) |
 | FE_CrAPMessages.c | ours | the Create-A-Player screens' message handlers |
 | FE_PGATourMessages.c | EA | the PGA TOUR menus: leaderboard, schedule, wrap-up, wins |
-| FE_LogoDesign.c | EA | the logo editor |
-| LogoTexture.c | ours | FE_LogoDesign.c's tail: logo to texture layout and back |
-| unsorted/sweep_8010FF5C.c | ph | a logo copy into FE_LogoDesign.c's buffer |
+| FE_LogoDesign.c | EA | the logo editor, and a logo laid out as a texture |
 
 ### EA UI Studio library
 
@@ -459,13 +457,13 @@ The movie player (intro, credits, golfer bios) and EA's MAD picture and movie fo
 | LLPictInt.c | EA | decodes a `"MADk"` picture file |
 | rcmp_mad_codec.c | EA | the MAD decoder: block decoder, inverse DCT, frames |
 
-Also: `hlaudmovie.c` (a movie's sound), `fe_movies.c`, `Code800B90F4.c` (frame lists).
+Also: `hlaudmovie.c` (a movie's sound), `uiProcessPolygon.c`, `Code800B90F4.c` (frame lists).
 
 ### Audio
 
 EA's sound engine: a table of playing sounds, emitters placed in the world, tracks that are
 either sequenced or streamed from disc, voices on the GameCube's hardware, and the game's side
-that drives it all. The block sits at 0x800A3E3C-0x800AF324 (uiobject.c among it), with the
+that drives it all. The block sits at 0x800A3E3C-0x800AF324 (uiObject.c among it), with the
 boot-time voice code in `startUp.c` right after and AudLock.c / UAudMemStack.c a little later. Headers: `include/core/gameaudio.h`, `audtrack.h`, `audcontainers.h`, `startup.h`.
 
 | File | Name | What it is |

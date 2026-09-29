@@ -195,7 +195,7 @@ f32 gSwingXScale[8] = {0.03f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f};
 f32 gBackswingTime[8] = {0.0f, 0.85f, 0.5f, 0.8f, 0.0f, 0.0f, 0.0f, 0.0f};
 
 // 0x8018830C  the power boost display's colour per level (RGB; the fourth value is not read):
-// grey for levels 1..3, then redder, plain (half-bright) red from level 6 (uiobject.c
+// grey for levels 1..3, then redder, plain (half-bright) red from level 6 (uiObject.c
 // UI_Obj_RenderBoostUI)
 f32 gBoostLevelColours[8][4] = {
     {0.5f, 0.5f, 0.5f, 0.5f},

@@ -2264,8 +2264,8 @@ void GM_vFEMessage77_Empty(MsgArg* pArgs, MsgArg* pResult) {
 // five save profiles, loaded or not, or by a cheat code in lbl_80281DF4) or is a created golfer
 // (FIRST_CREATED_GOLFER on), 0 when it is locked, -1 when its gGolferTable record's bAvailable is
 // -1 (not in the game); always 1 while GM_vSetAllGolfersPickable's flag (gpFEProfile->bAllGolfersPickable) is
-// set. pArgs[0] is not read. It also sets fe_movies.c's gFELockedGolferShade to 0 (answer not 0) or 0.2
-// (locked); no code reads that value. For a created golfer (30..33) the unlock tests read past
+// set. pArgs[0] is not read. It also sets uiProcessPolygon.c's gFELockedGolferShade to 0 (answer
+// not 0) or 0.2 (locked); no code reads that value. For a created golfer (30..33) the unlock tests read past
 // aGolferUnlocked[30]; the answer is already 1 then.
 void GM_vIsGolferUnlocked(MsgArg* pArgs, MsgArg* pResult) {
     int i;
@@ -5055,7 +5055,7 @@ void GM_vSetEATraxTrack(MsgArg* pArgs, MsgArg* pResult) {
 
 // Front-end message 311: whether EA Trax track pArgs[1] is on in music row pArgs[0]
 // (gSession.options.abTrackOn), and the track's two lines of text: the strings pArgs[2] and
-// pArgs[3] are pointed at its sz0 and its song name (Trax.c's gEATraxSongs).
+// pArgs[3] are pointed at its sz0 and its song name (uiEATrax.c's gEATraxSongs).
 void GM_vGetEATraxTrack(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gSession.options.abTrackOn[pArgs[0].i][pArgs[1].i];
     ((MsgString*)pArgs[2].p)->pStr = gEATraxSongs[pArgs[1].i].sz0;

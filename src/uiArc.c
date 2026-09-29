@@ -1,6 +1,6 @@
 // uiArc.c (our name; no TW06 or TW07 file has this code): the menu UI's arc element (UIArc, the UI
 // studio's plugin 8: UIArc_ProcessMessage): an arc, ring, pie or circle drawn as nSegments quads
-// from fStart to fEnd degrees, textured like fe_movies.c's polygons and shaded from one colour to
+// from fStart to fEnd degrees, textured like uiProcessPolygon.c's polygons and shaded from one colour to
 // another (UIArc_Draw). It links far from the other UI runtime files, among the front end's
 // FE_CrAPDB.c neighbours.
 
@@ -12,7 +12,7 @@
 #include "unsorted/cull.h"
 #include "camera.h"
 
-// fe_movies.c
+// uiProcessPolygon.c
 // port: declared as EA calls them: they take only (nTable, nEntry) and ignore the other three.
 void UI_LoadEntryPicture(s16 n2, s16 n0, s16 n8, s32 a, s32 b);
 void UI_ReleaseEntryPicture(s16 n2, s16 n0, s16 n8, s32 a, s32 b);
@@ -22,7 +22,7 @@ f32  UI_GetDrawDepth(void);
 f32* UITransform_GetViewParams(void);   // uiTransform.c
 void fn_800760D8(LLPict* pPict);        // LLVideo.c
 
-// The UI studio's colour add and multiply as of the last UIArc_Draw (like fe_movies.c's
+// The UI studio's colour add and multiply as of the last UIArc_Draw (like uiProcessPolygon.c's
 // gpUIPolyColourAdd, gpUIPolyColourMul); nothing reads them.
 // .sbss: defined in reverse address order (CodeWarrior lays it out last-defined-first).
 f32* gpUIArcColourAdd;

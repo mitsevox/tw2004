@@ -2,7 +2,7 @@
 // TW07's file lists, whose UI runs on Apt): the UI's transform stack (gpUITransformStack), which
 // the UI Studio library drives through its transform callback (UITransform_HandleOp). Pushing a UI
 // element multiplies its move, rotation and scale into a copy of the current level; the current
-// level is also kept in gUICurTransform for the UI's own drawing (fe_movies.c, uiText.c, uiArc.c).
+// level is also kept in gUICurTransform for the UI's own drawing (uiProcessPolygon.c, uiText.c, uiArc.c).
 
 #include "golfer.h"
 #include "game/frontend.h"
@@ -157,7 +157,7 @@ f32* UITransform_GetViewParams(void) {
 }
 
 // A copy of the transform stack's current level (gUICurTransform), which the UI's own drawing uses
-// (fe_movies.c, uiText.c, uiArc.c).
+// (uiProcessPolygon.c, uiText.c, uiArc.c).
 UITransform* UITransform_GetCurrent(void) {
     return &gUICurTransform;
 }

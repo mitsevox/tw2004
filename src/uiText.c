@@ -4,7 +4,7 @@
 // aligned and optionally shadowed (UIText_Draw); and the font settings it sets for that (the
 // shadow, the align point, the angle, drawing at once or queued). Its extent is its data: it is
 // the only user of the .data 0x80189C38-0x80189CA0, .sbss 0x80281F30-0x80281F38 and .sdata2
-// 0x80283BF0-0x80283C20 blocks, between fe_movies.c's and uiTransform.c's.
+// 0x80283BF0-0x80283C20 blocks, between uiProcessPolygon.c's and uiTransform.c's.
 
 #include "unsorted/cull.h"
 #include "game/frontend.h"

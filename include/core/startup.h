@@ -219,7 +219,7 @@ LAYOUT_ASSERT(CardPos, 0xC);
 
 // ---- the 'LEGL' pictures fn_800B166C keeps ----------------------------------------------------
 
-extern void* lbl_80282134;              // the first one's copy (fe_movies.c UI_PlayStartUpMovies shows and
+extern void* lbl_80282134;              // the first one's copy (uiProcessPolygon.c UI_PlayStartUpMovies shows and
                                         // frees it)
 extern u32   lbl_8028212C;              // its size
 

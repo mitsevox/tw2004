@@ -1,7 +1,7 @@
 #ifndef UIOBJECT_H
 #define UIOBJECT_H
 
-// uiobject.h (our name): uiobject.c's state, the 3D objects the in-game UI draws. Only what the
+// uiobject.h (our name): uiObject.c's state, the 3D objects the in-game UI draws. Only what the
 // code read so far uses.
 
 #include "camera.h"

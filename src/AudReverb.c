@@ -1,6 +1,6 @@
 // AudReverb.c (our name): the sound's aux A effect. fn_800AF224 takes a 128 KB buffer for the
 // effects library's memory, fn_800AF144 switches between a high-quality reverb (two settings)
-// and a delay, and fn_800AF2DC takes the effect off or puts it back. Between uiobject.c and
+// and a delay, and fn_800AF2DC takes the effect off or puts it back. Between uiObject.c and
 // startUp.c.
 
 #include "game_types.h"

@@ -65,10 +65,10 @@ void fn_800A295C();
 void fn_800A298C();
 void fn_80014594(void);
 void fn_800145E0(void);
-void UI_InitLoadingBar(void);     // fe_movies.c: set up the loading screen
-void UI_DrawLoadingScreenAndProgressBar(int nMode);    // fe_movies.c: update the loading screen
-void UI_FreeLoadingPicture(void);     // fe_movies.c
-void UI_LoadLoadingBarTexture(void);     // fe_movies.c
+void UI_InitLoadingBar(void);     // uiProcessPolygon.c: set up the loading screen
+void UI_DrawLoadingScreenAndProgressBar(int nMode);    // uiProcessPolygon.c: update the loading screen
+void UI_FreeLoadingPicture(void);     // uiProcessPolygon.c
+void UI_LoadLoadingBarTexture(void);     // uiProcessPolygon.c
 void fn_8001529C(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
 void fn_8001462C(void);
 void fn_8000B9E4();

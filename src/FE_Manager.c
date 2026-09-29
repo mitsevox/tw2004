@@ -98,7 +98,7 @@ static f32 FE_Manager_StrippedFn(f32 x) {
 
 // Sets the front end's state up once, at start-up (gomainloop fn_8006C720): no player slot loaded
 // or CPU, no backup rows (aBackup -1), no profile backups (p658), no movie queued, the menus' start
-// mode (nMode) -1; b0F, b10 and b18 set, b11 and n1C cleared. Then the points fe_movies.c draws at
+// mode (nMode) -1; b0F, b10 and b18 set, b11 and n1C cleared. Then the points uiProcessPolygon.c draws at
 // (UI_InitLoadingBarTilePos) and gUILoadingScreen's picture.
 void FE_vOpenONCE(void) {
     int i;
@@ -181,7 +181,7 @@ void FE_MakeMoviePathWithSubDir(char* pName, char* pDir, char* pPath) {
     sprintf(pPath, "data/movies/%s/%s.%s", pDir, pName, "NGC");
 }
 
-// A cameo movie's path: "data/movies/cameos/<name>.NGC" (fe_movies.c).
+// A cameo movie's path: "data/movies/cameos/<name>.NGC" (uiProcessPolygon.c).
 void FE_MakeCameoMoviePath(char* pName, char* pPath) {
     FE_MakeMoviePathWithSubDir(pName, "cameos", pPath);
 }

@@ -1,4 +1,4 @@
-// uiobject.c (EA's uiObject.c, golf/ui core/istudio runtime in TW06 and TW07): the 3D objects the
+// uiObject.c (EA's uiObject.c, golf/ui core/istudio runtime in TW06 and TW07): the 3D objects the
 // in-round UI draws for Swing.c: the power-boost display (a quad grown by the boost level and a
 // ring per level) and the spin display (a model tilted and rolled by the spin asked for), drawn by
 // UI_Obj_RenderBoostUI through a camera of its own. TW07's uiObject.c has UI_Obj_InitModule,

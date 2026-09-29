@@ -1,4 +1,4 @@
-// Code800B90F4.c (our name): two pieces of code that sit between rcmp_mad_codec.c and Trax.c.
+// Code800B90F4.c (our name): two pieces of code that sit between rcmp_mad_codec.c and uiEATrax.c.
 // - 0x800B90F4..0x800B9944, MAD_: the MAD movie decoder's frame handling (MadDecoder, llpict.h):
 //   reading the movie's files, six frames handed out with references, and decoding each file into
 //   one (the block decoder, MAD_decodemacroblock, is in rcmp_mad_codec.c). Its two allocations are

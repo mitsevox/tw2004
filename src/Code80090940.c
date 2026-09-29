@@ -2,11 +2,11 @@
 // named record holding a picture file; uiProcessInterface.c UI_ResolveFileEntries notes the table in
 // gUIState.n3C): decode an entry's picture, mark it to be freed, free it, and free the marked
 // ones or all of them. The polygon and arc elements load and release them with their screens
-// (fe_movies.c UI_LoadEntryPicture, UI_ReleaseEntryPicture).
-// Which file it belongs to is not known: it lies between uiProcessInterface.c and fe_movies.c
+// (uiProcessPolygon.c UI_LoadEntryPicture, UI_ReleaseEntryPicture).
+// Which file it belongs to is not known: it lies between uiProcessInterface.c and uiProcessPolygon.c
 // (EA's uiProcessPolygon.c), has no data or float constants of its own, and TW2003 has the same
 // code in the same place, so no pooled constant or string marks a boundary. Both neighbours use
-// gUIState.n3C (fe_movies.c UI_ShowDemoLoadingScreen) and both call into it.
+// gUIState.n3C (uiProcessPolygon.c UI_ShowDemoLoadingScreen) and both call into it.
 
 #include "game_types.h"
 #include "llpict.h"

@@ -1,4 +1,4 @@
-// Trax.c (our name; EA's uiEATrax.c): the EA Trax music display: the 'TRAX' and 'TRXT' stream
+// uiEATrax.c (EA's name; Trax.c before 2026-09-29): the EA Trax music display: the 'TRAX' and 'TRXT' stream
 // objects (the song list and the EA Trax logo) and, for 240 frames after a song starts, its names
 // in a box that slides in from the left and fades out.
 // Why uiEATrax.c: TW2003's data names "uiEATrax.c" right after "crcmp_mad_codec.c", and this file

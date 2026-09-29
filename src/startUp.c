@@ -2,7 +2,7 @@
 // The sound voices (lbl_802820E8: 50 wrappers around the hardware's voices, run from the mixer
 // callback fn_800AF324), the audio-RAM heap and its DMA, the two built-in sounds, the boot-time
 // memory-card checks and the start-up UI commands (lbl_801F5DA8), and the 'LEGL' stream (two
-// pictures; fe_movies.c shows the first at boot). It also holds a length estimate without a
+// pictures; uiProcessPolygon.c shows the first at boot). It also holds a length estimate without a
 // square root (for AudTable.c) and the ball-against-object test (for Ball.c). The sound code
 // talks to the GameCube's audio libraries; see core/startup.h.
 

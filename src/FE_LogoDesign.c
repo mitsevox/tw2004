@@ -3,10 +3,14 @@
 // save profile. A logo is a 64 x 64 or 128 x 32 grid of colour indexes into a 256-colour palette
 // (the CLUT, copied from the texture "__LogoSquare"); the menus set and read its pixels through
 // FE_CrAPMessages.c, and FE_LogoDesign_UploadCustomLogo copies it into the texture "__LogoSquare"
-// or "__LogoRect" to be drawn. Its last function, the copy between the logo's rows and the texture
-// layout, is kept as the unit LogoTexture.c.
+// or "__LogoRect" to be drawn. Last come the copy between a logo's rows and the texture layout and
+// the logo laid out as a texture for the golfer's clothes (char_tex_manager.c); these were the
+// units LogoTexture.c and unsorted/sweep_8010FF5C.c until 2026-09-29 (their code follows on with
+// no gap, and TW07's FE_LogoDesign.c also ends with pixel helpers).
 
 #include "engine.h"
+#include "gx.h"
+#include "core/startup.h"
 #include "frontend/fe.h"
 
 void FE_LogoDesign_OpenOnce(void);
@@ -219,4 +223,40 @@ int FE_LogoDesign_GetPixelColor(int nX, int nY, u32* pR, u32* pG, u32* pB, u32* 
     int nColor = pLogo[FE_LogoDesign_GetPixelIndex(nX, nY)];
     FE_LogoDesign_GetClutEntry(nColor, pR, pG, pB, pA);
     return nColor;
+}
+
+// Copy a logo between its plain layout (rows of nWidth colour indexes) and the texture layout
+// (tiles of 8 x 4 pixels, 32 bytes each, a row of tiles after another): bToTexture 1 from the
+// logo in pSrc to the texture in pDst, 0 the other way. Then flush pDst for the GPU.
+// One loop with the direction test inside: the compiler unswitches it into the two unrolled copies.
+void FE_LogoDesign_CopyLogoTexturePixels(u8* pDst, u8* pSrc, int bToTexture, int nWidth, int nHeight) {
+    int nTileRow;
+    int i;
+    int nRow;
+    int y;
+    int x;
+    int nPos;
+
+    nTileRow = (nWidth == 64) ? 64 * 4 : 128 * 4;
+    for (y = 0, nRow = 0; y < nHeight; y++, nRow += nWidth) {
+        i = nRow;
+        for (x = 0; x < nWidth; x++) {
+            nPos = (x / 8) * 32 + ((y % 4) * 8 + (y / 4) * nTileRow) + x % 8;
+            if (bToTexture) {
+                pDst[nPos] = pSrc[i];
+            } else {
+                pDst[i] = pSrc[nPos];
+            }
+            i++;
+        }
+    }
+    DCFlushRange(pDst, 64 * 64);
+    GXInvalidateTexAll();
+}
+
+u8 gLogoTexturePixels[64 * 64];
+
+u8* fn_8010FF5C(u8* pLogo, int nWidth, int nHeight) {
+    FE_LogoDesign_CopyLogoTexturePixels(gLogoTexturePixels, pLogo, 1, nWidth, nHeight);
+    return gLogoTexturePixels;
 }

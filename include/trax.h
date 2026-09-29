@@ -1,4 +1,4 @@
-// trax.h (our name): Trax.c's data, the EA Trax music display.
+// trax.h (our name): uiEATrax.c's data, the EA Trax music display.
 
 #ifndef TRAX_H
 #define TRAX_H

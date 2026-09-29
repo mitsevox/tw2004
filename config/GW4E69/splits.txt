@@ -647,7 +647,7 @@ uiProcessInterface.c:
 Code80090940.c:
 	.text       start:0x80090940 end:0x80090B80
 
-fe_movies.c:
+uiProcessPolygon.c:
 	.text       start:0x80090B80 end:0x800922A8
 	.data       start:0x80189C00 end:0x80189C38
 	.bss        start:0x801D8818 end:0x801D91F0
@@ -892,7 +892,7 @@ hlaudemitter.c:
 UAudContainers.c:
 	.text       start:0x800ADE70 end:0x800AE1F8
 
-uiobject.c:
+uiObject.c:
 	.text       start:0x800AE1F8 end:0x800AF114
 	.rodata     start:0x80183B08 end:0x80183BC8
 	.data       start:0x8018EC10 end:0x8018EC20
@@ -982,7 +982,7 @@ Code800B90F4.c:
 	.sbss       start:0x802821C0 end:0x802821E8
 	.sdata2     start:0x802841C8 end:0x802841E0
 
-Trax.c:
+uiEATrax.c:
 	.text       start:0x800B9FF0 end:0x800BA74C
 	.rodata     start:0x80184C68 end:0x80184C78
 	.bss        start:0x801F8458 end:0x801FA0F0
@@ -1345,16 +1345,10 @@ FE_PGATourMessages.c:
 	.sdata2     start:0x802848C0 end:0x802848C8
 
 FE_LogoDesign.c:
-	.text       start:0x8010F6C8 end:0x8010FC3C
+	.text       start:0x8010F6C8 end:0x8010FF9C
 	.data       start:0x80193D28 end:0x80193D58
-	.sbss       start:0x802824B8 end:0x802824C8
-
-LogoTexture.c:
-	.text       start:0x8010FC3C end:0x8010FF5C
-
-unsorted/sweep_8010FF5C.c:
-	.text       start:0x8010FF5C end:0x8010FF9C
 	.bss        start:0x80212B60 end:0x80213B60
+	.sbss       start:0x802824B8 end:0x802824C8
 
 DiscCheck.c:
 	.text       start:0x8010FF9C end:0x801104AC

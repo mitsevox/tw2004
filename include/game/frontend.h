@@ -11,7 +11,7 @@
 
 // An entry of a table in the UI file's second list; u0 is the entry's kind. In the colour table
 // (kind 0x10, UI_FindColorTable) p8 points at four bytes, alpha first (uiText.c). UI_ResolveFileEntries resolves
-// kind 1 to a texture and kind 2 to a named record (p4). Movie entries (fe_movies.c) use the same
+// kind 1 to a texture and kind 2 to a named record (p4). Movie entries (uiProcessPolygon.c) use the same
 // shape: flags 1 a texture (p4 its data), 2 a movie (p8 its LLPict).
 typedef struct UIFileEntry {
     u32  u0;                    // 0x0
@@ -154,7 +154,7 @@ void GM_vSetupPlayers(MsgArg* pArgs, MsgArg* pResult);  // FE_MessageTable.c: FE
 // A menu UI arc (uiArc.c): nSegments pieces from fStart to fEnd degrees, shaded from colour
 // colorA to colorB. Only what the code reads so far.
 typedef struct UIArc {
-    s16  n0;                    // 0x00  } passed to fe_movies.c's UI_LoadEntryPicture and UI_ReleaseEntryPicture
+    s16  n0;                    // 0x00  } passed to uiProcessPolygon.c's UI_LoadEntryPicture and UI_ReleaseEntryPicture
     s16  n2;                    // 0x02  } (-1: none)
     u8   unk4[4];
     u16  u8;                    // 0x08
@@ -217,7 +217,7 @@ void GM_vMCGetSaveNeeds(MsgArg* pArgs, MsgArg* pResult);
 extern u8 gbPausedWithoutScoreCard;         // set by the pause handler (GameUICommands.c GM_vPauseGame)
 extern u8 gbUICloseRequested;         // (uiProcessInterface.c) FEgolferanim.c's FE_IsGolferRenderAllowed tests it
 
-// Four floats a UI element passes down its transform stack, copied as one struct; fe_movies.c's
+// Four floats a UI element passes down its transform stack, copied as one struct; uiProcessPolygon.c's
 // UIPoly_Draw scales its quad's colours by them / 511.
 typedef struct UIWords4 {
     f32 a[4];
@@ -274,7 +274,7 @@ FrontEnd* UI_OpenInterface(char* szSet);
 // uiProcessInterface.c: for a UI name starting "tu", 1 in a lesson and -1 otherwise; else 0.
 int UI_GetTextureBankIndex(const char* szName);
 
-// Code80090940.c: the movie entries' pictures (fe_movies.c).
+// Code80090940.c: the movie entries' pictures (uiProcessPolygon.c).
 UIFileEntry* UI_DecodeEntryPicture(int nEntry);   // make entry nEntry's picture
 void UI_MarkEntryPictureForFree(int nEntry);           // mark entry nEntry (flag 0x10) to be freed
 

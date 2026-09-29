@@ -42,7 +42,7 @@ s8 gSavedCrAPHidden = -1;      // gpCrAPState->bHidden put aside while hint 0x34
 void UI_SetControllerEnabled(s32 n, s32 b);
 void UIText_SetFontDrawQueued(void);         // uiText.c
 void UITransform_Shutdown(void);
-void UI_EATraxFreeLogo(void);         // Trax.c
+void UI_EATraxFreeLogo(void);         // uiEATrax.c
 void UI_CloseInterface(FrontEnd* pFE);
 void UI_vCloseModule(void);
 void UI_ResolveFileEntries(FrontEnd* pFE);

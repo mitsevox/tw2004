@@ -1,5 +1,5 @@
-// fe_movies.c (a filemap guess, from a TW06 call-graph pairing; the code shows it is EA's
-// uiProcessPolygon.c, "UI runtime" / "iStudio runtime"): the menu UI's polygon element (the UI
+// uiProcessPolygon.c (EA's name, part of the UI studio runtime; fe_movies.c before 2026-09-29, a
+// filemap guess from a TW06 call-graph pairing): the menu UI's polygon element (the UI
 // studio's plugin 0: UIPoly_ProcessMessage, UIPoly_Draw), the pictures its elements load with their
 // screens, the loading screen and its progress bar of eight tiles, the start-up movies and the
 // full-screen pictures shown between them.
@@ -9,8 +9,8 @@
 // Golf/entry and golf/streaming, where this file's callers are (gomainloop.c, GoEntry.c,
 // streammanagerhole.c); TW06 lists uiprocesspolygon.c among the iStudio runtime files; and it links
 // between uiProcessInterface.c and uiText.c / uiTransform.c, in the UI runtime's alphabetical order.
-// EA's fe_movies.c / FE_Movies.c (TW06, TW07: FE_MakeMoviePath, FE_movieFade, FE_PlayIntroMovies)
-// is FE_Manager.c's movie code in this build.
+// EA's FE_Movies.c (TW06, TW07: FE_MakeMoviePath, FE_movieFade, FE_PlayIntroMovies) is
+// FE_Manager.c's movie code in this build.
 
 #include "game_types.h"
 #include "llpict.h"
