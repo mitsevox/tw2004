@@ -9,7 +9,7 @@
 #include "engine.h"
 #include "pad.h"
 
-void fn_8001437C(void);
+void Input_vStopAllVibration(void);
 int  Input_ScaleStickAxis(int nValue, int nDeadZone, int nMax);
 int  Input_ScaleTrigger(int nValue, int nDeadZone, int nMax);
 void Input_ScaleAnalog(PadStatus* pStatus, PadAnalog* pAnalog);
@@ -36,9 +36,9 @@ int Input_iInitModule(void) {
     return 0;
 }
 
-// Stops every pad's rumble (fn_8001437C) at shut-down; called by the shut-down list fn_80005590.
+// Stops every pad's rumble (Input_vStopAllVibration) at shut-down; called by the shut-down list fn_80005590.
 void Input_vCloseOnce(void) {
-    fn_8001437C();
+    Input_vStopAllVibration();
 }
 
 // What is plugged into port nChan, as SIProbe reports it: 0x09000000 a standard pad, 0x8B100000 a
@@ -255,7 +255,7 @@ u8* Input_sGetStickInfo(int nController) {
 }
 
 // A controller's buttons: the held ones in the high 16 bits, the ones pressed this frame in the low
-// 16 (see Controller_GetButtonMask).
+// 16 (see Input_uiMap).
 u32 Input_ReadControlPad(int nController) {
     return gControllers.auButtons[nController];
 }

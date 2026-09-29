@@ -25,16 +25,16 @@ typedef struct CamLens {
                                 //       to 1.0
     f32  fFov;                  // 0xA4  the field of view (GoGolfCam.c sets DEG(60.0f) or DEG(30.0f))
     f32  fA8;                   // 0xA8  the near clip distance (RC_vUpdateRenderCtxScreenMatricesAndInfo
-                                //       builds the projection from it); CA_vInitCamera starts it at 0.1
-    f32  fAC;                   // 0xAC  the far clip distance; CA_vInitCamera starts it at 4096
+                                //       builds the projection from it); CA_vSetDefaultCamera starts it at 0.1
+    f32  fAC;                   // 0xAC  the far clip distance; CA_vSetDefaultCamera starts it at 4096
                                 //       (GoTerrain.c Camera_SetLensFarClip sets it)
     f32  fB0;                   // 0xB0  Camera_GetLensFovScale; the zoom-to-aim camera divides its
                                 //       distance by it
     f32  fFlatWidth;            // 0xB4  } a flat camera's view width and height in world units:
     f32  fFlatHeight;           // 0xB8  } RC_vUpdateRenderCtxScreenMatricesAndInfo builds its
                                 //       projection with Mtx_OrthoScale from them, LLObj_Gc.c
-                                //       culls against them; 20 x 20 from CA_vInitCamera
-                                //       (fn_80076948 sets them; GoGrass.c's top-down grass camera
+                                //       culls against them; 20 x 20 from CA_vSetDefaultCamera
+                                //       (CA_vSetCameraFlatSize sets them; GoGrass.c's top-down grass camera
                                 //       sets 20 x 20 too)
 } CamLens;
 
@@ -1000,10 +1000,10 @@ f32         FB_fGetFrameBufferOffsetX(GoFrameBuf* pBuf); // f0
 
 CamLens* CA_spCreateCamera(void);                     // a new lens
 void     CA_vReleaseCamera(CamLens* pLens);           // free it
-void     CA_vSetLookAt(CamLens* pLens, f32* pPos, f32* pTarget);   // aims the lens from pPos at pTarget
-void     CA_vInitCamera(CamLens* pLens);
-void     fn_80076948(CamLens* pLens, f32 fB4, f32 fB8);   // sets fB4 and fB8
-void     fn_80076A0C_SetType(CamLens* pLens, s32 nType);          // sets nType
+void     Camera_SetCameraPositionAndTarget(CamLens* pLens, f32* pPos, f32* pTarget); // aims the lens from pPos at pTarget
+void     CA_vSetDefaultCamera(CamLens* pLens);
+void     CA_vSetCameraFlatSize(CamLens* pLens, f32 fB4, f32 fB8); // sets fB4 and fB8
+void     CA_vSetCameraProjectionMode(CamLens* pLens, s32 nType);  // sets nType
 f32*     VM_spCreateViewport(void);                     // a new screen rectangle
 void     VM_vReleaseViewport(f32* pRect);               // free it
 void     fn_800B3438(f32* pRect, f32 x, f32 y); // shadow.c

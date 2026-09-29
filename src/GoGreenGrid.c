@@ -20,8 +20,8 @@ void SD_FreeShaderObject(void* pMesh);
 void SD_DrawShaderObject(u8* pMesh);
 void RC_vUpdateCurrentRenderCtxTransformationMatrices(void);
 void RC_UpdateCurrentScreenMatrices(void);
-void Camera_SetLensFarClip(u8* p, f32 v); // sets the lens's far clip distance, fAC (fn_80014268 reads it)
-f32  fn_80014268(u8* p);
+void Camera_SetLensFarClip(u8* p, f32 v); // sets the lens's far clip distance, fAC (CA_fGetCameraFarZ reads it)
+f32  CA_fGetCameraFarZ(u8* p);
 
 void GR_Vec4Sub(f32* pA, f32* pB, f32* pOut);
 void GR_BuildGridRenderData(s32 nView);
@@ -474,7 +474,7 @@ void GR_DrawGreenGrid(int nView) {
     }
     RenderState_SetClipMode(0);
     pLens = ((Camera*)*gppCurrentRenderCtx)->unk10;
-    fAC = fn_80014268((u8*)pLens);
+    fAC = CA_fGetCameraFarZ((u8*)pLens);
     Camera_SetLensFarClip((u8*)pLens, 500.0f + fAC);
     RC_UpdateCurrentScreenMatrices();
     RC_vUpdateCurrentRenderCtxTransformationMatrices();

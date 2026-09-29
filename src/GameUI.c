@@ -9,7 +9,7 @@
 #include "game/modes/mode22.h"
 #include "game/modes/mode26.h"
 
-void  fn_8001437C(void);
+void  Input_vStopAllVibration(void);
 void  fn_8006A8B0(void);
 
 void  GUI_UpdateAllUIData(void);
@@ -128,9 +128,9 @@ void GUI_Init(void) {
 
 void  Gaud_Pause(int a);
 
-// Shuts the in-game HUD down: it only stops every controller's rumble (fn_8001437C).
+// Shuts the in-game HUD down: it only stops every controller's rumble (Input_vStopAllVibration).
 void GUI_DeInit(void) {
-    fn_8001437C();
+    Input_vStopAllVibration();
 }
 
 // Shows (b = 1: readouts refreshed by GUI_UpdateAllUIData, then UI message 2) or hides (message 1)
@@ -222,7 +222,7 @@ void GUI_UpdateAllUIData(void) {
 void GUI_OpenPauseMenu(void) {
     if (gSession.nPaused == 0) {
         GameMsg_SetPending(4);
-        fn_8001437C();
+        Input_vStopAllVibration();
         fn_80062CE0(0);
         if (TI_bCounterIsRunning(1)) {
             TI_sStopCounter(1);

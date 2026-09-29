@@ -11,7 +11,7 @@
 #include "discerror.h"
 #include "core/startup.h"
 
-void fn_8001437C(void);
+void Input_vStopAllVibration(void);
 void Aud_Pause(u8 b, u8 b2);
 void VIWaitForRetrace(void);
 void fn_800B6924(void);

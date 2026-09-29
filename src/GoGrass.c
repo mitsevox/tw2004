@@ -345,9 +345,9 @@ void Grass_CreateTopCamera(void) {
     FB_vSetFrameBuffer(gpGrassMgr->pFrameBuf, 0.0f, 0.0f, 256.0f, 256.0f, 1.0f, 1.0f);
     VM_vSetViewportRect(gpGrassMgr->pRect, 0.0f, 0.0f, 1.0f, 1.0f);
     fn_800B3438(gpGrassMgr->pRect, 1.0f, 1.0f);
-    CA_vInitCamera(gpGrassMgr->pLens);
-    fn_80076A0C_SetType(gpGrassMgr->pLens, 1);
-    fn_80076948(gpGrassMgr->pLens, 20.0f, 20.0f);
+    CA_vSetDefaultCamera(gpGrassMgr->pLens);
+    CA_vSetCameraProjectionMode(gpGrassMgr->pLens, 1);
+    CA_vSetCameraFlatSize(gpGrassMgr->pLens, 20.0f, 20.0f);
     gpGrassMgr->pCamera =
         RC_spCreateRenderCtx(gpGrassMgr->pLens, gpGrassMgr->pFrameBuf, gpGrassMgr->pRect);
 }
@@ -380,7 +380,7 @@ void Grass_AimTopCamera(void) {
     aAt[1] = gpGrassMgr->f3B0 - 1.0f;
     aAt[2] = fZ;
     aAt[3] = 1.0f;
-    CA_vSetLookAt(gpGrassMgr->pLens, aEye, aAt);
+    Camera_SetCameraPositionAndTarget(gpGrassMgr->pLens, aEye, aAt);
 }
 
 // The grass's 256 x 256 top texture: its buffer (allocated here, GoGrass.c line 1311) and texture

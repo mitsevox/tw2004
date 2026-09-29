@@ -121,7 +121,7 @@ anything but a putt, `(hold - 0.05)^2` comes off, at most 0.3 - so a 0.6 s pause
 **Power boost** (`Swing_BoostInput`, every backswing frame): with the boost option on, each
 **new press of Z** while the stick is pulled past 93 of its range adds one level, to a maximum of
 8. (The pad word `Input_ReadControlPad` returns held buttons in its top 16 bits and buttons pressed this
-frame in the bottom 16; `Controller_GetButtonMask(action, bHeld)` picks the half, and the boost asks for
+frame in the bottom 16; `Input_uiMap(action, bHeld)` picks the half, and the boost asks for
 action 0x1F = Z, not held. Corrected 2026-09-22: this paragraph used to say "held, one level per
 frame".) It is only called in phase 1, so **taps before the backswing or while holding at the
 top do not count**; all eight have to land while the club is going back. Backing the stick down

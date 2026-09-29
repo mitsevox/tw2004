@@ -34,7 +34,7 @@
 #include "game/modes/ladder.h"
 
 // Outside this file.
-void fn_800142A4(s8 n);                 // sets gnInputControlSet
+void Input_vSelectControlSet(s8 n);     // sets gnInputControlSet
 void SaveProfile_InitNew(SaveProfile* pProfile);
 void FE_OnGolferHiddenChanged(void);                 // FEgolferanim.c
 void UI_SetControllerEnabled(s32 p0, s32 p1);       // uiProcessInterface.c
@@ -2653,10 +2653,10 @@ void GM_vSetPinSet(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 120: selects row pArgs[0] of the button-mask table (gauInputButtonMap) that
-// Controller_GetButtonMask reads (fn_800142A4 keeps it in gnInputControlSet, an s8). The table has only
+// Input_uiMap reads (Input_vSelectControlSet keeps it in gnInputControlSet, an s8). The table has only
 // row 0 in this build.
 void GM_vSetButtonConfig(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800142A4(pArgs[0].i);
+    Input_vSelectControlSet(pArgs[0].i);
 }
 
 // Front-end message 121: whether save profile pArgs[0] has won trophy ball pArgs[1] (its

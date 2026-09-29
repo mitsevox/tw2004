@@ -48,7 +48,7 @@ void fn_80016C44(const f32* pViewport);
 void fn_80016198(void) {
     fn_80016B6C(1.0f, 1.0f);
     RenderView_SetUseCurrentMatrices(0);
-    fn_800141CC();
+    RenderView_SetDefaultColor();
     lbl_80280E08->fF4 = 1.0f;
     lbl_80280E08->fF8 = 1.0f;
     fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);

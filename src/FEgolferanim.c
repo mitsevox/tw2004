@@ -789,11 +789,11 @@ void FE_vUpdateGolferAll(void) {
     // FE_ZoomCrAPModel.
     if (gpCrAPState->pB4->pChar != NULL && gpCrAPState->nScreenKind == 3) {
         if (gpCrAPState->bPadLocked == 0) {
-            if (Controller_AnyPadHasButtons(Controller_GetButtonMask(0x33, 0))
-                || Controller_AnyPadHasButtons(Controller_GetButtonMask(0x33, 1))) {
+            if (Input_AnyPadPressed(Input_uiMap(0x33, 0))
+                || Input_AnyPadPressed(Input_uiMap(0x33, 1))) {
                 FE_RotateCrAPModel(0.05f);
-            } else if (Controller_AnyPadHasButtons(Controller_GetButtonMask(0x34, 0))
-                       || Controller_AnyPadHasButtons(Controller_GetButtonMask(0x34, 1))) {
+            } else if (Input_AnyPadPressed(Input_uiMap(0x34, 0))
+                       || Input_AnyPadPressed(Input_uiMap(0x34, 1))) {
                 FE_RotateCrAPModel(-0.05f);
             } else {
                 FE_RotateCrAPModel(0.0f);
@@ -802,8 +802,8 @@ void FE_vUpdateGolferAll(void) {
             FE_RotateCrAPModel(0.0f);
         }
         if (gpCrAPState->bPadLocked == 0 && gpCrAPState->nRenderState == 0
-            && (Controller_AnyPadHasButtons(Controller_GetButtonMask(0x35, 0))
-                || Controller_AnyPadHasButtons(Controller_GetButtonMask(0x35, 1)))) {
+            && (Input_AnyPadPressed(Input_uiMap(0x35, 0))
+                || Input_AnyPadPressed(Input_uiMap(0x35, 1)))) {
             FE_ZoomCrAPModel(1);
         } else {
             FE_ZoomCrAPModel(0);

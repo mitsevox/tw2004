@@ -783,14 +783,14 @@ u8 fn_8006D01C(void) {
     } else if (gSession.nGameType == 6 && fn_8006DC34()) {
         bDone = 1;
     } else if (gSession.nGameType == 6 && !gSession.bDemo && (gSession.uFlags & 0x4000)) {
-        if (Controller_AnyPadHasButtons(0)) {
+        if (Input_AnyPadPressed(0)) {
             fn_8009A16C();
         }
         if (fn_8009A180()) {
             bDone = 1;
         }
     } else if (gSession.nGameType == 6 && gSession.bDemo) {
-        if (Controller_AnyPadHasButtons(0)) {
+        if (Input_AnyPadPressed(0)) {
             bDone = 1;
         }
         if ((gSession.uFlags & 0x4000) && fn_8009A180()) {

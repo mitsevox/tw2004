@@ -90,7 +90,7 @@ typedef struct UIButtonEvent {
 } UIButtonEvent;
 #define UI_NUM_BUTTON_EVENTS 16
 extern UIButtonEvent gUIButtonEvents[UI_NUM_BUTTON_EVENTS];
-extern s32 gUIButtonHeldFrames[8];     // per controller (0..3): frames Controller_GetButtonMask(0x20, 1)'s
+extern s32 gUIButtonHeldFrames[8];     // per controller (0..3): frames Input_uiMap(0x20, 1)'s
                                        // button is held
                                 // in game type 6; past 10 GUI_SendButtonHeld runs
 extern s8 gSavedCrAPHidden;         // CrAPState.bHidden put aside while UI_ReadControllers's lone-player UI

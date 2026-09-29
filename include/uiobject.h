@@ -34,6 +34,6 @@ extern f32        gUIObjLightGreen; // }   0.05
 extern f32        gUIObjLightBlue; // }   0.476
 extern f32        gUIObjAlpha; // 0.19: UI_Obj_DrawSpinModel hands 255 times it to RenderState_SetConstantAlpha
 extern f32        gBoostLevelColours[8][4];   // the rings' colours, one per power boost level
-extern f32        gUIObjLookAtTarget[4];      // the lens's second point (CA_vSetLookAt)
+extern f32        gUIObjLookAtTarget[4];      // the lens's second point (Camera_SetCameraPositionAndTarget)
 
 #endif

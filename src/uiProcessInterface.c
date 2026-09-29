@@ -27,7 +27,7 @@ u8 gbPausedWithoutScoreCard;    // GameUICommands.c GM_vPauseGame: the scorecard
 UIDelayedHint gUIDelayedHint;   // a value a message hands back to the UI as a hint 3 frames later
 UIState gUIState;               // the UI's controller input, exit fade and picture table
 
-// Per controller: frames Controller_GetButtonMask(0x20, 1)'s button has been held in play; past 10
+// Per controller: frames Input_uiMap(0x20, 1)'s button has been held in play; past 10
 // UI_ReadControllers sends GUI_SendButtonHeld.
 s32 gUIButtonHeldFrames[8] = {0};
 // The UI event each controller button sends when pressed (UI_ReadControllers).
@@ -227,7 +227,7 @@ void UI_SetControllerEnabled(s32 n, s32 b) {
 // Unless blocked, fading out (bFadeToBlack) or a movie is queued, each enabled controller's newly
 // pressed buttons send their gUIButtonEvents event (UISProcessEvent; in play not while nPaused is 2
 // or 3), and in the menus any held button sends hint 0x22; in play each such controller is also
-// reported present (GUI_OnControllerPresent), and holding Controller_GetButtonMask(0x20, 1)'s
+// reported present (GUI_OnControllerPresent), and holding Input_uiMap(0x20, 1)'s
 // button over 10 frames sends GUI_SendButtonHeld.
 void UI_ReadControllers(void) {
     f32 fOne;
@@ -347,7 +347,7 @@ void UI_ReadControllers(void) {
                     GUI_OnControllerPresent(k);
                 }
                 if (gSession.nGameType == 6) {
-                    uMask = Controller_GetButtonMask(0x20, 1);
+                    uMask = Input_uiMap(0x20, 1);
                     uButtons = Input_ReadControlPad(k);
                     if (uButtons & uMask) {
                         gUIButtonHeldFrames[k]++;

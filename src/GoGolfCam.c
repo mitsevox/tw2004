@@ -1053,7 +1053,7 @@ void GolfCamera_InitGreenCamera(View* pView, int nPlayer) {
         pView->f50 = 1.0f;
         pView->f54 = 1.0f;
         pView->f58 = 1.0f;
-        if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x30, 1)) {
+        if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Input_uiMap(0x30, 1)) {
             pView->script.fCamTime = 2.0f;
         } else {
             pView->script.fCamTime = 0.0f;
@@ -1097,8 +1097,8 @@ void GolfCamera_ProcessGreenCamera(View* pView, int nPlayer) {
     Vec3Copy(pCam, vOld);
     if (pView->shot19C.fMaxHeight < 1.0f) {
         pView->f54 = 1.001f;
-        if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x2E, 1))
-            || (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x30, 1))) {
+        if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Input_uiMap(0x2E, 1))
+            || (Input_ReadControlPad(gPlayers[nPlayer].nController) & Input_uiMap(0x30, 1))) {
             pView->shot19C.fMaxHeight += gpCamTuning->f210 * gSession.fFrameTime;
         } else {
             pView->shot19C.fMaxHeight -= gpCamTuning->f210 * gSession.fFrameTime;
@@ -1109,8 +1109,8 @@ void GolfCamera_ProcessGreenCamera(View* pView, int nPlayer) {
         }
         fn_80039344(gPlayers[nPlayer].nView[0], pView->shot19C.fMaxHeight);
     } else {
-        if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x2E, 1))
-            || (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x30, 1))) {
+        if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Input_uiMap(0x2E, 1))
+            || (Input_ReadControlPad(gPlayers[nPlayer].nController) & Input_uiMap(0x30, 1))) {
             if (pView->f54 + gpCamTuning->f214 * gSession.fFrameTime < gpCamTuning->f20C) {
                 pView->f54 += gpCamTuning->f214 * gSession.fFrameTime;
             }
@@ -1122,12 +1122,12 @@ void GolfCamera_ProcessGreenCamera(View* pView, int nPlayer) {
         }
         fn_80039344(gPlayers[nPlayer].nView[0], 1.0f);
     }
-    if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x31, 1)) {
+    if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Input_uiMap(0x31, 1)) {
         pView->script.fCamTime += gpCamTuning->f218 * gSession.fFrameTime;
         if (pView->script.fCamTime >= 2.0f) {
             pView->script.fCamTime -= 4.0f;
         }
-    } else if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Controller_GetButtonMask(0x32, 1)) {
+    } else if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Input_uiMap(0x32, 1)) {
         pView->script.fCamTime -= gpCamTuning->f218 * gSession.fFrameTime;
         if (pView->script.fCamTime < -2.0f) {
             pView->script.fCamTime = 4.0f + pView->script.fCamTime;

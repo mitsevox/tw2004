@@ -584,7 +584,7 @@ void Lessons_Update(void) {
     }
     switch (gLessonStep) {
     case 0:
-        if (Input_ReadControlPad(gPlayers[0].nController) & Controller_GetButtonMask(0, 0)) {
+        if (Input_ReadControlPad(gPlayers[0].nController) & Input_uiMap(0, 0)) {
             gLessonStep = gLessonNextStep;
         }
         break;

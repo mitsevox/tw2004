@@ -1543,7 +1543,7 @@ f32 SW_fPowerAdjustForDraw(int nPlayer, f32 fPower) {
 // ---- the power boost input --------------------------------------------------------------------
 
 // Every backswing frame, for a human with the power boost option on: while the boost button
-// (Controller_GetButtonMask(0x1F)) is held with the stick more than 93 from centre, the boost level
+// (Input_uiMap(0x1F)) is held with the stick more than 93 from centre, the boost level
 // (nPowerBoost) rises one a frame up to 8, sending event 0x2D at each step. A running
 // fPowerBoostDieTime (1/12 s once the backswing backs down) counts down; when it runs out the level
 // and the turn angles are cleared and the boost display is reset (UI_Obj_ResetBoostRings).
@@ -1558,7 +1558,7 @@ void SW_vCheckForSwingBoost(int nPlayer) {
     nY   = SW_vGetStickY(nPlayer, SW_vGetStickInfo(nPlayer, gPlayers[nPlayer].nController));
     nX   = SW_vGetStickX(nPlayer, SW_vGetStickInfo(nPlayer, gPlayers[nPlayer].nController));
     fMag = (f32)Math_Sqrt((nX - 128) * (nX - 128) + (nY - 128) * (nY - 128));
-    if ((uButtons & Controller_GetButtonMask(0x1F, 0)) && fMag > 93.0f) {
+    if ((uButtons & Input_uiMap(0x1F, 0)) && fMag > 93.0f) {
         if (gPlayers[nPlayer].swing.nPowerBoost < 8) {
             (gPlayers[nPlayer].swing.nPowerBoost)++;
             EVENT_Trigger(nPlayer, 0x2D, 0, 0);
@@ -1638,7 +1638,7 @@ void SW_vCloseSpinWindow(int nPlayer) {
 }
 
 // Spin input, every frame after impact (SW_vStatePostSwing), for a human with the spin option
-// on while the spin button (Controller_GetButtonMask(0x20)) is held and the window is open
+// on while the spin button (Input_uiMap(0x20)) is held and the window is open
 // (bCanSpin): sends event 0x2E, grows the amount (nSpinBoost) one a frame up to 20 (a third of a
 // second for full spin), and takes the stick as the direction (nSpinCtrlX/Y) whenever either axis
 // is outside 96..160. The direction starts at x 128, y 255 (full y deflection) until the stick
@@ -1649,7 +1649,7 @@ void SW_vUpdateSpinControl(int nPlayer) {
     if (Player_IsCPU(nPlayer)) return;
     if (gSession.options.bSpinEnabled == 0) return;
     uButtons    = Input_ReadControlPad(gPlayers[nPlayer].nController);
-    if (!(uButtons & Controller_GetButtonMask(0x20, 0))) return;
+    if (!(uButtons & Input_uiMap(0x20, 0))) return;
     if (gPlayers[nPlayer].swing.bCanSpin == 0) return;
     EVENT_Trigger(nPlayer, 0x2E, 0, 0);
     nX = SW_vGetStickX(nPlayer, SW_vGetStickInfo(nPlayer, gPlayers[nPlayer].nController));

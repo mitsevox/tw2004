@@ -17,8 +17,8 @@ void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, in
 void Mtx_OrthoScale(f32 (*pMtx)[4], f32 f1, f32 f2);   // matrix builders, not decompiled yet
 void Mtx_Perspective(f32 (*pMtx)[4], f32 f1, f32 f2, f32 f3, f32 f4, f32 f5);
 void Mtx_PerspectiveDepthOverNear(f32 (*pMtx)[4], f32 f1, f32 f2, f32 f3, f32 f4);
-f32 fn_80014268(u8* p);
-f32 fn_80014270(u8* p);
+f32 CA_fGetCameraFarZ(u8* p);
+f32 CA_fGetCameraNearZ(u8* p);
 f32 Math_Tan(f32 x0);
 
 // This file's .sbss (engine.h), in reverse address order as the compiler lays it out.
@@ -75,8 +75,8 @@ f32 VM_fGetViewportOneOverHeightRatio(u8* p);
 f32 VM_fGetViewportHeightOverWidth(u8* p);
 f32 VM_fGetViewportOneOverWidthRatio(u8* p);
 f32 FB_fGetFrameBufferOneOverHeightRatio(u8* p);
-f32 fn_80014184(u8* p);
-f32 fn_8001418C(u8* p);
+f32 VM_fGetFrameBufferHeightOverWidth(u8* p);
+f32 FB_fGetFrameBufferOneOverWidthRatio(u8* p);
 
 void RC_vReleaseRenderCtx(void* pCamera) {
     StaticMem_Free(pCamera);
@@ -153,10 +153,10 @@ void RC_vUpdateRenderCtxScreenMatricesAndInfo(Camera* pCamera) {
     pCamera->f230 = -(logf(pCamera->f1E0 * (1.0f / 554.256f)) * 1.442695f);
     pCamera->f1E4 = VM_fGetViewportLeft(pRect) + VM_fGetViewportWidth(pRect) * 0.5f;
     pCamera->f1E8 = 1.0f - (VM_fGetViewportTop(pRect) + VM_fGetViewportHeight(pRect) * 0.5f);
-    pCamera->unk1F4 = pCamera->f1E0 * (fn_80014270((u8*)pLens) / 554.256f);
-    pCamera->unk1F8 = fn_80014268((u8*)pLens);
-    pCamera->f1FC = pCamera->f224 * VM_fGetViewportOneOverWidthRatio((u8*)pRect) * fn_8001418C((u8*)pBuf);
-    pCamera->f200 = fn_80014184((u8*)pBuf) * (VM_fGetViewportHeightOverWidth((u8*)pRect) *
+    pCamera->unk1F4 = pCamera->f1E0 * (CA_fGetCameraNearZ((u8*)pLens) / 554.256f);
+    pCamera->unk1F8 = CA_fGetCameraFarZ((u8*)pLens);
+    pCamera->f1FC = pCamera->f224 * VM_fGetViewportOneOverWidthRatio((u8*)pRect) * FB_fGetFrameBufferOneOverWidthRatio((u8*)pBuf);
+    pCamera->f200 = VM_fGetFrameBufferHeightOverWidth((u8*)pBuf) * (VM_fGetViewportHeightOverWidth((u8*)pRect) *
                     (pCamera->f224 * VM_fGetViewportOneOverHeightRatio((u8*)pRect) * FB_fGetFrameBufferOneOverHeightRatio((u8*)pBuf)));
 
     aSrc[0] = 1.0f;
@@ -366,11 +366,11 @@ f32 FB_fGetFrameBufferOneOverHeightRatio(u8* p) {
     return *(f32*)(p + 0x2C);
 }
 
-f32 fn_80014184(u8* p) {
+f32 VM_fGetFrameBufferHeightOverWidth(u8* p) {
     return *(f32*)(p + 0x30);
 }
 
-f32 fn_8001418C(u8* p) {
+f32 FB_fGetFrameBufferOneOverWidthRatio(u8* p) {
     return *(f32*)(p + 0x28);
 }
 
@@ -379,14 +379,14 @@ f32 fn_8001418C(u8* p) {
 // Set the colour of the view's vertices (r, g, b, a); NULL: the default grey.
 void RenderView_SetColor(f32* pColour) {
     if (pColour == NULL) {
-        fn_800141CC();
+        RenderView_SetDefaultColor();
         return;
     }
     LLMath_CopyVec(pColour, lbl_80280E08->aColour);
 }
 
 // The default vertex colour: half grey, opaque.
-void fn_800141CC(void) {
+void RenderView_SetDefaultColor(void) {
     lbl_80280E08->aColour[0] = 0.5f;
     lbl_80280E08->aColour[1] = 0.5f;
     lbl_80280E08->aColour[2] = 0.5f;
@@ -421,9 +421,9 @@ void RenderView_MakeQuad(f32* pXY, f32* pUV, f32 x0, f32 y0, f32 x1, f32 y1) {
 // ---- sweep code (not yet cleaned up) ----
 
 double tan();
-void fn_800142A4(s8 v);
+void Input_vSelectControlSet(s8 v);
 void Input_vStopVibration(int nController);
-void fn_8001437C(void);
+void Input_vStopAllVibration(void);
 
 // 1: RenderView_DrawPrimitive draws with the viewport and matrices already set (the camera's); 0:
 // with the view's own screen projection and viewport, put back after the draw.
@@ -431,11 +431,11 @@ void RenderView_SetUseCurrentMatrices(int a) {
     lbl_80280E08->nD0 = a;
 }
 
-f32 fn_80014268(u8* p) {
+f32 CA_fGetCameraFarZ(u8* p) {
     return *(f32*)(p + 0xAC);
 }
 
-f32 fn_80014270(u8* p) {
+f32 CA_fGetCameraNearZ(u8* p) {
     return *(f32*)(p + 0xA8);
 }
 
@@ -451,7 +451,7 @@ f32 Math_Tan(f32 x0) {
 
 // fake match: EA's table starts 8-aligned after the 17-byte "GoRenderCtx_Gc.c" (as TibExt.c's
 // lbl_80194758 after "TibExt.c"); plain u32 data is only 4-aligned. The functions from
-// fn_800142A4 on came from sweeps and may be another file, which would explain it.
+// Input_vSelectControlSet on came from sweeps and may be another file, which would explain it.
 u32 gauInputButtonMap[][0xE8 / 4] __attribute__((aligned(8))) = {
     {
         0xFFFF, 0x800, 0x800, 0x100, 0x400, 0x100, 0x800, 0x100, 0x400, 0x20,
@@ -463,12 +463,15 @@ u32 gauInputButtonMap[][0xE8 / 4] __attribute__((aligned(8))) = {
     },
 };
 
-void fn_800142A4(s8 v) {
+// Selects the control set: the row of gauInputButtonMap that Input_uiMap reads (front-end message
+// 120, GM_vSetButtonConfig; the table has only row 0 in this build).
+void Input_vSelectControlSet(s8 v) {
     gnInputControlSet = v;
 }
 
-// A button's mask in the row in use; bShift moves it up 16 bits.
-u32 Controller_GetButtonMask(int nButton, u8 bShift) {
+// A button's pad mask in the selected control set (gauInputButtonMap[gnInputControlSet][nButton]);
+// bShift (TW07's parameter name: held) moves it up 16 bits.
+u32 Input_uiMap(int nButton, u8 bShift) {
     if (bShift) {
         return gauInputButtonMap[gnInputControlSet][nButton] << 16;
     }
@@ -476,7 +479,7 @@ u32 Controller_GetButtonMask(int nButton, u8 bShift) {
 }
 
 // Whether any of the four pads has any of the buttons in uMask (0: any button at all).
-u8 Controller_AnyPadHasButtons(u32 uMask) {
+u8 Input_AnyPadPressed(u32 uMask) {
     u8 bPressed = 0;
     int nController = 0;
 
@@ -489,7 +492,8 @@ u8 Controller_AnyPadHasButtons(u32 uMask) {
     return bPressed;
 }
 
-void fn_8001437C(void) {
+// Stops the rumble on all four pads (Input_vStopVibration).
+void Input_vStopAllVibration(void) {
     s32 var_r31;
 
     var_r31 = 0;

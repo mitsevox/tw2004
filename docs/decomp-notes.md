@@ -991,7 +991,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
 - **[verified] `a()->arr[b()].f`** evaluates `b()` first and scales the index before calling
   `a()`; splitting `b()` into a local first moves the shift after the call.
 - **[verified] `(fn() & uMask)` operand order.** `and. r0, r3, rM` (call result first) comes from
-  the mask call inline: `if (Input_ReadControlPad(x) & Controller_GetButtonMask(k, m))`. A `uMask` local assigned
+  the mask call inline: `if (Input_ReadControlPad(x) & Input_uiMap(k, m))`. A `uMask` local assigned
   first gives `and. r0, rM, r3`, and swapping the operands in the source changes nothing. Applied
   to every single-use mask in Swing.c (States 04/05/08/09/10 exact, 06/12/14/22 closer).
 - **[verified] Statement order among plain stores matters**: `a[i] = 1; x = 0; y = 0;` and

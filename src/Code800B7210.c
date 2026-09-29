@@ -11,7 +11,7 @@
 #include "discerror.h"
 #include "core/startup.h"
 
-void fn_8001437C(void);
+void Input_vStopAllVibration(void);
 void Aud_Pause(u8 b, u8 b2);
 void VIWaitForRetrace(void);
 void fn_800B6924(void);
@@ -140,7 +140,7 @@ u8 fn_800B7490(void) {
             if (nStatus != 4 && nStatus != 6 && nStatus != 11) {
                 Aud_Pause(1, 1);
             }
-            fn_8001437C();
+            Input_vStopAllVibration();
             bShown = 1;
         }
         fn_800B7210(nStatus);

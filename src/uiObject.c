@@ -77,7 +77,7 @@ void UI_Obj_InitModule(void) {
     gUIObjSettings[0].a28[3] = 0.0f;
     UI_Obj_InitForRender();
     gpUIObjLens = CA_spCreateCamera();
-    CA_vInitCamera(gpUIObjLens);
+    CA_vSetDefaultCamera(gpUIObjLens);
     for (i = 0; i < 2; i++) {
         gUIObjSettings[i].a0[0] = -0.345f;
         gUIObjSettings[i].a0[1] = -0.23f;
@@ -225,8 +225,8 @@ void UI_Obj_RenderBoostUI(int nObj) {
 
     // the object's own lens
     pLens = Camera_GetCurrentLens();
-    CA_vInitCamera(gpUIObjLens);
-    CA_vSetLookAt(gpUIObjLens, aEye, gUIObjLookAtTarget);
+    CA_vSetDefaultCamera(gpUIObjLens);
+    Camera_SetCameraPositionAndTarget(gpUIObjLens, aEye, gUIObjLookAtTarget);
     CA_vSetCameraFieldOfView(gpUIObjLens, 0.00879646f);
     UI_Obj_SetCurrentRenderCtxLens(gpUIObjLens);
     RC_UpdateCurrentScreenMatrices();

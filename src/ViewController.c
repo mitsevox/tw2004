@@ -18,7 +18,7 @@ void  CameraController_InitOneCamera(View* pView);                     // set up
 void  fn_80038010(u8 a, int n, f32* pVec);
 void  fn_80038054(u8 a, int n, f32 f1, f32 f2);
 void  CameraController_Idle(View* pView, int nPlayer);
-void  CA_vSetLookAtSide(CamLens* pLens, f32* pPos, f32* pAt, f32* pUp);
+void  Camera_SetCameraPositionAndTargetWithSideVector(CamLens* pLens, f32* pPos, f32* pAt, f32* pUp);
 void  Camera_SetCameraPositionAndTargetWithOffsetAndScale(CamLens* pLens, f32* pPos, f32* pAt, f32* pF5C, f32* pF50);
 void  Camera_SetCameraYawPitchRollAndPosition(CamLens* pLens, f32* pPos, f32* pAngles);
 void  RC_vUpdateRenderCtxScreen(void* pCamera);
@@ -113,7 +113,7 @@ void ViewController_Update(int nView) {
     pCameraController = ViewController_GetCameraControl(nView);
     CameraController_Idle(pCameraController, ViewController_GetActivePlayerNumber(nView));
     if (pCameraController->nCurCamera == 2) {
-        CA_vSetLookAtSide(Camera_GetLens(pRenderContext),
+        Camera_SetCameraPositionAndTargetWithSideVector(Camera_GetLens(pRenderContext),
                           CameraController_GetCameraOrigin(pCameraController),
                           CameraController_GetCameraLookPoint(pCameraController),
                           pCameraController->vSide);
@@ -125,7 +125,7 @@ void ViewController_Update(int nView) {
                 CameraController_GetCameraViewOffset(pCameraController),
                 CameraController_GetCameraViewScale(pCameraController));
         } else {
-            CA_vSetLookAtSide(Camera_GetLens(pRenderContext),
+            Camera_SetCameraPositionAndTargetWithSideVector(Camera_GetLens(pRenderContext),
                               CameraController_GetCameraOrigin(pCameraController),
                               CameraController_GetCameraLookPoint(pCameraController),
                               pCameraController->vSide);

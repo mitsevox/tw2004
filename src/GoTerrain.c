@@ -55,8 +55,8 @@ void  Ter_SetZWrite(int n);
 void  RenderState_ChangeDrawFlags(u32 uClear, u32 uSet);
 void  RC_vUpdateCurrentRenderCtxTransformationMatrices(void);
 void  RC_UpdateCurrentScreenMatrices(void);
-void  Camera_SetLensFarClip(u8* p, f32 v); // sets the lens's far clip distance, fAC (fn_80014268 reads it)
-f32   fn_80014268(u8* p);
+void  Camera_SetLensFarClip(u8* p, f32 v); // sets the lens's far clip distance, fAC (CA_fGetCameraFarZ reads it)
+f32   CA_fGetCameraFarZ(u8* p);
 void  Ter_SetLODPlanes(Ter_LODPlane* pPlanes, f32 fStep, s32 a, s32 b, s32 c, s32 d);
 void  Ter_DrawPatchGround(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s32 n20, u8* pbFirst,
                           u8 b1,
@@ -1145,7 +1145,7 @@ void Ter_DrawFarClipPatches(void) {
     if (bAny) {
         Ter_SetZWrite(0);
         pLens = ((Camera*)*gppCurrentRenderCtx)->unk10;
-        fAC = fn_80014268((u8*)pLens);
+        fAC = CA_fGetCameraFarZ((u8*)pLens);
         Camera_SetLensFarClip((u8*)pLens, 25.0f + fAC);
         RC_UpdateCurrentScreenMatrices();
         RC_vUpdateCurrentRenderCtxTransformationMatrices();
@@ -2573,7 +2573,7 @@ void LLMath_Subtract(f32* pA, f32* pB, f32* pOut) {
 }
 #endif
 
-// Sets the lens's far clip distance (fAC, which fn_80014268 reads). Ter_DrawFarClipPatches and
+// Sets the lens's far clip distance (fAC, which CA_fGetCameraFarZ reads). Ter_DrawFarClipPatches and
 // GoGreenGrid.c push it out for a draw and put it back.
 void Camera_SetLensFarClip(u8* p, f32 v) {
     *(f32*)(p + 0xAC) = v;
