@@ -1,6 +1,6 @@
 // GoDynObj.c (EA's name, from its asserts; also in EA's 2002 source tree): the course's own objects
 // around the dynamic objects (dynobj.h): the 'TEO ' and 'BALL' stream handlers, the models of the
-// 'TEO ' objects, per-player objects, and when they are drawn (GoDynObjMgr, lbl_80281DA0). Partly
+// 'TEO ' objects, per-player objects, and when they are drawn (GoDynObjMgr, gpDynObjState). Partly
 // decompiled.
 
 #include "dynobj.h"
@@ -11,7 +11,7 @@
 #include "game.h"
 #include "unsorted/cull.h"
 
-char lbl_80187B98[27][13] = {
+char gGolfBallLogoTextureNames[27][13] = {
     "LogoBENHapex",
     "LogoCALLhxb",
     "LogoCALLhxr",
@@ -40,11 +40,11 @@ char lbl_80187B98[27][13] = {
     "LogoNIKEoneT",
     "LogoCYBM",
 };
-char lbl_80187CF8[4][13] = {"logoea", "logonike", "logotitl", "logostrt"};
+char gGolfBallLogoSlotNames[4][13] = {"logoea", "logonike", "logotitl", "logostrt"};
 
-f32 lbl_80281128 = 1.0f;
+f32 gGolfBallScale = 1.0f;
 
-GoDynObjMgr* lbl_80281DA0;
+GoDynObjMgr* gpDynObjState;
 
 void DynObj_LoadBallLogos(UStreamObject* pObject);   // the 'BALL' stream handler
 void DynObj_DrawTargetModels(s32 nView);
@@ -92,7 +92,7 @@ void DynObj_LoadTeoModel(UStreamObject* arg0) {
 // ---- end of sweep code ----
 
 // The 'BALL' stream handler: a bank of ball logos. Each player's chosen logo (its profile's byte
-// 0x38, from lbl_80187B98's names) is copied over the pixels of that player's logo texture
+// 0x38, from gGolfBallLogoTextureNames's names) is copied over the pixels of that player's logo texture
 // ("logoea", "logonike", ...), then the bank is freed.
 void DynObj_LoadBallLogos(UStreamObject* pObject) {
     u64 uLogo;
@@ -107,8 +107,8 @@ void DynObj_LoadBallLogos(UStreamObject* pObject) {
     pBank = fn_8000FB88(pObject, NULL, -2);
     for (i = 0; i < gSession.nNumPlayers; i++) {
         if ((s8)gSession.aProfile[i].nOutfit >= 0) {
-            SKA_PackName(&uLogo, lbl_80187B98[(s8)gSession.aProfile[i].nOutfit]);
-            SKA_PackName(&uSlot, lbl_80187CF8[i]);
+            SKA_PackName(&uLogo, gGolfBallLogoTextureNames[(s8)gSession.aProfile[i].nOutfit]);
+            SKA_PackName(&uSlot, gGolfBallLogoSlotNames[i]);
             fn_800102DC(uSlot, &pSlotBank, &pSlot);
             nLogo = fn_8001005C(pBank, uLogo);
             pLogo = &pBank->p8[nLogo];
@@ -148,32 +148,32 @@ void DynObj_UnRegisterStreamClients(void) {
     Stream_UnregisterLoadChunkCallback('BALL');
 }
 
-// Allocates the file's state (lbl_80281DA0); no 'TEO ' models yet. Called once at start-up.
+// Allocates the file's state (gpDynObjState); no 'TEO ' models yet. Called once at start-up.
 void DynObj_InitModule(void) {
-    lbl_80281DA0 = StaticMem_Alloc(sizeof(GoDynObjMgr), 2, 16, "GoDynObj.c", 283);
-    lbl_80281DA0->pTeo10000 = NULL;
-    lbl_80281DA0->apTeo10030[0] = NULL;
-    lbl_80281DA0->apTeo10030[1] = NULL;
-    lbl_80281DA0->apTeo10030[2] = NULL;
-    lbl_80281DA0->apTeo10030[3] = NULL;
-    lbl_80281DA0->apTeo10040[0] = NULL;
-    lbl_80281DA0->apTeo10040[1] = NULL;
-    lbl_80281DA0->apTeo10040[2] = NULL;
-    lbl_80281DA0->apTeo10040[3] = NULL;
-    lbl_80281DA0->apTeo10020[0] = NULL;
-    lbl_80281DA0->apTeo10020[1] = NULL;
-    lbl_80281DA0->apTeo10020[2] = NULL;
-    lbl_80281DA0->apTeo10006[0] = NULL;
-    lbl_80281DA0->apTeo10006[1] = NULL;
-    lbl_80281DA0->apTeo10006[2] = NULL;
-    lbl_80281DA0->apTeo10006[3] = NULL;
+    gpDynObjState = StaticMem_Alloc(sizeof(GoDynObjMgr), 2, 16, "GoDynObj.c", 283);
+    gpDynObjState->pTeo10000 = NULL;
+    gpDynObjState->apTeo10030[0] = NULL;
+    gpDynObjState->apTeo10030[1] = NULL;
+    gpDynObjState->apTeo10030[2] = NULL;
+    gpDynObjState->apTeo10030[3] = NULL;
+    gpDynObjState->apTeo10040[0] = NULL;
+    gpDynObjState->apTeo10040[1] = NULL;
+    gpDynObjState->apTeo10040[2] = NULL;
+    gpDynObjState->apTeo10040[3] = NULL;
+    gpDynObjState->apTeo10020[0] = NULL;
+    gpDynObjState->apTeo10020[1] = NULL;
+    gpDynObjState->apTeo10020[2] = NULL;
+    gpDynObjState->apTeo10006[0] = NULL;
+    gpDynObjState->apTeo10006[1] = NULL;
+    gpDynObjState->apTeo10006[2] = NULL;
+    gpDynObjState->apTeo10006[3] = NULL;
 }
 
 // Defined after DynObj_InitModule so that its "GoDynObj.c" comes first in .data, as in the original.
-s32 lbl_80187D38[4] = {1, 0, 3, 2};
+s32 gAltShotPartner[4] = {1, 0, 3, 2};
 
 void DynObj_CloseModule(void) {
-    StaticMem_Free(lbl_80281DA0);
+    StaticMem_Free(gpDynObjState);
 }
 
 // Makes the models of the 'TEO ' objects that are loaded, puts the flag (character 100) at the
@@ -183,42 +183,42 @@ void DynObj_InitForHole(void) {
     int nId;
     Character* pFlag;
 
-    if (lbl_80281DA0->pTeo10000 == NULL) {
-        lbl_80281DA0->pTeo10000 = Object_Create(((DynObjModelRef*)fn_8000B70C('TEO ', 10000))->p4);
-        lbl_80281DA0->pTeo10000->uFlags |= 1;
-        lbl_80281DA0->pTeo10000->uFlags |= 0x10;
+    if (gpDynObjState->pTeo10000 == NULL) {
+        gpDynObjState->pTeo10000 = Object_Create(((DynObjModelRef*)fn_8000B70C('TEO ', 10000))->p4);
+        gpDynObjState->pTeo10000->uFlags |= 1;
+        gpDynObjState->pTeo10000->uFlags |= 0x10;
     }
     for (i = 0; i < 4; i++) {
-        if (lbl_80281DA0->apTeo10030[i] == NULL) {
+        if (gpDynObjState->apTeo10030[i] == NULL) {
             nId = i + 10030;
             if (fn_8000B54C('TEO ', nId)) {
-                lbl_80281DA0->apTeo10030[i] = Object_Create(((DynObjModelRef*)fn_8000B70C('TEO ', nId))->p4);
+                gpDynObjState->apTeo10030[i] = Object_Create(((DynObjModelRef*)fn_8000B70C('TEO ', nId))->p4);
             }
         }
     }
     for (i = 0; i < 4; i++) {
-        if (lbl_80281DA0->apTeo10040[i] == NULL) {
+        if (gpDynObjState->apTeo10040[i] == NULL) {
             nId = i + 10040;
             if (fn_8000B54C('TEO ', nId)) {
-                lbl_80281DA0->apTeo10040[i] = Object_Create(((DynObjModelRef*)fn_8000B70C('TEO ', nId))->p4);
+                gpDynObjState->apTeo10040[i] = Object_Create(((DynObjModelRef*)fn_8000B70C('TEO ', nId))->p4);
             }
         }
     }
     if (GM_Currently_SkillZoneMode()) {
         for (i = 0; i < 4; i++) {
-            if (lbl_80281DA0->apTeo10006[i] == NULL) {
+            if (gpDynObjState->apTeo10006[i] == NULL) {
                 nId = i + 10006;
                 if (fn_8000B54C('TEO ', nId)) {
-                    lbl_80281DA0->apTeo10006[i] =
+                    gpDynObjState->apTeo10006[i] =
                         Object_Create(((DynObjModelRef*)fn_8000B70C('TEO ', nId))->p4);
                 }
             }
         }
         for (i = 0; i < 3; i++) {
-            if (lbl_80281DA0->apTeo10020[i] == NULL) {
+            if (gpDynObjState->apTeo10020[i] == NULL) {
                 nId = i + 10020;
                 if (fn_8000B54C('TEO ', nId)) {
-                    lbl_80281DA0->apTeo10020[i] =
+                    gpDynObjState->apTeo10020[i] =
                         Object_Create(((DynObjModelRef*)fn_8000B70C('TEO ', nId))->p4);
                 }
             }
@@ -234,62 +234,62 @@ void DynObj_InitForHole(void) {
             pFlag->uCharFlags |= 0x40;
         }
     }
-    lbl_80281DA0->fA94 = 7.0f;
-    lbl_80281DA0->fA98 = 10.5f;
-    lbl_80281DA0->fA9C = 0.3f;
-    lbl_80281DA0->fAA0 = 0.7f;
-    lbl_80281DA0->fAA4 = 1.5f;
-    lbl_80281DA0->fAA8 = 0.6f;
-    lbl_80281DA0->fAAC = -0.05169f;
+    gpDynObjState->fA94 = 7.0f;
+    gpDynObjState->fA98 = 10.5f;
+    gpDynObjState->fA9C = 0.3f;
+    gpDynObjState->fAA0 = 0.7f;
+    gpDynObjState->fAA4 = 1.5f;
+    gpDynObjState->fAA8 = 0.6f;
+    gpDynObjState->fAAC = -0.05169f;
     for (i = 0; i < gSession.nNumPlayers; i++) {
-        lbl_80281DA0->aB[i].bF4 = 0;
-        lbl_80281DA0->aA[i].bF8 = 0;
-        lbl_80281DA0->apPlayer[i] = NULL;
+        gpDynObjState->aB[i].bF4 = 0;
+        gpDynObjState->aA[i].bF8 = 0;
+        gpDynObjState->apPlayer[i] = NULL;
     }
-    lbl_80281DA0->apRing[0] = NULL;
-    lbl_80281DA0->apRing[1] = NULL;
-    lbl_80281DA0->apRing[2] = NULL;
-    lbl_80281DA0->apRing[3] = NULL;
-    lbl_80281DA0->apRing[4] = NULL;
-    lbl_80281DA0->apRing[5] = NULL;
-    lbl_80281DA0->apRing[6] = NULL;
-    lbl_80281DA0->apRing[7] = NULL;
-    lbl_80281DA0->apRing[8] = NULL;
-    lbl_80281DA0->apRing[9] = NULL;
-    lbl_80281DA0->nRing = 0;
+    gpDynObjState->apRing[0] = NULL;
+    gpDynObjState->apRing[1] = NULL;
+    gpDynObjState->apRing[2] = NULL;
+    gpDynObjState->apRing[3] = NULL;
+    gpDynObjState->apRing[4] = NULL;
+    gpDynObjState->apRing[5] = NULL;
+    gpDynObjState->apRing[6] = NULL;
+    gpDynObjState->apRing[7] = NULL;
+    gpDynObjState->apRing[8] = NULL;
+    gpDynObjState->apRing[9] = NULL;
+    gpDynObjState->nRing = 0;
 }
 
 // Frees the 'TEO ' models DynObj_InitForHole made.
 void DynObj_DeInitForHole(void) {
     int i;
 
-    if (lbl_80281DA0->pTeo10000 != NULL) {
-        Object_Free(lbl_80281DA0->pTeo10000);
+    if (gpDynObjState->pTeo10000 != NULL) {
+        Object_Free(gpDynObjState->pTeo10000);
     }
-    lbl_80281DA0->pTeo10000 = NULL;
+    gpDynObjState->pTeo10000 = NULL;
     for (i = 0; i < 4; i++) {
-        if (lbl_80281DA0->apTeo10030[i] != NULL) {
-            Object_Free(lbl_80281DA0->apTeo10030[i]);
+        if (gpDynObjState->apTeo10030[i] != NULL) {
+            Object_Free(gpDynObjState->apTeo10030[i]);
         }
-        lbl_80281DA0->apTeo10030[i] = NULL;
+        gpDynObjState->apTeo10030[i] = NULL;
     }
     for (i = 0; i < 4; i++) {
-        if (lbl_80281DA0->apTeo10040[i] != NULL) {
-            Object_Free(lbl_80281DA0->apTeo10040[i]);
+        if (gpDynObjState->apTeo10040[i] != NULL) {
+            Object_Free(gpDynObjState->apTeo10040[i]);
         }
-        lbl_80281DA0->apTeo10040[i] = NULL;
+        gpDynObjState->apTeo10040[i] = NULL;
     }
     for (i = 0; i < 3; i++) {
-        if (lbl_80281DA0->apTeo10020[i] != NULL) {
-            Object_Free(lbl_80281DA0->apTeo10020[i]);
+        if (gpDynObjState->apTeo10020[i] != NULL) {
+            Object_Free(gpDynObjState->apTeo10020[i]);
         }
-        lbl_80281DA0->apTeo10020[i] = NULL;
+        gpDynObjState->apTeo10020[i] = NULL;
     }
     for (i = 0; i < 4; i++) {
-        if (lbl_80281DA0->apTeo10006[i] != NULL) {
-            Object_Free(lbl_80281DA0->apTeo10006[i]);
+        if (gpDynObjState->apTeo10006[i] != NULL) {
+            Object_Free(gpDynObjState->apTeo10006[i]);
         }
-        lbl_80281DA0->apTeo10006[i] = NULL;
+        gpDynObjState->apTeo10006[i] = NULL;
     }
 }
 
@@ -323,11 +323,11 @@ void DynObj_RenderDynamicObjects(int nView) {
     }
 }
 
-// 0 in game mode 21 (alternate shot) while the player is in state 19 and the partner (lbl_80187D38)
+// 0 in game mode 21 (alternate shot) while the player is in state 19 and the partner (gAltShotPartner)
 // is not; else 1.
 u8 DynObj_bAltShotDrawBall(int nPlayer) {
     if (Game_GetMode() == 21 && (s8)GOLFERSTATE_GetCurrentState(nPlayer) == 19 &&
-        (s8)GOLFERSTATE_GetCurrentState(lbl_80187D38[nPlayer]) != 19) {
+        (s8)GOLFERSTATE_GetCurrentState(gAltShotPartner[nPlayer]) != 19) {
         return 0;
     }
     return 1;
@@ -443,7 +443,7 @@ void DynObj_PitchMarkAdd(f32* pPos, int nPlayer) {
     fGround = Ter_GetSupportingGroundData(Ter_GetTGD(), vPos, &pSurface, vNormal);
     if (TER_NO_GROUND != fGround && pSurface->nClass == 3 && fGround - pPos[1] < 0.02f &&
         (f32)Math_Sqrt(Vec3_LengthSqClamped(gPlayers[nPlayer].ball.vVel)) >= 10.0f) {
-        if (lbl_80281DA0->apRing[lbl_80281DA0->nRing] == NULL) {
+        if (gpDynObjState->apRing[gpDynObjState->nRing] == NULL) {
             // EA bug: def.n1A is never set, and type 0's setup copies it to DynObj.n14E
             def.n0 = 0;
             def.n4 = 0;
@@ -460,14 +460,14 @@ void DynObj_PitchMarkAdd(f32* pPos, int nPlayer) {
             setup.pC = NULL;
             nId = fn_800490B8(&setup);
             if (nId != -2) {
-                lbl_80281DA0->apRing[lbl_80281DA0->nRing] = fn_80048E4C(nId);
+                gpDynObjState->apRing[gpDynObjState->nRing] = fn_80048E4C(nId);
             }
         } else {
-            LLMath_CopyVec(vPos, lbl_80281DA0->apRing[lbl_80281DA0->nRing]->obj.m80[3]);
-            UObject_ComposeRotation(lbl_80281DA0->apRing[lbl_80281DA0->nRing]->obj.m0);
+            LLMath_CopyVec(vPos, gpDynObjState->apRing[gpDynObjState->nRing]->obj.m80[3]);
+            UObject_ComposeRotation(gpDynObjState->apRing[gpDynObjState->nRing]->obj.m0);
         }
-        lbl_80281DA0->nRing = lbl_80281DA0->nRing + 1;
-        lbl_80281DA0->nRing = lbl_80281DA0->nRing % 10;
+        gpDynObjState->nRing = gpDynObjState->nRing + 1;
+        gpDynObjState->nRing = gpDynObjState->nRing % 10;
     }
 }
 
@@ -490,7 +490,7 @@ void DynObj_ShotDivotHoleAdd(f32* pPos, int nPlayer) {
     vPos[2] = pPos[2];
     vPos[3] = 1.0f;
     fGround = Ter_GetSupportingGroundData(Ter_GetTGD(), vPos, &pSurface, vNormal);
-    if (lbl_80281DA0->apPlayer[nPlayer] == NULL) {
+    if (gpDynObjState->apPlayer[nPlayer] == NULL) {
         // EA bug: def.n1A is never set, and type 0's setup copies it to DynObj.n14E
         vPos[1] = 0.01f + fGround;
         def.n0 = 0;
@@ -508,16 +508,16 @@ void DynObj_ShotDivotHoleAdd(f32* pPos, int nPlayer) {
         setup.pC = NULL;
         nId = fn_800490B8(&setup);
         if (nId != -2) {
-            lbl_80281DA0->apPlayer[nPlayer] = fn_80048E4C(nId);
+            gpDynObjState->apPlayer[nPlayer] = fn_80048E4C(nId);
         }
     }
     LLMath_IdentifyMat(mTurn);
-    LLMath_IdentifyMat(lbl_80281DA0->apPlayer[nPlayer]->obj.m0);
+    LLMath_IdentifyMat(gpDynObjState->apPlayer[nPlayer]->obj.m0);
     mat44flt_EulerAngles(mTurn, -gPlayers[nPlayer].fAim, 0.0f, 0.0f);
-    LLMath_mat44fltMultiplyList(lbl_80281DA0->apPlayer[nPlayer]->obj.m0, mTurn, mObj, 4);
-    LLMath_CopyMat44(mObj, lbl_80281DA0->apPlayer[nPlayer]->obj.m0);
-    LLMath_CopyVec(vPos, lbl_80281DA0->apPlayer[nPlayer]->obj.m80[3]);
-    UObject_ComposeRotation(lbl_80281DA0->apPlayer[nPlayer]->obj.m0);
+    LLMath_mat44fltMultiplyList(gpDynObjState->apPlayer[nPlayer]->obj.m0, mTurn, mObj, 4);
+    LLMath_CopyMat44(mObj, gpDynObjState->apPlayer[nPlayer]->obj.m0);
+    LLMath_CopyVec(vPos, gpDynObjState->apPlayer[nPlayer]->obj.m80[3]);
+    UObject_ComposeRotation(gpDynObjState->apPlayer[nPlayer]->obj.m0);
 }
 
 // Draws a 'TEO ' model (10006 + the target's kind) at each target of the target games.
@@ -529,11 +529,11 @@ void DynObj_DrawTargetModels(s32 nView) {
     for (i = 0; i < GameModeSkillZoneBase_GetCupCount(); i++) {
         GameModeSkillZoneBase_GetCupPosition(i, vPos);
         nKind = gpGame->pfnGreenType(ViewController_GetActivePlayerNumber(nView), i);
-        if (lbl_80281DA0->apTeo10006[nKind] != NULL) {
-            Object_SetLod(lbl_80281DA0->apTeo10006[nKind], 0);
-            LLMath_IdentifyMat(lbl_80281DA0->apTeo10006[nKind]->m80);
-            LLMath_CopyVec(vPos, lbl_80281DA0->apTeo10006[nKind]->m80[3]);
-            Object_Draw(lbl_80281DA0->apTeo10006[nKind]);
+        if (gpDynObjState->apTeo10006[nKind] != NULL) {
+            Object_SetLod(gpDynObjState->apTeo10006[nKind], 0);
+            LLMath_IdentifyMat(gpDynObjState->apTeo10006[nKind]->m80);
+            LLMath_CopyVec(vPos, gpDynObjState->apTeo10006[nKind]->m80[3]);
+            Object_Draw(gpDynObjState->apTeo10006[nKind]);
         }
     }
 }
@@ -564,11 +564,11 @@ void DynObj_DrawTargetOverlays(s32 nView) {
             nModel = -1;
             break;
         }
-        if (nModel != -1 && lbl_80281DA0->apTeo10020[nModel] != NULL) {
-            Object_SetLod(lbl_80281DA0->apTeo10020[nModel], 0);
-            LLMath_IdentifyMat(lbl_80281DA0->apTeo10020[nModel]->m80);
-            LLMath_CopyVec(vPos, lbl_80281DA0->apTeo10020[nModel]->m80[3]);
-            Object_Draw(lbl_80281DA0->apTeo10020[nModel]);
+        if (nModel != -1 && gpDynObjState->apTeo10020[nModel] != NULL) {
+            Object_SetLod(gpDynObjState->apTeo10020[nModel], 0);
+            LLMath_IdentifyMat(gpDynObjState->apTeo10020[nModel]->m80);
+            LLMath_CopyVec(vPos, gpDynObjState->apTeo10020[nModel]->m80[3]);
+            Object_Draw(gpDynObjState->apTeo10020[nModel]);
         }
     }
     DS_vSetAlphaTestMode(1, 6, 0x80);
@@ -619,15 +619,15 @@ void DynObj_DrawGolfBalls(u8* pState) {
     f32 fTurn;
     f32 fT;
 
-    pBall = lbl_80281DA0->pTeo10000;
+    pBall = gpDynObjState->pTeo10000;
     for (i = 0; i < gSession.nNumPlayers; i++) {
         pState[i] = 0;
         if (!DynObj_bDrawBall(i)) {
             continue;
         }
         if ((s8)gSession.aProfile[i].nOutfit >= 0) {
-            pLogoA = lbl_80281DA0->apTeo10030[i];
-            pLogoB = lbl_80281DA0->apTeo10040[i];
+            pLogoA = gpDynObjState->apTeo10030[i];
+            pLogoB = gpDynObjState->apTeo10040[i];
         } else {
             pLogoA = NULL;
             pLogoB = NULL;
@@ -692,18 +692,18 @@ void DynObj_DrawGolfBalls(u8* pState) {
         if (pLogoB != NULL) {
             LLMath_IdentifyMat(pLogoB->m40);
         }
-        pBall->m40[0][0] = lbl_80281128;
-        pBall->m40[1][1] = lbl_80281128 / ViewController_GetCameraControl(gPlayers[i].nView[0])->f54;
-        pBall->m40[2][2] = lbl_80281128;
+        pBall->m40[0][0] = gGolfBallScale;
+        pBall->m40[1][1] = gGolfBallScale / ViewController_GetCameraControl(gPlayers[i].nView[0])->f54;
+        pBall->m40[2][2] = gGolfBallScale;
         if (pLogoA != NULL) {
-            pLogoA->m40[0][0] = lbl_80281128;
-            pLogoA->m40[1][1] = lbl_80281128 / ViewController_GetCameraControl(gPlayers[i].nView[0])->f54;
-            pLogoA->m40[2][2] = lbl_80281128;
+            pLogoA->m40[0][0] = gGolfBallScale;
+            pLogoA->m40[1][1] = gGolfBallScale / ViewController_GetCameraControl(gPlayers[i].nView[0])->f54;
+            pLogoA->m40[2][2] = gGolfBallScale;
         }
         if (pLogoB != NULL) {
-            pLogoB->m40[0][0] = lbl_80281128;
-            pLogoB->m40[1][1] = lbl_80281128 / ViewController_GetCameraControl(gPlayers[i].nView[0])->f54;
-            pLogoB->m40[2][2] = lbl_80281128;
+            pLogoB->m40[0][0] = gGolfBallScale;
+            pLogoB->m40[1][1] = gGolfBallScale / ViewController_GetCameraControl(gPlayers[i].nView[0])->f54;
+            pLogoB->m40[2][2] = gGolfBallScale;
         }
         LLMath_CopyVec(gPlayers[i].ball.vPos, pBall->m80[3]);
         pBall->m80[3][3] = 1.0f;
@@ -789,7 +789,7 @@ f32 DynObj_GetBallPixels(int nPlayer) {
 
     pCamera = RC_spGetCurrentRenderCtx();
     pLens = Camera_GetLens(pCamera);
-    fRadius = lbl_80281DA0->pTeo10000->pModel->apLod[0]->pInfo->f64 * lbl_80281128;
+    fRadius = gpDynObjState->pTeo10000->pModel->apLod[0]->pInfo->f64 * gGolfBallScale;
     LLMath_CopyVec(gPlayers[nPlayer].ball.vPos, &vPos.x);
     vPos.w = 1.0f;
     LLMath_mat44fltMultiply(pLens->m44, &vPos, &vAbove);
@@ -820,7 +820,7 @@ void DynObj_DivotAdd(f32* pPos, int nPlayer) {
     DynObjDef def;
     DynObjSetup setup;
     DynObjModel model;
-    GoDynObjPlayerB* pB = &lbl_80281DA0->aB[nPlayer];
+    GoDynObjPlayerB* pB = &gpDynObjState->aB[nPlayer];
     s32 nId;
 
     pB->v20[0] = pPos[0];
@@ -860,20 +860,20 @@ void DynObj_DivotAdd(f32* pPos, int nPlayer) {
 // Gives up the player's divot hole (DynObj_ShotDivotHoleAdd). pBall is not read (GameMode11.c
 // passes NULL).
 void DynObj_ShotDivotHoleHide(Ball* pBall, int nPlayer) {
-    if (lbl_80281DA0->apPlayer[nPlayer] != NULL) {
-        fn_800491C4(lbl_80281DA0->apPlayer[nPlayer]);
+    if (gpDynObjState->apPlayer[nPlayer] != NULL) {
+        fn_800491C4(gpDynObjState->apPlayer[nPlayer]);
         fn_800490EC();
-        lbl_80281DA0->apPlayer[nPlayer] = NULL;
+        gpDynObjState->apPlayer[nPlayer] = NULL;
     }
 }
 
 // Gives up the player's divot (DynObj_DivotAdd). pBall is not read (GameMode11.c passes NULL).
 void DynObj_DivotHide(Ball* pBall, int nPlayer) {
-    if (lbl_80281DA0->aB[nPlayer].bF4) {
-        fn_800491C4(lbl_80281DA0->aB[nPlayer].pF0);
+    if (gpDynObjState->aB[nPlayer].bF4) {
+        fn_800491C4(gpDynObjState->aB[nPlayer].pF0);
         fn_800490EC();
-        lbl_80281DA0->aB[nPlayer].pF0 = NULL;
-        lbl_80281DA0->aB[nPlayer].bF4 = 0;
+        gpDynObjState->aB[nPlayer].pF0 = NULL;
+        gpDynObjState->aB[nPlayer].bF4 = 0;
     }
 }
 
@@ -883,7 +883,7 @@ void DynObj_UpdateDivot(int nPlayer) {
     f32 mTmp[4][4];
     f32 vMove[4];
     f32 vWind[4];
-    GoDynObjPlayerB* pB = &lbl_80281DA0->aB[nPlayer];
+    GoDynObjPlayerB* pB = &gpDynObjState->aB[nPlayer];
     f32 fRange;
     f32 fGround;
 
@@ -897,17 +897,17 @@ void DynObj_UpdateDivot(int nPlayer) {
         LLMath_CopyMat44(mTmp, pB->pF0->obj.m0);
         UObject_ComposeRotation(pB->pF0->obj.m0);
         LLMath_CopyVec(pB->v20, pB->v30);
-        DynObj_LaunchDirection(pB->v40, pB->fC, lbl_80281DA0->fAA0);
-        LLMath_Scale(lbl_80281DA0->fA98 * (0.5f * Misc_RandFuncf(1) + 0.5f), pB->v40, pB->v40);
+        DynObj_LaunchDirection(pB->v40, pB->fC, gpDynObjState->fAA0);
+        LLMath_Scale(gpDynObjState->fA98 * (0.5f * Misc_RandFuncf(1) + 0.5f), pB->v40, pB->v40);
         pB->v40[3] = pB->v40[1];
         pB->bF5 = 0;
         pB->b0 = 1;
         pB->f10 = 0.0f;
-        fRange = lbl_80281DA0->fAA8;
+        fRange = gpDynObjState->fAA8;
         pB->v60[0] = fRange * Misc_RandFuncf(1) - 0.5f * fRange;
-        fRange = lbl_80281DA0->fAA8;
+        fRange = gpDynObjState->fAA8;
         pB->v60[1] = fRange * Misc_RandFuncf(1) - 0.5f * fRange;
-        fRange = lbl_80281DA0->fAA8;
+        fRange = gpDynObjState->fAA8;
         pB->v60[2] = fRange * Misc_RandFuncf(1) - 0.5f * fRange;
         pB->v50[0] = 0.0f;
         pB->v50[1] = 0.0f;
@@ -944,12 +944,12 @@ void DynObj_TeeAdd(f32* pPos, int nPlayer, u8 bReset) {
     DynObjDef def;
     DynObjSetup setup;
     DynObjModel model;
-    GoDynObjPlayerA* pA = &lbl_80281DA0->aA[nPlayer];
+    GoDynObjPlayerA* pA = &gpDynObjState->aA[nPlayer];
     s32 nId;
     int i;
 
     pA->v20[0] = pPos[0];
-    pA->v20[1] = pPos[1] + lbl_80281DA0->fAAC;
+    pA->v20[1] = pPos[1] + gpDynObjState->fAAC;
     pA->v20[2] = pPos[2];
     pA->v20[3] = 1.0f;
     pA->bF9 = 1;
@@ -1013,7 +1013,7 @@ void DynObj_TeeAdd(f32* pPos, int nPlayer, u8 bReset) {
 }
 
 void DynObj_TeeStruck(int nPlayer) {
-    lbl_80281DA0->aA[nPlayer].b70 = 1;
+    gpDynObjState->aA[nPlayer].b70 = 1;
 }
 
 // Flies the player's tee (DynObj_TeeAdd) once DynObj_TeeStruck knocked it: a random heading, speed
@@ -1023,7 +1023,7 @@ void DynObj_UpdateTee(int nPlayer) {
     f32 mTmp[4][4];
     f32 vMove[4];
     f32 vWind[4];
-    GoDynObjPlayerA* pA = &lbl_80281DA0->aA[nPlayer];
+    GoDynObjPlayerA* pA = &gpDynObjState->aA[nPlayer];
     f32 fRange;
     f32 fGround;
 
@@ -1039,17 +1039,17 @@ void DynObj_UpdateTee(int nPlayer) {
             LLMath_CopyMat44(mTmp, pA->pF4->obj.m0);
             UObject_ComposeRotation(pA->pF4->obj.m0);
             LLMath_CopyVec(pA->v20, pA->v30);
-            DynObj_LaunchDirection(pA->v40, pA->fC, lbl_80281DA0->fA9C);
-            LLMath_Scale(lbl_80281DA0->fA94 * Misc_RandFuncf(1), pA->v40, pA->v40);
+            DynObj_LaunchDirection(pA->v40, pA->fC, gpDynObjState->fA9C);
+            LLMath_Scale(gpDynObjState->fA94 * Misc_RandFuncf(1), pA->v40, pA->v40);
             pA->v40[3] = pA->v40[1];
             pA->bF9 = 0;
             pA->b0 = 1;
             pA->f10 = 0.0f;
-            fRange = lbl_80281DA0->fAA4;
+            fRange = gpDynObjState->fAA4;
             pA->v60[0] = fRange * Misc_RandFuncf(1) - 0.5f * fRange;
-            fRange = lbl_80281DA0->fAA4;
+            fRange = gpDynObjState->fAA4;
             pA->v60[1] = fRange * Misc_RandFuncf(1) - 0.5f * fRange;
-            fRange = lbl_80281DA0->fAA4;
+            fRange = gpDynObjState->fAA4;
             pA->v60[2] = fRange * Misc_RandFuncf(1) - 0.5f * fRange;
             pA->v50[0] = 0.0f;
             pA->v50[1] = 0.0f;
@@ -1087,10 +1087,10 @@ void DynObj_UpdateTee(int nPlayer) {
 }
 
 char* DynObj_GetGolfBallLogoTextureName(int i) {
-    return lbl_80187B98[i];
+    return gGolfBallLogoTextureNames[i];
 }
 
-// The index of the name in lbl_80187B98 (case ignored), or -1 (also for NULL).
+// The index of the name in gGolfBallLogoTextureNames (case ignored), or -1 (also for NULL).
 int DynObj_GetGolfBallLogoIndex(const char* szName) {
     int i;
 
@@ -1098,7 +1098,7 @@ int DynObj_GetGolfBallLogoIndex(const char* szName) {
         return -1;
     }
     for (i = 0; i < 27; i++) {
-        if (stricmp(szName, lbl_80187B98[i]) == 0) {
+        if (stricmp(szName, gGolfBallLogoTextureNames[i]) == 0) {
             return i;
         }
     }

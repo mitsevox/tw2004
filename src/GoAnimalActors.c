@@ -6,7 +6,7 @@
 #include "ball.h"
 #include "camera.h"
 
-AnimalStep lbl_80187DF0[6] = {
+AnimalStep gAnimalPoseSteps[6] = {
     { 0, 3, 1, 0.5f, 0.0f },
     { 1, 3, 2, 1.0f, 0.0f },
     { 2, 3, 3, 1.0f, 0.5f },
@@ -416,8 +416,8 @@ void ActAnimal_Update(DynObjAnimal* pAnimal, void* pArg) {
             fMaxB = 4.0f * fDt;
             fMinB = -4.0f * fDt;
             for (i = 0; i < 6; i++) {
-                if (pAnimal->n1AC == lbl_80187DF0[i].nFrom && pAnimal->n1B0 == lbl_80187DF0[i].nTo) {
-                    fDiff = lbl_80187DF0[i].fTarget - pAnimal->f1B4;
+                if (pAnimal->n1AC == gAnimalPoseSteps[i].nFrom && pAnimal->n1B0 == gAnimalPoseSteps[i].nTo) {
+                    fDiff = gAnimalPoseSteps[i].fTarget - pAnimal->f1B4;
                     if (pAnimal->n1AC == 2 || pAnimal->n1AC == 3) {
                         if (fDiff > fMaxA) {
                             fDiff = fMaxA;
@@ -434,9 +434,9 @@ void ActAnimal_Update(DynObjAnimal* pAnimal, void* pArg) {
                         }
                     }
                     pAnimal->f1B4 += fDiff;
-                    if (fabsf(pAnimal->f1B4 - lbl_80187DF0[i].fTarget) < 0.01f) {
-                        pAnimal->n1AC = lbl_80187DF0[i].nNext;
-                        pAnimal->f1B4 = lbl_80187DF0[i].fStart;
+                    if (fabsf(pAnimal->f1B4 - gAnimalPoseSteps[i].fTarget) < 0.01f) {
+                        pAnimal->n1AC = gAnimalPoseSteps[i].nNext;
+                        pAnimal->f1B4 = gAnimalPoseSteps[i].fStart;
                         pAnimal->n1B8 = 0;
                         return;
                     }

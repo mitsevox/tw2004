@@ -265,7 +265,7 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
     f32     vHand[4];
 
     pV    = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
-    pSlot = &lbl_80281DA0->aA[nPlayer];
+    pSlot = &gpDynObjState->aA[nPlayer];
     if (pV->nCurCamera != 11 && pV->nCurCamera != 0 && gpGame->pfnOKToShoot(nPlayer)) {
         GOLFERSTATE_Switch(GS_SHOT_SETUP, nPlayer);
         return;

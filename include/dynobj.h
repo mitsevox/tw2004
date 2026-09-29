@@ -316,7 +316,7 @@ typedef struct DynObjAnimal {
 } DynObjAnimal;
 LAYOUT_ASSERT(DynObjAnimal, 0x1C0);
 
-// A change of an animal's pose (our name; GoAnimalActors.c's lbl_80187DF0, 6 of them): in pose
+// A change of an animal's pose (our name; GoAnimalActors.c's gAnimalPoseSteps, 6 of them): in pose
 // nFrom heading for nTo, f1B4 moves to fTarget, then the animal takes pose nNext at fStart.
 typedef struct AnimalStep {
     u32  nFrom;                 // 0x00
@@ -325,7 +325,7 @@ typedef struct AnimalStep {
     f32  fTarget;               // 0x0C
     f32  fStart;                // 0x10
 } AnimalStep;
-extern AnimalStep lbl_80187DF0[6];
+extern AnimalStep gAnimalPoseSteps[6];
 
 // One entry of UKernel.c's lbl_801D5228 (12 bytes), taken by fn_80049230.
 typedef struct DynObjSlot {
@@ -380,7 +380,7 @@ typedef struct GoDynObjPlayerB {
 } GoDynObjPlayerB;
 LAYOUT_ASSERT(GoDynObjPlayerB, 0x100);
 
-// GoDynObj.c's state (0xAB0 bytes, lbl_80281DA0, allocated by DynObj_InitModule): per-player records
+// GoDynObj.c's state (0xAB0 bytes, gpDynObjState, allocated by DynObj_InitModule): per-player records
 // and objects, and the models of the 'TEO ' stream objects (DynObj_InitForHole makes them).
 typedef struct GoDynObjMgr {
     GoDynObjPlayerA aA[5];      // 0x000
@@ -403,11 +403,11 @@ typedef struct GoDynObjMgr {
 } GoDynObjMgr;
 LAYOUT_ASSERT(GoDynObjMgr, 0xAB0);
 
-extern GoDynObjMgr* lbl_80281DA0;
-extern s32  lbl_80187D38[4];            // GoDynObj.c: each player's partner in game mode 21
-extern char lbl_80187B98[27][13];       // GoDynObj.c: 27 names (DynObj_GetGolfBallLogoIndex finds one)
-extern char lbl_80187CF8[4][13];        // GoDynObj.c: each player's ball logo texture ("logoea", ...)
-extern f32  lbl_80281128;               // 1.0: scales the ball's radius (DynObj_GetBallPixels); owner unknown
+extern GoDynObjMgr* gpDynObjState;
+extern s32  gAltShotPartner[4];            // GoDynObj.c: each player's partner in game mode 21
+extern char gGolfBallLogoTextureNames[27][13];       // GoDynObj.c: 27 names (DynObj_GetGolfBallLogoIndex finds one)
+extern char gGolfBallLogoSlotNames[4][13];        // GoDynObj.c: each player's ball logo texture ("logoea", ...)
+extern f32  gGolfBallScale;               // 1.0: scales the ball's radius (DynObj_GetBallPixels); owner unknown
 
 // UKernel.c's list of the objects, first and last, the last id given out (DynObj.n134), a bit
 // mask of the used entries of lbl_801D5228 (fn_80049230; 16 at most), and two node pools (400-
@@ -427,7 +427,7 @@ void DynObj_PitchMarkAdd(f32* pPos, int nPlayer);  // a fast ball low over class
 void DynObj_ShotDivotHoleAdd(f32* pPos, int nPlayer);  // put the player's 'TEO ' 10001 object at pPos
 void DynObj_DivotAdd(f32* pPos, int nPlayer);  // put the player's 'TEO ' 10002 object at pPos
 void DynObj_TeeStruck(int nPlayer);             // launch the player's 'TEO ' 10004 object
-int  DynObj_GetGolfBallLogoIndex(const char* szName);   // the index of the name among lbl_80187B98's 27 (-1: none)
+int  DynObj_GetGolfBallLogoIndex(const char* szName);   // the index of the name among gGolfBallLogoTextureNames's 27 (-1: none)
 
 // UKernel.c, UObject.c. The UObject functions take the object part (&DynObj.obj).
 DynObj* fn_80048E44(void);                                  // the first object
