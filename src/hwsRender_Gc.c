@@ -12,7 +12,7 @@
 
 void SKN_InitModule(int n);                // Skin.c
 void fn_80037DD8(void);   // GoPostFx.c
-void fn_8011EB80(void);
+void Grass_CreateTopTexture(void);
 void fn_80112B34(void);                 // hwsOverride_Gc.c
 void fn_80112DD8(s32 nEntry);
 void fn_801132C4(SkinMeshRefs* pRefs);
@@ -83,7 +83,7 @@ void fn_80112C64(int bSplit) {
 void fn_80112CEC(void);
 void SKN_CloseModule(void);
 s32 fn_80037F80();
-s32 fn_8011EBF8();
+s32 Grass_FreeTopTexture();
 void fn_80112DA0(void);
 
 void fn_80112CEC(void) {
@@ -102,7 +102,7 @@ void fn_80112D20(void) {
         fn_80112C64(0);
     }
     if (fn_80112B80()) {
-        fn_8011EB80();
+        Grass_CreateTopTexture();
     }
     fn_80037DD8();
     if (gSession.nSplitScreen) {
@@ -117,7 +117,7 @@ void fn_80112D20(void) {
 void fn_80112DA0(void) {
     fn_80112CEC();
     if (fn_80112B80() != 0) {
-        fn_8011EBF8();
+        Grass_FreeTopTexture();
     }
     fn_80037F80();
     SKN_CloseModule();

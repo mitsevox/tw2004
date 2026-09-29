@@ -269,10 +269,10 @@ void FE_LogoDesign_CloseModule(void);
 void FE_LogoDesign_UploadCustomLogo(void);
 void fn_80110390(void);
 void fn_8011407C(void);
-void fn_8011E170(void);
-void fn_8011E3B0(void);
-void fn_8011E6E8(void);
-void fn_8011E974(void);
+void Grass_InitModule(void);
+void Grass_CloseModule(void);
+void Grass_UpdateView(void);
+void Grass_Render(void);
 void EASBio_InitOnce(void);
 void fn_80124B54(void);
 void fn_801250C0(void);
@@ -661,7 +661,7 @@ void GO_vInitIG(void) {
     REPLAY_InitModule();
     GameEffects_InitGameEffectSettings();
     PsBallFx_InitModule();
-    fn_8011E170();
+    Grass_InitModule();
     TI_vResetCounter(1);
     TI_vStartCounter(1);
     if (gSession.nC == 3) {
@@ -683,7 +683,7 @@ void fn_8006CDC4(void) {
     FB_vReleaseFrameBuffer(lbl_80281E5C);
     CA_vReleaseCamera(lbl_80281E60);
     UI_FreeLoadingBarTexture();
-    fn_8011E3B0();
+    Grass_CloseModule();
     fn_800A2E14();
     fn_80093D14();
     fn_800C8108();
@@ -861,7 +861,7 @@ void fn_8006D27C(void) {
         if (nView < 2) {
             fn_800A2BBC(nView);
             if (!gSession.nSplitScreen && !gSession.b11 && nView < 2) {
-                fn_8011E6E8();
+                Grass_UpdateView();
             }
             Ter_DrawHoleView(nView);
             if (nState != GS_GREEN_MORPH) {
@@ -941,7 +941,7 @@ void fn_8006D27C(void) {
             gPlayers[ViewController_GetActivePlayerNumber(nView)].pChar->uCharFlags &= ~1;
         }
         if (!gSession.nSplitScreen && !gSession.b11 && nView < 2) {
-            fn_8011E974();
+            Grass_Render();
         }
         fn_80039358(nView);
         if (nView < 2) {

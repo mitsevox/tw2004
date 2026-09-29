@@ -64,7 +64,7 @@ LAYOUT_ASSERT(SD_SShaderTypeData_Grass_Static, 0x378);
 extern SD_SShaderTypeData_Grass_Static SD_gGrassTypeData;
 extern SD_SShaderTypeData_Grass_Static* SD_gpGrassTypeData;
 
-// A grass data chunk as fn_8011E4D8 is given it: n2 0x30-byte entries follow the header, then the
+// A grass data chunk as Grass_LoadNetworkData is given it: n2 0x30-byte entries follow the header, then the
 // data (GrassChunkData).
 typedef struct GrassChunk {
     s16 unk0;
@@ -76,7 +76,7 @@ typedef struct GrassChunkData {
     f32 f4;                     // 0x4
 } GrassChunkData;
 
-// The grass file ('gras' stream object, fn_8011E584): a word giving the size of the part after its
+// The grass file ('gras' stream object, Grass_LoadStreamFile): a word giving the size of the part after its
 // 16-byte header, then this header, n0 halfwords, a word count and 16 bytes on, the records.
 typedef struct GrassFileHeader {
     s32 n0;                     // 0x0
@@ -88,31 +88,31 @@ typedef struct GrassFileHeader {
 } GrassFileHeader;
 
 typedef struct GrassTile {
-    s32 n0;                     // 0x0  its buffer needs (n0 * 32 + 0x580) / 16 vertices (fn_8011F544)
+    s32 n0;                     // 0x0  its buffer needs (n0 * 32 + 0x580) / 16 vertices (Grass_PlaceCell)
     f32 f4;                     // 0x4  } heights: the cell's bounding sphere spans f4 to f8 + f3B8
-    f32 f8;                     // 0x8  } (fn_8011F7F8)
+    f32 f8;                     // 0x8  } (Grass_BuildVisibleList)
     u8  unkC[0x10 - 0xC];
     u32 au10[2];                // 0x10  per shell set: offsets from the file's start (after its first
                                 //       16 bytes), made into addresses on load
 } GrassTile;
 
-// One of GoGrass.c's 16 buffers (0x4C bytes): the array at GrassManager.pEC, which fn_8011FFCC
+// One of GoGrass.c's 16 buffers (0x4C bytes): the array at GrassManager.pEC, which Grass_AllocBuffers
 // makes and puts in the apDC slots; apD8 and apF0 hold pointers into it too.
 typedef struct GrassBuffer {
-    f32   f0;                   // 0x00  } the x, z it was placed at (fn_8011F544); handed on by
-    f32   f4;                   // 0x04  } fn_8011F3AC
-    f32   f8;                   // 0x08  fn_8011F544's third argument
-    s32   nC;                   // 0x0C  1 (fn_8011F544)
+    f32   f0;                   // 0x00  } the x, z it was placed at (Grass_PlaceCell); handed on by
+    f32   f4;                   // 0x04  } Grass_DrawBuffers
+    f32   f8;                   // 0x08  Grass_PlaceCell's third argument
+    s32   nC;                   // 0x0C  1 (Grass_PlaceCell)
     u8    b10;                  // 0x10  1 when placed
     u8    unk11[0x14 - 0x11];
     u8    a14[0x40 - 0x14];     // 0x14  a render object: fn_8000827C sets it up (type 17),
                                 //       fn_80008248 when the buffer is put back
-    void* p40;                  // 0x40  n44 16-byte vertices (fn_8011FFCC); freed with the buffers
-    s32   n44;                  // 0x44  its vertex count: fn_8011FDEC picks the smallest big enough
+    void* p40;                  // 0x40  n44 16-byte vertices (Grass_AllocBuffers); freed with the buffers
+    s32   n44;                  // 0x44  its vertex count: Grass_TakeFreeBuffer picks the smallest big enough
     struct GrassTile* p48;      // 0x48  the file record it was built from
 } GrassBuffer;
 
-// What fn_8011F544 hands to a buffer's render object when it builds it (our name).
+// What Grass_PlaceCell hands to a buffer's render object when it builds it (our name).
 typedef struct GrassBufferDesc {
     struct GrassTile* pTile;    // 0x00
     void*             pVerts;   // 0x04  GrassBuffer.p40
@@ -127,29 +127,29 @@ LAYOUT_ASSERT(GrassBuffer, 0x4C);
 typedef struct GrassManager {
     TexEntry*    pTex;          // 0x00  } the grass texture named by n3A4 (akgrass1..4), found by
     TexBank*     pBank;         // 0x04  } GrassRender_vBuildAndUploadOneTimeData
-    s16*         p8;            // 0x08  the grass file's n0 halfwords (fn_8011E584)
+    s16*         p8;            // 0x08  the grass file's n0 halfwords (Grass_LoadStreamFile)
     struct GrassTile* pC;       // 0x0C  the grass file's n10 records
     s32          n10;           // 0x10
     s16          n14;           // 0x14  from a version-100 file's header, else -500
     s16          n16;           // 0x16  from a version-100 file's header, else -500
     s16          n18;           // 0x18  from a version-100 file's header, else 400
     s16          n1A;           // 0x1A  the header's n0 / n18
-    s32          n1C;           // 0x1C  the chunks added (fn_8011E4D8); cleared when the grass is freed
+    s32          n1C;           // 0x1C  the chunks added (Grass_LoadNetworkData); cleared when the grass is freed
     struct GrassChunkData* a20[10];   // 0x20  each chunk's data, byte-swapped in place
     struct GrassChunk*     a48[10];   // 0x48  the chunks
-    void*        pCamera;       // 0x70  the grass's render camera, made from the three below (fn_8011E9D8)
+    void*        pCamera;       // 0x70  the grass's render camera, made from the three below (Grass_CreateTopCamera)
     CamLens*     pLens;         // 0x74  a flat lens, 20 x 20
     GoFrameBuf*  pFrameBuf;     // 0x78  256 x 256
     f32*         pRect;         // 0x7C  its screen rectangle
-    GxTexture    tex80;         // 0x80  the 256 x 256 screen copy (fn_8011E170)
-    f32          fMinX;         // 0xB0  } the placed buffers' bounds (fn_8011F544); the lens looks
-    f32          fMaxX;         // 0xB4  } down on the corner fMinX, fMinZ (fn_8011EB04)
+    GxTexture    tex80;         // 0x80  the 256 x 256 screen copy (Grass_InitModule)
+    f32          fMinX;         // 0xB0  } the placed buffers' bounds (Grass_PlaceCell); the lens looks
+    f32          fMaxX;         // 0xB4  } down on the corner fMinX, fMinZ (Grass_AimTopCamera)
     f32          fMinZ;         // 0xB8  }
     f32          fMaxZ;         // 0xBC  }
     s32          nC0;           // 0xC0  10 at start
     u8           unkC4[0xD8 - 0xC4];
-    GrassBuffer** apD8;         // 0xD8  a stack of buffers (fn_8011FDC4 pushes, fn_8011FF58 empties)
-    GrassBuffer** apDC;         // 0xDC  16 free buffers (fn_8011FD74 puts one back, fn_8011FDEC
+    GrassBuffer** apD8;         // 0xD8  a stack of buffers (Grass_QueueRelease pushes, Grass_ReleaseQueued empties)
+    GrassBuffer** apDC;         // 0xDC  16 free buffers (Grass_AddFreeBuffer puts one back, Grass_TakeFreeBuffer
                                 //       takes the best fit)
     s32          nE0;           // 0xE0  the records at pEC
     u32          nE4;           // 0xE4  apD8's depth
@@ -165,15 +165,16 @@ typedef struct GrassManager {
                                 //        its view, then -1 / its view
     u8           unk128[0x148 - 0x128];
     f32          af148[2][4];   // 0x148  0, 0, 0, 1 + f3C8, then 1, 1, 1, -1 / f3C4
-    f32          af168[8];      // 0x168  eight tuning values set at start (fn_8011E170)
+    f32          af168[8];      // 0x168  eight tuning values set at start (Grass_InitModule)
     u8           unk188[0x208 - 0x188];
     f32          af208[4];      // 0x208  f3BC / 255 three times, then 0.5
     f32          af218[4];      // 0x218  f3C0 * f3F8 / 255 three times, then 0.5
-    f32          f228;          // 0x228  16 * f410 * cos(f40C) (fn_8011E6E8)
+    f32          f228;          // 0x228  16 * f410 * cos(f40C) (Grass_UpdateView)
     f32          f22C;          // 0x22C  16 * f410 * sin(f40C)
     f32          av230[16][4];  // 0x230  16 points around a circle of radius f41C, phase f414
     u8           unk330[0x348 - 0x330];
-    // 0x348..0x370: the block fn_8011F3AC hands to SD_SetShaderTypeParameters (row 17) once per buffer and pass.
+    // 0x348..0x370: the block Grass_DrawBuffers hands to SD_SetShaderTypeParameters (row 17) once
+    // per buffer and pass.
     f32          f348;          // 0x348  f3D0
     f32          f34C;          // 0x34C  the buffer's f0
     f32          f350;          // 0x350  the buffer's f4
@@ -187,10 +188,10 @@ typedef struct GrassManager {
     void*        p370;          // 0x370  an allocation; set while the grass is on (fn_8012022C)
     u8           unk374[0x3A4 - 0x374];
     s32          n3A4;          // 0x3A4  the last chunk's GrassChunkData.n0
-    // 0x3A8..0x420: values fn_8011E170 sets at start (given there).
+    // 0x3A8..0x420: values Grass_InitModule sets at start (given there).
     f32          f3A8;          // 0x3A8  2.5
     f32          f3AC;          // 0x3AC  2.5
-    f32          f3B0;          // 0x3B0  the height the grass lens looks down from (fn_8011EB04); 500
+    f32          f3B0;          // 0x3B0  the height the grass lens looks down from (Grass_AimTopCamera); 500
     f32          f3B4;          // 0x3B4  0.6
     f32          f3B8;          // 0x3B8  the last chunk's GrassChunkData.f4; 0.13
     f32          f3BC;          // 0x3BC  128
@@ -211,7 +212,7 @@ typedef struct GrassManager {
     f32          f3F8;          // 0x3F8
     f32          f3FC;          // 0x3FC  0
     f32          f400;          // 0x400  -0.36
-    s32          n404;          // 0x404  } buffers placed with nC 1 / otherwise (fn_8011F544)
+    s32          n404;          // 0x404  } buffers placed with nC 1 / otherwise (Grass_PlaceCell)
     s32          n408;          // 0x408  }
     f32          f40C;          // 0x40C  0.78
     f32          f410;          // 0x410  0.16
@@ -222,11 +223,11 @@ typedef struct GrassManager {
 
 extern GrassManager lbl_802603B0;
 extern GrassManager* lbl_80281900;
-extern s32 lbl_80282514;        // cleared when the grass is freed (fn_8011E3B4)
-extern void* lbl_80282510;      // the grass's 256x256 texture buffer (fn_8011EB80)
+extern s32 lbl_80282514;        // cleared when the grass is freed (Grass_DeInitForHole)
+extern void* lbl_80282510;      // the grass's 256x256 texture buffer (Grass_CreateTopTexture)
 extern GXTexObj lbl_8026038C;   // its texture
 
-// The mesh fn_8011F7F8 culls each grass cell with: its bounding sphere is set to the cell's before
+// The mesh Grass_BuildVisibleList culls each grass cell with: its bounding sphere is set to the cell's before
 // the test. A full UObjMesh (0x2C bytes), so it is not small data.
 extern UObjMesh     lbl_80260360;
 extern UObjMeshInfo lbl_802602C0;

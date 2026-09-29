@@ -132,8 +132,8 @@ void Ter_RegisterStreamClients();
 void Ter_UnRegisterStreamClients();
 void StaticCam_RegisterStreamClients();
 void StaticCam_UnRegisterStreamClients();
-void fn_8011E468();
-void fn_8011E4A4();
+void Grass_RegisterStreamClients();
+void Grass_UnRegisterStreamClients();
 void StreamManagerHole_RegisterStreamClients(void);
 void StreamManagerHole_UnregisterStreamClients(void);
 void StreamManagerHole_InitModule(void);
@@ -427,12 +427,12 @@ void StreamManagerHole_RegisterStreamClients(void) {
     Ter_RegisterStreamClients();
     DynObj_RegisterStreamClients();
     StaticCam_RegisterStreamClients();
-    fn_8011E468();
+    Grass_RegisterStreamClients();
 }
 
 // Unregister the handlers StreamManagerHole_RegisterStreamClients registered.
 void StreamManagerHole_UnregisterStreamClients(void) {
-    fn_8011E4A4();
+    Grass_UnRegisterStreamClients();
     DynObj_UnRegisterStreamClients();
     Ter_UnRegisterStreamClients();
     fn_800102B4();

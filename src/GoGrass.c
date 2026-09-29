@@ -25,27 +25,27 @@ void* lbl_80282510;
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_8011E170(void);
-void fn_8011E6E8(void);
-void fn_8011EC84(void);
-void fn_8011F7F8(void);
-void fn_8011E3B0(void);
+void Grass_InitModule(void);
+void Grass_UpdateView(void);
+void Grass_RenderTopTexture(void);
+void Grass_BuildVisibleList(void);
+void Grass_CloseModule(void);
 u8 fn_80112B80();
-void fn_8011E4A4(void);
-void fn_8011EE4C(void);
-void fn_8011EF88(void);
-void fn_8011F374(void);
-void fn_8011F3AC(void);
-void fn_8011F544(int nX, int nZ, int nCull, f32 f);
+void Grass_UnRegisterStreamClients(void);
+void Grass_DrawTopTextureDebug(void);
+void Grass_BeginRender(void);
+void Grass_EndRender(void);
+void Grass_DrawBuffers(void);
+void Grass_PlaceCell(int nX, int nZ, int nCull, f32 f);
 f32 fn_80120244(f32 fX, f32 fM);
 void fn_80120268(f32* pA, f32* pB, f32* pOut);
 Sphere* fn_8012028C(RenderObj* pObj);
 int fn_80007CE8(RenderObj* pObj, Camera* pCamera, int nMode, f32 fScale);   // LLObj_Gc.c
 void SD_SetShaderTypeParameters(int nRow, void* pData);   // GoTerrain.c: calls row nRow's function with pData
-void fn_8011E974(void);
-void fn_8011EAB8(void);
-void fn_8011EBF8(void);
-void fn_8011EC2C(void);
+void Grass_Render(void);
+void Grass_ReleaseTopCamera(void);
+void Grass_FreeTopTexture(void);
+void Grass_CopyTopTexture(void);
 void RC_vSetCurrentRenderCtx(void* pCamera);   // makes it the current render camera
 void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
 void fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY);
@@ -57,42 +57,44 @@ void RenderState_SetClipMode();
 void RC_UpdateCurrentScreenMatrices();
 void GrassRender_vBuildAndUploadOneTimeData(void);
 void fn_800738DC(TexBank* pBank, TexEntry* pTex, u8 bFirst);   // GoShaderObjectCommon
-void fn_8011FDC4(GrassBuffer* pBuffer);
-void fn_8011E3B4(void);
+void Grass_QueueRelease(GrassBuffer* pBuffer);
+void Grass_DeInitForHole(void);
 void fn_80008380(void);
-void fn_8011E468(void);
-void fn_8011E4D8(GrassChunk* pChunk);
-void fn_8011EB80(void);
-void fn_8011E9D8(void);
-void fn_8011EB04(void);
-s32 fn_8011FFCC(void);
-void fn_8011E584(UStreamObject* pObject);
-int  fn_8011E6B0(f32** ppA, f32** ppB);
-void fn_8011FD74(GrassBuffer* pBuffer);
-GrassBuffer* fn_8011FDEC(s32 nSize);
-void fn_8011FF58(void);
-void fn_80120194(void);
+void Grass_RegisterStreamClients(void);
+void Grass_LoadNetworkData(GrassChunk* pChunk);
+void Grass_CreateTopTexture(void);
+void Grass_CreateTopCamera(void);
+void Grass_AimTopCamera(void);
+s32 Grass_AllocBuffers(void);
+void Grass_LoadStreamFile(UStreamObject* pObject);
+int  Grass_CompareFarthestFirst(f32** ppA, f32** ppB);
+void Grass_AddFreeBuffer(GrassBuffer* pBuffer);
+GrassBuffer* Grass_TakeFreeBuffer(s32 nSize);
+void Grass_ReleaseQueued(void);
+void Grass_FreeBuffers(void);
 
 // The grass's draw data.
 char lbl_80194598[4][8] = {"akgras1", "akgras2", "akgras3", "akgras4"}; // textures, by n3A4
-f32 lbl_801945B8[4] = {0.21f, 0.31f, 0.1f, 1.0f};                          // a colour (fn_8011EC84)
+f32 lbl_801945B8[4] = {0.21f, 0.31f, 0.1f, 1.0f};                          // a colour (Grass_RenderTopTexture)
 f32 lbl_801945C8[8] = {0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f};  // the unit square's corners
-f32 lbl_801945E8[4] = {0.5f, 0.5f, 0.5f, 0.5f};                            // a colour (fn_8011EE4C)
-f32 lbl_801945F8[8] = {0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 0.5f, 1.0f, 1.0f};  // (fn_8011EE4C)
-f32 lbl_80194618[8] = {0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f};  // (fn_8011EE4C)
+f32 lbl_801945E8[4] = {0.5f, 0.5f, 0.5f, 0.5f};                            // a colour (Grass_DrawTopTextureDebug)
+f32 lbl_801945F8[8] = {0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 0.5f, 1.0f, 1.0f};  // (Grass_DrawTopTextureDebug)
+f32 lbl_80194618[8] = {0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f};  // (Grass_DrawTopTextureDebug)
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
-// 1.0f (0x80284A30), before the 4.9f fn_8011E170 uses first; its body is unknown.
+// 1.0f (0x80284A30), before the 4.9f Grass_InitModule uses first; its body is unknown.
 static f32 GoGrass_StrippedFn(f32 x) {
     return x + 1.0f;
 }
 
-// The grass's start: its chunk loader (chunk 6) is registered and its settings get their defaults.
-void fn_8011E170(void) {
+// The grass's start, once per round (gomainloop's round set-up): Grass_LoadNetworkData is
+// registered for network chunk 6, the manager's settings get their defaults (sway, fade, grid, the
+// eight row offsets in af168), its 256 x 256 texture is set up, and gbGrassFrameSkipped is cleared.
+void Grass_InitModule(void) {
     lbl_80281900->p370 = NULL;
     lbl_80281900->n1C = 0;
-    // port: fn_8011E4D8 takes the chunk as a GrassChunk*
-    Network_RegisterLoadNetworkCallback(6, (void (*)(u8*))fn_8011E4D8);
+    // port: Grass_LoadNetworkData takes the chunk as a GrassChunk*
+    Network_RegisterLoadNetworkCallback(6, (void (*)(u8*))Grass_LoadNetworkData);
     lbl_80281900->n3DC = 1;
     lbl_80281900->n3E0 = 1;
     lbl_80281900->n3F0 = 1;
@@ -140,43 +142,51 @@ void fn_8011E170(void) {
     lbl_80282514 = 0;
 }
 
-void fn_8011E3B0(void) {
+// Empty in this build: the round's shutdown (fn_8006CDC4) calls it, the partner of
+// Grass_InitModule.
+void Grass_CloseModule(void) {
 }
 
-// The grass goes: the objects of the list in use are pushed and the stack emptied into the slots,
-// then everything is freed.
-void fn_8011E3B4(void) {
+// The hole's grass goes (hole unload, beside Ter_UnloadHole): when a grass file is loaded, the
+// buffers in use are queued and released, the file's stream memory, the buffers and the top camera
+// are freed and gbGrassFrameSkipped cleared. The network chunk count is reset either way.
+void Grass_DeInitForHole(void) {
     int i;
     if (lbl_80281900->p370 != NULL) {
         fn_80008380();
         for (i = 0; i < lbl_80281900->anF8[lbl_80281900->n100]; i++) {
-            fn_8011FDC4(lbl_80281900->apF0[lbl_80281900->n100][i]);
+            Grass_QueueRelease(lbl_80281900->apF0[lbl_80281900->n100][i]);
         }
-        fn_8011FF58();
+        Grass_ReleaseQueued();
         StaticMem_Free(lbl_80281900->p370);
         lbl_80281900->p370 = NULL;
-        fn_80120194();
-        fn_8011EAB8();
+        Grass_FreeBuffers();
+        Grass_ReleaseTopCamera();
         lbl_80282514 = 0;
     }
     lbl_80281900->n1C = 0;
 }
 
-// The grass's stream handler ('gras') is registered when fn_80112B80 allows it.
-void fn_8011E468(void) {
+// The 'gras' stream chunk gets its loader (Grass_LoadStreamFile), only when fn_80112B80 says the
+// grass is on (one view, at most three players).
+void Grass_RegisterStreamClients(void) {
     if (fn_80112B80() != 0) {
-        Stream_RegisterLoadChunkCallback('gras', fn_8011E584);
+        Stream_RegisterLoadChunkCallback('gras', Grass_LoadStreamFile);
     }
 }
 
-void fn_8011E4A4(void) {
+// The partner of Grass_RegisterStreamClients: the 'gras' loader is removed, under the same
+// fn_80112B80 test.
+void Grass_UnRegisterStreamClients(void) {
     if (fn_80112B80() != 0) {
         Stream_UnregisterLoadChunkCallback(0x67726173);
     }
 }
 
-// Adds a grass data chunk: its data (after its n2 0x30-byte entries) is byte-swapped in place.
-void fn_8011E4D8(GrassChunk* pChunk) {
+// The network chunk 6 handler (registered by Grass_InitModule): the chunk and its data (after its
+// n2 0x30-byte entries) are kept in the next of the a48/a20 slots and the data byte-swapped in
+// place. The first chunk's data gives f3B8 (the blade height) and n3A4 (which akgras texture).
+void Grass_LoadNetworkData(GrassChunk* pChunk) {
     u8* pData;
     lbl_80281900->a48[lbl_80281900->n1C] = pChunk;
     lbl_80281900->a20[lbl_80281900->n1C] = (GrassChunkData*)((u8*)(pChunk + 1) + pChunk->n2 * 0x30);
@@ -189,7 +199,7 @@ void fn_8011E4D8(GrassChunk* pChunk) {
 
 // The 'gras' stream handler: the hole's grass file is loaded. Its header gives the grid (defaults
 // when its version is not 100); the records' two offsets become addresses.
-void fn_8011E584(UStreamObject* pObject) {
+void Grass_LoadStreamFile(UStreamObject* pObject) {
     u8* pCur;
     u8* pBase;
     s32 nSkip;
@@ -198,8 +208,8 @@ void fn_8011E584(UStreamObject* pObject) {
 
     lbl_80281900->p370 = pObject;
     pCur = pObject->pData;
-    fn_8011FFCC();
-    fn_8011E9D8();
+    Grass_AllocBuffers();
+    Grass_CreateTopCamera();
     nSkip = *(s32*)pCur;
     pCur += 0x10;
     pBase = pCur;
@@ -227,9 +237,9 @@ void fn_8011E584(UStreamObject* pObject) {
     }
 }
 
-// A sort order: by the float at +8 of the objects the two entries point to, the larger first
-// (equal gives -1).
-int fn_8011E6B0(f32** ppA, f32** ppB) {
+// The qsort order of Grass_BuildVisibleList: by each GrassBuffer's f8 (its squared distance from
+// the camera), the farthest first, so the grass draws back to front. Equal gives -1.
+int Grass_CompareFarthestFirst(f32** ppA, f32** ppB) {
     f32 fA = (*ppA)[2];
     f32 fB = (*ppB)[2];
     if (fA < fB) {
@@ -241,10 +251,13 @@ int fn_8011E6B0(f32** ppA, f32** ppB) {
     return 0;
 }
 
-// The grass's frame update (after one skipped frame): new random tuning values when f3D4 changed,
-// the buffers and the grass camera, the texture pass, then the 16 sway points around the circle
-// and the phase moved on by f418 per 60th of a second.
-void fn_8011E6E8(void) {
+// The grass's per-view update, before the hole is drawn (gomainloop, one full-screen view only;
+// never while the three-screen camera is on, and not on the first frame after load): new random row
+// offsets when f3D4 changed, the queued buffers released, the visible list rebuilt
+// (Grass_BuildVisibleList), the top camera aimed and, when n3E4 is set, the top texture rendered;
+// then the 16 sway offsets around the circle and the sway phase f414 moved on by f418 per 60th of a
+// second.
+void Grass_UpdateView(void) {
     f32 vPoint[4];
     int i;
     f32 fSin;
@@ -260,7 +273,7 @@ void fn_8011E6E8(void) {
         lbl_80282514 = 1;
         return;
     }
-    // port: as in fn_8011E974, EA's GoGrass.c saw GolfCamera_bIs3ScreenCamOn as returning int
+    // port: as in Grass_Render, EA's GoGrass.c saw GolfCamera_bIs3ScreenCamOn as returning int
     if (((int (*)(void))GolfCamera_bIs3ScreenCamOn)() != 0) {
         return;
     }
@@ -270,11 +283,11 @@ void fn_8011E6E8(void) {
         }
         lbl_80281900->f3D8 = lbl_80281900->f3D4;
     }
-    fn_8011FF58();
-    fn_8011F7F8();
-    fn_8011EB04();
+    Grass_ReleaseQueued();
+    Grass_BuildVisibleList();
+    Grass_AimTopCamera();
     if (lbl_80281900->n3E4 != 0) {
-        fn_8011EC84();
+        Grass_RenderTopTexture();
     }
     fSin = Math_Sin(lbl_80281900->f40C);
     fCos = Math_Cos(lbl_80281900->f40C);
@@ -295,21 +308,26 @@ void fn_8011E6E8(void) {
     }
 }
 
-void fn_8011E974(void) {
+// Draws the grass after the hole (gomainloop, one full-screen view, not with the three-screen
+// camera): render states and shader parameters (Grass_BeginRender), the buffers
+// (Grass_DrawBuffers), states back (Grass_EndRender), and the top texture's debug view when n3CC is
+// set (never, in this build).
+void Grass_Render(void) {
     // port: EA's GoGrass.c saw GolfCamera_bIs3ScreenCamOn as returning int (its result is not masked here); it
     //       returns u8
     if (lbl_80281900->p370 != NULL && lbl_80281900->n3E0 != 0 && ((int (*)(void))GolfCamera_bIs3ScreenCamOn)() == 0) {
-        fn_8011EF88();
-        fn_8011F3AC();
-        fn_8011F374();
+        Grass_BeginRender();
+        Grass_DrawBuffers();
+        Grass_EndRender();
         if (lbl_80281900->n3CC != 0) {
-            fn_8011EE4C();
+            Grass_DrawTopTextureDebug();
         }
     }
 }
 
-// The grass's render camera: a flat 20 x 20 lens drawing into a 256 x 256 frame buffer.
-void fn_8011E9D8(void) {
+// The grass's overhead camera (at load, Grass_LoadStreamFile): a flat 20 x 20 lens drawing into a
+// 256 x 256 frame buffer, for the top texture.
+void Grass_CreateTopCamera(void) {
     lbl_80281900->pLens = CA_spCreateCamera();
     lbl_80281900->pFrameBuf = FB_spCreateFrameBuffer();
     lbl_80281900->pRect = VM_spCreateViewport();
@@ -323,16 +341,18 @@ void fn_8011E9D8(void) {
         RC_spCreateRenderCtx(lbl_80281900->pLens, lbl_80281900->pFrameBuf, lbl_80281900->pRect);
 }
 
-void fn_8011EAB8(void) {
+// The partner of Grass_CreateTopCamera: its frame buffer, lens, viewport and render context are
+// released.
+void Grass_ReleaseTopCamera(void) {
     FB_vReleaseFrameBuffer(lbl_80281900->pFrameBuf);
     CA_vReleaseCamera(lbl_80281900->pLens);
     VM_vReleaseViewport(lbl_80281900->pRect);
     RC_vReleaseRenderCtx(lbl_80281900->pCamera);
 }
 
-// Points the grass lens straight down from f3B0 over the bounds' corner, offset by half its view
-// size.
-void fn_8011EB04(void) {
+// Points the overhead lens straight down from height f3B0 (500) at the visible grass: over the
+// list's minimum x, z corner plus half the lens's view size.
+void Grass_AimTopCamera(void) {
     f32 aEye[4];
     f32 aAt[4];
     f32 fX;
@@ -352,20 +372,24 @@ void fn_8011EB04(void) {
     CA_vSetLookAt(lbl_80281900->pLens, aEye, aAt);
 }
 
-// The grass's 256x256 texture: its buffer and texture object.
-void fn_8011EB80(void) {
+// The grass's 256 x 256 top texture: its buffer (allocated here, GoGrass.c line 1311) and texture
+// object. fn_80112D20 calls it when the grass is on.
+void Grass_CreateTopTexture(void) {
     lbl_80282510 = StaticMem_Alloc(GXGetTexBufferSize(256, 256, 4, 0, 0), 2, 32, "GoGrass.c", 1311);
     GXInitTexObj(&lbl_8026038C, lbl_80282510, 256, 256, 4, 0, 0, 0);
 }
 
-void fn_8011EBF8(void) {
+// The partner of Grass_CreateTopTexture (fn_80112DA0): the buffer is freed if there is one.
+void Grass_FreeTopTexture(void) {
     if (lbl_80282510 != NULL) {
         StaticMem_Free(lbl_80282510);
     }
     lbl_80282510 = NULL;
 }
 
-void fn_8011EC2C(void) {
+// The embedded frame buffer's 256 x 256 corner is copied into the top texture and the texture cache
+// invalidated.
+void Grass_CopyTopTexture(void) {
     GXSetTexCopySrc(0, 0, 256, 256);
     GXSetTexCopyDst(256, 256, 4, 0);
     GXCopyTex(lbl_80282510, 0);
@@ -373,9 +397,11 @@ void fn_8011EC2C(void) {
     GXInvalidateTexAll();
 }
 
-// Renders the grass texture: with the grass camera current, a 256 x 256 viewport is drawn and
-// copied out (fn_8011EC2C), then the previous camera and the full 512 x 448 screen come back.
-void fn_8011EC84(void) {
+// Renders the top texture: with the overhead camera current, a 256 x 256 viewport is filled with
+// gGrassTopClearColor, the terrain's grass drawn from above (Ter_RenderGrass) and copied out
+// (Grass_CopyTopTexture); then the previous camera and the full 512 x 448 screen come back.
+// Grass_BeginRender loads the texture as the blades' ground colour.
+void Grass_RenderTopTexture(void) {
     s32 nOld;
     void* pCamera;
 
@@ -404,7 +430,7 @@ void fn_8011EC84(void) {
     nOld = Ter_SetManageZUpdate(0);
     Ter_RenderGrass();
     Ter_SetManageZUpdate(nOld);
-    fn_8011EC2C();
+    Grass_CopyTopTexture();
     RC_vSetCurrentRenderCtx(pCamera);
     RenderState_SetViewport(RC_spGetCurrentRenderCtx());
     RC_UpdateCurrentScreenMatrices();
@@ -420,7 +446,9 @@ void fn_8011EC84(void) {
     RenderState_Flush();
 }
 
-void fn_8011EE4C(void) {
+// A debug view: the top texture drawn on a screen rectangle at half brightness. Grass_Render calls
+// it only when n3CC is set, which nothing in this build does.
+void Grass_DrawTopTextureDebug(void) {
     RenderView_SetUseCurrentMatrices(0);
     RenderState_SetDrawFlags(16);
     RenderView_SetColor(lbl_801945E8);
@@ -443,7 +471,9 @@ void fn_8011EE4C(void) {
     RenderState_Flush();
 }
 
-void fn_8011EF88(void) {
+// The grass's render states: the camera's matrices, no clipping, no alpha test, no z writes, draw
+// flags 80; then its texture stages and shader parameters (GrassRender_vBuildAndUploadOneTimeData).
+void Grass_BeginRender(void) {
     RC_UpdateCurrentScreenMatrices();
     RC_vUpdateRenderCtxTransformationMatrices(RC_spGetCurrentRenderCtx());
     RenderState_SetClipMode(0);
@@ -455,8 +485,11 @@ void fn_8011EF88(void) {
     GrassRender_vBuildAndUploadOneTimeData();
 }
 
-// Sets up the grass's texture stages (its texture by n3A4, and the grass texture) and works out
-// the shader parameters from the grass lens and the settings.
+// Sets up the grass's three texture stages (its blade texture by n3A4, akgras1..4, and the top
+// texture) and works out the shader parameters from the overhead lens and the settings: the top
+// texture's coordinates from x and z (af108), the fade with distance (af148: 1 + f3C8 - distance /
+// f3C4), the colours, then hands them to SD_vSetGrassParamsOnce. Called every time the grass is
+// drawn (Grass_BeginRender), despite its name.
 void GrassRender_vBuildAndUploadOneTimeData(void) {
     u64 uHash = fn_8000BEE4(lbl_80194598[lbl_80281900->n3A4]);
     f32 fX;
@@ -514,15 +547,17 @@ void GrassRender_vBuildAndUploadOneTimeData(void) {
     RenderState_Flush();
 }
 
-void fn_8011F374(void) {
+void Grass_EndRender(void) {
     DS_vSetAlphaTestMode(1, 6, 128);
     DS_vEnableZBufferUpdate(1);
     RenderState_Flush();
 }
 
-// Draws the buffers in use in two passes: the camera's direction, flattened and normalised, picks
-// the quadrant; each buffer's position goes to SD_SetShaderTypeParameters row 17, then the buffer is drawn.
-void fn_8011F3AC(void) {
+// Draws the visible buffers in two passes (GrassParams n24: which shell set): the camera's
+// direction, flattened and normalised, picks each set's vertex run (a18) and opacity (a10); each
+// buffer's x, z goes to the grass shader (SD_SetShaderTypeParameters row 17, the GrassParams at
+// f348), then the buffer is drawn.
+void Grass_DrawBuffers(void) {
     f32 vDir[4];
     s32 nPass;
     int i;
@@ -563,10 +598,12 @@ void fn_8011F3AC(void) {
     }
 }
 
-// Places the grass of grid cell (nX, nZ) in the list being built: the buffer already made for that
-// spot in the other list is reused, else a free one is built from the cell's file record. The
-// placed buffers' bounds grow to take it in. nCull (the cell's fn_80007CE8 result) is not used.
-void fn_8011F544(int nX, int nZ, int nCull, f32 f) {
+// Places the grass of grid cell (nX, nZ) in the list being built, fDist its squared camera
+// distance: the buffer already made for that spot in the other list is reused, else a free one is
+// taken (Grass_TakeFreeBuffer) and built from the cell's file record (shader object type 17,
+// SD_vShaderObject_Grass_Static_Init). The list's bounds grow to take it in. nCull (the cell's
+// fn_80007CE8 result) is not used.
+void Grass_PlaceCell(int nX, int nZ, int nCull, f32 f) {
     GrassBufferDesc desc;
     int i;
     u8 bFound;
@@ -590,7 +627,7 @@ void fn_8011F544(int nX, int nZ, int nCull, f32 f) {
         }
     }
     if (!bFound) {
-        pBuffer = fn_8011FDEC((lbl_80281900->pC[nTile].n0 * 32 + 0x580) / 16);
+        pBuffer = Grass_TakeFreeBuffer((lbl_80281900->pC[nTile].n0 * 32 + 0x580) / 16);
         if (pBuffer == NULL) {
             return;
         }
@@ -631,8 +668,9 @@ void fn_8011F544(int nX, int nZ, int nCull, f32 f) {
 
 // Builds the other list of grass buffers for this frame: every grid cell within f3E8 of the point
 // f3EC ahead of the camera (snapped to the 2.5 grid) whose bounding sphere is in view gets placed
-// (fn_8011F544), the list is sorted, and the old list's unplaced buffers are queued for release.
-void fn_8011F7F8(void) {
+// (Grass_PlaceCell), the list is sorted farthest first, and the old list's unplaced buffers are
+// queued for release. Also sets f3F8, the camera's downward tilt between f400 and f3FC as 0..1.
+void Grass_BuildVisibleList(void) {
     f32 vFlat[4];
     f32 vLook[4];
     f32 vAhead[4];
@@ -726,21 +764,21 @@ void fn_8011F7F8(void) {
                 continue;
             }
             Vec3Copy(&pSphere->x, vSphere);
-            fn_8011F544(nX, nZ, nCull, LLMath_SquareDistanceBetween3(vSphere, vPos));
+            Grass_PlaceCell(nX, nZ, nCull, LLMath_SquareDistanceBetween3(vSphere, vPos));
         }
     }
-    // port: fn_8011E6B0 compares two GrassBuffer pointers' f8 (the larger first)
+    // port: Grass_CompareFarthestFirst compares two GrassBuffer pointers' f8 (the larger first)
     qsort(lbl_80281900->apF0[lbl_80281900->n100], lbl_80281900->anF8[lbl_80281900->n100], 4,
-          (s32 (*)(const void*, const void*))fn_8011E6B0);
+          (s32 (*)(const void*, const void*))Grass_CompareFarthestFirst);
     for (i = 0; i < lbl_80281900->anF8[nOther]; i++) {
         if (lbl_80281900->apF0[nOther][i]->b10 == 0) {
-            fn_8011FDC4(lbl_80281900->apF0[nOther][i]);
+            Grass_QueueRelease(lbl_80281900->apF0[nOther][i]);
         }
     }
 }
 
-// Puts pBuffer in the first free one of the 16 apDC slots.
-void fn_8011FD74(GrassBuffer* pBuffer) {
+// Puts pBuffer in the first empty one of the 16 free slots (apDC).
+void Grass_AddFreeBuffer(GrassBuffer* pBuffer) {
     int i;
     for (i = 0; i < 16; i++) {
         if (lbl_80281900->apDC[i] == NULL) {
@@ -752,13 +790,14 @@ void fn_8011FD74(GrassBuffer* pBuffer) {
 }
 
 // Pushes pBuffer on the apD8 stack.
-void fn_8011FDC4(GrassBuffer* pBuffer) {
+void Grass_QueueRelease(GrassBuffer* pBuffer) {
     lbl_80281900->apD8[lbl_80281900->nE4] = pBuffer;
     lbl_80281900->nE4 = lbl_80281900->nE4 + 1;
 }
 
-// Takes the smallest free buffer of at least nSize out of apDC (NULL if there is none).
-GrassBuffer* fn_8011FDEC(s32 nSize) {
+// Takes the smallest free buffer holding at least nSize vertices out of the free slots (NULL if
+// there is none).
+GrassBuffer* Grass_TakeFreeBuffer(s32 nSize) {
     int i;
     int nBest = -1;
     GrassBuffer* pBest = NULL;
@@ -782,11 +821,12 @@ GrassBuffer* fn_8011FDEC(s32 nSize) {
     return NULL;
 }
 
-// Empties the apD8 stack: each buffer gets fn_80008248 on its a14 and goes to a free apDC slot.
-void fn_8011FF58(void) {
+// Empties the release queue: each buffer's shader object is closed (fn_80008248) and the buffer
+// goes back to the free slots.
+void Grass_ReleaseQueued(void) {
     while (lbl_80281900->nE4 != 0) {
         fn_80008248((UObjMeshPart*)lbl_80281900->apD8[lbl_80281900->nE4 - 1]->a14);
-        fn_8011FD74(lbl_80281900->apD8[lbl_80281900->nE4 - 1]);
+        Grass_AddFreeBuffer(lbl_80281900->apD8[lbl_80281900->nE4 - 1]);
         lbl_80281900->nE4 = lbl_80281900->nE4 - 1;
     }
 }
@@ -795,7 +835,7 @@ void fn_8011FF58(void) {
 
 // Makes the 16 grass buffers and their lists, all free: the first four hold 600 vertices, the rest
 // 450. Returns the bytes allocated.
-s32 fn_8011FFCC(void) {
+s32 Grass_AllocBuffers(void) {
     s32 nBytes;
     s32 nVerts;
     s32 nSize;
@@ -831,8 +871,8 @@ s32 fn_8011FFCC(void) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-// Frees the grass's allocations: each record's p40, then the tables.
-void fn_80120194(void) {
+// The partner of Grass_AllocBuffers: each buffer's vertices, then the lists and the buffers.
+void Grass_FreeBuffers(void) {
     int i;
     for (i = 0; i < lbl_80281900->nE0; i++) {
         StaticMem_Free(lbl_80281900->pEC[i].p40);

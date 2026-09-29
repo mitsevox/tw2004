@@ -85,7 +85,7 @@ Objects delivered by UStream
 | `CR_A` | FE_CrAP_LoadAssetsFromStream | FE_CrAPDB.c | swapped: CrAPAssetsByteSwap > ByteSwap_Records | little-endian on disc |
 | `CR_S` | FE_CrAP_LoadStringsFromStream | FE_CrAPDB.c | none seen | asm |
 | `PGST` | PGATourSimulation_LoadPGSTFromStream | sweep | none seen | asm |
-| `gras` | fn_8011E584 | GoGrass.c | none seen | asm; GoGrass.c has a swapping function (fn_8011E4D8) the handler does not reach within four calls: probably swapped later (inferred) |
+| `gras` | Grass_LoadStreamFile | GoGrass.c | none seen | asm; GoGrass.c has a swapping function (Grass_LoadNetworkData) the handler does not reach within four calls: probably swapped later (inferred) |
 | `EASI` | fn_80124B10 | sweep | none seen | asm |
 
 The course file's sub-chunks (`Cnet`)
@@ -115,4 +115,4 @@ Other byte-order facts
   Ball.c) and 0x800B96C8 (rcmp_mad_codec.c): those write little-endian data (asm, not looked into).
 - Other callers of the swap routines, not reached from a handler above: AnimStream.c (SKA_UnpackSwappedName),
   Skeleton.c (fn_80028564), Skin*.c (SKN_SwapMeshEntries ..), CharSliders.c
-  (CharSlider_CreateDefinitionsFromMem), GoGrass.c (fn_8011E4D8).
+  (CharSlider_CreateDefinitionsFromMem), GoGrass.c (Grass_LoadNetworkData).
