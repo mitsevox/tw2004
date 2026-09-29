@@ -72,7 +72,8 @@ def load(path):
             errors.append(f'line {n}: write the comment as plain text (name.py adds the //)')
         if not re.fullmatch(r'[0-9A-Fa-f]{8}', addr):
             errors.append(f'line {n}: address {addr!r} is not 8 hex digits')
-        ea_own = tier in ('T1', 'T2') and 'E2' in codes     # EA's own name, spelled as EA did
+        # EA's own name, spelled as EA did: from a related build (E2) or EA's text in this one (E1)
+        ea_own = tier in ('T1', 'T2') and ('E1' in codes or 'E2' in codes)
         if cur == new and re.fullmatch(r'fn_[0-9A-Fa-f]{8}', cur):
             errors.append(f'line {n}: {cur} keeps its placeholder name: every function read gets a name '
                           '(an empty or stripped one is named from where it is called and what for)')
@@ -80,7 +81,7 @@ def load(path):
             pass                                            # comment-only row: the name is not new
         elif not NAME.match(new) and not (ea_own and re.fullmatch(r'[A-Za-z_]\w*', new)):
             errors.append(f'line {n}: {new!r} is not EA style System_Verb (Mem_set, RenderState_SetDepthFunc);'
-                          ' EA\'s own name (T1/T2 with E2) may be spelled as EA did')
+                          ' EA\'s own name (T1/T2 with E1 or E2) may be spelled as EA did')
         if cur != new and re.search(r'_[0-9A-Fa-f]{8}$|maybe|guess|unk|Unknown', new):
             errors.append(f'line {n}: {new!r} carries an address or a confidence marker; the tier says that')
         if tier not in ('T1', 'T2', 'T3'):
