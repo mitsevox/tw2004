@@ -330,7 +330,7 @@ They will be sorted into the sections below.
   UI_FindTexture 93 -> 100), before using them as a base pointer (DynamicCam_GetLocation), and put a loop
   bound read through a pointer in a local to get the ctr loop (uiProcessInterface UI_FindColorTable 58 -> 97).
 - **[verified] `&a[i]` indexing matches where hand-walked pointers don't** (fe_movies UIPoly_Draw,
-  ActAnimal_SetWorldMatrix, SitDevFile fn_800BCF84 74.7 -> 98.8).
+  ActAnimal_SetWorldMatrix, SitDevFile SitDev_InvokeAction 74.7 -> 98.8).
 - **[verified] `const` on read-only pointer parameters changes argument-load order** (EASBStorage
   fn_80129F98 94.4 -> 100, fn_8012A050 90.2 -> 100, fn_80128580 83.8 -> 100).
 - **[verified] A constant left in r5..r8 at a call is not always an argument**: it can be left over from a
@@ -369,7 +369,7 @@ They will be sorted into the sections below.
 - **[verified] A caller's `cmpwi` on a returned pointer means EA tested it as a signed number**:
   `(s32)f() != 0`, marked fake match with a port note (GoPostFx fn_80037E50).
 - **[verified] A near-100 function whose only difference is a branch target can be a real behaviour bug**
-  in our C (PsMgr fn_800A27FC: two calls outside their block; SitDevFile fn_800BD3F8: wrong `&&`/`||`
+  in our C (PsMgr fn_800A27FC: two calls outside their block; SitDevFile SitDev_SuppressAction: wrong `&&`/`||`
   grouping). Check branch-only mismatches before calling them register noise.
 - **Linking (tools):**
   - A unit's `.data` range ends at its own 8-byte alignment, not the next object's 32-byte alignment

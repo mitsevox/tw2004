@@ -12,31 +12,37 @@ int SitDev_NumEntries(u16* pList, int nCount);
 int SitDev_NumEntriesUnused(u16* pList, int nCount);
 u32 SitDev_ChooseRandomResponseNoRepeat(u16* pList, int nCount, int nLeft, u32 nPick);
 
-void fn_800BD77C(int nSound);
-void fn_800BD7D0(u8 nMusic);
-void fn_800BD7E8(u16 uSound);
-void fn_800BD868(int nSound, int a);
+void GameEffects_SetPostGBNegativeCommentary(int nSound);
+void GameEffects_SetPostGBCrowdLevel(u8 nMusic);
+void GameEffects_SetPostGBCommentary(u16 uSound);
+void Gaud_StartPlaylist2Comment(int nSound, int a);
 
 // ---- running a script's actions ------------------------------------------------------------
 
-u8   fn_800BCE70(SitDevAction* pAction, u8 nEvent);
-u8   fn_800BCF84(SitDevAction* pAction, int nPlayer, u8 nEvent);
-u8   fn_800BD3F8(SitDevAction* pAction, int nSit, int nPlayer, u8 nEvent);
-void fn_800BD580(SitDevEntry8* pDo, int nPlayer, u8 nEvent);
+u8   SitDev_InvokeCommentaryBank(SitDevAction* pAction, u8 nEvent);
+u8   SitDev_InvokeAction(SitDevAction* pAction, int nPlayer, u8 nEvent);
+u8   SitDev_SuppressAction(SitDevAction* pAction, int nSit, int nPlayer, u8 nEvent);
+void SitDev_TriggerResponse(SitDevEntry8* pDo, int nPlayer, u8 nEvent);
 
-// Try the entry's actions in order: each fires by its chance unless fn_800BD3F8 holds it back.
-void fn_800BCD68(SitDevEntry* pEntry, int nSit, int nPlayer, u8 nEvent) {
+// Runs a matched situation's actions for the player (up to four, to the first 0xFFF0): each fires
+// by its percent chance unless SitDev_SuppressAction holds it back, a sound action through
+// SitDev_InvokeCommentaryBank, any other through SitDev_InvokeAction. nSit is the situation's
+// script file (the top five bits of b2). Afterwards, when the prediction flags were set for this
+// run (lbl_80281E29) and the last action tried played nothing, the prediction counts as not voiced
+// (lbl_80281E28 cleared); lbl_80281E29 is cleared either way.
+void SitDev_InvokeMultipleActions(SitDevEntry* pEntry, int nSit, int nPlayer, u8 nEvent) {
     int i;
     SitDevAction* pAction;
     u8 bPlayed = 0;
     for (i = 0; i < 4; i++) {
         if (pEntry->aActions[i] == 0xFFF0) break;
         pAction = &lbl_80282208->p18[pEntry->aActions[i]];
-        if (pAction->nChance > Misc_RandFunc(1) % 100 && !fn_800BD3F8(pAction, nSit, nPlayer, nEvent)) {
+        if (pAction->nChance > Misc_RandFunc(1) % 100
+            && !SitDev_SuppressAction(pAction, nSit, nPlayer, nEvent)) {
             if (pAction->bSound) {
-                bPlayed = fn_800BCE70(pAction, nEvent);
+                bPlayed = SitDev_InvokeCommentaryBank(pAction, nEvent);
             } else {
-                bPlayed = fn_800BCF84(pAction, nPlayer, nEvent);
+                bPlayed = SitDev_InvokeAction(pAction, nPlayer, nEvent);
             }
         }
     }
@@ -46,9 +52,13 @@ void fn_800BCD68(SitDevEntry* pEntry, int nSit, int nPlayer, u8 nEvent) {
     lbl_80281E29 = 0;
 }
 
-// Play a sound drawn from the action's deck, once per kind; not while the GameBreaker holds the
-// commentary back (then, for event 8, hand it to GameEffects for later).
-u8 fn_800BCE70(SitDevAction* pAction, u8 nEvent) {
+// A sound action: unless one of its kind (nKind) has played, draws a line from its list
+// (SitDev_NumEntries, SitDev_NumEntriesUnused, SitDev_ChooseRandomResponseNoRepeat) and plays it as
+// regular commentary (play mode 1; 0 at situation event 30, the flyover). While the GameBreaker
+// holds commentary back (GameEffects_SkipOtherCommentary) the drawn line is not played; at
+// situation event 8 it is kept for the end of a scripted GameBreaker that fails. Returns whether it
+// played.
+u8 SitDev_InvokeCommentaryBank(SitDevAction* pAction, u8 nEvent) {
     u32 nLeft;
     int nCount;
     u32 nSound;
@@ -59,21 +69,23 @@ u8 fn_800BCE70(SitDevAction* pAction, u8 nEvent) {
     nSound = SitDev_ChooseRandomResponseNoRepeat(pAction->aList, nCount, nLeft, Misc_RandFunc(1) % nLeft);
     bNot30 = nEvent != 30;
     if (!GameEffects_SkipOtherCommentary()) {
-        fn_800BD83C(nSound, bNot30);
+        Gaud_StartRegularComment(nSound, bNot30);
         gpSitDevData->abPlayed[pAction->nKind] = 1;
         return 1;
     }
     if (nEvent == 8) {
-        fn_800BD77C(nSound);
+        GameEffects_SetPostGBNegativeCommentary(nSound);
     }
     return 0;
 }
 
-// Run the action's p1C entries: one of each kind not played yet. A lone entry runs unless it is
-// the last line played (except for event 30). Otherwise each kind draws one of its entries at
-// random, skipping those already drawn (bit 15 of the list entry; when all are, the marks are
-// cleared) and the last line played.
-u8 fn_800BCF84(SitDevAction* pAction, int nPlayer, u8 nEvent) {
+// A response action (bSound clear): its list names responses (p1C), and each plays through
+// SitDev_TriggerResponse. A single response plays unless its kind has played or it is the last line
+// played (pE8; allowed at situation event 30). Otherwise, for each kind not played yet: a kind with
+// one response plays it unless it is the last line played; a kind with more draws one at random,
+// skipping those already drawn (bit 15; when every one is, the marks are cleared) and stepping one
+// on past the last line played, and marks it drawn. Returns whether anything played.
+u8 SitDev_InvokeAction(SitDevAction* pAction, int nPlayer, u8 nEvent) {
     s32 anCount[14];
     s32 aaIndex[14][50];
     SitDevEntry8* pDo;
@@ -89,7 +101,7 @@ u8 fn_800BCF84(SitDevAction* pAction, int nPlayer, u8 nEvent) {
         pDo = &lbl_80282208->p1C[pAction->aList[0]];
         if (pDo == gpSitDevData->pE8 && nEvent != 30) return 0;
         if (gpSitDevData->abPlayed[pDo->nKind]) return 0;
-        fn_800BD580(pDo, nPlayer, nEvent);
+        SitDev_TriggerResponse(pDo, nPlayer, nEvent);
         gpSitDevData->abPlayed[pDo->nKind] = 1;
         return 1;
     }
@@ -109,7 +121,8 @@ u8 fn_800BCF84(SitDevAction* pAction, int nPlayer, u8 nEvent) {
     for (nKind = 0; nKind < 14; nKind++) {
         if (anCount[nKind] == 1) {
             if (&lbl_80282208->p1C[pAction->aList[aaIndex[nKind][0]]] != gpSitDevData->pE8) {
-                fn_800BD580(&lbl_80282208->p1C[pAction->aList[aaIndex[nKind][0]]], nPlayer, nEvent);
+                SitDev_TriggerResponse(&lbl_80282208->p1C[pAction->aList[aaIndex[nKind][0]]], nPlayer,
+                                       nEvent);
                 bPlayed = 1;
                 gpSitDevData->abPlayed[nKind] = 1;
             }
@@ -141,7 +154,7 @@ u8 fn_800BCF84(SitDevAction* pAction, int nPlayer, u8 nEvent) {
                 nEntry = aaIndex[nKind][nPick];
                 pDo =&lbl_80282208->p1C[pAction->aList[nEntry] & 0x7FFF];
             }
-            fn_800BD580(pDo, nPlayer, nEvent);
+            SitDev_TriggerResponse(pDo, nPlayer, nEvent);
             gpSitDevData->abPlayed[nKind] = 1;
             pAction->aList[nEntry] |= 0x8000;
             bPlayed = 1;
@@ -150,12 +163,12 @@ u8 fn_800BCF84(SitDevAction* pAction, int nPlayer, u8 nEvent) {
     return bPlayed;
 }
 
-// Whether an action is held back: at situations 21 and 22 in modes with odd holes (gpGame's
-// bCustomRound, bRandom18, bDream18 or nRegionalRound), or while PlayNow_IsChallengeRunning is set
-// (at 22 only for a ball off the tee); for events 20 and 31 while the GameBreaker is up (not at
-// situation 2); and commentary (kinds 1 and 2) during a replay, in modes 6..8, where
-// GM_Currently_SkillZoneMode says so, and in mode 11.
-u8 fn_800BD3F8(SitDevAction* pAction, int nSit, int nPlayer, u8 nEvent) {
+// Whether an action is held back. Script files 21 and 22: in rounds with custom holes (gpGame
+// bCustomRound, bRandom18, bDream18, nRegionalRound), and during a challenge
+// (PlayNow_IsChallengeRunning; file 22 only for a ball not on lie 0). Situation events 20 and 31
+// while a GameBreaker is up, except script file 2. Commentary actions (kinds 1 and 2) during a
+// replay, in modes 6 to 8, when GM_Currently_SkillZoneMode says so, and in mode 11.
+u8 SitDev_SuppressAction(SitDevAction* pAction, int nSit, int nPlayer, u8 nEvent) {
     int nMode = Game_GetMode();
     if (nSit == 22 || nSit == 21) {
         if (gpGame->bCustomRound || gpGame->bRandom18 || gpGame->bDream18 || gpGame->nRegionalRound) return 1;
@@ -172,9 +185,15 @@ u8 fn_800BD3F8(SitDevAction* pAction, int nSit, int nPlayer, u8 nEvent) {
     return 0;
 }
 
-// Do one thing: 1 a commentary line (remembered in pE8), 11 and 10 sounds, 7 music, 4 a
-// GameBreaker for a human player, 12 and 13 set the player's emotion results.
-void fn_800BD580(SitDevEntry8* pDo, int nPlayer, u8 nEvent) {
+// Does one response, by its kind: 1 a line of regular commentary when commentary is on (options
+// a0[4]): played unless the GameBreaker holds commentary back, and remembered as the last line
+// (pE8) either way; 11 a line of playlist 2 (play mode 0 for player 0, else 2) when commentary is
+// on and not held back; 10 a line kept for a GameBreaker that works, when commentary is on; 7 a
+// crowd reaction (Gaud_InitCrowdReactionSound), kept for the GameBreaker's end while it holds
+// commentary back; 4 a GameBreaker for a player whose controller is 8 or lower (fn_8002E8B4): in
+// flight for argument 0, else scripted with it; 12 and 13 set the player's shot emotion
+// (fn_8006AAB4) or its predicted emotion (fn_8006ACE0) and note that the scripts did.
+void SitDev_TriggerResponse(SitDevEntry8* pDo, int nPlayer, u8 nEvent) {
     int bNot30;
     int nArg;
     switch (pDo->nKind) {
@@ -182,7 +201,7 @@ void fn_800BD580(SitDevEntry8* pDo, int nPlayer, u8 nEvent) {
         if (gSession.options.a0[4]) {
             bNot30 = nEvent != 30;
             if (!GameEffects_SkipOtherCommentary()) {
-                fn_800BD83C((u16)pDo->n4, bNot30);
+                Gaud_StartRegularComment((u16)pDo->n4, bNot30);
             }
             gpSitDevData->pE8 = pDo;
         }
@@ -194,17 +213,17 @@ void fn_800BD580(SitDevEntry8* pDo, int nPlayer, u8 nEvent) {
             if (nPlayer == 0) {
                 nArg = 0;
             }
-            fn_800BD868(uSound, nArg);
+            Gaud_StartPlaylist2Comment(uSound, nArg);
         }
         break;
     case 10:
         if (gSession.options.a0[4]) {
-            fn_800BD7E8(pDo->n4);
+            GameEffects_SetPostGBCommentary(pDo->n4);
         }
         break;
     case 7:
         if (GameEffects_SkipOtherCommentary()) {
-            fn_800BD7D0(pDo->n4);
+            GameEffects_SetPostGBCrowdLevel(pDo->n4);
         } else {
             Gaud_InitCrowdReactionSound(pDo->n4, nEvent != 5);
         }
@@ -229,8 +248,9 @@ void fn_800BD580(SitDevEntry8* pDo, int nPlayer, u8 nEvent) {
     }
 }
 
-// Clear the scripts' per-entry bytes.
-void fn_800BD74C(void) {
+// Clears the group flags (SitDevData.pD4, one byte per group, n10 of them), so every situation
+// group may fire again: at each shot set-up (situation event 3) and when the scripts load.
+void SitDev_ClearGroupFlags(void) {
     u32 i;
     for (i = 0; i < lbl_80282208->n10; i++) {
         gpSitDevData->pD4[i] = 0;
@@ -239,33 +259,41 @@ void fn_800BD74C(void) {
 
 // ---- sounds and music ----------------------------------------------------------------------
 
-// Hand GameEffects a commentary line to play later (u48; GameEffects_EndGameBreaker plays it as the
-// GameBreaker ends), unless one is waiting already; not in mode 11.
-void fn_800BD77C(int nSound) {
+// Keeps a commentary line for the end of a scripted GameBreaker the shot did not achieve
+// (gGameEffects.u48; GameEffects_EndGameBreaker plays it), unless one is kept already; not in mode
+// 11.
+void GameEffects_SetPostGBNegativeCommentary(int nSound) {
     if (Game_GetMode() != 11 && !gGameEffects.b47) {
         gGameEffects.u48 = nSound;
         gGameEffects.b47 = 1;
     }
 }
 
-// Hand GameEffects a music to play later (n4F; GameEffects_EndGameBreaker plays it as the GameBreaker ends).
-void fn_800BD7D0(u8 nMusic) {
+// Keeps a crowd reaction (gGameEffects.nCrowdReaction) for the end of a scripted GameBreaker the
+// shot did not achieve (GameEffects_EndGameBreaker).
+void GameEffects_SetPostGBCrowdLevel(u8 nMusic) {
     gGameEffects.bCrowdReactionSet = 1;
     gGameEffects.nCrowdReaction = nMusic;
 }
 
-// The same as fn_800BD77C with GameEffects' second slot (u4C).
-void fn_800BD7E8(u16 uSound) {
+// Keeps a commentary line for the end of a GameBreaker that works (gGameEffects.u4C: a predicted
+// one, or a scripted one the shot achieved; GameEffects_EndGameBreaker plays it), unless one is
+// kept already; not in mode 11.
+void GameEffects_SetPostGBCommentary(u16 uSound) {
     if (Game_GetMode() != 11 && !gGameEffects.b4A) {
         gGameEffects.u4C = uSound;
         gGameEffects.b4A = 1;
     }
 }
 
-void fn_800BD83C(int nSound, int a) {
+// Plays commentary line nSound of playlist 0, the regular commentary (Gaud_StartComment; a is its
+// play mode).
+void Gaud_StartRegularComment(int nSound, int a) {
     Gaud_StartComment(0, nSound, a);
 }
 
-void fn_800BD868(int nSound, int a) {
+// Plays commentary line nSound of playlist 2 (Gaud_StartComment; a is its play mode): response kind
+// 11.
+void Gaud_StartPlaylist2Comment(int nSound, int a) {
     Gaud_StartComment(2, nSound, a);
 }

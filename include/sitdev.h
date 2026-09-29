@@ -27,7 +27,7 @@ typedef struct SitDevData {
                                                 //        SitDevScripts.n10; freed by SitDev_vCloseModule
     u8    abPlayed[14];                         // 0x0D8  per kind of action: one has played already
     u8    unkE6[2];
-    struct SitDevEntry8* pE8;                   // 0x0E8  the last line played (fn_800BD580 kind 1)
+    struct SitDevEntry8* pE8;                   // 0x0E8  the last line played (SitDev_TriggerResponse kind 1)
     SitDevEvent aEvents[10];                    // 0x0EC  this frame's events, n13C of them
     s32   n13C;                                 // 0x13C  cleared with the block by SitDev_vInitModule
 } SitDevData;
@@ -56,7 +56,7 @@ typedef struct SitDevEntry {
     u32        auTests[SITDEV_NUM_VALUES / 32];   // 0x04
     u8         aOp[8];          // 0x10  0 always true, 1 ==, 2 !=, 3 <, 4 >, 5 any common bit
     u16        aArg[8];         // 0x18
-    u16        aActions[4];     // 0x28  SitDevScripts.p18 entries to try (fn_800BCD68), 0xFFF0 ends
+    u16        aActions[4];     // 0x28  SitDevScripts.p18 entries to try (SitDev_InvokeMultipleActions), 0xFFF0 ends
 } SitDevEntry;
 
 // An entry of the scripts' second table (SitDevScripts.p18, 0x68 bytes): what a script does.
@@ -64,14 +64,14 @@ typedef struct SitDevAction {
     u8         nKind;           // 0x00  its SitDevData.abPlayed byte; kinds 1 and 2 are commentary
     u8         nChance;         // 0x01  percent
     u8         unk2;
-    u8         bSound;          // 0x03  nonzero: play a sound from aList (fn_800BCE70), else run
-                                //       p1C entries (fn_800BCF84)
+    u8         bSound;          // 0x03  nonzero: play a sound from aList (SitDev_InvokeCommentaryBank), else run
+                                //       p1C entries (SitDev_InvokeAction)
     u16        aList[50];       // 0x04  a deck (SitDev_NumEntries..SitDev_ChooseRandomResponseNoRepeat); 0xFFF0 ends
 } SitDevAction;
 
 // An entry of the scripts' third table (SitDevScripts.p1C, 8 bytes): one thing to do.
 typedef struct SitDevEntry8 {
-    u8         nKind;           // 0x00  fn_800BD580's switch; also its SitDevData.abPlayed byte
+    u8         nKind;           // 0x00  SitDev_TriggerResponse's switch; also its SitDevData.abPlayed byte
     u8         unk1;
     SitDevBits b2;              // 0x02
     u32        n4;              // 0x04  its argument (a sound, a music, ...)
@@ -84,9 +84,9 @@ typedef struct SitDevScripts {
     u32   n04;                  // 0x04  entries at p18
     u32   n08;                  // 0x08  entries at p1C
     u32   n0C;                  // 0x0C  words at p20
-    u32   n10;                  // 0x10  bytes in SitDevData.pD4 (fn_800BD74C clears them)
+    u32   n10;                  // 0x10  bytes in SitDevData.pD4 (SitDev_ClearGroupFlags clears them)
     SitDevEntry*  p14;          // 0x14
-    SitDevAction* p18;          // 0x18  (fn_800BCD68)
+    SitDevAction* p18;          // 0x18  (SitDev_InvokeMultipleActions)
     SitDevEntry8* p1C;          // 0x1C
     u8*   p20;                  // 0x20
 } SitDevScripts;
@@ -109,9 +109,9 @@ typedef struct SitDevZone {
 extern SitDevZone* lbl_801FA1C0[10];    // the hole's zones
 extern s32 lbl_80282210;                // how many
 
-extern u8 lbl_80281E28;             // cleared by fn_800BCD68 when lbl_80281E29 is set and nothing played
+extern u8 lbl_80281E28;             // cleared by SitDev_InvokeMultipleActions when lbl_80281E29 is set and nothing played
 extern u32 lbl_80282218;            // the class of what the ball last hit, kept by SitDev_SetupStateVector (kind 29)
-extern u8 lbl_80281E29;             // cleared by fn_800BCD68 after every run
+extern u8 lbl_80281E29;             // cleared by SitDev_InvokeMultipleActions after every run
 
 // Per value: nonzero when the scripts compare it as signed (SitDev_CompareConditions).
 extern u8 lbl_80193188[88];
@@ -119,7 +119,7 @@ extern u8 lbl_80193188[88];
 // Per game mode: the bit SitDev_TranslateGameMode returns for it, -1 for none.
 extern s32 lbl_801910F8[28];
 
-void fn_800BD74C(void);             // clear SitDevData.pD4
+void SitDev_ClearGroupFlags(void);             // clear SitDevData.pD4
 extern s32 lbl_801FA198[5];         // per player; cleared by SitDev_ClearEmotionStates
 extern s32 lbl_801FA1AC[5];         // per player; 1: SitDev_PredictedEmotionAvailable is true
 

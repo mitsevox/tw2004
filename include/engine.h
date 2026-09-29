@@ -1471,7 +1471,7 @@ void fn_800B5918(const f32* pSrc, f32* pDst);   // GoShaderObject_Rain_Gc.c: cop
 // Normalises three floats and returns the length (0: a near-zero vector, copied as it is).
 f32  LLMath_NormalizeReturnLength3(f32* pSrc, f32* pDst);
 f32  LLMath_DistanceBetween3(f32* pA, f32* pB);  // three-float distance
-void fn_800BD83C(int nSound, int a);      // SitDevFile.c: Gaud_StartComment(0, nSound, a)
+void Gaud_StartRegularComment(int nSound, int a);      // SitDevFile.c: Gaud_StartComment(0, nSound, a)
 void BreakLine_Reset(int nView);
 // The EA Sports Bio, game side (EASportsBio.c; TW06's names)
 void EASBio_SetGamePlayState(u8 bFlag);

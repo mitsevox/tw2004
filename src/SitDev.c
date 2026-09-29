@@ -21,7 +21,7 @@ void SitDev_SetupStateVector(int nPlayer, u8 nEvent);
 void SitDev_ClearCupBevelFlag(void);
 void SitDev_ClearEmotionStates(void);
 u8   SitDev_ConditionsMatch(SitDevEntry* pEntry, SitDevData* pData, int nPlayer);
-void fn_800BCD68(SitDevEntry* pEntry, int nSit, int nPlayer, u8 nEvent);
+void SitDev_InvokeMultipleActions(SitDevEntry* pEntry, int nSit, int nPlayer, u8 nEvent);
 void SitDev_Vec3Sub(f32* pA, f32* pB, f32* pOut);
 
 // .sbss, defined in reverse address order
@@ -75,7 +75,7 @@ void SitDev_vUnregisterStreamClients(void) {
 // flyover) is dropped in custom, random, dream and regional rounds; 27 (a tree hit) once the ball
 // has collided; 26 (the putt's break line passed the cup) after the first since the last event 2 or
 // 3. Event 3 (the shot set-up) also clears the prediction flag (lbl_80281E28), the group flags
-// (fn_800BD74C), the cup bevel flag and the watched ball, then goes on as event 2 (a turn begins:
+// (SitDev_ClearGroupFlags), the cup bevel flag and the watched ball, then goes on as event 2 (a turn begins:
 // 26 may come again), then as event 25 (just before the swing): the emotion states are cleared, and
 // the event is dropped when an event 8, 9, 10 or 11 is queued already. The first event of a frame
 // fills in the state values for its player (SitDev_SetupStateVector); for events 20 and 29 (the
@@ -114,7 +114,7 @@ void SitDev_QueueEvent(int nPlayer, int a, u8 nEvent) {
         break;
     case 3:
         lbl_80281E28 = 0;
-        fn_800BD74C();
+        SitDev_ClearGroupFlags();
         SitDev_ClearCupBevelFlag();
         SitDev_ClearBallThatWasHit();
         SitDev_ClearEmotionStates();
@@ -153,8 +153,8 @@ void SitDev_QueueEvent(int nPlayer, int a, u8 nEvent) {
 // needs a queued event of its kind (any, for kind 0) whose player is the first queued event's; then
 // state value 0 is set again to the hole number (not for script file 22), and if its conditions
 // hold (SitDev_ConditionsMatch) and its group (n0; 0 for none) has not fired, the group is marked
-// and its actions run (fn_800BCD68) for that player. A situation for event 29 that tests value 64
-// (what the look-ahead ball hit) sets the prediction flags (lbl_80281E28, lbl_80281E29) first.
+// and its actions run (SitDev_InvokeMultipleActions) for that player. A situation for event 29 that
+// tests value 64 (what the look-ahead ball hit) sets the prediction flags (lbl_80281E28, lbl_80281E29) first.
 // Afterwards, when an event 33 (the shot is over) was seen and the scripts set no emotion for its
 // player (lbl_801FA198), the player's shot outcome is recorded as 5 (fn_8006AAB4).
 void SitDev_ProcessEventQueue(void) {
@@ -199,7 +199,8 @@ void SitDev_ProcessEventQueue(void) {
                     lbl_80281E28 = 1;
                     lbl_80281E29 = 1;
                 }
-                fn_800BCD68(pEntry, pEntry->b2.s.n5, gpSitDevData->aEvents[j].nPlayer, nEvent);
+                SitDev_InvokeMultipleActions(pEntry, pEntry->b2.s.n5, gpSitDevData->aEvents[j].nPlayer,
+                                             nEvent);
             }
         }
     }

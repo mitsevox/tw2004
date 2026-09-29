@@ -98,7 +98,7 @@ u8 SitDev_PredictedEmotionAvailable(int nPlayer) {
 // empty slot.
 
 // The entries of the first nCount of a list that are in use (not 0xFFF0, the empty mark); an
-// action's sound list (fn_800BCE70).
+// action's sound list (SitDev_InvokeCommentaryBank).
 int SitDev_NumEntries(u16* pList, int nCount) {
     int i;
     int nUsed = 0;

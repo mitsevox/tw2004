@@ -458,7 +458,7 @@ void GameEffects_EndGameBreaker(int nPlayer) {
         case 1:
             EVENT_Trigger(gGameEffects.nPlayer, 0x40, 0, -1);
             if (gGameEffects.b4A) {
-                fn_800BD83C(gGameEffects.u4C, 0);
+                Gaud_StartRegularComment(gGameEffects.u4C, 0);
                 gGameEffects.b4A = 0;
             }
             Gaud_InitCrowdReactionSound(3, 1);
@@ -467,13 +467,13 @@ void GameEffects_EndGameBreaker(int nPlayer) {
             EVENT_Trigger(gGameEffects.nPlayer, 0x3E, 0, -1);
             if (GameEffects_ScriptedGBDidIt(&gPlayers[gGameEffects.nPlayer].ball, gGameEffects.nPlayer, 0)) {
                 if (gGameEffects.b4A) {
-                    fn_800BD83C(gGameEffects.u4C, 0);
+                    Gaud_StartRegularComment(gGameEffects.u4C, 0);
                     gGameEffects.b4A = 0;
                 }
                 Gaud_InitCrowdReactionSound(3, 1);
             } else {
                 if (gGameEffects.b47) {
-                    fn_800BD83C(gGameEffects.u48, 0);
+                    Gaud_StartRegularComment(gGameEffects.u48, 0);
                 }
                 Gaud_InitCrowdReactionSound(gGameEffects.nCrowdReaction, 1);
                 gGameEffects.bCrowdReactionSet = 0;

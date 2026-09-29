@@ -4005,3 +4005,14 @@ address	name	comment	by	date
 8006795C	SitDev_ProcessEventQueue	rewrite	rr6 (replayed by orchestrator)	2026-09-29
 80067B1C	_SetStateVecAndCondition	rewrite	rr6 (replayed by orchestrator)	2026-09-29
 80067B5C	SitDev_Vec3Sub	keep	rr6 (replayed by orchestrator)	2026-09-29
+800BCD68	SitDev_InvokeMultipleActions	rewrite	rr6 (replayed by orchestrator)	2026-09-29
+800BCE70	SitDev_InvokeCommentaryBank	rewrite	rr6 (replayed by orchestrator)	2026-09-29
+800BCF84	SitDev_InvokeAction	rewrite	rr6 (replayed by orchestrator)	2026-09-29
+800BD3F8	SitDev_SuppressAction	rewrite	rr6 (replayed by orchestrator)	2026-09-29
+800BD580	SitDev_TriggerResponse	rewrite	rr6 (replayed by orchestrator)	2026-09-29
+800BD74C	SitDev_ClearGroupFlags	rewrite	rr6 (replayed by orchestrator)	2026-09-29
+800BD77C	GameEffects_SetPostGBNegativeCommentary	rewrite	rr6 (replayed by orchestrator)	2026-09-29
+800BD7D0	GameEffects_SetPostGBCrowdLevel	rewrite	rr6 (replayed by orchestrator)	2026-09-29
+800BD7E8	GameEffects_SetPostGBCommentary	rewrite	rr6 (replayed by orchestrator)	2026-09-29
+800BD83C	Gaud_StartRegularComment	add	rr6 (replayed by orchestrator)	2026-09-29
+800BD868	Gaud_StartPlaylist2Comment	add	rr6 (replayed by orchestrator)	2026-09-29

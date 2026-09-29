@@ -38,7 +38,7 @@ void SitDev_SwapTables(void);
 // (SitDevData.pCC, freed at round end); the first time, takes its first word as the scripts' header
 // (lbl_80282208), byte-swaps the header (SitDev_SwapHeader), turns its offsets into pointers
 // (SitDev_BindHeader) and byte-swaps the tables (SitDev_SwapTables). Then allocates the group flags
-// (pD4, one byte per group, header n10) and clears them (fn_800BD74C).
+// (pD4, one byte per group, header n10) and clears them (SitDev_ClearGroupFlags).
 void SitDev_LoadScripts(SitDevScripts** ppScripts) {
     SitDev_BeginLoadScripts();
     gpSitDevData->pCC = ppScripts;
@@ -49,7 +49,7 @@ void SitDev_LoadScripts(SitDevScripts** ppScripts) {
         SitDev_SwapTables();
     }
     gpSitDevData->pD4 = StaticMem_Alloc(lbl_80282208->n10, 2, 16, "SitDevFile.c", 105);
-    fn_800BD74C();
+    SitDev_ClearGroupFlags();
 }
 
 // Empty in this build; SitDev_LoadScripts calls it first.
