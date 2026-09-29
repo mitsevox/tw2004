@@ -2974,9 +2974,9 @@ void IG_vNumRemovableClubsLeft(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = GameModeBattle_NumRemovableClubsLeft(pArgs[0].i);
 }
 
-// Command 202: whether a GameBreaker is on: the GameBreaker letterbox is up (fn_8003DCAC).
+// Command 202: whether a GameBreaker is on: the GameBreaker letterbox is up (GameEffects_IsLetterboxOn).
 void IG_vIsGameBreakerOn(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_8003DCAC();
+    pResult->i = GameEffects_IsLetterboxOn();
 }
 
 // Command 203: an online game's pause check; empty in this build, which has no online play.

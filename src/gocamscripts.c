@@ -2912,15 +2912,15 @@ u8 CameraScript_WillGolferBeOccludedInThisView(int nPlayer, CamShot* pShot, CamS
     return Ter_CheckForGroundCollision(pCourse, vCam, vGolfer, vHit, vNormal, &pSurface, &pObj) != 0;
 }
 
-// Whether a shot that looks back at the golfer (pShot of fn_8003DC78's look-at kinds 1..7) must be
-// passed over for the player (1); 0 for any other shot and without a club (25). Passed over for a
-// CPU player, when the current shot does not follow the ball (CamScript_DoesScriptTrackBall), in
-// double time, when the ball is coming down below 5, has b99 set or has collided, or is within 40
-// of the pin (fn_800D0478). From the tee (lie 0) it is shown only for a drive (shot kind 1) at 0.9
-// power or more with a club below 9 aimed at surface 14 on a par 4 or 5; from elsewhere only while
-// GameBreaker is on or the aim is at water (surface 16).
+// Whether a shot that looks back at the golfer (pShot of CamScript_DoesScriptTrackGolfer's look-at
+// kinds 1..7) must be passed over for the player (1); 0 for any other shot and without a club (25).
+// Passed over for a CPU player, when the current shot does not follow the ball
+// (CamScript_DoesScriptTrackBall), in double time, when the ball is coming down below 5, has b99
+// set or has collided, or is within 40 of the pin (fn_800D0478). From the tee (lie 0) it is shown
+// only for a drive (shot kind 1) at 0.9 power or more with a club below 9 aimed at surface 14 on a
+// par 4 or 5; from elsewhere only while GameBreaker is on or the aim is at water (surface 16).
 u8 CamScript_SkipLookBackCam(CamScript* pScript, CamShot* pShot, int nPlayer) {
-    if (!fn_8003DC78(pShot)) return 0;
+    if (!CamScript_DoesScriptTrackGolfer(pShot)) return 0;
     if (gPlayers[nPlayer].nClub == 25) return 0;
     if (Player_IsCPU(nPlayer)) return 1;
     if (pScript->pShot != NULL && !CamScript_DoesScriptTrackBall(pScript->pShot)) return 1;

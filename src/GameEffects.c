@@ -365,8 +365,8 @@ int GameEffects_IsScriptedGameBreaker(int nPlayer) {
 // and double time go off, and the player's view gets GameBreaker camera sequence 0xB
 // (DynamicCam_ChooseSequence) for the shot's length to the look-ahead ball, by the ball's lie and
 // the surface class where the look-ahead ball lies. When the shot it picks tracks the golfer (kind
-// 5, fn_8003DC78) on a shot that is not a putt, the golfer is set to animation 14 unless he is in
-// 9. Event 0x3F.
+// 5, CamScript_DoesScriptTrackGolfer) on a shot that is not a putt, the golfer is set to animation
+// 14 unless he is in 9. Event 0x3F.
 void GameEffects_InFlightGameBreakerTrigger(int nPlayer) {
     int nClass;
     int nLie;
@@ -425,7 +425,7 @@ void GameEffects_InFlightGameBreakerTrigger(int nPlayer) {
             pShot = DynamicCam_ChooseScriptInSequence(pSeq, 0, &nKind, &fTime, &f2, &nB, &f3, nPlayer);
             if (pShot != NULL && pView->script.pShot != pShot && pView->script.pNextShot != pShot &&
                 !CamScript_SkipLookBackCam(&pView->script, pShot, nPlayer)) {
-                if (nKind == 5 && fn_8003DC78(pShot)) {
+                if (nKind == 5 && CamScript_DoesScriptTrackGolfer(pShot)) {
                     if (gPlayers[nPlayer].nShotKind != SHOT_TYPE_PUTT_e &&
                         fn_80095780(gPlayers[nPlayer].pChar) != 9) {
                         fn_80095744(gPlayers[nPlayer].pChar, 14);

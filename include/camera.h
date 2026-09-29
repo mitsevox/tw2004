@@ -54,7 +54,7 @@ typedef struct CamShot {
     union {
         struct {
             u32 u50;            // 0x50  on the CrAP screen: bit n for CrAPGolfer.nGolferId = n up to 32
-            u32 u54;            // 0x54  ... bit n - 32 above that (fn_8003D294)
+            u32 u54;            // 0x54  ... bit n - 32 above that (DynamicCam_MatchPlayer)
         } bits;
         f32 aArea[4];           // 0x50  a static camera (GoStaticCam.c): it is picked while the
                                 //       golfer or the ball is inside x aArea[0]..aArea[2],
@@ -178,7 +178,7 @@ extern StaticCams* lbl_80281E18;
 typedef struct CamSequence {
     char szName[0x20];          // 0x00  "DEF..." for a default sequence (DynamicCam_IsDefualtSeq)
     struct CamSequence* p20;   // 0x20  the sequence that follows (an index in the file)
-    f32  f24;                   // 0x24  fn_8003D0BC: picked for values from this ...
+    f32  f24;                   // 0x24  DynamicCam_MatchDistToPin: picked for values from this ...
     f32  f28;                   // 0x28  ... to this
     f32  f2C;                   // 0x2C  DynamicCam_MatchHeightDiff: picked for values from this ...
     f32  f30;                   // 0x30  ... to this
@@ -190,11 +190,11 @@ typedef struct CamSequence {
     u8   b45;                   // 0x45  the clubs it is for (DynamicCam_MatchSeqClub)
     u8   b46;                   // 0x46  6: the ball-flight camera keeps one for shot kind 5
     u8   b47;                   // 0x47  0 humans, 1 CPU players, 2 not in a replay, 3 in a replay,
-                                //       4 in a replay or a CPU player (fn_8003CEEC); the swing camera
+                                //       4 in a replay or a CPU player (DynamicCam_MatchPlayerType); the swing camera
                                 //       starts its shot with blend 5, time 0 when it is nonzero
     u8   b48;                   // 0x48  0 single-view play outside modes 9 and 11 and
                                 //       GM_Currently_SkillZoneMode; 1 split screen or modes 9 and
-                                //       11; 2 GM_Currently_SkillZoneMode (fn_8003D140)
+                                //       11; 2 GM_Currently_SkillZoneMode (DynamicCam_ModeType)
     u8   b49;                   // 0x49  a bit mask
     u8   b4A;                   // 0x4A  a bit mask
     s8   n4B;                   // 0x4B  one bit per value of Course_GetCurHolePar
@@ -453,7 +453,7 @@ typedef struct CamTuning {
     f32  f190;                  // 0x190  ... and backs off by this share of the height below its f68
     f32  f194;                  // 0x194  DynamicCam_ProcessScript: how far a camera below its least height rises a frame
     f32  f198;                  // 0x198  DynamicCam_TrackBallVelocityTight: the least ball speed it follows the flight at
-    f32  f19C;                  // 0x19C  the steepest a camera direction may tilt (fn_8003D810, radians)
+    f32  f19C;                  // 0x19C  the steepest a camera direction may tilt (DynamicCam_ClampBallVelocity, radians)
     f32  f1A0;                  // 0x1A0
     f32  f1A4;                 // 0x1A4  DynamicCam_ChoosePreFlightSequence: the obstruction test's slope
     f32  f1A8;                  // 0x1A8  CamScript_RunScript: how fast CamScript.fEC follows the
@@ -724,8 +724,8 @@ CamSequence* DynamicCam_ChooseSequence(int nPlayer, int nLie, int nClass, int nK
 CamSequence* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind);
 // The sequence and shot named after the golfer's clip (with b, Character.p1790 first).
 u8       DynamicCam_ChoosePairedSequenceOrCamera(int nPlayer, u8 b, CamSequence** ppSeq, CamShot** ppShot);
-u8       fn_8003D7A0(CamSequence* pSequence, int nPlayer);   // it suits the player's club and shot
-u8     fn_8003DC78(CamShot* pShot);     // the shot's bAC is 1..6 or 7
+u8       DynamicCam_IsValidFlightSequence(CamSequence* pSequence, int nPlayer);   // it suits the player's club and shot
+u8     CamScript_DoesScriptTrackGolfer(CamShot* pShot);     // the shot's bAC is 1..6 or 7
 // The ball's position, or the script's v70 when the ball is by the pin (with bKeep v70 follows it).
 void   DynamicCam_GetSmoothBallLocation(CamScript* pScript, CamShot* pShot, int nPlayer, f32* pOut, u8 bKeep);
 // 0 when gSession.nGameType is 3, else Character_IsLeftHanded of the player's golfer (Player.pChar)

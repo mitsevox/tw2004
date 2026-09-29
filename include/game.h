@@ -347,7 +347,7 @@ void GameEffects_SetSuperSlowMo(u8 bOn, int nPlayer, f32 fRate);
 f32  GameEffects_FieldOfViewChange(void);                 // the GameBreaker's field-of-view change
 u8   GameEffects_IsSlowDownSwingOn(int nPlayer);         // super slow motion is on (nPlayer unused)
 void GameEffects_Pause(int a);                // pause or resume a GameBreaker
-u8   fn_8003DCAC(void);                 // GoDynamicCam.c: the letterbox is up (predicted, or b19)
+u8   GameEffects_IsLetterboxOn(void);                 // GoDynamicCam.c: the letterbox is up (predicted, or b19)
 
 // GameMode.c
 void GameEffects_SendMessage50(void);

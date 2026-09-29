@@ -1948,7 +1948,7 @@ void GolfCamera_InitBallFlightCamera(View* pView, int nPlayer) {
         GolfCam_Vec3Add(vAim, gPlayers[nPlayer].vBall, pView->script.v50);
     }
     if (pView->p74 != NULL && pView->p74->b44 == 3 && pView->p74->p20 != pView->p74 && pView->p74->p20 != NULL
-        && pView->p74->p20->b44 == 4 && fn_8003D7A0(pView->p74->p20, nPlayer)) {
+        && pView->p74->p20->b44 == 4 && DynamicCam_IsValidFlightSequence(pView->p74->p20, nPlayer)) {
         pView->p74 = pView->p74->p20;
     } else {
         pView->p74 = DynamicCam_ChooseSequence(nPlayer, nLie, nClass, 4, 1, fDist);
@@ -2129,7 +2129,7 @@ void GolfCamera_ProcessBallFlightCamera(View* pView, int nPlayer) {
                 }
             }
             if (!CamScript_SkipLookBackCam(&pView->script, pShot, nPlayer)) {
-                if (nA == 5 && fn_8003DC78(pShot) && gPlayers[nPlayer].nShotKind != 0
+                if (nA == 5 && CamScript_DoesScriptTrackGolfer(pShot) && gPlayers[nPlayer].nShotKind != 0
                     && fn_80095780(gPlayers[nPlayer].pChar) != 9) {
                     // a cut: only once the golfer is in animation 14
                     if (fn_80095780(gPlayers[nPlayer].pChar) == 14) {
@@ -4003,13 +4003,13 @@ void GolfCamera_ForcePreShotEnding(View* pView) {
 }
 
 // Does the next shot (else the current one) follow the golfer: its move kind bAC is one of 1..7
-// (fn_8003DC78)? 0 with neither.
+// (CamScript_DoesScriptTrackGolfer)? 0 with neither.
 u8 GolfCamera_IsCameraTrackingPlayer(View* pView) {
     if (pView->script.pNextShot != NULL) {
-        return fn_8003DC78(pView->script.pNextShot) != 0;
+        return CamScript_DoesScriptTrackGolfer(pView->script.pNextShot) != 0;
     }
     if (pView->script.pShot != NULL) {
-        return fn_8003DC78(pView->script.pShot) != 0;
+        return CamScript_DoesScriptTrackGolfer(pView->script.pShot) != 0;
     }
     return 0;
 }
