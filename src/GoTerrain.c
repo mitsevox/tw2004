@@ -1,8 +1,10 @@
 // GoTerrain.c (EA's name, from its asserts; also in EA's 2002 source tree): the terrain renderer
-// (Ter_TerrainRendererMgr, terrain.h): loads the hole's ground and objects from the 'ter ', 'tgd '
-// and 'tLOD' chunks, sorts its patches and objects into draw lists by distance and level of
-// detail, animates the objects (trees, the crowd, the flag) and draws them. The file ends with
-// small setters of the renderer's state (RenderState), which share its constant pool.
+// (Ter_TerrainRendererMgr gTerRenderer, terrain.h): takes in the hole's ground and objects ('ter '),
+// the course data ('tgd ', with the tee and pin positions) and the LOD distances ('tLOD'); each
+// view, sorts the patches and objects into draw lists by distance and level of detail and draws
+// them in passes; animates the objects (trees, the crowd, the flag in the wind); draws the grass
+// patches for GoGrass.c. The file ends with small setters of the renderer's state (RenderState),
+// which share its constant pool.
 
 #include "golfer.h"
 #include "ball.h"
@@ -85,24 +87,28 @@ UObjMesh* fn_8003556C(UObjMesh* pGround);
 s32       fn_80035554(UObjMesh* pMesh);
 
 // .bss and .sbss in reverse address order
-Ter_TerrainRendererMgr gTerRenderer;
-s32 gTerLowBitCounts[5][32];
-s32 gTerUnreadToggle;
-s32 gTerPanoramaList2HiddenCount;
-f32 gTerTreePeriodRandom;
+Ter_TerrainRendererMgr gTerRenderer;   // the terrain renderer's state
+s32 gTerLowBitCounts[5][32];        // [n][k]: how many of k's lowest n bits are set
+s32 gTerUnreadToggle;               // written by fn_800355E0, read nowhere
+s32 gTerPanoramaList2HiddenCount;   // Ter_DrawPanoramaList leaves out list 2's last this-many
+f32 gTerTreePeriodRandom;           // Ter_vInitModule's pseudo-random number, 0..1
 
-f32 gTerLastObjectAlpha = -1.0f;
-s8  gTerLastZWrite = -1;
+f32 gTerLastObjectAlpha = -1.0f;    // the last object draw's alpha and z write
+s8  gTerLastZWrite = -1;            // (Ter_SetObjectRenderState); -1: none yet
+// Ter_SetLODPlanes's arguments: LOD 0's and LOD 1's lengths in steps (26 and 16 until a 'tLOD'
+// chunk sets them through Ter_LODStepsFromDistances), a step's length, the overlaps in steps
 s32 gTerLOD0Steps = 26;
 s32 gTerLOD1Steps = 16;
 f32 gTerLODStepSize = 5.0f;
 s32 gTerLOD1OverlapSteps = 4;
 s32 gTerLOD2OverlapSteps = 4;
-s32 gTerLODDataNear = -1;
-s32 gTerLODDataFar = -1;
-u8  gTerDrawPanoramaList0 = 1;
-u8  gTerDrawPanoramaList2 = 1;
+s32 gTerLODDataNear = -1;           // the 'tLOD' chunk's two distances (Ter_LODLoadCallback);
+s32 gTerLODDataFar = -1;            // -1: none loaded (Ter_IsLODDataLoaded)
+u8  gTerDrawPanoramaList0 = 1;      // 1: Ter_DrawPanoramaList draws object list 0
+u8  gTerDrawPanoramaList2 = 1;      // 1: Ter_DrawPanoramaList draws object list 2
 
+// Per course (Game_GetCourse), the three levels of detail's object mipmap biases
+// (Ter_SetCourseMipmapBias)
 f32 gTerCourseMipmapBias[21][3] = {
     { -5.0f, -8.0f, -8.0f },
     { -5.0f, -8.0f, -8.0f },
@@ -146,19 +152,24 @@ void Ter_vInitModule(void) {
     gTerRenderer.pPatchList = StaticMem_Alloc(1024 * sizeof(Ter_PatchReference), 2, 16, "GoTerrain.c", 567);
     gTerRenderer.pPostDrawTerrainList =
         StaticMem_Alloc(20 * sizeof(Ter_PatchReference), 2, 16, "GoTerrain.c", 572);
-    gTerRenderer.pObjectSortList = StaticMem_Alloc(650 * sizeof(Ter_ObjectReference), 2, 16, "GoTerrain.c", 577);
-    gTerRenderer.pOpaqueObjectList = StaticMem_Alloc(650 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 582);
+    gTerRenderer.pObjectSortList = StaticMem_Alloc(650 * sizeof(Ter_ObjectReference), 2, 16, "GoTerrain.c",
+                                                   577);
+    gTerRenderer.pOpaqueObjectList = StaticMem_Alloc(650 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c",
+                                                     582);
     gTerRenderer.pTranslucentObjectList =
         StaticMem_Alloc(200 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 587);
-    gTerRenderer.pNearbyObjectList = StaticMem_Alloc(70 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 592);
-    gTerRenderer.pDeferredItemsList = StaticMem_Alloc(50 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 597);
+    gTerRenderer.pNearbyObjectList = StaticMem_Alloc(70 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c",
+                                                     592);
+    gTerRenderer.pDeferredItemsList = StaticMem_Alloc(50 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c",
+                                                      597);
     gTerRenderer.pPanoramaItemsList =
         StaticMem_Alloc(300 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 602);
     gTerRenderer.pPostDrawItemsList =
         StaticMem_Alloc(400 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 607);
     gTerRenderer.pObjectStateList =
         StaticMem_Alloc(TER_NUM_OBJECTS * sizeof(Ter_ObjectState), 2, 16, "GoTerrain.c", 612);
-    gTerRenderer.xpGrassPatchList = StaticMem_Alloc(128 * sizeof(Ter_PatchReference), 2, 16, "GoTerrain.c", 633);
+    gTerRenderer.xpGrassPatchList = StaticMem_Alloc(128 * sizeof(Ter_PatchReference), 2, 16, "GoTerrain.c",
+                                                    633);
     gTerRenderer.fTreeMinPeriod = 3.7f;
     gTerRenderer.fTreeDiffPeriod = 1.6f;
     gTerRenderer.fTreeOverdrive = 1.0f;
@@ -239,6 +250,11 @@ void Ter_vCloseModule(void) {
         gTerRenderer.pCurrentHoleData = NULL;
     }
     if (gTerRenderer.pCourse != NULL) {
+        // EA bug: pCourse is the 'tgd ' chunk's pData, which points past the stream object's
+        // header (UStream.c), not at the block StaticMem allocated; StaticMem_Free reads the two
+        // words before it as a block's start and size. Ter_UnloadHole frees pCourseStreamData
+        // instead; this is harmless only when Ter_UnloadHole has already run and cleared pCourse.
+        // port: free pCourseStreamData here, as Ter_UnloadHole does.
         StaticMem_Free(gTerRenderer.pCourse);
         gTerRenderer.pCourse = NULL;
     }
@@ -704,11 +720,11 @@ s32 Ter_CompareObjectDistance(const void* pA, const void* pB) {
     return 0;
 }
 
-// Sets this frame's LOD planes (Ter_SetLODPlanes with the LOD steps gTerLOD0Steps..gTerLOD2OverlapSteps) and
-// the object cull distance, (fFOVScale x fDistanceCullYardsBase) squared.
+// Sets this frame's LOD planes (Ter_SetLODPlanes with the LOD steps gTerLOD0Steps ..
+// gTerLOD2OverlapSteps) and the object cull distance, (fFOVScale x fDistanceCullYardsBase) squared.
 void Ter_UpdateLODPlanes(void) {
-    Ter_SetLODPlanes(gTerRenderer.LODPlanes, gTerLODStepSize, gTerLOD0Steps, gTerLOD1Steps, gTerLOD1OverlapSteps,
-                gTerLOD2OverlapSteps);
+    Ter_SetLODPlanes(gTerRenderer.LODPlanes, gTerLODStepSize, gTerLOD0Steps, gTerLOD1Steps,
+                     gTerLOD1OverlapSteps, gTerLOD2OverlapSteps);
     gTerRenderer.fDistanceCullFrameYardsSquared =
         gTerRenderer.fFOVScale * gTerRenderer.fDistanceCullYardsBase;
     gTerRenderer.fDistanceCullFrameYardsSquared =
@@ -729,8 +745,8 @@ void Ter_SetLODPlanes(Ter_LODPlane* pPlanes, f32 fStep, s32 a, s32 b, s32 c, s32
 }
 
 // Turns the 'tLOD' chunk's distances a and b into Ter_SetLODPlanes's step counts, with step s =
-// gTerLODStepSize and overlaps c = gTerLOD1OverlapSteps, d = gTerLOD2OverlapSteps: *pA = ((a + c x s) / s - 1) /
-// fFOVScale, *pB = c + (b + d x s - (a + c x s)) / s (integer divisions).
+// gTerLODStepSize and overlaps c = gTerLOD1OverlapSteps, d = gTerLOD2OverlapSteps: *pA = ((a + c x
+// s) / s - 1) / fFOVScale, *pB = c + (b + d x s - (a + c x s)) / s (integer divisions).
 void Ter_LODStepsFromDistances(s32* pA, s32* pB, s32 a, s32 b) {
     // fake match: the (s32) and (int) casts of gTerLODStepSize are two conversions (the original
     // stores the one fctiwz result twice); the same cast everywhere shares one.
@@ -1597,6 +1613,8 @@ void Ter_SetObjectHit(u16 nPatch, u16 nObject) {
     }
 }
 
+// The crowd's pose steps (Ter_AnimateObjects): for crowd objects without bit 0x40 of word 3, and
+// (gTerCrowdPoseStepsFlag40) for those with it
 TerPoseStep gTerCrowdPoseSteps[6] = {
     { 0, 3, 1, 0.5f, 0.0f },
     { 1, 3, 2, 1.0f, 0.0f },
@@ -1614,8 +1632,8 @@ TerPoseStep gTerCrowdPoseStepsFlag40[2] = {
 // Animates the course objects once a frame (the frame time capped at 1/30 s): runs the crowd
 // countdowns, fades each object's views in (state 2) or out (state 0), and moves each object with
 // bit 0x1 of word 0: crowd members (bit 0x2) held in iCrowdPose, swaying in their pose or easing to
-// the next one through gTerCrowdPoseSteps (gTerCrowdPoseStepsFlag40 with bit 0x40 of word 3); bit 0x1 of word 3 rises
-// to 1 once n1C is 1; the trees sway by their period with noise.
+// the next one through gTerCrowdPoseSteps (gTerCrowdPoseStepsFlag40 with bit 0x40 of word 3); bit
+// 0x1 of word 3 rises to 1 once n1C is 1; the trees sway by their period with noise.
 // fake match: `3 == n18` in the two pose-step tests (register order; found by the permuter).
 void Ter_AnimateObjects(void) {
     f32 fTime;
@@ -1789,7 +1807,8 @@ void Ter_AnimateObjects(void) {
                             }
                         }
                         gTerRenderer.pObjectStateList[i].f4 += fStep;
-                        if (fabsf(gTerRenderer.pObjectStateList[i].f4 - gTerCrowdPoseStepsFlag40[k].fC) < 0.01f) {
+                        if (fabsf(gTerRenderer.pObjectStateList[i].f4 - gTerCrowdPoseStepsFlag40[k].fC)
+                            < 0.01f) {
                             gTerRenderer.pObjectStateList[i].n18 = gTerCrowdPoseStepsFlag40[k].n8;
                             gTerRenderer.pObjectStateList[i].f4 = gTerCrowdPoseStepsFlag40[k].f10;
                             gTerRenderer.pObjectStateList[i].nC = 0;
@@ -1832,7 +1851,8 @@ void Ter_AnimateObjects(void) {
 
 // Draws object list nList of the hole data (0 before the patches, 2 after them) when its switch is
 // on, as panorama items: each object that is not off screen, except (list 0) objects 0-1 or 2-3 by
-// lbl_802811F0's flag 0x2, (list 2) the last gTerPanoramaList2HiddenCount, and in split screen those with flag 8.
+// lbl_802811F0's flag 0x2, (list 2) the last gTerPanoramaList2HiddenCount, and in split screen
+// those with flag 8.
 void Ter_DrawPanoramaList(void* pHoleData, u32 nList) {
     UObjMesh* pRoot;
     UObjMesh* pList;
