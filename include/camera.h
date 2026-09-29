@@ -805,15 +805,15 @@ void   GolfCamera_InitZoomToAimCamera(View* pView, int nPlayer);    // 1
 void   GolfCamera_InitGreenZoomToAimCamera(View* pView, int nPlayer); // 2
 void   GolfCamera_InitElevatorCamera(View* pView, int nPlayer);     // 3
 void   GolfCamera_InitGreenCamera(View* pView, int nPlayer);                       // 4
-void   fn_800C0364(View* pView, int nPlayer);                       // 5
-void   fn_800C0624(View* pView, int nPlayer);                       // 6
-void   fn_800C0744(View* pView, int nPlayer);                       // 7
+void   GolfCamera_InitGreenRollCamera(View* pView, int nPlayer);                       // 5
+void   GolfCamera_InitReversePuttCamera(View* pView, int nPlayer);                       // 6
+void   GolfCamera_InitKneeCamera(View* pView, int nPlayer);                       // 7
 void   GolfCamera_InitPlaceBallCamera(View* pView, int nPlayer);                       // 8
 void   GolfCamera_InitSpeedGolfRunCamera(View* pView, int nPlayer);                       // 9
-void   fn_800C0880(View* pView, int nPlayer);                       // 10
+void   GolfCamera_InitFlyByCamera(View* pView, int nPlayer);                       // 10
 void   GolfCamera_InitPreShotCamera(View* pView, int nPlayer);      // 11
 void   GolfCamera_InitSwingCamera(View* pView, int nPlayer);        // 12
-void   fn_800C14B0(View* pView, int nPlayer);                       // 13
+void   GolfCamera_InitReplaySwingCamera(View* pView, int nPlayer);                       // 13
 void   GolfCamera_InitBallFlightCamera(View* pView, int nPlayer);   // 14
 void   GolfCamera_InitPostShotCamera(View* pView, int nPlayer);     // 15
 void   GolfCamera_InitInHoleCamera(View* pView, int nPlayer);       // 16
@@ -832,9 +832,9 @@ void   GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer); // 1
 void   GolfCamera_ProcessGreenZoomToAimCamera(View* pView, int nPlayer); // 2
 void   GolfCamera_ProcessElevatorCamera(View* pView, int nPlayer);                       // 3
 void   GolfCamera_ProcessGreenCamera(View* pView, int nPlayer);                       // 4
-void   fn_800C0414(View* pView, int nPlayer);                       // 5
-void   fn_800C06C8(View* pView, int nPlayer);                       // 6
-void   fn_800C0804(View* pView, int nPlayer);                       // 7
+void   GolfCamera_ProcessGreenRollCamera(View* pView, int nPlayer);                       // 5
+void   GolfCamera_ProcessReversePuttCamera(View* pView, int nPlayer);                       // 6
+void   GolfCamera_ProcessKneeCamera(View* pView, int nPlayer);                       // 7
 void   GolfCamera_ProcessPlaceBallCamera(View* pView, int nPlayer);                       // 8
 void   GolfCamera_ProcessSpeedGolfRunCamera(View* pView, int nPlayer);                       // 9
 void   GolfCamera_ProcessFlyByCamera(View* pView, int nPlayer);                       // 10
@@ -847,7 +847,7 @@ void   GolfCamera_ProcessInHoleCamera(View* pView, int nPlayer);    // 16
 void   fn_800C34F8(View* pView, int nPlayer);                       // 17
 void   GolfCamera_ProcessTutorialWaitCamera(View* pView, int nPlayer);                       // 18
 void   GolfCamera_ProcessSteepSlopeCamera(View* pView, int nPlayer); // 19
-void   fn_800C16C4(View* pView, int nPlayer);                       // 20
+void   GolfCamera_Process3ScreenCamera(View* pView, int nPlayer);                       // 20
 void   GolfCamera_ProcessHeartBeatCamera(View* pView, int nPlayer); // 21
 void   GolfCamera_ProcessShutterCamera(View* pView, int nPlayer);                       // 22
 void   GolfCamera_ProcessFECamera(View* pView, int nPlayer);                       // 23
@@ -873,7 +873,7 @@ void   CameraController_LagSideVector(f32* pA, f32* pB, f32* pOut);   // the gre
 
 void   GolfCamera_Init(void);
 void   GolfCamera_DeInit(void);
-void   fn_800C1790(View* pView, int nPlayer);
+void   GolfCamera_TurnOffComicCam(View* pView, int nPlayer);
 u8     fn_800C441C(View* pView, int nPlayer);
 u8     GolfCamera_Choose3ScreenCam(View* pView, int nPlayer);
 u8     GolfCamera_ChooseHeartBeatCam(View* pView, int nPlayer);

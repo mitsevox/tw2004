@@ -127,13 +127,13 @@ void CameraController_Idle(View* pView, int nPlayer) {
         GolfCamera_ProcessGreenCamera(pView, nPlayer);
         break;
     case 5:
-        fn_800C0414(pView, nPlayer);
+        GolfCamera_ProcessGreenRollCamera(pView, nPlayer);
         break;
     case 6:
-        fn_800C06C8(pView, nPlayer);
+        GolfCamera_ProcessReversePuttCamera(pView, nPlayer);
         break;
     case 7:
-        fn_800C0804(pView, nPlayer);
+        GolfCamera_ProcessKneeCamera(pView, nPlayer);
         break;
     case 8:
         GolfCamera_ProcessPlaceBallCamera(pView, nPlayer);
@@ -172,7 +172,7 @@ void CameraController_Idle(View* pView, int nPlayer) {
         GolfCamera_ProcessSteepSlopeCamera(pView, nPlayer);
         break;
     case 20:
-        fn_800C16C4(pView, nPlayer);
+        GolfCamera_Process3ScreenCamera(pView, nPlayer);
         break;
     case 21:
         GolfCamera_ProcessHeartBeatCamera(pView, nPlayer);
@@ -234,7 +234,7 @@ void CameraController_SetCameraMode(View* pView, int nCamera, int nPlayer, int n
     ViewController_SetCurrentViewController(nView);
     switch (nCamera) {
     case 10:
-        fn_800C0880(pView, nPlayer);
+        GolfCamera_InitFlyByCamera(pView, nPlayer);
         break;
     case 0:
         GolfCamera_InitShotSetupCamera(pView, nPlayer);
@@ -261,19 +261,19 @@ void CameraController_SetCameraMode(View* pView, int nCamera, int nPlayer, int n
         GolfCamera_InitGreenCamera(pView, nPlayer);
         break;
     case 5:
-        fn_800C0364(pView, nPlayer);
+        GolfCamera_InitGreenRollCamera(pView, nPlayer);
         break;
     case 6:
-        fn_800C0624(pView, nPlayer);
+        GolfCamera_InitReversePuttCamera(pView, nPlayer);
         break;
     case 7:
-        fn_800C0744(pView, nPlayer);
+        GolfCamera_InitKneeCamera(pView, nPlayer);
         break;
     case 12:
         GolfCamera_InitSwingCamera(pView, nPlayer);
         break;
     case 13:
-        fn_800C14B0(pView, nPlayer);
+        GolfCamera_InitReplaySwingCamera(pView, nPlayer);
         break;
     case 14:
         GolfCamera_InitBallFlightCamera(pView, nPlayer);

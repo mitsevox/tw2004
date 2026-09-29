@@ -1318,7 +1318,7 @@ void STATEFUNC_SimulateExit(int nPlayer) {
     REPLAY_RecordStop();
     fn_80062CE0(0);
     SW_KillVibration(nPlayer);
-    fn_800C1790(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), nPlayer);
+    GolfCamera_TurnOffComicCam(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]), nPlayer);
     fn_80062DB8(pViewObj, 0);
 }
 

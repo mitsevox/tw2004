@@ -1029,7 +1029,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
   `GOLFERSTATE_Pop` 98.53% -> 100; the permuter found it).
 - **[verified] A load the original does before a store to the same struct was a local.**
   `n = p->n60; p->f68 = 0.0f; fn(n, p);` keeps the load first; reading `p->n60` in the call
-  moves it after the store (GoGolfCam `fn_800C0880`, 94.6% -> 100).
+  moves it after the store (GoGolfCam `GolfCamera_InitFlyByCamera`, 94.6% -> 100).
 - **[verified] A typed struct-pointer global indexes differently from a cast byte pointer.**
   `extern Profile* gpSaveData; gpSaveData[n].f` gives `addis base; add; lwz off`;
   `((Profile*)u8ptr)[n].f` gives `addis idx; addi; lwzx` (GameMode23 `GameModeDriverPGATour_GetUsersCurrentEventID` 83.75% -> 100).
@@ -1088,7 +1088,7 @@ Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "
 - **[verified] An address used twice: keep the index, not a pointer.** `f32* pPin =
   &pCourse->pin[Game_CurrentPinSet()].x;` used twice swapped two registers in every declaration
   order; `nPinSet = Game_CurrentPinSet();` with `&pCourse->pin[nPinSet].x` written at each use
-  matched (GoGolfCam `fn_800C0414`, 98.52% -> 100).
+  matched (GoGolfCam `GolfCamera_ProcessGreenRollCamera`, 98.52% -> 100).
 - **[verified] A loop over a global array: index it, don't walk a pointer.** `T* p = gTable;
   for (...; p++)` gives `addi r0, r3, gTable@l; mr r31, r0` for the pointer; `gTable[i].x` in the
   loop body (CW strength-reduces it to the same walking pointer) gives the original's direct

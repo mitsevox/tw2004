@@ -1166,8 +1166,9 @@ void GolfCamera_ProcessGreenCamera(View* pView, int nPlayer) {
     }
 }
 
-// Camera 5: look at the pin through a 30-degree lens.
-void fn_800C0364(View* pView, int nPlayer) {
+// Camera 5, the putt preview camera (STATEFUNC_GreenWatchRollInit): look at the pin through a
+// 30-degree lens, with no shot and the clock (fCamTime) at 0.
+void GolfCamera_InitGreenRollCamera(View* pView, int nPlayer) {
     void* pSub;
     CourseInfo* pCourse;
     CameraController_GetCameraOrigin(pView);
@@ -1184,10 +1185,11 @@ void fn_800C0364(View* pView, int nPlayer) {
     }
 }
 
-// Camera 5: fly in to where the ball lay before the shot (the tuning's f4C over it) from out on
-// the side away from the pin, over a time and distance scaled by how far the ball is from the pin;
-// it keeps looking at the pin.
-void fn_800C0414(View* pView, int nPlayer) {
+// Camera 5's tick, the putt preview: follow the ghost ball (ballBefore) at the tuning's f4C over
+// it, starting out behind it on the side away from the pin and closing in (by the square of the
+// time left) over the tuning's f54 seconds from f50 out, both scaled down when the real ball is
+// less than f50 from the pin; it keeps looking at the pin. The colour fade and the clock step on.
+void GolfCamera_ProcessGreenRollCamera(View* pView, int nPlayer) {
     f32 vDir[4];
     f32 vToPin[4];
     f32 vOld[4];
@@ -1238,8 +1240,9 @@ void fn_800C0414(View* pView, int nPlayer) {
     }
 }
 
-// Camera 6: script 0x3A.
-void fn_800C0624(View* pView, int nPlayer) {
+// Camera 6, the reverse putt view (STATEFUNC_GreenReversePuttInit, while its button is held): a cut
+// to a shot of kind 0x3A.
+void GolfCamera_InitReversePuttCamera(View* pView, int nPlayer) {
     void* pCam;
     void* pSub;
     CamShot* pShot;
@@ -1252,8 +1255,8 @@ void fn_800C0624(View* pView, int nPlayer) {
     }
 }
 
-// Camera 6.
-void fn_800C06C8(View* pView, int nPlayer) {
+// Camera 6's tick (the reverse putt view): the script's per-frame update.
+void GolfCamera_ProcessReversePuttCamera(View* pView, int nPlayer) {
     void* pCam;
     void* pSub;
     pCam = CameraController_GetCameraOrigin(pView);
@@ -1261,8 +1264,9 @@ void fn_800C06C8(View* pView, int nPlayer) {
     CamScript_RunScript(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, gSession.fFrameTime);
 }
 
-// Camera 7 (the knee cam): a shot built by hand from the current one, lasting 0.55 s.
-void fn_800C0744(View* pView, int nPlayer) {
+// Camera 7, the knee cam (STATEFUNC_KneeCamInit): a hand-made shot (shot19C) with the current
+// shot's lens (f78) and bAA, queued as the next shot with a kind-1 blend of 0.55 s.
+void GolfCamera_InitKneeCamera(View* pView, int nPlayer) {
     CameraController_GetCameraOrigin(pView);
     CameraController_GetCameraLookPoint(pView);
     pView->shot19C.p40 = NULL;
@@ -1289,8 +1293,8 @@ void fn_800C0744(View* pView, int nPlayer) {
     pView->script.f8C = 0.55f;
 }
 
-// Camera 7 (the knee cam).
-void fn_800C0804(View* pView, int nPlayer) {
+// Camera 7's tick (the knee cam): the script's per-frame update.
+void GolfCamera_ProcessKneeCamera(View* pView, int nPlayer) {
     void* pCam;
     void* pSub;
     pCam = CameraController_GetCameraOrigin(pView);
@@ -1298,8 +1302,10 @@ void fn_800C0804(View* pView, int nPlayer) {
     CamScript_RunScript(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, gSession.fFrameTime);
 }
 
-// Camera 10: start on the first shot StaticCam_GetFlyByCam gives.
-void fn_800C0880(View* pView, int nPlayer) {
+// Camera 10, the hole fly-by (STATEFUNC_InitialFlyByInit and MidHoleFlyByInit): the script starts
+// on the first shot of fly-by route lbl_80282220->n60 (StaticCam_GetFlyByCam), its follow-on
+// queued; with none, no shot.
+void GolfCamera_InitFlyByCamera(View* pView, int nPlayer) {
     CamShot* pShot;
     s32 n;
     n = lbl_80282220->n60;  // fake match: read before the store below, in the original's order
@@ -1428,11 +1434,16 @@ void GolfCamera_ProcessPreShotCamera(View* pView, int nPlayer) {
     CamScript_RunScript(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, gSession.fFrameTime);
 }
 
-// Camera 12, the swing camera: pick the pre-flight sequence (the saved one, the follow-on of a kind 1
-// or 2 sequence, or a new one for the lie) and its shot of kind 9. Outside a replay the choice is
-// saved, and a big height difference to the target (over 10 up or down) or a ball on lies 3..5 can
-// swap in one of the plan's own shots. A shot that would hide the golfer is swapped for one from
-// sequence 0x1C.
+// Camera 12, the swing camera. The special swing is cleared (View.n260 0, heartbeat and shutter
+// off, the comic camera off) and the pre-flight sequence picked: outside a replay the one already
+// saved (p7C), else the follow-on (type 3) of a type-1 or type-2 sequence, or a new one for the
+// lie; outside a replay the pick is saved (p7C, p78). The shot: outside a replay the saved one
+// (p80, or alternate n264), else the sequence's kind-9 shot, which a human's big height difference
+// to the target (over 10 up or down: alternates 4 and 2) or, with fn_8012022C, lies 3..5 without
+// club 2 (alternate 5) can replace. A shot that would hide the golfer is swapped for one from
+// sequence 0x1C, split screen skips to the chain's last shot, and golfer animation 11 takes the
+// paired sequence or camera. It starts as a cut unless the view comes from camera 0 with a sequence
+// that allows a blend (b47 0).
 void GolfCamera_InitSwingCamera(View* pView, int nPlayer) {
     int nA;
     f32 f1;
@@ -1454,7 +1465,7 @@ void GolfCamera_InitSwingCamera(View* pView, int nPlayer) {
     pView->script.bCF = 0;
     lbl_80282220->f68 = 0.0f;
     lbl_80282220->b5D = 0;
-    fn_800C1790(pView, nPlayer);
+    GolfCamera_TurnOffComicCam(pView, nPlayer);
     pView->n260 = 0;
     lbl_80282220->b5A = 0;
     lbl_80282220->b5B = 0;
@@ -1633,8 +1644,9 @@ void GolfCamera_ProcessSwingCamera(View* pView, int nPlayer) {
     }
 }
 
-// Camera 13.
-void fn_800C14B0(View* pView, int nPlayer) {
+// Camera 13, the slow-motion swing replay (GS_REPLAY_SWING): the replay's counters (script.n110,
+// n114) and clock to 0, then the replay camera set up from the view's position and aim.
+void GolfCamera_InitReplaySwingCamera(View* pView, int nPlayer) {
     void* pCam;
     void* pSub;
     pCam = CameraController_GetCameraOrigin(pView);
@@ -1646,7 +1658,11 @@ void fn_800C14B0(View* pView, int nPlayer) {
     fn_800C5D64(pView, pCam, pSub, nPlayer);
 }
 
-// Camera 13's process.
+// Camera 13's tick. While the slow-motion swing camera is on, its own tick moves the camera first;
+// otherwise the tuning's colour (v68) is drawn over the view, fading out over the tuning's f78
+// seconds. After the script's update, if the slow-motion camera is on and the shot changed: from a
+// shot with no follow-on the script ends (blend kind 5, no next shot), else the old shot is queued
+// again.
 void GolfCamera_ProcessReplaySwingCamera(View* pView, int nPlayer) {
     f32 v[4];
     f32* pCam;
@@ -1678,7 +1694,8 @@ void GolfCamera_ProcessReplaySwingCamera(View* pView, int nPlayer) {
     }
 }
 
-// Camera 20.
+// Camera 20, the 3-screen comic-book swing camera: start the comic camera (GoComicCam; layout 1 for
+// special swing kind 9, else 0) and mark it on (b56).
 void GolfCamera_Init3ScreenCamera(View* pView, int nPlayer) {
     if (pView->n260 == 9) {
         fn_800B3550(1, pView, nPlayer);
@@ -1688,8 +1705,10 @@ void GolfCamera_Init3ScreenCamera(View* pView, int nPlayer) {
     lbl_80282220->b56 = 1;
 }
 
-// Camera 20: once fn_800B36F4 is done, back to the full view and on to the flight camera (14).
-void fn_800C16C4(View* pView, int nPlayer) {
+// Camera 20's tick: when the comic camera's own tick (GoComicCam) says it is done, the comic camera
+// is turned off and the view goes straight on to the ball-flight camera (14), running its first
+// tick; until then the script's update.
+void GolfCamera_Process3ScreenCamera(View* pView, int nPlayer) {
     f32* pCam;
     f32* pSub;
     int nView;
@@ -1697,7 +1716,7 @@ void fn_800C16C4(View* pView, int nPlayer) {
     pSub = CameraController_GetCameraLookPoint(pView);
     nView = gPlayers[nPlayer].nView[0];
     if (fn_800B36F4(pView, nPlayer, gSession.fFrameTime)) {
-        fn_800C1790(pView, nPlayer);
+        GolfCamera_TurnOffComicCam(pView, nPlayer);
         CameraController_SetCameraMode(ViewController_GetCameraControl(nView), 14, nPlayer, nView);
         GolfCamera_ProcessBallFlightCamera(pView, nPlayer);
     } else {
@@ -1705,8 +1724,11 @@ void fn_800C16C4(View* pView, int nPlayer) {
     }
 }
 
-// Undo what camera 20 set up (b56): the view's rectangle back to 0,0-1,1 and the render state reset.
-void fn_800C1790(View* pView, int nPlayer) {
+// When the comic camera is on (b56): the view's viewport back to the whole screen (0,0-1,1), the
+// render context's matrices and the render state updated, and b56 and b57 cleared. Called by the
+// swing camera's init, camera 20's tick, when the ball's flight ends (STATEFUNC_SimulateExit) and
+// when the special swings are stopped.
+void GolfCamera_TurnOffComicCam(View* pView, int nPlayer) {
     int nView = gPlayers[nPlayer].nView[0];
     if (lbl_80282220->b56) {
         VM_vSetViewportRect(RC_spGetRenderCtxViewport(ViewController_GetRenderContext(nView)), 0.0f, 0.0f,
@@ -3924,7 +3946,7 @@ u8 fn_800C7170(View* pView) {
 }
 
 void fn_800C7178(View* pView, int nPlayer) {
-    fn_800C1790(pView, nPlayer);
+    GolfCamera_TurnOffComicCam(pView, nPlayer);
     fn_800C6E14();
     fn_800C6DE4();
     fn_800C6E2C();
