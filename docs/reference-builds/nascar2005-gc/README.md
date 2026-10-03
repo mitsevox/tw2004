@@ -1,6 +1,6 @@
 # NASCAR 2005: Chase for the Cup, GameCube (USA, GN4E69), EA Tiburon, 2004
 
-Fetched on the owner's PC 2026-09-26 (PC job `refdwarf`, tools/ref/fetchdwarf.py; the archive and
+Fetched on the owner's PC 2026-09-26 (PC job `refdwarf`, tools/ref/fetchdwarf.py, removed 2026-10-03; the archive and
 ELF stay in C:/dev/refs). `NASCAR05.ELF` (18 MB) with DWARF 1.1 (CodeWarrior). `cus.txt`: its 230
 compilation units (source path, code range).
 

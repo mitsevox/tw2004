@@ -17,7 +17,7 @@ artifacts.
   `Dev_Golf_Release_PS3.elf`.
 - `madden2003-ps2/`: EA Tiburon's UI Studio library (our UIS units) from the Madden NFL 2003 PS2
   prototype's STABS debug info: signatures, locals in declaration order, types, and a pairing
-  with our functions (`tools/ref/mdebug.py`).
+  with our functions (`tools/ref/mdebug.py` (removed 2026-10-03; in git history)).
 
 ## Input fingerprints
 

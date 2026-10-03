@@ -79,7 +79,7 @@ u8  gSKALeftHanded;
 // character's pending event nClampEvent is held there once (nClampEvent then -1); the clip's fCC is
 // updated when it has a BlendClip.
 void SKA_Update(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32 fTime) {
-    // fake match: the declaration order (found by tools/match/declsearch.py) sets the registers
+    // fake match: the declaration order (found by tools/matching/declsearch.py) sets the registers
     u8* pKeys;
     f32* pRot;
     ClipTrack* pTrack;

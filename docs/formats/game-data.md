@@ -166,5 +166,5 @@ How the CPU uses it is in `docs/gameplay.md` (`AI_ChooseTarget`).
 Tools
 -----
 
-    python tools/research/ctrl_dump.py loadonce.gcb --out DIR      # writes NNN_stat_.bin etc.
-    python tools/research/txg_export.py DIR/012_BALF_.bin flags/   # the flag textures
+    python tools/formats/ctrl_dump.py loadonce.gcb --out DIR      # writes NNN_stat_.bin etc.
+    python tools/formats/txg_export.py DIR/012_BALF_.bin flags/   # the flag textures

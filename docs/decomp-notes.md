@@ -88,7 +88,7 @@ The fixes that come up most often. Each points to its full entry below.
 
 - **Read EA's later source first, when there is one.** A debug build of a later game from the same
   studio and engine keeps EA's own declarations. For this game, TW07's PS3 debug info is split per
-  source file in `docs/reference-builds/tw07-ps3/cu/` (made by `tools/match/tw07dwarf.py`; a machine
+  source file in `docs/reference-builds/tw07-ps3/cu/` (made by `tools/match/tw07dwarf.py`, removed 2026-10-03; a machine
   pairing of our functions with TW07's is `docs/reference-builds/tw07-ps3/pairs.tsv`). The compiler
   differs, but the programmers' style carried over three years, and it decides register
   allocation. **[verified]** on 16 functions in one session (2026-09-24), in five patterns:
@@ -113,7 +113,7 @@ The fixes that come up most often. Each points to its full entry below.
   decimal like `0.0138889f` is a few bits off. objdiff masks constant values, so the function
   still reads 100% while the value is wrong: a real parity bug in a port, and a common reason a
   unit won't link. Decimals are right only when the hex round-trips exactly (0.5, 0.25, 20.0).
-  `tools/match/constcheck.py` (when present) lists every mismatch and suggests the fraction. How
+  `tools/quality/constcheck.py` (when present) lists every mismatch and suggests the fraction. How
   the expression is written can also change the code (`x * (1.0f/65536.0f)` gives `fmuls`,
   `x / 65536.0f` gives `fdivs`). See [Floating point](#floating-point).
 
@@ -192,7 +192,7 @@ They will be sorted into the sections below.
   `memcpy` or `-fno-strict-aliasing`).
 - **[verified] MWCC treats `s32` (long) and `int` as different types when redeclaring, and an empty `()`
   prototype clashes with one whose parameters are promoted (u8, s8, u16, s16, f32).** `void f(); void
-  f(int)` compiles; `void f(); void f(u8)` does not. `tools/match/declcheck.py` finds these before a fold.
+  f(int)` compiles; `void f(); void f(u8)` does not. `tools/matching/declcheck.py` finds these before a fold.
 - **[verified] Plain `ninja` does not compile NonMatching units.** Build `ninja all_source` (or the unit's
   `.o`) to see compile errors; merge.py does.
 
@@ -612,7 +612,7 @@ so try EA's own forms (TW07, one local per job, the unswitched loop) before them
   and an integer unit (and the 750's rule that an integer op cannot issue beside a busy unit if it
   touches the register just defined there), so the first pass's order changes, the registers
   follow from the new live ranges, and the srawi is deleted after allocation.
-  `tools/match/sched750.py deadsearch` predicts which value to put it on. GoShaderObject_Particle_Gc
+  `tools/matching/sched750.py deadsearch` predicts which value to put it on. GoShaderObject_Particle_Gc
   fn_800949D0 97.89 -> 100: the round trip on n in `if (nLive <= (u32)(s64)(s32)n)` gave EA's
   order and registers (pVerts back to its plain form); the same round trip on nFirst * 36 had given
   every register but left 4 instructions out of order, and one on `n = ...` itself keeps a copy.
@@ -834,7 +834,7 @@ Added 2026-09-27 (from the ledgers solved that night; each ledger has the full s
 
 ### New from round 5, the mwcc-debugger round (2026-09-26)
 
-Read the compiler's own view first (`tools/match/mwccdbg.py`, docs/workflow.md "mwcc-debugger").
+Read the compiler's own view first (`tools/matching/mwccdbg.py`, docs/workflow.md "mwcc-debugger").
 
 - **[verified] The allocator's levels**: a variable with more than 28 remaining neighbours cannot be
   placed on the first level and jumps to the top (takes r31). One temp more or fewer is the lever.
@@ -1676,7 +1676,7 @@ are for code built with GCC 2.95 at -O0 (SN ProDG), kept for reference.
 - **[verified] Empty sections shift the link.** `NgcAs.exe` writes empty `.data`/`.bss`/`.sdata`/
   `.sbss` sections into every object. `mwldeppc` rounds the output section up when it meets one,
   even with the ALLOC flag cleared: our `.sbss` came out 2 bytes longer and the DOL hash failed while
-  every function read 100%. `tools/prodg/prodgcc.py` deletes empty sections from the object.
+  every function read 100%. `tools/build/prodg/prodgcc.py` deletes empty sections from the object.
 - **[verified] A call result stored straight from `r3`.** `x = f()` normally goes `mr r0, r3; stw r0`.
   When the variable's type differs from the function's declared return type (an `int` result
   into a `u32`, or into a pointer) GCC stores `stw r3` directly. So a direct store means the
@@ -1709,6 +1709,6 @@ are for code built with GCC 2.95 at -O0 (SN ProDG), kept for reference.
 - **[verified] Order of read-only data reveals declaration order.** A function-pointer table that
   precedes the `__FILE__` string in `.rodata` was defined above the functions (with prototypes).
 - The `ngccc.exe` driver refuses to run without an installed `sn.ini`; run `cpp.exe`, `cc1.exe`
-  and `NgcAs.exe` directly (see `tools/prodg/prodgcc.py`). `cc1` takes `-O0 -quiet in.i -o out.s`.
+  and `NgcAs.exe` directly (see `tools/build/prodg/prodgcc.py`). `cc1` takes `-O0 -quiet in.i -o out.s`.
 - The five ProDG builds in the compiler pack (3.5 - 3.9.3, all GCC 2.95.x) produce identical
   output for unoptimized code; the version cannot be identified from `-O0` functions.

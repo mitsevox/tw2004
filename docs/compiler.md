@@ -38,7 +38,7 @@ stack after each statement. It corresponds to the four source paths left in asse
 A separately built EA shared library. Confirmed SN Systems ProDG: `ChecksumCRC32.c` (8 functions)
 matches byte for byte under every ProDG build in the compiler pack at `-O0`, so the exact version
 cannot be told apart from unoptimized code; the project uses `ProDG/3.5` (2001). Driven by
-`tools/prodg/prodgcc.py` (the `ngccc` front end needs an installed `sn.ini` and is bypassed). This block is the file-reading layer,
+`tools/build/prodg/prodgcc.py` (the `ngccc` front end needs an installed `sn.ini` and is bypassed). This block is the file-reading layer,
 so it matters to the asset track (`docs/formats`).
 
 Evidence for the CodeWarrior version

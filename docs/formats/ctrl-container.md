@@ -3,7 +3,7 @@ CTRL stream container (`.hog`, `.gcb`, `.ngc`)
 
 Status: **chunk layout, object framing and the `Rdat` compression are known from the code**
 (`src/UStream.c`, read from the game's loader at `fn_8000D4F0`). The extractor
-`tools/research/ctrl_dump.py` reproduces every object on disc 1 to its declared size.
+`tools/formats/ctrl_dump.py` reproduces every object on disc 1 to its declared size.
 What is *inside* each object type is the next layer and is not decoded yet.
 
 Chunk layout
@@ -85,8 +85,8 @@ Object types on disc 1 (325 files)
 Extractor
 ---------
 
-    python tools/research/ctrl_dump.py <file.hog> -v            # list objects
-    python tools/research/ctrl_dump.py <file.hog> --out DIR     # write each object as .bin
+    python tools/formats/ctrl_dump.py <file.hog> -v            # list objects
+    python tools/formats/ctrl_dump.py <file.hog> --out DIR     # write each object as .bin
 
 Next: the per-type formats. `txf ` (`TXG `) and `ter ` (`OBG `) have their own tagged
 sub-structure; `BALF` and `BIO ` are the small ones the gameplay hypotheses care about.

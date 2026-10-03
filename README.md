@@ -46,7 +46,7 @@ What's here
   [`docs/decomp-notes.md`](docs/decomp-notes.md) (the CodeWarrior rulebook),
   [`docs/formats/`](docs/formats/README.md) (the game's data file formats),
   [`docs/gameplay.md`](docs/gameplay.md) (gameplay logic read from the code; not yet audited).
-- `tools/`: build, matching and naming scripts; `tools/codes/` has Gecko codes (an
+- `tools/`: build, matching and naming scripts; `mods/gecko/` has Gecko codes (an
   always-pool-cue gimme and a no-lucky-shots code, untested). A confirmed widescreen culling fix is
   in [`docs/tw2004-notes.md`](docs/tw2004-notes.md), "Frustum setup and widescreen codes".
 - `docs/notes/`: kept findings: EA bugs found, misfiled units, TW07/TW06 name pairing.

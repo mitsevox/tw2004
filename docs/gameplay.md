@@ -342,7 +342,7 @@ thing off** (the session byte we first took for a "no luck" option is the split-
 the caddie is off in split screen too). A CPU never gets one.
 
 A Gecko code that turns the lucky shot off (keeping lesson mode 11's scripted one) is in
-`tools/codes/no_lucky_shots.txt` - **untested**: one instruction, `Golfer_IsLucky` always takes
+`mods/gecko/no_lucky_shots.txt` - **untested**: one instruction, `Golfer_IsLucky` always takes
 its "not lucky" exit after the CPU / split-screen test.
 
 What the event does is in the lie code (`Physics_SetLie`, now in C - full rules under "Landings,
@@ -418,8 +418,8 @@ leaf's clips are picked **at random** (`Rand_Next(1) % n`, up to three tries) wi
 none repeats until all have played. No other condition applies to group 9.
 
 The libraries (`SAL` objects in `glbchar.gcb` for male/female, and one embedded in each
-character's `Data/Chars/NNchar.gcb` `CHR` object; `tools/research/find_sal.py`,
-`tools/research/sal_dump.py`) give, for the putter, the same clips for every style:
+character's `Data/Chars/NNchar.gcb` `CHR` object; `tools/formats/find_sal.py`,
+`tools/formats/sal_dump.py`) give, for the putter, the same clips for every style:
 
     shared male / female       gplptt10, gplptt01   /  fplptt10, fplptt01
     03 Cedric "Ace" Andrews, 09 Dominic "The Don" Donatello, 16 Hamish "Mulligan" McGregor,
@@ -433,7 +433,7 @@ McGregor's files are still named for EA's working names, `...ICAPONE\EXPORTED/GC
 
 `gplptt12` is the **pool-cue tap-in** (the golfer drops to the ground, turns the putter round
 and knocks it in with the grip like a cue). **Confirmed in game (2026-09-22)**: with the Gecko code
-in `tools/codes/pool_cue_gimme.txt`, which hands every group-9 lookup the `gplptt12` clip from any
+in `mods/gecko/pool_cue_gimme.txt`, which hands every group-9 lookup the `gplptt12` clip from any
 loaded golfer's library, a created golfer playing alongside Cedric Andrews tapped in with the pool
 cue on the first gimme. A created golfer's own library (character 08) has no group 9, and the
 creator's 111-animation playlist (group 20) has no tap-ins, so without the code they never get it. So it is a one-in-three

@@ -55,7 +55,7 @@ offsets. Notes on reading it:
 ## How it was extracted
 
 `python tools/ref/mdebug.py <elf> cfile --file 'Common/UIStudio' --types '^_?UIS' --out <dir>`
-(and `--file 'Objects\\(UISObj|UISCallback)\.c'` for `glue/`). `tools/ref/mdebug.py` is a small
+(and `--file 'Objects\\(UISObj|UISCallback)\.c'` for `glue/`). `tools/ref/mdebug.py` (removed 2026-10-03; in git history) is a small
 ECOFF reader: HDRR at the section's file offset, FDRs (0x48 bytes), local symbols (0x0C), strings;
 a stab is a local symbol whose index is 0x8F300 + the stab code in an FDR that starts with
 `@stabs`. Its other commands: `files`, `raw` (every symbol of a file), `type <name>` (one type

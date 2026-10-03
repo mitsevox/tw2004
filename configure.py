@@ -380,7 +380,7 @@ def MatchingFor(*versions):
 config.warn_missing_config = True
 config.warn_missing_source = False
 # EA's shared file library was built with SN ProDG (GCC 2.95) without optimization. See
-# docs/compiler.md. tools/prodg/prodgcc.py drives the compiler; tools/project.py selects it when
+# docs/compiler.md. tools/build/prodg/prodgcc.py drives the compiler; tools/project.py selects it when
 # mw_version starts with "ProDG/".
 cflags_gcc = [
     "-O0",
@@ -1239,7 +1239,7 @@ if args.mode == "configure":
     # Write build.ninja and objdiff.json
     generate_build(config)
     # dtk's gap units below the first SDK unit are uncharted game code: count them in "game"
-    from tools.match.autocat import categorise_auto_units
+    from tools.build.autocat import categorise_auto_units
     categorise_auto_units("objdiff.json", f"config/{config.version}/splits.txt")
 elif args.mode == "progress":
     # Print progress information

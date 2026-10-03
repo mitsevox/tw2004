@@ -26,7 +26,7 @@ units, TW07/TW06 name pairing, and the evidence files the code and name log cite
 - **Names and comments are true to the code** (docs/style.md "Where names and comments come from"):
   EA's name when a related build or EA's own text confirms it; otherwise a name read carefully from
   the code (tier T3). Every name is logged with evidence in `config/GW4E69/name_sources.tsv`
-  (`tools/match/name.py`). `fake match:` / `port:` / `EA bug:` labels are kept.
+  (`tools/naming/name.py`). `fake match:` / `port:` / `EA bug:` labels are kept.
 - **Downloads, purchases, posts, messages: ask the owner first.** Secrets (tokens) are created and
   stored by the owner; never ask for their values.
 - The owner is **mits** (GitHub `mitsevox`).

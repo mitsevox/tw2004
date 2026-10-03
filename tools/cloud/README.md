@@ -26,7 +26,7 @@ downloaded tools stay.
 
 ## Notes
 
-- `tools/match/hosttools.py` holds everything that differs between Windows and Linux (tool paths,
+- `tools/build/hosttools.py` holds everything that differs between Windows and Linux (tool paths,
   wibo/wine, how the compiler reports paths, stopping a process tree); the tools run unchanged on
   both.
 - Commits: plain messages, never a Co-Authored-By line or AI footer (CLAUDE.md).

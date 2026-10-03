@@ -12,7 +12,7 @@ The machines, the git flow, CI, the public page and decomp.dev. Matching tools a
 | **GitHub Actions** | the build on every push and PR, the public page | the private container `ghcr.io/mitsevox/tw2004-build:main` |
 
 Setting up a cloud session: [`../tools/cloud/README.md`](../tools/cloud/README.md). Everything
-platform-specific in the tools is in `tools/match/hosttools.py`, so they run unchanged on Windows
+platform-specific in the tools is in `tools/build/hosttools.py`, so they run unchanged on Windows
 and Linux.
 
 ## Git flow

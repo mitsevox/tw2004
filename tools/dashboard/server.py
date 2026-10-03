@@ -91,7 +91,7 @@ def parse_report(path):
                 fns[addr] = (num(f.get('size')), f.get('fuzzy_match_percent', 0) >= 100, linked, u['name'])
         if md.get('auto_generated'):
             # dtk's gap units: code no source file covers yet. The ones configure.py puts in a
-            # category (tools/match/autocat.py) are counted in it as well: by_cat keeps them apart
+            # category (tools/build/autocat.py) are counted in it as well: by_cat keeps them apart
             # so the page shows them inside their category, not as extra code beside it.
             unsplit['code'] += um.get('total_code', 0)
             unsplit['data'] += um.get('total_data', 0)

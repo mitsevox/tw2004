@@ -1,7 +1,7 @@
 # Name pairing survey: how many of EA's names the reference builds give back (2026-09-27, lane n1)
 
 A survey, not a rename: nothing in `src/`, `include/`, `symbols.txt` or `name_sources.tsv` changed.
-Tool: `tools/match/pairnames.py` (reusable; its docstring has the full method and every code).
+Tool: `tools/naming/pairnames.py` (reusable; its docstring has the full method and every code).
 Proposals: `2026-09-27-name-pairing.tsv` (one row per proposal, columns below).
 
 ## The counts
@@ -197,7 +197,7 @@ descriptive names, light verification, a name must never contradict the code):
 
 To get globals and fields (owner's PC, where the TW07 ELF is): export TW07's compilation-unit-level
 variables (name, type, size, declaring file) and full struct member lists (name, type, order) with
-the DWARF reader behind `tools/match/tw07dwarf.py`. Globals then pair through the 311 `lbl_` used by
+the DWARF reader behind `tools/match/tw07dwarf.py` (removed 2026-10-03; in git history). Globals then pair through the 311 `lbl_` used by
 already-paired functions (same file, same users, type/size); fields pair by member order and type
 (PS3 offsets are 64-bit, so order and type, not offsets). With TW07's PS3 disassembly a global's
 users could be read directly (TOC references), which would make that pairing much stronger.

@@ -1,7 +1,7 @@
 TXG texture groups (`txf ` objects)
 ===================================
 
-Status: **decoded and verified** by eye (`tools/research/txg_export.py` exports every texture
+Status: **decoded and verified** by eye (`tools/formats/txg_export.py` exports every texture
 of a hole as PNG; grass, cliffs and trees come out right in all three formats seen).
 Read from the files, not yet from code; the loader side is `LLTex.c` (`0x8000FC10`).
 
@@ -37,4 +37,4 @@ Images are in the GameCube's native tiled layouts, so they can be handed to `GXI
 unchanged; `txg_export.py` untiles them. Bytes-per-pixel checks out against the format byte
 for all 155 textures of `01_peb/Hole_01` (CMPR 4, I8 8, RGB5A3 16).
 
-    python tools/research/txg_export.py <hole.hog | file.gcb | txf.bin> <out_dir>
+    python tools/formats/txg_export.py <hole.hog | file.gcb | txf.bin> <out_dir>

@@ -51,7 +51,7 @@ The SDK starts earlier than first thought: `VIWaitForRetrace` is at `0x8012F314`
 **SDK source (Level 0).** `extern/sdk` is the Metroid Prime project's SDK / MSL source. **57 units
 (162 functions, 51,376 bytes) are linked from it and match.** Compilers: GC/1.2.5n for Dolphin
 libraries, GC/1.3 for MSL, flags in `cflags_sdk` / `cflags_runtime`. The pipeline is in
-`tools/research/sdk/` (run in the order given in each script's header). What is left of Prime's 154 units:
+`tools/matching/sdk/` (run in the order given in each script's header). What is left of Prime's 154 units:
 
 - 4 fully matching on code but blocked on data with no anchor (`fstload`, `EXIBios`, `GXPixel`,
   `OSError`): their `.data` is referenced only from other data. Would need a byte-pattern search.
@@ -95,7 +95,7 @@ none of it in Prime. Identified from callers and neighbours:
 | `0x80145998`-`0x80147B94` | 8.7 KB, 11 fns | MIX, the SDK voice mixer (`MIXInit`, `__MIXSetPan`, `MIXSetSoundMode` named; the two big ones are the settings update and the per-frame mix) | not in Prime; 2004 SDK objects differ |
 | `0x8015444C`-`0x8015C1F8` (pieces) | ~20 KB | MSL: `__ieee754_*`/`__kernel_*` math, `alloc.c`, `mem_funcs`, wide-char | MSL revision differs from Prime's; other games' MSL |
 
-Any of these needs another project's objects run through `tools/research/sdk/` (the scripts only
+Any of these needs another project's objects run through `tools/matching/sdk/` (the scripts only
 assume a directory of split `.o` files plus source), and its compiler version in `configure.py`.
 
 **MetroTRK (2026-09-22).** `extern/trk` is the Pikmin 2 project's MetroTRK source (CC0, see its
@@ -275,7 +275,7 @@ swing meter's per-player state as `SwingData` at player+0x3D4.
 `Ball_Holed`, `Physics_GetDistanceToCup`, `Physics_ApplySuperSucka` written (instruction-count exact; three
 register numbers off in the pull). `Physics_BallRolling`, `Ball_Collide` and `Physics_SetLie` are
 named and read. The Python transcription
-`tools/research/ctrl_dump.py` extracts every object from every `.hog` / `.gcb` on disc 1 to
+`tools/formats/ctrl_dump.py` extracts every object from every `.hog` / `.gcb` on disc 1 to
 its declared size, which is the proof the reading is right. Full format:
 [`formats/ctrl-container.md`](formats/ctrl-container.md). The rest of the file - buffer ring
 (`fn_8000CBFC`), object allocation from `SHDR` (`fn_8000C968`), the tag switch itself - is the
@@ -646,7 +646,7 @@ See [`infrastructure.md`](infrastructure.md) (the build container, CI, the publi
 The small-function sweep
 ------------------------
 
-Scripted matching of functions that need no judgement. Tools in `tools/sweep/` (`sweep.py`,
+Scripted matching of functions that need no judgement. Tools in `tools/matching/sweep/` (`sweep.py`,
 `sweep_m2c.py`, `smallsurvey.py`, `retry.py`; paths in `paths.py`, state and caches in `build/sweep/`).
 
 - `python sweep.py gen <maxbytes> 1 [--m2c]` finds functions not yet in any unit, writes C for
