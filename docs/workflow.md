@@ -227,9 +227,6 @@ match (look for EA's helper in TW07 first, else `fn_<caller>_Read` with `// fake
 Ter_DrawPatchPass and Glows fn_800981D0; the swap lever finds AI_ChooseTarget's fDX/fDZ order (112 -> 90
 with other levers in 4 min; the PC permuter found it first).
 
-**Heavy jobs on the owner's PC** (permuter, sweeper) and **branch cleanup** run as GitHub
-workflows: see [`infrastructure.md`](infrastructure.md).
-
 Before you commit
 -----------------
 
