@@ -1,6 +1,6 @@
 // golfer.h: the golfer record, the player struct and the attribute accessor, shared by
 // Golfer.c (the CPU golfer) and Swing.c (the human swing). Layouts are from the reads in
-// those files; see docs/formats/game-data.md and docs/gameplay.md.
+// those files; see docs/game/formats/game-data.md and docs/game/gameplay.md.
 
 #ifndef GOLFER_H
 #define GOLFER_H
@@ -109,7 +109,7 @@ typedef struct GolferRecord {
 LAYOUT_ASSERT(GolferRecord, 0x140);
 
 // Golfer states: the rows of sGolferStateEngineTable (init, update, exit), kept on a per-player
-// stack by GOLFERSTATE_Push/Pop/Switch/Set. Names from TW06's table (docs/tw06-names.md); TW06
+// stack by GOLFERSTATE_Push/Pop/Switch/Set. Names from TW06's table (docs/evidence/tw06-names.md); TW06
 // added two cut-scene states after PreShot and dropped the knee cam (our name for state 8).
 enum {
     GS_NONE                = 0,
@@ -155,7 +155,7 @@ enum {
 // this struct; add 0x3D4 for the player offset). Names are TW06's SW_sSwingData, which is the
 // same struct with a few fields added: 4 bytes after 0x14, 12 after 0x2C (the second stick),
 // 8 after 0x37C, 0x18 in all by 0x390. The fields our code uses were checked against it
-// (docs/tw06-names.md, "Structs").
+// (docs/evidence/tw06-names.md, "Structs").
 typedef struct SwingData {
     s32  nState;                // 0x000  (0x3D4) SW_* above
     f32  fTimeSwingTop;         // 0x004  animation times, from the clip's marks 1, 0, 2
@@ -256,7 +256,7 @@ typedef struct CourseMoneyTracking {
 // A player in the current round (human or CPU). 0xEF8 bytes; only the fields read so far.
 // TW06: GamePlayer (0xFE0). EA later grouped these fields into sub-structs in a different
 // order, so only blocks are matched: the score block is the first 0x200 bytes of TW06's
-// GolferScore_t and the shot block at 0x354 is its AIshot_t (see docs/tw06-names.md).
+// GolferScore_t and the shot block at 0x354 is its AIshot_t (see docs/evidence/tw06-names.md).
 typedef struct Player {
     s32  nIndex;                // 0x000
     s32  unk4;                  // 0x004

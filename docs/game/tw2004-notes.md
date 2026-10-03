@@ -1,0 +1,681 @@
+Tiger Woods PGA Tour 2004: what we know
+=======================================
+
+Everything learned about this specific game. General CodeWarrior / GameCube lessons live in
+[`decomp-notes.md`](../compiler/decomp-notes.md), compiler evidence in [`compiler.md`](../compiler/compiler.md), and
+file formats in [`formats/`](formats/README.md).
+
+Guesses are labelled as guesses. Rename and correct freely as evidence comes in.
+
+The game
+--------
+
+- Game ID `GW4E69`, USA, Revision 0, two discs. Shipped September 2003.
+- `main.dol` is byte-identical on both discs (SHA-1 `bbbc55485e51973931dee169e7bf87bc7379223f`),
+  1.62 MiB, 7,646 functions, 1.54 MB code, 1.08 MB data. No REL modules. No symbol map on either disc.
+- Written in **C**. Every leaked source name ends in `.c`, and there are no C++ exception tables.
+- Dolphin SDK build Sep 5 2002 (CARD library patched Apr 2 2003). This is the same SDK build
+  Metroid Prime Rev 0 uses; 76% of that project's SDK functions are byte-identical here, so its
+  SDK source is reusable. The `GBA` library is present but none of its functions matched (different
+  version); `thp` (video) and `dtk` (disk track player) were not found.
+
+Memory map of `main.dol`
+------------------------
+
+| Range | Contents |
+|-------|----------|
+| `0x80003100` | `.init`: startup, `memcpy`, `memset`, TRK vector table |
+| `0x80005520` - ~`0x8012FFFF` | EA game and engine code (CodeWarrior GC/2.x, `-O4`) |
+| `0x8012E950` - `0x801654CF` | Dolphin SDK, MSL C library, MetroTRK v2.0 |
+| `0x801654D0` - `0x8016C717` | **EA UI Studio** (`UIStudio.c`, `UISEvent.c`: menu screens, groups, "rate functions"), CodeWarrior -O4, ~29 KB, called from game code. Identified 2026-09-23 from its assert strings. |
+| `0x8016C718` - `0x80175F54` | EA shared file library, 124 functions, **GCC unoptimized** (`src/Common/...`, ProDG) |
+| `0x8017DB60` | `.rodata` (assert strings, jump tables) |
+| `0x801866E0` `.data`, `0x8019D540` `.bss`, `0x80280DA0` `.sdata`, `0x80281B80` `.sbss`, `0x80282A60` `.sdata2` (float constants) | |
+
+The boundary between EA code and the SDK is approximate: it is where dtk's first automatically
+named SDK function appears.
+
+SDK and runtime names
+---------------------
+
+423 SDK / MSL functions were named by matching them byte for byte against Metroid Prime Rev 0's
+split objects (`tools/research/match_sdk_names.py`). Only linker-filled bytes are masked, a name is
+used only if the match is unique both ways, and two self-checks passed: all 180 functions dtk had
+already named agreed, and all 1,906 calls between matched functions pointed at the expected names.
+12 were skipped because the name is shared by several static functions (`OnReset`, `AlarmHandler`,
+`WriteCallback`, `EraseCallback`). By library: gx 128, card 72, dvd 47, runtime 42, os 32, pad 20,
+si 19, exi 13, dsp 11, ar 9, mtx 6, other 36.
+
+The SDK starts earlier than first thought: `VIWaitForRetrace` is at `0x8012F314`.
+
+**SDK source (Level 0).** `extern/sdk` is the Metroid Prime project's SDK / MSL source. **57 units
+(162 functions, 51,376 bytes) are linked from it and match.** Compilers: GC/1.2.5n for Dolphin
+libraries, GC/1.3 for MSL, flags in `cflags_sdk` / `cflags_runtime`. The pipeline is in
+`tools/matching/sdk/` (run in the order given in each script's header). What is left of Prime's 154 units:
+
+- 4 fully matching on code but blocked on data with no anchor (`fstload`, `EXIBios`, `GXPixel`,
+  `OSError`): their `.data` is referenced only from other data. Would need a byte-pattern search.
+- 27 partially matching: a few functions per unit differ from Prime's source (this game's SDK patch
+  level or MSL revision). **Level 1 (2026-09-22): 23 of them are linked as `NonMatching` text-only
+  units** (data left in the auto units; the DOL is linked from the split objects so it stays exact),
+  which credits every function that already matches: +79 KB of code. Only 5 functions in them are
+  short of 100% (`fwrite`, `fseek`, `ftell`, `__close_all`, `CARDReadAsync` - this game's MSL/CARD
+  revision differs) plus `OSMemory`'s local `OnReset`, which dtk names `OnReset_8014B034` in the
+  target object. Most of the "missing" functions in those units simply do not exist in this binary
+  (e.g. the `LC*` locked-cache functions of `OSCache`, `AIStopDMA`, `GXSetVtxDescv`). Not linked:
+  `dvdfatal`, `OSFont`, `OSLink` (one small function each, large unmapped data).
+- 23 "gappy" (matched functions with unmatched ones between them). **Level 2 (2026-09-22): 22 of
+  them are linked the same way**, each as one text span from its first to its last function
+  (objects are contiguous in the link, so the unnamed functions inside the span belong to the unit;
+  they are this game's revision of the absent ones). Skipped: `__ppc_eabi_init` (Prime has it as
+  .cpp, and it spans .init and .text). +61 KB. Real differences found this way: the CARD library
+  (`__CARDAccess` 31%, `CARDBlock`/`CARDDir`/`CARDOpen` mostly unmatched - the April 2003 CARD
+  patch), MSL `printf` (`vprintf`, `float2str`, `double2hex` differ), `GXSetViewportJitter`,
+  `__num2dec_internal`. Name-collision clusters (`OnReset`, `AlarmHandler`, `WriteCallback`,
+  `EraseCallback`) are other units' locals with the same name and were left out of the spans.
+- **Locals referenced from outside the unit lose their name.** Because these units carry no data
+  yet, a local function whose switch jump table (`getTiming`, `stateBusy`, `SPEC2_MakeStatus`,
+  `parse_format`, `long2str`, `longlong2str`, `__equals_dec`) or reset-function record (`OnReset`)
+  sits in an auto data unit is emitted by dtk as a global named `name_ADDRESS`, so objdiff cannot
+  pair it and it reports 0% although the code matches. Giving each unit its data ranges (Level 3)
+  fixes that and is the route to "linked". About 5 KB.
+- `include/types.h` now also defines `uint`/`ushort`/`sshort`/`schar`/`uchar`, which the borrowed
+  MSL source (`printf.c`) uses; Prime gets them from its own `types.h`.
+- The 4 data-blocked full units (`fstload`, `EXIBios`, `GXPixel`, `OSError`) are linked the same
+  text-only way (2026-09-22), +10 KB. Their data still needs anchoring for "linked".
+- The rest are libraries this game does not link or SDK parts Prime never decompiled.
+
+**What is still unnamed in the SDK region (Level 4 map, 2026-09-22).** 383 functions, 111 KB,
+none of it in Prime. Identified from callers and neighbours:
+
+| Range | Size | What | Where source exists |
+|---|---|---|---|
+| `0x8015F784`-`0x801654D0` | ~24 KB | MetroTRK (the rest up to `0x8016C718` turned out to be EA's UI Studio, see the memory map; debugger nub; `TRK_main`, `TRKNubMainLoop` named) | Prime has only `mslsupp.c`/`nubinit.c`; full source in other decomps (Pikmin 2, Twilight Princess) |
+| `0x80135728`-`0x801393D0` | 15.5 KB, 65 fns | AX audio library (calls `AIInitDMA`, `DSPAddTask`, `DSPInit`, `AIStartDMA`) | not in Prime (MusyX); `doldecomp/dolphin`, games using JAudio |
+| `0x80145998`-`0x80147B94` | 8.7 KB, 11 fns | MIX, the SDK voice mixer (`MIXInit`, `__MIXSetPan`, `MIXSetSoundMode` named; the two big ones are the settings update and the per-frame mix) | not in Prime; 2004 SDK objects differ |
+| `0x8015444C`-`0x8015C1F8` (pieces) | ~20 KB | MSL: `__ieee754_*`/`__kernel_*` math, `alloc.c`, `mem_funcs`, wide-char | MSL revision differs from Prime's; other games' MSL |
+
+Any of these needs another project's objects run through `tools/matching/sdk/` (the scripts only
+assume a directory of split `.o` files plus source), and its compiler version in `configure.py`.
+
+**MetroTRK (2026-09-22).** `extern/trk` is the Pikmin 2 project's MetroTRK source (CC0, see its
+README). Compiled with GC/1.3.2 and Pikmin 2's TRK flags it reproduces 97 of this game's TRK
+functions byte for byte (v2.0 here vs v2.6 there); Melee's older TRK gave 20. The 27 units are
+linked `NonMatching` (`TRK_MINNOW_DOLPHIN` in configure.py, +19 KB). Two TRK functions live in
+`.init` (`TRK_memcpy`, `__TRK_reset`) and are split there. `mutex_TRK` and `target_options` are
+8-16 byte stubs this revision compiles differently.
+
+**Naming from a later SDK's libraries (2026-09-22).** The April 2004 Dolphin SDK library archives
+(reference only, not in the repo) were unpacked to objects and run through `match_sdk_names.py`:
+286 exact matches, 52 new names (CARD, OS mutex/semaphore, AX, MIX, AXFX, GX). Then
+`layout_align.py` aligned each reference object's function order against the game's by size,
+pinned at the exact matches, and named 21 more (`OSCreateThread`, `OSExitThread`, `AXSetVoiceSrc`,
+`DVDChangeDiskAsync`, `GXSetDrawDone`, `__CARDIsWritable`, `__CARDIsReadable`, `CARDOpen`...).
+Proposals of 12 bytes or less are not applied: tiny setters collide (one such false positive,
+`TRKSetBufferUsed` on a game function, was reverted). The remaining unnamed SDK-region code is
+AX/MIX/AXFX whose 2002 bytes differ from 2004's, and the 28 KB after `MWTRACE`, which is not SDK.
+
+**The April 2003 CARD patch, seen in code.** This game's CARD library is stamped Apr 2 2003
+(everything else Sep 5 2002). With the 2004 objects the difference is visible: `__CARDIsWritable`
+and `__CARDIsReadable` take the control block (`card, ent`) and replace the `__CARDAccess` +
+`__CARDIsWritable(ent)` pair; `CARDWriteAsync`, `CARDFastDeleteAsync`, `CARDRenameAsync` call
+`__CARDIsWritable`, `CARDReadAsync` calls `__CARDIsReadable`. Prime's source is guarded with
+`CARD_PATCH_2003` (set in `cflags_sdk`) at those spots; `CARDRead` and `CARDStat` went to 100% once
+the calls were fixed, which confirms it. `OSMutex.c` got its real range (Prime's object had only
+`__OSUnlockAllMutex`; this game has the whole file minus `OSTryLockMutex` and the condition
+variables, so it is `NonMatching`).
+
+Beyond that, Level 0 is done as far as borrowed source goes.
+
+Leaked source file names
+------------------------
+
+Found in assert strings. **All 94 are now pinned to addresses in [`filemap.md`](../evidence/filemap.md)**, in
+link order. Meanings of the prefixes are guesses.
+
+| Prefix | Guess | Files |
+|--------|-------|-------|
+| `LL` | low-level platform layer | `LLDisp_Gc` `LLDynTex` `LLFileIO_Gc` `LLFont` `LLObj_Gc` `LLPict_Gc` `LLPictInt` `LLTex` `LLTexGrp` `LLVideo` |
+| `U` | utility / kernel | `UAudMemStack` `UFont` `UFstPart` `UKernel` `UMemPool` `UObject` `UObject3D` `UStream` `UISEvent` `UIStudio` |
+| `Go` | game objects, cameras, renderer | `GoARAM` `GoBreakLine` `GoCamera` `GoCamTuningVars` `GoComicCam` `GoDynamicCam` `GoDynObj` `GoEntry` `GoFrameBuf` `GoGolfCam` `GoGrass` `GoGreenGrid` `GoLighting` `GoPostFx` `GoRenderCtx_Gc` `GoRenderSurface` `GoStaticCam` `GoTerrain` `GoViewport` |
+| `GoShaderObject` | shader objects | `_Glows_Gc` `_Particle_Gc` `_PrelitUVAnimation_Gc` `_Rain_Gc` `Common_DynamicRenderingBuffer_Gc.h` `Common_MorphAnimManager_Gc` `Common_ShaderObjectsData_Gc` `Common_TexAnimManager_Gc` `Container_OBFData_Gc` |
+| `hws` | materials / hardware shading | `hwsBurn` `hwsMaterial_Gc` `hwsOverride_Gc` `hwsRender_Gc` |
+| `Skin` / skeleton | character skinning, animation | `Skeleton` `Skin` `SkinBurn` `SkinMorph` `SkinPart` `AnimStream` `DynChain` `CharSliders` `char` `mtalib` `skalib` |
+| `FE_` / `ui` | front end, menus | `FE_CrAPDB` `FE_LogoDesign` `FE_Manager` `FE_PGATourMessages` `FEgolferanim` `uiLoadFile` `uiProcessInterface` `uiTransform` `EASportsBio` |
+| gameplay | | `YhSwing` `PsBallFx` `PsMgr` `Replay` `shadow` `SunFlr_Gc` `TibExt` `WPvi` `user` `4startUp` |
+| storage, audio, misc | | `MC_Gc` (memory card) `dvdfs` `SitDevFile` `crcmp_mad_codec` `GCN_Mem_Alloc` (MSL) `gbacable` `GBAXfer` `GBA` `dvd` `OSThread` (SDK) |
+| EA shared library (GCC block) | | (+ an XOR cipher module with no asserts, `src/Common/Cipher/CipherXOR.c`) `../../../Source/Common/Checksum/ChecksumCRC32.c` `../../../Source/Common/SharedFileIO/SharedFileIO.c` `../../../Source/Common/TagFile/TagFile.c` `../../../Source/NGC/SharedFileIO/llSharedFileIO.c` |
+
+Camera and visibility code (`0x80007BC4` - `0x800083A4`, fully matched)
+--------------------------------------------------------
+
+File unknown. It is **not** `GoCamera.c` (that is at `0x80076408`, see `filemap.md`); it sits
+between `LLObj_Gc.c` and `GoEntry.c`. Types are in `include/unsorted/cull.h`.
+
+| Address | Name | What it does | Status |
+|---------|------|--------------|--------|
+| `0x80007BC4` | `fn_80007BC4` | Move an object's bounding sphere into camera space, optionally report its depth, scale its radius, cull it | matched |
+| `0x80007C80` | `fn_80007C80` | Move a point into camera space (`viewMtx * point`) | matched |
+| `0x80007CE8` | `fn_80007CE8` | Same as `fn_80007BC4` without the depth output | matched |
+| `0x80007D74` | `fn_80007D74` | **Sphere vs view frustum test.** Returns 1 fully visible, 2 not visible, 4 touching a side edge, 8 touching the near limit. Separate path for a flat (non-perspective) camera, which only returns 2 or 4 | matched |
+| `0x800080D0`, `0x800081C4` | empty functions | Do nothing. Called from `fn_8006D8E8` and `fn_8006C854` | matched |
+| `0x800080D4` | `fn_800080D4` | Clears two fields of the global at `0x80280DA0`, then eight `GXSetVtxAttrFmt` calls: vertex formats 0 and 4 (position, color, two texture coords, normal) | matched |
+| `0x800081C8`, `0x80008214` | mode dispatch | Store a mode index, look up a function table (16-byte entries at `0x80188E78`, functions at +8), call its first function; second one calls the optional second function | matched |
+| `0x8000827C`, `0x80008248`, `0x800082CC` | type dispatch | Same idea for a type index: 0x44-byte entries at `0x80188E88`, functions at +0x24 (init, optional, third) | matched |
+| `0x800082F8` | `fn_800082F8` | Get a drawable object's bounding sphere (`obj->data + 0x58`) | matched |
+| `0x80008304` | `Vec3Copy` | Copy three floats. **Called 596 times from 110 functions** | matched |
+| `0x80008320` - `0x80008368` | ten getters | Return camera floats `0x220` down to `0x1F4` | matched |
+| `0x80008370`, `0x80008378` | getters | `cam->unk10`, then field 0 of that object; the cull test takes a different path when it is non-zero | matched |
+| `0x80008380` | `fn_80008380` | Calls `fn_800070DC`. Called from 21 functions | matched |
+| `0x800BAD60` | `LLMath_mat44fltMultiply` | 4x4 matrix times 4-float vector, uses paired-single math (hand-written assembly?) | not started |
+
+The dispatch object stores its type index at offset `0x0`. The cull test reads offset `0x0` of
+`cam->unk10` to choose perspective or flat, so these are probably the same object (unconfirmed;
+the two structs are still declared separately).
+
+`fn_80140590` is `GXSetVtxAttrFmt`: byte-identical to the one in Metroid Prime's SDK. Renamed in `symbols.txt`.
+
+Camera fields (guesses from how the cull test uses them): `0x11C` view matrix (4x4 floats);
+`0x1F4` / `0x1F8` near and far clip distances; `0x204`-`0x210` and `0x214`-`0x220` two sets of four
+frustum edge-plane numbers, chosen by a mode argument (0 or 1). Why there are two sets is unknown
+(two aspect ratios? a tight and a loose view?). `RenderState_SetClipZFromRenderCtx` also reads the two clip distances.
+
+The camera's sub-object (`cam->unk10`): field `0x0` is 0 for a perspective camera and non-zero for a
+flat one; `0xB4` / `0xB8` are the flat view's width and height (guess - the cull test halves them to
+get the box edges).
+
+Float constants for this file sit together in `.sdata2`: `1.0` at `0x80282A80` (owned by the three
+matched functions), `0.5` at `0x80282A84` (the cull test; in the source it is `/ 2.0f`). Both now belong to `code_80007BC4.c`.
+
+Frustum setup and widescreen codes
+----------------------------------
+
+`fn_80013950` (223 instructions, not yet decompiled) builds the camera's view volume each time it
+changes. Read from the disassembly, not yet verified by matching:
+
+- `cam+0x224` = result of `Math_Tan(0.5 * fov)` (looks like a tangent); `cam+0x228` = its reciprocal.
+- `cam+0x1FC` and `cam+0x200` = half-extents of the view, built from `0x224` and viewport values.
+  `0x1FC` feeds the planes the cull test uses with `x`, `0x200` the ones used with `y`.
+- Each edge plane is made by normalizing `(1, extent, 0)` with `LLMath_Normalize3`; the two results are
+  stored as a pair (set A: `0x204`/`0x20C` and `0x208`/`0x210`).
+- **Set B (`0x214` - `0x220`) is the same thing with the extents multiplied by 2.0** (constant at
+  `0x80282B7C`). So mode 1 of the cull test is a view twice as wide: a loose second-chance test.
+- `cam+0x1F4` / `0x1F8` = near / far limits. Then it builds the projection matrix at `cam+0x5C`
+  (`Mtx_Perspective` for perspective, `Mtx_PerspectiveDepthOverNear` for flat), and a combined matrix at `cam+0xDC`.
+- `fn_800977F8` (424 instructions) also writes both plane sets. Unexamined - maybe another camera type.
+
+How callers use the cull result: all five call sites only ask "was it 2?". `fn_80007B2C` maps
+2 -> 3, 1 -> 2, and for 4 / 8 runs the test again in mode 1.
+
+**Widescreen Gecko codes (GW4E69 Rev 0, both discs). `$Widescreen Culling Fix` is CONFIRMED by an
+A/B test on 2026-09-21** (Dolphin 2606a, Vulkan, widescreen hack on, stretch to 16:9):
+
+- **Code off (hack only):** obvious pop-in. Trees, patches of grass and other objects cut out in the
+  outer ~12.5% of the screen on each side - exactly the strip that lies outside the 4:3 view
+  (4:3 covers the middle 75% of a 16:9 frame). Happens on any camera movement, not only flyovers.
+- **Code on:** full 16:9 view, no pop-in, no glitches, in normal play, hole flyovers, replays, and
+  across a disc swap. Both discs used.
+- So the sphere test at `fn_80007D74` is the culling path for course scenery too (trees, grass), not
+  just small objects, and `x` is the horizontal axis as assumed. No second culling path has shown up.
+- Menus and HUD stay stretched, as with any widescreen-hack setup.
+- All seven call sites pass mode 0 (the tight 4:3 planes) first; only `fn_80007B2C` retries in mode 1.
+- `$Disable Object Culling` has not been tested; it was not needed.
+
+```
+$Widescreen Culling Fix          left / right "outside" (2) becomes "touching the edge" (4)
+04007EC0 3BE00004                was 3BE00002 (li r31, 2)
+04007EF0 3BE00004                was 3BE00002
+
+$Disable Object Culling          whole test returns 4 without testing (enable only one code)
+04007D74 38600004                li r3, 4
+04007D78 4E800020                blr
+```
+
+Assumes `x` is the horizontal axis in camera space. The top / bottom pair is at `0x80007F2C` and
+`0x80007F5C` if that turns out to be wrong. This test has only five call sites and works on bounding
+spheres, so course scenery may be culled by a different path. If pop-in remains with a code on,
+look at `fn_800977F8` and at code using the combined matrix at `cam+0xDC`. The cleaner long-term fix
+is in `fn_80013950`: scale the horizontal extent (`0x1FC`) by 4/3, or change the aspect it feeds
+to the projection matrix for a native 16:9 code that needs no widescreen hack.
+
+The asset loader (UStream.c) and the CTRL container
+-----------------------------------------------------
+
+`fn_8000D4F0` (the tag switch) and its helpers are `UStream.c` (assert string at
+`0x801868A0`). `src/UStream.c` holds `UStream_Decompress` / `UStream_Copy` / `UStream_Fill`
+(`0x8000CDEC`-`0x8000D4CC`), the `Rdat` decompressor and its helpers, all three exact (Decompress
+needed its length to be `long`, not `int` - see decomp-notes). The whole file
+(`0x8000C624`-`0x8000E708`, 31 functions: buffer rings, async reads, object allocation, the
+chunk switch, delivery to type handlers, open/close) is written and linked as NonMatching:
+19 exact, the rest 72-99% with
+the differences being expression association and register choice, no behaviour. Per-function
+state is in `build/GW4E69/report.json`.
+
+`src/Golfer.c` (our name; `0x8002A630`-`0x8002F1D4`, no assert names it) is the golfer record /
+attribute / CPU-golfer file, linked NonMatching. 20 functions written: the whole CPU shot
+pipeline (`AI_ChooseTarget`, `AI_ApplyError`, `AI_PlanShot`, `AI_DefaultTarget`,
+`AI_NearestTarget`, `AI_ShotKindForDistance`, `AI_ClubForShot`, `AI_FirstUsableClub`,
+`Club_UsableForKind`, `AI_MaxDistance`, `AI_PowerForTarget`, `AI_PowerScale`) plus the
+attribute accessor and helpers. Eleven are exact; `AI_ClubForShot`, `AI_MaxDistance`,
+`AI_ShotKindForDistance`, `AI_PowerScale` are instruction-identical and only differ in how
+the float-constant pool is labelled; `AI_PlanShot` 98.8%, `AI_ApplyError` 98.4%,
+`AI_NearestTarget` 99.1%, `Golfer_GetAttribute` 96.8%, `AI_ChooseTarget` 92.7% (register
+numbers). The structs (`GolferRecord`, `Player`, `AITarget`, `Session`, `GameState`) are in
+the file. Roughly 80 functions in the range are still untouched.
+
+`src/Swing.c` (`0x800589F8`-`0x80062E40`, named by its assert string) is the human swing,
+linked NonMatching. Seven functions written: `SW_vAdjustMishitFromAttribute`, `Swing_ComputePower`,
+`SW_fPowerBoostAdjustment`, `SW_vCalculateSpinFactor`, `SW_GetSpinScale`, `SW_fPowerAdjustForDraw`,
+`SW_vAdjustVibrationFromAttribute`. All compile to the original's instruction count; five are within 1% and
+two sit at 84% because CodeWarrior common-subexpressions the player address differently from
+our `gPlayers[nPlayer]` spelling. The shared structs moved to `include/golfer.h`, with the
+swing meter's per-player state as `SwingData` at player+0x3D4.
+
+`src/Ball.c` (our name; `0x80050C2C`-`0x8005620C`) is the ball physics, linked NonMatching:
+`Ball_Holed`, `Physics_GetDistanceToCup`, `Physics_ApplySuperSucka` written (instruction-count exact; three
+register numbers off in the pull). `Physics_BallRolling`, `Ball_Collide` and `Physics_SetLie` are
+named and read. The Python transcription
+`tools/formats/ctrl_dump.py` extracts every object from every `.hog` / `.gcb` on disc 1 to
+its declared size, which is the proof the reading is right. Full format:
+[`formats/ctrl-container.md`](formats/ctrl-container.md). The rest of the file - buffer ring
+(`fn_8000CBFC`), object allocation from `SHDR` (`fn_8000C968`), the tag switch itself - is the
+next decomp target in this area.
+
+What the GCC library actually is
+--------------------------------
+
+The assert strings settle it: the four `../../../Source/...` files are EA's cross-platform
+**memory-card save library**, not the course/asset loader.
+
+- `SFIO` = Shared File I/O: device enumeration (`SFIO_DEVICE_FIRST/LAST`, two memory-card slots),
+  save names, icons, directories, `CARD_RESULT_READY` from the GameCube CARD SDK.
+- `TagFile.c` (`src/Common/TagFile/TagFile.c`, 41 functions, done): the save-data container.
+  See "Save file format" below.
+- `ChecksumCRC32.c` guards the save data; the XOR cipher scrambles it.
+- The host game calls in through an assert stub `TibExt_AssertHandler` (4 bytes in retail) and an allocator
+  `fn_801220D4(pAllocator, size, align, __FILE__, __LINE__)` / `fn_80122128(...)`.
+
+Save file format (from TagFile.c)
+---------------------------------
+
+A save is a sequence of **records**. Each record is a 12-byte header followed by the payload,
+and the whole record is padded to the device block size (8 KiB on the memory card, 512 bytes
+for buffer type 1, 1 byte for type 4 = memory):
+
+    u32 uTag        record identifier (the game's tag values are not yet known)
+    u32 uSize       payload size in bytes
+    u32 uChecksum   CRC32 of the payload (ChecksumCRC32.c)
+
+An unused header slot holds the 12-byte string `"TAG SENTINEL"` (`TAG_BUFFERSIZE` = 12; the
+constant in the binary is the string three times over, 37 bytes, so the assert
+`sizeof(TAG_SENTINEL) >= TAG_BUFFERSIZE` holds). Header and payload are XOR-ciphered
+(CipherXOR.c) with a key the game passes to `TagFile_Init`; the key itself is copied out of the
+init parameters, so it will be found in whichever CodeWarrior file calls `TagFile_Init`.
+
+In memory the library keeps a **map**: an array of `{tag, offset, size, checksum}` (16 bytes
+each, `_TagFile_pData->Map.pList`) built as records are written or, on load, as the file is
+walked header by header (`TagFile_Update`, operation 4/5 = "delete/read map"). `TagFile_End`
+stores the CRC32 of the map into the session block at +0x44; on the read side the library
+recomputes it and returns error 9 if it differs. Records with the same tag are addressed by
+index (`TagFile_Read(pSession, uTag, uIndex, ...)`).
+
+Error codes: 1 already initialised, 2 not initialised, 4 bad parameter, 5 map full, 6 out of
+memory, 7 tag not found, 8 busy, 9 bad map checksum, 0xA bad payload checksum, 0xB bad header,
+0x6E size mismatch. Errors from the layers below are re-based: SFIO + 100, cipher + 200,
+checksum + 300.
+
+Boundary note: `llSharedFileIO.c` is `0x80171308`-`0x801730C8` (17 functions) and `TagFile.c`
+`0x801730C8`-`0x80175F54` (41). The "40 / 50" in filemap.md were assert-site counts.
+
+So decompiling it documents the **save-file format**, which is useful (save editors, understanding
+`MC_Gc.c`), but the `.hog` / `.gcb` course formats live elsewhere: look at `LLFileIO_Gc.c`,
+`dvdfs.c` callers, `UStream.c` and the `GoShaderObjectContainer_OBFData_Gc.c` loader instead.
+
+Conventions learned from the asserts: Hungarian notation (`u` unsigned, `e` enum, `p` pointer,
+`b` BOOL, `s` short), `BOOL` is a byte, macro `SFIO_ASSERT(cond)` expands to
+`{ u8 bSkip = 0; if (!((cond) | bSkip)) Assert(__FILE__, __LINE__, #cond, 0); }`, and
+`SFIO_DEVICE_MASK(e)` is `(u16)(1 << (u16)(e))` (the cast is what stops GCC folding it).
+
+In-progress files are kept `NonMatching` (original code is linked) until every function matches,
+because GCC emits the shared assert strings as private labels that the not-yet-written functions
+still reference from the auto units. Per-function progress comes from `report.json`.
+
+The save profile (`gpSaveData`)
+------------------------------
+
+`gpSaveData` points to five profiles, one per player slot, 0x10600 bytes each (`SaveProfile` in
+`include/game/save.h`). What the code proves so far:
+
+| Offset | Field | What it is |
+|---|---|---|
+| 0x0 | `bActive` | 1 when the slot holds a profile |
+| 0x1 | `szName` | the profile's name (compared with the all-time record holders) |
+| 0x1C | `aGolferUnlocked[30]` | per golfer (`UserInfo_UnlockGolfer` sets, `UserInfo_IsGolferAvailable` tests) |
+| 0x3A | `aCourseUnlocked[23]` | per course |
+| 0x51 | `aRewardUnlocked` | per reward (`UserInfo_UnlockReward` sets), up to 0x70 |
+| 0x70 | `b70` | set when an award is won, a round counted or a challenge started; cleared at round setup |
+| 0xC8 | `aC8[31]` | one per PGA TOUR tournament, 8 bytes each; byte 0 is 1 once it is won |
+| 0x20C | `aRTEAward[75]` | the real-time events' awards (4 bytes: won flag, the day) |
+| 0x338 | `aLadderAward[25]` | the ladder events' awards; the earnings rating counts the won ones |
+| 0x39C | `aAward[39]` | the other awards |
+| 0x438 | `aReplay[5]` | saved replays (0xF28 bytes each) |
+| 0x5000 | `nTourCardLevel` | 0..6: level 1 from the lessons, the rest from `GM_Earnings_PayRoundGoals`; scales payouts |
+| 0x5004, 0x504C | `a5004[71]`, `a504C[71]` | per marked hole (`UserInfo_GetPar5EagleStat`), continued at 0x10578 / 0x1057C for holes 71..74 |
+| 0x516C | `aMedal[29]` | the best challenge medal per group (0 best, 3 none), and the day at 0x51E4 |
+| 0x5230 | `aSavedRound[3]` | three saved custom rounds, 0x70 bytes each (the profile setup at 0x80057C88 clears three) |
+| 0x54C2 | | the created golfer kept in this slot: its names at 0x54C8, outfit 0x54F8, ball 0x54F9 |
+| 0xB634 | `tour` | the PGA TOUR season (TW06 `PGATourSeason_t`, 31 tournaments of 0x24 bytes) |
+
+A second block with the same layout, `lbl_80281DF4`, holds unlocks that apply to every profile.
+Two cheat codes, compared with `strcmp` at 0x8005655C, fill it: `"THEKITCHENSINK"` sets all 30
+golfers (0x1C..), 23 courses (0x3A..) and 18 rewards (0x51..) and TOUR card level 1;
+`"ALLTHETRACKS"` sets the courses.
+
+Leads and loose ends
+--------------------
+
+- `OnModADSRVol` (15 instructions, C bit-fields): **does not settle GC/2.0 vs GC/2.5.** The C is known
+  (read the index byte into a local, store into a byte table, set two 1-bit fields from `index == 0`
+  and `index == 1`) and matches exactly, but GC/2.0, 2.5 and 2.6 all produce the same bytes for it.
+  Not yet added to the project. Two larger bit-packing functions remain untested: `MAD_ReadLittleEndian`, `MAD_ReadNextFile`.
+- `fn_8000B508`, `fn_8000B54C`, `fn_8000B70C`: linked-list search family (head pointer at
+  `0x80281BFC`, `next` at `0xC`, two ID fields at `0x1C` and `0x20`). C for `fn_8000B70C` already
+  produces matching bytes; not yet added to the project.
+- `Quat_Copy`: copies four floats one at a time, unlike `Vec3Copy` which interleaves. Different
+  source form (struct assignment?) or different file flags. Unexplained.
+- Eleven functions in the EA region use the old-style function opening. Unexamined; may be a
+  library built with an older compiler.
+- The GCC block is the file-reading layer (`TagFile`, `SharedFileIO`). Unoptimized code is the
+  easiest to decompile, and it is the bridge to the asset formats.
+- 79 small functions contain real paired-single math (e.g. `LLMath_mat44fltMultiply`, `LLMath_mat44fltMultiplyList`,
+  `fn_8001EF78`). Probably hand-written assembly; would be matched as assembly, not C.
+
+Suggested next steps
+--------------------
+
+1. ~~Map the leaked file names to addresses.~~ Done: `docs/evidence/filemap.md`.
+2. **Follow the named SDK calls into EA code.** Callers of `PADRead` lead to input and the swing
+   (`YhSwing.c`); callers of `CARD*` to saves (`MC_Gc.c`); callers of `DVD*` to file loading and
+   the asset formats.
+3. **The GCC file library** (`0x8016C718`): compiler wired up (`ProDG/3.5`, `EASharedFileLib` in
+   configure.py); `ChecksumCRC32.c`, the XOR cipher module, `SharedFileIO.c` (50 functions) and
+   `TagFile.c` (41) done. Left: `llSharedFileIO.c` (17 functions, `0x80171308`-`0x801730C8`, the
+   GameCube CARD platform layer). Each module exposes a 7-entry function-pointer table via
+   `<Module>_GetInterface()`; shared error codes 2 = bad argument, 3 = wrong state,
+   6 = not initialised.
+4. **Add the already-solved small functions** to the project: the linked-list family at
+   `0x8000B508` and `OnModADSRVol`.
+
+Project conventions
+-------------------
+
+- `src/unsorted/code_ADDRESS.c` for files whose real name is unknown; the address is the first function.
+- `fn_ADDRESS` for functions and `unkOFFSET` for struct fields until there is evidence for a name.
+- Shared types for a group of files go in `include/unsorted/`.
+- Compiler: GC/2.5, flags in `configure.py` (`cflags_base`). Confirmed and unconfirmed flags are
+  listed in `compiler.md`.
+
+Starting a new area: check the references first
+-----------------------------------------------
+
+Do this every time work starts on a new file or system of this game (a struct, a group of
+`fn_` functions, a subsystem), before writing C. The external search is finished (see "Symbols
+from related builds" and "EA's source tree" below); what keeps paying off is looking up each new
+area in the TW06 material. Tools are in `C:\dev\scratch\tw\`; the reference files are in
+`C:\dev\ext\symbols\` (never committed).
+
+1. **Names already found.** Search [`tw06-names.md`](../evidence/tw06-names.md) for the addresses in the area.
+   Strong names are already in `symbols.txt`; a *medium* suggestion there is confirmed or
+   rejected now, by what the code does (update its row either way).
+2. **TW06 functions and signatures.** For a named function, `python tpiread.py func <TW06 name>`
+   gives its Xbox parameter types; `MAPFILE.TXT` in the PS2 folder gives the full C++ signature
+   (`grep <name> MAPFILE.TXT`). Neighbouring TW06 functions in the same module are likely
+   neighbours here too (`pdb_modules.json`).
+3. **Structs and enums.** `python tpiread.py find <word>` then `python tpiread.py struct <name>`.
+   Line the offsets up with ours: plain C structs lay out identically on Xbox and GameCube, so
+   matching offsets confirm the struct; TW06 may have inserted fields (the ball struct gained
+   `terrainHeight` at 0x58). Rename fields only where the offsets and our code agree; note TW06
+   names in comments; put enums in a header (as `include/physics.h`). Field renames change no
+   code, so `main.dol: OK` must still hold.
+4. **Where the file lives.** Check the 2002 source tree (below) for the real file name and folder.
+5. **Treat TW06 as 2005 evidence, not truth.** Our code wins every disagreement
+   (`vec4flt_LengthSquared3` was rejected because our code showed a normalise). Record
+   rejections in `tw06-names.md`.
+6. **After the area is decompiled and named, re-run the matcher** so its neighbours get names:
+   `python anchors.py gc && python anchors.py match && python anchors.py match ps2`, then
+   `python callgraph.py` and `python callgraph.py ps2`, then merge and apply as in
+   "Symbols from related builds" (strong only; `rename_fix.py` afterwards; check `main.dol: OK`).
+7. **SDK code** (anything past `0x8012E950` except UI Studio and the GCC file library): run
+   `harvest.py` / `harvest2.py` / `integrate.py plan` again instead; other projects' source may
+   already match.
+
+Adding a function: the steps
+----------------------------
+
+1. Read the disassembly in `build/GW4E69/asm/`. Write the plain-English logic first.
+2. Write the C in `src/`. Function names must equal the names in `config/GW4E69/symbols.txt`.
+3. In `config/GW4E69/splits.txt`, add or widen the file's `.text` range to cover the function.
+   Ranges must be contiguous.
+4. If the function uses float constants nobody else uses, add their `.sdata2` range too.
+5. In `configure.py`, make sure the file is listed as `Object(Matching, ...)`.
+6. `python configure.py`, then `ninja`. Success is `build/GW4E69/main.dol: OK`.
+7. If it fails: `ninja build/GW4E69/report.json` for per-function percentages, then
+   `objdiff-cli diff` for the instruction-level differences (left = original, right = ours).
+
+The permuter (for register-only near-misses)
+--------------------------------------------
+
+`decomp-permuter` (github.com/simonlindholm/decomp-permuter, cloned to `C:\dev\tools\`, set up
+2026-09-23) rewrites a function's C at random - temporaries, statement order, operand order -
+compiles each version and keeps the ones whose code is closer to the original. It is the tool
+for functions whose logic is right but whose register numbers or instruction order differ.
+
+Windows setup, with the helpers in the scratch folder (`C:\dev\scratch\tw\`):
+
+- `perm_setup.py <Unit> <fn>` makes `perm/<fn>/`: `base.c` is the unit preprocessed by mwcc
+  (`-EP`) with every other function cut to a prototype (inline helpers keep their bodies);
+  `target.o` is the function's asm from `build/GW4E69/asm/` assembled alone; `compile.sh` runs
+  the unit's exact mwcc flags.
+- `perm_objdump.py`: the disassembler the permuter scores with. Smart App Control blocks the
+  downloaded `powerpc-eabi-objdump.exe` (the assembler from the same zip runs), so this uses
+  `objdiff-cli` and prints objdump's layout, with data symbol names blanked.
+- Local patch in the permuter: `src/preprocess.py` reads `base.c` as-is when there is no `cpp`.
+- Run: `python C:\dev\tools\decomp-permuter\permuter.py perm\<fn> [more dirs] -j16 --best-only`.
+  Score 0 is a match (checked: an exact function scores 0). Results land in `perm/<fn>/output-*`
+  with a `diff.txt` against the base; carry the change back into `src/` by hand (macros are
+  expanded in `base.c`) and confirm with `ninja`.
+
+SDK from other decompilations
+-----------------------------
+
+2026-09-23: SDK source from three more public (CC0) GameCube decompilations, in
+`extern/ffcc` (Final Fantasy Crystal Chronicles, same Sep 5 2002 SDK build as this game),
+`extern/tww` (The Wind Waker, same build) and `extern/tp` (Twilight Princess, newer). Found by
+searching GitHub for the SDK version string `Sep  5 2002`. +80 functions, +31 KB,
+SDK side 58.9% -> 69.5%. Scripts in `C:\dev\scratch\tw\` (outside the repo):
+
+- `harvest.py`: compiles every SDK/MSL/TRK `.c` of the three projects with a few flag sets
+  (GC/1.2.5n with `-fp_contract off`/`on`/`-char unsigned` for Dolphin libraries; GC/1.3.2,
+  1.3, 1.2.5n with runtime flags for MSL) and compares each function against the game's
+  (relocation fields masked). `harvest2.py` does it per file: which game span each file covers
+  and what linking it would gain.
+- `integrate.py plan|apply`: picks files greedily by gain. A file is used only if no function in
+  its span that is exact today would be lost, and every existing unit inside the span lies wholly
+  inside it (those units are replaced: 26, mostly Prime-source units and a few sweep units). Adds
+  NonMatching text-span units (the DOL is still linked from the original objects), one
+  `configure.py` lib block per project/compiler/flags, and renames the game's `fn_` functions to
+  the source names.
+- **Pitfall: masked byte matching cannot tell tiny wrappers apart** (`CARDRead`/`CARDWrite`,
+  `fread`/`fwrite`, `__sys_alloc`/`__sys_free` differ only in the call target, which is masked).
+  Only `fn_` names are renamed, and every renamed function was checked at 100% in objdiff (which
+  does compare call targets). Renames were also applied to our own sources that called the old
+  names.
+- `prune_extern.py` keeps only the files the build uses (from `ninja -t deps`). Check that it
+  finds dependencies before trusting it: `.d` files are not kept on disk.
+- **The "name_ADDRESS" glitch, fixed for 5 functions (2026-09-23).** A local function that
+  a jump table or reset record points to is renamed `name_ADDRESS` by dtk when that data sits in
+  an auto unit, and objdiff then cannot pair it. Giving the owning unit just that data range
+  (`.data`/`.sdata` lines in `splits.txt`) fixes it: `getTiming` (vi), `stateBusy` (dvd), both
+  `OnReset`s (OSMemory, CARDBios), `SPEC2_MakeStatus` (Pad) now 100%. `parse_format`,
+  `long2str`, `longlong2str` now pair but are 82-98% (this game's printf revision differs).
+  `__equals_dec` is called from code outside its unit, so this does not apply to it.
+- The MetroTRK exception vector table (`.init` `0x80003534`-`0x80005468`, 8 KB, which dtk had
+  shown as `pad_00_80003534_init`) is Melee's `__exception.s` (assembly), exact. dtk keeps
+  `gTRKInterruptVectorTable` as a label, so the table is compared under a function-typed name
+  `TRK_exception_vectors`; Pikmin 2's copy (v2.6) is 0x54 bytes longer and does not match.
+- **Second round (2026-09-23), from projects the user suggested.** `extern/sonicheroes` (MIT,
+  licence text kept in the folder): MSL `strtold.c` (4 KB, `__strtold`) and `strtoul.c`
+  (`__strtoull`). `extern/gauntlet` (no licence stated): the `db` debugger-comms library
+  (`odenotstub.c`, 12 functions), two `AXVPB` functions, and `fabsf` from `MSL/atanf.c` (removed
+  later: the function it matched, at 0x8000AE94, is EA's own `fabs`, in UMemPool.c). Also re-picked flag variants for
+  a few files already in (`CARDWrite`, `Pad`, `OSAlloc`, `ansi_fp`). +4 KB, SDK 81.0% -> 82.6%.
+  `integrate.py` now keeps a replaced unit's data ranges when the new file has the same name, and
+  never renames to another project's own `fn_` placeholder; `rename_fix.py` reverts renames of
+  already-named functions and updates our sources.
+- Checked and not useful for code: Need for Speed Underground / Most Wanted (EA Black Box's C++
+  engine, no shared EA code with this game's engine; NFSMW's SDK is a 2005 revision and its files
+  need headers it does not ship), The Sims 2 (C++, mostly raw-byte wrappers), EA Nation server
+  (networking; the GameCube version has no online play). BFBB / Incredibles / Sonic Heroes /
+  Gauntlet show the cross-platform symbol method (PS2/Xbox builds with symbols or PDBs): worth
+  trying if a Tiger Woods 2004 build for another platform with symbols turns up.
+- Not done yet: data sections for these units (Level 3), more flag variants for the files that
+  compile but fall a few functions short, and other projects (Pikmin 2, Sunshine, Animal Crossing).
+
+Symbols from related builds
+---------------------------
+
+2026-09-23. Tiger Woods PGA Tour 2004 (GC, PS2, Xbox) was developed by **EA Redwood Shores**
+(the PC version by Headgate). No TW2004 build with symbols is known: none is on RetroReversing's
+PS2/GameCube symbol lists, and the TW2004 demo on OPS2M Demo 40 (SCED-51535) / UPS2M Italia 12/03
+(SCED-52057) is not marked as having debug info (unverified: the demo ELF itself was not checked).
+
+Downloaded from debugging.games to `C:\dev\ext\symbols\` (reference only, never committed):
+
+- **Tiger Woods PGA Tour 06, Xbox beta, 2005-07-12: `default.pdb` + debug `default.exe`.**
+  Same studio, **same engine lineage**: source root `c:\dev\tiger06\tigercode\code\`, with
+  `legacy\specif\ukernel.c`, `golf\hi-rendering\gocamera.c`, `golf\entry\goentry.c`,
+  `golf\hi-rendering\gogreengrid.c`, `golf\sitdev\sitdevfile.c`,
+  `golf\easportsshared\easportsbio.c`, `core\frontend\fe_manager.c`, `legacy\ll\llfont.c`,
+  and types `UStream`, `UMemPool`, `DynChainVars_t`, `PsBallFx_*`, `TSKALib*`, `TMTALib*`.
+  Built as unity files (`Legacy_unity.obj`: 68 source files `u*.c`/`ll*.c`, 1,129 functions;
+  `golf_unity`, `golf2_unity`, `other_unity`, `apt_unity`): 25,211 functions in 830 modules.
+  Parsed with `C:\dev\scratch\tw\pdbread.py` (minimal MSF 7.00 reader: modules, per-module
+  source files, S_GPROC32/S_LPROC32) into `pdb_modules.json`. Parts are C++ by 2005
+  (`DynTex::`, `UMemPoolResizeable::`); much is still C (`UIDList*`, `DynMemPool_*`).
+  x86 code, so no byte matching: names and struct layouts have to be carried over by string
+  references, call graphs and constants.
+- **Name transfer, first pass (2026-09-23): 85 functions paired, 46 applied** (one strong pairing rejected because our own code contradicts it: small vector helpers are the weak spot) (list and evidence:
+  [`tw06-names.md`](../evidence/tw06-names.md)). Tools in `C:\dev\scratch\tw\`: `anchors.py` (strings and
+  float constants per function; Xbox side exact from the debug exe's base relocations, GameCube
+  side by following lis/addi/ori and r2/r13 arithmetic per register) and `callgraph.py`
+  (C-library seeds + anchors, then mutual call-graph neighbourhood propagation, LCS alignment
+  of callee lists). Limits: the retail GameCube build has only 772 strings left (asserts
+  stripped), so anchors are few; the Xbox build is a debug build (no inlining, assert calls), so
+  call lists differ; functions under 48 bytes are too ambiguous to pair by calls.
+- **Second pass with the PS2 build (2026-09-23).** debugging.games also has TW06 PS2
+  (SLUS-21264, 2005-07-12): `SLUS_212.64` (release ELF, MIPS) + `MAPFILE.TXT` (11,930 global
+  functions with address, size and full C++ signature; statics are not listed, `ps2side.py`
+  finds them from `jal` targets). Optimized like this game, so its call graph is closer to ours.
+  Seeded with the Xbox pairs, `callgraph.py ps2` added 122 pairs; the two builds were merged
+  (agree -> strong, disagree -> conflict, not applied). 77 more names applied: 123 in all.
+  Known wrong PS2-only pairing: `Rand_Float` -> `Physics_ComputeBallLieModifier` (hand-named, so
+  not applied).
+  Next: more seeds from functions we decompile by hand.
+- **Types (2026-09-23).** `C:\dev\scratch\tw\tpiread.py` reads the PDB's type records
+  (`struct <name>`, `func <function>`, `find <text>`). TW06's `PhysicsBall_t` (0xCC bytes) is this
+  game's `Ball` (0xBC): identical up to 0x54, then TW06 inserts `terrainHeight` at 0x58, so
+  its later offsets are 4 (then 12) higher; this game keeps u8 flags at 0x98 that TW06 folded
+  into a `flags` word. Our hand-derived meanings matched TW06's names (closest-to-cup, last
+  collision surface, player, first sand position/speed, stall-check distance/time). Enums
+  `Lie_t`, `physicsBallState_t`, `Club_t`, `ShotType_t`, `PhysicsMishitType` are in
+  `include/physics.h`. Two corrections: lie 16 is `LIE_OUT_OF_BOUNDS_e` and ball state 5 is
+  `BallOutOfBounds` (this game also uses them for water, which is what our docs called
+  "hazard"). No TW06 map file was used: the PDB holds everything a map would; the only known
+  TW06 map (`MAPFILE.TXT`) is on the PS2 prototype disc.
+- **007 Agent Under Fire (GC, USA) and 007 Everything or Nothing (GC, EU)**: unstripped ELFs
+  (same studio, same console). A masked byte match (`C:\dev\scratch\tw\xmatch.py`) found no
+  shared EA engine code, only 27 SDK / runtime functions (names only). Agent Under Fire runs on a
+  different engine.
+
+EA's source tree (from the TW2003 Xbox prototypes)
+--------------------------------------------------
+
+2026-09-23. Hidden Palace has two Tiger Woods PGA Tour 2003 Xbox builds: Sep 3 2002 (PAL,
+`Golf_Pal_Final_Xbox`, full disc) and Sep 12 2002 (`Golf_Demo_Final_Xbox`, the demo). Both are
+**release builds with no symbols** (no PDB or map on the disc; the XBE only records the PDB's path).
+Every file of both was scanned (29 files / 205 MB and 489 files / 2.06 GB, with
+`C:\dev\scratch\tw\scanfiles.py`) for paths, file names, asserts and error texts: only the program
+(`default.xbe`) carries debug leftovers (the source paths); the data files hold in-game text only
+(memory-card messages, some still saying "for PlayStation"). The scans, strings and source paths are
+kept as text in `C:\dev\ext\tw2003\`; the game files were deleted after that was verified.
+Only 57 of their strings also occur in this game (course names, camera and movie debug labels), too
+few to pair functions.
+
+What they do give is **the real layout of EA's source tree**, root `C:\Dev\TigerCode\Code\` (the
+Sep 3 build: `C:\TigerCode\Code\`), with 64 file paths, the same set in both builds. The files this game names in its own asserts sit here:
+
+| Folder | Files seen (2002) |
+|---|---|
+| `Golf\AI\` | `Swing.c` (so our `Swing.c` has the right name) |
+| `Golf\Animation\` | `Skeleton.c`, `Skin.c`, `char.c`, `char_skin.c`, `MTA.c`, `mtalib.c`, `skalib.c` (our `skalib.c` has the right name) |
+| `Golf\Audio\Engine\Utils\` | `UAudMemStack.c` |
+| `Golf\Cameras\` | `GoDynamicCam.c`, `GoComicCam.c`, `GoStaticCam.c` |
+| `Golf\Entry\` | `GoEntry.c`, `startUp.c` |
+| `Golf\FrontEnd\` | `FE_Manager.c` |
+| `Golf\GameMode\` | `CareerMode.c`, `CourseInfo.c`, `Earnings.c`, `PlayNowMode.c`, `TournamentMode.c` |
+| `Golf\Hi-Rendering\` | `GoCamera.c`, `GoFrameBuf.c`, `GoViewport.c`, `GoDynObj.c`, `GoLighting.c`, `GoTerrain.c` (+ platform `Xbox\GoRenderCtx_Xbox.c`) |
+| `Golf\Lo-Rendering\Shader\` | `ShaderObject\...\GoShaderObject_{Glows,Particle,Rain}_Xbox.c`, `ShaderObjectContainer\...\GoShaderObjectContainer_OBFData_Xbox.c` |
+| `Golf\Memory Card\` | `MC.c` (+ `Xbox\MC_Xbox.c`) |
+| `Golf\RCMP\` | `rcmp_mad_codec.c` |
+| `Golf\SFX\` | `PsBallFx.c`, `PsMgr.c`, `UFstPart.c`, `shadow.c` |
+| `Golf\SitDev\` | `SitDev.c` |
+| `Golf\UI runtime\` | `FETextureMgr.c`, `FEgolferanim.c`, `uiEATrax.c`, `uiLoadFile.c`, `uiProcessInterface.c`, `uiTransform.c` |
+| `Legacy\LL\` | `LLFont.c`, `LLPictInt.c`, `LLTex.c`, `LLTexGrp.c`, `LLVideo.c` (+ `Xbox\LLDisSt/LLGraph/LLPict/LLObj_Xbox.c`) |
+| `Legacy\Lib\` | `UMath.c`, `UDynMemPool.c`, `UHeap.c`, `UMemPool.c`, `UObject.c`, `UObject3D.c` |
+| `Legacy\SPECIF\` | `UFont.c`, `UKernel.c`, `UStream.c` |
+
+Platform files end in `_Xbox`; this game's own asserts use the `_Gc` versions of the same names
+(`LLObj_Gc.c`, `MC_Gc.c`, `GoRenderCtx_Gc.c`, ...). This is the natural layout for `src/` once
+files are identified.
+
+CI and decomp.dev
+-----------------
+
+See [`infrastructure.md`](../infrastructure.md) (the build container, CI, the public page, decomp.dev).
+
+The small-function sweep
+------------------------
+
+Scripted matching of functions that need no judgement. Tools in `tools/matching/sweep/` (`sweep.py`,
+`sweep_m2c.py`, `smallsurvey.py`, `retry.py`; paths in `paths.py`, state and caches in `build/sweep/`).
+
+- `python sweep.py gen <maxbytes> 1 [--m2c]` finds functions not yet in any unit, writes C for
+  each one a translator can handle, and adds them as `src/unsorted/sweep_<address>.c` units
+  (NonMatching) to `splits.txt` and `configure.py`. Units that do not compile on their own are
+  dropped at once. Then `python configure.py`, `ninja`, `ninja build/GW4E69/report.json`.
+- `python sweep.py keep` marks a unit Matching only if every function in it is exact **and** its
+  object has no data section; everything else is removed. Then `python configure.py`, `ninja`
+  and check `main.dol: OK` before committing. A second `gen` pass picks up exact neighbours of
+  dropped functions.
+- Translators, tried in order: fixed shapes (empty, constant, field/global get and set,
+  wrappers); a one-call wrapper translator; a straight-line translator (no branches; loads,
+  stores, arithmetic, calls, plain stack frames); m2c for the rest (its own unit per function).
+- `sweep_skip.json` maps a function to the C that failed; it is retried only when a translator
+  produces different C. `m2c_cache.json` caches m2c output.
+- Excluded on purpose: functions using literal pools (float constants, strings in `.sdata2` /
+  `.rodata`) and paired-single assembly. Sweep units are placeholders: when a real source file is
+  identified, its sweep units are merged into it.
+- Caveat: a wrapper that passes its parameters straight on compiles the same whether or not the
+  C names them, so sweep wrappers may show fewer parameters than the original had.
+- **Repair pass (`retry.py`, 2026-09-23).** `python retry.py score` compiles each skipped m2c
+  function on its own and counts differing instructions against `main.elf` (linker-filled fields
+  masked; checked: known-exact functions score 0). `python retry.py try 12` then tries single
+  edits greedily and writes exact results to `retry_hits.json`, which `sweep.py gen` uses in
+  place of m2c's output. Edits: add an argument to a call, first or last (m2c drops arguments
+  that are already in `r3`/`r4` when the call happens, e.g. `free()` for `free(p)` - the most
+  common miss); remove parameter lists from prototypes; `void*` -> `u8*` (m2c does byte
+  arithmetic on `void*`, which CodeWarrior rejects); switch local/parameter/return types between
+  `u8`/`s8`/`u16`/`s16`/`s32`/`u32`. 80 functions so far. The checker is a pre-filter only: the
+  build's own comparison and `main.dol: OK` still decide.
+- The EA/SDK split in the README counts `0x801654D0`-`0x80175F54` (EA's UI Studio and EA's
+  GCC-built file library) as EA, and everything from `0x8012E950` on, plus `.init`, as SDK.

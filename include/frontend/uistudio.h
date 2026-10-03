@@ -7,7 +7,7 @@
 // over a set time. The front end reaches it through FrontEnd.pHandler (game/frontend.h).
 //
 // Type, field and tag names are EA's, from Madden NFL 2003's STABS of the same library
-// (docs/reference-builds/madden2003-ps2: every struct has the same size and offsets). Field types
+// (reference/madden2003-ps2: every struct has the same size and offsets). Field types
 // are ours where EA's differ only in sign (EA: Uint32 counts), and where noted. The comments in
 // the UIS sources call a control (UISControlT) a node.
 

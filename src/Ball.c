@@ -7,7 +7,7 @@
 // original's float bits are exactly those quotients, not the rounded decimals. The cup is real
 // geometry (surface classes 12/18, surface type 90): the ball is holed when it is on a cup surface
 // more than 2 in (rolling) or 2.5 in (landing) below the pin. The pull toward the cup
-// (Physics_ApplySuperSucka) is written up in docs/gameplay.md.
+// (Physics_ApplySuperSucka) is written up in docs/game/gameplay.md.
 
 #include "golfer.h"
 #include "physics.h"

@@ -1,5 +1,5 @@
 {
- "about": "TW2004 (GW4E69) original source files in link order, from the file map (docs/sourcefiles.md). text.start/end: best guess of the file's .text; text.core: the part certainly in the file (null: none); confidence values strong/medium/guess. Used by tools/match/mapunits.py.",
+ "about": "TW2004 (GW4E69) original source files in link order, from the file map (docs/evidence/sourcefiles.md). text.start/end: best guess of the file's .text; text.core: the part certainly in the file (null: none); confidence values strong/medium/guess. Used by tools/matching/mapunits.py.",
  "files": [
   {
    "name": "main.c",

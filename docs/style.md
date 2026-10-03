@@ -12,7 +12,7 @@ form can't be found, and it never changes the logic. The C must mean what the or
 prototypes that match their definitions, real fields where EA had fields, and one shared
 definition of shared data (see "Port hazards").
 
-`python tools/match/lint.py <files>` checks the mechanical rules below, and compiles each file
+`python tools/quality/lint.py <files>` checks the mechanical rules below, and compiles each file
 with the game's compiler to catch two kinds of undefined behaviour (see "Odd code vs wrong
 code"). Run it before every commit.
 
@@ -40,7 +40,7 @@ Names
   with it; most names can never be proven. Such a name is tier T3 in
   `config/GW4E69/name_sources.tsv` with the code reading as its evidence (code E6), carries no
   confidence marker or address suffix, and must never contradict the code. Work most-called first
-  (`python tools/match/hotnames.py`): one name makes every call site readable.
+  (`python tools/naming/hotnames.py`): one name makes every call site readable.
 - **Renaming a global or function** is done in `config/GW4E69/symbols.txt`, so every file and the
   assembly see the new name. Never alias with `#define NICE_NAME lbl_XXXXXXXX`.
 - **Style of names:** EA's own. Functions `System_Verb` (`View_SetCamera`, `Session_SetNumPlayers`)
@@ -59,10 +59,10 @@ Where names and comments come from
 
 The match is done (2026-09-27); the job now is code a person or a fresh AI can read. Names and
 comments are written in ONE pass per function, by whoever reads it (a naming lane), through
-`tools/match/name.py`, which logs every name with its evidence in `config/GW4E69/name_sources.tsv`.
+`tools/naming/name.py`, which logs every name with its evidence in `config/GW4E69/name_sources.tsv`.
 
 - **EA's name first** when there is evidence: EA's text in the binary, or EA's name in a related
-  build that the code confirms (TW07 PS3, TW06, Madden 2003; `docs/reference-builds/`). Tier T1/T2,
+  build that the code confirms (TW07 PS3, TW06, Madden 2003; `reference/`). Tier T1/T2,
   spelled as EA did.
 - **Otherwise name it from a careful reading of the code:** tier T3, what it does, EA's style. Most
   names can never be proven; a clear true name beats `fn_`. Never contradict the code.
@@ -84,7 +84,7 @@ Data access
 - **One declaration per global, one definition per type.** A global's `extern` lives in a header,
   with one type everywhere; a struct used by two files is defined once, in a header. A private
   local view of shared data (a partial struct, a `u8*` where others see a struct) is how files
-  drift apart: `python tools/match/typeaudit.py` lists them, and merges may not add any.
+  drift apart: `python tools/quality/typeaudit.py` lists them, and merges may not add any.
 
 - **Use struct fields, never raw offsets.** `gPlayers[n].nC38`, not `*(s32*)((u8*)p + 0xC38)`. If
   the field is missing, add it to the struct (with its offset comment) in the right header.

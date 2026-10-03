@@ -1,9 +1,0 @@
-$No Lucky Shots [mits]
-*UNTESTED.
-*Hidden mechanic: on about 1 in 10-12 eligible shots (1 in 6 at LUCK 100: par 3s, pitches, and fairway-type lies inside 250 yd), the game secretly rolls a "lucky shot". If your club, shot type and aim are close to what its own solver picked, it throws away your swing and plays a pre-solved shot at the pin, ignoring any sidehill lie. Nothing on screen tells you it happened.
-*Why disable it: every shot then plays the swing you made under the real slope physics, so your reads (like aiming off for a ball above or below your feet) always behave the same way. Good for honest practice, fair head-to-head play, or if you'd rather not have hidden assists. The cost is losing the occasional free near-perfect shot.
-*Lesson mode's scripted CPU lucky shot is kept.
-*Tiger Woods PGA Tour 2004 (USA, GW4E69).
-*How: Golfer_IsLucky (0x8002D994) always takes its "not lucky" exit after the CPU /
-*split-screen test (bne -> b at 0x8002D9CC). See docs/gameplay.md, "Luck".
-0402D9CC 48000018

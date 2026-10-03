@@ -7,7 +7,7 @@ save data...), says in a line what each file is and where its name comes from, a
 main loop, the game-state machine, a shot's path through the code and the UI script engine. The
 rest of this page is the build template's setup guide.
 
-See [Dependencies](dependencies.md) first.
+See [Dependencies](dtk/dependencies.md) first.
 
 1. [Create a new repository from this template](https://github.com/new?template_name=dtk-template&template_owner=encounter), then clone it.
 
@@ -43,7 +43,7 @@ If the game has `.map` files matching the DOL (and RELs, if applicable), they ca
 
 Add the `map` key to `config.yml`, pointing to the `.map` file from the game disc. (For example, `orig/[GAMEID]/files/main.map`.) For RELs, add a `map` key to each module in `config.yml`.
 
-If the game uses [common BSS](common_bss.md), be sure to set `common_start` as well. (See [`config.example.yml`](/config/GAMEID/config.example.yml).) Otherwise, the final link order may fail to be determined.
+If the game uses [common BSS](dtk/common_bss.md), be sure to set `common_start` as well. (See [`config.example.yml`](/config/GAMEID/config.example.yml).) Otherwise, the final link order may fail to be determined.
 
 Once the initial analysis is completed, `symbols.txt` and `splits.txt` will be generated from the map information. **Remove** the `map` fields from `config.yml` to avoid conflicts.
 

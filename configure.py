@@ -225,7 +225,7 @@ cflags_base = [
     "-fp hardware",
     "-Cpp_exceptions off",
     "-O4,p",
-    "-inline smart",  # EA code shows no automatic inlining; see docs/compiler.md
+    "-inline smart",  # EA code shows no automatic inlining; see docs/compiler/compiler.md
     '-pragma "cats off"',
     '-pragma "warn_notinlined off"',
     # EA built with data pooling off: each global is addressed on its own. With pooling on,
@@ -266,7 +266,7 @@ elif args.warn == "error":
     cflags_base.append("-W error")
 
 # Metrowerks library flags
-# Nintendo prebuilt the SDK with an older compiler than EA used for the game (see docs/compiler.md).
+# Nintendo prebuilt the SDK with an older compiler than EA used for the game (see docs/compiler/compiler.md).
 # Settings taken from the Metroid Prime project, which links the same SDK build.
 # Mirrors the Prime project's cflags_base exactly. Not derived from our cflags_base on purpose:
 # the SDK needs -inline auto, the EA code needs -inline smart.
@@ -291,7 +291,7 @@ cflags_sdk = [
     "-i extern/sdk/libc",
     f"-i build/{config.version}/include",
     "-DVERSION=0",  # SDK revision selector for extern/sdk, see include/GameVersions.h
-    "-DCARD_PATCH_2003=1",  # this game's CARD library is the Apr 2 2003 patch (see docs/tw2004-notes.md)
+    "-DCARD_PATCH_2003=1",  # this game's CARD library is the Apr 2 2003 patch (see docs/game/tw2004-notes.md)
 ]
 
 # MetroTRK (extern/trk, from the Pikmin 2 decompilation): its own flags, no game includes
@@ -338,7 +338,7 @@ cflags_rel = [
     "-sdata2 0",
 ]
 
-# Compiler / linker baseline. See docs/compiler.md for the evidence.
+# Compiler / linker baseline. See docs/compiler/compiler.md for the evidence.
 # GC/2.5 (mwcc 2.4.7 build 105, Feb 2003) is the working baseline. GC/2.6 and GC/2.7
 # produced identical output in every test; GC/2.0 differs in ~2% of functions
 # (byte masking / bit packing) and is the fallback if such a function refuses to match.
@@ -380,7 +380,7 @@ def MatchingFor(*versions):
 config.warn_missing_config = True
 config.warn_missing_source = False
 # EA's shared file library was built with SN ProDG (GCC 2.95) without optimization. See
-# docs/compiler.md. tools/prodg/prodgcc.py drives the compiler; tools/project.py selects it when
+# docs/compiler/compiler.md. tools/build/prodg/prodgcc.py drives the compiler; tools/project.py selects it when
 # mw_version starts with "ProDG/".
 cflags_gcc = [
     "-O0",
@@ -1120,7 +1120,7 @@ config.libs = [
             Object(Matching, "EASB.c"),
             # The UIS units are EA Tiburon's IStudio library (TW2005's paths: Code/Tiburon/IStudio/),
             # built with one library setting (#match-help: real teams set flags per library). This
-            # one set scores exactly as the four per-file sets did (agents/findings/
+            # one set scores exactly as the four per-file sets did (docs/evidence/notes/
             # 2026-09-26-uis-library-flags.md):
             # - pool_data on: fn_80165E9C 82.1 -> 94.2%.
             # - -inline auto,deferred: fn_80168DB0 88.9 -> 98.7%; fn_8016A830 and fn_8016B188 have
@@ -1239,7 +1239,7 @@ if args.mode == "configure":
     # Write build.ninja and objdiff.json
     generate_build(config)
     # dtk's gap units below the first SDK unit are uncharted game code: count them in "game"
-    from tools.match.autocat import categorise_auto_units
+    from tools.build.autocat import categorise_auto_units
     categorise_auto_units("objdiff.json", f"config/{config.version}/splits.txt")
 elif args.mode == "progress":
     # Print progress information

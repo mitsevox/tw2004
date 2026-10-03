@@ -1,7 +1,7 @@
 // UStream.c: EA's streaming asset loader (the CTRL / SHOC / SONO chunk files: .hog, .gcb,
 // .ngc). The file name comes from the assert string at 0x801868A0; the field names and the
 // UStream_ function names are ours, the Stream_ ones EA's (TW07). CodeWarrior GC/2.5, -O4,p.
-// See docs/formats/ctrl-container.md.
+// See docs/game/formats/ctrl-container.md.
 //
 // Shape of the system:
 //   - a stream is one of the .hog/.gcb files (up to 8 file names per stream, played in order);

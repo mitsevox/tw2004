@@ -21,8 +21,7 @@ Status
 the build reproduces the retail `main.dol` exactly.
 
 The project is now in its **readability** phase: making every file understandable to a person
-reading it cold, with real names, correct comments and readable locals
-([`agents/plan-readability.md`](agents/plan-readability.md)). As of 2026-09-29, of the 6,641
+reading it cold, with real names, correct comments and readable locals. As of 2026-09-29, of the 6,641
 functions in EA's code:
 
 - 5,548 are named (EA's own name where a related build confirms it, otherwise read from the code);
@@ -44,13 +43,17 @@ What's here
   `name_sources.tsv`, the evidence behind every name.
 - `docs/`: see [`docs/README.md`](docs/README.md) for the index and how far to trust each file.
   Highlights: [`docs/style.md`](docs/style.md) (how the C must read),
-  [`docs/decomp-notes.md`](docs/decomp-notes.md) (the CodeWarrior rulebook),
-  [`docs/formats/`](docs/formats/README.md) (the game's data file formats),
-  [`docs/gameplay.md`](docs/gameplay.md) (gameplay logic read from the code; not yet audited).
-- `tools/`: build, matching and naming scripts; `tools/codes/` has Gecko codes (an
-  always-pool-cue gimme and a no-lucky-shots code, untested). A confirmed widescreen culling fix is
-  in [`docs/tw2004-notes.md`](docs/tw2004-notes.md), "Frustum setup and widescreen codes".
-- `agents/`: how the work is organised and where it stands ([`agents/state.md`](agents/state.md)).
+  [`docs/compiler/decomp-notes.md`](docs/compiler/decomp-notes.md) (the CodeWarrior rulebook),
+  [`docs/game/formats/`](docs/game/formats/README.md) (the game's data file formats),
+  [`docs/game/gameplay.md`](docs/game/gameplay.md) (gameplay logic read from the code; not yet audited).
+- `reference/`: symbol dumps from related EA builds (TW07 PS3, TW06, Madden 2003, ...): the
+  evidence behind EA names ([`reference/README.md`](reference/README.md)).
+- `tools/`: `build/` (helpers the build runs), `naming/`, `quality/` (lint and audits), `matching/`,
+  `formats/` (readers for the game's data files), `research/`, `cloud/` (cloud session setup) and
+  `dashboard/` (the progress page).
+- `mods/gecko/`: Gecko codes (an always-pool-cue gimme and a no-lucky-shots code, untested). A
+  confirmed widescreen culling fix is in [`docs/game/tw2004-notes.md`](docs/game/tw2004-notes.md),
+  "Frustum setup and widescreen codes".
 
 Building
 ========

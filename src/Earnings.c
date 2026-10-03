@@ -177,7 +177,7 @@ void EarningsInfo_UnRegisterStreamClients(void) {
 void EarningsInfo_LoadERNFromStream(UStreamObject* pObject) {
     // port: the 'ERN ' object is copied straight into the prize table (EarningsTable); it is
     //       big-endian on disc, so a little-endian port converts it field by field here
-    //       (docs/format-byteorder.md)
+    //       (docs/game/format-byteorder.md)
     Stream_StreamLoadFixedSize(pObject, sizeof(gEarningsTable), &gEarningsTable);
 }
 

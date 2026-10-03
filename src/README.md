@@ -3,7 +3,7 @@
 What each part of Tiger Woods PGA Tour 2004 (GameCube) does, and which files in `src/` make it.
 Every file's first comment says what it is and where its name comes from; this page only groups
 them. Claims here come from those header comments (audited 2026-09-24) or from reading the code.
-Anything not proven is marked *(unverified)*. `docs/gameplay.md` was never audited: check the code
+Anything not proven is marked *(unverified)*. `docs/game/gameplay.md` was never audited: check the code
 before trusting a claim from it.
 
 Not EA game code, and not mapped here: the Nintendo SDK, the MSL C library, the Metrowerks runtime
@@ -20,7 +20,7 @@ and MetroTRK are built from public decomps in `extern/` (the `progress_category=
 | A shot, start to finish | `gomainloop.c` calls `fn_8005D2F8` (`Code8005D2E4.c`) each frame, which runs `GOLFERSTATE_Update` (`StateGolfer.c`): each player's golfer state (`stateFunc.c`, `STATEFUNC_*`). `STATEFUNC_Swing*` drives `Swing.c`, which launches the ball with `Physics_ShotImpact` (`Ball.c`); `GM_BallHit` and `GM_Update` (`GameMode.c`) keep the round's turns and strokes |
 | A round's rules | `GameRound.c` `GM_SetModeType` fills `gpGame`'s callbacks (`GameState`, `include/golfer.h`) with defaults, then calls the game mode's own setup (`GameMode*.c`) |
 | The menus | `uiProcessInterface.c` runs the UI; the screens run on EA's UI Studio library (`UISApi.c` is the game's side, `UISStack.c` `UISStackProcess` the script interpreter); menu messages land in `FE_MessageTable.c`, a round's in `GameUICommands.c` |
-| Loading anything from disc | `UStream.c` (the chunked `.hog`/`.gcb` streamer; `docs/formats/ctrl-container.md`), handlers registered per chunk type, file lists in `streammanagerhole.c` |
+| Loading anything from disc | `UStream.c` (the chunked `.hog`/`.gcb` streamer; `docs/game/formats/ctrl-container.md`), handlers registered per chunk type, file lists in `streammanagerhole.c` |
 | Shared headers | `include/engine.h` (services), `include/game.h` (round, modes), `include/golfer.h` (players, golfers, `GameState`), `include/character.h`, `include/camera.h` |
 
 `gSession.nGameType` (the outer loop in `GoEntry.c`): 0 boot decision, 1 start-up screens,

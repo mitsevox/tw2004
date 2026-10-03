@@ -48,7 +48,7 @@ void GM_CourseInfo_UnRegisterStreamClients(void) {
 
 // The 'CRI ' chunk's loader: copies it into gCourseInfo.
 // port: both chunks are copied straight into their tables; they are big-endian on disc, so a
-//       little-endian port converts them field by field here (docs/format-byteorder.md)
+//       little-endian port converts them field by field here (docs/game/format-byteorder.md)
 void GM_CourseInfo_LoadCRIfromStream(UStreamObject* pObject) {
     Stream_StreamLoadFixedSize(pObject, sizeof(gCourseInfo), gCourseInfo);
 }

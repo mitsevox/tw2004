@@ -197,7 +197,7 @@ void GameMode4_UnregisterStreamClients(void) {
 void GameMode4_LoadTCMFromStream(UStreamObject* pObject) {
     // port: the 'TCM ' object is copied straight into the ladder events (LadderEvent[25]); it is
     //       big-endian on disc, so a little-endian port converts it field by field here
-    //       (docs/format-byteorder.md)
+    //       (docs/game/format-byteorder.md)
     Stream_StreamLoadFixedSize(pObject, sizeof(gLadderEvents), gLadderEvents);
 }
 
