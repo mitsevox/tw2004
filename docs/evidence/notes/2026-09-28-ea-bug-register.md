@@ -87,6 +87,11 @@ own files in its pass; the rest come here.
 | LLVideo.c LLVideo_PreloadQueue / ReadNextFile / QueueAdd | ignores the stream's end (a movie under 16 chunks loops forever); apChunk[32] vs nMore up to 255; no full-queue check (1024) | the movie data |
 | LLVideo.c (MAD_IsAtEnd always 0) | a movie ends only when starved: also mid-movie if the disc falls behind | already labelled at MAD_ReadNextFile |
 
+## Moved out of the code (2026-10-03 review)
+| Where | Bug | Depends on |
+|---|---|---|
+| GoLightFogEnv.c LF_vSetLightingEnvironment | lights 0-2 step over the directional description, but light 3 always takes the fourth description, even when that is the directional one | whether any hole puts its directional light in slot 3 of TGD_LightingData |
+
 ## Dropped (checked: harmless or not a bug)
 AnimStream_AssignSlots / StartRead (streaming is never on: AnimStream_Init clears bOn);
 HwsBurn_CopySetOptions round-up (a fake-match question); GM_ShowPostShotAnimation's NULL test (pSurf

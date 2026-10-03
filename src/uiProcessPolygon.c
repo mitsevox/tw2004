@@ -366,7 +366,7 @@ void UIPoly_ProcessMessage(FEQuad* pQuad, int nMsg, u32 bSplit, FEMsgArg* pArgs)
     }
 }
 
-// Run with the other set-ups before each hole (Code8006F438.c HoleLoader_PostHoleInit); empty in this build.
+// Run with the other set-ups before each hole (HoleLoader_PostHoleInit); empty in this build.
 void UI_InitForHole(void) {
 }
 

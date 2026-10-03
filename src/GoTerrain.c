@@ -2061,7 +2061,7 @@ void Ter_SetCourseMipmapBias(int n) {
     gTerRenderer.fDefaultObjectMipmapBias[2] = gTerCourseMipmapBias[n][2];
 }
 
-// Unloads the hole's terrain (the hole loader, Code8006F438.c): stops the crowd, frees the 'ter '
+// Unloads the hole's terrain (HoleLoader_CloseCurrentHole): stops the crowd, frees the 'ter '
 // and 'tgd ' chunks, and puts the LOD settings back to their defaults (no 'tLOD' chunk, steps 26
 // and 16).
 void Ter_UnloadHole(void) {
@@ -2442,7 +2442,7 @@ f32 Ter_GetTimeInCycle(u32 n, f32 fPeriod) {
 void RC_vUpdateRenderCtxScreen();
 void LF_ApplyFogToRenderState(void);
 void LF_UpdateFogColourForCamera();
-void LF_SetFogSettings(TerSettings* pSettings);
+void LF_SetFogSettings(FG_SFogEnvironment* pSettings);
 
 // Gives the current render camera the model matrix pMtx (NULL: the identity).
 void RC_vSetCurrentRenderCtxTransformationMatrix(f32 (*pMtx)[4]) {
@@ -2478,22 +2478,22 @@ void LF_UpdateFog(void) {
 // Takes the current light set's fog settings (colours round the compass, fog distance) as the ones
 // the fog is made from (LF_SetFogSettings).
 void LF_UseCurrentFogSettings(void) {
-    LF_SetFogSettings(&LF_spGetCurrentLightFogEnvironment()->settings);
+    LF_SetFogSettings(&LF_spGetCurrentLightFogEnvironment()->fog);
 }
 
-LightSet* LF_spGetCurrentLightFogEnvironment(void) {
-    return lbl_80281380->pCur;
+LF_SLightFogEnvironment* LF_spGetCurrentLightFogEnvironment(void) {
+    return gpLightFogEnvMgr->pCur;
 }
 
-// Makes light set nSet of lbl_80281380 the current one.
+// Makes light set nSet of gpLightFogEnvMgr the current one.
 void LF_vSetCurrentLightFogEnvironment(s32 nSet) {
-    lbl_80281380->pCur = &lbl_80281380->aSet[nSet];
+    gpLightFogEnvMgr->pCur = &gpLightFogEnvMgr->aSet[nSet];
 }
 
 // Resets the current light set's fog settings to the defaults (FG_vSetDefaultFog: one grey-blue all
 // round, no turn).
 void LF_ResetCurrentFogSettings(void) {
-    FG_vSetDefaultFog(&LF_spGetCurrentLightFogEnvironment()->settings);
+    FG_vSetDefaultFog(&LF_spGetCurrentLightFogEnvironment()->fog);
 }
 
 // Gives the current light set's light group the default lights (fn_8006EDC0).
@@ -2502,15 +2502,15 @@ void LF_SetCurrentDefaultLights(void) {
     fn_8006EDC0(&LF_spGetCurrentLightFogEnvironment()->group);
 }
 
-// Hands the renderer the fog made from the fog settings (lbl_802811E0): the colour f44..f4C, a
-// start distance of 0.375 x f50 and an end of 4.15 x (f50 + 10).
+// Hands the renderer the blended fog: its colour, a start at 0.375 x its distance and an end at
+// 4.15 x (its distance + 10).
 void LF_ApplyFogToRenderState(void) {
-    RenderState_SetFogColour(lbl_802811E0->f44, lbl_802811E0->f48, lbl_802811E0->f4C);
-    RenderState_SetFogStart(0.375f * lbl_802811E0->f50);
-    RenderState_SetFogEnd(4.15f * (10.0f + lbl_802811E0->f50));
+    RenderState_SetFogColour(gpFogEnvironment->vCurrent[0], gpFogEnvironment->vCurrent[1],
+                             gpFogEnvironment->vCurrent[2]);
+    RenderState_SetFogStart(0.375f * gpFogEnvironment->vCurrent[3]);
+    RenderState_SetFogEnd(4.15f * (10.0f + gpFogEnvironment->vCurrent[3]));
 }
 
-void FG_vBlendFogForCamera();
 void CharacterRender_SetCurrentBuffer(s32 iBuffer);
 void CharacterRender_StartNewFrame(void);
 
@@ -2522,9 +2522,9 @@ void LF_UpdateFogColourForCamera(void) {
 }
 
 // Takes a copy of the fog settings (colours round the compass, turn, fog distance) that the fog
-// colour and distances are made from (lbl_802811E0).
-void LF_SetFogSettings(TerSettings* pSettings) {
-    Mem_cpy(lbl_802811E0, pSettings, sizeof(TerSettings));
+// colour and distances are made from (gpFogEnvironment).
+void LF_SetFogSettings(FG_SFogEnvironment* pSettings) {
+    Mem_cpy(gpFogEnvironment, pSettings, sizeof(FG_SFogEnvironment));
 }
 
 // a - b into out, three floats; the same helper as Ball.c's Ball_Vec3Sub.

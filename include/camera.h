@@ -1020,4 +1020,8 @@ CamLens* Camera_GetCurrentLens(void);                     // char.c
 void*    RC_spCreateRenderCtx(CamLens* pLens, GoFrameBuf* pBuf, f32* pRect);
 void     RC_vReleaseRenderCtx(void* pCamera);            // free it
 
+void GolfCamera_ResetSpecialCameraStates(void);
+// GoStaticCam.c
+void StaticCam_Reset(void);
+
 #endif

@@ -1,34 +1,20 @@
-// GoLightFogEnv.c (EA's name: TW07's golf/hi-rendering/GoLightFogEnv.c starts the same way,
-// LF_vInitModule and LF_vCloseModule looping over the light environments, then
-// LF_vSetLightingEnvironment from the hole's lighting data): split off goballfx.c at 0x80093524.
-// Its .sdata pointer lbl_80281380 is padded to 8 (0x80281384..0x80281388), where goballfx.c's
-// .sdata starts; its .bss (lbl_801D9278) follows the previous unit's.
+// GoLightFogEnv.c (EA's name, from TW07's golf/hi-rendering/GoLightFogEnv.c): the light-fog
+// environments. Each pairs a fog with a group of lights; one is current, and the scene is lit and
+// fogged with it. When a hole loads, its lighting and fog data fill the current environment.
 
 #include "lighting.h"
 #include "camera.h"
 #include "ball.h"
 
-void LF_LoadCurrentLights(void);
-void LF_vInitLightFogEnvironment(LightSet* pSet);
-void LF_vFreeLightFogEnvironment(LightSet* pSet);
-f32  LF_fComputeAngleBetweenLightAndCamera(s32 nLight, CamLens* pLens);
-f32  LF_fComputeAngleToLight(GoLight* pLight, CamLens* pLens);
-
-// GoLighting.c
-void fn_8006F144(LightSet* pSet);
-void fn_8006F148(LightSet* pSet);
-void FG_spSetFogDirection(LightSet* pSet, s32 nLight, f32* pVec, f32 f);
-void FG_vSetFogRotation(f32 f);
-
-LightSets  lbl_801D9278;
-LightSets* lbl_80281380 = &lbl_801D9278;
+LF_SLightFogEnvMgr  gLightFogEnvMgr;
+LF_SLightFogEnvMgr* gpLightFogEnvMgr = &gLightFogEnvMgr;
 
 void LF_vInitModule(void) {
     int i;
-    LightSet* pSet = lbl_80281380->aSet;
+    LF_SLightFogEnvironment* pEnv = gpLightFogEnvMgr->aSet;
     for (i = 0; i < NUM_LIGHT_SETS; i++) {
-        LF_vInitLightFogEnvironment(pSet);
-        pSet++;
+        LF_vInitLightFogEnvironment(pEnv);
+        pEnv++;
     }
     LF_vSetCurrentLightFogEnvironment(0);
     LF_LoadCurrentLights();
@@ -37,87 +23,85 @@ void LF_vInitModule(void) {
 
 void LF_vCloseModule(void) {
     int i;
-    LightSet* pSet = lbl_80281380->aSet;
+    LF_SLightFogEnvironment* pEnv = gpLightFogEnvMgr->aSet;
     for (i = 0; i < NUM_LIGHT_SETS; i++) {
-        LF_vFreeLightFogEnvironment(pSet);
-        pSet++;
+        LF_vFreeLightFogEnvironment(pEnv);
+        pEnv++;
     }
 }
 
-// Fill the current set from the hole's lights: the directional light from the first directional
-// record (with none among the first five it reads one record past them), the point lights from
-// the records around it.
-void LF_vSetLightingEnvironment(CourseLights* pLights) {
-    LightSet* pSet;
+// Lights the current environment from the hole's light descriptions: light 4 takes the first
+// directional light, and lights 0-3 the point lights in order, stepping over the directional one.
+// Every colour is halved.
+void LF_vSetLightingEnvironment(TGD_LightingData* pLighting) {
+    LF_SLightFogEnvironment* pEnv;
     GoLight* pLight;
-    CourseLight* pRec;
-    CourseLight* pDir;
-    u8 bSkip;
+    TGD_LightDesc* pDesc;
+    TGD_LightDesc* pDir;
+    u8 bAddOne;
     int i;
 
-    pSet = LF_spGetCurrentLightFogEnvironment();
+    pEnv = LF_spGetCurrentLightFogEnvironment();
     for (i = 0; i < 5; i++) {
-        pDir = &pLights->aLight[i];
+        pDir = &pLighting->aLight[i];
         if (pDir->nType == 1) break;
     }
-    pLight = pSet->group.apLight[4];
+    pLight = pEnv->group.apLight[4];
     pLight->nType = 1;
     LLMath_Scale(0.5f, pDir->vColor, pLight->u.dir.vColor);
     pLight->u.dir.f10 = 1.0f;
     pLight->u.dir.fC = 1.0f;
 
-    bSkip = 0;
-    if (pLights->aLight[0].nType == 1) {
-        bSkip = 1;
+    bAddOne = 0;
+    if (pLighting->aLight[0].nType == 1) {
+        bAddOne = 1;
     }
-    pRec = bSkip ? &pLights->aLight[1] : &pLights->aLight[0];
-    pLight = pSet->group.apLight[0];
+    pDesc = bAddOne ? &pLighting->aLight[1] : &pLighting->aLight[0];
+    pLight = pEnv->group.apLight[0];
     pLight->nType = 2;
-    LLMath_Scale(0.5f, pRec->vColor, pLight->u.point.vColor);
-    LLMath_CopyVec(pRec->vPos, pLight->u.point.vPos);
+    LLMath_Scale(0.5f, pDesc->vColor, pLight->u.point.vColor);
+    LLMath_CopyVec(pDesc->vPos, pLight->u.point.vPos);
     pLight->u.point.fC = 1.0f;
     pLight->u.point.f10 = 1.0f;
     pLight->u.point.f14 = 1.0f;
     pLight->u.point.f18 = 1.0f;
 
-    bSkip = 0;
+    bAddOne = 0;
     for (i = 0; i < 2; i++) {
-        if (pLights->aLight[i].nType == 1) {
-            bSkip = 1;
+        if (pLighting->aLight[i].nType == 1) {
+            bAddOne = 1;
         }
     }
-    pRec = bSkip ? &pLights->aLight[2] : &pLights->aLight[1];
-    pLight = pSet->group.apLight[1];
+    pDesc = bAddOne ? &pLighting->aLight[2] : &pLighting->aLight[1];
+    pLight = pEnv->group.apLight[1];
     pLight->nType = 2;
-    LLMath_Scale(0.5f, pRec->vColor, pLight->u.point.vColor);
-    LLMath_CopyVec(pRec->vPos, pLight->u.point.vPos);
+    LLMath_Scale(0.5f, pDesc->vColor, pLight->u.point.vColor);
+    LLMath_CopyVec(pDesc->vPos, pLight->u.point.vPos);
     pLight->u.point.fC = 1.0f;
     pLight->u.point.f10 = 1.0f;
     pLight->u.point.f14 = 1.0f;
     pLight->u.point.f18 = 1.0f;
 
-    bSkip = 0;
+    bAddOne = 0;
     for (i = 0; i < 3; i++) {
-        if (pLights->aLight[i].nType == 1) {
-            bSkip = 1;
+        if (pLighting->aLight[i].nType == 1) {
+            bAddOne = 1;
         }
     }
-    pRec = bSkip ? &pLights->aLight[3] : &pLights->aLight[2];
-    pLight = pSet->group.apLight[2];
+    pDesc = bAddOne ? &pLighting->aLight[3] : &pLighting->aLight[2];
+    pLight = pEnv->group.apLight[2];
     pLight->nType = 2;
-    LLMath_Scale(0.5f, pRec->vColor, pLight->u.point.vColor);
-    LLMath_CopyVec(pRec->vPos, pLight->u.point.vPos);
+    LLMath_Scale(0.5f, pDesc->vColor, pLight->u.point.vColor);
+    LLMath_CopyVec(pDesc->vPos, pLight->u.point.vPos);
     pLight->u.point.fC = 1.0f;
     pLight->u.point.f10 = 1.0f;
     pLight->u.point.f14 = 1.0f;
     pLight->u.point.f18 = 1.0f;
 
-    // EA bug: the last point light always takes the fourth record, even when that is the
-    // directional one
-    pLight = pSet->group.apLight[3];
+    pLight = pEnv->group.apLight[3];
     pLight->nType = 2;
-    LLMath_Scale(0.5f, pLights->aLight[3].vColor, pLight->u.point.vColor);
-    LLMath_CopyVec(pLights->aLight[3].vPos, pLight->u.point.vPos);
+    LLMath_Scale(0.5f, pLighting->aLight[3].vColor, pLight->u.point.vColor);
+    LLMath_CopyVec(pLighting->aLight[3].vPos, pLight->u.point.vPos);
     pLight->u.point.fC = 1.0f;
     pLight->u.point.f10 = 1.0f;
     pLight->u.point.f14 = 1.0f;
@@ -130,51 +114,50 @@ void LF_vSetDynamicLightModifiers(void) {
 }
 
 void LF_vSetLightModifiers(LightParams* pParams) {
-    LightSet* pSet;
+    LF_SLightFogEnvironment* pEnv;
     GoLight* pLight;
-    pSet = LF_spGetCurrentLightFogEnvironment();
-    Vec3Copy(pParams->v0, pSet->group.v28);
-    pLight = pSet->group.apLight[4];
+    pEnv = LF_spGetCurrentLightFogEnvironment();
+    Vec3Copy(pParams->v0, pEnv->group.v28);
+    pLight = pEnv->group.apLight[4];
     pLight->u.dir.f10 = pParams->f10;
-    pLight = pSet->group.apLight[0];
+    pLight = pEnv->group.apLight[0];
     pLight->u.point.fC = pParams->f20;
     pLight->u.point.f10 = pParams->f24;
     pLight->u.point.f14 = pParams->f24;
-    pLight = pSet->group.apLight[1];
+    pLight = pEnv->group.apLight[1];
     pLight->u.point.fC = pParams->f1C;
     pLight->u.point.f10 = 1.0f;
     pLight->u.point.f14 = 1.0f;
-    pLight = pSet->group.apLight[2];
+    pLight = pEnv->group.apLight[2];
     pLight->u.point.fC = pParams->f18;
     pLight->u.point.f10 = 1.0f;
     pLight->u.point.f14 = 1.0f;
-    pLight = pSet->group.apLight[3];
+    pLight = pEnv->group.apLight[3];
     pLight->u.point.fC = pParams->f14;
     pLight->u.point.f10 = 1.0f;
     pLight->u.point.f14 = 1.0f;
 }
 
-void LF_vSetFoggingEnvironment(CourseLightBlock* pBlock) {
-    LightSet* pSet;
-    pSet = LF_spGetCurrentLightFogEnvironment();
-    FG_vSetFogRotation(pBlock->f80);
-    FG_spSetFogDirection(pSet, 0, pBlock->a[0].v0, pBlock->a[0].f10);
-    FG_spSetFogDirection(pSet, 1, pBlock->a[1].v0, pBlock->a[1].f10);
-    FG_spSetFogDirection(pSet, 2, pBlock->a[2].v0, pBlock->a[2].f10);
-    FG_spSetFogDirection(pSet, 3, pBlock->a[3].v0, pBlock->a[3].f10);
+void LF_vSetFoggingEnvironment(TGD_FoggingData* pFogging) {
+    LF_SLightFogEnvironment* pEnv;
+    pEnv = LF_spGetCurrentLightFogEnvironment();
+    FG_vSetFogRotation(&pEnv->fog, pFogging->fRotation);
+    FG_spSetFogDirection(&pEnv->fog, 0, pFogging->aDirection[0].vColour, pFogging->aDirection[0].fDistance);
+    FG_spSetFogDirection(&pEnv->fog, 1, pFogging->aDirection[1].vColour, pFogging->aDirection[1].fDistance);
+    FG_spSetFogDirection(&pEnv->fog, 2, pFogging->aDirection[2].vColour, pFogging->aDirection[2].fDistance);
+    FG_spSetFogDirection(&pEnv->fog, 3, pFogging->aDirection[3].vColour, pFogging->aDirection[3].fDistance);
 }
 
-void LF_vInitLightFogEnvironment(LightSet* pSet) {
-    fn_8006E5A8(&pSet->group, NUM_SET_LIGHTS);
-    fn_8006F144(pSet);
+void LF_vInitLightFogEnvironment(LF_SLightFogEnvironment* pEnv) {
+    fn_8006E5A8(&pEnv->group, NUM_SET_LIGHTS);
+    fn_8006F144(pEnv);
 }
 
-void LF_vFreeLightFogEnvironment(LightSet* pSet) {
-    fn_8006E62C(&pSet->group);
-    fn_8006F148(pSet);
+void LF_vFreeLightFogEnvironment(LF_SLightFogEnvironment* pEnv) {
+    fn_8006E62C(&pEnv->group);
+    fn_8006F148(pEnv);
 }
 
-// The angle between the camera's direction and light nLight of the current set.
 f32 LF_fComputeAngleBetweenLightAndCamera(s32 nLight, CamLens* pLens) {
     return LF_fComputeAngleToLight(LF_spGetCurrentLightFogEnvironment()->group.apLight[nLight], pLens);
 }

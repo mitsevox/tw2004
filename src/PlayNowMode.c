@@ -52,7 +52,6 @@ void PlayNow_UnregisterStreamClients(void);
 void PlayNow_LoadPLYFromStream(UStreamObject* pObject);
 
 int   PlayNow_GetChallengeTarget(int i);
-void  Character_PreHoleInit(void);
 void  PlayNow_ApplyChallengeSetup(void);
 void  PlayNow_Shutdown(void);
 void  PlayNow_HoleStart(void);

@@ -1214,4 +1214,8 @@ void    MtaLib_Link(MtaLib* pLib);                  // mtalib.c: link a library 
 MalBank* MtaLib_GetBank(int nBank);
 void*    MtaLib_GetRandom(MalBank* pBank, int nGroup, int n);
 
+void Character_PreHoleInit(void);
+// AnimStream.c
+void AnimStream_WaitForRead(void);
+
 #endif

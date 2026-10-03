@@ -64,7 +64,6 @@ void RC_UpdateCurrentScreenMatrices();
 void GrassRender_vBuildAndUploadOneTimeData(void);
 void fn_800738DC(TexBank* pBank, TexEntry* pTex, u8 bFirst);   // GoShaderObjectCommon
 void Grass_QueueRelease(GrassBuffer* pBuffer);
-void Grass_DeInitForHole(void);
 void fn_80008380(void);
 void Grass_RegisterStreamClients(void);
 void Grass_LoadNetworkData(GrassChunk* pChunk);

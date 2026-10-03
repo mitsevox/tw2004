@@ -773,7 +773,7 @@ void fn_8006CFC8(void) {
 }
 
 // Whether the main loop should end this frame, by the game type's own tests: gSession's bEndLoop
-// and nC, lbl_802811E8[1], the pads, fn_8009A180 and UI_IsClosed.
+// and nC, a queued hole load, the pads, fn_8009A180 and UI_IsClosed.
 u8 fn_8006D01C(void) {
     u8 bDone = 0;
 
@@ -1168,7 +1168,7 @@ void fn_8006DC20(f32 f) {
 }
 
 u8 fn_8006DC34(void) {
-    return lbl_802811E8[1];
+    return gpHoleLoader->bHoleQueued;
 }
 
 void fn_8006DC40(int nField) {

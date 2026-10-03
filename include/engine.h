@@ -175,6 +175,7 @@ f32  Vec3_Dot(f32* pA, f32* pB);     // dot product
 f32  Math_Acos(f32 x);                // arc cosine
 void LLMath_Scale(f32 f, f32* pIn, f32* pOut);   // scale a vector (four floats)
 void LLMath_AddScale(f32* pA, f32* pB, f32 fScale, f32* pOut);   // out = a + fScale x b (four floats)
+void LLMath_Interpolate(f32* pA, f32* pB, f32 fT, f32* pOut);    // out = a + (b - a) x fT (four floats)
 double pow(double x, double y);         // 0x8015F824 (MSL)
 f32  powf(f32 x, f32 y);                // 0x8002C8D0 (Golfer.c): pow rounded to a float
 f32  LLMath_SquareDistanceBetween3(f32* pA, f32* pB);   // three-float squared distance
@@ -511,7 +512,7 @@ typedef struct RenderState {
                                 //       RenderState_ChangeDrawFlags)
     s32  nFogType;              // 0x024  } the fog: type (2, GX_FOG_LIN, at reset), start and end
     f32  fFogStart;             // 0x028  } distances (100 and 2048 at reset; LF_ApplyFogToRenderState makes
-    f32  fFogEnd;               // 0x02C  } them and c30 from lbl_802811E0); bit 0x8, with c30,
+    f32  fFogEnd;               // 0x02C  } them and c30 from gpFogEnvironment); bit 0x8, with c30,
                                 //          fNearZ and fFarZ
     GXColor c30;                // 0x030  the fog colour: three bytes given, the fourth always
                                 //        0x80; all 0xFF at reset
@@ -1461,7 +1462,6 @@ void fn_8006BAA8(int nPlayer);
 void REPLAY_Save(int nPlayer);          // the replay recorder
 void REPLAY_Play(int nPlayer);
 void REPLAY_Stop(void);                 // clears gSession.bReplay: a saved replay's playback ends
-void HoleLoader_QueueNextHole(void);
 void GR_ResetGreenGrid(int nView);
 void fn_8009EF98(void);
 void Gaud_StopShotClock(void);
@@ -1494,5 +1494,15 @@ void EASBio_SetGamePlayState(u8 bFlag);
 void EASBio_IncrementGamesWon(u32 uCount);
 void EASBio_SetCurrentGameWon(u8 bWon);
 u8   EASBio_IsCurrentGameWon(void);
+
+// LLTexGrp.c
+void fn_800106A0(int n);
+void fn_80010608(int n);
+// GoPostFx.c
+void fn_80037E50(void);
+// UFstPart.c
+void fn_80098C28(void);
+// UKernel.c
+void Kernel_RemoveAllObjects(void);
 
 #endif

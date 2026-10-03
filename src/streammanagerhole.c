@@ -134,8 +134,6 @@ void StaticCam_RegisterStreamClients();
 void StaticCam_UnRegisterStreamClients();
 void Grass_RegisterStreamClients();
 void Grass_UnRegisterStreamClients();
-void StreamManagerHole_RegisterStreamClients(void);
-void StreamManagerHole_UnregisterStreamClients(void);
 void StreamManagerHole_InitModule(void);
 void StreamManagerIngame_StreamSacFiles(void);
 void StreamManagerFEChar_InitModule(void);

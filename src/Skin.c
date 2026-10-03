@@ -26,7 +26,6 @@ void  fn_80016978(f32 fLeft, f32 fTop, f32 fWidth, f32 fHeight);   // Code800161
 void  fn_8006E7A4(LightGroup* pGroup);                   // GoLighting.c: load the group's lights
 void  fn_8006EADC(UObject* pObj);                        // GoLighting.c: light the object
 void  fn_8006ED70(void);                                 // GoLighting.c: lighting off
-void  LF_vSetDynamicLightModifiers(void);                // GoLightFogEnv.c
 f32   Ter_GetAmbientLight(CourseInfo* pCourse, f32* pPos);       // GoTerrainCollision.c: the ground's light
 void  SD_SetShaderTypeParameters(int nRow, void* pData); // GoTerrain.c: calls row nRow's pfn8
 void  fn_801127A0(void* pDesc);                          // hwsMaterial_Gc.c
@@ -59,7 +58,6 @@ void  SKN_GetCharPosition(Character* pChar, f32* pOut);
 int   SKN_GetLightCourse(void);
 void  LI_ResetLights(void);
 void  LI_SetObjectLights(UObject* pObj);
-void  LF_LoadCurrentLights(void);
 void  LF_SetCurrentBrightness(f32 f);
 void  SKN_BuildMatrices(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst, int nView);
 void  SKN_SetMeshMatrices(Skin* pSkin, int n);

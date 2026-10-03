@@ -203,22 +203,8 @@ typedef struct Ter_TerrainRendererMgr {
 } Ter_TerrainRendererMgr;
 LAYOUT_ASSERT(Ter_TerrainRendererMgr, 0x11C8);
 
-// The settings LF_SetFogSettings copies in (0x54 bytes); LF_ApplyFogToRenderState makes the renderer's colour
-// (RenderState.a30) and its distances f28 and f2C from them.
-typedef struct TerSettings {
-    f32  aColours[4][4];        // 0x00  Code8006F154.c: four colours, blended round the compass by
-                                //       the camera's heading
-    f32  f40;                   // 0x40  Code8006F154.c: an angle added to the heading (radians)
-    f32  f44;                   // 0x44  } the colour, 0..255 each
-    f32  f48;                   // 0x48  }
-    f32  f4C;                   // 0x4C  }
-    f32  f50;                   // 0x50  RenderState.f28 is 0.375 of it, f2C 4.15 x (it + 10)
-} TerSettings;
-LAYOUT_ASSERT(TerSettings, 0x54);
-
 extern Ter_TerrainRendererMgr gTerRenderer;
-extern TerSettings* lbl_802811E0;    // Code8006F154.c: points at lbl_801D70A8
-extern TerSettings lbl_801D70A8;
+
 // A step of a crowd member's move from one pose state to another (0x14 bytes; Ter_AnimateObjects): when its
 // states are n0 and n4, f4 is eased toward fC, and once there it goes to state n8 with f4 = f10.
 typedef struct TerPoseStep {
@@ -235,7 +221,6 @@ extern f32 gTerTreePeriodRandom;           // Ter_vInitModule's random number, 0
 extern s32 gTerLowBitCounts[5][32];     // [n][k]: how many of k's lowest n bits are set (Ter_vInitModule);
                                     // Ter_DrawPatchGround picks a ground's mesh by it
 
-void FG_vSetDefaultFog(TerSettings* pSettings); // Code8006F154.c: the default colours
 extern f32 gTerCourseMipmapBias[21][3];     // rows Ter_SetCourseMipmapBias copies into
                                             // fDefaultObjectMipmapBias
 extern f32 gTerLastObjectAlpha;
@@ -265,5 +250,7 @@ void RenderState_SetConstantAlphaOn(u8 b);             // renderer state
 void RenderState_SetConstantAlpha(u8 b);             // renderer state
 void RenderState_SetClipMode(int a);            // renderer state: nFC
 struct UObjMesh* Ter_GetObjectListModel(u16 nPatch, u16 nObjList);    // a course object's model
+
+void Ter_UnloadHole(void);
 
 #endif

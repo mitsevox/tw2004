@@ -130,4 +130,9 @@ u8   UStream_Update(void);              // runs the loader once; 0 when nothing 
 void UStream_AddBufferRef(UStreamBuffer** ppList);          // a chunk of the buffer is kept
 void UStream_ReleaseObjectBuffer(UStreamBuffer** ppBuffer);  // a kept chunk is done with
 
+// streammanagerhole.c
+void StreamManagerHole_RegisterStreamClients(void);
+void StreamManagerHole_UnregisterStreamClients(void);
+void StreamManagerHole_StreamFiles(void);
+
 #endif

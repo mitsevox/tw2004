@@ -162,4 +162,6 @@ void fn_8009943C(PsEmitterRecord* pRecord, u32 uSize);  // start the emitter a s
 void fn_800A3D6C(f32* pPos, int nPlayer);
 void fn_800A3DF4(int nPlayer);
 
+void fn_800A2E68(void);
+
 #endif

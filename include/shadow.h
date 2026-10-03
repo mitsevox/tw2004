@@ -48,4 +48,6 @@ extern f32*  lbl_80282168;      // the texture coordinates, two a vertex
 extern u8*   lbl_8028216C;      // the colours, four bytes a vertex
 extern f32*  lbl_80282170;      // the positions, three a vertex
 
+void fn_800B26DC(void);
+
 #endif

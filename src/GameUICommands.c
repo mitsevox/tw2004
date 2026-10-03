@@ -263,7 +263,6 @@ int   GameModeBattle_NumRemovableClubsLeft(int nPlayer);
 u8    GameModeBattle_RemoveClub(int nPlayer, int nClub);
 void  Character_ReopenTextureFiles(void);
 void  fn_80062B84(int a);
-void  HoleLoader_ResetQueueNextHole(void);
 s32   MC_CallActionFnMemoryRequired(CardPos* pPos);
 void  MC_ConnectCard(s32 nPort, s32 nSlot);
 s32   MC_SaveReplay(MCCardPos* pPos);

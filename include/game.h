@@ -8,6 +8,7 @@
 #include "golfer.h"
 #include "ball.h"
 #include "game/save.h"          // SaveProfile, SaveRecords (ReplayBuffer)
+#include "holeloader.h"
 
 // ---- the round -------------------------------------------------------------------------------
 
@@ -44,7 +45,6 @@ extern void*       lbl_80281E54;        // the render camera made from the three
 extern void*       lbl_80281E58;        // } made by VM_spCreateViewport,
 extern GoFrameBuf* lbl_80281E5C;        // }   FB_spCreateFrameBuffer
 extern void*       lbl_80281E60;        // }   and CA_spCreateCamera when a game type starts
-extern u8*   lbl_802811E8;              // [1]: a hole load is asked for (HoleLoader_QueueNextHole)
 
 // Replay.c
 void REPLAY_InitModule(void);                 // make the replay buffer
@@ -817,5 +817,19 @@ DVDCommandBlock* fn_801104A0(void);     // the disc change's command block
 extern DVDDiskID lbl_80213B60;          // the disc asked for by fn_80110390
 extern DVDCommandBlock lbl_80213B80;    // fn_80110390's disc change
 extern u8 lbl_802824D8;                 // fn_801102AC left a disc change for fn_80110390 to ask for
+
+// target.c
+void fn_8006A89C(void);
+// Code8002BBB0.c
+void fn_8002BC6C(void);
+// Code8006F608.c
+void fn_8006F650(void);
+void fn_8006FBF8(void);
+// Swing.c
+void SW_vDeInitForHole(void);
+// uiProcessPolygon.c
+void UI_InitForHole(void);
+// GameMode.c
+void GM_InitForHole(void);
 
 #endif

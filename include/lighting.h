@@ -1,13 +1,13 @@
-// lighting.h (our name): the scene's light sets. goballfx.c (TW06's name for the file) keeps four
-// sets of lights and a pointer to the current one (lbl_80281380); GoTerrain.c chooses the current
-// set (LF_vSetCurrentLightFogEnvironment) and hands it to the renderer. The lights themselves are
-// GoLighting.c's objects.
+// lighting.h (our name): the light-fog environments of GoLightFogEnv.c (TW07: GoLightFogEnv.h) and
+// the lights of GoLighting.c they are built from. There are four environments, each a fog and a group
+// of lights; one is current, and the renderer lights and fogs the scene with it.
 
 #ifndef LIGHTING_H
 #define LIGHTING_H
 
 #include "engine.h"
 #include "terrain.h"
+#include "fog.h"
 
 #define NUM_LIGHT_SETS      4
 #define NUM_SET_LIGHTS      5   // four point lights, then one directional light
@@ -46,27 +46,24 @@ typedef struct LightGroup {
 } LightGroup;
 LAYOUT_ASSERT(LightGroup, 0x38);
 
-// One set of lights (0x8C bytes).
-typedef struct LightSet {
-    TerSettings settings;       // 0x00  the terrain colours: LF_UseCurrentFogSettings copies them to the
-                                //       renderer's (LF_SetFogSettings), LF_ResetCurrentFogSettings resets
-                                //       them (FG_vSetDefaultFog)
+// A light-fog environment (TW07: LF_SLightFogEnvironment): a fog and the lights lit with it.
+typedef struct LF_SLightFogEnvironment {
+    FG_SFogEnvironment fog;     // 0x00  copied to the renderer's fog when the environment is used
     LightGroup group;           // 0x54
-} LightSet;
-LAYOUT_ASSERT(LightSet, 0x8C);
+} LF_SLightFogEnvironment;
+LAYOUT_ASSERT(LF_SLightFogEnvironment, 0x8C);
 
-// lbl_801D9278, reached through lbl_80281380 (0x238 bytes).
-typedef struct LightSets {
-    LightSet aSet[NUM_LIGHT_SETS];  // 0x000
-    LightSet* pCur;             // 0x230  the set in use (LF_vSetCurrentLightFogEnvironment picks it,
-                                //        LF_spGetCurrentLightFogEnvironment reads it)
+// Every light-fog environment and the current one (TW06: LF_SLightFogEnvMgr).
+typedef struct LF_SLightFogEnvMgr {
+    LF_SLightFogEnvironment aSet[NUM_LIGHT_SETS];   // 0x000
+    LF_SLightFogEnvironment* pCur;  // 0x230
     u8   unk234[4];
-} LightSets;
-LAYOUT_ASSERT(LightSets, 0x238);
+} LF_SLightFogEnvMgr;
+LAYOUT_ASSERT(LF_SLightFogEnvMgr, 0x238);
 
 // Settings for the current light set (0x30 bytes; FEgolferanim.c and Skin.c pass one, LF_vSetLightModifiers).
 typedef struct LightParams {
-    f32  v0[3];                 // 0x00  -> LightSet.v7C
+    f32  v0[3];                 // 0x00  -> LF_SLightFogEnvironment.v7C
     u8   unkC[0x10 - 0xC];
     f32  f10;                   // 0x10  -> the directional light's f10
     f32  f14;                   // 0x14  -> point light 3's fC
@@ -78,7 +75,8 @@ typedef struct LightParams {
 } LightParams;
 LAYOUT_ASSERT(LightParams, 0x30);
 
-extern LightSets* lbl_80281380;
+extern LF_SLightFogEnvMgr* gpLightFogEnvMgr;    // gLightFogEnvMgr
+extern LF_SLightFogEnvMgr gLightFogEnvMgr;
 
 // GoLighting.c's state (lbl_801D6F58, 0x150 bytes, reached through lbl_802811D8): the pool of
 // lights, and the colours and positions of the group last loaded (fn_8006E7A4), up to four point
@@ -113,18 +111,28 @@ extern GoLighting* lbl_802811D8;
 void fn_8006E5A8(LightGroup* pGroup, s32 nLights);  // take the group's lights from the pool
 void fn_8006E62C(LightGroup* pGroup);               // and give them back
 void fn_8006EDC0(LightGroup* pGroup);               // the default lights
+void fn_8006F144(struct LF_SLightFogEnvironment* pEnv);
+void fn_8006F148(struct LF_SLightFogEnvironment* pEnv);
 
-LightSet* LF_spGetCurrentLightFogEnvironment(void);    // lbl_80281380->pCur
-void LF_vSetCurrentLightFogEnvironment(s32 nSet);     // make aSet[nSet] the current set
+// Skin.c
+void LF_LoadCurrentLights(void);
+
+LF_SLightFogEnvironment* LF_spGetCurrentLightFogEnvironment(void);
+void LF_vSetCurrentLightFogEnvironment(s32 nSet);
 void LF_ResetCurrentFogSettings(void); // reset the current set's terrain colours to the defaults
 void LF_UseCurrentFogSettings(void);
 void LF_UpdateFog(void);
 
-void LF_vInitModule(void);      // create the lights of every set, and use set 0
-void LF_vCloseModule(void);     // and free them
-void LF_vSetLightingEnvironment(struct CourseLights* pLights); // fill the current set from a hole's lights
+void LF_vInitModule(void);
+void LF_vCloseModule(void);
+void LF_vSetLightingEnvironment(struct TGD_LightingData* pLighting);
+void LF_vSetDynamicLightModifiers(void);
 void LF_vSetLightModifiers(LightParams* pParams);
-void LF_vSetFoggingEnvironment(struct CourseLightBlock* pBlock);
+void LF_vSetFoggingEnvironment(struct TGD_FoggingData* pFogging);
+void LF_vInitLightFogEnvironment(LF_SLightFogEnvironment* pEnv);
+void LF_vFreeLightFogEnvironment(LF_SLightFogEnvironment* pEnv);
+f32  LF_fComputeAngleBetweenLightAndCamera(s32 nLight, struct CamLens* pLens);
+f32  LF_fComputeAngleToLight(GoLight* pLight, struct CamLens* pLens);
 
 // ---- goballfx.c's ball marker: a quad drawn on the ground under the ball ("marker" texture) ----
 

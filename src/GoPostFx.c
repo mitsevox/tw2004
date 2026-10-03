@@ -18,7 +18,6 @@ GxTexture lbl_801D4F80;
 
 void* lbl_80281D80;
 
-void fn_80037E50(void);
 void fn_80038A90(f32* pColour, f32 fCX, f32 fCY, u8 bCopy, int nView, int nField);
 void fn_80038724(int nField, int nView, f32 fAlpha, f32 fShake);
 void fn_80038E7C(f32* pXY, f32* pColour, f32* pUV, int n, f32* pSrc, f32 fCX, f32 fCY, f32 fX0,

@@ -54,21 +54,21 @@ typedef struct TerObject {
     u16  nObjList;              // 0x22  TW06: uiObjectListNum
 } TerObject;
 
-// One of a hole's lights (0x30 bytes).
-typedef struct CourseLight {
-    u8   nType;                 // 0x00  1: directional, 2: a point light (PsMgr.c dims each kind)
+// One of a hole's lights as the course data stores it (TW07: TGD_LightDesc).
+typedef struct TGD_LightDesc {
+    u8   nType;                 // 0x00  1: directional, 2: a point light
     u8   unk1[0x10 - 0x1];
     f32  vColor[4];             // 0x10
     f32  vPos[4];               // 0x20
-} CourseLight;
+} TGD_LightDesc;
 
-// A hole's lights, at CourseInfo 0x100. LF_vSetLightingEnvironment reads the first five records'
-// kinds; how many the block really holds is not known.
-typedef struct CourseLights {
+// A hole's lights as the course data stores them (TW07: TGD_LightingData). Only the first five
+// descriptions are ever read.
+typedef struct TGD_LightingData {
     s32  nLights;               // 0x00
     u8   unk4[0x10 - 0x4];
-    CourseLight aLight[5];      // 0x10
-} CourseLights;
+    TGD_LightDesc aLight[5];    // 0x10
+} TGD_LightingData;
 
 // The optional block at CourseInfo.p3C: what Ter_CourseLoadCallback hands the glows (glows.h) when a hole is
 // loaded; without it the glows get 0.8, 0.8, 0.4 / 0, 150, -400 / 1.
@@ -78,16 +78,18 @@ typedef struct CourseGlowBlock {
     f32  v10[4];                // 0x10  to SF_vSetSunColor (GlowState.v14)
 } CourseGlowBlock;
 
-// A block of four light vectors and values (CourseInfo.p38 and p44): LF_vSetFoggingEnvironment hands them to
-// the current light set (FG_spSetFogDirection), and f80 to FG_vSetFogRotation.
-typedef struct CourseLightBlock {
-    struct {
-        f32  v0[4];             // 0x00
-        f32  f10;               // 0x10
-        u8   unk14[0x20 - 0x14];
-    } a[4];
-    f32  f80;                   // 0x80
-} CourseLightBlock;
+// One direction of a hole's fog as the course data stores it (TW06: TGD_FogDesc).
+typedef struct TGD_FogDesc {
+    f32  vColour[4];            // 0x00  red, green, blue (0..1); the fourth is replaced by fDistance
+    f32  fDistance;             // 0x10
+    u8   unk14[0x20 - 0x14];
+} TGD_FogDesc;
+
+// A hole's fog as the course data stores it (TW06: TGD_FoggingData): see fog.h.
+typedef struct TGD_FoggingData {
+    TGD_FogDesc aDirection[4];  // 0x00
+    f32  fRotation;             // 0x80
+} TGD_FoggingData;
 
 // The current hole's terrain data (Ter_GetTGD): the ground as collision data. TW06:
 // TGD_TerrainInfo, the same offsets up to 0x2C; TW06 has three more pointers before the polygon
@@ -108,10 +110,10 @@ typedef struct CourseInfo {
     u8*    pLight;              // 0x30  per vertex: the light on the ground there, 0..255
                                 //       (Ter_GetAmbientLight)
     TerCell* pGrid;             // 0x34  nGridWidth x nGridLength cells, row by row. TW06: pTerrainGrid (0x3C)
-    CourseLightBlock* p38;      // 0x38  four optional blocks (NULL when absent); TW06 has its fog, sun,
+    TGD_FoggingData* p38;      // 0x38  four optional blocks (NULL when absent); TW06 has its fog, sun,
     struct CourseGlowBlock* p3C;    // 0x3C    sky and lighting data in the same place. fn_800A27FC uses
     u8*    p40;                 // 0x40    p38 without a test, p44 only when it is set
-    CourseLightBlock* p44;      // 0x44
+    TGD_FoggingData* p44;      // 0x44
     TerObject* pObjects;        // 0x48  the course objects. TW06: pObjectInstanceTable (0x54)
     TerPolyRef* pPolyRefs;      // 0x4C  TW06: pPolygonReferenceList (at 0x58 there)
     u16*   pObjRefs;            // 0x50  per cell, the objects in it (indices). TW06: pObjectReferenceList
@@ -123,7 +125,7 @@ typedef struct CourseInfo {
     PinPos pin[4];              // 0x70  the hole's four pin positions: gpGame->nPinSet[] picks one
     PinPos tee[4];              // 0xB0  the tee of each tee set (gSession.nTeeSet[])
     u8     unkF0[0x100 - 0xF0];
-    CourseLights lights;        // 0x100 the hole's lights (goballfx.c LF_vSetLightingEnvironment, PsMgr.c fn_800A27FC)
+    TGD_LightingData lights;    // 0x100 the hole's lights
 } CourseInfo;
 
 // An object in the world the ball can hit (a tree, a building, the flagstick), as DynObj_FindBallHit
