@@ -6,7 +6,8 @@ comments are done. The orchestrator appends each round's findings here (with the
 evidence); nothing is moved until then. Done items move to "Done" with the commit.
 Tiers: **proven** (evidence settles it), **strong** (evidence points one way; a lane must pin the
 boundaries), **weak** (a hint: settle or drop with evidence). "Passed" = the file is already through
-the naming pass. Details and evidence: agents/findings/2026-09-27-naming-leads.md (round given).
+the naming pass. Details and evidence: agents/findings/2026-09-27-naming-leads.md (round given; removed
+2026-10-03, in git history at 7ff1105).
 
 ## Open
 

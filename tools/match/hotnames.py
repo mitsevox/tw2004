@@ -16,7 +16,7 @@ the plan's measure that a comment was checked, not just present.
 Coverage = share of all call sites (bl/b to a function, counted in the original's split objects)
 whose target has a real name rather than fn_XXXXXXXX. Naming one function called from 300 places
 makes 300 lines readable, so this is the number the naming work moves. For each unnamed function:
-call sites, distinct callers, its unit, and n1's EA-name suggestion (agents/findings/
+call sites, distinct callers, its unit, and n1's EA-name suggestion (docs/notes/
 2026-09-27-name-pairing.tsv, confidence A/B/C) when there is one.
 Run after a build (`ninja` makes the split objects)."""
 import collections, pathlib, re, struct, sys
@@ -25,7 +25,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from callgraph import ROOT, R_PPC_REL24, current_objects, sections  # noqa: E402
 
 PLACEHOLDER = re.compile(r'^fn_[0-9A-Fa-f]{8}$')
-PAIRS = ROOT / 'agents/findings/2026-09-27-name-pairing.tsv'
+PAIRS = ROOT / 'docs/notes/2026-09-27-name-pairing.tsv'
 
 
 def call_sites(path):

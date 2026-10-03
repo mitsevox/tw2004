@@ -1,7 +1,7 @@
 # Infrastructure: where things run and how they connect
 
 The machines, the git flow, CI, the public page and decomp.dev. Matching tools are in
-[`workflow.md`](workflow.md); running agent lanes is in [`../agents/README.md`](../agents/README.md).
+[`workflow.md`](workflow.md).
 
 ## Where the work happens
 
@@ -18,13 +18,9 @@ and Linux.
 
 ## Git flow
 
-- **main is the only long-lived branch**, and every commit on it ends with `main.dol: OK`. The
-  orchestrator commits to main directly (the owner's rule: when the checks pass).
-- **Work from other hands arrives on branches** (`agent/<lane>` from cloud lanes, `gemini/...`,
-  `codex/...` from the Mac, `pc-results/...` from the PC) and goes into main only through
-  `python tools/agents/merge.py <name>` (branch `agent/<name>`; for another branch first
-  `git branch -f agent/<name> origin/<branch>`). The gates: DOL OK, no exact function lost, lint,
-  type/symbol audits, constants, the asm gate, the audit baseline (see `agents/README.md`).
+- **main is the only long-lived branch**, and every commit on it ends with `main.dol: OK`.
+- **Work arrives on branches** and goes into main once it builds with `main.dol: OK` and CI is
+  green. (The agent-lane merge gates were removed 2026-10-03; the workflow is being rebuilt.)
 - **Branches are cleaned up by a workflow**, since the session cannot delete branches itself:
 
   ```

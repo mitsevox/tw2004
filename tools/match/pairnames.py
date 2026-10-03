@@ -61,7 +61,7 @@ Method, per unit (our .o = one EA source file, functions in source order):
  4. Units with no reference file of their own take the files of their paired callers/callees
     (neighbour vote); their pairs are capped at C unless bracketed.
 Measured (2026-09-27, --holdout 0.5, three seeds): A 99%, B 91-96%, C 64-70% get the hidden name
-back; a hand check of 30 A/B pairs on real fn_ functions: agents/findings/2026-09-27-name-pairing.md.
+back; a hand check of 30 A/B pairs on real fn_ functions: docs/notes/2026-09-27-name-pairing.md.
 Codes in the output follow docs/style.md: E2b = TW07 name, E2 = TW06 name, E1 = EA's text, then the
 machine lines above. Every proposal is a CANDIDATE for the audit process (docs/style.md "Where names
 and comments come from"), never a rename.

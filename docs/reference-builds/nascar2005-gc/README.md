@@ -6,7 +6,7 @@ compilation units (source path, code range).
 
 Why we looked: the UIS units are EA Tiburon's IStudio library (TW2005's paths:
 Code/Tiburon/IStudio/), and NASCAR 2005 is a Tiburon GameCube game with DWARF
-(agents/findings/2026-09-26-tiburon-symbols.md).
+(docs/notes/2026-09-26-tiburon-symbols.md).
 
 What it has: **no IStudio / UIS**. Its UI is "Adapt" (F:/usr/local/Packages/Adapt/...), its engine
 a Tiburon `Source/Common` + `Source/NGC` tree (anim, fileio, glib, Resource, MovieRcmp, particlelib,

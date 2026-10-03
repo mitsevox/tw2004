@@ -38,7 +38,7 @@ Output in build/leversweep/: <fn>.txt (base score, the best variants with their 
 changed lines) and summary.tsv (one row per function). Applying a hit: make the same change in
 src/<Unit>.c, confirm it in the real build (the snapshot masks symbol names), check the meaning,
 and label it: an identity inline becomes `static inline T fn_<caller address>_Read(T v)` with a
-`// fake match:` comment (agents/brief.md)."""
+`// fake match:` comment (docs/style.md)."""
 import difflib, json, multiprocessing, os, pathlib, re, subprocess, sys, time
 
 HERE = pathlib.Path(__file__).resolve().parent

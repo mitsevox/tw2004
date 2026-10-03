@@ -21,8 +21,7 @@ Status
 the build reproduces the retail `main.dol` exactly.
 
 The project is now in its **readability** phase: making every file understandable to a person
-reading it cold, with real names, correct comments and readable locals
-([`agents/plan-readability.md`](agents/plan-readability.md)). As of 2026-09-29, of the 6,641
+reading it cold, with real names, correct comments and readable locals. As of 2026-09-29, of the 6,641
 functions in EA's code:
 
 - 5,548 are named (EA's own name where a related build confirms it, otherwise read from the code);
@@ -50,7 +49,7 @@ What's here
 - `tools/`: build, matching and naming scripts; `tools/codes/` has Gecko codes (an
   always-pool-cue gimme and a no-lucky-shots code, untested). A confirmed widescreen culling fix is
   in [`docs/tw2004-notes.md`](docs/tw2004-notes.md), "Frustum setup and widescreen codes".
-- `agents/`: how the work is organised and where it stands ([`agents/state.md`](agents/state.md)).
+- `docs/notes/`: kept findings: EA bugs found, misfiled units, TW07/TW06 name pairing.
 
 Building
 ========

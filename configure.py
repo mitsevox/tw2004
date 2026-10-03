@@ -1120,7 +1120,7 @@ config.libs = [
             Object(Matching, "EASB.c"),
             # The UIS units are EA Tiburon's IStudio library (TW2005's paths: Code/Tiburon/IStudio/),
             # built with one library setting (#match-help: real teams set flags per library). This
-            # one set scores exactly as the four per-file sets did (agents/findings/
+            # one set scores exactly as the four per-file sets did (docs/notes/
             # 2026-09-26-uis-library-flags.md):
             # - pool_data on: fn_80165E9C 82.1 -> 94.2%.
             # - -inline auto,deferred: fn_80168DB0 88.9 -> 98.7%; fn_8016A830 and fn_8016B188 have

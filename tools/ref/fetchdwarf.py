@@ -13,7 +13,7 @@ import pathlib, re, subprocess, sys, urllib.parse, urllib.request
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 REFS = {
     # EA Tiburon, GameCube, 2004: the likeliest build with the IStudio (UIS) library and DWARF
-    # (agents/findings/2026-09-26-tiburon-symbols.md).
+    # (docs/notes/2026-09-26-tiburon-symbols.md).
     'nascar2005gc': 'https://debugging.games/_files/GameCube/'
                     '[GC] NASCAR 2005 - Chase for the Cup (USA) [GN4E69] (DWARF).7z',
 }
