@@ -26,7 +26,7 @@ void  fn_80016978(f32 fLeft, f32 fTop, f32 fWidth, f32 fHeight);   // Code800161
 void  fn_8006E7A4(LightGroup* pGroup);                   // GoLighting.c: load the group's lights
 void  fn_8006EADC(UObject* pObj);                        // GoLighting.c: light the object
 void  fn_8006ED70(void);                                 // GoLighting.c: lighting off
-void  fn_80093824(void);                                 // GoLightFogEnv.c
+void  LF_vSetDynamicLightModifiers(void);                // GoLightFogEnv.c
 f32   Ter_GetAmbientLight(CourseInfo* pCourse, f32* pPos);       // GoTerrainCollision.c: the ground's light
 void  SD_SetShaderTypeParameters(int nRow, void* pData); // GoTerrain.c: calls row nRow's pfn8
 void  fn_801127A0(void* pDesc);                          // hwsMaterial_Gc.c
@@ -163,8 +163,8 @@ static f32 Skin_StrippedFn(f32 x) {
 // Draws the character's skin and its club's. uFlags bit 2: only their "shadow" parts, with shader
 // type 10's parameters set to 128 grey (shadow.c). Otherwise every other part, lit: bit 4 picks
 // light set 3; without it light set 0 with the character's lighting entry for this course
-// (Character.p44, SKN_GetLightCourse) and fn_80093824. The lights' brightness is 0.5 plus half the
-// ground's light under the character (Ter_GetAmbientLight). Clip mode 1 either way.
+// (Character.p44, SKN_GetLightCourse) and LF_vSetDynamicLightModifiers. The lights' brightness is
+// 0.5 plus half the ground's light under the character (Ter_GetAmbientLight). Clip mode 1 either way.
 void SKN_DrawCharacter(Character* pChar, u32 uFlags) {
     static f32 aShadowParams[4] = { 128.0f, 128.0f, 128.0f, 128.0f };
     f32 vPos[3];
@@ -188,11 +188,11 @@ void SKN_DrawCharacter(Character* pChar, u32 uFlags) {
             LF_vSetCurrentLightFogEnvironment(0);
             if (pEntry != NULL) {
                 // port: Character.p44's entries are what lighting.h calls LightParams
-                fn_80093854((LightParams*)pEntry);
+                LF_vSetLightModifiers((LightParams*)pEntry);
             }
         }
         if (!uSet3) {
-            fn_80093824();
+            LF_vSetDynamicLightModifiers();
         }
         SKN_GetCharPosition(pChar, vPos);
         LF_SetCurrentBrightness(0.5f * Ter_GetAmbientLight(Ter_GetTGD(), vPos) + 0.5f);

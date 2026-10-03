@@ -62,8 +62,8 @@ typedef struct CourseLight {
     f32  vPos[4];               // 0x20
 } CourseLight;
 
-// A hole's lights, at CourseInfo 0x100. fn_800935CC reads the first five records' kinds; how many
-// the block really holds is not known.
+// A hole's lights, at CourseInfo 0x100. LF_vSetLightingEnvironment reads the first five records'
+// kinds; how many the block really holds is not known.
 typedef struct CourseLights {
     s32  nLights;               // 0x00
     u8   unk4[0x10 - 0x4];
@@ -78,8 +78,8 @@ typedef struct CourseGlowBlock {
     f32  v10[4];                // 0x10  to SF_vSetSunColor (GlowState.v14)
 } CourseGlowBlock;
 
-// A block of four light vectors and values (CourseInfo.p38 and p44): fn_80093900 hands them to
-// the current light set (fn_8006F400), and f80 to fn_8006F430.
+// A block of four light vectors and values (CourseInfo.p38 and p44): LF_vSetFoggingEnvironment hands them to
+// the current light set (FG_spSetFogDirection), and f80 to FG_vSetFogRotation.
 typedef struct CourseLightBlock {
     struct {
         f32  v0[4];             // 0x00
@@ -123,7 +123,7 @@ typedef struct CourseInfo {
     PinPos pin[4];              // 0x70  the hole's four pin positions: gpGame->nPinSet[] picks one
     PinPos tee[4];              // 0xB0  the tee of each tee set (gSession.nTeeSet[])
     u8     unkF0[0x100 - 0xF0];
-    CourseLights lights;        // 0x100 the hole's lights (goballfx.c fn_800935CC, PsMgr.c fn_800A27FC)
+    CourseLights lights;        // 0x100 the hole's lights (goballfx.c LF_vSetLightingEnvironment, PsMgr.c fn_800A27FC)
 } CourseInfo;
 
 // An object in the world the ball can hit (a tree, a building, the flagstick), as DynObj_FindBallHit

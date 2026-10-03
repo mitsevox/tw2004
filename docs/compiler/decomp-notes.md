@@ -247,7 +247,7 @@ They will be sorted into the sections below.
 - **[verified] Test one flag bit as `(u & bit) >> n`, not `(u >> n) & 1`** (same `extrwi`, different
   epilogue order; FE_MessageTable GM_vMCIsCardPresent 99.3 -> 100).
 - **[verified] A call made in every branch of an if-chain is one call after it**, with the arguments
-  picked per branch (Code8006F154 fn_8006F154 91.3 -> 98.75). `(f32)sqrt(...)` must be cast before
+  picked per branch (Code8006F154 FG_vBlendFogForCamera 91.3 -> 98.75). `(f32)sqrt(...)` must be cast before
   multiplying by a float constant, or the multiply is done in double.
 - **[verified] A call or global load on the right of a comparison is evaluated first**: write
   `f(n) + 1 < rec`, not `rec > f(n) + 1`, when the original calls first (HoleScore GameAnalysis_IsShotForRecord 78.7 ->

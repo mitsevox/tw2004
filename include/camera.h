@@ -12,10 +12,11 @@
 typedef struct CamLens {
     s32  nType;                 // 0x00  0: a perspective camera, else flat (LLObj_Gc.c)
     f32  m4[4][4];              // 0x04  camera to world space (shadow.c fn_800B3484 hands it on as a
-                                //       matrix): m4[2] is the view direction (goballfx.c fn_80093A50
-                                //       takes its angle to a light), m4[3] the camera's position
-                                //       (GameMode8 measures the ball's distance to it); the green
-                                //       zoom-to-aim camera copies m4[0] to View.vSide
+                                //       matrix): m4[2] is the view direction (goballfx.c
+                                //       LF_fComputeAngleToLight takes its angle to a light), m4[3]
+                                //       the camera's position (GameMode8 measures the ball's
+                                //       distance to it); the green zoom-to-aim camera copies m4[0]
+                                //       to View.vSide
     f32  m44[4][4];             // 0x44  world to camera space (hlaudemitter.c Aud_EmiSet3DPos moves a
                                 //       sound's position with it)
     f32  m84[2][4];             // 0x84  [1] the scale that

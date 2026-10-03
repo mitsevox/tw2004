@@ -235,7 +235,7 @@ extern f32 gTerTreePeriodRandom;           // Ter_vInitModule's random number, 0
 extern s32 gTerLowBitCounts[5][32];     // [n][k]: how many of k's lowest n bits are set (Ter_vInitModule);
                                     // Ter_DrawPatchGround picks a ground's mesh by it
 
-void fn_8006F334(TerSettings* pSettings);   // Code8006F154.c: the default colours
+void FG_vSetDefaultFog(TerSettings* pSettings); // Code8006F154.c: the default colours
 extern f32 gTerCourseMipmapBias[21][3];     // rows Ter_SetCourseMipmapBias copies into
                                             // fDefaultObjectMipmapBias
 extern f32 gTerLastObjectAlpha;

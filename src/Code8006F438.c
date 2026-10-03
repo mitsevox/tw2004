@@ -6,26 +6,27 @@
 #include "engine.h"
 #include "game.h"
 
-void fn_8006F438(void);
+void HoleLoader_vLoadQueuedHole(void);
 void fn_800106A0(int n);                    // LLTexGrp.c
 void StreamManagerHole_RegisterStreamClients(void); // streammanagerhole.c
 void StreamManagerHole_UnregisterStreamClients(void); // streammanagerhole.c
 void StreamManagerHole_StreamFiles(void);   // streammanagerhole.c
-void fn_8006F4F0(void);
-void fn_8006F518(void);
-void fn_8006F5F8(void);
+void HoleLoader_PreHoleInit(void);
+void HoleLoader_PostHoleInit(void);
+void HoleLoader_OnLoadQueuedHole(void);
 
-// The hole loader's flags: [0] a hole is loaded (fn_8006F568 unloads it and clears the flag),
-// [1] a hole load is asked for (fn_8006F4B4 / fn_8006F4E0). The size is not known (2 to 8).
+// The hole loader's flags: [0] a hole is loaded (HoleLoader_CloseCurrentHole unloads it and clears the flag),
+// [1] a hole load is asked for (HoleLoader_QueueNextHole / HoleLoader_ResetQueueNextHole). The size
+// is not known (2 to 8).
 u8 lbl_80281E68[2];
 u8* lbl_802811E8 = lbl_80281E68;
 
 // Load the hole if one is asked for: stream its files in (with fn_800106A0 and fn_8000B4B0 set to 1
 // around it), mark it loaded (lbl_802811E8[0]) and set everything up for it.
-void fn_8006F438(void) {
-    fn_8006F5F8();
+void HoleLoader_vLoadQueuedHole(void) {
+    HoleLoader_OnLoadQueuedHole();
     if (lbl_802811E8[1] != 0) {
-        fn_8006F4F0();
+        HoleLoader_PreHoleInit();
         fn_800106A0(1);
         fn_8000B4B0(1);
         StreamManagerHole_RegisterStreamClients();
@@ -34,24 +35,24 @@ void fn_8006F438(void) {
         fn_800106A0(0);
         fn_8000B4B0(0);
         lbl_802811E8[0] = 1;
-        fn_8006F518();
+        HoleLoader_PostHoleInit();
         lbl_802811E8[1] = 0;
     }
 }
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_8006F5FC(void);
-void fn_8006F4B4(void);
-void fn_8006F4E0(void);
+void HoleLoader_OnQueueNextHole(void);
+void HoleLoader_QueueNextHole(void);
+void HoleLoader_ResetQueueNextHole(void);
 void SitDev_vInitBeforeHole();
 void fn_8006A89C();
-void fn_8006F600(void);
+void HoleLoader_OnPreHoleInit(void);
 void fn_8002BC6C();
 void Character_PreHoleInit();
 void fn_80037E50();
 void DynObj_InitForHole();
-void fn_8006F604(void);
+void HoleLoader_OnPostHoleInit(void);
 void fn_8006F650();
 void UI_InitForHole();
 void GR_vInitForHole();
@@ -72,24 +73,24 @@ s32 fn_800A2B34(s32);
 s32 BreakLine_CloseAfterHole();
 void AnimStream_WaitForRead(void);
 s32 Grass_DeInitForHole();
-void fn_8006F568(void);
+void HoleLoader_CloseCurrentHole(void);
 
-void fn_8006F4B4(void) {
-    fn_8006F5FC();
+void HoleLoader_QueueNextHole(void) {
+    HoleLoader_OnQueueNextHole();
     lbl_802811E8[1] = 1;
 }
 
-void fn_8006F4E0(void) {
+void HoleLoader_ResetQueueNextHole(void) {
     lbl_802811E8[1] = 0;
 }
 
-void fn_8006F4F0(void) {
-    fn_8006F600();
+void HoleLoader_PreHoleInit(void) {
+    HoleLoader_OnPreHoleInit();
     SitDev_vInitBeforeHole();
     fn_8006A89C();
 }
 
-void fn_8006F518(void) {
+void HoleLoader_PostHoleInit(void) {
     GR_vInitForHole();
     BreakLine_InitForHole();
     fn_8002BC6C();
@@ -102,10 +103,10 @@ void fn_8006F518(void) {
     fn_80037E50();
     fn_800B26DC();
     GolfCamera_ResetSpecialCameraStates();
-    fn_8006F604();
+    HoleLoader_OnPostHoleInit();
 }
 
-void fn_8006F568(void) {
+void HoleLoader_CloseCurrentHole(void) {
     s32 var_r31;
 
     fn_8006FBF8();
@@ -130,16 +131,16 @@ void fn_8006F568(void) {
     }
 }
 
-void fn_8006F5F8(void) {
+void HoleLoader_OnLoadQueuedHole(void) {
 }
 
-void fn_8006F5FC(void) {
+void HoleLoader_OnQueueNextHole(void) {
 }
 
-void fn_8006F600(void) {
+void HoleLoader_OnPreHoleInit(void) {
 }
 
-void fn_8006F604(void) {
+void HoleLoader_OnPostHoleInit(void) {
 }
 
 // ---- end of sweep code ----

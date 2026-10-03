@@ -9,25 +9,25 @@
 #include "ball.h"
 
 void LF_LoadCurrentLights(void);
-void fn_80093990(LightSet* pSet);
-void fn_800939CC(LightSet* pSet);
-f32  fn_80093A04(s32 nLight, CamLens* pLens);
-f32  fn_80093A50(GoLight* pLight, CamLens* pLens);
+void LF_vInitLightFogEnvironment(LightSet* pSet);
+void LF_vFreeLightFogEnvironment(LightSet* pSet);
+f32  LF_fComputeAngleBetweenLightAndCamera(s32 nLight, CamLens* pLens);
+f32  LF_fComputeAngleToLight(GoLight* pLight, CamLens* pLens);
 
 // GoLighting.c
 void fn_8006F144(LightSet* pSet);
 void fn_8006F148(LightSet* pSet);
-void fn_8006F400(LightSet* pSet, s32 nLight, f32* pVec, f32 f);
-void fn_8006F430(f32 f);
+void FG_spSetFogDirection(LightSet* pSet, s32 nLight, f32* pVec, f32 f);
+void FG_vSetFogRotation(f32 f);
 
 LightSets  lbl_801D9278;
 LightSets* lbl_80281380 = &lbl_801D9278;
 
-void fn_80093524(void) {
+void LF_vInitModule(void) {
     int i;
     LightSet* pSet = lbl_80281380->aSet;
     for (i = 0; i < NUM_LIGHT_SETS; i++) {
-        fn_80093990(pSet);
+        LF_vInitLightFogEnvironment(pSet);
         pSet++;
     }
     LF_vSetCurrentLightFogEnvironment(0);
@@ -35,11 +35,11 @@ void fn_80093524(void) {
     LF_UseCurrentFogSettings();
 }
 
-void fn_80093580(void) {
+void LF_vCloseModule(void) {
     int i;
     LightSet* pSet = lbl_80281380->aSet;
     for (i = 0; i < NUM_LIGHT_SETS; i++) {
-        fn_800939CC(pSet);
+        LF_vFreeLightFogEnvironment(pSet);
         pSet++;
     }
 }
@@ -47,7 +47,7 @@ void fn_80093580(void) {
 // Fill the current set from the hole's lights: the directional light from the first directional
 // record (with none among the first five it reads one record past them), the point lights from
 // the records around it.
-void fn_800935CC(CourseLights* pLights) {
+void LF_vSetLightingEnvironment(CourseLights* pLights) {
     LightSet* pSet;
     GoLight* pLight;
     CourseLight* pRec;
@@ -124,12 +124,12 @@ void fn_800935CC(CourseLights* pLights) {
     pLight->u.point.f18 = 1.0f;
 }
 
-void fn_80093824(void) {
+void LF_vSetDynamicLightModifiers(void) {
     LF_spGetCurrentLightFogEnvironment();
-    fn_80093A04(0, Camera_GetCurrentLens());
+    LF_fComputeAngleBetweenLightAndCamera(0, Camera_GetCurrentLens());
 }
 
-void fn_80093854(LightParams* pParams) {
+void LF_vSetLightModifiers(LightParams* pParams) {
     LightSet* pSet;
     GoLight* pLight;
     pSet = LF_spGetCurrentLightFogEnvironment();
@@ -154,31 +154,31 @@ void fn_80093854(LightParams* pParams) {
     pLight->u.point.f14 = 1.0f;
 }
 
-void fn_80093900(CourseLightBlock* pBlock) {
+void LF_vSetFoggingEnvironment(CourseLightBlock* pBlock) {
     LightSet* pSet;
     pSet = LF_spGetCurrentLightFogEnvironment();
-    fn_8006F430(pBlock->f80);
-    fn_8006F400(pSet, 0, pBlock->a[0].v0, pBlock->a[0].f10);
-    fn_8006F400(pSet, 1, pBlock->a[1].v0, pBlock->a[1].f10);
-    fn_8006F400(pSet, 2, pBlock->a[2].v0, pBlock->a[2].f10);
-    fn_8006F400(pSet, 3, pBlock->a[3].v0, pBlock->a[3].f10);
+    FG_vSetFogRotation(pBlock->f80);
+    FG_spSetFogDirection(pSet, 0, pBlock->a[0].v0, pBlock->a[0].f10);
+    FG_spSetFogDirection(pSet, 1, pBlock->a[1].v0, pBlock->a[1].f10);
+    FG_spSetFogDirection(pSet, 2, pBlock->a[2].v0, pBlock->a[2].f10);
+    FG_spSetFogDirection(pSet, 3, pBlock->a[3].v0, pBlock->a[3].f10);
 }
 
-void fn_80093990(LightSet* pSet) {
+void LF_vInitLightFogEnvironment(LightSet* pSet) {
     fn_8006E5A8(&pSet->group, NUM_SET_LIGHTS);
     fn_8006F144(pSet);
 }
 
-void fn_800939CC(LightSet* pSet) {
+void LF_vFreeLightFogEnvironment(LightSet* pSet) {
     fn_8006E62C(&pSet->group);
     fn_8006F148(pSet);
 }
 
 // The angle between the camera's direction and light nLight of the current set.
-f32 fn_80093A04(s32 nLight, CamLens* pLens) {
-    return fn_80093A50(LF_spGetCurrentLightFogEnvironment()->group.apLight[nLight], pLens);
+f32 LF_fComputeAngleBetweenLightAndCamera(s32 nLight, CamLens* pLens) {
+    return LF_fComputeAngleToLight(LF_spGetCurrentLightFogEnvironment()->group.apLight[nLight], pLens);
 }
 
-f32 fn_80093A50(GoLight* pLight, CamLens* pLens) {
+f32 LF_fComputeAngleToLight(GoLight* pLight, CamLens* pLens) {
     return Math_Acos(Vec3_Dot(pLens->m4[2], pLight->u.point.vPos));
 }

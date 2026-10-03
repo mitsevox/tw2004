@@ -4140,7 +4140,7 @@ u8 GolfCamera_IsGolferDoneAnimating(View* pView) {
 
 // Clear the shared state's special camera flags at 0x54..0x5B (the matrix camera, the script's matrix
 // mode, the comic camera, the super zoom, the slow-motion swing, the heart beat and the rest), if
-// the state exists. The hole loader (fn_8006F518) calls it.
+// the state exists. The hole loader (HoleLoader_PostHoleInit) calls it.
 void GolfCamera_ResetSpecialCameraStates(void) {
     if (gGolfCamState != NULL) {
         gGolfCamState->bMatrixCam = 0;

@@ -1461,7 +1461,7 @@ void fn_8006BAA8(int nPlayer);
 void REPLAY_Save(int nPlayer);          // the replay recorder
 void REPLAY_Play(int nPlayer);
 void REPLAY_Stop(void);                 // clears gSession.bReplay: a saved replay's playback ends
-void fn_8006F4B4(void);
+void HoleLoader_QueueNextHole(void);
 void GR_ResetGreenGrid(int nView);
 void fn_8009EF98(void);
 void Gaud_StopShotClock(void);

@@ -50,7 +50,7 @@ LAYOUT_ASSERT(LightGroup, 0x38);
 typedef struct LightSet {
     TerSettings settings;       // 0x00  the terrain colours: LF_UseCurrentFogSettings copies them to the
                                 //       renderer's (LF_SetFogSettings), LF_ResetCurrentFogSettings resets
-                                //       them (fn_8006F334)
+                                //       them (FG_vSetDefaultFog)
     LightGroup group;           // 0x54
 } LightSet;
 LAYOUT_ASSERT(LightSet, 0x8C);
@@ -64,7 +64,7 @@ typedef struct LightSets {
 } LightSets;
 LAYOUT_ASSERT(LightSets, 0x238);
 
-// Settings for the current light set (0x30 bytes; FEgolferanim.c and Skin.c pass one, fn_80093854).
+// Settings for the current light set (0x30 bytes; FEgolferanim.c and Skin.c pass one, LF_vSetLightModifiers).
 typedef struct LightParams {
     f32  v0[3];                 // 0x00  -> LightSet.v7C
     u8   unkC[0x10 - 0xC];
@@ -120,11 +120,11 @@ void LF_ResetCurrentFogSettings(void); // reset the current set's terrain colour
 void LF_UseCurrentFogSettings(void);
 void LF_UpdateFog(void);
 
-void fn_80093524(void);         // create the lights of every set, and use set 0
-void fn_80093580(void);         // and free them
-void fn_800935CC(struct CourseLights* pLights);        // fill the current set from a hole's lights
-void fn_80093854(LightParams* pParams);
-void fn_80093900(struct CourseLightBlock* pBlock);
+void LF_vInitModule(void);      // create the lights of every set, and use set 0
+void LF_vCloseModule(void);     // and free them
+void LF_vSetLightingEnvironment(struct CourseLights* pLights); // fill the current set from a hole's lights
+void LF_vSetLightModifiers(LightParams* pParams);
+void LF_vSetFoggingEnvironment(struct CourseLightBlock* pBlock);
 
 // ---- goballfx.c's ball marker: a quad drawn on the ground under the ball ("marker" texture) ----
 

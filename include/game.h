@@ -44,7 +44,7 @@ extern void*       lbl_80281E54;        // the render camera made from the three
 extern void*       lbl_80281E58;        // } made by VM_spCreateViewport,
 extern GoFrameBuf* lbl_80281E5C;        // }   FB_spCreateFrameBuffer
 extern void*       lbl_80281E60;        // }   and CA_spCreateCamera when a game type starts
-extern u8*   lbl_802811E8;              // [1]: a hole load is asked for (fn_8006F4B4)
+extern u8*   lbl_802811E8;              // [1]: a hole load is asked for (HoleLoader_QueueNextHole)
 
 // Replay.c
 void REPLAY_InitModule(void);                 // make the replay buffer

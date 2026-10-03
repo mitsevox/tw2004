@@ -1986,14 +1986,14 @@ void Ter_CourseLoadCallback(UStreamObject* pObject) {
     }
     Ter_InitTGD(gTerRenderer.pCourse);
     LF_vSetCurrentLightFogEnvironment(2);
-    fn_800935CC(&gTerRenderer.pCourse->lights);
-    fn_80093900(gTerRenderer.pCourse->p38);
+    LF_vSetLightingEnvironment(&gTerRenderer.pCourse->lights);
+    LF_vSetFoggingEnvironment(gTerRenderer.pCourse->p38);
     LF_vSetCurrentLightFogEnvironment(0);
-    fn_800935CC(&gTerRenderer.pCourse->lights);
-    fn_80093900(gTerRenderer.pCourse->p38);
+    LF_vSetLightingEnvironment(&gTerRenderer.pCourse->lights);
+    LF_vSetFoggingEnvironment(gTerRenderer.pCourse->p38);
     LF_vSetCurrentLightFogEnvironment(1);
-    fn_800935CC(&gTerRenderer.pCourse->lights);
-    fn_80093900(gTerRenderer.pCourse->p38);
+    LF_vSetLightingEnvironment(&gTerRenderer.pCourse->lights);
+    LF_vSetFoggingEnvironment(gTerRenderer.pCourse->p38);
     LF_vSetCurrentLightFogEnvironment(3);
     LF_SetCurrentDefaultLights();
     LF_ResetCurrentFogSettings();
@@ -2490,10 +2490,10 @@ void LF_vSetCurrentLightFogEnvironment(s32 nSet) {
     lbl_80281380->pCur = &lbl_80281380->aSet[nSet];
 }
 
-// Resets the current light set's fog settings to the defaults (fn_8006F334: one grey-blue all
+// Resets the current light set's fog settings to the defaults (FG_vSetDefaultFog: one grey-blue all
 // round, no turn).
 void LF_ResetCurrentFogSettings(void) {
-    fn_8006F334(&LF_spGetCurrentLightFogEnvironment()->settings);
+    FG_vSetDefaultFog(&LF_spGetCurrentLightFogEnvironment()->settings);
 }
 
 // Gives the current light set's light group the default lights (fn_8006EDC0).
@@ -2510,15 +2510,15 @@ void LF_ApplyFogToRenderState(void) {
     RenderState_SetFogEnd(4.15f * (10.0f + lbl_802811E0->f50));
 }
 
-void fn_8006F154();
+void FG_vBlendFogForCamera();
 void CharacterRender_SetCurrentBuffer(s32 iBuffer);
 void CharacterRender_StartNewFrame(void);
 
-// Blends the fog colour for the current camera's heading (fn_8006F154). The current render context
+// Blends the fog colour for the current camera's heading (FG_vBlendFogForCamera). The current render context
 // it fetches first is not used.
 void LF_UpdateFogColourForCamera(void) {
     RC_spGetCurrentRenderCtx();
-    fn_8006F154();
+    FG_vBlendFogForCamera();
 }
 
 // Takes a copy of the fog settings (colours round the compass, turn, fog distance) that the fog

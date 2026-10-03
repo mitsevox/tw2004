@@ -263,7 +263,7 @@ int   GameModeBattle_NumRemovableClubsLeft(int nPlayer);
 u8    GameModeBattle_RemoveClub(int nPlayer, int nClub);
 void  Character_ReopenTextureFiles(void);
 void  fn_80062B84(int a);
-void  fn_8006F4E0(void);
+void  HoleLoader_ResetQueueNextHole(void);
 s32   MC_CallActionFnMemoryRequired(CardPos* pPos);
 void  MC_ConnectCard(s32 nPort, s32 nSlot);
 s32   MC_SaveReplay(MCCardPos* pPos);
@@ -758,14 +758,14 @@ void GM_vExitGame(MsgArg* pArgs, MsgArg* pResult) {
 
 // Message 8: the pause menu closes (GUI_PauseMenuClosed); unless the round is fading to black to
 // end, the lesson restarts (Lessons_RestartLesson, lesson mode only); when it is, a hole load asked
-// for is cancelled (fn_8006F4E0).
+// for is cancelled (HoleLoader_ResetQueueNextHole).
 void GM_vClosePauseMenu(MsgArg* pArgs, MsgArg* pResult) {
     GUI_PauseMenuClosed();
     if (gUIState.bFadeToBlack == 0) {
         Lessons_RestartLesson();
         return;
     }
-    fn_8006F4E0();
+    HoleLoader_ResetQueueNextHole();
 }
 
 // Message 9: pause: notes whether the scorecard was down (gbPausedWithoutScoreCard), pauses the
@@ -2653,7 +2653,7 @@ void GM_vAddRemoveClub(MsgArg* pArgs, MsgArg* pResult) {
 // Command 180: asks for the other disc and loads the hole again: player 0's view runs camera script
 // 3 (CameraController_HoldFadeColor, zero vector), the golfer waits (GS_WAIT), the other disc is
 // asked for and waited on (fn_801102AC), the characters' texture files are reopened, a hole load is requested
-// (fn_8006F4B4) and the view's camera script goes back to 0. The result is always 0.
+// (HoleLoader_QueueNextHole) and the view's camera script goes back to 0. The result is always 0.
 void IG_vSwapDiscReloadHole(MsgArg* pArgs, MsgArg* pResult) {
     View* pView = ViewController_GetCameraControl(gPlayers[0].nView[0]);
     f32 vZero[4] = {0.0f, 0.0f, 0.0f, 0.0f};
@@ -2664,7 +2664,7 @@ void IG_vSwapDiscReloadHole(MsgArg* pArgs, MsgArg* pResult) {
         GOLFERSTATE_Set(GS_WAIT, 0);
         fn_801102AC();
         Character_ReopenTextureFiles();
-        fn_8006F4B4();
+        HoleLoader_QueueNextHole();
         pView->script.nFade = 0;
     }
 }
@@ -2703,25 +2703,25 @@ void IG_vGetDiscDriveStatus(MsgArg* pArgs, MsgArg* pResult) {
 // Command 181: does what command 8 does (GM_vClosePauseMenu: the pause menu closes; the lesson restarts,
 // or while fading to black the hole load request is dropped), then answers whether the current
 // hole's file is on the disc in the drive (fn_80110180 with fn_80110178's hole check on); if it is
-// not, the hole load request is dropped (fn_8006F4E0).
+// not, the hole load request is dropped (HoleLoader_ResetQueueNextHole).
 void IG_vCloseMenuCheckDisc(MsgArg* pArgs, MsgArg* pResult) {
     GM_vClosePauseMenu(NULL, NULL);
     fn_80110178(1);
     pResult->i = fn_80110180();
     fn_80110178(0);
     if (pResult->i == 0) {
-        fn_8006F4E0();
+        HoleLoader_ResetQueueNextHole();
     }
 }
 
 // Command 197: does what command 113 does (GM_vPauseMenuClosed: the sounds resume, the pause menu closes,
 // the lesson restarts unless fading to black), drops the hole load request unless a Play Now
-// challenge is running (fn_8006F4E0), then answers whether the current hole's file is on the disc
-// in the drive (fn_80110180 with fn_80110178's hole check on).
+// challenge is running (HoleLoader_ResetQueueNextHole), then answers whether the current hole's
+// file is on the disc in the drive (fn_80110180 with fn_80110178's hole check on).
 void IG_vResumeCheckDisc(MsgArg* pArgs, MsgArg* pResult) {
     GM_vPauseMenuClosed(NULL, NULL);
     if (!PlayNow_IsChallengeRunning()) {
-        fn_8006F4E0();
+        HoleLoader_ResetQueueNextHole();
     }
     fn_80110178(1);
     pResult->i = fn_80110180();

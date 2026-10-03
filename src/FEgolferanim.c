@@ -905,9 +905,9 @@ void FE_vUpdateGolferAll(void) {
             pLight = (LightParams*)&gpCrAPState->pB4->pChar->p44[21];
             if (gpCrAPState->nScreenKind == 1 && gpCrAPState->bDimmed) {
                 Mem_set(&params, 0, sizeof(params));
-                fn_80093854(&params);
+                LF_vSetLightModifiers(&params);
             } else {
-                fn_80093854(pLight);
+                LF_vSetLightModifiers(pLight);
             }
         }
         LF_LoadCurrentLights();
@@ -1313,7 +1313,7 @@ void FE_lite_vStreamCallback(UStreamObject* pObject) {
     ByteSwap_Records(&pSrc, &pDst,
                      aLightElemDef, sizeof(aLightElemDef) / sizeof(aLightElemDef[0]), gFEGolferLights->nLights);
     LF_vSetCurrentLightFogEnvironment(0);
-    fn_800935CC(gFEGolferLights);
+    LF_vSetLightingEnvironment(gFEGolferLights);
     LF_ResetCurrentFogSettings();
     StaticMem_Free(pObject);
 }
