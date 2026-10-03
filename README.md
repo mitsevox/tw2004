@@ -46,10 +46,14 @@ What's here
   [`docs/compiler/decomp-notes.md`](docs/compiler/decomp-notes.md) (the CodeWarrior rulebook),
   [`docs/game/formats/`](docs/game/formats/README.md) (the game's data file formats),
   [`docs/game/gameplay.md`](docs/game/gameplay.md) (gameplay logic read from the code; not yet audited).
-- `tools/`: build, matching and naming scripts; `mods/gecko/` has Gecko codes (an
-  always-pool-cue gimme and a no-lucky-shots code, untested). A confirmed widescreen culling fix is
-  in [`docs/game/tw2004-notes.md`](docs/game/tw2004-notes.md), "Frustum setup and widescreen codes".
-- `docs/evidence/notes/`: kept findings: EA bugs found, misfiled units, TW07/TW06 name pairing.
+- `reference/`: symbol dumps from related EA builds (TW07 PS3, TW06, Madden 2003, ...): the
+  evidence behind EA names ([`reference/README.md`](reference/README.md)).
+- `tools/`: `build/` (helpers the build runs), `naming/`, `quality/` (lint and audits), `matching/`,
+  `formats/` (readers for the game's data files), `research/`, `cloud/` (cloud session setup) and
+  `dashboard/` (the progress page).
+- `mods/gecko/`: Gecko codes (an always-pool-cue gimme and a no-lucky-shots code, untested). A
+  confirmed widescreen culling fix is in [`docs/game/tw2004-notes.md`](docs/game/tw2004-notes.md),
+  "Frustum setup and widescreen codes".
 
 Building
 ========
