@@ -4,7 +4,7 @@
 For every function of the unit, leaves first (a function comes after everything it calls inside the
 unit, so callee names are settled before their callers are read): its address and size, what it
 calls, who calls it (in any unit), the globals it reads or writes, the text of any string literal it
-uses, and any TW06 name suggestion from docs/tw06-names.md that has not been applied.
+uses, and any TW06 name suggestion from docs/evidence/tw06-names.md that has not been applied.
 Run after a build (`ninja` makes the split objects)."""
 import bisect, collections, json, pathlib, re, struct, sys
 
@@ -94,7 +94,7 @@ def symbol_addresses():
 def tw06_hints():
     """address -> 'tier: name (evidence)' for suggestions in tw06-names.md that were not applied."""
     hints = {}
-    doc = ROOT / 'docs/tw06-names.md'
+    doc = ROOT / 'docs/evidence/tw06-names.md'
     if doc.exists():
         for l in doc.read_text(encoding='utf-8').splitlines():
             m = re.match(r'^\| `([0-9A-Fa-f]{8})` \| `([^`]*)` \| `([^`]*)` \| (\w+) \| (.*) \|$', l)

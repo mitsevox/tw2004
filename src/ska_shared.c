@@ -6,7 +6,7 @@
 // (SKA_LoadFromMem; or SKA_SwapClip then SKA_PatchMemory, with the frame data in ARAM).
 // SKA_Update poses a skeleton from a clip at a time: it decodes the two keys around that time into
 // quaternions (SKAUtil_ExpandSingleFrameToDest) and blends them. EA's names come from 007
-// Everything or Nothing's SKA.cpp and SKA_Util.cpp (docs/reference-builds/007eon-ps2), TW07's
+// Everything or Nothing's SKA.cpp and SKA_Util.cpp (reference/007eon-ps2), TW07's
 // SKA_Base.c / SKA_Util.c / UBitArray.h and TW06's map; the rest are read from the code.
 
 #include "game_types.h"

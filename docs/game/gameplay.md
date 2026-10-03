@@ -1,6 +1,9 @@
 Gameplay logic, read from the code
 ==================================
 
+> **Unaudited.** Written from the disassembly during matching (2026-09-22) and never checked
+> against the finished, named code. Verify any claim in `src/` before relying on it.
+
 What the shot code actually does, in plain English with the numbers. Read from the disassembly
 on 2026-09-22 (functions named in `config/GW4E69/symbols.txt`). The golfer/AI file is being
 decompiled as `src/Golfer.c`: the accessor and its helpers match, `AI_ApplyError` and

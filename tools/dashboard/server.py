@@ -48,7 +48,7 @@ def cached(path, parse):
 
 def git_branch(root=ROOT):
     """Current branch, read from .git/HEAD (or a worktree's gitdir). No subprocess: on this PC a
-    git call from a windowless process opens a Windows Terminal window (see docs/decomp-notes.md)."""
+    git call from a windowless process opens a Windows Terminal window (see docs/compiler/decomp-notes.md)."""
     try:
         git = os.path.join(root, '.git')
         if os.path.isfile(git):

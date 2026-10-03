@@ -44,7 +44,7 @@ Validation: 2146 of 2240 integer-only blocks of the round-5 batch dumps (both pa
 on the main checkout's build/mwccdbg/*/) reproduced exactly; fn_800949D0's block B23 in both
 passes; deadsearch on its old dump finds the one lever that closed it (a dead srawi of n). FPU pipelines, calls and record forms are not
 modelled (such blocks are skipped). Found: fn_800949D0 exact from the deadsearch lead (a dead
-srawi of n moved the whole first pass; docs/decomp-notes.md "New from round 7")."""
+srawi of n moved the whole first pass; docs/compiler/decomp-notes.md "New from round 7")."""
 import itertools, os, re, sys
 
 # opcode -> (unit, latency, cycles in stage 1, cycles in stage 2); unit 0 BPU, 1 IU1, 2 any IU, 3 LSU

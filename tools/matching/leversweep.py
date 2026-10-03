@@ -11,7 +11,7 @@ directory (perm_setup.py, from the current src/) and --minutes of sweeping on -j
 about 8 hours on 2026-09-25). The time per function is sized for 20 cores: on 4 cores, 6 minutes
 does not reach every pair of a function with ~170 levers (leversweep_selftest.py: GoDynObj).
 
-The levers (docs/decomp-notes.md, "New from the first cloud lanes"), each tried at every site:
+The levers (docs/compiler/decomp-notes.md, "New from the first cloud lanes"), each tried at every site:
   safe    move a declaration; int/s32/long or u32/unsigned int respelled (the same type on the
           GameCube); an identity inline on an assignment's value (`p = __lv(&x[i])`: moved a pointer
           to EA's register in three functions); `x = a * b * c` split into `x = a; x *= b; ...`
@@ -574,7 +574,7 @@ def _write(unit, fn, base_score, results, nlev, secs, note, f=None, L=None, n1=0
             lines += ['  - ' + L[k][1] for k in combo]
             if any(L[k][0][0] in ('id', 'addr') for k in combo):
                 lines.append('  fake match: EA did not write this (an identity inline, or an address '
-                             'taken only to steer the compiler). Look in TW07 (docs/reference-builds/'
+                             'taken only to steer the compiler). Look in TW07 (reference/'
                              'tw07-ps3/cu/) for EA\'s real helper or macro at this spot and use it; '
                              'otherwise keep it with a `// fake match:` comment (an inline named '
                              'fn_<caller address>_Read).')

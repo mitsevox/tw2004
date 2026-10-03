@@ -20,7 +20,7 @@ char gSignatureDir[8] = "";      // the folder the signature file is looked for 
 
 // Checks at start-up (GoEntry.c) that the signature file Signat.sig is on the disc, in the folder
 // gSignatureDir names; without it the game stops on purpose. Nothing to do with skins: it lies in
-// the margin at SkinBurn.c's start (docs/sourcefiles.md) and may belong to the file before.
+// the margin at SkinBurn.c's start (docs/evidence/sourcefiles.md) and may belong to the file before.
 void SkinBurn_CheckSignatureFile(void) {
     char szPath[256];   // the size is not known (the frame leaves room for 256 bytes)
     int hFile;

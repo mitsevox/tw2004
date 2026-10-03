@@ -9,7 +9,7 @@ GameCube's native GX tiled layouts; the format byte in each table entry is the G
 (0 I4, 1 I8, 2 IA4, 3 IA8, 4 RGB565, 5 RGB5A3, 6 RGBA8, 8 C4, 9 C8, 14 CMPR). Only the top
 mip level is written. No third-party modules: PNGs are written with zlib directly.
 
-TXG layout (from the files; see docs/formats/txg-textures.md):
+TXG layout (from the files; see docs/game/formats/txg-textures.md):
     'TXG ' u32 version
     'HEAD' u32 8      u8 ?, u8 ?, u16 count, u32 0
     'TXHE' u32 size   count entries of 0x50 bytes

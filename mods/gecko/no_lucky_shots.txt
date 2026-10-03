@@ -5,5 +5,5 @@ $No Lucky Shots [mits]
 *Lesson mode's scripted CPU lucky shot is kept.
 *Tiger Woods PGA Tour 2004 (USA, GW4E69).
 *How: Golfer_IsLucky (0x8002D994) always takes its "not lucky" exit after the CPU /
-*split-screen test (bne -> b at 0x8002D9CC). See docs/gameplay.md, "Luck".
+*split-screen test (bne -> b at 0x8002D9CC). See docs/game/gameplay.md, "Luck".
 0402D9CC 48000018

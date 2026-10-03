@@ -1,5 +1,5 @@
 // endian.h (our name): reading the disc's and the memory card's data, which is big-endian (see
-// docs/format-byteorder.md for every format and the ones that are little-endian and swapped).
+// docs/game/format-byteorder.md for every format and the ones that are little-endian and swapped).
 //
 // BE16(p), BES16(p) (signed), BE32(p) and BEF32(p) read a big-endian value at p. Under CodeWarrior
 // they are the plain loads the game's code does (*(u32*)p and so on), so the code is the same byte for

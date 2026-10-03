@@ -7,7 +7,7 @@
 // the swing. The last functions are out-of-line copies of small header helpers
 // (Character_GetTagTime, Vec_Add, RenderState_SetBankTexture, Math_Atan ...). The golfer state
 // engine lives in StateGolfer.c and stateFunc.c. CodeWarrior GC/2.5, -O4,p. The formulas and tables
-// are written up in docs/gameplay.md.
+// are written up in docs/game/gameplay.md.
 
 #include "golfer.h"
 #include "ball.h"

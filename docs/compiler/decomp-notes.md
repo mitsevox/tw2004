@@ -2,7 +2,7 @@ Decompilation notes: CodeWarrior and GameCube
 =============================================
 
 General lessons that apply to any CodeWarrior / GameCube matching decompilation.
-Game-specific knowledge goes in [`tw2004-notes.md`](tw2004-notes.md).
+Game-specific knowledge goes in [`tw2004-notes.md`](../game/tw2004-notes.md).
 
 Each entry says where it came from:
 
@@ -88,8 +88,8 @@ The fixes that come up most often. Each points to its full entry below.
 
 - **Read EA's later source first, when there is one.** A debug build of a later game from the same
   studio and engine keeps EA's own declarations. For this game, TW07's PS3 debug info is split per
-  source file in `docs/reference-builds/tw07-ps3/cu/` (made by `tools/match/tw07dwarf.py`, removed 2026-10-03; a machine
-  pairing of our functions with TW07's is `docs/reference-builds/tw07-ps3/pairs.tsv`). The compiler
+  source file in `reference/tw07-ps3/cu/` (made by `tools/match/tw07dwarf.py`, removed 2026-10-03; a machine
+  pairing of our functions with TW07's is `reference/tw07-ps3/pairs.tsv`). The compiler
   differs, but the programmers' style carried over three years, and it decides register
   allocation. **[verified]** on 16 functions in one session (2026-09-24), in five patterns:
   - **EA's types:** a player index typed as EA's enum `PlayerNumber_t`, not `int`/`s32`, made four
@@ -531,7 +531,7 @@ so try EA's own forms (TW07, one local per job, the unswitched loop) before them
   SW_KillVibration exact (labelled fake; possibly a compiled-away assert).
 - **[verified] An inline getter's parameter is a frontend variable numbered below the frontend's
   shared temps**: Character_SetupForShot exact (labelled).
-- **UIS kept copies (mechanism, docs/notes/2026-09-26-r7-uis-copy-chains.md)**: each copy-
+- **UIS kept copies (mechanism, docs/evidence/notes/2026-09-26-r7-uis-copy-chains.md)**: each copy-
   propagation pass removes only the last link of a copy chain; a surviving copy is still coalesced
   unless both sides interfere; `void** q = &p;` gives EA's copy but adds a store. EA's source form
   is not found; AI_ChooseTarget's last miss (an extsb writing the frontend temp directly) is the
@@ -821,7 +821,7 @@ Added 2026-09-27 (from the ledgers solved that night; each ledger has the full s
 - **[verified, fake-match class] A dead value that survives to register allocation changes
   register choice and the final schedule**: `(s64)x` leaves a dead `srawi` until the post-RA
   peephole (UISEvent fn_80165B90 exact; swept on 10 other near-misses: nothing).
-- **[verified, negative] Dead asserts do nothing on GC/2.5 -O4,p** (docs/notes/
+- **[verified, negative] Dead asserts do nothing on GC/2.5 -O4,p** (docs/evidence/notes/
   2026-09-26-dead-asserts.md): every macro form compiles away without a trace except an empty
   two-armed `if {} else {}`, and dead buffers take no stack.
 - **[verified, negative] Parameter order does not move StaticCam_GetFlybyInformation** (all 364
@@ -829,7 +829,7 @@ Added 2026-09-27 (from the ledgers solved that night; each ledger has the full s
 - **UIS = EA Tiburon's IStudio library** (TW2005 paths `Code/Tiburon/IStudio/`): one flag set for
   all four units (`-pragma "pool_data on" -inline auto,deferred -str reuse,readonly`) ties the
   per-file flags exactly; no flag/pragma/compiler moves the kept-copy pattern, which is a copy
-  whose destination has a second definition in EA's source (docs/notes/
+  whose destination has a second definition in EA's source (docs/evidence/notes/
   2026-09-26-uis-library-flags.md).
 
 ### New from round 5, the mwcc-debugger round (2026-09-26)

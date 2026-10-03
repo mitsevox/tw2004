@@ -73,7 +73,7 @@ void GameModeDriverRTE_UnregisterStreamClients(void) {
 void GameModeDriverRTE_Locale_LoadRTEcFromStream(UStreamObject* pObject) {
     // port: the 'RTEc' object is copied straight into gRTEs.aEvent (RTEvent[118]); it is big-endian
     //       on disc, so a little-endian port converts it field by field here
-    //       (docs/format-byteorder.md)
+    //       (docs/game/format-byteorder.md)
     Stream_StreamLoadFixedSize(pObject, sizeof(gRTEs.aEvent), gRTEs.aEvent);
 }
 
@@ -82,7 +82,7 @@ void GameModeDriverRTE_Locale_LoadRTEcFromStream(UStreamObject* pObject) {
 void GameModeDriverRTE_LoadRTEsFromStream(UStreamObject* pObject) {
     // port: the 'RTEs' object is copied straight into gRTEs.aChallenge (Challenge[111]); it is
     //       big-endian on disc, so a little-endian port converts it field by field here
-    //       (docs/format-byteorder.md)
+    //       (docs/game/format-byteorder.md)
     Stream_StreamLoadFixedSize(pObject, sizeof(gRTEs.aChallenge), gRTEs.aChallenge);
 }
 

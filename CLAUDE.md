@@ -9,7 +9,7 @@ that leaves the logic exactly unchanged; (3) never change what the game does to 
 
 The agent workflow (lanes, orchestrator, rounds) was removed on 2026-10-03 and is being rebuilt
 with the owner from scratch. Until it is, there is no standing plan: ask the owner what to work on.
-Findings worth keeping from the old workflow are in `docs/notes/` (EA bug register, misfiled
+Findings worth keeping from the old workflow are in `docs/evidence/notes/` (EA bug register, misfiled
 units, TW07/TW06 name pairing, and the evidence files the code and name log cite).
 
 ## Hard rules (the owner's; never relax them)
@@ -40,7 +40,7 @@ ninja build/GW4E69/report.json     # objdiff scores (exact, matched %, linked co
 ```
 `orig/GW4E69/sys/main.dol` must exist first: locally it is already there; in the cloud run
 `tools/cloud/setup.sh` (needs the owner's `TW_BUILD_TOKEN` secret). Docs: `docs/getting_started.md`,
-`docs/workflow.md` (every command), `docs/decomp-notes.md` (the compiler rulebook: read "Try these
+`docs/workflow.md` (every command), `docs/compiler/decomp-notes.md` (the compiler rulebook: read "Try these
 first"), `docs/style.md` (how the C must read).
 
 ## Working with the owner

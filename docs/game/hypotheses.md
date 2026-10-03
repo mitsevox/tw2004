@@ -3,7 +3,7 @@ Gameplay hypotheses
 
 Predictions from thousands of hours of play, written down before the relevant code is decompiled
 so the source can confirm or refute them. Each entry says what evidence would settle it and where
-in the binary to look (addresses from [`filemap.md`](filemap.md)). Update the **Status** line when
+in the binary to look (addresses from [`filemap.md`](../evidence/filemap.md)). Update the **Status** line when
 something is learned; keep the original prediction as written.
 
 1. Caddie putt tips are unreliable

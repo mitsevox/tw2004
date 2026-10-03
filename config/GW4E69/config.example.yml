@@ -24,11 +24,11 @@ extract_objects: true
 
 # (optional) Path to the symbols.txt file.
 # This file will be created if it does not exist.
-# See docs/symbols.md for more information.
+# See docs/dtk/symbols.md for more information.
 symbols: config/GW4E69/symbols.txt
 # (optional) Path to the splits.txt file.
 # This file will be created if it does not exist.
-# See docs/splits.md for more information.
+# See docs/dtk/splits.md for more information.
 splits: config/GW4E69/splits.txt
 
 # (optional) Path to the DOL's .map file.
@@ -43,7 +43,7 @@ common_start: 0x80001234
 
 # (optional) Version used to generate `.comment` sections in the split objects.
 # If not specified, no `.comment` sections will be generated.
-# See docs/comment_section.md for more information.
+# See docs/dtk/comment_section.md for more information.
 # Known versions:
 # 8 - CodeWarrior for GameCube 1.0+
 # 10 - CodeWarrior for GameCube 1.3.2+
@@ -133,11 +133,11 @@ modules:
 
   # (optional) Path to the module's symbols.txt file.
   # This file will be created if it does not exist.
-  # See docs/symbols.md for more information.
+  # See docs/dtk/symbols.md for more information.
   symbols: config/GW4E69/module/symbols.txt
   # (optional) Path to the module's splits.txt file.
   # This file will be created if it does not exist.
-  # See docs/splits.md for more information.
+  # See docs/dtk/splits.md for more information.
   splits: config/GW4E69/module/splits.txt
 
   # (optional) Path to the module's .map file.

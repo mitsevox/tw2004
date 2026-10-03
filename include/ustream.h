@@ -1,6 +1,6 @@
 // ustream.h (our name): the stream loader's own types (UStream.c). The objects it delivers
 // (UStreamObject) and its public calls are in engine.h. The file format is described in
-// docs/formats/ctrl-container.md.
+// docs/game/formats/ctrl-container.md.
 
 #ifndef USTREAM_H
 #define USTREAM_H

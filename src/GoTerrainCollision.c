@@ -156,7 +156,7 @@ void Ter_InitTGD(CourseInfo* pCourse) {
 
     // port: the course data is big-endian and read in place through CourseInfo, TerCell,
     //       TerPolyRef, TerObject and the vertex list: a little-endian port converts it here,
-    //       before the offsets are turned into pointers (docs/format-byteorder.md)
+    //       before the offsets are turned into pointers (docs/game/format-byteorder.md)
     TER_RELOCATE(pCourse, pVerts);
     TER_RELOCATE(pCourse, pTriFlags);
     TER_RELOCATE(pCourse, pLight);

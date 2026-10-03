@@ -6,7 +6,7 @@ Part of the SDK import pipeline (run from the repo root, in this order):
   1. sdk_units.py       - which of the other project's SDK units match this binary completely
   2. name_data.py       - name data symbols by aligning references; --apply writes symbols.txt
   3. sdk_data_units.py  - per-unit data ranges for the units whose data is fully named
-Then add the units to splits.txt / configure.py (see docs/decomp-notes.md, "Bringing in another
+Then add the units to splits.txt / configure.py (see docs/compiler/decomp-notes.md, "Bringing in another
 project's SDK source"). Paths to the other project and scratch files are at the top of each script.
 """
 import os; os.makedirs("C:/dev/tw2004/build/sdk_import",exist_ok=True)

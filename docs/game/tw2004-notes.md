@@ -2,7 +2,7 @@ Tiger Woods PGA Tour 2004: what we know
 =======================================
 
 Everything learned about this specific game. General CodeWarrior / GameCube lessons live in
-[`decomp-notes.md`](decomp-notes.md), compiler evidence in [`compiler.md`](compiler.md), and
+[`decomp-notes.md`](../compiler/decomp-notes.md), compiler evidence in [`compiler.md`](../compiler/compiler.md), and
 file formats in [`formats/`](formats/README.md).
 
 Guesses are labelled as guesses. Rename and correct freely as evidence comes in.
@@ -130,7 +130,7 @@ Beyond that, Level 0 is done as far as borrowed source goes.
 Leaked source file names
 ------------------------
 
-Found in assert strings. **All 94 are now pinned to addresses in [`filemap.md`](filemap.md)**, in
+Found in assert strings. **All 94 are now pinned to addresses in [`filemap.md`](../evidence/filemap.md)**, in
 link order. Meanings of the prefixes are guesses.
 
 | Prefix | Guess | Files |
@@ -393,7 +393,7 @@ Leads and loose ends
 Suggested next steps
 --------------------
 
-1. ~~Map the leaked file names to addresses.~~ Done: `docs/filemap.md`.
+1. ~~Map the leaked file names to addresses.~~ Done: `docs/evidence/filemap.md`.
 2. **Follow the named SDK calls into EA code.** Callers of `PADRead` lead to input and the swing
    (`YhSwing.c`); callers of `CARD*` to saves (`MC_Gc.c`); callers of `DVD*` to file loading and
    the asset formats.
@@ -424,7 +424,7 @@ from related builds" and "EA's source tree" below); what keeps paying off is loo
 area in the TW06 material. Tools are in `C:\dev\scratch\tw\`; the reference files are in
 `C:\dev\ext\symbols\` (never committed).
 
-1. **Names already found.** Search [`tw06-names.md`](tw06-names.md) for the addresses in the area.
+1. **Names already found.** Search [`tw06-names.md`](../evidence/tw06-names.md) for the addresses in the area.
    Strong names are already in `symbols.txt`; a *medium* suggestion there is confirmed or
    rejected now, by what the code does (update its row either way).
 2. **TW06 functions and signatures.** For a named function, `python tpiread.py func <TW06 name>`
@@ -565,7 +565,7 @@ Downloaded from debugging.games to `C:\dev\ext\symbols\` (reference only, never 
   x86 code, so no byte matching: names and struct layouts have to be carried over by string
   references, call graphs and constants.
 - **Name transfer, first pass (2026-09-23): 85 functions paired, 46 applied** (one strong pairing rejected because our own code contradicts it: small vector helpers are the weak spot) (list and evidence:
-  [`tw06-names.md`](tw06-names.md)). Tools in `C:\dev\scratch\tw\`: `anchors.py` (strings and
+  [`tw06-names.md`](../evidence/tw06-names.md)). Tools in `C:\dev\scratch\tw\`: `anchors.py` (strings and
   float constants per function; Xbox side exact from the debug exe's base relocations, GameCube
   side by following lis/addi/ori and r2/r13 arithmetic per register) and `callgraph.py`
   (C-library seeds + anchors, then mutual call-graph neighbourhood propagation, LCS alignment
@@ -641,7 +641,7 @@ files are identified.
 CI and decomp.dev
 -----------------
 
-See [`infrastructure.md`](infrastructure.md) (the build container, CI, the public page, decomp.dev).
+See [`infrastructure.md`](../infrastructure.md) (the build container, CI, the public page, decomp.dev).
 
 The small-function sweep
 ------------------------

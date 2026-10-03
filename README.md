@@ -43,13 +43,13 @@ What's here
   `name_sources.tsv`, the evidence behind every name.
 - `docs/`: see [`docs/README.md`](docs/README.md) for the index and how far to trust each file.
   Highlights: [`docs/style.md`](docs/style.md) (how the C must read),
-  [`docs/decomp-notes.md`](docs/decomp-notes.md) (the CodeWarrior rulebook),
-  [`docs/formats/`](docs/formats/README.md) (the game's data file formats),
-  [`docs/gameplay.md`](docs/gameplay.md) (gameplay logic read from the code; not yet audited).
+  [`docs/compiler/decomp-notes.md`](docs/compiler/decomp-notes.md) (the CodeWarrior rulebook),
+  [`docs/game/formats/`](docs/game/formats/README.md) (the game's data file formats),
+  [`docs/game/gameplay.md`](docs/game/gameplay.md) (gameplay logic read from the code; not yet audited).
 - `tools/`: build, matching and naming scripts; `mods/gecko/` has Gecko codes (an
   always-pool-cue gimme and a no-lucky-shots code, untested). A confirmed widescreen culling fix is
-  in [`docs/tw2004-notes.md`](docs/tw2004-notes.md), "Frustum setup and widescreen codes".
-- `docs/notes/`: kept findings: EA bugs found, misfiled units, TW07/TW06 name pairing.
+  in [`docs/game/tw2004-notes.md`](docs/game/tw2004-notes.md), "Frustum setup and widescreen codes".
+- `docs/evidence/notes/`: kept findings: EA bugs found, misfiled units, TW07/TW06 name pairing.
 
 Building
 ========

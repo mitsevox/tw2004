@@ -117,7 +117,7 @@ void GameModeDriverPGATour_UnregisterStreamClients(void) {
 void GameModeDriverPGATour_LoadPGAcFromStream(UStreamObject* pObject) {
     // port: the 'PGAc' object is copied straight into gPgaData.aTournament (Tournament[31]); it is
     //       big-endian on disc, so a little-endian port converts it field by field here
-    //       (docs/format-byteorder.md)
+    //       (docs/game/format-byteorder.md)
     Stream_StreamLoadFixedSize(pObject, sizeof(gPgaData.aTournament), gPgaData.aTournament);
 }
 
@@ -125,7 +125,7 @@ void GameModeDriverPGATour_LoadPGAcFromStream(UStreamObject* pObject) {
 void GameModeDriverPGATour_LoadPGAtFromStream(UStreamObject* pObject) {
     // port: the 'PGAt' object is copied straight into gPgaData.aTourEvent (TourEvent[31]); it is
     //       big-endian on disc, so a little-endian port converts it field by field here
-    //       (docs/format-byteorder.md)
+    //       (docs/game/format-byteorder.md)
     Stream_StreamLoadFixedSize(pObject, sizeof(gPgaData.aTourEvent), gPgaData.aTourEvent);
 }
 
@@ -133,7 +133,7 @@ void GameModeDriverPGATour_LoadPGAtFromStream(UStreamObject* pObject) {
 void GameModeDriverPGATour_LoadPGApFromStream(UStreamObject* pObject) {
     // port: the 'PGAp' object is copied straight into gPgaData.aSponsorship (PgaSponsorship[11]);
     //       it is big-endian on disc, so a little-endian port converts it field by field here
-    //       (docs/format-byteorder.md)
+    //       (docs/game/format-byteorder.md)
     Stream_StreamLoadFixedSize(pObject, sizeof(gPgaData.aSponsorship), gPgaData.aSponsorship);
 }
 

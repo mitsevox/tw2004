@@ -161,7 +161,7 @@ container the course loader walks (not yet traced to a file). Per hole:
                               requirement, priority flag, shot shape (0 straight, 1/2 curve,
                               3/4 punch/lob, 5/6 big curve), power requirement, pad
 
-How the CPU uses it is in `docs/gameplay.md` (`AI_ChooseTarget`).
+How the CPU uses it is in `docs/game/gameplay.md` (`AI_ChooseTarget`).
 
 Tools
 -----

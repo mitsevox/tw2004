@@ -62,7 +62,7 @@ comments are written in ONE pass per function, by whoever reads it (a naming lan
 `tools/naming/name.py`, which logs every name with its evidence in `config/GW4E69/name_sources.tsv`.
 
 - **EA's name first** when there is evidence: EA's text in the binary, or EA's name in a related
-  build that the code confirms (TW07 PS3, TW06, Madden 2003; `docs/reference-builds/`). Tier T1/T2,
+  build that the code confirms (TW07 PS3, TW06, Madden 2003; `reference/`). Tier T1/T2,
   spelled as EA did.
 - **Otherwise name it from a careful reading of the code:** tier T3, what it does, EA's style. Most
   names can never be proven; a clear true name beats `fn_`. Never contradict the code.

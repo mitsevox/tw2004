@@ -13,14 +13,14 @@ renames nothing.
         re-runs the pairing, and reports how often each confidence level gets the hidden name back
 Run after a build (it reads the split objects in build/GW4E69/obj, like callgraph.py). ~30 s.
 
-References (docs/reference-builds/, derived inventories only):
+References (reference/, derived inventories only):
   tw07   TW07 PS3 DWARF, cu/<file>.txt: every function per EA source file, in source order, with its
          PS3 size, parameters (C++ `this` included), locals and the functions it inlines.
   tw06p  TW06 PS2 EA_DASH.ELF stabs, functions.cpp: EA's shared packages (SharedFileIO, TagFile,
          ChecksumCRC32, TibExt, ...), per source file in address order, with sizes and parameters.
-Hints taken as extra evidence (never alone): docs/tw06-names.md suggestions not yet applied
-(TW06 Xbox PDB / PS2 map pairing, code E2), docs/reference-builds/tw07-ps3/pairs.tsv (the PC pairing
-that saw TW07's call graph and strings), docs/reference-builds/007eon-ps2/shared_functions.tsv.
+Hints taken as extra evidence (never alone): docs/evidence/tw06-names.md suggestions not yet applied
+(TW06 Xbox PDB / PS2 map pairing, code E2), reference/tw07-ps3/pairs.tsv (the PC pairing
+that saw TW07's call graph and strings), reference/007eon-ps2/shared_functions.tsv.
 
 Method, per unit (our .o = one EA source file, functions in source order):
  1. Anchors: our functions that already carry a reference name (exact, `::` -> `_`). They give the
@@ -61,7 +61,7 @@ Method, per unit (our .o = one EA source file, functions in source order):
  4. Units with no reference file of their own take the files of their paired callers/callees
     (neighbour vote); their pairs are capped at C unless bracketed.
 Measured (2026-09-27, --holdout 0.5, three seeds): A 99%, B 91-96%, C 64-70% get the hidden name
-back; a hand check of 30 A/B pairs on real fn_ functions: docs/notes/2026-09-27-name-pairing.md.
+back; a hand check of 30 A/B pairs on real fn_ functions: docs/evidence/notes/2026-09-27-name-pairing.md.
 Codes in the output follow docs/style.md: E2b = TW07 name, E2 = TW06 name, E1 = EA's text, then the
 machine lines above. Every proposal is a CANDIDATE for the audit process (docs/style.md "Where names
 and comments come from"), never a rename.
@@ -73,7 +73,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import callgraph as cg  # noqa: E402
 
 ROOT = cg.ROOT
-REF = ROOT / 'docs/reference-builds'
+REF = ROOT / 'reference'
 SKIP = re.compile(r'^(UIS\w*|UIStudio|maddeca?|madidct|runtime/.*|src/MSL_C/.*)$')
 
 # ---------------------------------------------------------------------------------------- types
@@ -286,7 +286,7 @@ def load_ours():
 def load_hints():
     """address -> list of (source, reference name, strength)."""
     h = collections.defaultdict(list)
-    doc = ROOT / 'docs/tw06-names.md'
+    doc = ROOT / 'docs/evidence/tw06-names.md'
     for l in doc.read_text(encoding='utf-8').splitlines():
         m = re.match(r'^\| `([0-9A-Fa-f]{8})` \| `([^`]*)` \| `([^`]*)` \| (\w+) \| (.*) \|$', l)
         if m:

@@ -2,7 +2,7 @@
 """
 Survey the asset files on the two GW4E69 discs without interpreting them.
 
-    python tools/formats/asset_survey.py <disc1_files_dir> <disc2_files_dir> [-o docs/formats/survey.md]
+    python tools/formats/asset_survey.py <disc1_files_dir> <disc2_files_dir> [-o docs/game/formats/survey.md]
 
 For every file under Data/ and the disc root it records size, the first bytes, and a guess at the
 header shape (magic word, big/little-endian counts). Files are grouped by extension and by header

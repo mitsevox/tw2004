@@ -5,8 +5,8 @@ How a function gets from raw assembly to an exact match, with the exact commands
 in [`tools/matching/`](../tools/matching) (naming in `tools/naming/`, checks in `tools/quality/`,
 shared helpers in `tools/build/`); each one works on the checkout it lives in, so a git
 worktree uses its own build. Compiler rules (what C produces which instructions) are in
-[`decomp-notes.md`](decomp-notes.md); game facts, structs and names are in
-[`tw2004-notes.md`](tw2004-notes.md) and [`tw06-names.md`](tw06-names.md).
+[`decomp-notes.md`](compiler/decomp-notes.md); game facts, structs and names are in
+[`tw2004-notes.md`](game/tw2004-notes.md) and [`tw06-names.md`](evidence/tw06-names.md).
 
 All commands run from the checkout root.
 
@@ -45,7 +45,7 @@ unit claims an address range and absorbs the sweeps inside it.
 1. `python tools/matching/mkunit.py <Name>.c <lo> <hi> <after>.c`
    Edits `config/GW4E69/splits.txt` and `configure.py`, and prints the sweep files it absorbed.
    `<after>` is the unit it follows in `configure.py`. Ranges come from
-   [`filemap.md`](filemap.md) and the gaps between existing units.
+   [`filemap.md`](evidence/filemap.md) and the gaps between existing units.
 2. If sweeps were absorbed: `python tools/matching/fold.py <Name> <sweep1.c> ...`
    Merges them, builds, verifies every folded function is exact, then `git rm`s the sweeps and
    commits. Add `--push` only when working directly on `main`.
@@ -55,7 +55,7 @@ unit claims an address range and absorbs the sweeps inside it.
 Creating units from the file map
 --------------------------------
 
-[`sourcefiles.md`](sourcefiles.md) names the original source files; its machine-readable copy is
+[`sourcefiles.md`](evidence/sourcefiles.md) names the original source files; its machine-readable copy is
 `config/GW4E69/filemap.json`. `mapunits.py` turns every file there with a strong name and a certain
 core into a unit over that core (a `NonMatching` unit with a `.text` range, a header line naming
 the file and its evidence), and folds the sweep files inside the core into it unchanged, inside

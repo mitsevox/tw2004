@@ -19,8 +19,8 @@ Steps, in order; the first failure stops it and puts every touched file back:
      codes, evidence and purpose present; then rename.py --dry-run (current name at that address,
      new name unused anywhere);
   2. rename.py: symbols.txt, src/, include/ (code and comments);
-  3. the old names in the Markdown docs (not the dated records: docs/journal.md, docs/notes/,
-     docs/reference-builds/);
+  3. the old names in the Markdown docs (not the dated records: docs/evidence/notes/,
+     reference/);
   4. the comments of column 8 above their definitions;
   5. wraplong.py: lines the longer names pushed past lint's 110 columns are rewrapped;
   6. one row per name appended to config/GW4E69/name_sources.tsv;
@@ -44,7 +44,7 @@ REVIEW = ROOT / 'config/GW4E69/review.tsv'
 NAME = re.compile(r'^[A-Z][A-Za-z0-9]*(_[A-Za-z0-9]+)+$')
 CODES = re.compile(r'^E[1-6][a-z]?(\([^)]*\))?(\+E[1-6][a-z]?(\([^)]*\))?)*$')
 PATHS = ['src', 'include', 'config', 'docs']
-SKIP_MD = ('docs/journal.md', 'docs/reference-builds/', 'docs/notes/')
+SKIP_MD = ('reference/', 'docs/evidence/notes/')
 
 
 def run(cmd, **kw):
@@ -113,7 +113,7 @@ def update_markdown(rows):
             continue
         p = ROOT / f
         s = p.read_text(encoding='utf-8')
-        if f == 'docs/tw06-names.md':
+        if f == 'docs/evidence/tw06-names.md':
             # a record of TW06's names: only the "Now" column (the 2nd) follows our renames
             k = 0
             out = []

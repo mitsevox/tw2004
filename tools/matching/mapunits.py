@@ -1,4 +1,4 @@
-"""Create source units from the file map (config/GW4E69/filemap.json, see docs/sourcefiles.md).
+"""Create source units from the file map (config/GW4E69/filemap.json, see docs/evidence/sourcefiles.md).
 
     python tools/matching/mapunits.py --dry-run [--exclude A.c,B.c]   list what it would do
     python tools/matching/mapunits.py [--only File.c] [--exclude ...]  create the units

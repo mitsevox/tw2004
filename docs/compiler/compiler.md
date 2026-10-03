@@ -39,7 +39,7 @@ A separately built EA shared library. Confirmed SN Systems ProDG: `ChecksumCRC32
 matches byte for byte under every ProDG build in the compiler pack at `-O0`, so the exact version
 cannot be told apart from unoptimized code; the project uses `ProDG/3.5` (2001). Driven by
 `tools/build/prodg/prodgcc.py` (the `ngccc` front end needs an installed `sn.ini` and is bypassed). This block is the file-reading layer,
-so it matters to the asset track (`docs/formats`).
+so it matters to the asset track (`docs/game/formats`).
 
 Evidence for the CodeWarrior version
 ------------------------------------

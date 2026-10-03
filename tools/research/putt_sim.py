@@ -1,4 +1,4 @@
-"""Putt test harness for hypothesis 6 (docs/hypotheses.md).
+"""Putt test harness for hypothesis 6 (docs/game/hypotheses.md).
 
 A host-side port of the putt physics in src/Ball.c, on a flat, tilted plane of green:
 
