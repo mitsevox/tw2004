@@ -1,155 +1,37 @@
-# Getting Started
+Getting started
+===============
 
-**New to the code?** Read [`src/README.md`](../src/README.md) first: the map of the game's
-source. It groups every game file in `src/` into its subsystem (boot and main loop, rendering,
-cameras, ball physics, golfers, characters, the round and game modes, front end and UI, audio,
-save data...), says in a line what each file is and where its name comes from, and points at the
-main loop, the game-state machine, a shot's path through the code and the UI script engine. The
-rest of this page is the build template's setup guide.
+Setting up
+----------
 
-See [Dependencies](dtk/dependencies.md) first.
+1. Install the [dependencies](dtk/dependencies.md): Python 3 and ninja. On Linux and macOS,
+   `configure.py` downloads [wibo](https://github.com/decompals/wibo) to run the Windows compiler.
+2. Put your copy of the game (USA, `GW4E69`, Rev 0) in `orig/GW4E69/`: the disc image (ISO/GCM,
+   RVZ, WIA, WBFS, CISO, NFS, GCZ or TGC), or the extracted `main.dol` at
+   `orig/GW4E69/sys/main.dol`. Either disc works; `main.dol` is the same on both.
+3. Build:
 
-1. [Create a new repository from this template](https://github.com/new?template_name=dtk-template&template_owner=encounter), then clone it.
+   ```sh
+   python configure.py
+   ninja
+   ```
 
-2. Rename `orig/GAMEID` to the game's ID. (For example, `GLZE01` for _The Legend of Zelda: The Wind Waker_.)
+   The first run downloads the compilers and decomp-toolkit. The build ends with
+   `build/GW4E69/main.dol: OK` when every byte matches the retail game.
 
-3. Place your game files in `orig/[GAMEID]`. There are two options:
+Reading the code
+----------------
 
-   - **Disc image (recommended):** Place the disc image (ISO, GCM, RVZ, WBFS, CISO, GCZ, NFS, TGC, or WAD) directly in `orig/[GAMEID]`. When `object_base` is set in `config.yml`, decomp-toolkit will automatically read files from the disc image. Objects will be extracted to the filesystem on first build, so the disc image can be deleted afterward to save space.
+Start with [`src/README.md`](../src/README.md), the map of the source: which files make up each
+part of the game (the main loop, rendering, cameras, ball physics, golfers, game modes, the front
+end, audio, saves) and where a frame, a shot and a menu start.
 
-   - **Extracted files:** In Dolphin, use "Extract Entire Disc" for GameCube games, or use "Data Partition" -> "Extract Entire Partition" for Wii games.
+Then [`style.md`](style.md) for how the C is written, and [`workflow.md`](workflow.md) for the
+commands used to work on it.
 
-4. Rename `config/GAMEID` to the game's ID and modify `config/[GAMEID]/config.yml` appropriately, using [`config.example.yml`](/config/GAMEID/config.example.yml) as a reference. If the game doesn't use RELs, the `modules` list in `config.yml` can be removed.
+Configuration
+-------------
 
-5. Generate a `config/[GAMEID]/build.sha1` file for verification. This file is a list of SHA-1 hashes for each build artifact. One possible way:
-
-    ```sh
-    dtk shasum orig/[GAMEID]/sys/main.dol orig/[GAMEID]/files/*.rel -o config/[GAMEID]/build.sha1
-    ```
-
-6. Modify the paths in `config/[GAMEID]/build.sha1` to point to the `build` directory instead of `orig`. The DOL will be built at `build/[GAMEID]/main.dol`, and modules will be built at `build/[GAMEID]/[module_name]/[module_name].rel`.
-
-7. Update `VERSIONS` in [`configure.py`](/configure.py) with the game ID.
-
-8. Run `python configure.py` to generate the initial `build.ninja`.
-
-9. Run `ninja` to perform initial analysis.
-
-If all goes well, the initial `symbols.txt` and `splits.txt` should be automatically generated. Though it's likely it won't build yet. See [Post-analysis](#post-analysis) for next steps.
-
-## Using a `.map`
-
-If the game has `.map` files matching the DOL (and RELs, if applicable), they can be used to fill out `symbols.txt` and `splits.txt` automatically during the initial analysis.
-
-Add the `map` key to `config.yml`, pointing to the `.map` file from the game disc. (For example, `orig/[GAMEID]/files/main.map`.) For RELs, add a `map` key to each module in `config.yml`.
-
-If the game uses [common BSS](dtk/common_bss.md), be sure to set `common_start` as well. (See [`config.example.yml`](/config/GAMEID/config.example.yml).) Otherwise, the final link order may fail to be determined.
-
-Once the initial analysis is completed, `symbols.txt` and `splits.txt` will be generated from the map information. **Remove** the `map` fields from `config.yml` to avoid conflicts.
-
-## Using an `.elf`
-
-If the game has an `.elf` file (matching the DOL after running `dtk elf2dol` on it) then you can run the following to generate a config:
-
-```sh
-dtk elf config game.elf config/GAMEID
-```
-
-However, the splits _will_ be wrong, so the recommended move is to use the `symbols.txt` file that was generated, and copy the generated splits to a blank `splits.txt` as needed.
-
-If the game has an `.elf` file that _doesn't_ match the DOL, the info will still be useful, but you'll have to manually map the symbols over to your game version. Alternatively, you could base the project on the DOL created from that `.elf` instead.
-
-## Post-analysis
-
-After the initial analysis, `symbols.txt` and `splits.txt` will be generated. These files can be modified to adjust symbols and split points.
-
-If the game uses C++ exceptions, it's required to set up a split for the `__init_cpp_exceptions.cpp` file. This differs between linker versions.
-
-Often indicated by the following error:
-
-```
-#   runtime sources 'global_destructor_chain.c' and
-#   '__init_cpp_exceptions.cpp' both need to be updated to latest version.
-```
-
-### GC 1.0 - 2.6 linkers
-
-```yaml
-# splits.txt
-Runtime.PPCEABI.H/__init_cpp_exceptions.cpp:
-	.text       start:0x803294EC end:0x80329568
-	.ctors      start:0x80338680 end:0x80338684
-	.dtors      start:0x80338820 end:0x80338828
-	.sdata      start:0x803F67F0 end:0x803F67F8
-```
-
-`.text`:  
-Find the following symbols in `symbols.txt`:
-
-```
-GetR2__Fv = .text:0x803294EC; // type:function size:0x8 scope:local align:4
-__fini_cpp_exceptions = .text:0x803294F4; // type:function size:0x34 scope:global align:4
-__init_cpp_exceptions = .text:0x80329528; // type:function size:0x40 scope:global align:4
-```
-
-The split end is the address of `__init_cpp_exceptions` + size.
-
-`.ctors`:  
-Find the address of `__init_cpp_exception_reference` or `_ctors` in symbols.txt.  
-Always size 4.
-
-`.dtors`:  
-Look for the address of `__destroy_global_chain_reference` or `_dtors` in symbols.txt.  
-If `__fini_cpp_exceptions_reference` is present, it's size 8, otherwise size 4
-
-`.sdata`:  
-Find the following symbol in `symbols.txt`:
-
-```
-fragmentID = .sdata:0x803F67F0; // type:object size:0x4 scope:local align:4 data:4byte
-```
-
-The split end includes any inter-TU padding, so it's usually size 8.
-
-### GC 2.7+ and Wii linkers
-
-```yaml
-# splits.txt
-Runtime.PPCEABI.H/__init_cpp_exceptions.cpp:
-	.text       start:0x80345C34 end:0x80345CA4
-	.ctors      start:0x803A54A0 end:0x803A54A4 rename:.ctors$10
-	.dtors      start:0x803A56A0 end:0x803A56A4 rename:.dtors$10
-	.dtors      start:0x803A56A4 end:0x803A56A8 rename:.dtors$15
-	.sdata      start:0x80418CA8 end:0x80418CB0
-```
-
-`.text`:  
-Find the following symbols in `symbols.txt`:
-
-```
-__fini_cpp_exceptions = .text:0x80345C34; // type:function size:0x34 scope:global
-__init_cpp_exceptions = .text:0x80345C68; // type:function size:0x3C scope:global
-```
-
-The split end is the address of `__init_cpp_exceptions` + size.
-
-`.ctors$10`:  
-Find the address of `__init_cpp_exception_reference` or `_ctors` in symbols.txt.  
-Always size 4.
-
-`.dtors$10`:  
-Look for the address of `__destroy_global_chain_reference` or `_dtors` in symbols.txt.  
-Always size 4.
-
-`.dtors$15`:  
-Look for the address of `__fini_cpp_exceptions_reference` in symbols.txt.  
-Always size 4.
-
-`.sdata`:  
-Find the following symbol in `symbols.txt`:
-
-```
-fragmentID = .sdata:0x80418CA8; // type:object size:0x4 scope:local data:4byte
-```
-
-The split end includes any inter-TU padding, so it's usually size 8.
+`config/GW4E69/` holds decomp-toolkit's configuration: `symbols.txt` (every symbol's name, address
+and size), `splits.txt` (which address ranges belong to which source file) and `config.yml`.
+[`dtk/`](dtk/) has the toolkit's own reference for these files.

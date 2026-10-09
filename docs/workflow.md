@@ -1,340 +1,80 @@
-Matching workflow
-=================
+Working on the code
+===================
 
-How a function gets from raw assembly to an exact match, with the exact commands. The scripts are
-in [`tools/matching/`](../tools/matching) (naming in `tools/naming/`, checks in `tools/quality/`,
-shared helpers in `tools/build/`); each one works on the checkout it lives in, so a git
-worktree uses its own build. Compiler rules (what C produces which instructions) are in
-[`decomp-notes.md`](compiler/decomp-notes.md); game facts, structs and names are in
-[`tw2004-notes.md`](game/tw2004-notes.md) and [`tw06-names.md`](evidence/tw06-names.md).
-
-All commands run from the checkout root.
-
-The rules
----------
-
-- **Only exactly 100% counts.** 99.9% is not a match. The DOL check must stay `main.dol: OK`.
-- Commit at milestones (a unit finished, a batch of functions matched). Commit messages carry no
-  Co-Authored-By or AI-generated footers.
-- Delete a sweep file only after every function in it is confirmed exact in its new home
-  (`fold.py` checks this before it deletes anything). Never delete a file you have not checked.
-- Reference material in `C:\dev\ext` (other games' SDKs, libraries) is for reading only: never
-  copy it into the repo or mention it in commits. Game data and art never go in the repo.
-- `orig/` holds the game's DOL and is never committed (`.gitignore` covers it).
+The match is complete, so work on the code is about how it reads: names, types, prototypes and
+comments, under [`style.md`](style.md). Every change must keep the build byte-identical. All
+commands run from the checkout root.
 
 Build and score
 ---------------
 
 ```
-rm -f build/GW4E69/ok; ninja                   # must end with: main.dol: OK
-ninja build/GW4E69/report.json                 # per-function match scores
-python tools/quality/unitfns.py main/<Unit> all  # everything under 100% (None = not compiled)
-python tools/quality/sbs2.py main/<Unit> <fn>    # instruction diff, symbols masked
-python tools/quality/sbs2.py main/<Unit> <fn> sbs  # full side-by-side
+ninja                                              # must end with: build/GW4E69/main.dol: OK
+ninja build/GW4E69/report.json                     # objdiff's per-function scores
+python tools/quality/unitfns.py main/<Unit> all    # a unit's functions under 100%
+python tools/quality/sbs2.py main/<Unit> <fn>      # instruction diff against the original
+python tools/quality/sbs2.py main/<Unit> <fn> sbs  # the same, side by side
 ```
 
-Always pass `all` to `unitfns.py`: without it, functions with no score yet are hidden, which
-once made a unit look finished when it was not.
+objdiff's GUI works too: open the checkout as a project (`python configure.py` writes
+`objdiff.json`).
 
-Starting a new unit
--------------------
+`main.dol: OK` is the real check. objdiff scores by name and masks relocations, so a function
+can score 100% while a constant holds the wrong value or a jump table points at the wrong cases;
+the DOL comparison catches both.
 
-Most of the code is still covered by small auto-generated "sweep" files in `src/unsorted/`. A new
-unit claims an address range and absorbs the sweeps inside it.
-
-1. `python tools/matching/mkunit.py <Name>.c <lo> <hi> <after>.c`
-   Edits `config/GW4E69/splits.txt` and `configure.py`, and prints the sweep files it absorbed.
-   `<after>` is the unit it follows in `configure.py`. Ranges come from
-   [`filemap.md`](evidence/filemap.md) and the gaps between existing units.
-2. If sweeps were absorbed: `python tools/matching/fold.py <Name> <sweep1.c> ...`
-   Merges them, builds, verifies every folded function is exact, then `git rm`s the sweeps and
-   commits. Add `--push` only when working directly on `main`.
-3. If nothing was absorbed: create `src/<Name>.c` by hand (includes plus the functions) and run
-   `python configure.py`.
-
-Creating units from the file map
---------------------------------
-
-[`sourcefiles.md`](evidence/sourcefiles.md) names the original source files; its machine-readable copy is
-`config/GW4E69/filemap.json`. `mapunits.py` turns every file there with a strong name and a certain
-core into a unit over that core (a `NonMatching` unit with a `.text` range, a header line naming
-the file and its evidence), and folds the sweep files inside the core into it unchanged, inside
-the sweep block (see `tools/quality/sweepblock.py`). A file is left out when a named unit overlaps
-its core or a sweep crosses the core's edge.
+Naming
+------
 
 ```
-python tools/matching/mapunits.py --dry-run [--exclude A.c,B.c]   # what it would do, and what it skips
-python tools/matching/mapunits.py --only <File>.c                 # one file
-python tools/matching/mapunits.py [--exclude A.c,B.c]             # every qualifying file
-python tools/matching/mapunits.py --check                         # verify the units made so far
+python tools/naming/callgraph.py <Unit> [--unnamed]   # a unit's functions, leaves first, with
+                                                      # callers, callees, globals and strings
+python tools/naming/name.py <batch.tsv> --check       # validate a batch of function names
+python tools/naming/name.py <batch.tsv> --by "<who>"  # apply it, rebuild, log the evidence
+python tools/naming/rename.py <names.tsv>             # rename globals (symbols.txt and all uses)
 ```
 
-Use it when the map is re-run (new evidence can make more files strong) and to create a file's
-unit before matching in it; exclude files another agent is working in. Afterwards run
-`python configure.py`, rebuild (`main.dol: OK`) and compare `report.json` with the one from before:
-no function's score may change, and the exact count stays the same.
-
-Drafting C from assembly
-------------------------
-
-The unit's assembly is `build/GW4E69/asm/<Unit>.s` (generated by the build for NonMatching
-units). m2c turns it into a first draft.
-
-```
-python tools/matching/jtfix.py build/GW4E69/asm/<Unit>.s build/GW4E69/asm/<data file>.s <scratch>/u.s
-python <tools>/m2c/m2c.py -t ppc-mwcc-c --pointer-style left --globals used <scratch>/u.s > <scratch>/u_m2c.c
-python tools/matching/getfn.py <scratch>/u_m2c.c fn_A fn_B    # print single functions, no temp decls
-```
-
-`jtfix.py` is only needed when the unit has `switch` statements: it points m2c at the jump
-tables. The data file is whichever `build/GW4E69/asm/auto_*_data.s` holds the unit's
-`jumptable_XXXXXXXX` objects (`grep -l jumptable_<addr> build/GW4E69/asm/*.s`); for the game
-logic around 0x800D0000-0x80100000 it is `auto_05_801866E0_data.s`.
-
-m2c output is a starting point, not an answer. Rewrite it the way EA wrote it: real struct
-fields from `include/golfer.h`, `gPlayers[n].field` rather than cached pointers, names from
-`tw06-names.md`. Then compare with `sbs2.py` and apply the rules in `decomp-notes.md`.
-
-Closing the gap on a near-miss
-------------------------------
-
-**Try variants in bulk.** `tools/matching/trial.py` rebuilds and scores each variant of a snippet
-and keeps only an exact one. Write the script in your scratch folder:
-
-```python
-import sys; sys.path.insert(0, r'<checkout>/tools/matching')
-from trial import Trial
-t = Trial('GameMode8')
-t.trial('SpeedGolf_TickRunDelay', old_text, [variant1, variant2])   # keeps the first variant scoring 100
-t.apply(old_text, new_text)                              # plain edit, no scoring
-```
-
-**Sweep hundreds of variants.** `trial.py` takes about 15 s per variant; `tools/matching/quicktrial.py`
-takes under a second, because it compiles only the function's permuter snapshot
-(`build/perm/<fn>/base.c`, made by `perm_setup.py`) and compares it with the original. Use it for
-large sweeps (every declaration order, every spelling of a loop), then confirm the winner in the
-unit with `trial.py`:
-
-```python
-import sys; sys.path.insert(0, r'<checkout>/tools/matching')
-from quicktrial import base, score           # after: python tools/matching/perm_setup.py <Unit> <fn>
-src = base('fn_800FE3FC')
-print(score('fn_800FE3FC', src.replace(old_text, new_text)))   # differing instructions, 0 = exact
-```
-
-**Declaration order** changes register allocation. `declperm.py` tries every order of a
-function's first N declaration lines and keeps the best:
-
-```
-python tools/matching/declperm.py <Unit> src/<Unit>.c <fn> <N>
-```
-
-With more than about eight declarations, `declclimb.py` moves one line at a time and keeps each
-move that raises the score, until no single move helps (minutes, not hours; a local best):
-
-```
-python tools/matching/declclimb.py <Unit> <fn> <N>
-```
-
-Prefer an exact order close to the natural one: a reader should not wonder why the declarations
-are shuffled. When full permutations only find scrambled orders, try orders a few adjacent swaps
-from the natural one first (GameMode0 `fn_800FFDB8`: 137 of 633 such orders were exact, one a
-single swap from natural).
-
-**mwcc-debugger: see why a register differs** instead of guessing. It runs the compiler under an
-emulator and dumps the PCode between backend passes and the register allocator's priority list
-(each variable, its register, its neighbour count). About 7 s per function:
-
-```
-python tools/matching/mwccdbg.py src/<Unit>.c <fn> [--src scratch/copy.c]   # dumps in build/mwccdbg/<fn>
-```
-
-How to read it (the tool's README, https://github.com/cadmic/mwcc-debugger, explains the
-allocator): variables are listed highest priority first and each takes the lowest free register;
-a variable with more than 28 neighbours cannot be placed on the first "level" and jumps to the top
-of the list (it takes r31). Compare EA's registers with the list, find the first variable that
-differs, then change what gives it or its neighbours one temp more or fewer (`backend-00-initial-code`
-shows every temp). Example, hwsBurn HwsBurn_CopySetOptions: with `nAlign + *pOffset` the frontend loads
-`*pOffset` into its own temp, pBurn gets 29 neighbours and takes r31 instead of EA's r25.
-
-Setup, once per machine (Linux or macOS; needs gdb, cmake, Rust), both clones next to the repo
-(or set `MWCCDBG_HOME`):
-
-```
-git clone https://github.com/cadmic/mwcc-debugger
-git clone https://github.com/encounter/retrowin32 && cd retrowin32 && git checkout gdb-stub
-cargo build -p retrowin32 -F x86-unicorn --profile lto          # about 3 minutes
-```
-
-In a cloud container without IPv6, change `target remote localhost:9001` to `127.0.0.1:9001` in
-`mwcc_debugger.py` (gdb otherwise times out). The debugger supports GC/2.6, not our GC/2.5;
-`mwccdbg.py` swaps in 2.6, which compiles every unit of ours byte-identically (all 262 checked).
-
-**Replay the allocator offline** (`tools/matching/rasim.py`, from lane r6-misc): with a mwccdbg dump,
-`rasim.py build/mwccdbg/<fn> replay [--fpr]` rebuilds the compiler's priority list and colouring
-(checked against the dump: 0 differences on every function tried), and
-`rasim.py build/mwccdbg/<fn> search <lo> <hi> --summary` (or `name=r29 ...` targets) searches the
-order of the locals' vregs lo..hi (their declaration order) for EA's registers, thousands of orders
-a second without compiling. Write the winning order and confirm with a build (LLDynTex fn_8010A930:
-30 -> 4 aligned where climbs stalled, then exact).
-
-**Simulate the scheduler** (`tools/matching/sched750.py`, from lane b8): MWCC's list scheduler and
-its 750 machine model, transcribed from mwcceppc.exe, run on a mwccdbg dump. Use it when the
-registers are right and only the order inside a block differs:
-
-```
-python tools/matching/sched750.py predict build/mwccdbg/<fn> B23          # both passes vs the real ones
-python tools/matching/sched750.py deadsearch build/mwccdbg/<fn> B23 ea.txt  # which dead value gives EA's order
-```
-
-`ea.txt` is EA's order of the block, one `op args` per line in the dump's notation. `deadsearch`
-tries a dead `srawi` (a `(u32)(s64)(s32)x` round trip) or an extra copy of each value of the block,
-with the registers held fixed; confirm a hit with a build. The docstring has the model, its exe
-addresses and its assumptions (fn_800949D0 closed from its lead).
-
-**The permuter** searches random rewrites for you. It is slow (minutes to hours) but has solved
-functions nothing else did (`GameModeSkillZoneTimed_CheckShotAwards`: the loop counter had to be `long`).
-
-```
-python tools/matching/permute.py <Unit> <fn> --minutes 20 -j 4
-```
-
-It sets up `build/perm/<fn>`, runs the permuter and stops it at the time limit, killing the whole
-process tree (Git Bash's `timeout` does not stop it on Windows; a run once went 51 minutes). The
-machine is shared, so keep `-j 4` or less (the script caps it; on an idle many-core machine
-`--max-jobs 18 -j 18` lifts the cap, e.g. an overnight `--minutes 480` run). Output lands in `build/perm/<fn>/output-*`. Read the diff it found and apply the idea by hand;
-its code is often ugly but it points at the real change (a type, an order, a temporary).
-
-**The lever sweeper** tries the changes that have actually fixed near-misses (declaration moves,
-int/s32 spellings, an identity inline on an assignment, `*=` splits, loop forms, `(u32)` index
-casts, two adjacent independent assignments swapped), singly, in pairs and deeper, instead of
-random rewrites. CPU only, src/ untouched; meant
-for a whole night on every core:
-
-```
-ninja build/GW4E69/report.json
-python tools/matching/leversweep.py --from-report --min 95 -j 20      # ~6 min per function
-python tools/matching/leversweep.py <Unit> <fn>                        # one function
-```
-
-Results: `build/leversweep/summary.tsv` (one row per function: base, best, EXACT, safe/review, the
-levers) and `build/leversweep/<fn>.txt` (the best variants and the changed lines). A hit is a
-candidate: apply it to the unit, confirm it in the real build, and check the meaning. "review" levers
-change behaviour for some values (a signedness, a do/while as while) or may (a swap that stores
-through memory or to a global, which a pointer could alias); an identity inline is a fake
-match (look for EA's helper in TW07 first, else `fn_<caller>_Read` with `// fake match:`).
-`leversweep_selftest.py` sweeps functions already solved, from their source before the fix: on
-2026-09-25 it rediscovered BreakLine_Reset, GoDynObj DynObj_DrawGolfBalls (a two-change pair), GoTerrain
-Ter_DrawPatchPass and Glows fn_800981D0; the swap lever finds AI_ChooseTarget's fDX/fDZ order (112 -> 90
-with other levers in 4 min; the PC permuter found it first).
+`name.py`'s docstring describes the batch format: address, current name, new name, tier,
+evidence codes, evidence, purpose and an optional comment. Every name lands in
+`config/GW4E69/name_sources.tsv`. Name leaves first: a caller reads better once its callees have
+names.
 
 Before you commit
 -----------------
 
 ```
-rm -f build/GW4E69/ok; ninja                          # main.dol: OK
-python tools/quality/lint.py --diff main                # style check on the lines you changed
-python tools/quality/typeaudit.py --count               # no number higher than on main
-python tools/quality/symaudit.py --count                # no number higher than on main
-python tools/quality/constcheck.py --unit <Unit>        # 0 mismatches in the units you touched
+ninja                                         # main.dol: OK
+python tools/quality/lint.py --diff main      # style findings on the lines you changed
+python tools/quality/typeaudit.py --count     # no number higher than on main
+python tools/quality/symaudit.py --count      # no number higher than on main
+python tools/quality/constcheck.py --count    # no number higher than on main
 ```
 
-Lint must report 0 findings on your lines (see [`style.md`](style.md) for each rule). If a file
-you own has older findings, clean them as part of your work, keeping every function exact. A file
-that does not compile is a finding too (`compile-error`): the undefined-behaviour checks need the
-compiler's warnings.
+- `lint.py`: the rules in `style.md`, plus a compile with warnings for undefined behaviour.
+- `typeaudit.py`: globals declared with different types in different files, types defined twice,
+  and `extern`/`typedef` lines in `.c` files.
+- `symaudit.py`: each global's declared size against `symbols.txt`. A global of 8 bytes or less
+  lives in small data (reached through r13/r2); declaring it larger, or unsized
+  (`extern u8 x[];`), changes every access.
+- `constcheck.py`: the bytes each function's constants load, ours against the original's, with
+  the expression that reproduces a mismatch (`1.0f / 72.0f`, not `0.0138889f`).
 
-`typeaudit.py` counts globals declared with different types in different files, types defined in
-more than one file, and `extern`/`typedef` lines written in `.c` files (they belong in headers).
-`symaudit.py` compares each global's declared size (the compiler's own `sizeof`) with its size
-and section in `symbols.txt`: a global of 8 bytes or less lives in small data and is reached
-through r13/r2, so declaring it larger, or unsized (`extern u8 x[];`), makes every use compile to
-lis/addi instead. It also checks `static` against the symbol's scope where symbols.txt knows it.
-`symaudit.py --all` lists partial views too (a declaration smaller than the object).
+If the DOL check fails, `python tools/quality/doldiff.py orig/GW4E69/sys/main.dol
+build/GW4E69/main.dol` prints the differing ranges.
 
-**Constant values.** objdiff masks relocations, so a function scores 100% whatever value its
-constants hold: `lfs f1, @24@sda21(r2)` matches whether `@24` is 1/72 or `0.0138889f`, a few bits
-off. The DOL check only catches it once the unit is linked, and a port inherits the wrong value
-meanwhile.
-`constcheck.py` reads the bytes each 100% function loads, in our object and in the original's, and
-lists every difference (floats, then strings, then other data), suggesting the expression that
-reproduces the original exactly:
+Data built from your disc
+-------------------------
 
-```
-python tools/quality/constcheck.py --unit Ball          # one unit
-python tools/quality/constcheck.py                      # every unit, summary first
-python tools/quality/constcheck.py --count              # one number (merge ratchet)
-Ball.c Ball_Holed +0x38: ours 0x3C638E45 (0.0138889002) orig 0x3C638E39 (0.013888889 = 1/72?)
-```
+A few objects are Nintendo data or game assets whose bytes can't be committed: the AX library's
+compressor table and DSP microcode (`AXComp.c`, `DSPCode.c`), DiscError.c's font, startUp.c's
+boot sounds and two textures. `tools/build/gendata.py` reads them from your own
+`orig/GW4E69/sys/main.dol` into `build/GW4E69/gen/` before compiling, using the addresses and sizes
+in `symbols.txt`. To add one, add a line to its `FRAGMENTS` table and `#include` the generated
+fragment from the unit that defines the object.
 
-A mismatch usually means a literal typed out to a few digits: write it the way EA did,
-`1.0f / 72.0f` or `DEG(30.0f)`, and rerun until the unit shows 0.
+Rules
+-----
 
-Finishing a unit
-----------------
-
-A unit is done when it is linked, not when its functions score 100%. `NonMatching` units are
-compiled for scoring only; the DOL is still built from the original code for them. Once every
-function is exact, change the unit to `Object(Matching, ...)` in `configure.py`, run
-`python configure.py`, and rebuild: `main.dol: OK` now proves the unit byte for byte.
-
-If the DOL fails, the unit's data does not line up yet: its float constants (`.sdata2`) or
-switch tables (`.data`) are still split into the surrounding `auto_*` units, so linking adds a
-second copy. The steps:
-
-1. `python tools/matching/datamap.py <Unit>` lists the data sections our object emits and, for each
-   constant, the original symbol, its address and size, and which units use it.
-2. Continue only if the unit is the only user and the addresses are contiguous. Each object's
-   `.sdata2` is 8-aligned, so a lone 4-byte float owns 8 bytes; a range runs from the unit's first
-   constant to the next unit's first constant, and its length equals our section size rounded up
-   to 8.
-3. `python tools/matching/graduate.py <Unit>.c ".sdata2 0x... 0x..." [".data 0x... 0x..."]` adds the
-   ranges, switches the unit to Matching and rebuilds; it puts both files back if the DOL fails.
-4. Still failing: `python tools/quality/doldiff.py orig/GW4E69/sys/main.dol build/GW4E69/main.dol`
-   prints the differing ranges. A shifted block inside the unit's `.text` means a function is
-   defined out of address order (objdiff scores by name, so it still showed 100%); differences
-   only in data mean a range is wrong.
-5. Uninitialised globals (`.bss`/`.sbss`): define each one the unit owns in the unit's file, with
-   its true type and size, non-static, in REVERSE address order (CodeWarrior lays an object's `.bss`
-   out last-defined-first), then add the unit's `.bss` range to splits.txt by hand (graduate.py only
-   takes `.sdata2`/`.data`). Remove the matching `extern` from the header only if no other file
-   uses it; otherwise the header keeps the `extern` and the owner file has the definition.
-6. Stop and report, don't force it, when one of our constants maps to two original symbols (the
-   original was two files) or the constants are shared with neighbouring code (the unit is a
-   slice of a larger file).
-
-Leave the unit `NonMatching` until the DOL passes. Linking is also the only real check of
-`switch` statements: objdiff masks relocations, so a jump table pointing at the wrong case bodies
-still scores 100% until the DOL comparison catches it. Until then, `constcheck.py --unit <Unit>`
-(see "Before you commit") is the check for the constants' values.
-
-Units generated from main.dol
------------------------------
-
-Two SDK units hold only Nintendo data that no public decomp has: the AX library's `AXComp.c`
-(`__AXCompressorTable`) and `DSPCode.c` (`axDspSlave`, the DSP microcode, and
-`axDspSlaveLength`). Their bytes may never be committed, so their C is generated from the user's
-own `orig/GW4E69/sys/main.dol`: `tools/build/gendata.py` reads each symbol's address, size and
-alignment from `config/GW4E69/symbols.txt`, maps the address to a file offset through the DOL
-header and writes `build/GW4E69/gen/AXComp.c` and `DSPCode.c` (git-ignored, like all of `build/`).
-`python configure.py` writes them (the Objects need the files to exist) and `build.ninja` rewrites
-them before compiling whenever the DOL, `symbols.txt` or the script changes. The two Objects in
-`configure.py` point at them with `src_dir=gen_dir`. CI runs the same configure and ninja steps
-after copying the DOL in, so it generates them too.
-
-Game data that is an asset (art, sound) is handled the same way, one object at a time: the game
-unit's own C defines the object and `#include`s its initializer between the braces, and
-gendata.py's `FRAGMENTS` table writes that fragment (`build/GW4E69/gen/<name>.inc`, a comment
-saying it is generated and never committed, then the values) in the same pre-compile step. The
-game units' flags (and `lint.py`'s compile) have `-i build/GW4E69/gen`. So far: DiscError.c's
-font (`DiscError_font.inc`), startUp.c's two boot sounds (`startUp_sound0.inc`, `_sound1.inc`)
-and Code8009AA28.c's two blobs (`Code8009AA28_tex0.inc`, `_tex1.inc`). To add one, add a line to
-`FRAGMENTS` (symbol and element size) and write the definition in the unit. Code, tables and
-text stay ordinary C.
-
-When stuck
-----------
-
-Leave a near-miss at its best score and move on: the next function is usually faster than the
-last percent of this one. Note what was tried in the commit message or a comment above the
-function so the next attempt starts further ahead.
+- Every commit ends with `main.dol: OK`.
+- No game files (the DOL, disc images, art, sound) and no official SDK files in git.
+- Edit C and headers with an editor or a saved script, never with `sed` or heredocs.

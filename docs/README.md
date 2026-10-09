@@ -9,9 +9,9 @@ yet checked against the code (verify before relying on one).
 | File | What | Status |
 |---|---|---|
 | [getting_started.md](getting_started.md) | set up and build the project | current |
-| [style.md](style.md) | how the C must read; where names and comments come from | current |
+| [style.md](style.md) | how the C must read: names, comments, types, fake matches | current |
 | [infrastructure.md](infrastructure.md) | where things run, git flow, CI, the public page, decomp.dev | current |
-| [workflow.md](workflow.md) | every command: build, objdiff, the matching and naming tools | reference (to be rewritten with the new workflow) |
+| [workflow.md](workflow.md) | the commands: build, score, name, check before a commit | current |
 | [../src/README.md](../src/README.md) | the code map: 20 subsystems, what each source file does | current |
 
 ## The compiler: [`compiler/`](compiler/)
