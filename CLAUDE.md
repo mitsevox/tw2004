@@ -13,7 +13,7 @@ Rules:
 - Every function and global gets a name, logged with its evidence in
   `config/GW4E69/name_sources.tsv` (`tools/naming/name.py`).
 - Comments explain what the code does in the game. No `port:` notes; EA bugs go in
-  `docs/evidence/notes/2026-09-28-ea-bug-register.md`, not in the code.
+  `docs/game/ea-bugs.md`, not in the code.
 - No game files or official SDK files in git. `extern/` holds only public decompilations.
 - Edit C and headers with an editor or a saved script, never with sed or heredocs (they mangle
   backslashes).

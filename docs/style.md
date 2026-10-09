@@ -52,7 +52,7 @@ pool"), in plain words, where the code alone doesn't say it. That's all a commen
 - One label is allowed: `// fake match: <why>`, on code written only to make the compiler match
   (below), so it can be found and fixed later. Bugs in EA's own code are worth knowing, but they
   are listed in
-  [`evidence/notes/2026-09-28-ea-bug-register.md`](evidence/notes/2026-09-28-ea-bug-register.md),
+  [`game/ea-bugs.md`](game/ea-bugs.md),
   not in the source.
 
 Data and types

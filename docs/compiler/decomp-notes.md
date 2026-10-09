@@ -88,10 +88,10 @@ The fixes that come up most often. Each points to its full entry below.
 
 - **Read EA's later source first, when there is one.** A debug build of a later game from the same
   studio and engine keeps EA's own declarations. For this game, TW07's PS3 debug info is split per
-  source file in `reference/tw07-ps3/cu/` (made by `tools/match/tw07dwarf.py`, removed 2026-10-03; a machine
+  source file in `reference/tw07-ps3/cu/` (a machine
   pairing of our functions with TW07's is `reference/tw07-ps3/pairs.tsv`). The compiler
   differs, but the programmers' style carried over three years, and it decides register
-  allocation. **[verified]** on 16 functions in one session (2026-09-24), in five patterns:
+  allocation. **[verified]** on 16 functions, in five patterns:
   - **EA's types:** a player index typed as EA's enum `PlayerNumber_t`, not `int`/`s32`, made four
     Earnings functions exact; one `s32` -> `int` parameter fixed a PGA Tour loop.
   - **EA's local order:** `i` before `bMoved` (DynTex compaction), the quaternion maths, a music
@@ -105,7 +105,7 @@ The fixes that come up most often. Each points to its full entry below.
     last made its CALLER exact (a prototype change: rebuild every linked user).
   About half of the TW07 attempts do not help (the code moved on in three years): treat it as the
   first hypothesis, never as a fact, and never copy a name or comment from it into the source
-  without the audit (docs/style.md "Where names and comments come from").
+  without reading the function against it.
 
 - **Every float constant: read its hex from the original's data and write the exact expression
   EA wrote.** EA writes fractions and unit conversions, not decimals: `1.0f / 72.0f` (0x3C638E39),
@@ -151,742 +151,6 @@ The fixes that come up most often. Each points to its full entry below.
 - Every function at 100% but the DOL hash fails: check the unit's data sections, `.sdata2`
   constants and `splits.txt`. See [Data](#data-constants-and-symbols).
 
-### New from the map-first run (2026-09-23)
-
-These were found by the map lanes; each was verified by changing only that and watching the score move.
-They will be sorted into the sections below.
-
-- **[verified] A `u8` result that the caller stores without `clrlwi` means the callee returns `int`/`s32`.**
-  CodeWarrior masks a `u8` return at the call site. The reverse also holds: an `int` local returned from a
-  `u8` function gives `clrlwi r3` at the return (`u8 b` there gives `mr r3`). FE_MessageTable GM_vEASBioGetLevel
-  (91.25 -> 100 with an `s32` callee), GameMode4Menu LadderMap_IsRegionFinalNode (92.5 -> 100 with `int b`),
-  GameModeDriver IsAMonthAhead and 5 others.
-- **[verified] Front-end `MsgArg` handlers read every argument into locals before the first store.**
-  GameMode4Menu LadderMenu_SetNodePos: `p->fX = pArgs[1].f` -> `f32 fX = pArgs[1].f; ...; p->fX = fX;`, 49.4 -> 100
-  (LadderMenu_GetNodePos 79.9 -> 100, LadderMenu_GetFirstAndCursorNodePos 67.1 -> 100).
-- **[verified] Operands that are both calls are evaluated right to left.** `fn(5) + fn(4)` calls `fn(4)`
-  first; for arguments, `f(g(), h())` calls `h()` first. To call in source order, use a temporary.
-  CourseData GM_GetTotalPar, sweep_800D3208 (99.87 -> 100).
-- **[verified] `x = f(); if (x == NULL) { while (x == NULL) {...} }` gives CodeWarrior's "test the result,
-  then jump to the loop test" shape** (`cmplwi r3,0; bne end; b test`). StaticMemory StaticMem_Init 96.15 ->
-  100 (mark it `// fake match` if the outer `if` is redundant in the source).
-- **[verified] A count-down fill `n = count; i = 0; while (n-- > 0) a[i++] = v;` gives
-  `cmpwi n,0; ble; srwi. n,3; mtctr ... andi. 7`.** A `for (i = 0; i < n; i++)` gives `cmpwi n,8; subi`
-  (49%); plain `while (n--)` gives `beq`. GameHoleContests HoleContest_InitForHole.
-- **[verified] A loop over a global table with a dead `li r7,0; cmpwi r7,13; bge` before the unrolled body
-  wants an `s32` counter.** Glows fn_80098740: `int i` 77.4, `s32 i` 100.
-- **[verified] Take a pointer to the array element before the first store when a loop both reads fields
-  and calls with the element.** UIStudio fn_80168B80: `pScreen = &p->pScreens[i]; bOut = 0; ...`,
-  41.5 -> 100. UISScreen fn_8016C5C4 (77 -> 100). The opposite also happens (emotion fn_8006BAA8 wants
-  `gX[n].field` written out), so try both.
-- **[verified] A lone `cmpwi` with no branch at the end of a void function is `if (nErr != 0) return;`.**
-  An empty `if (...) {}` is removed entirely. TibExt fn_80122834 68.8 -> 100.
-- **[verified] `bResult = a && b;` shares the `li rX,0` of an earlier zero store and narrows later;
-  `bResult = 0; if (a && b) bResult = 1;` doesn't.** emotion fn_8006BB5C 98.2 -> 100.
-- **[verified] A range test on a state written as an unsigned byte: `(u8)(n - 2) <= 2`** gives
-  `subi; clrlwi 24; cmplwi 2`. target fn_80067CD4 92.8 -> 98.0.
-- **[verified] Comparing a call's result with a field: the inline form puts the field first (`cmplw r0,r3`);
-  a local for the result puts it first (`cmplw r3,r0`).** MC MC_SaveGameIsValid 99.69 -> 100.
-- **[verified] Writing a float's bits through a union drops an earlier dead store; a pointer cast
-  (`*(u32*)&f = ...`) keeps it.** urandom Rand_Float 88.2 -> 100. Mark it `// port:` (a port needs
-  `memcpy` or `-fno-strict-aliasing`).
-- **[verified] MWCC treats `s32` (long) and `int` as different types when redeclaring, and an empty `()`
-  prototype clashes with one whose parameters are promoted (u8, s8, u16, s16, f32).** `void f(); void
-  f(int)` compiles; `void f(); void f(u8)` does not. `tools/matching/declcheck.py` finds these before a fold.
-- **[verified] Plain `ninja` does not compile NonMatching units.** Build `ninja all_source` (or the unit's
-  `.o`) to see compile errors; merge.py does.
-
-### New from the fill-in run (2026-09-24)
-
-- **[verified] Split long arithmetic into statements to keep EA's grouping.** `(a + b - 1)` is regrouped
-  as `a + (b - 1)`; `u = a + b; u = (u - 1) & ~(a - 1);` keeps it (UMemPool fn_8000AFA0 84.0 -> 98.9). A
-  `+`/`-` chain of divisions gets reordered the same way (EASBStorage fn_801288DC 96.7 -> 100, five
-  statements). `d - (d/365)*365` is `d % 365`.
-- **[verified] A ternary loads its else-value first.** `(u > m) ? m : u` -> `(u <= m) ? u : m` when the
-  original is `mr r0,m; bgt; mr r0,u` (UStream fn_8000E790 99.57 -> 100).
-- **[verified] Parameters are copied to saved registers in declaration order, across int and float
-  registers**; swapping `(f32* pOut, f32 fAngle)` flips `fmr f31,f1` / `mr r31,r3` (Quaternion fn_800093AC
-  92.0 -> 100). Only reorder when the callers' asm agrees.
-- **[verified] `if (n > 0) do {...} while (--n > 0);`** gives `mr. rN; ble ... subic. rN; bgt` (char
-  ByteSwap_Records 91.7 -> 100).
-- **[verified] In a loop whose condition loads `*p`, write `*p = *p + 1`, not `(*p)++`**: the original
-  reuses the loaded value (EASBStorage fn_8012835C 95.0 -> 100).
-- **[verified] A string copy that walks a copy of its destination returns the destination** (r3 untouched
-  on every path): `char* f(dst, ...) { ...; return szDest; }` (EASBStorage fn_80128BF8 94.3 -> 100).
-- **[verified] Chained stores `p->a->pPrev = p->a->pNext = p->a;`** give load, store to itself, reload,
-  store (GoARAM fn_800B5C40 99.6 -> 100). Popping a list head re-reads through the head field:
-  `pHeap->pSpare = pHeap->pSpare->pNext` (fn_800B5F4C 92.8 -> 100).
-- **[verified] A value compared inside a loop is often computed into a local as the loop's first
-  statement** (GoARAM fn_800B5E88 94.3 -> 100).
-- **[verified] A call result kept in a named local and copied into the loop counter** (`nFirst = f(); for
-  (n = nFirst; ...)`) matches where initialising the counter directly does not (FE_CrAPDB FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum,
-  FE_CrAP_IsItemEquipped).
-- **[verified] A lone flag test before a non-void return is `if (flag) return X; return X;`** (the void
-  rule above, for value returns; FE_CrAPDB FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum 88.7 -> 94.0).
-- **[verified] `!(u & bit)` as an argument gives `rlwinm; cntlzw; srwi 5`; `(u & bit) == 0` gives
-  `extrwi; xori`** (UKernel Kernel_ReleaseObject 91.9 -> 100).
-- **[verified] `x * (1.0f / 512.0f)` puts the constant first in `fmuls`; `x / 512.0f` puts x first**
-  (uiText UIText_Draw 97.0 -> 98.7).
-- **[verified] `(old & 0xFFFFFF) | (v << 24)` gives `slwi` + `rlwimi` into old; the other operand order
-  inserts v the other way** (Code8009B340 fn_8009B340 96.7 -> 100). A bitfield store gives `stb` instead.
-- **[verified] A shared product kept in a local sets the `fmadds` operand order** (UMemPool mat44flt_EulerAngles).
-- **[verified] A param compare gives `cmpwi` only when both the parameter and the field it is stored to
-  are `int`** (GoARAM fn_800B65C0: u32 99.3, int param only 97.2, both int 100).
-- **[verified] The stack frame does not fix a local char buffer's size** (GoDynamicCam fn_8003C9D0 exact
-  with 12..0x18 bytes): say in a comment that the size is unknown.
-- **[verified] Angles: write `x / 180.0f * PI`, not `DEG(x)`.** MWCC rounds some `DEG()` products one bit
-  off EA's constants (175, -17, -5 degrees); objdiff masks it, constcheck catches it (GoLighting
-  fn_8006EDC0).
-- **[verified] A local `int` copy of an `s32` parameter survives as its own register** (an s32 copy is
-  merged away). MC_Gc's CARD waits: `int nChan = nPort;`, 8 functions 73-99 -> 100. Mark it fake match.
-- **[verified] When every caller masks a result with `clrlwi`, declare the callee `u8`** even if its body
-  shows no mask (UStream_Update: callers FEgolferanim FE_StreamFunc_SkinUpdate 97.0 -> 100). The callee's own score
-  does not decide it; the callers do.
-- **[verified] A `const` source pointer lets CW hoist an unrolled copy loop's loads above its stores**;
-  drop the `const` when the original alternates load/store (DynamicRenderingBuffer fn_800705F0 83 -> 100).
-- **[verified] Test one flag bit as `(u & bit) >> n`, not `(u >> n) & 1`** (same `extrwi`, different
-  epilogue order; FE_MessageTable GM_vMCIsCardPresent 99.3 -> 100).
-- **[verified] A call made in every branch of an if-chain is one call after it**, with the arguments
-  picked per branch (GoFog FG_vBlendFogForCamera 91.3 -> 98.75). `(f32)sqrt(...)` must be cast before
-  multiplying by a float constant, or the multiply is done in double.
-- **[verified] A call or global load on the right of a comparison is evaluated first**: write
-  `f(n) + 1 < rec`, not `rec > f(n) + 1`, when the original calls first (HoleScore GameAnalysis_IsShotForRecord 78.7 ->
-  98.8).
-- **[verified] `do {} while (++i < 4)`** for a 4-step loop with no ctr and the test at the bottom (UKernel
-  Kernel_PostPairToObject 80.5 -> 100).
-- **[verified] A struct's size can be proved by a `Mem_cpy` of it** (CamScript 0x118).
-- **[verified] `li r3/r4` missing before a call is not a missing argument**: CW reuses a still-live
-  argument register (char Character_SetClubsAndClothes).
-- **[verified] Two null tests that each go straight to the exit are two `return`s, not `||`** (`beq end;
-  lwz; cmplwi; beq end`; animblender SKABlendData_Shutdown 98.8 -> 100).
-- **[verified] Keep a call result in a named local when it is an index, a compare operand or an argument
-  inside an iterator loop.** It sets the `mulli`/`add` order (GoDynObj DynObj_LoadBallLogos, also for `Rand % n`
-  in GoStaticCam fn_80064F7C) and the `cmplw` operand order (char Character_GolferStreamCallbackIG; swapping the operands does
-  not help), and it matches inside iterator loops (hwsBurn HwsBurn_MarkOption). A `u8` flag argument computed
-  before intervening float tests also goes in a local first (animblender SKABlender_BlendLinear 65.6 -> 98.2).
-- **[verified] A `switch` inside a loop lays out its case bodies in source order**, not case-value order
-  (GoStaticCam StaticCam_CheckHotZone).
-- **[verified] `(uptr)` casts give the same code as `(u32)` for address arithmetic**: use them, they are
-  64-bit safe (Terrain_HeightAt).
-- **[verified] An inlined helper keeps its own shape**: `&&` conditions in the inlined copy can match while
-  the real function needs nested ifs (GoStaticCam fn_8006509C / fn_8006596C).
-- **[verified] Stores after a divide-by-w are scheduled z first**: write `z = 0` before x and y (GoDynObj
-  DynObj_GetBallPixels).
-- **[verified] A `u8` function returning an `int` local** gives the `li; li; clrlwi` join; a `u8` local lets
-  CW use `bnelr` (LLDynTex fn_8010BF3C 80 -> 100).
-- **[verified] A parameter reused as the running pointer** is the parameter itself, not a new local (char
-  Character_SwapTexEntries 95.3 -> 100).
-- **[verified] Copy a `u16` field to a `u32` local before shifting** it into a pointer offset: plain `slwi`
-  instead of `clrlslwi` (SkinMorph SkinMorph_StoreMesh 95 -> 100).
-- **[verified] `!(a ^ b)`** gives the original's `xor.` where `a == b` gives `cmpw` (u8 field vs int
-  parameter; Glows fn_800985FC).
-- **[verified] The order of a for-loop's increments sets the order of the `addi`s** (hlaudmovie
-  Ses_ProcessSampleData, AudTable Emi_UpdInstance).
-- **[verified] A `(u8)` cast on each argument to an `int` parameter is computed once (CSE)**; a `u8`
-  parameter masks at every call (Particle fn_80094534 91.3 -> 96.4).
-- **[verified] Read fields into locals before a run of matrix stores**, or CW reloads them after each store
-  (Glows fn_80098408 80.6 -> 94.5).
-- **[verified] Calls inside a later argument can run before a call in an earlier one**: write the
-  expression inline as the argument (GoTerrain Ter_RenderView 96.7 -> 100).
-- **[verified] `(int)` before a float-to-u8 conversion** gives `fctiwz` + `clrlwi` (GoComicCam ComicCam_Init9ScreenRapidMode).
-- **[verified] Set every loop cursor and end pointer as plain statements at the head of the loop**, in the
-  original's order; an end pointer can double as the backward cursor (hlaudvoice Voc_ResetModule 78 -> 100).
-- **[verified] EA's message-list macro is `aMsgs[n] = x; n++;`**, not `aMsgs[n++] = x` (GameMode26
-  GameMode26_ScoreShot, GameMode22 GameMode22_ScoreShot 91.4 -> 94.1). `PLAYER(i)->` instead of `gPlayers[i].` fixed both
-  twins' loops (GameMode26_ClearPlayerStats, GameMode22_ClearPlayerStats, about 73 -> 100).
-- **[verified] `(u32)` of a float held in a local calls `__cvt_fp2unsigned`**; the same cast of a literal is
-  folded (DynChain fn_80116304 75.5 -> 95.4).
-- **[verified] A 64-bit id packed from u16s**: `u <<= 16; u |= p[i];` gives `slwi; or`
-  (ShaderObjectsData fn_80074A24 67.7 -> 100).
-- **[verified] A call whose result EA ignores is a bare call statement**; assigning it to a later-overwritten
-  pointer keeps a dead `mulli`/`add` (FEgolferanim FE_CharPositionOverwrite).
-- **[verified] A command reader returning the advanced pointer** wants the advance in its own local or as a
-  post-increment in the `switch` (ShaderObjectsData fn_80074BE0, fn_80074CF4).
-- **[verified] A divide EA kept (`fdivs` by 1.0)** was a local set to 1.0f (FEgolferanim).
-- **[verified] Divide by a power of two, not multiply by the reciprocal**: `/ 2.0f` gives `fmuls` with the
-  dividend first (char Character_CalculateClipPoints). A stack vector can need `[4]` though only 3 are used, for the
-  offsets after it (char Character_ClipTest).
-- **[verified] A counted skip loop written counting down** gives CW's ctr loop with no index register
-  (Grass_Gc Static_Render 92.5 -> 96.5).
-- **[verified] Float tests: `if (f)` / `!f` put the value first in `fcmpu`**; `f != 0.0f` and `0.0f != f`
-  both put the zero first (GoTerrain Ter_CourseLoadCallback, TerrainData Network_DownloadDataPNB, GoPostFx fn_80039358). A float
-  `!(x < c)` gives a plain `blt` where `x >= c` gives `cror` (GoCamCont CameraController_PostEvent).
-- **[verified] Pointer plus integer always puts the pointer first in `add`**; adding as integers
-  (`(u8*)(n + (uptr)p)`) flips it (UMemPool fn_8000AFA0, marked fake match).
-- **[verified] Early exits:** `if (A || B) return;` compiles B as `bcond; b exit` while separate ifs
-  branch straight out (GoCamCont CameraController_CameraCollision); a `blt` to a return block placed after the fall-through
-  code is a `goto` to a label after that code (char GetTerrainHeightAndNormal); a duplicated tail is
-  written twice (`if (n < 30) { if (x) return 1; return t; } return t;`, fe_craputils UserInfo_IsGolferAvailable).
-- **[verified] `b = b != 0;`** before a test reproduces `clrlwi; neg; or; srwi.` (char Character_PreRenderAll).
-- **[verified] Two calls multiplied: the right-hand one runs first** (`f(a) * f(b)`; Skeleton SKEL_ItterateIKChain,
-  GoRenderCtx RenderState_SetViewport). `f = call(); f *= c;` puts the call result first in `fmuls`; `call() * c` puts
-  the constant first (GoCamCont CameraController_LagSideVector, TexAnimManager fn_80076C20).
-- **[verified] A switch's compare tree shows its empty cases**: add `case 0: case 3: break;` to get it
-  (GoAnimalActors ActAnimal_Update, GoLighting fn_8006E7A4); a one-case switch with default gives `beq A; b B`
-  where if/else gives `bne` (CharAnim UpdateSKAState).
-- **[verified] A field reloaded at every use of a small formula** means EA used a macro, not an inline
-  (GoAnimalActors ANIMAL_WAVE 94.4 -> 98.3).
-- **[verified] Keep call results in named locals** before passing them on (uiProcessInterface
-  UI_FindTexture 93 -> 100), before using them as a base pointer (DynamicCam_GetLocation), and put a loop
-  bound read through a pointer in a local to get the ctr loop (uiProcessInterface UI_FindColorTable 58 -> 97).
-- **[verified] `&a[i]` indexing matches where hand-walked pointers don't** (fe_movies UIPoly_Draw,
-  ActAnimal_SetWorldMatrix, SitDevFile SitDev_InvokeAction 74.7 -> 98.8).
-- **[verified] `const` on read-only pointer parameters changes argument-load order** (EASBStorage
-  fn_80129F98 94.4 -> 100, fn_8012A050 90.2 -> 100, fn_80128580 83.8 -> 100).
-- **[verified] A constant left in r5..r8 at a call is not always an argument**: it can be left over from a
-  store just before (fe_craputils UserInfo_UnlockGolfer, fn_8012B4C0, Code800BA940 fn_800BAA50). Check before
-  adding parameters.
-- **[verified] `volatile` on a global that interrupt callbacks write** (LLDisp_Gc's DispSync) fixed five
-  functions at once; this is real volatile, not a fake match.
-- **[verified] A caller's `extsb` on a result means the callee returns `s8`** (Caddie_GetTip); a `u16`
-  parameter fed `(s16)(s8)f()` gives `extsb; clrlwi 16`.
-- **[verified] `UISEvent.c` was built with `-pragma "pool_data on"`** (strings through one base register).
-- **[verified] Zeroing: a variable that already held a value gets its zero by `mr` from another zeroed
-  register; a variable set for the first time gets its own `li r,0`.** So when the original has two `li`s
-  and ours `li; mr`, give the second zero a fresh variable (a new loop counter), and the reverse for one
-  `li; mr` (Earnings HighScoreRecords_GetEndOfGameRecord, hwsBurn HwsBurn_BuildDesc, GameMode5 PlayNow_StartChallenge, GameHoleContests
-  HoleContest_DrawHoles; `a = b = 0`, types and statement order make no difference). A search written as an
-  inline helper hands its index back by `mr`; the same loop written in the caller gets `li` (UISEvent
-  fn_80165D2C, fn_80165D90).
-- **[verified] `int` and `s32` allocate differently, in both directions**: an `s32` parameter where `int`
-  fails (GoDynObj DynObj_DrawTargetModels 94 -> 100), `int` locals where `s32` fails (GM_vGetPar5EagleDate 92 -> 100).
-- **[verified] Block-scoped locals per switch case** allocate differently from one function-level local
-  (EventInfo PGATourPopup_GetRow_EventInProgress); case labels merged into `default` (`case 3: default:`) reshape the compare
-  tree or jump table (event EVENT_PlayerEmotionUpdated, NextShotType), and extra empty cases make the tree test a value
-  first (Controller_Gc Input_vUpdate: `case -2: case -3: break;`).
-- **[verified] Return a local instead of an expression** so the register restores come before the last
-  arithmetic (LLDynTex fn_8010B6AC 90 -> 100); round up through a local written back
-  (`n = a + *p; n = (n - 1) & ~(a - 1); *p = n;`, hwsBurn HwsBurn_CopyAligned); a round-up division only matches
-  as `(size - 1 + n) / size` (MC_Gc MC_MountCard).
-- **[verified] `static const` locals for constant struct arguments** load just before each call where
-  initialised locals load at entry; pass a global struct field by value directly, not through a local
-  (streammanagerhole RenderState_Apply).
-- **[verified] A local pointer to the array element flips `cmpw` operands** where swapping the `==`
-  operands doesn't (GoTerrain Ter_DrawGrassPatchesPass3); `if (x) return 0; return 1;` in a `u8` function gives
-  `cntlzw; srwi` where `return x == 0;` adds a mask (hwsRender_Gc fn_80112B80).
-- **[verified] EA's abs is `(v + (v >> 31)) ^ (v >> 31)`** (`srawi; add; xor`); MWCC's `__abs` gives
-  `xor; subf` (ShaderObjectsData fn_80074628).
-- **[verified] A caller's `cmpwi` on a returned pointer means EA tested it as a signed number**:
-  `(s32)f() != 0`, marked fake match with a port note (GoPostFx fn_80037E50).
-- **[verified] A near-100 function whose only difference is a branch target can be a real behaviour bug**
-  in our C (PsMgr fn_800A27FC: two calls outside their block; SitDevFile SitDev_SuppressAction: wrong `&&`/`||`
-  grouping). Check branch-only mismatches before calling them register noise.
-- **Linking (tools):**
-  - A unit's `.data` range ends at its own 8-byte alignment, not the next object's 32-byte alignment
-    (GoARAM). The last object in `.sdata`/`.sbss` ends at the true section end, not rounded to 8 (CARD).
-  - A linked unit cannot be `--extend`ed over a gap until every gap function is exact (the Matching C
-    must define them all).
-  - The linker strips functions nothing calls, with their constants and `.sbss`; a misnamed caller can
-    make a used function look unreferenced (CARDSetAttributesAsync).
-  - A dead instruction after an asm function's tail branch (`b TRK_main; blr`) must be counted in the
-    function's `symbols.txt` size. Otherwise dtk makes a `gap_` symbol from it and objdiff scores the
-    function below 100 although the DOL links (InitMetroTRK: size 0x94 -> 0x98, 97.3 -> 100).
-  - graduate.py takes `.rodata`, `.bss` and `.sdata` ranges too. `.bss` definitions go in reverse address
-    order, and `.bss`/`.sdata` ranges end at the last symbol's padded size (Trax).
-  - lint reports `ub-no-prototype` when a trailing `// comment` sits on a function-definition line: put the
-    comment on the line above (SkinBurn SkinBurn_RenumberMeshBits).
-  - **A unit whose `.sdata2` constants come out in the wrong order** (every function exact, DOL fails) had a
-    function EA's linker stripped. Put an unused `static <Unit>_StrippedFn` that uses the out-of-order
-    constants, in EA's order, just before their first user; check with `objdump -s -j .sdata2`. `x * 1.0f`
-    is folded away and emits nothing; `x + 1.0f` works. Linked this way: Code8009B340, ScreenClear,
-    GoCamCont, GoCamera, GoLighting, CharAnim. Inlining the callee is not the cause.
-  - A string literal lands in `.sdata` where its function is compiled: data defined before that function
-    comes first (GoObjShadow). `.sbss` definitions go in reverse address order.
-  - A redundant `(T*)a - (T*)b` size in a `memset` is not folded to a constant and breaks the link; use a
-    sum of `sizeof`s (`offsetof` is not on the game include path).
-- **Shell:** the Bash tool strips backslashes even inside quoted heredocs (`<<'EOF'`). Write scripts with
-  the Write tool.
-
-### New from the link waves (2026-09-24 afternoon)
-
-- **[verified] A global read twice with no store in between** (once for a test, again for a call): write
-  the second read as `*(volatile T*)&gGlobal` at that one use (GameHoleContests HoleContest_GetWinnerShotKind 95.3 -> 100).
-- **[verified] Constants and a string address loaded into saved registers at entry, before any call:**
-  EA's body sits in a loop, even `for (j = 0; j < 1; j++)` over one-entry arrays (PsBallFx_InitModule
-  43 -> 100).
-- **[verified] `p = arr; p += n;` instead of `&arr[n]`** keeps the element address, not the index
-  (UStream_Update 98.8 -> 99.8, File_ReadAsyncEx 93.8 -> 99.6).
-- **[verified] An expression passed to an inline is substituted at each use of the parameter**, so the
-  original can build the same value twice and take its bits apart again. Routing it through a static
-  inline reproduces that (GoTerrain Ter_DrawObjectList 89.2 -> 99.45).
-- **[verified] Runs of written-out zero stores were loops in EA's source:** the compiler unrolls a small
-  constant loop fully, with other registers than hand-written stores (SitDev_SetupStateVector 23 diffs ->
-  exact with two `for` loops).
-- **[verified] Copy a real struct member, not a cast byte array:** the struct copy keeps the original's
-  load/store order (FE_MessageTable GM_vShowAwardReplay 86 -> 100 with `SaveProfile.aReplay` as `Replay[5]`).
-- **[verified] EA's vector-scale helpers take the scale first** (TW07 `LLMath_Scale3(float, const float*,
-  float*)`): Vec3_Scale / LLMath_Scale fixed in 149 calls; Physics_BallFlying became exact.
-- **Permuter traps:** it ignores branch targets, so a "score 0" result can move a statement out of its `if`
-  and change the behaviour (uiText UIText_Draw); check the diff's meaning. A float operand swap can
-  score higher but fuse the other multiply into `fmadds` and round differently (AI_ChooseTarget): check
-  which product is fused. perm_setup's base.c breaks on `__declspec(export)` and on a char literal
-  inside a comment: edit base.c by hand.
-- **Orphan data:** after linking a unit, attach its orphan `.bss` too (define its globals in the unit in
-  reverse address order, add the `.bss` range to splits.txt): 45 units, data linked 30.8% -> 65.0%.
-
-### New from the first cloud lanes (2026-09-24 evening)
-
-- **[verified] A pointer local one callee-saved register too low: assign it from a one-line static
-  inline that returns the address** (`static inline Player* F(int n) { return &gPlayers[fn(n)]; }`):
-  BreakLine_Reset 19 diffs -> 0, gbacable Gba_ReadPads 22 -> 11 (then a declaration swap -> 0), Skin
-  SKN_SwapDesc 16 -> 7. The same for a value: `eLayout` read through `static inline u16 ReadU16(u16* p,
-  int i)` moved r27 -> r31 (ShaderObjectsData fn_80074628 exact). Mark each `// fake match:`.
-- **[verified] `a[i] = a[i] + base` with value and offset in each other's registers:** three statements
-  through a local, `x = a[i]; x += base; a[i] = x;` (uiLoadFile UI_RelocatePictureList 97.67 -> 100, UI_StreamLoadFonts).
-- **[verified] A one-line float product in the wrong multiply order:** one multiply per statement with
-  `*=` (PlaceBall_UpdateMomentums exact).
-- **[verified] How the calls before a loop are written can change how the loop unrolls:** TARGET_Init
-  19 diffs -> 0 from passing a call's result through a `u64 textureID` local (EA's TW07 name) alone.
-- **[verified] `for` and the equivalent `do/while` load their loop constants in a different order**
-  (Glows fn_800981D0: do/while -> `for (j = 0; j <= 4; j++)` 95.78 -> 100; `j < 5` is not exact).
-- **[verified] Indexing a struct's array through a `u8*`** (`&((u8*)p->data)[p->uPos]`, not
-  `&p->data[p->uPos]`) adds the index to the struct pointer first and folds the array offset into the
-  loads (Stream_ParseBufs exact).
-- **[verified] Link: `.sbss` defined last-first also flips chained assignments.** With the globals in
-  reverse address order, `a = b = c = 0` stores in the opposite order; write the chain low address first
-  to keep EA's store order (ShaderObjectsData: the only DOL differences were two chains).
-  The reverse also happens: two separate `x = 0; y = 0;` stores can come out swapped (the source order
-  does not change it), and only a chain restores EA's order (UStream_Init: `gReadyRingHead =
-  gReadyRingTail = 0;`). objdiff scored the function exact before: it compares the relocation names,
-  and two stores of the same register to two small-data globals swapped only show in the DOL.
-- **[verified] Link: a global the code never references is dead-stripped**, so the unit's `.bss` comes
-  out short. Declare the used object at the symbol's full size instead (LLFileIO_Gc lbl_801A0350: 0x2000
-  symbol, code uses 0x1000). An opaque SDK stand-in type needs the real type's alignment or the
-  padding before it goes missing (OSThread: f64 array for 8-byte alignment).
-- **[verified] Some register rotations need a type change AND a declaration move together;** each alone
-  scores no better, so one-change sweeps miss them. Sweep the pair (type x declaration order): GameMode26
-  GameMode26_ScoreShot 39 diffs -> 0 (parameter as `PlayerNumber_t`, nLead after nLength), GoDynObj DynObj_DrawGolfBalls
-  38 -> 0 (`s32 i`, pLogoA before pLogoB).
-- **[verified] A list walked with a signed index gets folded into one walking pointer; EA's code keeps the
-  list start and a byte offset apart.** The cast in the index, `list[(u32)i]`, brings EA's form back;
-  declaring the variable `u32` does not (GoTerrain Ter_DrawPatchPass 96.27 -> 100, Ter_DrawFarClipPatches 89.62 -> 100;
-  also GameHoleContests).
-- **[verified] Late constant load in `c * x` (fmuls const,x):** write the min or ternary into its own
-  temp; `0.5f * fTemp` alone still hoists the lfs above it. An unrelated statement between the temp
-  and the multiply holds the load back. Here that was taking the address of a field used later
-  (`p = &pObj->n108`, read as `*p` below): UObject Object_Render exact, found by an anonymous
-  decomp.me user (https://decomp.me/scratch/SOh7Q). The three changes each do nothing or worse
-  alone; leversweep.py has them as levers and finds the combination.
-- **[verified] A cast that changes nothing still changes the code:** `(u8)` on a u8 field read reorders
-  CodeWarrior's instructions and registers (hlaudtrackseq OnKeyOn, OnPitchRamp: 2 diffs -> 0
-  each; the permuter found `& 0xFFu` and `(unsigned int)`, which also work). Label it `// fake match:`.
-- **[verified] An identity read inside a declaration's initializer** (`int n = fn_X_Read(p->n38);`)
-  fixes a register order that the same read as a statement does not (hwsBurn HwsBurn_CopyEntries: 5 diffs ->
-  0; leversweep's statement-level levers stopped at 5). Label it `// fake match:`.
-- Other compiler versions (GC 2.0, 2.0p1, 2.6, 2.7, 1.3.2) gave output identical to 2.5 on 18 near-miss
-  functions tried today: not a lever for these.
-
-### New from round 7 (2026-09-26 evening to 2026-09-27)
-
-**Which lever first** (symptom -> first try; each has its entry below). Read the compiler's view
-first (mwccdbg last pass, `rasim.py` replay, `sched750.py`); most of these are labelled fake matches,
-so try EA's own forms (TW07, one local per job, the unswitched loop) before them.
-
-- Only the order inside one block differs, registers right -> `sched750.py deadsearch`, then a dead
-  `(s64)(s32)` round trip on the value it names (its srawi takes an issue slot; also reorders float
-  ops). Entry-block parameter copies in the wrong order -> a signed 64-bit index product
-  (non-power-of-two size). Independent entry `li`/`rlwinm` order -> `#pragma scheduling once`.
-- A kept `mr rX,rY` that no copy chain reproduces -> the OR lever (`x | y`, y a separate integer
-  local). A call result's `mr r0,r3 ... mr rN,r0` -> the 64-bit shift self-assignment after the call.
-- EA copies a different parameter register than ours -> `#pragma optimization_level 1|2`, or the
-  late `void*` copy.
-- Register order rotated, the candidates sitting at 28 neighbours (rasim trace) -> add one codeless
-  neighbour: a dead srawi (inside a block), a 64-bit OR high word (across blocks), a coalesced
-  inline-parameter phantom, a `(s64)` call argument. Remove one: a local declared later, a separate
-  local per job.
-- Float saved-register order wrong (constants or call temps coloured first) -> inline-parameter
-  phantoms (two-definition inline parameter), or one-element arrays numbered by first use.
-- A value must stay live with no code -> across blocks: a 64-bit OR high word; inside one block:
-  only a dead srawi (nothing else extends liveness).
-- A local must colour above/below a frontend temp (declaration order cannot do it) -> change the
-  webs: a fresh local per job stays a local; a reused variable's later webs become temps.
-- A hoisted address or constant folded into its users -> a two-definition phi (if/else, same value).
-- EA puts loop preheaders at the function's end -> the code in an inline (goto cleanup).
-- A 2-instruction block in the wrong order that our build never schedules -> EA's block had a third
-  instruction (a coalesced copy) there.
-- Spill slots or spill set wrong -> declaration order (slots follow vreg order).
-
-- **[verified, fake-match class] A kept `mr rX,rY` may be `or rX,rY,rY`** (the same encoding,
-  e.g. 7F7EDB78 = `mr r30,r27`). The register allocator only coalesces opcodes flagged "is a
-  move" (flag 0x10 in the opcode table; coalescing routine at 0x57b9b0 in GC/2.6 mwcceppc.exe):
-  PC_MR has it, PC_OR does not. So an OR whose two operands become one register survives every
-  copy-propagation pass and is never coalesced. Write `x | y` with y a separate local holding the
-  same value (`int b = bLast; ... = b | bLast;`); `x | x` and `x | Read(x)` fold in the frontend.
-  Where the OR sits sets its priority: in the inner loop's store it was a hoisted inner temp and
-  took r30 (EA); once at the outer loop level it took r29. UISScreen fn_8016AEEC 99.44 -> 100
-  (labelled). Try it first on UIS kept copies that no copy-chain form reproduces.
-- **[verified] A spilling function's final registers come from the LAST regalloc pass**: pass 1
-  spills, pass 2 recolours. Read the last pass (mwccdbg's summary now marks superseded passes);
-  `rasim.py --pass` replays it, including the spill-cost choice (lowest cost / remaining
-  neighbours, ties to the last in vreg order) and coalesced (phantom) neighbours.
-- **[verified] After a spill, a copy blocked from coalescing in pass 1 can coalesce in pass 2 and
-  become a permanent extra neighbour**: Golfer AI_ChooseTarget, a separate local for the governing
-  attribute (`nA = Shot_GoverningAttribute(..); nSkill = Golfer_GetAttribute(p, nA, ..)`), 18 wrong
-  registers -> 9, 98.66 -> 99.56.
-- **[verified] Locals declared after a crowded variable leave the graph first and lower its
-  remaining-neighbour count**: CameraScript_LagAimMarker's fMin had 33 (limit 31 for FPRs); the
-  reciprocal and a length pulled into locals declared after it: exact.
-- **[verified] An empty `if (field) {} else {}` whose condition reads a struct field makes the
-  frontend share that field's address** (EA's kept `mr`+`addi` address copies): Swing
-  SW_KillVibration exact (labelled fake; possibly a compiled-away assert).
-- **[verified] An inline getter's parameter is a frontend variable numbered below the frontend's
-  shared temps**: Character_SetupForShot exact (labelled).
-- **UIS kept copies (mechanism, docs/evidence/notes/2026-09-26-r7-uis-copy-chains.md)**: each copy-
-  propagation pass removes only the last link of a copy chain; a surviving copy is still coalesced
-  unless both sides interfere; `void** q = &p;` gives EA's copy but adds a store. EA's source form
-  is not found; AI_ChooseTarget's last miss (an extsb writing the frontend temp directly) is the
-  same class.
-- **[verified, fake-match class] `#pragma scheduling once` ... `#pragma scheduling reset` around
-  one function runs one scheduling pass instead of two.** With two, the pre-RA pass always puts
-  an entry block's `li` after every independent rlwinm (whatever the C order); one pass keeps
-  EA's `clrlwi, li, clrlwi`. UISScreen fn_8016C6C4 90.48 -> 100 and fn_8016C614 90.21 -> 100
-  (labelled). File-wide it is wrong: 12 other UISScreen functions drop (fn_8016B09C 100 -> 72).
-  Worth a try where only the order of independent entry-block instructions differs.
-- **[verified, fake-match class] `#pragma optimization_level 1|2` ... `reset` around one function
-  keeps a parameter copy that -O4's extra copy-propagation passes fold.** Copy propagation works
-  per use; at -O4 uScreen is folded into its incoming r5 before a call's argument setup, which
-  forces `extsh r4,r5` ahead of `mr r5,pStudio` and a copy of pStudio instead of EA's copy of
-  uScreen (a 3-cycle of argument registers). UISApi fn_80168F5C 88.15 -> 100 with level 1 alone
-  (no source change); fn_801694A0 92.97 -> 100 with level 2 plus one u16 local copy each of
-  uGroup / uScreen (level 1 alone: 16, level 2 alone: 7). Worth a try where EA keeps a `mr` copy
-  of a parameter register and ours copies a different one.
-- **[verified, fake-match class] A dead `(s64)` high word adds one register-allocation neighbour
-  to everything live at its def, but it disappears only in a call's argument block.** The post-RA
-  peephole deletes a dead `srawi` only when a later instruction in the SAME block overwrites its
-  register; the argument moves before a `bl` do, so put the `(s64)` on a call argument (the
-  parameter converts it back). Anywhere else (a pointer init, a loop condition, a loaded field)
-  the srawi stays in the output. UISEvent fn_80165ACC 99.08 -> 100: natural form (no copies) with
-  `fn_8016B0F8(pStudio, (s64)*pData, (s64)nArgs, pArgs)` lifts pStudio, uScreen and p from 27 to
-  29 neighbours, so they leave the graph in the second sweep and take r31/r30/r29 (rasim replay).
-  Completed 2026-09-27: the deletion rule is "not live out of the block": a srawi whose register
-  is dead at the block's end also goes (BFX_vRender: r0 before a call), and inside a loop a dead
-  srawi is never deleted (GameMode22 GameMode22_DecideWinner lab tests).
-- **[verified, fake-match class] An index written as a signed 64-bit product adds an early
-  instruction that leaves no trace.** `(u8*)p + (s32)n * (s64)sizeof(T)` in place of `&p[n]`
-  makes `li rK,size; mulhw` for the dead high word; the pre-RA scheduler issues the `li` in the
-  entry block's cycle 0, which moves the other cycle-0 instruction (a parameter copy) later, and
-  both dead instructions are gone after allocation. UISScreen fn_8016B188 99.86 -> 100 (EA copies
-  pScreen before pStudio and loads pData into r4). `pNodes[(s64)n]` / `[(u64)n]` do nothing and
-  `[(s64)(s32)n]` leaves code (20). Worth a try where only a parameter-copy order in the entry
-  block differs.
-- **[verified, fake-match class] A dead `srawi` deleted after allocation makes that block get
-  scheduled again, on physical registers.** Blocks scheduled before allocation carry a
-  "scheduled" flag (mwccdbg `{000c}`) and the post-RA scheduler skips them; when the post-RA
-  peephole deletes an instruction in the block (the dead high word of a `(s64)(s32)` round trip
-  survives allocation as `srawi r0,rX,31`), the flag is cleared (`{0004}`) and the post-RA
-  scheduler reorders the block with the real registers (anti-dependences included). UISScreen
-  fn_8016A510 (with nNode as both loop counters, 12): `if (((UISScreen*)(s64)(s32)pScreen)->pData
-  != NULL)` gives EA's entry `mr r23,r3; lwz r3,0x10(r4); mr r24,r4` (10), and `add =
-  *(UISVec4*)(s64)(s32)fn_8016C18C();` EA's order of a struct copy's loads among fmuls in the
-  call block (0). A switch per block: worth a try where only the order inside one block differs.
-  Note: an entry block is merged into the prologue block (and rescheduled there) only when the
-  prologue saves no FPRs.
-- **[verified] The last scheduling pass skips blocks the first pass scheduled unless an
-  instruction in the block was inserted or deleted after it; register allocation deleting
-  coalesced copies counts** (so does the post-RA deletion of a dead srawi: UISScreen
-  fn_8016A510). A block that starts with a call result's copies (`mr r128,r3; mr r35,r128`,
-  deleted when the value stays in r3) is always rescheduled after allocation; EA's may not have
-  been (hlaudtrackstm Stm_Tick: setting the mark in memory gave EA's block exactly). A real branch
-  between the call and the loads keeps the first pass's order but costs its compare: the frontend
-  folds every constant condition and no backend pass removes a compare.
-- **[verified, fake-match class] Volatile loads keep their order in both scheduling passes**, a
-  way to pin independent loads the last pass reorders: Stm_Tick 99.10 -> 100 with
-  `((volatile AudTrack*)pTrack)->u.stm.pStream` / `.uReadPos` and
-  `((volatile AudStream*)pStream)->uOffset` (same values), the cap computed first. Needs the exact
-  subset: any two of them, or one more (uLength), do not match.
-- **[verified, fake-match class] The "load deletion" pass removes an unused `li` only when
-  constant propagation changed something in the function.** An OR against a zero word triggers it:
-  `(((u64)(u32)p << 32) | (u64)(u32)p) >> 32` is p again, but the zero low word it folds makes the
-  pass run, and a leftover `li 0` (from other identity chains) is deleted instead of being reused
-  by the second CSE for a later `i = 0`. It also adds copy-propagation passes, so levers that
-  count copy-chain links need retuning after it. UISEvent fn_80165E9C 95.59 -> 100.
-- **[verified, fake-match class] A copy chain written after an instruction makes a parameter's
-  saved copy its LAST link, which fixes the entry order.** `p = (T*)(u32)((u64)(s64)((u64)(u32)p
-  << 32) >> 32);` (an identity; six of them in UISEvent fn_80165E9C) keeps copies of p until late
-  passes, so the pre-RA scheduler issues the pool base's `addi` before the `mr` of the parameter
-  (EA's order). Chain back into the parameter itself: a new local gets a higher vreg and the
-  wrong register; signed-shift or `(s64)(s32)` links leave dead srawi readers that pull the chain
-  early.
-- **[verified, fake-match class] A dead `(u32)(s64)(s32)x` can reorder a whole block through the
-  first scheduling pass**, not only add an allocator neighbour: its `srawi` takes an issue slot
-  and an integer unit (and the 750's rule that an integer op cannot issue beside a busy unit if it
-  touches the register just defined there), so the first pass's order changes, the registers
-  follow from the new live ranges, and the srawi is deleted after allocation.
-  `tools/matching/sched750.py deadsearch` predicts which value to put it on. GoShaderObject_Particle_Gc
-  fn_800949D0 97.89 -> 100: the round trip on n in `if (nLive <= (u32)(s64)(s32)n)` gave EA's
-  order and registers (pVerts back to its plain form); the same round trip on nFirst * 36 had given
-  every register but left 4 instructions out of order, and one on `n = ...` itself keeps a copy.
-
-Added 2026-09-27 (from the ledgers solved that night; each ledger has the full story):
-
-*Codeless neighbours and liveness*
-
-- **[verified] Inside a block, only a dead `srawi` extends liveness.** The allocator's liveness
-  skips a dead instruction entirely, except `srawi` (it sets XER[CA], so it is never "dead"): a
-  dead srawi interferes with everything live across it and keeps its source live up to it. A dead
-  `or`/`rlwinm`/`mulhw`/`li` gets 0 neighbours, but a dead `or` feeding a srawi is live, so
-  `srawi(a | b)` keeps both a and b live, and both go after allocation. Fake-match form (low word
-  = pPos, logic unchanged): `pPos = (f32*)(s32)((u64)(u32)pPos | (((u64)(s64)(V) >> 32 |
-  (u64)(u32)(P)) << 32));`. goballfx BFX_vRender 16 -> 0 aligned with three such statements
-  (placed early in block order so they issue before the UV add), 97.80 -> 100.
-- **[verified, fake-match class] A 64-bit OR high word keeps a value live ACROSS blocks and leaves
-  no code.** The backend has no dead-code pass for non-copies: the high word of a 64-bit op whose
-  low word is used survives to allocation, and the post-RA peephole deletes it outside loops.
-  `nWinner = (s32)((u64)(s64)nWinner | ((u64)(u32)pPlayer << 32));` after loop 1 keeps pPlayer live
-  to the loop's end (11 -> 24 neighbours): GameMode22 GameMode22_DecideWinner 97.96 -> 100. The low word must
-  reduce to a copy (`+` leaves `addc`; an unsigned OR/XOR folds the high word to a copy: use the
-  `(s64)` form). Within a block it does nothing (liveness is global there; use a srawi). Also
-  UISScreen fn_8016A2D4 (uEvent kept live across the calls). Dead copies never get this far: the
-  first copy-propagation pass deletes every dead copy at once, even under `opt_dead_assignments off`.
-- **[verified, fake-match class] A dead srawi fixes float scheduling too.** A srawi that is ready
-  early takes the first free issue slot whatever its source, pushing a float op back: uiArc
-  UIArc_Draw (EA's first pass issued fV0's `fadds` after the other corners' `fsubs`, the one
-  interference rasim said was missing). Host it on an int already live through the block, or its
-  GPR moves: `((s32)(s64)(s32)pArc->uFlags & 0x10)` in both ternaries, 98.26 -> 100.
-  `(s32)(s64)x` without the inner `(s32)` makes no srawi.
-- **[verified, fake-match class] More evidence for the signed 64-bit product**: UISApi fn_80169D90
-  66.85 -> 100 (`(u32)((s32)(nScreens + 1) * (s64)sizeof(UISScreen))` on the screen term: its
-  `li; mulhw` joins the pre-RA schedule). A power-of-two size folds to a shift and leaves no mulhw
-  (the handlers term: no effect). UISApi fn_80169C0C needed seven dead instructions in total:
-  `#pragma optimization_level 2` + four u32 parameter copies + three `(u32)(x * (u64)sizeof(T))`
-  products (64 -> 0 aligned; six gave 1).
-
-*Kept copies*
-
-- **[verified, fake-match class] A call result's kept copy (`mr r0,r3 ... mr rN,r0`): a 64-bit
-  shift self-assignment right after the call**, `x = (s32)((s64)((u64)x << 32) >> 32);`: it becomes
-  a copy chain after x, so the call-result copy survives the copy-propagation passes. UISApi
-  fn_80169858 99.34 -> 100; UISScreen fn_8016A2D4 (nRet), fn_8016AD54. For a signed value keep
-  the inner `(u64)(u32)` (a `(u64)(s32)` leaves a dead srawi of x that takes r0: fn_8016AD54 31 vs
-  8). Each extra copy-propagation pass in a function eats one link: add
-  `x = (s32)(u64)(u32)x;` for exactly one more. Works only on copies from a physical register
-  (fn_80169DC4: no effect on plain local copies).
-- **[verified] `x = (u32)(s32)x;` as a statement** is dropped by the frontend but still counts as a
-  redefinition for its copy substitution: later reads keep x instead of its source (UISScreen
-  fn_8016A2D4; it also restored the nRet chain after an OR woke constant propagation).
-- **[verified, fake-match class] Loop-carried copies**: `pLoop = pNode;` before the loop and again
-  inside it keeps EA's copies of a pointer (UISScreen fn_8016AD54, then fn_8016ABBC 96.23 -> 100
-  with the same recipe + rasim declaration order). A copy that steals a pre-RA slot from the load
-  after it: read the carried copy into a second local first (`pPrev8 = pLoop8; pLoop8 = pNode;
-  call(.., pPrev8->ppGroups[i])`, 3 -> 0). Needs the source copy and the carried copy in different
-  blocks; in a one-block preheader they interfere and the in-loop copy stays (fn_80169DC4).
-- **[verified] OR lever, details**: the second operand must be an integer local of another type
-  (`void*`/`T*` copies fold; `(u32)p | x` with `u32 x` folds; UISScreen fn_8016C270 153 -> 81, then
-  exact with a `(void*)` copy of pStack declared first). Several ORs of one source in one
-  preheader are merged by the backend CSE unless each uses a different integer type (u32 / long /
-  int: UISApi fn_80169DC4 96.74 -> 99.39). The post-RA peephole rewrites the first load after a
-  kept copy to the copy's source only for a real `mr`, not for an `or` (fn_8016ABBC).
-- **[verified] Copies the allocator coalesces**: only temp -> temp copies (a named local is never
-  merged, a parameter copy excepted), and a copy whose source stays live is not coalesced; a copy's
-  destination does not interfere with its direct source. A parameter vreg that dies before the
-  first call is always merged with its incoming register (UISScreen fn_8016A2D4, UISApi
-  fn_80169DC4, Particle fn_80094534). The frontend keeps a user copy variable only when its right
-  side is the first occurrence of a CSE'd cast; `int` and `long` casts form one CSE group, `(u8*)`
-  another, `unsigned int` none (fn_80169DC4).
-- **[verified, fake-match class] A two-definition phi keeps a hoisted stack address**:
-  `if (pRate->u10) { pArg1 = &aArgs[1]; pArg2 = &aArgs[2]; } else { same }` right after
-  `if (pRate->u10 == 0) continue;` stops every folding pass from putting `addi rX,r1,4` back into
-  the stores; CSE reuses the continue test's cr0, the branch disappears. UISApi fn_8016A030 94.83
-  -> 96.33 (every instruction EA's; lever from UIStudio fn_80166098).
-- **[verified] A u8 flag test can delete a loop's `li i,0`**: constant propagation turns the u8
-  `!bLoaded` test's rlwinm into a copy, which lets load deletion drop the loop counter's `li 0`
-  (the late CSE then makes the offset a copy of i). `u32 bLoaded` keeps EA's code: UISApi
-  fn_80169590 5 -> 0 aligned (int/s32 2, u16 5).
-- **[verified, fake-match class] A longer compare chain at entry adds the neighbour a parameter
-  lacks**: `if ((u8)(s32)(s8)bAll)` (extsb -> rlwinm -> cmpli, folded back to `clrlwi.` after
-  allocation) gives the test temp a second pre-RA slot touching pStack: UISApi fn_80168CD8 26 -> 0.
-  Other UIS entry-copy-order misses may share the cause.
-
-*How the frontend numbers variables*
-
-- **[verified] The frontend keeps a variable's name only for its FIRST web; each later independent
-  web becomes a frontend temp** (@N, numbered after the loop IVs and CSE temps, in first-def order,
-  and coloured before every local). Both directions are levers: a fresh local per job stays a
-  local (char Character_LoadTextures: k/m for the second name loop, 28 -> 0; skalib AnimLib_PlanBank `pWork`,
-  own `n`; LLTex TX_spParseTextureGroupFromStream palette counter k); reusing a variable makes the
-  later web a temp (skalib AnimLib_MergeOverlay: i also as the overlay search counter gives EA's
-  `mr` IV copy, 97.36 -> 100). Giving a pointer an earlier dummy use turns its later array webs
-  into temps (uiProcessInterface UI_ReadControllers: `pPressed = &n38; pButtons = (u32*)(void*)pPressed;
-  *pButtons = 0;`, 99.94 -> 100).
-- **[verified] Frontend CSE temps are numbered in order of each expression's SECOND occurrence**
-  (the first one only records it): add a late extra use to get a late-coloured temp (goballfx
-  BFX_vRender, the third dead statement).
-- **[verified] A one-element local array (`f32 fR[1]`) is scalarized into a frontend temp numbered
-  in order of first use**; a dead store (`fR[0] = 0`, removed) counts as a first use. That puts
-  locals among the temps: uiArc UIArc_Draw, every saved FPR EA's (98.08 -> 98.26, labelled).
-- **[verified] Inlined variables are numbered above the caller's hoisted temps**: an inlined
-  function's locals get vregs above them (first declared = lowest), its parameters between the
-  temps and those locals (UISApi fn_8016A030
-  64 -> 18 aligned, not exact). A `static inline char* Get(char* p) { return p++; }` parameter is
-  numbered before every other inline temp (UISScreen fn_8016B844: pStart r26, 34 -> 0).
-- **[verified, fake-match class] An inline parameter assigned twice gives coalesced float
-  phantoms.** A copy is coalesced only into a frontend temp (inline parameters are temps) and only
-  if it survives copy propagation (the destination has a second definition): `Calc(f32 x, f32 y)
-  { if (x <= y) x = y; return x; }` around an identity `Read(expr)` makes one permanent neighbour
-  per call, which fixed the saved-FPR order of the loop constants: Particle fn_80094534 99.36 ->
-  100 (`fRed = Calc(Read(v10 * t + v0), v20)` for each channel; a named copy local does nothing).
-- **[verified] Spill slots are handed out in vreg order** (locals in reverse declaration order),
-  so declaration order sets EA's slot map (skalib AnimLib_PlanBank; uiArc's f64 corners). A local
-  declared inside a loop body numbers after all function-level ones (AnimLib_MergeOverlay n50Al:
-  the spill tie goes to the higher vreg). A value that is stored and read back (`nClips +=
-  nLibClips; nClipsAll = nClips;` instead of the sum into nClipsAll) turns the reload into a copy
-  (load deletion) and moves the variable's allocator priority: AnimLib_PlanBank 57 -> 0 aligned.
-- **[verified] The spill cost**: each def costs its loop weight, each use twice its loop weight
-  (named vregs all agree); when every node is stuck, the lowest cost / remaining neighbours is
-  picked and coloured last (UISScreen fn_8016A2D4 ledger: one store inside a loop made uEvt cost
-  17 against pbOut's 3).
-
-*Control flow and loops*
-
-- **[verified] The frontend's goto/label cleanup runs only for small functions and inlined code**:
-  it moves loop preheaders to the function's end (EA's layout in UISScreen fn_8016B844). A few extra
-  statements anywhere turn it off; the 'd'/'x' cases as inlines brought it back (226 -> 189). The
-  same function: `while (nCount < nPad) { nCount++; *p++ = ' '; }` gives EA's single `ble` and the
-  counter's final value on the ctr loop's exit path (any `if (n > 0)` around a counted loop keeps
-  two branches).
-- **[verified, EA form] One loop with an invariant `if` is unswitched into two copies that share
-  every temp**: LogoTexture FE_LogoDesign_CopyLogoTexturePixels, the two copy loops written as one with `if (bToTexture)`
-  inside (nBase 38 -> 29 neighbours) and the tile base inline in the index (a plain nBase local is
-  reassociated: `shl + (nBase + x%8)`): 144 -> 0 aligned, no fake.
-- **[verified, EA form] A small constant loop is unrolled after the first CSE**, so its copies'
-  constants are not merged with earlier ones: DepthField DF_vDrawBufferToScreen, the two vertices
-  as `for (j = 0; j < 2; j++)` (97.88 -> 100). `#pragma opt_unroll_loops off` on one function hands
-  the unroll to the backend (srwi scheme instead of cmpwi 8): GameMode22 GameMode22_DecideWinner (labelled).
-- **[verified] A 2-instruction block EA scheduled differently from ours means a deleted
-  instruction**: our such preheaders are never scheduled (`{0004}` in every pass), so EA's block had a
-  third instruction, a copy coalesced away by allocation. MC MC_MergeRecords: EA's `add row; li k` =
-  loops walking a named `SaveRecords*` view (labelled fake), 20 -> 0 aligned.
-- **[verified] The pre-RA scheduler breaks equal-height ties by block order** (the statement
-  written first wins; pick order: critical-path urgent, then more successors made ready, then
-  height). GoShaderObject_Particle_Gc fn_800949D0 ledger; `sched750.py` models it.
-- **[verified, fake-match class] A copy in the loop condition extends a parameter's life without a
-  copy**: `for (i = 0; i < (pLib = (MtaLib*)(void*)pArg)->nRecords; i++)`, statements before the loop
-  on pArg: pArg and pLib get one register, the copy vanishes, the entry block keeps EA's `li` first
-  (char MtaLib_SwapAndLink 2 -> 0).
-- **[verified, EA form] A float join set by if/else into a named block local**, then stored and
-  clamped in place (`{ f32 f; if (c) f = E; else f = 0.0f; v[3] = f; } v[3] = v[3] < 0.0f ? ..`):
-  gocamscripts CamScript_Fade 8 -> 0 (store-to-load forwarding gives EA's `frsp`).
-
-*Types, forms and floats*
-
-- **[verified] `x / c` becomes `x * (1/c)` only for positive powers of two from 2.0 to 1024.0**
-  (2048, 4096, 16384, 0.5, 0.25, -128 stay `fdivs`), in every spelling and every compiler 1.0 -
-  3.0a5.2. The frontend always hoists a loop test's load; `#pragma opt_loop_invariants off` on the
-  function plus the test spelled differently from the divide (`*(const f32*)aStep` vs `aStep[0]`)
-  gave CamSpline CamScript_fEvaluateCurve 98.48 -> 100 (labelled).
-- **[verified, EA form] A byte swap in C, mask first**, `((v & 0xFF000000) >> 24) | ((v & 0xFF0000)
-  >> 8) | ((v & 0xFF00) << 8) | ((v & 0xFF) << 24)`, stays rlwinm/rlwimi through allocation and the
-  post-RA peephole makes it `stwbrx`: LLPictInt PictInt_Decode 93.26 -> 100 (the shift-first
-  spelling is not recognised at one swap). Mask-first also fixed maddec fn_800B769C's
-  `MAD_ENTRY` (`((u32)v & 0x3FF) << 22`).
-- **[verified, EA form] CodeWarrior's cast-lvalue post-increment keeps a moving cursor**:
-  `pSection = ((TexSection*)p)++;` is not folded by the IRO (`((char*)p) += n` and helpers are):
-  LLTex TX_spParseTextureGroupFromStream 111 -> 106, exact with the other forms in its ledger.
-- **[verified] A `long` (s32) passed to an `int` parameter inside a loop makes the frontend hoist
-  `(int)x` into loop-invariant copies** (spilled): `int nSet` gave EA's single register
-  (GoShaderObject_Grass_Gc SD_vShaderObject_Grass_Static_Init 265 -> 231). Its last miss was a
-  temp's live range: sched750's first-pass model ranked 7628 statement orders by that range, a
-  climb from the best reached 0 (labelled statement-order fake).
-
-*Linking*
-
-- **[verified] Unity builds**: char.o's `.data` would start at 0x801870FC, which our 8-aligned
-  sections cannot do; `#include "char_tex_manager.c"` into char.c (one TU, as TW07's
-  golf2_unity.cpp) links it (char Character_LoadTextures ledger). Suspect one when a unit's data starts
-  off 8-byte alignment.
-- **[verified] 4-byte `.sbss` gaps before 8-aligned small globals**: `__attribute__((aligned(8)))`
-  on the two u8s links LLTex (labelled fake; likely several EA files there, boundaries at the gaps).
-- **[verified] Pool order**: a function static (even block-scope) is emitted when its function
-  starts, and an int -> float conversion's constant is pooled after the function's literal
-  constants; `<Unit>_StrippedFn` stand-ins fix both (CamSpline, uiArc).
-
-### New from round 6 (2026-09-26 afternoon)
-
-- **[verified] Replay the allocator offline**: mwccdbg's `regalloc-*-pass-1-all/assigned.txt` are
-  enough to rebuild the priority list and colouring exactly (all 122 GPRs of LLDynTex fn_8010A930,
-  all 98 FPRs of Particle fn_80094534); a search over declaration orders against the replay found
-  EA's registers where objdiff-score climbs stalled (fn_8010A930 aligned 30 -> 4, then exact).
-  Scripts: r6-misc's rasim.py / rasearch.py (lane scratch; to be moved into tools/match).
-- **[verified] One `rlwinm; srawi` fold per basic block per peephole-forward pass, the last one**:
-  where EA keeps a srawi, EA's block had later signed candidates (the RGB565 decode written
-  mask-first, `(u & 0xF800) >> 8`: fn_8010A930 93.5 -> 99.05; FO_spLoadFontFromStream +1.8).
-- **[verified] The backend's second CSE turns `li rX,0` into `mr rX,<zero reg>` only for frontend
-  temps**: a function-level variable the frontend splits gets EA's `mr`, a block-level one keeps
-  `li` (Earnings GM_Earnings_CheckPuttGoals, with the field store `a[nSlot] = s.aPuttGoal[i].nValue`: exact).
-- **[verified] Temp creation order**: temps of one expression are coloured in reverse creation
-  order; writing one result into an existing local first and re-reading the array reorders them
-  (BreakLine_Render's rotation: `fZ = fX*c + v[2]*s; v[0] = fX*-s + v[2]*c; v[2] = fZ;`, exact).
-- **[verified] The late `void*` parameter copy also fixes argument-setup order** (hlaudtrackstm
-  Stm_SendSilenceToVoices 84.5 -> 100: memset's `li r4,0` ahead of its size).
-- **[verified, fake-match class] A dead value that survives to register allocation changes
-  register choice and the final schedule**: `(s64)x` leaves a dead `srawi` until the post-RA
-  peephole (UISEvent fn_80165B90 exact; swept on 10 other near-misses: nothing).
-- **[verified, negative] Dead asserts do nothing on GC/2.5 -O4,p** (docs/evidence/notes/
-  2026-09-26-dead-asserts.md): every macro form compiles away without a trace except an empty
-  two-armed `if {} else {}`, and dead buffers take no stack.
-- **[verified, negative] Parameter order does not move StaticCam_GetFlybyInformation** (all 364
-  float placements).
-- **UIS = EA Tiburon's IStudio library** (TW2005 paths `Code/Tiburon/IStudio/`): one flag set for
-  all four units (`-pragma "pool_data on" -inline auto,deferred -str reuse,readonly`) ties the
-  per-file flags exactly; no flag/pragma/compiler moves the kept-copy pattern, which is a copy
-  whose destination has a second definition in EA's source (docs/evidence/notes/
-  2026-09-26-uis-library-flags.md).
-
-### New from round 5, the mwcc-debugger round (2026-09-26)
-
-Read the compiler's own view first (`tools/matching/mwccdbg.py`, docs/workflow.md "mwcc-debugger").
-
-- **[verified] The allocator's levels**: a variable with more than 28 remaining neighbours cannot be
-  placed on the first level and jumps to the top (takes r31). One temp more or fewer is the lever.
-  hwsBurn HwsBurn_CopySetOptions (`nAlign + *pOffset` makes a temp: pBurn 29 neighbours, r31 not r25);
-  hlaudmovie Mov_SendSoundBlock (a use of pBlock in one more branch gave it the 29th: exact).
-- **[verified] The frontend numbers its temps above every declared local**, so a local EA orders
-  above a frontend temp cannot get there by declaration order; writing the expression at each use
-  (the frontend makes the temp) can. Swing SW_vImpact: pLaunchA/B locals -> `gPlayers[nPlayer].vLaunchA/B`
-  at each call, 6 -> 0.
-- **[verified] A callee's parameter order sets its callers' argument schedule**, even when every
-  register stays the same. GoTerrain Ter_DrawPatchGround 98.46 -> 100 and Ter_BuildObjectDrawLists 83.6 -> 100 from
-  Ter_AddObjectDraw's parameters in Ter_ObjectDrawData's field order. Worth a look wherever a ledger says
-  "argument order" (PictInt_Decode, Stm_Tick, fn_80006A98, fn_8009A708, UISApi/UISEvent).
-- **[verified] File-wide `opt_propagation off` keeps consecutive `x |= c` statements separate**
-  (the frontend otherwise merges them into one `ori`): uiText UIText_Draw 2 -> 0, no function worse.
-  A one-file flag: on the after-100% flag audit list.
-- **[observed] A `const` pointer lets loads move past stores through another pointer**; EA's code
-  kept each load after the previous store, so EA's parameters were not const. UISScreen fn_8016C270
-  aligned 191 -> 153 (non-const pArgs through the whole script-call chain).
-- **[verified] Reassigning a variable elsewhere can bring back a copy the frontend folds to a
-  constant**: LLTex fn_8000EA1C, case 11 reading its random number into b turned `li r30,0` into
-  EA's `mr r30,r31`, 98.99 -> 100.
-- **[verified] A `void*` copy stops the AST optimizer's copy propagation** (it rewrote pBlock to
-  pData): Particle fn_800951A0 92.0 -> 100 (`void* pBlock = pData`, the header field's own type).
-- **[observed] Unsolved pattern: EA keeps a copy our backend's first copy-propagation pass folds**
-  (UISScreen fn_8016AD54, fn_8016ABBC, fn_8016B4D4, fn_8016AEEC, fn_8016A2D4): no flag or form found.
-  Update 2026-09-27: all five are exact with labelled fakes (round 7: the OR lever, the call-result
-  shift chain, loop-carried copies, the 64-bit OR high word); EA's own form is still not known.
-
-### New from the evening push (2026-09-25)
-
-- **[verified] EA's late parameter copy (`mr r0,r3 ... mr rN,r0`): copy the parameter into a local
-  through `void*`**: `Character* pChar = (Character*)(void*)pArg;`. A plain copy or a same-type cast
-  is coalesced back into the parameter; the `void*` detour survives. Where the copy is declared
-  matters. char Character_BeginLoadTexturesCallbackFE 22 -> 0, Character_BeginSwapTexturesCallbackFE 23 -> 0, Character_BeginLoadTexturesCallbackIG 21 -> 0 diffs.
-- **[verified] Write index loops, not pointer walks**: EA's pointer registers come from CodeWarrior
-  strength-reducing `p[i]`. LLFont fn_80011D0C 7 -> 0 (`pLine[n]` instead of a `pCut` walk),
-  LLDynTex fn_8010A930 123 -> 105 (`pIndices[i]`).
-- **[verified] One local per job**: reusing a counter or pointer for a second job merges registers
-  EA kept apart. SkinPart SkinPart_ListChosenTextures 9 -> 0 (new `v`/`m` loop counters), char
-  Character_PlaceFeetOnGround 3 -> 0 (an `fH` local), UISApi fn_80168FC8 7 -> 0.
-- **[verified] The opposite also happens: route subexpressions through EXISTING multiply-assigned
-  locals**; fresh single-assignment locals are copied back into the expression and change nothing.
-  TerrainData Network_LineIntersection 4 -> 0; Ball Physics_HandleCollision 92 -> 31 aligned diffs.
-- **[verified] Random declaration orders followed by a move/swap climb** find gains that greedy climbs
-  record as "none": GoShaderObject_Particle fn_80094B84 130 -> 10 (then 0 with a `pAge` local).
-- **[verified] A string pool in `.rodata`** needs `-str reuse,readonly` on the unit (UISEvent: its
-  strings sat 0x28 off, behind the switch tables in `.data`).
-- **[observed] Ball Physics_HandleCollision keeps one register per float variable for the whole
-  function**, which `#pragma opt_lifetimes off` reproduces (171 -> 22 aligned); not kept (objdiff
-  lower), a lead for the plain-C shape.
-
 ### Loops and unrolling
 
 - **[verified] Two tests on players n and n + 1 can be a two-pass loop.** When the second
@@ -905,8 +169,7 @@ Read the compiler's own view first (`tools/matching/mwccdbg.py`, docs/workflow.m
   (skalib.c `AnimLib_BuildCb`, `SKALIB_InitModule`). With a variable bound, `for (i = 0; i < p->n; i++)`
   inside an `if` followed by more code gives `cmpw i, n; bge`, while the original's
   `cmpwi n, 0; ble` came from the bound held in a local or written `p->n > i`
-  (`Skalib_SetBudgets`, `AnimLib_FreeWorkCopies`). Tested in isolation in
-  `C:\dev\scratch\tw\looptest\`.
+  (`Skalib_SetBudgets`, `AnimLib_FreeWorkCopies`). Tested in isolation.
 - **[verified] Runs of identical stores are unrolled loops.** CW at -O4 fully unrolls small
   constant-count loops (10 link checks, 12 attribute stores, 19 flag bytes - the last as 18
   stores plus a one-iteration remainder loop) and unrolls a 34-iteration loop by two. Writing
@@ -916,6 +179,61 @@ Read the compiler's own view first (`tools/matching/mwccdbg.py`, docs/workflow.m
   6; count the stores per iteration to tell which one EA wrote. Likewise a five-player reset in GameMode16
   `GameModeSkillZoneTarget_ClearPerHoleData` matched only as `i = 0; while (i < 5) gPlayers[i++].nDC0 = 20;`, not as a `for`
   or a pointer walk.
+- **[verified] `x = f(); if (x == NULL) { while (x == NULL) {...} }` gives CodeWarrior's "test the result,
+  then jump to the loop test" shape** (`cmplwi r3,0; bne end; b test`). StaticMemory StaticMem_Init 96.15 ->
+  100 (mark it `// fake match` if the outer `if` is redundant in the source).
+- **[verified] A count-down fill `n = count; i = 0; while (n-- > 0) a[i++] = v;` gives
+  `cmpwi n,0; ble; srwi. n,3; mtctr ... andi. 7`.** A `for (i = 0; i < n; i++)` gives `cmpwi n,8; subi`
+  (49%); plain `while (n--)` gives `beq`. GameHoleContests HoleContest_InitForHole.
+- **[verified] A loop over a global table with a dead `li r7,0; cmpwi r7,13; bge` before the unrolled body
+  wants an `s32` counter.** Glows fn_80098740: `int i` 77.4, `s32 i` 100.
+- **[verified] `if (n > 0) do {...} while (--n > 0);`** gives `mr. rN; ble ... subic. rN; bgt` (char
+  ByteSwap_Records 91.7 -> 100).
+- **[verified] In a loop whose condition loads `*p`, write `*p = *p + 1`, not `(*p)++`**: the original
+  reuses the loaded value (EASBStorage fn_8012835C 95.0 -> 100).
+- **[verified] A value compared inside a loop is often computed into a local as the loop's first
+  statement** (GoARAM fn_800B5E88 94.3 -> 100).
+- **[verified] A call result kept in a named local and copied into the loop counter** (`nFirst = f(); for
+  (n = nFirst; ...)`) matches where initialising the counter directly does not (FE_CrAPDB FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum,
+  FE_CrAP_IsItemEquipped).
+- **[verified] A `const` source pointer lets CW hoist an unrolled copy loop's loads above its stores**;
+  drop the `const` when the original alternates load/store (DynamicRenderingBuffer fn_800705F0 83 -> 100).
+- **[verified] `do {} while (++i < 4)`** for a 4-step loop with no ctr and the test at the bottom (UKernel
+  Kernel_PostPairToObject 80.5 -> 100).
+- **[verified] The order of a for-loop's increments sets the order of the `addi`s** (hlaudmovie
+  Ses_ProcessSampleData, AudTable Emi_UpdInstance).
+- **[verified] Set every loop cursor and end pointer as plain statements at the head of the loop**, in the
+  original's order; an end pointer can double as the backward cursor (hlaudvoice Voc_ResetModule 78 -> 100).
+- **[verified] A counted skip loop written counting down** gives CW's ctr loop with no index register
+  (Grass_Gc Static_Render 92.5 -> 96.5).
+- **[verified] Constants and a string address loaded into saved registers at entry, before any call:**
+  EA's body sits in a loop, even `for (j = 0; j < 1; j++)` over one-entry arrays (PsBallFx_InitModule
+  43 -> 100).
+- **[verified] Runs of written-out zero stores were loops in EA's source:** the compiler unrolls a small
+  constant loop fully, with other registers than hand-written stores (SitDev_SetupStateVector 23 diffs ->
+  exact with two `for` loops).
+- **[verified] How the calls before a loop are written can change how the loop unrolls:** TARGET_Init
+  19 diffs -> 0 from passing a call's result through a `u64 textureID` local (EA's TW07 name) alone.
+- **[verified] `for` and the equivalent `do/while` load their loop constants in a different order**
+  (Glows fn_800981D0: do/while -> `for (j = 0; j <= 4; j++)` 95.78 -> 100; `j < 5` is not exact).
+- **[verified] The frontend's goto/label cleanup runs only for small functions and inlined code**:
+  it moves loop preheaders to the function's end (EA's layout in UISScreen fn_8016B844). A few extra
+  statements anywhere turn it off; the 'd'/'x' cases as inlines brought it back (226 -> 189). The
+  same function: `while (nCount < nPad) { nCount++; *p++ = ' '; }` gives EA's single `ble` and the
+  counter's final value on the ctr loop's exit path (any `if (n > 0)` around a counted loop keeps
+  two branches).
+- **[verified, EA form] One loop with an invariant `if` is unswitched into two copies that share
+  every temp**: LogoTexture FE_LogoDesign_CopyLogoTexturePixels, the two copy loops written as one with `if (bToTexture)`
+  inside (nBase 38 -> 29 neighbours) and the tile base inline in the index (a plain nBase local is
+  reassociated: `shl + (nBase + x%8)`): 144 -> 0 aligned, no fake.
+- **[verified, EA form] A small constant loop is unrolled after the first CSE**, so its copies'
+  constants are not merged with earlier ones: DepthField DF_vDrawBufferToScreen, the two vertices
+  as `for (j = 0; j < 2; j++)` (97.88 -> 100). `#pragma opt_unroll_loops off` on one function hands
+  the unroll to the backend (srwi scheme instead of cmpwi 8): GameMode22 GameMode22_DecideWinner (labelled).
+- **[verified, fake-match class] A copy in the loop condition extends a parameter's life without a
+  copy**: `for (i = 0; i < (pLib = (MtaLib*)(void*)pArg)->nRecords; i++)`, statements before the loop
+  on pArg: pArg and pLib get one register, the copy vanishes, the entry block keeps EA's `li` first
+  (char MtaLib_SwapAndLink 2 -> 0).
 
 ### Registers, declaration order and the stack
 
@@ -969,6 +287,46 @@ Read the compiler's own view first (`tools/matching/mwccdbg.py`, docs/workflow.m
   stayed at the same score with every declaration order; the permuter found the fix: the inner
   counter declared `long j` instead of `int j`. Try `long`/`s32` on counters when register
   numbers are off and reordering does nothing.
+- **[verified] Parameters are copied to saved registers in declaration order, across int and float
+  registers**; swapping `(f32* pOut, f32 fAngle)` flips `fmr f31,f1` / `mr r31,r3` (Quaternion fn_800093AC
+  92.0 -> 100). Only reorder when the callers' asm agrees.
+- **[verified] The stack frame does not fix a local char buffer's size** (GoDynamicCam fn_8003C9D0 exact
+  with 12..0x18 bytes): say in a comment that the size is unknown.
+- **[verified] A local `int` copy of an `s32` parameter survives as its own register** (an s32 copy is
+  merged away). MC_Gc's CARD waits: `int nChan = nPort;`, 8 functions 73-99 -> 100. Mark it fake match.
+- **[verified] Keep a call result in a named local when it is an index, a compare operand or an argument
+  inside an iterator loop.** It sets the `mulli`/`add` order (GoDynObj DynObj_LoadBallLogos, also for `Rand % n`
+  in GoStaticCam fn_80064F7C) and the `cmplw` operand order (char Character_GolferStreamCallbackIG; swapping the operands does
+  not help), and it matches inside iterator loops (hwsBurn HwsBurn_MarkOption). A `u8` flag argument computed
+  before intervening float tests also goes in a local first (animblender SKABlender_BlendLinear 65.6 -> 98.2).
+- **[verified] A parameter reused as the running pointer** is the parameter itself, not a new local (char
+  Character_SwapTexEntries 95.3 -> 100).
+- **[verified] Keep call results in named locals** before passing them on (uiProcessInterface
+  UI_FindTexture 93 -> 100), before using them as a base pointer (DynamicCam_GetLocation), and put a loop
+  bound read through a pointer in a local to get the ctr loop (uiProcessInterface UI_FindColorTable 58 -> 97).
+- **[verified] Zeroing: a variable that already held a value gets its zero by `mr` from another zeroed
+  register; a variable set for the first time gets its own `li r,0`.** So when the original has two `li`s
+  and ours `li; mr`, give the second zero a fresh variable (a new loop counter), and the reverse for one
+  `li; mr` (Earnings HighScoreRecords_GetEndOfGameRecord, hwsBurn HwsBurn_BuildDesc, GameMode5 PlayNow_StartChallenge, GameHoleContests
+  HoleContest_DrawHoles; `a = b = 0`, types and statement order make no difference). A search written as an
+  inline helper hands its index back by `mr`; the same loop written in the caller gets `li` (UISEvent
+  fn_80165D2C, fn_80165D90).
+- **[verified] Some register rotations need a type change AND a declaration move together;** each alone
+  scores no better, so one-change sweeps miss them. Sweep the pair (type x declaration order): GameMode26
+  GameMode26_ScoreShot 39 diffs -> 0 (parameter as `PlayerNumber_t`, nLead after nLength), GoDynObj DynObj_DrawGolfBalls
+  38 -> 0 (`s32 i`, pLogoA before pLogoB).
+- **[verified] An identity read inside a declaration's initializer** (`int n = fn_X_Read(p->n38);`)
+  fixes a register order that the same read as a statement does not (hwsBurn HwsBurn_CopyEntries: 5 diffs ->
+  0; leversweep's statement-level levers stopped at 5). Label it `// fake match:`.
+- **[verified] One local per job**: reusing a counter or pointer for a second job merges registers
+  EA kept apart. SkinPart SkinPart_ListChosenTextures 9 -> 0 (new `v`/`m` loop counters), char
+  Character_PlaceFeetOnGround 3 -> 0 (an `fH` local), UISApi fn_80168FC8 7 -> 0.
+- **[verified] The opposite also happens: route subexpressions through EXISTING multiply-assigned
+  locals**; fresh single-assignment locals are copied back into the expression and change nothing.
+  TerrainData Network_LineIntersection 4 -> 0; Ball Physics_HandleCollision 92 -> 31 aligned diffs.
+- **[observed] Ball Physics_HandleCollision keeps one register per float variable for the whole
+  function**, which `#pragma opt_lifetimes off` reproduces (171 -> 22 aligned); not kept (objdiff
+  lower), a lead for the plain-C shape.
 
 ### Evaluation and statement order
 
@@ -986,7 +344,7 @@ Read the compiler's own view first (`tools/matching/mwccdbg.py`, docs/workflow.m
 
 - **[verified] The right side of a comparison is evaluated first.** `f(0) < f(1)` calls `f(1)`
   first. So the call order in the original tells you how the comparison was written: m2c's
-  `t = f(1); if (f(0) < t)` is the source `f(0) < f(1)` (GameModeAlternateShot, 2026-09-23).
+  `t = f(1); if (f(0) < t)` is the source `f(0) < f(1)` (GameModeAlternateShot).
   Additions go left to right, so `a = f(x) + f(y)` calls `f(x)` first.
 - **[verified] `a()->arr[b()].f`** evaluates `b()` first and scales the index before calling
   `a()`; splitting `b()` into a local first moves the shift after the call.
@@ -1018,6 +376,32 @@ Read the compiler's own view first (`tools/matching/mwccdbg.py`, docs/workflow.m
   `u16 nSound = lbl_80192BA8[nEvent]; if (nEvent >= 37 || nSound == 0xFFFF) return;` (GameMode8
   `SpeedGolf_PlayEventComment`, 71.7% -> 93.9, then exact with the or-chain). Check the table is big enough for
   every index the callers pass; if not, it is an EA bug and gets a comment.
+- **[verified] Front-end `MsgArg` handlers read every argument into locals before the first store.**
+  GameMode4Menu LadderMenu_SetNodePos: `p->fX = pArgs[1].f` -> `f32 fX = pArgs[1].f; ...; p->fX = fX;`, 49.4 -> 100
+  (LadderMenu_GetNodePos 79.9 -> 100, LadderMenu_GetFirstAndCursorNodePos 67.1 -> 100).
+- **[verified] Operands that are both calls are evaluated right to left.** `fn(5) + fn(4)` calls `fn(4)`
+  first; for arguments, `f(g(), h())` calls `h()` first. To call in source order, use a temporary.
+  CourseData GM_GetTotalPar, sweep_800D3208 (99.87 -> 100).
+- **[verified] Split long arithmetic into statements to keep EA's grouping.** `(a + b - 1)` is regrouped
+  as `a + (b - 1)`; `u = a + b; u = (u - 1) & ~(a - 1);` keeps it (UMemPool fn_8000AFA0 84.0 -> 98.9). A
+  `+`/`-` chain of divisions gets reordered the same way (EASBStorage fn_801288DC 96.7 -> 100, five
+  statements). `d - (d/365)*365` is `d % 365`.
+- **[verified] A ternary loads its else-value first.** `(u > m) ? m : u` -> `(u <= m) ? u : m` when the
+  original is `mr r0,m; bgt; mr r0,u` (UStream fn_8000E790 99.57 -> 100).
+- **[verified] A call or global load on the right of a comparison is evaluated first**: write
+  `f(n) + 1 < rec`, not `rec > f(n) + 1`, when the original calls first (HoleScore GameAnalysis_IsShotForRecord 78.7 ->
+  98.8).
+- **[verified] Stores after a divide-by-w are scheduled z first**: write `z = 0` before x and y (GoDynObj
+  DynObj_GetBallPixels).
+- **[verified] Calls inside a later argument can run before a call in an earlier one**: write the
+  expression inline as the argument (GoTerrain Ter_RenderView 96.7 -> 100).
+- **[verified] Two calls multiplied: the right-hand one runs first** (`f(a) * f(b)`; Skeleton SKEL_ItterateIKChain,
+  GoRenderCtx RenderState_SetViewport). `f = call(); f *= c;` puts the call result first in `fmuls`; `call() * c` puts
+  the constant first (GoCamCont CameraController_LagSideVector, TexAnimManager fn_80076C20).
+- **[verified] A global read twice with no store in between** (once for a test, again for a call): write
+  the second read as `*(volatile T*)&gGlobal` at that one use (GameHoleContests HoleContest_GetWinnerShotKind 95.3 -> 100).
+- **[verified] `a[i] = a[i] + base` with value and offset in each other's registers:** three statements
+  through a local, `x = a[i]; x += base; a[i] = x;` (uiLoadFile UI_RelocatePictureList 97.67 -> 100, UI_StreamLoadFonts).
 
 ### Structs, arrays and pointers
 
@@ -1050,8 +434,8 @@ Read the compiler's own view first (`tools/matching/mwccdbg.py`, docs/workflow.m
   same `gPlayers[n].field` is read again after a call, CodeWarrior makes a pointer to the field
   itself and folds the first read into `lwzu rD, off(rP)`; later reads are `lwz rD, 0(rP)`. An
   explicit `s32* p = &gPlayers[n].field; ... *p` local blocks that shape (`addi rP; lwz` from the
-  base). Write the field access out each time. Applied to 33 functions of `Swing.c` in one sweep
-  (`C:\dev\scratch\tw\ptr_sweep.py`), 10 became exact. Exception: pointers that are indexed
+  base). Write the field access out each time. Applied to 33 functions of `Swing.c`, 10
+  became exact. Exception: pointers that are indexed
   (`pViews[k]`) or passed as pointers stay pointers. Likewise `lwzu` / `stbu` / `lbz 0(rN)` on a
   player field means EA repeated `gPlayers[n].field`; a local `Player* p` or `s8* pField` gives
   `lwz 0xOFF(rN)` instead, and the add comes out in a different place (GameMode10 GameModeSkillZoneBase_SetCup,
@@ -1101,7 +485,7 @@ Read the compiler's own view first (`tools/matching/mwccdbg.py`, docs/workflow.m
   byte arithmetic: `(Player*)((u8*)gPlayers + i * sizeof(Player))` (the `PLAYER(i)` macro in
   `golfer.h`). Every other spelling (`&gPlayers[i]`, `gPlayers + i`, a local base pointer, an
   unsized array, other counter types) walks one pointer instead. Found with ten-line test
-  functions (2026-09-23): `GM_RestartHole` exact, `GM_ClearDataForNewGame` 85 -> 98%, `GM_GolferConcede_Hole`
+  functions: `GM_RestartHole` exact, `GM_ClearDataForNewGame` 85 -> 98%, `GM_GolferConcede_Hole`
   85 -> 99.6%. Not every player loop uses it (`GM_CheckForAIConcede` got worse).
 - **[verified] The PLAYER(i) byte-offset form also applies to plain arrays**: EA's loops over
   `lbl_8020315C[i]` next to `gPlayers[i]` index both by byte offset
@@ -1113,6 +497,36 @@ Read the compiler's own view first (`tools/matching/mwccdbg.py`, docs/workflow.m
 - **[verified] GetHonors shape (all four match modes):** one variable for "best" and "other",
   the pin read as `pCourse->pin[nHole].x` (not through a pointer), and the ball through the
   Player (`*(f32*)(PLAYER(i)->ball + 8)`), not a Ball* cast. GameModeMatch GetHonors 85 -> 100%.
+- **[verified] Take a pointer to the array element before the first store when a loop both reads fields
+  and calls with the element.** UIStudio fn_80168B80: `pScreen = &p->pScreens[i]; bOut = 0; ...`,
+  41.5 -> 100. UISScreen fn_8016C5C4 (77 -> 100). The opposite also happens (emotion fn_8006BAA8 wants
+  `gX[n].field` written out), so try both.
+- **[verified] Chained stores `p->a->pPrev = p->a->pNext = p->a;`** give load, store to itself, reload,
+  store (GoARAM fn_800B5C40 99.6 -> 100). Popping a list head re-reads through the head field:
+  `pHeap->pSpare = pHeap->pSpare->pNext` (fn_800B5F4C 92.8 -> 100).
+- **[verified] Read fields into locals before a run of matrix stores**, or CW reloads them after each store
+  (Glows fn_80098408 80.6 -> 94.5).
+- **[verified] EA's message-list macro is `aMsgs[n] = x; n++;`**, not `aMsgs[n++] = x` (GameMode26
+  GameMode26_ScoreShot, GameMode22 GameMode22_ScoreShot 91.4 -> 94.1). `PLAYER(i)->` instead of `gPlayers[i].` fixed both
+  twins' loops (GameMode26_ClearPlayerStats, GameMode22_ClearPlayerStats, about 73 -> 100).
+- **[verified] Pointer plus integer always puts the pointer first in `add`**; adding as integers
+  (`(u8*)(n + (uptr)p)`) flips it (UMemPool fn_8000AFA0, marked fake match).
+- **[verified] `&a[i]` indexing matches where hand-walked pointers don't** (fe_movies UIPoly_Draw,
+  ActAnimal_SetWorldMatrix, SitDevFile SitDev_InvokeAction 74.7 -> 98.8).
+- **[verified] `p = arr; p += n;` instead of `&arr[n]`** keeps the element address, not the index
+  (UStream_Update 98.8 -> 99.8, File_ReadAsyncEx 93.8 -> 99.6).
+- **[verified] Copy a real struct member, not a cast byte array:** the struct copy keeps the original's
+  load/store order (FE_MessageTable GM_vShowAwardReplay 86 -> 100 with `SaveProfile.aReplay` as `Replay[5]`).
+- **[verified] Indexing a struct's array through a `u8*`** (`&((u8*)p->data)[p->uPos]`, not
+  `&p->data[p->uPos]`) adds the index to the struct pointer first and folds the array offset into the
+  loads (Stream_ParseBufs exact).
+- **[verified] A list walked with a signed index gets folded into one walking pointer; EA's code keeps the
+  list start and a byte offset apart.** The cast in the index, `list[(u32)i]`, brings EA's form back;
+  declaring the variable `u32` does not (GoTerrain Ter_DrawPatchPass 96.27 -> 100, Ter_DrawFarClipPatches 89.62 -> 100;
+  also GameHoleContests).
+- **[verified] Write index loops, not pointer walks**: EA's pointer registers come from CodeWarrior
+  strength-reducing `p[i]`. LLFont fn_80011D0C 7 -> 0 (`pLine[n]` instead of a `pCut` walk),
+  LLDynTex fn_8010A930 123 -> 105 (`pIndices[i]`).
 
 ### Types, casts and sign extension
 
@@ -1183,6 +597,38 @@ Read the compiler's own view first (`tools/matching/mwccdbg.py`, docs/workflow.m
   hoisted out of the loop; the plain `int` index computes it differently. The same `(u32)` index
   matched in GameModeMatch.c and in Stableford `fn_800FE8A8`: it is EA's habit (likely from a
   macro of theirs), so it is written without a fake-match comment.
+- **[verified] Writing a float's bits through a union drops an earlier dead store; a pointer cast
+  (`*(u32*)&f = ...`) keeps it.** urandom Rand_Float 88.2 -> 100.
+- **[verified] `(old & 0xFFFFFF) | (v << 24)` gives `slwi` + `rlwimi` into old; the other operand order
+  inserts v the other way** (Code8009B340 fn_8009B340 96.7 -> 100). A bitfield store gives `stb` instead.
+- **[verified] Test one flag bit as `(u & bit) >> n`, not `(u >> n) & 1`** (same `extrwi`, different
+  epilogue order; FE_MessageTable GM_vMCIsCardPresent 99.3 -> 100).
+- **[verified] `(uptr)` casts give the same code as `(u32)` for address arithmetic**: use them, they are
+  64-bit safe (Terrain_HeightAt).
+- **[verified] Copy a `u16` field to a `u32` local before shifting** it into a pointer offset: plain `slwi`
+  instead of `clrlslwi` (SkinMorph SkinMorph_StoreMesh 95 -> 100).
+- **[verified] A 64-bit id packed from u16s**: `u <<= 16; u |= p[i];` gives `slwi; or`
+  (ShaderObjectsData fn_80074A24 67.7 -> 100).
+- **[verified] `int` and `s32` allocate differently, in both directions**: an `s32` parameter where `int`
+  fails (GoDynObj DynObj_DrawTargetModels 94 -> 100), `int` locals where `s32` fails (GM_vGetPar5EagleDate 92 -> 100).
+- **[verified] EA's abs is `(v + (v >> 31)) ^ (v >> 31)`** (`srawi; add; xor`); MWCC's `__abs` gives
+  `xor; subf` (ShaderObjectsData fn_80074628).
+- **[verified] A cast that changes nothing still changes the code:** `(u8)` on a u8 field read reorders
+  CodeWarrior's instructions and registers (hlaudtrackseq OnKeyOn, OnPitchRamp: 2 diffs -> 0
+  each; the permuter found `& 0xFFu` and `(unsigned int)`, which also work). Label it `// fake match:`.
+- **[verified, EA form] A byte swap in C, mask first**, `((v & 0xFF000000) >> 24) | ((v & 0xFF0000)
+  >> 8) | ((v & 0xFF00) << 8) | ((v & 0xFF) << 24)`, stays rlwinm/rlwimi through allocation and the
+  post-RA peephole makes it `stwbrx`: LLPictInt PictInt_Decode 93.26 -> 100 (the shift-first
+  spelling is not recognised at one swap). Mask-first also fixed maddec fn_800B769C's
+  `MAD_ENTRY` (`((u32)v & 0x3FF) << 22`).
+- **[verified, EA form] CodeWarrior's cast-lvalue post-increment keeps a moving cursor**:
+  `pSection = ((TexSection*)p)++;` is not folded by the IRO (`((char*)p) += n` and helpers are):
+  LLTex TX_spParseTextureGroupFromStream 111 -> 106.
+- **[verified] A `long` (s32) passed to an `int` parameter inside a loop makes the frontend hoist
+  `(int)x` into loop-invariant copies** (spilled): `int nSet` gave EA's single register
+  (GoShaderObject_Grass_Gc SD_vShaderObject_Grass_Static_Init 265 -> 231). Its last miss was a
+  temp's live range: sched750's first-pass model ranked 7628 statement orders by that range, a
+  climb from the best reached 0 (labelled statement-order fake).
 
 ### Function calls and parameters
 
@@ -1245,6 +691,53 @@ Read the compiler's own view first (`tools/matching/mwccdbg.py`, docs/workflow.m
   stored in a callback slot returns a different type from the slot (a `u8` function in an `s32`
   slot), EA assigned it with a cast, e.g. `p->pfn = (u8 (*)(int, int))fn;` (GameMode15). Changing
   the function's own return type to fit the slot changes its code and loses the match.
+- **[verified] A `u8` result that the caller stores without `clrlwi` means the callee returns `int`/`s32`.**
+  CodeWarrior masks a `u8` return at the call site. The reverse also holds: an `int` local returned from a
+  `u8` function gives `clrlwi r3` at the return (`u8 b` there gives `mr r3`). FE_MessageTable GM_vEASBioGetLevel
+  (91.25 -> 100 with an `s32` callee), GameMode4Menu LadderMap_IsRegionFinalNode (92.5 -> 100 with `int b`),
+  GameModeDriver IsAMonthAhead and 5 others.
+- **[verified] MWCC treats `s32` (long) and `int` as different types when redeclaring, and an empty `()`
+  prototype clashes with one whose parameters are promoted (u8, s8, u16, s16, f32).** `void f(); void
+  f(int)` compiles; `void f(); void f(u8)` does not. `tools/matching/declcheck.py` finds these before a fold.
+- **[verified] When every caller masks a result with `clrlwi`, declare the callee `u8`** even if its body
+  shows no mask (UStream_Update: callers FEgolferanim FE_StreamFunc_SkinUpdate 97.0 -> 100). The callee's own score
+  does not decide it; the callers do.
+- **[verified] A call made in every branch of an if-chain is one call after it**, with the arguments
+  picked per branch (GoFog FG_vBlendFogForCamera 91.3 -> 98.75). `(f32)sqrt(...)` must be cast before
+  multiplying by a float constant, or the multiply is done in double.
+- **[verified] `li r3/r4` missing before a call is not a missing argument**: CW reuses a still-live
+  argument register (char Character_SetClubsAndClothes).
+- **[verified] A `(u8)` cast on each argument to an `int` parameter is computed once (CSE)**; a `u8`
+  parameter masks at every call (Particle fn_80094534 91.3 -> 96.4).
+- **[verified] A call whose result EA ignores is a bare call statement**; assigning it to a later-overwritten
+  pointer keeps a dead `mulli`/`add` (FEgolferanim FE_CharPositionOverwrite).
+- **[verified] `const` on read-only pointer parameters changes argument-load order** (EASBStorage
+  fn_80129F98 94.4 -> 100, fn_8012A050 90.2 -> 100, fn_80128580 83.8 -> 100).
+- **[verified] A constant left in r5..r8 at a call is not always an argument**: it can be left over from a
+  store just before (fe_craputils UserInfo_UnlockGolfer, fn_8012B4C0, Code800BA940 fn_800BAA50). Check before
+  adding parameters.
+- **[verified] A caller's `extsb` on a result means the callee returns `s8`** (Caddie_GetTip); a `u16`
+  parameter fed `(s16)(s8)f()` gives `extsb; clrlwi 16`.
+- **[verified] `static const` locals for constant struct arguments** load just before each call where
+  initialised locals load at entry; pass a global struct field by value directly, not through a local
+  (streammanagerhole RenderState_Apply).
+- **[verified] EA's vector-scale helpers take the scale first** (TW07 `LLMath_Scale3(float, const float*,
+  float*)`): Vec3_Scale / LLMath_Scale fixed in 149 calls; Physics_BallFlying became exact.
+- **[verified] The late `void*` parameter copy also fixes argument-setup order** (hlaudtrackstm
+  Stm_SendSilenceToVoices 84.5 -> 100: memset's `li r4,0` ahead of its size).
+- **[verified, negative] Parameter order does not move StaticCam_GetFlybyInformation** (all 364
+  float placements).
+- **[verified] A callee's parameter order sets its callers' argument schedule**, even when every
+  register stays the same. GoTerrain Ter_DrawPatchGround 98.46 -> 100 and Ter_BuildObjectDrawLists 83.6 -> 100 from
+  Ter_AddObjectDraw's parameters in Ter_ObjectDrawData's field order. Worth a look wherever only the
+  argument order differs.
+- **[observed] A `const` pointer lets loads move past stores through another pointer**; EA's code
+  kept each load after the previous store, so EA's parameters were not const. UISScreen fn_8016C270
+  aligned 191 -> 153 (non-const pArgs through the whole script-call chain).
+- **[verified] EA's late parameter copy (`mr r0,r3 ... mr rN,r0`): copy the parameter into a local
+  through `void*`**: `Character* pChar = (Character*)(void*)pArg;`. A plain copy or a same-type cast
+  is coalesced back into the parameter; the `void*` detour survives. Where the copy is declared
+  matters. char Character_BeginLoadTexturesCallbackFE 22 -> 0, Character_BeginSwapTexturesCallbackFE 23 -> 0, Character_BeginLoadTexturesCallbackIG 21 -> 0 diffs.
 
 ### Compares and conditions
 
@@ -1288,6 +781,27 @@ Read the compiler's own view first (`tools/matching/mwccdbg.py`, docs/workflow.m
   compiles to an extra compare and branch that looks like dead code (GameMode2 `fn_800F8624`,
   exact); when the original has a
   second test of the same variable right after the first, write the redundant form out.
+- **[verified] `bResult = a && b;` shares the `li rX,0` of an earlier zero store and narrows later;
+  `bResult = 0; if (a && b) bResult = 1;` doesn't.** emotion fn_8006BB5C 98.2 -> 100.
+- **[verified] A range test on a state written as an unsigned byte: `(u8)(n - 2) <= 2`** gives
+  `subi; clrlwi 24; cmplwi 2`. target fn_80067CD4 92.8 -> 98.0.
+- **[verified] Comparing a call's result with a field: the inline form puts the field first (`cmplw r0,r3`);
+  a local for the result puts it first (`cmplw r3,r0`).** MC MC_SaveGameIsValid 99.69 -> 100.
+- **[verified] `!(u & bit)` as an argument gives `rlwinm; cntlzw; srwi 5`; `(u & bit) == 0` gives
+  `extrwi; xori`** (UKernel Kernel_ReleaseObject 91.9 -> 100).
+- **[verified] A param compare gives `cmpwi` only when both the parameter and the field it is stored to
+  are `int`** (GoARAM fn_800B65C0: u32 99.3, int param only 97.2, both int 100).
+- **[verified] `!(a ^ b)`** gives the original's `xor.` where `a == b` gives `cmpw` (u8 field vs int
+  parameter; Glows fn_800985FC).
+- **[verified] Float tests: `if (f)` / `!f` put the value first in `fcmpu`**; `f != 0.0f` and `0.0f != f`
+  both put the zero first (GoTerrain Ter_CourseLoadCallback, TerrainData Network_DownloadDataPNB, GoPostFx fn_80039358). A float
+  `!(x < c)` gives a plain `blt` where `x >= c` gives `cror` (GoCamCont CameraController_PostEvent).
+- **[verified] `b = b != 0;`** before a test reproduces `clrlwi; neg; or; srwi.` (char Character_PreRenderAll).
+- **[verified] A local pointer to the array element flips `cmpw` operands** where swapping the `==`
+  operands doesn't (GoTerrain Ter_DrawGrassPatchesPass3); `if (x) return 0; return 1;` in a `u8` function gives
+  `cntlzw; srwi` where `return x == 0;` adds a mask (hwsRender_Gc fn_80112B80).
+- **[verified] A caller's `cmpwi` on a returned pointer means EA tested it as a signed number**:
+  `(s32)f() != 0`, marked fake match (GoPostFx fn_80037E50).
 
 ### Returns, early exits and switch
 
@@ -1347,6 +861,35 @@ Read the compiler's own view first (`tools/matching/mwccdbg.py`, docs/workflow.m
   original still returned it explicitly: `SpeedGolf_TickRunDelay` (GameMode8) matched as
   `if (gPlayers[nPlayer].nC38 <= 0) return gPlayers[nPlayer].nC38; return 1;`. Leaving the return
   out is undefined behaviour; `lint.py` reports it (`ub-missing-return`), and no unit has one.
+- **[verified] A lone `cmpwi` with no branch at the end of a void function is `if (nErr != 0) return;`.**
+  An empty `if (...) {}` is removed entirely. TibExt fn_80122834 68.8 -> 100.
+- **[verified] A string copy that walks a copy of its destination returns the destination** (r3 untouched
+  on every path): `char* f(dst, ...) { ...; return szDest; }` (EASBStorage fn_80128BF8 94.3 -> 100).
+- **[verified] A lone flag test before a non-void return is `if (flag) return X; return X;`** (the void
+  rule above, for value returns; FE_CrAPDB FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum 88.7 -> 94.0).
+- **[verified] Two null tests that each go straight to the exit are two `return`s, not `||`** (`beq end;
+  lwz; cmplwi; beq end`; animblender SKABlendData_Shutdown 98.8 -> 100).
+- **[verified] A `switch` inside a loop lays out its case bodies in source order**, not case-value order
+  (GoStaticCam StaticCam_CheckHotZone).
+- **[verified] A `u8` function returning an `int` local** gives the `li; li; clrlwi` join; a `u8` local lets
+  CW use `bnelr` (LLDynTex fn_8010BF3C 80 -> 100).
+- **[verified] A command reader returning the advanced pointer** wants the advance in its own local or as a
+  post-increment in the `switch` (ShaderObjectsData fn_80074BE0, fn_80074CF4).
+- **[verified] Early exits:** `if (A || B) return;` compiles B as `bcond; b exit` while separate ifs
+  branch straight out (GoCamCont CameraController_CameraCollision); a `blt` to a return block placed after the fall-through
+  code is a `goto` to a label after that code (char GetTerrainHeightAndNormal); a duplicated tail is
+  written twice (`if (n < 30) { if (x) return 1; return t; } return t;`, fe_craputils UserInfo_IsGolferAvailable).
+- **[verified] A switch's compare tree shows its empty cases**: add `case 0: case 3: break;` to get it
+  (GoAnimalActors ActAnimal_Update, GoLighting fn_8006E7A4); a one-case switch with default gives `beq A; b B`
+  where if/else gives `bne` (CharAnim UpdateSKAState).
+- **[verified] Block-scoped locals per switch case** allocate differently from one function-level local
+  (EventInfo PGATourPopup_GetRow_EventInProgress); case labels merged into `default` (`case 3: default:`) reshape the compare
+  tree or jump table (event EVENT_PlayerEmotionUpdated, NextShotType), and extra empty cases make the tree test a value
+  first (Controller_Gc Input_vUpdate: `case -2: case -3: break;`).
+- **[verified] Return a local instead of an expression** so the register restores come before the last
+  arithmetic (LLDynTex fn_8010B6AC 90 -> 100); round up through a local written back
+  (`n = a + *p; n = (n - 1) & ~(a - 1); *p = n;`, hwsBurn HwsBurn_CopyAligned); a round-up division only matches
+  as `(size - 1 + n) / size` (MC_Gc MC_MountCard).
 
 ### Inlining and inline helpers
 
@@ -1387,6 +930,18 @@ Read the compiler's own view first (`tools/matching/mwccdbg.py`, docs/workflow.m
   the end. It only matched as `static inline s8 f(void) { return gSession.x = gReplayData.y; }`,
   called in the loop and once as a statement. The same code written inline, or as two statements
   in the helper, keeps the wrong registers.
+- **[verified] An inlined helper keeps its own shape**: `&&` conditions in the inlined copy can match while
+  the real function needs nested ifs (GoStaticCam fn_8006509C / fn_8006596C).
+- **[verified] A field reloaded at every use of a small formula** means EA used a macro, not an inline
+  (GoAnimalActors ANIMAL_WAVE 94.4 -> 98.3).
+- **[verified] An expression passed to an inline is substituted at each use of the parameter**, so the
+  original can build the same value twice and take its bits apart again. Routing it through a static
+  inline reproduces that (GoTerrain Ter_DrawObjectList 89.2 -> 99.45).
+- **[verified] A pointer local one callee-saved register too low: assign it from a one-line static
+  inline that returns the address** (`static inline Player* F(int n) { return &gPlayers[fn(n)]; }`):
+  BreakLine_Reset 19 diffs -> 0, gbacable Gba_ReadPads 22 -> 11 (then a declaration swap -> 0), Skin
+  SKN_SwapDesc 16 -> 7. The same for a value: `eLayout` read through `static inline u16 ReadU16(u16* p,
+  int i)` moved r27 -> r31 (ShaderObjectsData fn_80074628 exact). Mark each `// fake match:`.
 
 ### Floating point
 
@@ -1440,6 +995,35 @@ Read the compiler's own view first (`tools/matching/mwccdbg.py`, docs/workflow.m
   `eps = 1e-6f; if (y < eps && y > -eps)`. Writing the literal `-1e-6f` loads a second constant.
 - **[verified] A hoisted constant is a local.** `x * (1.0f / 128.0f)` with the constant loaded
   into the "wrong" FPR number: the original declared `f32 fInv = 1.0f / 128.0f;` at the top.
+- **[verified] `x * (1.0f / 512.0f)` puts the constant first in `fmuls`; `x / 512.0f` puts x first**
+  (uiText UIText_Draw 97.0 -> 98.7).
+- **[verified] A shared product kept in a local sets the `fmadds` operand order** (UMemPool mat44flt_EulerAngles).
+- **[verified] Angles: write `x / 180.0f * PI`, not `DEG(x)`.** MWCC rounds some `DEG()` products one bit
+  off EA's constants (175, -17, -5 degrees); objdiff masks it, constcheck catches it (GoLighting
+  fn_8006EDC0).
+- **[verified] `(int)` before a float-to-u8 conversion** gives `fctiwz` + `clrlwi` (GoComicCam ComicCam_Init9ScreenRapidMode).
+- **[verified] `(u32)` of a float held in a local calls `__cvt_fp2unsigned`**; the same cast of a literal is
+  folded (DynChain fn_80116304 75.5 -> 95.4).
+- **[verified] A divide EA kept (`fdivs` by 1.0)** was a local set to 1.0f (FEgolferanim).
+- **[verified] Divide by a power of two, not multiply by the reciprocal**: `/ 2.0f` gives `fmuls` with the
+  dividend first (char Character_CalculateClipPoints). A stack vector can need `[4]` though only 3 are used, for the
+  offsets after it (char Character_ClipTest).
+- **[verified] A one-line float product in the wrong multiply order:** one multiply per statement with
+  `*=` (PlaceBall_UpdateMomentums exact).
+- **[verified] Late constant load in `c * x` (fmuls const,x):** write the min or ternary into its own
+  temp; `0.5f * fTemp` alone still hoists the lfs above it. An unrelated statement between the temp
+  and the multiply holds the load back. Here that was taking the address of a field used later
+  (`p = &pObj->n108`, read as `*p` below): UObject Object_Render exact, found by an anonymous
+  decomp.me user (https://decomp.me/scratch/SOh7Q). The three changes each do nothing or worse
+  alone; leversweep.py has them as levers and finds the combination.
+- **[verified, EA form] A float join set by if/else into a named block local**, then stored and
+  clamped in place (`{ f32 f; if (c) f = E; else f = 0.0f; v[3] = f; } v[3] = v[3] < 0.0f ? ..`):
+  gocamscripts CamScript_Fade 8 -> 0 (store-to-load forwarding gives EA's `frsp`).
+- **[verified] `x / c` becomes `x * (1/c)` only for positive powers of two from 2.0 to 1024.0**
+  (2048, 4096, 16384, 0.5, 0.25, -128 stay `fdivs`), in every spelling and every compiler 1.0 -
+  3.0a5.2. The frontend always hoists a loop test's load; `#pragma opt_loop_invariants off` on the
+  function plus the test spelled differently from the divide (`*(const f32*)aStep` vs `aStep[0]`)
+  gave CamSpline CamScript_fEvaluateCurve 98.48 -> 100 (labelled).
 
 ### Data, constants and symbols
 
@@ -1514,6 +1098,348 @@ Read the compiler's own view first (`tools/matching/mwccdbg.py`, docs/workflow.m
   one function but loaded once in another is `volatile`. In UStream.c exactly the scalars the
   DVD-read callback writes (`gbReadPending`, `gpReadBuffer`, the ring indices it advances) are
   volatile; the main-thread-only indices are not. That is the author's intent, not noise.
+- **[verified] A struct's size can be proved by a `Mem_cpy` of it** (CamScript 0x118).
+- **[verified] `volatile` on a global that interrupt callbacks write** (LLDisp_Gc's DispSync) fixed five
+  functions at once; this is real volatile, not a fake match.
+- **[verified] `UISEvent.c` was built with `-pragma "pool_data on"`** (strings through one base register).
+- **Linking:**
+  - A unit's `.data` range ends at its own 8-byte alignment, not the next object's 32-byte alignment
+    (GoARAM). The last object in `.sdata`/`.sbss` ends at the true section end, not rounded to 8 (CARD).
+  - A linked unit cannot be `--extend`ed over a gap until every gap function is exact (the Matching C
+    must define them all).
+  - The linker strips functions nothing calls, with their constants and `.sbss`; a misnamed caller can
+    make a used function look unreferenced (CARDSetAttributesAsync).
+  - A dead instruction after an asm function's tail branch (`b TRK_main; blr`) must be counted in the
+    function's `symbols.txt` size. Otherwise dtk makes a `gap_` symbol from it and objdiff scores the
+    function below 100 although the DOL links (InitMetroTRK: size 0x94 -> 0x98, 97.3 -> 100).
+  - `.bss` definitions go in reverse address
+    order, and `.bss`/`.sdata` ranges end at the last symbol's padded size (Trax).
+  - lint reports `ub-no-prototype` when a trailing `// comment` sits on a function-definition line: put the
+    comment on the line above (SkinBurn SkinBurn_RenumberMeshBits).
+  - **A unit whose `.sdata2` constants come out in the wrong order** (every function exact, DOL fails) had a
+    function EA's linker stripped. Put an unused `static <Unit>_StrippedFn` that uses the out-of-order
+    constants, in EA's order, just before their first user; check with `objdump -s -j .sdata2`. `x * 1.0f`
+    is folded away and emits nothing; `x + 1.0f` works. Linked this way: Code8009B340, ScreenClear,
+    GoCamCont, GoCamera, GoLighting, CharAnim. Inlining the callee is not the cause.
+  - A string literal lands in `.sdata` where its function is compiled: data defined before that function
+    comes first (GoObjShadow). `.sbss` definitions go in reverse address order.
+  - A redundant `(T*)a - (T*)b` size in a `memset` is not folded to a constant and breaks the link; use a
+    sum of `sizeof`s (`offsetof` is not on the game include path).
+- **[verified] Link: `.sbss` defined last-first also flips chained assignments.** With the globals in
+  reverse address order, `a = b = c = 0` stores in the opposite order; write the chain low address first
+  to keep EA's store order (ShaderObjectsData: the only DOL differences were two chains).
+  The reverse also happens: two separate `x = 0; y = 0;` stores can come out swapped (the source order
+  does not change it), and only a chain restores EA's order (UStream_Init: `gReadyRingHead =
+  gReadyRingTail = 0;`). objdiff scored the function exact before: it compares the relocation names,
+  and two stores of the same register to two small-data globals swapped only show in the DOL.
+- **[verified] Link: a global the code never references is dead-stripped**, so the unit's `.bss` comes
+  out short. Declare the used object at the symbol's full size instead (LLFileIO_Gc lbl_801A0350: 0x2000
+  symbol, code uses 0x1000). An opaque SDK stand-in type needs the real type's alignment or the
+  padding before it goes missing (OSThread: f64 array for 8-byte alignment).
+- **[verified] Unity builds**: char.o's `.data` would start at 0x801870FC, which our 8-aligned
+  sections cannot do; `#include "char_tex_manager.c"` into char.c (one TU, as TW07's
+  golf2_unity.cpp) links it (char Character_LoadTextures). Suspect one when a unit's data starts
+  off 8-byte alignment.
+- **[verified] 4-byte `.sbss` gaps before 8-aligned small globals**: `__attribute__((aligned(8)))`
+  on the two u8s links LLTex (labelled fake; likely several EA files there, boundaries at the gaps).
+- **[verified] Pool order**: a function static (even block-scope) is emitted when its function
+  starts, and an int -> float conversion's constant is pooled after the function's literal
+  constants; `<Unit>_StrippedFn` stand-ins fix both (CamSpline, uiArc).
+- **[verified] A string pool in `.rodata`** needs `-str reuse,readonly` on the unit (UISEvent: its
+  strings sat 0x28 off, behind the switch tables in `.data`).
+
+### Inside the register allocator and scheduler
+
+How CodeWarrior's backend allocates registers and schedules instructions, measured with
+mwcc-debugger dumps. Most levers here are fake matches: they reproduce EA's output, not EA's
+source, so try EA's own forms first (TW07's declarations, one local per job, the unswitched
+loop). Read the compiler's view before guessing: mwccdbg's last pass, a `rasim.py` replay,
+`sched750.py`.
+
+Which lever first, by symptom (each has its entry below):
+
+- Only the order inside one block differs, registers right -> `sched750.py deadsearch`, then a dead
+  `(s64)(s32)` round trip on the value it names (its srawi takes an issue slot; also reorders float
+  ops). Entry-block parameter copies in the wrong order -> a signed 64-bit index product
+  (non-power-of-two size). Independent entry `li`/`rlwinm` order -> `#pragma scheduling once`.
+- A kept `mr rX,rY` that no copy chain reproduces -> the OR lever (`x | y`, y a separate integer
+  local). A call result's `mr r0,r3 ... mr rN,r0` -> the 64-bit shift self-assignment after the call.
+- EA copies a different parameter register than ours -> `#pragma optimization_level 1|2`, or the
+  late `void*` copy.
+- Register order rotated, the candidates sitting at 28 neighbours (rasim trace) -> add one codeless
+  neighbour: a dead srawi (inside a block), a 64-bit OR high word (across blocks), a coalesced
+  inline-parameter phantom, a `(s64)` call argument. Remove one: a local declared later, a separate
+  local per job.
+- Float saved-register order wrong (constants or call temps coloured first) -> inline-parameter
+  phantoms (two-definition inline parameter), or one-element arrays numbered by first use.
+- A value must stay live with no code -> across blocks: a 64-bit OR high word; inside one block:
+  only a dead srawi (nothing else extends liveness).
+- A local must colour above/below a frontend temp (declaration order cannot do it) -> change the
+  webs: a fresh local per job stays a local; a reused variable's later webs become temps.
+- A hoisted address or constant folded into its users -> a two-definition phi (if/else, same value).
+- EA puts loop preheaders at the function's end -> the code in an inline (goto cleanup).
+- A 2-instruction block in the wrong order that our build never schedules -> EA's block had a third
+  instruction (a coalesced copy) there.
+- Spill slots or spill set wrong -> declaration order (slots follow vreg order).
+
+- **[verified, fake-match class] A kept `mr rX,rY` may be `or rX,rY,rY`** (the same encoding,
+  e.g. 7F7EDB78 = `mr r30,r27`). The register allocator only coalesces opcodes flagged "is a
+  move" (flag 0x10 in the opcode table; coalescing routine at 0x57b9b0 in GC/2.6 mwcceppc.exe):
+  PC_MR has it, PC_OR does not. So an OR whose two operands become one register survives every
+  copy-propagation pass and is never coalesced. Write `x | y` with y a separate local holding the
+  same value (`int b = bLast; ... = b | bLast;`); `x | x` and `x | Read(x)` fold in the frontend.
+  Where the OR sits sets its priority: in the inner loop's store it was a hoisted inner temp and
+  took r30 (EA); once at the outer loop level it took r29. UISScreen fn_8016AEEC 99.44 -> 100
+  (labelled). Try it first on UIS kept copies that no copy-chain form reproduces.
+- **[verified] A spilling function's final registers come from the LAST regalloc pass**: pass 1
+  spills, pass 2 recolours. Read the last pass (mwccdbg's summary now marks superseded passes);
+  `rasim.py --pass` replays it, including the spill-cost choice (lowest cost / remaining
+  neighbours, ties to the last in vreg order) and coalesced (phantom) neighbours.
+- **[verified] After a spill, a copy blocked from coalescing in pass 1 can coalesce in pass 2 and
+  become a permanent extra neighbour**: Golfer AI_ChooseTarget, a separate local for the governing
+  attribute (`nA = Shot_GoverningAttribute(..); nSkill = Golfer_GetAttribute(p, nA, ..)`), 18 wrong
+  registers -> 9, 98.66 -> 99.56.
+- **[verified] Locals declared after a crowded variable leave the graph first and lower its
+  remaining-neighbour count**: CameraScript_LagAimMarker's fMin had 33 (limit 31 for FPRs); the
+  reciprocal and a length pulled into locals declared after it: exact.
+- **[verified] An empty `if (field) {} else {}` whose condition reads a struct field makes the
+  frontend share that field's address** (EA's kept `mr`+`addi` address copies): Swing
+  SW_KillVibration exact (labelled fake; possibly a compiled-away assert).
+- **[verified] An inline getter's parameter is a frontend variable numbered below the frontend's
+  shared temps**: Character_SetupForShot exact (labelled).
+- **UIS kept copies (mechanism)**: each copy-
+  propagation pass removes only the last link of a copy chain; a surviving copy is still coalesced
+  unless both sides interfere; `void** q = &p;` gives EA's copy but adds a store. EA's source form
+  is not found; AI_ChooseTarget's last miss (an extsb writing the frontend temp directly) is the
+  same class.
+- **[verified, fake-match class] `#pragma scheduling once` ... `#pragma scheduling reset` around
+  one function runs one scheduling pass instead of two.** With two, the pre-RA pass always puts
+  an entry block's `li` after every independent rlwinm (whatever the C order); one pass keeps
+  EA's `clrlwi, li, clrlwi`. UISScreen fn_8016C6C4 90.48 -> 100 and fn_8016C614 90.21 -> 100
+  (labelled). File-wide it is wrong: 12 other UISScreen functions drop (fn_8016B09C 100 -> 72).
+  Worth a try where only the order of independent entry-block instructions differs.
+- **[verified, fake-match class] `#pragma optimization_level 1|2` ... `reset` around one function
+  keeps a parameter copy that -O4's extra copy-propagation passes fold.** Copy propagation works
+  per use; at -O4 uScreen is folded into its incoming r5 before a call's argument setup, which
+  forces `extsh r4,r5` ahead of `mr r5,pStudio` and a copy of pStudio instead of EA's copy of
+  uScreen (a 3-cycle of argument registers). UISApi fn_80168F5C 88.15 -> 100 with level 1 alone
+  (no source change); fn_801694A0 92.97 -> 100 with level 2 plus one u16 local copy each of
+  uGroup / uScreen (level 1 alone: 16, level 2 alone: 7). Worth a try where EA keeps a `mr` copy
+  of a parameter register and ours copies a different one.
+- **[verified, fake-match class] A dead `(s64)` high word adds one register-allocation neighbour
+  to everything live at its def, but it disappears only in a call's argument block.** The post-RA
+  peephole deletes a dead `srawi` only when a later instruction in the SAME block overwrites its
+  register; the argument moves before a `bl` do, so put the `(s64)` on a call argument (the
+  parameter converts it back). Anywhere else (a pointer init, a loop condition, a loaded field)
+  the srawi stays in the output. UISEvent fn_80165ACC 99.08 -> 100: natural form (no copies) with
+  `fn_8016B0F8(pStudio, (s64)*pData, (s64)nArgs, pArgs)` lifts pStudio, uScreen and p from 27 to
+  29 neighbours, so they leave the graph in the second sweep and take r31/r30/r29 (rasim replay).
+  The deletion rule is "not live out of the block": a srawi whose register
+  is dead at the block's end also goes (BFX_vRender: r0 before a call), and inside a loop a dead
+  srawi is never deleted (GameMode22 GameMode22_DecideWinner lab tests).
+- **[verified, fake-match class] An index written as a signed 64-bit product adds an early
+  instruction that leaves no trace.** `(u8*)p + (s32)n * (s64)sizeof(T)` in place of `&p[n]`
+  makes `li rK,size; mulhw` for the dead high word; the pre-RA scheduler issues the `li` in the
+  entry block's cycle 0, which moves the other cycle-0 instruction (a parameter copy) later, and
+  both dead instructions are gone after allocation. UISScreen fn_8016B188 99.86 -> 100 (EA copies
+  pScreen before pStudio and loads pData into r4). `pNodes[(s64)n]` / `[(u64)n]` do nothing and
+  `[(s64)(s32)n]` leaves code (20). Worth a try where only a parameter-copy order in the entry
+  block differs.
+- **[verified, fake-match class] A dead `srawi` deleted after allocation makes that block get
+  scheduled again, on physical registers.** Blocks scheduled before allocation carry a
+  "scheduled" flag (mwccdbg `{000c}`) and the post-RA scheduler skips them; when the post-RA
+  peephole deletes an instruction in the block (the dead high word of a `(s64)(s32)` round trip
+  survives allocation as `srawi r0,rX,31`), the flag is cleared (`{0004}`) and the post-RA
+  scheduler reorders the block with the real registers (anti-dependences included). UISScreen
+  fn_8016A510 (with nNode as both loop counters, 12): `if (((UISScreen*)(s64)(s32)pScreen)->pData
+  != NULL)` gives EA's entry `mr r23,r3; lwz r3,0x10(r4); mr r24,r4` (10), and `add =
+  *(UISVec4*)(s64)(s32)fn_8016C18C();` EA's order of a struct copy's loads among fmuls in the
+  call block (0). A switch per block: worth a try where only the order inside one block differs.
+  Note: an entry block is merged into the prologue block (and rescheduled there) only when the
+  prologue saves no FPRs.
+- **[verified] The last scheduling pass skips blocks the first pass scheduled unless an
+  instruction in the block was inserted or deleted after it; register allocation deleting
+  coalesced copies counts** (so does the post-RA deletion of a dead srawi: UISScreen
+  fn_8016A510). A block that starts with a call result's copies (`mr r128,r3; mr r35,r128`,
+  deleted when the value stays in r3) is always rescheduled after allocation; EA's may not have
+  been (hlaudtrackstm Stm_Tick: setting the mark in memory gave EA's block exactly). A real branch
+  between the call and the loads keeps the first pass's order but costs its compare: the frontend
+  folds every constant condition and no backend pass removes a compare.
+- **[verified, fake-match class] Volatile loads keep their order in both scheduling passes**, a
+  way to pin independent loads the last pass reorders: Stm_Tick 99.10 -> 100 with
+  `((volatile AudTrack*)pTrack)->u.stm.pStream` / `.uReadPos` and
+  `((volatile AudStream*)pStream)->uOffset` (same values), the cap computed first. Needs the exact
+  subset: any two of them, or one more (uLength), do not match.
+- **[verified, fake-match class] The "load deletion" pass removes an unused `li` only when
+  constant propagation changed something in the function.** An OR against a zero word triggers it:
+  `(((u64)(u32)p << 32) | (u64)(u32)p) >> 32` is p again, but the zero low word it folds makes the
+  pass run, and a leftover `li 0` (from other identity chains) is deleted instead of being reused
+  by the second CSE for a later `i = 0`. It also adds copy-propagation passes, so levers that
+  count copy-chain links need retuning after it. UISEvent fn_80165E9C 95.59 -> 100.
+- **[verified, fake-match class] A copy chain written after an instruction makes a parameter's
+  saved copy its LAST link, which fixes the entry order.** `p = (T*)(u32)((u64)(s64)((u64)(u32)p
+  << 32) >> 32);` (an identity; six of them in UISEvent fn_80165E9C) keeps copies of p until late
+  passes, so the pre-RA scheduler issues the pool base's `addi` before the `mr` of the parameter
+  (EA's order). Chain back into the parameter itself: a new local gets a higher vreg and the
+  wrong register; signed-shift or `(s64)(s32)` links leave dead srawi readers that pull the chain
+  early.
+- **[verified, fake-match class] A dead `(u32)(s64)(s32)x` can reorder a whole block through the
+  first scheduling pass**, not only add an allocator neighbour: its `srawi` takes an issue slot
+  and an integer unit (and the 750's rule that an integer op cannot issue beside a busy unit if it
+  touches the register just defined there), so the first pass's order changes, the registers
+  follow from the new live ranges, and the srawi is deleted after allocation.
+  `tools/matching/sched750.py deadsearch` predicts which value to put it on. GoShaderObject_Particle_Gc
+  fn_800949D0 97.89 -> 100: the round trip on n in `if (nLive <= (u32)(s64)(s32)n)` gave EA's
+  order and registers (pVerts back to its plain form); the same round trip on nFirst * 36 had given
+  every register but left 4 instructions out of order, and one on `n = ...` itself keeps a copy.
+- **[verified] Inside a block, only a dead `srawi` extends liveness.** The allocator's liveness
+  skips a dead instruction entirely, except `srawi` (it sets XER[CA], so it is never "dead"): a
+  dead srawi interferes with everything live across it and keeps its source live up to it. A dead
+  `or`/`rlwinm`/`mulhw`/`li` gets 0 neighbours, but a dead `or` feeding a srawi is live, so
+  `srawi(a | b)` keeps both a and b live, and both go after allocation. Fake-match form (low word
+  = pPos, logic unchanged): `pPos = (f32*)(s32)((u64)(u32)pPos | (((u64)(s64)(V) >> 32 |
+  (u64)(u32)(P)) << 32));`. goballfx BFX_vRender 16 -> 0 aligned with three such statements
+  (placed early in block order so they issue before the UV add), 97.80 -> 100.
+- **[verified, fake-match class] A 64-bit OR high word keeps a value live ACROSS blocks and leaves
+  no code.** The backend has no dead-code pass for non-copies: the high word of a 64-bit op whose
+  low word is used survives to allocation, and the post-RA peephole deletes it outside loops.
+  `nWinner = (s32)((u64)(s64)nWinner | ((u64)(u32)pPlayer << 32));` after loop 1 keeps pPlayer live
+  to the loop's end (11 -> 24 neighbours): GameMode22 GameMode22_DecideWinner 97.96 -> 100. The low word must
+  reduce to a copy (`+` leaves `addc`; an unsigned OR/XOR folds the high word to a copy: use the
+  `(s64)` form). Within a block it does nothing (liveness is global there; use a srawi). Also
+  UISScreen fn_8016A2D4 (uEvent kept live across the calls). Dead copies never get this far: the
+  first copy-propagation pass deletes every dead copy at once, even under `opt_dead_assignments off`.
+- **[verified, fake-match class] A dead srawi fixes float scheduling too.** A srawi that is ready
+  early takes the first free issue slot whatever its source, pushing a float op back: uiArc
+  UIArc_Draw (EA's first pass issued fV0's `fadds` after the other corners' `fsubs`, the one
+  interference rasim said was missing). Host it on an int already live through the block, or its
+  GPR moves: `((s32)(s64)(s32)pArc->uFlags & 0x10)` in both ternaries, 98.26 -> 100.
+  `(s32)(s64)x` without the inner `(s32)` makes no srawi.
+- **[verified, fake-match class] More evidence for the signed 64-bit product**: UISApi fn_80169D90
+  66.85 -> 100 (`(u32)((s32)(nScreens + 1) * (s64)sizeof(UISScreen))` on the screen term: its
+  `li; mulhw` joins the pre-RA schedule). A power-of-two size folds to a shift and leaves no mulhw
+  (the handlers term: no effect). UISApi fn_80169C0C needed seven dead instructions in total:
+  `#pragma optimization_level 2` + four u32 parameter copies + three `(u32)(x * (u64)sizeof(T))`
+  products (64 -> 0 aligned; six gave 1).
+- **[verified, fake-match class] A call result's kept copy (`mr r0,r3 ... mr rN,r0`): a 64-bit
+  shift self-assignment right after the call**, `x = (s32)((s64)((u64)x << 32) >> 32);`: it becomes
+  a copy chain after x, so the call-result copy survives the copy-propagation passes. UISApi
+  fn_80169858 99.34 -> 100; UISScreen fn_8016A2D4 (nRet), fn_8016AD54. For a signed value keep
+  the inner `(u64)(u32)` (a `(u64)(s32)` leaves a dead srawi of x that takes r0: fn_8016AD54 31 vs
+  8). Each extra copy-propagation pass in a function eats one link: add
+  `x = (s32)(u64)(u32)x;` for exactly one more. Works only on copies from a physical register
+  (fn_80169DC4: no effect on plain local copies).
+- **[verified] `x = (u32)(s32)x;` as a statement** is dropped by the frontend but still counts as a
+  redefinition for its copy substitution: later reads keep x instead of its source (UISScreen
+  fn_8016A2D4; it also restored the nRet chain after an OR woke constant propagation).
+- **[verified, fake-match class] Loop-carried copies**: `pLoop = pNode;` before the loop and again
+  inside it keeps EA's copies of a pointer (UISScreen fn_8016AD54, then fn_8016ABBC 96.23 -> 100
+  with the same recipe + rasim declaration order). A copy that steals a pre-RA slot from the load
+  after it: read the carried copy into a second local first (`pPrev8 = pLoop8; pLoop8 = pNode;
+  call(.., pPrev8->ppGroups[i])`, 3 -> 0). Needs the source copy and the carried copy in different
+  blocks; in a one-block preheader they interfere and the in-loop copy stays (fn_80169DC4).
+- **[verified] OR lever, details**: the second operand must be an integer local of another type
+  (`void*`/`T*` copies fold; `(u32)p | x` with `u32 x` folds; UISScreen fn_8016C270 153 -> 81, then
+  exact with a `(void*)` copy of pStack declared first). Several ORs of one source in one
+  preheader are merged by the backend CSE unless each uses a different integer type (u32 / long /
+  int: UISApi fn_80169DC4 96.74 -> 99.39). The post-RA peephole rewrites the first load after a
+  kept copy to the copy's source only for a real `mr`, not for an `or` (fn_8016ABBC).
+- **[verified] Copies the allocator coalesces**: only temp -> temp copies (a named local is never
+  merged, a parameter copy excepted), and a copy whose source stays live is not coalesced; a copy's
+  destination does not interfere with its direct source. A parameter vreg that dies before the
+  first call is always merged with its incoming register (UISScreen fn_8016A2D4, UISApi
+  fn_80169DC4, Particle fn_80094534). The frontend keeps a user copy variable only when its right
+  side is the first occurrence of a CSE'd cast; `int` and `long` casts form one CSE group, `(u8*)`
+  another, `unsigned int` none (fn_80169DC4).
+- **[verified, fake-match class] A two-definition phi keeps a hoisted stack address**:
+  `if (pRate->u10) { pArg1 = &aArgs[1]; pArg2 = &aArgs[2]; } else { same }` right after
+  `if (pRate->u10 == 0) continue;` stops every folding pass from putting `addi rX,r1,4` back into
+  the stores; CSE reuses the continue test's cr0, the branch disappears. UISApi fn_8016A030 94.83
+  -> 96.33 (every instruction EA's; lever from UIStudio fn_80166098).
+- **[verified] A u8 flag test can delete a loop's `li i,0`**: constant propagation turns the u8
+  `!bLoaded` test's rlwinm into a copy, which lets load deletion drop the loop counter's `li 0`
+  (the late CSE then makes the offset a copy of i). `u32 bLoaded` keeps EA's code: UISApi
+  fn_80169590 5 -> 0 aligned (int/s32 2, u16 5).
+- **[verified, fake-match class] A longer compare chain at entry adds the neighbour a parameter
+  lacks**: `if ((u8)(s32)(s8)bAll)` (extsb -> rlwinm -> cmpli, folded back to `clrlwi.` after
+  allocation) gives the test temp a second pre-RA slot touching pStack: UISApi fn_80168CD8 26 -> 0.
+  Other UIS entry-copy-order misses may share the cause.
+- **[verified] The frontend keeps a variable's name only for its FIRST web; each later independent
+  web becomes a frontend temp** (@N, numbered after the loop IVs and CSE temps, in first-def order,
+  and coloured before every local). Both directions are levers: a fresh local per job stays a
+  local (char Character_LoadTextures: k/m for the second name loop, 28 -> 0; skalib AnimLib_PlanBank `pWork`,
+  own `n`; LLTex TX_spParseTextureGroupFromStream palette counter k); reusing a variable makes the
+  later web a temp (skalib AnimLib_MergeOverlay: i also as the overlay search counter gives EA's
+  `mr` IV copy, 97.36 -> 100). Giving a pointer an earlier dummy use turns its later array webs
+  into temps (uiProcessInterface UI_ReadControllers: `pPressed = &n38; pButtons = (u32*)(void*)pPressed;
+  *pButtons = 0;`, 99.94 -> 100).
+- **[verified] Frontend CSE temps are numbered in order of each expression's SECOND occurrence**
+  (the first one only records it): add a late extra use to get a late-coloured temp (goballfx
+  BFX_vRender, the third dead statement).
+- **[verified] A one-element local array (`f32 fR[1]`) is scalarized into a frontend temp numbered
+  in order of first use**; a dead store (`fR[0] = 0`, removed) counts as a first use. That puts
+  locals among the temps: uiArc UIArc_Draw, every saved FPR EA's (98.08 -> 98.26, labelled).
+- **[verified] Inlined variables are numbered above the caller's hoisted temps**: an inlined
+  function's locals get vregs above them (first declared = lowest), its parameters between the
+  temps and those locals (UISApi fn_8016A030
+  64 -> 18 aligned, not exact). A `static inline char* Get(char* p) { return p++; }` parameter is
+  numbered before every other inline temp (UISScreen fn_8016B844: pStart r26, 34 -> 0).
+- **[verified, fake-match class] An inline parameter assigned twice gives coalesced float
+  phantoms.** A copy is coalesced only into a frontend temp (inline parameters are temps) and only
+  if it survives copy propagation (the destination has a second definition): `Calc(f32 x, f32 y)
+  { if (x <= y) x = y; return x; }` around an identity `Read(expr)` makes one permanent neighbour
+  per call, which fixed the saved-FPR order of the loop constants: Particle fn_80094534 99.36 ->
+  100 (`fRed = Calc(Read(v10 * t + v0), v20)` for each channel; a named copy local does nothing).
+- **[verified] Spill slots are handed out in vreg order** (locals in reverse declaration order),
+  so declaration order sets EA's slot map (skalib AnimLib_PlanBank; uiArc's f64 corners). A local
+  declared inside a loop body numbers after all function-level ones (AnimLib_MergeOverlay n50Al:
+  the spill tie goes to the higher vreg). A value that is stored and read back (`nClips +=
+  nLibClips; nClipsAll = nClips;` instead of the sum into nClipsAll) turns the reload into a copy
+  (load deletion) and moves the variable's allocator priority: AnimLib_PlanBank 57 -> 0 aligned.
+- **[verified] The spill cost**: each def costs its loop weight, each use twice its loop weight
+  (named vregs all agree); when every node is stuck, the lowest cost / remaining neighbours is
+  picked and coloured last (UISScreen fn_8016A2D4: one store inside a loop made uEvt cost
+  17 against pbOut's 3).
+- **[verified] A 2-instruction block EA scheduled differently from ours means a deleted
+  instruction**: our such preheaders are never scheduled (`{0004}` in every pass), so EA's block had a
+  third instruction, a copy coalesced away by allocation. MC MC_MergeRecords: EA's `add row; li k` =
+  loops walking a named `SaveRecords*` view (labelled fake), 20 -> 0 aligned.
+- **[verified] The pre-RA scheduler breaks equal-height ties by block order** (the statement
+  written first wins; pick order: critical-path urgent, then more successors made ready, then
+  height). GoShaderObject_Particle_Gc fn_800949D0; `sched750.py` models it.
+- **[verified] Replay the allocator offline**: mwccdbg's `regalloc-*-pass-1-all/assigned.txt` are
+  enough to rebuild the priority list and colouring exactly (all 122 GPRs of LLDynTex fn_8010A930,
+  all 98 FPRs of Particle fn_80094534); a search over declaration orders against the replay found
+  EA's registers where objdiff-score climbs stalled (fn_8010A930 aligned 30 -> 4, then exact). `rasim.py` does it.
+- **[verified] One `rlwinm; srawi` fold per basic block per peephole-forward pass, the last one**:
+  where EA keeps a srawi, EA's block had later signed candidates (the RGB565 decode written
+  mask-first, `(u & 0xF800) >> 8`: fn_8010A930 93.5 -> 99.05; FO_spLoadFontFromStream +1.8).
+- **[verified] The backend's second CSE turns `li rX,0` into `mr rX,<zero reg>` only for frontend
+  temps**: a function-level variable the frontend splits gets EA's `mr`, a block-level one keeps
+  `li` (Earnings GM_Earnings_CheckPuttGoals, with the field store `a[nSlot] = s.aPuttGoal[i].nValue`: exact).
+- **[verified] Temp creation order**: temps of one expression are coloured in reverse creation
+  order; writing one result into an existing local first and re-reading the array reorders them
+  (BreakLine_Render's rotation: `fZ = fX*c + v[2]*s; v[0] = fX*-s + v[2]*c; v[2] = fZ;`, exact).
+- **[verified, fake-match class] A dead value that survives to register allocation changes
+  register choice and the final schedule**: `(s64)x` leaves a dead `srawi` until the post-RA
+  peephole (UISEvent fn_80165B90 exact; swept on 10 other near-misses: nothing).
+- **[verified] The allocator's levels**: a variable with more than 28 remaining neighbours cannot be
+  placed on the first level and jumps to the top (takes r31). One temp more or fewer is the lever.
+  hwsBurn HwsBurn_CopySetOptions (`nAlign + *pOffset` makes a temp: pBurn 29 neighbours, r31 not r25);
+  hlaudmovie Mov_SendSoundBlock (a use of pBlock in one more branch gave it the 29th: exact).
+- **[verified] The frontend numbers its temps above every declared local**, so a local EA orders
+  above a frontend temp cannot get there by declaration order; writing the expression at each use
+  (the frontend makes the temp) can. Swing SW_vImpact: pLaunchA/B locals -> `gPlayers[nPlayer].vLaunchA/B`
+  at each call, 6 -> 0.
+- **[verified] Reassigning a variable elsewhere can bring back a copy the frontend folds to a
+  constant**: LLTex fn_8000EA1C, case 11 reading its random number into b turned `li r30,0` into
+  EA's `mr r30,r31`, 98.99 -> 100.
+- **[verified] A `void*` copy stops the AST optimizer's copy propagation** (it rewrote pBlock to
+  pData): Particle fn_800951A0 92.0 -> 100 (`void* pBlock = pData`, the header field's own type).
+- **[observed] Unsolved pattern: EA keeps a copy our backend's first copy-propagation pass folds**
+  (UISScreen fn_8016AD54, fn_8016ABBC, fn_8016B4D4, fn_8016AEEC, fn_8016A2D4): no flag or form found.
+  All five are now exact with labelled fake matches (the OR lever, the call-result
+  shift chain, loop-carried copies, the 64-bit OR high word); EA's own form is still not known.
 
 ### Other
 
@@ -1523,7 +1449,7 @@ Read the compiler's own view first (`tools/matching/mwccdbg.py`, docs/workflow.m
   the nonsense.
 - **[verified] `abs()` on an int** is emitted inline as `srawi t,v,31; xor; subf` (no call).
 - **[verified] GC/2.0, 2.5 and 2.6 compile the game units identically; GC/2.0p1 is worse**
-  (Golfer 70 -> 67, Ball 63 -> 46, Swing 139 -> 133). Tested on every game unit, 2026-09-23.
+  (Golfer 70 -> 67, Ball 63 -> 46, Swing 139 -> 133). Tested on every game unit.
 - **[verified] GCC without optimization looks nothing like CodeWarrior:** frame pointer in `r31`
   (`mr r31, r1`), every variable written back to the stack after each statement, epilogue through
   `r11`. A binary can contain code from more than one compiler. See the
@@ -1712,3 +1638,17 @@ are for code built with GCC 2.95 at -O0 (SN ProDG), kept for reference.
   and `NgcAs.exe` directly (see `tools/build/prodg/prodgcc.py`). `cc1` takes `-O0 -quiet in.i -o out.s`.
 - The five ProDG builds in the compiler pack (3.5 - 3.9.3, all GCC 2.95.x) produce identical
   output for unoptimized code; the version cannot be identified from `-O0` functions.
+- **[verified] A near-100 function whose only difference is a branch target can be a real behaviour bug**
+  in our C (PsMgr fn_800A27FC: two calls outside their block; SitDevFile SitDev_SuppressAction: wrong `&&`/`||`
+  grouping). Check branch-only mismatches before calling them register noise.
+- Other compiler versions (GC 2.0, 2.0p1, 2.6, 2.7, 1.3.2) gave output identical to 2.5 on 18 near-miss
+  functions tried today: not a lever for these.
+- **[verified, negative] Dead asserts do nothing on GC/2.5 -O4,p** : every macro form compiles away without a trace except an empty
+  two-armed `if {} else {}`, and dead buffers take no stack.
+- **UIS = EA Tiburon's IStudio library** (TW2005 paths `Code/Tiburon/IStudio/`): one flag set for
+  all four units (`-pragma "pool_data on" -inline auto,deferred -str reuse,readonly`) ties the
+  per-file flags exactly; no flag/pragma/compiler moves the kept-copy pattern, which is a copy
+  whose destination has a second definition in EA's source.
+- **[verified] File-wide `opt_propagation off` keeps consecutive `x |= c` statements separate**
+  (the frontend otherwise merges them into one `ori`): uiText UIText_Draw 2 -> 0, no function worse.
+  A one-file flag: on the after-100% flag audit list.
