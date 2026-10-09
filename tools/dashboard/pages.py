@@ -72,7 +72,7 @@ def seed(out_path, src_path):
 
 
 def merge_older(history_path, src_path):
-    """Adds the records of an older history file (e.g. the PC's build/dashboard_history.json,
+    """Adds the records of an older history file (e.g. a local build/dashboard_history.json,
     which covers commits from before a history rewrite) that are older than everything in
     history_path. Records from the same time on are left as they are."""
     h, src = load(history_path), load(src_path)

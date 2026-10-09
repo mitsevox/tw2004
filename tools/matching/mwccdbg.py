@@ -4,14 +4,14 @@ each backend pass and the register allocator's priority list, to see WHY a regis
     python tools/matching/mwccdbg.py <src/Unit.c> <fn> [--src other.c] [--out DIR]
 
 Runs the unit's own compile command (from ninja) with GC/2.6 in place of GC/2.5: the debugger
-supports 2.6, and 2.6 compiles all 262 of our units byte-identically to 2.5 (checked 2026-09-26).
+supports 2.6, and 2.6 compiles all 262 of our units byte-identically to 2.5.
 --src compiles a scratch copy of the unit instead (same flags). Output: DIR (default
 build/mwccdbg/<fn>): backend-NN-*.txt, frontend-*.txt, regalloc-gpr/fpr-pass-N-assigned.txt.
-Setup (once per machine) and how to read the dumps: docs/workflow.md "mwcc-debugger"."""
+Setup (once per machine): docs/workflow.md "Removing a fake match"."""
 import os, pathlib, re, shlex, shutil, subprocess, sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-# Both clones sit next to the main checkout (a lane's worktree is one level further down).
+# Both clones sit next to the checkout (or one level up, for a worktree), or under MWCCDBG_HOME.
 _HOMES = ([pathlib.Path(os.environ['MWCCDBG_HOME'])] if 'MWCCDBG_HOME' in os.environ else []) + [
     ROOT.parent, ROOT.parent.parent, pathlib.Path.home()]
 TOOLS = next((p for p in _HOMES if (p / 'mwcc-debugger').exists()), ROOT.parent)
@@ -43,7 +43,7 @@ def main():
     emu = TOOLS / 'retrowin32/target/lto/retrowin32'
     for p in (script, emu):
         if not p.exists():
-            sys.exit('%s missing: see docs/workflow.md "mwcc-debugger"' % p)
+            sys.exit('%s missing: see docs/workflow.md "Removing a fake match"' % p)
     cmds = subprocess.run(['ninja', '-t', 'commands', 'build/GW4E69/report.json'],
                           capture_output=True, text=True, cwd=ROOT).stdout.splitlines()
     cmd = next((c for c in cmds if ' -c %s ' % unit in c and 'mwcceppc' in c), None)
@@ -62,11 +62,11 @@ def main():
     # The emulator's gdb port (9001) is fixed (see below for how parallel runs avoid it).
     import fcntl, tempfile
     env = os.environ.copy()
-    if '/opt/homebrew/bin' not in env.get('PATH', ''):     # macOS: gdb from Homebrew (Gemini, round 4)
+    if '/opt/homebrew/bin' not in env.get('PATH', ''):     # macOS: gdb from Homebrew
         env['PATH'] = '/opt/homebrew/bin:' + env.get('PATH', '')
     dbg = [sys.executable, str(script), '-e', str(emu), '-a', shlex.join(args + ['-sym', 'on']), fn, str(out)]
     # Linux: run each debugger in its own network namespace (its own loopback, so its own port
-    # 9001): parallel runs from many lanes no longer queue on one lock. The -c stub brings `lo` up
+    # 9001): parallel runs no longer queue on one lock. The -c stub brings `lo` up
     # (SIOCSIFFLAGS: IFF_UP|IFF_RUNNING) and execs the debugger. Elsewhere: the lock, one at a time.
     up = ('import fcntl, os, socket, struct, sys; '
           'fcntl.ioctl(socket.socket(), 0x8914, struct.pack("16sH14s", b"lo", 0x41, bytes(14))); '

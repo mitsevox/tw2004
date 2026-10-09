@@ -1,5 +1,5 @@
 """Sweep combinations of the known matching levers over near-miss functions. CPU only; src/ is never
-written, every result is a candidate for a lane to apply and check.
+written, every result is a candidate to apply by hand and check.
 
     python tools/matching/leversweep.py <Unit> <fn> [--minutes 6] [-j N]
     python tools/matching/leversweep.py --from-report [--min 95] [--skip Unit,Unit] [--minutes 6] [-j N]
@@ -8,10 +8,10 @@ written, every result is a candidate for a lane to apply and check.
 (rebuild the report first: `ninja build/GW4E69/report.json`). Each function gets its permuter
 directory (perm_setup.py, from the current src/) and --minutes of sweeping on -j worker processes
 (default: all cores). An overnight run on 20 cores: `--from-report --min 95 -j 20` (80 functions,
-about 8 hours on 2026-09-25). The time per function is sized for 20 cores: on 4 cores, 6 minutes
+about 8 hours). The time per function is sized for 20 cores: on 4 cores, 6 minutes
 does not reach every pair of a function with ~170 levers (leversweep_selftest.py: GoDynObj).
 
-The levers (docs/compiler/decomp-notes.md, "New from the first cloud lanes"), each tried at every site:
+The levers (docs/compiler/decomp-notes.md), each tried at every site:
   safe    move a declaration; int/s32/long or u32/unsigned int respelled (the same type on the
           GameCube); an identity inline on an assignment's value (`p = __lv(&x[i])`: moved a pointer
           to EA's register in three functions); `x = a * b * c` split into `x = a; x *= b; ...`

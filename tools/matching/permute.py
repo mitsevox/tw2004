@@ -11,7 +11,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]   # the checkout this script 
 sys.path[:0] = [str(ROOT / 'tools' / d) for d in ('build', 'naming', 'quality', 'matching')]
 from hosttools import NEW_PROCESS_GROUP, kill_orphan_workers, stop_tree  # noqa: E402
 # decomp-permuter checkout: TW_PERMUTER, else tools/decomp-permuter beside the main checkout
-# (a worktree sits one level deeper, in <parent>/tw2004-agents/<lane>)
+# (or one level up, for a worktree)
 PERMUTER = os.environ.get('TW_PERMUTER') or next(
     (str(p) for p in (ROOT.parent / 'tools/decomp-permuter/permuter.py',
                       ROOT.parent.parent / 'tools/decomp-permuter/permuter.py') if p.exists()),

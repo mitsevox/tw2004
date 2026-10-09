@@ -3,7 +3,7 @@
 Sweep names as mkunit printed them (e.g. unsorted/sweep_X.c). Runs configure, merges and dedupes,
 builds, and checks that every folded function is exact. Only then does it git rm the sweeps and
 commit. Nothing is deleted unless the DOL is OK and every folded function matches. Pushes only
-with --push (agents working in a worktree leave pushing to the orchestrator).
+with --push.
 
 For a unit that already has a source (widened with `mkunit.py --extend`), each sweep function is
 put in a sweep block where its address falls, before, between or after the unit's functions, and
@@ -206,7 +206,7 @@ restore_left_out()
 folded = [n for s in sweeps for _, n in defined((ROOT / 'src' / s).read_text(encoding='utf-8'))]
 run('python configure.py')
 # Sweeps that declare one name with two types (with each other, or with the unit and its headers)
-# cannot be merged: find them before anything is written, and let the lane fix them first.
+# cannot be merged: find them before anything is written, so they are fixed first.
 d = run(f'python "{HERE / "declcheck.py"}" {name} ' + ' '.join(sweeps))
 print(d.stdout.strip() or d.stderr.strip()[-1000:])
 if d.returncode:

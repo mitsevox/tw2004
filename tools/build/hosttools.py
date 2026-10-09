@@ -28,7 +28,7 @@ if os.name == 'nt':
     def kill_orphan_workers():
         """Kill multiprocessing workers whose parent is gone. Windows does not end a worker when its
         parent dies, so a permuter that finished, crashed or was stopped from outside leaves its
-        pool behind (60 idle workers holding 2.9 GB were found on 2026-09-23)."""
+        pool behind."""
         ps = ("$p = Get-CimInstance Win32_Process; $alive = $p.ProcessId; "
               "$p | Where-Object { $_.CommandLine -match 'spawn_main\\(parent_pid=(\\d+)' -and "
               "-not ($alive -contains [int]$Matches[1]) } | "

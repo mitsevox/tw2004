@@ -81,8 +81,7 @@ def score(fn, src, show=False, aligned=False):
     0 still means exact."""
     if fn not in _target:
         _target[fn] = _dis(fn, os.path.join(_perm(fn), 'target.o'))
-    # One temporary folder per trial, removed when the trial ends (leaked folders once filled the
-    # cloud box's disk mid-run: 2026-09-25).
+    # One temporary folder per trial, removed when the trial ends (leaked folders fill the disk).
     with tempfile.TemporaryDirectory() as d:
         c, o = os.path.join(d, 'v.c'), os.path.join(d, 'v.o')
         open(c, 'w', encoding='utf-8').write(src)

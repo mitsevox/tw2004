@@ -2,18 +2,16 @@
 """
 Local progress dashboard for the tw2004 decompilation.
 
-    python tools/dashboard/server.py [--port 8420] [--host 0.0.0.0] [--agents DIR]
+    python tools/dashboard/server.py [--port 8420] [--host 0.0.0.0]
     python tools/dashboard/server.py --export site/ [--history history.json] [--sha SHA]
 
---export writes the static copy CI publishes on GitHub Pages (index.html reading progress.json,
-no "in flight" panel; report.json numbers only) and exits.
+--export writes the static copy CI publishes on GitHub Pages (index.html reading progress.json;
+report.json numbers only) and exits.
 
 Serves one page and /api/progress. Reads build/GW4E69/report.json (written by every `ninja`
 run), config/GW4E69/symbols.txt, build/dashboard_history.json (written by the post-commit hook,
-see refresh_history.py) and, for the "in flight" panel, each agent worktree's report under
---agents (default: the folder next to the repo named <repo>-agents). Standard library only.
-Never launches another program: on this PC any console program started from a windowless process
-opens a Windows Terminal window.
+see refresh_history.py). Standard library only. Never launches another program: on Windows a
+console program started from a windowless process opens a terminal window.
 """
 import argparse, json, os, re, time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -23,7 +21,6 @@ VERSION = 'GW4E69'
 REPORT = os.path.join(ROOT, 'build', VERSION, 'report.json')
 SYMBOLS = os.path.join(ROOT, 'config', VERSION, 'symbols.txt')
 HISTORY = os.path.join(ROOT, 'build', 'dashboard_history.json')
-AGENTS = os.path.join(os.path.dirname(ROOT), os.path.basename(ROOT) + '-agents')
 
 _cache = {}
 
@@ -143,48 +140,7 @@ def parse_symbols(path):
     return {'functions': total, 'named': named}
 
 
-def in_flight(main, agents_dir):
-    """Per agent worktree: the code its last build matches (or links) that main's build does not.
-    Compared function by function (by address), so folded sweep files and main moving on since
-    the branch point do not count as progress."""
-    out = []
-    try:
-        names = sorted(os.listdir(agents_dir))
-    except OSError:
-        return out
-    base = main['_fns']
-    for name in names:
-        root = os.path.join(agents_dir, name)
-        if os.path.normcase(os.path.abspath(root)) == os.path.normcase(ROOT):
-            continue
-        rep = cached(os.path.join(root, 'build', VERSION, 'report.json'), parse_report)
-        if not rep:
-            continue
-        matched = linked = new_fns = 0
-        per_unit = {}
-        for addr, (size, exact, is_linked, unit) in rep['_fns'].items():
-            b = base.get(addr, (0, False, False, ''))
-            if exact and not b[1]:
-                matched += size
-                new_fns += 1
-                per_unit[unit] = per_unit.get(unit, 0) + size
-            if is_linked and not b[2]:
-                linked += size
-        units = sorted(per_unit.items(), key=lambda kv: -kv[1])[:4]
-        out.append({
-            'name': name,
-            'branch': git_branch(root),
-            'mtime': rep['mtime'],
-            'matched_ahead': matched,
-            'linked_ahead': linked,
-            'functions_ahead': new_fns,
-            'units': [{'name': u[5:] if u.startswith('main/') else u, 'bytes': b} for u, b in units],
-        })
-    out.sort(key=lambda a: -a['matched_ahead'])
-    return out
-
-
-def progress(agents_dir):
+def progress():
     rep = cached(REPORT, parse_report)
     return {
         'now': time.time(),
@@ -192,7 +148,6 @@ def progress(agents_dir):
         'report': {k: v for k, v in rep.items() if not k.startswith('_')} if rep else None,
         'symbols': cached(SYMBOLS, parse_symbols) or {'functions': 0, 'named': 0},
         'history': cached(HISTORY, parse_history) or [],
-        'agents': in_flight(rep, agents_dir) if rep else [],
     }
 
 
@@ -303,17 +258,6 @@ tr.group td{background:var(--bg)}
 tr.group button{all:unset;cursor:pointer;display:flex;gap:6px;align-items:center;font-weight:550}
 tr.group .file small{border:0;padding:0}
 .more{margin-top:8px;font-size:13px;color:var(--text-3)}
-.agents{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
-.agent{border:1px solid var(--line);border-radius:10px;padding:10px 12px}
-.agent .top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
-.agent .nm{font-weight:600}
-.agent .age{font-size:12px;color:var(--text-3)}
-.agent .big{font-size:20px;font-weight:650;margin-top:2px}
-.agent .sub{font-size:12.5px;color:var(--text-2)}
-.agent ul{margin:6px 0 0;padding:0;list-style:none;font-size:12px;color:var(--text-3)}
-.agent li{display:flex;justify-content:space-between;gap:8px}
-.agent li span:first-child{font-family:ui-monospace,Consolas,monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.agent.idle{opacity:.6}
 .commits td{font-size:13px}
 .commits code{font-family:ui-monospace,Consolas,monospace;font-size:12px;color:var(--text-3)}
 .commits .d{white-space:nowrap;text-align:right;color:var(--text-2)}
@@ -346,7 +290,7 @@ footer code{font-family:ui-monospace,Consolas,monospace}
 <footer>Reads <code>build/GW4E69/report.json</code> (written by every <code>ninja</code> run), <code>symbols.txt</code> and <code>build/dashboard_history.json</code> (written by the post-commit hook). Refreshes every 20&nbsp;s. Read-only.</footer>
 </div>
 <script>
-const API='/api/progress',REFRESH=20000,AGENTS_PANEL=true;
+const API='/api/progress',REFRESH=20000;
 const $=s=>document.querySelector(s);
 const fmt=n=>Math.round(n).toLocaleString('en-US');
 const pct=(a,b)=>b?100*a/b:0;
@@ -410,7 +354,6 @@ function render(d){
    stat('Fuzzy code match',pf(m.fuzzy_match_percent||0,1),'partial functions count in part')+
   `</div>`+
   `<section class="card"><h2>History</h2><div class="chartlegend"><span><i class="sw matched"></i>Matched code</span><span><i class="sw linked"></i>Linked code</span><span style="color:var(--text-3)">% of all code, per commit</span></div><div id="chartbox"><svg id="chart" aria-label="Matched and linked code over time"></svg><div class="tip" id="tip"></div></div><p class="note" id="chartnote"></p></section>`+
-  (AGENTS_PANEL&&d.agents&&d.agents.length?`<section class="card"><h2>In flight &middot; agent worktrees ahead of main</h2><div class="agents" id="agents"></div><p class="note">From each worktree's last <code>ninja</code> report: code in functions that match there but not in main's build, compared function by function. Linked counts functions in files that worktree links and main does not.</p></section>`:'')+
   `<section class="card"><h2>Source files</h2>
    ${counts.ready?`<div class="callout"><span class="badge ready">&#8594; ${counts.ready}</span><span>${counts.ready===1?'file is':'files are'} 100% matched but not linked yet (${fmt(readyBytes)} B of code). <button class="link" data-f="ready">Show them</button></span></div>`:''}
    <div class="toolbar"><div class="seg" id="seg"></div><input type="search" id="q" placeholder="Filter by name" value="${esc(state.q)}"><select id="sortsel" aria-label="Sort by">${[['status','Sort: status'],['pct','Sort: matched %'],['code','Sort: size'],['fns','Sort: functions'],['name','Sort: name']].map(([k,l])=>`<option value="${k}"${state.sort===k?' selected':''}>${l}</option>`).join('')}</select></div>
@@ -419,7 +362,7 @@ function render(d){
     <th data-k="fns" class="n">Functions<span class="arr"></span></th><th data-k="code" class="n hide-sm">Code<span class="arr"></span></th>
     <th data-k="pct" class="n">Matched<span class="arr"></span></th></tr></thead><tbody></tbody></table></div><div class="more" id="more"></div></section>`+
   `<section class="card commits"><h2>Recent commits</h2><table><tbody id="commits"></tbody></table></section>`;
- renderSeg();renderUnits();renderAgents(d);renderCommits(d);drawChart();
+ renderSeg();renderUnits();renderCommits(d);drawChart();
  $('#sortsel').addEventListener('change',e=>{state.sort=e.target.value;state.dir=(state.sort==='name'||state.sort==='status')?1:-1;renderUnits()});
  $('#q').addEventListener('input',e=>{state.q=e.target.value;state.limit=300;renderUnits()});
  document.querySelectorAll('#units th[data-k]').forEach(th=>th.addEventListener('click',()=>{const k=th.dataset.k;if(state.sort===k)state.dir=-state.dir;else{state.sort=k;state.dir=(k==='name'||k==='status')?1:-1}renderUnits()}));
@@ -455,14 +398,6 @@ function renderUnits(){
  const sa=$('#showall');if(sa)sa.addEventListener('click',()=>{state.limit=1e9;renderUnits()});
  const sw=$('#sw');if(sw)sw.addEventListener('click',()=>{state.sweepOpen=!state.sweepOpen;renderUnits()});
  document.querySelectorAll('#units th[data-k]').forEach(th=>{th.querySelector('.arr').textContent=th.dataset.k===state.sort?(state.dir>0?'↑':'↓'):'';th.setAttribute('aria-sort',th.dataset.k===state.sort?(state.dir>0?'ascending':'descending'):'none')});
-}
-
-function renderAgents(d){
- const el=$('#agents');if(!el)return;
- el.innerHTML=d.agents.map(a=>`<div class="agent${a.matched_ahead?'':' idle'}"><div class="top"><span class="nm">${esc(a.name)}</span><span class="age">built ${ago(a.mtime)}</span></div>
-  <div class="big">${a.matched_ahead?'+'+fmt(a.matched_ahead)+' B':'&ndash;'}</div>
-  <div class="sub">${a.matched_ahead?`matched in ${a.functions_ahead} function${a.functions_ahead===1?'':'s'}`:'nothing ahead of main'}${a.linked_ahead?` &middot; +${fmt(a.linked_ahead)} B linked`:''}</div>
-  ${a.units.length?`<ul>${a.units.map(u=>`<li><span>${esc(u.name)}</span><span>+${fmt(u.bytes)}</span></li>`).join('')}</ul>`:''}</div>`).join('');
 }
 
 function renderCommits(d){
@@ -538,11 +473,10 @@ def export(out_dir, history_path, sha):
         'report': {k: v for k, v in rep.items() if not k.startswith('_')},
         'symbols': parse_symbols(SYMBOLS),
         'history': history,
-        'agents': [],
     }
     page = PAGE
-    for old, new in (("const API='/api/progress',REFRESH=20000,AGENTS_PANEL=true;",
-                      "const API='progress.json',REFRESH=300000,AGENTS_PANEL=false;"),
+    for old, new in (("const API='/api/progress',REFRESH=20000;",
+                      "const API='progress.json',REFRESH=300000;"),
                      (re.search(r'<footer>.*?</footer>', PAGE, re.S).group(0), STATIC_FOOTER)):
         assert old in page, old
         page = page.replace(old, new)
@@ -555,8 +489,6 @@ def export(out_dir, history_path, sha):
 
 
 class H(BaseHTTPRequestHandler):
-    agents_dir = AGENTS
-
     def log_message(self, *a):
         pass
 
@@ -571,7 +503,7 @@ class H(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path.startswith('/api/progress'):
             try:
-                body = json.dumps(progress(self.agents_dir), separators=(',', ':')).encode()
+                body = json.dumps(progress(), separators=(',', ':')).encode()
                 self._send(200, body, 'application/json')
             except Exception as e:
                 self._send(500, json.dumps({'error': str(e)}).encode(), 'application/json')
@@ -585,7 +517,6 @@ if __name__ == '__main__':
     ap = argparse.ArgumentParser()
     ap.add_argument('--host', default='0.0.0.0')
     ap.add_argument('--port', type=int, default=8420)
-    ap.add_argument('--agents', default=AGENTS, help='folder of agent worktrees for the "in flight" panel')
     ap.add_argument('--export', metavar='DIR', help='write the static site (GitHub Pages) to DIR and exit')
     ap.add_argument('--history', metavar='FILE', help='with --export: the history to publish '
                     '(default build/dashboard_history.json)')
@@ -594,7 +525,6 @@ if __name__ == '__main__':
     if a.export:
         export(a.export, a.history, a.sha)
         raise SystemExit(0)
-    H.agents_dir = a.agents
     srv = ThreadingHTTPServer((a.host, a.port), H)
-    print(f'tw2004 dashboard on http://{a.host}:{a.port}/  (root {ROOT}, agents {a.agents})', flush=True)
+    print(f'tw2004 dashboard on http://{a.host}:{a.port}/  (root {ROOT})', flush=True)
     srv.serve_forever()

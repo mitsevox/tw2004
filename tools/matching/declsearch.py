@@ -7,7 +7,7 @@ its body, then runs, in parallel worker processes:
   - `all`: every order of the declarations, when there are 7 or fewer (5,040 orders at most);
   - `ils`: iterated local search (a 2-move kick, then a 60-move first-improvement climb), one
     worker per random seed; it found orders that greedy climbs and pair sweeps missed (GoTerrain
-    fn_80031154: 24 -> 0 in 22 seconds, 2026-09-26).
+    fn_80031154: 24 -> 0 in 22 seconds).
 The -j workers are shared out over the functions: one `all` job for each small function, the rest
 `ils` seeds. A function whose search reaches 0 stops its other jobs.
 
@@ -61,7 +61,7 @@ def job(args):
     """One worker: (fn, mode, seed, deadline, stop) -> (fn, mode, seed, best score, best order, trials)."""
     fn, mode, seed, (slice_s, end), stop = args
     # Each job gets its own slice from when it starts (a queue of more jobs than workers would
-    # otherwise leave the later jobs no time: 17 of 41 got none on 2026-09-26), never past the end.
+    # otherwise leave the later jobs no time), never past the end.
     deadline = min(time.time() + slice_s, end)
     head, decl, rest = split(fn, quicktrial.base(fn))
     sc = scorer(fn, head, rest)

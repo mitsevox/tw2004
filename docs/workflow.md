@@ -62,6 +62,43 @@ python tools/quality/constcheck.py --count    # no number higher than on main
 If the DOL check fails, `python tools/quality/doldiff.py orig/GW4E69/sys/main.dol
 build/GW4E69/main.dol` prints the differing ranges.
 
+Removing a fake match
+---------------------
+
+Replacing a `// fake match:` with what EA wrote usually means a function that no longer matches
+while you search. The tools in `tools/matching/` score variants without guessing:
+
+```
+python tools/matching/perm_setup.py <Unit> <fn>        # snapshot the function into build/perm/<fn>
+python tools/matching/declperm.py <Unit> src/<Unit>.c <fn> <N>   # every order of N declarations
+python tools/matching/declclimb.py <Unit> <fn> <N>     # the same, one move at a time (large N)
+python tools/matching/declsearch.py <Unit>:<fn>       # declaration-order search on all cores
+python tools/matching/leversweep.py <Unit> <fn>        # combinations of the known levers
+python tools/matching/permute.py <Unit> <fn>           # decomp-permuter, with a time limit
+```
+
+From a script, `trial.py` (`Trial(unit).trial(fn, old, [variants])`, about 15 s a variant, keeps
+only an exact one) and `quicktrial.py` (`score(fn, src)`, under a second, on the perm snapshot)
+try variants in bulk. Prefer an exact form close to the natural one: a reader should not wonder
+why the declarations are shuffled.
+
+To see *why* a register differs, `mwccdbg.py src/<Unit>.c <fn>` runs the compiler under
+[mwcc-debugger](https://github.com/cadmic/mwcc-debugger) and dumps the PCode after each backend
+pass and the register allocator's priority list into `build/mwccdbg/<fn>`. Setup, once per machine
+(Linux or macOS; gdb, cmake, Rust), with both clones next to the repo or under `MWCCDBG_HOME`:
+
+```
+git clone https://github.com/cadmic/mwcc-debugger
+git clone https://github.com/encounter/retrowin32 && cd retrowin32 && git checkout gdb-stub
+cargo build -p retrowin32 -F x86-unicorn --profile lto
+```
+
+In a container without IPv6, change `localhost:9001` to `127.0.0.1:9001` in `mwcc_debugger.py`.
+The debugger supports GC/2.6; `mwccdbg.py` swaps it in for our GC/2.5, which compiles every unit
+identically. On a dump, `rasim.py` replays the register allocator and searches declaration orders
+offline, and `sched750.py` replays the instruction scheduler when only the order inside a block
+differs.
+
 Data built from your disc
 -------------------------
 

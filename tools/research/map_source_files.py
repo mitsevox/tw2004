@@ -13,7 +13,8 @@ import re, glob, os, sys, json, collections
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 ASM = os.path.join(ROOT, 'build', 'GW4E69', 'asm')
 strings = {}
-for f in glob.glob(os.path.join(ASM, 'auto_0[4-9]_*.s')) + glob.glob(os.path.join(ASM, 'auto_1*_*.s')):
+ASM_FILES = glob.glob(os.path.join(ASM, '**', '*.s'), recursive=True)
+for f in ASM_FILES:
     cur = None
     for line in open(f, errors='replace'):
         m = re.match(r'\.obj (\S+),', line)
@@ -21,7 +22,7 @@ for f in glob.glob(os.path.join(ASM, 'auto_0[4-9]_*.s')) + glob.glob(os.path.joi
         m = re.match(r'\s+\.string "(.*)"', line)
         if m and cur and re.search(r'\.[ch]$', m.group(1)): strings[cur] = m.group(1)
 refs = collections.defaultdict(set)
-for f in glob.glob(os.path.join(ASM, 'auto_0[0-1]_*.s')) + glob.glob(os.path.join(ASM, '*', '*.s')):
+for f in ASM_FILES:
     cur = addr = None
     for line in open(f, errors='replace'):
         m = re.match(r'\.fn (\S+),', line)
