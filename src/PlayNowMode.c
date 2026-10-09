@@ -158,7 +158,7 @@ void PlayNow_UnregisterStreamClients(void) {
 void PlayNow_LoadPLYFromStream(UStreamObject* pObject) {
     // port: the 'PLY ' object is copied straight into the challenges (Challenge[83]); it is
     //       big-endian on disc, so a little-endian port converts it field by field here
-    //       (docs/game/format-byteorder.md)
+    //       (docs/game/formats/byte-order.md)
     Stream_StreamLoadFixedSize(pObject, sizeof(gPlayNowChallenges), gPlayNowChallenges);
 }
 

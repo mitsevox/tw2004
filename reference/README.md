@@ -1,23 +1,57 @@
-# Related-build debug references
+# Reference material from related EA builds
 
-Generated inventories from later Tiger Woods builds. These are research evidence, not proof that
-TW2004 used the same name, type, layout, or implementation. Promote a finding into the decomp only
-after it agrees with the GameCube binary; record accepted mappings in `../tw06-names.md`.
+Symbol, type and source-file inventories extracted from other EA games that shipped with debug
+information, used as evidence for EA's names, types and file layout. A finding here is a lead, not
+proof: it goes into the decomp only once the GameCube code agrees with it, and every name taken
+from here is logged in `config/GW4E69/name_sources.tsv`.
 
-No game executable, PDB, SELF, XBE, ELF, disc image, or linker map is stored here. The files in this
-directory are compact symbol/type/source inventories generated from separately held reference
-artifacts.
+No executable, PDB, ELF, disc image or linker map is stored here, only the inventories made from
+them.
 
-## Contents
+## The builds
 
-- `tw06-ps2/`: CCC `stdump` exports from `EA_DASH.ELF`. This is EA dashboard and middleware code,
-  not the stripped main game executable.
-- `tw06-xbox/`: source/module/type indexes and selected type reconstructions from `default.pdb`.
-- `tw07-ps3/`: source, function, section, type, and DWARF-quality inventories from the reconstructed
-  `Dev_Golf_Release_PS3.elf`.
-- `madden2003-ps2/`: EA Tiburon's UI Studio library (our UIS units) from the Madden NFL 2003 PS2
-  prototype's STABS debug info: signatures, locals in declaration order, types, and a pairing
-  with our functions (`tools/ref/mdebug.py` (removed 2026-10-03; in git history)).
+| Folder | Build | What it gives |
+|---|---|---|
+| `tw07-ps3/` | Tiger Woods PGA Tour 07, PS3 debug build (full DWARF) | Function order, signatures and locals per source file (`cu/`), and a machine pairing with our functions (`pairs.tsv`). The richest source of EA names |
+| `tw06-xbox/` | Tiger Woods PGA Tour 06, Xbox beta PDB (2005-07-12) | Source files, modules and type records. Same studio and engine; partly C++ by then |
+| `tw06-ps2/` | Tiger Woods PGA Tour 06, PS2 (2005-07-12) | The `EA_DASH.ELF` dashboard's symbols: EA's shared save and file libraries |
+| `madden2003-ps2/` | Madden NFL 2003, PS2 prototype (EA Tiburon) | The UI Studio library our `UIS*` units are: signatures, locals, types, and the script opcodes |
+| `nascar2005-gc/` | NASCAR 2005, GameCube (EA Tiburon, DWARF) | Its compilation units; it turned out to have no UI Studio |
+| `007eon-ps2/` | 007 Everything or Nothing, PS2 (unstripped) | The few SDK and runtime functions it shares with this game |
+| `tw2003-gc/`, `tw2005-gc/` | Tiger Woods 2003 and 2005, GameCube retail | File names, strings and function address pairs with this game |
+
+The TW06 and TW07 names are two and three years newer than this game, and parts of those builds
+were rewritten in C++ (the game modes, the Apt front end). A name from them says "this function
+does the same job", which the code has to confirm.
+
+## EA's source tree
+
+The Tiger Woods PGA Tour 2003 Xbox release builds (September 2002) carry no symbols, but their
+executable still holds 64 source paths, which show how EA laid out the code under
+`C:\Dev\TigerCode\Code\`. The files this game names in its own asserts sit here:
+
+| Folder | Files |
+|---|---|
+| `Golf\AI\` | `Swing.c` |
+| `Golf\Animation\` | `Skeleton.c`, `Skin.c`, `char.c`, `char_skin.c`, `MTA.c`, `mtalib.c`, `skalib.c` |
+| `Golf\Audio\Engine\Utils\` | `UAudMemStack.c` |
+| `Golf\Cameras\` | `GoDynamicCam.c`, `GoComicCam.c`, `GoStaticCam.c` |
+| `Golf\Entry\` | `GoEntry.c`, `startUp.c` |
+| `Golf\FrontEnd\` | `FE_Manager.c` |
+| `Golf\GameMode\` | `CareerMode.c`, `CourseInfo.c`, `Earnings.c`, `PlayNowMode.c`, `TournamentMode.c` |
+| `Golf\Hi-Rendering\` | `GoCamera.c`, `GoFrameBuf.c`, `GoViewport.c`, `GoDynObj.c`, `GoLighting.c`, `GoTerrain.c` (and `Xbox\GoRenderCtx_Xbox.c`) |
+| `Golf\Lo-Rendering\Shader\` | `GoShaderObject_{Glows,Particle,Rain}_Xbox.c`, `GoShaderObjectContainer_OBFData_Xbox.c` |
+| `Golf\Memory Card\` | `MC.c` (and `Xbox\MC_Xbox.c`) |
+| `Golf\RCMP\` | `rcmp_mad_codec.c` |
+| `Golf\SFX\` | `PsBallFx.c`, `PsMgr.c`, `UFstPart.c`, `shadow.c` |
+| `Golf\SitDev\` | `SitDev.c` |
+| `Golf\UI runtime\` | `FETextureMgr.c`, `FEgolferanim.c`, `uiEATrax.c`, `uiLoadFile.c`, `uiProcessInterface.c`, `uiTransform.c` |
+| `Legacy\LL\` | `LLFont.c`, `LLPictInt.c`, `LLTex.c`, `LLTexGrp.c`, `LLVideo.c` (and the `Xbox\` platform files) |
+| `Legacy\Lib\` | `UMath.c`, `UDynMemPool.c`, `UHeap.c`, `UMemPool.c`, `UObject.c`, `UObject3D.c` |
+| `Legacy\SPECIF\` | `UFont.c`, `UKernel.c`, `UStream.c` |
+
+Platform files end in `_Xbox` there; this game's asserts name the `_Gc` versions (`LLObj_Gc.c`,
+`MC_Gc.c`, `GoRenderCtx_Gc.c`...).
 
 ## Input fingerprints
 

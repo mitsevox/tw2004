@@ -1,7 +1,6 @@
 # Tiger Woods PGA Tour 2005, GameCube (USA)
 
-First pass, 2026-09-25, on the owner's PC. The disc images stay on the PC; only the derived evidence
-below is in the repo (file names, strings with their addresses, function address pairs).
+Only derived evidence is in the repo (file names, strings with their addresses, function address pairs).
 
 ## What the discs have
 

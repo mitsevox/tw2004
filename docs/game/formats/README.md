@@ -1,8 +1,7 @@
 File formats
 ============
 
-Inventory of the data on the two `GW4E69` discs. Nothing here is reverse-engineered
-yet; this is the starting map. One page per format gets added as it is understood.
+Inventory of the data on the two `GW4E69` discs, with a page for each format that is understood.
 
 Containers and file types
 -------------------------
@@ -21,7 +20,8 @@ differences between them.
 
 Pages: [ctrl-container.md](ctrl-container.md) (the container and its `Rdat` compression),
 [txg-textures.md](txg-textures.md) (textures, exportable), [game-data.md](game-data.md)
-(attribute table, bios, tour data, records).
+(attribute table, bios, tour data, records), [byte-order.md](byte-order.md) (the byte order of
+every format, and which ones the code reads as a struct).
 
 Counts are for `Data/` recursively, except `.sab`.
 
@@ -34,6 +34,6 @@ Course folders
 
 Every file present on both discs is byte-identical except `opening.bnr` (the banner). Course
 folders on both discs are only partially duplicated: `01_peb` has all 18 holes on disc 1 and 2
-extra files on disc 2, and so on (see the survey).
+extra files on disc 2, and so on.
 
 Other `Data/` folders (both discs): `chars`, `charsac`, `charstrm`, `fechars`, `Fend`, `load`, `movies`.

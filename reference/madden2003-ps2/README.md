@@ -1,10 +1,8 @@
 # Madden NFL 2003, PlayStation 2 prototype (EA Tiburon, 2002-06-06)
 
-Derived evidence only. The executable stays outside the repo (on the research machine at
-`/home/user/refs/madden03/`); nothing here is code bytes or game data.
+Derived evidence only: nothing here is code bytes or game data.
 
-- Source: `https://debugging.games/_files/PlayStation 2/[PS2] Madden NFL 2003 (USA) [SLUS-20529] [2002-06-06].7z`
-  (downloaded with the owner's approval, 2026-09-27).
+- Build: Madden NFL 2003 (USA) prototype, SLUS-20529, 2002-06-06.
 - `SLUS_205.29`: MIPS ELF (ee-gcc 2.9x; the objects name `GNU as v2.9-ee-991111b`), optimized,
   not stripped, 58,607,700 bytes,
   SHA-256 `8af61dbc3bfa6aa3cedda7fff695d524ac91af955777c2039d26db99d6c5fb29`.
@@ -54,9 +52,7 @@ offsets. Notes on reading it:
 
 ## How it was extracted
 
-`python tools/ref/mdebug.py <elf> cfile --file 'Common/UIStudio' --types '^_?UIS' --out <dir>`
-(and `--file 'Objects\\(UISObj|UISCallback)\.c'` for `glue/`). `tools/ref/mdebug.py` (removed 2026-10-03; in git history) is a small
-ECOFF reader: HDRR at the section's file offset, FDRs (0x48 bytes), local symbols (0x0C), strings;
+With a small ECOFF reader (`tools/ref/mdebug.py`, in git history at e90a466): HDRR at the section's file offset, FDRs (0x48 bytes), local symbols (0x0C), strings;
 a stab is a local symbol whose index is 0x8F300 + the stab code in an FDR that starts with
 `@stabs`. Its other commands: `files`, `raw` (every symbol of a file), `type <name>` (one type
 expanded), `externs`. `opcodes.md` came from a scratch script that reads `UISStackProcess`'s jump

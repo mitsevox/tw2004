@@ -1,15 +1,14 @@
 Gameplay hypotheses
 ===================
 
-Predictions from thousands of hours of play, written down before the relevant code is decompiled
-so the source can confirm or refute them. Each entry says what evidence would settle it and where
-in the binary to look (addresses from [`filemap.md`](../evidence/filemap.md)). Update the **Status** line when
-something is learned; keep the original prediction as written.
+Predictions from thousands of hours of play, written down before the code was decompiled so the
+source could confirm or refute them. Each entry gives the prediction as it was made, what would
+settle it, and what the code turned out to say.
 
 1. Caddie putt tips are unreliable
 ----------------------------------
 
-**Observation (2026-09-22):** the caddie's read for putts is genuinely not great in some situations,
+**Observation:** the caddie's read for putts is genuinely not great in some situations,
 including "straight in" reads that still lip out. Suspected: RNG noise scaled by the putting stat,
 but it happened with putting maxed too. An open question rather than a prediction.
 
@@ -24,7 +23,7 @@ rendered), `GoGreenGrid.c` (`0x8009B68C`; green elevation grid), `PsBallFx.c` / 
 (`0x800A2C6C`; ball physics), `Swing.c` (`0x80058D18`), `CharSliders.c` (`0x8010D614`; golfer
 attribute sliders, 20 assert references - likely where stats scale things).
 
-**Refinement (2026-09-22):** the guess is a *simplified* physics model so the tip populates quickly.
+**Refinement:** the guess is a *simplified* physics model so the tip populates quickly.
 Supporting observation: on long putts with a lot of break the caddie visibly takes time, and
 sometimes reports the tip as **unavailable**. That means the tip is a search, not a closed-form
 formula. Two ways a search says "unavailable": it exhausted its budget (an iteration cap or a
@@ -33,7 +32,7 @@ The code will show which: look for a loop counter compared against a constant, o
 versus a "no candidate passed" exit. Either way the search granularity (step size in aim angle and
 power) is what makes the tip miss.
 
-**Result (2026-09-22, in C):** **a search with a budget, exactly as refined.** The tip is the
+**Result:** **a search with a budget, exactly as refined.** The tip is the
 CPU's shot rehearsal (`AI_RehearseShot`) run on a copy of you in player slot 4: the real ball
 physics, randomness off, 0.2 s of ball time per frame (twelve real ticks), aim moved 45% of the
 miss each round until the simulated ball *stops within 1.8 in of the pin*. `Caddie_GetTip` gives up after 600 frames -
@@ -59,7 +58,7 @@ shots per club.
 list, so start from callers of the tip solver once `GoBreakLine.c` / `Swing.c` are understood, and
 from `CharSliders.c` / `EASportsBio.c` (`0x80124B5C`) for attribute reads.
 
-**Result (2026-09-22, revised):** **confirmed, with the mechanism.** The *target* comes from
+**Result:** **confirmed, with the mechanism.** The *target* comes from
 a table of authored aim points per hole (`AI_ChooseTarget`), filtered against POWER, AGGRESSION
 and the shot's skill. The *shot* to reach it is then solved by rehearsal (`AI_RehearseShot`):
 the real physics simulated with randomness off, the aim corrected by 45% of the miss each
@@ -81,7 +80,7 @@ physics, wind or AI-error code. Absence across all of those files would confirm 
 **Where to look:** the AI error injection from hypothesis 2 (the obvious place to hide it), wind
 generation, and the swing meter code in `Swing.c`.
 
-**Result (2026-09-22):** **mostly right, with one exception.** The complete CPU shot pipeline,
+**Result:** **mostly right, with one exception.** The complete CPU shot pipeline,
 the human forgiveness / power / boost / spin functions read only the player's own attributes,
 the shot geometry, club tables and the RNG. But `Golfer_IsLucky` (`0x8002D994`) does read the
 standing: **in game mode 4, when player 1 is more than 4 holes up on player 0, player 0's
@@ -122,11 +121,11 @@ human input path (controller -> swing meter), the CPU path (AI shot solver), or 
 expose. Expect attributes to be read through a small set of accessor functions; naming those
 accessors makes every use site searchable.
 
-**Lead (2026-09-22):** the per-golfer attribute values are in `loadonce.gcb` as the `stat`
+**Lead:** the per-golfer attribute values are in `loadonce.gcb` as the `stat`
 object (EA's `DATA\STATS_GC.BIN`): 34 golfers x two blocks of 12 values 0..100, plus the
 created golfers' starting rows. See [`formats/game-data.md`](formats/game-data.md).
 
-**Result (2026-09-22):** there are **twelve** attributes, not nine. The front-end shows POWER,
+**Result:** there are **twelve** attributes, not nine. The front-end shows POWER,
 POWER BOOST, DRIVING ACCURACY, BALL STRIKING, APPROACH, PUTTING, RECOVERY, SPIN, LUCK; a debug
 menu adds three hidden ones, **AGGRESSION, IQ, SPEED**, and the attribute screen's own reads
 confirm the column order. Every golfer record has all twelve, including the created golfers.
@@ -152,7 +151,7 @@ sites are mapped in [`formats/game-data.md`](formats/game-data.md). What that ma
   are read elsewhere (lies/bounces, animation, the human power boost). Tables and formulas in
   [`gameplay.md`](gameplay.md).
 
-**Update (2026-09-22, Swing.c in C):** every human-side reader is now decompiled: forgiveness,
+**Update:** every human-side reader is now decompiled: forgiveness,
 power, power boost, spin and the mis-hit rumble. Per attribute, on the human side: DRIVING
 ACCURACY / BALL STRIKING / APPROACH / PUTTING / RECOVERY each shrink the stick error for their
 shot type and (driving, recovery) reduce the distance lost to it; POWER BOOST doubles the boost
@@ -180,16 +179,15 @@ human's best shots *are* the CPU's solver. Full account in [`gameplay.md`](gamep
 
 **Update (`STATEFUNC_FadeToTapInUpdate` in C):** a gimme's tap-in is the CPU path too: the game runs
 the CPU rehearsal on the human (controller set to CPU for the call) and plays its solution. So
-the human and CPU share the solver twice: for gimmes, and for a lucky shot. *(Corrected
-2026-09-23: this used to say every suggested shot is the rehearsal's solution. TW06's name for
-the state, FadeToTapIn, prompted a check: it is entered only when a gimme is allowed.)*
+the human and CPU share the solver twice: for gimmes, and for a lucky shot. The gimme state
+(TW06's FadeToTapIn) is entered only when a gimme is allowed.
 
 **Status:** answered.
 
 5. Is there hidden putting assistance (a "pull" toward the cup)?
 -----------------------------------------------------------------
 
-**Question (2026-09-22):** does the ball roll exactly where the player aimed and struck it, or is
+**Question:** does the ball roll exactly where the player aimed and struck it, or is
 there any assistance: a force or nudge toward the cup when the ball passes near it, a capture
 radius larger than the physical hole, or an aim correction applied before the roll?
 
@@ -204,17 +202,17 @@ CPU or on an attribute.
 (`0x8009B68C`, slope), the hole/cup collision code (unnamed; find it from the constant for the
 cup radius, 0.054 m or 2.125 in, or from what writes the "holed" state).
 
-**Partial result (2026-09-22):** two assists exist *before* the roll, none found yet *during* it.
+**Partial result:** two assists exist *before* the roll, none found yet *during* it.
 (1) `SW_vAdjustMishitFromAttribute` zeroes the stroke error for any putt under 2 units, before reading
 the attribute; (2) above that, PUTTING shrinks a stroke error under 0.436 (at 100) to an eighth.
 The CPU gets the mirror image: no error on putts under 1.5 units, angle error halved under 5.
 The physics-side question (a pull toward the cup, capture radius) is still open.
 
-**Result (2026-09-22, `Physics_ApplySuperSucka` in C):** **yes, there is a pull.** Inside 5.5 in of the pin
+**Result (`Physics_ApplySuperSucka` in C):** **yes, there is a pull.** Inside 5.5 in of the pin
 (the physics is in yards; we first misread it as metres), while the ball is still short of the
 hole, a ball heading within 30 degrees of the cup (or within 3.5 in regardless) gets `0.455 x dt x (pin - ball)` added to its velocity each frame - an
 acceleration toward the cup - limited so it never speeds the ball up along an axis on which it
-already moves faster than about 1.5 ft/s (corrected 2026-09-23; first read as an angle test). A ball crossing the cup fast and off line loses up to 67% of its speed
+already moves faster than about 1.5 ft/s. A ball crossing the cup fast and off line loses up to 67% of its speed
 instead (the lip). The hole itself is geometry: holed means "dropped more than 2 in below the
 pin height" on a cup surface, no capture radius. The pull applies to every ball, human or CPU,
 with no attribute involved. Full numbers in [`gameplay.md`](gameplay.md).
@@ -224,7 +222,7 @@ with no attribute involved. Full numbers in [`gameplay.md`](gameplay.md).
 6. The CPU's putt misses come from break, not distance
 -------------------------------------------------------
 
-**Prediction (2026-09-22):** how likely a CPU golfer is to make a putt has nothing to do with the
+**Prediction:** how likely a CPU golfer is to make a putt has nothing to do with the
 distance to the cup. The break decides it: more break, more misses; distance is not factored in
 at all. Probably not coded that way on purpose. It could fall out of how the AI "pulls back"
 from its perfect rehearsed putt: a breaking putt leaves more room for the error to push the
@@ -248,7 +246,7 @@ straight one?
 **Where to look:** `AI_ApplyError` (`Golfer.c`), `AI_RehearseShot`, `Physics_ApplySuperSucka`, the green slope
 code (`GoGreenGrid.c`, `0x8009B68C`) and the putt part of the ball physics.
 
-**Result (2026-09-22):** **half right: distance is coded, but break causes misses by itself.**
+**Result:** **half right: distance is coded, but break causes misses by itself.**
 Two separate things decide a CPU putt:
 
 - **Distance is in the code.** Putts under 1.5 yd (4.5 ft) are never missed, and under 5 yd
@@ -275,13 +273,13 @@ harness (not built yet).
 **Status:** answered - partly confirmed (break misses: yes, by a hidden +5% pace; distance: also
 counts).
 
-**Update (2026-09-23, rolling code in C):** two more things push the same way. (1) The break per
+**Update:** two more things push the same way. (1) The break per
 tick is `slope / spin`, and spin is proportional to speed, so a firmer ball really does take
 less break - the +5% pace is a line error on every breaking putt. (2) The CPU's rehearsal runs
 **without the cup pull** (`Physics_ApplySuperSucka` is skipped when simulating), so the real putt has help
 at the hole that the rehearsal never counted; that only rescues putts that arrive close.
 
-**Update (2026-09-23, measured):** `tools/research/putt_sim.py` ports the skid, roll, break, cup
+**Update:** `tools/research/putt_sim.py` ports the skid, roll, break, cup
 pull and air physics from `Ball.c` and the CPU's rehearsal from `Golfer.c`, on a flat tilted
 green. It checks out: on a level green its roll distances match the game's own putt power
 table to within 0.6% (at green-speed setting 2; see gameplay.md). The only invented part is the
@@ -290,8 +288,8 @@ game's.
 
 A perfect CPU (no skill error at all), side-hill putts, green setting 2. The rehearsal's aim
 always holes out at the rehearsed pace; the real putt at +5% passes the cup this far on the high
-side (inches; the cup is ~2.1 in in radius). Rerun 2026-09-23 after the cup pull was
-corrected (see hypothesis 5); a 2.25 in cup gives the same makes and misses:
+side (inches; the cup is ~2.1 in in radius). With the cup pull from
+hypothesis 5, a 2.25 in cup gives the same makes and misses:
 
     length    1% slope   2%      3%      4%
      6 ft     -0.5      -0.2    +0.4    +0.6     all holed
@@ -336,7 +334,7 @@ skill-scaled aim error and the fixed +5% pace.
 7. Power boost's full meter needs a non-linear number of Z presses
 -------------------------------------------------------------------
 
-**Prediction (2026-09-22):** a full power boost (the whole ball on the meter filled red) is very
+**Prediction:** a full power boost (the whole ball on the meter filled red) is very
 hard to reach because the number of Z presses needed grows faster than linearly: exponential, or
 some other curve that is not a straight line.
 
@@ -353,7 +351,7 @@ presses into a level.
 **Where to look:** `Swing.c` (the swing phases and state machine; search for the Z button mask and
 for writes of the boost level), and the meter drawing code that fills the ball.
 
-**Result (2026-09-22, `Swing_BoostInput` re-read):** **refuted on the count, but the difficulty
+**Result (`Swing_BoostInput` re-read):** **refuted on the count, but the difficulty
 is real and has a different cause.** Each Z **tap** adds exactly one level, up to 8: a straight
 line. (Correction: `gameplay.md` said "held, one level per frame". The button word keeps held
 buttons in its top half and *newly pressed* ones in the bottom half, and the boost asks for the
@@ -379,7 +377,7 @@ back-loaded reward.
 8. The heartbeat comes from a quick look-ahead simulation after the strike
 -----------------------------------------------------------------------------
 
-**Prediction (2026-09-22):** the heartbeat effect (the tense "this could go in" moment) is decided
+**Prediction:** the heartbeat effect (the tense "this could go in" moment) is decided
 by a separate, sped-up physics simulation run right after the ball is struck. If the simulated
 ball finishes close enough to the pin, the heartbeat starts shortly after the ball takes off.
 
@@ -396,7 +394,7 @@ runs another, or just watches the real ball is the question.
 banks or a string in `main.dol`), then its callers. Also check the swing states after launch
 (`Swing.c`) and `Ball.c`.
 
-**Result (2026-09-22, `fn_800DF824`, read):** **confirmed, almost exactly as predicted.** The
+**Result (`GM_SimulateBallMovement`):** **confirmed, almost exactly as predicted.** The
 moment the ball is struck (swing state 12 starting), the game copies the launched ball into a
 second ball in the player (`+0xB5C`). Every frame of the flight it first moves the real ball, then
 **runs the copy ahead in fast-forward** with sounds and effects off. It fits in as many physics
@@ -424,7 +422,7 @@ heartbeat sample is still unlocated.
 9. Gimme lip-outs that still count, and "straight in" reads that miss
 -----------------------------------------------------------------------
 
-**Prediction (2026-09-22):** in Tiger Woods 2003 there is a known glitch where a gimme's animation
+**Prediction:** in Tiger Woods 2003 there is a known glitch where a gimme's animation
 sometimes lips out and misses the hole, but the putt still counts as made. This is probably the
 same root cause as putts the caddy tip calls "straight in" that still miss: what the game *says*
 about a putt (the caddy read, the gimme result) is decided separately from what the ball physics
@@ -444,7 +442,7 @@ lets the ball roll freely.
 the caddy tip text (`STRAIGHT`, `BREAK` strings) and whatever computes it, and the hole-out
 check in the ball code.
 
-**Result (2026-09-22):** **right about gimmes, wrong about the caddie read.**
+**Result:** **right about gimmes, wrong about the caddie read.**
 
 - **A gimme counts no matter where the ball goes: confirmed, in the code.** A gimme sets player
   flag 8 (`STATEFUNC_TapInInit`), then plays the tap-in as a *real* putt: the CPU's rehearsal
@@ -468,7 +466,7 @@ check in the ball code.
 **Status:** answered - gimme half confirmed; caddie half refuted (the read is real physics, the
 misses come from a random wobble on your stroke).
 
-**Update (2026-09-23):** one refinement to "the read is real physics": it is the real physics
+**Update:** one refinement to "the read is real physics": it is the real physics
 **minus the cup pull and the near-cup gravity**, which the caddie's simulation skips. The real
 ball has both. Near the hole a real putt is pulled toward the cup (and slowed if it crosses the
 lip fast and off line), so the ball you hit and the ball the caddie simulated can part ways in
@@ -479,7 +477,7 @@ Facts already established that bear on these
 
 - **The game never calls the C library `rand()` / `srand()`.** EA's own generator is
   `Rand_Next(stream)` (`0x8000B130`), an additive lagged-Fibonacci generator with 20 words of
-  state per stream, and `Rand_Float` (`0x8000B428`) for [0, 1). Found 2026-09-22 through the AI
+  state per stream, and `Rand_Float` (`0x8000B428`) for [0, 1). Found through the AI
   error code; listing its callers locates every random decision in the game.
 - The leaked file names contain no "AI", "CPU" or "opponent" file, so the AI logic lives in a file
   without asserts or under a name that does not say so (`user.c`? `PsMgr.c`?).
