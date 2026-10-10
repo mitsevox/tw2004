@@ -48,10 +48,10 @@ portable to the 32-bit GameCube build.
   block: `line  PS3-address  size  [static ]return Name(parameters)`, then its `local` variables
   in declaration order and the functions it `inlines`. Inline-only functions (no address) are
   included. `cu/index.tsv` lists the files, their function counts and EA's source paths. Made by
-  `python tools/match/tw07dwarf.py <elf> <out dir>` (removed 2026-10-03; in git history).
+  `tools/match/tw07dwarf.py` (in git history at e90a466).
 - `pairs.tsv`: a machine pairing of TW2004 functions (GameCube address, our unit and current name)
   with TW07 functions (name, file, line), scored on shared strings, float constants, paired callees
   and callers, size ratio (PS3 code is about 1.8x GameCube) and source-order alignment within a
   unit. `conf` high/med/low; measured precision against names already proven: high 26/26, med 66/68,
-  low about 85%. A candidate, never a fact. `pairs_blind.tsv` is the same without our names, for
-  blind audit lanes. Snapshot of 2026-09-24; our names change as the audit renames functions.
+  low about 85%. A candidate, never a fact. Our names in it are a snapshot; many functions have been
+  named since.

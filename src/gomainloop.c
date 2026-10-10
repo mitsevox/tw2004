@@ -452,7 +452,7 @@ void fn_8006C7A8(void) {
     Kernel_InitOnStartup();
     fn_8006E2A4();
     fn_8006F14C();
-    fn_80093524();
+    LF_vInitModule();
     DynObj_InitModule();
     Network_InitModule();
     Pict_InitModule();
@@ -464,7 +464,7 @@ void fn_8006C854(void) {
     Aud_ExitSession(0);
     Network_CloseModule();
     DynObj_CloseModule();
-    fn_80093580();
+    LF_vCloseModule();
     fn_8006F150();
     fn_8006E424();
     Kernel_CloseOnShutdown();
@@ -654,7 +654,7 @@ void GO_vInitIG(void) {
     fn_8009CC00();
     BS_vInit();
     GR_vInit();
-    fn_8006F4B4();
+    HoleLoader_QueueNextHole();
     UI_OpenInterface("ingame");
     fn_8006DC20(1.0f);
     SW_vInitModule();
@@ -773,7 +773,7 @@ void fn_8006CFC8(void) {
 }
 
 // Whether the main loop should end this frame, by the game type's own tests: gSession's bEndLoop
-// and nC, lbl_802811E8[1], the pads, fn_8009A180 and UI_IsClosed.
+// and nC, a queued hole load, the pads, fn_8009A180 and UI_IsClosed.
 u8 fn_8006D01C(void) {
     u8 bDone = 0;
 
@@ -1168,7 +1168,7 @@ void fn_8006DC20(f32 f) {
 }
 
 u8 fn_8006DC34(void) {
-    return lbl_802811E8[1];
+    return gpHoleLoader->bHoleQueued;
 }
 
 void fn_8006DC40(int nField) {

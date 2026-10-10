@@ -20,7 +20,6 @@ void LLMath_mat44fltMultiply33(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // a ve
 f32  CamScript_fGetDistanceBetweenSplinePoints(f32* pPos0, f32* pPos1, f32* pPos2, f32* pPos3);
 
 void StaticCam_LoadCAMCfromStream(UStreamObject* pObject);
-void StaticCam_Reset(void);
 void StaticCam_SetupFlybyCameraPointers(CamShot* pShot, CamShot** ppPrev, CamShot** ppNext, CamShot** ppAfter);
 u8   StaticCam_CheckHotZone(CamShot* pShot, int nPlayer);
 void StaticCam_Vec3Add(f32* pA, f32* pB, f32* pOut);

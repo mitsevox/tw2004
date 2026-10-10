@@ -89,7 +89,7 @@ s32 gFELastDrawnSlot = -1;          // } a load, so he is given his ball and tex
 f32 lbl_80281348 = 0.918f;          // the share of the 448-line frame FE_RenderGolfer sets for screen kind 3
 
 Character* gFEGolferChars[CRAP_NUM_GOLFERS];    // per golfer slot: its starting character (NULL)
-CourseLights* gFEGolferLights;      // the golfer's lights ('LITE' stream object, FE_lite_vStreamCallback)
+TGD_LightingData* gFEGolferLights;  // the golfer's lights ('LITE' stream object, FE_lite_vStreamCallback)
 CrAPState* gpCrAPState;             // the menu golfer's state (allocated by FE_CharMgrInit)
 
 void FE_CharMgrClose(void);
@@ -140,7 +140,6 @@ char* DynObj_GetGolfBallLogoTextureName(int i);
 void CharacterRender_StartNewFrame(void);
 void Character_UpdateAnimation(Character* pChar, int a, f32 f);
 void SKN_PoseCharacter(Character* pChar, int n);
-void LF_LoadCurrentLights(void);
 void FE_CrAP_EquipDefaults(void);
 void SkinPart_SetChangeAllCopies(u8 b);
 void fn_8010B098(void* p);
@@ -905,9 +904,9 @@ void FE_vUpdateGolferAll(void) {
             pLight = (LightParams*)&gpCrAPState->pB4->pChar->p44[21];
             if (gpCrAPState->nScreenKind == 1 && gpCrAPState->bDimmed) {
                 Mem_set(&params, 0, sizeof(params));
-                fn_80093854(&params);
+                LF_vSetLightModifiers(&params);
             } else {
-                fn_80093854(pLight);
+                LF_vSetLightModifiers(pLight);
             }
         }
         LF_LoadCurrentLights();
@@ -1313,7 +1312,7 @@ void FE_lite_vStreamCallback(UStreamObject* pObject) {
     ByteSwap_Records(&pSrc, &pDst,
                      aLightElemDef, sizeof(aLightElemDef) / sizeof(aLightElemDef[0]), gFEGolferLights->nLights);
     LF_vSetCurrentLightFogEnvironment(0);
-    fn_800935CC(gFEGolferLights);
+    LF_vSetLightingEnvironment(gFEGolferLights);
     LF_ResetCurrentFogSettings();
     StaticMem_Free(pObject);
 }

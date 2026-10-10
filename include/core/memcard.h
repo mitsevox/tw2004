@@ -9,7 +9,7 @@
 //
 // port: MC_Gc.c is the layer a PC build replaces with file I/O; the functions below it marked
 //       "GameCube only" are the CARD library. The save data is written and read as raw big-endian
-//       bytes (docs/game/format-byteorder.md).
+//       bytes (docs/game/formats/byte-order.md).
 
 #ifndef CORE_MEMCARD_H
 #define CORE_MEMCARD_H

@@ -58,4 +58,7 @@ void BreakLine_Render(int nView);
 void BreakLine_GetClosestPointToCupPos(int nView, f32* pOut);
 void BreakLine_GetCaddyTipInfo(int nView, f32* pLong, f32* pSide);
 
+void BreakLine_InitForHole(void);
+void BreakLine_CloseAfterHole(void);
+
 #endif

@@ -122,7 +122,7 @@ def main():
                         src[n - 1:n] = [l[:cut].rstrip(), pre + rest]
                     continue
             if l.rstrip().endswith('\\') or (n > 1 and src[n - 2].rstrip().endswith('\\')):
-                # a macro's line: a plain break ends the macro there (round 20, Ball.c's
+                # a macro's line: a plain break ends the macro there (Ball.c's
                 # BALL_LANDING_EVENTS). Only the padding before the continuation backslash may go.
                 m = re.match(r'(.*?\S)\s+\\\s*$', l)
                 cols = [len(x.rstrip()) - 1 for x in src[max(0, n - 4):n + 3]

@@ -165,7 +165,7 @@ void Kernel_CloseModule(void) {
 }
 
 // Removes every dynamic object as Kernel_CloseModule does, but keeps the pools and starts the list,
-// the ids and the overflow slots over; called by fn_8006F568.
+// the ids and the overflow slots over; called by HoleLoader_CloseCurrentHole.
 void Kernel_RemoveAllObjects(void) {
     DynObj* pObj;
 

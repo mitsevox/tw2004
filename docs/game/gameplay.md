@@ -1,14 +1,10 @@
 Gameplay logic, read from the code
 ==================================
 
-> **Unaudited.** Written from the disassembly during matching (2026-09-22) and never checked
-> against the finished, named code. Verify any claim in `src/` before relying on it.
+> **Not yet checked against the finished code.** This was written from the disassembly while the
+> game was being matched. Verify a claim in `src/` before relying on it.
 
-What the shot code actually does, in plain English with the numbers. Read from the disassembly
-on 2026-09-22 (functions named in `config/GW4E69/symbols.txt`). The golfer/AI file is being
-decompiled as `src/Golfer.c`: the accessor and its helpers match, `AI_ApplyError` and
-`AI_ChooseTarget` compile to the same instructions with only register numbers differing, so
-the arithmetic below is confirmed, not just read.
+What the shot code actually does, in plain English with the numbers.
 Units: distances compare against constants like 1.5, 5, 50, 100, 200, which fit yards for full
 shots and feet for putts; the code does not say, so they are called "units" below.
 
@@ -30,8 +26,8 @@ The pieces
 | `gAITargets` | `0x801C65B8` | table of authored aim points, 12 bytes each |
 | `gForgivenessTable` | `0x80188168` | 27 rows x 3 floats (value at attribute 0 / 100 / 110) |
 
-Human swing: starting it (`SW_vStateIdleSwing`, `Swing_Begin`, in C)
---------------------------------------------------------------------------
+Human swing: starting it (`SW_vStateIdleSwing`, `Swing_Begin`)
+--------------------------------------------------------------
 
 Before the backswing the game polls both sticks every frame and holds their rest positions at
 128. **The swing starts the frame either stick is pulled past 160 of 255** - a quarter of its
@@ -74,10 +70,8 @@ names for the states come from TW06's copy of the same table (`GS_*` in `include
     18  RemoveBall: the ball goes to the pin, lie 12 (LIE_HOLED), animation 12
     19  Wait, 20 InitialFlyBy (the hole flyover), 21 MidHoleFlyBy, 22 PlaceBall, 23 Conceded
 
-**A gimme's tap-in is the CPU's solution** (state 15, `STATEFUNC_FadeToTapInUpdate`, in C).
-*Corrected 2026-09-23: this section used to say every suggested shot comes from here. It does
-not - state 14 enters state 15 only when `Gimme_Allowed` says yes; TW06 names the state
-FadeToTapIn.* When a gimme is given, `Shot_Plan` plans the tap-in, and every frame of the camera
+**A gimme's tap-in is the CPU's solution** (state 15, `STATEFUNC_FadeToTapInUpdate`). Not every
+suggested shot comes from here: state 14 enters state 15 only when `Gimme_Allowed` says yes. When a gimme is given, `Shot_Plan` plans the tap-in, and every frame of the camera
 move the game **runs `AI_RehearseShot` on you - your controller set to the CPU for the call, in
 fast mode (six ticks a frame)** - until it settles. State 16 (TapIn) then plays that solved putt
 for you. If the camera finishes before the rehearsal settles, the turn ends instead. For an
@@ -125,8 +119,7 @@ anything but a putt, `(hold - 0.05)^2` comes off, at most 0.3 - so a 0.6 s pause
 **new press of Z** while the stick is pulled past 93 of its range adds one level, to a maximum of
 8. (The pad word `Input_ReadControlPad` returns held buttons in its top 16 bits and buttons pressed this
 frame in the bottom 16; `Input_uiMap(action, bHeld)` picks the half, and the boost asks for
-action 0x1F = Z, not held. Corrected 2026-09-22: this paragraph used to say "held, one level per
-frame".) It is only called in phase 1, so **taps before the backswing or while holding at the
+action 0x1F = Z, not held.) It is only called in phase 1, so **taps before the backswing or while holding at the
 top do not count**; all eight have to land while the club is going back. Backing the stick down
 for 1/12 s clears it. `SW_fPowerBoostAdjustment` turns the level into power through the POWER BOOST
 attribute.
@@ -151,8 +144,8 @@ reseeds with it and snapshots the player, profile and a block of globals into th
 buffer; a replay reseeds from that and skips the luck swap and spin. That is why a replay
 reproduces the shot exactly, bounces and all.
 
-Human swing: the miss itself (`Swing_MeterError`, `0x8005BA94`, in C)
--------------------------------------------------------------------------
+Human swing: the miss itself (`Swing_MeterError`, `0x8005BA94`)
+---------------------------------------------------------------
 
 The raw error is the analog stick's path. Three stick samples are kept (each -128..127): where
 the swing started (centre), the top of the backswing, and impact. The path back is
@@ -209,8 +202,8 @@ quarter turn - **36 to 54 degrees off vertical, peaking at 45** - on the side th
 negative. We first took the value for a tempo; it is the angle the face code below stores.
 Both are tuning values set in `Swing_Init`, not attributes.
 
-Human swing: draw and fade (`SW_vGetClubDirection`, `SW_fCalculateSliceAmount`, in C)
---------------------------------------------------------------------------
+Human swing: draw and fade (`SW_vGetClubDirection`, `SW_fCalculateSliceAmount`)
+-------------------------------------------------------------------------------
 
 The shot's curve comes from the same three stick samples. On a full shot the angle of the
 backswing off vertical, `atan((top.x - centre.x) / (top.y - centre.y))`, is kept
@@ -372,8 +365,7 @@ parks it 3 in down in the cup.
 count) runs from the rolling step (`Physics_BallRolling`, state 4) every tick, for every *real*
 ball, human or CPU. **It is skipped in simulations** (`gSimulating`) unless `gSimFullCup` is set -
 so the CPU's shot rehearsal and the caddie's putt read run *without* it, while the state-15
-rehearsal (the gimme's tap-in) and the look-ahead ball get it (corrected
-2026-09-23; this used to say "gated only by a debug flag pair"):
+rehearsal (the gimme's tap-in) and the look-ahead ball get it:
 
 - inside **5.5 inches** of the pin (under three cup radii), on a putt that started at least 6 in
   away, and only while the ball is still short of the hole along its path from where it started;
@@ -384,9 +376,7 @@ rehearsal (the gimme's tap-in) and the look-ahead ball get it (corrected
 - otherwise, if heading **within 30 degrees** of the cup, or **within 3.5 in** regardless:
   `velocity += 0.455 x dt x (pin - ball)` on x and z - an acceleration toward the cup
   proportional to the offset - except on any axis where that would speed the ball up while it
-  already moves faster than about 1.5 ft/s along that axis. (Corrected 2026-09-23: first read
-  as "more than 16.8 degrees off line"; matching the function exactly showed the test is on the
-  axis speed.) So the pull can always slow a ball toward the cup, but only nudges a slow one.
+  already moves faster than about 1.5 ft/s along that axis. So the pull can always slow a ball toward the cup, but only nudges a slow one.
 
 How much is it? At 4 in off the line and rolling at a foot per second the ball spends about
 half a second in the zone and picks up under an inch per second sideways: a few degrees of
@@ -399,7 +389,7 @@ earlier "no deflection when perfect" was wrong - a perfect shot gets a fixed def
 Gimmes and the pool-cue tap-in
 ------------------------------
 
-**When** (`fn_800E2810`, from swing state 14 once the ball has stopped): the gimme option is on
+**When** (`Gimme_Allowed`, from swing state 14 once the ball has stopped): the gimme option is on
 (options byte 5, default on), not a replay, two mode flags clear, the ball within **0.5 yd (18 in)**
 of the pin (`GameAnalysis_GetCurrentDistanceToPin`), and either the club is the putter or it is a one-player game. Then
 state 15 (FadeToTapIn: the CPU rehearsal runs on the player until it settles) and state 16 (TapIn): animation 11,
@@ -413,10 +403,10 @@ to 12 (holed) wherever the ball is**; state 18 then puts the ball at the pin. So
 lips out is still scored as made. This is the rule behind the known TW2003 glitch. Flag 8 also
 stops the look-ahead's in-hole camera cut (below).
 
-**Which animation** (animation 11 -> `fn_800965DC`): a style from the score the tap-in will give
-(`fn_800D0AA0` = strokes + 1 - par: under par 6, par 5, over 2) is stored on the golfer, then
-clip group 9 is looked up in the golfer's animation library (`fn_800176E8` -> `fn_800258B4` ->
-`fn_80025640`: group, style, club class, a fourth key; each level falls back to a default). The
+**Which animation** (animation 11 -> `CharacterState_SetTapInState`): a style from the score the tap-in will give
+(`GameAnalysis_IsPuttFor` = strokes + 1 - par: under par 6, par 5, over 2) is stored on the golfer, then
+clip group 9 is looked up in the golfer's animation library (`Char_SetClip` -> `AnimLib_Pick` ->
+`AnimLib_Find`: group, style, club class, a fourth key; each level falls back to a default). The
 leaf's clips are picked **at random** (`Rand_Next(1) % n`, up to three tries) with a used-mask so
 none repeats until all have played. No other condition applies to group 9.
 
@@ -435,15 +425,15 @@ McGregor's files are still named for EA's working names, `...ICAPONE\EXPORTED/GC
 `MCGRUFF\EXPORTED/SM.CHG`.)
 
 `gplptt12` is the **pool-cue tap-in** (the golfer drops to the ground, turns the putter round
-and knocks it in with the grip like a cue). **Confirmed in game (2026-09-22)**: with the Gecko code
+and knocks it in with the grip like a cue). **Confirmed in game**: with the Gecko code
 in `mods/gecko/pool_cue_gimme.txt`, which hands every group-9 lookup the `gplptt12` clip from any
 loaded golfer's library, a created golfer playing alongside Cedric Andrews tapped in with the pool
 cue on the first gimme. A created golfer's own library (character 08) has no group 9, and the
 creator's 111-animation playlist (group 20) has no tap-ins, so without the code they never get it. So it is a one-in-three
 gimme for six golfers, every gimme for Pops, and never for anyone else - including Tiger.
 
-Animation memory: libraries, clip banks and the per-round budget (`skalib.c`, in C)
-----------------------------------------------------------------------------------
+Animation memory: libraries, clip banks and the per-round budget (`skalib.c`)
+-----------------------------------------------------------------------------
 
 EA's `skalib.c` (0x80021ADC-0x80026844, all 53 functions in C, 40 exact) manages the animation
 libraries. Two file types are registered with the streamer: **`SAL `** (a library: the clip tree
@@ -473,8 +463,8 @@ Merging the overlays (`AnimLib_PlanBank`, `AnimLib_MergeOverlay`):
 So in multiplayer, a golfer with many variants of one reaction can lose some of them for that
 round. The gimme group has three clips at most, so the pool-cue tap-in is never trimmed.
 
-The CPU's shot rehearsal (`AI_RehearseShot`, `0x8002B030`, in C)
--------------------------------------------------------------------
+The CPU's shot rehearsal (`AI_RehearseShot`, `0x8002B030`)
+----------------------------------------------------------
 
 After choosing an aim point the CPU does not trust its plan: it rehearses it. A private copy of
 the ball (`gSimBall`) is launched with the planned club and aim at **`power x AI_PowerScale`,
@@ -556,8 +546,8 @@ to about 0.4 degree off with a perfectly straight stick, and a short stroke more
 2.5 in at 30 ft; the cup is about 1.9 in in radius. A CPU or a lucky "perfect" shot gets no
 wobble.
 
-Putt power and club distances (`Ball.c`, in C)
----------------------------------------------
+Putt power and club distances (`Ball.c`)
+----------------------------------------
 
 **Putts** (`Physics_EstimatePuttPower`, distance -> power; used by the CPU and by your putt meter). A table of
 23 distances at power 0, 0.05, 0.10 .. 1.10 (`gPuttDist`), times a **green-speed scale**
@@ -577,10 +567,9 @@ harness; which setting the options menu starts on is not checked yet.)
 Because roll grows with the *square* of power, **the CPU's +5% putt pace (above) is +10% of
 distance**: a putt planned to die at the hole would finish about 10% of its length past it.
 
-**Full shots, chips and the rest** (`Physics_GetShotTableAndSurfaceID` picks the table, `fn_80050F88` interpolates):
+**Full shots, chips and the rest** (`Physics_GetShotTableAndSurfaceID` picks the table, `Physics_EstimateShotPower` interpolates):
 seven tables, one per shot kind 1..7, of 25 clubs x 11 distances at power 0.1, 0.2 .. 1.1
-(`gClubRows1..7`; corrected 2026-09-23 - the columns were first read as 0.0 .. 1.0, one step
-low). The tenth column (full power, 1.0) is the club's "reach" that `AI_PowerScale` divides a
+(`gClubRows1..7`). The tenth column (full power, 1.0) is the club's "reach" that `AI_PowerScale` divides a
 golfer's own distance by; the last is 110%, the same cap as putts. Some rows, in yards at
 power 0.6 / 1.0 / 1.1:
 
@@ -593,12 +582,12 @@ power 0.6 / 1.0 / 1.1:
     6                70 136 153     68 133 147    21  50  57
     7                36  77  86     25  55  62     2   5   6
 
-`fn_80050F88` also adds the difference between the table's reference surface (45; 14 for chips)
+`Physics_EstimateShotPower` also adds the difference between the table's reference surface (45; 14 for chips)
 and the surface under the ball (`SurfaceType +0x00`), so the lie changes the power a distance
 needs.
 
-The strike (`fn_800512BC`, exact)
---------------------------------
+The strike (`Physics_GetShotData`)
+----------------------------------
 
 How club, shot kind, power, aim and the ground under the ball become the ball's velocity and
 spin. Every number here is from the code.
@@ -631,7 +620,7 @@ spin. Every number here is from the code.
       4 rough, bad lie           80%        70%
       anything else           surface table (+0x00, +0x08)
 
-  (Lie numbers corrected 2026-09-23 from `Physics_SetLie`: 3/4 are the rough, 6/7/8 the sand.)
+  (Lie numbers from `Physics_SetLie`: 3/4 are the rough, 6/7/8 the sand.)
 
   plus the ball's own `+0x70`, and **each club step gives back 1.25% of what was lost** - a
   wedge (step 15) keeps about 19% more of the lost speed than a driver. A chip from the rough
@@ -640,13 +629,13 @@ spin. Every number here is from the code.
   (`gClubSpin`: 0.87 for the woods down to 0.11 for club 24) x kind spin (`gKindSpin`: kind 4
   x 1.5, kind 5 x 0.01 - a flop has no spin) x 0.85 x the lie's spin / 0.84.
 
-The ball in flight (`Ball_Tick`, `Physics_BallFlying` and helpers, in C)
--------------------------------------------------------------------------
+The ball in flight (`Ball_Tick`, `Physics_BallFlying` and helpers)
+------------------------------------------------------------------
 
 **Each tick** (`Ball_Tick`; a tick is one 20 ms step of the real ball, the same step the
 rehearsals use): the state's own step runs - in the air (`Physics_BallFlying`), rolling
-(`fn_80052268`) or bouncing (`Physics_BallRolling`) - then the ball moves by velocity / 36. A
-ball still in play is kept on the ground (`fn_8005418C`) or collided with the ground
+(`Physics_BallRollingandSlipping`) or bouncing (`Physics_BallRolling`) - then the ball moves by velocity / 36. A
+ball still in play is kept on the ground (`Physics_FixBallHeight`) or collided with the ground
 (`Ball_Collide`), then swept against trees and objects (`Physics_CheckDynObjCollisions`: event 0x27, and a bounce
 off it as surface 13). **Stall check:** every 4 seconds' worth of ticks the ball must have moved
 at least 4 inches since the last check, or it is stopped where it is. Then its speed, its
@@ -670,19 +659,19 @@ height above the ground and its closest approach to the pin are updated.
   velocity change is added).
 
 **Ground safety nets:** a rolling ball with no ground under it coasts for up to two ticks as if
-on flat ground, then it is a hazard (`fn_80052088`). The surface it coasts on is 109 whenever its
+on flat ground, then it is a hazard (`Physics_GetSurfaceInfo`). The surface it coasts on is 109 whenever its
 own surface index is below 156 - i.e. always; the test reads `n < 0 || n < 156`, which looks like
 a typo for `n >= 156`. A ball in the air with no ground under it within 8 ft of the pin is set
-down on the other ground height (`fn_80055324`); elsewhere it stays in play while above the
+down on the other ground height (`Physics_GetBallAltitude`); elsewhere it stays in play while above the
 course floor (`CourseInfo.fFloor`) and is a hazard below it.
 
-Skidding and rolling: how a putt breaks (`fn_80052268`, `Physics_BallRolling`)
+Skidding and rolling: how a putt breaks (`Physics_BallRollingandSlipping`, `Physics_BallRolling`)
 ----------------------------------------------------------------------------
 
 A ball on the ground is **skidding** (state 3) until its spin catches up with its speed, then
 **rolling** (state 4). Putts start in state 3.
 
-**Skid** (`fn_80052268`, exact): gravity along the ground plane, x (1 - surface `+0x14`) and
+**Skid** (`Physics_BallRollingandSlipping`, exact): gravity along the ground plane, x (1 - surface `+0x14`) and
 the course settings below, accelerates the ball; the velocity is kept on the plane at its
 speed; friction (1.5 x surface `+0x18` x the normal force, same settings) builds roll spin.
 When 0.84 x the spin reaches the speed, it is rolling.
@@ -728,8 +717,8 @@ sticky, but `Physics_EstimatePuttPower` (putt power for a distance) ignores it. 
 marker - the caddie and the CPU rehearse on the real physics - but a putt struck at the power the
 table gives for a distance rolls further on faster menu greens than the table says.
 
-Landings, lies, trees and water (`Ball_Collide`, `Physics_SetLie`, `fn_800539F8`, in C)
-------------------------------------------------------------------------------------
+Landings, lies, trees and water (`Ball_Collide`, `Physics_SetLie`, `Physics_ProcessCollision`)
+----------------------------------------------------------------------------------------------
 
 **Out of bounds** is 600 yards from where the shot started (squared distance over 360,000).
 
@@ -754,7 +743,7 @@ enters three rolls; a simulation rolls 0, which always gives the kind result:
   random 0..1 less LUCK/200 (not below 0), times the surface's `+0x04`. LUCK shrinks how far a
   lie can swing either way.
 
-**Trees** (`fn_800539F8`, surface class 17): the surface normal at the hit is turned by
+**Trees** (`Physics_ProcessCollision`, surface class 17): the surface normal at the hit is turned by
 12..19 degrees on two axes before the bounce. The sign test is `(roll & 31) != 0` - so it is
 **negative 31 times in 32**, a fixed world direction, not relative to your shot; it looks like a
 typo for a coin flip. A simulation, slot 4, or a perfect (lucky) shot rolls 0: a fixed +12, +12.
@@ -766,7 +755,7 @@ the flag swaying by how far off-centre and how fast it hit. Nothing happens whil
 swaying.
 
 **Spin you add with the stick is applied at the first bounce** (event 0x1D reads the stick,
-`fn_800539F8` applies it): backspin x (1.9 - the green-speed multiplier), sidespin x (1.95 -
+`Physics_ProcessCollision` applies it): backspin x (1.9 - the green-speed multiplier), sidespin x (1.95 -
 it) - so **on faster menu greens the spin you add is weaker** (backspin x 0.9 / 0.8 / 0.7).
 
 **Water skipping** (`Ball_Collide`): on water surfaces 41, 47 and 104, a ball that bounces up
@@ -778,8 +767,8 @@ its rise cut to a quarter. Any other water landing is a hazard.
 animation 13). The look-ahead ball's first landing sends its owner 0x49, which queues front-end
 message 0x1D.
 
-The bounce (`fn_80052598`, 98%)
-------------------------------
+The bounce (`Physics_HandleCollision`)
+--------------------------------------
 
 Every ground contact of a ball in the air, and every hop, runs this. It returns the square of
 the speed into the surface (for sand, the "how hard did it land" that decides a plugged lie).
@@ -823,14 +812,14 @@ high side, more for more break, at any skill**. On top of that is the random ski
 `AI_ApplyError` (hypothesis 6): an aim angle, which grows with distance, and a pace error, which on a
 breaking putt changes the line too.
 
-The look-ahead ball and the "this could go in" moment (`fn_800DF824`, read)
----------------------------------------------------------------------------
+The look-ahead ball and the "this could go in" moment (`GM_SimulateBallMovement`)
+---------------------------------------------------------------------------------
 
 At the strike, `STATEFUNC_SimulateInit` copies the launched ball into a second ball in the player
-(`+0xB5C`; our struct still calls it `ballBefore`). Every frame of the flight, `fn_800DF824`
+(`+0xB5C`; our struct still calls it `ballBefore`). Every frame of the flight, `GM_SimulateBallMovement`
 (called from `STATEFUNC_SimulateUpdate`):
 
-1. moves the real ball: `fn_800DB1C4` ticks of 20 ms, each `Ball_Tick(ball, 1.0)`. The
+1. moves the real ball: `GameEffects_BallUpdatesThisFrame` ticks of 20 ms, each `Ball_Tick(ball, 1.0)`. The
    rehearsal's sim uses the same 1.0 tick, so the rehearsal and the real ball integrate
    identically;
 2. if not split screen, **runs the copy ahead** with `Ball_SetSimulating(1)`: tick after tick
@@ -847,7 +836,7 @@ At the strike, `STATEFUNC_SimulateInit` copies the launched ball into a second b
    (`GameAnalysis_IsPuttFor <= 0`), a **50% roll** (`Rand_Next(1) % 100 < 50`); if **not holed** but
    its closest approach (ball `+0x60`, a running minimum kept by `Ball_Tick`) is **under 0.2 yd
    (7.2 in)**, always. Either way: flag 4 on the player, the distance saved at `+0xEEC`, and golfer
-   animation 9 (clip group 10 or 5, by `fn_80096530`).
+   animation 9 (clip group 10 or 5, by `CharacterState_UpdateGameEmotionState`).
 
 Separately, `fn_8006BB5C` (every frame, live ball) keeps a crowd-style intensity level 0..3 from
 the live ball's closest approach while rolling (thresholds 0.5, 2, 4.5, 9.3 yd), and toggles HUD
@@ -856,8 +845,8 @@ items 4 and 5 when a ball in the air comes within 40 yd.
 Still unknown: which outcome classes 8 and 9 are, and which sound is the heartbeat (camera 11 and
 animation 9 are the two candidates).
 
-The CPU's per-shot modifiers (`AI_SetShotModifiers`, `0x8002A630`, exact)
---------------------------------------------------------------------------
+The CPU's per-shot modifiers (`AI_SetShotModifiers`, `0x8002A630`)
+------------------------------------------------------------------
 
 Before every CPU shot, `Player_IsCPU` gated, its eight modifiers (POWER, IQ, AGGRESSION,
 STRIKING, APPROACH, PUTTING, RECOVERY, LUCK; aggression always the opposite sign) are set:
@@ -874,7 +863,7 @@ double, +40 at triple - and in match play it gets **worse** by 5 per hole it lea
 attributes never change; these are the modifiers `Golfer_GetAttribute` adds in mode 2, capped
 at 100 (110 for POWER, IQ, AGGRESSION).
 
-Wind (`fn_80055FC8`, `fn_80055F88`, `fn_80055F1C`; the flight step `fn_80051CD0`)
+Wind (`Wind_InitForHole`, `Wind_SetPhysicsWind`, `Wind_GetPhysicsWindVelocity`; the flight step `Physics_BallFlying`)
 ----------------------------------------------------------------------------------
 
 Each hole carries an authored wind (direction and speed in the course table at `0x801FA2F4`,

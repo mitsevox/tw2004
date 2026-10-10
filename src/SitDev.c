@@ -53,7 +53,7 @@ void SitDev_vCloseModule(void) {
     gpSitDevScripts = NULL;
 }
 
-// Before a hole loads (fn_8006F4F0): no commentary zones yet (the count
+// Before a hole loads (HoleLoader_PreHoleInit): no commentary zones yet (the count
 // SitDev_NetworkLoadCallback adds to).
 void SitDev_vInitBeforeHole(void) {
     gSitDevNumCommentaryZones = 0;

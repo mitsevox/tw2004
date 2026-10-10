@@ -38,14 +38,12 @@ void AI_TargetsClear(void);
 void UI_InitLoadingBar(void);
 s32  Aud_InitSession(u8 a, u8 b, u8 nListeners, int nUnused);
 void Character_ReloadSacFiles(void);
-void fn_8006F438(void);
 void Gaud_InitHole(void);
 void fn_80112D20(void);
 void fn_8009A16C(void);
 void fn_80112DA0(void);
 void Gaud_ExitHole(void);
 void Character_ExitHole(void);
-void fn_8006F568(void);
 void Luck_TightenOdds(void);
 void fn_8009554C(void);
 void CharacterTex_WaitEndOfTextureLoader(void);
@@ -140,7 +138,7 @@ void fn_800083A4(void) {
                 fn_8000882C();
                 Character_ReloadSacFiles();
             }
-            fn_8006F438();
+            HoleLoader_vLoadQueuedHole();
             Gaud_InitHole();
             fn_80112D20();
             gSession.nGameType = 6;
@@ -160,7 +158,7 @@ void fn_800083A4(void) {
             fn_80112DA0();
             Gaud_ExitHole();
             Character_ExitHole();
-            fn_8006F568();
+            HoleLoader_CloseCurrentHole();
             Luck_TightenOdds();
             if (fn_80008820() && gSession.nC == 0) {
                 gSession.nGameType = 5;
@@ -232,9 +230,9 @@ void fn_800083A4(void) {
     fn_8006C770();
 }
 
-// A hole load is asked for (lbl_802811E8[1], set by fn_8006F4B4): the loop loads another hole.
+// A hole load is queued (HoleLoader_QueueNextHole): the loop loads another hole.
 u8 fn_80008820(void) {
-    return lbl_802811E8[1];
+    return gpHoleLoader->bHoleQueued;
 }
 
 void fn_8000882C(void) {

@@ -163,4 +163,6 @@ void SitDev_LoadScripts(SitDevHeader** ppScripts);  // the 'sscr' stream handler
 // SitDevCommentaryZones.c
 void SitDev_NetworkLoadCallback(u8* pChunk);        // the course loader for chunk 5
 
+void SitDev_vInitBeforeHole(void);
+
 #endif

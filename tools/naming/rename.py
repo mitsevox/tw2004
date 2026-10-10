@@ -132,7 +132,7 @@ def main():
 
     def keep_comment_column(before, after):
         # a declaration's aligned trailing comment stays in its column when a name grows or shrinks
-        # (round 20: terrain.h's externs drifted); the code keeps at least one space before it
+        # (terrain.h's externs drifted once); the code keeps at least one space before it
         a, b = before.split('\n'), after.split('\n')
         if len(a) != len(b):
             return after

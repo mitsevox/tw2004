@@ -34,4 +34,6 @@ LAYOUT_ASSERT(GreenGrid, 0x118);
 
 extern GreenGrid* gpGreenGrid;
 
+void GR_vInitForHole(void);
+
 #endif

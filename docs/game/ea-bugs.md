@@ -1,41 +1,48 @@
-# EA bug register (from 2026-09-28)
+EA's bugs
+=========
 
-Every possible EA bug a lane reports ends here with a verdict, so none gets lost between rounds
-(owner, 2026-09-28). Labelled bugs carry `// EA bug:` in the code (grep for it); this file keeps
-the ones still open and why the others were dropped. naming.md rule 6: a lane settles bugs in its
-own files in its pass; the rest come here.
+Bugs in the shipped game's code, found while decompiling it. The decomp reproduces each one, since
+the bytes require it; they're listed here instead of being commented in the source.
 
-## Labelled
-| Where | What | Commit |
-|---|---|---|
-| GameModeStableford.c GameModeStableford_EndGame | stroke play's fewer-is-better prize test on Stableford points pays the losing side | 98ebd8d |
-| GameModeDriverPGATour.c GameModeDriverPGATour_SetTournament | the player's green speed option (options.n18) is saved but never put back after a tour round | 22cb76c (ro6) |
-| FE_CalendarPopups.c FE_GetDateTimeIfClockEarly | `nYear < 2003 && nMonth < 10` is no date cutoff (Oct-Dec of an earlier year is not "early") | 22cb76c (ro6) |
-| GameAnalysis.c GameAnalysis_GetTipStat | fairway percentage divides by all holes, par 3s too | 22cb76c (ro6) |
-| PGATourSimulation.c GM_PgaTourSim_CheckEndOfTournamentAward | the major-win count skips the bUser test: a major won by the pro in slot 0 of a skipped tournament counts as the player's (award 36) | round 15 (ro2) |
-| PGATourSimulation.c GM_PgaTourSim_DistributeWinnings | no new place starts after row 70: entrants below it who made the cut share the last paid place's prize | round 15 (ro3) |
-| PGATourSimulation.c CalcParBreakers | nBirdies already includes eagles and the formula adds nEagles again | round 15 (ro3) |
-| FE_MessageTable.c GM_vMCLoadUser (menu message 35) | answers 1 or an error, never 0: the slot is backed up and marked loaded when the load failed | round 15 (ro5) |
-| FE_MessageTable.c GM_vMaskString (menu message 399) | the terminator goes one past the stars; for 63 stars it writes szStars[64], past the buffer (64 or more: the loop does) | round 16 (rp6, label extended) |
-| FE_Manager.c FE_CrAP_IsItemLocked, kind 20 | counts groups with aMedal != 0, but 0 is the best medal and 3 none: a new profile (all 3) unlocks every kind-20 item with n <= 29, and winning best medals lowers the count (message 175 tests != 3) | round 17 (rq2) |
-| FE_Manager.c FE_CrAP_IsItemLocked, kind 24 | the loop `i = 23; i < 16` never runs: only n <= 0 unlocks (label made exact) | round 17 (rq2) |
-| Code800B90F4.c MAD_ReadNextFile | the end-of-movie test repeats the NULL test above it, so nEnd is never set: MAD_IsAtEnd always answers 0 and LLVideo.c stops a movie only when it is starved | round 17 (rq5) |
-| startUp.c Startup_CheckCards | hint 0x8B (card slot B empty) can never be sent: port 1 is only reached when port 0's status is 0, and that case tests port 0's status != 0 | round 18 (rr2) |
-| hlaudtrackstm.c Stm_Exit | cancels its DMAs with the track as owner, but AudDma_ToAram's owner is always 0 or 1: the cancel never matches, so a queued block DMA writes into ARAM buffers just freed and its callback counts into the freed track | round 18 (rr4) |
-| UAudContainers.c UList_InsertAt | an insert at the tail (not also the head) links after it, not in front: InsertSortWorldPerf leaves a higher-priority track at the tail, where Trk_AllocPerf steals first | round 18 (rr5) |
-| gocamscripts.c CamScript_CircleCameras | fA8 (the roll) blends by fT (0..2) instead of fShare: the roll runs on to twice the difference and snaps back when the blend ends | round 19 (rs6) |
-| rcmp_mad_codec.c madinit | `for (i = -256; i < 255; ...)` never writes gMadClamp[255] (.bss zero): a block value of +255 becomes pixel 0 (black) while +128..+254 become 255 | round 19 (rs2) |
-| GoTerrain.c Ter_vCloseModule | StaticMem_Free(pCourse) frees the 'tgd ' chunk's pData, which UStream.c:224 sets past the stream object's header: StaticMem_Free reads the two words before it as block start and size, so it frees the wrong range (Ter_UnloadHole frees pCourseStreamData, the right pointer); harmless only if Ter_UnloadHole ran first; `port:` free pCourseStreamData | round 20 (rt6) |
-| hlaudsession.c Ses_AllocBankHdr | the missing return (was labelled "fake match: EA bug") is EA's own form: now `EA bug:` + `port: return NULL` | round 19 (rs1, relabelled) |
+Confirmed
+---------
 
-## Open: behaviour proven possible, needs data or intent to settle
+The code does this, and the effect can happen in play.
+
+| Where | What |
+|---|---|
+| GameModeStableford.c GameModeStableford_EndGame | stroke play's fewer-is-better prize test on Stableford points pays the losing side |
+| GameModeDriverPGATour.c GameModeDriverPGATour_SetTournament | the player's green speed option (options.n18) is saved but never put back after a tour round |
+| FE_CalendarPopups.c FE_GetDateTimeIfClockEarly | `nYear < 2003 && nMonth < 10` is no date cutoff (Oct-Dec of an earlier year is not "early") |
+| GameAnalysis.c GameAnalysis_GetTipStat | fairway percentage divides by all holes, par 3s too |
+| PGATourSimulation.c GM_PgaTourSim_CheckEndOfTournamentAward | the major-win count skips the bUser test: a major won by the pro in slot 0 of a skipped tournament counts as the player's (award 36) |
+| PGATourSimulation.c GM_PgaTourSim_DistributeWinnings | no new place starts after row 70: entrants below it who made the cut share the last paid place's prize |
+| PGATourSimulation.c CalcParBreakers | nBirdies already includes eagles and the formula adds nEagles again |
+| FE_MessageTable.c GM_vMCLoadUser (menu message 35) | answers 1 or an error, never 0: the slot is backed up and marked loaded when the load failed |
+| FE_MessageTable.c GM_vMaskString (menu message 399) | the terminator goes one past the stars; for 63 stars it writes szStars[64], past the buffer (64 or more: the loop does) |
+| FE_Manager.c FE_CrAP_IsItemLocked, kind 20 | counts groups with aMedal != 0, but 0 is the best medal and 3 none: a new profile (all 3) unlocks every kind-20 item with n <= 29, and winning best medals lowers the count (message 175 tests != 3) |
+| FE_Manager.c FE_CrAP_IsItemLocked, kind 24 | the loop `i = 23; i < 16` never runs: only n <= 0 unlocks |
+| Code800B90F4.c MAD_ReadNextFile | the end-of-movie test repeats the NULL test above it, so nEnd is never set: MAD_IsAtEnd always answers 0 and LLVideo.c stops a movie only when it is starved |
+| startUp.c Startup_CheckCards | hint 0x8B (card slot B empty) can never be sent: port 1 is only reached when port 0's status is 0, and that case tests port 0's status != 0 |
+| hlaudtrackstm.c Stm_Exit | cancels its DMAs with the track as owner, but AudDma_ToAram's owner is always 0 or 1: the cancel never matches, so a queued block DMA writes into ARAM buffers just freed and its callback counts into the freed track |
+| UAudContainers.c UList_InsertAt | an insert at the tail (not also the head) links after it, not in front: InsertSortWorldPerf leaves a higher-priority track at the tail, where Trk_AllocPerf steals first |
+| gocamscripts.c CamScript_CircleCameras | fA8 (the roll) blends by fT (0..2) instead of fShare: the roll runs on to twice the difference and snaps back when the blend ends |
+| rcmp_mad_codec.c madinit | `for (i = -256; i < 255; ...)` never writes gMadClamp[255] (.bss zero): a block value of +255 becomes pixel 0 (black) while +128..+254 become 255 |
+| GoTerrain.c Ter_vCloseModule | StaticMem_Free(pCourse) frees the 'tgd ' chunk's pData, which UStream.c:224 sets past the stream object's header: StaticMem_Free reads the two words before it as block start and size, so it frees the wrong range (Ter_UnloadHole frees pCourseStreamData, the right pointer); harmless only if Ter_UnloadHole ran first |
+| hlaudsession.c Ses_AllocBankHdr | a path through the function reaches its end without returning a value |
+
+Possible
+--------
+
+The code allows it, but whether it ever happens depends on the game's data or on what EA meant.
+
 | Where | What | What settles it |
 |---|---|---|
-| GoTerrain.c Ter_vCloseModule path | whether close is ever reached with a course still loaded (then the labelled wrong free bites) | the shutdown path from the front end / reset |
-| GoTerrain.c Ter_LODLoadCallback | adds the remainder of the step where rounding up would add (step - remainder): a value not a multiple stays one (the comment says so) | the real 'tLOD' values |
-| GoTerrain.c Ter_vCloseModule / Ter_UnRegisterStreamClients | xpGrassPatchList never freed; 'tLOD' left registered (both in the comments) | whether close / unregister ever runs outside shutdown |
+| GoTerrain.c Ter_vCloseModule path | whether close is ever reached with a course still loaded (then the wrong free listed under Confirmed bites) | the shutdown path from the front end / reset |
+| GoTerrain.c Ter_LODLoadCallback | adds the remainder of the step where rounding up would add (step - remainder): a value not a multiple stays one | the real 'tLOD' values |
+| GoTerrain.c Ter_vCloseModule / Ter_UnRegisterStreamClients | xpGrassPatchList never freed; 'tLOD' left registered | whether close / unregister ever runs outside shutdown |
 | GoTerrainCollision.c Ter_FreeDropNetworkLoadCallback / Ter_OOBNetworkLoadCallback | store with no MAX_FREE_DROP_NETWORKS / MAX_OOB_NETWORKS check (TW07's are 0x80 bytes, ours 0x14) | the largest outline count per hole in the course files |
-| Ball.c Physics_GetFeetAngle_ForwardBackward | a flat normal (|y| < 1e-6) takes the +-90 degree sign from x like the RightLeft version (copy-paste?) | a caller that can pass a vertical ground normal |
+| Ball.c Physics_GetFeetAngle_ForwardBackward | a flat normal ( | y |
 | GoDynamicCam.c:914 DynamicCam_TrackBallVelocityLag | tests `f98 < f154` but eases by (f154 - fCamTime) / f154 squared: grows again if fCamTime passes f154 while f98 is under it | whether f98 and fCamTime can drift apart (f98 reset alone at gocamscripts.c:1949) |
 | GameModeDriverRTE.c GameModeDriverRTE_EndGame | calls gRTEChallengeEndGame unchecked; NULL (and aChallenge[-1] at line 266) only for an event with bOff or nChallenge 0 | the disc's 'RTEc' data; whether the calendar can start such an event |
 | GameModeDriverPGATour.c GetCourses | aTourEvent[nTourEvent - 1] with nTourEvent 0 (other functions test for 0) | the 'PGAc' tournament data |
@@ -63,8 +70,8 @@ own files in its pass; the rest come here.
 | FE_MessageTable.c GM_vSetCustomRoundName (message 212) | copies pArgs[3] characters with no bound: 20 or more overwrite n15 and the hole list | the longest name the menus pass |
 | FE_MessageTable.c GM_vSetRandomCustomRoundHole (message 228) | `% 0` with no course from its list unlocked; loops forever with only course 0 unlocked and all its holes in the round | whether course 0 is always unlocked; the state the menus call it in |
 | FE_MessageTable.c GM_vTestPassword | copies pArgs[1] characters into a 0x20-byte buffer | the longest code the menus pass |
-| FE_MessageTable.c GM_vQueueMovie (message 327) | proven: nothing writes FEMovie.nBio (fn_800770FC's three callers store only nKind; the state is .bss), so FE_movieFade always plays bios/bio01 (rq4) | whether the menus send pArgs[0] != 0 (the disc's UI script); whether the disc has bio02 and up |
-| gbacable.c Gba_*CashToMove / GM_vGbaAddCashToMove (message 624) | gGbaPortInUse is -1 from GM_vGbaStartLink until a GBA answers; the five getters and setters then index gGbaChannels[-1], which is TibExt.c's card record: Gba_SetCashToMove writes into its szFileName; link states 6 and 8 and message 623 read it (rq6) | the disc's UI script: messages 593 / 594 / 623 / 624 with nothing linked |
+| FE_MessageTable.c GM_vQueueMovie (message 327) | proven: nothing writes FEMovie.nBio (fn_800770FC's three callers store only nKind; the state is .bss), so FE_movieFade always plays bios/bio01 | whether the menus send pArgs[0] != 0 (the disc's UI script); whether the disc has bio02 and up |
+| gbacable.c Gba_*CashToMove / GM_vGbaAddCashToMove (message 624) | gGbaPortInUse is -1 from GM_vGbaStartLink until a GBA answers; the five getters and setters then index gGbaChannels[-1], which is TibExt.c's card record: Gba_SetCashToMove writes into its szFileName; link states 6 and 8 and message 623 read it | the disc's UI script: messages 593 / 594 / 623 / 624 with nothing linked |
 | gbacable.c Gba_UpdateLinkState state 6 | with 0 cash on the GBA, request 0x90 leaves n6C as asked and the profile still gets += n6C | the GBA game's side of request 0x90 |
 | gbacable.c Gba_UpdateLinkState state 8 | best round: a set profile value is overwritten by the GBA's 0; holes in one: the GBA's count is added again on every swap | the GBA game's data |
 | Code80090940.c UI_FreeMarkedEntryPictures | clears an entry's whole u0 (kind 2 too), so a picture element cannot decode its picture again in one UI session | UI data with a picture element loaded twice in a session |
@@ -85,18 +92,17 @@ own files in its pass; the rest come here.
 | GoDynamicCam.c ChooseSequence / ChoosePreFlightSequence | `uRand % (int)(1000 * fTotal)` divides by zero if the weights add up to under 0.001 | the camera data |
 | GoStaticCam.c Parse*CameraActor | no check against the 10 static / 30 fly-by slots | the course camera data |
 | LLVideo.c LLVideo_PreloadQueue / ReadNextFile / QueueAdd | ignores the stream's end (a movie under 16 chunks loops forever); apChunk[32] vs nMore up to 255; no full-queue check (1024) | the movie data |
-| LLVideo.c (MAD_IsAtEnd always 0) | a movie ends only when starved: also mid-movie if the disc falls behind | already labelled at MAD_ReadNextFile |
+| GoLightFogEnv.c LF_vSetLightingEnvironment | lights 0-2 step over the directional description, but light 3 always takes the fourth description, even when that is the directional one | whether any hole puts its directional light in slot 3 of TGD_LightingData |
 
-## Dropped (checked: harmless or not a bug)
+Checked and not bugs
+--------------------
+
 AnimStream_AssignSlots / StartRead (streaming is never on: AnimStream_Init clears bOn);
-HwsBurn_CopySetOptions round-up (a fake-match question); GM_ShowPostShotAnimation's NULL test (pSurf
+HwsBurn_CopySetOptions round-up (no effect on behaviour); GM_ShowPostShotAnimation's NULL test (pSurf
 cannot be NULL there); GameMode.c raw 0x1EC / 0x1F0 hook calls (EA form vs fake, no behaviour);
 PlayNow_GameFinished bCheck (only caller passes 0); Earnings gpSaveData by player number
 (Player.nIndex always equals the slot); SetupBonusBall case 4 (never set); speed golf state 24 (only
 redundant tests); event.c PracticeSwing 21 / PrevClub 13 / TopOfArc 13 (no visible effect);
 GameModeSkillZoneTarget_SetupNextGolfer re-aim (dead call); tips 11 and 13 (never shown, nothing
-breaks); GameModeSkillZoneHorse_HoleFinished u8 cast (a `port:` candidate); gSpeedGolfLogCycle
-(overwritten before read). Existing labels that may be harmless for the same nIndex reason:
-Earnings.c:1256, LadderedMode.c:365 (review when those files are next touched). Round 16:
-GM_vIsGolferUnlocked (golfers 30..33) / GM_vIsCourseUnlocked... (course 23) read one past their
-arrays as sized, but the answer is already 1 then (a header-size question, not a bug).
+breaks); GameModeSkillZoneHorse_HoleFinished u8 cast; gSpeedGolfLogCycle
+(overwritten before read).

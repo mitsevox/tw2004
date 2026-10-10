@@ -27,68 +27,9 @@ CHECKS = [
     ('tab', re.compile(r'\t')),
     ('trailing-space', re.compile(r'[ \t]+$')),
     ('no-braces', re.compile(r'^\s*(if|for|while)\s*\(.*\)\s*[^{\s;][^{]*;\s*(//.*)?$')),
+    ('old-label', re.compile(r'//.*(\bport:|\bEA bug:)')),
     ('commented-code', re.compile(r'^\s*//\s*([\w\[\]\.>-]+\s*[-+*/|&]?=[^=][^;]*|\w+\([^)]*\)|return\b[^;]*|(if|for|while)\s*\(.*\)\s*\{?)\s*;?\s*$')),
 ]
-# Port hazards (a 64-bit, little-endian port will need to look at these): a pointer in an integer, a
-# copy whose size is a literal instead of sizeof, the frame rate as a bare number. The owner's rule
-# (2026-09-26): the C is written the way EA wrote it, hazards included, so these are NOTES for the
-# port, printed but never counted as findings (they do not block a merge). Mark a known one with
-# `port: <why>` on the line or the line before to silence the note.
-PORT = [
-    ('port-ptr-int', re.compile(r'\(\s*(int|s32|u32|long)\s*\)\s*(&\s*\w|p[A-Z]\w*\b(?!\s*(\[|->|\.)))')),
-    ('port-literal-size', re.compile(r'\b(Mem_cpy|memcpy|memset|fn_80005AE8)\s*\([^;]*,\s*(0x[0-9A-Fa-f]{2,}|\d{3,})\s*\)')),
-    ('port-frame-rate', re.compile(r'\b59\.94|\b0\.01668')),
-]
-PORT_NOTES = {name for name, _ in PORT}
-# port-asm-no-fallback: CodeWarrior-only code with no plain-C version for a port. An `asm` function
-# must sit under `#ifdef __MWERKS__` with an `#else` holding a C version; a compiler intrinsic
-# (__cntlzw, ...) needs a C fallback in game_types.h or platform.h. Exempt with `port: <why>`.
-INTRINSIC = re.compile(r'\b(__cntlzw|__rlwimi|__rlwinm|__lwbrx|__lhbrx|__stwbrx|__sthbrx|__fabs|__fnabs|'
-                       r'__frsqrte|__fres|__fmadd|__fmsub|__fnmadd|__fnmsub|__fsel|__dcbf|__dcbt|__dcbz|'
-                       r'__dcbst|__icbi|__sync|__eieio|__isync)\s*\(')
-
-
-def intrinsic_fallbacks():
-    """Intrinsics that game_types.h or platform.h define as plain C for a port."""
-    out = set()
-    for h in ('game_types.h', 'platform.h'):
-        f = ROOT / 'include' / h
-        if f.exists():
-            t = f.read_text(encoding='utf-8', errors='replace')
-            out |= set(re.findall(r'^(?:static\s+inline\s+[\w \*]+?|#define\s+)(__\w+)\s*\(', t, re.M))
-    return out
-
-
-def asm_fallback_hits(lines, honor_exempt=True):
-    """Lines of asm functions and intrinsics with no plain-C version (port-asm-no-fallback).
-    honor_exempt=False ignores `port:` exemptions (merge.py's asm gate, for newly added asm)."""
-    hits, stack, have = [], [], intrinsic_fallbacks()
-    for i, l in enumerate(lines, 1):
-        s = l.strip()
-        exempt = honor_exempt and ('port:' in l or (i > 1 and 'port:' in lines[i - 2]))
-        if re.match(r'#\s*if', s):
-            stack.append({'mw': re.match(r'#\s*(ifdef\s+__MWERKS__|if\s+defined\s*\(?\s*__MWERKS__)', s)
-                          is not None, 'else': False, 'asm': []})
-        elif re.match(r'#\s*(else|elif)', s) and stack:
-            stack[-1]['else'] = True
-        elif re.match(r'#\s*endif', s) and stack:
-            blk = stack.pop()
-            if not blk['else']:
-                hits += blk['asm']
-        elif re.match(r'^asm\b', l) and not exempt:
-            blk = next((b for b in reversed(stack) if b['mw']), None)
-            hit = (i, 'port-asm-no-fallback', s)
-            if blk is None:
-                hits.append(hit)
-            elif not blk['else']:
-                blk['asm'].append(hit)
-        else:
-            m = INTRINSIC.search(l)
-            if m and m.group(1) not in have and not exempt and not s.startswith('//'):
-                hits.append((i, 'port-asm-no-fallback', s))
-    return hits
-
-
 # The statement after the condition is return/break/continue. Checked separately: a regex
 # lookahead after `\(.*\)` can backtrack to an inner parenthesis of the condition.
 EARLY_EXIT = re.compile(r'\)\s*(return\b[^;]*|break|continue);\s*(//.*)?$')
@@ -139,9 +80,6 @@ def lint(path, protos):
                 continue            # a one-line early exit is allowed (style.md, Formatting)
             if rx.search(l):
                 hits.append((i, name, l.strip()))
-        for name, rx in PORT:
-            if rx.search(l) and 'port:' not in l and 'port:' not in lines[i - 2]:
-                hits.append((i, name, l.strip()))
         if len(l) > 110:
             hits.append((i, 'long-line', '%d columns' % len(l)))
         if re.search(r'\bgoto\b', l) and 'fake match' not in l and 'fake match' not in lines[i - 2]:
@@ -157,7 +95,6 @@ def lint(path, protos):
             elif '//' not in m.group(4):
                 hits.append((i, 'proto-mismatch', '%s differs from %s with no comment saying why'
                              % (m.group(2), includes.label(decl[0][1]))))
-    hits += [h for h in asm_fallback_hits(lines) if h[0] not in raw_sweep]
     return hits + ub_check(path, lines)
 
 
@@ -185,6 +122,28 @@ def is_definition(lines, i):
         j -= 1
     head = ' '.join(l.strip() for l in lines[j - 1:i])
     return re.match(r'^[A-Za-z_][\w \*]*\b\w+\s*\([^;{}]*\)\s*\{?\s*$', head) is not None
+
+
+def enclosing_function(lines, i):
+    """The name of the function whose body holds line i (1-based), or None."""
+    for j in range(i - 1, -1, -1):
+        m = re.match(r'^[A-Za-z_][\w \*]*?\b(\w+)\s*\([^;]*$', lines[j])
+        if m and not lines[j].startswith(('typedef', 'return')):
+            return m.group(1)
+    return None
+
+
+_EA_BUGS = None
+
+
+def ea_bugs():
+    """{(file name, function)} from the Where column of docs/game/ea-bugs.md."""
+    global _EA_BUGS
+    if _EA_BUGS is None:
+        f = ROOT / 'docs/game/ea-bugs.md'
+        text = f.read_text(encoding='utf-8') if f.exists() else ''
+        _EA_BUGS = set(re.findall(r'^\| (\S+\.c) (\w+)', text, re.M))
+    return _EA_BUGS
 
 
 def ub_check(path, lines):
@@ -243,9 +202,9 @@ def ub_check(path, lines):
             if text in m.group(3):
                 i = int(m.group(2))
                 near = lines[i - 1] + (lines[i - 2] if i > 1 else '')
-                # EA's own form, labelled (the label and its port: line may sit just above)
-                ea = ' '.join(lines[max(0, i - 4):i])
-                if 'fake match' not in near and 'EA bug:' not in ea:
+                # EA's own bug, kept because the bytes require it, is listed in the register
+                ea = (path.name, enclosing_function(lines, i)) in ea_bugs()
+                if 'fake match' not in near and not ea:
                     hits.append((i, name, lines[i - 1].strip()))
     return hits
 
@@ -389,10 +348,6 @@ def main():
         hits = lint(f, protos)
         if changed is not None:     # file-level checks (line 1) count only if line 1 changed too
             hits = [h for h in hits if h[0] in changed[f.name] or h[1] == 'compile-error']
-        notes = [h for h in hits if h[1] in PORT_NOTES]
-        hits = [h for h in hits if h[1] not in PORT_NOTES]
-        for ln, n, msg in notes:
-            print('%s:%d: note %s: %s' % (f.name, ln, n, msg[:100]))
         total += len(hits)
         COMPILE_ERRORS.update((f.name, h[0]) for h in hits if h[1] == 'compile-error')
         if '--summary' in sys.argv:
@@ -405,7 +360,7 @@ def main():
             for ln, n, msg in hits:
                 print('%s:%d: %s: %s' % (f.name, ln, n, msg[:100]))
     # headers: long lines only (the C style rules above are for .c files); with --diff, only the
-    # lines changed since rev. Headers slipped past lint until 2026-09-29.
+    # lines changed since rev.
     for f, ln, n in header_long_lines(rev):
         print('%s:%d: long-line: %d columns' % (f, ln, n))
         total += 1

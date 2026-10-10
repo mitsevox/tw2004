@@ -483,4 +483,7 @@ int  ActAnimal_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2);
 // LLObj_Gc.c: how a mesh is clipped against the camera (3: off screen, not drawn).
 int  fn_80007B2C(UObjMesh* pMesh, void* pCamera, f32 a, f32 fSize, f32 c);
 
+void DynObj_InitForHole(void);
+void DynObj_DeInitForHole(void);
+
 #endif

@@ -454,10 +454,10 @@ void fn_8006F080(GoLight* pLight) {
     lbl_802811D8->nFree++;
 }
 
-void fn_8006F144(LightSet* pSet) {
+void fn_8006F144(LF_SLightFogEnvironment* pSet) {
 }
 
-void fn_8006F148(LightSet* pSet) {
+void fn_8006F148(LF_SLightFogEnvironment* pSet) {
 }
 
 void fn_8006F14C(void) {

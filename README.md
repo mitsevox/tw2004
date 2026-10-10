@@ -5,8 +5,7 @@ Tiger Woods PGA Tour 2004
 [![Functions](https://decomp.dev/mitsevox/tw2004.svg?mode=shield&measure=functions&label=Functions)](https://decomp.dev/mitsevox/tw2004)
 
 A matching decompilation of Tiger Woods PGA Tour 2004 for the GameCube: C source that compiles
-back to a byte-identical copy of the retail `main.dol`. The aim is EA's code as EA wrote it. A PC
-port and mods will start from that code later.
+back to a byte-identical copy of the retail `main.dol`, written the way EA wrote it.
 
 This repository contains no game assets, no game code binaries and no official SDK files. You need
 your own copy of the game to build it.
@@ -17,43 +16,26 @@ Supported version: `GW4E69`, Rev 0 (USA). `main.dol` is identical on Disc 1 and 
 Status
 ======
 
-**The match is complete.** All 7,647 functions are byte-exact and all 460 units link from C;
-the build reproduces the retail `main.dol` exactly.
+The match is complete: all 7,647 functions are byte-exact and every unit links from C.
 
-The project is now in its **readability** phase: making every file understandable to a person
-reading it cold, with real names, correct comments and readable locals. As of 2026-09-29, of the 6,641
-functions in EA's code:
+Work now goes into making the code read well: naming what is still unnamed, giving structs real
+fields, and keeping comments to what explains the game. Progress:
+[decomp.dev](https://decomp.dev/mitsevox/tw2004) and the [progress page](https://mitsevox.github.io/tw2004/).
 
-- 5,548 are named (EA's own name where a related build confirms it, otherwise read from the code);
-- 4,912 (74.0%) have been reviewed in the pass;
-- 154 of 279 source files are fully through it.
+Layout
+======
 
-Live numbers: the [progress page](https://mitsevox.github.io/tw2004/) and
-[decomp.dev](https://decomp.dev/mitsevox/tw2004).
-
-What's here
-===========
-
-- `src/`, `include/`: the game's C source and headers. Start with
-  [`src/README.md`](src/README.md), the map of the code by subsystem (boot and main loop,
-  rendering, cameras, ball physics, golfers, the round and game modes, front end, audio, saves).
-- `extern/`: the Nintendo SDK, C library, Metrowerks runtime and debugger, built from public
-  GameCube decompilations (credits in each folder's `CREDITS.md` / `README.md`).
-- `config/GW4E69/`: decomp-toolkit configuration (symbols, splits) and
-  `name_sources.tsv`, the evidence behind every name.
-- `docs/`: see [`docs/README.md`](docs/README.md) for the index and how far to trust each file.
-  Highlights: [`docs/style.md`](docs/style.md) (how the C must read),
-  [`docs/compiler/decomp-notes.md`](docs/compiler/decomp-notes.md) (the CodeWarrior rulebook),
-  [`docs/game/formats/`](docs/game/formats/README.md) (the game's data file formats),
-  [`docs/game/gameplay.md`](docs/game/gameplay.md) (gameplay logic read from the code; not yet audited).
-- `reference/`: symbol dumps from related EA builds (TW07 PS3, TW06, Madden 2003, ...): the
-  evidence behind EA names ([`reference/README.md`](reference/README.md)).
-- `tools/`: `build/` (helpers the build runs), `naming/`, `quality/` (lint and audits), `matching/`,
-  `formats/` (readers for the game's data files), `research/`, `cloud/` (cloud session setup) and
-  `dashboard/` (the progress page).
-- `mods/gecko/`: Gecko codes (an always-pool-cue gimme and a no-lucky-shots code, untested). A
-  confirmed widescreen culling fix is in [`docs/game/tw2004-notes.md`](docs/game/tw2004-notes.md),
-  "Frustum setup and widescreen codes".
+- `src/`, `include/`: the game's C source and headers. [`src/README.md`](src/README.md) maps the
+  files to the game's subsystems.
+- `extern/`: the Nintendo SDK, C library and Metrowerks runtime, built from public GameCube
+  decompilations (credits in each folder).
+- `config/GW4E69/`: decomp-toolkit configuration, and `name_sources.tsv`, the evidence behind
+  each name.
+- `reference/`: symbol dumps from related EA builds (TW07, TW06, Madden 2003 and others) that
+  EA's names are taken from.
+- `docs/`: the [docs index](docs/README.md).
+- `tools/`: build helpers and the naming and lint tools.
+- `mods/gecko/`: Gecko codes built from the decomp (untested).
 
 Building
 ========
@@ -70,8 +52,7 @@ Needs Python 3 and [ninja](https://github.com/ninja-build/ninja). On Linux and m
    ninja
    ```
 
-The build must end with `build/GW4E69/main.dol: OK`. Every command beyond that is in
-[`docs/workflow.md`](docs/workflow.md).
+The build ends with `build/GW4E69/main.dol: OK` when the output matches.
 
 Credits
 =======

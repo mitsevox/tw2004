@@ -1,224 +1,150 @@
 Code style
 ==========
 
-How the C in `src/` is written. Matching decides *what* the compiler must produce; this file
-decides how the source reads, so every unit looks like one author wrote it. Model files:
-`src/GameTargets.c` and `src/GameModeReplay.c`.
+How the C in `src/` reads. The match decides what the compiler must produce; this page decides how
+the source reads, so the whole game looks like one author wrote it. That author is EA: the goal is
+EA's code as EA wrote it, 32-bit habits included (pointers in `int`, literal sizes, type puns).
 
-The goal is EA's code exactly as EA wrote it (owner, 2026-09-26); a PC port starts from that code
-later. EA's form comes first, including its 32-bit habits (pointers in `int`, literal sizes, type
-puns): those get a `// port:` note, never a rewrite. A fake match is only the fallback when EA's
-form can't be found, and it never changes the logic. The C must mean what the original did:
-prototypes that match their definitions, real fields where EA had fields, and one shared
-definition of shared data (see "Port hazards").
-
-`python tools/quality/lint.py <files>` checks the mechanical rules below, and compiles each file
-with the game's compiler to catch two kinds of undefined behaviour (see "Odd code vs wrong
-code"). Run it before every commit.
+`python tools/quality/lint.py <files>` checks the mechanical rules below and compiles each file
+to catch undefined behaviour (see "Odd code vs wrong code").
 
 Files
 -----
 
-- **Header comment.** Every unit starts with `// <File>.c (our name): <what it does>`, two to four
-  lines in plain English: which game mode or system, the main data it works on. "(our name)"
-  marks names we chose; EA's file names are unknown. A unit named after its TW06 class says so
-  instead: `// GameModeStableford.c (TW06's GameModeStableford): game mode 18, ...`.
-- **File names**, strongest evidence first: EA's own name from an assert string in the binary
-  (`GoGolfCam.c`, header "(EA's name, from its asserts)"); a TW06 source file or class name when
-  the code proves the match (`GoTerrainCollision.c`, `GameModeStableford.c`); otherwise our own
-  (`GameMode8.c`, "(our name)").
-- **Order inside a file:** includes, then types local to the file, then `extern` data, then
-  prototypes, then functions in address order (the order is fixed by the binary).
-- **Includes:** `golfer.h` (players, sessions, shared game types), `ball.h`, `physics.h` as needed.
-  No includes of other units' `.c` files.
+- **Header comment.** Every file opens with two to four lines saying what it does in the game:
+  which system or game mode, and the main data it works on. When the file name is EA's, say so in
+  a word: `// GoGolfCam.c (EA's name): ...`.
+- **File names**, strongest evidence first: EA's own (an assert string in the binary, or the file
+  in a related EA build, `reference/`), then a TW06 class name the code confirms, then our own.
+- **Order inside a file:** includes, types local to the file, data, prototypes of static
+  functions, then functions in address order (the binary fixes the order).
 
 Names
 -----
 
-- **Functions and globals:** EA's name when there is evidence for it ("Where names and comments
-  come from" below). Otherwise, since 2026-09-27 (owner): name it from what the code does and roll
-  with it; most names can never be proven. Such a name is tier T3 in
-  `config/GW4E69/name_sources.tsv` with the code reading as its evidence (code E6), carries no
-  confidence marker or address suffix, and must never contradict the code. Work most-called first
-  (`python tools/naming/hotnames.py`): one name makes every call site readable.
-- **Renaming a global or function** is done in `config/GW4E69/symbols.txt`, so every file and the
-  assembly see the new name. Never alias with `#define NICE_NAME lbl_XXXXXXXX`.
-- **Style of names:** EA's own. Functions `System_Verb` (`View_SetCamera`, `Session_SetNumPlayers`)
-  or `fn_XXXXXXXX`. Globals `gName`. Locals and fields in Hungarian with a type prefix:
-  `n` integer, `f` float, `b` flag, `u` unsigned bit mask, `p` pointer, `a` array, `pfn` function
-  pointer, `sz` string. Parameters that are a player index are `nPlayer`, a hole `nHole`, a
-  view `nView`.
-- **Struct fields whose meaning is unknown** keep their type prefix plus the hex offset: `nC38`,
-  `fF08`, `aCD4[20]`. Padding and fields never read are `unkXXX`. Every field in a shared struct
-  has its offset in a trailing comment (`// 0xC38`).
-- **Macros** are for real abstractions (`PLAYER(i)`, a table's row count), in the header next to
-  the thing they describe. Not for shortening a name.
+- **Every function and global has a name.** No `fn_XXXXXXXX` or `lbl_XXXXXXXX` survives review.
+- **EA's name first**, spelled as EA did, when EA's text in the binary or a related build that the
+  code confirms gives it (tiers T1/T2). Otherwise a name read carefully from the code (T3). A name
+  never contradicts the code.
+- Every name is logged with its evidence in `config/GW4E69/name_sources.tsv`, through
+  `tools/naming/name.py` (functions) or `tools/naming/rename.py` (globals). Renames go through
+  `config/GW4E69/symbols.txt`, so the C and the assembly agree; never alias with `#define`.
+- **EA's naming style.** Functions `System_Verb` (`View_SetCamera`, `Session_SetNumPlayers`),
+  globals `gName`, locals and fields in Hungarian: `n` integer, `f` float, `b` flag, `u` unsigned
+  bit mask, `p` pointer, `a` array, `pfn` function pointer, `sz` string. A player index is
+  `nPlayer`, a hole `nHole`, a view `nView`.
+- **Struct fields** are named from how the code uses them. A field nobody has worked out yet keeps
+  its type prefix and hex offset (`nC38`, `fF08`); padding and fields never read are `unkXXX`.
+  Fields of shared structs carry their offset in a trailing comment (`// 0xC38`).
+- **Macros** are for real abstractions (`PLAYER(i)`, a table's row count), next to what they
+  describe. Not for shortening a name.
 
-Where names and comments come from
-----------------------------------
+Comments
+--------
 
-The match is done (2026-09-27); the job now is code a person or a fresh AI can read. Names and
-comments are written in ONE pass per function, by whoever reads it (a naming lane), through
-`tools/naming/name.py`, which logs every name with its evidence in `config/GW4E69/name_sources.tsv`.
+A comment explains how the code works and what it does in the game ("the winner takes the whole
+pool"), in plain words, where the code alone doesn't say it. That's all a comment is for.
 
-- **EA's name first** when there is evidence: EA's text in the binary, or EA's name in a related
-  build that the code confirms (TW07 PS3, TW06, Madden 2003; `reference/`). Tier T1/T2,
-  spelled as EA did.
-- **Otherwise name it from a careful reading of the code:** tier T3, what it does, EA's style. Most
-  names can never be proven; a clear true name beats `fn_`. Never contradict the code.
-- **The reader owns the comment:** keep it if it is right and clear; rewrite it if it is wrong,
-  stale (matching-era status notes), vague, or uses `fn_`/`lbl_` names that now have real ones; add
-  one where the name does not say everything a caller needs. Plain words, what it does in the game.
-- **Labels stay:** `fake match:`, `port:` and `EA bug:` notes mark later work; their text may be
-  corrected but the label is kept (name.py refuses to drop one).
-- Struct field, global, type and parameter names and comments: same rules; the reader fixes what
-  it finds wrong in the headers of the code it reads.
+- No matching notes, offset narration, address lists, provenance essays or status reports.
+  Where a name came from belongs in `name_sources.tsv`, not above the function.
+- No commented-out code and no m2c leftovers (`temp_r3`, `var_r31`, `M2C_ERROR`).
+- A comment is a claim: check it against the code. A wrong comment is worse than none.
+- One label is allowed: `// fake match: <why>`, on code written only to make the compiler match
+  (below), so it can be found and fixed later. Bugs in EA's own code are worth knowing, but they
+  are listed in
+  [`game/ea-bugs.md`](game/ea-bugs.md),
+  not in the source.
 
-History: a blind two-reader audit (2026-09-24, tag `audit-baseline-1`) checked every function name
-and comment of the matching era and found about 7% of names and 1 in 5 comments wrong: matching-era
-text is a claim until someone reads it against the code. Its tooling was retired on 2026-09-27.
+Data and types
+--------------
 
-Data access
------------
-
-- **One declaration per global, one definition per type.** A global's `extern` lives in a header,
-  with one type everywhere; a struct used by two files is defined once, in a header. A private
-  local view of shared data (a partial struct, a `u8*` where others see a struct) is how files
-  drift apart: `python tools/quality/typeaudit.py` lists them, and merges may not add any.
-
-- **Use struct fields, never raw offsets.** `gPlayers[n].nC38`, not `*(s32*)((u8*)p + 0xC38)`. If
-  the field is missing, add it to the struct (with its offset comment) in the right header.
-- Write player access the way EA did, `gPlayers[nPlayer].field` each time; see
-  `decomp-notes.md`, "Structs, arrays and pointers", for when `PLAYER(i)` or a local pointer is
-  needed instead.
-- Tables get a `typedef struct` describing one row, in the header of the system that owns the
-  table (no `typedef` or `extern` in a `.c` file; `typeaudit.py` counts them and merges may not
-  add any).
+- **One declaration per global, one definition per type.** A global's `extern` lives in a header
+  with one type everywhere; a struct used by two files is defined once, in a header. No `typedef`
+  or `extern` in a `.c` file. `python tools/quality/typeaudit.py` lists the exceptions.
+- **Struct fields, never raw offsets.** `gPlayers[n].nC38`, not `*(s32*)((u8*)p + 0xC38)`. If the
+  field is missing, add it to the struct in the right header.
+- Player access the way EA wrote it, `gPlayers[nPlayer].field` each time; see
+  [`compiler/decomp-notes.md`](compiler/decomp-notes.md), "Structs, arrays and pointers", for when
+  `PLAYER(i)` or a local pointer is needed instead.
+- A table gets a `typedef struct` for one row, in the header of the system that owns it.
+- Every shared struct with a proven size gets `LAYOUT_ASSERT(Type, size)` after its definition
+  (`platform.h`; checked only in the GameCube build).
 
 Prototypes
 ----------
 
-- **A function used by more than one file** is declared once, in the header of the system it
-  belongs to.
-- **A prototype local to a file** is for functions only that file calls.
-- **Headers:** `game.h` (game manager, rounds, modes, golfer states, sessions), `engine.h`
-  (memory, math, streams, events, sound), `golfer.h` (players and golfers), `ball.h` (the ball,
-  surfaces and the hole's terrain; `golfer.h` includes it), `camera.h` (views and cameras),
-  `character.h` (the golfer's character object and animation), `physics.h` (TW06's lie, shot-kind
-  and club enums), `platform.h` (the C library and layout checks; see Portability),
-  `game/save.h` (the save profile), `game/earnings.h` (the prize table), `game/modes/*.h` (data a
-  family of game modes shares: `challenge.h`, `pgatour.h`, `rte.h`). A header includes only the
-  headers below it (`game_types.h` < `platform.h` < `engine.h` < `camera.h`, `character.h`;
-  `physics.h`, `ball.h` < `golfer.h` < `game.h`).
-- **No per-file re-declaration with other types.** CodeWarrior rejects a second prototype whose
-  parameter types differ (even `int` vs `s32`) as "identifier redeclared". When one file's calls
-  need a different argument type to match, cast at the call site (`fn((u16)x)`) and say why.
+- **A function called from another file** is declared once, in the header of the system it belongs
+  to, with the definition's exact types. A prototype inside a `.c` file is only for that file's
+  own static functions.
+- **Headers:** `engine.h` (memory, math, streams, events, sound), `camera.h` (views and cameras),
+  `character.h` (the golfer's character and animation), `physics.h` (lies, shot kinds, clubs),
+  `ball.h` (the ball, surfaces, the hole's terrain), `golfer.h` (players and golfers), `game.h`
+  (game manager, rounds, modes, golfer states, sessions), `game/save.h`, `game/earnings.h`,
+  `game/modes/*.h`, plus one header per subsystem (`lighting.h`, `fog.h`, `holeloader.h`...). A
+  header includes only headers below it (`game_types.h` < `platform.h` < `engine.h` < `camera.h`,
+  `character.h`; `physics.h`, `ball.h` < `golfer.h` < `game.h`).
+- CodeWarrior rejects a second prototype whose parameter types differ (even `int` vs `s32`). When
+  one call needs another argument type to match, cast at the call site.
 
-Matching tricks
----------------
+Fake matches
+------------
 
-Code that exists only to make the compiler emit the original instructions is marked, so a
-reader knows it is deliberate:
+Code that exists only to make the compiler emit the original instructions is marked, so a reader
+knows it's deliberate and someone can come back for it:
 
 ```c
     int n;          // fake match: a copy of nPlayer, for the original register order
 ```
 
-- Use `// fake match: <why>` for anything a person would not naturally write (a redundant copy
-  of a variable, an odd type, a useless cast, a strange statement order).
-- Rules that explain *normal* EA style are not fake matches and need no comment: repeated
-  `gPlayers[n].field`, `while` loops, the `gPlayers[(u32)i]` index, and choosing `int` or
-  `s32`/`long` for a local (both are natural; the choice changes the code, see decomp-notes).
-- No `goto` unless the control flow cannot be matched without it; mark it as a fake match.
+- Anything a person wouldn't naturally write gets the label: a redundant copy, an odd type, a
+  useless cast, a strange statement order, a `goto`.
+- Normal EA habits are not fake matches: repeated `gPlayers[n].field`, `while` loops, the
+  `gPlayers[(u32)i]` index, `int` vs `s32` for a local.
+- A fake match never changes what the game does. Inline `asm` is only for code EA wrote in asm,
+  never to force a match.
 
 Odd code vs wrong code
 ----------------------
 
-A matching decomp is allowed to look strange. It is not allowed to be wrong. Two different things:
+A matching decomp may look strange. It may not be wrong.
 
-**Tolerated when the match needs it** (style complaints, not bugs; mark the unnatural ones as a
-fake match):
+**Tolerated when the match needs it:** unused variables or parameters, odd casts and signed or
+unsigned comparisons, redundant assignments, strange control flow or declaration order,
+non-idiomatic pointer arithmetic.
 
-- unused variables or parameters (EA's signatures are fixed by the callers)
-- suspicious casts, odd signed/unsigned comparisons
-- seemingly redundant assignments, or assignments that exist only for register allocation
-- weird control flow, and code that looks unreachable but is there because of how the compiler
-  lays out branches
-- non-idiomatic pointer arithmetic
-- declarations in strange places or orders, because moving them changes the match
-
-**Investigated even when the function matches** (undefined behaviour or a real correctness
-problem; the current compiler producing the right bytes does not make the C right):
+**Fixed even when the function matches**, because matching bytes don't make the C right:
 
 - a non-void function that can reach its end without `return` (`lint.py`: `ub-missing-return`)
-- reading a variable before it is set (`lint.py`: `ub-uninitialized`)
-- indexing past an array's declared size: the declaration is wrong, fix the size (the replay
-  array `nDE4` was declared `[18]` until code was found using 40 entries)
+- reading a variable before it is set (`ub-uninitialized`)
+- indexing past an array's declared size: the declaration is wrong, fix the size
 - a struct field whose type or offset disagrees with how the code uses it
-- calling a function with no prototype in scope, or through one whose return type or parameter
-  count disagrees with the definition. A deliberate per-file parameter type (see Prototypes) is
-  the only exception, and it carries a comment
+- a call with no prototype in scope, or through a prototype that disagrees with the definition
+- a call that only works because a register still holds a value from the call before it
 - shifts by the type's width or more, signed overflow the code relies on, a variable modified
-  twice without a sequence point (`i++ + i++`)
+  twice without a sequence point
 
-When the original itself has the bug (the bytes prove EA wrote it), keep it, since the match
-requires it, and say so: `// EA bug: reads nC38 of player 5, one past the last player`.
+When the bytes prove EA wrote the bug, keep it (the match requires it) and add it to the bug
+register.
 
-Port hazards
-------------
+Types and platform
+------------------
 
-A port will rebuild this C with another compiler, likely 64-bit and little-endian. The decomp does
-NOT write around that: EA's form wins (owner, 2026-09-26). `lint.py` prints these as notes for the
-port (they never block a merge); `// port: <what>` on the line or the line before records a known
-one:
-
-- `port-ptr-int`: a pointer cast to an integer (`(int)pFile + offset`). Keep it when EA did it.
-- `port-literal-size`: a copy or clear whose size is a number (`Mem_cpy(a, b, 0xBC)`). `sizeof` is
-  fine when it gives the same code; a literal is fine when that's what matches.
-- `port-frame-rate`: the frame rate as a bare number (`59.94f`). `FRAME_RATE` / `FRAME_TIME`
-  (engine.h) fold to the same constant.
-- `port-asm-no-fallback`: CodeWarrior-only code with no plain-C version. An `asm` function sits
-  under `#ifdef __MWERKS__` with an `#else` that computes the same result in C (marked untested
-  until a port runs it; the asm body stays as it is). A compiler intrinsic (`__cntlzw`) needs a C
-  fallback in game_types.h or platform.h, in the `TW_PORT` branch.
-
-The base types and the platform layer:
-
-- `game_types.h`: for the GameCube build `s32`/`u32` stay `long` (CodeWarrior treats `int` and
-  `long` differently, and some functions only match with `long`); a port defines `TW_PORT` and gets
-  `<stdint.h>` types. `uptr` is an integer as wide as a pointer, available for address arithmetic,
-  but EA's own integer type (`int`, `long`, `u32`) comes first when it is what EA wrote.
-- `platform.h` (included by engine.h): the C library prototypes, declared once (a port gets the
-  standard headers instead), and `LAYOUT_ASSERT(Type, size)`, a zero-code size check. Every shared
-  struct with a proven size gets one after its definition. The sizes are the GameCube's 32-bit
-  layouts, checked only when `TW_GC_LAYOUT` is defined (the GameCube build), so a 64-bit port knows
-  which structs its layout must not rely on.
-- Test `__MWERKS__` only for CodeWarrior syntax (`asm`, intrinsics). For what differs between the
-  GameCube build and a port, test `TW_PORT`: the Common library is built with ProDG, which defines
-  no `__MWERKS__`.
-
-When the original's code can only be matched with one of these, keep it and say why with
-`// port: <why>` on the line or the line before, so a porter knows to look there (a longer note's
-next lines are indented under its text, `//       `, so it is clear where the note ends). Data read from
-the disc or the memory card is big-endian and laid out for a 32-bit machine: read it through the
-loader's byte-order helpers, never by laying a struct over the buffer in new code.
+- `game_types.h`: `s32`/`u32` are `long` in the GameCube build (CodeWarrior treats `int` and `long`
+  differently, and some functions only match with `long`).
+- `platform.h` (included by `engine.h`): the C library prototypes, declared once, and
+  `LAYOUT_ASSERT`.
+- Test `__MWERKS__` only around CodeWarrior syntax (`asm`, intrinsics). The Common library is built
+  with ProDG, which doesn't define it.
+- Data read from the disc or the memory card is big-endian: read it through the loader's
+  byte-order helpers.
 
 Formatting
 ----------
 
-- 4 spaces, no tabs. Opening brace on the same line, functions included
-  (`void fn_800F125C(void) {`). Always braces on `if`/`for`/`while` bodies, except a one-line
-  early exit: `if (nPlayer < 0) return 0;` (also `break;`, `continue;`).
-- `if (a == 5)`, `for (i = 0; i < n; i++)`: spaces around binary operators and after keywords,
-  none inside parentheses.
+- 4 spaces, no tabs. Opening brace on the same line, functions included. Braces on every
+  `if`/`for`/`while` body, except a one-line early exit (`if (nPlayer < 0) return 0;`, `break;`,
+  `continue;`).
+- `if (a == 5)`, `for (i = 0; i < n; i++)`: spaces around binary operators and after keywords, none
+  inside parentheses.
 - Lines up to about 110 columns. LF line endings, no trailing whitespace, a final newline.
-- Declarations at the top of the block (C89, as the compiler needs), one per line when they carry
-  a comment.
-- Comments explain *why* or what the game does ("the winner gets the whole pool"), not what the
-  C says. No commented-out code; no m2c leftovers (`temp_r3`, `var_r31`, `M2C_ERROR`, `?` types).
-
-Sweep files
------------
-
-`src/unsorted/sweep_*.c` are machine-generated placeholders and are exempt from this file until
-they are folded into a named unit. Once folded, the code follows these rules like any other.
+- Declarations at the top of the block (C89, as the compiler needs).

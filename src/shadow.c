@@ -16,7 +16,6 @@ void  fn_800169AC(void);
 
 void fn_800B2360(u8 nIntensity);
 void fn_800B24D0(int nWidth, int nHeight);
-void fn_800B26DC(void);
 void fn_800B2724(void);
 void fn_800B2DB0(f32* pCentre, f32 (*pQuad)[4], f32 fHalfX, f32 fHalfZ);
 void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);

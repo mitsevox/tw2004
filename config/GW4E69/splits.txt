@@ -507,13 +507,13 @@ GoLighting.c:
 	.sdata      start:0x802811D8 end:0x802811E0
 	.sdata2     start:0x80283900 end:0x80283958
 
-Code8006F154.c:
+GoFog.c:
 	.text       start:0x8006F154 end:0x8006F438
 	.bss        start:0x801D70A8 end:0x801D7100
 	.sdata      start:0x802811E0 end:0x802811E8
 	.sdata2     start:0x80283958 end:0x80283988
 
-Code8006F438.c:
+GoHoleLoader.c:
 	.text       start:0x8006F438 end:0x8006F608
 	.sdata      start:0x802811E8 end:0x802811F0
 	.sbss       start:0x80281E68 end:0x80281E70

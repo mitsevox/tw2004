@@ -1,9 +1,9 @@
 """Remove build outputs that no build rule makes any more (a renamed, split or folded unit's old object).
     python tools/build/prune_stale.py [--dry-run]        (after configure.py, before ninja)
-Why: wibo runs the Windows compiler, whose file lookup ignores case. After uiobject.c became uiObject.c
-(2026-09-29) it kept writing into the old build/GW4E69/src/uiobject.o and uiObject.o never appeared, so
-objdiff's report failed; CI restores the previous run's build folder from its cache, so every CI build
-failed from then on. The check: `ninja -t targets all` lists every output the build makes; an object
+Why: wibo runs the Windows compiler, whose file lookup ignores case. After a unit is renamed only in
+case (uiobject.c to uiObject.c) it keeps writing into the old object, the new one never appears and
+objdiff's report fails; CI restores the previous run's build folder from its cache, so every later
+CI build would fail. The check: `ninja -t targets all` lists every output the build makes; an object
 (.o, and its .d / .i / .s) under build/*/src that is not one of them is stale and is removed. Nothing
 outside build/*/src is touched."""
 import pathlib, subprocess, sys

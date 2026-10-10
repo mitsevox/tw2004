@@ -31,13 +31,12 @@ shapes the C does not produce yet: --key r97=66.5 gives vreg 97 a different swee
 --phantoms r45,r119 adds pass 1's coalesced variables as permanent neighbours to this pass.
 Then write the declarations in that order and confirm with a real build.
 
-Found and verified by lane r6-misc (2026-09-26): the replay reproduced all 122 GPRs of LLDynTex
-fn_8010A930 and all 98 FPRs of Particle fn_80094534; the search took fn_8010A930 from 30 to 4
-aligned differences where objdiff-score climbs had stalled (then exact). Lane r7-golfer
-(2026-09-26) added the spill-cost choice, the tie rule and the pass selection: Golfer
-AI_ChooseTarget, both GPR passes (169 and 176 variables, five spill-cost choices in pass 1, one in
-pass 2) replay with 0 differences in order and registers, as do all 80 GPR and 34 FPR
-allocations of the round-5 batch dumps and pass 1 of its six spilling functions."""
+Checked: the replay reproduces all 122 GPRs of LLDynTex fn_8010A930 and all 98 FPRs of Particle
+fn_80094534; the search took fn_8010A930 from 30 to 4 aligned differences where objdiff-score climbs
+had stalled (then exact). With the spill-cost choice, the tie rule and the pass selection, Golfer
+AI_ChooseTarget's two GPR passes (169 and 176 variables, five spill-cost choices in pass 1, one in
+pass 2) replay with 0 differences in order and registers, as do 80 GPR and 34 FPR allocations of
+other dumps."""
 import os, random, re, sys
 
 

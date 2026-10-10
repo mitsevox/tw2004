@@ -166,7 +166,7 @@ void GM_DeInitModule(void) {
     GM_CourseInfo_DeInit();
 }
 
-// Moves the round to its next selected hole and asks for it to be loaded (fn_8006F4B4); 1 when
+// Moves the round to its next selected hole and asks for it to be loaded (HoleLoader_QueueNextHole); 1 when
 // there was one, 0 after the last. Crossing from the front nine to the back nine under the
 // one-mulligan-per-nine rule (2) gives the mulligans back. The pause menu calls it after the
 // end-of-hole scorecard.
@@ -178,7 +178,7 @@ int GM_GotoNextSelectedHole(void) {
                 GM_ClearMulliganCounters();
             }
             GM_SetCurrentHole(i);
-            fn_8006F4B4();
+            HoleLoader_QueueNextHole();
             return 1;
         }
     }

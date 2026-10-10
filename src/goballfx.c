@@ -1,7 +1,8 @@
 // goballfx.c (TW06's golf/hi-rendering/goballfx.c; BFX_vInit is paired with TW06's): the scene's
 // light sets and the ball marker (include/lighting.h). It keeps four sets of five lights (four point
-// lights and a directional one), fills the current set from the hole's lights (fn_800935CC) or from
-// a caller's settings (fn_80093854), and draws a small marker quad on the ground under the ball.
+// lights and a directional one), fills the current set from the hole's lights
+// (LF_vSetLightingEnvironment) or from a caller's settings (LF_vSetLightModifiers), and draws a
+// small marker quad on the ground under the ball.
 
 #include "lighting.h"
 #include "camera.h"

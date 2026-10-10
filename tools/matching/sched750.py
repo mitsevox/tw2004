@@ -19,7 +19,7 @@ last pass give the target. The registers are held fixed: a variant also changes 
 confirm it with a build (and rasim.py). `validate` counts the blocks of the dumps whose real
 schedules the model reproduces.
 
-Transcribed from mwcceppc.exe (GC/2.6) by lane b8, 2026-09-27: scheduleblock 0x507d80, the pick
+Transcribed from mwcceppc.exe (GC/2.6): scheduleblock 0x507d80, the pick
 0x507f50, findsuccessors 0x508090, addsuccessor 0x508480; the 750 MachineInfo at 0x5d2c70 (issue
 width 2) with latency 0x579180, can_issue 0x578e90, issue 0x578e10, advance_clock 0x578820 and the
 timing table 0x5d2c98 (7 bytes per opcode: unit, latency, cycles in the first and second stage).
@@ -40,11 +40,11 @@ timing table 0x5d2c98 (7 bytes per opcode: unit, latency, cycles in the first an
   free entries; 6 is what reproduces the dumps, the exact retire timing is not transcribed).
 - The first pass reads a copy's source instead of its destination (the dumps show `cmpl r39`
   where the input had `mr r45,r39; cmpl r45`); the model does the same before scheduling.
-Validation: 2146 of 2240 integer-only blocks of the round-5 batch dumps (both passes; `validate`
+Validation: 2146 of 2240 integer-only blocks of a batch of dumps (both passes; `validate`
 on the main checkout's build/mwccdbg/*/) reproduced exactly; fn_800949D0's block B23 in both
 passes; deadsearch on its old dump finds the one lever that closed it (a dead srawi of n). FPU pipelines, calls and record forms are not
 modelled (such blocks are skipped). Found: fn_800949D0 exact from the deadsearch lead (a dead
-srawi of n moved the whole first pass; docs/compiler/decomp-notes.md "New from round 7")."""
+srawi of n moved the whole first pass)."""
 import itertools, os, re, sys
 
 # opcode -> (unit, latency, cycles in stage 1, cycles in stage 2); unit 0 BPU, 1 IU1, 2 any IU, 3 LSU

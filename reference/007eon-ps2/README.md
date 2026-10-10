@@ -1,7 +1,6 @@
 # 007 Everything or Nothing, PS2 USA (SLUS-20751, 2003-12-12 build)
 
-Surveyed 2026-09-25 on the owner's PC. The build (from debugging.games) stays in `C:/dev/ext/`; only
-this note and `shared_functions.tsv` are in the repo.
+Only this note and `shared_functions.tsv` are in the repo; the build itself is not.
 
 ## What the build has
 

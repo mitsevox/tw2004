@@ -3,8 +3,8 @@ TW06 function names
 
 Names carried over from Tiger Woods PGA Tour 06 (2005): the Xbox beta PDB and the PS2 build's
 linker map (`MAPFILE.TXT`, SLUS-21264, 2005-07-12). Same studio (EA Redwood Shores) and the same
-engine lineage as this game. How they were found
-and the tools are in `tw2004-notes.md`, "Symbols from related builds". The PDB and executable are
+engine lineage as this game; [`reference/README.md`](../../reference/README.md) describes both
+builds. The PDB and executable are
 reference material and are not in this repository.
 
 **These are 2005 names.** TW06 is two years newer and partly C++; this game is C. A name here says
@@ -71,7 +71,7 @@ Functions still unnamed or named from TW06:
 | `80044BD4` | `CamScript_KeepAboveGround` | `CamScript_KeepAboveGround` | strong | PS2 nbr2(r8,4) |
 | `80045038` | `CameraScript_WillGolferBeOccludedInThisView` | `CameraScript_WillGolferBeOccludedInThisView` | strong | PS2 nbr(r4,3) |
 | `80045908` | `DF_vDrawBufferToScreen` | `DF_vDrawBufferToScreen` | strong | PS2 anchor(3) |
-| `80048AF4` | `Kernel_AllocObjectMem` | `Kernel_InitModule` | wrong | PS2 anchor(1); the code allocates an object (round 20, rt4): EA's Kernel_InitModule is 0x80048DD0 (registers 'Cact', creates the pools; TW07 order) |
+| `80048AF4` | `Kernel_AllocObjectMem` | `Kernel_InitModule` | wrong | PS2 anchor(1); the code allocates an object: EA's Kernel_InitModule is 0x80048DD0 (registers 'Cact', creates the pools; TW07 order) |
 | `80049B40` | `ActAnimal_SetWorldMatrix` | `ActAnimal_SetWorldMatrix` | strong | Xbox anchor(5) |
 | `8004B5A8` | `Ter_PointInFreeDropNetwork` | `Ter_PointInFreeDropNetwork` | strong | PS2 nbr(r8,4) |
 | `8004B664` | `Ter_PointInOOBNetwork` | `Ter_PointInOOBNetwork` | strong | PS2 nbr(r5,4) |
@@ -191,7 +191,7 @@ Functions still unnamed or named from TW06:
 | `80072ED8` | `fn_80072ED8` | `SKATime_Update` | medium | PS2 nbr2(r0,2) |
 | `80073108` | `fn_80073108` | `SKATime_Idle` | medium | PS2 anchor(1)+graph |
 | `80076400` | `fn_80076400` | `CA_spCreateCamera` | medium | PS2 nbr(r1,2) |
-| `800768E0` | `CA_vSetDefaultCamera` | `CA_vUpdateInternalFieldOfViewData` | wrong | PS2 nbr(r2,2); TW07's GoCamera order and signature make it CA_vSetDefaultCamera (round 21, ru6) |
+| `800768E0` | `CA_vSetDefaultCamera` | `CA_vUpdateInternalFieldOfViewData` | wrong | PS2 nbr(r2,2); TW07's GoCamera order and signature make it CA_vSetDefaultCamera |
 | `80077A80` | `FE_spGetGolfer` | `FE_spGetGolfer` | medium | PS2 calls(r0,1) |
 | `80078A2C` | `FE_CrAP_RandomizeCategoryWithUndesirableTest` | `FE_CrAP_RandomizeCategoryWithUndesirableTest` | medium | Xbox nbr(r1,2) |
 | `80091EE8` | `UI_PlayStartUpMovies` | `FE_movieFade` | medium | PS2 nbr(r0,2) |
@@ -345,7 +345,7 @@ Stack functions: `GetCurrentState` (was `SwingStack_Top`), `GetPreviousState`, `
 wrong), `Kill` (was `SwingStack_Clear`), `OpenONCE` (empty all stacks), `Update` (run every
 player's current update).
 
-## Names by position: game effects, analysis and the game modes (2026-09-23)
+## Names by position: game effects, analysis and the game modes
 
 These come from TW06's function order (the PS2 map is in source order) and from the modes'
 shared shapes; they are in the source comments ("TW06: ... (by position)"), and the symbols keep
@@ -362,7 +362,7 @@ their `fn_` names until the rest of each file is confirmed.
 | `GameModeBattle.c` | 25 | `GameModeBattle::` | ClubIsRequired (clubs 13, 21, 25), NumRemovableClubsLeft, RemoveClub, AddClub, Save/RestoreClubSetup, CanAddClub, GetWinner |
 | `GameModeStroke.c` | 0 | `GameModeStroke::` | Init, SetupNextGolfer, GetHonors, HoleFinished, GameFinished, EndGame (GoToPlayoff is the base class's; ours returns 0) |
 | `GameModeStableford.c` | 18 | `GameModeStableford::` | Init, PlayerDoneHole, SetupNextGolfer, GetHonors, HoleFinished, GameFinished, EndHole, EndGame; the data table `stablefordPointTable` (lbl_802816D0) |
-| `GameMode_Skins.c` | 2 | `GameModeSkins::` | GetHonors, GameFinished, GoToPlayoff, EndHole, EndGame (file renamed to EA's name, 2026-09-28) |
+| `GameMode_Skins.c` | 2 | `GameModeSkins::` | GetHonors, GameFinished, GoToPlayoff, EndHole, EndGame (the file has EA's name) |
 | `GameModeReplay.c` | 10 | `GameModeReplay::` | Init, SetupNextGolfer, HoleFinished, GameFinished, EndGame, LoadHole, RestartHole, StartGamePreData |
 | `GameModeDriverPGATour.c` | 23 | `GameModeDriverPGATour::` | the file's TW06 class; 31 methods, rows below |
 | `GameModeDriverRTE.c` | 24 | `GameModeDriverRTE::` | the file's TW06 class; 13 methods, rows below |

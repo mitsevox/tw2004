@@ -31,7 +31,6 @@ void fn_80069B74(int nPlayer);
 void fn_80069BEC(int nPlayer);
 void PlaceBall_RenderBallTarget(int nPlayer);
 void fn_8006A7A8(u8* pChunk);
-void fn_8006A89C(void);
 void fn_8006A8B0(void);
 void fn_8006A964(f32* pA, f32* pB, f32* pOut);
 void fn_8006A988(f32* pA, f32* pB, f32* pOut);

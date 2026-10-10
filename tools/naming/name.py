@@ -7,19 +7,19 @@ batch.tsv, tab-separated, one function per line (# lines skipped):
         T3 read from the code (docs/style.md "Names"); codes as in config/GW4E69/name_sources.tsv
         (E1 EA text, E2 TW06/TW07 name, E3 wrapper, E4 named data, E5 named neighbours, E6 the code);
   evidence: what in the code or the reference shows it; purpose: one line, what the function does;
-  comment (optional): KEEP (read, the existing comment is right: logged as reviewed), NONE (read,
-        a short function whose name says it all: logged as reviewed, needs no comment), or the function's whole comment, written for a reader of the code (what it
+  comment (optional): KEEP (the existing comment is right), NONE (a short function whose name
+        says it all), or the function's whole comment, written for a reader of the code (what it
         does in the game, units, what 0/NULL mean; read from the code, never contradicting it).
         It goes above the definition, wrapped at 100 columns, REPLACING an existing // comment:
-        rewrite a comment that is wrong, stale or vague. Keep every `fake match:`, `port:` and
-        `EA bug:` label of the old comment (correct its text if stale): name.py refuses a row
-        that drops one.
+        rewrite a comment that is wrong, stale or vague. Keep every `fake match:` label of the old
+        comment (correct its text if stale): name.py refuses a row that drops one, or that writes
+        a `port:` or `EA bug:` note (an EA bug goes in docs/game/ea-bugs.md).
 Steps, in order; the first failure stops it and puts every touched file back:
   1. every row checked: EA style name (System_Verb: `Mem_set`, `RenderState_SetDepthFunc`), tier,
      codes, evidence and purpose present; then rename.py --dry-run (current name at that address,
      new name unused anywhere);
   2. rename.py: symbols.txt, src/, include/ (code and comments);
-  3. the old names in the Markdown docs (not the dated records: docs/evidence/notes/,
+  3. the old names in the Markdown docs (not the reference dumps:
      reference/);
   4. the comments of column 8 above their definitions;
   5. wraplong.py: lines the longer names pushed past lint's 110 columns are rewrapped;
@@ -31,7 +31,7 @@ A row whose new_name equals current_name is comment-only: column 8 is added (tie
 evidence still say where the comment comes from), nothing is renamed and no name_sources row is
 written. Use it for functions that already have a name; a fn_XXXXXXXX placeholder is refused:
 every function read gets a name (an empty or stripped one after where it is called and what for).
-Needs a clean tree under src/, include/, config/ and docs/ (commit or stash first)."""
+Needs a clean tree under src/, include/, config/ and docs/ (commit first)."""
 import datetime, pathlib, re, subprocess, sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
@@ -40,11 +40,10 @@ import hotnames                                              # noqa: E402  (find
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 PY = sys.executable
 SOURCES = ROOT / 'config/GW4E69/name_sources.tsv'
-REVIEW = ROOT / 'config/GW4E69/review.tsv'
 NAME = re.compile(r'^[A-Z][A-Za-z0-9]*(_[A-Za-z0-9]+)+$')
 CODES = re.compile(r'^E[1-6][a-z]?(\([^)]*\))?(\+E[1-6][a-z]?(\([^)]*\))?)*$')
 PATHS = ['src', 'include', 'config', 'docs']
-SKIP_MD = ('reference/', 'docs/evidence/notes/')
+SKIP_MD = ('reference/',)
 
 
 def run(cmd, **kw):
@@ -134,38 +133,34 @@ def update_markdown(rows):
 
 
 def wrap_comment(text, indent=''):
-    """// lines of at most 100 columns; each fake match: / port: / EA bug: label starts a line. A
-    `port:` note's continuation lines are indented under its text ("//       "), so a porter sees
-    where the note ends."""
+    """// lines of at most 100 columns; a fake match: label starts a line."""
     out = []
-    for part in re.split(r'\s+(?=(?:fake match:|port:|EA bug:))', text.strip()):
+    for part in re.split(r'\s+(?=fake match:)', text.strip()):
         lines, cur = [], ''
-        cont = '//       ' if part.startswith('port:') else '// '
         for w in part.split():
-            pre = cont if lines else '// '
-            if cur and len(indent) + len(pre) + len(cur) + 1 + len(w) > 100:
+            if cur and len(indent) + 3 + len(cur) + 1 + len(w) > 100:
                 lines.append(cur)
                 cur = w
             else:
                 cur = f'{cur} {w}' if cur else w
         lines.append(cur)
-        out += [f'{indent}{"// " if k == 0 else cont}{l}' for k, l in enumerate(lines)]
+        out += [f'{indent}// {l}' for l in lines]
     return out
 
 
-LABELS = ('fake match:', 'port:', 'EA bug:')
-REWRITTEN = set()
+LABELS = ('fake match:',)
 
 
 def add_comments(rows):
     """Column 8 becomes the comment above each definition: added where there is none, and REPLACING
-    the existing // block where there is one (owner, 2026-09-27: naming lanes own the comments of
-    the functions they touch). A replacement must keep every matching label of the old block
-    (fake match:, port:, EA bug:; the text after it may be corrected). Only the first definition in
-    a file is commented (an #else plain-C copy keeps its own note). Returns (added, replaced, errors)."""
+    the existing // block where there is one. A replacement must keep every fake match: label of the
+    old block (the text after it may be corrected). Only the first definition in a file is
+    commented (an #else plain-C copy keeps its own note). Returns (added, replaced, errors)."""
     added, replaced, errors = 0, 0, []
     want = {new: com for _, _, new, *rest in rows for com in [rest[-1]] if com and com not in ('KEEP', 'NONE')}
     none = {new for _, _, new, *rest in rows if rest[-1] == 'NONE'}
+    errors += [f'{n}: the comment has a port: or EA bug: note (EA bugs go in docs/game/ea-bugs.md)'
+               for n, com in want.items() if 'port:' in com or 'EA bug:' in com]
     if not want and not none:
         return 0, 0, []
     found = set()
@@ -206,7 +201,6 @@ def add_comments(rows):
             lines[first:top] = wrap_comment(want[name])
             if first < top:
                 replaced += 1
-                REWRITTEN.add(name)
             else:
                 added += 1
         if defs:
@@ -239,7 +233,7 @@ def main():
               + (f' ({dry.stdout.strip()})' if dry is not None else ' (comments only)'))
         return
     if '--by' not in args:
-        sys.exit('name.py: say who proposed the batch: --by "<lane or model>"')
+        sys.exit('name.py: say who proposed the batch: --by "<who>"')
     by = args[args.index('--by') + 1]
     if run(['git', 'status', '--porcelain', '--'] + PATHS).stdout.strip():
         sys.exit('name.py: src/, include/, config/ or docs/ has uncommitted changes; commit them first')
@@ -250,7 +244,6 @@ def main():
         restore('rename.py failed:\n' + r.stdout + r.stderr)
     md = update_markdown(renames) if renames else 0
     ncom, nrep, cerr = add_comments(rows)
-    rewritten = REWRITTEN
     if cerr:
         restore('comment rows refused:\n  ' + '\n  '.join(cerr))
     for _ in range(10):         # a reflowed comment spills into its next line: repeat until stable
@@ -270,16 +263,6 @@ def main():
     if b.returncode or 'OK' not in check.stdout + check.stderr:
         tail = '\n'.join((b.stdout + b.stderr).splitlines()[-15:])
         restore('build or DOL check failed:\n' + tail + '\n' + check.stdout + check.stderr)
-    # the review log: every function this batch read, and what happened to its comment
-    new_log = not REVIEW.exists()
-    with open(REVIEW, 'a', encoding='utf-8') as f:
-        if new_log:
-            f.write('# Every function a naming lane has read (name.py): address, name, comment action\n'
-                    '# (keep: read and right; rewrite; add; none: needs none), who, date.\n'
-                    'address\tname\tcomment\tby\tdate\n')
-        for a, cur, new, *_rest, com in rows:
-            act = 'keep' if com == 'KEEP' else 'none' if com == 'NONE' else ('none' if not com else ('rewrite' if new in rewritten else 'add'))
-            f.write('\t'.join([a, new, act, by, today]) + '\n')
     after = coverage()
     lint = run([PY, 'tools/quality/lint.py', '--diff', 'HEAD']).stdout
     left = [l for l in lint.splitlines() if re.match(r'^\S+:\d+: ', l)]

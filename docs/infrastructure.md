@@ -8,7 +8,7 @@ The machines, the git flow, CI, the public page and decomp.dev. Matching tools a
 | Where | What runs there | Game files |
 |---|---|---|
 | **Cloud session** (Claude Code on the web) | edits, builds, pushes branches, opens PRs | fetched by `tools/cloud/setup.sh` from the private build container (owner's `TW_BUILD_TOKEN`, read-only) |
-| **Owner's PC** | local builds | `C:/dev/tw2004/orig`, never leaves the PC |
+| **Owner's PC** | local builds | `orig/` on the PC, never leaves it |
 | **GitHub Actions** | the build on every push and PR, the public page | the private container `ghcr.io/mitsevox/tw2004-build:main` |
 
 Setting up a cloud session: [`../tools/cloud/README.md`](../tools/cloud/README.md). Everything
@@ -33,10 +33,9 @@ the package's "Manage Actions access"). The build downloads the compilers pinned
 old-case object), and uploads `GW4E69_report` (objdiff's report.json) and `GW4E69_maps`.
 Builds of main queue one after another; newer pushes to any other branch cancel older runs.
 
-Pitfalls met: when the build repo is created from its template, the template's first container
-build can finish after the commit that adds `main.dol` and overwrite `:main` with an empty image
-("main.dol not found": re-run the latest container build). Pushing workflow files from the owner's
-GitHub CLI needs the `workflow` scope (`gh auth refresh -h github.com -s workflow`).
+If CI reports "main.dol not found", the container image `:main` is empty: re-run the latest
+container build in `mitsevox/tw2004-build`. Pushing workflow files from the GitHub CLI needs the
+`workflow` scope (`gh auth refresh -h github.com -s workflow`).
 
 ## The public progress page (GitHub Pages)
 
@@ -59,8 +58,8 @@ at that commit, no build needed); matched bytes need a build report of that comm
 page repeats the previous value (and says so). To rebuild past commits for real matched numbers:
 `python tools/dashboard/backfill_history.py <oldest> --pages-history out.json` (main's first-parent
 commits, about 30 s each), then merge `out.json` into `history.json` on `pages-history`. History
-from before the repository's rewrite on 2026-09-24 exists only in the PC's
-`build/dashboard_history.json`: `pages.py merge <history.json> <that file>` adds it.
+from before the repository's rewrite exists only in a local `build/dashboard_history.json`:
+`pages.py merge <history.json> <that file>` adds it.
 
 ## decomp.dev
 

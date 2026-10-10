@@ -24,7 +24,7 @@ and MetroTRK are built from public decomps in `extern/` (the `progress_category=
 | Shared headers | `include/engine.h` (services), `include/game.h` (round, modes), `include/golfer.h` (players, golfers, `GameState`), `include/character.h`, `include/camera.h` |
 
 `gSession.nGameType` (the outer loop in `GoEntry.c`): 0 boot decision, 1 start-up screens,
-10 start the front end, 3 front end, 4 start a round (`GO_vInitIG`), 5 load a hole (`Code8006F438.c`),
+10 start the front end, 3 front end, 4 start a round (`GO_vInitIG`), 5 load a hole (`GoHoleLoader.c`),
 6 play (the frame loop), 7 after the frame loop ends (back to 5 when another hole load is asked
 for, else 8), 8 shut the round down, 12 reset the console, 13 leave, 9 an error. Each type's
 step is a call into `gomainloop.c` (`GO_vInitFE`, `GO_vInitIG`, `fn_8006D8E8`...).
@@ -101,7 +101,7 @@ The outer loop moves between start-up screens, the front end and rounds (`gSessi
 | GoEntry.c | EA | the outer loop over `gSession.nGameType` |
 | Code8002EE1C.c | ph | the session (`Session_Init`, players, golfers, options) |
 | gomainloop.c | T6 | the main loop: every system's start-up and shut-down, the frame update, the render passes |
-| Code8006F438.c | ph | the hole loader: streams a hole's files in and sets the systems up for it |
+| GoHoleLoader.c | ph | the hole loader: streams a hole's files in and sets the systems up for it |
 | BootCourse.c | ours | the demo rounds (`DEMO_Start`: four fixed set-ups) and a 120-second idle timer `GoEntry.c` tests |
 | ScreenClear.c | ours | a black full-screen quad for 1, 2 or 30 frames |
 
@@ -159,7 +159,7 @@ files in [Characters](#characters).
 | UObject3D.c | EA | a model from a stream object; a recorded display list of renderer state |
 | GoFrameBuf.c | EA | a frame buffer's size and scale |
 | GoLighting.c | EA | the scene's lights: a pool of 25, loaded into GX (four point lights and an ambient) |
-| Code8006F154.c | ph | the terrain colour blended by the camera's heading |
+| GoFog.c | ph | the distance fog, blended by the camera's heading |
 | GoCamera.c | EA | a render camera's lens: field of view, position, target, matrices |
 | GoViewport.c | EA | a viewport (13 floats) |
 | GoLightFogEnv.c | T7 | the hole's lighting environments (`LF_*`) |
@@ -246,7 +246,7 @@ all arriving as stream chunks when a hole loads.
 | TerrainGround.c | ours | the triangle, height and surface type under a point |
 | CourseData.c | ours | the course table (`'CRI '`: 18 holes' par, wind, tees) and built rounds (`'CMPS'`) |
 
-Also here by subject: `GoTerrain.c` (drawing it), `GoGrass.c`, `Code8006F438.c` (the hole loader).
+Also here by subject: `GoTerrain.c` (drawing it), `GoGrass.c`, `GoHoleLoader.c` (the hole loader).
 
 ### Ball physics
 
