@@ -252,7 +252,7 @@ def header_long_lines(rev):
                 if len(l.rstrip('\r')) > 110]
     base = subprocess.run(['git', 'merge-base', rev, 'HEAD'], cwd=ROOT,
                           capture_output=True, text=True).stdout.strip() or rev
-    out = subprocess.run(['git', 'diff', '-U0', base, '--', 'include'], cwd=ROOT,
+    out = subprocess.run(['git', 'diff', '-B', '-M', '-U0', base, '--', 'include'], cwd=ROOT,
                          capture_output=True, text=True).stdout
     res, cur, ln = [], None, 0
     for l in out.splitlines():
@@ -277,7 +277,7 @@ def changed_lines(rev):
     # not counted as this branch's.
     base = subprocess.run(['git', 'merge-base', rev, 'HEAD'], cwd=ROOT,
                           capture_output=True, text=True).stdout.strip() or rev
-    out = subprocess.run(['git', 'diff', '-U0', base, '--', 'src'], cwd=ROOT,
+    out = subprocess.run(['git', 'diff', '-B', '-M', '-U0', base, '--', 'src'], cwd=ROOT,
                          capture_output=True, text=True).stdout
     res, cur = {}, None
     for l in out.splitlines():
@@ -303,7 +303,7 @@ def touched_units(rev):
     import subprocess
     base = subprocess.run(['git', 'merge-base', rev, 'HEAD'], cwd=ROOT,
                           capture_output=True, text=True).stdout.strip() or rev
-    names = subprocess.run(['git', 'diff', '--name-only', base, '--', 'src', 'include'], cwd=ROOT,
+    names = subprocess.run(['git', 'diff', '-B', '-M', '--name-only', base, '--', 'src', 'include'], cwd=ROOT,
                            capture_output=True, text=True).stdout.split()
     names += subprocess.run(['git', 'ls-files', '--others', '--exclude-standard', '--', 'src',
                              'include'], cwd=ROOT, capture_output=True, text=True).stdout.split()
