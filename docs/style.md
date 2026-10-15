@@ -30,10 +30,11 @@ Names
 - **A name says what the code does.** Where EA's own name is known (its text in the binary, or a
   related EA build in `reference/`), use it as EA spelled it; otherwise name it from a careful
   reading of the code. Either way the name is ours to stand behind: it is not cited anywhere, and
-  it never claims more than the code shows.
+  it never claims more than the code shows. Before naming a function, look for it in `reference/`.
 - Renames go through `tools/naming/name.py` (functions) or `tools/naming/rename.py` (globals),
   which change `config/GW4E69/symbols.txt`, the C and the headers together, so the C and the
-  assembly agree; never alias with `#define`.
+  assembly agree; never alias with `#define`. They also update the "Now" column of
+  `docs/evidence/tw06-names.md`; nothing else in `docs/evidence/` changes with a rename.
 - **EA's naming style.** Functions `System_Verb` (`View_SetCamera`, `Session_SetNumPlayers`),
   globals `gName`, locals and fields in Hungarian: `n` integer, `f` float, `b` flag, `u` unsigned
   bit mask, `p` pointer, `a` array, `pfn` function pointer, `sz` string. A player index is
@@ -42,7 +43,11 @@ Names
   bytes no code ever reads or writes (padding, unused space) are `unkXXX`. Fields of shared structs
   carry their offset in a trailing comment (`// 0xC38`).
 - **Values with a meaning** (camera modes, game types, message IDs, flag bits, a table's size)
-  get an enum or define: EA's when known, otherwise ours. Plain arithmetic constants stay numbers.
+  get an enum or define: EA's when known, otherwise ours. After adding one, search the repo for the
+  bare value so every use takes the name. The first value of a kind to get a name starts that
+  kind's enum, holding the values the pass can explain; the rest join it in the passes that use
+  them. Plain arithmetic constants stay numbers, and so does an ID whose meaning lives only in the
+  game's data (a sound or text index).
 - **Flags:** a field of bits is `uFlags` (`uXxxFlags` when a struct has several). Its bits are
   defines next to the struct, named for the struct: `PLAYER_IS_HUMAN` for
   `Player.uFlags`. A table's size is `SYSTEM_NUM_THINGS`.
@@ -62,6 +67,11 @@ not other builds, not tools, not history. The one exception is the `fake match:`
 because it marks a spot to come back to.
 
 Bugs in EA's own code are listed in [`game/ea-bugs.md`](game/ea-bugs.md), not in the source.
+Behaviour that looks unintended but can't be shown to happen in play goes there under "Possible",
+with what would settle it.
+
+A comment never describes a branch no caller can reach as if it runs; it says the branch is
+unreachable, or says nothing.
 
 Data and types
 --------------
@@ -85,7 +95,9 @@ Prototypes
 
 - **A function called from another file** is declared once, in the header of the system it belongs
   to, with the definition's exact types. A prototype inside a `.c` file is only for that file's
-  own static functions.
+  own static functions. A file with no header of its own declares its functions in its system's
+  header, under a section named for the file (`frontend/fe.h` for a front-end file). When a file's
+  prototypes already sit in two headers, a new one goes beside most of them.
 - **A function only its own file calls is `static`**, with `scope:local` on its line in
   `symbols.txt`. Never give it a header prototype just to quiet lint.
 - **A function is never called through a cast of itself.** When callers pass something other than
@@ -177,13 +189,21 @@ understand the code is always done: it's all there.
 **What a pass covers.** A file's pass owns everything the file defines, wherever it shows up: its
 functions' signatures and every call to them (a wrong cast in a caller's file is fixed in this
 pass), its globals and their declarations, and the struct fields its code reads, writes or
-passes on (their names, types and every use of them, in any file). It also fixes what the file reads from elsewhere when
-the file can't read right without it, such as a header field it uses. Other files are changed
+passes on (their names, types, comments and every use of them, in any file). It also fixes what
+the file reads from elsewhere when the file can't read right without it, such as a header field
+it uses. Other files are changed
 only where they meet this file; they stay `open` until their own pass. A new define replaces
 every test of that field across the repo, so no file keeps a bare bit the header names. Renaming
 or moving another file (to free EA's name for this one) doesn't audit it: its old text stays for
 its own pass. Anything else the pass finds outside that scope (a tool bug, another file's stale
 comment) goes in a commit of its own, or is left for that file's pass.
+
+**Every pass checks the file's two ends.** For the first and last functions, the commit message
+says what shows they belong to this file. Proof is one of these: the data they use (or a table
+that points at them) sits in this file's data, in the same order as the other files; or a related
+EA build (`reference/`) keeps them in the same file. When a function at an end
+uses no data and nothing else settles it, it stays where it is, and the commit message says so and
+what was checked. A boundary moves only with proof.
 
 Progress lives in [`audit.tsv`](audit.tsv), one row per game source file: `open`, or `done` with
 the commit that holds the pass and the reviewer who passed it. The author of a pass leaves the
@@ -236,7 +256,7 @@ Structure
 |---|---|
 | **D1.** Another file's prototype declared in a `.c` file; a non-static prototype for a function only this file calls; a call through a cast of the function | One prototype, in the owning header; `static`; a definition that takes what the callers pass |
 | **D2.** Raw pointer arithmetic (`*(s32*)((u8*)p + 0x10)`) | Struct fields |
-| **D3.** A file that isn't one EA source file (`CodeXXXXXXXX.c`, `unsorted/sweep_*`), a boundary that isn't proven, or our name on a file whose EA name is known | Its functions in the EA file they belong to, under EA's name; the proof of each boundary goes in the commit message. "Nothing else claims these functions" is not a proof |
+| **D3.** A file that isn't one EA source file (`CodeXXXXXXXX.c`, `unsorted/sweep_*`), a boundary moved without proof or an end the pass didn't check, or our name on a file whose EA name is known | Its functions in the EA file they belong to, under EA's name; the proof of each boundary goes in the commit message ("Every pass checks the file's two ends"). "Nothing else claims these functions" is not a proof |
 | **D4.** Undefined behaviour the compiler can see, not listed in the bug register | Fixed, or listed when EA wrote it |
 
 Not failures
