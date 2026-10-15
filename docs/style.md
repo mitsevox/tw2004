@@ -165,6 +165,13 @@ and local is understood and named, every comment is checked against the code, an
 left open is a tagged compiler trick. Names never claim more than the code shows, but the work to
 understand the code is always done: it's all there.
 
+Progress lives in [`audit.tsv`](audit.tsv), one row per game source file: `open`, or `done` with
+the commit that finished it. A file is done when `lint.py` has nothing to say about it and a
+reviewer has passed it; the commit that marks it done is that pass. CI fails if a done file picks
+up a lint finding, so done stays true. `python tools/quality/audit.py` shows the count, and
+`--sync` updates the rows after files are merged, split or moved (a merged file is done only when
+all of it is).
+
 Each item below fails a file. "Becomes" is the fix.
 
 Comments

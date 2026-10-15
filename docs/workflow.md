@@ -48,9 +48,11 @@ python tools/quality/lint.py --diff main      # style findings on the lines you 
 python tools/quality/typeaudit.py --count     # no number higher than on main
 python tools/quality/symaudit.py --count      # no number higher than on main
 python tools/quality/constcheck.py --count    # no number higher than on main
+python tools/quality/audit.py --check         # files marked done in docs/audit.tsv are still clean
 ```
 
 - `lint.py`: the rules in `style.md`, plus a compile with warnings for undefined behaviour.
+- `audit.py`: the audit table (`style.md`, "The audit"); CI runs `--check`.
 - `typeaudit.py`: globals declared with different types in different files, types defined twice,
   and `extern`/`typedef` lines in `.c` files.
 - `symaudit.py`: each global's declared size against `symbols.txt`. A global of 8 bytes or less
