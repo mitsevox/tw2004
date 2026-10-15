@@ -28,6 +28,10 @@ CHECKS = [
     ('trailing-space', re.compile(r'[ \t]+$')),
     ('no-braces', re.compile(r'^\s*(if|for|while)\s*\(.*\)\s*[^{\s;][^{]*;\s*(//.*)?$')),
     ('old-label', re.compile(r'//.*(\bport:|\bEA bug:)')),
+    ('placeholder-name', re.compile(r'\b(fn|lbl)_[0-9A-F]{8}')),
+    ('comment-other-build', re.compile(r'(//|/\*).*\b(TW0[67]|PDB|DWARF)\b')),
+    ('comment-address', re.compile(r'(//|/\*).*\b0x80[0-9A-Fa-f]{6}\b')),
+    ('comment-register', re.compile(r'(//|/\*).*\b[rf]([0-9]|[12][0-9]|3[01])\b')),
     ('commented-code', re.compile(r'^\s*//\s*([\w\[\]\.>-]+\s*[-+*/|&]?=[^=][^;]*|\w+\([^)]*\)|return\b[^;]*|(if|for|while)\s*\(.*\)\s*\{?)\s*;?\s*$')),
 ]
 # The statement after the condition is return/break/continue. Checked separately: a regex
@@ -67,9 +71,11 @@ def lint(path, protos):
     if not text.endswith('\n'):
         hits.append((len(lines), 'final-newline', 'no newline at end of file'))
     if not re.match(r'// \w+\.c\b', lines[0]):
-        hits.append((1, 'header-comment', 'first line should be "// <File>.c (our name): ..."'))
+        hits.append((1, 'header-comment', 'first line should be "// <File>.c: what the file does in the game"'))
     raw_sweep = sweepblock.lines_in_blocks(lines)      # style rules wait until the code is cleaned
     seen = includes.seen_headers(path)
+    defined = {m.group(1) for m in re.finditer(
+        r'^(?!typedef|return|#)[A-Za-z_][\w \*]*?\b(\w+)\s*\([^;{}]*$', text, re.M)}
     SWEEP_DEBT[path.name] = len(raw_sweep)
     for i, l in enumerate(lines, 1):
         l = l.rstrip('\r')
@@ -78,12 +84,12 @@ def lint(path, protos):
         for name, rx in CHECKS:
             if name == 'no-braces' and EARLY_EXIT.search(l):
                 continue            # a one-line early exit is allowed (style.md, Formatting)
+            if name == 'comment-register' and 'fake match' in l:
+                continue            # a fake-match tag may name the register its trick pins
             if rx.search(l):
                 hits.append((i, name, l.strip()))
         if len(l) > 110:
             hits.append((i, 'long-line', '%d columns' % len(l)))
-        if re.search(r'\bgoto\b', l) and 'fake match' not in l and 'fake match' not in lines[i - 2]:
-            hits.append((i, 'goto-unmarked', l.strip()))
         m = re.match(r'^(?!typedef|return|#|static)([A-Za-z_][\w \*]*?[\s\*])(\w+)\s*\(([^;{}]*)\)\s*;(.*)$', l)
         # only the headers this file includes count: one it does not see declares nothing here
         decl = [(sig, h) for sig, h in protos.get(m.group(2), []) if h in seen] if m else []
@@ -92,15 +98,18 @@ def lint(path, protos):
             if same:
                 hits.append((i, 'dup-prototype', '%s is already declared in %s'
                              % (m.group(2), includes.label(same[0]))))
-            elif '//' not in m.group(4):
-                hits.append((i, 'proto-mismatch', '%s differs from %s with no comment saying why'
+            else:
+                hits.append((i, 'proto-mismatch', '%s differs from %s: cast at the call site instead'
                              % (m.group(2), includes.label(decl[0][1]))))
+        elif m and m.group(2) not in defined:
+            hits.append((i, 'foreign-prototype', '%s belongs in the header of the file that defines it'
+                         % m.group(2)))
     return hits + ub_check(path, lines)
 
 
 # Undefined behaviour the game's own compiler can see. Unlike the style rules, these are bugs in
-# the C even when the function matches; one is accepted only with a "fake match:" comment on the
-# line or the line before, saying why the original must have had it.
+# the C even when the function matches. One is accepted only when EA wrote it (the bytes require
+# it) and it is listed in docs/game/ea-bugs.md.
 UB = [('ub-missing-return', 'return value expected'),
       ('ub-uninitialized', 'is not initialized before being used')]
 CFLAGS = ['-nodefaults', '-proc', 'gekko', '-align', 'powerpc', '-enum', 'int', '-fp', 'hardware',
@@ -166,8 +175,7 @@ def ub_check(path, lines):
             i = int(m.group(2))
             src = lines[i - 1] if i <= len(lines) else ''
             implicit.add(i)
-            if 'fake match' not in src:
-                hits.append((i, 'ub-no-prototype', 'implicit declaration: ' + src.strip()))
+            hits.append((i, 'ub-no-prototype', 'implicit declaration: ' + src.strip()))
         else:
             err.append(m)
     if out.returncode and (err or not implicit):
@@ -192,8 +200,7 @@ def ub_check(path, lines):
         if i in seen or is_definition(lines, i):
             continue            # a definition, not a call
         seen.add(i)
-        if 'fake match' not in src:
-            hits.append((i, 'ub-no-prototype', src.strip()))
+        hits.append((i, 'ub-no-prototype', src.strip()))
     for l in (out.stdout + out.stderr).splitlines():
         m = re.match(r'(.*?):(\d+): warning: (.*)', l)
         if not m or reported_name(m.group(1)) != path.name:
@@ -201,10 +208,9 @@ def ub_check(path, lines):
         for name, text in UB:
             if text in m.group(3):
                 i = int(m.group(2))
-                near = lines[i - 1] + (lines[i - 2] if i > 1 else '')
                 # EA's own bug, kept because the bytes require it, is listed in the register
                 ea = (path.name, enclosing_function(lines, i)) in ea_bugs()
-                if 'fake match' not in near and not ea:
+                if not ea:
                     hits.append((i, name, lines[i - 1].strip()))
     return hits
 

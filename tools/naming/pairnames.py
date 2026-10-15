@@ -62,9 +62,9 @@ Method, per unit (our .o = one EA source file, functions in source order):
     (neighbour vote); their pairs are capped at C unless bracketed.
 Measured (--holdout 0.5, three seeds): A 99%, B 91-96%, C 64-70% get the hidden name
 back; a hand check of 30 A/B pairs on real fn_ functions: docs/evidence/name-pairing.md.
-Codes in the output follow docs/style.md: E2b = TW07 name, E2 = TW06 name, E1 = EA's text, then the
-machine lines above. Every proposal is a CANDIDATE for the audit process (docs/style.md "Where names
-and comments come from"), never a rename.
+Codes in the output follow config/GW4E69/name_sources.tsv: E2b = TW07 name, E2 = TW06 name, E1 =
+EA's text, then the machine lines above. Every proposal is a candidate, checked against the code
+(docs/style.md "Names"), never a rename.
 Not scored: IStudio (UIS*, UIStudio), the MAD decoder (maddec*, madidct) and runtime/MSL units (named from
 Madden 2003 / NFSMW instead); they are counted separately (--all includes them)."""
 import collections, json, math, pathlib, random, re, statistics, sys

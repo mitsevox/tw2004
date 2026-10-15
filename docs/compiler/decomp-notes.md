@@ -181,7 +181,7 @@ The fixes that come up most often. Each points to its full entry below.
   or a pointer walk.
 - **[verified] `x = f(); if (x == NULL) { while (x == NULL) {...} }` gives CodeWarrior's "test the result,
   then jump to the loop test" shape** (`cmplwi r3,0; bne end; b test`). StaticMemory StaticMem_Init 96.15 ->
-  100 (mark it `// fake match` if the outer `if` is redundant in the source).
+  100.
 - **[verified] A count-down fill `n = count; i = 0; while (n-- > 0) a[i++] = v;` gives
   `cmpwi n,0; ble; srwi. n,3; mtctr ... andi. 7`.** A `for (i = 0; i < n; i++)` gives `cmpwi n,8; subi`
   (49%); plain `while (n--)` gives `beq`. GameHoleContests HoleContest_InitForHole.
@@ -291,9 +291,9 @@ The fixes that come up most often. Each points to its full entry below.
   registers**; swapping `(f32* pOut, f32 fAngle)` flips `fmr f31,f1` / `mr r31,r3` (Quaternion fn_800093AC
   92.0 -> 100). Only reorder when the callers' asm agrees.
 - **[verified] The stack frame does not fix a local char buffer's size** (GoDynamicCam fn_8003C9D0 exact
-  with 12..0x18 bytes): say in a comment that the size is unknown.
+  with 12..0x18 bytes): size it from what the code stores in it.
 - **[verified] A local `int` copy of an `s32` parameter survives as its own register** (an s32 copy is
-  merged away). MC_Gc's CARD waits: `int nChan = nPort;`, 8 functions 73-99 -> 100. Mark it fake match.
+  merged away). MC_Gc's CARD waits: `int nChan = nPort;`, 8 functions 73-99 -> 100.
 - **[verified] Keep a call result in a named local when it is an index, a compare operand or an argument
   inside an iterator loop.** It sets the `mulli`/`add` order (GoDynObj DynObj_LoadBallLogos, also for `Rand % n`
   in GoStaticCam fn_80064F7C) and the `cmplw` operand order (char Character_GolferStreamCallbackIG; swapping the operands does
@@ -317,7 +317,7 @@ The fixes that come up most often. Each points to its full entry below.
   38 -> 0 (`s32 i`, pLogoA before pLogoB).
 - **[verified] An identity read inside a declaration's initializer** (`int n = fn_X_Read(p->n38);`)
   fixes a register order that the same read as a statement does not (hwsBurn HwsBurn_CopyEntries: 5 diffs ->
-  0; leversweep's statement-level levers stopped at 5). Label it `// fake match:`.
+  0; leversweep's statement-level levers stopped at 5).
 - **[verified] One local per job**: reusing a counter or pointer for a second job merges registers
   EA kept apart. SkinPart SkinPart_ListChosenTextures 9 -> 0 (new `v`/`m` loop counters), char
   Character_PlaceFeetOnGround 3 -> 0 (an `fH` local), UISApi fn_80168FC8 7 -> 0.
@@ -363,7 +363,7 @@ The fixes that come up most often. Each points to its full entry below.
   order: GameMode2 `fn_800F8880`, 96.9% -> 100 (in field order the chain scores 94.8). The
   permuter's 30 exact variants all made the zero one shared value. It is per function, not EA
   style: the same seven stores in `fn_800F8B08` and GameModeMatch `fn_800EA548` match only as
-  separate statements. Mark the chain as a fake match.
+  separate statements.
 - **[verified] Nested call arguments are evaluated last argument first.** In
   `f(g(), Game_CurHoleIndex())` the hole index is fetched before `g()`. Writing it into a local
   first keeps the same call order but a different saved register (GameMode2 `fn_800F8EDC`,
@@ -375,7 +375,7 @@ The fixes that come up most often. Each points to its full entry below.
   `table[n]` before testing `n`, the source read it into a local at the top:
   `u16 nSound = lbl_80192BA8[nEvent]; if (nEvent >= 37 || nSound == 0xFFFF) return;` (GameMode8
   `SpeedGolf_PlayEventComment`, 71.7% -> 93.9, then exact with the or-chain). Check the table is big enough for
-  every index the callers pass; if not, it is an EA bug and gets a comment.
+  every index the callers pass; if not, it is an EA bug: list it in `game/ea-bugs.md`.
 - **[verified] Front-end `MsgArg` handlers read every argument into locals before the first store.**
   GameMode4Menu LadderMenu_SetNodePos: `p->fX = pArgs[1].f` -> `f32 fX = pArgs[1].f; ...; p->fX = fX;`, 49.4 -> 100
   (LadderMenu_GetNodePos 79.9 -> 100, LadderMenu_GetFirstAndCursorNodePos 67.1 -> 100).
@@ -510,7 +510,7 @@ The fixes that come up most often. Each points to its full entry below.
   GameMode26_ScoreShot, GameMode22 GameMode22_ScoreShot 91.4 -> 94.1). `PLAYER(i)->` instead of `gPlayers[i].` fixed both
   twins' loops (GameMode26_ClearPlayerStats, GameMode22_ClearPlayerStats, about 73 -> 100).
 - **[verified] Pointer plus integer always puts the pointer first in `add`**; adding as integers
-  (`(u8*)(n + (uptr)p)`) flips it (UMemPool fn_8000AFA0, marked fake match).
+  (`(u8*)(n + (uptr)p)`) flips it (UMemPool fn_8000AFA0).
 - **[verified] `&a[i]` indexing matches where hand-walked pointers don't** (fe_movies UIPoly_Draw,
   ActAnimal_SetWorldMatrix, SitDevFile SitDev_InvokeAction 74.7 -> 98.8).
 - **[verified] `p = arr; p += n;` instead of `&arr[n]`** keeps the element address, not the index
@@ -615,7 +615,7 @@ The fixes that come up most often. Each points to its full entry below.
   `xor; subf` (ShaderObjectsData fn_80074628).
 - **[verified] A cast that changes nothing still changes the code:** `(u8)` on a u8 field read reorders
   CodeWarrior's instructions and registers (hlaudtrackseq OnKeyOn, OnPitchRamp: 2 diffs -> 0
-  each; the permuter found `& 0xFFu` and `(unsigned int)`, which also work). Label it `// fake match:`.
+  each; the permuter found `& 0xFFu` and `(unsigned int)`, which also work).
 - **[verified, EA form] A byte swap in C, mask first**, `((v & 0xFF000000) >> 24) | ((v & 0xFF0000)
   >> 8) | ((v & 0xFF00) << 8) | ((v & 0xFF) << 24)`, stays rlwinm/rlwimi through allocation and the
   post-RA peephole makes it `stwbrx`: LLPictInt PictInt_Decode 93.26 -> 100 (the shift-first
@@ -801,14 +801,14 @@ The fixes that come up most often. Each points to its full entry below.
   operands doesn't (GoTerrain Ter_DrawGrassPatchesPass3); `if (x) return 0; return 1;` in a `u8` function gives
   `cntlzw; srwi` where `return x == 0;` adds a mask (hwsRender_Gc fn_80112B80).
 - **[verified] A caller's `cmpwi` on a returned pointer means EA tested it as a signed number**:
-  `(s32)f() != 0`, marked fake match (GoPostFx fn_80037E50).
+  `(s32)f() != 0` (GoPostFx fn_80037E50).
 
 ### Returns, early exits and switch
 
 - **[verified] A dispatch that tests the top case first can mean one more (empty) case.** With cases
   1 and 3 the compiler splits on a compare with 2; adding `case 4: break;` made it test 3 first,
-  then 1, as the original does (FE_Manager `FE_GetBIOMovieName`, 97.6 -> 100). Check the asm for a
-  compare with the extra value before calling it real; otherwise label it a fake match.
+  then 1, as the original does (FE_Manager `FE_GetBIOMovieName`, 97.6 -> 100). The asm shows a compare
+  with the extra value when the case is there.
 
 - **[verified] A byte test compiled `cmplwi; beq body; b end` is the last term of an or-chain of
   early exits**, not a switch: `if (a && b || Player_IsCPU(n) || gSession.nSplitScreen) return;`.
@@ -895,8 +895,7 @@ The fixes that come up most often. Each points to its full entry below.
 
 - **[verified] A `const` on an inline helper's return type moves the caller's first loads.**
   FourBall `fn_800E8FC8`: `static inline int FourBall_TeamSecond(int)` -> `static inline const int`,
-  94.39 -> 100 (`volatile` works the same; `s32`/`u32`/`long`/`short` go far worse). Label it a fake
-  match. Getting repeated "pick the team's player" code through small helpers fixed the register
+  94.39 -> 100 (`volatile` works the same; `s32`/`u32`/`long`/`short` go far worse). Getting repeated "pick the team's player" code through small helpers fixed the register
   numbers there (10 -> 4 differing) but made two neighbouring functions worse: decide per function.
 
 - **[verified] An inline helper that reads a global itself, rather than being passed it,
@@ -941,7 +940,7 @@ The fixes that come up most often. Each points to its full entry below.
   inline that returns the address** (`static inline Player* F(int n) { return &gPlayers[fn(n)]; }`):
   BreakLine_Reset 19 diffs -> 0, gbacable Gba_ReadPads 22 -> 11 (then a declaration swap -> 0), Skin
   SKN_SwapDesc 16 -> 7. The same for a value: `eLayout` read through `static inline u16 ReadU16(u16* p,
-  int i)` moved r27 -> r31 (ShaderObjectsData fn_80074628 exact). Mark each `// fake match:`.
+  int i)` moved r27 -> r31 (ShaderObjectsData fn_80074628 exact).
 
 ### Floating point
 
@@ -1053,15 +1052,14 @@ The fixes that come up most often. Each points to its full entry below.
   widened to the file's whole data block (GameMode11: 0x80192D20, not 0x801930AC).
 - **[verified] A dead-stripped function leaves its constants in the pool.** GameMode12's
   `.sdata2` has 0.0 and 0.5 early, where no remaining function uses them first; an unreferenced
-  function using 0.0f then 0.5f at that point makes the unit link. Such a placeholder is a fake
-  match with its body unknown: say so in its comment (style.md).
+  function using 0.0f then 0.5f at that point makes the unit link. Such a placeholder is a
+  compiler trick: tag it `// fake match:` (style.md, "Fake matches").
 - **[verified] Float literals are pooled in `.sdata2` in the order they first appear in the
   source**; compiler-made constants (the int-to-float double) follow that function's literals.
   Folded or dead literals (`x * 1.0f`, `if (0)`, unused locals or inlines) get no slot.
 - **[verified] A file-scope `const f32` is folded at every use and still emitted, so the value
   appears twice; a one-entry `const f32 x[1]` is loaded from the object instead.** GameMode8's lone
-  1.0 at the start of its pool (`lbl_80284708`) is reproduced only by the array (a fake match: the
-  bytes don't show what EA wrote).
+  1.0 at the start of its pool (`lbl_80284708`) is reproduced only by the array.
 - **[verified] A constant one bit off after linking can be a folded division.** GameMode8's
   0x3F7FBE76 is `59.94f / 60.0f`; the literal `0.999f` rounds to ...77.
 - **[verified] An inline helper moves arithmetic after a call**: `n += SG_Score(t, s)` puts the
@@ -1151,8 +1149,7 @@ The fixes that come up most often. Each points to its full entry below.
 ### Inside the register allocator and scheduler
 
 How CodeWarrior's backend allocates registers and schedules instructions, measured with
-mwcc-debugger dumps. Most levers here are fake matches: they reproduce EA's output, not EA's
-source, so try EA's own forms first (TW07's declarations, one local per job, the unswitched
+mwcc-debugger dumps. These levers reproduce EA's output, not necessarily EA's source, so try EA's own forms first (TW07's declarations, one local per job, the unswitched
 loop). Read the compiler's view before guessing: mwccdbg's last pass, a `rasim.py` replay,
 `sched750.py`.
 
@@ -1438,7 +1435,7 @@ Which lever first, by symptom (each has its entry below):
   pData): Particle fn_800951A0 92.0 -> 100 (`void* pBlock = pData`, the header field's own type).
 - **[observed] Unsolved pattern: EA keeps a copy our backend's first copy-propagation pass folds**
   (UISScreen fn_8016AD54, fn_8016ABBC, fn_8016B4D4, fn_8016AEEC, fn_8016A2D4): no flag or form found.
-  All five are now exact with labelled fake matches (the OR lever, the call-result
+  All five are now exact through levers (the OR lever, the call-result
   shift chain, loop-carried copies, the 64-bit OR high word); EA's own form is still not known.
 
 ### Other
