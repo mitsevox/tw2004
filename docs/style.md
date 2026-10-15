@@ -44,8 +44,8 @@ Names
 - **Values with a meaning** (camera modes, game types, message IDs, flag bits, a table's size)
   get an enum or define: EA's when known, otherwise ours. Plain arithmetic constants stay numbers.
 - **Flags:** a field of bits is `uFlags` (`uXxxFlags` when a struct has several). Its bits are
-  defines next to the struct, named for the struct's system: `AUDSOUND_NO_DOPPLER` for
-  `AudSound.uFlags`. A table's size is `SYSTEM_NUM_THINGS`.
+  defines next to the struct, named for the struct: `PLAYER_IS_HUMAN` for
+  `Player.uFlags`. A table's size is `SYSTEM_NUM_THINGS`.
 - **Macros** are for real abstractions (`PLAYER(i)`, a table's row count), next to what they
   describe. Not for shortening a name.
 
@@ -176,11 +176,14 @@ understand the code is always done: it's all there.
 
 **What a pass covers.** A file's pass owns everything the file defines, wherever it shows up: its
 functions' signatures and every call to them (a wrong cast in a caller's file is fixed in this
-pass), its globals and their declarations, and the struct fields its code touches (their names,
-types and every use of them, in any file). It also fixes what the file reads from elsewhere when
+pass), its globals and their declarations, and the struct fields its code reads, writes or
+passes on (their names, types and every use of them, in any file). It also fixes what the file reads from elsewhere when
 the file can't read right without it, such as a header field it uses. Other files are changed
 only where they meet this file; they stay `open` until their own pass. A new define replaces
-every test of that field across the repo, so no file keeps a bare bit the header names.
+every test of that field across the repo, so no file keeps a bare bit the header names. Renaming
+or moving another file (to free EA's name for this one) doesn't audit it: its old text stays for
+its own pass. Anything else the pass finds outside that scope (a tool bug, another file's stale
+comment) goes in a commit of its own, or is left for that file's pass.
 
 Progress lives in [`audit.tsv`](audit.tsv), one row per game source file: `open`, or `done` with
 the commit that holds the pass and the reviewer who passed it. The author of a pass leaves the
@@ -200,8 +203,8 @@ Comments
 | **A2.** Where a name came from: TW06, TW07, PDB, DWARF, asserts, "EA's name" | "gpGame->pfnGetCurrentLead (TW06: GetCurrentLead)." | Deleted |
 | **A3.** Matching notes: registers, scores, compiler behaviour, "the original does X, ours Y" | "keeps pData in r30 (ours: r29): 95%." | Deleted; a real trick gets a one-line `fake match:` |
 | **A4.** Addresses, offsets or raw field names narrated in prose | "the .sdata2 0x80283E90-0x80283EC0 and the .data ..." | The fields and globals get names; the comment goes |
-| **A5.** A comment that restates the code | "// Turns the IK on or off." over `gSkelIKEnabled = bOn;` | Deleted |
-| **A6.** A comment that's wrong, stale or a guess. A claim about what another function does is checked by reading that function | "most are not decompiled yet"; "starting the track" over a call that only takes one from the pool | Fixed against the code, or deleted |
+| **A5.** A comment that restates the code, or only points at another name ("(Player.fSpeed)") instead of saying what the value means | "// Turns the IK on or off." over `gSkelIKEnabled = bOn;` | Deleted, or says what the value means |
+| **A6.** A comment that's wrong, stale or a guess. A claim about what another function does is checked by reading that function | "most are not decompiled yet"; "frees the ball" over a call that only clears its flag | Fixed against the code, or deleted |
 | **A7.** `port:` and `EA bug:` notes | "// port: untested, the plain-C version ..." | `port:` deleted; an EA bug goes to `game/ea-bugs.md` |
 
 Code that isn't EA's
@@ -221,9 +224,9 @@ Names
 | Fails | Becomes |
 |---|---|
 | **C1.** A `fn_`/`lbl_` name, or a hybrid (`fn_800C8C70_Read`) | A real name |
-| **C2.** A name that claims more than the code shows | A name the code supports |
+| **C2.** A name that claims more than the code shows, or reuses a name another struct or function already uses for something else | A name the code supports, used for one thing |
 | **C3.** A field named by its offset (`p->nC38`, `fF08`) that any code touches | A name for what it holds |
-| **C4.** Locals and parameters like `a`, `b`, `p`, `t0`, `temp_r3` | Hungarian names for what they hold |
+| **C4.** Locals and parameters like `a`, `b`, `p`, `t0`, `temp_r3` | Hungarian names for what they hold; a parameter the function never reads takes the name of the matching parameter of the function its callers mirror |
 | **C5.** A value with a meaning left as a bare number: a flag bit, a group of bits, a count or table size | EA's enum or define, or ours, used everywhere the value is |
 
 Structure
@@ -233,7 +236,7 @@ Structure
 |---|---|
 | **D1.** Another file's prototype declared in a `.c` file; a non-static prototype for a function only this file calls; a call through a cast of the function | One prototype, in the owning header; `static`; a definition that takes what the callers pass |
 | **D2.** Raw pointer arithmetic (`*(s32*)((u8*)p + 0x10)`) | Struct fields |
-| **D3.** A file that isn't one EA source file (`CodeXXXXXXXX.c`, `unsorted/sweep_*`), a boundary that isn't proven, or our name on a file whose EA name is known | Its functions in the EA file they belong to, under EA's name; the proof of each boundary goes in the commit message |
+| **D3.** A file that isn't one EA source file (`CodeXXXXXXXX.c`, `unsorted/sweep_*`), a boundary that isn't proven, or our name on a file whose EA name is known | Its functions in the EA file they belong to, under EA's name; the proof of each boundary goes in the commit message. "Nothing else claims these functions" is not a proof |
 | **D4.** Undefined behaviour the compiler can see, not listed in the bug register | Fixed, or listed when EA wrote it |
 
 Not failures
