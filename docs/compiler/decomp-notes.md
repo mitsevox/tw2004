@@ -663,7 +663,7 @@ The fixes that come up most often. Each points to its full entry below.
   on); `(u8)a` gives `clrlwi r4, r3, 24` (GameMode11 `Lessons_ShowSwingHint`, 57.9% -> 100).
 - **[verified] A redeclaration with different parameter types is an error.** `void f(int, s32*);
   void f(int, int);` (also int vs s8, int vs long) gives "identifier redeclared", so a file that
-  includes the header cannot declare its own variant; cast at the call site instead.
+  includes the header cannot declare its own variant; cast the argument at the call site instead.
 - **[verified] A function that leaves r3 alone before a call passes its own first parameter on**,
   and a `clrlwi` before the call gives that parameter's type. GameModeBattle `fn_800E7ABC`:
   `u8 fn(int a) { fn_800EA548(a); }` adds a `clrlwi`; `u8 fn(u8 bCheck)` is exact.

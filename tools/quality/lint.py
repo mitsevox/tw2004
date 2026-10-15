@@ -31,12 +31,28 @@ CHECKS = [
     ('placeholder-name', re.compile(r'\b(fn|lbl)_[0-9A-F]{8}')),
     ('comment-other-build', re.compile(r'(//|/\*).*\b(TW0[67]|PDB|DWARF)\b')),
     ('comment-address', re.compile(r'(//|/\*).*\b0x80[0-9A-Fa-f]{6}\b')),
-    ('comment-register', re.compile(r'(//|/\*).*\b[rf]([0-9]|[12][0-9]|3[01])\b')),
+    ('comment-register', re.compile(r"(//|/\*).*(?<!\.)(?<!->)(?<!'s )\b[rf]([0-9]|[12][0-9]|3[01])\b")),
     ('commented-code', re.compile(r'^\s*//\s*([\w\[\]\.>-]+\s*[-+*/|&]?=[^=][^;]*|\w+\([^)]*\)|return\b[^;]*|(if|for|while)\s*\(.*\)\s*\{?)\s*;?\s*$')),
 ]
+CAST_CALL = re.compile(r'\(\s*\([\w\s\*]+\(\s*\*\s*\)\s*\([^()]*\)\s*\)\s*([A-Za-z_]\w*)\s*\)\s*\(')
 # The statement after the condition is return/break/continue. Checked separately: a regex
 # lookahead after `\(.*\)` can backtrack to an inner parenthesis of the condition.
 EARLY_EXIT = re.compile(r'\)\s*(return\b[^;]*|break|continue);\s*(//.*)?$')
+
+
+_USERS = None
+
+
+def users(name):
+    """The source files (src/ .c, include/ .h) whose code (not comments) uses the word name."""
+    global _USERS
+    if _USERS is None:
+        _USERS = {}
+        for f in list((ROOT / 'src').rglob('*.c')) + list((ROOT / 'include').rglob('*.h')):
+            code = re.sub(r'//[^\n]*|/\*.*?\*/', '', f.read_text(encoding='utf-8', errors='replace'), flags=re.S)
+            for w in set(re.findall(r'[A-Za-z_]\w*', code)):
+                _USERS.setdefault(w, set()).add(f.resolve())
+    return _USERS.get(name, set())
 
 
 def header_protos():
@@ -75,7 +91,7 @@ def lint(path, protos):
     raw_sweep = sweepblock.lines_in_blocks(lines)      # style rules wait until the code is cleaned
     seen = includes.seen_headers(path)
     defined = {m.group(1) for m in re.finditer(
-        r'^(?!typedef|return|#)[A-Za-z_][\w \*]*?\b(\w+)\s*\([^;{}]*$', text, re.M)}
+        r'^(?!typedef|return|#)[A-Za-z_][\w \*]*?\b(\w+)\s*\([^;]*$', text, re.M)}
     SWEEP_DEBT[path.name] = len(raw_sweep)
     for i, l in enumerate(lines, 1):
         l = l.rstrip('\r')
@@ -90,6 +106,10 @@ def lint(path, protos):
                 hits.append((i, name, l.strip()))
         if len(l) > 110:
             hits.append((i, 'long-line', '%d columns' % len(l)))
+        c = CAST_CALL.search(l)
+        if c:
+            hits.append((i, 'cast-call', '%s is called through a cast: make its definition and prototype '
+                         'take what the callers pass' % c.group(1)))
         m = re.match(r'^(?!typedef|return|#|static)([A-Za-z_][\w \*]*?[\s\*])(\w+)\s*\(([^;{}]*)\)\s*;(.*)$', l)
         # only the headers this file includes count: one it does not see declares nothing here
         decl = [(sig, h) for sig, h in protos.get(m.group(2), []) if h in seen] if m else []
@@ -99,11 +119,17 @@ def lint(path, protos):
                 hits.append((i, 'dup-prototype', '%s is already declared in %s'
                              % (m.group(2), includes.label(same[0]))))
             else:
-                hits.append((i, 'proto-mismatch', '%s differs from %s: cast at the call site instead'
-                             % (m.group(2), includes.label(decl[0][1]))))
+                hits.append((i, 'proto-mismatch', '%s differs from %s: one prototype, with the '
+                             'definition\'s types' % (m.group(2), includes.label(decl[0][1]))))
         elif m and m.group(2) not in defined:
             hits.append((i, 'foreign-prototype', '%s belongs in the header of the file that defines it'
                          % m.group(2)))
+        elif m and users(m.group(2)) - {path.resolve()}:
+            hits.append((i, 'foreign-prototype', '%s is used by other files: declare it in this file\'s '
+                         'header' % m.group(2)))
+        elif m:
+            hits.append((i, 'should-be-static', 'only this file uses %s: make it static (scope:local '
+                         'in symbols.txt), not a header prototype' % m.group(2)))
     return hits + ub_check(path, lines)
 
 

@@ -41,8 +41,11 @@ Names
 - **Struct fields** are named for what they hold, worked out from every place that uses them. Only
   bytes no code ever reads or writes (padding, unused space) are `unkXXX`. Fields of shared structs
   carry their offset in a trailing comment (`// 0xC38`).
-- **Values with a meaning** (camera modes, game types, message IDs, flag bits) get an enum or
-  define: EA's when known, otherwise ours. Plain arithmetic constants stay numbers.
+- **Values with a meaning** (camera modes, game types, message IDs, flag bits, a table's size)
+  get an enum or define: EA's when known, otherwise ours. Plain arithmetic constants stay numbers.
+- **Flags:** a field of bits is `uFlags` (`uXxxFlags` when a struct has several). Its bits are
+  defines next to the struct, named for the struct's system: `AUDSOUND_NO_DOPPLER` for
+  `AudSound.uFlags`. A table's size is `SYSTEM_NUM_THINGS`.
 - **Macros** are for real abstractions (`PLAYER(i)`, a table's row count), next to what they
   describe. Not for shortening a name.
 
@@ -83,6 +86,11 @@ Prototypes
 - **A function called from another file** is declared once, in the header of the system it belongs
   to, with the definition's exact types. A prototype inside a `.c` file is only for that file's
   own static functions.
+- **A function only its own file calls is `static`**, with `scope:local` on its line in
+  `symbols.txt`. Never give it a header prototype just to quiet lint.
+- **A function is never called through a cast of itself.** When callers pass something other than
+  what the definition takes, the definition (and its one prototype) is wrong: fix it to take what
+  the callers pass.
 - **Headers:** `engine.h` (memory, math, streams, events, sound), `camera.h` (views and cameras),
   `character.h` (the golfer's character and animation), `physics.h` (lies, shot kinds, clubs),
   `ball.h` (the ball, surfaces, the hole's terrain), `golfer.h` (players and golfers), `game.h`
@@ -91,7 +99,8 @@ Prototypes
   header includes only headers below it (`game_types.h` < `platform.h` < `engine.h` < `camera.h`,
   `character.h`; `physics.h`, `ball.h` < `golfer.h` < `game.h`).
 - CodeWarrior rejects a second prototype whose parameter types differ (even `int` vs `s32`). When
-  one call needs another argument type to match, cast at the call site.
+  one call needs another argument type to match, cast that argument at the call site (never the
+  function).
 
 Fake matches
 ------------
@@ -165,10 +174,18 @@ and local is understood and named, every comment is checked against the code, an
 left open is a tagged compiler trick. Names never claim more than the code shows, but the work to
 understand the code is always done: it's all there.
 
+**What a pass covers.** A file's pass owns everything the file defines, wherever it shows up: its
+functions' signatures and every call to them (a wrong cast in a caller's file is fixed in this
+pass), its globals and their declarations, and the struct fields its code touches (their names,
+types and every use of them, in any file). It also fixes what the file reads from elsewhere when
+the file can't read right without it, such as a header field it uses. Other files are changed
+only where they meet this file; they stay `open` until their own pass. A new define replaces
+every test of that field across the repo, so no file keeps a bare bit the header names.
+
 Progress lives in [`audit.tsv`](audit.tsv), one row per game source file: `open`, or `done` with
-the commit that finished it. A file is done when `lint.py` has nothing to say about it and a
-reviewer has passed it; the commit that marks it done is that pass. CI fails if a done file picks
-up a lint finding, so done stays true. `python tools/quality/audit.py` shows the count, and
+the commit that holds the pass and the reviewer who passed it. The author of a pass leaves the
+row `open`; the reviewer, who did not write it, marks it done. CI fails if a done file picks up a
+lint finding, so done stays true. `python tools/quality/audit.py` shows the count, and
 `--sync` updates the rows after files are merged, split or moved (a merged file is done only when
 all of it is).
 
@@ -184,7 +201,7 @@ Comments
 | **A3.** Matching notes: registers, scores, compiler behaviour, "the original does X, ours Y" | "keeps pData in r30 (ours: r29): 95%." | Deleted; a real trick gets a one-line `fake match:` |
 | **A4.** Addresses, offsets or raw field names narrated in prose | "the .sdata2 0x80283E90-0x80283EC0 and the .data ..." | The fields and globals get names; the comment goes |
 | **A5.** A comment that restates the code | "// Turns the IK on or off." over `gSkelIKEnabled = bOn;` | Deleted |
-| **A6.** A comment that's wrong, stale or a guess | "most are not decompiled yet" | Fixed against the code, or deleted |
+| **A6.** A comment that's wrong, stale or a guess. A claim about what another function does is checked by reading that function | "most are not decompiled yet"; "starting the track" over a call that only takes one from the pool | Fixed against the code, or deleted |
 | **A7.** `port:` and `EA bug:` notes | "// port: untested, the plain-C version ..." | `port:` deleted; an EA bug goes to `game/ea-bugs.md` |
 
 Code that isn't EA's
@@ -203,20 +220,20 @@ Names
 
 | Fails | Becomes |
 |---|---|
-| **C1.** A `fn_`/`lbl_` name, or a hybrid (`fn_800C8C70_Read`) | A real name, logged |
+| **C1.** A `fn_`/`lbl_` name, or a hybrid (`fn_800C8C70_Read`) | A real name |
 | **C2.** A name that claims more than the code shows | A name the code supports |
 | **C3.** A field named by its offset (`p->nC38`, `fF08`) that any code touches | A name for what it holds |
 | **C4.** Locals and parameters like `a`, `b`, `p`, `t0`, `temp_r3` | Hungarian names for what they hold |
-| **C5.** A value with a meaning left as a bare number | EA's enum or define, or ours |
+| **C5.** A value with a meaning left as a bare number: a flag bit, a group of bits, a count or table size | EA's enum or define, or ours, used everywhere the value is |
 
 Structure
 ---------
 
 | Fails | Becomes |
 |---|---|
-| **D1.** Another file's prototype declared in a `.c` file | One prototype, in the owning header |
+| **D1.** Another file's prototype declared in a `.c` file; a non-static prototype for a function only this file calls; a call through a cast of the function | One prototype, in the owning header; `static`; a definition that takes what the callers pass |
 | **D2.** Raw pointer arithmetic (`*(s32*)((u8*)p + 0x10)`) | Struct fields |
-| **D3.** A file that isn't one EA source file (`CodeXXXXXXXX.c`, `unsorted/sweep_*`) | Its functions in the EA file they belong to, boundaries proven |
+| **D3.** A file that isn't one EA source file (`CodeXXXXXXXX.c`, `unsorted/sweep_*`), a boundary that isn't proven, or our name on a file whose EA name is known | Its functions in the EA file they belong to, under EA's name; the proof of each boundary goes in the commit message |
 | **D4.** Undefined behaviour the compiler can see, not listed in the bug register | Fixed, or listed when EA wrote it |
 
 Not failures
@@ -231,10 +248,12 @@ Who checks what
 ---------------
 
 - **Tools:** the build (`main.dol: OK`), and `lint.py` for C1 (`placeholder-name`), D1
-  (`foreign-prototype`, `dup-prototype`, `proto-mismatch`), D2 (`raw-offset`), D4 (the `ub-` rules),
+  (`foreign-prototype`, `should-be-static`, `cast-call`, `dup-prototype`, `proto-mismatch`), D2 (`raw-offset`), D4 (the `ub-` rules),
   A7 (`old-label`), and comments that name another build, a register or an
   address (`comment-other-build`, `comment-register`, `comment-address`: the plain cases of A2-A4).
   It also counts the sweep code still waiting to be cleaned up.
 - **A reviewer:** everything that needs judgment (A1, A5, A6, B2-B5, C2-C5, D3). The reviewer is
   never the person who wrote the change, and checks every surviving comment and name against the
-  code.
+  code. `python tools/quality/lint.py --diff main` shows what the pass added to every file it
+  touched, not only the audited one; the pass adds no finding anywhere. The reviewer then marks
+  the row done, in a commit of its own.
