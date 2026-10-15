@@ -27,12 +27,12 @@ Names
 
 - **Everything is named:** functions, globals, struct fields, parameters and locals. No
   `fn_XXXXXXXX` or `lbl_XXXXXXXX` survives an audit.
-- **EA's name first**, spelled as EA did, when EA's text in the binary or a related build that the
-  code confirms gives it (tiers T1/T2). Otherwise a name read carefully from the code (T3). A name
-  never claims more than the code shows.
-- Every name is logged with its evidence in `config/GW4E69/name_sources.tsv`, through
-  `tools/naming/name.py` (functions) or `tools/naming/rename.py` (globals). That log is the only
-  place a name's evidence lives. Renames go through `config/GW4E69/symbols.txt`, so the C and the
+- **A name says what the code does.** Where EA's own name is known (its text in the binary, or a
+  related EA build in `reference/`), use it as EA spelled it; otherwise name it from a careful
+  reading of the code. Either way the name is ours to stand behind: it is not cited anywhere, and
+  it never claims more than the code shows.
+- Renames go through `tools/naming/name.py` (functions) or `tools/naming/rename.py` (globals),
+  which change `config/GW4E69/symbols.txt`, the C and the headers together, so the C and the
   assembly agree; never alias with `#define`.
 - **EA's naming style.** Functions `System_Verb` (`View_SetCamera`, `Session_SetNumPlayers`),
   globals `gName`, locals and fields in Hungarian: `n` integer, `f` float, `b` flag, `u` unsigned
@@ -173,7 +173,7 @@ Comments
 | Fails | Example | Becomes |
 |---|---|---|
 | **A1.** A header that tells the decomp's history: splits, dates, address ranges, section ownership, compiler flags | "Split 2026-09-27 ... This part (0x8002D8A8-0x8002DB80) owns .sdata 0x802810B0" | 1 to 3 lines on what the file does in the game |
-| **A2.** Where a name came from: TW06, TW07, PDB, DWARF, asserts, "EA's name" | "gpGame->pfnGetCurrentLead (TW06: GetCurrentLead)." | Deleted; the evidence is in `name_sources.tsv` |
+| **A2.** Where a name came from: TW06, TW07, PDB, DWARF, asserts, "EA's name" | "gpGame->pfnGetCurrentLead (TW06: GetCurrentLead)." | Deleted |
 | **A3.** Matching notes: registers, scores, compiler behaviour, "the original does X, ours Y" | "keeps pData in r30 (ours: r29): 95%." | Deleted; a real trick gets a one-line `fake match:` |
 | **A4.** Addresses, offsets or raw field names narrated in prose | "the .sdata2 0x80283E90-0x80283EC0 and the .data ..." | The fields and globals get names; the comment goes |
 | **A5.** A comment that restates the code | "// Turns the IK on or off." over `gSkelIKEnabled = bOn;` | Deleted |

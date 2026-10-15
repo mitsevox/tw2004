@@ -46,13 +46,10 @@ see [Game modes](#game-modes).
 | UIS / UI Studio | EA Tiburon's IStudio menu library (`UIS*.c`, `UIStudio.c`) |
 | EASB | EA Sports Bio, EA's cross-game player profile on the memory card |
 | `fn_8XXXXXXX`, `lbl_8XXXXXXX` | a function or global not named yet, by its address |
-| Name tiers | in `config/GW4E69/name_sources.tsv`: T1/T2 EA's own name (its text in the binary, or TW06/TW07/Madden 2003 confirmed by the code); T3 named from a careful reading of the code |
-| `n290`, `pfn3C`, `u04`, `b0F` | struct fields not named yet: a type letter and the field's offset |
-| `// fake match:` | C written a non-natural way only to reproduce EA's bytes; logic unchanged |
-| `// EA bug:` / `// port:` | a bug in EA's code (kept); a hazard for a later PC port (32-bit pointers, endianness) |
-| section / data-order notes | why globals are defined in reverse order etc. (CodeWarrior lays out `.bss`/`.sbss` last-defined-first) |
+| `n290`, `pfn3C`, `u04`, `b0F` | struct fields not named yet: a type letter and the field's offset. `unkXXX` is space no code touches |
+| `// fake match:` | a compiler trick that reproduces EA's bytes (a filler function, a dead store, a register pin); logic unchanged, tagged so it can be removed later |
 | Generated units | `AXComp.c` and `DSPCode.c` (SDK data) and the game's asset fragments are generated from your own `main.dol` at build time (`tools/build/gendata.py`), never committed (`docs/workflow.md` "Units generated from main.dol") |
-| sweep / fold | `unsorted/sweep_*.c` are small functions found by `sweep.py` whose original file is unknown; `fold.py` later merges sweep files into a unit |
+| `unsorted/sweep_*.c` | small functions whose EA file isn't proven yet; `fold.py` merges them into their unit |
 
 In the file tables, **Name** says where the file name comes from (the file's header comment has the
 details): **EA** EA's own name in this binary (an assert or file string); **T6** / **T7** EA's file

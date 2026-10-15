@@ -30,13 +30,13 @@ Naming
 python tools/naming/callgraph.py <Unit> [--unnamed]   # a unit's functions, leaves first, with
                                                       # callers, callees, globals and strings
 python tools/naming/name.py <batch.tsv> --check       # validate a batch of function names
-python tools/naming/name.py <batch.tsv> --by "<who>"  # apply it, rebuild, log the evidence
+python tools/naming/name.py <batch.tsv>              # apply it and rebuild
 python tools/naming/rename.py <names.tsv>             # rename globals (symbols.txt and all uses)
 ```
 
-`name.py`'s docstring describes the batch format: address, current name, new name, tier,
-evidence codes, evidence, purpose and an optional comment. Every name lands in
-`config/GW4E69/name_sources.tsv`. Name leaves first: a caller reads better once its callees have
+`name.py`'s docstring describes the batch format: address, current name, new name and an
+optional comment. `tools/naming/namecheck.py` flags a name whose prefix or claim the call graph
+doesn't support. Name leaves first: a caller reads better once its callees have
 names.
 
 Before you commit

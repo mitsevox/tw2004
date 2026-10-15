@@ -1,5 +1,6 @@
-# Where each function name came from and why. One row per applied name (tools: names
-# pipeline, see docs/style.md "Names"). T1 verified, T2 strong, T3 provisional (read from
+# Frozen 2026-10-15: names are no longer cited, and nothing writes here any more. Kept as a
+# record of how the earlier names were found.
+# Where each function name came from and why. One row per applied name. T1 verified, T2 strong, T3 provisional (read from
 # the code; since 2026-09-27 no address suffix, the tier says how sure it is). codes: E1 EA
 # text, E2 TW06/TW07 name confirmed, E3 wrapper, E4 named data, E5 role from named
 # neighbours, E6 read from the code.

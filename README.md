@@ -29,8 +29,8 @@ Layout
   files to the game's subsystems.
 - `extern/`: the Nintendo SDK, C library and Metrowerks runtime, built from public GameCube
   decompilations (credits in each folder).
-- `config/GW4E69/`: decomp-toolkit configuration, and `name_sources.tsv`, the evidence behind
-  each name.
+- `config/GW4E69/`: decomp-toolkit configuration (`symbols.txt` holds every name), and
+  `name_sources.tsv`, a frozen log of how the earlier names were found.
 - `reference/`: symbol dumps from related EA builds (TW07, TW06, Madden 2003 and others) that
   EA's names are taken from.
 - `docs/`: the [docs index](docs/README.md).

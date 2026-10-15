@@ -1,12 +1,9 @@
 """Apply a batch of function names in one step, or nothing at all.
-    python tools/naming/name.py <batch.tsv> --by "<who>"      apply, build, report
-    python tools/naming/name.py <batch.tsv> --check           validate only, change nothing
+    python tools/naming/name.py <batch.tsv>              apply, build, report
+    python tools/naming/name.py <batch.tsv> --check      validate only, change nothing
 batch.tsv, tab-separated, one function per line (# lines skipped):
-    address  current_name  new_name  tier  codes  evidence  purpose  [comment]
-  tier: T1 verified, T2 strong (EA's name from TW06/TW07/another EA build the code confirms),
-        T3 read from the code (docs/style.md "Names"); codes as in config/GW4E69/name_sources.tsv
-        (E1 EA text, E2 TW06/TW07 name, E3 wrapper, E4 named data, E5 named neighbours, E6 the code);
-  evidence: what in the code or the reference shows it; purpose: one line, what the function does;
+    address  current_name  new_name  [comment]
+  new_name: what the function does, in EA's style (docs/style.md "Names");
   comment (optional): KEEP (the existing comment is right), NONE (a short function whose name
         says it all), or the function's whole comment, written for a reader of the code (what it
         does in the game, units, what 0/NULL mean; read from the code, never contradicting it).
@@ -15,33 +12,27 @@ batch.tsv, tab-separated, one function per line (# lines skipped):
         comment (correct its text if stale): name.py refuses a row that drops one, or that writes
         a `port:` or `EA bug:` note (an EA bug goes in docs/game/ea-bugs.md).
 Steps, in order; the first failure stops it and puts every touched file back:
-  1. every row checked: EA style name (System_Verb: `Mem_set`, `RenderState_SetDepthFunc`), tier,
-     codes, evidence and purpose present; then rename.py --dry-run (current name at that address,
-     new name unused anywhere);
+  1. every row checked: a real name (no placeholder, address or "maybe"); then rename.py
+     --dry-run (current name at that address, new name a C identifier unused anywhere);
   2. rename.py: symbols.txt, src/, include/ (code and comments);
   3. the old names in the Markdown docs (not the reference dumps:
      reference/);
-  4. the comments of column 8 above their definitions;
+  4. the comments of column 4 above their definitions;
   5. wraplong.py: lines the longer names pushed past lint's 110 columns are rewrapped;
-  6. one row per name appended to config/GW4E69/name_sources.tsv;
-  7. configure + ninja, and the DOL check must print main.dol: OK;
-  8. report: call-site coverage before -> after (hotnames.py) and lint findings left on the lines
+  6. configure + ninja, and the DOL check must print main.dol: OK;
+  7. report: call-site coverage before -> after (hotnames.py) and lint findings left on the lines
      the batch changed.
-A row whose new_name equals current_name is comment-only: column 8 is added (tier, codes and
-evidence still say where the comment comes from), nothing is renamed and no name_sources row is
-written. Use it for functions that already have a name; a fn_XXXXXXXX placeholder is refused:
+A row whose new_name equals current_name is comment-only: column 4 is added and nothing is
+renamed. Use it for functions that already have a name; a fn_XXXXXXXX placeholder is refused:
 every function read gets a name (an empty or stripped one after where it is called and what for).
 Needs a clean tree under src/, include/, config/ and docs/ (commit first)."""
-import datetime, pathlib, re, subprocess, sys
+import pathlib, re, subprocess, sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import hotnames                                              # noqa: E402  (find_defs)
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 PY = sys.executable
-SOURCES = ROOT / 'config/GW4E69/name_sources.tsv'
-NAME = re.compile(r'^[A-Z][A-Za-z0-9]*(_[A-Za-z0-9]+)+$')
-CODES = re.compile(r'^E[1-6][a-z]?(\([^)]*\))?(\+E[1-6][a-z]?(\([^)]*\))?)*$')
 PATHS = ['src', 'include', 'config', 'docs']
 SKIP_MD = ('reference/',)
 
@@ -61,37 +52,24 @@ def load(path):
         if not l.strip() or l.startswith('#'):
             continue
         c = l.split('\t')
-        if len(c) not in (7, 8):
-            errors.append(f'line {n}: {len(c)} columns, need 7 or 8 '
-                          '(address current new tier codes evidence purpose [comment])')
+        if len(c) not in (3, 4):
+            errors.append(f'line {n}: {len(c)} columns, need 3 or 4 (address current new [comment])')
             continue
-        addr, cur, new, tier, codes, ev, purpose = (x.strip() for x in c[:7])
-        comment = c[7].strip() if len(c) == 8 else ''
+        addr, cur, new = (x.strip() for x in c[:3])
+        comment = c[3].strip() if len(c) == 4 else ''
         if comment.startswith('//') or '*/' in comment:
             errors.append(f'line {n}: write the comment as plain text (name.py adds the //)')
         if not re.fullmatch(r'[0-9A-Fa-f]{8}', addr):
             errors.append(f'line {n}: address {addr!r} is not 8 hex digits')
-        # EA's own name, spelled as EA did: from a related build (E2) or EA's text in this one (E1)
-        ea_own = tier in ('T1', 'T2') and ('E1' in codes or 'E2' in codes)
         if cur == new and re.fullmatch(r'fn_[0-9A-Fa-f]{8}', cur):
             errors.append(f'line {n}: {cur} keeps its placeholder name: every function read gets a name '
                           '(an empty or stripped one is named from where it is called and what for)')
         elif cur == new:
             pass                                            # comment-only row: the name is not new
-        elif not NAME.match(new) and not (ea_own and re.fullmatch(r'[A-Za-z_]\w*', new)):
-            errors.append(f'line {n}: {new!r} is not EA style System_Verb (Mem_set, RenderState_SetDepthFunc);'
-                          ' EA\'s own name (T1/T2 with E1 or E2) may be spelled as EA did')
-        if cur != new and re.search(r'_[0-9A-Fa-f]{8}$|maybe|guess|unk|Unknown', new):
-            errors.append(f'line {n}: {new!r} carries an address or a confidence marker; the tier says that')
-        if tier not in ('T1', 'T2', 'T3'):
-            errors.append(f'line {n}: tier {tier!r} is not T1, T2 or T3')
-        if not CODES.match(codes):
-            errors.append(f'line {n}: codes {codes!r} not like E6 or E2+E4')
-        if len(ev) < 10:
-            errors.append(f'line {n}: evidence is missing or too short')
-        if len(purpose) < 5:
-            errors.append(f'line {n}: purpose is missing')
-        rows.append((addr.upper(), cur, new, tier, codes, ev, purpose, comment))
+        elif re.search(r'^(fn|lbl)_|_[0-9A-Fa-f]{8}\b|[Mm]aybe|[Gg]uess|(^|_)[Uu]nk(?![a-z])|Unknown', new):
+            errors.append(f'line {n}: {new!r} is not a real name: no placeholder, address or '
+                          'confidence marker (docs/style.md "Names")')
+        rows.append((addr.upper(), cur, new, comment))
     return rows, errors
 
 
@@ -221,7 +199,7 @@ def main():
     tmp = ROOT / 'build/name_batch.tsv'
     tmp.parent.mkdir(exist_ok=True)
     renames = [r for r in rows if r[1] != r[2]]
-    errors += [f'{r[2]}: comment-only row without a comment' for r in rows if r[1] == r[2] and not r[7]]
+    errors += [f'{r[2]}: comment-only row without a comment' for r in rows if r[1] == r[2] and not r[3]]
     tmp.write_text(''.join(f'{r[0]}\t{r[1]}\t{r[2]}\n' for r in renames), encoding='utf-8')
     dry = run([PY, 'tools/naming/rename.py', str(tmp), '--dry-run']) if renames else None
     if dry is not None and dry.returncode:
@@ -232,9 +210,6 @@ def main():
         print(f'name.py: {len(rows)} row(s) pass the checks'
               + (f' ({dry.stdout.strip()})' if dry is not None else ' (comments only)'))
         return
-    if '--by' not in args:
-        sys.exit('name.py: say who proposed the batch: --by "<who>"')
-    by = args[args.index('--by') + 1]
     if run(['git', 'status', '--porcelain', '--'] + PATHS).stdout.strip():
         sys.exit('name.py: src/, include/, config/ or docs/ has uncommitted changes; commit them first')
 
@@ -251,10 +226,6 @@ def main():
         run([PY, 'tools/quality/wraplong.py', '--from-lint', '--diff', 'HEAD'])
         if run(['git', 'diff', '--stat']).stdout + run(['git', 'diff']).stdout[-4000:] == before_wrap:
             break
-    today = datetime.date.today().isoformat()
-    with open(SOURCES, 'a', encoding='utf-8') as f:
-        for a, cur, new, tier, codes, ev, purpose, _ in renames:
-            f.write('\t'.join([a, new, cur, tier, codes, ev, purpose, by, '', today]) + '\n')
     if run([PY, 'configure.py']).returncode:
         restore('configure.py failed')
     b = run(['ninja'])
