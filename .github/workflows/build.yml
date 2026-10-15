@@ -69,6 +69,10 @@ jobs:
         python tools/build/prune_stale.py
         ninja all_source progress build/${{ matrix.version }}/report.json
 
+    # A file marked done in docs/audit.tsv must stay lint-clean (docs/style.md, "The audit")
+    - name: Audit table
+      run: python tools/quality/audit.py --check
+
     # Upload map files
     - name: Upload map
       uses: actions/upload-artifact@v4

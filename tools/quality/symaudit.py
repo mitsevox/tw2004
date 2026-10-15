@@ -14,9 +14,9 @@ compiler itself (sizeof, in a copy of each unit), and compared with the object's
   too-big   the declaration is larger than the object (it overlaps whatever follows it);
   partial   the declaration is smaller than the object (only with --all: normal while a struct is
             still being worked out, but the goal is every global at its true size).
-An `extern` with `// fake match: <why>` on its line or the line before is skipped: some originals
-really did declare a global unsized (Swing.c's lbl_80281B40 is reached with lis/addi although it
-lives in .sdata).
+An `extern` with a `// fake match:` tag on its line or the line before is skipped: the size is the
+trick (docs/style.md, "Fake matches"), as when a global must be declared unsized (Swing.c's
+lbl_80281B40 is reached with lis/addi although it lives in .sdata).
 
 Scope (every built object). symbols.txt knows the scope of the SDK's symbols and a few others
 (the game's own functions and data carry none, so their `static` cannot be checked this way):

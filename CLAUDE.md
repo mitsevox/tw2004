@@ -10,8 +10,8 @@ Rules:
 
 - Write what EA wrote. A fake match is a last resort, marked `// fake match:`, and never changes
   what the game does.
-- Every function and global gets a name, logged with its evidence in
-  `config/GW4E69/name_sources.tsv` (`tools/naming/name.py`).
+- Every function, global and field gets a name that says what the code does
+  (`tools/naming/name.py`). Names are not cited.
 - Comments explain what the code does in the game. No `port:` notes; EA bugs go in
   `docs/game/ea-bugs.md`, not in the code.
 - No game files or official SDK files in git. `extern/` holds only public decompilations.

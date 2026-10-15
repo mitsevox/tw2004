@@ -183,8 +183,8 @@ def main():
     # A new unit: a header comment, the includes, then everything else in one sweep block, so the
     # machine-written code (raw offsets, externs) is marked as not yet cleaned, as in a widened unit.
     bodies = [b for _, b in by_address(bodies, addresses())]
-    head = '// %s (our name): made by fold.py from %d sweep files; not yet described.' \
-        % (pathlib.Path(out_name).name, len(files))
+    head = '// %s: describe what this file does in the game (style.md, "Files").' \
+        % pathlib.Path(out_name).name
     text = '\n'.join([head, ''] + includes + ['', sweepblock.BEGIN, ''] + decls + ['']
                      + '\n\n'.join(bodies).split('\n') + ['', sweepblock.END]) + '\n'
     path.write_text(text, encoding='utf-8', newline='\n')

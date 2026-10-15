@@ -44,7 +44,7 @@ def write(p, text):
 
 def load(tsv):
     """(line, address, old, new). A file with a header row naming `previous_name` and `name` columns
-    (config/GW4E69/name_sources.tsv, the repo's rename log) is read by those columns."""
+    (config/GW4E69/name_sources.tsv, the frozen log of earlier renames) is read by those columns."""
     rows, cols = [], None
     for n, l in enumerate(pathlib.Path(tsv).read_text(encoding='utf-8-sig').splitlines(), 1):
         f = [x.strip() for x in l.split('\t')]

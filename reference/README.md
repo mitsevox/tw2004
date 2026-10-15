@@ -2,8 +2,7 @@
 
 Symbol, type and source-file inventories extracted from other EA games that shipped with debug
 information, used as evidence for EA's names, types and file layout. A finding here is a lead, not
-proof: it goes into the decomp only once the GameCube code agrees with it, and every name taken
-from here is logged in `config/GW4E69/name_sources.tsv`.
+proof: it goes into the decomp only once the GameCube code agrees with it.
 
 No executable, PDB, ELF, disc image or linker map is stored here, only the inventories made from
 them.

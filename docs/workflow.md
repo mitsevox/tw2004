@@ -30,13 +30,13 @@ Naming
 python tools/naming/callgraph.py <Unit> [--unnamed]   # a unit's functions, leaves first, with
                                                       # callers, callees, globals and strings
 python tools/naming/name.py <batch.tsv> --check       # validate a batch of function names
-python tools/naming/name.py <batch.tsv> --by "<who>"  # apply it, rebuild, log the evidence
+python tools/naming/name.py <batch.tsv>              # apply it and rebuild
 python tools/naming/rename.py <names.tsv>             # rename globals (symbols.txt and all uses)
 ```
 
-`name.py`'s docstring describes the batch format: address, current name, new name, tier,
-evidence codes, evidence, purpose and an optional comment. Every name lands in
-`config/GW4E69/name_sources.tsv`. Name leaves first: a caller reads better once its callees have
+`name.py`'s docstring describes the batch format: address, current name, new name and an
+optional comment. `tools/naming/namecheck.py` flags a name whose prefix or claim the call graph
+doesn't support. Name leaves first: a caller reads better once its callees have
 names.
 
 Before you commit
@@ -48,9 +48,11 @@ python tools/quality/lint.py --diff main      # style findings on the lines you 
 python tools/quality/typeaudit.py --count     # no number higher than on main
 python tools/quality/symaudit.py --count      # no number higher than on main
 python tools/quality/constcheck.py --count    # no number higher than on main
+python tools/quality/audit.py --check         # files marked done in docs/audit.tsv are still clean
 ```
 
 - `lint.py`: the rules in `style.md`, plus a compile with warnings for undefined behaviour.
+- `audit.py`: the audit table (`style.md`, "The audit"); CI runs `--check`.
 - `typeaudit.py`: globals declared with different types in different files, types defined twice,
   and `extern`/`typedef` lines in `.c` files.
 - `symaudit.py`: each global's declared size against `symbols.txt`. A global of 8 bytes or less

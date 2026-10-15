@@ -37,8 +37,8 @@ the positional compare (branch targets included) is 0 as well.
 Output in build/leversweep/: <fn>.txt (base score, the best variants with their levers and the
 changed lines) and summary.tsv (one row per function). Applying a hit: make the same change in
 src/<Unit>.c, confirm it in the real build (the snapshot masks symbol names), check the meaning,
-and label it: an identity inline becomes `static inline T fn_<caller address>_Read(T v)` with a
-`// fake match:` comment (docs/style.md)."""
+and label it: an identity inline becomes a `static inline` named for what it reads, with a
+`// fake match:` comment naming the trick (docs/style.md)."""
 import difflib, json, multiprocessing, os, pathlib, re, subprocess, sys, time
 
 HERE = pathlib.Path(__file__).resolve().parent
@@ -576,8 +576,8 @@ def _write(unit, fn, base_score, results, nlev, secs, note, f=None, L=None, n1=0
                 lines.append('  fake match: EA did not write this (an identity inline, or an address '
                              'taken only to steer the compiler). Look in TW07 (reference/'
                              'tw07-ps3/cu/) for EA\'s real helper or macro at this spot and use it; '
-                             'otherwise keep it with a `// fake match:` comment (an inline named '
-                             'fn_<caller address>_Read).')
+                             'otherwise keep it with a `// fake match:` comment, the inline named '
+                             'for what it reads.')
         if best and best[0][0] < base_score:
             g = f.copy()
             for k in best[0][2]:
