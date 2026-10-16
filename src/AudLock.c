@@ -1,45 +1,43 @@
-// AudLock.c (our name): the sound engine's two locks. A mutex that the file system (LLFileIO_Gc.c's
-// read thread, File_Open, File_Close, File_ReadAsyncEx) shares with the streamed tracks and the
-// movie sound, each taking it around a whole step, and a one-count semaphore that guards the
-// stream read queue (hlaudtrackstm.c). Every lock call passes a string naming its caller
-// ("Mov_Tick", "File_Open"); this build ignores it.
+// AudLock.c: the sound engine's two locks, a mutex that the file reads share with the streamed tracks
+// and the movie sound, and a one-count semaphore over the stream read queue (hlaudtrackstm.c). Every
+// lock call passes a label for its caller ("Mov_Tick", "File_Open"), which this build ignores.
 
 #include "game_types.h"
 #include "platform.h"
 #include "core/audtrack.h"
 
-// Defined last-first: CodeWarrior lays .bss out in reverse order.
-OSMutex gAudLockMutex;                  // the file and stream lock
-OSSemaphore gAudLockReadQueueSem;       // the read-queue lock
+OSMutex gAudLockMutex;                  // the file reads, the streamed tracks and the movie sound
+OSSemaphore gAudLockReadQueueSem;       // the stream read queue
 
-// Sets both locks up: the mutex free, the read-queue semaphore at 1. LLFileIO_Gc.c calls it once
-// its read thread is running (fn_80005EC0).
+// Sets both locks up: the mutex free, the read-queue semaphore at 1. The file reads' set-up calls
+// it once their reader thread is running.
 void AudLock_Init(void) {
     OSInitMutex(&gAudLockMutex);
     OSInitSemaphore(&gAudLockReadQueueSem, 1);
 }
 
-// Takes the mutex that the file system (its read thread, File_Open, File_Close, File_ReadAsyncEx),
-// the streamed tracks and the movie sound share. szWho names the caller; it is not used.
+// Takes the mutex: the file reads (opening, closing, queueing a read and the reader thread), the
+// streamed tracks (Stm_Tick, Stm_Start...) and the movie sound (Mov_Tick...) each hold it while
+// they work. A thread can take it again while it holds it: Stm_Tick queues its reads through
+// File_ReadAsyncEx, which takes it too.
 void AudLock_Lock(const char* szWho) {
     OSLockMutex(&gAudLockMutex);
 }
 
-// Gives the mutex back (szWho is not used).
 void AudLock_Unlock(const char* szWho) {
     OSUnlockMutex(&gAudLockMutex);
 }
 
-// Takes the stream read queue's semaphore (hlaudtrackstm.c), but only when it is free: when it is
-// held (count 0) the caller goes on without it rather than blocking, and its
-// AudLock_UnlockReadQueue then raises the count to 2. szWho is not used.
+// Takes the read queue's semaphore only when it is free; when it is held (count 0) the caller goes
+// on without it rather than waiting. The DMA-done callbacks take it too (RemoveFromAudStreamQueue).
+// A caller that went on without it still signals on its way out (AudLock_UnlockReadQueue), so the
+// count can climb past 1.
 void AudLock_LockReadQueue(const char* szWho) {
     if (gAudLockReadQueueSem.nCount > 0) {
         OSWaitSemaphore(&gAudLockReadQueueSem);
     }
 }
 
-// Gives the read queue's semaphore back (szWho is not used).
 void AudLock_UnlockReadQueue(const char* szWho) {
     OSSignalSemaphore(&gAudLockReadQueueSem);
 }
