@@ -172,7 +172,7 @@ void OnKeyOn(AudSeqEvent* pEvent, AudTrack* pTrack) {
     request.pUser = pTrack;
     request.nIndex = nChannel;
     request.flags.n = 0;
-    request.flags.b.bNoReverb = (pTrack->pSource->pSound->uFlags & AUDSOUND_NO_REVERB)
+    request.flags.b.bNoReverb = (pTrack->pSource->pSound->uFlags & EMITTER_NO_REVERB)
                                 || (pTrack->pTmpl->uFlags & AUDTRACKTMPL_NO_REVERB);
     request.flags.b.bLoops = bLoops;
     request.nPriority = nVolume;
@@ -565,5 +565,5 @@ AudSeqTone* Ses_GetInstrumentTone(AudSeqBank* pBank, u8 nTone) {
 // The audio update rate given at start-up over 60 (Aud_InitOnce is passed 60, so 1): Seq_Check
 // scales event delays by it.
 f32 Mas_GetUpdateRateScale(void) {
-    return gMasTickRateScale;
+    return gMasUpdateRateScale;
 }

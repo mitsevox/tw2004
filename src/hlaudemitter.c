@@ -45,7 +45,7 @@ void Emi_ExitSession(void) {
 // with it (uTracksOn to uChanged) are not read; Aud_EmiAdd passes zeros.
 AudSource* Emi_AddInstance(u8 nEntry, s16 nSound, u8 uTracksOn, u8 uTracksOff, u32* auParams,
                            f32 (*aPos)[3], u16 uChanged) {
-    AudSound* pSound;
+    TEmitter* pSound;
     AudSource* pSource;
 
     pSound = Ses_GetEmitterTemplateFromID(nSound);
@@ -59,7 +59,7 @@ AudSource* Emi_AddInstance(u8 nEntry, s16 nSound, u8 uTracksOn, u8 uTracksOff, u
 // Applies source nEntry's commands of this frame (Aud_EmiCycle): uTracksOn / uTracksOff are the
 // tracks switched on / off (a bit each), auParams each track's controller value and uChanged which
 // of them were queued (a bit per track's controller, and the AUDSOURCE_CHANGED_ bits). A placed
-// sound (AUDSOUND_3D) gets its distance, pan and doppler pitch, and each track a volume by distance
+// sound (EMITTER_3D) gets its distance, pan and doppler pitch, and each track a volume by distance
 // (Attenuation3D); one farther away than its sound's fMaxDist is out of earshot and all its tracks
 // are freed. Every track then starts, stops or carries on (Trk_UpdatePerf).
 void Emi_UpdInstance(u8 nEntry, u8 uTracksOn, u8 uTracksOff, u32* auParams, f32 (*aPos)[3],
@@ -81,7 +81,7 @@ void Emi_UpdInstance(u8 nEntry, u8 uTracksOn, u8 uTracksOff, u32* auParams, f32 
     if (uChanged & AUDSOURCE_CHANGED_PARAMS_0_2) {
         PreprocessControllers(pSource, auParams, uChanged);
     }
-    if (pSource->pSound->uFlags & AUDSOUND_3D) {
+    if (pSource->pSound->uFlags & EMITTER_3D) {
         fDist = Distance3D(pSource, aPos);
         bHeard = fDist - pSource->pSound->fMaxDist < 0.0f;
         if (bHeard) {
@@ -101,7 +101,7 @@ void Emi_UpdInstance(u8 nEntry, u8 uTracksOn, u8 uTracksOff, u32* auParams, f32 
             pTrack = *ppTrack;
             bOn = (uTracksOn & uBit) != 0;
             bOff = (uTracksOff & uBit) != 0;
-            if (pSource->pSound->uFlags & AUDSOUND_3D) {
+            if (pSource->pSound->uFlags & EMITTER_3D) {
                 fDistAttn = Attenuation3D(fDist, pTmpl->fDistScale);
             }
             Trk_UpdatePerf(pSource, pTrack, pTmpl, i, bOn, bOff, fDistAttn);
@@ -141,7 +141,7 @@ static f32 Attenuation3D(f32 fDist, f32 fDistScale) {
     return fDistAttn;
 }
 
-// The doppler pitch of a placed sound (1 with AUDSOUND_NO_DOPPLER; its test for a sound not placed
+// The doppler pitch of a placed sound (1 with EMITTER_NO_DOPPLER; its test for a sound not placed
 // never passes, as only placed sounds get here): 345 / (345 - fSpeed), 345 being the speed of
 // sound and fSpeed 32 times how much nearer than fDist the nearest listener now is (at most 1).
 // Then keeps that nearest distance in fDist.
@@ -153,7 +153,7 @@ static void Doppler3D(AudSource* pSource) {
 
     fDist = pSource->afDist[0];
     uFlags = pSource->pSound->uFlags;
-    if ((uFlags & AUDSOUND_NO_DOPPLER) || !(uFlags & AUDSOUND_3D)) {
+    if ((uFlags & EMITTER_NO_DOPPLER) || !(uFlags & EMITTER_3D)) {
         fPitch = 1.0f;
     } else {
         if (gMicCount >= 2 && pSource->afDist[1] < pSource->afDist[0]) {
@@ -178,7 +178,7 @@ static void Panning3D(AudSource* pSource) {
     f32 fPan;
     f32 fDepth;
 
-    if (gMicCount < 2 && (pSource->pSound->uFlags & AUDSOUND_3D)) {
+    if (gMicCount < 2 && (pSource->pSound->uFlags & EMITTER_3D)) {
         fInv = pSource->afDist[0] > 0.0f ? 1.0f / pSource->afDist[0] : 0.0f;
         fPan = audfrac_Mul(-pSource->aPos[0][0], fInv);
         fDepth = audfrac_Mul(pSource->aPos[0][2], fInv);
@@ -332,7 +332,7 @@ void Emi_SetTrackPitchFactor(u8 nEntry, u8 nTrack, f32 fPitch) {
 
 // Prepares each track template of a sound just loaded from a bank (Trk_Check: a sequenced one's
 // events). nSound, the sound's number in the bank, is not used.
-void Emi_CheckTemplate(AudSound* pSound, u16 nSound) {
+void Emi_CheckTemplate(TEmitter* pSound, u16 nSound) {
     u8 i;
 
     for (i = 0; i < pSound->nTracks; i++) {

@@ -206,7 +206,7 @@ AudTrack* Trk_AllocPerf(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f3
     TListDbl* pList;
     AudTrack* pTrack;
 
-    bSorted = pSource->pSound->uFlags & AUDSOUND_3D;
+    bSorted = pSource->pSound->uFlags & EMITTER_3D;
     pList = &gTrkPerfLists[bSorted];
     if (pPool->nFree == 0) {
         pTrack = (AudTrack*)gTrkPerfLists[1].pTail;

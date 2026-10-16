@@ -76,7 +76,7 @@ void Gaud_InitWindSound(int n);
 void Gaud_InitTreeSound(int n);
 
 // Each volume curve's volume (Gaud_ReInit hands them to HLAudMaster.c).
-f32 lbl_8018E988[32] = {
+f32 lbl_8018E988[MAS_NUM_SUBMIX_CHANS] = {
     0.3f, 0.7f, 0.8f, 1.0f, 0.7f, 0.4f, 1.0f, 1.0f,
     1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.7f, 0.7f, 0.4f,
     1.5f, 1.5f, 1.5f, 1.4f, 1.0f, 1.0f, 0.4f, 1.0f,
@@ -196,7 +196,7 @@ u8 Aud_InitOnce(u8 nRate) {
         && (bOk = Voc_InitModule()) && (bOk = Mov_InitModule()) && (bOk = Aud_EmiInitOnce())
         && (bOk = Aud_MicInitOnce())) {
         BootSound_CopyToAram();
-        Mas_SetTickRate(nRate);
+        Mas_SetUpdateRate(nRate);
         bOk = 1;
     }
     return bOk;
@@ -621,7 +621,7 @@ u8 Gaud_ReInit(void) {
     lbl_80281434 = 0.6f;
     lbl_80281458 = 21.0f;
     Aud_InitOnce(60);
-    Aud_SetSubmixAll(32, lbl_8018E988);
+    Aud_SetSubmixAll(MAS_NUM_SUBMIX_CHANS, lbl_8018E988);
     return 1;
 }
 
@@ -1920,7 +1920,7 @@ void Gaud_SetSfxLevel(f32 fVolume) {
     Aud_SetSubmixAttn(6, lbl_8018E988[6] * fVolume);
     Aud_EmiSetTrackAttenuation(lbl_8028141B, 0, fVolume);
     Aud_EmiSetTrackAttenuation(lbl_8028141B, 1, fVolume);
-    for (i = 16; i < 32; i++) {
+    for (i = 16; i < MAS_NUM_SUBMIX_CHANS; i++) {
         Aud_SetSubmixAttn(i, fVolume * lbl_8018E988[i]);
     }
 }
