@@ -1111,7 +1111,7 @@ void Gaud_SwingBallHit(u8 nPlayer) {
         lbl_8028202F = 0;
     }
     lbl_80282033 = 1;
-    pView->tLast = TI_sReadCounter(1);
+    pView->tLast = TI_sReadCounter(TI_COUNTER_GAME);
 }
 
 // The ball lands or bounces (event.c's events 35 to 38): the impact sound of the surface it hit
@@ -1133,8 +1133,8 @@ void Gaud_BallBounce(u8 nPlayer) {
     pPlayer = &gPlayers[nPlayer];
     pSurface = pPlayer->ball.pHitSurface;
     pView = &lbl_801F1790[pPlayer->nView[0]];
-    tNow = TI_sReadCounter(1);
-    fElapsed = fn_8006E118(tNow, pView->tLast);
+    tNow = TI_sReadCounter(TI_COUNTER_GAME);
+    fElapsed = TI_fConvertTimeDifToSeconds(tNow, pView->tLast);
     pView->tLast = tNow;
     if ((pPlayer->ball.nCollideCount == 0
          || (pPlayer->ball.nCollideCount > 0 && fElapsed >= 0.2f))

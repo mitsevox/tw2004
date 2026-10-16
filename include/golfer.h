@@ -556,7 +556,7 @@ typedef struct Session {
                                 //        luck, no caddie
     u8   b11;                   // 0x011  cleared by Session_Init
     u8   bEndLoop;              // 0x012  ends the main loop of a round (game type 6) or the
-                                //        start-up (1): fn_8006D01C (gomainloop.c) checks and clears
+                                //        start-up (1): GO_bMainLoopDone (gomainloop.c) checks and clears
                                 //        it; set at the end of a game, by the end-of-round screen,
                                 //        a replay, the lessons and the fade to black
     u8   bReplay;               // 0x013  a saved replay is playing: no luck swap, no spin, instant launch

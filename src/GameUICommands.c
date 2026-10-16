@@ -2450,7 +2450,7 @@ void GM_vAllowConcede(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 1;
 }
 
-// Command 149: ends the main loop: gSession.nC 2, which fn_8006D01C (gomainloop.c) checks each
+// Command 149: ends the main loop: gSession.nC 2, which GO_bMainLoopDone (gomainloop.c) checks each
 // frame.
 void IG_vEndGameLoop(MsgArg* pArgs, MsgArg* pResult) {
     gSession.nC = 2;

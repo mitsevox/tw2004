@@ -79,7 +79,7 @@ u32 Misc_CreateRandomSeed_Internal(void) {
 
     OSTicksToCalendarTime(OSGetTime(), &time);
     uSeed = 10 + time.nSec + time.nMin + time.nHour;
-    uSeed ^= fn_8000B3E8();
+    uSeed ^= TI_uiReadCP0Count();
     return uSeed;
 }
 
@@ -122,7 +122,7 @@ f32 Misc_RandFuncg(int nStream) {
     return fRadius * fCos;
 }
 
-u32 fn_8000B3E8(void) {
+u32 TI_uiReadCP0Count(void) {
     return fn_8000B408();
 }
 

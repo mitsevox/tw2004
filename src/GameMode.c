@@ -1188,7 +1188,7 @@ void GM_SimulateBallMovement(int nPlayer) {
     f32 fDist;
     int nResult;
 
-    t0 = TI_sReadCounter(0);
+    t0 = TI_sReadCounter(TI_COUNTER_REALTIME);
     nUpdates = GameEffects_BallUpdatesThisFrame(nPlayer);
     if (gpGame->n294 != 0
         && GolfCamera_IsBallFlightPaused(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]),
@@ -1198,7 +1198,7 @@ void GM_SimulateBallMovement(int nPlayer) {
     for (i = 0; i < nUpdates; i++) {
         Physics_Simulate(&gPlayers[nPlayer].ball, 20);
     }
-    fMs = 1000.0f * fn_8006E118(TI_sReadCounter(0), t0);
+    fMs = 1000.0f * TI_fConvertTimeDifToSeconds(TI_sReadCounter(TI_COUNTER_REALTIME), t0);
     fBudget = 0.83f - fMs;
     if (OnlineGolf_bIsOnlineGame()) {
         fBudget = 0.83f;
@@ -1208,9 +1208,9 @@ void GM_SimulateBallMovement(int nPlayer) {
         Physics_SetSimFullCup(1);
         while (gPlayers[nPlayer].ballBefore.nState != 1 && gPlayers[nPlayer].ballBefore.nState != 5 &&
                gPlayers[nPlayer].ballBefore.nState != 0 && fBudget > 0.1f) {
-            t0 = TI_sReadCounter(0);
+            t0 = TI_sReadCounter(TI_COUNTER_REALTIME);
             Physics_Simulate(&gPlayers[nPlayer].ballBefore, 20);
-            fMs = 1000.0f * fn_8006E118(TI_sReadCounter(0), t0);
+            fMs = 1000.0f * TI_fConvertTimeDifToSeconds(TI_sReadCounter(TI_COUNTER_REALTIME), t0);
             nSteps++;
             fBudget -= fMs;
             if (OnlineGolf_bIsOnlineGame()) {

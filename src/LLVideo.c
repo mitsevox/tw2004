@@ -353,10 +353,10 @@ void LLVideo_Start(Video* pVideo) {
     LLVideo_PreloadQueue(pVideo);
 }
 
-// Stamps now (TI_sReadCounter(0)) as the movie's last frame time; LLVideo_IsFrameDue measures from
-// it.
+// Stamps now (the real-time counter) as the movie's last frame time; LLVideo_IsFrameDue measures
+// from it.
 void LLVideo_SetLastFrameTime(Video* pVideo) {
-    pVideo->tLast = TI_sReadCounter(0);
+    pVideo->tLast = TI_sReadCounter(TI_COUNTER_REALTIME);
 }
 
 // Runs every movie once (each pass of LLVideo_RunPlayback): each running movie whose next frame is
@@ -393,7 +393,8 @@ void LLVideo_UpdateAll(void) {
 
 // 1 once the movie's frame time (fFrameTime seconds) has passed since its last frame (tLast).
 u8 LLVideo_IsFrameDue(Video* pVideo) {
-    if (fn_8006E118(TI_sReadCounter(0), pVideo->tLast) < pVideo->fFrameTime) {
+    if (TI_fConvertTimeDifToSeconds(TI_sReadCounter(TI_COUNTER_REALTIME), pVideo->tLast)
+        < pVideo->fFrameTime) {
         return 0;
     }
     return 1;
@@ -466,7 +467,7 @@ void LLVideo_RunPlayback(Video* pVideo, u8 (*pfnStop)(Video* pVideo, int nArg), 
     LLVideo_BeginPlayback();
     LLVideo_SetupRender();
     LLVideo_Start(pVideo);
-    tFrame = TI_sReadCounter(0);
+    tFrame = TI_sReadCounter(TI_COUNTER_REALTIME);
     nLastFrame = -1;
     bFirst = 1;
     bDone = 0;
@@ -500,11 +501,11 @@ void LLVideo_RunPlayback(Video* pVideo, u8 (*pfnStop)(Video* pVideo, int nArg), 
         RenderState_SetPicture(&pVideo->pict);
         RenderState_Flush();
         RenderView_DrawPrimitive(0xA1, xy, 0, uv, 2);
-        while (fn_8006E118(TI_sReadCounter(0), tFrame) < 1.0f / 33.0f) {
+        while (TI_fConvertTimeDifToSeconds(TI_sReadCounter(TI_COUNTER_REALTIME), tFrame) < 1.0f / 33.0f) {
         }
         fn_80006FE8();
         VIWaitForRetrace();
-        tFrame = TI_sReadCounter(0);
+        tFrame = TI_sReadCounter(TI_COUNTER_REALTIME);
         fn_800083A0();
         fn_80008380();
     } while (!bDone);
