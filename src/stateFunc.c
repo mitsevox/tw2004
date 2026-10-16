@@ -127,7 +127,7 @@ void  STATEFUNC_ConcededInit(int nPlayer);
 void  STATEFUNC_ConcededUpdate(int nPlayer);
 void  STATEFUNC_ConcededExit(int nPlayer);
 
-ModeStateDef lbl_801883C0[2] = {
+MainStateFunctionList_t gMainStateTable[MAINSTATE_NUM] = {
     {NULL, NULL, NULL},
     {NULL, GOLFERSTATE_Update, NULL}
 };
