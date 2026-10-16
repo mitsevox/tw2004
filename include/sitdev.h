@@ -11,6 +11,12 @@
 
 #define SITDEV_NUM_VALUES 96
 
+// The state values the scripts test (SitDevData.aValue).
+enum SitDevValue {
+    SITDEV_VALUE_COMMENTARY_ZONES = 79     // the bits of the commentary zones the player's ballBefore
+                                           // copy is in (SitDev_GetCommentaryZones)
+};
+
 // An event queued for the scripts (SitDev_QueueEvent adds them, SitDev_ProcessEventQueue runs and
 // clears them).
 typedef struct SitDevEvent {
@@ -116,14 +122,16 @@ extern SwapField gSitDevSituationSwap[7];
 extern SwapField gSitDevActionSwap[5];
 extern SwapField gSitDevResponseSwap[4];
 
-// A situation zone, from chunk 5 of the hole's data (SitDev_NetworkLoadCallback): an outline (with its
-// net.nNumNodes nodes), and then the zone's bits (a u32 right after the last node).
-typedef struct SitDevZone {
-    TNetwork net;               // 0x0
-} SitDevZone;
+// What follows a commentary zone's outline, right after its last node (SitDev_GetCommentaryZones).
+typedef struct TCommentaryNetworkParam {
+    u32 uZoneBits;              // 0x0  the bits SITDEV_VALUE_COMMENTARY_ZONES has while a point is
+                                //      inside the zone
+} TCommentaryNetworkParam;
 
-extern SitDevZone* gSitDevCommentaryZones[10];  // the hole's zones
-extern s32 gSitDevNumCommentaryZones;           // how many
+#define SITDEV_NUM_COMMENTARY_ZONES 10
+
+extern TNetwork* gSitDevCommentaryZones[SITDEV_NUM_COMMENTARY_ZONES];  // the hole's zones
+extern s32 gSitDevNumCommentaryZones;                                  // how many
 
 // The look-ahead ball's commentary (situation event 29, its first bounce; SitDev.c): a situation
 // for it that tests value 64 sets both flags as it runs; SitDev_InvokeMultipleActions clears
@@ -161,7 +169,8 @@ void SitDev_SetBallHitTime(struct Ball* pBall);
 // SitDevFile.c
 void SitDev_LoadScripts(SitDevHeader** ppScripts);  // the 'sscr' stream handler
 // SitDevCommentaryZones.c
-void SitDev_NetworkLoadCallback(u8* pChunk);        // the course loader for chunk 5
+void SitDev_NetworkLoadCallback(u8* netPtr);        // the loader for commentary-zone networks
+u32  SitDev_GetCommentaryZones(f32* location);
 
 void SitDev_vInitBeforeHole(void);
 

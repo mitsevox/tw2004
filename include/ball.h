@@ -229,6 +229,11 @@ typedef struct TNetwork {
     TNetNode aNodes[1];         // 0x4  nNumNodes of them
 } TNetwork;
 
+// TNetwork.nExportType: which system a network is for (Network_RegisterLoadNetworkCallback).
+enum NetworkType {
+    NETWORK_TYPE_COMMENTARY_ZONE = 5    // a commentary zone (SitDevCommentaryZones.c)
+};
+
 #define MAX_FREE_DROP_NETWORKS 25
 #define MAX_OOB_NETWORKS       5
 
