@@ -883,8 +883,6 @@ void fn_80069C64(char* sz, f32 fX, f32 fY) {
     UFont_DrawString(sz, fX, fY);
 }
 
-f32  VM_fGetViewportHeightOverWidth(u8* p); // GoRenderCtx_Gc.c: of the screen rectangle
-
 f32 lbl_801887CC[4] = { 0.5f, 0.5f, 0.5f, 0.5f };
 f32 lbl_801887DC[4] = { 0.5f, 0.15f, 0.15f, 0.5f };
 f32 lbl_801887EC[4] = { 0.4f, 0.4f, 0.4f, 0.5f };
@@ -1021,7 +1019,7 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
 
     // the marker's height: kept where the camera can see it (within 3/4 of its field of view)
     fHalfFov = CA_fGetCameraFieldOfView(Camera_GetCurrentLens());
-    fHalfFov = 0.75f * fHalfFov * VM_fGetViewportHeightOverWidth((u8*)RC_spGetCurrentRenderCtxViewport());
+    fHalfFov = 0.75f * fHalfFov * VM_fGetViewportHeightOverWidth(RC_spGetCurrentRenderCtxViewport());
     fn_8006A964(pView->v10, pView->v0, vDir);
     if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
         LLMath_Normalize3(vDir, vDir);
@@ -1188,7 +1186,7 @@ void fn_8006A8B0(void) {
 
 // A point given as fractions of the camera's view (0..1) into the view's screen rectangle.
 void fn_8006A8D4(void* pCamera, f32* pX, f32* pY) {
-    f32* pRect = RC_spGetRenderCtxViewport(pCamera);
+    VM_SViewport* pRect = RC_spGetRenderCtxViewport(pCamera);
 
     *pX = VM_fGetViewportLeft(pRect) + *pX * VM_fGetViewportWidth(pRect);
     *pY = VM_fGetViewportTop(pRect) + *pY * VM_fGetViewportHeight(pRect);

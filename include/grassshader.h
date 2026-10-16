@@ -142,7 +142,7 @@ typedef struct GrassManager {
                                 //       (Grass_CreateTopCamera)
     CamLens*     pLens;         // 0x74  a flat lens, 20 x 20
     GoFrameBuf*  pFrameBuf;     // 0x78  256 x 256
-    f32*         pRect;         // 0x7C  its screen rectangle
+    VM_SViewport* pRect;        // 0x7C  its viewport
     GxTexture    tex80;         // 0x80  the 256 x 256 screen copy (Grass_InitModule)
     f32          fMinX;         // 0xB0  } the placed buffers' bounds (Grass_PlaceCell); the lens looks
     f32          fMaxX;         // 0xB4  } down on the corner fMinX, fMinZ (Grass_AimTopCamera)

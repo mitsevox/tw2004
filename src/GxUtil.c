@@ -19,7 +19,7 @@ void fn_8002A020(void) {
 
 // With bOn, clear the alpha of the rectangle (x0, y0)-(x1, y1) (colour writes off meanwhile);
 // always leaves alpha writes on.
-void fn_8002A024(u8 bOn, f32 x0, f32 y0, f32 x1, f32 y1) {
+void GxUtil_ClearAlphaRect(u8 bOn, f32 x0, f32 y0, f32 x1, f32 y1) {
     f32 xy[8];
     f32 colour[4];
 

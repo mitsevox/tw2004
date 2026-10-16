@@ -343,7 +343,7 @@ void Grass_CreateTopCamera(void) {
     gpGrassMgr->pRect = VM_spCreateViewport();
     FB_vSetFrameBuffer(gpGrassMgr->pFrameBuf, 0.0f, 0.0f, 256.0f, 256.0f, 1.0f, 1.0f);
     VM_vSetViewportRect(gpGrassMgr->pRect, 0.0f, 0.0f, 1.0f, 1.0f);
-    fn_800B3438(gpGrassMgr->pRect, 1.0f, 1.0f);
+    VM_vSetViewportRatios(gpGrassMgr->pRect, 1.0f, 1.0f);
     CA_vSetDefaultCamera(gpGrassMgr->pLens);
     CA_vSetCameraProjectionMode(gpGrassMgr->pLens, 1);
     CA_vSetCameraFlatSize(gpGrassMgr->pLens, 20.0f, 20.0f);

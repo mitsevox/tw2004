@@ -1,23 +1,18 @@
-// GoViewport.c (EA's name, from its asserts; also in EA's 2002 source tree): a viewport, 13
-// floats (0x34 bytes): its position and size on screen, a scale, and values derived from them.
+// GoViewport.c: viewports, the part of the frame buffer a render camera draws into (VM_SViewport):
+// making, freeing and resetting one, and working out its derived values.
 
 #include "camera.h"
 
-void  VM_vUpdateInternalViewportRectData(f32* pRect);
-void  VM_vInitModule(void);
-void  VM_vCloseModule(void);
-void  VM_vSetDefaultViewport(f32* pRect);
+static void VM_vSetDefaultViewport(VM_SViewport* pViewport);
 
-// A viewport's derived values, from its size ([2], [3]) and scale ([4], [5]): the scaled size,
-// the inverse scale, the size over the scale, and the height over the width.
-void VM_vUpdateInternalViewportRectData(f32* pRect) {
-    pRect[6] = pRect[2] * pRect[4];
-    pRect[7] = pRect[3] * pRect[5];
-    pRect[10] = 1.0f / pRect[4];
-    pRect[11] = 1.0f / pRect[5];
-    pRect[8] = pRect[2] * pRect[10];
-    pRect[9] = pRect[3] * pRect[11];
-    pRect[12] = pRect[3] / pRect[2];
+void VM_vUpdateInternalViewportRectData(VM_SViewport* pViewport) {
+    pViewport->fWidthTimesRatio = pViewport->fWidth * pViewport->fWidthRatio;
+    pViewport->fHeightTimesRatio = pViewport->fHeight * pViewport->fHeightRatio;
+    pViewport->fOneOverWidthRatio = 1.0f / pViewport->fWidthRatio;
+    pViewport->fOneOverHeightRatio = 1.0f / pViewport->fHeightRatio;
+    pViewport->fWidthOverRatio = pViewport->fWidth * pViewport->fOneOverWidthRatio;
+    pViewport->fHeightOverRatio = pViewport->fHeight * pViewport->fOneOverHeightRatio;
+    pViewport->fHeightOverWidth = pViewport->fHeight / pViewport->fWidth;
 }
 
 void VM_vInitModule(void) {
@@ -26,25 +21,24 @@ void VM_vInitModule(void) {
 void VM_vCloseModule(void) {
 }
 
-// A new viewport, set to the default.
-f32* VM_spCreateViewport(void) {
-    f32* pRect = StaticMem_Alloc(13 * sizeof(f32), 2, 16, "GoViewport.c", 137);
+VM_SViewport* VM_spCreateViewport(void) {
+    VM_SViewport* pViewport = StaticMem_Alloc(sizeof(VM_SViewport), 2, 16, "GoViewport.c", 137);
 
-    VM_vSetDefaultViewport(pRect);
-    return pRect;
+    VM_vSetDefaultViewport(pViewport);
+    return pViewport;
 }
 
-void VM_vReleaseViewport(f32* pRect) {
-    StaticMem_Free(pRect);
+void VM_vReleaseViewport(VM_SViewport* pViewport) {
+    StaticMem_Free(pViewport);
 }
 
-// The default viewport: at 0,0, size 1 by 1, scale 1 and 0.75.
-void VM_vSetDefaultViewport(f32* pRect) {
-    pRect[0] = 0.0f;
-    pRect[1] = 0.0f;
-    pRect[2] = 1.0f;
-    pRect[3] = 1.0f;
-    pRect[4] = 1.0f;
-    pRect[5] = 0.75f;
-    VM_vUpdateInternalViewportRectData(pRect);
+// All of the frame buffer, on a 4:3 screen.
+static void VM_vSetDefaultViewport(VM_SViewport* pViewport) {
+    pViewport->fLeft = 0.0f;
+    pViewport->fTop = 0.0f;
+    pViewport->fWidth = 1.0f;
+    pViewport->fHeight = 1.0f;
+    pViewport->fWidthRatio = 1.0f;
+    pViewport->fHeightRatio = 0.75f;
+    VM_vUpdateInternalViewportRectData(pViewport);
 }

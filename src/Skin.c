@@ -392,7 +392,7 @@ void RC_ApplyCurrentViewport(void) {
 // Hands the render context's viewport (left, top, width, height) to fn_80016978, which makes it the
 // current one.
 void RC_ApplyViewport(void* pCamera) {
-    f32* pRect;
+    VM_SViewport* pRect;
 
     pRect = RC_spGetRenderCtxViewport(pCamera);
     fn_80016978(VM_fGetViewportLeft(pRect), VM_fGetViewportTop(pRect), VM_fGetViewportWidth(pRect),
