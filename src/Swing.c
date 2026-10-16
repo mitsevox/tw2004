@@ -1064,7 +1064,7 @@ void SW_vUIRender3D(int nPlayer) {
             RenderState_SetViewport(RC_spGetCurrentRenderCtx());
             RenderState_SetDrawFlags(0x50);
             RenderState_SetBlendFactors(4, 5);
-            DS_vSetAlphaTestMode(0, 6, 0x80);
+            DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
             DS_vEnableZBufferUpdate(0);
             if (pObj->nTargetState == 6) {
                 RenderState_SetBankTexture(gpSwing->pBank, gpSwing->pClubBack);
@@ -1084,7 +1084,7 @@ void SW_vUIRender3D(int nPlayer) {
             mesh.pUV      = gpSwing->pA4[nView];
             SD_FillShaderObject((ShaderObject*)gpSwing->mesh[nView], &mesh, 1);
             SD_DrawShaderObject(gpSwing->mesh[nView]);
-            DS_vSetAlphaTestMode(1, 6, 0x80);
+            DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 0x80);
             DS_vEnableZBufferUpdate(1);
             RenderState_Flush();
         }

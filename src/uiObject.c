@@ -212,14 +212,14 @@ void UI_Obj_RenderBoostUI(int nObj) {
     RenderView_SetColor(aBlack);
     RC_ApplyCurrentViewport();
     RenderState_SetDrawFlags(0);
-    DS_vSetAlphaTestMode(0, 6, 0x80);
-    DS_vSetZBufferMode(7);
+    DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
+    DS_vSetZBufferMode(DS_COMPARE_ALWAYS);
     RenderState_SetRenderSurface(0, 0x200, 0x1C0, lbl_80281B88 & 1, 2, 1);
     RenderState_Flush();
     GXSetZMode(1, 7, 1);
     RenderView_DrawPrimitive(0xA1, aRect[0], NULL, NULL, 2);
-    DS_vSetAlphaTestMode(1, 6, 0x80);
-    DS_vSetZBufferMode(3);
+    DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 0x80);
+    DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
     RenderState_SetRenderSurface(0, 0x200, 0x1C0, lbl_80281B88 & 1, 8, 1);
     RenderState_Flush();
 
@@ -239,7 +239,7 @@ void UI_Obj_RenderBoostUI(int nObj) {
     DS_vEnableZBufferUpdate(1);
     RenderView_SetUseCurrentMatrices(1);
     RenderState_SetBlendFactors(4, 5);
-    DS_vSetAlphaTestMode(1, 4, 1);
+    DS_vSetAlphaTestMode(1, DS_COMPARE_GREATER, 1);
 
     // the base quad
     RenderState_SetBankTexture(gpUIObjTexBank, gpUIObjBaseTexture);
@@ -261,7 +261,7 @@ void UI_Obj_RenderBoostUI(int nObj) {
         aXYZ[i][3] = 1.0f;
     }
     RenderState_SetBankTexture(gpUIObjTexBank, gpUIObjBoostTexture);
-    DS_vSetAlphaTestMode(0, 6, 0x80);
+    DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
     if (gPlayers[nPlayer].swing.nPowerBoost > 0) {
         Vec3Copy(gBoostLevelColours[gPlayers[nPlayer].swing.nPowerBoost - 1], aColour);
     }
@@ -370,8 +370,8 @@ void UI_Obj_RenderBoostUI(int nObj) {
     RC_vUpdateRenderCtxTransformationMatrices(RC_spGetCurrentRenderCtx());
     RenderState_SetConstantAlphaOn(0);
     RenderState_SetBlendFactors(4, 5);
-    DS_vSetAlphaTestMode(1, 6, 0x80);
-    DS_vSetZBufferMode(3);
+    DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 0x80);
+    DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
     RenderState_Flush();
 }
 

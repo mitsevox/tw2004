@@ -105,8 +105,8 @@ void UI_EATraxDraw(void) {
             pTex = UI_GetTexBankFirstTexture(pBank);
         }
         RenderState_SetBlendFactors(4, 5);
-        DS_vSetAlphaTestMode(0, 6, 0x80);
-        DS_vSetZBufferMode(7);
+        DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
+        DS_vSetZBufferMode(DS_COMPARE_ALWAYS);
         RenderView_SetUseCurrentMatrices(0);
         DS_vEnableZBufferUpdate(0);
         if (UI_EATraxIsLogoLoaded()) {

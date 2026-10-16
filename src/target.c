@@ -232,8 +232,8 @@ void TARGET_RenderBallTarget(int nPlayer) {
     }
     GUI_UpdateTargetInfo(nPlayer, fDist, fTilt, fStep, fShare);
 
-    DS_vSetAlphaTestMode(0, 6, 0x7F);
-    DS_vSetZBufferMode(3);
+    DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x7F);
+    DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
     DS_vEnableZBufferUpdate(0);
     RenderState_SetBlendFactors(4, 5);
     RenderState_SetBankTexture(lbl_80281E3C, lbl_80281E40);
@@ -327,8 +327,8 @@ void TARGET_RenderBallTarget(int nPlayer) {
         RenderState_Flush();
         RenderView_DrawPrimitive(0x98, aShadow[0], NULL, aUV, 4);
     }
-    DS_vSetAlphaTestMode(1, 6, 0x80);
-    DS_vSetZBufferMode(3);
+    DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 0x80);
+    DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
     DS_vEnableZBufferUpdate(1);
     RenderState_Flush();
 
@@ -1003,8 +1003,8 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
     if (vCross[1] < 0.0f) {
         fSin = -fSin;
     }
-    DS_vSetAlphaTestMode(0, 6, 0x7F);
-    DS_vSetZBufferMode(3);
+    DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x7F);
+    DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
     RenderState_SetBlendFactors(4, 5);
     RenderState_SetBankTexture(lbl_80281E3C, lbl_80281E40);
     RenderState_SetDrawFlags(0x50);
@@ -1088,8 +1088,8 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
     RenderState_SetBankTexture(lbl_80281E34, lbl_80281E38);
     RenderState_Flush();
     RenderView_DrawPrimitive(0x98, aShadow[0], NULL, aUV, 4);
-    DS_vSetAlphaTestMode(1, 6, 0x80);
-    DS_vSetZBufferMode(3);
+    DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 0x80);
+    DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
     DS_vEnableZBufferUpdate(1);
     RenderView_SetColor(lbl_801887CC);
     RenderState_Flush();

@@ -204,7 +204,7 @@ void FE_CrAPBall_Render(u8 bTarget) {
         }
         RenderState_SetViewport(RC_spGetCurrentRenderCtx());
         RenderState_SetBlendFactors(4, 5);
-        DS_vSetAlphaTestMode(0, 6, 0x80);
+        DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
         DS_vEnableZBufferUpdate(1);
         RenderState_Flush();
         if (gpCrAPBallTeo10000 != NULL) {

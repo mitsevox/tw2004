@@ -290,16 +290,16 @@ s32 UFont_FindFreeSlot(void) {
 
 void FO_vSetFontContext(void) {
     fn_800111D8();
-    DS_vSetAlphaTestMode(1, 6, 1);
+    DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 1);
     DS_vEnableZBufferUpdate(0);
-    DS_vSetZBufferMode(7);
+    DS_vSetZBufferMode(DS_COMPARE_ALWAYS);
     RenderState_Flush();
 }
 
 void FO_vRestoreFontContext(void) {
     fn_800112DC();
     DS_vEnableZBufferUpdate(1);
-    DS_vSetZBufferMode(3);
+    DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
     RenderState_Flush();
 }
 

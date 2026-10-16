@@ -54,8 +54,8 @@ void fn_80093DB8(Ball* pBall, int nPlayer) {
     if (-65536.125f != fGround) {
         RenderState_SetBankTexture(lbl_80281F50, lbl_80281F54);
         DS_vEnableZBufferUpdate(0);
-        DS_vSetAlphaTestMode(0, 6, 0x80);
-        DS_vSetZBufferMode(3);
+        DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
+        DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
         RenderState_SetBlendFactors(4, 5);
         RenderState_SetCameraMatrices();
         RenderState_SetDrawFlags(0x70);
@@ -103,8 +103,8 @@ void fn_80093DB8(Ball* pBall, int nPlayer) {
         SD_FillShaderObject((ShaderObject*)lbl_801D96B8[nPlayer], &desc, 1);
         SD_DrawShaderObject(lbl_801D96B8[nPlayer]);
         DS_vEnableZBufferUpdate(1);
-        DS_vSetAlphaTestMode(1, 6, 0x80);
-        DS_vSetZBufferMode(3);
+        DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 0x80);
+        DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
         RenderState_Flush();
     }
 }

@@ -27,8 +27,8 @@ void GxUtil_ClearAlphaRect(u8 bOn, f32 x0, f32 y0, f32 x1, f32 y1) {
         GXSetAlphaUpdate(1);
         GXSetColorUpdate(0);
         DS_vEnableZBufferUpdate(0);
-        DS_vSetAlphaTestMode(0, 6, 0x80);
-        DS_vSetZBufferMode(7);
+        DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
+        DS_vSetZBufferMode(DS_COMPARE_ALWAYS);
         RenderState_SetDrawFlags(0);
         RenderView_MakeQuad(xy, NULL, x0, y0, x1, y1);
         colour[0] = 0.0f;
@@ -40,8 +40,8 @@ void GxUtil_ClearAlphaRect(u8 bOn, f32 x0, f32 y0, f32 x1, f32 y1) {
         RenderState_Flush();
         RenderView_DrawPrimitive(0xA1, xy, 0, NULL, 2);
         DS_vEnableZBufferUpdate(1);
-        DS_vSetAlphaTestMode(1, 6, 0x80);
-        DS_vSetZBufferMode(3);
+        DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 0x80);
+        DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
         GXSetColorUpdate(1);
         RenderState_Flush();
     } else {
@@ -56,7 +56,7 @@ void fn_8002A164(int nMode) {
     GXCopyTex(fn_8002A624(), 0);
     GXPixModeSync();
     fn_8002A608(&lbl_801C64A8);
-    DS_vSetAlphaTestMode(1, 4, 0);
+    DS_vSetAlphaTestMode(1, DS_COMPARE_GREATER, 0);
     RenderState_Flush();
     GXSetNumTevStages(1);
     if (nMode == 0) {
@@ -79,7 +79,7 @@ void fn_8002A164(int nMode) {
 // The end of fn_8002A164's drawing.
 void fn_8002A2FC(void) {
     GXSetAlphaUpdate(0);
-    DS_vSetAlphaTestMode(1, 6, 0x80);
+    DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 0x80);
     RenderState_Flush();
     lbl_80281D28 = 0;
     GXSetTevColorIn(1, 15, 0, 12, 15);

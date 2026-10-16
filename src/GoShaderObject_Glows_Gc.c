@@ -337,17 +337,17 @@ void ColGlow_RenderAllGlowInCurrentList(void) {
         RenderState_SetViewport(RC_spGetCurrentRenderCtx());
         RenderState_SetCameraMatrices();
         RenderState_SetBlendFactors(4, 1);
-        DS_vSetAlphaTestMode(0, 6, 0x80);
+        DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
         DS_vEnableZBufferUpdate(0);
         RenderState_SetDrawFlags(0x40);
-        DS_vSetZBufferMode(3);
+        DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
         RenderState_Flush();
         desc.pQueue = lbl_80281F80;
         desc.bFirst = 1;
         desc.pMtx = pMtx;
         SD_FillShaderObject((ShaderObject*)lbl_801D9A40, &desc, 1);
         SD_DrawShaderObject(lbl_801D9A40);
-        DS_vSetZBufferMode(7);
+        DS_vSetZBufferMode(DS_COMPARE_ALWAYS);
         RenderState_Flush();
         desc.pQueue = lbl_80281F80;
         desc.bFirst = 0;
@@ -357,8 +357,8 @@ void ColGlow_RenderAllGlowInCurrentList(void) {
         RC_vSetRenderCtxTransformationMatrix(pCamera, NULL);
         RenderState_SetViewport(RC_spGetCurrentRenderCtx());
         DS_vEnableZBufferUpdate(1);
-        DS_vSetZBufferMode(3);
-        DS_vSetAlphaTestMode(1, 6, 0x80);
+        DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
+        DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 0x80);
         RenderState_SetBlendFactors(4, 5);
         RenderState_Flush();
     }

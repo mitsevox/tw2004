@@ -496,19 +496,37 @@ typedef struct DispSync {
     s8   bBreak;                // 0x13  the GPU reached a break point (fn_80006EC8, GX's callback)
 } DispSync;
 
+// The compare functions of the depth and alpha tests: GX's own values, handed to it unchanged.
+typedef enum DS_ECompareFunctions {
+    DS_COMPARE_NEVER,
+    DS_COMPARE_LESS,
+    DS_COMPARE_EQUAL,
+    DS_COMPARE_LEQUAL,
+    DS_COMPARE_GREATER,
+    DS_COMPARE_NEQUAL,
+    DS_COMPARE_GEQUAL,
+    DS_COMPARE_ALWAYS           // for the depth test: the test is turned off
+} DS_ECompareFunctions;
+
+// RenderState.uChanged: the groups a setter changed, for RenderState_Apply to hand to GX.
+typedef enum DS_FChangeFlag {
+    DS_CHANGED_ZBUFFER_MODE = 0x1,      // eDepthCompare (DS_vSetZBufferMode)
+    DS_CHANGED_ZBUFFER_UPDATE = 0x2,    // bDepthWrite (DS_vEnableZBufferUpdate)
+    DS_CHANGED_ALPHA_TEST_MODE = 0x4    // eAlphaCompare, nAlphaRef, bAlphaTest (DS_vSetAlphaTestMode)
+} DS_FChangeFlag;
+
 // The renderer's state (gRenderState, 0x118 bytes; TW07's LLDisSt display state): only what the
 // game code writes. Each setter (the DS_v... and RenderState_Set... functions) writes one group of
 // fields and sets that group's bit in uChanged; RenderState_Apply hands the changed groups to GX.
 // The defaults are DS_vInitModule's. Enumerated values are GX's (GXCompare, GXBlendFactor,
 // GXBlendMode, GXFogType).
 typedef struct RenderState {
-    s32  nDepthCompare;         // 0x000  depth compare function (7, GX_ALWAYS, turns the test
-                                //        off); 3 (GX_LEQUAL) at reset; bit 0x1
-    u8   bDepthWrite;           // 0x004  depth-buffer writes on; 1 at reset; bit 0x2
+    DS_ECompareFunctions eDepthCompare;   // 0x000  the depth test; DS_COMPARE_LEQUAL at reset
+    u8   bDepthWrite;           // 0x004  depth-buffer writes on; 1 at reset
     u8   unk5[0x8 - 0x5];
-    s32  nAlphaCompare;         // 0x008  } the alpha test (DS_vSetAlphaTestMode): compare
-    u8   nAlphaRef;             // 0x00C  } function, reference 0..255, on; 6 (GX_GEQUAL), 100
-    u8   bAlphaTest;            // 0x00D  } and 0 (off) at reset; bit 0x4
+    DS_ECompareFunctions eAlphaCompare;   // 0x008  } the alpha test: compare function, reference
+    u8   nAlphaRef;             // 0x00C  } 0..255, on; DS_COMPARE_GEQUAL, 100 and 0 (off) at
+    u8   bAlphaTest;            // 0x00D  } reset
     u8   unkE[0x10 - 0xE];
     s32  nBlendSrc;             // 0x010  } blend source and destination factors; 4 and 5 (source
     s32  nBlendDst;             // 0x014  } alpha over inverse source alpha) at reset; bit 0x10
@@ -554,7 +572,7 @@ typedef struct RenderState {
     TexEntry* pTexEntry;        // 0x104  } the swing trail's, the logo editor's)
     struct GxTexture* pTex108;  // 0x108  or this texture (fn_8002A608)
     struct LLPict* pPict10C;    // 0x10C  or this picture (LLVideo.c RenderState_SetPicture: a movie's)
-    u32  uChanged;              // 0x110  which groups changed (the bits above)
+    u32  uChanged;              // 0x110  which groups changed (DS_FChangeFlag and the bits above)
     u32  uFlags;                // 0x114  bit 1: pTexBank/pTexEntry are set; bit 2: pTex108 is;
                                 //        bit 4: pPict10C is
 } RenderState;
@@ -1389,11 +1407,15 @@ typedef struct TrailMeshDescEx {
     f32        af18[4];         // 0x18
 } TrailMeshDescEx;
 
-int  Input_iInitModule(void);                 // controller init
+// RenderAccessors.c: the depth and alpha test setters and the call that hands them to GX (its
+// viewport getters are in camera.h).
 void RenderState_Flush(void);
-void DS_vSetZBufferMode(int nCompare);          // depth compare function (Code80012ED0.c)
-void DS_vEnableZBufferUpdate(int bEnable);      // depth-buffer writes on or off
-void DS_vSetAlphaTestMode(int bEnable, int nCompare, int nRef);   // nRef on a 0..0x80 scale
+void DS_vSetZBufferMode(DS_ECompareFunctions eZBufferMode);
+void DS_vEnableZBufferUpdate(int bZBufferUpdate);
+void DS_vSetAlphaTestMode(int bAlphaTestEnable, DS_ECompareFunctions eAlphaMode, int nAlphaRefValue);
+
+void Input_vInitOnce(void);
+int  Input_iInitModule(void);                 // controller init
 void Input_vCloseOnce(void);
 u32  Input_iGetPadType(int nChan);            // the pad's device type (SIProbe)
 u8   Input_bDoesPadExist(int nChan);            // a controller the game takes is plugged in

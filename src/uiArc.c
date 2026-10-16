@@ -306,7 +306,7 @@ void UIArc_Draw(UIArc* pArc, s32 a, s32 b) {
             aOut[j].y *= fProj;
             aOut[j].z = fZ;
         }
-        DS_vSetZBufferMode(7);
+        DS_vSetZBufferMode(DS_COMPARE_ALWAYS);
         RenderState_Flush();
         if (aColour[0][3] != 0.0f || aColour[1][3] != 0.0f || aColour[2][3] != 0.0f
             || aColour[3][3] != 0.0f) {

@@ -157,7 +157,7 @@ void DF_vDrawBufferToScreen(int n) {
     DS_vEnableZBufferUpdate(0);
     RenderState_SetBlendFactors(4, 5);
     RenderState_SetConstantAlphaOn(1);
-    DS_vSetAlphaTestMode(0, 6, 0x80);
+    DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
     for (i = 0; i < 5; i++) {
         RenderView_MakeQuad(aXY, aUV, 0.0f, 0.0f, 1.0f, 1.0f);
         bOdd = i % 2;
@@ -193,7 +193,7 @@ void DF_vDrawBufferToScreen(int n) {
     RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 8, 1);
     fn_80016B54(512, 448, 1.0f, 1.0f);
     RC_ApplyCurrentViewport();
-    DS_vSetAlphaTestMode(1, 6, 0x80);
+    DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 0x80);
     RenderState_SetConstantAlphaOn(0);
     RenderState_Flush();
 }

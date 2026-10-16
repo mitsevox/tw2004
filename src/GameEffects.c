@@ -587,8 +587,8 @@ void GameEffects_DrawLetterBoxes(f32 fHeight) {
     f32 uv[8];
     RenderView_SetUseCurrentMatrices(0);
     DS_vEnableZBufferUpdate(0);
-    DS_vSetZBufferMode(7);
-    DS_vSetAlphaTestMode(0, 6, 0x80);
+    DS_vSetZBufferMode(DS_COMPARE_ALWAYS);
+    DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
     RenderState_SetDrawFlags(0);
     RenderState_Flush();
     colour[0] = 0.0f;
@@ -602,8 +602,8 @@ void GameEffects_DrawLetterBoxes(f32 fHeight) {
     RenderView_SetColor(colour);
     RenderView_DrawPrimitive(0xA1, xy, 0, uv, 2);
     DS_vEnableZBufferUpdate(1);
-    DS_vSetAlphaTestMode(1, 6, 0x80);
-    DS_vSetZBufferMode(3);
+    DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 0x80);
+    DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
     RenderState_Flush();
 }
 

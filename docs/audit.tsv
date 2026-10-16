@@ -10,7 +10,6 @@ CalendarScreen.c	open
 CamSpline.c	open		
 CharAnim.c	open		
 CharSliders.c	open		
-Code80012ED0.c	open		
 Code80015470.c	open		
 Code80016198.c	open		
 Code8002BBB0.c	open		
@@ -159,6 +158,7 @@ PlayNowMode.c	open
 PsBallFx.c	open		
 PsMgr.c	open		
 Quaternion.c	open		
+RenderAccessors.c	open		
 Replay.c	open		
 ScreenClear.c	open		
 ShaderRow0.c	open		

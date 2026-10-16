@@ -236,8 +236,8 @@ void LLVideo_DarkenScreen(int nFlags) {
         RenderState_SetBlendFactors(4, 5);
         RenderView_SetUseCurrentMatrices(0);
         RenderState_SetDrawFlags(0x40);
-        DS_vSetAlphaTestMode(0, 6, 0x80);
-        DS_vSetZBufferMode(7);
+        DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
+        DS_vSetZBufferMode(DS_COMPARE_ALWAYS);
         RenderState_Flush();
         RenderView_DrawPrimitive(0xA1, xy, 0, NULL, 2);
         Input_vUpdate();
@@ -419,8 +419,8 @@ void LLVideo_SetupRender(void) {
     RenderState_SetRenderSurface(0, 512, 448, 0, 8, 1);
     RenderState_SetDrawFlags(0x10);
     DS_vEnableZBufferUpdate(0);
-    DS_vSetAlphaTestMode(0, 6, 0x80);
-    DS_vSetZBufferMode(7);
+    DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
+    DS_vSetZBufferMode(DS_COMPARE_ALWAYS);
     RenderState_SetScissor(0, 0, 512, 448);
     fn_80016B54(512, 448, 1.0f, 1.0f);
     fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
@@ -440,8 +440,8 @@ void LLVideo_RestoreRender(void) {
     fn_80012B2C(1.0f, 1.0f);
     FO_vSetCurrentAddMode(gpVideoSlots->n20);
     DS_vEnableZBufferUpdate(1);
-    DS_vSetAlphaTestMode(0, 6, 0x80);
-    DS_vSetZBufferMode(3);
+    DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
+    DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
     fn_80016B54(512, 448, 1.0f, 1.0f);
     fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
     RenderState_Flush();
