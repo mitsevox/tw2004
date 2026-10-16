@@ -2248,7 +2248,7 @@ EASBErrorE fn_8012CAA8(SFIOFuncTable* pCallbacks, int* pDevices) {
     params.pFuncs = pCallbacks;
     params.pKey = (u8*)szKey;
     params.uKeyLen = sizeof(szKey);
-    params.pCipher = (const CipherInterface*)Cipher_GetInterface();
+    params.pCipher = CryptXORQueryType();
     params.pAllocator = (void*)lbl_802825B0->uHeapID;
     eError = EASB_ErrorFromTagError(TagFile_Init(&params));
     if (eError == EASB_ERROR_NONE && lbl_802825B0->pBuffer == NULL) {

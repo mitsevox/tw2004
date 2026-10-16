@@ -691,7 +691,7 @@ config.libs = [
         "progress_category": "game",
         "objects": [
             Object(Matching, "Common/Checksum/ChecksumCRC32.c"),
-            Object(Matching, "Common/Cipher/CipherXOR.c"),
+            Object(Matching, "Common/Crypt/CryptXOR.c"),
             Object(Matching, "Common/SharedFileIO/SharedFileIO.c"),
             Object(Matching, "NGC/SharedFileIO/llSharedFileIO.c"),
             Object(Matching, "Common/TagFile/TagFile.c"),

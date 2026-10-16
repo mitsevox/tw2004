@@ -504,7 +504,7 @@ and an XOR cipher), EA Sports Bio, and the Game Boy Advance link.
 | EASBStorage.c | ours | the storage half of the EA Sports Bio library (may be several EA files) |
 | EASB.c | ours (the library's file tag) | EA Sports Bio's public calls |
 | Common/Checksum/ChecksumCRC32.c | EA | EA shared file library (ProDG GCC build): CRC32 |
-| Common/Cipher/CipherXOR.c | ours | EA shared file library: an XOR cipher |
+| Common/Crypt/CryptXOR.c | EA | EA shared file library: the XOR cipher that scrambles the save's records |
 | Common/SharedFileIO/SharedFileIO.c | EA | EA shared file library: the cross-platform save I/O |
 | NGC/SharedFileIO/llSharedFileIO.c | EA | EA shared file library: its GameCube layer |
 | Common/TagFile/TagFile.c | EA | EA shared file library: the tag-file save container |

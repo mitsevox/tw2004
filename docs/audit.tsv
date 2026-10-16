@@ -34,7 +34,7 @@ Code800B9944.c	open
 Code800BA940.c	open		
 Code80193188.c	open		
 Common/Checksum/ChecksumCRC32.c	open		
-Common/Cipher/CipherXOR.c	open		
+Common/Crypt/CryptXOR.c	open		
 Common/SharedFileIO/SharedFileIO.c	open		
 Common/TagFile/TagFile.c	open		
 Controller_Gc.c	open		
