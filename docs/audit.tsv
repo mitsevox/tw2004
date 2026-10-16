@@ -141,8 +141,8 @@ LLMem_Gc.c	open
 LLObj_Gc.c	open		
 LLPictInt.c	open		
 LLPict_Gc.c	open		
-LLRTClock.c	open		
-LLRTClock_Gc.c	open		
+LLRTClock.c	done	2ffe6987	claude-review
+LLRTClock_Gc.c	done	2ffe6987	claude-review
 LLTex.c	open		
 LLTexGrp.c	open		
 LLTime.c	done	49974e64	claude-review
