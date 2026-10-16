@@ -535,7 +535,7 @@ void           Emi_CheckTemplate(AudSound* pSound, u16 nSound);
 void           Emi_TrackCallback(AudSource* pSource, u8 nTrack, s32 nReason);
 
 // UAudVector.c
-f32            audvec3_ApproxLength(f32* pVec);
+f32            audvec3_ApproxLength(f32* v);
 
 // HLAudMaster.c
 AudSound*    Ses_GetEmitterTemplateFromID(s16 nSound);
