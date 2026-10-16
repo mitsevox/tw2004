@@ -16,8 +16,6 @@
 #include "engine.h"
 #include "game/save.h"
 
-// fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
-
 // One lesson: where the ball is placed and the shot kind, club and shape it sets (lessons 1..11;
 // 12 is the end).
 typedef struct Lesson {
@@ -621,7 +619,7 @@ void Lessons_Update(void) {
         gLessonFailedTries = 0;
         break;
     case 4:
-        if ((s8)GOLFERSTATE_GetCurrentState(0) != 20) {
+        if ((s8)GOLFERSTATE_GetCurrentState(0) != GS_INITIAL_FLY_BY) {
             Lessons_PlaceBall();
             GOLFERSTATE_Switch(GS_PRE_SHOT, 0);
             Lessons_ShowSwingHint(0, 0);

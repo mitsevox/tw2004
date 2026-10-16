@@ -13,8 +13,6 @@
 #include "engine.h"
 #include "game/earnings.h"
 
-// fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
-
 // Mode 17's state; only this file uses it. The .sbss ones are defined last address first (the
 // compiler lays a file's .sbss out last definition first).
 s32 gTargetToTargetSavedWeather = 4;    // options.nWeather before the game (StartGamePreData;
@@ -389,7 +387,7 @@ void GameModeSkillZoneTargetToTarget_SetupNextGolfer(void) {
     GameModeSkillZoneBase_ClearPerShotData();
     GameModeStroke_SetupNextGolfer();
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        if ((s8)GOLFERSTATE_GetCurrentState(i) == 1) {
+        if ((s8)GOLFERSTATE_GetCurrentState(i) == GS_PRE_SHOT) {
             if (PLAYER(i)->nTarget != PLAYER(i)->nNextTarget) {
                 GameModeSkillZoneBase_SetCup_AlignGolfer(i, PLAYER(i)->nNextTarget);
             }

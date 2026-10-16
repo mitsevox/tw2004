@@ -24,9 +24,7 @@ void  SW_vUIBlurReset(int nPlayer);
 void  SW_vImpact(int nPlayer);
 void  SW_UpdateVibration(int nPlayer);
 void  fn_80098C70(void);
-void  GOLFERSTATE_Pop(int nPlayer);
 void  SitDev_QueueEvent(int nPlayer, int a, u8 nEvent);
-s8    GOLFERSTATE_GetPreviousState(int nPlayer);  // the state below the top of the stack
 void  ViewController_RestoreViewportRect(int nView);
 void  fn_80039344(int nView, f32 f);             // a per-view float (0x801D5010[nView])
 void  fn_80062B64(int nPlayer);
@@ -132,7 +130,7 @@ MainStateFunctionList_t gMainStateTable[MAINSTATE_NUM] = {
     {NULL, GOLFERSTATE_Update, NULL}
 };
 
-SwingStateDef sGolferStateEngineTable[GS_NUM] = {
+GolferStateFunctionList_t sGolferStateEngineTable[GS_NUM] = {
     {NULL, NULL, NULL},
     {STATEFUNC_PreShotInit, STATEFUNC_PreShotUpdate, STATEFUNC_PreShotExit},
     {STATEFUNC_ShotSetupInit, STATEFUNC_ShotSetupUpdate, STATEFUNC_ShotSetupExit},

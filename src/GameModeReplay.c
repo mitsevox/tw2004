@@ -167,7 +167,7 @@ void GameModeReplay_SetupNextGolfer(void) {
     gReplayData.nWeather = nF12;
     gReplayData.nWeatherAmount = nF14;
     Misc_SetSeedFunc(0, nSeed);
-    GOLFERSTATE_Switch(1, 0);
+    GOLFERSTATE_Switch(GS_PRE_SHOT, 0);
 }
 
 // For a replay whose weather option (nWeather) is 1, 2 or 3, forces its saved weather amount

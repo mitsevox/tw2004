@@ -333,8 +333,8 @@ void DynObj_RenderDynamicObjects(int nView) {
 // 0 in game mode 21 (alternate shot) while the player is in state 19 and the partner (gAltShotPartner)
 // is not; else 1.
 u8 DynObj_bAltShotDrawBall(int nPlayer) {
-    if (Game_GetMode() == 21 && (s8)GOLFERSTATE_GetCurrentState(nPlayer) == 19 &&
-        (s8)GOLFERSTATE_GetCurrentState(gAltShotPartner[nPlayer]) != 19) {
+    if (Game_GetMode() == 21 && (s8)GOLFERSTATE_GetCurrentState(nPlayer) == GS_WAIT &&
+        (s8)GOLFERSTATE_GetCurrentState(gAltShotPartner[nPlayer]) != GS_WAIT) {
         return 0;
     }
     return 1;
@@ -372,13 +372,14 @@ u8 DynObj_bDrawBall(int nPlayer) {
             return 0;
         }
     }
-    if ((nLie == 0 || nLie == 12 || nLie == 9) && (s8)GOLFERSTATE_GetCurrentState(nPlayer) == 19) {
+    if ((nLie == 0 || nLie == 12 || nLie == 9) && (s8)GOLFERSTATE_GetCurrentState(nPlayer) == GS_WAIT) {
         return 0;
     }
     if (!DynObj_bAltShotDrawBall(nPlayer)) {
         return 0;
     }
-    if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 18 && nPlayer == CameraController_GetClippedGolfer()) {
+    if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == GS_REMOVE_BALL
+        && nPlayer == CameraController_GetClippedGolfer()) {
         return 0;
     }
     return 1;
@@ -387,10 +388,12 @@ u8 DynObj_bDrawBall(int nPlayer) {
 // Whether nPlayer's ball shadow is drawn: not in state 1 while the swing clip's tag 3 is set, not
 // in state 18 while tag 4 is set, and not when DynObj_bAltShotDrawBall says no.
 u8 DynObj_bDrawShadow(int nPlayer) {
-    if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 1 && Character_IsTagSet(gPlayers[nPlayer].pChar, 3)) {
+    if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == GS_PRE_SHOT
+        && Character_IsTagSet(gPlayers[nPlayer].pChar, 3)) {
         return 0;
     }
-    if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 18 && Character_IsTagSet(gPlayers[nPlayer].pChar, 4)) {
+    if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == GS_REMOVE_BALL
+        && Character_IsTagSet(gPlayers[nPlayer].pChar, 4)) {
         return 0;
     }
     if (!DynObj_bAltShotDrawBall(nPlayer)) {
@@ -402,7 +405,7 @@ u8 DynObj_bDrawShadow(int nPlayer) {
 // 1 when nPlayer's ball lies on lie 9, the player is in state 19 and DynObj_bAltShotDrawBall allows
 // it.
 u8 DynObj_bDrawMarker(int nPlayer) {
-    if (gPlayers[nPlayer].ball.nLie == 9 &&(s8)GOLFERSTATE_GetCurrentState(nPlayer) == 19 &&
+    if (gPlayers[nPlayer].ball.nLie == 9 &&(s8)GOLFERSTATE_GetCurrentState(nPlayer) == GS_WAIT &&
         DynObj_bAltShotDrawBall(nPlayer)) {
         return 1;
     }
@@ -425,7 +428,7 @@ void DynObj_RenderBalls(int nView) {
     RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
     if (gSession.nSplitScreen == 0) {
         DynObj_DrawBallMarkers();
-        if ((s8)GOLFERSTATE_GetCurrentState(ViewController_GetActivePlayerNumber(nView)) != 9) {
+        if ((s8)GOLFERSTATE_GetCurrentState(ViewController_GetActivePlayerNumber(nView)) != GS_GREEN_MORPH) {
             DynObj_DrawBallShadows(aState);
         }
     }

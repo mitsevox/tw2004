@@ -13,8 +13,6 @@
 #include "game.h"
 #include "engine.h"
 
-// fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
-
 // One target's claim (TW07's captured ring and ring owner): the ring of the claiming shot (0 the
 // bullseye .. 4, 5 unclaimed) and who holds it (0 or 1, 5 nobody).
 typedef struct Claim {
@@ -306,7 +304,7 @@ void GameModeSkillZoneCapture_SetupNextGolfer(void) {
     n0 = GameModeSkillZoneCapture_GetTotalTargetsHit(0);
     n1 = GameModeSkillZoneCapture_GetTotalTargetsHit(1);
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        if ((s8)GOLFERSTATE_GetCurrentState(i) == 1) {
+        if ((s8)GOLFERSTATE_GetCurrentState(i) == GS_PRE_SHOT) {
             GameModeSkillZoneCapture_SetShotClock(900);
             if (PLAYER(i)->nBalls == 0) {
                 GameModeSkillZoneBase_SetCup_AlignGolfer(i, (s8)PLAYER(i)->nTarget);
@@ -480,7 +478,7 @@ void GameModeSkillZoneCapture_HitBall(int nPlayer) {
 // golfer goes to GS_SIMULATE, the toggle UI hides, the ticking stops and gCaptureShotClockOut is
 // set, so CheckShotAwards claims nothing and shows text 0xD1.
 void GameModeSkillZoneCapture_ShotClockOut(void) {
-    GOLFERSTATE_Switch(12, lbl_80282278);   // GS_SIMULATE
+    GOLFERSTATE_Switch(GS_SIMULATE, lbl_80282278);
     GUI_HideAllToggleUI();
     Gaud_StopShotClock();
     gCaptureShotClockOut = 1;

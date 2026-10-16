@@ -108,10 +108,9 @@ typedef struct GolferRecord {
 } GolferRecord;
 LAYOUT_ASSERT(GolferRecord, 0x140);
 
-// Golfer states: the rows of sGolferStateEngineTable (init, update, exit), kept on a per-player
-// stack by GOLFERSTATE_Push/Pop/Switch/Set. Names from TW06's table (docs/evidence/tw06-names.md); TW06
-// added two cut-scene states after PreShot and dropped the knee cam (our name for state 8).
-enum {
+// Golfer states: the rows of sGolferStateEngineTable (enter, update, exit), kept on a per-player
+// stack by GOLFERSTATE_Push/Pop/Switch/Set.
+typedef enum GolferState {
     GS_NONE                = 0,
     GS_PRE_SHOT            = 1,     // walking up and addressing the ball
     GS_SHOT_SETUP          = 2,     // a CPU thinks here; a human goes straight to GS_SWING
@@ -120,7 +119,7 @@ enum {
     GS_GREEN               = 5,     // green camera
     GS_GREEN_WATCH_ROLL    = 6,     // the putt preview
     GS_GREEN_REVERSE_PUTT  = 7,     // reverse-putt camera
-    GS_KNEE_CAM            = 8,     // camera 7, TW06's kCameraMode_KneeCam; no TW06 state
+    GS_KNEE_CAM            = 8,     // camera mode 7, popped once its button is released
     GS_GREEN_MORPH         = 9,     // the putt-line view
     GS_SWING               = 10,    // over the ball with the HUD: the stick swing
     GS_REPLAY_SWING        = 11,    // the swing animation playing out to impact
@@ -136,8 +135,13 @@ enum {
     GS_MID_HOLE_FLY_BY     = 21,
     GS_PLACE_BALL          = 22,
     GS_CONCEDED            = 23,
-    GS_NUM                 = 27     // table rows (24..26 empty)
-};
+    // Speed golf's own states: their rows are empty until SpeedGolf_SetGolferStates fills them
+    // (it also gives GS_SIMULATE the run), and SpeedGolf_Shutdown empties them again.
+    GS_SPEED_GOLF_RUN      = 24,    // running to the ball (SpeedGolf_Run*)
+    GS_SPEED_GOLF_COUNTDOWN = 25,   // the countdown before a hole (SpeedGolf_Countdown*)
+    GS_SPEED_GOLF_HOLE_OVER = 26,   // the player's hole is over (SpeedGolf_HoleOver*)
+    GS_NUM                 = 27     // table rows
+} GolferState;
 
 // Swing states (TW06: SW_eSwingState), the value of SwingData.nState. Stepped by the table
 // gSwingPhaseFns; "fidget" is holding the stick at the top of the backswing.
@@ -897,7 +901,6 @@ f32  Shot_AimAngle(int nPlayer);
 void AI_ClubLonger(int nPlayer, s32* pClub, int nStep);
 void AI_ClubShorter(int nPlayer, s32* pClub, int nStep);
 void AI_ChooseTarget(int nPlayer);
-void GOLFERSTATE_Kill(int nPlayer);      // Swing.c: pop every state
 f32  AI_PowerScale(int nPlayer);
 void fn_8002D560_ShapeDir(int nPlayer, f32* pOut);
 void Caddie_Start(int nPlayer);

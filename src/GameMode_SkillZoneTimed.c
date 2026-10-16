@@ -14,8 +14,6 @@
 #include "engine.h"
 #include "game/earnings.h"
 
-// fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
-
 // Mode 13's state; only this file uses it. The .sbss ones are defined last address first (the
 // compiler lays a file's .sbss out last definition first).
 s32 gTimedSavedWeather = 4;    // options.nWeather before the game (StartGamePreData; Shutdown restores it)
@@ -476,7 +474,7 @@ void GameModeSkillZoneTimed_SetupNextGolfer(void) {
     GameModeSkillZoneBase_ClearPerShotData();
     GameModeStroke_SetupNextGolfer();
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        if ((s8)GOLFERSTATE_GetCurrentState(i) == 1) {
+        if ((s8)GOLFERSTATE_GetCurrentState(i) == GS_PRE_SHOT) {
             GameModeSkillZoneBase_SetupBonusBall(i);
             GameModeSkillZoneTimed_SetHudClock(PLAYER(i)->n290[Game_CurHoleIndex()]);
             if (PLAYER(i)->nBalls == 0) {
@@ -565,16 +563,16 @@ void GameModeSkillZoneTimed_TenSecWarning(void) {
 // ball stops.
 void GameModeSkillZoneTimed_TimerOut(void) {
     Gaud_StopShotClock();
-    if ((s8)GOLFERSTATE_GetCurrentState(lbl_80282278) == 1 ||
-        (s8)GOLFERSTATE_GetCurrentState(lbl_80282278) == 2 ||
-        (s8)GOLFERSTATE_GetCurrentState(lbl_80282278) == 3 ||
-        (s8)GOLFERSTATE_GetCurrentState(lbl_80282278) == 4 ||
-        (s8)GOLFERSTATE_GetCurrentState(lbl_80282278) == 10) {
+    if ((s8)GOLFERSTATE_GetCurrentState(lbl_80282278) == GS_PRE_SHOT ||
+        (s8)GOLFERSTATE_GetCurrentState(lbl_80282278) == GS_SHOT_SETUP ||
+        (s8)GOLFERSTATE_GetCurrentState(lbl_80282278) == GS_ZOOM ||
+        (s8)GOLFERSTATE_GetCurrentState(lbl_80282278) == GS_ELEVATOR ||
+        (s8)GOLFERSTATE_GetCurrentState(lbl_80282278) == GS_SWING) {
         gPlayers[lbl_80282278].ball.nLie = 12;
         gPlayers[lbl_80282278].nSGFlags |= 0x04000000;
         GameModeSkillZoneTimed_SetHudClock(0);
         PlayNow_SendMessage18(lbl_80282278);
-        GOLFERSTATE_Switch(13, lbl_80282278);
+        GOLFERSTATE_Switch(GS_IN_THE_HOLE, lbl_80282278);
         GameModeSkillZoneBase_StartComment(0x14);
         return;
     }

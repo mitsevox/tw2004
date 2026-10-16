@@ -18,8 +18,6 @@
 #include "frontend/fe.h"
 #include "unsorted/cull.h"
 
-// fake match: the (s8) on GOLFERSTATE_GetCurrentState and the (u8) on GOLFERSTATE_Set's player (see game.h).
-
 // A course's limits for mode 8's prize (SpeedGolf_GetWinner): a round's seconds plus 3 a stroke
 // under nLimit5000 wins 5000, under nLimit2500 2500, under nLimit1000 1000.
 typedef struct SGCourse {
@@ -186,18 +184,18 @@ void SpeedGolf_Init(void) {
 // The pfnShutdown of modes 6, 7 and 8 (the mode ends): golfer state 12 gets the normal ball-flight
 // functions back (STATEFUNC_Simulate*), and speed golf's own states 24 to 26 are emptied.
 void SpeedGolf_Shutdown(void) {
-    sGolferStateEngineTable[12].pfnEnter = STATEFUNC_SimulateInit;
-    sGolferStateEngineTable[12].pfnUpdate = STATEFUNC_SimulateUpdate;
-    sGolferStateEngineTable[12].pfnExit = STATEFUNC_SimulateExit;
-    sGolferStateEngineTable[24].pfnEnter = NULL;
-    sGolferStateEngineTable[24].pfnUpdate = NULL;
-    sGolferStateEngineTable[24].pfnExit = NULL;
-    sGolferStateEngineTable[25].pfnEnter = NULL;
-    sGolferStateEngineTable[25].pfnUpdate = NULL;
-    sGolferStateEngineTable[25].pfnExit = NULL;
-    sGolferStateEngineTable[26].pfnEnter = NULL;
-    sGolferStateEngineTable[26].pfnUpdate = NULL;
-    sGolferStateEngineTable[26].pfnExit = NULL;
+    sGolferStateEngineTable[GS_SIMULATE].pfnEnter = STATEFUNC_SimulateInit;
+    sGolferStateEngineTable[GS_SIMULATE].pfnUpdate = STATEFUNC_SimulateUpdate;
+    sGolferStateEngineTable[GS_SIMULATE].pfnExit = STATEFUNC_SimulateExit;
+    sGolferStateEngineTable[GS_SPEED_GOLF_RUN].pfnEnter = NULL;
+    sGolferStateEngineTable[GS_SPEED_GOLF_RUN].pfnUpdate = NULL;
+    sGolferStateEngineTable[GS_SPEED_GOLF_RUN].pfnExit = NULL;
+    sGolferStateEngineTable[GS_SPEED_GOLF_COUNTDOWN].pfnEnter = NULL;
+    sGolferStateEngineTable[GS_SPEED_GOLF_COUNTDOWN].pfnUpdate = NULL;
+    sGolferStateEngineTable[GS_SPEED_GOLF_COUNTDOWN].pfnExit = NULL;
+    sGolferStateEngineTable[GS_SPEED_GOLF_HOLE_OVER].pfnEnter = NULL;
+    sGolferStateEngineTable[GS_SPEED_GOLF_HOLE_OVER].pfnUpdate = NULL;
+    sGolferStateEngineTable[GS_SPEED_GOLF_HOLE_OVER].pfnExit = NULL;
 }
 
 // Speed golf's golfer states go in as a round starts (mode 6's pfnStartGamePreData; modes 7 and 8
@@ -205,18 +203,18 @@ void SpeedGolf_Shutdown(void) {
 // ball (SpeedGolf_Run*), 25 the countdown before a hole (SpeedGolf_Countdown*), 26 the end of the
 // player's hole (SpeedGolf_HoleOver*). SpeedGolf_Shutdown puts the normal ones back.
 void SpeedGolf_SetGolferStates(void) {
-    sGolferStateEngineTable[12].pfnEnter = SpeedGolf_RunInit;
-    sGolferStateEngineTable[12].pfnUpdate = SpeedGolf_RunUpdate;
-    sGolferStateEngineTable[12].pfnExit = SpeedGolf_RunExit;
-    sGolferStateEngineTable[24].pfnEnter = SpeedGolf_RunInit;
-    sGolferStateEngineTable[24].pfnUpdate = SpeedGolf_RunUpdate;
-    sGolferStateEngineTable[24].pfnExit = SpeedGolf_RunExit;
-    sGolferStateEngineTable[25].pfnEnter = SpeedGolf_CountdownInit;
-    sGolferStateEngineTable[25].pfnUpdate = SpeedGolf_CountdownUpdate;
-    sGolferStateEngineTable[25].pfnExit = SpeedGolf_CountdownExit;
-    sGolferStateEngineTable[26].pfnEnter = SpeedGolf_HoleOverInit;
-    sGolferStateEngineTable[26].pfnUpdate = SpeedGolf_HoleOverUpdate;
-    sGolferStateEngineTable[26].pfnExit = SpeedGolf_HoleOverExit;
+    sGolferStateEngineTable[GS_SIMULATE].pfnEnter = SpeedGolf_RunInit;
+    sGolferStateEngineTable[GS_SIMULATE].pfnUpdate = SpeedGolf_RunUpdate;
+    sGolferStateEngineTable[GS_SIMULATE].pfnExit = SpeedGolf_RunExit;
+    sGolferStateEngineTable[GS_SPEED_GOLF_RUN].pfnEnter = SpeedGolf_RunInit;
+    sGolferStateEngineTable[GS_SPEED_GOLF_RUN].pfnUpdate = SpeedGolf_RunUpdate;
+    sGolferStateEngineTable[GS_SPEED_GOLF_RUN].pfnExit = SpeedGolf_RunExit;
+    sGolferStateEngineTable[GS_SPEED_GOLF_COUNTDOWN].pfnEnter = SpeedGolf_CountdownInit;
+    sGolferStateEngineTable[GS_SPEED_GOLF_COUNTDOWN].pfnUpdate = SpeedGolf_CountdownUpdate;
+    sGolferStateEngineTable[GS_SPEED_GOLF_COUNTDOWN].pfnExit = SpeedGolf_CountdownExit;
+    sGolferStateEngineTable[GS_SPEED_GOLF_HOLE_OVER].pfnEnter = SpeedGolf_HoleOverInit;
+    sGolferStateEngineTable[GS_SPEED_GOLF_HOLE_OVER].pfnUpdate = SpeedGolf_HoleOverUpdate;
+    sGolferStateEngineTable[GS_SPEED_GOLF_HOLE_OVER].pfnExit = SpeedGolf_HoleOverExit;
 }
 
 // The pfnSetupNextGolfer of modes 6, 7 and 8 (GM_SetupGolfer_IfAllWaiting, once every golfer
@@ -228,11 +226,11 @@ void SpeedGolf_SetupNextGolfer(void) {
     s8 nState;
     for (i = 0; i < gNumPlayersSetUp; i++) {
         nState = GOLFERSTATE_GetCurrentState(i);
-        if (nState < 1 || (nState > 12 && !GUI_IsPostShotUIAnimating(i))) {
+        if (nState < GS_PRE_SHOT || (nState > GS_SIMULATE && !GUI_IsPostShotUIAnimating(i))) {
             if (!Player_IsHoled(i)) {
-                GOLFERSTATE_Set(1, i);
+                GOLFERSTATE_Set(GS_PRE_SHOT, i);
             } else {
-                GOLFERSTATE_Set(19, i);
+                GOLFERSTATE_Set(GS_WAIT, i);
             }
         }
         PLAYER(i)->nSGFlags &= ~1;
@@ -527,7 +525,7 @@ void SpeedGolf_StartHole(void) {
         Character_AlignShotWithTarget(i, 1, 1);
         fn_80095744(PLAYER(i)->pChar, 1);
         Emotion_UpdatePlayerEmotion(i);
-        GOLFERSTATE_Set(25, i);
+        GOLFERSTATE_Set(GS_SPEED_GOLF_COUNTDOWN, i);
     }
 }
 
@@ -606,7 +604,7 @@ void SpeedGolf_CountdownUpdate(int nPlayer) {
             }
             gPlayers[nPlayer].nC54 = 44;
             gPlayers[nPlayer].nSGFlags ^= 6;
-            GOLFERSTATE_Set(2, nPlayer);
+            GOLFERSTATE_Set(GS_SHOT_SETUP, nPlayer);
             fn_80062C80(gPlayers[nPlayer].nUISlot, 1);
         }
     } else if (nPlayer == 0) {
@@ -686,11 +684,11 @@ void SpeedGolf_TradeEventPoints(int nPlayer, int nEvent) {
             gPlayers[nOther].nSGPoints = 6000;
             gPlayers[nPlayer].nSGFlags |= 0xC000;
             gPlayers[nOther].nSGFlags |= 0x10000 | 0x4000;
-            if ((s8)GOLFERSTATE_GetCurrentState(nOther) != 26) {
-                GOLFERSTATE_Set(26, (u8)nOther);
+            if ((s8)GOLFERSTATE_GetCurrentState(nOther) != GS_SPEED_GOLF_HOLE_OVER) {
+                GOLFERSTATE_Set(GS_SPEED_GOLF_HOLE_OVER, (u8)nOther);
             }
-            if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) != 26) {
-                GOLFERSTATE_Set(26, (u8)nPlayer);
+            if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_SPEED_GOLF_HOLE_OVER) {
+                GOLFERSTATE_Set(GS_SPEED_GOLF_HOLE_OVER, (u8)nPlayer);
             }
         } else {
             SpeedGolf_ShowPoints(gPlayers[nPlayer].nUISlot, gPlayers[nPlayer].nSGPoints, 0);
@@ -710,11 +708,11 @@ void SpeedGolf_TradeEventPoints(int nPlayer, int nEvent) {
                         gPlayers[nPlayer].nSGPoints = 6000;
                         gPlayers[nOther].nSGFlags |= 0xC000;
                         gPlayers[nPlayer].nSGFlags |= 0x10000 | 0x4000;
-                        if ((s8)GOLFERSTATE_GetCurrentState(nOther) != 26) {
-                            GOLFERSTATE_Set(26, (u8)nOther);
+                        if ((s8)GOLFERSTATE_GetCurrentState(nOther) != GS_SPEED_GOLF_HOLE_OVER) {
+                            GOLFERSTATE_Set(GS_SPEED_GOLF_HOLE_OVER, (u8)nOther);
                         }
-                        if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) != 26) {
-                            GOLFERSTATE_Set(26, (u8)nPlayer);
+                        if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_SPEED_GOLF_HOLE_OVER) {
+                            GOLFERSTATE_Set(GS_SPEED_GOLF_HOLE_OVER, (u8)nPlayer);
                         }
                     }
                 }
@@ -746,7 +744,7 @@ u8 SpeedGolf_OnBallAtRest(int nPlayer) {
     if (gSpeedGolfCanSwitchToShot && (gPlayers[nPlayer].nSGFlags & 0x100000)) {
         gSpeedGolfCanSwitchToShot = 0;
         gPlayers[nPlayer].nSGFlags &= ~0x100000;
-        GOLFERSTATE_Switch(1, nPlayer);
+        GOLFERSTATE_Switch(GS_PRE_SHOT, nPlayer);
         return 0;
     }
     if (Game_GetMode() != 7) {
@@ -764,7 +762,7 @@ u8 SpeedGolf_OnBallAtRest(int nPlayer) {
             SpeedGolf_ShowBallDirection(gPlayers[nPlayer].nUISlot, 0);
             SpeedGolf_ShowRunTip(gPlayers[nPlayer].nUISlot, 0);
             SpeedGolf_ShowStopBallPrompt(gPlayers[nPlayer].nUISlot, 0);
-            GOLFERSTATE_Switch(1, nPlayer);
+            GOLFERSTATE_Switch(GS_PRE_SHOT, nPlayer);
             return 0;
         }
         return 1;
@@ -797,7 +795,7 @@ u8 SpeedGolf_OnBallAtRest(int nPlayer) {
         SpeedGolf_ShowRunTip(gPlayers[nPlayer].nUISlot, 0);
         SpeedGolf_ShowStopBallPrompt(gPlayers[nPlayer].nUISlot, 0);
         if (gSpeedGolfCanSwitchToShot) {
-            GOLFERSTATE_Switch(1, nPlayer);
+            GOLFERSTATE_Switch(GS_PRE_SHOT, nPlayer);
             gSpeedGolfCanSwitchToShot = 0;
         } else {
             gPlayers[nPlayer].nSGFlags |= 0x100000;
@@ -1129,8 +1127,8 @@ void SpeedGolf_RunUpdate(int nPlayer) {
     if (gPlayers[nPlayer].ball.nState == 0) {
     } else if (gPlayers[nPlayer].ball.nState == 1 || gPlayers[nPlayer].ball.nState == 5) {
         if (!SpeedGolf_OnBallAtRest(nPlayer)) {
-            if (Game_GetMode() == 7 && (s8)GOLFERSTATE_GetCurrentState(nOther) == 26) {
-                GOLFERSTATE_Set(26, (u8)nPlayer);
+            if (Game_GetMode() == 7 && (s8)GOLFERSTATE_GetCurrentState(nOther) == GS_SPEED_GOLF_HOLE_OVER) {
+                GOLFERSTATE_Set(GS_SPEED_GOLF_HOLE_OVER, (u8)nPlayer);
             }
             return;
         }
@@ -1168,10 +1166,10 @@ void SpeedGolf_RunUpdate(int nPlayer) {
                     }
                 }
                 if ((gPlayers[nOther].nSGFlags & 8) || (gPlayers[nPlayer].nSGFlags & 0x10)) {
-                    GOLFERSTATE_Set(26, (u8)nPlayer);
+                    GOLFERSTATE_Set(GS_SPEED_GOLF_HOLE_OVER, (u8)nPlayer);
                     if (gPlayers[nOther].ball.nState != 2 && gPlayers[nOther].ball.nState != 3 &&
                         gPlayers[nOther].ball.nState != 4) {
-                        GOLFERSTATE_Set(26, (u8)nOther);
+                        GOLFERSTATE_Set(GS_SPEED_GOLF_HOLE_OVER, (u8)nOther);
                     }
                     return;
                 }
@@ -1184,7 +1182,7 @@ void SpeedGolf_RunUpdate(int nPlayer) {
                 LLMath_CopyVec(&pHole->tee[gSession.nTeeSet[nPlayer]].x, p->vA44);
                 gPlayers[nPlayer].nSGFlags &= ~1;
                 if (gSpeedGolfCanSwitchToShot) {
-                    GOLFERSTATE_Switch(1, nPlayer);
+                    GOLFERSTATE_Switch(GS_PRE_SHOT, nPlayer);
                     gSpeedGolfCanSwitchToShot = 0;
                 } else {
                     gPlayers[nPlayer].nSGFlags |= 0x100000;
@@ -1192,7 +1190,7 @@ void SpeedGolf_RunUpdate(int nPlayer) {
             } else {
                 GameModeSkillZoneTimed_SetHudClock(0);
                 PlayNow_SendMessage18(nPlayer);
-                GOLFERSTATE_Switch(13, nPlayer);
+                GOLFERSTATE_Switch(GS_IN_THE_HOLE, nPlayer);
                 if (gSpeedGolfFirstHoleTips) {
                     gSpeedGolfFirstHoleTips = 0;
                     gSpeedGolfSecondHoleTip = 1;
@@ -1213,7 +1211,7 @@ void SpeedGolf_RunUpdate(int nPlayer) {
             if (gPlayers[nPlayer].ball.nState == 5) {
                 GM_ReplaceOOBBall(nPlayer);
                 if (gSpeedGolfCanSwitchToShot) {
-                    GOLFERSTATE_Switch(1, nPlayer);
+                    GOLFERSTATE_Switch(GS_PRE_SHOT, nPlayer);
                     gSpeedGolfCanSwitchToShot = 0;
                 } else {
                     gPlayers[nPlayer].nSGFlags |= 0x100000;
@@ -1294,9 +1292,9 @@ void SpeedGolf_RunUpdate(int nPlayer) {
                 }
             }
         }
-        if (Game_GetMode() == 7 && (s8)GOLFERSTATE_GetCurrentState(nOther) == 26) {
-            if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) != 26) {
-                GOLFERSTATE_Set(26, (u8)nPlayer);
+        if (Game_GetMode() == 7 && (s8)GOLFERSTATE_GetCurrentState(nOther) == GS_SPEED_GOLF_HOLE_OVER) {
+            if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_SPEED_GOLF_HOLE_OVER) {
+                GOLFERSTATE_Set(GS_SPEED_GOLF_HOLE_OVER, (u8)nPlayer);
             }
             return;
         }
@@ -1390,7 +1388,7 @@ void SpeedGolf_RunUpdate(int nPlayer) {
                 SpeedGolf_ShowRunTip(gPlayers[nPlayer].nUISlot, 0);
                 SpeedGolf_ShowStopBallPrompt(gPlayers[nPlayer].nUISlot, 0);
                 if (gSpeedGolfCanSwitchToShot || Game_GetMode() != 7) {
-                    GOLFERSTATE_Switch(1, nPlayer);
+                    GOLFERSTATE_Switch(GS_PRE_SHOT, nPlayer);
                     gSpeedGolfCanSwitchToShot = 0;
                 } else {
                     gPlayers[nPlayer].nSGFlags |= 0x100000;
@@ -1478,8 +1476,8 @@ void SpeedGolf_UpdatePlayers(void) {
                                 gPlayers[nPlayer].nSGPoints = 6000;
                                 gPlayers[nOther].nSGFlags |= 0xC000;
                                 gPlayers[nPlayer].nSGFlags |= 0x10000 | 0x4000;
-                                GOLFERSTATE_Set(26, (u8)nOther);
-                                GOLFERSTATE_Set(26, (u8)nPlayer);
+                                GOLFERSTATE_Set(GS_SPEED_GOLF_HOLE_OVER, (u8)nOther);
+                                GOLFERSTATE_Set(GS_SPEED_GOLF_HOLE_OVER, (u8)nPlayer);
                                 return;
                             }
                         }
@@ -1491,14 +1489,14 @@ void SpeedGolf_UpdatePlayers(void) {
                     if ((Input_ReadControlPad(gPlayers[nPlayer].nController)
                          & Input_uiMap(0x25, 0)) &&
                         !SpeedGolf_IsStartXYHeld(nPlayer) &&
-                        ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 24 ||
+                        ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == GS_SPEED_GOLF_RUN ||
                          (gPlayers[nPlayer].ball.nLie != 0 && gPlayers[nPlayer].ball.nLie != LIE_INCUP_e &&
                           gPlayers[nPlayer].ball.nLie != 16 &&
-                          (s8)GOLFERSTATE_GetCurrentState(nPlayer) != 2 &&
-                          (s8)GOLFERSTATE_GetCurrentState(nPlayer) != 4 &&
-                          (s8)GOLFERSTATE_GetCurrentState(nPlayer) != 3 &&
-                          (s8)GOLFERSTATE_GetCurrentState(nPlayer) != 8 &&
-                          (s8)GOLFERSTATE_GetCurrentState(nPlayer) != 10))) {
+                          (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_SHOT_SETUP &&
+                          (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_ELEVATOR &&
+                          (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_ZOOM &&
+                          (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_KNEE_CAM &&
+                          (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_SWING))) {
                         SpeedGolf_TradeEventPoints(nPlayer, 0x27);
                         pHole = Ter_GetTGD();
                         Physics_InitBall(&gPlayers[nPlayer].ball,
@@ -1511,7 +1509,7 @@ void SpeedGolf_UpdatePlayers(void) {
                         SpeedGolf_ShowBallDirection(gPlayers[nPlayer].nUISlot, 0);
                         SpeedGolf_ShowRunTip(gPlayers[nPlayer].nUISlot, 0);
                         SpeedGolf_ShowStopBallPrompt(gPlayers[nPlayer].nUISlot, 0);
-                        GOLFERSTATE_Switch(1, nPlayer);
+                        GOLFERSTATE_Switch(GS_PRE_SHOT, nPlayer);
                         gSpeedGolfCanSwitchToShot = 0;
                     }
                 }
@@ -1522,7 +1520,7 @@ void SpeedGolf_UpdatePlayers(void) {
             i = PLR_1_e;
             if ((Input_ReadControlPad(gPlayers[i].nController) & Input_uiMap(0x25, 0))
                 && !SpeedGolf_IsStartXYHeld(i) &&
-                ((s8)GOLFERSTATE_GetCurrentState(i) == 24 ||
+                ((s8)GOLFERSTATE_GetCurrentState(i) == GS_SPEED_GOLF_RUN ||
                  (gPlayers[i].ball.nLie != 0 && gPlayers[i].ball.nLie != LIE_INCUP_e &&
                   gPlayers[i].ball.nLie != 16))) {
                 pHole = Ter_GetTGD();
@@ -1533,7 +1531,7 @@ void SpeedGolf_UpdatePlayers(void) {
                 SpeedGolf_ShowBallDirection(gPlayers[i].nUISlot, 0);
                 SpeedGolf_ShowRunTip(gPlayers[i].nUISlot, 0);
                 SpeedGolf_ShowStopBallPrompt(gPlayers[i].nUISlot, 0);
-                GOLFERSTATE_Switch(1, i);
+                GOLFERSTATE_Switch(GS_PRE_SHOT, i);
             }
         }
         gSpeedGolfCanSwitchToShot = 1;
@@ -1663,7 +1661,8 @@ void SpeedGolf_HoleOverUpdate(int nPlayer) {
         gPlayers[nPlayer].nSGFlags |= 8;
         GM_EndOfGolferTurn(nPlayer);
         nOther = nPlayer ? 0 : 1;
-        if ((s8)GOLFERSTATE_GetCurrentState(nOther) != 26 && gPlayers[nOther].ball.nState == 0) {
+        if ((s8)GOLFERSTATE_GetCurrentState(nOther) != GS_SPEED_GOLF_HOLE_OVER
+            && gPlayers[nOther].ball.nState == 0) {
             gPlayers[nOther].nSGFlags |= 8;
             gPlayers[nPlayer].nSGFlags |= 8;
             // EA bug: nPlayer's turn is ended a second time; the other player's is never ended here
@@ -1771,17 +1770,21 @@ void SpeedGolf_SetHoleTime(int nPlayer, int nFrames) {
 // (message 17, 0), game message 18 and state 13.
 void SpeedGolf_TimerOut(void) {
     PlayerNumber_t nPlayer = PLR_1_e;
-    if (((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 1 || (s8)GOLFERSTATE_GetCurrentState(nPlayer) == 2 ||
-         (s8)GOLFERSTATE_GetCurrentState(nPlayer) == 3 || (s8)GOLFERSTATE_GetCurrentState(nPlayer) == 4 ||
-         (s8)GOLFERSTATE_GetCurrentState(nPlayer) == 10) &&
-        ((s8)GOLFERSTATE_GetCurrentState(PLR_2_e) == 1 || (s8)GOLFERSTATE_GetCurrentState(PLR_2_e) == 2 ||
-         (s8)GOLFERSTATE_GetCurrentState(PLR_2_e) == 3 || (s8)GOLFERSTATE_GetCurrentState(PLR_2_e) == 4 ||
-         (s8)GOLFERSTATE_GetCurrentState(PLR_2_e) == 10)) {
+    if (((s8)GOLFERSTATE_GetCurrentState(nPlayer) == GS_PRE_SHOT ||
+         (s8)GOLFERSTATE_GetCurrentState(nPlayer) == GS_SHOT_SETUP ||
+         (s8)GOLFERSTATE_GetCurrentState(nPlayer) == GS_ZOOM ||
+         (s8)GOLFERSTATE_GetCurrentState(nPlayer) == GS_ELEVATOR ||
+         (s8)GOLFERSTATE_GetCurrentState(nPlayer) == GS_SWING) &&
+        ((s8)GOLFERSTATE_GetCurrentState(PLR_2_e) == GS_PRE_SHOT ||
+         (s8)GOLFERSTATE_GetCurrentState(PLR_2_e) == GS_SHOT_SETUP ||
+         (s8)GOLFERSTATE_GetCurrentState(PLR_2_e) == GS_ZOOM ||
+         (s8)GOLFERSTATE_GetCurrentState(PLR_2_e) == GS_ELEVATOR ||
+         (s8)GOLFERSTATE_GetCurrentState(PLR_2_e) == GS_SWING)) {
         gPlayers[nPlayer].ball.nLie = LIE_INCUP_e;
         gPlayers[nPlayer].nSGFlags |= 0x4000000;
         GameModeSkillZoneTimed_SetHudClock(0);
         PlayNow_SendMessage18(nPlayer);
-        GOLFERSTATE_Switch(13, nPlayer);
+        GOLFERSTATE_Switch(GS_IN_THE_HOLE, nPlayer);
     }
 }
 
