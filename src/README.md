@@ -124,7 +124,8 @@ early in link order (0x80005628-0x80013720), between the LL rendering files.
 | ByteSwap.c | ours | copies little-endian disc data while swapping byte order |
 | LLTime.c | T7 | the clock and its stopwatch counters (`TI_*`) the main loop times frames with |
 | VecMath.c | ours (TW06: `vec4flt_*`) | paired-single vector and matrix helpers used everywhere |
-| llrtclock.c | T6 | the real-time clock as a date and as text |
+| LLRTClock_Gc.c | ours (after TW07 `LLRTClock_PS3.c`) | the console's date and time, read from the OS clock as numbers |
+| LLRTClock.c | T7 | the console's date and time as one line of text, for the front end |
 | GoARAM.c | EA | audio RAM: set-up, heap and the DMA queue (front end, memory card and animation park data there) |
 
 ### Rendering

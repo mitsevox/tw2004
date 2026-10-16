@@ -141,6 +141,8 @@ LLMem_Gc.c	open
 LLObj_Gc.c	open		
 LLPictInt.c	open		
 LLPict_Gc.c	open		
+LLRTClock.c	open		
+LLRTClock_Gc.c	open		
 LLTex.c	open		
 LLTexGrp.c	open		
 LLTime.c	done	49974e64	claude-review
@@ -225,7 +227,6 @@ hwsBurn.c	open
 hwsMaterial_Gc.c	open		
 hwsOverride_Gc.c	open		
 hwsRender_Gc.c	open		
-llrtclock.c	open		
 maddec.c	open		
 maddeca.c	open		
 madidct.c	open		
