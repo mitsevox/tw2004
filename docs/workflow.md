@@ -44,7 +44,7 @@ Before you commit
 
 ```
 ninja                                         # main.dol: OK
-python tools/quality/lint.py --diff main      # style findings on the lines you changed
+python tools/quality/lint.py --diff main      # style findings your branch added
 python tools/quality/typeaudit.py --count     # no number higher than on main
 python tools/quality/symaudit.py --count      # no number higher than on main
 python tools/quality/constcheck.py --count    # no number higher than on main
