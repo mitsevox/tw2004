@@ -75,9 +75,9 @@ void DS_vInitModule(void) {
 
     // fake match: mProjection, uChanged and uFlags through the global, the rest through p (only
     // this mix gives the original's base registers)
-    p->nDepthCompare = 3;
+    p->eDepthCompare = DS_COMPARE_LEQUAL;
     p->bDepthWrite = 1;
-    p->nAlphaCompare = 6;
+    p->eAlphaCompare = DS_COMPARE_GEQUAL;
     p->nAlphaRef = 100;
     p->bAlphaTest = 0;
     p->nBlendSrc = 4;
@@ -122,9 +122,10 @@ void RenderState_Apply(void) {
 
     nStage = 0;
     if (gRenderState.uChanged != 0) {
-        // depth: compare unless the test always passes (GX_ALWAYS)
-        if ((gRenderState.uChanged & 0x1) || (gRenderState.uChanged & 0x2)) {
-            GXSetZMode(gRenderState.nDepthCompare != 7, gRenderState.nDepthCompare,
+        // depth: compare unless the test always passes
+        if ((gRenderState.uChanged & DS_CHANGED_ZBUFFER_MODE)
+            || (gRenderState.uChanged & DS_CHANGED_ZBUFFER_UPDATE)) {
+            GXSetZMode(gRenderState.eDepthCompare != DS_COMPARE_ALWAYS, gRenderState.eDepthCompare,
                        gRenderState.bDepthWrite);
         }
         if (gRenderState.uChanged & 0x10) {
@@ -142,13 +143,13 @@ void RenderState_Apply(void) {
             }
         }
         // alpha test: off, or compare against nAlphaRef with the depth test after texturing
-        if (gRenderState.uChanged & 0x4) {
+        if (gRenderState.uChanged & DS_CHANGED_ALPHA_TEST_MODE) {
             if (gRenderState.bAlphaTest == 0) {
                 GXSetZCompLoc(1);
                 GXSetAlphaCompare(7, 0, 0, 7, 0);
             } else {
                 GXSetZCompLoc(0);
-                GXSetAlphaCompare(gRenderState.nAlphaCompare, gRenderState.nAlphaRef, 0, 7, 0);
+                GXSetAlphaCompare(gRenderState.eAlphaCompare, gRenderState.nAlphaRef, 0, 7, 0);
             }
         }
         if (gRenderState.uChanged & 0x20) {

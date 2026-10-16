@@ -64,8 +64,8 @@ void fn_800BA74C(u8 bFade) {
         RenderState_SetBlendFactors(4, 5);
         RenderView_SetUseCurrentMatrices(0);
         RenderState_SetDrawFlags(64);
-        DS_vSetAlphaTestMode(0, 6, 0x80);
-        DS_vSetZBufferMode(7);
+        DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
+        DS_vSetZBufferMode(DS_COMPARE_ALWAYS);
         RenderState_Flush();
         RenderView_DrawPrimitive(0xA1, xy, 0, NULL, 2);
         Input_vUpdate();
@@ -80,8 +80,8 @@ void fn_800BA74C(u8 bFade) {
             fn_80007260();
         }
     }
-    DS_vSetAlphaTestMode(0, 6, 0x80);
-    DS_vSetZBufferMode(3);
+    DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
+    DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
     RenderState_Flush();
     fn_800083A0();
     fn_80008380();

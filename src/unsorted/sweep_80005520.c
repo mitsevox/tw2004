@@ -11,7 +11,7 @@ void StaticMem_PreInit();
 void StaticMem_Init();
 void Math_InitLog2Table();
 void fn_8000B984();
-void DS_vInitOnce();
+void Input_vInitOnce();
 void Input_iInitModule();
 void StreamManager_InitOnce();
 void fn_8002F1D4();
@@ -32,7 +32,7 @@ void fn_80005520(void) {
     fn_8000B984();
     StaticMem_Init();
     fn_80005EC0();
-    DS_vInitOnce();
+    Input_vInitOnce();
     UStream_AllocBuffers();
     Session_Init();
     fn_8002F1D4();

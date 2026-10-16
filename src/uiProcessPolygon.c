@@ -217,7 +217,7 @@ void UIPoly_Draw(FEQuad* pQuad) {
         aOut[i].z = fZ;
     }
     DS_vEnableZBufferUpdate(0);
-    DS_vSetZBufferMode(7);
+    DS_vSetZBufferMode(DS_COMPARE_ALWAYS);
     RenderState_Flush();
     if (aColour[0][3] != 0.0f || aColour[1][3] != 0.0f || aColour[2][3] != 0.0f
         || aColour[3][3] != 0.0f) {
@@ -536,8 +536,8 @@ void UI_DrawLoadingBarTile(int nPoint) {
 
     fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
     RenderState_SetBlendFactors(4, 5);
-    DS_vSetAlphaTestMode(0, 6, 0x80);
-    DS_vSetZBufferMode(7);
+    DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
+    DS_vSetZBufferMode(DS_COMPARE_ALWAYS);
     RenderView_SetUseCurrentMatrices(0);
     DS_vEnableZBufferUpdate(0);
     RenderState_SetBankTexture(gpUILoadingBarBank, gpUILoadingBarTexture);
@@ -684,8 +684,8 @@ void UI_DrawFullScreenPicture(LLPict* pPict, f32 fAlpha) {
     RenderState_SetPicture(pPict);
     RenderState_SetBlendFactors(4, 5);
     RenderState_SetDrawFlags(0x50);
-    DS_vSetAlphaTestMode(0, 6, 0x80);
-    DS_vSetZBufferMode(7);
+    DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
+    DS_vSetZBufferMode(DS_COMPARE_ALWAYS);
     nOld = RC_GetCurrentFrameBuffer();
     FB_vSetFrameBuffer(&frameBuf, 0.0f, 0.0f, 512.0f, 448.0f, 1.0f, 1.0f);
     // port: the render slot is typed s32 but holds a pointer

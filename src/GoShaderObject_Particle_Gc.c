@@ -269,8 +269,8 @@ void fn_800949D0(SD_SShaderObject_Static* pObject) {
     nLive = pSys->anLive[nBuf];
     nStart = pSys->anStart[nBuf];
     if (nLive != 0) {
-        DS_vSetAlphaTestMode(0, 6, 0x80);
-        DS_vSetZBufferMode(3);
+        DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
+        DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
         DS_vEnableZBufferUpdate(0);
         RenderState_SetDrawFlags(0x70);
         RenderState_SetBankTexture(pSys->pBank, pSys->pTex);
@@ -306,7 +306,7 @@ void fn_800949D0(SD_SShaderObject_Static* pObject) {
             fn_80094534(pCamera->viewMtx, &pSys->shape, pVerts, pAges, nLive - n);
         }
         DS_vEnableZBufferUpdate(1);
-        DS_vSetAlphaTestMode(1, 6, 0x80);
+        DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 0x80);
         RenderState_Flush();
     }
 }

@@ -762,11 +762,15 @@ f32*   CameraController_GetCameraOrigin(View* pView);        // the camera's pos
 f32*   CameraController_GetCameraLookPoint(View* pView);    // where it looks (v10), or a script shot's angles
 u8     CameraController_IsFlybyDone(View* pView);        // 0: the script's shot aims by angles
                                                          // (ViewController_Update)
-VM_SViewport* RC_spGetRenderCtxViewport(void* pCamera);   // a render camera's viewport
+
+// RenderAccessors.c: a viewport's rectangle and a render context's viewport (its render state
+// setters are in engine.h).
 f32    VM_fGetViewportHeight(VM_SViewport* pViewport);
 f32    VM_fGetViewportWidth(VM_SViewport* pViewport);
 f32    VM_fGetViewportTop(VM_SViewport* pViewport);
 f32    VM_fGetViewportLeft(VM_SViewport* pViewport);
+VM_SViewport* RC_spGetRenderCtxViewport(RenderCamera* pRenderCtx);
+
 f32    VM_fGetViewportHeightOverWidth(VM_SViewport* pViewport);   // GoRenderCtx_Gc.c
 void*  RC_spGetCurrentRenderCtx(void);               // the current render camera
 void   RC_vUpdateRenderCtxTransformationMatrices(void* pCamera);

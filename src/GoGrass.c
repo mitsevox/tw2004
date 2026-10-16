@@ -418,8 +418,8 @@ void Grass_RenderTopTexture(void) {
     pCamera = RC_spGetCurrentRenderCtx();
     RC_vSetCurrentRenderCtx(gpGrassMgr->pCamera);
     DS_vEnableZBufferUpdate(0);
-    DS_vSetZBufferMode(7);
-    DS_vSetAlphaTestMode(0, 6, 128);
+    DS_vSetZBufferMode(DS_COMPARE_ALWAYS);
+    DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 128);
     RenderState_SetRenderSurface(1, 256, 256, 0, 1, 1);
     RenderState_SetScissor(0, 0, 256, 256);
     fn_80016B54(256, 256, 1.0f, 1.0f);
@@ -434,7 +434,7 @@ void Grass_RenderTopTexture(void) {
     RenderState_SetDrawFlags(0);
     RenderView_SetColor(gGrassTopClearColor);
     DS_vEnableZBufferUpdate(0);
-    DS_vSetAlphaTestMode(0, 6, 128);
+    DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 128);
     RenderState_Flush();
     RenderView_DrawPrimitive(161, gGrassTopQuad, 0, gGrassTopQuad, 2);
     nOld = Ter_SetManageZUpdate(0);
@@ -450,9 +450,9 @@ void Grass_RenderTopTexture(void) {
     RenderState_SetScissor(0, 0, 512, 448);
     fn_80016B54(512, 448, 1.0f, 1.0f);
     RC_ApplyCurrentViewport();
-    DS_vSetAlphaTestMode(1, 6, 128);
+    DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 128);
     DS_vEnableZBufferUpdate(1);
-    DS_vSetZBufferMode(3);
+    DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
     RenderState_Flush();
 }
 
@@ -463,7 +463,7 @@ void Grass_DrawTopTextureDebug(void) {
     RenderState_SetDrawFlags(16);
     RenderView_SetColor(gGrassDebugColor);
     DS_vEnableZBufferUpdate(0);
-    DS_vSetAlphaTestMode(0, 6, 128);
+    DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 128);
     GXLoadTexObj(&gGrassTopTexObj, 0);
     GXSetNumTexGens(1);
     GXSetTevOrder(0, 0, 0, 4);
@@ -472,12 +472,12 @@ void Grass_DrawTopTextureDebug(void) {
     GXSetTevColorOp(0, 0, 0, 1, 1, 0);
     GXSetTevAlphaIn(0, 7, 4, 5, 7);
     GXSetTevAlphaOp(0, 0, 0, 1, 1, 0);
-    DS_vSetZBufferMode(7);
+    DS_vSetZBufferMode(DS_COMPARE_ALWAYS);
     RenderState_Flush();
     RenderView_DrawPrimitive(161, gGrassDebugQuadPos, 0, gGrassDebugQuadUV, 2);
-    DS_vSetZBufferMode(3);
+    DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
     DS_vEnableZBufferUpdate(1);
-    DS_vSetAlphaTestMode(1, 6, 128);
+    DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 128);
     RenderState_Flush();
 }
 
@@ -488,7 +488,7 @@ void Grass_BeginRender(void) {
     RC_vUpdateRenderCtxTransformationMatrices(RC_spGetCurrentRenderCtx());
     RenderState_SetClipMode(0);
     RenderState_SetCameraMatrices();
-    DS_vSetAlphaTestMode(0, 6, 128);
+    DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 128);
     DS_vEnableZBufferUpdate(0);
     RenderState_SetDrawFlags(80);
     RenderState_Flush();
@@ -558,7 +558,7 @@ void GrassRender_vBuildAndUploadOneTimeData(void) {
 }
 
 void Grass_EndRender(void) {
-    DS_vSetAlphaTestMode(1, 6, 128);
+    DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 128);
     DS_vEnableZBufferUpdate(1);
     RenderState_Flush();
 }

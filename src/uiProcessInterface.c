@@ -170,7 +170,7 @@ void UI_DrawInterface(s32 nTicks) {
         RenderView_SetUseCurrentMatrices(0);
         RenderState_SetBlendFactors(4, 5);
         DS_vEnableZBufferUpdate(0);
-        DS_vSetAlphaTestMode(1, 6, 1);
+        DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 1);
         RenderState_Flush();
         if (gbUIFirstMenuDraw && gSession.nGameType == 3) {
             UI_ClearFirstMenuDraw();
@@ -187,8 +187,8 @@ void UI_DrawInterface(s32 nTicks) {
         fn_80012C54_SetWordWrap(0);
         fn_80016B6C(1.0f, 1.0f);
         DS_vEnableZBufferUpdate(1);
-        DS_vSetAlphaTestMode(1, 6, 0x80);
-        DS_vSetZBufferMode(3);
+        DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 0x80);
+        DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
         RenderState_Flush();
         if (gUIDelayedHint.nFrames <= 2 && gUIDelayedHint.nFrames >= 0) {
             gUIDelayedHint.nFrames++;

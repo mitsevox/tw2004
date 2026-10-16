@@ -16,6 +16,11 @@ void Input_ScaleAnalog(PadStatus* pStatus, PadAnalog* pAnalog);
 
 Controllers gControllers;   // the four pads: what Input_vUpdate read, and their rumble state
 
+// The controllers' once-only start-up: empty on this machine. main's start-up list calls it after
+// setting up the file reads, as the shut-down list calls Input_vCloseOnce after closing them.
+void Input_vInitOnce(void) {
+}
+
 // Starts the pad library and clears the four pads' state: D-pad emulation off, rumble switched on
 // and allowed on every pad. Returns 0. Called once, by the start-up list fn_80005520.
 int Input_iInitModule(void) {

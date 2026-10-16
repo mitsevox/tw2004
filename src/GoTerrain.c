@@ -280,12 +280,12 @@ void Ter_UnRegisterStreamClients(void) {
     Stream_UnregisterLoadChunkCallback('tgd ');
 }
 
-// Puts the render state back after drawing terrain: constant alpha off, alpha test on (mode 6,
-// reference 128), z buffer mode 3 with writes on.
+// Puts the render state back after drawing terrain: constant alpha off, alpha test on (greater
+// or equal, reference 128), depth test less or equal with writes on.
 void Ter_EndRender(void) {
     RenderState_SetConstantAlphaOn(0);
-    DS_vSetAlphaTestMode(1, 6, 128);
-    DS_vSetZBufferMode(3);
+    DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 128);
+    DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
     DS_vEnableZBufferUpdate(1);
     RenderState_Flush();
 }
@@ -302,8 +302,8 @@ void Ter_BeginRender(void) {
     RenderState_SetCameraMatrices();
     RenderState_SetCameraMatrices();
     RenderState_SetBlendFactors(4, 5);
-    DS_vSetAlphaTestMode(1, 6, 1);
-    DS_vSetZBufferMode(3);
+    DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 1);
+    DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
     LF_vSetCurrentLightFogEnvironment(2);
     LF_UseCurrentFogSettings();
     LF_UpdateFog();
@@ -398,7 +398,7 @@ void Ter_RenderView(void* pHoleData, int nView) {
     Ter_DrawPatchPass(2);
     Ter_DrawObjects();
     RenderState_SetBlendFactors(4, 5);
-    DS_vSetAlphaTestMode(1, 6, 0x80);
+    DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 0x80);
     RenderState_SetDrawFlags(0x70);
     RenderState_Flush();
 }
@@ -1070,7 +1070,7 @@ void Ter_DrawPatchPass(int nRenderPass) {
         }
         RenderState_Flush();
         RenderState_SetDrawFlags(0x70);
-        DS_vSetAlphaTestMode(0, 6, 1);
+        DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 1);
         for (nList = 0; nList <= 2; nList++) {
             if (nRenderPass != 2) {
                 if (nList == 0) {
@@ -1107,7 +1107,7 @@ void Ter_DrawPatchPass(int nRenderPass) {
         Ter_DrawObjectList(gTerRenderer.pDeferredItemsList, gTerRenderer.iDeferredItems,
                     gTerRenderer.eTerrainFilterMin, gTerRenderer.eTerrainFilterMag);
         gTerRenderer.iDeferredItems = 0;
-        DS_vSetAlphaTestMode(1, 6, 1);
+        DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 1);
         RenderState_Flush();
         Ter_SetZWrite(1);
         RenderState_Flush();
@@ -1181,7 +1181,7 @@ void Ter_DrawFarClipPatches(void) {
                 }
             }
         }
-        DS_vSetAlphaTestMode(1, 6, 1);
+        DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 1);
         RenderState_Flush();
         Ter_SetZWrite(1);
         RenderState_Flush();
@@ -1198,7 +1198,7 @@ void Ter_DrawObjects(void) {
         Ter_DrawObjectList(gTerRenderer.pTranslucentObjectList, gTerRenderer.iTranslucentObjects,
                     gTerRenderer.eObjectFilterMin, gTerRenderer.eObjectFilterMag);
     }
-    DS_vSetAlphaTestMode(1, 6, 128);
+    DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 128);
     RenderState_Flush();
 }
 
@@ -1254,7 +1254,7 @@ void Ter_DrawPostDrawObjects(void) {
     Ter_SetZWrite(1);
     RenderState_SetConstantAlphaOn(0);
     Ter_EndRender();
-    DS_vSetAlphaTestMode(1, 6, 128);
+    DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 128);
     RenderState_Flush();
 }
 
@@ -1317,7 +1317,7 @@ void Ter_DrawPatchGround(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32
     uFlags2 = Ter_GetMeshFlags(pGround, 2);
     pMesh = Ter_GetMeshChild(pGround, 0);
     if ((n20 & uPinBit) && !(n20 & uOtherPins)) {
-        DS_vSetAlphaTestMode(1, 6, 1);
+        DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 1);
         RenderState_Flush();
         bPinSet = 1;
     }
@@ -1364,7 +1364,7 @@ void Ter_DrawPatchGround(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32
         Ter_GetMeshNext(pMesh);
     }
     if (bPinSet) {
-        DS_vSetAlphaTestMode(0, 6, 1);
+        DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 1);
         RenderState_Flush();
     }
 }
@@ -1508,14 +1508,14 @@ u8 Ter_SetObjectRenderState(Ter_ObjectDrawData* pDraw, u8 bForce) {
     }
     if (fAlpha != gTerLastObjectAlpha || (s8)bZWrite != gTerLastZWrite || bForce) {
         if (1.0f == fAlpha) {
-            DS_vSetAlphaTestMode(1, 6, nRef);
+            DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, nRef);
             RenderState_ChangeDrawFlags(0x40, ((uFlags & 0x40) ? 0x40 : 0)
                                   | (((uFlags & 0x10) ? 0x10 : 0) | ((uFlags & 0x20) ? 0x20 : 0)));
             Ter_SetZWrite(bZWrite);
             RenderState_SetConstantAlphaOn(0);
             RenderState_SetBlendFactors(4, 5);
         } else {
-            DS_vSetAlphaTestMode(1, 6, fAlpha * nRef);
+            DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, fAlpha * nRef);
             Ter_SetZWrite(1);
             RenderState_SetConstantAlphaOn(1);
             RenderState_SetConstantAlpha(255.0f * (0.5f * fAlpha));
@@ -2194,7 +2194,7 @@ void Ter_RenderGrass(void) {
     RenderState_SetCameraMatrices();
     RenderState_SetCameraMatrices();
     RenderState_SetBlendFactors(4, 5);
-    DS_vSetAlphaTestMode(1, 6, 1);
+    DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 1);
     RenderState_SetDrawFlags(0x70);
     RenderState_Flush();
     gTerRenderer.xCameraReferencePos[0] = pLens->m4[3][0];
@@ -2267,7 +2267,7 @@ void Ter_DrawGrassPatches(int nRenderPass) {
             }
         }
     }
-    DS_vSetAlphaTestMode(1, 6, 1);
+    DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 1);
     RenderState_Flush();
     Ter_SetZWrite(1);
     RenderState_Flush();
@@ -2307,7 +2307,7 @@ void Ter_DrawGrassPatchesPass3(void) {
             }
         }
     }
-    DS_vSetAlphaTestMode(1, 6, 1);
+    DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 1);
     RenderState_Flush();
     Ter_SetZWrite(1);
     RenderState_Flush();

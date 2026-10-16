@@ -465,7 +465,7 @@ void GR_DrawGreenGrid(int nView) {
     GR_BuildGridRenderData(nView);
     RenderState_SetCameraMatrices();
     RenderState_SetBlendFactors(4, 5);
-    DS_vSetAlphaTestMode(0, 6, 0x80);
+    DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
     DS_vEnableZBufferUpdate(0);
     RenderState_SetBankTexture(gpGreenGridTexBank, gpGreenGridTex);
     if (gpGreenGrid->b104) {
@@ -496,7 +496,7 @@ void GR_DrawGreenGrid(int nView) {
     desc.pUV = gpGreenGrid->apUV[nView];
     SD_FillShaderObject((ShaderObject*)gpGreenGrid->aMesh[nView], &desc, 1);
     SD_DrawShaderObject(gpGreenGrid->aMesh[nView]);
-    DS_vSetAlphaTestMode(1, 6, 0x80);
+    DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 0x80);
     DS_vEnableZBufferUpdate(1);
     RenderState_Flush();
 }

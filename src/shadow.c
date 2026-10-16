@@ -209,7 +209,7 @@ void fn_800B281C(void) {
     fn_800169AC();
     RenderView_SetUseCurrentMatrices(0);
     RenderState_SetDrawFlags(0);
-    DS_vSetAlphaTestMode(0, 6, 0x80);
+    DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
     RenderState_Flush();
     aColour[0] = 0.0f;
     aColour[1] = 0.0f;
@@ -363,8 +363,8 @@ void fn_800B28D4(Character* pChar, int nView, u8 bFlat) {
     RenderState_SetCameraMatrices();
     RenderState_SetDrawFlags(0);
     DS_vEnableZBufferUpdate(0);
-    DS_vSetAlphaTestMode(0, 6, 0x80);
-    DS_vSetZBufferMode(7);
+    DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
+    DS_vSetZBufferMode(DS_COMPARE_ALWAYS);
     RenderState_SetScissor(0, 0, p->nWidth, p->nHeight);
     fn_800B281C();
     RenderState_SetScissor(1, 1, p->nWidth - 1, p->nHeight - 1);
@@ -375,8 +375,8 @@ void fn_800B28D4(Character* pChar, int nView, u8 bFlat) {
     fn_800B2470();
     fn_80016B54(0x200, 0x1C0, 1.0f, 1.0f);
     DS_vEnableZBufferUpdate(1);
-    DS_vSetAlphaTestMode(1, 6, 0x80);
-    DS_vSetZBufferMode(3);
+    DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 0x80);
+    DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
     RenderState_SetRenderSurface(0, 0x200, 0x1C0, lbl_80281B88 & 1, 8, 1);
     RenderState_SetScissor(0, 0, 0x200, 0x1C0);
     RC_vSetCurrentRenderCtx(pOldCamera);
@@ -426,8 +426,8 @@ void fn_800B2DB0(f32* pCentre, f32 (*pQuad)[4], f32 fHalfX, f32 fHalfZ) {
     fn_8002A608(&p->tex);
     RenderState_SetCameraMatrices();
     RenderState_SetClipMode(0);
-    DS_vSetAlphaTestMode(0, 6, 0x80);
-    DS_vSetZBufferMode(7);
+    DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
+    DS_vSetZBufferMode(DS_COMPARE_ALWAYS);
     DS_vEnableZBufferUpdate(0);
     RenderState_SetBlendFactors(4, 5);
     RenderState_Flush();
@@ -440,8 +440,8 @@ void fn_800B2DB0(f32* pCentre, f32 (*pQuad)[4], f32 fHalfX, f32 fHalfZ) {
     desc.pUV = aUV[0];
     SD_FillShaderObject((ShaderObject*)p->aMesh[0], &desc, 1);
     SD_DrawShaderObject(p->aMesh[0]);
-    DS_vSetAlphaTestMode(1, 6, 0x80);
-    DS_vSetZBufferMode(6);
+    DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 0x80);
+    DS_vSetZBufferMode(DS_COMPARE_GEQUAL);
     DS_vEnableZBufferUpdate(1);
 }
 
@@ -520,9 +520,9 @@ void fn_800B2FB0(Character* pChar, int nView, u8 bFlat) {
     RenderState_SetDrawFlags(0x70);
     RenderState_SetCameraMatrices();
     RenderState_SetClipMode(0);
-    DS_vSetZBufferMode(3);
+    DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
     RenderState_SetBlendFactors(4, 5);
-    DS_vSetAlphaTestMode(0, 6, 0x80);
+    DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
     RenderState_SetRenderSurface(0, 0x200, 0x1C0, lbl_80281B88 & 1, 8, 1);
     fn_8002A608(&p->tex);
     RenderState_Flush();
@@ -576,8 +576,8 @@ void fn_800B2FB0(Character* pChar, int nView, u8 bFlat) {
     desc.pUV = lbl_80282168;
     SD_FillShaderObject((ShaderObject*)p->aMesh[nView], &desc, 1);
     SD_DrawShaderObject(p->aMesh[nView]);
-    DS_vSetZBufferMode(3);
-    DS_vSetAlphaTestMode(1, 6, 0x80);
+    DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
+    DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 0x80);
     RenderState_SetRenderSurface(0, 0x200, 0x1C0, lbl_80281B88 & 1, 1, 1);
     RenderState_Flush();
 }

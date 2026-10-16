@@ -318,8 +318,8 @@ void DynObj_UpdateDynamicObjects(void) {
 // (GM_Currently_SkillZoneMode) the targets' 'TEO ' models.
 void DynObj_RenderDynamicObjects(int nView) {
     RenderState_SetBlendFactors(4, 5);
-    DS_vSetAlphaTestMode(1, 6, 0x80);
-    DS_vSetZBufferMode(3);
+    DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 0x80);
+    DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
     LF_vSetCurrentLightFogEnvironment(1);
     LF_UseCurrentFogSettings();
     LF_UpdateFog();
@@ -416,8 +416,8 @@ void DynObj_RenderBalls(int nView) {
     u8 aState[8];
 
     RenderState_SetBlendFactors(4, 5);
-    DS_vSetAlphaTestMode(1, 6, 0x80);
-    DS_vSetZBufferMode(3);
+    DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 0x80);
+    DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
     LF_vSetCurrentLightFogEnvironment(1);
     LF_UseCurrentFogSettings();
     LF_UpdateFog();
@@ -553,7 +553,7 @@ void DynObj_DrawTargetOverlays(s32 nView) {
     int i;
     int nModel;
 
-    DS_vSetAlphaTestMode(0, 6, 0x80);
+    DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
     DS_vEnableZBufferUpdate(0);
     RenderState_Flush();
     for (i = 0; i < GameModeSkillZoneBase_GetCupCount(); i++) {
@@ -579,7 +579,7 @@ void DynObj_DrawTargetOverlays(s32 nView) {
             Object_Draw(gpDynObjState->apTeo10020[nModel]);
         }
     }
-    DS_vSetAlphaTestMode(1, 6, 0x80);
+    DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 0x80);
     DS_vEnableZBufferUpdate(1);
     RenderState_Flush();
 }

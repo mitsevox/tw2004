@@ -99,7 +99,7 @@ int DynObjBase_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2) {
                 DS_vEnableZBufferUpdate(0);
             }
             if (pObj->uFlags & 0x800) {
-                DS_vSetAlphaTestMode(0, 6, 0x80);
+                DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
             }
             Object_Draw(&pObj->obj);
             if (pObj->uFlags & 0x400) {
@@ -107,7 +107,7 @@ int DynObjBase_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2) {
                 RenderState_Flush();
             }
             if (pObj->uFlags & 0x800) {
-                DS_vSetAlphaTestMode(1, 6, 0x80);
+                DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 0x80);
             }
             if ((pObj->uFlags & 0x400) || (pObj->uFlags & 0x800)) {
                 RenderState_Flush();

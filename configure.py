@@ -1179,7 +1179,7 @@ config.libs = [
             Object(Matching, "unsorted/sweep_8014CA80.c"),
             Object(Matching, "unsorted/sweep_801654D0.c", progress_category="sdk"),  # Metrowerks runtime / MetroTRK, not EA code
             Object(Matching, "unsorted/sweep_80165524.c", progress_category="sdk"),  # Metrowerks runtime / MetroTRK, not EA code
-            Object(Matching, "Code80012ED0.c"),
+            Object(Matching, "RenderAccessors.c"),
             Object(Matching, "Controller_Gc.c"),
             Object(Matching, "unsorted/sweep_800136F4.c"),
             Object(Matching, "event.c"),

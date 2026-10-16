@@ -118,16 +118,16 @@ void RC_vClearRenderCtxScreen(Camera* pCamera, u32 uFlags) {
     } else {
         RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 1, 1);
     }
-    DS_vSetAlphaTestMode(0, 6, 0x80);
-    DS_vSetZBufferMode(7);
+    DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
+    DS_vSetZBufferMode(DS_COMPARE_ALWAYS);
     RenderState_Flush();
     RenderView_MakeQuad(aXY, NULL, 0.0f, 0.0f, 1.0f, 1.0f);
     aXY[2] = 0.0f;
     aXY[6] = 0.0f;
     RenderView_SetColor(pCamera->a0);
     RenderView_DrawPrimitive(0xA1, aXY, NULL, NULL, 2);
-    DS_vSetAlphaTestMode(0, 6, 0x80);
-    DS_vSetZBufferMode(3);
+    DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
+    DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
     DS_vEnableZBufferUpdate(1);
     RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 8, 1);
     RenderState_Flush();

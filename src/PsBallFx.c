@@ -623,8 +623,8 @@ void fn_800A3A84(void) {
     RC_vSetCurrentRenderCtxTransformationMatrix(0);
     RenderState_SetCameraMatrices();
     RenderState_SetClipMode(0);
-    DS_vSetAlphaTestMode(0, 6, 0x80);
-    DS_vSetZBufferMode(3);
+    DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
+    DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
     RenderState_SetBlendFactors(1, 1);
     RenderState_Flush();
     if (lbl_80281408->an44[0] > 2) {
@@ -656,7 +656,7 @@ void fn_800A3A84(void) {
         SD_FillShaderObject(&lbl_80281408->mesh[0], &fill, 1);
         SD_DrawShaderObject(&lbl_80281408->mesh[0]);
     }
-    DS_vSetAlphaTestMode(1, 6, 0x80);
+    DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 0x80);
     RenderState_Flush();
 }
 

@@ -960,8 +960,8 @@ void FE_ClearGolferFrame(void) {
     f32 xy[8] = { 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
     f32 colour[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
-    DS_vSetAlphaTestMode(0, 6, 0x80);
-    DS_vSetZBufferMode(7);
+    DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
+    DS_vSetZBufferMode(DS_COMPARE_ALWAYS);
     DS_vEnableZBufferUpdate(1);
     RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 1, 1);
     RenderState_SetViewport(RC_spGetCurrentRenderCtx());
@@ -970,7 +970,7 @@ void FE_ClearGolferFrame(void) {
     RenderState_SetDrawFlags(0);
     RenderState_Flush();
     RenderView_DrawPrimitive(0xA1, xy, 0, NULL, 2);
-    DS_vSetZBufferMode(3);
+    DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
     DS_vEnableZBufferUpdate(1);
     RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 8, 1);
     RenderState_SetViewport(RC_spGetCurrentRenderCtx());
@@ -984,8 +984,8 @@ void FE_DrawGolferTexture(void) {
     f32 colour[4] = { 0.5f, 0.5f, 0.5f, 0.5f };
     f32 uv[8] = { 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
 
-    DS_vSetAlphaTestMode(0, 6, 0x80);
-    DS_vSetZBufferMode(7);
+    DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
+    DS_vSetZBufferMode(DS_COMPARE_ALWAYS);
     RenderState_SetConstantAlphaOn(0);
     RenderState_SetBlendFactors(4, 5);
     RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 8, 1);
@@ -1004,7 +1004,7 @@ void FE_DrawGolferTexture(void) {
 
 // Set the frame's alpha before the golfer is copied to his texture (FE_vRenderGolferAllPhase1):
 // with only alpha written, draw a quad of black at half alpha with the depth test off, then a
-// full-frame one of (0, 0, 0, 0) tested against the depth he left (compare 3). Then the frame is
+// full-frame one of (0, 0, 0, 0) tested against the depth he left (less or equal). Then the frame is
 // set up again the usual way.
 void FE_DrawGolferAlphaMask(void) {
     f32 xy2[8] = { 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
@@ -1012,8 +1012,8 @@ void FE_DrawGolferAlphaMask(void) {
     f32 colour1[4] = { 0.0f, 0.0f, 0.0f, 0.5f };
     f32 colour2[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
-    DS_vSetAlphaTestMode(0, 6, 0x80);
-    DS_vSetZBufferMode(7);
+    DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
+    DS_vSetZBufferMode(DS_COMPARE_ALWAYS);
     DS_vEnableZBufferUpdate(0);
     RenderState_SetBlendFactors(4, 5);
     RenderState_SetConstantAlphaOn(0);
@@ -1025,10 +1025,10 @@ void FE_DrawGolferAlphaMask(void) {
     RenderState_Flush();
     RenderView_DrawPrimitive(0xA1, xy1, 0, NULL, 2);
     RenderView_SetColor(colour2);
-    DS_vSetZBufferMode(3);
+    DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
     RenderState_Flush();
     RenderView_DrawPrimitive(0xA1, xy2, 0, NULL, 2);
-    DS_vSetZBufferMode(3);
+    DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
     DS_vEnableZBufferUpdate(1);
     RenderState_SetRenderSurface(0, 512, 448, lbl_80281B88 & 1, 8, 1);
     RenderState_SetViewport(RC_spGetCurrentRenderCtx());
@@ -1061,7 +1061,7 @@ void FE_RenderGolfer(u8 bFull) {
         RC_vUpdateRenderCtxTransformationMatrices(RC_spGetCurrentRenderCtx());
         RenderState_SetCameraMatrices();
         RenderState_SetClipMode(1);
-        DS_vSetAlphaTestMode(1, 6, 1);
+        DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 1);
         if (bFull) {
             RenderState_SetRenderSurface(1, 384, 528, 0, 1, 1);
         } else {
@@ -1070,7 +1070,7 @@ void FE_RenderGolfer(u8 bFull) {
         RenderState_SetViewport(RC_spGetCurrentRenderCtx());
         RenderState_Flush();
         DS_vEnableZBufferUpdate(1);
-        DS_vSetZBufferMode(3);
+        DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
         RenderState_Flush();
         if (gpCrAPState->nScreenKind == 3) {
             RenderState_SetScissor(0, 0, 512, 448.0f * lbl_80281348);

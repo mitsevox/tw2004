@@ -164,8 +164,8 @@ void fn_800B4FA4(RainObject* pRain) {
     nHalf = lbl_802814B8->n4;
     RenderState_SetBlendFactors(4, 5);
     RenderState_SetDrawFlags(0x40);
-    DS_vSetAlphaTestMode(0, 7, 0);
-    DS_vSetZBufferMode(3);
+    DS_vSetAlphaTestMode(0, DS_COMPARE_ALWAYS, 0);
+    DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
     RenderState_SetBankTexture(NULL, NULL);
     RenderState_Flush();
     LLMath_CopyMat44(pCamera->viewMtx, mView);
