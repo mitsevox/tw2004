@@ -12,8 +12,6 @@
 #include "game/save.h"
 #include "game/modes/pgatoursim.h"
 
-// fake match: the (s8) on GOLFERSTATE_GetCurrentState and the (u8) on GOLFERSTATE_Set's player (see game.h).
-
 int  GM_GetPlayerRoundScoreThroughHole(int nPlayer, int nHoles);
 void GM_SetSplitScreen(u8 b);
 

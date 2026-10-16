@@ -66,9 +66,9 @@ void GameModeSkins_SetupNextGolfer(void) {
     lbl_80282278 = gpGame->pfnGetHonors(5);
     for (i = 0; i < gNumPlayersSetUp; i++) {
         if (i == lbl_80282278) {
-            GOLFERSTATE_Set(1, i);
+            GOLFERSTATE_Set(GS_PRE_SHOT, i);
         } else {
-            GOLFERSTATE_Set(19, i);
+            GOLFERSTATE_Set(GS_WAIT, i);
         }
     }
 }

@@ -17,8 +17,6 @@
 #include "engine.h"
 #include "game/save.h"
 
-// fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
-
 u8    ComicCam_HasBallBeenHit(void);
 void  GameEffects_RenderPredictedGB(void);
 void  GameEffects_RenderScriptedGB(void);

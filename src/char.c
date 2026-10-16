@@ -543,8 +543,7 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
     }
     if (!bForce) {
         if (Character_IsGolfer(pChar)) {
-            // fake match: the state is compared as an s8 (see GOLFERSTATE_GetCurrentState)
-            if ((s8)GOLFERSTATE_GetCurrentState(pChar->nPlayer) == 0x13) {
+            if ((s8)GOLFERSTATE_GetCurrentState(pChar->nPlayer) == GS_WAIT) {
                 return;
             }
         } else if (pChar->fNearestCamDist

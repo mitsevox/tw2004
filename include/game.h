@@ -61,18 +61,43 @@ int  Game_CurHoleIndex(void);           // 0..17 in the round (Golfer.c)
 int  Game_CurrentPinSet(void);          // the current hole's pin position, 0..3 (Golfer.c)
 void Session_SetNumPlayers(int n);      // Golfer.c
 
-// ---- golfer states (Swing.c) -----------------------------------------------------------------
+// ---- the golfer state engine (StateGolfer.c) ----------------------------------------------------
+// Each player has a stack of golfer states (GolferState); the top one is the player's current
+// state, and its update runs every frame.
 
-// A row of sGolferStateEngineTable: a golfer state's callbacks.
-typedef struct SwingStateDef {
+// A row of sGolferStateEngineTable: a golfer state's callbacks, each given the player.
+typedef struct GolferStateFunctionList_t {
     void (*pfnEnter)(int nPlayer);  // 0x00
     void (*pfnUpdate)(int nPlayer); // 0x04
     void (*pfnExit)(int nPlayer);   // 0x08
-} SwingStateDef;
+} GolferStateFunctionList_t;
+LAYOUT_ASSERT(GolferStateFunctionList_t, 0xC);
 
-extern SwingStateDef sGolferStateEngineTable[GS_NUM];   // 0x801883D8  one row per GS_* state
+// One row per golfer state (stateFunc.c); speed golf puts its own callbacks in rows 12 and 24..26
+// while it runs (SpeedGolf_SetGolferStates) and takes them out after.
+extern GolferStateFunctionList_t sGolferStateEngineTable[GS_NUM];
 
-void GOLFERSTATE_Update(void);          // StateGolfer.c
+#define GOLFERSTATE_NUM_STACKS  5   // gGolferStacks: one per player slot
+#define GOLFERSTATE_STACK_SIZE  5   // states one stack holds (GOLFERSTATE_Push does not check)
+
+// One player's golfer state stack.
+typedef struct GolferStack {
+    s8   aStates[GOLFERSTATE_STACK_SIZE];   // 0x00  GolferState ids, bottom first
+    s8   nTop;                              // 0x05  index of the current state, -1 when empty
+} GolferStack;
+LAYOUT_ASSERT(GolferStack, 0x6);
+
+void        GOLFERSTATE_OpenONCE(void);
+void        GOLFERSTATE_Update(void);
+void        GOLFERSTATE_CloseONCE(void);
+void        GOLFERSTATE_Kill(int PlayerID);
+void        GOLFERSTATE_Push(s8 newState, int PlayerID);
+void        GOLFERSTATE_Pop(int PlayerID);
+void        GOLFERSTATE_Set(s8 newState, int PlayerID);
+void        GOLFERSTATE_Switch(s8 newState, int PlayerID);
+GolferState GOLFERSTATE_GetCurrentState(int PlayerID);     // or -1 when the stack is empty
+s8          GOLFERSTATE_GetPreviousState(int PlayerID);    // a GolferState, or -1
+u8          GOLFERSTATE_IsFrozen(void);
 
 // ---- the main state machine (statemain.c) -------------------------------------------------------
 // One current state for the whole game, front end or in-game: no player argument and no stack.
@@ -102,16 +127,6 @@ void STATEMAIN_Set(s8 nState);          // MAINSTATE_*
 u8   SW_vUpdateSwing(int nPlayer);          // the per-frame swing poll: the ball was struck
 void SW_vInitSwing(int nPlayer);          // reset the player's swing
 f32  SW_vGetShotPower(int nPlayer);          // the swing's shot power
-void GOLFERSTATE_Push(int nState, int nPlayer);     // push a state and run its enter callback
-void GOLFERSTATE_Set(s8 nState, int nPlayer);       // pop everything and start again from one state
-void GOLFERSTATE_Switch(int nState, int nPlayer);   // replace the current state
-// GS_*, or -1. The definition returns the state byte zero-extended (lbzx, Swing.c) and -1 as a full
-// int, so its return type is int. Many callers sign-extend the result, as if their own prototype
-// said s8; they write (s8)GOLFERSTATE_GetCurrentState(n), a fake match (without it GameMode8 falls
-// to 61/66). The same holds for the (u8) some callers put on GOLFERSTATE_Set's player (GameMode8,
-// GameRound). Both casts are harmless for the values these take (-1..0x30, 0..4).
-int  GOLFERSTATE_GetCurrentState(int nPlayer);
-u8   GOLFERSTATE_IsFrozen(void);
 void STATEFUNC_SimulateInit(int nPlayer);
 void STATEFUNC_SimulateUpdate(int nPlayer);
 void STATEFUNC_SimulateExit(int nPlayer);

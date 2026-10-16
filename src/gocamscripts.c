@@ -222,7 +222,7 @@ void CamScript_RunScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, 
         if (pScript->pShot->nStateType != 0
             && CamScript_KeepAboveGround(nPlayer, pCam, vPrev, CameraScript_SnapToScript(pScript, pScript->pShot) == 0,
                                          NULL, NULL, NULL, gpCamTuning->f168)
-            && (s8)GOLFERSTATE_GetCurrentState(nPlayer) == 12 && pScript->pShot->nStateType != 3) {
+            && (s8)GOLFERSTATE_GetCurrentState(nPlayer) == GS_SIMULATE && pScript->pShot->nStateType != 3) {
             CamScript_PutBackOnFairway(pScript, pCam, pSub, nPlayer, pShot, vPrev);
         }
         if (pScript->bFairwayFix) {
@@ -230,13 +230,14 @@ void CamScript_RunScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, 
                 CamScript_UpdateFairwayCam(pScript, pCam, pSub, nPlayer);
             }
         }
-        if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 12 && CameraScript_SnapToScript(pScript, pScript->pShot)
+        if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == GS_SIMULATE && CameraScript_SnapToScript(pScript, pScript->pShot)
             && pScript->pShot->nStateType != 3 && !pScript->bFairwayFix
                     && CamScript_CheckObstructedCamera(pCam, nPlayer)
                     && !GM_Currently_SkillZoneMode()) {
             CamScript_PutBackOnFairway(pScript, pCam, pSub, nPlayer, pShot, vPrev);
         }
-        if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 12 && !DynamicCam_bIsSwingCamera(pScript->pShot)) {
+        if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == GS_SIMULATE
+            && !DynamicCam_bIsSwingCamera(pScript->pShot)) {
             CamScript_CheckFlagCollision(pScript, pCam, pSub, nPlayer, pShot, vPrev);
         }
     }
@@ -524,7 +525,7 @@ void CamScript_SmoothTerrainHeight(CamScript* pScript, f32* pCam, u8 b, int nPla
         fRate = gpCamTuning->fE0;
         // All three cases ease the same way (only a level fD8 is left alone in golfer state 12).
         if (!b || gPlayers[nPlayer].ball.nCollideCount > 0
-            || (s8)GOLFERSTATE_GetCurrentState(nPlayer) != 12) {
+            || (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_SIMULATE) {
             fStep = fGround - pScript->fD8;
             fStep *= fRate;
             pScript->fD8 += fStep;
@@ -1260,7 +1261,7 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
     }
     switch (pShot->nLookAtKind) {
     case 0:
-        if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 18) {  // fake match: see game.h
+        if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == GS_REMOVE_BALL) {
             pCourse = Ter_GetTGD();
             nPin = Game_CurrentPinSet();
             Vec3Copy(&pCourse->pin[nPin].x, pOut);
@@ -1951,8 +1952,8 @@ void CameraScript_GoToNewScript(CamScript* pScript, CamShot* pShot, int nPlayer,
     pScript->bCE = 1;
     if ((pScript->nInterpType == 6 || pScript->nInterpType == 8 || pScript->nInterpType == 9
          || pScript->nInterpType == 10)
-        && (s8)GOLFERSTATE_GetCurrentState(nPlayer) != 10
-        && (s8)GOLFERSTATE_GetCurrentState(nPlayer) != 11) {   // fake match: see game.h
+        && (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_SWING
+        && (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_REPLAY_SWING) {
         pScript->nInterpType = 5;
         pScript->pNextShot = NULL;
     }

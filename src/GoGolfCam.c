@@ -2346,7 +2346,7 @@ void GolfCamera_ProcessPostShotCamera(View* pView, int nPlayer) {
 void GolfCamera_InitInHoleCamera(View* pView, int nPlayer) {
     CameraController_GetCameraOrigin(pView);
     CameraController_GetCameraLookPoint(pView);
-    GOLFERSTATE_GetCurrentState(nPlayer);  // the result is unused, as in the original
+    GOLFERSTATE_GetCurrentState(nPlayer);
     pView->p78 = pView->p74;
     pView->script.n110 = 0;        // 0 and then 1, as in the original
     pView->script.n110 = 1;
@@ -2361,7 +2361,6 @@ void GolfCamera_InitInHoleCamera(View* pView, int nPlayer) {
             pView->script.n110 = 0;
         }
     } else {
-        // The state is compared as a signed byte (extsb), as if GOLFERSTATE_GetCurrentState returned s8.
         if (GolfCamera_ShowPostShotAnimations(pView) || (s8)GOLFERSTATE_GetCurrentState(nPlayer) == GS_REMOVE_BALL) {
             GolfCamera_ChooseReactionCam(pView, nPlayer, 1);
         }

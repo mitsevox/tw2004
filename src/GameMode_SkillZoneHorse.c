@@ -14,8 +14,6 @@
 #include "engine.h"
 #include "game/earnings.h"
 
-// fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
-
 // Mode 15's state; only this file uses it. The .sbss ones are defined last address first (the
 // compiler lays a file's .sbss out last definition first).
 s32 gHorseSavedWeather = 4;    // options.nWeather before the game (StartGamePreData; Shutdown restores it)
@@ -381,7 +379,7 @@ void GameModeSkillZoneHorse_SetupNextGolfer(void) {
     GameModeSkillZoneBase_ClearPerShotData();
     GameModeStroke_SetupNextGolfer();
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        if ((s8)GOLFERSTATE_GetCurrentState(i) == 1) {
+        if ((s8)GOLFERSTATE_GetCurrentState(i) == GS_PRE_SHOT) {
             GameModeSkillZoneCapture_SetShotClock(900);
             if (gHorseLeader == i) {
                 gHorseLeader = 5;
@@ -503,7 +501,7 @@ void GameModeSkillZoneHorse_HitBall(int nPlayer) {
 // leader takes a letter (player 1 when the leader is player 0, else player 0: two players only;
 // message 0x38, Gaud_LetterForfeit).
 void GameModeSkillZoneHorse_ShotClockOut(void) {
-    GOLFERSTATE_Switch(12, lbl_80282278);   // GS_SIMULATE
+    GOLFERSTATE_Switch(GS_SIMULATE, lbl_80282278);
     GUI_HideAllToggleUI();
     Gaud_StopShotClock();
     gHorseShotClockOut = 1;

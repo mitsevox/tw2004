@@ -13,8 +13,6 @@
 #include "engine.h"
 #include "game/save.h"
 
-// fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
-
 void  GM_Earnings_FreeStreamMemory(void);
 void  GM_ClearHoleBonusStats(int nPlayer);
 u8    GM_IsRoundForcedOver(int nPlayer);

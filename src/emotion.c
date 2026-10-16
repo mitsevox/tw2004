@@ -111,7 +111,7 @@ void fn_8006ACF8(int nPlayer, int a) {
 
 // Works out the golfer's emotion for his current state; a change of n0 or n4 raises event 42.
 void Emotion_UpdatePlayerEmotion(int nPlayer) {
-    s8 nState = GOLFERSTATE_GetCurrentState(nPlayer);   // fake match: the s8 (see game.h)
+    s8 nState = GOLFERSTATE_GetCurrentState(nPlayer);
     int nWas0 = lbl_801D5F78[nPlayer].n0;
     int nWas4 = lbl_801D5F78[nPlayer].n4;
 

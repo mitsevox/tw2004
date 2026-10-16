@@ -465,7 +465,7 @@ void CameraController_CameraCollision(int nView, f32* pBounds) {
     }
     pPos = CameraController_GetCameraOrigin(pView);
     pAt = CameraController_GetCameraLookPoint(pView);
-    if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_SIMULATE) {   // fake match: (s8), see game.h
+    if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_SIMULATE) {
         return;
     }
     if (pView->script.pShot != NULL && pView->script.pShot->nStateType == 3) {
