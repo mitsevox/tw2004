@@ -12,10 +12,11 @@
 
 // ---- memory and strings ----------------------------------------------------------------------
 
-void* Mem_cpy(void* pDst, const void* pSrc, u32 uLen);          // memcpy; returns pDst
-void* Mem_move(void* pDst, const void* pSrc, u32 uLen);         // memmove: the ranges may overlap
-void* Mem_set(void* pDst, int nValue, u32 uLen);                // memset; returns pDst
-int   Mem_compare(const void* pA, const void* pB, u32 uLen);    // memcmp
+// LLMem_Gc.c: the engine's memcpy, memmove, memset and memcmp.
+void* Mem_cpy(void* pDst, const void* pSrc, u32 nLen);          // memcpy; returns pDst
+void* Mem_move(void* pDst, const void* pSrc, u32 nLen);         // memmove: may overlap; returns pDst
+void* Mem_set(void* pDst, int nValue, u32 nLen);                // memset; returns pDst
+int   Mem_compare(const void* pA, const void* pB, u32 nLen);    // memcmp: -1, 0 or 1
 // Allocates (StaticMemory.c): nMode picks the system heap or a part of the static heap (see there).
 void* StaticMem_Alloc(int nSize, int nMode, int nAlign, const char* pFile, int nLine);
 void  StaticMem_Free(void* p);                  // free

@@ -1151,7 +1151,9 @@ config.libs = [
             Object(Matching, "unsorted/sweep_80005520.c"),
             Object(Matching, "unsorted/sweep_80005590.c"),
             Object(Matching, "unsorted/sweep_800055D8.c"),
-            Object(Matching, "LLMem_Gc.c"),
+            # Built optimized for size: under -O4,p the copy and fill loops are unrolled and the
+            # four functions take 0xF94 bytes, against EA's 0x5C0.
+            Object(Matching, "LLMem_Gc.c", extra_cflags=["-O4,s"]),
             Object(Matching, "fe_craputils.c"),
             Object(Matching, "DynamicRenderingBuffer.c"),
             Object(Matching, "Code80070EC4.c"),

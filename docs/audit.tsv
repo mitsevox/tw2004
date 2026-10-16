@@ -136,7 +136,7 @@ LLDynTex.c	open
 LLFileIO_Gc.c	open		
 LLFont.c	open		
 LLMath_Gc.c	done	626ba02e	claude-review
-LLMem_Gc.c	open		
+LLMem_Gc.c	done	4e15bbc0	claude-review
 LLObj_Gc.c	open		
 LLPictInt.c	open		
 LLPict_Gc.c	open		

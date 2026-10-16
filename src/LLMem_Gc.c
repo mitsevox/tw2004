@@ -1,182 +1,176 @@
-// LLMem_Gc.c (our name, after TW07's legacy/ll/ps3/LLMem_PS3.c and TW06's legacy/ll/xbox/
-// llmem_xbox.c; TW07's file holds the same four functions, Mem_cpy, Mem_move, Mem_compare and
-// Mem_set): the engine's memory copy, move, fill and compare.
+// LLMem_Gc.c: the engine's memory copy, move, fill and compare, its own memcpy, memmove, memset and
+// memcmp.
 
 #include "engine.h"
 
-// EA built this file optimized for size: its loops count in ctr and are not unrolled.
-#pragma optimize_for_size on
-
-// Copies n units of type T from pSrc to pDst: eight at a time (all eight read before any is
-// written), then one at a time.
-#define MEM_COPY_UNITS(T, n)                    \
-    {                                           \
-        T* pD = pDst;                           \
-        const T* pS = pSrc;                     \
-        while ((n) > 7) {                       \
-            T t0, t1, t2, t3, t4, t5, t6, t7;   \
-            t1 = pS[1];                         \
-            t2 = pS[2];                         \
-            t3 = pS[3];                         \
-            t4 = pS[4];                         \
-            t5 = pS[5];                         \
-            t6 = pS[6];                         \
-            t7 = pS[7];                         \
-            t0 = pS[0];                         \
-            pS += 8;                            \
-            pD[0] = t0;                         \
-            pD[1] = t1;                         \
-            pD[2] = t2;                         \
-            pD[3] = t3;                         \
-            pD[4] = t4;                         \
-            pD[5] = t5;                         \
-            pD[6] = t6;                         \
-            pD[7] = t7;                         \
-            pD += 8;                            \
-            (n) -= 8;                           \
-        }                                       \
-        while ((n) != 0) {                      \
-            *pD++ = *pS++;                      \
-            (n)--;                              \
-        }                                       \
+// Copies nUnits units of type T from pFrom to pTo: eight at a time (all eight read before any is
+// written), then one at a time. Counts nUnits down to 0.
+#define MEM_COPY_UNITS(T, pTo, pFrom, nUnits)                                   \
+    {                                                                           \
+        T* pDstUnit = (pTo);                                                    \
+        const T* pSrcUnit = (pFrom);                                            \
+        while ((nUnits) > 7) {                                                  \
+            T unit0, unit1, unit2, unit3, unit4, unit5, unit6, unit7;           \
+            unit1 = pSrcUnit[1];                                                \
+            unit2 = pSrcUnit[2];                                                \
+            unit3 = pSrcUnit[3];                                                \
+            unit4 = pSrcUnit[4];                                                \
+            unit5 = pSrcUnit[5];                                                \
+            unit6 = pSrcUnit[6];                                                \
+            unit7 = pSrcUnit[7];                                                \
+            unit0 = pSrcUnit[0];                                                \
+            pSrcUnit += 8;                                                      \
+            pDstUnit[0] = unit0;                                                \
+            pDstUnit[1] = unit1;                                                \
+            pDstUnit[2] = unit2;                                                \
+            pDstUnit[3] = unit3;                                                \
+            pDstUnit[4] = unit4;                                                \
+            pDstUnit[5] = unit5;                                                \
+            pDstUnit[6] = unit6;                                                \
+            pDstUnit[7] = unit7;                                                \
+            pDstUnit += 8;                                                      \
+            (nUnits) -= 8;                                                      \
+        }                                                                       \
+        while ((nUnits) != 0) {                                                 \
+            *pDstUnit++ = *pSrcUnit++;                                          \
+            (nUnits)--;                                                         \
+        }                                                                       \
     }
 
-// memcpy: in the widest unit (8, 4, 2 or 1 bytes) that both addresses and the length are aligned
-// to.
-void* Mem_cpy(void* pDst, const void* pSrc, u32 uLen) {
-    if ((((uptr)pDst | (uptr)pSrc | uLen) & 7) == 0) {
-        uLen >>= 3;
-        MEM_COPY_UNITS(f64, uLen);
-    } else if ((((uptr)pDst | (uptr)pSrc | uLen) & 3) == 0) {
-        uLen >>= 2;
-        MEM_COPY_UNITS(u32, uLen);
-    } else if ((((uptr)pDst | (uptr)pSrc | uLen) & 1) == 0) {
-        uLen >>= 1;
-        MEM_COPY_UNITS(s16, uLen);
+// memcpy: copies nLen bytes in the widest unit (8, 4, 2 or 1 bytes) that both addresses and the
+// length are aligned to, and returns pDst.
+void* Mem_cpy(void* pDst, const void* pSrc, u32 nLen) {
+    if ((((uptr)pDst | (uptr)pSrc | nLen) & 7) == 0) {
+        nLen >>= 3;
+        MEM_COPY_UNITS(f64, pDst, pSrc, nLen);
+    } else if ((((uptr)pDst | (uptr)pSrc | nLen) & 3) == 0) {
+        nLen >>= 2;
+        MEM_COPY_UNITS(u32, pDst, pSrc, nLen);
+    } else if ((((uptr)pDst | (uptr)pSrc | nLen) & 1) == 0) {
+        nLen >>= 1;
+        MEM_COPY_UNITS(s16, pDst, pSrc, nLen);
     } else {
-        MEM_COPY_UNITS(u8, uLen);
+        MEM_COPY_UNITS(u8, pDst, pSrc, nLen);
     }
     return pDst;
 }
 
-// Copies n units of type T backwards, from the ends pSrcEnd and pDstEnd down: eight at a time (all
-// eight read before any is written), then one at a time.
-#define MEM_COPY_UNITS_BACK(T, n)               \
-    {                                           \
-        T* pD = pDstEnd;                        \
-        const T* pS = pSrcEnd;                  \
-        while ((n) > 7) {                       \
-            T t0, t1, t2, t3, t4, t5, t6, t7;   \
-            t1 = pS[-7];                        \
-            t2 = pS[-6];                        \
-            t3 = pS[-5];                        \
-            t4 = pS[-4];                        \
-            t5 = pS[-3];                        \
-            t6 = pS[-2];                        \
-            t7 = pS[-1];                        \
-            t0 = *(pS -= 8);                    \
-            pD[-8] = t0;                        \
-            pD[-7] = t1;                        \
-            pD[-6] = t2;                        \
-            pD[-5] = t3;                        \
-            pD[-4] = t4;                        \
-            pD[-3] = t5;                        \
-            pD[-2] = t6;                        \
-            pD[-1] = t7;                        \
-            pD -= 8;                            \
-            (n) -= 8;                           \
-        }                                       \
-        while ((n) != 0) {                      \
-            *--pD = *--pS;                      \
-            (n)--;                              \
-        }                                       \
+// Copies nUnits units of type T backwards, from the ends pFromEnd and pToEnd down: eight at a time
+// (all eight read before any is written), then one at a time. Counts nUnits down to 0.
+#define MEM_COPY_UNITS_BACK(T, pToEnd, pFromEnd, nUnits)                        \
+    {                                                                           \
+        T* pDstUnit = (pToEnd);                                                 \
+        const T* pSrcUnit = (pFromEnd);                                         \
+        while ((nUnits) > 7) {                                                  \
+            T unit0, unit1, unit2, unit3, unit4, unit5, unit6, unit7;           \
+            unit1 = pSrcUnit[-7];                                               \
+            unit2 = pSrcUnit[-6];                                               \
+            unit3 = pSrcUnit[-5];                                               \
+            unit4 = pSrcUnit[-4];                                               \
+            unit5 = pSrcUnit[-3];                                               \
+            unit6 = pSrcUnit[-2];                                               \
+            unit7 = pSrcUnit[-1];                                               \
+            unit0 = *(pSrcUnit -= 8);                                           \
+            pDstUnit[-8] = unit0;                                               \
+            pDstUnit[-7] = unit1;                                               \
+            pDstUnit[-6] = unit2;                                               \
+            pDstUnit[-5] = unit3;                                               \
+            pDstUnit[-4] = unit4;                                               \
+            pDstUnit[-3] = unit5;                                               \
+            pDstUnit[-2] = unit6;                                               \
+            pDstUnit[-1] = unit7;                                               \
+            pDstUnit -= 8;                                                      \
+            (nUnits) -= 8;                                                      \
+        }                                                                       \
+        while ((nUnits) != 0) {                                                 \
+            *--pDstUnit = *--pSrcUnit;                                          \
+            (nUnits)--;                                                         \
+        }                                                                       \
     }
 
 // memmove: Mem_cpy unless pSrc is below pDst and runs into it; then the copy runs backwards from
-// the ends, in the widest unit the ends and the length are aligned to.
-void* Mem_move(void* pDst, const void* pSrc, u32 uLen) {
+// the ends, in the widest unit the ends and the length are aligned to. Returns pDst.
+void* Mem_move(void* pDst, const void* pSrc, u32 nLen) {
     void* pDstEnd;
     const void* pSrcEnd;
 
-    // fake match: EA compares the two addresses as signed numbers (cmpw).
-    // port: the casts cut 64-bit addresses; compare the pointers themselves.
-    if ((s32)(uptr)pSrc >= (s32)(uptr)pDst || (const u8*)pSrc + uLen <= (u8*)pDst) {
-        return Mem_cpy(pDst, pSrc, uLen);
+    if ((int)pSrc >= (int)pDst || (const u8*)pSrc + nLen <= (u8*)pDst) {
+        return Mem_cpy(pDst, pSrc, nLen);
     }
-    pSrcEnd = (const u8*)pSrc + uLen;
-    pDstEnd = (u8*)pDst + uLen;
-    if ((((uptr)pDstEnd | (uptr)pSrcEnd | uLen) & 7) == 0) {
-        uLen >>= 3;
-        MEM_COPY_UNITS_BACK(f64, uLen);
-    } else if ((((uptr)pDstEnd | (uptr)pSrcEnd | uLen) & 3) == 0) {
-        uLen >>= 2;
-        MEM_COPY_UNITS_BACK(u32, uLen);
-    } else if ((((uptr)pDstEnd | (uptr)pSrcEnd | uLen) & 1) == 0) {
-        uLen >>= 1;
-        MEM_COPY_UNITS_BACK(s16, uLen);
+    pSrcEnd = (const u8*)pSrc + nLen;
+    pDstEnd = (u8*)pDst + nLen;
+    if ((((uptr)pDstEnd | (uptr)pSrcEnd | nLen) & 7) == 0) {
+        nLen >>= 3;
+        MEM_COPY_UNITS_BACK(f64, pDstEnd, pSrcEnd, nLen);
+    } else if ((((uptr)pDstEnd | (uptr)pSrcEnd | nLen) & 3) == 0) {
+        nLen >>= 2;
+        MEM_COPY_UNITS_BACK(u32, pDstEnd, pSrcEnd, nLen);
+    } else if ((((uptr)pDstEnd | (uptr)pSrcEnd | nLen) & 1) == 0) {
+        nLen >>= 1;
+        MEM_COPY_UNITS_BACK(s16, pDstEnd, pSrcEnd, nLen);
     } else {
-        MEM_COPY_UNITS_BACK(u8, uLen);
+        MEM_COPY_UNITS_BACK(u8, pDstEnd, pSrcEnd, nLen);
     }
     return pDst;
 }
 
-// memset: fills uLen bytes at pDst with the low byte of nValue and returns pDst. Under 32 bytes it
-// goes byte by byte; longer fills align to 8, then store the byte pattern 32 and then 8 bytes at a
-// time through a double.
-void* Mem_set(void* pDst, int nValue, u32 uLen) {
-    u8* p;
+// memset: fills nLen bytes at pDst with the low byte of nValue and returns pDst. Under 32 bytes it
+// goes byte by byte; longer fills go byte by byte up to an 8-byte boundary, then store a double
+// holding the byte eight times, 32 and then 8 bytes at a time, and end byte by byte.
+void* Mem_set(void* pDst, int nValue, u32 nLen) {
+    u8* pByte;
     u8* pWide;
-    int n;
+    int nToAlign;
     u32 uFill;
-    u8 b;
+    u8 nByte;
     union {
-        u32 a[2];
-        f64 d;
+        u32 aWords[2];
+        f64 fDouble;
     } fill;
 
-    b = nValue;
-    if (uLen < 32) {
-        p = pDst;
-        while (uLen != 0) {
-            *p++ = b;
-            uLen--;
+    nByte = nValue;
+    if (nLen < 32) {
+        pByte = pDst;
+        while (nLen != 0) {
+            *pByte++ = nByte;
+            nLen--;
         }
     } else {
         pWide = pDst;
-        n = (8 - (uptr)pWide) & 7;
-        while (n > 0) {
-            *pWide++ = b;
-            uLen--;
-            n--;
+        nToAlign = (8 - (uptr)pWide) & 7;
+        while (nToAlign > 0) {
+            *pWide++ = nByte;
+            nLen--;
+            nToAlign--;
         }
-        uFill = (b << 8) | b;
-        uFill = (uFill << 16) | (uFill & 0xFFFF);  // fake match: the mask gives EA's rlwimi
-        fill.a[0] = uFill;
-        fill.a[1] = uFill;
-        while (uLen > 31) {
-            ((f64*)pWide)[0] = fill.d;
-            uLen -= 32;
-            ((f64*)pWide)[1] = fill.d;
-            ((f64*)pWide)[2] = fill.d;
-            ((f64*)pWide)[3] = fill.d;
+        uFill = (nByte << 8) | nByte;
+        uFill = (uFill << 16) | (uFill & 0xFFFF);
+        fill.aWords[0] = uFill;
+        fill.aWords[1] = uFill;
+        while (nLen > 31) {
+            ((f64*)pWide)[0] = fill.fDouble;
+            nLen -= 32;
+            ((f64*)pWide)[1] = fill.fDouble;
+            ((f64*)pWide)[2] = fill.fDouble;
+            ((f64*)pWide)[3] = fill.fDouble;
             pWide += 32;
         }
-        while (uLen > 7) {
-            *(f64*)pWide = fill.d;
+        while (nLen > 7) {
+            *(f64*)pWide = fill.fDouble;
             pWide += 8;
-            uLen -= 8;
+            nLen -= 8;
         }
-        p = pWide;
-        while (uLen != 0) {
-            *p++ = b;
-            uLen--;
+        pByte = pWide;
+        while (nLen != 0) {
+            *pByte++ = nByte;
+            nLen--;
         }
     }
     return pDst;
 }
 
-// memcmp (MSL's): below 0, 0 or above 0 as the first differing byte of pA is below, equal to (none
-// differs) or above pB's.
-int Mem_compare(const void* pA, const void* pB, u32 uLen) {
-    return memcmp(pA, pB, uLen);
+// memcmp: -1, 0 or 1 as the first byte that differs is lower in pA, no byte differs, or the first
+// that differs is higher in pA (the bytes compared unsigned).
+int Mem_compare(const void* pA, const void* pB, u32 nLen) {
+    return memcmp(pA, pB, nLen);
 }
