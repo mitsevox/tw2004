@@ -128,7 +128,7 @@ GoTerrainCollision.c	open
 GoViewport.c	done	a131c343	claude-review
 Golfer.c	open		
 GxUtil.c	open		
-HLAudMaster.c	open		
+HLAudMaster.c	done	b381299d	claude-review
 HoleScore.c	open		
 LLDisp_Gc.c	open		
 LLDynTex.c	open		
