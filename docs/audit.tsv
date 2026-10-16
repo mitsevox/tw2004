@@ -4,7 +4,6 @@ AudLock.c	done	4ed54ddb	claude-review
 AudReverb.c	open		
 Ball.c	open		
 BootCourse.c	open		
-ByteSwap.c	open		
 CaddieTips.c	open		
 Calendar.c	open		
 CalendarScreen.c	open		
@@ -186,6 +185,7 @@ UAudContainers.c	open
 UAudMem.c	open		
 UAudMemStack.c	open		
 UAudVector.c	done	58556d0e	claude-review
+UByteSwap.c	open		
 UFont.c	open		
 UFstPart.c	open		
 UISApi.c	open		

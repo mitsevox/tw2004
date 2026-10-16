@@ -2,8 +2,8 @@
 // context's lens (TW07's CA_SCamera, here CamLens): its projection (perspective or flat), near and
 // far clip, field of view, and where it stands and what it looks at, as a camera-to-world matrix
 // (m4) and its inverse (m44), optionally with the world scaled around a point. TW07's GoCamera.c
-// has the first six named functions in this order (after its empty CA_vInitOnce and
-// CA_vCloseOnce, not in this file); the setters after them are GameCube copies of GoCamera.h's
+// has its empty CA_vInitOnce and CA_vCloseOnce and the first six named functions after them in
+// this order; the setters after them are GameCube copies of GoCamera.h's
 // inlines, and Camera_Subtract3 / Camera_Invert3 paired-single copies of LLMath's.
 
 #include "camera.h"
@@ -20,6 +20,14 @@ void CA_vSetCameraNearFarZ(CamLens* pLens, f32 fA8, f32 fAC);
 void CA_vSetCameraNearZ(CamLens* pLens, f32 fA8);
 void Camera_Subtract3(f32* pA, f32* pB, f32* pOut);
 void Camera_Invert3(f32* pA, f32* pOut);
+
+// Called once as the game starts and once when its outer loop ends (with the other systems'
+// once-only set-up and close); both do nothing.
+void CA_vInitOnce(void) {
+}
+
+void CA_vCloseOnce(void) {
+}
 
 // Works out the lens's fB0 from its field of view: tan(fov / 2) over tan(30 degrees), so 1 at the
 // default 60 degrees.

@@ -9,7 +9,7 @@ How the columns were filled:
 
 - **Handler**: every `UStream_RegisterHandler` call in the DOL (63; tag and function recovered from
   the call's `r3`/`r4` in the assembly, C or asm alike).
-- **Swap**: *swapped* = the handler reaches one of the two byte-swap routines, `fn_80076158` (swap a
+- **Swap**: *swapped* = the handler reaches one of the two byte-swap routines, `BYTESWAP_SWAPDATA` (swap a
   run of values) or `ByteSwap_Records` (swap by a field-format table), within four calls; the path is
   given; "little-endian on disc" below is inferred from that swap. *none seen* = no such call within four calls and no `lwbrx`/`lhbrx`. A "none seen" format
   is used as big-endian as far as the code shows; a deferred swap further away (as for `BNK `) is
@@ -41,19 +41,19 @@ Objects delivered by UStream
 | `Cnet` | Network_DownloadDataPNB | asm | none seen | asm; dispatches the course's sub-chunks to the loaders registered with `Network_RegisterLoadNetworkCallback` (below) |
 | `txf ` | fn_80010180 | asm | none seen | asm; `TXG ` texture groups, [formats/txg-textures.md](formats/txg-textures.md) |
 | `sfn ` | fn_800125BC | sweep | none seen | asm |
-| `SAC ` | Character_LoadSacFromStream | char.c (sweep block) | swapped: AnimLib_MergeOverlay > SKA_SwapClip > fn_80076158 | little-endian on disc |
-| `CLB ` (2) | Character_ClubStreamCallbackIG, Character_ClubStreamCallbackFE | char.c (asm) | swapped: Character_CreateClubSkinSet > fn_80076158 | little-endian on disc |
-| `CHR ` (2) | Character_GolferStreamCallbackIG, Character_GolferStreamCallbackFE | char.c (asm) | swapped: Character_LoadTextures > fn_80076158 | little-endian on disc |
-| `SKLO` | SkeletalObject_StreamCallback | char.c (sweep block) | swapped: Character_CreateFromMem > fn_80076158 | little-endian on disc |
+| `SAC ` | Character_LoadSacFromStream | char.c (sweep block) | swapped: AnimLib_MergeOverlay > SKA_SwapClip > BYTESWAP_SWAPDATA | little-endian on disc |
+| `CLB ` (2) | Character_ClubStreamCallbackIG, Character_ClubStreamCallbackFE | char.c (asm) | swapped: Character_CreateClubSkinSet > BYTESWAP_SWAPDATA | little-endian on disc |
+| `CHR ` (2) | Character_GolferStreamCallbackIG, Character_GolferStreamCallbackFE | char.c (asm) | swapped: Character_LoadTextures > BYTESWAP_SWAPDATA | little-endian on disc |
+| `SKLO` | SkeletalObject_StreamCallback | char.c (sweep block) | swapped: Character_CreateFromMem > BYTESWAP_SWAPDATA | little-endian on disc |
 | `MAL ` | MtaLib_OnLoaded | sweep | swapped: MtaLib_LoadBank > ByteSwap_Records | little-endian on disc |
 | `SAL ` | AnimLib_OnLoaded | skalib.c | swapped: AnimLib_Load > ByteSwap_Records | little-endian on disc; swapped by field tables (`SwapField`); yes: `AnimLib`, `ClipRecord` and `Clip` are then read in place, their offsets turned into 32-bit pointers. |
 | `BNK ` | ClipBank_OnLoaded | skalib.c | swapped later | the handler only stashes the file; `ClipBank_Install` > `ClipBank_Load` swaps it (`ClipBank_SwapHeader`, SKA_SwapClip per clip); yes: `ClipBank` is used in place, its clip offsets turned into 32-bit pointers. |
-| `stat` | Golfer_OnStatsLoaded | Golfer.c | swapped: Golfer_TableByteSwap > fn_80076158 | yes: copied over `gGolferTable[34]` (`GolferRecord`); only 0x98..0x140 of each record is swapped, in 8-byte units; the u32 at 0x90 is not. A |
+| `stat` | Golfer_OnStatsLoaded | Golfer.c | swapped: Golfer_TableByteSwap > BYTESWAP_SWAPDATA | yes: copied over `gGolferTable[34]` (`GolferRecord`); only 0x98..0x140 of each record is swapped, in 8-byte units; the u32 at 0x90 is not. A |
 | `rcrd` | Session_OnRecordsLoaded | Golfer.c | none seen | yes: copied straight over `gSession.aCourseRecord`, big-endian |
 | `ter ` | Ter_HoleDataLoadCallback | GoTerrain.c | none seen | asm |
 | `tgd ` | Ter_CourseLoadCallback | GoTerrain.c | none seen | yes: the course's collision data; `Ter_InitTGD` (Ter_InitTGD, GoTerrainCollision.c) lays `CourseInfo` (ball.h) over it and turns its offsets into pointers in place (`TER_RELOCATE`, 32-bit); `TerCell`, `TerPolyRef`, `TerObject` and the vertex list are read in place |
 | `tLOD` | Ter_LODLoadCallback | GoTerrain.c | none seen | asm |
-| `CAMS` | DynamicCam_LoadCAMSfromStream | GoDynamicCam.c | swapped: fn_80076158 | little-endian on disc |
+| `CAMS` | DynamicCam_LoadCAMSfromStream | GoDynamicCam.c | swapped: BYTESWAP_SWAPDATA | little-endian on disc |
 | `CAMV` (2) | DynamicCam_LoadCAMVfromStream, DynamicCam_LoadCAMVfromStreamFE | GoDynamicCam.c | swapped: DynamicCam_CopyScriptData > ByteSwap_Records | little-endian on disc |
 | `CAMA` | DynamicCam_LoadCAMAfromStream | GoDynamicCam.c | swapped: DynamicCam_CopyAnimPairData > ByteSwap_Records | little-endian on disc |
 | `TEO ` | DynObj_LoadTeoModel | sweep | none seen | asm |

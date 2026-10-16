@@ -575,11 +575,11 @@ LLVideo.c:
 	.sbss       start:0x80281EB8 end:0x80281EC0
 	.sdata2     start:0x80283A50 end:0x80283A70
 
-ByteSwap.c:
-	.text       start:0x80076158 end:0x800763BC
+UByteSwap.c:
+	.text       start:0x80076158 end:0x800763B4
 
 GoCamera.c:
-	.text       start:0x800763BC end:0x80076A54
+	.text       start:0x800763B4 end:0x80076A54
 	.data       start:0x80189480 end:0x80189490
 	.sdata2     start:0x80283A70 end:0x80283A98
 
