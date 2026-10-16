@@ -23,8 +23,8 @@ u8  gVocInUse;                          // voices in use, counted by Voc_Cycle
 void Voc_ResetModule(void) {
     AudVoicePool* pPool = gVocCores;
     AudVoicePool* pEnd = gVocCores + 1;
-    UList* pList;
-    UList* pListEnd;
+    TListDbl* pList;
+    TListDbl* pListEnd;
     AudVoice* pVoice;
     AudVoice* pVoiceEnd;
     u16 nVoice;
@@ -73,8 +73,8 @@ AudVoice* Voc_Alloc(AudVoiceRequest* pRequest) {
     AudVoicePool* pPool = gVocCores;
     AudVoice* pVoice = NULL;
     u8 bStolen = 0;
-    UList* pList;
-    UList* pListEnd;
+    TListDbl* pList;
+    TListDbl* pListEnd;
     AudVoice* pCand;
     s16 nVolume;
 
@@ -113,7 +113,7 @@ AudVoice* Voc_Alloc(AudVoiceRequest* pRequest) {
         }
     }
     if (pPool->free.nFree != 0) {
-        pVoice = UPool_Alloc(&pPool->free);
+        pVoice = (AudVoice*)UPool_Alloc(&pPool->free);
     }
     if (pVoice != NULL) {
         pVoice->nStealLevel = pRequest->nStealLevel;
@@ -305,7 +305,7 @@ void Voc_Cycle(void) {
             if (pVoice->nEndDelay <= 0) {
                 if (HwVoice_IsFree(pVoice->nHwVoice)) {
                     UList_DeleteAt(&pPool->aLists[0], &pVoice->link);
-                    UPool_Free(&pPool->free, pVoice);
+                    UPool_Free(&pPool->free, (TListSglLink*)pVoice);
                     // port: EA passes arguments HwVoice_OnVoiceFreed (empty) ignores
                     ((void (*)(u16, int))HwVoice_OnVoiceFreed)(pVoice->nHwVoice, pVoice->flags.b.bLoops != 0);
                     if (pVoice->flags.b.bStream) {

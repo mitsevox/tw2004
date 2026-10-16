@@ -9,7 +9,7 @@
 
 // A voice of the sound engine (hlaudvoice.c's), wrapping one of startUp.c's hardware voices.
 typedef struct AudVoice {
-    UListNode link;             // 0x0    in one of its pool's lists (AudVoicePool.aLists)
+    TListDblLink link;          // 0x0    in one of its pool's lists (AudVoicePool.aLists)
     u16  nHwVoice;              // 0x8    the startUp.c voice it plays on
     union {
         struct {
@@ -53,8 +53,8 @@ LAYOUT_ASSERT(AudVoice, 0x40);
 // The sound engine's voices (gVocCores, a single pool).
 typedef struct AudVoicePool {
     AudVoice aVoices[AUD_NUM_VOICES];   // 0x000
-    UList    aLists[3];         // 0xC80  the voices in use, by their nStealLevel
-    UPool    free;              // 0xCA4  the free voices
+    TListDbl aLists[3];                 // 0xC80  the voices in use, by their nStealLevel
+    TPool    free;                      // 0xCA4  the free voices
 } AudVoicePool;
 LAYOUT_ASSERT(AudVoicePool, 0xCAC);
 
@@ -335,7 +335,7 @@ typedef struct AudTrackSeq {
 
 // A playing track (0x8C bytes, from a pool of 32 made by Trk_InitModule).
 typedef struct AudTrack {
-    UListNode link;             // 0x0    in one of the two track lists (gTrkPerfLists)
+    TListDblLink link;          // 0x0    in one of the two track lists (gTrkPerfLists)
     AudTrackTmpl* pTmpl;        // 0x8
     AudVoice* apVoices[8];      // 0xC    one per channel (Trk_AllocPerf clears 0x20 bytes)
     struct AudSource* pSource;  // 0x2C   the sound source the track plays for
@@ -443,8 +443,8 @@ LAYOUT_ASSERT(AudEmitters, 0xD8);
 extern AudEmitters lbl_801F2668;
 
 // The two track lists: [0] in start order, [1] sorted on fDistAttn, highest first.
-extern UList gTrkPerfLists[2];
-extern UPool gTrkPerfPool;   // the free tracks
+extern TListDbl gTrkPerfLists[2];
+extern TPool gTrkPerfPool;   // the free tracks
 extern AudTrack* gTrkPerfs;  // the pool's memory
 
 // A disc read waiting in the stream read queue (gAudStreamReadQueue). bSilence marks a request
@@ -465,7 +465,7 @@ LAYOUT_ASSERT(AudStreamRead, 0x1C);
 
 // The stream read queue and its buffer.
 typedef struct AudStreamQueue {
-    UQueue        queue;        // 0x0
+    TQueue        queue;        // 0x0
     u8            bBusy;        // 0x18   a read is under way
     AudStreamRead aReads[8];    // 0x1C
 } AudStreamQueue;
