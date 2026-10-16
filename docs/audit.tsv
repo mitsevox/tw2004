@@ -183,7 +183,7 @@ TibExt.c	open
 UAudContainers.c	open		
 UAudMem.c	open		
 UAudMemStack.c	open		
-UAudVector.c	open		
+UAudVector.c	done	58556d0e	claude-review
 UFont.c	open		
 UFstPart.c	open		
 UISApi.c	open		
