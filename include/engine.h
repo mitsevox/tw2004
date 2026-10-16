@@ -123,7 +123,7 @@ void  qsort(void* pBase, u32 nCount, u32 nSize, s32 (*pfnCompare)(const void* pA
 
 // llrtclock.c: the real-time clock as a date: month 1-12, day, year, hour 0-23, minute, second,
 // millisecond. Always TRUE.
-int  fn_8011E020(s32* pnMonth, s32* pnDay, s32* pnYear, s32* pnHour, s32* pnMinute, s32* pnSecond,
+int  RTClock_GetCurrentTime(s32* pnMonth, s32* pnDay, s32* pnYear, s32* pnHour, s32* pnMinute, s32* pnSecond,
                  s32* pnMsec);
 void RTClock_GetDateTimeString(char* szOut);   // "M/D/YYYY H:MM AM"
 

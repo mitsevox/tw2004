@@ -805,7 +805,7 @@ void GM_vGetTodaysDate(MsgArg* pArgs, MsgArg* pResult) {
     s32 nSecond;
     s32 nMsec;
 
-    fn_8011E020(&nMonth, &nDay, &nYear, &nHour, &nMinute, &nSecond, &nMsec);
+    RTClock_GetCurrentTime(&nMonth, &nDay, &nYear, &nHour, &nMinute, &nSecond, &nMsec);
     *(s32*)pArgs[0].p = nMonth;
     *(s32*)pArgs[1].p = nDay;
     *(s32*)pArgs[2].p = nYear;

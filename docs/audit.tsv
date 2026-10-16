@@ -50,7 +50,7 @@ EASBStorage.c	open
 EASportsBio.c	open		
 Earnings.c	open		
 FE_Calendar.c	open		
-FE_CalendarPopups.c	open		
+FE_CalendarPopups.c	done	b2c600edd674	claude-review
 FE_CrAPDB.c	open		
 FE_CrAPMessages.c	open		
 FE_LogoDesign.c	open		

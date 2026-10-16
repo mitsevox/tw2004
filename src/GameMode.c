@@ -1483,7 +1483,7 @@ f32 GM_GetGameProgress(SaveProfile* pProfile) {
 f32 GM_GetBonusProgress(SaveProfile* pProfile) {
     f32 f = 0.0f;
     int i;
-    for (i = 0; i < 75; i++) {
+    for (i = 0; i < SAVE_NUM_RTE_AWARDS; i++) {
         if (pProfile->aRTEAward[i].bWon) {
             f += 1.0f;
         }

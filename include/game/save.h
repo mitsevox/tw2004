@@ -9,11 +9,11 @@
 
 #include "golfer.h"
 
-// An award in a save profile: whether it is won, and when. TW06: AwardInfoBase.
+// An award in a save profile: whether it is won, and when.
 typedef struct Award {
-    u8   bWon;                  // 0x0  TW06: bWon
+    u8   bWon;                  // 0x0
     u8   unk1;
-    u16  nDate;                 // 0x2  the day it was won (CalDate_GetToday). TW06: dateWon
+    u16  nDate;                 // 0x2  the day it was won (CalDate_GetToday)
 } Award;
 
 // A tournament of the season in a save profile (TW06: PGATourSeason_EventData, the same layout).
@@ -250,6 +250,8 @@ typedef struct Replay {
 } Replay;
 LAYOUT_ASSERT(Replay, 0xF28);
 
+#define SAVE_NUM_RTE_AWARDS 75  // SaveProfile.aRTEAward: the real-time event award ids
+
 // One save profile (0x10600 bytes).
 typedef struct SaveProfile {
     u8   bActive;               // 0x00000  1: the slot holds a profile; payouts are scaled and
@@ -307,7 +309,7 @@ typedef struct SaveProfile {
                                 //          the top 25 of the tour's money list
                                 //          (GM_PgaTourSim_CheckEndOfTournamentAward; TW07
                                 //          AwardInfoPGAMoneyList)
-    Award aRTEAward[75];        // 0x0020C  per real-time event id. TW06: rteEventAwardInfo
+    Award aRTEAward[SAVE_NUM_RTE_AWARDS];  // 0x0020C  per real-time event award id
     Award aLadderAward[25];     // 0x00338  per ladder event (LadderedMode.c);
                                 //          UserInfo_GetNumLadderEventsWon's earnings rating counts
                                 //          the won ones

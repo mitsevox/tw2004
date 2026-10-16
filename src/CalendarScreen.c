@@ -130,7 +130,7 @@ void Calendar_SelectCell(MsgArg* pArgs, MsgArg* pResult) {
     if (gCalendarGetEventInfoByDate[CalendarState.nDriver](nDate)) {
         nPanel = gCalendarGetPopupType[CalendarState.nDriver](nDate);
     } else {
-        nPanel = -1;
+        nPanel = CALENDAR_POPUP_NONE;
     }
     CalendarState.nPopupType = nPanel;
     pResult->i = nPanel;

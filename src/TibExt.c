@@ -61,7 +61,7 @@ u32 TibExtCurrentTimeGet(void) {
     int nDays;
     int nSeconds;
 
-    fn_8011E020(&nMonth, &nDay, &nYear, &nHour, &nMinute, &nSecond, &nMsec);
+    RTClock_GetCurrentTime(&nMonth, &nDay, &nYear, &nHour, &nMinute, &nSecond, &nMsec);
     CalDate_SetMDY(&uEpoch, 0, 0, 1970);
     CalDate_SetMDY(&uToday, nMonth, nDay, nYear);
     nDays = uToday - uEpoch - 1;

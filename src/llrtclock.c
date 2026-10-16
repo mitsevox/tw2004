@@ -3,7 +3,7 @@
 
 #include "engine.h"
 
-int fn_8011E020(s32* pnMonth, s32* pnDay, s32* pnYear, s32* pnHour, s32* pnMinute, s32* pnSecond,
+int RTClock_GetCurrentTime(s32* pnMonth, s32* pnDay, s32* pnYear, s32* pnHour, s32* pnMinute, s32* pnSecond,
                 s32* pnMsec) {
     OSCalendarTime time;
 
@@ -29,7 +29,7 @@ void RTClock_GetDateTimeString(char* szOut) {
     int bAM;
     char* szAMPM;
 
-    fn_8011E020(&nMonth, &nDay, &nYear, &nHour, &nMinute, &nSecond, &nSecond);
+    RTClock_GetCurrentTime(&nMonth, &nDay, &nYear, &nHour, &nMinute, &nSecond, &nSecond);
     bAM = 0;
     if (nHour >= 1 && nHour <= 12) {
         bAM = 1;
