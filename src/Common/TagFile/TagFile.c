@@ -55,7 +55,7 @@ typedef struct {
     u8*                      pKey;          // 0x4C
     u32                      uKeyLen;       // 0x50
     const CryptTypeT*        pCipher;       // 0x54
-    const ChecksumInterface* pChecksum;     // 0x58
+    const ChecksumTypeT*     pChecksum;     // 0x58
     int                      eOperation;    // 0x5C  1 create, 2 delete, 3 end, 4/5 open, 6 write, 8 read
     int                      eStep;         // 0x60  step within the operation
     void*                    pBuffer;       // 0x64  current record payload
@@ -97,7 +97,7 @@ static int TagFile_CipherError(int eError) {
 }
 
 static int TagFile_ChecksumError(int eError) {
-    if (eError == 0) {
+    if (eError == CHECKSUM_ERROR_NONE) {
         return 0;
     } else {
         return eError + 300;
@@ -292,15 +292,15 @@ static u32 TagFile_AddEntry(u32 uTag, u32 uSize, const void* pChecksum) {
 
 // Checksum and cipher ---------------------------------------------------------------------
 
-static int TagFile_Checksum(const void* pData, u32 uSize, ChecksumResult** ppResult) {
-    const ChecksumInterface* pChecksum = _TagFile_pData->pChecksum;
-    int eError = 0;
-    eError = pChecksum->pfnReset();
-    if (eError == 0) {
-        eError = pChecksum->pfnUpdate(pData, uSize);
-        if (eError == 0) {
-            eError = pChecksum->pfnFinalise(ppResult);
-            if (eError == 0) {
+static int TagFile_Checksum(const void* pData, u32 uSize, ChecksumResultT** ppResult) {
+    const ChecksumTypeT* pChecksum = _TagFile_pData->pChecksum;
+    ChecksumErrorE eError = CHECKSUM_ERROR_NONE;
+    eError = pChecksum->Start();
+    if (eError == CHECKSUM_ERROR_NONE) {
+        eError = pChecksum->Calculate(pData, uSize);
+        if (eError == CHECKSUM_ERROR_NONE) {
+            eError = pChecksum->Stop(ppResult);
+            if (eError == CHECKSUM_ERROR_NONE) {
                 return 0;
             }
         }
@@ -310,7 +310,7 @@ static int TagFile_Checksum(const void* pData, u32 uSize, ChecksumResult** ppRes
 
 // Checksum of the whole map, 4 bytes into pOut.
 static void TagFile_MapChecksum(void* pOut) {
-    ChecksumResult* pResult;
+    ChecksumResultT* pResult;
     int eError = 0;
     u32 uSize = 0;
     uSize = _TagFile_pData->Map.uNumEntries * sizeof(TagMapEntry);
@@ -321,7 +321,7 @@ static void TagFile_MapChecksum(void* pOut) {
         eError = TagFile_Checksum(_TagFile_pData->Map.pList, uSize, &pResult);
 #line 899
         SFIO_ASSERT(TAG_ERROR_NONE == eError);
-        memcpy(pOut, pResult->pData, 4);
+        memcpy(pOut, pResult->pChecksum, 4);
     }
 }
 
@@ -443,7 +443,7 @@ static int TagFile_ReadRecord(void) {
 // After a record has been read: decode header and payload, check tag, size and checksum.
 static int TagFile_VerifyRecord(void) {
     int eError = 0;
-    ChecksumResult* pResult = NULL;
+    ChecksumResultT* pResult = NULL;
     u8* pHeader = NULL;
     u32 uSize = 0;
     u32 uTag;
@@ -471,7 +471,7 @@ static int TagFile_VerifyRecord(void) {
     if (pResult->uSize != 4) {
         return TAG_ERROR_BAD_HEADER;
     }
-    if (memcmp(pResult->pData, &_TagFile_pData->uRecordChecksum, 4) != 0) {
+    if (memcmp(pResult->pChecksum, &_TagFile_pData->uRecordChecksum, 4) != 0) {
         return TAG_ERROR_BAD_CHECKSUM;
     }
     return 0;
@@ -486,7 +486,7 @@ int TagFile_IsInitialised(void) {
 int TagFile_Init(const TagFileInitParams* pParams) {
     int eError = 0;
     int eSFIOError = 0;
-    int eChecksumError = 0;
+    ChecksumErrorE eChecksumError = CHECKSUM_ERROR_NONE;
     CryptErrorE eCipherError = CRYPT_ERROR_NONE;
     if (TagFile_IsInitialised()) {
         return TAG_ERROR_ALREADY_INITIALISED;
@@ -502,11 +502,9 @@ int TagFile_Init(const TagFileInitParams* pParams) {
     if (_TagFile_pData == NULL) {
         return TAG_ERROR_NO_MEMORY;
     }
-    // The checksum module hands out its interface as a table of function addresses; this file
-    // reads the same table as a ChecksumInterface.
-    SFIOGetSignatureMethod((void* const**)&_TagFile_pData->pChecksum);
-    eChecksumError = _TagFile_pData->pChecksum->pfnInit(pParams->pAllocator);
-    if (eChecksumError != 0) {
+    SFIOGetSignatureMethod(&_TagFile_pData->pChecksum);
+    eChecksumError = _TagFile_pData->pChecksum->Init(pParams->pAllocator);
+    if (eChecksumError != CHECKSUM_ERROR_NONE) {
         return TagFile_ChecksumError(eChecksumError);
     }
     _TagFile_pData->pCipher = pParams->pCipher;
@@ -545,7 +543,7 @@ int TagFile_Init(const TagFileInitParams* pParams) {
 int TagFile_Shutdown(void) {
     int eError = 0;
     int eSFIOError = 0;
-    int eChecksumError = 0;
+    ChecksumErrorE eChecksumError = CHECKSUM_ERROR_NONE;
     CryptErrorE eCipherError = CRYPT_ERROR_NONE;
     if (!TagFile_IsInitialised()) {
         return TAG_ERROR_NOT_INITIALISED;
@@ -567,8 +565,8 @@ int TagFile_Shutdown(void) {
         _TagFile_pData->pKey = NULL;
     }
     _TagFile_pData->pCipher = NULL;
-    eChecksumError = _TagFile_pData->pChecksum->pfnShutdown();
-    if (eChecksumError != 0) {
+    eChecksumError = _TagFile_pData->pChecksum->Shutdown();
+    if (eChecksumError != CHECKSUM_ERROR_NONE) {
         return TagFile_ChecksumError(eChecksumError);
     }
     _TagFile_pData->pChecksum = NULL;
@@ -619,7 +617,7 @@ int TagFile_End(TagSession* pSession) {
 }
 
 int TagFile_Write(TagSession* pSession, u32 uTag, u32 uIndex, void* pBuffer, u32 uSize) {
-    ChecksumResult* pResult = NULL;
+    ChecksumResultT* pResult = NULL;
     int eError = 0;
     int eSFIOError = 0;
     TagMapEntry* pEntry = NULL;
@@ -635,7 +633,7 @@ int TagFile_Write(TagSession* pSession, u32 uTag, u32 uIndex, void* pBuffer, u32
     if (eError != 0) {
         return eError;
     }
-    memcpy(&_TagFile_pData->uRecordChecksum, pResult->pData, 4);
+    memcpy(&_TagFile_pData->uRecordChecksum, pResult->pChecksum, 4);
     if (pEntry == NULL) {
         uOffset = _TagFile_pData->Map.uNextOffset;
         TagFile_AddEntry(uTag, _TagFile_pData->uSize, &_TagFile_pData->uRecordChecksum);

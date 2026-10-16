@@ -1,125 +1,127 @@
-// EA shared file library, built with SN ProDG (GCC 2.95) without optimization.
-// Original path (from the assert string in the binary): ../../../Source/Common/Checksum/ChecksumCRC32.c
-// Function and field names are ours; the original names are unknown.
+// ChecksumCRC32.c: the CRC32 checksum of EA's shared file library. The tag file checks each record of
+// the EA Sports Bio save and its map of records with it, and EASBStorage.c the save's banner and icon.
 
-typedef struct {
-    unsigned long size;
-    void*         data;
-} CRC32Result;
+#include "Common/SharedFileIO.h"
+#include "Common/TibExtMem.h"
 
-typedef struct {
-    unsigned long* table;      // 256-entry lookup table, allocated in CRC32_Init
-    CRC32Result    result;
-    unsigned long  crc;        // running value, starts at 0xFFFFFFFF
-    void*          allocator;
-} CRC32State;
+static CheckSumCRC32InfoT _ChecksumCRC32_State = { NULL, { CHECKSUMCRC32_SIZE, NULL }, 0xFFFFFFFF, NULL };
 
-// Memory functions of the host game (CodeWarrior side). Signatures inferred from the calls.
-extern void* TibExtMemAlloc(void* allocator, unsigned long size, unsigned long align, const char* file, int line);
-extern void  TibExtMemFree(void* allocator, void* p, unsigned long size, unsigned long align);
+static ChecksumErrorE _ChecksumCRC32_Init(void* pAllocator);
+static ChecksumErrorE _ChecksumCRC32_Shutdown(void);
+static BOOL _ChecksumCRC32_IsInitialized(void);
+static ChecksumErrorE _ChecksumCRC32_Start(void);
+static ChecksumErrorE _ChecksumCRC32_CalculateBuffer(const u8* pBuffer, u32 uLength);
+static ChecksumErrorE _ChecksumCRC32_Stop(ChecksumResultT** ppResult);
+static ChecksumErrorE _ChecksumCRC32_GetSize(u32* pSize);
 
-CRC32State gCRC = { 0, { 4, 0 }, 0xFFFFFFFF, 0 };   // read directly by SharedFileIO.c, so not static
-static unsigned long gCRCResult;
-
-int CRC32_Init(void* allocator);
-int CRC32_Shutdown(void);
-int CRC32_IsInitialised(void);
-int CRC32_Reset(void);
-int CRC32_Update(const unsigned char* data, unsigned long len);
-int CRC32_Finalise(CRC32Result** out);
-int CRC32_GetResultSize(unsigned long* out);
-
-// The library exposes each module as a table of function pointers. Defined before the functions:
-// in the binary the table precedes the __FILE__ string in .rodata.
-static void* const gCRC32Interface[7] = {
-    (void*)CRC32_Init,
-    (void*)CRC32_Shutdown,
-    (void*)CRC32_IsInitialised,
-    (void*)CRC32_Reset,
-    (void*)CRC32_Update,
-    (void*)CRC32_Finalise,
-    (void*)CRC32_GetResultSize,
+static const ChecksumTypeT _ChecksumCRC32_Type = {
+    _ChecksumCRC32_Init,
+    _ChecksumCRC32_Shutdown,
+    _ChecksumCRC32_IsInitialized,
+    _ChecksumCRC32_Start,
+    _ChecksumCRC32_CalculateBuffer,
+    _ChecksumCRC32_Stop,
+    _ChecksumCRC32_GetSize,
 };
 
-unsigned long CRC32_Entry(unsigned long index) {
-    unsigned char k;
-    unsigned long c = index;
-    for (k = 8; k != 0; k--) {
-        if (c & 1) c = (c >> 1) ^ 0xEDB88320;
-        else       c = c >> 1;
+// The lookup table's entry for one byte value: the value shifted through eight rounds of the
+// reflected CRC32 polynomial 0xEDB88320.
+static u32 _ChecksumCRC32_Calculate(u32 uValue) {
+    u8 uLoop;
+    u32 uCRC = uValue;
+    for (uLoop = 8; uLoop != 0; uLoop--) {
+        if (uCRC & 1) {
+            uCRC = (uCRC >> 1) ^ 0xEDB88320;
+        } else {
+            uCRC = uCRC >> 1;
+        }
     }
-    return c;
+    return uCRC;
 }
 
-void CRC32_BuildTable(unsigned long* table) {
-    unsigned long i;
-    for (i = 0; i <= 255; i++) table[i] = CRC32_Entry(i);
-}
-
-int CRC32_Init(void* allocator) {
-    if (gCRC.table != 0) return 5;
-#line 214 "../../../Source/Common/Checksum/ChecksumCRC32.c"
-    gCRC.table = TibExtMemAlloc(allocator, 1024, 4, __FILE__, __LINE__);
-    if (gCRC.table == 0) return 1;
-    gCRC.allocator = allocator;
-    CRC32_BuildTable(gCRC.table);
-    gCRC.crc = 0xFFFFFFFF;
-    gCRC.result.size = 4;
-    gCRC.result.data = 0;
-    return 0;
-}
-
-int CRC32_Shutdown(void) {
-    if (gCRC.table == 0) return 6;
-    TibExtMemFree(gCRC.allocator, gCRC.table, 1024, 4);
-    gCRC.table = 0;
-    return 0;
-}
-
-int CRC32_IsInitialised(void) {
-    return gCRC.table != 0;
-}
-
-int CRC32_Reset(void) {
-    if (gCRC.table == 0) return 6;
-    gCRC.crc = 0xFFFFFFFF;
-    return 0;
-}
-
-int CRC32_Update(const unsigned char* data, unsigned long len) {
-    unsigned long i;
-    unsigned long idx;
-    unsigned long crc = gCRC.crc;
-    if (gCRC.table == 0) return 6;
-    if (data == 0) return 2;
-    // A `for` loop here makes GCC 2.95 -O0 emit a stray nop before it; a while loop does not.
-    i = 0;
-    while (i < len) {
-        idx = (data[i] ^ crc) & 0xFF;
-        crc = ((crc >> 8) & 0x00FFFFFF) ^ gCRC.table[idx];
-        i++;
+static void _ChecksumCRC32_CreateLookupTable(u32* pTable) {
+    u32 uLoop;
+    for (uLoop = 0; uLoop < CHECKSUMCRC32_NUM_ENTRIES; uLoop++) {
+        pTable[uLoop] = _ChecksumCRC32_Calculate(uLoop);
     }
-    gCRC.crc = crc;
-    return 0;
 }
 
-int CRC32_Finalise(CRC32Result** out) {
-    if (gCRC.table == 0) return 6;
-    if (out == 0) return 2;
-    gCRCResult = ~gCRC.crc;
-    gCRC.result.data = &gCRCResult;
-    gCRC.result.size = 4;
-    *out = &gCRC.result;
-    return 0;
+// Allocates and fills the lookup table and starts a checksum.
+static ChecksumErrorE _ChecksumCRC32_Init(void* pAllocator) {
+    if (_ChecksumCRC32_State.pLookupTable != NULL) return CHECKSUM_ERROR_INITIALIZED;
+#line 213 "../../../Source/Common/Checksum/ChecksumCRC32.c"
+    _ChecksumCRC32_State.pLookupTable = TibExtMemAlloc(pAllocator, CHECKSUMCRC32_NUM_ENTRIES * sizeof(u32), 4,
+                                                       __FILE__, __LINE__);
+    if (_ChecksumCRC32_State.pLookupTable == NULL) return CHECKSUM_ERROR_OUTOFMEMORY;
+    _ChecksumCRC32_State.pAllocator = pAllocator;
+    _ChecksumCRC32_CreateLookupTable(_ChecksumCRC32_State.pLookupTable);
+    _ChecksumCRC32_State.uCRC = 0xFFFFFFFF;
+    _ChecksumCRC32_State.Result.uSize = CHECKSUMCRC32_SIZE;
+    _ChecksumCRC32_State.Result.pChecksum = NULL;
+    return CHECKSUM_ERROR_NONE;
 }
 
-int CRC32_GetResultSize(unsigned long* out) {
-    if (gCRC.table == 0) return 6;
-    if (out == 0) return 2;
-    *out = 4;
-    return 0;
+// Frees the lookup table.
+static ChecksumErrorE _ChecksumCRC32_Shutdown(void) {
+    if (_ChecksumCRC32_State.pLookupTable == NULL) return CHECKSUM_ERROR_NOTINITIALIZED;
+    TibExtMemFree(_ChecksumCRC32_State.pAllocator, _ChecksumCRC32_State.pLookupTable,
+                  CHECKSUMCRC32_NUM_ENTRIES * sizeof(u32), 4);
+    _ChecksumCRC32_State.pLookupTable = NULL;
+    return CHECKSUM_ERROR_NONE;
 }
 
-void* const* CRC32_GetInterface(void) {
-    return gCRC32Interface;
+static BOOL _ChecksumCRC32_IsInitialized(void) {
+    return _ChecksumCRC32_State.pLookupTable != NULL;
+}
+
+// Starts a new checksum.
+static ChecksumErrorE _ChecksumCRC32_Start(void) {
+    if (_ChecksumCRC32_State.pLookupTable == NULL) return CHECKSUM_ERROR_NOTINITIALIZED;
+    _ChecksumCRC32_State.uCRC = 0xFFFFFFFF;
+    return CHECKSUM_ERROR_NONE;
+}
+
+// Adds uLength bytes to the running CRC, one table lookup per byte. A buffer can be added in
+// pieces, and adding after Stop carries on from where Stop left off.
+static ChecksumErrorE _ChecksumCRC32_CalculateBuffer(const u8* pBuffer, u32 uLength) {
+    u32 uIndex;
+    u32 uGen;
+    u32 uCRC = _ChecksumCRC32_State.uCRC;
+    if (_ChecksumCRC32_State.pLookupTable == NULL) return CHECKSUM_ERROR_NOTINITIALIZED;
+    if (pBuffer == NULL) return CHECKSUM_ERROR_INVALIDPARAMETERS;
+    uIndex = 0;
+    while (uIndex < uLength) {
+        uGen = (pBuffer[uIndex] ^ uCRC) & 0xFF;
+        uCRC = ((uCRC >> 8) & 0x00FFFFFF) ^ _ChecksumCRC32_State.pLookupTable[uGen];
+        uIndex++;
+    }
+    _ChecksumCRC32_State.uCRC = uCRC;
+    return CHECKSUM_ERROR_NONE;
+}
+
+// The finished CRC (the running value inverted), in *ppResult. The result points at one static
+// copy, which the next Stop overwrites. The running value is kept until the next Start.
+static ChecksumErrorE _ChecksumCRC32_Stop(ChecksumResultT** ppResult) {
+    static u32 uCRCResult;
+    if (_ChecksumCRC32_State.pLookupTable == NULL) return CHECKSUM_ERROR_NOTINITIALIZED;
+    if (ppResult == NULL) return CHECKSUM_ERROR_INVALIDPARAMETERS;
+    uCRCResult = ~_ChecksumCRC32_State.uCRC;
+    _ChecksumCRC32_State.Result.pChecksum = (u8*)&uCRCResult;
+    _ChecksumCRC32_State.Result.uSize = CHECKSUMCRC32_SIZE;
+    *ppResult = &_ChecksumCRC32_State.Result;
+    return CHECKSUM_ERROR_NONE;
+}
+
+// The size of the result in bytes: 4.
+static ChecksumErrorE _ChecksumCRC32_GetSize(u32* pSize) {
+    if (_ChecksumCRC32_State.pLookupTable == NULL) return CHECKSUM_ERROR_NOTINITIALIZED;
+    if (pSize == NULL) return CHECKSUM_ERROR_INVALIDPARAMETERS;
+    *pSize = CHECKSUMCRC32_SIZE;
+    return CHECKSUM_ERROR_NONE;
+}
+
+// The CRC32's functions as a table, which the shared file library (llSFIOGetSignatureMethod) and
+// EASBStorage.c take.
+const ChecksumTypeT* ChecksumCRC32QueryType(void) {
+    return &_ChecksumCRC32_Type;
 }

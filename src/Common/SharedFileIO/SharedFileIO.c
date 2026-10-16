@@ -976,7 +976,7 @@ void fn_8017124C(SFIODescriptor* pDescriptor, u32* pSize, u32* pEntries) {
     fn_80172D7C(pDescriptor, pSize, pEntries);
 }
 
-void SFIOGetSignatureMethod(void* const** ppInterface) {
+void SFIOGetSignatureMethod(const ChecksumTypeT** ppInterface) {
     llSFIOGetSignatureMethod(ppInterface);
 }
 
