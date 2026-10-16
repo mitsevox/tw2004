@@ -64,31 +64,30 @@ void          UPool_Free(TPool* pPool, TListSglLink* pNode);
 
 // UAudMemStack.c: a stack allocator. Blocks are cut from the top of one buffer, and each one is
 // recorded in a table so it can be given back by its address.
-typedef struct UAudMemStackBlock {
+typedef struct MemStackBlock_S {
     u8*  pMem;                  // 0x0    the block's start
     u32  uSize;                 // 0x4    its size, rounded up to the stack's alignment; 0 once freed
     u32  unk8;                  // 0x8
-} UAudMemStackBlock;
-LAYOUT_ASSERT(UAudMemStackBlock, 0xC);
+} MemStackBlock;
+LAYOUT_ASSERT(MemStackBlock, 0xC);
 
-typedef struct UAudMemStack {
-    u8*                pTop;        // 0x0    where the next block starts
-    u8*                pEnd;        // 0x4    one past the buffer's end
-    u32                nMaxBlocks;  // 0x8    entries in pBlocks
-    UAudMemStackBlock* pBlocks;     // 0xC
-    u32                nBlocks;     // 0x10   blocks handed out
-    u32                nBtmBlocks;  // 0x14   blocks cut from the bottom (TW07's AudMemStack_AllocBtm,
-                                    //        not in this build: 0), counted with nBlocks
-                                    //        against nMaxBlocks
-    u32                nAlign;      // 0x18   a power of two
-    u8                 bOwnBlocks;  // 0x1C   pBlocks was allocated by the stack itself
-} UAudMemStack;
-LAYOUT_ASSERT(UAudMemStack, 0x20);
+typedef struct AudMemStack_S {
+    u8*            pTop;        // 0x0    where the next block starts
+    u8*            pEnd;        // 0x4    one past the buffer's end
+    u32            nMaxBlocks;  // 0x8    entries in pBlocks
+    MemStackBlock* pBlocks;     // 0xC    the block table; AudMemStack_AllocTop fills entry nBlocks
+    u32            nBlocks;     // 0x10   blocks handed out from the top
+    u32            nBtmBlocks;  // 0x14   blocks cut from the bottom: nothing in this game cuts one, so
+                                //        always 0; counted with nBlocks against nMaxBlocks
+    u32            nAlign;      // 0x18   a power of two
+    u8             bOwnBlocks;  // 0x1C   pBlocks was taken from the game's heap by the stack itself
+} AudMemStack;
+LAYOUT_ASSERT(AudMemStack, 0x20);
 
-void  AudMemStack_Init(UAudMemStack* pStack, u8* pMem, u32 uSize, u32 nMaxBlocks, UAudMemStackBlock* pBlocks,
-                  u32 nAlign);
-void* AudMemStack_AllocTop(UAudMemStack* pStack, u32 uSize);
-void  AudMemStack_FreeTop(UAudMemStack* pStack, void* p);
+void  AudMemStack_Init(AudMemStack* pAudMemStack, u8* startAddr, u32 nBytes, u32 maxAllocs,
+                       MemStackBlock* memBlocksA, u32 alignPow2);
+void* AudMemStack_AllocTop(AudMemStack* pAudMemStack, u32 nBytes);
+void  AudMemStack_FreeTop(AudMemStack* pAudMemStack, void* addr);
 
 void*      AudMem_Alloc(u32 uSize);  // the sound engine's allocator
 void       AudMem_Free(void* p);     // gives back what AudMem_Alloc handed out
