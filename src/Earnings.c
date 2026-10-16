@@ -2518,7 +2518,7 @@ void GM_RecordIndividualHoleStats(int nPlayer) {
             if (gpSaveData[nProfile].bActive && nPar == 5 &&
                 gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] <= 3) {
                 nMarked = GM_ConvertCourseAndHoleToPar5EagleIndex(gpGame->nCurCourse, Game_GetCurHoleNum());
-                fn_8011E020(&nMonth, &nDay, &nYear, &nHour, &nMinute, &nSecond, &nMsec);
+                RTClock_GetCurrentTime(&nMonth, &nDay, &nYear, &nHour, &nMinute, &nSecond, &nMsec);
                 nDate = FE_DateToInt(nMonth, nDay, nYear);
                 if (nMarked != -1) {
                     UserInfo_SetPar5EagleStat(&gpSaveData[nProfile], 0, nMarked, 1);

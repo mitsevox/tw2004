@@ -1,6 +1,7 @@
 // fe.h (our name): the front end, the game's menus: the menu screens (FE_Manager.c), the
 // Create-A-Player database (FE_CrAPDB.c), the golfers animated on menu screens (FEgolferanim.c),
-// the PGA Tour messages (FE_PGATourMessages.c) and the logo editor (FE_LogoDesign.c).
+// the PGA Tour messages (FE_PGATourMessages.c), the logo editor (FE_LogoDesign.c) and the career
+// calendar's day-details popups (FE_CalendarPopups.c).
 
 #ifndef FRONTEND_FE_H
 #define FRONTEND_FE_H
@@ -9,6 +10,7 @@
 #include "platform.h"
 #include "endian.h"
 #include "game/save.h"
+#include "game/frontend.h"
 
 // ---- the menu screens (FE_Manager.c) ---------------------------------------------------------
 
@@ -345,6 +347,11 @@ typedef struct CrAPAsset {
 } CrAPAsset;
 LAYOUT_ASSERT(CrAPAsset, 0x118);
 
+// CrAPAsset.nLockKind: how an asset is unlocked.
+enum {
+    CRAP_LOCK_RTE_AWARD = 17    // by real-time event award nLock
+};
+
 // The Create-A-Player database (0x18 bytes, allocated by FE_CrAP_InitModule).
 typedef struct CrAPDB {
     s32  nAssets;               // 0x00  how many assets pAssets holds
@@ -493,6 +500,10 @@ s32  FE_CrAP_CollectSponsorshipItems(void);          // FE_CrAPDB.c: fill lbl_80
 // FE_CrAPDB.c: copy record n out
 void FE_CrAP_GetSponsorshipItemInfo(int n, s16* pN0, s32* pN4, char* pDst);
 void FE_CrAP_GetSponsorName(s16 n, char* pDst);      // FE_CrAPDB.c: name n of lbl_801935C8
+// FE_CrAPDB.c: the names of the first three assets offered for the current gender with lock kind
+// nKind and number nLock; how many there are, up to 3.
+s32  FE_CrAP_GetFirstThreeItemsWithLockModeAndVal(s32 nKind, s32 nLock, char* szFirst, char* szSecond,
+                                                  char* szThird);
 // FE_CrAPDB.c: send message nMsg with its values to the front end (the EA Sports Bio screens).
 void FE_SendHintInt(int nMsg, s32 nA);
 void FE_SendHintIntString(int nMsg, s32 nA, char* szB);
@@ -616,6 +627,23 @@ u8*  FE_LogoDesign_GetLogoAsTexture(u8* pLogo, int nWidth, int nHeight);
 
 extern u8 gLogoTexturePixels[64 * 64];  // a logo's pixels laid out as a texture
                                         // (FE_LogoDesign_GetLogoAsTexture); 64 x 64 or 128 x 32
+
+// ---- the career calendar's day-details popups (FE_CalendarPopups.c) ---------------------------
+
+// Rows 3 to 8 of the popup CareerCalendar.nPopupType names (CALENDAR_POPUP_*, game.h), for the
+// calendar drivers' row functions (FE_Calendar.c).
+void PGATourPopup_GetRow_EventInProgress(int nRow, char* szTitle, char* szText);
+void PGATourPopup_GetRow_EventResults(int nRow, char* szTitle, char* szText);
+void PGATourPopup_GetRow_EventUpcoming(int nRow, char* szTitle, char* szText);
+void PGATourPopup_GetRow_EventNextEvent(int nRow, char* szTitle, char* szText);
+void RealtimePopup_GetRow_TodaysEvent(int nRow, char* szTitle, char* szText);
+void RealtimePopup_GetRow_EventResults(int nRow, char* szTitle, char* szText);
+void RealtimePopup_GetRow_EventUpcoming(int nRow, char* szTitle, char* szText);
+// Menu handlers for front-end messages 536 (the next real-time event) and 544 (the console clock's
+// date), and for message 696's real-time event awards.
+void FE_GetNextRealtimeEventInfo(MsgArg* pArgs, MsgArg* pResult);
+void FE_GetDateTimeIfClockEarly(MsgArg* pArgs, MsgArg* pResult);
+void TrophyRoom_GetRTEAwardStatus(MsgArg* pArgs, MsgArg* pResult);
 
 // ---- the UI's polygon element, loading screen and start-up movies (uiProcessPolygon.c) -------
 

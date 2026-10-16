@@ -83,10 +83,8 @@ s32  fn_800A09EC(MCCardPos* pPos);      // }
 s32  MC_SaveUser(MCCardPos* pPos);      // }
 s32  MC_GetNumUser(MCCardPos* pPos);      // }
 void Gaud_ExitFE(void);
-void Gaud_PlayUISound(int n);
 void TrophyRoom_GetTourWinStatus(MsgArg* pArgs, MsgArg* pResult);
 void TrophyRoom_GetPlayerOfMonthStatus(MsgArg* pArgs, MsgArg* pResult);
-void TrophyRoom_GetRTEAwardStatus(MsgArg* pArgs, MsgArg* pResult);
 
 // The other files' message handlers in the table (the Create-A-Player screens, the logo editor,
 // the PGA TOUR screens, the stats screen, the EA Sports Bio...).
@@ -226,8 +224,6 @@ void UIStatsRankings_SetActiveStat(MsgArg* pArgs, MsgArg* pResult);
 void UIStatsRankings_GetIndStatsRow(MsgArg* pArgs, MsgArg* pResult);
 void UIStatsRankings_GetIndStatsNumRows(MsgArg* pArgs, MsgArg* pResult);
 void UIStatsRankings_GetNumRows(MsgArg* pArgs, MsgArg* pResult);
-void FE_GetNextRealtimeEventInfo(MsgArg* pArgs, MsgArg* pResult);
-void FE_GetDateTimeIfClockEarly(MsgArg* pArgs, MsgArg* pResult);
 void LadderMenu_SetNodePos(MsgArg* pArgs, MsgArg* pResult);
 void LadderMenu_GetNodePos(MsgArg* pArgs, MsgArg* pResult);
 void LadderMenu_GetEventText(MsgArg* pArgs, MsgArg* pResult);
@@ -3284,7 +3280,7 @@ void GM_vGetProfileProgress(MsgArg* pArgs, MsgArg* pResult) {
     *pnBits = n;
 
     n = 0;
-    for (i = 0; i < 75; i++) {
+    for (i = 0; i < SAVE_NUM_RTE_AWARDS; i++) {
         if (gpSaveData[nProfile].aRTEAward[i].bWon) {
             n++;
         }

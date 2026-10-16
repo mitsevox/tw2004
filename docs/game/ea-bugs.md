@@ -45,6 +45,7 @@ The code allows it, but whether it ever happens depends on the game's data or on
 | Ball.c Physics_GetFeetAngle_ForwardBackward | a flat normal ( | y |
 | GoDynamicCam.c:914 DynamicCam_TrackBallVelocityLag | tests `f98 < f154` but eases by (f154 - fCamTime) / f154 squared: grows again if fCamTime passes f154 while f98 is under it | whether f98 and fCamTime can drift apart (f98 reset alone at gocamscripts.c:1949) |
 | GameModeDriverRTE.c GameModeDriverRTE_EndGame | calls gRTEChallengeEndGame unchecked; NULL (and aChallenge[-1] at line 266) only for an event with bOff or nChallenge 0 | the disc's 'RTEc' data; whether the calendar can start such an event |
+| FE_CalendarPopups.c PGATourPopup_GetRow_EventUpcoming | the champion's score shows only above 0, else "N/A"; a tournament played on the tour keeps its winner's score to par (GameModeDriverPGATour_AdvanceEvent), so a winner at or under par shows "N/A" | the 'PGAc' data's starting champion scores (strokes or to par); the popup of a tournament a season after it was played |
 | GameModeDriverPGATour.c GetCourses | aTourEvent[nTourEvent - 1] with nTourEvent 0 (other functions test for 0) | the 'PGAc' tournament data |
 | PlayNowMode.c PlayNow_LoadBallSpot | gPlayNowBallSpots[-1] for a type-10 object with challenge 0 | the course files' 'Cact' type-10 objects |
 | Earnings.c last hole | hole goals checked twice (PayHoledGoals, then PayRoundGoals): a money goal (nAward 39) with bEachHole would pay twice | the 'ERN ' table: any enabled bEachHole money goal |

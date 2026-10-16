@@ -165,7 +165,7 @@ s32 GM_RealtimeMode_GetNEventsWon(void) {
     SaveProfile* p = &gpSaveData[nPlayer];
     s32 n = 0;
     s32 i;
-    for (i = 0; i < 75; i++) {
+    for (i = 0; i < SAVE_NUM_RTE_AWARDS; i++) {
         if (p->aRTEAward[i].bWon == 1) {
             n++;
         }
@@ -280,7 +280,7 @@ void GameModeDriverRTE_GetCurrentDate(s32* pMonth, s32* pDay, s32* pYear) {
     s32 nMinute;
     s32 nSecond;
     s32 nMsec;
-    fn_8011E020(&nMonth, &nDay, &nYear, &nHour, &nMinute, &nSecond, &nMsec);
+    RTClock_GetCurrentTime(&nMonth, &nDay, &nYear, &nHour, &nMinute, &nSecond, &nMsec);
     *pMonth = nMonth;
     *pDay = nDay;
     *pYear = nYear;
@@ -397,7 +397,7 @@ s32 GameModeDriverRTE_GetYearIndex(void) {
     s32 nUnused;
     s32 bOk;
     s32 nSeason;
-    fn_8011E020(&nUnused, &nUnused, &nYear, &nUnused, &nUnused, &nUnused, &nUnused);
+    RTClock_GetCurrentTime(&nUnused, &nUnused, &nYear, &nUnused, &nUnused, &nUnused, &nUnused);
     nSeason = nYear - 2003;
     bOk = 0;
     if (nSeason >= 0 && nSeason < 10) {

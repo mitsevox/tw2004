@@ -563,7 +563,7 @@ void FE_CrAP_UpdateSaleInfo(int a, int b) {
     default:
         return;
     }
-    fn_8011E020(&nMonth, &nDay, &nYear, &nHour, &nMinute, &nSecond, &nMsec);
+    RTClock_GetCurrentTime(&nMonth, &nDay, &nYear, &nHour, &nMinute, &nSecond, &nMsec);
     nSeed = FE_DateToInt(nMonth, nDay, nYear);
     for (j = 0; j < 5; j++) {
         gpFEProfile->aSaleEntry[b][nCategory][j] = -1;
@@ -718,12 +718,12 @@ u8 FE_CrAP_IsItemLocked(s32 nAsset, SaveProfile* pProfile) {
     case 16:
         bLocked = n > GM_GetGameProgress(pProfile);
         break;
-    case 17:
+    case CRAP_LOCK_RTE_AWARD:
         bLocked = !pProfile->aRTEAward[n].bWon;
         break;
     case 18:
         bLocked = 1;
-        for (i = 0; i < 75; i++) {
+        for (i = 0; i < SAVE_NUM_RTE_AWARDS; i++) {
             if (pProfile->aRTEAward[i].bWon) {
                 nCount++;
             }

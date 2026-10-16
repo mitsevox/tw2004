@@ -20,16 +20,6 @@
 #include "game/modes/pgatoursim.h"
 #include "frontend/fe.h"
 
-// The rows of the day-details popups (FE_CalendarPopups.c): PGA TOUR in progress, results, upcoming,
-// before it starts; real-time today's event, results, upcoming.
-void PGATourPopup_GetRow_EventInProgress(int nRow, char* szTitle, char* szText);
-void PGATourPopup_GetRow_EventResults(int nRow, char* szTitle, char* szText);
-void PGATourPopup_GetRow_EventUpcoming(int nRow, char* szTitle, char* szText);
-void PGATourPopup_GetRow_EventNextEvent(int nRow, char* szTitle, char* szText);
-void RealtimePopup_GetRow_TodaysEvent(int nRow, char* szTitle, char* szText);
-void RealtimePopup_GetRow_EventResults(int nRow, char* szTitle, char* szText);
-void RealtimePopup_GetRow_EventUpcoming(int nRow, char* szTitle, char* szText);
-
 void GetRankText(int nRank, char* sz);
 void Calendar_GetEventNameLine(u16 nDate, char* sz);
 u8   IsAMonthAhead(u32 nMonth, u32 nOther);
@@ -76,7 +66,7 @@ void Online_GetBottomLine(u16 nDate, int nLine, char* sz) {
 
 // The online calendar's day-details popup for a date: -1, none (stub).
 s32 Online_GetPopupType(u16 nDate) {
-    return -1;
+    return CALENDAR_POPUP_NONE;
 }
 
 // A row of the online calendar's day-details popup: leaves the title and text as they are (stub).
@@ -345,19 +335,19 @@ s32 PGATour_GetPopupType(u16 nDate) {
     nTodayStart = GameModeDriverPGATour_GetStartDate(nTodayId);
     nStart = GameModeDriverPGATour_GetStartDate(nId);
     if (GameModeDriverPGATour_GetUsersCurrentEventID(0) == -1) {
-        return 1;
+        return CALENDAR_POPUP_PGA_RESULTS;
     }
     if (nStart < nTodayStart) {
-        return 1;
+        return CALENDAR_POPUP_PGA_RESULTS;
     }
     if (nStart == nTodayStart) {
-        nResult = 0;
+        nResult = CALENDAR_POPUP_PGA_IN_PROGRESS;
         if (nTodayRound == 0) {
-            nResult = 3;
+            nResult = CALENDAR_POPUP_PGA_NEXT_EVENT;
         }
         return nResult;
     }
-    return 2;
+    return CALENDAR_POPUP_PGA_UPCOMING;
 }
 
 // A row of the PGA TOUR calendar's day-details popup (row 0, "Event:", is the calendar screen's):
@@ -389,16 +379,16 @@ void PGATour_GetPopupRow(int nRow, char* szTitle, char* szText) {
         return;
     default:
         switch (CalendarState.nPopupType) {
-        case 0:
+        case CALENDAR_POPUP_PGA_IN_PROGRESS:
             PGATourPopup_GetRow_EventInProgress(nRow, szTitle, szText);
             return;
-        case 1:
+        case CALENDAR_POPUP_PGA_RESULTS:
             PGATourPopup_GetRow_EventResults(nRow, szTitle, szText);
             return;
-        case 2:
+        case CALENDAR_POPUP_PGA_UPCOMING:
             PGATourPopup_GetRow_EventUpcoming(nRow, szTitle, szText);
             return;
-        case 3:
+        case CALENDAR_POPUP_PGA_NEXT_EVENT:
             PGATourPopup_GetRow_EventNextEvent(nRow, szTitle, szText);
             return;
         }
@@ -539,12 +529,12 @@ void RealTime_GetBottomLine(u16 nDate, int nLine, char* sz) {
 // 6 upcoming for a day to come.
 s32 RealTime_GetPopupType(u16 nDate) {
     if (nDate < CalendarState.nToday) {
-        return 5;
+        return CALENDAR_POPUP_RTE_RESULTS;
     }
     if (nDate == CalendarState.nToday) {
-        return (GM_RealtimeMode_TodaysEventCompleted() != 0) + 4;
+        return (GM_RealtimeMode_TodaysEventCompleted() != 0) + CALENDAR_POPUP_RTE_TODAY;
     }
-    return 6;
+    return CALENDAR_POPUP_RTE_UPCOMING;
 }
 
 // A row of the real-time events calendar's day-details popup (row 0, "Event:", is the calendar
@@ -566,13 +556,13 @@ void RealTime_GetPopupRow(int nRow, char* szTitle, char* szText) {
         return;
     default:
         switch (CalendarState.nPopupType) {
-        case 4:
+        case CALENDAR_POPUP_RTE_TODAY:
             RealtimePopup_GetRow_TodaysEvent(nRow, szTitle, szText);
             return;
-        case 5:
+        case CALENDAR_POPUP_RTE_RESULTS:
             RealtimePopup_GetRow_EventResults(nRow, szTitle, szText);
             return;
-        case 6:
+        case CALENDAR_POPUP_RTE_UPCOMING:
             RealtimePopup_GetRow_EventUpcoming(nRow, szTitle, szText);
             return;
         }

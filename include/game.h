@@ -648,12 +648,24 @@ typedef struct CareerCalendar {
     u32  nEndCell;              // 0x10  the cell after its last day
     u32  nPrevMonthDays;        // 0x14  the days in the month before
     s32  nDriver;               // 0x18  0 none, 1 PGA TOUR, 2 real-time events
-    s32  nPopupType;            // 0x1C  which panel the day's details show (PGA TOUR 0..3, RTE
-                                //       4..6, -1 no event; Calendar_SelectCell)
+    s32  nPopupType;            // 0x1C  which panel the day's details show (CALENDAR_POPUP_*;
+                                //       Calendar_SelectCell)
     u8   bSeasonOver;           // 0x20  the PGA TOUR season has no event left
     u8   unk21[0x28 - 0x21];
 } CareerCalendar;
 LAYOUT_ASSERT(CareerCalendar, 0x28);
+
+// CareerCalendar.nPopupType: the day-details panel, each with its rows in FE_CalendarPopups.c.
+enum {
+    CALENDAR_POPUP_NONE = -1,               // the day has no event
+    CALENDAR_POPUP_PGA_IN_PROGRESS = 0,     // the tournament of nToday, which is past its first round
+    CALENDAR_POPUP_PGA_RESULTS = 1,         // an earlier one, or any while player 1 has no tournament
+    CALENDAR_POPUP_PGA_UPCOMING = 2,        // a later tournament
+    CALENDAR_POPUP_PGA_NEXT_EVENT = 3,      // the tournament of nToday, which is its first round
+    CALENDAR_POPUP_RTE_TODAY = 4,           // the real-time event of nToday
+    CALENDAR_POPUP_RTE_RESULTS = 5,         // a real-time event on a past day
+    CALENDAR_POPUP_RTE_UPCOMING = 6         // a real-time event on a later day
+};
 
 extern CareerCalendar CalendarState;
 extern char* (*gCalendarGetEventName[3])(u16 nDate);    // the name of the event on a day ("" none)

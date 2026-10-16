@@ -49,5 +49,7 @@ void Gaud_StartMusic(u8 a, u16 b);
 u8   Gaud_GetMusicStatus(void);
 void Gaud_RestartMusic(void);
 void Aud_PlayBuiltInSound(u8 nSound);
+// Menu sound n: a step of the UI sound emitter's track 0, or for 1 and 6 of its track 1.
+void Gaud_PlayUISound(s32 n);
 
 #endif
