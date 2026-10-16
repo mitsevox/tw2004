@@ -177,38 +177,38 @@ u8 fn_801281B4(u16 uLanguage, u16* aLanguages, u8 nLanguages) {
 // Checks the save's banner and icon block against its CRC32, starting the checksum library
 // for the check if it is not running.
 EASBErrorE fn_80128200(void* pIcon, u32 uHeapID) {
-    const ChecksumInterface* pCrc;
-    ChecksumResult* pResult;
+    const ChecksumTypeT* pCrc;
+    ChecksumResultT* pResult;
     EASBErrorE eError;
-    int eCrcError;
+    ChecksumErrorE eCrcError;
     BOOL bRunning;
 
     eError = EASB_ERROR_NONE;
-    eCrcError = 0;
-    pCrc = (const ChecksumInterface*)CRC32_GetInterface();
-    bRunning = pCrc->pfnIsInitialised();
+    eCrcError = CHECKSUM_ERROR_NONE;
+    pCrc = ChecksumCRC32QueryType();
+    bRunning = pCrc->IsInitialized();
     if (!bRunning) {
-        eCrcError = pCrc->pfnInit((void*)uHeapID);
+        eCrcError = pCrc->Init((void*)uHeapID);
     }
-    if (eCrcError == 0) {
-        eCrcError = pCrc->pfnReset();
+    if (eCrcError == CHECKSUM_ERROR_NONE) {
+        eCrcError = pCrc->Start();
         if (eError == EASB_ERROR_NONE) {
-            eCrcError = pCrc->pfnUpdate(pIcon, EASB_ICON_SIZE);
-            if (eCrcError == 0) {
-                eCrcError = pCrc->pfnFinalise(&pResult);
-                if (eCrcError == 0 && *(u32*)pResult->pData != EASB_ICON_CRC) {
+            eCrcError = pCrc->Calculate(pIcon, EASB_ICON_SIZE);
+            if (eCrcError == CHECKSUM_ERROR_NONE) {
+                eCrcError = pCrc->Stop(&pResult);
+                if (eCrcError == CHECKSUM_ERROR_NONE && *(u32*)pResult->pChecksum != EASB_ICON_CRC) {
                     eError = EASB_ERROR_INVALID_ICON;
                 }
             }
         }
-        if (eCrcError != 0) {
+        if (eCrcError != CHECKSUM_ERROR_NONE) {
             eError = EASB_ERROR_UNKNOWN;
         }
         if (!bRunning) {
-            eCrcError = pCrc->pfnShutdown();
+            eCrcError = pCrc->Shutdown();
         }
     }
-    if (eCrcError != 0) {
+    if (eCrcError != CHECKSUM_ERROR_NONE) {
         eError = EASB_ERROR_UNKNOWN;
     }
     return eError;

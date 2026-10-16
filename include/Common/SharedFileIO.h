@@ -90,7 +90,47 @@ typedef struct {
 extern SFIOData*   _SFIO_pData;
 extern SFIODevice* _SFIO_pDevice;
 
-void* const* CRC32_GetInterface(void);
+// A checksum's result: its size in bytes and where its bytes are.
+typedef struct ChecksumResult_t {
+    u32 uSize;          // 0x00  4 for CRC32
+    u8* pChecksum;      // 0x04
+} ChecksumResultT;
+
+// What a checksum's functions return.
+typedef enum {
+    CHECKSUM_ERROR_NONE = 0,
+    CHECKSUM_ERROR_OUTOFMEMORY = 1,         // Init could not allocate its table
+    CHECKSUM_ERROR_INVALIDPARAMETERS = 2,   // a null buffer or result pointer
+    CHECKSUM_ERROR_INITIALIZED = 5,         // Init on a checksum already initialised
+    CHECKSUM_ERROR_NOTINITIALIZED = 6       // before Init, or after Shutdown
+} ChecksumErrorE;
+
+// A checksum's functions, as ChecksumCRC32QueryType hands them out. Start begins a new checksum,
+// Calculate adds a buffer to it and Stop gives the result.
+typedef struct ChecksumType_t {
+    ChecksumErrorE (*Init)(void* pAllocator);
+    ChecksumErrorE (*Shutdown)(void);
+    BOOL (*IsInitialized)(void);
+    ChecksumErrorE (*Start)(void);
+    ChecksumErrorE (*Calculate)(const u8* pBuffer, u32 uLength);
+    ChecksumErrorE (*Stop)(ChecksumResultT** ppResult);
+    ChecksumErrorE (*GetSize)(u32* pSize);
+} ChecksumTypeT;
+
+// ChecksumCRC32.c
+#define CHECKSUMCRC32_NUM_ENTRIES 256   // the lookup table: one entry per byte value
+#define CHECKSUMCRC32_SIZE 4            // a CRC32's size in bytes
+
+// The CRC32's state: its lookup table and the checksum being worked out.
+typedef struct CheckSumCRC32Info_t {
+    u32*            pLookupTable;   // 0x00  allocated by Init, freed by Shutdown; NULL when not initialised
+    ChecksumResultT Result;         // 0x04  what Stop hands back
+    u32             uCRC;           // 0x0C  the running CRC: 0xFFFFFFFF at Start; Stop hands back its inverse
+    void*           pAllocator;     // 0x10  the allocator the table came from
+} CheckSumCRC32InfoT;
+LAYOUT_ASSERT(CheckSumCRC32InfoT, 0x14);
+
+const ChecksumTypeT* ChecksumCRC32QueryType(void);
 
 // SharedFileIO.c: what TagFile.c calls.
 int  SFIOInit(int* pDevices, const SFIOFuncTable* pFuncs, void* pAllocator);
@@ -105,7 +145,7 @@ int  SFIORead(SFIOSession* pSession, void* pBuffer, u32 uSize);
 int  SFIOWrite(SFIOSession* pSession, void* pBuffer, u32 uSize);
 int  SFIOUpdate(int* pProcess, int* pResult);
 int  SFIOSetDescriptor(SFIODescriptor* pDescriptor);
-void fn_80171294_GetChecksumInterface(void* const** ppInterface);
+void SFIOGetSignatureMethod(const ChecksumTypeT** ppInterface);
 
 // SharedFileIO.c: what EASBStorage.c calls.
 int  fn_8016CFF8_SetSaveDescriptor(void* pHeader);
@@ -129,7 +169,7 @@ int  fn_80171E94(int eError, int* pProcess, int* pResult);
 int  fn_801727C8(int eError, int* pProcess, int* pResult);
 BOOL fn_80172D54(const char* pFilename);
 void fn_80172D7C(SFIODescriptor* pData, u32* pSize, u32* pEntries);
-void fn_80172F48(void* const** ppInterface);
+void llSFIOGetSignatureMethod(const ChecksumTypeT** ppInterface);
 void fn_80172FA4(BOOL bEnable);
 u32  fn_80173000(void);
 int  fn_80173024(SFIODescriptor* pDescriptor);

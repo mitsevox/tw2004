@@ -459,9 +459,9 @@ void fn_80172D7C(SFIODescriptor* pData, u32* pSize, u32* pEntries) {
 }
 
 // The checksum the library uses on this platform: CRC32.
-void fn_80172F48(void* const** ppInterface) {
-    void* const* pInterface = NULL;
-    pInterface = CRC32_GetInterface();
+void llSFIOGetSignatureMethod(const ChecksumTypeT** ppInterface) {
+    const ChecksumTypeT* pInterface = NULL;
+    pInterface = ChecksumCRC32QueryType();
     if (ppInterface != NULL) {
         *ppInterface = pInterface;
     }

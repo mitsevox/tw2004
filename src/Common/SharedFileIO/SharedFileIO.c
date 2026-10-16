@@ -976,8 +976,8 @@ void fn_8017124C(SFIODescriptor* pDescriptor, u32* pSize, u32* pEntries) {
     fn_80172D7C(pDescriptor, pSize, pEntries);
 }
 
-void fn_80171294_GetChecksumInterface(void* const** ppInterface) {
-    fn_80172F48(ppInterface);
+void SFIOGetSignatureMethod(const ChecksumTypeT** ppInterface) {
+    llSFIOGetSignatureMethod(ppInterface);
 }
 
 u32 SFIOGetHeaderSize(void) {

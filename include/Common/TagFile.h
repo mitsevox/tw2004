@@ -6,22 +6,6 @@
 
 #include "Common/SharedFileIO.h"
 
-typedef struct {
-    u32   uSize;   // 4 for CRC32
-    void* pData;   // points at the value
-} ChecksumResult;
-
-// ChecksumCRC32.c's functions (CRC32_GetInterface), read as a ChecksumInterface.
-typedef struct {
-    int (*pfnInit)(void* pAllocator);
-    int (*pfnShutdown)(void);
-    BOOL (*pfnIsInitialised)(void);   // tested as a byte by EASBStorage.c fn_80128200
-    int (*pfnReset)(void);
-    int (*pfnUpdate)(const void* pData, u32 uSize);
-    int (*pfnFinalise)(ChecksumResult** ppResult);
-    int (*pfnGetResultSize)(u32* pSize);
-} ChecksumInterface;
-
 // What a cipher's functions return. A cipher's status is one of these too: a call made in the
 // wrong state fails with the status itself.
 typedef enum {
