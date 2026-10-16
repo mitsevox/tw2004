@@ -141,7 +141,7 @@ typedef struct GrassManager {
     void*        pCamera;       // 0x70  the grass's render camera, made from the three below
                                 //       (Grass_CreateTopCamera)
     CamLens*     pLens;         // 0x74  a flat lens, 20 x 20
-    GoFrameBuf*  pFrameBuf;     // 0x78  256 x 256
+    FB_SFrameBuffer* pFrameBuf; // 0x78  256 x 256
     VM_SViewport* pRect;        // 0x7C  its viewport
     GxTexture    tex80;         // 0x80  the 256 x 256 screen copy (Grass_InitModule)
     f32          fMinX;         // 0xB0  } the placed buffers' bounds (Grass_PlaceCell); the lens looks

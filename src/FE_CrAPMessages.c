@@ -20,7 +20,6 @@ void FE_CrAP_SetTriggerAnims(u8 b);     // FE_CrAPDB.c: let the menu golfer's an
                                         // calls run (1) or not (0)
 void FE_CrAP_UnequipSlot(s16 nSlot);    // FE_CrAPDB.c: take the asset in the profile's slot off
 void Gaud_PlayUISound(s32 n);
-u8   IsLeapYear(u32 nYear);            // Calendar.c: a leap year (1900 counts as one)
 
 // Menu message 381: how many choices entry pArgs[1] of part pArgs[0] offers
 // (FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex).

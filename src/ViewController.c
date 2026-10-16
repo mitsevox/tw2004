@@ -74,7 +74,7 @@ void ViewController_Init(int nView, f32 fLeft, f32 fTop, f32 fWidth, f32 fHeight
     VM_vSetViewportRect(pViewport, fLeft, fTop, fWidth, fHeight);
     // port: RC_GetCurrentFrameBuffer is typed s32, but its value is the frame buffer
     pViewController->pCamera =
-        RC_spCreateRenderCtx(pLens, (GoFrameBuf*)RC_GetCurrentFrameBuffer(), pViewport);
+        RC_spCreateRenderCtx(pLens, (FB_SFrameBuffer*)RC_GetCurrentFrameBuffer(), pViewport);
     CameraController_InitOneCamera(&pViewController->view);
     pViewController->nPlayer = 5;
     pViewController->bActive = 1;

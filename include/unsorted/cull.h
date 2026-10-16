@@ -34,7 +34,7 @@ typedef struct Camera {
     /* 0x010 */ CamLens* unk10;
     /* 0x014 */ VM_SViewport* pRect; // its viewport (camera.h RenderCamera; RC_vSetRenderCtxViewport
                                      // sets it)
-    /* 0x018 */ GoFrameBuf* pBuf;    // its frame buffer (GoRenderCtx_Gc.c RC_spCreateRenderCtx)
+    /* 0x018 */ FB_SFrameBuffer* pBuf; // its frame buffer (GoRenderCtx_Gc.c RC_spCreateRenderCtx)
     /* 0x01C */ char pad1C[0x40];
     /* 0x05C */ float m5C[4][4];     // camera space to the screen (GoDynObj.c DynObj_GetBallPixels divides by
                                      // w)
@@ -71,7 +71,7 @@ typedef struct Camera {
 } Camera;
 LAYOUT_ASSERT(Camera, 0x234);       // GoRenderCtx_Gc.c RC_spCreateRenderCtx allocates 0x234 bytes
 
-GoFrameBuf* RC_spGetRenderCtxFrameBuffer(Camera* pCamera); // GoRenderCtx_Gc.c: the camera's frame buffer
+FB_SFrameBuffer* RC_spGetRenderCtxFrameBuffer(Camera* pCamera); // GoRenderCtx_Gc.c: the camera's frame buffer
 
 Sphere* fn_800082F8(RenderObj* obj);
 // LLMath_Gc.c: dest = A x M, all four floats (A a row vector; dest may be A).
