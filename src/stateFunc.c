@@ -1,7 +1,5 @@
 // stateFunc.c (EA's name: TW07's stateFunc.c holds the same STATEFUNC_* callbacks, 16 of them
-// paired in the same order from STATEFUNC_ShotSetupInit to STATEFUNC_PlaceBallUpdate): split off
-// Swing.c at 0x8005D44C. Its .sdata2 starts on the 8-aligned address after the padding at
-// 0x8028367C..0x80283680 and its .sbss after Code8005D2E4.c's at 0x80281E0A..0x80281E10.
+// paired in the same order from STATEFUNC_ShotSetupInit to STATEFUNC_PlaceBallUpdate).
 
 #include "golfer.h"
 #include "ball.h"
@@ -129,7 +127,7 @@ void  STATEFUNC_ConcededInit(int nPlayer);
 void  STATEFUNC_ConcededUpdate(int nPlayer);
 void  STATEFUNC_ConcededExit(int nPlayer);
 
-ModeStateDef lbl_801883C0[2] = {
+MainStateFunctionList_t gMainStateTable[MAINSTATE_NUM] = {
     {NULL, NULL, NULL},
     {NULL, GOLFERSTATE_Update, NULL}
 };

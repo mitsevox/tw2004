@@ -141,10 +141,6 @@ void SW_vUIUpdateIK(int nPlayer);
 void SW_vUIRender2D(int nPlayer);
 void SW_vUIRender3D(int nPlayer);
 void GOLFERSTATE_CloseONCE(void);
-void fn_8005D2E4(void);
-void fn_8005D2F8(void);
-void fn_8005D348(void);
-void fn_8005D3A8(s8 nState);
 void fn_80062E00(void);
 void fn_80062E20(void);
 int  CameraController_GetClippedShadow(void);
@@ -395,7 +391,7 @@ void fn_8006C720(void) {
     CA_vInitOnce();
     Physics_InitOnce();
     fn_800563C4();
-    fn_8005D2E4();
+    STATEMAIN_OpenONCE();
     GOLFERSTATE_OpenONCE();
     GM_vInitModuleONCE();
     fn_800A2064();
@@ -406,7 +402,7 @@ void fn_8006C720(void) {
 
 void fn_8006C770(void) {
     GM_vCloseModuleONCE();
-    fn_8005D348();
+    STATEMAIN_CloseONCE();
     GOLFERSTATE_CloseONCE();
     CA_vCloseOnce();
     fn_80056454();
@@ -550,7 +546,7 @@ void GO_vInitFE(void) {
     Player_SetGolfer(0, 0, 0, 0, 0);
     nView = gPlayers[0].nView[0];
     CameraController_SetCameraMode(ViewController_GetCameraControl(nView), 0x17, 0, nView);
-    fn_8005D3A8(0);
+    STATEMAIN_Set(MAINSTATE_FRONTEND);
     GOLFERSTATE_Set(0, 0);
     Gaud_InitFE();
     FE_CrAPBall_MakeObjects();
@@ -614,7 +610,7 @@ void GO_vInitIG(void) {
     fn_8006F608();
     StreamManagerIngame_RegisterStreamClients();
     IG_InitGameMessages();
-    fn_8005D3A8(1);
+    STATEMAIN_Set(MAINSTATE_INGAME);
     GM_InitModule_PreDataStream();
     SitDev_vInitModule();
     CameraTuning_Init();
@@ -1087,7 +1083,7 @@ void fn_8006D8E8(void) {
         if (gSession.nGameType == 1) {
             Startup_Update();
         } else {
-            fn_8005D2F8();
+            STATEMAIN_Update();
         }
         if (gSession.nGameType != 1) {
             GM_Update();

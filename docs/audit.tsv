@@ -18,7 +18,6 @@ Code8002C984.c	open
 Code8002DB80.c	open		
 Code8002EE1C.c	open		
 Code80037AB8.c	open		
-Code8005D2E4.c	open		
 Code8006F608.c	open		
 Code80070EC4.c	open		
 Code80090940.c	open		
@@ -237,6 +236,7 @@ ska_shared.c	open
 skalib.c	open		
 startUp.c	open		
 stateFunc.c	open		
+statemain.c	done	eee7aafb	claude-review
 streammanagerhole.c	open		
 target.c	open		
 uiArc.c	open		
