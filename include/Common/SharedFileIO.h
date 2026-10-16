@@ -105,7 +105,7 @@ int  SFIORead(SFIOSession* pSession, void* pBuffer, u32 uSize);
 int  SFIOWrite(SFIOSession* pSession, void* pBuffer, u32 uSize);
 int  SFIOUpdate(int* pProcess, int* pResult);
 int  SFIOSetDescriptor(SFIODescriptor* pDescriptor);
-void fn_80171294_GetChecksumInterface(void* const** ppInterface);
+void SFIOGetSignatureMethod(void* const** ppInterface);
 
 // SharedFileIO.c: what EASBStorage.c calls.
 int  fn_8016CFF8_SetSaveDescriptor(void* pHeader);
@@ -129,7 +129,7 @@ int  fn_80171E94(int eError, int* pProcess, int* pResult);
 int  fn_801727C8(int eError, int* pProcess, int* pResult);
 BOOL fn_80172D54(const char* pFilename);
 void fn_80172D7C(SFIODescriptor* pData, u32* pSize, u32* pEntries);
-void fn_80172F48(void* const** ppInterface);
+void llSFIOGetSignatureMethod(void* const** ppInterface);
 void fn_80172FA4(BOOL bEnable);
 u32  fn_80173000(void);
 int  fn_80173024(SFIODescriptor* pDescriptor);

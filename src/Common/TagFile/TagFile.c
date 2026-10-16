@@ -504,7 +504,7 @@ int TagFile_Init(const TagFileInitParams* pParams) {
     }
     // The checksum module hands out its interface as a table of function addresses; this file
     // reads the same table as a ChecksumInterface.
-    fn_80171294_GetChecksumInterface((void* const**)&_TagFile_pData->pChecksum);
+    SFIOGetSignatureMethod((void* const**)&_TagFile_pData->pChecksum);
     eChecksumError = _TagFile_pData->pChecksum->pfnInit(pParams->pAllocator);
     if (eChecksumError != 0) {
         return TagFile_ChecksumError(eChecksumError);
