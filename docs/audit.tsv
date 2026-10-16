@@ -174,7 +174,7 @@ Skin.c	open
 SkinBurn.c	open		
 SkinMorph.c	open		
 SkinPart.c	open		
-StateGolfer.c	open		
+StateGolfer.c	done	2b0ee2a1	claude-review
 StaticMemory.c	open		
 SunFlr_Gc.c	open		
 Swing.c	open		
