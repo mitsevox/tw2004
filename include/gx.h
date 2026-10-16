@@ -202,7 +202,7 @@ LAYOUT_ASSERT(GxTexture, 0x30);
 void fn_8002A528(GxTexture* pTex, int nWidth, int nHeight, void* pImage, void* pLut, int eFormat,
                  int eLutFormat, int eWrapS, int eWrapT);
 void fn_8002A608(GxTexture* pTex);  // make pTex the texture of the next draw
-void fn_8002A024(u8 bOn, f32 x0, f32 y0, f32 x1, f32 y1);
+void GxUtil_ClearAlphaRect(u8 bOn, f32 x0, f32 y0, f32 x1, f32 y1);
 void fn_8002A164(int nMode);
 void fn_8002A2FC(void);             // the end of fn_8002A164's drawing
 u8   fn_8002A3A4(void);             // fn_8002A164's screen copy is being drawn with

@@ -32,7 +32,7 @@ typedef struct {
 typedef struct Camera {
     /* 0x000 */ float a0[4];         // 0, 0, 0.5, 0 at setup (GoRenderCtx_Gc.c RC_vSetDefaultRenderCtx)
     /* 0x010 */ CamLens* unk10;
-    /* 0x014 */ float* pRect;        // its screen rectangle (camera.h RenderCamera; RC_vSetRenderCtxViewport
+    /* 0x014 */ VM_SViewport* pRect; // its viewport (camera.h RenderCamera; RC_vSetRenderCtxViewport
                                      // sets it)
     /* 0x018 */ GoFrameBuf* pBuf;    // its frame buffer (GoRenderCtx_Gc.c RC_spCreateRenderCtx)
     /* 0x01C */ char pad1C[0x40];

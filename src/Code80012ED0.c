@@ -12,27 +12,27 @@
 void DS_vInitOnce(void);
 
 // A viewport's height, as a fraction of the frame buffer's (1: all of it).
-f32 VM_fGetViewportHeight(f32* pRect) {
-    return pRect[3];
+f32 VM_fGetViewportHeight(VM_SViewport* pViewport) {
+    return pViewport->fHeight;
 }
 
 // A viewport's width, as a fraction of the frame buffer's (1: all of it).
-f32 VM_fGetViewportWidth(f32* pRect) {
-    return pRect[2];
+f32 VM_fGetViewportWidth(VM_SViewport* pViewport) {
+    return pViewport->fWidth;
 }
 
 // A viewport's top edge, as a fraction of the frame buffer's height (0: the top).
-f32 VM_fGetViewportTop(f32* pRect) {
-    return pRect[1];
+f32 VM_fGetViewportTop(VM_SViewport* pViewport) {
+    return pViewport->fTop;
 }
 
 // A viewport's left edge, as a fraction of the frame buffer's width (0: the left).
-f32 VM_fGetViewportLeft(f32* pRect) {
-    return pRect[0];
+f32 VM_fGetViewportLeft(VM_SViewport* pViewport) {
+    return pViewport->fLeft;
 }
 
-// The viewport (screen rectangle) a render context draws into.
-f32* RC_spGetRenderCtxViewport(void* pCamera) {
+// The viewport a render context draws into.
+VM_SViewport* RC_spGetRenderCtxViewport(void* pCamera) {
     return ((RenderCamera*)pCamera)->pRect;
 }
 

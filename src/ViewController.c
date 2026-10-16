@@ -22,7 +22,6 @@ void  Camera_SetCameraPositionAndTargetWithSideVector(CamLens* pLens, f32* pPos,
 void  Camera_SetCameraPositionAndTargetWithOffsetAndScale(CamLens* pLens, f32* pPos, f32* pAt, f32* pF5C, f32* pF50);
 void  Camera_SetCameraYawPitchRollAndPosition(CamLens* pLens, f32* pPos, f32* pAngles);
 void  RC_vUpdateRenderCtxScreen(void* pCamera);
-void  VM_vUpdateInternalViewportRectData(f32* pRect);
 void  mat44flt_EulerAngles(f32 (*pMtx)[4], f32 fYaw, f32 fPitch, f32 fRoll);   // UMemPool.c
 void  LLMath_InvertNormalized(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: rotation+translation inverse
 void  CA_vSetDefaultScalingVectors(CamLens* pLens);
@@ -67,7 +66,7 @@ int ViewController_GetCurrentViewControllerID(void) {
 void ViewController_Init(int nView, f32 fLeft, f32 fTop, f32 fWidth, f32 fHeight) {
     ViewController* pViewController;
     CamLens* pLens;
-    f32* pViewport;
+    VM_SViewport* pViewport;
 
     pViewController = ViewController_GetDataPtr(nView);
     pLens = CA_spCreateCamera();
@@ -171,14 +170,14 @@ void ViewController_TurnOnViewController(int nView, u8 bActive) {
 // (ViewController_RestoreViewportRect puts it back).
 void ViewController_SaveViewportRect(int nView) {
     ViewController* pViewController;
-    f32* pViewport;
+    VM_SViewport* pViewport;
 
     pViewController = ViewController_GetDataPtr(nView);
     pViewport = RC_spGetRenderCtxViewport(ViewController_GetRenderContext(nView));
-    pViewController->f284 = pViewport[0];
-    pViewController->f280 = pViewport[1];
-    pViewController->f27C = pViewport[2];
-    pViewController->f278 = pViewport[3];
+    pViewController->f284 = pViewport->fLeft;
+    pViewController->f280 = pViewport->fTop;
+    pViewController->f27C = pViewport->fWidth;
+    pViewController->f278 = pViewport->fHeight;
 }
 
 // Puts back the viewport rectangle ViewController_SaveViewportRect saved for view nView.
@@ -200,11 +199,11 @@ s32 RC_GetCurrentFrameBuffer(void) {
 
 // Sets a viewport's rectangle (fractions of the frame buffer: 0, 0, 1, 1 is all of it) and
 // recomputes its derived values.
-void VM_vSetViewportRect(f32* pViewport, f32 fLeft, f32 fTop, f32 fWidth, f32 fHeight) {
-    pViewport[0] = fLeft;
-    pViewport[1] = fTop;
-    pViewport[2] = fWidth;
-    pViewport[3] = fHeight;
+void VM_vSetViewportRect(VM_SViewport* pViewport, f32 fLeft, f32 fTop, f32 fWidth, f32 fHeight) {
+    pViewport->fLeft = fLeft;
+    pViewport->fTop = fTop;
+    pViewport->fWidth = fWidth;
+    pViewport->fHeight = fHeight;
     VM_vUpdateInternalViewportRectData(pViewport);
 }
 

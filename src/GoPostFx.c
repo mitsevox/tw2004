@@ -251,8 +251,8 @@ void fn_800383A8(void) {
 void fn_80038438(void) {
     int i;
     f32 aXY[8];
-    f32* pRect;
-    f32* pViewRect;
+    VM_SViewport* pRect;
+    VM_SViewport* pViewRect;
     f32 fX;
     f32 fY;
     f32 fH;
@@ -266,14 +266,15 @@ void fn_80038438(void) {
     DS_vSetAlphaTestMode(0, 6, 0x80);
     RenderState_Flush();
     pRect = RC_spGetRenderCtxViewport(RC_spGetCurrentRenderCtx());
-    fX = pRect[0];
-    fY = pRect[1];
-    fW = pRect[2];
-    fH = pRect[3];
+    fX = pRect->fLeft;
+    fY = pRect->fTop;
+    fW = pRect->fWidth;
+    fH = pRect->fHeight;
     for (i = 0; i < 4; i++) {
         if (lbl_801D50C0[i].b0 && ViewController_IsActive(i)) {
             pViewRect = RC_spGetRenderCtxViewport(ViewController_GetRenderContext(i));
-            VM_vSetViewportRect(pRect, pViewRect[0], pViewRect[1], pViewRect[2], pViewRect[3]);
+            VM_vSetViewportRect(pRect, pViewRect->fLeft, pViewRect->fTop, pViewRect->fWidth,
+                                pViewRect->fHeight);
             RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
             RC_vUpdateRenderCtxTransformationMatrices(RC_spGetCurrentRenderCtx());
             RenderState_SetViewport(RC_spGetCurrentRenderCtx());
@@ -329,7 +330,7 @@ void fn_80038724(int nField, int nView, f32 fAlpha, f32 fShake) {
     f32 aColour[4];
     f32 aXY[8];
     f32 aUV[8];
-    f32* pRect;
+    VM_SViewport* pRect;
     f32 fX;
     f32 fY;
     f32 fRight;
@@ -338,10 +339,10 @@ void fn_80038724(int nField, int nView, f32 fAlpha, f32 fShake) {
     f32 fDY;
 
     pRect = ((RenderCamera*)ViewController_GetRenderContext(nView))->pRect;
-    fX = pRect[0];
-    fY = pRect[1];
-    fRight = pRect[0] + pRect[2];
-    fBottom = pRect[1] + pRect[3];
+    fX = pRect->fLeft;
+    fY = pRect->fTop;
+    fRight = pRect->fLeft + pRect->fWidth;
+    fBottom = pRect->fTop + pRect->fHeight;
     DS_vEnableZBufferUpdate(0);
     RenderState_SetDrawFlags(0x50);
     RenderState_SetBlendFactors(4, 5);
@@ -400,10 +401,12 @@ void fn_800389C0(void) {
     }
 }
 
-// Clears the screen's alpha inside the camera's rectangle (fn_8002A024 with bOn 1; nField unused).
+// Clears the screen's alpha inside the camera's viewport (GxUtil_ClearAlphaRect with bOn 1; nField
+// unused).
 void fn_80038A2C(int nField, RenderCamera* pCamera) {
-    fn_8002A024(1, pCamera->pRect[0], pCamera->pRect[1], pCamera->pRect[0] + pCamera->pRect[2],
-                pCamera->pRect[1] + pCamera->pRect[3]);
+    GxUtil_ClearAlphaRect(1, pCamera->pRect->fLeft, pCamera->pRect->fTop,
+                          pCamera->pRect->fLeft + pCamera->pRect->fWidth,
+                          pCamera->pRect->fTop + pCamera->pRect->fHeight);
 }
 
 // nField and pCamera are unused; fn_800389C0 passes them.
@@ -419,7 +422,7 @@ void fn_80038A90(f32* pColour, f32 fCX, f32 fCY, u8 bCopy, int nView, int nField
     f32 aUV[18][4];
     f32 aColour[18][4];
     RenderCamera* pCamera;
-    f32* pRect;
+    VM_SViewport* pRect;
     f32 fX0;
     f32 fX1;
     f32 fY0;
@@ -434,12 +437,12 @@ void fn_80038A90(f32* pColour, f32 fCX, f32 fCY, u8 bCopy, int nView, int nField
     if (bCopy) {
         fn_800390CC(nField, pCamera);
     }
-    fX0 = pRect[0];
-    fY0 = pRect[1];
-    fX1 = fX0 + pRect[2];
-    fY1 = fY0 + pRect[3];
-    fCX = fCX * pRect[2] + pRect[0];
-    fCY = fCY * pRect[3] + pRect[1];
+    fX0 = pRect->fLeft;
+    fY0 = pRect->fTop;
+    fX1 = fX0 + pRect->fWidth;
+    fY1 = fY0 + pRect->fHeight;
+    fCX = fCX * pRect->fWidth + pRect->fLeft;
+    fCY = fCY * pRect->fHeight + pRect->fTop;
     DS_vEnableZBufferUpdate(0);
     if (bCopy) {
         RenderState_SetDrawFlags(0x50);
@@ -560,17 +563,17 @@ void fn_800390CC(int nField, RenderCamera* pCamera) {
     f32 aColour[4];
     f32 aXY[8];
     f32 aUV[8];
-    f32* pRect;
+    VM_SViewport* pRect;
     f32 fX;
     f32 fY;
     f32 fRight;
     f32 fBottom;
 
     pRect = pCamera->pRect;
-    fX = pRect[0];
-    fY = pRect[1];
-    fRight = pRect[0] + pRect[2];
-    fBottom = pRect[1] + pRect[3];
+    fX = pRect->fLeft;
+    fY = pRect->fTop;
+    fRight = pRect->fLeft + pRect->fWidth;
+    fBottom = pRect->fTop + pRect->fHeight;
     DS_vEnableZBufferUpdate(0);
     RenderState_SetDrawFlags(0x10);
     DS_vSetAlphaTestMode(0, 1, 0x80);

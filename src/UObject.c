@@ -14,7 +14,6 @@ void Object_DrawMesh(UObjMesh* pMesh);
 UObjMesh* Object_GetMeshAlternative(UObjMesh* pMesh, int i);
 int  Object_GetMeshFlags(UObjMesh* pMesh, int i);
 int  Object_GetLod(UObject* pObj);
-f32  VM_fGetViewportHeightOverWidth(u8* p);
 f32  Math_Tan(f32 f);
 void Ter_GetAmbientLight(CourseInfo* pCourse, f32* pPos);  // the ground's light at pPos
 void LF_SetCurrentBrightness(f32 f);
@@ -105,7 +104,7 @@ void Object_Render(UObject* pObj) {
     nLod = Object_GetLod(pObj);
     pMesh = pObj->pModel->apLod[nLod];
     fFov = Camera_GetCurrentLens()->fFov;
-    fMax = 0.75f * fFov * VM_fGetViewportHeightOverWidth((u8*)RC_spGetCurrentRenderCtxViewport());
+    fMax = 0.75f * fFov * VM_fGetViewportHeightOverWidth(RC_spGetCurrentRenderCtxViewport());
     RC_vSetCurrentRenderCtxTransformationMatrix(pObj->m80);
     fTemp = fFov <= fMax ? fFov : fMax;
     // fake match: n108's address is taken here only so the 0.5 is loaded after the min, as in the

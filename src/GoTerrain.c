@@ -24,7 +24,6 @@
 
 void  Character_SetOrientationVec(Character* pChar, f32* pDir, f32 f);
 void  GameModeSkillZoneBase_AddCup(f32 x, f32 y, f32 z);
-f32   VM_fGetViewportHeightOverWidth(u8* p);
 f32   Math_Tan(f32 x);           // tan
 void  Ter_BeginRender(void);
 void  Ter_RenderView(void* pHoleData, int nView);
@@ -377,7 +376,7 @@ void Ter_RenderView(void* pHoleData, int nView) {
     fTan = Math_Tan(0.5f * pLens->fFov);
     fWideTan = Math_Tan(0.5f
                         * (0.75f * pLens->fFov
-                           * VM_fGetViewportHeightOverWidth((u8*)RC_spGetCurrentRenderCtxViewport())));
+                           * VM_fGetViewportHeightOverWidth(RC_spGetCurrentRenderCtxViewport())));
     gTerRenderer.fCameraMinHalfFieldOfViewTan =
         (fTan <= fWideTan / ViewController_GetCameraControl(nView)->f54) ? fTan : fWideTan
                 / ViewController_GetCameraControl(nView)->f54;
@@ -2218,7 +2217,7 @@ void Ter_RenderGrass(void) {
     fTan = Math_Tan(0.5f * pLens->fFov);
     fWideTan = Math_Tan(0.5f
                         * (0.75f * pLens->fFov
-                           * VM_fGetViewportHeightOverWidth((u8*)RC_spGetCurrentRenderCtxViewport())));
+                           * VM_fGetViewportHeightOverWidth(RC_spGetCurrentRenderCtxViewport())));
     gTerRenderer.fCameraMinHalfFieldOfViewTan =
         (fTan <= fWideTan / ViewController_GetCameraControl(0)->f54) ? fTan : fWideTan
                 / ViewController_GetCameraControl(0)->f54;
@@ -2449,9 +2448,8 @@ void RC_vSetCurrentRenderCtxTransformationMatrix(f32 (*pMtx)[4]) {
     RC_vSetRenderCtxTransformationMatrix(*gppCurrentRenderCtx, pMtx);
 }
 
-// The current render context's viewport, its screen rectangle as fractions of the frame buffer
-// (RC_spGetRenderCtxViewport).
-f32* RC_spGetCurrentRenderCtxViewport(void) {
+// The current render context's viewport (RC_spGetRenderCtxViewport).
+VM_SViewport* RC_spGetCurrentRenderCtxViewport(void) {
     return RC_spGetRenderCtxViewport(*(void**)gppCurrentRenderCtx);
 }
 

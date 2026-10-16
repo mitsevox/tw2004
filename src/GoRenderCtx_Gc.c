@@ -17,7 +17,7 @@
 
 void RC_vOnRenderCtxScreenUpdated(Camera* pCamera);
 void RC_vUpdateRenderCtxScreen(Camera* pCamera);
-void RC_vSetRenderCtxViewport(Camera* pCamera, f32* pRect);
+static void RC_vSetRenderCtxViewport(Camera* pCamera, VM_SViewport* pViewport);
 void RC_vSetRenderCtxFrameBuffer(Camera* pCamera, GoFrameBuf* pBuf);
 void RC_vSetRenderCtxCamera(Camera* pCamera, CamLens* pLens);
 void RC_vSetDefaultRenderCtx(Camera* pCamera);
@@ -42,13 +42,13 @@ void** gppCurrentRenderCtx = gapCurrentRenderCtx;
 // Makes a render context (0x234 bytes, TW07's RC_SRenderCtx) from a lens (TW07's CA_SCamera), a
 // frame buffer and a screen rectangle: the identity model matrix, the default clear values, and the
 // screen matrices worked out.
-void* RC_spCreateRenderCtx(CamLens* pLens, GoFrameBuf* pBuf, f32* pRect) {
+void* RC_spCreateRenderCtx(CamLens* pLens, GoFrameBuf* pBuf, VM_SViewport* pViewport) {
     Camera* pCamera;
 
     pCamera = StaticMem_Alloc(0x234, 2, 16, "GoRenderCtx_Gc.c", 96);
     RC_vSetRenderCtxCamera(pCamera, pLens);
     RC_vSetRenderCtxFrameBuffer(pCamera, pBuf);
-    RC_vSetRenderCtxViewport(pCamera, pRect);
+    RC_vSetRenderCtxViewport(pCamera, pViewport);
     RC_vSetDefaultRenderCtx(pCamera);
     RC_vUpdateRenderCtxScreen(pCamera);
     return pCamera;
@@ -80,11 +80,10 @@ void RC_vSetCurrentRenderCtx(s32 v);
 void RC_vUpdateRenderCtxScreenMatricesAndInfo(Camera* pCamera);   // not decompiled yet
 void RC_vStoreRenderCtxTransformationMatrix(u8* arg0, f32 (*arg1)[4]);
 s32 LLMath_IdentifyMat();
-f32 VM_fGetViewportHeightRatio(u8* p);
-f32 VM_fGetViewportWidthRatio(u8* p);
-f32 VM_fGetViewportOneOverHeightRatio(u8* p);
-f32 VM_fGetViewportHeightOverWidth(u8* p);
-f32 VM_fGetViewportOneOverWidthRatio(u8* p);
+f32 VM_fGetViewportHeightRatio(VM_SViewport* pViewport);
+f32 VM_fGetViewportWidthRatio(VM_SViewport* pViewport);
+f32 VM_fGetViewportOneOverHeightRatio(VM_SViewport* pViewport);
+f32 VM_fGetViewportOneOverWidthRatio(VM_SViewport* pViewport);
 f32 FB_fGetFrameBufferOneOverHeightRatio(u8* p);
 f32 VM_fGetFrameBufferHeightOverWidth(u8* p);
 f32 FB_fGetFrameBufferOneOverWidthRatio(u8* p);
@@ -144,7 +143,7 @@ void RC_vClearRenderCtxScreen(Camera* pCamera, u32 uFlags) {
 // says the lens is not perspective), its transpose m9C, and world to screen mDC.
 void RC_vUpdateRenderCtxScreenMatricesAndInfo(Camera* pCamera) {
     CamLens* pLens;
-    f32* pRect;
+    VM_SViewport* pRect;
     GoFrameBuf* pBuf;
     f32 f;
     f32 mFlat[4][4];
@@ -166,9 +165,11 @@ void RC_vUpdateRenderCtxScreenMatricesAndInfo(Camera* pCamera) {
     pCamera->f1E8 = 1.0f - (VM_fGetViewportTop(pRect) + VM_fGetViewportHeight(pRect) * 0.5f);
     pCamera->unk1F4 = pCamera->f1E0 * (CA_fGetCameraNearZ((u8*)pLens) / 554.256f);
     pCamera->unk1F8 = CA_fGetCameraFarZ((u8*)pLens);
-    pCamera->f1FC = pCamera->f224 * VM_fGetViewportOneOverWidthRatio((u8*)pRect) * FB_fGetFrameBufferOneOverWidthRatio((u8*)pBuf);
-    pCamera->f200 = VM_fGetFrameBufferHeightOverWidth((u8*)pBuf) * (VM_fGetViewportHeightOverWidth((u8*)pRect) *
-                    (pCamera->f224 * VM_fGetViewportOneOverHeightRatio((u8*)pRect) * FB_fGetFrameBufferOneOverHeightRatio((u8*)pBuf)));
+    pCamera->f1FC = pCamera->f224 * VM_fGetViewportOneOverWidthRatio(pRect)
+                    * FB_fGetFrameBufferOneOverWidthRatio((u8*)pBuf);
+    pCamera->f200 = VM_fGetFrameBufferHeightOverWidth((u8*)pBuf) * (VM_fGetViewportHeightOverWidth(pRect) *
+                    (pCamera->f224 * VM_fGetViewportOneOverHeightRatio(pRect)
+                     * FB_fGetFrameBufferOneOverHeightRatio((u8*)pBuf)));
 
     aSrc[0] = 1.0f;
     aSrc[1] = pCamera->f1FC;
@@ -196,13 +197,14 @@ void RC_vUpdateRenderCtxScreenMatricesAndInfo(Camera* pCamera) {
     pCamera->unk220 = aDst[0];
 
     if (fn_80008378(pLens) == 0) {
-        f = pRect[2] * (1.0f / VM_fGetViewportHeightRatio((u8*)pRect)) / pRect[3];
-        Mtx_Perspective(pCamera->m5C, pCamera->f228, 1.0f / VM_fGetViewportWidthRatio((u8*)pRect), f,
+        f = pRect->fWidth * (1.0f / VM_fGetViewportHeightRatio(pRect)) / pRect->fHeight;
+        Mtx_Perspective(pCamera->m5C, pCamera->f228, 1.0f / VM_fGetViewportWidthRatio(pRect), f,
                     pCamera->unk1F4, pCamera->unk1F8);
     } else {
         Mtx_OrthoScale(mFlat, pLens->fFlatWidth, pLens->fFlatHeight);
-        f = pRect[2] * (1.0f / VM_fGetViewportHeightRatio((u8*)pRect)) / pRect[3];
-        Mtx_PerspectiveDepthOverNear(mProj, 1.0f / VM_fGetViewportWidthRatio((u8*)pRect), f, pCamera->unk1F4, pCamera->unk1F8);
+        f = pRect->fWidth * (1.0f / VM_fGetViewportHeightRatio(pRect)) / pRect->fHeight;
+        Mtx_PerspectiveDepthOverNear(mProj, 1.0f / VM_fGetViewportWidthRatio(pRect), f, pCamera->unk1F4,
+                                     pCamera->unk1F8);
         LLMath_mat44fltMultiplyList(mProj, mFlat, pCamera->m5C, 4);
     }
     LLMath_Transpose44(pCamera->m5C, pCamera->m9C);
@@ -261,8 +263,8 @@ void RC_vStoreRenderCtxTransformationMatrix(u8* arg0, f32 (*arg1)[4]) {
     (*(s8*)((u8*)(arg0) + 0x1DC)) = 0;
 }
 
-void RC_vSetRenderCtxViewport(Camera* pCamera, f32* pRect) {
-    pCamera->pRect = pRect;
+static void RC_vSetRenderCtxViewport(Camera* pCamera, VM_SViewport* pViewport) {
+    pCamera->pRect = pViewport;
 }
 
 void RC_vSetRenderCtxFrameBuffer(Camera* pCamera, GoFrameBuf* pBuf) {
@@ -299,7 +301,7 @@ void RenderState_SetClipZFromRenderCtx(Camera* pCamera) {
 // Hands the renderer the camera's screen rectangle: in frame buffer units (bit 0x800), and in
 // 512 x 448 screen pixels, left, right, top, bottom (bit 0x200).
 void RenderState_SetViewport(void* pCamera) {
-    f32* pRect;
+    VM_SViewport* pRect;
     GoFrameBuf* pBuf;
 
     pRect = RC_spGetRenderCtxViewport(pCamera);
@@ -337,24 +339,24 @@ void RenderState_SetDrawFlags(int a) {
     gRenderState.uChanged |= 0x20;
 }
 
-f32 VM_fGetViewportHeightRatio(u8* p) {
-    return *(f32*)(p + 0x14);
+f32 VM_fGetViewportHeightRatio(VM_SViewport* pViewport) {
+    return pViewport->fHeightRatio;
 }
 
-f32 VM_fGetViewportWidthRatio(u8* p) {
-    return *(f32*)(p + 0x10);
+f32 VM_fGetViewportWidthRatio(VM_SViewport* pViewport) {
+    return pViewport->fWidthRatio;
 }
 
-f32 VM_fGetViewportOneOverHeightRatio(u8* p) {
-    return *(f32*)(p + 0x2C);
+f32 VM_fGetViewportOneOverHeightRatio(VM_SViewport* pViewport) {
+    return pViewport->fOneOverHeightRatio;
 }
 
-f32 VM_fGetViewportHeightOverWidth(u8* p) {
-    return *(f32*)(p + 0x30);
+f32 VM_fGetViewportHeightOverWidth(VM_SViewport* pViewport) {
+    return pViewport->fHeightOverWidth;
 }
 
-f32 VM_fGetViewportOneOverWidthRatio(u8* p) {
-    return *(f32*)(p + 0x28);
+f32 VM_fGetViewportOneOverWidthRatio(VM_SViewport* pViewport) {
+    return pViewport->fOneOverWidthRatio;
 }
 
 f32 FB_fGetFrameBufferHeight(GoFrameBuf* pBuf) {

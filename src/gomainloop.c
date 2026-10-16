@@ -170,8 +170,6 @@ void fn_800718C4(void);
 void LLVideo_InitModule(void);
 void fn_800763B4(void);
 void fn_800763B8(void);
-void VM_vInitModule(void);
-void VM_vCloseModule(void);
 void FE_vOpenONCE(void);
 void FE_vInitModule(void);
 void FE_vCloseModule(void);

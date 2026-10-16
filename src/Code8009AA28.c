@@ -176,7 +176,7 @@ void fn_8009B134(void) {
 // where v4 falls on the view's screen, fn_8009A754's result for the field being drawn, and the
 // next depth copy (fn_8009A3F4). Camera_GetCurrentLens's result is thrown away.
 void SF_vUpdateSunFlare(s32 nView) {
-    f32* pRect;
+    VM_SViewport* pRect;
     s32 nCtx;
     SunFlrState* pState;
     SunFlrView* pView;

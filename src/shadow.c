@@ -7,7 +7,6 @@
 #include "shadow.h"
 #include "unsorted/cull.h"
 
-void  VM_vUpdateInternalViewportRectData(f32* pRect);
 void  SD_InitShaderObject(void* pMesh, int n, s32* pDesc);   // Skin.c: set up a mesh object
 void  SD_FreeShaderObject(void* pMesh);                      // Skin.c: free it
 void  fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY);
@@ -141,7 +140,7 @@ void fn_800B251C_ShadowInit(u8 bHigh) {
     p->pFrameBuf = FB_spCreateFrameBuffer();
     FB_vSetFrameBuffer(p->pFrameBuf, 0.0f, 0.0f, 256.0f, 256.0f, 1.0f, 1.0f);
     VM_vSetViewportRect(p->pRect, 0.0f, 0.0f, 1.0f, 1.0f);
-    fn_800B3438(p->pRect, 1.0f, 1.0f);
+    VM_vSetViewportRatios(p->pRect, 1.0f, 1.0f);
     p->pCamera = RC_spCreateRenderCtx(p->pLens, p->pFrameBuf, p->pRect);
     fn_800B24D0(256, 256);
     fn_800B26DC();
@@ -584,10 +583,11 @@ void fn_800B2FB0(Character* pChar, int nView, u8 bFlat) {
     RenderState_Flush();
 }
 
-void fn_800B3438(f32* pRect, f32 x, f32 y) {
-    pRect[4] = x;
-    pRect[5] = y;
-    VM_vUpdateInternalViewportRectData(pRect);
+// Sets a viewport's width and height ratios (the screen's shape) and works out its derived values.
+void VM_vSetViewportRatios(VM_SViewport* pViewport, f32 fWidthRatio, f32 fHeightRatio) {
+    pViewport->fWidthRatio = fWidthRatio;
+    pViewport->fHeightRatio = fHeightRatio;
+    VM_vUpdateInternalViewportRectData(pViewport);
 }
 
 // Four floats: pOut gets pA plus pB.

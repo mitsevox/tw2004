@@ -8,7 +8,7 @@ void fn_8009A844(void* pCamera, u8* pIn, u8* pOut);
 // Moves a point from the camera's 0..1 screen rectangle units (pIn: x, y) into frame buffer units
 // (pOut), as RenderState_SetViewport does for the rectangle itself.
 void fn_8009A844(void* pCamera, u8* pIn, u8* pOut) {
-    f32* pRect;
+    VM_SViewport* pRect;
     f32* pSrc = (f32*)pIn;
     f32* pDst = (f32*)pOut;
     f32 fLeft;

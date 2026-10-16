@@ -12,14 +12,14 @@ void RC_UpdateCurrentScreenMatrices(void);
 void fn_80038624(f32* pColour);
 void Gaud_UpdtSpecialShot(u8 nPlayer, u8 n);     // GameAudio.c
 
-void ComicCam_ModeSpecificUpdate(ComicPanel* pPanel, f32* pRect, int nPlayer, f32 fFrameTime);
+static void ComicCam_ModeSpecificUpdate(ComicPanel* pPanel, VM_SViewport* pRect, int nPlayer, f32 fFrameTime);
 u8   ComicCam_IsFrameOver(ComicPanel* pPanel, int nPlayer);
 void ComicCam_PerformTransition(ComicPanel* pPanel, View* pView, f32 fFrameTime);
-void ComicCam_PerformFadeOuts(ComicPanel* pPanel, f32* pRect, f32 fFrameTime);
-void ComicCam_SetViewportToSize(f32* pRect, f32 fTop, f32 fLeft, f32 fWidth, f32 fHeight);
+static void ComicCam_PerformFadeOuts(ComicPanel* pPanel, VM_SViewport* pRect, f32 fFrameTime);
+static void ComicCam_SetViewportToSize(VM_SViewport* pRect, f32 fTop, f32 fLeft, f32 fWidth, f32 fHeight);
 void ComicCam_Init3ScreenMode(void);
 void ComicCam_Init9ScreenRapidMode(void);
-u8   ComicCam_IsComicCamOver(f32* pRect, int nPlayer);
+static u8   ComicCam_IsComicCamOver(VM_SViewport* pRect, int nPlayer);
 u8   ComicCam_IsScreenFrozen(void);
 void ComicCam_CheckForCameraSwitch(View* pView, int nPlayer);
 
@@ -77,7 +77,7 @@ void ComicCam_StartComicCam(int nKind, View* pView, int nPlayer) {
 // its course move on to the next. Returns 1 when the camera is finished.
 u8 ComicCam_UpdateComicCam(View* pView, int nPlayer, f32 fFrameTime) {
     f32 aColour[4] = { 0.0f, 0.0f, 0.0f, 0.5f };
-    f32* pRect;
+    VM_SViewport* pRect;
     ComicPanel* pPanel = &gpComicCam->aPanel[gpComicCam->nPanel];
 
     pRect = RC_spGetRenderCtxViewport(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0]));
@@ -131,7 +131,8 @@ u8 ComicCam_UpdateComicCam(View* pView, int nPlayer, f32 fFrameTime) {
 // Layout 1's ending: once the last panel is reached, grow it a little each frame until it fills the
 // screen: its shorter side (both when square), from the centre when centred, else away from the
 // nearer screen edge. nPlayer is not used.
-void ComicCam_ModeSpecificUpdate(ComicPanel* pPanel, f32* pRect, int nPlayer, f32 fFrameTime) {
+static void ComicCam_ModeSpecificUpdate(ComicPanel* pPanel, VM_SViewport* pRect, int nPlayer,
+                                        f32 fFrameTime) {
     f32 fX;
     f32 fY;
     f32 fHeight;
@@ -151,10 +152,10 @@ void ComicCam_ModeSpecificUpdate(ComicPanel* pPanel, f32* pRect, int nPlayer, f3
              (gpComicCam->nShown >= gpComicCam->nPanels - 1 && 0.0f == gpComicCam->fTime)) &&
             fFrameTime > 0.0f) {
             pPanel->nNext = -1;
-            fX = pRect[0];
-            fWidth = pRect[2];
-            fHeight = pRect[3];
-            fY = pRect[1];
+            fX = pRect->fLeft;
+            fWidth = pRect->fWidth;
+            fHeight = pRect->fHeight;
+            fY = pRect->fTop;
             fRight = 1.0f - (fX + fWidth);
             fBottom = 1.0f - (fY + fHeight);
             if (fabsf(fWidth - fHeight) < 0.001f) {
@@ -232,7 +233,7 @@ void ComicCam_PerformTransition(ComicPanel* pPanel, View* pView, f32 fFrameTime)
 
 // Draw the panels still showing, each darkened as its time runs out, then put the render camera's
 // rectangle pRect back. pPanel is not used.
-void ComicCam_PerformFadeOuts(ComicPanel* pPanel, f32* pRect, f32 fFrameTime) {
+static void ComicCam_PerformFadeOuts(ComicPanel* pPanel, VM_SViewport* pRect, f32 fFrameTime) {
     f32 aColour[4] = { 0.0f, 0.0f, 0.0f, 0.5f };
     f32 fY;
     f32 fX;
@@ -240,10 +241,10 @@ void ComicCam_PerformFadeOuts(ComicPanel* pPanel, f32* pRect, f32 fFrameTime) {
     f32 fWidth;
     int i;
 
-    fX = pRect[0];
-    fY = pRect[1];
-    fHeight = pRect[3];
-    fWidth = pRect[2];
+    fX = pRect->fLeft;
+    fY = pRect->fTop;
+    fHeight = pRect->fHeight;
+    fWidth = pRect->fWidth;
     for (i = 0; i < 10; i++) {
         if (gpComicCam->a24[i] > 0.0f) {
             ComicCam_SetViewportToSize(pRect, gpComicCam->aPanel[i].fTop, gpComicCam->aPanel[i].fLeft,
@@ -261,7 +262,7 @@ void ComicCam_PerformFadeOuts(ComicPanel* pPanel, f32* pRect, f32 fFrameTime) {
 }
 
 // Set the render camera's screen rectangle pRect and bring the camera up to date.
-void ComicCam_SetViewportToSize(f32* pRect, f32 fTop, f32 fLeft, f32 fWidth, f32 fHeight) {
+static void ComicCam_SetViewportToSize(VM_SViewport* pRect, f32 fTop, f32 fLeft, f32 fWidth, f32 fHeight) {
     VM_vSetViewportRect(pRect, fLeft, fTop, fWidth, fHeight);
     RC_UpdateCurrentScreenMatrices();
     RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
@@ -414,13 +415,14 @@ void ComicCam_Init9ScreenRapidMode(void) {
 
 // Is the comic camera finished? Layout 1: once the golfer is half a second past animation event 2
 // and the current panel fills the screen; layout 0: once the last panel has run its course (bDone).
-u8 ComicCam_IsComicCamOver(f32* pRect, int nPlayer) {
+static u8 ComicCam_IsComicCamOver(VM_SViewport* pRect, int nPlayer) {
     switch (gpComicCam->nKind) {
     case 0:
         return gpComicCam->bDone != 0;
     case 1:
         if (0.5f + Character_GetTagTime(gPlayers[nPlayer].pChar, 2) < gPlayers[nPlayer].pChar->fAnimTime) {
-            if (0.0f == pRect[0] && 0.0f == pRect[1] && 1.0f == pRect[2] && 1.0f == pRect[3]) {
+            if (0.0f == pRect->fLeft && 0.0f == pRect->fTop && 1.0f == pRect->fWidth
+                && 1.0f == pRect->fHeight) {
                 return 1;
             }
             return 0;

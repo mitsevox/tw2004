@@ -699,14 +699,44 @@ extern CrAPState* gpCrAPState;
 extern struct Character* gFEGolferChars[CRAP_NUM_GOLFERS];   // per golfer slot: the character it starts
                                         // with (none); char.c's Character_FreeFEGolfers frees them
 
+// ---- viewports (GoViewport.c) ---------------------------------------------------------------
+
+// The part of the frame buffer a render camera draws into (VM_spCreateViewport makes one). The
+// rectangle is in fractions of the frame buffer: 0, 0, 1, 1 is all of it. The ratios are the
+// screen's shape, its width and height measured against its width: 1 and 0.75 by default (a 4:3
+// screen), 1 and 1 for the square shadow and grass textures. The projection divides by them
+// (RC_vUpdateRenderCtxScreenMatricesAndInfo). The last seven fields are worked out from the first
+// six by VM_vUpdateInternalViewportRectData.
+typedef struct VM_SViewport {
+    f32  fLeft;                 // 0x00  the left edge, 0 by default
+    f32  fTop;                  // 0x04  the top edge, 0 by default
+    f32  fWidth;                // 0x08  1 by default
+    f32  fHeight;               // 0x0C  1 by default
+    f32  fWidthRatio;           // 0x10  1 by default
+    f32  fHeightRatio;          // 0x14  0.75 by default
+    f32  fWidthTimesRatio;      // 0x18  fWidth * fWidthRatio
+    f32  fHeightTimesRatio;     // 0x1C  fHeight * fHeightRatio
+    f32  fWidthOverRatio;       // 0x20  fWidth / fWidthRatio
+    f32  fHeightOverRatio;      // 0x24  fHeight / fHeightRatio
+    f32  fOneOverWidthRatio;    // 0x28  1 / fWidthRatio
+    f32  fOneOverHeightRatio;   // 0x2C  1 / fHeightRatio
+    f32  fHeightOverWidth;      // 0x30  fHeight / fWidth
+} VM_SViewport;
+LAYOUT_ASSERT(VM_SViewport, 0x34);
+
+void          VM_vUpdateInternalViewportRectData(VM_SViewport* pViewport);   // work out the derived fields
+void          VM_vInitModule(void);     // nothing to set up
+void          VM_vCloseModule(void);    // nothing to free
+VM_SViewport* VM_spCreateViewport(void);                         // a new viewport, the default one
+void          VM_vReleaseViewport(VM_SViewport* pViewport);      // free it
+
 // ---- the views ------------------------------------------------------------------------------
 
 // A render camera: TW07's render context RC_SRenderCtx (GoRenderCtx.h); only what the cleaned
 // code reads here (the fuller layout is Camera in unsorted/cull.h).
 typedef struct RenderCamera {
     u8   unk0[0x14];
-    f32* pRect;                 // 0x14  its viewport (TW07 VM_SViewport): left, top, width, height,
-                                //       fractions of the frame buffer (RC_spGetRenderCtxViewport)
+    VM_SViewport* pRect;        // 0x14  its viewport (RC_spGetRenderCtxViewport)
 } RenderCamera;
 
 // Points at the slot holding the current render camera (gapCurrentRenderCtx):
@@ -718,7 +748,7 @@ extern void** gppCurrentRenderCtx;
 void   RC_vSetCurrentRenderCtxTransformationMatrix(f32 (*pMtx)[4]);
 // GoRenderCtx_Gc.c: gives the camera the model matrix pMtx (NULL: the identity).
 void   RC_vSetRenderCtxTransformationMatrix(void* pCamera, f32 (*pMtx)[4]);
-f32*   RC_spGetCurrentRenderCtxViewport(void); // GoTerrain.c: the current render camera's screen rectangle
+VM_SViewport* RC_spGetCurrentRenderCtxViewport(void);   // GoTerrain.c: the current render camera's viewport
 
 ViewController* ViewController_GetCurrentViewController(void);     // the current view (gpCurViewController)
 ViewController* ViewController_GetIndexedViewController(int nView);
@@ -732,18 +762,19 @@ f32*   CameraController_GetCameraOrigin(View* pView);        // the camera's pos
 f32*   CameraController_GetCameraLookPoint(View* pView);    // where it looks (v10), or a script shot's angles
 u8     CameraController_IsFlybyDone(View* pView);        // 0: the script's shot aims by angles
                                                          // (ViewController_Update)
-f32*   RC_spGetRenderCtxViewport(void* pCamera);      // a render camera's screen rectangle
-f32    VM_fGetViewportHeight(f32* pRect);         // the rectangle's [3]: its height
-f32    VM_fGetViewportWidth(f32* pRect);         // [2]: its width
-f32    VM_fGetViewportTop(f32* pRect);         // [1]: its top
-f32    VM_fGetViewportLeft(f32* pRect);         // [0]: its left
+VM_SViewport* RC_spGetRenderCtxViewport(void* pCamera);   // a render camera's viewport
+f32    VM_fGetViewportHeight(VM_SViewport* pViewport);
+f32    VM_fGetViewportWidth(VM_SViewport* pViewport);
+f32    VM_fGetViewportTop(VM_SViewport* pViewport);
+f32    VM_fGetViewportLeft(VM_SViewport* pViewport);
+f32    VM_fGetViewportHeightOverWidth(VM_SViewport* pViewport);   // GoRenderCtx_Gc.c
 void*  RC_spGetCurrentRenderCtx(void);               // the current render camera
 void   RC_vUpdateRenderCtxTransformationMatrices(void* pCamera);
 void   RenderState_SetViewport(void* pCamera);
 void   RenderState_SetCameraMatrices(void);
 int    ViewController_GetCurrentViewControllerID(void);
 // Sets a viewport's rectangle (fractions of the frame buffer).
-void   VM_vSetViewportRect(f32* pViewport, f32 fLeft, f32 fTop, f32 fWidth, f32 fHeight);
+void   VM_vSetViewportRect(VM_SViewport* pViewport, f32 fLeft, f32 fTop, f32 fWidth, f32 fHeight);
 // A world position on screen (0..1 across and down; pZ, if not NULL, gets a third value). Returns
 // 1 when the point is in front of the camera (clip w below 0), else 0.
 u8     RC_vComputeRenderCtxWorldToPrimitiveCoordinate(void* pCamera, f32* pPos, f32* pX, f32* pY, f32* pZ);
@@ -1002,7 +1033,7 @@ f32         FB_fGetFrameBufferOffsetY(GoFrameBuf* pBuf); // f4
 f32         FB_fGetFrameBufferWidth(GoFrameBuf* pBuf); // fWidth
 f32         FB_fGetFrameBufferOffsetX(GoFrameBuf* pBuf); // f0
 
-// ---- the parts of a render camera: lens (GoCamera.c), screen rectangle (GoViewport.c) ---------
+// ---- the parts of a render camera: lens (GoCamera.c) ----------------------------------------
 
 CamLens* CA_spCreateCamera(void);                     // a new lens
 void     CA_vReleaseCamera(CamLens* pLens);           // free it
@@ -1011,13 +1042,11 @@ void     Camera_SetCameraPositionAndTarget(CamLens* pLens, f32* pPos, f32* pTarg
 void     CA_vSetDefaultCamera(CamLens* pLens);
 void     CA_vSetCameraFlatSize(CamLens* pLens, f32 fB4, f32 fB8); // sets fB4 and fB8
 void     CA_vSetCameraProjectionMode(CamLens* pLens, s32 nType);  // sets nType
-f32*     VM_spCreateViewport(void);                     // a new screen rectangle
-void     VM_vReleaseViewport(f32* pRect);               // free it
-void     fn_800B3438(f32* pRect, f32 x, f32 y); // shadow.c
+void     VM_vSetViewportRatios(VM_SViewport* pViewport, f32 fWidthRatio, f32 fHeightRatio); // shadow.c
 CamLens* Camera_GetCurrentLens(void);                     // char.c
 
-// GoRenderCtx_Gc.c: a render camera made from a lens, a frame buffer and a screen rectangle.
-void*    RC_spCreateRenderCtx(CamLens* pLens, GoFrameBuf* pBuf, f32* pRect);
+// GoRenderCtx_Gc.c: a render camera made from a lens, a frame buffer and a viewport.
+void*    RC_spCreateRenderCtx(CamLens* pLens, GoFrameBuf* pBuf, VM_SViewport* pViewport);
 void     RC_vReleaseRenderCtx(void* pCamera);            // free it
 
 void GolfCamera_ResetSpecialCameraStates(void);

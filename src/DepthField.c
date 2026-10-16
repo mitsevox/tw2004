@@ -136,7 +136,7 @@ void DF_vDrawBufferToScreen(int n) {
     f32 aXY[8];
     f32 aUV[8];
     f32 aColour[4];
-    f32* pRect;
+    VM_SViewport* pRect;
     f32 fX0;
     f32 fY0;
     f32 fX1;
@@ -147,10 +147,10 @@ void DF_vDrawBufferToScreen(int n) {
     aColour[2] = lbl_801D5110[n].aColour[2];
     aColour[3] = lbl_801D5110[n].f4 * lbl_801D5110[n].f14;
     pRect = ((RenderCamera*)RC_spGetCurrentRenderCtx())->pRect;
-    fX0 = pRect[0];
-    fY0 = pRect[1];
-    fX1 = fX0 + pRect[2];
-    fY1 = fY0 + pRect[3];
+    fX0 = pRect->fLeft;
+    fY0 = pRect->fTop;
+    fX1 = fX0 + pRect->fWidth;
+    fY1 = fY0 + pRect->fHeight;
     fn_8002A608(&lbl_801D5198);
     RenderView_SetUseCurrentMatrices(0);
     RenderState_SetDrawFlags(0x50);
