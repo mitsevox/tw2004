@@ -236,7 +236,7 @@ ska_shared.c	open
 skalib.c	open		
 startUp.c	open		
 stateFunc.c	open		
-statemain.c	open		
+statemain.c	done	eee7aafb	claude-review
 streammanagerhole.c	open		
 target.c	open		
 uiArc.c	open		
