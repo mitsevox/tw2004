@@ -64,7 +64,6 @@ u8   CamScript_IngoreCameraCollisionSurface(int n);
 u8   CamScript_PlayableSurface(SurfaceType* pSurface);
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);                   // identity
 void LLMath_Transpose33(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: transposes the 3x3 part
-void LLMath_mat44fltMultiply33(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // a vector through a matrix
 void fn_80038010(u8 a, int n, f32* pVec);
 void fn_800386F0(int n, f32* pVec);
 f32  CamScript_GetFlybyCamRate(CamShot* pShot, f32 fA, f32 fB, f32 fTime);

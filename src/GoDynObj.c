@@ -67,7 +67,6 @@ void DynObj_LaunchDirection(f32* pOut, f32 fTurn, f32 fTilt);
 void UObject_ComposeRotation(f32 (*pMtx)[4]);
 void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
 void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);
-void LLMath_mat44fltMultiplyList(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void LLMath_CopyMat34(f32 (*pSrc)[4], f32 (*pDst)[4]);        // copies three rows
 void GoDynObj_Vec3Sub(f32* pA, f32* pB, f32* pOut);
 void GoDynObj_Vec4Add(f32* pA, f32* pB, f32* pOut);

@@ -16,8 +16,6 @@ f32  Math_Tan(f32 x);                // tan
 
 // 4x4 matrix helpers (the engine's; declared here until their own files are written).
 void LLMath_IdentifyMat(f32 m[4][4]);                                          // identity
-void LLMath_mat44fltMultiplyList(f32 a[4][4], f32 b[4][4], f32 out[4][4], int nRows); // out = a x b, 4 rows
-void LLMath_mat44fltMultiplyList33(f32 a[4][4], f32 b[4][4], f32 out[4][4], int nRows); // out = a x b, 3 rows
 void LLMath_CopyMat44(f32 src[4][4], f32 dst[4][4]);                         // copy 4 rows
 void LLMath_CopyMat34(f32 src[4][4], f32 dst[4][4]);                         // copy 3 rows
 

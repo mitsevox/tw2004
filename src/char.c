@@ -111,7 +111,6 @@ void  Character_PlaceFeetOnGround(Character* pChar);
 void  SKEL_TransformBones(CharModel* pModel, u32* auBits);
 void  fn_800B28D4(Character* pChar, int a, int b);
 void  fn_800B2FB0(Character* pChar, int a, int b);
-void  LLMath_mat44fltMultiply(f32 mtx[4][4], Vec4* src, Vec4* dst);    // VecMath.c: a point through a matrix
 void  Character_GetBonePos(Character* pChar, int nBone, f32* pPos);
 void  Character_ClubStreamCallbackIG(UStreamObject* pObject);
 void  Character_ClubStreamCallbackFE(UStreamObject* pObject);

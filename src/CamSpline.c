@@ -1,6 +1,6 @@
 // CamSpline.c (our name; TW07 has these functions, under the same names, in EA's
 // Shared/Cameras/CamUtils.c): the path helpers of the camera scripts, static cameras and fly-bys.
-// Catmull-Rom splines through four points (gCatmullRomBasis applied with VecMath.c's
+// Catmull-Rom splines through four points (gCatmullRomBasis applied with LLMath_Gc.c's
 // LLMath_mat44fltMultiply) for the camera's position, look angles and field of view, a spline
 // segment's length, the time step of an accelerating fly-by, a fly-by's Hermite curve, a point
 // between two points and a point swung on an arc around a centre.

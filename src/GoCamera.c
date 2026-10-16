@@ -14,7 +14,6 @@ void LLMath_IdentifyMat(f32 (*pMtx)[4]);                     // identity
 void CA_vSetDefaultScalingVectors(CamLens* pLens);
 f32  Math_Tan(f32 x);                              // tan, as a float
 void Camera_SetLensFarClip(u8* p, f32 v);             // GoTerrain.c: sets the lens's far clip, fAC
-void LLMath_mat44fltMultiplyList(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void CA_vSetCameraViewToWorldMatrix(CamLens* pLens, f32 (*pMtx)[4]);
 void CA_vSetCameraNearFarZ(CamLens* pLens, f32 fA8, f32 fAC);
 void CA_vSetCameraNearZ(CamLens* pLens, f32 fA8);

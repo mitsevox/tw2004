@@ -16,7 +16,6 @@
 
 CamLens* Camera_GetLens(void* pCamera);                        // the render camera's lens
 void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 a, f32 b, f32 c);      // a rotation matrix from three angles
-void LLMath_mat44fltMultiply33(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // a vector through a matrix
 f32  CamScript_fGetDistanceBetweenSplinePoints(f32* pPos0, f32* pPos1, f32* pPos2, f32* pPos3);
 
 void StaticCam_LoadCAMCfromStream(UStreamObject* pObject);
