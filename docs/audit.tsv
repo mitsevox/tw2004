@@ -151,7 +151,7 @@ LoadData.c	open
 MC.c	open		
 MC_Gc.c	open		
 MaterialTypes.c	open		
-MathQuat.c	open		
+MathQuat.c	done	6ad9dde6	claude-review
 NGC/SharedFileIO/llSharedFileIO.c	open		
 PGATourSimulation.c	open		
 PasswordManager.c	open		
