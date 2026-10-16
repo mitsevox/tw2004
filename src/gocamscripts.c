@@ -70,7 +70,6 @@ f32  CamScript_GetFlybyCamRate(CamShot* pShot, f32 fA, f32 fB, f32 fTime);
 u8   Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bHazards, f32 fStep,
                                          u8 bSlope, f32 fMaxSlope);   // GoTerrainCollision.c
 void CamScript_PickArcDirection(CamScript* pScript, f32* pSub, int nPlayer, f32* pPrev, f32 fTime);
-void Quat_RotateVector(f32* pTurn, f32* pVec, f32* pOut);     // the vector turned by it
 u8   GameEffects_SimulateBall(int nPlayer);          // GameEffects.c: the ball is simulated from its position
 u8   Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
                                  SurfaceType** ppSurface, TerObject** ppObj);
@@ -280,7 +279,7 @@ void CamScript_RunScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, 
             }
             if (fStep > 0.0f) {
                 Vec3_Sub(vPrev, pCam, vMove);
-                pScript->fD4 = (f32)Math_Sqrt(Vec3_LengthSqClamped(vMove)) / fStep;
+                pScript->fD4 = (f32)Math_Sqrt(LLMath_LengthSquared3(vMove)) / fStep;
             }
         }
     }
@@ -389,7 +388,7 @@ void CamScript_RunFEScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript
         }
         if (fTime > 0.0f) {
             Vec3_Sub(vPrev, pCam, vMove);
-            pScript->fD4 = (f32)Math_Sqrt(Vec3_LengthSqClamped(vMove)) / fTime;
+            pScript->fD4 = (f32)Math_Sqrt(LLMath_LengthSquared3(vMove)) / fTime;
         }
     }
 }
@@ -493,7 +492,7 @@ void CamScript_RunFlybyCamera(int nPlayer, f32* pCam, f32* pSub, CamScript* pScr
         CameraScript_SnapToScript(pScript, pScript->pShot);   // its answer is not used
         if (fStep > 0.0f) {
             Vec3_Sub(vPrev, pCam, vMove);
-            pScript->fD4 = (f32)Math_Sqrt(Vec3_LengthSqClamped(vMove)) / fStep;
+            pScript->fD4 = (f32)Math_Sqrt(LLMath_LengthSquared3(vMove)) / fStep;
         }
     }
 }
@@ -603,7 +602,7 @@ f32 CamScript_GetFlybyCamRate(CamShot* pShot, f32 fA, f32 fB, f32 fTime) {
     CamScript_SplineCamerasByPosition(vPrev, vFrom, vTo, vNext, vA, fA);
     CamScript_SplineCamerasByPosition(vPrev, vFrom, vTo, vNext, vB, fB);
     Vec3_Sub(vB, vA, vDiff);
-    return (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff)) / fTime;
+    return (f32)Math_Sqrt(LLMath_LengthSquared3(vDiff)) / fTime;
 }
 
 // The script's colour fade over the view (nFade; CameraController_FadeIn and
@@ -719,7 +718,7 @@ f32 CameraScript_GetSmoothTimeParam(CamScript* pScript) {
     f32 fT = pScript->fCamTime / pScript->f8C;
 
     if (pScript->bCE || fT > 0.5f) {
-        fT = 1.0f - (0.5f * Math_Cos(PI * fT) + 0.5f);
+        fT = 1.0f - (0.5f * cosf(PI * fT) + 0.5f);
     }
     return fT;
 }
@@ -881,7 +880,7 @@ void CamScript_LerpFixedTargetCameras(int nPlayer, f32* pCam, f32* pSub, CamScri
     // the dot product clamped to -1..1 (worked out again for each test)
     fDot = Vec3_Dot(vDir0, vDir1) < -1.0f ? -1.0f
          : (Vec3_Dot(vDir0, vDir1) > 1.0f ? 1.0f : Vec3_Dot(vDir0, vDir1));
-    fAngle = Math_Acos(fDot);
+    fAngle = acosf(fDot);
     fAngle *= fT;
     vec4flt_CrossProduct(vDir0, vDir1, vAxis);
     if (0.0f != vAxis[0] || 0.0f != vAxis[1] || 0.0f != vAxis[2]) {
@@ -894,8 +893,8 @@ void CamScript_LerpFixedTargetCameras(int nPlayer, f32* pCam, f32* pSub, CamScri
     if (0.0f != pSub[0] || 0.0f != pSub[1] || 0.0f != pSub[2]) {
         LLMath_Normalize3(pSub, pSub);
     }
-    fDist = Math_Sqrt(Vec3_LengthSqClamped(vFromAim));
-    Vec3_Scale(fT * ((f32)Math_Sqrt(Vec3_LengthSqClamped(vToAim)) - fDist) + fDist, pSub, pSub);
+    fDist = Math_Sqrt(LLMath_LengthSquared3(vFromAim));
+    Vec3_Scale(fT * ((f32)Math_Sqrt(LLMath_LengthSquared3(vToAim)) - fDist) + fDist, pSub, pSub);
     Vec3_Add(pCam, pSub, pSub);
     f = fT * (pNext->fFovStart - pShot->fFovStart) + pShot->fFovStart;
     f += GameEffects_FieldOfViewChange();
@@ -951,7 +950,7 @@ void CamScript_LerpSwingToBallFlightCameras(int nPlayer, f32* pCam, f32* pSub, C
     }
     Vec3_Sub(gPlayers[nPlayer].ball.vPos, pScript->vCamPos, vBall);
     vBall[1] = 0.0f;
-    Vec3_Scale(Math_Sqrt(Vec3_LengthSqClamped(vBall)), vDir, vDir);
+    Vec3_Scale(Math_Sqrt(LLMath_LengthSquared3(vBall)), vDir, vDir);
     Vec3_Add(vDir, pScript->vCamPos, vDir);
     CamScript_GetLookAtPoint(pNext, nPlayer, &pScript->aLookAt[4], pScript->vNextCamPos, pScript, pPrev,
                              fTime);
@@ -1272,7 +1271,7 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
                 Vec3_Sub(vPos, pCam, vDiff);
                 fY = vDiff[1];
                 vDiff[1] = 0.0f;
-                fLen = Math_Sqrt(Vec3_LengthSqClamped(vDiff));
+                fLen = Math_Sqrt(LLMath_LengthSquared3(vDiff));
                 if (fY / fLen < -0.2f && fLen > gpCamTuning->f128) {
                     vPos[1] = pCam[1] - 0.2f * fLen;
                 }
@@ -1452,9 +1451,9 @@ void CameraScript_CalculateShoulderShake(CamShot* pShot, f32* pOut, f32 fTime, f
         } else {
             fT = fTime * fSpeed;
         }
-        fX = (Math_Cos(5.0f * fT) + Math_Cos(7.0f * fT / 3.0f) + Math_Cos(fT / 5.0f) + 3.0f) / 6.0f;
-        fY = (fX + Math_Cos(9.0f * fT)) / 2.0f;
-        fZ = (fY + Math_Cos(11.0f * fT)) / 2.0f;
+        fX = (cosf(5.0f * fT) + cosf(7.0f * fT / 3.0f) + cosf(fT / 5.0f) + 3.0f) / 6.0f;
+        fY = (fX + cosf(9.0f * fT)) / 2.0f;
+        fZ = (fY + cosf(11.0f * fT)) / 2.0f;
         fX -= 0.5f;
         fY -= 0.5f;
         fZ -= 0.5f;
@@ -1517,21 +1516,21 @@ void CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* pShot
         fMin *= fB;
         fMin *= -vDir[1];
         vDir[1] = 0.0f;
-        fA = Math_Sqrt(Vec3_LengthSqClamped(vDir));
+        fA = Math_Sqrt(LLMath_LengthSquared3(vDir));
         if (fA < fMin && bClose) {
             if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
                 LLMath_Normalize3(vDir, vDir);
             }
             Vec3_Scale(fMin, vDir, vDir);
             fAimY = vAim[1];
-            vDir[1] = (vGoal[1] - fAimY) * ((f32)Math_Sqrt(Vec3_LengthSqClamped(vDir)) / fMin) + fAimY
+            vDir[1] = (vGoal[1] - fAimY) * ((f32)Math_Sqrt(LLMath_LengthSquared3(vDir)) / fMin) + fAimY
                     - pCam[1];
             Vec3_Add(vDir, pCam, vGoal);
         }
         if (bLimit) {
             Vec3_Sub(vGoal, pCam, vFlat);
             vFlat[1] = 0.0f;
-            if ((f32)Math_Sqrt(Vec3_LengthSqClamped(vFlat)) > fMinDist
+            if ((f32)Math_Sqrt(LLMath_LengthSquared3(vFlat)) > fMinDist
                 && pCam[1] - vGoal[1] > gpCamTuning->f12C) {
                 vGoal[1] = pCam[1] - gpCamTuning->f12C;
             }
@@ -1540,7 +1539,7 @@ void CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* pShot
         vCur[1] = 0.0f;
         Vec3_Sub(vGoal, pCam, vDir);
         vDir[1] = 0.0f;
-        fDist = Math_Sqrt(Vec3_LengthSqClamped(vDir));
+        fDist = Math_Sqrt(LLMath_LengthSquared3(vDir));
         Vec3_Sub(vGoal, pSub, vToGoal);  // vToGoal is not read
         if (0.0f != vCur[0] || 0.0f != vCur[1] || 0.0f != vCur[2]) {
             LLMath_Normalize3(vCur, vCur);
@@ -1549,7 +1548,7 @@ void CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* pShot
             LLMath_Normalize3(vDir, vDir);
         }
         // the dot product is taken up to three times, as a clamp macro would
-        fAngle = Math_Acos(Vec3_Dot(vCur, vDir) < -1.0f ? -1.0f
+        fAngle = acosf(Vec3_Dot(vCur, vDir) < -1.0f ? -1.0f
                              : (Vec3_Dot(vCur, vDir) > 1.0f ? 1.0f : Vec3_Dot(vCur, vDir)))
                  / fDiv;
         vec4flt_CrossProduct(vCur, vDir, vAxis);
@@ -1613,7 +1612,7 @@ void CameraScript_LagBallFlight(int nPlayer, f32* pOut, f32* pCam, CamShot* pSho
                 fBase = pCam[1] - pScript->pShot->fMinHeight;
             }
             vDir[1] = 0.0f;
-            fLen = Math_Sqrt(Vec3_LengthSqClamped(vDir));
+            fLen = Math_Sqrt(LLMath_LengthSquared3(vDir));
             // EA bug: fDrop is not set when the script has no current shot
             if (0.0f != fLen && fDrop / fLen < -0.2f) {
                 fLimit = fBase - 0.2f * fLen;
@@ -1625,7 +1624,7 @@ void CameraScript_LagBallFlight(int nPlayer, f32* pOut, f32* pCam, CamShot* pSho
             }
         }
         Vec3_Sub(vAim, pOut, vMove);
-        fRate = Math_Sqrt(Vec3_LengthSqClamped(vMove));
+        fRate = Math_Sqrt(LLMath_LengthSquared3(vMove));
         fRate = gpCamTuning->f138 * (fRate / gpCamTuning->f13C);
         fShare = fRate < 0.0f ? 0.0f : (fRate > 1.0f ? 1.0f : fRate);
         if (pScript->fScriptTime < gpCamTuning->fD4) {
@@ -1690,11 +1689,11 @@ void CameraScript_LagTargetPoint(int nPlayer, f32* pOut, f32* pCam, f32* pTarget
         }
         Vec3_Sub(vAim, pOut, vMove);
         vMove[1] = 0.0f;
-        fDist = Math_Sqrt(Vec3_LengthSqClamped(vMove));
+        fDist = Math_Sqrt(LLMath_LengthSquared3(vMove));
         fFrames = fTime / (1.0f / FRAME_RATE);
         fRate = gpCamTuning->f144 * fFrames;
         Vec3_Sub(vAim, pCam, vSpan);
-        fRange = Math_Sqrt(Vec3_LengthSqClamped(vSpan));
+        fRange = Math_Sqrt(LLMath_LengthSquared3(vSpan));
         fRange *= pShot->fFovStart / DEG(60.0f);
         fNear = gpCamTuning->f134 * fRange;
         if (fDist < fNear) {
@@ -1858,7 +1857,7 @@ void CameraScript_UpdateLandingEstimate(CamScript* pScript, int nPlayer) {
             pCourse = Ter_GetTGD();
             if (Ter_CheckForGroundCollision(pCourse, vPos, vStep, vHit, vNormal, &pSurface, &pObj)) {
                 Vec3_Sub(vHit, pBall->vStart, vLand);
-                fDist = Math_Sqrt(Vec3_LengthSqClamped(vLand));
+                fDist = Math_Sqrt(LLMath_LengthSquared3(vLand));
                 fReach = AI_MaxDistance(nPlayer, gPlayers[nPlayer].nShotKind, gPlayers[nPlayer].nClub);
                 fReach *= Physics_GetLiePowerPercentage(&gPlayers[nPlayer].ball);
                 fReach *= SW_vGetShotPower(nPlayer);
@@ -2065,7 +2064,7 @@ void CameraScript_InterpToNewScript(CamScript* pScript, CamShot* pShot, int nPla
             LLMath_CopyVec(pScript->vNextCamPos, vPos);
             DynamicCam_ProcessScript(pScript->pNextShot, nPlayer, pScript, vPos, pSub, pCam, 0.0f);
             Vec3_Sub(vPos, pCam, vDiff);
-            fDist = Math_Sqrt(Vec3_LengthSqClamped(vDiff));
+            fDist = Math_Sqrt(LLMath_LengthSquared3(vDiff));
             if (fDist / fInterpTime > fMaxSpeed) {
                 pScript->f8C = fDist / fMaxSpeed;
             }
@@ -2181,7 +2180,7 @@ void CameraScript_KeepPointInView(int nPlayer, f32* pCam, f32* pOut, f32* pTarge
     } else if (fDot > 1.0f) {
         fDot = 1.0f;
     }
-    fAngle = Math_Acos(fDot);
+    fAngle = acosf(fDot);
     if (fabsf(fAngle) > pScript->fLagAngle) {
         fAngle -= pScript->fLagAngle;
         vec4flt_CrossProduct(vOutDir, vTargetDir, vAxis);
@@ -2207,7 +2206,7 @@ void CameraScript_KeepPointInView(int nPlayer, f32* pCam, f32* pOut, f32* pTarge
         mAlign[3][1] = 0.0f;
         mAlign[3][2] = 0.0f;
         mAlign[3][3] = 1.0f;
-        fCos = Math_Cos(fAngle);
+        fCos = cosf(fAngle);
         fSin = Math_Sqrt(1.0f - fCos * fCos);
         mTurn[0][0] = fCos;
         mTurn[0][1] = fSin;
@@ -2296,7 +2295,7 @@ u8 CamScript_CheckObstructedCamera(f32* pCam, int nPlayer) {
     if (!bBlocked && !ViewController_GetIndexedViewController(gPlayers[nPlayer].nView[0])->bFlagOut) {
         Vec3_Sub(pCam, &pCourse->pin[nPin].x, vDiff);
         vDiff[1] = 0.0f;
-        fDist = Math_Sqrt(Vec3_LengthSqClamped(vDiff));
+        fDist = Math_Sqrt(LLMath_LengthSquared3(vDiff));
         fDist *= Camera_GetLensFovScale(Camera_GetCurrentLens());
         if (fDist < gpCamTuning->f120
             && pCam[1] - pCourse->pin[nPin].y < gpCamTuning->f124) {
@@ -2391,13 +2390,13 @@ void CamScript_GetCameraOnFairwayPos(CamScript* pScript, f32* pOut, f32* pCam, i
 
     Vec3_Sub(gPlayers[nPlayer].ball.vPos, vNearBall, vDiff);
     vDiff[1] = 0.0f;
-    fBall = Math_Sqrt(Vec3_LengthSqClamped(vDiff));
+    fBall = Math_Sqrt(LLMath_LengthSquared3(vDiff));
     Vec3_Sub(gPlayers[nPlayer].ball.vPos, vNearTarget, vDiff);
     vDiff[1] = 0.0f;
-    fTarget = Math_Sqrt(Vec3_LengthSqClamped(vDiff));
+    fTarget = Math_Sqrt(LLMath_LengthSquared3(vDiff));
     Vec3_Sub(gPlayers[nPlayer].ball.vPos, vPastPin, vDiff);
     vDiff[1] = 0.0f;
-    fPin = Math_Sqrt(Vec3_LengthSqClamped(vDiff));
+    fPin = Math_Sqrt(LLMath_LengthSquared3(vDiff));
     // the three spots in order of their distance from the ball
     if (fBall <= fTarget) {
         if (fBall <= fPin) {
@@ -2467,7 +2466,7 @@ void CamScript_GetCameraOnFairwayPos(CamScript* pScript, f32* pOut, f32* pCam, i
     }
     Vec3_Sub(pPin, vSpot, vPastPin);
     vPastPin[1] = 0.0f;
-    if ((f32)Math_Sqrt(Vec3_LengthSqClamped(vPastPin)) < 2.0f) {
+    if ((f32)Math_Sqrt(LLMath_LengthSquared3(vPastPin)) < 2.0f) {
         Vec3_Sub(pPin, gPlayers[nPlayer].ball.vPos, vNearBall);
         vNearBall[1] = 0.0f;
         if (0.0f != vNearBall[0] || 0.0f != vNearBall[1] || 0.0f != vNearBall[2]) {
@@ -2502,7 +2501,7 @@ void CamScript_CheckFlagCollision(CamScript* pScript, f32* pCam, f32* pSub, int 
     if (ViewController_GetIndexedViewController(gPlayers[nPlayer].nView[0])->bFlagOut) return;
     Vec3_Sub(pCam, &pCourse->pin[nPin].x, vDiff);
     vDiff[1] = 0.0f;
-    fDist = Math_Sqrt(Vec3_LengthSqClamped(vDiff));
+    fDist = Math_Sqrt(LLMath_LengthSquared3(vDiff));
     fDist *= Camera_GetLensFovScale(Camera_GetCurrentLens());
     if (fDist < gpCamTuning->f120) {
         if (pCam[1] - pCourse->pin[nPin].y < gpCamTuning->f124) {
@@ -2579,7 +2578,7 @@ void CamScript_UpdateFairwayCam(CamScript* pScript, f32* pCam, f32* pSub, int nP
         CamScript_GetNearestAIPoint(gPlayers[nPlayer].ball.vPos, vSpot);
         Vec3_Sub(pCam, vSpot, vToSpot);
         vToSpot[1] = 0.0f;
-        fDist = Math_Sqrt(Vec3_LengthSqClamped(vToSpot));
+        fDist = Math_Sqrt(LLMath_LengthSquared3(vToSpot));
         Vec3_Sub(pCam, gPlayers[nPlayer].ball.vPos, vFromBall);
         vFromBall[1] = 0.0f;
         if (0.0f != vFromBall[0] || 0.0f != vFromBall[1] || 0.0f != vFromBall[2]) {
@@ -2881,8 +2880,8 @@ f32 CamScript_EstimateBallFlightPercent(int nPlayer, CamScript* pScript) {
 
     Vec3_Sub(pScript->v50, gPlayers[nPlayer].ball.vStart, vStart);
     Vec3_Sub(pScript->v50, gPlayers[nPlayer].ball.vPos, vBall);
-    fStart = Math_Sqrt(Vec3_LengthSqClamped(vStart));
-    fBall = Math_Sqrt(Vec3_LengthSqClamped(vBall));
+    fStart = Math_Sqrt(LLMath_LengthSquared3(vStart));
+    fBall = Math_Sqrt(LLMath_LengthSquared3(vBall));
     if (fStart > 0.0f) {
         return 1.0f - fBall / fStart;
     }
@@ -2906,8 +2905,8 @@ f32 CamScript_GetBallToPinPercent(int nPlayer, CamScript* pScript) {
     Vec3_Sub(pPin, gPlayers[nPlayer].ball.vPos, vBall);
     vStart[1] = 0.0f;
     vBall[1] = 0.0f;
-    fStart = Math_Sqrt(Vec3_LengthSqClamped(vStart));
-    fBall = Math_Sqrt(Vec3_LengthSqClamped(vBall));
+    fStart = Math_Sqrt(LLMath_LengthSquared3(vStart));
+    fBall = Math_Sqrt(LLMath_LengthSquared3(vBall));
     if (fStart > 0.0f) {
         return 1.0f - fBall / fStart;
     }

@@ -461,8 +461,8 @@ void AI_ApplyError(int nPlayer) {
         } else if (p->fAim > PI) {
             p->fAim -= TWOPI;
         }
-        fSin = Math_Sin(p->fAim);
-        fCos = Math_Cos(p->fAim);
+        fSin = sinf(p->fAim);
+        fCos = cosf(p->fAim);
 
         // Distance error: two percentage terms, either side; one shot kind always comes up
         // short.

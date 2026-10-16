@@ -316,7 +316,7 @@ void Ter_BeginRender(void) {
         f32 fPeriod = 26.52f * 60.0f * (5.5f + (f32)i) / 1000.0f;
 
         wave.aWave[i] = 0.5f
-                * Math_Sin(6.2831855f * Ter_GetTimeInCycle(gSession.nFrameCount, fPeriod) / fPeriod)
+                * sinf(6.2831855f * Ter_GetTimeInCycle(gSession.nFrameCount, fPeriod) / fPeriod)
                         + 0.5f;
     }
     wave.nFrame = gSession.nFrameCount;
@@ -364,7 +364,7 @@ void Ter_RenderView(void* pHoleData, int nView) {
     for (i = 0; i < gNumPlayersSetUp; i++) {
         LLMath_Subtract(gPlayers[i].ball.vPos, gTerRenderer.xCameraReferencePos, vDiff);
         vDiff[1] = 0.0f;
-        fDist = Vec3_LengthSqClamped(vDiff);
+        fDist = LLMath_LengthSquared3(vDiff);
         if (fDist < gTerRenderer.fXZDistanceToClosestBallSquared) {
             gTerRenderer.fXZDistanceToClosestBallSquared = fDist;
         }
@@ -372,7 +372,7 @@ void Ter_RenderView(void* pHoleData, int nView) {
     LLMath_Subtract3(gPlayers[ViewController_GetActivePlayerNumber(gTerRenderer.iCurrentViewContext)].vBall,
                 &Ter_GetTGD()->pin[Game_CurrentPinSet()].x, vToPin);
     vToPin[1] = 0.0f;
-    gTerRenderer.fGolferDistanceToCup = Math_Sqrt(Vec3_LengthSqClamped(vToPin));
+    gTerRenderer.fGolferDistanceToCup = Math_Sqrt(LLMath_LengthSquared3(vToPin));
     fTan = Math_Tan(0.5f * pLens->fFov);
     fWideTan = Math_Tan(0.5f
                         * (0.75f * pLens->fFov
@@ -604,7 +604,7 @@ void Ter_AddPatchObjects(Ter_PatchReference* pPatch, s32 nFirstObject) {
             }
             LLMath_Subtract3(pBounds, gTerRenderer.xCameraReferencePos, v48);
             v48[1] = 0.0f;
-            fXZ = (f32)Math_Sqrt(Vec3_LengthSqClamped(v48)) - pBounds[3];
+            fXZ = (f32)Math_Sqrt(LLMath_LengthSquared3(v48)) - pBounds[3];
             if (fXZ < 0.0f) {
                 fXZ = 0.0f;
             }
@@ -622,19 +622,19 @@ void Ter_AddPatchObjects(Ter_PatchReference* pPatch, s32 nFirstObject) {
                 pPin = &Ter_GetTGD()->pin[Game_CurrentPinSet()].x;
                 LLMath_Subtract3(pBounds, pBall, v28);
                 v28[1] = 0.0f;
-                fBallToObject = (f32)Math_Sqrt(Vec3_LengthSqClamped(v28)) - pBounds[3];
+                fBallToObject = (f32)Math_Sqrt(LLMath_LengthSquared3(v28)) - pBounds[3];
                 if (fBallToObject < 0.0f) {
                     fBallToObject = 0.0f;
                 }
                 LLMath_Subtract3(pPin, pBall, v18);
                 v18[1] = 0.0f;
-                fPinToBall = Math_Sqrt(Vec3_LengthSqClamped(v18));
+                fPinToBall = Math_Sqrt(LLMath_LengthSquared3(v18));
                 if (fPinToBall < 0.0f) {
                     fPinToBall = 0.0f;
                 }
                 LLMath_Subtract3(pBounds, pPin, v8);
                 v8[1] = 0.0f;
-                fObjectToPin = (f32)Math_Sqrt(Vec3_LengthSqClamped(v8)) - pBounds[3];
+                fObjectToPin = (f32)Math_Sqrt(LLMath_LengthSquared3(v8)) - pBounds[3];
                 if (fObjectToPin < 0.0f) {
                     fObjectToPin = 0.0f;
                 }
@@ -680,7 +680,7 @@ void Ter_AddPatchObjects(Ter_PatchReference* pPatch, s32 nFirstObject) {
             if (eClipMethod != 3) {
                 pRef = &gTerRenderer.pObjectSortList[gTerRenderer.iTotalSortObjects];
                 pRef->fDistanceSquared = fDistanceSquared;
-                pRef->f14 = Vec3_LengthSqClamped(v48);
+                pRef->f14 = LLMath_LengthSquared3(v48);
                 LLMath_Subtract3(pBounds, gTerRenderer.xCameraReferencePos, v38);
                 pRef->f18 = Vec3_Dot(gTerRenderer.xCameraLookVector, v38);
                 iObject = nLast - i;
@@ -1714,7 +1714,7 @@ void Ter_AnimateObjects(void) {
                 fPeriod = 4.0f * (gTerRenderer.pObjectStateList[i].f0 - gTerRenderer.fTreeMinPeriod) + 1.5f;
                 if (gTerRenderer.pObjectStateList[i].n18 == 3) {
                     gTerRenderer.pObjectStateList[i].f4 =
-                        0.5f * Math_Sin(10.0f
+                        0.5f * sinf(10.0f
                                            * (6.2831855f
                                               * Ter_GetTimeInCycle(gTerRenderer.pObjectStateList[i].nC,
                                                             fPeriod / 10.0f)
@@ -1722,7 +1722,7 @@ void Ter_AnimateObjects(void) {
                         + 0.5f;
                 } else {
                     gTerRenderer.pObjectStateList[i].f4 =
-                        0.5f * Math_Sin(0.5f
+                        0.5f * sinf(0.5f
                                            * (6.2831855f
                                               * Ter_GetTimeInCycle(gTerRenderer.pObjectStateList[i].nC,
                                                             fPeriod / 0.5f)
@@ -1776,7 +1776,7 @@ void Ter_AnimateObjects(void) {
                         4.0f * (gTerRenderer.pObjectStateList[i].f0 - gTerRenderer.fTreeMinPeriod) + 1.5f;
                     if (gTerRenderer.pObjectStateList[i].n18 == 1) {
                         gTerRenderer.pObjectStateList[i].f4 =
-                            0.5f * Math_Sin(10.0f
+                            0.5f * sinf(10.0f
                                                * (6.2831855f
                                                   * Ter_GetTimeInCycle(gTerRenderer.pObjectStateList[i].nC,
                                                                 fPeriod / 10.0f)
@@ -1784,7 +1784,7 @@ void Ter_AnimateObjects(void) {
                             + 0.5f;
                     } else {
                         gTerRenderer.pObjectStateList[i].f4 =
-                            0.5f * Math_Sin(0.5f
+                            0.5f * sinf(0.5f
                                                * (6.2831855f
                                                   * Ter_GetTimeInCycle(gTerRenderer.pObjectStateList[i].nC,
                                                                 fPeriod / 0.5f)
@@ -1840,12 +1840,12 @@ void Ter_AnimateObjects(void) {
             fNoise = gTerRenderer.fTreeNoiseAmplitudeScale;
             gTerRenderer.pObjectStateList[i].f4 =
                 0.5f * fScale
-                    * Math_Sin(6.2831855f
+                    * sinf(6.2831855f
                                   * Ter_GetTimeInCycle(gSession.nFrameCount,
                                                        gTerRenderer.pObjectStateList[i].f0)
                                   / gTerRenderer.pObjectStateList[i].f0)
                 + 0.5f * (fScale * fNoise)
-                      * Math_Sin(6.2831855f
+                      * sinf(6.2831855f
                                     * Ter_GetTimeInCycle(gSession.nFrameCount,
                                                   gTerRenderer.fTreeNoisePeriodScale
                                                       * gTerRenderer.pObjectStateList[i].f0)
@@ -2041,7 +2041,7 @@ void Ter_CourseLoadCallback(UStreamObject* pObject) {
         gSession.f5B40 = fLength;
     }
     // port: f5B3C..f5B48 are read as one vector
-    fLength = Math_Sqrt(Vec3_LengthSqClamped(&gSession.f5B3C));
+    fLength = Math_Sqrt(LLMath_LengthSquared3(&gSession.f5B3C));
     if (fLength < 2000.0f && fLength > 0.0f) {
         Vec3_Scale(2000.0f / fLength, &gSession.f5B3C, &gSession.f5B3C);
     }
@@ -2209,7 +2209,7 @@ void Ter_RenderGrass(void) {
     for (i = 0; i < gNumPlayersSetUp; i++) {
         LLMath_Subtract(gPlayers[i].ball.vPos, gTerRenderer.xCameraReferencePos, vDiff);
         vDiff[1] = 0.0f;
-        fDist = Vec3_LengthSqClamped(vDiff);
+        fDist = LLMath_LengthSquared3(vDiff);
         if (fDist < gTerRenderer.fXZDistanceToClosestBallSquared) {
             gTerRenderer.fXZDistanceToClosestBallSquared = fDist;
         }

@@ -288,7 +288,7 @@ The fixes that come up most often. Each points to its full entry below.
   counter declared `long j` instead of `int j`. Try `long`/`s32` on counters when register
   numbers are off and reordering does nothing.
 - **[verified] Parameters are copied to saved registers in declaration order, across int and float
-  registers**; swapping `(f32* pOut, f32 fAngle)` flips `fmr f31,f1` / `mr r31,r3` (Quaternion fn_800093AC
+  registers**; swapping `(f32* pOut, f32 fAngle)` flips `fmr f31,f1` / `mr r31,r3` (MathQuat Legacy_Quat_BuildFromYaw
   92.0 -> 100). Only reorder when the callers' asm agrees.
 - **[verified] The stack frame does not fix a local char buffer's size** (GoDynamicCam fn_8003C9D0 exact
   with 12..0x18 bytes): size it from what the code stores in it.

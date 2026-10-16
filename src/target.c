@@ -430,7 +430,7 @@ u8 TARGET_UpdateMomentums(int nPlayer) {
         fn_8006A964(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0])->v0,
                     gPlayers[nPlayer].vBall, vToCamera);
         vToCamera[1] = 0.0f;
-        fCameraDist = 0.05f * (f32)Math_Sqrt(Vec3_LengthSqClamped(vToCamera));
+        fCameraDist = 0.05f * (f32)Math_Sqrt(LLMath_LengthSquared3(vToCamera));
         if (fCameraDist > 1.0f) {
             fTurn /= fCameraDist;
         }
@@ -441,8 +441,8 @@ u8 TARGET_UpdateMomentums(int nPlayer) {
         } else if (gPlayers[nPlayer].fAim > PI) {
             gPlayers[nPlayer].fAim -= 2.0f * PI;
         }
-        fSin = Math_Sin(gPlayers[nPlayer].fAim);
-        fCos = Math_Cos(gPlayers[nPlayer].fAim);
+        fSin = sinf(gPlayers[nPlayer].fAim);
+        fCos = cosf(gPlayers[nPlayer].fAim);
         fDX = -fSin * gPlayers[nPlayer].fDistance;
         fDZ = fCos * gPlayers[nPlayer].fDistance;
         gPlayers[nPlayer].vTarget[0] = fDX + gPlayers[nPlayer].vBall[0];
@@ -479,15 +479,15 @@ u8 TARGET_UpdateMomentums(int nPlayer) {
         }
         bMoved = 1;
         fStep *= gSession.fFrameTime * (60.0f * gPlayers[nPlayer].fA60);
-        fSin = Math_Sin(gPlayers[nPlayer].fAim);
-        fCos = Math_Cos(gPlayers[nPlayer].fAim);
+        fSin = sinf(gPlayers[nPlayer].fAim);
+        fCos = cosf(gPlayers[nPlayer].fAim);
         fDX = fStep * -fSin;
         fDZ = fStep * fCos;
         gPlayers[nPlayer].vTarget[0] += fDX;
         gPlayers[nPlayer].vTarget[2] += fDZ;
         fn_8006A964(gPlayers[nPlayer].vTarget, gPlayers[nPlayer].vBall, vDir);
         vDir[1] = 0.0f;
-        fAimDist = Math_Sqrt(Vec3_LengthSqClamped(vDir));
+        fAimDist = Math_Sqrt(LLMath_LengthSquared3(vDir));
         if (gPlayers[nPlayer].fA60 < 0.0f && fAimDist >= fMin) {
             bInRange = 1;
         } else if (gPlayers[nPlayer].fA60 > 0.0f
@@ -502,8 +502,8 @@ u8 TARGET_UpdateMomentums(int nPlayer) {
         }
         if (bInRange) {
             fn_8002BDEC_SetTarget(nPlayer, gPlayers[nPlayer].vTarget);
-            fSin = Math_Sin(gPlayers[nPlayer].fAim);
-            fCos = Math_Cos(gPlayers[nPlayer].fAim);
+            fSin = sinf(gPlayers[nPlayer].fAim);
+            fCos = cosf(gPlayers[nPlayer].fAim);
             fDX = -fSin * gPlayers[nPlayer].fDistance;
             fDZ = fCos * gPlayers[nPlayer].fDistance;
             gPlayers[nPlayer].vTarget[0] = fDX + gPlayers[nPlayer].vBall[0];
@@ -770,8 +770,8 @@ u8 PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed) {
 
     if (bMoved) {
         fHeading = gPlayers[nPlayer].fPlaceHeading;
-        fSin = Math_Sin(fHeading);
-        fCos = Math_Cos(fHeading);
+        fSin = sinf(fHeading);
+        fCos = cosf(fHeading);
         fBaseX = gPlayers[nPlayer].vPlacement[0];
         fBaseZ = gPlayers[nPlayer].vPlacement[2];
         vPos[0] = fZ * -fSin + fBaseX + fX * fCos;
@@ -789,8 +789,8 @@ u8 PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed) {
                 if (fHeading > PI) {
                     fHeading -= 2.0f * PI;
                 }
-                fSin = Math_Sin(fHeading);
-                fCos = Math_Cos(fHeading);
+                fSin = sinf(fHeading);
+                fCos = cosf(fHeading);
                 vPos[0] = fZ * -fSin + fBaseX + fX * fCos;
                 vPos[2] = fZ * fCos + fBaseZ + fX * fSin;
                 if (PlaceBall_CheckInBounds(vPos)) {
@@ -801,8 +801,8 @@ u8 PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed) {
                 if (fHeading < -PI) {
                     fHeading += 2.0f * PI;
                 }
-                fSin = Math_Sin(fHeading);
-                fCos = Math_Cos(fHeading);
+                fSin = sinf(fHeading);
+                fCos = cosf(fHeading);
                 vPos[0] = fZ * -fSin + fBaseX + fX * fCos;
                 vPos[2] = fZ * fCos + fBaseZ + fX * fSin;
                 if (PlaceBall_CheckInBounds(vPos)) {
@@ -1027,7 +1027,7 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
     fn_8006A964(vPos, pView->v0, vRel);
     fDotX = vDir[0] * vRel[0];
     fDotZ = vDir[2] * vRel[2];
-    fCos2 = Math_Cos(fHalfFov / 2.0f - PI / 180.0f);
+    fCos2 = cosf(fHalfFov / 2.0f - PI / 180.0f);
     fA = fCos2 * fCos2 - vDir[1] * vDir[1];
     fB = -(2.0f * fDotX * vDir[1]) - 2.0f * fDotZ * vDir[1];
     fC = vRel[0] * (vRel[0] * (fCos2 * fCos2)) + vRel[2] * (vRel[2] * (fCos2 * fCos2))

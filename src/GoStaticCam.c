@@ -436,7 +436,7 @@ void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32
                                                      pPrev->v30, pShot->v30, pNext->v30,
                         pAfter->v30, pCam, pSub, pFov, pShot->fFovStart, pNext->fFovStart, fT);
             StaticCam_Vec3Sub(pCam, vLast, vDiff);
-            fDist += (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
+            fDist += (f32)Math_Sqrt(LLMath_LengthSquared3(vDiff));
             if (fTarget > fDist) {
                 LLMath_CopyVec(pCam, vLast);
             }
@@ -475,7 +475,7 @@ void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32
                                                      pPrev->v30, pShot->v30, pNext->v30,
                         pAfter->v30, pCam, pSub, pFov, pShot->fFovStart, pNext->fFovStart, fT);
             StaticCam_Vec3Sub(pCam, vLast, vDiff);
-            fDist = fLastDist + (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
+            fDist = fLastDist + (f32)Math_Sqrt(LLMath_LengthSquared3(vDiff));
             i++;
         } while (i < 4);
         if (fDist > fTarget) {
@@ -485,7 +485,7 @@ void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32
                                                      pPrev->v30, pShot->v30, pNext->v30,
                         pAfter->v30, pCam, pSub, pFov, pShot->fFovStart, pNext->fFovStart, fT);
             StaticCam_Vec3Sub(pCam, vLast, vDiff);
-            fDist = fLastDist + (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
+            fDist = fLastDist + (f32)Math_Sqrt(LLMath_LengthSquared3(vDiff));
         } else if (fDist < fTarget) {
             fT = fT + (fHiT - fT) * ((fTarget - fDist) / (fHiDist - fDist));
             // fake match: empty tests (dead checks) on the shot pointers make the frontend load them
@@ -503,7 +503,7 @@ void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32
                                                      pPrev->v30, pShot->v30, pNext->v30,
                         pAfter->v30, pCam, pSub, pFov, pShot->fFovStart, pNext->fFovStart, fT);
             StaticCam_Vec3Sub(pCam, vLast, vDiff);
-            fDist = fLastDist + (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
+            fDist = fLastDist + (f32)Math_Sqrt(LLMath_LengthSquared3(vDiff));
         }
     }
     pScript->pShot = pShot;

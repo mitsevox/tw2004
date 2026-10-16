@@ -3941,8 +3941,8 @@ void GM_vRotatePoint2D(MsgArg* pArgs, MsgArg* pResult) {
     v.y = *(f32*)pArgs[2].p;
     v.z = 0.0f;
     v.w = 0.0f;
-    fSin = Math_Sin(fAngle);
-    fCos = Math_Cos(fAngle);
+    fSin = sinf(fAngle);
+    fCos = cosf(fAngle);
     mtx[0][0] = fCos;
     mtx[0][1] = fSin;
     mtx[1][0] = -fSin;

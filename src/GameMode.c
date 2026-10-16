@@ -656,7 +656,7 @@ int GM_DoPreshotAnimation(int nPlayer) {
     if (Game_GetCourse() == 0x12 && Game_GetCurHoleNum() == 10) {
         GM_Vec4Sub(gPlayers[nPlayer].vBall, &Ter_GetTGD()->tee[gSession.nTeeSet[nPlayer]].x, v);
         v[1] = 0.0f;
-        if ((f32)Math_Sqrt(Vec3_LengthSqClamped(v)) < 40.0f) {
+        if ((f32)Math_Sqrt(LLMath_LengthSquared3(v)) < 40.0f) {
             return 0;
         }
     }
@@ -711,7 +711,7 @@ int GM_ShowPostShotAnimation(int nPlayer) {
     if (Game_GetCourse() == 0x12 && Game_GetCurHoleNum() == 10) {
         GM_Vec4Sub(gPlayers[nPlayer].vBall, &Ter_GetTGD()->tee[gSession.nTeeSet[nPlayer]].x, vTee);
         vTee[1] = 0.0f;
-        if ((f32)Math_Sqrt(Vec3_LengthSqClamped(vTee)) < 40.0f) {
+        if ((f32)Math_Sqrt(LLMath_LengthSquared3(vTee)) < 40.0f) {
             return 0;
         }
     }
@@ -743,7 +743,7 @@ int GM_ShowPostShotAnimation(int nPlayer) {
         }
         GM_Vec3Sub(vPos, gPlayers[nPlayer].vBall, vFlat);
         vFlat[1] = 0.0f;
-        fLen  = Math_Sqrt(Vec3_LengthSqClamped(vFlat));
+        fLen  = Math_Sqrt(LLMath_LengthSquared3(vFlat));
         fRise = gPlayers[nPlayer].vBall[1] - fHigh;
         if (0.0f != fLen) {
             fSlope = fRise / fLen;

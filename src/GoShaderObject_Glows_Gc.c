@@ -69,8 +69,8 @@ void _CreateRing(int nGlow, int nSides) {
     fn_80097EC4(vStart);
     for (i = 1; i < nSides; i++) {
         fAngle = (2.0f * PI) * ((f32)i / (f32)nSides);
-        vRim[0] = Math_Cos(fAngle);
-        vRim[1] = Math_Sin(fAngle);
+        vRim[0] = cosf(fAngle);
+        vRim[1] = sinf(fAngle);
         vRim[2] = 0.0f;
         fn_80097EC4(vRim);
     }
@@ -101,8 +101,8 @@ void fn_800981D0(int nGlow, int nPoints) {
             } else {
                 fRadius = 1.0f;
             }
-            v[0] = fRadius * Math_Cos(fAngle);
-            v[1] = fRadius * Math_Sin(fAngle);
+            v[0] = fRadius * cosf(fAngle);
+            v[1] = fRadius * sinf(fAngle);
             v[2] = 0.0f;
             fn_80097EC4(v);
         }
@@ -150,8 +150,8 @@ void fn_80098408(GlowQueued* pGlow, const f32* pPos) {
 
     if (!(pGlow->n25 & 0x80)) {
         if (0.0f != pGlow->f20) {
-            fSin = Math_Sin(pGlow->f20);
-            fCos = Math_Cos(pGlow->f20);
+            fSin = sinf(pGlow->f20);
+            fCos = cosf(pGlow->f20);
         } else {
             fSin = 0.0f;
             fCos = 1.0f;

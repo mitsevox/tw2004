@@ -175,7 +175,7 @@ f32 CamScript_fGetDistanceBetweenSplinePoints(f32* p0, f32* p1, f32* p2, f32* p3
         fT += 1.0f / 32.0f;
         CamScript_SplineCamerasByPosition(p0, p1, p2, p3, &vPoint.x, fT);
         CamUtils_Vec3Sub(&vPoint.x, &vLast.x, &vDelta.x);
-        fLength += (f32)Math_Sqrt(Vec3_LengthSqClamped(&vDelta.x));
+        fLength += (f32)Math_Sqrt(LLMath_LengthSquared3(&vDelta.x));
         Vec3Copy(&vPoint.x, &vLast.x);
     }
     return fLength;
@@ -338,13 +338,13 @@ void CamUtils_vCalcArcPosition(f32* pA, f32* pB, f32* pC, int nDir, f32* pOut, f
             fAngleTo += 2.0f * PI;
         }
     }
-    fDistFrom = Math_Sqrt(Vec3_LengthSqClamped(&vFrom.x));
-    fDistTo = Math_Sqrt(Vec3_LengthSqClamped(&vTo.x));
+    fDistFrom = Math_Sqrt(LLMath_LengthSquared3(&vFrom.x));
+    fDistTo = Math_Sqrt(LLMath_LengthSquared3(&vTo.x));
     fDist = fT * (fDistTo - fDistFrom) + fDistFrom;
     fAngle = fT * (fAngleTo - fAngleFrom) + fAngleFrom;
-    pOut[0] = fDist * Math_Cos(fAngle) + pC[0];
+    pOut[0] = fDist * cosf(fAngle) + pC[0];
     pOut[1] = fT * (pB[1] - pA[1]) + pA[1];
-    pOut[2] = fDist * Math_Sin(fAngle) + pC[2];
+    pOut[2] = fDist * sinf(fAngle) + pC[2];
 }
 
 // Three floats: pOut gets pA minus pB.

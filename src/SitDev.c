@@ -145,7 +145,7 @@ void SitDev_QueueEvent(int nPlayer, int a, u8 nEvent) {
         if (nEvent == 20 || nEvent == 29) {
             SitDev_Vec3Sub(gPlayers[nPlayer].ballBefore.vPos, gPlayers[nPlayer].ball.vStart, vDiff);
             vDiff[1] = 0.0f;
-            nInches = 36.0f * (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
+            nInches = 36.0f * (f32)Math_Sqrt(LLMath_LengthSquared3(vDiff));
             _SetStateVecAndCondition(gpSitDevData->aValue, 18, nInches, gpSitDevData->aSetBits);
             _SetStateVecAndCondition(gpSitDevData->aValue, 19, nInches, gpSitDevData->aSetBits);
         }

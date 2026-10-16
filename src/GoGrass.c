@@ -298,14 +298,14 @@ void Grass_UpdateView(void) {
     if (gpGrassMgr->n3E4 != 0) {
         Grass_RenderTopTexture();
     }
-    fSin = Math_Sin(gpGrassMgr->f40C);
-    fCos = Math_Cos(gpGrassMgr->f40C);
+    fSin = sinf(gpGrassMgr->f40C);
+    fCos = cosf(gpGrassMgr->f40C);
     for (i = 0; i < 16; i++) {
         vPoint[0] = fCos * gpGrassMgr->f41C *
-                    Math_Sin(gpGrassMgr->f414 + 2.0f * PI * ((f32)i / 16.0f));
+                    sinf(gpGrassMgr->f414 + 2.0f * PI * ((f32)i / 16.0f));
         vPoint[1] = 0.0f;
         vPoint[2] = fSin * gpGrassMgr->f41C *
-                    Math_Sin(gpGrassMgr->f414 + 2.0f * PI * ((f32)i / 16.0f));
+                    sinf(gpGrassMgr->f414 + 2.0f * PI * ((f32)i / 16.0f));
         vPoint[3] = 0.0f;
         LLMath_CopyVec(vPoint, gpGrassMgr->av230[i]);
     }

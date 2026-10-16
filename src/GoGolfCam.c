@@ -47,7 +47,6 @@ void     fn_80038054(u8 a, int n, f32 f1, f32 f2);
 CamShot* GolfCamera_GetAlternateSwingCamera(int nFirst, int nPlayer);
 void     GolfCamera_UpdateSwingSlowMoCamera(View* pView, f32* pCam, f32* pSub, int nPlayer);
 f32      GolfCamera_GetTimeToNextShot(View* pView);
-void     Quat_RotateVector(f32* pQuat, f32* pIn, f32* pOut);  // rotate a vector by a quaternion
 u8       fn_8006BEA4(void);                             // emotion.c: a scripted GameBreaker's letterbox is up
 void     Gaud_InitSpecialShot(u8 nPlayer);
 void     fn_80039344(int nView, f32 f);                 // a per-view float (Swing.c's declaration)
@@ -225,7 +224,7 @@ void GolfCamera_InitZoomToAimCamera(View* pView, int nPlayer) {
             LLMath_Normalize3(vDir, vDir);
         }
         GolfCam_Vec3Sub(vAim, pCam, v);
-        Vec3_Scale(Math_Sqrt(Vec3_LengthSqClamped(v)), vDir, vDir);
+        Vec3_Scale(Math_Sqrt(LLMath_LengthSquared3(v)), vDir, vDir);
         GolfCam_Vec3Add(pCam, vDir, pSub);
     }
     EVENT_Trigger(nPlayer, 0x30, NULL, -1);
@@ -275,20 +274,20 @@ void GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer) {
     // flat distances to the goal: from the camera, from the aim and from where it started
     GolfCam_Vec3Sub(vGoal, pCam, vMove);
     vMove[1] = 0.0f;
-    fDist = Math_Sqrt(Vec3_LengthSqClamped(vMove));
+    fDist = Math_Sqrt(LLMath_LengthSquared3(vMove));
     GolfCam_Vec3Sub(vGoal, vAim, vAimMove);
     vAimMove[1] = 0.0f;
-    fTotal = Math_Sqrt(Vec3_LengthSqClamped(vAimMove));
+    fTotal = Math_Sqrt(LLMath_LengthSquared3(vAimMove));
     GolfCam_Vec3Sub(vGoal, pView->shot19C.v30, vStart);
     vStart[1] = 0.0f;
-    f = Math_Sqrt(Vec3_LengthSqClamped(vStart));
+    f = Math_Sqrt(LLMath_LengthSquared3(vStart));
     if (fTotal < f) {
         fTotal = f;
     }
     if (pView->script.f108 >= 1.0f) {
         GolfCam_Vec3Sub(vGoal, pCam, vCreep);
         vCreep[1] = 0.0f;
-        fSlow = Math_Sqrt(Vec3_LengthSqClamped(vCreep));
+        fSlow = Math_Sqrt(LLMath_LengthSquared3(vCreep));
         if (vCreep[0] != 0.0f || vCreep[1] != 0.0f || vCreep[2] != 0.0f) {
             LLMath_Normalize3(vCreep, vCreep);
         }
@@ -489,7 +488,7 @@ void GolfCamera_InitGreenZoomToAimCamera(View* pView, int nPlayer) {
                 LLMath_Normalize3(vDir, vDir);
             }
             GolfCam_Vec3Sub(vAim, pCam, v);
-            Vec3_Scale(Math_Sqrt(Vec3_LengthSqClamped(v)), vDir, vDir);
+            Vec3_Scale(Math_Sqrt(LLMath_LengthSquared3(v)), vDir, vDir);
             GolfCam_Vec3Add(pCam, vDir, pSub);
         }
         EVENT_Trigger(nPlayer, 0x30, NULL, -1);
@@ -542,13 +541,13 @@ void GolfCamera_ProcessGreenZoomToAimCamera(View* pView, int nPlayer) {
         // flat distances to the goal: from the camera, from the aim and from where it started
         GolfCam_Vec3Sub(vGoal, pCam, vMove);
         vMove[1] = 0.0f;
-        fDist = Math_Sqrt(Vec3_LengthSqClamped(vMove));
+        fDist = Math_Sqrt(LLMath_LengthSquared3(vMove));
         GolfCam_Vec3Sub(vGoal, vAim, vAimMove);
         vAimMove[1] = 0.0f;
-        fTotal = Math_Sqrt(Vec3_LengthSqClamped(vAimMove));
+        fTotal = Math_Sqrt(LLMath_LengthSquared3(vAimMove));
         GolfCam_Vec3Sub(vGoal, pView->shot19C.v30, vStart);
         vStart[1] = 0.0f;
-        f = Math_Sqrt(Vec3_LengthSqClamped(vStart));
+        f = Math_Sqrt(LLMath_LengthSquared3(vStart));
         if (fTotal < f) {
             fTotal = f;
         }
@@ -559,7 +558,7 @@ void GolfCamera_ProcessGreenZoomToAimCamera(View* pView, int nPlayer) {
         nPinSet = Game_CurrentPinSet();
         GolfCam_Vec3Sub(&pCourse->pin[nPinSet].x, vTarget, vPin);
         vPin[1] = 0.0f;
-        f = Math_Sqrt(Vec3_LengthSqClamped(vPin));
+        f = Math_Sqrt(LLMath_LengthSquared3(vPin));
         f += 1.5f;
         fSpeed = (f < 0.0f) ? 0.0f : ((f > 20.0f) ? 20.0f : f);
         f = fSpeed / Math_Tan(CA_fGetCameraFieldOfView(pLens) / 2.0f);
@@ -569,7 +568,7 @@ void GolfCamera_ProcessGreenZoomToAimCamera(View* pView, int nPlayer) {
         if (pView->script.f108 >= 1.0f) {
             GolfCam_Vec3Sub(vGoal, pCam, vCreep);
             vCreep[1] = 0.0f;
-            fSlow = Math_Sqrt(Vec3_LengthSqClamped(vCreep));
+            fSlow = Math_Sqrt(LLMath_LengthSquared3(vCreep));
             if (vCreep[0] != 0.0f || vCreep[1] != 0.0f || vCreep[2] != 0.0f) {
                 LLMath_Normalize3(vCreep, vCreep);
             }
@@ -764,12 +763,12 @@ void GolfCamera_ProcessPlaceBallCamera(View* pView, int nPlayer) {
             pView->script.fFadeTime += gSession.fFrameTime;
         }
         if (gSession.fFrameTime != 0.0f) {
-            fSin = Math_Sin(20.0f * PI / 180.0f);    // not DEG(20.0f): see camera 9's tick
-            fCos = Math_Cos(20.0f * PI / 180.0f);
+            fSin = sinf(20.0f * PI / 180.0f);        // not DEG(20.0f): see camera 9's tick
+            fCos = cosf(20.0f * PI / 180.0f);
             fUp = 10.0f * fSin;
             fBack = 10.0f * fCos;
-            fSin = Math_Sin(gPlayers[nPlayer].fPlaceHeading);
-            fCos = Math_Cos(gPlayers[nPlayer].fPlaceHeading);
+            fSin = sinf(gPlayers[nPlayer].fPlaceHeading);
+            fCos = cosf(gPlayers[nPlayer].fPlaceHeading);
             fX = fBack * -fSin;
             fZ = fBack * fCos;
             pCam[0] = fX + gPlayers[nPlayer].vPlacement[0];
@@ -923,10 +922,10 @@ void GolfCamera_ProcessSpeedGolfRunCamera(View* pView, int nPlayer) {
         }
         if (gSession.fFrameTime != 0.0f) {
             // 20 degrees, written out: DEG(20.0f) rounds one bit lower than the original's constant
-            fUp = fDist * Math_Sin(20.0f * PI / 180.0f);    // camera 8's height over the golfer; unused
-            fBack = fDist * Math_Cos(20.0f * PI / 180.0f);
-            fSin = Math_Sin(gPlayers[nPlayer].fPlaceHeading);
-            fCos = Math_Cos(gPlayers[nPlayer].fPlaceHeading);
+            fUp = fDist * sinf(20.0f * PI / 180.0f);        // camera 8's height over the golfer; unused
+            fBack = fDist * cosf(20.0f * PI / 180.0f);
+            fSin = sinf(gPlayers[nPlayer].fPlaceHeading);
+            fCos = cosf(gPlayers[nPlayer].fPlaceHeading);
             fX = fBack * -fSin;
             fZ = fBack * fCos;
             pCam[0] = gPlayers[nPlayer].vPlacement[0];
@@ -1229,7 +1228,7 @@ void GolfCamera_ProcessGreenRollCamera(View* pView, int nPlayer) {
         nPinSet = Game_CurrentPinSet();
         GolfCam_Vec3Sub(&pCourse->pin[nPinSet].x, gPlayers[nPlayer].vBall, vToPin);
         vToPin[1] = 0.0f;
-        fDist = Math_Sqrt(Vec3_LengthSqClamped(vToPin));
+        fDist = Math_Sqrt(LLMath_LengthSquared3(vToPin));
         if (fDist < 0.1f) {
             fDist = 0.1f;
         }
@@ -1944,7 +1943,7 @@ void GolfCamera_InitBallFlightCamera(View* pView, int nPlayer) {
             nClass = 10;
         }
         GolfCam_Vec3Sub(gPlayers[nPlayer].ballBefore.vPos, gPlayers[nPlayer].ball.vStart, vDiff);
-        fDist = Math_Sqrt(Vec3_LengthSqClamped(vDiff));
+        fDist = Math_Sqrt(LLMath_LengthSquared3(vDiff));
     } else {
         fDist = AI_MaxDistance(nPlayer, gPlayers[nPlayer].nShotKind, gPlayers[nPlayer].nClub);
         fDist *= Physics_GetLiePowerPercentage(&gPlayers[nPlayer].ball);
@@ -2282,7 +2281,7 @@ void GolfCamera_ProcessPostShotCamera(View* pView, int nPlayer) {
     if (pView->script.bFairwayFix && CamScript_DoesScriptTrackBall(pView->script.pShot)) {
         GolfCam_Vec3Sub(pCam, gPlayers[nPlayer].ball.vPos, vDelta);
         vDelta[1] = 0.0f;
-        fDist = (f32)Math_Sqrt(Vec3_LengthSqClamped(vDelta)) / 30.0f;
+        fDist = (f32)Math_Sqrt(LLMath_LengthSquared3(vDelta)) / 30.0f;
         fDist = (fDist < 0.5f) ? 0.5f : ((fDist > 5.0f) ? 5.0f : fDist);
         // one local for the target and the step
         fDist = 0.01f * (fDist - pView->script.pShot->fLookUpOffset);
@@ -2686,7 +2685,7 @@ u8 GolfCamera_ZoomCamGetStartAndEndVecs(View* pView, int nPlayer, f32* pSub, f32
     pBall = gPlayers[nPlayer].vBall;
     GolfCam_Vec3Sub(vTarget, pBall, vDir);
     vDir[1] = 0.0f;
-    fDist = Math_Sqrt(Vec3_LengthSqClamped(vDir));
+    fDist = Math_Sqrt(LLMath_LengthSquared3(vDir));
     if (vDir[0] != 0.0f || vDir[1] != 0.0f || vDir[2] != 0.0f) {
         LLMath_Normalize3(vDir, vDir);
     }
@@ -3024,7 +3023,7 @@ void GolfCamera_ClampLookAngle(f32* pFrom, f32* pTo, f32* pOut) {
         vFlatDir[1] = 0.0f;
         vFlatDir[2] = 0.0f;
     }
-    fAngle = Math_Acos((Vec3_Dot(vDir, vFlatDir) < -1.0f) ? -1.0f
+    fAngle = acosf((Vec3_Dot(vDir, vFlatDir) < -1.0f) ? -1.0f
                          : ((Vec3_Dot(vDir, vFlatDir) > 1.0f) ? 1.0f : Vec3_Dot(vDir, vFlatDir)));
     bClamp = 0;
     if (v[1] > 0.0f && fAngle > fMaxUp) {
@@ -3054,7 +3053,7 @@ int GolfCamera_LimitPositionChange(f32* pFrom, f32* pTo, f32* pOut, f32 fMax) {
     f32 vStep[4];
     f32 fDist;
     GolfCam_Vec3Sub(pTo, pFrom, v);
-    fDist = Math_Sqrt(Vec3_LengthSqClamped(v));
+    fDist = Math_Sqrt(LLMath_LengthSquared3(v));
     if (fDist > fMax && fDist > 1e-6f) {
         Vec3_Scale(fMax / fDist, v, vStep);
         GolfCam_Vec3Add(pFrom, vStep, pOut);
@@ -3542,10 +3541,10 @@ void GolfCamera_ZoomGreenCamera(View* pView, int nPlayer) {
     f32 v[4];
     GolfCam_Vec3Sub(gPlayers[nPlayer].vTarget2, gPlayers[nPlayer].vBall, v);
     v[1] = 0.0f;
-    if (pView->shot19C.fDist + 0.1f < (f32)Math_Sqrt(Vec3_LengthSqClamped(v)) - 3.0f) {
+    if (pView->shot19C.fDist + 0.1f < (f32)Math_Sqrt(LLMath_LengthSquared3(v)) - 3.0f) {
         pView->shot19C.fDist += 0.1f;
-    } else if (pView->shot19C.fDist > (f32)Math_Sqrt(Vec3_LengthSqClamped(v)) - 3.0f) {
-        pView->shot19C.fDist = (f32)Math_Sqrt(Vec3_LengthSqClamped(v)) - 3.0f;
+    } else if (pView->shot19C.fDist > (f32)Math_Sqrt(LLMath_LengthSquared3(v)) - 3.0f) {
+        pView->shot19C.fDist = (f32)Math_Sqrt(LLMath_LengthSquared3(v)) - 3.0f;
         if (pView->shot19C.fDist < 0.0f) {
             pView->shot19C.fDist = 0.0f;
         }
@@ -3590,7 +3589,7 @@ void GolfCamera_ChooseReactionCam(View* pView, int nPlayer, int a) {
     }
     GolfCam_Vec3Sub(gPlayers[nPlayer].ballBefore.vPos, gPlayers[nPlayer].ball.vStart, v);
     v[1] = 0.0f;
-    fDist = Math_Sqrt(Vec3_LengthSqClamped(v));
+    fDist = Math_Sqrt(LLMath_LengthSquared3(v));
     if (!DynamicCam_ChoosePairedSequenceOrCamera(nPlayer, 1, &pSeq, &pShot) && pShot == NULL) {
         pSeq = DynamicCam_ChooseSequence(nPlayer, nLie, nClass, 15, 1, fDist);
     }

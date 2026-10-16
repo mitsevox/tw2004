@@ -136,17 +136,13 @@ void  SKEL_UpdateState(CharModel* pModel, SkelPose* pPose, u8 bTransform);   // 
 void  fn_80037C48(Skin* pSkin, SkelPose* pPose);                // Skin.c
 void  CharacterState_PlayClipMorphs(Character* pChar, void* pLib, u8 bReset, f32 fOffset);   // CharAnim.c
 void  CharacterState_UpdateMorphState(Character* pChar);                            // CharAnim.c
-void  Quat_QuatToMatrix(f32* pQ, f32 (*m)[4]);                        // Quaternion.c: a rotation matrix
 int   Character_UpdateClubAttachment(Character* pChar, Clip* pClip);
-void  Quat_Invert(f32* pQ, f32* pOut);                          // Quaternion.c
-void  Quat_RotateVector(f32* pQ, f32* pIn, f32* pOut);                // Quaternion.c: a vector turned by pQ
 f32   SKEL_InitIKSkeleton(Character* pChar, f32* pTarget, int bNormals);  // Skeleton.c
 void  Char_Vec4Sub(f32* pA, f32* pB, f32* pOut);
 void  Character_BeginLoadTexturesCallbackIG(Character* pChar);
 void  Character_RequestClothesUpdateIG(int n);
 void  fn_8010B098(void* pModel);                                // LLDynTex.c
 void  CharacterState_SetTransition(TSKATime* pTime, s32 nState, f32 fTime);     // CharAnim.c
-void  Quat_ExtractEulerAngles(f32* pQ, f32* pA, f32* pB, f32* pC);          // Quaternion.c: a rotation as angles
 void  SKEL_InitHalfJoints(CharModel* pModel, SkelPose* pPose);          // Skeleton.c
 void  mat44flt_Invert(f32 (*pSrc)[4], f32 (*pDst)[4]);              // UMemPool.c
 void  Character_GetBonePosSwapIfLefty(Character* pChar, int nBone, f32* pPos);
@@ -237,11 +233,11 @@ f32 gCharCoveringNormal[4];     // } (Character_GetTerrainHeightAndNormal)
 // 1.0f, 2^30, 0.0f, -60000.0f and 3.0f (0x80282BC0), 1.0f and 3.0f before their first users
 // below; its body is unknown, this one only reproduces the order.
 static void char_StrippedFn(void) {
-    Math_Sin(1.0f);
-    Math_Sin(1073741824.0f);
-    Math_Sin(0.0f);
-    Math_Sin(-60000.0f);
-    Math_Sin(3.0f);
+    sinf(1.0f);
+    sinf(1073741824.0f);
+    sinf(0.0f);
+    sinf(-60000.0f);
+    sinf(3.0f);
 }
 
 // Clears the character's SKA tags (its animation events, Character.aTags): none set, each at time
@@ -952,10 +948,10 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     Char_Vec3Sub(vKnee, vHip, vThigh);
     Char_Vec3Sub(vKnee, vOld, vShin);
     Char_Vec3Sub(vOld, vToe, vFoot);
-    fReach = (f32)Math_Sqrt(Vec3_LengthSqClamped(vReach));
-    fLeg = (f32)Math_Sqrt(Vec3_LengthSqClamped(vLeg));
-    fThigh = (f32)Math_Sqrt(Vec3_LengthSqClamped(vThigh));
-    fShin = (f32)Math_Sqrt(Vec3_LengthSqClamped(vShin));
+    fReach = (f32)Math_Sqrt(LLMath_LengthSquared3(vReach));
+    fLeg = (f32)Math_Sqrt(LLMath_LengthSquared3(vLeg));
+    fThigh = (f32)Math_Sqrt(LLMath_LengthSquared3(vThigh));
+    fShin = (f32)Math_Sqrt(LLMath_LengthSquared3(vShin));
     if (fLeg > fThigh + fShin) {
         fLeg = fThigh + fShin;
     }
@@ -965,9 +961,9 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     }
     fSq = fThigh * fThigh + fShin * fShin;
     fCos = (fSq - fReach * fReach) / fDen;
-    fAngleA = Math_Acos((fCos < -1.0f) ? -1.0f : ((fCos > 1.0f) ? 1.0f : fCos));
+    fAngleA = acosf((fCos < -1.0f) ? -1.0f : ((fCos > 1.0f) ? 1.0f : fCos));
     fCos = (fSq - fLeg * fLeg) / fDen;
-    fAngleB = Math_Acos((fCos < -1.0f) ? -1.0f : ((fCos > 1.0f) ? 1.0f : fCos));
+    fAngleB = acosf((fCos < -1.0f) ? -1.0f : ((fCos > 1.0f) ? 1.0f : fCos));
     fTurn = fAngleA - fAngleB;
     vec4flt_CrossProduct(vShin, vThigh, vNormal);
     fLen = LLMath_NormalizeReturnLength3(vNormal, vNormal);
@@ -991,8 +987,8 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     }
 
     // the hip: turned by the change in the angle between the thigh and the hip-to-foot line
-    fTurn2 = Math_Asin(fShin * Math_Sin(fAngleA) / fReach);
-    fTurn2 -= Math_Asin(fShin * Math_Sin(fAngleB) / fLeg);
+    fTurn2 = asinf(fShin * sinf(fAngleA) / fReach);
+    fTurn2 -= asinf(fShin * sinf(fAngleB) / fLeg);
     if (fabsf(fTurn2) > 0.0001f) {
         Vec3_Scale(fTurn2, vNormal, vAxis);
         vAxis[3] = 0.0f;
@@ -1021,7 +1017,7 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     vAxis[0] *= 1.0f / fLen;
     vAxis[2] *= 1.0f / fLen;
     fCos = vSlope[1];
-    fTurn3 = Math_Acos((fCos < -1.0f) ? -1.0f : ((fCos > 1.0f) ? 1.0f : fCos));
+    fTurn3 = acosf((fCos < -1.0f) ? -1.0f : ((fCos > 1.0f) ? 1.0f : fCos));
     fTurn3 *= fDrop;
     if (fabsf(fTurn3) > 0.0001f) {
         Vec3_Scale(fTurn3, vAxis, vAxis);
@@ -1074,7 +1070,7 @@ void Character_SetOrientationVec(Character* pChar, f32* pDir, f32 fAngle) {
     f32 fRoll;
 
     if (pChar != NULL) {
-        fLen = Math_Sqrt(Vec3_LengthSqClamped(pDir));
+        fLen = Math_Sqrt(LLMath_LengthSquared3(pDir));
         if (fLen < 0.01f) return;
         Vec3_Scale(1.0f / fLen, pDir, mtx[0]);
         mtx[0][3] = 0.0f;
@@ -2092,7 +2088,7 @@ void Character_CalculateClipPoints(Character* pChar) {
     pChar->vSphereCentre[1] = vCentre[1];
     pChar->vSphereCentre[2] = vCentre[2];
     Char_Vec3Sub(pChar->vMax, pChar->vMin, vDiff);
-    pChar->fSphereRadius = (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff)) / 2.0f;
+    pChar->fSphereRadius = (f32)Math_Sqrt(LLMath_LengthSquared3(vDiff)) / 2.0f;
 }
 
 // Tests the character against the current camera. Only for the active player of the current view
@@ -2130,7 +2126,7 @@ void Character_ClipTest(Character* pChar, int nPlayer) {
     pChar->nShadowClipResult = fn_80007D74(&sSphereInCamSpace, RC_spGetCurrentRenderCtx(), 0);
     Char_Vec4Sub(pMat[3], Camera_GetCurrentLens()->m4[3], vDir);
     fDot = Vec3_Dot(Camera_GetCurrentLens()->m4[2], vDir);
-    fDist = (f32)Math_Sqrt(Vec3_LengthSqClamped(vDir));
+    fDist = (f32)Math_Sqrt(LLMath_LengthSquared3(vDir));
     if (fDist < pChar->fNearestCamDist) {
         pChar->fNearestCamDist = fDist;
     }

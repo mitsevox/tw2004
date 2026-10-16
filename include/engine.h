@@ -146,11 +146,6 @@ void RTClock_GetDateTimeString(char* s);
 #define DEG(x) ((x) * (PI / 180.0f))
 
 void Vec3Copy(const f32* pSrc, f32* pDst);   // 0x80008304 (const: see code_800082F8.c)
-f32  Math_Sin(f32 fAngle);           // sin
-f32  Math_Cos(f32 fAngle);           // cos
-f32  Math_Asin(f32 x);                // asin
-double Math_Sqrt(double x);           // sqrt
-f32  Vec3_LengthSqClamped(f32* pVec);            // dot with itself (at most FLT_MAX)
 extern f32 __float_max[];               // FLT_MAX (MSL's)
 void LLMath_CopyVec(const f32* pSrc, f32* pDst);   // 0x8000AD10 (const: see Vec3Copy)
 f32  atan2f(f32 y, f32 x);         // atan2f
@@ -172,25 +167,44 @@ u32  Misc_CreateRandomSeed(void);                 // a random seed from the cloc
 void Misc_InitModule(u32 uSeed);            // seed all three random streams
 void Misc_CloseModule(void);                 // drop the kept normal value (Misc_RandFuncg)
 f32  Misc_RandFuncf(int nStream);           // 0x8000B428  [0, 1)
-void Quat_Slerp(f32* pA, f32* pB, f32 fT);   // quaternion slerp from a to b by fT, into b
-void Quat_Multiply(f32* pA, f32* pB, f32* pOut); // quaternion product a x b (Quaternion.c)
-// The quaternion yaw x pitch x roll (about z, y and x; radians, each negated first).
-void Quat_EulerAngles(f32 fYaw, f32 fPitch, f32 fRoll, f32* pOut);
-void Quat_BuildFromVector(f32* pRot, f32* pOut); // a rotation vector (axis * angle) as a quaternion
-void Legacy_Quat_BuildFromYaw(f32 fAngle, f32* pOut); // the quaternion of a rotation by -fAngle about z
-void Legacy_Quat_BuildFromPitch(f32 fAngle, f32* pOut); // the quaternion of a rotation by -fAngle about y
-void Legacy_Quat_BuildFromRoll(f32 fAngle, f32* pOut); // the quaternion of a rotation by -fAngle about x
-void Quat_IdentifyForMul(f32* pQ);              // the identity quaternion (0, 0, 0, 1)
 f32  Math_Sqrtf(f32 x);                // square root (Skeleton.c); x itself when x <= 0
 void LLMath_AddScale3(f32* pA, f32* pB, f32 f, f32* pOut);   // out = a + f x b
 f32  Vec3_Dot(f32* pA, f32* pB);     // dot product
-f32  Math_Acos(f32 x);                // arc cosine
 void LLMath_Scale(f32 f, f32* pIn, f32* pOut);   // scale a vector (four floats)
 void LLMath_AddScale(f32* pA, f32* pB, f32 fScale, f32* pOut);   // out = a + fScale x b (four floats)
 void LLMath_Interpolate(f32* pA, f32* pB, f32 fT, f32* pOut);    // out = a + (b - a) x fT (four floats)
 double pow(double x, double y);         // 0x8015F824 (MSL)
 f32  powf(f32 x, f32 y);                // 0x8002C8D0 (Golfer.c): pow rounded to a float
 void vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut);   // cross product
+
+// MathQuat.c: quaternions, four floats x, y, z, w. A quaternion turns a vector as Quat_RotateVector
+// does, the same as the row vector times Quat_QuatToMatrix's matrix; Q1 x Q2 turns by Q1, then Q2.
+typedef f32 Quat[4];
+void Quat_Slerp(f32* Q1, f32* Q2, f32 fFactor_p);   // from Q1 to Q2 by fFactor_p, written over Q2
+void Quat_BuildFromMatrix(f32 (*M)[4], f32* Q);      // the rotation in M's 3x3 part
+// The turn by fYaw_p about z, then fPitch_p about y, then fRoll_p about x (radians).
+void Quat_EulerAngles(f32 fYaw_p, f32 fPitch_p, f32 fRoll_p, f32* Q);
+void Quat_Invert(f32* src, f32* dest);               // the inverse (any length)
+void Quat_Multiply(f32* Q1, f32* Q2, f32* Q);        // Q1 x Q2; Q must not be Q1 or Q2
+void Quat_Add(f32* Q1, f32* Q2, f32* Q);             // Q1 + Q2
+void Quat_RotateVector(f32* Q, f32* src, f32* dest); // src (a vector or a quaternion) turned by Q
+void Quat_QuatToMatrix(f32* Q, f32 (*M)[4]);         // the rotation matrix, into rows 0-2 of M
+// The turn by the rotation vector v (axis times angle in radians); the identity below 0.001.
+void Quat_BuildFromVector(f32* v, f32* Q);
+void Quat_BuildFromVectorAndScale(f32* v, f32* Q, f32 scale);   // the same with the angle given
+void Legacy_Quat_BuildFromYaw(f32 fYaw_p, f32* Q);       // the turn by fYaw_p about z (x toward y)
+void Legacy_Quat_BuildFromPitch(f32 fPitch_p, f32* Q);   // the turn by fPitch_p about y (z toward x)
+void Legacy_Quat_BuildFromRoll(f32 fRoll_p, f32* Q);     // the turn by fRoll_p about x (y toward z)
+// Q's yaw, pitch and roll (radians; yaw and roll within -pi/2..pi/2): Quat_EulerAngles(-yaw,
+// -pitch, -roll) gives Q (or -Q) back when its yaw and roll lie in that range.
+void Quat_ExtractEulerAngles(f32* Q, f32* fYaw_p, f32* fPitch_p, f32* fRoll_p);
+f32  sinf(f32 x);                    // sin() rounded to a float
+f32  acosf(f32 x);                   // acos() rounded to a float
+f32  cosf(f32 x);                    // cos() rounded to a float
+f32  asinf(f32 x);                   // asin() rounded to a float
+double Math_Sqrt(double x);          // square root; NaN for a negative x or +infinity
+void Quat_IdentifyForMul(f32* Q);    // the identity, (0, 0, 0, 1)
+f32  LLMath_LengthSquared3(const f32* A);   // A's squared length (x, y, z), at most FLT_MAX
 
 // LLMath_Gc.c: paired-single vectors and matrices. A vector is a row times a matrix, so a
 // matrix's row 3 is its translation; a name ending in 3 uses only x, y and z and leaves the output's

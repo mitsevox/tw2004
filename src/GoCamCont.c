@@ -17,7 +17,6 @@ u8   CameraController_PointIsOnScreen(int nPlayer, f32* pPos, f32 fMargin);
 u8   CameraController_HideGolfer(int nPlayer, int nView);
 void CameraController_SetShakeAmount(View* pView, f32 fTime, f32 fAmount);
 void CameraController_Vec3Sub(f32* pA, f32* pB, f32* pOut);
-void Quat_RotateVector(f32* pQuat, f32* pIn, f32* pOut);      // Quaternion.c: a vector turned by it
 void ViewController_SetCurrentViewController(int nView);    // ViewController.c: sets the current view
 void fn_80045824(int n);                                // DepthField.c: turns depth-of-field layer n off
 void Gaud_CameraShake(u8 nPlayer, u8 bLimit);                // GameAudio.c
@@ -484,7 +483,7 @@ void CameraController_CameraCollision(int nView, f32* pBounds) {
     vMove[0] = pView->script.v60[0];
     vMove[1] = 0.0f;
     vMove[2] = pView->script.v60[2];
-    fSpeed = Math_Sqrt(Vec3_LengthSqClamped(vMove));
+    fSpeed = Math_Sqrt(LLMath_LengthSquared3(vMove));
     CameraController_Vec3Sub(vObj, pPos, vToObj);
     vToObj[1] = 0.0f;
     if (vToObj[0] != 0.0f || vToObj[1] != 0.0f || vToObj[2] != 0.0f) {
@@ -642,7 +641,7 @@ void CameraController_LagSideVector(f32* pA, f32* pB, f32* pOut) {
         vB[1] = 0.0f;
         vB[2] = 0.0f;
     }
-    fAngle = Math_Acos(Vec3_Dot(vA, vB) < -1.0f  ? -1.0f
+    fAngle = acosf(Vec3_Dot(vA, vB) < -1.0f  ? -1.0f
                          : Vec3_Dot(vA, vB) > 1.0f ? 1.0f
                                                       : Vec3_Dot(vA, vB));
     fAngle *= 0.2f;

@@ -625,7 +625,7 @@ f32 GameAnalysis_GetCurrentBallFlightDistance(int nPlayer) {
     f32 vDiff[3];
     GameAnalysis_Vec3Sub(gPlayers[nPlayer].ball.vPos, gPlayers[nPlayer].ball.vStart, vDiff);
     vDiff[1] = 0.0f;
-    return Math_Sqrt(Vec3_LengthSqClamped(vDiff));
+    return Math_Sqrt(LLMath_LengthSquared3(vDiff));
 }
 
 // A point's distance from the current pin along the ground; 0 with no hole loaded.
@@ -637,7 +637,7 @@ f32 GameAnalysis_GetPositionDistanceToPin(f32* pPos) {
     nPin = Game_CurrentPinSet();
     GameAnalysis_Vec3Sub(pPos, &pCourse->pin[nPin].x, vDiff);
     vDiff[1] = 0.0f;
-    return Math_Sqrt(Vec3_LengthSqClamped(vDiff));
+    return Math_Sqrt(LLMath_LengthSquared3(vDiff));
 }
 
 // The round's holes the player finished one under par or better, counting back from the current
@@ -742,10 +742,10 @@ f32 GameAnalysis_GetPuttBreakAngle(int nPlayer) {
     vToPin[1] = 0.0f;
     GameAnalysis_Vec3Sub(vView, gPlayers[nPlayer].ball.vStart, vToView);
     vToView[1] = 0.0f;
-    if ((f32)Math_Sqrt(Vec3_LengthSqClamped(vToPin)) > 0.0f) {
+    if ((f32)Math_Sqrt(LLMath_LengthSquared3(vToPin)) > 0.0f) {
         LLMath_Normalize3(vToPin, vToPin);
     }
-    if ((f32)Math_Sqrt(Vec3_LengthSqClamped(vToView)) > 0.0f) {
+    if ((f32)Math_Sqrt(LLMath_LengthSquared3(vToView)) > 0.0f) {
         LLMath_Normalize3(vToView, vToView);
     }
     fCos = Vec3_Dot(vToView, vToPin);
@@ -754,7 +754,7 @@ f32 GameAnalysis_GetPuttBreakAngle(int nPlayer) {
     } else if (fCos > 1.0f) {
         fCos = 1.0f;
     }
-    fAngle = Math_Acos(fCos);
+    fAngle = acosf(fCos);
     if (vToView[2] * vToPin[0] - vToView[0] * vToPin[2] < 0.0f) {
         fAngle *= -1.0f;
     }
@@ -1036,13 +1036,13 @@ int GameAnalysis_GetSidehillLie(int nPlayer) {
     if (!Ter_GetSupportingGroundNormal(Ter_GetTGD(), gPlayers[nPlayer].ball.vPos, vNormal)) {
         return 0;
     }
-    fLength = Vec3_LengthSqClamped(vNormal);
+    fLength = LLMath_LengthSquared3(vNormal);
     if (fLength > 1.01f || fLength < 0.99f) {
         return 0;
     }
     fAim = gPlayers[nPlayer].fAim;
-    fSin = Math_Sin(fAim);
-    fCos = Math_Cos(fAim);
+    fSin = sinf(fAim);
+    fCos = cosf(fAim);
     Vec3Copy(vNormal, vTurned);
     Ball_RotatePair(&vTurned[2], &vTurned[0], fSin, fCos);
     fEpsilon = 0.000001f;

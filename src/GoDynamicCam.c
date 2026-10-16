@@ -27,7 +27,6 @@ void DynamicCam_ParseNextSeqs(void);
 u8   DynamicCamSearchForPairedSequence(char* szName, CamSequence** ppSeq, CamShot** ppShot);
 void DynamicCam_Vec3Add(f32* pA, f32* pB, f32* pOut);         // a + b
 void DynamicCam_Vec3Sub(f32* pA, f32* pB, f32* pOut);
-void Quat_RotateVector(f32* pTurn, f32* pVec, f32* pOut);     // the vector turned by it
 void DynamicCam_ParseAnimPairs(int nSize);
 u8   DynamicCam_MatchStateType(CamSequence* pSequence, int nKind);
 u8   DynamicCam_MatchScriptStateType(CamShot* pShot, int nKind);
@@ -516,7 +515,7 @@ void DynamicCam_ProcessScript(CamShot* pShot, int nPlayer, CamScript* pScript, f
             if (Game_GetCourse() == 12 && Game_GetCurHoleNum() == 10) {
                 DynamicCam_Vec3Sub(&pCourse->tee[gSession.nTeeSet[nPlayer]].x, pOut, aOff);
                 aOff[1] = 0.0f;
-                if ((f32)Math_Sqrt(Vec3_LengthSqClamped(aOff)) < 40.0f) {
+                if ((f32)Math_Sqrt(LLMath_LengthSquared3(aOff)) < 40.0f) {
                     fGround = Ter_GetLowestGroundHeight(pCourse, pOut);
                 } else {
                     fGround = CamScript_GuessBestPlayableHeight(pOut, NULL);
@@ -604,7 +603,7 @@ void DynamicCam_ProcessScript(CamShot* pShot, int nPlayer, CamScript* pScript, f
     if (pShot->nTrackMode == 3 && !CameraScript_SnapToScript(pScript, pShot) &&
         (pScript->pNextShot != pShot || pScript->fCamTime > 0.0f)) {
         DynamicCam_Vec3Sub(pOut, aOld, aStep);
-        fDist = (f32)Math_Sqrt(Vec3_LengthSqClamped(aStep));
+        fDist = (f32)Math_Sqrt(LLMath_LengthSquared3(aStep));
         if (aStep[0] != 0.0f || aStep[1] != 0.0f || aStep[2] != 0.0f) {
             LLMath_Normalize3(aStep, aDir);
         } else {
@@ -945,8 +944,8 @@ void DynamicCam_TrackBallVelocityLag(CamShot* pShot, int nPlayer, CamScript* pSc
     }
     DynamicCam_Vec3Sub(pOut, aFrom, aCurOff);
     DynamicCam_Vec3Sub(aTarget, aFrom, aTgtOff);
-    fCurDist = (f32)Math_Sqrt(Vec3_LengthSqClamped(aCurOff));
-    fStep = (f32)Math_Sqrt(Vec3_LengthSqClamped(aTgtOff)) - fCurDist;
+    fCurDist = (f32)Math_Sqrt(LLMath_LengthSquared3(aCurOff));
+    fStep = (f32)Math_Sqrt(LLMath_LengthSquared3(aTgtOff)) - fCurDist;
     fStep *= fMove;
     if (aCurOff[0] != 0.0f || aCurOff[1] != 0.0f || aCurOff[2] != 0.0f) {
         LLMath_Normalize3(aCurOff, aCurDir);
@@ -962,7 +961,7 @@ void DynamicCam_TrackBallVelocityLag(CamShot* pShot, int nPlayer, CamScript* pSc
         aTgtDir[1] = 0.0f;
         aTgtDir[2] = 0.0f;
     }
-    fAngle = Math_Acos(Vec3_Dot(aCurDir, aTgtDir));
+    fAngle = acosf(Vec3_Dot(aCurDir, aTgtDir));
     fTurn = fAngle * fTurn;
     vec4flt_CrossProduct(aCurDir, aTgtDir, aAxis);
     if (aAxis[0] != 0.0f || aAxis[1] != 0.0f || aAxis[2] != 0.0f) {
@@ -1878,7 +1877,7 @@ void DynamicCam_ClampBallVelocity(f32* pDir, f32* pA, f32* pB) {
     if (0.0f != vLevel[0] || 0.0f != vLevel[1] || 0.0f != vLevel[2]) {
         LLMath_Normalize3(vLevel, vLevel);
     }
-    if (fabsf(Math_Acos(Vec3_Dot(vLevel, pDir))) > gpCamTuning->f19C) {
+    if (fabsf(acosf(Vec3_Dot(vLevel, pDir))) > gpCamTuning->f19C) {
         vec4flt_CrossProduct(pDir, vLevel, vAxis);
         if (0.0f != vAxis[0] || 0.0f != vAxis[1] || 0.0f != vAxis[2]) {
             LLMath_Normalize3(vAxis, vAxis);

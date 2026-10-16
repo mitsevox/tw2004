@@ -71,8 +71,8 @@ void UITransform_RotateX(UITransform* p, f32 fAngle) {
     f32 fSin;
     f32 fCos;
     LLMath_IdentifyMat(mRot);
-    fSin = Math_Sin(fAngle);
-    fCos = Math_Cos(fAngle);
+    fSin = sinf(fAngle);
+    fCos = cosf(fAngle);
     mRot[1][1] = fCos;
     mRot[1][2] = fSin;
     mRot[2][1] = -fSin;
@@ -89,8 +89,8 @@ void UITransform_RotateY(UITransform* p, f32 fAngle) {
     f32 fSin;
     f32 fCos;
     LLMath_IdentifyMat(mRot);
-    fSin = Math_Sin(fAngle);
-    fCos = Math_Cos(fAngle);
+    fSin = sinf(fAngle);
+    fCos = cosf(fAngle);
     mRot[0][0] = fCos;
     mRot[0][2] = -fSin;
     mRot[2][0] = fSin;
@@ -107,8 +107,8 @@ void UITransform_RotateZ(UITransform* p, f32 fAngle) {
     f32 fSin;
     f32 fCos;
     LLMath_IdentifyMat(mRot);
-    fSin = Math_Sin(fAngle);
-    fCos = Math_Cos(fAngle);
+    fSin = sinf(fAngle);
+    fCos = cosf(fAngle);
     mRot[0][0] = fCos;
     mRot[0][1] = fSin;
     mRot[1][0] = -fSin;

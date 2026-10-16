@@ -165,11 +165,11 @@ void BreakLine_Render(int nView) {
                 if (vDir[0] != 0.0f || vDir[1] != 0.0f) {
                     LLMath_Normalize3(vDir, vDir);
                 }
-                fAngle = Math_Acos(Vec3_Dot(vDir, vAxis));
+                fAngle = acosf(Vec3_Dot(vDir, vAxis));
                 vec4flt_CrossProduct(vDir, vAxis, vCross);
                 fAngle = fAngle * (vCross[1] < 0.0f ? -1.0f : 1.0f);
-                fSin = Math_Sin(fAngle);
-                fCos = Math_Cos(fAngle);
+                fSin = sinf(fAngle);
+                fCos = cosf(fAngle);
                 // Turn the new pair of vertices to the heading and move them to the ball.
                 for (i = gpBreakLine->anVerts[nView]; i <= gpBreakLine->anVerts[nView] + 1; i++) {
                     fX = gpBreakLine->aVert[nView][i][0];
@@ -398,7 +398,7 @@ void BreakLine_GetCaddyTipInfo(int nView, f32* pLong, f32* pSide) {
         return;
     }
     fAlong = fDot * fAimDist;
-    fSide = fAimDist * Math_Sin(Math_Acos(fDot));
+    fSide = fAimDist * sinf(acosf(fDot));
     vec4flt_CrossProduct(vToHole, vToAim, vCross);
     fAlong = fAlong - fHoleDist;
     if (vCross[1] < 0.0f) {

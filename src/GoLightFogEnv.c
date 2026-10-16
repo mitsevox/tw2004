@@ -163,5 +163,5 @@ f32 LF_fComputeAngleBetweenLightAndCamera(s32 nLight, CamLens* pLens) {
 }
 
 f32 LF_fComputeAngleToLight(GoLight* pLight, CamLens* pLens) {
-    return Math_Acos(Vec3_Dot(pLens->m4[2], pLight->u.point.vPos));
+    return acosf(Vec3_Dot(pLens->m4[2], pLight->u.point.vPos));
 }

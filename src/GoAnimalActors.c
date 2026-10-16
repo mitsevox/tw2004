@@ -187,7 +187,7 @@ void ActAnimal_ScaleSpeedsByRouteLength(DynObjAnimal* pAnimal) {
             vStep[1] = pNext->vPos[1] - pNode->vPos[1];
             vStep[2] = pNext->vPos[2] - pNode->vPos[2];
             vStep[3] = 1.0f;
-            fLength += (f32)Math_Sqrt(Vec3_LengthSqClamped(vStep));
+            fLength += (f32)Math_Sqrt(LLMath_LengthSquared3(vStep));
             pNode = pNext;
         }
         pAnimal->f16C /= fLength;
@@ -308,7 +308,7 @@ void ActAnimal_Init(DynObjAnimal* pAnimal, DynObjSetup* pSetup) {
 // A wave from 0 to 1 and back, fRate times a second, at frame nFrame (our macro: EA's code reads
 // fRate twice at each use, which an inline function would not).
 #define ANIMAL_WAVE(nFrame, fRate) \
-    (0.5f * Math_Sin(6.2831855f * (fRate) * Ter_GetTimeInCycle((nFrame), 1.0f / (fRate))) + 0.5f)
+    (0.5f * sinf(6.2831855f * (fRate) * Ter_GetTimeInCycle((nFrame), 1.0f / (fRate))) + 0.5f)
 
 // Message 6, the per-frame update: moves the animal along its route, speeds it up or slows it
 // down (b1BC: moving), counts down its moving (f190) and resting (f18C) times, and animates its

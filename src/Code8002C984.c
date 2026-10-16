@@ -397,8 +397,8 @@ void Shot_FitTargetToClub(int nPlayer) {
     f32     fMax = AI_MaxDistance(nPlayer, p->nShotKind, p->nClub);
     f32     fSin, fCos, fDX, fDZ;
     if (p->fDistance > fMax) {
-        fSin = Math_Sin(p->fAim);
-        fCos = Math_Cos(p->fAim);
+        fSin = sinf(p->fAim);
+        fCos = cosf(p->fAim);
         fDZ  = fMax * fCos;
         fDX  = fMax * -fSin;
         p->vTarget[0] = p->vBall[0] + fDX;
@@ -408,8 +408,8 @@ void Shot_FitTargetToClub(int nPlayer) {
         if (Controller_IsCPU(p->nController)) return;
         if (p->nClub == CLUB_PUTTER_e) return;
         if (p->nShotKind == SHOT_TYPE_CHIP_e) return;
-        fSin = Math_Sin(p->fAim);
-        fCos = Math_Cos(p->fAim);
+        fSin = sinf(p->fAim);
+        fCos = cosf(p->fAim);
         fDZ  = fMax * fCos;
         fDX  = fMax * -fSin;
         p->vTarget[0] = p->vBall[0] + fDX;

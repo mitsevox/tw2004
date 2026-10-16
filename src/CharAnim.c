@@ -32,7 +32,6 @@ void  Character_InitSKATags(Character* pChar, Clip* pBlend, f32 fStart);   // ch
 void  fn_801141F8(struct DynChain* pChain, CharModel* pModel);   // DynChain.c
 char* Lessons_GetAnimName(void);                                    // GameMode11.c
 void  LLMath_CopyMat34(f32 (*pSrc)[4], f32 (*pDst)[4]);          // UMemPool.c: copies three rows
-void  Quat_BuildFromMatrix(f32 (*m)[4], f32* pQ);                    // Quaternion.c: a rotation matrix's quaternion
 
 // .bss (character.h). Section note: owner by link order only. Nothing here uses it (only skalib.c's
 // SKALIB_InitModule clears [0]); it lies between LLTime.c's .bss and GoShaderObject_Glows_Gc.c's, and of

@@ -10,14 +10,11 @@ void vec4flt_Zero(f32* pVec);                // GoLighting.c
 void fn_801164D4(f32* pA, f32* pB, f32* pOut);
 void fn_801164F8(f32* pA, f32* pB, f32* pOut);
 void fn_8011651C(f32* pA, f32* pB, f32* pOut);
-void Quat_RotateVector(f32* pQuat, f32* pIn, f32* pOut);           // Quaternion.c: a vector turned by it
-void Quat_ExtractEulerAngles(f32* pQ, f32* pA, f32* pB, f32* pC);        // Quaternion.c: a rotation as angles
 f32  Wind_GetPhysicsSpeed(void);                     // Ball.c
 void Wind_GetDirection(f32* pOut);                // Ball.c: the wind's direction
 void SKEL_TransformBones(CharModel* pModel, u32* auBits);
 f32  fn_80116304(u32 nFrame, f32 fPhase, f32 fStrength);
 f32  fn_80116468(void);
-void Quat_QuatToMatrix(f32* pQ, f32 (*pMtx)[4]);                                    // Quaternion.c
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);                                             // identity
 void fn_80114540(CharModel* pModel, DynChain* pChain, f32 f);
 void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 f);
@@ -288,11 +285,11 @@ void fn_80114540(CharModel* pModel, DynChain* pChain, f32 fDelta) {
 
     // Pulled toward where it hangs, and by gravity.
     fn_801164D4(vHang, pChain->pLinks->v04, vDiff);
-    fLag = Math_Sqrt(Vec3_LengthSqClamped(vDiff));
+    fLag = Math_Sqrt(LLMath_LengthSquared3(vDiff));
     Vec3_Scale(fDelta, vDiff, vDiff);
     fn_801164F8(pChain->pLinks->v24, vDiff, pChain->pLinks->v24);
     pChain->pLinks->v24[1] -= 0.018f * fDelta;
-    fSpeed = Math_Sqrt(Vec3_LengthSqClamped(pChain->pLinks->v24));
+    fSpeed = Math_Sqrt(LLMath_LengthSquared3(pChain->pLinks->v24));
     if (fSpeed > fMaxSpeed) {
         fSpeed = fMaxSpeed;
         LLMath_Normalize3(pChain->pLinks->v24, pChain->pLinks->v24);
@@ -330,7 +327,7 @@ void fn_80114540(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         LLMath_Normalize3(vTo, vTo);
         LLMath_Normalize3(vWas, vWas);
         vec4flt_CrossProduct(vTo, vWas, vAxis);
-        fAngle = Math_Acos(Vec3_Dot(vTo, vWas));
+        fAngle = acosf(Vec3_Dot(vTo, vWas));
         if (fAngle > 0.00001f) {
             LLMath_Normalize3(vAxis, vAxis);
             vAxis[0] *= fAngle;
@@ -480,7 +477,7 @@ void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 fDelta) {
                                  (vWas[1] - vBone[1]) * (vWas[1] - vBone[1]) +
                                  (vWas[2] - vBone[2]) * (vWas[2] - vBone[2])) > 0.001f) {
                 vec4flt_CrossProduct(vWas, vBone, vAxis);
-                fAngle = Math_Acos(Vec3_Dot(vBone, vWas));
+                fAngle = acosf(Vec3_Dot(vBone, vWas));
                 if (fabs(fAngle) > 0.01f) {
                     if (0.0f != vAxis[0] || 0.0f != vAxis[1] || 0.0f != vAxis[2]) {
                         LLMath_Normalize3(vAxis, vAxis);
@@ -649,7 +646,7 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         if (0.0f != fPeriod) {
             nPeriod = fPeriod;
             fT = (f32)(pChain->n18 % nPeriod) / fPeriod;
-            fAngle = fSize * Math_Sin(2.0f * PI * fT + PI * (2.0f * lbl_802824F8->aParams[0].a18[i]));
+            fAngle = fSize * sinf(2.0f * PI * fT + PI * (2.0f * lbl_802824F8->aParams[0].a18[i]));
             fAngle += PI * lbl_802824F8->aParams[0].a24[i] / 180.0f;
         } else {
             fAngle = 0.0f;
@@ -694,7 +691,7 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         if (0.0f != fPeriod) {
             nPeriod = fPeriod;
             fT = (f32)(pChain->n18 % nPeriod) / fPeriod;
-            fAngle = fSize * Math_Sin(2.0f * PI * fT + PI * (2.0f * lbl_802824F8->aParams[1].a18[i]));
+            fAngle = fSize * sinf(2.0f * PI * fT + PI * (2.0f * lbl_802824F8->aParams[1].a18[i]));
             fAngle += PI * lbl_802824F8->aParams[1].a24[i] / 180.0f;
         } else {
             fAngle = 0.0f;
@@ -817,7 +814,7 @@ void fn_80115B2C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
             fAmp *= fSize;
             if (0.0f != fPeriod) {
                 nPeriod = fPeriod;
-                fWave = Math_Sin(2.0f * PI * ((f32)(pChain->n18 % nPeriod) / fPeriod) +
+                fWave = sinf(2.0f * PI * ((f32)(pChain->n18 % nPeriod) / fPeriod) +
                                     pChain->n10 / 0.5f);
                 fAngle = fAmp * fWave;
             } else {
@@ -882,9 +879,9 @@ f32 fn_80116304(u32 nFrame, f32 fPhase, f32 fStrength) {
 
     fAngle = PI * (2.0f * ((f32)(nFrame % (u32)fPeriod) / fPeriod));
     // Four waves; CodeWarrior calls the right operand first, so the 3x wave is made first.
-    fWave = Math_Sin(7.0f * fAngle + 6.0f + fPhase) +
-            (Math_Sin(5.0f * fAngle + 4.0f + fPhase) +
-             (Math_Sin(fAngle + fPhase) + Math_Sin(3.0f * fAngle + 2.0f + fPhase)));
+    fWave = sinf(7.0f * fAngle + 6.0f + fPhase) +
+            (sinf(5.0f * fAngle + 4.0f + fPhase) +
+             (sinf(fAngle + fPhase) + sinf(3.0f * fAngle + 2.0f + fPhase)));
     fSway = fOne * fWave;
     fSway += lbl_802824F8->f94 + fStrength * (lbl_802824F8->f98 - lbl_802824F8->f94) / 35.0f;
     fSway = (fSway < 0.0f) ? 0.0f : ((fSway > fOne) ? fOne : fSway);

@@ -131,15 +131,15 @@ void fn_80098CDC(ParticleParams* pParams, f32* pPos, f32* pVel, f32* p18, f32* p
         fDist = pParams->f30;
     }
     fTurn = 2.0f * PI * Misc_RandFuncf(1);
-    fSinTurn = Math_Sin(fTurn);
-    fCosTurn = Math_Cos(fTurn);
+    fSinTurn = sinf(fTurn);
+    fCosTurn = cosf(fTurn);
     if (pParams->u58 & 0x40) {
         fPitch = pParams->f3C * Misc_RandFuncf(1) + pParams->f38;
     } else {
         fPitch = pParams->f38;
     }
-    fSinPitch = Math_Sin(fPitch);
-    fCosPitch = Math_Cos(fPitch);
+    fSinPitch = sinf(fPitch);
+    fCosPitch = cosf(fPitch);
     fDistXZ = fDist * fCosPitch;
     fSpeedXZ = fSpeed * fCosPitch;
     pPos[0] = fDistXZ * fCosTurn;
@@ -153,11 +153,11 @@ void fn_80098CDC(ParticleParams* pParams, f32* pPos, f32* pVel, f32* p18, f32* p
     if (pParams->u58 & 0x200) {
         if (pParams->u58 & 0x400) {
             fTurn = 2.0f * PI * Misc_RandFuncf(1);
-            fSinTurn = Math_Sin(fTurn);
-            fCosTurn = Math_Cos(fTurn);
+            fSinTurn = sinf(fTurn);
+            fCosTurn = cosf(fTurn);
             fPitch = 2.0f * PI * Misc_RandFuncf(1);
-            fSinPitch = Math_Sin(fPitch);
-            fCosPitch = Math_Cos(fPitch);
+            fSinPitch = sinf(fPitch);
+            fCosPitch = cosf(fPitch);
             if (pParams->u58 & 0x800) {
                 fRand = Misc_RandFuncf(1);
                 fRandXZ = fRand * fSinPitch;
@@ -473,9 +473,9 @@ PsEmitter* fn_80099758(ParticleParams* pParams) {
                                                  + pEmitter->params.v60[2] * pEmitter->params.v60[2]);
         pEmitter->params.f24 += pEmitter->params.f4
                               * (pEmitter->params.f28 + pEmitter->params.f2C
-                                 + (f32)Math_Sqrt(Vec3_LengthSqClamped(pEmitter->params.vA0)));
+                                 + (f32)Math_Sqrt(LLMath_LengthSquared3(pEmitter->params.vA0)));
         pEmitter->params.f24 += 0.5f * pEmitter->params.f4 * pEmitter->params.f4
-                              * (f32)Math_Sqrt(Vec3_LengthSqClamped(pParams->vB0));
+                              * (f32)Math_Sqrt(LLMath_LengthSquared3(pParams->vB0));
     }
     pEmitter->p40 = NULL;
     mat44flt_EulerAngles(pEmitter->mtx, pEmitter->params.f40, pEmitter->params.f44, pEmitter->params.f48);

@@ -576,8 +576,8 @@ u8 Ter_SearchForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut) {
         for (nRing = 0; nRing < 4; nRing++) {
             for (fTurn = 0.0f; fTurn <= 6.265732f; fTurn += 0.7853982f) {
                 fAngle = fHeading + fTurn;
-                fSin = Math_Sin(fAngle);
-                fCos = Math_Cos(fAngle);
+                fSin = sinf(fAngle);
+                fCos = cosf(fAngle);
                 vPos[0] = fCos * fRadius + p->ball.vPos[0];
                 vPos[2] = fSin * fRadius + p->ball.vPos[2];
                 // from water, only straight towards the pin
@@ -1342,7 +1342,7 @@ u8 Ter_LineSphereIntersection(f32* pFrom, f32* pDir, f32 fRange, f32* pCentre, f
     vCentre[2] = pCentre[2];
     vCentre[3] = 1.0f;
     Ter_Subtract3(vCentre, pFrom, vTo);
-    fDist = (f32)Math_Sqrt(Vec3_LengthSqClamped(vTo)) - fRadius;
+    fDist = (f32)Math_Sqrt(LLMath_LengthSquared3(vTo)) - fRadius;
     if (fDist > fRange) return 0;
     if (fDist < 0.0f) return 1;
     if (Vec3_Dot(vTo, pDir) < 0.0f) return 0;

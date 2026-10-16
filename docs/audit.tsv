@@ -151,13 +151,13 @@ LoadData.c	open
 MC.c	open		
 MC_Gc.c	open		
 MaterialTypes.c	open		
+MathQuat.c	open		
 NGC/SharedFileIO/llSharedFileIO.c	open		
 PGATourSimulation.c	open		
 PasswordManager.c	open		
 PlayNowMode.c	open		
 PsBallFx.c	open		
 PsMgr.c	open		
-Quaternion.c	open		
 RenderAccessors.c	done	63883fe8	claude-review
 Replay.c	open		
 ScreenClear.c	open		
