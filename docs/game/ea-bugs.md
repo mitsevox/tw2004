@@ -40,6 +40,8 @@ The code allows it, but whether it ever happens depends on the game's data or on
 
 | Where | What | What settles it |
 |---|---|---|
+| Calendar.c IsLeapYear | 1900 counts as a leap year (it was not): DaysInMonth gives February 1900 29 days, menu message 756 answers 1 for 1900, and the weekdays of 1 January to 28 February 1900 come out one day early (1 January 1900, a Monday, as Sunday); the day numbers rely on it (CalDate_SetMDY counts 1 January 2000 as day 36526) | whether the menus or any date ever use the year 1900; intent only |
+| Calendar.c CalDate_GetMDY | day 36525 (31 December 1999, CalDate_SetMDY) splits into day 0 of January 2000: the test for counting from 2000 is `>= 36525` where 2000's days start at 36526 | whether any stored date or the console's clock (which starts at 2000) can be 31 December 1999 |
 | GoTerrain.c Ter_vCloseModule path | whether close is ever reached with a course still loaded (then the wrong free listed under Confirmed bites) | the shutdown path from the front end / reset |
 | GoTerrain.c Ter_LODLoadCallback | adds the remainder of the step where rounding up would add (step - remainder): a value not a multiple stays one | the real 'tLOD' values |
 | GoTerrain.c Ter_vCloseModule / Ter_UnRegisterStreamClients | xpGrassPatchList never freed; 'tLOD' left registered | whether close / unregister ever runs outside shutdown |

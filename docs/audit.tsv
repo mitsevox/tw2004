@@ -5,7 +5,7 @@ AudReverb.c	open
 Ball.c	open		
 BootCourse.c	open		
 CaddieTips.c	open		
-Calendar.c	open		
+Calendar.c	done	2fad7246	claude-review
 CalendarScreen.c	open		
 CamSpline.c	open		
 CharAnim.c	open		

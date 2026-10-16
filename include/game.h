@@ -261,18 +261,21 @@ s32  GameModeBattle_GetClubLostOnLastHole(int nPlayer);          // GameModeBatt
 s32  GM_GetPotentialHoleResult(int nPlayer);    // gpGame->pfnGetPotentialHoleResult
 s32  GM_GetCurrentEventLead(int nPlayer);       // gpGame->pfnGetCurrentLead's answer
 u8   GM_IsPlayoff(void);                        // gpGame->bInPlayoff
-void CalDate_GetMDY(u16* pDate, s32* pMonth, s32* pDay, s32* pYear);
-void CalDate_SetMDY(u16* pDate, s32 nMonth, s32 nDay, u32 nYear);    // make a date
-void CalDate_AddDays(u16* pDate, s32 nDays);        // move a date on by nDays
-s32  CalDate_GetDayOfWeek(u16* pDate);                   // its day of the week, 1..7
-s32  DaysInMonth(u32 nMonth, u32 nYear);        // the days in a month (compared unsigned: cmplwi)
-void CalDate_GetPrevMonth(s32 nMonth, s32 nYear, s32* pMonth, s32* pYear);  // the month before
-void CalDate_GetNextMonth(s32 nMonth, s32 nYear, s32* pMonth, s32* pYear);  // the month after
-void CalDate_ToString(u16 nDate, char* pBuf);       // a date as text
-void CalDate_ToStringMD(u16 nDate, char* pBuf);       // a date as month/day
-s32  CalDate_GetDay(u16 nDate);            // Calendar.c
-u32  CalDate_GetMonth(u16 nDate);            // Calendar.c (unsigned: callers compare it with cmplw)
-u16  CalDate_GetToday(void);                 // today's date
+// Calendar.c: a date is its day number, 1 January 1900 being day 1.
+typedef u16 CalendarDate;
+u8   IsLeapYear(u32 year);
+s32  CalDate_GetDay(CalendarDate date);            // its day of the month, 1..31
+u32  CalDate_GetMonth(CalendarDate date);          // its month, 1..12
+void CalDate_SetMDY(CalendarDate* pDate, s32 month, s32 day, u32 year);   // make a date
+void CalDate_GetMDY(CalendarDate* pDate, s32* pMonth, s32* pDay, s32* pYear);
+void CalDate_AddDays(CalendarDate* pDate, s32 days);     // move a date on by days
+s32  CalDate_GetDayOfWeek(CalendarDate* pDate);          // its weekday, 1 Sunday .. 7 Saturday
+s32  DaysInMonth(u32 month, u32 year);                   // the days in a month
+void CalDate_GetPrevMonth(s32 curMonth, s32 curYear, s32* prevMonth, s32* prevYear);  // the month before
+void CalDate_GetNextMonth(s32 curMonth, s32 curYear, s32* nextMonth, s32* nextYear);  // the month after
+void CalDate_ToString(CalendarDate date, char* s);       // a date as "month/day/year"
+void CalDate_ToStringMD(CalendarDate date, char* s);     // a date as "month/day"
+CalendarDate CalDate_GetToday(void);                     // today's date from the console clock
 int  GM_GetHolePar(int nCourse, int nHole);   // a hole's par on a course
 int  GM_GetHoleIndexPar(int nHole);            // a hole's par
 s32  GM_GetHoleIndexTeeDistance(int nHole, int nTee);  // CourseData.c: a round hole's length from tee set
