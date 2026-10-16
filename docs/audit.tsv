@@ -185,7 +185,7 @@ UAudContainers.c	open
 UAudMem.c	open		
 UAudMemStack.c	open		
 UAudVector.c	done	58556d0e	claude-review
-UByteSwap.c	open		
+UByteSwap.c	done	f6808074	claude-review
 UFont.c	open		
 UFstPart.c	open		
 UISApi.c	open		
