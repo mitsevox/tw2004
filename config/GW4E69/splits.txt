@@ -1454,8 +1454,11 @@ FE_CalendarPopups.c:
 	.data       start:0x801944F8 end:0x80194580
 	.sdata      start:0x802818A8 end:0x802818F8
 
-llrtclock.c:
-	.text       start:0x8011E020 end:0x8011E170
+LLRTClock_Gc.c:
+	.text       start:0x8011E020 end:0x8011E0AC
+
+LLRTClock.c:
+	.text       start:0x8011E0AC end:0x8011E170
 	.data       start:0x80194580 end:0x80194598
 	.sdata      start:0x802818F8 end:0x80281900
 

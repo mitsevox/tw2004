@@ -131,11 +131,12 @@ void  qsort(void* pBase, u32 nCount, u32 nSize, s32 (*pfnCompare)(const void* pA
 #define FRAME_RATE 59.94f               // frames a second (NTSC)
 #define FRAME_TIME (1.0f / FRAME_RATE)  // one frame, in seconds
 
-// llrtclock.c: the real-time clock as a date: month 1-12, day, year, hour 0-23, minute, second,
-// millisecond. Always TRUE.
+// LLRTClock_Gc.c: the console's date and time: month 1-12, day of the month, the full year, hour
+// 0-23, minute, second, millisecond. Always TRUE.
 int  RTClock_GetCurrentTime(s32* pnMonth, s32* pnDay, s32* pnYear, s32* pnHour, s32* pnMinute, s32* pnSecond,
                  s32* pnMsec);
-void RTClock_GetDateTimeString(char* szOut);   // "M/D/YYYY H:MM AM"
+// LLRTClock.c: the console's date and time as "M/D/YYYY H:MM AM", into szOut.
+void RTClock_GetDateTimeString(char* szOut);
 
 // ---- math and random numbers -----------------------------------------------------------------
 

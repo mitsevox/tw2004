@@ -31,6 +31,7 @@ The code does this, and the effect can happen in play.
 | GoTerrain.c Ter_vCloseModule | StaticMem_Free(pCourse) frees the 'tgd ' chunk's pData, which UStream.c:224 sets past the stream object's header: StaticMem_Free reads the two words before it as block start and size, so it frees the wrong range (Ter_UnloadHole frees pCourseStreamData, the right pointer); harmless only if Ter_UnloadHole ran first |
 | hlaudsession.c Ses_AllocBankHdr | a path through the function reaches its end without returning a value |
 | hlaudemitter.c Emi_UpdInstance / Doppler3D | the new nearest distance is stored in fDist before Doppler3D measures how much nearer the sound came since the last frame, so the change is always 0 and the doppler pitch always 1 |
+| LLRTClock.c RTClock_GetDateTimeString | "AM" goes with clock hours 1 to 12 and "PM" with hours 0 and 13 to 23, so the hour after noon shows as "12:MM AM" and the hour after midnight as "12:MM PM": on the real-time events calendar's "Today:" line, and in front-end message 544's text (FE_GetDateTimeIfClockEarly, written only when the clock's year is before 2003 and its month before October) |
 
 Possible
 --------

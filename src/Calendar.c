@@ -192,8 +192,8 @@ void CalDate_ToStringMD(u16 nDate, char* pBuf) {
     sprintf(pBuf, "%d/%d", nMonth, nDay);
 }
 
-// Today's date as a day number: the month, day and year of the console's clock (RTClock_GetCurrentTime,
-// llrtclock.c) through CalDate_SetMDY.
+// Today's date as a day number: the month, day and year of the console's clock (RTClock_GetCurrentTime)
+// through CalDate_SetMDY.
 u16 CalDate_GetToday(void) {
     s32 nMonth;
     s32 nDay;
