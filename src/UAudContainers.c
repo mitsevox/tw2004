@@ -1,151 +1,147 @@
-// UAudContainers.c (EA's name: TW06's golf/audio/engine/utils/uaudcontainers.c, TW07's
-// UAudContainers.c, whose UList_, UQueue_ and UPool_ functions these are, in the same order and
-// shape; TW07's UStack_ and UBuff_ functions are not in this build): the sound engine's
-// containers, a doubly linked list (UList), a ring-buffer queue (UQueue, the stream read
-// requests) and a pool of fixed-size blocks (UPool, the voices and tracks). See
-// core/audcontainers.h.
+// UAudContainers.c: the sound engine's containers. A doubly linked list (the tracks and voices in
+// use), a ring-buffer queue (the stream read requests) and a pool of fixed-size blocks (the free
+// tracks and voices). None of them allocates: the caller hands in the memory.
 
 #include "core/audcontainers.h"
 
-// Empties a list that holds up to nSlots links (stored, never checked).
-void UList_Reset(UList* pList, u16 nSlots) {
-    pList->pHead = NULL;
-    pList->pTail = NULL;
-    pList->nSlots = nSlots;
-    pList->nCount = 0;
+// Empties a list. nslots is stored but never checked.
+void UList_Reset(TListDbl* plist, u16 nslots) {
+    plist->pHead = NULL;
+    plist->pTail = NULL;
+    plist->nSlots = nslots;
+    plist->nCount = 0;
 }
 
 // Adds a link at the head of a list.
-void UList_PushHead(UList* pList, UListNode* pNode) {
-    if (pList->nCount != 0) {
-        pList->pHead->pPrev = pNode;
+void UList_PushHead(TListDbl* plist, TListDblLink* plink) {
+    if (plist->nCount != 0) {
+        plist->pHead->pPrev = plink;
     } else {
-        pList->pTail = pNode;
+        plist->pTail = plink;
     }
-    pNode->pNext = pList->pHead;
-    pNode->pPrev = NULL;
-    pList->pHead = pNode;
-    pList->nCount++;
+    plink->pNext = plist->pHead;
+    plink->pPrev = NULL;
+    plist->pHead = plink;
+    plist->nCount++;
 }
 
 // Adds a link at the tail of a list.
-void UList_PushTail(UList* pList, UListNode* pNode) {
-    if (pList->nCount != 0) {
-        pList->pTail->pNext = pNode;
+void UList_PushTail(TListDbl* plist, TListDblLink* plink) {
+    if (plist->nCount != 0) {
+        plist->pTail->pNext = plink;
     } else {
-        pList->pHead = pNode;
+        plist->pHead = plink;
     }
-    pNode->pPrev = pList->pTail;
-    pNode->pNext = NULL;
-    pList->pTail = pNode;
-    pList->nCount++;
+    plink->pPrev = plist->pTail;
+    plink->pNext = NULL;
+    plist->pTail = plink;
+    plist->nCount++;
 }
 
-// Puts a link in front of pAt.
-// EA bug: when pAt is the tail (and not also the head) the link goes after it (UList_PushTail)
-// instead: InsertSortWorldPerf (hlaudtrack.c), inserting a track in front of the first one of lower
-// priority, then leaves the higher-priority track at the tail, where Trk_AllocPerf steals first.
-void UList_InsertAt(UList* pList, UListNode* pNode, UListNode* pAt) {
-    UListNode* pPrev;
+// Puts a link in front of pdestlink. When pdestlink is the tail (and not also the head), the link
+// goes after it instead, at the tail.
+void UList_InsertAt(TListDbl* plist, TListDblLink* plink, TListDblLink* pdestlink) {
+    TListDblLink* pprev;
 
-    if (pAt == pList->pHead) {
-        UList_PushHead(pList, pNode);
-    } else if (pAt == pList->pTail) {
-        UList_PushTail(pList, pNode);
+    if (pdestlink == plist->pHead) {
+        UList_PushHead(plist, plink);
+    } else if (pdestlink == plist->pTail) {
+        UList_PushTail(plist, plink);
     } else {
-        pPrev = pAt->pPrev;
-        pNode->pPrev = pPrev;
-        pNode->pNext = pAt;
-        pPrev->pNext = pNode;
-        pAt->pPrev = pNode;
-        pList->nCount++;
+        pprev = pdestlink->pPrev;
+        plink->pPrev = pprev;
+        plink->pNext = pdestlink;
+        pprev->pNext = plink;
+        pdestlink->pPrev = plink;
+        plist->nCount++;
     }
 }
 
 // Takes a link out of a list.
-void UList_DeleteAt(UList* pList, UListNode* pNode) {
-    if (pNode == pList->pTail) {
-        if (pNode->pPrev != NULL) {
-            pList->pTail = pNode->pPrev;
-            pNode->pPrev->pNext = NULL;
+void UList_DeleteAt(TListDbl* plist, TListDblLink* plink) {
+    if (plink == plist->pTail) {
+        if (plink->pPrev != NULL) {
+            plist->pTail = plink->pPrev;
+            plink->pPrev->pNext = NULL;
         } else {
-            pList->pTail = NULL;
-            pList->pHead = NULL;
+            plist->pTail = NULL;
+            plist->pHead = NULL;
         }
-    } else if (pNode == pList->pHead) {
-        if (pNode->pNext != NULL) {
-            pList->pHead = pNode->pNext;
-            pNode->pNext->pPrev = NULL;
+    } else if (plink == plist->pHead) {
+        if (plink->pNext != NULL) {
+            plist->pHead = plink->pNext;
+            plink->pNext->pPrev = NULL;
         } else {
-            pList->pTail = NULL;
-            pList->pHead = NULL;
+            plist->pTail = NULL;
+            plist->pHead = NULL;
         }
     } else {
-        pNode->pPrev->pNext = pNode->pNext;
-        pNode->pNext->pPrev = pNode->pPrev;
+        plink->pPrev->pNext = plink->pNext;
+        plink->pNext->pPrev = plink->pPrev;
     }
-    pList->nCount--;
+    plist->nCount--;
 }
 
-// Sets up an empty queue over a buffer of nMax items.
-void UQueue_Reset(UQueue* pQueue, void* pBuffer, u16 nMax, s32 nItemSize) {
-    pQueue->pBase = pBuffer;
-    pQueue->pEnd = (u8*)pBuffer + nMax * nItemSize;
-    pQueue->pWrite = pBuffer;
-    pQueue->pRead = pBuffer;
-    pQueue->nMax = nMax;
-    pQueue->nCount = 0;
-    pQueue->nItemSize = nItemSize;
+// Sets up an empty queue over buff, nslots items of itemSize bytes.
+void UQueue_Reset(TQueue* pq, void* buff, u16 nslots, u32 itemSize) {
+    pq->pBase = buff;
+    pq->pEnd = (u8*)buff + nslots * itemSize;
+    pq->pWrite = buff;
+    pq->pRead = buff;
+    pq->nMax = nslots;
+    pq->nCount = 0;
+    pq->nItemSize = itemSize;
 }
 
-// Adds an item and returns its slot for the caller to fill. It does not check for a full queue.
-void* UQueue_Push(UQueue* pQueue) {
-    u8* pItem;
+// Adds an item and returns its slot for the caller to fill. It does not check for a full queue:
+// the callers do, against nMax.
+u8* UQueue_Push(TQueue* pq) {
+    u8* pret;
 
-    pItem = pQueue->pWrite;
-    pQueue->nCount++;
-    pQueue->pWrite += pQueue->nItemSize;
-    if (pQueue->pWrite >= pQueue->pEnd) {
-        pQueue->pWrite -= pQueue->pEnd - pQueue->pBase;
+    pret = pq->pWrite;
+    pq->nCount++;
+    pq->pWrite += pq->nItemSize;
+    if (pq->pWrite >= pq->pEnd) {
+        pq->pWrite -= pq->pEnd - pq->pBase;
     }
-    return pItem;
+    return pret;
 }
 
 // Takes the oldest item, or returns NULL when the queue is empty.
-void* UQueue_Pop(UQueue* pQueue) {
-    u8* pItem;
+u8* UQueue_Pop(TQueue* pq) {
+    u8* pret;
 
-    if (pQueue->nCount - 1 < 0) return NULL;
-    pItem = pQueue->pRead;
-    pQueue->nCount--;
-    pQueue->pRead += pQueue->nItemSize;
-    if (pQueue->pRead >= pQueue->pEnd) {
-        pQueue->pRead -= pQueue->pEnd - pQueue->pBase;
+    if (pq->nCount - 1 < 0) return NULL;
+    pret = pq->pRead;
+    pq->nCount--;
+    pq->pRead += pq->nItemSize;
+    if (pq->pRead >= pq->pEnd) {
+        pq->pRead -= pq->pEnd - pq->pBase;
     }
-    return pItem;
+    return pret;
 }
 
-// Cuts pMem into nBlocks blocks of nBlockSize bytes and chains them all as free.
-void UPool_Init(UPool* pPool, void* pMem, u32 nBlocks, u32 nBlockSize) {
-    UPoolNode* pNode;
-    u32 i;
-    u8* pNext;
+// Cuts pBuffer into nEntries blocks of entrySizeBytes bytes and chains them all as free.
+void UPool_Init(TPool* pPool, void* pBuffer, u32 nEntries, u32 entrySizeBytes) {
+    TListSglLink* pNode;
+    u32 iEntry;
+    char* pEntry;
 
-    pNode = pMem;
+    pNode = pBuffer;
     pPool->head.pNext = pNode;
-    pNext = (u8*)pNode;
-    for (i = 0; i < nBlocks - 1; i++) {
-        pNext += nBlockSize;
-        pNode->pNext = (UPoolNode*)pNext;
-        pNode = (UPoolNode*)pNext;
+    pEntry = (char*)pNode;
+    for (iEntry = 0; iEntry < nEntries - 1; iEntry++) {
+        pEntry += entrySizeBytes;
+        pNode->pNext = (TListSglLink*)pEntry;
+        pNode = (TListSglLink*)pEntry;
     }
     pNode->pNext = &pPool->head;
-    pPool->nFree = nBlocks;
+    pPool->nFree = nEntries;
 }
 
 // Takes a free block, or returns NULL when none is left.
-void* UPool_Alloc(UPool* pPool) {
-    UPoolNode* pNode;
+TListSglLink* UPool_Alloc(TPool* pPool) {
+    TListSglLink* pNode;
 
     pNode = pPool->head.pNext;
     if (pNode == &pPool->head) return NULL;
@@ -155,8 +151,8 @@ void* UPool_Alloc(UPool* pPool) {
 }
 
 // Gives a block back to the pool.
-void UPool_Free(UPool* pPool, void* pBlock) {
-    ((UPoolNode*)pBlock)->pNext = pPool->head.pNext;
-    pPool->head.pNext = pBlock;
+void UPool_Free(TPool* pPool, TListSglLink* pNode) {
+    pNode->pNext = pPool->head.pNext;
+    pPool->head.pNext = pNode;
     pPool->nFree++;
 }
