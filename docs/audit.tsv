@@ -33,7 +33,7 @@ Code800B7210.c	open
 Code800B9944.c	open		
 Code800BA940.c	open		
 Code80193188.c	open		
-Common/Checksum/ChecksumCRC32.c	open		
+Common/Checksum/ChecksumCRC32.c	done	d5543081	claude-review
 Common/Crypt/CryptXOR.c	done	44db6e97	claude-review
 Common/SharedFileIO/SharedFileIO.c	open		
 Common/TagFile/TagFile.c	open		
