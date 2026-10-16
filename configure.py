@@ -975,7 +975,7 @@ config.libs = [
             Object(Matching, "animblender.c"),
             Object(Matching, "GoShaderObjectCommon_ShaderObjectsData_Gc.c"),
             Object(Matching, "LLVideo.c"),
-            Object(Matching, "ByteSwap.c"),
+            Object(Matching, "UByteSwap.c"),
             Object(Matching, "GoCamera.c"),
             Object(Matching, "GoViewport.c"),
             Object(Matching, "GoShaderObjectCommon_TexAnimManager_Gc.c"),
