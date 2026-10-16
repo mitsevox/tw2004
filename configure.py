@@ -956,7 +956,7 @@ config.libs = [
             Object(Matching, "PasswordManager.c"),
             Object(Matching, "Swing.c"),
             Object(Matching, "StateGolfer.c"),
-            Object(Matching, "Code8005D2E4.c"),
+            Object(Matching, "statemain.c"),
             Object(Matching, "stateFunc.c"),
             Object(Matching, "GoCamCont.c"),
             Object(Matching, "skalib.c"),

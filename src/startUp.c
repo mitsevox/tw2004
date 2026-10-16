@@ -1282,7 +1282,7 @@ void Startup_DeleteSaveGame(s32 nPort, s32 nSlot) {
 }
 
 // Start-up's per-frame update: the main loop (gomainloop.c fn_8006D8E8) calls it each frame of game
-// type 1, in place of fn_8005D2F8. Empty in this build.
+// type 1, in place of STATEMAIN_Update. Empty in this build.
 void Startup_Update(void) {
 }
 

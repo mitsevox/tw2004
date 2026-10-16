@@ -72,15 +72,32 @@ typedef struct SwingStateDef {
 
 extern SwingStateDef sGolferStateEngineTable[GS_NUM];   // 0x801883D8  one row per GS_* state
 
-// A second, single-slot state machine (no player argument): current index lbl_80281E09.
-typedef struct ModeStateDef {
-    void (*pfnEnter)(void);
-    void (*pfnUpdate)(void);
-    void (*pfnExit)(void);
-} ModeStateDef;
-
-extern ModeStateDef  lbl_801883C0[2];   // stateFunc.c
 void GOLFERSTATE_Update(void);          // StateGolfer.c
+
+// ---- the main state machine (statemain.c) -------------------------------------------------------
+// One current state for the whole game, front end or in-game: no player argument and no stack.
+
+// A row of gMainStateTable: a main state's callbacks.
+typedef struct MainStateFunctionList_t {
+    void (*pfnEnter)(void);     // 0x00
+    void (*pfnUpdate)(void);    // 0x04
+    void (*pfnExit)(void);      // 0x08
+} MainStateFunctionList_t;
+LAYOUT_ASSERT(MainStateFunctionList_t, 0xC);
+
+// Main states, the rows of gMainStateTable.
+enum {
+    MAINSTATE_FRONTEND = 0,     // set as the front end starts (GO_vInitFE); no callbacks
+    MAINSTATE_INGAME   = 1,     // set as a round starts (GO_vInitIG); its update runs the golfer states
+    MAINSTATE_NUM      = 2      // table rows
+};
+
+extern MainStateFunctionList_t gMainStateTable[MAINSTATE_NUM];  // stateFunc.c
+
+void STATEMAIN_OpenONCE(void);
+void STATEMAIN_Update(void);
+void STATEMAIN_CloseONCE(void);
+void STATEMAIN_Set(s8 nState);          // MAINSTATE_*
 
 u8   SW_vUpdateSwing(int nPlayer);          // the per-frame swing poll: the ball was struck
 void SW_vInitSwing(int nPlayer);          // reset the player's swing

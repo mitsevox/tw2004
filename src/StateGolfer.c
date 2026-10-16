@@ -34,8 +34,8 @@ void GOLFERSTATE_OpenONCE(void) {
     gInStateCallback = 0;
 }
 
-// Runs the current golfer state's update for every player that has one, once a frame (slot 1 of the
-// mode state table that Code8005D2E4.c runs). Nothing while the pause menu is open
+// Runs the current golfer state's update for every player that has one, once a frame (the update of
+// MAINSTATE_INGAME, which statemain.c runs). Nothing while the pause menu is open
 // (GUI_IsPauseMenuOpen) or while GOLFERSTATE_IsFrozen is set (never, in this build).
 void GOLFERSTATE_Update(void) {
     int i;
