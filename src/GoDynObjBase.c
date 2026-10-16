@@ -9,7 +9,6 @@
 
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);                                           // identity
 void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
-void LLMath_mat44fltMultiplyList(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void UObject_ComposeRotation(f32 (*pMtx)[4]);
 int  DynObjTurning_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2);
 

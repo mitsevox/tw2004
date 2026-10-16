@@ -189,8 +189,24 @@ void LLMath_AddScale(f32* pA, f32* pB, f32 fScale, f32* pOut);   // out = a + fS
 void LLMath_Interpolate(f32* pA, f32* pB, f32 fT, f32* pOut);    // out = a + (b - a) x fT (four floats)
 double pow(double x, double y);         // 0x8015F824 (MSL)
 f32  powf(f32 x, f32 y);                // 0x8002C8D0 (Golfer.c): pow rounded to a float
-f32  LLMath_SquareDistanceBetween3(f32* pA, f32* pB);   // three-float squared distance
 void vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut);   // cross product
+
+// LLMath_Gc.c: paired-single vectors and matrices. A vector is a row times a matrix, so a
+// matrix's row 3 is its translation; a name ending in 3 uses only x, y and z and leaves the output's
+// w as it was. The output may be the source. LLMath_mat44fltMultiply, the full four-float vector
+// times a matrix, is in unsorted/cull.h beside Vec4.
+void LLMath_mat44fltMultiply33(f32 (*M)[4], f32* A, f32* dest);   // a direction through a matrix
+// Each of nb (at least 1) rows of Alist through M into Blist: Blist = Alist x M (33: the 3x3s only).
+void LLMath_mat44fltMultiplyList(f32 (*M)[4], f32 (*Alist)[4], f32 (*Blist)[4], int nb);
+void LLMath_mat44fltMultiplyList33(f32 (*M)[4], f32 (*Alist)[4], f32 (*Blist)[4], int nb);
+// A scaled to length 1 into dest; one with squared length at most 2^-30 is copied as it is. The
+// ReturnLength forms also return A's length (0 for a copied one).
+void LLMath_Normalize(f32* A, f32* dest);
+void LLMath_Normalize3(f32* A, f32* dest);
+f32  LLMath_NormalizeReturnLength(f32* A, f32* dest);
+f32  LLMath_NormalizeReturnLength3(f32* A, f32* dest);
+f32  LLMath_SquareDistanceBetween3(f32* A, f32* B);   // squared distance between two points
+f32  LLMath_DistanceBetween3(f32* A, f32* B);         // distance between two points
 
 // ---- textures --------------------------------------------------------------------------------
 
@@ -1501,12 +1517,7 @@ void Gaud_StopComment(void);
 void Gaud_SetSfxLevel(f32 f);                // } the options menu passes them 0.2 x options.a0[0], a0[4]
 void Gaud_SetCommentLevel(f32 f);                // } and a0[1] (FE_MessageTable.c, GameUICommands.c)
 void Gaud_SetMusicLevel(f32 f);                // }
-void LLMath_Normalize(f32* pSrc, f32* pDst);    // VecMath.c: normalise four floats
-void LLMath_Normalize3(f32* pSrc, f32* pDst);   // normalise three floats (pDst[3] not written)
 void fn_800B5918(const f32* pSrc, f32* pDst);   // GoShaderObject_Rain_Gc.c: copy three floats
-// Normalises three floats and returns the length (0: a near-zero vector, copied as it is).
-f32  LLMath_NormalizeReturnLength3(f32* pSrc, f32* pDst);
-f32  LLMath_DistanceBetween3(f32* pA, f32* pB);  // three-float distance
 void Gaud_StartRegularComment(int nSound, int a);      // SitDevTrigger.c: Gaud_StartComment(0, nSound, a)
 void BreakLine_Reset(int nView);
 // The EA Sports Bio, game side (EASportsBio.c; TW06's names)

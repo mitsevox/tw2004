@@ -6,8 +6,6 @@
 #include "charstate.h"
 #include "unsorted/cull.h"
 
-f32  LLMath_NormalizeReturnLength(f32* pSrc, f32* pDst); // VecMath.c: normalises, gives the length
-                                                         // (0 if near zero)
 void vec4flt_Zero(f32* pVec);                // GoLighting.c
 void fn_801164D4(f32* pA, f32* pB, f32* pOut);
 void fn_801164F8(f32* pA, f32* pB, f32* pOut);
@@ -21,7 +19,6 @@ f32  fn_80116304(u32 nFrame, f32 fPhase, f32 fStrength);
 f32  fn_80116468(void);
 void Quat_QuatToMatrix(f32* pQ, f32 (*pMtx)[4]);                                    // Quaternion.c
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);                                             // identity
-void LLMath_mat44fltMultiplyList33(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);  // VecMath.c
 void fn_80114540(CharModel* pModel, DynChain* pChain, f32 f);
 void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 f);
 void fn_80115348(CharModel* pModel, DynChain* pChain, f32 f);

@@ -10,8 +10,6 @@
 #include "game.h"
 #include "ustream.h"
 
-void LLMath_mat44fltMultiplyList33(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // VecMath.c
-
 // The globals, in reverse address order (CodeWarrior lays them out last-defined-first).
 int gNetworkCount;                      // how many networks gNetworks holds
 TNetwork* gNetworks[32];                // the hole's networks, in the order they came

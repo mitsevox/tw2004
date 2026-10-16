@@ -37,7 +37,6 @@ void     fn_80038010(u8 a, int n, f32* pVec);
 void     fn_800380A8(u8 a, f32* pVec, u8 b, int nSlot, f32 f1, f32 f2);
 int      CameraController_GetClippedGolfer(void);
 void     mat44flt_EulerAngles(f32 (*m)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
-void     LLMath_mat44fltMultiply33(f32 (*m)[4], f32* pIn, f32* pOut);  // a vector through a matrix
 void     CameraController_BallIsOnScreen(int nPlayer);
 void     GolfCamera_ClampLookAngle(f32* pFrom, f32* pTo, f32* pOut);
 int      GolfCamera_LimitPositionChange(f32* pFrom, f32* pTo, f32* pOut, f32 fMax);

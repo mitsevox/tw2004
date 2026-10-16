@@ -1035,7 +1035,7 @@ config.libs = [
             Object(Matching, "uiEATrax.c"),
             Object(Matching, "ScreenClear.c"),
             Object(Matching, "Code800BA940.c"),
-            Object(Matching, "VecMath.c"),
+            Object(Matching, "LLMath_Gc.c"),
             Object(Matching, "SitDevMisc.c"),
             Object(Matching, "SitDevFile.c"),
             Object(Matching, "SitDevCommentaryZones.c"),

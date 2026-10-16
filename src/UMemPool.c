@@ -25,7 +25,6 @@ void Vec_Swap(f32* pA, f32* pB);
 void LLMath_IdentifyMat(f32 (*pDst)[4]);
 void LLMath_Negate3(f32* pSrc, f32* pDst);
 void Math_FillLog2Table(void);
-void LLMath_mat44fltMultiply33(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // a vector through a matrix
 
 // Copies a 4x4 matrix, one row at a time.
 void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]) {

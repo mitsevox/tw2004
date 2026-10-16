@@ -135,6 +135,7 @@ LLDisp_Gc.c	open
 LLDynTex.c	open		
 LLFileIO_Gc.c	open		
 LLFont.c	open		
+LLMath_Gc.c	open		
 LLMem_Gc.c	open		
 LLObj_Gc.c	open		
 LLPictInt.c	open		
@@ -198,7 +199,6 @@ UObject.c	open
 UObject3D.c	open		
 URes.c	done	e845bd03	claude-review
 UStream.c	open		
-VecMath.c	open		
 ViewController.c	open		
 Wind.c	open		
 ai_brain.c	open		
