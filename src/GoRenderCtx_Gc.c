@@ -18,7 +18,7 @@
 void RC_vOnRenderCtxScreenUpdated(Camera* pCamera);
 void RC_vUpdateRenderCtxScreen(Camera* pCamera);
 static void RC_vSetRenderCtxViewport(Camera* pCamera, VM_SViewport* pViewport);
-void RC_vSetRenderCtxFrameBuffer(Camera* pCamera, GoFrameBuf* pBuf);
+void RC_vSetRenderCtxFrameBuffer(Camera* pCamera, FB_SFrameBuffer* pBuf);
 void RC_vSetRenderCtxCamera(Camera* pCamera, CamLens* pLens);
 void RC_vSetDefaultRenderCtx(Camera* pCamera);
 void RenderState_SetClipZFromRenderCtx(Camera* pCamera);
@@ -42,7 +42,7 @@ void** gppCurrentRenderCtx = gapCurrentRenderCtx;
 // Makes a render context (0x234 bytes, TW07's RC_SRenderCtx) from a lens (TW07's CA_SCamera), a
 // frame buffer and a screen rectangle: the identity model matrix, the default clear values, and the
 // screen matrices worked out.
-void* RC_spCreateRenderCtx(CamLens* pLens, GoFrameBuf* pBuf, VM_SViewport* pViewport) {
+void* RC_spCreateRenderCtx(CamLens* pLens, FB_SFrameBuffer* pBuf, VM_SViewport* pViewport) {
     Camera* pCamera;
 
     pCamera = StaticMem_Alloc(0x234, 2, 16, "GoRenderCtx_Gc.c", 96);
@@ -83,9 +83,9 @@ f32 VM_fGetViewportHeightRatio(VM_SViewport* pViewport);
 f32 VM_fGetViewportWidthRatio(VM_SViewport* pViewport);
 f32 VM_fGetViewportOneOverHeightRatio(VM_SViewport* pViewport);
 f32 VM_fGetViewportOneOverWidthRatio(VM_SViewport* pViewport);
-f32 FB_fGetFrameBufferOneOverHeightRatio(u8* p);
-f32 VM_fGetFrameBufferHeightOverWidth(u8* p);
-f32 FB_fGetFrameBufferOneOverWidthRatio(u8* p);
+f32 FB_fGetFrameBufferOneOverHeightRatio(FB_SFrameBuffer* spFrameBuffer_p);
+f32 VM_fGetFrameBufferHeightOverWidth(FB_SFrameBuffer* spFrameBuffer_p);
+f32 FB_fGetFrameBufferOneOverWidthRatio(FB_SFrameBuffer* spFrameBuffer_p);
 
 void RC_vReleaseRenderCtx(void* pCamera) {
     StaticMem_Free(pCamera);
@@ -143,7 +143,7 @@ void RC_vClearRenderCtxScreen(Camera* pCamera, u32 uFlags) {
 void RC_vUpdateRenderCtxScreenMatricesAndInfo(Camera* pCamera) {
     CamLens* pLens;
     VM_SViewport* pRect;
-    GoFrameBuf* pBuf;
+    FB_SFrameBuffer* pBuf;
     f32 f;
     f32 mFlat[4][4];
     f32 mProj[4][4];
@@ -165,10 +165,10 @@ void RC_vUpdateRenderCtxScreenMatricesAndInfo(Camera* pCamera) {
     pCamera->unk1F4 = pCamera->f1E0 * (CA_fGetCameraNearZ((u8*)pLens) / 554.256f);
     pCamera->unk1F8 = CA_fGetCameraFarZ((u8*)pLens);
     pCamera->f1FC = pCamera->f224 * VM_fGetViewportOneOverWidthRatio(pRect)
-                    * FB_fGetFrameBufferOneOverWidthRatio((u8*)pBuf);
-    pCamera->f200 = VM_fGetFrameBufferHeightOverWidth((u8*)pBuf) * (VM_fGetViewportHeightOverWidth(pRect) *
+                    * FB_fGetFrameBufferOneOverWidthRatio(pBuf);
+    pCamera->f200 = VM_fGetFrameBufferHeightOverWidth(pBuf) * (VM_fGetViewportHeightOverWidth(pRect) *
                     (pCamera->f224 * VM_fGetViewportOneOverHeightRatio(pRect)
-                     * FB_fGetFrameBufferOneOverHeightRatio((u8*)pBuf)));
+                     * FB_fGetFrameBufferOneOverHeightRatio(pBuf)));
 
     aSrc[0] = 1.0f;
     aSrc[1] = pCamera->f1FC;
@@ -268,7 +268,7 @@ static void RC_vSetRenderCtxViewport(Camera* pCamera, VM_SViewport* pViewport) {
     pCamera->pRect = pViewport;
 }
 
-void RC_vSetRenderCtxFrameBuffer(Camera* pCamera, GoFrameBuf* pBuf) {
+void RC_vSetRenderCtxFrameBuffer(Camera* pCamera, FB_SFrameBuffer* pBuf) {
     pCamera->pBuf = pBuf;
 }
 
@@ -276,7 +276,7 @@ void RC_vSetRenderCtxCamera(Camera* pCamera, CamLens* pLens) {
     pCamera->unk10 = pLens;
 }
 
-GoFrameBuf* RC_spGetRenderCtxFrameBuffer(Camera* pCamera) {
+FB_SFrameBuffer* RC_spGetRenderCtxFrameBuffer(Camera* pCamera) {
     return pCamera->pBuf;
 }
 
@@ -303,7 +303,7 @@ void RenderState_SetClipZFromRenderCtx(Camera* pCamera) {
 // 512 x 448 screen pixels, left, right, top, bottom (bit 0x200).
 void RenderState_SetViewport(void* pCamera) {
     VM_SViewport* pRect;
-    GoFrameBuf* pBuf;
+    FB_SFrameBuffer* pBuf;
 
     pRect = RC_spGetRenderCtxViewport(pCamera);
     pBuf = RC_spGetRenderCtxFrameBuffer(pCamera);
@@ -360,32 +360,32 @@ f32 VM_fGetViewportOneOverWidthRatio(VM_SViewport* pViewport) {
     return pViewport->fOneOverWidthRatio;
 }
 
-f32 FB_fGetFrameBufferHeight(GoFrameBuf* pBuf) {
-    return pBuf->fHeight;
+f32 FB_fGetFrameBufferHeight(FB_SFrameBuffer* spFrameBuffer_p) {
+    return spFrameBuffer_p->fHeight;
 }
 
-f32 FB_fGetFrameBufferOffsetY(GoFrameBuf* pBuf) {
-    return pBuf->f4;
+f32 FB_fGetFrameBufferOffsetY(FB_SFrameBuffer* spFrameBuffer_p) {
+    return spFrameBuffer_p->fOffsetY;
 }
 
-f32 FB_fGetFrameBufferWidth(GoFrameBuf* pBuf) {
-    return pBuf->fWidth;
+f32 FB_fGetFrameBufferWidth(FB_SFrameBuffer* spFrameBuffer_p) {
+    return spFrameBuffer_p->fWidth;
 }
 
-f32 FB_fGetFrameBufferOffsetX(GoFrameBuf* pBuf) {
-    return pBuf->f0;
+f32 FB_fGetFrameBufferOffsetX(FB_SFrameBuffer* spFrameBuffer_p) {
+    return spFrameBuffer_p->fOffsetX;
 }
 
-f32 FB_fGetFrameBufferOneOverHeightRatio(u8* p) {
-    return *(f32*)(p + 0x2C);
+f32 FB_fGetFrameBufferOneOverHeightRatio(FB_SFrameBuffer* spFrameBuffer_p) {
+    return spFrameBuffer_p->fOneOverHeightRatio;
 }
 
-f32 VM_fGetFrameBufferHeightOverWidth(u8* p) {
-    return *(f32*)(p + 0x30);
+f32 VM_fGetFrameBufferHeightOverWidth(FB_SFrameBuffer* spFrameBuffer_p) {
+    return spFrameBuffer_p->fHeightOverWidth;
 }
 
-f32 FB_fGetFrameBufferOneOverWidthRatio(u8* p) {
-    return *(f32*)(p + 0x28);
+f32 FB_fGetFrameBufferOneOverWidthRatio(FB_SFrameBuffer* spFrameBuffer_p) {
+    return spFrameBuffer_p->fOneOverWidthRatio;
 }
 
 // ---- end of sweep code ----

@@ -13,7 +13,7 @@
 #include "llpict.h"
 
 void*       lbl_80281E60;
-GoFrameBuf* lbl_80281E5C;
+FB_SFrameBuffer* lbl_80281E5C;
 void*       lbl_80281E58;
 void*       lbl_80281E54;
 u8          lbl_80281E50;
@@ -152,8 +152,6 @@ void SitDev_vCloseModule(void);
 void TARGET_Init(void);
 void fn_80067CD4(int nPlayer);
 void SitDev_ProcessEventQueue(void);
-void FB_vInitModule(void);
-void FB_vCloseModule(void);
 void fn_8006E2A4(void);
 void fn_8006E424(void);
 void fn_8006F14C(void);

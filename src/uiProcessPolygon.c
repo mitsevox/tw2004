@@ -678,7 +678,7 @@ void UI_DrawFullScreenPicture(LLPict* pPict, f32 fAlpha) {
     f32 afColour[4];
     f32 afXY[8];
     f32 afUV[8];
-    GoFrameBuf frameBuf;
+    FB_SFrameBuffer frameBuf;
     s32 nOld;
 
     RenderState_SetPicture(pPict);
@@ -763,7 +763,7 @@ void LLMath_Add(f32* pA, f32* pB, f32* pOut) {
 }
 #endif
 
-// Make p0 (a GoFrameBuf) the current render context's frame buffer (GoRenderCtx_Gc.c
+// Make p0 (an FB_SFrameBuffer) the current render context's frame buffer (GoRenderCtx_Gc.c
 // RC_vSetRenderCtxFrameBuffer). port: the frame buffer travels as an s32, and
 // RC_vSetRenderCtxFrameBuffer is declared here
 //       without parameters: EA passes the render-context slot as a third argument it ignores.
