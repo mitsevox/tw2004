@@ -38,7 +38,8 @@ Names
 - **EA's naming style.** Functions `System_Verb` (`View_SetCamera`, `Session_SetNumPlayers`),
   globals `gName`, locals and fields in Hungarian: `n` integer, `f` float, `b` flag, `u` unsigned
   bit mask, `p` pointer, `a` array, `pfn` function pointer, `sz` string. A player index is
-  `nPlayer`, a hole `nHole`, a view `nView`.
+  `nPlayer`, a hole `nHole`, a view `nView`. A parameter or local whose EA name is known keeps it
+  as EA spelled it, Hungarian or not (`Mem_cpy(void* s1, const void* s2, u32 n)`, `M`, `dest`).
 - **Struct fields** are named for what they hold, worked out from every place that uses them. Only
   bytes no code ever reads or writes (padding, unused space) are `unkXXX`. Fields of shared structs
   carry their offset in a trailing comment (`// 0xC38`).
@@ -246,7 +247,7 @@ Names
 | **C1.** A `fn_`/`lbl_` name, or a hybrid (`fn_800C8C70_Read`) | A real name |
 | **C2.** A name that claims more than the code shows, or reuses a name another struct or function already uses for something else | A name the code supports, used for one thing |
 | **C3.** A field named by its offset (`p->nC38`, `fF08`) that any code touches | A name for what it holds |
-| **C4.** Locals and parameters like `a`, `b`, `p`, `t0`, `temp_r3` | Hungarian names for what they hold; a parameter the function never reads takes the name of the matching parameter of the function its callers mirror |
+| **C4.** Locals and parameters like `a`, `b`, `p`, `t0`, `temp_r3` | EA's names where `reference/` has them, else Hungarian names for what they hold; a parameter the function never reads takes the name of the matching parameter of the function its callers mirror |
 | **C5.** A value with a meaning left as a bare number: a flag bit, a group of bits, a count or table size | EA's enum or define, or ours, used everywhere the value is |
 
 Structure

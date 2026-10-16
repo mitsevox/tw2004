@@ -3,17 +3,17 @@
 
 #include "engine.h"
 
-int RTClock_GetCurrentTime(s32* pnMonth, s32* pnDay, s32* pnYear, s32* pnHour, s32* pnMinute, s32* pnSecond,
-                s32* pnMsec) {
+int RTClock_GetCurrentTime(s32* pMonth, s32* pDay, s32* pYear, s32* pHour, s32* pMinute, s32* pSecond,
+                s32* pMillisecond) {
     OSCalendarTime time;
 
     OSTicksToCalendarTime(OSGetTime(), &time);
-    *pnMonth = time.nMon + 1;
-    *pnDay = time.nMday;
-    *pnYear = time.nYear;
-    *pnHour = time.nHour;
-    *pnMinute = time.nMin;
-    *pnSecond = time.nSec;
-    *pnMsec = time.nMsec;
+    *pMonth = time.nMon + 1;
+    *pDay = time.nMday;
+    *pYear = time.nYear;
+    *pHour = time.nHour;
+    *pMinute = time.nMin;
+    *pSecond = time.nSec;
+    *pMillisecond = time.nMsec;
     return 1;
 }

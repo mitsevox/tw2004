@@ -13,10 +13,10 @@
 // ---- memory and strings ----------------------------------------------------------------------
 
 // LLMem_Gc.c: the engine's memcpy, memmove, memset and memcmp.
-void* Mem_cpy(void* pDst, const void* pSrc, u32 nLen);          // memcpy; returns pDst
-void* Mem_move(void* pDst, const void* pSrc, u32 nLen);         // memmove: may overlap; returns pDst
-void* Mem_set(void* pDst, int nValue, u32 nLen);                // memset; returns pDst
-int   Mem_compare(const void* pA, const void* pB, u32 nLen);    // memcmp: -1, 0 or 1
+void* Mem_cpy(void* s1, const void* s2, u32 n);                // memcpy; returns s1
+void* Mem_move(void* dst, const void* src, u32 n);             // memmove: may overlap; returns dst
+void* Mem_set(void* s, int c, u32 n);                          // memset; returns s
+int   Mem_compare(const void* s1, const void* s2, u32 n);      // memcmp: -1, 0 or 1
 // Allocates (StaticMemory.c): nMode picks the system heap or a part of the static heap (see there).
 void* StaticMem_Alloc(int nSize, int nMode, int nAlign, const char* pFile, int nLine);
 void  StaticMem_Free(void* p);                  // free
@@ -134,10 +134,10 @@ void  qsort(void* pBase, u32 nCount, u32 nSize, s32 (*pfnCompare)(const void* pA
 
 // LLRTClock_Gc.c: the console's date and time: month 1-12, day of the month, the full year, hour
 // 0-23, minute, second, millisecond. Always TRUE.
-int  RTClock_GetCurrentTime(s32* pnMonth, s32* pnDay, s32* pnYear, s32* pnHour, s32* pnMinute, s32* pnSecond,
-                 s32* pnMsec);
-// LLRTClock.c: the console's date and time as "M/D/YYYY H:MM AM", into szOut.
-void RTClock_GetDateTimeString(char* szOut);
+int  RTClock_GetCurrentTime(s32* pMonth, s32* pDay, s32* pYear, s32* pHour, s32* pMinute, s32* pSecond,
+                 s32* pMillisecond);
+// LLRTClock.c: the console's date and time as "M/D/YYYY H:MM AM", into s.
+void RTClock_GetDateTimeString(char* s);
 
 // ---- math and random numbers -----------------------------------------------------------------
 

@@ -4,28 +4,28 @@
 
 #include "engine.h"
 
-// Writes the clock's date and time into szOut as "M/D/YYYY H:MM AM": the hour on a 12-hour dial,
+// Writes the clock's date and time into s as "M/D/YYYY H:MM AM": the hour on a 12-hour dial,
 // then "AM" for clock hours 1 to 12 and "PM" for the rest.
-void RTClock_GetDateTimeString(char* szOut) {
-    s32 nMonth;
-    s32 nDay;
-    s32 nYear;
-    s32 nHour;
-    s32 nMinute;
-    s32 nUnused;
+void RTClock_GetDateTimeString(char* s) {
+    s32 month;
+    s32 day;
+    s32 year;
+    s32 hour;
+    s32 minute;
+    s32 dummy;
     int bAM;
-    char* szAMPM;
+    char* AMPM;
 
-    RTClock_GetCurrentTime(&nMonth, &nDay, &nYear, &nHour, &nMinute, &nUnused, &nUnused);
+    RTClock_GetCurrentTime(&month, &day, &year, &hour, &minute, &dummy, &dummy);
     bAM = 0;
-    if (nHour >= 1 && nHour <= 12) {
+    if (hour >= 1 && hour <= 12) {
         bAM = 1;
     }
-    szAMPM = bAM ? "AM" : "PM";
-    if (nHour == 0) {
-        nHour = 12;
-    } else if (nHour > 12) {
-        nHour -= 12;
+    AMPM = bAM ? "AM" : "PM";
+    if (hour == 0) {
+        hour = 12;
+    } else if (hour > 12) {
+        hour -= 12;
     }
-    sprintf(szOut, "%d/%d/%d %d:%02d %s", nMonth, nDay, nYear, nHour, nMinute, szAMPM);
+    sprintf(s, "%d/%d/%d %d:%02d %s", month, day, year, hour, minute, AMPM);
 }
