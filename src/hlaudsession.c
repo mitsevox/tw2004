@@ -318,16 +318,16 @@ AudStream* Ses_GetStreamFromPlayList(AudPlayList* pList, u16 nStream, u32* puLen
     return pStream;
 }
 
-// Turns reverb on (bOn 1) or off for track nTrack of sound nSound's template (bit 0x20 of the
-// track's n0, set: no reverb), so for every instance of the sound (Aud_SesTmplOvrTrackRvbMode).
+// Turns reverb on (bOn 1) or off for track nTrack of sound nSound's template (its
+// AUDTRACKTMPL_NO_REVERB), so for every instance of the sound (Aud_SesTmplOvrTrackRvbMode).
 void Ses_TmplOvrTrackRvbMode(s16 nSound, u8 nTrack, u8 bOn) {
     AudTrackTmpl* pTrack;
 
     pTrack = &Ses_GetEmitterTemplateFromID(nSound)->aTracks[nTrack];
     if (bOn == 0) {
-        pTrack->n0 |= 0x20;
+        pTrack->uFlags |= AUDTRACKTMPL_NO_REVERB;
     } else {
-        pTrack->n0 &= 0xDF;
+        pTrack->uFlags &= (u8)~AUDTRACKTMPL_NO_REVERB;
     }
 }
 

@@ -1,7 +1,7 @@
 // UAudVector.c (EA's name: TW07's Golf/Audio/Engine/Utils/UAudVector.c has audvec2_ApproxLength
 // and audvec3_ApproxLength, audvec3's locals as here; TW06 lists uaudvector.c with the same audio
 // utilities): the sound engine's vector maths. This build keeps only the length estimate without a
-// square root, which AudTable.c uses for a sound's distance. audfrac_Swap and audvec2_Set are
+// square root, which hlaudemitter.c uses for a sound's distance. audfrac_Swap and audvec2_Set are
 // inlines of TW07's UAudFrac.h and UAudVector.h that the compiler emitted out of line at the unit's
 // end, which is how this unit's end (0x800B1AA8) shows. Linked between startUp.c and
 // Code800B1AA8.c.
@@ -39,7 +39,7 @@ f32 audvec2_ApproxLength(f32* v) {
 }
 
 // The same estimate for the 3D vector v: the length of (v[2], the length of (v[0], v[1])).
-// AudTable.c's Distance3D measures a sound's distance with it.
+// hlaudemitter.c's Distance3D measures a sound's distance with it.
 f32 audvec3_ApproxLength(f32* v) {
     f32 tmpv[2];
     f32 tmp;

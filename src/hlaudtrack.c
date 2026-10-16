@@ -40,7 +40,7 @@ void TrkRender3D(AudSource* pSource, AudTrack* pTrack, f32 fVolume) {
         if (pVoice != NULL) {
             params.nVolume = audfrac_Mul(fVolume, pVoice->nVolume << 7);
             params.nPan = 64.0f * pSource->fPan + 64.0f;
-            params.n7 = 64.0f * pSource->f68 + 64.0f;
+            params.n7 = 64.0f * pSource->fPanDepth + 64.0f;
             Voc_Render(pVoice, &params);
         }
     }
@@ -206,14 +206,17 @@ AudTrack* Trk_AllocPerf(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f3
     UList* pList;
     AudTrack* pTrack;
 
-    bSorted = pSource->pSound->n3 & 1;
+    bSorted = pSource->pSound->uFlags & AUDSOUND_3D;
     pList = &gTrkPerfLists[bSorted];
     if (pPool->nFree == 0) {
         pTrack = (AudTrack*)gTrkPerfLists[1].pTail;
         if (gTrkPerfLists[1].nCount == 0) return NULL;
         if (bSorted == 1) {
             while (pTrack != NULL) {
-                if (pTrack->nState != 1 && !(pTrack->pTmpl->n0 & 8) && pTrack->fDistAttn < fDistAttn) break;
+                if (pTrack->nState != 1 && !(pTrack->pTmpl->uFlags & AUDTRACKTMPL_STREAMED)
+                    && pTrack->fDistAttn < fDistAttn) {
+                    break;
+                }
                 pTrack = (AudTrack*)pTrack->link.pPrev;
             }
         }
@@ -245,7 +248,7 @@ AudTrack* Trk_AllocPerf(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f3
     } else {
         InsertSortWorldPerf(pTrack);
     }
-    if (!(pTmpl->n0 & 8)) {
+    if (!(pTmpl->uFlags & AUDTRACKTMPL_STREAMED)) {
         Seq_Init(pTrack);
     } else {
         Stm_Init(pTrack);
@@ -254,8 +257,8 @@ AudTrack* Trk_AllocPerf(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f3
 }
 
 // Frees a track: takes it out of its source, deletes its voices at once, resets its sequencer
-// (Seq_Exit) or stream (Stm_Exit) state, tells the emitter (Emi_TrackCallback with 0) when the
-// template asks for it (n0 & 0x40), and gives it back to the pool. NULL is ignored. Always returns
+// (Seq_Exit) or stream (Stm_Exit) state, tells the emitter (AUD_TRKCB_FREED) when the
+// template asks (AUDTRACKTMPL_CB_ON_FREE), and gives it back to the pool. NULL is ignored. Always returns
 // 0 (TW07's returns a TPerf*).
 s32 Trk_FreePerf(AudTrack* pTrack) {
     UPool* pPool;
@@ -273,13 +276,13 @@ s32 Trk_FreePerf(AudTrack* pTrack) {
         pTrack->bits.b.bDetached = 1;
     }
     Trk_StopAllVoices(pTrack, 1);
-    if (!(pTrack->pTmpl->n0 & 8)) {
+    if (!(pTrack->pTmpl->uFlags & AUDTRACKTMPL_STREAMED)) {
         Seq_Exit(pTrack);
     } else {
         Stm_Exit(pTrack);
     }
-    if (pTmpl->n0 & 0x40) {
-        Emi_TrackCallback(pSource, pTmpl->n6, 0);
+    if (pTmpl->uFlags & AUDTRACKTMPL_CB_ON_FREE) {
+        Emi_TrackCallback(pSource, pTmpl->n6, AUD_TRKCB_FREED);
     }
     pTrack->pTmpl = NULL;
     pTrack->nState = 0;
@@ -292,10 +295,11 @@ s32 Trk_FreePerf(AudTrack* pTrack) {
 // Called by Emi_UpdInstance for each track of a source: starts, stops or restarts channel nChannel
 // as its distance attenuation fDistAttn changes. Nothing while the track is stopped and waiting
 // (state 2). At 0 or below a playing track stops; above 0 an idle one starts (allocated first when
-// there is none). Templates with n0 & 4 (and not 1) are switched by hand: bOn and bOff are the
-// caller's start and stop requests, and bOn on a playing one restarts it unless n0 & 0x10 is set. A
-// sequenced track stopped and started in one go keeps its variation and set. A playing placed track
-// that neither starts nor stops is re-sorted on the new fDistAttn.
+// there is none). Templates with AUDTRACKTMPL_MANUAL (and not AUDTRACKTMPL_STEPPED) are switched
+// by hand: bOn and bOff are the caller's start and stop requests, and bOn on a playing one
+// restarts it unless AUDTRACKTMPL_NO_RETRIGGER is set. A sequenced track stopped and started in
+// one go keeps its variation and set. A playing placed track that neither starts nor stops is
+// re-sorted on the new fDistAttn.
 void Trk_UpdatePerf(AudSource* pSource, AudTrack* pTrack, AudTrackTmpl* pTmpl, u8 nChannel, u8 bOn,
                  u8 bOff, f32 fDistAttn) {
     u8 bPlaying;
@@ -312,8 +316,8 @@ void Trk_UpdatePerf(AudSource* pSource, AudTrack* pTrack, AudTrackTmpl* pTmpl, u
     bCarryOver = 0;
     if (pTrack != NULL && pTrack->nState == 2) return;
     bPlaying = pTrack != NULL && pTrack->nState > 2;
-    bManual = (pTmpl->n0 & 4) && !(pTmpl->n0 & 1);
-    bRetrigger = (pTmpl->n0 & 0x10) == 0;
+    bManual = (pTmpl->uFlags & AUDTRACKTMPL_MANUAL) && !(pTmpl->uFlags & AUDTRACKTMPL_STEPPED);
+    bRetrigger = (pTmpl->uFlags & AUDTRACKTMPL_NO_RETRIGGER) == 0;
     bUpdate = bPlaying;
     bAudible = fDistAttn > 0.0f;
     bStart = bAudible &&
@@ -323,7 +327,7 @@ void Trk_UpdatePerf(AudSource* pSource, AudTrack* pTrack, AudTrackTmpl* pTmpl, u
     bStop = (!bAudible && bPlaying) ||
             (bAudible && bPlaying && bManual &&
              ((!bRetrigger && bOff && !bOn) || (bRetrigger && (bOn || bOff))));
-    if (bStop && bStart && !(pTmpl->n0 & 8)) {
+    if (bStop && bStart && !(pTmpl->uFlags & AUDTRACKTMPL_STREAMED)) {
         nCarryVar = pTrack->u.seq.nVariation;
         bCarryOver = 1;
         nCarryRange = pTrack->u.seq.nVarSet;
@@ -357,7 +361,7 @@ void Trk_UpdatePerf(AudSource* pSource, AudTrack* pTrack, AudTrackTmpl* pTmpl, u
 // streamed (Stm_Start) track.
 void Trk_Start(AudTrack* pTrack) {
     pTrack->params.flags.n = 0;
-    if (!(pTrack->pTmpl->n0 & 8)) {
+    if (!(pTrack->pTmpl->uFlags & AUDTRACKTMPL_STREAMED)) {
         Seq_Start(pTrack);
         return;
     }
@@ -377,7 +381,7 @@ void Trk_Stop(AudTrack* pTrack) {
         pTrack->pSource->apTracks[pTrack->nChannel] = NULL;
         pTrack->bits.b.bDetached = 1;
     }
-    if (!(pTrack->pTmpl->n0 & 8)) {
+    if (!(pTrack->pTmpl->uFlags & AUDTRACKTMPL_STREAMED)) {
         Seq_Stop(pTrack);
         return;
     }
@@ -425,7 +429,7 @@ void Trk_StopAllVoices(AudTrack* pTrack, int bNow) {
 // it.
 u8 Trk_Tick(AudTrack* pTrack) {
     pTrack->fPitch += pTrack->fPitchRamp;
-    return !(pTrack->pTmpl->n0 & 8) ? Seq_Tick(pTrack) : Stm_Tick(pTrack);
+    return !(pTrack->pTmpl->uFlags & AUDTRACKTMPL_STREAMED) ? Seq_Tick(pTrack) : Stm_Tick(pTrack);
 }
 
 // Asks a sequenced track to run event n next (Seq_Step); with bCheck (TW07's debounce), not when it
@@ -469,7 +473,7 @@ void Trk_Render(AudTrack* pTrack) {
 // Prepares a track template of a sound just loaded (Emi_CheckTemplate): a sequenced one's events
 // through Seq_Check; a streamed one needs nothing.
 void Trk_Check(AudTrackTmpl* pTmpl) {
-    if (!(pTmpl->n0 & 8)) {
+    if (!(pTmpl->uFlags & AUDTRACKTMPL_STREAMED)) {
         Seq_Check(pTmpl);
     }
 }

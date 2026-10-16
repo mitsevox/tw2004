@@ -30,6 +30,7 @@ The code does this, and the effect can happen in play.
 | rcmp_mad_codec.c madinit | `for (i = -256; i < 255; ...)` never writes gMadClamp[255] (.bss zero): a block value of +255 becomes pixel 0 (black) while +128..+254 become 255 |
 | GoTerrain.c Ter_vCloseModule | StaticMem_Free(pCourse) frees the 'tgd ' chunk's pData, which UStream.c:224 sets past the stream object's header: StaticMem_Free reads the two words before it as block start and size, so it frees the wrong range (Ter_UnloadHole frees pCourseStreamData, the right pointer); harmless only if Ter_UnloadHole ran first |
 | hlaudsession.c Ses_AllocBankHdr | a path through the function reaches its end without returning a value |
+| hlaudemitter.c Emi_UpdInstance / Doppler3D | the new nearest distance is stored in fDist before Doppler3D measures how much nearer the sound came since the last frame, so the change is always 0 and the doppler pitch always 1 |
 
 Possible
 --------
@@ -48,6 +49,7 @@ The code allows it, but whether it ever happens depends on the game's data or on
 | FE_CalendarPopups.c PGATourPopup_GetRow_EventUpcoming | the champion's score shows only above 0, else "N/A"; a tournament played on the tour keeps its winner's score to par (GameModeDriverPGATour_AdvanceEvent), so a winner at or under par shows "N/A" | the 'PGAc' data's starting champion scores (strokes or to par); the popup of a tournament a season after it was played |
 | GameModeDriverPGATour.c GetCourses | aTourEvent[nTourEvent - 1] with nTourEvent 0 (other functions test for 0) | the 'PGAc' tournament data |
 | PlayNowMode.c PlayNow_LoadBallSpot | gPlayNowBallSpots[-1] for a type-10 object with challenge 0 | the course files' 'Cact' type-10 objects |
+| hlaudemitter.c Emi_UpdInstance | hands the controllers on (PreprocessControllers) only when track 0, 1 or 2's changed (`uChanged & 7`): a new controller value for track 3-7 alone waits until one of those changes too | whether any sound has a streamed track past its third, or EA meant all eight bits |
 | Earnings.c last hole | hole goals checked twice (PayHoledGoals, then PayRoundGoals): a money goal (nAward 39) with bEachHole would pay twice | the 'ERN ' table: any enabled bEachHole money goal |
 | GameMode11.c Lessons_GetShape / GetClub / GetShotKind | gLessons[gLessonNum - 1] at lesson 0 or 12; no calling path found | whether Shot_Prepare can run during the closing line at lesson 12 |
 | GameMode11.c Lessons_StartGamePreData | overrides the golfer the menu chose (Session_SetGolfer(1, 0)); both sides deliberate | intent only |

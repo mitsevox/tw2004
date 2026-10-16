@@ -7,7 +7,7 @@
 // the first to use the next file's .sbss.
 // Ses_GetEmitterTemplateFromID (TW07: HLAudSession.c's) and audfrac_Mul (TW07: an inline in
 // UAudFrac.h) come before the Mas_ functions and have no data of their own: kept here, as nothing
-// places them elsewhere (AudTable.c, EA's hlaudemitter.c, ends just before them).
+// places them elsewhere (hlaudemitter.c ends just before them).
 
 #include "core/audtrack.h"
 #include "core/startup.h"

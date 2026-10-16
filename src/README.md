@@ -470,7 +470,7 @@ boot-time voice code in `startUp.c` right after and AudLock.c, UAudMemStack.c an
 | File | Name | What it is |
 |---|---|---|
 | GameAudio.c | ours | the game's side: starts the engine, drives emitters for course, mode and pin |
-| AudTable.c | ours | 256 playing sounds; 3D volume, pan and doppler |
+| hlaudemitter.c | T6 | 256 sound sources, one per emitter instance; 3D volume, pan and doppler |
 | HLAudMaster.c | T7 | master settings: 32 submix volumes and mutes |
 | hlaudmic.c | T6 | listeners: their count and reverb preset |
 | hlaudmovie.c | T6 | a movie's stereo sound on two voices |
@@ -479,11 +479,11 @@ boot-time voice code in `startUp.c` right after and AudLock.c, UAudMemStack.c an
 | hlaudtrackseq.c | T6 | the sequencer (event-played tracks) |
 | hlaudtrackstm.c | T6 | streamed tracks (music, long sounds) through ARAM |
 | hlaudvoice.c | T6 | voices over startUp.c's hardware voices |
-| hlaudemitter.c | T6 | 256 emitter instances |
+| hlaudemitterpool.c | T6 | 256 emitter instances |
 | UAudContainers.c | T6 | list, queue and pool containers |
 | AudReverb.c | ours | the aux A effect: reverb or delay |
 | startUp.c | EA | boot-time systems: 50 hardware voice wrappers, the mixer callback, ARAM heap, built-in sounds, boot memory-card checks, the `'LEGL'` pictures |
-| UAudVector.c | T7 | the sound engine's vector length estimate without a square root (AudTable.c's distances) |
+| UAudVector.c | T7 | the sound engine's vector length estimate without a square root (hlaudemitter.c's distances) |
 | AudLock.c | ours | the sound engine's mutex and semaphore |
 | UAudMemStack.c | EA | the sound engine's stack allocator |
 | UAudMem.c | T7 | the sound engine's memory: 384 KB of main memory run as a stack |

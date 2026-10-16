@@ -3,7 +3,7 @@
 // end's and each hole's emitters (Gaud_InitFE, Gaud_InitHole) and plays through them what happens
 // in the game: the swing and the ball, the crowd, the commentary, the music or the course's
 // ambience, the weather, the GameBreaker and the special swing cameras, the target and long-drive
-// games. It also holds engine calls that TW07 keeps in HLAudEmitterPool.c (our hlaudemitter.c):
+// games. It also holds sound engine calls of the same family as hlaudemitterpool.c's:
 // Aud_InitOnce, which starts the engine (memory stack, ARAM, sound table, movie sound, banks) one
 // step after another, Aud_Pause, Aud_Mute, the listener (Aud_Mic) calls, Aud_EmiSetTrackStream and
 // the movie and session calls; their data places them here. Its extent is proven by its data: every
@@ -16,7 +16,7 @@
 #include "core/audtrack.h"
 
 
-// hlaudemitter.c
+// hlaudemitterpool.c
 void Aud_EmiSetTrackStatus(u8 nId, u8 nTrack, u8 bOn);
 u8   Aud_EmiGetTrackStatus(u8 nId, u8 nTrack);
 void Aud_EmiSetControllerInt(u8 nId, u8 nTrack, u32 uParams);
@@ -32,7 +32,7 @@ void Aud_EmiSetTrackAttenuation(u8 nId, u8 nTrack, f32 fVolume);
 void GameEffects_VibrateControllerForHeartbeat(int nPlayer);
 u8   fn_8006BAD8(int nPlayer, s32* pOut);
 f32  fn_8006C630(void);
-// hlaudemitter.c: an emitter instance for sound nSound, in emitter nKind's group (-1: none), a its
+// hlaudemitterpool.c: an emitter instance for sound nSound, in emitter nKind's group (-1: none), a its
 // n24 (1: its position is sent every frame), b its n28 (0: placed in camera space); the callback
 // hears its tracks' reports (Aud_EmiTrkCB). 0xFF when all 256 are in use.
 u8   Aud_EmiAdd(s16 nSound, s16 nKind, int a, int b, void (*pfnCallback)(u8 nId, u8 nTrack, s32 n));
@@ -166,10 +166,7 @@ void BootSound_CopyToAram(void);
 void BootSound_Play(u8 nSound);
 
 u8   Voc_InitModule(void);                   // hlaudvoice.c
-u8   Aud_EmiInitOnce(void);                  // hlaudemitter.c; always 1
 u8   Rvb_InitModule(void);                      // AudReverb.c; always 1
-void Aud_EmiCycle(void);                     // hlaudemitter.c
-void Aud_EmiExitSession(void);                   // hlaudemitter.c
 void AudMem_Init(void);                   // UAudMem.c
 void Aud_EmiSetTrackStep(u8 nId, u8 nTrack, u8 n, int bCheck);
 
@@ -1949,7 +1946,7 @@ void Gaud_RestartMusic(void) {
 
 // Picks what a streamed track of instance nId plays: play list a, stream b, play mode c, packed
 // into the track's controller value (mode in the top byte, list in the next, stream in the low 16
-// bits) for AudTable.c to hand to the streamer.
+// bits) for hlaudemitter.c to hand to the streamer.
 void Aud_EmiSetTrackStream(u8 nId, u8 nTrack, u8 a, u16 b, s32 c) {
     Aud_EmiSetControllerInt(nId, nTrack, (c << 24) | (a << 16) | b);
 }

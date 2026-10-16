@@ -69,7 +69,8 @@ typedef struct AudVoiceParams {
     f32  fPitch;                // 0x0    an event sets it from its n4 / 65536
     s16  nVolume;               // 0x4
     u8   nPan;                  // 0x6    0 left, 0x40 centre, 0x7F right
-    u8   n7;                    // 0x7    a second pan (Panning3D's front/back), 0x7F for a movie
+    u8   n7;                    // 0x7    a second pan: 64 + 64 times the source's fPanDepth for a
+                                //        placed track, 0x7F for any other and for a movie
     u8   anAdsr[2];             // 0x8    envelope values for the tone: [0] attack, [1] decay
                                 //        (event 10, OnModADSRVol)
     u8   unkA[0xC - 0xA];
@@ -101,7 +102,8 @@ typedef struct AudVoiceRequest {
         struct {
             u16 unk15 : 1;
             u16 bNoReverb : 1;  //        aux A (reverb) off: streams, movies, and notes of sounds
-                                //        with n3 & 4 or templates with n0 & 0x20
+                                //        with AUDSOUND_NO_REVERB or templates with
+                                //        AUDTRACKTMPL_NO_REVERB
             u16 unk13 : 1;
             u16 bStream : 1;    //        Voc_Alloc gives the voice an ARAM stream buffer
             u16 b11 : 1;        //        bit 2 of the play list's number
@@ -184,13 +186,7 @@ LAYOUT_ASSERT(AudSeqEvent, 0x8);
 
 // The template a track plays: one of a bank sound's tracks (AudSound.aTracks, 0x1C bytes).
 typedef struct AudTrackTmpl {
-    u8   n0;                    // 0x0    0x01 stepped: runs only the event Seq_Step asks for (nStepEvent);
-                                //        0x02 loops (OnEnd goes on to a new variation); 0x04
-                                //        switched by hand (Trk_UpdatePerf's bOn / bOff; not with
-                                //        0x01); 0x08 streamed; 0x10 no restart while playing;
-                                //        0x20 reverb off (Ses_TmplOvrTrackRvbMode sets and clears
-                                //        it); 0x40 / 0x80 Emi_TrackCallback on free / on a
-                                //        variation change
+    u8   uFlags;                // 0x0    AUDTRACKTMPL_ bits
     u8   n1;                    // 0x1    how the next variation is picked (AutoSelectVariation); 0: never
     u8   n2;                    // 0x2    its channel count (one voice each; for a streamed track,
                                 //        its play list's)
@@ -200,10 +196,13 @@ typedef struct AudTrackTmpl {
     u8   n7;                    // 0x7    variations per set
     u8   n8;                    // 0x8    sets (the track's nVarSet picks one)
     u8   n9;                    // 0x9    the variation picked last
-    u8   nA;                    // 0xA    0xFF, or the set to use (set by Emi_SetTrackVarRangeTmpl)
+    u8   nVarSet;               // 0xA    0xFF, or a set of variations forced on all its tracks:
+                                //        AutoSelectVariation switches a track to it (set by
+                                //        Emi_SetTrackVarRangeTmpl)
     u8   unkB;
     f32  fC;                    // 0xC    copied to the track's f40
-    f32  f10;                   // 0x10   Attenuation3D's distance scale
+    f32  fDistScale;            // 0x10   a placed sound's distance is scaled by it before
+                                //        Attenuation3D turns it into the track's volume
     union {
         AudPlayList* pPlayList; // 0x14   streamed tracks; its n3 is the track's volume curve
         AudSeqBank* pBank;      //        sequenced tracks; the same n3
@@ -213,16 +212,41 @@ typedef struct AudTrackTmpl {
 } AudTrackTmpl;
 LAYOUT_ASSERT(AudTrackTmpl, 0x1C);
 
+// AudTrackTmpl.uFlags
+#define AUDTRACKTMPL_STEPPED      0x01  // runs only the event Seq_Step asks for (nStepEvent)
+#define AUDTRACKTMPL_LOOPS        0x02  // at a variation's end event the track goes on from the event
+                                        // it names (in a new variation when n1 picks them) instead
+                                        // of stopping
+#define AUDTRACKTMPL_MANUAL       0x04  // switched on and off by hand (Trk_UpdatePerf's bOn / bOff;
+                                        // not with AUDTRACKTMPL_STEPPED)
+#define AUDTRACKTMPL_STREAMED     0x08  // plays a stream (Stm_), not a sequence (Seq_)
+#define AUDTRACKTMPL_NO_RETRIGGER 0x10  // a switch on does not restart it while it plays
+#define AUDTRACKTMPL_NO_REVERB    0x20  // its voices play without reverb (Ses_TmplOvrTrackRvbMode)
+#define AUDTRACKTMPL_CB_ON_FREE   0x40  // reports to its emitter instance when the track is freed
+                                        // (AUD_TRKCB_FREED)
+#define AUDTRACKTMPL_CB_ON_LOOP   0x80  // reports each time the track goes on past a variation's end
+                                        // (AUD_TRKCB_LOOPED)
+
+// Why a track reports to its source's emitter instance (Emi_TrackCallback, Aud_EmiTrkCB).
+enum EAudTrkCBReason {
+    AUD_TRKCB_FREED = 0,        // the track was freed
+    AUD_TRKCB_LOOPED = 1        // it went on past the end of a variation
+};
+
 // A sound of a bank: tracks played together, one per channel.
 typedef struct AudSound {
     u8   nTracks;               // 0x0
     u8   unk1[0x3 - 0x1];
-    u8   n3;                    // 0x3    bit 0: placed in the world (distance, pan and doppler),
-                                //        its tracks go in the sorted list; bit 1: no doppler;
-                                //        bit 2: see OnKeyOn
-    f32  f4;                    // 0x4    placed sounds: how far away it is heard
+    u8   uFlags;                // 0x3    AUDSOUND_ bits
+    f32  fMaxDist;              // 0x4    placed sounds: the distance it is heard up to
     AudTrackTmpl aTracks[1];    // 0x8    nTracks of them
 } AudSound;
+
+// AudSound.uFlags
+#define AUDSOUND_3D          0x1    // placed in the world: distance, pan and doppler; its tracks
+                                    // go in the sorted list
+#define AUDSOUND_NO_DOPPLER  0x2    // placed, but its pitch does not change with its speed
+#define AUDSOUND_NO_REVERB   0x4    // its notes play without reverb (OnKeyOn)
 
 // One entry of a bank's sample table (0x38 bytes). Its addresses are relative to the bank's ARAM
 // block, in 4-bit units; Ses_ProcessSampleData adds the block's address.
@@ -302,7 +326,7 @@ typedef struct AudTrackSeq {
     u8   nVariation;            // 0x64   its variation
     u8   nNextChannel;          // 0x65   the channel the next note tries first
     u8   nNextEvent;            // 0x66   the next event in the variation (n3: done)
-    u8   nStepEvent;            // 0x67   0xFF, or the event to run next (templates with n0 & 1)
+    u8   nStepEvent;            // 0x67   0xFF, or the event to run next (AUDTRACKTMPL_STEPPED templates)
     u8   nVarSet;               // 0x68   its set of variations
     u8   n69;                   // 0x69   only ever cleared in this build
     u8   unk6A[0x6C - 0x6A];
@@ -333,39 +357,55 @@ typedef struct AudTrack {
     u8   unk5E[0x62 - 0x5E];
     u16  nWait;                 // 0x62   sequenced tracks: ticks waited for the next event
     union {
-        AudTrackStm stm;        // 0x64   streamed tracks (pTmpl->n0 & 8)
+        AudTrackStm stm;        // 0x64   streamed tracks (AUDTRACKTMPL_STREAMED)
         AudTrackSeq seq;        // 0x64   sequenced tracks
     } u;
 } AudTrack;
 LAYOUT_ASSERT(AudTrack, 0x8C);
 
-// A sound source: a playing sound (AudTable.c's table of 256, lbl_80282058), one track per
-// channel of its sound, and where it is heard.
+#define AUDSOURCE_NUM_TRACKS 8
+
+// A sound source: a playing sound (hlaudemitter.c's table of EMI_NUM_SOURCES, gEmiSources), one
+// track per channel of its sound, and where it is heard. Its first fields are the commands its
+// emitter instance queues for the next Aud_EmiCycle.
 typedef struct AudSource {
-    u8   u0;                    // 0x0    tracks switched on, a bit each (hlaudemitter.c; the
-                                //        sequencer's event OnTrackStatus sets bits too)
-    u8   u1;                    // 0x1    tracks switched off (and OnTrackStatus, for events whose n4 is 0)
-    u16  uChanged;              // 0x2    bits 0-7: that track's auParams was set; 0x200: u0 / u1
-    u32  auParams[8];           // 0x4    each track's controller value (Aud_EmiSetControllerInt;
-                                //        streamed tracks: PreprocessControllers)
-    f32  aPos[2][3];            // 0x24   where it is from each listener (audvec3_ApproxLength measures it)
-    AudSound* pSound;           // 0x3C
-    s16  nSound;                // 0x40   its number (Ses_GetEmitterTemplateFromID)
+    u8   uTracksOn;             // 0x0    tracks to switch on, a bit each: set by the game through its
+                                //        emitter instance and by the sequencer's event 6
+    u8   uTracksOff;            // 0x1    tracks to switch off, a bit each, set the same ways
+    u16  uChanged;              // 0x2    what was queued: bits 0-7 that track's auParams, and the
+                                //        AUDSOURCE_CHANGED_ bits
+    u32  auParams[AUDSOURCE_NUM_TRACKS];    // 0x4    each track's controller value, set by the game;
+                                //        for a streamed track the stream in the low 16 bits, the
+                                //        play list above it and the play mode in the top byte
+    f32  aPos[2][3];            // 0x24   its position relative to each listener
+    AudSound* pSound;           // 0x3C   the bank sound it plays
+    s16  nSound;                // 0x40   that sound's number: bank 0's from 0 up, bank 1's from -1
+                                //        down
     u8   unk42[0x44 - 0x42];
-    AudTrack* apTracks[8];      // 0x44   one per track of the sound
+    AudTrack* apTracks[AUDSOURCE_NUM_TRACKS];   // 0x44   one per track of the sound, NULL while
+                                //        that track has none from the pool
     f32  fPan;                  // 0x64   -1 left to 1 right
-    f32  f68;                   // 0x68   -1 to 1: the second pan (AudVoiceParams.n7)
+    f32  fPanDepth;             // 0x68   -1 to 1: its z over its distance from the one listener;
+                                //        1 with two listeners. Its voices' second pan comes from it
     f32  afDist[2];             // 0x6C   its distance from each listener
     f32  fDist;                 // 0x74   the nearest of them
     f32  fPitch;                // 0x78   its doppler pitch
 } AudSource;
 LAYOUT_ASSERT(AudSource, 0x7C);
 
+// AudSource.uChanged, besides the tracks' own bits
+#define AUDSOURCE_CHANGED_PARAMS_0_2 0x007  // tracks 0-2's bits: only these make Emi_UpdInstance
+                                            // hand the controllers on (PreprocessControllers)
+#define AUDSOURCE_CHANGED_STATUS     0x200  // tracks were switched on or off; nothing tests it
+#define AUDSOURCE_CHANGED_POS        0x400  // a new position was queued; nothing tests it
+
+#define EMI_NUM_SOURCES 256         // gEmiSources' entries, one per emitter instance
+
 // The sequencer's event handlers, by event type (filled by Seq_InitModule).
 typedef void (*AudSeqHandler)(AudSeqEvent* pEvent, AudTrack* pTrack);
 extern AudSeqHandler gSeqCmdHandlers[13];
 
-// One of hlaudemitter.c's 256 emitter instances (lbl_801F2740); only the fields read so far.
+// One of hlaudemitterpool.c's 256 emitter instances (lbl_801F2740); only the fields read so far.
 typedef struct AudInstance {
     AudSource* pCmd;            // 0x0    its sound source (Emi_AddInstance, the same number)
     struct AudInstance* pPrevActive;   // 0x4    the previous in AudEmitters.pActive's list
@@ -386,7 +426,7 @@ LAYOUT_ASSERT(AudInstance, 0x34);
 
 extern AudInstance lbl_801F2740[256];   // the instances, by id (0xFF: none)
 
-// hlaudemitter.c's emitters (lbl_801F2668, 0xD8 bytes): per emitter, its list of instances and
+// hlaudemitterpool.c's emitters (lbl_801F2668, 0xD8 bytes): per emitter, its list of instances and
 // a sound number. 32 fit the layout: the list heads end where the sound numbers begin.
 typedef struct AudEmitters {
     AudInstance* pFree;         // 0x0    the free instances, linked through pNextActive
@@ -454,7 +494,7 @@ typedef struct AudMicBlock {
     u8   unk0[0x48];
 } AudMicBlock;
 
-extern AudSource* lbl_80282058;           // AudTable.c's table
+extern AudSource* gEmiSources;            // the sound sources, by entry (hlaudemitter.c)
 extern u8 gMicCount;                      // the number of listeners (hlaudmic.c)
 extern f32 gMasSubmixVolumes[32];         // the volume of each curve (Mas_GetSubmix; HLAudMaster.c)
 extern s32 gMasMuteMask;                  // one bit per curve: 1 = muted (Mas_IsChanMuted; HLAudMaster.c)
@@ -476,21 +516,26 @@ void AudLock_Unlock(const char* szWho);           // give it back
 void AudLock_LockReadQueue(const char* szWho);    // take the read-queue lock
 void AudLock_UnlockReadQueue(const char* szWho);  // give it back
 
-// AudTable.c
+// hlaudemitter.c
 u8             Emi_InitModule(void);
 u8             Emi_InitSession(void);
 void           Emi_ExitSession(void);
-AudSource*     Emi_AddInstance(u8 nEntry, s16 nSound);
-void           Emi_UpdInstance(u8 nEntry, u8 uMaskA, u8 uMaskB, u32* auStreams, f32 (*aPos)[3], u16 uMask);
+AudSource*     Emi_AddInstance(u8 nEntry, s16 nSound, u8 uTracksOn, u8 uTracksOff, u32* auParams,
+                               f32 (*aPos)[3], u16 uChanged);
+void           Emi_UpdInstance(u8 nEntry, u8 uTracksOn, u8 uTracksOff, u32* auParams, f32 (*aPos)[3],
+                               u16 uChanged);
 void           Emi_DelInstance(u8 nEntry);
-void           Emi_SetTrackVariation(u8 nEntry, u8 nTrack, u8 n);
-void           Emi_SetTrackVarRange(u8 nEntry, u8 nTrack, u8 n);
-void           Emi_SetTrackVarRangeTmpl(s16 nSound, u8 nTrack, u8 n);       // the track's nA
-void           Emi_SetTrackStep(u8 nEntry, u8 nTrack, u8 n, int bCheck);
+void           Emi_SetTrackVariation(u8 nEntry, u8 nTrack, u8 nVariation);
+void           Emi_SetTrackVarRange(u8 nEntry, u8 nTrack, u8 nVarSet);
+void           Emi_SetTrackVarRangeTmpl(s16 nSound, u8 nTrack, u8 nVarSet);
+void           Emi_SetTrackStep(u8 nEntry, u8 nTrack, u8 nEvent, int bCheck);
 void           Emi_SetTrackAttenuation(u8 nEntry, u8 nTrack, f32 fVolume);
 void           Emi_SetTrackPitchFactor(u8 nEntry, u8 nTrack, f32 fPitch);
-void           Emi_CheckTemplate(AudSound* pSound, u16 n);
-void           Emi_TrackCallback(AudSource* pSource, u8 nTrack, s32 n);
+void           Emi_CheckTemplate(AudSound* pSound, u16 nSound);
+void           Emi_TrackCallback(AudSource* pSource, u8 nTrack, s32 nReason);
+
+// UAudVector.c
+f32            audvec3_ApproxLength(f32* pVec);
 
 // HLAudMaster.c
 AudSound*    Ses_GetEmitterTemplateFromID(s16 nSound);
@@ -595,7 +640,10 @@ void Voc_Stop(AudVoice* pVoice);    // let it end
 void Voc_Delete(AudVoice* pVoice);  // stop it now
 u8   Voc_CheckStreamHalfDone(AudVoice* pVoice, u32* puPos);
 
-// hlaudemitter.c
+// hlaudemitterpool.c
+u8   Aud_EmiInitOnce(void);         // always 1
+void Aud_EmiCycle(void);
+void Aud_EmiExitSession(void);
 void Aud_EmiTrkCB(u8 nId, u8 nBit, s32 n);
 int  Aud_EmiInitSession(void);      // Aud_EmiDel on every instance in use, emitters emptied
 void Aud_EmiDel(u8 nId);

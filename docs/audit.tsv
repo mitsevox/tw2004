@@ -2,7 +2,6 @@ file	state	commit	reviewer
 AnimStream.c	open		
 AudLock.c	open		
 AudReverb.c	open		
-AudTable.c	open		
 Ball.c	open		
 BootCourse.c	open		
 ByteSwap.c	open		
@@ -213,7 +212,8 @@ gbacable.c	open
 goballfx.c	open		
 gocamscripts.c	open		
 gomainloop.c	open		
-hlaudemitter.c	open		
+hlaudemitter.c	done	6e08fca1b823	claude-review
+hlaudemitterpool.c	open		
 hlaudmic.c	open		
 hlaudmovie.c	open		
 hlaudsession.c	open		
