@@ -37,33 +37,42 @@ void  fn_80095108(void);
 void* fn_800951A0(u32 uSize, u16 nAlign, int n);
 void  fn_8009527C(void* p);             // frees what fn_800951A0 allocated
 
-// The stopwatches (GoShaderObject_Particle_Gc.c, lbl_802813B0): a 64-bit clock made from the
-// 32-bit tick (fn_8000B3E8), and five watches read against it.
-typedef union ProfTime {
+// The game's clock (LLTime.c): a 64-bit count of ticks since the current mode started (each mode's
+// start calls TI_vInitModule), made from the 32-bit tick (TI_uiReadCP0Count) by counting its
+// wraps, and five counters that time against it like stopwatches.
+typedef union ClockTime {
     u64 u;
     struct {
-        u32 nHi;                // port: the halves in the GameCube's (big-endian) order
-        u32 nLo;
+        u32 nHi;                // in tNow, the times the tick has wrapped
+        u32 nLo;                // in tNow, the tick
     } w;
-} ProfTime;
+} ClockTime;
 
-typedef struct ProfWatch {
-    ProfTime tBase;             // 0x00  a running watch reads the clock minus this
-    ProfTime tStop;             // 0x08  when it was stopped
+// The counters the game uses; the other two are never started.
+enum {
+    TI_COUNTER_REALTIME = 0,    // reset and started each time a mode starts, never paused
+    TI_COUNTER_GAME = 1,        // a round's time: started with the round, stopped while paused
+    TI_COUNTER_FRONTEND = 2     // runs while the front end is up
+};
+#define TI_NUM_COUNTERS 5
+
+typedef struct TI_SCounter {
+    ClockTime tBase;            // 0x00  a running counter reads the clock minus this
+    ClockTime tStop;            // 0x08  the clock when it was stopped
     u8   bRunning;              // 0x10
-} ProfWatch;
-LAYOUT_ASSERT(ProfWatch, 0x18);
+} TI_SCounter;
+LAYOUT_ASSERT(TI_SCounter, 0x18);
 
-typedef struct ProfClock {
-    ProfTime tStart;            // 0x00  when TI_vInitModule set it up
-    ProfTime tNow;              // 0x08  the last reading
-    ProfWatch aWatches[5];      // 0x10
-    u8   unk88[0x110 - 0x88];   // 0x88  no code found reads these (size: lbl_801D97F8's 0x110 bytes)
-} ProfClock;
-LAYOUT_ASSERT(ProfClock, 0x110);
+typedef struct TI_STimeManager {
+    ClockTime tStart;           // 0x00  the tick at TI_vInitModule, high half 0
+    ClockTime tNow;             // 0x08  the clock at the last reading
+    TI_SCounter aCounters[TI_NUM_COUNTERS];    // 0x10
+    u8   unk88[0x110 - 0x88];   // 0x88  no code reads these
+} TI_STimeManager;
+LAYOUT_ASSERT(TI_STimeManager, 0x110);
 
-extern ProfClock  lbl_801D97F8;
-extern ProfClock* lbl_802813B0;
+extern TI_STimeManager  gTimeManager;
+extern TI_STimeManager* gpTimeManager;      // always &gTimeManager
 
 // The particles' buffers (GoShaderObject_Particle_Gc.c, lbl_802813A8).
 typedef struct ParticleBuffers {
@@ -75,15 +84,16 @@ typedef struct ParticleBuffers {
 extern ParticleBuffers  lbl_801D97E0;
 extern ParticleBuffers* lbl_802813A8;
 
-u32  fn_8000B3E8(void);                 // the tick (urandom.c)
-void TI_vInitModule(void);                 // set up, every watch reset and stopped
-u64  TI_sRead(void);                 // the clock, since the set-up
-void TI_vStartCounter(int nWatch);           // start
-u8   TI_bCounterIsRunning(int nWatch);           // running?
-u64  TI_sStopCounter(int nWatch);           // stop; returns the reading
-u64  TI_sReadCounter(int nWatch);           // the reading
-f32  fn_8006E118(u64 uNow, u64 uLast);  // seconds between two readings (gomainloop.c)
-void TI_vResetCounter(int nWatch);           // reset to 0
+u32  TI_uiReadCP0Count(void);           // the hardware's 32-bit tick (urandom.c)
+void TI_vInitModule(void);              // sets the clock going, every counter reset and stopped
+void TI_vCloseModule(void);             // does nothing
+u64  TI_sRead(void);                    // the clock, since TI_vInitModule
+void TI_vStartCounter(int nCounter);    // starts, or resumes from where it stopped
+u8   TI_bCounterIsRunning(int nCounter);
+u64  TI_sStopCounter(int nCounter);     // stops; returns the reading
+u64  TI_sReadCounter(int nCounter);     // the reading, running or not
+f32  TI_fConvertTimeDifToSeconds(u64 uNow, u64 uLast); // seconds between two readings (gomainloop.c)
+void TI_vResetCounter(int nCounter);    // the reading back to 0, running or not
 // Pack up to 12 characters of pName into a 64-bit code (base 40, table gSKANameCodes), stored with
 // its bytes reversed; returns 0, 1 for a name past 12 characters, 2 when a character was replaced.
 int   SKA_PackName(u64* pId, const char* pName);

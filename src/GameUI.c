@@ -216,16 +216,16 @@ void GUI_UpdateAllUIData(void) {
 }
 
 // Opens the pause menu, once (nothing while already paused): pending UI message 0x31 flagged
-// (GameMsg_SetPending(4)), the controllers' rumble stopped, message 0x23 with 0, timer 1 stopped, the
-// pause flag GUI_IsPauseMenuOpen returns and gSession.nPaused set, a GameBreaker paused, EASBio's
-// play state 0, and in a GameMode5 challenge PlayNow_OnPause.
+// (GameMsg_SetPending(4)), the controllers' rumble stopped, message 0x23 with 0, the game's
+// counter stopped, the pause flag GUI_IsPauseMenuOpen returns and gSession.nPaused set, a
+// GameBreaker paused, EASBio's play state 0, and in a GameMode5 challenge PlayNow_OnPause.
 void GUI_OpenPauseMenu(void) {
     if (gSession.nPaused == 0) {
         GameMsg_SetPending(4);
         Input_vStopAllVibration();
         fn_80062CE0(0);
-        if (TI_bCounterIsRunning(1)) {
-            TI_sStopCounter(1);
+        if (TI_bCounterIsRunning(TI_COUNTER_GAME)) {
+            TI_sStopCounter(TI_COUNTER_GAME);
         }
         lbl_802822DF = 1;
         gSession.nPaused = 1;
@@ -244,9 +244,9 @@ void GUI_SetEndOfGamePending(void) {
     lbl_80282281 = 0;
 }
 
-// Closes the pause menu (nothing when not paused) and finishes what the pause was covering. Unless
-// a menu screen is still up (GUI_IsFadingToBlack) it unpauses: timer 1 restarted, the pause flags cleared,
-// a GameBreaker resumed, sound unpaused, EASBio's play state 1. Then the save images are parked
+// Closes the pause menu (nothing when not paused) and finishes what the pause was covering. Unless a menu
+// screen is still up (GUI_IsFadingToBlack) it unpauses: the game's counter restarted, the pause flags
+// cleared, a GameBreaker resumed, sound unpaused, EASBio's play state 1. Then the save images are parked
 // (fn_8009EF98) and message 0x23 with 1 goes out in a replay outside modes 10 and 11. After the
 // end-of-round screen gSession.bEndLoop = 1 ends the round. After the end-of-hole screen: event
 // 0x46 and the mode's pfnScorecardClosed, then in mode 12 every player's scores for the hole
@@ -263,8 +263,8 @@ void GUI_PauseMenuClosed(void) {
             Lessons_PauseMenuClosed();
         }
         if (!GUI_IsFadingToBlack()) {
-            if (!TI_bCounterIsRunning(1)) {
-                TI_vStartCounter(1);
+            if (!TI_bCounterIsRunning(TI_COUNTER_GAME)) {
+                TI_vStartCounter(TI_COUNTER_GAME);
             }
             lbl_802822DF = 0;
             gSession.nPaused = 0;

@@ -19,7 +19,7 @@ typedef struct GameAudioView {
     u8   unk6[0x8 - 0x6];
     f32  f8;                    // 0x8    only ever cleared
     f32  fC;                    // 0xC    the last frame's time, for the swish's club speed
-    u64  tLast;                 // 0x10   TI_sReadCounter(1)'s reading at the ball's last hit or bounce
+    u64  tLast;                 // 0x10   the game's counter at the ball's last hit or bounce
     s32  n18;                   // 0x18   the swing state Gaud_UpdtSwing last saw
     u8   unk1C[0x20 - 0x1C];
 } GameAudioView;

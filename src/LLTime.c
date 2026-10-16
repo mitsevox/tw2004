@@ -1,19 +1,20 @@
-// LLTime.c (EA file, TW07 legacy/ll/LLTime.c): own unit, its .sdata (0x802813B0) starts on the
-// 8-aligned address after GoShaderObject_Particle_Gc.c's padding at 0x802813AC..0x802813B0
+// LLTime.c: the game's clock, a 64-bit count of ticks since the current mode started, and the five
+// counters the game times against it like stopwatches (real time, a round's time that stops while
+// paused, the front end's).
 
 #include "engine.h"
 
-ProfClock lbl_801D97F8;
-ProfClock* lbl_802813B0 = &lbl_801D97F8;
+TI_STimeManager gTimeManager;
+TI_STimeManager* gpTimeManager = &gTimeManager;
 
 void TI_vInitModule(void) {
     int i;
 
-    lbl_802813B0->tStart.u = 0;
-    lbl_802813B0->tStart.w.nLo = fn_8000B3E8();
-    lbl_802813B0->tNow = lbl_802813B0->tStart;
-    for (i = 0; i < 5; i++) {
-        lbl_802813B0->aWatches[i].bRunning = 0;
+    gpTimeManager->tStart.u = 0;
+    gpTimeManager->tStart.w.nLo = TI_uiReadCP0Count();
+    gpTimeManager->tNow = gpTimeManager->tStart;
+    for (i = 0; i < TI_NUM_COUNTERS; i++) {
+        gpTimeManager->aCounters[i].bRunning = 0;
         TI_vResetCounter(i);
     }
 }
@@ -21,61 +22,62 @@ void TI_vInitModule(void) {
 void TI_vCloseModule(void) {
 }
 
-// Reads the clock: the tick's wraps are counted in the high half.
+// Reads the clock: a 32-bit tick lower than at the last reading has wrapped, and the high half
+// counts one more.
 u64 TI_sRead(void) {
     u32 nTick;
 
-    nTick = fn_8000B3E8();
-    if (nTick < lbl_802813B0->tNow.w.nLo) {
-        lbl_802813B0->tNow.w.nHi++;
+    nTick = TI_uiReadCP0Count();
+    if (nTick < gpTimeManager->tNow.w.nLo) {
+        gpTimeManager->tNow.w.nHi++;
     }
-    lbl_802813B0->tNow.w.nLo = nTick;
-    return lbl_802813B0->tNow.u - lbl_802813B0->tStart.u;
+    gpTimeManager->tNow.w.nLo = nTick;
+    return gpTimeManager->tNow.u - gpTimeManager->tStart.u;
 }
 
-void TI_vStartCounter(int nWatch) {
-    ProfWatch* pWatch;
+void TI_vStartCounter(int nCounter) {
+    TI_SCounter* pCounter;
 
-    pWatch = &lbl_802813B0->aWatches[nWatch];
-    pWatch->tBase.u = pWatch->tBase.u + TI_sRead() - pWatch->tStop.u;
-    pWatch->bRunning = 1;
+    pCounter = &gpTimeManager->aCounters[nCounter];
+    pCounter->tBase.u = pCounter->tBase.u + TI_sRead() - pCounter->tStop.u;
+    pCounter->bRunning = 1;
 }
 
-u8 TI_bCounterIsRunning(int nWatch) {
-    ProfWatch* pWatch;
+u8 TI_bCounterIsRunning(int nCounter) {
+    TI_SCounter* pCounter;
 
-    pWatch = &lbl_802813B0->aWatches[nWatch];
-    return pWatch->bRunning;
+    pCounter = &gpTimeManager->aCounters[nCounter];
+    return pCounter->bRunning;
 }
 
-u64 TI_sStopCounter(int nWatch) {
-    ProfWatch* pWatch;
+u64 TI_sStopCounter(int nCounter) {
+    TI_SCounter* pCounter;
 
-    pWatch = &lbl_802813B0->aWatches[nWatch];
-    pWatch->tStop.u = TI_sRead();
-    pWatch->bRunning = 0;
-    return pWatch->tStop.u - pWatch->tBase.u;
+    pCounter = &gpTimeManager->aCounters[nCounter];
+    pCounter->tStop.u = TI_sRead();
+    pCounter->bRunning = 0;
+    return pCounter->tStop.u - pCounter->tBase.u;
 }
 
-u64 TI_sReadCounter(int nWatch) {
-    ProfWatch* pWatch;
-    u64 uNow;
+u64 TI_sReadCounter(int nCounter) {
+    TI_SCounter* pCounter;
+    u64 tNow;
 
-    pWatch = &lbl_802813B0->aWatches[nWatch];
-    if (pWatch->bRunning) {
-        uNow = TI_sRead();
+    pCounter = &gpTimeManager->aCounters[nCounter];
+    if (pCounter->bRunning) {
+        tNow = TI_sRead();
     } else {
-        uNow = pWatch->tStop.u;
+        tNow = pCounter->tStop.u;
     }
-    return uNow - pWatch->tBase.u;
+    return tNow - pCounter->tBase.u;
 }
 
-void TI_vResetCounter(int nWatch) {
-    ProfWatch* pWatch;
-    u64 uNow;
+void TI_vResetCounter(int nCounter) {
+    TI_SCounter* pCounter;
+    u64 tNow;
 
-    pWatch = &lbl_802813B0->aWatches[nWatch];
-    uNow = TI_sRead();
-    pWatch->tStop.u = uNow;
-    pWatch->tBase.u = uNow;
+    pCounter = &gpTimeManager->aCounters[nCounter];
+    tNow = TI_sRead();
+    pCounter->tStop.u = tNow;
+    pCounter->tBase.u = tNow;
 }

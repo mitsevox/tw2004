@@ -193,7 +193,6 @@ void fn_80093AD4(void);
 void fn_80093D14(void);
 void BS_vInit(void);
 void BS_vClose(void);
-void TI_vCloseModule(void);
 void fn_80095550(void);
 void CameraTuning_Init(void);
 void fn_80097E98(void);
@@ -309,7 +308,7 @@ void GO_vInitIG(void);
 void fn_8006CDC4(void);
 void fn_8006CEFC(void);
 void fn_8006CFC8(void);
-u8   fn_8006D01C(void);
+static u8 GO_bMainLoopDone(void);
 u8   fn_8006D1C0(int nView);
 void fn_8006D27C(void);
 void fn_8006D7E8(void);
@@ -539,8 +538,8 @@ void GO_vInitFE(void) {
     lbl_80281E58 = VM_spCreateViewport();
     lbl_80281E54 = RC_spCreateRenderCtx(lbl_80281E60, lbl_80281E5C, lbl_80281E58);
     RC_vSetCurrentRenderCtx(lbl_80281E54);
-    TI_vResetCounter(2);
-    TI_vStartCounter(2);
+    TI_vResetCounter(TI_COUNTER_FRONTEND);
+    TI_vStartCounter(TI_COUNTER_FRONTEND);
     Aud_InitSession(0, 0, 1, 0);
     fn_8000B884();
     fn_80124B54();
@@ -578,7 +577,7 @@ void fn_8006CB2C(void) {
     Character_CloseFE();
     Character_FreeFEGolfers();
     Players_Reset();
-    TI_sStopCounter(2);
+    TI_sStopCounter(TI_COUNTER_FRONTEND);
     FE_CrAP_CloseModule();
     fn_8010A4E8();
     UI_vCloseModule();
@@ -660,8 +659,8 @@ void GO_vInitIG(void) {
     GameEffects_InitGameEffectSettings();
     PsBallFx_InitModule();
     Grass_InitModule();
-    TI_vResetCounter(1);
-    TI_vStartCounter(1);
+    TI_vResetCounter(TI_COUNTER_GAME);
+    TI_vStartCounter(TI_COUNTER_GAME);
     if (gSession.nC == 3) {
         GM_SetModeType(5);
         PlayNow_StartChallenge();
@@ -685,8 +684,8 @@ void fn_8006CDC4(void) {
     fn_800A2E14();
     fn_80093D14();
     BreakLine_CloseModule();
-    if (TI_bCounterIsRunning(1)) {
-        TI_sStopCounter(1);
+    if (TI_bCounterIsRunning(TI_COUNTER_GAME)) {
+        TI_sStopCounter(TI_COUNTER_GAME);
     }
     SitDev_vCloseModule();
     fn_8006DCA4(0);
@@ -772,7 +771,7 @@ void fn_8006CFC8(void) {
 
 // Whether the main loop should end this frame, by the game type's own tests: gSession's bEndLoop
 // and nC, a queued hole load, the pads, fn_8009A180 and UI_IsClosed.
-u8 fn_8006D01C(void) {
+static u8 GO_bMainLoopDone(void) {
     u8 bDone = 0;
 
     if (gSession.nGameType == 6 && (gSession.bEndLoop || gSession.nC == 2)) {
@@ -1032,17 +1031,19 @@ void fn_8006D838(void) {
     Gba_UpdateLinkState();
 }
 
-// The main loop, until fn_8006D01C says stop. Each frame's time is taken from watch 1
-// (TI_sReadCounter), at most four frames (a bad reading counts as four); outside start-up it counts
-// the frames and sends event 0x1A once a second; then it runs the game type's frame.
+// The main loop, until GO_bMainLoopDone says stop. Each frame's time is how far the game's counter
+// moved since the last frame, at most four frames (a bad reading counts as four): it stands still
+// while paused, and in the front end and the start-up screens it is 0, as that counter is reset
+// there and never started. Outside start-up it counts the frames and sends event 0x1A once a
+// second; then it runs the game type's frame.
 void fn_8006D8E8(void) {
-    u64 uLast = TI_sReadCounter(1);
+    u64 uLast = TI_sReadCounter(TI_COUNTER_GAME);
     u64 uNow;
     f32 fTime;
     f64 dTime;
 
-    TI_sReadCounter(0);
-    while (!fn_8006D01C()) {
+    TI_sReadCounter(TI_COUNTER_REALTIME);
+    while (!GO_bMainLoopDone()) {
         fn_80110390();
         fn_800B7490();
         if (gSession.nGameType == 6) {
@@ -1050,14 +1051,14 @@ void fn_8006D8E8(void) {
         }
         fn_8006C69C();
         fn_80006EDC();
-        uNow = TI_sReadCounter(1);
+        uNow = TI_sReadCounter(TI_COUNTER_GAME);
         // fake match: the double step gives the original's frsp (EA's gomainloop.c saw a double
-        // return; every other file saw the float fn_8006E118 returns).
-        fTime = dTime = gSession.fFrameTime = fn_8006E118(uNow, uLast);
+        // return; every other file saw the float TI_fConvertTimeDifToSeconds returns).
+        fTime = dTime = gSession.fFrameTime = TI_fConvertTimeDifToSeconds(uNow, uLast);
         if (fTime > 4.0f * FRAME_TIME || fTime < 0.0f) {
             gSession.fFrameTime = 4.0f * FRAME_TIME;
         }
-        TI_sReadCounter(0);
+        TI_sReadCounter(TI_COUNTER_REALTIME);
         Input_vUpdate();
         if (gSession.nGameType == 6) {
             GM_CheckControllerPulled();
@@ -1355,6 +1356,6 @@ void fn_8006E0F8(void) {
 }
 
 // Seconds between two time-base readings (40.5 million ticks a second).
-f32 fn_8006E118(u64 uNow, u64 uLast) {
+f32 TI_fConvertTimeDifToSeconds(u64 uNow, u64 uLast) {
     return (1.0f / 40500000.0f) * (s32)(uNow - uLast);
 }

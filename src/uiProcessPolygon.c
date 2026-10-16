@@ -471,7 +471,7 @@ void UI_DrawLoadingScreenAndProgressBar(int nMode) {
         gUILoadingScreen.bRunning = 0;
     }
     gUILoadingScreen.uTime = TI_sRead();
-    fSecs = fn_8006E118(gUILoadingScreen.uTime, gUILoadingScreen.uLastTime);
+    fSecs = TI_fConvertTimeDifToSeconds(gUILoadingScreen.uTime, gUILoadingScreen.uLastTime);
     gUILoadingScreen.uLastTime = gUILoadingScreen.uTime;
     gUILoadingScreen.fElapsed += fabsf(fSecs);
     if (nMode != 1 && gUILoadingScreen.fElapsed <= gUILoadingScreen.fNextTile) {

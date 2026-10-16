@@ -111,8 +111,8 @@ void Session_SetupProfiles(void) {
 }
 
 void fn_8002F180(void) {
-    TI_vResetCounter(0);
-    TI_vStartCounter(0);
+    TI_vResetCounter(TI_COUNTER_REALTIME);
+    TI_vStartCounter(TI_COUNTER_REALTIME);
 }
 
 void Session_SetNumPlayers(int n) {

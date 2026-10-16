@@ -195,7 +195,7 @@ void GM_vStartupGetFilesNeeded(MsgArg* pArgs, MsgArg* pResult) {
     MC_Disconnect();
 }
 
-// Command 16: end start-up's main loop (gSession.nC 2, which gomainloop.c fn_8006D01C checks each
+// Command 16: end start-up's main loop (gSession.nC 2, which gomainloop.c GO_bMainLoopDone checks each
 // frame), as the menus' GM_vEndGameLoop.
 void GM_vStartupEndGameLoop(MsgArg* pArgs, MsgArg* pResult) {
     gSession.nC = 2;

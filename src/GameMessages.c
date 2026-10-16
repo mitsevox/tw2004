@@ -152,7 +152,7 @@ void GUI_SetControllerPulled(int nController) {
 // each controller present in game type 6, and menu command 61 too. If it was marked pulled,
 // the mark is cleared; while another is still marked nothing more happens. With none left the
 // controller message goes (GUI_SendMessage31) and the pause ends: gSession.nPaused 2 (paused for
-// the controllers) is lifted - timer 1 restarted, the pause-menu flag cleared, a GameBreaker
+// the controllers) is lifted - the game's counter restarted, the pause-menu flag cleared, a GameBreaker
 // resumed, the save images parked (fn_8009EF98) - and any other value becomes 1, the pause menu's
 // pause. In this build nothing marks a controller pulled (GUI_DetectControllerPull is empty).
 void GUI_OnControllerPresent(int nController) {
@@ -170,8 +170,8 @@ void GUI_OnControllerPresent(int nController) {
         }
         GUI_SendMessage31();
         if (gSession.nPaused == 2) {
-            if (!TI_bCounterIsRunning(1)) {
-                TI_vStartCounter(1);
+            if (!TI_bCounterIsRunning(TI_COUNTER_GAME)) {
+                TI_vStartCounter(TI_COUNTER_GAME);
             }
             lbl_802822DF = 0;
             GameEffects_Pause(0);

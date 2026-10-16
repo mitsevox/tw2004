@@ -4902,7 +4902,7 @@ void GM_vMCGetCardErrors(MsgArg* pArgs, MsgArg* pResult) {
     *(s32*)pArgs[6].p = 0;
 }
 
-// Front-end message 281: ends the menus' main loop: gSession.nC 2, which gomainloop.c fn_8006D01C
+// Front-end message 281: ends the menus' main loop: gSession.nC 2, which gomainloop.c GO_bMainLoopDone
 // checks each frame (the round's IG_vEndGameLoop is the same).
 void GM_vEndGameLoop(MsgArg* pArgs, MsgArg* pResult) {
     gSession.nC = 2;
