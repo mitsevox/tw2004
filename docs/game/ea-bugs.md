@@ -86,7 +86,7 @@ The code allows it, but whether it ever happens depends on the game's data or on
 | startUp.c command 4 | its table entry stays NULL: calling it crashes | whether the UI sends it |
 | startUp.c Startup_LoadLegalPicture | copies uSize plus up to 128 bytes of padding from the stream object | whether the stream allocation is padded |
 | hlaudtrackseq.c Seq_Tick (step path) | picks the event as n64 * n3 + n66, ignoring the variation set n68 that SetVarCmdBounds uses | a stepped template with n8 > 1 in the bank data |
-| AudLock.c AudLock_LockReadQueue | skips the take when the semaphore is held; the unlock then raises it to 2: no exclusion if two threads collide | whether the file and main threads overlap in the read queue |
+| AudLock.c AudLock_LockReadQueue | skips the take when the semaphore is held, but the caller's unlock still signals: once both give it back the count is 2 and the queue has no exclusion from then on | Stm_Tick and the reader thread (Stm_ReadDoneCB) both hold the AudLock mutex; whether a DMA-done callback (Stm_BlockDmaDoneCB, Stm_SilenceDmaDoneCB) comes in while one of them is in the queue |
 | UAudMemStack.c AudMemStack_FreeTop | lowers the top by the freed block's size: freeing out of order corrupts the stack (Ses_Init frees bank 1 then 0) | the load order above the banks |
 | SitDevFile.c SitDev_LoadScripts | allocates pD4 on every 'sscr' chunk, freed once at round end | whether a round loads more than one 'sscr' chunk |
 | SitDevTrigger.c SitDev_InvokeMultipleActions | bPlayed is the last action's: an earlier line that played can still clear gSitDevPredictionVoiced | intent only |

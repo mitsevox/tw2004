@@ -1,6 +1,6 @@
 file	state	commit	reviewer
 AnimStream.c	open		
-AudLock.c	open		
+AudLock.c	done	4ed54ddb	claude-review
 AudReverb.c	open		
 Ball.c	open		
 BootCourse.c	open		
@@ -185,7 +185,7 @@ TibExt.c	open
 UAudContainers.c	open		
 UAudMem.c	open		
 UAudMemStack.c	open		
-UAudVector.c	open		
+UAudVector.c	done	58556d0e	claude-review
 UFont.c	open		
 UFstPart.c	open		
 UISApi.c	open		

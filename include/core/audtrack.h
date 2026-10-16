@@ -509,9 +509,9 @@ extern u32 gSesFlags;                     // what is loaded (hlaudsession.c): 0x
                                           // the tracks tick when 0xD is set, only some when 0x40 is
 extern u32 lbl_80282018;                  // the sequencer re-triggers notes when its low 4 bits are 0
 
-// The audio locks (AudLock.c): the name is EA's label for who holds them.
+// The sound engine's locks (AudLock.c). szWho is a label for the caller; it is not used.
 void AudLock_Init(void);                          // set both locks up
-void AudLock_Lock(const char* szWho);             // take the stream lock
+void AudLock_Lock(const char* szWho);             // take the file and stream mutex
 void AudLock_Unlock(const char* szWho);           // give it back
 void AudLock_LockReadQueue(const char* szWho);    // take the read-queue lock
 void AudLock_UnlockReadQueue(const char* szWho);  // give it back
@@ -535,7 +535,7 @@ void           Emi_CheckTemplate(AudSound* pSound, u16 nSound);
 void           Emi_TrackCallback(AudSource* pSource, u8 nTrack, s32 nReason);
 
 // UAudVector.c
-f32            audvec3_ApproxLength(f32* pVec);
+f32            audvec3_ApproxLength(f32* v);
 
 // HLAudMaster.c
 AudSound*    Ses_GetEmitterTemplateFromID(s16 nSound);
