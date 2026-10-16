@@ -1008,34 +1008,38 @@ u8     GolfCamera_IsZoomCamDone(View* pView, int nPlayer);
 
 // ---- frame buffers (GoFrameBuf.c) -----------------------------------------------------------
 
-// A frame buffer's size and scale (0x34 bytes; FB_spCreateFrameBuffer makes one). The last seven fields are
-// worked out from the first six by FB_vUpdateInternalFrameBufferData.
-typedef struct GoFrameBuf {
-    f32  f0;                    // 0x00  0 by default
-    f32  f4;                    // 0x04  0 by default
+// The screen area a render camera draws into, in screen pixels (0x34 bytes; FB_spCreateFrameBuffer
+// makes one): its corner and size, and a scale on each axis. The last seven fields are worked out
+// from the first six by FB_vUpdateInternalFrameBufferData. The main loop's is 512 x 448, the
+// grass's and the shadow's 256 x 256, all at 0, 0 and scale 1.
+typedef struct FB_SFrameBuffer {
+    f32  fOffsetX;              // 0x00  the left edge, 0 by default
+    f32  fOffsetY;              // 0x04  the top edge, 0 by default
     f32  fWidth;                // 0x08  512 by default
     f32  fHeight;               // 0x0C  448 by default
-    f32  f10;                   // 0x10  a horizontal scale, 1 by default
-    f32  f14;                   // 0x14  a vertical scale, 1 by default
-    f32  f18;                   // 0x18  fWidth * f10
-    f32  f1C;                   // 0x1C  fHeight * f14
-    f32  f20;                   // 0x20  fWidth / f10
-    f32  f24;                   // 0x24  fHeight / f14
-    f32  f28;                   // 0x28  1 / f10
-    f32  f2C;                   // 0x2C  1 / f14
-    f32  fAspect;               // 0x30  fHeight / fWidth
-} GoFrameBuf;
-LAYOUT_ASSERT(GoFrameBuf, 0x34);
+    f32  fWidthRatio;           // 0x10  1 by default
+    f32  fHeightRatio;          // 0x14  1 by default
+    f32  fWidthTimesRatio;      // 0x18  fWidth * fWidthRatio
+    f32  fHeightTimesRatio;     // 0x1C  fHeight * fHeightRatio
+    f32  fWidthOverRatio;       // 0x20  fWidth / fWidthRatio
+    f32  fHeightOverRatio;      // 0x24  fHeight / fHeightRatio
+    f32  fOneOverWidthRatio;    // 0x28  1 / fWidthRatio
+    f32  fOneOverHeightRatio;   // 0x2C  1 / fHeightRatio
+    f32  fHeightOverWidth;      // 0x30  fHeight / fWidth
+} FB_SFrameBuffer;
+LAYOUT_ASSERT(FB_SFrameBuffer, 0x34);
 
-void        FB_vUpdateInternalFrameBufferData(GoFrameBuf* pBuf);   // work out the derived fields
-GoFrameBuf* FB_spCreateFrameBuffer(void);               // a new frame buffer with the default size
-void        FB_vReleaseFrameBuffer(GoFrameBuf* pBuf);   // free it
-void        FB_vSetDefaultFrameBuffer(GoFrameBuf* pBuf);   // the default size: 512 x 448, scale 1
-void        FB_vSetFrameBuffer(GoFrameBuf* pBuf, f32 f0, f32 f4, f32 fWidth, f32 fHeight, f32 f10, f32 f14);
-f32         FB_fGetFrameBufferHeight(GoFrameBuf* pBuf); // GoRenderCtx_Gc.c: fHeight
-f32         FB_fGetFrameBufferOffsetY(GoFrameBuf* pBuf); // f4
-f32         FB_fGetFrameBufferWidth(GoFrameBuf* pBuf); // fWidth
-f32         FB_fGetFrameBufferOffsetX(GoFrameBuf* pBuf); // f0
+void             FB_vInitModule(void);     // nothing to set up
+void             FB_vCloseModule(void);    // nothing to free
+FB_SFrameBuffer* FB_spCreateFrameBuffer(void);  // a new frame buffer: 512 x 448 at 0, 0, scale 1
+void             FB_vReleaseFrameBuffer(FB_SFrameBuffer* spFrameBuffer_p);    // free it
+void             FB_vSetFrameBuffer(FB_SFrameBuffer* spFrameBuffer_p, f32 fOffsetX_p, f32 fOffsetY_p,
+                                    f32 fWidth_p, f32 fHeight_p, f32 fWidthRatio_p, f32 fHeightRatio_p);
+// GoRenderCtx_Gc.c: the frame buffer's corner and size.
+f32              FB_fGetFrameBufferHeight(FB_SFrameBuffer* spFrameBuffer_p);
+f32              FB_fGetFrameBufferOffsetY(FB_SFrameBuffer* spFrameBuffer_p);
+f32              FB_fGetFrameBufferWidth(FB_SFrameBuffer* spFrameBuffer_p);
+f32              FB_fGetFrameBufferOffsetX(FB_SFrameBuffer* spFrameBuffer_p);
 
 // ---- the parts of a render camera: lens (GoCamera.c) ----------------------------------------
 
@@ -1052,7 +1056,7 @@ void     VM_vSetViewportRatios(VM_SViewport* pViewport, f32 fWidthRatio, f32 fHe
 CamLens* Camera_GetCurrentLens(void);                     // char.c
 
 // GoRenderCtx_Gc.c: a render camera made from a lens, a frame buffer and a viewport.
-void*    RC_spCreateRenderCtx(CamLens* pLens, GoFrameBuf* pBuf, VM_SViewport* pViewport);
+void*    RC_spCreateRenderCtx(CamLens* pLens, FB_SFrameBuffer* pBuf, VM_SViewport* pViewport);
 void     RC_vReleaseRenderCtx(void* pCamera);            // free it
 
 void GolfCamera_ResetSpecialCameraStates(void);

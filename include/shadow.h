@@ -15,7 +15,7 @@ typedef struct Shadow {
     void*       pImage;         // 0x400  the texture's pixels: the screen copy's buffer
     CamLens*    pLens;          // 0x404  } the render camera the shadow is drawn with,
     VM_SViewport* pRect;        // 0x408  }   made from these three
-    GoFrameBuf* pFrameBuf;      // 0x40C  }
+    FB_SFrameBuffer* pFrameBuf; // 0x40C  }
     void*       pCamera;        // 0x410  }
     f32         v414[4];        // 0x414  } set by fn_800B28D4 each time the shadow is drawn
     f32         f424;           // 0x424  }

@@ -15,7 +15,7 @@ void fn_8009A844(void* pCamera, u8* pIn, u8* pOut) {
     f32 fWidth;
     f32 fTop;
     f32 fHeight;
-    GoFrameBuf* pBuf;
+    FB_SFrameBuffer* pBuf;
     f32 f0;
     f32 fBufWidth;
     f32 f4;

@@ -102,7 +102,7 @@ GoDynObjTypes.c	open
 GoDynamicCam.c	open		
 GoEntry.c	open		
 GoFog.c	open		
-GoFrameBuf.c	open		
+GoFrameBuf.c	done	8c0e7adf	claude-review
 GoGolfCam.c	open		
 GoGrass.c	open		
 GoGreenGrid.c	open		
