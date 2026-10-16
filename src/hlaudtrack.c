@@ -13,11 +13,11 @@
 
 #include "core/audtrack.h"
 
-UList gTrkPerfLists[2];                // the tracks in use: [0] in start order, [1] placed ones
+TListDbl gTrkPerfLists[2];             // the tracks in use: [0] in start order, [1] placed ones
                                         // sorted on fDistAttn, loudest first (InsertSortWorldPerf)
 
 AudTrack* gTrkPerfs;                    // the 32 tracks (Trk_InitModule)
-UPool gTrkPerfPool;                     // the free ones
+TPool gTrkPerfPool;                     // the free ones
 
 // Sets a placed track's voices: volume, pan and doppler pitch from the sound's place.
 void TrkRender3D(AudSource* pSource, AudTrack* pTrack, f32 fVolume) {
@@ -83,7 +83,7 @@ void TrkRenderStereo(AudSource* pSource, AudTrack* pTrack, f32 fVolume) {
 // steals from the quiet end.
 void InsertSortWorldPerf(AudTrack* pTrack) {
     AudTrack* pAt;
-    UList* pList;
+    TListDbl* pList;
 
     pAt = (AudTrack*)gTrkPerfLists[1].pHead;
     pList = &gTrkPerfLists[1];
@@ -133,7 +133,7 @@ u8 Trk_InitModule(void) {
 // numbers are not used. TW07 has the loop as Trk_FreeAllPerfs.
 u8 Trk_InitSession(u8 nSession, u8 nSubsession) {
     s32 i;
-    UList* pList;
+    TListDbl* pList;
     AudTrack* pTrack;
 
     i = 0;
@@ -162,7 +162,7 @@ void Trk_ExitSession(void) {
 // tick, and not those of sound 8.
 void Trk_Cycle(void) {
     s32 i;
-    UList* pList;
+    TListDbl* pList;
     AudTrack* pTrack;
     AudTrackTmpl* pTmpl;
 
@@ -201,9 +201,9 @@ void Trk_Cycle(void) {
 // that is past state 1 and not streamed, for any other source the last one. Returns NULL when there
 // is none to take.
 AudTrack* Trk_AllocPerf(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f32 fDistAttn) {
-    UPool* const pPool = &gTrkPerfPool;
+    TPool* const pPool = &gTrkPerfPool;
     s32 bSorted;
-    UList* pList;
+    TListDbl* pList;
     AudTrack* pTrack;
 
     bSorted = pSource->pSound->uFlags & AUDSOUND_3D;
@@ -226,7 +226,7 @@ AudTrack* Trk_AllocPerf(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f3
             return NULL;
         }
     }
-    pTrack = UPool_Alloc(pPool);
+    pTrack = (AudTrack*)UPool_Alloc(pPool);
     pTrack->pTmpl = pTmpl;
     pTrack->pSource = pSource;
     pSource->apTracks[nChannel] = pTrack;
@@ -261,8 +261,8 @@ AudTrack* Trk_AllocPerf(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f3
 // template asks (AUDTRACKTMPL_CB_ON_FREE), and gives it back to the pool. NULL is ignored. Always returns
 // 0 (TW07's returns a TPerf*).
 s32 Trk_FreePerf(AudTrack* pTrack) {
-    UPool* pPool;
-    UList* pList;
+    TPool* pPool;
+    TListDbl* pList;
     AudTrackTmpl* pTmpl;
     AudSource* pSource;
 
@@ -288,7 +288,7 @@ s32 Trk_FreePerf(AudTrack* pTrack) {
     pTrack->nState = 0;
     pTrack->pSource = NULL;
     UList_DeleteAt(pList, &pTrack->link);
-    UPool_Free(pPool, pTrack);
+    UPool_Free(pPool, (TListSglLink*)pTrack);
     return 0;
 }
 

@@ -1,63 +1,66 @@
-// audcontainers.h (our name): the small containers the sound engine keeps its voices, tracks and
-// requests in (UAudContainers.c): a doubly linked list, a ring-buffer queue of fixed-size items and
-// a pool of fixed-size blocks. None of them allocates: the caller hands in the memory.
+// audcontainers.h: the sound engine's containers (UAudContainers.c: a doubly linked list, a
+// ring-buffer queue and a pool of fixed-size blocks), its stack allocator (UAudMemStack.c) and its
+// allocator (UAudMem.c).
 
 #ifndef CORE_AUDCONTAINERS_H
 #define CORE_AUDCONTAINERS_H
 
 #include "engine.h"
 
-// A link in a UList. It sits at the start of whatever the list holds.
-typedef struct UListNode {
-    struct UListNode* pPrev;    // 0x0    towards the head, NULL at the head
-    struct UListNode* pNext;    // 0x4    towards the tail, NULL at the tail
-} UListNode;
-LAYOUT_ASSERT(UListNode, 0x8);
+// A link in a TListDbl. It sits at the start of whatever the list holds.
+typedef struct TListDblLink_S {
+    struct TListDblLink_S* pPrev;   // 0x0    towards the head, NULL at the head
+    struct TListDblLink_S* pNext;   // 0x4    towards the tail, NULL at the tail
+} TListDblLink;
+LAYOUT_ASSERT(TListDblLink, 0x8);
 
-typedef struct UList {
-    UListNode* pHead;           // 0x0
-    UListNode* pTail;           // 0x4
-    u16        nSlots;          // 0x8    set by UList_Reset (TW07's nslots), never read here
-    u16        nCount;          // 0xA    links in the list
-} UList;
-LAYOUT_ASSERT(UList, 0xC);
+// A doubly linked list.
+typedef struct TListDbl {
+    TListDblLink* pHead;        // 0x0
+    TListDblLink* pTail;        // 0x4
+    u16           nSlots;       // 0x8    set by UList_Reset, never read
+    u16           nCount;       // 0xA    links in the list
+} TListDbl;
+LAYOUT_ASSERT(TListDbl, 0xC);
 
 // A ring buffer of nMax items of nItemSize bytes each, from pBase to pEnd.
-typedef struct UQueue {
+typedef struct TQueue {
     u8*  pBase;                 // 0x0    the buffer
     u8*  pEnd;                  // 0x4    one past its end
     u8*  pRead;                 // 0x8    the oldest item, taken by UQueue_Pop
     u8*  pWrite;                // 0xC    where UQueue_Push puts the next item
     u16  nMax;                  // 0x10   items the buffer holds
     u16  nCount;                // 0x12   items in the queue
-    s32  nItemSize;             // 0x14
-} UQueue;
-LAYOUT_ASSERT(UQueue, 0x18);
+    u32  nItemSize;             // 0x14
+} TQueue;
+LAYOUT_ASSERT(TQueue, 0x18);
 
-// A free block in a UPool: its first word links to the next free block.
-typedef struct UPoolNode {
-    struct UPoolNode* pNext;    // 0x0
-} UPoolNode;
+// A link in a singly linked list: a free block in a TPool links to the next free block with its
+// first word.
+typedef struct TListSglLink_S {
+    struct TListSglLink_S* pNext;   // 0x0
+} TListSglLink;
+LAYOUT_ASSERT(TListSglLink, 0x4);
 
 // A pool of fixed-size blocks. The free blocks form a chain from head.pNext that ends at the pool
 // itself (&head), not at NULL.
-typedef struct UPool {
-    UPoolNode head;             // 0x0    head.pNext: the first free block
-    u32       nFree;            // 0x4    free blocks
-} UPool;
-LAYOUT_ASSERT(UPool, 0x8);
+typedef struct TPool_S {
+    TListSglLink head;          // 0x0    head.pNext: the first free block
+    u32          nFree;         // 0x4    free blocks
+} TPool;
+LAYOUT_ASSERT(TPool, 0x8);
 
-void       UList_Reset(UList* pList, u16 nSlots);
-void       UList_PushHead(UList* pList, UListNode* pNode);
-void       UList_PushTail(UList* pList, UListNode* pNode);
-void       UList_InsertAt(UList* pList, UListNode* pNode, UListNode* pAt);
-void       UList_DeleteAt(UList* pList, UListNode* pNode);
-void       UQueue_Reset(UQueue* pQueue, void* pBuffer, u16 nMax, s32 nItemSize);
-void*      UQueue_Push(UQueue* pQueue);
-void*      UQueue_Pop(UQueue* pQueue);
-void       UPool_Init(UPool* pPool, void* pMem, u32 nBlocks, u32 nBlockSize);
-void*      UPool_Alloc(UPool* pPool);
-void       UPool_Free(UPool* pPool, void* pBlock);
+void          UList_Reset(TListDbl* plist, u16 nslots);
+void          UList_PushHead(TListDbl* plist, TListDblLink* plink);
+void          UList_PushTail(TListDbl* plist, TListDblLink* plink);
+void          UList_InsertAt(TListDbl* plist, TListDblLink* plink, TListDblLink* pdestlink);
+void          UList_DeleteAt(TListDbl* plist, TListDblLink* plink);
+void          UQueue_Reset(TQueue* pq, void* buff, u16 nslots, u32 itemSize);
+u8*           UQueue_Push(TQueue* pq);
+u8*           UQueue_Pop(TQueue* pq);
+void          UPool_Init(TPool* pPool, void* pBuffer, u32 nEntries, u32 entrySizeBytes);
+TListSglLink* UPool_Alloc(TPool* pPool);
+void          UPool_Free(TPool* pPool, TListSglLink* pNode);
 
 // UAudMemStack.c: a stack allocator. Blocks are cut from the top of one buffer, and each one is
 // recorded in a table so it can be given back by its address.
