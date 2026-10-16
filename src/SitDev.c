@@ -32,13 +32,13 @@ u8 gSitDevPredictionVoiced;     // such a situation's actions played something: 
                                 // other than gSitDevPredictedHitClass. Cleared at every shot set-up
 
 // Round start (GO_vInitIG): clears the commentary scripts' state block (SitDevData: no line played,
-// no events queued), registers the loader for a hole's commentary zones (course chunk 5,
-// SitDev_NetworkLoadCallback) and stops watching any ball (SitDev_ClearBallThatWasHit).
+// no events queued), registers the loader for a hole's commentary-zone networks
+// (SitDev_NetworkLoadCallback) and stops watching any ball (SitDev_ClearBallThatWasHit).
 void SitDev_vInitModule(void) {
     Mem_set(gpSitDevData, 0, sizeof(SitDevData));
     gpSitDevData->pE8 = NULL;
     gpSitDevData->n13C = 0;
-    Network_RegisterLoadNetworkCallback(5, SitDev_NetworkLoadCallback);
+    Network_RegisterLoadNetworkCallback(NETWORK_TYPE_COMMENTARY_ZONE, SitDev_NetworkLoadCallback);
     SitDev_ClearBallThatWasHit();
 }
 

@@ -164,7 +164,7 @@ ScreenClear.c	open
 ShaderRow0.c	open		
 ShaderRow19.c	open		
 SitDev.c	open		
-SitDevCommentaryZones.c	open		
+SitDevCommentaryZones.c	done	503eba0e	claude-review
 SitDevFile.c	open		
 SitDevMisc.c	open		
 SitDevStateVector.c	open		
