@@ -2,8 +2,8 @@
 // its functions in the same order): the sequencer, the tracks that play events (EA's track
 // commands) instead of a stream. A template holds sets of variations of events; each frame the
 // track waits out the next event's delay, then runs it through the handler table Seq_InitModule
-// fills (gSeqCmdHandlers, OnNoOp .. OnRvbWetAttn). A stepped template (n0 & 1) runs only the
-// events it is asked for (Seq_Step). Notes take a voice per channel, stealing one when all are
+// fills (gSeqCmdHandlers, OnNoOp .. OnRvbWetAttn). A stepped template (AUDTRACKTMPL_STEPPED) runs
+// only the events it is asked for (Seq_Step). Notes take a voice per channel, stealing one when all are
 // busy. ResetSequencerPerf and SetVarCmdBounds, inlines in TW07, are functions here; four small
 // helpers sit at its end (Aud_RandomBelow, Ses_IsSessionZero, Ses_GetInstrumentTone,
 // Mas_GetUpdateRateScale). Its extent is its data: OnKeyOn is the first to use its .sdata2 block
@@ -16,7 +16,7 @@ AudSeqHandler gSeqCmdHandlers[13];     // the event handlers by event type (Seq_
 // Picks a sequenced track's next variation the way its template's n1 says: 4 and up the next in
 // order, 2 at random but not the same one twice, 3 at random but not the one the template played
 // last (n9), others at random; the pick wraps below n7. A template with a single variation (n4 0 or
-// 1) always plays 0. A set forced on the template (nA, not 0xFF) becomes the track's set first.
+// 1) always plays 0. A set forced on the template (nVarSet, not 0xFF) becomes the track's set first.
 void AutoSelectVariation(AudTrack* pTrack) {
     AudTrackTmpl* pTmpl;
     u8 nNext;
@@ -26,8 +26,8 @@ void AutoSelectVariation(AudTrack* pTrack) {
         pTrack->u.seq.nVariation = 0;
         return;
     }
-    if (pTmpl->nA != 0xFF) {
-        pTrack->u.seq.nVarSet = pTmpl->nA;
+    if (pTmpl->nVarSet != 0xFF) {
+        pTrack->u.seq.nVarSet = pTmpl->nVarSet;
     }
     if (pTmpl->n1 >= 4) {
         nNext = pTrack->u.seq.nVariation + 1;
@@ -92,23 +92,23 @@ void CheckForStolenLoopers(AudTrack* pTrack) {
 void OnNoOp(AudSeqEvent* pEvent, AudTrack* pTrack) {
 }
 
-// Event 1, the end of a variation. A looping template (n0 & 2) goes on, unless the track is
+// Event 1, the end of a variation. A looping template (AUDTRACKTMPL_LOOPS) goes on, unless the track is
 // stopping: a new variation when it picks them (n1, AutoSelectVariation), from event n3 of it,
-// bNewVariation telling Seq_Tick to fetch the new events, and Emi_TrackCallback with 1 when the
-// template asks (n0 & 0x80). Any other template's track stops (state 3).
+// bNewVariation telling Seq_Tick to fetch the new events, and Emi_TrackCallback (AUD_TRKCB_LOOPED) when the
+// template asks (AUDTRACKTMPL_CB_ON_LOOP). Any other template's track stops (state 3).
 void OnEnd(AudSeqEvent* pEvent, AudTrack* pTrack) {
     AudTrackTmpl* pTmpl;
 
     pTmpl = pTrack->pTmpl;
-    if (pTmpl->n0 & 2) {
+    if (pTmpl->uFlags & AUDTRACKTMPL_LOOPS) {
         if (pTrack->nState != 3) {
             if (pTmpl->n1 != 0) {
                 AutoSelectVariation(pTrack);
             }
             pTrack->u.seq.nNextEvent = pEvent->n3;
             pTrack->bits.b.bNewVariation = 1;
-            if (pTmpl->n0 & 0x80) {
-                Emi_TrackCallback(pTrack->pSource, pTmpl->n6, 1);
+            if (pTmpl->uFlags & AUDTRACKTMPL_CB_ON_LOOP) {
+                Emi_TrackCallback(pTrack->pSource, pTmpl->n6, AUD_TRKCB_LOOPED);
             }
         }
     } else {
@@ -172,7 +172,8 @@ void OnKeyOn(AudSeqEvent* pEvent, AudTrack* pTrack) {
     request.pUser = pTrack;
     request.nIndex = nChannel;
     request.flags.n = 0;
-    request.flags.b.bNoReverb = (pTrack->pSource->pSound->n3 & 4) || (pTrack->pTmpl->n0 & 0x20);
+    request.flags.b.bNoReverb = (pTrack->pSource->pSound->uFlags & AUDSOUND_NO_REVERB)
+                                || (pTrack->pTmpl->uFlags & AUDTRACKTMPL_NO_REVERB);
     request.flags.b.bLoops = bLoops;
     request.nPriority = nVolume;
     request.n2 = 0x40;
@@ -250,7 +251,8 @@ void OnPitchRamp(AudSeqEvent* pEvent, AudTrack* pTrack) {
     }
 }
 
-// Event 6: switches the source's track n3 on (n4 non-zero: its bit in u0) or off (its bit in u1).
+// Event 6: switches the source's track n3 on (n4 non-zero: its bit in uTracksOn) or off (its bit in
+// uTracksOff), for the next Aud_EmiCycle to apply.
 void OnTrackStatus(AudSeqEvent* pEvent, AudTrack* pTrack) {
     AudSource* pSource;
     u8 uBit;
@@ -258,10 +260,10 @@ void OnTrackStatus(AudSeqEvent* pEvent, AudTrack* pTrack) {
     pSource = pTrack->pSource;
     uBit = 1 << (s8)pEvent->n3;
     if ((u8)pEvent->n4 != 0) {
-        pSource->u0 |= uBit;
+        pSource->uTracksOn |= uBit;
         return;
     }
-    pSource->u1 |= uBit;
+    pSource->uTracksOff |= uBit;
 }
 
 // Event 7: gives the source's streamed track n3 play list n4 (Stm_SetPlayList), allocating that
@@ -356,7 +358,7 @@ void Seq_Init(AudTrack* pTrack) {
 }
 
 // Clears a track's sequencer fields: no wait, variation 0 of set 0, the first channel, the first
-// event (0xFF for a stepped template, n0 & 1: it waits for Seq_Step), no step asked for, no notes
+// event (0xFF for a stepped template: it waits for Seq_Step), no step asked for, no notes
 // held.
 void ResetSequencerPerf(AudTrack* pTrack) {
     AudTrackTmpl* pTmpl;
@@ -365,7 +367,7 @@ void ResetSequencerPerf(AudTrack* pTrack) {
     pTrack->nWait = 0;
     pTrack->u.seq.nVariation = 0;
     pTrack->u.seq.nNextChannel = 0;
-    pTrack->u.seq.nNextEvent = (pTmpl->n0 & 1) ? 0xFF : 0;
+    pTrack->u.seq.nNextEvent = (pTmpl->uFlags & AUDTRACKTMPL_STEPPED) ? 0xFF : 0;
     pTrack->u.seq.nStepEvent = 0xFF;
     pTrack->u.seq.nVarSet = 0;
     pTrack->u.seq.n69 = 0;
@@ -377,7 +379,7 @@ void Seq_Exit(AudTrack* pTrack) {
     ResetSequencerPerf(pTrack);
 }
 
-// Starts a sequenced track (Trk_Start): from its first event (none for a stepped template, n0 & 1,
+// Starts a sequenced track (Trk_Start): from its first event (none for a stepped template,
 // which waits for Seq_Step), playing (state 6), with a new variation when the template picks them
 // (n1).
 void Seq_Start(AudTrack* pTrack) {
@@ -385,7 +387,7 @@ void Seq_Start(AudTrack* pTrack) {
 
     pTmpl = pTrack->pTmpl;
     pTrack->nWait = 0;
-    pTrack->u.seq.nNextEvent = (pTmpl->n0 & 1) ? 0xFF : 0;
+    pTrack->u.seq.nNextEvent = (pTmpl->uFlags & AUDTRACKTMPL_STEPPED) ? 0xFF : 0;
     pTrack->nState = 6;
     pTrack->u.seq.n69 = 0;
     if (pTmpl->n1 != 0) {
@@ -399,7 +401,7 @@ void Seq_Stop(AudTrack* pTrack) {
 }
 
 // Ticks a sequenced track once a frame (Trk_Tick). A stopping track (state 3) runs nothing and
-// returns 1, a stopped one returns 0. A stepped template (n0 & 1) runs only the event Seq_Step
+// returns 1, a stopped one returns 0. A stepped template (AUDTRACKTMPL_STEPPED) runs only the event Seq_Step
 // asked for, at once, after picking a new variation when it picks them (n1). Any other waits out
 // each event's delay (nWait counts the frames) and runs the ones that are due; after a looping End
 // event (bNewVariation) it fetches the new variation's events, and past the variation's last event
@@ -414,7 +416,7 @@ u8 Seq_Tick(AudTrack* pTrack) {
     pTmpl = pTrack->pTmpl;
     if (pTrack->nState == 3) return 1;
     if (pTrack->nState == 2) return 0;
-    if (pTmpl->n0 & 1) {
+    if (pTmpl->uFlags & AUDTRACKTMPL_STEPPED) {
         nNext = pTrack->u.seq.nStepEvent;
         if (nNext != 0xFF) {
             if (pTmpl->n1 != 0) {
@@ -476,7 +478,7 @@ void SetVarCmdBounds(AudTrack* pTrack, AudSeqEvent** ppEvent, AudSeqEvent** ppEn
     *ppEnd = pEnd;
 }
 
-// Asks a stepped template's track (n0 & 1) to run event n of its variation next (n below n3); with
+// Asks a stepped template's track to run event n of its variation next (n below n3); with
 // bCheck (TW07's debounce), not when it is on that event already.
 void Seq_Step(AudTrack* pTrack, u8 n, u8 bCheck) {
     AudTrackTmpl* pTmpl;
@@ -498,13 +500,13 @@ void Seq_SetVariationRange(AudTrack* pTrack, u8 n) {
     if (pTmpl->n1 != 0) {
         AutoSelectVariation(pTrack);
         pTrack->nWait = 0;
-        pTrack->u.seq.nNextEvent = (pTmpl->n0 & 1) ? 0xFF : 0;
+        pTrack->u.seq.nNextEvent = (pTmpl->uFlags & AUDTRACKTMPL_STEPPED) ? 0xFF : 0;
         pTrack->u.seq.nStepEvent = 0xFF;
     }
 }
 
 // Prepares a loaded template's events once (Trk_Check): every event's delay is scaled by the update
-// rate (Mas_GetUpdateRateScale), a looping template's (n0 & 2) End events without a delay get 60,
+// rate (Mas_GetUpdateRateScale), a looping template's End events without a delay get 60,
 // and each stream event's stream is looked up in the play list of the play list event before it
 // (the result is not kept).
 void Seq_Check(AudTrackTmpl* pTmpl) {
@@ -526,7 +528,7 @@ void Seq_Check(AudTrackTmpl* pTmpl) {
                 case 6:
                     break;
                 case 1:
-                    if ((pTmpl->n0 & 2) && pEvent->n0 == 0) {
+                    if ((pTmpl->uFlags & AUDTRACKTMPL_LOOPS) && pEvent->n0 == 0) {
                         pEvent->n0 = 60;
                     }
                     break;

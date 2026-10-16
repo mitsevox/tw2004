@@ -201,7 +201,7 @@ The fixes that come up most often. Each points to its full entry below.
 - **[verified] `do {} while (++i < 4)`** for a 4-step loop with no ctr and the test at the bottom (UKernel
   Kernel_PostPairToObject 80.5 -> 100).
 - **[verified] The order of a for-loop's increments sets the order of the `addi`s** (hlaudmovie
-  Ses_ProcessSampleData, AudTable Emi_UpdInstance).
+  Ses_ProcessSampleData, hlaudemitter Emi_UpdInstance).
 - **[verified] Set every loop cursor and end pointer as plain statements at the head of the loop**, in the
   original's order; an end pointer can double as the backward cursor (hlaudvoice Voc_ResetModule 78 -> 100).
 - **[verified] A counted skip loop written counting down** gives CW's ctr loop with no index register

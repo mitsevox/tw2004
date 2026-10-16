@@ -29,7 +29,7 @@ u8 Mic_InitModule(void) {
     return bOk;
 }
 
-// A session's listeners (Ses_Init): stores nListeners, one per view, which AudTable.c's 3D sound
+// A session's listeners (Ses_Init): stores nListeners, one per view, which hlaudemitter.c's 3D sound
 // reads (gMicCount). The session and subsession ids are not read. Always 1.
 u8 Mic_InitSession(u8 nSession, u8 nSubsession, u8 nListeners) {
     gMicCount = nListeners;

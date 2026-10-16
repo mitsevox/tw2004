@@ -1,440 +1,347 @@
-// hlaudemitter.c (our name; EA's file is HLAudEmitterPool.c: TW07's
-// golf/audio/engine/special/HLAudEmitterPool.c has these Aud_Emi functions in the same order, and
-// TW06 lists special/hlaudemitterpool.c too. EA's hl/hlaudemitter.c is our AudTable.c.): the sound
-// engine's emitter instances, the game's handles on playing sounds. A pool of 256 (0x34 bytes
-// each, lbl_801F2740) found by id (Aud_CheckEmitterInstance; 0xFF: none); instances of the same
-// sound can be grouped under an emitter (EA: an alias) and driven together (Aud_EmiAlias*). Most
-// calls check the id, then queue the command in the instance's AudTable.c entry (its pCmd, the
-// same number) or pass it on to AudTable.c's Emi_ function; Aud_EmiCycle hands the queued commands
-// over once a frame. Its extent is its data: it is the first to use the .bss at 0x801F2668 and the
-// .sdata2 block 0x80284008-0x80284018.
+// hlaudemitter.c: the sound engine's sound sources, one playing bank sound per emitter instance,
+// whose tracks it starts, steers and frees. For a sound placed in the world it works out the
+// volume, pan and doppler pitch from the sound's distance to the listeners.
 
 #include "core/audtrack.h"
-#include "golfer.h"
-#include "unsorted/cull.h"
 
-AudInstance* Aud_CheckEmitterInstance(u8 nId);
-void vec4flt_Zero3(f32* pVec);
-void Aud_EmiSet3DPos(u8 nId, f32* pPos, f32* pLast, u8 nView);
-void Voc_Cycle(void);                 // hlaudvoice.c
-void Rvb_Cycle(void);
-void HwVoice_Cycle(void);                 // startUp.c
+AudSource* gEmiSources;
 
-AudInstance lbl_801F2740[256];
-AudEmitters lbl_801F2668;
+static void FreeAllPerfs(AudSource* pSource);
+static f32  Attenuation3D(f32 fDist, f32 fDistScale);
+static void Doppler3D(AudSource* pSource);
+static void Panning3D(AudSource* pSource);
+static f32  Distance3D(AudSource* pSource, f32 (*aPos)[3]);
+static void PreprocessControllers(AudSource* pSource, u32* auParams, u16 uChanged);
 
-// fake match: stands in for a function the original linker stripped. The file's pool starts with
-// 1.0f (0x80284008), before the 0.0f Aud_EmiSet3DPos uses first; its body is unknown.
-static f32 hlaudemitter_StrippedFn(f32 x) {
-    return x + 1.0f;
-}
-
-// Sets up the instances, all on the free list, and empties every emitter. Always 1.
-u8 Aud_EmiInitOnce(void) {
-    AudInstance* pInst;
-    int i;
-
-    pInst = lbl_801F2740;
-    Mem_set(lbl_801F2740, 0, sizeof(lbl_801F2740));
-    for (i = 0; i < 256; i++, pInst++) {
-        pInst->nId = i;
-        pInst->pPrevActive = pInst - 1;
-        pInst->pNextActive = pInst + 1;
-    }
-    lbl_801F2668.pFree = lbl_801F2740;
-    lbl_801F2668.pFree->pPrevActive = NULL;
-    lbl_801F2668.pFreeTail = &lbl_801F2740[255];
-    lbl_801F2668.pFreeTail->pNextActive = NULL;
-    lbl_801F2668.pActive = NULL;
-    lbl_801F2668.pActiveTail = NULL;
-    lbl_801F2668.nActive = 0;
-    for (i = 0; i < 32; i++) {
-        lbl_801F2668.apFirst[i] = NULL;
-        lbl_801F2668.anSound[i] = 0;
-    }
-    lbl_801F2668.uFlags |= 1;
-    return 1;
-}
-
-// Runs Aud_EmiDel on every instance in use, then empties every emitter. Always 1.
-int Aud_EmiInitSession(void) {
-    AudInstance* pInst;
-    AudInstance* pNext;
+// Allocates the sources from the audio memory stack, cleared, each at pitch 1. Nonzero when it
+// worked.
+u8 Emi_InitModule(void) {
+    u8 bOk;
     s32 i;
 
-    for (pInst = lbl_801F2668.pActive; pInst != NULL; pInst = pNext) {
-        pNext = pInst->pNextActive;
-        Aud_EmiDel(pInst->nId);
+    bOk = 0;
+    gEmiSources = AudMem_Alloc(EMI_NUM_SOURCES * sizeof(AudSource));
+    if (gEmiSources != NULL) {
+        Mem_set(gEmiSources, 0, EMI_NUM_SOURCES * sizeof(AudSource));
+        for (i = 0; i < EMI_NUM_SOURCES; i++) {
+            gEmiSources[i].fPitch = 1.0f;
+        }
+        bOk = 1;
     }
-    for (i = 0; i < 32; i++) {
-        lbl_801F2668.apFirst[i] = NULL;
-        lbl_801F2668.anSound[i] = 0;
-    }
+    return bOk;
+}
+
+// The sources' part of starting a sound session (Ses_Init): nothing to do, always succeeds (1).
+u8 Emi_InitSession(void) {
     return 1;
 }
 
-// The emitters' part of ending a sound session (Aud_ExitSession): nothing to do.
-void Aud_EmiExitSession(void) {
+// The sources' part of ending a sound session (Ses_Exit): nothing to do.
+void Emi_ExitSession(void) {
 }
 
-// Once a frame (Gaud_Cycle): hands every instance's queued commands (tracks on / off, controller
-// values, position) to its AudTable.c entry through Emi_UpdInstance and clears them (an instance
-// with n24 1 sends its position again every frame), then ticks the tracks (Trk_Cycle) and voices
-// (Voc_Cycle) and counts the frame (lbl_80282018).
-void Aud_EmiCycle(void) {
-    AudInstance* pInst;
+// Aud_EmiAdd's half: clears source nEntry (the instance's own number) and binds it to bank sound
+// nSound. Returns the source, in which the instance then queues its commands. The commands passed
+// with it (uTracksOn to uChanged) are not read; Aud_EmiAdd passes zeros.
+AudSource* Emi_AddInstance(u8 nEntry, s16 nSound, u8 uTracksOn, u8 uTracksOff, u32* auParams,
+                           f32 (*aPos)[3], u16 uChanged) {
+    AudSound* pSound;
+    AudSource* pSource;
 
-    for (pInst = lbl_801F2668.pActive; pInst != NULL; pInst = pInst->pNextActive) {
-        Emi_UpdInstance(pInst->nId, pInst->pCmd->u0, pInst->pCmd->u1, pInst->pCmd->auParams,
-                    pInst->pCmd->aPos, pInst->pCmd->uChanged);
-        pInst->pCmd->u0 = 0;
-        pInst->pCmd->u1 = 0;
-        pInst->pCmd->uChanged = 0;
-        if (pInst->n24 == 1) {
-            Aud_EmiSet3DPos(pInst->nId, pInst->vPos, NULL, 0);
+    pSound = Ses_GetEmitterTemplateFromID(nSound);
+    pSource = &gEmiSources[nEntry];
+    Mem_set(pSource, 0, sizeof(AudSource));
+    pSource->nSound = nSound;
+    pSource->pSound = pSound;
+    return pSource;
+}
+
+// Applies source nEntry's commands of this frame (Aud_EmiCycle): uTracksOn / uTracksOff are the
+// tracks switched on / off (a bit each), auParams each track's controller value and uChanged which
+// of them were queued (a bit per track's controller, and the AUDSOURCE_CHANGED_ bits). A placed
+// sound (AUDSOUND_3D) gets its distance, pan and doppler pitch, and each track a volume by distance
+// (Attenuation3D); one farther away than its sound's fMaxDist is out of earshot and all its tracks
+// are freed. Every track then starts, stops or carries on (Trk_UpdatePerf).
+void Emi_UpdInstance(u8 nEntry, u8 uTracksOn, u8 uTracksOff, u32* auParams, f32 (*aPos)[3],
+                     u16 uChanged) {
+    AudSource* pSource;
+    f32 fDist;
+    u8 bHeard;
+    AudTrack** ppTrack;
+    AudTrackTmpl* pTmpl;
+    f32 fDistAttn;
+    u8 nTracks;
+    u8 i;
+    u8 uBit;
+    AudTrack* pTrack;
+    u8 bOn;
+    u8 bOff;
+
+    pSource = &gEmiSources[nEntry];
+    if (uChanged & AUDSOURCE_CHANGED_PARAMS_0_2) {
+        PreprocessControllers(pSource, auParams, uChanged);
+    }
+    if (pSource->pSound->uFlags & AUDSOUND_3D) {
+        fDist = Distance3D(pSource, aPos);
+        bHeard = fDist - pSource->pSound->fMaxDist < 0.0f;
+        if (bHeard) {
+            pSource->fDist = fDist;
+            Panning3D(pSource);
+            Doppler3D(pSource);
         }
-    }
-    Trk_Cycle();
-    Voc_Cycle();
-    Rvb_Cycle();
-    HwVoice_Cycle();
-    lbl_80282018++;
-}
-
-// Takes a free instance for sound nSound: onto the tail of the active list and, when nEmitter is
-// not negative, the tail of that emitter's list (its first instance sets the emitter's sound). Its
-// source's commands are cleared and handed on once. Returns its id, or 0xFF when all 256 are in use.
-u8 Aud_EmiAdd(s16 nSound, s16 nEmitter, int n24, int n28, void (*pfnCallback)(u8 nId, u8 nBit, s32 n)) {
-    AudInstance* pInst;
-    AudInstance* p;
-
-    if (lbl_801F2668.nActive >= 256) {
-        return 0xFF;
-    }
-    pInst = lbl_801F2668.pFree;
-    lbl_801F2668.pFree = pInst->pNextActive;
-    if (lbl_801F2668.pFree != NULL) {
-        lbl_801F2668.pFree->pPrevActive = NULL;
     } else {
-        lbl_801F2668.pFreeTail = NULL;
+        bHeard = 1;
     }
-    // port: EA passes five more arguments than Emi_AddInstance takes
-    pInst->pCmd = ((AudSource* (*)(u8, s16, int, int, int, int, int))Emi_AddInstance)(pInst->nId, nSound,
-                                                                                      0, 0, 0, 0, 0);
-    pInst->pCmd->u0 = 0;
-    pInst->pCmd->u1 = 0;
-    pInst->pCmd->uChanged = 0;
-    pInst->u22 = 0;
-    pInst->unk23 = 0;
-    pInst->n24 = n24;
-    pInst->n28 = n28;
-    pInst->pfnCallback = pfnCallback;
-    vec4flt_Zero3(pInst->vPos);
-    pInst->pPrevActive = lbl_801F2668.pActiveTail;
-    pInst->pNextActive = NULL;
-    if (pInst->pPrevActive != NULL) {
-        pInst->pPrevActive->pNextActive = pInst;
+    if (bHeard) {
+        ppTrack = pSource->apTracks;
+        fDistAttn = 1.0f;
+        nTracks = pSource->pSound->nTracks;
+        pTmpl = pSource->pSound->aTracks;
+        for (i = 0, uBit = 1; i < nTracks; uBit <<= 1, i++, pTmpl++, ppTrack++) {
+            pTrack = *ppTrack;
+            bOn = (uTracksOn & uBit) != 0;
+            bOff = (uTracksOff & uBit) != 0;
+            if (pSource->pSound->uFlags & AUDSOUND_3D) {
+                fDistAttn = Attenuation3D(fDist, pTmpl->fDistScale);
+            }
+            Trk_UpdatePerf(pSource, pTrack, pTmpl, i, bOn, bOff, fDistAttn);
+        }
+        return;
+    }
+    FreeAllPerfs(pSource);
+}
+
+// Frees every track of a source (Trk_FreePerf; a track it does not have is skipped).
+static void FreeAllPerfs(AudSource* pSource) {
+    u8 i;
+
+    for (i = 0; i < pSource->pSound->nTracks; i++) {
+        Trk_FreePerf(pSource->apTracks[i]);
+    }
+}
+
+// A placed track's volume (0 to 1) at distance fDist, scaled first by its template's fDistScale:
+// full up to 2, falling in a straight line to a quarter at 5 and on to silence at 10.
+static f32 Attenuation3D(f32 fDist, f32 fDistScale) {
+    f32 fScaled;
+    f32 fDistAttn;
+
+    fScaled = audfrac_Mul(fDist, fDistScale);
+    if (fScaled > 5.0f) {
+        fDistAttn = 0.25f - audfrac_Mul(fScaled - 5.0f, 3276.0f / 65536.0f);
+        if (fDistAttn < 0.0f) {
+            fDistAttn = 0.0f;
+        }
     } else {
-        lbl_801F2668.pActive = pInst;
+        fDistAttn = 1.0f;
+        if (fScaled > 2.0f) {
+            fDistAttn -= audfrac_Mul(fScaled - 2.0f, 0.25f);
+        }
     }
-    lbl_801F2668.pActiveTail = pInst;
-    lbl_801F2668.nActive++;
-    if (nEmitter >= 0) {
-        p = lbl_801F2668.apFirst[nEmitter];
-        if (p == NULL) {
-            lbl_801F2668.apFirst[nEmitter] = pInst;
-            lbl_801F2668.anSound[nEmitter] = nSound;
-        } else {
-            for (; p != NULL; p = p->pNext) {
-                if (p->pNext == NULL) {
-                    p->pNext = pInst;
-                    break;
-                }
+    return fDistAttn;
+}
+
+// The doppler pitch of a placed sound (1 with AUDSOUND_NO_DOPPLER; its test for a sound not placed
+// never passes, as only placed sounds get here): 345 / (345 - fSpeed), 345 being the speed of
+// sound and fSpeed 32 times how much nearer than fDist the nearest listener now is (at most 1).
+// Then keeps that nearest distance in fDist.
+static void Doppler3D(AudSource* pSource) {
+    f32 fDist;
+    u8 uFlags;
+    f32 fSpeed;
+    f32 fPitch;
+
+    fDist = pSource->afDist[0];
+    uFlags = pSource->pSound->uFlags;
+    if ((uFlags & AUDSOUND_NO_DOPPLER) || !(uFlags & AUDSOUND_3D)) {
+        fPitch = 1.0f;
+    } else {
+        if (gMicCount >= 2 && pSource->afDist[1] < pSource->afDist[0]) {
+            fDist = pSource->afDist[1];
+        }
+        fSpeed = 32.0f * (pSource->fDist - fDist);
+        if (fSpeed > 1.0f) {
+            fSpeed = 1.0f;
+        }
+        fPitch = 345.0f / (345.0f - fSpeed);
+    }
+    pSource->fPitch = fPitch;
+    pSource->fDist = fDist;
+}
+
+// The pan of a placed sound from where the one listener hears it: fPan -1 left to 1 right from
+// its x, fPanDepth -1 to 1 from its z, each over its distance. With two listeners (split screen)
+// it is centred (0, 1); its test for a sound not placed never passes, as only placed sounds get
+// here.
+static void Panning3D(AudSource* pSource) {
+    f32 fInv;
+    f32 fPan;
+    f32 fDepth;
+
+    if (gMicCount < 2 && (pSource->pSound->uFlags & AUDSOUND_3D)) {
+        fInv = pSource->afDist[0] > 0.0f ? 1.0f / pSource->afDist[0] : 0.0f;
+        fPan = audfrac_Mul(-pSource->aPos[0][0], fInv);
+        fDepth = audfrac_Mul(pSource->aPos[0][2], fInv);
+        fPan = fPan < -1.0f ? -1.0f : fPan > 1.0f ? 1.0f : fPan;
+        fDepth = fDepth < -1.0f ? -1.0f : fDepth > 1.0f ? 1.0f : fDepth;
+        pSource->fPan = fPan;
+        pSource->fPanDepth = fDepth;
+        return;
+    }
+    pSource->fPan = 0.0f;
+    pSource->fPanDepth = 1.0f;
+}
+
+// Measures the sound's distance from each listener into afDist; returns the nearest (32768 with
+// no listener). aPos is not read: the distances come from pSource->aPos, the array Aud_EmiCycle
+// passes in it.
+static f32 Distance3D(AudSource* pSource, f32 (*aPos)[3]) {
+    f32 fNearest;
+    u8 i;
+    f32 fDist;
+
+    fNearest = 32768.0f;
+    for (i = 0; i < gMicCount; i++) {
+        fDist = audvec3_ApproxLength(pSource->aPos[i]);
+        pSource->afDist[i] = fDist;
+        if (fNearest > fDist) {
+            fNearest = fDist;
+        }
+    }
+    return fNearest;
+}
+
+// For each track whose bit is set in uChanged: takes a track from the pool for it if it has none
+// (and stops there if the pool has none to give), and for a streamed track sets the play list and
+// stream its controller value auParams[i] holds: the stream in the low 16 bits, the play list
+// above it and the play mode in the top byte.
+static void PreprocessControllers(AudSource* pSource, u32* auParams, u16 uChanged) {
+    AudTrack* pTrack;
+    u32 uParam;
+    u8 i;
+    u16 uBit;
+
+    for (uBit = 1, i = 0; i < AUDSOURCE_NUM_TRACKS; i++, uBit <<= 1) {
+        if (uChanged & uBit) {
+            pTrack = pSource->apTracks[i];
+            if (pTrack == NULL) {
+                pTrack = Trk_AllocPerf(pSource, &pSource->pSound->aTracks[i], i, 1.0f);
+                if (pTrack == NULL) return;
+            }
+            if (pTrack->pTmpl->uFlags & AUDTRACKTMPL_STREAMED) {
+                uParam = auParams[i];
+                Stm_SetPlayList(pTrack, uParam >> 16);
+                Stm_SetStream(pTrack, uParam & 0xFFFF, (s32)uParam >> 24);
             }
         }
     }
-    pInst->nEmitter = nEmitter;
-    pInst->pNext = NULL;
-    Mem_set(pInst->pCmd->auParams, 0, sizeof(pInst->pCmd->auParams));
-    Mem_set(pInst->pCmd->aPos, 0, sizeof(pInst->pCmd->aPos));
-    Emi_UpdInstance(pInst->nId, 0, 0, pInst->pCmd->auParams, pInst->pCmd->aPos, 0);
-    return pInst->nId;
 }
 
-// Frees instance nId: out of the active list onto the head of the free list, and out of its
-// emitter's list (the emitter's sound is cleared with its last instance).
-void Aud_EmiDel(u8 nId) {
-    AudInstance* pInst = &lbl_801F2740[nId];
-    AudInstance* p;
-    AudInstance* pPrev;
+// Frees source nEntry's tracks and unbinds it from its sound.
+void Emi_DelInstance(u8 nEntry) {
+    AudSource* pSource;
 
-    if (nId != 0xFF && (lbl_801F2668.uFlags & 1)) {
-        Emi_DelInstance(nId);
-        if (pInst == lbl_801F2668.pActiveTail) {
-            if (pInst->pPrevActive != NULL) {
-                lbl_801F2668.pActiveTail = pInst->pPrevActive;
-                pInst->pPrevActive->pNextActive = NULL;
-            } else {
-                lbl_801F2668.pActive = NULL;
-                lbl_801F2668.pActiveTail = NULL;
-            }
-        } else if (pInst == lbl_801F2668.pActive) {
-            if (pInst->pNextActive != NULL) {
-                lbl_801F2668.pActive = pInst->pNextActive;
-                pInst->pNextActive->pPrevActive = NULL;
-            } else {
-                lbl_801F2668.pActive = NULL;
-                lbl_801F2668.pActiveTail = NULL;
-            }
-        } else {
-            pInst->pPrevActive->pNextActive = pInst->pNextActive;
-            pInst->pNextActive->pPrevActive = pInst->pPrevActive;
-        }
-        if (lbl_801F2668.pFree != NULL) {
-            lbl_801F2668.pFree->pPrevActive = pInst;
-        } else {
-            lbl_801F2668.pFreeTail = pInst;
-        }
-        pInst->pNextActive = lbl_801F2668.pFree;
-        pInst->pPrevActive = NULL;
-        lbl_801F2668.pFree = pInst;
-        lbl_801F2668.nActive--;
-        if (pInst->nEmitter >= 0) {
-            pPrev = NULL;
-            for (p = lbl_801F2668.apFirst[pInst->nEmitter]; p != NULL; p = p->pNext) {
-                if (p == pInst) {
-                    if (pPrev != NULL) {
-                        pPrev->pNext = pInst->pNext;
-                    } else {
-                        lbl_801F2668.apFirst[pInst->nEmitter] = pInst->pNext;
-                    }
-                    break;
-                }
-                pPrev = p;
-            }
-            if (lbl_801F2668.apFirst[pInst->nEmitter] == NULL) {
-                lbl_801F2668.anSound[pInst->nEmitter] = 0;
-            }
-        }
-        pInst->nEmitter = -1;
-        pInst->pNext = NULL;
+    pSource = &gEmiSources[nEntry];
+    FreeAllPerfs(pSource);
+    pSource->pSound = NULL;
+    pSource->nSound = 0;
+}
+
+// Sets the variation of source nEntry's track nTrack, taking a track from the pool for it if it
+// has none.
+void Emi_SetTrackVariation(u8 nEntry, u8 nTrack, u8 nVariation) {
+    AudSource* pSource;
+    AudTrackTmpl* pTmpl;
+    AudTrack* pTrack;
+
+    pSource = &gEmiSources[nEntry];
+    pTmpl = &pSource->pSound->aTracks[nTrack];
+    pTrack = pSource->apTracks[nTrack];
+    if (pTrack == NULL) {
+        pTrack = Trk_AllocPerf(pSource, pTmpl, nTrack, 1.0f);
+        if (pTrack == NULL) return;
+    }
+    Trk_SelectVariation(pTrack, nVariation);
+}
+
+// Switches source nEntry's track nTrack to set nVarSet of its variations, taking a track from the
+// pool for it if it has none.
+void Emi_SetTrackVarRange(u8 nEntry, u8 nTrack, u8 nVarSet) {
+    AudSource* pSource;
+    AudTrack* pTrack;
+
+    pSource = &gEmiSources[nEntry];
+    pTrack = pSource->apTracks[nTrack];
+    if (pTrack == NULL) {
+        pTrack = Trk_AllocPerf(pSource, &pSource->pSound->aTracks[nTrack], nTrack, 1.0f);
+        if (pTrack == NULL) return;
+    }
+    Trk_SetVariationRange(pTrack, nVarSet);
+}
+
+// Forces set nVarSet of its variations on track nTrack of sound nSound: on every source that plays
+// the sound, that track switches to the set when it next picks a variation (0xFF: no set forced).
+void Emi_SetTrackVarRangeTmpl(s16 nSound, u8 nTrack, u8 nVarSet) {
+    Ses_GetEmitterTemplateFromID(nSound)->aTracks[nTrack].nVarSet = nVarSet;
+}
+
+// Asks source nEntry's track nTrack to run event nEvent of its variation next (with bCheck, not
+// when that is already its next event), taking a track from the pool for it if it has none.
+void Emi_SetTrackStep(u8 nEntry, u8 nTrack, u8 nEvent, int bCheck) {
+    AudSource* pSource;
+    AudTrack* pTrack;
+
+    pSource = &gEmiSources[nEntry];
+    pTrack = pSource->apTracks[nTrack];
+    if (pTrack == NULL) {
+        pTrack = Trk_AllocPerf(pSource, &pSource->pSound->aTracks[nTrack], nTrack, 1.0f);
+        if (pTrack == NULL) return;
+    }
+    Trk_Step(pTrack, nEvent, bCheck);
+}
+
+// Sets the volume of source nEntry's track nTrack, taking a track from the pool
+// for it if it has none.
+void Emi_SetTrackAttenuation(u8 nEntry, u8 nTrack, f32 fVolume) {
+    AudSource* pSource;
+    AudTrack* pTrack;
+
+    pSource = &gEmiSources[nEntry];
+    pTrack = pSource->apTracks[nTrack];
+    if (pTrack == NULL) {
+        pTrack = Trk_AllocPerf(pSource, &pSource->pSound->aTracks[nTrack], nTrack, 1.0f);
+        if (pTrack == NULL) return;
+    }
+    pTrack->fVolume = fVolume;
+}
+
+// Sets the pitch factor of source nEntry's track nTrack, taking a track from the
+// pool for it if it has none.
+void Emi_SetTrackPitchFactor(u8 nEntry, u8 nTrack, f32 fPitch) {
+    AudSource* pSource;
+    AudTrack* pTrack;
+
+    pSource = &gEmiSources[nEntry];
+    pTrack = pSource->apTracks[nTrack];
+    if (pTrack == NULL) {
+        pTrack = Trk_AllocPerf(pSource, &pSource->pSound->aTracks[nTrack], nTrack, 1.0f);
+        if (pTrack == NULL) return;
+    }
+    pTrack->fPitch = fPitch;
+}
+
+// Prepares each track template of a sound just loaded from a bank (Trk_Check: a sequenced one's
+// events). nSound, the sound's number in the bank, is not used.
+void Emi_CheckTemplate(AudSound* pSound, u16 nSound) {
+    u8 i;
+
+    for (i = 0; i < pSound->nTracks; i++) {
+        Trk_Check(&pSound->aTracks[i]);
     }
 }
 
-// Whether track nTrack of instance nId is playing: switched on by Aud_EmiSetTrackStatus /
-// Aud_EmiSetAllTrackStatus and not yet reported back through Aud_EmiTrkCB. 0 for no instance (id
-// 0xFF).
-u8 Aud_EmiGetTrackStatus(u8 nId, u8 nTrack) {
-    AudInstance* pInst = Aud_CheckEmitterInstance(nId);
-    if (pInst == NULL) {
-        return 0;
-    }
-    return (pInst->u22 & (1 << nTrack)) != 0;
-}
-
-// The instance with an id; id 0xFF is none.
-AudInstance* Aud_CheckEmitterInstance(u8 nId) {
-    AudInstance* pInst = &lbl_801F2740[nId];
-    if (nId == 0xFF) {
-        return NULL;
-    }
-    return pInst;
-}
-
-// Switches track nTrack of instance nId on (bOn 1; also marks it playing for Aud_EmiGetTrackStatus)
-// or off. Only queued in its entry: the sound engine gets it at the next Aud_EmiCycle.
-void Aud_EmiSetTrackStatus(u8 nId, u8 nTrack, u8 bOn) {
-    AudInstance* pInst = Aud_CheckEmitterInstance(nId);
-    u8 uBit = 1 << nTrack;
-    if (pInst != NULL) {
-        if (bOn == 1) {
-            pInst->pCmd->u0 |= uBit;
-            pInst->u22 |= uBit;
-        } else {
-            pInst->pCmd->u1 |= uBit;
-        }
-        pInst->pCmd->uChanged |= 0x200;
-    }
-}
-
-// Switches the tracks of instance nId whose bits are set in n on and all the others off (a bit per
-// track), and marks the same bits playing for Aud_EmiGetTrackStatus. Sent at the next Aud_EmiCycle.
-void Aud_EmiSetAllTrackStatus(u8 nId, int n) {
-    AudInstance* pInst = Aud_CheckEmitterInstance(nId);
-    if (pInst != NULL) {
-        pInst->pCmd->u0 = n;
-        pInst->pCmd->u1 = ~n;
-        pInst->pCmd->uChanged |= 0x200;
-        pInst->u22 = n;
-    }
-}
-
-// Sets controller nTrack of instance nId to uParams: one 32-bit value per track (for a streamed
-// track its stream, play list and play mode: AudTable.c's PreprocessControllers) and marks it
-// changed. Sent at the next Aud_EmiCycle.
-void Aud_EmiSetControllerInt(u8 nId, u8 nTrack, u32 uParams) {
-    AudInstance* pInst = Aud_CheckEmitterInstance(nId);
-    if (pInst != NULL) {
-        pInst->pCmd->auParams[nTrack] = uParams;
-        pInst->pCmd->uChanged |= (u8)(1 << nTrack);
-    }
-}
-
-// Moves instance nId to pPos (NULL: where it is), its old position into pLast (when not NULL),
-// and works out where each view in use hears it: with n28 0 in the view's camera space, else as
-// it is for view nView and far above (0, 10000, 0) for the other.
-// EA bug: with pPos NULL and no view in use, pPos is still NULL at the last Vec3Copy.
-void Aud_EmiSet3DPos(u8 nId, f32* pPos, f32* pLast, u8 nView) {
-    int i;
-    AudInstance* pInst;
-    CamLens* pLens;
-    f32* pRel;
-    Vec4 vRel;
-
-    pInst = Aud_CheckEmitterInstance(nId);
-    if (pInst != NULL) {
-        for (i = 0; i < 2; i++) {
-            if ((gSession.nGameType == 3 || ViewController_IsActive(i)) && ViewController_GetRenderContext(i)
-                != NULL) {
-                pLens = ((Camera*)ViewController_GetRenderContext(i))->unk10;
-                if (pPos == NULL) {
-                    pPos = pInst->vPos;
-                }
-                if (pInst->n28 == 0) {
-                    LLMath_mat44fltMultiply(pLens->m44, (Vec4*)pPos, &vRel);
-                    pRel = &vRel.x;
-                } else if (i == nView) {
-                    pRel = pPos;
-                } else {
-                    pRel = &vRel.x;
-                    vRel.x = 0.0f;
-                    vRel.y = 10000.0f;
-                    vRel.z = 0.0f;
-                }
-                pInst->pCmd->aPos[i][0] = pRel[0];
-                pInst->pCmd->aPos[i][1] = pRel[1];
-                pInst->pCmd->aPos[i][2] = pRel[2];
-            }
-        }
-        if (pLast != NULL) {
-            Vec3Copy(pInst->vPos, pLast);
-        }
-        Vec3Copy(pPos, pInst->vPos);
-        pInst->pCmd->uChanged |= 0x400;
-    }
-}
-
-// The calls below pass on to AudTable.c's entry nId (the same number as the instance);
-// Aud_EmiSetTrackVarRangeTmpl passes a sound number instead (its definition, shared by all its instances).
-void Aud_EmiSetTrackVariation(u8 nId, u8 nTrack, u8 n) {
-    if (Aud_CheckEmitterInstance(nId) != NULL) {
-        Emi_SetTrackVariation(nId, nTrack, n);
-    }
-}
-
-// Picks variation range n for track nTrack of emitter instance nId (Emi_SetTrackVarRange, which
-// starts the track if needed), if the instance is alive.
-void Aud_EmiSetTrackVarRange(u8 nId, u8 nTrack, u8 n) {
-    if (Aud_CheckEmitterInstance(nId) != NULL) {
-        Emi_SetTrackVarRange(nId, nTrack, n);
-    }
-}
-
-// Sets variation range n for track nTrack of sound nSound's definition (Emi_SetTrackVarRangeTmpl),
-// so every instance playing that sound uses it. No instance check: nSound is a sound, not an
-// instance.
-void Aud_EmiSetTrackVarRangeTmpl(s16 nSound, u8 nTrack, u8 n) {
-    Emi_SetTrackVarRangeTmpl(nSound, nTrack, n);
-}
-
-// Asks track nTrack of emitter instance nId to play step n next (with bCheck, not when n is already
-// the current step; Emi_SetTrackStep), if the instance is alive.
-void Aud_EmiSetTrackStep(u8 nId, u8 nTrack, u8 n, int bCheck) {
-    if (Aud_CheckEmitterInstance(nId) != NULL) {
-        Emi_SetTrackStep(nId, nTrack, n, bCheck);
-    }
-}
-
-// Sets the volume of track nTrack of emitter instance nId, if the instance is alive.
-void Aud_EmiSetTrackAttenuation(u8 nId, u8 nTrack, f32 fVolume) {
-    if (Aud_CheckEmitterInstance(nId) != NULL) {
-        Emi_SetTrackAttenuation(nId, nTrack, fVolume);
-    }
-}
-
-// Sets the pitch factor (AudTrack.fPitch; tracks start at 1.0) of track nTrack of emitter instance
-// nId (Emi_SetTrackPitchFactor), if the instance is alive.
-void Aud_EmiSetTrackPitchFactor(u8 nId, u8 nTrack, f32 fPitch) {
-    if (Aud_CheckEmitterInstance(nId) != NULL) {
-        Emi_SetTrackPitchFactor(nId, nTrack, fPitch);
-    }
-}
-
-// The calls below do the same for every instance of an emitter.
-void Aud_EmiAliasSetTrackStatus(s16 nEmitter, u8 nTrack, u8 bOn) {
-    AudInstance* pInst;
-    for (pInst = lbl_801F2668.apFirst[nEmitter]; pInst != NULL; pInst = pInst->pNext) {
-        Aud_EmiSetTrackStatus(pInst->nId, nTrack, bOn);
-    }
-}
-
-// Aud_EmiSet3DPos for every instance of emitter nEmitter: they all move to pPos.
-void Aud_EmiAliasSet3DPos(s16 nEmitter, f32* pPos, f32* pLast, u8 nView) {
-    AudInstance* pInst;
-    for (pInst = lbl_801F2668.apFirst[nEmitter]; pInst != NULL; pInst = pInst->pNext) {
-        Aud_EmiSet3DPos(pInst->nId, pPos, pLast, nView);
-    }
-}
-
-// The emitter's own sound first (Aud_EmiSetTrackVarRangeTmpl), when it has instances.
-void Aud_EmiAliasSetTrackVarRange(s16 nEmitter, u8 nTrack, u8 n) {
-    AudInstance* pInst = lbl_801F2668.apFirst[nEmitter];
-    if (pInst != NULL) {
-        Aud_EmiSetTrackVarRangeTmpl(lbl_801F2668.anSound[nEmitter], nTrack, n);
-    }
-    for (; pInst != NULL; pInst = pInst->pNext) {
-        Aud_EmiSetTrackVarRange(pInst->nId, nTrack, n);
-    }
-}
-
-// Aud_EmiSetTrackStep for every instance of emitter nEmitter.
-void Aud_EmiAliasSetTrackStep(s16 nEmitter, u8 nTrack, u8 n, int bCheck) {
-    AudInstance* pInst;
-    for (pInst = lbl_801F2668.apFirst[nEmitter]; pInst != NULL; pInst = pInst->pNext) {
-        Aud_EmiSetTrackStep(pInst->nId, nTrack, n, bCheck);
-    }
-}
-
-// Aud_EmiSetTrackAttenuation for every instance of emitter nEmitter: track nTrack's volume.
-void Aud_EmiAliasSetTrackAttenuation(s16 nEmitter, u8 nTrack, f32 fVolume) {
-    AudInstance* pInst;
-    for (pInst = lbl_801F2668.apFirst[nEmitter]; pInst != NULL; pInst = pInst->pNext) {
-        Aud_EmiSetTrackAttenuation(pInst->nId, nTrack, fVolume);
-    }
-}
-
-// A track of instance nId reports back (AudTable.c's Emi_TrackCallback): n 0 when the track was
-// freed (Trk_FreePerf), 1 from a sequencer event (OnEnd). Marks track nBit not playing
-// (Aud_EmiGetTrackStatus) and passes the report on to the instance's callback (Aud_EmiAdd's
-// pfnCallback), when it has one.
-void Aud_EmiTrkCB(u8 nId, u8 nBit, s32 n) {
-    AudInstance* pInst;
-    void (*pfnCallback)(u8 nId, u8 nBit, s32 n);
-
-    pInst = Aud_CheckEmitterInstance(nId);
-    if (pInst != NULL) {
-        pInst->u22 &= (u8)~(1 << nBit);
-        pfnCallback = pInst->pfnCallback;
-        if (pfnCallback != NULL) {
-            pfnCallback(nId, nBit, n);
-        }
-    }
-}
-
-// Sets a four-float vector to (0, 0, 0, 1).
-void vec4flt_Zero3(f32* pVec) {
-    pVec[2] = 0.0f;
-    pVec[1] = 0.0f;
-    pVec[0] = 0.0f;
-    pVec[3] = 1.0f;
+// Passes a track's report on to the emitter instance of this source (the same number) through
+// Aud_EmiTrkCB: nReason AUD_TRKCB_FREED or AUD_TRKCB_LOOPED.
+void Emi_TrackCallback(AudSource* pSource, u8 nTrack, s32 nReason) {
+    Aud_EmiTrkCB((u8)(pSource - gEmiSources), nTrack, nReason);
 }
