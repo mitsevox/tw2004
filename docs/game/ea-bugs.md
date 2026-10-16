@@ -97,6 +97,7 @@ The code allows it, but whether it ever happens depends on the game's data or on
 | LLVideo.c LLVideo_PreloadQueue / ReadNextFile / QueueAdd | ignores the stream's end (a movie under 16 chunks loops forever); apChunk[32] vs nMore up to 255; no full-queue check (1024) | the movie data |
 | GoLightFogEnv.c LF_vSetLightingEnvironment | lights 0-2 step over the directional description, but light 3 always takes the fourth description, even when that is the directional one | whether any hole puts its directional light in slot 3 of TGD_LightingData |
 | TibExt.c TibExtMemAlloc / TibExtMemFree | the shared file library (ChecksumCRC32.c, TagFile.c, SharedFileIO.c) calls them with an allocator pointer, and TibExtMemAlloc also with its __FILE__ and __LINE__ (5 arguments); TibExt.c defines them with a u32 heap id, TibExtMemAlloc with 3 arguments, as EASB.c and EASBStorage.c call them. On the GameCube the extra arguments are ignored and the pointer and the u32 travel in the same register, so nothing goes wrong | nothing in play; a build with another calling convention or 64-bit pointers (Common/TibExtMem.h is the library's side) |
+| URes.c Resources_GetDataInBuffer | with no chunk of that tag and id it returns a pointer past the buffer, not NULL (Resources_GetChunkInBuffer returns NULL); UKernel.c Kernel_DownloadActors reads the 'tACT' chunk through it untested | whether every 'Cact' object in the course files has its 'tACT' chunk |
 
 Checked and not bugs
 --------------------

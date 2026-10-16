@@ -910,7 +910,7 @@ config.libs = [
             Object(Matching, "StaticMemory.c"),
             Object(Matching, "UMemPool.c"),
             Object(Matching, "urandom.c"),
-            Object(Matching, "ObjList.c"),
+            Object(Matching, "URes.c"),
             Object(Matching, "LoadData.c"),
             Object(Matching, "TerrainData.c"),
             Object(Matching, "UStream.c"),

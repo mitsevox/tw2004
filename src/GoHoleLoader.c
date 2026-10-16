@@ -26,12 +26,12 @@ void HoleLoader_vLoadQueuedHole(void) {
     if (gpHoleLoader->bHoleQueued != 0) {
         HoleLoader_PreHoleInit();
         fn_800106A0(1);
-        fn_8000B4B0(1);
+        Resources_vSetCurrentResourceClass(RESOURCES_CLASS_HOLE);
         StreamManagerHole_RegisterStreamClients();
         StreamManagerHole_StreamFiles();
         StreamManagerHole_UnregisterStreamClients();
         fn_800106A0(0);
-        fn_8000B4B0(0);
+        Resources_vSetCurrentResourceClass(RESOURCES_CLASS_DEFAULT);
         gpHoleLoader->bHoleLoaded = 1;
         HoleLoader_PostHoleInit();
         gpHoleLoader->bHoleQueued = 0;
@@ -89,7 +89,7 @@ void HoleLoader_CloseCurrentHole(void) {
         }
         Kernel_RemoveAllObjects();
         fn_80010608(1);
-        fn_8000B68C(1);
+        Resources_DelAllClassResources(RESOURCES_CLASS_HOLE);
         gpHoleLoader->bHoleLoaded = 0;
     }
 }

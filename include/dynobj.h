@@ -13,7 +13,7 @@
 typedef int (*DynObjHandler)(int nMsg, struct DynObj* pObj, void* pArg, void* pArg2);
 
 // An object's definition in the course data: its 'tACT' chunk from the chunk's id on
-// (Kernel_DownloadActors; TagRecord).
+// (Kernel_DownloadActors; TChunkR).
 typedef struct DynObjDef {
     s32  n0;                    // 0x00  the chunk's id -> DynObj.n140
     u8   n4;                    // 0x04  its type (DynObj_GetTypeHandler) -> DynObj.n146
@@ -59,7 +59,7 @@ typedef struct DynObjModelEntry {
     } u;
 } DynObjModelEntry;
 
-// An object's 'aRSL' chunk, laid over the chunk from its id on (TagRecord): the stream objects
+// An object's 'aRSL' chunk, laid over the chunk from its id on (TChunkR): the stream objects
 // it uses, the first its model.
 typedef struct DynObjModel {
     s32  nEntries;              // 0x0  set from the chunk's size

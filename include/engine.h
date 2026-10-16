@@ -1061,20 +1061,20 @@ extern void* lbl_80281D80;      // a 256 x 224 screen copy, only in game types 4
 // ---- the file streamer (UStream.c) -----------------------------------------------------------
 
 // An object built from SHOC chunks. The header is 0x34 bytes (LoadData.c copies one with
-// Mem_cpy(p, pObject, 0x34); ObjList.c's list head lbl_801A25B8 is one), then the rest of the
+// Mem_cpy(p, pObject, 0x34); URes.c's divider gResDivider is one), then the rest of the
 // copied chunk header (chunk+0x30 onward: a word, the name's length at 0x38, the name at 0x40)
 // and, 0x80-aligned, the data.
 typedef struct UStreamObject {
     u8*   pData;                  // 0x00
     u32   uUnk4;                  // 0x04
-    void (*pfn8)(struct UStreamObject* pObject);   // 0x08  called when ObjList.c releases the
-                                  //       object (fn_8000B588)
-    struct UStreamObject* pPrev;  // 0x0C  finished-object queue; ObjList.c: toward the list's tail
-    struct UStreamObject* pNext;  // 0x10  ObjList.c: toward the list's head
+    void (*pfnFree)(struct UStreamObject* pObject);   // 0x08  its handler's clean-up, which
+                                  //       Resources_Del calls before it frees the object
+    struct UStreamObject* pPrev;  // 0x0C  finished-object queue; resource list: toward the tail
+    struct UStreamObject* pNext;  // 0x10  resource list: toward the head
     int   nUnk14;                 // 0x14
     u32   uFlags;                 // 0x18  chunk+0x14; set to 1 for txf / Cpyr / Cact / txf2
     u32   uType;                  // 0x1C  chunk+0x18, e.g. 'ter '
-    u32   uId;                    // 0x20  chunk+0x1C: the object's id within its type (fn_8000B70C
+    u32   uId;                    // 0x20  chunk+0x1C: the object's id within its type (Resources_Get
                                   //       finds objects by type and id); for skalib's SAL and BNK
                                   //       objects, the animation slot
     u32   uSize;                  // 0x24  chunk+0x20 decompressed size
@@ -1090,30 +1090,39 @@ int  Stream_UnregisterLoadChunkCallback(int nType);
 u32  Stream_StreamLoadFixedSize(UStreamObject* pObject, u32 uMax, void* pDst);
 u32  fn_8000E81C(UStreamObject* pObject, void** ppData);          // the data and its size
 
-// The list of kept stream objects (ObjList.c). Objects are added at the head or the tail
-// (fn_8000B4B0 picks which), around a fixed mark object; fn_8000B68C releases one side of it.
-void fn_8000B46C(void);                 // empty the list (only the mark in it)
-void fn_8000B4B0(int nEnd);             // where fn_8000B4B8 adds: 0 the head, 1 the tail
-void fn_8000B4B8(UStreamObject* pObject);   // add an object
-u8   fn_8000B508(UStreamObject* pObject);   // an object of the same type and id is in the list
-u8   fn_8000B54C(u32 uType, u32 uId);   // an object of this type and id is in the list
-void fn_8000B588(UStreamObject* pObject);   // take an object out of the list and free it
-void fn_8000B63C(void);                 // release every object
-void fn_8000B68C(int nEnd);             // release the objects before (0) or after (1) the mark
-UStreamObject* fn_8000B70C(u32 uType, u32 uId);   // find an object by type and id (NULL: none)
+// ---- the resource list (URes.c) ---------------------------------------------------------------
 
-// A record in a block of tagged records (fn_8000B748): this header, then the data, then padding
-// to 4 bytes.
-typedef struct TagRecord {
+// The stream objects the game keeps once they are delivered (its resources), found by type and id.
+// A fixed divider splits the list: default resources go on the head's side of it, a hole's on the
+// tail's side, so the hole's can all be freed when it unloads.
+typedef enum Resources_EResourceClass {
+    RESOURCES_CLASS_DEFAULT,    // everything outside a hole's streaming
+    RESOURCES_CLASS_HOLE        // what streams in for a hole (HoleLoader_vLoadQueuedHole)
+} Resources_EResourceClass;
+
+void Resources_InitModule(void);
+// Sets the class Resources_Add adds under.
+void Resources_vSetCurrentResourceClass(Resources_EResourceClass eClass);
+void Resources_Add(UStreamObject* pRes);
+u8   Resources_IsAlreadyThere(UStreamObject* pRes);
+u8   Resources_IsIDRefAlreadyThere(u32 uType, u32 uId);
+void Resources_Del(UStreamObject* pRes);
+void Resources_CloseModule(void);
+void Resources_DelAllClassResources(Resources_EResourceClass eClass);
+UStreamObject* Resources_Get(u32 uType, u32 uId);   // NULL: none
+
+// A chunk in a buffer of chunks (Resources_GetDataInBuffer): this header, then the data, then
+// padding to 4 bytes.
+typedef struct TChunkR {
     u32  uTag;                  // 0x0
-    u32  uSize;                 // 0x4  the record's size, header included (before the padding)
+    u32  uSize;                 // 0x4  the chunk's size, header included (before the padding)
     u32  uId;                   // 0x8
-} TagRecord;
-LAYOUT_ASSERT(TagRecord, 0xC);
+} TChunkR;
+LAYOUT_ASSERT(TChunkR, 0xC);
 
-void* fn_8000B748(u8* pBlock, u32 uLen, u32 uTag, u32 uId);   // the record's data
-TagRecord* fn_8000B7B0(u8* pBlock, u32 uLen, u32 uTag, u32 uId);   // the record (NULL: none)
-void fn_8000B830(UStreamObject* pObject);   // free an object
+void* Resources_GetDataInBuffer(u8* pBuffer, u32 uBuffSize, u32 uTag, u32 uId);
+TChunkR* Resources_GetChunkInBuffer(u8* pBuffer, u32 uBuffSize, u32 uTag, u32 uId);   // NULL: none
+void Resources_UpdateOldResourceTime(UStreamObject* pRes);
 
 // Files on disc: a handle from open, -1 for none.
 int  fn_800060E0(const char* pName);    // file open

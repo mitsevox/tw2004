@@ -152,7 +152,6 @@ MC.c	open
 MC_Gc.c	open		
 MaterialTypes.c	open		
 NGC/SharedFileIO/llSharedFileIO.c	open		
-ObjList.c	open		
 PGATourSimulation.c	open		
 PasswordManager.c	open		
 PlayNowMode.c	open		
@@ -196,6 +195,7 @@ UKernel.c	open
 UMemPool.c	open		
 UObject.c	open		
 UObject3D.c	open		
+URes.c	open		
 UStream.c	open		
 VecMath.c	open		
 ViewController.c	open		

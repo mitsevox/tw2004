@@ -88,10 +88,10 @@ void DynObj_LoadTeoModel(UStreamObject* arg0);
 // The 'TEO ' stream handler: unless the object is already loaded, builds its model (fn_80045D80)
 // into the stream object's word 4 and sets DynObj_FreeTeoModel as its free handler.
 void DynObj_LoadTeoModel(UStreamObject* arg0) {
-    if (fn_8000B508(arg0) == 0) {
+    if (Resources_IsAlreadyThere(arg0) == 0) {
         (*(UObjModel**)((u8*)(arg0) + 4)) = fn_80045D80(arg0->pData);
-        (*(void (**)(UStreamObject*))((u8*)(arg0) + 8)) = DynObj_FreeTeoModel;
-        fn_8000B4B8(arg0);
+        arg0->pfnFree = DynObj_FreeTeoModel;
+        Resources_Add(arg0);
     }
 }
 
@@ -191,23 +191,25 @@ void DynObj_InitForHole(void) {
     Character* pFlag;
 
     if (gpDynObjState->pTeo10000 == NULL) {
-        gpDynObjState->pTeo10000 = Object_Create(((DynObjModelRef*)fn_8000B70C('TEO ', 10000))->p4);
+        gpDynObjState->pTeo10000 = Object_Create(((DynObjModelRef*)Resources_Get('TEO ', 10000))->p4);
         gpDynObjState->pTeo10000->uFlags |= 1;
         gpDynObjState->pTeo10000->uFlags |= 0x10;
     }
     for (i = 0; i < 4; i++) {
         if (gpDynObjState->apTeo10030[i] == NULL) {
             nId = i + 10030;
-            if (fn_8000B54C('TEO ', nId)) {
-                gpDynObjState->apTeo10030[i] = Object_Create(((DynObjModelRef*)fn_8000B70C('TEO ', nId))->p4);
+            if (Resources_IsIDRefAlreadyThere('TEO ', nId)) {
+                gpDynObjState->apTeo10030[i] =
+                    Object_Create(((DynObjModelRef*)Resources_Get('TEO ', nId))->p4);
             }
         }
     }
     for (i = 0; i < 4; i++) {
         if (gpDynObjState->apTeo10040[i] == NULL) {
             nId = i + 10040;
-            if (fn_8000B54C('TEO ', nId)) {
-                gpDynObjState->apTeo10040[i] = Object_Create(((DynObjModelRef*)fn_8000B70C('TEO ', nId))->p4);
+            if (Resources_IsIDRefAlreadyThere('TEO ', nId)) {
+                gpDynObjState->apTeo10040[i] =
+                    Object_Create(((DynObjModelRef*)Resources_Get('TEO ', nId))->p4);
             }
         }
     }
@@ -215,18 +217,18 @@ void DynObj_InitForHole(void) {
         for (i = 0; i < 4; i++) {
             if (gpDynObjState->apTeo10006[i] == NULL) {
                 nId = i + 10006;
-                if (fn_8000B54C('TEO ', nId)) {
+                if (Resources_IsIDRefAlreadyThere('TEO ', nId)) {
                     gpDynObjState->apTeo10006[i] =
-                        Object_Create(((DynObjModelRef*)fn_8000B70C('TEO ', nId))->p4);
+                        Object_Create(((DynObjModelRef*)Resources_Get('TEO ', nId))->p4);
                 }
             }
         }
         for (i = 0; i < 3; i++) {
             if (gpDynObjState->apTeo10020[i] == NULL) {
                 nId = i + 10020;
-                if (fn_8000B54C('TEO ', nId)) {
+                if (Resources_IsIDRefAlreadyThere('TEO ', nId)) {
                     gpDynObjState->apTeo10020[i] =
-                        Object_Create(((DynObjModelRef*)fn_8000B70C('TEO ', nId))->p4);
+                        Object_Create(((DynObjModelRef*)Resources_Get('TEO ', nId))->p4);
                 }
             }
         }
@@ -462,7 +464,7 @@ void DynObj_PitchMarkAdd(f32* pPos, int nPlayer) {
             setup.pDef = &def;
             setup.pModel = &model;
             model.aEntries[0].uType = 'TEO ';
-            setup.pModel->aEntries[0].u.pRef = (DynObjModelRef*)fn_8000B70C('TEO ', 10005);
+            setup.pModel->aEntries[0].u.pRef = (DynObjModelRef*)Resources_Get('TEO ', 10005);
             setup.pfnHandler = DynObj_GetTypeHandler(setup.pDef->n4);
             setup.pC = NULL;
             nId = Kernel_CreateObjectId(&setup);
@@ -510,7 +512,7 @@ void DynObj_ShotDivotHoleAdd(f32* pPos, int nPlayer) {
         setup.pDef = &def;
         setup.pModel = &model;
         model.aEntries[0].uType = 'TEO ';
-        setup.pModel->aEntries[0].u.pRef = (DynObjModelRef*)fn_8000B70C('TEO ', 10001);
+        setup.pModel->aEntries[0].u.pRef = (DynObjModelRef*)Resources_Get('TEO ', 10001);
         setup.pfnHandler = DynObj_GetTypeHandler(setup.pDef->n4);
         setup.pC = NULL;
         nId = Kernel_CreateObjectId(&setup);
@@ -849,7 +851,7 @@ void DynObj_DivotAdd(f32* pPos, int nPlayer) {
         setup.pDef = &def;
         setup.pModel = &model;
         model.aEntries[0].uType = 'TEO ';
-        setup.pModel->aEntries[0].u.pRef = (DynObjModelRef*)fn_8000B70C('TEO ', 10002);
+        setup.pModel->aEntries[0].u.pRef = (DynObjModelRef*)Resources_Get('TEO ', 10002);
         setup.pfnHandler = DynObj_GetTypeHandler(setup.pDef->n4);
         setup.pC = NULL;
         nId = Kernel_CreateObjectId(&setup);
@@ -974,7 +976,7 @@ void DynObj_TeeAdd(f32* pPos, int nPlayer, u8 bReset) {
         setup.pDef = &def;
         setup.pModel = &model;
         model.aEntries[0].uType = 'TEO ';
-        setup.pModel->aEntries[0].u.pRef = (DynObjModelRef*)fn_8000B70C('TEO ', 10004);
+        setup.pModel->aEntries[0].u.pRef = (DynObjModelRef*)Resources_Get('TEO ', 10004);
         setup.pfnHandler = DynObj_GetTypeHandler(setup.pDef->n4);
         setup.pC = NULL;
         nId = Kernel_CreateObjectId(&setup);

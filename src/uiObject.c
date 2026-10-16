@@ -117,7 +117,7 @@ void UI_Obj_CloseModule(void) {
 // port: a 'TEO ' object's UStreamObject.uUnk4 holds its model (see Code800B9944.c FE_CrAPBall_MakeObjects).
 void UI_Obj_InitForRender(void) {
     if (gpUIObjModel == NULL) {
-        gpUIObjModel = Object_Create((UObjModel*)fn_8000B70C('TEO ', 10003)->uUnk4);
+        gpUIObjModel = Object_Create((UObjModel*)Resources_Get('TEO ', 10003)->uUnk4);
     }
 }
 
