@@ -195,7 +195,7 @@ UKernel.c	open
 UMemPool.c	open		
 UObject.c	open		
 UObject3D.c	open		
-URes.c	open		
+URes.c	done	e845bd03	claude-review
 UStream.c	open		
 VecMath.c	open		
 ViewController.c	open		
