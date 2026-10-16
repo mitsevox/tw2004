@@ -182,7 +182,7 @@ Swing.c	open
 TerrainData.c	open		
 TerrainGround.c	open		
 TibExt.c	open		
-UAudContainers.c	open		
+UAudContainers.c	done	b5058d88	claude-review
 UAudMem.c	open		
 UAudMemStack.c	open		
 UAudVector.c	done	58556d0e	claude-review
