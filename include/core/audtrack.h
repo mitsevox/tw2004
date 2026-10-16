@@ -102,7 +102,7 @@ typedef struct AudVoiceRequest {
         struct {
             u16 unk15 : 1;
             u16 bNoReverb : 1;  //        aux A (reverb) off: streams, movies, and notes of sounds
-                                //        with AUDSOUND_NO_REVERB or templates with
+                                //        with EMITTER_NO_REVERB or templates with
                                 //        AUDTRACKTMPL_NO_REVERB
             u16 unk13 : 1;
             u16 bStream : 1;    //        Voc_Alloc gives the voice an ARAM stream buffer
@@ -184,7 +184,7 @@ typedef struct AudSeqEvent {
 } AudSeqEvent;
 LAYOUT_ASSERT(AudSeqEvent, 0x8);
 
-// The template a track plays: one of a bank sound's tracks (AudSound.aTracks, 0x1C bytes).
+// The template a track plays: one of a bank sound's tracks (TEmitter.aTracks, 0x1C bytes).
 typedef struct AudTrackTmpl {
     u8   uFlags;                // 0x0    AUDTRACKTMPL_ bits
     u8   n1;                    // 0x1    how the next variation is picked (AutoSelectVariation); 0: never
@@ -234,19 +234,19 @@ enum EAudTrkCBReason {
 };
 
 // A sound of a bank: tracks played together, one per channel.
-typedef struct AudSound {
+typedef struct TEmitter {
     u8   nTracks;               // 0x0
     u8   unk1[0x3 - 0x1];
-    u8   uFlags;                // 0x3    AUDSOUND_ bits
+    u8   uFlags;                // 0x3    EMITTER_ bits
     f32  fMaxDist;              // 0x4    placed sounds: the distance it is heard up to
     AudTrackTmpl aTracks[1];    // 0x8    nTracks of them
-} AudSound;
+} TEmitter;
 
-// AudSound.uFlags
-#define AUDSOUND_3D          0x1    // placed in the world: distance, pan and doppler; its tracks
+// TEmitter.uFlags
+#define EMITTER_3D          0x1     // placed in the world: distance, pan and doppler; its tracks
                                     // go in the sorted list
-#define AUDSOUND_NO_DOPPLER  0x2    // placed, but its pitch does not change with its speed
-#define AUDSOUND_NO_REVERB   0x4    // its notes play without reverb (OnKeyOn)
+#define EMITTER_NO_DOPPLER  0x2     // placed, but its pitch does not change with its speed
+#define EMITTER_NO_REVERB   0x4     // its notes play without reverb (OnKeyOn)
 
 // One entry of a bank's sample table (0x38 bytes). Its addresses are relative to the bank's ARAM
 // block, in 4-bit units; Ses_ProcessSampleData adds the block's address.
@@ -287,7 +287,7 @@ typedef struct AudBank {
     u8   unk28[0x2C - 0x28];
     u32  n2C;                   // 0x2C   the size of what sits between the sounds and the groups
     u32  nSounds;               // 0x30
-    AudSound* apSounds[1];      // 0x34   nSounds of them; offsets from the array's end on disc
+    TEmitter* apSounds[1];      // 0x34   nSounds of them; offsets from the array's end on disc
 } AudBank;
 
 // A streamed track's own fields (AudTrack 0x64), cleared by ResetStreamPerf.
@@ -378,7 +378,7 @@ typedef struct AudSource {
                                 //        for a streamed track the stream in the low 16 bits, the
                                 //        play list above it and the play mode in the top byte
     f32  aPos[2][3];            // 0x24   its position relative to each listener
-    AudSound* pSound;           // 0x3C   the bank sound it plays
+    TEmitter* pSound;           // 0x3C   the bank sound it plays
     s16  nSound;                // 0x40   that sound's number: bank 0's from 0 up, bank 1's from -1
                                 //        down
     u8   unk42[0x44 - 0x42];
@@ -496,10 +496,10 @@ typedef struct AudMicBlock {
 
 extern AudSource* gEmiSources;            // the sound sources, by entry (hlaudemitter.c)
 extern u8 gMicCount;                      // the number of listeners (hlaudmic.c)
-extern f32 gMasSubmixVolumes[32];         // the volume of each curve (Mas_GetSubmix; HLAudMaster.c)
-extern s32 gMasMuteMask;                  // one bit per curve: 1 = muted (Mas_IsChanMuted; HLAudMaster.c)
-extern f32 gMasTickRateScale;             // Mas_SetTickRate's rate, Mas_GetUpdateRateScale's
-                                          // result (HLAudMaster.c)
+#define MAS_NUM_SUBMIX_CHANS 32           // the submix channels a play list or bank plays through
+extern f32 gMasSubmixVolumes[MAS_NUM_SUBMIX_CHANS]; // each submix channel's volume, 1.0 unchanged
+extern u32 gMasMuteMask;                  // bit n set: submix channel n is muted
+extern f32 gMasUpdateRateScale;           // the update rate given at start-up over 60
 extern s32 gSesSession;                   // Ses_IsSessionZero says whether it is 0 (hlaudsession.c)
 extern AudStreamFile* gSesStreamFileHdr;  // the stream file's header (hlaudsession.c)
 extern AudBank* gSesBank1;                // bank 1 (hlaudsession.c)
@@ -531,17 +531,23 @@ void           Emi_SetTrackVarRangeTmpl(s16 nSound, u8 nTrack, u8 nVarSet);
 void           Emi_SetTrackStep(u8 nEntry, u8 nTrack, u8 nEvent, int bCheck);
 void           Emi_SetTrackAttenuation(u8 nEntry, u8 nTrack, f32 fVolume);
 void           Emi_SetTrackPitchFactor(u8 nEntry, u8 nTrack, f32 fPitch);
-void           Emi_CheckTemplate(AudSound* pSound, u16 nSound);
+void           Emi_CheckTemplate(TEmitter* pSound, u16 nSound);
 void           Emi_TrackCallback(AudSource* pSource, u8 nTrack, s32 nReason);
 
 // UAudVector.c
 f32            audvec3_ApproxLength(f32* v);
 
 // HLAudMaster.c
-AudSound*    Ses_GetEmitterTemplateFromID(s16 nSound);
-f32          audfrac_Mul(f32 fVolume, f32 fCurve);
+TEmitter*    Ses_GetEmitterTemplateFromID(s16 tmplID);
+f32          audfrac_Mul(f32 v1, f32 v2);
+u8           Mas_InitModule(void);
 u8           Mas_InitSession(void);
 void         Mas_ExitSession(void);
+void         Mas_SetUpdateRate(u8 nFps);
+void         Mas_SetOutputMode(u8 outputMode);
+void         Mas_SetSubmixChan(u8 submixChan, f32 attn);
+void         Mas_SetSubmixAll(u8 nchans, f32* attns);
+void         Mas_SetSubmixMuteAll(u32 chanmask);
 
 // hlaudmic.c
 u8           Mic_InitSession(u8 nSession, u8 nSubsession, u8 nListeners);
@@ -654,13 +660,7 @@ void Aud_EmiAliasSetTrackVarRange(s16 nEmitter, u8 nTrack, u8 n);
 void Aud_EmiAliasSetTrackStep(s16 nEmitter, u8 nTrack, u8 n, int bCheck);
 void Aud_EmiAliasSetTrackAttenuation(s16 nEmitter, u8 nTrack, f32 fVolume);
 
-// HLAudMaster.c, hlaudmic.c, hlaudmovie.c, hlaudsession.c: module start-up and GameAudio.c's controls
-u8   Mas_InitModule(void);
-void Mas_SetTickRate(u8 nRate);
-void Mas_SetOutputMode(u8 nMode);
-void Mas_SetSubmixChan(u8 nCurve, f32 fVolume);
-void Mas_SetSubmixAll(u8 nCurves, f32* pVolumes);
-void Mas_SetSubmixMuteAll(s32 uMask);
+// hlaudmic.c, hlaudmovie.c, hlaudsession.c: module start-up and GameAudio.c's controls
 u8   Mic_InitModule(void);
 void Mic_SetRvbPreset(u8 nMic, u8 nPreset);
 u8   Ses_InitModule(void);
