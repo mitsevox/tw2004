@@ -371,7 +371,7 @@ calendar with its real-time events, the ladder map, and the money and goals in t
 
 | File | Name | What it is |
 |---|---|---|
-| Calendar.c | ours | dates for the tour season: day numbers, weekdays, today's date, date strings |
+| Calendar.c | T7 | dates for the tour season: day numbers, weekdays, today's date, date strings |
 | Earnings.c | EA (TW2003 source tree) | money and goals: prize table (`'ERN '`), payouts and multipliers, unlock goals, saved replays |
 | CalendarScreen.c | ours | the career calendar screen's callbacks |
 | FE_Calendar.c | T7 | the calendar's per-mode driver tables and the month grid |
