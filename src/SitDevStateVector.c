@@ -20,7 +20,6 @@ u32 gSitDevPredictedHitClass;   // at situation event 29 (the look-ahead ball's 
 u8  SitDev_GetCupBevelFlag(void);
 int SitDev_GetPGARank(int nPlayer);
 u16 SitDev_TranslateGameMode(int nMode);
-u32 SitDev_GetCommentaryZones(f32* pPos);
 
 u8 SitDev_CompareConditions(SitDevSituation* pEntry, int nTest, SitDevData* pData, int nValue);
 
@@ -314,7 +313,8 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
         if (nKind == 29) {
             gSitDevPredictedHitClass = nValue;
         }
-        _SetStateVecAndCondition(pValues, 79, SitDev_GetCommentaryZones(pBefore->vPos), pSetBits);
+        _SetStateVecAndCondition(pValues, SITDEV_VALUE_COMMENTARY_ZONES,
+                                 SitDev_GetCommentaryZones(pBefore->vPos), pSetBits);
         _SetStateVecAndCondition(pValues, 75, SW_fGetBoostMagnitude(nPlayer), pSetBits);
         _SetStateVecAndCondition(pValues, 76, SW_fGetSpinMagnitude(nPlayer), pSetBits);
         _SetStateVecAndCondition(pValues, 23, (s32)(100.0f * SW_vGetHookSlice(nPlayer)), pSetBits);
