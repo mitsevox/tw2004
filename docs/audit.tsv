@@ -17,7 +17,6 @@ Code8002C984.c	open
 Code8002DB80.c	open		
 Code8002EE1C.c	open		
 Code80037AB8.c	open		
-Code8005D2E4.c	open		
 Code8006F608.c	open		
 Code80070EC4.c	open		
 Code80090940.c	open		
@@ -135,7 +134,8 @@ LLDisp_Gc.c	open
 LLDynTex.c	open		
 LLFileIO_Gc.c	open		
 LLFont.c	open		
-LLMem_Gc.c	open		
+LLMath_Gc.c	done	626ba02e	claude-review
+LLMem_Gc.c	done	4e15bbc0	claude-review
 LLObj_Gc.c	open		
 LLPictInt.c	open		
 LLPict_Gc.c	open		
@@ -199,7 +199,6 @@ UObject.c	open
 UObject3D.c	open		
 URes.c	done	e845bd03	claude-review
 UStream.c	open		
-VecMath.c	open		
 ViewController.c	open		
 Wind.c	open		
 ai_brain.c	open		
@@ -237,6 +236,7 @@ ska_shared.c	open
 skalib.c	open		
 startUp.c	open		
 stateFunc.c	open		
+statemain.c	done	eee7aafb	claude-review
 streammanagerhole.c	open		
 target.c	open		
 uiArc.c	open		

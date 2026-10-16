@@ -427,7 +427,7 @@ StateGolfer.c:
 	.bss        start:0x801D5A90 end:0x801D5AB0
 	.sbss       start:0x80281E00 end:0x80281E08
 
-Code8005D2E4.c:
+statemain.c:
 	.text       start:0x8005D2E4 end:0x8005D44C
 	.sbss       start:0x80281E08 end:0x80281E10
 
@@ -1035,7 +1035,7 @@ Code800BA940.c:
 	.sdata      start:0x80281518 end:0x80281520
 	.sdata2     start:0x80284248 end:0x80284280
 
-VecMath.c:
+LLMath_Gc.c:
 	.text       start:0x800BAD60 end:0x800BB0A8
 	.sdata2     start:0x80284280 end:0x80284290
 

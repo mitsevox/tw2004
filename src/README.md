@@ -17,7 +17,7 @@ and MetroTRK are built from public decomps in `extern/` (the `progress_category=
 | The entry point | `main()` in `unsorted/sweep_800055D8.c`: boot list (`sweep_80005520.c`), `GoEntry.c`'s loop, shutdown list (`sweep_80005590.c`) |
 | The game's state machine | `GoEntry.c` `fn_800083A4`: a switch on `gSession.nGameType` (table below) |
 | One frame | `gomainloop.c`: `fn_8006D8E8` is the frame loop, `fn_8006DBD4` picks the game type's frame, `fn_8006D27C` draws a round's frame, `fn_8006DDA8` runs every module's hooks |
-| A shot, start to finish | `gomainloop.c` calls `fn_8005D2F8` (`Code8005D2E4.c`) each frame, which runs `GOLFERSTATE_Update` (`StateGolfer.c`): each player's golfer state (`stateFunc.c`, `STATEFUNC_*`). `STATEFUNC_Swing*` drives `Swing.c`, which launches the ball with `Physics_ShotImpact` (`Ball.c`); `GM_BallHit` and `GM_Update` (`GameMode.c`) keep the round's turns and strokes |
+| A shot, start to finish | `gomainloop.c` calls `STATEMAIN_Update` (`statemain.c`) each frame, which runs `GOLFERSTATE_Update` (`StateGolfer.c`): each player's golfer state (`stateFunc.c`, `STATEFUNC_*`). `STATEFUNC_Swing*` drives `Swing.c`, which launches the ball with `Physics_ShotImpact` (`Ball.c`); `GM_BallHit` and `GM_Update` (`GameMode.c`) keep the round's turns and strokes |
 | A round's rules | `GameRound.c` `GM_SetModeType` fills `gpGame`'s callbacks (`GameState`, `include/golfer.h`) with defaults, then calls the game mode's own setup (`GameMode*.c`) |
 | The menus | `uiProcessInterface.c` runs the UI; the screens run on EA's UI Studio library (`UISApi.c` is the game's side, `UISStack.c` `UISStackProcess` the script interpreter); menu messages land in `FE_MessageTable.c`, a round's in `GameUICommands.c` |
 | Loading anything from disc | `UStream.c` (the chunked `.hog`/`.gcb` streamer; `docs/game/formats/ctrl-container.md`), handlers registered per chunk type, file lists in `streammanagerhole.c` |
@@ -123,7 +123,7 @@ early in link order (0x80005628-0x80013720), between the LL rendering files.
 | Controller_Gc.c | ours | the four controllers: buttons, sticks, triggers, rumble |
 | UByteSwap.c | T7 | copies little-endian disc data while swapping byte order |
 | LLTime.c | T7 | the clock and its stopwatch counters (`TI_*`) the main loop times frames with |
-| VecMath.c | ours (TW06: `vec4flt_*`) | paired-single vector and matrix helpers used everywhere |
+| LLMath_Gc.c | ours (after TW07 `LLMath_PS3.c`) | paired-single vector and matrix helpers used everywhere |
 | LLRTClock_Gc.c | ours (after TW07 `LLRTClock_PS3.c`) | the console's date and time, read from the OS clock as numbers |
 | LLRTClock.c | T7 | the console's date and time as one line of text, for the front end |
 | GoARAM.c | EA | audio RAM: set-up, heap and the DMA queue (front end, memory card and animation park data there) |
@@ -272,7 +272,7 @@ ball placement, and the golfer state engine that steps each player through a sho
 | Code8002DB80.c | ph | the caddie's putt tip, the golfer table, players, bags and options |
 | Swing.c | EA | the stick swing: phases, miss, power, attributes; club trail, boost display |
 | StateGolfer.c | T7 | the golfer state engine: each player's state stack (`GOLFERSTATE_*`) |
-| Code8005D2E4.c | ph | a one-slot state machine over `lbl_801883C0`; slot 1 runs `GOLFERSTATE_Update` |
+| statemain.c | T7 | the main state machine (`STATEMAIN_*`): front end or in-game; in-game runs `GOLFERSTATE_Update` |
 | stateFunc.c | T7 | the golfer states' enter/update/exit callbacks (`STATEFUNC_*`, 27 states) |
 | target.c | T6 | the aim marker, aim-point and ball-placement controls, where a ball may be dropped |
 | emotion.c | T6 | the golfers' emotions after a shot, picking the reaction they play |

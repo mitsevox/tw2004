@@ -75,7 +75,6 @@ static f32 GoRenderCtx_Gc_StrippedFn(f32 x) {
 
 s32 LLMath_CopyMat44();
 s32 LLMath_Transpose44();
-s32 LLMath_mat44fltMultiplyList();
 void RC_vSetCurrentRenderCtx(s32 v);
 void RC_vUpdateRenderCtxScreenMatricesAndInfo(Camera* pCamera);   // not decompiled yet
 void RC_vStoreRenderCtxTransformationMatrix(u8* arg0, f32 (*arg1)[4]);
@@ -221,8 +220,10 @@ void RC_vUpdateRenderCtxTransformationMatrices(void* pCamera) {
         LLMath_CopyMat44((*(s32*)((u8*)(arg0) + 0x10)) + 0x44, arg0 + 0x11C);
         LLMath_CopyMat44(arg0 + 0xDC, arg0 + 0x19C);
     } else {
-        LLMath_mat44fltMultiplyList((*(s32*)((u8*)(arg0) + 0x10)) + 0x44, arg0 + 0x1C, arg0 + 0x11C, 4);
-        LLMath_mat44fltMultiplyList(arg0 + 0xDC, arg0 + 0x1C, arg0 + 0x19C, 4);
+        LLMath_mat44fltMultiplyList((f32 (*)[4])((*(s32*)((u8*)(arg0) + 0x10)) + 0x44),
+                                    (f32 (*)[4])(arg0 + 0x1C), (f32 (*)[4])(arg0 + 0x11C), 4);
+        LLMath_mat44fltMultiplyList((f32 (*)[4])(arg0 + 0xDC), (f32 (*)[4])(arg0 + 0x1C),
+                                    (f32 (*)[4])(arg0 + 0x19C), 4);
     }
     LLMath_Transpose44(arg0 + 0x11C, arg0 + 0x15C);
 }

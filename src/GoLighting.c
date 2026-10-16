@@ -22,8 +22,6 @@ void    fn_8006F080(GoLight* pLight);
 void LLMath_MultiplyVec(f32* pA, f32* pB, f32* pOut);     // pOut = pA * pB, element by element
 void vec4flt_Zero(f32* pVec);                        // sets a vector to lbl_80186838
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);                   // identity
-void LLMath_mat44fltMultiplyList33(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // VecMath.c
-void LLMath_mat44fltMultiply33(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // a vector through a matrix
 void LLMath_InvertNormalized(f32 (*pSrc)[4], f32 (*pDst)[4]);  // UMemPool.c: inverts a rotation+translation
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with

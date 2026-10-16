@@ -74,8 +74,8 @@ LAYOUT_ASSERT(Camera, 0x234);       // GoRenderCtx_Gc.c RC_spCreateRenderCtx all
 GoFrameBuf* RC_spGetRenderCtxFrameBuffer(Camera* pCamera); // GoRenderCtx_Gc.c: the camera's frame buffer
 
 Sphere* fn_800082F8(RenderObj* obj);
-void LLMath_mat44fltMultiply(float mtx[4][4], Vec4* src, Vec4* dst);   // VecMath.c: dst = src x mtx
-                                                                        // (row vector; dst may be src)
+// LLMath_Gc.c: dest = A x M, all four floats (A a row vector; dest may be A).
+void LLMath_mat44fltMultiply(f32 (*M)[4], Vec4* A, Vec4* dest);
 int fn_80007D74(Sphere* sphere, Camera* cam, int mode);
 float fn_80008320(Camera* cam);
 float fn_80008328(Camera* cam);

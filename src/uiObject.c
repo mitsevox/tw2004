@@ -42,7 +42,6 @@ void RC_ApplyCurrentViewport(void);
 void RC_UpdateCurrentScreenMatrices(void);
 void SW_vGetCurrentSpin(int nPlayer, f32* pfSide, f32* pfForward);   // Swing.c: the spin asked for
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);                          // identity
-void LLMath_mat44fltMultiplyList33(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // VecMath.c
 void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);          // copy a matrix
 void UObject_ComposeRotation(f32 (*pMtx)[4]);
 void UI_Obj_DrawSpinModel(void);

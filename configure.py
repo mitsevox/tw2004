@@ -956,7 +956,7 @@ config.libs = [
             Object(Matching, "PasswordManager.c"),
             Object(Matching, "Swing.c"),
             Object(Matching, "StateGolfer.c"),
-            Object(Matching, "Code8005D2E4.c"),
+            Object(Matching, "statemain.c"),
             Object(Matching, "stateFunc.c"),
             Object(Matching, "GoCamCont.c"),
             Object(Matching, "skalib.c"),
@@ -1035,7 +1035,7 @@ config.libs = [
             Object(Matching, "uiEATrax.c"),
             Object(Matching, "ScreenClear.c"),
             Object(Matching, "Code800BA940.c"),
-            Object(Matching, "VecMath.c"),
+            Object(Matching, "LLMath_Gc.c"),
             Object(Matching, "SitDevMisc.c"),
             Object(Matching, "SitDevFile.c"),
             Object(Matching, "SitDevCommentaryZones.c"),
@@ -1151,7 +1151,9 @@ config.libs = [
             Object(Matching, "unsorted/sweep_80005520.c"),
             Object(Matching, "unsorted/sweep_80005590.c"),
             Object(Matching, "unsorted/sweep_800055D8.c"),
-            Object(Matching, "LLMem_Gc.c"),
+            # Built optimized for size: under -O4,p the copy and fill loops are unrolled and the
+            # four functions take 0xF94 bytes, against EA's 0x5C0.
+            Object(Matching, "LLMem_Gc.c", extra_cflags=["-O4,s"]),
             Object(Matching, "fe_craputils.c"),
             Object(Matching, "DynamicRenderingBuffer.c"),
             Object(Matching, "Code80070EC4.c"),
