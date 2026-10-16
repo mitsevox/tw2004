@@ -64,23 +64,23 @@ void FE_CrAPBall_LoadBALF(UStreamObject* pObject) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void FE_CrAPBall_FreeTEO(void* arg0);
+void FE_CrAPBall_FreeTEO(UStreamObject* pObject);
 
 // The 'TEO ' load handler: unless an object of the same type and id is listed already, the object's
 // model is built from its data (fn_80045D80) and kept in the object (word 4), with
-// FE_CrAPBall_FreeTEO as its free function (word 8), and the object is listed (fn_8000B4B8) for
+// FE_CrAPBall_FreeTEO as its free function, and the object is listed (Resources_Add) for
 // FE_CrAPBall_MakeObjects to find.
 void FE_CrAPBall_LoadTEO(UStreamObject* pObject) {
-    if (fn_8000B508(pObject) == 0) {
+    if (Resources_IsAlreadyThere(pObject) == 0) {
         (*(UObjModel**)((u8*)(pObject) + 4)) = fn_80045D80(pObject->pData);
-        (*(void (**)(void*))((u8*)(pObject) + 8)) = FE_CrAPBall_FreeTEO;
-        fn_8000B4B8(pObject);
+        pObject->pfnFree = FE_CrAPBall_FreeTEO;
+        Resources_Add(pObject);
     }
 }
 
 // Frees the model FE_CrAPBall_LoadTEO built for a 'TEO ' object (pObject: the object): its root
 // (fn_800075CC), then the model.
-void FE_CrAPBall_FreeTEO(void* pObject) {
+void FE_CrAPBall_FreeTEO(UStreamObject* pObject) {
     void* pModel;
 
     pModel = (*(void**)((u8*)(pObject) + 4));
@@ -134,19 +134,19 @@ void FE_CrAPBall_MakeObjects(void) {
     UStreamObject* pObject;
 
     if (gpCrAPBallTeo10000 == NULL) {
-        pObject = fn_8000B70C('TEO ', 10000);
+        pObject = Resources_Get('TEO ', 10000);
         if (pObject != NULL) {
             gpCrAPBallTeo10000 = Object_Create((UObjModel*)pObject->uUnk4);
         }
     }
     if (gpCrAPBallTeo10030 == NULL) {
-        pObject = fn_8000B70C('TEO ', 10030);
+        pObject = Resources_Get('TEO ', 10030);
         if (pObject != NULL) {
             gpCrAPBallTeo10030 = Object_Create((UObjModel*)pObject->uUnk4);
         }
     }
     if (gpCrAPBallTeo10040 == NULL) {
-        pObject = fn_8000B70C('TEO ', 10040);
+        pObject = Resources_Get('TEO ', 10040);
         if (pObject != NULL) {
             gpCrAPBallTeo10040 = Object_Create((UObjModel*)pObject->uUnk4);
         }

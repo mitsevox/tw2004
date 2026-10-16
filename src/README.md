@@ -116,7 +116,7 @@ early in link order (0x80005628-0x80013720), between the LL rendering files.
 | StaticMemory.c | ours | the game's own heap (one ~20 MB block, sorted free spans) |
 | UMemPool.c | EA | pools of fixed-size nodes; 4x4 matrix and paired-single math, atan2f, logarithm |
 | urandom.c | T6 | three random-number streams (lagged Fibonacci), uniform and normal floats |
-| ObjList.c | ours | the list of loaded stream objects, found by type and id |
+| URes.c | EA | the resource list: the stream objects kept once delivered, found by type and id |
 | LoadData.c | ours | stream handlers: `'txf2'` texture banks, the `'load'` object, the loading-screen file; `Game_GetMode` |
 | UStream.c | EA | the streaming asset loader (CTRL/SHOC/SONO chunk files `.hog`/`.gcb`), async DVD reads into 18 buffers |
 | streammanagerhole.c | T6 | the stream file lists (front end, start-up, in game, characters, hole) and their handler lists |

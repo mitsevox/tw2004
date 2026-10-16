@@ -424,7 +424,7 @@ void fn_8006C7A8(void) {
     StaticMem_Reset();
     AudMem_InitModule();
     fn_800080D4();
-    fn_8000B46C();
+    Resources_InitModule();
     UStream_Init();
     fn_800B655C();
     fn_8000F060();
@@ -482,7 +482,7 @@ void fn_8006C854(void) {
     fn_8000F0E8();
     fn_800B6560();
     UStream_CloseAll();
-    fn_8000B63C();
+    Resources_CloseModule();
     fn_80071890();
     fn_800081C4();
     Pict_CloseModule();

@@ -223,7 +223,7 @@ static int UStream_BeginObject(UStreamFill* pFill, UStreamChunk* pChunk) {
         Mem_cpy(&pObject->uFlags, &pChunk->uFlags, uExtra + 0x1C);
         pObject->pData = (u8*)(pObject + 1) + uExtra + uPad;
         pObject->uUnk4 = 0;
-        pObject->pfn8 = NULL;
+        pObject->pfnFree = NULL;
         pObject->pPrev = NULL;
         pObject->pNext = NULL;
     }
@@ -745,18 +745,18 @@ u8 UStream_Update(void) {
             StaticMem_Free(pObject);
             break;
         case TAG('R', 'P', 'N', 'S'):
-            if (fn_8000B508(pObject)) {
-                UStreamObject* pOld = fn_8000B70C(pObject->uType, pObject->uId);
+            if (Resources_IsAlreadyThere(pObject)) {
+                UStreamObject* pOld = Resources_Get(pObject->uType, pObject->uId);
                 if (pOld != NULL) {
                     if (pObject->uSize == pOld->uSize
                         && Mem_compare(pObject->pData, pOld->pData, pObject->uSize) == 0) {
                         StaticMem_Free(pObject);
                         break;
                     }
-                    fn_8000B588(pOld);
+                    Resources_Del(pOld);
                 }
             }
-            fn_8000B4B8(pObject);
+            Resources_Add(pObject);
             // port: the references of later objects are rebased by this object's data address
             gRPNSBase = (uptr)pObject->pData;
             break;

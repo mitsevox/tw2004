@@ -63,11 +63,11 @@ void Kernel_FreeObjectMem(void* p) {
 // references, its handler found by type (DynObj_GetTypeHandler), and the stream object is freed.
 void Kernel_DownloadActors(UStreamObject* pObject) {
     DynObjSetup setup;
-    TagRecord* pChunk;
+    TChunkR* pChunk;
     int i;
 
-    setup.pDef = (DynObjDef*)((u8*)fn_8000B748(pObject->pData, pObject->uSize, 'tACT', pObject->uId) -
-                              sizeof(u32));
+    setup.pDef = (DynObjDef*)((u8*)Resources_GetDataInBuffer(pObject->pData, pObject->uSize, 'tACT',
+                                                             pObject->uId) - sizeof(u32));
     switch (setup.pDef->n4) {
     case 200:
         StaticCam_ParseFlybyCameraActor(pObject);
@@ -96,13 +96,13 @@ void Kernel_DownloadActors(UStreamObject* pObject) {
         StaticMem_Free(pObject);
         return;
     }
-    pChunk = fn_8000B7B0(pObject->pData, pObject->uSize, 'aRSL', pObject->uId);
+    pChunk = Resources_GetChunkInBuffer(pObject->pData, pObject->uSize, 'aRSL', pObject->uId);
     if (pChunk != NULL) {
         setup.pModel = (DynObjModel*)&pChunk->uId;
-        setup.pModel->nEntries = (pChunk->uSize - sizeof(TagRecord)) / sizeof(DynObjModelEntry);
+        setup.pModel->nEntries = (pChunk->uSize - sizeof(TChunkR)) / sizeof(DynObjModelEntry);
         for (i = 0; i < setup.pModel->nEntries; i++) {
             if (setup.pModel->aEntries[i].u.nId != 0) {
-                setup.pModel->aEntries[i].u.pRef = (DynObjModelRef*)fn_8000B70C(
+                setup.pModel->aEntries[i].u.pRef = (DynObjModelRef*)Resources_Get(
                     setup.pModel->aEntries[i].uType, setup.pModel->aEntries[i].u.nId);
             }
         }
@@ -112,7 +112,7 @@ void Kernel_DownloadActors(UStreamObject* pObject) {
     setup.pfnHandler = DynObj_GetTypeHandler(setup.pDef->n4);
     setup.pC = (DynObjNames*)pObject;
     pObject->pData = (u8*)setup.pModel;
-    pObject->pfn8 = NULL;
+    pObject->pfnFree = NULL;
     pObject->uUnk4 = Kernel_CreateObjectId(&setup);
     StaticMem_Free(pObject);
 }

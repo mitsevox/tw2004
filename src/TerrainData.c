@@ -70,12 +70,12 @@ void Network_DownloadDataPNB(UStreamObject* pObject) {
     int i;
     TNetNode* pNode;
 
-    if (fn_8000B508(pObject)) {
-        fn_8000B830(pObject);
+    if (Resources_IsAlreadyThere(pObject)) {
+        Resources_UpdateOldResourceTime(pObject);
         return;
     }
-    pObject->pfn8 = Network_FreeDownloadData;
-    fn_8000B4B8(pObject);
+    pObject->pfnFree = Network_FreeDownloadData;
+    Resources_Add(pObject);
     pNet = (TNetwork*)(pObject->pData + 0xC);   // after a 12-byte header
     gNetworks[gNetworkCount++] = pNet;
     pNode = pNet->aNodes;

@@ -49,7 +49,7 @@ Compilers tested are the `GC/*` builds from the standard decomp compiler pack.
 | Test | Method | Rules out |
 |------|--------|-----------|
 | Function prologue style | 4,299 of 4,310 non-leaf EA functions use `stwu` first with LR saved at the top of the frame | GC/1.2.5 and older |
-| `fn_8000B70C` (linked list find, 15 instrs) | Natural C, compiled unchanged on every version | GC/3.0 (signed vs unsigned null compare) |
+| `Resources_Get` (linked list find, 15 instrs) | Natural C, compiled unchanged on every version | GC/3.0 (signed vs unsigned null compare) |
 | `fn_80008304` (Vec3 copy, 7 instrs) | Natural C, compiled unchanged; exact byte match on 2.0 - 2.7 at `-O4` only | GC/1.3.2 and older, GC/3.0, `-O2` and lower |
 | Compiler build dates | `mwcceppc.exe -version` | GC/2.7 (built Jul 22 2004, after the game shipped) |
 
