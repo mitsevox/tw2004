@@ -1,8 +1,11 @@
 """Check unit sources against docs/style.md (the mechanical rules only).
-    python tools/quality/lint.py [files...]        default: every src/*.c (sweeps are exempt)
+    python tools/quality/lint.py [files...]        default: every src/*.c (sweeps are exempt) and
+                                                  every header's long lines; named files: only them
     python tools/quality/lint.py --summary [files]  counts per file and rule instead of each line
-    python tools/quality/lint.py --diff main       only lines added or changed since main (use this
-                                                  on a branch: old debt in untouched lines is skipped)
+    python tools/quality/lint.py --diff main       only what the branch added since main (use this
+                                                  on a branch): findings on lines it added or
+                                                  changed that the file did not already have, so
+                                                  editing a line with old debt on it adds nothing
     python tools/quality/lint.py --diff main --compile   also compile every unit the branch touches
                                                   (changed .c files and units including a changed
                                                   header) with its real command: the DOL build never
@@ -243,29 +246,35 @@ def ub_check(path, lines):
 
 def header_long_lines(rev):
     """(include path, line, columns) for every header line past 110 columns: all of them without
-    rev, else only the lines added or changed since rev's merge base (working tree included)."""
+    rev, else only those the branch added since rev's merge base (working tree included). A long
+    line that replaces a long line in the same change (an edit to a line that was already long)
+    is old debt, not the branch's."""
     import subprocess
     if rev is None:
-        return [(h.relative_to(ROOT).as_posix(), i, len(l))
+        return [(h.relative_to(ROOT).as_posix(), i, len(l.rstrip('\r')))
                 for h in sorted((ROOT / 'include').rglob('*.h'))
                 for i, l in enumerate(h.read_text(encoding='utf-8', errors='replace').split('\n'), 1)
                 if len(l.rstrip('\r')) > 110]
-    base = subprocess.run(['git', 'merge-base', rev, 'HEAD'], cwd=ROOT,
-                          capture_output=True, text=True).stdout.strip() or rev
-    out = subprocess.run(['git', 'diff', '-B', '-M', '-U0', base, '--', 'include'], cwd=ROOT,
+    out = subprocess.run(['git', 'diff', '-B', '-M', '-U0', merge_base(rev), '--', 'include'], cwd=ROOT,
                          capture_output=True, text=True).stdout
-    res, cur, ln = [], None, 0
+    res, cur, ln, old_long = [], None, 0, 0
     for l in out.splitlines():
-        if l.startswith('+++ '):
-            cur = l[6:] if l != '+++ /dev/null' else None
+        if l.startswith(('+++ ', '--- ')):
+            if l.startswith('+++ '):
+                cur = l[6:] if l != '+++ /dev/null' else None
             continue
         m = re.match(r'@@ -\S+ \+(\d+)', l)
         if m:
-            ln = int(m.group(1))
+            ln, old_long = int(m.group(1)), 0
             continue
-        if l.startswith('+') and cur:
+        if l.startswith('-') and len(l) - 1 > 110:
+            old_long += 1                           # -U0: a change's old lines come before its new
+        elif l.startswith('+') and cur:
             if len(l) - 1 > 110:
-                res.append((cur, ln, len(l) - 1))
+                if old_long:
+                    old_long -= 1
+                else:
+                    res.append((cur, ln, len(l) - 1))
             ln += 1
     return res
 
@@ -297,6 +306,78 @@ def changed_lines(rev):
     return res
 
 
+def merge_base(rev):
+    import subprocess
+    return subprocess.run(['git', 'merge-base', rev, 'HEAD'], cwd=ROOT,
+                          capture_output=True, text=True).stdout.strip() or rev
+
+
+def base_paths(rev, folder):
+    """path now (relative to ROOT) -> its path at rev's merge base, for each file under folder the
+    branch changed or renamed. A file the branch added has no entry."""
+    import subprocess
+    out = subprocess.run(['git', 'diff', '-B', '-M', '--name-status', merge_base(rev), '--', folder],
+                         cwd=ROOT, capture_output=True, text=True).stdout
+    res = {}
+    for l in out.splitlines():
+        f = l.split('\t')
+        if f[0].startswith('R'):
+            res[f[2]] = f[1]
+        elif f[0][:1] in 'MT':
+            res[f[1]] = f[1]
+    return res
+
+
+def base_text(rev, path):
+    """The bytes of path (relative to ROOT) at rev's merge base."""
+    import subprocess
+    return subprocess.run(['git', 'show', '%s:%s' % (merge_base(rev), path)], cwd=ROOT,
+                          capture_output=True).stdout
+
+
+# Rules whose findings are told apart only by how many a file has: the line's text is no help,
+# because editing the line changes it (and the compiler wraps its messages at a width that
+# counts the file's path).
+COUNTED = {'long-line', 'trailing-space', 'tab', 'crlf', 'final-newline', 'header-comment',
+           'compile-error'}
+
+
+def finding_key(rule, msg):
+    """What identifies a finding in two versions of a file, apart from its line number: for a
+    pattern rule the text it matched (a placeholder name, a register), else the message."""
+    if rule in COUNTED:
+        return rule, ''
+    rx = dict(CHECKS).get(rule)
+    m = rx.search(msg) if rx else None
+    return rule, m.group(0) if m else msg
+
+
+def new_hits(f, hits, changed, rev, old, protos):
+    """The findings on changed lines the file did not have at rev's merge base. Each finding of
+    the old file pays for one finding on a changed line with the same key; findings on untouched
+    lines pay first, since they are the same ones."""
+    import collections, tempfile
+    budget = collections.Counter()
+    if old:
+        with tempfile.TemporaryDirectory() as tmp:
+            p = pathlib.Path(tmp) / f.name           # same name: compiler messages are matched by it
+            p.write_bytes(base_text(rev, old))
+            budget.update(finding_key(r, m) for _, r, m in lint(p, protos))
+    for ln, r, m in hits:
+        if ln not in changed and r != 'compile-error':
+            budget[finding_key(r, m)] -= 1
+    out = []
+    for h in hits:
+        # a compile error counts wherever it is: an edit anywhere can cause it
+        if h[0] in changed or h[1] == 'compile-error':
+            k = finding_key(h[1], h[2])
+            if budget[k] > 0:
+                budget[k] -= 1
+            else:
+                out.append(h)
+    return out
+
+
 def touched_units(rev):
     """The src/ units a branch touches since it left rev: .c files it changed, and every unit that
     includes (directly or not) a header it changed. Paths relative to src/, without .c."""
@@ -323,9 +404,21 @@ def compile_units(units):
     -> [(file name, line, 'compile-error', message)]"""
     import subprocess
     ninja = (ROOT / 'build.ninja').read_text(encoding='utf-8', errors='replace')
+
+    def target(u):
+        return NINJA_SEP.join(['build', 'GW4E69', 'src', '%s.o' % u.replace('/', NINJA_SEP)])
+    # A .c file #included into another unit (char_tex_manager.c into char.c) is checked by
+    # compiling the unit that includes it.
+    units = set(units)
+    for u in [u for u in units if ('build %s:' % target(u)) not in ninja]:
+        f = (ROOT / 'src' / (u + '.c')).resolve()
+        hosts = {c.relative_to(ROOT / 'src').with_suffix('').as_posix()
+                 for c in (ROOT / 'src').rglob('*.c') if f in includes.seen_headers(c)}
+        if hosts:
+            units = (units - {u}) | hosts
     targets, missing = [], []
-    for u in units:
-        t = NINJA_SEP.join(['build', 'GW4E69', 'src', '%s.o' % u.replace('/', NINJA_SEP)])
+    for u in sorted(units):
+        t = target(u)
         (targets if ('build %s:' % t) in ninja else missing).append((u, t))
     out = []
     for u, _ in missing:
@@ -368,9 +461,10 @@ def main():
     if '--diff' in argv:
         k = argv.index('--diff'); rev = argv[k + 1]; del argv[k:k + 2]
     args = [a for a in argv if a not in ('--summary', '--compile')]
-    files = [pathlib.Path(a) for a in args] or sorted((ROOT / 'src').glob('*.c'))
+    files = [pathlib.Path(a) for a in args] or sorted((ROOT / 'src').rglob('*.c'))
     protos = header_protos()
     changed = changed_lines(rev) if rev else None
+    olds = base_paths(rev, 'src') if rev else {}
     total = 0
     for f in files:
         if 'unsorted' in f.parts:
@@ -378,8 +472,9 @@ def main():
         if changed is not None and f.name not in changed:
             continue
         hits = lint(f, protos)
-        if changed is not None:     # file-level checks (line 1) count only if line 1 changed too
-            hits = [h for h in hits if h[0] in changed[f.name] or h[1] == 'compile-error']
+        if changed is not None:
+            rel = f.resolve().relative_to(ROOT).as_posix()
+            hits = new_hits(f, hits, changed[f.name], rev, olds.get(rel), protos)
         total += len(hits)
         COMPILE_ERRORS.update((f.name, h[0]) for h in hits if h[1] == 'compile-error')
         if '--summary' in sys.argv:
@@ -392,8 +487,8 @@ def main():
             for ln, n, msg in hits:
                 print('%s:%d: %s: %s' % (f.name, ln, n, msg[:100]))
     # headers: long lines only (the C style rules above are for .c files); with --diff, only the
-    # lines changed since rev.
-    for f, ln, n in header_long_lines(rev):
+    # ones the branch added; with named files and no --diff, none (they are not the files asked for).
+    for f, ln, n in (header_long_lines(rev) if rev or not args else []):
         print('%s:%d: long-line: %d columns' % (f, ln, n))
         total += 1
     if '--compile' in sys.argv:
