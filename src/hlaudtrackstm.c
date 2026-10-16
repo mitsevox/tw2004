@@ -73,7 +73,7 @@ u8 AddToAudStreamReadQueue(s32 hFile, u8* pDst, u32 uLen, u32 uOffset,
     bQueued = 0;
     AudLock_LockReadQueue("AddToAudStreamReadQueue");
     if (gAudStreamReadQueue.queue.nCount + 1 <= gAudStreamReadQueue.queue.nMax) {
-        pRead = UQueue_Push(&gAudStreamReadQueue.queue);
+        pRead = (AudStreamRead*)UQueue_Push(&gAudStreamReadQueue.queue);
         pRead->hFile = hFile;
         bQueued = 1;
         pRead->pDst = pDst;
@@ -98,7 +98,7 @@ u8 Stm_QueueSilence(AudTrack* pTrack) {
     bQueued = 0;
     AudLock_LockReadQueue("AddToAudStreamReadQueue");
     if (gAudStreamReadQueue.queue.nCount + 1 <= gAudStreamReadQueue.queue.nMax) {
-        pRead = UQueue_Push(&gAudStreamReadQueue.queue);
+        pRead = (AudStreamRead*)UQueue_Push(&gAudStreamReadQueue.queue);
         memset(pRead, 0, sizeof(AudStreamRead));
         pRead->pTrack = pTrack;
         bQueued = 1;

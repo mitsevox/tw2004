@@ -1035,6 +1035,8 @@ f32         FB_fGetFrameBufferOffsetX(GoFrameBuf* pBuf); // f0
 
 // ---- the parts of a render camera: lens (GoCamera.c) ----------------------------------------
 
+void     CA_vInitOnce(void);                          // once-only set-up (empty)
+void     CA_vCloseOnce(void);                         // once-only close (empty)
 CamLens* CA_spCreateCamera(void);                     // a new lens
 void     CA_vReleaseCamera(CamLens* pLens);           // free it
 void     Camera_SetCameraPositionAndTarget(CamLens* pLens, f32* pPos, f32* pTarget); // aims the lens from

@@ -344,12 +344,25 @@ COUNTED = {'long-line', 'trailing-space', 'tab', 'crlf', 'final-newline', 'heade
 
 def finding_key(rule, msg):
     """What identifies a finding in two versions of a file, apart from its line number: for a
-    pattern rule the text it matched (a placeholder name, a register), else the message."""
+    pattern rule the text it matched (a placeholder name, a register), else the message. For the
+    comment rules that is only the address, register or build the comment names, so rewording
+    the rest of the comment keeps the key."""
     if rule in COUNTED:
         return rule, ''
+    token = COMMENT_TOKEN.get(rule)
+    if token:
+        found = token.findall(msg)
+        return rule, ' '.join(found) if found else msg
     rx = dict(CHECKS).get(rule)
     m = rx.search(msg) if rx else None
     return rule, m.group(0) if m else msg
+
+
+COMMENT_TOKEN = {
+    'comment-address': re.compile(r'\b0x80[0-9A-Fa-f]{6}\b'),
+    'comment-register': re.compile(r"(?<!\.)(?<!->)(?<!'s )\b[rf](?:[0-9]|[12][0-9]|3[01])\b"),
+    'comment-other-build': re.compile(r'\b(?:TW0[67]|PDB|DWARF)\b'),
+}
 
 
 def new_hits(f, hits, changed, rev, old, protos):

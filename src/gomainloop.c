@@ -164,8 +164,6 @@ void fn_8007185C(void);
 void fn_80071890(void);
 void fn_800718C4(void);
 void LLVideo_InitModule(void);
-void fn_800763B4(void);
-void fn_800763B8(void);
 void FE_vOpenONCE(void);
 void FE_vInitModule(void);
 void FE_vCloseModule(void);
@@ -390,7 +388,7 @@ void fn_8006C720(void) {
     StaticMem_Reset();
     fn_8002E258();
     FE_vOpenONCE();
-    fn_800763B4();
+    CA_vInitOnce();
     Physics_InitOnce();
     fn_800563C4();
     STATEMAIN_OpenONCE();
@@ -406,7 +404,7 @@ void fn_8006C770(void) {
     GM_vCloseModuleONCE();
     STATEMAIN_CloseONCE();
     GOLFERSTATE_CloseONCE();
-    fn_800763B8();
+    CA_vCloseOnce();
     fn_80056454();
     fn_8002E25C();
     FE_LogoDesign_CloseOnce();

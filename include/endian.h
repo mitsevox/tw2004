@@ -12,10 +12,10 @@
 
 #include "game_types.h"
 
-// Copy nBytes from *ppSrc to pDst as values nWidth bytes wide (2, 4 or 8), reversing each value's
-// bytes, and move *ppSrc past them; a negative nWidth copies without swapping (ByteSwap.c). For
+// UByteSwap.c: copy nBytes from *pSrc to pDest as values elmSize bytes wide (2, 4 or 8), reversing
+// each value's bytes, and move *pSrc past them; a negative elmSize copies without swapping. For
 // the files that are little-endian on disc.
-void BYTESWAP_SWAPDATA(u8** ppSrc, u8* pDst, int nBytes, int nWidth);
+void BYTESWAP_SWAPDATA(u8** pSrc, u8* pDest, int nBytes, int elmSize);
 
 // One field of a byte-swap description: nBytes bytes made of nSize-byte values (negative: not
 // swapped).
