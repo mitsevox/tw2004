@@ -218,8 +218,8 @@ void fn_80094534(f32 (*pMtx)[4], ParticleShape* pShape, ParticleVertex* pVerts, 
             }
             fAngle = pVerts->f1C * t + pVerts->f18;
             fAngle = fAngle / (2.0f * PI);
-            fSin = Math_Sin(fAngle);
-            fCos = Math_Cos(fAngle);
+            fSin = sinf(fAngle);
+            fCos = cosf(fAngle);
             m[0][0] = -fCos;
             m[0][1] = fSin;
             m[0][3] = -v.x;

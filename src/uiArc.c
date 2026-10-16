@@ -207,8 +207,8 @@ void UIArc_Draw(UIArc* pArc, s32 a, s32 b) {
         }
         if (i == 0) {
             fCos2[0] = 0.0f;    // fake match: a dead store, numbers fCos2 before fSin2
-            fSin2[0] = Math_Sin(fStart);
-            fCos = Math_Cos(fStart);
+            fSin2[0] = sinf(fStart);
+            fCos = cosf(fStart);
         } else {
             fCos = fCos2[0];
         }
@@ -262,8 +262,8 @@ void UIArc_Draw(UIArc* pArc, s32 a, s32 b) {
         } else {
             fAngle = fStep * i + fStart;
         }
-        fSin2[0] = Math_Sin(fAngle);
-        fCos2[0] = Math_Cos(fAngle);
+        fSin2[0] = sinf(fAngle);
+        fCos2[0] = cosf(fAngle);
         aVtx[2].fU = fU2[0];
         aVtx[2].fV = fV2[0];
         aVtx[2].fX = fOuterX * fCos2[0];

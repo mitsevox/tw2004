@@ -128,14 +128,14 @@ void GR_ResetGreenGrid(int nView) {
                 PLAYER(ViewController_GetActivePlayerNumber(nViewCopy))->ball.vPos,
                 gpGreenGrid->aDir[nView]);
     gpGreenGrid->aDir[nView][1] = 0.0f;
-    fDist = (f32)Math_Sqrt(Vec3_LengthSqClamped(gpGreenGrid->aDir[nView]));
+    fDist = (f32)Math_Sqrt(LLMath_LengthSquared3(gpGreenGrid->aDir[nView]));
     LLMath_Normalize3(gpGreenGrid->aDir[nView], gpGreenGrid->aDir[nView]);
     if (PLAYER(ViewController_GetActivePlayerNumber(nViewCopy))->nClub == CLUB_PUTTER_e) {
         GR_Vec4Sub(&Ter_GetTGD()->pin[Game_CurrentPinSet()].x,
                     PLAYER(ViewController_GetActivePlayerNumber(nViewCopy))->ball.vPos,
                     vPin);
         vPin[1] = 0.0f;
-        fLen = 2.0f + (f32)Math_Sqrt(Vec3_LengthSqClamped(vPin));
+        fLen = 2.0f + (f32)Math_Sqrt(LLMath_LengthSquared3(vPin));
         gpGreenGrid->anRows[nView] = 2.0f * fLen;
         if (gSession.nSplitScreen && gpGreenGrid->anRows[nView] > 8) {
             gpGreenGrid->anRows[nView] = 8;

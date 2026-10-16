@@ -237,7 +237,7 @@ void fn_8006B0B8(int nPlayer) {
     }
     fn_8006BE80(gPlayers[nPlayer].vBall, gPlayers[nPlayer].vTarget, vToTarget);
     vToTarget[1] = 0.0f;
-    fDist = Math_Sqrt(Vec3_LengthSqClamped(vToTarget));
+    fDist = Math_Sqrt(LLMath_LengthSquared3(vToTarget));
     lbl_801D5F78[nPlayer].n0 = 2;
     switch (gPlayers[nPlayer].nShotKind) {
     case 0:

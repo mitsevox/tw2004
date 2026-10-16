@@ -69,7 +69,7 @@ void Camera_SetCameraPositionAndTarget(CamLens* pLens, f32* pPos, f32* pTarget) 
     pLens->m4[3][3] = 1.0f;
     vDir[3] = 0.0f;
     Camera_Subtract3(pTarget, pPos, vDir);
-    if ((f32)Math_Sqrt(Vec3_LengthSqClamped(vDir)) > 0.1f) {
+    if ((f32)Math_Sqrt(LLMath_LengthSquared3(vDir)) > 0.1f) {
         LLMath_Normalize3(vDir, pLens->m4[2]);
         if (fabsf(pLens->m4[2][1]) < 0.99f) {
             pLens->m4[0][0] = pLens->m4[2][2];
@@ -95,7 +95,7 @@ void Camera_SetCameraPositionAndTargetWithSideVector(CamLens* pLens, f32* pPos, 
     pLens->m4[3][3] = 1.0f;
     vDir[3] = 0.0f;
     Camera_Subtract3(pTarget, pPos, vDir);
-    if ((f32)Math_Sqrt(Vec3_LengthSqClamped(vDir)) > 0.1f) {
+    if ((f32)Math_Sqrt(LLMath_LengthSquared3(vDir)) > 0.1f) {
         LLMath_Normalize3(vDir, pLens->m4[2]);
         pLens->m4[0][0] = pSide[0];
         pLens->m4[0][1] = pSide[1];
@@ -123,7 +123,7 @@ void Camera_SetCameraPositionAndTargetWithOffsetAndScale(CamLens* pLens, f32* pP
     pLens->m4[3][3] = 1.0f;
     vDir[3] = 0.0f;
     Camera_Subtract3(pTarget, pPos, vDir);
-    if ((f32)Math_Sqrt(Vec3_LengthSqClamped(vDir)) > 0.1f) {
+    if ((f32)Math_Sqrt(LLMath_LengthSquared3(vDir)) > 0.1f) {
         LLMath_Normalize3(vDir, pLens->m4[2]);
         if (fabsf(pLens->m4[2][1]) < 0.99f) {
             pLens->m4[0][0] = pLens->m4[2][2];

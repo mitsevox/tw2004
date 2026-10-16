@@ -906,7 +906,7 @@ config.libs = [
             Object(Matching, "unsorted/code_800080D0.c"),
             Object(Matching, "unsorted/code_800082F8.c"),
             Object(Matching, "GoEntry.c"),
-            Object(Matching, "Quaternion.c"),
+            Object(Matching, "MathQuat.c"),
             Object(Matching, "StaticMemory.c"),
             Object(Matching, "UMemPool.c"),
             Object(Matching, "urandom.c"),

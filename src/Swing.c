@@ -1382,8 +1382,8 @@ void SW_vGetClubDirection(int nPlayer, f32* pOut) {
         fAngle = Math_Atan((fTopX - fCentreX) / fDY);
         gPlayers[nPlayer].swing.fControllerSliceAngle = fAngle;
         fAngle = SW_fCalculateSliceAmount(&gPlayers[nPlayer].nClub, fAngle);
-        fSin   = Math_Sin(fAngle);
-        fCos   = Math_Cos(fAngle);
+        fSin   = sinf(fAngle);
+        fCos   = cosf(fAngle);
         pOut[0] = -fSin;
         pOut[1] = 0.0f;
         pOut[2] = fCos;

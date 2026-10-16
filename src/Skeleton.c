@@ -25,21 +25,15 @@ f32  SKEL_ItterateIKChain(CharModel* pModel, IKChain* pChain, f32* pTarget, int 
 void SKEL_InitIKChain(CharModel* pModel, IKChain* pChain);
 void SKEL_TransformIKChainFromBones(CharModel* pModel, IKChain* pChain);
 f32  SKEL_AdjustHipHeight(CharModel* pModel, IKChain* pChain, f32* pTarget);
-void Quat_Invert(f32* pQ, f32* pOut);                   // Quaternion.c
 void SKA_BlendVec3(f32* pA, f32* pB, f32* pOut, f32 fT);  // a blend of two points by fT
 void SKA_BlendQuat(f32* pA, f32* pB, f32* pOut, f32 fT);  // a blend of two rotations by fT
 void LLMath_InvertNormalized(f32 (*pSrc)[4], f32 (*pDst)[4]);  // UMemPool.c: rotation+translation inverse
-void Quat_BuildFromMatrix(f32 (*m)[4], f32* pQ);                 // Quaternion.c: a rotation matrix's quaternion
 void Character_UpdateFeetTerrainInfo(Character* pChar, int bNormals);   // char.c
 void Character_PlaceFeetOnGround(Character* pChar);                     // char.c
 void fn_80113E60(void);                                 // DynChain.c
 void fn_80114080(void);                                 // DynChain.c
 void fn_80114398(struct DynChain* pChain);              // DynChain.c: frees a chain
 void fn_8011443C(CharModel* pModel, struct DynChain* pChain, f32 fDelta);   // DynChain.c
-void Quat_Add(f32* pA, f32* pB, f32* pOut);           // Quaternion.c
-void Quat_RotateVector(f32* pQuat, f32* pIn, f32* pOut);       // Quaternion.c: a vector turned by it
-void Quat_BuildFromVectorAndScale(f32* pAxis, f32* pOut, f32 fAngle);     // Quaternion.c: an axis-angle rotation
-void Quat_QuatToMatrix(f32* pQ, f32 (*pMtx)[4]);               // Quaternion.c: a rotation's matrix
 void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);        // copies a matrix
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);                        // identity
 void SKEL_SetHalfJoint(CharModel* pModel, int nBone, int nJoint, f32* pRest);
@@ -153,12 +147,12 @@ f32 SKEL_ItterateIKChain(CharModel* pModel, IKChain* pChain, f32* pTarget, int n
             nBone = pLink->nBone;
             SKEL_Vec3Sub(vEnd, pModel->pPoses[nBone].v10, vToEnd);
             SKEL_Vec3Sub(pTarget, pModel->pPoses[nBone].v10, vToTarget);
-            fLen = Math_Sqrtf(Vec3_LengthSqClamped(vToEnd) * Vec3_LengthSqClamped(vToTarget));
+            fLen = Math_Sqrtf(LLMath_LengthSquared3(vToEnd) * LLMath_LengthSquared3(vToTarget));
             fCos = Vec3_Dot(vToEnd, vToTarget) / fLen;
             if (fCos > 1.0f || fCos < -1.0f) {
                 fAngle = 0.0f;
             } else {
-                fAngle = pLink->fTurnShare * Math_Acos(fCos);
+                fAngle = pLink->fTurnShare * acosf(fCos);
             }
             if (fabsf(fAngle) > PI / 5000.0f) {
                 // the turn's axis in the bone's own frame, without its y and locked (nLockedAxis)
@@ -184,7 +178,7 @@ f32 SKEL_ItterateIKChain(CharModel* pModel, IKChain* pChain, f32* pTarget, int n
     SKEL_SetIKChainRotations(pSkel, pChain);
     Vec3Copy(vEnd, pChain->v8);
     SKEL_Vec3Sub(vEnd, pTarget, vDiff);
-    return (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
+    return (f32)Math_Sqrt(LLMath_LengthSquared3(vDiff));
 }
 
 // fake match: EA's file had a function here that the linker stripped; it used the 0.5 and 3.0 of
@@ -388,7 +382,7 @@ f32 SKEL_AdjustHipHeight(CharModel* pModel, IKChain* pChain, f32* pTarget) {
     pChain->pLinks[0].v28[1] = pSkel->fRootLinkHeight + pSkel->vHipOffset[1];
     SKEL_Vec3Sub(pTarget, pChain->v8, vDiff);
     Vec4_CopyPoint(pChain->v8, pModel->pPoses[pChain->pLinks[pChain->nLinks - 1].nBone].v10);
-    return (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
+    return (f32)Math_Sqrt(LLMath_LengthSquared3(vDiff));
 }
 
 // Turns the IK on or off.

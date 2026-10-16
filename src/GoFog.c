@@ -37,9 +37,9 @@ void FG_vBlendFogForCamera(void) {
     fCos = (fX < -1.0f) ? -1.0f : (fX > 1.0f) ? 1.0f : fX;
     fSin = (fZ < -1.0f) ? -1.0f : (fZ > 1.0f) ? 1.0f : fZ;
     if (fSin > 0.0f) {
-        fAngle = Math_Acos(fCos);
+        fAngle = acosf(fCos);
     } else {
-        fAngle = TWOPI - Math_Acos(fCos);
+        fAngle = TWOPI - acosf(fCos);
     }
     fAngle += pFog->fRotation;
     if (fAngle >= TWOPI) {

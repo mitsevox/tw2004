@@ -170,12 +170,12 @@ void LI_vEulerAnglesRYP(f32 (*pMtx)[4], f32 fA, f32 fB, f32 fC) {
     LLMath_IdentifyMat(mA);
     LLMath_IdentifyMat(mB);
     LLMath_IdentifyMat(mC);
-    mA[2][0] = Math_Sin(fA);
-    mA[2][2] = Math_Cos(fA);
-    mB[1][2] = Math_Sin(fB);
-    mB[1][1] = Math_Cos(fB);
-    mC[0][1] = Math_Sin(fC);
-    mC[0][0] = Math_Cos(fC);
+    mA[2][0] = sinf(fA);
+    mA[2][2] = cosf(fA);
+    mB[1][2] = sinf(fB);
+    mB[1][1] = cosf(fB);
+    mC[0][1] = sinf(fC);
+    mC[0][0] = cosf(fC);
     mA[0][2] = -mA[2][0];
     mA[0][0] = mA[2][2];
     mB[2][1] = -mB[1][2];

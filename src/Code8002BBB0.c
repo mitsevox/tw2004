@@ -138,8 +138,8 @@ void AI_NudgeAim(int nPlayer, f32 fDelta) {
     } else if (gPlayers[nPlayer].fAim > PI) {
         gPlayers[nPlayer].fAim -= 2 * PI;
     }
-    fSin = Math_Sin(gPlayers[nPlayer].fAim);
-    fCos = Math_Cos(gPlayers[nPlayer].fAim);
+    fSin = sinf(gPlayers[nPlayer].fAim);
+    fCos = cosf(gPlayers[nPlayer].fAim);
     vTarget[0] = gPlayers[nPlayer].vBall[0] + -fSin * gPlayers[nPlayer].fDistance;
     vTarget[2] = gPlayers[nPlayer].vBall[2] + fCos * gPlayers[nPlayer].fDistance;
     fn_8002BDEC_SetTarget(nPlayer, vTarget);
@@ -151,8 +151,8 @@ void AI_NudgeDistance(int nPlayer, f32 fDelta) {
     f32     fSin, fCos;
 
     gPlayers[nPlayer].fDistance += fDelta;
-    fSin = Math_Sin(gPlayers[nPlayer].fAim);
-    fCos = Math_Cos(gPlayers[nPlayer].fAim);
+    fSin = sinf(gPlayers[nPlayer].fAim);
+    fCos = cosf(gPlayers[nPlayer].fAim);
     vTarget[0] = gPlayers[nPlayer].vBall[0] + -fSin * gPlayers[nPlayer].fDistance;
     vTarget[2] = gPlayers[nPlayer].vBall[2] + fCos * gPlayers[nPlayer].fDistance;
     fn_8002BDEC_SetTarget(nPlayer, vTarget);

@@ -309,7 +309,7 @@ void UI_Obj_RenderBoostUI(int nObj) {
             LLMath_Normalize3(aDir, aDir);
             fDot = (Vec3_Dot(aUp, aDir) < -1.0f) ? -1.0f
                  : ((Vec3_Dot(aUp, aDir) > 1.0f) ? 1.0f : Vec3_Dot(aUp, aDir));
-            gUIObjSettings[nObj].a0[5] = Math_Acos(fDot);
+            gUIObjSettings[nObj].a0[5] = acosf(fDot);
             if (fSpinY < 0.0f) {
                 gUIObjSettings[nObj].a0[5] = -gUIObjSettings[nObj].a0[5];
             }
@@ -320,10 +320,10 @@ void UI_Obj_RenderBoostUI(int nObj) {
             mScale[0][0] = gUIObjSettings[nObj].a0[6];
             mScale[1][1] = gUIObjSettings[nObj].a0[6];
             mScale[2][2] = gUIObjSettings[nObj].a0[6];
-            fSinRoll = Math_Sin(gUIObjSettings[nObj].a0[9]);
-            fCosRoll = Math_Cos(gUIObjSettings[nObj].a0[9]);
-            fSinTilt = Math_Sin(gUIObjSettings[nObj].a0[5]);
-            fCosTilt = Math_Cos(gUIObjSettings[nObj].a0[5]);
+            fSinRoll = sinf(gUIObjSettings[nObj].a0[9]);
+            fCosRoll = cosf(gUIObjSettings[nObj].a0[9]);
+            fSinTilt = sinf(gUIObjSettings[nObj].a0[5]);
+            fCosTilt = cosf(gUIObjSettings[nObj].a0[5]);
             if (fSpinX < 0.0f && fSpinY < 0.0f) {
                 gUIObjSettings[nObj].a0[9] += (fabsf(fSpinX) > fabsf(fSpinY)) ? fabsf(fSpinX) : fabsf(fSpinY);
             } else {

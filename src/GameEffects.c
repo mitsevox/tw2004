@@ -391,7 +391,7 @@ void GameEffects_InFlightGameBreakerTrigger(int nPlayer) {
     if (!(gPlayers[nPlayer].uFlags & 8) && !Player_IsCPU(nPlayer) && gGameEffects.bGameBreaker != 1) {
         GameEffects_Vec3Sub(gPlayers[nPlayer].ball.vPos, gPlayers[nPlayer].ballBefore.vPos, v);
         v[1] = 0.0f;
-        fDist = Math_Sqrt(Vec3_LengthSqClamped(v));
+        fDist = Math_Sqrt(LLMath_LengthSquared3(v));
         if (gPlayers[nPlayer].nClub == 25) {
             if (fDist < 1.0f) {
                 return;
@@ -406,7 +406,7 @@ void GameEffects_InFlightGameBreakerTrigger(int nPlayer) {
         if (!gPlayers[nPlayer].bHitPin && Ter_GetTGD()) {
             GameEffects_Vec3Sub(gPlayers[nPlayer].ball.vStart, gPlayers[nPlayer].ballBefore.vPos, v2);
             v2[1] = 0.0f;
-            fDist = Math_Sqrt(Vec3_LengthSqClamped(v2));
+            fDist = Math_Sqrt(LLMath_LengthSquared3(v2));
             nLie = gPlayers[nPlayer].ball.nLie;
             if (gPlayers[nPlayer].ballBefore.nSurface >= 0) {
                 nClass = gSurfaceTypes[gPlayers[nPlayer].ballBefore.nSurface].nClass;
@@ -522,7 +522,7 @@ void GameEffects_RenderPredictedGB(void) {
     pGE = &gGameEffects;       // fake match: steers the register choice (found by the permuter)
     GameEffects_Vec3Sub(gPlayers[pGE->nPlayer].ball.vPos, gPlayers[pGE->nPlayer].ballBefore.vPos, v);
     v[1] = 0.0f;
-    fDist = Math_Sqrt(Vec3_LengthSqClamped(v));
+    fDist = Math_Sqrt(LLMath_LengthSquared3(v));
     if (!Player_IsCPU(gGameEffects.nPlayer)) {
         if (gPlayers[gGameEffects.nPlayer].nShotKind == SHOT_TYPE_PUTT_e) {
             if (fDist < 2.0f && !gGameEffects.bClosing) {

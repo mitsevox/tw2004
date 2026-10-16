@@ -114,8 +114,8 @@ f32 Misc_RandFuncg(int nStream) {
     }
     fU = Misc_RandFuncf(nStream);
     fAngle = 2.0f * PI * Misc_RandFuncf(nStream);
-    fSin = Math_Sin(fAngle);
-    fCos = Math_Cos(fAngle);
+    fSin = sinf(fAngle);
+    fCos = cosf(fAngle);
     fRadius = Math_Sqrt(-2.0f * logf(fU));
     lbl_80281BE0 = 1;
     lbl_80281BE4 = fRadius * fSin;

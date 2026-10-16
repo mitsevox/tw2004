@@ -717,14 +717,14 @@ void SKAUtil_EulerAnglesRPY(f32* pOut, f32 fX, f32 fY, f32 fZ) {
     f32 fCosXY;
 
     fHalfX = 0.5f * fX;
-    fSinX = Math_Sin(fHalfX);
-    fCosX = Math_Cos(fHalfX);
+    fSinX = sinf(fHalfX);
+    fCosX = cosf(fHalfX);
     fHalfZ = 0.5f * fZ;
-    fSinZ = Math_Sin(fHalfZ);
-    fCosZ = Math_Cos(fHalfZ);
+    fSinZ = sinf(fHalfZ);
+    fCosZ = cosf(fHalfZ);
     fHalfY = 0.5f * fY;
-    fSinY = Math_Sin(fHalfY);
-    fCosY = Math_Cos(fHalfY);
+    fSinY = sinf(fHalfY);
+    fCosY = cosf(fHalfY);
     fCosXY = fCosX * fCosY;
     pOut[3] = fCosZ * fCosXY - fSinZ * (fSinX * fSinY);
     pOut[0] = fSinZ * (fCosX * fSinY) + fSinX * (fCosZ * fCosY);

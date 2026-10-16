@@ -74,7 +74,6 @@ void GoDynObj_Vec3Add(f32* pA, f32* pB, f32* pOut);
 void DynObj_DrawBallMarkers(void);
 void DynObj_DrawGolfBalls(u8* pState);
 f32  DynObj_GetBallPixels(int nPlayer);
-void Quat_QuatToMatrix(f32* pQ, f32 (*pMtx)[4]);         // Quaternion.c: to a matrix
 void DynObj_UpdateDivot(int nPlayer);
 void DynObj_UpdateTee(int nPlayer);
 int  fn_8001005C(TexBank* pBank, u64 uHash);       // LLTex.c: the texture's index, or 0x80000000
@@ -450,7 +449,7 @@ void DynObj_PitchMarkAdd(f32* pPos, int nPlayer) {
     vPos[3] = 1.0f;
     fGround = Ter_GetSupportingGroundData(Ter_GetTGD(), vPos, &pSurface, vNormal);
     if (TER_NO_GROUND != fGround && pSurface->nClass == 3 && fGround - pPos[1] < 0.02f &&
-        (f32)Math_Sqrt(Vec3_LengthSqClamped(gPlayers[nPlayer].ball.vVel)) >= 10.0f) {
+        (f32)Math_Sqrt(LLMath_LengthSquared3(gPlayers[nPlayer].ball.vVel)) >= 10.0f) {
         if (gpDynObjState->apPitchMark[gpDynObjState->nNextPitchMark] == NULL) {
             // EA bug: def.n1A is never set, and type 0's setup copies it to DynObj.n14E
             def.n0 = 0;
@@ -819,7 +818,7 @@ f32 DynObj_GetBallPixels(int nPlayer) {
     vBottom.x = 256.0f * (1.0f + vBottom.x);
     vBottom.y = 224.0f * (1.0f + vBottom.y);
     GoDynObj_Vec3Sub(&vTop.x, &vBottom.x, vDiff);
-    return (f32)Math_Sqrt(Vec3_LengthSqClamped(vDiff));
+    return (f32)Math_Sqrt(LLMath_LengthSquared3(vDiff));
 }
 
 // Puts the player's divot ('TEO ' 10002) at pPos, facing against the aim, to be thrown by
@@ -1135,15 +1134,15 @@ void DynObj_LaunchDirection(f32* pOut, f32 fTurn, f32 fTilt) {
         pOut[2] = 0.0f;
         pOut[0] = 0.0f;
     } else {
-        fSinTilt = Math_Sin(fTilt);
-        fCosTilt = Math_Cos(fTilt);
+        fSinTilt = sinf(fTilt);
+        fCosTilt = cosf(fTilt);
         if (0.0f == fTurn) {
             pOut[0] = 0.0f;
             pOut[1] = fCosTilt;
             pOut[2] = fSinTilt;
         } else {
-            fSinTurn = Math_Sin(fTurn);
-            fCosTurn = Math_Cos(fTurn);
+            fSinTurn = sinf(fTurn);
+            fCosTurn = cosf(fTurn);
             pOut[1] = fCosTilt;
             pOut[0] = fSinTilt * fSinTurn;
             pOut[2] = fSinTilt * fCosTurn;

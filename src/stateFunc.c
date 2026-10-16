@@ -1706,7 +1706,7 @@ void STATEFUNC_RemoveBallUpdate(int nPlayer) {
                 f32 fT4 = Character_GetTagTime(gPlayers[nPlayer].pChar, 4);
                 if (Character_GetTagTime(gPlayers[nPlayer].pChar, 3) > fT4) {
                     fn_80062DDC(pB->vPos, pPrev, vDir);
-                    fSpeed = (f32)Math_Sqrt(Vec3_LengthSqClamped(vDir));
+                    fSpeed = (f32)Math_Sqrt(LLMath_LengthSquared3(vDir));
                     if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
                         LLMath_Normalize3(vDir, vDir);
                     }

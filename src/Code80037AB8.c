@@ -6,9 +6,6 @@
 #include "charstate.h"
 
 void  fn_801127C4(void* pDesc);                // hwsMaterial_Gc.c
-void  Quat_Add(f32* pA, f32* pB, f32* pOut);                // Quaternion.c
-void  Quat_RotateVector(f32* pQuat, f32* pIn, f32* pOut);            // Quaternion.c: pIn turned by pQuat
-void  Quat_QuatToMatrix(f32* pQ, f32 (*pMtx)[4]);                   // Quaternion.c: to a matrix
 void  LLMath_InvertNormalized(f32 (*pSrc)[4], f32 (*pDst)[4]);            // UMemPool.c: inverts a matrix
 
 // section note: the .bss between Skin.c's and GoPostFx.c's; only lbl_80281100 (the .sdata right

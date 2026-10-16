@@ -63,8 +63,8 @@ void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 fYaw, f32 fPitch, f32 fRoll) {
             pMtx[1][0] = 0.0f;
             pMtx[0][1] = 0.0f;
             if (fYaw != 0.0f) {
-                fSinYaw = Math_Sin(fYaw);
-                fCosYaw = Math_Cos(fYaw);
+                fSinYaw = sinf(fYaw);
+                fCosYaw = cosf(fYaw);
                 pMtx[2][2] = fCosYaw;
                 pMtx[0][0] = fCosYaw;
                 pMtx[2][0] = fSinYaw;
@@ -76,8 +76,8 @@ void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 fYaw, f32 fPitch, f32 fRoll) {
                 pMtx[0][2] = 0.0f;
             }
         } else {
-            fSinPitch = Math_Sin(fPitch);
-            fCosPitch = Math_Cos(fPitch);
+            fSinPitch = sinf(fPitch);
+            fCosPitch = cosf(fPitch);
             if (fYaw == 0.0f) {
                 pMtx[0][0] = 1.0f;
                 pMtx[2][0] = 0.0f;
@@ -89,8 +89,8 @@ void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 fYaw, f32 fPitch, f32 fRoll) {
                 pMtx[1][2] = fSinPitch;
                 pMtx[2][1] = -fSinPitch;
             } else {
-                fSinYaw = Math_Sin(fYaw);
-                fCosYaw = Math_Cos(fYaw);
+                fSinYaw = sinf(fYaw);
+                fCosYaw = cosf(fYaw);
                 pMtx[0][0] = fCosYaw;
                 pMtx[0][1] = 0.0f;
                 pMtx[0][2] = -fSinYaw;
@@ -103,8 +103,8 @@ void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 fYaw, f32 fPitch, f32 fRoll) {
             }
         }
     } else {
-        fSinRoll = Math_Sin(fRoll);
-        fCosRoll = Math_Cos(fRoll);
+        fSinRoll = sinf(fRoll);
+        fCosRoll = cosf(fRoll);
         if (fPitch == 0.0f) {
             if (fYaw == 0.0f) {
                 pMtx[2][2] = 1.0f;
@@ -117,8 +117,8 @@ void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 fYaw, f32 fPitch, f32 fRoll) {
                 pMtx[0][1] = fSinRoll;
                 pMtx[1][0] = -fSinRoll;
             } else {
-                fSinYaw = Math_Sin(fYaw);
-                fCosYaw = Math_Cos(fYaw);
+                fSinYaw = sinf(fYaw);
+                fCosYaw = cosf(fYaw);
                 pMtx[2][0] = fSinYaw;
                 pMtx[2][1] = 0.0f;
                 pMtx[2][2] = fCosYaw;
@@ -130,8 +130,8 @@ void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 fYaw, f32 fPitch, f32 fRoll) {
                 pMtx[1][2] = fSinRoll * fSinYaw;
             }
         } else {
-            fSinPitch = Math_Sin(fPitch);
-            fCosPitch = Math_Cos(fPitch);
+            fSinPitch = sinf(fPitch);
+            fCosPitch = cosf(fPitch);
             if (fYaw == 0.0f) {
                 pMtx[2][0] = 0.0f;
                 pMtx[2][1] = -fSinPitch;
@@ -143,8 +143,8 @@ void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 fYaw, f32 fPitch, f32 fRoll) {
                 pMtx[1][1] = fCosRoll * fCosPitch;
                 pMtx[1][2] = fCosRoll * fSinPitch;
             } else {
-                fSinYaw = Math_Sin(fYaw);
-                fCosYaw = Math_Cos(fYaw);
+                fSinYaw = sinf(fYaw);
+                fCosYaw = cosf(fYaw);
                 pMtx[2][1] = -fSinPitch;
                 fSinRollSinPitch = fSinRoll * fSinPitch;
                 fCosRollSinPitch = fSinPitch * fCosRoll;
@@ -174,11 +174,11 @@ void mat44flt_ExtractEulerAngles(f32 (*pMtx)[4], f32* pYaw, f32* pPitch, f32* pR
 
     if (pMtx[2][2] != 0.0f) {
         fYaw = atan2f(pMtx[2][0], pMtx[2][2]);
-        fPitch = -Math_Asin(pMtx[2][1]);
+        fPitch = -asinf(pMtx[2][1]);
         if (pMtx[1][1] != 0.0f) {
             fRoll = atan2f(pMtx[0][1], pMtx[1][1]);
         } else if (pMtx[0][1] != 0.0f) {
-            if (pMtx[0][1] * Math_Cos(fPitch) > 0.0f) {
+            if (pMtx[0][1] * cosf(fPitch) > 0.0f) {
                 fRoll = PI / 2.0f;
             } else {
                 fRoll = -PI / 2.0f;
@@ -202,15 +202,15 @@ void mat44flt_ExtractEulerAngles(f32 (*pMtx)[4], f32* pYaw, f32* pPitch, f32* pR
             fYaw = -atan2f(pMtx[0][0], pMtx[0][0]);
         }
     } else {
-        fPitch = -Math_Asin(pMtx[2][1]);
-        if (pMtx[2][0] * Math_Cos(fPitch) > 0.0f) {
+        fPitch = -asinf(pMtx[2][1]);
+        if (pMtx[2][0] * cosf(fPitch) > 0.0f) {
             fYaw = PI / 2.0f;
         } else {
             fYaw = -PI / 2.0f;
         }
         if (pMtx[1][1] != 0.0f) {
             fRoll = atan2f(pMtx[0][1], pMtx[1][1]);
-        } else if (pMtx[0][1] * Math_Cos(fPitch) > 0.0f) {
+        } else if (pMtx[0][1] * cosf(fPitch) > 0.0f) {
             fRoll = PI / 2.0f;
         } else {
             fRoll = -PI / 2.0f;

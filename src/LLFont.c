@@ -408,8 +408,8 @@ void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz) {
     fX = pCtx->f70;
     fY = pCtx->f74;
     if (0.0f != pCtx->fB8) {
-        fSin = Math_Sin(pCtx->fB8);
-        fCos = Math_Cos(pCtx->fB8);
+        fSin = sinf(pCtx->fB8);
+        fCos = cosf(pCtx->fB8);
         if (0.0f != fAlignX) {
             fWidth = fn_80011C90(pFont, pCtx, p);
             bMeasured = 1;

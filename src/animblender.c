@@ -719,9 +719,9 @@ void SKATime_Idle(Character* pChar, int nPlayer, TSKATime* pPlayer, SKABlendNode
     f32 fDelta;
 
     pPlayer->fIdleClock += fT;
-    fSmoothRand = 1.0f - (3.0f + (Math_Cos(pPlayer->fIdleClock / 5.0f) +
-                                  (Math_Cos(5.0f * pPlayer->fIdleClock)
-                                   + Math_Cos(7.0f * pPlayer->fIdleClock / 3.0f)))) /
+    fSmoothRand = 1.0f - (3.0f + (cosf(pPlayer->fIdleClock / 5.0f) +
+                                  (cosf(5.0f * pPlayer->fIdleClock)
+                                   + cosf(7.0f * pPlayer->fIdleClock / 3.0f)))) /
                              6.0f;
     if (gPlayers[nPlayer].nClub == CLUB_PUTTER_e) {
         if (pChar->nGroup == 9) {
