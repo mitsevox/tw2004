@@ -5,7 +5,7 @@
 // A tag file is the save-data container: a sequence of records, each a 12-byte header
 // (tag, size, checksum) followed by the payload, padded to the device block size. An unused
 // header slot holds TAG_SENTINEL. Every record is CRC32-checked and XOR-ciphered through the
-// interfaces exposed by ChecksumCRC32.c and CipherXOR.c. A map of the records (tag, offset,
+// interfaces exposed by ChecksumCRC32.c and CryptXOR.c. A map of the records (tag, offset,
 // size, checksum) is kept in memory and its checksum is written into the session at TagFile_End.
 
 #include "Common/TagFile.h"
@@ -54,7 +54,7 @@ typedef struct {
     TagSession               Session;       // 0x04
     u8*                      pKey;          // 0x4C
     u32                      uKeyLen;       // 0x50
-    const CipherInterface*   pCipher;       // 0x54
+    const CryptTypeT*        pCipher;       // 0x54
     const ChecksumInterface* pChecksum;     // 0x58
     int                      eOperation;    // 0x5C  1 create, 2 delete, 3 end, 4/5 open, 6 write, 8 read
     int                      eStep;         // 0x60  step within the operation
@@ -89,7 +89,7 @@ static int TagFile_SFIOError(int eError) {
 }
 
 static int TagFile_CipherError(int eError) {
-    if (eError == 0) {
+    if (eError == CRYPT_ERROR_NONE) {
         return 0;
     } else {
         return eError + 200;
@@ -326,16 +326,16 @@ static void TagFile_MapChecksum(void* pOut) {
 }
 
 static int TagFile_Encode(void* pData, u32 uSize) {
-    int eError = 0;
+    CryptErrorE eError = CRYPT_ERROR_NONE;
     if (_TagFile_pData->pCipher == NULL) {
         return 0;
     }
-    eError = _TagFile_pData->pCipher->pfnSetKey(_TagFile_pData->pKey, _TagFile_pData->uKeyLen);
-    if (eError == 0) {
-        eError = _TagFile_pData->pCipher->pfnEncode(pData, uSize);
-        if (eError == 0) {
-            eError = _TagFile_pData->pCipher->pfnReset();
-            if (eError == 0) {
+    eError = _TagFile_pData->pCipher->Start(_TagFile_pData->pKey, _TagFile_pData->uKeyLen);
+    if (eError == CRYPT_ERROR_NONE) {
+        eError = _TagFile_pData->pCipher->Encrypt(pData, uSize);
+        if (eError == CRYPT_ERROR_NONE) {
+            eError = _TagFile_pData->pCipher->Stop();
+            if (eError == CRYPT_ERROR_NONE) {
                 return 0;
             }
         }
@@ -344,16 +344,16 @@ static int TagFile_Encode(void* pData, u32 uSize) {
 }
 
 static int TagFile_Decode(void* pData, u32 uSize) {
-    int eError = 0;
+    CryptErrorE eError = CRYPT_ERROR_NONE;
     if (_TagFile_pData->pCipher == NULL) {
         return 0;
     }
-    eError = _TagFile_pData->pCipher->pfnSetKey(_TagFile_pData->pKey, _TagFile_pData->uKeyLen);
-    if (eError == 0) {
-        eError = _TagFile_pData->pCipher->pfnDecode(pData, uSize);
-        if (eError == 0) {
-            eError = _TagFile_pData->pCipher->pfnReset();
-            if (eError == 0) {
+    eError = _TagFile_pData->pCipher->Start(_TagFile_pData->pKey, _TagFile_pData->uKeyLen);
+    if (eError == CRYPT_ERROR_NONE) {
+        eError = _TagFile_pData->pCipher->Decrypt(pData, uSize);
+        if (eError == CRYPT_ERROR_NONE) {
+            eError = _TagFile_pData->pCipher->Stop();
+            if (eError == CRYPT_ERROR_NONE) {
                 return 0;
             }
         }
@@ -487,7 +487,7 @@ int TagFile_Init(const TagFileInitParams* pParams) {
     int eError = 0;
     int eSFIOError = 0;
     int eChecksumError = 0;
-    int eCipherError = 0;
+    CryptErrorE eCipherError = CRYPT_ERROR_NONE;
     if (TagFile_IsInitialised()) {
         return TAG_ERROR_ALREADY_INITIALISED;
     }
@@ -511,8 +511,8 @@ int TagFile_Init(const TagFileInitParams* pParams) {
     }
     _TagFile_pData->pCipher = pParams->pCipher;
     if (_TagFile_pData->pCipher != NULL) {
-        eCipherError = _TagFile_pData->pCipher->pfnInit(pParams->pAllocator);
-        if (eCipherError != 0) {
+        eCipherError = _TagFile_pData->pCipher->Init(pParams->pAllocator);
+        if (eCipherError != CRYPT_ERROR_NONE) {
             return TagFile_CipherError(eCipherError);
         }
         _TagFile_pData->uKeyLen = pParams->uKeyLen;
@@ -546,7 +546,7 @@ int TagFile_Shutdown(void) {
     int eError = 0;
     int eSFIOError = 0;
     int eChecksumError = 0;
-    int eCipherError = 0;
+    CryptErrorE eCipherError = CRYPT_ERROR_NONE;
     if (!TagFile_IsInitialised()) {
         return TAG_ERROR_NOT_INITIALISED;
     }
@@ -559,8 +559,8 @@ int TagFile_Shutdown(void) {
     TibExtMemFree(_TagFile_pData->pAllocator, _TagFile_pData->Map.pList, _TagFile_pData->Map.uMaxEntries * sizeof(TagMapEntry), 4);
     _TagFile_pData->Map.pList = NULL;
     if (_TagFile_pData->pCipher != NULL) {
-        eCipherError = _TagFile_pData->pCipher->pfnShutdown();
-        if (eCipherError != 0) {
+        eCipherError = _TagFile_pData->pCipher->Shutdown();
+        if (eCipherError != CRYPT_ERROR_NONE) {
             return TagFile_CipherError(eCipherError);
         }
         TibExtMemFree(_TagFile_pData->pAllocator, _TagFile_pData->pKey, _TagFile_pData->uKeyLen, 4);

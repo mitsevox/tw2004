@@ -6014,10 +6014,11 @@
    }
   },
   {
-   "name": "CipherXOR.c",
+   "name": "CryptXOR.c",
    "region": "EA-GCC",
    "name_confidence": "strong",
    "name_evidence": [
+    "TW06",
     "verified unit"
    ],
    "text": {
