@@ -158,7 +158,7 @@ PlayNowMode.c	open
 PsBallFx.c	open		
 PsMgr.c	open		
 Quaternion.c	open		
-RenderAccessors.c	open		
+RenderAccessors.c	done	63883fe8	claude-review
 Replay.c	open		
 ScreenClear.c	open		
 ShaderRow0.c	open		
