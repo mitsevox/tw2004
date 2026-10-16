@@ -1,89 +1,83 @@
-// HLAudMaster.c (TW07's golf/audio/engine/hl/HLAudMaster.c, whose Mas_ functions these are, in its
-// order; TW06 lists hl/hlaudmaster.c): the sound engine's master settings, the volume of each of
-// the 32 submix channels (EA's name; our tracks call them curves) and their mute bits, the output
-// mode, and the rate the sequencer's delays are scaled to. Split from hlaudmovie.c by its data:
-// its .sdata (0x80281460) and .sbss (0x80282060-0x80282065) each end in padding to the next file's
-// 8-aligned start, which one file's packed globals cannot leave, and Mic_InitModule after it is
-// the first to use the next file's .sbss.
-// Ses_GetEmitterTemplateFromID (TW07: HLAudSession.c's) and audfrac_Mul (TW07: an inline in
-// UAudFrac.h) come before the Mas_ functions and have no data of their own: kept here, as nothing
-// places them elsewhere (hlaudemitter.c ends just before them).
+// HLAudMaster.c: the sound engine's master mix: the volume and mute bit of each submix channel the
+// tracks play through, the output mode, and the update-rate scale the sequencer's event delays are
+// fitted to. It opens with two small helpers: a bank sound by number, and the fraction product.
 
 #include "core/audtrack.h"
 #include "core/startup.h"
 
-f32 gMasTickRateScale = 1.0f;           // nRate / 60 from Mas_SetTickRate (1.0 at 60)
+f32 gMasUpdateRateScale = 1.0f;         // the update rate given at start-up over 60 (1.0 at 60)
 
-f32 gMasSubmixVolumes[32];              // each submix channel's volume, 1.0 full
+f32 gMasSubmixVolumes[MAS_NUM_SUBMIX_CHANS]; // each submix channel's volume, 1.0 unchanged
 
-u8 gMasOutputMode;                      // Mas_SetOutputMode's (2), read nowhere
-s32 gMasMuteMask;                       // bit n set: submix channel n muted
+u8 gMasOutputMode;                      // the sound output mode (2); nothing reads it
+u32 gMasMuteMask;                       // bit n set: submix channel n is muted
 
-// A sound (EA: an emitter template) by its number: bank 0's from 0 up, bank 1's from -1 down.
-AudSound* Ses_GetEmitterTemplateFromID(s16 nSound) {
+// A bank sound by its number: bank 0's from 0 up, bank 1's from -1 down.
+TEmitter* Ses_GetEmitterTemplateFromID(s16 tmplID) {
     AudBank* pBank;
 
-    if (nSound >= 0) {
+    if (tmplID >= 0) {
         pBank = gSesBank0;
     } else {
         pBank = gSesBank1;
-        nSound = -1 - nSound;
+        tmplID = -1 - tmplID;
     }
-    return pBank->apSounds[nSound];
+    return pBank->apSounds[tmplID];
 }
 
-// The engine's fraction product (EA's audfrac_Mul, a UAudFrac.h inline, here out of line): volumes
-// and attenuations times each other.
-f32 audfrac_Mul(f32 fVolume, f32 fCurve) {
-    return fVolume * fCurve;
+f32 audfrac_Mul(f32 v1, f32 v2) {
+    return v1 * v2;
 }
 
-// The master's start-up step in Aud_InitOnce: every submix channel at full volume (1.0), none
-// muted, output mode 2. Always 1.
+// The master's start-up step in Aud_InitOnce: every submix channel at volume 1.0 (its tracks
+// unchanged), none muted, output mode 2. Always 1.
 u8 Mas_InitModule(void) {
+    u8 ok;
     s32 i;
 
+    ok = 1;
     gMasOutputMode = 2;
     gMasMuteMask = 0;
-    for (i = 0; i < 32; i++) {
+    for (i = 0; i < MAS_NUM_SUBMIX_CHANS; i++) {
         gMasSubmixVolumes[i] = 1.0f;
     }
-    return 1;
+    return ok;
 }
 
-// The master's step in Ses_Init: nothing to do. Always 1.
+// The master's step at the end of Ses_Init: nothing to do. Always 1.
 u8 Mas_InitSession(void) {
     return 1;
 }
 
-// The master's step in Ses_Exit: empty in this build.
+// The master's step in Ses_Exit: nothing to do.
 void Mas_ExitSession(void) {
 }
 
-// Scales the sequencer's event delays (read through Mas_GetUpdateRateScale) for nRate engine ticks a second:
-// nRate / 60, so 1.0 at 60, which is what Aud_InitOnce is always given.
-void Mas_SetTickRate(u8 nRate) {
-    gMasTickRateScale = nRate != 60 ? nRate / 60.0f : 1.0f;
+// Called by Aud_InitOnce with the frame rate it is given (always 60): keeps nFps / 60, 1.0 at 60,
+// by which Seq_Check scales every event delay of a loaded template (Mas_GetUpdateRateScale).
+void Mas_SetUpdateRate(u8 nFps) {
+    gMasUpdateRateScale = nFps != 60 ? nFps / 60.0f : 1.0f;
 }
 
-// Stores the sound output mode (Aud_SetOutputmode; 2 from Mas_InitModule). Nothing in this build
-// reads it.
-void Mas_SetOutputMode(u8 nMode) {
-    gMasOutputMode = nMode;
+// Stores the sound output mode (Aud_SetOutputmode, which GameAudio calls with 2, the start-up
+// value). Nothing reads it.
+void Mas_SetOutputMode(u8 outputMode) {
+    gMasOutputMode = outputMode;
 }
 
-// Sets submix channel nCurve's volume (0..31, 1.0 full), which scales every track played through it
-// (Mas_GetSubmix).
-void Mas_SetSubmixChan(u8 nCurve, f32 fVolume) {
-    gMasSubmixVolumes[nCurve] = fVolume;
+// Sets submix channel submixChan's volume, which scales every track played through it
+// (Mas_GetSubmix); 1.0 leaves them unchanged.
+void Mas_SetSubmixChan(u8 submixChan, f32 attn) {
+    gMasSubmixVolumes[submixChan] = attn;
 }
 
-// Sets the volumes of submix channels 0..nCurves-1 from pVolumes.
-void Mas_SetSubmixAll(u8 nCurves, f32* pVolumes) {
-    Mem_cpy(gMasSubmixVolumes, pVolumes, nCurves * sizeof(f32));
+// Sets the volumes of submix channels 0..nchans-1 from attns.
+void Mas_SetSubmixAll(u8 nchans, f32* attns) {
+    Mem_cpy(gMasSubmixVolumes, attns, nchans * sizeof(f32));
 }
 
-// Sets the mute mask: bit n of uMask set mutes submix channel n (Mas_IsChanMuted).
-void Mas_SetSubmixMuteAll(s32 uMask) {
-    gMasMuteMask = uMask;
+// Sets which submix channels are muted: bit n of chanmask set mutes channel n, whose volume
+// Mas_GetSubmix then gives as 0.
+void Mas_SetSubmixMuteAll(u32 chanmask) {
+    gMasMuteMask = chanmask;
 }

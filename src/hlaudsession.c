@@ -157,7 +157,7 @@ void Ses_ProcessArticulationData(u32 uMemory) {
     u8* pData;
     u8* pSampleData;
     u8 bBank0;
-    AudSound* pSound;
+    TEmitter* pSound;
     u32 j;
     AudGroup* pGroup;
     AudTrackTmpl* pTrack;
@@ -184,7 +184,7 @@ void Ses_ProcessArticulationData(u32 uMemory) {
         pBank->ppGroups[nGroup] = pGroup;
     }
     for (i = 0; i < pBank->nSounds; i++) {
-        pSound = (AudSound*)(pSounds + (uptr)pBank->apSounds[i]);
+        pSound = (TEmitter*)(pSounds + (uptr)pBank->apSounds[i]);
         pTrack = pSound->aTracks;
         pEnd = pTrack + pSound->nTracks;
         for (; pTrack < pEnd; pTrack++) {
