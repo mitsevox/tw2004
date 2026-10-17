@@ -27,8 +27,8 @@ void GameModeReplay_EndGame(void);
 f32 gSkillZoneCups[40][4];              // the target games' targets (x, y, z, w = 1)
 
 // Mode 10's setup (GM_SetModeType): this file's callbacks; the flags b273, b276 (re-plan as the
-// swing begins), b27B, b27C, b27D, b27F, b280 (the mid-hole flyover) and b281 (tutorial tips)
-// cleared; one player, no mulligans, no split screen, and hole 0 of the round made current.
+// swing begins), b27B, b27C, b27D, bDoFlyBy, bDoMidholeFlyBy (the mid-hole flyover) and
+// bAllowCaddieTips cleared; one player, no mulligans, no split screen, and hole 0 of the round made current.
 void GameModeReplay_Init(void) {
     gpGame->pfnInit = GameModeReplay_Init;
     gpGame->pfnSetupNextGolfer = GameModeReplay_SetupNextGolfer;
@@ -43,14 +43,14 @@ void GameModeReplay_Init(void) {
     gpGame->b27B = 0;
     gpGame->b27C = 0;
     gpGame->b27D = 0;
-    gpGame->b27F = 0;
-    gpGame->b280 = 0;
-    gpGame->b281 = 0;
-    gpGame->nScoringType = 0;
-    gpGame->nMulligans = 0;
-    gpGame->nC = 1;
-    gpGame->n10 = 1;
-    gpGame->nDC = 0;
+    gpGame->bDoFlyBy = 0;
+    gpGame->bDoMidholeFlyBy = 0;
+    gpGame->bAllowCaddieTips = 0;
+    gpGame->nScoringType = GM_SCORING_STROKES;
+    gpGame->nMulligans = GM_MULLIGANS_NONE;
+    gpGame->nMaxGolfers = 1;
+    gpGame->nMinGolfers = 1;
+    gpGame->nCurrentRound = 0;
     GM_SetCurrentHole(0);
     gSession.nSplitScreen = 0;
     gSession.nNumPlayers = 1;

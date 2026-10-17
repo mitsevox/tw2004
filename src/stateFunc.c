@@ -383,20 +383,21 @@ void STATEFUNC_PreShotExit(int nPlayer) {
     }
 }
 
-// State 2, a shot begins. A CPU takes camera 0 (with gpGame+0x290) or 12; with that flag the
-// golfer plays animation 2. The ball is kept as it lies and marked stopped, the live ball's state
-// cleared, the swing reset (SW_vInitSwing), the target set up, fA64 stored and event 6 fired.
+// State 2, a shot begins. A CPU takes camera 0 (when the mode has pre-shot animations,
+// nPreShotAnimationsMode) or 12; with them the golfer plays animation 2. The ball is kept as it
+// lies and marked stopped, the live ball's state cleared, the swing reset (SW_vInitSwing), the
+// target set up, fA64 stored and event 6 fired.
 void STATEFUNC_ShotSetupInit(int nPlayer) {
     s32   nView;
     Ball* pBall;
-    if (Player_IsCPU(nPlayer) && gpGame->n290 != 0) {
+    if (Player_IsCPU(nPlayer) && gpGame->nPreShotAnimationsMode != GM_ANIMS_OFF) {
         nView = gPlayers[nPlayer].nView[0];
         CameraController_SetCameraMode(ViewController_GetCameraControl(nView), 0, nPlayer, nView);
     } else if (Player_IsCPU(nPlayer)) {
         nView = gPlayers[nPlayer].nView[0];
         CameraController_SetCameraMode(ViewController_GetCameraControl(nView), 0xC, nPlayer, nView);
     }
-    if (gpGame->n290 != 0) {
+    if (gpGame->nPreShotAnimationsMode != GM_ANIMS_OFF) {
         fn_80095744(gPlayers[nPlayer].pChar, 2);
         CharacterState_UpdateSKAState(gPlayers[nPlayer].pChar);
     }
@@ -516,7 +517,7 @@ void STATEFUNC_SwingInit(int nPlayer) {
     Emotion_UpdatePlayerEmotion(nPlayer);
     fn_8006ACF8(nPlayer, 5);
     gPlayers[nPlayer].fC20 = 0.0f;
-    if (gPlayers[nPlayer].bUsedMulligan == 0 && gpGame->b281 != 0 && !Player_IsCPU(nPlayer)) {
+    if (gPlayers[nPlayer].bUsedMulligan == 0 && gpGame->bAllowCaddieTips != 0 && !Player_IsCPU(nPlayer)) {
         if (HoleContest_IsCurrentPlayerOnTee() && HoleContest_IsLongestDriveHole()) {
             GUI_ShowHoleContestIntro(0);
             GUI_ToggleUI(nPlayer, 0);
@@ -1252,7 +1253,7 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
     }
     SW_vUpdateSwing(nPlayer);
     fn_8006BB5C(nPlayer);
-    if (gpGame->b286 != 0 && !GameEffects_IsGameBreakerOn()) {
+    if (gpGame->bAllowSpeedSlowButtons != 0 && !GameEffects_IsGameBreakerOn()) {
         if (Player_IsCPU(nPlayer)) {
             if (Input_AnyPadPressed(Input_uiMap(0x16, 1))) {
                 bA = 1;
@@ -1349,7 +1350,8 @@ void STATEFUNC_InTheHoleUpdate(int nPlayer) {
             return;
         }
         GolfCamera_SetPostShowPostShotAnimations(pV, GM_ShowPostShotAnimation(nPlayer));
-        if (gpGame->n294 != 0 && pV->script.nFade != 1 && pV->script.nFade != 4) {
+        if (gpGame->nPostShotAnimationsMode != GM_ANIMS_OFF && pV->script.nFade != 1 &&
+            pV->script.nFade != 4) {
             if (!(gPlayers[nPlayer].uFlags & 8) || fn_8006AA9C(nPlayer) == 2) {
                 if (fn_80095780(gPlayers[nPlayer].pChar) != 9 && fn_80095798(gPlayers[nPlayer].pChar) != 9 &&
                     GolfCamera_ShowPostShotAnimations(pV)) {

@@ -65,7 +65,7 @@ GameMode12.c	open
 GameMode22.c	open		
 GameMode26.c	open		
 GameMode4Menu.c	open		
-GameMode6.c	open		
+GameMode6.c	done	9e50b099	claude-review
 GameMode7.c	open		
 GameMode8.c	open		
 GameModeAlternateShot.c	open		
@@ -183,7 +183,7 @@ TerrainGround.c	open
 TibExt.c	open		
 UAudContainers.c	done	b5058d88	claude-review
 UAudMem.c	open		
-UAudMemStack.c	open		
+UAudMemStack.c	done	6d2534bd	claude-review
 UAudVector.c	done	58556d0e	claude-review
 UByteSwap.c	done	f6808074	claude-review
 UFont.c	open		

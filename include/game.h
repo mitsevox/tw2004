@@ -13,8 +13,8 @@
 // ---- the round -------------------------------------------------------------------------------
 
 extern s32 lbl_80282278;                // the player whose turn it is
-extern u8  lbl_8028227C;                // the split-screen choice (GM_SetSplitScreen); the modes that
-                                        // force one view put it back when they end
+extern u8  gSplitScreen;                // the split-screen choice (GM_SetSplitScreen); modes 6, 7, 8,
+                                        // 22 and 26 put it back as they start
 
 // Replay (a saved shot) is in game/save.h: the save profile holds five.
 extern Replay gReplayData;              // 0x801D6030

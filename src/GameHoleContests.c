@@ -59,7 +59,7 @@ void HoleContest_NewRound(void) {
 // gSession.bDemo clear, no Play Now challenge running (PlayNow_IsChallengeRunning) or calendar flag
 // (PlayNow_GetCalendarFlag), and game mode 0 (stroke play), 1 (match play) or 2 (skins).
 u8 HoleContest_RoundHasContests(void) {
-    if (gpGame->nMulligans != 0) return 0;
+    if (gpGame->nMulligans != GM_MULLIGANS_NONE) return 0;
     if (gSession.nNumPlayers == 1) return 0;
     if (!GM_FullRoundOfGolf()) return 0;
     if (gSession.bDemo != 0) return 0;

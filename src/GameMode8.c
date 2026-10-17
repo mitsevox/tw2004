@@ -138,9 +138,10 @@ void  SpeedGolf_StartComment(s32 nLine, s32 a);
 // Game mode 8, solo speed golf, starts (GM_SetModeType): its callbacks go in, all shared with modes
 // 6 and 7 (GameMode6.c, GameMode7.c) apart from this setup, the hole's end (SpeedGolf_HoleFinished,
 // SpeedGolf_EndHole) and the game's end (SpeedGolf_GameFinished). No stroke limit, gimmes or
-// mulligans, the mode flags b271..b288 and n290 / n294 (no post-shot reactions) 0; gpGame n10, nC
-// and nScoringType 1 (nScoringType 1: holes won, not mode 7's points, in SpeedGolf_EndHole and
-// SpeedGolf_EndGame), nDC 0; split screen from lbl_8028227C; one player.
+// mulligans, the mode flags b271..bAllowEnvironmentSounds and the pre- and post-shot animations
+// off; nMinGolfers and nMaxGolfers 1, nScoringType GM_SCORING_HOLES_WON (not mode 7's points, in
+// SpeedGolf_EndHole and SpeedGolf_EndGame), nCurrentRound 0; split screen from gSplitScreen; one
+// player.
 void SpeedGolf_Init(void) {
     gpGame->pfnInit = SpeedGolf_Init;
     gpGame->pfnShutdown = SpeedGolf_Shutdown;
@@ -162,22 +163,22 @@ void SpeedGolf_Init(void) {
     gpGame->b273 = 0;
     gpGame->b277 = 0;
     gpGame->bGimmesAllowed = 0;
-    gpGame->b279 = 0;
-    gpGame->b27F = 0;
-    gpGame->b280 = 0;
-    gpGame->b281 = 0;
+    gpGame->bAllowHoleRestart = 0;
+    gpGame->bDoFlyBy = 0;
+    gpGame->bDoMidholeFlyBy = 0;
+    gpGame->bAllowCaddieTips = 0;
     gpGame->b283 = 0;
     gpGame->bAllowGameBreakers = 0;
-    gpGame->b286 = 0;
-    gpGame->b288 = 0;
-    gpGame->n290 = 0;
-    gpGame->n294 = 0;
-    gpGame->nMulligans = 0;
-    gpGame->n10 = 1;
-    gpGame->nC = 1;
-    gpGame->nDC = 0;
-    gpGame->nScoringType = 1;
-    gSession.nSplitScreen = lbl_8028227C;
+    gpGame->bAllowSpeedSlowButtons = 0;
+    gpGame->bAllowEnvironmentSounds = 0;
+    gpGame->nPreShotAnimationsMode = GM_ANIMS_OFF;
+    gpGame->nPostShotAnimationsMode = GM_ANIMS_OFF;
+    gpGame->nMulligans = GM_MULLIGANS_NONE;
+    gpGame->nMinGolfers = 1;
+    gpGame->nMaxGolfers = 1;
+    gpGame->nCurrentRound = 0;
+    gpGame->nScoringType = GM_SCORING_HOLES_WON;
+    gSession.nSplitScreen = gSplitScreen;
     Session_SetNumPlayers(1);
 }
 
@@ -430,16 +431,17 @@ u8 SpeedGolf_GoToPlayoff(u8 bCheck) {
     return 0;
 }
 
-// Mode 8's pfnEndHole. With gpGame->nScoringType 0 each player's time score for the hole
-// (SpeedGolf_GetHoleTimeScore) is worked out and thrown away; with nScoringType 1 (what mode 8
-// sets) each of players 0 and 1 who holed out wins the hole (nModePoints 1, nHolesWon + 1).
+// Mode 8's pfnEndHole. With gpGame->nScoringType GM_SCORING_STROKES each player's time score for the hole
+// (SpeedGolf_GetHoleTimeScore) is worked out and thrown away; with nScoringType
+// GM_SCORING_HOLES_WON (what mode 8 sets) each of players 0 and 1 who holed out wins the hole
+// (nModePoints 1, nHolesWon + 1).
 void SpeedGolf_EndHole(void) {
-    if (gpGame->nScoringType == 0) {
+    if (gpGame->nScoringType == GM_SCORING_STROKES) {
         SpeedGolf_GetHoleTimeScore(0, Game_CurHoleIndex());
         if (gNumPlayersSetUp > 1) {
             SpeedGolf_GetHoleTimeScore(1, Game_CurHoleIndex());
         }
-    } else if (gpGame->nScoringType == 1) {
+    } else if (gpGame->nScoringType == GM_SCORING_HOLES_WON) {
         if (Player_IsHoled(0)) {
             gPlayers[0].nModePoints[Game_CurHoleIndex()] = 1;
             gPlayers[0].nHolesWon++;
@@ -458,12 +460,12 @@ void SpeedGolfPoints_EndHole(void) {
     gPlayers[1].nSGHoleScore[Game_CurHoleIndex()] = gPlayers[1].nSGPoints;
 }
 
-// The pfnEndGame of modes 7 and 8. Only with gpGame->nScoringType 0 (mode 7): each player's time
-// total (SpeedGolf_GetTotalTimeScore) is worked out and thrown away, and the EASB bio records a
-// game won: always with two players, alone only with points (nSGPoints) above 0. Mode 8
-// (nScoringType 1) does nothing here; its prize is paid by SpeedGolf_GetWinner.
+// The pfnEndGame of modes 7 and 8. Only with gpGame->nScoringType GM_SCORING_STROKES (mode 7): each
+// player's time total (SpeedGolf_GetTotalTimeScore) is worked out and thrown away, and the EASB bio
+// records a game won: always with two players, alone only with points (nSGPoints) above 0. Mode 8
+// (nScoringType GM_SCORING_HOLES_WON) does nothing here; its prize is paid by SpeedGolf_GetWinner.
 void SpeedGolf_EndGame(void) {
-    if (gpGame->nScoringType == 0) {
+    if (gpGame->nScoringType == GM_SCORING_STROKES) {
         SpeedGolf_GetTotalTimeScore(0);
         if (gNumPlayersSetUp > 1) {
             SpeedGolf_GetTotalTimeScore(1);

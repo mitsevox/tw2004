@@ -65,7 +65,7 @@ void GameMode4_WinEvent(void);
 
 // Mode 4's setup (GM_SetModeType): GameModeMatch's match-play callbacks with this file's own
 // shutdown and end of game; no mulligans, no split screen. Unlike GameModeMatch_Init it leaves
-// bAIConcedes as it was and sets nC and n10 to 1 (GameMode4_StartEvent sets 2 for a match).
+// bAIConcedes as it was and sets nMaxGolfers and nMinGolfers to 1 (GameMode4_StartEvent sets 2 for a match).
 void GameMode4_Init(void) {
     gpGame->pfnInit = GameMode4_Init;
     gpGame->pfnShutdown = GameMode4_Shutdown;
@@ -76,11 +76,11 @@ void GameMode4_Init(void) {
     gpGame->pfnGoToPlayoff = GameModeMatch_GoToPlayoff;
     gpGame->pfnEndHole = GameModeMatch_EndHole;
     gpGame->pfnEndGame = GameMode4_EndGame;
-    gpGame->nScoringType = 1;
-    gpGame->nMulligans = 0;
-    gpGame->nC = 1;
-    gpGame->n10 = 1;
-    gpGame->nDC = 0;
+    gpGame->nScoringType = GM_SCORING_HOLES_WON;
+    gpGame->nMulligans = GM_MULLIGANS_NONE;
+    gpGame->nMaxGolfers = 1;
+    gpGame->nMinGolfers = 1;
+    gpGame->nCurrentRound = 0;
     gSession.nSplitScreen = 0;
 }
 
@@ -212,14 +212,15 @@ void GameMode4_LoadTCMSFromStream(UStreamObject* pObject) {
 }
 
 // Mode 4's shutdown (pfnShutdown). For a challenge event it takes the place of mode 5's shutdown,
-// which it calls first (gLadderChallengeShutdown). Then nC and n10 go back to 1, the weather and
-// wind options saved by GameMode4_StartEvent are restored, and no ladder event is running any more.
+// which it calls first (gLadderChallengeShutdown). Then nMaxGolfers and nMinGolfers go back to 1,
+// the weather and wind options saved by GameMode4_StartEvent are restored, and no ladder event is
+// running any more.
 void GameMode4_Shutdown(void) {
     if (gLadderChallengeShutdown) {
         gLadderChallengeShutdown();
     }
-    gpGame->nC = 1;
-    gpGame->n10 = 1;
+    gpGame->nMaxGolfers = 1;
+    gpGame->nMinGolfers = 1;
     gSession.options.nWeather = gLadderSavedWeather;
     gSession.options.nWind = gLadderSavedWind;
     gLadderEventRunning = 0;
@@ -253,8 +254,8 @@ void GameMode4_StartEvent(void) {
             gpGame->pfnShutdown = GameMode4_Shutdown;
         } else {
             gLadderChallengeShutdown = NULL;
-            gpGame->nC = 2;
-            gpGame->n10 = 2;
+            gpGame->nMaxGolfers = 2;
+            gpGame->nMinGolfers = 2;
             Session_SetNumPlayers(2);
             Session_SetGolfer(gLadderEvents[nEvent].nGolfer, 1);
             gSession.nController[1] = CONTROLLER_CPU;

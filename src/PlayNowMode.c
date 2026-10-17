@@ -67,7 +67,7 @@ u8 PlayNow_IsSpeedGolf(void);
 u8 PlayNow_HoleFinished(int nPlayer, u8 bCheck);
 
 // Game mode 5 (the Play Now challenges) starts, from GM_SetModeType: its own shutdown, hole-start,
-// end-game, hole-finished and hole-over callbacks go in, gpGame nC and n10 become 1, no restart is
+// end-game, hole-finished and hole-over callbacks go in, nMaxGolfers and nMinGolfers become 1, no restart is
 // pending, and the challenge list goes back to the mode's own 83 (gPlayNowChallenges; mode 24 swaps
 // in its own with PlayNow_SetChallengeList).
 void PlayNow_Init(void) {
@@ -77,23 +77,23 @@ void PlayNow_Init(void) {
     gpGame->pfnEndGame = PlayNow_EndGame;
     gpGame->pfnHoleFinished = PlayNow_HoleFinished;
     gpGame->pfnEndTurnEndHoleNotGame = PlayNow_HoleOver;
-    gpGame->nC = 1;
-    gpGame->n10 = 1;
+    gpGame->nMaxGolfers = 1;
+    gpGame->nMinGolfers = 1;
     gPlayNowRestarting = 0;
     gChallengeList = gPlayNowChallenges;
     gNumChallenges = 83;
 }
 
 // Mode 5's shutdown (pfnShutdown): the played mode's own shutdown runs once (then it is forgotten),
-// gpGame nC and n10 go back to 1, the options nWeather and wind that PlayNow_StartChallenge saved
+// nMaxGolfers and nMinGolfers go back to 1, the options nWeather and wind that PlayNow_StartChallenge saved
 // are put back, and no challenge is running any more (PlayNow_IsChallengeRunning).
 void PlayNow_Shutdown(void) {
     if (gPlayNowModeShutdown) {
         gPlayNowModeShutdown();
         gPlayNowModeShutdown = NULL;
     }
-    gpGame->nC = 1;
-    gpGame->n10 = 1;
+    gpGame->nMaxGolfers = 1;
+    gpGame->nMinGolfers = 1;
     gSession.options.nWeather = gPlayNowSavedOptionC;
     gSession.options.nWind = gPlayNowSavedWind;
     gPlayNowChallengeRunning = 0;
@@ -186,14 +186,15 @@ void PlayNow_LoadPLYsFromStream(UStreamObject* pObject) {
 // by nTargetKind: 0 none; 1 a one-hole challenge carries nTargetBase as strokes, else pars nudged
 // at random to total nTargetBase; 2 pars nudged at random to nTargetBase over par (a one-hole
 // challenge carries it, counting one hole); 3/4/5 birdie/par/bogey on each; 7 with match scoring
-// (gpGame->nScoringType 1) holes won at random until the margin is nTargetBase (negative: the
-// opponent's), with stroke scoring everyone on par and player 0 nudged to nTargetBase over. The
-// challenge hole starts at a score by nHoleKind: 0 none, 1 nHoleExtra, 2 par plus nHoleExtra, 3/4/5
-// birdie/par/bogey. Options nWeather becomes 3 when bForceWeather is set, else 0; no mulligans; the
-// challenge's wind. The first challenge of its group starts the group totals (gPlayNowGroupStrokes,
-// Par, Holes, Time) and flags the group's intro (gPlayNowIntroPending); a later one adds to them.
-// Last, the played mode's shutdown, end game, hole start, game finished, hole finished and
-// hole-over callbacks are kept (gPlayNowMode*) and mode 5's go in their place.
+// (gpGame->nScoringType GM_SCORING_HOLES_WON) holes won at random until the margin is nTargetBase
+// (negative: the opponent's), with stroke scoring everyone on par and player 0 nudged to
+// nTargetBase over. The challenge hole starts at a score by nHoleKind: 0 none, 1 nHoleExtra, 2 par
+// plus nHoleExtra, 3/4/5 birdie/par/bogey. Options nWeather becomes 3 when bForceWeather is set,
+// else 0; no mulligans; the challenge's wind. The first challenge of its group starts the group
+// totals (gPlayNowGroupStrokes, Par, Holes, Time) and flags the group's intro
+// (gPlayNowIntroPending); a later one adds to them. Last, the played mode's shutdown, end game,
+// hole start, game finished, hole finished and hole-over callbacks are kept (gPlayNowMode*) and
+// mode 5's go in their place.
 void PlayNow_StartChallenge(void) {
     int h;
     int nSum;
@@ -366,7 +367,7 @@ void PlayNow_StartChallenge(void) {
         }
         break;
     case 7:
-        if (gpGame->nScoringType == 1) {
+        if (gpGame->nScoringType == GM_SCORING_HOLES_WON) {
             nDiff = gChallengeList[gCurChallenge].nTargetBase;
             while (nDiff != 0) {
                 h = Misc_RandFunc(0) % (Game_CurHoleIndex() + 1);
@@ -383,7 +384,7 @@ void PlayNow_StartChallenge(void) {
                 }
             }
         }
-        if (gpGame->nScoringType == 0) {
+        if (gpGame->nScoringType == GM_SCORING_STROKES) {
             nSum0 = 0;
             for (h = 0; h < Game_CurHoleIndex(); h++) {
                 gPlayers[0].nStrokes[h] = GM_GetHoleIndexPar(h);
@@ -437,7 +438,7 @@ void PlayNow_StartChallenge(void) {
     } else {
         gSession.options.nWeather = 0;
     }
-    gpGame->nMulligans = 0;
+    gpGame->nMulligans = GM_MULLIGANS_NONE;
     gSession.options.nWind = gChallengeList[gCurChallenge].nWind;
     bFound = 0;
     for (i = gCurChallenge - 1; i >= 0; i--) {
@@ -716,14 +717,14 @@ u8 PlayNow_IsChallengeRunning(void) {
 // (aMedal[m].nRule; 0 never passes) holds against its mark, else 3 (none). With nScoring 0 the
 // group's totals so far are judged: 1 strokes plus nTargetBase at most the mark; 2 strokes over par
 // at most the mark; 3/4/5 birdie, par or bogey golf over the holes played; 6 the total time (n290)
-// under the mark; 7 in match scoring (gpGame->nScoringType 1) a margin of holes won of at least the
-// mark (with the calendar flag a playoff gives 1 if player 0 has won more holes, else 2; without it
-// a playoff counts only for mark 0 and a lead), in stroke scoring player 1's strokes minus player
-// 0's at most the mark; 8 more skins than every opponent and at most the mark in playoff holes
-// (nPlayoffHoles); 9 in a skill zone game at least the mark in points (nSkillZonePoints). With
-// nScoring 1 this hole alone: 1 strokes at most the mark, 2 over par at most the mark, 3/4/5
-// birdie, par or bogey or better, 6 as above, 7 a playoff player 0 leads gives 2, else the margin,
-// 9 as above.
+// under the mark; 7 in match scoring (gpGame->nScoringType GM_SCORING_HOLES_WON) a margin of holes
+// won of at least the mark (with the calendar flag a playoff gives 1 if player 0 has won more
+// holes, else 2; without it a playoff counts only for mark 0 and a lead), in stroke scoring player
+// 1's strokes minus player 0's at most the mark; 8 more skins than every opponent and at most the
+// mark in playoff holes (nPlayoffHoles); 9 in a skill zone game at least the mark in points
+// (nSkillZonePoints). With nScoring 1 this hole alone: 1 strokes at most the mark, 2 over par at
+// most the mark, 3/4/5 birdie, par or bogey or better, 6 as above, 7 a playoff player 0 leads gives
+// 2, else the margin, 9 as above.
 int PlayNow_GetMedal(void) {
     int m;
     int nRule;
@@ -789,7 +790,7 @@ int PlayNow_GetMedal(void) {
                 }
                 break;
             case 7:
-                if (gpGame->nScoringType == 1) {
+                if (gpGame->nScoringType == GM_SCORING_HOLES_WON) {
                     if (PlayNow_GetCalendarFlag()) {
                         if (gpGame->bInPlayoff) {
                             nPlayoff = 2;
@@ -809,7 +810,7 @@ int PlayNow_GetMedal(void) {
                         return m;
                     }
                 }
-                if (gpGame->nScoringType == 0) {
+                if (gpGame->nScoringType == GM_SCORING_STROKES) {
                     if (gSession.nNumPlayers > 1) {
                         nSum = 0;
                         for (i = 0; i < 18; i++) {

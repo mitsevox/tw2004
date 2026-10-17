@@ -54,8 +54,8 @@ void GameMode26_PreSwing(void);
 u8   GameMode26_GetWinner(s32* pnWinner);
 
 // Game mode 26's setup (GM_SetModeType): its callbacks; no gimmes, mulligans, stroke limit,
-// GameBreakers (b285), flight-camera toggles or in-flight replays (b286, b287), yardage or bumped
-// obstructions; two players (Session_SetNumPlayers), split screen as chosen (lbl_8028227C;
+// GameBreakers (b285), flight speed buttons or in-flight replays (bAllowSpeedSlowButtons, b287),
+// yardage or bumped obstructions; two players (Session_SetNumPlayers), split screen as chosen (gSplitScreen;
 // GM_SetSplitScreenForMode turns it on for this mode). No longest drive yet, the 120-frame winner
 // countdown and the intro comment reset, and the per-player score sounds (400 / 800 / 1200)
 // cleared. The winner is not reset here (GameMode26_StartEvent, GameMode26_RestartHole).
@@ -79,29 +79,29 @@ void GameMode26_Init(void) {
     gpGame->pfnLoadHole = GameMode26_HoleStart;
     gpGame->pfnRestartHole = GameMode26_RestartHole;
     gpGame->bGimmesAllowed = 0;
-    gpGame->b279 = 1;
-    gpGame->b27F = 0;
-    gpGame->b280 = 0;
+    gpGame->bAllowHoleRestart = 1;
+    gpGame->bDoFlyBy = 0;
+    gpGame->bDoMidholeFlyBy = 0;
     gpGame->b271 = 0;
-    gpGame->b281 = 0;
+    gpGame->bAllowCaddieTips = 0;
     gpGame->bStrokeLimit = 0;
     gpGame->bAllowGameBreakers = 0;
     gpGame->b274 = 0;
-    gpGame->b286 = 0;
+    gpGame->bAllowSpeedSlowButtons = 0;
     gpGame->b287 = 0;
-    gpGame->b288 = 0;
+    gpGame->bAllowEnvironmentSounds = 0;
     gpGame->b289 = 0;
     gpGame->b28A = 0;
     gpGame->bBumpObstructions = 0;
     gpGame->bShowYardage = 0;
-    gpGame->n290 = 0;
-    gpGame->n294 = 0;
-    gpGame->nMulligans = 0;
-    gpGame->n10 = 2;
-    gpGame->nC = 2;
-    gpGame->nDC = 0;
-    gpGame->nScoringType = 0;
-    gSession.nSplitScreen = lbl_8028227C;
+    gpGame->nPreShotAnimationsMode = GM_ANIMS_OFF;
+    gpGame->nPostShotAnimationsMode = GM_ANIMS_OFF;
+    gpGame->nMulligans = GM_MULLIGANS_NONE;
+    gpGame->nMinGolfers = 2;
+    gpGame->nMaxGolfers = 2;
+    gpGame->nCurrentRound = 0;
+    gpGame->nScoringType = GM_SCORING_STROKES;
+    gSession.nSplitScreen = gSplitScreen;
     gGameMode26SplitScreenShot = 0;
     gGameMode26LongestLength = 0.0f;
     gGameMode26LongestPlayer = 5;

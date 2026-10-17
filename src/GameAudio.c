@@ -378,7 +378,7 @@ void UpdateCrowdBuildup(void) {
 // and only with two players at most and outside replays. The music plays when its volume is above 0
 // and its row is on (the row is not asked when gSession.bDemo is set without flag 0x4000). When
 // in-game music does not play, the course ambience (sound 8, placed at (0, 0, 12)) streams instead
-// if gpGame->b288 and the SFX volume is above 0; UpdateStreaming starts it.
+// if gpGame->bAllowEnvironmentSounds and the SFX volume is above 0; UpdateStreaming starts it.
 void Gaud_SetStreamingContext(void) {
     int nMode;
     f32 fVolume;
@@ -457,7 +457,7 @@ void Gaud_SetStreamingContext(void) {
             Aud_EmiDel(lbl_80281418);
             lbl_80281418 = 0xFF;
         }
-        if (bMusic && !bFixed && gpGame->b288 && (s8)gSession.options.a0[0] > 0) {
+        if (bMusic && !bFixed && gpGame->bAllowEnvironmentSounds && (s8)gSession.options.a0[0] > 0) {
             nState = 2;
             if (lbl_8028141A == 0xFF) {
                 vPos[0] = 0.0f;
@@ -667,7 +667,7 @@ void Gaud_Monitor(void) {
 // emitter its instances join, so the Aud_EmiAlias calls drive them together (0 the wind and rain, 1
 // the trees); n goes to Aud_EmiAdd's n24. Kinds 0, 3 and 5 play as a pair of instances lbl_80281450
 // either side of the listener (kind 0 only once, lbl_80282042), the others at the object. Kinds
-// below 3 need gpGame->b288.
+// below 3 need gpGame->bAllowEnvironmentSounds.
 void Gaud_ActorDownloadCallback(GameAudioSource** ppSource, int n) {
     GameAudioSource* pSource;
     u32 nKind;
@@ -678,7 +678,7 @@ void Gaud_ActorDownloadCallback(GameAudioSource** ppSource, int n) {
 
     pSource = *ppSource;
     nKind = pSource->nKind;
-    if ((nKind >= 3 || gpGame->b288) && pSource->nSound != 0) {
+    if ((nKind >= 3 || gpGame->bAllowEnvironmentSounds) && pSource->nSound != 0) {
         nParam = n;
         switch (nKind) {
         case 0:
@@ -1668,56 +1668,56 @@ void Gaud_ExitTopOfArcBuildup(void) {
     }
 }
 
-// The wind, when gpGame->b288: emitter 0's track 0, and its track 1 at variation range n
+// The wind, when gpGame->bAllowEnvironmentSounds: emitter 0's track 0, and its track 1 at variation range n
 // (FirstFrameInit passes the wind option).
 void Gaud_InitWindSound(int n) {
-    if (gpGame->b288) {
+    if (gpGame->bAllowEnvironmentSounds) {
         Aud_EmiAliasSetTrackStatus(0, 0, 1);
         Aud_EmiAliasSetTrackVarRange(0, 1, n);
         Aud_EmiAliasSetTrackStatus(0, 1, 1);
     }
 }
 
-// Stops the wind (emitter 0's tracks 0 and 1), when gpGame->b288.
+// Stops the wind (emitter 0's tracks 0 and 1), when gpGame->bAllowEnvironmentSounds.
 void Gaud_ExitWindSound(void) {
-    if (gpGame->b288) {
+    if (gpGame->bAllowEnvironmentSounds) {
         Aud_EmiAliasSetTrackStatus(0, 0, 0);
         Aud_EmiAliasSetTrackStatus(0, 1, 0);
     }
 }
 
-// The trees in the wind, when gpGame->b288: sets emitter 1's track 0 to variation range n
+// The trees in the wind, when gpGame->bAllowEnvironmentSounds: sets emitter 1's track 0 to variation range n
 // (FirstFrameInit passes the wind option) and switches its track 1 on.
 void Gaud_InitTreeSound(int n) {
-    if (gpGame->b288) {
+    if (gpGame->bAllowEnvironmentSounds) {
         Aud_EmiAliasSetTrackVarRange(1, 0, n);
         Aud_EmiAliasSetTrackStatus(1, 1, 1);
     }
 }
 
-// Stops the trees (emitter 1's track 1), when gpGame->b288.
+// Stops the trees (emitter 1's track 1), when gpGame->bAllowEnvironmentSounds.
 void Gaud_ExitTreeSound(void) {
-    if (gpGame->b288) {
+    if (gpGame->bAllowEnvironmentSounds) {
         Aud_EmiAliasSetTrackStatus(1, 1, 0);
     }
 }
 
-// The rain, when gpGame->b288: emitter 0's track 2 at variation range 3 x fAmount (the course's
-// rain strength, fn_8006C630), at most 2.
+// The rain, when gpGame->bAllowEnvironmentSounds: emitter 0's track 2 at variation range
+// 3 x fAmount (the course's rain strength, fn_8006C630), at most 2.
 void Gaud_InitRainSound(f32 fAmount) {
     u32 n;
 
     n = (u8)(int)(3.0f * fAmount);
-    if (gpGame->b288) {
+    if (gpGame->bAllowEnvironmentSounds) {
         Aud_EmiAliasSetTrackVarRange(0, 2, (n <= 2) ? n : 2);
         Aud_EmiAliasSetTrackStatus(0, 2, 1);
     }
 }
 
-// Stops the rain, when gpGame->b288: emitter 0's track 2, and the ambience's track 2 when the
-// ambience streams.
+// Stops the rain, when gpGame->bAllowEnvironmentSounds: emitter 0's track 2, and the ambience's
+// track 2 when the ambience streams.
 void Gaud_ExitRainSound(void) {
-    if (gpGame->b288) {
+    if (gpGame->bAllowEnvironmentSounds) {
         Aud_EmiAliasSetTrackStatus(0, 2, 0);
         if (lbl_8028203C == 2) {
             Aud_EmiSetTrackStatus(lbl_8028141A, 2, 0);

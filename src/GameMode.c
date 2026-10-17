@@ -121,10 +121,10 @@ void GameEffects_Vec3Sub(f32* pA, f32* pB, f32* pOut) {
 }
 #endif
 
-// Once at boot (gomainloop's once-only init list): the split-screen choice (lbl_8028227C) goes to
+// Once at boot (gomainloop's once-only init list): the split-screen choice (gSplitScreen) goes to
 // one screen and the player up (lbl_80282278) to player 0.
 void GM_vInitModuleONCE(void) {
-    lbl_8028227C = 0;
+    gSplitScreen = 0;
     lbl_80282278 = 0;
 }
 
@@ -172,7 +172,7 @@ int GM_GotoNextSelectedHole(void) {
     int i;
     for (i = gpGame->nCurHole + 1; i < 18; i++) {
         if (gpGame->bHoleSelected[i]) {
-            if (Game_GetMulliganRule() == 2 && gpGame->nCurHole < 9 && i >= 9) {
+            if (Game_GetMulliganRule() == GM_MULLIGANS_ONE_PER_NINE && gpGame->nCurHole < 9 && i >= 9) {
                 GM_ClearMulliganCounters();
             }
             GM_SetCurrentHole(i);
@@ -185,7 +185,7 @@ int GM_GotoNextSelectedHole(void) {
 
 // A new hole: views 2 and 3 off, the balls to the tee, new wind, the mode's hole-start hook
 // (pfnLoadHole), effects and HUD reset, the hole contests cleared, the flyover when the mode has
-// one (b27F), each player's flags that GM_RecordBonusShotStats carries from shot to shot cleared,
+// one (bDoFlyBy), each player's flags that GM_RecordBonusShotStats carries from shot to shot cleared,
 // the player up set to the mode's first (GetHonors), event 0 (player 0xFF); then for all five
 // players the button hold counters (n144, n158) and the shot-limit and mulligan-this-hole flags
 // (bShotLimitExceeded, bUsedMulliganThisHole) cleared.
@@ -199,7 +199,7 @@ void GM_InitForHole(void) {
     GameEffects_ResetGameEffectSettings();
     GUI_Init();
     HoleContest_InitForHole();
-    if (gpGame->b27F) {
+    if (gpGame->bDoFlyBy) {
         GM_FlyByMode_Init();
     }
     for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -597,7 +597,7 @@ void GM_PlayerTookShot(int nPlayer) {
 // cut) still lies off the green.
 u8 GM_PlayerTakeMulligan(int nPlayer) {
     int i;
-    if (Game_GetMulliganRule() == 0) {
+    if (Game_GetMulliganRule() == GM_MULLIGANS_NONE) {
         return 0;
     }
     if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == GS_CONCEDED) {
@@ -606,7 +606,7 @@ u8 GM_PlayerTakeMulligan(int nPlayer) {
     if (GUI_IsAwardUIAnimating()) {
         return 0;
     }
-    if (Game_GetMulliganRule() == 2) {
+    if (Game_GetMulliganRule() == GM_MULLIGANS_ONE_PER_NINE) {
         if (gPlayers[nPlayer].bMulliganUsed) {
             return 0;
         }
@@ -640,15 +640,16 @@ u8 GM_PlayerTakeMulligan(int nPlayer) {
 }
 
 // Whether the golfer plays his pre-shot animation. With session flags 0x4000 and 0x8000 both set,
-// only off the tee. The mode's setting n290: 0 never; on course 18's 10th hole never within 40
-// yards of the tee; 1 always; otherwise always off the tee, never from elsewhere with a driver or
-// wood (clubs 0-8), never with an object or hazard nearby, else 85% of the time.
+// only off the tee. The mode's nPreShotAnimationsMode: GM_ANIMS_OFF never; on course 18's 10th hole
+// never within 40 yards of the tee; GM_ANIMS_ON always; otherwise always off the tee, never from
+// elsewhere with a driver or wood (clubs 0-8), never with an object or hazard nearby, else 85% of
+// the time.
 int GM_DoPreshotAnimation(int nPlayer) {
     f32 v[4];
     if ((gSession.uFlags & 0x4000) && (gSession.uFlags & 0x8000)) {
         return gPlayers[nPlayer].ball.nLie == 0;
     }
-    if (gpGame->n290 == 0) {
+    if (gpGame->nPreShotAnimationsMode == GM_ANIMS_OFF) {
         return 0;
     }
     if (Game_GetCourse() == 0x12 && Game_GetCurHoleNum() == 10) {
@@ -658,7 +659,7 @@ int GM_DoPreshotAnimation(int nPlayer) {
             return 0;
         }
     }
-    if (gpGame->n290 == 1) {
+    if (gpGame->nPreShotAnimationsMode == GM_ANIMS_ON) {
         return 1;
     }
     if (gPlayers[nPlayer].ball.nLie == 0) {
@@ -826,19 +827,19 @@ void GM_Update(void) {
     }
 }
 
-// Restarts the current hole, when the mode allows it (b279): all five players' records of the hole
-// cleared, the balls to the tee, the mode's pfnRestartHole, the flyover again when the mode has one
-// (b27F), the frame count in n12C, the HUD re-initialised, effects and cameras reset, each golfer's
-// animation and green morph reset, and message helper GameMsg_SetPending(2).
+// Restarts the current hole, when the mode allows it (bAllowHoleRestart): all five players' records
+// of the hole cleared, the balls to the tee, the mode's pfnRestartHole, the flyover again when the
+// mode has one (bDoFlyBy), the frame count in n12C, the HUD re-initialised, effects and cameras
+// reset, each golfer's animation and green morph reset, and message helper GameMsg_SetPending(2).
 void GM_RestartHole(void) {
     int i;
-    if (gpGame->b279) {
+    if (gpGame->bAllowHoleRestart) {
         for (i = 0; i < 5; i++) {
             GM_ClearPlayerHoleData(i, gpGame->nCurHole);
         }
         GM_InitBallsToTee();
         gpGame->pfnRestartHole();
-        if (gpGame->b27F) {
+        if (gpGame->bDoFlyBy) {
             GM_FlyByMode_Init();
         }
         gpGame->n12C = gSession.nFrameCount;
@@ -1167,13 +1168,14 @@ int GM_ChooseRemoveBallState(int nPlayer) {
 }
 
 // Each frame of a shot: the ball's physics steps for this frame (GameEffects_BallUpdatesThisFrame;
-// none when the mode has n294 and the ball is behind the camera), then on one screen the look-ahead
-// copy (ballBefore) runs on within a budget of 0.83 ms minus what the real ball took, until it
-// comes to rest (event 0x3C and its outcome recorded). Then, when SitDev_PredictedEmotionAvailable
-// allows and the mode has post-shot reactions: a scripted reaction (uFlags bit 0) starts animation
-// 9 once the ball passes the saved distance (fEEC, with bit 2); otherwise, for outcomes 8 and 9,
-// once per shot when the ball is 2 to 5.5 from the pin and near the closest it got, a look-ahead
-// holed at par or better starts it half the time and a look-ahead miss that came within 0.2 always does.
+// none when the mode has post-shot animations and the ball is behind the camera), then on one
+// screen the look-ahead copy (ballBefore) runs on within a budget of 0.83 ms minus what the real
+// ball took, until it comes to rest (event 0x3C and its outcome recorded). Then, when
+// SitDev_PredictedEmotionAvailable allows and the mode has post-shot reactions: a scripted reaction
+// (uFlags bit 0) starts animation 9 once the ball passes the saved distance (fEEC, with bit 2);
+// otherwise, for outcomes 8 and 9, once per shot when the ball is 2 to 5.5 from the pin and near
+// the closest it got, a look-ahead holed at par or better starts it half the time and a look-ahead
+// miss that came within 0.2 always does.
 void GM_SimulateBallMovement(int nPlayer) {
     int nSteps = 0;
     u64 t0;
@@ -1188,7 +1190,7 @@ void GM_SimulateBallMovement(int nPlayer) {
 
     t0 = TI_sReadCounter(TI_COUNTER_REALTIME);
     nUpdates = GameEffects_BallUpdatesThisFrame(nPlayer);
-    if (gpGame->n294 != 0
+    if (gpGame->nPostShotAnimationsMode != GM_ANIMS_OFF
         && GolfCamera_IsBallFlightPaused(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]),
                                          nPlayer)) {
         nUpdates = 0;
@@ -1288,10 +1290,10 @@ void GM_SetupCustomHoleSelection(void) {
 }
 
 // Whether button 8 was tapped: released after 2 to 5 frames of holding (the count is kept by
-// GM_bIsZoomButtonPressed), which asks for the mid-hole flyover; only when the mode has one (b280).
-// A tap resets the count.
+// GM_bIsZoomButtonPressed), which asks for the mid-hole flyover; only when the mode has one
+// (bDoMidholeFlyBy). A tap resets the count.
 u8 GM_bIsMidholeFlybyButtonPressed(int nPlayer) {
-    if (!gpGame->b280) {
+    if (!gpGame->bDoMidholeFlyBy) {
         return 0;
     }
     if ((Input_ReadControlPad(gPlayers[nPlayer].nController) & Input_uiMap(8, 0)) ||

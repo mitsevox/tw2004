@@ -11,7 +11,7 @@
 void GameModeStroke_EndGame(void);
 
 // Game mode 0's setup: installs stroke play's callbacks (no end-hole callback;
-// GameModeStroke_GoToPlayoff gives no playoff), one mulligan per player per nine (nMulligans 2),
+// GameModeStroke_GoToPlayoff gives no playoff), one mulligan per player per nine (GM_MULLIGANS_ONE_PER_NINE),
 // the current hole set to hole index 0 (GM_SetCurrentHole) and one view.
 void GameModeStroke_Init(void) {
     gpGame->pfnInit = GameModeStroke_Init;
@@ -21,11 +21,11 @@ void GameModeStroke_Init(void) {
     gpGame->pfnGameFinished = GameModeStroke_GameFinished;
     gpGame->pfnGoToPlayoff = GameModeStroke_GoToPlayoff;
     gpGame->pfnEndGame = GameModeStroke_EndGame;
-    gpGame->nScoringType = 0;
-    gpGame->nMulligans = 2;
-    gpGame->nC = 4;
-    gpGame->n10 = 1;
-    gpGame->nDC = 0;
+    gpGame->nScoringType = GM_SCORING_STROKES;
+    gpGame->nMulligans = GM_MULLIGANS_ONE_PER_NINE;
+    gpGame->nMaxGolfers = 4;
+    gpGame->nMinGolfers = 1;
+    gpGame->nCurrentRound = 0;
     GM_SetCurrentHole(0);
     gSession.nSplitScreen = 0;
 }
