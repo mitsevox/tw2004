@@ -21,6 +21,10 @@ void Rvb_Pause(u8 bMute);
 void Rvb_SetPreset(u8 nPreset);
 void Rvb_Cycle(void);
 
+#define RVB_FX_MEMORY_SIZE      0x20000 // the effect memory: 128 KB
+#define RVB_FX_MEMORY_ALIGN     4       // every block's alignment in the effect memory
+#define RVB_NUM_MEM_BLOCKS      32      // blocks the effect memory can hand out at once
+
 // The effects' settings: a 2.5 second reverb for mode 0, a 4 second one for mode 2, and for mode
 // 1 a delay of about half a second (499 and 501 ms left and right) with a little feedback.
 AXFX_REVERBHI gRvbReverbShort = { {0}, 0, 0.5f, 1.0f, 2.5f, 0.6f, 0.0f, 0.5f };
@@ -28,8 +32,8 @@ AXFX_DELAY gRvbDelay = { {0}, {499, 501, 10}, {15, 15, 0}, {100, 100, 0} };
 AXFX_REVERBHI gRvbReverbLong = { {0}, 0, 0.9f, 1.0f, 4.0f, 0.2f, 0.0f, 0.5f };
 
 // Uninitialised data, defined last-first (CodeWarrior lays it out in reverse).
-UAudMemStack gRvbMemStack;              // the effect memory, a stack over gRvbFxMemory
-UAudMemStackBlock gRvbMemBlocks[32];    // its block table
+AudMemStack gRvbMemStack;               // the effect memory, a stack over gRvbFxMemory
+MemStackBlock gRvbMemBlocks[RVB_NUM_MEM_BLOCKS]; // its block table
 s8 gRvbMode = -1;                       // the mode set up (-1: none yet)
 void* gRvbFxState;                      // the running effect's settings (one of the three above)
 AXAuxCallback gRvbFxCallback;           // the running effect's aux A callback
@@ -56,7 +60,8 @@ void Rvb_SetMode(s8 nMode) {
     if (nMode != gRvbMode) {
         gRvbMode = nMode;
         bEnabled = OSDisableInterrupts();
-        AudMemStack_Init(&gRvbMemStack, gRvbFxMemory, 0x20000, 32, gRvbMemBlocks, 4);
+        AudMemStack_Init(&gRvbMemStack, gRvbFxMemory, RVB_FX_MEMORY_SIZE, RVB_NUM_MEM_BLOCKS, gRvbMemBlocks,
+                         RVB_FX_MEMORY_ALIGN);
         if (gRvbMode == 1) {
             gRvbFxState = &gRvbDelay;
             gRvbFxCallback = AXFXDelayCallback;
@@ -77,7 +82,7 @@ void Rvb_SetMode(s8 nMode) {
 // The reverb's start-up step in Aud_InitOnce: takes the 128 KB effect memory from the sound
 // engine's memory and gives the effects library its allocator hooks. Always 1.
 u8 Rvb_InitModule(void) {
-    gRvbFxMemory = AudMem_Alloc(0x20000);
+    gRvbFxMemory = AudMem_Alloc(RVB_FX_MEMORY_SIZE);
     AXFXSetHooks(Rvb_FxAlloc, Rvb_FxFree);
     return 1;
 }

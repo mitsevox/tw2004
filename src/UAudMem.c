@@ -14,16 +14,21 @@ void  AudMem_CloseOnce(void);
 void  AudMem_InitModule(void);
 void  AudMem_CloseModule(void);
 
-// Defined last-address-first: CodeWarrior lays out .bss in reverse order of definition.
-void* gAudMemBuffer;                    // the buffer of the sound engine's stack (0x60000 bytes)
-UAudMemStack gAudMemStack;              // the sound engine's stack
-UAudMemStackBlock gAudMemBlocks[64];    // its block table
+#define AUDMEM_SIZE         0x60000     // the sound engine's memory: 384 KB
+#define AUDMEM_ALIGN        64          // the buffer's alignment and every block's
+#define AUDMEM_NUM_BLOCKS   64          // blocks the stack can hand out at once
 
-// The sound engine's memory (the first step of Aud_InitOnce): 384 KB (0x60000) of main memory,
-// 64-byte aligned, as a stack of up to 64 blocks.
+// Defined last-address-first: CodeWarrior lays out .bss in reverse order of definition.
+void* gAudMemBuffer;                            // the buffer of the sound engine's stack
+AudMemStack gAudMemStack;                       // the sound engine's stack
+MemStackBlock gAudMemBlocks[AUDMEM_NUM_BLOCKS]; // its block table
+
+// The sound engine's memory (the first step of Aud_InitOnce): 384 KB of main memory, 64-byte
+// aligned, as a stack of up to 64 blocks.
 void AudMem_Init(void) {
-    gAudMemBuffer = fn_800951A0(0x60000, 64, 0);
-    AudMemStack_Init(&gAudMemStack, gAudMemBuffer, 0x60000, 64, gAudMemBlocks, 64);
+    gAudMemBuffer = fn_800951A0(AUDMEM_SIZE, AUDMEM_ALIGN, 0);
+    AudMemStack_Init(&gAudMemStack, gAudMemBuffer, AUDMEM_SIZE, AUDMEM_NUM_BLOCKS, gAudMemBlocks,
+                     AUDMEM_ALIGN);
 }
 
 // Takes uSize bytes (rounded up to 64) from the sound engine's memory; NULL when it is full.
