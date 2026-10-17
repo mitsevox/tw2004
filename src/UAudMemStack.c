@@ -1,57 +1,57 @@
-// UAudMemStack.c (EA's name, from its asserts; also in EA's 2002 source tree): the sound engine's
-// stack allocator (AudMemStack_, TW07's names). Blocks are cut from the top of one buffer and
-// rounded up to the stack's alignment; giving one back lowers the top by its size, so blocks must
-// be given back last-first. UAudMem.c (the sound engine's memory) and AudReverb.c (the effect
-// memory) each run a stack.
+// UAudMemStack.c: the sound engine's stack allocator. Blocks are cut from the top of one buffer and
+// rounded up to the stack's alignment; giving one back lowers the top by its size, so blocks must be
+// given back last-first. The sound engine's memory (UAudMem.c) and the effect memory each run one.
 
 #include "core/audcontainers.h"
 
-// Sets up a stack over [pMem, pMem + uSize). With no table given, the stack allocates its own.
-void AudMemStack_Init(UAudMemStack* pStack, u8* pMem, u32 uSize, u32 nMaxBlocks, UAudMemStackBlock* pBlocks,
-                 u32 nAlign) {
-    pStack->pTop = pMem;
-    pStack->pEnd = pMem + uSize;
-    pStack->nMaxBlocks = nMaxBlocks;
-    pStack->nBlocks = 0;
-    pStack->nBtmBlocks = 0;
-    pStack->nAlign = nAlign;
-    if (pBlocks == NULL) {
-        pStack->pBlocks =
-            StaticMem_Alloc(nMaxBlocks * sizeof(UAudMemStackBlock), 0, nAlign, "UAudMemStack.c", 40);
-        pStack->bOwnBlocks = 1;
+// Sets up a stack over [startAddr, startAddr + nBytes) with room for maxAllocs blocks. With no
+// table given, the stack takes one from the game's heap and marks it as its own.
+void AudMemStack_Init(AudMemStack* pAudMemStack, u8* startAddr, u32 nBytes, u32 maxAllocs,
+                      MemStackBlock* memBlocksA, u32 alignPow2) {
+    pAudMemStack->pTop = startAddr;
+    pAudMemStack->pEnd = startAddr + nBytes;
+    pAudMemStack->nMaxBlocks = maxAllocs;
+    pAudMemStack->nBlocks = 0;
+    pAudMemStack->nBtmBlocks = 0;
+    pAudMemStack->nAlign = alignPow2;
+    if (memBlocksA == NULL) {
+        pAudMemStack->pBlocks =
+            StaticMem_Alloc(maxAllocs * sizeof(MemStackBlock), 0, alignPow2, "UAudMemStack.c", 40);
+        pAudMemStack->bOwnBlocks = 1;
     } else {
-        pStack->pBlocks = pBlocks;
-        pStack->bOwnBlocks = 0;
+        pAudMemStack->pBlocks = memBlocksA;
+        pAudMemStack->bOwnBlocks = 0;
     }
-    Mem_set(pStack->pBlocks, 0, pStack->nMaxBlocks * sizeof(UAudMemStackBlock));
+    Mem_set(pAudMemStack->pBlocks, 0, pAudMemStack->nMaxBlocks * sizeof(MemStackBlock));
 }
 
-// Cuts a block of uSize bytes (rounded up to the alignment) from the top; NULL when the table or
-// the buffer is full.
-void* AudMemStack_AllocTop(UAudMemStack* pStack, u32 uSize) {
-    UAudMemStackBlock* pBlock = &pStack->pBlocks[pStack->nBlocks];
+// Cuts a block of nBytes (rounded up to the alignment) from the top. NULL when the table is full or
+// the block would not end before the buffer's end.
+void* AudMemStack_AllocTop(AudMemStack* pAudMemStack, u32 nBytes) {
+    MemStackBlock* pmbl = &pAudMemStack->pBlocks[pAudMemStack->nBlocks];
 
-    if (pStack->nBlocks + pStack->nBtmBlocks >= pStack->nMaxBlocks) return NULL;
-    uSize = (uSize + (pStack->nAlign - 1)) & ~(pStack->nAlign - 1);
-    if (pStack->pTop + uSize >= pStack->pEnd) return NULL;
-    pBlock->pMem = pStack->pTop;
-    pBlock->uSize = uSize;
-    pStack->pTop += uSize;
-    pStack->nBlocks++;
-    return pBlock->pMem;
+    if (pAudMemStack->nBlocks + pAudMemStack->nBtmBlocks >= pAudMemStack->nMaxBlocks) return NULL;
+    nBytes = (nBytes + (pAudMemStack->nAlign - 1)) & ~(pAudMemStack->nAlign - 1);
+    if (pAudMemStack->pTop + nBytes >= pAudMemStack->pEnd) return NULL;
+    pmbl->pMem = pAudMemStack->pTop;
+    pmbl->uSize = nBytes;
+    pAudMemStack->pTop += nBytes;
+    pAudMemStack->nBlocks++;
+    return pmbl->pMem;
 }
 
-// Gives back the block starting at p (found in the table): the top drops by its size, so only the
-// last block handed out can be given back without freeing live memory.
-void AudMemStack_FreeTop(UAudMemStack* pStack, void* p) {
-    UAudMemStackBlock* pBlock = pStack->pBlocks;
+// Gives back the block starting at addr (looked up in the table; nothing when it is not there): the
+// top drops by its size, so only the last block handed out can be given back without freeing live
+// memory.
+void AudMemStack_FreeTop(AudMemStack* pAudMemStack, void* addr) {
+    MemStackBlock* pmbl = pAudMemStack->pBlocks;
     u32 i;
 
-    for (i = 0; i < pStack->nMaxBlocks; i++, pBlock++) {
-        if (pBlock->pMem == p) {
-            pStack->nBlocks--;
-            pStack->pTop -= pBlock->uSize;
-            pBlock->uSize = 0;
+    for (i = 0; i < pAudMemStack->nMaxBlocks; i++, pmbl++) {
+        if (pmbl->pMem == addr) {
+            pAudMemStack->nBlocks--;
+            pAudMemStack->pTop -= pmbl->uSize;
+            pmbl->uSize = 0;
             return;
         }
     }
