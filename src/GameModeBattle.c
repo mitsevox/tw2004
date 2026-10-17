@@ -28,7 +28,7 @@ void GameModeBattle_RestoreClubSetup(void);
 
 // Game mode 25's setup (GM_SetModeType, GameRound.c): installs the mode's callbacks (match play's
 // next golfer, honors, hole-finished and playoff; Battle's own game-finished, end-hole, end-game,
-// shutdown and round start), lets a CPU concede a hole, no mulligans (nMulligans 0) and one view.
+// shutdown and round start), lets a CPU concede a hole, no mulligans (GM_MULLIGANS_NONE) and one view.
 void GameModeBattle_Init(void) {
     gpGame->pfnInit = GameModeBattle_Init;
     gpGame->pfnShutdown = GameModeBattle_Shutdown;
@@ -41,11 +41,11 @@ void GameModeBattle_Init(void) {
     gpGame->pfnEndGame = GameModeBattle_EndGame;
     gpGame->pfnStartGamePostData = GameModeBattle_StartGamePostData;
     gpGame->bAIConcedes = 1;
-    gpGame->nScoringType = 1;
-    gpGame->nMulligans = 0;
-    gpGame->nC = 2;
-    gpGame->n10 = 2;
-    gpGame->nDC = 0;
+    gpGame->nScoringType = GM_SCORING_HOLES_WON;
+    gpGame->nMulligans = GM_MULLIGANS_NONE;
+    gpGame->nMaxGolfers = 2;
+    gpGame->nMinGolfers = 2;
+    gpGame->nCurrentRound = 0;
     gSession.nSplitScreen = 0;
 }
 

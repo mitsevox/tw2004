@@ -24,7 +24,7 @@ void  GM_BuildRegionalRound(int nCourse);
 // each section out in reverse order of definition).
 GameState  lbl_802028F0;                    // the game state (reached through gpGame)
 GameState* gpGame = &lbl_802028F0;          // golfer.h
-u8   lbl_8028227C;                          // game.h
+u8   gSplitScreen;                          // game.h
 s32  lbl_80282278;                          // game.h
 char lbl_80282270[8];                       // the hole name
 
@@ -125,29 +125,29 @@ void GM_SetModeType(int nMode) {
     gpGame->b276 = 1;
     gpGame->b277 = 1;
     gpGame->bGimmesAllowed = 1;
-    gpGame->b279 = 1;
+    gpGame->bAllowHoleRestart = 1;
     gpGame->bAIConcedes = 0;
     gpGame->b27B = 1;
     gpGame->b27C = 1;
     gpGame->b27D = 1;
     gpGame->b27E = 1;
-    gpGame->b27F = 1;
-    gpGame->b280 = 1;
-    gpGame->b281 = 1;
+    gpGame->bDoFlyBy = 1;
+    gpGame->bDoMidholeFlyBy = 1;
+    gpGame->bAllowCaddieTips = 1;
     gpGame->b282 = 1;
     gpGame->b283 = 1;
     gpGame->b284 = 1;
     gpGame->bAllowGameBreakers = 1;
-    gpGame->b286 = 1;
+    gpGame->bAllowSpeedSlowButtons = 1;
     gpGame->b287 = 1;
-    gpGame->b288 = 1;
+    gpGame->bAllowEnvironmentSounds = 1;
     gpGame->b289 = 1;
     gpGame->b28A = 1;
     gpGame->bNoWind = 0;
     gpGame->bBumpObstructions = 1;
     gpGame->b28D = 0;
-    gpGame->n290 = 2;
-    gpGame->n294 = 1;
+    gpGame->nPreShotAnimationsMode = GM_ANIMS_SOME;
+    gpGame->nPostShotAnimationsMode = GM_ANIMS_ON;
     gpGame->b28E = 0;
     gpGame->pfnInit = GM_DefaultNoOp;
     gpGame->pfnShutdown = GM_DefaultNoOp;
@@ -520,7 +520,7 @@ int GM_GetGolferRelativeCurrentScore(int nPlayer, u8 bCurrent) {
 
 // The score against par shown for a player: the PGA TOUR simulation's while a tour event runs
 // (GM_Currently_PgaTourMode), n2D8 in a playoff (gpGame->bInPlayoff), else
-// GM_GetGolferRelativeCurrentScore while the event's round number (gpGame->nDC) is below its round
+// GM_GetGolferRelativeCurrentScore while the event's round number (gpGame->nCurrentRound) is below its round
 // count (nE0), and 0 after the last round.
 int GM_GetGolferRelativeCumulativeScore(int nPlayer, u8 bCurrent) {
     if (GM_Currently_PgaTourMode()) {
@@ -529,7 +529,7 @@ int GM_GetGolferRelativeCumulativeScore(int nPlayer, u8 bCurrent) {
     if (gpGame->bInPlayoff) {
         return gPlayers[nPlayer].n2D8;
     }
-    if (gpGame->nDC < gpGame->nE0) {
+    if (gpGame->nCurrentRound < gpGame->nE0) {
         return GM_GetGolferRelativeCurrentScore(nPlayer, bCurrent);
     }
     return 0;
@@ -788,10 +788,10 @@ u8 GM_CanPlayerTakeMulligan(int nPlayer) {
     if (Player_IsCPU(nPlayer)) {
         return 0;
     }
-    if (Game_GetMulliganRule() == 0) {
+    if (Game_GetMulliganRule() == GM_MULLIGANS_NONE) {
         return 0;
     }
-    if (Game_GetMulliganRule() == 2 && gPlayers[nPlayer].bMulliganUsed) {
+    if (Game_GetMulliganRule() == GM_MULLIGANS_ONE_PER_NINE && gPlayers[nPlayer].bMulliganUsed) {
         return 0;
     }
     return 1;
@@ -824,7 +824,7 @@ int GM_GetMinPlayersForMode(int nMode) {
     case 6:
     case 7:
     case 8:
-        return gpGame->nScoringType == 0 ? 1 : 2;
+        return gpGame->nScoringType == GM_SCORING_STROKES ? 1 : 2;
     case 9:
         return 1;
     case 18:
@@ -845,10 +845,10 @@ int GM_GetMinPlayersForMode(int nMode) {
     return 0;
 }
 
-// Turns split screen on or off (gSession.nSplitScreen), keeping the choice in lbl_8028227C, from
-// which GameMode22.c restores it.
+// Turns split screen on or off (gSession.nSplitScreen), keeping the choice in gSplitScreen, which
+// modes 6, 7, 8, 22 and 26 put back as they start.
 void GM_SetSplitScreen(u8 b) {
-    lbl_8028227C = b;
+    gSplitScreen = b;
     gSession.nSplitScreen = b;
 }
 
@@ -915,9 +915,10 @@ char* GameManager_GetHoleName(int nHole) {
 }
 
 // Whether the mode allows the golfer's post-shot reactions (GM_ShowPostShotAnimation,
-// GM_ChooseRemoveBallState): gpGame->n294, on by default and cleared by modes 8, 13-15, 17 and 22.
+// GM_ChooseRemoveBallState): gpGame->nPostShotAnimationsMode, on by default and off in modes 6-9,
+// 13-17, 22 and 26.
 u8 GM_IsValidPostShotGameType(void) {
-    return gpGame->n294 != 0;
+    return gpGame->nPostShotAnimationsMode != GM_ANIMS_OFF;
 }
 
 // Seconds since the session's frame count was stored in gpGame->n12C (by GM_Update in game type

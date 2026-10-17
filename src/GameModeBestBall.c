@@ -25,9 +25,9 @@ u8   GameModeBestBall_GoToPlayoff(u8 bCheck);
 void GameModeBestBall_EndHole(void);
 void GameModeBestBall_EndGame(void);
 
-// Game mode 19's setup (GM_SetModeType): its callbacks; nScoringType 0, one mulligan per player per
-// nine (nMulligans 2), nC and n10 4 as in the other team modes, nDC 0, the current hole back to 0
-// (GM_SetCurrentHole) and split screen off.
+// Game mode 19's setup (GM_SetModeType): its callbacks; scored in strokes, one mulligan per player
+// per nine, nMaxGolfers and nMinGolfers 4 as in the other team modes, nCurrentRound 0, the current
+// hole back to 0 (GM_SetCurrentHole) and split screen off.
 void GameModeBestBall_Init(void) {
     gpGame->pfnInit = GameModeBestBall_Init;
     gpGame->pfnSetupNextGolfer = GameModeBestBall_SetupNextGolfer;
@@ -37,11 +37,11 @@ void GameModeBestBall_Init(void) {
     gpGame->pfnGoToPlayoff = GameModeBestBall_GoToPlayoff;
     gpGame->pfnEndHole = GameModeBestBall_EndHole;
     gpGame->pfnEndGame = GameModeBestBall_EndGame;
-    gpGame->nScoringType = 0;
-    gpGame->nMulligans = 2;
-    gpGame->nC = 4;
-    gpGame->n10 = 4;
-    gpGame->nDC = 0;
+    gpGame->nScoringType = GM_SCORING_STROKES;
+    gpGame->nMulligans = GM_MULLIGANS_ONE_PER_NINE;
+    gpGame->nMaxGolfers = 4;
+    gpGame->nMinGolfers = 4;
+    gpGame->nCurrentRound = 0;
     GM_SetCurrentHole(0);
     gSession.nSplitScreen = 0;
 }

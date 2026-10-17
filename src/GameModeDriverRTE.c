@@ -36,8 +36,8 @@ s32   GameModeDriverRTE_GetYearIndex(void);
 
 // Game mode 24 (real-time events; TW06 GM_Realtime_mode) starts, from GameRound's mode switch:
 // match play's golfer order, honors, hole, game-over and playoff rules (GameModeMatch) with this
-// file's GameModeDriverRTE_Shutdown and GameModeDriverRTE_EndGame; no mulligans, nC and n10 1, nDC
-// 0, single view. The event itself is played later as a mode 5 challenge
+// file's GameModeDriverRTE_Shutdown and GameModeDriverRTE_EndGame; no mulligans, nMaxGolfers and
+// nMinGolfers 1, nCurrentRound 0, single view. The event itself is played later as a mode 5 challenge
 // (GameModeDriverRTE_StartEvent).
 void GameModeDriverRTE_Init(void) {
     gpGame->pfnInit = GameModeDriverRTE_Init;
@@ -49,11 +49,11 @@ void GameModeDriverRTE_Init(void) {
     gpGame->pfnGoToPlayoff = GameModeMatch_GoToPlayoff;
     gpGame->pfnEndHole = GameModeMatch_EndHole;
     gpGame->pfnEndGame = GameModeDriverRTE_EndGame;
-    gpGame->nScoringType = 1;
-    gpGame->nMulligans = 0;
-    gpGame->nC = 1;
-    gpGame->n10 = 1;
-    gpGame->nDC = 0;
+    gpGame->nScoringType = GM_SCORING_HOLES_WON;
+    gpGame->nMulligans = GM_MULLIGANS_NONE;
+    gpGame->nMaxGolfers = 1;
+    gpGame->nMinGolfers = 1;
+    gpGame->nCurrentRound = 0;
     gSession.nSplitScreen = 0;
 }
 
@@ -100,15 +100,15 @@ void GameModeDriverRTE_Locale_LoadRTEnFromStream(UStreamObject* pObject) {
 }
 
 // Mode 24's shutdown (also wrapped around mode 5's while an event's challenge runs): mode 5's own
-// shutdown when one was saved, gpGame nC and n10 back to 1, the options nWeather and wind that
+// shutdown when one was saved, nMaxGolfers and nMinGolfers back to 1, the options nWeather and wind that
 // GameModeDriverRTE_StartEvent changed put back, and the event is no longer running
 // (GM_Currently_RealtimeMode).
 void GameModeDriverRTE_Shutdown(void) {
     if (gRTEChallengeShutdown) {
         gRTEChallengeShutdown();
     }
-    gpGame->nC = 1;
-    gpGame->n10 = 1;
+    gpGame->nMaxGolfers = 1;
+    gpGame->nMinGolfers = 1;
     gSession.options.nWeather = gRTESavedOptionC;
     gSession.options.nWind = gRTESavedWind;
     gRTEEventRunning = 0;

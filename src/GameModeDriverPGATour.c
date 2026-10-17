@@ -59,8 +59,8 @@ s32  GameModeDriverPGATour_GetNumEventsWon(void);
 
 // Game mode 23's setup (pfnInit, from GM_SetModeType): stroke play's golfer order, honors and
 // hole-finished rules with the tour's own hooks (round start and end, hole start and end, game over
-// and playoff, the lead and putt-for-lead / putt-for-win answers); no mulligans, gpGame nC and n10
-// 1, round 0 of 1 (nDC, nE0) and no split screen.
+// and playoff, the lead and putt-for-lead / putt-for-win answers); no mulligans, nMaxGolfers and
+// nMinGolfers 1, round 0 of 1 (nCurrentRound, nE0) and no split screen.
 void GameModeDriverPGATour_Init(void) {
     gpGame->pfnInit = GameModeDriverPGATour_Init;
     gpGame->pfnShutdown = GameModeDriverPGATour_Shutdown;
@@ -80,11 +80,11 @@ void GameModeDriverPGATour_Init(void) {
     gpGame->pfnGetPotentialLead = GameModeDriverPGATour_GetPotentialLead;
     gpGame->pfnGetPotentialHoleResult = GameModeDriverPGATour_GetPotentialHoleResult;
     gpGame->b274 = 0;
-    gpGame->nScoringType = 0;
-    gpGame->nMulligans = 0;
-    gpGame->nC = 1;
-    gpGame->n10 = 1;
-    gpGame->nDC = 0;
+    gpGame->nScoringType = GM_SCORING_STROKES;
+    gpGame->nMulligans = GM_MULLIGANS_NONE;
+    gpGame->nMaxGolfers = 1;
+    gpGame->nMinGolfers = 1;
+    gpGame->nCurrentRound = 0;
     gpGame->nE0 = 1;
     gSession.nSplitScreen = 0;
 }
@@ -150,13 +150,13 @@ void GameModeDriverPGATour_Locale_PgaTourMode_LoadPGAnFromStream(UStreamObject* 
     }
 }
 
-// pfnShutdown, as the mode ends: gpGame's nC and n10 go back to 1, the options' nWeather and nWind
+// pfnShutdown, as the mode ends: nMaxGolfers and nMinGolfers go back to 1, the options' nWeather and nWind
 // that PrepareForTeeOff replaced come back, and the tour-round flag (GM_Currently_PgaTourMode) is
 // cleared. options.nGreenSpeed, which SetTournament replaced (keeping the old value in
 // gPgaSavedOptions18), is not put back (see the EA bug there).
 void GameModeDriverPGATour_Shutdown(void) {
-    gpGame->nC = 1;
-    gpGame->n10 = 1;
+    gpGame->nMaxGolfers = 1;
+    gpGame->nMinGolfers = 1;
     gSession.options.nWeather = gPgaSavedWeather;
     gSession.options.nWind = gPgaSavedWind;
     gbPgaTourRoundActive = 0;
@@ -170,7 +170,7 @@ void GameModeDriverPGATour_StartGamePreData(void) {
 }
 
 // Sets up tournament format i (an index into gPgaData.aTourEvent) for the current round: all five
-// players play its tee set, the course is the round's course (round gpGame->nDC), every hole uses
+// players play its tee set, the course is the round's course (round gpGame->nCurrentRound), every hole uses
 // the round's pin position (profile 0's tour.nRound), and the round's nGreenSpeed replaces
 // options.nGreenSpeed, the green speed (the old value kept in gPgaSavedOptions18, never read back),
 // and is applied (Physics_SetGreenSpeedByType). The tee set is written back to the format
@@ -186,7 +186,7 @@ void GameModeDriverPGATour_SetTournament(s32 i) {
         gSession.nTeeSet[k] = nTee;
     }
     pEvent->nTeeSet = nTee;
-    GM_SetCurrentCourse(gPgaData.aTourEvent[i].aRound[gpGame->nDC].nCourse);
+    GM_SetCurrentCourse(gPgaData.aTourEvent[i].aRound[gpGame->nCurrentRound].nCourse);
     gSession.nPinSet = gPgaData.aTourEvent[i].aRound[gpSaveData[nPlayer].tour.nRound].nPinSet - 1;
     for (h = 0; h < 18; h++) {
         gpGame->nPinSet[h] = gPgaData.aTourEvent[i].aRound[gpSaveData[nPlayer].tour.nRound].nPinSet - 1;
@@ -222,7 +222,7 @@ void GameModeDriverPGATour_PrepareForTeeOff(void) {
     gPgaWinInfo.bPlaced = 0;
     if (gPgaData.aTournament[nEvent].nTourEvent) {
         gSession.nNumPlayers = 1;
-        gpGame->nDC = gpSaveData[nPlayer].tour.nRound;
+        gpGame->nCurrentRound = gpSaveData[nPlayer].tour.nRound;
         nFormat = gPgaData.aTournament[nEvent].nTourEvent - 1;
         gpGame->nE0 = gPgaData.aTourEvent[nFormat].nRounds;
         GameModeDriverPGATour_SetTournament(gPgaData.aTournament[nEvent].nTourEvent - 1);
@@ -687,7 +687,7 @@ u8 GameModeDriverPGATour_GameFinished(u8 bCheck) {
             return 0;
         }
     }
-    if (gpGame->nDC + 1 >= gpGame->nE0) {
+    if (gpGame->nCurrentRound + 1 >= gpGame->nE0) {
         GM_PgaTourSim_InitPlayoff(0);
         return GameModeDriverPGATour_GoToPlayoff(bCheck) == 0;
     }

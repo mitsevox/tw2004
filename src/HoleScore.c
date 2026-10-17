@@ -44,7 +44,7 @@ u8 GameAnalysis_IsPuttForLead(int nPlayer) {
     if (gNumPlayersSetUp == 1) {
         return 0;
     }
-    if (nKind == 0) {
+    if (nKind == GM_SCORING_STROKES) {
         nBest = 1000;
         // EA bug: nMine is never set when nPlayer is cut or not one of the players set up
         for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -78,7 +78,7 @@ u8 GameAnalysis_IsPuttForLead(int nPlayer) {
             return nMineStrokes < nBest;
         }
         return 0;
-    } else if (nKind == 1) {
+    } else if (nKind == GM_SCORING_HOLES_WON) {
         nBest = -1;
         nBestStrokes = 1000;
         for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -102,7 +102,7 @@ u8 GameAnalysis_IsPuttForLead(int nPlayer) {
             return 1;
         }
         return 0;
-    } else if (nKind == 2) {
+    } else if (nKind == GM_SCORING_SKINS) {
         nBest = -1;
         nBestStrokes = 1000;
         for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -151,7 +151,7 @@ u8 GameAnalysis_IsPuttForWin(int nPlayer) {
         return 0;
     }
     nLeft = GM_GetNumHolesRemainingInRound();
-    if (nKind == 0) {
+    if (nKind == GM_SCORING_STROKES) {
         if (nLeft != 1 && !GM_IsPlayoff()) {
             return 0;
         }
@@ -182,7 +182,7 @@ u8 GameAnalysis_IsPuttForWin(int nPlayer) {
             }
         }
         return nMineStrokes < nBest;
-    } else if (nKind == 1) {
+    } else if (nKind == GM_SCORING_HOLES_WON) {
         nBest = -1;
         nBestStrokes = 1000;
         for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -209,7 +209,7 @@ u8 GameAnalysis_IsPuttForWin(int nPlayer) {
             return 1;
         }
         return 0;
-    } else if (nKind == 2) {
+    } else if (nKind == GM_SCORING_SKINS) {
         nBest = -1;
         nBestStrokes = 1000;
         for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -396,7 +396,7 @@ s32 GameAnalysis_GetCurrentEventLead(int nPlayer) {
     if (gNumPlayersSetUp == 1) {
         return 0;
     }
-    if (nKind == 0) {
+    if (nKind == GM_SCORING_STROKES) {
         nBest = 1000;
         // EA bug: nMine is never set when nPlayer is cut or not one of the players set up
         for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -410,7 +410,7 @@ s32 GameAnalysis_GetCurrentEventLead(int nPlayer) {
             }
         }
         return nBest - nMine;
-    } else if (nKind == 1) {
+    } else if (nKind == GM_SCORING_HOLES_WON) {
         nBest = 0;
         for (i = 0; i < gNumPlayersSetUp; i++) {
             if (i == nPlayer) {
@@ -420,7 +420,7 @@ s32 GameAnalysis_GetCurrentEventLead(int nPlayer) {
             }
         }
         return nMine - nBest;
-    } else if (nKind == 2) {
+    } else if (nKind == GM_SCORING_SKINS) {
         nBest = 0;
         for (i = 0; i < gNumPlayersSetUp; i++) {
             if (i == nPlayer) {
@@ -470,7 +470,7 @@ s32 GameAnalysis_GetPotentialEventLead(int nPlayer) {
     if (gNumPlayersSetUp == 1) {
         return 0;
     }
-    if (nKind == 0) {
+    if (nKind == GM_SCORING_STROKES) {
         nBest = 1000;
         // EA bug: nMine is never set when nPlayer is cut or not one of the players set up
         for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -491,7 +491,7 @@ s32 GameAnalysis_GetPotentialEventLead(int nPlayer) {
             }
         }
         return nBest - nMine;
-    } else if (nKind == 1) {
+    } else if (nKind == GM_SCORING_HOLES_WON) {
         nLead = GM_GetCurrentEventLead(nPlayer);
         nHole = GM_GetPotentialHoleResult(nPlayer);
         if (nHole == 3) {
@@ -504,7 +504,7 @@ s32 GameAnalysis_GetPotentialEventLead(int nPlayer) {
             return nLead - 1;
         }
         return nLead;
-    } else if (nKind == 2) {
+    } else if (nKind == GM_SCORING_SKINS) {
         nLead = GM_GetCurrentEventLead(nPlayer);
         nHole = GM_GetPotentialHoleResult(nPlayer);
         if (nHole == 3) {

@@ -36,8 +36,9 @@ void GameMode12_AddShotPoints(int nPlayer);
 void GameMode12_ShotSetupUpdate(int nPlayer);
 
 // Mode 12 starts (pfnInit): its callbacks (the honors, hole-finished and game-finished ones are
-// stroke play's, GameModeStroke), round flags b271, b281, b288 and the stroke limit off, any number
-// of mulligans, hole 1, no surface hit yet, no split screen, and the options' nWeather 0.
+// stroke play's, GameModeStroke), round flags b271, bAllowCaddieTips, bAllowEnvironmentSounds and
+// the stroke limit off, any number of mulligans, hole 1, no surface hit yet, no split screen, and
+// the options' nWeather 0.
 void GameMode12_Init(void) {
     gpGame->pfnInit = GameMode12_Init;
     gpGame->pfnGetHonors = GameModeStroke_GetHonors;
@@ -53,14 +54,14 @@ void GameMode12_Init(void) {
     gpGame->pfnCheckShotAwards = GameMode12_AddShotPoints;
     gpGame->pfnSwingUpdate = GameMode12_ShotSetupUpdate;
     gpGame->b271 = 0;
-    gpGame->b281 = 0;
+    gpGame->bAllowCaddieTips = 0;
     gpGame->bStrokeLimit = 0;
-    gpGame->b288 = 0;
-    gpGame->nScoringType = 0;
-    gpGame->nMulligans = 1;
-    gpGame->nC = 4;
-    gpGame->n10 = 1;
-    gpGame->nDC = 0;
+    gpGame->bAllowEnvironmentSounds = 0;
+    gpGame->nScoringType = GM_SCORING_STROKES;
+    gpGame->nMulligans = GM_MULLIGANS_ANY;
+    gpGame->nMaxGolfers = 4;
+    gpGame->nMinGolfers = 1;
+    gpGame->nCurrentRound = 0;
     GM_SetCurrentHole(0);
     gGameMode12Surface = -1;
     gSession.nSplitScreen = 0;

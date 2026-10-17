@@ -25,10 +25,10 @@ void GameModePractice_EndTurnEndHoleNotGame(int nPlayer);
 void GameModePractice_InitCamera(void);
 
 // Game mode 9's (practice) setup (pfnInit, from GM_SetModeType): its hooks (stroke play's GetHonors
-// and GameModeStroke_GoToPlayoff as GoToPlayoff), any number of mulligans (nMulligans 1), no
+// and GameModeStroke_GoToPlayoff as GoToPlayoff), any number of mulligans (GM_MULLIGANS_ANY), no
 // gimmes, no stroke limit, no GameBreakers (b285), no scorecards from the game manager (b275; EndGame and
 // EndTurnEndHoleNotGame show their own), nothing counted in the profile's statistics (b27C, b27D),
-// no flyover at the hole start (b27F) but the mid-hole flyover button on (b280), one view, the
+// no flyover at the hole start (bDoFlyBy) but the mid-hole flyover button on (bDoMidholeFlyBy), one view, the
 // current hole 0 and the hole not ended early.
 void GameModePractice_Init(void) {
     gpGame->pfnInit = GameModePractice_Init;
@@ -46,16 +46,16 @@ void GameModePractice_Init(void) {
     gpGame->bGimmesAllowed = 0;
     gpGame->b27C = 0;
     gpGame->b27D = 0;
-    gpGame->b27F = 0;
-    gpGame->b280 = 1;
+    gpGame->bDoFlyBy = 0;
+    gpGame->bDoMidholeFlyBy = 1;
     gpGame->bAllowGameBreakers = 0;
-    gpGame->n290 = 0;
-    gpGame->n294 = 0;
-    gpGame->nScoringType = 0;
-    gpGame->nMulligans = 1;
-    gpGame->nC = 1;
-    gpGame->n10 = 1;
-    gpGame->nDC = 0;
+    gpGame->nPreShotAnimationsMode = GM_ANIMS_OFF;
+    gpGame->nPostShotAnimationsMode = GM_ANIMS_OFF;
+    gpGame->nScoringType = GM_SCORING_STROKES;
+    gpGame->nMulligans = GM_MULLIGANS_ANY;
+    gpGame->nMaxGolfers = 1;
+    gpGame->nMinGolfers = 1;
+    gpGame->nCurrentRound = 0;
     GM_SetCurrentHole(0);
     gPracticeHoleEndedEarly = 0;
     gSession.nSplitScreen = 0;

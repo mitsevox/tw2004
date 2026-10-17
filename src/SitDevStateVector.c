@@ -429,8 +429,8 @@ u8 GM_IsPlayoff(void) {
     return gpGame->bInPlayoff;
 }
 
-// The tour event's current round, from 0 (gpGame->nDC): SitDev_SetupStateVector sets value 62 to it
+// The tour event's current round, from 0 (gpGame->nCurrentRound): SitDev_SetupStateVector sets value 62 to it
 // plus 1 and value 14 to the score of the round before.
 s32 GM_GetCurrentRound(void) {
-    return gpGame->nDC;
+    return gpGame->nCurrentRound;
 }
