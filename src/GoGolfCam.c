@@ -4097,10 +4097,10 @@ void GolfCamera_AbortAllSpecialSwings(View* pView, int nPlayer) {
 }
 
 // Should the ball's flight wait this frame (GM_SimulateBallMovement skips its physics steps when
-// gpGame->n294 is set): the ball is behind the camera on the flat (the look and to-ball directions'
-// dot product not above 0) and the camera follows the golfer (GolfCamera_IsCameraTrackingPlayer).
-// Never without a current shot, for a shot of kind 3 (nStateType), or once script.fScriptTime
-// passes 5.
+// gpGame->nPostShotAnimationsMode is not GM_ANIMS_OFF): the ball is behind the camera on the flat
+// (the look and to-ball directions' dot product not above 0) and the camera follows the golfer
+// (GolfCamera_IsCameraTrackingPlayer). Never without a current shot, for a shot of kind 3
+// (nStateType), or once script.fScriptTime passes 5.
 u8 GolfCamera_IsBallFlightPaused(View* pView, int nPlayer) {
     f32 vLook[4];
     f32 vBall[4];

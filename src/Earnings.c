@@ -223,7 +223,7 @@ void GM_Earnings_AwardMoney(int nPlayer, int nMoney, CourseMoneyTracking* pMoney
 
     if (nPlayer >= 5 || nPlayer == 4) return;
     if (Player_IsCPU(nPlayer)) return;
-    if (Game_GetMulliganRule() != 0) return;
+    if (Game_GetMulliganRule() != GM_MULLIGANS_NONE) return;
     nProfile = gPlayers[nPlayer].nIndex;
     if (nProfile >= 5 || nProfile == 4) return;
     if (gpSaveData[nProfile].bActive != 1) return;
@@ -253,7 +253,7 @@ void GM_Earnings_AwardMoney(int nPlayer, int nMoney, CourseMoneyTracking* pMoney
 int GM_Earnings_GetStrokeWinnings(int nWinner, int nLoser, int nMargin, int* pPrize) {
     int nRating;
 
-    if (Game_GetMulliganRule() != 0) return 0;
+    if (Game_GetMulliganRule() != GM_MULLIGANS_NONE) return 0;
     if (Player_IsCPU(nWinner) || !Player_IsCPU(nLoser)) return 0;
     nRating = GM_Earnings_RateGolfer(nLoser);
     if (nMargin > 5) {
@@ -279,7 +279,7 @@ int GM_Earnings_GetStrokeWinningsTeam(int nWinner, int nLoser, int nMargin, int*
     int nBase2;
     int nTotal;
 
-    if (Game_GetMulliganRule() != 0) return 0;
+    if (Game_GetMulliganRule() != GM_MULLIGANS_NONE) return 0;
     if (Team_IsAllCPU(nWinner) || !Team_IsAllCPU(nLoser)) return 0;
     if (nLoser == 0) {
         nFirst = 0;
@@ -312,7 +312,7 @@ int GM_Earnings_GetLadderWinnings(int nWinner, int nLoser, int nMargin, s32* pPr
     int nEvent;
     int nMoney;
 
-    if (Game_GetMulliganRule() != 0) return 0;
+    if (Game_GetMulliganRule() != GM_MULLIGANS_NONE) return 0;
     nEvent = GameMode4_GetCurrentEvent();
     if (nMargin > 5) {
         nMargin = 5;
@@ -336,7 +336,7 @@ void GM_Earnings_AwardDoubleMoney(int nPlayer, int nMoney) {
     CourseMoneyTracking money;
     s32 nPaid;
 
-    if (Game_GetMulliganRule() == 0) {
+    if (Game_GetMulliganRule() == GM_MULLIGANS_NONE) {
         nPaid = nMoney * 2;
         Mem_set(&money, 0, sizeof(money));
         money.n24 = nPaid;
@@ -478,7 +478,7 @@ void GM_Earnings_PayShotGoals(int nPlayer) {
     int nKind;
 
     if (Game_GetMode() == 10) return;
-    if (Game_GetMulliganRule() != 0) return;
+    if (Game_GetMulliganRule() != GM_MULLIGANS_NONE) return;
     gpGame->pfnCheckShotAwards(nPlayer);
     nProfile = gPlayers[nPlayer].nIndex;
     if (gpSaveData[nProfile].bActive == 0) return;
@@ -536,7 +536,7 @@ void GM_Earnings_PayHoledGoals(int nPlayer) {
     int i;
 
     if (Game_GetMode() == 10) return;
-    if (Game_GetMulliganRule() != 0) return;
+    if (Game_GetMulliganRule() != GM_MULLIGANS_NONE) return;
     nProfile = gPlayers[nPlayer].nIndex;
     if (gpSaveData[nProfile].bActive == 0) return;
     if (Player_IsCPU(nPlayer)) return;
@@ -612,7 +612,7 @@ void GM_Earnings_PayRoundGoals(int nPlayer, u8 bRoundOver) {
 
     nLevel = 0;
     if (GM_IsSpeedGolfMode()) return;
-    if (Game_GetMulliganRule() != 0) return;
+    if (Game_GetMulliganRule() != GM_MULLIGANS_NONE) return;
     nProfile = gPlayers[nPlayer].nIndex;
     if (gpSaveData[nProfile].bActive == 0) return;
     if (Player_IsCPU(nPlayer)) return;
@@ -726,7 +726,7 @@ void GM_Earnings_CheckShotGoals(int nPlayer, Ball* pBall, u8 bPreview) {
     if (Player_IsCPU(nPlayer)) return;
     if (!GM_Earnings_AwardShotBonusToUser(nPlayer)) return;
     if (Lessons_IsRunning()) return;
-    if (Game_GetMulliganRule() != 0) return;
+    if (Game_GetMulliganRule() != GM_MULLIGANS_NONE) return;
 
     if (pBall != NULL) {
         Mem_cpy(&saved, &gPlayers[nPlayer].ball, sizeof(Ball));
@@ -897,7 +897,7 @@ void GM_Earnings_CheckPuttGoals(int nPlayer, u8 bPreview) {
     if (Player_IsCPU(nPlayer)) return;
     if (!GM_Earnings_AwardShotBonusToUser(nPlayer)) return;
     if (PlayNow_IsChallengeRunning() && !GameMode4_IsEventRunning()) return;
-    if (Game_GetMulliganRule() != 0) return;
+    if (Game_GetMulliganRule() != GM_MULLIGANS_NONE) return;
 
     for (i = Game_CurHoleIndex() + 1; i < 18; i++) {
         gPlayers[nPlayer].nStrokes[i] = 999;
@@ -1073,7 +1073,7 @@ void GM_Earnings_CheckHoleGoals(int nPlayer, u8 bPreview, u8 bRoundOver) {
     gNumAwards = 0;
     if (gSession.uFlags & 0x4000) return;
     if (!GM_Earnings_AwardShotBonusToUser(nPlayer)) return;
-    if (Game_GetMulliganRule() != 0) return;
+    if (Game_GetMulliganRule() != GM_MULLIGANS_NONE) return;
 
     for (i = Game_CurHoleIndex() + 1; i < 18; i++) {
         gPlayers[nPlayer].nStrokes[i] = 999;
@@ -1511,7 +1511,7 @@ s32 GM_Earnings_ComputeBonusModifiers(s32 nPoints, int nPlayer, u8 bCourse, u8 b
     s32 nBase;
     s32 nTotal;
 
-    if (Game_GetMulliganRule() != 0) return 0;
+    if (Game_GetMulliganRule() != GM_MULLIGANS_NONE) return 0;
     fTee = 1.0f;
     fHole = fTee;
     fCourse = GM_Earnings_GetCourseModifier();
@@ -1649,7 +1649,7 @@ int GM_Earnings_ComputeTOURCardModifiers(int nReward, int nPlayer, CourseMoneyTr
     f32 fMult;
     s32 nTotal;
 
-    if (Game_GetMulliganRule() != 0) return 0;
+    if (Game_GetMulliganRule() != GM_MULLIGANS_NONE) return 0;
     fMult = 1.0f;
     if (gpSaveData[gPlayers[nPlayer].nIndex].bActive != 0) {
         switch (gpSaveData[gPlayers[nPlayer].nIndex].nTourCardLevel) {
@@ -1689,7 +1689,7 @@ int GM_Earnings_ComputeTOURCardModifiers(int nReward, int nPlayer, CourseMoneyTr
 // GM_Earnings_CheckHoleGoals) stop without it.
 u8 GM_Earnings_AwardShotBonusToUser(int nPlayer) {
     if (Player_IsCPU(nPlayer)) return 0;
-    if (Game_GetMulliganRule() != 0) return 0;
+    if (Game_GetMulliganRule() != GM_MULLIGANS_NONE) return 0;
     if (gpSaveData[gPlayers[nPlayer].nIndex].bActive != 1) return 0;
     return 1;
 }
@@ -1703,7 +1703,7 @@ u8 GM_Earnings_AwardTrophyBall(int nPlayer, int nAward) {
     PlayerNumber_t nProfile;
     int nSlot;
 
-    if (Game_GetMulliganRule() != 0) return 0;
+    if (Game_GetMulliganRule() != GM_MULLIGANS_NONE) return 0;
     if (GM_Earnings_AwardThisTrophyBallToUser(nPlayer, nAward)) {
         nProfile = gPlayers[nPlayer].nIndex;
         if (gpSaveData[nProfile].bActive != 1) return 0;
@@ -1747,7 +1747,7 @@ s32 Earnings_CheckPuttAwards(int nPlayer, Ball* pBall, u8 b) {
 // Whether the player can still win award nAward (0..38): a human player with an active profile who
 // has not won it; never with mulligans on, nor for 39 (the goal tables' mark for a money prize).
 u8 GM_Earnings_AwardThisTrophyBallToUser(int nPlayer, int nAward) {
-    if (Game_GetMulliganRule() != 0) return 0;
+    if (Game_GetMulliganRule() != GM_MULLIGANS_NONE) return 0;
     if (nAward == 39) return 0;
     if (Player_IsCPU(nPlayer)) return 0;
     if (gpSaveData[gPlayers[nPlayer].nIndex].bActive != 1) return 0;
@@ -1757,7 +1757,7 @@ u8 GM_Earnings_AwardThisTrophyBallToUser(int nPlayer, int nAward) {
 // Mark pAward won with today's date (CalDate_GetToday). Returns 1 when it was not won before; 0,
 // with nothing changed, for a CPU player, a player without an active profile or with mulligans on.
 u8 GM_Earnings_GiveAwardToUser(int nPlayer, Award* pAward) {
-    if (Game_GetMulliganRule() != 0) return 0;
+    if (Game_GetMulliganRule() != GM_MULLIGANS_NONE) return 0;
     if (Player_IsCPU(nPlayer)) return 0;
     if (gpSaveData[gPlayers[nPlayer].nIndex].bActive != 1) return 0;
     if (pAward->bWon) return 0;
@@ -1796,7 +1796,7 @@ int HighScoreRecords_GetEndOfShotRecord(int nPlayer, Ball* pBall, int a, u8 bCou
     if (Game_GetMode() == 12 || GM_Currently_SkillZoneMode() || Game_GetMode() == 22 || Game_GetMode()
         == 26) return 0;
     if (gpGame->bRandom18) return 0;
-    if (Game_GetMulliganRule() != 0) return 0;
+    if (Game_GetMulliganRule() != GM_MULLIGANS_NONE) return 0;
     nProfile = gPlayers[nPlayer].nIndex;
     if (gpSaveData[nProfile].bActive == 0) return 0;
     if (gFEState.aLoaded[nProfile] == 0) {
@@ -1852,7 +1852,7 @@ int HighScoreRecords_GetEndOfHoleRecord(int nPlayer, Ball* pBall, int a, u8 bCou
     if (Game_GetMode() == 12 || GM_Currently_SkillZoneMode() || Game_GetMode() == 22 || Game_GetMode()
         == 26) return 0;
     if (gpGame->bRandom18) return 0;
-    if (Game_GetMulliganRule() != 0) return 0;
+    if (Game_GetMulliganRule() != GM_MULLIGANS_NONE) return 0;
     nProfile = gPlayers[nPlayer].nIndex;
     if (gpSaveData[nProfile].bActive == 0) return 0;
     if (gFEState.aLoaded[nProfile] == 0) {
@@ -1903,7 +1903,7 @@ int HighScoreRecords_GetEndOfGameRecord(int nPlayer, int bSave, u8 bCountStroke,
     if (gSession.uFlags & 0x4000) return 0;
     if (Player_IsCPU(nPlayer)) return 0;
     if (Game_GetMode() == 12) return 0;
-    if (Game_GetMulliganRule() != 0) return 0;
+    if (Game_GetMulliganRule() != GM_MULLIGANS_NONE) return 0;
     nProfile = gPlayers[nPlayer].nIndex;
     if (gpSaveData[nProfile].bActive == 0) return 0;
     if (gFEState.aLoaded[nProfile] == 0) {
@@ -2301,7 +2301,7 @@ void GM_ClearGameBonusStats(int nPlayer) {
 // other kind counts.
 u8 HighScoreRecords_CheckRecordGameSetting(int nKind) {
     if (Game_GetMode() == 9 || Game_GetMode() == 11) return 0;
-    if (Game_GetMulliganRule() != 0) return 0;
+    if (Game_GetMulliganRule() != GM_MULLIGANS_NONE) return 0;
     switch (nKind) {
     case 0:
         if (PlayNow_IsChallengeRunning() || !GM_FullRoundOfGolf() || GM_GetScoringType()) return 0;
@@ -2359,7 +2359,7 @@ void GM_RecordIndividualShotStats(int nPlayer) {
     int nPutt;
 
     if (!gpGame->b27B) return;
-    if (Game_GetMulliganRule() != 0) return;
+    if (Game_GetMulliganRule() != GM_MULLIGANS_NONE) return;
     pBall = &gPlayers[nPlayer].ball;
     nPar = GM_GetCurrentHolePar();
     nClass = gSurfaceTypes[pBall->nStartSurface].nClass;
@@ -2415,7 +2415,7 @@ void GM_RecordBonusShotStats(int nPlayer) {
     int nStrokes;
     int nPar;
 
-    if (Game_GetMulliganRule() == 0) {
+    if (Game_GetMulliganRule() == GM_MULLIGANS_NONE) {
         nLie = gPlayers[nPlayer].ball.nLie;
         if (gPlayers[nPlayer].bBunkerThisShot) {
             gPlayers[nPlayer].bBunkerThisHole = 1;
@@ -2467,7 +2467,7 @@ void GM_RecordIndividualHoleStats(int nPlayer) {
         default:
             return;
         }
-        if (Game_GetMulliganRule() == 0) {
+        if (Game_GetMulliganRule() == GM_MULLIGANS_NONE) {
             f32* pPos = gPlayers[nPlayer].ball.vPos;
 
             // How far the ball ended from vBall; the result is not used.
@@ -2531,9 +2531,9 @@ void GM_RecordIndividualHoleStats(int nPlayer) {
 
 // At the end of the round (its last hole, outside a playoff; GM_EndOfGolferTurn_HoleFinished), when
 // gpGame->b27D allows it, no challenge runs and mulligans are off: a full round is counted in the
-// profile (nRounds), and in stroke play (gpGame->nScoringType 0) also in nStrokeRounds, with its
-// strokes added to nStrokeRoundStrokes and kept as the best round (nBestRound) when lower. The
-// profile is flagged as changed (bChanged).
+// profile (nRounds), and in stroke play (gpGame->nScoringType GM_SCORING_STROKES) also in
+// nStrokeRounds, with its strokes added to nStrokeRoundStrokes and kept as the best round
+// (nBestRound) when lower. The profile is flagged as changed (bChanged).
 void GM_RecordIndividualRoundStats(int nPlayer) {
     PlayerNumber_t nProfile;
     int nStrokes;
@@ -2546,12 +2546,12 @@ void GM_RecordIndividualRoundStats(int nPlayer) {
         default:
             return;
         }
-        if (Game_GetMulliganRule() == 0) {
+        if (Game_GetMulliganRule() == GM_MULLIGANS_NONE) {
             nProfile = gPlayers[nPlayer].nIndex;
             if (gpSaveData[nProfile].bActive) {
                 if (GM_FullRoundOfGolf()) {
                     gpSaveData[nProfile].nRounds++;
-                    if (gpGame->nScoringType == 0) {
+                    if (gpGame->nScoringType == GM_SCORING_STROKES) {
                         nStrokes = GM_GetPlayerRoundStrokes(nPlayer);
                         gpSaveData[nProfile].nStrokeRounds++;
                         gpSaveData[nProfile].nStrokeRoundStrokes += nStrokes;
@@ -2608,7 +2608,7 @@ u8 Earnings_IsTourAwardEarned(int nPlayer, int nAward) {
     PgaStatCounts* pStats;
     TourSeason* pTour;
 
-    if (Game_GetMulliganRule() != 0) return 0;
+    if (Game_GetMulliganRule() != GM_MULLIGANS_NONE) return 0;
     pProfile = &gpSaveData[nPlayer];
     if (!pProfile->bActive) return 0;
     pStats = &pProfile->tour.aStats[PGA_USER_GOLFER];

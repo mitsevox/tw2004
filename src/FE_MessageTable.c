@@ -2679,11 +2679,11 @@ void GM_vGetEarningsTableA9B4(MsgArg* pArgs, MsgArg* pResult) {
 // per player per nine) is pArgs[0], but none in game mode 7 and any number in mode 9 (practice).
 void GM_vSetMulligan(MsgArg* pArgs, MsgArg* pResult) {
     if (Game_GetMode() == 7) {
-        gpGame->nMulligans = 0;
+        gpGame->nMulligans = GM_MULLIGANS_NONE;
         return;
     }
     if (Game_GetMode() == 9) {
-        gpGame->nMulligans = 1;
+        gpGame->nMulligans = GM_MULLIGANS_ANY;
         return;
     }
     gpGame->nMulligans = pArgs[0].i;

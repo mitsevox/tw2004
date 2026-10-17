@@ -53,10 +53,10 @@ void  GameModeSkillZoneHorse_GetIDScore(s32 nSurface, s32* pPoints);
 s32   GameModeSkillZoneHorse_GetLastShotExceeded(void);
 s32   GameModeSkillZoneHorse_GreenType(int nPlayer, int nTarget);
 
-// Game mode 15's setup (pfnInit, from GM_SetModeType): its hooks, nC and n10 2 (two players, as
-// GameModeBattle sets them), no wind, no gimmes, no mulligans, b28D set (the re-plan button picks
-// the next target), the current hole 0, pin set 0 and the target list emptied (the hole's targets
-// fill it as they load). The same settings as mode 14.
+// Game mode 15's setup (pfnInit, from GM_SetModeType): its hooks, nMaxGolfers and nMinGolfers 2
+// (two players, as GameModeBattle sets them), no wind, no gimmes, no mulligans, b28D set (the
+// re-plan button picks the next target), the current hole 0, pin set 0 and the target list emptied
+// (the hole's targets fill it as they load). The same settings as mode 14.
 void GameModeSkillZoneHorse_Init(void) {
     gpGame->pfnInit = GameModeSkillZoneHorse_Init;
     gpGame->pfnShutdown = GameModeSkillZoneHorse_Shutdown;
@@ -81,27 +81,27 @@ void GameModeSkillZoneHorse_Init(void) {
     gpGame->pfnGreenType = GameModeSkillZoneHorse_GreenType;
     gpGame->b276 = 0;
     gpGame->bGimmesAllowed = 0;
-    gpGame->b280 = 0;
+    gpGame->bDoMidholeFlyBy = 0;
     gpGame->b271 = 0;
-    gpGame->b281 = 0;
+    gpGame->bAllowCaddieTips = 0;
     gpGame->bStrokeLimit = 0;
     gpGame->bAllowGameBreakers = 0;
     gpGame->b274 = 0;
-    gpGame->b286 = 1;
+    gpGame->bAllowSpeedSlowButtons = 1;
     gpGame->b287 = 0;
-    gpGame->b288 = 0;
+    gpGame->bAllowEnvironmentSounds = 0;
     gpGame->b289 = 0;
     gpGame->b28A = 0;
     gpGame->bNoWind = 1;
     gpGame->bBumpObstructions = 0;
     gpGame->b28D = 1;
-    gpGame->nScoringType = 0;
-    gpGame->nMulligans = 0;
-    gpGame->n10 = 2;
-    gpGame->nC = 2;
-    gpGame->n290 = 0;
-    gpGame->n294 = 0;
-    gpGame->nDC = 0;
+    gpGame->nScoringType = GM_SCORING_STROKES;
+    gpGame->nMulligans = GM_MULLIGANS_NONE;
+    gpGame->nMinGolfers = 2;
+    gpGame->nMaxGolfers = 2;
+    gpGame->nPreShotAnimationsMode = GM_ANIMS_OFF;
+    gpGame->nPostShotAnimationsMode = GM_ANIMS_OFF;
+    gpGame->nCurrentRound = 0;
     GM_SetCurrentHole(0);
     gSkillZoneNumCups = 0;
     gSession.nSplitScreen = 0;

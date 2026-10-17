@@ -603,16 +603,42 @@ typedef struct Session {
 } Session;
 LAYOUT_ASSERT(Session, 0x5BD0);
 
-// The game state gpGame points at: the current game mode's rules (data and callbacks; TW06
-// turned this into the GameModeDriver class). Only what our files use is named.
+// GameState.nScoringType: how the round is scored (set by each mode's setup; GM_GetScoringType).
+typedef enum GM_ScoringType_t {
+    GM_SCORING_STROKES = 0,
+    GM_SCORING_HOLES_WON = 1,           // match play
+    GM_SCORING_SKINS = 2,
+    GM_SCORING_STABLEFORD = 3
+} GM_ScoringType_t;
+
+// GameState.nMulligans: the mode's mulligan rule (Game_GetMulliganRule; GM_PlayerTakeMulligan,
+// GM_CanPlayerTakeMulligan).
+typedef enum GM_MulliganType_t {
+    GM_MULLIGANS_NONE = 0,
+    GM_MULLIGANS_ANY = 1,               // any number
+    GM_MULLIGANS_ONE_PER_NINE = 2       // one per player per nine (GM_ClearMulliganCounters at the turn)
+} GM_MulliganType_t;
+
+// GameState.nPreShotAnimationsMode and nPostShotAnimationsMode: whether the golfer plays his
+// animations before the shot (GM_DoPreshotAnimation) and his reaction after it
+// (GM_IsValidPostShotGameType, which only asks for GM_ANIMS_OFF).
+typedef enum GM_AllowAnimationsTypes_t {
+    GM_ANIMS_OFF = 0,
+    GM_ANIMS_ON = 1,
+    GM_ANIMS_SOME = 2                   // pre-shot: always off the tee; elsewhere never with a wood,
+                                        // or near an object or hazard, else 85% of the time
+} GM_AllowAnimationsTypes_t;
+
+// The game state gpGame points at: the current game mode's rules, its data and callbacks. Only
+// what our files use is named.
 typedef struct GameState {
     s32  nMode;                 // 0x000
-    s32  nScoringType;          // 0x004  0 strokes, 1 holes won (match play), 2 skins, 3 Stableford
-                                //        (set by each mode's init; GM_GetScoringType)
-    s32  nMulligans;            // 0x008  0 none, 1 any number, 2 one per player per nine
-                                //        (GM_PlayerTakeMulligan)
-    s32  nC;                    // 0x00C  4 in the team modes
-    s32  n10;                   // 0x010  4 in the team modes
+    s32  nScoringType;          // 0x004  GM_ScoringType_t
+    s32  nMulligans;            // 0x008  GM_MulliganType_t
+    s32  nMaxGolfers;           // 0x00C  the most players the mode is played with (4 in the team
+                                //        modes, 1 in the solo ones); set by every mode, read nowhere
+    s32  nMinGolfers;           // 0x010  the fewest (4 in the team modes, 2 in the two-player ones);
+                                //        set by every mode, read nowhere
     s32  nCurCourse;            // 0x014  the course of the current hole
     s32  nHoleCourse[18];       // 0x018  the round's 18 holes: which course each comes from
     s32  nCurHoleNum;           // 0x060  the current hole's number on its course
@@ -625,7 +651,7 @@ typedef struct GameState {
                                 //        (GM_FullRoundOfGolf answers it during the playoff)
     u8   unkD6[2];
     s32  nPlayoffHoles;         // 0x0D8  playoff holes started
-    s32  nDC;                   // 0x0DC  the tour event's current round (GameModeDriverPGATour)
+    s32  nCurrentRound;         // 0x0DC  the tour event's current round, from 0 (GameModeDriverPGATour)
     s32  nE0;                   // 0x0E0  the event's round count (1 outside a tour event)
     s32  nPinSet[18];           // 0x0E4  per hole: which of its four pin positions (CourseInfo.pin) is used
     s32  n12C;                  // 0x12C
@@ -647,27 +673,24 @@ typedef struct GameState {
     u8   b16C[5][18];           // 0x16C  per player and hole, cleared with the hole's score
     u8   unk1C6[0x1C8 - 0x1C6];
     // The mode's callbacks (0x1C8..0x26C). GM_SetModeType sets them all to defaults (mostly empty
-    // stubs), then the mode's own setup replaces the ones it needs. The names are TW06's
-    // GameModeBase methods, from the modes' implementations (GameModeStroke, GameModeMatch, ...),
-    // and TW07's GameModeBase.cpp, which defines its methods in the slots' order.
-    void (*pfnInit)(void);      // 0x1C8  the mode's setup. TW06: Init
-    void (*pfnShutdown)(void);  // 0x1CC  the mode ends. TW06: Shutdown (GameModeBattle)
+    // stubs), then the mode's own setup replaces the ones it needs.
+    void (*pfnInit)(void);      // 0x1C8  the mode's setup
+    void (*pfnShutdown)(void);  // 0x1CC  the mode ends
     void (*pfnSetupNextGolfer)(void);   // 0x1D0  the next turn: whose shot it is, once every golfer
-                                //        waits (GM_SetupGolfer_IfAllWaiting). TW06: SetupNextGolfer
-    s32  (*pfnGetHonors)(int nPlayer);  // 0x1D4  who plays after nPlayer (5 = nobody). TW06: GetHonors
+                                //        waits (GM_SetupGolfer_IfAllWaiting)
+    s32  (*pfnGetHonors)(int nPlayer);  // 0x1D4  who plays after nPlayer (5 = nobody)
     u8   (*pfnHoleFinished)(int nPlayer, u8 bCheck);   // 0x1D8  the hole is over; bCheck 1 only asks
-                                //        (Gimme_Allowed). TW06: HoleFinished(PlayerNumber_t, u8)
-    u8   (*pfnGameFinished)(u8 bCheck);     // 0x1DC  the game is over. TW06: GameFinished(u8)
-    u8   (*pfnGoToPlayoff)(u8 bCheck);      // 0x1E0  TW06: GoToPlayoff(u8). Nothing in the binary
-                                //        calls it (0x800CFB88 only adds the slots up)
-    void (*pfnLoadHole)(void);  // 0x1E4  a hole starts (GM_InitForHole). TW07: LoadHole (the PGA
-                                //        TOUR's is TW06's PostHoleLoadInit)
-    void (*pfnEndHole)(void);   // 0x1E8  hole finished. TW06: EndHole
+                                //        (Gimme_Allowed)
+    u8   (*pfnGameFinished)(u8 bCheck);     // 0x1DC  the game is over
+    u8   (*pfnGoToPlayoff)(u8 bCheck);      // 0x1E0  whether a playoff starts; nothing in the game
+                                //        calls the slot
+    void (*pfnLoadHole)(void);  // 0x1E4  a hole starts (GM_InitForHole)
+    void (*pfnEndHole)(void);   // 0x1E8  hole finished
     void (*pfnStartGamePreData)(void);  // 0x1EC  a round starts, before the course data and cameras
-                                //        (GM_InitModule_PreDataStream). TW07: StartGamePreData
+                                //        (GM_InitModule_PreDataStream)
     void (*pfnStartGamePostData)(void); // 0x1F0  a round starts, after the players are set up
                                 //        (GM_InitModule_PostDataStream). TW07: StartGamePostData
-    void (*pfnEndGame)(void);   // 0x1F4  game finished. TW06: EndGame
+    void (*pfnEndGame)(void);   // 0x1F4  game finished
     u8   (*pfnIsPuttForLead)(int nPlayer);  // 0x1F8  holing this ball takes the lead
                                 //        (GM_IsPuttForLead). TW07: IsPuttForLead
     u8   (*pfnIsPuttForWin)(int nPlayer);   // 0x1FC  holing this ball wins; asked before the
@@ -696,10 +719,8 @@ typedef struct GameState {
     void (*pfnResetShot)(int nPlayer);  // 0x22C  after a re-plan (STATEFUNC_SwingUpdate,
                                 //        STATEFUNC_GreenMorphUpdate). TW07: ResetShot
     u8   (*pfnRenderBallTarget)(int nPlayer);   // 0x230  nonzero: the ball target is drawn as in
-                                //        the place-ball state (target.c, GameRound.c). TW07:
-                                //        RenderBallTarget
-    u8   (*pfnCheckControllerPulled)(void);    // 0x234  GM_CheckControllerPulled asks it.
-                                //        TW06 / TW07: CheckControllerPulled
+                                //        the place-ball state (target.c, GameRound.c)
+    u8   (*pfnCheckControllerPulled)(void);    // 0x234  GM_CheckControllerPulled asks it
     u8   (*pfnOKToShoot)(int nPlayer);  // 0x238  nonzero (the default): the pre-shot state may
                                 //        go on to the shot setup (STATEFUNC_PreShotUpdate). TW07:
                                 //        OKToShoot
@@ -716,7 +737,7 @@ typedef struct GameState {
     void (*pfnMulligan)(int nPlayer);   // 0x254  a mulligan was taken. TW07: Mulligan
     u8   (*pfnPickTarget)(int nPlayer); // 0x258  the re-plan button: the target modes pick the next
                                 //        target; nonzero lets the re-plan run. TW07: PickTarget
-    void (*pfnSetTimer)(int nPlayer, int nTime);    // 0x25C  set the time left. TW07: SetTimer
+    void (*pfnSetTimer)(int nPlayer, int nTime);    // 0x25C  set the time left
     void (*pfnHitBall)(int nPlayer);    // 0x260  the ball was hit (EVENT_HitBall). TW07: HitBall
     u8   (*pfnPickPrevTarget)(int nPlayer); // 0x264  "aim at the pin?" for a re-plan; the target
                                 //        modes pick the previous target. TW07: PickPrevTarget
@@ -733,23 +754,26 @@ typedef struct GameState {
     u8   b276;                  // 0x276  re-plan the shot as the swing begins
     u8   b277;                  // 0x277
     u8   bGimmesAllowed;        // 0x278  this mode allows gimmes
-    u8   b279;                  // 0x279
+    u8   bAllowHoleRestart;     // 0x279  the hole may be restarted (GM_RestartHole)
     u8   bAIConcedes;           // 0x27A  a CPU may concede the hole (GM_CheckForAIConcede)
     u8   b27B;                  // 0x27B
     u8   b27C;                  // 0x27C
     u8   b27D;                  // 0x27D
     u8   b27E;                  // 0x27E
-    u8   b27F;                  // 0x27F
-    u8   b280;                  // 0x280  the mid-hole flyover button works
-    u8   b281;                  // 0x281  tutorial tips may show at setup
+    u8   bDoFlyBy;              // 0x27F  the flyover plays as a hole starts or restarts
+    u8   bDoMidholeFlyBy;       // 0x280  the mid-hole flyover button works
+                                //        (GM_bIsMidholeFlybyButtonPressed)
+    u8   bAllowCaddieTips;      // 0x281  a human's swing may open with a caddie tip, or a hole
+                                //        contest's intro (STATEFUNC_SwingInit)
     u8   b282;                  // 0x282
     u8   b283;                  // 0x283  the special swing cameras may be used
     u8   b284;                  // 0x284  the re-plan button works
-    u8   bAllowGameBreakers;    // 0x285  the mode allows GameBreakers (GameEffects.c). TW07:
-                                //        AllowGameBreakers
-    u8   b286;                  // 0x286  the flight camera toggles are allowed
+    u8   bAllowGameBreakers;    // 0x285  the mode allows GameBreakers (GameEffects.c)
+    u8   bAllowSpeedSlowButtons;    // 0x286  buttons speed up or slow down the ball's flight
+                                //        (GameEffects_SetDoubleTime, GameEffects_SetHalfTime)
     u8   b287;                  // 0x287  in-flight replays are allowed
-    u8   b288;                  // 0x288
+    u8   bAllowEnvironmentSounds;   // 0x288  the course's wind, trees, rain and ambience sound
+                                //        (GameAudio.c)
     u8   b289;                  // 0x289
     u8   b28A;                  // 0x28A
     u8   bNoWind;               // 0x28B  wind off
@@ -757,8 +781,13 @@ typedef struct GameState {
     u8   b28D;                  // 0x28D
     u8   b28E;                  // 0x28E  set when the game finishes
     u8   unk28F;
-    s32  n290;                  // 0x290
-    s32  n294;                  // 0x294
+    s32  nPreShotAnimationsMode;    // 0x290  GM_AllowAnimationsTypes_t: the golfer's pre-shot
+                                //        animation (GM_DoPreshotAnimation); not GM_ANIMS_OFF: the shot
+                                //        setup starts animation 2, and a CPU's uses camera 0
+                                //        (STATEFUNC_ShotSetupInit)
+    s32  nPostShotAnimationsMode;   // 0x294  GM_AllowAnimationsTypes_t: the golfer's reaction after
+                                //        the shot (GM_IsValidPostShotGameType); not GM_ANIMS_OFF: the
+                                //        ball's flight may wait for the camera (GM_SimulateBallMovement)
 } GameState;
 LAYOUT_ASSERT(GameState, 0x298);
 

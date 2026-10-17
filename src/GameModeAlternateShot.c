@@ -27,8 +27,8 @@ void GameModeAlternateShot_EndHole(void);
 void GameModeAlternateShot_EndGame(void);
 
 // Game mode 21 (alternate shot) starts, from GameRound's mode switch: this file's golfer order,
-// honors, turn, hole, game-over, playoff and end-of-game callbacks; no gimmes, no mulligans, nC and
-// n10 4 (as the other team modes), nDC 0, single view.
+// honors, turn, hole, game-over, playoff and end-of-game callbacks; no gimmes, no mulligans,
+// nMaxGolfers and nMinGolfers 4 (as the other team modes), nCurrentRound 0, single view.
 void GameModeAlternateShot_Init(void) {
     gpGame->pfnInit = GameModeAlternateShot_Init;
     gpGame->pfnSetupNextGolfer = GameModeAlternateShot_SetupNextGolfer;
@@ -40,11 +40,11 @@ void GameModeAlternateShot_Init(void) {
     gpGame->pfnEndHole = GameModeAlternateShot_EndHole;
     gpGame->pfnEndGame = GameModeAlternateShot_EndGame;
     gpGame->bGimmesAllowed = 0;
-    gpGame->nScoringType = 1;
-    gpGame->nMulligans = 0;
-    gpGame->nC = 4;
-    gpGame->n10 = 4;
-    gpGame->nDC = 0;
+    gpGame->nScoringType = GM_SCORING_HOLES_WON;
+    gpGame->nMulligans = GM_MULLIGANS_NONE;
+    gpGame->nMaxGolfers = 4;
+    gpGame->nMinGolfers = 4;
+    gpGame->nCurrentRound = 0;
     gSession.nSplitScreen = 0;
 }
 

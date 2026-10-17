@@ -219,7 +219,7 @@ s32 gGameMode22ShowIntro;
 
 // Game mode 22's setup (GM_SetModeType): its callbacks; no gimmes, mulligans, stroke limit,
 // GameBreakers (bAllowGameBreakers), yardage or bumped obstructions; split screen as chosen
-// (lbl_8028227C); the per-player score sounds cleared (400 / 800 / 1200) and the intro messages to
+// (gSplitScreen); the per-player score sounds cleared (400 / 800 / 1200) and the intro messages to
 // show (GameMode22_UpdateFrame).
 void GameMode22_Init(void) {
     s32 i;
@@ -242,29 +242,29 @@ void GameMode22_Init(void) {
     gpGame->pfnLoadHole = GameMode22_HoleStart;
     gpGame->pfnRestartHole = GameMode22_RestartHole;
     gpGame->bGimmesAllowed = 0;
-    gpGame->b279 = 1;
-    gpGame->b27F = 0;
-    gpGame->b280 = 0;
+    gpGame->bAllowHoleRestart = 1;
+    gpGame->bDoFlyBy = 0;
+    gpGame->bDoMidholeFlyBy = 0;
     gpGame->b271 = 0;
-    gpGame->b281 = 0;
+    gpGame->bAllowCaddieTips = 0;
     gpGame->bStrokeLimit = 0;
     gpGame->bAllowGameBreakers = 0;
     gpGame->b274 = 0;
-    gpGame->b286 = 1;
+    gpGame->bAllowSpeedSlowButtons = 1;
     gpGame->b287 = 1;
-    gpGame->b288 = 0;
+    gpGame->bAllowEnvironmentSounds = 0;
     gpGame->b289 = 0;
     gpGame->b28A = 0;
     gpGame->bBumpObstructions = 0;
     gpGame->bShowYardage = 0;
-    gpGame->n290 = 0;
-    gpGame->n294 = 0;
-    gpGame->nMulligans = 0;
-    gpGame->n10 = 2;
-    gpGame->nC = 4;
-    gpGame->nDC = 0;
-    gpGame->nScoringType = 0;
-    gSession.nSplitScreen = lbl_8028227C;
+    gpGame->nPreShotAnimationsMode = GM_ANIMS_OFF;
+    gpGame->nPostShotAnimationsMode = GM_ANIMS_OFF;
+    gpGame->nMulligans = GM_MULLIGANS_NONE;
+    gpGame->nMinGolfers = 2;
+    gpGame->nMaxGolfers = 4;
+    gpGame->nCurrentRound = 0;
+    gpGame->nScoringType = GM_SCORING_STROKES;
+    gSession.nSplitScreen = gSplitScreen;
     for (i = 0; i < 5; i++) {
         gGameMode22Reached1200[i] = 0;
         gGameMode22Reached800[i] = 0;

@@ -127,9 +127,10 @@ void Lessons_AskContinue(void);
 void Lessons_HighlightHudItem(int nItem, int bOn);
 
 // Mode 11 starts (pfnInit): its callbacks; the yardage, the stroke limit, gimmes, the flyovers
-// (b27F, b280), setup tips, the re-plan button, the flight-camera toggles and in-flight replays
-// off, with b275, b27B..b27D, bAllowGameBreakers and b28A; n290, nC, n10 and b276 (re-plan as the
-// swing begins) set to 1; the ball's random rolls off (Physics_SetNoRandomRolls: lies and bounces
+// (bDoFlyBy, bDoMidholeFlyBy), caddie tips, the re-plan button, the flight speed buttons and
+// in-flight replays off, with b275, b27B..b27D, bAllowGameBreakers and b28A; the pre-shot
+// animations always (GM_ANIMS_ON), nMaxGolfers, nMinGolfers and b276 (re-plan as the swing
+// begins) set to 1; the ball's random rolls off (Physics_SetNoRandomRolls: lies and bounces
 // come out as in a simulation). The options the lessons change are saved and set: commentary level
 // 4, the putting grid off, power boost and spin on. Random stream 0 is seeded with 69, so the
 // lessons play the same each time.
@@ -151,17 +152,17 @@ void Lessons_Init(void) {
     gpGame->b27B = 0;
     gpGame->b27C = 0;
     gpGame->b27D = 0;
-    gpGame->b27F = 0;
-    gpGame->b280 = 0;
-    gpGame->b281 = 0;
+    gpGame->bDoFlyBy = 0;
+    gpGame->bDoMidholeFlyBy = 0;
+    gpGame->bAllowCaddieTips = 0;
     gpGame->b284 = 0;
     gpGame->bAllowGameBreakers = 0;
-    gpGame->b286 = 0;
+    gpGame->bAllowSpeedSlowButtons = 0;
     gpGame->b287 = 0;
     gpGame->b28A = 0;
-    gpGame->n290 = 1;
-    gpGame->nC = 1;
-    gpGame->n10 = 1;
+    gpGame->nPreShotAnimationsMode = GM_ANIMS_ON;
+    gpGame->nMaxGolfers = 1;
+    gpGame->nMinGolfers = 1;
     gpGame->b276 = 1;
     Physics_SetNoRandomRolls(1);
     gLessonSavedCommentLevel = gSession.options.a0[4];
@@ -214,7 +215,7 @@ void Lessons_StartGamePreData(void) {
     Session_SetNumPlayers(1);
     Session_SetGolfer(1, 0);
     gPlayers[0].nController = CONTROLLER_CPU;
-    gpGame->nMulligans = 0;
+    gpGame->nMulligans = GM_MULLIGANS_NONE;
     gLessonContinueChosen = 0;
     gLessonQuitChosen = 0;
 }

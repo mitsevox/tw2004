@@ -23,8 +23,9 @@ void GameModeStableford_EndHole(void);
 void GameModeStableford_EndGame(void);
 
 // Game mode 18's setup: installs Stableford's callbacks (GameModeStableford_GoToPlayoff: no
-// playoff), lets a CPU concede a hole, one mulligan per player per nine (nMulligans 2), the current
-// hole set to hole index 0 (GM_SetCurrentHole) and one view.
+// playoff), lets a CPU concede a hole, one mulligan per player per nine
+// (GM_MULLIGANS_ONE_PER_NINE), the current hole set to hole index 0 (GM_SetCurrentHole) and one
+// view.
 void GameModeStableford_Init(void) {
     gpGame->pfnInit = GameModeStableford_Init;
     gpGame->pfnSetupNextGolfer = GameModeStableford_SetupNextGolfer;
@@ -35,11 +36,11 @@ void GameModeStableford_Init(void) {
     gpGame->pfnEndHole = GameModeStableford_EndHole;
     gpGame->pfnEndGame = GameModeStableford_EndGame;
     gpGame->bAIConcedes = 1;
-    gpGame->nScoringType = 3;
-    gpGame->nMulligans = 2;
-    gpGame->nC = 4;
-    gpGame->n10 = 1;
-    gpGame->nDC = 0;
+    gpGame->nScoringType = GM_SCORING_STABLEFORD;
+    gpGame->nMulligans = GM_MULLIGANS_ONE_PER_NINE;
+    gpGame->nMaxGolfers = 4;
+    gpGame->nMinGolfers = 1;
+    gpGame->nCurrentRound = 0;
     GM_SetCurrentHole(0);
     gSession.nSplitScreen = 0;
 }

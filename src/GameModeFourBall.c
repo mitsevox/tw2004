@@ -27,8 +27,9 @@ void GameModeFourBall_EndHole(void);
 void GameModeFourBall_EndGame(void);
 
 // Game mode 20's setup (GM_SetModeType): this file's callbacks; CPU players may concede
-// (bAIConcedes), nScoringType 1, no mulligans, nC and n10 4 as in the other team modes, nDC 0 and
-// split screen off. Unlike GameModeBestBall_Init it does not reset the current hole.
+// (bAIConcedes), holes won, no mulligans, nMaxGolfers and nMinGolfers 4 as in the other team modes,
+// nCurrentRound 0 and split screen off. Unlike GameModeBestBall_Init it does not reset the current
+// hole.
 void GameModeFourBall_Init(void) {
     gpGame->pfnInit = GameModeFourBall_Init;
     gpGame->pfnSetupNextGolfer = GameModeFourBall_SetupNextGolfer;
@@ -39,11 +40,11 @@ void GameModeFourBall_Init(void) {
     gpGame->pfnEndHole = GameModeFourBall_EndHole;
     gpGame->pfnEndGame = GameModeFourBall_EndGame;
     gpGame->bAIConcedes = 1;
-    gpGame->nScoringType = 1;
-    gpGame->nMulligans = 0;
-    gpGame->nC = 4;
-    gpGame->n10 = 4;
-    gpGame->nDC = 0;
+    gpGame->nScoringType = GM_SCORING_HOLES_WON;
+    gpGame->nMulligans = GM_MULLIGANS_NONE;
+    gpGame->nMaxGolfers = 4;
+    gpGame->nMinGolfers = 4;
+    gpGame->nCurrentRound = 0;
     gSession.nSplitScreen = 0;
 }
 

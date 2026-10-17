@@ -50,9 +50,9 @@ s32   GameModeSkillZoneTimed_GreenType(int nPlayer, int nTarget);
 void  GameModeSkillZoneTimed_EndGame(void);
 
 // Game mode 13's setup (pfnInit, from GM_SetModeType): its hooks (the target list ones from
-// GameMode_SkillZoneBase.c), one view, no wind, no gimmes, any number of mulligans (nMulligans 1), b28D set
-// (the re-plan button picks the next target), the current hole 0, pin set 0 and the target list
-// emptied (the hole's targets fill it as they load).
+// GameMode_SkillZoneBase.c), one view, no wind, no gimmes, any number of mulligans
+// (GM_MULLIGANS_ANY), b28D set (the re-plan button picks the next target), the current hole 0, pin
+// set 0 and the target list emptied (the hole's targets fill it as they load).
 void GameModeSkillZoneTimed_Init(void) {
     gpGame->pfnInit = GameModeSkillZoneTimed_Init;
     gpGame->pfnShutdown = GameModeSkillZoneTimed_Shutdown;
@@ -78,27 +78,27 @@ void GameModeSkillZoneTimed_Init(void) {
     gpGame->pfnEndGame = GameModeSkillZoneTimed_EndGame;
     gpGame->b276 = 0;
     gpGame->bGimmesAllowed = 0;
-    gpGame->b280 = 0;
+    gpGame->bDoMidholeFlyBy = 0;
     gpGame->b271 = 0;
-    gpGame->b281 = 0;
+    gpGame->bAllowCaddieTips = 0;
     gpGame->bStrokeLimit = 0;
     gpGame->bAllowGameBreakers = 0;
     gpGame->b274 = 0;
-    gpGame->b286 = 1;
+    gpGame->bAllowSpeedSlowButtons = 1;
     gpGame->b287 = 0;
-    gpGame->b288 = 0;
+    gpGame->bAllowEnvironmentSounds = 0;
     gpGame->b289 = 0;
     gpGame->b28A = 0;
     gpGame->bNoWind = 1;
     gpGame->bBumpObstructions = 0;
     gpGame->b28D = 1;
-    gpGame->nScoringType = 0;
-    gpGame->nMulligans = 1;
-    gpGame->n10 = 1;
-    gpGame->nC = 1;
-    gpGame->n290 = 0;
-    gpGame->n294 = 0;
-    gpGame->nDC = 0;
+    gpGame->nScoringType = GM_SCORING_STROKES;
+    gpGame->nMulligans = GM_MULLIGANS_ANY;
+    gpGame->nMinGolfers = 1;
+    gpGame->nMaxGolfers = 1;
+    gpGame->nPreShotAnimationsMode = GM_ANIMS_OFF;
+    gpGame->nPostShotAnimationsMode = GM_ANIMS_OFF;
+    gpGame->nCurrentRound = 0;
     GM_SetCurrentHole(0);
     gSkillZoneNumCups = 0;
     gSession.nSplitScreen = 0;

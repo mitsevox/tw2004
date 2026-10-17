@@ -17,8 +17,9 @@ s32 gMatchPlayoffHonors = 5;            // who has the honor in the playoff (5 =
 int  GameModeMatch_GetTeeHonors(int nPlayer);
 void GameModeMatch_EndGame(void);
 
-// Mode 1's setup (GM_SetModeType): this file's callbacks, two players (nC and n10 2), CPU players
-// may concede, no mulligans, no split screen, and nobody holds the playoff honor yet
+// Mode 1's setup (GM_SetModeType): this file's callbacks, two players (nMaxGolfers and nMinGolfers
+// 2), CPU players may concede, no mulligans, no split screen, and nobody holds the playoff honor
+// yet
 // (gMatchPlayoffHonors 5). GameMode4 (the ladder's matches), GameModeBattle and GameModeDriverRTE
 // reuse most of the callbacks.
 void GameModeMatch_Init(void) {
@@ -31,11 +32,11 @@ void GameModeMatch_Init(void) {
     gpGame->pfnEndHole = GameModeMatch_EndHole;
     gpGame->pfnEndGame = GameModeMatch_EndGame;
     gpGame->bAIConcedes = 1;
-    gpGame->nScoringType = 1;
-    gpGame->nMulligans = 0;
-    gpGame->nC = 2;
-    gpGame->n10 = 2;
-    gpGame->nDC = 0;
+    gpGame->nScoringType = GM_SCORING_HOLES_WON;
+    gpGame->nMulligans = GM_MULLIGANS_NONE;
+    gpGame->nMaxGolfers = 2;
+    gpGame->nMinGolfers = 2;
+    gpGame->nCurrentRound = 0;
     gMatchPlayoffHonors = 5;
     gSession.nSplitScreen = 0;
 }

@@ -42,11 +42,11 @@ void GameModeSkins_Init(void) {
     gpGame->pfnEndGame = GameModeSkins_EndGame;
     gpGame->b274 = 0;
     gpGame->bAIConcedes = 1;
-    gpGame->nScoringType = 2;
-    gpGame->nMulligans = 0;
-    gpGame->nC = 4;
-    gpGame->n10 = 2;
-    gpGame->nDC = 0;
+    gpGame->nScoringType = GM_SCORING_SKINS;
+    gpGame->nMulligans = GM_MULLIGANS_NONE;
+    gpGame->nMaxGolfers = 4;
+    gpGame->nMinGolfers = 2;
+    gpGame->nCurrentRound = 0;
     gSkinsCarryOver = 0;
     gSkinsNumCarryOver = 0;
     gSession.nSplitScreen = 0;
