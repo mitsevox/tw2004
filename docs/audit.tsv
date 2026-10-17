@@ -93,7 +93,7 @@ GoARAM.c	open
 GoAnimalActors.c	open		
 GoBreakLine.c	open		
 GoCamCont.c	open		
-GoCamTuningVars.c	open		
+GoCamTuningVars.c	done	6923ea8d	claude-review
 GoCamera.c	open		
 GoComicCam.c	open		
 GoDynObj.c	open		
