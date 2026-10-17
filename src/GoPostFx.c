@@ -624,7 +624,8 @@ void fn_80039344(int nView, f32 f) {
     lbl_801D5010[nView] = f;
 }
 
-// Covers the screen in black at view nView's share (lbl_801D5010) of CamTuning.f208's alpha.
+// Covers the screen in black at view nView's share (lbl_801D5010) of the tuning's
+// fScreenDarkenAlpha.
 void fn_80039358(int nView) {
     f32 aColour[4];
     f32 aXY[16];    // only 8 are filled; the frame has room for 16
@@ -635,7 +636,7 @@ void fn_80039358(int nView) {
         aColour[0] = 0.0f;
         aColour[1] = 0.0f;
         aColour[2] = 0.0f;
-        aColour[3] = gpCamTuning->f208 * f;
+        aColour[3] = gpCamTuning->fScreenDarkenAlpha * f;
         RenderView_SetUseCurrentMatrices(0);
         RenderState_SetDrawFlags(0x40);
         RenderState_SetBlendFactors(4, 5);

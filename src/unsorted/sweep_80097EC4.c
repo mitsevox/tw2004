@@ -2,18 +2,11 @@
 
 #include "game_types.h"
 
-extern s32 gpCamTuning;
-void StaticMem_Free();
 void fn_800988A0();
 void fn_800988B8();
 void fn_800988CC();
 
-void fn_80097E98(void);
 void fn_80097EC4(f32* pPos);
-void fn_80097E98(void) {
-    StaticMem_Free(gpCamTuning);
-    gpCamTuning = 0;
-}
 
 // Two vertices at pPos, each after a byte (3, then 0): white, then transparent black.
 void fn_80097EC4(f32* pPos) {

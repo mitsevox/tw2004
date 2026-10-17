@@ -858,7 +858,7 @@ void STATEFUNC_ZoomExit(int nPlayer) {
 
 void STATEFUNC_ElevatorInit(int nPlayer) {
     int nView;
-    if (gpCamTuning->n1C0 != 0) {
+    if (gpCamTuning->bSteepSlopeCam != 0) {
         if (GolfCamera_NeedSteepSlopeCam(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]),
                                          nPlayer)) {
             nView = gPlayers[nPlayer].nView[0];
@@ -1454,7 +1454,7 @@ void STATEFUNC_ShowYardageUpdate(int nPlayer) {
         }
         if (CameraController_IsFadeOn(pV)) return;
         if (!GolfCamera_IsPostShotCamFinalCutDone(pV) && fn_80095780(gPlayers[nPlayer].pChar) == 9) {
-            if (!(fn_80062C28(gPlayers[nPlayer].pChar) >= gpCamTuning->f170 / 2.0f ||
+            if (!(fn_80062C28(gPlayers[nPlayer].pChar) >= gpCamTuning->fFadeTime / 2.0f ||
                   pV->script.fScriptTime > 1.0f)) {
                 return;
             }
@@ -1465,7 +1465,7 @@ void STATEFUNC_ShowYardageUpdate(int nPlayer) {
         if (Gimme_Allowed(nPlayer)) {
             GOLFERSTATE_Switch(GS_FADE_TO_TAP_IN, nPlayer);
         } else {
-            CameraController_FadeOut(pV, gpCamTuning->f170, (f32*)&vOffset);
+            CameraController_FadeOut(pV, gpCamTuning->fFadeTime, (f32*)&vOffset);
         }
         return;
     }

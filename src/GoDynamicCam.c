@@ -263,9 +263,9 @@ static f32 GoDynamicCam_StrippedFn(f32 x) {
 }
 
 // Sets up nSize bytes of shots just loaded in a round: as DynamicCam_ParseCameraViewsFE, and each
-// shot's least height fMinHeight is kept at least CamTuning.f168, its most height fMaxHeight at
-// least fMinHeight, and f8C within 0..0.49. When the sequence file is in too (nFilesLoaded is 2),
-// the sequences' choices are resolved (DynamicCam_ParseCameraSeqs).
+// shot's least height fMinHeight is kept at least the tuning's fGroundClearance, its most height
+// fMaxHeight at least fMinHeight, and f8C within 0..0.49. When the sequence file is in too
+// (nFilesLoaded is 2), the sequences' choices are resolved (DynamicCam_ParseCameraSeqs).
 void DynamicCam_ParseCameraViews(int nSize) {
     int i;
 
@@ -279,8 +279,8 @@ void DynamicCam_ParseCameraViews(int nSize) {
             gpDynCam->pShots[i].p40 = &gpDynCam->pShots[(s32)gpDynCam->pShots[i].p40];
             gpDynCam->pShots[i].p40->bA9 = 1;
         }
-        if (gpDynCam->pShots[i].fMinHeight < gpCamTuning->f168) {
-            gpDynCam->pShots[i].fMinHeight = gpCamTuning->f168;
+        if (gpDynCam->pShots[i].fMinHeight < gpCamTuning->fGroundClearance) {
+            gpDynCam->pShots[i].fMinHeight = gpCamTuning->fGroundClearance;
         }
         if (gpDynCam->pShots[i].fMaxHeight < gpDynCam->pShots[i].fMinHeight) {
             gpDynCam->pShots[i].fMaxHeight = gpDynCam->pShots[i].fMinHeight;
@@ -448,20 +448,22 @@ void DynamicCam_DeInit(void) {
     StaticMem_Free(gpDynCam);
 }
 
-// Places the camera at pOut for a shot by its tracking mode (nTrackMode): 0 and 1 DynamicCam_TrackPercent,
-// 2, 3, 4 and 8 DynamicCam_TrackOffset, 5 and 6 DynamicCam_TrackBallVelocityLag (with the frame
-// time f), 7 DynamicCam_TrackBallVelocityTight, 9 DynamicCam_TrackFixed. Then keeps it between the
-// shot's least and most height (fMinHeight, fMaxHeight) over the ground: the ground is measured when
-// CameraScript_SnapToScript holds for a shot other than the script's next one (on course 12 with
-// Game_GetCurHoleNum 10, Ter_GetLowestGroundHeight's height within 40 of the player's tee; else
+// Places the camera at pOut for a shot by its tracking mode (nTrackMode): 0 and 1
+// DynamicCam_TrackPercent, 2, 3, 4 and 8 DynamicCam_TrackOffset, 5 and 6
+// DynamicCam_TrackBallVelocityLag (with the frame time f), 7 DynamicCam_TrackBallVelocityTight, 9
+// DynamicCam_TrackFixed. Then keeps it between the shot's least and most height (fMinHeight,
+// fMaxHeight) over the ground: the ground is measured when CameraScript_SnapToScript holds for a
+// shot other than the script's next one (on course 12 with Game_GetCurHoleNum 10,
+// Ter_GetLowestGroundHeight's height within 40 of the player's tee; else
 // CamScript_GuessBestPlayableHeight, raised for a kind 4 shot that is neither a swing camera nor
 // tracks the golfer to the lower of the pin and the tee) and kept in the script's fD8; without
-// course data it is 0 (the shot's fMinHeight on the CrAP screen, game type 3). A swing camera or one that
-// tracks the golfer takes its heights over the ball instead, at least CamTuning.f168. Too low,
-// modes 5 to 7 rise by CamTuning.f194 a call while they were too low already (never under
-// CamTuning.f168), the others jump to the least height; above the most height less CamTuning.f174
-// over fD8 it eases in softly. Mode 3 then lags: it moves from where it was by the distance beyond
-// half its fDist, or less for a short move.
+// course data it is 0 (the shot's fMinHeight on the CrAP screen, game type 3). A swing camera or
+// one that tracks the golfer takes its heights over the ball instead, at least the tuning's
+// fGroundClearance. Too low, modes 5 to 7 rise by the tuning's fRiseStep a call while they were too
+// low already (never under the tuning's fGroundClearance), the others jump to the least height;
+// above the most height less the tuning's fHeightCeilingEase over fD8 it eases in softly. Mode 3
+// then lags: it moves from where it was by the distance beyond half its fDist, or less for a short
+// move.
 void DynamicCam_ProcessScript(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam,
                               f32* pSub,
                  f32 f) {
@@ -561,11 +563,11 @@ void DynamicCam_ProcessScript(CamShot* pShot, int nPlayer, CamScript* pScript, f
         fDiff = gPlayers[nPlayer].vBall[1] - fGround;
         fLo = pShot->fMinHeight + fDiff;
         fHi = pShot->fMaxHeight + fDiff;
-        if (fLo < gpCamTuning->f168) {
-            fLo = gpCamTuning->f168;
+        if (fLo < gpCamTuning->fGroundClearance) {
+            fLo = gpCamTuning->fGroundClearance;
         }
-        if (fHi < gpCamTuning->f168) {
-            fHi = gpCamTuning->f168;
+        if (fHi < gpCamTuning->fGroundClearance) {
+            fHi = gpCamTuning->fGroundClearance;
         }
     } else {
         fLo = pShot->fMinHeight;
@@ -575,20 +577,20 @@ void DynamicCam_ProcessScript(CamShot* pShot, int nPlayer, CamScript* pScript, f
         if (pShot->nTrackMode == 5 || pShot->nTrackMode == 6 || pShot->nTrackMode == 7) {
             // fake match: a negated >=, where < gives a plain bge
             if (!(aOld[1] - fGround >= fLo)) {
-                pOut[1] += gpCamTuning->f194;
+                pOut[1] += gpCamTuning->fRiseStep;
                 if (pOut[1] - fGround > fLo) {
                     pOut[1] = fGround + fLo;
                 }
             }
-            if (pOut[1] - fGround < gpCamTuning->f168) {
-                pOut[1] = fGround + gpCamTuning->f168;
+            if (pOut[1] - fGround < gpCamTuning->fGroundClearance) {
+                pOut[1] = fGround + gpCamTuning->fGroundClearance;
             }
         } else {
             pOut[1] = fGround + fLo;
         }
     } else {
         fFollow = pScript->fD8;
-        fEase = gpCamTuning->f174;
+        fEase = gpCamTuning->fHeightCeilingEase;
         fAbove = pOut[1] - fFollow;
         fTop = fHi - fEase;
         if (fAbove > fTop) {
@@ -778,12 +780,13 @@ void DynamicCam_TrackPercent(CamShot* pShot, int nPlayer, CamScript* pScript, f3
 }
 
 // Tracking modes 2, 3, 4 and 8: the camera fDist along the direction from the shot's first point
-// (nFromPoint) to its second (nToPoint), level for modes 2 and 3, then fSideOffset sideways (both as
-// DynamicCam_CalculateFlippedOffsets flips them), then its height from DynamicCam_AddHeightOffset.
-// For mode 8 its level offset from pSub (its height becoming pSub's) is scaled from CamTuning.f240
-// down to f248 as the distance CamScript_GetBallToPinPercent gives (never less than the most seen,
-// kept in the script's fMaxBallToPin) goes from CamTuning.f23C to f244; when
-// CameraScript_SnapToScript holds, fMaxBallToPin just takes the distance. Waits, like
+// (nFromPoint) to its second (nToPoint), level for modes 2 and 3, then fSideOffset sideways (both
+// as DynamicCam_CalculateFlippedOffsets flips them), then its height from
+// DynamicCam_AddHeightOffset. For mode 8 its level offset from pSub (its height becoming pSub's) is
+// scaled from the tuning's fTrackOffsetStartScale down to fTrackOffsetEndScale as the share of the
+// way to the pin CamScript_GetBallToPinPercent gives (never less than the most seen, kept in the
+// script's fMaxBallToPin) goes from the tuning's fTrackOffsetStartShare to fTrackOffsetEndShare;
+// when CameraScript_SnapToScript holds, fMaxBallToPin just takes the share. Waits, like
 // DynamicCam_TrackPercent, for a ball update when a point is the ball.
 void DynamicCam_TrackOffset(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam,
                             f32* pSub) {
@@ -818,12 +821,14 @@ void DynamicCam_TrackOffset(CamShot* pShot, int nPlayer, CamScript* pScript, f32
             fFar = pScript->fMaxBallToPin;
             DynamicCam_Vec3Sub(pOut, pSub, vOff);
             vOff[1] = 0.0f;
-            if (fFar > gpCamTuning->f23C) {
-                if (fFar > gpCamTuning->f244) {
-                    fScale = gpCamTuning->f248;
+            if (fFar > gpCamTuning->fTrackOffsetStartShare) {
+                if (fFar > gpCamTuning->fTrackOffsetEndShare) {
+                    fScale = gpCamTuning->fTrackOffsetEndScale;
                 } else {
-                    fScale = (fFar - gpCamTuning->f23C) / (gpCamTuning->f244 - gpCamTuning->f23C);
-                    fScale = gpCamTuning->f240 - fScale * (gpCamTuning->f240 - gpCamTuning->f248);
+                    fScale = (fFar - gpCamTuning->fTrackOffsetStartShare)
+                            / (gpCamTuning->fTrackOffsetEndShare - gpCamTuning->fTrackOffsetStartShare);
+                    fScale = gpCamTuning->fTrackOffsetStartScale - fScale
+                            * (gpCamTuning->fTrackOffsetStartScale - gpCamTuning->fTrackOffsetEndScale);
                 }
                 Vec3_Scale(fScale, vOff, vOff);
                 DynamicCam_Vec3Add(vOff, pSub, pOut);
@@ -836,18 +841,20 @@ void DynamicCam_TrackOffset(CamShot* pShot, int nPlayer, CamScript* pScript, f32
 }
 
 // Tracking modes 5 and 6, the lagging ball-flight camera: its target is fDist along the ball's
-// flight direction (level for mode 6, kept within CamTuning.f19C of level by
-// DynamicCam_ClampBallVelocity) from the ball (DynamicCam_GetLocation's point 0), plus
-// CamTuning.f18C times (fMaxHeight - height) when the ball is above its most height over the
-// script's ground fD8 or f190 times (height - fMinHeight) below its least, then fSideOffset
-// sideways (DynamicCam_AddOffset); the heights are the current shot's while the next shot has the
-// same mode. When CameraScript_SnapToScript holds the camera jumps there. Otherwise it closes the
-// distance to the ball (CamTuning.f14C) and turns round the ball towards the target (f150) by a
-// share per NTSC frame of the frame time f, scaled while the script's fScriptTime is under
-// CamTuning.f154 (by ((f154 - fCamTime) / f154) squared over f14C), times the script's f8C when its
-// nInterpType is 4, less for a ball slower than CamTuning.f198 and while the script's second clock
-// f88 is under f158; while f88 is under CamTuning.f15C only part of the target's height is taken
-// (the share to the power f160).
+// flight direction (level for mode 6, kept within the tuning's fMaxFlightTilt of level by
+// DynamicCam_ClampBallVelocity) from the ball (DynamicCam_GetLocation's point 0), plus the tuning's
+// fAboveMaxDistShare times (fMaxHeight - height) when the ball is above its most height over the
+// script's ground fD8 or fBelowMinDistShare times (height - fMinHeight) below its least (both
+// shorten fDist), then fSideOffset sideways (DynamicCam_AddOffset); the heights are the current
+// shot's while the next shot has the same mode. When CameraScript_SnapToScript holds the camera
+// jumps there. Otherwise it closes the distance to the ball (the tuning's fTrackCloseRate) and
+// turns round the ball towards the target (fTrackTurnRate) by a share per NTSC frame of the frame
+// time f, scaled while the script's fScriptTime is under the tuning's fTrackEaseInTime (by
+// ((fTrackEaseInTime - fCamTime) / fTrackEaseInTime) squared over fTrackCloseRate), times the
+// script's f8C when its nInterpType is 4, less for a ball slower than the tuning's
+// fTrackMinBallSpeed and while the script's second clock f88 is under fCutEaseInTime; while f88 is
+// under the tuning's fCutHeightEaseTime only part of the target's height is taken (the share to the
+// power fCutHeightEasePower).
 void DynamicCam_TrackBallVelocityLag(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam,
                                      f32* pSub,
                  f32 f) {
@@ -899,9 +906,9 @@ void DynamicCam_TrackBallVelocityLag(CamShot* pShot, int nPlayer, CamScript* pSc
     }
     fHeight = gPlayers[nPlayer].ball.vPos[1] - pScript->fD8;
     if (fHeight > fHi) {
-        fDist = gpCamTuning->f18C * (fHi - fHeight) + pShot->fDist;
+        fDist = gpCamTuning->fAboveMaxDistShare * (fHi - fHeight) + pShot->fDist;
     } else if (fHeight < fLo) {
-        fDist = gpCamTuning->f190 * (fHeight - fLo) + pShot->fDist;
+        fDist = gpCamTuning->fBelowMinDistShare * (fHeight - fLo) + pShot->fDist;
     } else {
         fDist = pShot->fDist;
     }
@@ -913,12 +920,12 @@ void DynamicCam_TrackBallVelocityLag(CamShot* pShot, int nPlayer, CamScript* pSc
     }
     // port: NTSC rate
     fFrames = f / (1.0f / 59.94f);
-    fMove = gpCamTuning->f14C * fFrames;
-    fTurn = gpCamTuning->f150 * fFrames;
-    if (pScript->fScriptTime < gpCamTuning->f154) {
-        fT = (gpCamTuning->f154 - pScript->fCamTime) / gpCamTuning->f154;
+    fMove = gpCamTuning->fTrackCloseRate * fFrames;
+    fTurn = gpCamTuning->fTrackTurnRate * fFrames;
+    if (pScript->fScriptTime < gpCamTuning->fTrackEaseInTime) {
+        fT = (gpCamTuning->fTrackEaseInTime - pScript->fCamTime) / gpCamTuning->fTrackEaseInTime;
         fT *= fT;
-        fEase = (1.0f / gpCamTuning->f14C) * fT;
+        fEase = (1.0f / gpCamTuning->fTrackCloseRate) * fT;
         fMove *= fEase;
         fTurn *= fEase;
     }
@@ -926,19 +933,19 @@ void DynamicCam_TrackBallVelocityLag(CamShot* pShot, int nPlayer, CamScript* pSc
         fMove *= pScript->f8C;
         fTurn *= pScript->f8C;
     }
-    if (gPlayers[nPlayer].ball.fSpeed < gpCamTuning->f198) {
-        fGrow = gPlayers[nPlayer].ball.fSpeed / gpCamTuning->f198;
+    if (gPlayers[nPlayer].ball.fSpeed < gpCamTuning->fTrackMinBallSpeed) {
+        fGrow = gPlayers[nPlayer].ball.fSpeed / gpCamTuning->fTrackMinBallSpeed;
         fGrow = fGrow * fGrow;
         fGrow = fGrow * fGrow;
         fMove *= fGrow;
         fTurn *= fGrow;
     }
-    if (pScript->f88 < gpCamTuning->f158) {
-        fMove *= pScript->f88 / gpCamTuning->f158;
-        fTurn *= pScript->f88 / gpCamTuning->f158;
+    if (pScript->f88 < gpCamTuning->fCutEaseInTime) {
+        fMove *= pScript->f88 / gpCamTuning->fCutEaseInTime;
+        fTurn *= pScript->f88 / gpCamTuning->fCutEaseInTime;
     }
-    if (pScript->f88 < gpCamTuning->f15C) {
-        fRise = powf(pScript->f88 / gpCamTuning->f15C, gpCamTuning->f160);
+    if (pScript->f88 < gpCamTuning->fCutHeightEaseTime) {
+        fRise = powf(pScript->f88 / gpCamTuning->fCutHeightEaseTime, gpCamTuning->fCutHeightEasePower);
         fRise *= fFrames;
         aTarget[1] = fRise * (aTarget[1] - pOut[1]) + pOut[1];
     }
@@ -983,11 +990,13 @@ void DynamicCam_TrackBallVelocityLag(CamShot* pShot, int nPlayer, CamScript* pSc
 }
 
 // Tracking mode 7, the tight ball-flight camera: fDist along the ball's flight direction from the
-// ball (DynamicCam_GetLocation's point 0), plus CamTuning.f18C times (fMaxHeight - height) when the
-// ball's height over the script's ground fD8 is above the shot's most height fMaxHeight, or f190
-// times (height - fMinHeight) when under its least height fMinHeight (the current shot's heights
-// while the next shot has the same mode), then fSideOffset sideways (DynamicCam_AddOffset). Nothing
-// moves while the ball is slower than CamTuning.f198.
+// ball (DynamicCam_GetLocation's point 0), plus the tuning's fAboveMaxDistShare times (fMaxHeight -
+// height) when the ball's height over the script's ground fD8 is above the shot's most height
+// fMaxHeight, or fBelowMinDistShare times (height - fMinHeight) when under its least height
+// fMinHeight (the current shot's heights while the next shot has the same mode); both shorten
+// fDist. Then fSideOffset sideways
+// (DynamicCam_AddOffset). Nothing moves while the ball is slower than the tuning's
+// fTrackMinBallSpeed.
 void DynamicCam_TrackBallVelocityTight(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam,
                                        f32* pSub) {
     f32 vFrom[4];
@@ -1004,7 +1013,7 @@ void DynamicCam_TrackBallVelocityTight(CamShot* pShot, int nPlayer, CamScript* p
     if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
         LLMath_Normalize3(vDir, vDir);
     }
-    if (gPlayers[nPlayer].ball.fSpeed < gpCamTuning->f198) return;
+    if (gPlayers[nPlayer].ball.fSpeed < gpCamTuning->fTrackMinBallSpeed) return;
     if (pScript->pNextShot != NULL && pScript->pShot->nTrackMode == pScript->pNextShot->nTrackMode) {
         fMax = pScript->pShot->fMaxHeight;
         fMin = pScript->pShot->fMinHeight;
@@ -1014,9 +1023,9 @@ void DynamicCam_TrackBallVelocityTight(CamShot* pShot, int nPlayer, CamScript* p
     }
     fHeight = gPlayers[nPlayer].ball.vPos[1] - pScript->fD8;
     if (fHeight > fMax) {
-        fDist = gpCamTuning->f18C * (fMax - fHeight) + pShot->fDist;
+        fDist = gpCamTuning->fAboveMaxDistShare * (fMax - fHeight) + pShot->fDist;
     } else if (fHeight < fMin) {
-        fDist = gpCamTuning->f190 * (fHeight - fMin) + pShot->fDist;
+        fDist = gpCamTuning->fBelowMinDistShare * (fHeight - fMin) + pShot->fDist;
     } else {
         fDist = pShot->fDist;
     }
@@ -1302,9 +1311,10 @@ CamSequence* DynamicCam_ChooseSequence(int nPlayer, int nLie, int nClass, int nK
 }
 
 // DynamicCam_ChooseSequence's pick for the pre-flight cameras: state nKind (3 becomes 28 when an
-// object or hazard is within CamTuning.f16C of the ball, and 3 again for the last fallback), the
-// ball's distance to the pin (GameAnalysis_GetCurrentDistanceToPin) within f24..f28
-// (DynamicCam_MatchDistToPin) in place of a shot distance, no end lie, generic shot types allowed.
+// object or hazard is within the tuning's fBallObstructionDist of the ball, and 3 again for the
+// last fallback), the ball's distance to the pin (GameAnalysis_GetCurrentDistanceToPin) within
+// f24..f28 (DynamicCam_MatchDistToPin) in place of a shot distance, no end lie, generic shot types
+// allowed.
 CamSequence* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind) {
     int anPicked[50];
     CourseInfo* pCourse;
@@ -1335,8 +1345,10 @@ CamSequence* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind
         return NULL;
     }
     fHeight = pCourse->pin[nPinSet].y - gPlayers[nPlayer].vBall[1];
-    if (nKind == 3 && Ter_CheckObjectAndHazardObstruction(gPlayers[nPlayer].ball.vPos, gpCamTuning->f16C, 1,
-                                                          0, 0.0f, 1, gpCamTuning->f1A4)) {
+    if (nKind == 3
+        && Ter_CheckObjectAndHazardObstruction(gPlayers[nPlayer].ball.vPos,
+                                               gpCamTuning->fBallObstructionDist, 1, 0, 0.0f, 1,
+                                               gpCamTuning->fObstructionMaxSlope)) {
         nKind = 28;
     }
     for (i = 0; i < gpDynCam->nSequences; i++) {
@@ -1737,16 +1749,17 @@ void DynamicCam_AddOffset(f32* pPos, f32* pDir, CamScript* pScript, CamShot* pSh
     DynamicCam_AddHeightOffset(pPos, pScript, pShot, nPlayer, fY);
 }
 
-// Sets the camera's height pPos[1] by the shot's nHeightRef (0: left alone): 1 between the golfer's feet
-// (bones 0x39 and 0x47), 2 the waist (bone 1), 3 the head (bone 0xA), 4 fY (the height before), 5
-// and 7 the ball (DynamicCam_GetSmoothBallLocation), 6 the pin; then the shot's fHeightOffset above
-// that. Kind 7 follows the ball smoothly: when CameraScript_SnapToScript holds it takes that height
-// and the script's f104 the shot's fMinHeight; otherwise, once per ball update this frame (none: it
-// stays at fY), it steps from the script's v70 towards the ball and takes a share of the way from
-// the last height: CamTuning.f22C while the ball rises (f104 keeping its height over the script's
-// ground fD8), and on the way down f230 near the ground (under the shot's fMinHeight, at least
-// 0.15) blending to f22C at the height f104. Early on (the script's fScriptTime under
-// CamTuning.fD4) the share is larger, all of the way at the start.
+// Sets the camera's height pPos[1] by the shot's nHeightRef (0: left alone): 1 between the golfer's
+// feet (bones 0x39 and 0x47), 2 the waist (bone 1), 3 the head (bone 0xA), 4 fY (the height
+// before), 5 and 7 the ball (DynamicCam_GetSmoothBallLocation), 6 the pin; then the shot's
+// fHeightOffset above that. Kind 7 follows the ball smoothly: when CameraScript_SnapToScript holds
+// it takes that height and the script's f104 the shot's fMinHeight; otherwise, once per ball update
+// this frame (none: it stays at fY), it steps from the script's v70 towards the ball and takes a
+// share of the way from the last height: the tuning's fRisingHeightShare while the ball rises (f104
+// keeping its height over the script's ground fD8), and on the way down fFallingHeightShare near the
+// ground (under the shot's fMinHeight, at least 0.15) blending to fRisingHeightShare at the height
+// f104. Early on (the script's fScriptTime under the tuning's fScriptEaseInTime) the share is
+// larger, all of the way at the start.
 void DynamicCam_AddHeightOffset(f32* pPos, CamScript* pScript, CamShot* pShot, int nPlayer, f32 fY) {
     f32 vBone47[4];
     f32 vBone39[4];
@@ -1824,21 +1837,22 @@ void DynamicCam_AddHeightOffset(f32* pPos, CamScript* pScript, CamShot* pShot, i
             fLow = 0.15f;
         }
         if (!gPlayers[nPlayer].ball.bHitTopArc) {
-            fEase = gpCamTuning->f22C;
+            fEase = gpCamTuning->fRisingHeightShare;
             pScript->f104 = pPos[1] - pScript->fD8;
         } else {
             fHeight = pPos[1] - pScript->fD8;
             if (fHeight <= fLow || pScript->f104 < fLow) {
-                fEase = gpCamTuning->f230;
+                fEase = gpCamTuning->fFallingHeightShare;
             } else if (fHeight > pScript->f104) {
-                fEase = gpCamTuning->f22C;
+                fEase = gpCamTuning->fRisingHeightShare;
             } else {
-                fEase = (gpCamTuning->f22C - gpCamTuning->f230) * ((fHeight - fLow) / pScript->f104) +
-                        gpCamTuning->f230;
+                fEase = (gpCamTuning->fRisingHeightShare - gpCamTuning->fFallingHeightShare)
+                        * ((fHeight - fLow) / pScript->f104) +
+                        gpCamTuning->fFallingHeightShare;
             }
         }
-        if (pScript->fScriptTime < gpCamTuning->fD4) {
-            dSmooth = Math_Sqrt((f32)Math_Sqrt(pScript->fScriptTime / gpCamTuning->fD4));
+        if (pScript->fScriptTime < gpCamTuning->fScriptEaseInTime) {
+            dSmooth = Math_Sqrt((f32)Math_Sqrt(pScript->fScriptTime / gpCamTuning->fScriptEaseInTime));
             fEase = 1.0f - (f32)dSmooth * (1.0f - fEase);
         }
         pPos[1] = fEase * (pPos[1] - fY) + fY;
@@ -1857,9 +1871,9 @@ u8 DynamicCam_IsValidFlightSequence(CamSequence* pSequence, int nPlayer) {
     return 0;
 }
 
-// Keeps the ball's flight direction pDir (normalised by the caller) within CamTuning.f19C radians
-// of level: with no level part at all it becomes the direction from pA (the camera) to pB (the
-// ball), normalised; tilted further than f19C, it is turned back to that tilt.
+// Keeps the ball's flight direction pDir (normalised by the caller) within the tuning's
+// fMaxFlightTilt radians of level: with no level part at all it becomes the direction from pA (the
+// camera) to pB (the ball), normalised; tilted further than that, it is turned back to that tilt.
 void DynamicCam_ClampBallVelocity(f32* pDir, f32* pA, f32* pB) {
     f32 vLevel[4];
     f32 vAxis[4];
@@ -1877,12 +1891,12 @@ void DynamicCam_ClampBallVelocity(f32* pDir, f32* pA, f32* pB) {
     if (0.0f != vLevel[0] || 0.0f != vLevel[1] || 0.0f != vLevel[2]) {
         LLMath_Normalize3(vLevel, vLevel);
     }
-    if (fabsf(acosf(Vec3_Dot(vLevel, pDir))) > gpCamTuning->f19C) {
+    if (fabsf(acosf(Vec3_Dot(vLevel, pDir))) > gpCamTuning->fMaxFlightTilt) {
         vec4flt_CrossProduct(pDir, vLevel, vAxis);
         if (0.0f != vAxis[0] || 0.0f != vAxis[1] || 0.0f != vAxis[2]) {
             LLMath_Normalize3(vAxis, vAxis);
         }
-        Vec3_Scale(gpCamTuning->f19C, vAxis, vAxis);
+        Vec3_Scale(gpCamTuning->fMaxFlightTilt, vAxis, vAxis);
         Quat_BuildFromVector(vAxis, qTurn);
         vLevel[3] = 0.0f;
         Quat_RotateVector(qTurn, vLevel, pDir);

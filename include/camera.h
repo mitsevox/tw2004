@@ -275,7 +275,8 @@ typedef struct CamScript {
                                 //       (CamScript_SmoothTerrainHeight)
     u8   unkE9[0xEC - 0xE9];
     f32  fBallUpdates;          // 0xEC  the ball updates per frame, eased towards
-                                //       GameEffects_BallUpdatesThisFrame by CamTuning.f1A8
+                                //       GameEffects_BallUpdatesThisFrame by the tuning's
+                                //       fBallUpdatesStep
     f32  fShakeTime;            // 0xF0  } the camera shake: time left and how far
     f32  fShakeAmount;          // 0xF4  } (CameraController_SetShakeAmount)
     f32  fBlendShare;           // 0xF8  the blend's share so far (never goes back; 1 ends interp
@@ -349,206 +350,243 @@ typedef struct ViewController {
 } ViewController;
 LAYOUT_ASSERT(ViewController, 0x288);
 
-// The camera tuning values (GoGolfCam.c), allocated and set by GoCamTuningVars.c's CameraTuning_Init.
-typedef struct CamTuning {
-    f32  f0;                    // 0x000  the zoom-to-aim camera's base speed
-    f32  f4;                    // 0x004  the zoom-to-aim camera's distance back from the target
-    f32  f8;                    // 0x008  the zoom-to-aim camera slows down over this last distance
-    f32  fC;                    // 0x00C  ... closer in when the ball is within this of it plus f4
-    f32  f10;                   // 0x010  ... as a share of the ball's distance
-    f32  f14;                   // 0x014  the zoom-to-aim camera's height over View.script.fD8
-    f32  f18;                   // 0x018  the zoom-to-aim camera's creep and aim-marker lag
-    f32  f1C;                   // 0x01C  both zoom-to-aim cameras' slow motion at full speed
-    f32  f20;                   // 0x020  the zoom-to-aim camera's slow motion before it sets off
-    f32  f24;                   // 0x024  both: the camera has arrived within this of its goal
-    f32  f28;                   // 0x028  the zoom-to-aim camera's aim-marker lag at the start
-    f32  f2C;                   // 0x02C  ... once there, its height's share of the move a frame
-    f32  f30;                   // 0x030  ... it slows down over this last distance
-    f32  f34;                   // 0x034  ... its base speed
-    f32  f38;                   // 0x038  ... its distance back on a putt
-    f32  f3C;                   // 0x03C  ... View.shot19C.fLookUpOffset falls by this each frame
-    f32  f40;                   // 0x040  ... once there, its height moves by this a frame
-    f32  f44;                   // 0x044  ... its height over the goal (for a lens of fB0 1)
-    f32  f48;                   // 0x048  ... the aim marker's lag
-    f32  f4C;                   // 0x04C  camera 5's height over the ball
-    f32  f50;                   // 0x050  camera 5: the ball-to-pin distance of a full swing out
-    f32  f54;                   // 0x054  camera 5: how long the swing out lasts
-    f32  f58;                   // 0x058  how long camera 13's closing shot lasts
-    f32  f5C;                   // 0x05C  how long the matrix camera's first shot lasts (twice as long for
-                                //        swing camera kinds other than 1 and 6)
-    f32  f60;                   // 0x060  camera 13's slow-motion step length (0: every frame)
-    f32  f64;                   // 0x064
-    f32  v68[4];                // 0x068  camera 13's fn_80038010 vector; [3] shrinks as the camera's time
-                                //        runs
-    f32  f78;                   // 0x078  ... over this many seconds
-    f32  f7C;                   // 0x07C  camera 13's fallback shots' fFovStart/fFovEnd: from this value ...
-    f32  f80;                   // 0x080  ... to this one
-    f32  f84;                   // 0x084  how long the super zoom's first shot lasts
-    f32  f88;                   // 0x088
-    f32  f8C;                   // 0x08C
-    f32  f90;                   // 0x090  CameraController_CheckForEvents switches to camera 2 while the ball
-                                //        is below this height (and falling, not yet bounced)
-    f32  f94;                   // 0x094  the elevator camera's first blend value
-    f32  f98;                   // 0x098  camera 8: 1 - this is its height's share of the move a frame
-    f32  f9C;                   // 0x09C  the swing camera: the least shot power for one
-                                //        (GolfCamera_ChooseSpecialSwing)
-    f32  fA0;                   // 0x0A0  ... above this power, the chance (percent) is fAC
-    f32  fA4;                   // 0x0A4  ... above this one, fB0 (else fA8)
-    f32  fA8;                   // 0x0A8
-    f32  fAC;                   // 0x0AC
-    f32  fB0;                   // 0x0B0
-    f32  fB4;                   // 0x0B4  ... above this power with a short club, always kind 11
-    f32  fB8;                   // 0x0B8  camera 15 waits this long on a ball near the green
+// ---- the camera tuning values (GoCamTuningVars.c) -------------------------------------------
+
+// The camera tuning values: fixed numbers the cameras read (speeds, distances, blend times, angles
+// in radians unless marked), allocated and set by CameraTuning_Init. Fields marked "never read" are
+// set there and read by no code.
+typedef struct sCameraTuningVars {
+    f32  fZoomToAimSpeed;       // 0x000  the zoom-to-aim camera's base speed (times the square root
+                                //        of the distance left, when that is over 1)
+    f32  fZoomToAimBack;        // 0x004  ... its distance back from the target (not on a putt)
+    f32  fZoomToAimRampDist;    // 0x008  ... it speeds up over this first distance (0: no ramp)
+    f32  fZoomToAimNearRange;   // 0x00C  ... a target closer to the ball than fZoomToAimBack plus this
+                                //        brings the camera in towards fZoomToAimNearShare of the
+                                //        ball's distance to it
+    f32  fZoomToAimNearShare;   // 0x010
+    f32  fZoomToAimHeight;      // 0x014  ... its height over the ground at the target, at the end
+    f32  fZoomToAimLag;         // 0x018  ... once there it closes 1/this of the way a frame; also the
+                                //        aim marker's lag (frames) at the end of the move
+    f32  fZoomBlur;             // 0x01C  both zoom-to-aim cameras' motion blur, times 1 - base speed /
+                                //        speed
+    f32  fZoomToAimWaitBlur;    // 0x020  the zoom-to-aim camera's motion blur before it sets off
+    f32  fZoomArriveDist;       // 0x024  both: the camera has arrived within this of its goal
+    f32  fZoomToAimStartLag;    // 0x028  the zoom-to-aim camera's aim-marker lag (frames) at the start
+                                //        of the move, blending to fZoomToAimLag at its end
+    f32  fZoomToAimHeightShare; // 0x02C  the zoom-to-aim camera, once there: its height's share of the
+                                //        way a frame
+    f32  fGreenZoomRampDist;    // 0x030  the green zoom-to-aim camera speeds up over this first distance
+    f32  fGreenZoomSpeed;       // 0x034  ... its base speed
+    f32  fZoomToAimPuttBack;    // 0x038  both zoom-to-aim cameras' distance back from the target on a putt
+    f32  fGreenZoomLookDrop;    // 0x03C  the green zoom-to-aim camera: shot19C.fLookUpOffset falls by
+                                //        this a frame
+    f32  fGreenZoomHeightStep;  // 0x040  ... once there, its height moves by this a frame
+    f32  fGreenZoomHeight;      // 0x044  ... its height over shot19C.fMinHeight (over the lens's fov
+                                //        scale; more when it needs it to see the pin)
+    f32  fGreenZoomLag;         // 0x048  ... once there it closes 1/this of the way a frame; the aim
+                                //        marker's lag (frames)
+    f32  fGreenRollHeight;      // 0x04C  the putt preview camera's height over the ghost ball
+    f32  fGreenRollDist;        // 0x050  ... how far out it starts (scaled down for a ball closer
+                                //        than this to the pin) ...
+    f32  fGreenRollTime;        // 0x054  ... and how long it takes to close in
+    f32  fReturnBlendTime;      // 0x058  the matrix and super zoom cameras: script.f8C for the shot
+                                //        from before, when it is queued again
+    f32  fMatrixBlendTime;      // 0x05C  the matrix camera's first script.f8C (twice this for special
+                                //        swings other than 1 and 6)
+    f32  fMatrixStepTime;       // 0x060  the matrix camera steps its script by this once every this
+                                //        many seconds (0: every frame)
+    f32  fMatrixBlur;           // 0x064  the matrix camera's motion blur
+    f32  vReplayTint[4];        // 0x068  the swing replay camera's tint over the view (fn_80038010);
+                                //        its alpha [3] fades out ...
+    f32  fReplayTintTime;       // 0x078  ... over this many seconds
+    f32  fSuperZoomStartFov;    // 0x07C  the super zoom's field of view at the start ...
+    f32  fSuperZoomEndFov;      // 0x080  ... and at the end (GolfCamera_CreateSuperZoomCamera sets it
+                                //        to the view's less the letterbox's change)
+    f32  fSuperZoomBlendTime;   // 0x084  ... its blend from one to the other
+    f32  fSuperZoomBlur;        // 0x088  ... its motion blur
+    f32  fSuperZoomShake;       // 0x08C  ... its screen shake
+    f32  fBallLowEventHeight;   // 0x090  camera event 2 is posted while the falling ball is below
+                                //        this height, before its first bounce
+    f32  fElevatorBlendTime;    // 0x094  the elevator camera's blend
+    f32  fHeightKeepShare;      // 0x098  the ball-placement and speed-golf run cameras: the share of
+                                //        the height difference kept a frame
+    f32  fSwingCamMinPower;     // 0x09C  the special swing camera (GolfCamera_ChooseSpecialSwing): the
+                                //        least shot power for one; above it the chance (percent) is
+                                //        fSwingCamLowChance ...
+    f32  fSwingCamMidPower;     // 0x0A0  ... above this, fSwingCamMidChance ...
+    f32  fSwingCamHighPower;    // 0x0A4  ... above this, fSwingCamHighChance
+    f32  fSwingCamLowChance;    // 0x0A8
+    f32  fSwingCamMidChance;    // 0x0AC
+    f32  fSwingCamHighChance;   // 0x0B0
+    f32  fSwingCamShortClubPower; // 0x0B4  ... above this power with a short club, always kind 11
+    f32  fPostShotSandWait;     // 0x0B8  the post-shot camera waits this long on a ball in a bunker
+                                //        (or for camera event 10)
     s32  nBeats;                // 0x0BC  the heartbeat camera's beats
-    s32  nBeatFrames;           // 0x0C0
-    f32  fC4;                   // 0x0C4
-    f32  fC8;                   // 0x0C8
-    f32  fCC;                   // 0x0CC
-    f32  fD0;                   // 0x0D0  CameraScript_GetBallHeightWithMaxHeight: how fast the aim
-                                //        comes down to a shot's fMaxHeight
-    f32  fD4;                   // 0x0D4  CameraScript_LagBallFlight: the aim eases in over this
-                                //        much of a move's time
-    f32  fD8;                   // 0x0D8  CamScript_GetLookAtPoint: CameraScript_LagAimMarker's first lag
-    f32  fDC;                   // 0x0DC  the green zoom-to-aim camera's aim marker
-                                //        (CameraScript_LagAimMarker)
-    f32  fE0;                   // 0x0E0  CamScript_SmoothTerrainHeight: CamScript.fD8's share of
-                                //        the way to the ground height a frame
-    f32  fE4;                   // 0x0E4  CamScript_GetLookAtPoint: the aim's lag on the ball
-                                //        (CameraScript_LagTargetPoint,
-                                //        CameraScript_KeepPointInView); also put in
-                                //        CamScript.fLagAngle
-    f32  fE8;                   // 0x0E8  ... its lag on a bone of the golfer (CameraScript_LagTargetPoint)
-    f32  fEC;                   // 0x0EC  CamScript_CheckOutOfBounds: the camera time before it checks
+    s32  nBeatFrames;           // 0x0C0  ... steps per beat
+    f32  fBeatFadeInTime;       // 0x0C4  ... each beat's fade in
+    f32  fBeatFadeOutTime;      // 0x0C8  ... fade out
+    f32  fBeatHoldTime;         // 0x0CC  ... and hold before the next cut
+    f32  fAboveMaxHeightShare;  // 0x0D0  CameraScript_GetBallHeightWithMaxHeight: the aim comes down
+                                //        by this share of how far the ball is above a shot's fMaxHeight
+    f32  fScriptEaseInTime;     // 0x0D4  the aim and the camera's height ease in over this much of a
+                                //        script's time (CameraScript_LagBallFlight,
+                                //        DynamicCam_AddHeightOffset)
+    f32  fAimMarkerLag;         // 0x0D8  a shot looking at the aim marker: its lag (frames)
+                                //        (CameraScript_LagAimMarker) ...
+    f32  fAimMarkerHeightShare; // 0x0DC  ... and its height's share of the way a frame (also the
+                                //        zoom-to-aim cameras')
+    f32  fGroundHeightShare;    // 0x0E0  CamScript_SmoothTerrainHeight: script.fD8's share of the way to
+                                //        the ground height a frame
+    f32  fBallLagAngle;         // 0x0E4  the most the look may trail the ball (radians; also put in
+                                //        script.fLagAngle)
+    f32  fGolferLagAngle;       // 0x0E8  ... or a bone of the golfer
+    f32  fOutOfBoundsDelay;     // 0x0EC  CamScript_CheckOutOfBounds: the camera time before it checks
                                 //        the hole's outline
-    f32  fF0;                   // 0x0F0  CameraScript_LagAimMarker: the aim closer than this (over the
-                                //        lens's fB0, times the drop to it) is pushed out to it
-    f32  fF4;                   // 0x0F4  CamScript_GetCameraOnFairwayPos: a spot is taken when the
-                                //        dot product of its level direction to the ball with the
-                                //        camera's is below this
-    f32  fF8;                   // 0x0F8
-    f32  fFC;                  // 0x0FC  CameraScript_IsDefaultSwingCam: the least dot product of the
+    f32  fAimMarkerMinDist;     // 0x0F0  CameraScript_LagAimMarker: an aim closer than this (over the
+                                //        lens's fov scale, times the drop to it) is pushed out to it
+    f32  fFairwaySpotMaxDot;    // 0x0F4  CamScript_GetCameraOnFairwayPos: a spot is taken when the dot
+                                //        product of its level direction to the ball with the camera's
+                                //        is below this
+    f32  fUnread1;              // 0x0F8  never read
+    f32  fDefaultSwingCamMinDot; // 0x0FC  CameraScript_IsDefaultSwingCam: the least dot product of the
                                 //        camera's and the aim's level directions from the ball
-    f32  f100;                  // 0x100  CamScript_UpdateFairwayCam: moves on only from this level
-                                //        distance to the spot CamScript_GetNearestAIPoint picks ...
-    f32  f104;                  // 0x104  ... after this long on the camera ...
-    f32  f108;                  // 0x108  ... and while the ball heads away from the camera (a dot
+    f32  fFairwayCamMoveDist;   // 0x100  the fairway camera (CamScript_UpdateFairwayCam) moves on only
+                                //        from this level distance to the spot by the ball ...
+    f32  fFairwayCamMinTime;    // 0x104  ... after this long on the camera ...
+    f32  fFairwayCamMaxDot;     // 0x108  ... and while the ball heads away from the camera (a dot
                                 //        product at most this)
-    f32  f10C;                  // 0x10C  CamScript_GetCameraOnFairwayPos: the camera's height over
-                                //        the ground at the spot
-    f32  f110;                  // 0x110  CamScript_UpdateFairwayCam: the shot's field of view narrows
-                                //        down to this ...
-    f32  f114;                  // 0x114  CamScript_PutBackOnFairway: its shot's field of view
-    f32  f118;                  // 0x118  ... by this a frame (CamScript_UpdateFairwayCam)
-    f32  f11C;                  // 0x11C  CameraScript_CalculateShoulderShake: a shot's fShakeAmount over
+    f32  fFairwayCamHeight;     // 0x10C  ... its height over the ground at the spot
+    f32  fFairwayCamMinFov;     // 0x110  ... its field of view narrows down to this ...
+    f32  fFairwayCamFov;        // 0x114  ... from this one (CamScript_PutBackOnFairway) ...
+    f32  fFairwayCamFovStep;    // 0x118  ... by this a frame
+    f32  fShoulderShakeScale;   // 0x11C  CameraScript_CalculateShoulderShake: a shot's fShakeAmount over
                                 //        this is its wobble's size
-    f32  f120;                  // 0x120  CamScript_CheckObstructedCamera: a camera closer to the
-                                //        pin than this (level, times the lens's fB0) ...
-    f32  f124;                  // 0x124  ... and less than this above it counts as in the way
-    f32  f128;                  // 0x128  CamScript_GetLookAtPoint: the least level distance for the
-                                //        steep-aim limit
-    f32  f12C;                  // 0x12C  CameraScript_LagAimMarker: the most the aim may sit below the camera
-    f32  f130;                  // 0x130  CamScript_GuessBestPlayableHeight: the headroom a camera
-                                //        needs over a ground layer
-    f32  f134;                  // 0x134  CameraScript_LagTargetPoint: the look-at point eases in
-                                //        slower within this share of the (field-of-view scaled)
-                                //        camera distance
-    f32  f138;                  // 0x138  CameraScript_LagBallFlight: the aim's most share of the
-                                //        way a step ...
-    f32  f13C;                  // 0x13C  ... reached at this distance from it
-    f32  f140;                  // 0x140  CameraScript_LagBallFlight: its height share for a falling
-                                //        ball near the ground
-    f32  f144;                  // 0x144  CameraScript_LagTargetPoint: the look-at point's level
-                                //        share of the way a frame
-    f32  f148;                  // 0x148  ... and its height's
-    f32  f14C;                  // 0x14C  } DynamicCam_TrackBallVelocityLag: how fast a following camera
-    f32  f150;                  // 0x150  } closes the distance and the angle to its target, per 60th
-    f32  f154;                  // 0x154  DynamicCam_TrackBallVelocityLag: while CamScript.fScriptTime is
-                                //        under this, both are scaled by ((f154 - fCamTime) / f154)
-                                //        squared, over f14C (tested on fScriptTime, eased by fCamTime)
-    f32  f158;                  // 0x158  CameraScript_LagBallFlight: the aim eases in over this
-                                //        much of CamScript.f88
-    f32  f15C;                  // 0x15C  CameraScript_InterpToNewScript puts it in CamScript.f88 (0 for
-                                //        the default swing camera)
-    f32  f160;                  // 0x160  CameraScript_LagBallFlight: the power of its height ease-in
-    f32  f164;                  // 0x164  CamScript_GetLookAtPoint: kind 13's share of the height change
-                                //        a frame
-    f32  f168;                  // 0x168  the ground clearance for CamScript_KeepAboveGround
-    f32  f16C;                  // 0x16C  the obstruction radius around the ball for the pre-shot routine
-    f32  f170;                  // 0x170  a blend for CameraController_FadeIn / CameraController_FadeOut
-    f32  f174;                  // 0x174  DynamicCam_ProcessScript: how softly a camera eases in under its
-                                //        height limit
-    f32  f178;                  // 0x178
-    f32  v17C[4];               // 0x17C
-    f32  f18C;                  // 0x18C  DynamicCam_TrackBallVelocityTight: the ball-flight camera closes in
-                                //        by this share of the height above the shot's fMaxHeight ...
-    f32  f190;                  // 0x190  ... and backs off by this share of the height below its fMinHeight
-    f32  f194;                  // 0x194  DynamicCam_ProcessScript: how far a camera below its least height
-                                //        rises a frame
-    f32  f198;                  // 0x198  DynamicCam_TrackBallVelocityTight: the least ball speed it follows
-                                //        the flight at
-    f32  f19C;                  // 0x19C  the steepest a camera direction may tilt
-                                //        (DynamicCam_ClampBallVelocity, radians)
-    f32  f1A0;                  // 0x1A0
-    f32  f1A4;                 // 0x1A4  DynamicCam_ChoosePreFlightSequence: the obstruction test's slope
-    f32  f1A8;                  // 0x1A8  CamScript_RunScript: how fast CamScript.fBallUpdates follows the
+    f32  fFlagClearDist;        // 0x120  with the flagstick in, a camera closer to the pin than this
+                                //        (level, times the lens's fov scale) ...
+    f32  fFlagClearHeight;      // 0x124  ... and less than this above it is in the way
+                                //        (CamScript_CheckObstructedCamera) or raised
+                                //        (CamScript_CheckFlagCollision)
+    f32  fSteepAimMinDist;      // 0x128  the fairway fix: the aim may drop 1 in 5 to the camera at most,
+                                //        fully from this level distance out
+    f32  fAimMarkerMaxDrop;     // 0x12C  CameraScript_LagAimMarker: the most the aim may sit below the
+                                //        camera
+    f32  fPlayableHeadroom;     // 0x130  CamScript_GuessBestPlayableHeight: the room a camera needs over
+                                //        a ground layer
+    f32  fLookNearScale;        // 0x134  CameraScript_LagTargetPoint: the look-at point eases in slower
+                                //        within this times the (fov scaled) camera distance
+    f32  fBallLagMaxShare;      // 0x138  CameraScript_LagBallFlight: the aim's most share of the way a
+                                //        step ...
+    f32  fBallLagFullDist;      // 0x13C  ... reached at this distance from it
+    f32  fBallLagLowShare;      // 0x140  ... its height share for a falling ball near the ground
+    f32  fLookLevelShare;       // 0x144  CameraScript_LagTargetPoint: the look-at point's level share
+                                //        of the way a frame ...
+    f32  fLookHeightShare;      // 0x148  ... and its height's
+    f32  fTrackCloseRate;       // 0x14C  DynamicCam_TrackBallVelocityLag: how fast a following camera
+                                //        closes the distance ...
+    f32  fTrackTurnRate;        // 0x150  ... and the angle to its target, per 60th of a second
+    f32  fTrackEaseInTime;      // 0x154  ... while the script's time is under this, both are scaled
+                                //        by ((this - camera time) / this) squared, over fTrackCloseRate
+    f32  fCutEaseInTime;        // 0x158  the aim and a following camera ease in over this much of
+                                //        script.f88 ...
+    f32  fCutHeightEaseTime;    // 0x15C  ... and their height over this much
+                                //        (CameraScript_InterpToNewScript starts script.f88 at this, or
+                                //        at 0 from the default swing camera)
+    f32  fCutHeightEasePower;   // 0x160  ... the power of that height ease-in
+    f32  fGroundLookHeightShare; // 0x164  a shot looking at the ground under the ball: its height's
+                                //        share of the way, each frame with ball updates
+    f32  fGroundClearance;      // 0x168  the cameras' least height over the ground
+    f32  fBallObstructionDist;  // 0x16C  an object or hazard this close to the ball stops the pre-shot
+                                //        animation (GM_DoPreshotAnimation) and turns pre-flight
+                                //        sequence kind 3 into 28
+    f32  fFadeTime;             // 0x170  the colour fades out at the end of a shot (GameMode.c,
+                                //        stateFunc.c) and into the scorecard and tutorial cameras; the
+                                //        golfer's animation counts as almost done within this of its end
+    f32  fHeightCeilingEase;    // 0x174  DynamicCam_ProcessScript: a camera eases into its most height
+                                //        over this band
+    f32  fFlyByFadeTime;        // 0x178  the hole fly-by fades to vFlyByFadeColor when this much of a
+                                //        group's last shot is left, and fades over this into a curve's
+                                //        next shot
+    f32  vFlyByFadeColor[4];    // 0x17C
+    f32  fAboveMaxDistShare;    // 0x18C  the ball-flight cameras (DynamicCam_TrackBallVelocityLag and
+                                //        DynamicCam_TrackBallVelocityTight): the shot's fDist is lowered
+                                //        by this share of the ball's height above its fMaxHeight ...
+    f32  fBelowMinDistShare;    // 0x190  ... or by this share of its height below its fMinHeight
+    f32  fRiseStep;             // 0x194  DynamicCam_ProcessScript: how far a camera below its least
+                                //        height rises a frame (track modes 5..7)
+    f32  fTrackMinBallSpeed;    // 0x198  for a ball slower than this a following camera slows down
+                                //        (DynamicCam_TrackBallVelocityLag) or stops
+                                //        (DynamicCam_TrackBallVelocityTight)
+    f32  fMaxFlightTilt;        // 0x19C  DynamicCam_ClampBallVelocity: the most the ball's flight
+                                //        direction may tilt from level
+    f32  fUnread2;              // 0x1A0  never read
+    f32  fObstructionMaxSlope;  // 0x1A4  DynamicCam_ChoosePreFlightSequence: the obstruction test's slope
+    f32  fBallUpdatesStep;      // 0x1A8  CamScript_RunScript: how fast script.fBallUpdates follows the
                                 //        ball's updates per frame
-    f32  f1AC;                  // 0x1AC
-    f32  f1B0;                  // 0x1B0
-    f32  f1B4;                  // 0x1B4  } CameraController_CameraCollision (GoCamCont.c), flat directions:
-    f32  f1B8;                  // 0x1B8  } the least cosine from the camera's motion (f1B4) and from its look
-    f32  f1BC;                  // 0x1BC  } (f1B8) to the object; the most the camera may move in a frame
-                                //        } (f1BC)
-    s32  n1C0;                  // 0x1C0  nonzero enables camera 19
-    s32  n1C4;                  // 0x1C4
+    f32  fUnread3;              // 0x1AC  never read
+    f32  fUnread4;              // 0x1B0  never read
+    f32  fCollideMinMoveCos;    // 0x1B4  CameraController_CameraCollision, level directions: the least
+                                //        cosine from the camera's motion ...
+    f32  fCollideMinLookCos;    // 0x1B8  ... and from its look to the object ...
+    f32  fCollideMaxMove;       // 0x1BC  ... and the most the camera may move in a frame
+    s32  bSteepSlopeCam;        // 0x1C0  the elevator state may use the steep-slope camera
+    s32  nUnread1;              // 0x1C4  never read
     s32  bCheckSlope;           // 0x1C8  GolfCamera_NeedSteepSlopeCam tests the slope to the target
                                 //        (GolfCamera_SteepSlopeCamCheckSlope)
-    s32  bCheckTerrain;         // 0x1CC  and the ground in between (GolfCamera_SteepSlopeCamCheckCollision)
-    f32  f1D0;                  // 0x1D0  the steep-slope camera: height step per try (down going
-                                //        up, up going down)
-    f32  f1D4;                  // 0x1D4  ... distance step back per try
-    f32  f1D8;                  // 0x1D8  ... first distance back from the ball
-    s32  n1DC;                  // 0x1DC  ... most tries
-    f32  fSlopeUp;              // 0x1E0
-    f32  fSlopeDown;            // 0x1E4
-    f32  f1E8;                  // 0x1E8  the steep-slope camera's base: x offset from the ball
-    f32  f1EC;                  // 0x1EC  ... height over the ball
-    f32  f1F0;                  // 0x1F0  ... how far the camera may move per call
-    f32  f1F4;                  // 0x1F4  ... how far the aim may move per call
+    s32  bCheckTerrain;         // 0x1CC  ... and the ground in between
+                                //        (GolfCamera_SteepSlopeCamCheckCollision)
+    f32  fSteepSlopeHeightStep; // 0x1D0  the steep-slope camera: height step per try (down going up,
+                                //        up going down)
+    f32  fSteepSlopeBackStep;   // 0x1D4  ... distance step back per try
+    f32  fSteepSlopeBack;       // 0x1D8  ... first distance back
+    s32  nSteepSlopeMaxTries;   // 0x1DC  ... most tries
+    f32  fSlopeUp;              // 0x1E0  ... needed for a slope up to the target at least this steep
+                                //        (rise over run) ...
+    f32  fSlopeDown;            // 0x1E4  ... or down to it at least this steep
+    f32  fSteepSlopeOffsetX;    // 0x1E8  ... its base: x offset from the ball ...
+    f32  fSteepSlopeHeight;     // 0x1EC  ... and height over it
+    f32  fSteepSlopeMaxCamMove; // 0x1F0  ... how far the camera may move per call
+    f32  fSteepSlopeMaxAimMove; // 0x1F4  ... how far the aim may move per call
     f32  fMaxPitchUp;           // 0x1F8  GolfCamera_ClampLookAngle: the steepest camera angle above
                                 //        the horizontal (degrees)
-    f32  fMaxPitchDown;         // 0x1FC  and below it
-    f32  f200;                  // 0x200  } the camera shake CameraController_Idle starts on the swing's
-    f32  f204;                  // 0x204  } events 5..14: CamScript.fShakeAmount and fShakeTime
-                                //        } (CameraController_SetShakeAmount)
-    f32  f208;                 // 0x208  times lbl_801D5010[view]: the alpha of GoPostFx fn_80039358's
-                                //        black cover
-    f32  f20C;                 // 0x20C  camera 4: the most View.f54 grows to
-    f32  f210;                  // 0x210  camera 4: how fast (per second) it moves in from its start
-    f32  f214;                  // 0x214  camera 4: how fast View.f54 grows and shrinks
-    f32  f218;                  // 0x218  camera 4: how fast (per second) buttons 0x31/0x32 turn it round
-    f32  f21C;                  // 0x21C  camera 4: the angle of its swing between the ball and the pin
-    f32  f220;                  // 0x220  camera 4: its ground clearance, and its least height over the ball
-    f32  f224;                  // 0x224  camera 4: (f20C - 1) times this raises the aim each frame ...
-    s32  n228;                  // 0x228  ... unless this is set: then the aim is at the camera's height
-    f32  f22C;                  // 0x22C  placement height kind 7 (GoDynamicCam.c
-                                //        DynamicCam_AddHeightOffset): the share of the way to the
-                                //        new height taken per ball step, rising ...
-    f32  f230;                  // 0x230  ... and falling towards the shot's fMinHeight
-    f32  f234;                  // 0x234
-    f32  f238;                  // 0x238
-    f32  f23C;                  // 0x23C  placement kind 8 (GoDynamicCam.c DynamicCam_TrackOffset): past this
-                                //        distance the camera's offset is scaled from f240 ...
-    f32  f240;                  // 0x240
-    f32  f244;                  // 0x244  ... down to f248 at this distance and beyond
-    f32  f248;                  // 0x248
-    s32  n24C;                  // 0x24C
-    f32  f250;                  // 0x250
-    f32  f254;                  // 0x254
-    f32  f258;                  // 0x258
-} CamTuning;
-LAYOUT_ASSERT(CamTuning, 0x25C);
+    f32  fMaxPitchDown;         // 0x1FC  ... and below it
+    f32  fSwingShakeAmount;     // 0x200  the camera shake CameraController_Idle starts on the swing's
+                                //        events 5..14 ...
+    f32  fSwingShakeTime;       // 0x204  ... and how long it lasts
+    f32  fScreenDarkenAlpha;    // 0x208  the alpha of the black cover fn_80039358 draws, times the
+                                //        view's share (lbl_801D5010, set by the green camera)
+    f32  fGreenCamMaxScale;     // 0x20C  the green camera: the most View.f54 grows to
+    f32  fGreenCamMoveInSpeed;  // 0x210  ... how fast (per second) it moves in from its start
+    f32  fGreenCamScaleSpeed;   // 0x214  ... how fast View.f54 grows and shrinks
+    f32  fGreenCamOrbitSpeed;   // 0x218  ... how fast (per second) buttons 0x31/0x32 turn it round
+    f32  fGreenCamArcSide;      // 0x21C  ... the side offset of its swing between the ball and the pin
+    f32  fGreenCamClearance;    // 0x220  ... its ground clearance, and its least height over the ball
+    f32  fGreenCamAimRaise;     // 0x224  ... (fGreenCamMaxScale - 1) times this raises the aim each
+                                //        frame ...
+    s32  bGreenCamLevelAim;     // 0x228  ... unless this is set: then the aim is at the camera's height
+    f32  fRisingHeightShare;    // 0x22C  DynamicCam_AddHeightOffset: the share of the way to the new
+                                //        height a ball step while the ball rises ...
+    f32  fFallingHeightShare;   // 0x230  ... and near the shot's fMinHeight on the way down
+    f32  fUnread5;              // 0x234  never read
+    f32  fUnread6;              // 0x238  never read
+    f32  fTrackOffsetStartShare; // 0x23C  DynamicCam_TrackOffset, mode 8: past this share of the way to
+                                //        the pin (CamScript_GetBallToPinPercent) the camera's offset is
+                                //        scaled from fTrackOffsetStartScale ...
+    f32  fTrackOffsetStartScale; // 0x240
+    f32  fTrackOffsetEndShare;  // 0x244  ... down to fTrackOffsetEndScale at this share and beyond
+    f32  fTrackOffsetEndScale;  // 0x248
+    s32  nUnread2;              // 0x24C  never read
+    f32  fUnread7;              // 0x250  never read
+    f32  fUnread8;              // 0x254  never read
+    f32  fUnread9;              // 0x258  never read
+} sCameraTuningVars;
+LAYOUT_ASSERT(sCameraTuningVars, 0x25C);
 
-extern CamTuning* gpCamTuning;         // EA's file list has GoCamTuningVars
+extern sCameraTuningVars* gpCamTuning;
+
+void CameraTuning_Init(void);
+void CameraTuning_Close(void);
+
+// ---- the golf cameras' shared state (GoGolfCam.c) -------------------------------------------
 
 // The golf cameras' shared state (0x200 bytes, allocated by GolfCamera_Init).
 typedef struct GolfCamState {
