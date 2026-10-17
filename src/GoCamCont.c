@@ -89,10 +89,10 @@ void CameraController_ResetCameraState(View* pView) {
 
 // The view's camera controller, every frame: runs the current camera mode's process (mode 25, no
 // camera, only runs the colour fade, a finished fade-out staying held); on the golfer's animation
-// events 5..14 (not on the CrAP screen, game type 3) starts a camera shake (CamTuning.f204 long,
-// f200 strong) with its sound (Gaud_CameraShake); shakes the camera while the shake lasts; keeps
-// the side vector v20 nonzero (CameraController_ComputeCurrentSideVector, else (1, 0, 0)) and runs
-// the view's fade clock fFade.
+// events 5..14 (not on the CrAP screen, game type 3) starts a camera shake (the tuning's
+// fSwingShakeTime long, fSwingShakeAmount strong) with its sound (Gaud_CameraShake); shakes the
+// camera while the shake lasts; keeps the side vector v20 nonzero
+// (CameraController_ComputeCurrentSideVector, else (1, 0, 0)) and runs the view's fade clock fFade.
 void CameraController_Idle(View* pView, int nPlayer) {
     int i;
     int nMove;
@@ -197,7 +197,8 @@ void CameraController_Idle(View* pView, int nPlayer) {
             if (Character_IsTagSet(gPlayers[nPlayer].pChar, i + 5)
                 && fn_80062BB0(gPlayers[nPlayer].pChar, i + 5)) {
                 fn_80062B98(gPlayers[nPlayer].pChar, i + 5);
-                CameraController_SetShakeAmount(pView, gpCamTuning->f204, gpCamTuning->f200);
+                CameraController_SetShakeAmount(pView, gpCamTuning->fSwingShakeTime,
+                                                gpCamTuning->fSwingShakeAmount);
                 Gaud_CameraShake(nPlayer, 0);
             }
         }
@@ -431,9 +432,10 @@ u8 CameraController_HideGolfer(int nPlayer, int nView) {
 }
 
 // Posts camera event 2 (CameraController_PostEvent) while the player's ball is coming down below
-// CamTuning.f90 before its first collision.
+// the tuning's fBallLowEventHeight before its first collision.
 void CameraController_CheckForEvents(View* pView, int nPlayer) {
-    if (gPlayers[nPlayer].ball.vVel[1] < 0.0f && gPlayers[nPlayer].ball.fHeight < gpCamTuning->f90
+    if (gPlayers[nPlayer].ball.vVel[1] < 0.0f && gPlayers[nPlayer].ball.fHeight
+        < gpCamTuning->fBallLowEventHeight
         && gPlayers[nPlayer].ball.nCollideCount < 1) {
         CameraController_PostEvent(pView, 2, nPlayer);
     }
@@ -442,8 +444,9 @@ void CameraController_CheckForEvents(View* pView, int nPlayer) {
 // Called by the terrain drawing (GoTerrain.c) when view nView's camera touches the bounds of an
 // object centred at pBounds. While the ball is in flight (GS_SIMULATE, with gpGame->b289 set), with
 // no next shot and a current shot not of kind 3 at least 0.5 into it, a camera moving towards the
-// object (flat, no faster than CamTuning.f1BC) while heading and looking towards it (cosines at
-// least f1B4 and f1B8) goes back on the fairway (CamScript_PutBackOnFairway).
+// object (flat, no faster than the tuning's fCollideMaxMove) while heading and looking towards it
+// (cosines at least fCollideMinMoveCos and fCollideMinLookCos) goes back on the fairway
+// (CamScript_PutBackOnFairway).
 void CameraController_CameraCollision(int nView, f32* pBounds) {
     View* pView = ViewController_GetCameraControl(nView);
     int nPlayer = ViewController_GetActivePlayerNumber(nView);
@@ -502,10 +505,10 @@ void CameraController_CameraCollision(int nView, f32* pBounds) {
     if (fSpeed <= 0.0f) {
         return;
     }
-    if (fSpeed > gpCamTuning->f1BC) {
+    if (fSpeed > gpCamTuning->fCollideMaxMove) {
         return;
     }
-    if (fMoveCos < gpCamTuning->f1B4 || fLookCos < gpCamTuning->f1B8) {
+    if (fMoveCos < gpCamTuning->fCollideMinMoveCos || fLookCos < gpCamTuning->fCollideMinLookCos) {
         return;
     }
     CamScript_PutBackOnFairway(&pView->script, pPos, pAt, nPlayer, &pView->shot19C, pPos);

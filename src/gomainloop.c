@@ -184,8 +184,6 @@ void fn_80093D14(void);
 void BS_vInit(void);
 void BS_vClose(void);
 void fn_80095550(void);
-void CameraTuning_Init(void);
-void fn_80097E98(void);
 void fn_80098A98(void);
 void fn_80098B5C(void);
 void fn_80099344(f32 fFrameTime);
@@ -563,7 +561,7 @@ void fn_8006CB2C(void) {
     CA_vReleaseCamera(lbl_80281E60);
     fn_80062E20();
     DynamicCam_DeInit();
-    fn_80097E98();
+    CameraTuning_Close();
     Character_CloseFE();
     Character_FreeFEGolfers();
     Players_Reset();
@@ -708,7 +706,7 @@ void fn_8006CDC4(void) {
     fn_80062E20();
     DynamicCam_DeInit();
     StaticCam_DeInit();
-    fn_80097E98();
+    CameraTuning_Close();
     GM_DeInitModule();
     fn_8006F64C();
     Ter_vCloseModule();

@@ -197,7 +197,7 @@ engine.h `ModuleHooks`). Particles, rain and the ball's effects sit here too.
 | unsorted/sweep_8009554C.c | ph | six empty functions (GoEntry.c, gomainloop.c and char.c call them) |
 | GoShaderObjectCommon_MorphAnimManager_Gc.c | EA | the list of morph animations |
 | unsorted/sweep_800977CC.c | ph | frees a buffer at +0xC0 *(unverified which file)* |
-| unsorted/sweep_80097E98.c | ph | frees `lbl_80281F78`; emits two vertices *(unverified which file; sits before the glows)* |
+| unsorted/sweep_80097EC4.c | ph | emits two vertices *(unverified which file; sits before the glows)* |
 | GoShaderObject_Glows_Gc.c | EA | the glows' shapes and drawing |
 | UFstPart.c | EA | particle emitters |
 | PsMgr.c | EA | weather particle effects (only the rain on GameCube) |

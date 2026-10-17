@@ -93,7 +93,7 @@ GoARAM.c	open
 GoAnimalActors.c	open		
 GoBreakLine.c	open		
 GoCamCont.c	open		
-GoCamTuningVars.c	open		
+GoCamTuningVars.c	done	6923ea8d	claude-review
 GoCamera.c	open		
 GoComicCam.c	open		
 GoDynObj.c	open		
@@ -265,7 +265,7 @@ unsorted/sweep_80095798.c	open
 unsorted/sweep_800957B0.c	open		
 unsorted/sweep_800957D8.c	open		
 unsorted/sweep_800977CC.c	open		
-unsorted/sweep_80097E98.c	open		
+unsorted/sweep_80097EC4.c	open		
 unsorted/sweep_8009A844.c	open		
 unsorted/sweep_8009B314.c	open		
 unsorted/sweep_801338E0.c	open		

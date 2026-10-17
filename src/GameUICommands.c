@@ -908,13 +908,13 @@ void GM_vGetGolferUserMoney(MsgArg* pArgs, MsgArg* pResult) {
 // and up): 1 when he is not in a reaction animation (nCurState not 9, 11 or 12), or when the
 // camera's script has ended (GolfCamera_IsPostShotCamDone) and either it is not tracking him
 // (GolfCamera_IsCameraTrackingPlayer) or his animation is paused or has less than the camera
-// tuning's f170 left.
+// tuning's fFadeTime left.
 void GM_vIsPostShotCameraDone(MsgArg* pArgs, MsgArg* pResult) {
     u8 bPostShotCamDone;        // the locals are TW07's
     u8 bCamTrackingPlayer;
     u8 bAnimPaused;             // the golfer's uFlags bit 0
     u8 bNotReactionAnim;        // the golfer's nCurState is not 9, 11 or 12
-    u8 bAnimAlmostDone;         // his animation has less than the camera tuning's f170 left
+    u8 bAnimAlmostDone;         // his animation has less than the camera tuning's fFadeTime left
 
     if (pArgs[0].i >= 5) {
         pResult->i = 1;
@@ -928,7 +928,7 @@ void GM_vIsPostShotCameraDone(MsgArg* pArgs, MsgArg* pResult) {
     bNotReactionAnim = gPlayers[pArgs[0].i].pChar->nCurState != 9 &&
                        gPlayers[pArgs[0].i].pChar->nCurState != 11 &&
                        gPlayers[pArgs[0].i].pChar->nCurState != 12;
-    bAnimAlmostDone = fn_80062C28(gPlayers[pArgs[0].i].pChar) < gpCamTuning->f170;
+    bAnimAlmostDone = fn_80062C28(gPlayers[pArgs[0].i].pChar) < gpCamTuning->fFadeTime;
     if ((bPostShotCamDone && (!bCamTrackingPlayer || bAnimPaused || bAnimAlmostDone)) || bNotReactionAnim) {
         pResult->i = 1;
         return;
