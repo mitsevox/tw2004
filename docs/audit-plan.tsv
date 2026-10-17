@@ -1,0 +1,391 @@
+order	area	file	task	scope	state
+1	Cameras	GoCamTuningVars.c	pass	the whole file	done
+2	Cameras	CamSpline.c	pass	the whole file	open
+3	Cameras	ViewController.c	pass	the whole file	open
+4	Cameras	GoStaticCam.c	pass	the whole file	open
+5	Cameras	GoDynamicCam.c	chunk 1/3	DynamicCam_RegisterStreamClients .. DynamicCam_TrackPercent	open
+6	Cameras	GoDynamicCam.c	chunk 2/3	DynamicCam_TrackOffset .. DynamicCam_MatchSeqClub	open
+7	Cameras	GoDynamicCam.c	chunk 3/3	DynamicCam_MatchHeightDiff .. GameEffects_IsLetterboxOn	open
+8	Cameras	GoDynamicCam.c	whole-file review	the whole file	open
+9	Cameras	GoComicCam.c	pass	the whole file	open
+10	Cameras	GoCamCont.c	pass	the whole file	open
+11	Cameras	gocamscripts.c	chunk 1/4	gocamscripts_StrippedFn .. CamScript_LerpCameras	open
+12	Cameras	gocamscripts.c	chunk 2/4	CameraScript_GetSmoothTimeParam .. CamScript_GetLookAtPoint	open
+13	Cameras	gocamscripts.c	chunk 3/4	CameraScript_CalculateShoulderShake .. CameraScript_KeepPointInView	open
+14	Cameras	gocamscripts.c	chunk 4/4	CameraScript_IsDefaultSwingCam .. CamScript_DoesScriptTrackBall	open
+15	Cameras	gocamscripts.c	whole-file review	the whole file	open
+16	Cameras	GoGolfCam.c	chunk 1/6	GoGolfCam_StrippedFn .. GolfCamera_ProcessPlaceBallCamera	open
+17	Cameras	GoGolfCam.c	chunk 2/6	GolfCamera_InitSpeedGolfRunCamera .. GolfCamera_InitSwingCamera	open
+18	Cameras	GoGolfCam.c	chunk 3/6	GolfCamera_ProcessSwingCamera .. GolfCamera_ProcessInHoleCamera	open
+19	Cameras	GoGolfCam.c	chunk 4/6	GolfCamera_InitScoreCardCamera .. GolfCamera_CreateMatrixCamera	open
+20	Cameras	GoGolfCam.c	chunk 5/6	GolfCamera_UpdateMatrixCamera .. GolfCamera_IsPreShotCamReadyForFade	open
+21	Cameras	GoGolfCam.c	chunk 6/6	GolfCamera_ForcePreShotEnding .. GameEffects_IsPredictedGameBreakerOn	open
+22	Cameras	GoGolfCam.c	whole-file review	the whole file	open
+23	Core services	LLRTClock_Gc.c	pass	the whole file	done
+24	Core services	UByteSwap.c	pass	the whole file	done
+25	Core services	LLMem_Gc.c	pass	the whole file	done
+26	Core services	LLMath_Gc.c	pass	the whole file	done
+27	Core services	MathQuat.c	pass	the whole file	done
+28	Core services	LLRTClock.c	pass	the whole file	done
+29	Core services	LLTime.c	pass	the whole file	done
+30	Core services	URes.c	pass	the whole file	done
+31	Core services	Controller_Gc.c	pass	the whole file	open
+32	Core services	StaticMemory.c	pass	the whole file	open
+33	Core services	GoARAM.c	pass	the whole file	open
+34	Core services	urandom.c	pass	the whole file	open
+35	Core services	LLFileIO_Gc.c	pass	the whole file	open
+36	Core services	streammanagerhole.c	pass	the whole file	open
+37	Core services	LoadData.c	pass	the whole file	open
+38	Core services	UMemPool.c	pass	the whole file	open
+39	Core services	UStream.c	chunk 1/2	UStream_ReleaseBuffer .. UStream_Update	open
+40	Core services	UStream.c	chunk 2/2	UStream_ReleaseObjectBuffer .. fn_8000E81C	open
+41	Core services	UStream.c	whole-file review	the whole file	open
+42	The course	CourseData.c	pass	the whole file	open
+43	The course	TerrainGround.c	pass	the whole file	open
+44	The course	TerrainData.c	pass	the whole file	open
+45	The course	UObject.c	pass	the whole file	open
+46	The course	GoDynObjTypes.c	pass	the whole file	open
+47	The course	GoTerrainCollision.c	chunk 1/3	Ter_Floor .. Ter_GetHighestGroundTriangle	open
+48	The course	GoTerrainCollision.c	chunk 2/3	Ter_GetLowestGroundTriangle .. Ter_CheckForWorldCollision	open
+49	The course	GoTerrainCollision.c	chunk 3/3	Ter_CheckForWorldCollisionOneGrid .. MaterialTypes_getMaterialID	open
+50	The course	GoTerrainCollision.c	whole-file review	the whole file	open
+51	The course	GoDynObjBase.c	pass	the whole file	open
+52	The course	UKernel.c	pass	the whole file	open
+53	The course	GoAnimalActors.c	pass	the whole file	open
+54	The course	GoDynObj.c	chunk 1/2	DynObj_LoadTeoModel .. DynObj_DrawGolfBalls	open
+55	The course	GoDynObj.c	chunk 2/2	DynObj_GetBallPixels .. DynObj_CloseModuleEmpty	open
+56	The course	GoDynObj.c	whole-file review	the whole file	open
+57	Audio	AudLock.c	pass	the whole file	done
+58	Audio	UAudVector.c	pass	the whole file	done
+59	Audio	UAudMemStack.c	pass	the whole file	done
+60	Audio	HLAudMaster.c	pass	the whole file	done
+61	Audio	UAudContainers.c	pass	the whole file	done
+62	Audio	UAudMem.c	pass	the whole file	open
+63	Audio	startUp.c	chunk 1/2	HwVoice_MixerCallback .. AudAram_Free	open
+64	Audio	startUp.c	chunk 2/2	AudAram_AllocStreamBuffer .. Startup_LoadOptionsFromCard	open
+65	Audio	startUp.c	whole-file review	the whole file	open
+66	Audio	hlaudmic.c	pass	the whole file	open
+67	Audio	AudReverb.c	pass	the whole file	open
+68	Audio	hlaudmovie.c	pass	the whole file	open
+69	Audio	hlaudvoice.c	pass	the whole file	open
+70	Audio	hlaudemitterpool.c	pass	the whole file	open
+71	Audio	hlaudemitter.c	pass	the whole file	done
+72	Audio	hlaudtrackseq.c	pass	the whole file	open
+73	Audio	hlaudtrack.c	pass	the whole file	open
+74	Audio	hlaudsession.c	pass	the whole file	open
+75	Audio	hlaudtrackstm.c	pass	the whole file	open
+76	Audio	GameAudio.c	chunk 1/3	GameAudio_StrippedFn .. Gaud_ExitFE	open
+77	Audio	GameAudio.c	chunk 2/3	Gaud_InitHole .. Gaud_InitSpecialShot	open
+78	Audio	GameAudio.c	chunk 3/3	Gaud_UpdtSpecialShot .. Aud_SesTmplOvrTrackRvbMode	open
+79	Audio	GameAudio.c	whole-file review	the whole file	open
+80	Ball physics	Wind.c	pass	the whole file	open
+81	Ball physics	Code800B1AA8.c	pass	the whole file	open
+82	Ball physics	MaterialTypes.c	pass	the whole file	open
+83	Ball physics	Ball.c	chunk 1/4	Ball_NoGround .. Physics_GetShotData	open
+84	Ball physics	Ball.c	chunk 2/4	Physics_ThrowBall .. Physics_SetLie	open
+85	Ball physics	Ball.c	chunk 3/4	Ball_SpinKeep .. Physics_SetBallPosition	open
+86	Ball physics	Ball.c	chunk 4/4	Physics_InitBall .. Ball_Vec3Negate	open
+87	Ball physics	Ball.c	whole-file review	the whole file	open
+88	Golfers	statemain.c	pass	the whole file	done
+89	Golfers	StateGolfer.c	pass	the whole file	done
+90	Golfers	Golfer.c	pass	the whole file	open
+91	Golfers	Code8002BBB0.c	pass	the whole file	open
+92	Golfers	Code8002C984.c	pass	the whole file	open
+93	Golfers	Replay.c	pass	the whole file	open
+94	Golfers	Swing.c	chunk 1/3	Swing_StrippedFn .. SW_UpdateVibration	open
+95	Golfers	Swing.c	chunk 2/3	SW_vStateThroughSwing .. SW_vCalculateMishitAngle	open
+96	Golfers	Swing.c	chunk 3/3	SW_fPowerAdjustForDraw .. SW_vImpactForController8	open
+97	Golfers	Swing.c	whole-file review	the whole file	open
+98	Golfers	CaddieTips.c	pass	the whole file	open
+99	Golfers	Code8002DB80.c	pass	the whole file	open
+100	Golfers	ai_brain.c	pass	the whole file	open
+101	Golfers	emotion.c	pass	the whole file	open
+102	Golfers	target.c	chunk 1/2	target_StrippedFn .. PlaceBall_UpdateMomentums	open
+103	Golfers	target.c	chunk 2/2	fn_80069A84 .. fn_8006AA3C	open
+104	Golfers	target.c	whole-file review	the whole file	open
+105	Golfers	stateFunc.c	chunk 1/3	stateFunc_StrippedFn .. STATEFUNC_ReplaySwingUpdate	open
+106	Golfers	stateFunc.c	chunk 2/3	STATEFUNC_ReplaySwingExit .. STATEFUNC_FadeToTapInInit	open
+107	Golfers	stateFunc.c	chunk 3/3	STATEFUNC_FadeToTapInUpdate .. fn_80062E20	open
+108	Golfers	stateFunc.c	whole-file review	the whole file	open
+109	Characters	hwsMaterial_Gc.c	pass	the whole file	open
+110	Characters	hwsOverride_Gc.c	pass	the whole file	open
+111	Characters	char_tex_manager.c	pass	the whole file	open
+112	Characters	mtalib.c	pass	the whole file	open
+113	Characters	Code80095564.c	pass	the whole file	open
+114	Characters	ska_shared.c	pass	the whole file	open
+115	Characters	DynChain.c	pass	the whole file	open
+116	Characters	hwsRender_Gc.c	pass	the whole file	open
+117	Characters	Skeleton.c	chunk 1/2	SKEL_SetIKChainRotations .. SKEL_FreeIKSkeleton	open
+118	Characters	Skeleton.c	chunk 2/2	SKEL_LoadFromMem .. BitArray_CopyArray	open
+119	Characters	Skeleton.c	whole-file review	the whole file	open
+120	Characters	skalib.c	chunk 1/3	AnimLib_FindByName .. AnimLib_DropCb	open
+121	Characters	skalib.c	chunk 2/3	AnimLib_ResolveRecord .. AnimLib_MergeOverlay	open
+122	Characters	skalib.c	chunk 3/3	AnimLib_FreeWorkCopies .. AnimLib_GetCharSlotLib	open
+123	Characters	skalib.c	whole-file review	the whole file	open
+124	Characters	SkinMorph.c	pass	the whole file	open
+125	Characters	CharSliders.c	pass	the whole file	open
+126	Characters	hwsBurn.c	pass	the whole file	open
+127	Characters	AnimStream.c	chunk 1/2	AnimStream_Init .. AnimStream_ReadPlayerClips	open
+128	Characters	AnimStream.c	chunk 2/2	AnimStream_ReadFirstClips .. SKA_UnpackSwappedName	open
+129	Characters	AnimStream.c	whole-file review	the whole file	open
+130	Characters	Code80037AB8.c	pass	the whole file	open
+131	Characters	SkinBurn.c	pass	the whole file	open
+132	Characters	animblender.c	pass	the whole file	open
+133	Characters	SkinPart.c	chunk 1/2	SkinPart_ApplyBodyChoices .. SkinPart_UpdateMarks	open
+134	Characters	SkinPart.c	chunk 2/2	SkinPart_FindPart .. SkinPart_FindDescPart	open
+135	Characters	SkinPart.c	whole-file review	the whole file	open
+136	Characters	CharAnim.c	pass	the whole file	open
+137	Characters	Skin.c	chunk 1/2	SKN_DrawShadowParts .. SKN_SwapDescHeader	open
+138	Characters	Skin.c	chunk 2/2	fn_800368FC_Read .. SKN_Create	open
+139	Characters	Skin.c	whole-file review	the whole file	open
+140	Characters	char.c	chunk 1/5	char_StrippedFn .. Character_SetPreferedPos	open
+141	Characters	char.c	chunk 2/5	fn_800187CC_Read .. Character_BeginLoadTexturesCallbackIG	open
+142	Characters	char.c	chunk 3/5	Character_EndLoadTexturesCallbackIG .. Character_UpdateClubAttachment	open
+143	Characters	char.c	chunk 4/5	Character_PlayClip .. SkeletalObject_UnregisterStreamClient	open
+144	Characters	char.c	chunk 5/5	Character_SetClubsAndClothes .. MtaLib_SwapAndLink	open
+145	Characters	char.c	whole-file review	the whole file	open
+146	The round	GameAnalysis.c	pass	the whole file	open
+147	The round	HoleScore.c	chunk 1/2	GameAnalysis_IsPuttForLead .. GameAnalysis_GetPuttBreakAngle	open
+148	The round	HoleScore.c	chunk 2/2	GameAnalysis_IsPuttFor .. GameAnalysis_Vec3Sub	open
+149	The round	HoleScore.c	whole-file review	the whole file	open
+150	The round	GameHoleContests.c	pass	the whole file	open
+151	The round	GameMessages.c	pass	the whole file	open
+152	The round	GameRound.c	chunk 1/2	GM_Vec4Sub .. GM_UserHasEagledHole	open
+153	The round	GameRound.c	chunk 2/2	GM_GetPar5EagleDate .. GUI_SendMessage31	open
+154	The round	GameRound.c	whole-file review	the whole file	open
+155	The round	GameUI.c	pass	the whole file	open
+156	The round	GameEffects.c	pass	the whole file	open
+157	The round	GameMode.c	chunk 1/2	GameManager_StrippedFn .. GM_ShowPostShotAnimation	open
+158	The round	GameMode.c	chunk 2/2	GM_ShowPostShotCrowdFlyby .. GUI_ToggleMulligan	open
+159	The round	GameMode.c	whole-file review	the whole file	open
+160	Game modes	GameMode6.c	pass	the whole file	done
+161	Game modes	GameMode_Practice.c	pass	the whole file	open
+162	Game modes	GameMode26.c	pass	the whole file	open
+163	Game modes	GameModeDriverPGATour.c	chunk 1/2	GameModeDriverPGATour_Init .. GameModeDriverPGATour_GoToPlayoff	open
+164	Game modes	GameModeDriverPGATour.c	chunk 2/2	GM_PgaTourMode_GetNEvents .. GameModeDriverPGATour_GetUsersCurrentEventID	open
+165	Game modes	GameModeDriverPGATour.c	whole-file review	the whole file	open
+166	Game modes	GameMode11.c	chunk 1/2	Lessons_Init .. Lessons_Update	open
+167	Game modes	GameMode11.c	chunk 2/2	Lessons_AllowFlightCamera .. Lessons_StartLine	open
+168	Game modes	GameMode11.c	whole-file review	the whole file	open
+169	Game modes	GameMode7.c	pass	the whole file	open
+170	Game modes	GameModeReplay.c	pass	the whole file	open
+171	Game modes	GameModeStroke.c	pass	the whole file	open
+172	Game modes	GameModeStableford.c	pass	the whole file	open
+173	Game modes	GameModeMatch.c	pass	the whole file	open
+174	Game modes	GameModeBestBall.c	pass	the whole file	open
+175	Game modes	LadderedMode.c	pass	the whole file	open
+176	Game modes	GameModeAlternateShot.c	pass	the whole file	open
+177	Game modes	GameModeFourBall.c	pass	the whole file	open
+178	Game modes	GameModeDriverRTE.c	pass	the whole file	open
+179	Game modes	GameModeBattle.c	pass	the whole file	open
+180	Game modes	GameMode12.c	pass	the whole file	open
+181	Game modes	GameMode_Skins.c	pass	the whole file	open
+182	Game modes	GameMode_SkillZoneCapture.c	pass	the whole file	open
+183	Game modes	GameMode_SkillZoneTarget.c	pass	the whole file	open
+184	Game modes	GameMode_SkillZoneTargetToTarget.c	pass	the whole file	open
+185	Game modes	GameMode_SkillZoneHorse.c	pass	the whole file	open
+186	Game modes	PlayNowMode.c	chunk 1/2	PlayNow_Init .. PlayNow_GetMedal	open
+187	Game modes	PlayNowMode.c	chunk 2/2	PlayNow_IsSpeedGolf .. PlayNow_SendMessage18	open
+188	Game modes	PlayNowMode.c	whole-file review	the whole file	open
+189	Game modes	GameMode8.c	chunk 1/3	SpeedGolf_Init .. SpeedGolf_OnBallAtRest	open
+190	Game modes	GameMode8.c	chunk 2/3	SpeedGolfPoints_ScoreHoleResult .. SpeedGolf_HoleOverInit	open
+191	Game modes	GameMode8.c	chunk 3/3	SpeedGolf_HoleOverUpdate .. SpeedGolf_Vec4Sub	open
+192	Game modes	GameMode8.c	whole-file review	the whole file	open
+193	Game modes	GameMode_SkillZoneTimed.c	pass	the whole file	open
+194	Game modes	GameMode22.c	pass	the whole file	open
+195	Game modes	GameMode_SkillZoneBase.c	pass	the whole file	open
+196	Career	Calendar.c	pass	the whole file	done
+197	Career	LadderMap.c	pass	the whole file	open
+198	Career	GameMode4Menu.c	pass	the whole file	open
+199	Career	fe_stats.c	pass	the whole file	open
+200	Career	FE_CalendarPopups.c	pass	the whole file	done
+201	Career	CalendarScreen.c	pass	the whole file	open
+202	Career	PGATourSimulation.c	chunk 1/3	GetEntrantMCPtr .. GM_PgaTourSim_GetGolferIDFromEntrantID	open
+203	Career	PGATourSimulation.c	chunk 2/3	GetLastHoleToScore .. CalcRankingsForStat	open
+204	Career	PGATourSimulation.c	chunk 3/3	CalcSimplePlayerStats .. GM_PgaTourSim_SetScoresDirty	open
+205	Career	PGATourSimulation.c	whole-file review	the whole file	open
+206	Career	Earnings.c	chunk 1/4	GM_Earnings_CopyGoalResults .. GM_Earnings_PayRoundGoals	open
+207	Career	Earnings.c	chunk 2/4	Earnings_GetSurfaceClassBit .. GM_Earnings_CheckEagleEveryPar5	open
+208	Career	Earnings.c	chunk 3/4	GM_Earnings_CheckWinAllTournaments .. HighScoreRecords_GetSkillZoneRecordType	open
+209	Career	Earnings.c	chunk 4/4	Earnings_GetLongDriveRecordType .. Earnings_GetAwardMessageId	open
+210	Career	Earnings.c	whole-file review	the whole file	open
+211	Career	FE_Calendar.c	pass	the whole file	open
+212	Situation scripts and commentary	Code80193188.c	pass	the whole file	open
+213	Situation scripts and commentary	SitDevCommentaryZones.c	pass	the whole file	done
+214	Situation scripts and commentary	SitDevFile.c	pass	the whole file	open
+215	Situation scripts and commentary	SitDevTrigger.c	pass	the whole file	open
+216	Situation scripts and commentary	SitDevMisc.c	pass	the whole file	open
+217	Situation scripts and commentary	event.c	chunk 1/2	EVENT_InitForGame .. EVENT_BallHitDelayed	open
+218	Situation scripts and commentary	event.c	chunk 2/2	EVENT_Trigger .. GameEffects_GetCurrentTriggerType	open
+219	Situation scripts and commentary	event.c	whole-file review	the whole file	open
+220	Situation scripts and commentary	SitDev.c	pass	the whole file	open
+221	Situation scripts and commentary	SitDevStateVector.c	pass	the whole file	open
+222	Save data	user.c	pass	the whole file	open
+223	Save data	Common/Crypt/CryptXOR.c	pass	the whole file	done
+224	Save data	gbacable.c	chunk 1/2	Gba_CalcCheckByte .. Gba_StepPorts	open
+225	Save data	gbacable.c	chunk 2/2	fn_80123E34_Read .. Gba_UpdateLinkState	open
+226	Save data	gbacable.c	whole-file review	the whole file	open
+227	Save data	Common/Checksum/ChecksumCRC32.c	pass	the whole file	done
+228	Save data	TibExt.c	pass	the whole file	open
+229	Save data	NGC/SharedFileIO/llSharedFileIO.c	pass	the whole file	open
+230	Save data	EASB.c	pass	the whole file	open
+231	Save data	Common/TagFile/TagFile.c	pass	the whole file	open
+232	Save data	MC.c	chunk 1/2	MC_LoadInitialUser .. MC_SaveUser	open
+233	Save data	MC.c	chunk 2/2	fn_800A1164 .. fn_800A27F4	open
+234	Save data	MC.c	whole-file review	the whole file	open
+235	Save data	MC_Gc.c	chunk 1/2	fn_8009CB9C .. fn_8009E360	open
+236	Save data	MC_Gc.c	chunk 2/2	fn_8009E47C .. MC_pGetMC	open
+237	Save data	MC_Gc.c	whole-file review	the whole file	open
+238	Save data	EASportsBio.c	pass	the whole file	open
+239	Save data	Common/SharedFileIO/SharedFileIO.c	chunk 1/2	fn_8016CFF8_SetSaveDescriptor .. SFIOGetSessionInfo	open
+240	Save data	Common/SharedFileIO/SharedFileIO.c	chunk 2/2	fn_8016FBB8_DeleteStart .. SFIOGetHeaderSize	open
+241	Save data	Common/SharedFileIO/SharedFileIO.c	whole-file review	the whole file	open
+242	Save data	EASBStorage.c	chunk 1/3	fn_80127D84 .. fn_80129218	open
+243	Save data	EASBStorage.c	chunk 2/3	EASB_PackValue .. fn_8012B190	open
+244	Save data	EASBStorage.c	chunk 3/3	fn_8012B27C .. fn_8012CCCC	open
+245	Save data	EASBStorage.c	whole-file review	the whole file	open
+246	Disc	DiscCheck.c	pass	the whole file	open
+247	Disc	DiscError.c	pass	the whole file	open
+248	Disc	Code800B7210.c	pass	the whole file	open
+249	Movies	maddeca.c	pass	the whole file	open
+250	Movies	madidct.c	pass	the whole file	open
+251	Movies	LLVideo.c	pass	the whole file	open
+252	Movies	LLPictInt.c	pass	the whole file	open
+253	Movies	LLPict_Gc.c	pass	the whole file	open
+254	Movies	rcmp_mad_codec.c	pass	the whole file	open
+255	Movies	maddec.c	pass	the whole file	open
+256	Boot and game flow	ScreenClear.c	pass	the whole file	open
+257	Boot and game flow	GoHoleLoader.c	pass	the whole file	open
+258	Boot and game flow	Code8002EE1C.c	pass	the whole file	open
+259	Boot and game flow	BootCourse.c	pass	the whole file	open
+260	Boot and game flow	GoEntry.c	pass	the whole file	open
+261	Boot and game flow	gomainloop.c	chunk 1/2	gomainloop_StrippedFn .. GO_vInitIG	open
+262	Boot and game flow	gomainloop.c	chunk 2/2	fn_8006CDC4 .. TI_fConvertTimeDifToSeconds	open
+263	Boot and game flow	gomainloop.c	whole-file review	the whole file	open
+264	Boot and game flow	unsorted/sweep_80005580.c	fold	prove its file and fold it in	open
+265	Boot and game flow	unsorted/sweep_800055D4.c	fold	prove its file and fold it in	open
+266	Boot and game flow	unsorted/sweep_80005590.c	fold	prove its file and fold it in	open
+267	Boot and game flow	unsorted/sweep_80005520.c	fold	prove its file and fold it in	open
+268	Boot and game flow	unsorted/sweep_800055D8.c	fold	prove its file and fold it in	open
+269	Shader objects and effects	GoShaderObjectCommon_TexAnimManager_Gc.c	pass	the whole file	open
+270	Shader objects and effects	GoShaderObjectCommon_MorphAnimManager_Gc.c	pass	the whole file	open
+271	Shader objects and effects	UFstPart.c	pass	the whole file	open
+272	Shader objects and effects	ShaderRow0.c	pass	the whole file	open
+273	Shader objects and effects	ShaderRow19.c	pass	the whole file	open
+274	Shader objects and effects	GoShaderObjectContainer_OBFData_Gc.c	pass	the whole file	open
+275	Shader objects and effects	PsMgr.c	pass	the whole file	open
+276	Shader objects and effects	Code8006F608.c	pass	the whole file	open
+277	Shader objects and effects	GoShaderObject_Rain_Gc.c	pass	the whole file	open
+278	Shader objects and effects	GoShaderObject_Particle_Gc.c	pass	the whole file	open
+279	Shader objects and effects	GoShaderObject_Grass_Gc.c	pass	the whole file	open
+280	Shader objects and effects	PsBallFx.c	pass	the whole file	open
+281	Shader objects and effects	GoShaderObject_Glows_Gc.c	pass	the whole file	open
+282	Shader objects and effects	GoShaderObjectCommon_ShaderObjectsData_Gc.c	pass	the whole file	open
+283	Shader objects and effects	DynamicRenderingBuffer.c	pass	the whole file	open
+284	Shader objects and effects	Code80070EC4.c	pass	the whole file	open
+285	Shader objects and effects	GoShaderObject_PrelitUVAnimation_Gc.c	pass	the whole file	open
+286	Shader objects and effects	unsorted/sweep_800977CC.c	fold	prove its file and fold it in	open
+287	Shader objects and effects	unsorted/sweep_80070168.c	fold	prove its file and fold it in	open
+288	Shader objects and effects	unsorted/sweep_8009554C.c	fold	prove its file and fold it in	open
+289	Shader objects and effects	unsorted/sweep_8006FF2C.c	fold	prove its file and fold it in	open
+290	Shader objects and effects	unsorted/sweep_80097EC4.c	fold	prove its file and fold it in	open
+291	Rendering	GoViewport.c	pass	the whole file	done
+292	Rendering	GoFrameBuf.c	pass	the whole file	done
+293	Rendering	GoRenderSurface.c	pass	the whole file	open
+294	Rendering	GoFog.c	pass	the whole file	open
+295	Rendering	LLFont.c	pass	the whole file	open
+296	Rendering	RenderAccessors.c	pass	the whole file	done
+297	Rendering	LLTexGrp.c	pass	the whole file	open
+298	Rendering	SunFlr_Gc.c	pass	the whole file	open
+299	Rendering	LLDisp_Gc.c	pass	the whole file	open
+300	Rendering	LLTex.c	pass	the whole file	open
+301	Rendering	Code8009B340.c	pass	the whole file	open
+302	Rendering	GoCamera.c	pass	the whole file	open
+303	Rendering	LLObj_Gc.c	pass	the whole file	open
+304	Rendering	UFont.c	pass	the whole file	open
+305	Rendering	GoLighting.c	pass	the whole file	open
+306	Rendering	UObject3D.c	pass	the whole file	open
+307	Rendering	GxUtil.c	pass	the whole file	open
+308	Rendering	GoRenderCtx_Gc.c	pass	the whole file	open
+309	Rendering	LLDynTex.c	pass	the whole file	open
+310	Rendering	Code8009A928.c	pass	the whole file	open
+311	Rendering	Code800BA940.c	pass	the whole file	open
+312	Rendering	GoLightFogEnv.c	pass	the whole file	open
+313	Rendering	Code80015470.c	pass	the whole file	open
+314	Rendering	GoObjShadow.c	pass	the whole file	open
+315	Rendering	goballfx.c	pass	the whole file	open
+316	Rendering	Code8009AA28.c	pass	the whole file	open
+317	Rendering	Code80016198.c	pass	the whole file	open
+318	Rendering	GoGreenGrid.c	pass	the whole file	open
+319	Rendering	DepthField.c	pass	the whole file	open
+320	Rendering	GoBreakLine.c	pass	the whole file	open
+321	Rendering	GoPostFx.c	pass	the whole file	open
+322	Rendering	shadow.c	pass	the whole file	open
+323	Rendering	GoTerrain.c	chunk 1/4	GoTerrain_StrippedFn .. Ter_LODStepsFromDistances	open
+324	Rendering	GoTerrain.c	chunk 2/4	GoTerrain_StrippedFn4 .. Ter_SetObjectRenderState	open
+325	Rendering	GoTerrain.c	chunk 3/4	Ter_StartCrowdAnimation .. Ter_DrawGrassPatchesPass3	open
+326	Rendering	GoTerrain.c	chunk 4/4	Ter_BuildGrassPatchList .. CharacterRender_RenderSetup	open
+327	Rendering	GoTerrain.c	whole-file review	the whole file	open
+328	Rendering	GoGrass.c	pass	the whole file	open
+329	Rendering	unsorted/sweep_8009B314.c	fold	prove its file and fold it in	open
+330	Rendering	unsorted/code_800080D0.c	fold	prove its file and fold it in	open
+331	Rendering	unsorted/sweep_800136F4.c	fold	prove its file and fold it in	open
+332	Rendering	unsorted/code_800082F8.c	fold	prove its file and fold it in	open
+333	Rendering	unsorted/sweep_8009A844.c	fold	prove its file and fold it in	open
+334	EA UI Studio library	UIStudio.c	pass	the whole file	open
+335	EA UI Studio library	UISScreen.c	chunk 1/2	_IsChildOfControl .. _ParseInitialize	open
+336	EA UI Studio library	UISScreen.c	chunk 2/2	_DetermineVisibility .. _ParseMaps	open
+337	EA UI Studio library	UISScreen.c	whole-file review	the whole file	open
+338	EA UI Studio library	UISEvent.c	pass	the whole file	open
+339	EA UI Studio library	UISApi.c	pass	the whole file	open
+340	EA UI Studio library	UISStack.c	chunk 1/1	_UISPatchFncPC .. UISStackProcess	open
+341	EA UI Studio library	UISStack.c	whole-file review	the whole file	open
+342	Front end and UI	uiTransform.c	pass	the whole file	open
+343	Front end and UI	Code800B9944.c	pass	the whole file	open
+344	Front end and UI	uiObject.c	pass	the whole file	open
+345	Front end and UI	Code80090940.c	pass	the whole file	open
+346	Front end and UI	Code800B1D3C.c	pass	the whole file	open
+347	Front end and UI	uiEATrax.c	pass	the whole file	open
+348	Front end and UI	FE_LogoDesign.c	pass	the whole file	open
+349	Front end and UI	uiText.c	pass	the whole file	open
+350	Front end and UI	PasswordManager.c	pass	the whole file	open
+351	Front end and UI	uiLoadFile.c	pass	the whole file	open
+352	Front end and UI	fe_craputils.c	pass	the whole file	open
+353	Front end and UI	GameUICommands.c	chunk 1/4	IG_RunGameMessage .. GM_vClosePauseMenu	open
+354	Front end and UI	GameUICommands.c	chunk 2/4	GM_vPauseGame .. GM_vConcede_Hole	open
+355	Front end and UI	GameUICommands.c	chunk 3/4	GM_vReportCaddieTipWindow .. GM_vGetHoleContestWon	open
+356	Front end and UI	GameUICommands.c	chunk 4/4	GM_vIsLadderEvent .. Gaud_StartPlaylist18Comment	open
+357	Front end and UI	GameUICommands.c	whole-file review	the whole file	open
+358	Front end and UI	uiArc.c	pass	the whole file	open
+359	Front end and UI	FE_CrAPDB.c	chunk 1/3	FE_CrAP_InitModule .. FE_CrAP_GetSubCategoryIndexForCategoryAndSubcategoryID	open
+360	Front end and UI	FE_CrAPDB.c	chunk 2/3	FE_CrAP_GetSubCategoryNameForCategoryAndSubcategoryIndex .. FE_CrAP_GetUnlockMessageFrom	open
+361	Front end and UI	FE_CrAPDB.c	chunk 3/3	FE_CrAP_TryClubSwappingAsset .. FE_SendHint10Args	open
+362	Front end and UI	FE_CrAPDB.c	whole-file review	the whole file	open
+363	Front end and UI	FE_PGATourMessages.c	pass	the whole file	open
+364	Front end and UI	uiProcessPolygon.c	pass	the whole file	open
+365	Front end and UI	FEgolferanim.c	chunk 1/3	FEgolferanim_StrippedFn .. FE_vUpdateGolferAll	open
+366	Front end and UI	FEgolferanim.c	chunk 2/3	FE_vRenderGolferAllPhase1 .. FE_vTriggerCrAPAnimAndCamera	open
+367	Front end and UI	FEgolferanim.c	chunk 3/3	FE_GetCurrentAnimName .. FE_Vec4Sub	open
+368	Front end and UI	FEgolferanim.c	whole-file review	the whole file	open
+369	Front end and UI	FE_CrAPMessages.c	chunk 1/2	GM_vGetNumCrAPItems .. GM_vGetNewCrAPItemsText	open
+370	Front end and UI	FE_CrAPMessages.c	chunk 2/2	GM_vGetTodaysDate .. GM_vIsCrAPItemRemovable	open
+371	Front end and UI	FE_CrAPMessages.c	whole-file review	the whole file	open
+372	Front end and UI	FE_Manager.c	chunk 1/2	FE_Manager_StrippedFn .. FE_CrAP_IsItemLocked	open
+373	Front end and UI	FE_Manager.c	chunk 2/2	FE_DateToInt .. FE_IsHiddenAttribute	open
+374	Front end and UI	FE_Manager.c	whole-file review	the whole file	open
+375	Front end and UI	FE_MessageTable.c	chunk 1/8	FE_RunGameMessage .. FE_InitGameMessages	open
+376	Front end and UI	FE_MessageTable.c	chunk 2/8	GM_vGetMinPlayersForMode .. GM_vGetBioLines	open
+377	Front end and UI	FE_MessageTable.c	chunk 3/8	GM_vSaveGolferModel .. GM_vSetVibration	open
+378	Front end and UI	FE_MessageTable.c	chunk 4/8	FE_GetRecordEntry .. GM_vSaveCreatedPlayerToSlot	open
+379	Front end and UI	FE_MessageTable.c	chunk 5/8	GM_vGetMenuGameMode .. GM_vSetOptionLevel2	open
+380	Front end and UI	FE_MessageTable.c	chunk 6/8	GM_vGetOptionN14 .. GM_vGetEATraxTrack	open
+381	Front end and UI	FE_MessageTable.c	chunk 7/8	GM_vSetCustomRoundSlot .. GM_vGbaIsLinkFailed	open
+382	Front end and UI	FE_MessageTable.c	chunk 8/8	GM_vGbaResumeLink .. MC_CallActionFnSave	open
+383	Front end and UI	FE_MessageTable.c	whole-file review	the whole file	open
+384	Front end and UI	uiProcessInterface.c	pass	the whole file	open
+385	Unplaced	unsorted/sweep_8003944C.c	fold	prove its file and fold it in	open
+386	Unplaced	unsorted/sweep_80095780.c	fold	prove its file and fold it in	open
+387	Unplaced	unsorted/sweep_80095798.c	fold	prove its file and fold it in	open
+388	Unplaced	unsorted/sweep_800957B0.c	fold	prove its file and fold it in	open
+389	Unplaced	unsorted/sweep_80095744.c	fold	prove its file and fold it in	open
+390	Unplaced	unsorted/sweep_800957D8.c	fold	prove its file and fold it in	open

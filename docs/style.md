@@ -213,6 +213,17 @@ lint finding, so done stays true. `python tools/quality/audit.py` shows the coun
 `--sync` updates the rows after files are merged, split or moved (a merged file is done only when
 all of it is).
 
+The work left is planned in [`audit-plan.tsv`](audit-plan.tsv): every task in the order it runs,
+area by area (the areas of `src/README.md`). Each task is one writer and one reviewer, and the
+reviewer marks its row done along with the file's row. A file up to about 1,000 lines gets one
+`pass`. A bigger file gets `chunk` passes, each over a group of its functions, then a
+`whole-file review`. The writer and the reviewer of a chunk read the whole file first and change
+or grade only their chunk; the file stays `open` between chunks. The whole-file review is a fresh
+reviewer reading the whole file (its header, both ends, names across its functions, every comment),
+and only it marks the file done. A `fold` proves which file an `unsorted/` scrap belongs to and
+folds it in. A pass that renames, splits or merges a file updates the plan in the same commit.
+`audit.py --check` fails when the plan and `audit.tsv` disagree.
+
 Each item below fails a file. "Becomes" is the fix.
 
 Comments
