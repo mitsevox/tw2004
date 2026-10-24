@@ -23,7 +23,6 @@ void RC_UpdateCurrentScreenMatrices(void);
 void CharacterRender_RenderSetup(void); // GoTerrain.c
 void SKN_DrawCharacter(Character* pChar, u32 uFlags);
 u8   Character_IsGolfer(Character* pChar);
-void Character_GetBonePos(Character* pChar, int nBone, f32* pPos);   // char.c: a bone's position
 void RC_vSetCurrentRenderCtx(void* pCamera);        // makes it the current render camera
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);       // identity
 void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: copy a 4x4 matrix

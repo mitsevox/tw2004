@@ -48,11 +48,69 @@ typedef enum CameraInterpType_e {
     CAMINTERP_CUT = 5           // no move: the camera stays on the shot, then cuts to the next
 } CameraInterpType_e;
 
-// The script state a shot serves (CamShot.nStateType).
+// The script state a shot serves (CamShot.nStateType, CameraSequence_t.nStateType): the golf camera
+// that picks it (DynamicCam_ChooseScript, DynamicCam_ChooseSequence).
 typedef enum CameraShotState_e {
     CAMSTATE_FLYBY = 0,         // a fly-by shot (CamScript_RunFlybyCamera flies it)
-    CAMSTATE_STATIC = 38        // a static camera
+    CAMSTATE_PRE_SHOT = 1,      // the pre-shot camera (GolfCamera_InitPreShotCamera)
+    CAMSTATE_SHOT_SETUP = 2,    // the shot set-up camera (GolfCamera_InitShotSetupCamera)
+    CAMSTATE_SWING = 3,         // the swing camera (GolfCamera_InitSwingCamera)
+    CAMSTATE_BALL_FLIGHT = 4,   // the ball-flight camera (GolfCamera_InitBallFlightCamera)
+    CAMSTATE_REPLAY_SWING = 13, // the replay swing camera's shots (GolfCamera_CreateReplayCamera; also
+                                // the heartbeat and shutter cameras' when they have none of their own)
+    CAMSTATE_SWING_OBSTRUCTED = 28, // the swing camera when its view is blocked: an object or hazard
+                                    // by the ball (DynamicCam_ChoosePreFlightSequence) or the golfer
+                                    // hidden (GolfCamera_InitSwingCamera)
+    CAMSTATE_ALT_SWING_1 = 29,  // } the alternate swing cameras the player steps through
+    CAMSTATE_ALT_SWING_2 = 30,  // } (GolfCamera_GetAlternateSwingCamera)
+    CAMSTATE_ALT_SWING_3 = 31,  // }
+    CAMSTATE_ALT_SWING_4 = 32,  // }
+    CAMSTATE_ALT_SWING_5 = 33,  // }
+    CAMSTATE_MATRIX_SWING = 34, // the matrix camera's shot (GolfCamera_CreateMatrixCamera) and the
+                                // slow-motion replay swing's (GolfCamera_CreateReplayCamera)
+    CAMSTATE_STATIC = 38,       // a static camera
+    CAMSTATE_COMIC_3SCREEN = 40, // } the comic camera's panels (GoComicCam.c): 40..42 for the
+    CAMSTATE_COMIC_9SCREEN = 43  // } three-panel layout, 43..45 for the nine-panel one
 } CameraShotState_e;
+
+// A camera event (CameraController_PostEvent; the script's nRequestedEvent; the event a sequence's
+// shot choice answers, CameraEventTrigger_t.nEvent).
+typedef enum CameraEvent_e {
+    CAMEVENT_ANY = 9,           // a choice for it answers every event but CAMEVENT_PRESHOT_TIMED
+                                // (DynamicCam_ChooseScriptInSequence)
+    CAMEVENT_TIMED_FIRST = 13,  // } the events a choice's time trigger may ask for
+    CAMEVENT_TIMED_LAST = 22,   // } (CameraEventTrigger_t.nTimeTrigger); the pre-shot camera starts
+                                //   with the first (GolfCamera_InitPreShotCamera)
+    CAMEVENT_PRESHOT_TIMED = 23, // posted in the pre-shot when its sequence has a shot for it
+                                 // (GolfCamera_IsThereACameraGoingToBeTimeTriggered)
+    CAMEVENT_NONE = 25          // none: no time trigger (CameraScript_InterpToNewScript)
+} CameraEvent_e;
+
+// A point a dynamic shot places its camera by (CamShot.nFromPoint, nToPoint; DynamicCam_GetLocation).
+typedef enum CameraTracking_e {
+    CAMPOINT_BALL = 0,          // the ball (DynamicCam_GetSmoothBallLocation)
+    CAMPOINT_BALL_AHEAD = 23    // the look-at point of this number is ahead of the ball along its
+                                // flight (CamScript_GetLookAtPoint); DynamicCam_GetLocation has no
+                                // case for it. The tracking functions wait for a ball update for both.
+} CameraTracking_e;
+
+// How a dynamic shot's camera follows its two points (CamShot.nTrackMode; DynamicCam_ProcessScript).
+typedef enum CamTrackMode {
+    CAMTRACK_PERCENT_FLAT = 0,  // DynamicCam_TrackPercent: share fDist of the way from nFromPoint to
+                                // nToPoint, the way taken level
+    CAMTRACK_PERCENT = 1,       // the same, the way as it is
+    CAMTRACK_OFFSET_FLAT = 2,   // DynamicCam_TrackOffset: fDist along the level direction from
+                                // nFromPoint to nToPoint
+    CAMTRACK_OFFSET_FLAT_LAGGED = 3,    // the same, and the camera trails its moves
+    CAMTRACK_OFFSET = 4,        // fDist along the direction as it is
+    CAMTRACK_BALL_LAG = 5,      // DynamicCam_TrackBallVelocityLag: follows the ball's flight, closing in
+                                // and turning round the ball a share a frame
+    CAMTRACK_BALL_LAG_FLAT = 6, // the same, the flight taken level
+    CAMTRACK_BALL_TIGHT = 7,    // DynamicCam_TrackBallVelocityTight: on the ball's flight each frame
+    CAMTRACK_OFFSET_TO_PIN = 8, // as CAMTRACK_OFFSET, but once the ball is past a share of the way to
+                                // the pin the camera moves only part of the way from where it was
+    CAMTRACK_FIXED = 9          // DynamicCam_TrackFixed: at nFromPoint
+} CamTrackMode;
 
 // What a shot looks at (CamShot.nLookAtKind; CamScript_GetLookAtPoint).
 typedef enum CamLookAtKind {
@@ -131,7 +189,8 @@ typedef struct CamShot {
     u8   bDynamic;              // 0xA8  played by the dynamic camera (DynamicCam_ProcessScript); 0: by
                                 //       the static camera (StaticCam_ProcessScript)
     u8   bHasPrev;              // 0xA9  another shot's pNext leads here: not the first of its sequence
-                                //       or route (DynamicCam_ParseCameraViewsFE, StaticCam_GetFlyByCam)
+                                //       or route (DynamicCam_ChooseScript never picks it;
+                                //       StaticCam_GetFlyByCam)
     u8   bShowGolfer;           // 0xAA  the golfer is drawn in this shot
     u8   nInterpType;           // 0xAB  how the script moves into it (CameraInterpType_e: 0 a plain
                                 //       blend, 1 fixed target, 13 share of the flight, 15 share
@@ -142,8 +201,8 @@ typedef struct CamShot {
                                 //       DynamicCam_MatchScriptStateType)
     s8   nUnread;               // 0xAE  a static camera's StaticCamFromTess_t.nUnread; never read
     u8   nFromPoint;            // 0xAF  } the two points the camera's place is measured between
-    u8   nToPoint;              // 0xB0  } (DynamicCam_GetLocation kinds; 16: the ball)
-    u8   nTrackMode;            // 0xB1  how the camera follows them (DynamicCam_ProcessScript)
+    u8   nToPoint;              // 0xB0  } (CameraTracking_e; DynamicCam_GetLocation)
+    u8   nTrackMode;            // 0xB1  how the camera follows them (CamTrackMode)
     u8   nHeightRef;            // 0xB2  what the camera's height is taken from (CamHeightRef;
                                 //       DynamicCam_AddHeightOffset)
     u8   unkB3[0xC0 - 0xB3];
@@ -261,11 +320,13 @@ LAYOUT_ASSERT(StaticCamManager_t, 0x1E68);
 
 extern StaticCamManager_t* gpStaticCams;
 
-// A camera sequence (DynamicCam's, 0x50 bytes): the shots a camera plan steps through, and the
-// conditions it is picked on. Its shot choices (CamChoice) are in dyncam.h.
-typedef struct CamSequence {
+// A camera sequence (0x50 bytes, from the 'CAMS' file; GoDynamicCam.c): the shots a camera plan
+// steps through, and the conditions it is picked on. Its shot choices (CameraEventTrigger_t) are in
+// dyncam.h.
+typedef struct CameraSequence_t {
     char szName[0x20];          // 0x00  "DEF..." for a default sequence (DynamicCam_IsDefualtSeq)
-    struct CamSequence* p20;   // 0x20  the sequence that follows (an index in the file)
+    struct CameraSequence_t* pNext; // 0x20  the sequence that follows (an index in the file; the
+                                    //       sequence itself when that one has no shot choices)
     f32  fMinDist;              // 0x24  } the distance to the pin it is picked for
     f32  fMaxDist;              // 0x28  } (DynamicCam_MatchDistToPin)
     f32  fMinPinHeight;         // 0x2C  } the pin's height over the ball it is picked for
@@ -274,7 +335,8 @@ typedef struct CamSequence {
     f32  f38;                   // 0x38  its length
     s32  nChoices;              // 0x3C  how many shot choices pChoices holds
     u32  uCourses;              // 0x40  one bit per course it is used on
-    u8   nStateType;            // 0x44  the script state it serves (DynamicCam_MatchStateType)
+    u8   nStateType;            // 0x44  the script state it serves (CameraShotState_e;
+                                //       DynamicCam_MatchStateType)
     u8   b45;                   // 0x45  the clubs it is for (DynamicCam_MatchSeqClub)
     u8   nShotType;             // 0x46  the shot types it is for (DynamicCam_MatchSeqShot); 6: the
                                 //       ball-flight camera keeps one for shot kind 5
@@ -287,9 +349,9 @@ typedef struct CamSequence {
     u8   uStartLies;            // 0x49  } camera lies, a bit each (DynamicCam_MatchLies): the
     u8   uEndLies;              // 0x4A  } ball's lie (the tee: 1), and the surface under it
     s8   n4B;                   // 0x4B  one bit per value of GM_GetCurrentHolePar
-    struct CamChoice* pChoices; // 0x4C  its shot choices (dyncam.h)
-} CamSequence;
-LAYOUT_ASSERT(CamSequence, 0x50);
+    struct CameraEventTrigger_t* pChoices; // 0x4C  its shot choices (dyncam.h)
+} CameraSequence_t;
+LAYOUT_ASSERT(CameraSequence_t, 0x50);
 
 // The colour fade over a view (CameraScriptSettings_t.nFade), run by CamScript_Fade.
 typedef enum CameraFadeType_e {
@@ -353,13 +415,14 @@ typedef struct CameraScriptSettings_t {
                                 //       (CamUtils_vCalcArcPosition)
     f32  fD4;                   // 0xD4  the camera's speed when the script moves to the next shot
                                 //       (CamScript_RunScript)
-    f32  fD8;                   // 0xD8  camera 8: the ground height it follows
-                                //       (DynamicCam_TrackBallVelocityTight measures the ball's height over
-                                //       it)
+    f32  fGroundHeight;         // 0xD8  the ground height the camera's heights are kept over: measured
+                                //       by DynamicCam_ProcessScript as a dynamic shot starts, eased by
+                                //       CamScript_SmoothTerrainHeight, set by some golf cameras
     f32  fLagAngle;             // 0xDC  how far the look direction may trail its target
                                 //       (CameraScript_KeepPointInView)
-    s32  nTriggerKind;          // 0xE0  } a shot kind started once fScriptTime passes fTriggerTime
-    f32  fTriggerTime;          // 0xE4  } (DynamicCam_ChooseScriptInSequence; 25 = none)
+    s32  nTriggerKind;          // 0xE0  } the camera event (CameraEvent_e) asked for once fScriptTime
+    f32  fTriggerTime;          // 0xE4  } passes fTriggerTime: a shot choice's time trigger
+                                //         (DynamicCam_ChooseScriptInSequence; CAMEVENT_NONE: none)
     u8   bNoGround;             // 0xE8  no ground was found under the camera
                                 //       (CamScript_SmoothTerrainHeight)
     u8   unkE9[0xEC - 0xE9];
@@ -371,7 +434,8 @@ typedef struct CameraScriptSettings_t {
     f32  fBlendShare;           // 0xF8  the blend's share so far (never goes back; 1 ends interp
                                 //       types 13 and 15)
     u8   unkFC[0x100 - 0xFC];
-    f32  fMaxBallToPin;         // 0x100  tracking mode 8: the largest CamScript_GetBallToPinPercent so far
+    f32  fMaxBallToPin;         // 0x100  CAMTRACK_OFFSET_TO_PIN: the largest CamScript_GetBallToPinPercent
+                                //        so far
     f32  f104;                  // 0x104
     f32  f108;                  // 0x108
     f32  f10C;                  // 0x10C
@@ -408,9 +472,9 @@ typedef struct View {
     u8       bFade;             // 0x06C  the fade is on
     u8       unk6D[3];
     s32      nCurCamera;        // 0x070  the camera mode (CameraMode_t)
-    CamSequence* p74;           // 0x074  the camera sequence the shots are picked from
-    CamSequence* p78;           // 0x078  the sequence before the post-shot cameras (p74 saved)
-    CamSequence* p7C;           // 0x07C  the swing camera's sequence, kept for the replay
+    CameraSequence_t* p74;      // 0x074  the camera sequence the shots are picked from
+    CameraSequence_t* p78;      // 0x078  the sequence before the post-shot cameras (p74 saved)
+    CameraSequence_t* p7C;      // 0x07C  the swing camera's sequence, kept for the replay
     CamShot* p80;               // 0x080
     CameraScriptSettings_t script;           // 0x084  the camera script the camera functions drive
     CamShot  shot19C;           // 0x19C  a shot built by hand (the knee, steep-slope and elevator cameras)
@@ -535,8 +599,8 @@ typedef struct sCameraTuningVars {
                                 //        (CameraScript_LagAimMarker) ...
     f32  fAimMarkerHeightShare; // 0x0DC  ... and its height's share of the way a frame (also the
                                 //        zoom-to-aim cameras')
-    f32  fGroundHeightShare;    // 0x0E0  CamScript_SmoothTerrainHeight: script.fD8's share of the way to
-                                //        the ground height a frame
+    f32  fGroundHeightShare;    // 0x0E0  CamScript_SmoothTerrainHeight: script.fGroundHeight's share of
+                                //        the way to the ground height a frame
     f32  fBallLagAngle;         // 0x0E4  the most the look may trail the ball (radians; also put in
                                 //        script.fLagAngle)
     f32  fGolferLagAngle;       // 0x0E8  ... or a bone of the golfer
@@ -596,8 +660,8 @@ typedef struct sCameraTuningVars {
                                 //        share of the way, each frame with ball updates
     f32  fGroundClearance;      // 0x168  the cameras' least height over the ground
     f32  fBallObstructionDist;  // 0x16C  an object or hazard this close to the ball stops the pre-shot
-                                //        animation (GM_DoPreshotAnimation) and turns pre-flight
-                                //        sequence kind 3 into 28
+                                //        animation (GM_DoPreshotAnimation) and turns the swing camera's
+                                //        pre-flight sequence into CAMSTATE_SWING_OBSTRUCTED's
     f32  fFadeTime;             // 0x170  the colour fades out at the end of a shot (GameMode.c,
                                 //        stateFunc.c) and into the scorecard and tutorial cameras; the
                                 //        golfer's animation counts as almost done within this of its end
@@ -612,7 +676,7 @@ typedef struct sCameraTuningVars {
                                 //        by this share of the ball's height above its fMaxHeight ...
     f32  fBelowMinDistShare;    // 0x190  ... or by this share of its height below its fMinHeight
     f32  fRiseStep;             // 0x194  DynamicCam_ProcessScript: how far a camera below its least
-                                //        height rises a frame (track modes 5..7)
+                                //        height rises a frame (CAMTRACK_BALL_LAG..CAMTRACK_BALL_TIGHT)
     f32  fTrackMinBallSpeed;    // 0x198  for a ball slower than this a following camera slows down
                                 //        (DynamicCam_TrackBallVelocityLag) or stops
                                 //        (DynamicCam_TrackBallVelocityTight)
@@ -668,7 +732,7 @@ typedef struct sCameraTuningVars {
     f32  fFallingHeightShare;   // 0x230  ... and near the shot's fMinHeight on the way down
     f32  fUnread5;              // 0x234  never read
     f32  fUnread6;              // 0x238  never read
-    f32  fTrackOffsetStartShare; // 0x23C  DynamicCam_TrackOffset, mode 8: past this share of the way to
+    f32  fTrackOffsetStartShare; // 0x23C  CAMTRACK_OFFSET_TO_PIN: past this share of the way to
                                 //        the pin (CamScript_GetBallToPinPercent) the camera's offset is
                                 //        scaled from fTrackOffsetStartScale ...
     f32  fTrackOffsetStartScale; // 0x240
@@ -906,21 +970,32 @@ void   RenderState_SetCameraMatrices(void);
 u8     RC_vComputeRenderCtxWorldToPrimitiveCoordinate(void* pCamera, f32* pPos, f32* pX, f32* pY, f32* pZ);
 void   fn_8006A8D4(void* pCamera, f32* pX, f32* pY);
 
-// ---- camera shots and sequences (0x8003A7C8..) ----------------------------------------------
+// ---- the dynamic cameras' shots and sequences (GoDynamicCam.c; its tables are in dyncam.h) ----
 
-CamShot* DynamicCam_ChooseScript(int nPlayer, int nKind, CamShot* pShot);
-u8       DynamicCam_bIsSwingCamera(CamShot* pShot);    // the shot is one of kinds 1, 3, 13, 28..34 or 40..45
-CamShot* DynamicCam_ChooseScriptByName(char* szName);     // the shot with this name (case ignored), or NULL
-// A shot of kind nKind from the sequence, picked at random, and its blend values (each out
-// pointer may be NULL).
-CamShot* DynamicCam_ChooseScriptInSequence(CamSequence* pSequence, int nKind, int* pA, f32* pF1, f32* pF2,
-                     int* pB, f32* pF3, int nPlayer);
-CamSequence* DynamicCam_ChooseSequence(int nPlayer, int nLie, int nClass, int nKind, u8 a, f32 fDist);
-CamSequence* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind);
+void     DynamicCam_RegisterStreamClients(void);
+void     DynamicCam_UnRegisterStreamClients(void);
+void     DynamicCam_RegisterStreamClientsFE(void);
+void     DynamicCam_UnRegisterStreamClientsFE(void);
+void     DynamicCam_Init(void);
+void     DynamicCam_DeInit(void);
+// lookAt and origCamPos are the view's look point and its camera position before this frame.
+void     DynamicCam_ProcessScript(CamShot* link, int ePlayerID, CameraScriptSettings_t* settings,
+                                  f32* position, f32* lookAt, f32* origCamPos, f32 timeStep);
+u8       DynamicCam_bIsSwingCamera(CamShot* camLink);
+CamShot* DynamicCam_ChooseScript(int ePlayerID, int state, CamShot* dontPick);
+CamShot* DynamicCam_ChooseScriptByName(char* camName);
+// A shot for the event from the sequence's choices, picked at random, and its blend (each out
+// pointer may be NULL): interp a CameraInterpType_e, timeTrigger a CameraEvent_e.
+CamShot* DynamicCam_ChooseScriptInSequence(CameraSequence_t* sequence, CameraEvent_e event, int* interp,
+                                           f32* time, f32* speed, int* timeTrigger, f32* timeTriggerTime,
+                                           int playerID);
+CameraSequence_t* DynamicCam_ChooseSequence(int nPlayer, int nLie, int nClass, int nKind, u8 a, f32 fDist);
+CameraSequence_t* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind);
 // The sequence and shot named after the golfer's clip (with b, Character.p1790 first).
-u8       DynamicCam_ChoosePairedSequenceOrCamera(int nPlayer, u8 b, CamSequence** ppSeq, CamShot** ppShot);
+u8       DynamicCam_ChoosePairedSequenceOrCamera(int nPlayer, u8 b, CameraSequence_t** ppSeq,
+                                                 CamShot** ppShot);
 // it suits the player's club and shot
-u8       DynamicCam_IsValidFlightSequence(CamSequence* pSequence, int nPlayer);
+u8       DynamicCam_IsValidFlightSequence(CameraSequence_t* pSequence, int nPlayer);
 u8     CamScript_DoesScriptTrackGolfer(CamShot* pShot);     // the shot's nLookAtKind is 1..6 or 7
 // The ball's position, or the script's v70 when the ball is by the pin (with bKeep v70 follows it).
 void   DynamicCam_GetSmoothBallLocation(CameraScriptSettings_t* pScript, CamShot* pShot, int nPlayer,
@@ -931,6 +1006,7 @@ u8     CameraScript_FlipCameraForLefty(int nPlayer, CamShot* pShot);
 
 // ---- the camera scripts (gocamscripts.c, 0x8003DCE8..) ----------------------------------------
 
+f32      CamScript_GetBallToPinPercent(int nPlayer, CameraScriptSettings_t* pScript);
 // pCam and pSub are the view's camera position and where it looks
 // (CameraController_GetCameraOrigin, CameraController_GetCameraLookPoint).
 void     CamScript_RunScript(int nPlayer, f32* pCam, f32* pSub, CameraScriptSettings_t* pScript,

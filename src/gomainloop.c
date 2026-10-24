@@ -104,8 +104,6 @@ void fn_800382E0(void);
 void fn_80038968(void);
 void fn_800389C0(void);
 void fn_80039358(int nView);
-void DynamicCam_Init(void);
-void DynamicCam_DeInit(void);
 void fn_80045660(void);
 void fn_80045848(int nPlayer);
 void fn_80045D18(void);
