@@ -727,7 +727,7 @@ u8 AudAram_InitModule(void) {
     gpAudAramHeapRecords = AudMem_Alloc(sizeof(ARAMHeap) + 32 * sizeof(ARAMBlock));
     gpAudAramHeap = GoARAM_HeapInit(ARAM_HEAP_SIZE, gAudAramBase, 32, gpAudAramHeapRecords);
     gAudAramZeroBlock = GoARAM_HeapAlloc(gpAudAramHeap, ARAM_ZERO_SIZE, 32);
-    gpAudAramZeroBuffer = fn_800951A0(ARAM_ZERO_SIZE, 32, 1);
+    gpAudAramZeroBuffer = Mem_AllocFunc(ARAM_ZERO_SIZE, 32, 1);
     Mem_set(gpAudAramZeroBuffer, 0, ARAM_ZERO_SIZE);
     AudDma_ToAram(gAudAramZeroBlock, gpAudAramZeroBuffer, ARAM_ZERO_SIZE, AudAram_ZeroBlockDone, 0);
     gAudAramStreamBuffers = GoARAM_HeapAlloc(gpAudAramHeap, 0x7F000, 32);
@@ -739,7 +739,7 @@ u8 AudAram_InitModule(void) {
 u8 AudAram_InitSession(void) {
     if (gbAudAramZeroDone) {
         gbAudAramZeroDone = 0;
-        fn_8009527C(gpAudAramZeroBuffer);
+        Mem_FreeFunc(gpAudAramZeroBuffer);
     }
     return 1;
 }
@@ -748,7 +748,7 @@ u8 AudAram_InitSession(void) {
 void AudAram_ExitSession(void) {
     if (gbAudAramZeroDone) {
         gbAudAramZeroDone = 0;
-        fn_8009527C(gpAudAramZeroBuffer);
+        Mem_FreeFunc(gpAudAramZeroBuffer);
     }
 }
 
@@ -1305,16 +1305,16 @@ void Startup_LoadLegalPicture(UStreamObject* pObject) {
     s32 nPad = 128 - (s32)pObject->uSize % 128;
     if (gnLegalPictures == 0) {
         gLegalPictureSize = pObject->uSize + nPad;
-        gpLegalPicture = StaticMem_Alloc(gLegalPictureSize, 2, 16, "startUp.c", 882);
+        gpLegalPicture = Circular_MemAllocFunc(gLegalPictureSize, MEMTYPE_LOW, 16, "startUp.c", 882);
         Mem_cpy(gpLegalPicture, pObject->pData, gLegalPictureSize);
         gnLegalPictures++;
     } else if (gnLegalPictures == 1) {
         gLegalPicture2Size = pObject->uSize + nPad;
-        gpLegalPicture2 = StaticMem_Alloc(gLegalPicture2Size, 2, 16, "startUp.c", 891);
+        gpLegalPicture2 = Circular_MemAllocFunc(gLegalPicture2Size, MEMTYPE_LOW, 16, "startUp.c", 891);
         Mem_cpy(gpLegalPicture2, pObject->pData, gLegalPicture2Size);
         gnLegalPictures++;
     }
-    StaticMem_Free(pObject);
+    Circular_MemFreeFunc(pObject);
 }
 
 // Build the card status table from scratch (as Startup_CheckCards does, without its messages), then look

@@ -113,7 +113,8 @@ void SKALIB_InitModule(void) {
         lbl_80281D18 = 0;
     }
     // four players
-    gLastReactionClips = StaticMem_Alloc(4 * sizeof(*gLastReactionClips), 2, 0, "skalib.c", 508);
+    gLastReactionClips =
+        Circular_MemAllocFunc(4 * sizeof(*gLastReactionClips), MEMTYPE_LOW, 0, "skalib.c", 508);
     Mem_set(gLastReactionClips, 0, 4 * sizeof(*gLastReactionClips));
     gSKAAram8BitFrame = gSkaFrame2Space;
     gSKAAram8BitFrame = (u8*)((((uptr)gSKAAram8BitFrame >> 5) + 1) << 5);
@@ -135,7 +136,7 @@ void SKALIB_CloseModule(void) {
     int i;
 
     AnimLib_FreeCopies();
-    StaticMem_Free(gLastReactionClips);
+    Circular_MemFreeFunc(gLastReactionClips);
     gLastReactionClips = NULL;
     for (i = 0; i < 3; i++) {
         if (gBankLibs[i] != NULL) {
@@ -158,23 +159,23 @@ void SKALIB_CloseModule(void) {
 void AnimLib_Free(AnimLib* pLib) {
     if (pLib->pFile != NULL) {
         if (pLib->pClipData != NULL) {
-            StaticMem_Free(pLib->ppClips);
+            Circular_MemFreeFunc(pLib->ppClips);
         }
-        StaticMem_Free(pLib->pFile);
+        Circular_MemFreeFunc(pLib->pFile);
     } else {
         if (pLib->ppClips != NULL) {
-            StaticMem_Free(pLib->ppClips);
+            Circular_MemFreeFunc(pLib->ppClips);
         }
         if (pLib->pIndex != NULL) {
-            StaticMem_Free(pLib->pIndex);
+            Circular_MemFreeFunc(pLib->pIndex);
         }
         if (pLib->pTree != NULL) {
-            StaticMem_Free(pLib->pTree);
+            Circular_MemFreeFunc(pLib->pTree);
         }
         if (pLib->pRecords != NULL) {
-            StaticMem_Free(pLib->pRecords);
+            Circular_MemFreeFunc(pLib->pRecords);
         }
-        StaticMem_Free(pLib);
+        Circular_MemFreeFunc(pLib);
     }
 }
 
@@ -190,9 +191,9 @@ void ClipBank_Free(ClipBank* pBank) {
         }
     }
     if (pBank->pFile != NULL) {
-        StaticMem_Free(pBank->pFile);
+        Circular_MemFreeFunc(pBank->pFile);
     } else {
-        StaticMem_Free(pBank);
+        Circular_MemFreeFunc(pBank);
     }
 }
 
@@ -444,7 +445,7 @@ void Skalib_SetBudgets(void) {
         gClipsPerLeaf = aKeepDouble[n - 1];
         gClipBankBudget = aBytes[n - 1];
     }
-    gCurLibSlot = (Misc_RandFunc(1) & 1) ^ 1;
+    gCurLibSlot = (Misc_RandFunc(RANDOM_PRESENTATION) & 1) ^ 1;
     if (gSlotsDoubleBuffered) {
         pSlot0 = &gLibSlots[0];
         pSlot1 = &gLibSlots[1];
@@ -533,10 +534,10 @@ int AnimLib_TrimCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB,
     return 0;
 }
 
-// A random fraction in [0, 1) (Misc_RandFuncf, stream 1): where AnimLib_TrimCb starts a leaf's kept
-// run.
+// A random fraction in [0, 1) (Misc_RandFuncf, RANDOM_PRESENTATION): where AnimLib_TrimCb starts a
+// leaf's kept run.
 f32 Skalib_Random(void) {
-    return Misc_RandFuncf(1);
+    return Misc_RandFuncf(RANDOM_PRESENTATION);
 }
 
 // A clip that can still be flagged for dropping: not merged into another record (2, 0x10), not
@@ -579,7 +580,7 @@ int AnimLib_MarkDropRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLea
             nMarked = 0;
             pIdx    = pLib->pIndex + pLeaf->nFirst;
             for (i = 0; i < nExtra; i++) {
-                nStart = Misc_RandFunc(1) % pLeaf->nCount;
+                nStart = Misc_RandFunc(RANDOM_PRESENTATION) % pLeaf->nCount;
                 for (j = nStart; j < pLeaf->nCount; j++) {
                     pRec = &pLib->pRecords[pIdx[j]];
                     if (SKA_MARKABLE(pRec, pCtx)) {
@@ -607,7 +608,7 @@ int AnimLib_MarkDropRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLea
                 }
             }
             for (i = nMarked; i < nExtra; i++) {
-                nStart = Misc_RandFunc(1) % pLeaf->nCount;
+                nStart = Misc_RandFunc(RANDOM_PRESENTATION) % pLeaf->nCount;
                 for (j = nStart; j < pLeaf->nCount; j++) {
                     pRec = &pLib->pRecords[pIdx[j]];
                     while ((pRec->uFlags & 2) || (pRec->uFlags & 0x10)) {
@@ -1255,19 +1256,22 @@ u32 AnimLib_PlanBank(u32 nSlot) {
             // in r20 until the retry and spills the one read at the end; one local: 99.4%)
             nBytesBefore2 = ctx.nBytes;
             nBytesBefore  = ctx.nBytes;
-            pRecordsCopy = StaticMem_Alloc(pLib->nRecords * sizeof(ClipRecord), 1, 0, "skalib.c", 2078);
+            pRecordsCopy = Circular_MemAllocFunc(pLib->nRecords * sizeof(ClipRecord), MEMTYPE_HIGH, 0,
+                                                 "skalib.c", 2078);
             Mem_cpy(pRecordsCopy, pLib->pRecords, pLib->nRecords * sizeof(ClipRecord));
-            pIndexCopy = StaticMem_Alloc(pLib->nClips2 * 2, 1, 0, "skalib.c", 2080);
+            pIndexCopy = Circular_MemAllocFunc(pLib->nClips2 * 2, MEMTYPE_HIGH, 0, "skalib.c", 2080);
             Mem_cpy(pIndexCopy, pLib->pIndex, pLib->nClips2 * 2);
-            pTreeCopy = StaticMem_Alloc(pLib->nTreeSize, 1, 0, "skalib.c", 2082);
+            pTreeCopy = Circular_MemAllocFunc(pLib->nTreeSize, MEMTYPE_HIGH, 0, "skalib.c", 2082);
             Mem_cpy(pTreeCopy, pLib->pTree, pLib->nTreeSize);
             for (i = 0; i < nOvs; i++) {
                 apRecords[i] =
-                    StaticMem_Alloc(pOvs[i].pWork->nRecords * sizeof(ClipRecord), 1, 0, "skalib.c", 2086);
+                    Circular_MemAllocFunc(pOvs[i].pWork->nRecords * sizeof(ClipRecord), MEMTYPE_HIGH, 0,
+                                          "skalib.c", 2086);
                 Mem_cpy(apRecords[i], pOvs[i].pWork->pRecords, pOvs[i].pWork->nRecords * sizeof(ClipRecord));
-                apIndex[i] = StaticMem_Alloc(pOvs[i].pWork->nClips2 * 2, 1, 0, "skalib.c", 2088);
+                apIndex[i] = Circular_MemAllocFunc(pOvs[i].pWork->nClips2 * 2, MEMTYPE_HIGH, 0,
+                                                   "skalib.c", 2088);
                 Mem_cpy(apIndex[i], pOvs[i].pWork->pIndex, pOvs[i].pWork->nClips2 * 2);
-                apTree[i] = StaticMem_Alloc(pOvs[i].nTree, 1, 0, "skalib.c", 2090);
+                apTree[i] = Circular_MemAllocFunc(pOvs[i].nTree, MEMTYPE_HIGH, 0, "skalib.c", 2090);
                 Mem_cpy(apTree[i], pOvs[i].pWork->pTree, pOvs[i].nTree);
             }
             if (!AnimLib_TrimToFit(&ctx, pLib, pOvs, nOvs, 0)) {
@@ -1296,13 +1300,13 @@ u32 AnimLib_PlanBank(u32 nSlot) {
                     }
                 }
             }
-            StaticMem_Free(pRecordsCopy);
-            StaticMem_Free(pIndexCopy);
-            StaticMem_Free(pTreeCopy);
+            Circular_MemFreeFunc(pRecordsCopy);
+            Circular_MemFreeFunc(pIndexCopy);
+            Circular_MemFreeFunc(pTreeCopy);
             for (i = 0; i < nOvs; i++) {
-                StaticMem_Free(apRecords[i]);
-                StaticMem_Free(apIndex[i]);
-                StaticMem_Free(apTree[i]);
+                Circular_MemFreeFunc(apRecords[i]);
+                Circular_MemFreeFunc(apIndex[i]);
+                Circular_MemFreeFunc(apTree[i]);
             }
             gClipBankStats[nSlot].nBytes    = ctx.nBytes - nHdr;
             gClipBankStats[nSlot].nKeep     = ctx.nKeep;
@@ -1313,11 +1317,11 @@ u32 AnimLib_PlanBank(u32 nSlot) {
         gClipBankStats[nSlot].n04     = 0;
         pBank = gClipBanks[nSlot];
         if (pBank == NULL) {
-            pBank = StaticMem_Alloc(nBudget, 2, 0x40, "skalib.c", 2159);
+            pBank = Circular_MemAllocFunc(nBudget, MEMTYPE_LOW, 0x40, "skalib.c", 2159);
         }
         nRet = nBudget;
     } else {
-        pBank = StaticMem_Alloc(nTotal, 2, 0x40, "skalib.c", 2175);
+        pBank = Circular_MemAllocFunc(nTotal, MEMTYPE_LOW, 0x40, "skalib.c", 2175);
         nRet  = nTotal;
     }
     pBank->nClips  = nClips;
@@ -1595,7 +1599,9 @@ s32 AnimLib_MergeOverlay(u8* pData, int nSlot) {
             pNew->nClips    = 0;
             pNew->pBank     = pBank;
             if (pOv->pChar->pRecords == NULL) {
-                pOv->pChar->pRecords = StaticMem_Alloc(pSrc->nClips * sizeof(ClipRecord), 2, 0, "skalib.c", 2943);
+                pOv->pChar->pRecords = Circular_MemAllocFunc(pSrc->nClips * sizeof(ClipRecord), MEMTYPE_LOW,
+                        0,
+                        "skalib.c", 2943);
             }
             ctx.pLib     = pNew;
             ctx.pRecords = pOv->pChar->pRecords;
@@ -1668,13 +1674,13 @@ void AnimLib_FreeCopies(void) {
         if (pSlot->nOverlays != 0) {
             for (j = 0; j < pSlot->nOverlays; j++) {
                 pOv = &pSlot->overlays[j];
-                StaticMem_Free(pOv->pCopy);
+                Circular_MemFreeFunc(pOv->pCopy);
                 pOv->pCopy = NULL;
             }
         }
         pSlot->nOverlays = 0;
         if (pSlot->pCopy != NULL) {
-            StaticMem_Free(pSlot->pCopy);
+            Circular_MemFreeFunc(pSlot->pCopy);
         }
         pSlot->pCopy = NULL;
     }
@@ -1735,13 +1741,13 @@ void AnimLib_ReloadSlot(void) {
     }
     pSlot = &gLibSlots[nSlot];
     if (pSlot->nOverlays != 0) {
-        pSlot->pLib = StaticMem_Alloc(pSlot->nSize, 1, 0x40, "skalib.c", 3193);
+        pSlot->pLib = Circular_MemAllocFunc(pSlot->nSize, MEMTYPE_HIGH, 0x40, "skalib.c", 3193);
         Mem_cpy(pSlot->pLib, pSlot->pCopy, pSlot->nSize);
         pLib = AnimLib_Load((u8*)pSlot->pLib, ClipBank_Get(nSlot));
         pLib->pFile = pSlot->pLib;
         for (j = 0; j < pSlot->nOverlays; j++) {
             pOv        = &pSlot->overlays[j];
-            pOv->pWork = StaticMem_Alloc(pOv->nSize, 1, 0x40, "skalib.c", 3207);
+            pOv->pWork = Circular_MemAllocFunc(pOv->nSize, MEMTYPE_HIGH, 0x40, "skalib.c", 3207);
             Mem_cpy(pOv->pWork, pOv->pCopy, pOv->nSize);
             AnimLib_Load((u8*)pOv->pWork, ClipBank_Get(nSlot));
             pOv->nStreamId = pOv->nGolferId + 3;
@@ -1929,7 +1935,7 @@ int AnimLib_RandomIndex(u32 uUsed, int nCount) {
     int nTries = 0;
     u32 nPick;
     do {
-        nPick = Misc_RandFunc(1) % nCount;
+        nPick = Misc_RandFunc(RANDOM_PRESENTATION) % nCount;
         if (!((1 << nPick) & uUsed)) break;
     } while (++nTries < 3);
     return nPick;
@@ -2099,7 +2105,7 @@ AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank) {
                 pData = (u8*)((((uptr)pData >> 4) + 1) << 4);
             }
             pLib->pClipData = pData;
-            pLib->ppClips   = StaticMem_Alloc(pLib->nClips * 4, 2, 0x40, "skalib.c", 4164);
+            pLib->ppClips   = Circular_MemAllocFunc(pLib->nClips * 4, MEMTYPE_LOW, 0x40, "skalib.c", 4164);
             for (i = 0; i < pLib->nRecords; i++) {
                 pLib->pRecords[i].pClip =
                     SKA_LoadFromMem(pLib->pClipData + (uptr)pLib->pRecords[i].pClip, NULL, 16);
@@ -2168,7 +2174,7 @@ void AnimLib_OnLoaded(UStreamObject* pFile) {
     AnimLib* pLib;
 
     if (nSlot < 3 && gBankLibs[nSlot] == NULL) {
-        gLibSlots[nSlot].pCopy = StaticMem_Alloc(pFile->uSize, 2, 0x40, "skalib.c", 4520);
+        gLibSlots[nSlot].pCopy = Circular_MemAllocFunc(pFile->uSize, MEMTYPE_LOW, 0x40, "skalib.c", 4520);
         Mem_cpy(gLibSlots[nSlot].pCopy, pFile->pData, pFile->uSize);
         gLibSlots[nSlot].nSize = pFile->uSize;
         pLib = AnimLib_Load(pFile->pData, ClipBank_Get(nSlot));
@@ -2181,7 +2187,7 @@ void AnimLib_OnLoaded(UStreamObject* pFile) {
         bFree = 0;
     }
     if (bFree) {
-        StaticMem_Free(pFile);
+        Circular_MemFreeFunc(pFile);
     }
 }
 
@@ -2207,7 +2213,7 @@ void ClipBank_Install(UStreamObject* pFile) {
         gClipBanks[nSlot]->pFile = pFile;
     }
     if (bFree) {
-        StaticMem_Free(pFile);
+        Circular_MemFreeFunc(pFile);
     }
 }
 
@@ -2241,11 +2247,12 @@ void ClipBank_Stash(int nSlot) {
         GoARAM_WaitTransfer(GoARAM_CopyToAram(gClipBankFiles[nSlot], gClipBankAram[nSlot],
                                               gClipBankAramSizes[nSlot]));
         if (gClipBankFiles[nSlot] != gClipBankRestoreFile) {
-            StaticMem_Free(gClipBankFiles[nSlot]);
+            Circular_MemFreeFunc(gClipBankFiles[nSlot]);
         }
         gClipBankFiles[nSlot] = NULL;
         if (nSlot == 0 && gClipBankRestoreFile == NULL) {
-            gClipBankRestoreFile = StaticMem_Alloc(gClipBankAramSizes[nSlot], 2, 0x20, "skalib.c", 4671);
+            gClipBankRestoreFile = Circular_MemAllocFunc(gClipBankAramSizes[nSlot], MEMTYPE_LOW, 0x20,
+                                                         "skalib.c", 4671);
         }
     }
 }
@@ -2273,7 +2280,7 @@ void ClipBank_FreeAram(void) {
         }
     }
     if (gClipBankRestoreFile != NULL) {
-        StaticMem_Free(gClipBankRestoreFile);
+        Circular_MemFreeFunc(gClipBankRestoreFile);
         gClipBankRestoreFile = NULL;
     }
 }

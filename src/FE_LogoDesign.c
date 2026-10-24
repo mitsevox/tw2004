@@ -29,14 +29,14 @@ LogoEdit* gpLogoEdit;           // the editor's state while the front end runs
 // Allocates the logo editor's palette (256 colours, cleared) once at start-up (gomainloop's set-up
 // beside GOLFERSTATE_OpenONCE); FE_LogoDesign_LoadClut fills it later.
 void FE_LogoDesign_OpenOnce(void) {
-    gpLogoClut = StaticMem_Alloc(256 * sizeof(s16), 0, 0, "FE_LogoDesign.c", 47);
+    gpLogoClut = Circular_MemAllocFunc(256 * sizeof(s16), MEMTYPE_SYSTEM, 0, "FE_LogoDesign.c", 47);
     Mem_set(gpLogoClut, 0, 256 * sizeof(s16));
     gbLogoClutLoaded = 0;
 }
 
 // Frees the palette FE_LogoDesign_OpenOnce allocated and marks it not loaded.
 void FE_LogoDesign_CloseOnce(void) {
-    StaticMem_Free(gpLogoClut);
+    Circular_MemFreeFunc(gpLogoClut);
     gpLogoClut = NULL;
     gbLogoClutLoaded = 0;
 }
@@ -45,14 +45,14 @@ void FE_LogoDesign_CloseOnce(void) {
 // cleared (logo 0, square, unchanged), and the palette copied from "__LogoSquare" if that has not
 // been done yet (FE_LogoDesign_LoadClut).
 void FE_LogoDesign_InitModule(void) {
-    gpLogoEdit = StaticMem_Alloc(sizeof(LogoEdit), 2, 0, "FE_LogoDesign.c", 67);
+    gpLogoEdit = Circular_MemAllocFunc(sizeof(LogoEdit), MEMTYPE_LOW, 0, "FE_LogoDesign.c", 67);
     Mem_set(gpLogoEdit, 0, sizeof(LogoEdit));
     FE_LogoDesign_LoadClut();
 }
 
 // Frees the logo editor's state (FE_LogoDesign_InitModule); the palette stays.
 void FE_LogoDesign_CloseModule(void) {
-    StaticMem_Free(gpLogoEdit);
+    Circular_MemFreeFunc(gpLogoEdit);
     gpLogoEdit = NULL;
 }
 

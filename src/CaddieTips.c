@@ -205,7 +205,7 @@ u8 CTIP_FlopShotTrigger(int nPlayer) {
 // Which of a tip's nCount short versions to show. EA wrote the count as a parameter: with one
 // version (% 1) the compiler still divides, where a literal % 1 folds away.
 static inline u32 SwingTips_Pick(u32 nCount) {
-    return Misc_RandFunc(0) % nCount;
+    return Misc_RandFunc(RANDOM_GAME) % nCount;
 }
 
 // The caddie tips as a swing starts (STATEFUNC_SwingInit): only when the tips option is on (options
@@ -236,7 +236,7 @@ void CTIP_ShowCaddieTip(int nPlayer) {
     if (gpSaveData[nProfile].bActive != 1) {
         return;
     }
-    for (nChan = 0; nChan < 4; nChan++) {
+    for (nChan = 0; nChan < INPUT_NUM_PADS; nChan++) {
         for (i = 0; i < gSession.nNumPlayers; i++) {
             if (!Input_bDoesPadExist(nChan) && nChan == gSession.nController[i]) {
                 bControllerIsPulled = 1;

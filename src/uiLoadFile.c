@@ -97,10 +97,10 @@ void UI_StreamLoadFile(UStreamObject* pObject) {
     if (gUIFileAram == 0 && gSession.nGameType == 10) {
         gUIFileAramSize = ((pObject->uSize >> 5) + 1) << 5;
     }
-    pData = StaticMem_Alloc(pObject->uSize, 2, 32, "uiLoadFile.c", 165);
+    pData = Circular_MemAllocFunc(pObject->uSize, MEMTYPE_LOW, 32, "uiLoadFile.c", 165);
     Mem_cpy(pData, pObject->pData, pObject->uSize);
     gpUIFileData = pData;
-    StaticMem_Free(pObject);
+    Circular_MemFreeFunc(pObject);
 }
 
 // 'TXFS' handler: when UI_TestTextureGroupChkRef wants the texture group's kind (its id modulo
@@ -111,7 +111,7 @@ void UI_StreamLoadTextures(UStreamObject* pObject) {
         gUITextureBanks.ap4[gUITextureBanks.nCount] = fn_8000FB88(pObject, NULL, 0);
         gUITextureBanks.nCount++;
     }
-    StaticMem_Free(pObject);
+    Circular_MemFreeFunc(pObject);
 }
 
 // .sdata order: defined here, after UI_RegisterStreamClients's "ingame" and "startup", as in the
@@ -133,18 +133,18 @@ void UI_StreamLoadPictures(UStreamObject* pObject) {
         }
         if (gbUIPicturesToAram) {
             GoARAM_WaitTransfer(GoARAM_CopyToAram(pObject->pData, gUIPicturesAram, gUIPicturesAramSize));
-            pData = StaticMem_Alloc(pObject->uSize, 1, 32, "uiLoadFile.c", 247);
+            pData = Circular_MemAllocFunc(pObject->uSize, MEMTYPE_HIGH, 32, "uiLoadFile.c", 247);
             gbUIPicturesToAram = 0;
         } else {
-            StaticMem_Free(pObject);
+            Circular_MemFreeFunc(pObject);
             return;
         }
     } else {
-        pData = StaticMem_Alloc(pObject->uSize, 2, 32, "uiLoadFile.c", 257);
+        pData = Circular_MemAllocFunc(pObject->uSize, MEMTYPE_LOW, 32, "uiLoadFile.c", 257);
     }
     Mem_cpy(pData, pObject->pData, pObject->uSize);
     UI_RelocatePictureList(pData);
-    StaticMem_Free(pObject);
+    Circular_MemFreeFunc(pObject);
 }
 
 // Make pList the picture list (gpUIPictureList) and turn its record offsets into pointers.
@@ -173,7 +173,7 @@ void UI_StreamLoadFonts(UStreamObject* pObject) {
     int nSlot;
     u32 uFont;
 
-    pData = StaticMem_Alloc(pObject->uSize, 2, 32, "uiLoadFile.c", 348);
+    pData = Circular_MemAllocFunc(pObject->uSize, MEMTYPE_LOW, 32, "uiLoadFile.c", 348);
     Mem_cpy(pData, pObject->pData, pObject->uSize);
     gpUIFonts = pData;
     for (i = 0; i < gpUIFonts[0]; i++) {
@@ -184,7 +184,7 @@ void UI_StreamLoadFonts(UStreamObject* pObject) {
         UFont_LoadFont(nSlot, &((UIFont*)gpUIFonts[1 + i])->nSlot, 0);
         ((UIFont*)gpUIFonts[1 + i])->nSlot = nSlot;
     }
-    StaticMem_Free(pObject);
+    Circular_MemFreeFunc(pObject);
 }
 
 // The UI file's data (gpUIFileData) for UI_OpenInterface. szUnused: EA passes the UI set's name to
@@ -196,7 +196,7 @@ void* UI_GetFileData(char* szUnused) {
 // Free the UI file's data p (UI_CloseInterface) unless it is NULL.
 void UI_FreeFileData(void* p) {
     if (p != NULL) {
-        StaticMem_Free(p);
+        Circular_MemFreeFunc(p);
     }
 }
 
@@ -227,7 +227,7 @@ UINamedList* UI_GetPictureList(char* szUnused) {
 // Free the picture list p unless it is NULL (UI_CloseInterface, UI_FreeMenuPictures).
 void UI_FreePictureList(void* p) {
     if (p != NULL) {
-        StaticMem_Free(p);
+        Circular_MemFreeFunc(p);
     }
 }
 
@@ -244,7 +244,7 @@ void UI_FreeFonts(u32* pTable) {
         for (i = 0; i < pTable[0]; i++) {
             UFont_FreeFont(((UIFont*)pTable[1 + i])->nSlot);
         }
-        StaticMem_Free(pTable);
+        Circular_MemFreeFunc(pTable);
     }
 }
 
@@ -274,7 +274,7 @@ void UI_RestoreMenuPictures(void) {
     UINamedList* pData;
 
     if (gpFrontEnd->pC == NULL) {
-        pData = StaticMem_Alloc(gUIPicturesAramSize, 1, 32, "uiLoadFile.c", 585);
+        pData = Circular_MemAllocFunc(gUIPicturesAramSize, MEMTYPE_HIGH, 32, "uiLoadFile.c", 585);
         GoARAM_WaitTransfer(GoARAM_CopyFromAram(pData, gUIPicturesAram, gUIPicturesAramSize));
         UI_RelocatePictureList(pData);
         gpFrontEnd->pC = gpUIPictureList;

@@ -183,7 +183,7 @@ void GM_PgaTourSim_SimRound(int nPlayer, SeasonEvent* pEvent, int nRound, int n,
         pEntrant->nCurrentHole = 0;
         for (i = 1; i < nEntrants; i++) {
             pEntrant = GetEntrantNonMCPtr(i);
-            pEntrant->nCurrentHole = Misc_RandFunc(0) % 18;
+            pEntrant->nCurrentHole = Misc_RandFunc(RANDOM_GAME) % 18;
         }
     }
 }
@@ -314,7 +314,7 @@ void GM_PgaTourSim_SimTournamentWinner(int nPlayer) {
         nWinner = 0;
     } else {
         // fake match: the pick goes through its own local (orig computes it in r0, then copies it)
-        nRand = Misc_RandFunc(0) % nPlayoff;
+        nRand = Misc_RandFunc(RANDOM_GAME) % nPlayoff;
         nPick = nRand;
         for (i = 0; i < nEntrants; i++) {
             if (GM_PgaTourSim_EntrantIsInPlayoff(nPlayer, i)) {
@@ -408,7 +408,7 @@ void GM_PgaTourSim_CheckEndOfTournamentAward(int nPlayer, u8 bUser, u8 bFirst) {
         }
         if (GM_PgaTourSim_IsLeaderForStat(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_SEASON_WINNINGS)
             && GM_Earnings_GiveAwardToUser(nPlayer, &gpSaveData[nPlayer].aTourAward[14])) {
-            if ((Misc_RandFunc(0) & 1) == 0) {
+            if ((Misc_RandFunc(RANDOM_GAME) & 1) == 0) {
                 PlayPGAAwardVideo(5, 1);
             } else {
                 PlayPGAAwardVideo(2, 1);
@@ -505,14 +505,14 @@ void GM_PgaTourSim_SelectEntrants(PgaEntrantMC* aEntrant, s16* pnEntrants, u8 bU
         aGolfer[i] = i;
     }
     for (i = 0; i < PGA_NUM_PROS - 1; i++) {
-        j = i + Misc_RandFunc(0) % (PGA_NUM_PROS - i);
+        j = i + Misc_RandFunc(RANDOM_GAME) % (PGA_NUM_PROS - i);
         if (j != i) {
             nSwap = aGolfer[j];
             aGolfer[j] = aGolfer[i];
             aGolfer[i] = nSwap;
         }
     }
-    *pnEntrants = Misc_RandFunc(0) % 28 + 100;
+    *pnEntrants = Misc_RandFunc(RANDOM_GAME) % 28 + 100;
     if (bUser) {
         aGolfer[0] = PGA_USER_GOLFER;
     }
@@ -583,7 +583,7 @@ void GM_PgaTourSim_DetermineTargetScores(int nPlayer, int n) {
     }
     qsort(aOrder, nEntrants, sizeof(aOrder[0]), HistoricalScoreRankCompareIncreasing);
     for (i = 0; i < nEntrants - 1; i++) {
-        j = i + (s32)fabsf(3.0f * Misc_RandFuncg(0));
+        j = i + (s32)fabsf(3.0f * Misc_RandFuncg(RANDOM_GAME));
         j = (j <= nEntrants - 1) ? j : nEntrants - 1;
         if (j != i && !GM_PgaTourSim_IsEntrantUser(nPlayer, aOrder[j])) {
             nEntrant = aOrder[j];
@@ -594,7 +594,7 @@ void GM_PgaTourSim_DetermineTargetScores(int nPlayer, int n) {
     nRoundPar = GM_GetCurrentCourseTotalPar(gSession.nTeeSet[0]) * 4;
     nPar = nRoundPar + n;
     for (i = 0; i < nEntrants; i++) {
-        nTarget = 8.0f * Misc_RandFuncg(0) + (18.0f + nPar);
+        nTarget = 8.0f * Misc_RandFuncg(RANDOM_GAME) + (18.0f + nPar);
         nTarget = (nTarget <= nPar) ? nPar : nTarget;
         aTarget[i] = (nTarget <= nPar + 25) ? nTarget : nPar + 25;
     }
@@ -905,7 +905,7 @@ void GM_PgaTourSim_AdvanceField(int nPlayer) {
     nMinHole++;                 // fake match: one statement, "+ 1", swaps the saved registers
     for (i = 1; i < nEntrants; i++) {
         pEntrant = GetEntrantNonMCPtr(i);
-        pEntrant->nCurrentHole += Misc_RandFunc(0) % 3;
+        pEntrant->nCurrentHole += Misc_RandFunc(RANDOM_GAME) % 3;
         pEntrant->nCurrentHole = pEntrant->nCurrentHole <= nMinHole ? nMinHole : pEntrant->nCurrentHole;
         pEntrant->nCurrentHole = 18 < pEntrant->nCurrentHole ? 18 : pEntrant->nCurrentHole;
     }
@@ -994,13 +994,13 @@ void GM_PgaTourSim_SimEntrantScoresOnHole(int nPlayer, int nRound, int nEntrant,
     fPar5 = fScale * pPro->fPar5Avg;
     switch (nPar) {
     case 3:
-        fStrokes = 0.5f * Misc_RandFuncg(0) + fPar3;
+        fStrokes = 0.5f * Misc_RandFuncg(RANDOM_GAME) + fPar3;
         break;
     case 4:
-        fStrokes = 0.6f * Misc_RandFuncg(0) + fPar4;
+        fStrokes = 0.6f * Misc_RandFuncg(RANDOM_GAME) + fPar4;
         break;
     case 5:
-        fStrokes = 0.7f * Misc_RandFuncg(0) + fPar5;
+        fStrokes = 0.7f * Misc_RandFuncg(RANDOM_GAME) + fPar5;
         break;
     }
     // EA bug: fStrokes is never set on a hole whose par is not 3, 4 or 5.
@@ -1038,7 +1038,7 @@ void GM_PgaTourSim_SimAdjustEntrantScores(int nPlayer, int nEntrant, int nRound)
     gbScoresDirty = 1;
     if (nRound < 3) {
         fTarget = 0.25f * pEntrantMC->nTargetScore;
-        fScore = fTarget + Misc_RandFuncg(0);
+        fScore = fTarget + Misc_RandFuncg(RANDOM_GAME);
         fScore = fScore <= fTarget - 3.0f ? fTarget - 3.0f : fScore;
         fScore = fScore <= 3.0f + fTarget ? fScore : 3.0f + fTarget;
         nTarget = (s32)(0.5f + fScore);
@@ -1046,13 +1046,13 @@ void GM_PgaTourSim_SimAdjustEntrantScores(int nPlayer, int nEntrant, int nRound)
         nTarget = pEntrantMC->nTargetScore - GM_PgaTourSim_GetTotalScoreFromEntrantID(nPlayer, nEntrant, 0);
     }
     while (TotalEntrantHoleScores(nEntrant) > nTarget) {
-        s32 nHole = Misc_RandFunc(0) % 18;
+        s32 nHole = Misc_RandFunc(RANDOM_GAME) % 18;
         u8 bDone = 0;
 
         while (!bDone) {
             if (pEntrant->aHoleStrokes[nHole] > 1) {
                 if (pEntrant->aHoleStrokes[nHole] == 2) {
-                    if (Misc_RandFuncf(0) < 0.0005f) {
+                    if (Misc_RandFuncf(RANDOM_GAME) < 0.0005f) {
                         bDone = 1;
                         pEntrant->aHoleStrokes[nHole]--;
                     }
@@ -1068,13 +1068,13 @@ void GM_PgaTourSim_SimAdjustEntrantScores(int nPlayer, int nEntrant, int nRound)
         }
     }
     while (TotalEntrantHoleScores(nEntrant) < nTarget) {
-        s32 nHole = Misc_RandFunc(0) % 18;
+        s32 nHole = Misc_RandFunc(RANDOM_GAME) % 18;
         u8 bDone = 0;
 
         while (!bDone) {
             if (pEntrant->aHoleStrokes[nHole] < 10) {
                 if (pEntrant->aHoleStrokes[nHole] >= 6) {
-                    if (Misc_RandFuncf(0) < 0.01f) {
+                    if (Misc_RandFuncf(RANDOM_GAME) < 0.01f) {
                         bDone = 1;
                         pEntrant->aHoleStrokes[nHole]++;
                     }
@@ -1164,7 +1164,7 @@ void GM_PgaTourSim_SimEntrantStatsOnHole(int nPlayer, int nRound, int nEntrant, 
 
     // A green in regulation: fGIRPct percent of holes.
     bGIR = 0;
-    if (Misc_RandFuncf(0) * 100.0f < pPro->fGIRPct) {
+    if (Misc_RandFuncf(RANDOM_GAME) * 100.0f < pPro->fGIRPct) {
         bGIR = 1;
     }
     pStats->nGreensHit += bGIR;
@@ -1177,13 +1177,13 @@ void GM_PgaTourSim_SimEntrantStatsOnHole(int nPlayer, int nRound, int nEntrant, 
 
     // The drive: the pro's average plus 30 x a normal random number, no longer than the hole;
     // one over 520 loses up to 50.
-    fRandom = 30.0f * Misc_RandFuncg(0) + pPro->fDriveAvg;
+    fRandom = 30.0f * Misc_RandFuncg(RANDOM_GAME) + pPro->fDriveAvg;
     fDrive = (fRandom > 0.0f) ? fRandom : 0.0f;
     if (fDrive > GM_GetHoleIndexTeeDistance(nHole, 0)) {
         fDrive = GM_GetHoleIndexTeeDistance(nHole, 0);
     }
     if (fDrive > 520.0f) {
-        fDrive -= 50.0f * Misc_RandFuncf(0);
+        fDrive -= 50.0f * Misc_RandFuncf(RANDOM_GAME);
     }
     nDrive = fDrive;
     pStats->nLongestDrive = ((u16)nDrive <= pStats->nLongestDrive) ? pStats->nLongestDrive : nDrive;
@@ -1193,9 +1193,9 @@ void GM_PgaTourSim_SimEntrantStatsOnHole(int nPlayer, int nRound, int nEntrant, 
     }
 
     // The putts: the pro's average per hole, never more than the strokes less one.
-    nPutts = 0.5f + (0.3f * Misc_RandFuncg(0) + pPro->fPuttAvg / 18.0f);
+    nPutts = 0.5f + (0.3f * Misc_RandFuncg(RANDOM_GAME) + pPro->fPuttAvg / 18.0f);
     if (nPutts <= 0) {
-        if (Misc_RandFuncf(0) < 0.05f) {
+        if (Misc_RandFuncf(RANDOM_GAME) < 0.05f) {
             nPutts = 0;
         } else {
             nPutts = 1;
@@ -1210,7 +1210,7 @@ void GM_PgaTourSim_SimEntrantStatsOnHole(int nPlayer, int nRound, int nEntrant, 
     // A fairway on a par 4 or 5: fFairwayPct percent of them.
     if (nPar >= 4) {
         bHit = 0;
-        if (Misc_RandFuncf(0) * 100.0f < pPro->fFairwayPct) {
+        if (Misc_RandFuncf(RANDOM_GAME) * 100.0f < pPro->fFairwayPct) {
             bHit = 1;
         }
         pStats->nFairwaysHit += bHit;
@@ -1218,9 +1218,9 @@ void GM_PgaTourSim_SimEntrantStatsOnHole(int nPlayer, int nRound, int nEntrant, 
     }
 
     // A bunker on one hole in ten not under par, saved fSandSavePct percent of the time.
-    if (nStrokes >= nPar && Misc_RandFuncf(0) < 0.1f) {
+    if (nStrokes >= nPar && Misc_RandFuncf(RANDOM_GAME) < 0.1f) {
         bHit = 0;
-        if (Misc_RandFuncf(0) * 100.0f < pPro->fSandSavePct) {
+        if (Misc_RandFuncf(RANDOM_GAME) * 100.0f < pPro->fSandSavePct) {
             bHit = 1;
         }
         pStats->nBunkerSaves += bHit;

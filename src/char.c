@@ -1091,7 +1091,7 @@ Character* Character_Create(void) {
     int i;
 
     pNode = NULL;
-    pChar = StaticMem_Alloc(sizeof(Character), 2, 0x40, "char.c", 0x8A4);
+    pChar = Circular_MemAllocFunc(sizeof(Character), MEMTYPE_LOW, 0x40, "char.c", 0x8A4);
     pChar->pfnPreBones = NULL;
     for (i = 0; i < 4; i++) {
         pChar->buffers[i].n00 = -1;
@@ -1099,7 +1099,7 @@ Character* Character_Create(void) {
         pChar->buffers[i].p0C = NULL;
         pChar->buffers[i].p10 = NULL;
         pChar->buffers[i].p14 = NULL;
-        pChar->buffers[i].pBuf = StaticMem_Alloc(0x890, 2, 0x40, "char.c", 0x8AF);
+        pChar->buffers[i].pBuf = Circular_MemAllocFunc(0x890, MEMTYPE_LOW, 0x40, "char.c", 0x8AF);
     }
     pNode = &pChar->blend;
     SKATime_Init((TSKATime*)pChar->anim);
@@ -1188,16 +1188,16 @@ void Character_AlignCharacterForShotImpact(Character* pChar) {
 void Character_FreeTextures(Character* pChar) {
     CharacterTex_ReleasePoolEntries(pChar);
     if (pChar->pTexEntries != NULL) {
-        StaticMem_Free(pChar->pTexEntries);
+        Circular_MemFreeFunc(pChar->pTexEntries);
     }
     if (pChar->pPalettes != NULL) {
-        StaticMem_Free(pChar->pPalettes);
+        Circular_MemFreeFunc(pChar->pPalettes);
     }
     if (pChar->pB8 != NULL) {
-        StaticMem_Free(pChar->pB8);
+        Circular_MemFreeFunc(pChar->pB8);
     }
     if (pChar->pBC != NULL) {
-        StaticMem_Free(pChar->pBC);
+        Circular_MemFreeFunc(pChar->pBC);
     }
     if (pChar->hFile >= 0) {
         fn_8000633C(pChar->hFile);
@@ -1273,12 +1273,13 @@ void Character_LoadTextures(Character* pChar, Skin** apSkins, int nSkins) {
     pChar->pPalettes = NULL;
     pChar->pBC = NULL;
     if (pChar->nTexEntries != 0) {
-        pChar->pTexEntries = StaticMem_Alloc(pChar->nTexEntries * sizeof(TexEntry), 2, 0x10, "char.c", 0x9A9);
-        pChar->pB8 = StaticMem_Alloc(pChar->nTexEntries * 64, 2, 0x10, "char.c", 0x9AE);
+        pChar->pTexEntries = Circular_MemAllocFunc(pChar->nTexEntries * sizeof(TexEntry), MEMTYPE_LOW, 0x10,
+                                                   "char.c", 0x9A9);
+        pChar->pB8 = Circular_MemAllocFunc(pChar->nTexEntries * 64, MEMTYPE_LOW, 0x10, "char.c", 0x9AE);
     }
     if (pChar->nPalettes != 0) {
-        pChar->pPalettes = StaticMem_Alloc(nPalBytes, 2, 0x10, "char.c", 0x9B8);
-        pChar->pBC = StaticMem_Alloc(nPal, 2, 0x10, "char.c", 0x9BD);
+        pChar->pPalettes = Circular_MemAllocFunc(nPalBytes, MEMTYPE_LOW, 0x10, "char.c", 0x9B8);
+        pChar->pBC = Circular_MemAllocFunc(nPal, MEMTYPE_LOW, 0x10, "char.c", 0x9BD);
     }
     if (bAll) {
         if (pChar->nTexEntries != 0) {
@@ -1315,7 +1316,7 @@ void Character_LoadTextures(Character* pChar, Skin** apSkins, int nSkins) {
         }
     }
     if (pList != NULL) {
-        StaticMem_Free(pList);
+        Circular_MemFreeFunc(pList);
     }
     fn_800100B0(&pChar->bank78, pChar->pTexEntries, pChar->pPalettes, pChar->pB8, pChar->pBC,
                 pChar->nTexEntries, pChar->nPalettes);
@@ -1676,7 +1677,7 @@ void CharacterTex_WaitEndOfTextureLoader(void) {
 //       (SKA_SwapClip > BYTESWAP_SWAPDATA): a little-endian port does not swap there.
 void Character_LoadSacFromStream(UStreamObject* pObject) {
     AnimLib_MergeOverlay(pObject->pData, pObject->uId);
-    StaticMem_Free(pObject);
+    Circular_MemFreeFunc(pObject);
 }
 
 void Character_RegisterSacStreamClient(void) {
@@ -1841,7 +1842,7 @@ Character* Character_CreateFromMem(u8* pData, int nUnused, int nSet, int nId, u8
     // the p44 entries
     BYTESWAP_SWAPDATA(&pData, (u8*)&pChar->n40, 4, 4);
     pData += 0xC;
-    pChar->p44 = StaticMem_Alloc(pChar->n40 * sizeof(CharEntry44), 2, 0x40, "char.c", 0xE04);
+    pChar->p44 = Circular_MemAllocFunc(pChar->n40 * sizeof(CharEntry44), MEMTYPE_LOW, 0x40, "char.c", 0xE04);
     for (i = 0; i < pChar->n40; i++) {
         BYTESWAP_SWAPDATA(&pData, (u8*)pChar->p44[i].v0, 0xC, 4);
         pChar->p44[i].fC = 1.0f;
@@ -1892,9 +1893,9 @@ Character* Character_CreateFromMem(u8* pData, int nUnused, int nSet, int nId, u8
         pPeek = pData + 0x13C;
         BYTESWAP_SWAPDATA(&pPeek, (u8*)&uLibFlags, 4, 4);
         if (pChar->nSlot == 2 || nBank != 0 || (uLibFlags & 1)) {
-            pCopy = StaticMem_Alloc(nSize, 2, 0x40, "char.c", 0xE54);
+            pCopy = Circular_MemAllocFunc(nSize, MEMTYPE_LOW, 0x40, "char.c", 0xE54);
         } else {
-            pCopy = StaticMem_Alloc(nSize, 1, 0x40, "char.c", 0xE57);
+            pCopy = Circular_MemAllocFunc(nSize, MEMTYPE_HIGH, 0x40, "char.c", 0xE57);
         }
         Mem_cpy(pCopy, pData, nSize);
         pLib = AnimLib_Load(pCopy, ClipBank_Get(pChar->nSlot));
@@ -1903,7 +1904,7 @@ Character* Character_CreateFromMem(u8* pData, int nUnused, int nSet, int nId, u8
         } else {
             gLibSlots[pChar->nSlot].overlays[gLibSlots[pChar->nSlot].nOverlays].pWork = pLib;
             gLibSlots[pChar->nSlot].overlays[gLibSlots[pChar->nSlot].nOverlays].pCopy =
-                StaticMem_Alloc(nSize, 2, 0x40, "char.c", 0xE68);
+                Circular_MemAllocFunc(nSize, MEMTYPE_LOW, 0x40, "char.c", 0xE68);
             Mem_cpy(gLibSlots[pChar->nSlot].overlays[gLibSlots[pChar->nSlot].nOverlays].pCopy,
                     pData, nSize);
             gLibSlots[pChar->nSlot].overlays[gLibSlots[pChar->nSlot].nOverlays].nSize = nSize;
@@ -1911,7 +1912,7 @@ Character* Character_CreateFromMem(u8* pData, int nUnused, int nSet, int nId, u8
             gLibSlots[pChar->nSlot].overlays[gLibSlots[pChar->nSlot].nOverlays].nStreamId = nId + 3;
             gLibSlots[pChar->nSlot].overlays[gLibSlots[pChar->nSlot].nOverlays].bActive = bLook;
             gLibSlots[pChar->nSlot].nOverlays++;
-            pChar->pLib = StaticMem_Alloc(0x2800, 2, 0x40, "char.c", 0xE75);
+            pChar->pLib = Circular_MemAllocFunc(0x2800, MEMTYPE_LOW, 0x40, "char.c", 0xE75);
         }
         pData += nSize;
     } else {
@@ -1958,7 +1959,7 @@ void CharSkinRef_Init(Skin* pSkin, CharSkinRef* pRef, s32 n) {
 }
 
 void CharSkinRef_Free(void* p) {
-    StaticMem_Free(p);
+    Circular_MemFreeFunc(p);
 }
 
 // Makes a club skin set from a 'CLB ' object: per entry its club class, that class's afC (the club
@@ -1971,7 +1972,7 @@ CharSkinSet* Character_CreateClubSkinSet(u8* pData) {
     s32 nClass;
     int i;
 
-    pSet = StaticMem_Alloc(sizeof(CharSkinSet), 2, 0x40, "char.c", 0xF15);
+    pSet = Circular_MemAllocFunc(sizeof(CharSkinSet), MEMTYPE_LOW, 0x40, "char.c", 0xF15);
     if (pSet == NULL) {
         return NULL;
     }
@@ -1989,7 +1990,7 @@ CharSkinSet* Character_CreateClubSkinSet(u8* pData) {
         BYTESWAP_SWAPDATA(&pData, (u8*)&nSize, 4, 4);
         pData += 4;
         pSet->apSkins[nClass] = SKN_Create(pData, 0);
-        pSet->a9C[nClass] = StaticMem_Alloc(sizeof(CharSkinRef), 2, 0x40, "char.c", 0xF25);
+        pSet->a9C[nClass] = Circular_MemAllocFunc(sizeof(CharSkinRef), MEMTYPE_LOW, 0x40, "char.c", 0xF25);
         CharSkinRef_Init(pSet->apSkins[nClass], pSet->a9C[nClass], sizeof(CharSkinRef));
         if (nClass == 0 || nClass == 1) {
             pSet->a3C[nClass][0] = 0.065f;
@@ -2044,7 +2045,7 @@ void Character_FreeClubSkinSets(CharSkinSet* pSet) {
                     CharSkinRef_Free(gClubSkinSets[i]->a9C[j]);
                 }
             }
-            StaticMem_Free(gClubSkinSets[i]);
+            Circular_MemFreeFunc(gClubSkinSets[i]);
             gClubSkinSets[i] = NULL;
         }
     }
@@ -2342,13 +2343,13 @@ void Character_Free(Character* pChar) {
         SKEL_Free(pChar->pModel);
         pChar->pModel = NULL;
         for (i = 0; i < 4; i++) {
-            StaticMem_Free(pChar->buffers[i].pBuf);
+            Circular_MemFreeFunc(pChar->buffers[i].pBuf);
         }
         if (pChar->p44 != NULL) {
-            StaticMem_Free(pChar->p44);
+            Circular_MemFreeFunc(pChar->p44);
         }
         if (pChar->pRecords != NULL) {
-            StaticMem_Free(pChar->pRecords);
+            Circular_MemFreeFunc(pChar->pRecords);
         }
         if (Character_IsGolfer(pChar)) {
             Character_FreeTextures(pChar);
@@ -2356,7 +2357,7 @@ void Character_Free(Character* pChar) {
         if (pChar->pSliderDefs != NULL) {
             CharSlider_Free(pChar->pSliderDefs);
         }
-        StaticMem_Free(pChar);
+        Circular_MemFreeFunc(pChar);
         if (gSession.nGameType == 3) {
             ClipBank_Release(nSlot);
         }
@@ -2748,7 +2749,7 @@ void Character_ClubStreamCallbackIG(UStreamObject* pObject) {
             gClubSkinSets[1] = NULL;
         }
     }
-    StaticMem_Free(pObject);
+    Circular_MemFreeFunc(pObject);
 }
 
 // The front end's 'CLB ' stream handler: as Character_ClubStreamCallbackIG, with one set only.
@@ -2757,7 +2758,7 @@ void Character_ClubStreamCallbackFE(UStreamObject* pObject) {
         gClubSkinSets[0] = Character_CreateClubSkinSet(pObject->pData);
         gClubSkinSets[1] = NULL;
     }
-    StaticMem_Free(pObject);
+    Circular_MemFreeFunc(pObject);
 }
 
 // Registers Character_ClubStreamCallbackIG for 'CLB ' objects (streammanagerhole's in-game list).
@@ -2813,7 +2814,7 @@ void Character_GolferStreamCallbackIG(UStreamObject* pObject) {
         }
     }
     fn_800106B8(0);
-    StaticMem_Free(pObject);
+    Circular_MemFreeFunc(pObject);
 }
 
 // Registers Character_GolferStreamCallbackIG for 'CHR ' objects (streammanagerhole's in-game list).
@@ -2834,16 +2835,16 @@ void Character_GolferStreamCallbackFE(UStreamObject* pObject) {
     Character* pChar;
     Clip* pClip;
 
-    StaticMem_ResetCount();
-    StaticMem_StartCount();
+    Circular_ClearMemorySizeRecorder();
+    Circular_StartMemorySizeRecorder();
     UI_ParkFileInAram();
     pCopy = UI_GetFileBuffer();
     Mem_cpy(pCopy, pObject, pObject->uSize + 0x80);
-    StaticMem_Free(pObject);
+    Circular_MemFreeFunc(pObject);
     pCopy->pData = (u8*)pCopy + 0x80;
     gpCrAPState->pB8->pChar = Character_CreateFromMem(pCopy->pData, 0, 0, pCopy->uId, 0, NULL);
-    StaticMem_StopCount();
-    StaticMem_GetCount();
+    Circular_StopMemorySizeRecorder();
+    Circular_GetCurrentMemorySizeRecorder();
     Character_LoadTextures(gpCrAPState->pB8->pChar, NULL, 0);
     UI_RestoreFileFromAram();
     gpCrAPState->pB8->pChar->nPlays = -1;
@@ -2927,7 +2928,7 @@ void SkeletalObject_StreamCallback(UStreamObject* pObject) {
         Character_Add(Character_CreateFromMem(pObject->pData, 0, 0, pObject->uId, 0, NULL));
     pChar->nPlayer = 1000;
     pChar->uId     = pObject->uId;
-    StaticMem_Free(pObject);
+    Circular_MemFreeFunc(pObject);
 }
 
 void SkeletalObject_RegisterStreamClient(void) {

@@ -201,13 +201,14 @@ void UITransform_HandleOp(int nOp, UITransformDesc* p) {
 // Allocate the UI's transform stack (gpUITransformStack; UI_OpenInterface) and set its bottom
 // level's matrix to identity; the level's other fields are left as allocated.
 void UITransform_Init(void) {
-    gpUITransformStack = StaticMem_Alloc(sizeof(UITransformStack), 2, 16, "uiTransform.c", 203);
+    gpUITransformStack = Circular_MemAllocFunc(sizeof(UITransformStack), MEMTYPE_LOW, 16,
+                                               "uiTransform.c", 203);
     gpUITransformStack->nTop = 0;
     LLMath_IdentifyMat(gpUITransformStack->aLevel[gpUITransformStack->nTop].m);
 }
 
 // Free the UI's transform stack (UI_vCloseModule).
 void UITransform_Shutdown(void) {
-    StaticMem_Free(gpUITransformStack);
+    Circular_MemFreeFunc(gpUITransformStack);
     gpUITransformStack = NULL;
 }

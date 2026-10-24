@@ -88,7 +88,7 @@ void fn_800A29B4(UStreamObject* pObject) {
         strcpy(lbl_801F1640[i], szName);
         i++;
     }
-    StaticMem_Free(pObject);
+    Circular_MemFreeFunc(pObject);
 }
 
 // fake match: stands in for a function the original linker stripped. The file's pool has 1.0 before
@@ -106,7 +106,7 @@ s32 fn_800A2A80(s32 nKind, f32* pArg, s32 n3) {
         }
         break;
     case 0:
-        lbl_801F16F4[0] = StaticMem_Alloc(0x28, 2, 32, "PsMgr.c", 530);    // the rain object
+        lbl_801F16F4[0] = Circular_MemAllocFunc(0x28, MEMTYPE_LOW, 32, "PsMgr.c", 530);    // the rain object
         if (pArg != NULL) {
             fStrength = *pArg;
         } else {
@@ -126,7 +126,7 @@ void fn_800A2B34(s32 nKind) {
     case 0:
         if (lbl_801F16F4[nKind] != NULL) {
             fn_800B4F24(lbl_801F16F4[nKind]);
-            StaticMem_Free(lbl_801F16F4[nKind]);
+            Circular_MemFreeFunc(lbl_801F16F4[nKind]);
             lbl_801F16F4[nKind] = NULL;
         }
         break;

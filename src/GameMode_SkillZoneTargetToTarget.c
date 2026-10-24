@@ -211,7 +211,7 @@ void GameModeSkillZoneTargetToTarget_CheckShotAwards(int nPlayer) {
                 gTargetToTargetShotPoints = 0;
                 if ((s8)gPlayers[nPlayer].bAllTargetsHit == 0) {
                     gPlayers[nPlayer].bAllTargetsHit = 1;
-                    if (!(Misc_RandFunc(0) & 1)) {
+                    if (!(Misc_RandFunc(RANDOM_GAME) & 1)) {
                         nMsg = 0x2B;
                     } else {
                         nMsg = 0x2C;
@@ -221,21 +221,21 @@ void GameModeSkillZoneTargetToTarget_CheckShotAwards(int nPlayer) {
             if (nMsg == -1) {
                 switch (gSkillZoneNumCups - GameModeSkillZoneBase_CountGreensHit(nPlayer)) {
                 case 1:
-                    if (Misc_RandFunc(0) & 1) {
+                    if (Misc_RandFunc(RANDOM_GAME) & 1) {
                         nMsg = 0x26;
                     } else {
                         nMsg = 0x43;
                     }
                     break;
                 case 2:
-                    if (Misc_RandFunc(0) & 1) {
+                    if (Misc_RandFunc(RANDOM_GAME) & 1) {
                         nMsg = 0x27;
                     } else {
                         nMsg = 0x44;
                     }
                     break;
                 case 3:
-                    if (Misc_RandFunc(0) & 1) {
+                    if (Misc_RandFunc(RANDOM_GAME) & 1) {
                         nMsg = 0x28;
                     } else {
                         nMsg = 0x45;
@@ -250,13 +250,13 @@ void GameModeSkillZoneTargetToTarget_CheckShotAwards(int nPlayer) {
                 default:
                     if (GameModeSkillZoneBase_CountGreensHit(nPlayer) <= gSkillZoneNumCups / 4) {
                         if (gTargetToTargetShotBalls == 1) {
-                            if (Misc_RandFunc(0) & 1) {
+                            if (Misc_RandFunc(RANDOM_GAME) & 1) {
                                 nMsg = 0x36;
                             } else {
                                 nMsg = 0x37;
                             }
                         } else {
-                            switch (Misc_RandFunc(0) & 3) {
+                            switch (Misc_RandFunc(RANDOM_GAME) & 3) {
                             case 0:
                                 nMsg = 0x4F;
                                 break;
@@ -272,7 +272,7 @@ void GameModeSkillZoneTargetToTarget_CheckShotAwards(int nPlayer) {
                             }
                         }
                     } else {
-                        switch (Misc_RandFunc(0) & 7) {
+                        switch (Misc_RandFunc(RANDOM_GAME) & 7) {
                         case 0:
                         case 1:
                             nMsg = 0x46;
@@ -323,7 +323,7 @@ void GameModeSkillZoneTargetToTarget_CheckShotAwards(int nPlayer) {
             gTargetToTargetShotPoints = 0;
             gPlayers[nPlayer].nHitStreak = 0;
             gTargetToTargetShotBalls = 0;
-            if (Misc_RandFunc(0) & 1) {
+            if (Misc_RandFunc(RANDOM_GAME) & 1) {
                 nMsg = 0xB;
             } else {
                 nMsg = 0xD;
@@ -343,7 +343,7 @@ void GameModeSkillZoneTargetToTarget_CheckShotAwards(int nPlayer) {
             gTargetToTargetShotPoints = GM_Earnings_ComputeTOURCardModifiers(gTargetToTargetShotPoints,
                     nPlayer, 0);
         } else if (nMsg == -1) {
-            if (!(Misc_RandFunc(0) & 1)) {
+            if (!(Misc_RandFunc(RANDOM_GAME) & 1)) {
                 nMsg = 0;
             } else {
                 nMsg = 0x4E;

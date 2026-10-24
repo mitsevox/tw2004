@@ -49,8 +49,8 @@ void Session_Init(void) {
     pSession->nFrameCount = 0;
     pSession->n28         = 0;
     Options_SetDefaults(&gSession.options);
-    gSession.nSeed = Misc_RandFunc(0);
-    Misc_SetSeedFunc(0, gSession.nSeed);
+    gSession.nSeed = Misc_RandFunc(RANDOM_GAME);
+    Misc_SetSeedFunc(RANDOM_GAME, gSession.nSeed);
     gSession.nNumPlayers = 1;
     gSession.nPinSet     = -1;
     gSession.bStrokeLimit = 1;

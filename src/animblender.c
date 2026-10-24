@@ -46,11 +46,11 @@ void AnimBlender_InitModule(void) {
     } else {
         nNumEntries = 50;
     }
-    gSKAChannelPool = CreateMemPool(nNumEntries, 0x34, 2, 16);
-    gSKABlenderPool = CreateMemPool(nNumEntries, 0x2C, 2, 16);
-    gSKABlendDataPool = CreateMemPool(nNumEntries, 0x20, 2, 16);
-    gSkelPosePool = CreateMemPool(nNumEntries, sizeof(SkelPose), 2, 16);
-    gMorphPosePool = CreateMemPool(nNumEntries, 0x114C, 2, 16);
+    gSKAChannelPool = CreateMemPool(nNumEntries, 0x34, MEMTYPE_LOW, 16);
+    gSKABlenderPool = CreateMemPool(nNumEntries, 0x2C, MEMTYPE_LOW, 16);
+    gSKABlendDataPool = CreateMemPool(nNumEntries, 0x20, MEMTYPE_LOW, 16);
+    gSkelPosePool = CreateMemPool(nNumEntries, sizeof(SkelPose), MEMTYPE_LOW, 16);
+    gMorphPosePool = CreateMemPool(nNumEntries, 0x114C, MEMTYPE_LOW, 16);
 }
 
 // Destroy the pools AnimBlender_InitModule made.

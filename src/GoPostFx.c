@@ -38,7 +38,8 @@ void RC_ApplyViewport(void* pCamera);            // Skin.c
 void fn_80037DD8(void) {
     lbl_80281D80 = NULL;
     if (gSession.nGameType >= 4 && gSession.nGameType <= 8) {
-        lbl_80281D80 = StaticMem_Alloc(GXGetTexBufferSize(256, 224, 6, 0, 0), 2, 0x20, "GoPostFx.c", 119);
+        lbl_80281D80 = Circular_MemAllocFunc(GXGetTexBufferSize(256, 224, 6, 0, 0), MEMTYPE_LOW, 0x20,
+                                             "GoPostFx.c", 119);
     }
     fn_80037E50();
 }
@@ -79,7 +80,7 @@ void fn_800392D0(void);
 
 void fn_80037F80(void) {
     if (lbl_80281D80 != NULL) {
-        StaticMem_Free(lbl_80281D80);
+        Circular_MemFreeFunc(lbl_80281D80);
         lbl_80281D80 = NULL;
     }
 }
@@ -355,8 +356,8 @@ void fn_80038724(int nField, int nView, f32 fAlpha, f32 fShake) {
     aUV[1] = aXY[1];
     aUV[4] = aXY[4];
     aUV[5] = aXY[5];
-    fDX = fShake * (Misc_RandFuncf(1) - 0.5f);
-    fDY = fShake * (Misc_RandFuncf(1) - 0.5f);
+    fDX = fShake * (Misc_RandFuncf(RANDOM_PRESENTATION) - 0.5f);
+    fDY = fShake * (Misc_RandFuncf(RANDOM_PRESENTATION) - 0.5f);
     aXY[0] += fDX;
     aXY[1] += fDY;
     aXY[4] += fDX;

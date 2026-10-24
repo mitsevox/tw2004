@@ -1031,7 +1031,7 @@ void GM_Pick_PlayOffHole(void) {
         return;
     }
     GM_SelectHoleSet(0);
-    nCur = nHoles[Misc_RandFunc(0) % n];
+    nCur = nHoles[Misc_RandFunc(RANDOM_GAME) % n];
     GM_SetCurrentHole(nCur);
     GM_SelectSingleHole(nCur);
 }
@@ -1164,9 +1164,9 @@ void GM_BuildRandom18(void) {
     for (n = 0; n < 4; n++) {
     slot3:
         if (n < 2) {
-            slots[n] = Misc_RandFunc(1) % 9;
+            slots[n] = Misc_RandFunc(RANDOM_PRESENTATION) % 9;
         } else {
-            slots[n] = Misc_RandFunc(1) % 9 + 9;
+            slots[n] = Misc_RandFunc(RANDOM_PRESENTATION) % 9 + 9;
         }
         for (k = 0; k < n; k++) {
             if (slots[n] == slots[k] || slots[n] == slots[k] + 1 || slots[n] == slots[k] - 1) {
@@ -1175,11 +1175,11 @@ void GM_BuildRandom18(void) {
             }
         }
     pick3:
-        nPick = Misc_RandFunc(1) % nAvail;
+        nPick = Misc_RandFunc(RANDOM_PRESENTATION) % nAvail;
         gpGame->nCurCourse = courses.a[nPick];
         gpGame->nCurHoleNum = 0;
         while (!fn_80110180()) {
-            nPick = Misc_RandFunc(1) % nAvail;
+            nPick = Misc_RandFunc(RANDOM_PRESENTATION) % nAvail;
             gpGame->nCurCourse = courses.a[nPick];
             gpGame->nCurHoleNum = 0;
             if (!fn_80110180()) {
@@ -1208,7 +1208,7 @@ void GM_BuildRandom18(void) {
         }
         // fake match: the original sign-extends the picked byte into a register of its own (the
         // (s8) of a u8); a plain s8 array read loads straight into nHole's register
-        nHole = (s8)holes[Misc_RandFunc(1) % nHoles];
+        nHole = (s8)holes[Misc_RandFunc(RANDOM_PRESENTATION) % nHoles];
         for (k = 0; k < n; k++) {
             if (nCourse == gpGame->nHoleCourse[slots[k]] && nHole == gpGame->nHoleNum[slots[k]]) {
                 // fake match: a retry jump, as the binary branches; structured retries untried
@@ -1232,9 +1232,9 @@ void GM_BuildRandom18(void) {
     for (n = 0; n < 4; n++) {
     slot5:
         if (n < 2) {
-            slots[n] = Misc_RandFunc(1) % 9;
+            slots[n] = Misc_RandFunc(RANDOM_PRESENTATION) % 9;
         } else {
-            slots[n] = Misc_RandFunc(1) % 9 + 9;
+            slots[n] = Misc_RandFunc(RANDOM_PRESENTATION) % 9 + 9;
         }
         if (gpGame->nHoleNum[slots[n]] != -1) {
             // fake match: a retry jump, as the binary branches; structured retries untried
@@ -1247,11 +1247,11 @@ void GM_BuildRandom18(void) {
             }
         }
     pick5:
-        nPick = Misc_RandFunc(1) % nAvail;
+        nPick = Misc_RandFunc(RANDOM_PRESENTATION) % nAvail;
         gpGame->nCurCourse = courses.a[nPick];
         gpGame->nCurHoleNum = 0;
         while (!fn_80110180()) {
-            nPick = Misc_RandFunc(1) % nAvail;
+            nPick = Misc_RandFunc(RANDOM_PRESENTATION) % nAvail;
             gpGame->nCurCourse = courses.a[nPick];
             gpGame->nCurHoleNum = 0;
             if (!fn_80110180()) {
@@ -1267,7 +1267,7 @@ void GM_BuildRandom18(void) {
                 nHoles++;
             }
         }
-        nHole = (s8)holes[Misc_RandFunc(1) % nHoles];
+        nHole = (s8)holes[Misc_RandFunc(RANDOM_PRESENTATION) % nHoles];
         for (k = 0; k < n; k++) {
             if (nCourse == gpGame->nHoleCourse[slots[k]] && nHole == gpGame->nHoleNum[slots[k]]) {
                 // fake match: a retry jump, as the binary branches; structured retries untried
@@ -1291,11 +1291,11 @@ void GM_BuildRandom18(void) {
     for (i = 0; i < 18; i++) {
         if (gpGame->nHoleNum[i] == -1) {
         pick4:
-            nPick = Misc_RandFunc(1) % nAvail;
+            nPick = Misc_RandFunc(RANDOM_PRESENTATION) % nAvail;
             gpGame->nCurCourse = courses.a[nPick];
             gpGame->nCurHoleNum = 0;
             while (!fn_80110180()) {
-                nPick = Misc_RandFunc(1) % nAvail;
+                nPick = Misc_RandFunc(RANDOM_PRESENTATION) % nAvail;
                 gpGame->nCurCourse = courses.a[nPick];
                 gpGame->nCurHoleNum = 0;
                 if (!fn_80110180()) {
@@ -1311,7 +1311,7 @@ void GM_BuildRandom18(void) {
                     nHoles++;
                 }
             }
-            nHole = (s8)holes[Misc_RandFunc(1) % nHoles];
+            nHole = (s8)holes[Misc_RandFunc(RANDOM_PRESENTATION) % nHoles];
             for (k = 0; k < i; k++) {
                 if (nCourse == gpGame->nHoleCourse[k] && nHole == gpGame->nHoleNum[k]) {
                     // fake match: a retry jump, as the binary branches; structured retries untried

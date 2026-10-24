@@ -544,10 +544,10 @@ void Seq_Check(AudTrackTmpl* pTmpl) {
     }
 }
 
-// A random number from 0 to nRange - 1 (Misc_RandFunc(1)); 0 when nRange is 0.
+// A random number from 0 to nRange - 1 (Misc_RandFunc(RANDOM_PRESENTATION)); 0 when nRange is 0.
 u32 Aud_RandomBelow(u32 nRange) {
     if (nRange != 0) {
-        return Misc_RandFunc(1) % nRange;
+        return Misc_RandFunc(RANDOM_PRESENTATION) % nRange;
     }
     return 0;
 }

@@ -10,6 +10,7 @@
 // (FEgolferanim.c), and make random golfers.
 
 #include "engine.h"
+#include "pad.h"
 #include "camera.h"
 #include "frontend/fe.h"
 #include "game/frontend.h"
@@ -662,13 +663,13 @@ void GM_vClearMarkedNewCrAPItems(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Menu message 502: 1 when a controller in any of the four ports holds the A button (PAD_BUTTON_A
-// in the held half of Input_ReadControlPad), else 0.
+// Menu message 502: 1 when a controller in any of the four ports holds the A button (the held half
+// of Input_ReadControlPad), else 0.
 void GM_vIsAnyPadHoldingA(MsgArg* pArgs, MsgArg* pResult) {
     int i;
 
-    for (i = 0; i < 4; i++) {
-        if (Input_bDoesPadExist(i) && (Input_ReadControlPad(i) & 0x1000000)) {
+    for (i = 0; i < INPUT_NUM_PADS; i++) {
+        if (Input_bDoesPadExist(i) && (Input_ReadControlPad(i) & PAD_BUTTON_A << 16)) {
             pResult->i = 1;
             return;
         }
@@ -688,22 +689,22 @@ void GM_vGetDPadHeld(MsgArg* pArgs, MsgArg* pResult) {
     s32* pD = pArgs[4].p;
 
     if (Input_bDoesPadExist(nChan)) {
-        if (Input_ReadControlPad(nChan) & 0x80000) {
+        if (Input_ReadControlPad(nChan) & PAD_BUTTON_UP << 16) {
             *pA = 1;
         } else {
             *pA = 0;
         }
-        if (Input_ReadControlPad(nChan) & 0x40000) {
+        if (Input_ReadControlPad(nChan) & PAD_BUTTON_DOWN << 16) {
             *pB = 1;
         } else {
             *pB = 0;
         }
-        if (Input_ReadControlPad(nChan) & 0x10000) {
+        if (Input_ReadControlPad(nChan) & PAD_BUTTON_LEFT << 16) {
             *pC = 1;
         } else {
             *pC = 0;
         }
-        if (Input_ReadControlPad(nChan) & 0x20000) {
+        if (Input_ReadControlPad(nChan) & PAD_BUTTON_RIGHT << 16) {
             *pD = 1;
         } else {
             *pD = 0;
@@ -816,7 +817,7 @@ void GM_vGetRandom1To99(MsgArg* pArgs, MsgArg* pResult) {
     u32 n = 0;
 
     while (n == 0) {
-        n = (u32)(100.0f * Misc_RandFuncg(0)) % 100;
+        n = (u32)(100.0f * Misc_RandFuncg(RANDOM_GAME)) % 100;
     }
     pResult->f = n;
 }
@@ -1077,10 +1078,10 @@ void GM_vFEMessage598_Empty(MsgArg* pArgs, MsgArg* pResult) {
 // equipment tiers are worked out again (FE_CrAP_UpdateUserAttributeMods).
 void GM_vRandomizeCrAPGolfer(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
-    int nRoll = Misc_RandFunc(0) % 100;
+    int nRoll = Misc_RandFunc(RANDOM_GAME) % 100;
     int nChoice;
 
-    Misc_RandFunc(0);                       // drawn, not used
+    Misc_RandFunc(RANDOM_GAME);                       // drawn, not used
     FE_CrAP_SetTriggerAnims(0);
     FE_CrAP_UnequipSlot(2);
     FE_CrAP_UnequipSlot(5);
@@ -1108,25 +1109,25 @@ void GM_vRandomizeCrAPGolfer(MsgArg* pArgs, MsgArg* pResult) {
     FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 20, 70);
     FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 8, 70);
     nChoice = FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 14, 0);
-    if (Misc_RandFunc(0) % 100 < 95) {
+    if (Misc_RandFunc(RANDOM_GAME) % 100 < 95) {
         FE_CrAP_TurnOnPart(15, 0, nChoice);
     } else {
         FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 15, 0);
     }
     if (nRoll < 75) {
-        FE_CrAP_TurnOnPart(9, 0, Misc_RandFunc(0) % 3);
+        FE_CrAP_TurnOnPart(9, 0, Misc_RandFunc(RANDOM_GAME) % 3);
     } else if (nRoll >= 75 && nRoll < 85) {
-        Misc_RandFunc(0);                   // drawn, not used
+        Misc_RandFunc(RANDOM_GAME);                   // drawn, not used
         FE_CrAP_TurnOnPart(9, 0, 6);
     } else if (nRoll >= 85 && nRoll < 95) {
-        Misc_RandFunc(0);                   // drawn, not used
+        Misc_RandFunc(RANDOM_GAME);                   // drawn, not used
         FE_CrAP_TurnOnPart(9, 0, 4);
     } else {
-        Misc_RandFunc(0);                   // drawn, not used
+        Misc_RandFunc(RANDOM_GAME);                   // drawn, not used
         FE_CrAP_TurnOnPart(9, 0, 8);
     }
     FE_CrAP_RandomizeCategoryWithUndesirableTest(10, 95);
-    FE_CrAP_RandomizeCrAPCategoryAndSubcategoryItem(pProfile, 7, (Misc_RandFunc(0) & 1) + 1, 0);
+    FE_CrAP_RandomizeCrAPCategoryAndSubcategoryItem(pProfile, 7, (Misc_RandFunc(RANDOM_GAME) & 1) + 1, 0);
     FE_CrAP_UpdateUserAttributeMods(pProfile);
 }
 
@@ -1154,7 +1155,7 @@ void GM_vRandomizeCrAPOutfit(MsgArg* pArgs, MsgArg* pResult) {
     FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 19, 70);
     FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 20, 70);
     FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 8, 70);
-    FE_CrAP_RandomizeCrAPCategoryAndSubcategoryItem(pProfile, 7, (Misc_RandFunc(0) & 1) + 1, 0);
+    FE_CrAP_RandomizeCrAPCategoryAndSubcategoryItem(pProfile, 7, (Misc_RandFunc(RANDOM_GAME) & 1) + 1, 0);
     FE_CrAP_UpdateUserAttributeMods(pProfile);
 }
 
@@ -1166,7 +1167,7 @@ void GM_vRandomizeCrAPOutfit(MsgArg* pArgs, MsgArg* pResult) {
 void GM_vRandomizeCrAPGolferInIdleShot(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
     View* pView = ViewController_GetCameraControl(ViewController_GetCurrentViewControllerID());
-    Gaud_PlayUISound((Misc_RandFunc(0) & 7) + 11);
+    Gaud_PlayUISound((Misc_RandFunc(RANDOM_GAME) & 7) + 11);
     FE_ResetCrAPZoom();
     FE_SetCrAPCameraIdleState(0);
     GolfCamera_SwitchCrAPCamera(pView, "Crap Idle", gpCrAPState->nCamIdleState, 0, 0, 0);
@@ -1243,11 +1244,11 @@ void GM_vGetNumCrAPSaleItemsOwned(MsgArg* pArgs, MsgArg* pResult) {
 // 8 (5%), and part 10 gets a desirable choice 95% of the time
 // (FE_CrAP_RandomizeCategoryWithUndesirableTest). The equipment tiers are not worked out again.
 void GM_vRandomizeCrAPBody(MsgArg* pArgs, MsgArg* pResult) {
-    int nRoll = Misc_RandFunc(0) % 100;
+    int nRoll = Misc_RandFunc(RANDOM_GAME) % 100;
     int nChoice;
     SaveProfile* pProfile;
 
-    Misc_RandFunc(0);                       // drawn, not used
+    Misc_RandFunc(RANDOM_GAME);                       // drawn, not used
     pProfile = FE_GetCurrentProfile();
     FE_CrAP_SetTriggerAnims(0);
     FE_CrAP_TurnOnPart(5, 0, 0);
@@ -1264,21 +1265,21 @@ void GM_vRandomizeCrAPBody(MsgArg* pArgs, MsgArg* pResult) {
     FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 21, 0);
     FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 11, 0);
     nChoice = FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 14, 0);
-    if (Misc_RandFunc(0) % 100 < 95) {
+    if (Misc_RandFunc(RANDOM_GAME) % 100 < 95) {
         FE_CrAP_TurnOnPart(15, 0, nChoice);
     } else {
         FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 15, 0);
     }
     if (nRoll < 75) {
-        FE_CrAP_TurnOnPart(9, 0, Misc_RandFunc(0) % 3);
+        FE_CrAP_TurnOnPart(9, 0, Misc_RandFunc(RANDOM_GAME) % 3);
     } else if (nRoll >= 75 && nRoll < 85) {
-        Misc_RandFunc(0);                   // drawn, not used
+        Misc_RandFunc(RANDOM_GAME);                   // drawn, not used
         FE_CrAP_TurnOnPart(9, 0, 6);
     } else if (nRoll >= 85 && nRoll < 95) {
-        Misc_RandFunc(0);                   // drawn, not used
+        Misc_RandFunc(RANDOM_GAME);                   // drawn, not used
         FE_CrAP_TurnOnPart(9, 0, 4);
     } else {
-        Misc_RandFunc(0);                   // drawn, not used
+        Misc_RandFunc(RANDOM_GAME);                   // drawn, not used
         FE_CrAP_TurnOnPart(9, 0, 8);
     }
     FE_CrAP_RandomizeCategoryWithUndesirableTest(10, 95);

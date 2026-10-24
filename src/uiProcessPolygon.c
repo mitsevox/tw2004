@@ -636,7 +636,7 @@ void UI_PlayStartUpMovies(void) {
     FE_MakeMoviePath("eas", szPath);
     LLVideo_PlayFile(szPath, NULL, 0, 0);
     if (!(gSession.uFlags & 0x4000)) {
-        sprintf(szName, "tigcam%02d", (s16)((Misc_RandFunc(0) & 1) + 1));
+        sprintf(szName, "tigcam%02d", (s16)((Misc_RandFunc(RANDOM_GAME) & 1) + 1));
         FE_MakeCameoMoviePath(szName, szPath);
         LLVideo_PlayFile(szPath, FE_IsMovieSkipPressed, 0, 0);
     }
@@ -644,7 +644,7 @@ void UI_PlayStartUpMovies(void) {
     UI_ShowPictureFadingIn(pPict, 180, 1.0f / 30.0f);
     fn_80008380();
     Pict_Free(pPict);
-    StaticMem_Free(gpLegalPicture);
+    Circular_MemFreeFunc(gpLegalPicture);
     gpLegalPicture = NULL;
 }
 

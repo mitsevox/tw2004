@@ -144,9 +144,9 @@ void GameModeDriverPGATour_Locale_PgaTourMode_LoadPGAnFromStream(UStreamObject* 
     void* pData;
     u32 nSize = fn_8000E81C(pObject, &pData);
     if (nSize) {
-        gPgaData.pNames = fn_800951A0(nSize, 0x10, 1);
+        gPgaData.pNames = Mem_AllocFunc(nSize, 0x10, 1);
         Mem_cpy(gPgaData.pNames, pData, nSize);
-        StaticMem_Free(pObject);
+        Circular_MemFreeFunc(pObject);
     }
 }
 
@@ -369,7 +369,7 @@ void GameModeDriverPGATour_PlayEndOfGameMovies(void) {
             if (nWins >= 3) {
                 GUI_QueueMessage(5, 8, 0, 0);
             } else {
-                GUI_QueueMessage(5, (Misc_RandFunc(1) & 3) + 27, 0, 0);
+                GUI_QueueMessage(5, (Misc_RandFunc(RANDOM_PRESENTATION) & 3) + 27, 0, 0);
             }
         } else if (gpSaveData[nPlayer].tour.nEvent == 9) {
             GUI_QueueMessage(5, 9, 0, 0);

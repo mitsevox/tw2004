@@ -167,7 +167,7 @@ void Grass_DeInitForHole(void) {
             Grass_QueueRelease(gpGrassMgr->apF0[gpGrassMgr->n100][i]);
         }
         Grass_ReleaseQueued();
-        StaticMem_Free(gpGrassMgr->p370);
+        Circular_MemFreeFunc(gpGrassMgr->p370);
         gpGrassMgr->p370 = NULL;
         Grass_FreeBuffers();
         Grass_ReleaseTopCamera();
@@ -288,7 +288,7 @@ void Grass_UpdateView(void) {
     }
     if (gpGrassMgr->f3D4 != gpGrassMgr->f3D8) {
         for (i = 0; i < 8; i++) {
-            gpGrassMgr->af168[i] = gpGrassMgr->f3D4 * Misc_RandFuncf(1);
+            gpGrassMgr->af168[i] = gpGrassMgr->f3D4 * Misc_RandFuncf(RANDOM_PRESENTATION);
         }
         gpGrassMgr->f3D8 = gpGrassMgr->f3D4;
     }
@@ -385,14 +385,15 @@ void Grass_AimTopCamera(void) {
 // The grass's 256 x 256 top texture: its buffer (allocated here, GoGrass.c line 1311) and texture
 // object. fn_80112D20 calls it when the grass is on.
 void Grass_CreateTopTexture(void) {
-    gpGrassTopTexBuf = StaticMem_Alloc(GXGetTexBufferSize(256, 256, 4, 0, 0), 2, 32, "GoGrass.c", 1311);
+    gpGrassTopTexBuf = Circular_MemAllocFunc(GXGetTexBufferSize(256, 256, 4, 0, 0), MEMTYPE_LOW, 32,
+                                             "GoGrass.c", 1311);
     GXInitTexObj(&gGrassTopTexObj, gpGrassTopTexBuf, 256, 256, 4, 0, 0, 0);
 }
 
 // The partner of Grass_CreateTopTexture (fn_80112DA0): the buffer is freed if there is one.
 void Grass_FreeTopTexture(void) {
     if (gpGrassTopTexBuf != NULL) {
-        StaticMem_Free(gpGrassTopTexBuf);
+        Circular_MemFreeFunc(gpGrassTopTexBuf);
     }
     gpGrassTopTexBuf = NULL;
 }
@@ -855,11 +856,13 @@ s32 Grass_AllocBuffers(void) {
     gpGrassMgr->nE0 = 16;
     gpGrassMgr->anF8[0] = 0;
     gpGrassMgr->anF8[1] = 0;
-    gpGrassMgr->pEC = StaticMem_Alloc(16 * sizeof(GrassBuffer), 2, 16, "GoGrass.c", 3707);
-    gpGrassMgr->apF0[0] = StaticMem_Alloc(16 * sizeof(GrassBuffer*), 2, 16, "GoGrass.c", 3709);
-    gpGrassMgr->apF0[1] = StaticMem_Alloc(16 * sizeof(GrassBuffer*), 2, 16, "GoGrass.c", 3711);
-    gpGrassMgr->apD8 = StaticMem_Alloc(16 * sizeof(GrassBuffer*), 2, 16, "GoGrass.c", 3714);
-    gpGrassMgr->apDC = StaticMem_Alloc(16 * sizeof(GrassBuffer*), 2, 16, "GoGrass.c", 3716);
+    gpGrassMgr->pEC = Circular_MemAllocFunc(16 * sizeof(GrassBuffer), MEMTYPE_LOW, 16, "GoGrass.c", 3707);
+    gpGrassMgr->apF0[0] = Circular_MemAllocFunc(16 * sizeof(GrassBuffer*), MEMTYPE_LOW, 16,
+                                                "GoGrass.c", 3709);
+    gpGrassMgr->apF0[1] = Circular_MemAllocFunc(16 * sizeof(GrassBuffer*), MEMTYPE_LOW, 16,
+                                                "GoGrass.c", 3711);
+    gpGrassMgr->apD8 = Circular_MemAllocFunc(16 * sizeof(GrassBuffer*), MEMTYPE_LOW, 16, "GoGrass.c", 3714);
+    gpGrassMgr->apDC = Circular_MemAllocFunc(16 * sizeof(GrassBuffer*), MEMTYPE_LOW, 16, "GoGrass.c", 3716);
     nBytes = 16 * sizeof(GrassBuffer) + 4 * (16 * sizeof(GrassBuffer*));
     for (i = 0; i < gpGrassMgr->nE0; i++) {
         if (i < 4) {
@@ -868,7 +871,7 @@ s32 Grass_AllocBuffers(void) {
             nVerts = 450;
         }
         nSize = nVerts * 16;
-        gpGrassMgr->pEC[i].p40 = StaticMem_Alloc(nSize, 2, 16, "GoGrass.c", 3729);
+        gpGrassMgr->pEC[i].p40 = Circular_MemAllocFunc(nSize, MEMTYPE_LOW, 16, "GoGrass.c", 3729);
         nBytes += nSize;
         gpGrassMgr->pEC[i].n44 = nVerts;
     }
@@ -882,13 +885,13 @@ s32 Grass_AllocBuffers(void) {
 void Grass_FreeBuffers(void) {
     int i;
     for (i = 0; i < gpGrassMgr->nE0; i++) {
-        StaticMem_Free(gpGrassMgr->pEC[i].p40);
+        Circular_MemFreeFunc(gpGrassMgr->pEC[i].p40);
     }
-    StaticMem_Free(gpGrassMgr->apF0[0]);
-    StaticMem_Free(gpGrassMgr->apF0[1]);
-    StaticMem_Free(gpGrassMgr->pEC);
-    StaticMem_Free(gpGrassMgr->apDC);
-    StaticMem_Free(gpGrassMgr->apD8);
+    Circular_MemFreeFunc(gpGrassMgr->apF0[0]);
+    Circular_MemFreeFunc(gpGrassMgr->apF0[1]);
+    Circular_MemFreeFunc(gpGrassMgr->pEC);
+    Circular_MemFreeFunc(gpGrassMgr->apDC);
+    Circular_MemFreeFunc(gpGrassMgr->apD8);
 }
 
 // Whether the hole has its grass file loaded (GoGolfCam asks, for the lie-based camera height).

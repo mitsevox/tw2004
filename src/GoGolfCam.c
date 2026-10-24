@@ -83,7 +83,7 @@ static f32 GoGolfCam_StrippedFn(f32 x) {
 // start (fn_80062E00).
 void GolfCamera_Init(void) {
     int i;
-    gGolfCamState = StaticMem_Alloc(0x200, 2, 0, "GoGolfCam.c", 164);
+    gGolfCamState = Circular_MemAllocFunc(0x200, MEMTYPE_LOW, 0, "GoGolfCam.c", 164);
     gGolfCamState->bMatrixCam = 0;
     gGolfCamState->bScriptMatrixMode = 0;
     gGolfCamState->bComicCam = 0;
@@ -106,7 +106,7 @@ void GolfCamera_Init(void) {
 // Free the shared camera state GolfCamera_Init allocated (called when a round's systems stop,
 // fn_80062E20).
 void GolfCamera_DeInit(void) {
-    StaticMem_Free(gGolfCamState);
+    Circular_MemFreeFunc(gGolfCamState);
     gGolfCamState = NULL;
 }
 
@@ -1398,7 +1398,7 @@ void GolfCamera_InitPreShotCamera(View* pView, int nPlayer) {
     nLie = gPlayers[nPlayer].ball.nLie;
     pView->p74 = NULL;
     pShot = StaticCam_ChooseScript(nPlayer, STATICCAM_EVENT_PRE_SHOT, 0, pView->script.pShot);
-    if (pShot == NULL || Misc_RandFunc(1) % 100 > 50) {
+    if (pShot == NULL || Misc_RandFunc(RANDOM_PRESENTATION) % 100 > 50) {
         if (DynamicCam_ChoosePairedSequenceOrCamera(nPlayer, 0, &pView->p74, &pShot) && pView->p74 != NULL) {
             pShot = DynamicCam_ChooseScriptInSequence(pView->p74, CAMEVENT_TIMED_FIRST, &nA, &f1, &f2, &nB,
                                                       &f3, nPlayer);
@@ -3777,7 +3777,7 @@ void GolfCamera_ChooseSpecialSwing(View* pView, int nPlayer) {
         if (fPower > gpCamTuning->fSwingCamShortClubPower && (u8)bShortClub) {
             pView->nSpecialSwingType = 11;
         } else if (fPower > gpCamTuning->fSwingCamHighPower) {
-            if ((f32)(s32)(Misc_RandFunc(1) % 100) < gpCamTuning->fSwingCamHighChance) {
+            if ((f32)(s32)(Misc_RandFunc(RANDOM_PRESENTATION) % 100) < gpCamTuning->fSwingCamHighChance) {
                 pView->nSpecialSwingType = gGolfCamState->n1EC[nPlayer];
                 gGolfCamState->n1EC[nPlayer]++;
                 if (gGolfCamState->n1EC[nPlayer] >= 12) {
@@ -3785,7 +3785,7 @@ void GolfCamera_ChooseSpecialSwing(View* pView, int nPlayer) {
                 }
             }
         } else if (fPower > gpCamTuning->fSwingCamMidPower) {
-            if ((f32)(s32)(Misc_RandFunc(1) % 100) < gpCamTuning->fSwingCamMidChance) {
+            if ((f32)(s32)(Misc_RandFunc(RANDOM_PRESENTATION) % 100) < gpCamTuning->fSwingCamMidChance) {
                 pView->nSpecialSwingType = gGolfCamState->n1EC[nPlayer];
                 gGolfCamState->n1EC[nPlayer]++;
                 if (gGolfCamState->n1EC[nPlayer] >= 12) {
@@ -3793,7 +3793,7 @@ void GolfCamera_ChooseSpecialSwing(View* pView, int nPlayer) {
                 }
             }
         } else if (fPower > gpCamTuning->fSwingCamMinPower) {
-            if ((f32)(s32)(Misc_RandFunc(1) % 100) < gpCamTuning->fSwingCamLowChance) {
+            if ((f32)(s32)(Misc_RandFunc(RANDOM_PRESENTATION) % 100) < gpCamTuning->fSwingCamLowChance) {
                 pView->nSpecialSwingType = gGolfCamState->n1EC[nPlayer];
                 gGolfCamState->n1EC[nPlayer]++;
                 if (gGolfCamState->n1EC[nPlayer] >= 12) {
@@ -3805,7 +3805,7 @@ void GolfCamera_ChooseSpecialSwing(View* pView, int nPlayer) {
             pView->nSpecialSwingType = 1;
             gGolfCamState->n1EC[nPlayer] = 2;
         }
-        if (fn_8006BEA4() && Misc_RandFunc(1) % 100 > 50) {
+        if (fn_8006BEA4() && Misc_RandFunc(RANDOM_PRESENTATION) % 100 > 50) {
             pView->nSpecialSwingType = 7;
             gGolfCamState->n1EC[nPlayer] = 8;
             if (gGolfCamState->n1EC[nPlayer] >= 12) {

@@ -77,14 +77,14 @@ void fn_80037CD8(Skin* pSkin) {
     if (pModel != NULL) {
         if (pModel->pDesc != NULL) {
             fn_801127C4(pModel->pDesc);
-            StaticMem_Free(pSkin->pModel->pDesc);
+            Circular_MemFreeFunc(pSkin->pModel->pDesc);
         }
-        StaticMem_Free(pSkin->pModel);
+        Circular_MemFreeFunc(pSkin->pModel);
     }
     if (pSkin->pWorld2Bone != NULL) {
-        StaticMem_Free(pSkin->pWorld2Bone);
+        Circular_MemFreeFunc(pSkin->pWorld2Bone);
     }
-    StaticMem_Free(pSkin);
+    Circular_MemFreeFunc(pSkin);
 }
 
 // ---- end of sweep code ----
@@ -95,7 +95,7 @@ void fn_80037D5C(SkinDesc* pDesc) {
 
     for (i = 0; i < pDesc->nMeshes; i++) {
         if (pDesc->p34[i].pBits != NULL && (pDesc->p34[i].uFlags & 0x400000)) {
-            StaticMem_Free(pDesc->p34[i].pBits);
+            Circular_MemFreeFunc(pDesc->p34[i].pBits);
         }
     }
 }

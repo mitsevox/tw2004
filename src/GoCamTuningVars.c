@@ -13,7 +13,7 @@ sCameraTuningVars* gpCamTuning;
 // front end and each round start (GO_vInitFE, GO_vInitIG). fMaxPitchUp and fMaxPitchDown are in
 // degrees (GolfCamera_ClampLookAngle converts them).
 void CameraTuning_Init(void) {
-    gpCamTuning = StaticMem_Alloc(sizeof(sCameraTuningVars), 2, 0, "GoCamTuningVars.c", 24);
+    gpCamTuning = Circular_MemAllocFunc(sizeof(sCameraTuningVars), MEMTYPE_LOW, 0, "GoCamTuningVars.c", 24);
     gpCamTuning->fZoomToAimSpeed = 10.0f;
     gpCamTuning->fZoomToAimBack = 15.0f;
     gpCamTuning->fZoomToAimRampDist = 0.0f;
@@ -169,6 +169,6 @@ void CameraTuning_Init(void) {
 
 // Free the camera tuning values; run when the front end and each round shut down.
 void CameraTuning_Close(void) {
-    StaticMem_Free(gpCamTuning);
+    Circular_MemFreeFunc(gpCamTuning);
     gpCamTuning = NULL;
 }

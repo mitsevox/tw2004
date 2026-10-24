@@ -135,7 +135,7 @@ PictFile* LLVideo_ReadNextFile(void* pArg) {
         }
         nSize += apChunk[i]->uSize;
     }
-    pData = StaticMem_Alloc(nSize, 1, 0x20, "LLVideo.c", 0x3C4);
+    pData = Circular_MemAllocFunc(nSize, MEMTYPE_HIGH, 0x20, "LLVideo.c", 0x3C4);
     pDst = pData;
     for (i = 0; i < nChunks; i++) {
         memcpy(pDst, apChunk[i]->aData, apChunk[i]->uSize);
@@ -268,7 +268,7 @@ void LLVideo_InitModule(void) {
 // through LLVideo_ReadNextFile), in no slot, not running, at 33 frames a second. LLVideo_Destroy
 // frees it.
 Video* LLVideo_Create(void) {
-    Video* pVideo = StaticMem_Alloc(sizeof(Video), 2, 0x40, "LLVideo.c", 0x5C1);
+    Video* pVideo = Circular_MemAllocFunc(sizeof(Video), MEMTYPE_LOW, 0x40, "LLVideo.c", 0x5C1);
     Pict_OpenMovie(&pVideo->pict, &pVideo->stream, LLVideo_ReadNextFile, pVideo);
     pVideo->nSlot = -1;
     pVideo->bRunning = 0;
@@ -290,7 +290,7 @@ void LLVideo_Destroy(Video* pVideo) {
         LLVideo_SetSlot(pVideo->nSlot, NULL);
     }
     Pict_CloseMovie(&pVideo->pict, &pVideo->stream);
-    StaticMem_Free(pVideo);
+    Circular_MemFreeFunc(pVideo);
 }
 
 // Puts pVideo (or NULL) in slot nSlot (0..7) and returns the movie that was there, which no longer

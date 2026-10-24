@@ -78,10 +78,10 @@ void fn_8009CC00(void) {
     if (lbl_80281FC4 == 0) {
         lbl_80281FC4 = GoARAM_Alloc(MC_BUFFER_SIZE + 0x20);
     }
-    lbl_80281FE8 = StaticMem_Alloc(MC_BUFFER_SIZE, 1, 0x20, "MC_Gc.c", 129);
+    lbl_80281FE8 = Circular_MemAllocFunc(MC_BUFFER_SIZE, MEMTYPE_HIGH, 0x20, "MC_Gc.c", 129);
     lbl_80281FE4 = lbl_80281FE8;
     lbl_80281FEC = lbl_80281FE8;
-    lbl_80281FDC = StaticMem_Alloc(MC_BUFFER_SIZE, 1, 0x20, "MC_Gc.c", 133);
+    lbl_80281FDC = Circular_MemAllocFunc(MC_BUFFER_SIZE, MEMTYPE_HIGH, 0x20, "MC_Gc.c", 133);
     lbl_80281FD8 = lbl_80281FDC;
     lbl_80281FE0 = lbl_80281FDC;
     fn_8009EF98();
@@ -91,16 +91,16 @@ void fn_8009CC00(void) {
 // ARAM. The second image is not freed.
 void fn_8009CC88(void) {
     if (lbl_80281FB8 != NULL) {
-        StaticMem_Free(lbl_80281FB8);
+        Circular_MemFreeFunc(lbl_80281FB8);
         lbl_80281FB8 = NULL;
     }
     if (lbl_80281FBC != NULL) {
-        StaticMem_Free(lbl_80281FBC);
+        Circular_MemFreeFunc(lbl_80281FBC);
         lbl_80281FBC = NULL;
     }
     MC_FreeEAGameList();
     if (lbl_80281FE8 != NULL) {
-        StaticMem_Free(lbl_80281FE8);
+        Circular_MemFreeFunc(lbl_80281FE8);
         lbl_80281FEC = NULL;
         lbl_80281FE4 = NULL;
         lbl_80281FE8 = NULL;
@@ -1055,8 +1055,8 @@ void fn_8009EF98(void) {
             Skalib_ReclaimBankMemory(0);
             Skalib_ReclaimBankMemory(1);
         } else {
-            StaticMem_Free(lbl_80281FE8);
-            StaticMem_Free(lbl_80281FDC);
+            Circular_MemFreeFunc(lbl_80281FE8);
+            Circular_MemFreeFunc(lbl_80281FDC);
         }
         lbl_80281FE8 = NULL;
         lbl_80281FEC = NULL;
@@ -1076,9 +1076,9 @@ void fn_8009F02C(void) {
             lbl_80281FDC = lbl_80281FE0 = lbl_80281FD8 = (SaveImage*)Skalib_LendBankMemory(1);
         } else {
             lbl_80281FE8 = lbl_80281FEC = lbl_80281FE4 =
-                StaticMem_Alloc(lbl_80281FC0, 1, 0x20, "MC_Gc.c", 2805);
+                Circular_MemAllocFunc(lbl_80281FC0, MEMTYPE_HIGH, 0x20, "MC_Gc.c", 2805);
             lbl_80281FDC = lbl_80281FE0 = lbl_80281FD8 =
-                StaticMem_Alloc(lbl_80281FC0, 1, 0x20, "MC_Gc.c", 2810);
+                Circular_MemAllocFunc(lbl_80281FC0, MEMTYPE_HIGH, 0x20, "MC_Gc.c", 2810);
         }
         GoARAM_WaitTransfer(GoARAM_CopyFromAram(lbl_80281FE8, lbl_80281FC4, lbl_80281FC0));
     }

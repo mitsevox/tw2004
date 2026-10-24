@@ -34,7 +34,7 @@ void fn_80098A98(void) {
     int i;
 
     for (i = 0; i < 6; i++) {
-        lbl_801DB888[i] = StaticMem_Alloc(sizeof(PsEmitter), 2, 64, "UFstPart.c", 408);
+        lbl_801DB888[i] = Circular_MemAllocFunc(sizeof(PsEmitter), MEMTYPE_LOW, 64, "UFstPart.c", 408);
         lbl_801DB888[i]->b5C = 0;
         memset(&params, 0, sizeof(ParticleParams));
         params.nCount = 128;
@@ -59,7 +59,7 @@ void fn_80098B5C(void) {
     lbl_80281F88 = NULL;
     for (i = 0; i < 6; i++) {
         SD_FreeShaderObject(&lbl_801DB888[i]->mesh);
-        StaticMem_Free(lbl_801DB888[i]);
+        Circular_MemFreeFunc(lbl_801DB888[i]);
     }
 }
 
@@ -67,7 +67,7 @@ void fn_80098BDC(PsEmitter* pEmitter) {
     pEmitter->b5C = 0;
     if (pEmitter->params.n54 < 0) {
         SD_FreeShaderObject(&pEmitter->mesh);
-        StaticMem_Free(pEmitter);
+        Circular_MemFreeFunc(pEmitter);
     }
 }
 
@@ -117,12 +117,12 @@ void fn_80098CDC(ParticleParams* pParams, f32* pPos, f32* pVel, f32* p18, f32* p
     f32 z;
 
     if (pParams->u58 & 8) {
-        fSpeed = pParams->f2C * Misc_RandFuncf(1) + pParams->f28;
+        fSpeed = pParams->f2C * Misc_RandFuncf(RANDOM_PRESENTATION) + pParams->f28;
     } else {
         fSpeed = pParams->f28;
     }
     if (pParams->u58 & 0x20) {
-        fRand = Misc_RandFuncf(1);
+        fRand = Misc_RandFuncf(RANDOM_PRESENTATION);
         if (pParams->u58 & 0x10) {
             fRand = Math_Sqrt(fRand);
         }
@@ -130,11 +130,11 @@ void fn_80098CDC(ParticleParams* pParams, f32* pPos, f32* pVel, f32* p18, f32* p
     } else {
         fDist = pParams->f30;
     }
-    fTurn = 2.0f * PI * Misc_RandFuncf(1);
+    fTurn = 2.0f * PI * Misc_RandFuncf(RANDOM_PRESENTATION);
     fSinTurn = sinf(fTurn);
     fCosTurn = cosf(fTurn);
     if (pParams->u58 & 0x40) {
-        fPitch = pParams->f3C * Misc_RandFuncf(1) + pParams->f38;
+        fPitch = pParams->f3C * Misc_RandFuncf(RANDOM_PRESENTATION) + pParams->f38;
     } else {
         fPitch = pParams->f38;
     }
@@ -152,14 +152,14 @@ void fn_80098CDC(ParticleParams* pParams, f32* pPos, f32* pVel, f32* p18, f32* p
     pVel[3] = 0.0f;
     if (pParams->u58 & 0x200) {
         if (pParams->u58 & 0x400) {
-            fTurn = 2.0f * PI * Misc_RandFuncf(1);
+            fTurn = 2.0f * PI * Misc_RandFuncf(RANDOM_PRESENTATION);
             fSinTurn = sinf(fTurn);
             fCosTurn = cosf(fTurn);
-            fPitch = 2.0f * PI * Misc_RandFuncf(1);
+            fPitch = 2.0f * PI * Misc_RandFuncf(RANDOM_PRESENTATION);
             fSinPitch = sinf(fPitch);
             fCosPitch = cosf(fPitch);
             if (pParams->u58 & 0x800) {
-                fRand = Misc_RandFuncf(1);
+                fRand = Misc_RandFuncf(RANDOM_PRESENTATION);
                 fRandXZ = fRand * fSinPitch;
                 y = fRand * fCosPitch;
                 z = fRandXZ * fSinTurn;
@@ -185,30 +185,30 @@ void fn_80098CDC(ParticleParams* pParams, f32* pPos, f32* pVel, f32* p18, f32* p
         } else {
             fSpread = pParams->v60[0];
             if (fSpread) {
-                pPos[0] += fSpread * (2.0f * Misc_RandFuncf(1) - 1.0f);
+                pPos[0] += fSpread * (2.0f * Misc_RandFuncf(RANDOM_PRESENTATION) - 1.0f);
             }
             fSpread = pParams->v60[1];
             if (fSpread) {
-                pPos[1] += fSpread * (2.0f * Misc_RandFuncf(1) - 1.0f);
+                pPos[1] += fSpread * (2.0f * Misc_RandFuncf(RANDOM_PRESENTATION) - 1.0f);
             }
             fSpread = pParams->v60[2];
             if (fSpread) {
-                pPos[2] += fSpread * (2.0f * Misc_RandFuncf(1) - 1.0f);
+                pPos[2] += fSpread * (2.0f * Misc_RandFuncf(RANDOM_PRESENTATION) - 1.0f);
             }
         }
     }
     if (pParams->u58 & 1) {
-        *p18 = 2.0f * PI * Misc_RandFuncf(1);
+        *p18 = 2.0f * PI * Misc_RandFuncf(RANDOM_PRESENTATION);
     } else {
         *p18 = 0.0f;
     }
     if (pParams->u58 & 2) {
-        *p1C = pParams->fC * -(2.0f * Misc_RandFuncf(1) - 1.0f);
+        *p1C = pParams->fC * -(2.0f * Misc_RandFuncf(RANDOM_PRESENTATION) - 1.0f);
     } else {
         *p1C = pParams->fC;
     }
     if (pParams->u58 & 4) {
-        *p20 = pParams->f14 * Misc_RandFuncf(1) + pParams->f10;
+        *p20 = pParams->f14 * Misc_RandFuncf(RANDOM_PRESENTATION) + pParams->f10;
     } else {
         *p20 = pParams->f10;
     }
@@ -268,7 +268,7 @@ u32 fn_8009912C(PsEmitter* pEmitter, int n, f32 fStep, f32 fLiveStep) {
     }
     pEmitter->f48 -= fStep;
     if (pEmitter->f48 < 0.0f) {
-        pEmitter->f48 += pEmitter->params.f1C * Misc_RandFuncf(1) + pEmitter->params.f18;
+        pEmitter->f48 += pEmitter->params.f1C * Misc_RandFuncf(RANDOM_PRESENTATION) + pEmitter->params.f18;
         pEmitter->f44 = pEmitter->params.f20;
     }
     if (pEmitter->f44 >= 0.0f) {
@@ -444,7 +444,7 @@ PsEmitter* fn_80099758(ParticleParams* pParams) {
         pParams->nCount = 128;
     }
     if (pParams->n54 < 0) {
-        pEmitter = StaticMem_Alloc(sizeof(PsEmitter), 2, 64, "UFstPart.c", 967);
+        pEmitter = Circular_MemAllocFunc(sizeof(PsEmitter), MEMTYPE_LOW, 64, "UFstPart.c", 967);
         create.bAlloc = 1;
         create.pParams = pParams;
         SD_InitShaderObject(&pEmitter->mesh, 9, &create);

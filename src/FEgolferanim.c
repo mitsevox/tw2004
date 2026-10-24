@@ -163,7 +163,7 @@ void FE_CharMgrInit(void) {
     int nPrev;
     int nNext;
 
-    gpCrAPState = StaticMem_Alloc(sizeof(CrAPState), 2, 0, "FEgolferanim.c", 337);
+    gpCrAPState = Circular_MemAllocFunc(sizeof(CrAPState), MEMTYPE_LOW, 0, "FEgolferanim.c", 337);
     gpCrAPState->nScreenKind = 0;
     gpCrAPState->nCamIdleState = 0;
     gpCrAPState->nClub = 0;
@@ -184,7 +184,7 @@ void FE_CharMgrInit(void) {
     gpCrAPState->bClearCache = 0;
     gpCrAPState->n8C = -1;
     gpCrAPState->n194 = 0;
-    gpCrAPState->n198 = Misc_RandFunc(0) & 3;
+    gpCrAPState->n198 = Misc_RandFunc(RANDOM_GAME) & 3;
     gpCrAPState->fFacing = 0.0f;
     gpCrAPState->fTargetFacing = 0.0f;
     gpCrAPState->b1B0 = 0;
@@ -234,7 +234,7 @@ void FE_CharMgrClose(void) {
     FE_StreamStopForClose();
     FE_vExecuteClearGolferCache();
     FE_vFreeUnusedCharacters();
-    StaticMem_Free(gpCrAPState);
+    Circular_MemFreeFunc(gpCrAPState);
     gpCrAPState = NULL;
 }
 
@@ -1303,7 +1303,7 @@ void FE_lite_vStreamCallback(UStreamObject* pObject) {
     void* pSrc;
     void* pDst;
 
-    gFEGolferLights = StaticMem_Alloc(pObject->uSize, 2, 16, "FEgolferanim.c", 3143);
+    gFEGolferLights = Circular_MemAllocFunc(pObject->uSize, MEMTYPE_LOW, 16, "FEgolferanim.c", 3143);
     pSrc = pObject->pData;
     pDst = gFEGolferLights;
     ByteSwap_Records(&pSrc, &pDst,
@@ -1313,7 +1313,7 @@ void FE_lite_vStreamCallback(UStreamObject* pObject) {
     LF_vSetCurrentLightFogEnvironment(0);
     LF_vSetLightingEnvironment(gFEGolferLights);
     LF_ResetCurrentFogSettings();
-    StaticMem_Free(pObject);
+    Circular_MemFreeFunc(pObject);
 }
 
 // Drop the golfers loaded for the menus: bClearCache has FE_vFreeUnusedCharacters free them once

@@ -113,14 +113,14 @@ early in link order (0x80005628-0x80013720), between the LL rendering files.
 | LLMem_Gc.c | ours (after TW06 `llmem_xbox.c`) | memory copy, fill and compare |
 | LLFileIO_Gc.c | EA | disc file reads, from a queue run by a reader thread |
 | MathQuat.c | T7 | quaternion rotations (slerp, products, matrices, Euler angles); the float sin, cos, acos, asin and sqrt |
-| StaticMemory.c | ours | the game's own heap (one ~20 MB block, sorted free spans) |
+| UCirc.c | T7 | the game's own heap (one ~20 MB block, sorted free spans, blocks from either end) |
 | UMemPool.c | EA | pools of fixed-size nodes; 4x4 matrix and paired-single math, atan2f, logarithm |
 | urandom.c | T6 | three random-number streams (lagged Fibonacci), uniform and normal floats |
 | URes.c | EA | the resource list: the stream objects kept once delivered, found by type and id |
 | LoadData.c | ours | stream handlers: `'txf2'` texture banks, the `'load'` object, the loading-screen file; `Game_GetMode` |
 | UStream.c | EA | the streaming asset loader (CTRL/SHOC/SONO chunk files `.hog`/`.gcb`), async DVD reads into 18 buffers |
 | streammanagerhole.c | T6 | the stream file lists (front end, start-up, in game, characters, hole) and their handler lists |
-| Controller_Gc.c | ours | the four controllers: buttons, sticks, triggers, rumble |
+| LLInput_Gc.c | ours (after TW06 `llinput_xbox.c`) | the four controllers: buttons, sticks, triggers, rumble |
 | UByteSwap.c | T7 | copies little-endian disc data while swapping byte order |
 | LLTime.c | T7 | the clock and its stopwatch counters (`TI_*`) the main loop times frames with |
 | LLMath_Gc.c | ours (after TW07 `LLMath_PS3.c`) | paired-single vector and matrix helpers used everywhere |

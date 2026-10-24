@@ -166,7 +166,7 @@ void GameModeReplay_SetupNextGolfer(void) {
     gReplayData.nWindSpeed = nWindSpeed;
     gReplayData.nWeather = nF12;
     gReplayData.nWeatherAmount = nF14;
-    Misc_SetSeedFunc(0, nSeed);
+    Misc_SetSeedFunc(RANDOM_GAME, nSeed);
     GOLFERSTATE_Switch(GS_PRE_SHOT, 0);
 }
 

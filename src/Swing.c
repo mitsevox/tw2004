@@ -269,9 +269,9 @@ void SW_vInitModule(void) {
         gPlayers[i].swing.fAlpha = 0.0f;
     }
     for (i = 0; i < 2; i++) {
-        gpSwing->p94[i] = StaticMem_Alloc(0x138, 2, 0x10, "Swing.c", 555);
-        gpSwing->p9C[i] = StaticMem_Alloc(0x68, 2, 0x10, "Swing.c", 556);
-        gpSwing->pA4[i] = StaticMem_Alloc(0xD0, 2, 0x10, "Swing.c", 557);
+        gpSwing->p94[i] = Circular_MemAllocFunc(0x138, MEMTYPE_LOW, 0x10, "Swing.c", 555);
+        gpSwing->p9C[i] = Circular_MemAllocFunc(0x68, MEMTYPE_LOW, 0x10, "Swing.c", 556);
+        gpSwing->pA4[i] = Circular_MemAllocFunc(0xD0, MEMTYPE_LOW, 0x10, "Swing.c", 557);
     }
 }
 
@@ -282,9 +282,9 @@ void SW_vCloseModule(void) {
     SD_FreeShaderObject(gpSwing->mesh[0]);
     SD_FreeShaderObject(gpSwing->mesh[1]);
     for (i = 0; i < 2; i++) {
-        StaticMem_Free(gpSwing->p94[i]);
-        StaticMem_Free(gpSwing->p9C[i]);
-        StaticMem_Free(gpSwing->pA4[i]);
+        Circular_MemFreeFunc(gpSwing->p94[i]);
+        Circular_MemFreeFunc(gpSwing->p9C[i]);
+        Circular_MemFreeFunc(gpSwing->pA4[i]);
     }
 }
 
@@ -311,12 +311,12 @@ f32 SW_vGetControllerStartOfSwing(SwingData* pSw) {
 
 u8 lbl_80281194[8] = {0x80, 0x80, 0x80, 0x80};    // a neutral pad: both sticks centred (0x80)
 
-// The sticks of pad nController as bytes 0..255 (Input_sGetStickInfo: [0] and [1] the C stick's x
-// and y, [2] and [3] the main stick's; y grows as the stick is pulled back), or a neutral pad (both
-// sticks centred at 128) when there is none or Lessons_UseNeutralPad() says so (it always returns 0 in this
-// build). nPlayer is unused.
+// The sticks of pad nController as bytes 0..255 (Input_sGetStickInfo's Controller_StickInfo: [0]
+// and [1] the C stick's x and y, [2] and [3] the main stick's; y grows as the stick is pulled
+// back), or a neutral pad (both sticks centred at 128) when there is none or
+// Lessons_UseNeutralPad() says so (it always returns 0 in this build). nPlayer is unused.
 u8* SW_vGetStickInfo(int nPlayer, int nController) {
-    u8* pPad = Input_sGetStickInfo(nController);
+    u8* pPad = (u8*)Input_sGetStickInfo(nController);
     if (pPad == NULL || Lessons_UseNeutralPad()) {
         return lbl_80281194;
     }
@@ -1154,7 +1154,7 @@ void SW_vImpact(int nPlayer) {
 
     p = &gPlayers[nPlayer];
     if (Game_GetMode() == 10) {
-        Misc_SetSeedFunc(0, gReplayData.nSeed);
+        Misc_SetSeedFunc(RANDOM_GAME, gReplayData.nSeed);
         // port: 0x630 of the swing data's 0x634 bytes (it holds no pointers)
         Mem_cpy(&gPlayers[0].swing, &gReplayData.player.swing, 0x630);
     } else if (gSession.bReplay == 0) {
@@ -1484,8 +1484,8 @@ f32 SW_vCalculateMishitAngle(int nPlayer) {
     fCentreX = gPlayers[nPlayer].swing.nCalibrateX;
     fCentreY = gPlayers[nPlayer].swing.nCalibrateY;
 
-    fTopX    += Misc_RandFuncf(0) * 30.0f - 15.0f;
-    fImpactX += Misc_RandFuncf(0) * 30.0f - 15.0f;
+    fTopX    += Misc_RandFuncf(RANDOM_GAME) * 30.0f - 15.0f;
+    fImpactX += Misc_RandFuncf(RANDOM_GAME) * 30.0f - 15.0f;
     vDir[0] = 0.0f;
     vDir[1] = 0.0f;
     vDir[2] = 1.0f;

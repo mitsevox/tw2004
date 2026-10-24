@@ -739,7 +739,7 @@ void GameMode22_ScoreShot(int nPlayer) {
         }
     }
     if (nMsgs > 0 && gGameMode22.nWinner == 5) {
-        GameMode26_StartComment(aMsgs[Misc_RandFunc(1) % nMsgs], 0);
+        GameMode26_StartComment(aMsgs[Misc_RandFunc(RANDOM_PRESENTATION) % nMsgs], 0);
     }
 }
 

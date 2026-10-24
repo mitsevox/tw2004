@@ -454,7 +454,7 @@ void GameMode26_ScoreShot(PlayerNumber_t nPlayer) {
     if (pPlayer->nDriveScore >= gGameMode26TargetScore) {
         gGameMode26Winner = nPlayer;
         nMsgs = 0;
-        nPick = Misc_RandFunc(1) % 3;
+        nPick = Misc_RandFunc(RANDOM_PRESENTATION) % 3;
         if (nPick == 0) {
             GameMode26_StartComment(1, 0);
         } else if (nPick == 1) {
@@ -466,7 +466,7 @@ void GameMode26_ScoreShot(PlayerNumber_t nPlayer) {
         }
     }
     if (nMsgs > 0 && gGameMode26Winner == 5) {
-        GameMode26_StartComment(aMsgs[Misc_RandFunc(1) % nMsgs], 0);
+        GameMode26_StartComment(aMsgs[Misc_RandFunc(RANDOM_PRESENTATION) % nMsgs], 0);
     }
 }
 

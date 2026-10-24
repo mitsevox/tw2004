@@ -22,14 +22,15 @@ void VM_vCloseModule(void) {
 }
 
 VM_SViewport* VM_spCreateViewport(void) {
-    VM_SViewport* pViewport = StaticMem_Alloc(sizeof(VM_SViewport), 2, 16, "GoViewport.c", 137);
+    VM_SViewport* pViewport = Circular_MemAllocFunc(sizeof(VM_SViewport), MEMTYPE_LOW, 16,
+                                                    "GoViewport.c", 137);
 
     VM_vSetDefaultViewport(pViewport);
     return pViewport;
 }
 
 void VM_vReleaseViewport(VM_SViewport* pViewport) {
-    StaticMem_Free(pViewport);
+    Circular_MemFreeFunc(pViewport);
 }
 
 // All of the frame buffer, on a 4:3 screen.

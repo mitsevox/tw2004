@@ -29,12 +29,12 @@ ComicCam* gpComicCam;
 
 // Allocate the comic camera's state (gpComicCam) when a round's systems start (GO_vInitIG).
 void ComicCam_InitComicCam(void) {
-    gpComicCam = StaticMem_Alloc(sizeof(ComicCam), 2, 0, "GoComicCam.c", 91);
+    gpComicCam = Circular_MemAllocFunc(sizeof(ComicCam), MEMTYPE_LOW, 0, "GoComicCam.c", 91);
 }
 
 // Free the comic camera's state (gpComicCam) when the round's systems shut down (gomainloop.c).
 void ComicCam_CloseComicCam(void) {
-    StaticMem_Free(gpComicCam);
+    Circular_MemFreeFunc(gpComicCam);
 }
 
 // Start the comic camera for nPlayer's view (GolfCamera_Init3ScreenCamera) with layout nKind (0:
@@ -319,7 +319,7 @@ void ComicCam_Init9ScreenRapidMode(void) {
         { 1, 0, 4, 6, 8, 5, 3, 2, 7 },
         { 0, 1, 2, 7, 8, 3, 6, 5, 4 },
     };
-    int nOrder = Misc_RandFunc(1) & 3;
+    int nOrder = Misc_RandFunc(RANDOM_PRESENTATION) & 3;
 
     gpComicCam->aPanel[aOrder[nOrder][0]].fTop = 0.03f;
     gpComicCam->aPanel[aOrder[nOrder][0]].fLeft = 0.03f;
@@ -405,7 +405,7 @@ void ComicCam_Init9ScreenRapidMode(void) {
     gpComicCam->nPanel = 0;
     gpComicCam->fTime = 0.0f;
     gpComicCam->nShown = 0;
-    if (!(Misc_RandFunc(1) & 1)) {
+    if (!(Misc_RandFunc(RANDOM_PRESENTATION) & 1)) {
         gpComicCam->nPanels = 18;
     } else {
         gpComicCam->nPanels = 9;

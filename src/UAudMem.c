@@ -26,7 +26,7 @@ MemStackBlock gAudMemBlocks[AUDMEM_NUM_BLOCKS]; // its block table
 // The sound engine's memory (the first step of Aud_InitOnce): 384 KB of main memory, 64-byte
 // aligned, as a stack of up to 64 blocks.
 void AudMem_Init(void) {
-    gAudMemBuffer = fn_800951A0(AUDMEM_SIZE, AUDMEM_ALIGN, 0);
+    gAudMemBuffer = Mem_AllocFunc(AUDMEM_SIZE, AUDMEM_ALIGN, 0);
     AudMemStack_Init(&gAudMemStack, gAudMemBuffer, AUDMEM_SIZE, AUDMEM_NUM_BLOCKS, gAudMemBlocks,
                      AUDMEM_ALIGN);
 }
@@ -50,11 +50,11 @@ void AudMem_InitOnce(void) {
 void AudMem_CloseOnce(void) {
 }
 
-// Empty in this build: the per-mode start-up fn_8006C7A8 calls it right after StaticMem_Reset.
+// Empty in this build: the per-mode start-up fn_8006C7A8 calls it right after Circular_InitBuffer.
 void AudMem_InitModule(void) {
 }
 
 // Empty in this build: the per-mode shut-down fn_8006C854 calls it just before
-// StaticMem_Checkpoint.
+// Circular_CloseBuffer.
 void AudMem_CloseModule(void) {
 }

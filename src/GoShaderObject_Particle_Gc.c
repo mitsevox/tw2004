@@ -12,7 +12,7 @@
 #include "psmgr.h"
 #include "unsorted/cull.h"
 
-// The main-memory heap's globals (fn_80095108, fn_800951A0), defined last-address-first.
+// The main-memory heap's globals (fn_80095108, Mem_AllocFunc), defined last-address-first.
 s32 lbl_80281F68;                       // the heap's size
 int lbl_80281F64;                       // the heap
 u8* lbl_80281F60;                       // the end of the last block allocated
@@ -24,10 +24,14 @@ ParticleBuffers* lbl_802813A8 = &lbl_801D97E0;
 
 // The particles' four buffers, two of 90000 bytes and two of 10000.
 void fn_8009414C(void) {
-    lbl_802813A8->apBuffers[0] = StaticMem_Alloc(90000, 2, 32, "GoShaderObject_Particle_Gc.c", 109);
-    lbl_802813A8->apBuffers[1] = StaticMem_Alloc(90000, 2, 32, "GoShaderObject_Particle_Gc.c", 111);
-    lbl_802813A8->apBuffers[2] = StaticMem_Alloc(10000, 2, 32, "GoShaderObject_Particle_Gc.c", 113);
-    lbl_802813A8->apBuffers[3] = StaticMem_Alloc(10000, 2, 32, "GoShaderObject_Particle_Gc.c", 115);
+    lbl_802813A8->apBuffers[0] = Circular_MemAllocFunc(90000, MEMTYPE_LOW, 32,
+                                                       "GoShaderObject_Particle_Gc.c", 109);
+    lbl_802813A8->apBuffers[1] = Circular_MemAllocFunc(90000, MEMTYPE_LOW, 32,
+                                                       "GoShaderObject_Particle_Gc.c", 111);
+    lbl_802813A8->apBuffers[2] = Circular_MemAllocFunc(10000, MEMTYPE_LOW, 32,
+                                                       "GoShaderObject_Particle_Gc.c", 113);
+    lbl_802813A8->apBuffers[3] = Circular_MemAllocFunc(10000, MEMTYPE_LOW, 32,
+                                                       "GoShaderObject_Particle_Gc.c", 115);
     lbl_802813A8->n14 = 0;
     lbl_802813A8->b10 = 0;
 }
@@ -35,10 +39,10 @@ void fn_8009414C(void) {
 void fn_80094214(void) {
     lbl_802813A8->n14 = 0;
     lbl_802813A8->b10 = 0;
-    StaticMem_Free(lbl_802813A8->apBuffers[0]);
-    StaticMem_Free(lbl_802813A8->apBuffers[1]);
-    StaticMem_Free(lbl_802813A8->apBuffers[2]);
-    StaticMem_Free(lbl_802813A8->apBuffers[3]);
+    Circular_MemFreeFunc(lbl_802813A8->apBuffers[0]);
+    Circular_MemFreeFunc(lbl_802813A8->apBuffers[1]);
+    Circular_MemFreeFunc(lbl_802813A8->apBuffers[2]);
+    Circular_MemFreeFunc(lbl_802813A8->apBuffers[3]);
 }
 
 void fn_80094274(void) {
@@ -54,7 +58,8 @@ void fn_8009428C(SD_SShaderObject_Static* pObject, ParticleCreate* pCreate) {
     ParticleSystem* pSys;
 
     if (pCreate->bAlloc) {
-        pObject->pData = StaticMem_Alloc(sizeof(ParticleSystem), 2, 32, "GoShaderObject_Particle_Gc.c", 201);
+        pObject->pData = Circular_MemAllocFunc(sizeof(ParticleSystem), MEMTYPE_LOW, 32,
+                                               "GoShaderObject_Particle_Gc.c", 201);
         ((ParticleSystem*)pObject->pData)->nFirst = lbl_802813A8->n14;
         lbl_802813A8->n14 += pCreate->pParams->nCount;
         return;
@@ -109,7 +114,7 @@ void fn_800944F8(SD_SShaderObject_Static* pObject) {
     if (lbl_802813A8->n14 > pSys->nFirst) {
         lbl_802813A8->n14 = pSys->nFirst;
     }
-    StaticMem_Free(pSys);
+    Circular_MemFreeFunc(pSys);
 }
 
 void fn_800950CC(f32 s, f32 t);
@@ -498,8 +503,8 @@ void fn_80095108(void) {
 }
 
 // Allocates uSize bytes aligned to nAlign (0: 16). A HeapBlockHead sits just before the result,
-// and the padding's size in the byte after it (for fn_8009527C).
-void* fn_800951A0(u32 uSize, u16 nAlign, int n) {
+// and the padding's size in the byte after it (for Mem_FreeFunc).
+void* Mem_AllocFunc(u32 uSize, u16 nAlign, int n) {
     u32 uPad;
     u32 uTotal;
     void* pBlock;
@@ -535,7 +540,7 @@ void* fn_800951A0(u32 uSize, u16 nAlign, int n) {
     return pData;
 }
 
-void fn_8009527C(void* p) {
+void Mem_FreeFunc(void* p) {
     HeapBlockHead* pHead;
     u32 uSize;
     u8 uPad;

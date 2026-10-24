@@ -379,7 +379,7 @@ void ActAnimal_Update(DynObjAnimal* pAnimal, void* pArg) {
         case 3:
             break;
         }
-        pAnimal->f18C = pAnimal->a178[3] * Misc_RandFuncf(1) + pAnimal->a178[2];
+        pAnimal->f18C = pAnimal->a178[3] * Misc_RandFuncf(RANDOM_PRESENTATION) + pAnimal->a178[2];
     }
     pAnimal->n1B8 += (u32)(59.94f * fDt);  // port: frames at the NTSC rate
 

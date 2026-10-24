@@ -93,9 +93,9 @@ void GameModeDriverRTE_Locale_LoadRTEnFromStream(UStreamObject* pObject) {
     void* pData;
     u32 nSize = fn_8000E81C(pObject, &pData);
     if (nSize) {
-        gRTEs.pNames = fn_800951A0(nSize, 0x10, 1);
+        gRTEs.pNames = Mem_AllocFunc(nSize, 0x10, 1);
         Mem_cpy(gRTEs.pNames, pData, nSize);
-        StaticMem_Free(pObject);
+        Circular_MemFreeFunc(pObject);
     }
 }
 
@@ -237,7 +237,7 @@ void GameModeDriverRTE_QueueWinMessages(void) {
         break;
     }
     if (!bFirst && !bSaid) {
-        switch (Misc_RandFunc(0) & 3) {
+        switch (Misc_RandFunc(RANDOM_GAME) & 3) {
         case 0:
             GUI_QueueMessage(10, 2, 0, 0);
             return;

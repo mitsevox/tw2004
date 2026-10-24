@@ -94,7 +94,7 @@ void DEMO_Start(void) {
             GM_SelectSingleHole(17);
             break;
         }
-        gpGame->nPinSet[Game_CurHoleIndex()] = Misc_RandFunc(0) & 3;
+        gpGame->nPinSet[Game_CurHoleIndex()] = Misc_RandFunc(RANDOM_GAME) & 3;
     }
     lbl_80281F90 = lbl_80281F90 + 1;
     lbl_80281F90 = lbl_80281F90 & 3;

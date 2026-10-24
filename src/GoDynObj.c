@@ -124,8 +124,8 @@ void DynObj_LoadBallLogos(UStreamObject* pObject) {
             }
         }
     }
-    StaticMem_Free(pBank);
-    StaticMem_Free(pObject);
+    Circular_MemFreeFunc(pBank);
+    Circular_MemFreeFunc(pObject);
 }
 
 // ---- sweep code (not yet cleaned up) ----
@@ -137,7 +137,7 @@ void DynObj_FreeTeoModel(UStreamObject* arg0) {
 
     temp_r31 = (*(void**)((u8*)(arg0) + 4));
     fn_800075CC(*(UObjModelRoot**)((u8*)(temp_r31) + 0x10));
-    StaticMem_Free(temp_r31);
+    Circular_MemFreeFunc(temp_r31);
 }
 
 // ---- end of sweep code ----
@@ -154,7 +154,7 @@ void DynObj_UnRegisterStreamClients(void) {
 
 // Allocates the file's state (gpDynObjState); no 'TEO ' models yet. Called once at start-up.
 void DynObj_InitModule(void) {
-    gpDynObjState = StaticMem_Alloc(sizeof(GoDynObjMgr), 2, 16, "GoDynObj.c", 283);
+    gpDynObjState = Circular_MemAllocFunc(sizeof(GoDynObjMgr), MEMTYPE_LOW, 16, "GoDynObj.c", 283);
     gpDynObjState->pTeo10000 = NULL;
     gpDynObjState->apTeo10030[0] = NULL;
     gpDynObjState->apTeo10030[1] = NULL;
@@ -178,7 +178,7 @@ void DynObj_InitModule(void) {
 s32 gAltShotPartner[4] = {1, 0, 3, 2};
 
 void DynObj_CloseModule(void) {
-    StaticMem_Free(gpDynObjState);
+    Circular_MemFreeFunc(gpDynObjState);
 }
 
 // Makes the models of the 'TEO ' objects that are loaded, puts the flag (character 100) at the
@@ -912,17 +912,18 @@ void DynObj_UpdateDivot(int nPlayer) {
         UObject_ComposeRotation(pB->pF0->obj.m0);
         LLMath_CopyVec(pB->v20, pB->v30);
         DynObj_LaunchDirection(pB->v40, pB->fC, gpDynObjState->fDivotTilt);
-        LLMath_Scale(gpDynObjState->fDivotSpeed * (0.5f * Misc_RandFuncf(1) + 0.5f), pB->v40, pB->v40);
+        LLMath_Scale(gpDynObjState->fDivotSpeed * (0.5f * Misc_RandFuncf(RANDOM_PRESENTATION) + 0.5f),
+                     pB->v40, pB->v40);
         pB->v40[3] = pB->v40[1];
         pB->bF5 = 0;
         pB->b0 = 1;
         pB->f10 = 0.0f;
         fRange = gpDynObjState->fDivotSpin;
-        pB->v60[0] = fRange * Misc_RandFuncf(1) - 0.5f * fRange;
+        pB->v60[0] = fRange * Misc_RandFuncf(RANDOM_PRESENTATION) - 0.5f * fRange;
         fRange = gpDynObjState->fDivotSpin;
-        pB->v60[1] = fRange * Misc_RandFuncf(1) - 0.5f * fRange;
+        pB->v60[1] = fRange * Misc_RandFuncf(RANDOM_PRESENTATION) - 0.5f * fRange;
         fRange = gpDynObjState->fDivotSpin;
-        pB->v60[2] = fRange * Misc_RandFuncf(1) - 0.5f * fRange;
+        pB->v60[2] = fRange * Misc_RandFuncf(RANDOM_PRESENTATION) - 0.5f * fRange;
         pB->v50[0] = 0.0f;
         pB->v50[1] = 0.0f;
         pB->v50[2] = 0.0f;
@@ -1046,7 +1047,7 @@ void DynObj_UpdateTee(int nPlayer) {
     if (pA->b70 && pA->b0) {
         pA->b0 = 0;
         if (pA->bF9) {
-            pA->fC = -gPlayers[nPlayer].fAim + Misc_RandFuncf(1) - 0.5f;
+            pA->fC = -gPlayers[nPlayer].fAim + Misc_RandFuncf(RANDOM_PRESENTATION) - 0.5f;
             LLMath_IdentifyMat(pA->mB4);
             mat44flt_EulerAngles(pA->mB4, pA->fC, 0.0f, 0.0f);
             LLMath_mat44fltMultiplyList(pA->pF4->obj.m0, pA->mB4, mTmp, 4);
@@ -1054,17 +1055,17 @@ void DynObj_UpdateTee(int nPlayer) {
             UObject_ComposeRotation(pA->pF4->obj.m0);
             LLMath_CopyVec(pA->v20, pA->v30);
             DynObj_LaunchDirection(pA->v40, pA->fC, gpDynObjState->fTeeTilt);
-            LLMath_Scale(gpDynObjState->fTeeSpeed * Misc_RandFuncf(1), pA->v40, pA->v40);
+            LLMath_Scale(gpDynObjState->fTeeSpeed * Misc_RandFuncf(RANDOM_PRESENTATION), pA->v40, pA->v40);
             pA->v40[3] = pA->v40[1];
             pA->bF9 = 0;
             pA->b0 = 1;
             pA->f10 = 0.0f;
             fRange = gpDynObjState->fTeeSpin;
-            pA->v60[0] = fRange * Misc_RandFuncf(1) - 0.5f * fRange;
+            pA->v60[0] = fRange * Misc_RandFuncf(RANDOM_PRESENTATION) - 0.5f * fRange;
             fRange = gpDynObjState->fTeeSpin;
-            pA->v60[1] = fRange * Misc_RandFuncf(1) - 0.5f * fRange;
+            pA->v60[1] = fRange * Misc_RandFuncf(RANDOM_PRESENTATION) - 0.5f * fRange;
             fRange = gpDynObjState->fTeeSpin;
-            pA->v60[2] = fRange * Misc_RandFuncf(1) - 0.5f * fRange;
+            pA->v60[2] = fRange * Misc_RandFuncf(RANDOM_PRESENTATION) - 0.5f * fRange;
             pA->v50[0] = 0.0f;
             pA->v50[1] = 0.0f;
             pA->v50[2] = 0.0f;

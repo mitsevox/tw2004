@@ -259,7 +259,7 @@ int fn_8000EA1C(u8* pCode, int nArg, int nPush, DynObj* pObj) {
                 } else {
                     int nSign;
 
-                    b = (int)Misc_RandFunc(0);
+                    b = (int)Misc_RandFunc(RANDOM_GAME);
                     nSign = b >> 31;
                     b = (nSign + b) ^ nSign;   // EA's abs
                     a = b % -a;
@@ -586,7 +586,7 @@ TexBank* TX_spParseTextureGroupFromStream(u8* p, TexBank* pInto, int n) {
     if (pInto != NULL) {
         pBank = pInto;
     } else {
-        pBank = StaticMem_Alloc(nSize, 2, 0x10, "LLTex.c", 0x717);
+        pBank = Circular_MemAllocFunc(nSize, MEMTYPE_LOW, 0x10, "LLTex.c", 0x717);
         pInto = pBank;
     }
     // the bank's first 8 bytes (its counts n2 and n4) as the data has them
@@ -608,7 +608,7 @@ TexBank* TX_spParseTextureGroupFromStream(u8* p, TexBank* pInto, int n) {
     p += pSection->nSize;
     pPixels = ((TexSection*)p)++;
     if (n != -2) {
-        pBank->p18 = StaticMem_Alloc(pPixels->nSize, 2, 0x20, "LLTex.c", 0x77A);
+        pBank->p18 = Circular_MemAllocFunc(pPixels->nSize, MEMTYPE_LOW, 0x20, "LLTex.c", 0x77A);
         pBank->n1C = pPixels->nSize;
         Mem_cpy(pBank->p18, p, pPixels->nSize);
     } else {
@@ -648,7 +648,7 @@ TexBank* TX_spParseTextureGroupFromStream(u8* p, TexBank* pInto, int n) {
     pSection = ((TexSection*)p)++;
     if (pSection->nSize > 0) {
         if (n != -2) {
-            pBank->p20 = StaticMem_Alloc(pSection->nSize, 2, 0x20, "LLTex.c", 0x7FB);
+            pBank->p20 = Circular_MemAllocFunc(pSection->nSize, MEMTYPE_LOW, 0x20, "LLTex.c", 0x7FB);
             pBank->n24 = pSection->nSize;
             Mem_cpy(pBank->p20, p, pSection->nSize);
         } else {
@@ -678,18 +678,18 @@ TexBank* TX_spParseTextureGroupFromStream(u8* p, TexBank* pInto, int n) {
 // Frees a bank's pixel and palette data, unless they are not its own.
 void fn_8000FFAC(TexBank* pBank) {
     if (pBank->p18 != NULL && pBank->b2D != 1) {
-        StaticMem_Free(pBank->p18);
+        Circular_MemFreeFunc(pBank->p18);
         pBank->p18 = NULL;
     }
     if (pBank->p20 != NULL && pBank->p20 != pBank->p18 && pBank->b2D != 1) {
-        StaticMem_Free(pBank->p20);
+        Circular_MemFreeFunc(pBank->p20);
         pBank->p20 = NULL;
     }
 }
 
 void fn_80010028(TexBank* pBank) {
     fn_8000FFAC(pBank);
-    StaticMem_Free(pBank);
+    Circular_MemFreeFunc(pBank);
 }
 
 // The index of the bank's texture with this name hash, or 0x80000000.

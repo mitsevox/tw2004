@@ -20,7 +20,7 @@ GoLight* fn_8006EFB8(void);
 void    fn_8006F080(GoLight* pLight);
 
 void LLMath_MultiplyVec(f32* pA, f32* pB, f32* pOut);     // pOut = pA * pB, element by element
-void vec4flt_Zero(f32* pVec);                        // sets a vector to lbl_80186838
+void vec4flt_Zero(f32* pVec);                        // sets a vector to gVec4Zero
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);                   // identity
 void LLMath_InvertNormalized(f32 (*pSrc)[4], f32 (*pDst)[4]);  // UMemPool.c: inverts a rotation+translation
 
@@ -42,7 +42,8 @@ void fn_8006E2A4(void) {
     s32 i;
 
     lbl_802811D8->nPool = NUM_POOL_LIGHTS;
-    lbl_802811D8->pPool = StaticMem_Alloc(NUM_POOL_LIGHTS * sizeof(GoLight), 2, 0x10, "GoLighting.c", 0xF8);
+    lbl_802811D8->pPool = Circular_MemAllocFunc(NUM_POOL_LIGHTS * sizeof(GoLight), MEMTYPE_LOW, 0x10,
+                                                "GoLighting.c", 0xF8);
     lbl_802811D8->p0 = lbl_802811D8->pPool;
     lbl_802811D8->pUsed = NULL;
     lbl_802811D8->pFree = NULL;
@@ -82,7 +83,7 @@ void fn_8006E2A4(void) {
 // Frees the pool.
 void fn_8006E424(void) {
     if (lbl_802811D8->pPool != NULL) {
-        StaticMem_Free(lbl_802811D8->pPool);
+        Circular_MemFreeFunc(lbl_802811D8->pPool);
         lbl_802811D8->pPool = NULL;
     }
 }

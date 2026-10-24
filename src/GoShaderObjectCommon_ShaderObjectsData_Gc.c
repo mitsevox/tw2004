@@ -599,7 +599,8 @@ void fn_80074DA8(ShaderVtxArrays* pArrays, int eType, MorphAnim* pAnim, ShaderCm
     nWords = pCmds->nWords;
     p = pCmds->pCmds;
     nSize = (((nWords << 1) + 0x1F) & ~0x1F) + 0x800;   // the commands' bytes, rounded up, + 2 KB
-    pList = StaticMem_Alloc(nSize, 1, 32, "GoShaderObjectCommon_ShaderObjectsData_Gc.c", 1039);
+    pList = Circular_MemAllocFunc(nSize, MEMTYPE_HIGH, 32,
+                                  "GoShaderObjectCommon_ShaderObjectsData_Gc.c", 1039);
     DCInvalidateRange(pList, nSize);
     GXBeginDisplayList(pList, nSize);
     GXResetWriteGatherPipe();
@@ -708,7 +709,7 @@ void fn_80074DA8(ShaderVtxArrays* pArrays, int eType, MorphAnim* pAnim, ShaderCm
     pAnim->p4 = (void*)(((uptr)pCmds->pCmds + 0x1F) & ~(uptr)0x1F);
     Mem_cpy(pAnim->p4, pList, pAnim->n0);
     DCFlushRange(pAnim->p4, pAnim->n0);
-    StaticMem_Free(pList);
+    Circular_MemFreeFunc(pList);
     if (eType == 2 || eType == 3) {
         fn_80097474(pAnim);
     }

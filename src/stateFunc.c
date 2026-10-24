@@ -566,7 +566,7 @@ void STATEFUNC_SwingInit(int nPlayer) {
 
 // State 10 every frame: the swing. The swing phase runs; an idle timer (reset by Input_AnyPadPressed
 // or a
-// swing phase past 0, wraps at 10 s). When the ball is hit: GM_BallHit, the RNG stream 1 is
+// swing phase past 0, wraps at 10 s). When the ball is hit: GM_BallHit, RANDOM_PRESENTATION is
 // reseeded from the session seed, the view told, and it is state 11 (the swing animation) on a
 // special camera (with gpGame+0x283) - or state 12 straight away. Otherwise, for a human outside a
 // replay before the swing starts: the caddie updates; button 6 re-plans the shot (the 0x264 hook
@@ -604,7 +604,7 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
         View* pV;
         GM_BallHit(nPlayer);
         fn_80062B6C(nPlayer);
-        Misc_SetSeedFunc(1, gSession.nSeed);
+        Misc_SetSeedFunc(RANDOM_PRESENTATION, gSession.nSeed);
         pV = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
         GolfCamera_ChooseSpecialSwing(pV, nPlayer);
         Gaud_SwingBallHit((u8)nPlayer);

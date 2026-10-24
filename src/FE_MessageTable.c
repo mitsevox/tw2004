@@ -25,6 +25,7 @@
 #include "frontend/fe.h"
 #include "core/memcard.h"
 #include "core/gbacable.h"
+#include "pad.h"
 #include "charstate.h"
 #include "trax.h"
 #include "core/gameaudio.h"
@@ -1669,7 +1670,7 @@ void GM_vPlayMenuSound(MsgArg* pArgs, MsgArg* pResult) {
 
     n = pArgs[0].i;
     if (n == 11) {
-        Gaud_PlayUISound((Misc_RandFunc(0) & 7) + 11);
+        Gaud_PlayUISound((Misc_RandFunc(RANDOM_GAME) & 7) + 11);
     } else {
         Gaud_PlayUISound(n);
     }
@@ -4022,7 +4023,7 @@ void GM_vSetRandomCustomRoundHole(MsgArg* pArgs, MsgArg* pResult) {
         }
     }
 retry:
-    nPick = Misc_RandFunc(1) % nUnlocked + 1;
+    nPick = Misc_RandFunc(RANDOM_PRESENTATION) % nUnlocked + 1;
     nFound = 0;
     for (i = 0; i < 20; i++) {
         if ((gpSaveData[nSlot].aCourseUnlocked[aCourses[i]] ||
@@ -4032,7 +4033,7 @@ retry:
             break;
         }
     }
-    nHoleNum = Misc_RandFunc(1) % 18;
+    nHoleNum = Misc_RandFunc(RANDOM_PRESENTATION) % 18;
     for (i = 0; i < 18; i++) {
         if (nCourse == gpSaveData[nSlot].aSavedRound[nRound].nCourse[i] &&
             nHoleNum == gpSaveData[nSlot].aSavedRound[nRound].nHoleNum[i]) {
@@ -5279,10 +5280,9 @@ void GM_vClearBackupRow(MsgArg* pArgs, MsgArg* pResult) {
     gFEState.aBackup[pArgs[0].i] = -1;
 }
 
-// Front-end message 332: 1 when the controller in port pArgs[0] is a WaveBird (Input_iGetPadType
-// 0x8B100000), else 0.
+// Front-end message 332: 1 when the controller in port pArgs[0] is a WaveBird, else 0.
 void GM_vIsWaveBird(MsgArg* pArgs, MsgArg* pResult) {
-    if (Input_iGetPadType(pArgs[0].i) == 0x8B100000) {
+    if (Input_iGetPadType(pArgs[0].i) == SI_GC_WAVEBIRD) {
         pResult->i = 1;
     } else {
         pResult->i = 0;

@@ -46,7 +46,8 @@ static void StaticCam_LoadCAMCfromStream(UStreamObject* pStreamData) {
     ByteSwap_Records(&pSrc, &pDst, headerElmDef, 2, 1);
     if (gpStaticCams->nCurves != 0) {
         gpStaticCams->pCurves =
-            StaticMem_Alloc(gpStaticCams->nCurves * sizeof(Curve), 2, 0, "GoStaticCam.c", 190);
+            Circular_MemAllocFunc(gpStaticCams->nCurves * sizeof(Curve), MEMTYPE_LOW, 0,
+                                  "GoStaticCam.c", 190);
     }
     for (i = 0; i < gpStaticCams->nCurves; i++) {
         pDst = &gpStaticCams->pCurves[i];
@@ -57,7 +58,7 @@ static void StaticCam_LoadCAMCfromStream(UStreamObject* pStreamData) {
             pSrc = (u8*)pSrc + 2;   // the keys are 0x22 bytes in the file
         }
     }
-    StaticMem_Free(pStreamData);
+    Circular_MemFreeFunc(pStreamData);
 }
 
 // Takes a fly-by camera (a 'Cact' object of type 200, from UKernel.c) as the next of aFlyBy, named
@@ -110,7 +111,7 @@ void StaticCam_ParseFlybyCameraActor(UStreamObject* pCameraActor) {
         gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].bShowGolfer = 0;
     }
     gpStaticCams->nFlyBy++;
-    StaticMem_Free(pCameraActor);
+    Circular_MemFreeFunc(pCameraActor);
 }
 
 // Takes a static camera (a 'Cact' object of type 201, from UKernel.c) as the next of aStatic, named
@@ -168,13 +169,13 @@ void StaticCam_ParseStaticCameraActor(UStreamObject* pCameraActor) {
                 gpStaticCams->aStatic[gpStaticCams->nStatic].v20,
                 gpStaticCams->aStatic[gpStaticCams->nStatic].v30);
     gpStaticCams->nStatic++;
-    StaticMem_Free(pCameraActor);
+    Circular_MemFreeFunc(pCameraActor);
 }
 
 // Allocates the cameras' state (gpStaticCams), with no timing curves, and empties it
 // (StaticCam_Reset). Called when a round starts up (GO_vInitIG).
 void StaticCam_Init(void) {
-    gpStaticCams = StaticMem_Alloc(sizeof(StaticCamManager_t), 2, 0, "GoStaticCam.c", 380);
+    gpStaticCams = Circular_MemAllocFunc(sizeof(StaticCamManager_t), MEMTYPE_LOW, 0, "GoStaticCam.c", 380);
     gpStaticCams->pCurves = NULL;
     StaticCam_Reset();
 }
@@ -182,7 +183,7 @@ void StaticCam_Init(void) {
 // Empties the cameras' state (StaticCam_Reset) and frees it, when a round shuts down.
 void StaticCam_DeInit(void) {
     StaticCam_Reset();
-    StaticMem_Free(gpStaticCams);
+    Circular_MemFreeFunc(gpStaticCams);
     gpStaticCams = NULL;
 }
 
@@ -203,7 +204,7 @@ void StaticCam_Reset(void) {
     gpStaticCams->apRoute[8] = NULL;
     gpStaticCams->apRoute[9] = NULL;
     if (gpStaticCams->pCurves != NULL) {
-        StaticMem_Free(gpStaticCams->pCurves);
+        Circular_MemFreeFunc(gpStaticCams->pCurves);
     }
     gpStaticCams->pCurves = NULL;
     gpStaticCams->nCurves = 0;
@@ -242,7 +243,7 @@ CamShot* StaticCam_ChooseScript(int ePlayerID, StaticCam_EventType_e event, u8 d
     if (scriptsFound == 0) {
         return NULL;
     }
-    i = Misc_RandFunc(1) % scriptsFound;
+    i = Misc_RandFunc(RANDOM_PRESENTATION) % scriptsFound;
     return &gpStaticCams->aStatic[possibleScripts[i]];
 }
 

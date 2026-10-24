@@ -37,7 +37,7 @@ LLPict* PictInt_Decode(PictFile* pFile) {
     // fake match: the height's swap spelled high byte first with u16 casts gives EA's clrlslwi and
     // rlwimi; the width's spelling does not
     pFile->nHeight = (((u16)pFile->nHeight >> 8) & 0xFF) | (((u16)pFile->nHeight & 0xFF) << 8);
-    pPict =StaticMem_Alloc(sizeof(LLPict), 1, 32, "LLPictInt.c", 142);
+    pPict =Circular_MemAllocFunc(sizeof(LLPict), MEMTYPE_HIGH, 32, "LLPictInt.c", 142);
     if (pPict == NULL) {
         return NULL;
     }
@@ -46,7 +46,8 @@ LLPict* PictInt_Decode(PictFile* pFile) {
     pPict->nHeight = pFile->nHeight;
     pPict->fMaxU = 1.0f;
     pPict->fMaxV = 1.0f;
-    pPict->pPixels = StaticMem_Alloc(pPict->nWidth * pPict->nHeight * 3 / 2, 1, 32, "LLPictInt.c", 150);
+    pPict->pPixels = Circular_MemAllocFunc(pPict->nWidth * pPict->nHeight * 3 / 2, MEMTYPE_HIGH, 32,
+                                           "LLPictInt.c", 150);
     pY = Pict_GetPlaneY(pPict);
     pU = Pict_GetPlaneU(pPict);
     pV = Pict_GetPlaneV(pPict);

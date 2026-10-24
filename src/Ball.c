@@ -1343,7 +1343,7 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, SurfaceType* pSurface) {
     if (fRest < 0.0f) {
         if (!(gSimulating || gNoRandomRolls || pBall->nPlayer == 4 ||
               (pBall->nPlayer >= 0 && pBall->nPlayer <= 3 && gPlayers[pBall->nPlayer].bPerfect))) {
-            fK = 1.0f - 2.0f * Misc_RandFuncf(0);
+            fK = 1.0f - 2.0f * Misc_RandFuncf(RANDOM_GAME);
             fK -= 0.005f * (s8)Golfer_GetAttribute(&gPlayers[pBall->nPlayer], ATTR_LUCK, ATTR_TOTAL);
             if (fK < -1.0f) {
                 fK = -1.0f;
@@ -1561,7 +1561,7 @@ void Physics_SetLie(Ball* pBall, SurfaceType* pSurface) {
         if (gSimulating || gNoRandomRolls) {
             r = 0;
         } else {
-            r = Misc_RandFunc(0);
+            r = Misc_RandFunc(RANDOM_GAME);
         }
     rough:
         if ((r & 127) < uLuck / 2) {
@@ -1585,7 +1585,7 @@ void Physics_SetLie(Ball* pBall, SurfaceType* pSurface) {
         if (gSimulating || gNoRandomRolls) {
             r = 0;
         } else {
-            r = Misc_RandFunc(0);
+            r = Misc_RandFunc(RANDOM_GAME);
         }
         if ((r & 127) < uLuck / 4 + 16) {
             r >>= 8;
@@ -1599,7 +1599,7 @@ void Physics_SetLie(Ball* pBall, SurfaceType* pSurface) {
         if (gSimulating || gNoRandomRolls) {
             r = 0;
         } else {
-            r = Misc_RandFunc(0);
+            r = Misc_RandFunc(RANDOM_GAME);
         }
         if (!pBall->bGotFirstSandPos
             || fabsf(pBall->vPos[0] - pBall->vFirstSandPos[0]) >= 0.16666667f ||
@@ -1666,8 +1666,8 @@ void Physics_SetLie(Ball* pBall, SurfaceType* pSurface) {
                 f = 0.0f;
                 rSign = 0;
             } else {
-                rSign = Misc_RandFunc(0);
-                f = Misc_RandFuncf(0) - 0.5f * (0.01f * uLuck);
+                rSign = Misc_RandFunc(RANDOM_GAME);
+                f = Misc_RandFuncf(RANDOM_GAME) - 0.5f * (0.01f * uLuck);
                 if (f < 0.0f) {
                     f = 0.0f;
                 }
@@ -1707,7 +1707,7 @@ u8 Physics_ProcessCollision(Ball* pBall, f32* pHit, f32* pNormal, SurfaceType* p
             (pBall->nPlayer >= 0 && pBall->nPlayer <= 3 && gPlayers[pBall->nPlayer].bPerfect)) {
             r = 0;
         } else {
-            r = Misc_RandFunc(0);
+            r = Misc_RandFunc(RANDOM_GAME);
         }
         nA = (r & 7) + 12;
         if (r & 31) {

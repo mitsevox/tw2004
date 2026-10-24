@@ -127,11 +127,11 @@ void fn_800B251C_ShadowInit(u8 bHigh) {
     s32 aDesc[2];
 
     fn_800B2314();
-    lbl_80282170 = StaticMem_Alloc(0x6000, 2, 16, "shadow.c", 180);
-    lbl_8028216C = StaticMem_Alloc(0x2000, 2, 16, "shadow.c", 181);
-    lbl_80282168 = StaticMem_Alloc(0x4000, 2, 16, "shadow.c", 182);
-    lbl_80282164 = StaticMem_Alloc(0x1000, 2, 16, "shadow.c", 183);
-    lbl_80282160 = StaticMem_Alloc(0x1000, 2, 16, "shadow.c", 184);
+    lbl_80282170 = Circular_MemAllocFunc(0x6000, MEMTYPE_LOW, 16, "shadow.c", 180);
+    lbl_8028216C = Circular_MemAllocFunc(0x2000, MEMTYPE_LOW, 16, "shadow.c", 181);
+    lbl_80282168 = Circular_MemAllocFunc(0x4000, MEMTYPE_LOW, 16, "shadow.c", 182);
+    lbl_80282164 = Circular_MemAllocFunc(0x1000, MEMTYPE_LOW, 16, "shadow.c", 183);
+    lbl_80282160 = Circular_MemAllocFunc(0x1000, MEMTYPE_LOW, 16, "shadow.c", 184);
     p->pLens = CA_spCreateCamera();
     p->pRect = VM_spCreateViewport();
     p->pFrameBuf = FB_spCreateFrameBuffer();
@@ -189,11 +189,11 @@ void fn_800B2734(void) {
         p->pLens = NULL;
     }
     fn_800B246C();
-    StaticMem_Free(lbl_80282170);
-    StaticMem_Free(lbl_8028216C);
-    StaticMem_Free(lbl_80282168);
-    StaticMem_Free(lbl_80282164);
-    StaticMem_Free(lbl_80282160);
+    Circular_MemFreeFunc(lbl_80282170);
+    Circular_MemFreeFunc(lbl_8028216C);
+    Circular_MemFreeFunc(lbl_80282168);
+    Circular_MemFreeFunc(lbl_80282164);
+    Circular_MemFreeFunc(lbl_80282160);
     fn_800B235C();
 }
 

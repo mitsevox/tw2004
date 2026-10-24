@@ -690,9 +690,9 @@ void CameraController_ComputeCurrentSideVector(View* pView) {
 // Shakes the camera: moves its position a random amount, up to half the shake strength (the
 // script's fShakeAmount, CameraController_SetShakeAmount) each way.
 void CameraController_ShakeCamera(View* pView) {
-    pView->vOrigin[0] += pView->script.fShakeAmount * (Misc_RandFuncf(0) - 0.5f);
-    pView->vOrigin[1] += pView->script.fShakeAmount * (Misc_RandFuncf(0) - 0.5f);
-    pView->vOrigin[2] += pView->script.fShakeAmount * (Misc_RandFuncf(0) - 0.5f);
+    pView->vOrigin[0] += pView->script.fShakeAmount * (Misc_RandFuncf(RANDOM_GAME) - 0.5f);
+    pView->vOrigin[1] += pView->script.fShakeAmount * (Misc_RandFuncf(RANDOM_GAME) - 0.5f);
+    pView->vOrigin[2] += pView->script.fShakeAmount * (Misc_RandFuncf(RANDOM_GAME) - 0.5f);
 }
 
 // Starts a camera shake lasting fTime (the script's fShakeTime, counted down by

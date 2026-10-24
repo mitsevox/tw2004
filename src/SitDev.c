@@ -46,10 +46,10 @@ void SitDev_vInitModule(void) {
 // pGroupFlags) and forgets the loaded scripts (gpSitDevScripts).
 void SitDev_vCloseModule(void) {
     if (gpSitDevData->pD0 != NULL) {
-        StaticMem_Free(gpSitDevData->pD0);
+        Circular_MemFreeFunc(gpSitDevData->pD0);
     }
-    StaticMem_Free(gpSitDevData->pCC);
-    StaticMem_Free(gpSitDevData->pGroupFlags);
+    Circular_MemFreeFunc(gpSitDevData->pCC);
+    Circular_MemFreeFunc(gpSitDevData->pGroupFlags);
     gpSitDevScripts = NULL;
 }
 
