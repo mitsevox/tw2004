@@ -15,6 +15,7 @@
 #include "frontend/fe.h"
 #include "camera.h"
 #include "frontend/uistudio.h"
+#include "pad.h"
 
 // Defined here (declared in game/frontend.h); .sbss in reverse address order.
 FrontEnd* gpFrontEnd;           // the open UI (UI_OpenInterface), NULL when none
@@ -32,10 +33,10 @@ UIState gUIState;               // the UI's controller input, exit fade and pict
 s32 gUIButtonHeldFrames[8] = {0};
 // The UI event each controller button sends when pressed (UI_ReadControllers).
 UIButtonEvent gUIButtonEvents[UI_NUM_BUTTON_EVENTS] = {
-    {0x1000, 0x0}, {0x800, 0x6}, {0x100, 0x7}, {0x8, 0x2},
-    {0x4, 0x3},    {0x1, 0x4},   {0x2, 0x5},   {0x200, 0x8},
-    {0x400, 0x9},  {0x40, 0xA},  {0x10, 0xC},  {0x0, 0xE},
-    {0x20, 0xB},   {0x10, 0xD},  {0x0, 0xF},   {0x0, 0x1},
+    {PAD_BUTTON_START, 0x0}, {PAD_BUTTON_Y, 0x6}, {PAD_BUTTON_A, 0x7}, {PAD_BUTTON_UP, 0x2},
+    {PAD_BUTTON_DOWN, 0x3}, {PAD_BUTTON_LEFT, 0x4}, {PAD_BUTTON_RIGHT, 0x5}, {PAD_BUTTON_B, 0x8},
+    {PAD_BUTTON_X, 0x9}, {PAD_TRIGGER_L, 0xA}, {PAD_TRIGGER_Z, 0xC}, {0, 0xE}, {PAD_TRIGGER_R, 0xB},
+    {PAD_TRIGGER_Z, 0xD}, {0, 0xF}, {0, 0x1}
 };
 s8 gSavedCrAPHidden = -1;      // gpCrAPState->bHidden put aside while hint 0x34 is up (-1: none)
 
@@ -270,7 +271,7 @@ void UI_ReadControllers(void) {
     Mem_set(aArgs, 0, sizeof(aArgs));
     pButtons = aButtons;
     pPressed = aPressed;
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < INPUT_NUM_PADS; i++) {
         if (Input_bDoesPadExist(i)) {
             gUIState.abPluggedIn[i] = 1;
             gUIState.nFramesNoPad = 0;
@@ -280,17 +281,17 @@ void UI_ReadControllers(void) {
         }
         if (gUIState.abPluggedIn[i]) {
             pButtons[i] = Input_ReadControlPad(i);
-            if (pButtons[i] & 0x40000) {
-                pButtons[i] |= 4;
+            if (pButtons[i] & PAD_BUTTON_DOWN << 16) {
+                pButtons[i] |= PAD_BUTTON_DOWN;
             }
-            if (pButtons[i] & 0x80000) {
-                pButtons[i] |= 8;
+            if (pButtons[i] & PAD_BUTTON_UP << 16) {
+                pButtons[i] |= PAD_BUTTON_UP;
             }
-            if (pButtons[i] & 0x20000) {
-                pButtons[i] |= 2;
+            if (pButtons[i] & PAD_BUTTON_RIGHT << 16) {
+                pButtons[i] |= PAD_BUTTON_RIGHT;
             }
-            if (pButtons[i] & 0x10000) {
-                pButtons[i] |= 1;
+            if (pButtons[i] & PAD_BUTTON_LEFT << 16) {
+                pButtons[i] |= PAD_BUTTON_LEFT;
             }
             if (gUIState.auLastButtons[i] != pButtons[i]) {
                 gUIState.anHeldFrames[i] = 0;
@@ -330,7 +331,7 @@ void UI_ReadControllers(void) {
     }
     aArgs[0] = 0;
     if (gUIState.bFadeToBlack == 0 && FE_movieIsQueueEmpty() && gUIState.bButtonsBlocked == 0) {
-        for (k = 0; k < 4; k++) {
+        for (k = 0; k < INPUT_NUM_PADS; k++) {
             if (gUIState.abPluggedIn[k] && gUIState.abInputEnabled[k]) {
                 if (gSession.nGameType != 6 || (gSession.nPaused != 2 && gSession.nPaused != 3)) {
                     pEvent = gUIButtonEvents;

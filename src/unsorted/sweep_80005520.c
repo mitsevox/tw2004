@@ -1,6 +1,7 @@
 // Small functions found by the sweep (sweep.py). Original file and meanings unknown.
 
 #include "game_types.h"
+#include "engine.h"
 
 void Session_Init();
 void UStream_AllocBuffers();
@@ -11,8 +12,6 @@ void StaticMem_PreInit();
 void StaticMem_Init();
 void Math_InitLog2Table();
 void fn_8000B984();
-void Input_vInitOnce();
-void Input_iInitModule();
 void StreamManager_InitOnce();
 void fn_8002F1D4();
 void fn_80095108();

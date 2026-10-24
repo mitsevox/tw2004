@@ -34,7 +34,6 @@ Common/Checksum/ChecksumCRC32.c	done	d5543081	claude-review
 Common/Crypt/CryptXOR.c	done	44db6e97	claude-review
 Common/SharedFileIO/SharedFileIO.c	open		
 Common/TagFile/TagFile.c	open		
-Controller_Gc.c	open		
 CourseData.c	open		
 DepthField.c	open		
 DiscCheck.c	open		
@@ -135,6 +134,7 @@ LLDisp_Gc.c	open
 LLDynTex.c	open		
 LLFileIO_Gc.c	open		
 LLFont.c	open		
+LLInput_Gc.c	open		
 LLMath_Gc.c	done	626ba02e	claude-review
 LLMem_Gc.c	done	4e15bbc0	claude-review
 LLObj_Gc.c	open		
