@@ -165,7 +165,7 @@ void FE_CharBios_LoadBIOfromStream(UStreamObject* pObject) {
 u8 FE_IsMovieSkipPressed(Video* pVideo, int nArg) {
     int i;
     Input_vUpdate();
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < INPUT_NUM_PADS; i++) {
         if (Input_ReadControlPad(i)) {
             return 1;
         }

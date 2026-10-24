@@ -140,7 +140,7 @@ UFont.c:
 RenderAccessors.c:
 	.text       start:0x80012ED0 end:0x80012FA0
 
-Controller_Gc.c:
+LLInput_Gc.c:
 	.text       start:0x80012FA0 end:0x800136F4
 	.bss        start:0x801A36A0 end:0x801A3728
 

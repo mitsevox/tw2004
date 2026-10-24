@@ -52,8 +52,8 @@ LAYOUT_ASSERT(GbaChannel, 0x78);
 extern GbaChannel gGbaChannels[GBA_NUM_CHANNELS];
 extern DVDDiskID* gGbaDiscID;  // the disc's ID: its game code goes to the GBA in the handshake
 extern u32 gGbaInitTick;        // the tick the link code started at (Gba_Init)
-extern PadStatus gGbaPads[GBA_NUM_CHANNELS];   // the pads as Gba_ReadPads reads them
-extern const u32 gGbaPadResetBits[GBA_NUM_CHANNELS];   // each port's PADReset bit (0x80000000 >> port)
+extern PADStatus gGbaPads[GBA_NUM_CHANNELS];   // the pads as Gba_ReadPads reads them
+extern const u32 gGbaPadResetBits[GBA_NUM_CHANNELS];   // each port's PADReset bit (PAD_CHANn_BIT)
 
 // Time-base ticks in a millisecond (the time base runs at a quarter of the bus clock, which the OS
 // keeps at 0x800000F8). A GBA command waits 100 ms for the GBA.

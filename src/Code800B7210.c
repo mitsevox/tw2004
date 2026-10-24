@@ -5,13 +5,13 @@
 
 #include "game_types.h"
 #include "engine.h"
+#include "pad.h"
 #include "golfer.h"
 #include "platform.h"
 #include "game.h"
 #include "discerror.h"
 #include "core/startup.h"
 
-void Input_vStopAllVibration(void);
 void Aud_Pause(u8 b, u8 b2);
 void VIWaitForRetrace(void);
 void fn_800B6924(void);
@@ -115,10 +115,10 @@ u8 fn_800B7490(void) {
         Input_vUpdate();
         nLast = nStatus;
         nStatus = DVDGetDriveStatus();
-        if ((Input_ReadControlPad(0) & 0x01000000) || (Input_ReadControlPad(1) & 0x01000000) ||
-            (Input_ReadControlPad(2) & 0x01000000) || (Input_ReadControlPad(3) & 0x01000000) || nStatus
-                    == 6 ||
-            nStatus == 10) {
+        if ((Input_ReadControlPad(0) & PAD_BUTTON_A << 16) ||
+            (Input_ReadControlPad(1) & PAD_BUTTON_A << 16) ||
+            (Input_ReadControlPad(2) & PAD_BUTTON_A << 16) ||
+            (Input_ReadControlPad(3) & PAD_BUTTON_A << 16) || nStatus == 6 || nStatus == 10) {
             if (nStatus != -1) {
                 fn_800066E4(1, 1, 1, 0);
             }

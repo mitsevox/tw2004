@@ -236,7 +236,7 @@ void CTIP_ShowCaddieTip(int nPlayer) {
     if (gpSaveData[nProfile].bActive != 1) {
         return;
     }
-    for (nChan = 0; nChan < 4; nChan++) {
+    for (nChan = 0; nChan < INPUT_NUM_PADS; nChan++) {
         for (i = 0; i < gSession.nNumPlayers; i++) {
             if (!Input_bDoesPadExist(nChan) && nChan == gSession.nController[i]) {
                 bControllerIsPulled = 1;
