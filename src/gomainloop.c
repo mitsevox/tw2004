@@ -142,8 +142,6 @@ void SW_vUIRender3D(int nPlayer);
 void fn_80062E00(void);
 void fn_80062E20(void);
 int  CameraController_GetClippedShadow(void);
-void StaticCam_Init(void);
-void StaticCam_DeInit(void);
 void EVENT_InitForGame(void);
 void SitDev_vInitModule(void);
 void SitDev_vCloseModule(void);

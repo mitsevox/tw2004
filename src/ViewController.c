@@ -246,13 +246,13 @@ f32* CameraController_GetCameraViewOffset(View* pView) {
 }
 
 // Whether the camera is out of its fly-by: true when its script has no current shot, when that
-// shot's nStateType is set, or when the shot has no next shot (p40) and the script's move is not kind 1.
+// shot's nStateType is set, or when the shot has no next shot (pNext) and the script's move is not kind 1.
 // ViewController_Update aims the lens at the look point when true and by the shot's angles when
 // false.
 u8 CameraController_IsFlybyDone(View* pView) {
     if (pView->script.pShot == NULL) return 1;
     if (pView->script.pShot->nStateType) return 1;
-    if (pView->script.pShot->p40 == NULL && pView->script.nFade != 1) return 1;
+    if (pView->script.pShot->pNext == NULL && pView->script.nFade != 1) return 1;
     return 0;
 }
 

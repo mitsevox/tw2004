@@ -68,8 +68,8 @@ void ComicCam_StartComicCam(int nKind, View* pView, int nPlayer) {
     gpComicCam->nPlayer = nPlayer;
     pShot = DynamicCam_ChooseScript(nPlayer, nShot, pView->script.pShot);
     if (pShot != NULL && !CameraScript_WillGolferBeOccludedInThisView(nPlayer, pShot, &pView->script)) {
-        CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f, 0x19,
-                                       0.0f);
+        CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, CAMINTERP_CUT, 0.0f,
+                                       100.0f, 0x19, 0.0f);
     }
 }
 
@@ -455,8 +455,8 @@ void ComicCam_CheckForCameraSwitch(View* pView, int nPlayer) {
     case 0:
         pShot = DynamicCam_ChooseScript(nPlayer, nPanel + 0x28, pView->script.pShot);
         if (pShot != NULL && !CameraScript_WillGolferBeOccludedInThisView(nPlayer, pShot, &pView->script)) {
-            CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f,
-                                           0x19, 0.0f);
+            CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, CAMINTERP_CUT, 0.0f,
+                                           100.0f, 0x19, 0.0f);
         }
         Gaud_UpdtSpecialShot(nPlayer, nColumn);
         return;
@@ -471,8 +471,8 @@ void ComicCam_CheckForCameraSwitch(View* pView, int nPlayer) {
                 pShot = DynamicCam_ChooseScript(nPlayer, nShot, pShot);
                 if (pShot != NULL &&
                     !CameraScript_WillGolferBeOccludedInThisView(nPlayer, pShot, &pView->script)) {
-                    CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, 5, 0.0f,
-                                                   100.0f, 0x19, 0.0f);
+                    CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, CAMINTERP_CUT,
+                                                   0.0f, 100.0f, 0x19, 0.0f);
                 }
             }
         }

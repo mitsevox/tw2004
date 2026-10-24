@@ -153,6 +153,9 @@ f32  fabsf(f32 x);                      // 0x8000AD9C: fabs (0x8000AE94, platfor
 f32  logf(f32 x);                // natural logarithm
 // A rotation matrix's yaw (about z), pitch (about y) and roll (about x), radians (UMemPool.c).
 void mat44flt_ExtractEulerAngles(f32 (*pMtx)[4], f32* pYaw, f32* pPitch, f32* pRoll);
+// A rotation matrix from yaw (about y), pitch (about x) and roll (about z), radians, into rows 0-2
+// of pMtx (UMemPool.c).
+void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 fYaw, f32 fPitch, f32 fRoll);
 void Math_InitLog2Table(void);                 // make the log2 table (gLog2Table)
 void Math_FreeLog2Table(void);                 // free the log2 table
 double acos(double x);                  // 0x8015F784 (MSL)

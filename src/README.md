@@ -218,7 +218,7 @@ describe; static cameras and fly-bys come from the course data.
 | GoDynamicCam.c | EA | camera shots, sequences and choices from the camera files, picked by situation |
 | gocamscripts.c | T6 | camera scripts: move from shot to shot, keep above ground, aim at ball and pin |
 | GoCamCont.c | T6 | each view's camera controller: camera mode, idle state |
-| GoStaticCam.c | EA | the course's static cameras and fly-by paths (`'Cact'`, `'CAMC'` objects) |
+| GoStaticCam.c | EA | the course's static cameras and fly-by routes (`'Cact'`, `'CAMC'` objects) |
 | GoCamTuningVars.c | EA | the camera tuning values |
 | GoComicCam.c | EA | the comic-book camera: the shot shown in panels |
 | GoGolfCam.c | EA | the golf cameras: each mode's init and per-frame process |

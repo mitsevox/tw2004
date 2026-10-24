@@ -464,7 +464,7 @@ The fixes that come up most often. Each points to its full entry below.
   `if (gPlayers[n].nLie == 6 || ... == 7 || ... == 8)` became `subi; cmplwi 1; ble` (a 6..7 range)
   plus one compare; the same chain through `Player* p` (`p->nLie == 6 || ...`) gave the original's
   three plain `cmpwi/beq` (`Lie_AllowsFullSwing`, exact). A `switch` with the three cases was
-  wrong both ways. The other direction: `pShot->p40->bAB == 6 || == 8 || == 9 || == 10` on a
+  wrong both ways. The other direction: `pShot->pNext->nInterpType == 6 || == 8 || == 9 || == 10` on a
   field read through a pointer gave the original's one `subi 8; clrlwi; cmplwi 2; ble` (8..10);
   copied into a `u8` local first, the same chain gave an 8..9 range plus a compare with 10
   (GoGolfCam `GolfCamera_InitZoomToAimCamera`). Which spelling makes the range depends on how the
@@ -1096,7 +1096,7 @@ The fixes that come up most often. Each points to its full entry below.
   one function but loaded once in another is `volatile`. In UStream.c exactly the scalars the
   DVD-read callback writes (`gbReadPending`, `gpReadBuffer`, the ring indices it advances) are
   volatile; the main-thread-only indices are not. That is the author's intent, not noise.
-- **[verified] A struct's size can be proved by a `Mem_cpy` of it** (CamScript 0x118).
+- **[verified] A struct's size can be proved by a `Mem_cpy` of it** (CameraScriptSettings_t 0x118).
 - **[verified] `volatile` on a global that interrupt callbacks write** (LLDisp_Gc's DispSync) fixed five
   functions at once; this is real volatile, not a fake match.
 - **[verified] `UISEvent.c` was built with `-pragma "pool_data on"`** (strings through one base register).
