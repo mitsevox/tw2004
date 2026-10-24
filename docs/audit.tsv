@@ -125,7 +125,7 @@ GoShaderObject_Rain_Gc.c	open
 GoStaticCam.c	done	3dfcfcd0	claude-review
 GoTerrain.c	open		
 GoTerrainCollision.c	open		
-GoViewCont.c	open		
+GoViewCont.c	done	4dd6d8e6	claude-review
 GoViewport.c	done	a131c343	claude-review
 Golfer.c	open		
 GxUtil.c	open		
