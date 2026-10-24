@@ -407,7 +407,7 @@ void CamScript_RunFlybyCamera(int nPlayer, f32* pCam, f32* pSub, CamScript* pScr
     f32 vMove[4];
     f32 vMoveTo[4];
     f32 fFov;
-    FlyByPath* pPath;
+    Curve* pPath;
     f32 fShare;
     f32 fStep;
     f32 fMoveTime = gpCamTuning->fFlyByFadeTime;
@@ -570,9 +570,8 @@ f32 CamScript_AccelerateTime(CamScript* pScript, f32 fTime) {
     fStart = CamScript_GetFlybyCamRate(pScript->pShot, 0.0f, fTime / pScript->f8C, fTime);
     if (fSpeed < fStart && fSpeed > fNow) return fTime;
     if (fSpeed > fStart && fSpeed < fNow) return fTime;
-    // port: EA passes an argument CamScript_GetFlybyTimeStep ignores (the shot, in r3)
-    return ((f32 (*)(CamShot*, f32, f32, f32, f32, f32, f32))CamScript_GetFlybyTimeStep)(
-        pScript->pShot, fSpeed, fNow, pScript->pShot->f48, pScript->pShot->f4C, pScript->fCamTime, fTime);
+    return CamScript_GetFlybyTimeStep(fSpeed, fNow, pScript->pShot->f48, pScript->pShot->f4C,
+                                      pScript->fCamTime, fTime);
 }
 
 // The camera's speed along the spline through a fly-by shot's chain (the shot before, p44; the
@@ -1108,8 +1107,9 @@ void CamScript_ArcCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript,
 }
 
 // Interp type 7: there and back. The share runs to 1 at the blend's middle and back to 0; the point
-// looked at, the camera's swing (CamUtils_vCalcArcPosition, way round nArcDir: 1 going, 2 coming back),
-// the field of view, depth of field and blur follow it; the roll (fRoll) blends by the doubled share instead.
+// looked at, the camera's swing (CamUtils_vCalcArcPosition, way round nArcDir: CAMERA_ARC_ANGLE_DOWN
+// going, CAMERA_ARC_ANGLE_UP coming back), the field of view, depth of field and blur follow it; the
+// roll (fRoll) blends by the doubled share instead.
 void CamScript_CircleCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime) {
     f32 vMove[4];
     f32 vPos[4];
@@ -1134,9 +1134,9 @@ void CamScript_CircleCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScri
     Vec3_Add(vPos, pScript->aLookAt, vPos);
     Vec3Copy(vPos, pSub);
     if (fT < 1.0f) {
-        pScript->nArcDir = 1;
+        pScript->nArcDir = CAMERA_ARC_ANGLE_DOWN;
     } else {
-        pScript->nArcDir = 2;
+        pScript->nArcDir = CAMERA_ARC_ANGLE_UP;
     }
     CamUtils_vCalcArcPosition(pScript->vCamPos, pScript->vNextCamPos, pSub, pScript->nArcDir, pCam, fShare);
     f = fShare * (pNext->fFovStart - pShot->fFovStart) + pShot->fFovStart;
@@ -1166,11 +1166,12 @@ void CamScript_CircleCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScri
     pScript->fRoll = fT * (pNext->fRoll - pShot->fRoll) + pShot->fRoll;
 }
 
-// Picks the way round (nArcDir: 1 or 2, 0 for either) of an arced move between the two shots. For blend
-// kind 12 it is 2 for a left-handed golfer (CameraScript_FlipCameraForLefty), else 1; kind 11 the
-// other way. Otherwise each way's curve midpoint (CamUtils_vCalcArcPosition, round the halfway
-// point of the two look-at points) is tested against the in-bounds outlines
-// (Ter_PointInOOBNetwork), and the way whose point alone is inside is taken.
+// Picks the way round (nArcDir, a CameraArcMode_e) of an arced move between the two shots. For blend
+// kind 12 it is CAMERA_ARC_ANGLE_UP for a left-handed golfer (CameraScript_FlipCameraForLefty), else
+// CAMERA_ARC_ANGLE_DOWN; kind 11 the other way. Otherwise each way's curve midpoint
+// (CamUtils_vCalcArcPosition, round the halfway point of the two look-at points) is tested against
+// the in-bounds outlines (Ter_PointInOOBNetwork), and the way whose point alone is inside is taken;
+// when both or neither are, CAMERA_ARC_EITHER_WAY.
 void CamScript_PickArcDirection(CamScript* pScript, f32* pSub, int nPlayer, f32* pPrev, f32 fTime) {
     f32 vSide1[4];
     f32 vSide2[4];
@@ -1184,15 +1185,15 @@ void CamScript_PickArcDirection(CamScript* pScript, f32* pSub, int nPlayer, f32*
 
     if (pScript->nInterpType == 12) {
         if (CameraScript_FlipCameraForLefty(nPlayer, NULL)) {
-            pScript->nArcDir = 2;
+            pScript->nArcDir = CAMERA_ARC_ANGLE_UP;
         } else {
-            pScript->nArcDir = 1;
+            pScript->nArcDir = CAMERA_ARC_ANGLE_DOWN;
         }
     } else if (pScript->nInterpType == 11) {
         if (CameraScript_FlipCameraForLefty(nPlayer, NULL)) {
-            pScript->nArcDir = 1;
+            pScript->nArcDir = CAMERA_ARC_ANGLE_DOWN;
         } else {
-            pScript->nArcDir = 2;
+            pScript->nArcDir = CAMERA_ARC_ANGLE_UP;
         }
     } else {
         Vec3Copy(pSub, vLook);
@@ -1204,22 +1205,24 @@ void CamScript_PickArcDirection(CamScript* pScript, f32* pSub, int nPlayer, f32*
         Vec3_Scale(0.5f, vHalf, vPoint);
         Vec3_Add(vPoint, vLook, vPoint);
         Vec3Copy(vPoint, vMid);
-        pScript->nArcDir = 1;
-        CamUtils_vCalcArcPosition(pScript->vCamPos, pScript->vNextCamPos, vMid, 1, vSide1, 0.5f);
-        pScript->nArcDir = 2;
-        CamUtils_vCalcArcPosition(pScript->vCamPos, pScript->vNextCamPos, vMid, 2, vSide2, 0.5f);
+        pScript->nArcDir = CAMERA_ARC_ANGLE_DOWN;
+        CamUtils_vCalcArcPosition(pScript->vCamPos, pScript->vNextCamPos, vMid, CAMERA_ARC_ANGLE_DOWN,
+                                  vSide1, 0.5f);
+        pScript->nArcDir = CAMERA_ARC_ANGLE_UP;
+        CamUtils_vCalcArcPosition(pScript->vCamPos, pScript->vNextCamPos, vMid, CAMERA_ARC_ANGLE_UP,
+                                  vSide2, 0.5f);
         bIn1 = Ter_PointInOOBNetwork(vSide1);
         bIn2 = Ter_PointInOOBNetwork(vSide2);
         if (!bIn1) {
             if (!bIn2) {
-                pScript->nArcDir = 0;
+                pScript->nArcDir = CAMERA_ARC_EITHER_WAY;
             } else {
-                pScript->nArcDir = 2;
+                pScript->nArcDir = CAMERA_ARC_ANGLE_UP;
             }
         } else if (!bIn2) {
-            pScript->nArcDir = 1;
+            pScript->nArcDir = CAMERA_ARC_ANGLE_DOWN;
         } else {
-            pScript->nArcDir = 0;
+            pScript->nArcDir = CAMERA_ARC_EITHER_WAY;
         }
     }
 }

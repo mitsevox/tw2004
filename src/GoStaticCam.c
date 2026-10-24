@@ -16,7 +16,6 @@
 
 CamLens* Camera_GetLens(void* pCamera);                        // the render camera's lens
 void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 a, f32 b, f32 c);      // a rotation matrix from three angles
-f32  CamScript_fGetDistanceBetweenSplinePoints(f32* pPos0, f32* pPos1, f32* pPos2, f32* pPos3);
 
 void StaticCam_LoadCAMCfromStream(UStreamObject* pObject);
 void StaticCam_SetupFlybyCameraPointers(CamShot* pShot, CamShot** ppPrev, CamShot** ppNext, CamShot** ppAfter);
@@ -36,7 +35,7 @@ void StaticCam_UnRegisterStreamClients(void) {
     Stream_UnregisterLoadChunkCallback('CAMC');
 }
 
-// The 'CAMC' stream handler: the fly-by paths' timing curves (FlyByPath, found by
+// The 'CAMC' stream handler: the fly-by paths' timing curves (Curve, found by
 // StaticCam_GetFlybyTimeCurve), byte-swapped from the file (a two-word header into u1E5C and
 // nPaths, then each path and its 0x22-byte keys) into a table allocated here. Frees the object.
 void StaticCam_LoadCAMCfromStream(UStreamObject* pObject) {
@@ -53,7 +52,7 @@ void StaticCam_LoadCAMCfromStream(UStreamObject* pObject) {
     ByteSwap_Records(&pSrc, &pDst, aHeader, 2, 1);
     if (gpStaticCams->nPaths != 0) {
         gpStaticCams->pPaths =
-            StaticMem_Alloc(gpStaticCams->nPaths * sizeof(FlyByPath), 2, 0, "GoStaticCam.c", 190);
+            StaticMem_Alloc(gpStaticCams->nPaths * sizeof(Curve), 2, 0, "GoStaticCam.c", 190);
     }
     for (i = 0; i < gpStaticCams->nPaths; i++) {
         pDst = &gpStaticCams->pPaths[i];
@@ -357,8 +356,8 @@ CamShot* StaticCam_GetFlyByCam(int nPath) {
 }
 
 // Fly-by path uPath's timing curve, or NULL.
-FlyByPath* StaticCam_GetFlybyTimeCurve(u32 uPath) {
-    FlyByPath* pPaths;
+Curve* StaticCam_GetFlybyTimeCurve(u32 uPath) {
+    Curve* pPaths;
     u32 i;
 
     pPaths = gpStaticCams->pPaths;

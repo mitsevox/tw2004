@@ -1042,7 +1042,7 @@ config.libs = [
             Object(Matching, "SitDevStateVector.c"),
             Object(Matching, "SitDevTrigger.c"),
             Object(Matching, "GoGolfCam.c"),
-            Object(Matching, "CamSpline.c"),
+            Object(Matching, "CamUtils.c"),
             Object(Matching, "GoBreakLine.c"),
             Object(Matching, "AnimStream.c"),
             Object(Matching, "TerrainGround.c"),

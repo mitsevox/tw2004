@@ -222,7 +222,7 @@ describe; static cameras and fly-bys come from the course data.
 | GoCamTuningVars.c | EA | the camera tuning values |
 | GoComicCam.c | EA | the comic-book camera: the shot shown in panels |
 | GoGolfCam.c | EA | the golf cameras: each mode's init and per-frame process |
-| CamSpline.c | ours | Catmull-Rom spline paths for cameras |
+| CamUtils.c | T6/T7 | the camera paths' maths: Catmull-Rom splines through shots, a fly-by's timing curve, points between two points or swung round a centre |
 
 GameEffects.c (the GameBreaker letterbox and slow motion) is in [The round](#the-round).
 

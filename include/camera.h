@@ -141,24 +141,34 @@ typedef struct FlyByCamDef {
     s8   nPath;                 // 0x38  its path (0..9) -> CamShot.nA4
 } FlyByCamDef;
 
-// One key of a fly-by path's spline (0x24 bytes; a 'CAMC' object holds them byte-swapped, 0x22
-// bytes each).
+// A point or tangent of a fly-by's timing curve: x along the share of the fly-by's time, y the value.
+typedef struct CurvePoint2D {
+    f32  x;                     // 0x00
+    f32  y;                     // 0x04
+} CurvePoint2D;
+
+// One key of a fly-by's timing curve, a Hermite segment from start to end (0x24 bytes; a 'CAMC'
+// object holds them byte-swapped, 0x22 bytes each).
 typedef struct FlyByKey {
-    f32  af[8];                 // 0x00
+    CurvePoint2D start;         // 0x00
+    CurvePoint2D end;           // 0x08
+    CurvePoint2D startTangent;  // 0x10
+    CurvePoint2D endTangent;    // 0x18
     u8   b20;                   // 0x20
     u8   b21;                   // 0x21
     u8   unk22[2];
 } FlyByKey;
 
-// A fly-by path's spline (0x2E0 bytes), from the 'CAMC' object.
-typedef struct FlyByPath {
+// A fly-by path's timing curve (0x2E0 bytes), from the 'CAMC' object: for a share of the fly-by's
+// time, the key whose start.x..end.x holds it gives the value (CamScript_fEvaluateCurve).
+typedef struct Curve {
     u32  u0;                    // 0x00
     u32  uPath;                 // 0x04  the path it belongs to (CamShot.nA4; StaticCam_GetFlybyTimeCurve)
     f32  fLength;               // 0x08
-    u32  nKeys;                 // 0x0C
+    u32  nKeys;                 // 0x0C  how many of aKeys are used
     FlyByKey aKeys[20];         // 0x10
-} FlyByPath;
-LAYOUT_ASSERT(FlyByPath, 0x2E0);
+} Curve;
+LAYOUT_ASSERT(Curve, 0x2E0);
 
 #define NUM_STATIC_CAMS 10
 #define NUM_FLYBY_CAMS  30
@@ -175,7 +185,7 @@ typedef struct StaticCams {
     CamShot* apPath[NUM_FLYBY_PATHS];      // 0x1E34  each path's first shot
     u32  u1E5C;                 // 0x1E5C  } the 'CAMC' object's header
     u32  nPaths;                // 0x1E60  } the number of splines in pPaths
-    FlyByPath* pPaths;          // 0x1E64
+    Curve* pPaths;              // 0x1E64
 } StaticCams;
 LAYOUT_ASSERT(StaticCams, 0x1E68);
 
@@ -261,7 +271,8 @@ typedef struct CamScript {
     u8   bCE;                   // 0xCE  set by every new script, never cleared in this build
     u8   bFairwayFix;           // 0xCF  the camera was put back on the fairway (a point of kind
                                 //       16, DynamicCam_GetLocation)
-    s32  nArcDir;               // 0xD0  the way round an arced blend swings (CamUtils_vCalcArcPosition)
+    s32  nArcDir;               // 0xD0  the way round an arced blend swings, a CameraArcMode_e
+                                //       (CamUtils_vCalcArcPosition)
     f32  fD4;                   // 0xD4  the camera's speed when the script moves to the next shot
                                 //       (CamScript_RunScript)
     f32  fD8;                   // 0xD8  camera 8: the ground height it follows
@@ -884,36 +895,49 @@ u8       CamScript_DoesScriptTrackBall(CamShot* pShot);             // the shot'
 // GoCamera.c: works out the lens's fB0 from its field of view.
 void     CA_vUpdateInternalFieldOfViewData(CamLens* pLens);
 
-// ---- camera script helpers (CamSpline.c, 0x800C7480..)-------------------------------------
+// ---- the camera paths' maths (CamUtils.c) -----------------------------------------------------
 
-// Both write a point into pOut: CamUtils_vGetPositionBetweenTwoPoints goes fDist along the
-// direction from pA to pB (its y cleared unless bKeepY, normalised unless bRaw), then fSide across
-// the flattened direction; CamUtils_vCalcArcPosition swings around pC from pA towards pB at share
-// fT (nDir: 0 the short way round, 1 angle decreasing, else increasing).
-void   CamUtils_vGetPositionBetweenTwoPoints(f32* pA, f32* pB, u8 bKeepY, u8 bRaw, f32* pOut, f32 fDist,
-                                             f32 fSide);
-void   CamUtils_vCalcArcPosition(f32* pA, f32* pB, f32* pC, int nDir, f32* pOut, f32 fT);
-// The splined camera (CamScript_SplineCameras): the camera position on the spline through pPos0..3,
-// the look angles on the one through pLook0..3 (each unwrapped to within half a turn of the one
-// before), and the field of view between fFov1 and fFov2, at share fT between the middle two.
-void   CamScript_SplineCamerasByPositionAndLook(f32* pPos0, f32* pPos1, f32* pPos2, f32* pPos3,
-                                                f32* pLook0, f32* pLook1, f32* pLook2, f32* pLook3,
-                                                f32* pCam, f32* pSub, f32* pFov, f32 fFov1, f32 fFov2,
-                                                f32 fT);
-// a point on the spline
-void   CamScript_SplineCamerasByPosition(f32* p0, f32* p1, f32* p2, f32* p3, f32* pOut, f32 fT);
-f32    CamScript_GetFlybyTimeStep(f32 fA, f32 fB, f32 fC, f32 fD, f32 fE, f32 fF);
-// The value of a fly-by path's curve at time fT (CamScript_RunFlybyCamera).
-f32    CamScript_fEvaluateCurve(FlyByPath* pPath, f32 fT);
-// CamSpline.c: the Catmull-Rom basis matrix.
-extern f32 gCatmullRomBasis[4][4];
+// CamUtils_vCalcArcPosition's arcMode, the way the camera swings round the centre (CamScript.nArcDir).
+// The angle is measured in the flat x-z plane, from x towards z.
+typedef enum CameraArcMode_e {
+    CAMERA_ARC_EITHER_WAY = 0,  // no way asked for: the start angle goes a turn up when the end's is
+                                // more than half a turn above it
+    CAMERA_ARC_ANGLE_DOWN = 1,  // the angle decreases
+    CAMERA_ARC_ANGLE_UP = 2     // the angle increases
+} CameraArcMode_e;
+
+// The splined camera: the position on the spline through pos0..3, the look angles on the one
+// through look0..3 (each unwrapped to within half a turn of the one before), and the field of view
+// between fov0 and fov1, at share param between the middle two.
+void   CamScript_SplineCamerasByPositionAndLook(f32* pos0, f32* pos1, f32* pos2, f32* pos3, f32* look0,
+                                                f32* look1, f32* look2, f32* look3, f32* finalPos,
+                                                f32* finalLook, f32* finalFOV, f32 fov0, f32 fov1,
+                                                f32 param);
+// The point at share param between pos1 and pos2 on the Catmull-Rom spline through pos0..pos3.
+void   CamScript_SplineCamerasByPosition(f32* pos0, f32* pos1, f32* pos2, f32* pos3, f32* finalPos,
+                                         f32 param);
+// A fly-by's time step while it speeds up (CamScript_AccelerateTime).
+f32    CamScript_GetFlybyTimeStep(f32 rate0, f32 rate1, f32 time1, f32 accelParam, f32 currentTime,
+                                  f32 timeStep);
+// The length of the spline between pos1 and pos2.
+f32    CamScript_fGetDistanceBetweenSplinePoints(f32* pos0, f32* pos1, f32* pos2, f32* pos3);
+// A fly-by path's timing curve at a share of its time (-1 when out of range).
+f32    CamScript_fEvaluateCurve(Curve* c, f32 time);
+// Both write a point into endPt: CamUtils_vGetPositionBetweenTwoPoints goes param along the way
+// from pt1 to pt2 (flattened unless use3D, a share of the way if usePercent), then sideOffset
+// across it; CamUtils_vCalcArcPosition swings round centerPoint from pt1 towards pt2 at share
+// param, the way arcMode (CameraArcMode_e) gives.
+void   CamUtils_vGetPositionBetweenTwoPoints(f32* pt1, f32* pt2, u8 use3D, u8 usePercent, f32* endPt,
+                                             f32 param, f32 sideOffset);
+void   CamUtils_vCalcArcPosition(f32* pt1, f32* pt2, f32* centerPoint, CameraArcMode_e arcMode,
+                                 f32* endPoint, f32 param);
 
 // ---- the static and fly-by cameras (GoStaticCam.c, 0x8006449C..) ----------------------------
 
 void     StaticCam_ProcessScript(CamShot* pShot, int nPlayer, f32* pOut);   // the shot's position
 CamShot* StaticCam_ChooseScript(int nPlayer, int nKind, u8 bNotKind5, CamShot* pNot);
 CamShot* StaticCam_GetFlyByCam(int nPath);        // a fly-by path's first shot (NULL past the 10th)
-FlyByPath* StaticCam_GetFlybyTimeCurve(u32 uPath);      // a fly-by path's timing curve (NULL: none)
+Curve*   StaticCam_GetFlybyTimeCurve(u32 uPath);  // a fly-by path's timing curve (NULL: none)
 void     StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32* pSub, f32* pFov,
                      int nPlayer, f32 fShare);
 
