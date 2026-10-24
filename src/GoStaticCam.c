@@ -91,7 +91,7 @@ void StaticCam_ParseFlybyCameraActor(UStreamObject* pCameraActor) {
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].fFovStart = PI * (camPtr->fFov / 180.0f);
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].nInterpType = CAMINTERP_SPLINE;
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].fInterpTime = camPtr->fInterpTime;
-    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].nLookAtKind = CAMLOOK_SHOT_POINT;
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].nLookAtKind = CAMPOINT_SHOT_POINT;
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].bHasPrev = 1;
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].v30[0] = PI * (camPtr->aLook[0] / 180.0f);
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].v30[1] = PI * (camPtr->aLook[1] / 180.0f);
@@ -216,7 +216,7 @@ void StaticCam_ProcessScript(CamShot* link, int ePlayerID, f32* position) {
 
 // A random static camera for event (one of its pick.uEvents) whose area holds one of the player's
 // ball positions (StaticCam_CheckHotZone), other than ignoreLink; with dontShowGolfer none that looks
-// at the golfer (CAMLOOK_GOLFER_WAIST_LAGGED). Only on course 12 with Game_GetCurHoleNum 10, and only
+// at the golfer (CAMPOINT_GOLFER_WAIST_LAGGED). Only on course 12 with Game_GetCurHoleNum 10, and only
 // for STATICCAM_EVENT_PRE_SHOT; NULL otherwise and when none fits.
 CamShot* StaticCam_ChooseScript(int ePlayerID, StaticCam_EventType_e event, u8 dontShowGolfer,
                                 CamShot* ignoreLink) {
@@ -232,7 +232,7 @@ CamShot* StaticCam_ChooseScript(int ePlayerID, StaticCam_EventType_e event, u8 d
     pFound = possibleScripts;
     for (i = 0; i < gpStaticCams->nStatic; i++) {
         if (!gpStaticCams->aStatic[i].bHasPrev && (event & gpStaticCams->aStatic[i].pick.uEvents)
-            && (!dontShowGolfer || gpStaticCams->aStatic[i].nLookAtKind != CAMLOOK_GOLFER_WAIST_LAGGED)
+            && (!dontShowGolfer || gpStaticCams->aStatic[i].nLookAtKind != CAMPOINT_GOLFER_WAIST_LAGGED)
             && StaticCam_CheckHotZone(&gpStaticCams->aStatic[i], ePlayerID)
             && ignoreLink != &gpStaticCams->aStatic[i]) {
             *pFound++ = i;

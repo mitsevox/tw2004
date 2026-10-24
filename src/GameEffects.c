@@ -279,9 +279,9 @@ void GameEffects_TargetGameBreakerTrigger(int nPlayer) {
 }
 
 // As the ball is hit (STATEFUNC_SimulateInit), for a GameBreaker that is up (not in the demo): half
-// and double time off, and the player's view gets GameBreaker camera sequence 0xC (DynamicCam_ChooseSequence,
-// from the lie the ball is hit from) for the shot's full distance (AI_MaxDistance times the lie's
-// power times the swing's power). b19 is set, which starts the letterbox
+// and double time off, and the player's view gets a CAMSTATE_GAMEBREAKER_HIT camera sequence
+// (DynamicCam_ChooseSequence, from the lie the ball is hit from) for the shot's full distance
+// (AI_MaxDistance times the lie's power times the swing's power). b19 is set, which starts the letterbox
 // (GameEffects_RenderScriptedGB), and f24 is held to 0.8 at most. On course 7 there is no camera,
 // only b19.
 void GameEffects_ScriptedGameBreakerBallHitTrigger(int nPlayer) {
@@ -300,7 +300,7 @@ void GameEffects_ScriptedGameBreakerBallHitTrigger(int nPlayer) {
         GameEffects_SetHalfTime(0, nPlayer);
         GameEffects_SetDoubleTime(0, nPlayer);
         pView = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
-        pView->p74 = DynamicCam_ChooseSequence(nPlayer, nLie, 3, 0xC, 1, fDist);
+        pView->p74 = DynamicCam_ChooseSequence(nPlayer, nLie, 3, CAMSTATE_GAMEBREAKER_HIT, 1, fDist);
         gGameEffects.b19 = 1;
         if (gGameEffects.f24 > 0.8f) {
             gGameEffects.f24 = 0.8f;
@@ -363,7 +363,7 @@ int GameEffects_IsScriptedGameBreaker(int nPlayer) {
 // gSession.bDemo set, or when the mode allows no GameBreakers (gpGame->bAllowGameBreakers clear).
 // The ball must still be at least 1 (club 25, the putter), 10 (a drive, nShotKind 1) or 5 (any
 // other shot) from the look-ahead ball across the ground, bHitPin clear and a course loaded. Half
-// and double time go off, and the player's view gets GameBreaker camera sequence 0xB
+// and double time go off, and the player's view gets a CAMSTATE_GAMEBREAKER_FLIGHT camera sequence
 // (DynamicCam_ChooseSequence) for the shot's length to the look-ahead ball, by the ball's lie and
 // the surface class where the look-ahead ball lies. When the shot it picks tracks the golfer (kind
 // 5, CamScript_DoesScriptTrackGolfer) on a shot that is not a putt, the golfer is set to animation
@@ -422,7 +422,7 @@ void GameEffects_InFlightGameBreakerTrigger(int nPlayer) {
             GameEffects_SetHalfTime(0, nPlayer);
             GameEffects_SetDoubleTime(0, nPlayer);
             pView = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
-            pSeq = DynamicCam_ChooseSequence(nPlayer, nLie, nClass, 0xB, 1, fDist);
+            pSeq = DynamicCam_ChooseSequence(nPlayer, nLie, nClass, CAMSTATE_GAMEBREAKER_FLIGHT, 1, fDist);
             pShot = DynamicCam_ChooseScriptInSequence(pSeq, 0, &nKind, &fTime, &f2, &nB, &f3, nPlayer);
             if (pShot != NULL && pView->script.pShot != pShot && pView->script.pNextShot != pShot &&
                 !CamScript_SkipLookBackCam(&pView->script, pShot, nPlayer)) {
