@@ -1022,7 +1022,7 @@ The fixes that come up most often. Each points to its full entry below.
   (2048, 4096, 16384, 0.5, 0.25, -128 stay `fdivs`), in every spelling and every compiler 1.0 -
   3.0a5.2. The frontend always hoists a loop test's load; `#pragma opt_loop_invariants off` on the
   function plus the test spelled differently from the divide (`*(const f32*)aStep` vs `aStep[0]`)
-  gave CamSpline CamScript_fEvaluateCurve 98.48 -> 100 (labelled).
+  gave CamUtils CamScript_fEvaluateCurve 98.48 -> 100 (labelled).
 
 ### Data, constants and symbols
 
@@ -1142,7 +1142,7 @@ The fixes that come up most often. Each points to its full entry below.
   on the two u8s links LLTex (labelled fake; likely several EA files there, boundaries at the gaps).
 - **[verified] Pool order**: a function static (even block-scope) is emitted when its function
   starts, and an int -> float conversion's constant is pooled after the function's literal
-  constants; `<Unit>_StrippedFn` stand-ins fix both (CamSpline, uiArc).
+  constants; `<Unit>_StrippedFn` stand-ins fix both (CamUtils, uiArc).
 - **[verified] A string pool in `.rodata`** needs `-str reuse,readonly` on the unit (UISEvent: its
   strings sat 0x28 off, behind the switch tables in `.data`).
 

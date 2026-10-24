@@ -1075,7 +1075,7 @@ GoGolfCam.c:
 	.sbss       start:0x80282220 end:0x80282228
 	.sdata2     start:0x802842C0 end:0x802843B8
 
-CamSpline.c:
+CamUtils.c:
 	.text       start:0x800C7480 end:0x800C808C
 	.data       start:0x80191440 end:0x80191480
 	.sdata2     start:0x802843B8 end:0x802843F8

@@ -1166,7 +1166,7 @@ void GolfCamera_ProcessGreenCamera(View* pView, int nPlayer) {
         }
         CamUtils_vGetPositionBetweenTwoPoints(pFrom, pTo, 1, 1, vA, 1.0f, -gpCamTuning->fGreenCamArcSide);
         CamUtils_vGetPositionBetweenTwoPoints(pFrom, pTo, 1, 1, vB, 1.0f, gpCamTuning->fGreenCamArcSide);
-        CamUtils_vCalcArcPosition(vA, vB, pTo, 2, pCam, fT);
+        CamUtils_vCalcArcPosition(vA, vB, pTo, CAMERA_ARC_ANGLE_UP, pCam, fT);
         LLMath_CopyVec(pTo, pSub);
     }
     CamScript_KeepAboveGround(nPlayer, pCam, vOld, 1, NULL, &fAbove, NULL, gpCamTuning->fGreenCamClearance);
@@ -2470,7 +2470,7 @@ void GolfCamera_InitTutorialWaitCamera(View* pView, int nPlayer) {
     pView->script.pNextShot = &gGolfCamState->shot12C;
     pView->script.nInterpType = 7;
     pView->script.f8C = 40.0f;
-    pView->script.nArcDir = 1;
+    pView->script.nArcDir = CAMERA_ARC_ANGLE_DOWN;
     pView->script.fCamTime = 0.00001f;
 }
 
@@ -2486,7 +2486,7 @@ void GolfCamera_ProcessTutorialWaitCamera(View* pView, int nPlayer) {
         pView->script.pNextShot = &gGolfCamState->shot12C;
         pView->script.nInterpType = 7;
         pView->script.f8C = 40.0f;
-        pView->script.nArcDir = 1;
+        pView->script.nArcDir = CAMERA_ARC_ANGLE_DOWN;
         pView->script.fCamTime = 0.00001f;
     }
 }
@@ -3219,9 +3219,9 @@ void GolfCamera_CreateMatrixCamera(View* pView, f32* pFrom, f32* pTo, int nPlaye
         pView->script.f8C = gpCamTuning->fMatrixBlendTime;
         pView->script.nInterpType = 2;
         if (CameraScript_FlipCameraForLefty(nPlayer, NULL)) {
-            pView->script.nArcDir = 2;
+            pView->script.nArcDir = CAMERA_ARC_ANGLE_UP;
         } else {
-            pView->script.nArcDir = 1;
+            pView->script.nArcDir = CAMERA_ARC_ANGLE_DOWN;
         }
     } else if (nOrder == 1) {
         pView->script.pShot = &gGolfCamState->shot12C;
@@ -3229,9 +3229,9 @@ void GolfCamera_CreateMatrixCamera(View* pView, f32* pFrom, f32* pTo, int nPlaye
         pView->script.f8C = gpCamTuning->fMatrixBlendTime;
         pView->script.nInterpType = 2;
         if (CameraScript_FlipCameraForLefty(nPlayer, NULL)) {
-            pView->script.nArcDir = 1;
+            pView->script.nArcDir = CAMERA_ARC_ANGLE_DOWN;
         } else {
-            pView->script.nArcDir = 1;
+            pView->script.nArcDir = CAMERA_ARC_ANGLE_DOWN;
         }
     } else {
         pView->script.pShot = &gGolfCamState->shot6C;
@@ -3239,9 +3239,9 @@ void GolfCamera_CreateMatrixCamera(View* pView, f32* pFrom, f32* pTo, int nPlaye
         pView->script.nInterpType = 7;
         pView->script.f8C = 2.0f * gpCamTuning->fMatrixBlendTime;
         if (CameraScript_FlipCameraForLefty(nPlayer, NULL)) {
-            pView->script.nArcDir = 2;
+            pView->script.nArcDir = CAMERA_ARC_ANGLE_UP;
         } else {
-            pView->script.nArcDir = 1;
+            pView->script.nArcDir = CAMERA_ARC_ANGLE_DOWN;
         }
     }
     pView->script.fCamTime = 0.00001f;
