@@ -186,7 +186,7 @@ UAudMem.c	open
 UAudMemStack.c	done	6d2534bd	claude-review
 UAudVector.c	done	58556d0e	claude-review
 UByteSwap.c	done	f6808074	claude-review
-UCirc.c	open		
+UCirc.c	done	f961489e	claude-review
 UFont.c	open		
 UFstPart.c	open		
 UISApi.c	open		
