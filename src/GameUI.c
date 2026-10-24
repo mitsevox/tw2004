@@ -9,7 +9,6 @@
 #include "game/modes/mode22.h"
 #include "game/modes/mode26.h"
 
-void  Input_vStopAllVibration(void);
 void  fn_8006A8B0(void);
 
 void  GUI_UpdateAllUIData(void);

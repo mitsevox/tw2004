@@ -37,15 +37,17 @@ s32  GbaReadContext(s32 nChan);
 void GbaOpen(s32 nChan);
 void Gba_SetState(s32 v);
 
-// Each port's PADReset bit (SI_CHAN_BIT: 0x80000000 >> port), for Gba_ReadPads.
-const u32 gGbaPadResetBits[GBA_NUM_CHANNELS] = { 0x80000000, 0x40000000, 0x20000000, 0x10000000 };
+// Each port's PADReset bit, for Gba_ReadPads.
+const u32 gGbaPadResetBits[GBA_NUM_CHANNELS] = {
+    PAD_CHAN0_BIT, PAD_CHAN1_BIT, PAD_CHAN2_BIT, PAD_CHAN3_BIT
+};
 
 s32 gGbaLinkState = -1;    // the link state (Gba_SetState lists them); -1: never started
 s32 gGbaPortInUse = -1;    // the port a GBA answered on (Gba_StepPorts); -1: none
 
 // data order: .bss and .sbss are defined in reverse address order (CodeWarrior lays them out
 // last-defined-first)
-PadStatus gGbaPads[GBA_NUM_CHANNELS];         // Gba_ReadPads' pad buffer; nothing else reads it
+PADStatus gGbaPads[GBA_NUM_CHANNELS];         // Gba_ReadPads' pad buffer; nothing else reads it
 GbaChannel gGbaChannels[GBA_NUM_CHANNELS];    // each controller port's link
 
 u32 gGbaInitTick;                 // OSGetTick() when Gba_Init ran; new contexts carry it (uStart)
@@ -707,7 +709,7 @@ void Gba_ReadPads(void) {
     int nChan;
     u32 uReset = 0;
     GbaChannel* pCh;
-    PadStatus* pPad;
+    PADStatus* pPad;
     const u32* pMask;
     u32 uKey;
     u32 uStart;
@@ -726,9 +728,9 @@ void Gba_ReadPads(void) {
                 if ((u8)pCh->uPadWord
                     == Gba_CalcCheckByte(((pCh->uPadWord >> 16) & 0xFF) | (pCh->uPadWord & 0xFF00))) {
                     uKey = pCh->uPadWord;
-                    pPad->uButtons = (((uKey >> 23) & 1) ? 4 : 0) |
-                                     ((((uKey >> 22) & 1) ? 8 : 0) |
-                                      ((((uKey >> 20) & 1) ? 2 : 0) | ((uKey >> 21) & 1)));
+                    pPad->button = (((uKey >> 23) & 1) ? PAD_BUTTON_DOWN : 0) |
+                                   ((((uKey >> 22) & 1) ? PAD_BUTTON_UP : 0) |
+                                    ((((uKey >> 20) & 1) ? PAD_BUTTON_RIGHT : 0) | ((uKey >> 21) & 1)));
                 }
             }
             pCh->bNewPadWord = 0;

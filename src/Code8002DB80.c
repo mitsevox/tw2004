@@ -526,7 +526,7 @@ void Session_UnregisterRecordsHandler(void) {
 void fn_8002EBA4(u8* pObj, u8 nValue) {
     int i;
     pObj[7] = nValue;
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < INPUT_NUM_PADS; i++) {
         Input_vSetVibrationStatus(i, pObj[7]);
     }
 }

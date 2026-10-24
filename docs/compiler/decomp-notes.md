@@ -885,7 +885,7 @@ The fixes that come up most often. Each points to its full entry below.
 - **[verified] Block-scoped locals per switch case** allocate differently from one function-level local
   (EventInfo PGATourPopup_GetRow_EventInProgress); case labels merged into `default` (`case 3: default:`) reshape the compare
   tree or jump table (event EVENT_PlayerEmotionUpdated, NextShotType), and extra empty cases make the tree test a value
-  first (Controller_Gc Input_vUpdate: `case -2: case -3: break;`).
+  first (LLInput_Gc Input_vUpdate: `case -2: case -3: break;`).
 - **[verified] Return a local instead of an expression** so the register restores come before the last
   arithmetic (LLDynTex fn_8010B6AC 90 -> 100); round up through a local written back
   (`n = a + *p; n = (n - 1) & ~(a - 1); *p = n;`, hwsBurn HwsBurn_CopyAligned); a round-up division only matches

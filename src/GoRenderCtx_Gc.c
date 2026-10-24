@@ -13,6 +13,7 @@
 
 #include "game_types.h"
 #include "engine.h"
+#include "pad.h"
 #include "unsorted/cull.h"
 
 void RC_vOnRenderCtxScreenUpdated(Camera* pCamera);
@@ -436,8 +437,6 @@ void RenderView_MakeQuad(f32* pXY, f32* pUV, f32 x0, f32 y0, f32 x1, f32 y1) {
 
 double tan();
 void Input_vSelectControlSet(s8 v);
-void Input_vStopVibration(int nController);
-void Input_vStopAllVibration(void);
 
 // 1: RenderView_DrawPrimitive draws with the viewport and matrices already set (the camera's); 0:
 // with the view's own screen projection and viewport, put back after the draw.
@@ -470,12 +469,15 @@ f32 Math_Tan(f32 x0) {
 // indexed by button: Input_uiMap reads them.
 u32 gauInputButtonMap[][0xE8 / 4] __attribute__((aligned(8))) = {
     {
-        0xFFFF, 0x800, 0x800, 0x100, 0x400, 0x100, 0x800, 0x100, 0x400, 0x20,
-        0x40, 0x1, 0x2, 0x8, 0x4, 0x1, 0x2, 0x8, 0x4, 0x40,
-        0x1, 0x2, 0x100, 0x800, 0x200, 0x400, 0x1, 0x2, 0x8, 0x4,
-        0x200, 0x10, 0x10, 0, 0x800, 0x100, 0x40, 0x400, 0x100, 0x1,
-        0x2, 0x8, 0x4, 0, 0x40, 0x400, 0x40, 0x100, 0x20, 0x800,
-        0x400, 0x40, 0x20, 0x200, 0, 0, 0, 0
+        0xFFFF, PAD_BUTTON_Y, PAD_BUTTON_Y, PAD_BUTTON_A, PAD_BUTTON_X, PAD_BUTTON_A, PAD_BUTTON_Y,
+        PAD_BUTTON_A, PAD_BUTTON_X, PAD_TRIGGER_R, PAD_TRIGGER_L, PAD_BUTTON_LEFT, PAD_BUTTON_RIGHT,
+        PAD_BUTTON_UP, PAD_BUTTON_DOWN, PAD_BUTTON_LEFT, PAD_BUTTON_RIGHT, PAD_BUTTON_UP,
+        PAD_BUTTON_DOWN, PAD_TRIGGER_L, PAD_BUTTON_LEFT, PAD_BUTTON_RIGHT, PAD_BUTTON_A,
+        PAD_BUTTON_Y, PAD_BUTTON_B, PAD_BUTTON_X, PAD_BUTTON_LEFT, PAD_BUTTON_RIGHT, PAD_BUTTON_UP,
+        PAD_BUTTON_DOWN, PAD_BUTTON_B, PAD_TRIGGER_Z, PAD_TRIGGER_Z, 0, PAD_BUTTON_Y, PAD_BUTTON_A,
+        PAD_TRIGGER_L, PAD_BUTTON_X, PAD_BUTTON_A, PAD_BUTTON_LEFT, PAD_BUTTON_RIGHT, PAD_BUTTON_UP,
+        PAD_BUTTON_DOWN, 0, PAD_TRIGGER_L, PAD_BUTTON_X, PAD_TRIGGER_L, PAD_BUTTON_A, PAD_TRIGGER_R,
+        PAD_BUTTON_Y, PAD_BUTTON_X, PAD_TRIGGER_L, PAD_TRIGGER_R, PAD_BUTTON_B, 0, 0, 0, 0
     },
 };
 
@@ -504,7 +506,7 @@ u8 Input_AnyPadPressed(u32 uMask) {
             bPressed = 1;
         }
         nController++;
-    } while (nController < 4);
+    } while (nController < INPUT_NUM_PADS);
     return bPressed;
 }
 
@@ -516,7 +518,7 @@ void Input_vStopAllVibration(void) {
     do {
         Input_vStopVibration(var_r31);
         var_r31 += 1;
-    } while (var_r31 < 4);
+    } while (var_r31 < INPUT_NUM_PADS);
 }
 
 // ---- end of sweep code ----

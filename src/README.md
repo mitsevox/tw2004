@@ -120,7 +120,7 @@ early in link order (0x80005628-0x80013720), between the LL rendering files.
 | LoadData.c | ours | stream handlers: `'txf2'` texture banks, the `'load'` object, the loading-screen file; `Game_GetMode` |
 | UStream.c | EA | the streaming asset loader (CTRL/SHOC/SONO chunk files `.hog`/`.gcb`), async DVD reads into 18 buffers |
 | streammanagerhole.c | T6 | the stream file lists (front end, start-up, in game, characters, hole) and their handler lists |
-| Controller_Gc.c | ours | the four controllers: buttons, sticks, triggers, rumble |
+| LLInput_Gc.c | ours (after TW06 `llinput_xbox.c`) | the four controllers: buttons, sticks, triggers, rumble |
 | UByteSwap.c | T7 | copies little-endian disc data while swapping byte order |
 | LLTime.c | T7 | the clock and its stopwatch counters (`TI_*`) the main loop times frames with |
 | LLMath_Gc.c | ours (after TW07 `LLMath_PS3.c`) | paired-single vector and matrix helpers used everywhere |

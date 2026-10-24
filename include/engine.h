@@ -1397,48 +1397,56 @@ void fn_80012438(LLFont* pFont);
 
 // ---- controller input ------------------------------------------------------------------------
 
-// One controller as the pad library reads it (12 bytes a pad, filled by PADRead).
-typedef struct PadStatus {
-    u16 uButtons;                 // 0x00
-    s8  nStickX;                  // 0x02
-    s8  nStickY;                  // 0x03
-    s8  nSubStickX;               // 0x04  the C stick
-    s8  nSubStickY;               // 0x05
-    u8  nTriggerL;                // 0x06
-    u8  nTriggerR;                // 0x07
-    u8  nAnalogA;                 // 0x08
-    u8  nAnalogB;                 // 0x09
-    s8  nError;                   // 0x0A  0: read, -1: no controller
-    u8  unkB;                     // 0x0B
-} PadStatus;
+// One controller as the pad library reads it (12 bytes a pad, filled by PADRead). The sticks are
+// -128..127 with y growing upwards, the triggers and analog buttons 0..255.
+typedef struct PADStatus {
+    u16 button;                   // 0x00  the buttons held (PAD_BUTTON_* in pad.h)
+    s8  stickX;                   // 0x02  the main stick
+    s8  stickY;                   // 0x03
+    s8  substickX;                // 0x04  the C stick
+    s8  substickY;                // 0x05
+    u8  triggerLeft;              // 0x06
+    u8  triggerRight;             // 0x07
+    u8  analogA;                  // 0x08
+    u8  analogB;                  // 0x09
+    s8  err;                      // 0x0A  PAD_ERR_* (pad.h)
+} PADStatus;
+LAYOUT_ASSERT(PADStatus, 0xC);
 
-// A pad's sticks and triggers rescaled to 0-255 with a dead zone; 0x80 is the centre. Y grows
-// downwards.
-typedef struct PadAnalog {
-    u8  nSubStickX;               // 0x00
+#define INPUT_NUM_PADS 4          // the controller ports
+
+// A pad's sticks and triggers rescaled to 0-255 with a dead zone of 15 (Input_vUpdate); 0x80 is a
+// centred stick, and y grows as the stick is pulled back.
+typedef struct Controller_StickInfo {
+    u8  nSubStickX;               // 0x00  the C stick
     u8  nSubStickY;               // 0x01
-    u8  nStickX;                  // 0x02
+    u8  nStickX;                  // 0x02  the main stick
     u8  nStickY;                  // 0x03
     u8  nTriggerL;                // 0x04
     u8  nTriggerR;                // 0x05
-} PadAnalog;
+} Controller_StickInfo;
 
+// A pad's rumble.
 typedef struct PadRumble {
-    u8  bOn;                      // 0x00  cleared while rumble is switched off (Input_vSetVibrationStatus)
-    u8  bAllowed;                 // 0x01
-    s16 nFrames;                  // 0x02  frames the motor has run; it stops after 60
+    u8  bOn;                      // 0x00  the pad may rumble: the game options' vibration setting
+                                  //       (Input_vSetVibrationStatus)
+    u8  bAllowed;                 // 0x01  also needed to rumble; set for every pad at start-up and
+                                  //       never cleared
+    s16 nFrames;                  // 0x02  0 while the motor is off, else frames since it started
+                                  //       plus 1; Input_vUpdate stops it past 60
 } PadRumble;
 
-// Controller_Gc.c's state: the four pads.
+// LLInput_Gc.c's state (gControllers): the four pads.
 typedef struct Controllers {
-    u8  bStickAsDpad;             // 0x00  the main stick also presses the D-pad
-    u32 uConnected;               // 0x04  one bit a pad, 0x80000000 >> n
-    PadStatus aStatus[4];         // 0x08
-    PadAnalog aAnalog[4];         // 0x38
-    u32 auButtons[4];             // 0x50  held << 16 | pressed this frame
-    u32 auHeld[4];                // 0x60  last frame's held buttons
-    PadRumble aRumble[4];         // 0x70
-    s8  nRead;                    // 0x80  one bit a pad (1 << n): it answered this frame
+    u8  bStickAsDpad;             // 0x00  the main stick also presses the D-pad (Input_vEmulateDPad)
+    u32 uConnected;               // 0x04  the pads plugged in, one bit a pad: PAD_CHAN0_BIT >> n
+    PADStatus aStatus[INPUT_NUM_PADS];   // 0x08  what PADRead last read
+    Controller_StickInfo aStickInfo[INPUT_NUM_PADS];   // 0x38
+    u32 auButtons[INPUT_NUM_PADS];       // 0x50  held << 16 | pressed this frame (Input_ReadControlPad)
+    u32 auHeld[INPUT_NUM_PADS];          // 0x60  the buttons held at the last read
+    PadRumble aRumble[INPUT_NUM_PADS];   // 0x70
+    s8  uRead;                    // 0x80  the pads this frame's read settled (read, or found
+                                  //       unplugged), one bit a pad: 1 << n
 } Controllers;
 LAYOUT_ASSERT(Controllers, 0x84);
 
@@ -1474,19 +1482,21 @@ void DS_vSetZBufferMode(DS_ECompareFunctions eZBufferMode);
 void DS_vEnableZBufferUpdate(int bZBufferUpdate);
 void DS_vSetAlphaTestMode(int bAlphaTestEnable, DS_ECompareFunctions eAlphaMode, int nAlphaRefValue);
 
+// LLInput_Gc.c: the four controllers.
+extern Controllers gControllers;
 void Input_vInitOnce(void);
-int  Input_iInitModule(void);                 // controller init
-void Input_vCloseOnce(void);
-u32  Input_iGetPadType(int nChan);            // the pad's device type (SIProbe)
-u8   Input_bDoesPadExist(int nChan);            // a controller the game takes is plugged in
-void Input_vEmulateDPad(u8 bOn);               // the main stick also presses the D-pad
-void Input_vVibrateBuzz(int nController, int bOn);         // rumble on or off
-void Input_vVibrateWave(int nController, int nStrength);   // rumble strength
-void Input_vStopVibration(int nController);      // rumble off
-void Input_vSetVibrationStatus(int nController, int bEnable);   // rumble allowed or not
-void Input_vUpdate(void);                 // read the controllers
-u8*  Input_sGetStickInfo(int nController);      // the pad's state: stick bytes at +0, +2, +3
-u32  Input_ReadControlPad(int nController);      // buttons: held << 16 | pressed this frame
+int  Input_iInitModule(void);                   // start the pad library, clear the pads' state
+void Input_vCloseOnce(void);                    // stop every pad's rumble
+u32  Input_iGetPadType(int joyPad);             // the device type on a port (SI_GC_* in pad.h)
+u8   Input_bDoesPadExist(int joyPad);           // a controller the game takes is plugged in
+void Input_vEmulateDPad(u8 emulate);            // the main stick also presses the D-pad
+void Input_vVibrateBuzz(int joyPad, int vibOn);         // rumble at full strength, or off
+void Input_vVibrateWave(int joyPad, int vibRate);       // rumble at a strength 0-255
+void Input_vStopVibration(int joyPad);                  // rumble off
+void Input_vSetVibrationStatus(int joyPad, int vibOn);  // the pad may rumble or not
+void Input_vUpdate(void);                       // read the controllers, once a frame
+Controller_StickInfo* Input_sGetStickInfo(int joyPad);  // the pad's sticks and triggers, 0-255
+u32  Input_ReadControlPad(int joyPad);          // buttons: held << 16 | pressed this frame
 void RenderState_SetDrawFlags(int a);
 // A screen quad (GameEffects' letter boxes, GxUtil.c's alpha clear): RenderView_MakeQuad fills its corners
 // (x0, y0)-(x1, y1), RenderView_SetColor sets its colour (four floats), RenderView_DrawPrimitive draws it.
@@ -1506,6 +1516,7 @@ extern s8   gnInputControlSet;          // GoRenderCtx_Gc.c: the row of gauInput
                                         // (Input_vSelectControlSet)
 extern u32  gauInputButtonMap[][0xE8 / 4]; // GoRenderCtx_Gc.c: rows of button masks, by button
 u8   Input_AnyPadPressed(u32 uMask);                    // any pad pressed these buttons
+void Input_vStopAllVibration(void);                     // GoRenderCtx_Gc.c: every pad's rumble off
 
 // ---- events, sound, effects ------------------------------------------------------------------
 
