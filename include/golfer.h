@@ -329,7 +329,7 @@ typedef struct Player {
                                 //        PreShotBallPos
     SwingData swing;            // 0x3D4  the swing meter's state for this player
     s32  nController;           // 0xA08  CONTROLLER_CPU for the AI. TW06: Controller (PlayerCtrl_t, 9 = AI)
-    s32  nView[2];              // 0xA0C  the views (ViewController) the player uses. TW06:
+    s32  nView[2];              // 0xA0C  the views (ViewController_t) the player uses. TW06:
                                 //        viewControllerID[2]
     f32  vTarget[4];            // 0xA14
     f32  vTargetCopy[4];        // 0xA24  copy of the planned target. Probably TW06's originalTargetPos

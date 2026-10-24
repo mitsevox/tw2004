@@ -207,7 +207,7 @@ void RC_vUpdateRenderCtxScreenMatricesAndInfo(Camera* pCamera) {
         LLMath_mat44fltMultiplyList(mProj, mFlat, pCamera->m5C, 4);
     }
     LLMath_Transpose44(pCamera->m5C, pCamera->m9C);
-    LLMath_mat44fltMultiplyList(pCamera->m5C, pLens->m44, pCamera->mDC, 4);
+    LLMath_mat44fltMultiplyList(pCamera->m5C, pLens->mWorldToView, pCamera->mDC, 4);
 }
 
 // Rebuilds the matrices made from the model matrix at +0x1C: the lens's world-to-camera matrix with

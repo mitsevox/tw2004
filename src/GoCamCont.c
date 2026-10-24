@@ -17,7 +17,6 @@ u8   CameraController_PointIsOnScreen(int nPlayer, f32* pPos, f32 fMargin);
 u8   CameraController_HideGolfer(int nPlayer, int nView);
 void CameraController_SetShakeAmount(View* pView, f32 fTime, f32 fAmount);
 void CameraController_Vec3Sub(f32* pA, f32* pB, f32* pOut);
-void ViewController_SetCurrentViewController(int nView);    // ViewController.c: sets the current view
 void fn_80045824(int n);                                // DepthField.c: turns depth-of-field layer n off
 void Gaud_CameraShake(u8 nPlayer, u8 bLimit);                // GameAudio.c
 f32  Vec4_LengthSqClamped(f32* pV);                              // Swing.c
@@ -31,27 +30,27 @@ static f32 GoCamCont_StrippedFn(f32 x) {
 }
 
 // Sets a view's camera controller up: no camera mode (25), no camera sequences or shots, the
-// script's clocks, fade, flags, positions and shake cleared, f50..f58 1, the script's v70 (0, 0, 0,
+// script's clocks, fade, flags, positions and shake cleared, vViewScale 1, the script's v70 (0, 0, 0,
 // 1), and the script's recording shot pB4 pointed at the view's own shot19C.
 void CameraController_InitOneCamera(View* pView) {
     int i;
 
     for (i = 0; i < 4; i++) {
-        pView->v0[i] = 0.0f;
+        pView->vOrigin[i] = 0.0f;
     }
     for (i = 0; i < 4; i++) {
-        pView->v10[i] = 0.0f;
+        pView->vLookPoint[i] = 0.0f;
     }
-    pView->f50 = 1.0f;
-    pView->f54 = 1.0f;
-    pView->f58 = 1.0f;
+    pView->vViewScale[0] = 1.0f;
+    pView->vViewScale[1] = 1.0f;
+    pView->vViewScale[2] = 1.0f;
     pView->nCurCamera = 25;
     pView->script.fCamTime = 0.0f;
     pView->script.fScriptTime = 0.0f;
     pView->script.fFadeTime = 0.0f;
     pView->script.pShot = NULL;
     pView->script.pNextShot = NULL;
-    pView->script.nFade = 0;
+    pView->script.nFade = CAMFADE_NONE;
     pView->script.bBlendPending = 0;
     pView->script.bFairwayFix = 0;
     pView->script.bNoGround = 0;
@@ -97,7 +96,7 @@ void CameraController_Idle(View* pView, int nPlayer) {
     int i;
     int nMove;
 
-    if (pView->nCurCamera != 2) {
+    if (pView->nCurCamera != CAMMODE_GREEN_ZOOM_TO_AIM) {
         pView->vSide[0] = 0.0f;
         pView->vSide[1] = 0.0f;
         pView->vSide[2] = 0.0f;
@@ -116,13 +115,13 @@ void CameraController_Idle(View* pView, int nPlayer) {
     case 1:
         GolfCamera_ProcessZoomToAimCamera(pView, nPlayer);
         break;
-    case 2:
+    case CAMMODE_GREEN_ZOOM_TO_AIM:
         GolfCamera_ProcessGreenZoomToAimCamera(pView, nPlayer);
         break;
     case 3:
         GolfCamera_ProcessElevatorCamera(pView, nPlayer);
         break;
-    case 4:
+    case CAMMODE_GREEN:
         GolfCamera_ProcessGreenCamera(pView, nPlayer);
         break;
     case 5:
@@ -184,9 +183,9 @@ void CameraController_Idle(View* pView, int nPlayer) {
         if (gSession.nPaused == 0) {
             // port: one NTSC frame a call, not gSession.fFrameTime
             CamScript_Fade(&pView->script, FRAME_TIME);
-            // A colour fade held in state 4 (after fading up) stays on instead of ending.
-            if (nMove == 4 && pView->script.nFade == 0) {
-                pView->script.nFade = 4;
+            // A colour fade that just faded out (CAMFADE_OUT_DONE) stays on instead of ending.
+            if (nMove == CAMFADE_OUT_DONE && pView->script.nFade == CAMFADE_NONE) {
+                pView->script.nFade = CAMFADE_OUT_DONE;
             }
             pView->script.fFadeTime += FRAME_TIME;
         }
@@ -246,7 +245,7 @@ void CameraController_SetCameraMode(View* pView, int nCamera, int nPlayer, int n
     case 1:
         GolfCamera_InitZoomToAimCamera(pView, nPlayer);
         break;
-    case 2:
+    case CAMMODE_GREEN_ZOOM_TO_AIM:
         GolfCamera_InitGreenZoomToAimCamera(pView, nPlayer);
         break;
     case 3:
@@ -258,7 +257,7 @@ void CameraController_SetCameraMode(View* pView, int nCamera, int nPlayer, int n
     case 9:
         GolfCamera_InitSpeedGolfRunCamera(pView, nPlayer);
         break;
-    case 4:
+    case CAMMODE_GREEN:
         GolfCamera_InitGreenCamera(pView, nPlayer);
         break;
     case 5:
@@ -407,7 +406,8 @@ int CameraController_GetClippedShadow(void) {
 // Whether view nView hides the player's golfer: the view is the player's own (his nView[0], and
 // ViewController_GetActivePlayerNumber gives it to him) and either its current shot does not show
 // the golfer (bShowGolfer 0) and neither does the next shot it blends to (unless interp type 5), or the
-// camera is in mode 15 or 16 and GolfCamera_IsGolferDoneAnimating holds; with no shot, only in camera mode 4.
+// camera is in mode 15 or 16 and GolfCamera_IsGolferDoneAnimating holds; with no shot, only in the
+// green camera (CAMMODE_GREEN).
 u8 CameraController_HideGolfer(int nPlayer, int nView) {
     View* pView;
 
@@ -424,7 +424,7 @@ u8 CameraController_HideGolfer(int nPlayer, int nView) {
                     return 1;
                 }
             }
-        } else if (pView->nCurCamera == 4) {
+        } else if (pView->nCurCamera == CAMMODE_GREEN) {
             return 1;
         }
     }
@@ -514,48 +514,51 @@ void CameraController_CameraCollision(int nView, f32* pBounds) {
     CamScript_PutBackOnFairway(&pView->script, pPos, pAt, nPlayer, &pView->shot19C, pPos);
 }
 
-// Colour fade state 2 (CamScript_Fade): the colour pVec over the view, its alpha falling from pVec[3]
+// Colour fade CAMFADE_IN (CamScript_Fade): the colour pVec over the view, its alpha falling from pVec[3]
 // to 0 over fTime.
 void CameraController_FadeIn(View* pView, f32 fTime, f32* pVec) {
-    pView->script.nFade = 2;
+    pView->script.nFade = CAMFADE_IN;
     LLMath_CopyVec(pVec, pView->script.vFadeColor);
     pView->script.fFadeTime = 0.0f;
     pView->script.fFadeLength = fTime;
 }
 
-// Colour fade state 1 (CamScript_Fade): the colour pVec over the view, its alpha rising from 0 to
+// Colour fade CAMFADE_OUT (CamScript_Fade): the colour pVec over the view, its alpha rising from 0 to
 // pVec[3] over fTime.
 void CameraController_FadeOut(View* pView, f32 fTime, f32* pVec) {
-    pView->script.nFade = 1;
+    pView->script.nFade = CAMFADE_OUT;
     LLMath_CopyVec(pVec, pView->script.vFadeColor);
     pView->script.fFadeTime = 0.0f;
     pView->script.fFadeLength = fTime;
 }
 
-// Whether the view's colour fade has finished (states 4 and 5) or is held (3).
+// Whether the view's colour fade has finished (CAMFADE_OUT_DONE, CAMFADE_IN_DONE) or is held (CAMFADE_HOLD).
 u8 CameraController_IsFadeDone(View* pView) {
-    if (pView->script.nFade == 5 || pView->script.nFade == 4 || pView->script.nFade == 3) {
+    if (pView->script.nFade == CAMFADE_IN_DONE || pView->script.nFade == CAMFADE_OUT_DONE
+        || pView->script.nFade == CAMFADE_HOLD) {
         return 1;
     }
     return 0;
 }
 
-// Whether a fade-out (state 1) has finished and holds its colour (state 4).
+// Whether a fade out (CAMFADE_OUT) has just finished (CAMFADE_OUT_DONE).
 u8 CameraController_IsFadeOutDone(View* pView) {
-    return pView->script.nFade == 4;
+    return pView->script.nFade == CAMFADE_OUT_DONE;
 }
 
-// Whether a colour fade covers the view: fading in (2), fading out (1) or finished fading out (4).
+// Whether a colour fade covers the view: fading in, fading out or just faded out (CAMFADE_IN,
+// CAMFADE_OUT, CAMFADE_OUT_DONE).
 u8 CameraController_IsFadeOn(View* pView) {
-    if (pView->script.nFade == 2 || pView->script.nFade == 1 || pView->script.nFade == 4) {
+    if (pView->script.nFade == CAMFADE_IN || pView->script.nFade == CAMFADE_OUT || pView->script.nFade
+        == CAMFADE_OUT_DONE) {
         return 1;
     }
     return 0;
 }
 
-// Covers the view with the colour pVec, held (fade state 3) until another fade starts.
+// Covers the view with the colour pVec, held (CAMFADE_HOLD) until another fade starts.
 void CameraController_HoldFadeColor(View* pView, f32* pVec) {
-    pView->script.nFade = 3;
+    pView->script.nFade = CAMFADE_HOLD;
     LLMath_CopyVec(pVec, pView->script.vFadeColor);
 }
 
@@ -658,15 +661,15 @@ void CameraController_LagSideVector(f32* pA, f32* pB, f32* pOut) {
     Quat_RotateVector(qTurn, vA, pOut);
 }
 
-// The view's side vector vSide: square to its flat look direction (v0 to v10) and turned about that
-// direction by the script's roll fRoll (0 without a shot).
+// The view's side vector vSide: square to its flat look direction (vOrigin to vLookPoint) and
+// turned about that direction by the script's roll fRoll (0 without a shot).
 void CameraController_ComputeCurrentSideVector(View* pView) {
     f32 vDir[4];
     f32 vUp[4] = {0.0f, 1.0f, 0.0f, 0.0f};
     f32 vSide[4];
     f32 qTurn[4];
 
-    CameraController_Vec3Sub(pView->v10, pView->v0, vDir);
+    CameraController_Vec3Sub(pView->vLookPoint, pView->vOrigin, vDir);
     vDir[1] = 0.0f;
     if (vDir[0] == 0.0f && vDir[2] == 0.0f) {
         vDir[0] = 0.01f;
@@ -687,9 +690,9 @@ void CameraController_ComputeCurrentSideVector(View* pView) {
 // Shakes the camera: moves its position a random amount, up to half the shake strength (the
 // script's fShakeAmount, CameraController_SetShakeAmount) each way.
 void CameraController_ShakeCamera(View* pView) {
-    pView->v0[0] += pView->script.fShakeAmount * (Misc_RandFuncf(0) - 0.5f);
-    pView->v0[1] += pView->script.fShakeAmount * (Misc_RandFuncf(0) - 0.5f);
-    pView->v0[2] += pView->script.fShakeAmount * (Misc_RandFuncf(0) - 0.5f);
+    pView->vOrigin[0] += pView->script.fShakeAmount * (Misc_RandFuncf(0) - 0.5f);
+    pView->vOrigin[1] += pView->script.fShakeAmount * (Misc_RandFuncf(0) - 0.5f);
+    pView->vOrigin[2] += pView->script.fShakeAmount * (Misc_RandFuncf(0) - 0.5f);
 }
 
 // Starts a camera shake lasting fTime (the script's fShakeTime, counted down by

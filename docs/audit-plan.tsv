@@ -1,7 +1,7 @@
 order	area	file	task	scope	state
 1	Cameras	GoCamTuningVars.c	pass	the whole file	done
 2	Cameras	CamUtils.c	pass	the whole file	done
-3	Cameras	ViewController.c	pass	the whole file	open
+3	Cameras	GoViewCont.c	pass	the whole file	done
 4	Cameras	GoStaticCam.c	pass	the whole file	done
 5	Cameras	GoDynamicCam.c	chunk 1/3	DynamicCam_RegisterStreamClients .. DynamicCam_TrackPercent	open
 6	Cameras	GoDynamicCam.c	chunk 2/3	DynamicCam_TrackOffset .. DynamicCam_MatchSeqClub	open

@@ -526,9 +526,9 @@ void fn_80099BA0(Camera* pCamera) {
     CamLens* pLens = Camera_GetLens(pCamera);
     PsEmitter* pEmitter;
 
-    lbl_801DB878[0] = pLens->m4[3][0];
-    lbl_801DB878[1] = pLens->m4[3][1];
-    lbl_801DB878[2] = pLens->m4[3][2];
+    lbl_801DB878[0] = pLens->mViewToWorld[3][0];
+    lbl_801DB878[1] = pLens->mViewToWorld[3][1];
+    lbl_801DB878[2] = pLens->mViewToWorld[3][2];
     lbl_801DB878[3] = 1.0f;
     // port: 16 is p40's index in words; with 64-bit pointers it would be offsetof / sizeof(void*)
     lbl_80281F88 = fn_80099C50(lbl_80281F88, 16, fn_80099E34);

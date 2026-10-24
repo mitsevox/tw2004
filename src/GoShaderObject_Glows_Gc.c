@@ -331,9 +331,8 @@ void ColGlow_RenderAllGlowInCurrentList(void) {
     CamLens* pLens = Camera_GetLens(pCamera);
     f32 (*pMtx)[4];
     if (lbl_80281F80 != NULL && lbl_80281F80->nCount > 0) {
-        pMtx = pLens->m44;
-        // port: the lens's 0x04..0x44 block is used as a matrix here (CamLens has v4 there)
-        RC_vSetRenderCtxTransformationMatrix(pCamera, pLens->m4);
+        pMtx = pLens->mWorldToView;
+        RC_vSetRenderCtxTransformationMatrix(pCamera, pLens->mViewToWorld);
         RenderState_SetViewport(RC_spGetCurrentRenderCtx());
         RenderState_SetCameraMatrices();
         RenderState_SetBlendFactors(4, 1);

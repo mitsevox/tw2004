@@ -39,7 +39,6 @@ void fn_80008380(void);
 void LLMath_Add(f32* pA, f32* pB, f32* pOut);
 void UI_DrawFullScreenPicture(LLPict* pPict, f32 fAlpha);    // draws the picture at that alpha
 void UI_ShowPictureFadingIn(LLPict* pPict, int nFrames, f32 fStep);
-s32  RC_GetCurrentFrameBuffer(void);                 // ViewController.c
 void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
 void LLMath_MultiplyVec(f32* pA, f32* pB, f32* pOut);     // pOut = pA * pB, element by element
 void UIPoly_Draw(FEQuad* pQuad);
@@ -60,8 +59,7 @@ void UI_ShowLoadingScreen(void);
 void UI_OnFrontEndStart(void);
 void UI_RestoreAfterMovie(void);
 f32 UI_GetDrawDepth(void);
-void RC_vSetRenderCtxFrameBuffer();
-void UI_SetCurrentRenderCtxFrameBuffer(s32 p0);
+static void UI_SetCurrentRenderCtxFrameBuffer(FB_SFrameBuffer* spFrameBuffer_p);
 
 u8 gbUIFirstMenuDraw = 1;               // cleared on the first menu draw (UI_ClearFirstMenuDraw)
 // 0.2 for a locked golfer, else 0 (FE_MessageTable.c GM_vIsGolferUnlocked and
@@ -679,17 +677,16 @@ void UI_DrawFullScreenPicture(LLPict* pPict, f32 fAlpha) {
     f32 afXY[8];
     f32 afUV[8];
     FB_SFrameBuffer frameBuf;
-    s32 nOld;
+    FB_SFrameBuffer* pOldFrameBuffer;
 
     RenderState_SetPicture(pPict);
     RenderState_SetBlendFactors(4, 5);
     RenderState_SetDrawFlags(0x50);
     DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
     DS_vSetZBufferMode(DS_COMPARE_ALWAYS);
-    nOld = RC_GetCurrentFrameBuffer();
+    pOldFrameBuffer = RC_spGetCurrentRenderCtxFrameBuffer();
     FB_vSetFrameBuffer(&frameBuf, 0.0f, 0.0f, 512.0f, 448.0f, 1.0f, 1.0f);
-    // port: the render slot is typed s32 but holds a pointer
-    UI_SetCurrentRenderCtxFrameBuffer((s32)&frameBuf);
+    UI_SetCurrentRenderCtxFrameBuffer(&frameBuf);
     RenderState_SetViewport(RC_spGetCurrentRenderCtx());
     RenderState_Flush();
     afColour[0] = 0.5f;
@@ -700,7 +697,7 @@ void UI_DrawFullScreenPicture(LLPict* pPict, f32 fAlpha) {
     RenderView_MakePictUV(afUV, pPict);
     RenderView_SetColor(afColour);
     RenderView_DrawPrimitive(0xA1, afXY, 0, afUV, 2);
-    UI_SetCurrentRenderCtxFrameBuffer(nOld);
+    UI_SetCurrentRenderCtxFrameBuffer(pOldFrameBuffer);
 }
 
 // Before a movie (FE_Manager.c FE_PreMovieSetup): free the pixel data (fn_8000FFAC) of each 'txf2'
@@ -763,12 +760,10 @@ void LLMath_Add(f32* pA, f32* pB, f32* pOut) {
 }
 #endif
 
-// Make p0 (an FB_SFrameBuffer) the current render context's frame buffer (GoRenderCtx_Gc.c
-// RC_vSetRenderCtxFrameBuffer). port: the frame buffer travels as an s32, and
-// RC_vSetRenderCtxFrameBuffer is declared here
-//       without parameters: EA passes the render-context slot as a third argument it ignores.
-void UI_SetCurrentRenderCtxFrameBuffer(s32 p0) {
-    RC_vSetRenderCtxFrameBuffer(*(s32*)((u8*)gppCurrentRenderCtx), p0, gppCurrentRenderCtx);
+// Makes spFrameBuffer_p the current render context's frame buffer (GoRenderCtx_Gc.c
+// RC_vSetRenderCtxFrameBuffer).
+static void UI_SetCurrentRenderCtxFrameBuffer(FB_SFrameBuffer* spFrameBuffer_p) {
+    RC_vSetRenderCtxFrameBuffer(*gppCurrentRenderCtx, spFrameBuffer_p);
 }
 
 TexEntry* UI_GetTexBankFirstTexture(TexBank* pBank) {

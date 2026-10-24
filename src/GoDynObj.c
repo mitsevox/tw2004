@@ -669,7 +669,8 @@ void DynObj_DrawGolfBalls(u8* pState) {
                 Quat_QuatToMatrix(gPlayers[i].vOrient, pLogoB->m0);
             }
         }
-        fDist = LLMath_SquareDistanceBetween3(Camera_GetCurrentLens()->m4[3], gPlayers[i].ball.vPos);
+        fDist = LLMath_SquareDistanceBetween3(Camera_GetCurrentLens()->mViewToWorld[3],
+                                              gPlayers[i].ball.vPos);
         if (fDist > 2500.0f) {
             Object_SetLod(pBall, 2);
             if (pLogoA != NULL) {
@@ -703,16 +704,19 @@ void DynObj_DrawGolfBalls(u8* pState) {
             LLMath_IdentifyMat(pLogoB->m40);
         }
         pBall->m40[0][0] = gGolfBallScale;
-        pBall->m40[1][1] = gGolfBallScale / ViewController_GetCameraControl(gPlayers[i].nView[0])->f54;
+        pBall->m40[1][1] = gGolfBallScale
+                / ViewController_GetCameraControl(gPlayers[i].nView[0])->vViewScale[1];
         pBall->m40[2][2] = gGolfBallScale;
         if (pLogoA != NULL) {
             pLogoA->m40[0][0] = gGolfBallScale;
-            pLogoA->m40[1][1] = gGolfBallScale / ViewController_GetCameraControl(gPlayers[i].nView[0])->f54;
+            pLogoA->m40[1][1] = gGolfBallScale
+                    / ViewController_GetCameraControl(gPlayers[i].nView[0])->vViewScale[1];
             pLogoA->m40[2][2] = gGolfBallScale;
         }
         if (pLogoB != NULL) {
             pLogoB->m40[0][0] = gGolfBallScale;
-            pLogoB->m40[1][1] = gGolfBallScale / ViewController_GetCameraControl(gPlayers[i].nView[0])->f54;
+            pLogoB->m40[1][1] = gGolfBallScale
+                    / ViewController_GetCameraControl(gPlayers[i].nView[0])->vViewScale[1];
             pLogoB->m40[2][2] = gGolfBallScale;
         }
         LLMath_CopyVec(gPlayers[i].ball.vPos, pBall->m80[3]);
@@ -802,7 +806,7 @@ f32 DynObj_GetBallPixels(int nPlayer) {
     fRadius = gpDynObjState->pTeo10000->pModel->apLod[0]->pInfo->f64 * gGolfBallScale;
     LLMath_CopyVec(gPlayers[nPlayer].ball.vPos, &vPos.x);
     vPos.w = 1.0f;
-    LLMath_mat44fltMultiply(pLens->m44, &vPos, &vAbove);
+    LLMath_mat44fltMultiply(pLens->mWorldToView, &vPos, &vAbove);
     LLMath_CopyVec(&vAbove.x, &vBelow.x);
     vAbove.y += fRadius;
     vBelow.y -= fRadius;

@@ -28,8 +28,8 @@ void FG_vBlendFogForCamera(void) {
     f32* pTo;
     f32 fT;
 
-    fZ = pLens->m4[2][2];
-    fX = pLens->m4[2][0];
+    fZ = pLens->mViewToWorld[2][2];
+    fX = pLens->mViewToWorld[2][0];
     fLen2 = fX * fX + fZ * fZ;
     fScale = (fLen2 == 0.0f) ? 0.0f : 1.0f / Math_Sqrtf(fLen2);
     fX *= fScale;

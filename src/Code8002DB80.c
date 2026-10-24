@@ -53,7 +53,6 @@ void Golfer_TableSetup(void);
                                     // or 25 (the putter)
 
 
-void  ViewController_Init(int nView, f32 x, f32 y, f32 w, f32 h);       // open it (screen fractions)
 
 void Caddie_Start(int nPlayer) {
     if ((!gPlayers[nPlayer].bPerfect && gPlayers[nPlayer].nShotKind != SHOT_TYPE_PUTT_e) ||

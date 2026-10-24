@@ -2664,7 +2664,7 @@ void IG_vSwapDiscReloadHole(MsgArg* pArgs, MsgArg* pResult) {
         fn_801102AC();
         Character_ReopenTextureFiles();
         HoleLoader_QueueNextHole();
-        pView->script.nFade = 0;
+        pView->script.nFade = CAMFADE_NONE;
     }
 }
 

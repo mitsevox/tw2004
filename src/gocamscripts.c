@@ -28,7 +28,6 @@ void CameraScript_KeepPointInView(int nPlayer, f32* pCam, f32* pOut, f32* pTarge
                                   CameraScriptSettings_t* pScript, f32 fLag);
 void CameraScript_OffsetLookVector(f32* pPos, f32* pTarget, f32 fUp, f32 fSide);
 void Character_GetBonePos(Character* pChar, int nBone, f32* pPos);   // char.c: a bone's position
-void fn_80038054(u8 a, int n, f32 f1, f32 f2);
 void fn_800457B8(int nPlayer, f32 f);
 f32  GameEffects_DepthOfFieldChange(f32 f);
 u8   CamScript_IsSecondViewShot(CamShot* pShot);
@@ -73,7 +72,6 @@ u8   CamScript_IngoreCameraCollisionSurface(int n);
 u8   CamScript_PlayableSurface(SurfaceType* pSurface);
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);                   // identity
 void LLMath_Transpose33(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: transposes the 3x3 part
-void fn_80038010(u8 a, int n, f32* pVec);
 void fn_800386F0(int n, f32* pVec);
 f32  CamScript_GetFlybyCamRate(CamShot* pShot, f32 fA, f32 fB, f32 fTime);
 u8   Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bHazards, f32 fStep,
@@ -124,13 +122,13 @@ void CamScript_RunScript(int nPlayer, f32* pCam, f32* pSub, CameraScriptSettings
     Ter_GetTGD();  // the result is not used
     if (!b && !CameraScript_SnapToScript(pScript, pScript->pShot)
         && (gSession.nPaused != 0 || (0.0f == gSession.fFrameTime && 0.0f == fTime))) {
-        if (pScript->nFade != 0) {
+        if (pScript->nFade != CAMFADE_NONE) {
             CamScript_Fade(pScript, fTime);
         }
         return;
     }
     if (CameraScript_DontUpdateCameraDuringSlowMo(pScript, nPlayer)) {
-        if (pScript->nFade != 0) {
+        if (pScript->nFade != CAMFADE_NONE) {
             CamScript_Fade(pScript, fTime);
         }
         return;
@@ -194,9 +192,9 @@ void CamScript_RunScript(int nPlayer, f32* pCam, f32* pSub, CameraScriptSettings
         f90 = pScript->pShot->f90;
         if (f8C > 0.0f || f90 > 0.0f) {
             if (CamScript_IsSecondViewShot(pScript->pShot)) {
-                fn_80038054(1, gPlayers[nPlayer].nView[1], f90, f8C);
+                PostFx_SetBlur(1, gPlayers[nPlayer].nView[1], f90, f8C);
             } else {
-                fn_80038054(1, gPlayers[nPlayer].nView[0], f90, f8C);
+                PostFx_SetBlur(1, gPlayers[nPlayer].nView[0], f90, f8C);
             }
         }
         pScript->fRoll = pScript->pShot->fRoll;
@@ -254,7 +252,7 @@ void CamScript_RunScript(int nPlayer, f32* pCam, f32* pSub, CameraScriptSettings
         }
     }
     CamScript_SmoothTerrainHeight(pScript, pCam, 1, nPlayer, -1.0f);
-    if (pScript->nFade != 0) {
+    if (pScript->nFade != CAMFADE_NONE) {
         CamScript_Fade(pScript, fTime);
     }
     if (CameraScript_SnapToScript(pScript, pScript->pShot)) {
@@ -431,7 +429,7 @@ void CamScript_RunFlybyCamera(int nPlayer, f32* pCam, f32* pSub, CameraScriptSet
     LLMath_CopyVec(gpCamTuning->vFlyByFadeColor, vMoveTo);
     if (!b && !CameraScript_SnapToScript(pScript, pScript->pShot)
         && (gSession.nPaused != 0 || (0.0f == gSession.fFrameTime && 0.0f == fTime))) {
-        if (pScript->nFade != 0) {
+        if (pScript->nFade != CAMFADE_NONE) {
             CamScript_Fade(pScript, fTime);
         }
         return;
@@ -446,7 +444,7 @@ void CamScript_RunFlybyCamera(int nPlayer, f32* pCam, f32* pSub, CameraScriptSet
                                       CamScript_fEvaluateCurve(pPath, fShare));
         CA_vSetCameraFieldOfView(Camera_GetLens(ViewController_GetRenderContext(gPlayers[nPlayer].nView[0])),
                                  fFov);
-        if (pScript->nFade != 0) {
+        if (pScript->nFade != CAMFADE_NONE) {
             CamScript_Fade(pScript, fTime);
         }
         if (fShare >= 1.0f) {
@@ -454,7 +452,7 @@ void CamScript_RunFlybyCamera(int nPlayer, f32* pCam, f32* pSub, CameraScriptSet
                 pScript->pShot = pScript->pNextShot;
                 pScript->pNextShot = pScript->pNextShot->pNext;
                 pScript->fCamTime = 0.0f;
-                pScript->nFade = 2;
+                pScript->nFade = CAMFADE_IN;
                 LLMath_CopyVec(vMoveTo, pScript->vFadeColor);
                 pScript->fFadeTime = 0.0f;
                 pScript->fFadeLength = fMoveTime;
@@ -486,7 +484,7 @@ void CamScript_RunFlybyCamera(int nPlayer, f32* pCam, f32* pSub, CameraScriptSet
     } else {
         CamScript_SplineCameras(nPlayer, pCam, pSub, pScript, vPrev, fTime);
     }
-    if (pScript->nFade != 0) {
+    if (pScript->nFade != CAMFADE_NONE) {
         CamScript_Fade(pScript, fTime);
     }
     if (CameraScript_SnapToScript(pScript, pScript->pShot)) {
@@ -624,7 +622,7 @@ f32 CamScript_GetFlybyCamRate(CamShot* pShot, f32 fA, f32 fB, f32 fTime) {
 }
 
 // The script's colour fade over the view (nFade; CameraController_FadeIn and
-// CameraController_FadeOut start it), drawn as the view's colour (GoPostFx.c fn_80038010):
+// CameraController_FadeOut start it), drawn as the view's colour (GoPostFx.c PostFx_SetFade):
 // vFadeColor with its alpha rising from 0 to vFadeColor[3] over fFadeLength (1), falling from it to
 // 0 (2), held at it (3), or the view's current colour kept (4, fn_800386F0); 5 draws nothing. Once
 // fFadeTime passes fFadeLength, 1 turns into 4 and 2 into 5; 4 and 5 end (0) on the next frame that
@@ -634,12 +632,12 @@ void CamScript_Fade(CameraScriptSettings_t* pScript, f32 fTime) {
 
     Vec3Copy(pScript->vFadeColor, v);
     switch (pScript->nFade) {
-    case 1:
+    case CAMFADE_OUT:
         v[3] = pScript->vFadeColor[3] * (pScript->fFadeTime / pScript->fFadeLength);
         v[3] = v[3] < 0.0f ? 0.0f : (v[3] > pScript->vFadeColor[3] ? pScript->vFadeColor[3] : v[3]);
-        fn_80038010(1, ViewController_GetCurrentViewControllerID(), v);
+        PostFx_SetFade(1, ViewController_GetCurrentViewControllerID(), v);
         break;
-    case 2:
+    case CAMFADE_IN:
         {
             f32 f;
 
@@ -652,31 +650,31 @@ void CamScript_Fade(CameraScriptSettings_t* pScript, f32 fTime) {
             v[3] = f;
         }
         v[3] = v[3] < 0.0f ? 0.0f : (v[3] > pScript->vFadeColor[3] ? pScript->vFadeColor[3] : v[3]);
-        fn_80038010(1, ViewController_GetCurrentViewControllerID(), v);
+        PostFx_SetFade(1, ViewController_GetCurrentViewControllerID(), v);
         break;
-    case 3:
+    case CAMFADE_HOLD:
         v[3] = pScript->vFadeColor[3];
         v[3] = v[3] < 0.0f ? 0.0f : (v[3] > pScript->vFadeColor[3] ? pScript->vFadeColor[3] : v[3]);
-        fn_80038010(1, ViewController_GetCurrentViewControllerID(), v);
+        PostFx_SetFade(1, ViewController_GetCurrentViewControllerID(), v);
         break;
-    case 4:
+    case CAMFADE_OUT_DONE:
         fn_800386F0(ViewController_GetCurrentViewControllerID(), v);
         {
             f32 f = v[3];
             v[3] = f < 0.0f ? 0.0f : (f > pScript->vFadeColor[3] ? pScript->vFadeColor[3] : f);
         }
-        fn_80038010(1, ViewController_GetCurrentViewControllerID(), v);
+        PostFx_SetFade(1, ViewController_GetCurrentViewControllerID(), v);
         break;
-    case 5:
+    case CAMFADE_IN_DONE:
         break;
     }
     if (fTime > 0.0f) {
-        if (pScript->nFade == 4 || pScript->nFade == 5) {
-            pScript->nFade = 0;
-        } else if (pScript->nFade == 2 && pScript->fFadeTime > pScript->fFadeLength) {
-            pScript->nFade = 5;
-        } else if (pScript->nFade == 1 && pScript->fFadeTime > pScript->fFadeLength) {
-            pScript->nFade = 4;
+        if (pScript->nFade == CAMFADE_OUT_DONE || pScript->nFade == CAMFADE_IN_DONE) {
+            pScript->nFade = CAMFADE_NONE;
+        } else if (pScript->nFade == CAMFADE_IN && pScript->fFadeTime > pScript->fFadeLength) {
+            pScript->nFade = CAMFADE_IN_DONE;
+        } else if (pScript->nFade == CAMFADE_OUT && pScript->fFadeTime > pScript->fFadeLength) {
+            pScript->nFade = CAMFADE_OUT_DONE;
         }
     }
 }
@@ -684,7 +682,7 @@ void CamScript_Fade(CameraScriptSettings_t* pScript, f32 fTime) {
 // Interp type 0: the camera and the point it looks at move on straight lines from the current shot's
 // to the next one's, by CameraScript_GetSmoothTimeParam's share; the field of view (fFovStart), the
 // depth of field (fDepthOfField, DepthField.c fn_800457B8), the blur (fBlur and f90, GoPostFx.c
-// fn_80038054; TW07's CamScript_RunScript calls them dof and blur) and the roll (fRoll, into the
+// PostFx_SetBlur; TW07's CamScript_RunScript calls them dof and blur) and the roll (fRoll, into the
 // script's fRoll) blend the same.
 void CamScript_LerpCameras(int nPlayer, f32* pCam, f32* pSub, CameraScriptSettings_t* pScript, f32* pPrev,
                            f32 fTime) {
@@ -723,9 +721,9 @@ void CamScript_LerpCameras(int nPlayer, f32* pCam, f32* pSub, CameraScriptSettin
     f90 = fT * (pNext->f90 - pShot->f90) + pShot->f90;
     if (f > 0.0f || f90 > 0.0f) {
         if (CamScript_IsSecondViewShot(pShot)) {
-            fn_80038054(1, gPlayers[nPlayer].nView[1], f90, f);
+            PostFx_SetBlur(1, gPlayers[nPlayer].nView[1], f90, f);
         } else {
-            fn_80038054(1, gPlayers[nPlayer].nView[0], f90, f);
+            PostFx_SetBlur(1, gPlayers[nPlayer].nView[0], f90, f);
         }
     }
     pScript->fRoll = fT * (pNext->fRoll - pShot->fRoll) + pShot->fRoll;
@@ -791,9 +789,9 @@ void CamScript_LerpPercentOfFlightCameras(int nPlayer, f32* pCam, f32* pSub, Cam
     f90 = fT * (pNext->f90 - pShot->f90) + pShot->f90;
     if (f > 0.0f || f90 > 0.0f) {
         if (CamScript_IsSecondViewShot(pShot)) {
-            fn_80038054(1, gPlayers[nPlayer].nView[1], f90, f);
+            PostFx_SetBlur(1, gPlayers[nPlayer].nView[1], f90, f);
         } else {
-            fn_80038054(1, gPlayers[nPlayer].nView[0], f90, f);
+            PostFx_SetBlur(1, gPlayers[nPlayer].nView[0], f90, f);
         }
     }
     pScript->fRoll = fT * (pNext->fRoll - pShot->fRoll) + pShot->fRoll;
@@ -847,9 +845,9 @@ void CamScript_LerpPercentToPinCameras(int nPlayer, f32* pCam, f32* pSub, Camera
     f90 = fT * (pNext->f90 - pShot->f90) + pShot->f90;
     if (f > 0.0f || f90 > 0.0f) {
         if (CamScript_IsSecondViewShot(pShot)) {
-            fn_80038054(1, gPlayers[nPlayer].nView[1], f90, f);
+            PostFx_SetBlur(1, gPlayers[nPlayer].nView[1], f90, f);
         } else {
-            fn_80038054(1, gPlayers[nPlayer].nView[0], f90, f);
+            PostFx_SetBlur(1, gPlayers[nPlayer].nView[0], f90, f);
         }
     }
     pScript->fRoll = fT * (pNext->fRoll - pShot->fRoll) + pShot->fRoll;
@@ -931,9 +929,9 @@ void CamScript_LerpFixedTargetCameras(int nPlayer, f32* pCam, f32* pSub, CameraS
     f90 = fT * (pNext->f90 - pShot->f90) + pShot->f90;
     if (f > 0.0f || f90 > 0.0f) {
         if (CamScript_IsSecondViewShot(pShot)) {
-            fn_80038054(1, gPlayers[nPlayer].nView[1], f90, f);
+            PostFx_SetBlur(1, gPlayers[nPlayer].nView[1], f90, f);
         } else {
-            fn_80038054(1, gPlayers[nPlayer].nView[0], f90, f);
+            PostFx_SetBlur(1, gPlayers[nPlayer].nView[0], f90, f);
         }
     }
     pScript->fRoll = fT * (pNext->fRoll - pShot->fRoll) + pShot->fRoll;
@@ -993,9 +991,9 @@ void CamScript_LerpSwingToBallFlightCameras(int nPlayer, f32* pCam, f32* pSub,
     f90 = fT * (pNext->f90 - pShot->f90) + pShot->f90;
     if (f > 0.0f || f90 > 0.0f) {
         if (CamScript_IsSecondViewShot(pShot)) {
-            fn_80038054(1, gPlayers[nPlayer].nView[1], f90, f);
+            PostFx_SetBlur(1, gPlayers[nPlayer].nView[1], f90, f);
         } else {
-            fn_80038054(1, gPlayers[nPlayer].nView[0], f90, f);
+            PostFx_SetBlur(1, gPlayers[nPlayer].nView[0], f90, f);
         }
     }
     pScript->fRoll = fT * (pNext->fRoll - pShot->fRoll) + pShot->fRoll;
@@ -1068,9 +1066,9 @@ void CamScript_SplineCameras(int nPlayer, f32* pCam, f32* pSub, CameraScriptSett
     f90 = fT * (pNext->f90 - pShot->f90) + pShot->f90;
     if (f > 0.0f || f90 > 0.0f) {
         if (CamScript_IsSecondViewShot(pShot)) {
-            fn_80038054(1, gPlayers[nPlayer].nView[1], f90, f);
+            PostFx_SetBlur(1, gPlayers[nPlayer].nView[1], f90, f);
         } else {
-            fn_80038054(1, gPlayers[nPlayer].nView[0], f90, f);
+            PostFx_SetBlur(1, gPlayers[nPlayer].nView[0], f90, f);
         }
     }
     pScript->fRoll = fT * (pNext->fRoll - pShot->fRoll) + pShot->fRoll;
@@ -1118,9 +1116,9 @@ void CamScript_ArcCameras(int nPlayer, f32* pCam, f32* pSub, CameraScriptSetting
     f90 = fT * (pNext->f90 - pShot->f90) + pShot->f90;
     if (f > 0.0f || f90 > 0.0f) {
         if (CamScript_IsSecondViewShot(pShot)) {
-            fn_80038054(1, gPlayers[nPlayer].nView[1], f90, f);
+            PostFx_SetBlur(1, gPlayers[nPlayer].nView[1], f90, f);
         } else {
-            fn_80038054(1, gPlayers[nPlayer].nView[0], f90, f);
+            PostFx_SetBlur(1, gPlayers[nPlayer].nView[0], f90, f);
         }
     }
     pScript->fRoll = fT * (pNext->fRoll - pShot->fRoll) + pShot->fRoll;
@@ -1176,9 +1174,9 @@ void CamScript_CircleCameras(int nPlayer, f32* pCam, f32* pSub, CameraScriptSett
     f90 = fShare * (pNext->f90 - pShot->f90) + pShot->f90;
     if (f > 0.0f || f90 > 0.0f) {
         if (CamScript_IsSecondViewShot(pShot)) {
-            fn_80038054(1, gPlayers[nPlayer].nView[1], f90, f);
+            PostFx_SetBlur(1, gPlayers[nPlayer].nView[1], f90, f);
         } else {
-            fn_80038054(1, gPlayers[nPlayer].nView[0], f90, f);
+            PostFx_SetBlur(1, gPlayers[nPlayer].nView[0], f90, f);
         }
     }
     // EA bug: the roll blends by fT (0..2), not fShare like everything else: with shots of
@@ -1801,13 +1799,13 @@ void CameraScript_RecordCurrentCam(CamShot* pShot, f32* pCam, f32* pSub, int nPl
                 = CA_fGetCameraFieldOfView(
                         Camera_GetLens(
                                 ViewController_GetIndexedViewController(
-                                        gPlayers[nPlayer].nView[1])->pCamera));
+                                        gPlayers[nPlayer].nView[1])->pRenderContext));
     } else {
         pShot->fFovStart
                 = CA_fGetCameraFieldOfView(
                         Camera_GetLens(
                                 ViewController_GetIndexedViewController(
-                                        gPlayers[nPlayer].nView[0])->pCamera));
+                                        gPlayers[nPlayer].nView[0])->pRenderContext));
         pShot->fFovStart -= GameEffects_FieldOfViewChange();
     }
     pShot->fFovEnd = pShot->fFovStart;
