@@ -539,7 +539,7 @@ void SKN_InitModule(int n) {
 // Frees gSkinFrameBuf, when set, and clears it and its two counts.
 void SKN_CloseModule(void) {
     if (gSkinFrameBuf != NULL) {
-        StaticMem_Free(gSkinFrameBuf);
+        Circular_MemFreeFunc(gSkinFrameBuf);
     }
     gSkinFrameBuf = NULL;
     gSkinFrameBufSize = 0;
@@ -982,9 +982,10 @@ s32 SKN_AllocRenderData(Skin* pSkin, u8 b) {
     }
     pModel = pSkin->pModel;
     pDesc = pModel->pDesc;
-    pSkin->pSkinMtx = StaticMem_Alloc(pModel->n50 * sizeof(*pSkin->pSkinMtx), 2, 0x80, "Skin.c", 0x500);
-    pSkin->aMtxBits = StaticMem_Alloc((pModel->n50 + 31) / 32 * 4, 2, 0, "Skin.c", 0x50C);
-    pSkin->aMeshBits = StaticMem_Alloc((pModel->n40 + 31) / 32 * 4, 2, 0, "Skin.c", 0x50D);
+    pSkin->pSkinMtx = Circular_MemAllocFunc(pModel->n50 * sizeof(*pSkin->pSkinMtx), MEMTYPE_LOW, 0x80,
+                                            "Skin.c", 0x500);
+    pSkin->aMtxBits = Circular_MemAllocFunc((pModel->n50 + 31) / 32 * 4, MEMTYPE_LOW, 0, "Skin.c", 0x50C);
+    pSkin->aMeshBits = Circular_MemAllocFunc((pModel->n40 + 31) / 32 * 4, MEMTYPE_LOW, 0, "Skin.c", 0x50D);
     BitArray_ClearArray(pSkin->aMtxBits, pModel->n50);
     BitArray_ClearArray(pSkin->aMeshBits, pModel->n40);
     if (pDesc != NULL) {
@@ -1028,15 +1029,15 @@ s32 SKN_FreeRenderData(Skin* pSkin) {
     // port: EA passes an argument SkinPart_ShutdownSkin ignores
     ((void (*)(Skin*))SkinPart_ShutdownSkin)(pSkin);
     if (pSkin->pSkinMtx != NULL) {
-        StaticMem_Free(pSkin->pSkinMtx);
+        Circular_MemFreeFunc(pSkin->pSkinMtx);
     }
     pSkin->pSkinMtx = NULL;
     if (pSkin->aMtxBits != NULL) {
-        StaticMem_Free(pSkin->aMtxBits);
+        Circular_MemFreeFunc(pSkin->aMtxBits);
     }
     pSkin->aMtxBits = NULL;
     if (pSkin->aMeshBits != NULL) {
-        StaticMem_Free(pSkin->aMeshBits);
+        Circular_MemFreeFunc(pSkin->aMeshBits);
     }
     pSkin->aMeshBits = NULL;
     pSkin->uFlags = pSkin->uFlags & ~2;
@@ -1047,8 +1048,8 @@ s32 SKN_FreeRenderData(Skin* pSkin) {
 
 // Makes a skin from its file (pData: a SkinModel; version 4 carries a SkinDesc at pDesc's offset).
 // The file's headers are byte-swapped in place the first time (u30 flags 0x40000002 mark it). The
-// model and its description are copied into memory of their own (b: at the high end of the heap,
-// allocation mode 1 instead of 2) and made usable; the pose starts at the model's bone poses; the
+// model and its description are copied into memory of their own (b: MEMTYPE_HIGH instead of
+// MEMTYPE_LOW) and made usable; the pose starts at the model's bone poses; the
 // skin gets its part choices, morph state and render data (SKN_AllocRenderData). SkinPart's
 // change-all-copies is on meanwhile.
 Skin* SKN_Create(u8* pData, u8 b) {
@@ -1064,7 +1065,7 @@ Skin* SKN_Create(u8* pData, u8 b) {
 
     bOld = SkinPart_GetChangeAllCopies();
     SkinPart_SetChangeAllCopies(1);
-    pSkin = StaticMem_Alloc(sizeof(Skin), 2, 0x80, "Skin.c", 0x5C4);
+    pSkin = Circular_MemAllocFunc(sizeof(Skin), MEMTYPE_LOW, 0x80, "Skin.c", 0x5C4);
     memset(pSkin, 0, sizeof(Skin));
     pModel = (SkinModel*)pData;     // the file's model, then the copy
     if ((pModel->u30 & 0x40000002) != 0x40000002) {
@@ -1089,9 +1090,9 @@ Skin* SKN_Create(u8* pData, u8 b) {
         nDescSize = 0;
     }
     if (b) {
-        pSkin->pModel = StaticMem_Alloc(nSize, 1, 0x80, "Skin.c", 0x5EF);
+        pSkin->pModel = Circular_MemAllocFunc(nSize, MEMTYPE_HIGH, 0x80, "Skin.c", 0x5EF);
     } else {
-        pSkin->pModel = StaticMem_Alloc(nSize, 2, 0x80, "Skin.c", 0x5F3);
+        pSkin->pModel = Circular_MemAllocFunc(nSize, MEMTYPE_LOW, 0x80, "Skin.c", 0x5F3);
     }
     memcpy(pSkin->pModel, pModel, nSize);
     pModel = pSkin->pModel;
@@ -1099,9 +1100,9 @@ Skin* SKN_Create(u8* pData, u8 b) {
     pModel->n08 = nSize;
     if (nDescSize != 0) {
         if (b) {
-            pModel->pDesc = StaticMem_Alloc(nDescSize, 1, 0x80, "Skin.c", 0x604);
+            pModel->pDesc = Circular_MemAllocFunc(nDescSize, MEMTYPE_HIGH, 0x80, "Skin.c", 0x604);
         } else {
-            pModel->pDesc = StaticMem_Alloc(nDescSize, 2, 0x80, "Skin.c", 0x608);
+            pModel->pDesc = Circular_MemAllocFunc(nDescSize, MEMTYPE_LOW, 0x80, "Skin.c", 0x608);
         }
         memcpy(pModel->pDesc, pDesc, nDescSize);
         SkinPart_FixupDesc(pModel->pDesc);
@@ -1121,7 +1122,8 @@ Skin* SKN_Create(u8* pData, u8 b) {
         Quat_Copy(pBones[i].q0, pSkin->pose.aBones[i].q0);
         Quat_Copy(pBones[i].v10, pSkin->pose.aBones[i].v10);
     }
-    pSkin->pWorld2Bone = StaticMem_Alloc(pModel->n14 * sizeof(*pSkin->pWorld2Bone), 2, 0x80, "Skin.c", 0x62A);
+    pSkin->pWorld2Bone = Circular_MemAllocFunc(pModel->n14 * sizeof(*pSkin->pWorld2Bone), MEMTYPE_LOW, 0x80,
+                                               "Skin.c", 0x62A);
     if (pDesc != NULL) {
         fn_801127A0(pDesc);
     }

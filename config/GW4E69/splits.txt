@@ -67,7 +67,7 @@ MathQuat.c:
 	.rodata     start:0x8017DB70 end:0x8017DB80
 	.sdata2     start:0x80282A88 end:0x80282AC0
 
-StaticMemory.c:
+UCirc.c:
 	.text       start:0x8000977C end:0x8000A0E8
 	.data       start:0x80186810 end:0x80186828
 	.sbss       start:0x80281BB0 end:0x80281BD8
@@ -140,7 +140,7 @@ UFont.c:
 RenderAccessors.c:
 	.text       start:0x80012ED0 end:0x80012FA0
 
-Controller_Gc.c:
+LLInput_Gc.c:
 	.text       start:0x80012FA0 end:0x800136F4
 	.bss        start:0x801A36A0 end:0x801A3728
 

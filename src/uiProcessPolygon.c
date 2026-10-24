@@ -644,7 +644,7 @@ void UI_PlayStartUpMovies(void) {
     UI_ShowPictureFadingIn(pPict, 180, 1.0f / 30.0f);
     fn_80008380();
     Pict_Free(pPict);
-    StaticMem_Free(gpLegalPicture);
+    Circular_MemFreeFunc(gpLegalPicture);
     gpLegalPicture = NULL;
 }
 

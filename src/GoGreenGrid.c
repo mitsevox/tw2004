@@ -60,11 +60,11 @@ void GR_vInit(void) {
     desc[1] = 1;
     for (i = 0; i < nViews; i++) {
         SD_InitShaderObject(gpGreenGrid->aMesh[i], 0x13, desc);
-        gpGreenGrid->apVert[i] = StaticMem_Alloc(desc[0] * 12, 2, 16, "GoGreenGrid.c", 94);
-        gpGreenGrid->apUV[i] = StaticMem_Alloc(desc[0] * 8, 2, 16, "GoGreenGrid.c", 99);
-        gpGreenGrid->apColor[i] = StaticMem_Alloc(desc[0] * 4, 2, 16, "GoGreenGrid.c", 104);
-        gpGreenGrid->apIndex[i] = StaticMem_Alloc(desc[0] * 2, 2, 16, "GoGreenGrid.c", 109);
-        gpGreenGrid->apHeight[i] = StaticMem_Alloc(nRows * 16, 2, 16, "GoGreenGrid.c", 114);
+        gpGreenGrid->apVert[i] = Circular_MemAllocFunc(desc[0] * 12, MEMTYPE_LOW, 16, "GoGreenGrid.c", 94);
+        gpGreenGrid->apUV[i] = Circular_MemAllocFunc(desc[0] * 8, MEMTYPE_LOW, 16, "GoGreenGrid.c", 99);
+        gpGreenGrid->apColor[i] = Circular_MemAllocFunc(desc[0] * 4, MEMTYPE_LOW, 16, "GoGreenGrid.c", 104);
+        gpGreenGrid->apIndex[i] = Circular_MemAllocFunc(desc[0] * 2, MEMTYPE_LOW, 16, "GoGreenGrid.c", 109);
+        gpGreenGrid->apHeight[i] = Circular_MemAllocFunc(nRows * 16, MEMTYPE_LOW, 16, "GoGreenGrid.c", 114);
         gpGreenGrid->aTarget[i][0] = 0.0f;
         gpGreenGrid->aTarget[i][1] = 0.0f;
         gpGreenGrid->aTarget[i][2] = 0.0f;
@@ -95,11 +95,11 @@ void GR_vClose(void) {
     int i;
     for (i = 0; i < nViews; i++) {
         SD_FreeShaderObject(gpGreenGrid->aMesh[i]);
-        StaticMem_Free(gpGreenGrid->apVert[i]);
-        StaticMem_Free(gpGreenGrid->apUV[i]);
-        StaticMem_Free(gpGreenGrid->apColor[i]);
-        StaticMem_Free(gpGreenGrid->apIndex[i]);
-        StaticMem_Free(gpGreenGrid->apHeight[i]);
+        Circular_MemFreeFunc(gpGreenGrid->apVert[i]);
+        Circular_MemFreeFunc(gpGreenGrid->apUV[i]);
+        Circular_MemFreeFunc(gpGreenGrid->apColor[i]);
+        Circular_MemFreeFunc(gpGreenGrid->apIndex[i]);
+        Circular_MemFreeFunc(gpGreenGrid->apHeight[i]);
     }
 }
 

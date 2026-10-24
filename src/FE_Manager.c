@@ -1,4 +1,4 @@
-// FE_Manager.c (EA's name, from its StaticMem_Alloc file names): the front end's manager. TW07
+// FE_Manager.c (EA's name, from its Circular_MemAllocFunc file names): the front end's manager. TW07
 // spreads the same functions over FE_Manager.c, FE_Movies.c, FE_UserMgr.c and FE_CrAPUtils.c; here
 // they come in this order:
 //  - start-up (FE_vOpenONCE) and the golfers' bios from the stream (FE_CharBios_*);
@@ -125,7 +125,7 @@ void FE_vOpenONCE(void) {
 // any.
 void FE_CharBios_FreeStreamMemory(void) {
     if (gpFEBios != NULL) {
-        StaticMem_Free(gpFEBios);
+        Circular_MemFreeFunc(gpFEBios);
         gpFEBios = NULL;
     }
 }
@@ -155,9 +155,9 @@ void FE_CharBios_UnRegisterStreamClients(void) {
 // The 'BIO ' stream object's handler: copies its data (the golfers' bios, FEBio records) into a new
 // block, gpFEBios, and frees the object.
 void FE_CharBios_LoadBIOfromStream(UStreamObject* pObject) {
-    gpFEBios = StaticMem_Alloc(pObject->uSize, 2, 32, "FE_Manager.c", 285);
+    gpFEBios = Circular_MemAllocFunc(pObject->uSize, MEMTYPE_LOW, 32, "FE_Manager.c", 285);
     Mem_cpy(gpFEBios, pObject->pData, pObject->uSize);
-    StaticMem_Free(pObject);
+    Circular_MemFreeFunc(pObject);
 }
 
 // A movie's skip test (LLVideo_PlayFile's pfnStop, whose arguments it ignores): any button on any
@@ -165,7 +165,7 @@ void FE_CharBios_LoadBIOfromStream(UStreamObject* pObject) {
 u8 FE_IsMovieSkipPressed(Video* pVideo, int nArg) {
     int i;
     Input_vUpdate();
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < INPUT_NUM_PADS; i++) {
         if (Input_ReadControlPad(i)) {
             return 1;
         }
@@ -331,7 +331,7 @@ void FE_vCloseModule(void) {
 // (bRunning, its picture); keeps the hashes of the logo textures "__LogoSquare" and "__LogoRect".
 void FE_InitManager(void) {
     int i;
-    gpFEProfile = StaticMem_Alloc(sizeof(FEProfile), 2, 16, "FE_Manager.c", 1035);
+    gpFEProfile = Circular_MemAllocFunc(sizeof(FEProfile), MEMTYPE_LOW, 16, "FE_Manager.c", 1035);
     Mem_set(gpFEProfile, 0, sizeof(FEProfile));
     gpFEProfile->bCopy = 0;
     gpFEProfile->bEditingCopy = 0;
@@ -381,7 +381,7 @@ void FE_CloseManager(void) {
     }
     FE_CharBios_FreeStreamMemory();
     FE_Manager_FreeStreamMemory();
-    StaticMem_Free(gpFEProfile);
+    Circular_MemFreeFunc(gpFEProfile);
 }
 
 // Backs up every active save slot's profile (gpSaveData[0..3]) into the row of the same number of
@@ -434,11 +434,11 @@ void FE_BackupProfile(int nSlot) {
 
 // Swaps backup rows a and b (gFEState.p658) through a temporary block.
 void FE_SwapBackupRows(int a, int b) {
-    SaveProfile* pTemp = StaticMem_Alloc(sizeof(SaveProfile), 1, 32, "FE_Manager.c", 1194);
+    SaveProfile* pTemp = Circular_MemAllocFunc(sizeof(SaveProfile), MEMTYPE_HIGH, 32, "FE_Manager.c", 1194);
     Mem_cpy(pTemp, &gFEState.p658[b], sizeof(SaveProfile));
     Mem_cpy(&gFEState.p658[b], &gFEState.p658[a], sizeof(SaveProfile));
     Mem_cpy(&gFEState.p658[a], pTemp, sizeof(SaveProfile));
-    StaticMem_Free(pTemp);
+    Circular_MemFreeFunc(pTemp);
 }
 
 // Golfer nGolfer's record: its golfer-table entry, or for a created golfer (FIRST_CREATED_GOLFER
@@ -1396,7 +1396,7 @@ void FE_MoveBackupsToARAM(void) {
             gFEBackupAramAddr = GoARAM_Alloc(FE_BACKUP_SIZE);
         }
         GoARAM_WaitTransfer(GoARAM_CopyToAram(gFEState.p658, gFEBackupAramAddr, gFEBackupSize));
-        StaticMem_Free(gFEState.p658);
+        Circular_MemFreeFunc(gFEState.p658);
         gFEState.p658 = NULL;
     }
 }
@@ -1407,7 +1407,7 @@ void FE_MoveBackupsToARAM(void) {
 void FE_RestoreBackupsFromARAM(void) {
     if (gFEState.p658 == NULL) {
         gFEBackupSize = FE_BACKUP_SIZE;
-        gFEState.p658 = StaticMem_Alloc(gFEBackupSize, 2, 32, "FE_Manager.c", 2778);
+        gFEState.p658 = Circular_MemAllocFunc(gFEBackupSize, MEMTYPE_LOW, 32, "FE_Manager.c", 2778);
         memset(gFEState.p658, 0, gFEBackupSize);
         if (gFEBackupAramAddr != 0) {
             GoARAM_WaitTransfer(GoARAM_CopyFromAram(gFEState.p658, gFEBackupAramAddr, gFEBackupSize));

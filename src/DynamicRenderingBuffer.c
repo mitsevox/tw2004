@@ -24,16 +24,18 @@ void fn_80070B68(u16 nIndex);
 DynRenderBuffer* fn_8007018C(int nMaxVerts, int nMaxDraws) {
     DynRenderBuffer* pBuf;
 
-    pBuf = StaticMem_Alloc(sizeof(DynRenderBuffer), 2, 32, DRB_FILE, 163);
+    pBuf = Circular_MemAllocFunc(sizeof(DynRenderBuffer), MEMTYPE_LOW, 32, DRB_FILE, 163);
     // room for 1.6 indices per vertex
-    pBuf->pIndices = StaticMem_Alloc((int)(1.6f * (nMaxVerts * sizeof(u16))), 2, 32, DRB_FILE, 173);
-    pBuf->apPos[0] = StaticMem_Alloc(nMaxVerts * 12, 2, 32, DRB_FILE, 181);
-    pBuf->apPos[1] = StaticMem_Alloc(nMaxVerts * 12, 2, 32, DRB_FILE, 188);
-    pBuf->apColour[0] = StaticMem_Alloc(nMaxVerts * 4, 2, 32, DRB_FILE, 195);
-    pBuf->apColour[1] = StaticMem_Alloc(nMaxVerts * 4, 2, 32, DRB_FILE, 202);
-    pBuf->apTexCoord[0] = StaticMem_Alloc(nMaxVerts * 8, 2, 32, DRB_FILE, 209);
-    pBuf->apTexCoord[1] = StaticMem_Alloc(nMaxVerts * 8, 2, 32, DRB_FILE, 216);
-    pBuf->pDraws = StaticMem_Alloc(nMaxDraws * sizeof(DynRenderDraw) + 4, 2, 32, DRB_FILE, 223);
+    pBuf->pIndices = Circular_MemAllocFunc((int)(1.6f * (nMaxVerts * sizeof(u16))), MEMTYPE_LOW, 32,
+                                           DRB_FILE, 173);
+    pBuf->apPos[0] = Circular_MemAllocFunc(nMaxVerts * 12, MEMTYPE_LOW, 32, DRB_FILE, 181);
+    pBuf->apPos[1] = Circular_MemAllocFunc(nMaxVerts * 12, MEMTYPE_LOW, 32, DRB_FILE, 188);
+    pBuf->apColour[0] = Circular_MemAllocFunc(nMaxVerts * 4, MEMTYPE_LOW, 32, DRB_FILE, 195);
+    pBuf->apColour[1] = Circular_MemAllocFunc(nMaxVerts * 4, MEMTYPE_LOW, 32, DRB_FILE, 202);
+    pBuf->apTexCoord[0] = Circular_MemAllocFunc(nMaxVerts * 8, MEMTYPE_LOW, 32, DRB_FILE, 209);
+    pBuf->apTexCoord[1] = Circular_MemAllocFunc(nMaxVerts * 8, MEMTYPE_LOW, 32, DRB_FILE, 216);
+    pBuf->pDraws = Circular_MemAllocFunc(nMaxDraws * sizeof(DynRenderDraw) + 4, MEMTYPE_LOW, 32, DRB_FILE,
+                                         223);
     pBuf->nMaxVerts = nMaxVerts;
     pBuf->nMaxDraws = nMaxDraws;
     pBuf->nBuffer = 0;
@@ -43,15 +45,15 @@ DynRenderBuffer* fn_8007018C(int nMaxVerts, int nMaxDraws) {
 }
 
 void fn_80070348(DynRenderBuffer* pBuf) {
-    StaticMem_Free(pBuf->pDraws);
-    StaticMem_Free(pBuf->apTexCoord[1]);
-    StaticMem_Free(pBuf->apTexCoord[0]);
-    StaticMem_Free(pBuf->apColour[1]);
-    StaticMem_Free(pBuf->apColour[0]);
-    StaticMem_Free(pBuf->apPos[1]);
-    StaticMem_Free(pBuf->apPos[0]);
-    StaticMem_Free(pBuf->pIndices);
-    StaticMem_Free(pBuf);
+    Circular_MemFreeFunc(pBuf->pDraws);
+    Circular_MemFreeFunc(pBuf->apTexCoord[1]);
+    Circular_MemFreeFunc(pBuf->apTexCoord[0]);
+    Circular_MemFreeFunc(pBuf->apColour[1]);
+    Circular_MemFreeFunc(pBuf->apColour[0]);
+    Circular_MemFreeFunc(pBuf->apPos[1]);
+    Circular_MemFreeFunc(pBuf->apPos[0]);
+    Circular_MemFreeFunc(pBuf->pIndices);
+    Circular_MemFreeFunc(pBuf);
 }
 
 // Draw nCount of the buffer's indices from nStart as one primitive, from the vertex arrays last

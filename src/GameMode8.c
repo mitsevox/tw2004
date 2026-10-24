@@ -14,6 +14,7 @@
 #include "golfer.h"
 #include "game.h"
 #include "engine.h"
+#include "pad.h"
 #include "game/save.h"
 #include "frontend/fe.h"
 #include "unsorted/cull.h"
@@ -910,38 +911,39 @@ f32 SpeedGolf_GroundDistance(f32* pA, f32* pB) {
     return Math_Sqrt(v[0] * v[0] + v[2] * v[2]);
 }
 
-// A human's sticks for the run: the pad's stick bytes 3, 2, 0 and 1 (Input_sGetStickInfo), beyond a
-// 96..160 dead zone and scaled to about -1..1, go into fMomentumZ, fMomentumX, fMomentumTurn and
-// fA8C (the last two negated); 0 inside the dead zone. PlaceBall_UpdateMomentums moves the runner
-// (the placement point) by fMomentumX and fMomentumZ and turns its heading by fMomentumTurn.
+// A human's sticks for the run: the main stick's y and x and the C stick's x and y
+// (Input_sGetStickInfo), beyond a 96..160 dead zone and scaled to about -1..1, go into fMomentumZ,
+// fMomentumX, fMomentumTurn and fA8C (the last two negated); 0 inside the dead zone.
+// PlaceBall_UpdateMomentums moves the runner (the placement point) by fMomentumX and fMomentumZ and
+// turns its heading by fMomentumTurn.
 void SpeedGolf_ReadSticks(int nPlayer) {
-    u8* pPad = Input_sGetStickInfo(gPlayers[nPlayer].nController);
-    if (pPad) {
-        if (pPad[3] < 96.0f) {
-            gPlayers[nPlayer].fMomentumZ = (96.0f - pPad[3]) / 96.0f;
-        } else if (pPad[3] > 160.0f) {
-            gPlayers[nPlayer].fMomentumZ = (160.0f - pPad[3]) / 96.0f;
+    Controller_StickInfo* pStickInfo = Input_sGetStickInfo(gPlayers[nPlayer].nController);
+    if (pStickInfo) {
+        if (pStickInfo->nStickY < 96.0f) {
+            gPlayers[nPlayer].fMomentumZ = (96.0f - pStickInfo->nStickY) / 96.0f;
+        } else if (pStickInfo->nStickY > 160.0f) {
+            gPlayers[nPlayer].fMomentumZ = (160.0f - pStickInfo->nStickY) / 96.0f;
         } else {
             gPlayers[nPlayer].fMomentumZ = 0.0f;
         }
-        if (pPad[2] < 96.0f) {
-            gPlayers[nPlayer].fMomentumX = (96.0f - pPad[2]) / 96.0f;
-        } else if (pPad[2] > 160.0f) {
-            gPlayers[nPlayer].fMomentumX = (160.0f - pPad[2]) / 96.0f;
+        if (pStickInfo->nStickX < 96.0f) {
+            gPlayers[nPlayer].fMomentumX = (96.0f - pStickInfo->nStickX) / 96.0f;
+        } else if (pStickInfo->nStickX > 160.0f) {
+            gPlayers[nPlayer].fMomentumX = (160.0f - pStickInfo->nStickX) / 96.0f;
         } else {
             gPlayers[nPlayer].fMomentumX = 0.0f;
         }
-        if (pPad[0] < 96.0f) {
-            gPlayers[nPlayer].fMomentumTurn = -((96.0f - pPad[0]) / 96.0f);
-        } else if (pPad[0] > 160.0f) {
-            gPlayers[nPlayer].fMomentumTurn = -((160.0f - pPad[0]) / 96.0f);
+        if (pStickInfo->nSubStickX < 96.0f) {
+            gPlayers[nPlayer].fMomentumTurn = -((96.0f - pStickInfo->nSubStickX) / 96.0f);
+        } else if (pStickInfo->nSubStickX > 160.0f) {
+            gPlayers[nPlayer].fMomentumTurn = -((160.0f - pStickInfo->nSubStickX) / 96.0f);
         } else {
             gPlayers[nPlayer].fMomentumTurn = 0.0f;
         }
-        if (pPad[1] < 96.0f) {
-            gPlayers[nPlayer].fA8C = -(96.0f - pPad[1]) / 96.0f;
-        } else if (pPad[1] > 160.0f) {
-            gPlayers[nPlayer].fA8C = -(160.0f - pPad[1]) / 96.0f;
+        if (pStickInfo->nSubStickY < 96.0f) {
+            gPlayers[nPlayer].fA8C = -(96.0f - pStickInfo->nSubStickY) / 96.0f;
+        } else if (pStickInfo->nSubStickY > 160.0f) {
+            gPlayers[nPlayer].fA8C = -(160.0f - pStickInfo->nSubStickY) / 96.0f;
         } else {
             gPlayers[nPlayer].fA8C = 0.0f;
         }
@@ -1422,20 +1424,20 @@ void SpeedGolf_RunExit(int nPlayer) {
     CameraController_SetCameraMode(ViewController_GetCameraControl(nView), 25, nPlayer, nView);
 }
 
-// 1 when the player's pad has buttons 0x1000, 0x400 and 0x800 (Start, X and Y on a GameCube pad)
-// all down, each pressed this frame or held; 0 for the CPU and for any other controller.
+// 1 when the player's pad has Start, X and Y all down, each pressed this frame or held; 0 for the
+// CPU and for any other controller.
 u8 SpeedGolf_IsStartXYHeld(int nPlayer) {
     int bDown;
     int nCtrl = gPlayers[nPlayer].nController;  // fake match: only the first read goes through nCtrl
     if (nCtrl >= 8) {
         return 0;
     }
-    bDown = (Input_ReadControlPad(nCtrl) & 0x1000 || Input_ReadControlPad(gPlayers[nPlayer].nController)
-             & 0x10000000) &&
-            (Input_ReadControlPad(gPlayers[nPlayer].nController) & 0x400 ||
-             Input_ReadControlPad(gPlayers[nPlayer].nController) & 0x4000000) &&
-            (Input_ReadControlPad(gPlayers[nPlayer].nController) & 0x800 ||
-             Input_ReadControlPad(gPlayers[nPlayer].nController) & 0x8000000);
+    bDown = (Input_ReadControlPad(nCtrl) & PAD_BUTTON_START
+             || Input_ReadControlPad(gPlayers[nPlayer].nController) & PAD_BUTTON_START << 16) &&
+            (Input_ReadControlPad(gPlayers[nPlayer].nController) & PAD_BUTTON_X ||
+             Input_ReadControlPad(gPlayers[nPlayer].nController) & PAD_BUTTON_X << 16) &&
+            (Input_ReadControlPad(gPlayers[nPlayer].nController) & PAD_BUTTON_Y ||
+             Input_ReadControlPad(gPlayers[nPlayer].nController) & PAD_BUTTON_Y << 16);
     return bDown;
 }
 

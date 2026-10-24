@@ -163,7 +163,8 @@ void PGASchedule_Build(MsgArg* pArgs, MsgArg* pResult) {
     s32 i;
 
     if (gPgaScheduleEvents == NULL) {
-        gPgaScheduleEvents = StaticMem_Alloc(nEvents * 4, 1, 16, "FE_PGATourMessages.c", 263);
+        gPgaScheduleEvents = Circular_MemAllocFunc(nEvents * 4, MEMTYPE_HIGH, 16,
+                                                   "FE_PGATourMessages.c", 263);
     }
     for (i = 0; i < nEvents; i++) {
         if (GameModeDriverPGATour_GetStartDate(i)) {

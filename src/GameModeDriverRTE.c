@@ -93,9 +93,9 @@ void GameModeDriverRTE_Locale_LoadRTEnFromStream(UStreamObject* pObject) {
     void* pData;
     u32 nSize = fn_8000E81C(pObject, &pData);
     if (nSize) {
-        gRTEs.pNames = fn_800951A0(nSize, 0x10, 1);
+        gRTEs.pNames = Mem_AllocFunc(nSize, 0x10, 1);
         Mem_cpy(gRTEs.pNames, pData, nSize);
-        StaticMem_Free(pObject);
+        Circular_MemFreeFunc(pObject);
     }
 }
 

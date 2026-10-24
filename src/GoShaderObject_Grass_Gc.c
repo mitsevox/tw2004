@@ -56,7 +56,7 @@ static f32 GoShaderObject_Grass_Gc_StrippedFn(f32 x) {
 
 // The grass type starts: a pool of 32 render records of 32 bytes.
 void SD_vShaderObject_Grass_Type_Init(void) {
-    SD_gpGrassTypeData->pPool = CreateMemPool(32, 32, 2, 16);
+    SD_gpGrassTypeData->pPool = CreateMemPool(32, 32, MEMTYPE_LOW, 16);
 }
 
 void SD_vShaderObject_Grass_Type_Close(void) {

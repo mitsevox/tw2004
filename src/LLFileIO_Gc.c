@@ -345,7 +345,7 @@ void* fn_800065C8(const char* szPath, u32* puSize, int nAlign) {
     }
     nLen = info.uLength;
     uSize = nLen;
-    pData = StaticMem_Alloc(nLen, 1, nAlign, "LLFileIO_Gc.c", 750);
+    pData = Circular_MemAllocFunc(nLen, MEMTYPE_HIGH, nAlign, "LLFileIO_Gc.c", 750);
     if (pData == NULL) {
         return NULL;
     }

@@ -80,7 +80,7 @@ void fn_800B4C00(RainList* pList, int nDrops) {
     int i;
 
     uSize = ((nDrops * 32 + 31) & ~31) + 0x400;
-    pBuf = StaticMem_Alloc(uSize, 1, 0x20, "GoShaderObject_Rain_Gc.c", 218);
+    pBuf = Circular_MemAllocFunc(uSize, MEMTYPE_HIGH, 0x20, "GoShaderObject_Rain_Gc.c", 218);
     DCInvalidateRange(pBuf, uSize);
     GXBeginDisplayList(pBuf, uSize);
     GXResetWriteGatherPipe();
@@ -100,10 +100,10 @@ void fn_800B4C00(RainList* pList, int nDrops) {
     }
     fn_800124A8();
     uSize = GXEndDisplayList();
-    pList->pList = StaticMem_Alloc(uSize, 2, 0x20, "GoShaderObject_Rain_Gc.c", 251);
+    pList->pList = Circular_MemAllocFunc(uSize, MEMTYPE_LOW, 0x20, "GoShaderObject_Rain_Gc.c", 251);
     Mem_cpy(pList->pList, pBuf, uSize);
     DCFlushRange(pBuf, uSize);
-    StaticMem_Free(pBuf);
+    Circular_MemFreeFunc(pBuf);
     pList->uSize = uSize;
 }
 
@@ -116,11 +116,13 @@ void SD_vShaderObject_Rain_Dynamic_Init(RainObject* pRain, f32* pStrength) {
 
     fn_800B4C00(&pData->list, 900);
     for (i = 0; i < 4; i++) {
-        pData->apA[i] = StaticMem_Alloc(RAIN_BUF_A_SIZE, 2, 0x20, "GoShaderObject_Rain_Gc.c", 280);
+        pData->apA[i] = Circular_MemAllocFunc(RAIN_BUF_A_SIZE, MEMTYPE_LOW, 0x20,
+                                              "GoShaderObject_Rain_Gc.c", 280);
         memset(pData->apA[i], 0, RAIN_BUF_A_SIZE);
     }
     for (i = 0; i < 2; i++) {
-        pData->apB[i] = StaticMem_Alloc(RAIN_BUF_B_SIZE, 2, 0x20, "GoShaderObject_Rain_Gc.c", 292);
+        pData->apB[i] = Circular_MemAllocFunc(RAIN_BUF_B_SIZE, MEMTYPE_LOW, 0x20,
+                                              "GoShaderObject_Rain_Gc.c", 292);
         memset(pData->apB[i], 0, RAIN_BUF_B_SIZE);
     }
     uSplash = fn_8000BEE4("splash");
@@ -132,12 +134,12 @@ void fn_800B4F24(RainObject* pRain) {
     RainData* pData = &pRain->data;
     int i;
 
-    StaticMem_Free(pData->list.pList);
+    Circular_MemFreeFunc(pData->list.pList);
     for (i = 0; i < 4; i++) {
-        StaticMem_Free(pData->apA[i]);
+        Circular_MemFreeFunc(pData->apA[i]);
     }
     for (i = 0; i < 2; i++) {
-        StaticMem_Free(pData->apB[i]);
+        Circular_MemFreeFunc(pData->apB[i]);
     }
 }
 

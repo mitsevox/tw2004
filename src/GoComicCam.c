@@ -29,12 +29,12 @@ ComicCam* gpComicCam;
 
 // Allocate the comic camera's state (gpComicCam) when a round's systems start (GO_vInitIG).
 void ComicCam_InitComicCam(void) {
-    gpComicCam = StaticMem_Alloc(sizeof(ComicCam), 2, 0, "GoComicCam.c", 91);
+    gpComicCam = Circular_MemAllocFunc(sizeof(ComicCam), MEMTYPE_LOW, 0, "GoComicCam.c", 91);
 }
 
 // Free the comic camera's state (gpComicCam) when the round's systems shut down (gomainloop.c).
 void ComicCam_CloseComicCam(void) {
-    StaticMem_Free(gpComicCam);
+    Circular_MemFreeFunc(gpComicCam);
 }
 
 // Start the comic camera for nPlayer's view (GolfCamera_Init3ScreenCamera) with layout nKind (0:

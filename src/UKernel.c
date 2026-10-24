@@ -1,4 +1,4 @@
-// UKernel.c (EA's name: its StaticMem_Alloc passes "UKernel.c"; TW07's legacy/specif/UKernel.c
+// UKernel.c (EA's name: its Circular_MemAllocFunc passes "UKernel.c"; TW07's legacy/specif/UKernel.c
 // holds Kernel_DownloadActors, Kernel_InitModule and Kernel_CloseModule in this order; TW06 has
 // legacy\specif\ukernel.c): the kernel of the course's dynamic objects (actors, dynobj.h). It turns
 // each 'Cact' actor chunk into a dynamic object or hands it to its own system, keeps the objects in
@@ -40,7 +40,7 @@ void* Kernel_AllocObjectMem(int nSize) {
     if (nSize < 528 && gKernelLargeObjectPool->nFree != 0) {
         return AllocPoolMem(gKernelLargeObjectPool);
     }
-    return StaticMem_Alloc(nSize, 1, 16, "UKernel.c", 201);
+    return Circular_MemAllocFunc(nSize, MEMTYPE_HIGH, 16, "UKernel.c", 201);
 }
 
 // Gives an object's memory back to the pool it came from, or to the heap.
@@ -50,7 +50,7 @@ void Kernel_FreeObjectMem(void* p) {
     } else if ((u8*)p > (u8*)gKernelLargeObjectPool && (u8*)p < gKernelLargeObjectPool->pEnd) {
         ReturnPoolMem(gKernelLargeObjectPool, p);
     } else {
-        StaticMem_Free(p);
+        Circular_MemFreeFunc(p);
     }
 }
 
@@ -82,17 +82,17 @@ void Kernel_DownloadActors(UStreamObject* pObject) {
         break;
     case 7:
         fn_8009943C((PsEmitterRecord*)pObject->pData, pObject->uSize);
-        StaticMem_Free(pObject);
+        Circular_MemFreeFunc(pObject);
         return;
     case 8:
-        StaticMem_Free(pObject);
+        Circular_MemFreeFunc(pObject);
         return;
     case 10:
         PlayNow_LoadBallSpot(pObject);
         return;
     case 9:
         Gaud_ActorDownloadCallback(pObject, 1);
-        StaticMem_Free(pObject);
+        Circular_MemFreeFunc(pObject);
         return;
     }
     pChunk = Resources_GetChunkInBuffer(pObject->pData, pObject->uSize, 'aRSL', pObject->uId);
@@ -113,15 +113,15 @@ void Kernel_DownloadActors(UStreamObject* pObject) {
     pObject->pData = (u8*)setup.pModel;
     pObject->pfnFree = NULL;
     pObject->uUnk4 = Kernel_CreateObjectId(&setup);
-    StaticMem_Free(pObject);
+    Circular_MemFreeFunc(pObject);
 }
 
 // Sets the kernel up when a round starts (GO_vInitIG): the 'Cact' handler (Kernel_DownloadActors),
 // the two node pools (256 nodes each of 400 and 528 bytes) and an empty object list.
 void Kernel_InitModule(void) {
     Stream_RegisterLoadChunkCallback('Cact', Kernel_DownloadActors);
-    gKernelSmallObjectPool = CreateMemPool(256, 400, 2, 16);
-    gKernelLargeObjectPool = CreateMemPool(256, 528, 2, 16);
+    gKernelSmallObjectPool = CreateMemPool(256, 400, MEMTYPE_LOW, 16);
+    gKernelLargeObjectPool = CreateMemPool(256, 528, MEMTYPE_LOW, 16);
     gKernelFirstObject = NULL;
     gKernelLastObject = NULL;
     gKernelLastObjectId = 0;

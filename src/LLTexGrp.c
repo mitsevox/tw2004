@@ -65,7 +65,7 @@ void fn_80010180(UStreamObject* pObject) {
             }
         }
     } while (bMore);
-    StaticMem_Free(pObject);
+    Circular_MemFreeFunc(pObject);
 }
 
 void fn_80010284(void) {
@@ -106,7 +106,8 @@ void fn_800103C0(void) {
 
     lbl_80280DD8->nNumSlots = 100;
     lbl_80280DD8->pSlots =
-        StaticMem_Alloc(lbl_80280DD8->nNumSlots * sizeof(TexGrpSlot), 2, 16, "LLTexGrp.c", 859);
+        Circular_MemAllocFunc(lbl_80280DD8->nNumSlots * sizeof(TexGrpSlot), MEMTYPE_LOW, 16,
+                              "LLTexGrp.c", 859);
     for (i = 0; i < lbl_80280DD8->nNumSlots; i++) {
         lbl_80280DD8->pSlots[i].pBank = NULL;
         lbl_80280DD8->pSlots[i].n8 = -1;
@@ -129,7 +130,7 @@ void fn_8001049C(void) {
             lbl_80280DD8->pSlots[i].pBank = NULL;
         }
     }
-    StaticMem_Free(lbl_80280DD8->pSlots);
+    Circular_MemFreeFunc(lbl_80280DD8->pSlots);
     lbl_80280DD8->pSlots = NULL;
 }
 

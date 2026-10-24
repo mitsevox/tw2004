@@ -31,7 +31,7 @@ static f32 GoBreakLine_StrippedFn(f32 x) {
 // the ball (fAB30) to 0 at the end (fAB34), with fAB38 20 and fAB3C 0.009, which nothing in this
 // file reads.
 void BreakLine_InitModule(void) {
-    gpBreakLine = StaticMem_Alloc(sizeof(BreakLine), 2, 16, "GoBreakLine.c", 93);
+    gpBreakLine = Circular_MemAllocFunc(sizeof(BreakLine), MEMTYPE_LOW, 16, "GoBreakLine.c", 93);
     gpBreakLine->fAB30 = 27.0f;
     gpBreakLine->fAB34 = 0.0f;
     gpBreakLine->fAB38 = 20.0f;
@@ -40,7 +40,7 @@ void BreakLine_InitModule(void) {
 
 // Frees the break line's state (BreakLine_InitModule's allocation).
 void BreakLine_CloseModule(void) {
-    StaticMem_Free(gpBreakLine);
+    Circular_MemFreeFunc(gpBreakLine);
     gpBreakLine = NULL;
 }
 

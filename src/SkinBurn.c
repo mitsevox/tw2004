@@ -130,10 +130,10 @@ void SkinBurn_DropUnusedMatrices(Skin* pSkin) {
     if (nBits == 0) {
         return;
     }
-    aBits = StaticMem_Alloc((nBits + 31) / 32 * sizeof(u32), 1, 16, "SkinBurn.c", 205);
+    aBits = Circular_MemAllocFunc((nBits + 31) / 32 * sizeof(u32), MEMTYPE_HIGH, 16, "SkinBurn.c", 205);
     BitArray_ClearArray(aBits, nBits);
-    aOld = StaticMem_Alloc(nBits * sizeof(s32), 1, 16, "SkinBurn.c", 209);
-    aNew = StaticMem_Alloc(nBits * sizeof(s32), 1, 16, "SkinBurn.c", 210);
+    aOld = Circular_MemAllocFunc(nBits * sizeof(s32), MEMTYPE_HIGH, 16, "SkinBurn.c", 209);
+    aNew = Circular_MemAllocFunc(nBits * sizeof(s32), MEMTYPE_HIGH, 16, "SkinBurn.c", 210);
     memset(aOld, -1, nBits * sizeof(s32));
     memset(aNew, -1, nBits * sizeof(s32));
 
@@ -189,9 +189,9 @@ void SkinBurn_DropUnusedMatrices(Skin* pSkin) {
     }
 
     pModel->n50 = nKept;
-    StaticMem_Free(aBits);
-    StaticMem_Free(aOld);
-    StaticMem_Free(aNew);
+    Circular_MemFreeFunc(aBits);
+    Circular_MemFreeFunc(aOld);
+    Circular_MemFreeFunc(aNew);
 }
 
 // The bytes nCount items of nSize take, rounded up to nAlign (a power of two); 0 when there is no
@@ -265,7 +265,7 @@ void SkinBurn_PackModel(Skin* pSkin) {
     }
     nSize += SkinBurn_GetAlignedSize(&pOld, nIndexes, sizeof(s32), 16);
 
-    pBase = StaticMem_Alloc(nSize, 2, 16, "SkinBurn.c", 434);
+    pBase = Circular_MemAllocFunc(nSize, MEMTYPE_LOW, 16, "SkinBurn.c", 434);
     nOffset = 0;
     pNew = SkinBurn_CopyAligned(pBase, &nOffset, pOld, sizeof(SkinModel), 16);
     pNew->n08 = nSize;
@@ -288,7 +288,7 @@ void SkinBurn_PackModel(Skin* pSkin) {
         nFirst += pEntry->n8;
     }
     pSkin->pModel = pNew;
-    StaticMem_Free(pOld);
+    Circular_MemFreeFunc(pOld);
 }
 
 // Brings the skin's model in line with pBurn's burnt description: renumbers and packs its mesh
@@ -357,7 +357,7 @@ void SkinBurn_BurnSkin(Skin* pSkin, s32* aParts, s32* aList) {
     pDesc = HwsBurn_Burn(pBurn);
     pOld = pSkin->pModel->pDesc;
     pSkin->pModel->pDesc = pDesc;
-    StaticMem_Free(pOld);
+    Circular_MemFreeFunc(pOld);
     SkinBurn_BurnModel(pSkin, pBurn);
     HwsBurn_Destroy(pBurn);
     SkinMorph_FreeBlended(pSkin, pBlock, pTable);

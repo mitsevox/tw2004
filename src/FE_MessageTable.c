@@ -25,6 +25,7 @@
 #include "frontend/fe.h"
 #include "core/memcard.h"
 #include "core/gbacable.h"
+#include "pad.h"
 #include "charstate.h"
 #include "trax.h"
 #include "core/gameaudio.h"
@@ -5279,10 +5280,9 @@ void GM_vClearBackupRow(MsgArg* pArgs, MsgArg* pResult) {
     gFEState.aBackup[pArgs[0].i] = -1;
 }
 
-// Front-end message 332: 1 when the controller in port pArgs[0] is a WaveBird (Input_iGetPadType
-// 0x8B100000), else 0.
+// Front-end message 332: 1 when the controller in port pArgs[0] is a WaveBird, else 0.
 void GM_vIsWaveBird(MsgArg* pArgs, MsgArg* pResult) {
-    if (Input_iGetPadType(pArgs[0].i) == 0x8B100000) {
+    if (Input_iGetPadType(pArgs[0].i) == SI_GC_WAVEBIRD) {
         pResult->i = 1;
     } else {
         pResult->i = 0;

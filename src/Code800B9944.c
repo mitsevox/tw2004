@@ -56,7 +56,7 @@ void FE_CrAPBall_UnRegisterStreamClients(void) {
 // FE_CrAPBall_SetLogo; the stream object itself is freed.
 void FE_CrAPBall_LoadBALF(UStreamObject* pObject) {
     gpCrAPBallLogoBank = fn_8000FB88(pObject, NULL, 0);
-    StaticMem_Free(pObject);
+    Circular_MemFreeFunc(pObject);
 }
 
 // ---- sweep code (not yet cleaned up) ----
@@ -82,7 +82,7 @@ void FE_CrAPBall_FreeTEO(UStreamObject* pObject) {
 
     pModel = (*(void**)((u8*)(pObject) + 4));
     fn_800075CC(*(UObjModelRoot**)((u8*)(pModel) + 0x10));
-    StaticMem_Free(pModel);
+    Circular_MemFreeFunc(pModel);
 }
 
 // ---- end of sweep code ----
@@ -116,11 +116,11 @@ void FE_CrAPBall_Free(void) {
     gpCrAPBallTeo10040 = NULL;
     if (gpCrAPBallLogoBank != NULL) {
         fn_8000FFAC(gpCrAPBallLogoBank);
-        StaticMem_Free(gpCrAPBallLogoBank);
+        Circular_MemFreeFunc(gpCrAPBallLogoBank);
         gpCrAPBallLogoBank = NULL;
     }
     if (gpCrAPBallUnusedMem != NULL) {
-        StaticMem_Free(gpCrAPBallUnusedMem);
+        Circular_MemFreeFunc(gpCrAPBallUnusedMem);
         gpCrAPBallUnusedMem = NULL;
     }
 }

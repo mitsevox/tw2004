@@ -17,12 +17,12 @@ f32  Wind_GetPhysicsSpeed(void);                 // Ball.c: the wind's speed
 f32  fn_8006C630(void);                 // gomainloop.c
 
 void REPLAY_InitModule(void) {
-    lbl_80281E48 = StaticMem_Alloc(sizeof(ReplayBuffer), 2, 0, "Replay.c", 77);
+    lbl_80281E48 = Circular_MemAllocFunc(sizeof(ReplayBuffer), MEMTYPE_LOW, 0, "Replay.c", 77);
     lbl_80281E48->b1525C = 0;
 }
 
 void REPLAY_CloseModule(void) {
-    StaticMem_Free(lbl_80281E48);
+    Circular_MemFreeFunc(lbl_80281E48);
     lbl_80281E48 = NULL;
 }
 

@@ -153,31 +153,31 @@ void GameModePractice_InitCamera(void) {
     CameraController_FadeIn(ViewController_GetCameraControl(gPlayers[0].nView[0]), 0.5f, vFadeColor);
 }
 
-// The pad's sticks while the ball is being placed (STATEFUNC_PlaceBallUpdate, in every mode): stick
-// bytes 3, 2 and 0 (Input_sGetStickInfo), beyond a 96..160 dead zone and scaled to about -1..1, go
-// into fMomentumZ, fMomentumX and fMomentumTurn (the last negated), which PlaceBall_UpdateMomentums
-// uses to move the cursor and turn its heading. Inside the dead zone a value is left as it was
-// (PlaceBall_UpdateMomentums eases it back to 0).
+// The pad's sticks while the ball is being placed (STATEFUNC_PlaceBallUpdate, in every mode): the
+// main stick's y and x and the C stick's x (Input_sGetStickInfo), beyond a 96..160 dead zone and
+// scaled to about -1..1, go into fMomentumZ, fMomentumX and fMomentumTurn (the last negated), which
+// PlaceBall_UpdateMomentums uses to move the cursor and turn its heading. Inside the dead zone a
+// value is left as it was (PlaceBall_UpdateMomentums eases it back to 0).
 void GameModePractice_ReadPlaceBallSticks(int nPlayer) {
-    u8* pPad = Input_sGetStickInfo(gPlayers[nPlayer].nController);
-    if (pPad) {
-        if (pPad[3] < 96.0f) {
-            gPlayers[nPlayer].fMomentumZ = (96.0f - pPad[3]) / 96.0f;
+    Controller_StickInfo* pStickInfo = Input_sGetStickInfo(gPlayers[nPlayer].nController);
+    if (pStickInfo) {
+        if (pStickInfo->nStickY < 96.0f) {
+            gPlayers[nPlayer].fMomentumZ = (96.0f - pStickInfo->nStickY) / 96.0f;
         }
-        if (pPad[3] > 160.0f) {
-            gPlayers[nPlayer].fMomentumZ = (160.0f - pPad[3]) / 96.0f;
+        if (pStickInfo->nStickY > 160.0f) {
+            gPlayers[nPlayer].fMomentumZ = (160.0f - pStickInfo->nStickY) / 96.0f;
         }
-        if (pPad[2] < 96.0f) {
-            gPlayers[nPlayer].fMomentumX = (96.0f - pPad[2]) / 96.0f;
+        if (pStickInfo->nStickX < 96.0f) {
+            gPlayers[nPlayer].fMomentumX = (96.0f - pStickInfo->nStickX) / 96.0f;
         }
-        if (pPad[2] > 160.0f) {
-            gPlayers[nPlayer].fMomentumX = (160.0f - pPad[2]) / 96.0f;
+        if (pStickInfo->nStickX > 160.0f) {
+            gPlayers[nPlayer].fMomentumX = (160.0f - pStickInfo->nStickX) / 96.0f;
         }
-        if (pPad[0] < 96.0f) {
-            gPlayers[nPlayer].fMomentumTurn = -(96.0f - pPad[0]) / 96.0f;
+        if (pStickInfo->nSubStickX < 96.0f) {
+            gPlayers[nPlayer].fMomentumTurn = -(96.0f - pStickInfo->nSubStickX) / 96.0f;
         }
-        if (pPad[0] > 160.0f) {
-            gPlayers[nPlayer].fMomentumTurn = -(160.0f - pPad[0]) / 96.0f;
+        if (pStickInfo->nSubStickX > 160.0f) {
+            gPlayers[nPlayer].fMomentumTurn = -(160.0f - pStickInfo->nSubStickX) / 96.0f;
         }
     }
 }

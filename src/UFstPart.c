@@ -34,7 +34,7 @@ void fn_80098A98(void) {
     int i;
 
     for (i = 0; i < 6; i++) {
-        lbl_801DB888[i] = StaticMem_Alloc(sizeof(PsEmitter), 2, 64, "UFstPart.c", 408);
+        lbl_801DB888[i] = Circular_MemAllocFunc(sizeof(PsEmitter), MEMTYPE_LOW, 64, "UFstPart.c", 408);
         lbl_801DB888[i]->b5C = 0;
         memset(&params, 0, sizeof(ParticleParams));
         params.nCount = 128;
@@ -59,7 +59,7 @@ void fn_80098B5C(void) {
     lbl_80281F88 = NULL;
     for (i = 0; i < 6; i++) {
         SD_FreeShaderObject(&lbl_801DB888[i]->mesh);
-        StaticMem_Free(lbl_801DB888[i]);
+        Circular_MemFreeFunc(lbl_801DB888[i]);
     }
 }
 
@@ -67,7 +67,7 @@ void fn_80098BDC(PsEmitter* pEmitter) {
     pEmitter->b5C = 0;
     if (pEmitter->params.n54 < 0) {
         SD_FreeShaderObject(&pEmitter->mesh);
-        StaticMem_Free(pEmitter);
+        Circular_MemFreeFunc(pEmitter);
     }
 }
 
@@ -444,7 +444,7 @@ PsEmitter* fn_80099758(ParticleParams* pParams) {
         pParams->nCount = 128;
     }
     if (pParams->n54 < 0) {
-        pEmitter = StaticMem_Alloc(sizeof(PsEmitter), 2, 64, "UFstPart.c", 967);
+        pEmitter = Circular_MemAllocFunc(sizeof(PsEmitter), MEMTYPE_LOW, 64, "UFstPart.c", 967);
         create.bAlloc = 1;
         create.pParams = pParams;
         SD_InitShaderObject(&pEmitter->mesh, 9, &create);

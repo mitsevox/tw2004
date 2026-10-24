@@ -10,6 +10,7 @@
 // (FEgolferanim.c), and make random golfers.
 
 #include "engine.h"
+#include "pad.h"
 #include "camera.h"
 #include "frontend/fe.h"
 #include "game/frontend.h"
@@ -662,13 +663,13 @@ void GM_vClearMarkedNewCrAPItems(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Menu message 502: 1 when a controller in any of the four ports holds the A button (PAD_BUTTON_A
-// in the held half of Input_ReadControlPad), else 0.
+// Menu message 502: 1 when a controller in any of the four ports holds the A button (the held half
+// of Input_ReadControlPad), else 0.
 void GM_vIsAnyPadHoldingA(MsgArg* pArgs, MsgArg* pResult) {
     int i;
 
-    for (i = 0; i < 4; i++) {
-        if (Input_bDoesPadExist(i) && (Input_ReadControlPad(i) & 0x1000000)) {
+    for (i = 0; i < INPUT_NUM_PADS; i++) {
+        if (Input_bDoesPadExist(i) && (Input_ReadControlPad(i) & PAD_BUTTON_A << 16)) {
             pResult->i = 1;
             return;
         }
@@ -688,22 +689,22 @@ void GM_vGetDPadHeld(MsgArg* pArgs, MsgArg* pResult) {
     s32* pD = pArgs[4].p;
 
     if (Input_bDoesPadExist(nChan)) {
-        if (Input_ReadControlPad(nChan) & 0x80000) {
+        if (Input_ReadControlPad(nChan) & PAD_BUTTON_UP << 16) {
             *pA = 1;
         } else {
             *pA = 0;
         }
-        if (Input_ReadControlPad(nChan) & 0x40000) {
+        if (Input_ReadControlPad(nChan) & PAD_BUTTON_DOWN << 16) {
             *pB = 1;
         } else {
             *pB = 0;
         }
-        if (Input_ReadControlPad(nChan) & 0x10000) {
+        if (Input_ReadControlPad(nChan) & PAD_BUTTON_LEFT << 16) {
             *pC = 1;
         } else {
             *pC = 0;
         }
-        if (Input_ReadControlPad(nChan) & 0x20000) {
+        if (Input_ReadControlPad(nChan) & PAD_BUTTON_RIGHT << 16) {
             *pD = 1;
         } else {
             *pD = 0;

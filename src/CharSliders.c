@@ -1,4 +1,4 @@
-// CharSliders.c (EA's name: the file string of its StaticMem_Alloc calls; TW07 has it as
+// CharSliders.c (EA's name: the file string of its Circular_MemAllocFunc calls; TW07 has it as
 // golf/animation/CharSliders.c, with CharSlider_Free in CharSliders_shared.c): a character's body
 // and face sliders, the created golfer's settings. CharSlider_CreateDefinitionsFromMem reads a
 // character's slider definitions from its file data and CharSlider_Free frees them;
@@ -35,40 +35,40 @@ void CharSlider_Free(CharSliderDefs* pDefs) {
         if (pDefs->pDefs != NULL) {
             for (i = 0; i < pDefs->nSliders; i++) {
                 if (pDefs->pDefs[i].pLinks != NULL) {
-                    StaticMem_Free(pDefs->pDefs[i].pLinks);
+                    Circular_MemFreeFunc(pDefs->pDefs[i].pLinks);
                 }
                 if (pDefs->pDefs[i].pLimits != NULL) {
-                    StaticMem_Free(pDefs->pDefs[i].pLimits);
+                    Circular_MemFreeFunc(pDefs->pDefs[i].pLimits);
                 }
                 if (pDefs->pDefs[i].pBoneRanges != NULL) {
                     for (j = 0; j < pDefs->pDefs[i].nBoneRanges; j++) {
-                        StaticMem_Free(pDefs->pDefs[i].pBoneRanges[j].items.pBones);
+                        Circular_MemFreeFunc(pDefs->pDefs[i].pBoneRanges[j].items.pBones);
                     }
-                    StaticMem_Free(pDefs->pDefs[i].pBoneRanges);
+                    Circular_MemFreeFunc(pDefs->pDefs[i].pBoneRanges);
                 }
                 if (pDefs->pDefs[i].pMorphRanges != NULL) {
                     for (j = 0; j < pDefs->pDefs[i].nMorphRanges; j++) {
-                        StaticMem_Free(pDefs->pDefs[i].pMorphRanges[j].items.pMorphs);
+                        Circular_MemFreeFunc(pDefs->pDefs[i].pMorphRanges[j].items.pMorphs);
                     }
-                    StaticMem_Free(pDefs->pDefs[i].pMorphRanges);
+                    Circular_MemFreeFunc(pDefs->pDefs[i].pMorphRanges);
                 }
             }
-            StaticMem_Free(pDefs->pDefs);
+            Circular_MemFreeFunc(pDefs->pDefs);
         }
         if (pDefs->pValues != NULL) {
-            StaticMem_Free(pDefs->pValues);
+            Circular_MemFreeFunc(pDefs->pValues);
         }
         if (pDefs->aMorphIds != NULL) {
-            StaticMem_Free(pDefs->aMorphIds);
+            Circular_MemFreeFunc(pDefs->aMorphIds);
         }
-        StaticMem_Free(pDefs);
+        Circular_MemFreeFunc(pDefs);
     }
 }
 
 // Read a character's slider definitions from its file data at *ppData (Character_CreateFromMem):
 // the slider and morph target counts and 8 bytes skipped, then the sliders, each one's links,
 // limits, bone ranges and their bones, morph ranges and their morph targets, and the morph target
-// ids, each byte-swapped by its layout into memory from StaticMem_Alloc; *ppData is left after
+// ids, each byte-swapped by its layout into memory from Circular_MemAllocFunc; *ppData is left after
 // them. NULL when there are no sliders.
 CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData) {
     void* pDst;
@@ -91,15 +91,18 @@ CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData) {
         return NULL;
     }
 
-    pDefs = StaticMem_Alloc(sizeof(CharSliderDefs), 2, 0, "CharSliders.c", 1010);
+    pDefs = Circular_MemAllocFunc(sizeof(CharSliderDefs), MEMTYPE_LOW, 0, "CharSliders.c", 1010);
     Mem_set(pDefs, 0, sizeof(CharSliderDefs));
     pDefs->nSliders = nSliders;
-    pDefs->pDefs = StaticMem_Alloc(pDefs->nSliders * sizeof(CharSliderDef), 2, 0, "CharSliders.c", 1014);
+    pDefs->pDefs = Circular_MemAllocFunc(pDefs->nSliders * sizeof(CharSliderDef), MEMTYPE_LOW, 0,
+                                         "CharSliders.c", 1014);
     Mem_set(pDefs->pDefs, 0, pDefs->nSliders * sizeof(CharSliderDef));
-    pDefs->pValues = StaticMem_Alloc(pDefs->nSliders * sizeof(CharSliderValue), 2, 0, "CharSliders.c", 1016);
+    pDefs->pValues = Circular_MemAllocFunc(pDefs->nSliders * sizeof(CharSliderValue), MEMTYPE_LOW, 0,
+                                           "CharSliders.c", 1016);
     Mem_set(pDefs->pValues, 0, pDefs->nSliders * sizeof(CharSliderValue));
     pDefs->nMorphs = nMorphs;
-    pDefs->aMorphIds = StaticMem_Alloc(pDefs->nMorphs * sizeof(u64), 2, 0, "CharSliders.c", 1020);
+    pDefs->aMorphIds = Circular_MemAllocFunc(pDefs->nMorphs * sizeof(u64), MEMTYPE_LOW, 0,
+                                             "CharSliders.c", 1020);
     Mem_set(pDefs->aMorphIds, 0, pDefs->nMorphs * sizeof(u64));
 
     // The sliders; the pointers read with them are not valid yet.
@@ -113,7 +116,8 @@ CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData) {
     }
     for (i = 0; i < pDefs->nSliders; i++) {
         if (pDefs->pDefs[i].nLinks > 0) {
-            pDefs->pDefs[i].pLinks = StaticMem_Alloc(pDefs->pDefs[i].nLinks * sizeof(CharSliderLink), 2, 0,
+            pDefs->pDefs[i].pLinks = Circular_MemAllocFunc(pDefs->pDefs[i].nLinks * sizeof(CharSliderLink),
+                                                           MEMTYPE_LOW, 0,
                                                  "CharSliders.c", 1039);
             for (j = 0; j < pDefs->pDefs[i].nLinks; j++) {
                 pDst = &pDefs->pDefs[i].pLinks[j];
@@ -123,7 +127,8 @@ CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData) {
     }
     for (i = 0; i < pDefs->nSliders; i++) {
         if (pDefs->pDefs[i].nLimits > 0) {
-            pDefs->pDefs[i].pLimits = StaticMem_Alloc(pDefs->pDefs[i].nLimits * sizeof(CharSliderLimit), 2, 0,
+            pDefs->pDefs[i].pLimits = Circular_MemAllocFunc(pDefs->pDefs[i].nLimits
+                                                            * sizeof(CharSliderLimit), MEMTYPE_LOW, 0,
                                                   "CharSliders.c", 1053);
             for (nLimit = 0; nLimit < pDefs->pDefs[i].nLimits; nLimit++) {
                 pDst = &pDefs->pDefs[i].pLimits[nLimit];
@@ -136,8 +141,8 @@ CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData) {
     for (i = 0; i < pDefs->nSliders; i++) {
         if (pDefs->pDefs[i].nBoneRanges > 0) {
             pDefs->pDefs[i].pBoneRanges
-                    = StaticMem_Alloc(pDefs->pDefs[i].nBoneRanges * sizeof(CharSliderRange),
-                                                      2, 0, "CharSliders.c", 1067);
+                    = Circular_MemAllocFunc(pDefs->pDefs[i].nBoneRanges * sizeof(CharSliderRange),
+                                                      MEMTYPE_LOW, 0, "CharSliders.c", 1067);
             for (nBoneRange = 0; nBoneRange < pDefs->pDefs[i].nBoneRanges; nBoneRange++) {
                 pDst = &pDefs->pDefs[i].pBoneRanges[nBoneRange];
                 ByteSwap_Records((void**)ppData, &pDst, gCharSliderBoneRangeSwap, 4, 1);
@@ -149,7 +154,9 @@ CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData) {
         for (j = 0; j < pDefs->pDefs[i].nBoneRanges; j++) {
             if (pDefs->pDefs[i].pBoneRanges[j].nItems > 0) {
                 pDefs->pDefs[i].pBoneRanges[j].items.pBones =
-                    StaticMem_Alloc(pDefs->pDefs[i].pBoneRanges[j].nItems * sizeof(CharSliderBone), 2, 0,
+                    Circular_MemAllocFunc(pDefs->pDefs[i].pBoneRanges[j].nItems * sizeof(CharSliderBone),
+                                          MEMTYPE_LOW,
+                                          0,
                                 "CharSliders.c", 1084);
                 for (nBone = 0; nBone < pDefs->pDefs[i].pBoneRanges[j].nItems; nBone++) {
                     pDst = &pDefs->pDefs[i].pBoneRanges[j].items.pBones[nBone];
@@ -163,8 +170,8 @@ CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData) {
     for (i = 0; i < pDefs->nSliders; i++) {
         if (pDefs->pDefs[i].nMorphRanges > 0) {
             pDefs->pDefs[i].pMorphRanges
-                    = StaticMem_Alloc(pDefs->pDefs[i].nMorphRanges * sizeof(CharSliderRange),
-                                                       2, 0, "CharSliders.c", 1100);
+                    = Circular_MemAllocFunc(pDefs->pDefs[i].nMorphRanges * sizeof(CharSliderRange),
+                                                       MEMTYPE_LOW, 0, "CharSliders.c", 1100);
             for (nMorphRange = 0; nMorphRange < pDefs->pDefs[i].nMorphRanges; nMorphRange++) {
                 pDst = &pDefs->pDefs[i].pMorphRanges[nMorphRange];
                 ByteSwap_Records((void**)ppData, &pDst, gCharSliderMorphRangeSwap, 4, 1);
@@ -176,7 +183,8 @@ CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData) {
         for (j = 0; j < pDefs->pDefs[i].nMorphRanges; j++) {
             if (pDefs->pDefs[i].pMorphRanges[j].nItems > 0) {
                 pDefs->pDefs[i].pMorphRanges[j].items.pMorphs =
-                    StaticMem_Alloc(pDefs->pDefs[i].pMorphRanges[j].nItems * sizeof(CharSliderMorph), 2, 0,
+                    Circular_MemAllocFunc(pDefs->pDefs[i].pMorphRanges[j].nItems * sizeof(CharSliderMorph),
+                                          MEMTYPE_LOW, 0,
                                 "CharSliders.c", 1117);
                 for (k = 0; k < pDefs->pDefs[i].pMorphRanges[j].nItems; k++) {
                     pDst = &pDefs->pDefs[i].pMorphRanges[j].items.pMorphs[k];

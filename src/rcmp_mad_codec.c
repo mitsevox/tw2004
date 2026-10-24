@@ -40,7 +40,8 @@ void MAD_SetReadCallback(PictFile* (*pfnRead)(void* pArg), void* pArg) {
 // U and V planes after it (3/2 bytes a pixel), with no references yet.
 void MAD_AllocFrame(PictFrame* pFrame, int nWidth, int nHeight) {
     pFrame->nRefs = 0;
-    pFrame->pPixels = StaticMem_Alloc((u32)(nHeight * nWidth * 3) >> 1, 1, 32, "rcmp_mad_codec.c", 79);
+    pFrame->pPixels = Circular_MemAllocFunc((u32)(nHeight * nWidth * 3) >> 1, MEMTYPE_HIGH, 32,
+                                            "rcmp_mad_codec.c", 79);
     pFrame->nWidth = nWidth;
     pFrame->nHeight = nHeight;
 }
@@ -49,7 +50,7 @@ void MAD_AllocFrame(PictFrame* pFrame, int nWidth, int nHeight) {
 // six).
 void MAD_FreeFrame(PictFrame* pFrame) {
     if (pFrame->pPixels != NULL) {
-        StaticMem_Free(pFrame->pPixels);
+        Circular_MemFreeFunc(pFrame->pPixels);
         pFrame->pPixels = NULL;
     }
 }
@@ -85,7 +86,7 @@ void MAD_CloseDecoder(MadDecoder* p) {
         }
     }
     if (p->pFrames != NULL) {
-        StaticMem_Free(p->pFrames);
+        Circular_MemFreeFunc(p->pFrames);
     }
 }
 
@@ -189,7 +190,7 @@ PictFrame* MAD_GetNextFrame(MadDecoder* p, PictFile* pFile) {
         p->fFrameTime = 1000.0f / (p->nRate / 65535.0f);
         p->nWidth = pFile->nWidth;
         p->nHeight = pFile->nHeight;
-        pFrame = StaticMem_Alloc(6 * sizeof(PictFrame), 1, 32, "rcmp_mad_codec.c", 473);
+        pFrame = Circular_MemAllocFunc(6 * sizeof(PictFrame), MEMTYPE_HIGH, 32, "rcmp_mad_codec.c", 473);
         p->pFrames = pFrame;
         for (i = 0; i < 6; i++) {
             MAD_AllocFrame(pFrame, p->nWidth, p->nHeight);
@@ -205,7 +206,7 @@ PictFrame* MAD_GetNextFrame(MadDecoder* p, PictFile* pFile) {
 
 void MAD_FreeFile(PictFile* pFile) {
     if (pFile != NULL) {
-        StaticMem_Free(pFile);
+        Circular_MemFreeFunc(pFile);
     }
 }
 

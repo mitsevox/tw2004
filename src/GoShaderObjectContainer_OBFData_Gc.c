@@ -15,7 +15,8 @@ void fn_8006FCDC(OBFData* pData, OBFChunk* pChunk) {
     u8* pBuf;
 
     uSize = pChunk->n02 * pChunk->n04;
-    pBuf = StaticMem_Alloc((uSize + 31) & ~31, 2, 32, "GoShaderObjectContainer_OBFData_Gc.c", 0x41);
+    pBuf = Circular_MemAllocFunc((uSize + 31) & ~31, MEMTYPE_LOW, 32,
+                                 "GoShaderObjectContainer_OBFData_Gc.c", 0x41);
     nKind = pChunk->nKind;
     Mem_cpy(pBuf, pChunk->aData, uSize);
     DCFlushRange(pBuf, uSize);
@@ -72,17 +73,17 @@ void fn_8006FE44(OBFData* pData) {
 
     for (i = 0; i < 5; i++) {
         if (pData->aBufs[i] != NULL) {
-            StaticMem_Free(pData->aBufs[i]);
+            Circular_MemFreeFunc(pData->aBufs[i]);
         }
     }
     if (pData->pBuf1 != NULL) {
-        StaticMem_Free(pData->pBuf1);
+        Circular_MemFreeFunc(pData->pBuf1);
     }
     if (pData->pBuf0 != NULL) {
-        StaticMem_Free(pData->pBuf0);
+        Circular_MemFreeFunc(pData->pBuf0);
     }
     if (pData->pBuf3 != NULL) {
-        StaticMem_Free(pData->pBuf3);
+        Circular_MemFreeFunc(pData->pBuf3);
     }
 }
 

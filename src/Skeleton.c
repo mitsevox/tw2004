@@ -694,7 +694,8 @@ void SKEL_CreateIKChain(CharModel* pModel, IKChain* pChain, IKChainDef* pDef) {
     pChain->nLinks = pDef->nLinks;
     pChain->nMaxIterations = pDef->nMaxIterations;
     pChain->fTolerance = pDef->fTolerance;
-    pChain->pLinks = StaticMem_Alloc(pChain->nLinks * sizeof(IKLink), 2, 64, "Skeleton.c", 1126);
+    pChain->pLinks = Circular_MemAllocFunc(pChain->nLinks * sizeof(IKLink), MEMTYPE_LOW, 64,
+                                           "Skeleton.c", 1126);
     for (i = 0; i < pChain->nLinks; i++) {
         pLink = &pChain->pLinks[i];
         pLink->nBone = CharModel_GetBoneIndexMapped(pModel, pDef->pLinks[i].nBone);
@@ -717,15 +718,17 @@ Skeleton* SKEL_CreateIKSkeleton(CharModel* pModel, CharModelDefs* pDefs) {
     IKChainDef* pChainDefs = pDefs->pDefs;
     s8 nChains = pDefs->nDefs;
 
-    pSkel = StaticMem_Alloc(sizeof(Skeleton), 2, 64, "Skeleton.c", 1148);
+    pSkel = Circular_MemAllocFunc(sizeof(Skeleton), MEMTYPE_LOW, 64, "Skeleton.c", 1148);
     pSkel->nChains = nChains;
-    pSkel->pChains = StaticMem_Alloc(nChains * sizeof(IKChain), 2, 64, "Skeleton.c", 1151);
+    pSkel->pChains = Circular_MemAllocFunc(nChains * sizeof(IKChain), MEMTYPE_LOW, 64, "Skeleton.c", 1151);
     for (i = 0; i < pSkel->nChains; i++) {
         SKEL_CreateIKChain(pModel, &pSkel->pChains[i], &pChainDefs[i]);
     }
     pSkel->pDefs = pChainDefs;
-    pSkel->pIKRots = StaticMem_Alloc(pModel->nBones * sizeof(f32[4]), 2, 64, "Skeleton.c", 1159);
-    pSkel->pWeightedRots = StaticMem_Alloc(pModel->nBones * sizeof(f32[4]), 2, 64, "Skeleton.c", 1160);
+    pSkel->pIKRots = Circular_MemAllocFunc(pModel->nBones * sizeof(f32[4]), MEMTYPE_LOW, 64,
+                                           "Skeleton.c", 1159);
+    pSkel->pWeightedRots = Circular_MemAllocFunc(pModel->nBones * sizeof(f32[4]), MEMTYPE_LOW, 64,
+                                                 "Skeleton.c", 1160);
     pSkel->pUsedRots = pSkel->pIKRots;
     pSkel->nIKClubClass = -1;
     pSkel->nIKClipKey = -1;
@@ -754,12 +757,12 @@ Skeleton* SKEL_CreateIKSkeleton(CharModel* pModel, CharModelDefs* pDefs) {
 void SKEL_FreeIKSkeleton(Skeleton* pSkel) {
     int i;
     for (i = 0; i < pSkel->nChains; i++) {
-        StaticMem_Free(pSkel->pChains[i].pLinks);
+        Circular_MemFreeFunc(pSkel->pChains[i].pLinks);
     }
-    StaticMem_Free(pSkel->pChains);
-    StaticMem_Free(pSkel->pWeightedRots);
-    StaticMem_Free(pSkel->pIKRots);
-    StaticMem_Free(pSkel);
+    Circular_MemFreeFunc(pSkel->pChains);
+    Circular_MemFreeFunc(pSkel->pWeightedRots);
+    Circular_MemFreeFunc(pSkel->pIKRots);
+    Circular_MemFreeFunc(pSkel);
 }
 
 // Loads a character model from pData (read through BYTESWAP_SWAPDATA): its bone count, two floats
@@ -774,7 +777,7 @@ CharModel* SKEL_LoadFromMem(u8* pData, s8 nExtra, CharModelDefs* pDefs, int bLef
     CharModel* pModel;
     int i;
 
-    pModel = StaticMem_Alloc(sizeof(CharModel), 2, 64, "Skeleton.c", 1228);
+    pModel = Circular_MemAllocFunc(sizeof(CharModel), MEMTYPE_LOW, 64, "Skeleton.c", 1228);
     memset(pModel, 0, sizeof(CharModel));
     BYTESWAP_SWAPDATA(&pData, (u8*)&pModel->nBones, 4, 4);
     if (nExtra < 0) {
@@ -784,7 +787,7 @@ CharModel* SKEL_LoadFromMem(u8* pData, s8 nExtra, CharModelDefs* pDefs, int bLef
         }
     }
     nTotal = pModel->nBones + nExtra;
-    pModel->pBones = StaticMem_Alloc(nTotal * sizeof(Bone), 2, 64, "Skeleton.c", 1242);
+    pModel->pBones = Circular_MemAllocFunc(nTotal * sizeof(Bone), MEMTYPE_LOW, 64, "Skeleton.c", 1242);
     BYTESWAP_SWAPDATA(&pData, (u8*)&pModel->fRightFootLen, 4, 4);
     BYTESWAP_SWAPDATA(&pData, (u8*)&pModel->fLeftFootLen, 4, 4);
     for (i = 0; i < pModel->nBones; i++) {
@@ -801,8 +804,10 @@ CharModel* SKEL_LoadFromMem(u8* pData, s8 nExtra, CharModelDefs* pDefs, int bLef
         pModel->pBones[i].uId = *(u64*)gSkelBoneNames[0x54];  // port: reads 8 bytes of the name
     }
     pModel->nBones = nTotal;
-    pModel->pMatrices = StaticMem_Alloc(pModel->nBones * sizeof(f32[4][4]), 2, 64, "Skeleton.c", 1265);
-    pModel->pPoses = StaticMem_Alloc(pModel->nBones * sizeof(BonePose), 2, 64, "Skeleton.c", 1266);
+    pModel->pMatrices = Circular_MemAllocFunc(pModel->nBones * sizeof(f32[4][4]), MEMTYPE_LOW, 64,
+                                              "Skeleton.c", 1265);
+    pModel->pPoses = Circular_MemAllocFunc(pModel->nBones * sizeof(BonePose), MEMTYPE_LOW, 64,
+                                           "Skeleton.c", 1266);
     for (i = 0; i < pModel->nBones; i++) {
         Quat_IdentifyForMul(pModel->pBones[i].q0C);
     }
@@ -1106,9 +1111,9 @@ void SKEL_CloseModule(void) {
 void SKEL_Free(CharModel* pModel) {
     int i;
 
-    StaticMem_Free(pModel->pBones);
-    StaticMem_Free(pModel->pMatrices);
-    StaticMem_Free(pModel->pPoses);
+    Circular_MemFreeFunc(pModel->pBones);
+    Circular_MemFreeFunc(pModel->pMatrices);
+    Circular_MemFreeFunc(pModel->pPoses);
     if (pModel->pF0 != NULL) {
         fn_80114398(pModel->pF0);
     }
@@ -1131,7 +1136,7 @@ void SKEL_Free(CharModel* pModel) {
     if (pModel->pSkel != NULL) {
         SKEL_FreeIKSkeleton(pModel->pSkel);
     }
-    StaticMem_Free(pModel);
+    Circular_MemFreeFunc(pModel);
 }
 
 // Fills in aBone, each bone id's index in the model (0xFF: none; id 0 is bone 0): each model bone

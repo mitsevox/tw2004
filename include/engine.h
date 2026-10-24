@@ -17,17 +17,37 @@ void* Mem_cpy(void* s1, const void* s2, u32 n);                // memcpy; return
 void* Mem_move(void* dst, const void* src, u32 n);             // memmove: may overlap; returns dst
 void* Mem_set(void* s, int c, u32 n);                          // memset; returns s
 int   Mem_compare(const void* s1, const void* s2, u32 n);      // memcmp: -1, 0 or 1
-// Allocates (StaticMemory.c): nMode picks the system heap or a part of the static heap (see there).
-void* StaticMem_Alloc(int nSize, int nMode, int nAlign, const char* pFile, int nLine);
-void  StaticMem_Free(void* p);                  // free
-void  StaticMem_SetMode(s32 n);                 // } the StaticMem_Alloc mode TibExtMemAlloc uses
-s32   StaticMem_GetMode(void);                  // } (EASportsBio.c: 0 while the Bio starts, then 2)
-void  StaticMem_ResetCount(void);               // start a new count of the bytes taken
-void  StaticMem_StartCount(void);               // } counting on / off
-void  StaticMem_StopCount(void);                // }
-s32   StaticMem_GetCount(void);                 // the bytes taken since StaticMem_ResetCount
+// UCirc.c: the game's own heap, one big block from the system heap with blocks cut from either end
+// of its free spans.
+
+// Where Circular_MemAllocFunc takes a block from: the system heap, or the low or high end of a free
+// span of the game's heap.
+typedef enum TTypeAcces {
+    MEMTYPE_SYSTEM        = 0,  // the system heap (Mem_AllocFunc)
+    MEMTYPE_HIGH          = 1,  // the high end of the first span big enough, searching down from
+                                // the cursor
+    MEMTYPE_LOW           = 2,  // the low end of the first span big enough, searching up from the
+                                // cursor, which then moves to that span
+    MEMTYPE_HIGH_BEST_FIT = 4   // the high end of the smallest span big enough
+} TTypeAcces;
+
+void  Circular_DestroyBuffer(void);
+void  Circular_InitOnce(void);
+void  Circular_PreInit(void);
+void  Circular_CreateBuffer(void);
+void  Circular_InitBuffer(void);
+void  Circular_CloseBuffer(void);
+void* Circular_MemAllocFunc(int MemSize, TTypeAcces TypeMem, int align, const char* filename,
+                            int lineNumber);
+void  Circular_MemFreeFunc(void* Ptr);
+void  Circular_SetCurrentMemType(TTypeAcces eType);
+TTypeAcces Circular_GetCurrentMemType(void);
+void  Circular_ClearMemorySizeRecorder(void);
+void  Circular_StartMemorySizeRecorder(void);
+void  Circular_StopMemorySizeRecorder(void);
+s32   Circular_GetCurrentMemorySizeRecorder(void);
 // The main-memory heap (GoShaderObject_Particle_Gc.c): fn_80095108 makes it from the arena.
-// fn_800951A0 returns a block aligned to nAlign (0: 16) that remembers the heap block and its
+// Mem_AllocFunc returns a block aligned to nAlign (0: 16) that remembers the heap block and its
 // own padding just before and after it (every caller passes 1 as n, which it does not read).
 typedef struct HeapBlockHead {
     void* pBlock;               // 0x0  the heap block it is in
@@ -35,8 +55,8 @@ typedef struct HeapBlockHead {
 } HeapBlockHead;
 
 void  fn_80095108(void);
-void* fn_800951A0(u32 uSize, u16 nAlign, int n);
-void  fn_8009527C(void* p);             // frees what fn_800951A0 allocated
+void* Mem_AllocFunc(u32 uSize, u16 nAlign, int n);
+void  Mem_FreeFunc(void* p);            // frees what Mem_AllocFunc allocated
 
 // The game's clock (LLTime.c): a 64-bit count of ticks since the current mode started (each mode's
 // start calls TI_vInitModule), made from the 32-bit tick (TI_uiReadCP0Count) by counting its
@@ -1148,7 +1168,8 @@ typedef struct UStreamObject {
     struct UStreamObject* pPrev;  // 0x0C  finished-object queue; resource list: toward the tail
     struct UStreamObject* pNext;  // 0x10  resource list: toward the head
     int   nUnk14;                 // 0x14
-    u32   uFlags;                 // 0x18  chunk+0x14; set to 1 for txf / Cpyr / Cact / txf2
+    u32   uFlags;                 // 0x18  chunk+0x14: where its block came from (a TTypeAcces;
+                                  //       MEMTYPE_HIGH for txf / Cpyr / Cact / txf2)
     u32   uType;                  // 0x1C  chunk+0x18, e.g. 'ter '
     u32   uId;                    // 0x20  chunk+0x1C: the object's id within its type (Resources_Get
                                   //       finds objects by type and id); for skalib's SAL and BNK
@@ -1394,48 +1415,56 @@ void fn_80012438(LLFont* pFont);
 
 // ---- controller input ------------------------------------------------------------------------
 
-// One controller as the pad library reads it (12 bytes a pad, filled by PADRead).
-typedef struct PadStatus {
-    u16 uButtons;                 // 0x00
-    s8  nStickX;                  // 0x02
-    s8  nStickY;                  // 0x03
-    s8  nSubStickX;               // 0x04  the C stick
-    s8  nSubStickY;               // 0x05
-    u8  nTriggerL;                // 0x06
-    u8  nTriggerR;                // 0x07
-    u8  nAnalogA;                 // 0x08
-    u8  nAnalogB;                 // 0x09
-    s8  nError;                   // 0x0A  0: read, -1: no controller
-    u8  unkB;                     // 0x0B
-} PadStatus;
+// One controller as the pad library reads it (12 bytes a pad, filled by PADRead). The sticks are
+// -128..127 with y growing upwards, the triggers and analog buttons 0..255.
+typedef struct PADStatus {
+    u16 button;                   // 0x00  the buttons held (PAD_BUTTON_* in pad.h)
+    s8  stickX;                   // 0x02  the main stick
+    s8  stickY;                   // 0x03
+    s8  substickX;                // 0x04  the C stick
+    s8  substickY;                // 0x05
+    u8  triggerLeft;              // 0x06
+    u8  triggerRight;             // 0x07
+    u8  analogA;                  // 0x08
+    u8  analogB;                  // 0x09
+    s8  err;                      // 0x0A  PAD_ERR_* (pad.h)
+} PADStatus;
+LAYOUT_ASSERT(PADStatus, 0xC);
 
-// A pad's sticks and triggers rescaled to 0-255 with a dead zone; 0x80 is the centre. Y grows
-// downwards.
-typedef struct PadAnalog {
-    u8  nSubStickX;               // 0x00
+#define INPUT_NUM_PADS 4          // the controller ports
+
+// A pad's sticks and triggers rescaled to 0-255 with a dead zone of 15 (Input_vUpdate); 0x80 is a
+// centred stick, and y grows as the stick is pulled back.
+typedef struct Controller_StickInfo {
+    u8  nSubStickX;               // 0x00  the C stick
     u8  nSubStickY;               // 0x01
-    u8  nStickX;                  // 0x02
+    u8  nStickX;                  // 0x02  the main stick
     u8  nStickY;                  // 0x03
     u8  nTriggerL;                // 0x04
     u8  nTriggerR;                // 0x05
-} PadAnalog;
+} Controller_StickInfo;
 
+// A pad's rumble.
 typedef struct PadRumble {
-    u8  bOn;                      // 0x00  cleared while rumble is switched off (Input_vSetVibrationStatus)
-    u8  bAllowed;                 // 0x01
-    s16 nFrames;                  // 0x02  frames the motor has run; it stops after 60
+    u8  bOn;                      // 0x00  the pad may rumble: the game options' vibration setting
+                                  //       (Input_vSetVibrationStatus)
+    u8  bAllowed;                 // 0x01  also needed to rumble; set for every pad at start-up and
+                                  //       never cleared
+    s16 nFrames;                  // 0x02  0 while the motor is off, else frames since it started
+                                  //       plus 1; Input_vUpdate stops it past 60
 } PadRumble;
 
-// Controller_Gc.c's state: the four pads.
+// LLInput_Gc.c's state (gControllers): the four pads.
 typedef struct Controllers {
-    u8  bStickAsDpad;             // 0x00  the main stick also presses the D-pad
-    u32 uConnected;               // 0x04  one bit a pad, 0x80000000 >> n
-    PadStatus aStatus[4];         // 0x08
-    PadAnalog aAnalog[4];         // 0x38
-    u32 auButtons[4];             // 0x50  held << 16 | pressed this frame
-    u32 auHeld[4];                // 0x60  last frame's held buttons
-    PadRumble aRumble[4];         // 0x70
-    s8  nRead;                    // 0x80  one bit a pad (1 << n): it answered this frame
+    u8  bStickAsDpad;             // 0x00  the main stick also presses the D-pad (Input_vEmulateDPad)
+    u32 uConnected;               // 0x04  the pads plugged in, one bit a pad: PAD_CHAN0_BIT >> n
+    PADStatus aStatus[INPUT_NUM_PADS];   // 0x08  what PADRead last read
+    Controller_StickInfo aStickInfo[INPUT_NUM_PADS];   // 0x38
+    u32 auButtons[INPUT_NUM_PADS];       // 0x50  held << 16 | pressed this frame (Input_ReadControlPad)
+    u32 auHeld[INPUT_NUM_PADS];          // 0x60  the buttons held at the last read
+    PadRumble aRumble[INPUT_NUM_PADS];   // 0x70
+    s8  uRead;                    // 0x80  the pads this frame's read settled (read, or found
+                                  //       unplugged), one bit a pad: 1 << n
 } Controllers;
 LAYOUT_ASSERT(Controllers, 0x84);
 
@@ -1471,19 +1500,21 @@ void DS_vSetZBufferMode(DS_ECompareFunctions eZBufferMode);
 void DS_vEnableZBufferUpdate(int bZBufferUpdate);
 void DS_vSetAlphaTestMode(int bAlphaTestEnable, DS_ECompareFunctions eAlphaMode, int nAlphaRefValue);
 
+// LLInput_Gc.c: the four controllers.
+extern Controllers gControllers;
 void Input_vInitOnce(void);
-int  Input_iInitModule(void);                 // controller init
-void Input_vCloseOnce(void);
-u32  Input_iGetPadType(int nChan);            // the pad's device type (SIProbe)
-u8   Input_bDoesPadExist(int nChan);            // a controller the game takes is plugged in
-void Input_vEmulateDPad(u8 bOn);               // the main stick also presses the D-pad
-void Input_vVibrateBuzz(int nController, int bOn);         // rumble on or off
-void Input_vVibrateWave(int nController, int nStrength);   // rumble strength
-void Input_vStopVibration(int nController);      // rumble off
-void Input_vSetVibrationStatus(int nController, int bEnable);   // rumble allowed or not
-void Input_vUpdate(void);                 // read the controllers
-u8*  Input_sGetStickInfo(int nController);      // the pad's state: stick bytes at +0, +2, +3
-u32  Input_ReadControlPad(int nController);      // buttons: held << 16 | pressed this frame
+int  Input_iInitModule(void);                   // start the pad library, clear the pads' state
+void Input_vCloseOnce(void);                    // stop every pad's rumble
+u32  Input_iGetPadType(int joyPad);             // the device type on a port (SI_GC_* in pad.h)
+u8   Input_bDoesPadExist(int joyPad);           // a controller the game takes is plugged in
+void Input_vEmulateDPad(u8 emulate);            // the main stick also presses the D-pad
+void Input_vVibrateBuzz(int joyPad, int vibOn);         // rumble at full strength, or off
+void Input_vVibrateWave(int joyPad, int vibRate);       // rumble at a strength 0-255
+void Input_vStopVibration(int joyPad);                  // rumble off
+void Input_vSetVibrationStatus(int joyPad, int vibOn);  // the pad may rumble or not
+void Input_vUpdate(void);                       // read the controllers, once a frame
+Controller_StickInfo* Input_sGetStickInfo(int joyPad);  // the pad's sticks and triggers, 0-255
+u32  Input_ReadControlPad(int joyPad);          // buttons: held << 16 | pressed this frame
 void RenderState_SetDrawFlags(int a);
 // A screen quad (GameEffects' letter boxes, GxUtil.c's alpha clear): RenderView_MakeQuad fills its corners
 // (x0, y0)-(x1, y1), RenderView_SetColor sets its colour (four floats), RenderView_DrawPrimitive draws it.
@@ -1503,6 +1534,7 @@ extern s8   gnInputControlSet;          // GoRenderCtx_Gc.c: the row of gauInput
                                         // (Input_vSelectControlSet)
 extern u32  gauInputButtonMap[][0xE8 / 4]; // GoRenderCtx_Gc.c: rows of button masks, by button
 u8   Input_AnyPadPressed(u32 uMask);                    // any pad pressed these buttons
+void Input_vStopAllVibration(void);                     // GoRenderCtx_Gc.c: every pad's rumble off
 
 // ---- events, sound, effects ------------------------------------------------------------------
 

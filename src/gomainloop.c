@@ -27,8 +27,6 @@ void fn_800080D4(void);
 void fn_800081C4(void);
 void fn_80008380(void);
 void fn_800083A0(void);
-void StaticMem_Reset(void);
-void StaticMem_Checkpoint(void);
 void fn_8000F060(void);
 void fn_8000F0E8(void);
 void fn_800103C0(void);
@@ -371,7 +369,7 @@ void fn_8006C6F0(void) {
 }
 
 void fn_8006C720(void) {
-    StaticMem_Reset();
+    Circular_InitBuffer();
     fn_8002E258();
     FE_vOpenONCE();
     CA_vInitOnce();
@@ -383,7 +381,7 @@ void fn_8006C720(void) {
     fn_800A2064();
     FE_LogoDesign_OpenOnce();
     EASBio_InitOnce();
-    StaticMem_Checkpoint();
+    Circular_CloseBuffer();
 }
 
 void fn_8006C770(void) {
@@ -401,7 +399,7 @@ void fn_8006C7A8(void) {
     u32 uSeed;
 
     REPLAY_Init();
-    StaticMem_Reset();
+    Circular_InitBuffer();
     AudMem_InitModule();
     fn_800080D4();
     Resources_InitModule();
@@ -467,7 +465,7 @@ void fn_8006C854(void) {
     fn_800081C4();
     Pict_CloseModule();
     AudMem_CloseModule();
-    StaticMem_Checkpoint();
+    Circular_CloseBuffer();
 }
 
 // Makes view nView's camera the current render camera and applies it, then draws the full-screen

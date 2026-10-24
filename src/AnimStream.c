@@ -49,7 +49,7 @@ void AnimStream_Init(void) {
     int k;
     int m;
 
-    gpAnimStream = StaticMem_Alloc(sizeof(AnimStream), 2, 0, "AnimStream.c", 158);
+    gpAnimStream = Circular_MemAllocFunc(sizeof(AnimStream), MEMTYPE_LOW, 0, "AnimStream.c", 158);
     gpAnimStream->pReadBuf = NULL;
     gpAnimStream->pReadClips = NULL;
     gpAnimStream->pRead = NULL;
@@ -106,20 +106,20 @@ void AnimStream_Close(void) {
     int m;
 
     if (gpAnimStream->pRead != NULL) {
-        StaticMem_Free(gpAnimStream->pRead);
+        Circular_MemFreeFunc(gpAnimStream->pRead);
     }
     for (i = 0; i < 2; i++) {
         for (j = 0; j < 2; j++) {
             for (k = 0; k < 8; k++) {
                 for (m = 0; m < 6; m++) {
                     if (gpAnimStream->bufs[i][j][k][m].pData != NULL) {
-                        StaticMem_Free(gpAnimStream->bufs[i][j][k][m].pData);
+                        Circular_MemFreeFunc(gpAnimStream->bufs[i][j][k][m].pData);
                     }
                 }
             }
         }
     }
-    StaticMem_Free(gpAnimStream);
+    Circular_MemFreeFunc(gpAnimStream);
     gpAnimStream = NULL;
 }
 
@@ -582,7 +582,7 @@ void AnimStream_AllocBuffers(void) {
                 if (nSize > 0) {
                     for (j = 0; j < 2; j++) {
                         gpAnimStream->bufs[j][i][nStyle][nClub].pData =
-                            StaticMem_Alloc(nSize, 2, 64, "AnimStream.c", 1005);
+                            Circular_MemAllocFunc(nSize, MEMTYPE_LOW, 64, "AnimStream.c", 1005);
                         gpAnimStream->bufs[j][i][nStyle][nClub].nSize = nSize;
                         gpAnimStream->nBytes += nSize;
                     }
@@ -591,7 +591,7 @@ void AnimStream_AllocBuffers(void) {
         }
     }
     if (nMax > 0) {
-        gpAnimStream->pRead = StaticMem_Alloc(nMax, 2, 64, "AnimStream.c", 1018);
+        gpAnimStream->pRead = Circular_MemAllocFunc(nMax, MEMTYPE_LOW, 64, "AnimStream.c", 1018);
         gpAnimStream->nReadSize = nMax;
         gpAnimStream->nBytes += nMax;
     }

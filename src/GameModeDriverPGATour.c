@@ -144,9 +144,9 @@ void GameModeDriverPGATour_Locale_PgaTourMode_LoadPGAnFromStream(UStreamObject* 
     void* pData;
     u32 nSize = fn_8000E81C(pObject, &pData);
     if (nSize) {
-        gPgaData.pNames = fn_800951A0(nSize, 0x10, 1);
+        gPgaData.pNames = Mem_AllocFunc(nSize, 0x10, 1);
         Mem_cpy(gPgaData.pNames, pData, nSize);
-        StaticMem_Free(pObject);
+        Circular_MemFreeFunc(pObject);
     }
 }
 
