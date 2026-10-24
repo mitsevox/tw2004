@@ -598,7 +598,7 @@ The fixes that come up most often. Each points to its full entry below.
   matched in GameModeMatch.c and in Stableford `fn_800FE8A8`: it is EA's habit (likely from a
   macro of theirs), so it is written without a fake-match comment.
 - **[verified] Writing a float's bits through a union drops an earlier dead store; a pointer cast
-  (`*(u32*)&f = ...`) keeps it.** urandom Rand_Float 88.2 -> 100.
+  (`*(u32*)&f = ...`) keeps it.** urandom Misc_RandFuncf 88.2 -> 100.
 - **[verified] `(old & 0xFFFFFF) | (v << 24)` gives `slwi` + `rlwimi` into old; the other operand order
   inserts v the other way** (Code8009B340 fn_8009B340 96.7 -> 100). A bitfield store gives `stb` instead.
 - **[verified] Test one flag bit as `(u & bit) >> n`, not `(u >> n) & 1`** (same `extrwi`, different
@@ -960,7 +960,7 @@ The fixes that come up most often. Each points to its full entry below.
   compiler merge them (GameMode8 `SpeedGolf_RunUpdate`).
 - **[verified] A value the compiler CSEs into a callee-saved float register** (e.g. `100 - skill`
   used three times, first computed *after* a call) was a named local in the source, assigned
-  right after the call whose result it is combined with: `r = Rand_Float(0); miss = 100 - skill;
+  right after the call whose result it is combined with: `r = Misc_RandFuncf(0); miss = 100 - skill;
   err = limit * (miss * r) / 100;`. Computing it before the call moves the `fsubs`.
 - **[verified] Float locals coalesce by live range, not by name.** Two slopes computed in two
   halves of a function got different registers until they were two variables declared in the

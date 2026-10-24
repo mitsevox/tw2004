@@ -476,8 +476,8 @@ Facts already established that bear on these
 ---------------------------------------------
 
 - **The game never calls the C library `rand()` / `srand()`.** EA's own generator is
-  `Rand_Next(stream)` (`0x8000B130`), an additive lagged-Fibonacci generator with 20 words of
-  state per stream, and `Rand_Float` (`0x8000B428`) for [0, 1). Found through the AI
+  `Misc_RandFunc(stream)` (`0x8000B130`), an additive lagged-Fibonacci generator with 20 words of
+  state per stream, and `Misc_RandFuncf` (`0x8000B428`) for [0, 1). Found through the AI
   error code; listing its callers locates every random decision in the game.
 - The leaked file names contain no "AI", "CPU" or "opponent" file, so the AI logic lives in a file
   without asserts or under a name that does not say so (`user.c`? `PsMgr.c`?).
