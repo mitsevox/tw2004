@@ -41,7 +41,7 @@ UObjModel* fn_80045D80(u8* pData) {
     int nLods;
     int i;
 
-    pModel = StaticMem_Alloc(sizeof(UObjModel), 2, 0x80, "UObject3D.c", 506);
+    pModel = Circular_MemAllocFunc(sizeof(UObjModel), MEMTYPE_LOW, 0x80, "UObject3D.c", 506);
     pModel->p10 = fn_800073B4(pData, 0);
     pGroup = fn_80045F5C(fn_80045F6C(pModel->p10), 0);
     nLods = fn_80045F50(pGroup);

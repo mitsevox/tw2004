@@ -202,21 +202,21 @@ static int UStream_BeginObject(UStreamFill* pFill, UStreamChunk* pChunk) {
     }
     if (nWanted) {
         if (pChunk->uType == TAG('t', 'x', 'f', ' ')) {
-            pChunk->uFlags = 1;
+            pChunk->uFlags = MEMTYPE_HIGH;
         }
         if (pChunk->uType == TAG('C', 'p', 'y', 'r')) {
-            pChunk->uFlags = 1;
+            pChunk->uFlags = MEMTYPE_HIGH;
         }
         if (pChunk->uType == TAG('C', 'a', 'c', 't')) {
-            pChunk->uFlags = 1;
+            pChunk->uFlags = MEMTYPE_HIGH;
         }
         if (pChunk->uType == TAG('t', 'x', 'f', '2')) {
-            pChunk->uFlags = 1;
+            pChunk->uFlags = MEMTYPE_HIGH;
         }
         uPad = (uExtra + sizeof(UStreamObject)) & 0x7F;
         uPad = uPad ? 0x80 - uPad : 0;
-        pObject = StaticMem_Alloc(sizeof(UStreamObject) + uExtra + uPad + pChunk->uSize, pChunk->uFlags,
-                              0x80, "UStream.c", 732);
+        pObject = Circular_MemAllocFunc(sizeof(UStreamObject) + uExtra + uPad + pChunk->uSize, pChunk->uFlags,
+                                        0x80, "UStream.c", 732);
         pFill->pObject = pObject;
         pObject->nUnk14 = 0;
         pFill->uPos = 0;
@@ -742,7 +742,7 @@ u8 UStream_Update(void) {
         pObject->uRef30 += gRPNSBase;
         switch ((int)pObject->uType) {   // the original compares the tag signed (cmpw)
         case TAG('C', 'c', 't', 'r'):
-            StaticMem_Free(pObject);
+            Circular_MemFreeFunc(pObject);
             break;
         case TAG('R', 'P', 'N', 'S'):
             if (Resources_IsAlreadyThere(pObject)) {
@@ -750,7 +750,7 @@ u8 UStream_Update(void) {
                 if (pOld != NULL) {
                     if (pObject->uSize == pOld->uSize
                         && Mem_compare(pObject->pData, pOld->pData, pObject->uSize) == 0) {
-                        StaticMem_Free(pObject);
+                        Circular_MemFreeFunc(pObject);
                         break;
                     }
                     Resources_Del(pOld);
@@ -768,7 +768,7 @@ u8 UStream_Update(void) {
                 }
             }
             if (i >= gnNumHandlers) {
-                StaticMem_Free(pObject);
+                Circular_MemFreeFunc(pObject);
             }
             break;
         }
@@ -851,7 +851,7 @@ int UStream_Close(int nStream) {
     if (gpUsedList != NULL && nStream > 0) return -1;
     if (fn_8000633C(gStreams[(u32)nStream].hFile) != 0) return -1;
     if (gFill.pObject != NULL) {
-        StaticMem_Free(gFill.pObject);
+        Circular_MemFreeFunc(gFill.pObject);
         gFill.pObject = NULL;
     }
     gnCurStream--;
@@ -938,13 +938,13 @@ int Stream_UnregisterLoadChunkCallback(int nType) {
 
 // One-time allocation of the 18 read buffers.
 void UStream_AllocBuffers(void) {
-    gpBufferMemory = fn_800951A0(USTREAM_NUM_BUFFERS * sizeof(UStreamBuffer), 0x40, 1);
+    gpBufferMemory = Mem_AllocFunc(USTREAM_NUM_BUFFERS * sizeof(UStreamBuffer), 0x40, 1);
     gbAutoRead = 0;
 }
 
 void UStream_FreeBuffers(void) {
     if (gpBufferMemory != NULL) {
-        fn_8009527C(gpBufferMemory);
+        Mem_FreeFunc(gpBufferMemory);
         gpBufferMemory = NULL;
     }
 }
@@ -986,7 +986,7 @@ void UStream_Init(void) {
     gpUsedList = NULL;
     gFill.pObject = NULL;
     gpDoneList = NULL;
-    gpNodePool = CreateMemPool(0x200, 8, 1, 0x10);
+    gpNodePool = CreateMemPool(0x200, 8, MEMTYPE_HIGH, 0x10);
     gnNumStreams = 0;
     gnNumHandlers = 0;
     for (i = 0; i < USTREAM_MAX_HANDLERS; i++) {
@@ -1019,7 +1019,7 @@ u32 Stream_StreamLoadFixedSize(UStreamObject* pObject, u32 uMax, void* pDst) {
         }
         Mem_cpy(pDst, pObject->pData, uSize);
     }
-    StaticMem_Free(pObject);
+    Circular_MemFreeFunc(pObject);
     return uSize;
 }
 

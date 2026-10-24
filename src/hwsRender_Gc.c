@@ -69,10 +69,10 @@ u8 fn_80112C04(void) {
 // Allocate the skinned-vertex buffer: bigger for split screen.
 void fn_80112C64(int bSplit) {
     if (bSplit == 0) {
-        lbl_802824E0 = StaticMem_Alloc(0x30C00, 2, 32, "hwsRender_Gc.c", 266);
+        lbl_802824E0 = Circular_MemAllocFunc(0x30C00, MEMTYPE_LOW, 32, "hwsRender_Gc.c", 266);
         lbl_802824EC = 0x30C00;
     } else {
-        lbl_802824E0 = StaticMem_Alloc(0x5DC00, 2, 32, "hwsRender_Gc.c", 271);
+        lbl_802824E0 = Circular_MemAllocFunc(0x5DC00, MEMTYPE_LOW, 32, "hwsRender_Gc.c", 271);
         lbl_802824EC = 0x5DC00;
     }
 }
@@ -87,7 +87,7 @@ void fn_80112DA0(void);
 
 void fn_80112CEC(void) {
     if (lbl_802824E0 != NULL) {
-        StaticMem_Free(lbl_802824E0);
+        Circular_MemFreeFunc(lbl_802824E0);
         lbl_802824E0 = NULL;
     }
 }

@@ -22,7 +22,7 @@ void PictInt_CloseModule(void);
 void Pict_InitModule(void) {
     void* pBuffer;
     PictInt_InitModule();
-    pBuffer = StaticMem_Alloc(2048, 2, 32, "LLPict_Gc.c", 68);
+    pBuffer = Circular_MemAllocFunc(2048, MEMTYPE_LOW, 32, "LLPict_Gc.c", 68);
     *gpPictWorkBuffer = pBuffer;
 }
 
@@ -30,7 +30,7 @@ void Pict_InitModule(void) {
 // allocated.
 void Pict_CloseModule(void) {
     PictInt_CloseModule();
-    StaticMem_Free(*gpPictWorkBuffer);
+    Circular_MemFreeFunc(*gpPictWorkBuffer);
 }
 
 // Pict_TilePlane in place: rearranges an nWidth x nHeight plane of bytes (nHeight a multiple of 4)
@@ -109,8 +109,8 @@ LLPict* Pict_CreateFromMemory(u8* pData, u32 uSize) {
 // Frees a picture Pict_CreateFromMemory made, and its pixels; NULL does nothing.
 void Pict_Free(LLPict* pPict) {
     if (pPict != NULL) {
-        StaticMem_Free(pPict->pPixels);
-        StaticMem_Free(pPict);
+        Circular_MemFreeFunc(pPict->pPixels);
+        Circular_MemFreeFunc(pPict);
     }
 }
 
@@ -126,7 +126,7 @@ void Pict_AfterFree(void) {
 void Pict_OpenMovie(LLPict* pPict, PictStream* pStream, PictFile* (*pfnRead)(void* pArg),
                     void* pArg) {
     pPict->pPixels = NULL;
-    pStream->pDecoder = StaticMem_Alloc(80, 1, 32, "LLPict_Gc.c", 278);
+    pStream->pDecoder = Circular_MemAllocFunc(80, MEMTYPE_HIGH, 32, "LLPict_Gc.c", 278);
     pStream->pFrame = NULL;
     MAD_SetReadCallback(pfnRead, pArg);
     MAD_InitDecoder(pStream->pDecoder);
@@ -137,13 +137,13 @@ void Pict_OpenMovie(LLPict* pPict, PictStream* pStream, PictFile* (*pfnRead)(voi
 // Video and is not freed.
 void Pict_CloseMovie(LLPict* pPict, PictStream* pStream) {
     if (pPict->pPixels != NULL) {
-        StaticMem_Free(pPict->pPixels);
+        Circular_MemFreeFunc(pPict->pPixels);
     }
     if (pStream->pFrame != NULL) {
         MAD_ReleaseFrame(pStream->pDecoder, pStream->pFrame);
     }
     MAD_CloseDecoder(pStream->pDecoder);
-    StaticMem_Free(pStream->pDecoder);
+    Circular_MemFreeFunc(pStream->pDecoder);
 }
 
 // Empty in this build. LLVideo_Start calls it when a movie starts playing.
@@ -156,7 +156,7 @@ void Pict_SizeToMovie(LLPict* pPict, PictStream* pStream) {
     pPict->nWidth = pStream->pFrame->nWidth;
     pPict->nHeight = pStream->pFrame->nHeight;
     pPict->pPixels =
-        StaticMem_Alloc(pPict->nWidth * pPict->nHeight * 3 / 2, 1, 32, "LLPict_Gc.c", 346);
+        Circular_MemAllocFunc(pPict->nWidth * pPict->nHeight * 3 / 2, MEMTYPE_HIGH, 32, "LLPict_Gc.c", 346);
     pPict->fMaxU = 1.0f;
     pPict->fMaxV = 1.0f;
 }

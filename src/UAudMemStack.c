@@ -16,7 +16,8 @@ void AudMemStack_Init(AudMemStack* pAudMemStack, u8* startAddr, u32 nBytes, u32 
     pAudMemStack->nAlign = alignPow2;
     if (memBlocksA == NULL) {
         pAudMemStack->pBlocks =
-            StaticMem_Alloc(maxAllocs * sizeof(MemStackBlock), 0, alignPow2, "UAudMemStack.c", 40);
+            Circular_MemAllocFunc(maxAllocs * sizeof(MemStackBlock), MEMTYPE_SYSTEM, alignPow2,
+                                  "UAudMemStack.c", 40);
         pAudMemStack->bOwnBlocks = 1;
     } else {
         pAudMemStack->pBlocks = memBlocksA;

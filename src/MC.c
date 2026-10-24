@@ -1029,9 +1029,9 @@ void MC_FreeEAGameList(void) {
     int i;
     if (lbl_80281FF0 != NULL) {
         for (i = 0; i < lbl_80281FF4; i++) {
-            StaticMem_Free(lbl_80281FF0[i].p4);
+            Circular_MemFreeFunc(lbl_80281FF0[i].p4);
         }
-        StaticMem_Free(lbl_80281FF0);
+        Circular_MemFreeFunc(lbl_80281FF0);
         lbl_80281FF0 = NULL;
     }
 }
@@ -1075,19 +1075,19 @@ void MC_LoadEAGameListfromStream(UStreamObject* pObject) {
     s32 nLen;
 
     if (lbl_80281FF0 != NULL) {
-        StaticMem_Free(pObject);
+        Circular_MemFreeFunc(pObject);
         return;
     }
     p = (char*)pObject->pData;
     lbl_80281FF4 = MC_CountTitles(p);
     if (lbl_80281FF4 == 0) {
-        StaticMem_Free(pObject);
+        Circular_MemFreeFunc(pObject);
         return;
     }
-    lbl_80281FF0 = StaticMem_Alloc(lbl_80281FF4 * sizeof(MCEagmEntry), 2, 0x10, "MC.c", 3336);
+    lbl_80281FF0 = Circular_MemAllocFunc(lbl_80281FF4 * sizeof(MCEagmEntry), MEMTYPE_LOW, 0x10, "MC.c", 3336);
     for (i = 0; i < lbl_80281FF4; i++) {
         lbl_80281FF0[i].n8 = MC_CountSlusNumbers(p);
-        lbl_80281FF0[i].p4 = StaticMem_Alloc(lbl_80281FF0[i].n8 * 16, 2, 0x10, "MC.c", 3349);
+        lbl_80281FF0[i].p4 = Circular_MemAllocFunc(lbl_80281FF0[i].n8 * 16, MEMTYPE_LOW, 0x10, "MC.c", 3349);
         for (j = 0; j < lbl_80281FF0[i].n8 + 1; j++) {
             p = MC_SkipToNextLine(p);
         }
@@ -1108,7 +1108,7 @@ void MC_LoadEAGameListfromStream(UStreamObject* pObject) {
             p = MC_SkipToNextLine(p);
         }
     }
-    StaticMem_Free(pObject);
+    Circular_MemFreeFunc(pObject);
 }
 
 // Find the first 'eagm' entry holding a name that szGameCode starts with: mark it and set its bit

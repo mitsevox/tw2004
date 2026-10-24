@@ -596,12 +596,12 @@ void Math_PreInitLog2Table(void) {
 // Math_FillLog2Table. Nothing in this build reads the table.
 void Math_InitLog2Table(void) {
     Math_PreInitLog2Table();
-    gLog2Table = fn_800951A0(0x400 * sizeof(f32), 16, 1);
+    gLog2Table = Mem_AllocFunc(0x400 * sizeof(f32), 16, 1);
     Math_FillLog2Table();
 }
 
 void Math_FreeLog2Table(void) {
-    fn_8009527C(gLog2Table);
+    Mem_FreeFunc(gLog2Table);
 }
 
 // The float log: the natural logarithm of x, through the double log().
@@ -609,7 +609,7 @@ f32 logf(f32 x) {
     return log(x);
 }
 
-// Makes a pool of nNodes nodes of uNodeSize bytes each from one StaticMem_Alloc block (uFlags is
+// Makes a pool of nNodes nodes of uNodeSize bytes each from one Circular_MemAllocFunc block (uFlags is
 // its memory type): the header is padded to uAlign (a power of two) and each node's size is rounded
 // up to it. The nodes are filled with 0xDD and chained into the free list, the last one first. NULL
 // when the allocation fails.
@@ -623,7 +623,7 @@ UMemPool* CreateMemPool(int nNodes, u32 uNodeSize, u32 uFlags, u32 uAlign) {
     uSize = uAlign + uNodeSize;
     uSize = (uSize - 1) & ~(uAlign - 1);
     uTotal = uAlign + nNodes * uSize;
-    pPool = StaticMem_Alloc(uTotal, uFlags, uAlign, "UMemPool.c", 82);
+    pPool = Circular_MemAllocFunc(uTotal, uFlags, uAlign, "UMemPool.c", 82);
     if (pPool != NULL) {
         pPool->nNodes = nNodes;
         pPool->nFree = nNodes;
@@ -643,9 +643,9 @@ UMemPool* CreateMemPool(int nNodes, u32 uNodeSize, u32 uFlags, u32 uAlign) {
     return pPool;
 }
 
-// Frees a pool and all its nodes at once (its one StaticMem_Alloc block).
+// Frees a pool and all its nodes at once (its one Circular_MemAllocFunc block).
 void DeleteMemPool(UMemPool* pPool) {
-    StaticMem_Free(pPool);
+    Circular_MemFreeFunc(pPool);
 }
 
 // Takes a node off the free list and fills it with 0xBB; NULL when the pool is empty.

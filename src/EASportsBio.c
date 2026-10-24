@@ -52,9 +52,9 @@ void EASBio_InitOnce(void) {
     lbl_80261040.pCallbacks = SFIO_spGetCallbacks();
     lbl_80261040.uHeapID = 0;
     lbl_80261040.uGamesPlayedTypeLanguage = 'en';
-    StaticMem_SetMode(0);
+    Circular_SetCurrentMemType(MEMTYPE_SYSTEM);
     fn_8012D394(&lbl_80261040);
-    StaticMem_SetMode(2);
+    Circular_SetCurrentMemType(MEMTYPE_LOW);
     lbl_80281988->bNewAccomplishment = 0;
     lbl_80281988->bBioLoaded = 0;
     fn_8012DAB8(2);
@@ -92,14 +92,14 @@ s32 EASBio_WaitForAsyncProcessToComplete(void) {
 // Copies the 'EASI' icon into the manager's buffer.
 void fn_80124B10(UStreamObject* pObject) {
     Mem_cpy(lbl_80281988->pIcon, pObject->pData, pObject->uSize);
-    StaticMem_Free(pObject);
+    Circular_MemFreeFunc(pObject);
 }
 
 // Sets up the manager for the front end: no pictures yet, room for the icon, nothing pending.
 void fn_80124B54(void) {
     lbl_80281988->pCurrentGameImage = NULL;
     lbl_80281988->pOurGameImage = NULL;
-    lbl_80281988->pIcon = StaticMem_Alloc(0x2000, 2, 32, "EASportsBio.c", 454);
+    lbl_80281988->pIcon = Circular_MemAllocFunc(0x2000, MEMTYPE_LOW, 32, "EASportsBio.c", 454);
     lbl_8028257D = 0;
     lbl_8028257C = 0;
     lbl_80282578 = 0;
@@ -249,13 +249,13 @@ void fn_80124C10(void) {
 
 void fn_801250C0(void) {
     if (lbl_80281988->pCurrentGameImage != NULL) {
-        StaticMem_Free(lbl_80281988->pCurrentGameImage);
+        Circular_MemFreeFunc(lbl_80281988->pCurrentGameImage);
     }
     if (lbl_80281988->pOurGameImage != NULL) {
-        StaticMem_Free(lbl_80281988->pOurGameImage);
+        Circular_MemFreeFunc(lbl_80281988->pOurGameImage);
     }
     if (lbl_80281988->pIcon != NULL) {
-        StaticMem_Free(lbl_80281988->pIcon);
+        Circular_MemFreeFunc(lbl_80281988->pIcon);
     }
 }
 

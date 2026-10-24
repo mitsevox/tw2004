@@ -907,7 +907,7 @@ config.libs = [
             Object(Matching, "unsorted/code_800082F8.c"),
             Object(Matching, "GoEntry.c"),
             Object(Matching, "MathQuat.c"),
-            Object(Matching, "StaticMemory.c"),
+            Object(Matching, "UCirc.c"),
             Object(Matching, "UMemPool.c"),
             Object(Matching, "urandom.c"),
             Object(Matching, "URes.c"),

@@ -105,7 +105,7 @@ int MtaLib_ApplyToPose(void* pUnused, MtaLib* pLib, SkelPose1* pPose, f32 fTime)
 }
 
 void MtaLib_Free(void* pItem) {
-    StaticMem_Free(pItem);
+    Circular_MemFreeFunc(pItem);
 }
 
 // Links a library that is already in the machine's byte order (MtaLib_SwapAndLink without the
@@ -172,10 +172,10 @@ void MtaLib_FreeBank(MalBank* pBank) {
             for (j = 0; j < pBank->aGroup[i].nNum; j++) {
                 MtaLib_Free(pBank->aGroup[i].apItem[j]);
             }
-            StaticMem_Free(pBank->aGroup[i].apItem);
+            Circular_MemFreeFunc(pBank->aGroup[i].apItem);
         }
     }
-    StaticMem_Free(pBank);
+    Circular_MemFreeFunc(pBank);
 }
 
 // The bank of slot nBank, NULL outside slots 0 and 1.
@@ -225,7 +225,7 @@ MalBank* MtaLib_LoadBank(u8* pData) {
     MalBank* pBank;
     MtaLib* pLib;
 
-    pBank = StaticMem_Alloc(sizeof(MalBank), 2, 0x40, "mtalib.c", 474);
+    pBank = Circular_MemAllocFunc(sizeof(MalBank), MEMTYPE_LOW, 0x40, "mtalib.c", 474);
     gMtaLibBytes += sizeof(MalBank);
     BYTESWAP_SWAPDATA(&pData, (u8*)&pBank->nNumGroups, 4, 4);
     if ((uptr)pData & 0xF) {
@@ -236,7 +236,7 @@ MalBank* MtaLib_LoadBank(u8* pData) {
         pGroup = &pBank->aGroup[nGroup];
         BYTESWAP_SWAPDATA(&pData, (u8*)&pGroup->nNum, 4, 4);
         if (pGroup->nNum != 0) {
-            pGroup->apItem = StaticMem_Alloc(pGroup->nNum * 4, 2, 0x40, "mtalib.c", 490);
+            pGroup->apItem = Circular_MemAllocFunc(pGroup->nNum * 4, MEMTYPE_LOW, 0x40, "mtalib.c", 490);
             for (j = 0; j < pGroup->nNum; j++) {
                 if ((uptr)pData & 0xF) {
                     pData = (u8*)(((uptr)pData & ~0xF) + 0x10);
@@ -245,7 +245,7 @@ MalBank* MtaLib_LoadBank(u8* pData) {
                 pB = pA = pData;
                 ByteSwap_Records(&pA, &pB, aHeader, 10, 1);
                 pLib = (MtaLib*)pData;
-                pGroup->apItem[j] = StaticMem_Alloc(pLib->nBytes, 2, 0x40, "mtalib.c", 501);
+                pGroup->apItem[j] = Circular_MemAllocFunc(pLib->nBytes, MEMTYPE_LOW, 0x40, "mtalib.c", 501);
                 gMtaLibBytes += pLib->nBytes;
                 nSize = pLib->nBytes;
                 pB = pA = pData;
@@ -269,7 +269,7 @@ void MtaLib_OnLoaded(UStreamObject* pObject) {
     if (uSlot < 2 && gMtaLibBanks[uSlot] == NULL) {
         gMtaLibBanks[uSlot] = MtaLib_LoadBank(pObject->pData);
     }
-    StaticMem_Free(pObject);
+    Circular_MemFreeFunc(pObject);
 }
 
 void MtaLib_Register(void) {

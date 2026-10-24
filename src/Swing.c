@@ -269,9 +269,9 @@ void SW_vInitModule(void) {
         gPlayers[i].swing.fAlpha = 0.0f;
     }
     for (i = 0; i < 2; i++) {
-        gpSwing->p94[i] = StaticMem_Alloc(0x138, 2, 0x10, "Swing.c", 555);
-        gpSwing->p9C[i] = StaticMem_Alloc(0x68, 2, 0x10, "Swing.c", 556);
-        gpSwing->pA4[i] = StaticMem_Alloc(0xD0, 2, 0x10, "Swing.c", 557);
+        gpSwing->p94[i] = Circular_MemAllocFunc(0x138, MEMTYPE_LOW, 0x10, "Swing.c", 555);
+        gpSwing->p9C[i] = Circular_MemAllocFunc(0x68, MEMTYPE_LOW, 0x10, "Swing.c", 556);
+        gpSwing->pA4[i] = Circular_MemAllocFunc(0xD0, MEMTYPE_LOW, 0x10, "Swing.c", 557);
     }
 }
 
@@ -282,9 +282,9 @@ void SW_vCloseModule(void) {
     SD_FreeShaderObject(gpSwing->mesh[0]);
     SD_FreeShaderObject(gpSwing->mesh[1]);
     for (i = 0; i < 2; i++) {
-        StaticMem_Free(gpSwing->p94[i]);
-        StaticMem_Free(gpSwing->p9C[i]);
-        StaticMem_Free(gpSwing->pA4[i]);
+        Circular_MemFreeFunc(gpSwing->p94[i]);
+        Circular_MemFreeFunc(gpSwing->p9C[i]);
+        Circular_MemFreeFunc(gpSwing->pA4[i]);
     }
 }
 

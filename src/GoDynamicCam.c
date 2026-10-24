@@ -117,7 +117,7 @@ static void DynamicCam_LoadCAMSfromStream(UStreamObject* pStreamData) {
         gpDynCam->nFilesLoaded = 1;
     }
     if (gpDynCam->pSequences != NULL) {
-        StaticMem_Free(pStreamData);
+        Circular_MemFreeFunc(pStreamData);
         return;
     }
     srcPtr = pStreamData->pData;
@@ -125,16 +125,18 @@ static void DynamicCam_LoadCAMSfromStream(UStreamObject* pStreamData) {
     srcPtr = pStreamData->pData + 4;
     BYTESWAP_SWAPDATA(&srcPtr, (u8*)&numTriggersToLoad, sizeof(numTriggersToLoad), 4);
     gpDynCam->pSequences =
-        StaticMem_Alloc(numSeqsToLoad * sizeof(CameraSequence_t), 2, 0, "GoDynamicCam.c", 403);
+        Circular_MemAllocFunc(numSeqsToLoad * sizeof(CameraSequence_t), MEMTYPE_LOW, 0,
+                              "GoDynamicCam.c", 403);
     gpDynCam->pChoices =
-        StaticMem_Alloc(numTriggersToLoad * sizeof(CameraEventTrigger_t), 2, 0, "GoDynamicCam.c", 404);
+        Circular_MemAllocFunc(numTriggersToLoad * sizeof(CameraEventTrigger_t), MEMTYPE_LOW, 0,
+                              "GoDynamicCam.c", 404);
     gpDynCam->nSequences = 0;
     gpDynCam->nChoicesUsed = 0;
     srcPtr = pStreamData->pData + 8;
     DynamicCam_CopySequenceData(srcPtr, (u8*)gpDynCam->pSequences, numSeqsToLoad);
     DynamicCam_ParseCameraSeqs(numSeqsToLoad);
     DynamicCam_ParseNextSeqs();
-    StaticMem_Free(pStreamData);
+    Circular_MemFreeFunc(pStreamData);
 }
 
 // The round's 'CAMV' handler, the shot file: copies the shots (DynamicCam_CopyScriptData) and sets
@@ -146,40 +148,40 @@ static void DynamicCam_LoadCAMVfromStream(UStreamObject* pStreamData) {
         gpDynCam->nFilesLoaded = 1;
     }
     if (gpDynCam->pShots != NULL) {
-        StaticMem_Free(pStreamData);
+        Circular_MemFreeFunc(pStreamData);
         return;
     }
-    gpDynCam->pShots = StaticMem_Alloc(pStreamData->uSize, 2, 0, "GoDynamicCam.c", 454);
+    gpDynCam->pShots = Circular_MemAllocFunc(pStreamData->uSize, MEMTYPE_LOW, 0, "GoDynamicCam.c", 454);
     DynamicCam_CopyScriptData(pStreamData->pData, gpDynCam->pShots, pStreamData->uSize / sizeof(CamShot));
     DynamicCam_ParseCameraViews(pStreamData->uSize);
-    StaticMem_Free(pStreamData);
+    Circular_MemFreeFunc(pStreamData);
 }
 
 // The front end's 'CAMV' handler: as DynamicCam_LoadCAMVfromStream, but nFilesLoaded is left alone
 // and the shots are set up by DynamicCam_ParseCameraViewsFE.
 static void DynamicCam_LoadCAMVfromStreamFE(UStreamObject* pStreamData) {
     if (gpDynCam->pShots != NULL) {
-        StaticMem_Free(pStreamData);
+        Circular_MemFreeFunc(pStreamData);
         return;
     }
-    gpDynCam->pShots = StaticMem_Alloc(pStreamData->uSize, 2, 0, "GoDynamicCam.c", 495);
+    gpDynCam->pShots = Circular_MemAllocFunc(pStreamData->uSize, MEMTYPE_LOW, 0, "GoDynamicCam.c", 495);
     DynamicCam_CopyScriptData(pStreamData->pData, gpDynCam->pShots, pStreamData->uSize / sizeof(CamShot));
     DynamicCam_ParseCameraViewsFE(pStreamData->uSize);
-    StaticMem_Free(pStreamData);
+    Circular_MemFreeFunc(pStreamData);
 }
 
 // The 'CAMA' handler, the anim pairs: copies them (DynamicCam_CopyAnimPairData) and turns their
 // indexes into pointers (DynamicCam_ParseAnimPairs). Frees the object; a second file is dropped.
 static void DynamicCam_LoadCAMAfromStream(UStreamObject* pStreamData) {
     if (gpDynCam->pAnimPairs != NULL) {
-        StaticMem_Free(pStreamData);
+        Circular_MemFreeFunc(pStreamData);
         return;
     }
-    gpDynCam->pAnimPairs = StaticMem_Alloc(pStreamData->uSize, 2, 0, "GoDynamicCam.c", 536);
+    gpDynCam->pAnimPairs = Circular_MemAllocFunc(pStreamData->uSize, MEMTYPE_LOW, 0, "GoDynamicCam.c", 536);
     DynamicCam_CopyAnimPairData(pStreamData->pData, gpDynCam->pAnimPairs,
                                 pStreamData->uSize / sizeof(CameraAnimPairs_t));
     DynamicCam_ParseAnimPairs(pStreamData->uSize);
-    StaticMem_Free(pStreamData);
+    Circular_MemFreeFunc(pStreamData);
 }
 
 // Copies numSeqs sequences from the file (little-endian) into dest, swapping each value's bytes.
@@ -397,7 +399,8 @@ static void DynamicCam_ParseAnimPairs(int size) {
 // Allocates the dynamic cameras' tables (gpDynCam), empty. Called as the front end and as a round
 // start (GO_vInitFE, GO_vInitIG).
 void DynamicCam_Init(void) {
-    DynamicCamManager_t* pManager = StaticMem_Alloc(sizeof(DynamicCamManager_t), 2, 0, "GoDynamicCam.c", 938);
+    DynamicCamManager_t* pManager = Circular_MemAllocFunc(sizeof(DynamicCamManager_t), MEMTYPE_LOW, 0,
+                                                          "GoDynamicCam.c", 938);
 
     gpDynCam = pManager;
     pManager->pSequences = NULL;
@@ -418,23 +421,23 @@ void DynamicCam_DeInit(void) {
     gpDynCam->nAnimPairs = 0;
     gpDynCam->nChoicesUsed = 0;
     if (gpDynCam->pSequences != NULL) {
-        StaticMem_Free(gpDynCam->pSequences);
+        Circular_MemFreeFunc(gpDynCam->pSequences);
         gpDynCam->pSequences = NULL;
     }
     if (gpDynCam->pShots != NULL) {
-        StaticMem_Free(gpDynCam->pShots);
+        Circular_MemFreeFunc(gpDynCam->pShots);
         gpDynCam->pShots = NULL;
     }
     if (gpDynCam->pAnimPairs != NULL) {
-        StaticMem_Free(gpDynCam->pAnimPairs);
+        Circular_MemFreeFunc(gpDynCam->pAnimPairs);
         gpDynCam->pAnimPairs = NULL;
     }
     if (gpDynCam->pChoices != NULL) {
-        StaticMem_Free(gpDynCam->pChoices);
+        Circular_MemFreeFunc(gpDynCam->pChoices);
         gpDynCam->pChoices = NULL;
     }
     gpDynCam->nFilesLoaded = 0;
-    StaticMem_Free(gpDynCam);
+    Circular_MemFreeFunc(gpDynCam);
 }
 
 // Places a dynamic shot's camera at position for this frame, by the shot's tracking mode

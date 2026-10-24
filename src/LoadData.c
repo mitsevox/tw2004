@@ -39,15 +39,15 @@ void fn_8000B8F4(void) {
         if (lbl_801A2614[i]) {
             fn_8000FFAC(lbl_801A26DC[i]);
         }
-        StaticMem_Free(lbl_801A26DC[i]);
+        Circular_MemFreeFunc(lbl_801A26DC[i]);
         lbl_801A26DC[i] = NULL;
     }
 }
 
 void fn_8000B984(void) {
-    lbl_80281C04 = fn_800951A0(147700, 16, 1);
-    lbl_80281C0C = fn_800951A0(sizeof(UStreamObject), 16, 1);
-    lbl_80281C08 = fn_800951A0(TXF2_KEPT_SIZE, 16, 1);
+    lbl_80281C04 = Mem_AllocFunc(147700, 16, 1);
+    lbl_80281C0C = Mem_AllocFunc(sizeof(UStreamObject), 16, 1);
+    lbl_80281C08 = Mem_AllocFunc(TXF2_KEPT_SIZE, 16, 1);
 }
 
 void fn_8000B9E4(void) {
@@ -69,7 +69,7 @@ void fn_8000BA6C(void) {
 void fn_8000BA94(UStreamObject* pObject) {
     lbl_801A25F0.uSize = pObject->uSize;
     Mem_cpy(lbl_80281C04, pObject->pData, pObject->uSize);
-    StaticMem_Free(pObject);
+    Circular_MemFreeFunc(pObject);
 }
 
 void fn_8000BAE0(void) {
@@ -126,12 +126,12 @@ void fn_8000BCA0(UStreamObject* pObject) {
         Mem_cpy(lbl_80281C0C, pObject, sizeof(UStreamObject));
         Mem_cpy(lbl_80281C08, pObject->pData, TXF2_KEPT_SIZE);
         lbl_80281C0C->pData = lbl_80281C08;
-        StaticMem_Free(pObject);
+        Circular_MemFreeFunc(pObject);
         return;
     }
     lbl_801A26DC[n] = fn_8000FB88(pObject, NULL, 0);
     lbl_801A2614[n] = 1;
-    StaticMem_Free(pObject);
+    Circular_MemFreeFunc(pObject);
     lbl_80281C00++;
 }
 

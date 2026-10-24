@@ -561,7 +561,7 @@ void SkinPart_AllocChoices(Skin* pSkin) {
     nBytes = nParts * sizeof(SkinChoice);
     for (i = 0; i < 4; i++) {
         if (nParts != 0) {
-            pSkin->aParts[i] = StaticMem_Alloc(nBytes, 2, 16, "SkinPart.c", 655);
+            pSkin->aParts[i] = Circular_MemAllocFunc(nBytes, MEMTYPE_LOW, 16, "SkinPart.c", 655);
             memset(pSkin->aParts[i], 0, nBytes);
         } else {
             pSkin->aParts[i] = NULL;
@@ -570,7 +570,7 @@ void SkinPart_AllocChoices(Skin* pSkin) {
         if (nSets != 0) {
             // nSets * 8 is nSets SkinChoices; an int product here, so it is not shared with the
             // memset's size (sizeof makes that one unsigned)
-            pSkin->aSets[i] = StaticMem_Alloc(nSets * 8, 2, 16, "SkinPart.c", 670);
+            pSkin->aSets[i] = Circular_MemAllocFunc(nSets * 8, MEMTYPE_LOW, 16, "SkinPart.c", 670);
             memset(pSkin->aSets[i], 0, nSets * sizeof(SkinChoice));
             for (j = 0; j < nSets; j++) {
                 if (SkinPart_GetNumSetOptions(pSkin, j, 0) >= 1) {
@@ -596,10 +596,10 @@ void SkinPart_FreeChoices(Skin* pSkin) {
 
     for (i = 0; i < 4; i++) {
         if (pSkin->aParts[i] != NULL) {
-            StaticMem_Free(pSkin->aParts[i]);
+            Circular_MemFreeFunc(pSkin->aParts[i]);
         }
         if (pSkin->aSets[i] != NULL) {
-            StaticMem_Free(pSkin->aSets[i]);
+            Circular_MemFreeFunc(pSkin->aSets[i]);
         }
     }
 }
@@ -1137,7 +1137,7 @@ void SkinPart_ListOptionTextures(Skin* pSkin, int n, SkinListEntry* aList, s32* 
 
 // Lists the textures the skins' parts need as copy nCopy chooses them (each part's chosen variant
 // and option; for a part whose name code is in aIds, every option of every variant), each once with
-// its recolouring, in a new *ppList (StaticMem; the caller frees it). Returns the list's length.
+// its recolouring, in a new *ppList (MEMTYPE_HIGH; the caller frees it). Returns the list's length.
 s32 SkinPart_ListChosenTextures(Skin** apSkins, int nSkins, SkinListEntry** ppList, u64* aIds, int nIds,
                                 int nCopy) {
     int j;
@@ -1160,7 +1160,7 @@ s32 SkinPart_ListChosenTextures(Skin** apSkins, int nSkins, SkinListEntry** ppLi
         }
     }
     nList = 0;
-    *ppList = StaticMem_Alloc(n * sizeof(SkinListEntry), 1, 0, "SkinPart.c", 1980);
+    *ppList = Circular_MemAllocFunc(n * sizeof(SkinListEntry), MEMTYPE_HIGH, 0, "SkinPart.c", 1980);
     for (i = 0; i < nSkins; i++) {
         if (apSkins[i] != NULL && apSkins[i]->pModel != NULL && apSkins[i]->pModel->pDesc != NULL) {
             pSkin = apSkins[i];
@@ -1200,7 +1200,7 @@ s32 SkinPart_ListChosenTextures(Skin** apSkins, int nSkins, SkinListEntry** ppLi
 static inline SkinDesc* fn_800CE8C0_Read(SkinDesc* p) { return p; }
 
 // Lists every texture any option of the skins' parts can use (patched for copy 0's chosen sets),
-// each once with its recolouring, in a new *ppList (StaticMem; the caller frees it). Returns the
+// each once with its recolouring, in a new *ppList (MEMTYPE_HIGH; the caller frees it). Returns the
 // list's length. Character_LoadTextures loads only these outside the front end.
 s32 SkinPart_ListAllTextures(Skin** apSkins, int nSkins, SkinListEntry** ppList) {
     s32 nList;
@@ -1218,7 +1218,7 @@ s32 SkinPart_ListAllTextures(Skin** apSkins, int nSkins, SkinListEntry** ppList)
             n += apSkins[i]->pModel->pDesc->n10;
         }
     }
-    *ppList = StaticMem_Alloc(n * sizeof(SkinListEntry), 1, 0, "SkinPart.c", 2068);
+    *ppList = Circular_MemAllocFunc(n * sizeof(SkinListEntry), MEMTYPE_HIGH, 0, "SkinPart.c", 2068);
     nList = 0;
     for (i = 0; i < nSkins; i++) {
         if (apSkins[i] != NULL && apSkins[i]->pModel != NULL &&
@@ -1288,7 +1288,7 @@ void SkinPart_DropUnusedTextures(Skin** apSkins, int nSkins, DynTex* pTex) {
     }
     fn_8010ADA4(pTex);
     if (pList != NULL) {
-        StaticMem_Free(pList);
+        Circular_MemFreeFunc(pList);
     }
 }
 
@@ -1317,7 +1317,7 @@ void SkinPart_QueueMissingTextures(Skin** apSkins, int nSkins, DynTex* pTex, u64
         }
     }
     if (pList != NULL) {
-        StaticMem_Free(pList);
+        Circular_MemFreeFunc(pList);
     }
 }
 

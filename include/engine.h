@@ -17,17 +17,37 @@ void* Mem_cpy(void* s1, const void* s2, u32 n);                // memcpy; return
 void* Mem_move(void* dst, const void* src, u32 n);             // memmove: may overlap; returns dst
 void* Mem_set(void* s, int c, u32 n);                          // memset; returns s
 int   Mem_compare(const void* s1, const void* s2, u32 n);      // memcmp: -1, 0 or 1
-// Allocates (StaticMemory.c): nMode picks the system heap or a part of the static heap (see there).
-void* StaticMem_Alloc(int nSize, int nMode, int nAlign, const char* pFile, int nLine);
-void  StaticMem_Free(void* p);                  // free
-void  StaticMem_SetMode(s32 n);                 // } the StaticMem_Alloc mode TibExtMemAlloc uses
-s32   StaticMem_GetMode(void);                  // } (EASportsBio.c: 0 while the Bio starts, then 2)
-void  StaticMem_ResetCount(void);               // start a new count of the bytes taken
-void  StaticMem_StartCount(void);               // } counting on / off
-void  StaticMem_StopCount(void);                // }
-s32   StaticMem_GetCount(void);                 // the bytes taken since StaticMem_ResetCount
+// UCirc.c: the game's own heap, one big block from the system heap with blocks cut from either end
+// of its free spans.
+
+// Where Circular_MemAllocFunc takes a block from: the system heap, or the low or high end of a free
+// span of the game's heap.
+typedef enum TTypeAcces {
+    MEMTYPE_SYSTEM        = 0,  // the system heap (Mem_AllocFunc)
+    MEMTYPE_HIGH          = 1,  // the high end of the first span big enough, searching down from
+                                // the cursor
+    MEMTYPE_LOW           = 2,  // the low end of the first span big enough, searching up from the
+                                // cursor, which then moves to that span
+    MEMTYPE_HIGH_BEST_FIT = 4   // the high end of the smallest span big enough
+} TTypeAcces;
+
+void  Circular_DestroyBuffer(void);
+void  Circular_InitOnce(void);
+void  Circular_PreInit(void);
+void  Circular_CreateBuffer(void);
+void  Circular_InitBuffer(void);
+void  Circular_CloseBuffer(void);
+void* Circular_MemAllocFunc(int MemSize, TTypeAcces TypeMem, int align, const char* filename,
+                            int lineNumber);
+void  Circular_MemFreeFunc(void* Ptr);
+void  Circular_SetCurrentMemType(TTypeAcces eType);
+TTypeAcces Circular_GetCurrentMemType(void);
+void  Circular_ClearMemorySizeRecorder(void);
+void  Circular_StartMemorySizeRecorder(void);
+void  Circular_StopMemorySizeRecorder(void);
+s32   Circular_GetCurrentMemorySizeRecorder(void);
 // The main-memory heap (GoShaderObject_Particle_Gc.c): fn_80095108 makes it from the arena.
-// fn_800951A0 returns a block aligned to nAlign (0: 16) that remembers the heap block and its
+// Mem_AllocFunc returns a block aligned to nAlign (0: 16) that remembers the heap block and its
 // own padding just before and after it (every caller passes 1 as n, which it does not read).
 typedef struct HeapBlockHead {
     void* pBlock;               // 0x0  the heap block it is in
@@ -35,8 +55,8 @@ typedef struct HeapBlockHead {
 } HeapBlockHead;
 
 void  fn_80095108(void);
-void* fn_800951A0(u32 uSize, u16 nAlign, int n);
-void  fn_8009527C(void* p);             // frees what fn_800951A0 allocated
+void* Mem_AllocFunc(u32 uSize, u16 nAlign, int n);
+void  Mem_FreeFunc(void* p);            // frees what Mem_AllocFunc allocated
 
 // The game's clock (LLTime.c): a 64-bit count of ticks since the current mode started (each mode's
 // start calls TI_vInitModule), made from the 32-bit tick (TI_uiReadCP0Count) by counting its
@@ -1130,7 +1150,8 @@ typedef struct UStreamObject {
     struct UStreamObject* pPrev;  // 0x0C  finished-object queue; resource list: toward the tail
     struct UStreamObject* pNext;  // 0x10  resource list: toward the head
     int   nUnk14;                 // 0x14
-    u32   uFlags;                 // 0x18  chunk+0x14; set to 1 for txf / Cpyr / Cact / txf2
+    u32   uFlags;                 // 0x18  chunk+0x14: where its block came from (a TTypeAcces;
+                                  //       MEMTYPE_HIGH for txf / Cpyr / Cact / txf2)
     u32   uType;                  // 0x1C  chunk+0x18, e.g. 'ter '
     u32   uId;                    // 0x20  chunk+0x1C: the object's id within its type (Resources_Get
                                   //       finds objects by type and id); for skalib's SAL and BNK

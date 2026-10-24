@@ -35,14 +35,14 @@ void CA_vUpdateInternalFieldOfViewData(CamLens* pLens) {
 
 // A new lens (0xBC bytes) with CA_vSetDefaultCamera's settings.
 CamLens* CA_spCreateCamera(void) {
-    CamLens* pLens = StaticMem_Alloc(sizeof(CamLens), 2, 16, "GoCamera.c", 152);
+    CamLens* pLens = Circular_MemAllocFunc(sizeof(CamLens), MEMTYPE_LOW, 16, "GoCamera.c", 152);
 
     CA_vSetDefaultCamera(pLens);
     return pLens;
 }
 
 void CA_vReleaseCamera(CamLens* pLens) {
-    StaticMem_Free(pLens);
+    Circular_MemFreeFunc(pLens);
 }
 
 // fake match: stands in for a function the original linker stripped. The file's pool has 0.1,

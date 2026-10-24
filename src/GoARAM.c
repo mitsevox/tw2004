@@ -1,5 +1,5 @@
 // GoARAM.c (EA's name, from its asserts): the audio RAM (ARAM): its set-up (GoARAM_Init), its heap
-// and the queue of DMA transfers between main memory and ARAM (the state at lbl_801F6680). The
+// and the queue of DMA transfers between main memory and ARAM (the state at gARAMState). The
 // front end, the memory card and the animation code keep data here while it is not needed.
 
 #include "core/goaram.h"
@@ -25,8 +25,8 @@ s32        GoARAM_GetTransferState(ARAMTransfer* pTransfer);
 void       fn_80007328(void);
 void       fn_80007368(void);
 
-ARAMState lbl_801F6680;
-ARAMState* lbl_802814C8 = &lbl_801F6680;
+ARAMState gARAMState;
+ARAMState* gpARAMState = &gARAMState;
 
 // Sets up a heap of uSize bytes at ARAM address uBase, with nBlocks block records after pHeap:
 // one record holds the whole heap as free, the others go to the spare list.
@@ -55,7 +55,7 @@ ARAMHeap* GoARAM_HeapInit(u32 uSize, u32 uBase, u32 nBlocks, ARAMHeap* pHeap) {
 
 void fn_800B5D08(ARAMHeap* pHeap) {
     if (pHeap->p20 != NULL) {
-        StaticMem_Free(pHeap->p20);
+        Circular_MemFreeFunc(pHeap->p20);
     }
 }
 
@@ -256,27 +256,27 @@ void GoARAM_HandleTransferDone(ARQRequest* pRequest) {
 void GoARAM_ReleaseTransfer(ARAMTransfer* pTransfer) {
     pTransfer->nState = 0;
     if (pTransfer == pTransfer->pNext) {
-        lbl_802814C8->pQueued = NULL;
+        gpARAMState->pQueued = NULL;
     } else {
-        if (pTransfer == lbl_802814C8->pQueued) {
-            lbl_802814C8->pQueued = pTransfer->pNext;
+        if (pTransfer == gpARAMState->pQueued) {
+            gpARAMState->pQueued = pTransfer->pNext;
         }
         pTransfer->pPrev->pNext = pTransfer->pNext;
         pTransfer->pNext->pPrev = pTransfer->pPrev;
         pTransfer->pPrev = pTransfer;
         pTransfer->pNext = pTransfer;
     }
-    lbl_802814C8->nQueued--;
-    if (lbl_802814C8->pUnused != NULL) {
-        pTransfer->pNext = lbl_802814C8->pUnused;
-        pTransfer->pPrev = lbl_802814C8->pUnused->pPrev;
-        if (lbl_802814C8->pUnused->pPrev != NULL) {
-            lbl_802814C8->pUnused->pPrev->pNext = pTransfer;
+    gpARAMState->nQueued--;
+    if (gpARAMState->pUnused != NULL) {
+        pTransfer->pNext = gpARAMState->pUnused;
+        pTransfer->pPrev = gpARAMState->pUnused->pPrev;
+        if (gpARAMState->pUnused->pPrev != NULL) {
+            gpARAMState->pUnused->pPrev->pNext = pTransfer;
         }
-        lbl_802814C8->pUnused->pPrev = pTransfer;
+        gpARAMState->pUnused->pPrev = pTransfer;
     }
-    lbl_802814C8->pUnused = pTransfer;
-    lbl_802814C8->nUnused++;
+    gpARAMState->pUnused = pTransfer;
+    gpARAMState->nUnused++;
 }
 
 // Sets up the ARAM: the heap over all of it and ARAM_NUM_TRANSFERS unused transfers.
@@ -289,49 +289,50 @@ void GoARAM_Init(void) {
     ARInit(NULL, 0);
     uBase = ARGetBaseAddress();
     uEnd = ARGetSize();
-    lbl_802814C8->pHeapMem = fn_800951A0(sizeof(ARAMHeap) + ARAM_NUM_BLOCKS * sizeof(ARAMBlock), 16, 1);
-    lbl_802814C8->pHeap = GoARAM_HeapInit(uEnd - uBase, uBase, ARAM_NUM_BLOCKS, lbl_802814C8->pHeapMem);
-    lbl_802814C8->p8 = fn_800951A0(ARAM_NUM_TRANSFERS * sizeof(ARAMTransfer), 16, 1);
-    lbl_802814C8->nTransfers = ARAM_NUM_TRANSFERS;
-    if (lbl_802814C8->p8 == NULL) {
-        lbl_802814C8->p18 = StaticMem_Alloc(ARAM_NUM_TRANSFERS * sizeof(ARAMTransfer), 2, 16, "GoARAM.c", 192);
-        lbl_802814C8->pTransfers = lbl_802814C8->p18;
+    gpARAMState->pHeapMem = Mem_AllocFunc(sizeof(ARAMHeap) + ARAM_NUM_BLOCKS * sizeof(ARAMBlock), 16, 1);
+    gpARAMState->pHeap = GoARAM_HeapInit(uEnd - uBase, uBase, ARAM_NUM_BLOCKS, gpARAMState->pHeapMem);
+    gpARAMState->p8 = Mem_AllocFunc(ARAM_NUM_TRANSFERS * sizeof(ARAMTransfer), 16, 1);
+    gpARAMState->nTransfers = ARAM_NUM_TRANSFERS;
+    if (gpARAMState->p8 == NULL) {
+        gpARAMState->p18 = Circular_MemAllocFunc(ARAM_NUM_TRANSFERS * sizeof(ARAMTransfer), MEMTYPE_LOW, 16,
+                                                 "GoARAM.c", 192);
+        gpARAMState->pTransfers = gpARAMState->p18;
     } else {
-        lbl_802814C8->p18 = NULL;
-        lbl_802814C8->pTransfers = lbl_802814C8->p8;
+        gpARAMState->p18 = NULL;
+        gpARAMState->pTransfers = gpARAMState->p8;
     }
-    lbl_802814C8->pQueued = NULL;
-    lbl_802814C8->pUnused = NULL;
-    pTransfer = lbl_802814C8->pTransfers;
+    gpARAMState->pQueued = NULL;
+    gpARAMState->pUnused = NULL;
+    pTransfer = gpARAMState->pTransfers;
     for (i = 0; i < ARAM_NUM_TRANSFERS; i++) {
         pTransfer->pNext = pTransfer;
         pTransfer->pPrev = pTransfer;
-        if (lbl_802814C8->pUnused != NULL) {
-            pTransfer->pNext = lbl_802814C8->pUnused;
-            pTransfer->pPrev = lbl_802814C8->pUnused->pPrev;
-            if (lbl_802814C8->pUnused->pPrev != NULL) {
-                lbl_802814C8->pUnused->pPrev->pNext = pTransfer;
+        if (gpARAMState->pUnused != NULL) {
+            pTransfer->pNext = gpARAMState->pUnused;
+            pTransfer->pPrev = gpARAMState->pUnused->pPrev;
+            if (gpARAMState->pUnused->pPrev != NULL) {
+                gpARAMState->pUnused->pPrev->pNext = pTransfer;
             }
-            lbl_802814C8->pUnused->pPrev = pTransfer;
+            gpARAMState->pUnused->pPrev = pTransfer;
         }
-        lbl_802814C8->pUnused = pTransfer;
+        gpARAMState->pUnused = pTransfer;
         pTransfer++;
     }
-    lbl_802814C8->nUnused = ARAM_NUM_TRANSFERS;
-    lbl_802814C8->nQueued = 0;
+    gpARAMState->nUnused = ARAM_NUM_TRANSFERS;
+    gpARAMState->nQueued = 0;
 }
 
 void GoARAM_Shutdown(void) {
-    if (lbl_802814C8->p18 != NULL) {
-        StaticMem_Free(lbl_802814C8->p18);
-        lbl_802814C8->p18 = NULL;
+    if (gpARAMState->p18 != NULL) {
+        Circular_MemFreeFunc(gpARAMState->p18);
+        gpARAMState->p18 = NULL;
     }
-    fn_8009527C(lbl_802814C8->p8);
-    lbl_802814C8->p8 = NULL;
-    fn_800B5D08(lbl_802814C8->pHeap);
-    lbl_802814C8->pHeap = NULL;
-    fn_8009527C(lbl_802814C8->pHeapMem);
-    lbl_802814C8->pHeapMem = NULL;
+    Mem_FreeFunc(gpARAMState->p8);
+    gpARAMState->p8 = NULL;
+    fn_800B5D08(gpARAMState->pHeap);
+    gpARAMState->pHeap = NULL;
+    Mem_FreeFunc(gpARAMState->pHeapMem);
+    gpARAMState->pHeapMem = NULL;
 }
 
 void fn_800B655C(void) {
@@ -342,11 +343,11 @@ void fn_800B6560(void) {
 
 // Hands out uSize bytes of ARAM, 32-byte aligned, and returns their address.
 u32 GoARAM_Alloc(u32 uSize) {
-    return GoARAM_HeapAlloc(lbl_802814C8->pHeap, uSize, 32);
+    return GoARAM_HeapAlloc(gpARAMState->pHeap, uSize, 32);
 }
 
 void GoARAM_Free(u32 uAram) {
-    GoARAM_HeapFree(lbl_802814C8->pHeap, uAram);
+    GoARAM_HeapFree(gpARAMState->pHeap, uAram);
 }
 
 // Queues a DMA of uLength bytes from uSource to uDest (nType as ARQRequest.type) and returns its
@@ -356,29 +357,29 @@ ARAMTransfer* GoARAM_QueueTransfer(u32 uSource, u32 uDest, u32 uLength, int nTyp
     ARAMTransfer* pTransfer;
 
     fn_80007368();
-    pTransfer = lbl_802814C8->pUnused;
+    pTransfer = gpARAMState->pUnused;
     if (pTransfer == pTransfer->pNext) {
-        lbl_802814C8->pUnused = NULL;
+        gpARAMState->pUnused = NULL;
     } else {
-        if (pTransfer == lbl_802814C8->pUnused) {
-            lbl_802814C8->pUnused = pTransfer->pNext;
+        if (pTransfer == gpARAMState->pUnused) {
+            gpARAMState->pUnused = pTransfer->pNext;
         }
         pTransfer->pPrev->pNext = pTransfer->pNext;
         pTransfer->pNext->pPrev = pTransfer->pPrev;
         pTransfer->pPrev = pTransfer;
         pTransfer->pNext = pTransfer;
     }
-    lbl_802814C8->nUnused--;
-    if (lbl_802814C8->pQueued != NULL) {
-        pTransfer->pNext = lbl_802814C8->pQueued;
-        pTransfer->pPrev = lbl_802814C8->pQueued->pPrev;
-        if (lbl_802814C8->pQueued->pPrev != NULL) {
-            lbl_802814C8->pQueued->pPrev->pNext = pTransfer;
+    gpARAMState->nUnused--;
+    if (gpARAMState->pQueued != NULL) {
+        pTransfer->pNext = gpARAMState->pQueued;
+        pTransfer->pPrev = gpARAMState->pQueued->pPrev;
+        if (gpARAMState->pQueued->pPrev != NULL) {
+            gpARAMState->pQueued->pPrev->pNext = pTransfer;
         }
-        lbl_802814C8->pQueued->pPrev = pTransfer;
+        gpARAMState->pQueued->pPrev = pTransfer;
     }
-    lbl_802814C8->pQueued = pTransfer;
-    lbl_802814C8->nQueued++;
+    gpARAMState->pQueued = pTransfer;
+    gpARAMState->nQueued++;
     fn_80007328();
     pTransfer->pfnDone = pfnDone;
     pTransfer->uOwner = uOwner;
@@ -401,8 +402,8 @@ int GoARAM_CancelTransfers(u32 uOwner) {
 
     fn_80007368();
     i = 0;
-    pTransfer = lbl_802814C8->pQueued;
-    nQueued = lbl_802814C8->nQueued;
+    pTransfer = gpARAMState->pQueued;
+    nQueued = gpARAMState->nQueued;
     for (; i < nQueued; i++) {
         pNext = pTransfer->pNext;
         if ((pTransfer->uFlags & 2) && pTransfer->uOwner == uOwner) {

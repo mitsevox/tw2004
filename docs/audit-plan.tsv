@@ -30,7 +30,7 @@ order	area	file	task	scope	state
 29	Core services	LLTime.c	pass	the whole file	done
 30	Core services	URes.c	pass	the whole file	done
 31	Core services	LLInput_Gc.c	pass	the whole file	done
-32	Core services	StaticMemory.c	pass	the whole file	open
+32	Core services	UCirc.c	pass	the whole file	done
 33	Core services	GoARAM.c	pass	the whole file	open
 34	Core services	urandom.c	pass	the whole file	open
 35	Core services	LLFileIO_Gc.c	pass	the whole file	open

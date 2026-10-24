@@ -63,7 +63,7 @@ void Object_Destroy(UObject* pObj) {
 
 // A new object of the model, from the heap (freed by Object_Free).
 UObject* Object_Create(UObjModel* pModel) {
-    UObject* pObj = StaticMem_Alloc(sizeof(UObject), 2, 1, "UObject.c", 368);
+    UObject* pObj = Circular_MemAllocFunc(sizeof(UObject), MEMTYPE_LOW, 1, "UObject.c", 368);
 
     Object_Init(pObj, pModel, 0);
     return pObj;
@@ -72,7 +72,7 @@ UObject* Object_Create(UObjModel* pModel) {
 // Frees an object Object_Create made.
 void Object_Free(UObject* pObj) {
     Object_Destroy(pObj);
-    StaticMem_Free(pObj);
+    Circular_MemFreeFunc(pObj);
 }
 
 void Object_Draw(UObject* pObj) {

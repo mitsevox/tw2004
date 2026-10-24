@@ -57,6 +57,7 @@ int    isspace(int c);                          // 0x80155F70 (MSL)
 int    sprintf(char* pBuf, const char* pFmt, ...);
 int    snprintf(char* pBuf, u32 uLen, const char* pFmt, ...);
 int    vsprintf(char* pBuf, const char* pFmt, va_list args);
+int    printf(const char* pFmt, ...);
 int    sscanf(const char* pStr, const char* pFmt, ...);   // 0x80159408, before MSL's __StringRead
 double atan(double x);
 double sin(double x);

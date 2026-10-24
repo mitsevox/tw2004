@@ -38,7 +38,7 @@ DynChainSettings* lbl_802824F8;
 
 // Make the chains' settings, with their starting values.
 void fn_80113E60(void) {
-    lbl_802824F8 = StaticMem_Alloc(sizeof(DynChainSettings), 2, 0, "DynChain.c", 173);
+    lbl_802824F8 = Circular_MemAllocFunc(sizeof(DynChainSettings), MEMTYPE_LOW, 0, "DynChain.c", 173);
     lbl_802824F8->aParams[1].a0[0] = 3.6f;
     lbl_802824F8->aParams[1].a0[1] = 6.0f;
     lbl_802824F8->aParams[1].a0[2] = 9.9f;
@@ -98,7 +98,7 @@ void fn_8011407C(void) {
 }
 
 void fn_80114080(void) {
-    StaticMem_Free(lbl_802824F8);
+    Circular_MemFreeFunc(lbl_802824F8);
     lbl_802824F8 = NULL;
 }
 
@@ -170,8 +170,8 @@ DynChain* fn_80114270(CharModel* pModel, int nBone, s32 nType, s32 n10) {
             }
         }
     }
-    pChain = StaticMem_Alloc(sizeof(DynChain), 2, 64, "DynChain.c", 390);
-    pChain->pLinks = StaticMem_Alloc(nLinks * sizeof(DynChainLink), 2, 64, "DynChain.c", 392);
+    pChain = Circular_MemAllocFunc(sizeof(DynChain), MEMTYPE_LOW, 64, "DynChain.c", 390);
+    pChain->pLinks = Circular_MemAllocFunc(nLinks * sizeof(DynChainLink), MEMTYPE_LOW, 64, "DynChain.c", 392);
     pChain->nLinks = nLinks;
     pChain->nBone = nBone;
     pChain->nType = nType;
@@ -184,8 +184,8 @@ DynChain* fn_80114270(CharModel* pModel, int nBone, s32 nType, s32 n10) {
 
 // Free a chain.
 void fn_80114398(DynChain* pChain) {
-    StaticMem_Free(pChain->pLinks);
-    StaticMem_Free(pChain);
+    Circular_MemFreeFunc(pChain->pLinks);
+    Circular_MemFreeFunc(pChain);
 }
 
 // pIn (x, y, z, w) through pMtx's rotation into pOut; w is copied.

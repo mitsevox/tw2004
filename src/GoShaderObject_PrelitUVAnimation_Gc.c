@@ -144,7 +144,7 @@ void fn_800711F8(PrelitUVObject* pObj, const DynRenderSize* pSize) {
     } else {
         pObj->pBuf = fn_8007018C(50, 1);
     }
-    pObj->pMtx = StaticMem_Alloc(0x20, 2, 32, "GoShaderObject_PrelitUVAnimation_Gc.c", 172);
+    pObj->pMtx = Circular_MemAllocFunc(0x20, MEMTYPE_LOW, 32, "GoShaderObject_PrelitUVAnimation_Gc.c", 172);
     pObj->pMtx[0][0] = 1.0f;
     pObj->pMtx[0][1] = 0.0f;
     pObj->pMtx[0][2] = 0.0f;
@@ -157,7 +157,7 @@ void fn_800711F8(PrelitUVObject* pObj, const DynRenderSize* pSize) {
 
 // Free the object's texture matrix and buffer.
 void fn_800712B4(PrelitUVObject* pObj) {
-    StaticMem_Free(pObj->pMtx);
+    Circular_MemFreeFunc(pObj->pMtx);
     fn_80070348(pObj->pBuf);
 }
 
