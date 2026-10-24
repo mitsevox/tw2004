@@ -80,7 +80,11 @@ def norm(ret, params):
     return ' '.join(ret.replace('*', ' * ').split()) + '(' + ','.join(ps) + ')'
 
 
-def lint(path, protos):
+def lint(path, protos, as_path=None):
+    """The findings of the file at path. as_path is the file it is a version of (new_hits lints a
+    branch's base version from a temporary copy): the file whose own uses of a name don't count as
+    another file's."""
+    me = (as_path or path).resolve()
     raw = path.read_bytes()
     text = raw.decode('utf-8', errors='replace')
     lines = text.split('\n')
@@ -127,7 +131,7 @@ def lint(path, protos):
         elif m and m.group(2) not in defined:
             hits.append((i, 'foreign-prototype', '%s belongs in the header of the file that defines it'
                          % m.group(2)))
-        elif m and users(m.group(2)) - {path.resolve()}:
+        elif m and users(m.group(2)) - {me}:
             hits.append((i, 'foreign-prototype', '%s is used by other files: declare it in this file\'s '
                          'header' % m.group(2)))
         elif m:
@@ -375,7 +379,7 @@ def new_hits(f, hits, changed, rev, old, protos):
         with tempfile.TemporaryDirectory() as tmp:
             p = pathlib.Path(tmp) / f.name           # same name: compiler messages are matched by it
             p.write_bytes(base_text(rev, old))
-            budget.update(finding_key(r, m) for _, r, m in lint(p, protos))
+            budget.update(finding_key(r, m) for _, r, m in lint(p, protos, as_path=f))
     for ln, r, m in hits:
         if ln not in changed and r != 'compile-error':
             budget[finding_key(r, m)] -= 1
