@@ -146,18 +146,20 @@ void UISProcessHint(void* pHandler, int nMsg, int nArgs, MsgArg* pArgs);
 // per-part first-asset table, the list caches and the 64 sponsorship records (lbl_80282470), and
 // clear the caches.
 void FE_CrAP_InitModule(void) {
-    lbl_80282460 = StaticMem_Alloc(sizeof(CrAPDB), 2, 0, "FE_CrAPDB.c", 211);
+    lbl_80282460 = Circular_MemAllocFunc(sizeof(CrAPDB), MEMTYPE_LOW, 0, "FE_CrAPDB.c", 211);
     lbl_80282460->pAssets = NULL;
     lbl_80282460->pStrings = NULL;
     lbl_80282460->nAssets = 0;
     lbl_80282460->uStringsSize = 0;
     lbl_80282460->nGender = 0;
     lbl_80282460->b14 = 1;
-    lbl_80282480 = StaticMem_Alloc(CRAP_NUM_PARTS * sizeof(s32), 2, 0, "FE_CrAPDB.c", 219);
-    lbl_8028247C = StaticMem_Alloc(CRAP_NUM_PARTS * 64 * sizeof(s32), 2, 0, "FE_CrAPDB.c", 220);
-    lbl_80282478 = StaticMem_Alloc(CRAP_NUM_PARTS * 64 * sizeof(s32), 2, 0, "FE_CrAPDB.c", 221);
-    lbl_80282474 = StaticMem_Alloc(CRAP_NUM_PARTS * sizeof(s32), 2, 0, "FE_CrAPDB.c", 222);
-    lbl_80282470 = StaticMem_Alloc(64 * sizeof(CrAPRecord), 2, 0, "FE_CrAPDB.c", 224);
+    lbl_80282480 = Circular_MemAllocFunc(CRAP_NUM_PARTS * sizeof(s32), MEMTYPE_LOW, 0, "FE_CrAPDB.c", 219);
+    lbl_8028247C = Circular_MemAllocFunc(CRAP_NUM_PARTS * 64 * sizeof(s32), MEMTYPE_LOW, 0,
+                                         "FE_CrAPDB.c", 220);
+    lbl_80282478 = Circular_MemAllocFunc(CRAP_NUM_PARTS * 64 * sizeof(s32), MEMTYPE_LOW, 0,
+                                         "FE_CrAPDB.c", 221);
+    lbl_80282474 = Circular_MemAllocFunc(CRAP_NUM_PARTS * sizeof(s32), MEMTYPE_LOW, 0, "FE_CrAPDB.c", 222);
+    lbl_80282470 = Circular_MemAllocFunc(64 * sizeof(CrAPRecord), MEMTYPE_LOW, 0, "FE_CrAPDB.c", 224);
     lbl_8028246C = 0;
     FE_CrAP_ResetLastCategoryTables();
     lbl_80282464 = NULL;
@@ -184,30 +186,30 @@ void FE_CrAP_ResetLastCategoryTables(void) {
 // Free the database: its stream objects, the database and its tables.
 void FE_CrAP_CloseModule(void) {
     if (lbl_80282464 != NULL) {
-        StaticMem_Free(lbl_80282464);
+        Circular_MemFreeFunc(lbl_80282464);
     }
     if (lbl_80282468 != NULL) {
-        StaticMem_Free(lbl_80282468);
+        Circular_MemFreeFunc(lbl_80282468);
     }
     lbl_80282468 = NULL;
     lbl_80282464 = NULL;
     if (lbl_80282460 != NULL) {
-        StaticMem_Free(lbl_80282460);
+        Circular_MemFreeFunc(lbl_80282460);
     }
     if (lbl_80282480 != NULL) {
-        StaticMem_Free(lbl_80282480);
+        Circular_MemFreeFunc(lbl_80282480);
     }
     if (lbl_8028247C != NULL) {
-        StaticMem_Free(lbl_8028247C);
+        Circular_MemFreeFunc(lbl_8028247C);
     }
     if (lbl_80282478 != NULL) {
-        StaticMem_Free(lbl_80282478);
+        Circular_MemFreeFunc(lbl_80282478);
     }
     if (lbl_80282474 != NULL) {
-        StaticMem_Free(lbl_80282474);
+        Circular_MemFreeFunc(lbl_80282474);
     }
     if (lbl_80282470 != NULL) {
-        StaticMem_Free(lbl_80282470);
+        Circular_MemFreeFunc(lbl_80282470);
     }
     lbl_80282480 = NULL;
     lbl_8028247C = NULL;

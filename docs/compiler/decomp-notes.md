@@ -180,7 +180,7 @@ The fixes that come up most often. Each points to its full entry below.
   `GameModeSkillZoneTarget_ClearPerHoleData` matched only as `i = 0; while (i < 5) gPlayers[i++].nDC0 = 20;`, not as a `for`
   or a pointer walk.
 - **[verified] `x = f(); if (x == NULL) { while (x == NULL) {...} }` gives CodeWarrior's "test the result,
-  then jump to the loop test" shape** (`cmplwi r3,0; bne end; b test`). StaticMemory StaticMem_Init 96.15 ->
+  then jump to the loop test" shape** (`cmplwi r3,0; bne end; b test`). UCirc.c's Circular_CreateBuffer 96.15 ->
   100.
 - **[verified] A count-down fill `n = count; i = 0; while (n-- > 0) a[i++] = v;` gives
   `cmpwi n,0; ble; srwi. n,3; mtctr ... andi. 7`.** A `for (i = 0; i < n; i++)` gives `cmpwi n,8; subi`
@@ -1432,7 +1432,7 @@ Which lever first, by symptom (each has its entry below):
   constant**: LLTex fn_8000EA1C, case 11 reading its random number into b turned `li r30,0` into
   EA's `mr r30,r31`, 98.99 -> 100.
 - **[verified] A `void*` copy stops the AST optimizer's copy propagation** (it rewrote pBlock to
-  pData): Particle fn_800951A0 92.0 -> 100 (`void* pBlock = pData`, the header field's own type).
+  pData): Particle Mem_AllocFunc 92.0 -> 100 (`void* pBlock = pData`, the header field's own type).
 - **[observed] Unsolved pattern: EA keeps a copy our backend's first copy-propagation pass folds**
   (UISScreen fn_8016AD54, fn_8016ABBC, fn_8016B4D4, fn_8016AEEC, fn_8016A2D4): no flag or form found.
   All five are now exact through levers (the OR lever, the call-result

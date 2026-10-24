@@ -22,7 +22,7 @@ SkinDesc* HwsBurn_BuildDesc(HwsBurn* pBurn);
 // HwsBurn_DropMorphTarget, HwsBurn_SetOverrideTable), gets the burnt description from HwsBurn_Burn
 // and frees the burn with HwsBurn_Destroy.
 HwsBurn* HwsBurn_Create(SkinDesc* pDesc) {
-    HwsBurn* pBurn = StaticMem_Alloc(sizeof(HwsBurn), 1, 16, "hwsBurn.c", 46);
+    HwsBurn* pBurn = Circular_MemAllocFunc(sizeof(HwsBurn), MEMTYPE_HIGH, 16, "hwsBurn.c", 46);
     int i;
     int nBytes;
 
@@ -36,47 +36,48 @@ HwsBurn* HwsBurn_Create(SkinDesc* pDesc) {
     pBurn->n60 = pDesc->n10;
     pBurn->n70 = pDesc->n88;
     if (pBurn->nParts != 0) {
-        pBurn->aVariant = StaticMem_Alloc(pBurn->nParts * 4, 1, 16, "hwsBurn.c", 61);
+        pBurn->aVariant = Circular_MemAllocFunc(pBurn->nParts * 4, MEMTYPE_HIGH, 16, "hwsBurn.c", 61);
         memset(pBurn->aVariant, 0, pBurn->nParts * 4);
-        pBurn->aOption = StaticMem_Alloc(pBurn->nParts * 4, 1, 16, "hwsBurn.c", 64);
+        pBurn->aOption = Circular_MemAllocFunc(pBurn->nParts * 4, MEMTYPE_HIGH, 16, "hwsBurn.c", 64);
         for (i = 0; i < pBurn->nParts; i++) {
             pBurn->aOption[i] = -1;
             pBurn->aVariant[i] = -1;
         }
     }
     if (pBurn->n18 != 0) {
-        pBurn->a1C = StaticMem_Alloc(pBurn->n18 * 4, 1, 16, "hwsBurn.c", 76);
+        pBurn->a1C = Circular_MemAllocFunc(pBurn->n18 * 4, MEMTYPE_HIGH, 16, "hwsBurn.c", 76);
         memset(pBurn->a1C, 0, pBurn->n18 * 4);
     }
     if (pBurn->n20 != 0) {
-        pBurn->p28 = StaticMem_Alloc((pBurn->n20 + 31) / 32 * 4, 1, 16, "hwsBurn.c", 83);
+        pBurn->p28 = Circular_MemAllocFunc((pBurn->n20 + 31) / 32 * 4, MEMTYPE_HIGH, 16, "hwsBurn.c", 83);
         BitArray_ClearArray(pBurn->p28, pBurn->n20);
-        pBurn->a2C = StaticMem_Alloc(pBurn->n20 * 4, 1, 16, "hwsBurn.c", 87);
-        pBurn->a30 = StaticMem_Alloc(pBurn->n20 * 4, 1, 16, "hwsBurn.c", 88);
+        pBurn->a2C = Circular_MemAllocFunc(pBurn->n20 * 4, MEMTYPE_HIGH, 16, "hwsBurn.c", 87);
+        pBurn->a30 = Circular_MemAllocFunc(pBurn->n20 * 4, MEMTYPE_HIGH, 16, "hwsBurn.c", 88);
     }
     if (pBurn->n34 != 0) {
         nBytes = (pBurn->n34 + 31) / 32 * 4;
-        pBurn->p3C = StaticMem_Alloc(nBytes, 1, 16, "hwsBurn.c", 94);
-        pBurn->p40 = StaticMem_Alloc(nBytes, 1, 16, "hwsBurn.c", 95);
+        pBurn->p3C = Circular_MemAllocFunc(nBytes, MEMTYPE_HIGH, 16, "hwsBurn.c", 94);
+        pBurn->p40 = Circular_MemAllocFunc(nBytes, MEMTYPE_HIGH, 16, "hwsBurn.c", 95);
         BitArray_ClearArray(pBurn->p3C, pBurn->n34);
         BitArray_ClearArray(pBurn->p40, pBurn->n34);
-        pBurn->a44 = StaticMem_Alloc(pBurn->n34 * 4, 1, 16, "hwsBurn.c", 100);
-        pBurn->a48 = StaticMem_Alloc(pBurn->n34 * 4, 1, 16, "hwsBurn.c", 101);
+        pBurn->a44 = Circular_MemAllocFunc(pBurn->n34 * 4, MEMTYPE_HIGH, 16, "hwsBurn.c", 100);
+        pBurn->a48 = Circular_MemAllocFunc(pBurn->n34 * 4, MEMTYPE_HIGH, 16, "hwsBurn.c", 101);
     }
     if (pBurn->n4C != 0) {
-        pBurn->p54 = StaticMem_Alloc((pBurn->n4C + 31) / 32 * 4, 1, 16, "hwsBurn.c", 107);
+        pBurn->p54 = Circular_MemAllocFunc((pBurn->n4C + 31) / 32 * 4, MEMTYPE_HIGH, 16, "hwsBurn.c", 107);
         BitArray_ClearArray(pBurn->p54, pBurn->n4C);
-        pBurn->a58 = StaticMem_Alloc(pBurn->n4C * 4, 1, 16, "hwsBurn.c", 111);
-        pBurn->a5C = StaticMem_Alloc(pBurn->n4C * 4, 1, 16, "hwsBurn.c", 112);
+        pBurn->a58 = Circular_MemAllocFunc(pBurn->n4C * 4, MEMTYPE_HIGH, 16, "hwsBurn.c", 111);
+        pBurn->a5C = Circular_MemAllocFunc(pBurn->n4C * 4, MEMTYPE_HIGH, 16, "hwsBurn.c", 112);
     }
     if (pBurn->n60 != 0) {
-        pBurn->a64 = StaticMem_Alloc(pBurn->n60 * sizeof(SkinDesc14), 1, 16, "hwsBurn.c", 120);
+        pBurn->a64 = Circular_MemAllocFunc(pBurn->n60 * sizeof(SkinDesc14), MEMTYPE_HIGH, 16,
+                                           "hwsBurn.c", 120);
     }
     if (pBurn->n70 != 0) {
-        pBurn->p78 = StaticMem_Alloc((pBurn->n70 + 31) / 32 * 4, 1, 16, "hwsBurn.c", 127);
+        pBurn->p78 = Circular_MemAllocFunc((pBurn->n70 + 31) / 32 * 4, MEMTYPE_HIGH, 16, "hwsBurn.c", 127);
         BitArray_ClearArray(pBurn->p78, pBurn->n70);
-        pBurn->a7C = StaticMem_Alloc(pBurn->n70 * 4, 1, 16, "hwsBurn.c", 131);
-        pBurn->a80 = StaticMem_Alloc(pBurn->n70 * 4, 1, 16, "hwsBurn.c", 132);
+        pBurn->a7C = Circular_MemAllocFunc(pBurn->n70 * 4, MEMTYPE_HIGH, 16, "hwsBurn.c", 131);
+        pBurn->a80 = Circular_MemAllocFunc(pBurn->n70 * 4, MEMTYPE_HIGH, 16, "hwsBurn.c", 132);
     }
     return pBurn;
 }
@@ -84,57 +85,57 @@ HwsBurn* HwsBurn_Create(SkinDesc* pDesc) {
 // Free a burn and its tables.
 void HwsBurn_Destroy(HwsBurn* pBurn) {
     if (pBurn->aVariant != NULL) {
-        StaticMem_Free(pBurn->aVariant);
+        Circular_MemFreeFunc(pBurn->aVariant);
     }
     if (pBurn->aOption != NULL) {
-        StaticMem_Free(pBurn->aOption);
+        Circular_MemFreeFunc(pBurn->aOption);
     }
     if (pBurn->a1C != NULL) {
-        StaticMem_Free(pBurn->a1C);
+        Circular_MemFreeFunc(pBurn->a1C);
     }
     if (pBurn->p28 != NULL) {
-        StaticMem_Free(pBurn->p28);
+        Circular_MemFreeFunc(pBurn->p28);
     }
     if (pBurn->a2C != NULL) {
-        StaticMem_Free(pBurn->a2C);
+        Circular_MemFreeFunc(pBurn->a2C);
     }
     if (pBurn->a30 != NULL) {
-        StaticMem_Free(pBurn->a30);
+        Circular_MemFreeFunc(pBurn->a30);
     }
     if (pBurn->p3C != NULL) {
-        StaticMem_Free(pBurn->p3C);
+        Circular_MemFreeFunc(pBurn->p3C);
     }
     if (pBurn->p40 != NULL) {
-        StaticMem_Free(pBurn->p40);
+        Circular_MemFreeFunc(pBurn->p40);
     }
     if (pBurn->a44 != NULL) {
-        StaticMem_Free(pBurn->a44);
+        Circular_MemFreeFunc(pBurn->a44);
     }
     if (pBurn->a48 != NULL) {
-        StaticMem_Free(pBurn->a48);
+        Circular_MemFreeFunc(pBurn->a48);
     }
     if (pBurn->p54 != NULL) {
-        StaticMem_Free(pBurn->p54);
+        Circular_MemFreeFunc(pBurn->p54);
     }
     if (pBurn->a58 != NULL) {
-        StaticMem_Free(pBurn->a58);
+        Circular_MemFreeFunc(pBurn->a58);
     }
     if (pBurn->a5C != NULL) {
-        StaticMem_Free(pBurn->a5C);
+        Circular_MemFreeFunc(pBurn->a5C);
     }
     if (pBurn->a64 != NULL) {
-        StaticMem_Free(pBurn->a64);
+        Circular_MemFreeFunc(pBurn->a64);
     }
     if (pBurn->p78 != NULL) {
-        StaticMem_Free(pBurn->p78);
+        Circular_MemFreeFunc(pBurn->p78);
     }
     if (pBurn->a7C != NULL) {
-        StaticMem_Free(pBurn->a7C);
+        Circular_MemFreeFunc(pBurn->a7C);
     }
     if (pBurn->a80 != NULL) {
-        StaticMem_Free(pBurn->a80);
+        Circular_MemFreeFunc(pBurn->a80);
     }
-    StaticMem_Free(pBurn);
+    Circular_MemFreeFunc(pBurn);
 }
 
 // Sets the callback the burn runs with pSkin on each material entry (SkinDesc.p14) it copies
@@ -678,7 +679,7 @@ SkinDesc* HwsBurn_BuildDesc(HwsBurn* pBurn) {
     nBytes += HwsBurn_AlignedSize(pDesc->pB8, pDesc->nB4, sizeof(SkinDescB8), 16);
 
     // The copy.
-    pBlock = StaticMem_Alloc(nBytes, 2, 16, "hwsBurn.c", 979);
+    pBlock = Circular_MemAllocFunc(nBytes, MEMTYPE_LOW, 16, "hwsBurn.c", 979);
     nOffset = 0;
     pOut = HwsBurn_CopyAligned(pBlock, &nOffset, pDesc, sizeof(SkinDesc), 16);
     pOut->n08 = nBytes;

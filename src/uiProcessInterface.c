@@ -483,7 +483,7 @@ FrontEnd* UI_OpenInterface(char* szSet) {
     gbUIRunning = 1;
     gbUIClosed = 0;
     UI_SetInterfaceName(szSet);
-    gpFrontEnd = StaticMem_Alloc(sizeof(FrontEnd), 2, 16, "uiProcessInterface.c", 904);
+    gpFrontEnd = Circular_MemAllocFunc(sizeof(FrontEnd), MEMTYPE_LOW, 16, "uiProcessInterface.c", 904);
     gpFrontEnd->f18 = 0.0f;
     gpFrontEnd->pFile = UI_GetFileData(szSet);
     gpFrontEnd->p8 = UI_GetTextureBanks(szSet);
@@ -501,7 +501,7 @@ FrontEnd* UI_OpenInterface(char* szSet) {
     UI_RelocateFile(gpFrontEnd);
     UI_ResolveFileEntries(gpFrontEnd);
     UI_FindColorTable(gpFrontEnd);
-    gpFrontEnd->pHandler = StaticMem_Alloc(UISGetMemSize(10, 9, 256, 2, 2048, 128), 2, 16,
+    gpFrontEnd->pHandler = Circular_MemAllocFunc(UISGetMemSize(10, 9, 256, 2, 2048, 128), MEMTYPE_LOW, 16,
                                          "uiProcessInterface.c", 943);
     UISInit(gpFrontEnd->pHandler, 10, 9, 256, 2, 2048, 128, 16);
     UISRegisterPluginFnc(gpFrontEnd->pHandler, 0, (UISPluginFncT*)UIPoly_ProcessMessage);
@@ -569,8 +569,8 @@ void UI_CloseInterface(FrontEnd* pFE) {
     UI_FreePictureList(pFE->pC);
     UI_FreeTextureBanks(pFE->p8);
     UI_FreeFileData(pFE->pFile);
-    StaticMem_Free(gpFrontEnd->pHandler);
-    StaticMem_Free(gpFrontEnd);
+    Circular_MemFreeFunc(gpFrontEnd->pHandler);
+    Circular_MemFreeFunc(gpFrontEnd);
     gpFrontEnd = NULL;
 }
 

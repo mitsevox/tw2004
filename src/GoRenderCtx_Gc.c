@@ -45,7 +45,7 @@ void** gppCurrentRenderCtx = gapCurrentRenderCtx;
 void* RC_spCreateRenderCtx(CamLens* pLens, FB_SFrameBuffer* pBuf, VM_SViewport* pViewport) {
     Camera* pCamera;
 
-    pCamera = StaticMem_Alloc(0x234, 2, 16, "GoRenderCtx_Gc.c", 96);
+    pCamera = Circular_MemAllocFunc(0x234, MEMTYPE_LOW, 16, "GoRenderCtx_Gc.c", 96);
     RC_vSetRenderCtxCamera(pCamera, pLens);
     RC_vSetRenderCtxFrameBuffer(pCamera, pBuf);
     RC_vSetRenderCtxViewport(pCamera, pViewport);
@@ -88,7 +88,7 @@ f32 VM_fGetFrameBufferHeightOverWidth(FB_SFrameBuffer* spFrameBuffer_p);
 f32 FB_fGetFrameBufferOneOverWidthRatio(FB_SFrameBuffer* spFrameBuffer_p);
 
 void RC_vReleaseRenderCtx(void* pCamera) {
-    StaticMem_Free(pCamera);
+    Circular_MemFreeFunc(pCamera);
 }
 
 // Hands the render context's viewport and scissor rectangle to the renderer

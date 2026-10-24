@@ -201,12 +201,12 @@ void GameMode4_LoadTCMFromStream(UStreamObject* pObject) {
     Stream_StreamLoadFixedSize(pObject, sizeof(gLadderEvents), gLadderEvents);
 }
 
-// The 'TCMS' chunk: the events' names, copied into a new 16-byte-aligned block (fn_800951A0) that
+// The 'TCMS' chunk: the events' names, copied into a new 16-byte-aligned block (Mem_AllocFunc) that
 // gLadderNames keeps with its size. A NULL object is ignored.
 void GameMode4_LoadTCMSFromStream(UStreamObject* pObject) {
     if (pObject) {
         gLadderNames.uSize = pObject->uSize;
-        gLadderNames.pText = fn_800951A0(gLadderNames.uSize, 0x10, 1);
+        gLadderNames.pText = Mem_AllocFunc(gLadderNames.uSize, 0x10, 1);
         memcpy(gLadderNames.pText, pObject->pData, gLadderNames.uSize);
     }
 }

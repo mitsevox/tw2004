@@ -24,7 +24,8 @@ typedef struct UStreamChunk {
     u32  uLength;               // 0x04  header included
     u8   unk8[8];
     u32  uSubTag;               // 0x10  'SHDR', 'SDAT', 'Rdat'
-    u32  uFlags;                // 0x14  SHDR: the object's allocation flags (UStreamObject.uFlags)
+    u32  uFlags;                // 0x14  SHDR: where the object's block comes from (a TTypeAcces;
+                                //       UStreamObject.uFlags)
     u32  uType;                 // 0x18  SHDR: the object's type ('ter ', 'txf ', ...); SONO: 'shdr' / 'samp'
     u32  uId;                   // 0x1C  SHDR: the object's id (UStreamObject.uId); SONO: which sound memory
                                 //       (2: Ses_AllocStreamFileHdr)

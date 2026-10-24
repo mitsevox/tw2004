@@ -39,7 +39,7 @@ int fn_8002F260(s32 n0, s32 nWidth, s32 nHeight, s32 nKind, s32 n20, s32 nSurfac
     lbl_801D3950[nSurface].nSize = fn_8002F480(nSurface);
     if (n0 != 1) {
         lbl_801D3950[nSurface].pBuffer =
-            StaticMem_Alloc(lbl_801D3950[nSurface].nSize, 2, 32, "GoRenderSurface.c", 198);
+            Circular_MemAllocFunc(lbl_801D3950[nSurface].nSize, MEMTYPE_LOW, 32, "GoRenderSurface.c", 198);
         // port: EA tested the pointer as a signed integer (cmpwi); a port tests it against NULL
         if ((s32)lbl_801D3950[nSurface].pBuffer == 0) {
             return 0;
@@ -50,7 +50,7 @@ int fn_8002F260(s32 n0, s32 nWidth, s32 nHeight, s32 nKind, s32 n20, s32 nSurfac
 
 // Frees slot nSurface's buffer and clears the slot.
 void fn_8002F32C(s32 nSurface) {
-    StaticMem_Free(lbl_801D3950[nSurface].pBuffer);
+    Circular_MemFreeFunc(lbl_801D3950[nSurface].pBuffer);
     Mem_set(&lbl_801D3950[nSurface], 0, sizeof(RenderSurface));
     lbl_801D3950[nSurface].n0 = 0;
 }

@@ -22,7 +22,7 @@ GlowList* _StartGlowStrip(int nGlow, int nVerts) {
     void* pList;
 
     uSize = ((nVerts * 32 + 31) & ~31) + 0x400;
-    pList = StaticMem_Alloc(uSize, 1, 32, "GoShaderObject_Glows_Gc.c", 134);
+    pList = Circular_MemAllocFunc(uSize, MEMTYPE_HIGH, 32, "GoShaderObject_Glows_Gc.c", 134);
     DCInvalidateRange(pList, uSize);
     GXBeginDisplayList(pList, uSize);
     GXResetWriteGatherPipe();
@@ -41,10 +41,10 @@ void _EndGlowStrip(GlowList* pList) {
     u32 uSize;
 
     uSize = GXEndDisplayList();
-    pCopy = StaticMem_Alloc(uSize, 2, 32, "GoShaderObject_Glows_Gc.c", 159);
+    pCopy = Circular_MemAllocFunc(uSize, MEMTYPE_LOW, 32, "GoShaderObject_Glows_Gc.c", 159);
     Mem_cpy(pCopy, pList->p4, uSize);
     DCFlushRange(pCopy, uSize);
-    StaticMem_Free(pList->p4);
+    Circular_MemFreeFunc(pList->p4);
     pList->p4 = pCopy;
     pList->n0 = uSize;
     lbl_801D99D0.nCount++;
@@ -252,7 +252,7 @@ void GlowsRenderData_CloseModule(void) {
     int i;
     for (i = 0; i < NUM_GLOWS; i++) {
         if (lbl_801D99D0.a[i].p4 != NULL) {
-            StaticMem_Free(lbl_801D99D0.a[i].p4);
+            Circular_MemFreeFunc(lbl_801D99D0.a[i].p4);
             lbl_801D99D0.nCount--;
         }
     }

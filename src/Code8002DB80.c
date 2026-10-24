@@ -185,7 +185,7 @@ void Golfer_UnregisterStatsHandler(void) {
 void Golfer_OnStatsLoaded(UStreamObject* pObject) {
     Mem_cpy(gGolferTable, pObject->pData, pObject->uSize);
     Golfer_TableByteSwap();
-    StaticMem_Free(pObject);
+    Circular_MemFreeFunc(pObject);
     Golfer_TableSetup();
 }
 
@@ -512,7 +512,7 @@ void Session_OnRecordsLoaded(UStreamObject* pObject) {
     // port: the records are big-endian on disc and copied straight over the course-record structs;
     //       a little-endian port converts them field by field here.
     Mem_cpy(gSession.aCourseRecord, pObject->pData, pObject->uSize);
-    StaticMem_Free(pObject);
+    Circular_MemFreeFunc(pObject);
 }
 
 void Session_RegisterRecordsHandler(void) {

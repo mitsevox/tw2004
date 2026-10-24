@@ -23,14 +23,15 @@ void FB_vCloseModule(void) {
 }
 
 FB_SFrameBuffer* FB_spCreateFrameBuffer(void) {
-    FB_SFrameBuffer* spFrameBuffer = StaticMem_Alloc(sizeof(FB_SFrameBuffer), 2, 16, "GoFrameBuf.c", 137);
+    FB_SFrameBuffer* spFrameBuffer = Circular_MemAllocFunc(sizeof(FB_SFrameBuffer), MEMTYPE_LOW, 16,
+                                                           "GoFrameBuf.c", 137);
 
     FB_vSetDefaultFrameBuffer(spFrameBuffer);
     return spFrameBuffer;
 }
 
 void FB_vReleaseFrameBuffer(FB_SFrameBuffer* spFrameBuffer_p) {
-    StaticMem_Free(spFrameBuffer_p);
+    Circular_MemFreeFunc(spFrameBuffer_p);
 }
 
 // The whole 512 x 448 screen.

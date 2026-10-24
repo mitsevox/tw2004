@@ -96,7 +96,7 @@ void Resources_Del(UStreamObject* pRes) {
         }
     }
     if (pRes != &gResDivider) {
-        StaticMem_Free(pRes);
+        Circular_MemFreeFunc(pRes);
     }
 }
 
@@ -204,5 +204,5 @@ void Resources_UpdateOldResourceTime(UStreamObject* pRes) {
         }
         pOldRes = pOldRes->pPrev;
     }
-    StaticMem_Free(pRes);
+    Circular_MemFreeFunc(pRes);
 }

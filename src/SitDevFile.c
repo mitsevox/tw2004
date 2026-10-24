@@ -53,7 +53,8 @@ void SitDev_LoadScripts(SitDevHeader** ppScripts) {
         SitDev_BindHeader(gpSitDevScripts);
         SitDev_SwapTables();
     }
-    gpSitDevData->pGroupFlags = StaticMem_Alloc(gpSitDevScripts->nGroups, 2, 16, "SitDevFile.c", 105);
+    gpSitDevData->pGroupFlags = Circular_MemAllocFunc(gpSitDevScripts->nGroups, MEMTYPE_LOW, 16,
+                                                      "SitDevFile.c", 105);
     SitDev_ClearGroupFlags();
 }
 

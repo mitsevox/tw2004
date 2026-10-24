@@ -7,7 +7,6 @@
 #include "frontend/fe.h"
 #include "game/frontend.h"
 
-int  printf(const char* pFmt, ...);         // MSL
 void VISetPostRetraceCallback(void (*pCallback)(u32 nRetrace));
 void VISetBlack(int bBlack);
 void VIFlush(void);

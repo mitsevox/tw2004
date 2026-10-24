@@ -331,15 +331,16 @@ void SkinMorph_Create(Skin* pSkin) {
     if (nMorphs == 0) {
         return;
     }
-    pMorphState = StaticMem_Alloc(sizeof(SkinMorphState), 2, 16, "SkinMorph.c", 91);
+    pMorphState = Circular_MemAllocFunc(sizeof(SkinMorphState), MEMTYPE_LOW, 16, "SkinMorph.c", 91);
     memset(pMorphState, 0, sizeof(SkinMorphState));
     pMorphState->nMorphs = nMorphs;
     nBytes = (nMorphs + 31) / 32 * sizeof(u32);
-    pMorphState->aChanged[0] = StaticMem_Alloc(nBytes, 2, 16, "SkinMorph.c", 95);
-    pMorphState->aChanged[1] = StaticMem_Alloc(nBytes, 2, 16, "SkinMorph.c", 96);
+    pMorphState->aChanged[0] = Circular_MemAllocFunc(nBytes, MEMTYPE_LOW, 16, "SkinMorph.c", 95);
+    pMorphState->aChanged[1] = Circular_MemAllocFunc(nBytes, MEMTYPE_LOW, 16, "SkinMorph.c", 96);
     BitArray_ClearArray(pMorphState->aChanged[0], nMorphs);
     BitArray_ClearArray(pMorphState->aChanged[1], nMorphs);
-    pMorphState->afWeights = StaticMem_Alloc(nMorphs * sizeof(f32), 2, 16, "SkinMorph.c", 100);
+    pMorphState->afWeights = Circular_MemAllocFunc(nMorphs * sizeof(f32), MEMTYPE_LOW, 16,
+                                                   "SkinMorph.c", 100);
     memset(pMorphState->afWeights, 0, nMorphs * sizeof(f32));
     pSkin->pMorph = pMorphState;
 }
@@ -386,7 +387,7 @@ void SkinMorph_Update(Skin* pSkin, int nView) {
 }
 
 // Blends every morph target, at its current weight, into a new override table and memory block for
-// the skin's morphed meshes (StaticMem mode 1), and gives both: NULL and NULL without a morph state
+// the skin's morphed meshes (MEMTYPE_HIGH), and gives both: NULL and NULL without a morph state
 // or morphed meshes. SkinBurn_BurnSkin burns them into the skin; SkinMorph_FreeBlended frees them.
 void SkinMorph_CreateBlended(Skin* pSkin, HwsMemBlock** ppBlock, HwsOverrideTable** ppTable) {
     HwsMemBlock* pBlock;
@@ -433,10 +434,10 @@ void SkinMorph_FreeBlended(Skin* pSkin, HwsMemBlock* pBlock, HwsOverrideTable* p
 // Frees the skin's morph state and its arrays, if it has one.
 void SkinMorph_Destroy(Skin* pSkin) {
     if (pSkin->pMorph != NULL) {
-        StaticMem_Free(pSkin->pMorph->afWeights);
-        StaticMem_Free(pSkin->pMorph->aChanged[0]);
-        StaticMem_Free(pSkin->pMorph->aChanged[1]);
-        StaticMem_Free(pSkin->pMorph);
+        Circular_MemFreeFunc(pSkin->pMorph->afWeights);
+        Circular_MemFreeFunc(pSkin->pMorph->aChanged[0]);
+        Circular_MemFreeFunc(pSkin->pMorph->aChanged[1]);
+        Circular_MemFreeFunc(pSkin->pMorph);
         pSkin->pMorph = NULL;
     }
 }

@@ -55,7 +55,7 @@ ARAMHeap* GoARAM_HeapInit(u32 uSize, u32 uBase, u32 nBlocks, ARAMHeap* pHeap) {
 
 void fn_800B5D08(ARAMHeap* pHeap) {
     if (pHeap->p20 != NULL) {
-        StaticMem_Free(pHeap->p20);
+        Circular_MemFreeFunc(pHeap->p20);
     }
 }
 
@@ -289,12 +289,13 @@ void GoARAM_Init(void) {
     ARInit(NULL, 0);
     uBase = ARGetBaseAddress();
     uEnd = ARGetSize();
-    gpARAMState->pHeapMem = fn_800951A0(sizeof(ARAMHeap) + ARAM_NUM_BLOCKS * sizeof(ARAMBlock), 16, 1);
+    gpARAMState->pHeapMem = Mem_AllocFunc(sizeof(ARAMHeap) + ARAM_NUM_BLOCKS * sizeof(ARAMBlock), 16, 1);
     gpARAMState->pHeap = GoARAM_HeapInit(uEnd - uBase, uBase, ARAM_NUM_BLOCKS, gpARAMState->pHeapMem);
-    gpARAMState->p8 = fn_800951A0(ARAM_NUM_TRANSFERS * sizeof(ARAMTransfer), 16, 1);
+    gpARAMState->p8 = Mem_AllocFunc(ARAM_NUM_TRANSFERS * sizeof(ARAMTransfer), 16, 1);
     gpARAMState->nTransfers = ARAM_NUM_TRANSFERS;
     if (gpARAMState->p8 == NULL) {
-        gpARAMState->p18 = StaticMem_Alloc(ARAM_NUM_TRANSFERS * sizeof(ARAMTransfer), 2, 16, "GoARAM.c", 192);
+        gpARAMState->p18 = Circular_MemAllocFunc(ARAM_NUM_TRANSFERS * sizeof(ARAMTransfer), MEMTYPE_LOW, 16,
+                                                 "GoARAM.c", 192);
         gpARAMState->pTransfers = gpARAMState->p18;
     } else {
         gpARAMState->p18 = NULL;
@@ -323,14 +324,14 @@ void GoARAM_Init(void) {
 
 void GoARAM_Shutdown(void) {
     if (gpARAMState->p18 != NULL) {
-        StaticMem_Free(gpARAMState->p18);
+        Circular_MemFreeFunc(gpARAMState->p18);
         gpARAMState->p18 = NULL;
     }
-    fn_8009527C(gpARAMState->p8);
+    Mem_FreeFunc(gpARAMState->p8);
     gpARAMState->p8 = NULL;
     fn_800B5D08(gpARAMState->pHeap);
     gpARAMState->pHeap = NULL;
-    fn_8009527C(gpARAMState->pHeapMem);
+    Mem_FreeFunc(gpARAMState->pHeapMem);
     gpARAMState->pHeapMem = NULL;
 }
 

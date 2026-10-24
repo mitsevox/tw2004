@@ -38,8 +38,8 @@ UObjModelRoot* fn_800073B4(u8* pData, int n) {
     }
     pHead = (UObjModelHead*)pData;
     pData += sizeof(UObjModelHead);
-    pRoot = StaticMem_Alloc(sizeof(UObjModelRoot) + pHead->nMeshes * sizeof(UObjMesh) +
-                        (pHead->nMeshes - 1) * sizeof(UObjMesh*), 2, 16, "LLObj_Gc.c", 198);
+    pRoot = Circular_MemAllocFunc(sizeof(UObjModelRoot) + pHead->nMeshes * sizeof(UObjMesh) +
+                        (pHead->nMeshes - 1) * sizeof(UObjMesh*), MEMTYPE_LOW, 16, "LLObj_Gc.c", 198);
     pNext = (u8*)pRoot;
     pRoot->pE4 = NULL;
     pRoot->pE0 = pStart;
@@ -68,7 +68,7 @@ void fn_80007524(UObjMesh* pMesh) {
         }
     }
     if (pMesh->p18 != NULL) {
-        StaticMem_Free(pMesh->p18);
+        Circular_MemFreeFunc(pMesh->p18);
     }
     pChild = pMesh->p10;
     for (i = 0; i < pMesh->pInfo->n0; i++) {
@@ -89,9 +89,9 @@ void fn_800075CC(UObjModelRoot* pRoot) {
     }
     fn_80007524(pRoot->pMesh);
     if (pRoot->pE4 != NULL) {
-        StaticMem_Free(pRoot->pE4);
+        Circular_MemFreeFunc(pRoot->pE4);
     }
-    StaticMem_Free(pRoot);
+    Circular_MemFreeFunc(pRoot);
 }
 
 // Makes a mesh's parts from the model data at pData: the first gets its type (pInfo->n88) set up
@@ -104,7 +104,8 @@ void fn_80007658(UObjModelRoot* pRoot, UObjMesh* pMesh, u8* pData, int nCount, i
     if (nCount == 0) {
         return;
     }
-    pMesh->p18 = StaticMem_Alloc(pMesh->pInfo->n8C * sizeof(UObjMeshPart), 2, 32, "LLObj_Gc.c", 398);
+    pMesh->p18 = Circular_MemAllocFunc(pMesh->pInfo->n8C * sizeof(UObjMeshPart), MEMTYPE_LOW, 32,
+                                       "LLObj_Gc.c", 398);
     Mem_set(pMesh->p18, 0, pMesh->pInfo->n8C * sizeof(UObjMeshPart));
     Mem_set(pMesh->a1C, 0, sizeof(pMesh->a1C));
     desc.n0 = pMesh->pInfo->n8C;
@@ -142,7 +143,7 @@ void fn_80007824(UObjModelRoot* pRoot, int nSet) {
     for (i = 0; i < 5; i++) {
         if (pRoot->aSets[0].an20[i] != 0) {
             uSize = (pRoot->aSets[0].an20[i] * 12 + 31) & ~31;
-            pRoot->aSets[nSet].ap0[i] = StaticMem_Alloc(uSize, 2, 32, "LLObj_Gc.c", 473);
+            pRoot->aSets[nSet].ap0[i] = Circular_MemAllocFunc(uSize, MEMTYPE_LOW, 32, "LLObj_Gc.c", 473);
             Mem_cpy(pRoot->aSets[nSet].ap0[i], pRoot->aSets[0].ap0[i], uSize);
         }
     }
@@ -154,7 +155,7 @@ void fn_80007930(UObjModelRoot* pRoot, int nSet) {
 
     for (i = 0; i < 5; i++) {
         if (pRoot->aSets[0].an20[i] != 0) {
-            StaticMem_Free(pRoot->aSets[nSet].ap0[i]);
+            Circular_MemFreeFunc(pRoot->aSets[nSet].ap0[i]);
         }
     }
 }

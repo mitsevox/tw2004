@@ -124,8 +124,8 @@ void DynObj_LoadBallLogos(UStreamObject* pObject) {
             }
         }
     }
-    StaticMem_Free(pBank);
-    StaticMem_Free(pObject);
+    Circular_MemFreeFunc(pBank);
+    Circular_MemFreeFunc(pObject);
 }
 
 // ---- sweep code (not yet cleaned up) ----
@@ -137,7 +137,7 @@ void DynObj_FreeTeoModel(UStreamObject* arg0) {
 
     temp_r31 = (*(void**)((u8*)(arg0) + 4));
     fn_800075CC(*(UObjModelRoot**)((u8*)(temp_r31) + 0x10));
-    StaticMem_Free(temp_r31);
+    Circular_MemFreeFunc(temp_r31);
 }
 
 // ---- end of sweep code ----
@@ -154,7 +154,7 @@ void DynObj_UnRegisterStreamClients(void) {
 
 // Allocates the file's state (gpDynObjState); no 'TEO ' models yet. Called once at start-up.
 void DynObj_InitModule(void) {
-    gpDynObjState = StaticMem_Alloc(sizeof(GoDynObjMgr), 2, 16, "GoDynObj.c", 283);
+    gpDynObjState = Circular_MemAllocFunc(sizeof(GoDynObjMgr), MEMTYPE_LOW, 16, "GoDynObj.c", 283);
     gpDynObjState->pTeo10000 = NULL;
     gpDynObjState->apTeo10030[0] = NULL;
     gpDynObjState->apTeo10030[1] = NULL;
@@ -178,7 +178,7 @@ void DynObj_InitModule(void) {
 s32 gAltShotPartner[4] = {1, 0, 3, 2};
 
 void DynObj_CloseModule(void) {
-    StaticMem_Free(gpDynObjState);
+    Circular_MemFreeFunc(gpDynObjState);
 }
 
 // Makes the models of the 'TEO ' objects that are loaded, puts the flag (character 100) at the

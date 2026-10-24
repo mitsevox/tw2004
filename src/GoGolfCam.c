@@ -83,7 +83,7 @@ static f32 GoGolfCam_StrippedFn(f32 x) {
 // start (fn_80062E00).
 void GolfCamera_Init(void) {
     int i;
-    gGolfCamState = StaticMem_Alloc(0x200, 2, 0, "GoGolfCam.c", 164);
+    gGolfCamState = Circular_MemAllocFunc(0x200, MEMTYPE_LOW, 0, "GoGolfCam.c", 164);
     gGolfCamState->bMatrixCam = 0;
     gGolfCamState->bScriptMatrixMode = 0;
     gGolfCamState->bComicCam = 0;
@@ -106,7 +106,7 @@ void GolfCamera_Init(void) {
 // Free the shared camera state GolfCamera_Init allocated (called when a round's systems stop,
 // fn_80062E20).
 void GolfCamera_DeInit(void) {
-    StaticMem_Free(gGolfCamState);
+    Circular_MemFreeFunc(gGolfCamState);
     gGolfCamState = NULL;
 }
 

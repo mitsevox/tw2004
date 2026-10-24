@@ -31,7 +31,7 @@ HwsMemBlock* fn_80112848(SkinDesc* pDesc, s32 nSize, int nMode) {
     if (nSize == 0) {
         return NULL;
     }
-    pBlock = StaticMem_Alloc(nSize + sizeof(HwsMemBlock), nMode, 16, "hwsOverride_Gc.c", 60);
+    pBlock = Circular_MemAllocFunc(nSize + sizeof(HwsMemBlock), nMode, 16, "hwsOverride_Gc.c", 60);
     pBlock->nSize = nSize;
     pBlock->nUsed = 0;
     pBlock->pData = (u8*)(pBlock + 1);
@@ -39,16 +39,16 @@ HwsMemBlock* fn_80112848(SkinDesc* pDesc, s32 nSize, int nMode) {
 }
 
 HwsMemBlock* fn_801128C8(SkinDesc* pDesc, s32 nSize) {
-    return fn_80112848(pDesc, nSize, 2);
+    return fn_80112848(pDesc, nSize, MEMTYPE_LOW);
 }
 
 HwsMemBlock* fn_801128EC(SkinDesc* pDesc, s32 nSize) {
-    return fn_80112848(pDesc, nSize, 1);
+    return fn_80112848(pDesc, nSize, MEMTYPE_HIGH);
 }
 
 void fn_80112910(HwsMemBlock* pBlock) {
     if (pBlock != NULL) {
-        StaticMem_Free(pBlock);
+        Circular_MemFreeFunc(pBlock);
     }
 }
 
@@ -80,7 +80,7 @@ HwsOverrideTable* fn_8011296C(SkinDesc* pDesc, s32 nMeshes, int nMode) {
     if (n == 0) {
         return NULL;
     }
-    pTable = StaticMem_Alloc(n * 4 + sizeof(HwsOverrideTable), nMode, 16, "hwsOverride_Gc.c", 129);
+    pTable = Circular_MemAllocFunc(n * 4 + sizeof(HwsOverrideTable), nMode, 16, "hwsOverride_Gc.c", 129);
     pTable->nMeshes = n;
     pTable->pDesc = pDesc;
     pTable->apMesh = (void**)(pTable + 1);
@@ -89,16 +89,16 @@ HwsOverrideTable* fn_8011296C(SkinDesc* pDesc, s32 nMeshes, int nMode) {
 }
 
 HwsOverrideTable* fn_80112A10(SkinDesc* pDesc, s32 nMeshes) {
-    return fn_8011296C(pDesc, nMeshes, 2);
+    return fn_8011296C(pDesc, nMeshes, MEMTYPE_LOW);
 }
 
 HwsOverrideTable* fn_80112A34(SkinDesc* pDesc, s32 nMeshes) {
-    return fn_8011296C(pDesc, nMeshes, 1);
+    return fn_8011296C(pDesc, nMeshes, MEMTYPE_HIGH);
 }
 
 void fn_80112A58(HwsOverrideTable* pTable) {
     if (pTable != NULL) {
-        StaticMem_Free(pTable);
+        Circular_MemFreeFunc(pTable);
     }
 }
 

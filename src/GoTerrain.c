@@ -154,27 +154,28 @@ void Ter_vInitModule(void) {
     s32 j;
     s32 nBits;
 
-    gTerRenderer.pPatchList = StaticMem_Alloc(1024 * sizeof(Ter_PatchReference), 2, 16, "GoTerrain.c", 567);
+    gTerRenderer.pPatchList =
+        Circular_MemAllocFunc(1024 * sizeof(Ter_PatchReference), MEMTYPE_LOW, 16, "GoTerrain.c", 567);
     gTerRenderer.pPostDrawTerrainList =
-        StaticMem_Alloc(20 * sizeof(Ter_PatchReference), 2, 16, "GoTerrain.c", 572);
-    gTerRenderer.pObjectSortList = StaticMem_Alloc(650 * sizeof(Ter_ObjectReference), 2, 16, "GoTerrain.c",
-                                                   577);
-    gTerRenderer.pOpaqueObjectList = StaticMem_Alloc(650 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c",
-                                                     582);
+        Circular_MemAllocFunc(20 * sizeof(Ter_PatchReference), MEMTYPE_LOW, 16, "GoTerrain.c", 572);
+    gTerRenderer.pObjectSortList =
+        Circular_MemAllocFunc(650 * sizeof(Ter_ObjectReference), MEMTYPE_LOW, 16, "GoTerrain.c", 577);
+    gTerRenderer.pOpaqueObjectList =
+        Circular_MemAllocFunc(650 * sizeof(Ter_ObjectDrawData), MEMTYPE_LOW, 16, "GoTerrain.c", 582);
     gTerRenderer.pTranslucentObjectList =
-        StaticMem_Alloc(200 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 587);
-    gTerRenderer.pNearbyObjectList = StaticMem_Alloc(70 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c",
-                                                     592);
-    gTerRenderer.pDeferredItemsList = StaticMem_Alloc(50 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c",
-                                                      597);
+        Circular_MemAllocFunc(200 * sizeof(Ter_ObjectDrawData), MEMTYPE_LOW, 16, "GoTerrain.c", 587);
+    gTerRenderer.pNearbyObjectList =
+        Circular_MemAllocFunc(70 * sizeof(Ter_ObjectDrawData), MEMTYPE_LOW, 16, "GoTerrain.c", 592);
+    gTerRenderer.pDeferredItemsList =
+        Circular_MemAllocFunc(50 * sizeof(Ter_ObjectDrawData), MEMTYPE_LOW, 16, "GoTerrain.c", 597);
     gTerRenderer.pPanoramaItemsList =
-        StaticMem_Alloc(300 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 602);
+        Circular_MemAllocFunc(300 * sizeof(Ter_ObjectDrawData), MEMTYPE_LOW, 16, "GoTerrain.c", 602);
     gTerRenderer.pPostDrawItemsList =
-        StaticMem_Alloc(400 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 607);
+        Circular_MemAllocFunc(400 * sizeof(Ter_ObjectDrawData), MEMTYPE_LOW, 16, "GoTerrain.c", 607);
     gTerRenderer.pObjectStateList =
-        StaticMem_Alloc(TER_NUM_OBJECTS * sizeof(Ter_ObjectState), 2, 16, "GoTerrain.c", 612);
-    gTerRenderer.xpGrassPatchList = StaticMem_Alloc(128 * sizeof(Ter_PatchReference), 2, 16, "GoTerrain.c",
-                                                    633);
+        Circular_MemAllocFunc(TER_NUM_OBJECTS * sizeof(Ter_ObjectState), MEMTYPE_LOW, 16, "GoTerrain.c", 612);
+    gTerRenderer.xpGrassPatchList =
+        Circular_MemAllocFunc(128 * sizeof(Ter_PatchReference), MEMTYPE_LOW, 16, "GoTerrain.c", 633);
     gTerRenderer.fTreeMinPeriod = 3.7f;
     gTerRenderer.fTreeDiffPeriod = 1.6f;
     gTerRenderer.fTreeOverdrive = 1.0f;
@@ -240,27 +241,27 @@ void Ter_vInitModule(void) {
 // Shuts the terrain renderer down (gomainloop): frees the lists Ter_vInitModule allocated (not
 // xpGrassPatchList), the hole's data (fn_800075CC) and the course.
 void Ter_vCloseModule(void) {
-    StaticMem_Free(gTerRenderer.pPatchList);
-    StaticMem_Free(gTerRenderer.pPostDrawTerrainList);
-    StaticMem_Free(gTerRenderer.pObjectSortList);
-    StaticMem_Free(gTerRenderer.pOpaqueObjectList);
-    StaticMem_Free(gTerRenderer.pTranslucentObjectList);
-    StaticMem_Free(gTerRenderer.pNearbyObjectList);
-    StaticMem_Free(gTerRenderer.pDeferredItemsList);
-    StaticMem_Free(gTerRenderer.pPanoramaItemsList);
-    StaticMem_Free(gTerRenderer.pPostDrawItemsList);
-    StaticMem_Free(gTerRenderer.pObjectStateList);
+    Circular_MemFreeFunc(gTerRenderer.pPatchList);
+    Circular_MemFreeFunc(gTerRenderer.pPostDrawTerrainList);
+    Circular_MemFreeFunc(gTerRenderer.pObjectSortList);
+    Circular_MemFreeFunc(gTerRenderer.pOpaqueObjectList);
+    Circular_MemFreeFunc(gTerRenderer.pTranslucentObjectList);
+    Circular_MemFreeFunc(gTerRenderer.pNearbyObjectList);
+    Circular_MemFreeFunc(gTerRenderer.pDeferredItemsList);
+    Circular_MemFreeFunc(gTerRenderer.pPanoramaItemsList);
+    Circular_MemFreeFunc(gTerRenderer.pPostDrawItemsList);
+    Circular_MemFreeFunc(gTerRenderer.pObjectStateList);
     if (gTerRenderer.pCurrentHoleData != NULL) {
         fn_800075CC(gTerRenderer.pCurrentHoleData);
         gTerRenderer.pCurrentHoleData = NULL;
     }
     if (gTerRenderer.pCourse != NULL) {
         // EA bug: pCourse is the 'tgd ' chunk's pData, which points past the stream object's
-        // header (UStream.c), not at the block StaticMem allocated; StaticMem_Free reads the two
+        // header (UStream.c), not at the block Circular_MemAllocFunc gave; Circular_MemFreeFunc reads the two
         // words before it as a block's start and size. Ter_UnloadHole frees pCourseStreamData
         // instead; this is harmless only when Ter_UnloadHole has already run and cleared pCourse.
         // port: free pCourseStreamData here, as Ter_UnloadHole does.
-        StaticMem_Free(gTerRenderer.pCourse);
+        Circular_MemFreeFunc(gTerRenderer.pCourse);
         gTerRenderer.pCourse = NULL;
     }
 }
@@ -1929,7 +1930,7 @@ void Ter_LODLoadCallback(UStreamObject* pObject) {
 
     gTerLODDataNear = pData->fC;
     gTerLODDataFar = pData->f10;
-    StaticMem_Free(pObject);
+    Circular_MemFreeFunc(pObject);
     // A value that is not a multiple of gTerLODStepSize gets its remainder added (a multiple only
     // when the remainder was half of it); EA's rounding as it is.
     nRem = gTerLODDataNear % (s32)gTerLODStepSize;
@@ -2068,10 +2069,10 @@ void Ter_UnloadHole(void) {
     if (gTerRenderer.pCurrentHoleData != NULL) {
         fn_800075CC(gTerRenderer.pCurrentHoleData);
         gTerRenderer.pCurrentHoleData = NULL;
-        StaticMem_Free(gTerRenderer.pCurrentHoleDataStreamData);
+        Circular_MemFreeFunc(gTerRenderer.pCurrentHoleDataStreamData);
     }
     if (gTerRenderer.pCourse != NULL) {
-        StaticMem_Free(gTerRenderer.pCourseStreamData);
+        Circular_MemFreeFunc(gTerRenderer.pCourseStreamData);
         gTerRenderer.pCourse = NULL;
     }
     gTerRenderer.iLowLODListOffset = -1;
@@ -2091,7 +2092,7 @@ void Ter_TeeLoadCallback(UStreamObject* pObject) {
         gTerRenderer.pCourse->tee[pTee->nIndex].z = pTee->vPos[2];
         gTerRenderer.pCourse->tee[pTee->nIndex].w = 1.0f;
     }
-    StaticMem_Free(pObject);
+    Circular_MemFreeFunc(pObject);
 }
 
 // A pin position arrived (UKernel.c hands it on). With GM_Currently_SkillZoneMode set it goes to
@@ -2114,7 +2115,7 @@ u8 Ter_PinLoadCallback(UStreamObject* pObject) {
             gTerRenderer.pCourse->pin[pPin->nIndex].w = 1.0f;
         }
     }
-    StaticMem_Free(pObject);
+    Circular_MemFreeFunc(pObject);
     return 0;
 }
 

@@ -117,7 +117,7 @@ void PlayNow_LoadBallSpot(void* pObj) {
         gPlayNowBallSpots[i].fY = pRecord->v[1];
         gPlayNowBallSpots[i].fZ = pRecord->v[2];
     }
-    StaticMem_Free(pObj);
+    Circular_MemFreeFunc(pObj);
 }
 
 // Selects challenge nChallenge (a 0-based index into gChallengeList) as the current one and as the
@@ -169,9 +169,9 @@ void PlayNow_LoadPLYsFromStream(UStreamObject* pObject) {
     void* pData;
     u32 nSize = fn_8000E81C(pObject, &pData);
     if (nSize) {
-        gPlayNowText = fn_800951A0(nSize, 0x10, 1);
+        gPlayNowText = Mem_AllocFunc(nSize, 0x10, 1);
         Mem_cpy(gPlayNowText, pData, nSize);
-        StaticMem_Free(pObject);
+        Circular_MemFreeFunc(pObject);
     }
 }
 

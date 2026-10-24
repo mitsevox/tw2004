@@ -75,14 +75,14 @@ void UI_vEATraxUnRegisterStreamClients(void) {
 // object.
 void UI_vEATraxLoadfromStream(UStreamObject* pObject) {
     Mem_cpy(gEATraxSongs, pObject->pData, sizeof(gEATraxSongs));
-    StaticMem_Free(pObject);
+    Circular_MemFreeFunc(pObject);
 }
 
 // The 'TRXT' stream object's loader: load its texture bank (the EA Trax logo) into a texture slot
 // (gEATraxDisplay.nLogo), then free the object.
 void UI_vEATraxLoadLogoFromStream(UStreamObject* pObject) {
     gEATraxDisplay.nLogo = fn_800107C0(pObject, NULL, 0);
-    StaticMem_Free(pObject);
+    Circular_MemFreeFunc(pObject);
 }
 
 // Draw the EA Trax song display (gomainloop.c, each frame), unless the screen is fading to black or

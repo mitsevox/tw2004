@@ -10,5 +10,5 @@ void fn_8009B314(u8 v) {
 }
 
 void fn_8009B320(void* p) {
-    StaticMem_Free(p);
+    Circular_MemFreeFunc(p);
 }

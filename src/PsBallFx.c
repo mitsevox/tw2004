@@ -283,10 +283,10 @@ void PsBallFx_InitModule(void) {
     // into saved registers ahead of every call.
     for (j = 0; j < 1; j++) {
         SD_InitShaderObject(&lbl_80281408->mesh[j], 0, &size);
-        lbl_80281408->ap2C[j] = StaticMem_Alloc(0x640, 2, 16, "PsBallFx.c", 1435);
-        lbl_80281408->ap30[j] = StaticMem_Alloc(0x320, 2, 16, "PsBallFx.c", 1440);
-        lbl_80281408->ap28[j] = StaticMem_Alloc(0x960, 2, 16, "PsBallFx.c", 1445);
-        lbl_80281408->ap50[j] = StaticMem_Alloc(0x4B0, 2, 16, "PsBallFx.c", 1450);
+        lbl_80281408->ap2C[j] = Circular_MemAllocFunc(0x640, MEMTYPE_LOW, 16, "PsBallFx.c", 1435);
+        lbl_80281408->ap30[j] = Circular_MemAllocFunc(0x320, MEMTYPE_LOW, 16, "PsBallFx.c", 1440);
+        lbl_80281408->ap28[j] = Circular_MemAllocFunc(0x960, MEMTYPE_LOW, 16, "PsBallFx.c", 1445);
+        lbl_80281408->ap50[j] = Circular_MemAllocFunc(0x4B0, MEMTYPE_LOW, 16, "PsBallFx.c", 1450);
         for (i = 0; i < 50; i++) {
             lbl_80281408->ap2C[j][i * 8 + 0] = 0.0f;
             lbl_80281408->ap2C[j][i * 8 + 1] = 0.0f;
@@ -308,10 +308,10 @@ void PsBallFx_InitModule(void) {
 
 void fn_800A2E14(void) {
     SD_FreeShaderObject(&lbl_80281408->mesh[0]);
-    StaticMem_Free(lbl_80281408->ap28[0]);
-    StaticMem_Free(lbl_80281408->ap2C[0]);
-    StaticMem_Free(lbl_80281408->ap30[0]);
-    StaticMem_Free(lbl_80281408->ap50[0]);
+    Circular_MemFreeFunc(lbl_80281408->ap28[0]);
+    Circular_MemFreeFunc(lbl_80281408->ap2C[0]);
+    Circular_MemFreeFunc(lbl_80281408->ap30[0]);
+    Circular_MemFreeFunc(lbl_80281408->ap50[0]);
 }
 
 // Clear the sand trail's state and give emitters 0, 6 and 14 the current course's vectors (on

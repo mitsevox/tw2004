@@ -14,8 +14,8 @@ void fn_800563C4(void) {
 
     lbl_80281DF0.bSigned = 0;
     lbl_80281DF0.nSponsor = 0;
-    gpSaveData = StaticMem_Alloc(5 * sizeof(SaveProfile), 0, 32, "user.c", 97);
-    lbl_80281DF4 = StaticMem_Alloc(sizeof(SaveProfile), 0, 32, "user.c", 98);
+    gpSaveData = Circular_MemAllocFunc(5 * sizeof(SaveProfile), MEMTYPE_SYSTEM, 32, "user.c", 97);
+    lbl_80281DF4 = Circular_MemAllocFunc(sizeof(SaveProfile), MEMTYPE_SYSTEM, 32, "user.c", 98);
     for (i = 0; i < 5; i++) {
         SaveProfile_InitSlot(i);
     }
@@ -23,6 +23,6 @@ void fn_800563C4(void) {
 }
 
 void fn_80056454(void) {
-    StaticMem_Free(gpSaveData);
-    StaticMem_Free(lbl_80281DF4);
+    Circular_MemFreeFunc(gpSaveData);
+    Circular_MemFreeFunc(lbl_80281DF4);
 }
