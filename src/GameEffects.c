@@ -372,7 +372,7 @@ void GameEffects_InFlightGameBreakerTrigger(int nPlayer) {
     int nClass;
     int nLie;
     View* pView;
-    CamSequence* pSeq;
+    CameraSequence_t* pSeq;
     CamShot* pShot;
     f32 fDist;
     f32 fTime;
@@ -437,7 +437,7 @@ void GameEffects_InFlightGameBreakerTrigger(int nPlayer) {
                 }
                 pView->p74 = pSeq;
                 pView->script.nRequestedEvent = 0;
-                pView->script.nC8 = 25;
+                pView->script.nC8 = CAMEVENT_NONE;
             }
             EVENT_Trigger(nPlayer, 0x3F, 0, -1);
         }

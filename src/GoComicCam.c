@@ -54,11 +54,11 @@ void ComicCam_StartComicCam(int nKind, View* pView, int nPlayer) {
     switch (nKind) {
     case 0:
         ComicCam_Init3ScreenMode();
-        nShot = 0x28;
+        nShot = CAMSTATE_COMIC_3SCREEN;
         break;
     case 1:
         ComicCam_Init9ScreenRapidMode();
-        nShot = 0x2B;
+        nShot = CAMSTATE_COMIC_9SCREEN;
         break;
     }
     gpComicCam->bScreenFrozen = 0;
@@ -69,7 +69,7 @@ void ComicCam_StartComicCam(int nKind, View* pView, int nPlayer) {
     pShot = DynamicCam_ChooseScript(nPlayer, nShot, pView->script.pShot);
     if (pShot != NULL && !CameraScript_WillGolferBeOccludedInThisView(nPlayer, pShot, &pView->script)) {
         CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, CAMINTERP_CUT, 0.0f,
-                                       100.0f, 0x19, 0.0f);
+                                       100.0f, CAMEVENT_NONE, 0.0f);
     }
 }
 
@@ -453,10 +453,10 @@ void ComicCam_CheckForCameraSwitch(View* pView, int nPlayer) {
 
     switch (gpComicCam->nKind) {
     case 0:
-        pShot = DynamicCam_ChooseScript(nPlayer, nPanel + 0x28, pView->script.pShot);
+        pShot = DynamicCam_ChooseScript(nPlayer, nPanel + CAMSTATE_COMIC_3SCREEN, pView->script.pShot);
         if (pShot != NULL && !CameraScript_WillGolferBeOccludedInThisView(nPlayer, pShot, &pView->script)) {
             CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, CAMINTERP_CUT, 0.0f,
-                                           100.0f, 0x19, 0.0f);
+                                           100.0f, CAMEVENT_NONE, 0.0f);
         }
         Gaud_UpdtSpecialShot(nPlayer, nColumn);
         return;
@@ -465,14 +465,14 @@ void ComicCam_CheckForCameraSwitch(View* pView, int nPlayer) {
             pShot = pView->script.pShot;
             if (pShot != NULL) {
                 nShot = pShot->nStateType + 1;
-                if (nShot > 0x2D) {
-                    nShot = 0x2B;
+                if (nShot > CAMSTATE_COMIC_9SCREEN + 2) {
+                    nShot = CAMSTATE_COMIC_9SCREEN;
                 }
                 pShot = DynamicCam_ChooseScript(nPlayer, nShot, pShot);
                 if (pShot != NULL &&
                     !CameraScript_WillGolferBeOccludedInThisView(nPlayer, pShot, &pView->script)) {
                     CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, CAMINTERP_CUT,
-                                                   0.0f, 100.0f, 0x19, 0.0f);
+                                                   0.0f, 100.0f, CAMEVENT_NONE, 0.0f);
                 }
             }
         }
