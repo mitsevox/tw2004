@@ -71,7 +71,7 @@ The code allows it, but whether it ever happens depends on the game's data or on
 | PGATourSimulation.c SimTournamentWinner / CheckEndOfTournamentAward | bFirst is set before the playoff winner: a player tied first who loses the playoff may still get nWinStreak++ / nMajorWins++ | trace a real playoff (AdvancePlayer moves entrant 0 back to the playoff hole first) |
 | PGATourSimulation.c CalculateCutRow | with no row below 70th it returns the last row, so one entrant is cut anyway | needs a 30-way tie at the cut; intent only |
 | FE_CrAPMessages.c GM_vGetNumCrAPSaleItemsOwned / GM_vIsCrAPItemOnSale | empty sale slots stay -1 (fn_80077C1C): owned bit (u32)-1 read ~512 MB past aB1CC; "on sale" for a choice that does not exist | the disc's 'CR_A' data: any sale category with fewer than 5 eligible assets |
-| FE_CrAPMessages.c GM_vIsCrAPAnimInGolferLib | reads pB4->pChar->pLib with no NULL test on pChar | whether the menu golfer can be unloaded when the message comes |
+| FE_CrAPMessages.c GM_vIsCrAPAnimInGolferLib | reads pShown->pChar->pLib with no NULL test on pChar | whether the menu golfer can be unloaded when the message comes |
 | FE_CrAPMessages.c GM_vIsCrAPItemEquipped | 16-byte variant-name buffer where the same call elsewhere uses 64 | the longest variant name in the data |
 | GameModeFourBall.c EndGame | adds nMoney to money.n14 where GameModeMatch adds nPrize | intent only |
 | FE_MessageTable.c GM_vFindGolferBio | no matching bio reads entry 29, one past FE_NUM_BIOS | whether the menus ask for a golfer without a bio |
@@ -98,6 +98,7 @@ The code allows it, but whether it ever happens depends on the game's data or on
 | SitDev.c / SitDevCommentaryZones.c | the event queue and the zone list (10 slots each) have no bounds check | the scripts' data |
 | SitDevTrigger.c SitDev_InvokeCommentaryBank | `% nLeft` with an empty list divides by zero | the commentary banks' data |
 | GoGolfCam.c GolfCamera_ChooseReactionCam | tests ball.nSurface >= 0 but reads gSurfaceTypes[ballBefore.nSurface] | whether ballBefore.nSurface can be negative while ball.nSurface is not |
+| GoDynamicCam.c DynamicCam_MatchPlayer | the shot's golfer bits are tested in uGolfersLow for ids up to 32, so id 32 shifts 1 by 32 (undefined in C; the PowerPC's slw gives 0): a shot never fits golfer 32, and uGolfersHigh's bit 0 is never tested | whether the CrAP screen ever shows golfer 32 (gGolferTable has NUM_GOLFERS, 34, ids 0..33), and the shots' uGolfersHigh bit 0 |
 | GoDynamicCam.c ChooseSequence / ChoosePreFlightSequence | `uRand % (int)(1000 * fTotal)` divides by zero if the weights add up to under 0.001 | the camera data |
 | GoStaticCam.c Parse*CameraActor | no check against the 10 static / 30 fly-by slots | the course camera data |
 | CamUtils.c CamUtils_vCalcArcPosition, CAMERA_ARC_EITHER_WAY | only an end angle more than half a turn above the start's is brought round; one more than half a turn below it is left (a start at 72 degrees and an end at -126, or a start with x 0 on the -z side, which is given 270 degrees), so the camera swings the long way round | whether CamScript_PickArcDirection's "either way" was meant as the short way |

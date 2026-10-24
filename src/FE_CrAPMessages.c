@@ -86,10 +86,10 @@ void GM_vSetCRAPSlider(MsgArg* pArgs, MsgArg* pResult) {
     Character* pChar;
 
     pChoices->a9B4[nSlider] = pArgs[1].i;
-    if (gpCrAPState->pB4 == NULL) {
+    if (gpCrAPState->pShown == NULL) {
         return;
     }
-    pChar = gpCrAPState->pB4->pChar;
+    pChar = gpCrAPState->pShown->pChar;
     if (pChar == NULL) {
         return;
     }
@@ -1322,9 +1322,9 @@ void GM_vIsCrAPAnimInGolferLib(MsgArg* pArgs, MsgArg* pResult) {
     int nEntry = pArgs[1].i;
     int nChoice = pArgs[2].i;
 
-    if (gpCrAPState->pB4 != NULL && nPart == 13) {
+    if (gpCrAPState->pShown != NULL && nPart == 13) {
         FE_CrAP_GetPartVariantName(nPart, nEntry, nChoice, szName);
-        if (AnimLib_FindByName(gpCrAPState->pB4->pChar->pLib, szName) == NULL) {
+        if (AnimLib_FindByName(gpCrAPState->pShown->pChar->pLib, szName) == NULL) {
             bFound = 0;
         }
     }

@@ -2422,9 +2422,9 @@ void GM_vFEMessage89_Empty(MsgArg* pArgs, MsgArg* pResult) {
 // created golfer's look, it takes that profile's look (Character_ApplyCrAPSettings).
 void GM_vSetCurrentProfileSlot(MsgArg* pArgs, MsgArg* pResult) {
     gpFEProfile->nSlot = pArgs[0].i;
-    if (gpCrAPState->pB4->pChar != NULL &&
-        (gpCrAPState->pB4->pChar->nGolferId == 7 || gpCrAPState->pB4->pChar->nGolferId == 29)) {
-        Character_ApplyCrAPSettings(gpCrAPState->pB4->pChar, &FE_GetCurrentProfile()->choices);
+    if (gpCrAPState->pShown->pChar != NULL &&
+        (gpCrAPState->pShown->pChar->nGolferId == 7 || gpCrAPState->pShown->pChar->nGolferId == 29)) {
+        Character_ApplyCrAPSettings(gpCrAPState->pShown->pChar, &FE_GetCurrentProfile()->choices);
     }
 }
 
@@ -2641,7 +2641,7 @@ void GM_vNextShirt(MsgArg* pArgs, MsgArg* pResult) {
         }
         if (gSession.aProfile[gpFEProfile->nSlot].nShirt == nStart) break;
     }
-    Character_RequestClothesUpdateFE(gpCrAPState->pB4->nIndex);
+    Character_RequestClothesUpdateFE(gpCrAPState->pShown->nIndex);
 }
 
 // Front-end message 119: the pin position every hole uses (gSession.nPinSet, 0..3; -1 counts as 0).

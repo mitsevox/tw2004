@@ -30,8 +30,8 @@ static f32 GoCamCont_StrippedFn(f32 x) {
 }
 
 // Sets a view's camera controller up: no camera mode (25), no camera sequences or shots, the
-// script's clocks, fade, flags, positions and shake cleared, vViewScale 1, the script's v70 (0, 0, 0,
-// 1), and the script's recording shot pB4 pointed at the view's own shot19C.
+// script's clocks, fade, flags, positions and shake cleared, vViewScale 1, the script's
+// vLastBallPos (0, 0, 0, 1), and the script's recording shot pB4 pointed at the view's own shot19C.
 void CameraController_InitOneCamera(View* pView) {
     int i;
 
@@ -71,10 +71,10 @@ void CameraController_InitOneCamera(View* pView) {
     for (i = 0; i < 8; i++) {
         pView->script.aLookAt[i] = 0.0f;
     }
-    pView->script.v70[0] = 0.0f;
-    pView->script.v70[1] = 0.0f;
-    pView->script.v70[2] = 0.0f;
-    pView->script.v70[3] = 1.0f;
+    pView->script.vLastBallPos[0] = 0.0f;
+    pView->script.vLastBallPos[1] = 0.0f;
+    pView->script.vLastBallPos[2] = 0.0f;
+    pView->script.vLastBallPos[3] = 1.0f;
 }
 
 // Forgets the view's camera sequences (p74, p78, p7C) and shot p80, and clears bSkipFancyPreshotCams.
@@ -316,7 +316,7 @@ void CameraController_SetCameraMode(View* pView, int nCamera, int nPlayer, int n
 
 // Starts a shot of kind nKind chosen for the player (DynamicCam_ChooseScript; none leaves the
 // script without a shot) on the view, with its follow-on as the next shot, and runs the script's
-// first frame at once. Camera mode 24's init starts kind 10 with it.
+// first frame at once. Camera mode 24's init starts a CAMSTATE_ANY_SECOND_VIEW shot with it.
 void CameraController_StartScriptOfKind(View* pView, int nPlayer, int nKind) {
     f32* pPos = CameraController_GetCameraOrigin(pView);
     f32* pAt = CameraController_GetCameraLookPoint(pView);

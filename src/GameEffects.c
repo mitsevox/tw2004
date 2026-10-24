@@ -28,19 +28,19 @@ u8    GM_IsPuttForWin(int nPlayer);
 GameEffects gGameEffects;   // the effects state (game.h; GameManager, GoGolfCam and others read it)
 
 // Starts a scripted GameBreaker for player nWho, for reason nWhy (a bit in uFlags).
-#define GB_START(nWho, nWhy)                                                                \
-    if (!gGameEffects.bGameBreaker || gGameEffects.bClosing || gGameEffects.nGBType != 0) { \
-        gGameEffects.bClosing = 0;                                                          \
-        gGameEffects.bGameBreaker = 1;                                                      \
-        gGameEffects.fGBTime = 0.0f;                                                        \
-        gGameEffects.f24 = 0.0f;                                                            \
-        gGameEffects.b19 = 0;                                                               \
-        gGameEffects.nGBType = 0;                                                           \
-        gGameEffects.nPlayer = (nWho);                                                      \
-        gGameEffects.bPaused = 0;                                                           \
-        gGameEffects.uFlags = 1 << (nWhy);                                                  \
-        gGameEffects.nHeartbeats = 0;                                                       \
-        EVENT_Trigger((nWho), 0x3D, 0, -1);                                                 \
+#define GB_START(nWho, nWhy)                                                                          \
+    if (!gGameEffects.bGameBreaker || gGameEffects.bClosing || gGameEffects.nGBType != GB_SCRIPTED) { \
+        gGameEffects.bClosing = 0;                                                                    \
+        gGameEffects.bGameBreaker = 1;                                                                \
+        gGameEffects.fGBTime = 0.0f;                                                                  \
+        gGameEffects.f24 = 0.0f;                                                                      \
+        gGameEffects.bBallHit = 0;                                                                    \
+        gGameEffects.nGBType = GB_SCRIPTED;                                                           \
+        gGameEffects.nPlayer = (nWho);                                                                \
+        gGameEffects.bPaused = 0;                                                                     \
+        gGameEffects.uFlags = 1 << (nWhy);                                                            \
+        gGameEffects.nHeartbeats = 0;                                                                 \
+        EVENT_Trigger((nWho), 0x3D, 0, -1);                                                           \
     }
 
 // Once, as the game starts (GO_vInitIG): double time (b10), half time (b11), super slow motion and
@@ -53,7 +53,7 @@ void GameEffects_InitGameEffectSettings(void) {
     gGameEffects.bSpeedyTime = 0;
     gGameEffects.n28 = 0;
     gGameEffects.bGameBreaker = 0;
-    gGameEffects.b19 = 0;
+    gGameEffects.bBallHit = 0;
     gGameEffects.bPaused = 0;
     gGameEffects.bRumble = 0;
     gGameEffects.nHeartbeats = 0;
@@ -71,7 +71,7 @@ void GameEffects_ResetGameEffectSettings(void) {
     gGameEffects.bPaused = 0;
     gGameEffects.bRumble = 0;
     if (gGameEffects.bGameBreaker) {
-        if (gGameEffects.nGBType == 0) {
+        if (gGameEffects.nGBType == GB_SCRIPTED) {
             EVENT_Trigger(gGameEffects.nPlayer, 0x3E, 0, -1);
         } else {
             EVENT_Trigger(gGameEffects.nPlayer, 0x40, 0, -1);
@@ -80,7 +80,7 @@ void GameEffects_ResetGameEffectSettings(void) {
     }
     gGameEffects.bGameBreaker = 0;
     gGameEffects.bSpinWindowDone = 0;
-    gGameEffects.b19 = 0;
+    gGameEffects.bBallHit = 0;
     gGameEffects.bPostGBLine = 0;
     for (i = 0; i < gSession.nNumPlayers; i++) {
         if (fn_8002E898_IsPad(gSession.nController[i])) {
@@ -281,16 +281,16 @@ void GameEffects_TargetGameBreakerTrigger(int nPlayer) {
 // As the ball is hit (STATEFUNC_SimulateInit), for a GameBreaker that is up (not in the demo): half
 // and double time off, and the player's view gets a CAMSTATE_GAMEBREAKER_HIT camera sequence
 // (DynamicCam_ChooseSequence, from the lie the ball is hit from) for the shot's full distance
-// (AI_MaxDistance times the lie's power times the swing's power). b19 is set, which starts the letterbox
-// (GameEffects_RenderScriptedGB), and f24 is held to 0.8 at most. On course 7 there is no camera,
-// only b19.
+// (AI_MaxDistance times the lie's power times the swing's power). bBallHit is set, which starts the
+// letterbox (GameEffects_RenderScriptedGB), and f24 is held to 0.8 at most. On course 7 there is no
+// camera, only bBallHit.
 void GameEffects_ScriptedGameBreakerBallHitTrigger(int nPlayer) {
     int nLie;
     f32 fDist;
     View* pView;
     if ((!(gSession.uFlags & 0x4000) || !(gSession.uFlags & 0x8000)) && gGameEffects.bGameBreaker) {
         if (Game_GetCourse() == 7) {
-            gGameEffects.b19 = 1;
+            gGameEffects.bBallHit = 1;
             return;
         }
         nLie = gPlayers[nPlayer].ball.nLie;
@@ -301,7 +301,7 @@ void GameEffects_ScriptedGameBreakerBallHitTrigger(int nPlayer) {
         GameEffects_SetDoubleTime(0, nPlayer);
         pView = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
         pView->p74 = DynamicCam_ChooseSequence(nPlayer, nLie, 3, CAMSTATE_GAMEBREAKER_HIT, 1, fDist);
-        gGameEffects.b19 = 1;
+        gGameEffects.bBallHit = 1;
         if (gGameEffects.f24 > 0.8f) {
             gGameEffects.f24 = 0.8f;
         }
@@ -415,7 +415,7 @@ void GameEffects_InFlightGameBreakerTrigger(int nPlayer) {
             gGameEffects.bGameBreaker = 1;
             gGameEffects.fGBTime = 0.0f;
             gGameEffects.f24 = 0.0f;
-            gGameEffects.nGBType = 1;
+            gGameEffects.nGBType = GB_PREDICTED;
             gGameEffects.nPlayer = nPlayer;
             gGameEffects.bPaused = 0;
             gGameEffects.nHeartbeats = 0;
@@ -458,7 +458,7 @@ void GameEffects_EndGameBreaker(int nPlayer) {
             gGameEffects.fGBTime = 0.8f;
         }
         switch (gGameEffects.nGBType) {
-        case 1:
+        case GB_PREDICTED:
             EVENT_Trigger(gGameEffects.nPlayer, 0x40, 0, -1);
             if (gGameEffects.bPostGBLine) {
                 Gaud_StartRegularComment(gGameEffects.nPostGBLine, 0);
@@ -466,7 +466,7 @@ void GameEffects_EndGameBreaker(int nPlayer) {
             }
             Gaud_InitCrowdReactionSound(3, 1);
             return;
-        case 0:
+        case GB_SCRIPTED:
             EVENT_Trigger(gGameEffects.nPlayer, 0x3E, 0, -1);
             if (GameEffects_ScriptedGBDidIt(&gPlayers[gGameEffects.nPlayer].ball, gGameEffects.nPlayer, 0)) {
                 if (gGameEffects.bPostGBLine) {
@@ -493,10 +493,10 @@ void GameEffects_EndGameBreaker(int nPlayer) {
 void GameEffects_RenderGameBreakerEffects(void) {
     if (gGameEffects.bGameBreaker && gSession.nPaused == 0 && !gGameEffects.bPaused) {
         switch (gGameEffects.nGBType) {
-        case 1:
+        case GB_PREDICTED:
             GameEffects_RenderPredictedGB();
             return;
-        case 0:
+        case GB_SCRIPTED:
             GameEffects_RenderScriptedGB();
             break;
         }
@@ -548,18 +548,18 @@ void GameEffects_RenderPredictedGB(void) {
     }
 }
 
-// Each frame of a scripted GameBreaker: f24 counts up until b19 is set (the ball is hit,
-// GameEffects_ScriptedGameBreakerBallHitTrigger), then down. From b19 on the letterbox is drawn
+// Each frame of a scripted GameBreaker: f24 counts up until bBallHit is set (the ball is hit,
+// GameEffects_ScriptedGameBreakerBallHitTrigger), then down. From bBallHit on the letterbox is drawn
 // (growing to 0.15 of the screen over 0.8 s) and fGBTime advances, or runs down while closing until
 // the GameBreaker is over.
 void GameEffects_RenderScriptedGB(void) {
     f32 fHeight;
-    if (gGameEffects.b19) {
+    if (gGameEffects.bBallHit) {
         gGameEffects.f24 -= gSession.fFrameTime;
     } else {
         gGameEffects.f24 += gSession.fFrameTime;
     }
-    if (gGameEffects.b19) {
+    if (gGameEffects.bBallHit) {
         if (gGameEffects.fGBTime < 0.8f) {
             fHeight = 0.15f * (gGameEffects.fGBTime / 0.8f);
         } else {
@@ -618,13 +618,13 @@ f32 GameEffects_FieldOfViewChange(void) {
     if (gGameEffects.bPaused) {
         return 0.0f;
     }
-    if (gGameEffects.nGBType == 1) {
+    if (gGameEffects.nGBType == GB_PREDICTED) {
         if (gGameEffects.fGBTime < 0.8f) {
             return 0.34906587f * (gGameEffects.fGBTime / 0.8f);
         }
         return 0.34906587f;
     }
-    if (gGameEffects.nGBType == 0) {
+    if (gGameEffects.nGBType == GB_SCRIPTED) {
         if (gGameEffects.fGBTime < 0.8f) {
             return 0.34906587f * (gGameEffects.fGBTime / 0.8f);
         }
@@ -735,7 +735,7 @@ u8 GameEffects_SkipOtherCommentary(void) {
     if (!gGameEffects.bGameBreaker) {
         return 0;
     }
-    if (gGameEffects.nGBType == 1) {
+    if (gGameEffects.nGBType == GB_PREDICTED) {
         return 1;
     }
     if (gGameEffects.bClosing) {
@@ -790,7 +790,7 @@ void GameEffects_Pause(int a) {
     if (gGameEffects.bGameBreaker) {
         if (gGameEffects.bPaused) {
             gGameEffects.bPaused = 0;
-            if (gGameEffects.nGBType == 0) {
+            if (gGameEffects.nGBType == GB_SCRIPTED) {
                 EVENT_Trigger(gGameEffects.nPlayer, 0x3D, 0, -1);
                 return;
             }
@@ -798,7 +798,7 @@ void GameEffects_Pause(int a) {
             return;
         }
         gGameEffects.bPaused = 1;
-        if (gGameEffects.nGBType == 0) {
+        if (gGameEffects.nGBType == GB_SCRIPTED) {
             EVENT_Trigger(gGameEffects.nPlayer, 0x3E, 0, -1);
             return;
         }
