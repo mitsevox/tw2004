@@ -342,7 +342,7 @@ s32 CharacterState_ResetFidgetState(Character* pChar) {
 // A random count of 8 to 10: how many times the idle picks the ambient idle (group 2) before the
 // idle clip (group 3).
 s8 GET_AMBIENT_FIDGET_COUNT(void) {
-    return Misc_RandFunc(1) % 3 + 8;
+    return Misc_RandFunc(RANDOM_PRESENTATION) % 3 + 8;
 }
 
 // Whether the golfer is not playing a fidget (group 4, bFidgeting set): the idle (state 5) keeps
@@ -415,7 +415,7 @@ s32 CharacterState_UpdateFidgetState(Character* pChar) {
 // Draws a random number it does not use and returns 1: how many times the idle clip (group 3) plays
 // before a fidget (group 4).
 s32 GET_IDLE_FIDGET_COUNT(void) {
-    Misc_RandFunc(1);
+    Misc_RandFunc(RANDOM_PRESENTATION);
     return 1;
 }
 
@@ -486,7 +486,8 @@ void CharacterState_UpdateSKAState(Character* pChar) {
             gSession.options.nWind >= 1 && pChar->nSlot == 0) {
             nGroup = 16;
         } else if (gPlayers[pChar->nPlayer].ball.nLie == 0 && gPlayers[pChar->nPlayer].nClub >= 0 &&
-                   gPlayers[pChar->nPlayer].nClub <= 5 && Misc_RandFunc(1) % 100 < 10 && pChar->nSlot == 0) {
+                   gPlayers[pChar->nPlayer].nClub <= 5 && Misc_RandFunc(RANDOM_PRESENTATION) % 100 < 10
+                           && pChar->nSlot == 0) {
             nGroup = 16;
         }
         CharacterState_AddSKABlendData(pChar, 1, nGroup, SKABlender_BlendLinear, 1, 2, -10000.0f, -30000.0f,

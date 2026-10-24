@@ -2278,9 +2278,9 @@ void GM_vIsLadderEvent(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
-// A random number from stream 1 of Misc_RandFunc (command 136).
+// A random number from RANDOM_PRESENTATION (command 136).
 void GM_vGetRandInt(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = Misc_RandFunc(1);
+    pResult->i = Misc_RandFunc(RANDOM_PRESENTATION);
 }
 
 // The UI's command 137: always answers 0 in this build.

@@ -43,7 +43,7 @@ void SitDev_InvokeMultipleActions(SitDevSituation* pEntry, int nFile, int nPlaye
     for (i = 0; i < 4; i++) {
         if (pEntry->aActions[i] == 0xFFF0) break;
         pAction = &gpSitDevScripts->pActions[pEntry->aActions[i]];
-        if (pAction->nChance > Misc_RandFunc(1) % 100
+        if (pAction->nChance > Misc_RandFunc(RANDOM_PRESENTATION) % 100
             && !SitDev_SuppressAction(pAction, nFile, nPlayer, nEvent)) {
             if (pAction->bSound) {
                 bPlayed = SitDev_InvokeCommentaryBank(pAction, nEvent);
@@ -72,7 +72,8 @@ u8 SitDev_InvokeCommentaryBank(SitDevAction* pAction, u8 nEvent) {
     if (gpSitDevData->abPlayed[pAction->nKind]) return 0;
     nCount = SitDev_NumEntries(pAction->aList, 50);
     nLeft = SitDev_NumEntriesUnused(pAction->aList, nCount);
-    nSound = SitDev_ChooseRandomResponseNoRepeat(pAction->aList, nCount, nLeft, Misc_RandFunc(1) % nLeft);
+    nSound = SitDev_ChooseRandomResponseNoRepeat(pAction->aList, nCount, nLeft,
+                                                 Misc_RandFunc(RANDOM_PRESENTATION) % nLeft);
     bNot30 = nEvent != 30;
     if (!GameEffects_SkipOtherCommentary()) {
         Gaud_StartRegularComment(nSound, bNot30);
@@ -133,7 +134,7 @@ u8 SitDev_InvokeAction(SitDevAction* pAction, int nPlayer, u8 nEvent) {
                 gpSitDevData->abPlayed[nKind] = 1;
             }
         } else if (anCount[nKind] > 1) {
-            nPick = Misc_RandFunc(1) % anCount[nKind];
+            nPick = Misc_RandFunc(RANDOM_PRESENTATION) % anCount[nKind];
             nEntry = aaIndex[nKind][nPick];
             nStart = nPick;
             while (pAction->aList[nEntry] & 0x8000) {

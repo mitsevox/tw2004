@@ -202,7 +202,7 @@ void* MtaLib_GetRandom(MalBank* pBank, int nGroup, int n) {
 
     apItem = MtaLib_GetGroup(pBank, nGroup, &nNum, n);
     if (nNum != 0) {
-        return apItem[Misc_RandFunc(1) % nNum];
+        return apItem[Misc_RandFunc(RANDOM_PRESENTATION) % nNum];
     }
     return NULL;
 }

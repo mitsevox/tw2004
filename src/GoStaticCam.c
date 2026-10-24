@@ -243,7 +243,7 @@ CamShot* StaticCam_ChooseScript(int ePlayerID, StaticCam_EventType_e event, u8 d
     if (scriptsFound == 0) {
         return NULL;
     }
-    i = Misc_RandFunc(1) % scriptsFound;
+    i = Misc_RandFunc(RANDOM_PRESENTATION) % scriptsFound;
     return &gpStaticCams->aStatic[possibleScripts[i]];
 }
 

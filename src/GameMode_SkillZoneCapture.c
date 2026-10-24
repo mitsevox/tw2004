@@ -118,7 +118,7 @@ void GameModeSkillZoneCapture_StartGamePreData(void) {
     gCaptureSavedWind = gSession.options.nWind;
     gSession.options.nWeather = 4;
     gSession.options.nWind = 0;
-    gCaptureFirstGolfer = Misc_RandFunc(0) & 1;
+    gCaptureFirstGolfer = Misc_RandFunc(RANDOM_GAME) & 1;
 }
 
 u8 GameModeSkillZoneCapture_GoToPlayoff(u8 bCheck) {
@@ -207,7 +207,7 @@ void GameModeSkillZoneCapture_CheckShotAwards(int nPlayer) {
             } else {
                 nText = 0;
                 if (gCaptureClaims[nTarget].nRing == 5) {
-                    if (!(Misc_RandFunc(0) & 1)) {
+                    if (!(Misc_RandFunc(RANDOM_GAME) & 1)) {
                         nMsg = 0x1A;
                     } else {
                         nMsg = 0x52;
@@ -218,7 +218,7 @@ void GameModeSkillZoneCapture_CheckShotAwards(int nPlayer) {
                     nText = 0xD4;
                     nStolenLocked = 1;
                     gPlayers[nPlayer].nSteals++;
-                    if (!(Misc_RandFunc(0) & 1)) {
+                    if (!(Misc_RandFunc(RANDOM_GAME) & 1)) {
                         nMsg = 0xF;
                     } else {
                         nMsg = 0x1B;
@@ -228,14 +228,14 @@ void GameModeSkillZoneCapture_CheckShotAwards(int nPlayer) {
                     gPlayers[nPlayer].nBullseyes++;
                     if (nStolenLocked == 0) {
                         nText = 0xD2;
-                        if (!(Misc_RandFunc(0) & 1)) {
+                        if (!(Misc_RandFunc(RANDOM_GAME) & 1)) {
                             nMsg = 0x16;
                         } else {
                             nMsg = 0x53;
                         }
                     } else {
                         nText = 0xD5;
-                        if (!(Misc_RandFunc(0) & 1)) {
+                        if (!(Misc_RandFunc(RANDOM_GAME) & 1)) {
                             nMsg = 0x17;
                         } else {
                             nMsg = 0x1C;
@@ -310,13 +310,13 @@ void GameModeSkillZoneCapture_SetupNextGolfer(void) {
                 GameModeSkillZoneBase_SetCup_AlignGolfer(i, (s8)PLAYER(i)->nTarget);
             }
             if (i == 0 && n1 >= n0 + 3) {
-                if (!(Misc_RandFunc(0) & 1)) {
+                if (!(Misc_RandFunc(RANDOM_GAME) & 1)) {
                     nMsg = 0x4A;
                 } else {
                     nMsg = 0x4C;
                 }
             } else if (i == 1 && n0 >= n1 + 3) {
-                if (!(Misc_RandFunc(0) & 1)) {
+                if (!(Misc_RandFunc(RANDOM_GAME) & 1)) {
                     nMsg = 0x4B;
                 } else {
                     nMsg = 0x4D;

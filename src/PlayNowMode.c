@@ -303,7 +303,7 @@ void PlayNow_StartChallenge(void) {
             }
             nDiff = gChallengeList[gCurChallenge].nTargetBase - nSum0;
             while (nDiff != 0) {
-                h = Misc_RandFunc(0) % (Game_CurHoleIndex() + 1);
+                h = Misc_RandFunc(RANDOM_GAME) % (Game_CurHoleIndex() + 1);
                 if (nDiff < 0) {
                     if (gPlayers[0].nStrokes[h] > GM_GetHoleIndexPar(h) - 1) {
                         gPlayers[0].nStrokes[h]--;
@@ -335,7 +335,7 @@ void PlayNow_StartChallenge(void) {
             }
             nDiff = gChallengeList[gCurChallenge].nTargetBase;
             while (nDiff != 0) {
-                h = Misc_RandFunc(0) % (Game_CurHoleIndex() + 1);
+                h = Misc_RandFunc(RANDOM_GAME) % (Game_CurHoleIndex() + 1);
                 if (nDiff < 0) {
                     if (gPlayers[0].nStrokes[h] > GM_GetHoleIndexPar(h) - 1) {
                         gPlayers[0].nStrokes[h]--;
@@ -370,7 +370,7 @@ void PlayNow_StartChallenge(void) {
         if (gpGame->nScoringType == GM_SCORING_HOLES_WON) {
             nDiff = gChallengeList[gCurChallenge].nTargetBase;
             while (nDiff != 0) {
-                h = Misc_RandFunc(0) % (Game_CurHoleIndex() + 1);
+                h = Misc_RandFunc(RANDOM_GAME) % (Game_CurHoleIndex() + 1);
                 if (nDiff < 0) {
                     if (gPlayers[0].nModePoints[h] == 0 && gPlayers[1].nModePoints[h] == 0) {
                         nDiff++;
@@ -395,7 +395,7 @@ void PlayNow_StartChallenge(void) {
             }
             nDiff = gChallengeList[gCurChallenge].nTargetBase;
             while (nDiff != 0) {
-                i = Misc_RandFunc(0) % (Game_CurHoleIndex() + 1);
+                i = Misc_RandFunc(RANDOM_GAME) % (Game_CurHoleIndex() + 1);
                 if (nDiff < 0) {
                     if (gPlayers[0].nStrokes[i] > GM_GetHoleIndexPar(i) - 1) {
                         gPlayers[0].nStrokes[i]--;
@@ -613,7 +613,7 @@ s32 gPlayNowMedalMessages[3][3] = {
 // Queues a message for medal nMedal (0 best .. 2): one of its three ids in gPlayNowMedalMessages,
 // picked at random, as GUI message kind 7.
 void PlayNow_QueueMedalMessage(int nMedal) {
-    s32 nMsg = gPlayNowMedalMessages[nMedal][Misc_RandFunc(0) % 3];
+    s32 nMsg = gPlayNowMedalMessages[nMedal][Misc_RandFunc(RANDOM_GAME) % 3];
     GUI_QueueMessage(7, nMsg, 0, 0);
 }
 

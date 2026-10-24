@@ -72,7 +72,7 @@ void AI_SetShotModifiers(int nPlayer) {
         p->attrMod[ATTR_LUCK]          = 10;
     } else if (Game_GetMode() == 4) {
         int nLead = gPlayers[1].nHolesWon - gPlayers[0].nHolesWon;
-        p->attrMod[ATTR_POWER] = Misc_RandFunc(0) % 10 - 5;
+        p->attrMod[ATTR_POWER] = Misc_RandFunc(RANDOM_GAME) % 10 - 5;
         if (nLead > 0) {
             p->attrMod[ATTR_IQ]            = nLead * -5;
             p->attrMod[ATTR_AGGRESSION]    = nLead * -5;
@@ -82,23 +82,23 @@ void AI_SetShotModifiers(int nPlayer) {
             p->attrMod[ATTR_RECOVERY]      = nLead * -5;
             p->attrMod[ATTR_LUCK]          = nLead * -5;
         } else {
-            p->attrMod[ATTR_IQ]            = Misc_RandFunc(0) % 10 - 5;
-            p->attrMod[ATTR_AGGRESSION]    = Misc_RandFunc(0) % 10 - 5;
-            p->attrMod[ATTR_BALL_STRIKING] = Misc_RandFunc(0) % 10 - 5;
-            p->attrMod[ATTR_APPROACH]      = Misc_RandFunc(0) % 10 - 5;
-            p->attrMod[ATTR_PUTTING]       = Misc_RandFunc(0) % 10 - 5;
-            p->attrMod[ATTR_RECOVERY]      = Misc_RandFunc(0) % 10 - 5;
-            p->attrMod[ATTR_LUCK]          = Misc_RandFunc(0) % 10 - 5;
+            p->attrMod[ATTR_IQ]            = Misc_RandFunc(RANDOM_GAME) % 10 - 5;
+            p->attrMod[ATTR_AGGRESSION]    = Misc_RandFunc(RANDOM_GAME) % 10 - 5;
+            p->attrMod[ATTR_BALL_STRIKING] = Misc_RandFunc(RANDOM_GAME) % 10 - 5;
+            p->attrMod[ATTR_APPROACH]      = Misc_RandFunc(RANDOM_GAME) % 10 - 5;
+            p->attrMod[ATTR_PUTTING]       = Misc_RandFunc(RANDOM_GAME) % 10 - 5;
+            p->attrMod[ATTR_RECOVERY]      = Misc_RandFunc(RANDOM_GAME) % 10 - 5;
+            p->attrMod[ATTR_LUCK]          = Misc_RandFunc(RANDOM_GAME) % 10 - 5;
         }
     } else {
-        p->attrMod[ATTR_POWER]         = Misc_RandFunc(0) % 10 - 5;
-        p->attrMod[ATTR_IQ]            = Misc_RandFunc(0) % 10 - 5;
-        p->attrMod[ATTR_AGGRESSION]    = Misc_RandFunc(0) % 10 - 5;
-        p->attrMod[ATTR_BALL_STRIKING] = Misc_RandFunc(0) % 10 - 5;
-        p->attrMod[ATTR_APPROACH]      = Misc_RandFunc(0) % 10 - 5;
-        p->attrMod[ATTR_PUTTING]       = Misc_RandFunc(0) % 10 - 5;
-        p->attrMod[ATTR_RECOVERY]      = Misc_RandFunc(0) % 10 - 5;
-        p->attrMod[ATTR_LUCK]          = Misc_RandFunc(0) % 10 - 5;
+        p->attrMod[ATTR_POWER]         = Misc_RandFunc(RANDOM_GAME) % 10 - 5;
+        p->attrMod[ATTR_IQ]            = Misc_RandFunc(RANDOM_GAME) % 10 - 5;
+        p->attrMod[ATTR_AGGRESSION]    = Misc_RandFunc(RANDOM_GAME) % 10 - 5;
+        p->attrMod[ATTR_BALL_STRIKING] = Misc_RandFunc(RANDOM_GAME) % 10 - 5;
+        p->attrMod[ATTR_APPROACH]      = Misc_RandFunc(RANDOM_GAME) % 10 - 5;
+        p->attrMod[ATTR_PUTTING]       = Misc_RandFunc(RANDOM_GAME) % 10 - 5;
+        p->attrMod[ATTR_RECOVERY]      = Misc_RandFunc(RANDOM_GAME) % 10 - 5;
+        p->attrMod[ATTR_LUCK]          = Misc_RandFunc(RANDOM_GAME) % 10 - 5;
     }
     Golfer_ClampModifiers(p);
 }
@@ -424,13 +424,13 @@ void AI_ApplyError(int nPlayer) {
         }
         // Even a good golfer occasionally blows an approach.
         if (fSkill > 80.0f) {
-            if (Misc_RandFunc(0) % 20 == 0) {
+            if (Misc_RandFunc(RANDOM_GAME) % 20 == 0) {
                 fMaxAngle *= 4.0f; fDist1 *= 4.0f; fDist2 *= 4.0f; fSkill *= 0.25f;
-            } else if (Misc_RandFunc(0) % 10 == 0) {
+            } else if (Misc_RandFunc(RANDOM_GAME) % 10 == 0) {
                 fMaxAngle *= 2.0f; fDist1 *= 2.0f; fDist2 *= 2.0f; fSkill *= 0.5f;
             }
         } else if (fSkill > 60.0f) {
-            if (Misc_RandFunc(0) % 20 == 0) {
+            if (Misc_RandFunc(RANDOM_GAME) % 20 == 0) {
                 fMaxAngle *= 2.0f; fDist1 *= 2.0f; fDist2 *= 2.0f; fSkill *= 0.5f;
             }
         }
@@ -446,13 +446,13 @@ void AI_ApplyError(int nPlayer) {
         }
 
         // Aim: up to the angle limit, at least a quarter of a degree, either side.
-        fRand   = Misc_RandFuncf(0);
+        fRand   = Misc_RandFuncf(RANDOM_GAME);
         fMiss   = 100.0f - fSkill;
         fAimErr = fMaxAngle * (fMiss * fRand) / 100.0f;
         if (fAimErr < DEG(0.25f)) {
             fAimErr += DEG(0.25f);
         }
-        if (Misc_RandFunc(0) & 1) {
+        if (Misc_RandFunc(RANDOM_GAME) & 1) {
             fAimErr *= -1.0f;
         }
         p->fAim += fAimErr;
@@ -466,12 +466,13 @@ void AI_ApplyError(int nPlayer) {
 
         // Distance error: two percentage terms, either side; one shot kind always comes up
         // short.
-        fRand   = Misc_RandFuncf(0);
+        fRand   = Misc_RandFuncf(RANDOM_GAME);
         fDistErr  = fDist1 * (fMiss * fRand) / 100.0f;
-        fRand     = Misc_RandFuncf(0);
+        fRand     = Misc_RandFuncf(RANDOM_GAME);
         fDistErr += fDist2 * (fMiss * fRand) / 100.0f;
         // (A full swing on anything but a par 3 always comes up short; otherwise a coin flip.)
-        if ((p->nShotKind == SHOT_TYPE_DRIVE_e && GM_GetCurrentHolePar() != 3) || (Misc_RandFunc(0) & 1)) {
+        if ((p->nShotKind == SHOT_TYPE_DRIVE_e && GM_GetCurrentHolePar() != 3)
+            || (Misc_RandFunc(RANDOM_GAME) & 1)) {
             fDistErr *= -1.0f;
         }
         p->fDistance = p->fDistance * ((100.0f + fDistErr) / 100.0f);

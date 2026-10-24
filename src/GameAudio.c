@@ -1190,7 +1190,7 @@ void Gaud_BallInCup(u8 nPlayer) {
     nId = lbl_801F1790[pPlayer->nView[0]].n1;
     Aud_EmiSet3DPos(nId, pPlayer->ball.vPos, NULL, 0);
     Aud_EmiSetTrackAttenuation(nId, 0, 2.0f);
-    nRand = Misc_RandFunc(2) & 1;   // one of two sounds at random
+    nRand = Misc_RandFunc(RANDOM_AUDIO) & 1;   // one of two sounds at random
     Aud_EmiSetTrackStep(nId, 0, nRand == 0 ? 0x1A : 0x1C, 0);
 }
 

@@ -184,7 +184,7 @@ void FE_CharMgrInit(void) {
     gpCrAPState->bClearCache = 0;
     gpCrAPState->n8C = -1;
     gpCrAPState->n194 = 0;
-    gpCrAPState->n198 = Misc_RandFunc(0) & 3;
+    gpCrAPState->n198 = Misc_RandFunc(RANDOM_GAME) & 3;
     gpCrAPState->fFacing = 0.0f;
     gpCrAPState->fTargetFacing = 0.0f;
     gpCrAPState->b1B0 = 0;

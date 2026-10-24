@@ -86,10 +86,10 @@ void HoleContest_DrawHoles(void) {
         }
     }
     if (bFound) {
-        gHoleContestLongestDriveHole = Misc_RandFunc(0) % 18;
+        gHoleContestLongestDriveHole = Misc_RandFunc(RANDOM_GAME) % 18;
         while (GM_GetHoleIndexPar(gHoleContestLongestDriveHole) == 3
                || !GM_GetHoleIndexDrivingSideGame(gHoleContestLongestDriveHole)) {
-            gHoleContestLongestDriveHole = Misc_RandFunc(0) % 18;
+            gHoleContestLongestDriveHole = Misc_RandFunc(RANDOM_GAME) % 18;
         }
     } else {
         gHoleContestLongestDriveHole = -1;
@@ -102,15 +102,15 @@ void HoleContest_DrawHoles(void) {
         }
     }
     if (bFound) {
-        gHoleContestClosestToPinHole = Misc_RandFunc(0) % 18;
+        gHoleContestClosestToPinHole = Misc_RandFunc(RANDOM_GAME) % 18;
         while (GM_GetHoleIndexPar(gHoleContestClosestToPinHole) > 3) {
-            gHoleContestClosestToPinHole = Misc_RandFunc(0) % 18;
+            gHoleContestClosestToPinHole = Misc_RandFunc(RANDOM_GAME) % 18;
         }
     } else {
         gHoleContestClosestToPinHole = -1;
     }
 
-    if ((int)(Misc_RandFunc(0) % 100) < 20) {
+    if ((int)(Misc_RandFunc(RANDOM_GAME) % 100) < 20) {
         bFound = 0;
         for (i = 0; i < 18; i++) {
             if (GM_GetHoleIndexPar(i) == 3 && i != gHoleContestClosestToPinHole) {
@@ -118,10 +118,10 @@ void HoleContest_DrawHoles(void) {
             }
         }
         if (bFound) {
-            gHoleContestHoleInOneHole = Misc_RandFunc(0) % 18;
+            gHoleContestHoleInOneHole = Misc_RandFunc(RANDOM_GAME) % 18;
             while (GM_GetHoleIndexPar(gHoleContestHoleInOneHole) > 3 || gHoleContestHoleInOneHole
                    == gHoleContestClosestToPinHole) {
-                gHoleContestHoleInOneHole = Misc_RandFunc(0) % 18;
+                gHoleContestHoleInOneHole = Misc_RandFunc(RANDOM_GAME) % 18;
             }
         } else {
             gHoleContestHoleInOneHole = -1;

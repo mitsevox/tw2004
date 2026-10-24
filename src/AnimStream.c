@@ -671,7 +671,7 @@ void AnimStream_RandomizeClips(void) {
                                          NULL, NULL);
                             if (nCount > 0) {
                                 gpAnimStream->players[i].clips[nIndex][nStyle][nClub].nNext =
-                                    Misc_RandFunc(1) % nCount;
+                                    Misc_RandFunc(RANDOM_PRESENTATION) % nCount;
                             }
                         }
                     }

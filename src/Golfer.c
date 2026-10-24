@@ -88,7 +88,7 @@ u8 Golfer_IsLucky(int nPlayer) {
             uOdds = 1;
         }
     }
-    uRoll = Misc_RandFunc(0) % uOdds;
+    uRoll = Misc_RandFunc(RANDOM_GAME) % uOdds;
     if (gPlayers[nPlayer].ball.nLie != LIE_GREEN_e && gPlayers[nPlayer].nShotKind != SHOT_TYPE_PUTT_e &&
         !gSession.nSplitScreen) {
         Game_CurrentPinSet();

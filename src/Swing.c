@@ -1154,7 +1154,7 @@ void SW_vImpact(int nPlayer) {
 
     p = &gPlayers[nPlayer];
     if (Game_GetMode() == 10) {
-        Misc_SetSeedFunc(0, gReplayData.nSeed);
+        Misc_SetSeedFunc(RANDOM_GAME, gReplayData.nSeed);
         // port: 0x630 of the swing data's 0x634 bytes (it holds no pointers)
         Mem_cpy(&gPlayers[0].swing, &gReplayData.player.swing, 0x630);
     } else if (gSession.bReplay == 0) {
@@ -1484,8 +1484,8 @@ f32 SW_vCalculateMishitAngle(int nPlayer) {
     fCentreX = gPlayers[nPlayer].swing.nCalibrateX;
     fCentreY = gPlayers[nPlayer].swing.nCalibrateY;
 
-    fTopX    += Misc_RandFuncf(0) * 30.0f - 15.0f;
-    fImpactX += Misc_RandFuncf(0) * 30.0f - 15.0f;
+    fTopX    += Misc_RandFuncf(RANDOM_GAME) * 30.0f - 15.0f;
+    fImpactX += Misc_RandFuncf(RANDOM_GAME) * 30.0f - 15.0f;
     vDir[0] = 0.0f;
     vDir[1] = 0.0f;
     vDir[2] = 1.0f;

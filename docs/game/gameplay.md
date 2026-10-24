@@ -21,7 +21,7 @@ The pieces
 | `AI_PlanShot(i, target)` | `0x8002BDEC` | turns a target into club / power |
 | `SW_vAdjustMishitFromAttribute(i)` | `0x8005C5EC` | shrinks a human's swing error by attribute |
 | `Swing_ComputePower(i)` | `0x8005B250` | final power for either kind of player |
-| `Rand_Next(stream)` / `Rand_Float(stream)` | `0x8000B130` / `0x8000B428` | EA's RNG (below) |
+| `Misc_RandFunc(stream)` / `Misc_RandFuncf(stream)` | `0x8000B130` / `0x8000B428` | EA's RNG (below) |
 | `gPlayers` | `0x801C66E8` | 5 x 0xEF8 player structs |
 | `gAITargets` | `0x801C65B8` | table of authored aim points, 12 bytes each |
 | `gForgivenessTable` | `0x80188168` | 27 rows x 3 floats (value at attribute 0 / 100 / 110) |
@@ -154,7 +154,7 @@ the swing started (centre), the top of the backswing, and impact. The path back 
 the two unit directions, clamped to the meter's maximum (`gpSwing + 0x114`). Straight back and
 straight through is zero.
 
-**Both x samples get a random +-15 added first** (`Rand_Float x 30 - 15`) - on a +-128 stick
+**Both x samples get a random +-15 added first** (`Misc_RandFuncf x 30 - 15`) - on a +-128 stick
 that is up to ~1.7 degrees of wobble on a full shot after the 0.2 scale, ~0.25 degrees on a putt.
 That is the only random term in the human swing, and forgiveness (next) then shrinks whatever
 is left. A CPU or a perfect shot never gets here: `Swing_Launch` stores an error of 0 instead.
@@ -304,7 +304,7 @@ at each hole transition until 1 in 10** (`Luck_TightenOdds`, from the game state
 - **in game mode 4, when player 1 has won more than 4 holes more than player 0, the odds are
   halved again** (1 in 3 at LUCK 100); the same halving applies on one flagged hole;
 - it only fires off the green, never on a putt, and only for a pitch, a shot from lie 1 or 2
-  under 250 yards, or on a par 3; then `Rand_Next(0) % odds == 0` is the roll.
+  under 250 yards, or on a par 3; then `Misc_RandFunc(0) % odds == 0` is the roll.
 
 The roll is made once, when the shot is planned (`Shot_Plan`), and its result is
 `Player.bPerfect`. What that flag does turned out to be the best-hidden mechanic in the game:
@@ -407,7 +407,7 @@ stops the look-ahead's in-hole camera cut (below).
 (`GameAnalysis_IsPuttFor` = strokes + 1 - par: under par 6, par 5, over 2) is stored on the golfer, then
 clip group 9 is looked up in the golfer's animation library (`Char_SetClip` -> `AnimLib_Pick` ->
 `AnimLib_Find`: group, style, club class, a fourth key; each level falls back to a default). The
-leaf's clips are picked **at random** (`Rand_Next(1) % n`, up to three tries) with a used-mask so
+leaf's clips are picked **at random** (`Misc_RandFunc(1) % n`, up to three tries) with a used-mask so
 none repeats until all have played. No other condition applies to group 9.
 
 The libraries (`SAL` objects in `glbchar.gcb` for male/female, and one embedded in each
@@ -833,7 +833,7 @@ At the strike, `STATEFUNC_SimulateInit` copies the launched ball into a second b
 4. once per shot (`+0xC2C`), when the prediction's outcome class is 8 or 9 and the **real** ball
    is between **2 and 5.5 yd** from the pin and within **0.3 yd** of its closest approach so far
    (still closing): if the prediction is **holed** and the score would be par or better
-   (`GameAnalysis_IsPuttFor <= 0`), a **50% roll** (`Rand_Next(1) % 100 < 50`); if **not holed** but
+   (`GameAnalysis_IsPuttFor <= 0`), a **50% roll** (`Misc_RandFunc(1) % 100 < 50`); if **not holed** but
    its closest approach (ball `+0x60`, a running minimum kept by `Ball_Tick`) is **under 0.2 yd
    (7.2 in)**, always. Either way: flag 4 on the player, the distance saved at `+0xEEC`, and golfer
    animation 9 (clip group 10 or 5, by `CharacterState_UpdateGameEmotionState`).
@@ -901,8 +901,8 @@ RNG, and is softened for CPU balls regardless of the score.
 EA's random number generator
 ----------------------------
 
-`Rand_Next(stream)` is an additive lagged-Fibonacci generator: 20 words of state per stream at
+`Misc_RandFunc(stream)` is an additive lagged-Fibonacci generator: 20 words of state per stream at
 `0x801A24C4 + stream*0x50`, an index per stream at `0x801A24B8`. Each call moves the index back
 one (wrapping at 20) and does `s[i] = s[i] + s[(i + 3) mod 20]`, returning `s[i]`.
-`Rand_Float(stream)` puts the low 23 bits into a float mantissa with exponent 0 and subtracts 1,
+`Misc_RandFuncf(stream)` puts the low 23 bits into a float mantissa with exponent 0 and subtracts 1,
 giving [0, 1). The AI uses stream 0. The C library `rand()` is never called anywhere.
