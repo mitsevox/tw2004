@@ -122,7 +122,7 @@ GoShaderObject_Grass_Gc.c	open
 GoShaderObject_Particle_Gc.c	open		
 GoShaderObject_PrelitUVAnimation_Gc.c	open		
 GoShaderObject_Rain_Gc.c	open		
-GoStaticCam.c	open		
+GoStaticCam.c	done	3dfcfcd0	claude-review
 GoTerrain.c	open		
 GoTerrainCollision.c	open		
 GoViewport.c	done	a131c343	claude-review
