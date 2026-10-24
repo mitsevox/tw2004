@@ -32,32 +32,33 @@ static u8   DynamicCam_CanUseScriptOnThisHole(CameraEventTrigger_t* trigger);
 static u8   DynamicCam_CanUseScriptOnThisModel(CameraEventTrigger_t* trigger, int playerID);
 static void DynamicCam_TrackPercent(CamShot* link, int ePlayerID, CameraScriptSettings_t* settings,
                                     f32* position, f32* lookAt, f32* origCamPos);
-u8   DynamicCamSearchForPairedSequence(char* szName, CameraSequence_t** ppSeq, CamShot** ppShot);
+static void DynamicCam_TrackOffset(CamShot* link, int ePlayerID, CameraScriptSettings_t* settings,
+                                   f32* position, f32* lookAt, f32* origCamPos);
+static void DynamicCam_TrackBallVelocityLag(CamShot* link, int ePlayerID, CameraScriptSettings_t* settings,
+                                            f32* position, f32* lookAt, f32* origCamPos, f32 timeStep);
+static void DynamicCam_TrackBallVelocityTight(CamShot* link, int ePlayerID, CameraScriptSettings_t* settings,
+                                              f32* position, f32* lookAt, f32* origCamPos);
+static void DynamicCam_TrackFixed(CamShot* link, int ePlayerID, CameraScriptSettings_t* settings,
+                                  f32* position, f32* lookAt, f32* origCamPos);
+static void DynamicCam_GetLocation(CameraTracking_e tracking, int ePlayerID, f32* position,
+                                   CameraScriptSettings_t* settings, CamShot* link, f32* lookAt,
+                                   f32* origCamPos);
+static u8   DynamicCamSearchForPairedSequence(char* animName, CameraSequence_t** pSequence, CamShot** pLink);
+static u8   DynamicCam_IsDefualtSeq(CameraSequence_t* seq, CameraShotState_e state);
+static CameraLie_e DynamicCam_MaterialToCameraLie(u32 lieID, int playerID);
+static CameraLie_e DynamicCam_BallLieToCameraLie(Lie_t lie, int playerID);
+static u8   DynamicCam_MatchSeqClub(CameraSequence_t* seq, int ePlayerID);
 void DynamicCam_Vec3Add(f32* pA, f32* pB, f32* pOut);         // a + b
 void DynamicCam_Vec3Sub(f32* pA, f32* pB, f32* pOut);
 u8   DynamicCam_MatchStateType(CameraSequence_t* pSequence, int nKind);
 u8   DynamicCam_MatchScriptStateType(CamShot* pShot, int nKind);
 u8   DynamicCam_MatchPlayer(CamShot* pShot);
-void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CameraScriptSettings_t* pScript,
-                            CamShot* pShot, f32* pCam, f32* pSub);
 void DynamicCam_AddOffset(f32* pPos, f32* pDir, CameraScriptSettings_t* pScript, CamShot* pShot, int nPlayer,
                           f32 fSide, f32 fY);
 void DynamicCam_AddHeightOffset(f32* pPos, CameraScriptSettings_t* pScript, CamShot* pShot, int nPlayer,
                                 f32 fY);
-void DynamicCam_TrackOffset(CamShot* pShot, int nPlayer, CameraScriptSettings_t* pScript, f32* pOut,
-                            f32* pCam, f32* pSub);
-void DynamicCam_TrackBallVelocityLag(CamShot* pShot, int nPlayer, CameraScriptSettings_t* pScript, f32* pOut,
-                                     f32* pCam, f32* pSub, f32 f);
-void DynamicCam_TrackBallVelocityTight(CamShot* pShot, int nPlayer, CameraScriptSettings_t* pScript,
-                                       f32* pOut, f32* pCam, f32* pSub);
-void DynamicCam_TrackFixed(CamShot* pShot, int nPlayer, CameraScriptSettings_t* pScript, f32* pOut, f32* pCam,
-                           f32* pSub);
 f32  DynamicCam_fAdjustMaxHeightByHole(f32 f);
 void DynamicCam_ClampBallVelocity(f32* pDir, f32* pA, f32* pB);
-u8   DynamicCam_IsDefualtSeq(CameraSequence_t* pSequence, int nKind);
-s32  DynamicCam_MaterialToCameraLie(u32 n, int nPlayer);
-s32  DynamicCam_BallLieToCameraLie(int n, int nPlayer);
-u8   DynamicCam_MatchSeqClub(CameraSequence_t* pSequence, int nPlayer);
 u8   DynamicCam_MatchHeightDiff(CameraSequence_t* pSequence, int nPlayer, f32 f);
 u8   DynamicCam_MatchSeqShot(CameraSequence_t* pSequence, int nPlayer, u8 b);
 u8   DynamicCam_MatchPlayerType(CameraSequence_t* pSequence, int nPlayer);
@@ -795,665 +796,670 @@ static void DynamicCam_TrackPercent(CamShot* link, int ePlayerID, CameraScriptSe
     DynamicCam_AddHeightOffset(position, settings, link, ePlayerID, origHeight);
 }
 
-// Tracking modes 2, 3, 4 and 8: the camera fDist along the direction from the shot's first point
-// (nFromPoint) to its second (nToPoint), level for modes 2 and 3, then fSideOffset sideways (both
-// as DynamicCam_CalculateFlippedOffsets flips them), then its height from
-// DynamicCam_AddHeightOffset. For mode 8 its level offset from pSub (its height becoming pSub's) is
-// scaled from the tuning's fTrackOffsetStartScale down to fTrackOffsetEndScale as the share of the
-// way to the pin CamScript_GetBallToPinPercent gives (never less than the most seen, kept in the
-// script's fMaxBallToPin) goes from the tuning's fTrackOffsetStartShare to fTrackOffsetEndShare;
-// when CameraScript_SnapToScript holds, fMaxBallToPin just takes the share. Waits, like
-// DynamicCam_TrackPercent, for a ball update when a point is the ball.
-void DynamicCam_TrackOffset(CamShot* pShot, int nPlayer, CameraScriptSettings_t* pScript, f32* pOut,
-                            f32* pCam, f32* pSub) {
-    f32 vFrom[4];
-    f32 vTo[4];
-    f32 vOff[4];
-    f32 fSide;
-    f32 fDist;
-    f32 fY = pOut[1];
-    f32 fFar;
-    f32 fScale;
+// CAMTRACK_OFFSET_FLAT, CAMTRACK_OFFSET_FLAT_LAGGED, CAMTRACK_OFFSET and CAMTRACK_OFFSET_TO_PIN: the
+// camera refOffset along the direction from the shot's first point (DynamicCam_GetLocation for
+// nFromPoint) to its second (nToPoint), taken level for the first two, and sideOffset to the side (the
+// shot's fDist and fSideOffset, as DynamicCam_CalculateFlippedOffsets flips them for a lefty), then
+// its height by DynamicCam_AddHeightOffset (from the height it had). For CAMTRACK_OFFSET_TO_PIN, once
+// the share of the way to the pin (CamScript_GetBallToPinPercent, never less than the most seen, kept
+// in the settings' fMaxBallToPin) passes the tuning's fTrackOffsetStartShare, the camera's level move
+// from origCamPos (its place before this frame) is scaled from the tuning's fTrackOffsetStartScale
+// down to fTrackOffsetEndScale at fTrackOffsetEndShare, and its height becomes origCamPos's; on a
+// shot's first frame (CameraScript_SnapToScript) fMaxBallToPin just takes the share. Waits, like
+// DynamicCam_TrackPercent, for a frame in which the ball updates when a point is the ball.
+static void DynamicCam_TrackOffset(CamShot* link, int ePlayerID, CameraScriptSettings_t* settings,
+                                   f32* position, f32* lookAt, f32* origCamPos) {
+    f32 object1Location[4];
+    f32 object2Location[4];
+    f32 curToNewPosition[4];
+    f32 sideOffset;
+    f32 refOffset;
+    f32 origHeight = position[1];
+    f32 ballToPinPercent;
+    f32 scaleAmount;
 
-    if ((pShot->nFromPoint == CAMPOINT_BALL || pShot->nToPoint == CAMPOINT_BALL
-         || pShot->nFromPoint == CAMPOINT_BALL_AHEAD || pShot->nToPoint == CAMPOINT_BALL_AHEAD)
-        && GameEffects_BallUpdatesThisFrame(nPlayer) < 1) {
+    if ((link->nFromPoint == CAMPOINT_BALL || link->nToPoint == CAMPOINT_BALL
+         || link->nFromPoint == CAMPOINT_BALL_AHEAD || link->nToPoint == CAMPOINT_BALL_AHEAD)
+        && GameEffects_BallUpdatesThisFrame(ePlayerID) < 1) {
         return;
     }
-    DynamicCam_GetLocation(pShot->nFromPoint, nPlayer, vFrom, pScript, pShot, pCam, pSub);
-    DynamicCam_GetLocation(pShot->nToPoint, nPlayer, vTo, pScript, pShot, pCam, pSub);
-    if (pShot->nTrackMode == CAMTRACK_OFFSET_FLAT || pShot->nTrackMode == CAMTRACK_OFFSET_FLAT_LAGGED) {
-        DynamicCam_CalculateFlippedOffsets(pShot, nPlayer, &fSide, &fDist);
-        CamUtils_vGetPositionBetweenTwoPoints(vFrom, vTo, 0, 0, pOut, fDist, fSide);
+    DynamicCam_GetLocation(link->nFromPoint, ePlayerID, object1Location, settings, link, lookAt, origCamPos);
+    DynamicCam_GetLocation(link->nToPoint, ePlayerID, object2Location, settings, link, lookAt, origCamPos);
+    if (link->nTrackMode == CAMTRACK_OFFSET_FLAT || link->nTrackMode == CAMTRACK_OFFSET_FLAT_LAGGED) {
+        DynamicCam_CalculateFlippedOffsets(link, ePlayerID, &sideOffset, &refOffset);
+        CamUtils_vGetPositionBetweenTwoPoints(object1Location, object2Location, 0, 0, position, refOffset,
+                                              sideOffset);
     } else {
-        DynamicCam_CalculateFlippedOffsets(pShot, nPlayer, &fSide, &fDist);
-        CamUtils_vGetPositionBetweenTwoPoints(vFrom, vTo, 1, 0, pOut, fDist, fSide);
+        DynamicCam_CalculateFlippedOffsets(link, ePlayerID, &sideOffset, &refOffset);
+        CamUtils_vGetPositionBetweenTwoPoints(object1Location, object2Location, 1, 0, position, refOffset,
+                                              sideOffset);
     }
-    if (pShot->nTrackMode == CAMTRACK_OFFSET_TO_PIN) {
-        fFar = CamScript_GetBallToPinPercent(nPlayer, pScript);
-        if (!CameraScript_SnapToScript(pScript, pShot)) {
-            if (fFar > pScript->fMaxBallToPin) {
-                pScript->fMaxBallToPin = fFar;
+    if (link->nTrackMode == CAMTRACK_OFFSET_TO_PIN) {
+        ballToPinPercent = CamScript_GetBallToPinPercent(ePlayerID, settings);
+        if (!CameraScript_SnapToScript(settings, link)) {
+            if (ballToPinPercent > settings->fMaxBallToPin) {
+                settings->fMaxBallToPin = ballToPinPercent;
             }
-            fFar = pScript->fMaxBallToPin;
-            DynamicCam_Vec3Sub(pOut, pSub, vOff);
-            vOff[1] = 0.0f;
-            if (fFar > gpCamTuning->fTrackOffsetStartShare) {
-                if (fFar > gpCamTuning->fTrackOffsetEndShare) {
-                    fScale = gpCamTuning->fTrackOffsetEndScale;
+            ballToPinPercent = settings->fMaxBallToPin;
+            DynamicCam_Vec3Sub(position, origCamPos, curToNewPosition);
+            curToNewPosition[1] = 0.0f;
+            if (ballToPinPercent > gpCamTuning->fTrackOffsetStartShare) {
+                if (ballToPinPercent > gpCamTuning->fTrackOffsetEndShare) {
+                    scaleAmount = gpCamTuning->fTrackOffsetEndScale;
                 } else {
-                    fScale = (fFar - gpCamTuning->fTrackOffsetStartShare)
+                    scaleAmount = (ballToPinPercent - gpCamTuning->fTrackOffsetStartShare)
                             / (gpCamTuning->fTrackOffsetEndShare - gpCamTuning->fTrackOffsetStartShare);
-                    fScale = gpCamTuning->fTrackOffsetStartScale - fScale
+                    scaleAmount = gpCamTuning->fTrackOffsetStartScale - scaleAmount
                             * (gpCamTuning->fTrackOffsetStartScale - gpCamTuning->fTrackOffsetEndScale);
                 }
-                Vec3_Scale(fScale, vOff, vOff);
-                DynamicCam_Vec3Add(vOff, pSub, pOut);
+                Vec3_Scale(scaleAmount, curToNewPosition, curToNewPosition);
+                DynamicCam_Vec3Add(curToNewPosition, origCamPos, position);
             }
         } else {
-            pScript->fMaxBallToPin = fFar;
+            settings->fMaxBallToPin = ballToPinPercent;
         }
     }
-    DynamicCam_AddHeightOffset(pOut, pScript, pShot, nPlayer, fY);
+    DynamicCam_AddHeightOffset(position, settings, link, ePlayerID, origHeight);
 }
 
-// Tracking modes 5 and 6, the lagging ball-flight camera: its target is fDist along the ball's
-// flight direction (level for mode 6, kept within the tuning's fMaxFlightTilt of level by
-// DynamicCam_ClampBallVelocity) from the ball (DynamicCam_GetLocation's point 0), plus the tuning's
-// fAboveMaxDistShare times (fMaxHeight - height) when the ball is above its most height over the
-// script's ground fGroundHeight or fBelowMinDistShare times (height - fMinHeight) below its least (both
-// shorten fDist), then fSideOffset sideways (DynamicCam_AddOffset); the heights are the current
-// shot's while the next shot has the same mode. When CameraScript_SnapToScript holds the camera
-// jumps there. Otherwise it closes the distance to the ball (the tuning's fTrackCloseRate) and
-// turns round the ball towards the target (fTrackTurnRate) by a share per NTSC frame of the frame
-// time f, scaled while the script's fScriptTime is under the tuning's fTrackEaseInTime (by
-// ((fTrackEaseInTime - fCamTime) / fTrackEaseInTime) squared over fTrackCloseRate), times the
-// script's f8C when its nInterpType is 4, less for a ball slower than the tuning's
-// fTrackMinBallSpeed and while the script's second clock f88 is under fCutEaseInTime; while f88 is
-// under the tuning's fCutHeightEaseTime only part of the target's height is taken (the share to the
-// power fCutHeightEasePower).
-void DynamicCam_TrackBallVelocityLag(CamShot* pShot, int nPlayer, CameraScriptSettings_t* pScript, f32* pOut,
-                                     f32* pCam, f32* pSub, f32 f) {
-    f32 fStep;
-    f32 aFrom[4];
-    f32 aBallDir[4];
-    f32 aTarget[4];
-    f32 aCurOff[4];
-    f32 aCurDir[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-    f32 aTgtOff[4];
-    f32 aTgtDir[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-    f32 aNew[4];
-    f32 aNewDir[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-    f32 aAxis[4];
-    f32 aTurn[4];
-    CamShot* pCur;
-    f32 fHi;
-    f32 fLo;
-    f32 fHeight;
-    f32 fDist;
-    f32 fMove;
-    f32 fTurn;
-    f32 fEase;
-    f32 fT;
-    f32 fCurDist;
-    f32 fAngle;
+// CAMTRACK_BALL_LAG and CAMTRACK_BALL_LAG_FLAT, the lagging ball-flight camera. Its target is offset
+// along the ball's flight direction (taken level for CAMTRACK_BALL_LAG_FLAT, kept within the tuning's
+// fMaxFlightTilt of level by DynamicCam_ClampBallVelocity) from the ball (CAMPOINT_BALL), then the
+// shot's fSideOffset to the side (DynamicCam_AddOffset). offset is the shot's fDist, less the
+// tuning's fAboveMaxDistShare times how far the ball is above the shot's fMaxHeight over the
+// settings' fGroundHeight, or fBelowMinDistShare times how far below fMinHeight (the settings'
+// current shot's heights while the next shot has the same tracking mode). On a shot's first frame
+// (CameraScript_SnapToScript) the camera jumps to the target. Otherwise it closes on the target's
+// distance from the ball by the tuning's fTrackCloseRate and turns round the ball towards it by
+// fTrackTurnRate, shares a frame (timeStep in NTSC frames), each scaled: while the settings'
+// fScriptTime is under the tuning's fTrackEaseInTime by ((fTrackEaseInTime - fCamTime) /
+// fTrackEaseInTime) squared over fTrackCloseRate; by the settings' fInterpTime when its nInterpType is
+// 4; by (the ball's speed / the tuning's fTrackMinBallSpeed) to the fourth for a slower ball; and
+// while the settings' fCutEaseTime is under the tuning's fCutEaseInTime by fCutEaseTime /
+// fCutEaseInTime. While fCutEaseTime is under the tuning's fCutHeightEaseTime the target's height is
+// taken from the camera's only (fCutEaseTime / fCutHeightEaseTime) to the power fCutHeightEasePower,
+// times the frames, of the way.
+static void DynamicCam_TrackBallVelocityLag(CamShot* link, int ePlayerID, CameraScriptSettings_t* settings,
+                                            f32* position, f32* lookAt, f32* origCamPos, f32 timeStep) {
+    f32 diffLength;
+    f32 ballLocation[4];
+    f32 ballVelocity[4];
+    f32 newPosition[4];
+    f32 ballToOldPos[4];
+    f32 ballToOldPosNorm[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+    f32 ballToNewPos[4];
+    f32 ballToNewPosNorm[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+    f32 ballToRotPos[4];
+    f32 ballToRotPosNorm[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+    f32 rotAxis[4];
+    f32 rotationQuat[4];
+    CamShot* pCurShot;
+    f32 maxHeight;
+    f32 minHeight;
+    f32 smoothedBallAltitude;
+    f32 offset;
+    f32 translationScaleAmount;
+    f32 rotationScaleAmount;
+    f32 easeLagAmount;
+    f32 fEaseShare;
+    f32 oldDistance;
+    f32 angleDiffInRad;
     f32 fFrames;
-    f32 fY;
-    f32 fGrow;
-    f32 fRise;
+    f32 origHeight;
+    f32 ballSpeedFactor;
+    f32 fHeightShare;
 
-    fY = pOut[1];
-    DynamicCam_GetLocation(CAMPOINT_BALL, nPlayer, aFrom, pScript, pShot, pCam, pSub);
-    Vec3Copy(gPlayers[nPlayer].ball.vVel, aBallDir);
-    if (pShot->nTrackMode == CAMTRACK_BALL_LAG_FLAT) {
-        aBallDir[1] = 0.0f;
+    origHeight = position[1];
+    DynamicCam_GetLocation(CAMPOINT_BALL, ePlayerID, ballLocation, settings, link, lookAt, origCamPos);
+    Vec3Copy(gPlayers[ePlayerID].ball.vVel, ballVelocity);
+    if (link->nTrackMode == CAMTRACK_BALL_LAG_FLAT) {
+        ballVelocity[1] = 0.0f;
     }
-    if (aBallDir[0] != 0.0f || aBallDir[1] != 0.0f || aBallDir[2] != 0.0f) {
-        LLMath_Normalize3(aBallDir, aBallDir);
+    if (ballVelocity[0] != 0.0f || ballVelocity[1] != 0.0f || ballVelocity[2] != 0.0f) {
+        LLMath_Normalize3(ballVelocity, ballVelocity);
     }
-    DynamicCam_ClampBallVelocity(aBallDir, pOut, aFrom);
-    if (pScript->pNextShot != NULL && pScript->pShot->nTrackMode == pScript->pNextShot->nTrackMode) {
-        pCur = pScript->pShot;
-        fHi = pCur->fMaxHeight;
-        fLo = pCur->fMinHeight;
+    DynamicCam_ClampBallVelocity(ballVelocity, position, ballLocation);
+    if (settings->pNextShot != NULL && settings->pShot->nTrackMode == settings->pNextShot->nTrackMode) {
+        pCurShot = settings->pShot;
+        maxHeight = pCurShot->fMaxHeight;
+        minHeight = pCurShot->fMinHeight;
     } else {
-        fHi = pShot->fMaxHeight;
-        fLo = pShot->fMinHeight;
+        maxHeight = link->fMaxHeight;
+        minHeight = link->fMinHeight;
     }
-    fHeight = gPlayers[nPlayer].ball.vPos[1] - pScript->fGroundHeight;
-    if (fHeight > fHi) {
-        fDist = gpCamTuning->fAboveMaxDistShare * (fHi - fHeight) + pShot->fDist;
-    } else if (fHeight < fLo) {
-        fDist = gpCamTuning->fBelowMinDistShare * (fHeight - fLo) + pShot->fDist;
+    smoothedBallAltitude = gPlayers[ePlayerID].ball.vPos[1] - settings->fGroundHeight;
+    if (smoothedBallAltitude > maxHeight) {
+        offset = gpCamTuning->fAboveMaxDistShare * (maxHeight - smoothedBallAltitude) + link->fDist;
+    } else if (smoothedBallAltitude < minHeight) {
+        offset = gpCamTuning->fBelowMinDistShare * (smoothedBallAltitude - minHeight) + link->fDist;
     } else {
-        fDist = pShot->fDist;
+        offset = link->fDist;
     }
-    LLMath_AddScale3(aFrom, aBallDir, fDist, aTarget);
-    DynamicCam_AddOffset(aTarget, aBallDir, pScript, pShot, nPlayer, pShot->fSideOffset, fY);
-    if (CameraScript_SnapToScript(pScript, pShot)) {
-        Vec3Copy(aTarget, pOut);
+    LLMath_AddScale3(ballLocation, ballVelocity, offset, newPosition);
+    DynamicCam_AddOffset(newPosition, ballVelocity, settings, link, ePlayerID, link->fSideOffset, origHeight);
+    if (CameraScript_SnapToScript(settings, link)) {
+        Vec3Copy(newPosition, position);
         return;
     }
-    // port: NTSC rate
-    fFrames = f / (1.0f / 59.94f);
-    fMove = gpCamTuning->fTrackCloseRate * fFrames;
-    fTurn = gpCamTuning->fTrackTurnRate * fFrames;
-    if (pScript->fScriptTime < gpCamTuning->fTrackEaseInTime) {
-        fT = (gpCamTuning->fTrackEaseInTime - pScript->fCamTime) / gpCamTuning->fTrackEaseInTime;
-        fT *= fT;
-        fEase = (1.0f / gpCamTuning->fTrackCloseRate) * fT;
-        fMove *= fEase;
-        fTurn *= fEase;
+    fFrames = timeStep / FRAME_TIME;
+    translationScaleAmount = gpCamTuning->fTrackCloseRate * fFrames;
+    rotationScaleAmount = gpCamTuning->fTrackTurnRate * fFrames;
+    if (settings->fScriptTime < gpCamTuning->fTrackEaseInTime) {
+        fEaseShare = (gpCamTuning->fTrackEaseInTime - settings->fCamTime) / gpCamTuning->fTrackEaseInTime;
+        fEaseShare *= fEaseShare;
+        easeLagAmount = (1.0f / gpCamTuning->fTrackCloseRate) * fEaseShare;
+        translationScaleAmount *= easeLagAmount;
+        rotationScaleAmount *= easeLagAmount;
     }
-    if (pScript->nInterpType == 4) {
-        fMove *= pScript->f8C;
-        fTurn *= pScript->f8C;
+    if (settings->nInterpType == 4) {
+        translationScaleAmount *= settings->fInterpTime;
+        rotationScaleAmount *= settings->fInterpTime;
     }
-    if (gPlayers[nPlayer].ball.fSpeed < gpCamTuning->fTrackMinBallSpeed) {
-        fGrow = gPlayers[nPlayer].ball.fSpeed / gpCamTuning->fTrackMinBallSpeed;
-        fGrow = fGrow * fGrow;
-        fGrow = fGrow * fGrow;
-        fMove *= fGrow;
-        fTurn *= fGrow;
+    if (gPlayers[ePlayerID].ball.fSpeed < gpCamTuning->fTrackMinBallSpeed) {
+        ballSpeedFactor = gPlayers[ePlayerID].ball.fSpeed / gpCamTuning->fTrackMinBallSpeed;
+        ballSpeedFactor = ballSpeedFactor * ballSpeedFactor;
+        ballSpeedFactor = ballSpeedFactor * ballSpeedFactor;
+        translationScaleAmount *= ballSpeedFactor;
+        rotationScaleAmount *= ballSpeedFactor;
     }
-    if (pScript->f88 < gpCamTuning->fCutEaseInTime) {
-        fMove *= pScript->f88 / gpCamTuning->fCutEaseInTime;
-        fTurn *= pScript->f88 / gpCamTuning->fCutEaseInTime;
+    if (settings->fCutEaseTime < gpCamTuning->fCutEaseInTime) {
+        translationScaleAmount *= settings->fCutEaseTime / gpCamTuning->fCutEaseInTime;
+        rotationScaleAmount *= settings->fCutEaseTime / gpCamTuning->fCutEaseInTime;
     }
-    if (pScript->f88 < gpCamTuning->fCutHeightEaseTime) {
-        fRise = powf(pScript->f88 / gpCamTuning->fCutHeightEaseTime, gpCamTuning->fCutHeightEasePower);
-        fRise *= fFrames;
-        aTarget[1] = fRise * (aTarget[1] - pOut[1]) + pOut[1];
+    if (settings->fCutEaseTime < gpCamTuning->fCutHeightEaseTime) {
+        fHeightShare = powf(settings->fCutEaseTime / gpCamTuning->fCutHeightEaseTime,
+                            gpCamTuning->fCutHeightEasePower);
+        fHeightShare *= fFrames;
+        newPosition[1] = fHeightShare * (newPosition[1] - position[1]) + position[1];
     }
-    DynamicCam_Vec3Sub(pOut, aFrom, aCurOff);
-    DynamicCam_Vec3Sub(aTarget, aFrom, aTgtOff);
-    fCurDist = (f32)Math_Sqrt(LLMath_LengthSquared3(aCurOff));
-    fStep = (f32)Math_Sqrt(LLMath_LengthSquared3(aTgtOff)) - fCurDist;
-    fStep *= fMove;
-    if (aCurOff[0] != 0.0f || aCurOff[1] != 0.0f || aCurOff[2] != 0.0f) {
-        LLMath_Normalize3(aCurOff, aCurDir);
+    DynamicCam_Vec3Sub(position, ballLocation, ballToOldPos);
+    DynamicCam_Vec3Sub(newPosition, ballLocation, ballToNewPos);
+    oldDistance = (f32)Math_Sqrt(LLMath_LengthSquared3(ballToOldPos));
+    diffLength = (f32)Math_Sqrt(LLMath_LengthSquared3(ballToNewPos)) - oldDistance;
+    diffLength *= translationScaleAmount;
+    if (ballToOldPos[0] != 0.0f || ballToOldPos[1] != 0.0f || ballToOldPos[2] != 0.0f) {
+        LLMath_Normalize3(ballToOldPos, ballToOldPosNorm);
     } else {
-        aCurDir[0] = 0.0f;
-        aCurDir[1] = 0.0f;
-        aCurDir[2] = 0.0f;
+        ballToOldPosNorm[0] = 0.0f;
+        ballToOldPosNorm[1] = 0.0f;
+        ballToOldPosNorm[2] = 0.0f;
     }
-    if (aTgtOff[0] != 0.0f || aTgtOff[1] != 0.0f || aTgtOff[2] != 0.0f) {
-        LLMath_Normalize3(aTgtOff, aTgtDir);
+    if (ballToNewPos[0] != 0.0f || ballToNewPos[1] != 0.0f || ballToNewPos[2] != 0.0f) {
+        LLMath_Normalize3(ballToNewPos, ballToNewPosNorm);
     } else {
-        aTgtDir[0] = 0.0f;
-        aTgtDir[1] = 0.0f;
-        aTgtDir[2] = 0.0f;
+        ballToNewPosNorm[0] = 0.0f;
+        ballToNewPosNorm[1] = 0.0f;
+        ballToNewPosNorm[2] = 0.0f;
     }
-    fAngle = acosf(Vec3_Dot(aCurDir, aTgtDir));
-    fTurn = fAngle * fTurn;
-    vec4flt_CrossProduct(aCurDir, aTgtDir, aAxis);
-    if (aAxis[0] != 0.0f || aAxis[1] != 0.0f || aAxis[2] != 0.0f) {
-        LLMath_Normalize3(aAxis, aAxis);
+    angleDiffInRad = acosf(Vec3_Dot(ballToOldPosNorm, ballToNewPosNorm));
+    rotationScaleAmount = angleDiffInRad * rotationScaleAmount;
+    vec4flt_CrossProduct(ballToOldPosNorm, ballToNewPosNorm, rotAxis);
+    if (rotAxis[0] != 0.0f || rotAxis[1] != 0.0f || rotAxis[2] != 0.0f) {
+        LLMath_Normalize3(rotAxis, rotAxis);
     }
-    Vec3_Scale(fTurn, aAxis, aAxis);
-    Quat_BuildFromVector(aAxis, aTurn);
-    aCurDir[3] = 0.0f;
-    Quat_RotateVector(aTurn, aCurDir, aNew);
-    if (aNew[0] != 0.0f || aNew[1] != 0.0f || aNew[2] != 0.0f) {
-        LLMath_Normalize3(aNew, aNewDir);
+    Vec3_Scale(rotationScaleAmount, rotAxis, rotAxis);
+    Quat_BuildFromVector(rotAxis, rotationQuat);
+    ballToOldPosNorm[3] = 0.0f;
+    Quat_RotateVector(rotationQuat, ballToOldPosNorm, ballToRotPos);
+    if (ballToRotPos[0] != 0.0f || ballToRotPos[1] != 0.0f || ballToRotPos[2] != 0.0f) {
+        LLMath_Normalize3(ballToRotPos, ballToRotPosNorm);
     } else {
-        aNewDir[0] = 0.0f;
-        aNewDir[1] = 0.0f;
-        aNewDir[2] = 0.0f;
+        ballToRotPosNorm[0] = 0.0f;
+        ballToRotPosNorm[1] = 0.0f;
+        ballToRotPosNorm[2] = 0.0f;
     }
-    Vec3_Scale(fCurDist + fStep, aNewDir, aNew);
-    DynamicCam_Vec3Add(aFrom, aNew, pOut);
+    Vec3_Scale(oldDistance + diffLength, ballToRotPosNorm, ballToRotPos);
+    DynamicCam_Vec3Add(ballLocation, ballToRotPos, position);
 }
 
-// Tracking mode 7, the tight ball-flight camera: fDist along the ball's flight direction from the
-// ball (DynamicCam_GetLocation's point 0), plus the tuning's fAboveMaxDistShare times (fMaxHeight -
-// height) when the ball's height over the script's ground fGroundHeight is above the shot's most height
-// fMaxHeight, or fBelowMinDistShare times (height - fMinHeight) when under its least height
-// fMinHeight (the current shot's heights while the next shot has the same mode); both shorten
-// fDist. Then fSideOffset sideways
-// (DynamicCam_AddOffset). Nothing moves while the ball is slower than the tuning's
+// CAMTRACK_BALL_TIGHT, the tight ball-flight camera: straight to the target
+// DynamicCam_TrackBallVelocityLag works out, with the flight direction as it is (neither taken level
+// nor kept near it). It stays where it is while the ball is slower than the tuning's
 // fTrackMinBallSpeed.
-void DynamicCam_TrackBallVelocityTight(CamShot* pShot, int nPlayer, CameraScriptSettings_t* pScript,
-                                       f32* pOut, f32* pCam, f32* pSub) {
-    f32 vFrom[4];
-    f32 vDir[4];
-    f32 vPos[4];
-    f32 fY = pOut[1];
-    f32 fHeight;
-    f32 fMax;
-    f32 fMin;
-    f32 fDist;
+static void DynamicCam_TrackBallVelocityTight(CamShot* link, int ePlayerID, CameraScriptSettings_t* settings,
+                                              f32* position, f32* lookAt, f32* origCamPos) {
+    f32 ballLocation[4];
+    f32 ballVelocity[4];
+    f32 newPosition[4];
+    f32 origHeight = position[1];
+    f32 smoothedBallAltitude;
+    f32 maxHeight;
+    f32 minHeight;
+    f32 offset;
 
-    DynamicCam_GetLocation(CAMPOINT_BALL, nPlayer, vFrom, pScript, pShot, pCam, pSub);
-    Vec3Copy(gPlayers[nPlayer].ball.vVel, vDir);
-    if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
-        LLMath_Normalize3(vDir, vDir);
+    DynamicCam_GetLocation(CAMPOINT_BALL, ePlayerID, ballLocation, settings, link, lookAt, origCamPos);
+    Vec3Copy(gPlayers[ePlayerID].ball.vVel, ballVelocity);
+    if (0.0f != ballVelocity[0] || 0.0f != ballVelocity[1] || 0.0f != ballVelocity[2]) {
+        LLMath_Normalize3(ballVelocity, ballVelocity);
     }
-    if (gPlayers[nPlayer].ball.fSpeed < gpCamTuning->fTrackMinBallSpeed) return;
-    if (pScript->pNextShot != NULL && pScript->pShot->nTrackMode == pScript->pNextShot->nTrackMode) {
-        fMax = pScript->pShot->fMaxHeight;
-        fMin = pScript->pShot->fMinHeight;
+    if (gPlayers[ePlayerID].ball.fSpeed < gpCamTuning->fTrackMinBallSpeed) return;
+    if (settings->pNextShot != NULL && settings->pShot->nTrackMode == settings->pNextShot->nTrackMode) {
+        maxHeight = settings->pShot->fMaxHeight;
+        minHeight = settings->pShot->fMinHeight;
     } else {
-        fMax = pShot->fMaxHeight;
-        fMin = pShot->fMinHeight;
+        maxHeight = link->fMaxHeight;
+        minHeight = link->fMinHeight;
     }
-    fHeight = gPlayers[nPlayer].ball.vPos[1] - pScript->fGroundHeight;
-    if (fHeight > fMax) {
-        fDist = gpCamTuning->fAboveMaxDistShare * (fMax - fHeight) + pShot->fDist;
-    } else if (fHeight < fMin) {
-        fDist = gpCamTuning->fBelowMinDistShare * (fHeight - fMin) + pShot->fDist;
+    smoothedBallAltitude = gPlayers[ePlayerID].ball.vPos[1] - settings->fGroundHeight;
+    if (smoothedBallAltitude > maxHeight) {
+        offset = gpCamTuning->fAboveMaxDistShare * (maxHeight - smoothedBallAltitude) + link->fDist;
+    } else if (smoothedBallAltitude < minHeight) {
+        offset = gpCamTuning->fBelowMinDistShare * (smoothedBallAltitude - minHeight) + link->fDist;
     } else {
-        fDist = pShot->fDist;
+        offset = link->fDist;
     }
-    LLMath_AddScale3(vFrom, vDir, fDist, vPos);
-    DynamicCam_AddOffset(vPos, vDir, pScript, pShot, nPlayer, pShot->fSideOffset, fY);
-    Vec3Copy(vPos, pOut);
+    LLMath_AddScale3(ballLocation, ballVelocity, offset, newPosition);
+    DynamicCam_AddOffset(newPosition, ballVelocity, settings, link, ePlayerID, link->fSideOffset, origHeight);
+    Vec3Copy(newPosition, position);
 }
 
-// Tracking mode 9: the camera at the shot's first point (DynamicCam_GetLocation for nFromPoint).
-void DynamicCam_TrackFixed(CamShot* pShot, int nPlayer, CameraScriptSettings_t* pScript, f32* pOut, f32* pCam,
-                           f32* pSub) {
-    f32 vPos[4];
+// CAMTRACK_FIXED: the camera at the shot's first point (DynamicCam_GetLocation for nFromPoint).
+static void DynamicCam_TrackFixed(CamShot* link, int ePlayerID, CameraScriptSettings_t* settings,
+                                  f32* position, f32* lookAt, f32* origCamPos) {
+    f32 objectPosition[4];
 
-    DynamicCam_GetLocation(pShot->nFromPoint, nPlayer, vPos, pScript, pShot, pCam, pSub);
-    Vec3Copy(vPos, pOut);
+    DynamicCam_GetLocation(link->nFromPoint, ePlayerID, objectPosition, settings, link, lookAt, origCamPos);
+    Vec3Copy(objectPosition, position);
 }
 
-// A tracking point of kind nKind for the shot, into pOut (the body parts are TW07's names for these
-// bones): 0 the ball (DynamicCam_GetSmoothBallLocation), 1 Player.vBall, 2 between the golfer's
-// feet (bones 0x39 and 0x47), 4 the waist (bone 1), 6 the head (bone 10), 8 the chest (bone 7), 9
-// Player.vTarget2, 10 the pin, 11 the player's tee, 12 the script's v50, 16 the script's own camera
-// point (set on the fairway by CamScript_GetCameraOnFairwayPos for its shot or
-// CamScript_PutBackOnFairway for its next shot while CameraScript_SnapToScript holds, else the
-// script's vCamPos), 17..19 the head, chest and waist moved one unit along their bone's third matrix
-// row, 20 and 21 the shot's other point (the golfer's origin, bone 0, when that is 20 or 21 too)
-// moved one unit along bone 0's first or third row, 24 the shot's v20, 25 (0, 0, 100). Any other
-// kind leaves pOut as it was.
-void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CameraScriptSettings_t* pScript,
-                            CamShot* pShot, f32* pCam, f32* pSub) {
-    f32 vBone47[4];
-    f32 vBone39[4];
-    f32 vMid[4];
-    f32 vBone10[4];
-    f32 vBone1[4];
-    f32 vBone7[4];
-    f32 vDir7[4];
-    f32 vDir10[4];
-    f32 vDir1[4];
-    f32 vFrom[4];
-    f32 vDir[4];
-    f32 (*pMatrix)[4];
-    int nOther;
+// The point of kind tracking for the shot link (CameraTracking_e) into position. A point moved
+// along a bone's matrix row stays where it is when the bone has no matrix. CAMPOINT_FAIRWAY_CAM
+// is, on the shot's first frame (CameraScript_SnapToScript), a spot on the fairway: for the settings'
+// current shot from CamScript_GetCameraOnFairwayPos (kept in vCamPos, and bFairwayFix set), for its
+// next shot from CamScript_PutBackOnFairway (kept in vNextCamPos); on later frames it is vCamPos for
+// both. A kind with no case here leaves position as it was.
+static void DynamicCam_GetLocation(CameraTracking_e tracking, int ePlayerID, f32* position,
+                                   CameraScriptSettings_t* settings, CamShot* link, f32* lookAt,
+                                   f32* origCamPos) {
+    f32 leftFootPos[4];
+    f32 rightFootPos[4];
+    f32 footCenterPos[4];
+    f32 headPos[4];
+    f32 waistPos[4];
+    f32 chestPos[4];
+    f32 chestDir[4];
+    f32 headDir[4];
+    f32 waistDir[4];
+    f32 originPos[4];
+    f32 originDir[4];
+    f32 (*pBoneMat)[4];
+    CameraTracking_e otherTracking;
     int nPin;
     int nTee;
     CourseInfo* pCourse;
 
-    if (nKind == pShot->nFromPoint) {
-        nOther = pShot->nToPoint;
+    if (tracking == link->nFromPoint) {
+        otherTracking = link->nToPoint;
     } else {
-        nOther = pShot->nFromPoint;
+        otherTracking = link->nFromPoint;
     }
-    switch (nKind) {
+    switch (tracking) {
     case CAMPOINT_BALL:
-        DynamicCam_GetSmoothBallLocation(pScript, pShot, nPlayer, pOut, 0);
+        DynamicCam_GetSmoothBallLocation(settings, link, ePlayerID, position, 0);
         break;
-    case 2:
-        Character_GetBonePos(gPlayers[nPlayer].pChar, 0x39, vBone39);
-        Character_GetBonePos(gPlayers[nPlayer].pChar, 0x47, vBone47);
-        DynamicCam_Vec3Add(vBone39, vBone47, vMid);
-        Vec3_Scale(0.5f, vMid, vMid);
-        Vec3Copy(vMid, pOut);
+    case CAMPOINT_GOLFER_FEET:
+        Character_GetBonePos(gPlayers[ePlayerID].pChar, 0x39, rightFootPos);
+        Character_GetBonePos(gPlayers[ePlayerID].pChar, 0x47, leftFootPos);
+        DynamicCam_Vec3Add(rightFootPos, leftFootPos, footCenterPos);
+        Vec3_Scale(0.5f, footCenterPos, footCenterPos);
+        Vec3Copy(footCenterPos, position);
         break;
-    case 6:
-        Character_GetBonePos(gPlayers[nPlayer].pChar, 10, vBone10);
-        Vec3Copy(vBone10, pOut);
+    case CAMPOINT_GOLFER_HEAD:
+        Character_GetBonePos(gPlayers[ePlayerID].pChar, 10, headPos);
+        Vec3Copy(headPos, position);
         break;
-    case 8:
-        Character_GetBonePos(gPlayers[nPlayer].pChar, 7, vBone7);
-        Vec3Copy(vBone7, pOut);
+    case CAMPOINT_GOLFER_CHEST:
+        Character_GetBonePos(gPlayers[ePlayerID].pChar, 7, chestPos);
+        Vec3Copy(chestPos, position);
         break;
-    case 4:
-        Character_GetBonePos(gPlayers[nPlayer].pChar, 1, vBone1);
-        Vec3Copy(vBone1, pOut);
+    case CAMPOINT_GOLFER_WAIST:
+        Character_GetBonePos(gPlayers[ePlayerID].pChar, 1, waistPos);
+        Vec3Copy(waistPos, position);
         break;
-    case 1:
-        Vec3Copy(gPlayers[nPlayer].vBall, pOut);
+    case CAMPOINT_BALL_SPOT:
+        Vec3Copy(gPlayers[ePlayerID].vBall, position);
         break;
-    case 9:
-        Vec3Copy(gPlayers[nPlayer].vTarget2, pOut);
+    case CAMPOINT_AIM:
+        Vec3Copy(gPlayers[ePlayerID].vTarget2, position);
         break;
-    case 12:
-        Vec3Copy(pScript->v50, pOut);
+    case CAMPOINT_LANDING:
+        Vec3Copy(settings->v50, position);
         break;
-    case 10:
+    case CAMPOINT_PIN:
         nPin = Game_CurrentPinSet();
         pCourse = Ter_GetTGD();
-        Vec3Copy(&pCourse->pin[nPin].x, pOut);
+        Vec3Copy(&pCourse->pin[nPin].x, position);
         break;
-    case 11:
-        nTee = gSession.nTeeSet[nPlayer];
+    case CAMPOINT_TEE:
+        nTee = gSession.nTeeSet[ePlayerID];
         pCourse = Ter_GetTGD();
-        Vec3Copy(&pCourse->tee[nTee].x, pOut);
+        Vec3Copy(&pCourse->tee[nTee].x, position);
         break;
-    case 24:
-        Vec3Copy(pShot->v20, pOut);
+    case CAMPOINT_SHOT_POINT:
+        Vec3Copy(link->v20, position);
         break;
-    case 16:
-        if (CameraScript_SnapToScript(pScript, pShot)) {
-            if (pShot == pScript->pShot) {
-                CamScript_GetCameraOnFairwayPos(pScript, pOut, pCam, nPlayer, pScript->pB4, pSub, NULL);
-                Vec3Copy(pOut, pScript->vCamPos);
-                pScript->bFairwayFix = 1;
-            } else if (pShot == pScript->pNextShot) {
-                CamScript_PutBackOnFairway(pScript, pOut, pCam, nPlayer, pScript->pB4, pSub);
-                Vec3Copy(pOut, pScript->vNextCamPos);
+    case CAMPOINT_FAIRWAY_CAM:
+        if (CameraScript_SnapToScript(settings, link)) {
+            if (link == settings->pShot) {
+                CamScript_GetCameraOnFairwayPos(settings, position, lookAt, ePlayerID, settings->pB4,
+                                                origCamPos, NULL);
+                Vec3Copy(position, settings->vCamPos);
+                settings->bFairwayFix = 1;
+            } else if (link == settings->pNextShot) {
+                CamScript_PutBackOnFairway(settings, position, lookAt, ePlayerID, settings->pB4, origCamPos);
+                Vec3Copy(position, settings->vNextCamPos);
             }
-        } else if (pShot == pScript->pShot) {
-            Vec3Copy(pScript->vCamPos, pOut);
-        } else if (pShot == pScript->pNextShot) {
-            // the script's vCamPos for the next shot too (vNextCamPos is where the fairway branch keeps it)
-            Vec3Copy(pScript->vCamPos, pOut);
+        } else if (link == settings->pShot) {
+            Vec3Copy(settings->vCamPos, position);
+        } else if (link == settings->pNextShot) {
+            Vec3Copy(settings->vCamPos, position);
         }
         break;
-    case 17:
-        Character_GetBonePos(gPlayers[nPlayer].pChar, 10, vBone10);
-        pMatrix = Character_GetBoneMatrix(gPlayers[nPlayer].pChar, 10);
-        if (pMatrix == NULL) {
-            Vec3Copy(vBone10, pOut);
+    case CAMPOINT_GOLFER_HEAD_DIR:
+        Character_GetBonePos(gPlayers[ePlayerID].pChar, 10, headPos);
+        pBoneMat = Character_GetBoneMatrix(gPlayers[ePlayerID].pChar, 10);
+        if (pBoneMat == NULL) {
+            Vec3Copy(headPos, position);
             break;
         }
-        Vec3Copy(pMatrix[2], vDir10);
-        if (0.0f != vDir10[0] || 0.0f != vDir10[1] || 0.0f != vDir10[2]) {
-            LLMath_Normalize3(vDir10, vDir10);
+        Vec3Copy(pBoneMat[2], headDir);
+        if (0.0f != headDir[0] || 0.0f != headDir[1] || 0.0f != headDir[2]) {
+            LLMath_Normalize3(headDir, headDir);
         }
-        DynamicCam_Vec3Add(vBone10, vDir10, pOut);
+        DynamicCam_Vec3Add(headPos, headDir, position);
         break;
-    case 18:
-        Character_GetBonePos(gPlayers[nPlayer].pChar, 7, vBone7);
-        pMatrix = Character_GetBoneMatrix(gPlayers[nPlayer].pChar, 7);
-        if (pMatrix == NULL) {
-            Vec3Copy(vBone7, pOut);
+    case CAMPOINT_GOLFER_CHEST_DIR:
+        Character_GetBonePos(gPlayers[ePlayerID].pChar, 7, chestPos);
+        pBoneMat = Character_GetBoneMatrix(gPlayers[ePlayerID].pChar, 7);
+        if (pBoneMat == NULL) {
+            Vec3Copy(chestPos, position);
             break;
         }
-        Vec3Copy(pMatrix[2], vDir7);
-        if (0.0f != vDir7[0] || 0.0f != vDir7[1] || 0.0f != vDir7[2]) {
-            LLMath_Normalize3(vDir7, vDir7);
+        Vec3Copy(pBoneMat[2], chestDir);
+        if (0.0f != chestDir[0] || 0.0f != chestDir[1] || 0.0f != chestDir[2]) {
+            LLMath_Normalize3(chestDir, chestDir);
         }
-        DynamicCam_Vec3Add(vBone7, vDir7, pOut);
+        DynamicCam_Vec3Add(chestPos, chestDir, position);
         break;
-    case 19:
-        Character_GetBonePos(gPlayers[nPlayer].pChar, 1, vBone1);
-        pMatrix = Character_GetBoneMatrix(gPlayers[nPlayer].pChar, 1);
-        if (pMatrix == NULL) {
-            Vec3Copy(vBone1, pOut);
+    case CAMPOINT_GOLFER_WAIST_DIR:
+        Character_GetBonePos(gPlayers[ePlayerID].pChar, 1, waistPos);
+        pBoneMat = Character_GetBoneMatrix(gPlayers[ePlayerID].pChar, 1);
+        if (pBoneMat == NULL) {
+            Vec3Copy(waistPos, position);
             break;
         }
-        Vec3Copy(pMatrix[2], vDir1);
-        if (0.0f != vDir1[0] || 0.0f != vDir1[1] || 0.0f != vDir1[2]) {
-            LLMath_Normalize3(vDir1, vDir1);
+        Vec3Copy(pBoneMat[2], waistDir);
+        if (0.0f != waistDir[0] || 0.0f != waistDir[1] || 0.0f != waistDir[2]) {
+            LLMath_Normalize3(waistDir, waistDir);
         }
-        DynamicCam_Vec3Add(vBone1, vDir1, pOut);
+        DynamicCam_Vec3Add(waistPos, waistDir, position);
         break;
-    case 20:
-        if (nOther != 20 && nOther != 21) {
-            DynamicCam_GetLocation(nOther, nPlayer, vFrom, pScript, pShot, pCam, pSub);
+    case CAMPOINT_GOLFER_AXIS_X:
+        if (otherTracking != CAMPOINT_GOLFER_AXIS_X && otherTracking != CAMPOINT_GOLFER_AXIS_Z) {
+            DynamicCam_GetLocation(otherTracking, ePlayerID, originPos, settings, link, lookAt, origCamPos);
         } else {
-            Character_GetBonePos(gPlayers[nPlayer].pChar, 0, vFrom);
+            Character_GetBonePos(gPlayers[ePlayerID].pChar, 0, originPos);
         }
-        pMatrix = Character_GetBoneMatrix(gPlayers[nPlayer].pChar, 0);
-        if (pMatrix == NULL) {
-            Vec3Copy(vFrom, pOut);
+        pBoneMat = Character_GetBoneMatrix(gPlayers[ePlayerID].pChar, 0);
+        if (pBoneMat == NULL) {
+            Vec3Copy(originPos, position);
             break;
         }
-        Vec3Copy(pMatrix[0], vDir);
-        if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
-            LLMath_Normalize3(vDir, vDir);
+        Vec3Copy(pBoneMat[0], originDir);
+        if (0.0f != originDir[0] || 0.0f != originDir[1] || 0.0f != originDir[2]) {
+            LLMath_Normalize3(originDir, originDir);
         }
-        DynamicCam_Vec3Add(vFrom, vDir, pOut);
+        DynamicCam_Vec3Add(originPos, originDir, position);
         break;
-    case 21:
-        if (nOther != 20 && nOther != 21) {
-            DynamicCam_GetLocation(nOther, nPlayer, vFrom, pScript, pShot, pCam, pSub);
+    case CAMPOINT_GOLFER_AXIS_Z:
+        if (otherTracking != CAMPOINT_GOLFER_AXIS_X && otherTracking != CAMPOINT_GOLFER_AXIS_Z) {
+            DynamicCam_GetLocation(otherTracking, ePlayerID, originPos, settings, link, lookAt, origCamPos);
         } else {
-            Character_GetBonePos(gPlayers[nPlayer].pChar, 0, vFrom);
+            Character_GetBonePos(gPlayers[ePlayerID].pChar, 0, originPos);
         }
-        pMatrix = Character_GetBoneMatrix(gPlayers[nPlayer].pChar, 0);
-        if (pMatrix == NULL) {
-            Vec3Copy(vFrom, pOut);
+        pBoneMat = Character_GetBoneMatrix(gPlayers[ePlayerID].pChar, 0);
+        if (pBoneMat == NULL) {
+            Vec3Copy(originPos, position);
             break;
         }
-        Vec3Copy(pMatrix[2], vDir);
-        if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
-            LLMath_Normalize3(vDir, vDir);
+        Vec3Copy(pBoneMat[2], originDir);
+        if (0.0f != originDir[0] || 0.0f != originDir[1] || 0.0f != originDir[2]) {
+            LLMath_Normalize3(originDir, originDir);
         }
-        DynamicCam_Vec3Add(vFrom, vDir, pOut);
+        DynamicCam_Vec3Add(originPos, originDir, position);
         break;
-    case 25:
-        pOut[0] = 0.0f;
-        pOut[1] = 0.0f;
-        pOut[2] = 100.0f;
+    case CAMPOINT_WORLD_Z:
+        position[0] = 0.0f;
+        position[1] = 0.0f;
+        position[2] = 100.0f;
         break;
     }
 }
 
-// Picks the camera sequence for state nKind of nPlayer's shot, from the first 50 sequences with
-// shot choices whose state, club, shot (a: TW07's allowGenericShotTypes), player type, course, par,
-// game mode, start lie (nLie, or the tee on the tee; DynamicCam_BallLieToCameraLie), end lie
-// (nClass through DynamicCam_MaterialToCameraLie), pin height over the ball (f2C..f30) and shot
-// distance fDist (f24..f28) all fit: one at random by their weights (f34). With none, the last
-// default ("DEF") sequence for the state on this course, else the first default one for the state
-// that has choices, else NULL. NULL without course data.
-CameraSequence_t* DynamicCam_ChooseSequence(int nPlayer, int nLie, int nClass, int nKind, u8 a, f32 fDist) {
-    int anPicked[DYNAMICCAM_MAX_POSSIBLE];
+// Picks the camera sequence for state of ePlayerID's shot: one at random by their weights (fWeight)
+// of the first DYNAMICCAM_MAX_POSSIBLE sequences with shot choices whose state, club, shot type
+// (generic ones only with allowGenericShotTypes), player type, course, par, start lie (the ball's lie
+// startLie, CAMLIE_TEE on the tee; DynamicCam_BallLieToCameraLie), end lie (surface class endLie;
+// DynamicCam_MaterialToCameraLie), pin height over the ball (fMinPinHeight..fMaxPinHeight), game mode
+// and shot distance shotDist (fMinDist..fMaxDist) all fit. With none, the last default ("DEF")
+// sequence for the state on this course, else the first default one for the state that has choices,
+// else NULL. NULL without course data.
+CameraSequence_t* DynamicCam_ChooseSequence(int ePlayerID, int startLie, int endLie, int state,
+                                            u8 allowGenericShotTypes, f32 shotDist) {
+    int possibleScripts[DYNAMICCAM_MAX_POSSIBLE];
     CourseInfo* pCourse;
     CameraSequence_t* pSeq;
     int i;
-    int nPicked;
-    int nSum;
-    int nDefault;
-    int nTee;
-    int nClassBit;
+    int scriptsFound;
+    int currentScript;
+    int defaultSeq;
+    int cameraStartLie;
+    int cameraEndLie;
     int nPinSet;
-    u32 uRand;
-    int nRoll;
-    f32 fHeight;
-    f32 fTotal;
+    u32 randomNum;
+    int randomScript;
+    f32 heightDiff;
+    f32 possiblePercent;
 
-    nPicked = 0;
-    nSum = 0;
-    nDefault = -1;
-    if (Player_OnTee(nPlayer)) {
-        nTee = 1;
+    scriptsFound = 0;
+    currentScript = 0;
+    defaultSeq = -1;
+    if (Player_OnTee(ePlayerID)) {
+        cameraStartLie = CAMLIE_TEE;
     } else {
-        nTee = DynamicCam_BallLieToCameraLie(nLie, nPlayer);
+        cameraStartLie = DynamicCam_BallLieToCameraLie(startLie, ePlayerID);
     }
-    nClassBit = DynamicCam_MaterialToCameraLie(nClass, nPlayer);
+    cameraEndLie = DynamicCam_MaterialToCameraLie(endLie, ePlayerID);
     nPinSet = Game_CurrentPinSet();
     pCourse = Ter_GetTGD();
     if (pCourse == NULL) {
         return NULL;
     }
-    fHeight = pCourse->pin[nPinSet].y - gPlayers[nPlayer].vBall[1];
+    heightDiff = pCourse->pin[nPinSet].y - gPlayers[ePlayerID].vBall[1];
     for (i = 0; i < gpDynCam->nSequences; i++) {
-        if (nPicked >= DYNAMICCAM_MAX_POSSIBLE) {
+        if (scriptsFound >= DYNAMICCAM_MAX_POSSIBLE) {
             break;
         }
         if (gpDynCam->pSequences[i].nChoices > 0) {
-            if (DynamicCam_IsDefualtSeq(&gpDynCam->pSequences[i], nKind) &&
+            if (DynamicCam_IsDefualtSeq(&gpDynCam->pSequences[i], state) &&
                 DynamicCam_MatchCourse(&gpDynCam->pSequences[i])) {
-                nDefault = i;
-            } else if (DynamicCam_MatchStateType(&gpDynCam->pSequences[i], nKind) &&
-                       DynamicCam_MatchSeqClub(&gpDynCam->pSequences[i], nPlayer) &&
-                       DynamicCam_MatchSeqShot(&gpDynCam->pSequences[i], nPlayer, a) &&
-                       DynamicCam_MatchPlayerType(&gpDynCam->pSequences[i], nPlayer) &&
+                defaultSeq = i;
+            } else if (DynamicCam_MatchStateType(&gpDynCam->pSequences[i], state) &&
+                       DynamicCam_MatchSeqClub(&gpDynCam->pSequences[i], ePlayerID) &&
+                       DynamicCam_MatchSeqShot(&gpDynCam->pSequences[i], ePlayerID, allowGenericShotTypes) &&
+                       DynamicCam_MatchPlayerType(&gpDynCam->pSequences[i], ePlayerID) &&
                        DynamicCam_MatchCourse(&gpDynCam->pSequences[i]) &&
                        DynamicCam_MatchPars(&gpDynCam->pSequences[i]) &&
-                       DynamicCam_MatchLies(gpDynCam->pSequences[i].uStartLies, nTee) &&
-                       DynamicCam_MatchLies(gpDynCam->pSequences[i].uEndLies, nClassBit) &&
-                       DynamicCam_MatchHeightDiff(&gpDynCam->pSequences[i], nPlayer, fHeight) &&
+                       DynamicCam_MatchLies(gpDynCam->pSequences[i].uStartLies, cameraStartLie) &&
+                       DynamicCam_MatchLies(gpDynCam->pSequences[i].uEndLies, cameraEndLie) &&
+                       DynamicCam_MatchHeightDiff(&gpDynCam->pSequences[i], ePlayerID, heightDiff) &&
                        DynamicCam_ModeType(&gpDynCam->pSequences[i])) {
                 pSeq = &gpDynCam->pSequences[i];
-                if (fDist >= pSeq->fMinDist && fDist <= pSeq->fMaxDist && pSeq->nChoices > 0) {
-                    anPicked[nPicked] = i;
-                    nPicked++;
+                if (shotDist >= pSeq->fMinDist && shotDist <= pSeq->fMaxDist && pSeq->nChoices > 0) {
+                    possibleScripts[scriptsFound] = i;
+                    scriptsFound++;
                 }
             }
         }
     }
-    if (nPicked == 0) {
-        if (nDefault >= 0) {
-            return &gpDynCam->pSequences[nDefault];
+    if (scriptsFound == 0) {
+        if (defaultSeq >= 0) {
+            return &gpDynCam->pSequences[defaultSeq];
         }
         for (i = 0; i < gpDynCam->nSequences; i++) {
-            if (DynamicCam_IsDefualtSeq(&gpDynCam->pSequences[i], nKind) &&
+            if (DynamicCam_IsDefualtSeq(&gpDynCam->pSequences[i], state) &&
                 gpDynCam->pSequences[i].nChoices > 0) {
                 return &gpDynCam->pSequences[i];
             }
         }
         return NULL;
     }
-    uRand = Misc_RandFunc(RANDOM_PRESENTATION);
-    fTotal = 0.0f;
-    for (i = 0; i < nPicked; i++) {
-        fTotal += gpDynCam->pSequences[anPicked[i]].f34;
+    randomNum = Misc_RandFunc(RANDOM_PRESENTATION);
+    possiblePercent = 0.0f;
+    for (i = 0; i < scriptsFound; i++) {
+        possiblePercent += gpDynCam->pSequences[possibleScripts[i]].fWeight;
     }
-    nRoll = uRand % (int)(1000.0f * fTotal);
-    for (i = 0; i < nPicked; i++) {
-        if ((f32)(nRoll - nSum) < 1000.0f * gpDynCam->pSequences[anPicked[i]].f34) {
-            return &gpDynCam->pSequences[anPicked[i]];
+    randomScript = randomNum % (int)(1000.0f * possiblePercent);
+    for (i = 0; i < scriptsFound; i++) {
+        if ((f32)(randomScript - currentScript)
+            < 1000.0f * gpDynCam->pSequences[possibleScripts[i]].fWeight) {
+            return &gpDynCam->pSequences[possibleScripts[i]];
         }
-        nSum += (int)(1000.0f * gpDynCam->pSequences[anPicked[i]].f34);
+        currentScript += (int)(1000.0f * gpDynCam->pSequences[possibleScripts[i]].fWeight);
     }
-    return &gpDynCam->pSequences[anPicked[0]];
+    return &gpDynCam->pSequences[possibleScripts[0]];
 }
 
-// DynamicCam_ChooseSequence's pick for the pre-flight cameras: state nKind (3 becomes 28 when an
-// object or hazard is within the tuning's fBallObstructionDist of the ball, and 3 again for the
-// last fallback), the ball's distance to the pin (GameAnalysis_GetCurrentDistanceToPin) within
-// f24..f28 (DynamicCam_MatchDistToPin) in place of a shot distance, no end lie, generic shot types
-// allowed.
-CameraSequence_t* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind) {
-    int anPicked[DYNAMICCAM_MAX_POSSIBLE];
+// DynamicCam_ChooseSequence's pick for the pre-flight cameras: the ball's distance to the pin
+// (GameAnalysis_GetCurrentDistanceToPin, DynamicCam_MatchDistToPin) stands for the shot distance,
+// there is no end lie, and generic shot types are allowed. A CAMSTATE_SWING pick is made for
+// CAMSTATE_SWING_OBSTRUCTED instead when an object or hazard is within the tuning's
+// fBallObstructionDist of the ball (Ter_CheckObjectAndHazardObstruction); the last fallback, the
+// first default sequence with choices, then looks for CAMSTATE_SWING again.
+CameraSequence_t* DynamicCam_ChoosePreFlightSequence(int ePlayerID, int startLie, int state) {
+    int possibleScripts[DYNAMICCAM_MAX_POSSIBLE];
     CourseInfo* pCourse;
     int i;
-    int nPicked;
-    int nSum;
-    int nDefault;
-    int nTee;
+    int scriptsFound;
+    int currentScript;
+    int defaultSeq;
+    int cameraStartLie;
     int nPinSet;
-    u32 uRand;
-    int nRoll;
-    f32 fPinDist;
-    f32 fHeight;
-    f32 fTotal;
+    u32 randomNum;
+    int randomScript;
+    f32 distToPin;
+    f32 heightDiff;
+    f32 possiblePercent;
 
-    nPicked = 0;
-    nSum = 0;
-    nDefault = -1;
-    if (Player_OnTee(nPlayer)) {
-        nTee = 1;
+    scriptsFound = 0;
+    currentScript = 0;
+    defaultSeq = -1;
+    if (Player_OnTee(ePlayerID)) {
+        cameraStartLie = CAMLIE_TEE;
     } else {
-        nTee = DynamicCam_BallLieToCameraLie(nLie, nPlayer);
+        cameraStartLie = DynamicCam_BallLieToCameraLie(startLie, ePlayerID);
     }
-    fPinDist = GameAnalysis_GetCurrentDistanceToPin(nPlayer);
+    distToPin = GameAnalysis_GetCurrentDistanceToPin(ePlayerID);
     nPinSet = Game_CurrentPinSet();
     pCourse = Ter_GetTGD();
     if (pCourse == NULL) {
         return NULL;
     }
-    fHeight = pCourse->pin[nPinSet].y - gPlayers[nPlayer].vBall[1];
-    if (nKind == CAMSTATE_SWING
-        && Ter_CheckObjectAndHazardObstruction(gPlayers[nPlayer].ball.vPos,
+    heightDiff = pCourse->pin[nPinSet].y - gPlayers[ePlayerID].vBall[1];
+    if (state == CAMSTATE_SWING
+        && Ter_CheckObjectAndHazardObstruction(gPlayers[ePlayerID].ball.vPos,
                                                gpCamTuning->fBallObstructionDist, 1, 0, 0.0f, 1,
                                                gpCamTuning->fObstructionMaxSlope)) {
-        nKind = CAMSTATE_SWING_OBSTRUCTED;
+        state = CAMSTATE_SWING_OBSTRUCTED;
     }
     for (i = 0; i < gpDynCam->nSequences; i++) {
-        if (nPicked >= DYNAMICCAM_MAX_POSSIBLE) {
+        if (scriptsFound >= DYNAMICCAM_MAX_POSSIBLE) {
             break;
         }
         if (gpDynCam->pSequences[i].nChoices > 0) {
-            if (DynamicCam_IsDefualtSeq(&gpDynCam->pSequences[i], nKind) &&
+            if (DynamicCam_IsDefualtSeq(&gpDynCam->pSequences[i], state) &&
                 DynamicCam_MatchCourse(&gpDynCam->pSequences[i])) {
-                nDefault = i;
-            } else if (DynamicCam_MatchStateType(&gpDynCam->pSequences[i], nKind) &&
-                       DynamicCam_MatchSeqClub(&gpDynCam->pSequences[i], nPlayer) &&
-                       DynamicCam_MatchSeqShot(&gpDynCam->pSequences[i], nPlayer, 1) &&
-                       DynamicCam_MatchPlayerType(&gpDynCam->pSequences[i], nPlayer) &&
-                       DynamicCam_MatchDistToPin(&gpDynCam->pSequences[i], nPlayer, fPinDist) &&
+                defaultSeq = i;
+            } else if (DynamicCam_MatchStateType(&gpDynCam->pSequences[i], state) &&
+                       DynamicCam_MatchSeqClub(&gpDynCam->pSequences[i], ePlayerID) &&
+                       DynamicCam_MatchSeqShot(&gpDynCam->pSequences[i], ePlayerID, 1) &&
+                       DynamicCam_MatchPlayerType(&gpDynCam->pSequences[i], ePlayerID) &&
+                       DynamicCam_MatchDistToPin(&gpDynCam->pSequences[i], ePlayerID, distToPin) &&
                        DynamicCam_MatchCourse(&gpDynCam->pSequences[i]) &&
                        DynamicCam_MatchPars(&gpDynCam->pSequences[i]) &&
-                       DynamicCam_MatchHeightDiff(&gpDynCam->pSequences[i], nPlayer, fHeight) &&
+                       DynamicCam_MatchHeightDiff(&gpDynCam->pSequences[i], ePlayerID, heightDiff) &&
                        DynamicCam_ModeType(&gpDynCam->pSequences[i]) &&
-                       DynamicCam_MatchLies(gpDynCam->pSequences[i].uStartLies, nTee)) {
-                anPicked[nPicked] = i;
-                nPicked++;
+                       DynamicCam_MatchLies(gpDynCam->pSequences[i].uStartLies, cameraStartLie)) {
+                possibleScripts[scriptsFound] = i;
+                scriptsFound++;
             }
         }
     }
-    if (nPicked == 0) {
-        if (nDefault >= 0) {
-            return &gpDynCam->pSequences[nDefault];
+    if (scriptsFound == 0) {
+        if (defaultSeq >= 0) {
+            return &gpDynCam->pSequences[defaultSeq];
         }
-        if (nKind == CAMSTATE_SWING_OBSTRUCTED) {
-            nKind = CAMSTATE_SWING;
+        if (state == CAMSTATE_SWING_OBSTRUCTED) {
+            state = CAMSTATE_SWING;
         }
         for (i = 0; i < gpDynCam->nSequences; i++) {
-            if (DynamicCam_IsDefualtSeq(&gpDynCam->pSequences[i], nKind) &&
+            if (DynamicCam_IsDefualtSeq(&gpDynCam->pSequences[i], state) &&
                 gpDynCam->pSequences[i].nChoices > 0) {
                 return &gpDynCam->pSequences[i];
             }
         }
         return NULL;
     }
-    uRand = Misc_RandFunc(RANDOM_PRESENTATION);
-    fTotal = 0.0f;
-    for (i = 0; i < nPicked; i++) {
-        fTotal += gpDynCam->pSequences[anPicked[i]].f34;
+    randomNum = Misc_RandFunc(RANDOM_PRESENTATION);
+    possiblePercent = 0.0f;
+    for (i = 0; i < scriptsFound; i++) {
+        possiblePercent += gpDynCam->pSequences[possibleScripts[i]].fWeight;
     }
-    nRoll = uRand % (int)(1000.0f * fTotal);
-    for (i = 0; i < nPicked; i++) {
-        if ((f32)(nRoll - nSum) < 1000.0f * gpDynCam->pSequences[anPicked[i]].f34) {
-            return &gpDynCam->pSequences[anPicked[i]];
+    randomScript = randomNum % (int)(1000.0f * possiblePercent);
+    for (i = 0; i < scriptsFound; i++) {
+        if ((f32)(randomScript - currentScript)
+            < 1000.0f * gpDynCam->pSequences[possibleScripts[i]].fWeight) {
+            return &gpDynCam->pSequences[possibleScripts[i]];
         }
-        nSum += (int)(1000.0f * gpDynCam->pSequences[anPicked[i]].f34);
+        currentScript += (int)(1000.0f * gpDynCam->pSequences[possibleScripts[i]].fWeight);
     }
-    return &gpDynCam->pSequences[anPicked[0]];
+    return &gpDynCam->pSequences[possibleScripts[0]];
 }
 
-// The anim pair named szName (an animation's name, case ignored) gives a sequence (*ppSeq) or a
-// shot (*ppShot), returning 1: its pChanceSeq 39 times in 100 when that has shot choices, else by
-// its kind: 14 one of pRandomSeq1, pRandomSeq2 and pRandomSeq3 at random (pRandomSeq3 when the
-// pick is missing), 13 its shot. 0 when no pair gives one.
-u8 DynamicCamSearchForPairedSequence(char* szName, CameraSequence_t** ppSeq, CamShot** ppShot) {
+// The anim pair named animName (case ignored) gives a sequence (*pSequence) or a shot (*pLink),
+// returning 1: its pChanceSeq 39 times in 100 when that has shot choices, else by its kind: a
+// CAMPAIR_RANDOM_SEQUENCE pair one of pRandomSeq1, pRandomSeq2 and pRandomSeq3 at random
+// (pRandomSeq3 when the one picked is missing; the search goes on when that is missing too), a
+// CAMPAIR_SHOT pair its shot. 0 when no pair gives one.
+static u8 DynamicCamSearchForPairedSequence(char* animName, CameraSequence_t** pSequence, CamShot** pLink) {
     int i;
-    u32 nPick;
+    u32 randomval;
 
     for (i = 0; i < gpDynCam->nAnimPairs; i++) {
-        if (stricmp(gpDynCam->pAnimPairs[i].szName, szName) != 0) {
+        if (stricmp(gpDynCam->pAnimPairs[i].szName, animName) != 0) {
             continue;
         }
         if (gpDynCam->pAnimPairs[i].pChanceSeq != NULL && gpDynCam->pAnimPairs[i].pChanceSeq->nChoices > 0 &&
             Misc_RandFunc(RANDOM_PRESENTATION) % 100 > 60) {
-            *ppSeq = gpDynCam->pAnimPairs[i].pChanceSeq;
+            *pSequence = gpDynCam->pAnimPairs[i].pChanceSeq;
             return 1;
         }
-        if (gpDynCam->pAnimPairs[i].nKind == 14) {
-            nPick = Misc_RandFunc(RANDOM_PRESENTATION) % 3;
-            if (nPick == 0 && gpDynCam->pAnimPairs[i].pRandomSeq1 != NULL) {
-                *ppSeq = gpDynCam->pAnimPairs[i].pRandomSeq1;
+        if (gpDynCam->pAnimPairs[i].nKind == CAMPAIR_RANDOM_SEQUENCE) {
+            randomval = Misc_RandFunc(RANDOM_PRESENTATION) % 3;
+            if (randomval == 0 && gpDynCam->pAnimPairs[i].pRandomSeq1 != NULL) {
+                *pSequence = gpDynCam->pAnimPairs[i].pRandomSeq1;
                 return 1;
             }
-            if (nPick == 1 && gpDynCam->pAnimPairs[i].pRandomSeq2 != NULL) {
-                *ppSeq = gpDynCam->pAnimPairs[i].pRandomSeq2;
+            if (randomval == 1 && gpDynCam->pAnimPairs[i].pRandomSeq2 != NULL) {
+                *pSequence = gpDynCam->pAnimPairs[i].pRandomSeq2;
                 return 1;
             }
             if (gpDynCam->pAnimPairs[i].pRandomSeq3 != NULL) {
-                *ppSeq = gpDynCam->pAnimPairs[i].pRandomSeq3;
+                *pSequence = gpDynCam->pAnimPairs[i].pRandomSeq3;
                 return 1;
             }
-        } else if (gpDynCam->pAnimPairs[i].nKind == 13) {
-            *ppShot = gpDynCam->pAnimPairs[i].pShot;
+        } else if (gpDynCam->pAnimPairs[i].nKind == CAMPAIR_SHOT) {
+            *pLink = gpDynCam->pAnimPairs[i].pShot;
             return 1;
         }
     }
@@ -1461,116 +1467,124 @@ u8 DynamicCamSearchForPairedSequence(char* szName, CameraSequence_t** ppSeq, Cam
 }
 
 // The sequence or shot paired with the golfer's animation (DynamicCamSearchForPairedSequence): with
-// b (TW07's checkReaction) the clip in Character.pReactionClip when there is one, else the clip it
-// is playing. While the GameBreaker letterbox is up (GameEffects_IsLetterboxOn) the name with "LB"
-// in front is tried first. 1 when one is found; *ppSeq and *ppShot are cleared first, and a NULL out pointer
-// gives 0.
-u8 DynamicCam_ChoosePairedSequenceOrCamera(int nPlayer, u8 b, CameraSequence_t** ppSeq, CamShot** ppShot) {
-    char szName[0x18];          // the frame allows 12 to 24 bytes; the true size is unknown
-    char* pName = NULL;
+// checkReaction the clip in Character.pReactionClip when there is one, else the clip he is playing
+// (pCurClip). While the GameBreaker letterbox is up (GameEffects_IsLetterboxOn) the name with "LB" in
+// front is tried first. 1 when one is found; *pSequence and *pLink are cleared first, and a NULL out
+// pointer gives 0.
+u8 DynamicCam_ChoosePairedSequenceOrCamera(int ePlayerID, u8 checkReaction, CameraSequence_t** pSequence,
+                                           CamShot** pLink) {
+    char copyAnimName[0x18];
+    char* animName = NULL;
 
-    if (ppSeq == NULL || ppShot == NULL) {
+    if (pSequence == NULL || pLink == NULL) {
         return 0;
     }
-    *ppSeq = NULL;
-    *ppShot = NULL;
-    if (b && gPlayers[nPlayer].pChar->pReactionClip != NULL) {
-        pName = gPlayers[nPlayer].pChar->pReactionClip->name;
+    *pSequence = NULL;
+    *pLink = NULL;
+    if (checkReaction && gPlayers[ePlayerID].pChar->pReactionClip != NULL) {
+        animName = gPlayers[ePlayerID].pChar->pReactionClip->name;
     }
-    if (pName == NULL && gPlayers[nPlayer].pChar->pCurClip != NULL) {
-        pName = gPlayers[nPlayer].pChar->pCurClip->name;
+    if (animName == NULL && gPlayers[ePlayerID].pChar->pCurClip != NULL) {
+        animName = gPlayers[ePlayerID].pChar->pCurClip->name;
     }
-    if (pName != NULL) {
+    if (animName != NULL) {
         if (GameEffects_IsLetterboxOn()) {
-            sprintf(szName, "LB%s", pName);
-            if (DynamicCamSearchForPairedSequence(szName, ppSeq, ppShot) == 1) {
+            sprintf(copyAnimName, "LB%s", animName);
+            if (DynamicCamSearchForPairedSequence(copyAnimName, pSequence, pLink) == 1) {
                 return 1;
             }
         }
-        if (DynamicCamSearchForPairedSequence(pName, ppSeq, ppShot) == 1) {
+        if (DynamicCamSearchForPairedSequence(animName, pSequence, pLink) == 1) {
             return 1;
         }
     }
     return 0;
 }
 
-// A default sequence for state nKind: one of that state (DynamicCam_MatchStateType) whose name
-// starts with "DEF". 0 for NULL.
-u8 DynamicCam_IsDefualtSeq(CameraSequence_t* pSequence, int nKind) {
-    if (pSequence == NULL) return 0;
-    if (!DynamicCam_MatchStateType(pSequence, nKind)) return 0;
-    if (pSequence->szName[0] != 'D') return 0;
-    if (pSequence->szName[1] != 'E') return 0;
-    if (pSequence->szName[2] != 'F') return 0;
+// A default sequence for state: one of that state (DynamicCam_MatchStateType) whose name starts with
+// "DEF". 0 for NULL.
+static u8 DynamicCam_IsDefualtSeq(CameraSequence_t* seq, CameraShotState_e state) {
+    if (seq == NULL) return 0;
+    if (!DynamicCam_MatchStateType(seq, state)) return 0;
+    if (seq->szName[0] != 'D') return 0;
+    if (seq->szName[1] != 'E') return 0;
+    if (seq->szName[2] != 'F') return 0;
     return 1;
 }
 
-// The camera lie for each end lie (DynamicCam_MaterialToCameraLie; entry 1 is decided there by the
-// ball's lie) and for each ball lie (DynamicCam_BallLieToCameraLie). A sequence's uStartLies and uEndLies
-// hold one bit per camera lie.
-s32 gMaterialToCamLies[20] = {0, 1, 2, 6, 2, 3, 4, 5, 3, 3, 3, 3, 6, 3, 3, 3, 5, 3, 6, 7};
-s32 gBallLieToCamLies[17] = {1, 2, 2, 3, 3, 3, 4, 4, 4, 6, 2, 3, 6, 5, 5, 5, 7};
+// The camera lie for surface class lieID, CAMLIE_NONE past 19: class 1 is the tee under a ball on
+// the tee (LIE_TEE_e), else the fairway.
+static CameraLie_e DynamicCam_MaterialToCameraLie(u32 lieID, int playerID) {
+    static CameraLie_e sMaterialToCamLies[20] = {
+        CAMLIE_NONE, CAMLIE_TEE, CAMLIE_FAIRWAY, CAMLIE_GREEN, CAMLIE_FAIRWAY, CAMLIE_ROUGH,
+        CAMLIE_SAND, CAMLIE_WATER, CAMLIE_ROUGH, CAMLIE_ROUGH, CAMLIE_ROUGH, CAMLIE_ROUGH,
+        CAMLIE_GREEN, CAMLIE_ROUGH, CAMLIE_ROUGH, CAMLIE_ROUGH, CAMLIE_WATER, CAMLIE_ROUGH,
+        CAMLIE_GREEN, CAMLIE_OUT_OF_BOUNDS,
+    };
+    CameraLie_e nRet;
 
-// The camera lie for end lie n (0..19), from gMaterialToCamLies; 0 for any other n. Lie 1 depends
-// on the ball: 1 when it lies on lie 0, else 2.
-s32 DynamicCam_MaterialToCameraLie(u32 n, int nPlayer) {
-    s32 nRet;
-
-    if (n > 19) return 0;
-    if (n == 1) {
-        nRet = 2;
-        if (gPlayers[nPlayer].ball.nLie == 0) {
-            nRet = 1;
+    if (lieID > 19) return CAMLIE_NONE;
+    if (lieID == 1) {
+        nRet = CAMLIE_FAIRWAY;
+        if (gPlayers[playerID].ball.nLie == LIE_TEE_e) {
+            nRet = CAMLIE_TEE;
         }
         return nRet;
     }
-    return gMaterialToCamLies[n];
+    return sMaterialToCamLies[lieID];
 }
 
-// The camera lie for ball lie n, from gBallLieToCamLies (17 entries; n is not checked). nPlayer is
-// not used.
-s32 DynamicCam_BallLieToCameraLie(int n, int nPlayer) {
-    return gBallLieToCamLies[n];
+// The camera lie for each ball lie up to LIE_OUT_OF_BOUNDS_e (DynamicCam_BallLieToCameraLie).
+CameraLie_e gBallLieToCamLies[17] = {
+    CAMLIE_TEE, CAMLIE_FAIRWAY, CAMLIE_FAIRWAY, CAMLIE_ROUGH, CAMLIE_ROUGH, CAMLIE_ROUGH,
+    CAMLIE_SAND, CAMLIE_SAND, CAMLIE_SAND, CAMLIE_GREEN, CAMLIE_FAIRWAY, CAMLIE_ROUGH,
+    CAMLIE_GREEN, CAMLIE_WATER, CAMLIE_WATER, CAMLIE_WATER, CAMLIE_OUT_OF_BOUNDS,
+};
+
+// The camera lie for the ball's lie, from gBallLieToCamLies. lie is not checked: LIE_MISC_e (17),
+// which Physics_SetLie gives the surface classes it does not list, reads one past the table.
+// playerID is not used.
+static CameraLie_e DynamicCam_BallLieToCameraLie(Lie_t lie, int playerID) {
+    return gBallLieToCamLies[lie];
 }
 
-// The sequence suits the player's club: b45 picks the clubs (0 any, 1 woods, 2 5..9 irons,
-// 3 1..5 irons, 4 wedges, 5 putter, 6 woods and irons, 7 woods and 1..5 irons, 8 all but the
-// putter, 9 5 iron to the wedges, 10 irons and wedges).
-u8 DynamicCam_MatchSeqClub(CameraSequence_t* pSequence, int nPlayer) {
-    int nClub = gPlayers[nPlayer].nClub;
+// The sequence suits the player's club (its nClubType). The woods are the drivers and the 3, 5 and
+// 7 woods, the wedges the pitching wedge to the high lob wedge.
+static u8 DynamicCam_MatchSeqClub(CameraSequence_t* seq, int ePlayerID) {
+    Club_t club = gPlayers[ePlayerID].nClub;
 
-    switch (pSequence->b45) {
-    case 0:
+    switch (seq->nClubType) {
+    case CAMCLUB_ANY:
         return 1;
-    case 1:
-        if (nClub >= CLUB_DRIVER1_e && nClub <= CLUB_7WOOD_e) return 1;
+    case CAMCLUB_WOODS:
+        if (club >= CLUB_DRIVER1_e && club <= CLUB_7WOOD_e) return 1;
         return 0;
-    case 2:
-        if (nClub >= CLUB_5IRON_e && nClub <= CLUB_9IRON_e) return 1;
+    case CAMCLUB_IRONS_5_TO_9:
+        if (club >= CLUB_5IRON_e && club <= CLUB_9IRON_e) return 1;
         return 0;
-    case 3:
-        if (nClub >= CLUB_1IRON_e && nClub <= CLUB_5IRON_e) return 1;
+    case CAMCLUB_IRONS_1_TO_5:
+        if (club >= CLUB_1IRON_e && club <= CLUB_5IRON_e) return 1;
         return 0;
-    case 4:
-        if (nClub >= CLUB_PITCHINGWEDGE_e && nClub <= CLUB_HIGHLOBWEDGE_e) return 1;
+    case CAMCLUB_WEDGES:
+        if (club >= CLUB_PITCHINGWEDGE_e && club <= CLUB_HIGHLOBWEDGE_e) return 1;
         return 0;
-    case 5:
-        if (nClub >= CLUB_PUTTER_e && nClub <= CLUB_PUTTER_e) return 1;
+    case CAMCLUB_PUTTER:
+        if (club >= CLUB_PUTTER_e && club <= CLUB_PUTTER_e) return 1;
         return 0;
-    case 6:
-        if (nClub >= CLUB_DRIVER1_e && nClub <= CLUB_9IRON_e) return 1;
+    case CAMCLUB_WOODS_AND_IRONS:
+        if (club >= CLUB_DRIVER1_e && club <= CLUB_9IRON_e) return 1;
         return 0;
-    case 8:
-        if (nClub >= CLUB_DRIVER1_e && nClub <= CLUB_HIGHLOBWEDGE_e) return 1;
+    case CAMCLUB_ALL_BUT_PUTTER:
+        if (club >= CLUB_DRIVER1_e && club <= CLUB_HIGHLOBWEDGE_e) return 1;
         return 0;
-    case 9:
-        if (nClub >= CLUB_5IRON_e && nClub <= CLUB_HIGHLOBWEDGE_e) return 1;
+    case CAMCLUB_5_IRON_TO_WEDGES:
+        if (club >= CLUB_5IRON_e && club <= CLUB_HIGHLOBWEDGE_e) return 1;
         return 0;
-    case 10:
-        if (nClub >= CLUB_1IRON_e && nClub <= CLUB_HIGHLOBWEDGE_e) return 1;
+    case CAMCLUB_IRONS_AND_WEDGES:
+        if (club >= CLUB_1IRON_e && club <= CLUB_HIGHLOBWEDGE_e) return 1;
         return 0;
-    case 7:
-        if (nClub >= CLUB_DRIVER1_e && nClub <= CLUB_5IRON_e) return 1;
+    case CAMCLUB_WOODS_TO_5_IRON:
+        if (club >= CLUB_DRIVER1_e && club <= CLUB_5IRON_e) return 1;
         return 0;
     default:
         return 0;
@@ -1953,12 +1967,12 @@ void DynamicCam_GetSmoothBallLocation(CameraScriptSettings_t* pScript, CamShot* 
 
 // The shot's side offset fSideOffset into *pA and its distance fDist into *pB (each when not NULL; nothing
 // for a NULL shot). When CameraScript_FlipCameraForLefty holds for the player and the shot one of
-// them changes sign: the side (-fSideOffset), or the distance (-fDist) for a shot with a point of kind 21
-// (DynamicCam_GetLocation).
+// them changes sign: the side (-fSideOffset), or the distance (-fDist) for a shot with a
+// CAMPOINT_GOLFER_AXIS_Z point.
 void DynamicCam_CalculateFlippedOffsets(CamShot* pShot, int nPlayer, f32* pA, f32* pB) {
     if (pShot != NULL) {
         if (CameraScript_FlipCameraForLefty(nPlayer, pShot)) {
-            if (pShot->nFromPoint == 21 || pShot->nToPoint == 21) {
+            if (pShot->nFromPoint == CAMPOINT_GOLFER_AXIS_Z || pShot->nToPoint == CAMPOINT_GOLFER_AXIS_Z) {
                 if (pA != NULL) {
                     *pA = pShot->fSideOffset;
                 }
@@ -2048,7 +2062,9 @@ void DynamicCam_Vec3Sub(f32* pA, f32* pB, f32* pOut) {
 u8 CamScript_DoesScriptTrackGolfer(CamShot* pShot) {
     u8 nKind = pShot->nLookAtKind;
 
-    if (nKind == 1 || (u8)(nKind - 2) <= 4U || nKind == 7) {
+    if (nKind == CAMPOINT_BALL_SPOT
+        || (u8)(nKind - CAMPOINT_GOLFER_FEET) <= CAMPOINT_GOLFER_HEAD - CAMPOINT_GOLFER_FEET
+        || nKind == CAMPOINT_GOLFER_HEAD_LAGGED) {
         return 1;
     }
     return 0;
