@@ -340,7 +340,7 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
         GolfCamera_IsThereACameraGoingToBeTimeTriggered(pV, nPlayer)) {
         fn_80095744(gPlayers[nPlayer].pChar, 5);
         CharacterState_UpdateSKAState(gPlayers[nPlayer].pChar);
-        CameraController_PostEvent(pV, 0x17, nPlayer);
+        CameraController_PostEvent(pV, CAMEVENT_PRESHOT_TIMED, nPlayer);
     }
     if (CameraController_IsFadeOutDone(pV)
         && (GolfCamera_IsPreShotCamReadyForFade(pV, nPlayer, 0.25f)

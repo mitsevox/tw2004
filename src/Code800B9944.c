@@ -37,7 +37,6 @@ void FE_CrAPBall_LoadTEO(UStreamObject* pObject);
 void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);                   // identity
 void UObject_ComposeRotation(f32 (*pMtx)[4]);
-void Character_GetBonePos(Character* pChar, int nBone, f32* pPos);
 void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
 int  fn_8001005C(TexBank* pBank, u64 uHash);       // LLTex.c: the texture's index, or 0x80000000
 
