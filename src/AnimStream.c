@@ -279,18 +279,18 @@ u8 AnimStream_StartRead(int nSlot, int nPlayer, int nIndex, int nStyle, int nClu
     pRec = &pChar->pRecords[nFirst];
     AnimStream_GetFilePath((pRec->uFlags >> 1) & 1, pChar->nSlot, nPlayer, szPath);
     uOffset = pRec->n20;
-    gpAnimStream->hFile = fn_800060E0(szPath);
+    gpAnimStream->hFile = File_Open(szPath);
     gpAnimStream->nState = 1;
     gpAnimStream->nReadPlayer = nPlayer;
-    uFileSize = fn_800065B0(gpAnimStream->hFile);
+    uFileSize = File_GetLength(gpAnimStream->hFile);
     if (uFileSize < uOffset + gpAnimStream->pReadBuf->nSize) {
         uLen = uFileSize - uOffset;
         uLen -= uLen & 0x7FF;
     } else {
         uLen = gpAnimStream->pReadBuf->nSize;
     }
-    if (fn_80006444(gpAnimStream->hFile, gpAnimStream->pRead, uLen, uOffset, AnimStream_OnReadDone) < 0) {
-        fn_8000633C(gpAnimStream->hFile);
+    if (File_ReadAsync(gpAnimStream->hFile, gpAnimStream->pRead, uLen, uOffset, AnimStream_OnReadDone) < 0) {
+        File_Close(gpAnimStream->hFile);
         gpAnimStream->hFile = -1;
         return 0;
     }
@@ -310,7 +310,7 @@ void AnimStream_OnReadDone(int nBytes, int nError) {
 // Otherwise the read stays done (nState 2) and a later call stores it.
 void AnimStream_EndRead(u8 bForce) {
     if (gpAnimStream->hFile >= 0) {
-        fn_8000633C(gpAnimStream->hFile);
+        File_Close(gpAnimStream->hFile);
         gpAnimStream->hFile = -1;
     }
     if (bForce || AnimStream_CanReplaceClip(gpAnimStream->nReadPlayer, gpAnimStream->pReadBuf->pData)) {
@@ -707,8 +707,8 @@ void AnimStream_ReadPlayerClips(int nPlayer) {
     nSlot = gpAnimStream->players[nPlayer].nSlot;
     pLib = pChar->pLib;
     AnimStream_GetFilePath(0, pChar->nSlot, nPlayer, szPath);
-    gpAnimStream->hFile = fn_800060E0(szPath);
-    uFileSize = fn_800065B0(gpAnimStream->hFile);
+    gpAnimStream->hFile = File_Open(szPath);
+    uFileSize = File_GetLength(gpAnimStream->hFile);
     for (i = 0; i < 2; i++) {
         for (nStyle = 0; nStyle < 8; nStyle++) {
             for (nClub = 0; nClub < 6; nClub++) {
@@ -732,12 +732,12 @@ void AnimStream_ReadPlayerClips(int nPlayer) {
             }
         }
     }
-    fn_8000633C(gpAnimStream->hFile);
+    File_Close(gpAnimStream->hFile);
     gpAnimStream->hFile = -1;
 
     AnimStream_GetFilePath(1, nAnimSlot, 0, szPath);
-    gpAnimStream->hFile = fn_800060E0(szPath);
-    uFileSize = fn_800065B0(gpAnimStream->hFile);
+    gpAnimStream->hFile = File_Open(szPath);
+    uFileSize = File_GetLength(gpAnimStream->hFile);
     for (i = 0; i < 2; i++) {
         for (nStyle = 0; nStyle < 8; nStyle++) {
             for (nClub = 0; nClub < 6; nClub++) {
@@ -761,7 +761,7 @@ void AnimStream_ReadPlayerClips(int nPlayer) {
             }
         }
     }
-    fn_8000633C(gpAnimStream->hFile);
+    File_Close(gpAnimStream->hFile);
     gpAnimStream->hFile = -1;
 }
 
@@ -790,8 +790,8 @@ void AnimStream_ReadFirstClips(void) {
         pLib = pChar->pLib;
         pRecords = pChar->pRecords;
         AnimStream_GetFilePath(0, pChar->nSlot, nPlayer, szPath);
-        gpAnimStream->hFile = fn_800060E0(szPath);
-        uFileSize = fn_800065B0(gpAnimStream->hFile);
+        gpAnimStream->hFile = File_Open(szPath);
+        uFileSize = File_GetLength(gpAnimStream->hFile);
         for (i = 0; i < 2; i++) {
             for (nStyle = 0; nStyle < 8; nStyle++) {
                 for (nClub = 0; nClub < 6; nClub++) {
@@ -815,7 +815,7 @@ void AnimStream_ReadFirstClips(void) {
                 }
             }
         }
-        fn_8000633C(gpAnimStream->hFile);
+        File_Close(gpAnimStream->hFile);
         gpAnimStream->hFile = -1;
     }
     AnimStream_ReadSharedClips(0);
@@ -842,8 +842,8 @@ void AnimStream_ReadSharedClips(int nSlot) {
     uFlags = 0;
     if (gpAnimStream->bOn == 0) return;
     AnimStream_GetFilePath(1, nSlot, 0, szPath);
-    gpAnimStream->hFile = fn_800060E0(szPath);
-    uFileSize = fn_800065B0(gpAnimStream->hFile);
+    gpAnimStream->hFile = File_Open(szPath);
+    uFileSize = File_GetLength(gpAnimStream->hFile);
     for (nPlayer = 0; nPlayer < gSession.nNumPlayers && nPlayer < 2; nPlayer++) {
         pChar = gPlayers[nPlayer].pChar;
         if (nSlot != pChar->nSlot) continue;
@@ -874,7 +874,7 @@ void AnimStream_ReadSharedClips(int nSlot) {
             }
         }
     }
-    fn_8000633C(gpAnimStream->hFile);
+    File_Close(gpAnimStream->hFile);
     gpAnimStream->hFile = -1;
 }
 
@@ -886,7 +886,7 @@ void AnimStream_ReadNow(int hFile, u32 uFileSize, void* pDst, u32 uLen, u32 uOff
         uLen -= uLen & 0x7FF;
     }
     gpAnimStream->bReadDone = 0;
-    fn_80006444(hFile, pDst, uLen, uOffset, AnimStream_OnReadNowDone);
+    File_ReadAsync(hFile, pDst, uLen, uOffset, AnimStream_OnReadNowDone);
     do {
         fn_8006C63C();
     } while (gpAnimStream->bReadDone == 0);

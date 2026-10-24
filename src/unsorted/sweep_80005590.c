@@ -4,7 +4,6 @@
 
 void UStream_FreeBuffers();
 void fn_800055D4();
-void fn_800060DC();
 void fn_8000724C();
 void StreamManager_CloseOnce();
 void AudMem_CloseOnce();
@@ -15,7 +14,7 @@ void fn_80005590(void) {
     StreamManager_CloseOnce();
     fn_8000724C();
     UStream_FreeBuffers();
-    fn_800060DC();
+    File_CloseOnce();
     Input_vCloseOnce();
     Circular_DestroyBuffer();
     Math_FreeLog2Table();

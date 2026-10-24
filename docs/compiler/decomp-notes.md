@@ -1131,7 +1131,7 @@ The fixes that come up most often. Each points to its full entry below.
   gReadyRingTail = 0;`). objdiff scored the function exact before: it compares the relocation names,
   and two stores of the same register to two small-data globals swapped only show in the DOL.
 - **[verified] Link: a global the code never references is dead-stripped**, so the unit's `.bss` comes
-  out short. Declare the used object at the symbol's full size instead (LLFileIO_Gc lbl_801A0350: 0x2000
+  out short. Declare the used object at the symbol's full size instead (LLFileIO_Gc gDiscFilePaths: 0x2000
   symbol, code uses 0x1000). An opaque SDK stand-in type needs the real type's alignment or the
   padding before it goes missing (OSThread: f64 array for 8-byte alignment).
 - **[verified] Unity builds**: char.o's `.data` would start at 0x801870FC, which our 8-aligned

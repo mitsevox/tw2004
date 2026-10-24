@@ -649,7 +649,7 @@ void UI_PlayStartUpMovies(void) {
 }
 
 // Show pPict over the whole screen for nFrames frames, a frame each (with the audio stepped and the
-// disc checked, fn_800B7490), its alpha rising by fStep a frame from 0 up to 1.
+// disc checked, DiscError_WaitForDrive), its alpha rising by fStep a frame from 0 up to 1.
 void UI_ShowPictureFadingIn(LLPict* pPict, int nFrames, f32 fStep) {
     f32 fAlpha = 0.0f;
     int i;
@@ -665,7 +665,7 @@ void UI_ShowPictureFadingIn(LLPict* pPict, int nFrames, f32 fStep) {
         fn_80007254();
         fn_800083A0();
         Gaud_Cycle();
-        fn_800B7490();
+        DiscError_WaitForDrive();
     }
 }
 

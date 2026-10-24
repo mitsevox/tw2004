@@ -1023,7 +1023,7 @@ void fn_8006D8E8(void) {
     TI_sReadCounter(TI_COUNTER_REALTIME);
     while (!GO_bMainLoopDone()) {
         fn_80110390();
-        fn_800B7490();
+        DiscError_WaitForDrive();
         if (gSession.nGameType == 6) {
             Character_ResetTimeScalesOnCombo();
         }
