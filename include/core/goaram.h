@@ -73,7 +73,7 @@ typedef struct ARAMTransfer {
 } ARAMTransfer;
 LAYOUT_ASSERT(ARAMTransfer, 0x44);
 
-// GoARAM.c's state (lbl_801F6680, reached through lbl_802814C8).
+// GoARAM.c's state (gARAMState, reached through gpARAMState).
 typedef struct ARAMState {
     ARAMHeap*     pHeap;        // 0x0
     void*         pHeapMem;     // 0x4    the heap and its block records (fn_800951A0)
@@ -88,7 +88,7 @@ typedef struct ARAMState {
 } ARAMState;
 LAYOUT_ASSERT(ARAMState, 0x28);
 
-extern ARAMState* lbl_802814C8;
+extern ARAMState* gpARAMState;
 
 // The heap (startUp.c keeps a second heap inside one block of this one).
 ARAMHeap*     GoARAM_HeapInit(u32 uSize, u32 uBase, u32 nBlocks, ARAMHeap* pHeap);
