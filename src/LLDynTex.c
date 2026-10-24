@@ -34,8 +34,6 @@ int  fn_8001005C(TexBank* pBank, u64 uHash);       // LLTex.c: the texture's ind
 TexEntry* fn_800107E4(TexBank* pBank, int nTex);  // LLTexGrp.c
 s32  fn_8010BC94(const void* pA, const void* pB);
 s32  fn_8010B5F8(DynTexObj* pObj);
-void fn_80007368(void);
-void fn_80007328(void);
 
 DynTexState* lbl_80282488;
 
@@ -822,9 +820,9 @@ u8 fn_8010BFE0(void) {
             return 0;
         }
     }
-    fn_80007368();
+    Displ_DisableInterrupts();
     bReady = lbl_80282488->b974 != 0;
-    fn_80007328();
+    Displ_RestoreInterrupts();
     if (bReady) {
         pTex = DYNTEX_CHAR(lbl_80282488->pA88->ppBank)->pDynTex;
         // Copy what the last read brought.

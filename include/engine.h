@@ -553,8 +553,11 @@ extern struct GXFifoObj* lbl_80281BA0; // LLDisp_Gc.c: the command FIFO (GXInit'
 extern u32 lbl_80281B9C;                // LLDisp_Gc.c: the most the FIFO has held (fn_800124CC)
 extern void* lbl_80281BA4[2];           // LLDisp_Gc.c: two image buffers (DepthField.c and
                                         //       FEgolferanim.c make textures of them)
-extern s32* gpInterruptsOffDepth;               // the interrupts-off depth that LLDisp_Gc.c's fn_80007368 and
-                                        //       fn_80007328 count (fn_80005580 clears it)
+extern s32* gpInterruptsOffDepth;      // the interrupts-off depth that LLDisp_Gc.c's
+                                        //       Displ_DisableInterrupts and Displ_RestoreInterrupts
+                                        //       count (fn_80005580 clears it)
+void Displ_RestoreInterrupts(void);     // LLDisp_Gc.c: leave one level; interrupts back on at the last
+void Displ_DisableInterrupts(void);     // LLDisp_Gc.c: interrupts off, counting the levels
 
 // LLDisp_Gc.c's frame sync (lbl_801A2350, our name): the FIFO break points the GPU is stopped at,
 // so the CPU knows when a frame's commands have been drawn.
