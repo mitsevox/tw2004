@@ -27,7 +27,6 @@ f32  CameraScript_GetBallHeightWithMaxHeight(int nPlayer, CameraScriptSettings_t
 void CameraScript_KeepPointInView(int nPlayer, f32* pCam, f32* pOut, f32* pTarget,
                                   CameraScriptSettings_t* pScript, f32 fLag);
 void CameraScript_OffsetLookVector(f32* pPos, f32* pTarget, f32 fUp, f32 fSide);
-void Character_GetBonePos(Character* pChar, int nBone, f32* pPos);   // char.c: a bone's position
 void fn_800457B8(int nPlayer, f32 f);
 f32  GameEffects_DepthOfFieldChange(f32 f);
 u8   CamScript_IsSecondViewShot(CamShot* pShot);

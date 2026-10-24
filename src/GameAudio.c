@@ -38,7 +38,6 @@ f32  fn_8006C630(void);
 u8   Aud_EmiAdd(s16 nSound, s16 nKind, int a, int b, void (*pfnCallback)(u8 nId, u8 nTrack, s32 n));
 void Aud_EmiSetTrackVarRangeTmpl(s16 nSound, u8 nTrack, u8 n);
 void Aud_EmiSetAllTrackStatus(u8 nId, int n);
-void Character_GetBonePos(Character* pChar, int nBone, f32* pPos);
 void Gaud_ExitSpecialShot(u8 nPlayer);
 void Gaud_ExitCamZoom(u8 nPlayer);
 void Gaud_ExitSlowMo(u8 nPlayer);

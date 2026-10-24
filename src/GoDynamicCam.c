@@ -39,7 +39,6 @@ void DynamicCam_LoadCAMVfromStreamFE(UStreamObject* pObject);
 void DynamicCam_LoadCAMAfromStream(UStreamObject* pObject);
 void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CameraScriptSettings_t* pScript,
                             CamShot* pShot, f32* pCam, f32* pSub);
-void Character_GetBonePos(Character* pChar, int nBone, f32* pPos);   // char.c: a bone's position
 void DynamicCam_AddOffset(f32* pPos, f32* pDir, CameraScriptSettings_t* pScript, CamShot* pShot, int nPlayer,
                           f32 fSide, f32 fY);
 void DynamicCam_AddHeightOffset(f32* pPos, CameraScriptSettings_t* pScript, CamShot* pShot, int nPlayer,

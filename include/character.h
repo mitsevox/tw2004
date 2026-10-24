@@ -888,6 +888,7 @@ void  Character_GetEndOfAnimationPosition(Character* pChar, f32* pOut);    // th
 void  Character_ClearKeyFrameBuffers(Character* pChar);    // empty the character's four data buffers
 u8    Character_IsHoldingBall(Character* pChar);    // the clip's n1C is above bone 0x54's index
 void  Character_GetBallOnFingerPosition(Character* pChar, f32* pPos);
+void  Character_GetBonePos(Character* pChar, int nBone, f32* pPos);     // a bone's position, by bone id
 f32 (*Character_GetBoneMatrix(Character* pChar, int nBone))[4];  // a bone's matrix
 u8    Character_IsLeftHanded(Character* pChar);    // the model's bLeftHanded
 int   Character_GetShadowClipResult(Character* pChar);    // nShadowClipResult

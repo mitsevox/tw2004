@@ -111,7 +111,6 @@ void  Character_PlaceFeetOnGround(Character* pChar);
 void  SKEL_TransformBones(CharModel* pModel, u32* auBits);
 void  fn_800B28D4(Character* pChar, int a, int b);
 void  fn_800B2FB0(Character* pChar, int a, int b);
-void  Character_GetBonePos(Character* pChar, int nBone, f32* pPos);
 void  Character_ClubStreamCallbackIG(UStreamObject* pObject);
 void  Character_ClubStreamCallbackFE(UStreamObject* pObject);
 void  Character_GolferStreamCallbackIG(UStreamObject* pObject);
