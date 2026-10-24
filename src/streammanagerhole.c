@@ -130,8 +130,6 @@ void StreamManagerGlobals_UnregisterStreamClients(void);
 void StreamManagerGlobals_StreamFiles(void);
 void Ter_RegisterStreamClients();
 void Ter_UnRegisterStreamClients();
-void StaticCam_RegisterStreamClients();
-void StaticCam_UnRegisterStreamClients();
 void Grass_RegisterStreamClients();
 void Grass_UnRegisterStreamClients();
 void StreamManagerHole_InitModule(void);

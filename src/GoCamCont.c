@@ -324,10 +324,10 @@ void CameraController_StartScriptOfKind(View* pView, int nPlayer, int nKind) {
     CamShot* pShot = DynamicCam_ChooseScript(nPlayer, nKind, NULL);
 
     if (pShot != NULL) {
-        pView->script.pNextShot = pShot->p40;
-        if (pShot->p40 != NULL) {
-            pView->script.nInterpType = pShot->p40->nInterpType;
-            pView->script.f8C = pShot->p40->f48;
+        pView->script.pNextShot = pShot->pNext;
+        if (pShot->pNext != NULL) {
+            pView->script.nInterpType = pShot->pNext->nInterpType;
+            pView->script.f8C = pShot->pNext->fInterpTime;
         }
     }
     pView->script.fCamTime = 0.0f;
@@ -420,7 +420,7 @@ u8 CameraController_HideGolfer(int nPlayer, int nView) {
             }
             if (pView->script.pShot->bShowGolfer == 0) {
                 if (pView->script.pNextShot == NULL || pView->script.pNextShot->bShowGolfer == 0
-                    || pView->script.nInterpType == 5) {
+                    || pView->script.nInterpType == CAMINTERP_CUT) {
                     return 1;
                 }
             }
@@ -560,8 +560,8 @@ void CameraController_HoldFadeColor(View* pView, f32* pVec) {
 }
 
 // Posts camera event nKind to the view: it becomes the view's requested event
-// (CamScript.nRequestedEvent). Without a club (25) only events 0, 5, 8, 11 and 23 are taken. Event
-// 12 first holds the current camera (recorded into shot19C) for 0.3 while the view fades to grey
+// (CameraScriptSettings_t.nRequestedEvent). Without a club (25) only events 0, 5, 8, 11 and 23 are
+// taken. Event 12 first holds the current camera (recorded into shot19C) for 0.3 while the view fades to grey
 // (alpha 0.5), then goes on to a kind-12 shot chosen for the player; event 7 becomes 10 when the
 // ball lies on surface class 7 or 16. While event 12 waits only 5, 8 and 10 replace it; 6 is never
 // taken; 2 and 3 do not replace 7, nor 7 them.
@@ -582,10 +582,10 @@ void CameraController_PostEvent(View* pView, int nKind, int nPlayer) {
         pShot = DynamicCam_ChooseScript(nPlayer, 12, NULL);
         if (pShot != NULL) {
             CameraScript_RecordCurrentCam(&pView->shot19C, pPos, pAt, nPlayer, &pView->script, 0);
-            pView->shot19C.p40 = pShot;
-            CameraScript_InterpToNewScript(&pView->script, &pView->shot19C, nPlayer, pPos, pAt, 5, 0.0f,
-                                           100.0f, 25, 0.0f);
-            pView->script.nInterpType = 5;
+            pView->shot19C.pNext = pShot;
+            CameraScript_InterpToNewScript(&pView->script, &pView->shot19C, nPlayer, pPos, pAt, CAMINTERP_CUT,
+                                           0.0f, 100.0f, 25, 0.0f);
+            pView->script.nInterpType = CAMINTERP_CUT;
             pView->script.f8C = 0.3f;
             CameraController_FadeOut(pView, 0.3f, vGrey);
         }
@@ -713,8 +713,8 @@ void CameraController_ResetAimMarkerInSwingCamera(View* pView, int nPlayer) {
     f32* pPos = CameraController_GetCameraOrigin(pView);
 
     CameraScript_InterpToNewScript(&pView->script, pView->script.pShot, nPlayer, pPos,
-                                   CameraController_GetCameraLookPoint(pView), 5,
-                                   0.0f, 100.0f, 25, 0.0f);
+                                   CameraController_GetCameraLookPoint(pView), CAMINTERP_CUT, 0.0f, 100.0f,
+                                   25, 0.0f);
 }
 
 // Puts the point pPos through the camera onto the screen: pX and pY from 0 to 1 across it, pZ its

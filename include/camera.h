@@ -41,17 +41,59 @@ typedef struct CamLens {
 
 f32 CA_fGetCameraFieldOfView(CamLens* pLens);        // GoRenderCtx_Gc.c: the lens's field of view
 
-// A camera shot (0xC0 bytes; TW07's CameraScript_t): a named script position the camera script
-// moves to. The shots of a sequence are chained through p40.
+// How the camera script moves into a shot (CamShot.nInterpType, the script's nInterpType;
+// CamScript_RunScript).
+typedef enum CameraInterpType_e {
+    CAMINTERP_SPLINE = 3,       // along the spline through the shots around it (CamScript_SplineCameras)
+    CAMINTERP_CUT = 5           // no move: the camera stays on the shot, then cuts to the next
+} CameraInterpType_e;
+
+// The script state a shot serves (CamShot.nStateType).
+typedef enum CameraShotState_e {
+    CAMSTATE_FLYBY = 0,         // a fly-by shot (CamScript_RunFlybyCamera flies it)
+    CAMSTATE_STATIC = 38        // a static camera
+} CameraShotState_e;
+
+// What a shot looks at (CamShot.nLookAtKind; CamScript_GetLookAtPoint).
+typedef enum CamLookAtKind {
+    CAMLOOK_GOLFER_WAIST_LAGGED = 5,    // the golfer's waist (bone 1), trailed
+                                        // (CameraScript_LagTargetPoint)
+    CAMLOOK_SHOT_POINT = 24             // the shot's own v30
+} CamLookAtKind;
+
+// The game speed while a shot plays (CamShot.nTimeMode), set when the script starts the shot
+// (CameraScript_GoToNewScript, CameraScript_InterpToNewScript; not in split screen).
+typedef enum CamShotTimeMode {
+    SHOTTIME_HALF = 0,          // half speed (GameEffects_SetHalfTime)
+    SHOTTIME_NORMAL = 1,
+    SHOTTIME_DOUBLE = 2,        // double speed (GameEffects_SetDoubleTime)
+    SHOTTIME_MATRIX = 3         // normal speed, the matrix camera mode on (GolfCamera_SetCameraMatrixMode)
+} CamShotTimeMode;
+
+// What a shot's camera height is taken from (CamShot.nHeightRef; DynamicCam_AddHeightOffset).
+typedef enum CamHeightRef {
+    CAMHEIGHT_NONE = 0          // the camera keeps its own height (fHeightOffset is not added)
+} CamHeightRef;
+
+// A camera shot (0xC0 bytes): a named script position the camera script moves to. The shots of a
+// sequence or a fly-by route are chained through pNext.
 typedef struct CamShot {
     char szName[0x20];          // 0x00
     f32  v20[4];                // 0x20  a position ([1]: the elevator camera adds the course's height)
     f32  v30[4];                // 0x30  a second position (the super zoom's target, the zoom-to-aim
-                                //       camera's start)
-    struct CamShot* p40;       // 0x40
-    struct CamShot* p44;        // 0x44  in View.shot19C: the shot camera 13 goes back to
-    f32  f48;                   // 0x48  how long the shot lasts
-    f32  f4C;                   // 0x4C
+                                //       camera's start, the point a static camera looks at; a fly-by
+                                //       shot's look angles in radians)
+    struct CamShot* pNext;      // 0x40  the shot that follows
+    struct CamShot* pPrev;      // 0x44  the shot before it: the first point of the spline through
+                                //       the shots around it (the fly-by routes chain it; the golf
+                                //       cameras set it to the shot they started from, and camera 13
+                                //       goes back to View.shot19C's)
+    f32  fInterpTime;           // 0x48  how long the move into the shot takes (a fly-by shot's: the
+                                //       flight on to the next one); the field of view goes from
+                                //       fFovStart to fFovEnd over it
+    f32  fLength;               // 0x4C  how long the shot is: a time for most shots (a golf camera
+                                //       moves on once the script's fCamTime passes it), a fly-by
+                                //       shot's distance along the spline to the next one
     union {
         struct {
             u32 u50;            // 0x50  on the CrAP screen: bit n for CrAPGolfer.nGolferId = n up to 32
@@ -69,35 +111,41 @@ typedef struct CamShot {
     f32  fLookSideOffset;       // 0x70  } where it looks: moved this far to the side and up
     f32  fLookUpOffset;         // 0x74  } (CameraScript_OffsetLookVector)
     f32  fFovStart;             // 0x78  } the field of view at the start and the end of the shot
-    f32  fFovEnd;               // 0x7C  } (over f48; in degrees in the files)
+    f32  fFovEnd;               // 0x7C  } (over fInterpTime; in degrees in the files)
     f32  fHeightOffset;         // 0x80  added to the camera's height (DynamicCam_AddHeightOffset)
     f32  f84;                   // 0x84
     f32  fDepthOfField;         // 0x88  CamScript_RunScript hands it (plus
                                 //       GameEffects_DepthOfFieldChange of it) to fn_800457B8
-    f32  f8C;                   // 0x8C  } CamScript_RunScript passes both to fn_80038054 (slow motion) when
-    f32  f90;                   // 0x90  } either is above 0
+    f32  fBlur;                 // 0x8C  } CamScript_RunScript passes both to fn_80038054 when either is
+    f32  f90;                   // 0x90  } above 0, fBlur as the blur amount (the argument the golf
+                                //       cameras pass fZoomBlur in)
     f32  fShakeAmount;          // 0x94  } the shoulder shake (CameraScript_CalculateShoulderShake):
     f32  fShakeSpeed;           // 0x98  } how far and how fast; none when fShakeAmount is 0
     f32  fRoll;                 // 0x9C  the camera's roll (the script's fRoll)
-    s32  nA0;                   // 0xA0  CameraScript_InterpToNewScript: 0 GameEffects_SetHalfTime on, 2
-                                //       GameEffects_SetDoubleTime on (else both off); 3 calls
-                                //       GolfCamera_SetCameraMatrixMode(1)
-    s32  nA4;                   // 0xA4
+    s32  nTimeMode;             // 0xA0  the game speed while it plays (CamShotTimeMode)
+    union {
+        s32 nRoute;             // 0xA4  a fly-by shot: the route it is on (0..9)
+        u32 uEvents;            //       a static camera: the events it serves
+                                //       (StaticCam_EventType_e, a bit each)
+    } pick;
     u8   bDynamic;              // 0xA8  played by the dynamic camera (DynamicCam_ProcessScript); 0: by
                                 //       the static camera (StaticCam_ProcessScript)
-    u8   bA9;                   // 0xA9  another shot's p40 leads here (DynamicCam_ParseCameraViewsFE)
+    u8   bHasPrev;              // 0xA9  another shot's pNext leads here: not the first of its sequence
+                                //       or route (DynamicCam_ParseCameraViewsFE, StaticCam_GetFlyByCam)
     u8   bShowGolfer;           // 0xAA  the golfer is drawn in this shot
-    u8   nInterpType;           // 0xAB  how the script moves into it (CamScript.nInterpType: 0 a plain
+    u8   nInterpType;           // 0xAB  how the script moves into it (CameraInterpType_e: 0 a plain
                                 //       blend, 1 fixed target, 13 share of the flight, 15 share
                                 //       to the pin, ...; CamScript_RunScript)
-    u8   nLookAtKind;           // 0xAC  what it looks at (CamScript_GetLookAtPoint: 0 the ball,
-                                //       23 ahead of the ball's flight, ...)
-    u8   nStateType;            // 0xAD  the script state it serves (DynamicCam_MatchScriptStateType)
-    s8   nAE;                   // 0xAE  a static camera's record byte 0x1C (StaticCam_ParseStaticCameraActor)
+    u8   nLookAtKind;           // 0xAC  what it looks at (CamLookAtKind; CamScript_GetLookAtPoint: 0
+                                //       the ball, 23 ahead of the ball's flight, ...)
+    u8   nStateType;            // 0xAD  the script state it serves (CameraShotState_e;
+                                //       DynamicCam_MatchScriptStateType)
+    s8   nUnread;               // 0xAE  a static camera's StaticCamFromTess_t.nUnread; never read
     u8   nFromPoint;            // 0xAF  } the two points the camera's place is measured between
     u8   nToPoint;              // 0xB0  } (DynamicCam_GetLocation kinds; 16: the ball)
     u8   nTrackMode;            // 0xB1  how the camera follows them (DynamicCam_ProcessScript)
-    u8   nHeightRef;            // 0xB2  what fMinHeight / fMaxHeight are measured from
+    u8   nHeightRef;            // 0xB2  what the camera's height is taken from (CamHeightRef;
+                                //       DynamicCam_AddHeightOffset)
     u8   unkB3[0xC0 - 0xB3];
 } CamShot;
 LAYOUT_ASSERT(CamShot, 0xC0);
@@ -105,41 +153,45 @@ LAYOUT_ASSERT(CamShot, 0xC0);
 // ---- the course's static and fly-by cameras (GoStaticCam.c) ----------------------------------
 // A course's 'Cact' objects of type 201 are static cameras, those of type 200 fly-by cameras
 // (UKernel.c's Kernel_DownloadActors hands them over); each becomes a CamShot. The fly-by cameras are
-// chained into up to 10 paths, and a 'CAMC' stream object brings a spline table per path.
-// The type names below are ours, from the shots' names ("Static Cam: %d", "FlyBy Cam: %d").
+// chained into up to 10 routes, and a 'CAMC' stream object brings a timing curve per route.
 
 // A type 201 object's data (UStreamObject.pData; the same 'Cact' data as DynObjDef, 8 bytes in).
-typedef struct StaticCamDef {
+typedef struct StaticCamFromTess_t {
     u8   unk0[0x10];
     f32  aPos[3];               // 0x10  -> CamShot.v20
-    s32  n1C;                   // 0x1C  -> CamShot.nAE
-    s32  n20;                   // 0x20  -> CamShot.nLookAtKind (5: skipped when StaticCam_ChooseScript
-                                //       is asked to)
-    s32  nKinds;                // 0x24  -> CamShot.nA4: the shot kinds it serves, a bit each
-    f32  fFov;                  // 0x28  in degrees -> CamShot.fFovStart
-    f32  f2C;                   // 0x2C  in degrees -> CamShot.fFovEnd
-    f32  f30;                   // 0x30  -> CamShot.f48
-    f32  f34;                   // 0x34  -> CamShot.f4C
+    s32  nUnread;               // 0x1C  -> CamShot.nUnread, never read
+    s32  nLookAtKind;           // 0x20  -> CamShot.nLookAtKind
+    u32  uEvents;               // 0x24  -> CamShot.pick.uEvents: the events it serves
+                                //       (StaticCam_EventType_e, a bit each)
+    f32  fFovStart;             // 0x28  } in degrees -> CamShot.fFovStart, fFovEnd
+    f32  fFovEnd;               // 0x2C  }
+    f32  fInterpTime;           // 0x30  -> CamShot.fInterpTime
+    f32  fLength;               // 0x34  -> CamShot.fLength
     f32  aArea[4];              // 0x38  -> CamShot.u.aArea
     f32  aAngle[3];             // 0x48  in degrees: which way it looks (-> CamShot.v30, turned into
                                 //       the point it looks at)
-    f32  f54;                   // 0x54  -> CamShot.fDepthOfField
-    s32  n58;                   // 0x58  -> CamShot.nA0
-} StaticCamDef;
+    f32  fDepthOfField;         // 0x54  -> CamShot.fDepthOfField
+    s32  nTimeMode;             // 0x58  -> CamShot.nTimeMode
+} StaticCamFromTess_t;
 
 // A type 200 object's data.
-typedef struct FlyByCamDef {
+typedef struct FlybyCamFromTess_t {
     u8   unk0[0x10];
     f32  aPos[3];               // 0x10  -> CamShot.v20
     f32  fFov;                  // 0x1C  in degrees -> CamShot.fFovStart
-    f32  f20;                   // 0x20  -> CamShot.f48
-    s8   nId;                   // 0x24  its number on the path
-    s8   nNext;                 // 0x25  the next camera's nId (-99: the path ends here)
+    f32  fInterpTime;           // 0x20  -> CamShot.fInterpTime
+    s8   nId;                   // 0x24  its number, which other cameras' nNext name
+    s8   nNext;                 // 0x25  the next camera's nId (FLYBY_END_HIDE_GOLFER, or a number no
+                                //       camera has: the route ends here)
     u8   unk26[2];
     f32  aLook[3];              // 0x28  in degrees -> CamShot.v30
-    f32  f34;                   // 0x34  0..1 (clamped on load) -> CamShot.f4C
-    s8   nPath;                 // 0x38  its path (0..9) -> CamShot.nA4
-} FlyByCamDef;
+    f32  fLength;               // 0x34  0..1 (clamped on load) -> CamShot.fLength, which
+                                //       StaticCam_GetFlyByCam replaces on a route's cameras
+    s8   nRoute;                // 0x38  its route (0..9) -> CamShot.pick.nRoute
+} FlybyCamFromTess_t;
+
+// A fly-by camera's nNext that ends its route and hides the golfer on every camera of the route.
+#define FLYBY_END_HIDE_GOLFER -99
 
 // A point or tangent of a fly-by's timing curve: x along the share of the fly-by's time, y the value.
 typedef struct CurvePoint2D {
@@ -154,42 +206,60 @@ typedef struct FlyByKey {
     CurvePoint2D end;           // 0x08
     CurvePoint2D startTangent;  // 0x10
     CurvePoint2D endTangent;    // 0x18
-    u8   b20;                   // 0x20
-    u8   b21;                   // 0x21
+    u8   uUnread20;             // 0x20  } copied from the file, never read
+    u8   uUnread21;             // 0x21  }
     u8   unk22[2];
 } FlyByKey;
 
-// A fly-by path's timing curve (0x2E0 bytes), from the 'CAMC' object: for a share of the fly-by's
-// time, the key whose start.x..end.x holds it gives the value (CamScript_fEvaluateCurve).
+#define CURVE_NUM_KEYS 20
+
+// A fly-by route's timing curve (0x2E0 bytes), from the 'CAMC' object: how far along the route the
+// camera is at each share of the flight's time. For a share, the key whose start.x..end.x holds it
+// gives the value (CamScript_fEvaluateCurve).
 typedef struct Curve {
-    u32  u0;                    // 0x00
-    u32  uPath;                 // 0x04  the path it belongs to (CamShot.nA4; StaticCam_GetFlybyTimeCurve)
-    f32  fLength;               // 0x08
+    u32  uUnread;               // 0x00  never read
+    u32  nRoute;                // 0x04  the route it times (CamShot.pick.nRoute; StaticCam_GetFlybyTimeCurve)
+    f32  fDuration;             // 0x08  how long the flight along the route takes
     u32  nKeys;                 // 0x0C  how many of aKeys are used
-    FlyByKey aKeys[20];         // 0x10
+    FlyByKey aKeys[CURVE_NUM_KEYS];        // 0x10
 } Curve;
 LAYOUT_ASSERT(Curve, 0x2E0);
 
-#define NUM_STATIC_CAMS 10
-#define NUM_FLYBY_CAMS  30
-#define NUM_FLYBY_PATHS 10
+#define STATICCAM_NUM_STATIC 10    // static cameras a course can have
+#define STATICCAM_NUM_FLYBY  30    // fly-by cameras
+#define STATICCAM_NUM_ROUTES 10    // fly-by routes
+#define STATICCAM_CROWD_ROUTE 9    // the route the post-shot crowd fly-by takes; its cameras do not
+                                   // show the golfer
+
+// The moments a static camera can be picked for (StaticCam_ChooseScript; a bit each in
+// CamShot.pick.uEvents). The ball's ones are asked for only for a CPU player or in a replay.
+typedef enum StaticCam_EventType_e {
+    STATICCAM_EVENT_BALL_IN_AIR = 0x02,     // the ball is flying and has hit nothing yet
+    STATICCAM_EVENT_BALL_BOUNCED = 0x04,    // the ball is flying after hitting something
+    STATICCAM_EVENT_BALL_ON_GROUND = 0x08,  // the ball is no longer flying
+    STATICCAM_EVENT_PUTT = 0x10,            // the ball was putted
+    STATICCAM_EVENT_PRE_SHOT = 0x20,        // before the shot (GolfCamera_InitPreShotCamera)
+    STATICCAM_EVENT_POST_SHOT = 0x40        // after the shot (GolfCamera_InitPostShotCamera,
+                                            // GolfCamera_CutToGolferDoneAnimatingCam)
+} StaticCam_EventType_e;
 
 // GoStaticCam.c's state (0x1E68 bytes, allocated by StaticCam_Init).
-typedef struct StaticCams {
-    CamShot aStatic[NUM_STATIC_CAMS];      // 0x0000  "Static Cam: n"
-    CamShot aFlyBy[NUM_FLYBY_CAMS];        // 0x0780  "FlyBy Cam: n"
+typedef struct StaticCamManager_t {
+    CamShot aStatic[STATICCAM_NUM_STATIC];     // 0x0000  "Static Cam: n"
+    CamShot aFlyBy[STATICCAM_NUM_FLYBY];       // 0x0780  "FlyBy Cam: n"
     s32  nFlyBy;                // 0x1E00  how many of aFlyBy are loaded
     s32  nStatic;               // 0x1E04  how many of aStatic are loaded
-    u8   bLinked;               // 0x1E08  the fly-by paths are chained (StaticCam_GetFlyByCam)
-    f32  afPathLength[NUM_FLYBY_PATHS];    // 0x1E0C  each path's length, its shots' f4C added up
-    CamShot* apPath[NUM_FLYBY_PATHS];      // 0x1E34  each path's first shot
-    u32  u1E5C;                 // 0x1E5C  } the 'CAMC' object's header
-    u32  nPaths;                // 0x1E60  } the number of splines in pPaths
-    Curve* pPaths;              // 0x1E64
-} StaticCams;
-LAYOUT_ASSERT(StaticCams, 0x1E68);
+    u8   bLinked;               // 0x1E08  the fly-by routes are chained (StaticCam_GetFlyByCam)
+    f32  afRouteLength[STATICCAM_NUM_ROUTES];  // 0x1E0C  each route's length, its shots' fLength
+                                               //         added up
+    CamShot* apRoute[STATICCAM_NUM_ROUTES];    // 0x1E34  each route's first shot
+    u32  uUnread;               // 0x1E5C  the 'CAMC' object's first word, never read
+    u32  nCurves;               // 0x1E60  how many curves pCurves holds
+    Curve* pCurves;             // 0x1E64  the routes' timing curves
+} StaticCamManager_t;
+LAYOUT_ASSERT(StaticCamManager_t, 0x1E68);
 
-extern StaticCams* gpStaticCams;
+extern StaticCamManager_t* gpStaticCams;
 
 // A camera sequence (DynamicCam's, 0x50 bytes): the shots a camera plan steps through, and the
 // conditions it is picked on. Its shot choices (CamChoice) are in dyncam.h.
@@ -221,11 +291,11 @@ typedef struct CamSequence {
 } CamSequence;
 LAYOUT_ASSERT(CamSequence, 0x50);
 
-// A view's camera script (0x118 bytes at View + 0x84; TW07's CameraScriptSettings_t): the shot the
-// camera plays, the one after it, and the move it makes between them. The camera script functions
+// A view's camera script (0x118 bytes at View + 0x84): the shot the camera plays, the one after
+// it, and the move it makes between them. The camera script functions
 // (gocamscripts.c) and DynamicCam_GetLocation take it as pScript; every caller passes
 // &pView->script.
-typedef struct CamScript {
+typedef struct CameraScriptSettings_t {
     f32  vCamPos[4];            // 0x00  the current shot's camera position (camera 4 keeps the
                                 //       ball here)
     f32  vNextCamPos[4];        // 0x10  the next shot's, blended to (camera 4 keeps the pin here)
@@ -253,7 +323,7 @@ typedef struct CamScript {
     f32  fRoll;                 // 0xA8  the camera's roll: the current shot's fRoll, blended
                                 //       (CamScript_RunScript)
     CamShot* pShot;             // 0xAC  the current shot
-    CamShot* pNextShot;         // 0xB0  the next one (the current shot's p40;
+    CamShot* pNextShot;         // 0xB0  the next one (the current shot's pNext;
                                 //       CameraController_StartScriptOfKind)
     CamShot* pB4;               // 0xB4  where SwitchCrAPCamera records the current camera
     CamShot* pB8;               // 0xB8  the shot before (GolfCamera_CutToGolferDoneAnimatingCam)
@@ -299,8 +369,9 @@ typedef struct CamScript {
     f32  f10C;                  // 0x10C
     s32  n110;                  // 0x110
     s32  n114;                  // 0x114
-} CamScript;
-LAYOUT_ASSERT(CamScript, 0x118);    // CameraScript_WillGolferBeOccludedInThisView copies 0x118 bytes
+} CameraScriptSettings_t;
+// CameraScript_WillGolferBeOccludedInThisView copies 0x118 bytes.
+LAYOUT_ASSERT(CameraScriptSettings_t, 0x118);
 
 // A view's camera controller (CameraController_SetCameraMode, EA's name in TW06 and TW07): the
 // camera mode, its shots and script. It sits at +4 in a ViewController; only the fields read so far.
@@ -327,7 +398,7 @@ typedef struct View {
     CamSequence* p78;           // 0x078  the sequence before the post-shot cameras (p74 saved)
     CamSequence* p7C;           // 0x07C  the swing camera's sequence, kept for the replay
     CamShot* p80;               // 0x080
-    CamScript script;           // 0x084  the camera script the camera functions drive
+    CameraScriptSettings_t script;           // 0x084  the camera script the camera functions drive
     CamShot  shot19C;           // 0x19C  a shot built by hand (the knee, steep-slope and elevator cameras)
     s32      nSavedCamera;      // 0x25C
     s32      nSpecialSwingType; // 0x260  the special swing camera picked for this shot (0 none;
@@ -850,7 +921,8 @@ u8       DynamicCam_ChoosePairedSequenceOrCamera(int nPlayer, u8 b, CamSequence*
 u8       DynamicCam_IsValidFlightSequence(CamSequence* pSequence, int nPlayer);
 u8     CamScript_DoesScriptTrackGolfer(CamShot* pShot);     // the shot's nLookAtKind is 1..6 or 7
 // The ball's position, or the script's v70 when the ball is by the pin (with bKeep v70 follows it).
-void   DynamicCam_GetSmoothBallLocation(CamScript* pScript, CamShot* pShot, int nPlayer, f32* pOut, u8 bKeep);
+void   DynamicCam_GetSmoothBallLocation(CameraScriptSettings_t* pScript, CamShot* pShot, int nPlayer,
+                                        f32* pOut, u8 bKeep);
 // 0 when gSession.nGameType is 3, else Character_IsLeftHanded of the player's golfer (Player.pChar)
 // as a flag; the shot is not read.
 u8     CameraScript_FlipCameraForLefty(int nPlayer, CamShot* pShot);
@@ -859,35 +931,36 @@ u8     CameraScript_FlipCameraForLefty(int nPlayer, CamShot* pShot);
 
 // pCam and pSub are the view's camera position and where it looks
 // (CameraController_GetCameraOrigin, CameraController_GetCameraLookPoint).
-void     CamScript_RunScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, u8 b,
-                     f32 fTime);
-void     CamScript_RunFEScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, int a,
-                     f32 fTime);
-void     CamScript_RunFlybyCamera(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, u8 b,
-                     f32 fTime);
-void     CamScript_Fade(CamScript* pScript, f32 fTime);
-void     CameraScript_RecordCurrentCam(CamShot* pShot, f32* pCam, f32* pSub, int nPlayer, CamScript* pScript,
-                                       u8 bView1);
-void     CameraScript_InterpToNewScript(CamScript* pScript, CamShot* pShot, int nPlayer, f32* pCam, f32* pSub,
-                                        int nInterpType, f32 fInterpTime, f32 fMaxSpeed,
+void     CamScript_RunScript(int nPlayer, f32* pCam, f32* pSub, CameraScriptSettings_t* pScript,
+                             CamShot* pShot, u8 b, f32 fTime);
+void     CamScript_RunFEScript(int nPlayer, f32* pCam, f32* pSub, CameraScriptSettings_t* pScript,
+                               CamShot* pShot, int a, f32 fTime);
+void     CamScript_RunFlybyCamera(int nPlayer, f32* pCam, f32* pSub, CameraScriptSettings_t* pScript,
+                                  CamShot* pShot, u8 b, f32 fTime);
+void     CamScript_Fade(CameraScriptSettings_t* pScript, f32 fTime);
+void     CameraScript_RecordCurrentCam(CamShot* pShot, f32* pCam, f32* pSub, int nPlayer,
+                                       CameraScriptSettings_t* pScript, u8 bView1);
+void     CameraScript_InterpToNewScript(CameraScriptSettings_t* pScript, CamShot* pShot, int nPlayer,
+                                        f32* pCam, f32* pSub, int nInterpType, f32 fInterpTime, f32 fMaxSpeed,
                                         int nTimeTrigger, f32 fTimeTriggerTime);
-u8       CameraScript_SnapToScript(CamScript* pScript, CamShot* pShot);
+u8       CameraScript_SnapToScript(CameraScriptSettings_t* pScript, CamShot* pShot);
 void     CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* pShot, u8 bClose, u8 bLimit,
                                    f32 fRate, f32 fMinDist, f32 fYShare);
-void     CamScript_GetCameraOnFairwayPos(CamScript* pScript, f32* pOut, f32* pCam, int nPlayer,
-                     CamShot* pShot, f32* pSub, f32* pHeight);
-void     CamScript_PutBackOnFairway(CamScript* pScript, f32* pCam, f32* pSub, int nPlayer, CamShot* pShot,
-                                    f32* pPrev);
+void     CamScript_GetCameraOnFairwayPos(CameraScriptSettings_t* pScript, f32* pOut, f32* pCam, int nPlayer,
+                                         CamShot* pShot, f32* pSub, f32* pHeight);
+void     CamScript_PutBackOnFairway(CameraScriptSettings_t* pScript, f32* pCam, f32* pSub, int nPlayer,
+                                    CamShot* pShot, f32* pPrev);
 // how far the ball's flight has run
-f32      CamScript_EstimateBallFlightPercent(int nPlayer, CamScript* pScript);
-u8       CamScript_SkipLookBackCam(CamScript* pScript, CamShot* pShot, int nPlayer);
-void     CameraScript_UpdateLandingEstimate(CamScript* pScript, int nPlayer);
+f32      CamScript_EstimateBallFlightPercent(int nPlayer, CameraScriptSettings_t* pScript);
+u8       CamScript_SkipLookBackCam(CameraScriptSettings_t* pScript, CamShot* pShot, int nPlayer);
+void     CameraScript_UpdateLandingEstimate(CameraScriptSettings_t* pScript, int nPlayer);
 u8       CameraScript_IsDefaultSwingCam(CamShot* pShot, int nPlayer, f32* pCam);
 // Keep pNew above the ground (by fClearance); the out values are optional (NULL): pbFound any
 // ground under pNew, pfGround the ground height used, pbRaised pNew was raised.
 u8       CamScript_KeepAboveGround(int nPlayer, f32* pNew, f32* pOld, u8 bCheckPath, u8* pbFound,
                                    f32* pfGround, u8* pbRaised, f32 fClearance);
-u8       CameraScript_WillGolferBeOccludedInThisView(int nPlayer, CamShot* pShot, CamScript* pScript);
+u8       CameraScript_WillGolferBeOccludedInThisView(int nPlayer, CamShot* pShot,
+                                                     CameraScriptSettings_t* pScript);
 void     CA_vSetCameraFieldOfView(CamLens* pLens, f32 fFov);   // sets the lens's field of view
 u8       CamScript_DoesScriptTrackBall(CamShot* pShot);             // the shot's nLookAtKind is 0, 13..15 or
                                                                     // 23
@@ -897,7 +970,8 @@ void     CA_vUpdateInternalFieldOfViewData(CamLens* pLens);
 
 // ---- the camera paths' maths (CamUtils.c) -----------------------------------------------------
 
-// CamUtils_vCalcArcPosition's arcMode, the way the camera swings round the centre (CamScript.nArcDir).
+// CamUtils_vCalcArcPosition's arcMode, the way the camera swings round the centre
+// (CameraScriptSettings_t.nArcDir).
 // The angle is measured in the flat x-z plane, from x towards z.
 typedef enum CameraArcMode_e {
     CAMERA_ARC_EITHER_WAY = 0,  // no way asked for: the start angle goes a turn up when the end's is
@@ -921,7 +995,7 @@ f32    CamScript_GetFlybyTimeStep(f32 rate0, f32 rate1, f32 time1, f32 accelPara
                                   f32 timeStep);
 // The length of the spline between pos1 and pos2.
 f32    CamScript_fGetDistanceBetweenSplinePoints(f32* pos0, f32* pos1, f32* pos2, f32* pos3);
-// A fly-by path's timing curve at a share of its time (-1 when out of range).
+// A fly-by route's timing curve at a share of its time (-1 when out of range).
 f32    CamScript_fEvaluateCurve(Curve* c, f32 time);
 // Both write a point into endPt: CamUtils_vGetPositionBetweenTwoPoints goes param along the way
 // from pt1 to pt2 (flattened unless use3D, a share of the way if usePercent), then sideOffset
@@ -932,14 +1006,22 @@ void   CamUtils_vGetPositionBetweenTwoPoints(f32* pt1, f32* pt2, u8 use3D, u8 us
 void   CamUtils_vCalcArcPosition(f32* pt1, f32* pt2, f32* centerPoint, CameraArcMode_e arcMode,
                                  f32* endPoint, f32 param);
 
-// ---- the static and fly-by cameras (GoStaticCam.c, 0x8006449C..) ----------------------------
+// ---- the static and fly-by cameras (GoStaticCam.c) -------------------------------------------
 
-void     StaticCam_ProcessScript(CamShot* pShot, int nPlayer, f32* pOut);   // the shot's position
-CamShot* StaticCam_ChooseScript(int nPlayer, int nKind, u8 bNotKind5, CamShot* pNot);
-CamShot* StaticCam_GetFlyByCam(int nPath);        // a fly-by path's first shot (NULL past the 10th)
-Curve*   StaticCam_GetFlybyTimeCurve(u32 uPath);  // a fly-by path's timing curve (NULL: none)
-void     StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32* pSub, f32* pFov,
-                     int nPlayer, f32 fShare);
+void     StaticCam_RegisterStreamClients(void);     // take the 'CAMC' objects (the hole streamer)
+void     StaticCam_UnRegisterStreamClients(void);
+void     StaticCam_ParseFlybyCameraActor(UStreamObject* pCameraActor);    // 'Cact' type 200
+void     StaticCam_ParseStaticCameraActor(UStreamObject* pCameraActor);   // 'Cact' type 201
+void     StaticCam_Init(void);
+void     StaticCam_DeInit(void);
+void     StaticCam_Reset(void);                     // forget the hole's cameras
+void     StaticCam_ProcessScript(CamShot* link, int ePlayerID, f32* position);   // the shot's position
+CamShot* StaticCam_ChooseScript(int ePlayerID, StaticCam_EventType_e event, u8 dontShowGolfer,
+                                CamShot* ignoreLink);
+CamShot* StaticCam_GetFlyByCam(int iRouteNum_p);     // a route's first shot (NULL past the 10th)
+Curve*   StaticCam_GetFlybyTimeCurve(u32 iRouteNum_p);   // a route's timing curve (NULL: none)
+void     StaticCam_GetFlybyInformation(CameraScriptSettings_t* settings, int nRoute, f32* position,
+                                       f32* lookat, f32* fov, int ePlayerID, f32 fParam);
 
 // ---- the camera modes' setups (GoGolfCam.c), one per CameraController_SetCameraMode mode --------
 
@@ -1122,7 +1204,5 @@ void*    RC_spCreateRenderCtx(CamLens* pLens, FB_SFrameBuffer* pBuf, VM_SViewpor
 void     RC_vReleaseRenderCtx(void* pCamera);            // free it
 
 void GolfCamera_ResetSpecialCameraStates(void);
-// GoStaticCam.c
-void StaticCam_Reset(void);
 
 #endif

@@ -9,6 +9,7 @@
 #include "dynobj.h"
 #include "terrain.h"
 #include "psmgr.h"
+#include "camera.h"
 
 DynObjSlot gKernelOverflowSlots[32];      // pairs that did not fit on their object (16 used)
 
@@ -24,8 +25,6 @@ void fn_8000E830(DynObj* pObj);
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);                   // identity
 void UObject_ComposeRotation(f32 (*pMtx)[4]);
 
-void StaticCam_ParseFlybyCameraActor(UStreamObject* pObject);
-void StaticCam_ParseStaticCameraActor(UStreamObject* pObject);
 void Gaud_ActorDownloadCallback(UStreamObject* pObject, int n);
 void PlayNow_LoadBallSpot(void* pObj);
 

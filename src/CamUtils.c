@@ -196,7 +196,7 @@ static f32 CamUtils_OrderConstants(f32 x) {   // fake match: never called, pools
     return x + -1.0f;
 }
 
-// A fly-by path's timing curve c at share time of the fly-by's time (-1 for no curve or a time
+// A fly-by route's timing curve c at share time of the fly-by's time (-1 for no curve or a time
 // outside 0..1). The key whose start.x..end.x holds time is walked in 128 steps of its Hermite
 // segment, and the value is read off the straight step around time.
 #pragma opt_loop_invariants off   // fake match: keeps the step count's load where the divide uses it
