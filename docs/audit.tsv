@@ -134,7 +134,7 @@ LLDisp_Gc.c	open
 LLDynTex.c	open		
 LLFileIO_Gc.c	open		
 LLFont.c	open		
-LLInput_Gc.c	open		
+LLInput_Gc.c	done	5bf26c73	claude-review
 LLMath_Gc.c	done	626ba02e	claude-review
 LLMem_Gc.c	done	4e15bbc0	claude-review
 LLObj_Gc.c	open		
