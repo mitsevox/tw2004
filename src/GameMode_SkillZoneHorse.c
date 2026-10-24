@@ -274,14 +274,14 @@ void GameModeSkillZoneHorse_CheckShotAwards(int nPlayer) {
                     Gaud_LetterGained();
                     if (nTarget == gHorseLeaderTarget) {
                         GameMsg_Send5Ints(0x33, 0, 0, 0, 0xCE, 1);
-                        if (!(Misc_RandFunc(0) & 1)) {
+                        if (!(Misc_RandFunc(RANDOM_GAME) & 1)) {
                             nMsg = 0xE;
                         } else {
                             nMsg = 0x10;
                         }
                     } else {
                         GameMsg_Send5Ints(0x33, 0, 0, 0, 0xD0, 1);
-                        if (!(Misc_RandFunc(0) & 1)) {
+                        if (!(Misc_RandFunc(RANDOM_GAME) & 1)) {
                             nMsg = 0xA;
                         } else {
                             nMsg = 0xC;
@@ -334,7 +334,7 @@ void GameModeSkillZoneHorse_CheckShotAwards(int nPlayer) {
             Gaud_LetterGained();
             switch (gPlayers[nPlayer].nHorseLetters) {
             case 1:
-                if (!(Misc_RandFunc(0) & 1)) {
+                if (!(Misc_RandFunc(RANDOM_GAME) & 1)) {
                     nMsg = 3;
                 } else {
                     nMsg = 4;
@@ -347,7 +347,7 @@ void GameModeSkillZoneHorse_CheckShotAwards(int nPlayer) {
                 nMsg = 6;
                 break;
             case 4:
-                if (!(Misc_RandFunc(0) & 1)) {
+                if (!(Misc_RandFunc(RANDOM_GAME) & 1)) {
                     nMsg = 7;
                 } else {
                     nMsg = 8;
@@ -383,7 +383,7 @@ void GameModeSkillZoneHorse_SetupNextGolfer(void) {
             GameModeSkillZoneCapture_SetShotClock(900);
             if (gHorseLeader == i) {
                 gHorseLeader = 5;
-                if (!(Misc_RandFunc(0) & 1)) {
+                if (!(Misc_RandFunc(RANDOM_GAME) & 1)) {
                     GameModeSkillZoneBase_PlayComment(0x23, 0);
                 } else {
                     GameModeSkillZoneBase_PlayComment(0x24, 0);

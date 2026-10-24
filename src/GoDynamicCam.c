@@ -659,7 +659,7 @@ CamShot* DynamicCam_ChooseScript(int ePlayerID, int state, CamShot* dontPick) {
         }
     }
     if (scriptsFound == 0) return NULL;
-    i = Misc_RandFunc(1) % scriptsFound;
+    i = Misc_RandFunc(RANDOM_PRESENTATION) % scriptsFound;
     return &gpDynCam->pShots[possibleScripts[i]];
 }
 
@@ -712,7 +712,7 @@ CamShot* DynamicCam_ChooseScriptInSequence(CameraSequence_t* sequence, CameraEve
         }
     }
     if (scriptsFound == 0) return NULL;
-    randomNum = Misc_RandFunc(1) % scriptsFound;
+    randomNum = Misc_RandFunc(RANDOM_PRESENTATION) % scriptsFound;
     if (interp != NULL) {
         *interp = sequence->pChoices[possibleScripts[randomNum]].nInterpType;
     }
@@ -1309,7 +1309,7 @@ CameraSequence_t* DynamicCam_ChooseSequence(int nPlayer, int nLie, int nClass, i
         }
         return NULL;
     }
-    uRand = Misc_RandFunc(1);
+    uRand = Misc_RandFunc(RANDOM_PRESENTATION);
     fTotal = 0.0f;
     for (i = 0; i < nPicked; i++) {
         fTotal += gpDynCam->pSequences[anPicked[i]].f34;
@@ -1403,7 +1403,7 @@ CameraSequence_t* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int 
         }
         return NULL;
     }
-    uRand = Misc_RandFunc(1);
+    uRand = Misc_RandFunc(RANDOM_PRESENTATION);
     fTotal = 0.0f;
     for (i = 0; i < nPicked; i++) {
         fTotal += gpDynCam->pSequences[anPicked[i]].f34;
@@ -1431,12 +1431,12 @@ u8 DynamicCamSearchForPairedSequence(char* szName, CameraSequence_t** ppSeq, Cam
             continue;
         }
         if (gpDynCam->pAnimPairs[i].pChanceSeq != NULL && gpDynCam->pAnimPairs[i].pChanceSeq->nChoices > 0 &&
-            Misc_RandFunc(1) % 100 > 60) {
+            Misc_RandFunc(RANDOM_PRESENTATION) % 100 > 60) {
             *ppSeq = gpDynCam->pAnimPairs[i].pChanceSeq;
             return 1;
         }
         if (gpDynCam->pAnimPairs[i].nKind == 14) {
-            nPick = Misc_RandFunc(1) % 3;
+            nPick = Misc_RandFunc(RANDOM_PRESENTATION) % 3;
             if (nPick == 0 && gpDynCam->pAnimPairs[i].pRandomSeq1 != NULL) {
                 *ppSeq = gpDynCam->pAnimPairs[i].pRandomSeq1;
                 return 1;

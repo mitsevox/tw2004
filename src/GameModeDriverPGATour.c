@@ -369,7 +369,7 @@ void GameModeDriverPGATour_PlayEndOfGameMovies(void) {
             if (nWins >= 3) {
                 GUI_QueueMessage(5, 8, 0, 0);
             } else {
-                GUI_QueueMessage(5, (Misc_RandFunc(1) & 3) + 27, 0, 0);
+                GUI_QueueMessage(5, (Misc_RandFunc(RANDOM_PRESENTATION) & 3) + 27, 0, 0);
             }
         } else if (gpSaveData[nPlayer].tour.nEvent == 9) {
             GUI_QueueMessage(5, 9, 0, 0);

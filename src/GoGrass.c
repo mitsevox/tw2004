@@ -288,7 +288,7 @@ void Grass_UpdateView(void) {
     }
     if (gpGrassMgr->f3D4 != gpGrassMgr->f3D8) {
         for (i = 0; i < 8; i++) {
-            gpGrassMgr->af168[i] = gpGrassMgr->f3D4 * Misc_RandFuncf(1);
+            gpGrassMgr->af168[i] = gpGrassMgr->f3D4 * Misc_RandFuncf(RANDOM_PRESENTATION);
         }
         gpGrassMgr->f3D8 = gpGrassMgr->f3D4;
     }

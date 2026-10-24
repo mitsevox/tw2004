@@ -444,7 +444,7 @@ void Skalib_SetBudgets(void) {
         gClipsPerLeaf = aKeepDouble[n - 1];
         gClipBankBudget = aBytes[n - 1];
     }
-    gCurLibSlot = (Misc_RandFunc(1) & 1) ^ 1;
+    gCurLibSlot = (Misc_RandFunc(RANDOM_PRESENTATION) & 1) ^ 1;
     if (gSlotsDoubleBuffered) {
         pSlot0 = &gLibSlots[0];
         pSlot1 = &gLibSlots[1];
@@ -533,10 +533,10 @@ int AnimLib_TrimCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB,
     return 0;
 }
 
-// A random fraction in [0, 1) (Misc_RandFuncf, stream 1): where AnimLib_TrimCb starts a leaf's kept
-// run.
+// A random fraction in [0, 1) (Misc_RandFuncf, RANDOM_PRESENTATION): where AnimLib_TrimCb starts a
+// leaf's kept run.
 f32 Skalib_Random(void) {
-    return Misc_RandFuncf(1);
+    return Misc_RandFuncf(RANDOM_PRESENTATION);
 }
 
 // A clip that can still be flagged for dropping: not merged into another record (2, 0x10), not
@@ -579,7 +579,7 @@ int AnimLib_MarkDropRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLea
             nMarked = 0;
             pIdx    = pLib->pIndex + pLeaf->nFirst;
             for (i = 0; i < nExtra; i++) {
-                nStart = Misc_RandFunc(1) % pLeaf->nCount;
+                nStart = Misc_RandFunc(RANDOM_PRESENTATION) % pLeaf->nCount;
                 for (j = nStart; j < pLeaf->nCount; j++) {
                     pRec = &pLib->pRecords[pIdx[j]];
                     if (SKA_MARKABLE(pRec, pCtx)) {
@@ -607,7 +607,7 @@ int AnimLib_MarkDropRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLea
                 }
             }
             for (i = nMarked; i < nExtra; i++) {
-                nStart = Misc_RandFunc(1) % pLeaf->nCount;
+                nStart = Misc_RandFunc(RANDOM_PRESENTATION) % pLeaf->nCount;
                 for (j = nStart; j < pLeaf->nCount; j++) {
                     pRec = &pLib->pRecords[pIdx[j]];
                     while ((pRec->uFlags & 2) || (pRec->uFlags & 0x10)) {
@@ -1929,7 +1929,7 @@ int AnimLib_RandomIndex(u32 uUsed, int nCount) {
     int nTries = 0;
     u32 nPick;
     do {
-        nPick = Misc_RandFunc(1) % nCount;
+        nPick = Misc_RandFunc(RANDOM_PRESENTATION) % nCount;
         if (!((1 << nPick) & uUsed)) break;
     } while (++nTries < 3);
     return nPick;

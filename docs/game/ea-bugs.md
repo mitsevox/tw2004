@@ -32,6 +32,7 @@ The code does this, and the effect can happen in play.
 | hlaudsession.c Ses_AllocBankHdr | a path through the function reaches its end without returning a value |
 | hlaudemitter.c Emi_UpdInstance / Doppler3D | the new nearest distance is stored in fDist before Doppler3D measures how much nearer the sound came since the last frame, so the change is always 0 and the doppler pitch always 1 |
 | LLRTClock.c RTClock_GetDateTimeString | "AM" goes with clock hours 1 to 12 and "PM" with hours 0 and 13 to 23, so the hour after noon shows as "12:MM AM" and the hour after midnight as "12:MM PM": on the real-time events calendar's "Today:" line, and in front-end message 544's text (FE_GetDateTimeIfClockEarly, written only when the clock's year is before 2003 and its month before October) |
+| urandom.c Misc_RandFuncg | takes logf of a uniform number in [0, 1), not (0, 1]: when Misc_RandFuncf draws 0 (one draw in 2^23), the pair it makes is infinite or NaN, handed to the tour simulation or Create-A-Player like any other |
 
 Possible
 --------

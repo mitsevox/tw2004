@@ -45,8 +45,8 @@ void REPLAY_Save(int nPlayer) {
         gReplayData.bF10 = 0;
         return;
     }
-    gSession.nSeed = Misc_RandFunc(0);
-    Misc_SetSeedFunc(0, gSession.nSeed);
+    gSession.nSeed = Misc_RandFunc(RANDOM_GAME);
+    Misc_SetSeedFunc(RANDOM_GAME, gSession.nSeed);
     gReplayData.nSeed = gSession.nSeed;
     Mem_cpy(&gReplayData.player, &gPlayers[nPlayer], sizeof(Player));
     Mem_cpy(&lbl_80281E48->profile, &gpSaveData[nPlayer], sizeof(SaveProfile));
@@ -123,7 +123,7 @@ void REPLAY_Play(int nPlayer) {
     f32 fEEC;
 
     if (gReplayData.bF10) {
-        Misc_SetSeedFunc(0, gReplayData.nSeed);
+        Misc_SetSeedFunc(RANDOM_GAME, gReplayData.nSeed);
         Mem_cpy(&ball, &gPlayers[nPlayer].ballBefore, sizeof(Ball));
         uFlags = gPlayers[nPlayer].uFlags;
         fEEC = gPlayers[nPlayer].fEEC;

@@ -209,7 +209,7 @@ void GameModeSkillZoneTarget_CheckShotAwards(int nPlayer) {
                 gTargetShotPoints = 0;
                 if ((s8)gPlayers[nPlayer].bAllTargetsHit == 0) {
                     gPlayers[nPlayer].bAllTargetsHit = 1;
-                    if (!(Misc_RandFunc(0) & 1)) {
+                    if (!(Misc_RandFunc(RANDOM_GAME) & 1)) {
                         nMsg = 0x2B;
                     } else {
                         nMsg = 0x2C;
@@ -273,7 +273,7 @@ void GameModeSkillZoneTarget_CheckShotAwards(int nPlayer) {
         if (fLength > gPlayers[nPlayer].nSkillZoneLongestDrive) {
             gPlayers[nPlayer].nSkillZoneLongestDrive = fLength;
             if (nMsg == -1) {
-                switch (Misc_RandFunc(0) & 3) {
+                switch (Misc_RandFunc(RANDOM_GAME) & 3) {
                 case 0:
                     nMsg = 0x31;
                     break;
@@ -289,7 +289,7 @@ void GameModeSkillZoneTarget_CheckShotAwards(int nPlayer) {
             gTargetShotPoints = 0;
             if (nMsg == -1) {
                 GameMsg_Send5Ints(0x33, 0, 0, 0, 0xCB, 1);
-                switch (Misc_RandFunc(0) & 3) {
+                switch (Misc_RandFunc(RANDOM_GAME) & 3) {
                 case 0:
                     nMsg = 0x2F;
                     break;
@@ -309,7 +309,7 @@ void GameModeSkillZoneTarget_CheckShotAwards(int nPlayer) {
             gTargetShotPoints = (f32)(gTargetShotPoints * gTargetBonusMultiplier);
             gTargetShotPoints = GM_Earnings_ComputeBonusModifiers(gTargetShotPoints, nPlayer, 1, 1, 1, 0);
             gTargetShotPoints = GM_Earnings_ComputeTOURCardModifiers(gTargetShotPoints, nPlayer, 0);
-        } else if (!(Misc_RandFunc(0) & 1)) {
+        } else if (!(Misc_RandFunc(RANDOM_GAME) & 1)) {
             GameModeSkillZoneBase_StartComment(0);
         } else {
             GameModeSkillZoneBase_StartComment(0x4E);

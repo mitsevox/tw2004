@@ -245,9 +245,9 @@ void GameModeSkillZoneBase_SetupBonusBall(int nPlayer) {
     s32 r;
     if (!GameModeSkillZoneBase_FirstShot(nPlayer)) {
         if (gPlayers[nPlayer].nE98 >= 10) {
-            r = Misc_RandFunc(0) % 20;
+            r = Misc_RandFunc(RANDOM_GAME) % 20;
         } else {
-            r = Misc_RandFunc(0) % 100;
+            r = Misc_RandFunc(RANDOM_GAME) % 100;
         }
         if (r <= 5) {
             gPlayers[nPlayer].nDBC = 5;

@@ -90,12 +90,12 @@ void fn_800B4C00(RainList* pList, int nDrops) {
     GXInvalidateVtxCache();
     fn_80012520(0xA8, 4, nDrops * 2);   // lines
     for (i = 0; i < nDrops; i++) {
-        fX = 35.0f * Misc_RandFuncf(1) - 17.5f;
-        fY = 25.0f * Misc_RandFuncf(1) - 12.5f;
-        fZ = 35.0f * Misc_RandFuncf(1) - 17.5f;
+        fX = 35.0f * Misc_RandFuncf(RANDOM_PRESENTATION) - 17.5f;
+        fY = 25.0f * Misc_RandFuncf(RANDOM_PRESENTATION) - 12.5f;
+        fZ = 35.0f * Misc_RandFuncf(RANDOM_PRESENTATION) - 17.5f;
         fn_800B58C0(fX, fY, fZ);
         fn_800B58B4(0);
-        fn_800B58C0(fX, (fY - 0.2f) - 0.1f * Misc_RandFuncf(1), fZ);
+        fn_800B58C0(fX, (fY - 0.2f) - 0.1f * Misc_RandFuncf(RANDOM_PRESENTATION), fZ);
         fn_800B58B4(1);
     }
     fn_800124A8();
@@ -321,14 +321,14 @@ void fn_800B52D4(RainObject* pRain, f32* pTime) {
         pSplash = &pData->apB[nBuf][i];
         if (fAlpha <= 0.0f) {
             // fake match: through the buffer again, not pSplash (the original reloads apB here)
-            pData->apB[nBuf][i].fAlpha = 0.9f * (0.65f * Misc_RandFuncf(1)) + 0.05f;
+            pData->apB[nBuf][i].fAlpha = 0.9f * (0.65f * Misc_RandFuncf(RANDOM_PRESENTATION)) + 0.05f;
         } else {
             pSplash->fAlpha = 0.05f;
         }
-        fSize = 0.05f * Misc_RandFuncf(1) + 0.05f;
-        vCenter.x = (20.0f * Misc_RandFuncf(1) + pLens->mViewToWorld[3][0]) - 10.0f;
+        fSize = 0.05f * Misc_RandFuncf(RANDOM_PRESENTATION) + 0.05f;
+        vCenter.x = (20.0f * Misc_RandFuncf(RANDOM_PRESENTATION) + pLens->mViewToWorld[3][0]) - 10.0f;
         vCenter.y = pLens->mViewToWorld[3][1];
-        vCenter.z = (20.0f * Misc_RandFuncf(1) + pLens->mViewToWorld[3][2]) - 10.0f;
+        vCenter.z = (20.0f * Misc_RandFuncf(RANDOM_PRESENTATION) + pLens->mViewToWorld[3][2]) - 10.0f;
         vCenter.y = 0.1f + Ter_GetHighestGroundHeight(Ter_GetTGD(), &vCenter.x);
         Ter_GetSupportingGroundNormal(Ter_GetTGD(), &vCenter.x, &vPos.x);
         fn_800B5918(&vCenter.x, pSplash->av[0]);

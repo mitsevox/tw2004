@@ -803,7 +803,6 @@ void  Character_SetClubStatesForCharacter(Character* pChar, int nSlot, struct Sk
 extern f32 gSkelIdentityQuat[4];             // the identity rotation (quaternion), set by SKEL_InitModule
 extern u8  gSkelIKEnabled;                // IK on (SKEL_EnableIK); off, the IK functions do nothing
 extern u8  gSkelLeftHandedPairs[42][2];         // pairs of standard bones (SKEL_GenerateLeftHandedTable reads the first 41)
-extern f32 lbl_80186838[4];             // a zero vector (vec4flt_Zero copies it)
 
 // AnimStream.c: the animation groups it streams clips for (groups 1 and 5, the reactions), and the
 // index each has in its tables.

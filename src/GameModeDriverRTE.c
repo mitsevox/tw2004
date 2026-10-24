@@ -237,7 +237,7 @@ void GameModeDriverRTE_QueueWinMessages(void) {
         break;
     }
     if (!bFirst && !bSaid) {
-        switch (Misc_RandFunc(0) & 3) {
+        switch (Misc_RandFunc(RANDOM_GAME) & 3) {
         case 0:
             GUI_QueueMessage(10, 2, 0, 0);
             return;

@@ -259,7 +259,7 @@ int fn_8000EA1C(u8* pCode, int nArg, int nPush, DynObj* pObj) {
                 } else {
                     int nSign;
 
-                    b = (int)Misc_RandFunc(0);
+                    b = (int)Misc_RandFunc(RANDOM_GAME);
                     nSign = b >> 31;
                     b = (nSign + b) ^ nSign;   // EA's abs
                     a = b % -a;

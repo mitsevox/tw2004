@@ -358,7 +358,7 @@ void PGASponsor_SignNext(MsgArg* pArgs, MsgArg* pResult) {
         nBonusCash = GameModeDriverPGATour_GetSponsorshipBonusCash(i);
         if (!pProfile->aSponsor[i].bSigned && nProgress <= (s32)GM_GetGameProgress(pProfile)) {
         retry:
-            nSponsor = gPgaSponsorChoices[Misc_RandFunc(0) % 11];
+            nSponsor = gPgaSponsorChoices[Misc_RandFunc(RANDOM_GAME) % 11];
             for (j = 0; j < i; j++) {
                 if (pProfile->aSponsor[j].nSponsor == nSponsor && pProfile->aSponsor[j].bSigned) {
                     // fake match: EA jumps straight back (a do-while adds a test)
@@ -418,7 +418,7 @@ void PGASponsor_PickStartingSponsor(MsgArg* pArgs, MsgArg* pResult) {
     s32* pStartCash = (s32*)pArgs[1].p;
     s32* pBonusCash = (s32*)pArgs[2].p;
 
-    FE_SetStartingSponsor(gPgaSponsorChoices[Misc_RandFunc(0) % 11]);
+    FE_SetStartingSponsor(gPgaSponsorChoices[Misc_RandFunc(RANDOM_GAME) % 11]);
     *pSponsor = FE_GetStartingSponsor();
     *pStartCash = GameModeDriverPGATour_GetSponsorshipStartCash(0);
     *pBonusCash = GameModeDriverPGATour_GetSponsorshipBonusCash(0);

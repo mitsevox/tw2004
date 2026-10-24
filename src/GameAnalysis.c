@@ -24,7 +24,7 @@ int GameAnalysis_PickTip(void) {
                           Game_GetMode() != 4 && Game_GetMode() != 23)) {
         return 14;
     }
-    if (Game_GetMode() == 23 && Misc_RandFunc(1) % 100 < 75) {
+    if (Game_GetMode() == 23 && Misc_RandFunc(RANDOM_PRESENTATION) % 100 < 75) {
         return 12;
     }
     bAny = 0;
@@ -38,7 +38,7 @@ int GameAnalysis_PickTip(void) {
         return 14;
     }
     bFound = 0;
-    nTip = Misc_RandFunc(1) % 14;
+    nTip = Misc_RandFunc(RANDOM_PRESENTATION) % 14;
     while (!bFound) {
         if (GameAnalysis_IsTipForMode(Game_GetMode(), nTip) && GameAnalysis_AnyoneHasTipStat(nTip)
             && !gTipShown[nTip]) {

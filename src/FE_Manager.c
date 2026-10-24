@@ -511,8 +511,8 @@ int FE_GetSaleIDFromSaleCategory(int n) {
 // (FE_DateToInt; 3081979 if that is 0): one of the category's parts at random, then up to five
 // different assets of that part for gender b (or either, gender 2) that are unlocked for the
 // current profile (FE_CrAP_IsItemLocked) and have a level above 0. They go in gpFEProfile's
-// aSalePart, aSaleEntry and aSaleChoice (-1: none). The random stream is then seeded from the clock
-// again (gSession.nSeed).
+// aSalePart, aSaleEntry and aSaleChoice (-1: none). The draws come from RANDOM_GAME, seeded with the
+// date; after them it is seeded from the clock (a new gSession.nSeed).
 void FE_CrAP_UpdateSaleInfo(int a, int b) {
     int aFound[3000];
     int aKinds[88];         // fake match: 4 are used; 88 gives the original's stack frame
@@ -573,8 +573,8 @@ void FE_CrAP_UpdateSaleInfo(int a, int b) {
     if (gpFEProfile->nDateSeed == 0) {
         gpFEProfile->nDateSeed = 3081979;          // 8/3/1979, packed as FE_DateToInt does
     }
-    Misc_SetSeedFunc(0, gpFEProfile->nDateSeed);
-    gpFEProfile->aSalePart[b][nCategory] = aKinds[Misc_RandFunc(0) % nKinds];
+    Misc_SetSeedFunc(RANDOM_GAME, gpFEProfile->nDateSeed);
+    gpFEProfile->aSalePart[b][nCategory] = aKinds[Misc_RandFunc(RANDOM_GAME) % nKinds];
     nB = b;
     for (i = 0; i < nCount; i++) {
         FE_CrAP_SetCurrentGender(FE_CrAP_GetAssetGender(i));
@@ -590,8 +590,8 @@ void FE_CrAP_UpdateSaleInfo(int a, int b) {
     for (j = 0; j < 5; j++) {
         if (j >= nFound) break;
     retry:
-        FE_CrAP_GetCategorySubcategoryAndEntryNumFromAssetID(aFound[Misc_RandFunc(0) % nFound], &nKind,
-                &nPart, &nChoice);
+        FE_CrAP_GetCategorySubcategoryAndEntryNumFromAssetID(aFound[Misc_RandFunc(RANDOM_GAME) % nFound],
+                &nKind, &nPart, &nChoice);
         gpFEProfile->aSaleEntry[b][nCategory][j] = nPart;
         gpFEProfile->aSaleChoice[b][nCategory][j] = nChoice;
         for (i = 0; i < j; i++) {
@@ -602,7 +602,7 @@ void FE_CrAP_UpdateSaleInfo(int a, int b) {
         }
     }
     gSession.nSeed = Misc_CreateRandomSeed();
-    Misc_SetSeedFunc(0, gSession.nSeed);
+    Misc_SetSeedFunc(RANDOM_GAME, gSession.nSeed);
 }
 
 // Whether Create-A-Player asset nAsset is still locked for profile pProfile: never with bit 0x4000
@@ -944,7 +944,7 @@ u8 FE_CrAP_IsAssetUndesirable(s16 nPart, CrAPAsset* pAsset) {
 // allows, and nothing changes when none fits.
 void FE_CrAP_RandomizeCategoryWithUndesirableTest(s16 nPart, int nChance) {
     int aChoices[250];
-    u32 bDesirable = (int)(Misc_RandFunc(0) % 100) < nChance;
+    u32 bDesirable = (int)(Misc_RandFunc(RANDOM_GAME) % 100) < nChance;
     int nFound = 0;
     int nCount = FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(nPart, 0);
     int i;
@@ -962,7 +962,7 @@ void FE_CrAP_RandomizeCategoryWithUndesirableTest(s16 nPart, int nChance) {
         }
     }
     if (nFound) {
-        FE_CrAP_TurnOnPart(nPart, 0, aChoices[Misc_RandFunc(0) % nFound]);
+        FE_CrAP_TurnOnPart(nPart, 0, aChoices[Misc_RandFunc(RANDOM_GAME) % nFound]);
     }
 }
 
@@ -1068,11 +1068,11 @@ void FE_CrAP_RandomizeFace(SaveProfile* pProfile) {
     FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 9, 0);
     FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 16, 0);
 
-    bChance = Misc_RandFunc(0) % 100 < 10;
+    bChance = Misc_RandFunc(RANDOM_GAME) % 100 < 10;
     bPicking = 1;
     nCount = FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(3, 0);
     while (bPicking) {
-        nPick = Misc_RandFunc(0) % nCount;
+        nPick = Misc_RandFunc(RANDOM_GAME) % nCount;
         pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(3, 0, nPick);
         if (bChance && pAsset &&
             (stricmp(pAsset->szName, "Corn Rows") == 0 || stricmp(pAsset->szName, "Afro") == 0 ||
@@ -1089,32 +1089,32 @@ void FE_CrAP_RandomizeFace(SaveProfile* pProfile) {
         }
     }
 
-    bChance = Misc_RandFunc(0) % 100 < 20;
+    bChance = Misc_RandFunc(RANDOM_GAME) % 100 < 20;
     if (bChance) {
         nCount = FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(4, 0);
-        nPick = Misc_RandFunc(0) % (nCount - 1);
+        nPick = Misc_RandFunc(RANDOM_GAME) % (nCount - 1);
         nPick++;
         FE_CrAP_TurnOnPart(4, 0, nPick);
     } else {
         FE_CrAP_TurnOnPart(4, 0, 0);
     }
-    bChance = Misc_RandFunc(0) % 100 < 10;
+    bChance = Misc_RandFunc(RANDOM_GAME) % 100 < 10;
     if (bChance) {
         nCount = FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(5, 0);
-        nPick = Misc_RandFunc(0) % (nCount - 1);
+        nPick = Misc_RandFunc(RANDOM_GAME) % (nCount - 1);
         nPick++;
         FE_CrAP_TurnOnPart(5, 0, nPick);
     } else {
         FE_CrAP_TurnOnPart(5, 0, 0);
     }
-    bChance = Misc_RandFunc(0) % 100 < 10;
+    bChance = Misc_RandFunc(RANDOM_GAME) % 100 < 10;
     if (bChance) {
         nCount = FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(6, 0);
         if (nCount != -1) {
             if (nCount > 1) {
-                nPick = Misc_RandFunc(0) % (nCount - 1);
+                nPick = Misc_RandFunc(RANDOM_GAME) % (nCount - 1);
             } else {
-                nPick = Misc_RandFunc(0) % (nCount - 1);   // EA bug: divides by zero for one choice
+                nPick = Misc_RandFunc(RANDOM_GAME) % (nCount - 1);   // EA bug: divides by zero for one choice
                 nPick++;
             }
             FE_CrAP_TurnOnPart(6, 0, nPick);
@@ -1123,11 +1123,11 @@ void FE_CrAP_RandomizeFace(SaveProfile* pProfile) {
         FE_CrAP_TurnOnPart(6, 0, 0);
     }
 
-    bChance = Misc_RandFunc(0) % 100 < 80;
+    bChance = Misc_RandFunc(RANDOM_GAME) % 100 < 80;
     bPicking = 1;
     nCount = FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(14, 0);
     while (bPicking) {
-        nPick = Misc_RandFunc(0) % nCount;
+        nPick = Misc_RandFunc(RANDOM_GAME) % nCount;
         pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(14, 0, nPick);
         if (bChance && !FE_CrAP_IsCrazyHairColor(pAsset)) {
             FE_CrAP_TurnOnPart(14, 0, nPick);
@@ -1139,15 +1139,15 @@ void FE_CrAP_RandomizeFace(SaveProfile* pProfile) {
         }
         nPrev = nPick;
     }
-    bChance = Misc_RandFunc(0) % 100 < 90;
+    bChance = Misc_RandFunc(RANDOM_GAME) % 100 < 90;
     if (bChance) {
         FE_CrAP_TurnOnPart(15, 0, nPrev);
     } else {
-        bChance = Misc_RandFunc(0) % 100 < 80;
+        bChance = Misc_RandFunc(RANDOM_GAME) % 100 < 80;
         bPicking = 1;
         nCount = FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(15, 0);
         while (bPicking) {
-            nPick = Misc_RandFunc(0) % nCount;
+            nPick = Misc_RandFunc(RANDOM_GAME) % nCount;
             pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(15, 0, nPick);
             if (bChance && !FE_CrAP_IsCrazyFaceHairColor(pAsset)) {
                 FE_CrAP_TurnOnPart(15, 0, nPick);
@@ -1160,13 +1160,13 @@ void FE_CrAP_RandomizeFace(SaveProfile* pProfile) {
         }
     }
 
-    bChance = Misc_RandFunc(0) % 100 < 40;
+    bChance = Misc_RandFunc(RANDOM_GAME) % 100 < 40;
     if (bChance) {
-        bChance = Misc_RandFunc(0) % 100 < 80;
+        bChance = Misc_RandFunc(RANDOM_GAME) % 100 < 80;
         bPicking = 1;
         nCount = FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(0, 0);
         while (bPicking) {
-            nPick = Misc_RandFunc(0) % nCount;
+            nPick = Misc_RandFunc(RANDOM_GAME) % nCount;
             pAsset = FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(0, 0, nPick);
             if (bChance && !FE_CrAP_IsCrazyHat(pAsset)) {
                 FE_CrAP_TurnOnPart(0, 0, nPick);
@@ -1191,23 +1191,23 @@ void FE_CrAP_RandomizeFace(SaveProfile* pProfile) {
     FE_CrAP_UnequipSlot(12);
     FE_CrAP_UnequipSlot(13);
     FE_CrAP_UnequipSlot(14);
-    if (Misc_RandFunc(0) % 100 < 30) {
+    if (Misc_RandFunc(RANDOM_GAME) % 100 < 30) {
         FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 19, 0);
     }
-    if (Misc_RandFunc(0) % 100 < 30) {
+    if (Misc_RandFunc(RANDOM_GAME) % 100 < 30) {
         FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 20, 0);
     }
-    bChance = Misc_RandFunc(0) % 100 < 20;
+    bChance = Misc_RandFunc(RANDOM_GAME) % 100 < 20;
     if (bChance) {
         nCount = FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(19, 3);
-        nPick = Misc_RandFunc(0) % nCount;
+        nPick = Misc_RandFunc(RANDOM_GAME) % nCount;
         FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(19, 3, nPick);
         FE_CrAP_TurnOnPart(19, 0, nPick);
     }
-    bChance = Misc_RandFunc(0) % 100 < 5;
+    bChance = Misc_RandFunc(RANDOM_GAME) % 100 < 5;
     if (bChance) {
         nCount = FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(8, 0);
-        FE_CrAP_TurnOnPart(8, 0, Misc_RandFunc(0) % nCount);
+        FE_CrAP_TurnOnPart(8, 0, Misc_RandFunc(RANDOM_GAME) % nCount);
     } else {
         FE_CrAP_UnequipSlot(13);
     }
@@ -1228,7 +1228,7 @@ void FE_CrAP_RandomizeAll(SaveProfile* pProfile) {
     FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 1, 0);
     FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 2, 0);
     FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(pProfile, 7, 0);
-    FE_CrAP_RandomizeCrAPCategoryAndSubcategoryItem(pProfile, 7, (Misc_RandFunc(0) & 1) + 1, 0);
+    FE_CrAP_RandomizeCrAPCategoryAndSubcategoryItem(pProfile, 7, (Misc_RandFunc(RANDOM_GAME) & 1) + 1, 0);
     FE_CrAP_RandomizeFace(pProfile);
 }
 
@@ -1239,7 +1239,7 @@ int FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(SaveProfile* pProfile, s16 nPa
     int nCount = FE_CrAP_GetNumberOfSubcategoryIndicesForCategory(nPart);
     int nPick;
     if (nCount > 0) {
-        nPick = Misc_RandFunc(0) % nCount;
+        nPick = Misc_RandFunc(RANDOM_GAME) % nCount;
     } else {
         nPick = 0;
     }
@@ -1257,7 +1257,7 @@ int FE_CrAP_RandomizeCrAPCategoryAndSubcategoryItem(SaveProfile* pProfile, s16 n
     int i;
     int nPick;
     FE_CrAP_GetNumEntriesInCrAPDB();
-    if ((int)(Misc_RandFunc(0) % 100) + 1 <= nChance) {
+    if ((int)(Misc_RandFunc(RANDOM_GAME) % 100) + 1 <= nChance) {
         if (gSession.uFlags & 0x4000) {
             FE_CrAP_TurnOnPart(nPart, b, 0);
             return 0;
@@ -1267,7 +1267,7 @@ int FE_CrAP_RandomizeCrAPCategoryAndSubcategoryItem(SaveProfile* pProfile, s16 n
     if (gSession.uFlags & 0x4000) {
         nCount = FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(nPart, b);
         if (nCount != 0) {
-            nPick = Misc_RandFunc(0) % nCount;
+            nPick = Misc_RandFunc(RANDOM_GAME) % nCount;
             FE_CrAP_TurnOnPart(nPart, b, nPick);
             return nPick;
         }
@@ -1285,7 +1285,7 @@ int FE_CrAP_RandomizeCrAPCategoryAndSubcategoryItem(SaveProfile* pProfile, s16 n
             FE_CrAP_TurnOnPart(nPart, b, 0);
             return 0;
         }
-        nPick = Misc_RandFunc(0) % nFound;
+        nPick = Misc_RandFunc(RANDOM_GAME) % nFound;
         FE_CrAP_TurnOnPart(nPart, b, aChoices[nPick]);
         return aChoices[nPick];
     }

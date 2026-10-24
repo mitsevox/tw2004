@@ -1294,7 +1294,7 @@ f32 Math_Sqrtf(f32 x) {
 
 // Sets a four-float vector to zero.
 void vec4flt_Zero(f32* pVec) {
-    LLMath_CopyVec(lbl_80186838, pVec);
+    LLMath_CopyVec(gVec4Zero, pVec);
 }
 
 // pA + pB into out, three floats (paired singles).

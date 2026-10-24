@@ -63,7 +63,7 @@ void fn_8006F64C(void) {
 
 // ---- end of sweep code ----
 
-// Picks lbl_802811F0's flags for the hole, then reseeds random stream 1 and applies them
+// Picks lbl_802811F0's flags for the hole, then reseeds RANDOM_PRESENTATION and applies them
 // (fn_8006FB10). Split screen (or session flag 0x4000) gets bit 0 only; else a wind over 6 (wind
 // option on) on courses 0, 1, 2 and 6 sets bit 4, then b1C sets bit 1, or the game option nWeather
 // picks (not on course 4's hole 18): a roll over the course's lbl_80188900 choices with f18 rolled
@@ -96,7 +96,7 @@ void fn_8006F650(void) {
 
                 if (lbl_802811F0->n10 >= lbl_802811F0->n0C || lbl_802811F0->b14) {
                     fSum = 0.0f;
-                    fRoll = Misc_RandFuncf(1);
+                    fRoll = Misc_RandFuncf(RANDOM_PRESENTATION);
                     lbl_802811F0->n08 = 0;
                     for (i = 0; fRoll > fSum; i++) {
                         fSum += lbl_80188900[Game_GetCourse()][i].fShare;
@@ -106,8 +106,8 @@ void fn_8006F650(void) {
                             break;
                         }
                     }
-                    lbl_802811F0->n0C = Misc_RandFuncf(1) * (f32)(lbl_80188900[Game_GetCourse()][i].nMax -
-                                                                  lbl_80188900[Game_GetCourse()][i].nMin) +
+                    lbl_802811F0->n0C = Misc_RandFuncf(RANDOM_PRESENTATION) * (f32)(
+                            lbl_80188900[Game_GetCourse()][i].nMax - lbl_80188900[Game_GetCourse()][i].nMin) +
                                         (f32)lbl_80188900[Game_GetCourse()][i].nMin;
                     lbl_802811F0->b14 = 0;
                     lbl_802811F0->n10 = 1;
@@ -135,7 +135,7 @@ void fn_8006F650(void) {
                 int i;
 
                 fSum = 0.0f;
-                fRoll = Misc_RandFuncf(1);
+                fRoll = Misc_RandFuncf(RANDOM_PRESENTATION);
                 for (i = 0; fRoll > fSum; i++) {
                     fSum += lbl_80188900[Game_GetCourse()][i].fShare;
                     if (fRoll <= fSum) {
@@ -144,12 +144,12 @@ void fn_8006F650(void) {
                         break;
                     }
                 }
-                lbl_802811F0->f18 = 0.75f * Misc_RandFuncf(1) + 0.25f;
+                lbl_802811F0->f18 = 0.75f * Misc_RandFuncf(RANDOM_PRESENTATION) + 0.25f;
                 break;
             }
             case 3:
                 lbl_802811F0->uFlags |= 2;
-                lbl_802811F0->f18 = 0.75f * Misc_RandFuncf(1) + 0.25f;
+                lbl_802811F0->f18 = 0.75f * Misc_RandFuncf(RANDOM_PRESENTATION) + 0.25f;
                 break;
             case 5:
             case 6:
@@ -161,8 +161,8 @@ void fn_8006F650(void) {
     if (fn_8006FCCC()) {
         fn_8006FCC8();
     } else {
-        uSeed = Misc_RandFunc(1);
-        Misc_SetSeedFunc(1, uSeed);
+        uSeed = Misc_RandFunc(RANDOM_PRESENTATION);
+        Misc_SetSeedFunc(RANDOM_PRESENTATION, uSeed);
         fn_8006FCC4(uSeed);
     }
     fn_8006FB10();

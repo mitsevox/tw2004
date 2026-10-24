@@ -95,19 +95,19 @@ void Wind_InitForHole(void) {
         }
         switch (n) {
         case 0:
-            fSpeed = Misc_RandFunc(0) % 7;
+            fSpeed = Misc_RandFunc(RANDOM_GAME) % 7;
             break;
         case 1:
-            fSpeed = 2.0f + Misc_RandFunc(0) % 11;
+            fSpeed = 2.0f + Misc_RandFunc(RANDOM_GAME) % 11;
             break;
         case 2:
-            fSpeed = 5.0f + Misc_RandFunc(0) % 16;
+            fSpeed = 5.0f + Misc_RandFunc(RANDOM_GAME) % 16;
             break;
         case 3:
-            fSpeed = 12.0f + Misc_RandFunc(0) % 20;
+            fSpeed = 12.0f + Misc_RandFunc(RANDOM_GAME) % 20;
             break;
         }
-        n = Misc_RandFunc(0) % 8;
+        n = Misc_RandFunc(RANDOM_GAME) % 8;
     }
     Wind_SetPhysicsWind(n, fSpeed);
 }

@@ -164,14 +164,32 @@ double acos(double x);                  // 0x8015F784 (MSL)
 double asin(double x);                  // 0x8015F7A4 (MSL)
 double atan2(double y, double x);       // 0x8015F7C4 (MSL)
 double log(double x);                   // 0x8015F804 (MSL)
-u32  Misc_RandFunc(int nStream);            // 0x8000B130  EA's lagged-Fibonacci generator
-f32  Misc_RandFuncg(int nStream);          // a normally distributed random number (mean 0, deviation 1):
-                                        // Box-Muller on two Misc_RandFuncf, the second result kept
-void Misc_SetSeedFunc(int nStream, u32 uSeed);   // seed a random stream
-u32  Misc_CreateRandomSeed(void);                 // a random seed from the clock
-void Misc_InitModule(u32 uSeed);            // seed all three random streams
-void Misc_CloseModule(void);                 // drop the kept normal value (Misc_RandFuncg)
-f32  Misc_RandFuncf(int nStream);           // 0x8000B428  [0, 1)
+
+// urandom.c: the game's random numbers, three independent streams.
+typedef enum eRandomType {
+    RANDOM_GAME = 0,            // mostly the shot, the wind, the computer golfers, the game modes, the tour
+                                // simulation and the front end; a shot's replay reseeds it with the
+                                // seed it kept, so the shot comes out the same
+    RANDOM_PRESENTATION = 1,    // mostly cameras, effects, animation and commentary (also the holes
+                                // of the "Random 18" course and of a custom round's random hole);
+                                // reseeded from the session's seed at every swing
+    RANDOM_AUDIO = 2            // only the choice between two sounds of the ball dropping in the cup
+} eRandomType;
+#define RANDOM_NUM_TYPES  3
+#define RANDOM_TABLE_SIZE 20    // the words of a stream's table
+
+extern f32 gVec4Zero[4];                // a zero vector (vec4flt_Zero copies it)
+
+u32  Misc_RandFunc(eRandomType type);   // the next 32-bit number of a stream
+void Misc_SetSeedFunc(eRandomType type, s32 seed);
+s32  Misc_CreateRandomSeed(void);       // a seed from the clock
+void Misc_InitModule(s32 seed);         // seeds every stream with seed
+void Misc_CloseModule(void);            // drops the kept normal value (Misc_RandFuncg)
+// A normally distributed number (mean 0, deviation 1), by Box-Muller on two Misc_RandFuncf; every
+// other call returns the second of the pair it made.
+f32  Misc_RandFuncg(eRandomType type);
+f32  Misc_RandFuncf(eRandomType type);  // a float in [0, 1)
+
 f32  Math_Sqrtf(f32 x);                // square root (Skeleton.c); x itself when x <= 0
 void LLMath_AddScale3(f32* pA, f32* pB, f32 f, f32* pOut);   // out = a + f x b
 f32  Vec3_Dot(f32* pA, f32* pB);     // dot product

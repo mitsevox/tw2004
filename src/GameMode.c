@@ -672,7 +672,7 @@ int GM_DoPreshotAnimation(int nPlayer) {
                                             0, 1, 4.0f, 1, 0.577f)) {
         return 0;
     }
-    return (Misc_RandFunc(1) % 100) < 85;
+    return (Misc_RandFunc(RANDOM_PRESENTATION) % 100) < 85;
 }
 
 // Whether the golfer plays a reaction after the shot. Never when GM_IsValidPostShotGameType says
@@ -775,21 +775,21 @@ int GM_ShowPostShotAnimation(int nPlayer) {
     }
     if (gPlayers[nPlayer].nShotKind == SHOT_TYPE_PUTT_e) {
         switch (nResult) {
-        case 0:  return Misc_RandFunc(1) % 100 < 80;
-        case 1:  return Misc_RandFunc(1) % 100 < 100;
+        case 0:  return Misc_RandFunc(RANDOM_PRESENTATION) % 100 < 80;
+        case 1:  return Misc_RandFunc(RANDOM_PRESENTATION) % 100 < 100;
         case 2:  return 1;
-        case 3:  return Misc_RandFunc(1) % 100 < 70;
-        case 4:  return Misc_RandFunc(1) % 100 < 90;
-        default: return Misc_RandFunc(1) % 100 < 50;
+        case 3:  return Misc_RandFunc(RANDOM_PRESENTATION) % 100 < 70;
+        case 4:  return Misc_RandFunc(RANDOM_PRESENTATION) % 100 < 90;
+        default: return Misc_RandFunc(RANDOM_PRESENTATION) % 100 < 50;
         }
     } else {
         switch (fn_8006AA9C(nPlayer)) {
-        case 0:  return Misc_RandFunc(1) % 100 < 35;
-        case 1:  return Misc_RandFunc(1) % 100 < 100;
+        case 0:  return Misc_RandFunc(RANDOM_PRESENTATION) % 100 < 35;
+        case 1:  return Misc_RandFunc(RANDOM_PRESENTATION) % 100 < 100;
         case 2:  return 1;
-        case 3:  return Misc_RandFunc(1) % 100 < 70;
-        case 4:  return Misc_RandFunc(1) % 100 < 90;
-        default: return Misc_RandFunc(1) % 100 < 50;
+        case 3:  return Misc_RandFunc(RANDOM_PRESENTATION) % 100 < 70;
+        case 4:  return Misc_RandFunc(RANDOM_PRESENTATION) % 100 < 90;
+        default: return Misc_RandFunc(RANDOM_PRESENTATION) % 100 < 50;
         }
     }
 }
@@ -1158,10 +1158,10 @@ int GM_ChooseRemoveBallState(int nPlayer) {
         return (gPlayers[nPlayer].uFlags >> 1) & 1;
     }
     if (GM_GetCurrentHolePar() - gPlayers[nPlayer].nStrokes[gpGame->nCurHole] > 1) {
-        if (Misc_RandFunc(1) % 10 == 0) {
+        if (Misc_RandFunc(RANDOM_PRESENTATION) % 10 == 0) {
             return 1;
         }
-    } else if (!(Misc_RandFunc(1) & 3)) {
+    } else if (!(Misc_RandFunc(RANDOM_PRESENTATION) & 3)) {
         return 1;
     }
     return 0;
@@ -1246,7 +1246,7 @@ void GM_SimulateBallMovement(int nPlayer) {
                         fDist - gPlayers[nPlayer].ball.fClosest < 0.3f) {
                         if (gPlayers[nPlayer].ballBefore.nLie == LIE_INCUP_e &&
                             GameAnalysis_IsPuttFor(nPlayer) <= 0) {
-                            if (Misc_RandFunc(1) % 100 < 50) {
+                            if (Misc_RandFunc(RANDOM_PRESENTATION) % 100 < 50) {
                                 gPlayers[nPlayer].uFlags |= 4;
                                 gPlayers[nPlayer].fEEC = fDist;
                                 fn_80095744(gPlayers[nPlayer].pChar, 9);

@@ -1669,7 +1669,7 @@ void GM_vPlayMenuSound(MsgArg* pArgs, MsgArg* pResult) {
 
     n = pArgs[0].i;
     if (n == 11) {
-        Gaud_PlayUISound((Misc_RandFunc(0) & 7) + 11);
+        Gaud_PlayUISound((Misc_RandFunc(RANDOM_GAME) & 7) + 11);
     } else {
         Gaud_PlayUISound(n);
     }
@@ -4022,7 +4022,7 @@ void GM_vSetRandomCustomRoundHole(MsgArg* pArgs, MsgArg* pResult) {
         }
     }
 retry:
-    nPick = Misc_RandFunc(1) % nUnlocked + 1;
+    nPick = Misc_RandFunc(RANDOM_PRESENTATION) % nUnlocked + 1;
     nFound = 0;
     for (i = 0; i < 20; i++) {
         if ((gpSaveData[nSlot].aCourseUnlocked[aCourses[i]] ||
@@ -4032,7 +4032,7 @@ retry:
             break;
         }
     }
-    nHoleNum = Misc_RandFunc(1) % 18;
+    nHoleNum = Misc_RandFunc(RANDOM_PRESENTATION) % 18;
     for (i = 0; i < 18; i++) {
         if (nCourse == gpSaveData[nSlot].aSavedRound[nRound].nCourse[i] &&
             nHoleNum == gpSaveData[nSlot].aSavedRound[nRound].nHoleNum[i]) {

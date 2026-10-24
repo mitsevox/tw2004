@@ -132,7 +132,7 @@ void Lessons_HighlightHudItem(int nItem, int bOn);
 // animations always (GM_ANIMS_ON), nMaxGolfers, nMinGolfers and b276 (re-plan as the swing
 // begins) set to 1; the ball's random rolls off (Physics_SetNoRandomRolls: lies and bounces
 // come out as in a simulation). The options the lessons change are saved and set: commentary level
-// 4, the putting grid off, power boost and spin on. Random stream 0 is seeded with 69, so the
+// 4, the putting grid off, power boost and spin on. RANDOM_GAME is seeded with 69, so the
 // lessons play the same each time.
 void Lessons_Init(void) {
     gpGame->pfnInit = Lessons_Init;
@@ -173,7 +173,7 @@ void Lessons_Init(void) {
     gSession.options.bPuttingGrid = 0;
     gSession.options.bBoostEnabled = 1;
     gSession.options.bSpinEnabled = 1;
-    Misc_SetSeedFunc(0, 69);
+    Misc_SetSeedFunc(RANDOM_GAME, 69);
 }
 
 // Hole start (pfnLoadHole): the lessons start over (Lessons_Reset).
