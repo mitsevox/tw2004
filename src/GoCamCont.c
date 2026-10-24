@@ -326,7 +326,7 @@ void CameraController_StartScriptOfKind(View* pView, int nPlayer, int nKind) {
         pView->script.pNextShot = pShot->pNext;
         if (pShot->pNext != NULL) {
             pView->script.nInterpType = pShot->pNext->nInterpType;
-            pView->script.f8C = pShot->pNext->fInterpTime;
+            pView->script.fInterpTime = pShot->pNext->fInterpTime;
         }
     }
     pView->script.fCamTime = 0.0f;
@@ -582,14 +582,14 @@ void CameraController_PostEvent(View* pView, int nKind, int nPlayer) {
         return;
     }
     if (nKind == 12 && pView->script.nRequestedEvent != 12) {
-        pShot = DynamicCam_ChooseScript(nPlayer, 12, NULL);
+        pShot = DynamicCam_ChooseScript(nPlayer, CAMSTATE_GAMEBREAKER_HIT, NULL);
         if (pShot != NULL) {
             CameraScript_RecordCurrentCam(&pView->shot19C, pPos, pAt, nPlayer, &pView->script, 0);
             pView->shot19C.pNext = pShot;
             CameraScript_InterpToNewScript(&pView->script, &pView->shot19C, nPlayer, pPos, pAt, CAMINTERP_CUT,
                                            0.0f, 100.0f, CAMEVENT_NONE, 0.0f);
             pView->script.nInterpType = CAMINTERP_CUT;
-            pView->script.f8C = 0.3f;
+            pView->script.fInterpTime = 0.3f;
             CameraController_FadeOut(pView, 0.3f, vGrey);
         }
     }
