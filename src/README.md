@@ -214,7 +214,7 @@ describe; static cameras and fly-bys come from the course data.
 
 | File | Name | What it is |
 |---|---|---|
-| ViewController.c | ours (after TW06 `viewControllerID`) | the four views: render camera and camera controller each |
+| GoViewCont.c | T6 | the four views: render camera and camera controller each |
 | GoDynamicCam.c | EA | camera shots, sequences and choices from the camera files, picked by situation |
 | gocamscripts.c | T6 | camera scripts: move from shot to shot, keep above ground, aim at ball and pin |
 | GoCamCont.c | T6 | each view's camera controller: camera mode, idle state |

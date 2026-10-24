@@ -72,6 +72,8 @@ typedef struct Camera {
 LAYOUT_ASSERT(Camera, 0x234);       // GoRenderCtx_Gc.c RC_spCreateRenderCtx allocates 0x234 bytes
 
 FB_SFrameBuffer* RC_spGetRenderCtxFrameBuffer(Camera* pCamera); // GoRenderCtx_Gc.c: the camera's frame buffer
+void RC_vUpdateRenderCtxScreen(Camera* pCamera);   // GoRenderCtx_Gc.c: rebuild its screen values and matrices
+void RC_vSetRenderCtxFrameBuffer(Camera* pCamera, FB_SFrameBuffer* pBuf);   // GoRenderCtx_Gc.c
 
 Sphere* fn_800082F8(RenderObj* obj);
 // LLMath_Gc.c: dest = A x M, all four floats (A a row vector; dest may be A).

@@ -9,10 +9,10 @@
 #include "camera.h"
 #include "terrain.h"
 
-PostFxTint lbl_801D50C0[4];
-PostFx5090 lbl_801D5090[4];
-PostFx5020 lbl_801D5020[4];
-f32 lbl_801D5010[4];
+PostFxTint lbl_801D50C0[VIEWCONTROLLER_NUM_VIEWS];
+PostFx5090 lbl_801D5090[VIEWCONTROLLER_NUM_VIEWS];
+PostFx5020 lbl_801D5020[VIEWCONTROLLER_NUM_VIEWS];
+f32 lbl_801D5010[VIEWCONTROLLER_NUM_VIEWS];
 GxTexture lbl_801D4FB0[2];
 GxTexture lbl_801D4F80;
 
@@ -47,7 +47,7 @@ void fn_80037DD8(void) {
 void fn_80037E50(void) {
     int i;
 
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < VIEWCONTROLLER_NUM_VIEWS; i++) {
         lbl_801D50C0[i].b0 = 0;
         lbl_801D5090[i].b0 = 0;
         lbl_801D5020[i].b0 = 0;
@@ -67,7 +67,6 @@ void fn_80037E50(void) {
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_80037F80(void);
-void fn_80038010(u8 b, int nView, f32* pColour);
 void fn_80037FB4(u8 b, f32* pColour);
 u8 fn_8003944C();
 void fn_80038314(void);
@@ -89,22 +88,22 @@ void fn_80037F80(void) {
 void fn_80037FB4(u8 b, f32* pColour) {
     int i;
 
-    for (i = 0; i < 4; i++) {
-        fn_80038010(b, i, pColour);
+    for (i = 0; i < VIEWCONTROLLER_NUM_VIEWS; i++) {
+        PostFx_SetFade(b, i, pColour);
     }
 }
 
 // ---- end of sweep code ----
 
 // Sets (b) or clears view nView's colour.
-void fn_80038010(u8 b, int nView, f32* pColour) {
+void PostFx_SetFade(u8 b, int nView, f32* pColour) {
     lbl_801D50C0[nView].b0 = b;
     if (b) {
         LLMath_CopyVec(pColour, lbl_801D50C0[nView].aColour);
     }
 }
 
-void fn_80038054(u8 b, int nView, f32 f4, f32 f8) {
+void PostFx_SetBlur(u8 b, int nView, f32 f4, f32 f8) {
     lbl_801D5090[nView].b0 = b;
     lbl_801D5090[nView].f4 = f4;
     lbl_801D5090[nView].f8 = f8;
@@ -224,7 +223,7 @@ void fn_800382E0(void) {
 void fn_80038314(void) {
     int i;
 
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < VIEWCONTROLLER_NUM_VIEWS; i++) {
         if (lbl_801D5020[i].b0 && ViewController_IsActive(i)) {
             fn_80038A90(lbl_801D5020[i].aColour, lbl_801D5020[i].fX, lbl_801D5020[i].fY,
                         lbl_801D5020[i].b1, i, lbl_80281B88 & 1);
@@ -237,7 +236,7 @@ void fn_80038314(void) {
 void fn_800383A8(void) {
     int i;
 
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < VIEWCONTROLLER_NUM_VIEWS; i++) {
         if (lbl_801D5090[i].b0 && ViewController_IsActive(i)) {
             fn_80038724(lbl_80281B88 & 1, i, lbl_801D5090[i].f8, lbl_801D5090[i].f4);
             lbl_801D5090[i].b0 = 0;
@@ -270,7 +269,7 @@ void fn_80038438(void) {
     fY = pRect->fTop;
     fW = pRect->fWidth;
     fH = pRect->fHeight;
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < VIEWCONTROLLER_NUM_VIEWS; i++) {
         if (lbl_801D50C0[i].b0 && ViewController_IsActive(i)) {
             pViewRect = RC_spGetRenderCtxViewport(ViewController_GetRenderContext(i));
             VM_vSetViewportRect(pRect, pViewRect->fLeft, pViewRect->fTop, pViewRect->fWidth,
@@ -382,7 +381,7 @@ void fn_80038724(int nField, int nView, f32 fAlpha, f32 fShake) {
 void fn_80038968(void) {
     int i;
 
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < VIEWCONTROLLER_NUM_VIEWS; i++) {
         if (lbl_801D5090[i].b0) {
             fn_80038A2C(lbl_80281B88 & 1, RC_spGetCurrentRenderCtx());
             return;
@@ -394,7 +393,7 @@ void fn_80038968(void) {
 void fn_800389C0(void) {
     int i;
 
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < VIEWCONTROLLER_NUM_VIEWS; i++) {
         if (lbl_801D5090[i].b0) {
             fn_80038A6C(lbl_80281B88 & 1, ViewController_GetRenderContext(i));
         }

@@ -255,9 +255,9 @@ void fn_800B52D4(RainObject* pRain, f32* pTime) {
     nBuf = lbl_802814B8->n0;
     nHalf = lbl_802814B8->n4;
     sphere.radius = lbl_802814B8->f8;
-    vCenter.x = -pCamera->unk10->m4[3][0];
-    vCenter.y = pCamera->unk10->m4[3][1];
-    vCenter.z = -pCamera->unk10->m4[3][2];
+    vCenter.x = -pCamera->unk10->mViewToWorld[3][0];
+    vCenter.y = pCamera->unk10->mViewToWorld[3][1];
+    vCenter.z = -pCamera->unk10->mViewToWorld[3][2];
     vCenter.w = 1.0f;
     fOff = (vCenter.x >= 0.0f) ? 17.5f : -17.5f;
     vCenter.x = vCenter.x - 35.0f * (int)(vCenter.x / 35.0f) - fOff;
@@ -326,9 +326,9 @@ void fn_800B52D4(RainObject* pRain, f32* pTime) {
             pSplash->fAlpha = 0.05f;
         }
         fSize = 0.05f * Misc_RandFuncf(1) + 0.05f;
-        vCenter.x = (20.0f * Misc_RandFuncf(1) + pLens->m4[3][0]) - 10.0f;
-        vCenter.y = pLens->m4[3][1];
-        vCenter.z = (20.0f * Misc_RandFuncf(1) + pLens->m4[3][2]) - 10.0f;
+        vCenter.x = (20.0f * Misc_RandFuncf(1) + pLens->mViewToWorld[3][0]) - 10.0f;
+        vCenter.y = pLens->mViewToWorld[3][1];
+        vCenter.z = (20.0f * Misc_RandFuncf(1) + pLens->mViewToWorld[3][2]) - 10.0f;
         vCenter.y = 0.1f + Ter_GetHighestGroundHeight(Ter_GetTGD(), &vCenter.x);
         Ter_GetSupportingGroundNormal(Ter_GetTGD(), &vCenter.x, &vPos.x);
         fn_800B5918(&vCenter.x, pSplash->av[0]);

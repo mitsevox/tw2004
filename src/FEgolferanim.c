@@ -128,7 +128,6 @@ void LLMath_IdentifyMat(f32 (*m)[4]);          // identity matrix
 void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
 void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
 void fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY);
-void ViewController_Update(int nView);
 void RC_UpdateCurrentScreenMatrices(void);
 void SKN_DrawCharacterParts(Character* pChar);
 void SKN_DrawClubParts(Character* pChar);
@@ -561,8 +560,8 @@ int FE_StreamGetCurrentState(void) {
 }
 
 // Each front-end frame, after FE_vUpdateGolferAll: update the current view and take its camera into
-// the golfer display: an identity matrix in mC0, the camera's position and look point (View v0,
-// v10) in v100 and v110, and the screen kind's (nScreenKind) pair of vectors (lbl_80189A40, 60, 80)
+// the golfer display: an identity matrix in mC0, the camera's position and look point (View vOrigin,
+// vLookPoint) in v100 and v110, and the screen kind's (nScreenKind) pair of vectors (lbl_80189A40, 60, 80)
 // in v120 and v130.
 void FE_SetupCamera(void) {
     View* pView;
@@ -570,8 +569,8 @@ void FE_SetupCamera(void) {
     pView = ViewController_GetCameraControl(ViewController_GetCurrentViewControllerID());
     ViewController_Update(ViewController_GetCurrentViewControllerID());
     LLMath_IdentifyMat(gpCrAPState->mC0);
-    LLMath_CopyVec(pView->v0, gpCrAPState->v100);
-    LLMath_CopyVec(pView->v10, gpCrAPState->v110);
+    LLMath_CopyVec(pView->vOrigin, gpCrAPState->v100);
+    LLMath_CopyVec(pView->vLookPoint, gpCrAPState->v110);
     switch (gpCrAPState->nScreenKind) {
     case 0:
         LLMath_CopyVec(lbl_80189A40[0], gpCrAPState->v120);

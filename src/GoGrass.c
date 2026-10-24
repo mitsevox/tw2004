@@ -525,8 +525,8 @@ void GrassRender_vBuildAndUploadOneTimeData(void) {
     GXSetTevColorOp(2, 0, 0, 0, 1, 0);
     GXSetTevAlphaIn(2, 7, 4, 5, 7);
     GXSetTevAlphaOp(2, 0, 0, 1, 1, 0);
-    fX = gpGrassMgr->pLens->m4[3][0] - 0.5f * gpGrassMgr->pLens->fFlatWidth;
-    fZ = gpGrassMgr->pLens->m4[3][2] - 0.5f * gpGrassMgr->pLens->fFlatHeight;
+    fX = gpGrassMgr->pLens->mViewToWorld[3][0] - 0.5f * gpGrassMgr->pLens->fFlatWidth;
+    fZ = gpGrassMgr->pLens->mViewToWorld[3][2] - 0.5f * gpGrassMgr->pLens->fFlatHeight;
     gpGrassMgr->af108[0][0] = 1.0f + fX / gpGrassMgr->pLens->fFlatWidth;
     gpGrassMgr->af108[0][1] = 1.0f + fZ / gpGrassMgr->pLens->fFlatHeight;
     gpGrassMgr->af108[0][2] = 1.0f;
@@ -576,7 +576,7 @@ void Grass_DrawBuffers(void) {
     CamLens* pLens = Camera_GetCurrentLens();
 
     nBuffers = gpGrassMgr->anF8[gpGrassMgr->n100];
-    LLMath_CopyVec(pLens->m4[2], vDir);
+    LLMath_CopyVec(pLens->mViewToWorld[2], vDir);
     vDir[1] = 0.0f;
     if (vDir[0] != 0.0f || vDir[1] != 0.0f || vDir[2] != 0.0f) {
         LLMath_Normalize3(vDir, vDir);
@@ -716,7 +716,7 @@ void Grass_BuildVisibleList(void) {
     gpGrassMgr->n404 = 0;
     gpGrassMgr->n408 = 0;
     nRadius = 1.0f + gpGrassMgr->f3E8 / 2.5f;
-    Vec3Copy(pLens->m4[2], vLook);
+    Vec3Copy(pLens->mViewToWorld[2], vLook);
     Vec3Copy(vLook, vFlat);
     if (vLook[0] != 0.0f || vLook[1] != 0.0f || vLook[2] != 0.0f) {
         LLMath_Normalize3(vLook, vLook);
@@ -733,7 +733,7 @@ void Grass_BuildVisibleList(void) {
     if (vFlat[0] != 0.0f || vFlat[1] != 0.0f || vFlat[2] != 0.0f) {
         LLMath_Normalize3(vFlat, vFlat);
     }
-    LLMath_CopyVec(pLens->m4[3], vPos);
+    LLMath_CopyVec(pLens->mViewToWorld[3], vPos);
     LLMath_Scale(gpGrassMgr->f3EC, vFlat, vAhead);
     Grass_Vec3Add(vAhead, vPos, vCentre);
     if (vCentre[0] < 0.0f) {
@@ -769,7 +769,8 @@ void Grass_BuildVisibleList(void) {
             pSphere->y = 0.5f * (gpGrassMgr->f3B8 + (pTile->f4 + pTile->f8));
             pSphere->z = 1.25f + (2.5f * (f32)nZ + (f32)gpGrassMgr->n16);
             nCull = fn_80007CE8((RenderObj*)&gGrassCellMesh, RC_spGetCurrentRenderCtx(),
-                                0, ViewController_GetCameraControl(gTerRenderer.iCurrentViewContext)->f54);
+                                0, ViewController_GetCameraControl(
+                                        gTerRenderer.iCurrentViewContext)->vViewScale[1]);
             if (nCull == 2) {
                 continue;
             }

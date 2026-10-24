@@ -216,7 +216,7 @@ void UI_SetControllerEnabled(s32 n, s32 b) {
 // Once a frame (from UI_UpdateInterface): read the controllers for the UI. The main stick works the
 // D-pad in start-up, the menus and, while the pause menu is open, in play (game type 6). In a round
 // (4 to 8, not paused) nothing is read while any player's view has a script fade running or held
-// (script.nFade 1 to 4) with a camera other than 0x15. Each plugged-in controller's buttons (the
+// (CAMFADE_OUT to CAMFADE_OUT_DONE) with a camera other than 0x15. Each plugged-in controller's buttons (the
 // stick's directions folded into the D-pad bits) are compared with last frame's: a button held 9
 // frames counts as pressed again. gUIState.nNumPluggedIn counts the controllers plugged in,
 // nFramesNoPad the frames with none. In the menus, the two-player modes 7 (speed golf on points)
@@ -254,7 +254,8 @@ void UI_ReadControllers(void) {
     if (gSession.nGameType >= 4 && gSession.nGameType <= 8 && gSession.nPaused == 0) {
         for (i = 0; i < gSession.nNumPlayers; i++) {
             pView = ViewController_GetCameraControl(gPlayers[i].nView[0]);
-            if ((CameraController_IsFadeOn(pView) || pView->script.nFade == 3) && pView->nCurCamera != 0x15) {
+            if ((CameraController_IsFadeOn(pView) || pView->script.nFade == CAMFADE_HOLD)
+                && pView->nCurCamera != 0x15) {
                 return;
             }
         }

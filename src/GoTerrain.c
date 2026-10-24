@@ -352,13 +352,13 @@ void Ter_RenderView(void* pHoleData, int nView) {
     gTerRenderer.iCurrentViewContext = nView;
     pLens = Camera_GetCurrentLens();
     gTerRenderer.fFOVScale = 1.0f / Camera_GetLensFovScale(pLens);
-    gTerRenderer.xCameraReferencePos[0] = pLens->m4[3][0];
-    gTerRenderer.xCameraReferencePos[1] = pLens->m4[3][1];
-    gTerRenderer.xCameraReferencePos[2] = pLens->m4[3][2];
+    gTerRenderer.xCameraReferencePos[0] = pLens->mViewToWorld[3][0];
+    gTerRenderer.xCameraReferencePos[1] = pLens->mViewToWorld[3][1];
+    gTerRenderer.xCameraReferencePos[2] = pLens->mViewToWorld[3][2];
     gTerRenderer.xCameraReferencePos[3] = 1.0f;
-    gTerRenderer.xCameraLookVector[0] = pLens->m4[2][0];
-    gTerRenderer.xCameraLookVector[1] = pLens->m4[2][1];
-    gTerRenderer.xCameraLookVector[2] = pLens->m4[2][2];
+    gTerRenderer.xCameraLookVector[0] = pLens->mViewToWorld[2][0];
+    gTerRenderer.xCameraLookVector[1] = pLens->mViewToWorld[2][1];
+    gTerRenderer.xCameraLookVector[2] = pLens->mViewToWorld[2][2];
     gTerRenderer.xCameraLookVector[3] = 1.0f;
     gTerRenderer.fXZDistanceToClosestBallSquared = 1000000.0f;
     for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -378,8 +378,8 @@ void Ter_RenderView(void* pHoleData, int nView) {
                         * (0.75f * pLens->fFov
                            * VM_fGetViewportHeightOverWidth(RC_spGetCurrentRenderCtxViewport())));
     gTerRenderer.fCameraMinHalfFieldOfViewTan =
-        (fTan <= fWideTan / ViewController_GetCameraControl(nView)->f54) ? fTan : fWideTan
-                / ViewController_GetCameraControl(nView)->f54;
+        (fTan <= fWideTan / ViewController_GetCameraControl(nView)->vViewScale[1]) ? fTan : fWideTan
+                / ViewController_GetCameraControl(nView)->vViewScale[1];
     RenderState_Flush();
     if (!gTerRenderer.bObjectTestMode) {
         Ter_DrawPanoramaList(pHoleData, 0);
@@ -475,7 +475,7 @@ void Ter_BuildPatchLists(void* pHoleData) {
                 }
                 eClipMethod = fn_80007B2C(pMesh, pCamera, fDist, gTerRenderer.fCameraMinHalfFieldOfViewTan,
                                           ViewController_GetCameraControl(
-                                                  gTerRenderer.iCurrentViewContext)->f54);
+                                                  gTerRenderer.iCurrentViewContext)->vViewScale[1]);
                 if (eClipMethod != 3) {
                     pPatch = &gTerRenderer.pPatchList[gTerRenderer.iTotalPatches++];
                     Ter_FillPatchReference(pMesh, eClipMethod, iRenderPass, pPatch, fDist);
@@ -675,7 +675,7 @@ void Ter_AddPatchObjects(Ter_PatchReference* pPatch, s32 nFirstObject) {
             } else {
                 pView = ViewController_GetCameraControl(gTerRenderer.iCurrentViewContext);
                 eClipMethod = fn_80007B2C(pLOD0, RC_spGetCurrentRenderCtx(), Math_Sqrt(fDistanceSquared),
-                                          gTerRenderer.fCameraMinHalfFieldOfViewTan, pView->f54);
+                                          gTerRenderer.fCameraMinHalfFieldOfViewTan, pView->vViewScale[1]);
             }
             if (eClipMethod != 3) {
                 pRef = &gTerRenderer.pObjectSortList[gTerRenderer.iTotalSortObjects];
@@ -1900,7 +1900,7 @@ void Ter_DrawPanoramaList(void* pHoleData, u32 nList) {
                     pView = ViewController_GetCameraControl(gTerRenderer.iCurrentViewContext);
                     nClip = fn_80007B2C(pMesh, RC_spGetCurrentRenderCtx(), 0.0f,
                                         gTerRenderer.fCameraMinHalfFieldOfViewTan,
-                                        pView->f54);
+                                        pView->vViewScale[1]);
                     if (nClip != 3) {
                         // fake match: uFlags is reused for bUseFog (fog unless flag 0x20); a new local
                         // is computed after the call to Ter_GetMeshMipmapBiasScale, the original before it
@@ -2197,13 +2197,13 @@ void Ter_RenderGrass(void) {
     DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 1);
     RenderState_SetDrawFlags(0x70);
     RenderState_Flush();
-    gTerRenderer.xCameraReferencePos[0] = pLens->m4[3][0];
-    gTerRenderer.xCameraReferencePos[1] = pLens->m4[3][1];
-    gTerRenderer.xCameraReferencePos[2] = pLens->m4[3][2];
+    gTerRenderer.xCameraReferencePos[0] = pLens->mViewToWorld[3][0];
+    gTerRenderer.xCameraReferencePos[1] = pLens->mViewToWorld[3][1];
+    gTerRenderer.xCameraReferencePos[2] = pLens->mViewToWorld[3][2];
     gTerRenderer.xCameraReferencePos[3] = 1.0f;
-    gTerRenderer.xCameraLookVector[0] = pLens->m4[2][0];
-    gTerRenderer.xCameraLookVector[1] = pLens->m4[2][1];
-    gTerRenderer.xCameraLookVector[2] = pLens->m4[2][2];
+    gTerRenderer.xCameraLookVector[0] = pLens->mViewToWorld[2][0];
+    gTerRenderer.xCameraLookVector[1] = pLens->mViewToWorld[2][1];
+    gTerRenderer.xCameraLookVector[2] = pLens->mViewToWorld[2][2];
     gTerRenderer.xCameraLookVector[3] = 1.0f;
     gTerRenderer.fXZDistanceToClosestBallSquared = 1000000.0f;
     for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -2219,8 +2219,8 @@ void Ter_RenderGrass(void) {
                         * (0.75f * pLens->fFov
                            * VM_fGetViewportHeightOverWidth(RC_spGetCurrentRenderCtxViewport())));
     gTerRenderer.fCameraMinHalfFieldOfViewTan =
-        (fTan <= fWideTan / ViewController_GetCameraControl(0)->f54) ? fTan : fWideTan
-                / ViewController_GetCameraControl(0)->f54;
+        (fTan <= fWideTan / ViewController_GetCameraControl(0)->vViewScale[1]) ? fTan : fWideTan
+                / ViewController_GetCameraControl(0)->vViewScale[1];
     RenderState_Flush();
     Ter_BuildGrassPatchList(pHoleData);
     Ter_DrawGrassPatches(0);
@@ -2344,7 +2344,7 @@ void Ter_BuildGrassPatchList(void* pUnused) {
             }
             pView = ViewController_GetCameraControl(gTerRenderer.iCurrentViewContext);
             nClip = fn_80007B2C(Ter_GetGroundDrawMesh(pPatch->pGround), pCamera, fDist,
-                                gTerRenderer.fCameraMinHalfFieldOfViewTan, pView->f54);
+                                gTerRenderer.fCameraMinHalfFieldOfViewTan, pView->vViewScale[1]);
             if (nClip != 3) {
                 Mem_cpy(pGrass, pPatch, sizeof(Ter_PatchReference));
                 pGrass->eClipMethod = nClip;

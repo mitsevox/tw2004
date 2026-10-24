@@ -20,7 +20,6 @@ void fn_8009A344(s32 nView, SunFlrView* pView);
 void fn_8009A3F4(s32 nView);
 f32  fn_8009A754(s32 nView, SunFlrView* pView);
 
-s32  RC_GetCurrentFrameBuffer(void);                 // ViewController.c
 void fn_8009A250(void);                 // SunFlr_Gc.c
 void fn_8009B314(u8 v);
 void SF_vSetFlareType(s32 v);           // GoTerrain.c
@@ -177,18 +176,16 @@ void fn_8009B134(void) {
 // next depth copy (fn_8009A3F4). Camera_GetCurrentLens's result is thrown away.
 void SF_vUpdateSunFlare(s32 nView) {
     VM_SViewport* pRect;
-    s32 nCtx;
+    FB_SFrameBuffer* pFrameBuffer;
     SunFlrState* pState;
     SunFlrView* pView;
 
     pRect = RC_spGetCurrentRenderCtxViewport();
-    nCtx = RC_GetCurrentFrameBuffer();
+    pFrameBuffer = RC_spGetCurrentRenderCtxFrameBuffer();
     Camera_GetCurrentLens();
-    // port: RC_GetCurrentFrameBuffer is typed s32 in ViewController.c, but its value is a render
-    //       context pointer
-    FB_fGetFrameBufferWidth((FB_SFrameBuffer*)nCtx);
+    FB_fGetFrameBufferWidth(pFrameBuffer);
     VM_fGetViewportWidth(pRect);
-    FB_fGetFrameBufferHeight((FB_SFrameBuffer*)nCtx);
+    FB_fGetFrameBufferHeight(pFrameBuffer);
     VM_fGetViewportHeight(pRect);
     pState = lbl_802813B8;
     if (pState->b1BF0) {

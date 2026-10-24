@@ -11,19 +11,19 @@
 // the pointer at the render camera's +0x10. Only the fields read so far; its size is unknown.
 typedef struct CamLens {
     s32  nType;                 // 0x00  0: a perspective camera, else flat (LLObj_Gc.c)
-    f32  m4[4][4];              // 0x04  camera to world space (shadow.c fn_800B3484 hands it on as a
-                                //       matrix): m4[2] is the view direction (goballfx.c
-                                //       LF_fComputeAngleToLight takes its angle to a light), m4[3]
+    f32  mViewToWorld[4][4];    // 0x04  camera to world space (shadow.c fn_800B3484 hands it on as a
+                                //       matrix): [2] is the view direction (goballfx.c
+                                //       LF_fComputeAngleToLight takes its angle to a light), [3]
                                 //       the camera's position (GameMode8 measures the ball's
-                                //       distance to it); the green zoom-to-aim camera copies m4[0]
+                                //       distance to it); the green zoom-to-aim camera copies [0]
                                 //       to View.vSide
-    f32  m44[4][4];             // 0x44  world to camera space (hlaudemitterpool.c Aud_EmiSet3DPos moves a
-                                //       sound's position with it)
-    f32  m84[2][4];             // 0x84  [1] the scale that
+    f32  mWorldToView[4][4];    // 0x44  world to camera space, the inverse of mViewToWorld
+                                //       (hlaudemitterpool.c Aud_EmiSet3DPos moves a sound's
+                                //       position with it)
+    f32  aScalingVectors[2][4]; // 0x84  [1] the scale that
                                 //       Camera_SetCameraPositionAndTargetWithOffsetAndScale puts
                                 //       on the world around a point, [0] its inverse;
-                                //       ViewController.c CA_vSetDefaultScalingVectors sets all
-                                //       to 1.0
+                                //       CA_vSetDefaultScalingVectors sets both to 1 (no scaling)
     f32  fFov;                  // 0xA4  the field of view (GoGolfCam.c sets DEG(60.0f) or DEG(30.0f))
     f32  fA8;                   // 0xA8  the near clip distance (RC_vUpdateRenderCtxScreenMatricesAndInfo
                                 //       builds the projection from it); CA_vSetDefaultCamera starts it at 0.1
@@ -116,8 +116,8 @@ typedef struct CamShot {
     f32  f84;                   // 0x84
     f32  fDepthOfField;         // 0x88  CamScript_RunScript hands it (plus
                                 //       GameEffects_DepthOfFieldChange of it) to fn_800457B8
-    f32  fBlur;                 // 0x8C  } CamScript_RunScript passes both to fn_80038054 when either is
-    f32  f90;                   // 0x90  } above 0, fBlur as the blur amount (the argument the golf
+    f32  fBlur;                 // 0x8C  } CamScript_RunScript passes both to PostFx_SetBlur when either
+    f32  f90;                   // 0x90  } is above 0, fBlur as the blur amount (the argument the golf
                                 //       cameras pass fZoomBlur in)
     f32  fShakeAmount;          // 0x94  } the shoulder shake (CameraScript_CalculateShoulderShake):
     f32  fShakeSpeed;           // 0x98  } how far and how fast; none when fShakeAmount is 0
@@ -291,6 +291,17 @@ typedef struct CamSequence {
 } CamSequence;
 LAYOUT_ASSERT(CamSequence, 0x50);
 
+// The colour fade over a view (CameraScriptSettings_t.nFade), run by CamScript_Fade.
+typedef enum CameraFadeType_e {
+    CAMFADE_NONE     = 0,
+    CAMFADE_OUT      = 1,       // the colour's alpha rising from 0 (CameraController_FadeOut)
+    CAMFADE_IN       = 2,       // falling to 0 (CameraController_FadeIn)
+    CAMFADE_HOLD     = 3,       // the colour held until another fade starts
+                                // (CameraController_HoldFadeColor)
+    CAMFADE_OUT_DONE = 4,       // } a fade out or in just ended; CamScript_Fade's next step
+    CAMFADE_IN_DONE  = 5        // } ends the fade (CAMFADE_NONE)
+} CameraFadeType_e;
+
 // A view's camera script (0x118 bytes at View + 0x84): the shot the camera plays, the one after
 // it, and the move it makes between them. The camera script functions
 // (gocamscripts.c) and DynamicCam_GetLocation take it as pScript; every caller passes
@@ -329,10 +340,7 @@ typedef struct CameraScriptSettings_t {
     CamShot* pB8;               // 0xB8  the shot before (GolfCamera_CutToGolferDoneAnimatingCam)
     s32  nInterpType;           // 0xBC  how the script blends into the next shot (its
                                 //       nInterpType; CameraController_StartScriptOfKind)
-    s32  nFade;                 // 0xC0  the screen fade (CamScript_Fade): 0 none, 1 fading up to vFadeColor
-                                //       (CameraController_FadeOut), 2 fading away (FadeIn), 3 held
-                                //       (CameraController_HoldFadeColor), 4 kept after 1 ends, 5 after 2 ends
-                                //       (then 0)
+    s32  nFade;                 // 0xC0  the colour fade to vFadeColor over the view (CameraFadeType_e)
     s32  nRequestedEvent;       // 0xC4  the camera event asked for (CameraController_StartScriptOfKind)
     s32  nC8;                   // 0xC8  the shot kind last started
     u8   bBlendPending;         // 0xCC  a blend into a new shot started and has not stepped a frame yet
@@ -373,27 +381,33 @@ typedef struct CameraScriptSettings_t {
 // CameraScript_WillGolferBeOccludedInThisView copies 0x118 bytes.
 LAYOUT_ASSERT(CameraScriptSettings_t, 0x118);
 
+// A camera controller's camera mode (View.nCurCamera, set by CameraController_SetCameraMode): one
+// of the golf cameras of GoGolfCam.c, numbered as CameraController_Idle switches on them.
+typedef enum CameraMode_t {
+    CAMMODE_GREEN_ZOOM_TO_AIM = 2,      // the zoom-to-aim camera on the green
+    CAMMODE_GREEN             = 4       // the green camera: the world scaled by View.vViewScale
+                                        // around View.vViewOffset
+} CameraMode_t;
+
 // A view's camera controller (CameraController_SetCameraMode, EA's name in TW06 and TW07): the
-// camera mode, its shots and script. It sits at +4 in a ViewController; only the fields read so far.
+// camera mode, its shots and script. It sits at +4 in a ViewController_t; only the fields read so
+// far.
 typedef struct View {
-    f32      v0[4];             // 0x000  what CameraController_GetCameraOrigin returns: the
-                                //        camera's position (inferred)
-    f32      v10[4];            // 0x010  what CameraController_GetCameraLookPoint returns: where it
-                                //        looks (the pin, for camera 5)
+    f32      vOrigin[4];        // 0x000  the camera's position (CameraController_GetCameraOrigin)
+    f32      vLookPoint[4];     // 0x010  where it looks (CameraController_GetCameraLookPoint; the
+                                //        pin, for camera 5); while a script shot aims by angles
+                                //        (CameraController_IsFlybyDone false), the yaw, pitch and
+                                //        roll instead
     f32      vSide[4];          // 0x020  the camera's side vector
                                 //        (CameraController_ComputeCurrentSideVector)
     f32      v30[4];            // 0x030
     f32      v40[4];            // 0x040
-    f32      f50;               // 0x050
-    f32      f54;               // 0x054
-    f32      f58;               // 0x058
-    f32      f5C;               // 0x05C
-    f32      f60;               // 0x060  camera 4: the camera's height over the ball once it is in place
-    f32      f64;               // 0x064
+    f32      vViewScale[3];     // 0x050  } the green camera's world scale and offset
+    f32      vViewOffset[3];    // 0x05C  } (Camera_SetCameraPositionAndTargetWithOffsetAndScale)
     f32      fFade;             // 0x068  how far the view has faded (the ball-in-flight state waits for 0.5)
     u8       bFade;             // 0x06C  the fade is on
     u8       unk6D[3];
-    s32      nCurCamera;        // 0x070
+    s32      nCurCamera;        // 0x070  the camera mode (CameraMode_t)
     CamSequence* p74;           // 0x074  the camera sequence the shots are picked from
     CamSequence* p78;           // 0x078  the sequence before the post-shot cameras (p74 saved)
     CamSequence* p7C;           // 0x07C  the swing camera's sequence, kept for the replay
@@ -412,25 +426,29 @@ typedef struct View {
 } View;
 LAYOUT_ASSERT(View, 0x26C);
 
-// One of the four views on screen (gViewControllers, 0x288 bytes each; Player.nView[], TW06's
-// viewControllerID, index them): the render camera, the view's camera controller, the player it
-// follows.
-typedef struct ViewController {
-    void*    pCamera;           // 0x000  the render camera (ViewController_GetRenderContext)
-    View     view;              // 0x004  (ViewController_GetCameraControl)
-    s32      nPlayer;           // 0x270  set by ViewController_SetActivePlayerNumber
-    u8       bActive;           // 0x274  the view is in use (TW07's ViewController_IsActive): set by
-                                //        ViewController_Init, cleared by ViewController_Delete,
-                                //        either by ViewController_TurnOnViewController
+#define VIEWCONTROLLER_NUM_VIEWS 4      // gViewControllers: the views on screen at most
+#define VIEWCONTROLLER_NO_PLAYER 5      // nPlayer from ViewController_Init until a player is set:
+                                        // one past the five player slots
+
+// One of the views on screen (gViewControllers, 0x288 bytes each; Player.nView[] indexes them):
+// the render context it draws with, the view's camera controller, the player it follows.
+typedef struct ViewController_t {
+    void*    pRenderContext;    // 0x000  (ViewController_GetRenderContext)
+    View     cameraController;  // 0x004  (ViewController_GetCameraControl)
+    s32      nPlayer;           // 0x270  the player the view follows
+                                //        (ViewController_SetActivePlayerNumber)
+    u8       bActive;           // 0x274  the view is in use: set by ViewController_Init, cleared by
+                                //        ViewController_Delete, either by
+                                //        ViewController_TurnOnViewController
     u8       bFlagOut;          // 0x275  the flagstick is out (set while every player on this view
                                 //        is on the green, the fringe or holed): no pin collisions
     u8       unk276[2];
-    f32      f278;              // 0x278  } the render camera's screen rectangle, saved by
-    f32      f27C;              // 0x27C  } ViewController_SaveViewportRect in reverse order (f284
-    f32      f280;              // 0x280  } is its first value) and put back by
-    f32      f284;              // 0x284  } ViewController_RestoreViewportRect
-} ViewController;
-LAYOUT_ASSERT(ViewController, 0x288);
+    f32      fSavedHeight;      // 0x278  } the viewport rectangle ViewController_SaveViewportRect
+    f32      fSavedWidth;       // 0x27C  } keeps and ViewController_RestoreViewportRect puts back
+    f32      fSavedTop;         // 0x280  }
+    f32      fSavedLeft;        // 0x284  }
+} ViewController_t;
+LAYOUT_ASSERT(ViewController_t, 0x288);
 
 // ---- the camera tuning values (GoCamTuningVars.c) -------------------------------------------
 
@@ -478,7 +496,7 @@ typedef struct sCameraTuningVars {
     f32  fMatrixStepTime;       // 0x060  the matrix camera steps its script by this once every this
                                 //        many seconds (0: every frame)
     f32  fMatrixBlur;           // 0x064  the matrix camera's motion blur
-    f32  vReplayTint[4];        // 0x068  the swing replay camera's tint over the view (fn_80038010);
+    f32  vReplayTint[4];        // 0x068  the swing replay camera's tint over the view (PostFx_SetFade);
                                 //        its alpha [3] fades out ...
     f32  fReplayTintTime;       // 0x078  ... over this many seconds
     f32  fSuperZoomStartFov;    // 0x07C  the super zoom's field of view at the start ...
@@ -636,9 +654,9 @@ typedef struct sCameraTuningVars {
     f32  fSwingShakeTime;       // 0x204  ... and how long it lasts
     f32  fScreenDarkenAlpha;    // 0x208  the alpha of the black cover fn_80039358 draws, times the
                                 //        view's share (lbl_801D5010, set by the green camera)
-    f32  fGreenCamMaxScale;     // 0x20C  the green camera: the most View.f54 grows to
+    f32  fGreenCamMaxScale;     // 0x20C  the green camera: the most View.vViewScale[1] grows to
     f32  fGreenCamMoveInSpeed;  // 0x210  ... how fast (per second) it moves in from its start
-    f32  fGreenCamScaleSpeed;   // 0x214  ... how fast View.f54 grows and shrinks
+    f32  fGreenCamScaleSpeed;   // 0x214  ... how fast View.vViewScale[1] grows and shrinks
     f32  fGreenCamOrbitSpeed;   // 0x218  ... how fast (per second) buttons 0x31/0x32 turn it round
     f32  fGreenCamArcSide;      // 0x21C  ... the side offset of its swing between the ball and the pin
     f32  fGreenCamClearance;    // 0x220  ... its ground clearance, and its least height over the ball
@@ -870,19 +888,6 @@ void   RC_vSetCurrentRenderCtxTransformationMatrix(f32 (*pMtx)[4]);
 void   RC_vSetRenderCtxTransformationMatrix(void* pCamera, f32 (*pMtx)[4]);
 VM_SViewport* RC_spGetCurrentRenderCtxViewport(void);   // GoTerrain.c: the current render camera's viewport
 
-ViewController* ViewController_GetCurrentViewController(void);     // the current view (gpCurViewController)
-ViewController* ViewController_GetIndexedViewController(int nView);
-void*  ViewController_GetRenderContext(int nView);          // the view's render camera
-View*  ViewController_GetCameraControl(int nView);
-void   ViewController_SetActivePlayerNumber(int nView, int nPlayer);   // the player the view follows
-int    ViewController_GetActivePlayerNumber(int nView);          // the player the view follows (as set above)
-u8     ViewController_IsActive(int nView);          // the view is in use
-void   ViewController_TurnOnViewController(int nView, u8 bActive);   // sets ViewController.bActive
-f32*   CameraController_GetCameraOrigin(View* pView);        // the camera's position (v0)
-f32*   CameraController_GetCameraLookPoint(View* pView);    // where it looks (v10), or a script shot's angles
-u8     CameraController_IsFlybyDone(View* pView);        // 0: the script's shot aims by angles
-                                                         // (ViewController_Update)
-
 // RenderAccessors.c: a viewport's rectangle and a render context's viewport (its render state
 // setters are in engine.h).
 f32    VM_fGetViewportHeight(VM_SViewport* pViewport);
@@ -896,9 +901,6 @@ void*  RC_spGetCurrentRenderCtx(void);               // the current render camer
 void   RC_vUpdateRenderCtxTransformationMatrices(void* pCamera);
 void   RenderState_SetViewport(void* pCamera);
 void   RenderState_SetCameraMatrices(void);
-int    ViewController_GetCurrentViewControllerID(void);
-// Sets a viewport's rectangle (fractions of the frame buffer).
-void   VM_vSetViewportRect(VM_SViewport* pViewport, f32 fLeft, f32 fTop, f32 fWidth, f32 fHeight);
 // A world position on screen (0..1 across and down; pZ, if not NULL, gets a third value). Returns
 // 1 when the point is in front of the camera (clip w below 0), else 0.
 u8     RC_vComputeRenderCtxWorldToPrimitiveCoordinate(void* pCamera, f32* pPos, f32* pX, f32* pY, f32* pZ);
@@ -1080,18 +1082,20 @@ void   GolfCamera_ProcessGolferBoneCamera(View* pView, int nPlayer);            
 
 // ---- the camera controller (0x80062F38..) ---------------------------------------------------
 
+void   CameraController_InitOneCamera(View* pView);             // set up a view's camera controller
+void   CameraController_Idle(View* pView, int nPlayer);         // run it for a frame
 void   CameraController_SetCameraMode(View* pView, int nCamera, int nPlayer, int nView);
 void   CameraController_ResetCameraState(View* pView);
 void   CameraController_CameraCollision(int nView, f32* pBounds);    // the view's camera is inside an
                                                                      // object's bounds
 void   CameraController_FadeIn(View* pView, f32 fTime, f32* pVec);
 void   CameraController_FadeOut(View* pView, f32 fTime, f32* pVec);
-u8     CameraController_IsFadeDone(View* pView);             // script.nFade 3, 4 or 5: a colour fade held or
-                                                             // ending
-u8     CameraController_IsFadeOutDone(View* pView);             // script.nFade 4: kept after fading up
-u8     CameraController_IsFadeOn(View* pView);             // script.nFade 1, 2 or 4: a colour fade running or
-                                                           // held
-void   CameraController_HoldFadeColor(View* pView, f32* pVec);  // script.nFade 3: hold the colour pVec over
+u8     CameraController_IsFadeDone(View* pView);             // CAMFADE_HOLD, _OUT_DONE or _IN_DONE:
+                                                             // a fade held or ending
+u8     CameraController_IsFadeOutDone(View* pView);             // CAMFADE_OUT_DONE: a fade out just ended
+u8     CameraController_IsFadeOn(View* pView);             // CAMFADE_OUT, _IN or _OUT_DONE: a fade running or
+                                                           // just faded out
+void   CameraController_HoldFadeColor(View* pView, f32* pVec);  // CAMFADE_HOLD: hold the colour pVec over
                                                                 // the view
 void   CameraController_PostEvent(View* pView, int nKind, int nPlayer);
 void   CameraController_ResetAimMarkerInSwingCamera(View* pView, int nPlayer);
@@ -1193,6 +1197,12 @@ CamLens* CA_spCreateCamera(void);                     // a new lens
 void     CA_vReleaseCamera(CamLens* pLens);           // free it
 void     Camera_SetCameraPositionAndTarget(CamLens* pLens, f32* pPos, f32* pTarget); // aims the lens from
                                                                                      // pPos at pTarget
+// The same with the lens's side vector given.
+void     Camera_SetCameraPositionAndTargetWithSideVector(CamLens* pLens, f32* pPos, f32* pTarget,
+                                                         f32* pSide);
+// The same, then the world scaled by pScale around pCenter.
+void     Camera_SetCameraPositionAndTargetWithOffsetAndScale(CamLens* pLens, f32* pPos, f32* pTarget,
+                                                             f32* pCenter, f32* pScale);
 void     CA_vSetDefaultCamera(CamLens* pLens);
 void     CA_vSetCameraFlatSize(CamLens* pLens, f32 fB4, f32 fB8); // sets fB4 and fB8
 void     CA_vSetCameraProjectionMode(CamLens* pLens, s32 nType);  // sets nType
@@ -1202,6 +1212,33 @@ CamLens* Camera_GetCurrentLens(void);                     // char.c
 // GoRenderCtx_Gc.c: a render camera made from a lens, a frame buffer and a viewport.
 void*    RC_spCreateRenderCtx(CamLens* pLens, FB_SFrameBuffer* pBuf, VM_SViewport* pViewport);
 void     RC_vReleaseRenderCtx(void* pCamera);            // free it
+
+// ---- the views (GoViewCont.c) ----------------------------------------------------------------
+
+void             ViewController_ResetAll(void);                 // every view unused
+void             ViewController_SetCurrentViewController(int iViewControllerID);
+ViewController_t* ViewController_GetCurrentViewController(void);
+ViewController_t* ViewController_GetIndexedViewController(int iViewControllerID);
+int              ViewController_GetCurrentViewControllerID(void);
+// Opens a view on the rectangle given in fractions of the frame buffer.
+void             ViewController_Init(int iViewControllerID, f32 fLeft, f32 fTop, f32 fWidth, f32 fHeight);
+void             ViewController_Delete(int iViewControllerID);  // closes it
+void             ViewController_Update(int iViewControllerID);  // runs its camera for a frame
+void*            ViewController_GetRenderContext(int iViewControllerID);
+View*            ViewController_GetCameraControl(int iViewControllerID);
+void             ViewController_SetActivePlayerNumber(int iViewControllerID, int ePlayerID);
+int              ViewController_GetActivePlayerNumber(int iViewControllerID);   // the player it follows
+u8               ViewController_IsActive(int iViewControllerID);                // the view is in use
+void             ViewController_TurnOnViewController(int iViewControllerID, u8 active);
+void             ViewController_SaveViewportRect(int iViewControllerID);
+void             ViewController_RestoreViewportRect(int iViewControllerID);
+FB_SFrameBuffer* RC_spGetCurrentRenderCtxFrameBuffer(void);     // the current render context's one
+void             VM_vSetViewportRect(VM_SViewport* spViewport_p, f32 fLeft_p, f32 fTop_p, f32 fWidth_p,
+                                     f32 fHeight_p);            // fractions of the frame buffer
+void             CA_vSetDefaultScalingVectors(CamLens* spCamera_p);             // no scaling
+u8               CameraController_IsFlybyDone(View* pCameraController);
+f32*             CameraController_GetCameraLookPoint(View* pCameraController);  // View.vLookPoint
+f32*             CameraController_GetCameraOrigin(View* pCameraController);     // View.vOrigin
 
 void GolfCamera_ResetSpecialCameraStates(void);
 

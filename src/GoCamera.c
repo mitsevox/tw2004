@@ -1,9 +1,9 @@
 // GoCamera.c (EA's name, from its asserts; also in EA's 2002 source tree; TW06): a render
 // context's lens (TW07's CA_SCamera, here CamLens): its projection (perspective or flat), near and
 // far clip, field of view, and where it stands and what it looks at, as a camera-to-world matrix
-// (m4) and its inverse (m44), optionally with the world scaled around a point. TW07's GoCamera.c
-// has its empty CA_vInitOnce and CA_vCloseOnce and the first six named functions after them in
-// this order; the setters after them are GameCube copies of GoCamera.h's
+// (mViewToWorld) and its inverse (mWorldToView), optionally with the world scaled around a point.
+// TW07's GoCamera.c has its empty CA_vInitOnce and CA_vCloseOnce and the first six named functions
+// after them in this order; the setters after them are GameCube copies of GoCamera.h's
 // inlines, and Camera_Subtract3 / Camera_Invert3 paired-single copies of LLMath's.
 
 #include "camera.h"
@@ -11,7 +11,6 @@
 void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);     // UMemPool.c: copy a 4x4 matrix
 void LLMath_InvertNormalized(f32 (*pSrc)[4], f32 (*pDst)[4]);     // UMemPool.c: rotation+translation inverse
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);                     // identity
-void CA_vSetDefaultScalingVectors(CamLens* pLens);
 f32  Math_Tan(f32 x);                              // tan, as a float
 void Camera_SetLensFarClip(u8* p, f32 v);             // GoTerrain.c: sets the lens's far clip, fAC
 void CA_vSetCameraViewToWorldMatrix(CamLens* pLens, f32 (*pMtx)[4]);
@@ -63,24 +62,24 @@ void Camera_SetCameraPositionAndTarget(CamLens* pLens, f32* pPos, f32* pTarget) 
     f32 vDir[4];
 
     CA_vSetDefaultScalingVectors(pLens);
-    pLens->m4[3][0] = pPos[0];
-    pLens->m4[3][1] = pPos[1];
-    pLens->m4[3][2] = pPos[2];
-    pLens->m4[3][3] = 1.0f;
+    pLens->mViewToWorld[3][0] = pPos[0];
+    pLens->mViewToWorld[3][1] = pPos[1];
+    pLens->mViewToWorld[3][2] = pPos[2];
+    pLens->mViewToWorld[3][3] = 1.0f;
     vDir[3] = 0.0f;
     Camera_Subtract3(pTarget, pPos, vDir);
     if ((f32)Math_Sqrt(LLMath_LengthSquared3(vDir)) > 0.1f) {
-        LLMath_Normalize3(vDir, pLens->m4[2]);
-        if (fabsf(pLens->m4[2][1]) < 0.99f) {
-            pLens->m4[0][0] = pLens->m4[2][2];
-            pLens->m4[0][1] = 0.0f;
-            pLens->m4[0][2] = -pLens->m4[2][0];
-            pLens->m4[0][3] = 0.0f;
-            LLMath_Normalize3(pLens->m4[0], pLens->m4[0]);
+        LLMath_Normalize3(vDir, pLens->mViewToWorld[2]);
+        if (fabsf(pLens->mViewToWorld[2][1]) < 0.99f) {
+            pLens->mViewToWorld[0][0] = pLens->mViewToWorld[2][2];
+            pLens->mViewToWorld[0][1] = 0.0f;
+            pLens->mViewToWorld[0][2] = -pLens->mViewToWorld[2][0];
+            pLens->mViewToWorld[0][3] = 0.0f;
+            LLMath_Normalize3(pLens->mViewToWorld[0], pLens->mViewToWorld[0]);
         }
-        vec4flt_CrossProduct(pLens->m4[2], pLens->m4[0], pLens->m4[1]);
+        vec4flt_CrossProduct(pLens->mViewToWorld[2], pLens->mViewToWorld[0], pLens->mViewToWorld[1]);
     }
-    LLMath_InvertNormalized(pLens->m4, pLens->m44);
+    LLMath_InvertNormalized(pLens->mViewToWorld, pLens->mWorldToView);
 }
 
 // The same as Camera_SetCameraPositionAndTarget with the lens's x axis given (pSide, normalised
@@ -89,59 +88,60 @@ void Camera_SetCameraPositionAndTargetWithSideVector(CamLens* pLens, f32* pPos, 
     f32 vDir[4];
 
     CA_vSetDefaultScalingVectors(pLens);
-    pLens->m4[3][0] = pPos[0];
-    pLens->m4[3][1] = pPos[1];
-    pLens->m4[3][2] = pPos[2];
-    pLens->m4[3][3] = 1.0f;
+    pLens->mViewToWorld[3][0] = pPos[0];
+    pLens->mViewToWorld[3][1] = pPos[1];
+    pLens->mViewToWorld[3][2] = pPos[2];
+    pLens->mViewToWorld[3][3] = 1.0f;
     vDir[3] = 0.0f;
     Camera_Subtract3(pTarget, pPos, vDir);
     if ((f32)Math_Sqrt(LLMath_LengthSquared3(vDir)) > 0.1f) {
-        LLMath_Normalize3(vDir, pLens->m4[2]);
-        pLens->m4[0][0] = pSide[0];
-        pLens->m4[0][1] = pSide[1];
-        pLens->m4[0][2] = pSide[2];
-        pLens->m4[0][3] = 0.0f;
-        LLMath_Normalize3(pLens->m4[0], pLens->m4[0]);
-        vec4flt_CrossProduct(pLens->m4[2], pLens->m4[0], pLens->m4[1]);
+        LLMath_Normalize3(vDir, pLens->mViewToWorld[2]);
+        pLens->mViewToWorld[0][0] = pSide[0];
+        pLens->mViewToWorld[0][1] = pSide[1];
+        pLens->mViewToWorld[0][2] = pSide[2];
+        pLens->mViewToWorld[0][3] = 0.0f;
+        LLMath_Normalize3(pLens->mViewToWorld[0], pLens->mViewToWorld[0]);
+        vec4flt_CrossProduct(pLens->mViewToWorld[2], pLens->mViewToWorld[0], pLens->mViewToWorld[1]);
     }
-    LLMath_InvertNormalized(pLens->m4, pLens->m44);
+    LLMath_InvertNormalized(pLens->mViewToWorld, pLens->mWorldToView);
 }
 
 // Aims the lens like Camera_SetCameraPositionAndTarget, then scales the world by pScale around
-// pCenter: m44 gets the scale, m4 its inverse (1 / pScale, kept in m84[0]).
+// pCenter: mWorldToView gets the scale, mViewToWorld its inverse (1 / pScale, kept in
+// aScalingVectors[0]).
 void Camera_SetCameraPositionAndTargetWithOffsetAndScale(CamLens* pLens, f32* pPos, f32* pTarget, f32* pCenter, f32* pScale) {
     f32 vDir[4];
     f32 mB[4][4];
     f32 mA[4][4];
     f32 mTmp[4][4];
 
-    LLMath_CopyVec(pScale, pLens->m84[1]);
-    Camera_Invert3(pLens->m84[1], pLens->m84[0]);
-    pLens->m4[3][0] = pPos[0];
-    pLens->m4[3][1] = pPos[1];
-    pLens->m4[3][2] = pPos[2];
-    pLens->m4[3][3] = 1.0f;
+    LLMath_CopyVec(pScale, pLens->aScalingVectors[1]);
+    Camera_Invert3(pLens->aScalingVectors[1], pLens->aScalingVectors[0]);
+    pLens->mViewToWorld[3][0] = pPos[0];
+    pLens->mViewToWorld[3][1] = pPos[1];
+    pLens->mViewToWorld[3][2] = pPos[2];
+    pLens->mViewToWorld[3][3] = 1.0f;
     vDir[3] = 0.0f;
     Camera_Subtract3(pTarget, pPos, vDir);
     if ((f32)Math_Sqrt(LLMath_LengthSquared3(vDir)) > 0.1f) {
-        LLMath_Normalize3(vDir, pLens->m4[2]);
-        if (fabsf(pLens->m4[2][1]) < 0.99f) {
-            pLens->m4[0][0] = pLens->m4[2][2];
-            pLens->m4[0][1] = 0.0f;
-            pLens->m4[0][2] = -pLens->m4[2][0];
-            pLens->m4[0][3] = 0.0f;
-            LLMath_Normalize3(pLens->m4[0], pLens->m4[0]);
+        LLMath_Normalize3(vDir, pLens->mViewToWorld[2]);
+        if (fabsf(pLens->mViewToWorld[2][1]) < 0.99f) {
+            pLens->mViewToWorld[0][0] = pLens->mViewToWorld[2][2];
+            pLens->mViewToWorld[0][1] = 0.0f;
+            pLens->mViewToWorld[0][2] = -pLens->mViewToWorld[2][0];
+            pLens->mViewToWorld[0][3] = 0.0f;
+            LLMath_Normalize3(pLens->mViewToWorld[0], pLens->mViewToWorld[0]);
         }
-        vec4flt_CrossProduct(pLens->m4[2], pLens->m4[0], pLens->m4[1]);
+        vec4flt_CrossProduct(pLens->mViewToWorld[2], pLens->mViewToWorld[0], pLens->mViewToWorld[1]);
     }
-    LLMath_InvertNormalized(pLens->m4, pLens->m44);
+    LLMath_InvertNormalized(pLens->mViewToWorld, pLens->mWorldToView);
 
     // world to camera: move pCenter to the origin, scale, move it back
     LLMath_IdentifyMat(mTmp);
     mTmp[3][0] = pCenter[0];
     mTmp[3][1] = pCenter[1];
     mTmp[3][2] = pCenter[2];
-    LLMath_mat44fltMultiplyList(mTmp, pLens->m44, mB, 4);
+    LLMath_mat44fltMultiplyList(mTmp, pLens->mWorldToView, mB, 4);
     LLMath_IdentifyMat(mTmp);
     mTmp[0][0] = pScale[0];
     mTmp[1][1] = pScale[1];
@@ -151,7 +151,7 @@ void Camera_SetCameraPositionAndTargetWithOffsetAndScale(CamLens* pLens, f32* pP
     mTmp[3][0] = -pCenter[0];
     mTmp[3][1] = -pCenter[1];
     mTmp[3][2] = -pCenter[2];
-    LLMath_mat44fltMultiplyList(mTmp, mA, pLens->m44, 4);
+    LLMath_mat44fltMultiplyList(mTmp, mA, pLens->mWorldToView, 4);
 
     // camera to world: the same with the inverse scale
     LLMath_IdentifyMat(mTmp);
@@ -159,18 +159,19 @@ void Camera_SetCameraPositionAndTargetWithOffsetAndScale(CamLens* pLens, f32* pP
     mTmp[3][1] = pCenter[1];
     mTmp[3][2] = pCenter[2];
     LLMath_IdentifyMat(mB);
-    mB[0][0] = pLens->m84[0][0];
-    mB[1][1] = pLens->m84[0][1];
-    mB[2][2] = pLens->m84[0][2];
+    mB[0][0] = pLens->aScalingVectors[0][0];
+    mB[1][1] = pLens->aScalingVectors[0][1];
+    mB[2][2] = pLens->aScalingVectors[0][2];
     LLMath_mat44fltMultiplyList(mB, mTmp, mA, 4);
     LLMath_IdentifyMat(mTmp);
     mTmp[3][0] = -pCenter[0];
     mTmp[3][1] = -pCenter[1];
     mTmp[3][2] = -pCenter[2];
     LLMath_mat44fltMultiplyList(mTmp, mA, mB, 4);
-    LLMath_mat44fltMultiplyList(pLens->m4, mB, mA, 4);
-    LLMath_CopyMat44(mA, pLens->m4);
-    LLMath_mat44fltMultiplyList(pLens->m4, pLens->m44, mB, 4);   // the result is never used
+    LLMath_mat44fltMultiplyList(pLens->mViewToWorld, mB, mA, 4);
+    LLMath_CopyMat44(mA, pLens->mViewToWorld);
+    // the result is never used
+    LLMath_mat44fltMultiplyList(pLens->mViewToWorld, pLens->mWorldToView, mB, 4);
 }
 
 // A new lens's settings: a perspective camera, near clip 0.1 and far clip 4096, a 60-degree field
@@ -191,11 +192,11 @@ void CA_vSetCameraFlatSize(CamLens* pLens, f32 fB4, f32 fB8) {
 // Sets the lens's camera-to-world matrix (pMtx, or the identity when NULL) and its inverse.
 void CA_vSetCameraViewToWorldMatrix(CamLens* pLens, f32 (*pMtx)[4]) {
     if (pMtx == NULL) {
-        LLMath_IdentifyMat(pLens->m4);
-        LLMath_IdentifyMat(pLens->m44);
+        LLMath_IdentifyMat(pLens->mViewToWorld);
+        LLMath_IdentifyMat(pLens->mWorldToView);
     } else {
-        LLMath_CopyMat44(pMtx, pLens->m4);
-        LLMath_InvertNormalized(pMtx, pLens->m44);
+        LLMath_CopyMat44(pMtx, pLens->mViewToWorld);
+        LLMath_InvertNormalized(pMtx, pLens->mWorldToView);
     }
     CA_vSetDefaultScalingVectors(pLens);
 }

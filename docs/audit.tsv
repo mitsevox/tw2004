@@ -125,6 +125,7 @@ GoShaderObject_Rain_Gc.c	open
 GoStaticCam.c	done	3dfcfcd0	claude-review
 GoTerrain.c	open		
 GoTerrainCollision.c	open		
+GoViewCont.c	open		
 GoViewport.c	done	a131c343	claude-review
 Golfer.c	open		
 GxUtil.c	open		
@@ -199,7 +200,6 @@ UObject.c	open
 UObject3D.c	open		
 URes.c	done	e845bd03	claude-review
 UStream.c	open		
-ViewController.c	open		
 Wind.c	open		
 ai_brain.c	open		
 animblender.c	open		

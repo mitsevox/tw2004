@@ -2123,8 +2123,8 @@ void Character_ClipTest(Character* pChar, int nPlayer) {
     pChar->nClipResult = fn_80007D74(&sSphereInCamSpace, RC_spGetCurrentRenderCtx(), 0);
     sSphereInCamSpace.radius = 3.0f;
     pChar->nShadowClipResult = fn_80007D74(&sSphereInCamSpace, RC_spGetCurrentRenderCtx(), 0);
-    Char_Vec4Sub(pMat[3], Camera_GetCurrentLens()->m4[3], vDir);
-    fDot = Vec3_Dot(Camera_GetCurrentLens()->m4[2], vDir);
+    Char_Vec4Sub(pMat[3], Camera_GetCurrentLens()->mViewToWorld[3], vDir);
+    fDot = Vec3_Dot(Camera_GetCurrentLens()->mViewToWorld[2], vDir);
     fDist = (f32)Math_Sqrt(LLMath_LengthSquared3(vDir));
     if (fDist < pChar->fNearestCamDist) {
         pChar->fNearestCamDist = fDist;

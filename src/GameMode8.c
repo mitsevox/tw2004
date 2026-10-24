@@ -1375,7 +1375,7 @@ void SpeedGolf_RunUpdate(int nPlayer) {
         SpeedGolf_Vec4Sub(pBall->vPos,
                           Camera_GetLens(
                                   ViewController_GetIndexedViewController(
-                                          gPlayers[nPlayer].nView[0])->pCamera)->m4[3],
+                                          gPlayers[nPlayer].nView[0])->pRenderContext)->mViewToWorld[3],
                           vDir);
         fDist = (fToPlace <= (f32)Math_Sqrt(vDir[0] * vDir[0] + vDir[2] * vDir[2]))
 

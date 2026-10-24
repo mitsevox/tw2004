@@ -922,7 +922,7 @@ config.libs = [
             Object(Matching, "streammanagerhole.c"),
             Object(Matching, "Code80015470.c"),
             Object(Matching, "Code80016198.c"),
-            Object(Matching, "ViewController.c"),
+            Object(Matching, "GoViewCont.c"),
             Object(Matching, "char.c"),
             Object(Matching, "mtalib.c"),
             Object(Matching, "ska_shared.c"),

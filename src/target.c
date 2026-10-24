@@ -148,11 +148,11 @@ void TARGET_RenderBallTarget(int nPlayer) {
     pCamera = ViewController_GetRenderContext(gPlayers[nPlayer].nView[0]);
     aMarkerQuad[0][0] = 2.0f * lbl_801D5BF0[nPlayer].f24;
     aMarkerQuad[0][1] = 2.0f * lbl_801D5BF0[nPlayer].f24
-            / ViewController_GetCameraControl(gPlayers[nPlayer].nView[0])->f54;
+            / ViewController_GetCameraControl(gPlayers[nPlayer].nView[0])->vViewScale[1];
     aMarkerQuad[0][2] = -lbl_801D5BF0[nPlayer].f24;
     aMarkerQuad[1][0] = 2.0f * lbl_801D5BF0[nPlayer].f24;
     aMarkerQuad[1][1] = 2.0f * lbl_801D5BF0[nPlayer].f24
-            / ViewController_GetCameraControl(gPlayers[nPlayer].nView[0])->f54;
+            / ViewController_GetCameraControl(gPlayers[nPlayer].nView[0])->vViewScale[1];
     aMarkerQuad[1][2] = lbl_801D5BF0[nPlayer].f24;
     aMarkerQuad[2][0] = 0.0f;
     aMarkerQuad[2][1] = 0.0f;
@@ -427,7 +427,7 @@ u8 TARGET_UpdateMomentums(int nPlayer) {
         if (gPlayers[nPlayer].nShotKind == 0) {
             fTurn = PI / 360.0f * gPlayers[nPlayer].fA5C;
         }
-        fn_8006A964(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0])->v0,
+        fn_8006A964(ViewController_GetCameraControl(gPlayers[nPlayer].nView[0])->vOrigin,
                     gPlayers[nPlayer].vBall, vToCamera);
         vToCamera[1] = 0.0f;
         fCameraDist = 0.05f * (f32)Math_Sqrt(LLMath_LengthSquared3(vToCamera));
@@ -1020,11 +1020,11 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
     // the marker's height: kept where the camera can see it (within 3/4 of its field of view)
     fHalfFov = CA_fGetCameraFieldOfView(Camera_GetCurrentLens());
     fHalfFov = 0.75f * fHalfFov * VM_fGetViewportHeightOverWidth(RC_spGetCurrentRenderCtxViewport());
-    fn_8006A964(pView->v10, pView->v0, vDir);
+    fn_8006A964(pView->vLookPoint, pView->vOrigin, vDir);
     if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
         LLMath_Normalize3(vDir, vDir);
     }
-    fn_8006A964(vPos, pView->v0, vRel);
+    fn_8006A964(vPos, pView->vOrigin, vRel);
     fDotX = vDir[0] * vRel[0];
     fDotZ = vDir[2] * vRel[2];
     fCos2 = cosf(fHalfFov / 2.0f - PI / 180.0f);

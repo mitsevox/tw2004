@@ -156,6 +156,8 @@ void mat44flt_ExtractEulerAngles(f32 (*pMtx)[4], f32* pYaw, f32* pPitch, f32* pR
 // A rotation matrix from yaw (about y), pitch (about x) and roll (about z), radians, into rows 0-2
 // of pMtx (UMemPool.c).
 void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 fYaw, f32 fPitch, f32 fRoll);
+// Inverts a rotation-plus-translation matrix into pDst (UMemPool.c).
+void LLMath_InvertNormalized(f32 (*pSrc)[4], f32 (*pDst)[4]);
 void Math_InitLog2Table(void);                 // make the log2 table (gLog2Table)
 void Math_FreeLog2Table(void);                 // free the log2 table
 double acos(double x);                  // 0x8015F784 (MSL)
@@ -1076,7 +1078,7 @@ extern f32 lbl_80281120[2];     // 1, 0
 // ---- the screen effects (GoPostFx.c) ---------------------------------------------------------
 
 // Three effects per view (four views each; our names), each drawn once when set, then cleared.
-// A colour drawn over the view (fn_80038010 sets it, fn_80038438 draws it).
+// A colour drawn over the view (PostFx_SetFade sets it, fn_80038438 draws it).
 typedef struct PostFxTint {
     u8   b0;                    // 0x00  set: draw it this frame
     u8   unk1[3];
@@ -1084,7 +1086,7 @@ typedef struct PostFxTint {
 } PostFxTint;
 LAYOUT_ASSERT(PostFxTint, 0x14);
 
-// Set by fn_80038054, drawn by fn_80038724.
+// Set by PostFx_SetBlur, drawn by fn_80038724.
 typedef struct PostFx5090 {
     u8   b0;                    // 0x00  set: draw it this frame
     u8   unk1[3];
@@ -1110,6 +1112,9 @@ extern PostFx5020 lbl_801D5020[4];
 extern PostFx5090 lbl_801D5090[4];
 extern PostFxTint lbl_801D50C0[4];
 extern void* lbl_80281D80;      // a 256 x 224 screen copy, only in game types 4..8
+
+void PostFx_SetFade(u8 b, int nView, f32* pColour);     // sets (b) or clears view nView's colour
+void PostFx_SetBlur(u8 b, int nView, f32 f4, f32 f8);   // sets (b) or clears view nView's blur
 
 // ---- the file streamer (UStream.c) -----------------------------------------------------------
 

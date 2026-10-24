@@ -61,10 +61,6 @@ void DS_vCloseModule(void);
 void fn_80016198(void);
 void fn_800162A0(void);
 void fn_800162A4(int nField);
-void ViewController_ResetAll(void);
-void ViewController_SetCurrentViewController(int nView);
-void ViewController_Delete(int nView);
-void ViewController_Update(int nView);
 void CharacterTex_TextureLoader(void);
 void Character_PostInit(void);
 void Character_ClipTest(Character* pChar, int nPlayer);
@@ -333,7 +329,7 @@ void fn_8006E0BC(void);
 u8   fn_8006E0C0(void);
 void fn_8006E0F8(void);
 
-s32 lbl_801888D0[4] = {0, 1, 2, 3};     // the order the views are drawn in
+s32 lbl_801888D0[VIEWCONTROLLER_NUM_VIEWS] = {0, 1, 2, 3};     // the order the views are drawn in
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0f (0x802838C0), before the constants fn_8006C968 uses first; its body is unknown.
@@ -834,7 +830,7 @@ void fn_8006D27C(void) {
     DynObj_UpdateDynamicObjects();
     fn_80099344(gSession.fFrameTime);
     fn_800B2724();
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < VIEWCONTROLLER_NUM_VIEWS; i++) {
         nView = lbl_801888D0[i];
         if (!ViewController_IsActive(nView)) continue;
         nState = GOLFERSTATE_GetCurrentState(ViewController_GetActivePlayerNumber(nView));

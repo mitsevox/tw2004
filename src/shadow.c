@@ -28,7 +28,6 @@ void RC_vSetCurrentRenderCtx(void* pCamera);        // makes it the current rend
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);       // identity
 void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: copy a 4x4 matrix
 void LLMath_InvertNormalized(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: inverts a rotation+translation
-void CA_vSetDefaultScalingVectors(CamLens* pLens);
 f32  Math_Tan(f32 x);                // tan, as a float
 void fn_800B2470(void);
 void fn_800B281C(void);
@@ -613,16 +612,15 @@ void fn_800B3460(f32* pA, f32* pB, f32* pOut) {
 }
 #endif
 
-// Give a lens its world-to-camera matrix pMtx (m44) and the inverse at +0x04; NULL resets both
-// to the identity.
+// Give a lens its world-to-camera matrix pMtx (mWorldToView) and the inverse (mViewToWorld); NULL
+// resets both to the identity.
 void fn_800B3484(CamLens* pLens, f32 (*pMtx)[4]) {
     if (pMtx == NULL) {
-        // the matrix at +0x04 overlaps the v4/v24/v34 rows (camera.h)
-        LLMath_IdentifyMat(pLens->m4);
-        LLMath_IdentifyMat(pLens->m44);
+        LLMath_IdentifyMat(pLens->mViewToWorld);
+        LLMath_IdentifyMat(pLens->mWorldToView);
     } else {
-        LLMath_CopyMat44(pMtx, pLens->m44);
-        LLMath_InvertNormalized(pMtx, pLens->m4);
+        LLMath_CopyMat44(pMtx, pLens->mWorldToView);
+        LLMath_InvertNormalized(pMtx, pLens->mViewToWorld);
     }
     CA_vSetDefaultScalingVectors(pLens);
 }
