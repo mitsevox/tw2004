@@ -3,7 +3,8 @@ Working on the code
 
 The match is complete, so work on the code is about how it reads: names, types, prototypes and
 comments, under [`style.md`](style.md). Every change must keep the build byte-identical. All
-commands run from the checkout root.
+commands run from the checkout root. How audit passes are written, reviewed and landed is in
+[`audit-process.md`](audit-process.md).
 
 Build and score
 ---------------
