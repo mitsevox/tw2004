@@ -336,14 +336,14 @@ void fn_801132C4(SkinMeshRefs* pRefs) {
         DCFlushRange(lbl_802824F0, uSize);
         pTexCoords = pRefs->p1C;
         GXInvalidateVtxCache();
-        GXSetVtxAttrFmt(1, GX_VA_POS, 1, 4, 0);         // positions: xyz floats
+        GXSetVtxAttrFmt(1, GX_VA_POS, 1, 4, 0); // positions: xyz floats
         GXSetVtxAttrFmt(1, 10, 0, 1, 6);        // normals: s8, 6 fraction bits
         GXSetVtxAttrFmt(1, 13, 1, 3, 12);       // texture coordinates: s16 pairs, 12 fraction bits
         GXSetArray(GX_VA_POS, pPosBuf, 12);
         GXSetArray(10, pNormalBuf, 3);
         GXSetArray(13, pTexCoords, 4);
         GXClearVtxDesc();
-        GXSetVtxDesc(GX_VA_POS, 3);                     // all three by 16-bit index
+        GXSetVtxDesc(GX_VA_POS, 3);             // all three by 16-bit index
         GXSetVtxDesc(10, 3);
         GXSetVtxDesc(13, 3);
     }

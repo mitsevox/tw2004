@@ -179,8 +179,8 @@ engine.h `ModuleHooks`). Particles, rain and the ball's effects sit here too.
 | GoShaderObjectContainer_OBFData_Gc.c | EA | copies a shader object's chunks into GPU-ready buffers *(last function's file unverified)* |
 | GoShaderObject_PrelitTextured_Gc.c | ours (after TW06) | row 0's hooks: a prelit, textured mesh on a dynamic rendering buffer |
 | DynamicRenderingBuffer.c | ours | vertices a shader object rewrites each frame (EA's header name `GoShaderObjectCommon_DynamicRenderingBuffer_Gc.h`) *(first function's file unverified)* |
-| GoShaderObject_PrelitRGBAUVAnimation_Gc.c | ours (after TW06) | row 4's static hooks: a display list whose texture scrolls |
-| GoShaderObject_PrelitTexturedMorph_Gc.c | ours (after TW06) | row 2's static hooks: a display list whose vertices morph |
+| GoShaderObject_PrelitRGBAUVAnimation_Gc.c | ours (after TW06) | row 4's static hooks: a display list whose texture scrolls *(last function's file unverified: the split from the next file follows TW06's file per shader type, not this game's data)* |
+| GoShaderObject_PrelitTexturedMorph_Gc.c | ours (after TW06) | row 2's static hooks: a display list whose vertices morph *(first function's file unverified, as above)* |
 | GoShaderObject_PrelitUVAnimation_Gc.c | EA | row 5: prelit geometry with scrolling textures; init/close of every shader type |
 | GoShaderObjectCommon_ShaderObjectsData_Gc.c | EA | builds the display lists that draw shader objects |
 | GoShaderObjectCommon_TexAnimManager_Gc.c | EA | scrolling-texture matrices |

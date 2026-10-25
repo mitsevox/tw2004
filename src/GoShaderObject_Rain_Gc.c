@@ -83,7 +83,7 @@ void fn_800B4C00(RainList* pList, int nDrops) {
     GXBeginDisplayList(pBuf, uSize);
     GXResetWriteGatherPipe();
     GXClearVtxDesc();
-    GXSetVtxDesc(GX_VA_POS, 1);         // position, direct
+    GXSetVtxDesc(GX_VA_POS, 1); // position, direct
     GXSetVtxDesc(11, 2);        // colour 0, an 8-bit index
     GXInvalidateVtxCache();
     fn_80012520(0xA8, 4, nDrops * 2);   // lines
@@ -202,7 +202,7 @@ void fn_800B4FA4(RainObject* pRain) {
     fn_800B58FC(mPos[2], mPos[2]);
     GXLoadPosMtxImm(mPos, 0);
     GXClearVtxDesc();
-    GXSetVtxDesc(GX_VA_POS, 1);         // position, colour, texture coordinates: direct
+    GXSetVtxDesc(GX_VA_POS, 1); // position, colour, texture coordinates: direct
     GXSetVtxDesc(11, 1);
     GXSetVtxDesc(13, 1);
     GXInvalidateVtxCache();

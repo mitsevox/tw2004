@@ -1114,7 +1114,7 @@ void fn_80076B7C(void);             // make the manager
 void fn_80076BC4(void);             // free it
 void TexAnim_Update(f32 fFrame);    // set the clock and move every matrix
 f32  fn_80076E18(void);             // the clock
-void TexAnim_RemoveAll(void);       // forget every animation
+void TexAnim_RemoveAll(void);       // forget every animation, clock back to 0
 
 // A shader object that scrolls its texture (GoShaderObject_PrelitUVAnimation_Gc.c, row 5 of
 // lbl_80188E88): a DynRenderObject with its own texture matrix, loaded as matrix 0x39.

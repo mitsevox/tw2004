@@ -16,7 +16,8 @@ void SD_vShaderObject_PrelitRGBAUVAnimation_Static_Init(StaticShaderObject* pObj
     ShaderData_BuildDisplayList(pObj->pArrays, pObj->eType, &pObj->anim, pCmds);
 }
 
-// Close the object, and forget every texture animation (every object's, not only this one's).
+// Close the object, forget every texture animation (every object's, not only this one's) and set
+// the texture animation clock back to 0.
 void SD_vShaderObject_PrelitRGBAUVAnimation_Static_Close(StaticShaderObject* pObj) {
     ShaderData_CloseDisplayList(&pObj->anim);
     TexAnim_RemoveAll();

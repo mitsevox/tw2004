@@ -82,7 +82,7 @@ void DynRenderBuffer_Draw(DynRenderBuffer* pBuf, u32 nStart, u16 nCount, int nPr
     GXSetArray(13, pBuf->apTexCoord[nBuffer], 8);     // GX_VA_TEX0
     GXSetArray(11, pBuf->apColour[nBuffer], 4);       // GX_VA_CLR0
     GXClearVtxDesc();
-    GXSetVtxDesc(GX_VA_POS, 3);                                // 16-bit indices
+    GXSetVtxDesc(GX_VA_POS, 3);                        // 16-bit indices
     GXSetVtxDesc(11, 3);
     GXSetVtxDesc(13, 3);
     fn_80012520(lbl_8018C7C8[nPrim], 2, nCount);
