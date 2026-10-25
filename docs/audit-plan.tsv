@@ -66,7 +66,7 @@ order	area	file	task	scope	state
 63	Audio	startUp.c	chunk 1/2	HwVoice_MixerCallback .. AudAram_Free	open
 64	Audio	startUp.c	chunk 2/2	AudAram_AllocStreamBuffer .. Startup_LoadOptionsFromCard	open
 65	Audio	startUp.c	whole-file review	the whole file	open
-66	Audio	hlaudmic.c	pass	the whole file	open
+66	Audio	hlaudmic.c	pass	the whole file	done
 67	Audio	AudReverb.c	pass	the whole file	open
 68	Audio	hlaudmovie.c	pass	the whole file	open
 69	Audio	hlaudvoice.c	pass	the whole file	open

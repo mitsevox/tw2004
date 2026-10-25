@@ -218,7 +218,7 @@ gocamscripts.c	open
 gomainloop.c	open		
 hlaudemitter.c	done	6e08fca1b823	claude-review
 hlaudemitterpool.c	open		
-hlaudmic.c	open		
+hlaudmic.c	done	b1dd4c3b	claude-review
 hlaudmovie.c	open		
 hlaudsession.c	open		
 hlaudtrack.c	open		
