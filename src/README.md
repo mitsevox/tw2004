@@ -525,7 +525,6 @@ Small sweep files whose file and subsystem are not known:
 | File | What it is |
 |---|---|
 | unsorted/sweep_8003944C.c | a function returning 0, between GoPostFx.c and GoDynamicCam.c |
-| unsorted/sweep_80095744.c, sweep_80095780.c, sweep_80095798.c, sweep_800957B0.c, sweep_800957D8.c | setters and getters of an object's +0x18..+0x2C fields, between Code80095564.c and CharAnim.c |
 
 In the SDK and runtime address range, not EA code: `unsorted/sweep_801338E0.c` (EXI2 / debugger
 stubs), `sweep_801654D0.c`, `sweep_801654F4.c`, `sweep_80165524.c` (Metrowerks critical sections;

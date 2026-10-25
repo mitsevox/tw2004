@@ -387,8 +387,8 @@ order	area	file	task	scope	state
 383	Front end and UI	FE_MessageTable.c	whole-file review	the whole file	open
 384	Front end and UI	uiProcessInterface.c	pass	the whole file	open
 385	Unplaced	unsorted/sweep_8003944C.c	fold	prove its file and fold it in	open
-386	Unplaced	unsorted/sweep_80095780.c	fold	prove its file and fold it in	open
-387	Unplaced	unsorted/sweep_80095798.c	fold	prove its file and fold it in	open
-388	Unplaced	unsorted/sweep_800957B0.c	fold	prove its file and fold it in	open
-389	Unplaced	unsorted/sweep_80095744.c	fold	prove its file and fold it in	open
-390	Unplaced	unsorted/sweep_800957D8.c	fold	prove its file and fold it in	open
+386	Unplaced	unsorted/sweep_80095780.c	fold	prove its file and fold it in	done
+387	Unplaced	unsorted/sweep_80095798.c	fold	prove its file and fold it in	done
+388	Unplaced	unsorted/sweep_800957B0.c	fold	prove its file and fold it in	done
+389	Unplaced	unsorted/sweep_80095744.c	fold	prove its file and fold it in	done
+390	Unplaced	unsorted/sweep_800957D8.c	fold	prove its file and fold it in	done

@@ -1144,11 +1144,6 @@ config.libs = [
             Object(Matching, "GoDynObjBase.c"),
             Object(Matching, "unsorted/sweep_8006FF2C.c"),
             Object(Matching, "ShaderRow0.c"),
-            Object(Matching, "unsorted/sweep_80095744.c"),
-            Object(Matching, "unsorted/sweep_80095780.c"),
-            Object(Matching, "unsorted/sweep_80095798.c"),
-            Object(Matching, "unsorted/sweep_800957B0.c"),
-            Object(Matching, "unsorted/sweep_800957D8.c"),
 
             Object(Matching, "unsorted/sweep_8009A844.c"),
             Object(Matching, "Main.c"),

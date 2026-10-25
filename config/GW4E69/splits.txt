@@ -700,23 +700,8 @@ unsorted/sweep_8009554C.c:
 Code80095564.c:
 	.text       start:0x80095564 end:0x80095744
 
-unsorted/sweep_80095744.c:
-	.text       start:0x80095744 end:0x80095780
-
-unsorted/sweep_80095780.c:
-	.text       start:0x80095780 end:0x80095798
-
-unsorted/sweep_80095798.c:
-	.text       start:0x80095798 end:0x800957B0
-
-unsorted/sweep_800957B0.c:
-	.text       start:0x800957B0 end:0x800957D8
-
-unsorted/sweep_800957D8.c:
-	.text       start:0x800957D8 end:0x800957FC
-
 CharAnim.c:
-	.text       start:0x800957FC end:0x80097208
+	.text       start:0x80095744 end:0x80097208
 	.rodata     start:0x80183A70 end:0x80183A98
 	.data       start:0x80189CE8 end:0x80189D30
 	.bss        start:0x801D9908 end:0x801D99D0
