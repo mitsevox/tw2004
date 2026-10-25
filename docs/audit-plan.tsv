@@ -113,7 +113,7 @@ order	area	file	task	scope	state
 110	Characters	hwsOverride_Gc.c	pass	the whole file	open
 111	Characters	char_tex_manager.c	pass	the whole file	open
 112	Characters	mtalib.c	pass	the whole file	open
-113	Characters	Code80095564.c	pass	the whole file	open
+113	Characters	char_skin.c	pass	the whole file	open
 114	Characters	ska_shared.c	pass	the whole file	open
 115	Characters	DynChain.c	pass	the whole file	open
 116	Characters	hwsRender_Gc.c	pass	the whole file	open

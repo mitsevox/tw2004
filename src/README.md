@@ -299,7 +299,7 @@ choice, and the golfer's streamed textures and clothes.
 | Code80037AB8.c | ph | split off Skin.c: bone inverse matrices, morph weights from a pose, frees description bits |
 | animblender.c | T6 *(name unproven)* | blend trees (`SKABlendNode`) and the animation player (`TSKATime`) |
 | CharAnim.c | ours (TW06: `char_state.c`) | the golfer's animation state: clip-group blends, idle and emotion updates, queued state changes |
-| Code80095564.c | ph | with a single view, frees every golfer's body skin |
+| char_skin.c | T03 | in a single view, which golfer's body skin has its render data |
 | AnimStream.c | EA | clip streaming for groups 1 and 5 (turned off in every case); base-40 name codes |
 | SkinPart.c | EA | a skin's parts (e.g. the glove), variants, options and sets |
 | CharSliders.c | EA | body sliders: definitions, bone and morph-target blending |
@@ -530,7 +530,7 @@ Small sweep files whose file and subsystem are not known:
 | File | What it is |
 |---|---|
 | unsorted/sweep_8003944C.c | a function returning 0, between GoPostFx.c and GoDynamicCam.c |
-| unsorted/sweep_80095744.c, sweep_80095780.c, sweep_80095798.c, sweep_800957B0.c, sweep_800957D8.c | setters and getters of an object's +0x18..+0x2C fields, between Code80095564.c and CharAnim.c |
+| unsorted/sweep_80095744.c, sweep_80095780.c, sweep_80095798.c, sweep_800957B0.c, sweep_800957D8.c | setters and getters of an object's +0x18..+0x2C fields, between char_skin.c and CharAnim.c |
 
 In the SDK and runtime address range, not EA code: `unsorted/sweep_801338E0.c` (EXI2 / debugger
 stubs), `sweep_801654D0.c`, `sweep_801654F4.c`, `sweep_80165524.c` (Metrowerks critical sections;

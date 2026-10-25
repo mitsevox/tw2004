@@ -168,8 +168,6 @@ void  SKN_CloseModule(void);
 void  fn_80095554(void);
 void  fn_8009555C(void);
 void  fn_80095560(void);
-void  fn_80095564(void);
-void  fn_800955F0(int nPlayer);
 void  sApplyUserLogos(void* pChar, void* pModel, SkinChoices* pChoices);   // char_tex_manager.c
 void  fn_8010BA2C(void* p);
 void  FE_StreamInterruptState(void);               // FEgolferanim.c
@@ -740,7 +738,7 @@ void Character_SetPreferedPos(Character* pChar) {
             fn_80037AB8(pChar->pSkin, pChar->pModel, 0, 0);
             SKEL_SetSkinBonePoses(pChar->pModel, pChar->pSkin->pModel->p34);
             SKEL_SetDefaultWorld2BoneMatrices(pChar->pModel, pChar->pSkin->pWorld2Bone);
-            SKEL_SetSkinningMatrices(pChar->pModel, pChar->pSkin->pSkinMtx, pChar->pSkin->pModel->n14);
+            SKEL_SetSkinningMatrices(pChar->pModel, pChar->pSkin->pSkinMtx, pChar->pSkin->pModel->nBones);
         }
     }
 }
@@ -2402,10 +2400,10 @@ void Character_CloseIG(void) {
     CharacterTex_Close();
 }
 
-// The characters' step at the end of each hole (fn_80095564: outside split screen, every player's
-// skin frees what loading it allocated).
+// The characters' step at the end of each hole: in a single view, every player's golfer's body skin
+// gives back its render data (CharacterSkin_FreeAll).
 void Character_ExitHole(void) {
-    fn_80095564();
+    CharacterSkin_FreeAll();
 }
 
 // Starts the characters for the front end (GO_vInitFE): the dynamic texture pool, IK off, blend
@@ -3061,13 +3059,13 @@ void Character_ResetBlenders(Character* pChar) {
 
 // Wakes the player's golfer for its turn (stateFunc's PreShot, InitialFlyBy and PlaceBall):
 // uCharFlags bit 0x40 cleared so it is drawn again (Character_Sleep set it), its body skin made the
-// loaded one in single view (fn_800955F0) and its textures streamed
+// only one with render data in single view (CharacterSkin_LoadOnlyPlayer) and its textures streamed
 // (CharacterTex_StartStreamingPlayers). In single view, when it is not the golfer last prepared
 // (gCharTexStreamedPlayer), it is also flagged to be dressed again
 // (Character_RequestClothesUpdateIG).
 void Character_PrepareForRendering(int nPlayer) {
     gPlayers[nPlayer].pChar->uCharFlags &= ~0x40;
-    fn_800955F0(nPlayer);
+    CharacterSkin_LoadOnlyPlayer(nPlayer);
     CharacterTex_StartStreamingPlayers(nPlayer);
     if (!gSession.nSplitScreen && gCharTexStreamedPlayer != nPlayer) {
         Character_RequestClothesUpdateIG(nPlayer);
