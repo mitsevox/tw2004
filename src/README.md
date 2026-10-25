@@ -49,14 +49,14 @@ see [Game modes](#game-modes).
 | `n290`, `pfn3C`, `u04`, `b0F` | struct fields not named yet: a type letter and the field's offset. `unkXXX` is space no code touches |
 | `// fake match:` | a compiler trick that reproduces EA's bytes (a filler function, a dead store, a register pin); logic unchanged, tagged so it can be removed later |
 | Generated units | `AXComp.c` and `DSPCode.c` (SDK data) and the game's asset fragments are generated from your own `main.dol` at build time (`tools/build/gendata.py`), never committed (`docs/workflow.md` "Units generated from main.dol") |
-| `unsorted/sweep_*.c` | small functions whose EA file isn't proven yet; `fold.py` merges them into their unit |
+| *(... unverified)* | a file boundary that nothing proves: the functions there went to the neighbour the evidence favours, and the commit that moved them gives the evidence for and against (`docs/audit-process.md`, "Folds and other code moves") |
 
 In the file tables, **Name** says where the file name comes from (the file's header comment has the
 details): **EA** EA's own name in this binary (an assert or file string); **T6** / **T7** EA's file
 name in Tiger Woods 2006 / 2007, whose functions match these; **T03** / **T05** a source path in
 Tiger Woods 2003 / 2005 (EA's file string there); **M03** Madden NFL 2003's debug
 symbols; **ours** a name we chose for what the file does; **ph** a placeholder named after its
-address (`CodeXXXXXXXX.c`, `unsorted/*`), its original file unknown.
+address (`CodeXXXXXXXX.c`), its original file unknown.
 Files are listed in link order (address order) within each group.
 
 ## Subsystems
