@@ -78,7 +78,7 @@ typedef struct CourseList {
 const CourseList lbl_80184D40 = {{0, 1, 2, 3, 0, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20}};
 
 // A course counts as unlocked when any of the five profiles (or the second block) has its flag.
-#define COURSE_UNLOCKED(c, k) (gpSaveData[k].aCourseUnlocked[c] || lbl_80281DF4->aCourseUnlocked[c])
+#define COURSE_UNLOCKED(c, k) (gpSaveData[k].aCourseUnlocked[c] || gpPasswordUnlocks->aCourseUnlocked[c])
 
 // Three floats: pOut gets pA minus pB.
 #ifdef __MWERKS__
@@ -1089,7 +1089,7 @@ void GM_SetupDefaultProfile(void) {
         }
     }
     bAny = 0;
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < SAVE_NUM_SLOTS; i++) {
         if (gpSaveData[i].bActive == 1) {
             bAny = 1;
         }
@@ -1189,7 +1189,7 @@ void GM_BuildRandom18(void) {
         }
         nCourse = courses.a[nPick];
         for (k = 0; k < 20; k++) {
-            for (i = 0; i < 5; i++) {
+            for (i = 0; i < SAVE_NUM_SLOTS; i++) {
                 if (COURSE_UNLOCKED(k, i)) {
                     break;
                 }

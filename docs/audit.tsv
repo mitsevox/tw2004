@@ -267,4 +267,4 @@ unsorted/sweep_80097EC4.c	open
 unsorted/sweep_8009A844.c	open		
 unsorted/sweep_8009B314.c	open		
 urandom.c	done	9f000176	claude-review
-user.c	open		
+user.c	done	d1383be8	claude-review
