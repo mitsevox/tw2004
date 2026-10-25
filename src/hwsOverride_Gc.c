@@ -14,8 +14,8 @@ s32 fn_80112804(SkinDesc* pDesc) {
     int i;
 
     for (i = 0; i < pDesc->nOverrideMeshes; i++) {
-        if (pDesc->p34[i].uFlags & 0x100000) {
-            nSize += pDesc->p34[i].nSize;
+        if (pDesc->pMeshes[i].uFlags & 0x100000) {
+            nSize += pDesc->pMeshes[i].nSize;
         }
     }
     return nSize;
@@ -112,7 +112,7 @@ void* fn_80112A80(HwsMemBlock* pBlock, HwsOverrideTable* pTable, int i, u8 bKeep
     if (bKeep && pTable->apMesh[i] != NULL) {
         return pTable->apMesh[i];
     }
-    p = fn_80112938(pBlock, pTable->pDesc->p34[i].nSize);
+    p = fn_80112938(pBlock, pTable->pDesc->pMeshes[i].nSize);
     pTable->apMesh[i] = p;
     return p;
 }

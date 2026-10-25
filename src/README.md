@@ -281,7 +281,7 @@ choice, and the golfer's streamed textures and clothes.
 | skalib.c | EA | the animation library: SAL libraries and BNK clip banks in three slots, clip choice |
 | Skeleton.c | EA | the skeleton: IK chains and weights, per-bone factors |
 | Skin.c | EA | a skinned model: bone matrices, morph weights, drawing |
-| Code80037AB8.c | ph | split off Skin.c: bone inverse matrices, morph weights from a pose, frees description bits |
+| SkinUtil.c | ours | a skin's rest pose and default world-to-bone matrices, the body skin's morph weights from the animation, freeing a skin; the screen copy's globals *(which file holds them is unverified)* |
 | animblender.c | T6 *(name unproven)* | blend trees (`SKABlendNode`) and the animation player (`TSKATime`) |
 | CharAnim.c | ours (TW06: `char_state.c`) | the golfer's animation state: clip-group blends, idle and emotion updates, queued state changes |
 | char_skin.c | T03 | in a single view, which golfer's body skin has its render data; six empty hooks *(where the file starts is unverified)* |

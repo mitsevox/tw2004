@@ -91,14 +91,20 @@ typedef struct SkinMeshBit {
 } SkinMeshBit;
 LAYOUT_ASSERT(SkinMeshBit, 8);
 
-// An entry of the iterator fn_80113B34 walks and of SkinDesc.p34.
+// An entry of the iterator fn_80113B34 walks and of SkinDesc.pMeshes.
 typedef struct SkinMesh {
     SkinMeshBit* pBits;         // 0x0  n8 of them (SkinPart_MarkMeshMatrices)
     s32  nSize;                 // 0x4
     s32  n8;                    // 0x8
-    u32  uFlags;                // 0xC  0x300000 both set: counted; 1 and 0x10: marks its bits
+    u32  uFlags;                // 0xC  0x300000 both set: counted; 1 and 0x10: marks its bits;
+                                //      SKINMESH_OWN_BITS
 } SkinMesh;
 LAYOUT_ASSERT(SkinMesh, 0x10);
+
+// SkinMesh.uFlags bits.
+#define SKINMESH_OWN_BITS  0x400000     // the mesh owns pBits: SKN_FreeDescMeshBits frees it, and
+                                        // HwsBurn_ListMeshes leaves its bytes out of a burn's size;
+                                        // no code sets it
 
 // A pair of bytes of a SkinDesc28 (HwsBurn_MarkEntry and fn_80113910 add up the n1s).
 typedef struct SkinDesc28Pair {
@@ -190,12 +196,12 @@ typedef struct SkinDesc {
     s32* p20;                   // 0x020
     s32  n24;                   // 0x024  entries in p28
     SkinDesc28* p28;            // 0x028
-    s32  nMeshes;               // 0x02C  entries in p34 (an HwsBurn keeps a bit per mesh)
-    s32  nOverrideMeshes;       // 0x030  p34's meshes up to the last one flagged 0x100000 (an
+    s32  nMeshes;               // 0x02C  entries in pMeshes (an HwsBurn keeps a bit per mesh)
+    s32  nOverrideMeshes;       // 0x030  pMeshes up to the last one flagged 0x100000 (an
                                 //        override table has an entry each; HwsBurn_BuildDesc)
-    SkinMesh* p34;              // 0x034
+    SkinMesh* pMeshes;          // 0x034
     s32  n38;                   // 0x038  entries in p3C
-    s32* p3C;                   // 0x03C  SkinDesc.p34 entries, -1 none (SkinMorph_EntryNeedsBlend)
+    s32* p3C;                   // 0x03C  SkinDesc.pMeshes entries, -1 none (SkinMorph_EntryNeedsBlend)
     s32  n40;                   // 0x040  entries in p44; an HwsBurn keeps a bit per entry
                                 //        (HwsBurn_Create)
     SkinDesc44* p44;            // 0x044
@@ -249,14 +255,15 @@ typedef struct SkinModel54 {
 } SkinModel54;
 LAYOUT_ASSERT(SkinModel54, 0x14);
 
-// What Skin.pModel points at; only what SkinPart.c and SkinBurn.c read.
+// What Skin.pModel points at: a skin's model as its file carries it (SKN_Create copies it):
+// its bones, meshes and blended matrices, and its description.
 typedef struct SkinModel {
     s32  n00;                   // 0x00  4: the file carries a SkinDesc at pDesc (SKN_Create)
     s32  n04;                   // 0x04
     s32  n08;                   // 0x08  its size with all its arrays once burnt (SkinBurn_PackModel)
     s32  n0C;                   // 0x0C  entries in p3C
     u8   unk10[4];
-    s32  nBones;                // 0x14  its bones: the bone poses in p34, the default world-to-bone
+    s32  nBones;                // 0x14  its bones: the bone poses in pPoses, the default world-to-bone
                                 //       matrices (Skin.pWorld2Bone), and the first of Skin.pSkinMtx,
                                 //       the skinning matrices handed to the character's model
     s16  n18;                   // 0x18  } -1 in a model SKN_FixupModel makes up
@@ -267,10 +274,12 @@ typedef struct SkinModel {
     s32  n24;                   // 0x24  }
     s32  n28;                   // 0x28  }
     s32  n2C;                   // 0x2C  }
-    u32  u30;                   // 0x30  0x40000002 both set: already byte-swapped (SKN_Create);
-                                //       0x80000000: offsets made pointers (SKN_FixupModel)
-    BonePose* p34;              // 0x34  nBones of them; handed to the character's model
-                                //       (SKEL_SetSkinBonePoses)
+    u32  uFlags;                // 0x30  0x40000002 both set: already byte-swapped (SKN_Create);
+                                //       0x80000000: offsets made pointers (SKN_FixupModel);
+                                //       SKINMODEL_DEFAULT_POSE
+    BonePose* pPoses;           // 0x34  nBones of them, each relative to its parent until
+                                //       SKN_InitDefaultPose puts them in model space; handed to the
+                                //       character's model (SKEL_SetSkinBonePoses)
     void* p38;                  // 0x38  one 0x50-byte block
     void* p3C;                  // 0x3C  n0C 0x50-byte blocks
     s32  n40;                   // 0x40  bits in Skin.aMeshBits; also the entries in p44
@@ -282,6 +291,9 @@ typedef struct SkinModel {
     u8   unk58[0x140 - 0x58];
 } SkinModel;
 LAYOUT_ASSERT(SkinModel, 0x140);  // SkinBurn_PackModel copies it whole
+
+// SkinModel.uFlags bits.
+#define SKINMODEL_DEFAULT_POSE  0x8000  // SKN_InitDefaultPose has put pPoses in model space
 
 // What Skin.pMorph points at (SkinMorph.c; our name): the weights of the skin's morph targets.
 typedef struct SkinMorphState {
@@ -612,8 +624,9 @@ typedef struct CharSkinSet {
     s32  nCount;                // 0x08  how many club classes the 'CLB ' object holds
     f32  afC[6];                // 0x0C  per club class: the club head bone's height (Character_SelectClub)
     Skin* apSkins[6];           // 0x24  per club class: its skin (SkinPart.c picks its parts and sets)
-    f32  a3C[6][4];             // 0x3C  per club class: a point on the club, through bone 0x52's matrix
-                                //       (Character_UpdateTestPoints: aTestPoints[4])
+    f32  a3C[6][4];             // 0x3C  per club class: a point on the club, through the club bone's
+                                //       matrix (SKEL_BONE_IGDRIVER; Character_UpdateTestPoints:
+                                //       aTestPoints[4])
     CharSkinRef* a9C[6];        // 0x9C  freed with CharSkinRef_Free (Character_FreeClubSkinSets)
 } CharSkinSet;
 
@@ -647,7 +660,12 @@ extern CharSkinSet* gClubSkinSets[2];   // what Character_CreateClubSkinSet make
                                         // view in split screen (Character.pClubSet;
                                         // Character_FreeClubSkinSets frees them)
 
-void  fn_80037CD8(Skin* pSkin);         // Skin.c: frees a skin
+// ---- a skin's default pose, its pose's morph weights, freeing it (SkinUtil.c) ----
+void  SKN_InitDefaultPose(Skin* pSkin, CharModel* pSkeleton, int skelOffset, int skelOffsetStart);
+void  SKN_ApplyPoseMorphWeights(Skin* pSkin, SkelPose* pPose);
+void  SKN_Free(Skin* pSKN);
+void  SKN_FreeDescMeshBits(SkinDesc* pDesc);
+
 s32   SKN_FreeRenderData(Skin* pSkin);         // Skin.c: frees what loading it allocated
 s32   SKN_AllocRenderData(Skin* pSkin, u8 b);   // Skin.c: allocates it
 Skin* SKN_Create(u8* pData, u8 b);     // Skin.c: makes a skin from its file

@@ -1155,9 +1155,9 @@ void fn_8002F38C(s32 nSurface, s32 nC, s32 n10, s32 n14, u32 uFlags, s32 n18);
 s32  fn_8002F454(s32 nSurface);     // the surface's buffer size, 0 if the slot is free
 
 // The graphics helpers (GxUtil.c, 0x80029FC8; the rest are in gx.h)
-void* fn_8002A624(void);            // the screen copy's pixels (lbl_80281100->pPixels)
+void* fn_8002A624(void);            // the screen copy's pixels (gpScreenCopy->pPixels)
 
-// The screen copy (our name; what lbl_80281100 points at): render surface 1, set up by gomainloop
+// The screen copy (gScreenCopy, reached through gpScreenCopy): render surface 1, set up by gomainloop
 // fn_8006DCA8 for each game type; screen copies fill it (fn_8002A164, DepthField, FEgolferanim).
 typedef struct ScreenCopy {
     void* pPixels;              // 0x00  surface 1's buffer, NULL without a size
@@ -1167,8 +1167,8 @@ typedef struct ScreenCopy {
     s32   nSize;                // 0x10  the buffer's size in bytes (fn_8002F454)
 } ScreenCopy;
 
-extern ScreenCopy  lbl_801D4F68;
-extern ScreenCopy* lbl_80281100;
+extern ScreenCopy  gScreenCopy;
+extern ScreenCopy* gpScreenCopy;
 extern s32 lbl_80281B88;        // bit 0: the video field being drawn
 extern s32* lbl_802811F8;       // points at lbl_80281E80, a copy of lbl_80281B88 (fn_800718E4)
 

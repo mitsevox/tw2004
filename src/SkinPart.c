@@ -650,7 +650,7 @@ s32 SkinPart_GetMaxPartOptionSize(SkinDesc* pDesc, int nPart) {
 }
 
 // The bytes the skin's chosen options can need at most: each part's SkinPart_GetMaxPartOptionSize
-// added up, but no more than all of SkinDesc.p34's meshes with flags 0x300000 together. Skin.c
+// added up, but no more than all of SkinDesc.pMeshes's meshes with flags 0x300000 together. Skin.c
 // (SKN_AllocRenderData) calls it and ignores the result.
 s32 SkinPart_GetMaxOptionsSize(Skin* pSkin) {
     SkinDesc* pDesc;
@@ -667,8 +667,8 @@ s32 SkinPart_GetMaxOptionsSize(Skin* pSkin) {
     }
     nAll = 0;
     for (j = 0; j < pDesc->nOverrideMeshes; j++) {
-        if ((pDesc->p34[j].uFlags & 0x300000) == 0x300000) {
-            nAll += pDesc->p34[j].nSize;
+        if ((pDesc->pMeshes[j].uFlags & 0x300000) == 0x300000) {
+            nAll += pDesc->pMeshes[j].nSize;
         }
     }
     if (nBytes > nAll) {
@@ -1389,7 +1389,7 @@ SkinMesh* SkinIter_GetMesh(SkinIter* pIter) {
     return pIter->pCur;
 }
 
-// The current entry's index in the description table the iterator walks (SkinDesc.p34 for a mesh).
+// The current entry's index in the description table the iterator walks (SkinDesc.pMeshes for a mesh).
 s32 SkinIter_GetIndex(SkinIter* pIter) {
     return pIter->nCur;
 }
@@ -1418,8 +1418,8 @@ void SkinPart_FixupDesc(SkinDesc* pDesc) {
     if (pDesc->p28 != NULL) {
         pDesc->p28 = (SkinDesc28*)((u8*)pDesc + (uptr)pDesc->p28);
     }
-    if (pDesc->p34 != NULL) {
-        pDesc->p34 = (SkinMesh*)((u8*)pDesc + (uptr)pDesc->p34);
+    if (pDesc->pMeshes != NULL) {
+        pDesc->pMeshes = (SkinMesh*)((u8*)pDesc + (uptr)pDesc->pMeshes);
     }
     if (pDesc->p3C != NULL) {
         pDesc->p3C = (s32*)((u8*)pDesc + (uptr)pDesc->p3C);

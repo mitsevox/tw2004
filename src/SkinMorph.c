@@ -176,7 +176,7 @@ s32 SkinMorph_PickTargets(SkinMorphWork* pWork, SkinDesc44* pEntry, int nSet) {
 
     nFirst = pEntry->n18;
     pDesc = pWork->pDesc;
-    aMeshes = pDesc->p34;
+    aMeshes = pDesc->pMeshes;
     aIndexes = pDesc->p3C;
     pTarget = &pDesc->p44[pEntry->n10];
     nLeft = pWork->nMorphs - nFirst;
@@ -305,7 +305,7 @@ u8 SkinMorph_EntryNeedsBlend(Skin* pSkin, int nView, int nEntry) {
             pTarget = &pDesc->p44[pEntry->n10 + i];
             for (j = 0; j < pTarget->n8; j++) {
                 nMesh = pDesc->p3C[pTarget->n0 + j];
-                if (nMesh >= 0 && pDesc->p34[nMesh].n8 > 0) {
+                if (nMesh >= 0 && pDesc->pMeshes[nMesh].n8 > 0) {
                     break;
                 }
             }
@@ -455,7 +455,7 @@ s32 SkinMorph_GetBlendSize(Skin* pSkin) {
     }
     nSize = 0;
     for (i = 0; i < pDesc->nOverrideMeshes; i++) {
-        pMesh = &pDesc->p34[i];
+        pMesh = &pDesc->pMeshes[i];
         if ((pMesh->uFlags & 0x100010) == 0x100010) {
             nSize += pMesh->nSize;
         }

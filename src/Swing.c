@@ -820,11 +820,11 @@ void SW_vUIBlurReset(int nPlayer) {
     gPlayers[nPlayer].swing.nNumInBlurQueue = 0;
 }
 
-// Each frame (gomainloop), record the club for its trail: the club head (bone 0x53) and grip (bone
-// 0x52) positions go on the front of the 25-entry history (prevClub), dropping the oldest. When the
-// head has moved more than 0.3 since the last entry (and the history is not empty), five in-between
-// entries are added instead, each blended from the last entry to now with the shaft re-extended to
-// the club's current length, so a fast swing still draws a smooth arc.
+// Each frame (gomainloop), record the club for its trail: the club head (bone 0x53) and grip
+// (SKEL_BONE_IGDRIVER) positions go on the front of the 25-entry history (prevClub), dropping the
+// oldest. When the head has moved more than 0.3 since the last entry (and the history is not
+// empty), five in-between entries are added instead, each blended from the last entry to now with
+// the shaft re-extended to the club's current length, so a fast swing still draws a smooth arc.
 void SW_vUIUpdateBlurBuffer(int nPlayer) {
     f32        vB8[4];
     f32        vA8[4];
@@ -841,7 +841,7 @@ void SW_vUIUpdateBlurBuffer(int nPlayer) {
     Character*   pObj = gPlayers[nPlayer].pChar;
     SwingData* pSw  = &gPlayers[nPlayer].swing;
     int        nHead = CharModel_GetBoneIndex(pObj->pModel, 0x53);
-    int        nGrip = CharModel_GetBoneIndex(pObj->pModel, 0x52);
+    int        nGrip = CharModel_GetBoneIndex(pObj->pModel, SKEL_BONE_IGDRIVER);
     f32        f;                  // the head's move, then the blend step
     f32        fLen;
     int        k;
@@ -1016,7 +1016,7 @@ void SW_vUIRender3D(int nPlayer) {
     pSw   = &gPlayers[nPlayer].swing;
     pObj  = gPlayers[nPlayer].pChar;
     nView = gPlayers[nPlayer].nView[0];
-    nGrip = CharModel_GetBoneIndex(pObj->pModel, 0x52);
+    nGrip = CharModel_GetBoneIndex(pObj->pModel, SKEL_BONE_IGDRIVER);
     if (Player_IsCPU(nPlayer)) {
         if (GM_GetModeType() != GM_Lessons_mode) return;
         if (GM_GetCurrentLesson() != 8) {
@@ -1108,7 +1108,7 @@ void SW_vUIAdjustClub(Character* pObj, SwingData* pSw, int nStickX) {
     f32 vRot[3];
     CharModel_GetBoneIndexMapped(pObj->pModel, 0x24);
     CharModel_GetBoneIndexMapped(pObj->pModel, 0x11);
-    CharModel_GetBoneIndex(pObj->pModel, 0x52);
+    CharModel_GetBoneIndex(pObj->pModel, SKEL_BONE_IGDRIVER);
     if (pObj->nTargetState == 6) {
         fAmount = (pObj->fAnimTime - pSw->fTimeSwingStart) / (pSw->fTimeSwingTop - pSw->fTimeSwingStart);
         fAmount *= fAmount;

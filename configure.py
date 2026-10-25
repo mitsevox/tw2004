@@ -960,7 +960,7 @@ config.libs = [
             Object(Matching, "LLPict_Gc.c"),
             Object(Matching, "GoTerrain.c"),
             Object(Matching, "Skin.c"),
-            Object(Matching, "Code80037AB8.c"),
+            Object(Matching, "SkinUtil.c"),
             Object(Matching, "GoPostFx.c"),
             Object(Matching, "GoDynamicCam.c"),
             Object(Matching, "gocamscripts.c"),
