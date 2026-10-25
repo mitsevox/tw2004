@@ -679,11 +679,8 @@ LLTime.c:
 	.bss        start:0x801D97F8 end:0x801D9908
 	.sdata      start:0x802813B0 end:0x802813B8
 
-unsorted/sweep_8009554C.c:
-	.text       start:0x8009554C end:0x80095564
-
 char_skin.c:
-	.text       start:0x80095564 end:0x80095744
+	.text       start:0x8009554C end:0x80095744
 
 CharAnim.c:
 	.text       start:0x80095744 end:0x80097208
@@ -1520,8 +1517,11 @@ dolphin/si/SISamplingRate.c:
 	.data       start:0x80195D08 end:0x80195DA0
 	.sbss       start:0x80282638 end:0x80282640
 
-unsorted/sweep_801338E0.c:
-	.text       start:0x801338E0 end:0x80133918
+dolphin/amcstubs/AmcExi2Stubs.c:
+	.text       start:0x801338E0 end:0x80133910
+
+dolphin/odenotstub/odenotstub.c:
+	.text       start:0x80133910 end:0x80133918
 
 dolphin/ar/ar.c:
 	.text       start:0x80133918 end:0x8013538C
@@ -1904,7 +1904,7 @@ src/MSL_C/PPCEABI/bare/H/ansi_fp.c:
 runtime/buffer_io.c:
 	.text       start:0x80155E48 end:0x80155F40
 
-unsorted/sweep_80155F40.c:
+runtime/critical_regions.gamecube.c:
 	.text       start:0x80155F40 end:0x80155F4C
 
 runtime/ctype.c:
@@ -2205,14 +2205,8 @@ MetroTRK/gdev/main.c:
 MetroTRK/MWTrace.c:
 	.text       start:0x80165480 end:0x801654D0
 
-unsorted/sweep_801654D0.c:
-	.text       start:0x801654D0 end:0x801654F4
-
-unsorted/sweep_801654F4.c:
-	.text       start:0x801654F4 end:0x80165524
-
-unsorted/sweep_80165524.c:
-	.text       start:0x80165524 end:0x80165528
+MetroTRK/MWCriticalSection_gc.c:
+	.text       start:0x801654D0 end:0x80165528
 
 UISEvent.c:
 	.text       start:0x80165528 end:0x80166098

@@ -144,7 +144,6 @@ void  SKEL_InitHalfJoints(CharModel* pModel, SkelPose* pPose);          // Skele
 void  Character_GetBonePosSwapIfLefty(Character* pChar, int nBone, f32* pPos);
 void  Char_Vec3Add(f32* pA, f32* pB, f32* pOut);
 void  Char_Vec3Sub(f32* pA, f32* pB, f32* pOut);
-void  fn_80095558(void);
 void  AnimLib_ApplySlotCustomAnims(int nSlot);                         // skalib.c
 void  Skalib_PlanBanks(void);                                        // skalib.c
 void  AnimStream_AllocBuffers(void);                                        // AnimStream.c
@@ -165,9 +164,6 @@ void  SKN_InitTris(void);
 void  SKN_FreeTris(void);
 void  SKN_InitModule(int n);
 void  SKN_CloseModule(void);
-void  fn_80095554(void);
-void  fn_8009555C(void);
-void  fn_80095560(void);
 void  sApplyUserLogos(void* pChar, void* pModel, SkinChoices* pChoices);   // char_tex_manager.c
 void  fn_8010BA2C(void* p);
 void  FE_StreamInterruptState(void);               // FEgolferanim.c
@@ -1158,7 +1154,7 @@ Character* Character_Create(void) {
 // The characters' set-up before a hole (and on a restart): with more than two players, the dynamic
 // textures go to the player with the honor (CharacterTex_PreHoleInit).
 void Character_PreHoleInit(void) {
-    fn_80095554();
+    CharacterSkin_PreHoleInit();
     CharacterTex_PreHoleInit();
 }
 
@@ -1737,7 +1733,7 @@ void Character_PostInit(void) {
     int i;
     Character* pChar;
 
-    fn_80095558();
+    CharacterSkin_PostInit();
     if (gSession.nNumPlayers <= 2) {
         for (i = 0; i < gSession.nNumPlayers; i++) {
             pChar = gPlayers[i].pChar;
@@ -2376,7 +2372,7 @@ Character* Character_Add(Character* pChar) {
 // copy changed together) and the skin meshes of each view (SKN_InitTris).
 void Character_InitIG(void) {
     int n;
-    fn_8009555C();
+    CharacterSkin_Init();
     CharacterTex_Init();
     SKEL_EnableIK(1);
     n = 6;
@@ -2396,7 +2392,7 @@ void Character_CloseIG(void) {
     SKN_FreeTris();
     SkinPart_Shutdown();
     AnimStream_Close();
-    fn_80095560();
+    CharacterSkin_Close();
     CharacterTex_Close();
 }
 

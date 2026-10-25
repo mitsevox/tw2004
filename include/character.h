@@ -1240,7 +1240,14 @@ void*    MtaLib_GetRandom(MalBank* pBank, int nGroup, int n);
 
 void Character_PreHoleInit(void);
 
-// char_skin.c: which golfers' body skins have their render data, in a single view.
+// char_skin.c: which golfers' body skins have their render data, in a single view; and the skin's
+// steps in the characters' set-up, frame, hole exit and shutdown, which are empty.
+void  CharacterSkin_PostExitHole(void);
+void  CharacterSkin_Update(void);
+void  CharacterSkin_PreHoleInit(void);
+void  CharacterSkin_PostInit(void);
+void  CharacterSkin_Init(void);
+void  CharacterSkin_Close(void);
 void  CharacterSkin_FreeAll(void);
 void  CharacterSkin_LoadOnlyPlayer(int nPlayer);
 
