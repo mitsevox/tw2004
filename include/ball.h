@@ -349,9 +349,10 @@ f32  Ter_CheckForDropLocation(TGD_TerrainInfo* pTerrainData, f32* location, u8 n
 u8   Ter_IsValidDropSurface(s32 surfaceID);    // a green or cup surface type
 // the supporting ground's upward normal; 0 with no ground
 u8   Ter_GetSupportingGroundNormal(TGD_TerrainInfo* pTerrainData, f32* location, f32* normal);
-u8   Ter_PointInTriangleXZpY(f32* pA, f32* pB, f32* pC, f32 fX, f32 fZ);   // (x, z) lies inside the triangle
-// a point's weights in a triangle
-void Ter_GetBarycentricCoords(f32 (*pTri)[3], f32* pPos, f32* pA, f32* pB, f32* pC);
+u8   Ter_PointInTriangleXZpY(f32* t0, f32* t1, f32* t2, f32 x, f32 z);   // (x, z) lies inside the triangle
+// a point's weights against a triangle's corners, in the x-z plane
+void Ter_GetBarycentricCoords(f32 (*pVertexData)[3], f32* location, f32* pWeight0, f32* pWeight1,
+                              f32* pWeight2);
 // the highest ground over or under (x, z); TER_NO_GROUND if none
 f32  Ter_GetHighestGroundHeight(TGD_TerrainInfo* pTerrainData, f32* location);
 // the lowest ground over or under (x, z); TER_NO_GROUND if none
@@ -391,14 +392,19 @@ u8   Ter_CheckForPinCollision(TGD_TerrainInfo* pTerrainData, int playerID, f32* 
 u8   Ter_CheckForWorldCollision(TGD_TerrainInfo* pTerrainData, int playerID, f32* fPoint0, f32* fPoint1,
                                 f32* pCollisionPoint, f32* pSurfaceNormal, TGD_MaterialInfo** pSurfaceInfo,
                                 TGD_ObjectInstanceInfo** pSurfaceObject, u8* pDrawKick);
-// the same, through branches and leaves
-u8   Ter_CheckForSolidWorldCollision(TGD_TerrainInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit,
-                                     f32* pNormal, TGD_MaterialInfo** ppSurface,
-                                     TGD_ObjectInstanceInfo** ppObj);
-u8   Ter_CheckForObjectCollision(TGD_TerrainInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
-                                 TGD_MaterialInfo** ppSurface,
-                                 TGD_ObjectInstanceInfo** ppObj);   // the first object a line hits
-s32  MaterialTypes_getMaterialID(TGD_MaterialInfo* pSurface);   // a surface's row in gSurfaceTypes, or -1
+// the same, but surfaces with a negative fRestitution do not count
+u8   Ter_CheckForSolidWorldCollision(TGD_TerrainInfo* pTerrainData, int playerID, f32* fPoint0, f32* fPoint1,
+                                     f32* pCollisionPoint, f32* pSurfaceNormal,
+                                     TGD_MaterialInfo** pSurfaceInfo,
+                                     TGD_ObjectInstanceInfo** pSurfaceObject);
+// the first ground a segment hits (no flagstick, no objects)
+u8   Ter_CheckForGroundCollision(TGD_TerrainInfo* pTerrainData, f32* fPoint0, f32* fPoint1,
+                                 f32* pCollisionPoint, f32* pSurfaceNormal, TGD_MaterialInfo** pSurfaceInfo,
+                                 TGD_ObjectInstanceInfo** pSurfaceObject);
+// the first course object (or MATERIAL_COLLIDES_AS_OBJECT ground) a segment hits
+u8   Ter_CheckForObjectCollision(TGD_TerrainInfo* pTerrainData, f32* fPoint0, f32* fPoint1,
+                                 f32* pCollisionPoint, f32* pSurfaceNormal, TGD_MaterialInfo** pSurfaceInfo,
+                                 TGD_ObjectInstanceInfo** pSurfaceObject);
 
 // ---- the ball (Ball.c) ----------------------------------------------------------------------
 

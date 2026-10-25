@@ -53,8 +53,10 @@ typedef struct TGD_MaterialInfo {
     f32  f04;                   // 0x04  lie: size of the random lie quality (Physics_SetLie).
                                 //       TW06: impactV_Modifier
     f32  f08;                   // 0x08  launch: spin factor. TW06: impactSpin
-    f32  f0C;                   // 0x0C  bounce restitution; below 0: branches/leaves (randomised, LUCK).
-                                //       TW06: restitution
+    f32  fRestitution;          // 0x0C  bounce restitution. Below 0 (rows 96 and 97): a random one,
+                                //       swayed by ATTR_LUCK, when the ball's rolls are random
+                                //       (Physics_HandleCollision); Ter_CheckForSolidWorldCollision
+                                //       ignores the surface
     f32  f10;                   // 0x10  bounce: friction at the contact. TW06: grip
     f32  f14;                   // 0x14  skid: 1 - this scales the slope pull. TW06: kinetic
     f32  f18;                   // 0x18  skid: friction building roll spin. TW06: transKinetic
@@ -67,8 +69,8 @@ typedef struct TGD_MaterialInfo {
     u32  nClass;                // 0x2C  surface class (SurfaceClass_t), not a Lie_t
     u32  nSoundId;              // 0x30  TW06: soundID; nothing here reads it yet
     u32  uFlags;                // 0x34  MATERIAL_BALL_CAN_LIE; 0x2: taking the ball out sets the
-                                //       player's bPenaltyShot; 0x10: event 0x25 on landing; 0x80 is
-                                //       read by GoTerrainCollision; MATERIAL_NO_SHADOW
+                                //       player's bPenaltyShot; 0x10: event 0x25 on landing;
+                                //       MATERIAL_NO_SHADOW; MATERIAL_COLLIDES_AS_OBJECT
     u32  nCollisionEffectId;    // 0x38  TW06: uiCollisionEffectID
     u32  nSwingSoundId;         // 0x3C  TW06: uiSwingSoundID
     u32  nSwingEffectId;        // 0x40  TW06: uiSwingEffectID
@@ -83,11 +85,19 @@ LAYOUT_ASSERT(TGD_MaterialInfo, 0x44);
 // (the cup has both; a cart path row and three others have 0x20)
 #define MATERIAL_NO_SHADOW 0x60
 
+// TGD_MaterialInfo.uFlags: ground that Ter_CheckForObjectCollision tests with the course objects,
+// so a ball on the ground runs into it (Physics_CheckObjectCollisions); only row 149 has it
+#define MATERIAL_COLLIDES_AS_OBJECT 0x80
+
 #define NUM_SURFACE_TYPES 156   // rows in gSurfaceTypes
 
 // The flagstick's row of gSurfaceTypes: the surface Ter_CheckForPinCollision gives a ball that hits
 // the stick. A hit on it fires the flagstick's event (EVENT_CollisionPin), and a ball in the air
 // that hits it loses its spin (Physics_CheckTerrainCollisions).
 #define SURFACE_FLAGSTICK 90
+
+// ---- MaterialTypes.c ------------------------------------------------------------------------
+
+s32 MaterialTypes_getMaterialID(const TGD_MaterialInfo* material);   // a surface's row, or -1
 
 #endif

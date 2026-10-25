@@ -1196,8 +1196,8 @@ void Physics_BallRollingandSlipping(Ball* pBall, f32 fTicks) {
 //   surface +0x24 (x the course settings; the green-speed setting and rain make it firmer or
 //   softer) + surface +0x28 (x 0.667 in rough, x 0.5 in thick rough); past a full bend the ball
 //   comes straight back.
-// - In the frame of that normal: restitution is surface +0x0C (0.5..1 counts as 0.5); on
-//   surfaces with a negative +0x0C (branches, leaves) a real ball's value is randomised by
+// - In the frame of that normal: restitution is the surface's fRestitution (0.5..1 counts as 0.5);
+//   on surfaces with a negative one (rows 96 and 97) a real ball's value is randomised by
 //   +-0.75 x (1 + it), pushed down by 0.005 x LUCK - the "kinder" deflection - and course 9
 //   halves it first. Fast balls on short grass bounce less (x 1 - 1.2 x (speed - 8.8) / +0x24),
 //   short grass and rough lose a bit more when slow, and rain deadens the bounce.
@@ -1340,7 +1340,7 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, TGD_MaterialInfo* pSurfac
     Ball_RotatePair(&pBall->vVel[0], &pBall->vVel[2], fG, fH);
     Ball_RotatePair(&pBall->vSpin[0], &pBall->vSpin[2], fG, fH);
     vSlip[0] = 0.462857157f * (0.839999974f * pBall->vSpin[2] + pBall->vVel[0]);
-    fRest = pSurface->f0C;
+    fRest = pSurface->fRestitution;
     if (fRest > 0.5f && fRest < 1.0f) {
         fRest = 0.5f;
     }
@@ -1417,7 +1417,7 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, TGD_MaterialInfo* pSurfac
         Vec3_Scale(fBite, pBall->vVel, pBall->vVel);
         Vec3_Scale(fBite, pBall->vSpin, pBall->vSpin);
     }
-    if (pSurface != NULL && pSurface->f0C >= 0.0f && pBall->vVel[1] < 0.674666584f &&
+    if (pSurface != NULL && pSurface->fRestitution >= 0.0f && pBall->vVel[1] < 0.674666584f &&
         (f32)Math_Sqrt(pBall->vVel[0] * pBall->vVel[0] + pBall->vVel[2] * pBall->vVel[2]) < 1.90666652f) {
         if (pBall->nSolidCollideCount < 6
             && (pSurface->nClass == SURFCLASS_FRINGE_e || pSurface->nClass == SURFCLASS_GREEN_e
@@ -1456,7 +1456,7 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, TGD_MaterialInfo* pSurfac
     fT  = cosf(fT);
     Ball_RotatePair(&pBall->vVel[0], &pBall->vVel[1], fBounce, fT);
     Ball_RotatePair(&pBall->vSpin[0], &pBall->vSpin[1], fBounce, fT);
-    if (pSurface != NULL && pSurface->f0C >= 0.0f &&
+    if (pSurface != NULL && pSurface->fRestitution >= 0.0f &&
         (pSurface->nClass == SURFCLASS_FRINGE_e || pSurface->nClass == SURFCLASS_GREEN_e
             || pSurface->nClass == SURFCLASS_FAIRWAY_e) &&
         pSurface->f24 <= 80.0f && fSpeed < pSurface->f24) {
@@ -1506,7 +1506,7 @@ u8 Physics_CheckObjectCollisions(Ball* pBall, f32 fTicks) {
         pSurface = &gSurfaceTypes[14];
     }
     LLMath_Normalize3(vNormal, vNormal);
-    if (pSurface->f0C >= 0.0f) {
+    if (pSurface->fRestitution >= 0.0f) {
         Vec3Copy(vHit, pBall->vPos);
         pBall->vPos[1] += 0.027055556f;
     }
@@ -1514,7 +1514,7 @@ u8 Physics_CheckObjectCollisions(Ball* pBall, f32 fTicks) {
     pBall->pHitObject = pObj;
     BALL_LANDING_EVENTS(pBall, pSurface, pObj);
     Physics_HandleCollision(pBall, vNormal, pSurface);
-    if (pSurface->f0C >= 0.0f) {
+    if (pSurface->fRestitution >= 0.0f) {
         Vec3Copy(pBall->vPos, pBall->vPrev);
         LLMath_AddScale3(pBall->vPos, pBall->vVel, 9.25925906e-06f, pBall->vPos);
     }
@@ -1757,7 +1757,7 @@ u8 Physics_ProcessCollision(Ball* pBall, f32* pHit, f32* pNormal, TGD_MaterialIn
         *pFrac = 0.97f;
     }
     Vec3Copy(pHit, pBall->vPos);
-    if (pSurface->f0C >= 0.0f) {
+    if (pSurface->fRestitution >= 0.0f) {
         LLMath_AddScale3(pBall->vPos, pBall->vVel, -9.25925906e-06f, pBall->vPos);
     }
     if (pSurface->nClass == SURFCLASS_NOT_PLAYABLE_e && pSurface == &gSurfaceTypes[108]) {
@@ -1772,7 +1772,7 @@ u8 Physics_ProcessCollision(Ball* pBall, f32* pHit, f32* pNormal, TGD_MaterialIn
     }
     pBall->pHitSurface = pSurface;
     pBall->pHitObject  = pObj;
-    if (pSurface->f0C >= 0.0f && !pBall->bLanded && pBall->nPlayer >= 0 && pBall->nState == 2) {
+    if (pSurface->fRestitution >= 0.0f && !pBall->bLanded && pBall->nPlayer >= 0 && pBall->nState == 2) {
         if (!pBall->bLanded) {
             pBall->bLanded = 1;
             EVENT_Trigger(pBall->nPlayer, 0x1D, pBall, !gSimulating);
@@ -1974,7 +1974,7 @@ u8 Physics_CheckTerrainCollisions(Ball* pBall, f32 fTicks) {
     if (0.375f != pSurface->f1C) {
         pSurface = &gSurfaceTypes[14];
     }
-    if ((pSurface->uFlags & 0x10) && pSurface->f0C < 0.0f && bOut <= 1) return 0;
+    if ((pSurface->uFlags & 0x10) && pSurface->fRestitution < 0.0f && bOut <= 1) return 0;
     if (!Physics_ProcessCollision(pBall, vHit, vNormal, pSurface, pObj, &fFrac, fTicks)) return 0;
     BALL_LANDING_EVENTS(pBall, pSurface, pObj);
     nIndex = MaterialTypes_getMaterialID(pSurface);
