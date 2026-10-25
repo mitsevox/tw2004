@@ -63,7 +63,7 @@ static void StaticCam_LoadCAMCfromStream(UStreamObject* pStreamData) {
 
 // Takes a fly-by camera (a 'Cact' object of type 200, from UKernel.c) as the next of aFlyBy, named
 // "FlyBy Cam: <its nId>": its route, position, field of view, look angles (degrees to radians, into
-// v30), fInterpTime and fLength (clamped to 0..1), moved along a spline (CAMINTERP_SPLINE) and
+// vLook), fInterpTime and fLength (clamped to 0..1), moved along a spline (CAMINTERP_SPLINE) and
 // looking by its angles. Until StaticCam_GetFlyByCam links the cameras, pNext and pPrev hold the
 // next camera's number and its own, and bHasPrev is set; bLinked is cleared so that the next
 // StaticCam_GetFlyByCam links them again. The crowd fly-by's cameras (STATICCAM_CROWD_ROUTE) hide
@@ -86,17 +86,17 @@ void StaticCam_ParseFlybyCameraActor(UStreamObject* pCameraActor) {
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].fLength = camPtr->fLength;
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].fLookSideOffset = 0.0f;
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].fLookUpOffset = 0.0f;
-    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].v20[0] = camPtr->aPos[0];
-    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].v20[1] = camPtr->aPos[1];
-    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].v20[2] = camPtr->aPos[2];
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].vPos[0] = camPtr->aPos[0];
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].vPos[1] = camPtr->aPos[1];
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].vPos[2] = camPtr->aPos[2];
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].fFovStart = PI * (camPtr->fFov / 180.0f);
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].nInterpType = CAMINTERP_SPLINE;
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].fInterpTime = camPtr->fInterpTime;
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].nLookAtKind = CAMPOINT_SHOT_POINT;
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].bHasPrev = 1;
-    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].v30[0] = PI * (camPtr->aLook[0] / 180.0f);
-    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].v30[1] = PI * (camPtr->aLook[1] / 180.0f);
-    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].v30[2] = PI * (camPtr->aLook[2] / 180.0f);
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].vLook[0] = PI * (camPtr->aLook[0] / 180.0f);
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].vLook[1] = PI * (camPtr->aLook[1] / 180.0f);
+    gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].vLook[2] = PI * (camPtr->aLook[2] / 180.0f);
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].pNext = (CamShot*)(uptr)(s32)camPtr->nNext;
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].pPrev = (CamShot*)(uptr)(s32)camPtr->nId;
     gpStaticCams->aFlyBy[gpStaticCams->nFlyBy].nHeightRef = CAMHEIGHT_NONE;
@@ -117,7 +117,7 @@ void StaticCam_ParseFlybyCameraActor(UStreamObject* pCameraActor) {
 // Takes a static camera (a 'Cact' object of type 201, from UKernel.c) as the next of aStatic, named
 // "Static Cam: <its index>": its position, fields of view (degrees to radians), area (u.aArea), the
 // events it serves and the rest of its StaticCamFromTess_t; a cut (CAMINTERP_CUT) to it, heights 0
-// to 10000. The point it looks at, v30, is one unit from its position along its three angles
+// to 10000. The point it looks at, vLook, is one unit from its position along its three angles
 // (mat44flt_EulerAngles). Frees the object.
 void StaticCam_ParseStaticCameraActor(UStreamObject* pCameraActor) {
     f32 straightAheadVec[4] = { 0.0f, 0.0f, 1.0f, 0.0f };
@@ -134,9 +134,9 @@ void StaticCam_ParseStaticCameraActor(UStreamObject* pCameraActor) {
     gpStaticCams->aStatic[gpStaticCams->nStatic].fLength = camPtr->fLength;
     gpStaticCams->aStatic[gpStaticCams->nStatic].fLookSideOffset = 0.0f;
     gpStaticCams->aStatic[gpStaticCams->nStatic].fLookUpOffset = 0.0f;
-    gpStaticCams->aStatic[gpStaticCams->nStatic].v20[0] = camPtr->aPos[0];
-    gpStaticCams->aStatic[gpStaticCams->nStatic].v20[1] = camPtr->aPos[1];
-    gpStaticCams->aStatic[gpStaticCams->nStatic].v20[2] = camPtr->aPos[2];
+    gpStaticCams->aStatic[gpStaticCams->nStatic].vPos[0] = camPtr->aPos[0];
+    gpStaticCams->aStatic[gpStaticCams->nStatic].vPos[1] = camPtr->aPos[1];
+    gpStaticCams->aStatic[gpStaticCams->nStatic].vPos[2] = camPtr->aPos[2];
     gpStaticCams->aStatic[gpStaticCams->nStatic].fFovStart = PI * (camPtr->fFovStart / 180.0f);
     gpStaticCams->aStatic[gpStaticCams->nStatic].fFovEnd = PI * (camPtr->fFovEnd / 180.0f);
     gpStaticCams->aStatic[gpStaticCams->nStatic].pNext = NULL;
@@ -158,16 +158,16 @@ void StaticCam_ParseStaticCameraActor(UStreamObject* pCameraActor) {
     gpStaticCams->aStatic[gpStaticCams->nStatic].fMaxHeight = 10000.0f;
     gpStaticCams->aStatic[gpStaticCams->nStatic].nTimeMode = camPtr->nTimeMode;
     gpStaticCams->aStatic[gpStaticCams->nStatic].pick.uEvents = camPtr->uEvents;
-    gpStaticCams->aStatic[gpStaticCams->nStatic].v30[0] = PI * (camPtr->aAngle[0] / 180.0f);
-    gpStaticCams->aStatic[gpStaticCams->nStatic].v30[1] = PI * (camPtr->aAngle[1] / 180.0f);
-    gpStaticCams->aStatic[gpStaticCams->nStatic].v30[2] = PI * (camPtr->aAngle[2] / 180.0f);
+    gpStaticCams->aStatic[gpStaticCams->nStatic].vLook[0] = PI * (camPtr->aAngle[0] / 180.0f);
+    gpStaticCams->aStatic[gpStaticCams->nStatic].vLook[1] = PI * (camPtr->aAngle[1] / 180.0f);
+    gpStaticCams->aStatic[gpStaticCams->nStatic].vLook[2] = PI * (camPtr->aAngle[2] / 180.0f);
     pShot = &gpStaticCams->aStatic[gpStaticCams->nStatic];
-    mat44flt_EulerAngles(eulerMatrix, pShot->v30[1], pShot->v30[0], pShot->v30[2]);
+    mat44flt_EulerAngles(eulerMatrix, pShot->vLook[1], pShot->vLook[0], pShot->vLook[2]);
     LLMath_mat44fltMultiply33(eulerMatrix, straightAheadVec,
-                              gpStaticCams->aStatic[gpStaticCams->nStatic].v30);
-    LLMath_Add3(gpStaticCams->aStatic[gpStaticCams->nStatic].v30,
-                gpStaticCams->aStatic[gpStaticCams->nStatic].v20,
-                gpStaticCams->aStatic[gpStaticCams->nStatic].v30);
+                              gpStaticCams->aStatic[gpStaticCams->nStatic].vLook);
+    LLMath_Add3(gpStaticCams->aStatic[gpStaticCams->nStatic].vLook,
+                gpStaticCams->aStatic[gpStaticCams->nStatic].vPos,
+                gpStaticCams->aStatic[gpStaticCams->nStatic].vLook);
     gpStaticCams->nStatic++;
     Circular_MemFreeFunc(pCameraActor);
 }
@@ -210,9 +210,9 @@ void StaticCam_Reset(void) {
     gpStaticCams->nCurves = 0;
 }
 
-// A static or fly-by shot's camera position: its v20, into position. ePlayerID is not used.
+// A static or fly-by shot's camera position: its vPos, into position. ePlayerID is not used.
 void StaticCam_ProcessScript(CamShot* link, int ePlayerID, f32* position) {
-    Vec3Copy(link->v20, position);
+    Vec3Copy(link->vPos, position);
 }
 
 // A random static camera for event (one of its pick.uEvents) whose area holds one of the player's
@@ -342,7 +342,7 @@ CamShot* StaticCam_GetFlyByCam(int iRouteNum_p) {
                             pNextNextCamera = pNextCamera;
                         }
                         pCurCamera->fLength = CamScript_fGetDistanceBetweenSplinePoints(
-                            pPrevCamera->v20, pCurCamera->v20, pNextCamera->v20, pNextNextCamera->v20);
+                            pPrevCamera->vPos, pCurCamera->vPos, pNextCamera->vPos, pNextNextCamera->vPos);
                         gpStaticCams->afRouteLength[i] += pCurCamera->fLength;
                     }
                     if (pCurCamera != NULL) {
@@ -378,7 +378,7 @@ Curve* StaticCam_GetFlybyTimeCurve(u32 iRouteNum_p) {
 
 // Flies the camera to share fParam of fly-by route nRoute's length (afRouteLength): position,
 // lookat (look angles) and fov come from CamScript_SplineCamerasByPositionAndLook's splines through
-// the v20 and v30 of the four shots around the current one (StaticCam_SetupFlybyCameraPointers),
+// the vPos and vLook of the four shots around the current one (StaticCam_SetupFlybyCameraPointers),
 // the field of view from the view's lens towards the shots' fFovStart. From the script's current
 // shot (pShot), the share of that shot's segment (fSegmentShare) and the distance flown so far
 // (fFlyByDist), it steps along the spline 0.005 of a segment at a time, going on to the next shot
@@ -418,9 +418,9 @@ void StaticCam_GetFlybyInformation(CameraScriptSettings_t* settings, int nRoute,
     *fov = CA_fGetCameraFieldOfView(
         Camera_GetLens(ViewController_GetRenderContext(gPlayers[ePlayerID].nView[0])));
     if (0.0f == idealDist) {
-        CamScript_SplineCamerasByPositionAndLook(pPrevCamera->v20, pCurCamera->v20, pNextCamera->v20,
-                                                 pNextNextCamera->v20, pPrevCamera->v30, pCurCamera->v30,
-                                                 pNextCamera->v30, pNextNextCamera->v30, position, lookat,
+        CamScript_SplineCamerasByPositionAndLook(pPrevCamera->vPos, pCurCamera->vPos, pNextCamera->vPos,
+                                                 pNextNextCamera->vPos, pPrevCamera->vLook, pCurCamera->vLook,
+                                                 pNextCamera->vLook, pNextNextCamera->vLook, position, lookat,
                                                  fov, pCurCamera->fFovStart, pNextCamera->fFovStart,
                                                  sectionPercent);
     } else {
@@ -439,10 +439,11 @@ void StaticCam_GetFlybyInformation(CameraScriptSettings_t* settings, int nRoute,
                 StaticCam_SetupFlybyCameraPointers(pCurCamera, &pPrevCamera, &pNextCamera, &pNextNextCamera);
                 sectionPercent = 0.0f;
             }
-            CamScript_SplineCamerasByPositionAndLook(pPrevCamera->v20, pCurCamera->v20, pNextCamera->v20,
-                                                     pNextNextCamera->v20, pPrevCamera->v30, pCurCamera->v30,
-                                                     pNextCamera->v30, pNextNextCamera->v30, position, lookat,
-                                                     fov, pCurCamera->fFovStart, pNextCamera->fFovStart,
+            CamScript_SplineCamerasByPositionAndLook(pPrevCamera->vPos, pCurCamera->vPos, pNextCamera->vPos,
+                                                     pNextNextCamera->vPos, pPrevCamera->vLook,
+                                                     pCurCamera->vLook, pNextCamera->vLook,
+                                                     pNextNextCamera->vLook, position, lookat, fov,
+                                                     pCurCamera->fFovStart, pNextCamera->fFovStart,
                                                      sectionPercent);
             LLMath_Subtract3(position, origPos, origPosDiff);
             currentDist += (f32)Math_Sqrt(LLMath_LengthSquared3(origPosDiff));
@@ -480,10 +481,11 @@ void StaticCam_GetFlybyInformation(CameraScriptSettings_t* settings, int nRoute,
                 lastOverPercent = sectionPercent;
                 sectionPercent -= percentDiff / (f32)(2 << i);
             }
-            CamScript_SplineCamerasByPositionAndLook(pPrevCamera->v20, pCurCamera->v20, pNextCamera->v20,
-                                                     pNextNextCamera->v20, pPrevCamera->v30, pCurCamera->v30,
-                                                     pNextCamera->v30, pNextNextCamera->v30, position, lookat,
-                                                     fov, pCurCamera->fFovStart, pNextCamera->fFovStart,
+            CamScript_SplineCamerasByPositionAndLook(pPrevCamera->vPos, pCurCamera->vPos, pNextCamera->vPos,
+                                                     pNextNextCamera->vPos, pPrevCamera->vLook,
+                                                     pCurCamera->vLook, pNextCamera->vLook,
+                                                     pNextNextCamera->vLook, position, lookat, fov,
+                                                     pCurCamera->fFovStart, pNextCamera->fFovStart,
                                                      sectionPercent);
             LLMath_Subtract3(position, origPos, origPosDiff);
             currentDist = prevDist + (f32)Math_Sqrt(LLMath_LengthSquared3(origPosDiff));
@@ -493,10 +495,11 @@ void StaticCam_GetFlybyInformation(CameraScriptSettings_t* settings, int nRoute,
             endPercent = (sectionPercent - lastUnderPercent)
                     * (1.0f - (currentDist - idealDist) / (currentDist - lastUnderDist)) + lastUnderPercent;
             sectionPercent = endPercent;
-            CamScript_SplineCamerasByPositionAndLook(pPrevCamera->v20, pCurCamera->v20, pNextCamera->v20,
-                                                     pNextNextCamera->v20, pPrevCamera->v30, pCurCamera->v30,
-                                                     pNextCamera->v30, pNextNextCamera->v30, position, lookat,
-                                                     fov, pCurCamera->fFovStart, pNextCamera->fFovStart,
+            CamScript_SplineCamerasByPositionAndLook(pPrevCamera->vPos, pCurCamera->vPos, pNextCamera->vPos,
+                                                     pNextNextCamera->vPos, pPrevCamera->vLook,
+                                                     pCurCamera->vLook, pNextCamera->vLook,
+                                                     pNextNextCamera->vLook, position, lookat, fov,
+                                                     pCurCamera->fFovStart, pNextCamera->fFovStart,
                                                      sectionPercent);
             LLMath_Subtract3(position, origPos, origPosDiff);
             currentDist = prevDist + (f32)Math_Sqrt(LLMath_LengthSquared3(origPosDiff));
@@ -511,13 +514,14 @@ void StaticCam_GetFlybyInformation(CameraScriptSettings_t* settings, int nRoute,
             if (pNextNextCamera) {
             } else {
             }
-            if (pPrevCamera->v20) {
+            if (pPrevCamera->vPos) {
             } else {
             }
-            CamScript_SplineCamerasByPositionAndLook(pPrevCamera->v20, pCurCamera->v20, pNextCamera->v20,
-                                                     pNextNextCamera->v20, pPrevCamera->v30, pCurCamera->v30,
-                                                     pNextCamera->v30, pNextNextCamera->v30, position, lookat,
-                                                     fov, pCurCamera->fFovStart, pNextCamera->fFovStart,
+            CamScript_SplineCamerasByPositionAndLook(pPrevCamera->vPos, pCurCamera->vPos, pNextCamera->vPos,
+                                                     pNextNextCamera->vPos, pPrevCamera->vLook,
+                                                     pCurCamera->vLook, pNextCamera->vLook,
+                                                     pNextNextCamera->vLook, position, lookat, fov,
+                                                     pCurCamera->fFovStart, pNextCamera->fFovStart,
                                                      sectionPercent);
             LLMath_Subtract3(position, origPos, origPosDiff);
             currentDist = prevDist + (f32)Math_Sqrt(LLMath_LengthSquared3(origPosDiff));

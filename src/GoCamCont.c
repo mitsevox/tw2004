@@ -31,7 +31,7 @@ static f32 GoCamCont_StrippedFn(f32 x) {
 
 // Sets a view's camera controller up: no camera mode (25), no camera sequences or shots, the
 // script's clocks, fade, flags, positions and shake cleared, vViewScale 1, the script's
-// vLastBallPos (0, 0, 0, 1), and the script's recording shot pB4 pointed at the view's own shot19C.
+// vLastBallPos (0, 0, 0, 1), and the script's recording shot pRecordShot pointed at the view's own shot19C.
 void CameraController_InitOneCamera(View* pView) {
     int i;
 
@@ -54,7 +54,7 @@ void CameraController_InitOneCamera(View* pView) {
     pView->script.bBlendPending = 0;
     pView->script.bFairwayFix = 0;
     pView->script.bNoGround = 0;
-    pView->script.pB4 = &pView->shot19C;
+    pView->script.pRecordShot = &pView->shot19C;
     pView->script.fShakeTime = 0.0f;
     pView->p78 = NULL;
     pView->p7C = NULL;
