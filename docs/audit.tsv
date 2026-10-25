@@ -150,7 +150,7 @@ LadderMap.c	open
 LadderedMode.c	open		
 MC.c	open		
 MC_Gc.c	open		
-Main.c	open		
+Main.c	done	c80db2da	claude-review
 MaterialTypes.c	open		
 MathQuat.c	done	6ad9dde6	claude-review
 NGC/SharedFileIO/llSharedFileIO.c	open		
