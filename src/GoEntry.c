@@ -1,5 +1,5 @@
 // GoEntry.c (EA's name, from its asserts; also in EA's 2002 source tree): the game's outer loop.
-// fn_800083A4 steps gSession.nGameType from start-up through the front end, the rounds and back,
+// MA_vMain steps gSession.nGameType from start-up through the front end, the rounds and back,
 // until the game is left or the console is reset.
 
 #include "game.h"
@@ -56,7 +56,7 @@ void fn_8000882C(void);
 
 // The game's outer loop: each pass runs the current game type's step and moves nGameType on to
 // the next, until type 13 (leave) or type 12 (reset the console).
-void fn_800083A4(void) {
+void MA_vMain(s32 iArgc_p, char** chppArgv_p) {
     u8 bQuit;
 
     bQuit = 0;
