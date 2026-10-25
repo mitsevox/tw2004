@@ -418,28 +418,29 @@ void GM_SetCurrentHole(int nHole) {
     }
 }
 
-// Sets the round's course. 23 builds "Random 18" (GM_BuildRandom18, flag bRandom18), 22 "Dream 18"
-// (GM_BuildDream18, bDream18) and 24..29 a regional round (GM_BuildRegionalRound, nRegionalRound =
-// 1..6); 22 and 24..29 then take the current hole's course from the built round. Any other value is
+// Sets the round's course. 23 builds "Random 18" (GM_BuildRandom18, flag bRandom18), 22 "Tiger's
+// Dream 18" (GM_BuildDream18, bDream18) and 24..29 "Compilation 1..6" (GM_BuildRegionalRound,
+// nRegionalRound = 1..6); these compilation courses then take the current hole's course from their
+// hole list. Any other value is
 // one course played as its holes 1..18; while a custom round is set up (bCustomRound) only the
 // current course changes.
 void GM_SetCurrentCourse(int nCourse) {
     int i;
-    if (nCourse == 23) {
+    if (nCourse == COURSE_RANDOM_18) {
         GM_BuildRandom18();
         gpGame->bRandom18 = 1;
         return;
     }
     gpGame->bRandom18 = 0;
-    if (nCourse == 22) {
+    if (nCourse == COURSE_TIGERS_DREAM_18) {
         gpGame->bDream18 = 1;
         GM_BuildDream18();
         gpGame->nCurCourse = gpGame->nHoleCourse[gpGame->nCurHole];
         return;
     }
     gpGame->bDream18 = 0;
-    if (nCourse >= 24 && nCourse < 30) {
-        gpGame->nRegionalRound = nCourse - 23;
+    if (nCourse >= COURSE_COMPILATION_1 && nCourse < NUM_COURSES) {
+        gpGame->nRegionalRound = nCourse - (COURSE_COMPILATION_1 - 1);
         GM_BuildRegionalRound(nCourse);
         gpGame->nCurCourse = gpGame->nHoleCourse[gpGame->nCurHole];
     } else {
@@ -1098,19 +1099,19 @@ void GM_SetupDefaultProfile(void) {
     }
 }
 
-// Builds the "Dream 18" round (course 22): each hole's course and hole number from row 0 of the
-// 'CMPS' table (GM_CourseInfo_GetCompilationCourse, GM_CourseInfo_GetCompilationHole; the table
-// counts holes from 1).
+// Builds the compilation course "Tiger's Dream 18" (course 22): each hole's course and hole number
+// from row 0 of the 'CMPS' table (GM_CourseInfo_GetCompilationCourse,
+// GM_CourseInfo_GetCompilationHole; the table counts holes from 1).
 void GM_BuildDream18(void) {
     int i;
     for (i = 0; i < 18; i++) {
-        gpGame->nHoleCourse[i] = GM_CourseInfo_GetCompilationCourse(22, i);
-        gpGame->nHoleNum[i] = GM_CourseInfo_GetCompilationHole(22, i) - 1;
+        gpGame->nHoleCourse[i] = GM_CourseInfo_GetCompilationCourse(COURSE_TIGERS_DREAM_18, i);
+        gpGame->nHoleNum[i] = GM_CourseInfo_GetCompilationHole(COURSE_TIGERS_DREAM_18, i) - 1;
     }
 }
 
-// Builds regional round nCourse (24..29: US Northwest, US Southwest, US East, Europe, Pacific, S.
-// Hemisphere) from its row of the 'CMPS' table, as GM_BuildDream18 does.
+// Builds compilation course nCourse (24..29, Compilation 1..6: US Northwest, US Southwest, US East,
+// Europe, Pacific, S. Hemisphere) from its row of the 'CMPS' table, as GM_BuildDream18 does.
 void GM_BuildRegionalRound(int nCourse) {
     int i;
     for (i = 0; i < 18; i++) {
