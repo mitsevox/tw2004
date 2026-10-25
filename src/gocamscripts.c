@@ -890,8 +890,8 @@ void CamScript_LerpFixedTargetCameras(int nPlayer, f32* pCam, f32* pSub, CameraS
         LLMath_Normalize3(vDir1, vDir1);
     }
     // the dot product clamped to -1..1 (worked out again for each test)
-    fDot = Vec3_Dot(vDir0, vDir1) < -1.0f ? -1.0f
-         : (Vec3_Dot(vDir0, vDir1) > 1.0f ? 1.0f : Vec3_Dot(vDir0, vDir1));
+    fDot = LLMath_DotProduct3(vDir0, vDir1) < -1.0f ? -1.0f
+         : (LLMath_DotProduct3(vDir0, vDir1) > 1.0f ? 1.0f : LLMath_DotProduct3(vDir0, vDir1));
     fAngle = acosf(fDot);
     fAngle *= fT;
     vec4flt_CrossProduct(vDir0, vDir1, vAxis);
@@ -1573,8 +1573,8 @@ void CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* pShot
             LLMath_Normalize3(vDir, vDir);
         }
         // the dot product is taken up to three times, as a clamp macro would
-        fAngle = acosf(Vec3_Dot(vCur, vDir) < -1.0f ? -1.0f
-                             : (Vec3_Dot(vCur, vDir) > 1.0f ? 1.0f : Vec3_Dot(vCur, vDir)))
+        fAngle = acosf(LLMath_DotProduct3(vCur, vDir) < -1.0f ? -1.0f
+                       : (LLMath_DotProduct3(vCur, vDir) > 1.0f ? 1.0f : LLMath_DotProduct3(vCur, vDir)))
                  / fDiv;
         vec4flt_CrossProduct(vCur, vDir, vAxis);
         if (0.0f != vAxis[0] || 0.0f != vAxis[1] || 0.0f != vAxis[2]) {
@@ -2210,7 +2210,7 @@ void CameraScript_KeepPointInView(int nPlayer, f32* pCam, f32* pOut, f32* pTarge
     }
     LLMath_Normalize3(vToTarget, vTargetDir);
     LLMath_Normalize3(vToOut, vOutDir);
-    fDot = Vec3_Dot(vTargetDir, vOutDir);
+    fDot = LLMath_DotProduct3(vTargetDir, vOutDir);
     if (fDot < -1.0f) {
         fDot = -1.0f;
     } else if (fDot > 1.0f) {
@@ -2295,7 +2295,7 @@ u8 CameraScript_IsDefaultSwingCam(CamShot* pShot, int nPlayer, f32* pCam) {
     if (0.0f != vCam[0] || 0.0f != vCam[1] || 0.0f != vCam[2]) {
         LLMath_Normalize3(vCam, vCam);
     }
-    if (Vec3_Dot(vCam, vAim) > gpCamTuning->fDefaultSwingCamMinDot) return 1;
+    if (LLMath_DotProduct3(vCam, vAim) > gpCamTuning->fDefaultSwingCamMinDot) return 1;
     return 0;
 }
 
@@ -2474,7 +2474,7 @@ void CamScript_GetCameraOnFairwayPos(CameraScriptSettings_t* pScript, f32* pOut,
     if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
         LLMath_Normalize3(vDir, vDir);
     }
-    if (Vec3_Dot(vDir, vCamDir) < gpCamTuning->fFairwaySpotMaxDot) {
+    if (LLMath_DotProduct3(vDir, vCamDir) < gpCamTuning->fFairwaySpotMaxDot) {
         bFound = 1;
     }
     if (!bFound) {
@@ -2484,7 +2484,7 @@ void CamScript_GetCameraOnFairwayPos(CameraScriptSettings_t* pScript, f32* pOut,
         if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
             LLMath_Normalize3(vDir, vDir);
         }
-        if (Vec3_Dot(vDir, vCamDir) < gpCamTuning->fFairwaySpotMaxDot) {
+        if (LLMath_DotProduct3(vDir, vCamDir) < gpCamTuning->fFairwaySpotMaxDot) {
             bFound = 1;
         }
     }
@@ -2495,7 +2495,7 @@ void CamScript_GetCameraOnFairwayPos(CameraScriptSettings_t* pScript, f32* pOut,
         if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
             LLMath_Normalize3(vDir, vDir);
         }
-        if (Vec3_Dot(vDir, vCamDir) < gpCamTuning->fFairwaySpotMaxDot) {
+        if (LLMath_DotProduct3(vDir, vCamDir) < gpCamTuning->fFairwaySpotMaxDot) {
             bFound = 1;
         }
     }
@@ -2639,7 +2639,7 @@ void CamScript_UpdateFairwayCam(CameraScriptSettings_t* pScript, f32* pCam, f32*
         if (0.0f != vVel[0] || 0.0f != vVel[1] || 0.0f != vVel[2]) {
             LLMath_Normalize3(vVel, vVel);
         }
-        fDot = Vec3_Dot(vDir, vVel);
+        fDot = LLMath_DotProduct3(vDir, vVel);
         if (fDist < gpCamTuning->fFairwayCamMoveDist) return;
         if (fDot > gpCamTuning->fFairwayCamMaxDot) return;
         fHeight = CamScript_GuessBestPlayableHeight(vSpot, NULL);

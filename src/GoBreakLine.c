@@ -165,7 +165,7 @@ void BreakLine_Render(int nView) {
                 if (vDir[0] != 0.0f || vDir[1] != 0.0f) {
                     LLMath_Normalize3(vDir, vDir);
                 }
-                fAngle = acosf(Vec3_Dot(vDir, vAxis));
+                fAngle = acosf(LLMath_DotProduct3(vDir, vAxis));
                 vec4flt_CrossProduct(vDir, vAxis, vCross);
                 fAngle = fAngle * (vCross[1] < 0.0f ? -1.0f : 1.0f);
                 fSin = sinf(fAngle);
@@ -391,7 +391,7 @@ void BreakLine_GetCaddyTipInfo(int nView, f32* pLong, f32* pSide) {
     LLMath_Normalize3(vToHole, vToHole);
     BreakLine_Vec3Sub(vAim, vBall, vToAim);
     LLMath_Normalize3(vToAim, vToAim);
-    fDot = Vec3_Dot(vToHole, vToAim);
+    fDot = LLMath_DotProduct3(vToHole, vToAim);
     if (0.0f == fDot) {
         *pLong = 0.0f;
         *pSide = 0.0f;

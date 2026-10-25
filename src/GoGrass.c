@@ -66,7 +66,7 @@ void fn_800738DC(TexBank* pBank, TexEntry* pTex, u8 bFirst);   // GoShaderObject
 void Grass_QueueRelease(GrassBuffer* pBuffer);
 void fn_80008380(void);
 void Grass_RegisterStreamClients(void);
-void Grass_LoadNetworkData(GrassChunk* pChunk);
+void Grass_LoadNetworkData(TNetwork* netPtr);
 void Grass_CreateTopTexture(void);
 void Grass_CreateTopCamera(void);
 void Grass_AimTopCamera(void);
@@ -97,13 +97,12 @@ static f32 GoGrass_StrippedFn(f32 x) {
 }
 
 // The grass's start, once per round (gomainloop's round set-up): Grass_LoadNetworkData is
-// registered for network chunk 6, the manager's settings get their defaults (sway, fade, grid, the
+// registered for NETWORK_TYPE_GRASS, the manager's settings get their defaults (sway, fade, grid, the
 // eight row offsets in af168), its 256 x 256 texture is set up, and gbGrassFrameSkipped is cleared.
 void Grass_InitModule(void) {
     gpGrassMgr->p370 = NULL;
     gpGrassMgr->n1C = 0;
-    // port: Grass_LoadNetworkData takes the chunk as a GrassChunk*
-    Network_RegisterLoadNetworkCallback(6, (void (*)(u8*))Grass_LoadNetworkData);
+    Network_RegisterLoadNetworkCallback(NETWORK_TYPE_GRASS, Grass_LoadNetworkData);
     gpGrassMgr->n3DC = 1;
     gpGrassMgr->n3E0 = 1;
     gpGrassMgr->n3F0 = 1;
@@ -192,13 +191,14 @@ void Grass_UnRegisterStreamClients(void) {
     }
 }
 
-// The network chunk 6 handler (registered by Grass_InitModule): the chunk and its data (after its
-// n2 0x30-byte entries) are kept in the next of the a48/a20 slots and the data byte-swapped in
-// place. The first chunk's data gives f3B8 (the blade height) and n3A4 (which akgras texture).
-void Grass_LoadNetworkData(GrassChunk* pChunk) {
+// The grass network's loader (registered by Grass_InitModule): the network and its data (after its
+// last node) are kept in the next of the a48/a20 slots and the data byte-swapped in place. The
+// first chunk's data gives f3B8 (the blade height) and n3A4 (which akgras texture).
+void Grass_LoadNetworkData(TNetwork* netPtr) {
     u8* pData;
-    gpGrassMgr->a48[gpGrassMgr->n1C] = pChunk;
-    gpGrassMgr->a20[gpGrassMgr->n1C] = (GrassChunkData*)((u8*)(pChunk + 1) + pChunk->n2 * 0x30);
+    gpGrassMgr->a48[gpGrassMgr->n1C] = netPtr;
+    gpGrassMgr->a20[gpGrassMgr->n1C] =
+        (GrassChunkData*)((u8*)netPtr->aNodes + netPtr->nNumNodes * sizeof(TNode));
     pData = (u8*)gpGrassMgr->a20[gpGrassMgr->n1C];
     BYTESWAP_SWAPDATA(&pData, pData, 8, 4);
     gpGrassMgr->f3B8 = gpGrassMgr->a20[0]->f4;

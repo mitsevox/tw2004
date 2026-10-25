@@ -991,7 +991,7 @@ static void DynamicCam_TrackBallVelocityLag(CamShot* link, int ePlayerID, Camera
         ballToNewPosNorm[1] = 0.0f;
         ballToNewPosNorm[2] = 0.0f;
     }
-    angleDiffInRad = acosf(Vec3_Dot(ballToOldPosNorm, ballToNewPosNorm));
+    angleDiffInRad = acosf(LLMath_DotProduct3(ballToOldPosNorm, ballToNewPosNorm));
     rotationScaleAmount = angleDiffInRad * rotationScaleAmount;
     vec4flt_CrossProduct(ballToOldPosNorm, ballToNewPosNorm, rotAxis);
     if (rotAxis[0] != 0.0f || rotAxis[1] != 0.0f || rotAxis[2] != 0.0f) {
@@ -1934,7 +1934,7 @@ static void DynamicCam_ClampBallVelocity(f32* ballVelocity, f32* camPos, f32* ba
     if (0.0f != ballVelocity2D[0] || 0.0f != ballVelocity2D[1] || 0.0f != ballVelocity2D[2]) {
         LLMath_Normalize3(ballVelocity2D, ballVelocity2D);
     }
-    if (fabsf(acosf(Vec3_Dot(ballVelocity2D, ballVelocity))) > gpCamTuning->fMaxFlightTilt) {
+    if (fabsf(acosf(LLMath_DotProduct3(ballVelocity2D, ballVelocity))) > gpCamTuning->fMaxFlightTilt) {
         vec4flt_CrossProduct(ballVelocity, ballVelocity2D, rotationAxis);
         if (0.0f != rotationAxis[0] || 0.0f != rotationAxis[1] || 0.0f != rotationAxis[2]) {
             LLMath_Normalize3(rotationAxis, rotationAxis);

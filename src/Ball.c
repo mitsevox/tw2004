@@ -788,7 +788,7 @@ u8 Physics_GetShotData(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, 
         Vec3_Scale(fSpeed, pB, vDir);
         Ball_RotatePair(&vDir[0], &vDir[2], fSinAim, fCosAim);
         LLMath_Normalize3(vNormal, vNormal);
-        LLMath_AddScale3(vDir, vNormal, -Vec3_Dot(vDir, vNormal), pVel);
+        LLMath_AddScale3(vDir, vNormal, -LLMath_DotProduct3(vDir, vNormal), pVel);
         Vec3_Scale(1.8f, pVel, pVel);
         pSpin[0] = 0.0f;
         pSpin[1] = 0.0f;
@@ -1156,7 +1156,7 @@ void Physics_BallRollingandSlipping(Ball* pBall, f32 fTicks) {
     vAccel[0] = -(fPull * (vNormal[0] * fDot));
     vAccel[1] = fPull * (-0.107170001f - vNormal[1] * fDot);
     vAccel[2] = -(fPull * (vNormal[2] * fDot));
-    LLMath_AddScale3(pBall->vVel, vNormal, -Vec3_Dot(pBall->vVel, vNormal), vTmp);
+    LLMath_AddScale3(pBall->vVel, vNormal, -LLMath_DotProduct3(pBall->vVel, vNormal), vTmp);
     LLMath_Normalize3(vTmp, vDir);
     Vec3_Scale(Math_Sqrt(LLMath_LengthSquared3(pBall->vVel)), vDir, pBall->vVel);
     fFric = 1.5f * (pSurface->f18 * (-0.107170001f * vNormal[1]));
@@ -1271,7 +1271,7 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, TGD_MaterialInfo* pSurfac
         bFlip = 1;
     }
     fSpeed = Math_Sqrt(LLMath_LengthSquared3(pBall->vVel));
-    fD     = Vec3_Dot(pBall->vVel, pNormal);
+    fD     = LLMath_DotProduct3(pBall->vVel, pNormal);
     fImpact = (pNormal[0] * fD) * (pNormal[0] * fD) + (pNormal[1] * fD) * (pNormal[1] * fD)
               + (pNormal[2] * fD) * (pNormal[2] * fD);
     LLMath_AddScale3(pNormal, pBall->vVel, 1.0f / fSpeed, vBent);
@@ -1307,7 +1307,7 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, TGD_MaterialInfo* pSurfac
     Vec3_Scale(-0.839999974f, pNormal, vDown);
     vec4flt_CrossProduct(pBall->vSpin, vDown, vCon);
     Ball_Vec3Add(vCon, pBall->vVel, vCon);
-    LLMath_AddScale3(vCon, pNormal, -Vec3_Dot(vCon, pNormal), vSlide);
+    LLMath_AddScale3(vCon, pNormal, -LLMath_DotProduct3(vCon, pNormal), vSlide);
     if (LLMath_LengthSquared3(vSlide) != 0.0f) {
         LLMath_Normalize3(vSlide, vDir);
     } else {
@@ -2131,7 +2131,7 @@ void Physics_BallRolling(Ball* pBall, f32 fTicks) {
         }
     }
     LLMath_Normalize3(vNormal, vNormal);
-    LLMath_AddScale3(pBall->vVel, vNormal, -Vec3_Dot(pBall->vVel, vNormal), vTmp);
+    LLMath_AddScale3(pBall->vVel, vNormal, -LLMath_DotProduct3(pBall->vVel, vNormal), vTmp);
     LLMath_Normalize3(vTmp, vDir);
     Vec3_Scale(Math_Sqrt(LLMath_LengthSquared3(pBall->vVel)), vDir, pBall->vVel);
     Vec3_Scale(-0.839999974f, vNormal, vDown);
