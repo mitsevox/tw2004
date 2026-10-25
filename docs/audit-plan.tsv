@@ -269,12 +269,12 @@ order	area	file	task	scope	state
 266	Boot and game flow	unsorted/sweep_80005590.c	fold	prove its file and fold it in	done
 267	Boot and game flow	unsorted/sweep_80005520.c	fold	prove its file and fold it in	done
 268	Boot and game flow	unsorted/sweep_800055D8.c	fold	prove its file and fold it in	done
-268	Boot and game flow	Main.c	pass	the whole file	open
+268	Boot and game flow	Main.c	pass	the whole file	done
 269	Shader objects and effects	GoShaderObjectCommon_TexAnimManager_Gc.c	pass	the whole file	open
 270	Shader objects and effects	GoShaderObjectCommon_MorphAnimManager_Gc.c	pass	the whole file	open
 271	Shader objects and effects	UFstPart.c	pass	the whole file	open
 272	Shader objects and effects	GoShaderObject_PrelitTextured_Gc.c	pass	the whole file	done
-273	Shader objects and effects	ShaderRow19.c	pass	the whole file	open
+273	Shader objects and effects	GoShaderObject_PrelitTexturedLine_Gc.c	pass	the whole file	done
 274	Shader objects and effects	GoShaderObjectContainer_OBFData_Gc.c	pass	the whole file	open
 275	Shader objects and effects	PsMgr.c	pass	the whole file	open
 276	Shader objects and effects	Code8006F608.c	pass	the whole file	open

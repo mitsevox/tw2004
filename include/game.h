@@ -56,6 +56,7 @@ void REPLAY_GetSpin(int nPlayer, f32* pForwardSpin, f32* pSideSpin);
 void REPLAY_RecordStart(void);
 void REPLAY_RecordStop(void);
 
+void MA_vMain(s32 iArgc_p, char** chppArgv_p);  // GoEntry.c: the outer loop (main's arguments, unread)
 int  Game_GetCourse(void);              // 0x80008830
 int  Game_CurHoleIndex(void);           // 0..17 in the round (Golfer.c)
 int  Game_CurrentPinSet(void);          // the current hole's pin position, 0..3 (Golfer.c)

@@ -53,7 +53,6 @@ void fn_80006EC8(void);
 void fn_80007160(void);
 void fn_80007264(f32* pGamma);
 void fn_800070DC(void);
-s32  fn_8000724C(void);
 void fn_80007254(void);
 u8   fn_80007258(void);
 void fn_80007260(void);
@@ -289,7 +288,7 @@ void fn_80007160(void) {
 
 // Starts the display: the video mode, the image buffer, GX, the frame sync and its callbacks;
 // then, a retrace later (two for some TV modes), clears the image buffers and turns the picture on.
-s32 fn_800071BC(void) {
+s32 Displ_OpenOnce(void) {
     VIInit();
     fn_800067E4(NULL);
     fn_80006A98();
@@ -310,7 +309,7 @@ s32 fn_800071BC(void) {
     return 0;
 }
 
-s32 fn_8000724C(void) {
+s32 Displ_CloseOnce(void) {
     return 0;
 }
 
