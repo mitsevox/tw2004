@@ -1138,7 +1138,7 @@ u8     CamScript_DoesScriptTrackGolfer(CamShot* script);
 // vLastBallPos follows the ball).
 void   DynamicCam_GetSmoothBallLocation(CameraScriptSettings_t* settings, CamShot* script, int ePlayerID,
                                         f32* position, u8 set);
-// 0 when gSession.nGameType is 3, else Character_IsLeftHanded of the player's golfer (Player.pChar)
+// 0 in the front end (GAMESTATE_FE_RUN), else Character_IsLeftHanded of the player's golfer (Player.pChar)
 // as a flag; the shot is not read.
 u8     CameraScript_FlipCameraForLefty(int nPlayer, CamShot* pShot);
 

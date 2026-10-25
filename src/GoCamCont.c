@@ -191,7 +191,7 @@ void CameraController_Idle(View* pView, int nPlayer) {
         }
         break;
     }
-    if (gPlayers[nPlayer].pChar != NULL && gSession.nGameType != 3) {
+    if (gPlayers[nPlayer].pChar != NULL && gSession.nGameType != GAMESTATE_FE_RUN) {
         for (i = 0; i <= 9; i++) {
             if (Character_IsTagSet(gPlayers[nPlayer].pChar, i + 5)
                 && fn_80062BB0(gPlayers[nPlayer].pChar, i + 5)) {

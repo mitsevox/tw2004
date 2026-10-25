@@ -39,7 +39,7 @@ void UI_EATraxReset(void) {
     gEATraxDisplay.nFrames = 0;
     gEATraxDisplay.nTrack = 0;
     gEATraxDisplay.nLogo = -1;
-    if (gSession.nGameType == 10) {
+    if (gSession.nGameType == GAMESTATE_FE_SETUP) {
         gEATraxDisplay.nFont = 2;
         return;
     }

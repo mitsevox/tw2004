@@ -589,7 +589,7 @@ void IG_InitGameMessages(void) {
 u8 IG_IsControllerInPlay(int nController) {
     int i;
 
-    if (gSession.nGameType != 6) {
+    if (gSession.nGameType != GAMESTATE_IG_PLAY_HOLE) {
         return 1;
     }
     for (i = 0; i < gSession.nNumPlayers; i++) {
@@ -1920,7 +1920,7 @@ void GM_vIsDemoSetup(MsgArg* pArgs, MsgArg* pResult) {
 // Whether the round (game type 6) is paused for a pulled controller (gSession.nPaused 2, or 3,
 // which nothing in this build sets) (command 120).
 void GM_vIsPausedForController(MsgArg* pArgs, MsgArg* pResult) {
-    if (gSession.nGameType == 6 && (gSession.nPaused == 2 || gSession.nPaused == 3)) {
+    if (gSession.nGameType == GAMESTATE_IG_PLAY_HOLE && (gSession.nPaused == 2 || gSession.nPaused == 3)) {
         pResult->i = 1;
         return;
     }

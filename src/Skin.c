@@ -283,7 +283,7 @@ int SKN_GetLightCourse(void) {
 void SKN_PoseCharacter(Character* pChar, int n) {
     Skin* pClub;
 
-    if (gSession.nSplitScreen == 0 || gSession.nGameType == 3) {
+    if (gSession.nSplitScreen == 0 || gSession.nGameType == GAMESTATE_FE_RUN) {
         SkinMorph_Update(pChar->pSkin, pChar->nView);
     }
     SKN_BuildMatrices(pChar->pSkin, pChar->pModel, 0, 0, pChar->nView);

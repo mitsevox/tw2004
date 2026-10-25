@@ -552,7 +552,7 @@ void DynamicCam_ProcessScript(CamShot* link, int ePlayerID, CameraScriptSettings
         } else {
             fActualGroundHeight = settings->fGroundHeight;
         }
-    } else if (gSession.nGameType == 3) {
+    } else if (gSession.nGameType == GAMESTATE_FE_RUN) {
         fActualGroundHeight = link->fMinHeight;
         position[1] = fActualGroundHeight;
     } else {
@@ -1758,7 +1758,7 @@ static u8 DynamicCam_MatchPlayer(CamShot* script) {
     CrAPGolfer* pGolfer;
     int nGolferId;
 
-    if (gSession.nGameType != 3) return 1;
+    if (gSession.nGameType != GAMESTATE_FE_RUN) return 1;
     pGolfer = gpCrAPState->pShown;
     if (pGolfer != NULL && pGolfer->pChar != NULL) {
         nGolferId = pGolfer->nGolferId;

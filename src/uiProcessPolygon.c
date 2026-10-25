@@ -137,7 +137,7 @@ void UIPoly_Draw(FEQuad* pQuad) {
         pEntry = gpFrontEnd->pFile->p8->apTables[pQuad->nTable]->apEntries[pQuad->nEntry];
         szName = pEntry->szC;
         if (pEntry->u0 & 1) {
-            if (gSession.nGameType == 3) {
+            if (gSession.nGameType == GAMESTATE_FE_RUN) {
                 pBank = gFEtmBanks[pQuad->nEntry];
                 pTex = UI_GetTexBankFirstTexture(pBank);
                 RenderState_SetBankTexture(pBank, pTex);
@@ -440,7 +440,7 @@ void UI_InitLoadingBar(void) {
         gUILoadingScreen.fElapsed = 0.0f;
         gUILoadingScreen.uLastTime = TI_sRead();
         gUILoadingScreen.n0 = 0;
-        if (gSession.nGameType == 4) {
+        if (gSession.nGameType == GAMESTATE_IG_SETUP) {
             gUILoadingScreen.nNumPlayers = gSession.nNumPlayers;
         } else {
             gUILoadingScreen.nNumPlayers = 0;

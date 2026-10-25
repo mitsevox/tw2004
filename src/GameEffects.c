@@ -169,7 +169,7 @@ f32 GameEffects_AdjustTimeRate(f32 fFrameTime) {
 // (GameEffects_StartOfSlowMoFrame), else 0. Otherwise one step per FRAME_TIME of frame time,
 // rounded, at least 1 (twice that, at least 2, in mode 26).
 int GameEffects_BallUpdatesThisFrame(int nPlayer) {
-    if (gSession.nGameType == 3 || GolfCamera_IsScriptMatrixModeOn()) {
+    if (gSession.nGameType == GAMESTATE_FE_RUN || GolfCamera_IsScriptMatrixModeOn()) {
         return 1;
     }
     if (0.0f == gSession.fFrameTime) {

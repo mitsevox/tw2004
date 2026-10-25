@@ -3021,7 +3021,7 @@ u8 CamScript_SkipLookBackCam(CameraScriptSettings_t* pScript, CamShot* pShot, in
 // Whether the player's camera offsets are mirrored for a left-handed golfer
 // (Character_IsLeftHanded); never on the CrAP screen (game type 3). pShot is not read.
 u8 CameraScript_FlipCameraForLefty(int nPlayer, CamShot* pShot) {
-    if (gSession.nGameType == 3) {
+    if (gSession.nGameType == GAMESTATE_FE_RUN) {
         return 0;
     }
     return Character_IsLeftHanded(gPlayers[nPlayer].pChar) != 0;

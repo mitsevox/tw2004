@@ -542,6 +542,23 @@ LAYOUT_ASSERT(CourseRecord, 0x320);
 
 #define NUM_COURSE_RECORDS 21   // 0xF00..0x50A0 of the session
 
+// The game's outer state (Session.nGameType): GoEntry.c's loop runs one step for it and moves it
+// on. Not the round's game mode (gpGame->nMode, GM_ModeType_t).
+typedef enum GAME_MODE_e {
+    GAMESTATE_BOOT = 0,         // decides what follows the boot
+    GAMESTATE_STARTUP = 1,      // the start-up screens
+    GAMESTATE_FE_RUN = 3,       // the front end (the menus)
+    GAMESTATE_IG_SETUP = 4,     // starts a round (GO_vInitIG)
+    GAMESTATE_IG_LOAD_HOLE = 5, // loads a hole
+    GAMESTATE_IG_PLAY_HOLE = 6, // plays it (the frame loop)
+    GAMESTATE_IG_EXIT_HOLE = 7, // after the frame loop: the next hole, or the round's end
+    GAMESTATE_IG_SHUTDOWN = 8,  // shuts the round down
+    GAMESTATE_ERROR = 9,        // an error: the loop only prints a message
+    GAMESTATE_FE_SETUP = 10,    // starts the front end (GO_vInitFE)
+    GAMESTATE_RESET = 12,       // resets the console
+    GAMESTATE_QUIT = 13         // leaves the loop
+} GAME_MODE_e;
+
 typedef struct Session {
     u32  uFlags;                // 0x000  bit 1: use the alternate attribute block everywhere;
                                 //        bit 9: every club in the bag; 0x4000 the demo set-up
@@ -549,7 +566,7 @@ typedef struct Session {
                                 //        controller 9, every attribute 105, no earnings, clear
                                 //        weather (fn_8006F650), caddie tips off; many tests want
                                 //        0x8000 with it
-    s32  nGameType;             // 0x004  4 gets a second view
+    s32  nGameType;             // 0x004  the game's outer state (GAME_MODE_e)
     u8   bDemo;                 // 0x008  the game the menus start is the demo (set by
                                 //        FE_MessageTable.c GM_vStartDemo; DEMO_Start runs as the
                                 //        menus fade out): no GameBreakers, hole contests, EASBio

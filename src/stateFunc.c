@@ -226,7 +226,7 @@ void STATEFUNC_PreShotInit(int nPlayer) {
     Mem_cpy(&gPlayers[nPlayer].ballBefore, pBall, sizeof(Ball));
     gPlayers[nPlayer].fA64 = GameAnalysis_GetInitialDistanceToPin(nPlayer);
     EVENT_Trigger(nPlayer, 3, 0, -1);
-    if (gSession.nGameType != 8 && Player_IsCPU(nPlayer)) {
+    if (gSession.nGameType != GAMESTATE_IG_SHUTDOWN && Player_IsCPU(nPlayer)) {
         GUI_ToggleUI(nPlayer, 1);
     }
     if (GM_DoPreshotAnimation(nPlayer) != 0) {
@@ -474,7 +474,8 @@ void STATEFUNC_ShotSetupUpdate(int nPlayer) {
 }
 
 void STATEFUNC_ShotSetupExit(int nPlayer) {
-    if (gSession.nGameType != 8 && gPlayers[nPlayer].ball.nLie != LIE_INCUP_e && !Player_IsCPU(nPlayer)) {
+    if (gSession.nGameType != GAMESTATE_IG_SHUTDOWN && gPlayers[nPlayer].ball.nLie != LIE_INCUP_e
+        && !Player_IsCPU(nPlayer)) {
         GUI_ToggleUI(nPlayer, 1);
     }
 }

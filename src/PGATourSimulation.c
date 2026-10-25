@@ -736,7 +736,7 @@ s32 GM_PgaTourSim_GetTotalScoreFromEntrantID(int nPlayer, int nEntrant, u8 b) {
     GetEntrantMCPtr(nPlayer, nEntrant);
     pEntrant = GetEntrantNonMCPtr(nEntrant);
     nStrokes = 0;
-    if (gSession.nGameType == 3 && gpSaveData[nPlayer].tour.nRound == 0) {
+    if (gSession.nGameType == GAMESTATE_FE_RUN && gpSaveData[nPlayer].tour.nRound == 0) {
         for (i = 0; i < 4; i++) {
             nStrokes += GM_PgaTourSim_GetRoundScoreFromEntrantID(nPlayer, nEntrant, i);
         }
@@ -776,7 +776,7 @@ int GM_PgaTourSim_GetRelativeScoreFromEntrantID(int nPlayer, int nEntrant, u8 b)
     GameModeDriverPGATour_GetCourses(GameModeDriverPGATour_GetEventInfo(nEvent), aCourses);
     GetEntrantNonMCPtr(nEntrant);
     nScore = GM_PgaTourSim_GetTotalScoreFromEntrantID(nPlayer, nEntrant, b);
-    if (gSession.nGameType == 3 && gpSaveData[nPlayer].tour.nRound == 0) {
+    if (gSession.nGameType == GAMESTATE_FE_RUN && gpSaveData[nPlayer].tour.nRound == 0) {
         for (i = 0; i < 4; i++) {
             nScore -= GM_GetTotalPar(aCourses[i], 0);
         }
@@ -831,7 +831,7 @@ s32 GM_PgaTourSim_GetRoundScoreFromEntrantID(int nPlayer, int nEntrant, int nRou
     s32 nStrokes;
     s32 i;
 
-    if (nRound == gpSaveData[nPlayer].tour.nRound && gSession.nGameType != 3) {
+    if (nRound == gpSaveData[nPlayer].tour.nRound && gSession.nGameType != GAMESTATE_FE_RUN) {
         nStrokes = 0;
         // The (s16) is in the original (an extsh before each add), as in CommitEntrantRoundScore.
         for (i = 0; i < pEntrant->nCurrentHole; i++) {

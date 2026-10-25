@@ -64,9 +64,9 @@ void UI_SetInterfaceName(char* szSet) {
 // texture banks, 'FONS' fonts, 'GRPS' and 'MPCS' the picture list. StreamManager.c calls it
 // before the menus', a round's and start-up's files are streamed.
 void UI_RegisterStreamClients(void) {
-    if (gSession.nGameType == 4) {
+    if (gSession.nGameType == GAMESTATE_IG_SETUP) {
         gUIInterfaceName = "ingame";
-    } else if (gSession.nGameType == 0) {
+    } else if (gSession.nGameType == GAMESTATE_BOOT) {
         gUIInterfaceName = "startup";
     } else {
         gUIInterfaceName = "frontend";
@@ -94,7 +94,7 @@ void UI_UnregisterStreamClients(void) {
 void UI_StreamLoadFile(TStreamData* pObject) {
     void* pData;
 
-    if (gUIFileAram == 0 && gSession.nGameType == 10) {
+    if (gUIFileAram == 0 && gSession.nGameType == GAMESTATE_FE_SETUP) {
         gUIFileAramSize = ((pObject->uSize >> 5) + 1) << 5;
     }
     pData = Circular_MemAllocFunc(pObject->uSize, MEMTYPE_LOW, 32, "uiLoadFile.c", 165);

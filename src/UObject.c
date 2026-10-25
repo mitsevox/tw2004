@@ -117,7 +117,7 @@ void Object_Render(UObject* pObj) {
     nFlags2 = Object_GetMeshFlags(pMesh, 2);
     bLit = nFlags2 & 4;
     if (bLit) {
-        if (gSession.nGameType != 3) {
+        if (gSession.nGameType != GAMESTATE_FE_RUN) {
             Ter_GetAmbientLight(Ter_GetTGD(), pObj->m80[3]);
             LF_SetCurrentBrightness(0.8f);
         }

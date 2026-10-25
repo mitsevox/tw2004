@@ -65,40 +65,40 @@ void fn_800083A4(void) {
     SkinBurn_CheckSignatureFile();
     do {
         switch (gSession.nGameType) {
-        case 0:
+        case GAMESTATE_BOOT:
             if (gSession.uFlags & 0x400) {
                 fn_8006C6F0();
                 if (gSession.uFlags & 5) {
-                    gSession.nGameType = 4;
+                    gSession.nGameType = GAMESTATE_IG_SETUP;
                 } else {
-                    gSession.nGameType = 10;
+                    gSession.nGameType = GAMESTATE_FE_SETUP;
                 }
             } else if (gSession.uFlags & 5) {
                 fn_8006C6F0();
-                gSession.nGameType = 4;
+                gSession.nGameType = GAMESTATE_IG_SETUP;
             } else {
                 fn_8006CEFC();
-                gSession.nGameType = 1;
+                gSession.nGameType = GAMESTATE_STARTUP;
             }
             if (gSession.uFlags & 0x20000) {
                 SaveProfile_SetupDummy();
             }
             break;
-        case 1:
+        case GAMESTATE_STARTUP:
             UI_OpenInterface("startup");
             fn_8006D8E8();
             fn_8006CFC8();
             if (gSession.nC == 0) {
-                gSession.nGameType = 10;
+                gSession.nGameType = GAMESTATE_FE_SETUP;
             } else {
-                gSession.nGameType = 12;
+                gSession.nGameType = GAMESTATE_RESET;
             }
             break;
-        case 10:
+        case GAMESTATE_FE_SETUP:
             GO_vInitFE();
-            gSession.nGameType = 3;
+            gSession.nGameType = GAMESTATE_FE_RUN;
             break;
-        case 3:
+        case GAMESTATE_FE_RUN:
             UI_OnFrontEndStart();
             if (gFEState.bFirstTime) {
                 FE_PlayIntroMovies();
@@ -106,7 +106,7 @@ void fn_800083A4(void) {
             Gaud_StartFEMusic(gFEState.bFirstTime);
             UI_OpenInterface("frontend");
             fn_8006D8E8();
-            if (gSession.nC == 0 && gSession.nGameType != 13) {
+            if (gSession.nC == 0 && gSession.nGameType != GAMESTATE_QUIT) {
                 FE_StreamStopAllStreaming();
                 if (gSession.uFlags & 0x4000) {
                     GameMode26_StartEvent();
@@ -115,20 +115,20 @@ void fn_800083A4(void) {
                 UI_ShowLoadingScreen();
             }
             fn_8006CB2C();
-            if (gSession.nGameType == 13) {
+            if (gSession.nGameType == GAMESTATE_QUIT) {
                 bQuit = 1;
             } else if (gSession.nC == 0) {
-                gSession.nGameType = 4;
+                gSession.nGameType = GAMESTATE_IG_SETUP;
             } else {
-                gSession.nGameType = 12;
+                gSession.nGameType = GAMESTATE_RESET;
             }
             break;
-        case 4:
+        case GAMESTATE_IG_SETUP:
             gSession.n28++;
             GO_vInitIG();
-            gSession.nGameType = 5;
+            gSession.nGameType = GAMESTATE_IG_LOAD_HOLE;
             break;
-        case 5:
+        case GAMESTATE_IG_LOAD_HOLE:
             AI_TargetsClear();
             UI_InitLoadingBar();
             // one listener per view
@@ -140,29 +140,29 @@ void fn_800083A4(void) {
             HoleLoader_vLoadQueuedHole();
             Gaud_InitHole();
             fn_80112D20();
-            gSession.nGameType = 6;
+            gSession.nGameType = GAMESTATE_IG_PLAY_HOLE;
             break;
-        case 6:
+        case GAMESTATE_IG_PLAY_HOLE:
             if ((gSession.uFlags & 0x4000) && gSession.bDemo) {
                 fn_8009A16C();
             }
             fn_8006D8E8();
-            if (gSession.nGameType == 13) {
+            if (gSession.nGameType == GAMESTATE_QUIT) {
                 bQuit = 1;
             } else {
-                gSession.nGameType = 7;
+                gSession.nGameType = GAMESTATE_IG_EXIT_HOLE;
             }
             break;
-        case 7:
+        case GAMESTATE_IG_EXIT_HOLE:
             fn_80112DA0();
             Gaud_ExitHole();
             Character_ExitHole();
             HoleLoader_CloseCurrentHole();
             Luck_TightenOdds();
             if (fn_80008820() && gSession.nC == 0) {
-                gSession.nGameType = 5;
+                gSession.nGameType = GAMESTATE_IG_LOAD_HOLE;
             } else {
-                gSession.nGameType = 8;
+                gSession.nGameType = GAMESTATE_IG_SHUTDOWN;
             }
             if (gSession.nC == 0 || gSession.nC == 3) {
                 if ((gSession.uFlags & 0x4000) && gSession.bDemo) {
@@ -175,21 +175,21 @@ void fn_800083A4(void) {
             CharacterTex_WaitEndOfTextureLoader();
             Aud_ExitSession(1);
             break;
-        case 8:
+        case GAMESTATE_IG_SHUTDOWN:
             fn_8006CDC4();
             if (gSession.nC == 0) {
-                gSession.nGameType = 10;
+                gSession.nGameType = GAMESTATE_FE_SETUP;
             } else if (gSession.nC == 3) {
-                gSession.nGameType = 4;
+                gSession.nGameType = GAMESTATE_IG_SETUP;
             } else {
-                gSession.nGameType = 12;
+                gSession.nGameType = GAMESTATE_RESET;
             }
             if ((gSession.uFlags & 0x4000) && fn_8009A1EC()) {
                 DEMO_Start();
-                gSession.nGameType = 4;
+                gSession.nGameType = GAMESTATE_IG_SETUP;
             }
             break;
-        case 12:
+        case GAMESTATE_RESET:
             // Reset: wait for the display to finish, black the screen for two frames,
             // recalibrate all four pads and restart (nC 2: a hot reset to the menu).
             fn_800070DC();
@@ -214,10 +214,10 @@ void fn_800083A4(void) {
             }
             OSResetSystem(0, 1, 0);
             return;
-        case 13:
+        case GAMESTATE_QUIT:
             bQuit = 1;
             break;
-        case 9:
+        case GAMESTATE_ERROR:
             printf("%s (%ld), We hit an erroroneous mode!\n", "GoEntry.c", 814L);
             break;
         default:
