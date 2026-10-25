@@ -1344,7 +1344,7 @@ void FE_vExitUI(void) {
             Session_SetGolfer(0, 0);
         }
     }
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < SAVE_NUM_SLOTS; i++) {
         if (gFEState.aCPU[i]) {
             gSession.nController[i] = CONTROLLER_CPU;
             gSession.uBag[i] = 0;

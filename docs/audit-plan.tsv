@@ -46,7 +46,7 @@ order	area	file	task	scope	state
 43	The course	TerrainGround.c	pass	the whole file	done
 44	The course	UNetwork.c	pass	the whole file	done
 45	The course	UObject.c	pass	the whole file	done
-46	The course	GoDynObjTypes.c	pass	the whole file	open
+46	The course	GoDynObjTypes.c	pass	the whole file	done
 47	The course	GoTerrainCollision.c	chunk 1/3	Ter_Floor .. Ter_GetHighestGroundTriangle	open
 48	The course	GoTerrainCollision.c	chunk 2/3	Ter_GetLowestGroundTriangle .. Ter_CheckForWorldCollision	open
 49	The course	GoTerrainCollision.c	chunk 3/3	Ter_CheckForWorldCollisionOneGrid .. MaterialTypes_getMaterialID	open
@@ -62,7 +62,7 @@ order	area	file	task	scope	state
 59	Audio	UAudMemStack.c	pass	the whole file	done
 60	Audio	HLAudMaster.c	pass	the whole file	done
 61	Audio	UAudContainers.c	pass	the whole file	done
-62	Audio	UAudMem.c	pass	the whole file	open
+62	Audio	UAudMem.c	pass	the whole file	done
 63	Audio	startUp.c	chunk 1/2	HwVoice_MixerCallback .. AudAram_Free	open
 64	Audio	startUp.c	chunk 2/2	AudAram_AllocStreamBuffer .. Startup_LoadOptionsFromCard	open
 65	Audio	startUp.c	whole-file review	the whole file	open
@@ -113,7 +113,7 @@ order	area	file	task	scope	state
 110	Characters	hwsOverride_Gc.c	pass	the whole file	open
 111	Characters	char_tex_manager.c	pass	the whole file	open
 112	Characters	mtalib.c	pass	the whole file	open
-113	Characters	Code80095564.c	pass	the whole file	open
+113	Characters	char_skin.c	pass	the whole file	done
 114	Characters	ska_shared.c	pass	the whole file	open
 115	Characters	DynChain.c	pass	the whole file	open
 116	Characters	hwsRender_Gc.c	pass	the whole file	open
@@ -222,7 +222,7 @@ order	area	file	task	scope	state
 219	Situation scripts and commentary	event.c	whole-file review	the whole file	open
 220	Situation scripts and commentary	SitDev.c	pass	the whole file	open
 221	Situation scripts and commentary	SitDevStateVector.c	pass	the whole file	open
-222	Save data	user.c	pass	the whole file	open
+222	Save data	user.c	pass	the whole file	done
 223	Save data	Common/Crypt/CryptXOR.c	pass	the whole file	done
 224	Save data	gbacable.c	chunk 1/2	Gba_CalcCheckByte .. Gba_StepPorts	open
 225	Save data	gbacable.c	chunk 2/2	fn_80123E34_Read .. Gba_UpdateLinkState	open
@@ -264,11 +264,12 @@ order	area	file	task	scope	state
 261	Boot and game flow	gomainloop.c	chunk 1/2	gomainloop_StrippedFn .. GO_vInitIG	open
 262	Boot and game flow	gomainloop.c	chunk 2/2	fn_8006CDC4 .. TI_fConvertTimeDifToSeconds	open
 263	Boot and game flow	gomainloop.c	whole-file review	the whole file	open
-264	Boot and game flow	unsorted/sweep_80005580.c	fold	prove its file and fold it in	open
-265	Boot and game flow	unsorted/sweep_800055D4.c	fold	prove its file and fold it in	open
-266	Boot and game flow	unsorted/sweep_80005590.c	fold	prove its file and fold it in	open
-267	Boot and game flow	unsorted/sweep_80005520.c	fold	prove its file and fold it in	open
-268	Boot and game flow	unsorted/sweep_800055D8.c	fold	prove its file and fold it in	open
+264	Boot and game flow	unsorted/sweep_80005580.c	fold	prove its file and fold it in	done
+265	Boot and game flow	unsorted/sweep_800055D4.c	fold	prove its file and fold it in	done
+266	Boot and game flow	unsorted/sweep_80005590.c	fold	prove its file and fold it in	done
+267	Boot and game flow	unsorted/sweep_80005520.c	fold	prove its file and fold it in	done
+268	Boot and game flow	unsorted/sweep_800055D8.c	fold	prove its file and fold it in	done
+268	Boot and game flow	Main.c	pass	the whole file	open
 269	Shader objects and effects	GoShaderObjectCommon_TexAnimManager_Gc.c	pass	the whole file	open
 270	Shader objects and effects	GoShaderObjectCommon_MorphAnimManager_Gc.c	pass	the whole file	open
 271	Shader objects and effects	UFstPart.c	pass	the whole file	open
@@ -290,7 +291,7 @@ order	area	file	task	scope	state
 287	Shader objects and effects	unsorted/sweep_80070168.c	fold	prove its file and fold it in	open
 288	Shader objects and effects	unsorted/sweep_8009554C.c	fold	prove its file and fold it in	open
 289	Shader objects and effects	unsorted/sweep_8006FF2C.c	fold	prove its file and fold it in	open
-290	Shader objects and effects	unsorted/sweep_80097EC4.c	fold	prove its file and fold it in	open
+290	Shader objects and effects	unsorted/sweep_80097EC4.c	fold	prove its file and fold it in	done
 291	Rendering	GoViewport.c	pass	the whole file	done
 292	Rendering	GoFrameBuf.c	pass	the whole file	done
 293	Rendering	GoRenderSurface.c	pass	the whole file	open
@@ -310,7 +311,7 @@ order	area	file	task	scope	state
 307	Rendering	GxUtil.c	pass	the whole file	open
 308	Rendering	GoRenderCtx_Gc.c	pass	the whole file	open
 309	Rendering	LLDynTex.c	pass	the whole file	open
-310	Rendering	Code8009A928.c	pass	the whole file	open
+310	Rendering	GlowMgr.c	pass	the whole file	done
 311	Rendering	Code800BA940.c	pass	the whole file	open
 312	Rendering	GoLightFogEnv.c	pass	the whole file	open
 313	Rendering	Code80015470.c	pass	the whole file	open
@@ -329,9 +330,9 @@ order	area	file	task	scope	state
 326	Rendering	GoTerrain.c	chunk 4/4	Ter_BuildGrassPatchList .. CharacterRender_RenderSetup	open
 327	Rendering	GoTerrain.c	whole-file review	the whole file	open
 328	Rendering	GoGrass.c	pass	the whole file	open
-329	Rendering	unsorted/sweep_8009B314.c	fold	prove its file and fold it in	open
+329	Rendering	unsorted/sweep_8009B314.c	fold	prove its file and fold it in	done
 330	Rendering	unsorted/code_800080D0.c	fold	prove its file and fold it in	open
-331	Rendering	unsorted/sweep_800136F4.c	fold	prove its file and fold it in	open
+331	Rendering	unsorted/sweep_800136F4.c	fold	prove its file and fold it in	done
 332	Rendering	unsorted/code_800082F8.c	fold	prove its file and fold it in	open
 333	Rendering	unsorted/sweep_8009A844.c	fold	prove its file and fold it in	open
 334	EA UI Studio library	UIStudio.c	pass	the whole file	open
@@ -386,8 +387,8 @@ order	area	file	task	scope	state
 383	Front end and UI	FE_MessageTable.c	whole-file review	the whole file	open
 384	Front end and UI	uiProcessInterface.c	pass	the whole file	open
 385	Unplaced	unsorted/sweep_8003944C.c	fold	prove its file and fold it in	open
-386	Unplaced	unsorted/sweep_80095780.c	fold	prove its file and fold it in	open
-387	Unplaced	unsorted/sweep_80095798.c	fold	prove its file and fold it in	open
-388	Unplaced	unsorted/sweep_800957B0.c	fold	prove its file and fold it in	open
-389	Unplaced	unsorted/sweep_80095744.c	fold	prove its file and fold it in	open
-390	Unplaced	unsorted/sweep_800957D8.c	fold	prove its file and fold it in	open
+386	Unplaced	unsorted/sweep_80095780.c	fold	prove its file and fold it in	done
+387	Unplaced	unsorted/sweep_80095798.c	fold	prove its file and fold it in	done
+388	Unplaced	unsorted/sweep_800957B0.c	fold	prove its file and fold it in	done
+389	Unplaced	unsorted/sweep_80095744.c	fold	prove its file and fold it in	done
+390	Unplaced	unsorted/sweep_800957D8.c	fold	prove its file and fold it in	done

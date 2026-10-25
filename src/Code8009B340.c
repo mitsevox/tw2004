@@ -1,7 +1,7 @@
 // Code8009B340.c (our name; what it draws is not known yet): a list of nodes (FadeNode,
 // lbl_80281FA0) drawn as queued glows (fn_8009B260) that fade out, each freed once it has faded. Its
 // data is its own: the .sbss 0x80281FA0-0x80281FA8 and the .sdata2 0x80283EC0-0x80283EC8.
-// fn_8009B320 before it (it frees a node) is probably this file's too.
+// It starts with fn_8009B320, which frees a node.
 
 #include "glows.h"
 
@@ -14,6 +14,14 @@ FadeNode* lbl_80281FA0;
 static f32 Code8009B340_StrippedFn(f32 x) {
     return x * 255.0f;
 }
+
+// ---- sweep code (not yet cleaned up) ----
+
+void fn_8009B320(FadeNode* pNode) {
+    Circular_MemFreeFunc(pNode);
+}
+
+// ---- end of sweep code ----
 
 // Advances a node by fTime seconds; one that has faded out is marked for freeing.
 void fn_8009B340(FadeNode* pNode, f32 fTime) {
@@ -73,7 +81,8 @@ void fn_8009B4B4(void) {
     }
 }
 
-void fn_8009B528(f32 fTime) {
+// Advances every node by fTime seconds, then frees the ones that have faded out.
+void FadeGlow_UpdateAll(f32 fTime) {
     FadeNode* pNode;
 
     for (pNode = lbl_80281FA0; pNode != NULL; pNode = pNode->pNext) {
@@ -82,7 +91,8 @@ void fn_8009B528(f32 fTime) {
     fn_8009B4B4();
 }
 
-void fn_8009B57C(void) {
+// Queues every node's glows for drawing.
+void FadeGlow_RenderAll(void) {
     FadeNode* pNode;
 
     for (pNode = lbl_80281FA0; pNode != NULL; pNode = pNode->pNext) {
@@ -104,10 +114,12 @@ void fn_8009B5BC(void) {
     lbl_80281FA0 = NULL;
 }
 
-void fn_8009B604(void) {
+// Starts with no nodes.
+void FadeGlow_InitModule(void) {
     lbl_80281FA0 = NULL;
 }
 
-void fn_8009B610(void) {
+// Frees every node.
+void FadeGlow_CloseModule(void) {
     fn_8009B5BC();
 }
