@@ -88,7 +88,7 @@ GameMode_Skins.c	open
 GameRound.c	open		
 GameUI.c	open		
 GameUICommands.c	open		
-GlowMgr.c	open		
+GlowMgr.c	done	a9daa694	claude-review
 GoARAM.c	done	77c51d42	claude-review
 GoAnimalActors.c	open		
 GoBreakLine.c	open		

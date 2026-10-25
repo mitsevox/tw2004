@@ -310,7 +310,7 @@ order	area	file	task	scope	state
 307	Rendering	GxUtil.c	pass	the whole file	open
 308	Rendering	GoRenderCtx_Gc.c	pass	the whole file	open
 309	Rendering	LLDynTex.c	pass	the whole file	open
-310	Rendering	GlowMgr.c	pass	the whole file	open
+310	Rendering	GlowMgr.c	pass	the whole file	done
 311	Rendering	Code800BA940.c	pass	the whole file	open
 312	Rendering	GoLightFogEnv.c	pass	the whole file	open
 313	Rendering	Code80015470.c	pass	the whole file	open
