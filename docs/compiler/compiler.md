@@ -76,21 +76,38 @@ matches, but identically on GC/2.0, 2.5 and 2.6, so it does not separate them. G
 (63 functions, including the 99.67% near-miss `GM_BuildRandom18`) compiles byte-identically under
 GC/1.3.2, 2.0, 2.0p1, 2.5, 2.6 and 2.7, so its stubborn register shuffle is not a version effect.
 
-**The C library (MSL) was not built with one compiler (2026-09-23).** ansi_fp.c matches only on GC/2.0,
-2.5 or 2.6 (on GC/1.3.2 `__timesdec` is 95.4 and `__minus_dec` 96.7; GC/2.0p1 is worse). printf.c's
-parse_format, long2str, longlong2str, double2hex and float2str all reach 100 on GC/2.5 (82-98 on GC/1.3),
-while s_ldexp in the same group drops from 100 to 99.96 on GC/2.5. So set the compiler per file. The
-earlier "this game's printf revision differs" was a compiler difference. Try GC/2.5 on any other MSL
-near-miss. GameMode4Menu (game code) scored identically on GC/2.0 and GC/2.5.
+**MSL, the runtime and MetroTRK are built with GC/2.5, like the game (2026-10-25).** Every
+CodeWarrior file was rebuilt with each version from GC/1.0 to GC/2.7, with its own flags:
+
+| Library | Files | Matches with |
+|---------|------:|--------------|
+| EA game | 244 | GC/2.5, 2.6, 2.7 (2.0 fails 4) |
+| Dolphin SDK | 97 | GC/1.2.5n only (no other version builds more than 37) |
+| MetroTRK | 27 | GC/1.3.2 through 2.7 |
+| MSL and runtime | 56 | GC/2.5 through 2.7, all but mbstring.c with the group's flags |
+
+The per-file mix of GC/1.3, 1.3.2 and 2.5 that MSL used before was a patch over wrong source
+revisions. printf.c and ansi_fp.c match only on GC/2.5 or newer, and every file pinned to an older
+version also matches on GC/2.5 once its source is right:
+- s_ldexp.c needed the older revision's floating-point classification values (`FP_NAN` 1 through
+  `FP_SUBNORMAL` 5). `extern/sdk/libc/math.h` used to pick them by compiler version, so only GC/1.3
+  produced them.
+- e_pow.c is the Sun fdlibm source (`extern/sdk/runtime/e_pow.c`). The eCos-derived copy from
+  another decomp takes the address of `one` and its `math.h` emits sqrtf's constants, which adds
+  24 bytes to `.sdata2`.
+- mbstring.c matches without automatic inlining (`-inline noauto`): mbtowc calls is_utf8_complete.
+
+MetroTRK cannot tell GC/1.3.2 from 2.5 by its code. It ships prebuilt in the same CodeWarrior
+install as MSL, so it uses the same compiler. GameMode4Menu (game code) scored identically on
+GC/2.0 and GC/2.5.
 
 Things that looked like evidence but were not
 ---------------------------------------------
 
-- **MSL library test.** `mem_funcs.c` from another project's MSL source matched the binary
-  only when compiled with GC/3.0 (built Dec 2005). That compiler cannot have been used for a
-  2003 game. Most likely explanation: this game links a different MSL source revision, and
-  older source plus a newer compiler happened to produce the same bytes. The MSL library was
-  prebuilt by Metrowerks anyway, so it says little about the compiler EA used.
+- **MSL library test.** `mem_funcs.c` from one project's MSL source matched the binary only
+  when compiled with GC/3.0 (built Dec 2005), which cannot have built a 2003 game. The copy the
+  build uses now (from another decomp) matches on GC/2.5: the first copy was a different source
+  revision.
 - **SDK version stamp `(0x2301)`.** That is the compiler Nintendo used to build the SDK.
 - **Paired-single instructions.** Most are the `psq_st` / `psq_l` float register saves that
   every version from GC/1.3.2 up emits under `-proc gekko`. The 210 real paired-single math

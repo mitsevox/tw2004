@@ -88,29 +88,6 @@ void GXSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor
   __GXData->bpSentNot = 0;
 }
 
-void GXInitFogAdjTable(GXFogAdjTable *table, u16 width, const Mtx44 proj) {
-  f32 x, nearZ, scale, sideX, dist;
-  u32 i;
-
-  if (proj[3][3] == 0.0) {
-    nearZ = proj[2][3] / (proj[2][2] - 1.0f);
-    sideX = (nearZ * (proj[0][2] + 1.0f)) / proj[0][0];
-  } else {
-    nearZ = (proj[2][3] + 1.0f) / proj[2][2];
-    sideX = -(proj[0][3] - 1.0f) / proj[0][0];
-  }
-
-  scale = 2.0f / width;
-
-  for (i = 0; i < 10; i++) {
-    x = (i + 1) * 32;
-    x *= scale;
-    x *= sideX;
-    dist = sqrtf(1.0f + (x * x) / (nearZ * nearZ));
-    table->r[i] = (u32)(dist * 256.0f) & 0xFFF;
-  }
-}
-
 void GXSetFogRangeAdj(GXBool enable, u16 center, const GXFogAdjTable *table) {
   u32 i;
   u32 range_adj;

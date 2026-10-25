@@ -3,7 +3,8 @@
 A matching decompilation of Tiger Woods PGA Tour 2004 (GameCube, GW4E69). Build with
 `python configure.py && ninja`; every commit must end with `build/GW4E69/main.dol: OK`. The build
 needs `orig/GW4E69/sys/main.dol`; a cloud session gets it with `tools/cloud/setup.sh`.
-How the C must read: [`docs/style.md`](docs/style.md). Compiler behaviour:
+How the C must read: [`docs/style.md`](docs/style.md). How the audit runs:
+[`docs/audit-process.md`](docs/audit-process.md). Compiler behaviour:
 [`docs/compiler/decomp-notes.md`](docs/compiler/decomp-notes.md).
 
 Rules:

@@ -183,44 +183,6 @@ static u32 __GXGetNumXfbLines(u32 efbHt, u32 iScale) {
   return realHt;
 }
 
-u16 GXGetNumXfbLines(u16 efbHeight, f32 yScale) {
-  u32 iScale;
-
-  iScale = (u32)(256.0f / yScale) & 0x1FF;
-  return __GXGetNumXfbLines(efbHeight, iScale);
-}
-
-f32 GXGetYScaleFactor(u16 efbHeight, u16 xfbHeight) {
-  f32 fScale;
-  f32 yScale;
-  u32 iScale;
-  u32 tgtHt;
-  u32 realHt;
-
-  tgtHt = xfbHeight;
-  yScale = (f32)xfbHeight / (f32)efbHeight;
-  iScale = (u32)(256.0f / yScale) & 0x1FF;
-  realHt = __GXGetNumXfbLines(efbHeight, iScale);
-
-  while (realHt > xfbHeight) {
-    tgtHt--;
-    yScale = (f32)tgtHt / (f32)efbHeight;
-    iScale = (u32)(256.0f / yScale) & 0x1FF;
-    realHt = __GXGetNumXfbLines(efbHeight, iScale);
-  }
-
-  fScale = yScale;
-  while (realHt < xfbHeight) {
-    fScale = yScale;
-    tgtHt++;
-    yScale = (f32)tgtHt / (f32)efbHeight;
-    iScale = (u32)(256.0f / yScale) & 0x1FF;
-    realHt = __GXGetNumXfbLines(efbHeight, iScale);
-  }
-
-  return fScale;
-}
-
 u32 GXSetDispCopyYScale(f32 vscale) {
   u8 enable;
   u32 iScale;

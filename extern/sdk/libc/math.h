@@ -113,32 +113,7 @@ _MATH_INLINE float powf(float __x, float __y) { return pow(__x, __y); }
 
 #define signbit(x)((int)(__HI(x)&0x80000000))
 
-/* The pre-2.4.7 runtime headers use different floating-point classification values. */
-#if !defined(__MWERKS__) || __MWERKS__ >= 0x2407
-#define FP_NAN 0
-#define FP_INFINITE 1
-#define FP_ZERO 3
-#define FP_NORMAL 4
-#define FP_SUBNORMAL 2
-
-static inline int __fpclassifyf(float x) {
-  switch ((*(_INT32*)&x) & 0x7f800000) {
-  case 0:
-    if ((*(_INT32*)&x) & 0x007fffff)
-      return FP_SUBNORMAL;
-    else
-      return FP_ZERO;
-  default:
-    return FP_NORMAL;
-  case 0x7f800000:
-    if ((*(_INT32*)&x) & 0x007fffff)
-      return FP_NAN;
-    else
-      return FP_INFINITE;
-  }
-}
-
-#else
+/* This MSL revision's classification values (later revisions renumbered them, FP_NAN 0). */
 #define FP_NAN 1
 #define FP_INFINITE 2
 #define FP_ZERO 3
@@ -164,8 +139,6 @@ static inline int __fpclassifyf(float x) {
   }
   return FP_NORMAL;
 }
-
-#endif
 
 static inline int __fpclassifyd(double x) {
   switch (__HI(x) & 0x7ff00000) {
@@ -196,8 +169,8 @@ static inline int __fpclassifyd(double x) {
 
 #ifdef __MWERKS__
 extern inline float sqrtf(float x) {
-  static const double _half = .5;
-  static const double _three = 3.0;
+  const double _half = .5;
+  const double _three = 3.0;
   volatile float y;
 
   if (x > 0.0f) {
