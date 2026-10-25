@@ -29,7 +29,8 @@ i_file = os.path.join(out_dir, stem + '.i'); s_file = os.path.join(out_dir, stem
 # cpp.exe predefines nothing on its own (the driver passes its version through the specs), so
 # give it the compiler's version the way ngccc would.
 cpp_flags = ['-D__GNUC__=2', '-D__GNUC_MINOR__=95'] + [f for f in flags if f.startswith(('-I', '-D', '-U', '-nostdinc'))]
-cc1_flags = [f for f in flags if not f.startswith(('-I', '-D', '-U', '-nostdinc'))]
+as_flags = [x for f in flags if f.startswith('-Wa,') for x in f[4:].split(',')]   # -Wa,<opt> goes to NgcAs, as with gcc
+cc1_flags = [f for f in flags if not f.startswith(('-I', '-D', '-U', '-nostdinc', '-Wa,'))]
 def strip_empty_sections(path):
     """NgcAs emits empty .data/.bss/.sbss/.sdata sections. The CodeWarrior linker still rounds the
     output section up for them (it shifted .sbss by 2 bytes), so remove them from the section table
@@ -69,6 +70,38 @@ def strip_empty_sections(path):
     open(path, 'wb').write(d)
 
 
+def size_string_labels(path):
+    """gcc names each string literal with a .LC label that has no size or type. Give every .LC label
+    in a data section the object type and a size (a string's length with its NUL, otherwise up to
+    the next label or the section end), so that the strings show up as data objects like
+    CodeWarrior's."""
+    import struct
+    d = bytearray(open(path, 'rb').read())
+    shoff = struct.unpack('>I', d[0x20:0x24])[0]; shentsize, shnum = struct.unpack('>HH', d[0x2E:0x32])
+    sh = [struct.unpack('>10I', d[shoff + i * shentsize: shoff + i * shentsize + 40]) for i in range(shnum)]
+    for symtab in [h for h in sh if h[1] == 2]:
+        strtab = sh[symtab[6]]
+        off, size, ent = symtab[4], symtab[5], symtab[9]
+        syms = []
+        for k in range(size // ent):
+            so = off + k * ent
+            name_off, value, ssize, info, other, shndx = struct.unpack('>IIIBBH', d[so:so + 16])
+            n0 = strtab[4] + name_off
+            name = bytes(d[n0:d.index(0, n0)]).decode('latin-1')
+            syms.append((so, name, value, ssize, info, shndx))
+        for so, name, value, ssize, info, shndx in syms:
+            if not name.startswith('.LC') or ssize or not 0 < shndx < len(sh) or sh[shndx][1] != 1 or sh[shndx][2] & 4:
+                continue
+            ends = [v for _, n, v, _, i, x in syms if x == shndx and v > value and (i & 0xF) != 3]
+            end = min(ends) if ends else sh[shndx][5]
+            body = bytes(d[sh[shndx][4] + value: sh[shndx][4] + end])
+            nul = body.find(0)
+            if 0 < nul and not any(body[nul:]) and all(32 <= c < 127 or c in (9, 10, 13) for c in body[:nul]):
+                end = value + nul + 1          # a string: its bytes and the NUL, not the alignment padding
+            struct.pack_into('>IB', d, so + 8, end - value, (info & 0xF0) | 1)
+    open(path, 'wb').write(d)
+
+
 def run(cmd):
     cmd = wrapper + cmd
     r = subprocess.run(cmd, capture_output=True, text=True)
@@ -92,5 +125,6 @@ def write_depfile(path):
 run([os.path.join(d, 'cpp.exe' if os.path.exists(os.path.join(d, 'cpp.exe')) else 'CPP.exe'), *cpp_flags, src, i_file])
 write_depfile(os.path.join(out_dir, stem + '.d'))
 run([os.path.join(d, 'cc1.exe'), *cc1_flags, '-quiet', i_file, '-o', s_file])
-run([os.path.join(d, 'NgcAs.exe'), s_file, '-o', o_file])
+run([os.path.join(d, 'NgcAs.exe'), *as_flags, s_file, '-o', o_file])
 strip_empty_sections(o_file)
+size_string_labels(o_file)

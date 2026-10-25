@@ -384,6 +384,7 @@ config.warn_missing_source = False
 # mw_version starts with "ProDG/".
 cflags_gcc = [
     "-O0",
+    "-Wa,-L",
     "-nostdinc",
     "-I include",
 ]
