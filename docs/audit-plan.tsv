@@ -222,7 +222,7 @@ order	area	file	task	scope	state
 219	Situation scripts and commentary	event.c	whole-file review	the whole file	open
 220	Situation scripts and commentary	SitDev.c	pass	the whole file	open
 221	Situation scripts and commentary	SitDevStateVector.c	pass	the whole file	open
-222	Save data	user.c	pass	the whole file	open
+222	Save data	user.c	pass	the whole file	done
 223	Save data	Common/Crypt/CryptXOR.c	pass	the whole file	done
 224	Save data	gbacable.c	chunk 1/2	Gba_CalcCheckByte .. Gba_StepPorts	open
 225	Save data	gbacable.c	chunk 2/2	fn_80123E34_Read .. Gba_UpdateLinkState	open
