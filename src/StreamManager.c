@@ -122,8 +122,9 @@ void StreamManager_InitOnce(void) {
     StreamManager_InitModule();
 }
 
-// Adds loading-screen file nFile (data/Load/Load<nFile>.gcb) to the loading screen's list. LoadData.c
-// picks nFile for the game mode or course, streams the list right after and then empties it.
+// Adds loading-screen file nFile (data/Load/Load<nFile>.gcb) to the loading screen's list.
+// FEtm_StreamLoadScreen (FETextureMgr.c) picks nFile for the game mode or course, streams the list
+// right after and then empties it.
 void StreamManager_AddLoadScreenFile(int nFile) {
     char szName[64];
 

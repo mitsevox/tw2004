@@ -59,7 +59,7 @@ void fn_800124A8(void);                                 // LLFont.c: end the pri
 int fn_80073878(TexBank* pBank, TexEntry* pTex) {
     int i;
     for (i = 0; i < pBank->n2; i++) {
-        if (pBank->p8[i].u0 == pTex->u0 && pTex != &pBank->p8[i]) return i;
+        if (pBank->pTextures[i].u0 == pTex->u0 && pTex != &pBank->pTextures[i]) return i;
     }
     return -1;
 }

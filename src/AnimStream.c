@@ -83,7 +83,7 @@ void AnimStream_Init(void) {
             gpAnimStream->bOn = 0;
         }
     }
-    if (Game_GetMode() == 11) {
+    if (GM_GetModeType() == GM_Lessons_mode) {
         gpAnimStream->bOn = 0;
     }
     if (gSession.nSplitScreen == 1) {

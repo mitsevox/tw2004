@@ -20,16 +20,18 @@ int GameAnalysis_PickTip(void) {
     u8 bFound;
     int nTip;
     u8 bAny;
-    if (PlayNow_IsChallengeRunning() || (Game_GetMode() != 0 && Game_GetMode() != 1 && Game_GetMode() != 2 &&
-                          Game_GetMode() != 4 && Game_GetMode() != 23)) {
+    if (PlayNow_IsChallengeRunning()
+        || (GM_GetModeType() != GM_Stroke_mode && GM_GetModeType() != GM_Match_mode && GM_GetModeType()
+            != GM_Skins_mode &&
+                          GM_GetModeType() != GM_Laddered_mode && GM_GetModeType() != GM_PgaTour_mode)) {
         return 14;
     }
-    if (Game_GetMode() == 23 && Misc_RandFunc(RANDOM_PRESENTATION) % 100 < 75) {
+    if (GM_GetModeType() == GM_PgaTour_mode && Misc_RandFunc(RANDOM_PRESENTATION) % 100 < 75) {
         return 12;
     }
     bAny = 0;
     for (i = 0; i < 14; i++) {
-        if (GameAnalysis_IsTipForMode(Game_GetMode(), i) && GameAnalysis_AnyoneHasTipStat(i)
+        if (GameAnalysis_IsTipForMode(GM_GetModeType(), i) && GameAnalysis_AnyoneHasTipStat(i)
             && !gTipShown[i]) {
             bAny = 1;
         }
@@ -40,7 +42,7 @@ int GameAnalysis_PickTip(void) {
     bFound = 0;
     nTip = Misc_RandFunc(RANDOM_PRESENTATION) % 14;
     while (!bFound) {
-        if (GameAnalysis_IsTipForMode(Game_GetMode(), nTip) && GameAnalysis_AnyoneHasTipStat(nTip)
+        if (GameAnalysis_IsTipForMode(GM_GetModeType(), nTip) && GameAnalysis_AnyoneHasTipStat(nTip)
             && !gTipShown[nTip]) {
             bFound = 1;
         } else {
@@ -58,17 +60,17 @@ u8 GameAnalysis_IsTipForMode(int nMode, int nTip) {
         return 0;
     }
     switch (nMode) {
-    case 0:
+    case GM_Stroke_mode:
         return nTip != 12;
-    case 1:
-    case 2:
-    case 4:
+    case GM_Match_mode:
+    case GM_Skins_mode:
+    case GM_Laddered_mode:
         if (nTip != 12 && nTip != 2 && nTip != 3 && nTip != 4 && nTip != 6 && nTip != 7 && nTip != 8 &&
             nTip != 9 && nTip != 10 && nTip != 11) {
             return 1;
         }
         return 0;
-    case 23:
+    case GM_PgaTour_mode:
         return 1;
     default:
         return 0;

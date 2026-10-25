@@ -31,7 +31,7 @@ u8 lbl_80189CB0[6][4] = {
 
 void BFX_vInit(void) {
     s32 desc[2];
-    fn_800102DC(fn_8000BEE4("marker"), &lbl_80281F44, &lbl_80281F48);
+    fn_800102DC(FEtm_PackName("marker"), &lbl_80281F44, &lbl_80281F48);
     desc[0] = 0x10;
     desc[1] = 4;
     SD_InitShaderObject(lbl_801D94B0, 0, desc);

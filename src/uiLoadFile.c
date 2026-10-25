@@ -104,11 +104,11 @@ void UI_StreamLoadFile(UStreamObject* pObject) {
 }
 
 // 'TXFS' handler: when UI_TestTextureGroupChkRef wants the texture group's kind (its id modulo
-// 100000), build its texture bank (fn_8000FB88) into the next of gUITextureBanks' five slots
+// 100000), build its texture bank (TX_spDownloadData) into the next of gUITextureBanks' five slots
 // (nothing checks the count); the stream object is freed either way.
 void UI_StreamLoadTextures(UStreamObject* pObject) {
     if (UI_TestTextureGroupChkRef((int)pObject->uId % 100000)) {
-        gUITextureBanks.ap4[gUITextureBanks.nCount] = fn_8000FB88(pObject, NULL, 0);
+        gUITextureBanks.ap4[gUITextureBanks.nCount] = TX_spDownloadData(pObject, NULL, 0);
         gUITextureBanks.nCount++;
     }
     Circular_MemFreeFunc(pObject);

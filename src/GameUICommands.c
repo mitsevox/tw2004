@@ -593,7 +593,7 @@ u8 IG_IsControllerInPlay(int nController) {
         return 1;
     }
     for (i = 0; i < gSession.nNumPlayers; i++) {
-        if (((s8)GOLFERSTATE_GetCurrentState(i) != GS_WAIT || Game_GetMode() == 7) &&
+        if (((s8)GOLFERSTATE_GetCurrentState(i) != GS_WAIT || GM_GetModeType() == GM_SpeedGolfPoints_mode) &&
             (nController == PLAYER(i)->nController || Player_IsCPU(i))) {
             return 1;
         }
@@ -604,11 +604,11 @@ u8 IG_IsControllerInPlay(int nController) {
 // Message 1: which kind of round the menus are in: 3 speed golf (mode 8), 2 the two-player
 // speed-golf modes (6, 7), 1 split screen, else 0.
 void GM_vGetRoundUIKind(MsgArg* pArgs, MsgArg* pResult) {
-    if (Game_GetMode() == 8) {
+    if (GM_GetModeType() == GM_SpeedGolf_mode) {
         pResult->i = 3;
         return;
     }
-    if (Game_GetMode() == 6 || Game_GetMode() == 7) {
+    if (GM_GetModeType() == GM_SpeedGolfMatch_mode || GM_GetModeType() == GM_SpeedGolfPoints_mode) {
         pResult->i = 2;
         return;
     }
@@ -684,7 +684,7 @@ void GM_vGetPlayerHoleScore(MsgArg* pArgs, MsgArg* pResult) {
         pResult->i = GM_GetPlayerRoundScore(pArgs[0].i) - GM_GetPlayerRoundScoreThroughHole(pArgs[0].i, 9);
     } else if (pArgs[1].i == 20) {
         pResult->i = GM_GetPlayerRoundScore(pArgs[0].i);
-    } else if (Game_GetMode() == 19) {
+    } else if (GM_GetModeType() == GM_BestBall_mode) {
         pResult->i = GM_BestBallMode_GetTeamHoleScore((u8)pArgs[0].i, pArgs[1].i);
     } else {
         pResult->i = gPlayers[pArgs[0].i].nStrokes[pArgs[1].i];
@@ -728,7 +728,7 @@ void GM_vGetCurrentHoleIndex(MsgArg* pArgs, MsgArg* pResult) {
 // Message 6: the player whose turn it is (lbl_80282278); in mode 26 (two-player long drive) the
 // answer alternates 0, 1, 0... each time it is asked (gAlternateGolferUp).
 void GM_vGetCurrentGolferIndex(MsgArg* pArgs, MsgArg* pResult) {
-    if (Game_GetMode() == 26) {
+    if (GM_GetModeType() == GM_LongDriveRace_mode) {
         pResult->i = gAlternateGolferUp;
         gAlternateGolferUp = 1 - gAlternateGolferUp;
         return;
@@ -741,12 +741,12 @@ void GM_vGetCurrentGolferIndex(MsgArg* pArgs, MsgArg* pResult) {
 // the PGA TOUR (mode 23) GM_PgaTourSim_SetUserQuit(0, 1). The online branch
 // (OnlineGolf_bIsOnlineGame, always 0 in this build) never runs.
 void GM_vExitGame(MsgArg* pArgs, MsgArg* pResult) {
-    if (Game_GetMode() == 9) {
+    if (GM_GetModeType() == GM_Practice_mode) {
         GUI_SetEndOfGamePending();
     } else {
         gUIState.bFadeToBlack = 1;
     }
-    if (Game_GetMode() == 23) {
+    if (GM_GetModeType() == GM_PgaTour_mode) {
         GM_PgaTourSim_SetUserQuit(0, 1);
     }
     if (OnlineGolf_bIsOnlineGame()) {
@@ -886,7 +886,7 @@ void GM_vRestartCurHole(MsgArg* pArgs, MsgArg* pResult) {
     if (PlayNow_IsChallengeRunning()) {
         PlayNow_Restart();
     }
-    if (Game_GetMode() == 26 || Game_GetMode() == 22) {
+    if (GM_GetModeType() == GM_LongDriveRace_mode || GM_GetModeType() == GM_LongDrive_mode) {
         Gaud_RestartMusic();
     }
 }
@@ -965,9 +965,9 @@ void GM_vGetSkinWins(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gPlayers[pArgs[0].i].nSkinsTotal;
 }
 
-// Message 32: the game mode (Game_GetMode).
+// Message 32: the game mode (GM_GetModeType).
 void GM_vGetGameModeType(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = Game_GetMode();
+    pResult->i = GM_GetModeType();
 }
 
 // Message 33: player pArgs[0]'s speed-golf time score summed over all 18 holes
@@ -1125,14 +1125,14 @@ void GM_vGetLieModifier(MsgArg* pArgs, MsgArg* pResult) {
 // GM_GetPlayerRoundScore, in the PGA TOUR (23) the entrant's score to par, best ball (19) the
 // team's, else his cumulative score to par.
 void GM_vGetRelativeScore(MsgArg* pArgs, MsgArg* pResult) {
-    switch (Game_GetMode()) {
-    case 18:
+    switch (GM_GetModeType()) {
+    case GM_Stableford_mode:
         pResult->i = GM_GetPlayerRoundScore(pArgs[0].i);
         return;
-    case 23:
+    case GM_PgaTour_mode:
         pResult->i = GM_PgaTourSim_GetRelativeScoreFromEntrantID(pArgs[0].i, 0, 0);
         return;
-    case 19:
+    case GM_BestBall_mode:
         pResult->i = GM_BestBallMode_GetTeamRelativeScore(pArgs[0].i, 1);
         return;
     default:
@@ -1144,8 +1144,8 @@ void GM_vGetRelativeScore(MsgArg* pArgs, MsgArg* pResult) {
 // Message 42: player pArgs[0]'s score in round pArgs[1] of the event (the PGA TOUR, mode 23: from
 // the simulation; else Player.nRoundScore).
 void GM_vGetRoundScore(MsgArg* pArgs, MsgArg* pResult) {
-    switch (Game_GetMode()) {
-    case 23:
+    switch (GM_GetModeType()) {
+    case GM_PgaTour_mode:
         pResult->i = GM_PgaTourSim_GetRoundScoreFromEntrantID(pArgs[0].i, 0, pArgs[1].i);
         return;
     }
@@ -1957,24 +1957,24 @@ void GM_vGetRecordName(MsgArg* pArgs, MsgArg* pResult) {
         sprintf(((MsgString*)pArgs[3].p)->pStr, "%s", gSession.recA[pArgs[1].i][pArgs[2].i].szName);
         return;
     }
-    if (Game_GetMode() == 16) {
+    if (GM_GetModeType() == GM_SkillZoneTarget_mode) {
         sprintf(((MsgString*)pArgs[3].p)->pStr, "%s", gSession.recB[Game_GetCurHoleNum()][0][pArgs[2].i].szName);
         return;
     }
-    if (Game_GetMode() == 17) {
+    if (GM_GetModeType() == GM_SkillZoneTargetToTarget_mode) {
         sprintf(((MsgString*)pArgs[3].p)->pStr, "%s", gSession.recB[Game_GetCurHoleNum()][1][pArgs[2].i].szName);
         return;
     }
-    if (Game_GetMode() == 13) {
+    if (GM_GetModeType() == GM_SkillZoneTimed_mode) {
         sprintf(((MsgString*)pArgs[3].p)->pStr, "%s", gSession.recB[Game_GetCurHoleNum()][2][pArgs[2].i].szName);
         return;
     }
-    if (Game_GetMode() == 22 && GameMode22_GetVariant() == 0) {
+    if (GM_GetModeType() == GM_LongDrive_mode && GameMode22_GetVariant() == 0) {
         sprintf(((MsgString*)pArgs[3].p)->pStr, "%s",
                 gSession.recC[GameMode22_GetHoleRecordIndex(Game_GetCurHoleNum())][0][pArgs[2].i].szName);
         return;
     }
-    if (Game_GetMode() == 22 && GameMode22_GetVariant() == 1) {
+    if (GM_GetModeType() == GM_LongDrive_mode && GameMode22_GetVariant() == 1) {
         sprintf(((MsgString*)pArgs[3].p)->pStr, "%s",
                 gSession.recC[GameMode22_GetHoleRecordIndex(Game_GetCurHoleNum())][1][pArgs[2].i].szName);
         return;
@@ -1994,23 +1994,23 @@ void GM_vGetRecordScore(MsgArg* pArgs, MsgArg* pResult) {
         pResult->i = gSession.recA[pArgs[1].i][pArgs[2].i].nValue;
         return;
     }
-    if (Game_GetMode() == 16) {
+    if (GM_GetModeType() == GM_SkillZoneTarget_mode) {
         pResult->i = gSession.recB[Game_GetCurHoleNum()][0][pArgs[2].i].nValue;
         return;
     }
-    if (Game_GetMode() == 17) {
+    if (GM_GetModeType() == GM_SkillZoneTargetToTarget_mode) {
         pResult->i = gSession.recB[Game_GetCurHoleNum()][1][pArgs[2].i].nValue;
         return;
     }
-    if (Game_GetMode() == 13) {
+    if (GM_GetModeType() == GM_SkillZoneTimed_mode) {
         pResult->i = gSession.recB[Game_GetCurHoleNum()][2][pArgs[2].i].nValue;
         return;
     }
-    if (Game_GetMode() == 22 && GameMode22_GetVariant() == 0) {
+    if (GM_GetModeType() == GM_LongDrive_mode && GameMode22_GetVariant() == 0) {
         pResult->i = gSession.recC[GameMode22_GetHoleRecordIndex(Game_GetCurHoleNum())][0][pArgs[2].i].nValue;
         return;
     }
-    if (Game_GetMode() == 22 && GameMode22_GetVariant() == 1) {
+    if (GM_GetModeType() == GM_LongDrive_mode && GameMode22_GetVariant() == 1) {
         pResult->i = gSession.recC[GameMode22_GetHoleRecordIndex(Game_GetCurHoleNum())][1][pArgs[2].i].nValue;
         return;
     }
@@ -2816,7 +2816,7 @@ void IG_vPgaTour_GetCurrEventName(MsgArg* pArgs, MsgArg* pResult) {
 // 6, 2, 2, 2, 0, 4, 4, 4, 4, 10) or 2 for the second (one more); 1 plays none. Nothing in modes 22
 // and 26.
 void IG_vPlayShotScoreAnimSound(MsgArg* pArgs, MsgArg* pResult) {
-    if (Game_GetMode() == 26 || Game_GetMode() == 22) return;
+    if (GM_GetModeType() == GM_LongDriveRace_mode || GM_GetModeType() == GM_LongDrive_mode) return;
     switch (pArgs[1].i) {
     case 0:
         switch (pArgs[0].i) {

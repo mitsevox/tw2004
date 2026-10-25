@@ -93,7 +93,7 @@ void FE_LogoDesign_RefreshLogo(void) {
     gpLogoEdit->bDirty = 1;
 }
 
-// Fills the logo being edited with the pixels of the texture named pName (fn_8000BD80), taken out
+// Fills the logo being edited with the pixels of the texture named pName (FEtm_GetTexturePixels), taken out
 // of the texture layout at the editor's shape's size (FE_LogoDesign_CopyLogoTexturePixels). Nothing
 // when there is no such texture. It does not mark the logo changed (the menus do,
 // GM_vMarkLogoChanged).
@@ -102,7 +102,7 @@ void FE_LogoDesign_SetLogoToPremadeTexture(char* pName) {
     u8* pPixels;
     int nWidth;
     int nHeight;
-    if (fn_8000BD80(pName, &pPixels)) {
+    if (FEtm_GetTexturePixels(pName, &pPixels)) {
         if (gpLogoEdit->nShape == LOGO_SQUARE) {
             nWidth = 64;
             nHeight = 64;
@@ -163,12 +163,12 @@ void FE_LogoDesign_UploadCustomLogo(void) {
         } else {
             pName = "__LogoRect";
         }
-        fn_800102DC(fn_8000BEE4(pName), &pBank, &pTex);
+        fn_800102DC(FEtm_PackName(pName), &pBank, &pTex);
         if (pTex == NULL) {
-            fn_8000BDF8(pName, &pBank, &pTex);
+            FEtm_FindTexture(pName, &pBank, &pTex);
         }
         if (pTex != NULL) {
-            pPixels = pBank->p18 + pTex->aMips[0].uPixels;
+            pPixels = pBank->pPixels + pTex->aMips[0].uPixels;
             if (gpLogoEdit->nShape == LOGO_SQUARE) {
                 nWidth = 64;
                 nHeight = 64;
@@ -190,7 +190,7 @@ void FE_LogoDesign_LoadClut(void) {
     TexEntry* pTex;
     s16* pPalette;
     if (gbLogoClutLoaded == 0) {
-        fn_8000BDF8("__LogoSquare", &pBank, &pTex);
+        FEtm_FindTexture("__LogoSquare", &pBank, &pTex);
         if (pTex != NULL) {
             pPalette = FE_LogoDesign_GetClut();
             Mem_cpy(pPalette, pBank->p20 + pBank->pC[pTex->nPalette].uColors, pBank->n24);

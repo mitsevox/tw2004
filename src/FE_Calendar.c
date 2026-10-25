@@ -427,7 +427,7 @@ void PGATour_Play(void) {
     s32 nRound;
 
     Session_SetGolfer(30, 0);
-    GM_SetModeType(23);
+    GM_SetModeType(GM_PgaTour_mode);
     GameModeDriverPGATour_GetEventByDate(CalendarState.nSelected, &nId, &nRound);
     GameModeDriverPGATour_SkipToEvent(nId);
 }
@@ -591,7 +591,7 @@ char* RealTime_GetEventName(u16 nDate) {
 // one (GM_RealtimeMode_SelectEventToday).
 void RealTime_Play(void) {
     Session_SetGolfer(30, 0);
-    GM_SetModeType(24);
+    GM_SetModeType(GM_Realtime_mode);
     GM_RealtimeMode_SelectEventToday();
 }
 

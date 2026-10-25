@@ -297,7 +297,7 @@ void fn_8006B250(int nPlayer) {
 void fn_8006B2C4(int nPlayer, u8 bBefore) {
     Ball* pBall;
 
-    if (Game_GetMode() == 11) {
+    if (GM_GetModeType() == GM_Lessons_mode) {
         lbl_801D5F78[nPlayer].n4 = 0;
         lbl_801D5F78[nPlayer].n10 = 0;
         lbl_801D5F78[nPlayer].n0 = 4;

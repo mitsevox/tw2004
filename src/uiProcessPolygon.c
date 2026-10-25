@@ -21,12 +21,12 @@
 #include "frontend/uisvec.h"
 #include "unsorted/cull.h"
 
-// Per 'txf2' texture bank (lbl_801A26DC): nonzero marks the bank's gUITxf2BankState at the menus'
+// Per 'txf2' texture bank (gFEtmBanks): nonzero marks the bank's gUITxf2BankState at the menus'
 // shutdown (uiProcessInterface.c UI_CloseInterface); nothing in this build writes it.
-u32 gUITxf2BankMarkOnExit[UI_NUM_TXF2_BANKS];
+u32 gUITxf2BankMarkOnExit[FETM_NUM_BANKS];
 // Per 'txf2' texture bank: UI_FreeTxf2BankPixels frees a bank's pixels before a movie when its
 // nFreeBeforeMovie is positive (nothing sets it positive in this build).
-UITxf2BankState gUITxf2BankState[UI_NUM_TXF2_BANKS];
+UITxf2BankState gUITxf2BankState[FETM_NUM_BANKS];
 UILoadingScreen gUILoadingScreen;       // the loading screen and its progress bar (UI_InitLoadingBar)
 f32 gUILoadingBarTilePos[8][2];         // the bar's tiles' x, y (UI_InitLoadingBarTilePos)
 
@@ -139,7 +139,7 @@ void UIPoly_Draw(FEQuad* pQuad) {
         szName = pEntry->szC;
         if (pEntry->u0 & 1) {
             if (gSession.nGameType == 3) {
-                pBank = lbl_801A26DC[pQuad->nEntry];
+                pBank = gFEtmBanks[pQuad->nEntry];
                 pTex = UI_GetTexBankFirstTexture(pBank);
                 RenderState_SetBankTexture(pBank, pTex);
             } else {
@@ -396,11 +396,11 @@ void UI_InitLoadingBarTilePos(void) {
     gUILoadingBarTilePos[7][1] = 0.839f;
 }
 
-// Load the loading bar's texture bank from LoadData.c's copy of the 'txf2' object with id 10000 and
+// Load the loading bar's texture bank from FETextureMgr.c's copy of its 'txf2' object and
 // take its first texture, unless the session has flag 4.
 void UI_LoadLoadingBarTexture(void) {
     if (gSession.uFlags & 4) return;
-    gUILoadingBarBankSlot = fn_800107C0(lbl_80281C0C, NULL, 0);
+    gUILoadingBarBankSlot = fn_800107C0(gpFEtmLoadingBarObject, NULL, 0);
     gpUILoadingBarBank = fn_800106C4(gUILoadingBarBankSlot);
     gpUILoadingBarTexture = UI_GetTexBankFirstTexture(gpUILoadingBarBank);
 }
@@ -409,7 +409,7 @@ void UI_LoadLoadingBarTexture(void) {
 // unless one is there.
 void UI_DecodeLoadingPicture(void) {
     if (gUILoadingScreen.pPicture == NULL) {
-        gUILoadingScreen.pPicture = Pict_CreateFromMemory(lbl_80281C04, lbl_801A25F0.uSize);
+        gUILoadingScreen.pPicture = Pict_CreateFromMemory(gpFEtmLoadScreenData, gFEtmLoadScreenInfo.uSize);
     }
 }
 
@@ -586,7 +586,7 @@ void UI_ShowLoadingScreen(void) {
 void UI_FadeInLoadingScreen(int nFrames) {
     LLPict* pPict;
 
-    pPict = Pict_CreateFromMemory(lbl_80281C04, lbl_801A25F0.uSize);
+    pPict = Pict_CreateFromMemory(gpFEtmLoadScreenData, gFEtmLoadScreenInfo.uSize);
     UI_ShowPictureFadingIn(pPict, nFrames, 1.0f / 30.0f);
     fn_80008380();
     Pict_Free(pPict);
@@ -701,16 +701,17 @@ void UI_DrawFullScreenPicture(LLPict* pPict, f32 fAlpha) {
     UI_SetCurrentRenderCtxFrameBuffer(pOldFrameBuffer);
 }
 
-// Before a movie (FE_Manager.c FE_PreMovieSetup): free the pixel data (fn_8000FFAC) of each 'txf2'
-// texture bank whose gUITxf2BankState nFreeBeforeMovie is positive, waiting for the GPU first.
-// Nothing in this build makes it positive (FE_Manager.c only clears it), so nothing is freed.
+// Before a movie (FE_Manager.c FE_PreMovieSetup): free the pixel data
+// (TX_vFreeTextureDataInTextureGroup) of each 'txf2' texture bank whose gUITxf2BankState
+// nFreeBeforeMovie is positive, waiting for the GPU first. Nothing in this build makes it positive
+// (FE_Manager.c only clears it), so nothing is freed.
 void UI_FreeTxf2BankPixels(void) {
     int i;
 
-    for (i = 0; i < UI_NUM_TXF2_BANKS; i++) {
+    for (i = 0; i < FETM_NUM_BANKS; i++) {
         if (gUITxf2BankState[i].nFreeBeforeMovie > 0) {
             fn_80008380();
-            fn_8000FFAC(lbl_801A26DC[i]);
+            TX_vFreeTextureDataInTextureGroup(gFEtmBanks[i]);
         }
     }
 }
@@ -768,5 +769,5 @@ static void UI_SetCurrentRenderCtxFrameBuffer(FB_SFrameBuffer* spFrameBuffer_p) 
 }
 
 TexEntry* UI_GetTexBankFirstTexture(TexBank* pBank) {
-    return pBank->p8;
+    return pBank->pTextures;
 }

@@ -630,10 +630,41 @@ typedef enum GM_AllowAnimationsTypes_t {
                                         // or near an object or hazard, else 85% of the time
 } GM_AllowAnimationsTypes_t;
 
+// The game modes: GameState.nMode, what GM_GetModeType answers and GM_SetModeType sets up.
+typedef enum GM_ModeType_t {
+    GM_Stroke_mode = 0,
+    GM_Match_mode = 1,
+    GM_Skins_mode = 2,
+    GM_OnlineTour_mode = 3,             // GM_SetModeType has no setup for it
+    GM_Laddered_mode = 4,               // the ladder's matches (LadderedMode.c)
+    GM_PlayNow_mode = 5,                // the Play Now challenges
+    GM_SpeedGolfMatch_mode = 6,         // two-player speed golf, match play
+    GM_SpeedGolfPoints_mode = 7,        // two-player speed golf on event points
+    GM_SpeedGolf_mode = 8,              // speed golf, alone against the clock
+    GM_Practice_mode = 9,
+    GM_Replay_mode = 10,
+    GM_Lessons_mode = 11,
+    GM_StrokePoints_mode = 12,          // stroke play with points for the surfaces landed on
+    GM_SkillZoneTimed_mode = 13,        // the target games, one hole each: 13 to 17
+    GM_SkillZoneCapture_mode = 14,
+    GM_SkillZoneHorse_mode = 15,
+    GM_SkillZoneTarget_mode = 16,
+    GM_SkillZoneTargetToTarget_mode = 17,
+    GM_Stableford_mode = 18,
+    GM_BestBall_mode = 19,
+    GM_FourBall_mode = 20,
+    GM_AlternateShot_mode = 21,
+    GM_LongDrive_mode = 22,             // the long-drive contest
+    GM_PgaTour_mode = 23,               // the PGA TOUR season
+    GM_Realtime_mode = 24,              // the real-time events on the calendar
+    GM_Battle_mode = 25,
+    GM_LongDriveRace_mode = 26          // the two-player long-drive race
+} GM_ModeType_t;
+
 // The game state gpGame points at: the current game mode's rules, its data and callbacks. Only
 // what our files use is named.
 typedef struct GameState {
-    s32  nMode;                 // 0x000
+    s32  nMode;                 // 0x000  a GM_ModeType_t
     s32  nScoringType;          // 0x004  GM_ScoringType_t
     s32  nMulligans;            // 0x008  GM_MulliganType_t
     s32  nMaxGolfers;           // 0x00C  the most players the mode is played with (4 in the team
@@ -880,7 +911,7 @@ extern u8           gClubKindTable[8][CLUB_MAX_e];   // 0x801874B0  which clubs 
 extern f32          gClubDistAtPower0[CLUB_MAX_e];   // 0x80187580  reach at POWER 0 (245 for the woods)
 extern f32          gClubPowerStep[CLUB_MAX_e];      // 0x801875E8  reach gained per POWER point over 100
 
-int  Game_GetMode(void);                // 0x8000BED8
+GM_ModeType_t GM_GetModeType(void);    // FETextureMgr.c: gpGame->nMode
 int  Golfer_FindById(int nId);          // the gGolferTable row with that nModelID, -1 none
 void fn_8002EBA4(u8* pObj, u8 nValue);  // set byte 7 of the options (a7[0]) and apply it (Golfer.c)
 int  GM_GetCurrentHolePar(void);

@@ -502,7 +502,7 @@ void Grass_BeginRender(void) {
 // f3C4), the colours, then hands them to SD_vSetGrassParamsOnce. Called every time the grass is
 // drawn (Grass_BeginRender), despite its name.
 void GrassRender_vBuildAndUploadOneTimeData(void) {
-    u64 uHash = fn_8000BEE4(gGrassTextureNames[gpGrassMgr->n3A4]);
+    u64 uHash = FEtm_PackName(gGrassTextureNames[gpGrassMgr->n3A4]);
     f32 fX;
     f32 fZ;
 

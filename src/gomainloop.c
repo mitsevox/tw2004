@@ -505,7 +505,7 @@ void GO_vInitFE(void) {
     TI_vResetCounter(TI_COUNTER_FRONTEND);
     TI_vStartCounter(TI_COUNTER_FRONTEND);
     Aud_InitSession(0, 0, 1, 0);
-    fn_8000B884();
+    FEtm_InitFETextureMgr();
     fn_80124B54();
     FE_vInitModule();
     StreamManagerFrontend_RegisterStreamClients();
@@ -545,7 +545,7 @@ void fn_8006CB2C(void) {
     FE_CrAP_CloseModule();
     fn_8010A4E8();
     UI_vCloseModule();
-    fn_8000B8F4();
+    FEtm_CloseFETextureMgr();
     fn_801250C0();
     ViewController_Delete(0);
     fn_8009CC88();
@@ -626,7 +626,7 @@ void GO_vInitIG(void) {
     TI_vResetCounter(TI_COUNTER_GAME);
     TI_vStartCounter(TI_COUNTER_GAME);
     if (gSession.nC == 3) {
-        GM_SetModeType(5);
+        GM_SetModeType(GM_PlayNow_mode);
         PlayNow_StartChallenge();
         gSession.nC = 0;
     }
@@ -777,13 +777,13 @@ static u8 GO_bMainLoopDone(void) {
 u8 fn_8006D1C0(int nView) {
     int nPlayer = ViewController_GetActivePlayerNumber(nView);
 
-    if (Game_GetMode() == 9) {
+    if (GM_GetModeType() == GM_Practice_mode) {
         return (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_PLACE_BALL;
     }
     if (gSession.nPaused) {
         return 0;
     }
-    if ((Game_GetMode() == 7 || Game_GetMode() == 8)
+    if ((GM_GetModeType() == GM_SpeedGolfPoints_mode || GM_GetModeType() == GM_SpeedGolf_mode)
         && ((gPlayers[nPlayer].nSGFlags & 1) || (gPlayers[nPlayer].nSGFlags & 0x02000000))) {
         return 0;
     }
@@ -841,7 +841,7 @@ void fn_8006D27C(void) {
             fn_800A3A84();
             fn_8006DF28();
             fn_80045848(ViewController_GetActivePlayerNumber(nView));
-            if (Game_GetMode() == 7 || Game_GetMode() == 8) {
+            if (GM_GetModeType() == GM_SpeedGolfPoints_mode || GM_GetModeType() == GM_SpeedGolf_mode) {
                 if ((u8)SpeedGolf_IsRunning(ViewController_GetActivePlayerNumber(nView))) {
                     fn_800BAB80(ViewController_GetActivePlayerNumber(nView));
                     fn_800BAA50(ViewController_GetActivePlayerNumber(nView));

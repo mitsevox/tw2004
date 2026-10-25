@@ -302,7 +302,7 @@ void PsBallFx_InitModule(void) {
     lbl_80281408->ap74[1] = NULL;
     lbl_80281408->apEmitter[0] = NULL;
     lbl_80281408->apEmitter[1] = NULL;
-    uHash = fn_8000BEE4("sandtrl");
+    uHash = FEtm_PackName("sandtrl");
     fn_800102DC(uHash, &lbl_80281408->pBank, &lbl_80281408->pTex);
 }
 

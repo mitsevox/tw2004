@@ -75,7 +75,7 @@ u8 Golfer_IsLucky(int nPlayer) {
         return 0;
     }
     uOdds = gLuckOdds[nPlayer];
-    if (Game_GetMode() == 4 && gPlayers[1].nHolesWon - gPlayers[0].nHolesWon > 4) {
+    if (GM_GetModeType() == GM_Laddered_mode && gPlayers[1].nHolesWon - gPlayers[0].nHolesWon > 4) {
         uOdds >>= 1;
     } else if (HoleContest_IsHoleInOneHole()) {
         uOdds >>= 1;

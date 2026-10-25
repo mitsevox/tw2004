@@ -38,7 +38,6 @@ void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);                   // identity
 void UObject_ComposeRotation(f32 (*pMtx)[4]);
 void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
-int  fn_8001005C(TexBank* pBank, u64 uHash);       // LLTex.c: the texture's index, or 0x80000000
 
 // Registers the stream handlers for the ball the Create-A-Player menu golfer holds: 'TEO ' objects
 // (its models, FE_CrAPBall_LoadTEO) and the 'BALF' texture bank (its logos, FE_CrAPBall_LoadBALF).
@@ -55,7 +54,7 @@ void FE_CrAPBall_UnRegisterStreamClients(void) {
 // The 'BALF' load handler: the object is a texture bank of ball logos, kept for
 // FE_CrAPBall_SetLogo; the stream object itself is freed.
 void FE_CrAPBall_LoadBALF(UStreamObject* pObject) {
-    gpCrAPBallLogoBank = fn_8000FB88(pObject, NULL, 0);
+    gpCrAPBallLogoBank = TX_spDownloadData(pObject, NULL, 0);
     Circular_MemFreeFunc(pObject);
 }
 
@@ -115,7 +114,7 @@ void FE_CrAPBall_Free(void) {
     }
     gpCrAPBallTeo10040 = NULL;
     if (gpCrAPBallLogoBank != NULL) {
-        fn_8000FFAC(gpCrAPBallLogoBank);
+        TX_vFreeTextureDataInTextureGroup(gpCrAPBallLogoBank);
         Circular_MemFreeFunc(gpCrAPBallLogoBank);
         gpCrAPBallLogoBank = NULL;
     }
@@ -247,14 +246,15 @@ void FE_CrAPBall_SetLogo(char* szBall) {
     if (pSlotBank == NULL || pSlot == NULL) {
         return;
     }
-    nLogo = fn_8001005C(gpCrAPBallLogoBank, uLogo);
-    if (nLogo == (int)0x80000000) {
+    nLogo = TX_uiFindTextureIndexFromID(gpCrAPBallLogoBank, uLogo);
+    if (nLogo == (int)TX_NO_TEXTURE_INDEX) {
         return;
     }
     gbCrAPBallLogoShown = 1;
-    pLogo = &gpCrAPBallLogoBank->p8[nLogo];
+    pLogo = &gpCrAPBallLogoBank->pTextures[nLogo];
     for (i = 0; i < pLogo->n41; i++) {
-        Mem_cpy(pSlotBank->p18 + pSlot->aMips[i].uPixels, gpCrAPBallLogoBank->p18 + pLogo->aMips[i].uPixels,
+        Mem_cpy(pSlotBank->pPixels + pSlot->aMips[i].uPixels, gpCrAPBallLogoBank->pPixels
+                + pLogo->aMips[i].uPixels,
                 pLogo->aMips[i].nC * 16);
     }
 }

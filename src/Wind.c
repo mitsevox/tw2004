@@ -84,7 +84,7 @@ void Wind_InitForHole(void) {
         switch (Game_GetCourse()) {
         case 6:
         case 15:
-            if (Game_GetMode() != 4 || GameMode4_GetCurrentEvent() > 0) {
+            if (GM_GetModeType() != GM_Laddered_mode || GameMode4_GetCurrentEvent() > 0) {
                 if (n < 2) {
                     n = 2;
                 } else {

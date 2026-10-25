@@ -390,7 +390,7 @@ void Gaud_SetStreamingContext(void) {
     u8 nRow;
     f32 vPos[3];
 
-    nMode = Game_GetMode();
+    nMode = GM_GetModeType();
     fVolume = 0.2f * (s8)gSession.options.a0[1];
     bFixed = gSession.nGameType == 3 || gSession.nGameType == 10;
     bNoBreaker = !bFixed && gSession.bDemo;
@@ -407,28 +407,28 @@ void Gaud_SetStreamingContext(void) {
         bMusic = gSession.nNumPlayers <= 2 && !gSession.bReplay;
         bOn = bOn && bMusic;
         switch (nMode) {
-        case 0:
-        case 1:
-        case 2:
-        case 9:
-        case 18:
-        case 19:
-        case 20:
-        case 21:
+        case GM_Stroke_mode:
+        case GM_Match_mode:
+        case GM_Skins_mode:
+        case GM_Practice_mode:
+        case GM_Stableford_mode:
+        case GM_BestBall_mode:
+        case GM_FourBall_mode:
+        case GM_AlternateShot_mode:
             nRow = 1;
             break;
-        case 6:
-        case 7:
-        case 8:
-        case 12:
-        case 13:
-        case 14:
-        case 15:
-        case 16:
-        case 17:
-        case 22:
-        case 25:
-        case 26:
+        case GM_SpeedGolfMatch_mode:
+        case GM_SpeedGolfPoints_mode:
+        case GM_SpeedGolf_mode:
+        case GM_StrokePoints_mode:
+        case GM_SkillZoneTimed_mode:
+        case GM_SkillZoneCapture_mode:
+        case GM_SkillZoneHorse_mode:
+        case GM_SkillZoneTarget_mode:
+        case GM_SkillZoneTargetToTarget_mode:
+        case GM_LongDrive_mode:
+        case GM_Battle_mode:
+        case GM_LongDriveRace_mode:
             nRow = 2;
             break;
         default:
@@ -783,7 +783,7 @@ void Gaud_InitHole(void) {
 
     nViews = (gSession.nSplitScreen != 0) + 1;
     nCourse = Game_GetCourse();
-    nMode = Game_GetMode();
+    nMode = GM_GetModeType();
     n = Game_GetCurHoleNum();
     pView = lbl_801F1790;
     pPlayer = gPlayers;
@@ -856,8 +856,12 @@ void Gaud_InitHole(void) {
     lbl_80282031 = 0;
     lbl_80282033 = 0;
     lbl_80282034 = 0;
-    // the modes 0-2, 4, 5, 10, 18-21, 23-25 (bit mask 0x03BC0437)
-    lbl_80282040 = ((1 << nMode) & 0x03BC0437) != 0;
+    lbl_80282040 = ((1 << nMode) & (1 << GM_Stroke_mode | 1 << GM_Match_mode | 1 << GM_Skins_mode |
+                                    1 << GM_Laddered_mode | 1 << GM_PlayNow_mode | 1 << GM_Replay_mode |
+                                    1 << GM_Stableford_mode | 1 << GM_BestBall_mode |
+                                    1 << GM_FourBall_mode | 1 << GM_AlternateShot_mode |
+                                    1 << GM_PgaTour_mode | 1 << GM_Realtime_mode |
+                                    1 << GM_Battle_mode)) != 0;
 }
 
 // After a hole's play (GoEntry.c): deletes the ambience emitter (or stops the music) and the
@@ -1037,7 +1041,7 @@ void Gaud_SwingBallHit(u8 nPlayer) {
     nIdB = pView->n3;
     nKind = GolfCamera_GetSpecialSwingType(ViewController_GetCameraControl(pPlayer->nView[0]));
     bRestore = 1;
-    nMode = Game_GetMode();
+    nMode = GM_GetModeType();
     if (fn_8006BEA4()) {
         Gaud_InitSlowMo(nPlayer, 0);
         bRestore = 0;
@@ -1098,7 +1102,8 @@ void Gaud_SwingBallHit(u8 nPlayer) {
     }
     Aud_EmiSet3DPos(nIdSwing, pPlayer->ball.vPos, NULL, 0);
     Aud_EmiSetTrackVarRange(nIdSwing, 1, lbl_80183AD8[pPlayer->nClub]);
-    if ((nMode == 22 || nMode == 26) && SW_vGetNonPowerAttributeAffectedShotPower(nPlayer) > 1.0f) {
+    if ((nMode == GM_LongDrive_mode || nMode == GM_LongDriveRace_mode)
+        && SW_vGetNonPowerAttributeAffectedShotPower(nPlayer) > 1.0f) {
         Aud_EmiSetTrackVariation(nIdSwing, 1, 5);
     } else {
         Aud_EmiSetTrackVariation(nIdSwing, 1, lbl_80183AF4[pPlayer->ball.nLie]);
@@ -1165,7 +1170,7 @@ void Gaud_BallBounce(u8 nPlayer) {
                 Aud_EmiSetTrackStep(nId, 0, pSurface->nSoundId, 0);
                 Aud_EmiSetTrackAttenuation(nId, 0, fVolume);
             }
-            if (Game_GetMode() == 26 || Game_GetMode() == 22) {
+            if (GM_GetModeType() == GM_LongDriveRace_mode || GM_GetModeType() == GM_LongDrive_mode) {
                 GameMode26_BallBounceSound(nPlayer);
             }
         }
@@ -1449,7 +1454,7 @@ void Gaud_InitSpecialShot(u8 nPlayer) {
     nKind = GolfCamera_GetSpecialSwingType(ViewController_GetCameraControl(0));
     bPlay = 1;
     n = 0;
-    if (Game_GetMode() < 6 || Game_GetMode() > 8) {
+    if (GM_GetModeType() < GM_SpeedGolfMatch_mode || GM_GetModeType() > GM_SpeedGolf_mode) {
         Aud_Mute(0, 1);
         switch (nKind) {
         case 1:
@@ -1545,7 +1550,7 @@ void Gaud_ExitSpecialShot(u8 nPlayer) {
 
     pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
     nKind = GolfCamera_GetSpecialSwingType(ViewController_GetCameraControl(0));
-    if (Game_GetMode() < 6 || Game_GetMode() > 8) {
+    if (GM_GetModeType() < GM_SpeedGolfMatch_mode || GM_GetModeType() > GM_SpeedGolf_mode) {
         Aud_Mute(0, 0);
         Aud_EmiSetTrackStatus(pView->n2, 1, 0);
         Aud_EmiSetTrackStatus(pView->n3, 1, 0);
@@ -1565,7 +1570,7 @@ void Gaud_InitSlowMo(u8 nPlayer, u8 n) {
     GameAudioView* pView;
 
     pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
-    if (Game_GetMode() < 6 || Game_GetMode() > 8) {
+    if (GM_GetModeType() < GM_SpeedGolfMatch_mode || GM_GetModeType() > GM_SpeedGolf_mode) {
         Aud_EmiSetTrackVarRange(pView->n2, 3, n);
         Aud_EmiSetTrackVarRange(pView->n3, 3, n);
         Aud_EmiSetTrackStatus(pView->n2, 3, 1);
@@ -1579,7 +1584,7 @@ void Gaud_ExitSlowMo(u8 nPlayer) {
     GameAudioView* pView;
 
     pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
-    if (Game_GetMode() < 6 || Game_GetMode() > 8) {
+    if (GM_GetModeType() < GM_SpeedGolfMatch_mode || GM_GetModeType() > GM_SpeedGolf_mode) {
         Aud_EmiSetTrackStatus(pView->n2, 3, 0);
         Aud_EmiSetTrackStatus(pView->n3, 3, 0);
     }

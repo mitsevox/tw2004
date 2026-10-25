@@ -240,7 +240,7 @@ void GM_EndOfGolferTurn(int nPlayer) {
         if (Player_IsHoled(nPlayer)) {
             bWait = 1;
         }
-    } else if (Game_GetMode() == 0x1A) {
+    } else if (GM_GetModeType() == GM_LongDriveRace_mode) {
         bWait = 1;
     } else if (gpGame->bAIConcedes) {
         if (GM_CheckForAIConcede(nPlayer)) {
@@ -419,7 +419,7 @@ u8 GM_CheckForBallOOB(int nPlayer) {
             if (GM_Currently_PgaTourMode()) {
                 GM_PgaTourSim_SetUserEntrantHoleStrokes(nPlayer, gPlayers[nPlayer].nStrokes[gpGame->nCurHole]);
             }
-            if (Game_GetMode() == 8 || Game_GetMode() == 7) {
+            if (GM_GetModeType() == GM_SpeedGolf_mode || GM_GetModeType() == GM_SpeedGolfPoints_mode) {
                 return 1;
             }
             if (gpGame->bStrokeLimit && gPlayers[nPlayer].nStrokes[gpGame->nCurHole] >= 10) {
@@ -919,7 +919,7 @@ void GM_GolferConcede_Hole(int nPlayer) {
     gPlayers[nPlayer].nStrokes[gpGame->nCurHole] = 999;
     p->nPutts[gpGame->nCurHole] = 999;
     gPlayers[nPlayer].ball.nState = 0;
-    if (Game_GetMode() != 0x12) {
+    if (GM_GetModeType() != GM_Stableford_mode) {
         nPlayers = gNumPlayersSetUp;
         n = 0;
         for (i = 0; i < nPlayers; i++) {
@@ -980,17 +980,17 @@ void GM_CheckForShotChanges(int nPlayer) {
     }
     if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_GREEN_MORPH) {
         if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Input_uiMap(9, 0)) {
-            if (Game_GetMode() == 0x1A || Game_GetMode() == 0x16) return;
+            if (GM_GetModeType() == GM_LongDriveRace_mode || GM_GetModeType() == GM_LongDrive_mode) return;
             EVENT_Trigger(nPlayer, 0xD, 0, -1);
             GUI_ToggleUI(nPlayer, 1);
             bChanged = 1;
         } else if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Input_uiMap(10, 0)) {
-            if (Game_GetMode() == 0x1A || Game_GetMode() == 0x16) return;
+            if (GM_GetModeType() == GM_LongDriveRace_mode || GM_GetModeType() == GM_LongDrive_mode) return;
             EVENT_Trigger(nPlayer, 0xE, 0, -1);
             GUI_ToggleUI(nPlayer, 1);
             bChanged = 1;
         } else if (Input_ReadControlPad(gPlayers[nPlayer].nController) & Input_uiMap(0x1E, 0)) {
-            if (Game_GetMode() == 0x1A || Game_GetMode() == 0x16) return;
+            if (GM_GetModeType() == GM_LongDriveRace_mode || GM_GetModeType() == GM_LongDrive_mode) return;
             EVENT_Trigger(nPlayer, 0xF, 0, -1);
             GUI_ToggleUI(nPlayer, 1);
             bChanged = 1;

@@ -301,7 +301,7 @@ void FE_PlayIntroMovies(void) {
 // as player 0's and its course.
 void FE_PlayTrophyBallHighlight(Replay* pReplay) {
     Mem_cpy(&gReplayData, pReplay, sizeof(Replay));
-    GM_SetModeType(10);
+    GM_SetModeType(GM_Replay_mode);
     Session_SetGolfer(gReplayData.player.golfer.nIndex, 0);
     GM_SetCurrentCourse(gReplayData.nCourse);
 }
@@ -336,15 +336,15 @@ void FE_InitManager(void) {
     gpFEProfile->bEditingCopy = 0;
     gpFEProfile->nSlot = 0;
     gpFEProfile->n1 = -1;
-    for (i = 0; i < UI_NUM_TXF2_BANKS; i++) {
+    for (i = 0; i < FETM_NUM_BANKS; i++) {
         gUITxf2BankState[i].b0 = 0;
         gUITxf2BankState[i].nFreeBeforeMovie = 0;
         gUITxf2BankState[i].b1 = 0;
     }
     gUILoadingScreen.bRunning = 0;
     gUILoadingScreen.pPicture = NULL;
-    gpFEProfile->uSquareHash = fn_8000BEE4("__LogoSquare");
-    gpFEProfile->uRectHash = fn_8000BEE4("__LogoRect");
+    gpFEProfile->uSquareHash = FEtm_PackName("__LogoSquare");
+    gpFEProfile->uRectHash = FEtm_PackName("__LogoRect");
     gpFEProfile->bAllGolfersPickable = 0;
     gpFEProfile->bGolferPicked = 0;
     gpFEProfile->nEASBioError = 0;
@@ -1334,7 +1334,7 @@ void FE_CrAP_EquipDefaults(void) {
 // ladder closed (Gaud_ExitFE, GameMode4_ExitFE).
 void FE_vExitUI(void) {
     int i;
-    if (Game_GetMode() == 5 || Game_GetMode() == 11) {
+    if (GM_GetModeType() == GM_PlayNow_mode || GM_GetModeType() == GM_Lessons_mode) {
         if (gpSaveData[0].bActive) {
             gFEState.aBackup[0] = 0;
             if (!gpFEProfile->bGolferPicked) {
@@ -1364,17 +1364,17 @@ void FE_vExitUI(void) {
             gpSaveData[i].bActive = 0;
         }
     }
-    gFEState.nMode = Game_GetMode();
+    gFEState.nMode = GM_GetModeType();
     if (GameMode4_IsEventRunning()) {
-        gFEState.nMode = 4;
+        gFEState.nMode = GM_Laddered_mode;
     }
     if (GM_Currently_PgaTourMode()) {
-        gFEState.nMode = 23;
+        gFEState.nMode = GM_PgaTour_mode;
     }
-    if (gpFEProfile->bAwardReplay && Game_GetMode() == 10) {
+    if (gpFEProfile->bAwardReplay && GM_GetModeType() == GM_Replay_mode) {
         gFEState.nMode = 27;
     }
-    if (gFEState.nMode == 11 && gpSaveData[gpFEProfile->nSlot].nTourCardLevel > 0) {
+    if (gFEState.nMode == GM_Lessons_mode && gpSaveData[gpFEProfile->nSlot].nTourCardLevel > 0) {
         gFEState.nMode = 28;
     }
     gFEState.bDemoStarting = 0;

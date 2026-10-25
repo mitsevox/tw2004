@@ -1485,7 +1485,7 @@ void GM_vGetDemoSetupFlag(MsgArg* pArgs, MsgArg* pResult) {
 // (game mode 5) it first sets gpFEProfile->bGolferPicked, which keeps FE_vExitUI from giving player 0
 // the created golfer.
 void GM_vSetPlayerGolfer(MsgArg* pArgs, MsgArg* pResult) {
-    if (Game_GetMode() == 5) {
+    if (GM_GetModeType() == GM_PlayNow_mode) {
         gpFEProfile->bGolferPicked = 1;
     }
     Session_SetGolfer(pArgs[1].i, pArgs[0].i);
@@ -1515,9 +1515,9 @@ void GM_vGetPlayerGolfer(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gSession.nGolfer[pArgs[0].i];
 }
 
-// Front-end message 24: the session's game mode (Game_GetMode).
+// Front-end message 24: the session's game mode (GM_GetModeType).
 void GM_vGetGameMode(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = Game_GetMode();
+    pResult->i = GM_GetModeType();
 }
 
 // Front-end message 25: always answers 1 in this build.
@@ -2679,11 +2679,11 @@ void GM_vGetEarningsTableA9B4(MsgArg* pArgs, MsgArg* pResult) {
 // Front-end message 123: the round's mulligan rule (gpGame->nMulligans: 0 none, 1 any number, 2 one
 // per player per nine) is pArgs[0], but none in game mode 7 and any number in mode 9 (practice).
 void GM_vSetMulligan(MsgArg* pArgs, MsgArg* pResult) {
-    if (Game_GetMode() == 7) {
+    if (GM_GetModeType() == GM_SpeedGolfPoints_mode) {
         gpGame->nMulligans = GM_MULLIGANS_NONE;
         return;
     }
-    if (Game_GetMode() == 9) {
+    if (GM_GetModeType() == GM_Practice_mode) {
         gpGame->nMulligans = GM_MULLIGANS_ANY;
         return;
     }
@@ -2722,8 +2722,8 @@ void GM_vToggleClub(MsgArg* pArgs, MsgArg* pResult) {
     nClub = pArgs[1].i;
     if (!(gSession.uFlags & 0x4000)) {
         gSession.uBag[pArgs[0].i] ^= 1 << nClub;
-        if (gSession.nGolfer[pArgs[0].i] >= FIRST_CREATED_GOLFER || Game_GetMode() == 4) {
-            Game_GetMode();     // the original calls it again and ignores the result
+        if (gSession.nGolfer[pArgs[0].i] >= FIRST_CREATED_GOLFER || GM_GetModeType() == GM_Laddered_mode) {
+            GM_GetModeType();   // the original calls it again and ignores the result
             pRecord->uBagMask = gSession.uBag[pArgs[0].i];
         }
     }
@@ -3711,22 +3711,22 @@ void GM_vGetReplayGolferLastName(MsgArg* pArgs, MsgArg* pResult) {
 void GM_vGetGolferPrize(MsgArg* pArgs, MsgArg* pResult) {
     int nEvent = GameMode4_GetNumEventsWon();
 
-    switch (Game_GetMode()) {
-    case 4:
+    switch (GM_GetModeType()) {
+    case GM_Laddered_mode:
         if (nEvent >= 25) {
             pResult->i = gEarningsTable.aLadderPrize[24].nBase;
             return;
         }
         pResult->i = gEarningsTable.aLadderPrize[gLadderMap.nEvent].nBase;
         return;
-    case 0:
-    case 1:
+    case GM_Stroke_mode:
+    case GM_Match_mode:
         pResult->i = gEarningsTable.aStrokePrize[GM_GetGolferMoneyRating(pArgs[0].i)].nBase;
         return;
-    case 2:
+    case GM_Skins_mode:
         pResult->i = gEarningsTable.aSkins[GM_GetGolferMoneyRating(pArgs[0].i)].n10;
         return;
-    case 3:
+    case GM_OnlineTour_mode:
         return;
     }
 }
@@ -5566,8 +5566,8 @@ void GM_vSwapDisc(MsgArg* pArgs, MsgArg* pResult) {
 // when the working profile's bGolferPicked is set). Answers whether the course is on the disc in
 // the drive (fn_80110180, its hole-file check turned on while it runs).
 void GM_vStartEventCheckDisc(MsgArg* pArgs, MsgArg* pResult) {
-    if (Game_GetMode() == 11) {
-        if (Game_GetMode() == 5 || Game_GetMode() == 11) {
+    if (GM_GetModeType() == GM_Lessons_mode) {
+        if (GM_GetModeType() == GM_PlayNow_mode || GM_GetModeType() == GM_Lessons_mode) {
             if (gpSaveData[0].bActive) {
                 gFEState.aBackup[0] = 0;
                 if (gpFEProfile->bGolferPicked == 0) {
@@ -5579,8 +5579,8 @@ void GM_vStartEventCheckDisc(MsgArg* pArgs, MsgArg* pResult) {
         }
         Lessons_StartFromMenu();
         fn_80110178(1);
-    } else if (Game_GetMode() == 5) {
-        if (Game_GetMode() == 5 || Game_GetMode() == 11) {
+    } else if (GM_GetModeType() == GM_PlayNow_mode) {
+        if (GM_GetModeType() == GM_PlayNow_mode || GM_GetModeType() == GM_Lessons_mode) {
             if (gpSaveData[0].bActive) {
                 gFEState.aBackup[0] = 0;
                 if (gpFEProfile->bGolferPicked == 0) {
@@ -5592,13 +5592,13 @@ void GM_vStartEventCheckDisc(MsgArg* pArgs, MsgArg* pResult) {
         }
         PlayNow_StartChallenge();
         fn_80110178(1);
-    } else if (Game_GetMode() == 23) {
+    } else if (GM_GetModeType() == GM_PgaTour_mode) {
         GameModeDriverPGATour_PrepareForTeeOff();
-    } else if (Game_GetMode() == 26) {
+    } else if (GM_GetModeType() == GM_LongDriveRace_mode) {
         GameMode26_StartEvent();
-    } else if (Game_GetMode() == 22) {
+    } else if (GM_GetModeType() == GM_LongDrive_mode) {
         GameMode22_StartEvent();
-    } else if (Game_GetMode() == 24) {
+    } else if (GM_GetModeType() == GM_Realtime_mode) {
         GameModeDriverRTE_StartEvent();
     }
     pResult->i = fn_80110180();
@@ -6154,21 +6154,21 @@ void GM_vSetLongDriveOptions(MsgArg* pArgs, MsgArg* pResult) {
         switch (pArgs[1].i) {
         case 0:
         default:
-            nMode = 26;
+            nMode = GM_LongDriveRace_mode;
             n = 0;
             break;
         case 1:
-            nMode = 22;
+            nMode = GM_LongDrive_mode;
             n = 0;
             break;
         case 2:
-            nMode = 22;
+            nMode = GM_LongDrive_mode;
             n = 1;
             break;
         }
         GM_SetModeType(nMode);
         GM_SetSplitScreenForMode();
-        if (nMode == 22) {
+        if (nMode == GM_LongDrive_mode) {
             GameMode22_SetVariant(n);
         }
         return;

@@ -417,7 +417,7 @@ u8 SW_vStateIdleSwing(int nPlayer) {
     u8*     pPad;
     u8      bCStick, bMain;     // each stick's y pulled back past 160 (pad bytes 1 and 3)
 
-    if (Controller_IsCPU(nController) || Game_GetMode() == 10) {
+    if (Controller_IsCPU(nController) || GM_GetModeType() == GM_Replay_mode) {
         gPlayers[nPlayer].swing.nState = 1;
         SW_vStateInitBackSwing(nPlayer);
         pChar->uFlags &= ~1;
@@ -493,7 +493,7 @@ u8 SW_vStateBackSwing(int nPlayer) {
         pObj->fBackswing = 0.0f;
     }
     fAnimTime = pObj->fAnimTime;
-    if (Controller_IsCPU(nController) || Game_GetMode() == 10) {
+    if (Controller_IsCPU(nController) || GM_GetModeType() == GM_Replay_mode) {
         f32 fFrac;
         AI_MaxDistance(nPlayer, gPlayers[nPlayer].nShotKind, gPlayers[nPlayer].nClub);
         if (Lessons_IsShortBackswingLesson()) {
@@ -707,7 +707,7 @@ u8 SW_vStateDownSwing(int nPlayer) {
     if (pObj->pModel->pSkel != NULL) {
         pObj->pModel->pSkel->nShoulderFrames = 4;
     }
-    if (!Controller_IsCPU(nController) && Game_GetMode() != 10) {
+    if (!Controller_IsCPU(nController) && GM_GetModeType() != GM_Replay_mode) {
         int nDX, nDY;
         f32 fDist2;
         pPad   = SW_vGetStickInfo(nPlayer, nController);
@@ -807,11 +807,11 @@ u8 SW_vStateCancelSwing(int nPlayer) {
 // unused: gpSwing holds one set for everyone.
 void SW_vUIInit(int nPlayer) {
     u64 uHash;
-    uHash = fn_8000BEE4("clubback");
+    uHash = FEtm_PackName("clubback");
     fn_800102DC(uHash, &gpSwing->pBank, &gpSwing->pClubBack);
-    uHash = fn_8000BEE4("clubdown");
+    uHash = FEtm_PackName("clubdown");
     fn_800102DC(uHash, &gpSwing->pBank, &gpSwing->pClubDown);
-    uHash = fn_8000BEE4("tball");
+    uHash = FEtm_PackName("tball");
     fn_800102DC(uHash, &gpSwing->pBank, &gpSwing->pTBall);
 }
 
@@ -915,7 +915,7 @@ void SW_vUIUpdateIK(int nPlayer) {
     f32        fT;
 
     if (Player_IsCPU(nPlayer)) {
-        if (Game_GetMode() != 11) return;
+        if (GM_GetModeType() != GM_Lessons_mode) return;
         if (GM_GetCurrentLesson() != 8) {
             switch (GM_GetCurrentLesson()) {
             case 9:
@@ -932,7 +932,7 @@ void SW_vUIUpdateIK(int nPlayer) {
     }
     if (pObj->nTargetState == 6 || pObj->nTargetState == 7) {
         pSw = &gPlayers[nPlayer].swing;
-        if (Game_GetMode() == 11 && Player_IsCPU(nPlayer)) {
+        if (GM_GetModeType() == GM_Lessons_mode && Player_IsCPU(nPlayer)) {
             if (GM_GetCurrentLesson() == 8) {
                 nStickX = 0;
             } else {
@@ -1018,7 +1018,7 @@ void SW_vUIRender3D(int nPlayer) {
     nView = gPlayers[nPlayer].nView[0];
     nGrip = CharModel_GetBoneIndex(pObj->pModel, 0x52);
     if (Player_IsCPU(nPlayer)) {
-        if (Game_GetMode() != 11) return;
+        if (GM_GetModeType() != GM_Lessons_mode) return;
         if (GM_GetCurrentLesson() != 8) {
             switch (GM_GetCurrentLesson()) {
             case 9:
@@ -1153,7 +1153,7 @@ void SW_vImpact(int nPlayer) {
     f32     fAim;
 
     p = &gPlayers[nPlayer];
-    if (Game_GetMode() == 10) {
+    if (GM_GetModeType() == GM_Replay_mode) {
         Misc_SetSeedFunc(RANDOM_GAME, gReplayData.nSeed);
         // port: 0x630 of the swing data's 0x634 bytes (it holds no pointers)
         Mem_cpy(&gPlayers[0].swing, &gReplayData.player.swing, 0x630);

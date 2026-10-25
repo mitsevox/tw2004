@@ -533,7 +533,7 @@ u8 GameMode26_GetWinner(s32* pnWinner) {
 
 // Whether game mode 26 is being played (GUI_IsPostShotUIAnimating asks).
 u8 GameMode26_IsActive(void) {
-    return Game_GetMode() == 26;
+    return GM_GetModeType() == GM_LongDriveRace_mode;
 }
 
 // Whether somebody has won and the 120-frame winner countdown (gGameMode26WinnerCountdown) is still

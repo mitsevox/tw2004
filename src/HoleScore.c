@@ -559,7 +559,7 @@ s32 GameAnalysis_GetPotentialHoleResult(int nPlayer) {
         return 3;
     }
     nBest = 1000;
-    if (Game_GetMode() == 21) {
+    if (GM_GetModeType() == GM_AlternateShot_mode) {
         nMine = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1;
         if (nPlayer == 0 || nPlayer == 1) {
             i = 2;

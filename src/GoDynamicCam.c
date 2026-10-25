@@ -1709,23 +1709,23 @@ static u8 DynamicCam_MatchStateType(CameraSequence_t* seq, CameraShotState_e sta
 }
 
 // The sequence suits the game mode and the screen, by its nModeType (CameraGameModeTypes_e): the
-// split screen (gSession.nSplitScreen), the game mode (Game_GetMode: 9 practice, 11 the lessons)
+// split screen (gSession.nSplitScreen), the game mode (GM_GetModeType: practice, the lessons)
 // and the skill zone (GM_Currently_SkillZoneMode). 0 for NULL or any other nModeType.
 static u8 DynamicCam_ModeType(CameraSequence_t* seq) {
-    int mode = Game_GetMode();
+    int mode = GM_GetModeType();
 
     if (seq == NULL) return 0;
     if (seq->nModeType == CAMGAMEMODE_SINGLE_VIEW) {
         if (gSession.nSplitScreen) return 0;
-        if (mode == 9) return 0;
-        if (mode == 11) return 0;
+        if (mode == GM_Practice_mode) return 0;
+        if (mode == GM_Lessons_mode) return 0;
         if (GM_Currently_SkillZoneMode()) return 0;
         return 1;
     }
     if (seq->nModeType == CAMGAMEMODE_SPLIT_OR_TRAINING) {
         if (gSession.nSplitScreen) return 1;
-        if (mode == 9) return 1;
-        return mode == 11;
+        if (mode == GM_Practice_mode) return 1;
+        return mode == GM_Lessons_mode;
     }
     if (seq->nModeType == CAMGAMEMODE_SKILL_ZONE) {
         return GM_Currently_SkillZoneMode() != 0;

@@ -161,7 +161,7 @@ void EVENT_PracticeSwing(int nPlayer, int nEvent, void* pData, int nArg) {
 // player).
 void EVENT_HitBall(int nPlayer, int nEvent, void* pData, int nArg) {
     if (nArg == 1) {
-        if (Game_GetMode() == 26 && (gSession.uFlags & 0x4000)) {
+        if (GM_GetModeType() == GM_LongDriveRace_mode && (gSession.uFlags & 0x4000)) {
             fn_8009A16C();
         }
         gpGame->pfnHitBall(nPlayer);
@@ -195,7 +195,8 @@ void EVENT_NextClub(int nPlayer, int nEvent, void* pData, int nArg) {
     int nTries;
     u8 bOk;
 
-    if (Lessons_OnEvent(nPlayer, 13) || Game_GetMode() == 22 || Game_GetMode() == 26) return;
+    if (Lessons_OnEvent(nPlayer, 13) || GM_GetModeType() == GM_LongDrive_mode || GM_GetModeType()
+        == GM_LongDriveRace_mode) return;
     nOldClub = gPlayers[nPlayer].nClub;
     if (gPlayers[nPlayer].nClub == CLUB_PUTTER_e) return;
     nTries = 0;
@@ -239,7 +240,8 @@ void EVENT_PrevClub(int nPlayer, int nEvent, void* pData, int nArg) {
     int nTries;
     u8 bOk;
 
-    if (Lessons_OnEvent(nPlayer, 13) || Game_GetMode() == 22 || Game_GetMode() == 26) return;
+    if (Lessons_OnEvent(nPlayer, 13) || GM_GetModeType() == GM_LongDrive_mode || GM_GetModeType()
+        == GM_LongDriveRace_mode) return;
     nOldClub = gPlayers[nPlayer].nClub;
     if (gPlayers[nPlayer].nClub == CLUB_PUTTER_e) return;
     nTries = 0;
@@ -280,7 +282,8 @@ void EVENT_PrevClub(int nPlayer, int nEvent, void* pData, int nArg) {
 // screen the front end is sent message 0x14 with the player's nUISlot. Nothing when a lesson blocks
 // it or in the long-drive modes 22 and 26.
 void EVENT_NextShotType(int nPlayer, int nEvent, void* pData, int nArg) {
-    if (Lessons_OnEvent(nPlayer, 15) || Game_GetMode() == 26 || Game_GetMode() == 22) return;
+    if (Lessons_OnEvent(nPlayer, 15) || GM_GetModeType() == GM_LongDriveRace_mode || GM_GetModeType()
+        == GM_LongDrive_mode) return;
     NextShotType(nPlayer);
     if (gSession.nSplitScreen) {
         fn_80062CB0(gPlayers[nPlayer].nUISlot, 1);
@@ -527,7 +530,7 @@ void EVENT_PlayerEmotionUpdated(int nPlayer, int nEvent, void* pData, int nArg) 
     int nB;
     int nAnim;
 
-    if (Game_GetMode() != 11 || nArg == 1) {
+    if (GM_GetModeType() != GM_Lessons_mode || nArg == 1) {
         nA = fn_8006AA70(nPlayer);
         nB = fn_8006AA84(nPlayer);
         switch (nA) {

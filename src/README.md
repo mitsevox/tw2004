@@ -28,7 +28,7 @@ and MetroTRK are built from public decomps in `extern/` (the `progress_category=
 6 play (the frame loop), 7 after the frame loop ends (back to 5 when another hole load is asked
 for, else 8), 8 shut the round down, 12 reset the console, 13 leave, 9 an error. Each type's
 step is a call into `gomainloop.c` (`GO_vInitFE`, `GO_vInitIG`, `fn_8006D8E8`...).
-The game *mode* (stroke play, skins...) is a different number, `gpGame->nMode` (`Game_GetMode()`);
+The game *mode* (stroke play, skins...) is a different number, `gpGame->nMode` (`GM_GetModeType()`);
 see [Game modes](#game-modes).
 
 ## Glossary
@@ -117,7 +117,7 @@ early in link order (0x80005628-0x80013720), between the LL rendering files.
 | UMemPool.c | EA | pools of fixed-size nodes; 4x4 matrix and paired-single math, atan2f, logarithm |
 | urandom.c | T6 | three random-number streams (lagged Fibonacci), uniform and normal floats |
 | URes.c | EA | the resource list: the stream objects kept once delivered, found by type and id |
-| LoadData.c | ours | stream handlers: `'txf2'` texture banks, the `'load'` object, the loading-screen file; `Game_GetMode` |
+| FETextureMgr.c | EA | the front end's `'txf2'` texture banks, found by a texture's name; the loading bar's texture and the loading screen's picture (`'load'`); `GM_GetModeType`, `FEtm_PackName` |
 | UStream.c | EA | the streaming asset loader (CTRL/SHOC/SONO chunk files `.hog`/`.gcb`), async DVD reads into 18 buffers |
 | StreamManager.c | T6 | the stream manager: a file list per kind of stream (round, front end, loading screen, menu golfer, global data, start-up, hole), the chunk handlers each kind registers, and streaming a list behind the loading screen |
 | LLInput_Gc.c | ours (after TW06 `llinput_xbox.c`) | the four controllers: buttons, sticks, triggers, rumble |

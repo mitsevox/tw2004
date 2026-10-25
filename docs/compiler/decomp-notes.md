@@ -679,7 +679,7 @@ The fixes that come up most often. Each points to its full entry below.
 - **[verified] 64-bit arguments skip r4.** `fn(handle, 0, k)` sites where the original sets r5 and
   r6 but never r4 are `fn(handle, (unsigned long long)k)`: a 64-bit integer goes in an aligned
   register pair (r5:r6). The animation-event lookups (`Character_GetTagTime`, `Character_IsTagSet`,
-  `fn_80062BB0`, `fn_80062B98`) take the 64-bit event id that `fn_8000BEE4` hashes.
+  `fn_80062BB0`, `fn_80062B98`) take the 64-bit event id that `FEtm_PackName` packs.
 - **[verified] A function that returns its pointer argument** keeps r3 untouched and works on a
   copy in another register (`mr r6, r3`); a `void` function advances r3 directly.
 - **[verified] The caller's cast and the prototype's type decide the extension.** A `clrlwi` on

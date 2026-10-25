@@ -911,7 +911,7 @@ config.libs = [
             Object(Matching, "UMemPool.c"),
             Object(Matching, "urandom.c"),
             Object(Matching, "URes.c"),
-            Object(Matching, "LoadData.c"),
+            Object(Matching, "FETextureMgr.c"),
             Object(Matching, "TerrainData.c"),
             Object(Matching, "UStream.c"),
             Object(Matching, "LLTex.c"),

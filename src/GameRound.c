@@ -192,83 +192,83 @@ void GM_SetModeType(int nMode) {
     gpGame->pfnGreenType = GM_DefaultTargetState;
     gpGame->pfnPreShotInit = GM_DefaultNoOpPlayer;
     lbl_80282278 = 0;
-    switch (Game_GetMode()) {
-    case 0:
+    switch (GM_GetModeType()) {
+    case GM_Stroke_mode:
         GameModeStroke_Init();
         break;
-    case 1:
+    case GM_Match_mode:
         GameModeMatch_Init();
         break;
-    case 2:
+    case GM_Skins_mode:
         GameModeSkins_Init();
         break;
-    case 4:
+    case GM_Laddered_mode:
         GameMode4_Init();
         break;
-    case 6:
+    case GM_SpeedGolfMatch_mode:
         SpeedGolfMatch_Init();
         break;
-    case 7:
+    case GM_SpeedGolfPoints_mode:
         SpeedGolfPoints_Init();
         break;
-    case 8:
+    case GM_SpeedGolf_mode:
         SpeedGolf_Init();
         break;
-    case 9:
+    case GM_Practice_mode:
         GameModePractice_Init();
         break;
-    case 5:
+    case GM_PlayNow_mode:
         PlayNow_Init();
         break;
-    case 10:
+    case GM_Replay_mode:
         GameModeReplay_Init();
         break;
-    case 11:
+    case GM_Lessons_mode:
         Lessons_Init();
         break;
-    case 12:
+    case GM_StrokePoints_mode:
         GameMode12_Init();
         break;
-    case 13:
+    case GM_SkillZoneTimed_mode:
         GameModeSkillZoneTimed_Init();
         break;
-    case 14:
+    case GM_SkillZoneCapture_mode:
         GameModeSkillZoneCapture_Init();
         break;
-    case 15:
+    case GM_SkillZoneHorse_mode:
         GameModeSkillZoneHorse_Init();
         break;
-    case 16:
+    case GM_SkillZoneTarget_mode:
         GameModeSkillZoneTarget_Init();
         break;
-    case 17:
+    case GM_SkillZoneTargetToTarget_mode:
         GameModeSkillZoneTargetToTarget_Init();
         break;
-    case 18:
+    case GM_Stableford_mode:
         GameModeStableford_Init();
         break;
-    case 19:
+    case GM_BestBall_mode:
         GameModeBestBall_Init();
         break;
-    case 20:
+    case GM_FourBall_mode:
         GameModeFourBall_Init();
         break;
-    case 21:
+    case GM_AlternateShot_mode:
         GameModeAlternateShot_Init();
         break;
-    case 23:
+    case GM_PgaTour_mode:
         GameModeDriverPGATour_Init();
         break;
-    case 24:
+    case GM_Realtime_mode:
         GameModeDriverRTE_Init();
         break;
-    case 25:
+    case GM_Battle_mode:
         GameModeBattle_Init();
         break;
-    case 26:
+    case GM_LongDriveRace_mode:
         GameMode26_Init();
         break;
-    case 22:
+    case GM_LongDrive_mode:
         GameMode22_Init();
         break;
     }
@@ -540,12 +540,12 @@ int GM_GetGolferRelativeCumulativeScore(int nPlayer, u8 bCurrent) {
 int GM_GetPlayerRoundScoreThroughHole(int nPlayer, int nHoles) {
     int n;
     int i;
-    if (Game_GetMode() == 19) {
+    if (GM_GetModeType() == GM_BestBall_mode) {
         n = 0;
         for (i = 0; i < nHoles; i++) {
             n += GM_BestBallMode_GetTeamHoleScore(nPlayer, i);
         }
-    } else if (Game_GetMode() == 18) {
+    } else if (GM_GetModeType() == GM_Stableford_mode) {
         n = 0;
         for (i = 0; i < nHoles; i++) {
             n += gPlayers[nPlayer].nModePoints[i];
@@ -811,35 +811,35 @@ void GM_ClearMulliganCounters(void) {
 // 2 by gpGame->nScoringType; 0 for any other mode.
 int GM_GetMinPlayersForMode(int nMode) {
     switch (nMode) {
-    case 0:
+    case GM_Stroke_mode:
         return 1;
-    case 1:
+    case GM_Match_mode:
         return 2;
-    case 2:
+    case GM_Skins_mode:
         return 2;
-    case 4:
+    case GM_Laddered_mode:
         return 1;
-    case 5:
+    case GM_PlayNow_mode:
         return 1;
-    case 6:
-    case 7:
-    case 8:
+    case GM_SpeedGolfMatch_mode:
+    case GM_SpeedGolfPoints_mode:
+    case GM_SpeedGolf_mode:
         return gpGame->nScoringType == GM_SCORING_STROKES ? 1 : 2;
-    case 9:
+    case GM_Practice_mode:
         return 1;
-    case 18:
+    case GM_Stableford_mode:
         return 1;
-    case 19:
+    case GM_BestBall_mode:
         return 4;
-    case 20:
+    case GM_FourBall_mode:
         return 4;
-    case 21:
+    case GM_AlternateShot_mode:
         return 4;
-    case 23:
+    case GM_PgaTour_mode:
         return 1;
-    case 24:
+    case GM_Realtime_mode:
         return 1;
-    case 26:
+    case GM_LongDriveRace_mode:
         return 2;
     }
     return 0;
@@ -854,17 +854,17 @@ void GM_SetSplitScreen(u8 b) {
 
 // Split screen for the mode: modes 0-2 as the session has it, 6, 7 and 26 always, others never.
 void GM_SetSplitScreenForMode(void) {
-    switch (Game_GetMode()) {
-    case 6:
-    case 7:
+    switch (GM_GetModeType()) {
+    case GM_SpeedGolfMatch_mode:
+    case GM_SpeedGolfPoints_mode:
         GM_SetSplitScreen(1);
         return;
-    case 26:
+    case GM_LongDriveRace_mode:
         GM_SetSplitScreen(1);
         return;
-    case 0:
-    case 1:
-    case 2:
+    case GM_Stroke_mode:
+    case GM_Match_mode:
+    case GM_Skins_mode:
         if (gSession.nSplitScreen == 1) {
             GM_SetSplitScreen(1);
             return;
@@ -1336,8 +1336,10 @@ void GM_BuildRandom18(void) {
 
 // Whether the game mode is one of the skill-zone games (modes 13-17).
 u8 GM_Currently_SkillZoneMode(void) {
-    if (Game_GetMode() == 13 || Game_GetMode() == 14 || Game_GetMode() == 15 || Game_GetMode() == 16 ||
-        Game_GetMode() == 17) {
+    if (GM_GetModeType() == GM_SkillZoneTimed_mode || GM_GetModeType() == GM_SkillZoneCapture_mode
+        || GM_GetModeType() == GM_SkillZoneHorse_mode || GM_GetModeType()
+        == GM_SkillZoneTarget_mode ||
+        GM_GetModeType() == GM_SkillZoneTargetToTarget_mode) {
         return 1;
     }
     return 0;
@@ -1345,7 +1347,8 @@ u8 GM_Currently_SkillZoneMode(void) {
 
 // Whether the game mode is speed golf (modes 6-8).
 u8 GM_IsSpeedGolfMode(void) {
-    if (Game_GetMode() == 6 || Game_GetMode() == 7 || Game_GetMode() == 8) {
+    if (GM_GetModeType() == GM_SpeedGolfMatch_mode || GM_GetModeType() == GM_SpeedGolfPoints_mode
+        || GM_GetModeType() == GM_SpeedGolf_mode) {
         return 1;
     }
     return 0;

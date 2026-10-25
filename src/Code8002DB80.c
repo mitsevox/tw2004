@@ -214,7 +214,7 @@ int Golfer_GetAttribute(Player* pPlayer, int nAttr, int nMode) {
     if (nMode == ATTR_BASE || nMode == ATTR_TOTAL) {
         // fake match: the (s8) casts on the s8 record values keep the original's extsb before the add
         if (Controller_IsCPU(pPlayer->nController) && pPlayer->golfer.nIndex < FIRST_CREATED_GOLFER &&
-            (Game_GetMode() == 4 || (gSession.uFlags & 2))) {
+            (GM_GetModeType() == GM_Laddered_mode || (gSession.uFlags & 2))) {
             nValue =
                 (s8)((s8)pPlayer->golfer.attrAlt[nAttr] + Golfer_TierBonus(pPlayer->golfer.tier[nAttr]));
         } else {
