@@ -26,7 +26,7 @@ void fn_80071914(void);
 void fn_80071994(void);
 void fn_80071A54(int nRow);
 void fn_80071A90(int nRow);
-void fn_80070168(void);     // sweep_80070168.c: calls a display list
+void fn_80070168(void);     // DynamicRenderingBuffer.c: calls a display list
 void fn_8007524C(void);     // GoShaderObjectCommon_ShaderObjectsData_Gc.c: empty
 
 // The hooks of lbl_80188E78 and lbl_80188E88 defined in other units, by unit.
@@ -35,7 +35,7 @@ void fn_8006FDCC(void);
 void fn_8006FDD0(void);
 void fn_8006FED4(u8* p0, s32 p1);
 void fn_8006FF08(u8* p0);
-// sweep_8006FF2C.c
+// GoShaderObjectContainer_OBFData_Gc.c
 void fn_8006FF2C(void* arg0);
 // DynamicRenderingBuffer.c
 void fn_80070B74(void);
@@ -126,8 +126,6 @@ void fn_800711A4(StaticShaderObject* pObj) {
     if (pObj->anim.b8 != 0) {
         GXSetArray(9, pObj->pArrays->apPos[0], 12);
     }
-    // port: fn_80070168 (sweep_80070168.c) is defined without parameters but hands r3 and r4 on to
-    //       GXCallDisplayList
     ((void (*)(void*, u32))fn_80070168)(pObj->anim.p4, pObj->anim.n0);
 }
 
@@ -272,8 +270,6 @@ void fn_800715D0(StaticShaderObject* pObj) {
     if (pObj->anim.b8 != 0) {
         GXSetArray(9, pObj->pArrays->apPos[0], 12);
     }
-    // port: fn_80070168 (sweep_80070168.c) is defined without parameters but hands r3 and r4 on to
-    //       GXCallDisplayList
     ((void (*)(void*, u32))fn_80070168)(pObj->anim.p4, pObj->anim.n0);
 }
 
@@ -297,8 +293,6 @@ void fn_80071680(StaticShaderObject* pObj) {
     if (pObj->anim.b8 != 0) {
         GXSetArray(9, pObj->pArrays->apPos[0], 12);
     }
-    // port: fn_80070168 (sweep_80070168.c) is defined without parameters but hands r3 and r4 on to
-    //       GXCallDisplayList
     ((void (*)(void*, u32))fn_80070168)(pObj->anim.p4, pObj->anim.n0);
 }
 

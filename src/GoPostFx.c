@@ -69,13 +69,11 @@ void fn_80037E50(void) {
 
 void fn_80037F80(void);
 void fn_80037FB4(u8 b, f32* pColour);
-u8 fn_8003944C();
+u8 fn_8003944C(void);
 void fn_80038314(void);
 void fn_800383A8(void);
 void fn_80038438(void);
 void fn_800382E0(void);
-void fn_80038A2C(int nField, RenderCamera* pCamera);
-void fn_80038A6C(int nField, void* pCamera);
 void fn_800392D0(void);
 
 void fn_80037F80(void) {
@@ -653,3 +651,11 @@ void fn_80039358(int nView) {
         RenderState_Flush();
     }
 }
+
+// ---- sweep code (not yet cleaned up) ----
+
+u8 fn_8003944C(void) {
+    return 0;
+}
+
+// ---- end of sweep code ----

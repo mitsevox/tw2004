@@ -67,6 +67,20 @@ Merge conflicts with `main` are resolved by keeping both sides' intent: the plan
 keep every row that is done on either side; renamed types and functions take main's new name at
 the lines the pass brought in.
 
+Folds and other code moves
+--------------------------
+
+A `fold` puts an `unsorted/` scrap into the file it belongs to. The commit message gives the proof
+of the boundary (`style.md`, "Every pass checks the file's two ends"); when nothing proves it, the
+scrap goes to the neighbour the evidence favours, the message says so, with the evidence for and
+against, and `src/README.md` marks that boundary unverified. Nothing stays in `unsorted/`.
+
+Code that a fold, move or split adds to a file that is **open** in `audit.tsv` moves as it is:
+the file's own pass brings it to the bar. Code added to a file that is **done** must be brought
+to the `style.md` bar in the same change and kept consistent with what that file's audit set up
+(its names, types, enums, header ownership and comment style), and an independent reviewer grades
+it against that bar before it lands.
+
 Big files
 ---------
 

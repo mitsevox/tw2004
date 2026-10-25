@@ -1,7 +1,8 @@
 // LLObj_Gc.c (EA's name, from its asserts; also in EA's 2002 source tree): building and freeing a
 // model's mesh tree from its stream data, then the visibility tests (0x80007BC4..: move an
 // object's bounding sphere into camera space, then cull it), written earlier as
-// unsorted/code_80007BC4.c and not yet cleaned up.
+// unsorted/code_80007BC4.c and not yet cleaned up. Last come the vertex format set-up, the model
+// parts' and array sets' type-function dispatch, and the camera and drawable getters.
 
 #include "unsorted/cull.h"
 #include "dynobj.h"
@@ -326,6 +327,104 @@ int fn_80007D74(Sphere* s, Camera* cam, int mode) {
         }
         return 4;
     }
+}
+
+// ---- end of sweep code ----
+
+// ---- sweep code (not yet cleaned up) ----
+
+typedef struct {
+    /* 0x00 */ char pad0[0x10];
+    /* 0x10 */ int unk10;
+    /* 0x14 */ int unk14;
+} UnkGlobal;
+
+UnkGlobal lbl_801A24A0;
+UnkGlobal* lbl_80280DA0 = &lbl_801A24A0;
+
+void GXSetVtxAttrFmt(int vtxfmt, int attr, int cnt, int type, unsigned char frac);
+
+void fn_800080D0(void) {
+}
+
+void fn_800080D4(void) {
+    lbl_80280DA0->unk14 = 0;
+    lbl_80280DA0->unk10 = 0;
+    GXSetVtxAttrFmt(0, 9, 1, 4, 0);
+    GXSetVtxAttrFmt(0, 11, 1, 5, 0);
+    GXSetVtxAttrFmt(0, 13, 1, 3, 9);
+    GXSetVtxAttrFmt(0, 14, 1, 3, 9);
+    GXSetVtxAttrFmt(0, 10, 0, 4, 0);
+    GXSetVtxAttrFmt(4, 9, 1, 4, 0);
+    GXSetVtxAttrFmt(4, 11, 1, 5, 0);
+    GXSetVtxAttrFmt(4, 13, 1, 4, 0);
+}
+
+void fn_800081C4(void) {
+}
+
+// Gives an array set its mode and runs the mode's setup function on it.
+void fn_800081C8(UObjArraySet* pSet, int nMode, void* pArg) {
+    pSet->n30 = nMode;
+    pSet->pFuncs = &lbl_80188E78[nMode].set;
+    pSet->pFuncs->p0(pSet, pArg);
+}
+
+void fn_80008214(UObjArraySet* pSet) {
+    if (pSet->pFuncs->p4 != NULL) {
+        pSet->pFuncs->p4(pSet);
+    }
+}
+
+void fn_80008248(UObjMeshPart* pPart) {
+    if (pPart->pFuncs->p4 != NULL) {
+        pPart->pFuncs->p4(pPart);
+    }
+}
+
+// Gives a mesh part its type and array set and runs the type's setup function on it.
+void fn_8000827C(UObjMeshPart* pPart, UObjArraySet* pSet, int nType, void* pArg) {
+    pPart->n0 = nType;
+    pPart->pSet = pSet;
+    pPart->pFuncs = &lbl_80188E88[nType].part;
+    pPart->pFuncs->p0(pPart, pArg);
+}
+
+// Draws a mesh part through its type's draw function (UObjPartFuncs.p8).
+void ObjPart_Draw(UObjMeshPart* pPart) {
+    pPart->pFuncs->p8(pPart);
+}
+
+extern void fn_800070DC(void);
+
+Sphere* fn_800082F8(RenderObj* obj) {
+    return &obj->data->bounds;
+}
+
+void Vec3Copy(const f32* pSrc, f32* pDst) {
+    pDst[0] = pSrc[0];
+    pDst[1] = pSrc[1];
+    pDst[2] = pSrc[2];
+}
+
+float fn_80008320(Camera* cam) { return cam->unk220; }
+float fn_80008328(Camera* cam) { return cam->unk21C; }
+float fn_80008330(Camera* cam) { return cam->unk218; }
+float fn_80008338(Camera* cam) { return cam->unk214; }
+float fn_80008340(Camera* cam) { return cam->unk210; }
+float fn_80008348(Camera* cam) { return cam->unk208; }
+float fn_80008350(Camera* cam) { return cam->unk20C; }
+float fn_80008358(Camera* cam) { return cam->unk204; }
+float fn_80008360(Camera* cam) { return cam->unk1F4; }
+float fn_80008368(Camera* cam) { return cam->unk1F8; }
+CamLens* Camera_GetLens(Camera* cam) { return cam->unk10; }
+int fn_80008378(CamLens* sub) { return sub->nType; }
+
+void fn_80008380(void) {
+    fn_800070DC();
+}
+
+void fn_800083A0(void) {
 }
 
 // ---- end of sweep code ----

@@ -153,3 +153,15 @@ void fn_800976A8(MorphAnim* pAnim, f32 fWeight) {
     }
     lbl_80281F70->au8[pAnim->nIndex] = gSession.nFrameCount;
 }
+
+// ---- sweep code (not yet cleaned up) ----
+
+void fn_800977CC(void* arg0);
+
+void fn_800977CC(void* arg0) {
+    if ((u32) (*(u32*)((u8*)(arg0) + 0xC0)) != 0U) {
+        Circular_MemFreeFunc((void*)(*(u32*)((u8*)(arg0) + 0xC0)));
+    }
+}
+
+// ---- end of sweep code ----

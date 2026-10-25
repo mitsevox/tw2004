@@ -4,6 +4,7 @@
 #include "glows.h"
 #include "camera.h"
 #include "core/startup.h"
+#include "unsorted/cull.h"
 
 f32 lbl_80189DA8[6][8] = {
     {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f},
@@ -258,3 +259,39 @@ f32 fn_8009A754(s32 nView, SunFlrView* pView) {
     fSum *= lbl_802813B8->f0;
     return fSum;
 }
+
+// ---- sweep code (not yet cleaned up) ----
+
+// Moves a point from the camera's 0..1 screen rectangle units (pIn: x, y) into frame buffer units
+// (pOut), as RenderState_SetViewport does for the rectangle itself.
+void fn_8009A844(void* pCamera, u8* pIn, u8* pOut) {
+    VM_SViewport* pRect;
+    f32* pSrc = (f32*)pIn;
+    f32* pDst = (f32*)pOut;
+    f32 fLeft;
+    f32 fWidth;
+    f32 fTop;
+    f32 fHeight;
+    FB_SFrameBuffer* pBuf;
+    f32 f0;
+    f32 fBufWidth;
+    f32 f4;
+    f32 fBufHeight;
+
+    pRect = RC_spGetRenderCtxViewport(pCamera);
+    fLeft = VM_fGetViewportLeft(pRect);
+    fWidth = VM_fGetViewportWidth(pRect);
+    pDst[0] = pSrc[0] * fWidth + fLeft;
+    fTop = VM_fGetViewportTop(pRect);
+    fHeight = VM_fGetViewportHeight(pRect);
+    pDst[1] = pSrc[1] * fHeight + fTop;
+    pBuf = RC_spGetRenderCtxFrameBuffer(pCamera);
+    f0 = FB_fGetFrameBufferOffsetX(pBuf);
+    fBufWidth = FB_fGetFrameBufferWidth(pBuf);
+    pDst[0] = pDst[0] * fBufWidth + f0;
+    f4 = FB_fGetFrameBufferOffsetY(pBuf);
+    fBufHeight = FB_fGetFrameBufferHeight(pBuf);
+    pDst[1] = pDst[1] * fBufHeight + f4;
+}
+
+// ---- end of sweep code ----

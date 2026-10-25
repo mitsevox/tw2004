@@ -135,9 +135,7 @@ files in [Characters](#characters).
 | File | Name | What it is |
 |---|---|---|
 | LLDisp_Gc.c | EA | the display: video mode, image buffer, CPU/GPU sync, copying each frame out |
-| LLObj_Gc.c | EA | a model's mesh tree from its stream data; bounding-sphere visibility tests |
-| unsorted/code_800080D0.c | ph | vertex format set-up and the per-type function-table dispatch |
-| unsorted/code_800082F8.c | ph | camera and drawable-object accessors (`Vec3Copy`) |
+| LLObj_Gc.c | EA | a model's mesh tree from its stream data; bounding-sphere visibility tests; the parts' type-function dispatch and the camera getters *(from 0x800080D0 on: file unverified)* |
 | LLTex.c | EA | texture banks from `'txf '` objects; byte-code scripts that drive texture items |
 | LLTexGrp.c | EA | the list of loaded texture banks; find a texture by name hash |
 | LLFont.c | EA | the font renderer (`'sfn '` fonts) |
@@ -149,7 +147,7 @@ files in [Characters](#characters).
 | GxUtil.c | ours | a 256x224 copy of the screen as a texture, rectangle alpha clear, texture object set-up |
 | GoRenderSurface.c | EA | five off-screen render surfaces |
 | GoTerrain.c | EA | the terrain renderer: the hole's ground and objects in draw lists by distance and LOD; animated trees, crowd, flag |
-| GoPostFx.c | EA | screen effects over each view (a colour, two effects from a screen copy) |
+| GoPostFx.c | EA | screen effects over each view (a colour, two effects from a screen copy) *(last function's file unverified)* |
 | DepthField.c | T6 | depth-of-field blur |
 | UObject3D.c | EA | a model from a stream object; a recorded display list of renderer state |
 | GoFrameBuf.c | EA | a frame buffer's size and scale |
@@ -160,8 +158,7 @@ files in [Characters](#characters).
 | GoLightFogEnv.c | T7 | the hole's lighting environments (`LF_*`) |
 | goballfx.c | T6 | four sets of five lights, and the ball's ground marker |
 | GoObjShadow.c | ours | object shadows drawn with the "shadow" texture (called from GoDynObj.c) |
-| SunFlr_Gc.c | EA | the sun flare's GameCube part: depth around the sun, how much is visible |
-| unsorted/sweep_8009A844.c | ph | a screen-rectangle point to frame-buffer units (next to the sun flare) |
+| SunFlr_Gc.c | EA | the sun flare's GameCube part: depth around the sun, how much is visible *(last function's file unverified)* |
 | GlowMgr.c | T7 | the glows' set-up, shut-down, per-view update and drawing, for gomainloop.c |
 | Code8009AA28.c | ph | the sun flare's set-up and per-view update; the glow queue's add *(last function's file unverified)* |
 | Code8009B340.c | ph | a list of fading glow nodes *(first function's file unverified)* |
@@ -180,19 +177,16 @@ engine.h `ModuleHooks`). Particles, rain and the ball's effects sit here too.
 | File | Name | What it is |
 |---|---|---|
 | Code8006F608.c | ph | the hole's weather: rolls per-course choices and starts/stops effects, the rain among them (PsMgr.c) |
-| GoShaderObjectContainer_OBFData_Gc.c | EA | copies a shader object's chunks into GPU-ready buffers |
-| unsorted/sweep_8006FF2C.c | ph | one of row 0's hooks (sets a vertex array, then calls sweep_80070168.c) |
+| GoShaderObjectContainer_OBFData_Gc.c | EA | copies a shader object's chunks into GPU-ready buffers *(last function's file unverified)* |
 | GoShaderObject_PrelitTextured_Gc.c | ours (after TW06) | row 0's hooks: a prelit, textured mesh on a dynamic rendering buffer |
-| unsorted/sweep_80070168.c | ph | calls a display list, then `fn_800124CC` (LLFont.c) |
-| DynamicRenderingBuffer.c | ours | vertices a shader object rewrites each frame (EA's header name `GoShaderObjectCommon_DynamicRenderingBuffer_Gc.h`) |
+| DynamicRenderingBuffer.c | ours | vertices a shader object rewrites each frame (EA's header name `GoShaderObjectCommon_DynamicRenderingBuffer_Gc.h`) *(first function's file unverified)* |
 | Code80070EC4.c | ph | rows 4 and 2's static hooks (row 2 plays a morph animation) |
 | GoShaderObject_PrelitUVAnimation_Gc.c | EA | row 5: prelit geometry with scrolling textures; init/close of every shader type |
 | GoShaderObjectCommon_ShaderObjectsData_Gc.c | EA | builds the display lists that draw shader objects |
 | GoShaderObjectCommon_TexAnimManager_Gc.c | EA | scrolling-texture matrices |
 | GoShaderObject_Particle_Gc.c | EA | the particle shader; also the main-memory heap made from the OS arena |
 | unsorted/sweep_8009554C.c | ph | six empty functions (GoEntry.c, gomainloop.c and char.c call them) |
-| GoShaderObjectCommon_MorphAnimManager_Gc.c | EA | the list of morph animations |
-| unsorted/sweep_800977CC.c | ph | frees a buffer at +0xC0 *(unverified which file)* |
+| GoShaderObjectCommon_MorphAnimManager_Gc.c | EA | the list of morph animations *(last function's file unverified)* |
 | GoShaderObject_Glows_Gc.c | EA | the glows' shapes and drawing |
 | UFstPart.c | EA | particle emitters |
 | PsMgr.c | EA | weather particle effects (only the rain on GameCube) |
@@ -517,12 +511,6 @@ The `Common/` and `NGC/` files are built with SN ProDG (GCC 2.95), unoptimised, 
 | DiscCheck.c | ours | which disc is in the drive; disc changes; course files per disc |
 
 ### Unplaced
-
-Small sweep files whose file and subsystem are not known:
-
-| File | What it is |
-|---|---|
-| unsorted/sweep_8003944C.c | a function returning 0, between GoPostFx.c and GoDynamicCam.c |
 
 In the SDK and runtime address range, not EA code: `unsorted/sweep_801338E0.c` (EXI2 / debugger
 stubs), `sweep_801654D0.c`, `sweep_801654F4.c`, `sweep_80165524.c` (Metrowerks critical sections;
