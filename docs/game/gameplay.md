@@ -678,7 +678,7 @@ When 0.84 x the spin reaches the speed, it is rolling.
 
 **Roll** (`Physics_BallRolling`, 99%), every tick:
 
-1. **Holed** if it is on a cup surface (class 12 or 18, or surface 90 within 2 yd of the pin)
+1. **Holed** if it is on a cup surface (class 12 or 18, or SURFACE_FLAGSTICK, the flagstick's row 90, within 2 yd of the pin)
    and more than 2 in below the pin. That is the only "in" test.
 2. The velocity is laid onto the ground plane at its speed.
 3. **Break.** The sideways part of the slope (the ground normal's horizontal part, x surface

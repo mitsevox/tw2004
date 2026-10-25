@@ -13,9 +13,6 @@ void SD_InitShaderObject(void* pMesh, int n, s32* pDesc);
 void SD_FreeShaderObject(void* pMesh);
 void SD_DrawShaderObject(u8* pMesh);
 
-// GoTerrainCollision.c
-f32 Ter_GetSupportingWorldHeight(TGD_TerrainInfo* pCourse, f32* pPos);
-
 #define NUM_SHADOW_MESHES 5
 
 // The uninitialised globals are defined last-first: CodeWarrior lays them out in reverse.

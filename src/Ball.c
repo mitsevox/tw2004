@@ -5,8 +5,8 @@
 // rough). No assert names this file (the leaked list's PsBallFx.c is elsewhere). Units are yards
 // and seconds. Many constants are inches or miles per hour converted to yards (INCHES, MPH): the
 // original's float bits are exactly those quotients, not the rounded decimals. The cup is real
-// geometry (the cup classes, surface type 90): the ball is holed when it is on a cup surface
-// more than 2 in (rolling) or 2.5 in (landing) below the pin. The pull toward the cup
+// geometry: the ball is holed when it is on a cup surface (the cup classes, or SURFACE_FLAGSTICK
+// within 2 yd of the pin) more than 2 in (rolling) or 2.5 in (landing) below the pin. The pull toward the cup
 // (Physics_ApplySuperSucka) is written up in docs/game/gameplay.md.
 
 #include "golfer.h"
@@ -383,7 +383,7 @@ void   Physics_TimedSimulation_local(Ball* pBall, f32 fSeconds, f32 fTick);
 u8     DynObj_FindBallHit(int nPlayer, f32* pTo, f32* pFrom, f32* pHit, f32* pNormal, HitObject** ppWhat);
 u8     Physics_CheckFlagstickHit(Ball* pBall, void* pv, f32* pHit, f32* pNormal);
 u8     Physics_ProcessCollision(Ball* pBall, f32* pHit, f32* pNormal, TGD_MaterialInfo* pSurface,
-                                TerObject* pObj,
+                                TGD_ObjectInstanceInfo* pObj,
                                 f32* pFrac, f32 fTicks);
 u8     Physics_CheckObjectCollisions(Ball* pBall, f32 fTicks);
 // the bounce; returns the impact
@@ -431,7 +431,7 @@ static inline f32 Ball_Clamp(f32 x, f32 fLo, f32 fHi) {
 
 #define PIN(pBall) (&(pBall)->pCourse->pin[Game_CurrentPinSet()].x)
 
-// A landing: a player's ball fires 0x25 on flagged surfaces, then 0x26 on the cup (surface 90),
+// A landing: a player's ball fires 0x25 on flagged surfaces, then 0x26 on the flagstick (SURFACE_FLAGSTICK),
 // 0x24 on an object, 0x23 on the ground; a look-ahead ball's first landing (Player.ballBefore) tells
 // its player (0x49).
 #define BALL_LANDING_EVENTS(pBall, pSurface, pObj)                                                 \
@@ -439,7 +439,7 @@ static inline f32 Ball_Clamp(f32 x, f32 fLo, f32 fHi) {
         if ((pSurface)->uFlags & 0x10) {                                                           \
             EVENT_Trigger((pBall)->nPlayer, 0x25, (pBall), !gSimulating);                            \
         }                                                                                          \
-        if (MaterialTypes_getMaterialID(pSurface) == 90) {                                         \
+        if (MaterialTypes_getMaterialID(pSurface) == SURFACE_FLAGSTICK) {                          \
             EVENT_Trigger((pBall)->nPlayer, 0x26, (pBall), !gSimulating);                            \
         } else if (pObj) {                                                                         \
             EVENT_Trigger((pBall)->nPlayer, 0x24, (pBall), !gSimulating);                            \
@@ -1479,7 +1479,7 @@ u8 Physics_CheckObjectCollisions(Ball* pBall, f32 fTicks) {
     f32          vNormal[4];
     f32          vFrom[4];
     f32          vTo[4];
-    TerObject*   pObj;
+    TGD_ObjectInstanceInfo* pObj;
     TGD_MaterialInfo* pSurface;
     if (pBall->pCourse == NULL) return 0;
     Vec3Copy(pBall->vPrev, vFrom);
@@ -1706,8 +1706,8 @@ static inline f32 Ball_SpinKeep(Ball* pBall) {
 // given back for the part of the tick not flown. First bounce of a shot in flight: event 0x1D,
 // and the spin stick's input becomes the ball's spin (backspin x (1.9 - green setting), side x
 // (1.95 - green setting)), turned to the direction of travel; event 0x1F.
-u8 Physics_ProcessCollision(Ball* pBall, f32* pHit, f32* pNormal, TGD_MaterialInfo* pSurface, TerObject* pObj,
-                            f32* pFrac, f32 fTicks) {
+u8 Physics_ProcessCollision(Ball* pBall, f32* pHit, f32* pNormal, TGD_MaterialInfo* pSurface,
+                            TGD_ObjectInstanceInfo* pObj, f32* pFrac, f32 fTicks) {
     f32 vSpin[4];
     f32 fSin, fCos;
     s32 r;
@@ -1939,9 +1939,10 @@ void Physics_StopBall(Ball* pBall) {
 }
 
 // A ball in the air meets the ground. Out of bounds (600 yd) is a hazard. Ter_CheckForWorldCollision finds
-// the hit; Physics_ProcessCollision handles it; landing events; the cup (surface 90) kills spin; the bounce
-// (Physics_HandleCollision) - on SURFCLASS_SAND_e the first landing point and impact are kept for the lie. On
-// a cup surface more than 2.5 in below the pin: holed. Then the ball flies on for the rest of the
+// the hit; Physics_ProcessCollision handles it; landing events; the flagstick (SURFACE_FLAGSTICK) kills
+// spin; the bounce (Physics_HandleCollision) - on SURFCLASS_SAND_e the first landing point and impact are
+// kept for the lie. On a cup surface, or the flagstick within 2 yd of the pin, more than 2.5 in below the
+// pin: holed. Then the ball flies on for the rest of the
 // tick (Ter_CheckForSolidWorldCollision for a second hit). Water: surfaces 47, 41
 // and 104 let a ball that bounces up faster than 2.93 and moves on more than 1.71 x that (and over
 // 5.87) skip, its rise quartered; anything else is a hazard.
@@ -1952,7 +1953,7 @@ u8 Physics_CheckTerrainCollisions(Ball* pBall, f32 fTicks) {
     f32          vTo[4];
     f32          fFrac;
     TGD_MaterialInfo* pSurface;
-    TerObject*   pObj;
+    TGD_ObjectInstanceInfo* pObj;
     u8           bOut;
     int          nIndex;
     f32          fImpact, fAcross;
@@ -1977,7 +1978,7 @@ u8 Physics_CheckTerrainCollisions(Ball* pBall, f32 fTicks) {
     if (!Physics_ProcessCollision(pBall, vHit, vNormal, pSurface, pObj, &fFrac, fTicks)) return 0;
     BALL_LANDING_EVENTS(pBall, pSurface, pObj);
     nIndex = MaterialTypes_getMaterialID(pSurface);
-    if (nIndex == 90) {
+    if (nIndex == SURFACE_FLAGSTICK) {
         pBall->vSpin[0] = 0.0f;
         pBall->vSpin[1] = 0.0f;
         pBall->vSpin[2] = 0.0f;
@@ -1989,7 +1990,7 @@ u8 Physics_CheckTerrainCollisions(Ball* pBall, f32 fTicks) {
         Vec3Copy(pBall->vPos, pBall->vFirstSandPos);
     }
     if (pSurface->nClass == SURFCLASS_CUP_e || pSurface->nClass == SURFCLASS_CUP_GREEN_e ||
-        (nIndex == 90 && LLMath_DistanceBetween3(pBall->vPos, PIN(pBall)) < 2.0f)) {
+        (nIndex == SURFACE_FLAGSTICK && LLMath_DistanceBetween3(pBall->vPos, PIN(pBall)) < 2.0f)) {
         if (pBall->pCourse->pin[Game_CurrentPinSet()].y - pBall->vPos[1] > 0.0694444478f) {
             Physics_ForceBallInHole(pBall);
             return 1;
@@ -2107,7 +2108,7 @@ void Physics_ApplySuperSucka(Ball* pBall, f32 fDt) {
     }
 }
 
-// State 4, rolling. Holed when on a cup surface (the cup classes, or surface 90 within 2 yd of
+// State 4, rolling. Holed when on a cup surface (the cup classes, or SURFACE_FLAGSTICK within 2 yd of
 // the pin) more than 2 in below the pin. Otherwise the velocity is laid onto the ground plane
 // at its speed, then:
 // - break: the slope's sideways part (surface +0x1C, x 0.6 on a green) turns the velocity by
@@ -2134,7 +2135,7 @@ void Physics_BallRolling(Ball* pBall, f32 fTicks) {
     if (!Physics_GetSurfaceInfo(pBall, &pSurface, vNormal)) return;
     pBall->nSurface = MaterialTypes_getMaterialID(pSurface);
     if (pSurface->nClass == SURFCLASS_CUP_e || pSurface->nClass == SURFCLASS_CUP_GREEN_e ||
-        (pBall->nSurface == 90 && LLMath_DistanceBetween3(pBall->vPos, PIN(pBall)) < 2.0f)) {
+        (pBall->nSurface == SURFACE_FLAGSTICK && LLMath_DistanceBetween3(pBall->vPos, PIN(pBall)) < 2.0f)) {
         if (pBall->pCourse->pin[Game_CurrentPinSet()].y - pBall->vPos[1] > 0.055555556f) {
             Physics_ForceBallInHole(pBall);
             return;
