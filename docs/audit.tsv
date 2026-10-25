@@ -252,18 +252,11 @@ uiText.c	open
 uiTransform.c	open		
 unsorted/code_800080D0.c	open		
 unsorted/code_800082F8.c	open		
-unsorted/sweep_800136F4.c	open		
 unsorted/sweep_8003944C.c	open		
 unsorted/sweep_8006FF2C.c	open		
 unsorted/sweep_80070168.c	open		
 unsorted/sweep_8009554C.c	open		
-unsorted/sweep_80095744.c	open		
-unsorted/sweep_80095780.c	open		
-unsorted/sweep_80095798.c	open		
-unsorted/sweep_800957B0.c	open		
-unsorted/sweep_800957D8.c	open		
 unsorted/sweep_800977CC.c	open		
-unsorted/sweep_80097EC4.c	open		
 unsorted/sweep_8009A844.c	open		
 unsorted/sweep_8009B314.c	open		
 urandom.c	done	9f000176	claude-review

@@ -1144,11 +1144,6 @@ config.libs = [
             Object(Matching, "GoDynObjBase.c"),
             Object(Matching, "unsorted/sweep_8006FF2C.c"),
             Object(Matching, "ShaderRow0.c"),
-            Object(Matching, "unsorted/sweep_80095744.c"),
-            Object(Matching, "unsorted/sweep_80095780.c"),
-            Object(Matching, "unsorted/sweep_80095798.c"),
-            Object(Matching, "unsorted/sweep_800957B0.c"),
-            Object(Matching, "unsorted/sweep_800957D8.c"),
 
             Object(Matching, "unsorted/sweep_8009A844.c"),
             Object(Matching, "Main.c"),
@@ -1158,7 +1153,6 @@ config.libs = [
             Object(Matching, "fe_craputils.c"),
             Object(Matching, "DynamicRenderingBuffer.c"),
             Object(Matching, "Code80070EC4.c"),
-            Object(Matching, "unsorted/sweep_80097EC4.c"),
             Object(Matching, "Code8009A928.c"),
             Object(Matching, "hlaudvoice.c"),
             Object(Matching, "AudLock.c"),
@@ -1178,7 +1172,6 @@ config.libs = [
             Object(Matching, "unsorted/sweep_80165524.c", progress_category="sdk"),  # Metrowerks runtime / MetroTRK, not EA code
             Object(Matching, "RenderAccessors.c"),
             Object(Matching, "LLInput_Gc.c"),
-            Object(Matching, "unsorted/sweep_800136F4.c"),
             Object(Matching, "event.c"),
             Object(Matching, "SitDev.c"),
             Object(Matching, "unsorted/sweep_8009554C.c"),
