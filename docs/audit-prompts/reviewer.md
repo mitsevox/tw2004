@@ -48,6 +48,10 @@ REVIEW:
      `symbols.txt`; nothing foreign left in `src/unsorted` (lint skips it, so grep by hand).
   7. `fake match:` tags only on real compiler tricks; none added.
   8. Arrays indexed past their size have an `ea-bugs.md` row.
+  9. A suspected bug in EA's code that you find anywhere, in this file or another, and verify
+     goes into `docs/game/ea-bugs.md` (under "Possible", with what would settle it, unless it is
+     shown to happen in play): as a blocking item on a FAIL, or in your own commit on a PASS.
+     Other notes about other files are not kept; each file's own pass finds them.
 
 VERDICT:
 - PASS: nothing blocks. In a commit of your own on `review/{BRANCH}`, set the plan row to `done`

@@ -97,4 +97,7 @@ Where things go
 
 - Each writer and reviewer has its own scratch directory outside the repo. Nothing from it is
   committed.
+- A suspected EA bug that a writer or reviewer verifies, in any file, goes into
+  [`game/ea-bugs.md`](game/ea-bugs.md) in that pass. Other notes about other files are not kept:
+  each file's own pass finds them.
 - Branches `audit/*` and `review/*` stay local; only the pull-request branch is pushed.
