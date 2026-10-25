@@ -488,11 +488,12 @@ typedef struct MovieSound {
 } MovieSound;
 LAYOUT_ASSERT(MovieSound, 0x18);
 
-// The listeners' 0x48-byte block (hlaudmic.c's gMicData): Mic_InitModule allocates and clears it;
-// nothing reads it in this build.
+// The listeners' block (hlaudmic.c's gMicData): Mic_InitModule allocates and clears it; nothing
+// reads it in this build.
 typedef struct AudMicBlock {
     u8   unk0[0x48];
 } AudMicBlock;
+LAYOUT_ASSERT(AudMicBlock, 0x48);
 
 extern AudSource* gEmiSources;            // the sound sources, by entry (hlaudemitter.c)
 extern u8 gMicCount;                      // the number of listeners (hlaudmic.c)
@@ -550,8 +551,10 @@ void         Mas_SetSubmixAll(u8 nchans, f32* attns);
 void         Mas_SetSubmixMuteAll(u32 chanmask);
 
 // hlaudmic.c
-u8           Mic_InitSession(u8 nSession, u8 nSubsession, u8 nListeners);
+u8           Mic_InitModule(void);
+u8           Mic_InitSession(u8 sessID, u8 subsessID, u8 nMics);
 void         Mic_ExitSession(void);
+void         Mic_SetRvbPreset(u8 micID, u8 presetID);
 
 // AudReverb.c
 void         Rvb_SetPreset(u8 nPreset);         // a listener's reverb preset (empty in this build)
@@ -660,9 +663,7 @@ void Aud_EmiAliasSetTrackVarRange(s16 nEmitter, u8 nTrack, u8 n);
 void Aud_EmiAliasSetTrackStep(s16 nEmitter, u8 nTrack, u8 n, int bCheck);
 void Aud_EmiAliasSetTrackAttenuation(s16 nEmitter, u8 nTrack, f32 fVolume);
 
-// hlaudmic.c, hlaudmovie.c, hlaudsession.c: module start-up and GameAudio.c's controls
-u8   Mic_InitModule(void);
-void Mic_SetRvbPreset(u8 nMic, u8 nPreset);
+// hlaudmovie.c, hlaudsession.c: module start-up and GameAudio.c's controls
 u8   Ses_InitModule(void);
 u8   Ses_Init(u8 nSession, u8 nSubsession, u8 nListeners);
 void Ses_Exit(void);
