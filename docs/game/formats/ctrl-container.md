@@ -2,7 +2,7 @@ CTRL stream container (`.hog`, `.gcb`, `.ngc`)
 ================================================
 
 Status: **chunk layout, object framing and the `Rdat` compression are known from the code**
-(`src/UStream.c`, read from the game's loader at `fn_8000D4F0`). The extractor
+(`src/UStream.c`, read from the game's loader, `Stream_ParseBufs`). The extractor
 `tools/formats/ctrl_dump.py` reproduces every object on disc 1 to its declared size.
 What is *inside* each object type is the next layer and is not decoded yet.
 
@@ -21,7 +21,7 @@ includes the 16-byte header, 8 bytes of zero, then payload.
 | `FILL` | padding to the next 8 KiB boundary; when fewer than 8 bytes remain the tag stands alone |
 
 Chunks never cross an 8 KiB (0x2000) boundary: the file is laid out in DVD-sized blocks and
-the loader reads 0x6000 bytes at a time (`fn_8000D4F0` loops while the read offset is below
+the loader reads 0x6000 bytes at a time (`Stream_ParseBufs` loops while the read offset is below
 0x6000).
 
 The loader's tag switch also accepts `DSPM`, `MPG2`, `VAGM`, `SWVR` and `XADP` (movie and audio
@@ -33,12 +33,19 @@ Objects (`SHOC`)
 An object is delivered as one `SHDR` chunk followed by data chunks. The sub-type is the u32 at
 payload offset 0 (file offset +0x10 of the chunk):
 
-`SHDR` (0x40 bytes of chunk in total), fields at chunk offsets:
+`SHDR` (a 0x40-byte header, the scripts at +0x3C running on past it), fields at chunk offsets:
 
     +0x18  char[4]  type      e.g. 'ter ', 'txf ', 'Cact'
     +0x20  u32      size      decompressed size of the object
-    +0x34  u32      name len  (the object name, if any, is at +0x3C; +0x34 bytes long)
-    +0x3C  char[]   name
+    +0x34  u32      the first script's length
+    +0x38  u32      'Csac' only: with +0x34, how much of the header's tail the object keeps
+    +0x3C  u8[]     two byte-code scripts (LLTex.c's interpreter), the first +0x34 bytes long:
+                    the first says whether the object is loaded, the second runs when it is.
+                    A 'Csac' runs no scripts: it is always loaded and keeps the header's tail from
+                    +0x30 on in the object (8 bytes plus +0x34 + +0x38 rounded up to a word)
+
+The fields are `StreamChunk`'s (`include/ustream.h`). `tools/formats/ctrl_dump.py` names the
+objects it writes after the bytes at +0x3C, taking them for a name.
 
 `SDAT`: raw bytes; payload starts at chunk offset 0x40.
 

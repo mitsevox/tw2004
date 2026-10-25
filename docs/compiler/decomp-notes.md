@@ -671,7 +671,7 @@ The fixes that come up most often. Each points to its full entry below.
   (GameMode5 `PlayNow_EndGame`: `fn_800D2994` as `u16` drops 93.93 -> 92.96).
 - **[verified] m2c turns a register holding half of a constant into an extra argument.** When the
   next call's argument register already holds `lis rN, 'PG'` for a later constant, m2c passes it
-  on. `UStream_RegisterHandler('PGAc', fn, 'PG\0\0')` was really two arguments: GameMode23
+  on. `Stream_RegisterLoadChunkCallback('PGAc', fn, 'PG\0\0')` was really two arguments: GameMode23
   `fn_800EDE7C`, GameMode24 `fn_800F0518`, GameMode5 `PlayNow_RegisterStreamClients` all went exact once it was
   dropped. Check each extra argument m2c shows against the callee's definition.
 - **[verified] An unexplained `mr r3, r4` before the first call** means an unused first
@@ -1127,7 +1127,7 @@ The fixes that come up most often. Each points to its full entry below.
   reverse address order, `a = b = c = 0` stores in the opposite order; write the chain low address first
   to keep EA's store order (ShaderObjectsData: the only DOL differences were two chains).
   The reverse also happens: two separate `x = 0; y = 0;` stores can come out swapped (the source order
-  does not change it), and only a chain restores EA's order (UStream_Init: `gReadyRingHead =
+  does not change it), and only a chain restores EA's order (Stream_InitModule: `gReadyRingHead =
   gReadyRingTail = 0;`). objdiff scored the function exact before: it compares the relocation names,
   and two stores of the same register to two small-data globals swapped only show in the DOL.
 - **[verified] Link: a global the code never references is dead-stripped**, so the unit's `.bss` comes
@@ -1429,7 +1429,7 @@ Which lever first, by symptom (each has its entry below):
   (the frontend makes the temp) can. Swing SW_vImpact: pLaunchA/B locals -> `gPlayers[nPlayer].vLaunchA/B`
   at each call, 6 -> 0.
 - **[verified] Reassigning a variable elsewhere can bring back a copy the frontend folds to a
-  constant**: LLTex fn_8000EA1C, case 11 reading its random number into b turned `li r30,0` into
+  constant**: LLTex RPN_RunScript, case 11 reading its random number into b turned `li r30,0` into
   EA's `mr r30,r31`, 98.99 -> 100.
 - **[verified] A `void*` copy stops the AST optimizer's copy propagation** (it rewrote pBlock to
   pData): Particle Mem_AllocFunc 92.0 -> 100 (`void* pBlock = pData`, the header field's own type).

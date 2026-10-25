@@ -53,7 +53,7 @@ int DynObjBase_TakeAmount(int nMsg, DynObj* pObj, void* pArg) {
             pObj->uFlags |= 0x08000000;
             pObj->n144 -= (s16)nAmount;
             if (pObj->p15C != NULL) {
-                fn_8000EA1C(pObj->p15C, (u32)pObj->n144 >> 31, nId & 0x7FFF, pObj);
+                RPN_RunScript(pObj->p15C, (u32)pObj->n144 >> 31, nId & 0x7FFF, pObj);
             }
         }
     }

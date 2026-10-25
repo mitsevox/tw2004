@@ -144,7 +144,6 @@ void SkinPart_SetChangeAllCopies(u8 b);
 void fn_8010B098(void* p);
 void fn_8010B9BC(void);
 u8   fn_8010BFE0(void);
-void UStream_Stop(void);
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0, before the 0.5 and 0.0 FE_CharMgrInit uses first; its body is unknown, this one only
@@ -392,7 +391,7 @@ void FE_StreamFunc_SkinUpdate(void) {
 }
 
 void FE_StreamFunc_SkinInterrupt(void) {
-    UStream_Stop();
+    Stream_StopLoading();
 }
 
 // The texture state's start, for the golfer just streamed in (pLoadingGolfer): profiles set up, his clubs and
@@ -1910,7 +1909,7 @@ void FE_OpenGolferStream(void) {
 }
 
 void FE_CloseGolferStream(void) {
-    UStream_Close(gpStreamManagerLists->nStream);
+    Stream_CloseStreamFile(gpStreamManagerLists->nStream);
 }
 
 // Four floats: pOut gets pA minus pB.

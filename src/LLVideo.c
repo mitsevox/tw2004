@@ -61,7 +61,7 @@ void LLVideo_ChunkAddBufferRef(VideoChunk* pChunk) {
 
 // A chunk is done with: let go of its stream buffer.
 void LLVideo_ChunkReleaseBuffer(VideoChunk* pChunk) {
-    UStream_ReleaseObjectBuffer(&pChunk->pBuffer);
+    UStream_ReleaseBufferRef(&pChunk->pBuffer);
 }
 
 // Empties the queue.
@@ -177,10 +177,6 @@ void fn_80007254(void);
 u8   fn_80007258(void);
 void fn_80007260(void);
 void VIWaitForRetrace(void);
-// the stream loader (UStream.c) and the music (UI_EATraxShowSong)
-int  Stream_OpenStreamFile(const char* pName);
-int  UStream_Stop(void);
-int  UStream_Close(int nStream);
 void UI_EATraxShowSong(int n, s8 nTrack);
 
 void LLVideo_BeginPlayback(void);
@@ -476,11 +472,11 @@ void LLVideo_RunPlayback(Video* pVideo, u8 (*pfnStop)(Video* pVideo, int nArg), 
         } else {
             LLVideo_UpdateAll();
             if (pfnStop != NULL && pfnStop(pVideo, nArg)) {
-                UStream_Stop();
+                Stream_StopLoading();
                 LLVideo_Stop(pVideo);
             }
             if (LLVideo_HasEnded(pVideo)) {
-                UStream_Stop();
+                Stream_StopLoading();
                 LLVideo_Stop(pVideo);
             }
             if (nLastFrame == LLVideo_GetFrame(pVideo)) {
@@ -516,8 +512,9 @@ void LLVideo_RunPlayback(Video* pVideo, u8 (*pfnStop)(Video* pVideo, int nArg), 
 
 // Plays the movie file pName full screen until it ends or pfnStop(pVideo, nArg) says so
 // (LLVideo_RunPlayback), in slot 0. First ends a frame left open, hides the EA Trax song and draws
-// the screen black (LLVideo_DarkenScreen(nFlags | 1): nFlags bit 1 fades). Nothing more when the
-// file does not open. The front end's intro, credits and bio movies.
+// the screen black (LLVideo_DarkenScreen(nFlags | 1): nFlags bit 1 fades). Nothing more when
+// Stream_OpenStreamFile answers -1, which it never does (a refused open answers a USTREAM_ERR_
+// value). The front end's intro, credits and bio movies.
 void LLVideo_PlayFile(const char* pName, u8 (*pfnStop)(Video* pVideo, int nArg), int nArg, int nFlags) {
     int nStream;
     Video* pVideo;
@@ -536,7 +533,7 @@ void LLVideo_PlayFile(const char* pName, u8 (*pfnStop)(Video* pVideo, int nArg),
         LLVideo_RunPlayback(pVideo, pfnStop, nArg);
         UStream_SetAutoRead(0);
         LLVideo_Destroy(pVideo);
-        UStream_Close(nStream);
+        Stream_CloseStreamFile(nStream);
     }
 }
 

@@ -66,7 +66,7 @@ typedef struct DynObjModel {
     DynObjModelEntry aEntries[1]; // 0x4  nEntries of them (as many as the chunk holds)
 } DynObjModel;
 
-// The byte-code scripts an object runs with fn_8000EA1C (DynObjSetup.pC).
+// The byte-code scripts an object runs with RPN_RunScript (DynObjSetup.pC).
 typedef struct DynObjNames {
     u8   unk0[0x28];
     u8*  p28;                   // 0x28  -> DynObj.p15C
@@ -269,7 +269,7 @@ typedef struct DynObj {
     s32  n150;                  // 0x150
     u32  uFlags;                // 0x154
     f32  f158;                  // 0x158
-    u8*  p15C;                  // 0x15C  } scripts run by fn_8000EA1C (p15C when n144 drops,
+    u8*  p15C;                  // 0x15C  } scripts run by RPN_RunScript (p15C when n144 drops,
     u8*  p160;                  // 0x160  }  p160 by Kernel_ReleaseObject)
     u8*  p164;                  // 0x164  }
     s32  n168;                  // 0x168

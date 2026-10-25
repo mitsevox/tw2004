@@ -1,6 +1,6 @@
-// ustream.h (our name): the stream loader's own types (UStream.c). The objects it delivers
-// (TStreamData) and its public calls are in engine.h. The file format is described in
-// docs/game/formats/ctrl-container.md.
+// ustream.h: the stream loader's own types and calls (UStream.c). The objects it delivers
+// (TStreamData) and the calls their handlers make (register, unregister, load) are in engine.h;
+// the rest are declared here. The file format is described in docs/game/formats/ctrl-container.md.
 
 #ifndef USTREAM_H
 #define USTREAM_H
@@ -21,6 +21,15 @@
 // myAsyncReadCallback's verdict on a read other than 0 (kept)
 #define USTREAM_READ_FAILED   5         // an error, or short of a buffer before the file's end
 #define USTREAM_READ_STALE    0xDEAD    // read from a position the stream has since left
+
+// Stream_OpenStreamFiles's answers when it cannot open a stream
+#define USTREAM_ERR_TOO_MANY_STREAMS  (-0x65)   // USTREAM_MAX_STREAMS are open
+#define USTREAM_ERR_BUFFERS_HELD      (-0x66)   // the movie player still holds buffers (gpUsedList)
+#define USTREAM_ERR_PARSING           (-0x67)   // buffers are being parsed (gpCurList)
+#define USTREAM_ERR_READ_PENDING      (-0x68)   // a read is in flight
+#define USTREAM_ERR_READ_WAITING      (-0x69)   // read buffers wait to be parsed (gReadyRing)
+
+#define USTREAM_NUM_QUEUE_NODES 0x200   // finished objects waiting at once (gpDoneList's node pool)
 
 #define TAG(a, b, c, d) (((u32)(a) << 24) | ((u32)(b) << 16) | ((u32)(c) << 8) | (u32)(d))
 
@@ -44,7 +53,7 @@ typedef struct StreamChunkS {
     int  nScriptLen;            // 0x34  SHDR: the first script's length; a 'Csac' runs no scripts
                                 //       and keeps nScriptLen + nKeepLen bytes of the header's tail
     int  nKeepLen;              // 0x38  SHDR of a 'Csac': the rest of the tail it keeps
-    u8   aScripts[4];           // 0x3C  SHDR: two LLTex scripts (fn_8000EA1C), the first nScriptLen
+    u8   aScripts[4];           // 0x3C  SHDR: two LLTex scripts (RPN_RunScript), the first nScriptLen
                                 //       bytes long (they run on past the header)
 } StreamChunk;
 
@@ -83,8 +92,14 @@ typedef struct StreamFileList {
 } StreamFileList;
 LAYOUT_ASSERT(StreamFileList, 0x284);
 
-int  Stream_OpenStreamFiles(const StreamFileList* pParams);  // a new stream; its index or < 0
-int  UStream_Close(int nStream);                            // nStream or -1
+int  Stream_OpenStreamFiles(const StreamFileList* streamFileList);  // its index, or USTREAM_ERR_
+int  Stream_OpenStreamFile(const char* streamFileName);    // a stream of that one file
+int  Stream_CloseStreamFile(int whichFile);                 // whichFile, or -1
+int  Stream_StopLoading(void);          // no more reads; 1 while one is still in flight
+void Stream_InitOnce(void);             // start-up: the read buffers
+void Stream_CloseOnce(void);
+void Stream_InitModule(void);           // the main loop's start: the loader's state
+void Stream_CloseModule(void);          // the main loop's end
 
 // ---- the stream manager (StreamManager.c) -----------------------------------------------------
 
@@ -164,7 +179,7 @@ typedef struct StrmCBS {
     int   hFile;             // 0x00  -1 when nothing is open
     int   nFileSize;         // 0x04
     int   nFilePos;          // 0x08  next read offset
-    int   nUnkC;             // 0x0C  -2 at open
+    int   nReserved;         // 0x0C  -2 at open; nothing reads it
     u8    bEOF;              // 0x10  the file is read to its end (or reading was stopped)
     u8    bEndAtSWVR;        // 0x11  a buffer starting with an SWVR chunk ends the reading; set
                              //       whenever a file is open
@@ -176,10 +191,11 @@ typedef struct StrmCBS {
     u8    pad2A0[0x40];
 } StrmCB;
 
+// A handler table entry (gHandlers, Stream_RegisterLoadChunkCallback).
 typedef struct {
-    int   nType;             // a 4-character tag; compared signed (cmpw) in the register calls
-    void  (*pfnHandler)(TStreamData* pObject);
-    int   nRefs;
+    int   nType;             // the objects' type, a 4-character tag (TStreamData.uType)
+    LoadChunkCallbackPtr pfnHandler;   // what Stream_Progress hands each such object to
+    int   nRefs;             // registrations of this pair not yet taken back
 } UStreamHandler;
 
 typedef struct TStreamQueueS {
@@ -198,6 +214,6 @@ typedef struct ParseInProgS {
 u8   Stream_Progress(void);             // runs the loader once; 0 when nothing is left to read
 void UStream_AddBufferRef(CDBuf** ppBuffer);                // a chunk of the buffer is kept
 void UStream_SetAutoRead(u8 bAuto);     // set while a movie plays: each read starts the next
-void UStream_ReleaseObjectBuffer(CDBuf** ppBuffer);          // a kept chunk is done with
+void UStream_ReleaseBufferRef(CDBuf** ppBuffer);            // a kept chunk is done with
 
 #endif

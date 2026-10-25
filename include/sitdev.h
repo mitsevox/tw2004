@@ -29,7 +29,9 @@ typedef struct SitDevEvent {
 typedef struct SitDevData {
     u16   aValue[SITDEV_NUM_VALUES];            // 0x000  set through _SetStateVecAndCondition
     u32   aSetBits[SITDEV_NUM_VALUES / 32];     // 0x0C0  bit n: aValue[n] has been set
-    void* pCC;                                  // 0x0CC  SitDev_LoadScripts' argument; freed by
+    void* pCC;                                  // 0x0CC  the last 'sscr' object loaded (the
+                                                //        first one's data is gpSitDevScripts);
+                                                //        freed by
                                                 //        SitDev_vCloseModule
     void* pD0;                                  // 0x0D0  freed by SitDev_vCloseModule when set
     u8*   pGroupFlags;                          // 0x0D4  a byte per situation group (nGroups): 1
@@ -99,8 +101,8 @@ typedef struct SitDevResponse {
     u32        n4;              // 0x04  its argument (a sound, a music, ...)
 } SitDevResponse;
 
-// The situation scripts' header (TW07's SitDevHeader; gpSitDevScripts): the block whose address is
-// the first word of SitDev_LoadScripts' argument. SitDev_BindHeader turns the offsets at 0x14..0x20
+// The situation scripts' header (TW07's SitDevHeader; gpSitDevScripts): the data of the first
+// 'sscr' stream object (SitDev_LoadScripts). SitDev_BindHeader turns the offsets at 0x14..0x20
 // into pointers.
 typedef struct SitDevHeader {
     u32              nSituations;   // 0x00  entries at pSituations
@@ -167,7 +169,7 @@ void SitDev_ClearEmotionStates(void);
 void SitDev_ClearBallThatWasHit(void);
 void SitDev_SetBallHitTime(struct Ball* pBall);
 // SitDevFile.c
-void SitDev_LoadScripts(SitDevHeader** ppScripts);  // the 'sscr' stream handler
+void SitDev_LoadScripts(TStreamData* pObject);  // the 'sscr' stream handler
 // SitDevCommentaryZones.c
 void SitDev_NetworkLoadCallback(u8* netPtr);        // the loader for commentary-zone networks
 u32  SitDev_GetCommentaryZones(f32* location);

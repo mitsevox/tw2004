@@ -167,7 +167,7 @@ void PlayNow_LoadPLYFromStream(TStreamData* pObject) {
 // gPlayNowText; the stream's copy is freed. An empty object leaves gPlayNowText as it was.
 void PlayNow_LoadPLYsFromStream(TStreamData* pObject) {
     void* pData;
-    u32 nSize = fn_8000E81C(pObject, &pData);
+    u32 nSize = Stream_StreamLoadVariableSize(pObject, &pData);
     if (nSize) {
         gPlayNowText = Mem_AllocFunc(nSize, 0x10, 1);
         Mem_cpy(gPlayNowText, pData, nSize);

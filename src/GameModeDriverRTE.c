@@ -91,7 +91,7 @@ void GameModeDriverRTE_LoadRTEsFromStream(TStreamData* pObject) {
 // freed. An empty object leaves pNames as it was.
 void GameModeDriverRTE_Locale_LoadRTEnFromStream(TStreamData* pObject) {
     void* pData;
-    u32 nSize = fn_8000E81C(pObject, &pData);
+    u32 nSize = Stream_StreamLoadVariableSize(pObject, &pData);
     if (nSize) {
         gRTEs.pNames = Mem_AllocFunc(nSize, 0x10, 1);
         Mem_cpy(gRTEs.pNames, pData, nSize);

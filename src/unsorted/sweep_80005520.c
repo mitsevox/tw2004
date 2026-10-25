@@ -5,7 +5,6 @@
 #include "ustream.h"
 
 void Session_Init();
-void UStream_AllocBuffers();
 void fn_80005580();
 void fn_800071BC();
 void fn_8002F1D4();
@@ -25,7 +24,7 @@ void fn_80005520(void) {
     Circular_CreateBuffer();
     File_InitOnce();
     Input_vInitOnce();
-    UStream_AllocBuffers();
+    Stream_InitOnce();
     Session_Init();
     fn_8002F1D4();
     Gaud_InitOnce();
