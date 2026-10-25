@@ -27,9 +27,8 @@ PLAN_HEAD = 'order\tarea\tfile\ttask\tscope\tstate'
 SKIP = ('dolphin/',)
 # Not EA code: debugger stubs, Metrowerks critical sections and MSL stubs in the SDK and runtime
 # address range (src/README.md, "Unplaced"). They belong to the libraries in extern/.
-SDK_SCRAPS = ('unsorted/sweep_801338E0.c', 'unsorted/sweep_8013B3C4.c', 'unsorted/sweep_8014CA80.c',
-              'unsorted/sweep_80155F40.c', 'unsorted/sweep_801654D0.c', 'unsorted/sweep_801654F4.c',
-              'unsorted/sweep_80165524.c')
+SDK_SCRAPS = ('unsorted/sweep_801338E0.c', 'unsorted/sweep_80155F40.c', 'unsorted/sweep_801654D0.c',
+              'unsorted/sweep_801654F4.c', 'unsorted/sweep_80165524.c')
 
 
 def game_files():

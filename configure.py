@@ -1178,8 +1178,6 @@ config.libs = [
             Object(Matching, "hlaudtrackseq.c"),
             Object(Matching, "hlaudemitterpool.c"),
             Object(Matching, "AudReverb.c"),
-            Object(Matching, "unsorted/sweep_8013B3C4.c"),
-            Object(Matching, "unsorted/sweep_8014CA80.c"),
             Object(Matching, "unsorted/sweep_801654D0.c", progress_category="sdk"),  # Metrowerks runtime / MetroTRK, not EA code
             Object(Matching, "unsorted/sweep_80165524.c", progress_category="sdk"),  # Metrowerks runtime / MetroTRK, not EA code
             Object(Matching, "RenderAccessors.c"),
