@@ -38,7 +38,7 @@ void fn_80076BF0(void) {
 
 // Set the clock from the frame count and move every animation's matrix: the fraction of rate times
 // clock, snapped to fScale steps.
-void fn_80076C20(f32 fFrame) {
+void TexAnim_Update(f32 fFrame) {
     TexAnim* pAnim;
     int i;
     f32 fU;
@@ -98,7 +98,7 @@ f32 fn_80076E18(void) {
 }
 
 // Forget every animation.
-void fn_80076E24(void) {
+void TexAnim_RemoveAll(void) {
     if (lbl_80281EC0 != NULL) {
         lbl_80281EC0->nAnims = 0;
         lbl_80281EC0->fTime = 0.0f;

@@ -23,16 +23,15 @@ void fn_80070B68(u16 nIndex);
 
 // ---- sweep code (not yet cleaned up) ----
 
-void GXCallDisplayList();
 void fn_800124CC();
-void fn_80070168(void);
-
-void fn_80070168(void) {
-    GXCallDisplayList();
-    fn_800124CC();
-}
 
 // ---- end of sweep code ----
+
+// Draw the display list pList of nSize bytes, then note how full the GX FIFO got.
+void SD_CallDisplayList(void* pList, u32 nSize) {
+    GXCallDisplayList(pList, nSize);
+    fn_800124CC();
+}
 
 // Make a buffer for nMaxVerts vertices (two pairs of position, colour and texture-coordinate
 // arrays), 1.6 indices per vertex and nMaxDraws draws.
@@ -79,11 +78,11 @@ void DynRenderBuffer_Draw(DynRenderBuffer* pBuf, u32 nStart, u16 nCount, int nPr
     u8 nBuffer = pBuf->nBuffer;
 
     GXInvalidateVtxCache();
-    GXSetArray(9, pBuf->apPos[nBuffer], 12);          // GX_VA_POS
+    GXSetArray(GX_VA_POS, pBuf->apPos[nBuffer], 12);
     GXSetArray(13, pBuf->apTexCoord[nBuffer], 8);     // GX_VA_TEX0
     GXSetArray(11, pBuf->apColour[nBuffer], 4);       // GX_VA_CLR0
     GXClearVtxDesc();
-    GXSetVtxDesc(9, 3);                                // 16-bit indices
+    GXSetVtxDesc(GX_VA_POS, 3);                        // 16-bit indices
     GXSetVtxDesc(11, 3);
     GXSetVtxDesc(13, 3);
     fn_80012520(lbl_8018C7C8[nPrim], 2, nCount);
@@ -235,9 +234,6 @@ void fn_80070D7C(f32* pfWeight);
 void fn_80070D88(StaticShaderObject* pObj, ShaderCmds* pCmds);
 void fn_80070DBC(StaticShaderObject* pObj);
 void fn_80070DF4(StaticShaderObject* pObj);
-void fn_8007524C(void);     // GoShaderObjectCommon_ShaderObjectsData_Gc.c: empty
-s32 fn_80097688(void);      // GoShaderObjectCommon_MorphAnimManager_Gc.c: how many animations
-void fn_80097624(MorphAnim* pAnim);     // GoShaderObjectCommon_MorphAnimManager_Gc.c: free its data
 
 // Row 7's data hook: nothing.
 void fn_80070B74(void) {
@@ -245,61 +241,56 @@ void fn_80070B74(void) {
 
 // Row 7's static init: build the object's display list from pCmds.
 void fn_80070B78(StaticShaderObject* pObj, ShaderCmds* pCmds) {
-    fn_80074DA8(pObj->pArrays, pObj->eType, &pObj->anim, pCmds);
+    ShaderData_BuildDisplayList(pObj->pArrays, pObj->eType, &pObj->anim, pCmds);
 }
 
 // Row 7's static close.
 void fn_80070BAC(StaticShaderObject* pObj) {
-    // port: EA passes an argument fn_8007524C ignores
-    ((void (*)(MorphAnim*))fn_8007524C)(&pObj->anim);
+    ShaderData_CloseDisplayList(&pObj->anim);
 }
 
 // Row 7's static render: the display list (with the object's positions when the list sets none).
 void fn_80070BD0(StaticShaderObject* pObj) {
-    if (pObj->anim.b8 != 0) {
-        GXSetArray(9, pObj->pArrays->apPos[0], 12);
+    if (pObj->anim.bNoPosArray != 0) {
+        GXSetArray(GX_VA_POS, pObj->pArrays->apPos[0], 12);
     }
-    ((void (*)(void*, u32))fn_80070168)(pObj->anim.p4, pObj->anim.n0);
+    SD_CallDisplayList(pObj->anim.pList, pObj->anim.nListSize);
 }
 
 // Row 8's static init.
 void fn_80070C24(StaticShaderObject* pObj, ShaderCmds* pCmds) {
-    fn_80074DA8(pObj->pArrays, pObj->eType, &pObj->anim, pCmds);
+    ShaderData_BuildDisplayList(pObj->pArrays, pObj->eType, &pObj->anim, pCmds);
 }
 
 // Row 8's static close.
 void fn_80070C58(StaticShaderObject* pObj) {
-    // port: EA passes an argument fn_8007524C ignores
-    ((void (*)(MorphAnim*))fn_8007524C)(&pObj->anim);
+    ShaderData_CloseDisplayList(&pObj->anim);
 }
 
 // Row 8's static render.
 void fn_80070C7C(StaticShaderObject* pObj) {
-    if (pObj->anim.b8 != 0) {
-        GXSetArray(9, pObj->pArrays->apPos[0], 12);
+    if (pObj->anim.bNoPosArray != 0) {
+        GXSetArray(GX_VA_POS, pObj->pArrays->apPos[0], 12);
     }
-    // port: see fn_80070BD0
-    ((void (*)(void*, u32))fn_80070168)(pObj->anim.p4, pObj->anim.n0);
+    SD_CallDisplayList(pObj->anim.pList, pObj->anim.nListSize);
 }
 
 // Row 1's static init.
 void fn_80070CD0(StaticShaderObject* pObj, ShaderCmds* pCmds) {
-    fn_80074DA8(pObj->pArrays, pObj->eType, &pObj->anim, pCmds);
+    ShaderData_BuildDisplayList(pObj->pArrays, pObj->eType, &pObj->anim, pCmds);
 }
 
 // Row 1's static close.
 void fn_80070D04(StaticShaderObject* pObj) {
-    // port: EA passes an argument fn_8007524C ignores
-    ((void (*)(MorphAnim*))fn_8007524C)(&pObj->anim);
+    ShaderData_CloseDisplayList(&pObj->anim);
 }
 
 // Row 1's static render.
 void fn_80070D28(StaticShaderObject* pObj) {
-    if (pObj->anim.b8 != 0) {
-        GXSetArray(9, pObj->pArrays->apPos[0], 12);
+    if (pObj->anim.bNoPosArray != 0) {
+        GXSetArray(GX_VA_POS, pObj->pArrays->apPos[0], 12);
     }
-    // port: see fn_80070BD0
-    ((void (*)(void*, u32))fn_80070168)(pObj->anim.p4, pObj->anim.n0);
+    SD_CallDisplayList(pObj->anim.pList, pObj->anim.nListSize);
 }
 
 // Row 3's data hook: the morph weight.
@@ -309,14 +300,13 @@ void fn_80070D7C(f32* pfWeight) {
 
 // Row 3's static init.
 void fn_80070D88(StaticShaderObject* pObj, ShaderCmds* pCmds) {
-    fn_80074DA8(pObj->pArrays, pObj->eType, &pObj->anim, pCmds);
+    ShaderData_BuildDisplayList(pObj->pArrays, pObj->eType, &pObj->anim, pCmds);
 }
 
 // Row 3's static close: free the morph animation's data.
 void fn_80070DBC(StaticShaderObject* pObj) {
-    fn_80097624(&pObj->anim);
-    // port: EA passes an argument fn_8007524C ignores
-    ((void (*)(MorphAnim*))fn_8007524C)(&pObj->anim);
+    MorphAnim_Free(&pObj->anim);
+    ShaderData_CloseDisplayList(&pObj->anim);
 }
 
 // Row 3's static render: the display list, with the morph animation brought up to date first once
@@ -324,12 +314,12 @@ void fn_80070DBC(StaticShaderObject* pObj) {
 void fn_80070DF4(StaticShaderObject* pObj) {
     MorphAnim* pAnim = &pObj->anim;
 
-    if (pObj->anim.b8 != 0) {
-        GXSetArray(9, pObj->pArrays->apPos[0], 12);
+    if (pObj->anim.bNoPosArray != 0) {
+        GXSetArray(GX_VA_POS, pObj->pArrays->apPos[0], 12);
     }
-    if (fn_80097688() != 0 && (u32)gSession.nFrameCount % 3 == pAnim->nIndex % 3 &&
-        (u32)gSession.nFrameCount > fn_80097694(pAnim->nIndex)) {
-        fn_800976A8(pAnim, lbl_80281E70);
+    if (MorphAnim_GetCount() != 0 && (u32)gSession.nFrameCount % 3 == pAnim->nIndex % 3 &&
+        (u32)gSession.nFrameCount > MorphAnim_GetLastUpdateFrame(pAnim->nIndex)) {
+        MorphAnim_Update(pAnim, lbl_80281E70);
     }
-    ((void (*)(void*, u32))fn_80070168)(pAnim->p4, pAnim->n0);
+    SD_CallDisplayList(pAnim->pList, pAnim->nListSize);
 }

@@ -491,12 +491,12 @@ void SD_vShaderObject_Grass_Static_Render(SD_SShaderObject_Static* pObject) {
         return;
     }
     GXInvalidateVtxCache();
-    GXSetVtxAttrFmt(3, 9, 1, 4, 0);
+    GXSetVtxAttrFmt(3, GX_VA_POS, 1, 4, 0);
     GXSetVtxAttrFmt(3, 13, 1, 4, 9);
     GXSetVtxAttrFmt(3, 14, 1, 4, 9);
     GXSetVtxAttrFmt(3, 11, 1, 5, 0);
     GXClearVtxDesc();
-    GXSetVtxDesc(9, 1);
+    GXSetVtxDesc(GX_VA_POS, 1);
     GXSetVtxDesc(11, 1);
     GXSetVtxDesc(13, 1);
     GXSetVtxDesc(14, 1);

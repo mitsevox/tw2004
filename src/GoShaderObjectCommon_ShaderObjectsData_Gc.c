@@ -577,7 +577,7 @@ u16* fn_80074CF4(u16* p, u16* pEnd) {
 // 3 skipped, 4 the blend mode, 5 a texture matrix, 6 the morph and its f32), in a buffer then
 // copied over the commands. Types 1, 3 and 10 draw untextured, 2 and 3 morph, 4 and 5 use a
 // texture matrix; 10 has no colours or normals either.
-void fn_80074DA8(ShaderVtxArrays* pArrays, int eType, MorphAnim* pAnim, ShaderCmds* pCmds) {
+void ShaderData_BuildDisplayList(ShaderVtxArrays* pArrays, int eType, MorphAnim* pAnim, ShaderCmds* pCmds) {
     void* pList;
     u8 bFirst;
     u16* p;
@@ -592,9 +592,9 @@ void fn_80074DA8(ShaderVtxArrays* pArrays, int eType, MorphAnim* pAnim, ShaderCm
     lbl_80281EB3 = lbl_80281EB4 = lbl_80281EB5 = 0;   // data order: see fn_800738DC's chain
     bFirst = 1;
     if (pCmds->nFrames > 1) {
-        pAnim->b8 = 1;
+        pAnim->bNoPosArray = 1;
     } else {
-        pAnim->b8 = 0;
+        pAnim->bNoPosArray = 0;
     }
     nWords = pCmds->nWords;
     p = pCmds->pCmds;
@@ -613,9 +613,9 @@ void fn_80074DA8(ShaderVtxArrays* pArrays, int eType, MorphAnim* pAnim, ShaderCm
         lbl_80281EB3 = 1;
     }
     if (pArrays->apPos[pCmds->nFrame] != NULL) {
-        GXSetVtxDesc(9, 3);
-        if (pAnim->b8 == 0) {
-            GXSetArray(9, pArrays->apPos[pCmds->nFrame], 12);
+        GXSetVtxDesc(GX_VA_POS, 3);
+        if (pAnim->bNoPosArray == 0) {
+            GXSetArray(GX_VA_POS, pArrays->apPos[pCmds->nFrame], 12);
         }
         bArrays = 1;
     }
@@ -704,11 +704,11 @@ void fn_80074DA8(ShaderVtxArrays* pArrays, int eType, MorphAnim* pAnim, ShaderCm
     if (bTexMtx) {
         GXSetTexCoordGen2(0, 1, 4, 0x3C, 0, 0x7D);
     }
-    pAnim->n0 = GXEndDisplayList();
+    pAnim->nListSize = GXEndDisplayList();
     // the commands' address rounded up to 32 bytes
-    pAnim->p4 = (void*)(((uptr)pCmds->pCmds + 0x1F) & ~(uptr)0x1F);
-    Mem_cpy(pAnim->p4, pList, pAnim->n0);
-    DCFlushRange(pAnim->p4, pAnim->n0);
+    pAnim->pList = (void*)(((uptr)pCmds->pCmds + 0x1F) & ~(uptr)0x1F);
+    Mem_cpy(pAnim->pList, pList, pAnim->nListSize);
+    DCFlushRange(pAnim->pList, pAnim->nListSize);
     Circular_MemFreeFunc(pList);
     if (eType == 2 || eType == 3) {
         fn_80097474(pAnim);
@@ -716,7 +716,9 @@ void fn_80074DA8(ShaderVtxArrays* pArrays, int eType, MorphAnim* pAnim, ShaderCm
     RenderState_SetConstantAlphaActive(0);
 }
 
-void fn_8007524C(void) {
+// Nothing: a static shader object's display list sits in its own commands (copied over them by
+// ShaderData_BuildDisplayList), so closing it frees nothing.
+void ShaderData_CloseDisplayList(MorphAnim* pAnim) {
 }
 
 // Write a vertex's texture coordinate, colour, normal and position index to GX's FIFO (the GX
