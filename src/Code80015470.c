@@ -25,7 +25,6 @@ BufferPool* gpBufferPool = &gBufferPool;
 
 // ---- sweep code (not yet cleaned up) ----
 
-void LLMath_IdentifyMat(f32 (*m)[4]);          // identity matrix
 void DS_vCloseModule(void);
 void RenderState_SetTexCoordGen(s32 nCoord, s32 nFunc, s32 nSrc, s32 nMtx);
 void RenderState_SetKColorAlpha(u8 nAlpha);

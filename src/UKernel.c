@@ -17,12 +17,11 @@ DynObj* gKernelFirstObject;               // the object list's head
 DynObj* gKernelLastObject;                // and its tail
 s32 gKernelLastObjectId;                  // the last id given out (DynObj.n134)
 u32 gKernelOverflowSlotMask;              // bit n: gKernelOverflowSlots[n] is taken
-UMemPool* gKernelSmallObjectPool;         // 400-byte nodes
-UMemPool* gKernelLargeObjectPool;         // 528-byte nodes
+MemPoolPtr gKernelSmallObjectPool;         // 400-byte nodes
+MemPoolPtr gKernelLargeObjectPool;         // 528-byte nodes
 
 DynObj* Kernel_CreateObject(DynObjSetup* pSetup);
 void fn_8000E830(DynObj* pObj);
-void LLMath_IdentifyMat(f32 (*pMtx)[4]);                   // identity
 void UObject_ComposeRotation(f32 (*pMtx)[4]);
 
 void Gaud_ActorDownloadCallback(UStreamObject* pObject, int n);

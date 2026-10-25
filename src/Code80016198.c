@@ -17,9 +17,7 @@ ViewState* lbl_80280E08 = &lbl_801B8A98;
 
 // ---- sweep code (not yet cleaned up) ----
 
-void LLMath_IdentifyMat(f32 (*m)[4]);          // identity matrix
 s32  fn_800072E0(void);
-void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);  // UMemPool.c: copy a 4x4 matrix
 void fn_80016C28(f32* pSrc, f32* pDst);             // negate four floats
 void fn_80012520(u32 ePrim, u32 eFormat, u16 nVerts);  // LLFont.c: GXBegin
 void fn_800124A8(void);                                // LLFont.c: end the primitive

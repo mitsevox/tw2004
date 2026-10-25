@@ -43,7 +43,7 @@ static UStreamBuffer* gpFreeList; // 0x80281C50  released buffers not yet back i
 static UStreamBuffer* gpCurList;  // 0x80281C4C  buffers being parsed
 static UStreamBuffer* gpUsedList; // 0x80281C48  parsed buffers that objects still reference
 static UStreamFill gFill;         // 0x80281C40  object being filled and how far
-static UMemPool* gpNodePool;      // 0x80281C3C
+static MemPoolPtr gpNodePool;      // 0x80281C3C
 static UStreamNode* gpDoneList;   // 0x80281C38  objects finished by the parser
 static void* gpBufferMemory;      // 0x80281C34
 static int  gnCurStream;          // 0x80281C30  -1 = none

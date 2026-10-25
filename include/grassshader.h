@@ -53,7 +53,7 @@ typedef struct SD_SShaderTypeData_Grass_Static {
     GrassWord* p35C;            // 0x35C
     GrassWord* pRow;            // 0x360  the first vertex of the current row
     u32        unk364;
-    UMemPool*  pPool;           // 0x368  32 render records
+    MemPoolPtr pPool;           // 0x368  32 render records
     GrassParams* pParams;       // 0x36C  set by SD_vShaderObject_Grass_Type_SetParameters
     f32        f370;            // 0x370
     s8         n374;            // 0x374

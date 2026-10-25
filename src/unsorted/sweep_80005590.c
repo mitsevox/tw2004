@@ -17,7 +17,7 @@ void fn_80005590(void) {
     File_CloseOnce();
     Input_vCloseOnce();
     Circular_DestroyBuffer();
-    Math_FreeLog2Table();
+    MF_vCloseOnce();
     GoARAM_CloseOnce();
     AudMem_CloseOnce();
     fn_800055D4();

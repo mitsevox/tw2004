@@ -141,7 +141,6 @@ void  Character_RequestClothesUpdateIG(int n);
 void  fn_8010B098(void* pModel);                                // LLDynTex.c
 void  CharacterState_SetTransition(TSKATime* pTime, s32 nState, f32 fTime);     // CharAnim.c
 void  SKEL_InitHalfJoints(CharModel* pModel, SkelPose* pPose);          // Skeleton.c
-void  mat44flt_Invert(f32 (*pSrc)[4], f32 (*pDst)[4]);              // UMemPool.c
 void  Character_GetBonePosSwapIfLefty(Character* pChar, int nBone, f32* pPos);
 void  Char_Vec3Add(f32* pA, f32* pB, f32* pOut);
 void  Char_Vec3Sub(f32* pA, f32* pB, f32* pOut);

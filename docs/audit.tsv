@@ -196,6 +196,8 @@ UISScreen.c	open
 UISStack.c	open		
 UIStudio.c	open		
 UKernel.c	open		
+UMatFlt.c	open		
+UMath.c	open		
 UMemPool.c	open		
 UObject.c	open		
 UObject3D.c	open		

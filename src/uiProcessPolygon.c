@@ -40,7 +40,6 @@ void LLMath_Add(f32* pA, f32* pB, f32* pOut);
 void UI_DrawFullScreenPicture(LLPict* pPict, f32 fAlpha);    // draws the picture at that alpha
 void UI_ShowPictureFadingIn(LLPict* pPict, int nFrames, f32 fStep);
 void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
-void LLMath_MultiplyVec(f32* pA, f32* pB, f32* pOut);     // pOut = pA * pB, element by element
 void UIPoly_Draw(FEQuad* pQuad);
 void UIPoly_UnpackVertex(FEVertex* pVtx, f32* pPos, f32* pUV, f32* pColour, f32* pScale, f32* pAdd);
 void UI_LoadEntryPicture(s16 nTable, s16 nEntry);

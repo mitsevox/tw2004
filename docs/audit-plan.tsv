@@ -36,6 +36,8 @@ order	area	file	task	scope	state
 35	Core services	LLFileIO_Gc.c	pass	the whole file	done
 36	Core services	StreamManager.c	pass	the whole file	done
 37	Core services	FETextureMgr.c	pass	the whole file	done
+38	Core services	UMatFlt.c	pass	the whole file	open
+38	Core services	UMath.c	pass	the whole file	open
 38	Core services	UMemPool.c	pass	the whole file	open
 39	Core services	UStream.c	chunk 1/2	UStream_ReleaseBuffer .. UStream_Update	open
 40	Core services	UStream.c	chunk 2/2	UStream_ReleaseObjectBuffer .. fn_8000E81C	open

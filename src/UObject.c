@@ -8,7 +8,6 @@
 #include "terrain.h"
 #include "golfer.h"
 
-void LLMath_IdentifyMat(f32 (*pMtx)[4]);                   // identity
 void Object_Render(UObject* pObj);
 void Object_DrawMesh(UObjMesh* pMesh);
 UObjMesh* Object_GetMeshAlternative(UObjMesh* pMesh, int i);

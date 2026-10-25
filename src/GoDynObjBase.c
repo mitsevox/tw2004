@@ -7,8 +7,6 @@
 #include "camera.h"
 #include "golfer.h"
 
-void LLMath_IdentifyMat(f32 (*pMtx)[4]);                                           // identity
-void mat44flt_EulerAngles(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
 void UObject_ComposeRotation(f32 (*pMtx)[4]);
 int  DynObjTurning_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2);
 
@@ -169,7 +167,7 @@ void DynObjTurning_Update(DynObjTurning* pObj, void* pArg) {
     f32 mTurn[4][4];
 
     LLMath_IdentifyMat(mTurn);
-    mat44flt_EulerAngles(mTurn, 2.0f * PI * (pObj->fSpeed / 360.0f) / 60.0f, 0.0f, 0.0f);
+    mat44flt_EulerAngles(2.0f * PI * (pObj->fSpeed / 360.0f) / 60.0f, 0.0f, 0.0f, mTurn);
     LLMath_mat44fltMultiplyList(pObj->base.obj.m0, mTurn, pObj->base.obj.m0, 4);
     UObject_ComposeRotation(pObj->base.obj.m0);
 }
