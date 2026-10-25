@@ -44,7 +44,7 @@ EASB.c	open
 EASBStorage.c	open		
 EASportsBio.c	open		
 Earnings.c	open		
-FETextureMgr.c	open		
+FETextureMgr.c	done	b0d0e61d	claude-review
 FE_Calendar.c	open		
 FE_CalendarPopups.c	done	b2c600edd674	claude-review
 FE_CrAPDB.c	open		
