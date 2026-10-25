@@ -4,6 +4,9 @@
 
 - [getting_started.md](getting_started.md): set up and build the project.
 - [style.md](style.md): how the C must read (names, comments, types, fake matches), and what an audit pass fixes. Progress: [audit.tsv](audit.tsv).
+- [audit-process.md](audit-process.md): how the audit runs (writer, reviewer, landing, big
+  files, parallel tasks), with the writer and reviewer briefs in [audit-prompts/](audit-prompts/).
+  The task list: [audit-plan.tsv](audit-plan.tsv).
 - [workflow.md](workflow.md): the commands to build, score, name and check a change.
 - [infrastructure.md](infrastructure.md): where things run, CI, the progress page, decomp.dev.
 - [../src/README.md](../src/README.md): the code map, what each source file does in the game.
