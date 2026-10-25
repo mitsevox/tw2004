@@ -2054,7 +2054,7 @@ runtime/e_log.c:
 	.sbss       start:0x80282A08 end:0x80282A10
 	.sdata2     start:0x80284E38 end:0x80284EB8
 
-src/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common_Embedded/Math/Double_precision/e_pow.c:
+runtime/e_pow.c:
 	.text       start:0x8015D03C end:0x8015D8F0
 	.rodata     start:0x80185588 end:0x801855B8
 	.sdata2     start:0x80284EB8 end:0x80284FC8
