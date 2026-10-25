@@ -332,7 +332,7 @@ order	area	file	task	scope	state
 328	Rendering	GoGrass.c	pass	the whole file	open
 329	Rendering	unsorted/sweep_8009B314.c	fold	prove its file and fold it in	open
 330	Rendering	unsorted/code_800080D0.c	fold	prove its file and fold it in	open
-331	Rendering	unsorted/sweep_800136F4.c	fold	prove its file and fold it in	open
+331	Rendering	unsorted/sweep_800136F4.c	fold	prove its file and fold it in	done
 332	Rendering	unsorted/code_800082F8.c	fold	prove its file and fold it in	open
 333	Rendering	unsorted/sweep_8009A844.c	fold	prove its file and fold it in	open
 334	EA UI Studio library	UIStudio.c	pass	the whole file	open

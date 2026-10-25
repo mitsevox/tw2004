@@ -1178,7 +1178,6 @@ config.libs = [
             Object(Matching, "unsorted/sweep_80165524.c", progress_category="sdk"),  # Metrowerks runtime / MetroTRK, not EA code
             Object(Matching, "RenderAccessors.c"),
             Object(Matching, "LLInput_Gc.c"),
-            Object(Matching, "unsorted/sweep_800136F4.c"),
             Object(Matching, "event.c"),
             Object(Matching, "SitDev.c"),
             Object(Matching, "unsorted/sweep_8009554C.c"),

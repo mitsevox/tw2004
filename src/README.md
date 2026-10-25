@@ -143,7 +143,6 @@ files in [Characters](#characters).
 | LLFont.c | EA | the font renderer (`'sfn '` fonts) |
 | UFont.c | EA | the text layer over LLFont.c: six font slots, queued or immediate text |
 | RenderAccessors.c | ours | a viewport's rectangle, a render context's viewport; the depth and alpha test setters and the flush that hands them to GX *(unverified which file)* |
-| unsorted/sweep_800136F4.c | ph | two tiny functions next to GoRenderCtx_Gc.c *(unverified which file)* |
 | GoRenderCtx_Gc.c | EA | the render camera (lens, frame buffer, screen rectangle, matrices) and screen state |
 | Code80015470.c | ph | the renderer's state cache and the buffer pool |
 | Code80016198.c | ph | the 2D view: viewport, screen size, vertex output |
