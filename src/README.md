@@ -534,6 +534,5 @@ Small sweep files whose file and subsystem are not known:
 
 In the SDK and runtime address range, not EA code: `unsorted/sweep_801338E0.c` (EXI2 / debugger
 stubs), `sweep_801654D0.c`, `sweep_801654F4.c`, `sweep_80165524.c` (Metrowerks critical sections;
-`progress_category="sdk"`), and, by their addresses *(unverified)*, `sweep_8013B3C4.c` (an empty
-function between the DVD files), `sweep_8014CA80.c` (between OSSync and OSThread) and
-`sweep_80155F40.c` (MSL's critical-region stubs).
+`progress_category="sdk"`), and, by its address *(unverified)*, `sweep_80155F40.c` (MSL's
+critical-region stubs).

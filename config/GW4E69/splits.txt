@@ -127,20 +127,20 @@ LLTex.c:
 
 LLTexGrp.c:
 	.text       start:0x8001013C end:0x800107F4
-	.data       start:0x801869A8 end:0x801869B8
+	.data       start:0x801869A8 end:0x801869C0
 	.bss        start:0x801A3458 end:0x801A3478
 	.sdata      start:0x80280DD8 end:0x80280DE0
 
 LLFont.c:
 	.text       start:0x800107F4 end:0x8001256C
-	.data       start:0x801869B8 end:0x80186AD8
-	.bss        start:0x801A3478 end:0x801A34B0
+	.data       start:0x801869C0 end:0x80186AD8
+	.bss        start:0x801A3478 end:0x801A34C0
 	.sbss       start:0x80281C88 end:0x80281C90
 	.sdata2     start:0x80282B20 end:0x80282B48
 
 UFont.c:
 	.text       start:0x8001256C end:0x80012ED0
-	.bss        start:0x801A34B0 end:0x801A36A0
+	.bss        start:0x801A34C0 end:0x801A36A0
 	.sdata      start:0x80280DE0 end:0x80280DF0
 	.sdata2     start:0x80282B48 end:0x80282B58
 
@@ -978,13 +978,13 @@ UAudMem.c:
 
 GoARAM.c:
 	.text       start:0x800B5C40 end:0x800B6924
-	.data       start:0x8018FFB8 end:0x8018FFC8
+	.data       start:0x8018FFB8 end:0x8018FFE0
 	.bss        start:0x801F6680 end:0x801F66A8
 	.sdata      start:0x802814C8 end:0x802814D0
 
 DiscError.c:
 	.text       start:0x800B6924 end:0x800B7210
-	.data       start:0x8018FFC8 end:0x80190DB0
+	.data       start:0x8018FFE0 end:0x80190DB0
 	.bss        start:0x801F66A8 end:0x801F6858
 	.sdata      start:0x802814D0 end:0x802814D8
 	.sbss       start:0x80282188 end:0x802821A0
@@ -1676,7 +1676,7 @@ dolphin/dsp/dsp_task.c:
 
 dolphin/dvd/dvdlow.c:
 	.text       start:0x8013A0D0 end:0x8013AF10
-	.bss        start:0x8027A4C0 end:0x8027A590
+	.bss        start:0x8027A4C0 end:0x8027A5A0
 	.sdata      start:0x80281A08 end:0x80281A10
 	.sbss       start:0x80282778 end:0x802827C0
 
@@ -1686,13 +1686,10 @@ dolphin/dvd/dvdfs.c:
 	.sdata      start:0x80281A10 end:0x80281A18
 	.sbss       start:0x802827C0 end:0x802827E0
 
-unsorted/sweep_8013B3C4.c:
-	.text       start:0x8013B3C4 end:0x8013B3C8
-
 src/dolphin/dvd/dvd.c:
-	.text       start:0x8013B3C8 end:0x8013DCB4
+	.text       start:0x8013B3C4 end:0x8013DCB4
 	.data       start:0x80199BB8 end:0x80199D38
-	.bss        start:0x8027A590 end:0x8027A638
+	.bss        start:0x8027A5A0 end:0x8027A638
 	.sdata      start:0x80281A18 end:0x80281A38
 	.sbss       start:0x802827E0 end:0x80282830
 
@@ -1835,7 +1832,7 @@ dolphin/os/OSContext.c:
 dolphin/os/OSError.c:
 	.text       start:0x8014A0AC end:0x8014A758
 	.data       start:0x8019B770 end:0x8019BA90
-	.bss        start:0x8027C9B0 end:0x8027C9F8
+	.bss        start:0x8027C9B0 end:0x8027CA00
 	.sdata      start:0x80281AC0 end:0x80281AC8
 
 src/os/OSFont.c:
@@ -1859,7 +1856,7 @@ dolphin/os/OSMutex.c:
 
 dolphin/os/OSReboot.c:
 	.text       start:0x8014B70C end:0x8014B8F0
-	.bss        start:0x8027C9F8 end:0x8027CA20
+	.bss        start:0x8027CA00 end:0x8027CA20
 	.sbss       start:0x80282910 end:0x80282920
 
 dolphin/os/OSReset.c:
@@ -1880,11 +1877,8 @@ src/os/OSSemaphore.c:
 dolphin/os/OSSync.c:
 	.text       start:0x8014C9FC end:0x8014CA80
 
-unsorted/sweep_8014CA80.c:
-	.text       start:0x8014CA80 end:0x8014CA84
-
 src/dolphin/os/OSThread.c:
-	.text       start:0x8014CA84 end:0x8014E48C
+	.text       start:0x8014CA80 end:0x8014E48C
 	.data       start:0x8019BAD0 end:0x8019C2E0
 	.bss        start:0x8027CA78 end:0x8027D470
 	.sdata      start:0x80281AD0 end:0x80281AD8
@@ -2060,7 +2054,7 @@ runtime/e_log.c:
 	.sbss       start:0x80282A08 end:0x80282A10
 	.sdata2     start:0x80284E38 end:0x80284EB8
 
-src/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common_Embedded/Math/Double_precision/e_pow.c:
+runtime/e_pow.c:
 	.text       start:0x8015D03C end:0x8015D8F0
 	.rodata     start:0x80185588 end:0x801855B8
 	.sdata2     start:0x80284EB8 end:0x80284FC8
@@ -2301,7 +2295,7 @@ UISApi.c:
 UISScreen.c:
 	.text       start:0x8016A2D4 end:0x8016C718
 	.data       start:0x8019D118 end:0x8019D1FC
-	.bss        start:0x80280628 end:0x80280648
+	.bss        start:0x80280628 end:0x80280660
 	.sdata2     start:0x802851C0 end:0x802851E8
 
 Common/Checksum/ChecksumCRC32.c:
@@ -2333,7 +2327,7 @@ Common/TagFile/TagFile.c:
 dolphin/gba/GBA.c:
 	.text       start:0x80175F54 end:0x80176280
 	.data       start:0x8019D2C0 end:0x8019D300
-	.bss        start:0x80280648 end:0x80280B60
+	.bss        start:0x80280660 end:0x80280B60
 	.sdata      start:0x80281B60 end:0x80281B68
 	.sbss       start:0x80282A38 end:0x80282A40
 

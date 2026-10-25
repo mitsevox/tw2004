@@ -35,10 +35,6 @@ static int DLcreate(AXFX_REVHI_DELAYLINE* dl, s32 max_length) {
 	return 1;
 }
 
-static void DLdelete(AXFX_REVHI_DELAYLINE* dl) {
-    __AXFXFree(dl->inputs);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x80193E70
@@ -120,61 +116,6 @@ static int ReverbHICreate(AXFX_REVHI_WORK* rv, f32 coloration, f32 time, f32 mix
     }
 
     return 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8019435C
- * PAL Size: 524b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-static int ReverbHIModify(AXFX_REVHI_WORK* rv, f32 coloration, f32 time, f32 mix, f32 damping, f32 preDelay, f32 crosstalk) {
-    u8 i;
-
-	ASSERTMSGLINE(209, coloration >= 0.0f && coloration <= 1.0f &&
-				  time >= 0.01f && time <= 10.0f &&
-				  mix >= 0.0f && mix <= 1.0f &&
-				  crosstalk >= 0.0f && crosstalk <= 1.0f &&
-				  damping >= 0.0f && damping <= 1.0f &&
-				  preDelay >= 0.0f && preDelay <= 100.0f,
-				  "The value of specified parameter is out of range.");
-
-    if ((coloration < 0.0f) || (coloration > 1.0f)
-     || (time < 0.01f) || (time > 10.0f)
-     || (mix < 0.0f) || (mix > 1.0f)
-     || (crosstalk < 0.0f) || (crosstalk > 1.0f)
-     || (damping < 0.0f) || (damping > 1.0f)
-     || (preDelay < 0.0f) || (preDelay > 100.0f)) {
-        return 0;
-    }
-
-    rv->allPassCoeff = coloration;
-    rv->level = mix;
-    rv->crosstalk = crosstalk;
-    rv->damping = damping;
-    if (rv->damping < 0.05f) {
-        rv->damping = 0.05f;
-    }
-    rv->damping = (1.0f - (0.05f + (0.8f * rv->damping)));
-
-    for (i = 0; i < 9; i++) {
-        DLdelete(&rv->AP[i]);
-    }
-
-    for (i = 0; i < 9; i++) {
-        DLdelete(&rv->C[i]);
-    }
-
-    if (rv->preDelayTime) {
-        for (i = 0; i < 3; i++) {
-            __AXFXFree(rv->preDelayLine[i]);
-        }
-    }
-
-    return ReverbHICreate(rv, coloration, time, mix, damping, preDelay, crosstalk);
 }
 
 const static double i2fMagic = 4503601774854144.0;
@@ -664,23 +605,6 @@ static void ReverbHICallback(s32* left, s32* right, s32* surround, AXFX_REVHI_WO
     }
 }
 
-static void ReverbHIFree(AXFX_REVHI_WORK* rv) {
-    u8 i;
-    for (i = 0; i < 9; i++) {
-        DLdelete(&rv->AP[i]);
-    }
-
-    for (i = 0; i < 9; i++) {
-        DLdelete(&rv->C[i]);
-    }
-
-    if (rv->preDelayTime) {
-        for (i = 0; i < 3; i++) {
-            __AXFXFree(rv->preDelayLine[i]);
-        }
-    }
-}
-
 int AXFXReverbHiInit(AXFX_REVERBHI* rev) {
     int ret;
     BOOL old;
@@ -690,26 +614,6 @@ int AXFXReverbHiInit(AXFX_REVERBHI* rev) {
     ret = ReverbHICreate(&rev->rv, rev->coloration, rev->time, rev->mix, rev->damping, rev->preDelay, rev->crosstalk);
     OSRestoreInterrupts(old);
     return ret;
-}
-
-int AXFXReverbHiShutdown(AXFX_REVERBHI* rev) {
-    BOOL old;
-
-    old = OSDisableInterrupts();
-    ReverbHIFree(&rev->rv);
-    OSRestoreInterrupts(old);
-    return 1;
-}
-
-int AXFXReverbHiSettings(AXFX_REVERBHI* rev) {
-    BOOL old;
-
-    old = OSDisableInterrupts();
-    rev->tempDisableFX = 1;
-    ReverbHIModify(&rev->rv, rev->coloration, rev->time, rev->mix, rev->damping, rev->preDelay, rev->crosstalk);
-    rev->tempDisableFX = 0;
-    OSRestoreInterrupts(old);
-    return 1;
 }
 
 void AXFXReverbHiCallback(AXFX_BUFFERUPDATE* bufferUpdate, AXFX_REVERBHI* reverb) {

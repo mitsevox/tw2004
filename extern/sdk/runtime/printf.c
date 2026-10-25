@@ -1233,24 +1233,6 @@ int printf(const char* format, ...) {
 }
 
 /**
- * @note Address: N/A
- * @note Size: 0xE0
- */
-int fprintf(FILE* file, const char* format, ...) {
-  int ret;
-  va_list l;
-
-  if (fwide(stdout, -1) >= 0) {
-    return -1;
-  }
-
-  va_start(l, format);
-  ret = __pformatter(&__FileWrite, file, format, l);
-  va_end(l);
-  return ret;
-}
-
-/**
  * @note Address: 0x800C76D8
  * @note Size: 0x98
  */
@@ -1265,14 +1247,6 @@ size_t vprintf(const char* pFormat, va_list arg) {
   ret = __pformatter(&__FileWrite, (void*)stdout, pFormat, arg);
   __end_critical_region(files_access);
   return ret;
-}
-
-/**
- * @note Address: N/A
- * @note Size: 0x8C
- */
-void vfprintf(void) {
-  // UNUSED FUNCTION
 }
 
 /**

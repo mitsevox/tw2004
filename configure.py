@@ -384,6 +384,7 @@ config.warn_missing_source = False
 # mw_version starts with "ProDG/".
 cflags_gcc = [
     "-O0",
+    "-Wa,-L",
     "-nostdinc",
     "-I include",
 ]
@@ -430,7 +431,7 @@ if args.mode == "configure" and gen_dol.exists():
 config.libs = [
     {
         "lib": "sonicheroes_sdk_0",
-        "mw_version": "GC/1.3.2",
+        "mw_version": "GC/2.5",
         "cflags": ["-nodefaults", "-proc gekko", "-align powerpc", "-enum int", "-fp hardware", "-Cpp_exceptions off", "-O4,p", "-inline auto", "-pragma \"cats off\"", "-pragma \"warn_notinlined off\"", "-maxerrors 1", "-nosyspath", "-RTTI off", "-str reuse", "-DNDEBUG=1", "-D__GEKKO__", "-fp_contract on", "-use_lmw_stmw on", "-str reuse,pool,readonly", "-common off", "-inline deferred,auto", "-char signed", "-i extern/sonicheroes/include", "-i extern/sonicheroes/include/dolphin", "-i extern/sonicheroes/include/MSL_C", "-i extern/sonicheroes/src", "-ir extern/sonicheroes/src/dolphin", "-i extern/sonicheroes/Include"],
         "progress_category": "sdk",
         "src_dir": "extern/sonicheroes",
@@ -483,7 +484,7 @@ config.libs = [
     },
     {
         "lib": "ffcc_sdk_0",
-        "mw_version": "GC/1.3.2",
+        "mw_version": "GC/2.5",
         "cflags": ["-nodefaults", "-proc gekko", "-align powerpc", "-enum int", "-fp hardware", "-Cpp_exceptions off", "-O4,p", "-inline auto", "-pragma \"cats off\"", "-pragma \"warn_notinlined off\"", "-maxerrors 1", "-nosyspath", "-RTTI off", "-str reuse", "-DNDEBUG=1", "-D__GEKKO__", "-fp_contract on", "-use_lmw_stmw on", "-str reuse,pool,readonly", "-common off", "-inline deferred,auto", "-char signed", "-i extern/ffcc/include", "-i extern/ffcc/include/dolphin", "-i extern/ffcc/src", "-i extern/ffcc/include/TRK_MINNOW_DOLPHIN", "-ir extern/ffcc/src", "-i extern/ffcc/Include", "-DBUILD_VERSION=0", "-DVERSION_GCCE6W"],
         "progress_category": "sdk",
         "src_dir": "extern/ffcc",
@@ -495,7 +496,7 @@ config.libs = [
             Object(Matching, "src/MSL_C/PPCEABI/bare/H/ansi_files.c"),
             Object(Matching, "src/MSL_C/PPCEABI/bare/H/direct_io.c"),
             Object(Matching, "src/MSL_C/PPCEABI/bare/H/file_io.c"),
-            Object(Matching, "src/MSL_C/PPCEABI/bare/H/mem_funcs.c", mw_version="GC/2.5"),
+            Object(Matching, "src/MSL_C/PPCEABI/bare/H/mem_funcs.c"),
             Object(Matching, "src/MSL_C/PPCEABI/bare/H/string.c"),
             Object(Matching, "src/MSL_C/PPCEABI/bare/H/s_atan.c"),
         ],
@@ -562,13 +563,13 @@ config.libs = [
     },
     {
         "lib": "tww_sdk_3",
-        "mw_version": "GC/1.3.2",
+        "mw_version": "GC/2.5",
         "cflags": ["-nodefaults", "-proc gekko", "-align powerpc", "-enum int", "-fp hardware", "-Cpp_exceptions off", "-O4,p", "-inline auto", "-pragma \"cats off\"", "-pragma \"warn_notinlined off\"", "-maxerrors 1", "-nosyspath", "-RTTI off", "-str reuse", "-DNDEBUG=1", "-D__GEKKO__", "-fp_contract on", "-use_lmw_stmw on", "-str reuse,pool,readonly", "-common off", "-inline deferred,auto", "-char signed", "-i extern/tww/include", "-i extern/tww/src", "-ir extern/tww/src/dolphin", "-i extern/tww/src/PowerPC_EABI_Support/MetroTRK", "-i extern/tww/Include", "-i extern/tww/src/PowerPC_EABI_Support/MSL/MSL_C++/MSL_Common/Include", "-i extern/tww/src/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Include", "-i extern/tww/src/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common_Embedded/Math/Include", "-i extern/tww/src/PowerPC_EABI_Support/MSL/MSL_C/PPC_EABI/Include", "-i extern/tww/src/PowerPC_EABI_Support/Runtime/Inc", "-DVERSION=0"],
         "progress_category": "sdk",
         "src_dir": "extern/tww",
         "objects": [
-            Object(Matching, "src/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/mbstring.c", mw_version="GC/1.3"),
-            Object(Matching, "src/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common_Embedded/Math/Double_precision/e_pow.c"),
+            # mbtowc calls is_utf8_complete instead of inlining it
+            Object(Matching, "src/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/mbstring.c", extra_cflags=["-inline noauto"]),
         ],
     },
     {
@@ -586,7 +587,7 @@ config.libs = [
     },
     {
         "lib": "ffcc_sdk_5",
-        "mw_version": "GC/1.3.2",
+        "mw_version": "GC/2.5",
         "cflags": ["-nodefaults", "-proc gekko", "-align powerpc", "-enum int", "-fp hardware", "-Cpp_exceptions off", "-O4,p", "-inline auto", "-pragma \"cats off\"", "-pragma \"warn_notinlined off\"", "-maxerrors 1", "-nosyspath", "-RTTI off", "-str reuse", "-DNDEBUG=1", "-D__GEKKO__", "-fp_contract on", "-use_lmw_stmw on", "-rostr", "-common off", "-inline deferred,auto", "-char signed", "-sdata 0", "-sdata2 0", "-i extern/ffcc/include", "-i extern/ffcc/include/dolphin", "-i extern/ffcc/src", "-i extern/ffcc/include/TRK_MINNOW_DOLPHIN", "-ir extern/ffcc/src", "-i extern/ffcc/Include", "-DBUILD_VERSION=0", "-DVERSION_GCCE6W"],
         "progress_category": "sdk",
         "src_dir": "extern/ffcc",
@@ -605,7 +606,7 @@ config.libs = [
     },
     {
         "lib": "TRK_MINNOW_DOLPHIN",
-        "mw_version": "GC/1.3.2",
+        "mw_version": "GC/2.5",
         "cflags": cflags_trk,
         "progress_category": "sdk",
         "src_dir": "extern/trk",
@@ -835,13 +836,12 @@ config.libs = [
     },
     {
         "lib": "MSL_C.PPCEABI.bare.H",
-        "mw_version": "GC/1.3",
+        "mw_version": "GC/2.5",
         "cflags": cflags_runtime,
         "progress_category": "sdk",
         "src_dir": "extern/sdk",
         "objects": [
-            # built with the game's compiler, like ansi_fp.c: GC/1.3 misses long2str, float2str and three more
-            Object(Matching, "runtime/printf.c", mw_version="GC/2.5"),
+            Object(Matching, "runtime/printf.c"),
             Object(Matching, "runtime/runtime.c"),
             Object(Matching, "runtime/FILE_POS.c"),
             Object(Matching, "runtime/locale.c"),
@@ -870,6 +870,7 @@ config.libs = [
             Object(Matching, "runtime/w_fmod.c"),
             Object(Matching, "runtime/w_log.c"),
             Object(Matching, "runtime/w_pow.c"),
+            Object(Matching, "runtime/e_pow.c"),
             Object(Matching, "runtime/extras.c"),
             Object(Matching, "runtime/__mem.c"),
             Object(Matching, "runtime/__va_arg.c"),
@@ -878,7 +879,7 @@ config.libs = [
             Object(Matching, "runtime/misc_io.c"),
             Object(Matching, "runtime/s_copysign.c"),
             Object(Matching, "runtime/s_modf.c"),
-            Object(Matching, "runtime/qsort.c", mw_version="GC/2.5"),
+            Object(Matching, "runtime/qsort.c"),
             Object(Matching, "runtime/wchar_io.c"),
             Object(Matching, "runtime/uart_console_io.c"),
         ],
@@ -1177,8 +1178,6 @@ config.libs = [
             Object(Matching, "hlaudtrackseq.c"),
             Object(Matching, "hlaudemitterpool.c"),
             Object(Matching, "AudReverb.c"),
-            Object(Matching, "unsorted/sweep_8013B3C4.c"),
-            Object(Matching, "unsorted/sweep_8014CA80.c"),
             Object(Matching, "unsorted/sweep_801654D0.c", progress_category="sdk"),  # Metrowerks runtime / MetroTRK, not EA code
             Object(Matching, "unsorted/sweep_80165524.c", progress_category="sdk"),  # Metrowerks runtime / MetroTRK, not EA code
             Object(Matching, "RenderAccessors.c"),
