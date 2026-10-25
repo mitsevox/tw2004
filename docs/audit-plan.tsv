@@ -212,7 +212,7 @@ order	area	file	task	scope	state
 209	Career	Earnings.c	chunk 4/4	Earnings_GetLongDriveRecordType .. Earnings_GetAwardMessageId	open
 210	Career	Earnings.c	whole-file review	the whole file	open
 211	Career	FE_Calendar.c	pass	the whole file	open
-212	Situation scripts and commentary	SitDevSignedValues.c	pass	the whole file	open
+212	Situation scripts and commentary	SitDevSignedValues.c	pass	the whole file	done
 213	Situation scripts and commentary	SitDevCommentaryZones.c	pass	the whole file	done
 214	Situation scripts and commentary	SitDevFile.c	pass	the whole file	open
 215	Situation scripts and commentary	SitDevTrigger.c	pass	the whole file	open

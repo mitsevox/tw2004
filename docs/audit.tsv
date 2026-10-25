@@ -167,7 +167,7 @@ SitDev.c	open
 SitDevCommentaryZones.c	done	503eba0e	claude-review
 SitDevFile.c	open		
 SitDevMisc.c	open		
-SitDevSignedValues.c	open		
+SitDevSignedValues.c	done	78bf4509	claude-review
 SitDevStateVector.c	open		
 SitDevTrigger.c	open		
 Skeleton.c	open		
