@@ -425,7 +425,7 @@ u8 GameModeSkillZoneBase_IsLongDrive(int nPlayer, f32 fLength) {
     return 0;
 }
 
-// The index 0..4 of a bonus object the ball hit (the id the pfnCollisionActor hook gets, Ball.n140)
+// The index 0..4 of a bonus object the ball hit (the id the pfnCollisionActor hook gets, DynObj.nActorId)
 // on the current hole: hole 0's objects 0xD7, 0xD5, 0xD4, 0xD6, 0xD8, hole 1's 0x3B..0x3F, hole 2's
 // 24..28; 4 for anything else. Modes 13 and 16 raise their multiplier by the index plus 2.
 s32 GameModeSkillZoneBase_GetBonusIndex(s32 nId) {

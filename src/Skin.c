@@ -600,12 +600,12 @@ void SKN_FixupModel(SkinModel* pModel) {
     pModel->u30 = pModel->u30 | 0x80000000;
 }
 
-// Builds the skin's matrices (p108C) for this frame; nothing without its render data (bit 2 of
-// uFlags). The first SkinModel.n14, one per bone, are the character model's skinning matrices
-// (p768), from nFirst on, each taken nSkip further along there (not copied when p108C is p768).
-// Each later one whose bit is set in aMtxBits (SkinPart_UpdateMarks: those the chosen meshes use) is a
-// weighted sum of up to three others (SkinModel.p54). nView: both callers pass the character's
-// nView; unused.
+// Builds the skin's matrices (p108C) for this frame; nothing without its render data
+// (SKIN_HAS_RENDER_DATA). The first SkinModel.nBones, one per bone, are the character model's
+// skinning matrices (p768), from nFirst on, each taken nSkip further along there (not copied when
+// p108C is p768). Each later one whose bit is set in aMtxBits (SkinPart_UpdateMarks: those the
+// chosen meshes use) is a weighted sum of up to three others (SkinModel.p54). nView: both callers
+// pass the character's nView; unused.
 void SKN_BuildMatrices(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst, int nView) {
     int j;
     SkinModel54* pEntry;
@@ -622,16 +622,16 @@ void SKN_BuildMatrices(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst
         return;
     }
     nMatrices = pSkin->pModel->n50;
-    if (!(pSkin->uFlags & 2)) {
+    if (!(pSkin->uFlags & SKIN_HAS_RENDER_DATA)) {
         return;
     }
     SkinPart_UpdateMarks(pSkin);
     if (pSkin->pSkinMtx != pCharModel->p768) {
         Mem_cpy(pSkin->pSkinMtx[nFirst], pCharModel->p768[nFirst + nSkip],
-                (pSkin->pModel->n14 - nFirst) * sizeof(*pSkin->pSkinMtx));
+                (pSkin->pModel->nBones - nFirst) * sizeof(*pSkin->pSkinMtx));
     }
     aMtx = pSkin->pSkinMtx;
-    for (i = pSkin->pModel->n14; i < nMatrices; i++) {
+    for (i = pSkin->pModel->nBones; i < nMatrices; i++) {
         if (BitArray_TestBit(pSkin->aMtxBits, i)) {
             pEntry = &pSkin->pModel->p54[i];
             nBones = pEntry->nBones;
@@ -655,7 +655,7 @@ void SKN_SetMeshMatrices(Skin* pSkin, int n) {
     s32 nEntries;
     HwsOverrideTable* pTable;
 
-    if (pSkin->apOverride[n] != NULL && (pSkin->uFlags & 2)) {
+    if (pSkin->apOverride[n] != NULL && (pSkin->uFlags & SKIN_HAS_RENDER_DATA)) {
         pTable = pSkin->apOverride[n];
         nEntries = pSkin->pModel->n40;
         for (i = 0; i < nEntries; i++) {
@@ -966,8 +966,8 @@ void SKN_SwapBonePoses(BonePose* pBones, s32 nBones) {
     BYTESWAP_SWAPDATA(&pSrc, (u8*)pBones, nBones * sizeof(BonePose), 4);
 }
 
-// Gives a skin what posing and drawing it needs (bit 2 of uFlags marks a skin that has it); 0 when
-// it already had it, else 1: its matrices (p108C, SkinModel.n50 of them) and the aMtxBits and aMeshBits
+// Gives a skin what posing and drawing it needs (SKIN_HAS_RENDER_DATA marks a skin that has it); 0
+// when it already had it, else 1: its matrices (p108C, SkinModel.n50 of them) and the aMtxBits and aMeshBits
 // bit arrays, cleared; with a description, its morph memory (a1098[0]) and mesh override table
 // (a10A0[0]), and uFlags bit 1 (choices changed). Every morph target is marked changed. b: also
 // calls SkinPart_InitSkin (empty in this build).
@@ -976,7 +976,7 @@ s32 SKN_AllocRenderData(Skin* pSkin, u8 b) {
     SkinDesc* pDesc;
     s32 nSize;
 
-    if (pSkin->uFlags & 2) {
+    if (pSkin->uFlags & SKIN_HAS_RENDER_DATA) {
         return 0;
     }
     pModel = pSkin->pModel;
@@ -1001,7 +1001,7 @@ s32 SKN_AllocRenderData(Skin* pSkin, u8 b) {
         }
     }
     SkinMorph_UpdateAllTargets(pSkin);
-    pSkin->uFlags = pSkin->uFlags | 2;
+    pSkin->uFlags = pSkin->uFlags | SKIN_HAS_RENDER_DATA;
     return 1;
 }
 
@@ -1011,7 +1011,7 @@ s32 SKN_AllocRenderData(Skin* pSkin, u8 b) {
 s32 SKN_FreeRenderData(Skin* pSkin) {
     SkinModel* pModel;
 
-    if (!(pSkin->uFlags & 2)) {
+    if (!(pSkin->uFlags & SKIN_HAS_RENDER_DATA)) {
         return 0;
     }
     fn_80008380();
@@ -1039,7 +1039,7 @@ s32 SKN_FreeRenderData(Skin* pSkin) {
         Circular_MemFreeFunc(pSkin->aMeshBits);
     }
     pSkin->aMeshBits = NULL;
-    pSkin->uFlags = pSkin->uFlags & ~2;
+    pSkin->uFlags = pSkin->uFlags & ~SKIN_HAS_RENDER_DATA;
     return 1;
 }
 
@@ -1112,17 +1112,17 @@ Skin* SKN_Create(u8* pData, u8 b) {
     pDesc = pModel->pDesc;
     pSkin->bFootPoints = 0;
     pBones = pModel->p34;
-    SKN_SwapBonePoses(pBones, pModel->n14);
+    SKN_SwapBonePoses(pBones, pModel->nBones);
     BitArray_FillArray(pSkin->pose.a0, 0x80);
     BitArray_FillArray(pSkin->pose.a10, 0x80);
     BitArray_FillArray(pSkin->pose.a20, 0x80);
     BitArray_FillArray(pSkin->pose.a30, 0x80);
-    for (i = 0; i < pModel->n14; i++) {
+    for (i = 0; i < pModel->nBones; i++) {
         Quat_Copy(pBones[i].q0, pSkin->pose.aBones[i].q0);
         Quat_Copy(pBones[i].v10, pSkin->pose.aBones[i].v10);
     }
-    pSkin->pWorld2Bone = Circular_MemAllocFunc(pModel->n14 * sizeof(*pSkin->pWorld2Bone), MEMTYPE_LOW, 0x80,
-                                               "Skin.c", 0x62A);
+    pSkin->pWorld2Bone = Circular_MemAllocFunc(pModel->nBones * sizeof(*pSkin->pWorld2Bone), MEMTYPE_LOW,
+                                               0x80, "Skin.c", 0x62A);
     if (pDesc != NULL) {
         fn_801127A0(pDesc);
     }

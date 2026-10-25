@@ -3,6 +3,7 @@
 
 #include "engine.h"
 #include "core/goaram.h"
+#include "core/audcontainers.h"
 #include "ustream.h"
 #include "game_types.h"
 
@@ -13,11 +14,9 @@ void fn_80005580(void);
 void fn_800071BC();
 void fn_8002F1D4();
 void Gaud_InitOnce();
-void AudMem_InitOnce();
 void fn_80005520(void);
 void fn_800055D4(void);
 void fn_8000724C();
-void AudMem_CloseOnce();
 void fn_80005590(void);
 void fn_800083A4();
 s32 main(s32 p0, s32 p1);

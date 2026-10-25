@@ -1,6 +1,6 @@
 // PasswordManager.c (TW06's and TW07's golf/earnings/passwordmanager.cpp, a C++ class there; our
 // spelling): the cheat codes typed in the menus (PasswordManager_TestPassword) and the unlocks they
-// set, which hold for every profile (lbl_80281DF4, and the bit arrays gPasswordEnteredBits and
+// set, which hold for every profile (gpPasswordUnlocks, and the bit arrays gPasswordEnteredBits and
 // gSponsorPasswordBits): IsPasswordEntered, IsSponsorshipPasswordEntered, TestPassword and
 // SetDefaults, which TW07's class also has (TestPassword last there). Then, with no TW07
 // counterpart in this file, the set-up of a new save profile (SaveProfile_*).
@@ -38,7 +38,7 @@ u8 PasswordManager_IsSponsorshipPasswordEntered(int n) {
 }
 
 // Tests a code typed in the menus (menu message GM_vTestPassword); if it is a cheat, sets what it
-// unlocks, which holds for every profile (lbl_80281DF4), and returns 1 (0: not a cheat).
+// unlocks, which holds for every profile (gpPasswordUnlocks), and returns 1 (0: not a cheat).
 // THEKITCHENSINK unlocks every golfer, course and reward and TOUR card level 1 (and clears
 // gFEState.bTourCardWithheld); ALLTHETRACKS the courses and rewards; CANYOUPICKONE the golfers;
 // fourteen codes one golfer each; SHERWOOD TARGET sets cheat bit 6. The 16 codes of
@@ -51,92 +51,92 @@ u8 PasswordManager_TestPassword(char* szCode) {
 
     if (strcmp(szCode, "THEKITCHENSINK") == 0) {
         for (i = 0; i < 30; i++) {
-            lbl_80281DF4->aGolferUnlocked[i] = 1;
+            gpPasswordUnlocks->aGolferUnlocked[i] = 1;
         }
         for (i = 0; i < 21; i++) {
-            lbl_80281DF4->aCourseUnlocked[i] = 1;
+            gpPasswordUnlocks->aCourseUnlocked[i] = 1;
         }
-        lbl_80281DF4->aCourseUnlocked[21] = 1;
-        lbl_80281DF4->aCourseUnlocked[COURSE_TIGERS_DREAM_18] = 1;
+        gpPasswordUnlocks->aCourseUnlocked[21] = 1;
+        gpPasswordUnlocks->aCourseUnlocked[COURSE_TIGERS_DREAM_18] = 1;
         for (i = 0; i < 18; i++) {
-            lbl_80281DF4->aRewardUnlocked[i] = 1;
+            gpPasswordUnlocks->aRewardUnlocked[i] = 1;
         }
-        lbl_80281DF4->nTourCardLevel = 1;
+        gpPasswordUnlocks->nTourCardLevel = 1;
         gFEState.bTourCardWithheld = 0;
         return 1;
     }
     if (strcmp(szCode, "ALLTHETRACKS") == 0) {
         for (i = 0; i < 21; i++) {
-            lbl_80281DF4->aCourseUnlocked[i] = 1;
+            gpPasswordUnlocks->aCourseUnlocked[i] = 1;
         }
-        lbl_80281DF4->aCourseUnlocked[21] = 1;
-        lbl_80281DF4->aCourseUnlocked[COURSE_TIGERS_DREAM_18] = 1;
+        gpPasswordUnlocks->aCourseUnlocked[21] = 1;
+        gpPasswordUnlocks->aCourseUnlocked[COURSE_TIGERS_DREAM_18] = 1;
         for (i = 0; i < 18; i++) {
-            lbl_80281DF4->aRewardUnlocked[i] = 1;
+            gpPasswordUnlocks->aRewardUnlocked[i] = 1;
         }
         return 1;
     }
     if (strcmp(szCode, "CANYOUPICKONE") == 0) {
         for (i = 0; i < 30; i++) {
-            lbl_80281DF4->aGolferUnlocked[i] = 1;
+            gpPasswordUnlocks->aGolferUnlocked[i] = 1;
         }
         return 1;
     }
     // One golfer each.
     if (strcmp(szCode, "4REDSHIRTS") == 0) {
-        lbl_80281DF4->aGolferUnlocked[1] = 1;
+        gpPasswordUnlocks->aGolferUnlocked[1] = 1;
         return 1;
     }
     if (strcmp(szCode, "ACEINTHEHOLE") == 0) {
-        lbl_80281DF4->aGolferUnlocked[2] = 1;
+        gpPasswordUnlocks->aGolferUnlocked[2] = 1;
         return 1;
     }
     if (strcmp(szCode, "DISCOKING") == 0) {
-        lbl_80281DF4->aGolferUnlocked[8] = 1;
+        gpPasswordUnlocks->aGolferUnlocked[8] = 1;
         return 1;
     }
     if (strcmp(szCode, "SHORTGAME") == 0) {
-        lbl_80281DF4->aGolferUnlocked[15] = 1;
+        gpPasswordUnlocks->aGolferUnlocked[15] = 1;
         return 1;
     }
     if (strcmp(szCode, "DWILBY") == 0) {
-        lbl_80281DF4->aGolferUnlocked[17] = 1;
+        gpPasswordUnlocks->aGolferUnlocked[17] = 1;
         return 1;
     }
     if (strcmp(szCode, "EMERALDCHAMP") == 0) {
-        lbl_80281DF4->aGolferUnlocked[19] = 1;
+        gpPasswordUnlocks->aGolferUnlocked[19] = 1;
         return 1;
     }
     if (strcmp(szCode, "TRAVELER") == 0) {
-        lbl_80281DF4->aGolferUnlocked[20] = 1;
+        gpPasswordUnlocks->aGolferUnlocked[20] = 1;
         return 1;
     }
     if (strcmp(szCode, "BEVERLYHILLS") == 0) {
-        lbl_80281DF4->aGolferUnlocked[25] = 1;
+        gpPasswordUnlocks->aGolferUnlocked[25] = 1;
         return 1;
     }
     if (strcmp(szCode, "THENEWLEFTY") == 0) {
-        lbl_80281DF4->aGolferUnlocked[27] = 1;
+        gpPasswordUnlocks->aGolferUnlocked[27] = 1;
         return 1;
     }
     if (strcmp(szCode, "CEDDYBEAR") == 0) {
-        lbl_80281DF4->aGolferUnlocked[9] = 1;
+        gpPasswordUnlocks->aGolferUnlocked[9] = 1;
         return 1;
     }
     if (strcmp(szCode, "DTBROWN") == 0) {
-        lbl_80281DF4->aGolferUnlocked[6] = 1;
+        gpPasswordUnlocks->aGolferUnlocked[6] = 1;
         return 1;
     }
     if (strcmp(szCode, "EDDIE") == 0) {
-        lbl_80281DF4->aGolferUnlocked[16] = 1;
+        gpPasswordUnlocks->aGolferUnlocked[16] = 1;
         return 1;
     }
     if (strcmp(szCode, "ERUPTION") == 0) {
-        lbl_80281DF4->aGolferUnlocked[26] = 1;
+        gpPasswordUnlocks->aGolferUnlocked[26] = 1;
         return 1;
     }
     if (strcmp(szCode, "ICYONE") == 0) {
-        lbl_80281DF4->aGolferUnlocked[29] = 1;
+        gpPasswordUnlocks->aGolferUnlocked[29] = 1;
         return 1;
     }
     if (stricmp(szCode, "SHERWOOD TARGET") == 0) {
@@ -161,91 +161,91 @@ u8 PasswordManager_TestPassword(char* szCode) {
     return 0;
 }
 
-// Sets the unlocks that hold for every profile (lbl_80281DF4) to their defaults at start-up (user.c
-// fn_800563C4): a new profile's (SaveProfile_InitNew), not active, with the starting golfers and
+// Sets the unlocks that hold for every profile (gpPasswordUnlocks) to their defaults at start-up (user.c
+// UserManager_OpenOnce): a new profile's (SaveProfile_InitNew), not active, with the starting golfers and
 // courses, only reward 0, no money, stats, awards or medals, no TOUR card, and every cheat bit
 // cleared (gPasswordEnteredBits 0..6, gSponsorPasswordBits).
 void PasswordManager_SetDefaults(void) {
     int i;
 
-    SaveProfile_InitNew(lbl_80281DF4);
+    SaveProfile_InitNew(gpPasswordUnlocks);
     BitArray_ClearArray(gPasswordEnteredBits, 7);
     BitArray_ClearArray(gSponsorPasswordBits, 16);
-    lbl_80281DF4->bActive = 0;
+    gpPasswordUnlocks->bActive = 0;
     for (i = 0; i < 16; i++) {
-        lbl_80281DF4->aGolferUnlocked[gStartUnlockedGolfers[i]] = 1;
+        gpPasswordUnlocks->aGolferUnlocked[gStartUnlockedGolfers[i]] = 1;
     }
     for (i = 0; i < 21; i++) {
-        lbl_80281DF4->aCourseUnlocked[i] = 1;
+        gpPasswordUnlocks->aCourseUnlocked[i] = 1;
     }
-    lbl_80281DF4->aCourseUnlocked[21] = 1;
-    lbl_80281DF4->aCourseUnlocked[COURSE_TIGERS_DREAM_18] = 1;
+    gpPasswordUnlocks->aCourseUnlocked[21] = 1;
+    gpPasswordUnlocks->aCourseUnlocked[COURSE_TIGERS_DREAM_18] = 1;
     for (i = 0; i < 6; i++) {
-        lbl_80281DF4->aCourseUnlocked[gStartLockedCourses[i]] = 0;
+        gpPasswordUnlocks->aCourseUnlocked[gStartLockedCourses[i]] = 0;
     }
-    lbl_80281DF4->aCourseUnlocked[21] = 1;
-    lbl_80281DF4->aCourseUnlocked[COURSE_TIGERS_DREAM_18] = 1;
+    gpPasswordUnlocks->aCourseUnlocked[21] = 1;
+    gpPasswordUnlocks->aCourseUnlocked[COURSE_TIGERS_DREAM_18] = 1;
     for (i = 0; i < 18; i++) {
-        lbl_80281DF4->aRewardUnlocked[i] = 0;
+        gpPasswordUnlocks->aRewardUnlocked[i] = 0;
     }
-    lbl_80281DF4->aRewardUnlocked[0] = 1;
+    gpPasswordUnlocks->aRewardUnlocked[0] = 1;
 
-    lbl_80281DF4->nTotalCash = 0;
-    lbl_80281DF4->nCurrentCash = 0;
-    lbl_80281DF4->nStrokeRounds = 0;
-    lbl_80281DF4->nStrokeRoundStrokes = 0;
-    lbl_80281DF4->nRounds = 0;
-    lbl_80281DF4->nPuttHoles = 0;
-    lbl_80281DF4->nPutts = 0;
-    lbl_80281DF4->nDrives = 0;
-    lbl_80281DF4->nDriveDistance = 0;
-    lbl_80281DF4->nFairways = 0;
-    lbl_80281DF4->nFairwaysHit = 0;
-    lbl_80281DF4->nHoles = 0;
-    lbl_80281DF4->nGreensHit = 0;
-    lbl_80281DF4->nLongestDrive = 0;
-    lbl_80281DF4->nLongestPutt = 0;
-    lbl_80281DF4->nBestRound = 0;
-    lbl_80281DF4->bChanged = 0;
+    gpPasswordUnlocks->nTotalCash = 0;
+    gpPasswordUnlocks->nCurrentCash = 0;
+    gpPasswordUnlocks->nStrokeRounds = 0;
+    gpPasswordUnlocks->nStrokeRoundStrokes = 0;
+    gpPasswordUnlocks->nRounds = 0;
+    gpPasswordUnlocks->nPuttHoles = 0;
+    gpPasswordUnlocks->nPutts = 0;
+    gpPasswordUnlocks->nDrives = 0;
+    gpPasswordUnlocks->nDriveDistance = 0;
+    gpPasswordUnlocks->nFairways = 0;
+    gpPasswordUnlocks->nFairwaysHit = 0;
+    gpPasswordUnlocks->nHoles = 0;
+    gpPasswordUnlocks->nGreensHit = 0;
+    gpPasswordUnlocks->nLongestDrive = 0;
+    gpPasswordUnlocks->nLongestPutt = 0;
+    gpPasswordUnlocks->nBestRound = 0;
+    gpPasswordUnlocks->bChanged = 0;
     for (i = 0; i < 25; i++) {
-        lbl_80281DF4->aLadderAward[i].bWon = 0;
+        gpPasswordUnlocks->aLadderAward[i].bWon = 0;
     }
     for (i = 0; i < 31; i++) {
-        lbl_80281DF4->aC8[i].award.bWon = 0;
+        gpPasswordUnlocks->aC8[i].award.bWon = 0;
     }
     for (i = 0; i < 16; i++) {
-        lbl_80281DF4->aTourAward[i].bWon = 0;
+        gpPasswordUnlocks->aTourAward[i].bWon = 0;
     }
     for (i = 0; i < 3; i++) {
-        lbl_80281DF4->aMoneyListAward[i].bWon = 0;
+        gpPasswordUnlocks->aMoneyListAward[i].bWon = 0;
     }
     // EA bug: runs past the 75 awards, as in SaveProfile_InitNew.
     for (i = 0; i < 118; i++) {
-        lbl_80281DF4->aRTEAward[i].bWon = 0;
+        gpPasswordUnlocks->aRTEAward[i].bWon = 0;
     }
     for (i = 0; i < 75; i++) {
-        UserInfo_SetPar5EagleStat(lbl_80281DF4, 0, i, 0);
+        UserInfo_SetPar5EagleStat(gpPasswordUnlocks, 0, i, 0);
     }
     for (i = 0; i < 29; i++) {
-        lbl_80281DF4->aMedal[i] = 3;
+        gpPasswordUnlocks->aMedal[i] = 3;
     }
-    lbl_80281DF4->n5168 = 3;
+    gpPasswordUnlocks->n5168 = 3;
 
-    lbl_80281DF4->nHolesInOne = 0;
-    lbl_80281DF4->nAlbatrosses = 0;
-    lbl_80281DF4->nEagles = 0;
-    lbl_80281DF4->nBirdies = 0;
-    lbl_80281DF4->nPars = 0;
-    lbl_80281DF4->nBogeys = 0;
-    lbl_80281DF4->nDoubleBogeys = 0;
+    gpPasswordUnlocks->nHolesInOne = 0;
+    gpPasswordUnlocks->nAlbatrosses = 0;
+    gpPasswordUnlocks->nEagles = 0;
+    gpPasswordUnlocks->nBirdies = 0;
+    gpPasswordUnlocks->nPars = 0;
+    gpPasswordUnlocks->nBogeys = 0;
+    gpPasswordUnlocks->nDoubleBogeys = 0;
     for (i = 0; i < 39; i++) {
-        lbl_80281DF4->aAward[i].bWon = 0;
+        gpPasswordUnlocks->aAward[i].bWon = 0;
     }
     for (i = 0; i < 15; i++) {
-        lbl_80281DF4->aTipSeen[i] = 0;
+        gpPasswordUnlocks->aTipSeen[i] = 0;
     }
-    lbl_80281DF4->bCaddieTipsOff = 0;
-    lbl_80281DF4->nTourCardLevel = 0;
+    gpPasswordUnlocks->bCaddieTipsOff = 0;
+    gpPasswordUnlocks->nTourCardLevel = 0;
 }
 
 // Sets save slot nSlot up as a new profile (SaveProfile_InitNew) named "USER<nSlot + 1>", not
@@ -278,7 +278,7 @@ void SaveProfile_SetupDummy(void) {
 // gFEState.nMCRewardMoney (plus the first sponsor's start cash when one is signed; a billion with cheat bit
 // 0); no stats, awards, medals (aMedal 3) or TOUR card; three empty saved rounds, the default
 // created golfer (SaveProfile_InitCreatedGolfer), no PGA TOUR seasons, the Create-A-Player defaults
-// (FE_CrAP_InitCrAPInfo) and the first sponsor (lbl_80281DF0) signed when there is one.
+// (FE_CrAP_InitCrAPInfo) and the first sponsor (gStartingSponsor) signed when there is one.
 void SaveProfile_InitNew(SaveProfile* pProfile) {
     int i;
     int j;
@@ -323,7 +323,7 @@ void SaveProfile_InitNew(SaveProfile* pProfile) {
         pProfile->nCurrentCash = 1000000000;
     } else {
         pProfile->nCurrentCash = gFEState.nMCRewardMoney + 25000;
-        if (lbl_80281DF0.bSigned) {
+        if (gStartingSponsor.bSigned) {
             pProfile->nCurrentCash += GameModeDriverPGATour_GetSponsorshipStartCash(0);
         }
     }
@@ -405,9 +405,9 @@ void SaveProfile_InitNew(SaveProfile* pProfile) {
     GM_PgaTourSim_ClearAllSeasons(&pProfile->tour);
     BitArray_ClearArray(pProfile->aUserFlags, 2);
     FE_CrAP_InitCrAPInfo(pProfile);
-    if (lbl_80281DF0.bSigned) {
+    if (gStartingSponsor.bSigned) {
         pProfile->aSponsor[0].bSigned = 1;
-        pProfile->aSponsor[0].nSponsor = lbl_80281DF0.nSponsor;
+        pProfile->aSponsor[0].nSponsor = gStartingSponsor.nSponsor;
     }
 }
 
