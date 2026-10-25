@@ -1088,6 +1088,14 @@ void SD_vShaderObject_PrelitTextured_Dynamic_Render(DynRenderObject* pObj);
 void SD_vShaderObject_PrelitTextured_Dynamic_Refresh(DynRenderObject* pObj, DynRenderFill* pFill,
                                                      u8 bRestart);
 
+// GoShaderObject_PrelitTexturedLine_Gc.c: row 19's shader-object hooks, row 0's mesh drawn as
+// lines.
+void SD_vShaderObject_PrelitTexturedLine_Dynamic_Init(DynRenderObject* pObj, const DynRenderSize* pSize);
+void SD_vShaderObject_PrelitTexturedLine_Dynamic_Close(DynRenderObject* pObj);
+void SD_vShaderObject_PrelitTexturedLine_Dynamic_Render(DynRenderObject* pObj);
+void SD_vShaderObject_PrelitTexturedLine_Dynamic_Refresh(DynRenderObject* pObj, DynRenderFill* pFill,
+                                                         u8 bRestart);
+
 // A scrolling texture animation (GoShaderObjectCommon_TexAnimManager_Gc.c; our names, after
 // fn_80074BE0's). Each frame its texture matrix is moved by the fraction of fU and fV times the
 // clock, snapped to fScale steps of fInv.
