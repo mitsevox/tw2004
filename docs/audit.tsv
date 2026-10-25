@@ -119,6 +119,7 @@ GoShaderObjectContainer_OBFData_Gc.c	open
 GoShaderObject_Glows_Gc.c	open		
 GoShaderObject_Grass_Gc.c	open		
 GoShaderObject_Particle_Gc.c	open		
+GoShaderObject_PrelitTextured_Gc.c	open		
 GoShaderObject_PrelitUVAnimation_Gc.c	open		
 GoShaderObject_Rain_Gc.c	open		
 GoStaticCam.c	done	3dfcfcd0	claude-review
@@ -161,7 +162,6 @@ PsMgr.c	open
 RenderAccessors.c	done	63883fe8	claude-review
 Replay.c	open		
 ScreenClear.c	open		
-ShaderRow0.c	open		
 ShaderRow19.c	open		
 SitDev.c	open		
 SitDevCommentaryZones.c	done	503eba0e	claude-review

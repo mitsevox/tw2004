@@ -539,7 +539,7 @@ GoShaderObjectContainer_OBFData_Gc.c:
 unsorted/sweep_8006FF2C.c:
 	.text       start:0x8006FF2C end:0x8006FF80
 
-ShaderRow0.c:
+GoShaderObject_PrelitTextured_Gc.c:
 	.text       start:0x8006FF80 end:0x80070168
 
 unsorted/sweep_80070168.c:

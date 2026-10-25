@@ -423,8 +423,8 @@ void GR_DrawGreenGrid(int nView) {
     // fake match: an s32 (long) copy of nView, kept in its own register, for the
     // ViewController_GetActivePlayerNumber calls
     s32 nViewCopy;
-    TrailDraw draw;
-    TrailMeshDesc desc;
+    DynRenderDrawIn draw;
+    DynRenderFill desc;
     CamLens* pLens;
     f32 fAC;
     int nPlayer;
@@ -484,16 +484,16 @@ void GR_DrawGreenGrid(int nView) {
     RenderState_SetCameraMatrices();
     Camera_SetLensFarClip((u8*)pLens, fAC);
     RenderState_Flush();
-    draw.nPrims = 3;
-    draw.nFirst = 0;
+    draw.nPrim = DYNRENDER_PRIM_LINE_STRIP;
+    draw.nStart = 0;
     draw.nCount = gpGreenGrid->nIndices;
-    desc.n0 = 1;
+    desc.nCount = 1;
     desc.nVerts = gpGreenGrid->nVerts;
-    desc.pDraw = &draw;
+    desc.pDraws = &draw;
     desc.pIndices = gpGreenGrid->apIndex[nView];
     desc.pPos = gpGreenGrid->apVert[nView];
     desc.pColour = gpGreenGrid->apColor[nView];
-    desc.pUV = gpGreenGrid->apUV[nView];
+    desc.pTexCoord = gpGreenGrid->apUV[nView];
     SD_FillShaderObject((ShaderObject*)gpGreenGrid->aMesh[nView], &desc, 1);
     SD_DrawShaderObject(gpGreenGrid->aMesh[nView]);
     DS_vSetAlphaTestMode(1, DS_COMPARE_GEQUAL, 0x80);

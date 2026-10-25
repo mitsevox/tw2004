@@ -197,7 +197,7 @@ The fixes that come up most often. Each points to its full entry below.
   (n = nFirst; ...)`) matches where initialising the counter directly does not (FE_CrAPDB FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum,
   FE_CrAP_IsItemEquipped).
 - **[verified] A `const` source pointer lets CW hoist an unrolled copy loop's loads above its stores**;
-  drop the `const` when the original alternates load/store (DynamicRenderingBuffer fn_800705F0 83 -> 100).
+  drop the `const` when the original alternates load/store (DynamicRenderingBuffer DynRenderBuffer_AddIndices 83 -> 100).
 - **[verified] `do {} while (++i < 4)`** for a 4-step loop with no ctr and the test at the bottom (UKernel
   Kernel_PostPairToObject 80.5 -> 100).
 - **[verified] The order of a for-loop's increments sets the order of the `addi`s** (hlaudmovie
