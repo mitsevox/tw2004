@@ -1155,7 +1155,6 @@ config.libs = [
             Object(Matching, "unsorted/sweep_801654F4.c", progress_category="sdk"),  # Metrowerks runtime / MetroTRK, not EA code
 
             Object(Matching, "GxUtil.c"),
-            Object(Matching, "unsorted/sweep_80070168.c"),
             # Built with opt_propagation off: fn_800922A8's two flag ORs stay separate (ori 4, ori
             # 0x400; with propagation the front end merges them into ori 0x404), no function worse.
             Object(Matching, "uiText.c", extra_cflags=['-pragma "opt_propagation off"']),

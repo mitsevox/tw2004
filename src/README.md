@@ -181,8 +181,7 @@ engine.h `ModuleHooks`). Particles, rain and the ball's effects sit here too.
 | Code8006F608.c | ph | the hole's weather: rolls per-course choices and starts/stops effects, the rain among them (PsMgr.c) |
 | GoShaderObjectContainer_OBFData_Gc.c | EA | copies a shader object's chunks into GPU-ready buffers *(last function's file unverified)* |
 | ShaderRow0.c | ours | row 0's hooks on a dynamic rendering buffer |
-| unsorted/sweep_80070168.c | ph | calls a display list, then `fn_800124CC` (LLFont.c) |
-| DynamicRenderingBuffer.c | ours | vertices a shader object rewrites each frame (EA's header name `GoShaderObjectCommon_DynamicRenderingBuffer_Gc.h`) |
+| DynamicRenderingBuffer.c | ours | vertices a shader object rewrites each frame (EA's header name `GoShaderObjectCommon_DynamicRenderingBuffer_Gc.h`) *(first function's file unverified)* |
 | Code80070EC4.c | ph | rows 4 and 2's static hooks (row 2 plays a morph animation) |
 | GoShaderObject_PrelitUVAnimation_Gc.c | EA | row 5: prelit geometry with scrolling textures; init/close of every shader type |
 | GoShaderObjectCommon_ShaderObjectsData_Gc.c | EA | builds the display lists that draw shader objects |

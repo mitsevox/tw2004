@@ -21,6 +21,19 @@ void fn_80070B50(u16 nIndex);
 void fn_80070B5C(u16 nIndex);
 void fn_80070B68(u16 nIndex);
 
+// ---- sweep code (not yet cleaned up) ----
+
+void GXCallDisplayList();
+void fn_800124CC();
+void fn_80070168(void);
+
+void fn_80070168(void) {
+    GXCallDisplayList();
+    fn_800124CC();
+}
+
+// ---- end of sweep code ----
+
 DynRenderBuffer* fn_8007018C(int nMaxVerts, int nMaxDraws) {
     DynRenderBuffer* pBuf;
 
@@ -218,7 +231,6 @@ void fn_80070D7C(f32* pfWeight);
 void fn_80070D88(StaticShaderObject* pObj, ShaderCmds* pCmds);
 void fn_80070DBC(StaticShaderObject* pObj);
 void fn_80070DF4(StaticShaderObject* pObj);
-void fn_80070168(void);     // sweep_80070168.c: calls a display list
 void fn_8007524C(void);     // GoShaderObjectCommon_ShaderObjectsData_Gc.c: empty
 s32 fn_80097688(void);      // GoShaderObjectCommon_MorphAnimManager_Gc.c: how many animations
 void fn_80097624(MorphAnim* pAnim);     // GoShaderObjectCommon_MorphAnimManager_Gc.c: free its data
@@ -243,7 +255,7 @@ void fn_80070BD0(StaticShaderObject* pObj) {
     if (pObj->anim.b8 != 0) {
         GXSetArray(9, pObj->pArrays->apPos[0], 12);
     }
-    // port: fn_80070168 (sweep_80070168.c) is defined without parameters but hands r3 and r4 on to
+    // port: fn_80070168 (above) is defined without parameters but hands r3 and r4 on to
     //       GXCallDisplayList
     ((void (*)(void*, u32))fn_80070168)(pObj->anim.p4, pObj->anim.n0);
 }
@@ -317,7 +329,7 @@ void fn_80070DF4(StaticShaderObject* pObj) {
         (u32)gSession.nFrameCount > fn_80097694(pAnim->nIndex)) {
         fn_800976A8(pAnim, lbl_80281E70);
     }
-    // port: fn_80070168 (sweep_80070168.c) is defined without parameters but hands r3 and r4 on to
+    // port: fn_80070168 (above) is defined without parameters but hands r3 and r4 on to
     //       GXCallDisplayList
     ((void (*)(void*, u32))fn_80070168)(pAnim->p4, pAnim->n0);
 }
