@@ -1153,7 +1153,6 @@ config.libs = [
             Object(Matching, "fe_craputils.c"),
             Object(Matching, "DynamicRenderingBuffer.c"),
             Object(Matching, "Code80070EC4.c"),
-            Object(Matching, "unsorted/sweep_80097EC4.c"),
             Object(Matching, "Code8009A928.c"),
             Object(Matching, "hlaudvoice.c"),
             Object(Matching, "AudLock.c"),
