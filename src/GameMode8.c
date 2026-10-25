@@ -727,7 +727,7 @@ void SpeedGolf_TradeEventPoints(int nPlayer, int nEvent) {
 // A shot has come to rest (SpeedGolf_RunUpdate, ball state 1, or 5 out of bounds). First a return
 // to the shot state that mode 7 deferred (nSGFlags bit 20) happens once gSpeedGolfCanSwitchToShot
 // allows. The stroke is counted. Out of bounds (GM_CheckForBallOOB) the ball is dropped from a
-// lateral hazard (surface class 7) or replaced, the run flag, arrow, tip and prompt are cleared and
+// lateral hazard (SURFCLASS_WATER_e) or replaced, the run flag, arrow, tip and prompt are cleared and
 // the golfer goes back to state 1 (in mode 7 now if gSpeedGolfCanSwitchToShot allows, else deferred
 // through bit 20), with mode 7's penalties: event 4 out of bounds, 5 in a hazard (nSGFlags bit 11),
 // 30 and 31 on the replay. In mode 7 a tee shot (vBall at the tee spot vA44) records the drive's
@@ -755,7 +755,7 @@ u8 SpeedGolf_OnBallAtRest(int nPlayer) {
         if (GM_CheckForBallOOB(nPlayer)) {
             pSurf = Ter_GetSupportingWorldMaterial(gPlayers[nPlayer].ball.pCourse,
                                                    gPlayers[nPlayer].ball.vPos);
-            if (pSurf != NULL && pSurf->nClass == 7) {
+            if (pSurf != NULL && pSurf->nClass == SURFCLASS_WATER_e) {
                 GM_ReplaceLateralHazardBall(nPlayer);
                 gPlayers[nPlayer].nSGFlags &= ~1;
             } else {
@@ -776,7 +776,7 @@ u8 SpeedGolf_OnBallAtRest(int nPlayer) {
     nOtherStrokes = gPlayers[nOther].nStrokes[Game_CurHoleIndex()];
     if (GM_CheckForBallOOB(nPlayer)) {
         pSurf = Ter_GetSupportingWorldMaterial(gPlayers[nPlayer].ball.pCourse, gPlayers[nPlayer].ball.vPos);
-        if (pSurf != NULL && pSurf->nClass == 7) {
+        if (pSurf != NULL && pSurf->nClass == SURFCLASS_WATER_e) {
             if (gPlayers[nPlayer].nSGFlags & 0x10) {
                 SpeedGolf_TradeEventPoints(nPlayer, 0x1F);
             } else {

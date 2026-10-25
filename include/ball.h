@@ -202,7 +202,8 @@ typedef struct Ball {
                                 //       set). TW06: PBF_HitTopArc
     u8   bSpinApplied;          // 0x9B  the spin-stick input went into the spin at that bounce
                                 //       (event 0x1F); 1 from the start for a putt
-    u8   bGotFirstSandPos;      // 0x9C  landed in sand (class 6) this shot. TW06: PBF_GotFirstSandPos
+    u8   bGotFirstSandPos;      // 0x9C  landed in sand (SURFCLASS_SAND_e) this shot.
+                                //       TW06: PBF_GotFirstSandPos
     u8   unk9D[0xA0 - 0x9D];
     f32  vFirstSandPos[3];      // 0xA0  where it first landed in sand. TW06: firstSandPosition
     f32  fAC;                   // 0xAC  ticks spent with no ground under a rolling ball

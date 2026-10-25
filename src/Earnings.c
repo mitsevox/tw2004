@@ -663,14 +663,14 @@ void GM_Earnings_PayRoundGoals(int nPlayer, u8 bRoundOver) {
 }
 
 // The bit of ShotGoal.uLies and PuttGoal.uLies for a surface class (TGD_MaterialInfo.nClass; the goal
-// checkers pass GameAnalysis_GetInitialStartingLie, the surface the shot left): class 1 bit 0, 2
-// (fairway) bit 1, 5 (rough) bit 2, 6 (sand) bit 3, 3 (green) bit 4; any other class bit 6.
+// checkers pass GameAnalysis_GetInitialStartingLie, the surface the shot left): the tee box bit 0,
+// the fairway bit 1, the rough bit 2, sand bit 3, the green bit 4; any other class bit 6.
 s32 Earnings_GetSurfaceClassBit(u32 n) {
-    if (n == 1) return 0;
-    if (n == 2) return 1;
-    if (n == 5) return 2;
-    if (n == 6) return 3;
-    if (n == 3) return 4;
+    if (n == SURFCLASS_TEE_e) return 0;
+    if (n == SURFCLASS_FAIRWAY_e) return 1;
+    if (n == SURFCLASS_ROUGH_e) return 2;
+    if (n == SURFCLASS_SAND_e) return 3;
+    if (n == SURFCLASS_GREEN_e) return 4;
     return 6;
 }
 
@@ -1770,7 +1770,7 @@ u8 GM_Earnings_GiveAwardToUser(int nPlayer, Award* pAward) {
 // one without a profile; the record holder's name is the profile's, or "User <n>" when the front
 // end has no profile loaded in that slot.
 
-// The end-of-shot record check: a shot on a par 4 or 5 that left class-1 ground and stayed in
+// The end-of-shot record check: a shot on a par 4 or 5 that left the tee box and stayed in
 // bounds is offered to record kind 1, its length in yards, while
 // HighScoreRecords_CheckRecordGameSetting(1) allows it. a (TW07: setrecord) writes a place in. With
 // bAll (TW07: firstPlaceOnly) only a new best (HighScoreRecords_CheckRecord gives 2 or 4) is
@@ -1818,7 +1818,7 @@ int HighScoreRecords_GetEndOfShotRecord(int nPlayer, Ball* pBall, int a, u8 bCou
     }
     nPar = GM_GetCurrentHolePar();
     nClass = gSurfaceTypes[pBall->nStartSurface].nClass;
-    if (HighScoreRecords_CheckRecordGameSetting(1) && (nPar == 4 || nPar == 5) && nClass == 1
+    if (HighScoreRecords_CheckRecordGameSetting(1) && (nPar == 4 || nPar == 5) && nClass == SURFCLASS_TEE_e
         && !GM_IsBallOOB(nPlayer, pBall)) {
         nResult = HighScoreRecords_CheckRecord(1, (s32)fDist, a, szName, nPlayer);
         if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
@@ -2339,12 +2339,12 @@ u8 HighScoreRecords_CheckRecordGameSetting(int nKind) {
 }
 
 // After a shot that stayed in bounds (GM_PlayerTookShot), when gpGame->b27B allows it and mulligans
-// are off: the shot's statistics. A drive (the first stroke of a par 4 or 5, off class-1 ground)
+// are off: the shot's statistics. A drive (the first stroke of a par 4 or 5, off the tee box)
 // can be the round's longest (Player.nLongestDrive) and the profile's (nLongestDrive), in yards,
 // and is counted in the profile (nDrives drives, nDriveDistance their yards). The first stroke's
 // length goes in nC24; bFairwayHit marks a fairway hit (that first stroke on a par 4 or 5 finished
 // on the fairway, the green or in the hole), bGreenInReg a green in regulation (on the green or in
-// the hole, not on class-3 ground, in par - 2 strokes or fewer). A holed putt (club 25) can be the
+// the hole, not on the green, in par - 2 strokes or fewer). A holed putt (club 25) can be the
 // round's and the profile's longest (both nLongestPutt): 3 x Player.fA64, in feet.
 void GM_RecordIndividualShotStats(int nPlayer) {
     u32 nClass;
@@ -2371,7 +2371,7 @@ void GM_RecordIndividualShotStats(int nPlayer) {
     nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
     pSurface = Ter_GetSupportingWorldMaterial(pBall->pCourse, gPlayers[nPlayer].vBall);
     nProfile = gPlayers[nPlayer].nIndex;
-    if ((nPar == 4 || nPar == 5) && nStrokes == 1 && nClass == 1) {
+    if ((nPar == 4 || nPar == 5) && nStrokes == 1 && nClass == SURFCLASS_TEE_e) {
         if (fDist > gPlayers[nPlayer].nLongestDrive) {
             gPlayers[nPlayer].nLongestDrive = fDist;
         }
@@ -2387,11 +2387,13 @@ void GM_RecordIndividualShotStats(int nPlayer) {
         (nLie == LIE_FAIRWAY_e || nLie == LIE_GREEN_e || nLie == LIE_INCUP_e)) {
         gPlayers[nPlayer].bFairwayHit[Game_CurHoleIndex()] = 1;
     }
-    if (pSurface != NULL && pSurface->nClass != 3 && (nLie == LIE_GREEN_e || nLie == LIE_INCUP_e) &&
+    if (pSurface != NULL && pSurface->nClass != SURFCLASS_GREEN_e
+        && (nLie == LIE_GREEN_e || nLie == LIE_INCUP_e) &&
         nStrokes <= nPar - 2) {
         gPlayers[nPlayer].bGreenInReg[Game_CurHoleIndex()] = 1;
     }
-    if (gpSaveData[nProfile].bActive && (nPar == 4 || nPar == 5) && nStrokes == 1 && nClass == 1) {
+    if (gpSaveData[nProfile].bActive && (nPar == 4 || nPar == 5) && nStrokes == 1
+        && nClass == SURFCLASS_TEE_e) {
         gpSaveData[nProfile].nDrives++;
         gpSaveData[nProfile].nDriveDistance += (s32)fDist;
         gpSaveData[nProfile].bChanged = 1;

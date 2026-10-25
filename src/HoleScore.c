@@ -788,17 +788,17 @@ u8 GameAnalysis_LastHoleWasTied(void) {
     return 0;
 }
 
-// The class (TGD_MaterialInfo.nClass) of the surface the shot started from (Ball.nStartSurface), 0 when
-// it has none or is out of range.
+// The class (TGD_MaterialInfo.nClass) of the surface the shot started from (Ball.nStartSurface),
+// SURFCLASS_NONE_e when it has none or is out of range.
 u32 GameAnalysis_GetInitialStartingLie(int nPlayer) {
     if (gPlayers[nPlayer].ball.nStartSurface < 0 ||
         gPlayers[nPlayer].ball.nStartSurface >= NUM_SURFACE_TYPES) {
-        return 0;
+        return SURFCLASS_NONE_e;
     }
     return gSurfaceTypes[gPlayers[nPlayer].ball.nStartSurface].nClass;
 }
 
-// The ground under Player.vBall is not green (class 3) and the hole's strokes so far are three
+// The ground under Player.vBall is not the green and the hole's strokes so far are three
 // under par or better (bUnder: more than three); without bAnyLie, the ball must also be on the
 // green or in the cup and two under par (bUnder: more).
 u8 GameAnalysis_CurrentShotGIR(int nPlayer, u8 bUnder, u8 bAnyLie) {
@@ -813,21 +813,22 @@ u8 GameAnalysis_CurrentShotGIR(int nPlayer, u8 bUnder, u8 bAnyLie) {
         if (bAnyLie) {
             nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
             if (bUnder) {
-                if (pSurface->nClass != 3 && nStrokes < nPar - 3) {
+                if (pSurface->nClass != SURFCLASS_GREEN_e && nStrokes < nPar - 3) {
                     return 1;
                 }
-            } else if (pSurface->nClass != 3 && nStrokes <= nPar - 3) {
+            } else if (pSurface->nClass != SURFCLASS_GREEN_e && nStrokes <= nPar - 3) {
                 return 1;
             }
         } else {
             nLie = gPlayers[nPlayer].ball.nLie;
             nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
             if (bUnder) {
-                if (pSurface->nClass != 3 && (nLie == LIE_GREEN_e || nLie == LIE_INCUP_e) &&
+                if (pSurface->nClass != SURFCLASS_GREEN_e && (nLie == LIE_GREEN_e || nLie == LIE_INCUP_e) &&
                     nStrokes < nPar - 2) {
                     return 1;
                 }
-            } else if (pSurface->nClass != 3 && (nLie == LIE_GREEN_e || nLie == LIE_INCUP_e) &&
+            } else if (pSurface->nClass != SURFCLASS_GREEN_e
+                       && (nLie == LIE_GREEN_e || nLie == LIE_INCUP_e) &&
                        nStrokes <= nPar - 2) {
                 return 1;
             }
@@ -836,11 +837,11 @@ u8 GameAnalysis_CurrentShotGIR(int nPlayer, u8 bUnder, u8 bAnyLie) {
     return 0;
 }
 
-// Whether the shot started from fairway ground (surface class 1) and the ball now lies on the
+// Whether the shot started from the tee box (SURFCLASS_TEE_e) and the ball now lies on the
 // fairway (LIE_FAIRWAY_e), the green (LIE_GREEN_e) or in the cup (LIE_INCUP_e). Earnings.c's awards
 // test it.
 u8 GameAnalysis_GetFairwayDrive(int nPlayer) {
-    if (GameAnalysis_GetInitialStartingLie(nPlayer) != 1) return 0;
+    if (GameAnalysis_GetInitialStartingLie(nPlayer) != SURFCLASS_TEE_e) return 0;
     if (gPlayers[nPlayer].ball.nLie == 1 || gPlayers[nPlayer].ball.nLie == 9 ||
         gPlayers[nPlayer].ball.nLie == 12) {
         return 1;

@@ -414,8 +414,9 @@ void fn_800A31E0(Ball* pBall, int nPlayer) {
     }
     nLie = gPlayers[nPlayer].ball.nLie;
     if ((nLie == 1 || (u32)(nLie - 2) <= 2 || nLie == 0) && pSurface != NULL &&
-        (pSurface->nClass == 1 || pSurface->nClass == 2 || pSurface->nClass == 5 ||
-         pSurface->nClass == 11) &&
+        (pSurface->nClass == SURFCLASS_TEE_e || pSurface->nClass == SURFCLASS_FAIRWAY_e
+            || pSurface->nClass == SURFCLASS_ROUGH_e ||
+         pSurface->nClass == SURFCLASS_THICK_ROUGH_e) &&
         gPlayers[nPlayer].nClub > 8 &&
         (gPlayers[nPlayer].nShotKind == 1 || gPlayers[nPlayer].nShotKind == 4)) {
         DynObj_ShotDivotHoleAdd(pBall->vPos, nPlayer);
@@ -445,10 +446,10 @@ void fn_800A3348(Ball* pBall, int nPlayer) {
         if (0.375f != pSurface->f1C) {
             return;
         }
-        if (pSurface->nClass == 6) {
+        if (pSurface->nClass == SURFCLASS_SAND_e) {
             gPlayers[nPlayer].bBunkerThisShot = 1;
         }
-        if (pSurface->nClass == 7 || pSurface->nClass == 16) {
+        if (pSurface->nClass == SURFCLASS_WATER_e || pSurface->nClass == SURFCLASS_WATER_OOB_e) {
             gPlayers[nPlayer].b30E = 1;
         }
         Ter_GetSupportingWorldData(Ter_GetTGD(), vPos, &pGround, vNormal);
@@ -566,7 +567,7 @@ void fn_800A34C0(int nTrail, Ball* pBall, f32* pDir) {
     }
 }
 
-// A trail behind a ball moving over sand (surface class 6), along its flat direction; not in
+// A trail behind a ball moving over sand (SURFCLASS_SAND_e), along its flat direction; not in
 // split screen.
 void PsBallFx_TriggerTrail(Ball* pBall, int nPlayer) {
     f32 vPos[4];
@@ -581,8 +582,9 @@ void PsBallFx_TriggerTrail(Ball* pBall, int nPlayer) {
     vPos[1] = pBall->vPos[1];
     vPos[2] = pBall->vPos[2];
     vPos[3] = 1.0f;
+    // EA compares the class signed here
     if (TER_NO_GROUND == Ter_GetSupportingGroundData(Ter_GetTGD(), vPos, &pSurface, vNormal) ||
-        0.375f != pSurface->f1C || (int)pSurface->nClass != 6) {    // EA compares the class signed here
+        0.375f != pSurface->f1C || (int)pSurface->nClass != SURFCLASS_SAND_e) {
         return;
     }
     LLMath_CopyVec(gPlayers[nPlayer].ball.vVel, vDir);

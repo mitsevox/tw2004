@@ -410,22 +410,22 @@ void fn_8006B6F0(int nPlayer) {
     if (pSurface == NULL) {
         lbl_801D5F78[nPlayer].n0 = 4;
         lbl_801D5F78[nPlayer].n4 = 0;
-    } else if (pSurface->nClass == 5) {
+    } else if (pSurface->nClass == SURFCLASS_ROUGH_e) {
         lbl_801D5F78[nPlayer].n0 = 1;
         lbl_801D5F78[nPlayer].n4 = 0;
-    } else if (pSurface->nClass == 6) {
+    } else if (pSurface->nClass == SURFCLASS_SAND_e) {
         lbl_801D5F78[nPlayer].n0 = 1;
         lbl_801D5F78[nPlayer].n4 = 1;
-    } else if (pSurface->nClass == 3) {
+    } else if (pSurface->nClass == SURFCLASS_GREEN_e) {
         lbl_801D5F78[nPlayer].n0 = 0;
         lbl_801D5F78[nPlayer].n4 = 1;
-    } else if (pSurface->nClass == 11) {
+    } else if (pSurface->nClass == SURFCLASS_THICK_ROUGH_e) {
         lbl_801D5F78[nPlayer].n0 = 1;
         lbl_801D5F78[nPlayer].n4 = 1;
-    } else if (pSurface->nClass == 4) {
+    } else if (pSurface->nClass == SURFCLASS_FRINGE_e) {
         lbl_801D5F78[nPlayer].n0 = 0;
         lbl_801D5F78[nPlayer].n4 = 0;
-    } else if (pSurface->nClass == 2) {
+    } else if (pSurface->nClass == SURFCLASS_FAIRWAY_e) {
         lbl_801D5F78[nPlayer].n0 = 0;
         lbl_801D5F78[nPlayer].n4 = 0;
     } else {

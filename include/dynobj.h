@@ -519,7 +519,7 @@ extern MemPoolPtr gKernelLargeObjectPool;
 void fn_800075CC(UObjModelRoot* pRoot);    // frees a model fn_800073B4 made
 
 // GoDynObj.c
-void DynObj_PitchMarkAdd(f32* pPos, int nPlayer);  // a fast ball landing on the green (class 3)
+void DynObj_PitchMarkAdd(f32* pPos, int nPlayer);  // a fast ball landing on SURFCLASS_GREEN_e
                                                    // leaves a pitch mark ('TEO ' 10005)
 void DynObj_ShotDivotHoleAdd(f32* pPos, int nPlayer);  // put the player's divot hole ('TEO ' 10001) at pPos
 void DynObj_DivotAdd(f32* pPos, int nPlayer);  // put the player's divot ('TEO ' 10002) at pPos

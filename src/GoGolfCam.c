@@ -433,8 +433,10 @@ void GolfCamera_InitGreenZoomToAimCamera(View* pView, int nPlayer) {
         if (fLow < -60000.0f) {
             if (!(fHigh < -60000.0f)) {
                 fGround = fHigh;
-                if (pSurfaceHigh != NULL && pSurfaceHigh->nClass != 3 && pSurfaceHigh->nClass != 4
-                    && pSurfaceHigh->nClass != 12 && pSurfaceHigh->nClass != 18) {
+                if (pSurfaceHigh != NULL && pSurfaceHigh->nClass != SURFCLASS_GREEN_e
+                    && pSurfaceHigh->nClass != SURFCLASS_FRINGE_e
+                    && pSurfaceHigh->nClass != SURFCLASS_CUP_e
+                    && pSurfaceHigh->nClass != SURFCLASS_CUP_GREEN_e) {
                     fGround += 0.5f;
                 }
             } else {
@@ -442,8 +444,9 @@ void GolfCamera_InitGreenZoomToAimCamera(View* pView, int nPlayer) {
             }
         } else {
             fGround = fLow;
-            if (pSurfaceLow != NULL && pSurfaceLow->nClass != 3 && pSurfaceLow->nClass != 4
-                && pSurfaceLow->nClass != 12 && pSurfaceLow->nClass != 18) {
+            if (pSurfaceLow != NULL && pSurfaceLow->nClass != SURFCLASS_GREEN_e
+                && pSurfaceLow->nClass != SURFCLASS_FRINGE_e
+                && pSurfaceLow->nClass != SURFCLASS_CUP_e && pSurfaceLow->nClass != SURFCLASS_CUP_GREEN_e) {
                 fGround += 0.5f;
             }
         }
@@ -941,10 +944,10 @@ void GolfCamera_ProcessSpeedGolfRunCamera(View* pView, int nPlayer) {
             if (pSurface != NULL) {
                 nClass = pSurface->nClass;
             } else {
-                nClass = 0;
+                nClass = SURFCLASS_NONE_e;
             }
-            // down to the water line in water (classes 7 and 16), back up out of it
-            if (nClass == 7 || nClass == 16) {
+            // down to the water line in water, back up out of it
+            if (nClass == SURFCLASS_WATER_e || nClass == SURFCLASS_WATER_OOB_e) {
                 gSpeedGolfRunCamEyeHeight[nPlayer] -= 0.1f;
             } else {
                 gSpeedGolfRunCamEyeHeight[nPlayer] += 0.1f;
@@ -961,7 +964,7 @@ void GolfCamera_ProcessSpeedGolfRunCamera(View* pView, int nPlayer) {
                 && !Player_IsCPU(nPlayer)) {
                 Input_vVibrateBuzz(gPlayers[nPlayer].nController, 0);
             }
-            if (nClass != 7) {
+            if (nClass != SURFCLASS_WATER_e) {
                 // the step: the length of three times vCBC's x and z, per 60th of a second
                 fStep = (f32)Math_Sqrt((f32)(pow(3.0f * gPlayers[nPlayer].vCBC[2], 2.0)
                                                 + pow(3.0f * gPlayers[nPlayer].vCBC[0], 2.0)))
@@ -1956,7 +1959,7 @@ void GolfCamera_InitBallFlightCamera(View* pView, int nPlayer) {
         if (gPlayers[nPlayer].ballBefore.nSurface >= 0) {
             nClass = gSurfaceTypes[gPlayers[nPlayer].ballBefore.nSurface].nClass;
         } else {
-            nClass = 10;
+            nClass = SURFCLASS_OTHER_e;
         }
         GolfCam_Vec3Sub(gPlayers[nPlayer].ballBefore.vPos, gPlayers[nPlayer].ball.vStart, vDiff);
         fDist = Math_Sqrt(LLMath_LengthSquared3(vDiff));
@@ -1964,7 +1967,7 @@ void GolfCamera_InitBallFlightCamera(View* pView, int nPlayer) {
         fDist = AI_MaxDistance(nPlayer, gPlayers[nPlayer].nShotKind, gPlayers[nPlayer].nClub);
         fDist *= Physics_GetLiePowerPercentage(&gPlayers[nPlayer].ball);
         fDist *= SW_vGetShotPower(nPlayer);
-        nClass = 2;
+        nClass = SURFCLASS_FAIRWAY_e;
         GolfCam_Vec3Sub(gPlayers[nPlayer].vTarget, gPlayers[nPlayer].vBall, vAim);
         LLMath_Normalize3(vAim, vAim);
         Vec3_Scale(fDist, vAim, vAim);
@@ -3625,7 +3628,7 @@ void GolfCamera_ChooseReactionCam(View* pView, int nPlayer, int a) {
     if (gPlayers[nPlayer].ball.nSurface >= 0) {
         nClass = gSurfaceTypes[gPlayers[nPlayer].ballBefore.nSurface].nClass;
     } else {
-        nClass = 10;
+        nClass = SURFCLASS_OTHER_e;
     }
     GolfCam_Vec3Sub(gPlayers[nPlayer].ballBefore.vPos, gPlayers[nPlayer].ball.vStart, v);
     v[1] = 0.0f;

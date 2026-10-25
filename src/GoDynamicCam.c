@@ -1513,10 +1513,10 @@ static u8 DynamicCam_IsDefualtSeq(CameraSequence_t* seq, CameraShotState_e state
     return 1;
 }
 
-// The camera lie for surface class lieID, CAMLIE_NONE past 19: class 1 is the tee under a ball on
-// the tee (LIE_TEE_e), else the fairway.
+// The camera lie for surface class lieID, CAMLIE_NONE past the table: SURFCLASS_TEE_e is the tee
+// under a ball on the tee (LIE_TEE_e), else the fairway.
 static CameraLie_e DynamicCam_MaterialToCameraLie(u32 lieID, int playerID) {
-    static CameraLie_e sMaterialToCamLies[20] = {
+    static CameraLie_e sMaterialToCamLies[SURFCLASS_NOT_PLAYABLE_e + 1] = {
         CAMLIE_NONE, CAMLIE_TEE, CAMLIE_FAIRWAY, CAMLIE_GREEN, CAMLIE_FAIRWAY, CAMLIE_ROUGH,
         CAMLIE_SAND, CAMLIE_WATER, CAMLIE_ROUGH, CAMLIE_ROUGH, CAMLIE_ROUGH, CAMLIE_ROUGH,
         CAMLIE_GREEN, CAMLIE_ROUGH, CAMLIE_ROUGH, CAMLIE_ROUGH, CAMLIE_WATER, CAMLIE_ROUGH,
@@ -1524,8 +1524,8 @@ static CameraLie_e DynamicCam_MaterialToCameraLie(u32 lieID, int playerID) {
     };
     CameraLie_e nRet;
 
-    if (lieID > 19) return CAMLIE_NONE;
-    if (lieID == 1) {
+    if (lieID > SURFCLASS_NOT_PLAYABLE_e) return CAMLIE_NONE;
+    if (lieID == SURFCLASS_TEE_e) {
         nRet = CAMLIE_FAIRWAY;
         if (gPlayers[playerID].ball.nLie == LIE_TEE_e) {
             nRet = CAMLIE_TEE;

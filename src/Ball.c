@@ -5,7 +5,7 @@
 // rough). No assert names this file (the leaked list's PsBallFx.c is elsewhere). Units are yards
 // and seconds. Many constants are inches or miles per hour converted to yards (INCHES, MPH): the
 // original's float bits are exactly those quotients, not the rounded decimals. The cup is real
-// geometry (surface classes 12/18, surface type 90): the ball is holed when it is on a cup surface
+// geometry (the cup classes, surface type 90): the ball is holed when it is on a cup surface
 // more than 2 in (rolling) or 2.5 in (landing) below the pin. The pull toward the cup
 // (Physics_ApplySuperSucka) is written up in docs/game/gameplay.md.
 
@@ -348,9 +348,9 @@ const ClubRow gClubRows7[25] = {
     {{0.1f, 0.2f, 0.5f, 0.9f, 1.4f, 1.9f, 2.6f, 3.4f, 4.2f, 5.1f, 6.0f}}   // high lob wedge
 };
 
-// The ground's pace by course setting: x gTurfSpeed's (0.6 .. 1.4, classes 2, 3, 4), then the
-// green speed (options +0x18, class 3), the fairway (gFairwaySetting, class 2) and the rough
-// (options +0x1C, class 5).
+// The ground's pace by course setting: x gTurfSpeed's (0.6 .. 1.4) on the fairway, green and
+// fringe, then the green speed (options +0x18) on the green, the fairway's (gFairwaySetting) on the
+// fairway and the rough's (options +0x1C) on the rough.
 const f32 gTurfSpeedMul[5] = {
     0.6f, 0.8f, 1.0f, 1.2f, 1.4f
 };
@@ -399,7 +399,7 @@ u8     Physics_CheckDynObjCollisions(Ball* pBall, f32 fTicks);
 
 // 0..4, default 2; rain sets 1 (light) or 0 (heavy): the putt table and friction
 s32 gTurfSpeed = 2;
-// options +0x1C (ROUGH LENGTH?), 0..2: class-5 friction x 0.7, 1, 1.3
+// options +0x1C (ROUGH LENGTH?), 0..2: SURFCLASS_ROUGH_e friction x 0.7, 1, 1.3
 s32 gRoughSetting = 1;
 // .bss: defined in reverse address order.
 // Per player 0..3: the ball's last position over ground Ter_CheckForDropLocation calls a preferred
@@ -411,7 +411,7 @@ f32 gBallDropSpot[4][4];
 u8  gBallGroundValid;                     // the two ground heights below are current
 f32 gBallGroundHeight;                    // ground height under the ball
 f32 gBallGroundHeight2;                   // the other ground height (Ter_GetEnclosingGroundData)
-s32 gFairwaySetting;                      // 0..2: class-2 friction x 1.0 / 0.9 / 0.8
+s32 gFairwaySetting;                      // 0..2: fairway friction x 1.0 / 0.9 / 0.8
 // options +0x18 (GREEN SPEED?), 0..2: green friction x 1, 0.9, 0.8
 s32 gGreenSpeedSetting;
 u8  gNoRandomRolls;                       // lie, bounce and tree rolls come out 0 (the lessons)
@@ -1140,16 +1140,17 @@ void Physics_BallRollingandSlipping(Ball* pBall, f32 fTicks) {
     pBall->nSurface = MaterialTypes_getMaterialID(pSurface);
     LLMath_Normalize3(vNormal, vNormal);
     fPull = 1.0f - pSurface->f14;
-    if (pSurface->nClass == 3) {
+    if (pSurface->nClass == SURFCLASS_GREEN_e) {
         fPull *= 2.0f - gGreenSpeedMul[gGreenSpeedSetting];
     }
-    if (pSurface->nClass == 2) {
+    if (pSurface->nClass == SURFCLASS_FAIRWAY_e) {
         fPull *= 2.0f - gFairwaySpeedMul[gFairwaySetting];
     }
-    if (pSurface->nClass == 5) {
+    if (pSurface->nClass == SURFCLASS_ROUGH_e) {
         fPull *= 2.0f - gRoughMul[gRoughSetting];
     }
-    if (pSurface->nClass == 3 || pSurface->nClass == 4 || pSurface->nClass == 2) {
+    if (pSurface->nClass == SURFCLASS_GREEN_e || pSurface->nClass == SURFCLASS_FRINGE_e
+        || pSurface->nClass == SURFCLASS_FAIRWAY_e) {
         fPull *= 2.0f - gTurfSpeedMul[gTurfSpeed];
     }
     fDot = -0.107170001f * vNormal[1];
@@ -1160,16 +1161,17 @@ void Physics_BallRollingandSlipping(Ball* pBall, f32 fTicks) {
     LLMath_Normalize3(vTmp, vDir);
     Vec3_Scale(Math_Sqrt(LLMath_LengthSquared3(pBall->vVel)), vDir, pBall->vVel);
     fFric = 1.5f * (pSurface->f18 * (-0.107170001f * vNormal[1]));
-    if (pSurface->nClass == 3) {
+    if (pSurface->nClass == SURFCLASS_GREEN_e) {
         fFric *= 2.0f - gGreenSpeedMul[gGreenSpeedSetting];
     }
-    if (pSurface->nClass == 2) {
+    if (pSurface->nClass == SURFCLASS_FAIRWAY_e) {
         fFric *= 2.0f - gFairwaySpeedMul[gFairwaySetting];
     }
-    if (pSurface->nClass == 5) {
+    if (pSurface->nClass == SURFCLASS_ROUGH_e) {
         fFric *= 2.0f - gRoughMul[gRoughSetting];
     }
-    if (pSurface->nClass == 3 || pSurface->nClass == 4 || pSurface->nClass == 2) {
+    if (pSurface->nClass == SURFCLASS_GREEN_e || pSurface->nClass == SURFCLASS_FRINGE_e
+        || pSurface->nClass == SURFCLASS_FAIRWAY_e) {
         fFric *= 2.0f - gTurfSpeedMul[gTurfSpeed];
     }
     fFric = 2.97619057f * fFric;
@@ -1188,11 +1190,11 @@ void Physics_BallRollingandSlipping(Ball* pBall, f32 fTicks) {
 
 // The bounce. Returns the square of the speed into the surface (Physics_CheckTerrainCollisions keeps its root as
 // the sand-landing impact).
-// - Water (class 7, 16) quarters the spin; elsewhere sideways spin is capped (2.93, or the
+// - Water quarters the spin; elsewhere sideways spin is capped (2.93, or the
 //   ball's ground speed once that is 5.28 or more).
 // - The normal is bent toward the incoming ball by how soft the ground is: speed into it /
 //   surface +0x24 (x the course settings; the green-speed setting and rain make it firmer or
-//   softer) + surface +0x28 (x 0.667 in rough, x 0.5 for class 11); past a full bend the ball
+//   softer) + surface +0x28 (x 0.667 in rough, x 0.5 in thick rough); past a full bend the ball
 //   comes straight back.
 // - In the frame of that normal: restitution is surface +0x0C (0.5..1 counts as 0.5); on
 //   surfaces with a negative +0x0C (branches, leaves) a real ball's value is randomised by
@@ -1246,7 +1248,7 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, TGD_MaterialInfo* pSurfac
     // the three turns back), fA (spin clamp and the bank angle), fC (surface +0x28 and the turned
     // direction) and fBounce (the sines of the turns back) give EA's float registers.
     pBall->nCollideCount++;
-    if (pSurface->nClass == 7 || pSurface->nClass == 16) {
+    if (pSurface->nClass == SURFCLASS_WATER_e || pSurface->nClass == SURFCLASS_WATER_OOB_e) {
         Vec3_Scale(0.25f, pBall->vSpin, pBall->vSpin);
     } else {
         fT = 0.84f * pBall->vSpin[0];
@@ -1277,23 +1279,24 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, TGD_MaterialInfo* pSurfac
     LLMath_AddScale3(pNormal, pBall->vVel, 1.0f / fSpeed, vBent);
     Ball_Vec3Negate(vBent, vBent);
     fA = fabsf(fD) / pSurface->f24;
-    if (pSurface->nClass == 3) {
+    if (pSurface->nClass == SURFCLASS_GREEN_e) {
         fA *= 2.0f - gGreenSpeedMul[gGreenSpeedSetting];
     }
-    if (pSurface->nClass == 2) {
+    if (pSurface->nClass == SURFCLASS_FAIRWAY_e) {
         fA *= 2.0f - gFairwaySpeedMul[gFairwaySetting];
     }
-    if (pSurface->nClass == 5) {
+    if (pSurface->nClass == SURFCLASS_ROUGH_e) {
         fA *= 2.0f - gRoughMul[gRoughSetting];
     }
-    if (pSurface->nClass == 3 || pSurface->nClass == 4 || pSurface->nClass == 2) {
+    if (pSurface->nClass == SURFCLASS_GREEN_e || pSurface->nClass == SURFCLASS_FRINGE_e
+        || pSurface->nClass == SURFCLASS_FAIRWAY_e) {
         fA *= 2.0f - (1.4f * (gTurfSpeedMul[gTurfSpeed] - 1.0f) + 1.0f);
     }
     fC = pSurface->f28;
-    if (pSurface->nClass == 5) {
+    if (pSurface->nClass == SURFCLASS_ROUGH_e) {
         fC *= 0.667f;
     }
-    if (pSurface->nClass == 11) {
+    if (pSurface->nClass == SURFCLASS_THICK_ROUGH_e) {
         fC *= 0.5f;
     }
     fA += fC;
@@ -1364,12 +1367,14 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, TGD_MaterialInfo* pSurfac
     }
     fBounce = 0.0350000001f + (fRest * fM + 1.0f);
     if (fRest >= 0.0f) {
-        if (pSurface->nClass == 4 || pSurface->nClass == 2 || pSurface->nClass == 3
-            || pSurface->nClass == 5) {
+        if (pSurface->nClass == SURFCLASS_FRINGE_e || pSurface->nClass == SURFCLASS_FAIRWAY_e
+            || pSurface->nClass == SURFCLASS_GREEN_e
+            || pSurface->nClass == SURFCLASS_ROUGH_e) {
             if (pSurface->f24 <= 80.0f && fSpeed < pSurface->f24) {
                 fBounce -= ((0.150000006f * fRest) * (pSurface->f24 - fSpeed)) / pSurface->f24;
             }
-            if (pSurface->nClass == 3 || pSurface->nClass == 4 || pSurface->nClass == 2) {
+            if (pSurface->nClass == SURFCLASS_GREEN_e || pSurface->nClass == SURFCLASS_FRINGE_e
+                || pSurface->nClass == SURFCLASS_FAIRWAY_e) {
                 fBounce *= 0.109999999f * (gTurfSpeedMul[gTurfSpeed] - 1.0f) + 1.0f;
             }
         }
@@ -1381,13 +1386,15 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, TGD_MaterialInfo* pSurfac
     fLen = Math_Sqrt(vSlip[0] * vSlip[0] + vSlip[2] * vSlip[2]);
     fGrip = pSurface->f10 * fabsf(vSlip[1]);
     fGrip *= 0.3f;
-    if (pSurface->nClass == 4 || pSurface->nClass == 3 || pSurface->nClass == 2) {
+    if (pSurface->nClass == SURFCLASS_FRINGE_e || pSurface->nClass == SURFCLASS_GREEN_e
+        || pSurface->nClass == SURFCLASS_FAIRWAY_e) {
         fGrip *= gTurfSpeedMul[gTurfSpeed];
     }
     if (fGrip < fLen && fLen != 0.0f) {
         fN = pSurface->f10;
         fN *= 0.3f;
-        if (pSurface->nClass == 3 || pSurface->nClass == 4 || pSurface->nClass == 2) {
+        if (pSurface->nClass == SURFCLASS_GREEN_e || pSurface->nClass == SURFCLASS_FRINGE_e
+            || pSurface->nClass == SURFCLASS_FAIRWAY_e) {
             fN *= gTurfSpeedMul[gTurfSpeed];
         }
         fScale = fabsf(fN * vSlip[1] / fLen);
@@ -1401,8 +1408,8 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, TGD_MaterialInfo* pSurfac
     } else {
         Vec3_Scale(1.0f + fRest, pBall->vSpin, pBall->vSpin);
     }
-    if (pSurface->nClass == 5 || pSurface->nClass == 11) {
-        if (pSurface->nClass == 5) {
+    if (pSurface->nClass == SURFCLASS_ROUGH_e || pSurface->nClass == SURFCLASS_THICK_ROUGH_e) {
+        if (pSurface->nClass == SURFCLASS_ROUGH_e) {
             fBite = 0.8f;
         } else {
             fBite = 0.6f;
@@ -1413,7 +1420,8 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, TGD_MaterialInfo* pSurfac
     if (pSurface != NULL && pSurface->f0C >= 0.0f && pBall->vVel[1] < 0.674666584f &&
         (f32)Math_Sqrt(pBall->vVel[0] * pBall->vVel[0] + pBall->vVel[2] * pBall->vVel[2]) < 1.90666652f) {
         if (pBall->nSolidCollideCount < 6
-            && (pSurface->nClass == 4 || pSurface->nClass == 3 || pSurface->nClass == 2) &&
+            && (pSurface->nClass == SURFCLASS_FRINGE_e || pSurface->nClass == SURFCLASS_GREEN_e
+                || pSurface->nClass == SURFCLASS_FAIRWAY_e) &&
             gTurfSpeedMul[gTurfSpeed] > 0.7f &&
             (f32)Math_Sqrt((pBall->vPos[0] - pBall->vStart[0]) * (pBall->vPos[0] - pBall->vStart[0]) +
                              (pBall->vPos[2] - pBall->vStart[2]) * (pBall->vPos[2] - pBall->vStart[2]))
@@ -1449,7 +1457,8 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, TGD_MaterialInfo* pSurfac
     Ball_RotatePair(&pBall->vVel[0], &pBall->vVel[1], fBounce, fT);
     Ball_RotatePair(&pBall->vSpin[0], &pBall->vSpin[1], fBounce, fT);
     if (pSurface != NULL && pSurface->f0C >= 0.0f &&
-        (pSurface->nClass == 4 || pSurface->nClass == 3 || pSurface->nClass == 2) &&
+        (pSurface->nClass == SURFCLASS_FRINGE_e || pSurface->nClass == SURFCLASS_GREEN_e
+            || pSurface->nClass == SURFCLASS_FAIRWAY_e) &&
         pSurface->f24 <= 80.0f && fSpeed < pSurface->f24) {
         pBall->vVel[1] *= 1.0f - 0.349999994f * ((pSurface->f24 - fSpeed) / pSurface->f24);
     }
@@ -1514,17 +1523,18 @@ u8 Physics_CheckObjectCollisions(Ball* pBall, f32 fTicks) {
 
 // The lie from the surface class, with LUCK (0..110, players 0..3) in the rolls; a sim or
 // gNoRandomRolls rolls 0 (the kind result):
-//   1, 2: lie 1.  3, 18: lie 9 (green).  4: lie 10.  7, 16: lie 13.  8: lie 11.
-//   5 (rough): surface 145 is lie 4; else a coin flip, forced good when (r & 127) < LUCK/2 -
+//   Tee box, fairway: lie 1.  Green, green at the cup: lie 9.  Fringe: lie 10.  Both waters:
+//   lie 13.  Cart path: lie 11.
+//   Rough: surface 145 is lie 4; else a coin flip, forced good when (r & 127) < LUCK/2 -
 //     good: lie 3 / surface 27 (never on course 6); bad: lie 4 / surface 28.
-//   11: (r & 127) < LUCK/4 + 16 gives the rough treatment instead of lie 5 / surface 26.
-//   6, 20 (sand): lie 6 (clean, surface 35), 7 (surface 36) or 8 (plugged, surface 34),
-//     from where and how hard it landed and three LUCK rolls; class 20 is surface 146.
-//   12: holed (event 0x21 the first time).  Anything else: lie 17.
+//   Thick rough: (r & 127) < LUCK/4 + 16 gives the rough treatment instead of lie 5 / surface 26.
+//   Both sands: lie 6 (clean, surface 35), 7 (surface 36) or 8 (plugged, surface 34),
+//     from where and how hard it landed and three LUCK rolls; SURFCLASS_SAND_KEEPS_ROW_e keeps 146.
+//   The cup: holed (event 0x21 the first time).  Anything else: lie 17.
 // Then a random lie quality (+0x70), +-(Misc_RandFuncf - LUCK/200, not below 0) x surface +0x04.
 // The cases share code through gotos, as the original's branches do: a roll can move a lie up a
-// level (class 11 to the rough; plugged to 7 to clean). Copies of the shared code do not match
-// (the rough code copied into case 11: 91.8%).
+// level (thick rough to rough; plugged to 7 to clean). Copies of the shared code do not match
+// (the rough code copied into the thick rough case: 91.8%).
 void Physics_SetLie(Ball* pBall, TGD_MaterialInfo* pSurface) {
     TGD_MaterialInfo* pLie;
     u32          uLuck;
@@ -1543,18 +1553,18 @@ void Physics_SetLie(Ball* pBall, TGD_MaterialInfo* pSurface) {
         }
     }
     switch (pSurface->nClass) {
-    case 1:
-    case 2:
+    case SURFCLASS_TEE_e:
+    case SURFCLASS_FAIRWAY_e:
         pBall->nLie = LIE_FAIRWAY_e;
         break;
-    case 3:
-    case 18:
+    case SURFCLASS_GREEN_e:
+    case SURFCLASS_CUP_GREEN_e:
         pBall->nLie = LIE_GREEN_e;
         break;
-    case 4:
+    case SURFCLASS_FRINGE_e:
         pBall->nLie = LIE_FRINGE_e;
         break;
-    case 5:
+    case SURFCLASS_ROUGH_e:
         if (pBall->nSurface == 145) {
             pBall->nLie = LIE_ROUGH_e;
             break;
@@ -1582,7 +1592,7 @@ void Physics_SetLie(Ball* pBall, TGD_MaterialInfo* pSurface) {
             break;
         }
         break;
-    case 11:
+    case SURFCLASS_THICK_ROUGH_e:
         if (gSimulating || gNoRandomRolls) {
             r = 0;
         } else {
@@ -1595,8 +1605,8 @@ void Physics_SetLie(Ball* pBall, TGD_MaterialInfo* pSurface) {
         pBall->nLie     = LIE_THICK_ROUGH_e;
         pBall->nSurface = 26;
         break;
-    case 6:
-    case 20:
+    case SURFCLASS_SAND_e:
+    case SURFCLASS_SAND_KEEPS_ROW_e:
         if (gSimulating || gNoRandomRolls) {
             r = 0;
         } else {
@@ -1634,18 +1644,18 @@ void Physics_SetLie(Ball* pBall, TGD_MaterialInfo* pSurface) {
         pBall->nLie     = LIE_SAND_DEEP_e;
         pBall->nSurface = 34;
     sandEnd:
-        if (pSurface->nClass == 20) {
+        if (pSurface->nClass == SURFCLASS_SAND_KEEPS_ROW_e) {
             pBall->nSurface = 146;
         }
         break;
-    case 7:
-    case 16:
+    case SURFCLASS_WATER_e:
+    case SURFCLASS_WATER_OOB_e:
         pBall->nLie = LIE_WATER_e;
         break;
-    case 8:
+    case SURFCLASS_CARTPATH_e:
         pBall->nLie = LIE_CARTPATH_e;
         break;
-    case 12:
+    case SURFCLASS_CUP_e:
         pBall->bHoled = 1;
         if (pBall->nLie != LIE_INCUP_e) {
             pBall->nLie = LIE_INCUP_e;
@@ -1688,7 +1698,7 @@ static inline f32 Ball_SpinKeep(Ball* pBall) {
     return (f32)(1 - pBall->nSolidCollideCount);
 }
 
-// The ball has hit something (a surface, or an object as surface 13). A tree (class 17) tilts
+// The ball has hit something (a surface, or an object as surface 13). A tree (SURFCLASS_TREE_e) tilts
 // the hit normal by 12..19 degrees on two axes - negative unless the roll's low 5 bits are 0,
 // so almost always negative; a sim, gNoRandomRolls, slot 4 or a perfect shot rolls 0 (+12, +12).
 // The ball is put at the hit point (backed off along its velocity on a solid surface), a
@@ -1703,7 +1713,7 @@ u8 Physics_ProcessCollision(Ball* pBall, f32* pHit, f32* pNormal, TGD_MaterialIn
     s32 r;
     int nA, nB;
     f32 fPrev, fNow, fBack, fAngle, fS, fC;
-    if (pSurface->nClass == 17) {
+    if (pSurface->nClass == SURFCLASS_TREE_e) {
         if (gSimulating || gNoRandomRolls || pBall->nPlayer == 4 ||
             (pBall->nPlayer >= 0 && pBall->nPlayer <= 3 && gPlayers[pBall->nPlayer].bPerfect)) {
             r = 0;
@@ -1750,7 +1760,7 @@ u8 Physics_ProcessCollision(Ball* pBall, f32* pHit, f32* pNormal, TGD_MaterialIn
     if (pSurface->f0C >= 0.0f) {
         LLMath_AddScale3(pBall->vPos, pBall->vVel, -9.25925906e-06f, pBall->vPos);
     }
-    if (pSurface->nClass == 19 && pSurface == &gSurfaceTypes[108]) {
+    if (pSurface->nClass == SURFCLASS_NOT_PLAYABLE_e && pSurface == &gSurfaceTypes[108]) {
         Physics_OutOfBounds(pBall, 1);
         return 0;
     }
@@ -1930,9 +1940,9 @@ void Physics_StopBall(Ball* pBall) {
 
 // A ball in the air meets the ground. Out of bounds (600 yd) is a hazard. Ter_CheckForWorldCollision finds
 // the hit; Physics_ProcessCollision handles it; landing events; the cup (surface 90) kills spin; the bounce
-// (Physics_HandleCollision) - on sand (class 6) the first landing point and impact are kept for the lie. On
+// (Physics_HandleCollision) - on SURFCLASS_SAND_e the first landing point and impact are kept for the lie. On
 // a cup surface more than 2.5 in below the pin: holed. Then the ball flies on for the rest of the
-// tick (Ter_CheckForSolidWorldCollision for a second hit). Water (class 7 or 16): surfaces 47, 41
+// tick (Ter_CheckForSolidWorldCollision for a second hit). Water: surfaces 47, 41
 // and 104 let a ball that bounces up faster than 2.93 and moves on more than 1.71 x that (and over
 // 5.87) skip, its rise quartered; anything else is a hazard.
 u8 Physics_CheckTerrainCollisions(Ball* pBall, f32 fTicks) {
@@ -1973,12 +1983,12 @@ u8 Physics_CheckTerrainCollisions(Ball* pBall, f32 fTicks) {
         pBall->vSpin[2] = 0.0f;
     }
     fImpact = Physics_HandleCollision(pBall, vNormal, pSurface);
-    if (pSurface->nClass == 6 && !pBall->bGotFirstSandPos) {
+    if (pSurface->nClass == SURFCLASS_SAND_e && !pBall->bGotFirstSandPos) {
         pBall->bGotFirstSandPos       = 1;
         pBall->fFirstSandVMag = Math_Sqrt(fImpact);
         Vec3Copy(pBall->vPos, pBall->vFirstSandPos);
     }
-    if (pSurface->nClass == 12 || pSurface->nClass == 18 ||
+    if (pSurface->nClass == SURFCLASS_CUP_e || pSurface->nClass == SURFCLASS_CUP_GREEN_e ||
         (nIndex == 90 && LLMath_DistanceBetween3(pBall->vPos, PIN(pBall)) < 2.0f)) {
         if (pBall->pCourse->pin[Game_CurrentPinSet()].y - pBall->vPos[1] > 0.0694444478f) {
             Physics_ForceBallInHole(pBall);
@@ -1986,7 +1996,7 @@ u8 Physics_CheckTerrainCollisions(Ball* pBall, f32 fTicks) {
         }
     }
     if (pBall->nState == 4) {
-        if (pSurface->nClass == 12) {
+        if (pSurface->nClass == SURFCLASS_CUP_e) {
             pBall->bHoled = 1;
             Physics_StopBall(pBall);
             return 1;
@@ -2013,7 +2023,7 @@ u8 Physics_CheckTerrainCollisions(Ball* pBall, f32 fTicks) {
         vTo[1] += BALL_RADIUS;
         Vec3Copy(vTo, pBall->vPos);
     }
-    if (pSurface->nClass == 7 || pSurface->nClass == 16) {
+    if (pSurface->nClass == SURFCLASS_WATER_e || pSurface->nClass == SURFCLASS_WATER_OOB_e) {
         nIndex = MaterialTypes_getMaterialID(pSurface);
         if ((nIndex == 47 || nIndex == 41 || nIndex == 104) && pBall->vVel[1] > 2.9333334f) {
             fAcross = Math_Sqrt(pBall->vVel[0] * pBall->vVel[0] + pBall->vVel[2] * pBall->vVel[2]);
@@ -2097,7 +2107,7 @@ void Physics_ApplySuperSucka(Ball* pBall, f32 fDt) {
     }
 }
 
-// State 4, rolling. Holed when on a cup surface (class 12 or 18, or surface 90 within 2 yd of
+// State 4, rolling. Holed when on a cup surface (the cup classes, or surface 90 within 2 yd of
 // the pin) more than 2 in below the pin. Otherwise the velocity is laid onto the ground plane
 // at its speed, then:
 // - break: the slope's sideways part (surface +0x1C, x 0.6 on a green) turns the velocity by
@@ -2123,7 +2133,7 @@ void Physics_BallRolling(Ball* pBall, f32 fTicks) {
     u8           bFlip;
     if (!Physics_GetSurfaceInfo(pBall, &pSurface, vNormal)) return;
     pBall->nSurface = MaterialTypes_getMaterialID(pSurface);
-    if (pSurface->nClass == 12 || pSurface->nClass == 18 ||
+    if (pSurface->nClass == SURFCLASS_CUP_e || pSurface->nClass == SURFCLASS_CUP_GREEN_e ||
         (pBall->nSurface == 90 && LLMath_DistanceBetween3(pBall->vPos, PIN(pBall)) < 2.0f)) {
         if (pBall->pCourse->pin[Game_CurrentPinSet()].y - pBall->vPos[1] > 0.055555556f) {
             Physics_ForceBallInHole(pBall);
@@ -2143,7 +2153,7 @@ void Physics_BallRolling(Ball* pBall, f32 fTicks) {
         fX *= fK;
         fZ *= fK;
         fLen = pSurface->f1C * (f32)Math_Sqrt(fZ * fZ + fX * fX);
-        if (pSurface->nClass == 3) {
+        if (pSurface->nClass == SURFCLASS_GREEN_e) {
             fLen *= 0.6f;
         }
         vec4flt_CrossProduct(pBall->vVel, vDown, pBall->vSpin);
@@ -2196,10 +2206,11 @@ void Physics_BallRolling(Ball* pBall, f32 fTicks) {
         }
     }
     fTurn = vNormal[1] * (0.0765499994f * fRough);
-    if (pSurface->nClass == 3) {
+    if (pSurface->nClass == SURFCLASS_GREEN_e) {
         fTurn *= 0.575f;
     }
-    if (pSurface->nClass == 3 || pSurface->nClass == 4 || pSurface->nClass == 2) {
+    if (pSurface->nClass == SURFCLASS_GREEN_e || pSurface->nClass == SURFCLASS_FRINGE_e
+        || pSurface->nClass == SURFCLASS_FAIRWAY_e) {
         fV = gTurfSpeedMul[gTurfSpeed];
         if (fV > 1.0f) {
             fTurn *= 2.0f - (1.16f * (fV - 1.0f) + 1.0f);
@@ -2209,13 +2220,13 @@ void Physics_BallRolling(Ball* pBall, f32 fTicks) {
             fTurn *= 2.0f - fV;
         }
     }
-    if (pSurface->nClass == 3) {
+    if (pSurface->nClass == SURFCLASS_GREEN_e) {
         fTurn *= 2.0f - gGreenSpeedMul[gGreenSpeedSetting];
     }
-    if (pSurface->nClass == 2) {
+    if (pSurface->nClass == SURFCLASS_FAIRWAY_e) {
         fTurn *= 2.0f - gFairwaySpeedMul[gFairwaySetting];
     }
-    if (pSurface->nClass == 5) {
+    if (pSurface->nClass == SURFCLASS_ROUGH_e) {
         fTurn *= 2.0f - gRoughMul[gRoughSetting];
     }
     fTurn *= fTicks;

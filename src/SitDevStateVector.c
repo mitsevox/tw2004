@@ -306,9 +306,9 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
                  100;   // fake match: reload
         _SetStateVecAndCondition(pValues, 58, nValue, pSetBits);
         _SetStateVecAndCondition(pValues, 59, nValue, pSetBits);
-        nValue = pBall->pHitSurface == NULL ? 0 : pBall->pHitSurface->nClass;
+        nValue = pBall->pHitSurface == NULL ? SURFCLASS_NONE_e : pBall->pHitSurface->nClass;
         _SetStateVecAndCondition(pValues, 63, nValue, pSetBits);
-        nValue = pBefore->pHitSurface == NULL ? 0 : pBefore->pHitSurface->nClass;
+        nValue = pBefore->pHitSurface == NULL ? SURFCLASS_NONE_e : pBefore->pHitSurface->nClass;
         _SetStateVecAndCondition(pValues, 64, nValue, pSetBits);
         if (nKind == 29) {
             gSitDevPredictedHitClass = nValue;
@@ -325,26 +325,28 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
 }
 
 // Correct the surface class of where a ball lies (TGD_MaterialInfo.nClass) for the scripts: outside the
-// course outline, or on ground a ball may not stay on, is 19 (not playable) unless it is water; a
-// ball that must be dropped counts as water (7); surface 151 is 21; class 18 (green) reads as 12.
+// course outline, or on ground a ball may not stay on, is SURFCLASS_NOT_PLAYABLE_e unless it is
+// water; a ball that must be dropped counts as SURFCLASS_WATER_e; surface 151 is 21, a class only
+// the scripts see; SURFCLASS_CUP_GREEN_e reads as SURFCLASS_CUP_e.
 void modifyFinalLie(s32* pClass, int nSurface, Ball* pBall, Player* pPlayer) {
     u8 bWater;
     u8 bNoLie;
     bWater = nSurface >= 0 && nSurface < NUM_SURFACE_TYPES &&
-             (gSurfaceTypes[nSurface].nClass == 7 || gSurfaceTypes[nSurface].nClass == 16);
+             (gSurfaceTypes[nSurface].nClass == SURFCLASS_WATER_e
+                 || gSurfaceTypes[nSurface].nClass == SURFCLASS_WATER_OOB_e);
     bNoLie = nSurface >= 0 && nSurface < NUM_SURFACE_TYPES && !(gSurfaceTypes[nSurface].uFlags & 1) &&
              (gSurfaceTypes[nSurface].uFlags & 2);
     if ((!Ter_PointInOOBNetwork(pBall->vPos) && !bWater) || (bNoLie && !bWater)) {
-        *pClass = 19;
+        *pClass = SURFCLASS_NOT_PLAYABLE_e;
     }
     if (pPlayer->b30E) {
-        *pClass = 7;
+        *pClass = SURFCLASS_WATER_e;
     }
     if (nSurface == 151) {
         *pClass = 21;
     }
-    if (*pClass == 18) {
-        *pClass = 12;
+    if (*pClass == SURFCLASS_CUP_GREEN_e) {
+        *pClass = SURFCLASS_CUP_e;
     }
 }
 

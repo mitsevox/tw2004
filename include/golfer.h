@@ -296,7 +296,7 @@ typedef struct Player {
                                 //        replay
     u8   bHitPin;               // 0x30D  the shot hit the flagstick (event 38, Collision)
     u8   b30E;                  // 0x30E  a replaced ball must be dropped (GM_ReplaceOOBBall)
-    u8   bBunkerThisShot;       // 0x30F  the ball touched a bunker (surface class 6, PsBallFx.c)
+    u8   bBunkerThisShot;       // 0x30F  the ball touched a bunker (SURFCLASS_SAND_e, PsBallFx.c)
     u8   bBunkerThisHole;       // 0x310  set from bBunkerThisShot after a shot
                                 //        (GM_RecordBonusShotStats), cleared by GM_ClearHoleBonusStats;
                                 //        the tour's bunker stats

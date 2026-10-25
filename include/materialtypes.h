@@ -8,6 +8,43 @@
 #include "game_types.h"
 #include "platform.h"
 
+// TGD_MaterialInfo.nClass: the kind of ground a surface is. Physics_SetLie makes the ball's lie
+// (Lie_t) from it and DynamicCam_MaterialToCameraLie the camera's. Classes 13 and 14 (one row of
+// the data each) have no name: no code tests them. 21 has none either: no row has it, and only
+// modifyFinalLie sets it, for the situation scripts.
+typedef enum SurfaceClass_t {
+    SURFCLASS_NONE_e = 0,           // no surface found (what callers use then)
+    SURFCLASS_TEE_e = 1,            // the tee box: a fairway lie; the camera's tee under a teed ball
+    SURFCLASS_FAIRWAY_e = 2,
+    SURFCLASS_GREEN_e = 3,
+    SURFCLASS_FRINGE_e = 4,
+    SURFCLASS_ROUGH_e = 5,          // a random rough lie, high or not
+    SURFCLASS_SAND_e = 6,           // a bunker: a random sand lie, and the ball takes that lie's row
+    SURFCLASS_WATER_e = 7,          // water hazard: speed golf drops the ball beside it
+    SURFCLASS_CARTPATH_e = 8,
+    SURFCLASS_OFF_LIMITS_e = 9,     // ground the camera keeps off as it does SURFCLASS_OTHER_e
+                                    // (CamScript_PlayableSurface); a LIE_MISC_e lie. 46 of its 48
+                                    // rows let no ball lie and carry penalty bit 0x2, so
+                                    // GM_CheckForBallOOB takes the ball off with a penalty stroke;
+                                    // row 132 (0x8) takes it off without one, row 149 (0x8D) lets
+                                    // it lie
+    SURFCLASS_OTHER_e = 10,         // any other ground a ball may stop on (LIE_MISC_e); no drops on
+                                    // it, the camera keeps off it, and the cameras assume it when
+                                    // the look-ahead ball found no surface
+    SURFCLASS_THICK_ROUGH_e = 11,   // thick rough, or by luck a plain rough lie
+    SURFCLASS_CUP_e = 12,           // the cup: a ball on it is holed
+    SURFCLASS_HIDES_BALL_e = 15,    // a ball out of bounds on it is not drawn, as in water
+                                    // (DynObj_bDrawBall), and the placement cursor crosses it at
+                                    // water's pace; a LIE_MISC_e lie
+    SURFCLASS_WATER_OOB_e = 16,     // water: a water lie, but speed golf replaces the ball as out
+                                    // of bounds instead of dropping it beside
+    SURFCLASS_TREE_e = 17,          // a tree: a random bounce off it
+    SURFCLASS_CUP_GREEN_e = 18,     // green at the cup: a green lie, and a ball sunk below the pin's
+                                    // foot on it drops in
+    SURFCLASS_NOT_PLAYABLE_e = 19,  // ground off the playable course; the camera's out of bounds
+    SURFCLASS_SAND_KEEPS_ROW_e = 20 // sand whose ball gets a random sand lie but keeps this row (146)
+} SurfaceClass_t;
+
 // A row of gSurfaceTypes (0x44 bytes): how a ball behaves on one kind of ground. Its field names
 // after "TW06:" agree with what the code here does with each field.
 typedef struct TGD_MaterialInfo {
@@ -27,11 +64,7 @@ typedef struct TGD_MaterialInfo {
     f32  f24;                   // 0x24  bounce: how hard a landing it takes to bend the normal (softness).
                                 //       TW06: terminalVy
     f32  f28;                   // 0x28  bounce: base softness. TW06: surfaceFriction
-    u32  nClass;                // 0x2C  surface class (TW06: lieID), not a Lie_t. Physics_SetLie makes the
-                                //       lie from it: 1, 2 fairway; 3 green; 4 fringe; 5, 11 rough; 6, 20
-                                //       sand; 7, 16 water; 8 cart path; 12 the cup; 18 green (holes a ball,
-                                //       as 12). 17 = tree; 19 = not playable
-                                //       (Ter_CalcLowestPlayableWorldHeight)
+    u32  nClass;                // 0x2C  surface class (SurfaceClass_t), not a Lie_t
     u32  nSoundId;              // 0x30  TW06: soundID; nothing here reads it yet
     u32  uFlags;                // 0x34  Bit 0x1: a ball may lie or be dropped here (without it
                                 //       GameManager takes the ball out); 0x2: taking it out sets the

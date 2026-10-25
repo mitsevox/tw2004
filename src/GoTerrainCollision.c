@@ -495,8 +495,9 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bH
         }
     }
     if (apRef[0] != NULL) {
-        if (gSurfaceTypes[apRef[0]->nSurface].nClass == 3 || gSurfaceTypes[apRef[0]->nSurface].nClass == 2
-            || gSurfaceTypes[apRef[0]->nSurface].nClass == 6) {
+        if (gSurfaceTypes[apRef[0]->nSurface].nClass == SURFCLASS_GREEN_e
+            || gSurfaceTypes[apRef[0]->nSurface].nClass == SURFCLASS_FAIRWAY_e
+            || gSurfaceTypes[apRef[0]->nSurface].nClass == SURFCLASS_SAND_e) {
             bObstructed = 0;
         }
     }
@@ -506,7 +507,7 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bH
         for (k = 1; k < 5; k++) {
             if (abFreeDrop[k] || apRef[k] == NULL
                 || (apRef[k] != NULL && !(gSurfaceTypes[apRef[k]->nSurface].uFlags & 1)
-                    && gSurfaceTypes[apRef[k]->nSurface].nClass != 8)) {
+                    && gSurfaceTypes[apRef[k]->nSurface].nClass != SURFCLASS_CARTPATH_e)) {
                 return 1;
             }
         }
@@ -587,7 +588,7 @@ u8 Ter_SearchForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut) {
                 vPos[0] = fCos * fRadius + p->ball.vPos[0];
                 vPos[2] = fSin * fRadius + p->ball.vPos[2];
                 // from water, only straight towards the pin
-                if (gSurfaceTypes[p->ball.nSurface].nClass == 7 && fTurn > 0.0f) continue;
+                if (gSurfaceTypes[p->ball.nSurface].nClass == SURFCLASS_WATER_e && fTurn > 0.0f) continue;
                 vPos[1] = p->ball.vPos[1] + 2.0f * fRadius;
                 vPos[1] = Ter_CheckForDropLocation(pCourse, vPos, 0, &bDrop, &bPreferredLie, &pSurface);
                 if ((bPreferred && bPreferredLie) || (!bPreferred && bDrop)) {
@@ -638,7 +639,7 @@ f32 Ter_CheckForDropLocation(TGD_TerrainInfo* pCourse, f32* pPos, u8 bOnDropSurf
             *ppSurface = pSurface;
         }
         bOk = fHeight != TER_NO_GROUND && pSurface != NULL && (pSurface->uFlags & 1)
-              && pSurface->nClass != 10 && fabsf(vNormal[1]) > 0.86603f
+              && pSurface->nClass != SURFCLASS_OTHER_e && fabsf(vNormal[1]) > 0.86603f
               && Ter_PointInOOBNetwork(vPos) && !Ter_PointInFreeDropNetwork(vPos)
               // fake match: bOnDropSurface is always 0 here, but the original tests it again
               && (bOnDropSurface || !Ter_CheckObjectAndHazardObstruction(vPos, 1.5f, 0, 1, 2.0f, 1, 0.577f));
@@ -668,7 +669,8 @@ f32 Ter_CheckForDropLocation(TGD_TerrainInfo* pCourse, f32* pPos, u8 bOnDropSurf
 // the lie ID; not a Lie_t) is a preferred place for a drop: classes 1 to 4, the ones Physics_SetLie
 // turns into the fairway (1, 2), green (3) and fringe (4) lies.
 u8 Ter_LieIsPreferred(u32 nClass) {
-    if (nClass == 1 || nClass == 2 || nClass == 3 || nClass == 4) {
+    if (nClass == SURFCLASS_TEE_e || nClass == SURFCLASS_FAIRWAY_e || nClass == SURFCLASS_GREEN_e
+        || nClass == SURFCLASS_FRINGE_e) {
         return 1;
     }
     return 0;
@@ -682,7 +684,7 @@ u8 Ter_IsValidDropSurface(s32 nSurface) {
 
     if (nSurface < 0 || nSurface >= NUM_SURFACE_TYPES) return 0;
     nClass = gSurfaceTypes[nSurface].nClass;
-    if (nClass == 3 || nClass == 12 || nClass == 18) return 1;
+    if (nClass == SURFCLASS_GREEN_e || nClass == SURFCLASS_CUP_e || nClass == SURFCLASS_CUP_GREEN_e) return 1;
     return 0;
 }
 
@@ -695,7 +697,8 @@ f32 Ter_CalcLowestPlayableWorldHeight(TGD_TerrainInfo* pCourse) {
     TGD_PolygonReference* pRef = pCourse->pPolyRefs;
 
     for (i = 0; i < pCourse->nPolyRefs; i++) {
-        if (pRef->nSurface < NUM_SURFACE_TYPES && gSurfaceTypes[pRef->nSurface].nClass == 19) {
+        if (pRef->nSurface < NUM_SURFACE_TYPES
+            && gSurfaceTypes[pRef->nSurface].nClass == SURFCLASS_NOT_PLAYABLE_e) {
             pRef++;
         } else {
             f32* pVert = pCourse->pVerts[TER_FIRST_VERTEX(pRef)];

@@ -293,8 +293,8 @@ typedef struct SaveProfile {
     s32  nRounds;               // 0x0007C  full rounds counted
     s32  nPuttHoles;            // 0x00080  holes whose putts are counted (fewer than 10)
     s32  nPutts;                // 0x00084  their putts
-    s32  nDrives;               // 0x00088  drives counted (the tee shot of a par 4 or 5 off class-1
-                                //          ground)
+    s32  nDrives;               // 0x00088  drives counted (the tee shot of a par 4 or 5 off the tee
+                                //          box)
     s32  nDriveDistance;        // 0x0008C  their yards together
     s32  nFairways;             // 0x00090  par 4 and 5 holes counted
     s32  nFairwaysHit;          // 0x00094  those where the player's bFairwayHit was set

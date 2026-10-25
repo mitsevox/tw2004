@@ -566,7 +566,7 @@ void CameraController_HoldFadeColor(View* pView, f32* pVec) {
 // (CameraScriptSettings_t.nRequestedEvent). Without a club (25) only events 0, 5, 8, 11 and
 // CAMEVENT_PRESHOT_TIMED are taken. Event 12 first holds the current camera (recorded into
 // shot19C) for 0.3 while the view fades to grey (alpha 0.5), then goes on to a kind-12 shot chosen
-// for the player; event 7 becomes 10 when the ball lies on surface class 7 or 16. While event 12
+// for the player; event 7 becomes 10 when the ball lies in water. While event 12
 // waits only 5, 8 and 10 replace it; 6 is never taken; 2 and 3 do not replace 7, nor 7 them.
 void CameraController_PostEvent(View* pView, int nKind, int nPlayer) {
     f32* pPos = CameraController_GetCameraOrigin(pView);
@@ -596,7 +596,8 @@ void CameraController_PostEvent(View* pView, int nKind, int nPlayer) {
     if (nKind == 7) {
         if (!(Ter_GetSupportingWorldData(Ter_GetTGD(), gPlayers[nPlayer].ball.vPos, &pSurface, vNormal)
               < -60000.0f)
-            && pSurface != NULL && (pSurface->nClass == 7 || pSurface->nClass == 16)) {
+            && pSurface != NULL
+                    && (pSurface->nClass == SURFCLASS_WATER_e || pSurface->nClass == SURFCLASS_WATER_OOB_e)) {
             nKind = 10;
         }
     }

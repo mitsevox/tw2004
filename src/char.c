@@ -383,10 +383,10 @@ void Character_UpdateFeetTerrainInfo(Character* pChar, int bNormals) {
 }
 
 // The ground height at pPos (searched from 0.055 above it), with *ppNormal pointed at that ground's
-// normal (a static copy); -65536.125 for none, and for surface classes 0xC and 0x12. Of the
+// normal (a static copy); -65536.125 for none, and for the cup classes. Of the
 // supporting ground (just below the point) and the covering ground (just above it), the covering
-// one is taken when it is the only one, or the supporting one is on class 7 or 0x13, or the two are
-// less than 0.05 apart, or it is less than 1 above the point.
+// one is taken when it is the only one, or the supporting one is on water or not playable, or the
+// two are less than 0.05 apart, or it is less than 1 above the point.
 f32 Character_GetTerrainHeightAndNormal(Character* pChar, f32* pPos, f32** ppNormal) {
     f32 vPos[4];
     f32 fSupportingHeight;
@@ -403,10 +403,12 @@ f32 Character_GetTerrainHeightAndNormal(Character* pChar, f32* pPos, f32** ppNor
                                        gCharSupportingNormal, &fCoveringHeight, &pCoveringSurface,
                                        gCharCoveringNormal);
             if (!(fCoveringHeight < -60000.0f)) {
-                if (fSupportingHeight < -60000.0f || pSupportingSurface->nClass == 7 ||
-                    pSupportingSurface->nClass == 0x13 || fCoveringHeight - fSupportingHeight < 0.05f ||
+                if (fSupportingHeight < -60000.0f || pSupportingSurface->nClass == SURFCLASS_WATER_e ||
+                    pSupportingSurface->nClass == SURFCLASS_NOT_PLAYABLE_e || fCoveringHeight
+                            - fSupportingHeight < 0.05f ||
                     fCoveringHeight < 1.0f + pPos[1]) {
-                    if (pCoveringSurface->nClass == 0xC || pCoveringSurface->nClass == 0x12) {
+                    if (pCoveringSurface->nClass == SURFCLASS_CUP_e
+                        || pCoveringSurface->nClass == SURFCLASS_CUP_GREEN_e) {
                         return -65536.125f;
                     }
                     *ppNormal = gCharCoveringNormal;
@@ -415,7 +417,8 @@ f32 Character_GetTerrainHeightAndNormal(Character* pChar, f32* pPos, f32** ppNor
             } else if (fSupportingHeight < -60000.0f) {
                 goto none;      // fake match: the original puts this return after the supporting height
             }
-            if (pSupportingSurface->nClass == 0xC || pSupportingSurface->nClass == 0x12) {
+            if (pSupportingSurface->nClass == SURFCLASS_CUP_e
+                || pSupportingSurface->nClass == SURFCLASS_CUP_GREEN_e) {
                 return -65536.125f;
             }
             *ppNormal = gCharSupportingNormal;
