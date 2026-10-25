@@ -27,11 +27,11 @@ u32   gUIPicturesAram;          // the menus' 'GRPS'/'MPCS' data's ARAM address
 UILoaded gUITextureBanks;       // the texture banks the 'TXFS' handler keeps (UI_StreamLoadTextures)
 
 void UI_UnregisterStreamClients(void);
-void UI_StreamLoadFile(UStreamObject* pObject);
-void UI_StreamLoadTextures(UStreamObject* pObject);
-void UI_StreamLoadPictures(UStreamObject* pObject);
+void UI_StreamLoadFile(TStreamData* pObject);
+void UI_StreamLoadTextures(TStreamData* pObject);
+void UI_StreamLoadPictures(TStreamData* pObject);
 void UI_RelocatePictureList(UINamedList* pList);
-void UI_StreamLoadFonts(UStreamObject* pObject);
+void UI_StreamLoadFonts(TStreamData* pObject);
 u8 UI_TestTextureGroupChkRef(int nKind);
 void UI_RefreshFileEntries(void);                          // uiProcessInterface.c
 void fn_80010028(TexBank* pBank);                          // LLTex.c: free a texture bank
@@ -91,7 +91,7 @@ void UI_UnregisterStreamClients(void) {
 // 'DATS' handler: keep a copy of the UI file (gpUIFileData) and free the stream object. While the
 // menus are being started (game type 10) and the file has never been parked in ARAM (gUIFileAram
 // 0), its size is noted for UI_ParkFileInAram, rounded up past the next multiple of 32.
-void UI_StreamLoadFile(UStreamObject* pObject) {
+void UI_StreamLoadFile(TStreamData* pObject) {
     void* pData;
 
     if (gUIFileAram == 0 && gSession.nGameType == 10) {
@@ -106,7 +106,7 @@ void UI_StreamLoadFile(UStreamObject* pObject) {
 // 'TXFS' handler: when UI_TestTextureGroupChkRef wants the texture group's kind (its id modulo
 // 100000), build its texture bank (TX_spDownloadData) into the next of gUITextureBanks' five slots
 // (nothing checks the count); the stream object is freed either way.
-void UI_StreamLoadTextures(UStreamObject* pObject) {
+void UI_StreamLoadTextures(TStreamData* pObject) {
     if (UI_TestTextureGroupChkRef((int)pObject->uId % 100000)) {
         gUITextureBanks.ap4[gUITextureBanks.nCount] = TX_spDownloadData(pObject, NULL, 0);
         gUITextureBanks.nCount++;
@@ -123,7 +123,7 @@ u8    gbUIPicturesToAram = 1;   // the menus' 'GRPS'/'MPCS' data has not been co
 // are dropped, and the list stays NULL until UI_RestoreMenuPictures brings it back from ARAM.
 // Outside the menus every copy is kept. A kept copy is relocated (UI_RelocatePictureList); the
 // stream object is freed.
-void UI_StreamLoadPictures(UStreamObject* pObject) {
+void UI_StreamLoadPictures(TStreamData* pObject) {
     UINamedList* pData;
 
     if (strcmp(gUIInterfaceName, "frontend") == 0) {
@@ -167,7 +167,7 @@ void UI_RelocatePictureList(UINamedList* pList) {
 // turn the offsets into pointers, load each font into a free font slot and note the slot in the
 // font's nSlot; the stream object is freed.
 // port: the data stores 32-bit offsets where the code expects pointers, as the GameCube's are.
-void UI_StreamLoadFonts(UStreamObject* pObject) {
+void UI_StreamLoadFonts(TStreamData* pObject) {
     u32* pData;
     u32 i;
     int nSlot;

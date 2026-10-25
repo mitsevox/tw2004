@@ -30,7 +30,7 @@ int fn_8001013C(void) {
 
 // The 'txf ' stream handler: loads the object's bank into the list (once for each record that
 // asks for it, when records are in use), then frees the object.
-void fn_80010180(UStreamObject* pObject) {
+void fn_80010180(TStreamData* pObject) {
     TexGrpRec* pRec;
     int nC;
     int nRec;
@@ -217,7 +217,7 @@ int fn_80010760(u32 uId, int nAfter) {
     return -1;
 }
 
-int fn_800107C0(UStreamObject* pObject, TexBank* pBank, int n) {
+int fn_800107C0(TStreamData* pObject, TexBank* pBank, int n) {
     return fn_800106F0(TX_spDownloadData(pObject, pBank, n));
 }
 

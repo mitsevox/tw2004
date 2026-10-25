@@ -6,11 +6,11 @@
 #include "engine.h"
 #include "ustream.h"
 
-UStreamObject* gpResHead;               // the newest default resource (the divider when none)
-UStreamObject* gpResDivider;            // gResDivider while the list is set up, else NULL
-UStreamObject* gpResTail;               // the newest of a hole's resources (the divider when none)
+TStreamData* gpResHead;                 // the newest default resource (the divider when none)
+TStreamData* gpResDivider;              // gResDivider while the list is set up, else NULL
+TStreamData* gpResTail;                 // the newest of a hole's resources (the divider when none)
 Resources_EResourceClass gResCurrentClass;  // the class Resources_Add adds under
-UStreamObject gResDivider;              // between the two classes; never freed
+TStreamData gResDivider;                // between the two classes; never freed
 
 // Empties the resource list: only the divider is in it, as both its head and its tail.
 void Resources_InitModule(void) {
@@ -33,7 +33,7 @@ void Resources_vSetCurrentResourceClass(Resources_EResourceClass eClass) {
 
 // Adds a resource at the current class's end of the list: a default one at the head, a hole's at
 // the tail.
-void Resources_Add(UStreamObject* pRes) {
+void Resources_Add(TStreamData* pRes) {
     pRes->pPrev = NULL;
     pRes->pNext = NULL;
     if (gResCurrentClass == RESOURCES_CLASS_DEFAULT) {
@@ -48,8 +48,8 @@ void Resources_Add(UStreamObject* pRes) {
 }
 
 // Whether a resource of the same type and id is in the list.
-u8 Resources_IsAlreadyThere(UStreamObject* pRes) {
-    UStreamObject* pCurrentRes = gpResHead;
+u8 Resources_IsAlreadyThere(TStreamData* pRes) {
+    TStreamData* pCurrentRes = gpResHead;
 
     while (pCurrentRes != NULL) {
         if (pCurrentRes->uType == pRes->uType && pCurrentRes->uId == pRes->uId) {
@@ -62,7 +62,7 @@ u8 Resources_IsAlreadyThere(UStreamObject* pRes) {
 
 // Whether a resource of this type and id is in the list.
 u8 Resources_IsIDRefAlreadyThere(u32 uType, u32 uId) {
-    UStreamObject* pRes = gpResHead;
+    TStreamData* pRes = gpResHead;
 
     while (pRes != NULL) {
         if (pRes->uType == uType && pRes->uId == uId) {
@@ -75,7 +75,7 @@ u8 Resources_IsIDRefAlreadyThere(u32 uType, u32 uId) {
 
 // Takes a resource out of the list and frees it, calling its own free function first. The divider
 // is unlinked but never freed.
-void Resources_Del(UStreamObject* pRes) {
+void Resources_Del(TStreamData* pRes) {
     if (pRes->pfnFree != NULL) {
         pRes->pfnFree(pRes);
     }
@@ -103,8 +103,8 @@ void Resources_Del(UStreamObject* pRes) {
 // Frees every resource of both classes and unlinks the divider: the list is empty until
 // Resources_InitModule sets it up again.
 void Resources_CloseModule(void) {
-    UStreamObject* pRes = gpResHead;
-    UStreamObject* pDelRes;
+    TStreamData* pRes = gpResHead;
+    TStreamData* pDelRes;
 
     while (pRes != NULL) {
         pDelRes = pRes;
@@ -119,8 +119,8 @@ void Resources_CloseModule(void) {
 // Frees every resource of a class: when a hole unloads, the hole's ones past the divider. The
 // divider stays. The branch for the default class has no caller.
 void Resources_DelAllClassResources(Resources_EResourceClass eClass) {
-    UStreamObject* pRes;
-    UStreamObject* pDelRes;
+    TStreamData* pRes;
+    TStreamData* pDelRes;
 
     if (eClass == RESOURCES_CLASS_DEFAULT) {
         pRes = gpResHead;
@@ -142,8 +142,8 @@ void Resources_DelAllClassResources(Resources_EResourceClass eClass) {
 }
 
 // The resource of this type and id; NULL when there is none.
-UStreamObject* Resources_Get(u32 uType, u32 uId) {
-    UStreamObject* pRes;
+TStreamData* Resources_Get(u32 uType, u32 uId) {
+    TStreamData* pRes;
 
     for (pRes = gpResHead; pRes != NULL; pRes = pRes->pPrev) {
         if (pRes->uType == uType && pRes->uId == uId) {
@@ -195,8 +195,8 @@ TChunkR* Resources_GetChunkInBuffer(u8* pBuffer, u32 uBuffSize, u32 uTag, u32 uI
 
 // For a resource that streamed in again while its old copy is in the list: frees the new copy. It
 // looks the old one up first, but does nothing with it.
-void Resources_UpdateOldResourceTime(UStreamObject* pRes) {
-    UStreamObject* pOldRes = gpResHead;
+void Resources_UpdateOldResourceTime(TStreamData* pRes) {
+    TStreamData* pOldRes = gpResHead;
 
     while (pOldRes != NULL) {
         if (pOldRes->uType == pRes->uType && pOldRes->uId == pRes->uId) {

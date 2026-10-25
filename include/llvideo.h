@@ -15,7 +15,7 @@
 // the stream buffer, its tag word replaced by that buffer. A piece of the movie spans nMore + 1
 // chunks in a row.
 typedef struct VideoChunk {
-    UStreamBuffer* pBuffer;             // 0x00  the buffer it sits in (in use while it is queued)
+    CDBuf* pBuffer;                     // 0x00  the buffer it sits in (in use while it is queued)
     u32  uLength;                       // 0x04  header included
     u8   unk8[4];
     int  nSlot;                         // 0x0C  the slot of the movie it belongs to
@@ -75,5 +75,6 @@ extern u8 gbVideoFrameWasOpen;                 // fn_80007258()'s value when the
 
 // Play the movie file pName; pfnStop(pVideo, nArg) nonzero stops it early.
 void LLVideo_PlayFile(const char* pName, u8 (*pfnStop)(Video* pVideo, int nArg), int nArg, int nFlags);
+void LLVideo_HandleChunk(VideoChunk* pChunk);   // UStream.c hands it each MPG2 chunk
 
 #endif

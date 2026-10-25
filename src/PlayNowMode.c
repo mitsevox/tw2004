@@ -49,7 +49,7 @@ s32 gPlayNowSavedWind;                  // gSession.options.nWind saved while a 
 void PlayNow_SelectGroup(int nGroup);
 s32 PlayNow_GetNumGroups(void);
 void PlayNow_UnregisterStreamClients(void);
-void PlayNow_LoadPLYFromStream(UStreamObject* pObject);
+void PlayNow_LoadPLYFromStream(TStreamData* pObject);
 
 int   PlayNow_GetChallengeTarget(int i);
 void  PlayNow_ApplyChallengeSetup(void);
@@ -57,7 +57,7 @@ void  PlayNow_Shutdown(void);
 void  PlayNow_HoleStart(void);
 void  PlayNow_EndGame(void);
 void  PlayNow_HoleOver(int nPlayer);
-void  PlayNow_LoadPLYsFromStream(UStreamObject* pObject);
+void  PlayNow_LoadPLYsFromStream(TStreamData* pObject);
 int   PlayNow_GetGroupTarget(int iUnused);
 void  PlayNow_QueueMedalMessage(int nMedal);
 u8    PlayNow_HasAllMedals(int nProfile);
@@ -155,7 +155,7 @@ void PlayNow_UnregisterStreamClients(void) {
 
 // The 'PLY ' stream object (EA's DATA\PLAYNOW_GC.BIN): the 83 challenges, copied into
 // gPlayNowChallenges.
-void PlayNow_LoadPLYFromStream(UStreamObject* pObject) {
+void PlayNow_LoadPLYFromStream(TStreamData* pObject) {
     // port: the 'PLY ' object is copied straight into the challenges (Challenge[83]); it is
     //       big-endian on disc, so a little-endian port converts it field by field here
     //       (docs/game/formats/byte-order.md)
@@ -165,7 +165,7 @@ void PlayNow_LoadPLYFromStream(UStreamObject* pObject) {
 // The 'PLYs' stream object (EA's PLAYNOW.STR): the groups' names and descriptions, the text block
 // Challenge.nGroupName and nGroupDesc are offsets into, copied into a new 16-byte aligned block at
 // gPlayNowText; the stream's copy is freed. An empty object leaves gPlayNowText as it was.
-void PlayNow_LoadPLYsFromStream(UStreamObject* pObject) {
+void PlayNow_LoadPLYsFromStream(TStreamData* pObject) {
     void* pData;
     u32 nSize = fn_8000E81C(pObject, &pData);
     if (nSize) {

@@ -11,7 +11,7 @@
 #include "platform.h"
 
 struct CourseInfo;
-struct UStreamObject;
+struct TStreamData;
 struct UObjMesh;                    // dynobj.h: the hole data is a tree of them
                                     // (Ter_GetMeshNext..Ter_GetHoleModelRoot)
 
@@ -131,9 +131,9 @@ typedef struct TerLODData {
 // course, which TW06 keeps in Ter_TerrainGameDataMgr: GetTGD, Ter_GetTGD, returns pCourse).
 typedef struct Ter_TerrainRendererMgr {
     void*        pCurrentHoleData;              // 0x000  made from the 'ter ' chunk's data (fn_800073B4)
-    struct UStreamObject* pCurrentHoleDataStreamData;   // 0x004  the 'ter ' chunk
+    struct TStreamData* pCurrentHoleDataStreamData;     // 0x004  the 'ter ' chunk
     struct CourseInfo* pCourse;                 // 0x008  NULL until loaded
-    struct UStreamObject* pCourseStreamData;    // 0x00C  the chunk pCourse came in
+    struct TStreamData* pCourseStreamData;      // 0x00C  the chunk pCourse came in
     Ter_PatchReference*  pPatchList;            // 0x010  iTotalPatches of them
     Ter_PatchReference*  pPostDrawTerrainList;  // 0x014  iTotalPostDrawTerrainPatches of them
     Ter_ObjectReference* pObjectSortList;       // 0x018  iTotalSortObjects of them
@@ -245,8 +245,8 @@ void Ter_StopCrowdAnimation(u8 bReset);
 f32  Ter_GetCrowdAnimationCountdown(void);
 f32  Ter_GetCrowdAnimationDelayedStartPercentage(void);
 f32  Math_Floor(f32 x);            // floor
-void Ter_TeeLoadCallback(struct UStreamObject* pObject);   // a tee's position (TerPosData)
-u8   Ter_PinLoadCallback(struct UStreamObject* pObject);   // a pin's position (TerPosData)
+void Ter_TeeLoadCallback(struct TStreamData* pObject);     // a tee's position (TerPosData)
+u8   Ter_PinLoadCallback(struct TStreamData* pObject);     // a pin's position (TerPosData)
 void RenderState_SetBlendFactors(int a, int b);     // renderer state: n10 and n14
 void RenderState_SetConstantAlphaOn(u8 b);             // renderer state
 void RenderState_SetConstantAlpha(u8 b);             // renderer state

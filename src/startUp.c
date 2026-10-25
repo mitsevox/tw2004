@@ -48,7 +48,7 @@ void   Startup_SendCardFullMsg(void);
 void   Startup_SendSaveDamagedMsg(void);
 void   Startup_UpdateCardStatuses(void);
 u8     Startup_AreAllSlotsEmpty(void);
-void   Startup_LoadLegalPicture(UStreamObject* pObject);
+void   Startup_LoadLegalPicture(TStreamData* pObject);
 
 // port: the GameCube's audio and ARAM libraries and their set-up.
 void   AIInit(u8* pStack);
@@ -592,7 +592,7 @@ void HwVoice_SetReverb(u16 nVoice, u8 bA, u8 bB) {
 
 // A streamed sound's first chunk (nBuffer 0, the first half of its ARAM buffer) sets the voice's
 // decoder: the chunk's coefficients and its first frame's header, also used when it loops.
-void HwVoice_SetStreamDecoder(u16 nVoice, StreamChunk* pChunk, u32 uSize, int nBuffer) {
+void HwVoice_SetStreamDecoder(u16 nVoice, StmBlock* pChunk, u32 uSize, int nBuffer) {
     Voice* p = &gpHwVoices[nVoice];
     if (nBuffer == 0) {
         u8 nHeader = pChunk->aData[0];
@@ -1303,7 +1303,7 @@ void startup_UnregisterStreamClients(void) {
 // uiProcessPolygon.c UI_PlayStartUpMovies shows the first after the start-up movies and frees it)
 // and free each object. A copy's size is rounded up to 128 bytes (a size already a multiple of 128
 // gets 128 more).
-void Startup_LoadLegalPicture(UStreamObject* pObject) {
+void Startup_LoadLegalPicture(TStreamData* pObject) {
     s32 nPad = 128 - (s32)pObject->uSize % 128;
     if (gnLegalPictures == 0) {
         gLegalPictureSize = pObject->uSize + nPad;

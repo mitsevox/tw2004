@@ -672,5 +672,7 @@ void Mov_Init(void);
 void Mov_Exit(void);
 void Mov_Start(void);
 void Mov_Tick(void);
+struct MovieSoundBlock;
+void Mov_SendSoundBlock(struct MovieSoundBlock* pBlock);    // UStream.c: a DSPM / VAGM / XADP chunk
 
 #endif

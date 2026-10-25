@@ -109,7 +109,7 @@ void FE_RenderGolfer(u8 bFull);
 void FE_SetupCharState(void);
 void FE_CharPositionOverwrite(void);
 void FE_RotateCrAPModel(f32 fTurn);
-void FE_lite_vStreamCallback(UStreamObject* pObject);
+void FE_lite_vStreamCallback(TStreamData* pObject);
 void FE_vExecuteClearGolferCache(void);
 void FE_vFreeUnusedCharacters(void);
 u8   FE_IsGolferInOtherSlot(int nGolfer, CrAPGolfer* pGolfer);
@@ -382,7 +382,7 @@ void FE_StreamFunc_SkinClose(void) {
 // Run the stream until it has nothing left to do, then finish the state; after an interrupt the
 // golfer is marked not loaded (bLoaded).
 void FE_StreamFunc_SkinUpdate(void) {
-    if (!UStream_Update()) {
+    if (!Stream_Progress()) {
         if (gFEStreamStateMgr.bAbort) {
             gpCrAPState->pLoadingGolfer->bLoaded = 0;
         }
@@ -1287,7 +1287,7 @@ void FE_lite_vRegisterStreamClients(void) {
 
 // A 'LITE' object: copy its lights (little-endian) into gFEGolferLights, swapping each value's
 // bytes, and make them light set 0's.
-void FE_lite_vStreamCallback(UStreamObject* pObject) {
+void FE_lite_vStreamCallback(TStreamData* pObject) {
     SwapField aLightHeaderDef[] = {
         { 4, 4 },                                           // nLights
         { 12, 4 },

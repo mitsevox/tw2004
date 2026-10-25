@@ -37,7 +37,7 @@ GolferRecord gCurGolferRecord;      // 0x801CB1C0
 Player       gPlayers[5];           // 0x801C66E8
 
 void Luck_ResetOdds(int nPlayer);
-void Golfer_OnStatsLoaded(UStreamObject* pObject);
+void Golfer_OnStatsLoaded(TStreamData* pObject);
 void Golfer_TableByteSwap(void);
 int  Golfer_TierBonus(int nTier);
 void Player_SetGolfer(int nPlayer, int nGolfer, int nController, u32 uBag, int bRightSide);
@@ -182,7 +182,7 @@ void Golfer_UnregisterStatsHandler(void) {
 }
 
 // The 'stat' handler: copy the file over the table, fix its endianness, set it up.
-void Golfer_OnStatsLoaded(UStreamObject* pObject) {
+void Golfer_OnStatsLoaded(TStreamData* pObject) {
     Mem_cpy(gGolferTable, pObject->pData, pObject->uSize);
     Golfer_TableByteSwap();
     Circular_MemFreeFunc(pObject);
@@ -508,7 +508,7 @@ void Golfer_TableByteSwap(void) {
 }
 
 // The 'rcrd' handler: the courses' records into the session.
-void Session_OnRecordsLoaded(UStreamObject* pObject) {
+void Session_OnRecordsLoaded(TStreamData* pObject) {
     // port: the records are big-endian on disc and copied straight over the course-record structs;
     //       a little-endian port converts them field by field here.
     Mem_cpy(gSession.aCourseRecord, pObject->pData, pObject->uSize);

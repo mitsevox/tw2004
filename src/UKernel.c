@@ -24,11 +24,11 @@ DynObj* Kernel_CreateObject(DynObjSetup* pSetup);
 void fn_8000E830(DynObj* pObj);
 void UObject_ComposeRotation(f32 (*pMtx)[4]);
 
-void Gaud_ActorDownloadCallback(UStreamObject* pObject, int n);
+void Gaud_ActorDownloadCallback(TStreamData* pObject, int n);
 void PlayNow_LoadBallSpot(void* pObj);
 
 void Kernel_FreeObjectMem(void* p);
-void Kernel_DownloadActors(UStreamObject* pObject);
+void Kernel_DownloadActors(TStreamData* pObject);
 
 // Memory for an object of nSize bytes: a node of the small or the large pool while one is free,
 // else from the heap.
@@ -59,7 +59,7 @@ void Kernel_FreeObjectMem(void* p) {
 // (fn_8009943C), 8 is dropped, 9 is a sound (Gaud_ActorDownloadCallback), 10 the Play Now ball
 // spot. Any other type becomes a dynamic object: its 'aRSL' resource list is resolved into model
 // references, its handler found by type (DynObj_GetTypeHandler), and the stream object is freed.
-void Kernel_DownloadActors(UStreamObject* pObject) {
+void Kernel_DownloadActors(TStreamData* pObject) {
     DynObjSetup setup;
     TChunkR* pChunk;
     int i;
@@ -111,7 +111,7 @@ void Kernel_DownloadActors(UStreamObject* pObject) {
     setup.pC = (DynObjNames*)pObject;
     pObject->pData = (u8*)setup.pModel;
     pObject->pfnFree = NULL;
-    pObject->uUnk4 = Kernel_CreateObjectId(&setup);
+    pObject->uHandlerData = Kernel_CreateObjectId(&setup);
     Circular_MemFreeFunc(pObject);
 }
 

@@ -10,7 +10,7 @@
 #include "camera.h"
 #include "unsorted/cull.h"
 
-static void StaticCam_LoadCAMCfromStream(UStreamObject* pStreamData);
+static void StaticCam_LoadCAMCfromStream(TStreamData* pStreamData);
 static void StaticCam_SetupFlybyCameraPointers(CamShot* pCurCamera, CamShot** pPrevCamera,
                                                CamShot** pNextCamera, CamShot** pNextNextCamera);
 static u8   StaticCam_CheckHotZone(CamShot* script, int ePlayerID);
@@ -32,7 +32,7 @@ void StaticCam_UnRegisterStreamClients(void) {
 // The 'CAMC' stream handler: the fly-by routes' timing curves, byte-swapped from the file (a
 // two-word header into uUnread and nCurves, then each curve's four words and its keys, 0x22 bytes
 // each in the file) into pCurves, allocated here. Frees the object.
-static void StaticCam_LoadCAMCfromStream(UStreamObject* pStreamData) {
+static void StaticCam_LoadCAMCfromStream(TStreamData* pStreamData) {
     SwapField headerElmDef[2] = { { 4, 4 }, { 4, 4 } };
     SwapField curveElmDef[4] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };
     SwapField nodeElmDef[3] = { { 0x20, 4 }, { 1, 1 }, { 1, 1 } };
@@ -68,7 +68,7 @@ static void StaticCam_LoadCAMCfromStream(UStreamObject* pStreamData) {
 // next camera's number and its own, and bHasPrev is set; bLinked is cleared so that the next
 // StaticCam_GetFlyByCam links them again. The crowd fly-by's cameras (STATICCAM_CROWD_ROUTE) hide
 // the golfer. Frees the object.
-void StaticCam_ParseFlybyCameraActor(UStreamObject* pCameraActor) {
+void StaticCam_ParseFlybyCameraActor(TStreamData* pCameraActor) {
     char szName[0x20];
     FlybyCamFromTess_t* camPtr;
 
@@ -119,7 +119,7 @@ void StaticCam_ParseFlybyCameraActor(UStreamObject* pCameraActor) {
 // events it serves and the rest of its StaticCamFromTess_t; a cut (CAMINTERP_CUT) to it, heights 0
 // to 10000. The point it looks at, vLook, is one unit from its position along its three angles
 // (mat44flt_EulerAngles). Frees the object.
-void StaticCam_ParseStaticCameraActor(UStreamObject* pCameraActor) {
+void StaticCam_ParseStaticCameraActor(TStreamData* pCameraActor) {
     f32 straightAheadVec[4] = { 0.0f, 0.0f, 1.0f, 0.0f };
     char szName[0x20];
     f32 eulerMatrix[4][4];

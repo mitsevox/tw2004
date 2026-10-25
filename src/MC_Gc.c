@@ -16,8 +16,8 @@
 void fn_8006C63C(void);         // called in every wait for a CARD library result (not yet known)
 void fn_8009DC80(s32 nPort, s32 nSlot, s32 nResult);
 void fn_8009DCE8(void);
-void fn_8009EB30(UStreamObject* pObject);
-void fn_8009EB38(UStreamObject* pObject);
+void fn_8009EB30(TStreamData* pObject);
+void fn_8009EB38(TStreamData* pObject);
 void MC_OnBusy(s32 nPort, s32 nSlot);
 s32  fn_8009E280(s32 nPort, s32 nSlot, s32 nFile, CARDStat* pStat);
 s32  fn_8009ED34(s32 nPort, s32 nSlot, const char* pName, const char* pBackupName);
@@ -59,8 +59,8 @@ s32   lbl_80281FCC;
 s32   lbl_80281FC8;
 u32   lbl_80281FC4;
 u32   lbl_80281FC0;
-UStreamObject* lbl_80281FBC;
-UStreamObject* lbl_80281FB8;
+TStreamData* lbl_80281FBC;
+TStreamData* lbl_80281FB8;
 s32   lbl_80281FB4;
 s32   lbl_80281FB0;
 
@@ -918,11 +918,11 @@ void MC_UnRegisterStreamClients(void) {
     Stream_UnregisterLoadChunkCallback('eagm');
 }
 
-void fn_8009EB30(UStreamObject* pObject) {
+void fn_8009EB30(TStreamData* pObject) {
     lbl_80281FB8 = pObject;
 }
 
-void fn_8009EB38(UStreamObject* pObject) {
+void fn_8009EB38(TStreamData* pObject) {
     lbl_80281FBC = pObject;
 }
 

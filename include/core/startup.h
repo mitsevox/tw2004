@@ -144,12 +144,12 @@ LAYOUT_ASSERT(Voice, 0x68);
 // One 0x8000-byte chunk of a streamed sound (Stm_SendBlockToVoices): the decoder's coefficients, then the
 // ADPCM data it DMAs into one half of the voice's ARAM buffer. The data's first byte is its first
 // frame's header (predictor and scale).
-typedef struct StreamChunk {
+typedef struct StmBlock {
     u32  a0[8];                 // 0x000  -> Voice.a18
     u8   unk20[0x100 - 0x20];
     u8   aData[0x7F00];         // 0x100
-} StreamChunk;
-LAYOUT_ASSERT(StreamChunk, 0x8000);
+} StmBlock;
+LAYOUT_ASSERT(StmBlock, 0x8000);
 
 // One block of a movie's stereo sound (Mov_SendSoundBlock): each channel's coefficients, then each
 // channel's 0x2FC0 bytes of ADPCM data.
@@ -173,7 +173,7 @@ typedef struct MovieSoundBlock {
 // DMA nLen bytes from main memory to ARAM; pfnDone(n) is called when it is done. Returns 1.
 int AudDma_ToAram(u32 uAram, void* pSrc, int nLen, void (*pfnDone)(u32 n), int n);
 // Hand a streamed block's ADPCM header to voice nVoice (only for the buffer's first half).
-void HwVoice_SetStreamDecoder(u16 nVoice, StreamChunk* pChunk, u32 uSize, int nBuffer);
+void HwVoice_SetStreamDecoder(u16 nVoice, StmBlock* pChunk, u32 uSize, int nBuffer);
 // Cancel the ARAM transfers queued for pOwner.
 void AudDma_CancelOwner(void* pOwner);
 // The CPU cache work around a DMA of uLen bytes at p (nDir an ARQ_TYPE_*); GoARAM.c uses them too.

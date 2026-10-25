@@ -39,7 +39,7 @@ order	area	file	task	scope	state
 38	Core services	UMatFlt.c	pass	the whole file	done
 38	Core services	UMath.c	pass	the whole file	done
 38	Core services	UMemPool.c	pass	the whole file	done
-39	Core services	UStream.c	chunk 1/2	UStream_ReleaseBuffer .. UStream_Update	open
+39	Core services	UStream.c	chunk 1/2	addToFreeList .. Stream_Progress	done
 40	Core services	UStream.c	chunk 2/2	UStream_ReleaseObjectBuffer .. fn_8000E81C	open
 41	Core services	UStream.c	whole-file review	the whole file	open
 42	The course	CourseData.c	pass	the whole file	open

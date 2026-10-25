@@ -428,7 +428,7 @@ int  fn_8000EA1C(u8* pCode, int nArg, int nPush, struct DynObj* pObj);
 int  fn_800102DC(u64 uHash, TexBank** ppBank, TexEntry** ppTex);
 // Makes a texture bank from a 'txf ' stream object's data (LLTex.c), in pBank or, when it is NULL,
 // a new allocation.
-TexBank* TX_spDownloadData(struct UStreamObject* pObject, TexBank* pBank, int n);
+TexBank* TX_spDownloadData(struct TStreamData* pObject, TexBank* pBank, int n);
 void TX_vFreeTextureDataInTextureGroup(TexBank* pBank); // LLTex.c: free a bank's pixel and palette data
 // LLTex.c: the index of the bank's texture with this packed name, or TX_NO_TEXTURE_INDEX.
 int  TX_uiFindTextureIndexFromID(TexBank* pBank, u64 uHash);
@@ -463,7 +463,7 @@ typedef struct LoadObjInfo {
 LAYOUT_ASSERT(LoadObjInfo, 0x24);
 extern LoadObjInfo gFEtmLoadScreenInfo;
 extern u8* gpFEtmLoadScreenData;
-extern struct UStreamObject* gpFEtmLoadingBarObject;
+extern struct TStreamData* gpFEtmLoadingBarObject;
 
 // LLTex.c: points at a flag byte RenderState_SetConstantAlphaActive (Code80015470.c) sets; while
 // it is set, the shader objects' untextured stage takes its alpha from the constant colour, not
@@ -509,7 +509,7 @@ LAYOUT_ASSERT(TexGrpList, 0x20);
 
 void fn_80010544(int nSlot);            // frees the bank in slot nSlot and empties the slot
 TexBank* fn_800106C4(int nSlot);        // the bank in slot nSlot
-int  fn_800107C0(struct UStreamObject* pObject, TexBank* pBank, int n);   // loads a bank: its slot
+int  fn_800107C0(struct TStreamData* pObject, TexBank* pBank, int n);     // loads a bank: its slot
 
 // ---- disc reads (LLFileIO_Gc.c) ------------------------------------------------------------------
 
@@ -1230,14 +1230,15 @@ void PostFx_SetBlur(u8 b, int nView, f32 f4, f32 f8);   // sets (b) or clears vi
 // loading bar's; URes.c's divider gResDivider is one), then the rest of the
 // copied chunk header (chunk+0x30 onward: a word, the name's length at 0x38, the name at 0x40)
 // and, 0x80-aligned, the data.
-typedef struct UStreamObject {
+typedef struct TStreamData {
     u8*   pData;                  // 0x00
-    u32   uUnk4;                  // 0x04
-    void (*pfnFree)(struct UStreamObject* pObject);   // 0x08  its handler's clean-up, which
+    u32   uHandlerData;           // 0x04  0 when made; what its handler made of it, kept here (a
+                                  //       'TEO ' model, a 'Cact' object's kernel id)
+    void (*pfnFree)(struct TStreamData* pObject);     // 0x08  its handler's clean-up, which
                                   //       Resources_Del calls before it frees the object
-    struct UStreamObject* pPrev;  // 0x0C  finished-object queue; resource list: toward the tail
-    struct UStreamObject* pNext;  // 0x10  resource list: toward the head
-    int   nUnk14;                 // 0x14
+    struct TStreamData* pPrev;    // 0x0C  finished-object queue; resource list: toward the tail
+    struct TStreamData* pNext;    // 0x10  resource list: toward the head
+    int   nReserved;              // 0x14  cleared when the object is made; nothing reads it
     u32   uFlags;                 // 0x18  chunk+0x14: where its block came from (a TTypeAcces;
                                   //       MEMTYPE_HIGH for txf / Cpyr / Cact / txf2)
     u32   uType;                  // 0x1C  chunk+0x18, e.g. 'ter '
@@ -1245,17 +1246,17 @@ typedef struct UStreamObject {
                                   //       finds objects by type and id); for skalib's SAL and BNK
                                   //       objects, the animation slot
     u32   uSize;                  // 0x24  chunk+0x20 decompressed size
-    u32   uRef28;                 // 0x28  chunk+0x24 } rebased by the RPNS value when the
-    u32   uRef2C;                 // 0x2C  chunk+0x28 } object is delivered
-    u32   uRef30;                 // 0x30  chunk+0x2C }
-} UStreamObject;
-LAYOUT_ASSERT(UStreamObject, 0x34);
+    u32   aScriptRefs[3];         // 0x28  chunk+0x24: three byte-code scripts (fn_8000EA1C), offsets
+                                  //       into the last 'RPNS' object's data until Stream_Progress
+                                  //       makes them pointers (DynObjNames reads them so)
+} TStreamData;
+LAYOUT_ASSERT(TStreamData, 0x34);
 
-int  Stream_RegisterLoadChunkCallback(int nType, void (*pfnHandler)(UStreamObject*));
+int  Stream_RegisterLoadChunkCallback(int nType, void (*pfnHandler)(TStreamData*));
 int  Stream_UnregisterLoadChunkCallback(int nType);
 // Copies the object's data out and frees the object.
-u32  Stream_StreamLoadFixedSize(UStreamObject* pObject, u32 uMax, void* pDst);
-u32  fn_8000E81C(UStreamObject* pObject, void** ppData);          // the data and its size
+u32  Stream_StreamLoadFixedSize(TStreamData* pObject, u32 uMax, void* pDst);
+u32  fn_8000E81C(TStreamData* pObject, void** ppData);            // the data and its size
 
 // ---- the resource list (URes.c) ---------------------------------------------------------------
 
@@ -1270,13 +1271,13 @@ typedef enum Resources_EResourceClass {
 void Resources_InitModule(void);
 // Sets the class Resources_Add adds under.
 void Resources_vSetCurrentResourceClass(Resources_EResourceClass eClass);
-void Resources_Add(UStreamObject* pRes);
-u8   Resources_IsAlreadyThere(UStreamObject* pRes);
+void Resources_Add(TStreamData* pRes);
+u8   Resources_IsAlreadyThere(TStreamData* pRes);
 u8   Resources_IsIDRefAlreadyThere(u32 uType, u32 uId);
-void Resources_Del(UStreamObject* pRes);
+void Resources_Del(TStreamData* pRes);
 void Resources_CloseModule(void);
 void Resources_DelAllClassResources(Resources_EResourceClass eClass);
-UStreamObject* Resources_Get(u32 uType, u32 uId);   // NULL: none
+TStreamData* Resources_Get(u32 uType, u32 uId);     // NULL: none
 
 // A chunk in a buffer of chunks (Resources_GetDataInBuffer): this header, then the data, then
 // padding to 4 bytes.
@@ -1289,7 +1290,7 @@ LAYOUT_ASSERT(TChunkR, 0xC);
 
 void* Resources_GetDataInBuffer(u8* pBuffer, u32 uBuffSize, u32 uTag, u32 uId);
 TChunkR* Resources_GetChunkInBuffer(u8* pBuffer, u32 uBuffSize, u32 uTag, u32 uId);   // NULL: none
-void Resources_UpdateOldResourceTime(UStreamObject* pRes);
+void Resources_UpdateOldResourceTime(TStreamData* pRes);
 
 // ---- fonts -----------------------------------------------------------------------------------
 

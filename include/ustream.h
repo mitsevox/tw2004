@@ -1,5 +1,5 @@
 // ustream.h (our name): the stream loader's own types (UStream.c). The objects it delivers
-// (UStreamObject) and its public calls are in engine.h. The file format is described in
+// (TStreamData) and its public calls are in engine.h. The file format is described in
 // docs/game/formats/ctrl-container.md.
 
 #ifndef USTREAM_H
@@ -12,50 +12,60 @@
 #define USTREAM_MAX_STREAMS   2
 #define USTREAM_MAX_HANDLERS  64
 #define USTREAM_MAX_FILES     8
+#define USTREAM_DATA_ALIGN    0x80      // an object's data starts on this boundary
+#define USTREAM_SHDR_KEPT_SIZE 0x1C     // the SHDR fields every object keeps: StreamChunk.uFlags on,
+                                        // TStreamData.uFlags to its end
+#define USTREAM_SONO_STREAM_HDR 2       // a SONO 'shdr' with this id is the audio stream file's
+                                        // header; any other id is a bank (Ses_AllocBankHdr)
+
+// myAsyncReadCallback's verdict on a read other than 0 (kept)
+#define USTREAM_READ_FAILED   5         // an error, or short of a buffer before the file's end
+#define USTREAM_READ_STALE    0xDEAD    // read from a position the stream has since left
 
 #define TAG(a, b, c, d) (((u32)(a) << 24) | ((u32)(b) << 16) | ((u32)(c) << 8) | (u32)(d))
 
 // The header of a chunk in a stream file (0x40 bytes). Every chunk starts with its tag, its
 // length (header included) and 8 zero bytes. SHOC and SONO chunks go on with a sub-tag; an SHDR's
-// fields from uFlags on are the ones UStreamObject keeps from its uFlags on (UStream_BeginObject
+// fields from uFlags on are the ones TStreamData keeps from its uFlags on (loadStreamChunk
 // copies them), and an SDAT's data or an Rdat's packed piece follows the header.
-typedef struct UStreamChunk {
+typedef struct StreamChunkS {
     u32  uTag;                  // 0x00  'SHOC', 'SONO', 'FILL', 'DSPM', ...
     u32  uLength;               // 0x04  header included
     u8   unk8[8];
     u32  uSubTag;               // 0x10  'SHDR', 'SDAT', 'Rdat'
     u32  uFlags;                // 0x14  SHDR: where the object's block comes from (a TTypeAcces;
-                                //       UStreamObject.uFlags)
+                                //       TStreamData.uFlags)
     u32  uType;                 // 0x18  SHDR: the object's type ('ter ', 'txf ', ...); SONO: 'shdr' / 'samp'
-    u32  uId;                   // 0x1C  SHDR: the object's id (UStreamObject.uId); SONO: which sound memory
-                                //       (2: Ses_AllocStreamFileHdr)
+    u32  uId;                   // 0x1C  SHDR: the object's id (TStreamData.uId); SONO: which sound memory
+                                //       (USTREAM_SONO_STREAM_HDR: Ses_AllocStreamFileHdr)
     u32  uSize;                 // 0x20  SHDR: the object's (unpacked) size
-    u8   unk24[0x34 - 0x24];
-    int  nScriptLen;            // 0x34  SHDR: the first script's length; a 'Csac' has no scripts
-                                //       and keeps nScriptLen + n38 bytes of the header's tail instead
-    int  n38;                   // 0x38  SHDR of a 'Csac': a second length
+    u32  aScriptRefs[3];        // 0x24  SHDR: TStreamData.aScriptRefs
+    u8   unk30[4];
+    int  nScriptLen;            // 0x34  SHDR: the first script's length; a 'Csac' runs no scripts
+                                //       and keeps nScriptLen + nKeepLen bytes of the header's tail
+    int  nKeepLen;              // 0x38  SHDR of a 'Csac': the rest of the tail it keeps
     u8   aScripts[4];           // 0x3C  SHDR: two LLTex scripts (fn_8000EA1C), the first nScriptLen
                                 //       bytes long (they run on past the header)
-} UStreamChunk;
+} StreamChunk;
 
 // The SONO sound being loaded (0x14 bytes): where its data goes and how far it has got.
 typedef struct UStreamSound {
     u8*  pDst;                  // 0x00  the sound memory it is read into; NULL: the data is skipped
     u32  uSize;                 // 0x04
     u32  uPos;                  // 0x08  bytes so far
-    u32  uKind;                 // 0x0C  'shdr' or 'samp' (UStreamChunk.uType)
-    u32  uMemory;               // 0x10  UStreamChunk.uId: which sound memory
+    u32  uKind;                 // 0x0C  'shdr' or 'samp' (StreamChunk.uType)
+    u32  uMemory;               // 0x10  StreamChunk.uId: which sound memory
 } UStreamSound;
 
 // One read buffer: 0x40 bytes of bookkeeping followed by 0x6000 bytes of file data.
-typedef struct UStreamBuffer {
-    struct UStreamBuffer* pNext;   // 0x00  list link
+typedef struct CDBufS {
+    struct CDBufS* pNext;          // 0x00  list link
     int  nFileOffset;              // 0x04  where in the file this buffer came from
-    u32  uPos;                     // 0x08  parse position inside data[]
-    int  nRefs;                    // 0x0C  objects still reading from data[]
+    u32  uPos;                     // 0x08  parse position inside aData
+    int  nRefs;                    // 0x0C  chunks of aData the movie player holds
     u8   pad[0x30];
-    u8   data[USTREAM_BUFFER_SIZE];
-} UStreamBuffer;
+    u8   aData[USTREAM_BUFFER_SIZE];
+} CDBuf;
 
 // What UStream calls when it opens a stream's file and when it is done with it, with that file's
 // apOpenedArg / apClosedArg.
@@ -63,17 +73,17 @@ typedef void (*StreamBeginCallback)(void* pData);
 typedef void (*StreamEndCallback)(void* pData);
 
 // What the caller passes to Stream_OpenStreamFiles (0x284 bytes) - the file list and per-file callbacks.
-typedef struct {
+typedef struct StreamFileList {
     int   nNumFiles;                                 // 0x000
     char  aszName[USTREAM_MAX_FILES][0x40];          // 0x004
     StreamBeginCallback apfnOpened[USTREAM_MAX_FILES];   // 0x204
     StreamEndCallback   apfnClosed[USTREAM_MAX_FILES];   // 0x224
     void* apOpenedArg[USTREAM_MAX_FILES];            // 0x244
     void* apClosedArg[USTREAM_MAX_FILES];            // 0x264
-} UStreamParams;
-LAYOUT_ASSERT(UStreamParams, 0x284);
+} StreamFileList;
+LAYOUT_ASSERT(StreamFileList, 0x284);
 
-int  Stream_OpenStreamFiles(const UStreamParams* pParams);  // a new stream; its index or < 0
+int  Stream_OpenStreamFiles(const StreamFileList* pParams);  // a new stream; its index or < 0
 int  UStream_Close(int nStream);                            // nStream or -1
 
 // ---- the stream manager (StreamManager.c) -----------------------------------------------------
@@ -94,7 +104,7 @@ typedef enum StreamFileType {
 // The stream manager's file lists (gpStreamManagerLists, 0x11A0 bytes) and the stream open on one
 // of them. FEgolferanim.c opens and closes the FE character list itself.
 typedef struct StreamLists {
-    UStreamParams aParams[STREAM_NUM_FILE_TYPES];  // 0x000  by StreamFileType
+    StreamFileList aParams[STREAM_NUM_FILE_TYPES];  // 0x000  by StreamFileType
     int  nStream;               // 0x119C  the open stream (Stream_OpenStreamFiles)
 } StreamLists;
 LAYOUT_ASSERT(StreamLists, 0x11A0);
@@ -150,41 +160,44 @@ void StreamManagerIngame_StreamSacFiles(void);
 void StreamManagerFEChar_SetupFileStream(s32 nGolferId, s32 nIndex);
 
 // A stream (0x2E0 bytes).
-typedef struct {
+typedef struct StrmCBS {
     int   hFile;             // 0x00  -1 when nothing is open
     int   nFileSize;         // 0x04
     int   nFilePos;          // 0x08  next read offset
     int   nUnkC;             // 0x0C  -2 at open
-    u8    bEOF;              // 0x10
-    u8    bWaitingForSWVR;   // 0x11
+    u8    bEOF;              // 0x10  the file is read to its end (or reading was stopped)
+    u8    bEndAtSWVR;        // 0x11  a buffer starting with an SWVR chunk ends the reading; set
+                             //       whenever a file is open
     u8    pad12[2];
-    int   nChunkBudget;      // 0x14  -1 = unlimited; counts reads down to EOF
+    int   nReadBudget;       // 0x14  -1: no limit; else buffers left to read before bEOF (nothing
+                             //       in this build sets one)
     int   nFileIndex;        // 0x18
-    UStreamParams params;    // 0x1C
+    StreamFileList params;   // 0x1C
     u8    pad2A0[0x40];
-} UStream;
+} StrmCB;
 
 typedef struct {
     int   nType;             // a 4-character tag; compared signed (cmpw) in the register calls
-    void  (*pfnHandler)(UStreamObject* pObject);
+    void  (*pfnHandler)(TStreamData* pObject);
     int   nRefs;
 } UStreamHandler;
 
-typedef struct UStreamNode {
-    struct UStreamNode* pNext;
-    UStreamObject* pObject;
-} UStreamNode;
+typedef struct TStreamQueueS {
+    struct TStreamQueueS* pNext;
+    TStreamData* pObject;
+} TStreamQueue;
 
-// The object the parser is filling and how much of its data has arrived (one 8-byte static: the
-// parser reaches both fields off one base register, and UStream_BeginObject sets both).
-typedef struct UStreamFill {
-    UStreamObject* pObject;
+// The object the parser is filling and how much of its data has arrived (loadStreamChunk sets
+// both; SDAT and Rdat chunks fill it).
+typedef struct ParseInProgS {
+    TStreamData* pObject;
     u32 uPos;
-} UStreamFill;
+} ParseInProg;
 
 // The calls the movie player (LLVideo.c) makes on the loader's buffers.
-u8   UStream_Update(void);              // runs the loader once; 0 when nothing is left to read
-void UStream_AddBufferRef(UStreamBuffer** ppList);          // a chunk of the buffer is kept
-void UStream_ReleaseObjectBuffer(UStreamBuffer** ppBuffer);  // a kept chunk is done with
+u8   Stream_Progress(void);             // runs the loader once; 0 when nothing is left to read
+void UStream_AddBufferRef(CDBuf** ppBuffer);                // a chunk of the buffer is kept
+void UStream_SetAutoRead(u8 bAuto);     // set while a movie plays: each read starts the next
+void UStream_ReleaseObjectBuffer(CDBuf** ppBuffer);          // a kept chunk is done with
 
 #endif

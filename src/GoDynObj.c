@@ -52,7 +52,7 @@ f32 gGolfBallScale = 1.0f;
 // The file's state: allocated by DynObj_InitModule, freed by DynObj_CloseModule.
 GoDynObjMgr* gpDynObjState;
 
-void DynObj_LoadBallLogos(UStreamObject* pObject);   // the 'BALL' stream handler
+void DynObj_LoadBallLogos(TStreamData* pObject);     // the 'BALL' stream handler
 void DynObj_DrawTargetModels(s32 nView);
 void DynObj_DrawTargetOverlays(s32 nView);
 void DynObj_DrawBallShadows(u8* aState);
@@ -75,14 +75,14 @@ void DynObj_UpdateTee(int nPlayer);
 
 // ---- sweep code (not yet cleaned up) ----
 
-void DynObj_FreeTeoModel(UStreamObject* arg0);
-void DynObj_LoadTeoModel(UStreamObject* arg0);
+void DynObj_FreeTeoModel(TStreamData* arg0);
+void DynObj_LoadTeoModel(TStreamData* arg0);
 
 // The 'TEO ' stream handler: unless the object is already loaded, builds its model (fn_80045D80)
-// into the stream object's word 4 and sets DynObj_FreeTeoModel as its free handler.
-void DynObj_LoadTeoModel(UStreamObject* arg0) {
+// into the stream object's uHandlerData and sets DynObj_FreeTeoModel as its free handler.
+void DynObj_LoadTeoModel(TStreamData* arg0) {
     if (Resources_IsAlreadyThere(arg0) == 0) {
-        (*(UObjModel**)((u8*)(arg0) + 4)) = fn_80045D80(arg0->pData);
+        arg0->uHandlerData = (u32)fn_80045D80(arg0->pData);
         arg0->pfnFree = DynObj_FreeTeoModel;
         Resources_Add(arg0);
     }
@@ -93,7 +93,7 @@ void DynObj_LoadTeoModel(UStreamObject* arg0) {
 // The 'BALL' stream handler: a bank of ball logos. Each player's chosen logo (its profile's byte
 // 0x38, from gGolfBallLogoTextureNames's names) is copied over the pixels of that player's logo texture
 // ("logoea", "logonike", ...), then the bank is freed.
-void DynObj_LoadBallLogos(UStreamObject* pObject) {
+void DynObj_LoadBallLogos(TStreamData* pObject) {
     u64 uLogo;
     u64 uSlot;
     TexBank* pSlotBank;
@@ -128,10 +128,10 @@ void DynObj_LoadBallLogos(UStreamObject* pObject) {
 
 // Frees a 'TEO ' object's model (the handler DynObj_LoadTeoModel sets): the model's root, then the
 // record itself.
-void DynObj_FreeTeoModel(UStreamObject* arg0) {
+void DynObj_FreeTeoModel(TStreamData* arg0) {
     void* temp_r31;
 
-    temp_r31 = (*(void**)((u8*)(arg0) + 4));
+    temp_r31 = (void*)arg0->uHandlerData;
     fn_800075CC(*(UObjModelRoot**)((u8*)(temp_r31) + 0x10));
     Circular_MemFreeFunc(temp_r31);
 }

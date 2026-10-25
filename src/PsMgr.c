@@ -8,7 +8,7 @@
 #include "lighting.h"
 
 void fn_800A27FC(f32 fLight1, f32 fLight2);
-void fn_800A29B4(UStreamObject* pObject);
+void fn_800A29B4(TStreamData* pObject);
 
 // GoShaderObject_Rain_Gc.c
 void SD_vShaderObject_Rain_Dynamic_Init(void* pRain, f32* pStrength);
@@ -72,7 +72,7 @@ void PsMgr_UnregisterStreamClients(void) {
 
 // The 'sfxd' stream handler: each word (sscanf %s) after an '=' before the first '}' of its text
 // goes into lbl_801F1640 in turn.
-void fn_800A29B4(UStreamObject* pObject) {
+void fn_800A29B4(TStreamData* pObject) {
     char* pEnd;
     char* p;
     int i;

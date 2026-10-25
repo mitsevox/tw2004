@@ -108,8 +108,8 @@ s32* lbl_80282478;
 s32* lbl_80282474;
 CrAPRecord* lbl_80282470;
 s32 lbl_8028246C;
-UStreamObject* lbl_80282468;
-UStreamObject* lbl_80282464;
+TStreamData* lbl_80282468;
+TStreamData* lbl_80282464;
 CrAPDB* lbl_80282460;
 
 // This file, in address order.
@@ -120,8 +120,8 @@ void FE_CrAP_TurnOnAsset(CrAPAsset* pAsset);
 u8   FE_CrAP_IsFadeOutCategory(int nPart);
 int  FE_CrAP_GetAssetIndexFromAsset(CrAPAsset* pAsset);
 int  FE_CrAP_GetFirstCategoryAssetID(s16 nPart);
-void FE_CrAP_LoadAssetsFromStream(UStreamObject* pObject);
-void FE_CrAP_LoadStringsFromStream(UStreamObject* pObject);
+void FE_CrAP_LoadAssetsFromStream(TStreamData* pObject);
+void FE_CrAP_LoadStringsFromStream(TStreamData* pObject);
 void FE_CrAP_PostAssetsLoad(void);
 void FE_CrAP_GetAssetVariantName(CrAPAsset* pAsset, char* pName);
 void CrAPAssetsByteSwap(void);
@@ -909,7 +909,7 @@ void FE_CrAP_UnRegisterStreamClients(void) {
 // The 'CR_A' stream handler: the object's data becomes the asset array (0x118 bytes each),
 // byte-swapped; the object is kept for FE_CrAP_CloseModule to free, and FE_CrAP_PostAssetsLoad
 // runs.
-void FE_CrAP_LoadAssetsFromStream(UStreamObject* pObject) {
+void FE_CrAP_LoadAssetsFromStream(TStreamData* pObject) {
     if (pObject != NULL) {
         lbl_80282460->pAssets = (CrAPAsset*)pObject->pData;
         lbl_80282460->nAssets = pObject->uSize / sizeof(CrAPAsset);
@@ -922,7 +922,7 @@ void FE_CrAP_LoadAssetsFromStream(UStreamObject* pObject) {
 // The 'CR_S' stream handler: the object's data becomes the names the assets use (categories,
 // colours, animations, camera shots, unlock texts); the object is kept for FE_CrAP_CloseModule to
 // free.
-void FE_CrAP_LoadStringsFromStream(UStreamObject* pObject) {
+void FE_CrAP_LoadStringsFromStream(TStreamData* pObject) {
     if (pObject != NULL) {
         lbl_80282460->pStrings = (char*)pObject->pData;
         lbl_80282460->uStringsSize = pObject->uSize;

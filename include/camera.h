@@ -261,7 +261,7 @@ LAYOUT_ASSERT(CamShot, 0xC0);
 // (UKernel.c's Kernel_DownloadActors hands them over); each becomes a CamShot. The fly-by cameras are
 // chained into up to 10 routes, and a 'CAMC' stream object brings a timing curve per route.
 
-// A type 201 object's data (UStreamObject.pData; the same 'Cact' data as DynObjDef, 8 bytes in).
+// A type 201 object's data (TStreamData.pData; the same 'Cact' data as DynObjDef, 8 bytes in).
 typedef struct StaticCamFromTess_t {
     u8   unk0[0x10];
     f32  aPos[3];               // 0x10  -> CamShot.vPos
@@ -1226,8 +1226,8 @@ void   CamUtils_vCalcArcPosition(f32* pt1, f32* pt2, f32* centerPoint, CameraArc
 
 void     StaticCam_RegisterStreamClients(void);     // take the 'CAMC' objects (the hole streamer)
 void     StaticCam_UnRegisterStreamClients(void);
-void     StaticCam_ParseFlybyCameraActor(UStreamObject* pCameraActor);    // 'Cact' type 200
-void     StaticCam_ParseStaticCameraActor(UStreamObject* pCameraActor);   // 'Cact' type 201
+void     StaticCam_ParseFlybyCameraActor(TStreamData* pCameraActor);      // 'Cact' type 200
+void     StaticCam_ParseStaticCameraActor(TStreamData* pCameraActor);     // 'Cact' type 201
 void     StaticCam_Init(void);
 void     StaticCam_DeInit(void);
 void     StaticCam_Reset(void);                     // forget the hole's cameras

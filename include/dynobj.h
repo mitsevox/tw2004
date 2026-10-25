@@ -43,9 +43,9 @@ typedef struct DynObjAnimalDef {
                                 //       0x3C, 0x44)
 } DynObjAnimalDef;
 
-// The stream object an object's model comes from (a view of UStreamObject: its +4 is the model).
+// The stream object an object's model comes from (a view of TStreamData: its +4 is the model).
 typedef struct DynObjModelRef {
-    u8*  pData;                 // 0x00  UStreamObject.pData; an animal's route follows a 12-byte
+    u8*  pData;                 // 0x00  TStreamData.pData; an animal's route follows a 12-byte
                                 //       header in it (ActAnimal_Init)
     struct UObjModel* p4;       // 0x04  goes to Object_Init
 } DynObjModelRef;
