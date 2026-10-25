@@ -2,11 +2,11 @@
 
 #include "engine.h"
 #include "core/goaram.h"
+#include "core/audcontainers.h"
 #include "ustream.h"
 
 void fn_800055D4();
 void fn_8000724C();
-void AudMem_CloseOnce();
 
 void fn_80005590(void);
 void fn_80005590(void) {

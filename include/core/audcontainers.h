@@ -89,7 +89,13 @@ void  AudMemStack_Init(AudMemStack* pAudMemStack, u8* startAddr, u32 nBytes, u32
 void* AudMemStack_AllocTop(AudMemStack* pAudMemStack, u32 nBytes);
 void  AudMemStack_FreeTop(AudMemStack* pAudMemStack, void* addr);
 
-void*      AudMem_Alloc(u32 uSize);  // the sound engine's allocator
-void       AudMem_Free(void* p);     // gives back what AudMem_Alloc handed out
+// UAudMem.c: the sound engine's memory, one stack of 64-byte blocks.
+void  AudMem_Init(void);
+void* AudMem_Alloc(u32 nBytes);
+void  AudMem_Free(void* addr);
+void  AudMem_InitOnce(void);
+void  AudMem_CloseOnce(void);
+void  AudMem_InitModule(void);
+void  AudMem_CloseModule(void);
 
 #endif

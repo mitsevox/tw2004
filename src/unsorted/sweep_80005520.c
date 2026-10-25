@@ -2,6 +2,7 @@
 
 #include "engine.h"
 #include "core/goaram.h"
+#include "core/audcontainers.h"
 #include "ustream.h"
 
 void Session_Init();
@@ -9,7 +10,6 @@ void fn_80005580();
 void fn_800071BC();
 void fn_8002F1D4();
 void Gaud_InitOnce();
-void AudMem_InitOnce();
 
 void fn_80005520(void);
 void fn_80005520(void) {
