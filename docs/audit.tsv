@@ -124,7 +124,7 @@ GoShaderObject_PrelitUVAnimation_Gc.c	open
 GoShaderObject_Rain_Gc.c	open		
 GoStaticCam.c	done	3dfcfcd0	claude-review
 GoTerrain.c	open		
-GoTerrainCollision.c	open		
+GoTerrainCollision.c	done	889ca522	claude-review
 GoViewCont.c	done	4dd6d8e6	claude-review
 GoViewport.c	done	a131c343	claude-review
 Golfer.c	open		
