@@ -14,7 +14,7 @@ and MetroTRK are built from public decomps in `extern/` (the `progress_category=
 
 | To see | Read |
 |---|---|
-| The entry point | `main()` in `unsorted/sweep_800055D8.c`: boot list (`sweep_80005520.c`), `GoEntry.c`'s loop, shutdown list (`sweep_80005590.c`) |
+| The entry point | `main()` in `Main.c`: the boot list, `GoEntry.c`'s loop, the shutdown list |
 | The game's state machine | `GoEntry.c` `fn_800083A4`: a switch on `gSession.nGameType` (table below) |
 | One frame | `gomainloop.c`: `fn_8006D8E8` is the frame loop, `fn_8006DBD4` picks the game type's frame, `fn_8006D27C` draws a round's frame, `fn_8006DDA8` runs every module's hooks |
 | A shot, start to finish | `gomainloop.c` calls `STATEMAIN_Update` (`statemain.c`) each frame, which runs `GOLFERSTATE_Update` (`StateGolfer.c`): each player's golfer state (`stateFunc.c`, `STATEFUNC_*`). `STATEFUNC_Swing*` drives `Swing.c`, which launches the ball with `Physics_ShotImpact` (`Ball.c`); `GM_BallHit` and `GM_Update` (`GameMode.c`) keep the round's turns and strokes |
@@ -90,11 +90,7 @@ The outer loop moves between start-up screens, the front end and rounds (`gSessi
 
 | File | Name | What it is |
 |---|---|---|
-| unsorted/sweep_80005520.c | ph | the boot-time init list `main` calls first (memory, ARAM, streamer buffers, session...) |
-| unsorted/sweep_80005580.c | ph | one boot-time setter (clears `*lbl_80281510`) |
-| unsorted/sweep_80005590.c | ph | the shutdown list `main` calls last |
-| unsorted/sweep_800055D4.c | ph | an empty function the shutdown list calls |
-| unsorted/sweep_800055D8.c | ph | `main()` |
+| Main.c | T7 | `main()`, with the boot-time init list it calls first and the shutdown list it calls last |
 | GoEntry.c | EA | the outer loop over `gSession.nGameType` |
 | Code8002EE1C.c | ph | the session (`Session_Init`, players, golfers, options) |
 | gomainloop.c | T6 | the main loop: every system's start-up and shut-down, the frame update, the render passes |

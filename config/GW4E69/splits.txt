@@ -11,20 +11,8 @@ Sections:
 	.sdata2     type:rodata align:32
 	.sbss2      type:bss align:32
 
-unsorted/sweep_80005520.c:
-	.text       start:0x80005520 end:0x80005580
-
-unsorted/sweep_80005580.c:
-	.text       start:0x80005580 end:0x80005590
-
-unsorted/sweep_80005590.c:
-	.text       start:0x80005590 end:0x800055D4
-
-unsorted/sweep_800055D4.c:
-	.text       start:0x800055D4 end:0x800055D8
-
-unsorted/sweep_800055D8.c:
-	.text       start:0x800055D8 end:0x80005628
+Main.c:
+	.text       start:0x80005520 end:0x80005628
 
 LLMem_Gc.c:
 	.text       start:0x80005628 end:0x80005BE8

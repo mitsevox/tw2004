@@ -150,6 +150,7 @@ LadderMap.c	open
 LadderedMode.c	open		
 MC.c	open		
 MC_Gc.c	open		
+Main.c	open		
 MaterialTypes.c	open		
 MathQuat.c	done	6ad9dde6	claude-review
 NGC/SharedFileIO/llSharedFileIO.c	open		
@@ -251,11 +252,6 @@ uiText.c	open
 uiTransform.c	open		
 unsorted/code_800080D0.c	open		
 unsorted/code_800082F8.c	open		
-unsorted/sweep_80005520.c	open		
-unsorted/sweep_80005580.c	open		
-unsorted/sweep_80005590.c	open		
-unsorted/sweep_800055D4.c	open		
-unsorted/sweep_800055D8.c	open		
 unsorted/sweep_800136F4.c	open		
 unsorted/sweep_8003944C.c	open		
 unsorted/sweep_8006FF2C.c	open		
