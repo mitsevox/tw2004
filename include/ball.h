@@ -9,9 +9,9 @@
 #include "game_types.h"
 #include "platform.h"
 #include "terrain.h"   // the terrain manager (gTerRenderer)
-#include "materialtypes.h"   // SurfaceType
+#include "materialtypes.h"   // TGD_MaterialInfo
 
-extern SurfaceType gSurfaceTypes[NUM_SURFACE_TYPES];   // 0x8017E9B8
+extern TGD_MaterialInfo gSurfaceTypes[NUM_SURFACE_TYPES];   // 0x8017E9B8
 extern const f32 gRealBallRadiusIn;     // 0x80283300  0.84: a real golf ball, in inches
 extern const f32 lbl_80283304;          // 0.7056 (0.84 squared); GoDynObj.c DynObj_DrawGolfBalls
 
@@ -20,28 +20,38 @@ typedef struct PinPos {
     f32  x, y, z, w;
 } PinPos;
 
-// One strip of ground triangles (8 bytes). TW06: TGD_PolygonReference (0xC bytes, the same up
-// to 0x8).
-typedef struct TerPolyRef {
-    u16  nVertex;               // 0x0  first vertex, low 16 bits. TW06: uiVertexIndex
-    u16  n2;                    // 0x2  TW06: uiSourceObject
-    u8   u4;                    // 0x4  TW06: flags
-    u8   nTris;                 // 0x5  TW06: uiPolygonCount
-    u8   nSurface;              // 0x6  row of gSurfaceTypes. TW06: uiMaterialType
-    u8   nVertexHi;             // 0x7  first vertex, high bits. TW06: uiVertexIndexHi
-} TerPolyRef;
+// One strip of triangles (8 bytes): triangle k of the strip is vertices k, k+1 and k+2 from its
+// first vertex.
+typedef struct TGD_PolygonReference {
+    u16  nVertex;               // 0x0  first vertex, low 16 bits
+    u16  nObject;               // 0x2  the course object (row of pObjects) the strip is part of; 0: ground
+    u8   uFlags;                // 0x4  POLYREF_*; 0 for ground that is there whatever the pin position
+    u8   nTris;                 // 0x5  its triangles
+    u8   nSurface;              // 0x6  row of gSurfaceTypes
+    u8   nVertexHi;             // 0x7  first vertex, high bits
+} TGD_PolygonReference;
+LAYOUT_ASSERT(TGD_PolygonReference, 0x8);
+
+// TGD_PolygonReference.uFlags: a strip with any bit set is part of a cup's ground, there only for
+// the pin positions it names.
+#define POLYREF_PIN_POSITIONS       0x0F   // bit n: there when the hole's pin is at position n
+#define POLYREF_NOT_IN_SPLIT_SCREEN 0x10   // and not while the screen is split
 
 #define TER_FIRST_VERTEX(pRef) (((pRef)->nVertexHi << 16) + (pRef)->nVertex)
 
-// One cell of the ground grid (0xC bytes). TW06: TGD_Cell.
-typedef struct TerCell {
-    s16  nMaxHeight;            // 0x0  highest ground in the cell, whole yards. TW06: maxHeightYards
-    s16  nMinHeight;            // 0x2  TW06: minHeightYards
-    u32  uRefs;                 // 0x4  its strips: the first TerPolyRef << 12 | the count.
-                                //      TW06: uiPolygonReferenceListOffsetAndCount
-    u16  nObjRefs;              // 0x8  TW06: uiObjectReferenceCount
-    u16  nObjRefOffset;         // 0xA  TW06: uiObjectReferenceListOffset
-} TerCell;
+// One cell of the ground grid (0xC bytes).
+typedef struct TGD_Cell {
+    s16  nMaxHeight;            // 0x0  highest ground in the cell, whole yards
+    s16  nMinHeight;            // 0x2  lowest ground in the cell, whole yards
+    u32  uRefs;                 // 0x4  its strips: their first row of pPolyRefs << CELL_REFS_FIRST_SHIFT
+                                //      | their count (CELL_REFS_COUNT_MASK)
+    u16  nObjRefs;              // 0x8  its course objects: how many
+    u16  nObjRefOffset;         // 0xA  and their first row of pObjRefs
+} TGD_Cell;
+LAYOUT_ASSERT(TGD_Cell, 0xC);
+
+#define CELL_REFS_FIRST_SHIFT 12      // TGD_Cell.uRefs: the first strip's row, above the count
+#define CELL_REFS_COUNT_MASK  0xFFF   // TGD_Cell.uRefs: how many strips
 
 // A course object (0x24 bytes): a tree, a building, the pin. TW06: TGD_ObjectInstanceInfo (0x28
 // bytes, the same up to 0x24).
@@ -70,8 +80,8 @@ typedef struct TGD_LightingData {
     TGD_LightDesc aLight[5];    // 0x10
 } TGD_LightingData;
 
-// The optional block at CourseInfo.p3C: what Ter_CourseLoadCallback hands the glows (glows.h) when a hole is
-// loaded; without it the glows get 0.8, 0.8, 0.4 / 0, 150, -400 / 1.
+// The optional block at TGD_TerrainInfo.p3C: what Ter_CourseLoadCallback hands the glows (glows.h)
+// when a hole is loaded; without it the glows get 0.8, 0.8, 0.4 / 0, 150, -400 / 1.
 typedef struct CourseGlowBlock {
     f32  v0[3];                 // 0x00  to SF_vSetSunPosition (GlowState.v4), and gSession.f5B3C..f5B44
     u32  nC;                    // 0x0C  to SF_vSetFlareType (GlowState.n1930) when 0..3, else 1
@@ -91,31 +101,27 @@ typedef struct TGD_FoggingData {
     f32  fRotation;             // 0x80
 } TGD_FoggingData;
 
-// The current hole's terrain data (Ter_GetTGD): the ground as collision data. TW06:
-// TGD_TerrainInfo, the same offsets up to 0x2C; TW06 has three more pointers before the polygon
-// list. The ground is triangle strips: each TerPolyRef names a first vertex and a triangle count,
-// and triangle k of a strip is vertices k, k+1, k+2.
-typedef struct CourseInfo {
-    u32    nGridWidth;          // 0x00  cells across (x). TW06: uiReferenceGridWidth
-    u32    nGridLength;         // 0x04  cells along (z). TW06: uiReferenceGridLength
-    f32    fGridOrigin[2];      // 0x08  x, z of the grid's corner. TW06: fReferenceGridOrigin
-    f32    fGridCellSize[2];    // 0x10  TW06: fReferenceGridCellSize
+// The current hole's terrain data (Ter_GetTGD): the ground as collision data. The ground is
+// triangle strips (TGD_PolygonReference) found through a grid of cells (TGD_Cell).
+typedef struct TGD_TerrainInfo {
+    u32    nGridWidth;          // 0x00  cells across (x)
+    u32    nGridLength;         // 0x04  cells along (z)
+    f32    fGridOrigin[2];      // 0x08  x, z of the grid's corner
+    f32    fGridCellSize[2];    // 0x10  a cell's size along x and z
     u8     unk18[0x20 - 0x18];
-    u32    nPolyRefs;           // 0x20  TW06: uiPolygonReferencesListSize
+    u32    nPolyRefs;           // 0x20  rows of pPolyRefs
     u8     unk24[4];
-    f32  (*pVerts)[3];          // 0x28  TW06: pVertexList
-    u8*    pTriFlags;           // 0x2C  per vertex, for the triangle that ends there: bits 0-2 = 0 skip it;
-                                //       bit 3 done (Ter_ComputeHighestPointInEveryTriangle); bits
-                                //       4-5 / 6-7 its highest / lowest corner
+    f32  (*pVerts)[3];          // 0x28  every strip's vertices
+    u8*    pTriFlags;           // 0x2C  per vertex, for the triangle that ends there (TER_TRI_*)
     u8*    pLight;              // 0x30  per vertex: the light on the ground there, 0..255
                                 //       (Ter_GetAmbientLight)
-    TerCell* pGrid;             // 0x34  nGridWidth x nGridLength cells, row by row. TW06: pTerrainGrid (0x3C)
+    TGD_Cell* pGrid;            // 0x34  nGridWidth x nGridLength cells, row by row
     TGD_FoggingData* p38;      // 0x38  four optional blocks (NULL when absent); TW06 has its fog, sun,
     struct CourseGlowBlock* p3C;    // 0x3C    sky and lighting data in the same place. fn_800A27FC uses
     u8*    p40;                 // 0x40    p38 without a test, p44 only when it is set
     TGD_FoggingData* p44;      // 0x44
     TerObject* pObjects;        // 0x48  the course objects. TW06: pObjectInstanceTable (0x54)
-    TerPolyRef* pPolyRefs;      // 0x4C  TW06: pPolygonReferenceList (at 0x58 there)
+    TGD_PolygonReference* pPolyRefs;   // 0x4C  the strips, listed cell by cell (TGD_Cell.uRefs)
     u16*   pObjRefs;            // 0x50  per cell, the objects in it (indices). TW06: pObjectReferenceList
                                 //       (0x5C)
     u8     unk54[0x60 - 0x54];
@@ -126,7 +132,16 @@ typedef struct CourseInfo {
     PinPos tee[4];              // 0xB0  the tee of each tee set (gSession.nTeeSet[])
     u8     unkF0[0x100 - 0xF0];
     TGD_LightingData lights;    // 0x100 the hole's lights
-} CourseInfo;
+} TGD_TerrainInfo;
+
+// TGD_TerrainInfo.pTriFlags, the byte of the triangle that ends at a vertex
+#define TER_TRI_KICK_MASK    0x07   // bits 0-2; 0: the height and collision lookups skip the triangle
+                                    // (Ter_GetGroundPolyList's strip list does not test them)
+#define TER_TRI_DONE         0x08   // set while a walk over the strips has seen the triangle
+#define TER_TRI_HIGHEST_SHIFT 4     // bits 4-5: which corner (0..2) is highest
+#define TER_TRI_LOWEST_SHIFT  6     // bits 6-7: which corner is lowest
+#define TER_TRI_HIGHEST_CORNER(uFlags) (((uFlags) >> TER_TRI_HIGHEST_SHIFT) & 3)
+#define TER_TRI_LOWEST_CORNER(uFlags)  (((uFlags) >> TER_TRI_LOWEST_SHIFT) & 3)
 
 // An object in the world the ball can hit (a tree, a building, the flagstick), as DynObj_FindBallHit
 // reports it. Only the fields Ball.c reads are known; its size is not.
@@ -171,10 +186,10 @@ typedef struct Ball {
                                 //       lieModifier (next after lieAngle)
     s32  nSurface;              // 0x74  surface type under the ball (90 = the cup). TW06: surfaceID
     s32  nStartSurface;         // 0x78  surface at the start of the shot. TW06: initialSurfaceID
-    CourseInfo* pCourse;        // 0x7C  TW06: pTerrainData (TGD_TerrainInfo*)
+    TGD_TerrainInfo* pCourse;        // 0x7C  TW06: pTerrainData (TGD_TerrainInfo*)
     s32  nCollideCount;         // 0x80  TW06: collideCount
     s32  nSolidCollideCount;    // 0x84  TW06: solidCollideCount
-    SurfaceType* pHitSurface;   // 0x88  what it last hit. TW06: pLastCollisionSurface
+    TGD_MaterialInfo* pHitSurface;   // 0x88  what it last hit. TW06: pLastCollisionSurface
     TerObject* pHitObject;      // 0x8C  the object it last hit. TW06: pLastCollisionObject
     HitObject* pHitActor;       // 0x90  the world object it last hit (Physics_CheckDynObjCollisions). TW06:
                                 //       pLastCollisionActor
@@ -243,7 +258,7 @@ typedef struct TerBox {
     f32  vMax[4];               // 0x10
 } TerBox;
 
-#define NUM_CUP_POSITIONS 4     // one set of cup geometry per pin position (CourseInfo.pin)
+#define NUM_CUP_POSITIONS 4     // one set of cup geometry per pin position (TGD_TerrainInfo.pin)
 
 #define MAX_OBJECTS 1000        // course objects a line test can mark
 #define TER_NO_GROUND -65536.125f   // the height the ground lookups return when nothing is under the point
@@ -266,7 +281,7 @@ typedef struct CourseLoader {
 } CourseLoader;
 LAYOUT_ASSERT(CourseLoader, 0x8);
 
-CourseInfo* Ter_GetTGD(void);          // the current hole's terrain data
+TGD_TerrainInfo* Ter_GetTGD(void);          // the current hole's terrain data
 u8   Network_RegisterLoadNetworkCallback(int nChunk, void (*pfn)(u8*));   // 0x8000C0B4: pfn gets each
                                                                           // network of nExportType nChunk
 void Network_CloseModule(void);                 // network count 0, loader count -1
@@ -284,60 +299,69 @@ u8   PlaceBall_IsValidDropLocation(f32* pPos);            // a ball may be place
 u8   PlaceBall_CheckInBounds(f32* pPos);            // the point is in bounds. TW06: PlaceBall_CheckInBounds?
 TNetwork* PlaceBall_GetPlaceBallNetwork(void);            // the hole's placement outline (lbl_80281E30), if
                                                           // any
-f32  CamScript_GuessBestPlayableHeight(f32* pPos, SurfaceType** ppSurface);   // 0x800447DC
+f32  CamScript_GuessBestPlayableHeight(f32* pPos, TGD_MaterialInfo** ppSurface);   // 0x800447DC
 
-// TerrainGround.c (our name): the ground under a point or a quad
-int  Ter_GetGroundPolyList(CourseInfo* pCourse, f32* pA, f32* pB, f32* pC, f32* pD, TerPolyRef* pList,
-                           int nMax,
-                 u32 uSkip);   // the ground strips under a quad, as runs of triangles
-// The ground triangle under a point: its height there, the grid cell, the strip, the triangle's
-// first vertex and its number in the strip. Probably TW06's Ter_GetSupportingGroundTriangle.
-f32  Ter_GetSupportingGroundTriangle(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3],
-                 s32* pTri);
-SurfaceType* Ter_GetSupportingGroundMaterial(CourseInfo* pCourse, f32* pPos);   // surface type under a point
+// TerrainGround.c: the ground under a quad or a point
+// The ground strips under a quad, as runs of triangles, leaving out surfaces with uiIgnoreFlags
+int  Ter_GetGroundPolyList(TGD_TerrainInfo* pTerrainData, f32* p1, f32* p2, f32* p3, f32* p4,
+                           TGD_PolygonReference* pReturnResult, int iListSize, u32 uiIgnoreFlags);
+// The highest ground triangle at or below a point: its height there, its cell, its strip, its first
+// vertex and that vertex's number in the strip; TER_NO_GROUND when there is none
+f32  Ter_GetSupportingGroundTriangle(TGD_TerrainInfo* pTerrainData, f32* location, TGD_Cell** pCellResult,
+                                     TGD_PolygonReference** pPolyRefResult, f32 (**pTriangleVertices)[3],
+                                     s32* iFirstVertexIndex);
+// The surface of that triangle; NULL when there is none
+TGD_MaterialInfo* Ter_GetSupportingGroundMaterial(TGD_TerrainInfo* pTerrainData, f32* location);
 
 // GoTerrainCollision (TW06's goterraincollision.c; types from its definitions)
-void Ter_InitTGD(CourseInfo* pCourse);          // TW06: Ter_InitTGD, readies a loaded course's data
+void Ter_InitTGD(TGD_TerrainInfo* pCourse);          // TW06: Ter_InitTGD, readies a loaded course's data
 u8   Ter_Use3DCupGeometry(void);               // the cup is real geometry the ball drops into
 u8   Ter_PointInFreeDropNetwork(f32* pPos);    // inside a free-drop area
 u8   Ter_PointInOOBNetwork(f32* pPos);         // inside the in-bounds outlines (always, with none loaded)
 u8   Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bHazards, f32 fStep, u8 bSlope,
                                          f32 fMaxSlope);
 u8   Ter_SearchForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut);   // where to drop the ball
-f32  Ter_CheckForDropLocation(CourseInfo* pCourse, f32* pPos, u8 bOnDropSurface, u8* pbDrop, u8* pbPreferred,
-                              SurfaceType** ppSurface);   // whether a ball could be dropped at a point
+f32  Ter_CheckForDropLocation(TGD_TerrainInfo* pCourse, f32* pPos, u8 bOnDropSurface, u8* pbDrop,
+                              u8* pbPreferred,
+                              TGD_MaterialInfo** ppSurface);   // whether a ball could be dropped at a point
 u8   Ter_IsValidDropSurface(s32 nSurface);
-u8   Ter_GetSupportingGroundNormal(CourseInfo* pCourse, f32* pPos, f32* pNormal);   // 0 with no ground
+u8   Ter_GetSupportingGroundNormal(TGD_TerrainInfo* pCourse, f32* pPos, f32* pNormal);   // 0 with no ground
 u8   Ter_PointInTriangleXZpY(f32* pA, f32* pB, f32* pC, f32 fX, f32 fZ);   // (x, z) lies inside the triangle
 // a point's weights in a triangle
 void Ter_GetBarycentricCoords(f32 (*pTri)[3], f32* pPos, f32* pA, f32* pB, f32* pC);
-f32  Ter_GetHighestGroundHeight(CourseInfo* pCourse, f32* pPos);   // ground height, -65536.1 if none
-f32  Ter_GetLowestGroundHeight(CourseInfo* pCourse, f32* pPos);   // ground height (GoTerrainCollision.c)
+f32  Ter_GetHighestGroundHeight(TGD_TerrainInfo* pCourse, f32* pPos);   // ground height, -65536.1 if none
+f32  Ter_GetLowestGroundHeight(TGD_TerrainInfo* pCourse, f32* pPos);   // ground height (GoTerrainCollision.c)
 // Every ground height under and over pPos (up to nMax), with its surface; returns how many.
-u32  Ter_GetTerrainLayers(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurfaces, f32* pHeights, u32 nMax);
-f32  Ter_GetSupportingGroundHeight(CourseInfo* pCourse, f32* pPos);   // ground height, -60000 and below if
-                                                                      // none
+u32  Ter_GetTerrainLayers(TGD_TerrainInfo* pCourse, f32* pPos, TGD_MaterialInfo** ppSurfaces, f32* pHeights,
+                          u32 nMax);
+// ground height, -60000 and below if none
+f32  Ter_GetSupportingGroundHeight(TGD_TerrainInfo* pCourse, f32* pPos);
 // covering ground height and normal
-f32  Ter_GetCoveringGroundHeightAndNormal(CourseInfo* pCourse, f32* pPos, f32* pNormal);
-SurfaceType* Ter_GetSupportingWorldMaterial(CourseInfo* pCourse, f32* pPos);   // the surface under a point
-f32  Ter_GetSupportingGroundData(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurface, f32* pNormal);
+f32  Ter_GetCoveringGroundHeightAndNormal(TGD_TerrainInfo* pCourse, f32* pPos, f32* pNormal);
+// the surface under a point
+TGD_MaterialInfo* Ter_GetSupportingWorldMaterial(TGD_TerrainInfo* pCourse, f32* pPos);
+f32  Ter_GetSupportingGroundData(TGD_TerrainInfo* pCourse, f32* pPos, TGD_MaterialInfo** ppSurface,
+                                 f32* pNormal);
 // The same with objects included (TW06: Ter_GetSupportingWorldData); GoTerrainCollision.c.
-f32  Ter_GetSupportingWorldData(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurface, f32* pNormal);
-void Ter_GetEnclosingGroundHeight(CourseInfo* pCourse, f32* pPos, f32* pLow, f32* pHigh);
-void Ter_GetEnclosingGroundData(CourseInfo* pCourse, f32* pPos, f32* pLow, SurfaceType** ppSurfaceLow,
-                                f32* pNormalLow, f32* pHigh, SurfaceType** ppSurfaceHigh, f32* pNormalHigh);
-u8   Ter_CheckForPinCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
-                              SurfaceType** ppSurface, TerObject** ppObj);
-u8   Ter_CheckForWorldCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit,
-                                f32* pNormal,
-                 SurfaceType** ppSurface, TerObject** ppObj, u8* pbFlags);   // the first thing a line hits
-u8   Ter_CheckForSolidWorldCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit,
+f32  Ter_GetSupportingWorldData(TGD_TerrainInfo* pCourse, f32* pPos, TGD_MaterialInfo** ppSurface,
+                                f32* pNormal);
+void Ter_GetEnclosingGroundHeight(TGD_TerrainInfo* pCourse, f32* pPos, f32* pLow, f32* pHigh);
+void Ter_GetEnclosingGroundData(TGD_TerrainInfo* pCourse, f32* pPos, f32* pLow,
+                                TGD_MaterialInfo** ppSurfaceLow, f32* pNormalLow, f32* pHigh,
+                                TGD_MaterialInfo** ppSurfaceHigh, f32* pNormalHigh);
+u8   Ter_CheckForPinCollision(TGD_TerrainInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit,
+                              f32* pNormal,
+                              TGD_MaterialInfo** ppSurface, TerObject** ppObj);
+// the first thing a line hits
+u8   Ter_CheckForWorldCollision(TGD_TerrainInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit,
+                                f32* pNormal, TGD_MaterialInfo** ppSurface, TerObject** ppObj, u8* pbFlags);
+u8   Ter_CheckForSolidWorldCollision(TGD_TerrainInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit,
                                      f32* pNormal,
-                 SurfaceType** ppSurface, TerObject** ppObj);   // the same, through branches and leaves
-u8   Ter_CheckForObjectCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
-                                 SurfaceType** ppSurface,
+                 TGD_MaterialInfo** ppSurface, TerObject** ppObj);   // the same, through branches and leaves
+u8   Ter_CheckForObjectCollision(TGD_TerrainInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
+                                 TGD_MaterialInfo** ppSurface,
                  TerObject** ppObj);   // the first object a line hits
-s32  MaterialTypes_getMaterialID(SurfaceType* pSurface);   // a surface's row in gSurfaceTypes, or -1
+s32  MaterialTypes_getMaterialID(TGD_MaterialInfo* pSurface);   // a surface's row in gSurfaceTypes, or -1
 
 // ---- the ball (Ball.c) ----------------------------------------------------------------------
 

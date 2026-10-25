@@ -959,7 +959,7 @@ s32 GM_GetSecondHonors(void) {
 // lie 0, the physics ball reset, the before-shot copy (ballBefore) and the vBall/vA44 positions at
 // the tee, the golfer waiting (GS_WAIT) and the low-IQ penalty cleared.
 void GM_InitBallsToTee(void) {
-    CourseInfo* pCourse = Ter_GetTGD();
+    TGD_TerrainInfo* pCourse = Ter_GetTGD();
     int         i;
     for (i = 0; i < gNumPlayersSetUp; i++) {
         gPlayers[i].ball.nLie = 0;
@@ -1039,7 +1039,7 @@ void GM_Pick_PlayOffHole(void) {
 // Whether the ball is in the hole (never in modes 13-17), setting its lie to holed: with
 // Ter_Use3DCupGeometry on, when the lie already is; with it off, within half a yard of the pin.
 u8 GM_CheckForBallInHole(int nPlayer) {
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     int         nPinSet;
     f32         dx;
     f32         dz;

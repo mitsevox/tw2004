@@ -14,7 +14,7 @@ void SD_FreeShaderObject(void* pMesh);
 void SD_DrawShaderObject(u8* pMesh);
 
 // GoTerrainCollision.c
-f32 Ter_GetSupportingWorldHeight(CourseInfo* pCourse, f32* pPos);
+f32 Ter_GetSupportingWorldHeight(TGD_TerrainInfo* pCourse, f32* pPos);
 
 // .bss and .sbss in reverse address order (CodeWarrior lays them out last-defined-first).
 f32       lbl_801D95C8[5][12];

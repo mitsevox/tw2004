@@ -1127,7 +1127,7 @@ void Gaud_SwingBallHit(u8 nPlayer) {
 void Gaud_BallBounce(u8 nPlayer) {
     Player* pPlayer;
     GameAudioView* pView;
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
     u64 tNow;
     f32 fElapsed;
     f32 fSpeed;

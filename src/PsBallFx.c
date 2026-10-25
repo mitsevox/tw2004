@@ -396,7 +396,7 @@ void fn_800A30E4(int nKind, Ball* pBall, int nPlayer, u8 bFlight, f32 fValue) {
 void fn_800A31E0(Ball* pBall, int nPlayer) {
     f32 vPos[4];
     f32 vNormal[4];
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
     int nLie;
 
     if (gPlayers[nPlayer].nClub == 25) {
@@ -432,8 +432,8 @@ void fn_800A31E0(Ball* pBall, int nPlayer) {
 void fn_800A3348(Ball* pBall, int nPlayer) {
     f32 vPos[4];
     f32 vNormal[4];
-    SurfaceType* pGround;
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pGround;
+    TGD_MaterialInfo* pSurface;
     f32 fDot;
 
     vPos[0] = pBall->vPos[0];
@@ -572,7 +572,7 @@ void PsBallFx_TriggerTrail(Ball* pBall, int nPlayer) {
     f32 vPos[4];
     f32 vNormal[4];
     f32 vDir[4];
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
 
     if (gSession.nSplitScreen) {
         return;

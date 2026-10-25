@@ -979,7 +979,7 @@ void STATEFUNC_GreenWatchRollInit(int nPlayer) {
 // fade completes.
 void STATEFUNC_GreenWatchRollUpdate(int nPlayer) {
     Vec4        vOffset = {0.45f, 0.45f, 0.45f, 0.5f};
-    CourseInfo* pCourse = Ter_GetTGD();
+    TGD_TerrainInfo* pCourse = Ter_GetTGD();
     int         nSteps;
     int         i;
 
@@ -1649,7 +1649,7 @@ void STATEFUNC_RemoveBallInit(int nPlayer) {
     Ball* pBall       = &gPlayers[nPlayer].ball;
     Ball* pBallBefore = &gPlayers[nPlayer].ballBefore;
     int  nPinSet;
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     Mem_cpy(pBallBefore, pBall, sizeof(Ball));
     Emotion_UpdatePlayerEmotion(nPlayer);
     nPinSet = Game_CurrentPinSet();
@@ -1947,7 +1947,7 @@ void STATEFUNC_PlaceBallInit(int nPlayer) {
     f32         fTmp[4];
     f32         fLow, fHigh;
     int         i;
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
 
     gSession.bReplay = 0;
     Vec3Copy(gPlayers[nPlayer].ball.vPos, gPlayers[nPlayer].vBall);

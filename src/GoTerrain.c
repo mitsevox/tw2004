@@ -1972,7 +1972,7 @@ void Ter_CourseLoadCallback(TStreamData* pObject) {
     f32 fLength;
 
     gTerRenderer.pCourseStreamData = pObject;
-    gTerRenderer.pCourse = (CourseInfo*)pObject->pData;
+    gTerRenderer.pCourse = (TGD_TerrainInfo*)pObject->pData;
     for (i = 0; i < 4; i++) {
         gTerRenderer.pCourse->tee[i].x = 0.0f;
         gTerRenderer.pCourse->pin[i].x = 0.0f;

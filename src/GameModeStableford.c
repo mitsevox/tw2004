@@ -90,7 +90,7 @@ s32 GameModeStableford_GetHonors(int nPlayer) {
     s32 nLow;
     s32 nScore;
     s32 nHigh;
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     int nPinSet;
     f32 fBest;
     int nBest;

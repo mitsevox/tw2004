@@ -87,8 +87,8 @@ u8 CTIP_CheckWithWindTrigger(int nPlayer) {
 }
 
 // The penalty lie tip's test (tip 8, three short versions): the lie keeps too little of the shot's
-// power. The share the surface under the ball keeps (SurfaceType.f00, plus the ball's fLieModifier
-// times the golfer's recovery / 100), in percent, plus the lie's random spread (SurfaceType.f04
+// power. The share the surface under the ball keeps (TGD_MaterialInfo.f00, plus the ball's fLieModifier
+// times the golfer's recovery / 100), in percent, plus the lie's random spread (TGD_MaterialInfo.f04
 // times 100 less the recovery) is under 75.
 u8 CTIP_CheckPenaltyLieTrigger(int nPlayer) {
     f32 fQuality;

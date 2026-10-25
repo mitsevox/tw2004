@@ -663,7 +663,7 @@ void GM_Earnings_PayRoundGoals(int nPlayer, u8 bRoundOver) {
     }
 }
 
-// The bit of ShotGoal.uLies and PuttGoal.uLies for a surface class (SurfaceType.nClass; the goal
+// The bit of ShotGoal.uLies and PuttGoal.uLies for a surface class (TGD_MaterialInfo.nClass; the goal
 // checkers pass GameAnalysis_GetInitialStartingLie, the surface the shot left): class 1 bit 0, 2
 // (fairway) bit 1, 5 (rough) bit 2, 6 (sand) bit 3, 3 (green) bit 4; any other class bit 6.
 s32 Earnings_GetSurfaceClassBit(u32 n) {
@@ -2357,7 +2357,7 @@ void GM_RecordIndividualShotStats(int nPlayer) {
     int nLie;
     int nStrokes;
     int nProfile;
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
     int nPutt;
 
     if (!gpGame->b27B) return;

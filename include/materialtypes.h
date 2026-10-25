@@ -1,4 +1,4 @@
-// materialtypes.h (our name): the SurfaceType row, split out of ball.h so that MaterialTypes.c,
+// materialtypes.h (our name): the TGD_MaterialInfo row, split out of ball.h so that MaterialTypes.c,
 // which defines the const table, need not see ball.h's non-const extern of it. ball.h includes
 // this file.
 
@@ -8,10 +8,9 @@
 #include "game_types.h"
 #include "platform.h"
 
-// A row of gSurfaceTypes (0x44 bytes): how a ball behaves on one kind of ground. TW06:
-// TGD_MaterialInfo, the same size; its field names (after "TW06:") agree with what the code here
-// does with each field.
-typedef struct SurfaceType {
+// A row of gSurfaceTypes (0x44 bytes): how a ball behaves on one kind of ground. Its field names
+// after "TW06:" agree with what the code here does with each field.
+typedef struct TGD_MaterialInfo {
     f32  f00;                   // 0x00  launch: share of the speed kept; + the ball's fLieModifier
                                 //       (Physics_GetLiePowerPercentage). TW06: impactV
     f32  f04;                   // 0x04  lie: size of the random lie quality (Physics_SetLie).
@@ -34,15 +33,19 @@ typedef struct SurfaceType {
                                 //       as 12). 17 = tree; 19 = not playable
                                 //       (Ter_CalcLowestPlayableWorldHeight)
     u32  nSoundId;              // 0x30  TW06: soundID; nothing here reads it yet
-    u32  u34;                   // 0x34  TW06: flags. Bit 0x1: a ball may lie or be dropped here (without
-                                //       it GameManager takes the ball out); 0x2: taking it out sets the
+    u32  uFlags;                // 0x34  Bit 0x1: a ball may lie or be dropped here (without it
+                                //       GameManager takes the ball out); 0x2: taking it out sets the
                                 //       player's bPenaltyShot; 0x10: event 0x25 on landing; 0x80 is
-                                //       read by GoTerrainCollision
+                                //       read by GoTerrainCollision; MATERIAL_NO_SHADOW
     u32  nCollisionEffectId;    // 0x38  TW06: uiCollisionEffectID
     u32  nSwingSoundId;         // 0x3C  TW06: uiSwingSoundID
     u32  nSwingEffectId;        // 0x40  TW06: uiSwingEffectID
-} SurfaceType;
-LAYOUT_ASSERT(SurfaceType, 0x44);
+} TGD_MaterialInfo;
+LAYOUT_ASSERT(TGD_MaterialInfo, 0x44);
+
+// TGD_MaterialInfo.uFlags: bits 5 and 6, either of which keeps the golfer's shadow off the surface
+// (the cup has both; a cart path row and three others have 0x20)
+#define MATERIAL_NO_SHADOW 0x60
 
 #define NUM_SURFACE_TYPES 156   // rows in gSurfaceTypes
 

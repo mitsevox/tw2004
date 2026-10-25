@@ -36,7 +36,7 @@ static f32 TerrainData_StrippedFn(f32 x) {
 // nodes stored at height 0 on the ground with it.
 f32 Network_GetNodeGroundHeight(const f32* pPos) {
     f32 v[4];
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     f32 fHeight;
 
     v[0] = pPos[0];
@@ -318,7 +318,7 @@ u8 Network_RayNetworkDoesIntersect(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNo
 }
 
 // TW06: Ter_TerrainGameDataMgr::GetTGD.
-CourseInfo* Ter_GetTGD(void) {
+TGD_TerrainInfo* Ter_GetTGD(void) {
     return gTerRenderer.pCourse;
 }
 
