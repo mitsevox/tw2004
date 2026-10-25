@@ -22,11 +22,11 @@ LAYOUT_ASSERT(LLPict, 0x74);
 typedef struct PictFile {
     u32  uMagic;                // 0x00  'MADk'
     u8   unk4[0xC - 0x4];
-    u32  uC;                    // 0x0C
+    u32  uRate;                 // 0x0C  the movie's frames per second, 16.16 (MAD_GetNextFrame)
     s16  nWidth;                // 0x10
     s16  nHeight;               // 0x12
     u8   unk14;
-    u8   n15;                   // 0x15  given to MAD_initdecode
+    u8   nQuality;              // 0x15  scales the decoder's quantizer (MAD_initdecode)
     u8   unk16[2];
     u8   aData[4];              // 0x18  the coded picture (any length)
 } PictFile;
@@ -128,6 +128,8 @@ extern void** gpPictWorkBuffer;
 LLPict* Pict_CreateFromMemory(u8* pData, u32 uSize);
 
 // LLPictInt.c
+void    PictInt_InitModule(void);           // nothing to do
+void    PictInt_CloseModule(void);          // nothing to do
 LLPict* PictInt_Decode(PictFile* pFile);
 
 #endif
