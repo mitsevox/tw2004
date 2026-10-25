@@ -77,7 +77,7 @@ void MtaLib_ApplyEntry(MtaEntry* pEntry, SkelPoseBlock* pBlock, int nMorph, Skel
 
     // pPose and fWeight are unused: MtaLib_ApplyToPose passes them
     fT = MtaLib_GetEntryFrames(pEntry, &fA, &fB, fTime);
-    pBlock->af8[nMorph] = fT * (fB - fA) + fA;
+    pBlock->afMorphWeights[nMorph] = fT * (fB - fA) + fA;
     BitArray_SetBit(pBlock->aBits, nMorph);
 }
 

@@ -16,7 +16,6 @@ Code8002BBB0.c	open
 Code8002C984.c	open		
 Code8002DB80.c	open		
 Code8002EE1C.c	open		
-Code80037AB8.c	open		
 Code8006F608.c	open		
 Code80090940.c	open		
 Code8009AA28.c	open		
@@ -176,6 +175,7 @@ Skin.c	open
 SkinBurn.c	open		
 SkinMorph.c	open		
 SkinPart.c	open		
+SkinUtil.c	done	83bbdccf	claude-review
 StateGolfer.c	done	2b0ee2a1	claude-review
 StreamManager.c	done	7511d865	claude-review
 SunFlr_Gc.c	open		

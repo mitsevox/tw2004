@@ -45,7 +45,7 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits);
 Skeleton* SKEL_CreateIKSkeleton(CharModel* pModel, CharModelDefs* pDefs);
 struct DynChain* fn_80114270(CharModel* pModel, int nBone, s32 nType, s32 n10);   // DynChain.c
 
-// Names the club bone (IGdriver, 0x52) can go by in a model (SKEL_GenerateBoneLookupTable).
+// Names the club bone (SKEL_BONE_IGDRIVER) can go by in a model (SKEL_GenerateBoneLookupTable).
 char* gSkelClubBoneNames[5] = { "IGDriver", "IGputter", "IGiron3", "IGiron7", "IGwedge" };
 
 // Left/right bone id pairs, each way round: the arms and hands (0x10-0x1E rcolr..rt3 with
@@ -95,18 +95,18 @@ void SKEL_TransformIKChain(CharModel* pModel, IKChain* pChain) {
     int nBone;
     Skeleton* pSkel = pModel->pSkel;
 
-    Quat_Copy(pChain->pLinks[0].q18, pModel->pPoses[pChain->pLinks[0].nBone].q0);
-    Quat_Copy(pChain->pLinks[0].v28, pModel->pPoses[pChain->pLinks[0].nBone].v10);
+    Quat_Copy(pChain->pLinks[0].q18, pModel->pPoses[pChain->pLinks[0].nBone].qRot);
+    Quat_Copy(pChain->pLinks[0].v28, pModel->pPoses[pChain->pLinks[0].nBone].vPos);
     for (i = 1; i < pChain->nLinks; i++) {
         pLink = &pChain->pLinks[i];
         nBone = pLink->nBone;
         pPose = &pModel->pPoses[nBone];
         pPrev = &pModel->pPoses[pChain->pLinks[pLink->nPrev].nBone];
-        Quat_RotateVector(pPrev->q0, pLink->v28, vOffset);
-        Quat_Add(pPrev->v10, vOffset, pPose->v10);
-        pPose->v10[3] = 0.0f;
+        Quat_RotateVector(pPrev->qRot, pLink->v28, vOffset);
+        Quat_Add(pPrev->vPos, vOffset, pPose->vPos);
+        pPose->vPos[3] = 0.0f;
         Quat_Multiply(pSkel->pIKRots[nBone], pLink->q18, qRot);
-        Quat_Multiply(qRot, pPrev->q0, pPose->q0);
+        Quat_Multiply(qRot, pPrev->qRot, pPose->qRot);
     }
 }
 
@@ -135,15 +135,15 @@ f32 SKEL_ItterateIKChain(CharModel* pModel, IKChain* pChain, f32* pTarget, int n
     f32 fCos;
     int i;
 
-    Vec4_CopyPoint(pModel->pPoses[pChain->pLinks[pChain->nLinks - 1].nBone].v10, vEnd);
+    Vec4_CopyPoint(pModel->pPoses[pChain->pLinks[pChain->nLinks - 1].nBone].vPos, vEnd);
     vToEnd[3] = 0.0f;
     vEnd[3] = 1.0f;
     for (i = nLast; i >= nFirst; i--) {
         pLink = &pChain->pLinks[i];
         if (pLink->fTurnShare > 0.0f) {
             nBone = pLink->nBone;
-            SKEL_Vec3Sub(vEnd, pModel->pPoses[nBone].v10, vToEnd);
-            SKEL_Vec3Sub(pTarget, pModel->pPoses[nBone].v10, vToTarget);
+            SKEL_Vec3Sub(vEnd, pModel->pPoses[nBone].vPos, vToEnd);
+            SKEL_Vec3Sub(pTarget, pModel->pPoses[nBone].vPos, vToTarget);
             fLen = Math_Sqrtf(LLMath_LengthSquared3(vToEnd) * LLMath_LengthSquared3(vToTarget));
             fCos = LLMath_DotProduct3(vToEnd, vToTarget) / fLen;
             if (fCos > 1.0f || fCos < -1.0f) {
@@ -155,7 +155,7 @@ f32 SKEL_ItterateIKChain(CharModel* pModel, IKChain* pChain, f32* pTarget, int n
                 // the turn's axis in the bone's own frame, without its y and locked (nLockedAxis)
                 // components
                 vec4flt_CrossProduct(vToEnd, vToTarget, vAxis);
-                Quat_Invert(pModel->pPoses[nBone].q0, qInv);
+                Quat_Invert(pModel->pPoses[nBone].qRot, qInv);
                 Quat_RotateVector(qInv, vAxis, vLocal);
                 vLocal[3] = 0.0f;
                 vLocal[1] = 0.0f;
@@ -166,9 +166,9 @@ f32 SKEL_ItterateIKChain(CharModel* pModel, IKChain* pChain, f32* pTarget, int n
                 Vec3_Scale(fAngle, vLocal, vLocal);
                 SKEL_Vec3Add(vLocal, pLink->v58, pLink->v58);
                 Quat_BuildFromVectorAndScale(vLocal, qTurn, fAngle);
-                Quat_RotateVector(pModel->pPoses[nBone].q0, qTurn, qRot);
+                Quat_RotateVector(pModel->pPoses[nBone].qRot, qTurn, qRot);
                 Quat_RotateVector(qRot, vToEnd, vTurned);
-                SKEL_Vec3Add(pModel->pPoses[nBone].v10, vTurned, vEnd);
+                SKEL_Vec3Add(pModel->pPoses[nBone].vPos, vTurned, vEnd);
             }
         }
     }
@@ -263,14 +263,14 @@ void SKEL_InitIKChain(CharModel* pModel, IKChain* pChain) {
             pPrevLink = NULL;
         }
         if (i == 0) {
-            Quat_Copy(pModel->pPoses[nBone].q0, pLink->q18);
+            Quat_Copy(pModel->pPoses[nBone].qRot, pLink->q18);
         } else {
             Quat_Copy(pBone->q0C, pLink->q18);
         }
         if (pPrevLink != NULL && pPrevLink->nBone != pBone->nParent) {
-            Quat_Invert(pModel->pPoses[nPrevBone].q0, qInv);
-            Quat_Multiply(pModel->pPoses[nBone].q0, qInv, pLink->q18);
-            SKEL_VecSub(pModel->pPoses[nBone].v10, pModel->pPoses[nPrevBone].v10, vDelta);
+            Quat_Invert(pModel->pPoses[nPrevBone].qRot, qInv);
+            Quat_Multiply(pModel->pPoses[nBone].qRot, qInv, pLink->q18);
+            SKEL_VecSub(pModel->pPoses[nBone].vPos, pModel->pPoses[nPrevBone].vPos, vDelta);
             vDelta[3] = 0.0f;
             Quat_RotateVector(qInv, vDelta, pLink->v28);
             pLink->v28[3] = 0.0f;
@@ -280,12 +280,12 @@ void SKEL_InitIKChain(CharModel* pModel, IKChain* pChain) {
                 pLink->b0 |= 1;
             }
         } else if (i == 0) {
-            LLMath_CopyVec(pModel->pPoses[nBone].v10, pLink->v28);
+            LLMath_CopyVec(pModel->pPoses[nBone].vPos, pLink->v28);
         } else {
             LLMath_CopyVec(pBone->v1C, pLink->v28);
         }
     }
-    Vec4_CopyPoint(pModel->pPoses[pChain->pLinks[pChain->nLinks - 1].nBone].v10, pChain->v8);
+    Vec4_CopyPoint(pModel->pPoses[pChain->pLinks[pChain->nLinks - 1].nBone].vPos, pChain->v8);
 }
 
 // Solves the chain toward pTarget: up to nIterations IK iterations (SKEL_ItterateIKChain over all
@@ -324,7 +324,7 @@ void SKEL_TransformIKChainFromBones(CharModel* pModel, IKChain* pChain) {
     BonePose* pPose;
     BonePose* pPrev;
 
-    CharModel_GetBoneIndex(pModel, 0x52);  // EA drops the answer
+    CharModel_GetBoneIndex(pModel, SKEL_BONE_IGDRIVER);  // EA drops the answer
     uDone = 0;
     for (i = 0; i < pChain->nLinks; i++) {
         pLink = &pChain->pLinks[i];
@@ -338,16 +338,16 @@ void SKEL_TransformIKChainFromBones(CharModel* pModel, IKChain* pChain) {
             pPose = &pModel->pPoses[nBone];
             pPrev = &pModel->pPoses[nPrevBone];
             if (bKept) {
-                Quat_RotateVector(pPrev->q0, pLink->v48, vOffset);
-                Quat_Multiply(pLink->q38, pPrev->q0, pPose->q0);
+                Quat_RotateVector(pPrev->qRot, pLink->v48, vOffset);
+                Quat_Multiply(pLink->q38, pPrev->qRot, pPose->qRot);
             } else {
-                Quat_RotateVector(pPrev->q0, pBone->v1C, vOffset);
-                Quat_Multiply(pBone->q0C, pPrev->q0, pPose->q0);
+                Quat_RotateVector(pPrev->qRot, pBone->v1C, vOffset);
+                Quat_Multiply(pBone->q0C, pPrev->qRot, pPose->qRot);
             }
-            Quat_Add(pPrev->v10, vOffset, pPose->v10);
-            pPose->v10[3] = 0.0f;
-            Quat_QuatToMatrix(pPose->q0, pModel->pMatrices[nBone]);
-            Vec4_CopyPoint(pPose->v10, pModel->pMatrices[nBone][3]);
+            Quat_Add(pPrev->vPos, vOffset, pPose->vPos);
+            pPose->vPos[3] = 0.0f;
+            Quat_QuatToMatrix(pPose->qRot, pModel->pMatrices[nBone]);
+            Vec4_CopyPoint(pPose->vPos, pModel->pMatrices[nBone][3]);
             uDone |= (u64)1 << nBone;
         }
     }
@@ -378,7 +378,7 @@ f32 SKEL_AdjustHipHeight(CharModel* pModel, IKChain* pChain, f32* pTarget) {
     }
     pChain->pLinks[0].v28[1] = pSkel->fRootLinkHeight + pSkel->vHipOffset[1];
     SKEL_Vec3Sub(pTarget, pChain->v8, vDiff);
-    Vec4_CopyPoint(pChain->v8, pModel->pPoses[pChain->pLinks[pChain->nLinks - 1].nBone].v10);
+    Vec4_CopyPoint(pChain->v8, pModel->pPoses[pChain->pLinks[pChain->nLinks - 1].nBone].vPos);
     return (f32)Math_Sqrt(LLMath_LengthSquared3(vDiff));
 }
 
@@ -473,7 +473,7 @@ void SKEL_TransitionIK(Skeleton* pSkel, u8 bRelax, f32 fTime) {
 // weight: takes the extra right-shoulder rotation (qShoulderRot) back off while nShoulderFrames
 // counts down; re-poses the first chain from its bones' own rotations
 // (SKEL_TransformIKChainFromBones), and while the character's flag 0x4000 is set and the weight is
-// between 0 and 1, blends the club bone (0x52) from its pose before that toward the new one by the
+// between 0 and 1, blends the club bone from its pose before that toward the new one by the
 // weight. Then solves the second chain (the left arm) so the left wrist (0x28) reaches its place on
 // the club (v108C, SKEL_SaveLeftHandGrip), turns the wrist to its rotation on the club (q107C),
 // rebuilds the bones from the left collarbone (0x23) down, keeping the wrist's rotation, and the
@@ -518,33 +518,33 @@ void SKEL_PostTransformIKSkeleton(Character* pChar) {
         Quat_Copy(qRot, pSkel->pIKRots[CharModel_GetBoneIndexMapped(pModel, 0x11)]);
         pSkel->nShoulderFrames--;
     }
-    nGrip = CharModel_GetBoneIndex(pModel, 0x52);
+    nGrip = CharModel_GetBoneIndex(pModel, SKEL_BONE_IGDRIVER);
     pGrip = &pModel->pPoses[nGrip];
     if (pSkel->fIKWeight > 0.0f && pSkel->fIKWeight < 1.0f) {
-        Quat_Copy(pGrip->q0, qGrip);
-        Quat_Copy(pGrip->v10, vGrip);
+        Quat_Copy(pGrip->qRot, qGrip);
+        Quat_Copy(pGrip->vPos, vGrip);
     }
     SKEL_TransformIKChainFromBones(pModel, pSkel->pChains);
     if (pChar->uCharFlags & 0x4000) {
         if (pSkel->fIKWeight > 0.0f && pSkel->fIKWeight < 1.0f) {
-            Quat_Slerp(qGrip, pGrip->q0, pSkel->fIKWeight);
-            SKA_BlendVec3(pGrip->v10, vGrip, pGrip->v10, 1.0f - pSkel->fIKWeight);
-            Quat_QuatToMatrix(pGrip->q0, pModel->pMatrices[nGrip]);
-            Vec4_CopyPoint(pGrip->v10, pModel->pMatrices[nGrip][3]);
+            Quat_Slerp(qGrip, pGrip->qRot, pSkel->fIKWeight);
+            SKA_BlendVec3(pGrip->vPos, vGrip, pGrip->vPos, 1.0f - pSkel->fIKWeight);
+            Quat_QuatToMatrix(pGrip->qRot, pModel->pMatrices[nGrip]);
+            Vec4_CopyPoint(pGrip->vPos, pModel->pMatrices[nGrip][3]);
         }
     }
     SKEL_InitIKChain(pModel, pChain);
     CharModel_GetBoneIndexMapped(pModel, 0x15);  // EA drops the answer
     nWrist = CharModel_GetBoneIndexMapped(pModel, 0x28);
     pWrist = &pModel->pPoses[nWrist];
-    Quat_RotateVector(pGrip->q0, pSkel->v108C, vTarget);
-    Quat_Add(vTarget, pGrip->v10, vTarget);
+    Quat_RotateVector(pGrip->qRot, pSkel->v108C, vTarget);
+    Quat_Add(vTarget, pGrip->vPos, vTarget);
     vTarget[3] = 0.0f;
     SKEL_SolveIKChain(pModel, pChain, vTarget, pChain->nMaxIterations, NULL, pChain->fTolerance);
     if (pSkel->fIKWeight < 1.0f) {
         SKEL_WeightIKChain(pSkel, pChain, pSkel->fIKWeight);
     }
-    Quat_Multiply(pSkel->q107C, pGrip->q0, pWrist->q0);
+    Quat_Multiply(pSkel->q107C, pGrip->qRot, pWrist->qRot);
     BitArray_ClearBit(pModel->a14, nWrist);
     BitArray_ClearArray(aBits, 0x80);
     BitArray_SetBit(aBits, CharModel_GetBoneIndexMapped(pModel, 0x23));
@@ -554,7 +554,7 @@ void SKEL_PostTransformIKSkeleton(Character* pChar) {
     SKEL_ResetIKChain(pModel->pSkel, pChain, 0);
 }
 
-// Records where the left wrist (0x28) sits on the club (bone 0x52, mirrored in x for a
+// Records where the left wrist (0x28) sits on the club (SKEL_BONE_IGDRIVER, mirrored in x for a
 // left-hander): its rotation relative to the club's into the skeleton's q107C and its position into
 // v108C, where SKEL_PostTransformIKSkeleton puts it back each frame. Nothing without a skeleton or
 // while the IK is off.
@@ -569,7 +569,7 @@ void SKEL_SaveLeftHandGrip(Character* pChar) {
 
     if (pModel->pSkel == NULL || gSkelIKEnabled == 0) return;
     pWristMtx = pModel->pMatrices[CharModel_GetBoneIndexMapped(pModel, 0x28)];
-    pGripMtx = pModel->pMatrices[CharModel_GetBoneIndex(pModel, 0x52)];
+    pGripMtx = pModel->pMatrices[CharModel_GetBoneIndex(pModel, SKEL_BONE_IGDRIVER)];
     if (pModel->bLeftHanded) {
         LLMath_IdentifyMat(mFlip);
         mFlip[0][0] = -1.0f;
@@ -589,7 +589,7 @@ void SKEL_TranslateIKChainY(CharModel* pModel, IKChain* pChain, f32 fDy) {
     int i;
     for (i = 0; i < pChain->nLinks; i++) {
         int nBone = pChain->pLinks[i].nBone;
-        pModel->pPoses[nBone].v10[1] += fDy;
+        pModel->pPoses[nBone].vPos[1] += fDy;
         pModel->pMatrices[nBone][3][1] += fDy;
     }
 }
@@ -908,15 +908,15 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
     BitArray_MergeArrayWithOr(pModel->a14, pModel->a24, aModel, 0x80);
     LLMath_IdentifyMat(mScale);
     if (BitArray_Intersects(aBits, aCur, 0x80)) {
-        Quat_Copy(pModel->pBones[0].q0C, pModel->pPoses[0].q0);
-        Quat_Copy(pModel->pBones[0].v1C, pModel->pPoses[0].v10);
-        Quat_QuatToMatrix(pModel->pPoses[0].q0, pModel->pMatrices[0]);
+        Quat_Copy(pModel->pBones[0].q0C, pModel->pPoses[0].qRot);
+        Quat_Copy(pModel->pBones[0].v1C, pModel->pPoses[0].vPos);
+        Quat_QuatToMatrix(pModel->pPoses[0].qRot, pModel->pMatrices[0]);
         mScale[0][0] = pModel->a140[0][0];
         mScale[1][1] = pModel->a140[0][1];
         mScale[2][2] = pModel->a140[0][2];
         LLMath_mat44fltMultiplyList(pModel->pMatrices[0], mScale, mOut, 4);
         LLMath_CopyMat44(mOut, pModel->pMatrices[0]);
-        Vec4_CopyPoint(pModel->pPoses[0].v10, pModel->pMatrices[0][3]);
+        Vec4_CopyPoint(pModel->pPoses[0].vPos, pModel->pMatrices[0][3]);
         SKEL_UpdateSkinningMatrix(pModel, pModel->pMatrices[0], 0);
     }
     BitArray_ShiftUp(aCur, aCur, 4, 1);
@@ -960,35 +960,35 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
             if (BitArray_Intersects(aModel, aCur, 0x80)) {
                 pParentPose = &pModel->pPoses[pBone->nParent];
                 if (BitArray_Intersects(pModel->a24, aCur, 0x80)) {
-                    Quat_RotateVector(pParentPose->q0, pBone->v1C, vPos);
-                    Quat_Add(pParentPose->v10, vPos, pPose->v10);
-                    pPose->v10[3] = 0.0f;
+                    Quat_RotateVector(pParentPose->qRot, pBone->v1C, vPos);
+                    Quat_Add(pParentPose->vPos, vPos, pPose->vPos);
+                    pPose->vPos[3] = 0.0f;
                     if (i == 1) {
                         pSkel = pModel->pSkel;
                         if (pSkel != NULL && 0.0f != pSkel->f10C4) {
-                            SKEL_Vec3Add(pPose->v10, pSkel->vHipOffsetWeighted, pPose->v10);
+                            SKEL_Vec3Add(pPose->vPos, pSkel->vHipOffsetWeighted, pPose->vPos);
                         }
                     }
                 }
                 if (BitArray_Intersects(pModel->a14, aCur, 0x80)) {
                     if (BitArray_Intersects(aSkel, aCur, 0x80)) {
                         Quat_Multiply(pSkelRot[i], pBone->q0C, qRot);
-                        Quat_Multiply(qRot, pParentPose->q0, pPose->q0);
+                        Quat_Multiply(qRot, pParentPose->qRot, pPose->qRot);
                     } else {
-                        Quat_Multiply(pBone->q0C, pParentPose->q0, pPose->q0);
+                        Quat_Multiply(pBone->q0C, pParentPose->qRot, pPose->qRot);
                     }
                 }
             }
-            Quat_QuatToMatrix(pPose->q0, pModel->pMatrices[i]);
+            Quat_QuatToMatrix(pPose->qRot, pModel->pMatrices[i]);
             mScale[0][0] = pModel->a140[i][0];
             mScale[1][1] = pModel->a140[i][1];
             mScale[2][2] = pModel->a140[i][2];
-            if (pModel->bLeftHanded && i == CharModel_GetBoneIndex(pModel, 0x52)) {
-                mScale[0][0] = -mScale[0][0];   // with bLeftHanded set, bone 0x52's x is flipped
+            if (pModel->bLeftHanded && i == CharModel_GetBoneIndex(pModel, SKEL_BONE_IGDRIVER)) {
+                mScale[0][0] = -mScale[0][0];   // with bLeftHanded set, the club bone's x is flipped
             }
             LLMath_mat44fltMultiplyList(pModel->pMatrices[i], mScale, mOut, 4);
             LLMath_CopyMat44(mOut, pModel->pMatrices[i]);
-            Vec4_CopyPoint(pPose->v10, pModel->pMatrices[i][3]);
+            Vec4_CopyPoint(pPose->vPos, pModel->pMatrices[i][3]);
             SKEL_UpdateSkinningMatrix(pModel, pModel->pMatrices[i], i);
             BitArray_MergeArrayWithOr(aBits, aCur, aBits, 0x80);
         }
@@ -1001,7 +1001,7 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits) {
 // Copies pPose's local rotations (bones in its a0 bits) and positions (a10 bits) into the model's
 // bones; with bTransform, then rebuilds those bones (SKEL_TransformBones). For a left-handed golfer
 // (bLeftHanded) the pose is mirrored: each rotation goes to the bone's left/right partner (aBone2,
-// whose a0 bit is set), the root's (1) and a club hanging from the root (0x52) turned half a turn
+// whose a0 bit is set), the root's (1) and a club bone hanging from the root turned half a turn
 // in pitch; the root's, GBall1's (0x54) and the club's positions have z negated (the club's x
 // instead when it has a parent).
 void SKEL_UpdateState(CharModel* pModel, SkelPose* pPose, u8 bTransform) {
@@ -1018,40 +1018,40 @@ void SKEL_UpdateState(CharModel* pModel, SkelPose* pPose, u8 bTransform) {
             if (pModel->bLeftHanded) {
                 if (i == CharModel_GetBoneIndex(pModel, 1)) {
                     Legacy_Quat_BuildFromPitch(PI, qTurn);
-                    Quat_Multiply(pPose->aBones[i].q0, qTurn, pModel->pBones[pModel->aBone2[i]].q0C);
+                    Quat_Multiply(pPose->aBones[i].qRot, qTurn, pModel->pBones[pModel->aBone2[i]].q0C);
                     BitArray_SetBit(pPose->a0, pModel->aBone2[i]);
-                } else if (i == CharModel_GetBoneIndex(pModel, 0x52)) {
+                } else if (i == CharModel_GetBoneIndex(pModel, SKEL_BONE_IGDRIVER)) {
                     if (pModel->pBones[i].nParent == 0) {
                         Legacy_Quat_BuildFromPitch(PI, qTurn);
-                        Quat_Multiply(pPose->aBones[i].q0, qTurn, pModel->pBones[pModel->aBone2[i]].q0C);
+                        Quat_Multiply(pPose->aBones[i].qRot, qTurn, pModel->pBones[pModel->aBone2[i]].q0C);
                         BitArray_SetBit(pPose->a0, pModel->aBone2[i]);
                     } else {
-                        Quat_Copy(pPose->aBones[i].q0, pModel->pBones[pModel->aBone2[i]].q0C);
+                        Quat_Copy(pPose->aBones[i].qRot, pModel->pBones[pModel->aBone2[i]].q0C);
                         BitArray_SetBit(pPose->a0, pModel->aBone2[i]);
                     }
                 } else {
-                    Quat_Copy(pPose->aBones[i].q0, pModel->pBones[pModel->aBone2[i]].q0C);
+                    Quat_Copy(pPose->aBones[i].qRot, pModel->pBones[pModel->aBone2[i]].q0C);
                     BitArray_SetBit(pPose->a0, pModel->aBone2[i]);
                 }
             } else {
-                Quat_Copy(pPose->aBones[i].q0, pModel->pBones[i].q0C);
+                Quat_Copy(pPose->aBones[i].qRot, pModel->pBones[i].q0C);
             }
         }
         if (BitArray_TestBit(aPos, i)) {
             if (pModel->bLeftHanded
                 && (i == CharModel_GetBoneIndex(pModel, 1) || i == CharModel_GetBoneIndex(pModel, 0x54))) {
-                Quat_Copy(pPose->aBones[i].v10, pModel->pBones[i].v1C);
+                Quat_Copy(pPose->aBones[i].vPos, pModel->pBones[i].v1C);
                 pModel->pBones[i].v1C[2] = -pModel->pBones[i].v1C[2];
-            } else if (pModel->bLeftHanded && i == CharModel_GetBoneIndex(pModel, 0x52)) {
+            } else if (pModel->bLeftHanded && i == CharModel_GetBoneIndex(pModel, SKEL_BONE_IGDRIVER)) {
                 if (pModel->pBones[i].nParent == 0) {
-                    Quat_Copy(pPose->aBones[i].v10, pModel->pBones[i].v1C);
+                    Quat_Copy(pPose->aBones[i].vPos, pModel->pBones[i].v1C);
                     pModel->pBones[i].v1C[2] = -pModel->pBones[i].v1C[2];
                 } else {
-                    Quat_Copy(pPose->aBones[i].v10, pModel->pBones[i].v1C);
+                    Quat_Copy(pPose->aBones[i].vPos, pModel->pBones[i].v1C);
                     pModel->pBones[i].v1C[0] = -pModel->pBones[i].v1C[0];
                 }
             } else {
-                Quat_Copy(pPose->aBones[i].v10, pModel->pBones[i].v1C);
+                Quat_Copy(pPose->aBones[i].vPos, pModel->pBones[i].v1C);
             }
         }
     }
@@ -1081,11 +1081,11 @@ void SKEL_BlendPoses(int nBone, int nCount, SkelPose* pA, SkelPose* pB, SkelPose
     BitArray_ClearArray(pOut->a10, 0x80);
     for (i = nBone; i <= nLast; i++) {
         if (BitArray_Intersects(aRot, aCur, 0x80)) {
-            SKA_BlendQuat(pA->aBones[i].q0, pB->aBones[i].q0, pOut->aBones[i].q0, fT);
+            SKA_BlendQuat(pA->aBones[i].qRot, pB->aBones[i].qRot, pOut->aBones[i].qRot, fT);
             BitArray_MergeArrayWithOr(pOut->a0, aCur, pOut->a0, 0x80);
         }
         if (BitArray_Intersects(aPos, aCur, 0x80)) {
-            SKA_BlendVec3(pA->aBones[i].v10, pB->aBones[i].v10, pOut->aBones[i].v10, fT);
+            SKA_BlendVec3(pA->aBones[i].vPos, pB->aBones[i].vPos, pOut->aBones[i].vPos, fT);
             BitArray_MergeArrayWithOr(pOut->a10, aCur, pOut->a10, 0x80);
         }
         BitArray_ShiftUp(aCur, aCur, 0x80, 1);
@@ -1138,7 +1138,7 @@ void SKEL_Free(CharModel* pModel) {
 
 // Fills in aBone, each bone id's index in the model (0xFF: none; id 0 is bone 0): each model bone
 // from 1 is found by its name (the first 8 bytes of uId) in mtalib.c's bone names (gSkelBoneNames).
-// The club bone (0x52) can go by other names: of the first 30 bones with no known name, the first
+// The club bone (SKEL_BONE_IGDRIVER) goes by other names: of the first 30 bones with no known name, the first
 // named in gSkelClubBoneNames becomes it.
 void SKEL_GenerateBoneLookupTable(CharModel* pModel) {
     char szName[9];
@@ -1172,7 +1172,7 @@ void SKEL_GenerateBoneLookupTable(CharModel* pModel) {
             szName[8] = '\0';
             for (j = 0; j < sizeof(gSkelClubBoneNames) / sizeof(gSkelClubBoneNames[0]); j++) {
                 if (strcmp(gSkelClubBoneNames[j], szName) == 0) {
-                    pModel->aBone[0x52] = aUnknown[i];
+                    pModel->aBone[SKEL_BONE_IGDRIVER] = aUnknown[i];
                     return;
                 }
             }
@@ -1226,10 +1226,10 @@ void SKEL_InitHalfJoints(CharModel* pModel, SkelPose* pPose) {
     int nSecond = CharModel_GetBoneIndex(pModel, 0x22);
 
     if (nFirst != 0xFF) {
-        Quat_Copy(pPose->aBones[nFirst].q0, pModel->q740);
+        Quat_Copy(pPose->aBones[nFirst].qRot, pModel->q740);
     }
     if (nSecond != 0xFF) {
-        Quat_Copy(pPose->aBones[nSecond].q0, pModel->q750);
+        Quat_Copy(pPose->aBones[nSecond].qRot, pModel->q750);
     }
 }
 
@@ -1240,7 +1240,7 @@ void SKEL_SetHalfJoint(CharModel* pModel, int nBone, int nJoint, f32* pRest) {
     Quat_Slerp(pModel->pBones[nJoint].q0C, pModel->pBones[nBone].q0C, 0.5f);
 }
 
-// Hands the model its skin's bone poses (SkinModel.p34); SKEL_UpdateSkinningMatrix does nothing
+// Hands the model its skin's bone poses (SkinModel.pPoses); SKEL_UpdateSkinningMatrix does nothing
 // without them.
 void SKEL_SetSkinBonePoses(CharModel* pModel, void* pPoses) {
     pModel->p760 = pPoses;

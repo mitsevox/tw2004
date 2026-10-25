@@ -1204,7 +1204,7 @@ void FE_SetupCharState(void) {
 
 // The shown golfer's pre-bones callback (pfnPreBones, set by FE_vUpdateGolferAll), with b85 set:
 // pins him to his spot by zeroing the waist bone's (bone 1) x, z and w, and moves the club bone
-// (0x52, when the character's bit 0x4000 is set) and the ball bone (0x54, when he holds the ball:
+// (when the character's bit 0x4000 is set) and the ball bone (0x54, when he holds the ball:
 // Character_IsHoldingBall) with it, keeping their offsets from the waist.
 void FE_CharPositionOverwrite(void) {
     f32 vClubPos[4];
@@ -1217,7 +1217,7 @@ void FE_CharPositionOverwrite(void) {
 
     pModel = gpCrAPState->pShown->pChar->pModel;
     pWaistBone = &pModel->pBones[CharModel_GetBoneIndex(pModel, 1)];
-    pClubBone = &pModel->pBones[CharModel_GetBoneIndex(pModel, 0x52)];
+    pClubBone = &pModel->pBones[CharModel_GetBoneIndex(pModel, SKEL_BONE_IGDRIVER)];
     CharModel_GetBoneIndex(pModel, 0x54);              // EA looks bone 0x54 up here without using it
     bBallExists = Character_IsHoldingBall(gpCrAPState->pShown->pChar);
     if (gpCrAPState->b85 == 0) {

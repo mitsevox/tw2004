@@ -279,7 +279,7 @@ Skin.c:
 	.sbss       start:0x80281D70 end:0x80281D80
 	.sdata2     start:0x80283018 end:0x80283020
 
-Code80037AB8.c:
+SkinUtil.c:
 	.text       start:0x80037AB8 end:0x80037DD8
 	.bss        start:0x801D4F68 end:0x801D4F80
 	.sdata      start:0x80281100 end:0x80281108

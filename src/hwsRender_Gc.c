@@ -225,9 +225,9 @@ void fn_80112DD8(s32 nEntry) {
                 nMesh = *pMesh++;
                 if (nMesh >= 0) {
                     if (nMesh < nOverrides && apOverride[nMesh] != NULL) {
-                        fn_801136C4(&pDesc->p34[nMesh], apOverride[nMesh], pRefs, anFirst[j], *pCount);
+                        fn_801136C4(&pDesc->pMeshes[nMesh], apOverride[nMesh], pRefs, anFirst[j], *pCount);
                     } else {
-                        fn_8011368C(&pDesc->p34[nMesh], pRefs, anFirst[j], *pCount);
+                        fn_8011368C(&pDesc->pMeshes[nMesh], pRefs, anFirst[j], *pCount);
                     }
                 }
                 anFirst[j] += *pCount;
@@ -477,7 +477,7 @@ void fn_80113904(s32 p0) {
 
 // ---- end of sweep code ----
 
-// An iterator in pBuf over the SkinDesc.p34 meshes of pArgs's SkinDesc.p44 entry (first step
+// An iterator in pBuf over the SkinDesc.pMeshes meshes of pArgs's SkinDesc.p44 entry (first step
 // taken). It takes as many steps as the n1s of the entry's SkinDesc28 add up to.
 SkinIter* fn_80113910(u8* pBuf, SkinIterArgs* pArgs) {
     SkinMeshIter* pIter = (SkinMeshIter*)pBuf;
@@ -568,7 +568,7 @@ void fn_80113BCC(SkinIter* pIter) {
         }
         p->iter.nCur = p->pDesc->p3C[p->pEntry->n0 + p->n1C];
         if (p->iter.nCur >= 0) {
-            p->iter.pCur = &p->pDesc->p34[p->iter.nCur];
+            p->iter.pCur = &p->pDesc->pMeshes[p->iter.nCur];
         }
     } while (p->iter.nCur < 0);
 }

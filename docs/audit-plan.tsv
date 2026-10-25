@@ -130,7 +130,7 @@ order	area	file	task	scope	state
 127	Characters	AnimStream.c	chunk 1/2	AnimStream_Init .. AnimStream_ReadPlayerClips	open
 128	Characters	AnimStream.c	chunk 2/2	AnimStream_ReadFirstClips .. SKA_UnpackSwappedName	open
 129	Characters	AnimStream.c	whole-file review	the whole file	open
-130	Characters	Code80037AB8.c	pass	the whole file	open
+130	Characters	SkinUtil.c	pass	the whole file	done
 131	Characters	SkinBurn.c	pass	the whole file	open
 132	Characters	animblender.c	pass	the whole file	open
 133	Characters	SkinPart.c	chunk 1/2	SkinPart_ApplyBodyChoices .. SkinPart_UpdateMarks	open

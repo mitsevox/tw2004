@@ -126,9 +126,9 @@ void SKABlendData_Init(SKABlendNode** ppNode, int nType, int nFormat, SKABlendFn
         BitArray_FillArray(((SkelPose1*)(*ppNode)->pPose)->pose.a20, 128);
         BitArray_FillArray(((SkelPose1*)(*ppNode)->pPose)->pose.a30, 128);
         for (i = 0; i < 3; i++) {
-            BitArray_FillArray(((SkelPose1*)(*ppNode)->pPose)->aBlocks[i].aBits, 20);
-            for (j = 0; j < 20; j++) {
-                ((SkelPose1*)(*ppNode)->pPose)->aBlocks[i].af8[j] = 0.0f;
+            BitArray_FillArray(((SkelPose1*)(*ppNode)->pPose)->aBlocks[i].aBits, SKELPOSE_NUM_MORPHS);
+            for (j = 0; j < SKELPOSE_NUM_MORPHS; j++) {
+                ((SkelPose1*)(*ppNode)->pPose)->aBlocks[i].afMorphWeights[j] = 0.0f;
             }
         }
     }
@@ -231,7 +231,7 @@ void SKABlender_AddBlenderData(Character* pChar, SKABlendNode* pNew, SKABlendNod
                     Character_InitBoneStateBits(pChar, &((SkelPose1*)pNew->pPose)->pose);
                     for (j = 0; j < 3; j++) {
                         memset(&((SkelPose1*)pNew->pPose)->aBlocks[j], 0, sizeof(SkelPoseBlock));
-                        BitArray_FillArray(((SkelPose1*)pNew->pPose)->aBlocks[j].aBits, 20);
+                        BitArray_FillArray(((SkelPose1*)pNew->pPose)->aBlocks[j].aBits, SKELPOSE_NUM_MORPHS);
                     }
                 }
             }
@@ -386,8 +386,8 @@ void SKABlender_Update(Character* pChar, SKABlendNode* pNode, CharModel* pModel,
                     }
                     if ((pClipFirst->uFlags & 0x10) && !(pClipOther->uFlags & 0x10)) {
                         pPose = pFirst->pPose;
-                        LLMath_CopyVec(pChar->qGripFromRoot, pPose->aBones[pChar->nGripBone].q0);
-                        LLMath_CopyVec(pChar->vGripFromRoot, pPose->aBones[pChar->nGripBone].v10);
+                        LLMath_CopyVec(pChar->qGripFromRoot, pPose->aBones[pChar->nGripBone].qRot);
+                        LLMath_CopyVec(pChar->vGripFromRoot, pPose->aBones[pChar->nGripBone].vPos);
                     }
                 }
             }
@@ -582,7 +582,7 @@ void SKABlender_BlendLinear(SKABlendNode* pNode, CharModel* pModel, f32 fTime) {
             memcpy(pNode->pPose, pNode->u.blend.apChild[nChannel]->pPose, sizeof(SkelPose1));
             for (i = 0; i < 3; i++) {
                 BitArray_ClearArray(((SkelPose1*)pNode->u.blend.apChild[nChannel]->pPose)->aBlocks[i].aBits,
-                                  20);
+                                  SKELPOSE_NUM_MORPHS);
             }
         }
     }

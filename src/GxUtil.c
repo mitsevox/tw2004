@@ -148,5 +148,5 @@ void fn_8002A608(GxTexture* pTex) {
 }
 
 void* fn_8002A624(void) {
-    return lbl_80281100->pPixels;
+    return gpScreenCopy->pPixels;
 }

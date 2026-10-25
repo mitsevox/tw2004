@@ -94,7 +94,6 @@ void  ClipBank_Restore(int nSlot);                  // skalib.c
 ClipBank* ClipBank_Get(u32 nSlot);                  // skalib.c
 AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank);  // skalib.c
 CharModel* SKEL_LoadFromMem(u8* pData, s8 n, CharModelDefs* pDefs, int b);   // Skeleton.c
-void  fn_80037AB8(Skin* pSkin, CharModel* pModel, int nBone, int nId);   // Skin.c
 void  SkinPart_BurnBodySkin(Character* pChar);                // SkinPart.c
 CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData);
 void  Character_FreeClubSkinSets(CharSkinSet* pSet);
@@ -130,7 +129,6 @@ void  SKA_SetLeftHanded(u8 v);                                        // ska_sha
 void  SKEL_PreTransformIKSkeleton(CharModel* pModel);                           // Skeleton.c
 void  SKEL_PostTransformIKSkeleton(Character* pChar);                            // Skeleton.c
 void  SKEL_UpdateState(CharModel* pModel, SkelPose* pPose, u8 bTransform);   // Skeleton.c
-void  fn_80037C48(Skin* pSkin, SkelPose* pPose);                // Skin.c
 void  CharacterState_PlayClipMorphs(Character* pChar, void* pLib, u8 bReset, f32 fOffset);   // CharAnim.c
 void  CharacterState_UpdateMorphState(Character* pChar);                            // CharAnim.c
 int   Character_UpdateClubAttachment(Character* pChar, Clip* pClip);
@@ -311,8 +309,8 @@ void Character_InitBoneState(Character* pChar, SkelPose* pPose) {
         BitArray_FillArray(pPose->a20, 0x80);
         BitArray_FillArray(pPose->a30, 0x80);
         for (i = 0; i < pChar->pModel->nBones; i++) {
-            Quat_Copy(pSkin->pose.aBones[i].q0, pPose->aBones[i].q0);
-            Quat_Copy(pSkin->pose.aBones[i].v10, pPose->aBones[i].v10);
+            Quat_Copy(pSkin->pose.aBones[i].qRot, pPose->aBones[i].qRot);
+            Quat_Copy(pSkin->pose.aBones[i].vPos, pPose->aBones[i].vPos);
         }
     }
 }
@@ -427,7 +425,7 @@ f32 Character_GetTerrainHeightAndNormal(Character* pChar, f32* pPos, f32** ppNor
 // the right toe, left toe, right ankle and left ankle (bones 0x3A, 0x48, 0x39, 0x47), from the
 // points Character_SetSkin kept in the skin, or before that set out along the bones' axes by the
 // model's leg sizes (fRightFootLen right, fLeftFootLen left); 4 the club class's club point through
-// the club bone 0x52 (IGdriver).
+// the club bone (SKEL_BONE_IGDRIVER).
 void Character_UpdateTestPoints(Character* pChar) {
     f32 (*pClubMtx)[4];
     f32 (*pMtxLToe)[4];
@@ -440,7 +438,7 @@ void Character_UpdateTestPoints(Character* pChar) {
     if (!Character_IsGolfer(pChar)) {
         return;
     }
-    pClubMtx = Character_GetBoneMatrix(pChar, 0x52);
+    pClubMtx = Character_GetBoneMatrix(pChar, SKEL_BONE_IGDRIVER);
     if (pChar->pSkin->bFootPoints) {
         pMtxLToe = Character_GetBoneMatrixSwapIfLefty(pChar, 0x48);
         pMtxRToe = Character_GetBoneMatrixSwapIfLefty(pChar, 0x3A);
@@ -472,7 +470,7 @@ void Character_UpdateTestPoints(Character* pChar) {
 
 // Keeps the club out of the ground: on fairly level ground (the feet's average ground normal vAvgGroundNormal
 // has y above 0.9), when the club point (test point 4) is below the terrain and the club bone
-// 0x52's y axis points into the slope, that axis is shortened by how far the point is under,
+// SKEL_BONE_IGDRIVER's y axis points into the slope, that axis is shortened by how far the point is under,
 // measured against the club class's head height (not below 3/4 of it).
 void Character_KeepClubOutOfGround(Character* pChar) {
     f32 vNormal[4];
@@ -485,7 +483,7 @@ void Character_KeepClubOutOfGround(Character* pChar) {
     f32 fHead;
 
     if (pChar->pClubSet != NULL && pChar->vAvgGroundNormal[1] > 0.9f) {
-        pMtx = Character_GetBoneMatrix(pChar, 0x52);
+        pMtx = Character_GetBoneMatrix(pChar, SKEL_BONE_IGDRIVER);
         if (pMtx != NULL && (pCourse = Ter_GetTGD()) != NULL) {
             fHeight = Ter_GetCoveringGroundHeightAndNormal(pCourse, pChar->aTestPoints[4], vNormal);
             // the else's return is the dead second `b` after the fUnder return; !(<) keeps the
@@ -504,7 +502,7 @@ void Character_KeepClubOutOfGround(Character* pChar) {
                 fLength = (fHead - fUnder * vNormal[1] / fDot) / fHead;
                 if (fLength > 0.75f) {
                     Vec3_Scale(fLength, pMtx[1], pMtx[1]);
-                    SKEL_UpdateSkinningMatrix(pChar->pModel, pMtx, 0x52);
+                    SKEL_UpdateSkinningMatrix(pChar->pModel, pMtx, SKEL_BONE_IGDRIVER);
                 }
             }
         }
@@ -578,7 +576,7 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
     if (pChar->blend.pPose != NULL) {
         SKABlender_Update(pChar, &pChar->blend, pChar->pModel, pChar->fAnimTime);
         if (Character_IsGolfer(pChar) && pChar->pClubSet != NULL) {
-            // fake match: aBones[nClubHeadBone].v10[1] written as a flat float index (0x40 / 4 + 8 per
+            // fake match: aBones[nClubHeadBone].vPos[1] written as a flat float index (0x40 / 4 + 8 per
             // bone + 5), which gives the original's indexed store; the pose is all 4-byte words
             ((f32*)pChar->blend.pPose)[pChar->nClubHeadBone * 8 + 21]
                     = pChar->pClubSet->afC[pChar->nClubClass];
@@ -601,7 +599,7 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
     }
     if (!gSession.b11 && Character_IsGolfer(pChar) && pChar->morphBlend.pPose != NULL) {
         SKABlender_Update(pChar, &pChar->morphBlend, pChar->pModel, pChar->morphAnim.fTime);
-        fn_80037C48(pChar->pSkin, pChar->morphBlend.pPose);
+        SKN_ApplyPoseMorphWeights(pChar->pSkin, pChar->morphBlend.pPose);
     }
     if (pChar->uFlags & 2) {
         pChar->uFlags |= 1;
@@ -645,12 +643,12 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
 }
 
 // Gives the character its skeleton (model) and looks up the bones the swing needs: the club head
-// (0x53), the club bone (0x52, IGdriver: the trail's grip end) and the right wrist (0x15).
+// (0x53), the club bone (SKEL_BONE_IGDRIVER: the trail's grip end) and the right wrist (0x15).
 void Character_SetSkeleton(Character* pChar, CharModel* pModel) {
     if (pChar != NULL) {
         pChar->pModel        = pModel;
         pChar->nClubHeadBone = CharModel_GetBoneIndex(pChar->pModel, 0x53);
-        pChar->nGripBone     = CharModel_GetBoneIndex(pChar->pModel, 0x52);
+        pChar->nGripBone     = CharModel_GetBoneIndex(pChar->pModel, SKEL_BONE_IGDRIVER);
         pChar->nWristBone    = CharModel_GetBoneIndexMapped(pChar->pModel, 0x15);
     }
 }
@@ -732,8 +730,8 @@ void Character_SetPreferedPos(Character* pChar) {
         SKEL_UpdateState(pChar->pModel, &pChar->pSkin->pose, 1);
         SKEL_InitHalfJoints(pChar->pModel, &pChar->pSkin->pose);
         if (pChar->pSkin->pModel != NULL) {
-            fn_80037AB8(pChar->pSkin, pChar->pModel, 0, 0);
-            SKEL_SetSkinBonePoses(pChar->pModel, pChar->pSkin->pModel->p34);
+            SKN_InitDefaultPose(pChar->pSkin, pChar->pModel, 0, 0);
+            SKEL_SetSkinBonePoses(pChar->pModel, pChar->pSkin->pModel->pPoses);
             SKEL_SetDefaultWorld2BoneMatrices(pChar->pModel, pChar->pSkin->pWorld2Bone);
             SKEL_SetSkinningMatrices(pChar->pModel, pChar->pSkin->pSkinMtx, pChar->pSkin->pModel->nBones);
         }
@@ -970,7 +968,7 @@ void Character_IKLegToGround(Character* pChar, TGD_TerrainInfo* pCourse, int nLe
     if (fabsf(fTurn) > 0.0001f) {
         Vec3_Scale(fTurn, vNormal, vAxis);
         Quat_BuildFromVector(vAxis, qTurn);
-        Quat_Invert(pChar->pModel->pPoses[nKnee].q0, qA8);
+        Quat_Invert(pChar->pModel->pPoses[nKnee].qRot, qA8);
         Quat_RotateVector(qA8, qTurn, q98);
         Quat_Multiply(q98, pChar->pModel->pBones[nKnee].q0C, qB8);
         Quat_Copy(qB8, pChar->pModel->pBones[nKnee].q0C);
@@ -983,7 +981,7 @@ void Character_IKLegToGround(Character* pChar, TGD_TerrainInfo* pCourse, int nLe
         Vec3_Scale(fTurn2, vNormal, vAxis);
         vAxis[3] = 0.0f;
         Quat_BuildFromVector(vAxis, qTurn);
-        Quat_Invert(pChar->pModel->pPoses[nHip].q0, qA8);
+        Quat_Invert(pChar->pModel->pPoses[nHip].qRot, qA8);
         Quat_RotateVector(qA8, qTurn, q98);
         Quat_Multiply(q98, pChar->pModel->pBones[nHip].q0C, qB8);
         Quat_Copy(qB8, pChar->pModel->pBones[nHip].q0C);
@@ -991,11 +989,11 @@ void Character_IKLegToGround(Character* pChar, TGD_TerrainInfo* pCourse, int nLe
 
     // the ankle: tilted about the horizontal axis across the slope, by the slope's angle
     pBone = &pChar->pModel->pBones[nHip];
-    Quat_Multiply(pBone->q0C, pChar->pModel->pPoses[pBone->nParent].q0, q88);
+    Quat_Multiply(pBone->q0C, pChar->pModel->pPoses[pBone->nParent].qRot, q88);
     Quat_Multiply(pChar->pModel->pBones[nKnee - 1].q0C, q88, q58);
     Quat_Multiply(pChar->pModel->pBones[nKnee].q0C, q58, q68);
     Quat_Invert(q68, q78);
-    Quat_Multiply(pChar->pModel->pPoses[nAnkle].q0, q78, q48);
+    Quat_Multiply(pChar->pModel->pPoses[nAnkle].qRot, q78, q48);
     vAxis[0] = vSlope[2];
     vAxis[1] = 0.0f;
     vAxis[2] = -vSlope[0];
@@ -1929,7 +1927,10 @@ Character* Character_CreateFromMem(u8* pData, int nUnused, int nSet, int nId, u8
         for (i = 0; i < 6; i++) {
             pSkin = pChar->pClubSet->apSkins[i];
             if (pSkin != NULL) {
-                fn_80037AB8(pSkin, pChar->pModel, CharModel_GetBoneIndex(pChar->pModel, 0x52) - 0x52, 0x52);
+                SKN_InitDefaultPose(pSkin, pChar->pModel,
+                                    CharModel_GetBoneIndex(pChar->pModel, SKEL_BONE_IGDRIVER) -
+                                        SKEL_BONE_IGDRIVER,
+                                    SKEL_BONE_IGDRIVER);
             }
         }
     }
@@ -2032,7 +2033,7 @@ void Character_FreeClubSkinSets(CharSkinSet* pSet) {
         if (gClubSkinSets[i] != NULL) {
             for (j = 0; j < 6; j++) {
                 if (gClubSkinSets[i]->apSkins[j] != NULL) {
-                    fn_80037CD8(gClubSkinSets[i]->apSkins[j]);
+                    SKN_Free(gClubSkinSets[i]->apSkins[j]);
                 }
                 if (gClubSkinSets[i]->a9C[j] != NULL) {
                     CharSkinRef_Free(gClubSkinSets[i]->a9C[j]);
@@ -2208,7 +2209,7 @@ void Character_UpdateAll(f32 fTime) {
 }
 
 // Hangs the club from the hand or from the root, as the clip says. With clip flag 0x10 the club
-// bone (nGripBone, bone 0x52) goes back to its parent, the right wrist (nWristBone); otherwise it is
+// bone (nGripBone, SKEL_BONE_IGDRIVER) goes back to its parent, the right wrist (nWristBone); otherwise it is
 // parented to the root (bit 0x4000 of uCharFlags) and its rotation and offset from the root are
 // kept in qGripFromRoot and vGripFromRoot (for a left-hander turned half round and mirrored in z).
 // Returns 1 when the attachment changed, 0 when it already was that way.
@@ -2229,14 +2230,14 @@ int Character_UpdateClubAttachment(Character* pChar, Clip* pClip) {
         pModel = pChar->pModel;
         pChar->uCharFlags |= 0x4000;
         pChar->pModel->pBones[pChar->nGripBone].nParent = 0;
-        Quat_Invert(pModel->pPoses[0].q0, qRoot);
-        Quat_Multiply(pModel->pPoses[pChar->nGripBone].q0, qRoot, pChar->qGripFromRoot);
+        Quat_Invert(pModel->pPoses[0].qRot, qRoot);
+        Quat_Multiply(pModel->pPoses[pChar->nGripBone].qRot, qRoot, pChar->qGripFromRoot);
         if (Character_IsLeftHanded(pChar)) {
             Legacy_Quat_BuildFromPitch(PI, qTurn);
             Quat_Multiply(pChar->qGripFromRoot, qTurn, qGrip);
             Quat_Copy(qGrip, pChar->qGripFromRoot);
         }
-        Char_Vec4Sub(pModel->pPoses[pChar->nGripBone].v10, pModel->pPoses[0].v10, vOffset);
+        Char_Vec4Sub(pModel->pPoses[pChar->nGripBone].vPos, pModel->pPoses[0].vPos, vOffset);
         vOffset[3] = 0.0f;
         Quat_RotateVector(qRoot, vOffset, pChar->vGripFromRoot);
         pChar->vGripFromRoot[3] = 0.0f;
@@ -2328,7 +2329,7 @@ void Character_Free(Character* pChar) {
         pNode = &pChar->morphBlend;  // a node without the root's nGroup
         SKABlendData_Shutdown(&pNode, 0);
         if (pChar->pSkin != NULL) {
-            fn_80037CD8(pChar->pSkin);
+            SKN_Free(pChar->pSkin);
         }
         if (pChar->pLib != NULL) {
             AnimLib_Free(pChar->pLib);
@@ -2658,14 +2659,14 @@ void Character_SetupForShot(Character* pChar) {
     Char_Vec4Sub(pPlayer->vTarget, pBallPos, vDir);
     vDir[1] = 0.0f;
     Character_SetOrientationVec(pChar, vDir, 0.0f);
-    Quat_Copy(pModel->pBones[0].q0C, pModel->pPoses[0].q0);
-    Quat_Copy(pModel->pBones[0].v1C, pModel->pPoses[0].v10);
-    Quat_QuatToMatrix(pModel->pPoses[0].q0, pModel->pMatrices[0]);
-    Vec4_CopyPoint(pModel->pPoses[0].v10, pModel->pMatrices[0][3]);
+    Quat_Copy(pModel->pBones[0].q0C, pModel->pPoses[0].qRot);
+    Quat_Copy(pModel->pBones[0].v1C, pModel->pPoses[0].vPos);
+    Quat_QuatToMatrix(pModel->pPoses[0].qRot, pModel->pMatrices[0]);
+    Vec4_CopyPoint(pModel->pPoses[0].vPos, pModel->pMatrices[0][3]);
     if (bInitIK && (pSkel = pChar->pModel->pSkel) != NULL) {
         pOldClip = pChar->pCurClip;
         CharModel_GetBoneIndex(pChar->pModel, 1);      // the results are not used
-        CharModel_GetBoneIndex(pChar->pModel, 0x52);
+        CharModel_GetBoneIndex(pChar->pModel, SKEL_BONE_IGDRIVER);
         pClip = Char_SetClip(pChar, 0, pChar->nStyle, NULL);
         if (pClip->pD8 == NULL) {
             SKEL_ResetIKSkeleton(pSkel);
@@ -2691,11 +2692,11 @@ void Character_SetupForShot(Character* pChar) {
         }
         Char_Vec4Add(vOffsetX, pChar->pModel->pBones[0].v1C, pChar->pModel->pBones[0].v1C);
         Char_Vec4Add(vOffsetZ, pChar->pModel->pBones[0].v1C, pChar->pModel->pBones[0].v1C);
-        Quat_Copy(pModel->pBones[0].v1C, pModel->pPoses[0].v10);
-        Vec4_CopyPoint(pModel->pPoses[0].v10, pModel->pMatrices[0][3]);
+        Quat_Copy(pModel->pBones[0].v1C, pModel->pPoses[0].vPos);
+        Vec4_CopyPoint(pModel->pPoses[0].vPos, pModel->pMatrices[0][3]);
         SKEL_ResetIKSkeleton(pSkel);
         if (pChar->pClubSet != NULL) {
-            pSkel->pose.aBones[pChar->nClubHeadBone].v10[1] = pChar->pClubSet->afC[pChar->nClubClass];
+            pSkel->pose.aBones[pChar->nClubHeadBone].vPos[1] = pChar->pClubSet->afC[pChar->nClubClass];
         }
         SKEL_UpdateState(pChar->pModel, &pSkel->pose, 1);
         Character_UpdateTestPoints(pChar);
@@ -3107,7 +3108,7 @@ void Character_GetTeeInHandPositionAndRot(Character* pChar, f32* pPos, f32* pAng
         } else {
             LLMath_AddScale3(pPos, vAxis, 0.000625f, pPos);
         }
-        Quat_ExtractEulerAngles(pChar->pModel->pPoses[CharModel_GetBoneIndexMapped(pChar->pModel, 0x15)].q0,
+        Quat_ExtractEulerAngles(pChar->pModel->pPoses[CharModel_GetBoneIndexMapped(pChar->pModel, 0x15)].qRot,
                                 &pAngles[0], &pAngles[1],
                     &pAngles[2]);
         pAngles[1] += 30.0f / 180.0f * PI;

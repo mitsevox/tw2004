@@ -65,10 +65,10 @@ typedef struct IKChainDef {
 } IKChainDef;
 LAYOUT_ASSERT(IKChainDef, 0x10);
 
-// A bone's pose in a model (CharModel.p34).
+// A bone's pose in a model (CharModel.pPoses, SkinModel.pPoses).
 typedef struct BonePose {
-    f32  q0[4];                 // 0x00  its rotation (quaternion)
-    f32  v10[4];                // 0x10  its position (SKEL_TranslateIKChainY moves its y)
+    f32  qRot[4];               // 0x00  its rotation (quaternion)
+    f32  vPos[4];               // 0x10  its position (SKEL_TranslateIKChainY moves its y)
 } BonePose;
 LAYOUT_ASSERT(BonePose, 0x20);
 
@@ -85,13 +85,14 @@ typedef struct SkelPose {
 LAYOUT_ASSERT(SkelPose, 0x1040);
 
 // A format 1 pose buffer (0x114C bytes; animblender.c copies it whole): three blocks from 0x4, each
-// starting with a bit per morph (20: SKABlender_BlendLinear clears them all; CharSliders.c clears morph
+// starting with a bit per morph (SKABlender_BlendLinear clears them all; CharSliders.c clears morph
 // m's in every block with SKABlender_ClearMorph).
-// SKABlendData_Init sets each block's bits and its 20 floats, and clears the SkelPose's first bit arrays.
+// SKABlendData_Init sets each block's bits and its weights, and clears the SkelPose's first bit arrays.
+#define SKELPOSE_NUM_MORPHS  20     // morphs in a block: its bits and weights
 typedef struct SkelPoseBlock {
-    u32  aBits[1];              // 0x00
+    u32  aBits[1];              // 0x00  a bit per morph: its weight was set
     u8   unk4[4];
-    f32  af8[20];               // 0x08  one per morph, 0 when the buffer is taken (SKABlendData_Init)
+    f32  afMorphWeights[SKELPOSE_NUM_MORPHS];   // 0x08  0 when the buffer is taken (SKABlendData_Init)
 } SkelPoseBlock;
 LAYOUT_ASSERT(SkelPoseBlock, 0x58);
 
@@ -274,12 +275,16 @@ LAYOUT_ASSERT(DynChainSettings, 0xC0);
 // mtalib.c (Skeleton.c reads it): EA's bone names, by bone id (the first is empty);
 // SKEL_GenerateBoneLookupTable finds the model's bones by them. The ids the golfer code uses: 0x15
 // rwrst (the right wrist), 0x36 rhip, 0x38 rknee, 0x39 rankl, 0x3A rtoe, 0x44-0x48 the left leg's
-// (lhip, lthitwst, lknee, lankl, ltoe), 0x52 IGdriver (the club bone, gripped), 0x53 clubhead,
+// (lhip, lthitwst, lknee, lankl, ltoe), SKEL_BONE_IGDRIVER, 0x53 clubhead,
 // 0x54 GBall1. The model loader (SKEL_LoadFromMem) copies bone 0x54's first 8 bytes into each bone
 // it adds as the bone's uId.
 extern char* gSkelBoneNames[90];
+// Bone ids: indexes into gSkelBoneNames, named for their entry.
+typedef enum SkelBoneId {
+    SKEL_BONE_IGDRIVER = 0x52     // "IGdriver": the club bone, gripped; a club skin's bones start at it
+} SkelBoneId;
 // Skeleton.c: the names of the club models' bones ("IGDriver", "IGputter", "IGiron3", "IGiron7",
-// "IGwedge"); SKEL_GenerateBoneLookupTable gives a model bone with one of them bone id 0x52's index.
+// "IGwedge"); SKEL_GenerateBoneLookupTable gives a model bone with one of them SKEL_BONE_IGDRIVER's index.
 extern char* gSkelClubBoneNames[5];
 extern struct Character* gSkelIKCharacter;   // Skeleton.c: the character SKEL_AdjustHipPosition moves with its root
 extern u8 gSkelPantBones[6];      // Skeleton.c: the bone ids of the model's kind 2 dynamic chains
@@ -726,7 +731,7 @@ typedef struct Character {
                                 //         character found by id); cleared when an update is skipped
     s32   nClubClass;           // 0x169C  the club class for clip lookups (Char_SetClip; 1 looks up as 0)
     s32   nClubHeadBone;        // 0x16A0  bone 0x53's index: the club head (the swing trail's end)
-    s32   nGripBone;            // 0x16A4  bone 0x52's index: the grip (the trail's other end)
+    s32   nGripBone;            // 0x16A4  SKEL_BONE_IGDRIVER's index: the grip (the trail's other end)
     s32   nWristBone;           // 0x16A8  bone 0x15's index, the right wrist (CharModel_GetBoneIndexMapped):
                                 //         the grip bone's parent (Character_UpdateClubAttachment restores it after flag 0x4000)
     f32   qGripFromRoot[4];     // 0x16AC  } the grip bone's rotation and offset from the root while
@@ -1201,7 +1206,8 @@ LAYOUT_ASSERT(MalBank, 0x1C);
 // byte b gives fLo + (fHi - fLo) * b / 256 (MtaLib_GetEntryFrames).
 typedef struct MtaEntry {
     u8     unk00[0x20];
-    s32    nMorph;              // 0x20  the morph whose weight it drives (SkelPoseBlock.af8); < 0: none
+    s32    nMorph;              // 0x20  the morph whose weight it drives (SkelPoseBlock.afMorphWeights);
+                                //       < 0: none
     s32    nBytes;              // 0x24  the bytes of its data
     s32    nLastFrame;          // 0x28
     f32    fFrameTime;          // 0x2C  the time per frame

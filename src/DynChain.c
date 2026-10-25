@@ -114,18 +114,18 @@ void fn_801140AC(DynChainLink* pLink, CharModel* pModel, int nBone, s32 nType) {
         pLink->nParent = pModel->pBones[nBone].nParent;
         LLMath_CopyVec(pModel->pMatrices[nBone][3], pLink->v04);
         if (nType == 0) {
-            Vec4_CopyPoint(pModel->pPoses[pLink->nParent].v10, vParent);
-            Vec4_CopyPoint(pModel->pPoses[nBone].v10, vBone);
+            Vec4_CopyPoint(pModel->pPoses[pLink->nParent].vPos, vParent);
+            Vec4_CopyPoint(pModel->pPoses[nBone].vPos, vBone);
             fn_801164D4(vBone, vParent, vDiff);
             pLink->fLength = LLMath_NormalizeReturnLength3(vDiff, vDiff);
         } else {
             pLink->fLength = 0.5f;
         }
         pLink->f8C = 0.0f;
-        Quat_Copy(pModel->pPoses[nBone].q0, pLink->q44);
-        Quat_Copy(pModel->pPoses[nBone].q0, pLink->q54);
-        Quat_Copy(pModel->pPoses[nBone].v10, pLink->v64);
-        Quat_Copy(pModel->pPoses[nBone].v10, pLink->v74);
+        Quat_Copy(pModel->pPoses[nBone].qRot, pLink->q44);
+        Quat_Copy(pModel->pPoses[nBone].qRot, pLink->q54);
+        Quat_Copy(pModel->pPoses[nBone].vPos, pLink->v64);
+        Quat_Copy(pModel->pPoses[nBone].vPos, pLink->v74);
         vec4flt_Zero(pLink->v24);
     }
 }
@@ -333,9 +333,9 @@ void fn_80114540(CharModel* pModel, DynChain* pChain, f32 fDelta) {
             vAxis[1] *= fAngle;
             vAxis[2] *= fAngle;
             Quat_BuildFromVector(vAxis, qTurn);
-            Quat_Multiply(pModel->pPoses[pChain->nBone].q0, qTurn, pModel->pPoses[pChain->nBone].q0);
+            Quat_Multiply(pModel->pPoses[pChain->nBone].qRot, qTurn, pModel->pPoses[pChain->nBone].qRot);
         }
-        Quat_QuatToMatrix(pModel->pPoses[pChain->nBone].q0, mRot);
+        Quat_QuatToMatrix(pModel->pPoses[pChain->nBone].qRot, mRot);
         LLMath_IdentifyMat(mScale);
         mScale[0][0] = pModel->a140[pChain->nBone][0];
         mScale[1][1] = pModel->a140[pChain->nBone][1];
@@ -394,11 +394,11 @@ void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     // Each link's offset to the next bone as the model stands now.
     for (i = 0; i < pChain->nLinks - 1; i++) {
         pChain->pLinks[i].v34[0] =
-            pModel->pPoses[pChain->nBone + i + 1].v10[0] - pModel->pPoses[pChain->nBone + i].v10[0];
+            pModel->pPoses[pChain->nBone + i + 1].vPos[0] - pModel->pPoses[pChain->nBone + i].vPos[0];
         pChain->pLinks[i].v34[1] =
-            pModel->pPoses[pChain->nBone + i + 1].v10[1] - pModel->pPoses[pChain->nBone + i].v10[1];
+            pModel->pPoses[pChain->nBone + i + 1].vPos[1] - pModel->pPoses[pChain->nBone + i].vPos[1];
         pChain->pLinks[i].v34[2] =
-            pModel->pPoses[pChain->nBone + i + 1].v10[2] - pModel->pPoses[pChain->nBone + i].v10[2];
+            pModel->pPoses[pChain->nBone + i + 1].vPos[2] - pModel->pPoses[pChain->nBone + i].vPos[2];
         pChain->pLinks[i].v34[3] = 0.0f;
     }
 
@@ -408,7 +408,7 @@ void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     fPull = 30.0f * fStiff * fDelta;
     for (i = 1; i < pChain->nLinks; i++) {
         fDown = (f32)i / (f32)(pChain->nLinks + 1);
-        Quat_Copy(pModel->pPoses[pChain->nBone + i].v10, vPos);
+        Quat_Copy(pModel->pPoses[pChain->nBone + i].vPos, vPos);
         pChain->pLinks[i].v64[3] = 1.0f;
         vPos[3] = 1.0f;
         vDiff[0] = vPos[0] - pChain->pLinks[i].v64[0];
@@ -439,7 +439,7 @@ void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 fDelta) {
             vPos[1] += vZ[1] * fDot;
             vPos[2] += vZ[2] * fDot;
         }
-        Quat_Copy(pModel->pPoses[pChain->pLinks[i].nParent].v10, vParent);
+        Quat_Copy(pModel->pPoses[pChain->pLinks[i].nParent].vPos, vParent);
         vDiff[0] = vPos[0] - vParent[0];
         vDiff[1] = vPos[1] - vParent[1];
         vDiff[2] = vPos[2] - vParent[2];
@@ -450,7 +450,7 @@ void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         vPos[1] = vDiff[1] * pChain->pLinks[i].fLength + vParent[1];
         vPos[2] = vDiff[2] * pChain->pLinks[i].fLength + vParent[2];
         Quat_Copy(vPos, pChain->pLinks[i].v64);
-        Quat_Copy(vPos, pModel->pPoses[pChain->nBone + i].v10);
+        Quat_Copy(vPos, pModel->pPoses[pChain->nBone + i].vPos);
         Vec4_CopyPoint(vPos, pModel->pMatrices[pChain->nBone + i][3]);
         SKEL_UpdateSkinningMatrix(pModel, pModel->pMatrices[pChain->nBone + i], pChain->nBone + i);
     }
@@ -459,11 +459,11 @@ void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     for (i = 0; i < pChain->nLinks; i++) {
         if (i + 1 < pChain->nLinks) {
             vBone[0] =
-                pModel->pPoses[pChain->nBone + i + 1].v10[0] - pModel->pPoses[pChain->nBone + i].v10[0];
+                pModel->pPoses[pChain->nBone + i + 1].vPos[0] - pModel->pPoses[pChain->nBone + i].vPos[0];
             vBone[1] =
-                pModel->pPoses[pChain->nBone + i + 1].v10[1] - pModel->pPoses[pChain->nBone + i].v10[1];
+                pModel->pPoses[pChain->nBone + i + 1].vPos[1] - pModel->pPoses[pChain->nBone + i].vPos[1];
             vBone[2] =
-                pModel->pPoses[pChain->nBone + i + 1].v10[2] - pModel->pPoses[pChain->nBone + i].v10[2];
+                pModel->pPoses[pChain->nBone + i + 1].vPos[2] - pModel->pPoses[pChain->nBone + i].vPos[2];
             vBone[3] = 0.0f;
             Vec3Copy(pChain->pLinks[i].v34, vWas);
             if (0.0f != vBone[0] || 0.0f != vBone[1] || 0.0f != vBone[2]) {
@@ -485,11 +485,11 @@ void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 fDelta) {
                     vAxis[1] *= fAngle;
                     vAxis[2] *= fAngle;
                     Quat_BuildFromVector(vAxis, qTurn);
-                    Quat_Multiply(pModel->pPoses[pChain->nBone + i].q0, qTurn,
-                                pModel->pPoses[pChain->nBone + i].q0);
+                    Quat_Multiply(pModel->pPoses[pChain->nBone + i].qRot, qTurn,
+                                pModel->pPoses[pChain->nBone + i].qRot);
                 }
             }
-            Quat_QuatToMatrix(pModel->pPoses[pChain->nBone + i].q0, mRot);
+            Quat_QuatToMatrix(pModel->pPoses[pChain->nBone + i].qRot, mRot);
             LLMath_IdentifyMat(mScale);
             mScale[0][0] = pModel->a140[pChain->nBone + i][0];
             mScale[1][1] = pModel->a140[pChain->nBone + i][1];
@@ -501,9 +501,9 @@ void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         } else {
             // The last bone takes the rotation of the one above it (not in 4-link chains).
             if (pChain->nLinks != 4) {
-                Quat_Copy(pModel->pPoses[pChain->nBone + i - 1].q0, pModel->pPoses[pChain->nBone + i].q0);
+                Quat_Copy(pModel->pPoses[pChain->nBone + i - 1].qRot, pModel->pPoses[pChain->nBone + i].qRot);
             }
-            Quat_QuatToMatrix(pModel->pPoses[pChain->nBone + i].q0, mRot);
+            Quat_QuatToMatrix(pModel->pPoses[pChain->nBone + i].qRot, mRot);
             LLMath_IdentifyMat(mScale);
             mScale[0][0] = pModel->a140[pChain->nBone + i][0];
             mScale[1][1] = pModel->a140[pChain->nBone + i][1];
@@ -765,7 +765,7 @@ void fn_80115B2C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         // Bend down, by how level the link is and how near it points to the kind's direction.
         LLMath_Normalize3(vBone, vBoneN);
         fLevel = 1.0f - fabsf(vBoneN[1]);
-        Quat_ExtractEulerAngles(pModel->pPoses[pChain->pLinks->nParent].q0, &fX, &fY, &fZ);
+        Quat_ExtractEulerAngles(pModel->pPoses[pChain->pLinks->nParent].qRot, &fX, &fY, &fZ);
         fOff = fabsf(180.0f / PI * fY - lbl_80193E48[pChain->n10]);
         if (fOff > 360.0f) {
             fOff = (s32)fOff % 360;

@@ -1144,25 +1144,25 @@ void fn_8006DCA0(int n) {
 void fn_8006DCA4(int n) {
 }
 
-// Sets up the screen copy (lbl_80281100): with a size, render surface 1 of that size and kind
+// Sets up the screen copy (gpScreenCopy): with a size, render surface 1 of that size and kind
 // becomes its buffer; with none, it has no buffer.
 void fn_8006DCA8(s32 nWidth, s32 nHeight, s32 nC, s32 nKind) {
-    lbl_80281100->nWidth = nWidth;
-    lbl_80281100->nHeight = nHeight;
-    lbl_80281100->nC = nC;
+    gpScreenCopy->nWidth = nWidth;
+    gpScreenCopy->nHeight = nHeight;
+    gpScreenCopy->nC = nC;
     if (nWidth == 0 && nHeight == 0) {
-        lbl_80281100->nSize = 0;
-        lbl_80281100->pPixels = NULL;
+        gpScreenCopy->nSize = 0;
+        gpScreenCopy->pPixels = NULL;
         return;
     }
-    fn_8002F260(2, lbl_80281100->nWidth, lbl_80281100->nHeight, nKind, 8, 1);
-    lbl_80281100->nSize = fn_8002F454(1);
-    lbl_80281100->pPixels = lbl_801D3950[1].pBuffer;
+    fn_8002F260(2, gpScreenCopy->nWidth, gpScreenCopy->nHeight, nKind, 8, 1);
+    gpScreenCopy->nSize = fn_8002F454(1);
+    gpScreenCopy->pPixels = lbl_801D3950[1].pBuffer;
 }
 
 // Frees the screen copy's surface, if it has one.
 void fn_8006DD44(void) {
-    if (lbl_80281100->nWidth != 0 && lbl_80281100->nHeight != 0) {
+    if (gpScreenCopy->nWidth != 0 && gpScreenCopy->nHeight != 0) {
         fn_8002F32C(1);
     }
 }
