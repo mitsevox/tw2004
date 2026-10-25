@@ -199,7 +199,7 @@ UKernel.c	open
 UMatFlt.c	done	db5f2ece	claude-review
 UMath.c	done	db5f2ece	claude-review
 UMemPool.c	done	db5f2ece	claude-review
-UObject.c	open		
+UObject.c	done	23ee123c	claude-review
 UObject3D.c	open		
 URes.c	done	e845bd03	claude-review
 UStream.c	done	93ca1961	claude-review
