@@ -123,20 +123,6 @@ void GXSetVtxDesc(GXAttr attr, GXAttrType type) {
   __GXData->dirtyState |= 8;
 }
 
-void GXSetVtxDescv(GXVtxDescList *attrPtr) {
-  while (attrPtr->attr != GX_VA_NULL) {
-    SETVCDATTR(attrPtr->attr, attrPtr->type);
-    attrPtr++;
-  }
-
-  if (__GXData->hasNrms || __GXData->hasBiNrms) {
-    SET_REG_FIELD(__GXData->vcdLo, 2, 11, __GXData->nrmType);
-  } else {
-    SET_REG_FIELD(__GXData->vcdLo, 2, 11, 0);
-  }
-  __GXData->dirtyState |= 8;
-}
-
 void __GXSetVCD(void) {
   GX_WRITE_SOME_REG4(8, 0x50, __GXData->vcdLo, -12);
   GX_WRITE_SOME_REG4(8, 0x60, __GXData->vcdHi, -12);
