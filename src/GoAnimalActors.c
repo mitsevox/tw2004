@@ -44,7 +44,7 @@ void ActAnimal_SetWorldMatrix(DynObjAnimal* pAnimal, f32 fDt) {
     f32 fC;
     AnimalRoute* pRoute;
     AnimalNode* pNode;
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     f32 fPos;
     f32 fT;
     f32 fGround;
@@ -205,7 +205,7 @@ void ActAnimal_Init(DynObjAnimal* pAnimal, DynObjSetup* pSetup) {
     UObjMesh* pMesh;
     int nBitsA;
     int nBitsB;
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     f32 fGround;
     f32 fY;
 

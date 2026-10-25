@@ -22,7 +22,7 @@
 #define CUP_DIAMETER 0.10717f         // 3.86 in (a real cup is 4.25)
 
 void   Physics_StopBall(Ball* pBall);                   // 0x80054340
-void   Physics_SetLie(Ball* pBall, SurfaceType* pSurface);
+void   Physics_SetLie(Ball* pBall, TGD_MaterialInfo* pSurface);
 void   Physics_QuickSimulate(Ball* pBall, f32 fTicks);
 void   Physics_FixBallHeight(Ball* pBall, u8 bSettle, f32 fTicks);
 u8     Physics_GetShotTableAndSurfaceID(int nKind, int nClub, int a, const ClubRow** ppRow, s32* pSurface);
@@ -382,11 +382,12 @@ void   Physics_TimedSimulation_local(Ball* pBall, f32 fSeconds, f32 fTick);
 
 u8     DynObj_FindBallHit(int nPlayer, f32* pTo, f32* pFrom, f32* pHit, f32* pNormal, HitObject** ppWhat);
 u8     Physics_CheckFlagstickHit(Ball* pBall, void* pv, f32* pHit, f32* pNormal);
-u8     Physics_ProcessCollision(Ball* pBall, f32* pHit, f32* pNormal, SurfaceType* pSurface, TerObject* pObj,
+u8     Physics_ProcessCollision(Ball* pBall, f32* pHit, f32* pNormal, TGD_MaterialInfo* pSurface,
+                                TerObject* pObj,
                                 f32* pFrac, f32 fTicks);
 u8     Physics_CheckObjectCollisions(Ball* pBall, f32 fTicks);
 // the bounce; returns the impact
-f32    Physics_HandleCollision(Ball* pBall, f32* pNormal, SurfaceType* pSurface);
+f32    Physics_HandleCollision(Ball* pBall, f32* pNormal, TGD_MaterialInfo* pSurface);
 // the flagstick's position and radius
 void   DynObj_GetBoundingSphere(HitObject* pObj, f32* pPos, f32* pRadius);
 u8     Physics_CheckTerrainCollisions(Ball* pBall, f32 fTicks);
@@ -435,7 +436,7 @@ static inline f32 Ball_Clamp(f32 x, f32 fLo, f32 fHi) {
 // its player (0x49).
 #define BALL_LANDING_EVENTS(pBall, pSurface, pObj)                                                 \
     if ((pBall)->nPlayer >= 0) {                                                                   \
-        if ((pSurface)->u34 & 0x10) {                                                              \
+        if ((pSurface)->uFlags & 0x10) {                                                           \
             EVENT_Trigger((pBall)->nPlayer, 0x25, (pBall), !gSimulating);                            \
         }                                                                                          \
         if (MaterialTypes_getMaterialID(pSurface) == 90) {                                         \
@@ -599,7 +600,7 @@ static inline f32 ClubRow_Dist(const ClubRow* pRow, int i) {
 // ball.
 f32 Physics_EstimateShotPower(f32 fDist, Ball* pBall, int nKind, int nClub) {
     s32          nSurface;
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
     const ClubRow* pRow;
     f32          vNormal[4];
     f32          fBase, fAdj, fFrac, fPower;
@@ -723,7 +724,7 @@ u8 Physics_GetShotData(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, 
     f32          fSin, fCos;
     f32          fSinF, fCosF;
     f32          fSinS, fCosS;
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
     f32          fSpeed, fSlope, fSide, fMax, fLaunch, fKeep, fSpin;
     int          nLie;
 
@@ -1075,9 +1076,9 @@ static inline int Ball_Owner(Ball* pBall) {
 // the other source either (or it is more than 1 in above the ball), the ball may coast on for
 // up to two ticks on surface 109 (or its own) as if on flat ground - unless GM_IsBallOOB says
 // otherwise - and is a hazard after that. Returns 0 for a hazard.
-u8 Physics_GetSurfaceInfo(Ball* pBall, SurfaceType** ppSurface, f32* pNormal) {
-    SurfaceType* pSurface;
-    SurfaceType* pSurface2;
+u8 Physics_GetSurfaceInfo(Ball* pBall, TGD_MaterialInfo** ppSurface, f32* pNormal) {
+    TGD_MaterialInfo* pSurface;
+    TGD_MaterialInfo* pSurface2;
     f32          vNormal[4];
     f32          vNormal2[4];
     f32          fDrop;
@@ -1133,7 +1134,7 @@ void Physics_BallRollingandSlipping(Ball* pBall, f32 fTicks) {
     f32          vTmp[4];
     f32          vDir[4];
     f32          vSpinAdd[4];
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
     f32          fPull, fDot, fFric;
     if (!Physics_GetSurfaceInfo(pBall, &pSurface, vNormal)) return;
     pBall->nSurface = MaterialTypes_getMaterialID(pSurface);
@@ -1206,7 +1207,7 @@ void Physics_BallRollingandSlipping(Ball* pBall, f32 fTicks) {
 //   hit, backspin makes it check or spin back (x 13.3 x friction; a tenth of that if the spin
 //   stick was used or the spin is not backspin).
 // - Short grass with a soft landing speed (+0x24 of 80 or less) loses up to 35% of its rise.
-f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, SurfaceType* pSurface) {
+f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, TGD_MaterialInfo* pSurface) {
     f32 vBent[4];
     f32 vDown[4];
     f32 vCon[4];
@@ -1470,7 +1471,7 @@ u8 Physics_CheckObjectCollisions(Ball* pBall, f32 fTicks) {
     f32          vFrom[4];
     f32          vTo[4];
     TerObject*   pObj;
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
     if (pBall->pCourse == NULL) return 0;
     Vec3Copy(pBall->vPrev, vFrom);
     vFrom[1] -= BALL_RADIUS;
@@ -1524,8 +1525,8 @@ u8 Physics_CheckObjectCollisions(Ball* pBall, f32 fTicks) {
 // The cases share code through gotos, as the original's branches do: a roll can move a lie up a
 // level (class 11 to the rough; plugged to 7 to clean). Copies of the shared code do not match
 // (the rough code copied into case 11: 91.8%).
-void Physics_SetLie(Ball* pBall, SurfaceType* pSurface) {
-    SurfaceType* pLie;
+void Physics_SetLie(Ball* pBall, TGD_MaterialInfo* pSurface) {
+    TGD_MaterialInfo* pLie;
     u32          uLuck;
     u32          r;
     int          nLuck;
@@ -1695,7 +1696,7 @@ static inline f32 Ball_SpinKeep(Ball* pBall) {
 // given back for the part of the tick not flown. First bounce of a shot in flight: event 0x1D,
 // and the spin stick's input becomes the ball's spin (backspin x (1.9 - green setting), side x
 // (1.95 - green setting)), turned to the direction of travel; event 0x1F.
-u8 Physics_ProcessCollision(Ball* pBall, f32* pHit, f32* pNormal, SurfaceType* pSurface, TerObject* pObj,
+u8 Physics_ProcessCollision(Ball* pBall, f32* pHit, f32* pNormal, TGD_MaterialInfo* pSurface, TerObject* pObj,
                             f32* pFrac, f32 fTicks) {
     f32 vSpin[4];
     f32 fSin, fCos;
@@ -1835,7 +1836,7 @@ u8 Physics_CheckDynObjCollisions(Ball* pBall, f32 fTicks) {
     f32          vTo[4];
     HitObject*   pWhat;
     f32          fFrac;
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
     Vec3Copy(pBall->vPrev, vFrom);
     vFrom[1] -= BALL_RADIUS;
     Vec3Copy(pBall->vPos, vTo);
@@ -1900,7 +1901,7 @@ void Physics_FixBallHeight(Ball* pBall, u8 bSettle, f32 fTicks) {
 // (Physics_FixBallHeight) and given the lie of the surface under it - a surface whose +0x1C is not 0.375
 // counts as surface 14 - or, with no surface at all, it is a hazard.
 void Physics_StopBall(Ball* pBall) {
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
     if (pBall->bHoled) {
         pBall->nState    = 1;
         pBall->nLie      = LIE_INCUP_e;
@@ -1940,7 +1941,7 @@ u8 Physics_CheckTerrainCollisions(Ball* pBall, f32 fTicks) {
     f32          vFrom[4];
     f32          vTo[4];
     f32          fFrac;
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
     TerObject*   pObj;
     u8           bOut;
     int          nIndex;
@@ -1962,7 +1963,7 @@ u8 Physics_CheckTerrainCollisions(Ball* pBall, f32 fTicks) {
     if (0.375f != pSurface->f1C) {
         pSurface = &gSurfaceTypes[14];
     }
-    if ((pSurface->u34 & 0x10) && pSurface->f0C < 0.0f && bOut <= 1) return 0;
+    if ((pSurface->uFlags & 0x10) && pSurface->f0C < 0.0f && bOut <= 1) return 0;
     if (!Physics_ProcessCollision(pBall, vHit, vNormal, pSurface, pObj, &fFrac, fTicks)) return 0;
     BALL_LANDING_EVENTS(pBall, pSurface, pObj);
     nIndex = MaterialTypes_getMaterialID(pSurface);
@@ -2029,7 +2030,7 @@ u8 Physics_CheckTerrainCollisions(Ball* pBall, f32 fTicks) {
 
 // Distance from a point to the pin, 1000 when there is no course.
 f32 Physics_GetDistanceToCup(f32* pPos) {
-    CourseInfo* pCourse = Ter_GetTGD();
+    TGD_TerrainInfo* pCourse = Ter_GetTGD();
     if (pCourse != NULL) {
         return LLMath_DistanceBetween3(pPos, &pCourse->pin[Game_CurrentPinSet()].x);
     }
@@ -2115,7 +2116,7 @@ void Physics_BallRolling(Ball* pBall, f32 fTicks) {
     f32          vDown[4];
     f32          vDir[4];
     f32          vAxis[4];
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
     f32          fSin, fCos;
     f32          fA, fB;
     f32          fTurn, fZ, fX, fLen, fAngle, fK, fV, fRough;
@@ -2246,8 +2247,8 @@ f32 Physics_GetBallAltitude(Ball* pBall) {
     f32          vPin[4];
     f32          fHeight;
     f32          fHeight2;
-    SurfaceType* pSurface;
-    SurfaceType* pSurface2;
+    TGD_MaterialInfo* pSurface;
+    TGD_MaterialInfo* pSurface2;
     if (pBall->nState != 2) return 0.0f;
     Ter_GetEnclosingGroundData(pBall->pCourse, pBall->vPos, &fHeight, &pSurface, vNormal, &fHeight2,
                                &pSurface2, vNormal2);
@@ -2378,7 +2379,7 @@ void Physics_TimedSimulation(Ball* pBall, f32 fSeconds, f32 fTick) {
 // on it (radius + 0.05 in), placed, with the lie of the surface there and fLieModifier halved.
 u8 Physics_DropBall(Ball* pBall, f32* pPos) {
     f32          v[4];
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
     f32          fGround;
     Vec3Copy(pPos, v);
     v[1] += INCHES(2.0f);

@@ -243,7 +243,7 @@ all arriving as stream chunks when a hole loads.
 | GoAnimalActors.c | T6 | the animals on the course |
 | GoDynObjTypes.c | ours | dynamic object types 6 and 9 |
 | GoTerrainCollision.c | T6 | the ground as collision data: drops, heights, normals, surfaces; the ball against ground, pin and objects |
-| TerrainGround.c | ours | the triangle, height and surface type under a point |
+| TerrainGround.c | ours | the ground strips under the golfer's shadow; the supporting triangle, its height and surface under a point |
 | CourseInfo.c | EA | the course table (`'CRI '`: 18 holes' par, wind, tees) and the compilation courses (`'CMPS'`) |
 
 Also here by subject: `GoTerrain.c` (drawing it), `GoGrass.c`, `GoHoleLoader.c` (the hole loader).

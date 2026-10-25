@@ -196,13 +196,13 @@ void GR_UpdateGreenGrid(int nView) {
     int n;
     int nRow;
     int nCol;
-    CourseInfo* pCourse = Ter_GetTGD();
+    TGD_TerrainInfo* pCourse = Ter_GetTGD();
     // fake match: an s32 (long) copy of nView, kept in its own register, for the
     // ViewController_GetActivePlayerNumber calls
     s32 nViewCopy;
     f32 vPoint[4];
     f32 vNormal[4];
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
     int nSteps = 0;
     f32 fAcross;
     f32 fAlong;

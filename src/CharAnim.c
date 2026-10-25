@@ -154,7 +154,7 @@ void CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKA
     f32 vNormal[4];
     Clip* pClip;
     char* pName;
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     f32 fDelay;
 
     if (pChar->nStyle == -1) return;

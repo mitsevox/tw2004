@@ -183,7 +183,7 @@ s32 GameModeFourBall_GetHonors(int nPlayer) {
     int t;
     int i;
     int j;
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     int nPinSet;
     f32 fBest;
     int nBest;

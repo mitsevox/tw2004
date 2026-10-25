@@ -439,7 +439,7 @@ void DynObj_PitchMarkAdd(f32* pPos, int nPlayer) {
     DynObjModel model;
     f32 vPos[4];
     f32 vNormal[4];
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
     f32 fGround;
     s32 nId;
 
@@ -488,7 +488,7 @@ void DynObj_ShotDivotHoleAdd(f32* pPos, int nPlayer) {
     DynObjModel model;
     f32 vPos[4];
     f32 vNormal[4];
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
     f32 fGround;
     s32 nId;
 

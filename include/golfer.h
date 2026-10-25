@@ -685,7 +685,8 @@ typedef struct GameState {
     s32  nPlayoffHoles;         // 0x0D8  playoff holes started
     s32  nCurrentRound;         // 0x0DC  the tour event's current round, from 0 (GameModeDriverPGATour)
     s32  nE0;                   // 0x0E0  the event's round count (1 outside a tour event)
-    s32  nPinSet[18];           // 0x0E4  per hole: which of its four pin positions (CourseInfo.pin) is used
+    s32  nPinSet[18];           // 0x0E4  per hole: which of its four pin positions (TGD_TerrainInfo.pin)
+                                //        is used
     s32  n12C;                  // 0x12C
     f32* pPinPos;               // 0x130  the current hole's pin (GoTerrainCollision.c sets it);
                                 //        speed golf measures the ball's distance to it

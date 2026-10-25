@@ -737,7 +737,7 @@ void SpeedGolf_TradeEventPoints(int nPlayer, int nEvent) {
 u8 SpeedGolf_OnBallAtRest(int nPlayer) {
     int nOther;
     f32 fDist;
-    SurfaceType* pSurf;
+    TGD_MaterialInfo* pSurf;
     int nStrokes;               // read and never used
     int nOtherStrokes;          // read and never used
     f32 fX;
@@ -1107,7 +1107,7 @@ void SpeedGolf_RunUpdate(int nPlayer) {
     int nPar;
     int nDiff;
     int n;
-    CourseInfo* pHole;
+    TGD_TerrainInfo* pHole;
     f32 fDist;
     f32 fToPlace;
     f32 fAngle;
@@ -1456,7 +1456,7 @@ void SpeedGolf_UpdatePlayers(void) {
     PlayerNumber_t nOther;
     int nPlayer;
     int k;
-    CourseInfo* pHole;
+    TGD_TerrainInfo* pHole;
     if (gSession.nPaused == 0) {
         if (GM_GetModeType() == GM_SpeedGolfPoints_mode) {
             i = PLR_1_e;

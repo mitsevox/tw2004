@@ -61,8 +61,8 @@ u8       GolfCamera_ChooseImpactMatrixCam(View* pView, int nPlayer);
 u8       GolfCamera_ChooseSuperZoomCam(View* pView, int nPlayer);
 void     GolfCamera_CreateMatrixCamera(View* pView, f32* pFrom, f32* pTo, int nPlayer);
 void     GolfCamera_CreateSuperZoomCamera(View* pView, f32* pFrom, f32* pTo, int nPlayer);
-u8       Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
-                                     SurfaceType** ppSurface, TerObject** ppObj);
+u8       Ter_CheckForGroundCollision(TGD_TerrainInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
+                                     TGD_MaterialInfo** ppSurface, TerObject** ppObj);
 
 // .bss and .sbss (one object each, so the reverse-order rule does not come into it).
 f32 gSteepSlopeCamLastTarget[4];    // the target the steep-slope camera last worked for
@@ -248,7 +248,7 @@ void GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer) {
     u8 bHit;
     f32* pCam;
     f32* pSub;
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     u8 bMirror;
     s8 bKeepFlat; // fake match: s8 (TW07's bool keepFlat); as u8 or int the srwi is scheduled early
     f32 fSpeed;
@@ -413,14 +413,14 @@ void GolfCamera_InitGreenZoomToAimCamera(View* pView, int nPlayer) {
     f32 v[4];
     f32 vNormalHigh[4];
     f32 vNormalLow[4];
-    SurfaceType* pSurfaceLow;
-    SurfaceType* pSurfaceHigh;
+    TGD_MaterialInfo* pSurfaceLow;
+    TGD_MaterialInfo* pSurfaceHigh;
     f32 fLow;
     f32 fHigh;
     CamShot* pShot;
     f32 fGround;
     f32 fTop;
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     f32* pCam;
     f32* pSub;
     pCam = CameraController_GetCameraOrigin(pView);
@@ -516,7 +516,7 @@ void GolfCamera_ProcessGreenZoomToAimCamera(View* pView, int nPlayer) {
     u8 bHit;
     f32* pCam;
     f32* pSub;
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     CamLens* pLens;
     u8 bArrived;
     int nPinSet;
@@ -738,13 +738,13 @@ void GolfCamera_ProcessPlaceBallCamera(View* pView, int nPlayer) {
     f32 v[4];
     f32 vHit[4];
     f32 vNormal[4];
-    SurfaceType* pSurfaceAt;
+    TGD_MaterialInfo* pSurfaceAt;
     f32 fAbove;
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
     TerObject* pObj;
     f32* pCam;
     f32* pSub;
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     int nPinSet;
     f32 fGround;
     f32 fDiff;
@@ -901,7 +901,7 @@ void GolfCamera_ProcessSpeedGolfRunCamera(View* pView, int nPlayer) {
     f32 fAbove;
     f32* pCam;
     f32* pSub;
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
     u32 nClass;
     f32 fUp;
     f32 fBack;
@@ -1046,7 +1046,7 @@ void GolfCamera_InitGreenCamera(View* pView, int nPlayer) {
     f32 v[4];
     f32* pCam;
     f32* pSub;
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     int nPinSet;
     pCam = CameraController_GetCameraOrigin(pView);
     pSub = CameraController_GetCameraLookPoint(pView);
@@ -1197,7 +1197,7 @@ void GolfCamera_ProcessGreenCamera(View* pView, int nPlayer) {
 // 30-degree lens, with no shot and the clock (fCamTime) at 0.
 void GolfCamera_InitGreenRollCamera(View* pView, int nPlayer) {
     void* pSub;
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     CameraController_GetCameraOrigin(pView);
     pSub = CameraController_GetCameraLookPoint(pView);
     pCourse = Ter_GetTGD();
@@ -1222,7 +1222,7 @@ void GolfCamera_ProcessGreenRollCamera(View* pView, int nPlayer) {
     f32 vToPin[4];
     f32 vOld[4];
     f32* pCam;
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     int nPinSet;
     f32 fDist;
     f32 fTime;
@@ -2881,7 +2881,7 @@ u8 GolfCamera_SteepSlopeCamCheckSlope(View* pView, int nPlayer, f32 fUp, f32 fDo
 u8 GolfCamera_SteepSlopeCamCheckCollision(View* pView, int nPlayer) {
     f32 vHit[4];
     f32 vNormal[4];
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
     TerObject* pObj;
     return Ter_CheckForGroundCollision(gPlayers[nPlayer].ball.pCourse, pView->vOrigin,
                                        gPlayers[nPlayer].vTarget,
@@ -2933,7 +2933,7 @@ void GolfCamera_ComputeSteepSlopeCamVectors(View* pView, int nPlayer) {
     f32 vDir[4] = {0.0f, 0.0f, 0.0f, 0.0f};
     f32 vHit[4];
     f32 vNormal[4];
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
     TerObject* pObj;
     int nMax;
     int nTries;

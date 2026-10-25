@@ -321,7 +321,7 @@ int GameEffects_IsScriptedGameBreaker(int nPlayer) {
     int bPossible = 0;
     int nPar;
     int nStrokes;
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     void* pSurface;
     f32 fDist;
     pCourse = Ter_GetTGD();

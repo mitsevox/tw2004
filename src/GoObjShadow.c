@@ -14,7 +14,7 @@ void SD_FreeShaderObject(void* pMesh);
 void SD_DrawShaderObject(u8* pMesh);
 
 // GoTerrainCollision.c
-f32 Ter_GetSupportingWorldHeight(CourseInfo* pCourse, f32* pPos);
+f32 Ter_GetSupportingWorldHeight(TGD_TerrainInfo* pCourse, f32* pPos);
 
 #define NUM_SHADOW_MESHES 5
 

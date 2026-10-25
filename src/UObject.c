@@ -14,7 +14,7 @@ UObjMesh* Object_GetMeshAlternative(UObjMesh* pMesh, int i);
 int  Object_GetMeshFlags(UObjMesh* pMesh, int i);
 int  Object_GetLod(UObject* pObj);
 f32  Math_Tan(f32 f);
-void Ter_GetAmbientLight(CourseInfo* pCourse, f32* pPos);  // the ground's light at pPos
+void Ter_GetAmbientLight(TGD_TerrainInfo* pCourse, f32* pPos);  // the ground's light at pPos
 void LF_SetCurrentBrightness(f32 f);
 void LF_LoadCurrentLights(void);
 void LI_SetObjectLights(UObject* pObj);

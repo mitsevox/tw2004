@@ -583,7 +583,7 @@ power 0.6 / 1.0 / 1.1:
     7                36  77  86     25  55  62     2   5   6
 
 `Physics_EstimateShotPower` also adds the difference between the table's reference surface (45; 14 for chips)
-and the surface under the ball (`SurfaceType +0x00`), so the lie changes the power a distance
+and the surface under the ball (`TGD_MaterialInfo +0x00`), so the lie changes the power a distance
 needs.
 
 The strike (`Physics_GetShotData`)
@@ -663,7 +663,7 @@ on flat ground, then it is a hazard (`Physics_GetSurfaceInfo`). The surface it c
 own surface index is below 156 - i.e. always; the test reads `n < 0 || n < 156`, which looks like
 a typo for `n >= 156`. A ball in the air with no ground under it within 8 ft of the pin is set
 down on the other ground height (`Physics_GetBallAltitude`); elsewhere it stays in play while above the
-course floor (`CourseInfo.fFloor`) and is a hazard below it.
+course floor (`TGD_TerrainInfo.fFloor`) and is a hazard below it.
 
 Skidding and rolling: how a putt breaks (`Physics_BallRollingandSlipping`, `Physics_BallRolling`)
 ----------------------------------------------------------------------------

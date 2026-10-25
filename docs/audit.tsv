@@ -180,7 +180,7 @@ StreamManager.c	done	7511d865	claude-review
 SunFlr_Gc.c	open		
 Swing.c	open		
 TerrainData.c	open		
-TerrainGround.c	open		
+TerrainGround.c	done	ff3496ef	claude-review
 TibExt.c	open		
 UAudContainers.c	done	b5058d88	claude-review
 UAudMem.c	open		

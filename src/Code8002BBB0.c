@@ -84,7 +84,7 @@ void AI_TargetsLoad(u8* pChunk) {
 // Fill in everything that follows from a target: the landing surface, the target height, the
 // distance, and (for a human) a snap to the club's reach when it is just under.
 void fn_8002BDEC_SetTarget(int nPlayer, f32* pTarget) {
-    SurfaceType* pSurface = NULL;
+    TGD_MaterialInfo* pSurface = NULL;
     f32          fHeight;
     f32          fDX, fDZ;
     int          nType;
@@ -161,7 +161,7 @@ void AI_NudgeDistance(int nPlayer, f32 fDelta) {
 // Aim at the pin.
 void AI_DefaultTarget(int nPlayer) {
     int         nPinSet = Game_CurrentPinSet();
-    CourseInfo* pCourse = Ter_GetTGD();
+    TGD_TerrainInfo* pCourse = Ter_GetTGD();
     Player*     p       = &gPlayers[nPlayer];
     f32*        pTarget;
     p->vTarget[0]    = pCourse->pin[nPinSet].x;
@@ -216,7 +216,7 @@ void AI_ChooseTarget(int nPlayer) {
     // fake match: the untyped alias preserves the original target-table register order.
     void*       pTargets;
     int         nKind;
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     s8          nZone;
     // fake match: widened attribute locals reproduce the original hoisted cast order.
     long long   nPower;
@@ -348,7 +348,7 @@ void AI_ChooseTarget(int nPlayer) {
 void fn_8002C8B4(void) {
 }
 
-// The current hole's pin position, 0..3: which of CourseInfo.pin it uses.
+// The current hole's pin position, 0..3: which of TGD_TerrainInfo.pin it uses.
 int Game_CurrentPinSet(void) {
     return gpGame->nPinSet[gpGame->nCurHole];
 }

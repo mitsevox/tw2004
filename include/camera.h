@@ -1122,7 +1122,7 @@ CamShot* DynamicCam_ChooseScriptByName(char* camName);
 CamShot* DynamicCam_ChooseScriptInSequence(CameraSequence_t* sequence, CameraEvent_e event, int* interp,
                                            f32* time, f32* speed, int* timeTrigger, f32* timeTriggerTime,
                                            int playerID);
-// startLie is the ball's lie (Lie_t), endLie a surface class (SurfaceType.nClass).
+// startLie is the ball's lie (Lie_t), endLie a surface class (TGD_MaterialInfo.nClass).
 CameraSequence_t* DynamicCam_ChooseSequence(int ePlayerID, int startLie, int endLie, int state,
                                             u8 allowGenericShotTypes, f32 shotDist);
 CameraSequence_t* DynamicCam_ChoosePreFlightSequence(int ePlayerID, int startLie, int state);

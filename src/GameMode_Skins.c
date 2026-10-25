@@ -80,7 +80,7 @@ void GameModeSkins_SetupNextGolfer(void) {
 s32 GameModeSkins_GetHonors(int nPlayer) {
     int i;
     int h;
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     int nPinSet;
     f32 fBest;
     int nBest;
