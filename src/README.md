@@ -15,7 +15,7 @@ and MetroTRK are built from public decomps in `extern/` (the `progress_category=
 | To see | Read |
 |---|---|
 | The entry point | `main()` in `Main.c`: the boot list, `GoEntry.c`'s loop, the shutdown list |
-| The game's state machine | `GoEntry.c` `fn_800083A4`: a switch on `gSession.nGameType` (table below) |
+| The game's state machine | `GoEntry.c` `MA_vMain`: a switch on `gSession.nGameType` (table below) |
 | One frame | `gomainloop.c`: `fn_8006D8E8` is the frame loop, `fn_8006DBD4` picks the game type's frame, `fn_8006D27C` draws a round's frame, `fn_8006DDA8` runs every module's hooks |
 | A shot, start to finish | `gomainloop.c` calls `STATEMAIN_Update` (`statemain.c`) each frame, which runs `GOLFERSTATE_Update` (`StateGolfer.c`): each player's golfer state (`stateFunc.c`, `STATEFUNC_*`). `STATEFUNC_Swing*` drives `Swing.c`, which launches the ball with `Physics_ShotImpact` (`Ball.c`); `GM_BallHit` and `GM_Update` (`GameMode.c`) keep the round's turns and strokes |
 | A round's rules | `GameRound.c` `GM_SetModeType` fills `gpGame`'s callbacks (`GameState`, `include/golfer.h`) with defaults, then calls the game mode's own setup (`GameMode*.c`) |
