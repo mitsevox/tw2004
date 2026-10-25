@@ -514,7 +514,7 @@ The fixes that come up most often. Each points to its full entry below.
 - **[verified] `&a[i]` indexing matches where hand-walked pointers don't** (fe_movies UIPoly_Draw,
   ActAnimal_SetWorldMatrix, SitDevFile SitDev_InvokeAction 74.7 -> 98.8).
 - **[verified] `p = arr; p += n;` instead of `&arr[n]`** keeps the element address, not the index
-  (UStream_Update 98.8 -> 99.8, File_ReadAsyncEx 93.8 -> 99.6).
+  (Stream_Progress 98.8 -> 99.8, File_ReadAsyncEx 93.8 -> 99.6).
 - **[verified] Copy a real struct member, not a cast byte array:** the struct copy keeps the original's
   load/store order (FE_MessageTable GM_vShowAwardReplay 86 -> 100 with `SaveProfile.aReplay` as `Replay[5]`).
 - **[verified] Indexing a struct's array through a `u8*`** (`&((u8*)p->data)[p->uPos]`, not
@@ -700,7 +700,7 @@ The fixes that come up most often. Each points to its full entry below.
   prototype clashes with one whose parameters are promoted (u8, s8, u16, s16, f32).** `void f(); void
   f(int)` compiles; `void f(); void f(u8)` does not. `tools/matching/declcheck.py` finds these before a fold.
 - **[verified] When every caller masks a result with `clrlwi`, declare the callee `u8`** even if its body
-  shows no mask (UStream_Update: callers FEgolferanim FE_StreamFunc_SkinUpdate 97.0 -> 100). The callee's own score
+  shows no mask (Stream_Progress: callers FEgolferanim FE_StreamFunc_SkinUpdate 97.0 -> 100). The callee's own score
   does not decide it; the callers do.
 - **[verified] A call made in every branch of an if-chain is one call after it**, with the arguments
   picked per branch (GoFog FG_vBlendFogForCamera 91.3 -> 98.75). `(f32)sqrt(...)` must be cast before

@@ -383,7 +383,7 @@ void FE_StreamFunc_SkinClose(void) {
 // Run the stream until it has nothing left to do, then finish the state; after an interrupt the
 // golfer is marked not loaded (bLoaded).
 void FE_StreamFunc_SkinUpdate(void) {
-    if (!UStream_Update()) {
+    if (!Stream_Progress()) {
         if (gFEStreamStateMgr.bAbort) {
             gpCrAPState->pLoadingGolfer->bLoaded = 0;
         }

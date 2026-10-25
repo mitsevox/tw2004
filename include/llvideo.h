@@ -75,5 +75,6 @@ extern u8 gbVideoFrameWasOpen;                 // fn_80007258()'s value when the
 
 // Play the movie file pName; pfnStop(pVideo, nArg) nonzero stops it early.
 void LLVideo_PlayFile(const char* pName, u8 (*pfnStop)(Video* pVideo, int nArg), int nArg, int nFlags);
+void LLVideo_HandleChunk(VideoChunk* pChunk);   // UStream.c hands it each MPG2 chunk
 
 #endif

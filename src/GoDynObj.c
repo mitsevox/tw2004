@@ -83,10 +83,10 @@ void DynObj_FreeTeoModel(TStreamData* arg0);
 void DynObj_LoadTeoModel(TStreamData* arg0);
 
 // The 'TEO ' stream handler: unless the object is already loaded, builds its model (fn_80045D80)
-// into the stream object's word 4 and sets DynObj_FreeTeoModel as its free handler.
+// into the stream object's uHandlerData and sets DynObj_FreeTeoModel as its free handler.
 void DynObj_LoadTeoModel(TStreamData* arg0) {
     if (Resources_IsAlreadyThere(arg0) == 0) {
-        (*(UObjModel**)((u8*)(arg0) + 4)) = fn_80045D80(arg0->pData);
+        arg0->uHandlerData = (u32)fn_80045D80(arg0->pData);
         arg0->pfnFree = DynObj_FreeTeoModel;
         Resources_Add(arg0);
     }
@@ -135,7 +135,7 @@ void DynObj_LoadBallLogos(TStreamData* pObject) {
 void DynObj_FreeTeoModel(TStreamData* arg0) {
     void* temp_r31;
 
-    temp_r31 = (*(void**)((u8*)(arg0) + 4));
+    temp_r31 = (void*)arg0->uHandlerData;
     fn_800075CC(*(UObjModelRoot**)((u8*)(temp_r31) + 0x10));
     Circular_MemFreeFunc(temp_r31);
 }

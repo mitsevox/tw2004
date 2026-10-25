@@ -112,7 +112,7 @@ void Kernel_DownloadActors(TStreamData* pObject) {
     setup.pC = (DynObjNames*)pObject;
     pObject->pData = (u8*)setup.pModel;
     pObject->pfnFree = NULL;
-    pObject->uUnk4 = Kernel_CreateObjectId(&setup);
+    pObject->uHandlerData = Kernel_CreateObjectId(&setup);
     Circular_MemFreeFunc(pObject);
 }
 

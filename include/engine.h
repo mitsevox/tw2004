@@ -1211,12 +1211,13 @@ void PostFx_SetBlur(u8 b, int nView, f32 f4, f32 f8);   // sets (b) or clears vi
 // and, 0x80-aligned, the data.
 typedef struct TStreamData {
     u8*   pData;                  // 0x00
-    u32   uUnk4;                  // 0x04
+    u32   uHandlerData;           // 0x04  0 when made; what its handler made of it, kept here (a
+                                  //       'TEO ' model, a 'Cact' object's kernel id)
     void (*pfnFree)(struct TStreamData* pObject);     // 0x08  its handler's clean-up, which
                                   //       Resources_Del calls before it frees the object
     struct TStreamData* pPrev;    // 0x0C  finished-object queue; resource list: toward the tail
     struct TStreamData* pNext;    // 0x10  resource list: toward the head
-    int   nUnk14;                 // 0x14
+    int   nReserved;              // 0x14  cleared when the object is made; nothing reads it
     u32   uFlags;                 // 0x18  chunk+0x14: where its block came from (a TTypeAcces;
                                   //       MEMTYPE_HIGH for txf / Cpyr / Cact / txf2)
     u32   uType;                  // 0x1C  chunk+0x18, e.g. 'ter '
@@ -1224,9 +1225,9 @@ typedef struct TStreamData {
                                   //       finds objects by type and id); for skalib's SAL and BNK
                                   //       objects, the animation slot
     u32   uSize;                  // 0x24  chunk+0x20 decompressed size
-    u32   uRef28;                 // 0x28  chunk+0x24 } rebased by the RPNS value when the
-    u32   uRef2C;                 // 0x2C  chunk+0x28 } object is delivered
-    u32   uRef30;                 // 0x30  chunk+0x2C }
+    u32   aScriptRefs[3];         // 0x28  chunk+0x24: three byte-code scripts (fn_8000EA1C), offsets
+                                  //       into the last 'RPNS' object's data until Stream_Progress
+                                  //       makes them pointers (DynObjNames reads them so)
 } TStreamData;
 LAYOUT_ASSERT(TStreamData, 0x34);
 
