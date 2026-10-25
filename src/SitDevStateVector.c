@@ -51,9 +51,9 @@ u8 SitDev_ConditionsMatch(SitDevSituation* pEntry, SitDevData* pData, int nPlaye
 
 // Test nTest of the situation against state value nValue, by the test's operator (aOp): 0 always
 // true, 1 equal to the argument, 2 not equal, 3 the value greater, 4 the value less, 5 any bit in
-// common. Values lbl_80193188 marks are compared as signed 16-bit. An unknown operator fails.
+// common. Values gSitDevValueIsSigned marks are compared as signed 16-bit. An unknown operator fails.
 u8 SitDev_CompareConditions(SitDevSituation* pEntry, int nTest, SitDevData* pData, int nValue) {
-    if (lbl_80193188[nValue]) {
+    if (gSitDevValueIsSigned[nValue]) {
         switch (pEntry->aOp[nTest]) {
         case 0:
             return 1;
