@@ -999,6 +999,7 @@ u8   Bag_AddClub(int nPlayer, int nBit);
 u8   Bag_RemoveClub(int nPlayer, int nBit);
 u8   Bag_HasClub(int nPlayer, int nBit);
 int  Bag_CountClubs(int nPlayer);
+void Session_Init(void);
 void Session_SetGolfer(int nGolfer, int nPlayer);
 void Session_SetupProfiles(void);
 void Golfer_RegisterStatsHandler(void);
