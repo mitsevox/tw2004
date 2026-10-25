@@ -28,7 +28,6 @@ Code800B1D3C.c	open
 Code800B7210.c	open		
 Code800B9944.c	open		
 Code800BA940.c	open		
-Code80193188.c	open		
 Common/Checksum/ChecksumCRC32.c	done	d5543081	claude-review
 Common/Crypt/CryptXOR.c	done	44db6e97	claude-review
 Common/SharedFileIO/SharedFileIO.c	open		
@@ -150,6 +149,7 @@ LadderMap.c	open
 LadderedMode.c	open		
 MC.c	open		
 MC_Gc.c	open		
+Main.c	open		
 MaterialTypes.c	open		
 MathQuat.c	done	6ad9dde6	claude-review
 NGC/SharedFileIO/llSharedFileIO.c	open		
@@ -167,6 +167,7 @@ SitDev.c	open
 SitDevCommentaryZones.c	done	503eba0e	claude-review
 SitDevFile.c	open		
 SitDevMisc.c	open		
+SitDevSignedValues.c	done	78bf4509	claude-review
 SitDevStateVector.c	open		
 SitDevTrigger.c	open		
 Skeleton.c	open		
@@ -251,24 +252,12 @@ uiText.c	open
 uiTransform.c	open		
 unsorted/code_800080D0.c	open		
 unsorted/code_800082F8.c	open		
-unsorted/sweep_80005520.c	open		
-unsorted/sweep_80005580.c	open		
-unsorted/sweep_80005590.c	open		
-unsorted/sweep_800055D4.c	open		
-unsorted/sweep_800055D8.c	open		
-unsorted/sweep_800136F4.c	open		
 unsorted/sweep_8003944C.c	open		
 unsorted/sweep_8006FF2C.c	open		
 unsorted/sweep_80070168.c	open		
 unsorted/sweep_8009554C.c	open		
-unsorted/sweep_80095744.c	open		
-unsorted/sweep_80095780.c	open		
-unsorted/sweep_80095798.c	open		
-unsorted/sweep_800957B0.c	open		
-unsorted/sweep_800957D8.c	open		
 unsorted/sweep_800977CC.c	open		
-unsorted/sweep_80097EC4.c	open		
 unsorted/sweep_8009A844.c	open		
 unsorted/sweep_8009B314.c	open		
 urandom.c	done	9f000176	claude-review
-user.c	open		
+user.c	done	d1383be8	claude-review

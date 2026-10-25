@@ -1087,7 +1087,7 @@ config.libs = [
             Object(Matching, "GameModeStroke.c"),
             Object(Matching, "GameMode11.c"),
             Object(Matching, "LadderedMode.c"),
-            Object(Matching, "Code80193188.c"),
+            Object(Matching, "SitDevSignedValues.c"),
             Object(Matching, "uiArc.c"),
             Object(Matching, "FE_CrAPDB.c"),
             Object(Matching, "FE_CrAPMessages.c"),
@@ -1144,30 +1144,20 @@ config.libs = [
             Object(Matching, "GoDynObjBase.c"),
             Object(Matching, "unsorted/sweep_8006FF2C.c"),
             Object(Matching, "ShaderRow0.c"),
-            Object(Matching, "unsorted/sweep_80095744.c"),
-            Object(Matching, "unsorted/sweep_80095780.c"),
-            Object(Matching, "unsorted/sweep_80095798.c"),
-            Object(Matching, "unsorted/sweep_800957B0.c"),
-            Object(Matching, "unsorted/sweep_800957D8.c"),
 
             Object(Matching, "unsorted/sweep_8009A844.c"),
-            Object(Matching, "unsorted/sweep_80005520.c"),
-            Object(Matching, "unsorted/sweep_80005590.c"),
-            Object(Matching, "unsorted/sweep_800055D8.c"),
+            Object(Matching, "Main.c"),
             # Built optimized for size: under -O4,p the copy and fill loops are unrolled and the
             # four functions take 0xF94 bytes, against EA's 0x5C0.
             Object(Matching, "LLMem_Gc.c", extra_cflags=["-O4,s"]),
             Object(Matching, "fe_craputils.c"),
             Object(Matching, "DynamicRenderingBuffer.c"),
             Object(Matching, "Code80070EC4.c"),
-            Object(Matching, "unsorted/sweep_80097EC4.c"),
             Object(Matching, "Code8009A928.c"),
             Object(Matching, "hlaudvoice.c"),
             Object(Matching, "AudLock.c"),
             Object(Matching, "unsorted/sweep_801654F4.c", progress_category="sdk"),  # Metrowerks runtime / MetroTRK, not EA code
-            Object(Matching, "unsorted/sweep_80005580.c"),
 
-            Object(Matching, "unsorted/sweep_800055D4.c"),
             Object(Matching, "GxUtil.c"),
             Object(Matching, "unsorted/sweep_8003944C.c"),
             Object(Matching, "unsorted/sweep_80070168.c"),
@@ -1182,7 +1172,6 @@ config.libs = [
             Object(Matching, "unsorted/sweep_80165524.c", progress_category="sdk"),  # Metrowerks runtime / MetroTRK, not EA code
             Object(Matching, "RenderAccessors.c"),
             Object(Matching, "LLInput_Gc.c"),
-            Object(Matching, "unsorted/sweep_800136F4.c"),
             Object(Matching, "event.c"),
             Object(Matching, "SitDev.c"),
             Object(Matching, "unsorted/sweep_8009554C.c"),
