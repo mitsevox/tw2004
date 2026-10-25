@@ -30,7 +30,6 @@ u8   fn_8010BF3C(void);
 u8   fn_8010BFE0(void);
 void fn_80007254(void);                 // LLDisp_Gc.c
 int  fn_800106F0(TexBank* pBank);       // LLTexGrp.c
-TexEntry* fn_800107E4(TexBank* pBank, int nTex);  // LLTexGrp.c
 s32  fn_8010BC94(const void* pA, const void* pB);
 s32  fn_8010B5F8(DynTexObj* pObj);
 
@@ -709,7 +708,8 @@ void fn_8010BCFC(u64 uId, void* p, s32 n) {
     int nTex = TX_uiFindTextureIndexFromID(*lbl_80282488->p8, uId);
 
     if (nTex != (int)TX_NO_TEXTURE_INDEX) {
-        lbl_80282488->aUses[lbl_80282488->n96C].pTex = fn_800107E4(*lbl_80282488->p8, nTex);
+        lbl_80282488->aUses[lbl_80282488->n96C].pTex =
+            TX_spGetTextureGroupTextureFromIndex(*lbl_80282488->p8, nTex);
     } else {
         SKA_UnpackName(&uId, szName);
         return;
@@ -719,7 +719,8 @@ void fn_8010BCFC(u64 uId, void* p, s32 n) {
     lbl_80282488->aUses[lbl_80282488->n96C].nC = -1;
     lbl_80282488->n96C++;
     if (lbl_80282488->aUses[lbl_80282488->n96C - 1].pTex->b47 & 1) {
-        lbl_80282488->aUses[lbl_80282488->n96C].pTex = fn_800107E4(*lbl_80282488->p8, nTex + 1);
+        lbl_80282488->aUses[lbl_80282488->n96C].pTex =
+            TX_spGetTextureGroupTextureFromIndex(*lbl_80282488->p8, nTex + 1);
         lbl_80282488->aUses[lbl_80282488->n96C].p4 = p;
         lbl_80282488->aUses[lbl_80282488->n96C].n8 = n;
         lbl_80282488->aUses[lbl_80282488->n96C].nC = -1;

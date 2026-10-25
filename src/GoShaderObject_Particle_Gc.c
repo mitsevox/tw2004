@@ -66,7 +66,7 @@ void fn_8009428C(SD_SShaderObject_Static* pObject, ParticleCreate* pCreate) {
     }
     pSys = pObject->pData;
     pSys->nTexture = pCreate->pParams->nTexture;
-    fn_800102DC(FEtm_PackName(lbl_801F1640[pSys->nTexture]), &pSys->pBank, &pSys->pTex);
+    TG_iFindTextureGroupAndTexture(FEtm_PackName(lbl_801F1640[pSys->nTexture]), &pSys->pBank, &pSys->pTex);
     pSys->nCount = pCreate->pParams->nCount;
     pSys->u18 = pCreate->pParams->u58;
     pSys->anStart[0] = 0;

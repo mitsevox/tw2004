@@ -163,7 +163,7 @@ void FE_LogoDesign_UploadCustomLogo(void) {
         } else {
             pName = "__LogoRect";
         }
-        fn_800102DC(FEtm_PackName(pName), &pBank, &pTex);
+        TG_iFindTextureGroupAndTexture(FEtm_PackName(pName), &pBank, &pTex);
         if (pTex == NULL) {
             FEtm_FindTexture(pName, &pBank, &pTex);
         }

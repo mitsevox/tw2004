@@ -426,7 +426,8 @@ struct DynObj;
 int  RPN_RunScript(u8* pCode, int nArg, int nPush, struct DynObj* pObj);
 
 // Find a loaded texture by its packed name: its bank and entry (both NULL if none).
-int  fn_800102DC(u64 uHash, TexBank** ppBank, TexEntry** ppTex);
+int  TG_iFindTextureGroupAndTexture(u64 uHash, TexBank** ppBank, TexEntry** ppTex);
+TexEntry* TX_spGetTextureGroupTextureFromIndex(TexBank* pBank, int nTex);   // the bank's texture nTex
 // Makes a texture bank from a 'txf ' stream object's data (LLTex.c), in pBank or, when it is NULL,
 // a new allocation.
 TexBank* TX_spDownloadData(struct TStreamData* pObject, TexBank* pBank, int n);
@@ -473,7 +474,7 @@ extern u8* lbl_80280DC8;
 void RenderState_SetConstantAlphaActive(u8 bActive);
 
 // The texture bank list (LLTexGrp.c): the banks loaded from 'txf ' stream objects, searched by
-// fn_800102DC.
+// TG_iFindTextureGroupAndTexture.
 typedef struct TexGrpSlot {
     TexBank* pBank;             // 0x0  NULL: a free slot
     int  n4;                    // 0x4  the list's n8 when the bank came in (fn_80010608 frees by it)
@@ -501,7 +502,8 @@ typedef struct TexGrpList {
     u8   bUseRecs;              // 0x0C  set: objects are loaded as pRecs says
     u8   unkD[3];
     int  n10;                   // 0x10
-    u8   b14;                   // 0x14  set: fn_800102DC only looks in slots whose n8 is n10
+    u8   b14;                   // 0x14  set: TG_iFindTextureGroupAndTexture only looks in slots
+                                //       whose n8 is n10
     u8   unk15[3];
     int  nNumRecs;              // 0x18
     TexGrpRec* pRecs;           // 0x1C
@@ -910,7 +912,7 @@ void fn_80098CDC(ParticleParams* pParams, f32* pPos, f32* pVel, f32* p18, f32* p
 // A particle system (0xAC bytes, the shader object's pData): its run of particles in the particle
 // buffers (lbl_802813A8), and what it draws with.
 typedef struct ParticleSystem {
-    TexBank*  pBank;            // 0x00  } its texture (fn_800102DC)
+    TexBank*  pBank;            // 0x00  } its texture (TG_iFindTextureGroupAndTexture)
     TexEntry* pTex;             // 0x04  }
     u16  nFirst;                // 0x08  its first particle in the buffers
     u16  nCount;                // 0x0A  how many

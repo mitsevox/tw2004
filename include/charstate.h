@@ -40,39 +40,47 @@ typedef struct SkinLink {
 } SkinLink;
 LAYOUT_ASSERT(SkinLink, 0x10);
 
-// A texture's scale (x, y) and offset (x, y): an entry of SkinDesc.pB8, SkinDesc14.a20 (taken from
-// pB8 by SkinPart_ApplySetsToMaterialEntry) and a material's copy of it (SkinDesc18.uvC, hwsMaterial_Gc.c fn_80112614
-// copies it whole; hwsRender_Gc.c fn_80112DD8 reads it).
+// A texture's scale (x, y) and offset (x, y): an entry of SkinDesc.pB8, SkinDesc14.uvScaleOffset
+// (taken from pB8 by SkinPart_ApplySetsToMaterialEntry) and a material's copy of it
+// (SkinDesc18.uvScaleOffset, copied whole by HwsMaterial_SetupMaterial; hwsRender_Gc.c
+// fn_80112DD8 reads it).
 typedef struct SkinDescB8 {
     f32  a[4];                  // 0x0
 } SkinDescB8;
 LAYOUT_ASSERT(SkinDescB8, 0x10);
 
-// An entry of SkinDesc.p14, copied and patched by SkinPart_ApplySetsToMaterialEntry.
+// A material's entry in its skin's description (SkinDesc.pMaterialEntries), copied and patched by
+// SkinPart_ApplySetsToMaterialEntry; HwsMaterial_SetupMaterial makes the material from it.
 typedef struct SkinDesc14 {
-    u64  uId;                   // 0x00
-    u32  u08;                   // 0x08  bit 2: take a20 from SkinDesc.pB8; bit 1: not texture-listed
+    u64  uId;                   // 0x00  its texture's name code
+    u32  uFlags;                // 0x08  SKINDESC14_UNTEXTURED, SKINDESC14_UV_FROM_SETS
     u32  u0C;                   // 0x0C
     u32  u10;                   // 0x10
     s16  n14;                   // 0x14
     s16  n16;                   // 0x16  entries of pB8 from n1C
     s32  n18;                   // 0x18  an entry of SkinDesc.p8C, -1 none
     s32  n1C;                   // 0x1C
-    SkinDescB8 a20;             // 0x20
+    SkinDescB8 uvScaleOffset;   // 0x20
 } SkinDesc14;
 LAYOUT_ASSERT(SkinDesc14, 0x30);
+
+// SkinDesc14.uFlags bits.
+#define SKINDESC14_UNTEXTURED   1   // no texture: its material draws untextured, and the skin's
+                                    // texture lists leave it out
+#define SKINDESC14_UV_FROM_SETS 2   // SkinPart_ApplySetsToMaterialEntry takes uvScaleOffset from
+                                    // SkinDesc.pB8, at the chosen set variant's UV index
 
 // A SkinDesc14 as version 8 descriptions with n04 == 0 store it (our name): SKN_SwapDesc moves
 // u14 to SkinDesc14.u10 and narrows n10 and n18 into n14 and n16.
 typedef struct SkinDesc14Old {
     u64  uId;                   // 0x00
-    u32  u08;                   // 0x08
+    u32  uFlags;                // 0x08
     u32  u0C;                   // 0x0C
     s32  n10;                   // 0x10  -> SkinDesc14.n14
     u32  u14;                   // 0x14  -> SkinDesc14.u10
     s32  n18;                   // 0x18  -> SkinDesc14.n16
     s32  n1C;                   // 0x1C
-    SkinDescB8 a20;             // 0x20
+    SkinDescB8 uvScaleOffset;   // 0x20
 } SkinDesc14Old;
 LAYOUT_ASSERT(SkinDesc14Old, 0x30);
 
@@ -159,24 +167,25 @@ typedef struct SkinDesc8C {
 } SkinDesc8C;
 LAYOUT_ASSERT(SkinDesc8C, 0x30);
 
-// A skin's description (SkinModel.pDesc), as loaded from its file.
-// A material of SkinDesc.p18 (fn_80112DD8 sets up GX from it); SkinDesc.p20 holds indexes of them.
+// A material of SkinDesc.pMaterials (hwsMaterial_Gc.c makes them; fn_80112DD8 sets up GX from
+// one); SkinDesc.p20 holds indexes of them.
 typedef struct SkinDesc18 {
     TexEntry* pTex;             // 0x00  NULL: drawn untextured
     u8   unk4[4];
     TexBank* pBank;             // 0x08  pTex's bank
-    SkinDescB8 uvC;             // 0x0C  the later passes' texture scale (x, y) and offset (x, y)
+    SkinDescB8 uvScaleOffset;   // 0x0C  the later passes' texture scale (x, y) and offset (x, y)
 } SkinDesc18;
 LAYOUT_ASSERT(SkinDesc18, 0x1C);
 
+// A skin's description (SkinModel.pDesc), as loaded from its file.
 typedef struct SkinDesc {
     s32  nVersion;            // 0x000  8
     s32  n04;                   // 0x004
     s32  n08;                   // 0x008  a burnt one's size, in bytes (HwsBurn_BuildDesc)
     u32  uFlags;                // 0x00C  bit 1: its offsets are pointers now
-    s32  n10;                   // 0x010  entries in p14 and p18
-    SkinDesc14* p14;            // 0x014
-    SkinDesc18* p18;            // 0x018
+    s32  nMaterials;            // 0x010  entries in pMaterialEntries and pMaterials
+    SkinDesc14* pMaterialEntries;   // 0x014
+    SkinDesc18* pMaterials;     // 0x018  HwsMaterial_Create allocates them when NULL
     s32  n1C;                   // 0x01C  entries in p20
     s32* p20;                   // 0x020
     s32  n24;                   // 0x024  entries in p28
@@ -548,8 +557,8 @@ typedef struct HwsBurn {
     u32* p54;                   // 0x54  n4C bits
     s32* a58;                   // 0x58  the n50 set bits of p54, in order
     s32* a5C;                   // 0x5C  per bit of p54: its place in a58
-    s32  n60;                   // 0x60  pDesc->n10
-    SkinDesc14* a64;            // 0x64  a copy of pDesc->p14 (HwsBurn_PrepareMaterials)
+    s32  n60;                   // 0x60  pDesc->nMaterials
+    SkinDesc14* a64;            // 0x64  a copy of pDesc->pMaterialEntries (HwsBurn_PrepareMaterials)
     void (*pfn68)(Skin* pSkin, SkinDesc14* pEntry); // 0x68  } called on each a64 entry with
     Skin* pSkin;                // 0x6C  } pSkin (HwsBurn_SetMaterialCallback; SkinBurn SkinBurn_BurnSkin)
     s32  n70;                   // 0x70  pDesc->n88
@@ -579,7 +588,8 @@ LAYOUT_ASSERT(SkinListEntry, 0x10);
 // What SkinPart_SetupMaterials is given (by char.c and FEgolferanim.c); only what it reads.
 typedef struct SkinTarget {
     u8   unk0[4];
-    TexBank* pBank;             // 0x4  passed on to fn_80112614: its materials' textures come from it
+    TexBank* pBank;             // 0x4  passed on to HwsMaterial_SetupMaterial: its materials'
+                                //      textures come from it
 } SkinTarget;
 
 // An 8-byte record Character_CreateClubSkinSet makes for each skin of a CharSkinSet (CharSkinRef_Init fills it;
@@ -717,6 +727,11 @@ void  SkinMorph_CreateBlended(Skin* pSkin, HwsMemBlock** ppBlock, HwsOverrideTab
 void  SkinMorph_Destroy(Skin* pSkin);
 void  SkinMorph_FreeBlended(Skin* pSkin, HwsMemBlock* pBlock, HwsOverrideTable* pTable);
 
+// hwsMaterial_Gc.c: a skin description's materials.
+void  HwsMaterial_SetupMaterial(SkinDesc14* pEntry, SkinDesc18* pMaterial, TexBank* pBank);
+void  HwsMaterial_Create(SkinDesc* pDesc);
+void  HwsMaterial_Destroy(SkinDesc* pDesc);
+
 // hwsOverride_Gc.c: a mesh table and a memory block for a skin description's morphed meshes.
 HwsMemBlock* fn_801128EC(SkinDesc* pDesc, s32 nSize);
 void  fn_80112910(HwsMemBlock* pBlock);
@@ -724,7 +739,7 @@ HwsOverrideTable* fn_80112A34(SkinDesc* pDesc, s32 nMeshes);
 void  fn_80112A58(HwsOverrideTable* pTable);
 void* fn_80112A80(HwsMemBlock* pBlock, HwsOverrideTable* pTable, int i, u8 bKeep);
 
-// hwsBurn.c: pfn is called with pSkin on each SkinDesc.p14 entry the burn copies; HwsBurn_Burn
+// hwsBurn.c: pfn is called with pSkin on each SkinDesc.pMaterialEntries entry the burn copies; HwsBurn_Burn
 // makes the burnt skin's description.
 HwsBurn* HwsBurn_Create(SkinDesc* pDesc);
 void  HwsBurn_Destroy(HwsBurn* pBurn);

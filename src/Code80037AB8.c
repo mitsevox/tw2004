@@ -5,8 +5,6 @@
 #include "engine.h"
 #include "charstate.h"
 
-void  fn_801127C4(void* pDesc);                // hwsMaterial_Gc.c
-
 // section note: the .bss between Skin.c's and GoPostFx.c's; only lbl_80281100 (the .sdata right
 // after Skin.c's) points at it. Skin.c's tail fits the addresses equally well.
 ScreenCopy lbl_801D4F68;
@@ -75,7 +73,7 @@ void fn_80037CD8(Skin* pSkin) {
     pModel = pSkin->pModel;
     if (pModel != NULL) {
         if (pModel->pDesc != NULL) {
-            fn_801127C4(pModel->pDesc);
+            HwsMaterial_Destroy(pModel->pDesc);
             Circular_MemFreeFunc(pSkin->pModel->pDesc);
         }
         Circular_MemFreeFunc(pSkin->pModel);

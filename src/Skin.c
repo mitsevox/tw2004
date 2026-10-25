@@ -27,7 +27,6 @@ void  fn_8006E7A4(LightGroup* pGroup);                   // GoLighting.c: load t
 void  fn_8006EADC(TObject* pObj);                        // GoLighting.c: light the object
 void  fn_8006ED70(void);                                 // GoLighting.c: lighting off
 void  SD_SetShaderTypeParameters(int nRow, void* pData); // GoTerrain.c: calls row nRow's pfn8
-void  fn_801127A0(void* pDesc);                          // hwsMaterial_Gc.c
 HwsMemBlock* fn_801128C8(SkinDesc* pDesc, s32 nSize);         // hwsOverride_Gc.c
 HwsOverrideTable* fn_80112A10(SkinDesc* pDesc, s32 nMeshes);  // hwsOverride_Gc.c
 void  fn_80112B18(HwsOverrideTable* pTable, int i, void* p);  // hwsOverride_Gc.c
@@ -702,8 +701,8 @@ static inline SkinMesh* fn_800368FC_Read(SkinDesc* pDesc, int j) {
 
 // Byte-swaps a skin description's arrays (its header is SKN_SwapDescHeader's), in place, and turns
 // the offsets of its p28 entries' data and its meshes' bit data into pointers. Version 8
-// descriptions with n04 0 have the old p14 layout (SkinDesc14Old) and are converted to the new one
-// (n04 becomes 1).
+// descriptions with n04 0 have the old pMaterialEntries layout (SkinDesc14Old) and are converted to
+// the new one (n04 becomes 1).
 void SKN_SwapDesc(SkinDesc* pDesc) {
     SwapField aDesc14[10] = { { 8, -8 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 2, 2 }, { 2, 2 }, { 4, 4 },
                               { 4, 4 }, { 8, 4 }, { 8, 4 } };
@@ -736,40 +735,40 @@ void SKN_SwapDesc(SkinDesc* pDesc) {
     if (pDesc->nVersion > 8 || (pDesc->nVersion == 8 && pDesc->n04 == 1)) {
         // fake match: this walk alone uses p and j, every other one pData and i. With pData and i here
         // its registers swap; the mesh-bits loop needs a counter set before it (i) for EA's `mr` start
-        p = (u8*)pDesc->p14;
-        for (j = 0; j < pDesc->n10; j++) {
+        p = (u8*)pDesc->pMaterialEntries;
+        for (j = 0; j < pDesc->nMaterials; j++) {
             pSrc = pDst = p;
             ByteSwap_Records(&pSrc, &pDst, aDesc14, 10, 1);
             p += sizeof(SkinDesc14);
         }
     } else if (pDesc->nVersion == 8 && pDesc->n04 == 0) {
-        pData = (u8*)pDesc->p14;
+        pData = (u8*)pDesc->pMaterialEntries;
         if (pData != NULL) {
-            for (i = 0; i < pDesc->n10; i++) {
+            for (i = 0; i < pDesc->nMaterials; i++) {
                 pSrc = pDst = pData;
                 ByteSwap_Records(&pSrc, &pDst, aOld14, 9, 1);
                 pData += sizeof(SkinDesc14);
             }
-            for (i = 0; i < pDesc->n10; i++) {
-                pEntry = &pDesc->p14[i];
+            for (i = 0; i < pDesc->nMaterials; i++) {
+                pEntry = &pDesc->pMaterialEntries[i];
                 memcpy(&old, pEntry, sizeof(SkinDesc14Old));
                 pEntry->uId = old.uId;
-                pEntry->u08 = old.u08;
+                pEntry->uFlags = old.uFlags;
                 pEntry->u0C = old.u0C;
                 pEntry->u10 = old.u14;
                 pEntry->n14 = old.n10;
                 pEntry->n16 = old.n18;
                 pEntry->n18 = -1;
                 pEntry->n1C = old.n1C;
-                pEntry->a20 = old.a20;
+                pEntry->uvScaleOffset = old.uvScaleOffset;
             }
             pDesc->n04 = 1;
         }
     }
 
-    pData = (u8*)pDesc->p18;
+    pData = (u8*)pDesc->pMaterials;
     if (pData != NULL) {
-        for (i = 0; i < pDesc->n10; i++) {
+        for (i = 0; i < pDesc->nMaterials; i++) {
             pSrc = pDst = pData;
             ByteSwap_Records(&pSrc, &pDst, aDesc18, 3, 1);
             pData += sizeof(SkinDesc18);
@@ -1124,7 +1123,7 @@ Skin* SKN_Create(u8* pData, u8 b) {
     pSkin->pWorld2Bone = Circular_MemAllocFunc(pModel->n14 * sizeof(*pSkin->pWorld2Bone), MEMTYPE_LOW, 0x80,
                                                "Skin.c", 0x62A);
     if (pDesc != NULL) {
-        fn_801127A0(pDesc);
+        HwsMaterial_Create(pDesc);
     }
     SkinPart_AllocChoices(pSkin);
     SkinMorph_Create(pSkin);

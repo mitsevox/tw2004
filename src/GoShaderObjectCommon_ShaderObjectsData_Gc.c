@@ -473,8 +473,8 @@ u16* fn_80074628(u16* p, u16* pEnd) {
 }
 
 // A command of the display list: a texture by its 64-bit id (four u16s, high first), with
-// bSecond a second one; both found (fn_800102DC) set up the texture stages (fn_800740F4 for
-// two, fn_800738DC for one, which also gets *pbFirst). A NULL p sets up no texture.
+// bSecond a second one; both found (TG_iFindTextureGroupAndTexture) set up the texture stages
+// (fn_800740F4 for two, fn_800738DC for one, which also gets *pbFirst). A NULL p sets up no texture.
 u16* fn_80074A24(u16* p, u16* pEnd, u8 bSecond, u8* pbFirst) {
     u64 uId;
     u64 uId2;
@@ -505,11 +505,11 @@ u16* fn_80074A24(u16* p, u16* pEnd, u8 bSecond, u8* pbFirst) {
     }
     if (uId != 0 && uId2 != 0) {
         if (bSecond) {
-            fn_800102DC(uId, &pBank, &pTex);
-            fn_800102DC(uId2, &pBank2, &pTex2);
+            TG_iFindTextureGroupAndTexture(uId, &pBank, &pTex);
+            TG_iFindTextureGroupAndTexture(uId2, &pBank2, &pTex2);
             fn_800740F4(pBank, pTex, pBank2, pTex2);
         } else {
-            fn_800102DC(uId, &pBank, &pTex);
+            TG_iFindTextureGroupAndTexture(uId, &pBank, &pTex);
             fn_800738DC(pBank, pTex, *pbFirst);
         }
     } else {
