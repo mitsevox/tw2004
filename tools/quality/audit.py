@@ -8,7 +8,7 @@
 docs/audit.tsv, tab-separated: file (under src/), state (open or done), commit (the one holding
 the pass), reviewer (who passed it); commit and reviewer stay empty while open. The author of a
 pass leaves the row open: the reviewer, who did not write it, marks it done. The SDK's own files
-(src/dolphin/, and the SDK and runtime scraps in SDK_SCRAPS) are not listed.
+(src/dolphin/) are not listed.
 docs/audit-plan.tsv, tab-separated: order, area, file, task, scope, state. Every task the audit
 has left, in the order they run: a 'pass' over a whole file; for a big file, 'chunk i/n' passes
 over groups of its functions, then a 'whole-file review' that alone takes the file to done; a
@@ -25,16 +25,12 @@ HEAD = 'file\tstate\tcommit\treviewer'
 PLAN = ROOT / 'docs' / 'audit-plan.tsv'
 PLAN_HEAD = 'order\tarea\tfile\ttask\tscope\tstate'
 SKIP = ('dolphin/',)
-# Not EA code: debugger stubs, Metrowerks critical sections and MSL stubs in the SDK and runtime
-# address range (src/README.md, "Unplaced"). They belong to the libraries in extern/.
-SDK_SCRAPS = ('unsorted/sweep_801338E0.c', 'unsorted/sweep_80155F40.c', 'unsorted/sweep_801654D0.c',
-              'unsorted/sweep_801654F4.c', 'unsorted/sweep_80165524.c')
 
 
 def game_files():
     return sorted(f for f in (p.relative_to(ROOT / 'src').as_posix()
                               for p in (ROOT / 'src').rglob('*.c'))
-                  if not f.startswith(SKIP) and f not in SDK_SCRAPS)
+                  if not f.startswith(SKIP))
 
 
 def load():

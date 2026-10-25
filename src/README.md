@@ -80,7 +80,6 @@ Files are listed in link order (address order) within each group.
 - [Audio](#audio)
 - [Save data, memory card, EA Sports Bio, GBA link](#save-data)
 - [Disc](#disc)
-- [Unplaced](#unplaced)
 
 ### Boot and game flow
 
@@ -509,10 +508,3 @@ The `Common/` and `NGC/` files are built with SN ProDG (GCC 2.95), unoptimised, 
 | DiscError.c | ours | the disc-error screens, drawn straight into the frame buffer with an 8x8 font |
 | Code800B7210.c | ph | split off DiscError.c: the messages, drawing one for a drive status, the per-frame drive check |
 | DiscCheck.c | ours | which disc is in the drive; disc changes; course files per disc |
-
-### Unplaced
-
-In the SDK and runtime address range, not EA code: `unsorted/sweep_801338E0.c` (EXI2 / debugger
-stubs), `sweep_801654D0.c`, `sweep_801654F4.c`, `sweep_80165524.c` (Metrowerks critical sections;
-`progress_category="sdk"`), and, by its address *(unverified)*, `sweep_80155F40.c` (MSL's
-critical-region stubs).
