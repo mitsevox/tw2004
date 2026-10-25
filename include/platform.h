@@ -111,6 +111,7 @@ void OSResetSystem(int nReset, u32 uResetCode, int bForceMenu);
 typedef struct OSThread {
     f64  unk0[0x318 / 8];       // opaque; f64 only for its 8-byte alignment (LLFileIO_Gc.c's .bss pads to it)
 } OSThread;                   // a thread (0x318 bytes; LLFileIO_Gc.c's reader is one)
+#define OS_THREAD_ATTR_DETACH 0x0001    // uAttr: no other thread waits for it to end
 int  OSCreateThread(OSThread* pThread, void* (*pfnMain)(void* pArg), void* pArg, void* pStackTop,
                     u32 uStackSize, s32 nPriority, u16 uAttr);
 s32  OSResumeThread(OSThread* pThread);

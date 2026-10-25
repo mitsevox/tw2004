@@ -33,7 +33,7 @@ void fn_8010FF9C(void) {
     int i;
 
     lbl_802824D4 = DVDGetCurrentDiskID()->nDiskNumber;
-    pData = fn_800065C8("data/fend/d_layout.bin", &uSize, 32);
+    pData = File_ReadFileToHeap("data/fend/d_layout.bin", &uSize, 32);
     lbl_802824C8 = pData[0];
     lbl_802824CC = pData[4];
     pName = pData + 8;
@@ -148,7 +148,7 @@ void fn_801102AC(void) {
         }
         fn_8006DBD4();
         fn_80006FE8();
-        fn_800B7490();
+        DiscError_WaitForDrive();
     } while (nStatus != 0);
 }
 

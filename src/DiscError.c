@@ -1,5 +1,5 @@
 // DiscError.c (our name): the disc-error screens ("The Disc Cover is open.", "Please insert the
-// ... Game Disc", "An error has occurred.") shown from fn_800B7490 when the drive reports a
+// ... Game Disc", "An error has occurred.") shown from DiscError_WaitForDrive when the drive reports a
 // problem. They are drawn straight into the frame buffer (YCbCr pixels, every row doubled) with
 // the game's own 8x8 font, one nibble per pixel.
 

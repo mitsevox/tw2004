@@ -1200,7 +1200,7 @@ void Character_FreeTextures(Character* pChar) {
         Circular_MemFreeFunc(pChar->pBC);
     }
     if (pChar->hFile >= 0) {
-        fn_8000633C(pChar->hFile);
+        File_Close(pChar->hFile);
     }
 }
 
@@ -1325,7 +1325,7 @@ void Character_LoadTextures(Character* pChar, Skin** apSkins, int nSkins) {
     ((void (*)(Skin*, TexBank*, int, int))SkinPart_InitTextures)(pChar->pSkin, &pChar->bank78, 0xBF600,
             0xCDA);
     sprintf(pChar->szTexFile, "%sdata\\CharStrm\\CharTex\\%02dalltex.fxg", "", pChar->nGolferId + 1);
-    pChar->hFile = fn_800060E0(pChar->szTexFile);
+    pChar->hFile = File_Open(pChar->szTexFile);
 }
 
 // Copies every skin's newest choices (copy 3, see SkinPart_SetChangeAllCopies) down to copy 2, as a
@@ -1723,12 +1723,12 @@ void Character_ReopenTextureFiles(void) {
     Character* pChar;
 
     for (i = 0; i < gSession.nNumPlayers; i++) {
-        fn_8000633C(gPlayers[i].pChar->hFile);
+        File_Close(gPlayers[i].pChar->hFile);
     }
     for (i = 0; i < gSession.nNumPlayers; i++) {
         pChar = gPlayers[i].pChar;
         sprintf(pChar->szTexFile, "%sdata\\CharStrm\\CharTex\\%02dalltex.fxg", "", pChar->nGolferId + 1);
-        pChar->hFile = fn_800060E0(pChar->szTexFile);
+        pChar->hFile = File_Open(pChar->szTexFile);
     }
 }
 

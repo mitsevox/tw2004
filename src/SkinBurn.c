@@ -26,13 +26,13 @@ void SkinBurn_CheckSignatureFile(void) {
     int hFile;
 
     sprintf(szPath, "%sSignat.sig", gSignatureDir);
-    hFile = fn_800060E0(szPath);
+    hFile = File_Open(szPath);
     if (hFile < 0) {
         // port: EA stops the game on purpose with a write to address 0 (undefined in C); a port
         //       should abort here instead
         *(volatile s32*)0 = 0;
     }
-    fn_8000633C(hFile);
+    File_Close(hFile);
 }
 
 // Renumbers each SkinModel.p44 entry's n0 (a SkinDesc.p34 mesh) to its number in the burnt

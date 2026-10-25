@@ -66,7 +66,7 @@ void StartStreamVoices(AudTrack* pTrack) {
 // when it is done (ProcessAudStreamReadQueue starts it). Returns 0 when the queue is full.
 u8 AddToAudStreamReadQueue(s32 hFile, u8* pDst, u32 uLen, u32 uOffset,
                            void (*pfnDone)(void* pDst, int nBytes, AudTrack* pTrack, u8 nId),
-                           AudTrack* pTrack, u8 nId, u8 n19) {
+                           AudTrack* pTrack, u8 nId, u8 bLegacy) {
     u8 bQueued;
     AudStreamRead* pRead;
 
@@ -82,7 +82,7 @@ u8 AddToAudStreamReadQueue(s32 hFile, u8* pDst, u32 uLen, u32 uOffset,
         pRead->pfnDone = pfnDone;
         pRead->pTrack = pTrack;
         pRead->nId = nId;
-        pRead->n19 = n19;
+        pRead->bLegacy = bLegacy;
         pRead->bSilence = 0;
     }
     AudLock_UnlockReadQueue("AddToAudStreamReadQueue");
@@ -130,11 +130,9 @@ void ProcessAudStreamReadQueue(void) {
             if (pRead->bSilence) {
                 Stm_SendSilenceToVoices(pRead->pTrack);
             } else {
-                // port: EA passes a (pDst, nBytes, pTrack, nId) callback and the track pointer where
-                // File_ReadAsyncEx takes void (*)(int nBytes, int nError) and an s32 (n1C)
                 File_ReadAsyncEx(pRead->hFile, pRead->pDst, pRead->uLen, pRead->uOffset,
-                                 (void (*)(int, int))pRead->pfnDone, 0, (s32)pRead->pTrack, pRead->nId,
-                                 pRead->n19);
+                                 (CallbackPtrEx)pRead->pfnDone, FILE_PRIORITY_HIGH, (u32)pRead->pTrack,
+                                 pRead->nId, pRead->bLegacy);
             }
         } else {
             bMore = 0;

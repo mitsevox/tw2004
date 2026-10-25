@@ -763,7 +763,7 @@ u8 fn_8010BF3C(void) {
 // Run the loader (fn_8010BFE0) until the queue is empty and nothing is left to do.
 void fn_8010BF68(void) {
     while (!fn_8010BF3C()) {
-        fn_800B7490();
+        DiscError_WaitForDrive();
         fn_8010BFE0();
         fn_80007254();
     }
@@ -771,7 +771,7 @@ void fn_8010BF68(void) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-// fn_80006444's callback: nBytes more arrived (nError is not read).
+// File_ReadAsync's callback: nBytes more arrived (nError is not read).
 void fn_8010BFA0(int nBytes, int nError) {
     lbl_80282488->n97C = nBytes;
     lbl_80282488->n978 = lbl_80282488->n978 + nBytes;
@@ -789,7 +789,7 @@ void fn_8010BFA0(int nBytes, int nError) {
 // The loader, one step per call (each frame from char.c and FEgolferanim.c; fn_8010BF68 runs it
 // until done): takes the next queued job, then streams the pixels and palette of each texture in
 // use (aUses) from the file of p8's character (fn_8010BC88) in reads of at most nA98 bytes,
-// fn_80006444 reading in the background and fn_8010BFA0 counting what arrived, and copies them
+// File_ReadAsync reading in the background and fn_8010BFA0 counting what arrived, and copies them
 // into the job's character's DynTex. Returns whether it is still busy.
 u8 fn_8010BFE0(void) {
     TexEntry* pEntry;
@@ -895,7 +895,7 @@ u8 fn_8010BFE0(void) {
             lbl_80282488->nA90 = lbl_80282488->n988 - lbl_80282488->nA8C;
         }
         lbl_80282488->b974 = 0;
-        fn_80006444(DYNTEX_CHAR(lbl_80282488->p8)->hFile, lbl_80282488->p0, nLen,
+        File_ReadAsync(DYNTEX_CHAR(lbl_80282488->p8)->hFile, lbl_80282488->p0, nLen,
                     lbl_80282488->u98C + lbl_80282488->n978, fn_8010BFA0);
         return 1;
     }

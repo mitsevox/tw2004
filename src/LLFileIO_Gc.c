@@ -1,96 +1,92 @@
-// LLFileIO_Gc.c (EA's name, from its asserts): the disc file reads, run from a queue by a reader
-// thread.
+// LLFileIO_Gc.c: the game's disc file reads. Files are opened by path into handles; reads are queued
+// at two priorities, and a reader thread hands them to the drive one at a time.
 #include "engine.h"
 #include "platform.h"
 #include "core/startup.h"
 #include "core/audtrack.h"
 
-// section note: .bss and .sbss are laid out last-defined-first, so these are defined from the
-// highest address down.
-// The open files' paths, by slot. The symbol is 0x2000 bytes; the code only reaches the first 0x1000.
-// section note: declared at the symbol's full size, 64 slots; an unreferenced array for the rest is
-// dead-stripped by the linker.
-char lbl_801A0350[64][0x80];
-DiscFile lbl_8019EAD0[32];              // the open files
-FileReqPool lbl_8019E880[2];            // the free requests, per priority
-FileQueue lbl_8019E868[2];              // the queued reads, per priority
-OSThread lbl_8019E550;                  // the reader thread (fn_80005D10)
-u8 lbl_8019D54C[0x1000];                // the reader thread's stack
-OSSemaphore lbl_8019D540;               // signalled when a read ends, or the queue gets its first read
-s32 lbl_80281B84;                       // the last read's result: bytes read, or below 0 an error
-s32 lbl_80281B80;                       // how many files are open
-
-void fn_80005BE8(const char* szSrc, char* szDst);
-void fn_80005C48(s32 nResult, DVDFileInfo* pInfo);
-void fn_800060DC(void);
+// A copy of each open file's path, by handle: written on open, cleared on close, never read. Only
+// the first FILE_NUM_FILES rows are used.
+char gDiscFilePaths[64][FILE_PATH_SIZE];
+DiscFile gDiscFiles[FILE_NUM_FILES];                // the open files, by handle
+FileReqPool gFileReqPools[FILE_NUM_PRIORITIES];     // the free requests, per priority
+FileQueue gFileQueues[FILE_NUM_PRIORITIES];         // the queued reads, per priority
+OSThread gFileDaemonThread;                         // the reader thread (file_RequestDaemon)
+u8 gFileDaemonStack[0x1000];                        // the reader thread's stack
+OSSemaphore gFileDaemonSem;     // signalled when a read ends, or when a read is queued with none queued
+s32 gFileReadResult;            // the running read's result: 0 until it ends, then the bytes read, or
+                                // below 0 an error
+s32 gNumOpenFiles;              // how many handles hold an open file
 
 // Copies a file path in the disc's form: letters upper case, backslashes as slashes.
-void fn_80005BE8(const char* szSrc, char* szDst) {
-    while (*szSrc != 0) {
-        if (*szSrc >= 'a' && *szSrc <= 'z') {
-            *szDst = *szSrc - ('a' - 'A');
-        } else if (*szSrc == '\\') {
-            *szDst = '/';
+static void File_FormatFilename(const char* strFilenameSrc, char* strFilenameDest) {
+    while (*strFilenameSrc != 0) {
+        if (*strFilenameSrc >= 'a' && *strFilenameSrc <= 'z') {
+            *strFilenameDest = *strFilenameSrc - ('a' - 'A');
+        } else if (*strFilenameSrc == '\\') {
+            *strFilenameDest = '/';
         } else {
-            *szDst = *szSrc;
+            *strFilenameDest = *strFilenameSrc;
         }
-        szSrc++;
-        szDst++;
+        strFilenameSrc++;
+        strFilenameDest++;
     }
-    *szDst = 0;
+    *strFilenameDest = 0;
 }
 
-// The read's DVD callback: drops the CPU cache over what was read and wakes the reader.
-void fn_80005C48(s32 nResult, DVDFileInfo* pInfo) {
+// The drive's callback when a read ends: drops the CPU cache over what was read, keeps the result
+// and wakes the reader.
+static void File_AsyncCallback(s32 nResult, DVDFileInfo* pInfo) {
     if (nResult > 0) {
         DCInvalidateRange(pInfo->pAddr, nResult);
     }
-    lbl_80281B84 = nResult;
-    OSSignalSemaphore(&lbl_8019D540);
+    gFileReadResult = nResult;
+    OSSignalSemaphore(&gFileDaemonSem);
 }
 
-// Starts a queued read, retrying (with the disc-error screen) until the drive takes it.
-void fn_80005C90(FileReq* pReq) {
-    lbl_80281B84 = 0;
+// Hands a read to the drive, trying until the drive takes it; each try first waits out any disc
+// error (DiscError_WaitForDrive).
+static void File_StartRead(FileReq* pReq) {
+    gFileReadResult = 0;
     do {
-        fn_800B7490();
-    } while (!DVDReadAsyncPrio(&lbl_8019EAD0[pReq->nFile].info, pReq->pBuf, pReq->nLen, pReq->nOffset,
-                               fn_80005C48, 2));
+        DiscError_WaitForDrive();
+    } while (!DVDReadAsyncPrio(&gDiscFiles[pReq->nFile].info, pReq->pBuf, pReq->nLen, pReq->nOffset,
+                               File_AsyncCallback, 2));
 }
 
-// The reader thread (EA's name, from its lock: file_RequestDaemon). Each time the semaphore wakes it,
-// it finishes the read it started (the callback, then the request back to its priority's free
-// list) and starts the first queued read of the most urgent priority; a read that failed goes
-// through the disc-error check and is started again.
-void* fn_80005D10(void* pArg) {
+// The reader thread. Each time gFileDaemonSem wakes it: a read that ended without an error is
+// finished (its callback called, the request back on its priority's free list); otherwise it waits
+// out any disc error (DiscError_WaitForDrive). Then, holding no read, it takes the first queued read
+// of the most urgent priority, and starts the read it holds (again, when the last try failed).
+static void* file_RequestDaemon(void* pArg) {
     int nPrio;                  // set whenever pReq is
     FileReq* pReq;
     FileReqPool* pPool;
 
     pReq = NULL;
     for (;;) {
-        OSWaitSemaphore(&lbl_8019D540);
+        OSWaitSemaphore(&gFileDaemonSem);
         AudLock_Lock("file_RequestDaemon");
-        if (pReq != NULL && lbl_80281B84 >= 0) {
+        if (pReq != NULL && gFileReadResult >= 0) {
             if (pReq->pfnDone != NULL) {
-                if (pReq->b21) {
-                    // port: EA passes two arguments more than the callback takes
+                if (pReq->bLegacy) {
+                    // a CallbackPtr: the length asked for and 0, then two zeros it does not take
                     ((void (*)(int, int, int, int))pReq->pfnDone)(pReq->nLen, 0, 0, 0);
                 } else {
-                    // a callback of the other kind: the buffer, the length, n1C and b20
-                    ((void (*)(void*, s32, s32, u8))pReq->pfnDone)(pReq->pBuf, pReq->nLen, pReq->n1C,
-                                                                  pReq->b20);
+                    // the buffer, the length asked for, and the caller's user value and id
+                    ((void (*)(void*, s32, u32, u8))pReq->pfnDone)(pReq->pBuf, pReq->nLen, pReq->uUser,
+                                                                  pReq->nUid);
                 }
                 OSCheckActiveThreads();
                 pReq->pfnDone = NULL;
-                pReq->n1C = 0;
-                pReq->b20 = 0;
-                pReq->b21 = 0;
+                pReq->uUser = 0;
+                pReq->nUid = 0;
+                pReq->bLegacy = 0;
             }
             pReq->nFile = -1;
             pReq->pBuf = NULL;
             pReq->nLen = 0;
-            pPool = &lbl_8019E880[nPrio];
+            pPool = &gFileReqPools[nPrio];
             pReq->nOffset = 0;
             pReq->pPrev->pNext = pReq->pNext;
             pReq->pNext->pPrev = pReq->pPrev;
@@ -105,53 +101,51 @@ void* fn_80005D10(void* pArg) {
                 pPool->pNext = pReq;
             }
             pReq = NULL;
-            lbl_8019E868[nPrio].nCount--;
+            gFileQueues[nPrio].nCount--;
         } else {
-            fn_800B7490();
+            DiscError_WaitForDrive();
         }
         if (pReq == NULL) {
-            for (nPrio = 0; nPrio < 2; nPrio++) {
-                if (lbl_8019E868[nPrio].nCount > 0) {
-                    pReq = lbl_8019E868[nPrio].pNext;
+            for (nPrio = 0; nPrio < FILE_NUM_PRIORITIES; nPrio++) {
+                if (gFileQueues[nPrio].nCount > 0) {
+                    pReq = gFileQueues[nPrio].pNext;
                     break;
                 }
             }
         }
         if (pReq != NULL) {
-            fn_80005C90(pReq);
+            File_StartRead(pReq);
         }
         AudLock_Unlock("file_RequestDaemon");
     }
 }
 
-// Sets the file reads up: the drive, no files open, empty queues with eight free requests per
-// priority, and the reader thread.
-int fn_80005EC0(void) {
+int File_InitOnce(void) {
     FileQueue* pQueue;
     FileReqPool* pPool;
     int i;
     s32 j;
 
     DVDInit();
-    OSInitSemaphore(&lbl_8019D540, 0);
-    Mem_set(lbl_8019EAD0, 0, sizeof(lbl_8019EAD0));
-    for (j = 0; j < 32; j++) {
-        lbl_8019EAD0[j].nEntry = -1;
-        lbl_8019EAD0[j].szPath[0] = 0;
-        lbl_801A0350[j][0] = 0;
+    OSInitSemaphore(&gFileDaemonSem, 0);
+    Mem_set(gDiscFiles, 0, sizeof(gDiscFiles));
+    for (j = 0; j < FILE_NUM_FILES; j++) {
+        gDiscFiles[j].nEntry = -1;
+        gDiscFiles[j].szPath[0] = 0;
+        gDiscFilePaths[j][0] = 0;
     }
-    lbl_80281B80 = i = 0;
-    for (; i < 2; i++) {
-        pQueue = &lbl_8019E868[i];
-        pPool = &lbl_8019E880[i];
+    gNumOpenFiles = i = 0;
+    for (; i < FILE_NUM_PRIORITIES; i++) {
+        pQueue = &gFileQueues[i];
+        pPool = &gFileReqPools[i];
         Mem_set(pQueue, 0, sizeof(FileQueue));
         Mem_set(pPool, 0, sizeof(FileReqPool));
         pQueue->pNext = (FileReq*)pQueue;
         pPool->pNext = (FileReq*)pPool;
         pQueue->pPrev = (FileReq*)pQueue;
         pPool->pPrev = (FileReq*)pPool;
-        // each request goes in after the one before it, the first after the pool itself (EA's
-        // list insert tests the pointer it inserts after, even an array element's address)
+        // each request goes in after the one before it, the first after the pool itself; the
+        // insert tests the node it inserts after for NULL, even an array element's address
         if (pPool != NULL) {
             pPool->aReq[0].pNext = pPool->pNext;
             pPool->aReq[0].pPrev = (FileReq*)pPool;
@@ -160,7 +154,7 @@ int fn_80005EC0(void) {
             }
             pPool->pNext = &pPool->aReq[0];
         }
-        for (j = 1; j < 8; j++) {
+        for (j = 1; j < FILE_NUM_REQUESTS; j++) {
             if (&pPool->aReq[j - 1] != NULL) {
                 pPool->aReq[j].pNext = pPool->aReq[j - 1].pNext;
                 pPool->aReq[j].pPrev = &pPool->aReq[j - 1];
@@ -171,204 +165,197 @@ int fn_80005EC0(void) {
             }
         }
     }
-    OSCreateThread(&lbl_8019E550, fn_80005D10, NULL, lbl_8019D54C + sizeof(lbl_8019D54C),
-                   sizeof(lbl_8019D54C), 15, 1);
-    OSResumeThread(&lbl_8019E550);
+    OSCreateThread(&gFileDaemonThread, file_RequestDaemon, NULL, gFileDaemonStack + sizeof(gFileDaemonStack),
+                   sizeof(gFileDaemonStack), 15, OS_THREAD_ATTR_DETACH);
+    OSResumeThread(&gFileDaemonThread);
     AudLock_Init();
     return 0;
 }
 
-void fn_800060DC(void) {
+void File_CloseOnce(void) {
 }
 
-// Opens a file (EA's name, from its lock: File_Open): a file already open gets one more open, a
-// new one takes a free slot. Returns the slot, or -1 when none is free.
-int fn_800060E0(const char* szName) {
-    char szPath[0x80];          // the size is unknown: the frame leaves 0x88 bytes for it
-    int hFile;
+int File_Open(const char* filename) {
+    char formattedFilename[FILE_PATH_SIZE];
+    int handle;
     int i;
     s32 nEntry;
 
-    hFile = -1;
-    fn_80005BE8(szName, szPath);
+    handle = -1;
+    File_FormatFilename(filename, formattedFilename);
     AudLock_Lock("File_Open");
-    for (i = 0; i < 32; i++) {
-        if (lbl_8019EAD0[i].nEntry == -1) {
-            hFile = i;
+    for (i = 0; i < FILE_NUM_FILES; i++) {
+        if (gDiscFiles[i].nEntry == -1) {
+            handle = i;
             break;
         }
     }
-    if (hFile != -1) {
+    if (handle != -1) {
         do {
-            nEntry = DVDConvertPathToEntrynum(szPath);
+            nEntry = DVDConvertPathToEntrynum(formattedFilename);
             if (nEntry < 0) {
-                fn_800B7490();
+                DiscError_WaitForDrive();
             }
         } while (nEntry < 0);
-        for (i = 0; i < 32; i++) {
-            if (nEntry == lbl_8019EAD0[i].nEntry && strcmp(szPath, lbl_8019EAD0[i].szPath) == 0) {
-                hFile = i;
-                lbl_8019EAD0[i].nOpens++;
+        for (i = 0; i < FILE_NUM_FILES; i++) {
+            if (nEntry == gDiscFiles[i].nEntry && strcmp(formattedFilename, gDiscFiles[i].szPath) == 0) {
+                handle = i;
+                gDiscFiles[i].nOpens++;
                 break;
             }
         }
-        if (i >= 32) {
+        if (i >= FILE_NUM_FILES) {
             for (;;) {
-                if (DVDFastOpen(nEntry, &lbl_8019EAD0[hFile].info)) {
-                    lbl_8019EAD0[hFile].nEntry = nEntry;
-                    lbl_8019EAD0[hFile].nOpens = 1;
-                    strcpy(lbl_8019EAD0[hFile].szPath, szPath);
-                    strcpy(lbl_801A0350[hFile], szPath);
+                if (DVDFastOpen(nEntry, &gDiscFiles[handle].info)) {
+                    gDiscFiles[handle].nEntry = nEntry;
+                    gDiscFiles[handle].nOpens = 1;
+                    strcpy(gDiscFiles[handle].szPath, formattedFilename);
+                    strcpy(gDiscFilePaths[handle], formattedFilename);
                     break;
                 }
-                fn_800B7490();
+                DiscError_WaitForDrive();
             }
-            lbl_80281B80++;
+            gNumOpenFiles++;
         }
     }
     AudLock_Unlock("File_Open");
-    return hFile;
+    return handle;
 }
 
-// Closes a file (EA's name, from its lock: File_Close): one open fewer, and at none the disc file is
-// closed and its slot freed.
-int fn_8000633C(int hFile) {
+int File_Close(int fileID) {
     FileQueue* pQueue;
     FileReq* pReq;
-    int bClosed;
+    int closeStatus;
     int i;
 
     AudLock_Lock("File_Close");
-    // what walked the two queues here was compiled out (asserts, likely)
-    for (i = 0; i < 2; i++) {
-        pQueue = &lbl_8019E868[i];
+    // walks both queues without doing anything with the reads in them
+    for (i = 0; i < FILE_NUM_PRIORITIES; i++) {
+        pQueue = &gFileQueues[i];
         for (pReq = pQueue->pNext; pReq != (FileReq*)pQueue; pReq = pReq->pNext) {
         }
     }
-    lbl_8019EAD0[hFile].nOpens--;
-    if (lbl_8019EAD0[hFile].nOpens <= 0) {
+    gDiscFiles[fileID].nOpens--;
+    if (gDiscFiles[fileID].nOpens <= 0) {
         do {
-            bClosed = DVDClose(&lbl_8019EAD0[hFile].info);
-            if (!bClosed) {
-                fn_800B7490();
+            closeStatus = DVDClose(&gDiscFiles[fileID].info);
+            if (!closeStatus) {
+                DiscError_WaitForDrive();
             }
-        } while (!bClosed);
-        lbl_8019EAD0[hFile].nEntry = -1;
-        lbl_8019EAD0[hFile].szPath[0] = 0;
-        lbl_801A0350[hFile][0] = 0;
-        lbl_80281B80--;
+        } while (!closeStatus);
+        gDiscFiles[fileID].nEntry = -1;
+        gDiscFiles[fileID].szPath[0] = 0;
+        gDiscFilePaths[fileID][0] = 0;
+        gNumOpenFiles--;
     }
     AudLock_Unlock("File_Close");
     return 0;
 }
 
-int fn_80006444(int hFile, void* pDst, u32 uLen, u32 uOffset,
-                void (*pfnDone)(int nBytes, int nError)) {
-    return File_ReadAsyncEx(hFile, pDst, uLen, uOffset, pfnDone, 1, 0, 0, 1);
+int File_ReadAsync(int fileID, void* destAdr, u32 bytesToRead, u32 offsetFromStart,
+                   CallbackPtr callbackFuncPtr) {
+    return File_ReadAsyncEx(fileID, destAdr, bytesToRead, offsetFromStart, callbackFuncPtr,
+                            FILE_PRIORITY_LOW, 0, 0, 1);
 }
 
-// Queues a read (EA's name, from its lock: File_ReadAsyncEx): takes a free request of the
-// priority, puts it at the end of that priority's queue and wakes the reader if it is the only
-// read queued. Nothing is queued when none is free.
-int File_ReadAsyncEx(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(int nBytes, int nError),
-                u8 nPrio, s32 n1C, u8 b20, u8 b21) {
+// Takes a free request of the priority, puts it at the end of that priority's queue and wakes the
+// reader when it is the only read queued. Nothing is queued when none is free.
+int File_ReadAsyncEx(int fileID, void* destAdr, u32 bytesToRead, u32 offsetFromStart,
+                     CallbackPtrEx callbackFuncPtr, u8 priority, u32 user, u8 uid, u8 legacy) {
     FileReqPool* pPool;
     FileReq* pReq;
     FileQueue* pQueue;
 
-    fn_800B7490();
+    DiscError_WaitForDrive();
     AudLock_Lock("File_ReadAsyncEx");
-    pPool = &lbl_8019E880[nPrio];
+    pPool = &gFileReqPools[priority];
     pReq = pPool->pNext;
     if (pReq != (FileReq*)pPool) {
         pReq->pPrev->pNext = pReq->pNext;
         pReq->pNext->pPrev = pReq->pPrev;
         pReq->pPrev = pReq;
         pReq->pNext = pReq;
-        // EA's list insert again, written out on the queue element each time
-        if (&lbl_8019E868[nPrio] != NULL) {
-            pReq->pNext = (FileReq*)&lbl_8019E868[nPrio];
-            pReq->pPrev = lbl_8019E868[nPrio].pPrev;
-            if (lbl_8019E868[nPrio].pPrev != NULL) {
-                lbl_8019E868[nPrio].pPrev->pNext = pReq;
+        // in at the queue's end; the insert tests the queue's address for NULL
+        if (&gFileQueues[priority] != NULL) {
+            pReq->pNext = (FileReq*)&gFileQueues[priority];
+            pReq->pPrev = gFileQueues[priority].pPrev;
+            if (gFileQueues[priority].pPrev != NULL) {
+                gFileQueues[priority].pPrev->pNext = pReq;
             }
-            lbl_8019E868[nPrio].pPrev = pReq;
+            gFileQueues[priority].pPrev = pReq;
         }
-        pQueue = lbl_8019E868;
-        (pQueue += nPrio)->nCount++;   // fake match: compound expression for register order (r4/r5)
-        pReq->nFile = hFile;
-        pReq->pBuf = pDst;
-        pReq->nOffset = uOffset;
-        pReq->nLen = uLen;
-        pReq->pfnDone = pfnDone;
-        pReq->n1C = n1C;
-        pReq->b20 = b20;
-        pReq->b21 = b21;
-        if (lbl_8019E868[0].nCount + lbl_8019E868[1].nCount == 1) {
-            OSSignalSemaphore(&lbl_8019D540);
+        pQueue = gFileQueues;
+        (pQueue += priority)->nCount++;   // fake match: the queue pointer stepped inside the increment
+        pReq->nFile = fileID;
+        pReq->pBuf = destAdr;
+        pReq->nOffset = offsetFromStart;
+        pReq->nLen = bytesToRead;
+        pReq->pfnDone = callbackFuncPtr;
+        pReq->uUser = user;
+        pReq->nUid = uid;
+        pReq->bLegacy = legacy;
+        if (gFileQueues[FILE_PRIORITY_HIGH].nCount + gFileQueues[FILE_PRIORITY_LOW].nCount == 1) {
+            OSSignalSemaphore(&gFileDaemonSem);
         }
     }
     AudLock_Unlock("File_ReadAsyncEx");
     return 0;
 }
 
-// A file's size in bytes.
-u32 fn_800065B0(int hFile) {
-    return lbl_8019EAD0[hFile].info.uLength;
+u32 File_GetLength(int fileID) {
+    return gDiscFiles[fileID].info.uLength;
 }
 
-// Reads a whole file, waiting for the drive, into a new allocation aligned to nAlign; its size goes
-// to *puSize when that is not NULL. NULL when no memory is free.
-void* fn_800065C8(const char* szPath, u32* puSize, int nAlign) {
+void* File_ReadFileToHeap(const char* filename, u32* fileLength, int align) {
     DVDFileInfo info;
     u32 uSize;
-    s32 nLen;
+    s32 fileLen;
     s32 nEntry;
-    void* pData;
+    void* memLoc;
     s32 nStatus;
     u8 bRetry;
 
     do {
-        nEntry = DVDConvertPathToEntrynum(szPath);
+        nEntry = DVDConvertPathToEntrynum(filename);
         if (nEntry < 0) {
-            fn_800B7490();
+            DiscError_WaitForDrive();
         }
     } while (nEntry < 0);
-    if (nEntry < 0) {           // never: the loop above waits for the file
+    if (nEntry < 0) {           // unreachable: the loop above waits for the file
         return NULL;
     }
     for (;;) {
         if (DVDFastOpen(nEntry, &info)) {
             break;
         }
-        fn_800B7490();
+        DiscError_WaitForDrive();
     }
-    nLen = info.uLength;
-    uSize = nLen;
-    pData = Circular_MemAllocFunc(nLen, MEMTYPE_HIGH, nAlign, "LLFileIO_Gc.c", 750);
-    if (pData == NULL) {
+    fileLen = info.uLength;
+    uSize = fileLen;
+    memLoc = Circular_MemAllocFunc(fileLen, MEMTYPE_HIGH, align, "LLFileIO_Gc.c", 750);
+    if (memLoc == NULL) {
         return NULL;
     }
     do {
-        DVDReadAsyncPrio(&info, pData, uSize, 0, NULL, 2);
+        DVDReadAsyncPrio(&info, memLoc, uSize, 0, NULL, 2);
         bRetry = 0;
         do {
             // a DVDFileInfo begins with its command block
             nStatus = DVDGetCommandBlockStatus((DVDCommandBlock*)&info);
-            if (nStatus == 0) {     // fake match: a break before the loop's own (same) test
+            if (nStatus == 0) {     // the read is done: no drive wait
                 break;
             }
-            bRetry = fn_800B7490();
+            bRetry = DiscError_WaitForDrive();
         } while (nStatus != 0);
     } while (bRetry);
     do {
         nStatus = DVDClose(&info);
         if (!nStatus) {
-            fn_800B7490();
+            DiscError_WaitForDrive();
         }
     } while (!nStatus);
-    if (puSize != NULL) {
-        *puSize = nLen;
+    if (fileLength != NULL) {
+        *fileLength = fileLen;
     }
-    return pData;
+    return memLoc;
 }

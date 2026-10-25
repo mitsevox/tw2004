@@ -6,7 +6,6 @@
 void Session_Init();
 void UStream_AllocBuffers();
 void fn_80005580();
-void fn_80005EC0();
 void fn_800071BC();
 void StreamManager_InitOnce();
 void fn_8002F1D4();
@@ -24,7 +23,7 @@ void fn_80005520(void) {
     Math_InitLog2Table();
     fn_8000B984();
     Circular_CreateBuffer();
-    fn_80005EC0();
+    File_InitOnce();
     Input_vInitOnce();
     UStream_AllocBuffers();
     Session_Init();

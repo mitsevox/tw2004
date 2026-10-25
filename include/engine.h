@@ -506,42 +506,86 @@ s32 DVDConvertPathToEntrynum(const char* pPath);
 int DVDFastOpen(s32 nEntry, DVDFileInfo* pInfo);
 int DVDClose(DVDFileInfo* pInfo);
 
-// An open file (lbl_8019EAD0, 32 of them, 0xC4 bytes each).
+#define FILE_NUM_FILES      32      // files open at once (a handle is a slot of gDiscFiles)
+#define FILE_NUM_REQUESTS   8       // reads that can wait at each priority
+#define FILE_PATH_SIZE      0x80    // a path in the disc's form, its terminator included
+
+// A read's priority: the reader takes the first read queued at the lowest number that has one.
+#define FILE_PRIORITY_HIGH  0       // the sound streams' reads (File_ReadAsyncEx)
+#define FILE_PRIORITY_LOW   1       // every File_ReadAsync
+#define FILE_NUM_PRIORITIES 2
+
+// What File_ReadAsync calls from the reader thread when a read is done: the length it asked for,
+// and 0.
+typedef void (*CallbackPtr)(int nBytes, int nError);
+// What File_ReadAsyncEx takes: a CallbackPtr when legacy is set, else a
+// void (*)(void* destAdr, int nBytes, u32 user, u8 uid) cast to this type.
+typedef void (*CallbackPtrEx)(int nBytes, int nError);
+
+// An open file, one per handle.
 typedef struct DiscFile {
     DVDFileInfo info;           // 0x00
     s32  nEntry;                // 0x3C  its disc entry number; -1: a free slot
     s32  nOpens;                // 0x40  how many opens it has (File_Close closes it at 0)
-    char szPath[0x80];          // 0x44  its path in the disc's form (fn_80005BE8)
+    char szPath[FILE_PATH_SIZE];    // 0x44  its path in the disc's form (File_FormatFilename)
 } DiscFile;
+LAYOUT_ASSERT(DiscFile, 0xC4);
 
-// A queued read (0x24 bytes: lbl_8019E880 holds eight free ones per priority).
+// A read: on its priority's free list (FileReqPool), or in its priority's queue (FileQueue) from
+// File_ReadAsyncEx until the reader has finished it.
 typedef struct FileReq {
     struct FileReq* pNext;      // 0x00
     struct FileReq* pPrev;      // 0x04
-    s32   nFile;                // 0x08  the DiscFile to read from
-    void* pBuf;                 // 0x0C
-    s32   nLen;                 // 0x10
-    s32   nOffset;              // 0x14
-    void (*pfnDone)(int nBytes, int nError);    // 0x18
-    s32   n1C;                  // 0x1C
-    u8    b20;                  // 0x20
-    u8    b21;                  // 0x21
+    s32   nFile;                // 0x08  the handle to read from
+    void* pBuf;                 // 0x0C  where the bytes go
+    s32   nLen;                 // 0x10  how many bytes to read
+    s32   nOffset;              // 0x14  where in the file they start
+    CallbackPtrEx pfnDone;      // 0x18  called when the read is done; NULL: nothing is
+    u32   uUser;                // 0x1C  } handed back to pfnDone when bLegacy is 0
+    u8    nUid;                 // 0x20  }
+    u8    bLegacy;              // 0x21  pfnDone is a CallbackPtr
     u8    unk22[2];
 } FileReq;
+LAYOUT_ASSERT(FileReq, 0x24);
 
-// A priority's reads: a ring through the FileReqs, the list itself as its end (lbl_8019E868[2]).
+// A priority's queued reads, oldest first: a ring through the FileReqs with the queue itself as
+// its end.
 typedef struct FileQueue {
     FileReq* pNext;             // 0x00
     FileReq* pPrev;             // 0x04
-    s32   nCount;               // 0x08
+    s32   nCount;               // 0x08  the reads queued, the one the reader is running included
 } FileQueue;
+LAYOUT_ASSERT(FileQueue, 0xC);
 
-// A priority's free FileReqs (lbl_8019E880[2]): a ring like FileQueue's, and the eight requests.
+// A priority's free FileReqs: a ring like FileQueue's, and the requests themselves.
 typedef struct FileReqPool {
     FileReq* pNext;             // 0x00
     FileReq* pPrev;             // 0x04
-    FileReq  aReq[8];           // 0x08
+    FileReq  aReq[FILE_NUM_REQUESTS];   // 0x08
 } FileReqPool;
+LAYOUT_ASSERT(FileReqPool, 0x128);
+
+// Sets the file reads up at start-up: the drive, no files open, the queues, the reader thread, and
+// the sound engine's locks (AudLock_Init), one of which the reads share. Returns 0.
+int  File_InitOnce(void);
+void File_CloseOnce(void);              // empty: nothing is shut down
+// Opens a file by its path: its handle, or -1 when no slot is free (even when the file is already
+// open). A file already open gets one more open on its handle. Waits for the disc.
+int  File_Open(const char* filename);
+// One open fewer; at none the disc file is closed and its handle freed. Returns 0.
+int  File_Close(int fileID);
+// Queues a read of bytesToRead bytes at offsetFromStart into destAdr at FILE_PRIORITY_LOW without
+// waiting for it. Returns 0, even when no request was free and the read was dropped.
+int  File_ReadAsync(int fileID, void* destAdr, u32 bytesToRead, u32 offsetFromStart,
+                    CallbackPtr callbackFuncPtr);
+// The same read at a priority. When it is done, the reader calls callbackFuncPtr(bytesToRead, 0)
+// if legacy is set, else callbackFuncPtr(destAdr, bytesToRead, user, uid).
+int  File_ReadAsyncEx(int fileID, void* destAdr, u32 bytesToRead, u32 offsetFromStart,
+                      CallbackPtrEx callbackFuncPtr, u8 priority, u32 user, u8 uid, u8 legacy);
+u32  File_GetLength(int fileID);        // the file's size in bytes
+// Reads a whole file into a new block aligned to align, waiting (and retrying) until the disc gives
+// it; its size goes to *fileLength unless that is NULL. NULL if no memory is free.
+void* File_ReadFileToHeap(const char* filename, u32* fileLength, int align);
 
 // ---- the renderer ----------------------------------------------------------------------------
 
@@ -1224,21 +1268,6 @@ void* Resources_GetDataInBuffer(u8* pBuffer, u32 uBuffSize, u32 uTag, u32 uId);
 TChunkR* Resources_GetChunkInBuffer(u8* pBuffer, u32 uBuffSize, u32 uTag, u32 uId);   // NULL: none
 void Resources_UpdateOldResourceTime(UStreamObject* pRes);
 
-// Files on disc: a handle from open, -1 for none.
-int  fn_800060E0(const char* pName);    // file open
-int  fn_8000633C(int hFile);            // file close
-// Reads uLen bytes at uOffset into pDst without waiting; pfnDone is called when it is done.
-// Returns 0, even when no request was free and the read was dropped.
-int  fn_80006444(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(int nBytes, int nError));
-// The same read queued at priority nPrio (0 or 1). The reader calls pfnDone(nBytes, 0) when b21
-// is set, else pfnDone(pDst, nBytes, n1C, b20) (the stream tracks: the track and the read id).
-int  File_ReadAsyncEx(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(int nBytes, int nError),
-                      u8 nPrio, s32 n1C, u8 b20, u8 b21);
-u32  fn_800065B0(int hFile);            // file size
-// LLFileIO_Gc.c: read a whole file into a new block aligned to nAlign, waiting (and retrying)
-// until the disc gives it; its size goes to *puSize. NULL if no memory is free.
-void* fn_800065C8(const char* pName, u32* puSize, int nAlign);
-
 // ---- fonts -----------------------------------------------------------------------------------
 
 f32  fn_80012C30(char* sz);             // UFont.c: a string's width
@@ -1543,8 +1572,8 @@ void Input_vStopAllVibration(void);                     // GoRenderCtx_Gc.c: eve
 
 void Aud_ExitSession(s32 n);                // GameAudio.c
 void Gaud_Cycle(void);                 // GameAudio.c: once a frame, the emitters and the queued sound
-u8   fn_800B7490(void);                 // DiscError.c: show the disc-error screen while the drive
-                                        // reports a problem; 1: it was shown (UStream.c, DiscCheck.c)
+u8   DiscError_WaitForDrive(void);      // Code800B7210.c: show the disc-error screen while the drive
+                                        // reports a problem; 1: it was shown
 
 // A node of Code8009B340.c's list (lbl_80281FA0): glows queued by fn_8009B260 that fade out
 // (fAlpha falls by fAlphaSpeed a second) and is freed once it has faded.
