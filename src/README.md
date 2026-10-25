@@ -147,7 +147,7 @@ files in [Characters](#characters).
 | GxUtil.c | ours | a 256x224 copy of the screen as a texture, rectangle alpha clear, texture object set-up |
 | GoRenderSurface.c | EA | five off-screen render surfaces |
 | GoTerrain.c | EA | the terrain renderer: the hole's ground and objects in draw lists by distance and LOD; animated trees, crowd, flag |
-| GoPostFx.c | EA | screen effects over each view (a colour, two effects from a screen copy) |
+| GoPostFx.c | EA | screen effects over each view (a colour, two effects from a screen copy) *(last function's file unverified)* |
 | DepthField.c | T6 | depth-of-field blur |
 | UObject3D.c | EA | a model from a stream object; a recorded display list of renderer state |
 | GoFrameBuf.c | EA | a frame buffer's size and scale |
@@ -516,12 +516,6 @@ The `Common/` and `NGC/` files are built with SN ProDG (GCC 2.95), unoptimised, 
 | DiscCheck.c | ours | which disc is in the drive; disc changes; course files per disc |
 
 ### Unplaced
-
-Small sweep files whose file and subsystem are not known:
-
-| File | What it is |
-|---|---|
-| unsorted/sweep_8003944C.c | a function returning 0, between GoPostFx.c and GoDynamicCam.c |
 
 In the SDK and runtime address range, not EA code: `unsorted/sweep_801338E0.c` (EXI2 / debugger
 stubs), `sweep_801654D0.c`, `sweep_801654F4.c`, `sweep_80165524.c` (Metrowerks critical sections;

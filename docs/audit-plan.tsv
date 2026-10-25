@@ -386,7 +386,7 @@ order	area	file	task	scope	state
 382	Front end and UI	FE_MessageTable.c	chunk 8/8	GM_vGbaResumeLink .. MC_CallActionFnSave	open
 383	Front end and UI	FE_MessageTable.c	whole-file review	the whole file	open
 384	Front end and UI	uiProcessInterface.c	pass	the whole file	open
-385	Unplaced	unsorted/sweep_8003944C.c	fold	prove its file and fold it in	open
+385	Unplaced	unsorted/sweep_8003944C.c	fold	prove its file and fold it in	done
 386	Unplaced	unsorted/sweep_80095780.c	fold	prove its file and fold it in	done
 387	Unplaced	unsorted/sweep_80095798.c	fold	prove its file and fold it in	done
 388	Unplaced	unsorted/sweep_800957B0.c	fold	prove its file and fold it in	done
