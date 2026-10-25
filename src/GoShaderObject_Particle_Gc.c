@@ -290,7 +290,7 @@ void fn_800949D0(SD_SShaderObject_Static* pObject) {
         RenderState_Flush();
         pCamera = RC_spGetCurrentRenderCtx();
         GXClearVtxDesc();
-        GXSetVtxDesc(9, 1);                     // position, colour, texture coordinates: direct
+        GXSetVtxDesc(GX_VA_POS, 1);                     // position, colour, texture coordinates: direct
         GXSetVtxDesc(11, 1);
         GXSetVtxDesc(13, 1);
         GXInvalidateVtxCache();

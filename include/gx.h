@@ -115,6 +115,7 @@ void GXInvalidateVtxCache(void);
 
 void GXBeginDisplayList(void* pList, u32 uSize);
 u32  GXEndDisplayList(void);            // the list's size
+void GXCallDisplayList(void* pList, u32 uSize);
 void GXResetWriteGatherPipe(void);
 
 // ---- matrices --------------------------------------------------------------------------------
@@ -126,6 +127,8 @@ void GXLoadNrmMtxImm(f32 (*pMtx)[4], int nId);
 #define GX_CLIP_ENABLE  0
 #define GX_CLIP_DISABLE 1
 void GXSetClipMode(int eMode);
+// The vertex attributes GXSetArray, GXSetVtxDesc and GXSetVtxAttrFmt take (the SDK's GXAttr).
+#define GX_VA_POS 9             // the position
 void GXSetArray(int eAttr, void* pBase, u8 nStride);
 void GXClearVtxDesc(void);
 void GXSetVtxDesc(int eAttr, int eType);

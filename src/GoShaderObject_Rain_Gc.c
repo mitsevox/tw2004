@@ -11,7 +11,6 @@
 #include "unsorted/cull.h"
 #include "core/startup.h"
 
-void fn_80070168(void);                                 // calls a display list (see fn_800B4FA4)
 void fn_80012520(u32 ePrim, u32 eFormat, u16 nVerts);  // LLFont.c: GXBegin
 void fn_800124A8(void);                                // LLFont.c: end the primitive
 void fn_800B58B4(s32 p0);
@@ -84,7 +83,7 @@ void fn_800B4C00(RainList* pList, int nDrops) {
     GXBeginDisplayList(pBuf, uSize);
     GXResetWriteGatherPipe();
     GXClearVtxDesc();
-    GXSetVtxDesc(9, 1);         // position, direct
+    GXSetVtxDesc(GX_VA_POS, 1);         // position, direct
     GXSetVtxDesc(11, 2);        // colour 0, an 8-bit index
     GXInvalidateVtxCache();
     fn_80012520(0xA8, 4, nDrops * 2);   // lines
@@ -189,8 +188,7 @@ void fn_800B4FA4(RainObject* pRain) {
                     mPos[1][3] = v.y;
                     mPos[2][3] = -v.z;
                     GXLoadPosMtxImm(mPos, 0);
-                    // port: EA passes the list and its size, which fn_80070168 hands on unread
-                    ((void (*)(void*, u32))fn_80070168)(pData->list.pList, pData->list.uSize);
+                    SD_CallDisplayList(pData->list.pList, pData->list.uSize);
                 }
             }
         }
@@ -204,7 +202,7 @@ void fn_800B4FA4(RainObject* pRain) {
     fn_800B58FC(mPos[2], mPos[2]);
     GXLoadPosMtxImm(mPos, 0);
     GXClearVtxDesc();
-    GXSetVtxDesc(9, 1);         // position, colour, texture coordinates: direct
+    GXSetVtxDesc(GX_VA_POS, 1);         // position, colour, texture coordinates: direct
     GXSetVtxDesc(11, 1);
     GXSetVtxDesc(13, 1);
     GXInvalidateVtxCache();

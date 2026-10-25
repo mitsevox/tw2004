@@ -11,7 +11,6 @@
 void fn_80097EC4(f32* pPos);
 void fn_800124A8(void);                                 // LLFont.c: end the primitive
 void fn_80012520(u32 ePrim, u32 eFormat, u16 nVerts);  // LLFont.c: GXBegin
-void fn_80070168(void);                                 // calls a display list (see fn_80098408)
 
 // This file's .sbss (glows.h).
 GlowQueue* gpCurrentGlowList;
@@ -46,7 +45,7 @@ GlowList* _StartGlowStrip(int nGlow, int nVerts) {
     GXResetWriteGatherPipe();
     GXClearVtxDesc();
     GXSetVtxDesc(0, 1);                         // matrix index, position, colour: direct
-    GXSetVtxDesc(9, 1);
+    GXSetVtxDesc(GX_VA_POS, 1);
     GXSetVtxDesc(11, 1);
     GXInvalidateVtxCache();
     lbl_801D99D0.a[nGlow].p4 = pList;
@@ -220,7 +219,7 @@ void fn_80098408(GlowQueued* pGlow, const f32* pPos) {
         } else {
             GXSetZMode(1, 3, 1);                // less or equal, with depth write
         }
-        ((void (*)(void*, u32))fn_80070168)(lbl_801D99D0.a[pGlow->n25].p4, lbl_801D99D0.a[pGlow->n25].n0);
+        SD_CallDisplayList(lbl_801D99D0.a[pGlow->n25].p4, lbl_801D99D0.a[pGlow->n25].n0);
     }
 }
 

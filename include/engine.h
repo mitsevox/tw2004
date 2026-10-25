@@ -1055,6 +1055,7 @@ void DynRenderBuffer_AddVertices(DynRenderBuffer* pBuf, const void* pPos, const 
 void DynRenderBuffer_AddIndices(DynRenderBuffer* pBuf, u16* pIndices, u32 nCount, u8 bRestart);
 void DynRenderBuffer_AddDraws(DynRenderBuffer* pBuf, const DynRenderDrawIn* pDraws, u16 nCount, int nPrim,
                               u8 bRestart);
+void SD_CallDisplayList(void* pList, u32 nSize);
 
 // A shader object that draws through a dynamic rendering buffer, as the hooks of rows 0 and 19 of
 // lbl_80188E88 see it (our names): the ShaderObject with its row's data.
@@ -1111,9 +1112,9 @@ LAYOUT_ASSERT(TexAnimManager, 0x610);
 
 void fn_80076B7C(void);             // make the manager
 void fn_80076BC4(void);             // free it
-void fn_80076C20(f32 fFrame);       // set the clock and move every matrix
+void TexAnim_Update(f32 fFrame);    // set the clock and move every matrix
 f32  fn_80076E18(void);             // the clock
-void fn_80076E24(void);             // forget every animation
+void TexAnim_RemoveAll(void);       // forget every animation
 
 // A shader object that scrolls its texture (GoShaderObject_PrelitUVAnimation_Gc.c, row 5 of
 // lbl_80188E88): a DynRenderObject with its own texture matrix, loaded as matrix 0x39.

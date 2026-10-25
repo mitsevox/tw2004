@@ -18,7 +18,6 @@ Code8002DB80.c	open
 Code8002EE1C.c	open		
 Code80037AB8.c	open		
 Code8006F608.c	open		
-Code80070EC4.c	open		
 Code80090940.c	open		
 Code8009AA28.c	open		
 Code8009B340.c	open		
@@ -118,6 +117,8 @@ GoShaderObjectContainer_OBFData_Gc.c	open
 GoShaderObject_Glows_Gc.c	open		
 GoShaderObject_Grass_Gc.c	open		
 GoShaderObject_Particle_Gc.c	open		
+GoShaderObject_PrelitRGBAUVAnimation_Gc.c	open		
+GoShaderObject_PrelitTexturedMorph_Gc.c	open		
 GoShaderObject_PrelitTextured_Gc.c	done	e9d81c8e	claude-review
 GoShaderObject_PrelitUVAnimation_Gc.c	open		
 GoShaderObject_Rain_Gc.c	open		

@@ -149,12 +149,12 @@ void RenderView_DrawPrimitive(int ePrim, f32* pPos, f32* pColour, f32* pUV, int 
         GXSetCurrentMtx(0);
     }
     GXClearVtxDesc();
-    GXSetVtxDesc(9, 1);
+    GXSetVtxDesc(GX_VA_POS, 1);
     GXSetVtxDesc(11, 1);
     if (pUV != NULL) {
         GXSetVtxDesc(13, 1);
     }
-    GXSetVtxAttrFmt(7, 9, 1, 4, 0);
+    GXSetVtxAttrFmt(7, GX_VA_POS, 1, 4, 0);
     GXSetVtxAttrFmt(7, 11, 1, 5, 0);
     if (pUV != NULL) {
         GXSetVtxAttrFmt(7, 13, 1, 4, 0);

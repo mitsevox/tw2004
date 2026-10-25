@@ -26,17 +26,15 @@ void fn_80071914(void);
 void fn_80071994(void);
 void fn_80071A54(int nRow);
 void fn_80071A90(int nRow);
-void fn_80070168(void);     // DynamicRenderingBuffer.c: calls a display list
-void fn_8007524C(void);     // GoShaderObjectCommon_ShaderObjectsData_Gc.c: empty
 
 // The hooks of lbl_80188E78 and lbl_80188E88 defined in other units, by unit.
 // GoShaderObjectContainer_OBFData_Gc.c
 void fn_8006FDCC(void);
 void fn_8006FDD0(void);
-void fn_8006FED4(u8* p0, s32 p1);
-void fn_8006FF08(u8* p0);
+void fn_8006FED4(StaticShaderObject* pObj, ShaderCmds* pCmds);
+void fn_8006FF08(StaticShaderObject* pObj);
 // GoShaderObjectContainer_OBFData_Gc.c
-void fn_8006FF2C(void* arg0);
+void fn_8006FF2C(StaticShaderObject* pObj);
 // DynamicRenderingBuffer.c
 void fn_80070B74(void);
 void fn_80070B78(StaticShaderObject* pObj, ShaderCmds* pCmds);
@@ -52,15 +50,6 @@ void fn_80070D7C(f32* pfWeight);
 void fn_80070D88(StaticShaderObject* pObj, ShaderCmds* pCmds);
 void fn_80070DBC(StaticShaderObject* pObj);
 void fn_80070DF4(StaticShaderObject* pObj);
-// Code80070EC4.c
-void fn_80070EC4(TerWaveData* pWave);
-void fn_80070F00(StaticShaderObject* pObj, ShaderCmds* pCmds);
-void fn_80070F34(StaticShaderObject* pObj);
-void fn_80070F5C(StaticShaderObject* pObj);
-void fn_80070FB0(f32* pfWeight);
-void fn_80070FBC(StaticShaderObject* pObj, ShaderCmds* pCmds);
-void fn_80070FF0(StaticShaderObject* pObj);
-void fn_80071028(StaticShaderObject* pObj);
 // GoShaderObject_Particle_Gc.c
 void fn_8009414C(void);
 void fn_80094214(void);
@@ -106,27 +95,26 @@ s32* lbl_802811F8 = &lbl_80281E80;
 
 // Row 5's data hook: set the texture animation clock from the frame count.
 void fn_8007110C(u32* pnFrame) {
-    fn_80076C20(*pnFrame);
+    TexAnim_Update(*pnFrame);
 }
 
 // Row 5's static init: build the object's display list from pCmds.
 void fn_80071148(StaticShaderObject* pObj, ShaderCmds* pCmds) {
-    fn_80074DA8(pObj->pArrays, pObj->eType, &pObj->anim, pCmds);
+    ShaderData_BuildDisplayList(pObj->pArrays, pObj->eType, &pObj->anim, pCmds);
 }
 
 // Row 5's static close; it also forgets every texture animation.
 void fn_8007117C(StaticShaderObject* pObj) {
-    // port: EA passes an argument fn_8007524C ignores
-    ((void (*)(MorphAnim*))fn_8007524C)(&pObj->anim);
-    fn_80076E24();
+    ShaderData_CloseDisplayList(&pObj->anim);
+    TexAnim_RemoveAll();
 }
 
 // Row 5's static render: the display list (with the object's positions when the list sets none).
 void fn_800711A4(StaticShaderObject* pObj) {
-    if (pObj->anim.b8 != 0) {
-        GXSetArray(9, pObj->pArrays->apPos[0], 12);
+    if (pObj->anim.bNoPosArray != 0) {
+        GXSetArray(GX_VA_POS, pObj->pArrays->apPos[0], 12);
     }
-    ((void (*)(void*, u32))fn_80070168)(pObj->anim.p4, pObj->anim.n0);
+    SD_CallDisplayList(pObj->anim.pList, pObj->anim.nListSize);
 }
 
 // Make the object's buffer (at the given sizes, or 50 vertices and one draw) and its texture
@@ -178,7 +166,7 @@ void fn_800712EC(PrelitUVObject* pObj) {
 }
 
 // Add a frame's draws, indices and vertices to the object's buffer (bRestart: replace what is
-// there) and move its matrix like a texture animation's (fn_80076C20).
+// there) and move its matrix like a texture animation's (TexAnim_Update).
 void fn_800713B4(PrelitUVObject* pObj, PrelitUVFill* pFill, u8 bRestart) {
     f32 fTime;
     f32 fU;
@@ -256,21 +244,20 @@ void fn_80071574(void) {
 
 // Row 10's static init: build the object's display list from pCmds.
 void fn_80071578(StaticShaderObject* pObj, ShaderCmds* pCmds) {
-    fn_80074DA8(pObj->pArrays, pObj->eType, &pObj->anim, pCmds);
+    ShaderData_BuildDisplayList(pObj->pArrays, pObj->eType, &pObj->anim, pCmds);
 }
 
 // Row 10's static close.
 void fn_800715AC(StaticShaderObject* pObj) {
-    // port: EA passes an argument fn_8007524C ignores
-    ((void (*)(MorphAnim*))fn_8007524C)(&pObj->anim);
+    ShaderData_CloseDisplayList(&pObj->anim);
 }
 
 // Row 10's static render: the display list (with the object's positions when the list sets none).
 void fn_800715D0(StaticShaderObject* pObj) {
-    if (pObj->anim.b8 != 0) {
-        GXSetArray(9, pObj->pArrays->apPos[0], 12);
+    if (pObj->anim.bNoPosArray != 0) {
+        GXSetArray(GX_VA_POS, pObj->pArrays->apPos[0], 12);
     }
-    ((void (*)(void*, u32))fn_80070168)(pObj->anim.p4, pObj->anim.n0);
+    SD_CallDisplayList(pObj->anim.pList, pObj->anim.nListSize);
 }
 
 // Row 6's data hook: nothing.
@@ -279,21 +266,20 @@ void fn_80071624(void) {
 
 // Row 6's static init: build the object's display list from pCmds.
 void fn_80071628(StaticShaderObject* pObj, ShaderCmds* pCmds) {
-    fn_80074DA8(pObj->pArrays, pObj->eType, &pObj->anim, pCmds);
+    ShaderData_BuildDisplayList(pObj->pArrays, pObj->eType, &pObj->anim, pCmds);
 }
 
 // Row 6's static close.
 void fn_8007165C(StaticShaderObject* pObj) {
-    // port: EA passes an argument fn_8007524C ignores
-    ((void (*)(MorphAnim*))fn_8007524C)(&pObj->anim);
+    ShaderData_CloseDisplayList(&pObj->anim);
 }
 
 // Row 6's static render: the display list (with the object's positions when the list sets none).
 void fn_80071680(StaticShaderObject* pObj) {
-    if (pObj->anim.b8 != 0) {
-        GXSetArray(9, pObj->pArrays->apPos[0], 12);
+    if (pObj->anim.bNoPosArray != 0) {
+        GXSetArray(GX_VA_POS, pObj->pArrays->apPos[0], 12);
     }
-    ((void (*)(void*, u32))fn_80070168)(pObj->anim.p4, pObj->anim.n0);
+    SD_CallDisplayList(pObj->anim.pList, pObj->anim.nListSize);
 }
 
 void fn_800716D4(void) {
@@ -488,12 +474,12 @@ ModuleHooks lbl_80188E88[20] = {
     },
     {   // 2
         NULL, NULL,
-        (void (*)(void*))fn_80070FB0,
+        (void (*)(void*))SD_vShaderObject_PrelitTexturedMorph_Type_SetParameters,
         NULL, NULL, NULL, NULL, NULL, NULL,
         {
-            (void (*)(struct UObjMeshPart*, void*))fn_80070FBC,
-            (void (*)(struct UObjMeshPart*))fn_80070FF0,
-            (void (*)(struct UObjMeshPart*))fn_80071028,
+            (void (*)(struct UObjMeshPart*, void*))SD_vShaderObject_PrelitTexturedMorph_Static_Init,
+            (void (*)(struct UObjMeshPart*))SD_vShaderObject_PrelitTexturedMorph_Static_Close,
+            (void (*)(struct UObjMeshPart*))SD_vShaderObject_PrelitTexturedMorph_Static_Render,
         },
     },
     {   // 3
@@ -508,12 +494,12 @@ ModuleHooks lbl_80188E88[20] = {
     },
     {   // 4
         NULL, NULL,
-        (void (*)(void*))fn_80070EC4,
+        (void (*)(void*))SD_vShaderObject_PrelitRGBAUVAnimation_Type_SetParameters,
         NULL, NULL, NULL, NULL, NULL, NULL,
         {
-            (void (*)(struct UObjMeshPart*, void*))fn_80070F00,
-            (void (*)(struct UObjMeshPart*))fn_80070F34,
-            (void (*)(struct UObjMeshPart*))fn_80070F5C,
+            (void (*)(struct UObjMeshPart*, void*))SD_vShaderObject_PrelitRGBAUVAnimation_Static_Init,
+            (void (*)(struct UObjMeshPart*))SD_vShaderObject_PrelitRGBAUVAnimation_Static_Close,
+            (void (*)(struct UObjMeshPart*))SD_vShaderObject_PrelitRGBAUVAnimation_Static_Render,
         },
     },
     {   // 5

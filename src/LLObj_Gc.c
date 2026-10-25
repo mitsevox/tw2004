@@ -350,12 +350,12 @@ void fn_800080D0(void) {
 void fn_800080D4(void) {
     lbl_80280DA0->unk14 = 0;
     lbl_80280DA0->unk10 = 0;
-    GXSetVtxAttrFmt(0, 9, 1, 4, 0);
+    GXSetVtxAttrFmt(0, GX_VA_POS, 1, 4, 0);
     GXSetVtxAttrFmt(0, 11, 1, 5, 0);
     GXSetVtxAttrFmt(0, 13, 1, 3, 9);
     GXSetVtxAttrFmt(0, 14, 1, 3, 9);
     GXSetVtxAttrFmt(0, 10, 0, 4, 0);
-    GXSetVtxAttrFmt(4, 9, 1, 4, 0);
+    GXSetVtxAttrFmt(4, GX_VA_POS, 1, 4, 0);
     GXSetVtxAttrFmt(4, 11, 1, 5, 0);
     GXSetVtxAttrFmt(4, 13, 1, 4, 0);
 }
