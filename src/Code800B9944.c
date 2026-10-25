@@ -34,7 +34,6 @@ char gszCrAPBallLogoTex[] = "logoea";   // the texture FE_CrAPBall_SetLogo copie
 
 void FE_CrAPBall_LoadBALF(TStreamData* pObject);
 void FE_CrAPBall_LoadTEO(TStreamData* pObject);
-void UObject_ComposeRotation(f32 (*pMtx)[4]);
 void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
 
 // Registers the stream handlers for the ball the Create-A-Player menu golfer holds: 'TEO ' objects
@@ -159,7 +158,7 @@ void FE_CrAPBall_DrawObject(TObject* pObj, f32 (*mBone)[4], f32 (*mScale)[4], f3
     LLMath_CopyMat44(pObj->mObjToWorld, m80);
     LLMath_mat44fltMultiplyList33(mBone, pObj->mRotation, pObj->mRotation, 3);
     LLMath_mat44fltMultiplyList33(mScale, pObj->mScale, pObj->mScale, 3);
-    UObject_ComposeRotation(pObj->mRotation);
+    Object_UpdateO2WComposed33(pObj);
     LLMath_CopyVec(pPos, pObj->mObjToWorld[3]);
     pObj->mObjToWorld[3][3] = 1.0f;
     LLMath_mat44fltMultiplyList(gpCrAPState->mC0, pObj->mObjToWorld, pObj->mObjToWorld, 4);

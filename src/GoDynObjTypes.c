@@ -6,8 +6,6 @@
 
 #include "dynobj.h"
 
-void UObject_ComposeRotation(f32 (*pMtx)[4]);
-
 // Type 6's message 2: sets the object up from its definition as type 0 does, but with no flags (so
 // the flag tests below never hold), n14E at -1, and the model of the setup's first entry (or none).
 void DynObjType6_Init(DynObj* pObj, DynObjSetup* pSetup) {
@@ -67,7 +65,7 @@ void DynObjType6_Init(DynObj* pObj, DynObjSetup* pSetup) {
     }
     LLMath_IdentifyMat(pObj->obj.mRotation);
     LLMath_IdentifyMat(pObj->obj.mScale);
-    UObject_ComposeRotation(pObj->obj.mRotation);
+    Object_UpdateO2WComposed33(&pObj->obj);
     pObj->obj.mObjToWorld[3][0] = pDef->aPos[0];
     pObj->obj.mObjToWorld[3][1] = pDef->aPos[1];
     pObj->obj.mObjToWorld[3][2] = pDef->aPos[2];
@@ -141,7 +139,7 @@ void DynObjType9_Init(DynObj* pObj, DynObjSetup* pSetup) {
     Object_Init(&pObj->obj,NULL, 0);
     LLMath_IdentifyMat(pObj->obj.mRotation);
     LLMath_IdentifyMat(pObj->obj.mScale);
-    UObject_ComposeRotation(pObj->obj.mRotation);
+    Object_UpdateO2WComposed33(&pObj->obj);
     pObj->obj.mObjToWorld[3][0] = pDef->aPos[0];
     pObj->obj.mObjToWorld[3][1] = pDef->aPos[1];
     pObj->obj.mObjToWorld[3][2] = pDef->aPos[2];

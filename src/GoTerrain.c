@@ -685,7 +685,7 @@ void Ter_AddPatchObjects(Ter_PatchReference* pPatch, s32 nFirstObject) {
                 pRef->fDistanceSquared = fDistanceSquared;
                 pRef->f14 = LLMath_LengthSquared3(v48);
                 LLMath_Subtract3(pBounds, gTerRenderer.xCameraReferencePos, v38);
-                pRef->f18 = Vec3_Dot(gTerRenderer.xCameraLookVector, v38);
+                pRef->f18 = LLMath_DotProduct3(gTerRenderer.xCameraLookVector, v38);
                 iObject = nLast - i;
                 pRef->eClipMethod = eClipMethod;
                 pRef->pContainerPatch = pPatch;

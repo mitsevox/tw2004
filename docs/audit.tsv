@@ -29,7 +29,6 @@ Code800B1D3C.c	open
 Code800B7210.c	open		
 Code800B9944.c	open		
 Code800BA940.c	open		
-Code80193188.c	open		
 Common/Checksum/ChecksumCRC32.c	done	d5543081	claude-review
 Common/Crypt/CryptXOR.c	done	44db6e97	claude-review
 Common/SharedFileIO/SharedFileIO.c	open		
@@ -168,6 +167,7 @@ SitDev.c	open
 SitDevCommentaryZones.c	done	503eba0e	claude-review
 SitDevFile.c	open		
 SitDevMisc.c	open		
+SitDevSignedValues.c	done	78bf4509	claude-review
 SitDevStateVector.c	open		
 SitDevTrigger.c	open		
 Skeleton.c	open		
@@ -179,7 +179,6 @@ StateGolfer.c	done	2b0ee2a1	claude-review
 StreamManager.c	done	7511d865	claude-review
 SunFlr_Gc.c	open		
 Swing.c	open		
-TerrainData.c	open		
 TerrainGround.c	done	ff3496ef	claude-review
 TibExt.c	open		
 UAudContainers.c	done	b5058d88	claude-review
@@ -199,6 +198,7 @@ UKernel.c	open
 UMatFlt.c	done	db5f2ece	claude-review
 UMath.c	done	db5f2ece	claude-review
 UMemPool.c	done	db5f2ece	claude-review
+UNetwork.c	done	e81334d8	claude-review
 UObject.c	done	23ee123c	claude-review
 UObject3D.c	open		
 URes.c	done	e845bd03	claude-review
@@ -218,7 +218,7 @@ gocamscripts.c	open
 gomainloop.c	open		
 hlaudemitter.c	done	6e08fca1b823	claude-review
 hlaudemitterpool.c	open		
-hlaudmic.c	open		
+hlaudmic.c	done	b1dd4c3b	claude-review
 hlaudmovie.c	open		
 hlaudsession.c	open		
 hlaudtrack.c	open		

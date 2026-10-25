@@ -30,7 +30,7 @@ void fn_80069AFC(int nPlayer);
 void fn_80069B74(int nPlayer);
 void fn_80069BEC(int nPlayer);
 void PlaceBall_RenderBallTarget(int nPlayer);
-void fn_8006A7A8(u8* pChunk);
+void fn_8006A7A8(TNetwork* netPtr);
 void fn_8006A8B0(void);
 void fn_8006A964(f32* pA, f32* pB, f32* pOut);
 void fn_8006A988(f32* pA, f32* pB, f32* pOut);
@@ -43,13 +43,13 @@ static f32 target_StrippedFn(f32 x) {
     return x + 1.0f;
 }
 
-// Set up when play starts (GO_vInitIG): the hole's chunk 3 loader, the marker textures ("tball"
-// and "shadow") and the five players' marker settings.
+// Set up when play starts (GO_vInitIG): the loader of the hole's ball-placement network, the
+// marker textures ("tball" and "shadow") and the five players' marker settings.
 void TARGET_Init(void) {
     u64 textureID;
     int i;
 
-    Network_RegisterLoadNetworkCallback(3, fn_8006A7A8);
+    Network_RegisterLoadNetworkCallback(NETWORK_TYPE_PLACE_BALL, fn_8006A7A8);
     lbl_80281E30 = NULL;
     textureID = FEtm_PackName("tball");
     fn_800102DC(textureID, &lbl_80281E3C, &lbl_80281E40);
@@ -192,7 +192,7 @@ void TARGET_RenderBallTarget(int nPlayer) {
         return;
     }
     LLMath_Normalize3(vDir, vDir);
-    fDot = Vec3_Dot(vUp, vDir);
+    fDot = LLMath_DotProduct3(vUp, vDir);
     vec4flt_CrossProduct(vDir, vUp, vCross);
     fCos = (fDot < -1.0f) ? -1.0f : ((fDot > 1.0f) ? 1.0f : fDot);
     fSin = Math_Sqrt(1.0f - fCos * fCos);
@@ -996,7 +996,7 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
         return;
     }
     LLMath_Normalize3(vDir, vDir);
-    fDot = Vec3_Dot(vUp, vDir);
+    fDot = LLMath_DotProduct3(vUp, vDir);
     vec4flt_CrossProduct(vDir, vUp, vCross);
     fCos = (fDot < -1.0f) ? -1.0f : ((fDot > 1.0f) ? 1.0f : fDot);
     fSin = Math_Sqrt(1.0f - fCos * fCos);
@@ -1143,18 +1143,18 @@ void PlaceBall_SetupTarget(int nPlayer) {
     lbl_801D5BF0[nPlayer].f24 = 0.2f;
 }
 
-// The hole's chunk 3 loader: the placement outline. Each node is listed in lbl_801D5CCC, and any
-// of its links that names the node itself is cleared.
-void fn_8006A7A8(u8* pChunk) {
-    TNetwork* pNet = (TNetwork*)pChunk;
+// The loader of the hole's ball-placement network (NETWORK_TYPE_PLACE_BALL): the placement
+// outline. Each node is listed in lbl_801D5CCC, and any of its links that names the node itself is
+// cleared.
+void fn_8006A7A8(TNetwork* netPtr) {
     int i;
     int j;
-    TNetNode* pNode;
+    TNode* pNode;
 
-    lbl_80281E30 = pNet;
-    pNode = pNet->aNodes;
+    lbl_80281E30 = netPtr;
+    pNode = netPtr->aNodes;
     lbl_80281E44 = 0;
-    for (i = 0; i < pNet->nNumNodes; i++) {
+    for (i = 0; i < netPtr->nNumNodes; i++) {
         lbl_801D5CCC[i].pNode = pNode;
         for (j = 0; j < 10; j++) {
             if (pNode->aLinks[j] == i) {

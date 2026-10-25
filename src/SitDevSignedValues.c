@@ -1,10 +1,11 @@
-// Code80193188.c (our name): a data-only file; TW07 has SitDev\Shared\SitDevSharedTables.c, which
-// is probably this, but nothing names it for TW2004.
+// SitDevSignedValues.c: which of the state values the situation scripts test are signed:
+// SitDev_CompareConditions compares a "greater" or "less" test on these as signed 16-bit numbers
+// (relative scores, leads, angles).
 
 #include "game_types.h"
 #include "sitdev.h"
 
-u8 lbl_80193188[88] = {
+u8 gSitDevValueIsSigned[SITDEV_NUM_SIGNED_FLAGS] = {
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     1, 1, 0, 0, 0, 0, 0, 1,

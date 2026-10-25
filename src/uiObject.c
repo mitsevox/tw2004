@@ -41,7 +41,6 @@ void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, in
 void RC_ApplyCurrentViewport(void);
 void RC_UpdateCurrentScreenMatrices(void);
 void SW_vGetCurrentSpin(int nPlayer, f32* pfSide, f32* pfForward);   // Swing.c: the spin asked for
-void UObject_ComposeRotation(f32 (*pMtx)[4]);
 void UI_Obj_DrawSpinModel(void);
 void UI_Obj_DrawMesh(UObjMesh* pMesh);
 void LI_LoadLightGroup(LightGroup* pGroup);   // Skin.c: load the group's lights (fn_8006E7A4)
@@ -305,8 +304,8 @@ void UI_Obj_RenderBoostUI(int nObj) {
             aDir[2] = 0.0f;
             aDir[3] = 1.0f;
             LLMath_Normalize3(aDir, aDir);
-            fDot = (Vec3_Dot(aUp, aDir) < -1.0f) ? -1.0f
-                 : ((Vec3_Dot(aUp, aDir) > 1.0f) ? 1.0f : Vec3_Dot(aUp, aDir));
+            fDot = (LLMath_DotProduct3(aUp, aDir) < -1.0f) ? -1.0f
+                 : ((LLMath_DotProduct3(aUp, aDir) > 1.0f) ? 1.0f : LLMath_DotProduct3(aUp, aDir));
             gUIObjSettings[nObj].a0[5] = acosf(fDot);
             if (fSpinY < 0.0f) {
                 gUIObjSettings[nObj].a0[5] = -gUIObjSettings[nObj].a0[5];
@@ -348,7 +347,7 @@ void UI_Obj_RenderBoostUI(int nObj) {
             LLMath_CopyMat44(gpUIObjModel->mObjToWorld, mSave80);
             LLMath_mat44fltMultiplyList33(mRot, gpUIObjModel->mRotation, gpUIObjModel->mRotation, 3);
             LLMath_mat44fltMultiplyList33(mScale, gpUIObjModel->mScale, gpUIObjModel->mScale, 3);
-            UObject_ComposeRotation(gpUIObjModel->mRotation);
+            Object_UpdateO2WComposed33(gpUIObjModel);
             LLMath_CopyVec(vPos, gpUIObjModel->mObjToWorld[3]);
             gpUIObjModel->mObjToWorld[3][3] = 1.0f;
             UI_Obj_DrawSpinModel();

@@ -143,8 +143,10 @@ extern u32 gSitDevPredictedHitClass;   // the class of what the look-ahead ball 
                                        // SitDevStateVector.c)
 extern u8 gSitDevPredictionPending;    // such a situation is running
 
-// Per value: nonzero when the scripts compare it as signed (SitDev_CompareConditions).
-extern u8 lbl_80193188[88];
+// Per state value: nonzero when SitDev_CompareConditions compares it as signed. It covers values
+// 0..87 only, of the SITDEV_NUM_VALUES the scripts can test.
+#define SITDEV_NUM_SIGNED_FLAGS 88
+extern u8 gSitDevValueIsSigned[SITDEV_NUM_SIGNED_FLAGS];
 
 // Per game mode: the bit SitDev_TranslateGameMode returns for it, -1 for none.
 extern s32 gSitDevGameModeBits[28];
@@ -171,7 +173,7 @@ void SitDev_SetBallHitTime(struct Ball* pBall);
 // SitDevFile.c
 void SitDev_LoadScripts(TStreamData* pObject);  // the 'sscr' stream handler
 // SitDevCommentaryZones.c
-void SitDev_NetworkLoadCallback(u8* netPtr);        // the loader for commentary-zone networks
+void SitDev_NetworkLoadCallback(TNetwork* netPtr);        // the loader for commentary-zone networks
 u32  SitDev_GetCommentaryZones(f32* location);
 
 void SitDev_vInitBeforeHole(void);

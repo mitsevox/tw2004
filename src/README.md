@@ -235,7 +235,7 @@ all arriving as stream chunks when a hole loads.
 
 | File | Name | What it is |
 |---|---|---|
-| TerrainData.c | ours | the hole's networks (free-drop areas, out of bounds, situation zones) from `'Cnet'` objects; outline tests |
+| UNetwork.c | T7 | the hole's networks (out of bounds, free-drop areas, commentary zones, the AI's aim points, the grass) from `'Cnet'` objects, handed to the loader registered for their type; outline tests |
 | GoDynObj.c | EA | the course's own objects around the dynamic objects: `'TEO '`/`'BALL'` handlers, per-player objects, drawing |
 | UObject.c | EA | a drawable object: three matrices, a model with up to four LODs |
 | UKernel.c | EA | the kernel's list of the course's dynamic objects |
@@ -401,7 +401,7 @@ lines, sounds and music. The SitDev files sit together at 0x800BB0A8-0x800BD894.
 | SitDevCommentaryZones.c | T6/T7 | the hole's commentary zones and the zone test |
 | SitDevStateVector.c | T6/T7 | the values the scripts test (golfer, shot, ball, hole) |
 | SitDevTrigger.c | T6/T7 | running a script entry's actions (commentary, sounds, music) |
-| Code80193188.c | ph | data only: a per-value flag table SitDevStateVector.c reads (TW07's `SitDevSharedTables.c` probably) |
+| SitDevSignedValues.c | ours | data only: which state values the scripts compare as signed |
 
 ### Front end and UI
 

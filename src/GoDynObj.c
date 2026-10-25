@@ -63,7 +63,6 @@ void BFX_vRender(Ball* pBall, int nPlayer);    // GoObjShadow.c
 void Object_SetLod(TObject* pObj, s8 nLod);
 int  CameraController_GetClippedGolfer(void);
 void DynObj_LaunchDirection(f32* pOut, f32 fTurn, f32 fTilt);
-void UObject_ComposeRotation(f32 (*pMtx)[4]);
 void GoDynObj_Vec3Sub(f32* pA, f32* pB, f32* pOut);
 void GoDynObj_Vec4Add(f32* pA, f32* pB, f32* pOut);
 void GoDynObj_Vec3Add(f32* pA, f32* pB, f32* pOut);
@@ -472,7 +471,7 @@ void DynObj_PitchMarkAdd(f32* pPos, int nPlayer) {
         } else {
             LLMath_CopyVec(vPos,
                            gpDynObjState->apPitchMark[gpDynObjState->nNextPitchMark]->obj.mObjToWorld[3]);
-            UObject_ComposeRotation(gpDynObjState->apPitchMark[gpDynObjState->nNextPitchMark]->obj.mRotation);
+            Object_UpdateO2WComposed33(&gpDynObjState->apPitchMark[gpDynObjState->nNextPitchMark]->obj);
         }
         gpDynObjState->nNextPitchMark = gpDynObjState->nNextPitchMark + 1;
         gpDynObjState->nNextPitchMark = gpDynObjState->nNextPitchMark % 10;
@@ -525,7 +524,7 @@ void DynObj_ShotDivotHoleAdd(f32* pPos, int nPlayer) {
     LLMath_mat44fltMultiplyList(gpDynObjState->apDivotHole[nPlayer]->obj.mRotation, mTurn, mObj, 4);
     LLMath_CopyMat44(mObj, gpDynObjState->apDivotHole[nPlayer]->obj.mRotation);
     LLMath_CopyVec(vPos, gpDynObjState->apDivotHole[nPlayer]->obj.mObjToWorld[3]);
-    UObject_ComposeRotation(gpDynObjState->apDivotHole[nPlayer]->obj.mRotation);
+    Object_UpdateO2WComposed33(&gpDynObjState->apDivotHole[nPlayer]->obj);
 }
 
 // Draws a 'TEO ' model (10006 + the target's kind) at each target of the target games.
@@ -766,12 +765,12 @@ void DynObj_DrawGolfBalls(u8* pState) {
                 LLMath_Scale(fGrow, pLogoB->mScale[2], pLogoB->mScale[2]);
             }
         }
-        UObject_ComposeRotation(pBall->mRotation);
+        Object_UpdateO2WComposed33(pBall);
         if (pLogoA != NULL) {
-            UObject_ComposeRotation(pLogoA->mRotation);
+            Object_UpdateO2WComposed33(pLogoA);
         }
         if (pLogoB != NULL) {
-            UObject_ComposeRotation(pLogoB->mRotation);
+            Object_UpdateO2WComposed33(pLogoB);
         }
         if (DynObj_bDrawShadow(i)) {
             pState[i] = 1;
@@ -865,7 +864,7 @@ void DynObj_DivotAdd(f32* pPos, int nPlayer) {
     } else {
         LLMath_IdentifyMat(pB->pF0->obj.mRotation);
         LLMath_CopyVec(pB->v20, pB->pF0->obj.mObjToWorld[3]);
-        UObject_ComposeRotation(pB->pF0->obj.mRotation);
+        Object_UpdateO2WComposed33(&pB->pF0->obj);
     }
 }
 
@@ -907,7 +906,7 @@ void DynObj_UpdateDivot(int nPlayer) {
         mat44flt_EulerAngles(pB->fC, 0.0f, 0.0f, pB->mB0);
         LLMath_mat44fltMultiplyList(pB->pF0->obj.mRotation, pB->mB0, mTmp, 4);
         LLMath_CopyMat44(mTmp, pB->pF0->obj.mRotation);
-        UObject_ComposeRotation(pB->pF0->obj.mRotation);
+        Object_UpdateO2WComposed33(&pB->pF0->obj);
         LLMath_CopyVec(pB->v20, pB->v30);
         DynObj_LaunchDirection(pB->v40, pB->fC, gpDynObjState->fDivotTilt);
         LLMath_Scale(gpDynObjState->fDivotSpeed * (0.5f * Misc_RandFuncf(RANDOM_PRESENTATION) + 0.5f),
@@ -944,7 +943,7 @@ void DynObj_UpdateDivot(int nPlayer) {
     LLMath_IdentifyMat(pB->mB0);
     mat44flt_EulerAngles(pB->fC + pB->v50[0], pB->v50[1], pB->v50[2], pB->mB0);
     LLMath_CopyMat34(pB->mB0, pB->pF0->obj.mRotation);
-    UObject_ComposeRotation(pB->pF0->obj.mRotation);
+    Object_UpdateO2WComposed33(&pB->pF0->obj);
     LLMath_CopyVec(pB->v30, pB->pF0->obj.mObjToWorld[3]);
     pB->pF0->obj.mObjToWorld[3][3] = 1.0f;
 }
@@ -991,7 +990,7 @@ void DynObj_TeeAdd(f32* pPos, int nPlayer, u8 bReset) {
         LLMath_IdentifyMat(pA->mB4);
         LLMath_CopyVec(pA->v20, pA->v30);
         LLMath_CopyVec(pA->v20, pA->pF4->obj.mObjToWorld[3]);
-        UObject_ComposeRotation(pA->pF4->obj.mRotation);
+        Object_UpdateO2WComposed33(&pA->pF4->obj);
         return;
     }
     if (bReset) {
@@ -1022,7 +1021,7 @@ void DynObj_TeeAdd(f32* pPos, int nPlayer, u8 bReset) {
     LLMath_CopyMat34(pA->mB4, pA->pF4->obj.mRotation);
     LLMath_CopyVec(pA->v20, pA->v30);
     LLMath_CopyVec(pA->v20, pA->pF4->obj.mObjToWorld[3]);
-    UObject_ComposeRotation(pA->pF4->obj.mRotation);
+    Object_UpdateO2WComposed33(&pA->pF4->obj);
 }
 
 void DynObj_TeeStruck(int nPlayer) {
@@ -1050,7 +1049,7 @@ void DynObj_UpdateTee(int nPlayer) {
             mat44flt_EulerAngles(pA->fC, 0.0f, 0.0f, pA->mB4);
             LLMath_mat44fltMultiplyList(pA->pF4->obj.mRotation, pA->mB4, mTmp, 4);
             LLMath_CopyMat44(mTmp, pA->pF4->obj.mRotation);
-            UObject_ComposeRotation(pA->pF4->obj.mRotation);
+            Object_UpdateO2WComposed33(&pA->pF4->obj);
             LLMath_CopyVec(pA->v20, pA->v30);
             DynObj_LaunchDirection(pA->v40, pA->fC, gpDynObjState->fTeeTilt);
             LLMath_Scale(gpDynObjState->fTeeSpeed * Misc_RandFuncf(RANDOM_PRESENTATION), pA->v40, pA->v40);
@@ -1086,14 +1085,14 @@ void DynObj_UpdateTee(int nPlayer) {
         LLMath_IdentifyMat(pA->mB4);
         mat44flt_EulerAngles(pA->fC + pA->v50[0], pA->v50[1], pA->v50[2], pA->mB4);
         LLMath_CopyMat34(pA->mB4, pA->pF4->obj.mRotation);
-        UObject_ComposeRotation(pA->pF4->obj.mRotation);
+        Object_UpdateO2WComposed33(&pA->pF4->obj);
         LLMath_CopyVec(pA->v30, pA->pF4->obj.mObjToWorld[3]);
         pA->pF4->obj.mObjToWorld[3][3] = 1.0f;
     } else {
         LLMath_IdentifyMat(pA->mB4);
         mat44flt_EulerAngles(pA->v50[0], pA->v50[1], pA->v50[2], pA->mB4);
         LLMath_CopyMat34(pA->mB4, pA->pF4->obj.mRotation);
-        UObject_ComposeRotation(pA->pF4->obj.mRotation);
+        Object_UpdateO2WComposed33(&pA->pF4->obj);
         LLMath_CopyVec(pA->v30, pA->pF4->obj.mObjToWorld[3]);
         pA->pF4->obj.mObjToWorld[3][3] = 1.0f;
     }

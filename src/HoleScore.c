@@ -748,7 +748,7 @@ f32 GameAnalysis_GetPuttBreakAngle(int nPlayer) {
     if ((f32)Math_Sqrt(LLMath_LengthSquared3(vToView)) > 0.0f) {
         LLMath_Normalize3(vToView, vToView);
     }
-    fCos = Vec3_Dot(vToView, vToPin);
+    fCos = LLMath_DotProduct3(vToView, vToPin);
     if (fCos < -1.0f) {
         fCos = -1.0f;
     } else if (fCos > 1.0f) {

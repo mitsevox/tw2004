@@ -9,8 +9,8 @@ s32 gSitDevNumCommentaryZones;                                   // how many; ze
 
 // The loader SitDev_vInitModule registers for commentary-zone networks: adds the network, one
 // zone's outline followed by its TCommentaryNetworkParam, to the hole's zones.
-void SitDev_NetworkLoadCallback(u8* netPtr) {
-    gSitDevCommentaryZones[gSitDevNumCommentaryZones] = (TNetwork*)netPtr;
+void SitDev_NetworkLoadCallback(TNetwork* netPtr) {
+    gSitDevCommentaryZones[gSitDevNumCommentaryZones] = netPtr;
     gSitDevNumCommentaryZones++;
 }
 
