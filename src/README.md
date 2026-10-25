@@ -162,7 +162,7 @@ files in [Characters](#characters).
 | GoObjShadow.c | ours | object shadows drawn with the "shadow" texture (called from GoDynObj.c) |
 | SunFlr_Gc.c | EA | the sun flare's GameCube part: depth around the sun, how much is visible |
 | unsorted/sweep_8009A844.c | ph | a screen-rectangle point to frame-buffer units (next to the sun flare) |
-| Code8009A928.c | ph | the glows' frame hooks for gomainloop.c |
+| GlowMgr.c | T7 | the glows' set-up, shut-down, per-view update and drawing, for gomainloop.c |
 | Code8009AA28.c | ph | the sun flare's set-up and per-view update; the glow queue's add *(last function's file unverified)* |
 | Code8009B340.c | ph | a list of fading glow nodes *(first function's file unverified)* |
 | GoGreenGrid.c | EA | the grid drawn over the putting green |

@@ -202,8 +202,8 @@ void fn_8009B260(f32* pPos, u32 uColorA, u32 uColorB, u8 n25, u8 n24, u8 n26, f3
                  f32 f20) {
     GlowQueued* pGlow;
 
-    if (lbl_80281F80->nCount < NUM_GLOW_QUEUE) {
-        pGlow = &lbl_80281F80->a[lbl_80281F80->nCount++];
+    if (gpCurrentGlowList->nCount < NUM_GLOW_QUEUE) {
+        pGlow = &gpCurrentGlowList->a[gpCurrentGlowList->nCount++];
         pGlow->uColorA = uColorA;
         pGlow->uColorB = uColorB;
         LLMath_CopyVec(pPos, pGlow->vPos);
