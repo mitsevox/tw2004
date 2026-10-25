@@ -53,7 +53,7 @@ void Kernel_FreeObjectMem(void* p) {
 }
 
 // The 'Cact' stream handler: one actor (dynamic object) of the hole arrived. By its type (the
-// 'tACT' data's n4): 200 and 201 are fly-by and static cameras (StaticCam), 5 and 6 go to
+// 'tACT' data's nType): 200 and 201 are fly-by and static cameras (StaticCam), 5 and 6 go to
 // Ter_TeeLoadCallback / Ter_PinLoadCallback (6 continues when that answers nonzero), 7 is a particle emitter
 // (fn_8009943C), 8 is dropped, 9 is a sound (Gaud_ActorDownloadCallback), 10 the Play Now ball
 // spot. Any other type becomes a dynamic object: its 'aRSL' resource list is resolved into model
@@ -65,7 +65,7 @@ void Kernel_DownloadActors(TStreamData* pObject) {
 
     setup.pDef = (DynObjDef*)((u8*)Resources_GetDataInBuffer(pObject->pData, pObject->uSize, 'tACT',
                                                              pObject->uId) - sizeof(u32));
-    switch (setup.pDef->n4) {
+    switch (setup.pDef->nType) {
     case 200:
         StaticCam_ParseFlybyCameraActor(pObject);
         return;
@@ -75,7 +75,7 @@ void Kernel_DownloadActors(TStreamData* pObject) {
     case 5:
         Ter_TeeLoadCallback(pObject);
         return;
-    case 6:
+    case DYNOBJ_TYPE_PIN:
         if (!Ter_PinLoadCallback(pObject)) return;
         break;
     case 7:
@@ -88,7 +88,7 @@ void Kernel_DownloadActors(TStreamData* pObject) {
     case 10:
         PlayNow_LoadBallSpot(pObject);
         return;
-    case 9:
+    case DYNOBJ_TYPE_SOUND:
         Gaud_ActorDownloadCallback(pObject, 1);
         Circular_MemFreeFunc(pObject);
         return;
@@ -106,8 +106,8 @@ void Kernel_DownloadActors(TStreamData* pObject) {
     } else {
         setup.pModel = NULL;
     }
-    setup.pfnHandler = DynObj_GetTypeHandler(setup.pDef->n4);
-    setup.pC = (DynObjNames*)pObject;
+    setup.pfnHandler = DynObj_GetTypeHandler(setup.pDef->nType);
+    setup.pScripts = (DynObjScripts*)pObject;
     pObject->pData = (u8*)setup.pModel;
     pObject->pfnFree = NULL;
     pObject->uHandlerData = Kernel_CreateObjectId(&setup);
@@ -204,17 +204,17 @@ void Kernel_AppendObject(DynObj* pObj) {
     pObj->pNext = NULL;
 }
 
-// A new object: its handler gives its size (message 1), then sets it up (message 2), and it gets
-// the next id and goes at the end of the list. NULL when there was no memory.
+// A new object: its handler gives its size (DYNOBJ_MSG_SIZE), then sets it up (DYNOBJ_MSG_INIT),
+// and it gets the next id and goes at the end of the list. NULL when there was no memory.
 DynObj* Kernel_CreateObject(DynObjSetup* pSetup) {
-    DynObj* pObj = Kernel_AllocObjectMem(pSetup->pfnHandler(1, NULL, NULL, NULL));
+    DynObj* pObj = Kernel_AllocObjectMem(pSetup->pfnHandler(DYNOBJ_MSG_SIZE, NULL, NULL, NULL));
 
     if (pObj == NULL) {
         return NULL;
     }
     pObj->pfnHandler = pSetup->pfnHandler;
     pObj->n134 = ++gKernelLastObjectId;
-    pObj->pfnHandler(2, pObj, pSetup, NULL);
+    pObj->pfnHandler(DYNOBJ_MSG_INIT, pObj, pSetup, NULL);
     Kernel_AppendObject(pObj);
     return pObj;
 }
@@ -266,11 +266,11 @@ void Kernel_SweepDeadObjects(void) {
 }
 
 // Marks the object for removal: its id n134 becomes 0 (Kernel_SweepDeadObjects frees it later),
-// first running its p160 byte-code (RPN_RunScript) unless p160 is NULL or flag 0x20000000 is set.
+// first running its pReleaseScript (RPN_RunScript) unless that is NULL or flag 0x20000000 is set.
 void Kernel_ReleaseObject(DynObj* pObj) {
     if (pObj->n134 != 0) {
-        if (!(pObj->uFlags & 0x20000000) && pObj->p160 != NULL) {
-            RPN_RunScript(pObj->p160, !(pObj->uFlags & 0x10000000), -1, pObj);
+        if (!(pObj->uFlags & 0x20000000) && pObj->pReleaseScript != NULL) {
+            RPN_RunScript(pObj->pReleaseScript, !(pObj->uFlags & 0x10000000), -1, pObj);
         }
         pObj->n134 = 0;
     }
@@ -291,9 +291,9 @@ int Kernel_PostPairToOverflowSlot(DynObj* pObj, int a, int b) {
         pSlot++;
     }
     pSlot->pObj = pObj;
-    pSlot->pair.b0 = a;
+    pSlot->pair.nFirst = a;
     gKernelOverflowSlotMask |= uBit;
-    pSlot->pair.b1 = b;
+    pSlot->pair.nSecond = b;
     pSlot->nId = pObj->n134;
     pSlot->n2 = 600;
     return 1;
@@ -305,9 +305,9 @@ int Kernel_PostPairToObject(DynObj* pObj, int a, int b, int bOverflow) {
     int i = 0;
 
     do {
-        if (pObj->a138[i].b0 == 0) {
-            pObj->a138[i].b0 = a;
-            pObj->a138[i].b1 = b;
+        if (pObj->aPairs[i].nFirst == 0) {
+            pObj->aPairs[i].nFirst = a;
+            pObj->aPairs[i].nSecond = b;
             return 1;
         }
     } while (++i < 4);
@@ -317,9 +317,9 @@ int Kernel_PostPairToObject(DynObj* pObj, int a, int b, int bOverflow) {
     return 0;
 }
 
-// Stores (a, b) on every object with an id (n134 not 0) whose actor id n140 (the actor chunk's id)
-// is nKey; nothing when a is 126. The actor byte-code's opcode 56 (RPN_RunScript).
-void Kernel_PostPairByActorId(int nKey, int a, int b) {
+// Stores (a, b) on every object with an id (n134 not 0) whose nActorId (the actor chunk's id) is
+// nActorId; nothing when a is 126. The actor byte-code's opcode 56 (RPN_RunScript).
+void Kernel_PostPairByActorId(int nActorId, int a, int b) {
     DynObj* pObj;
 
     switch (a) {
@@ -327,44 +327,44 @@ void Kernel_PostPairByActorId(int nKey, int a, int b) {
         return;
     default:
         for (pObj = gKernelFirstObject; pObj != NULL; pObj = pObj->pNext) {
-            if (pObj->n140 == nKey && pObj->n134 != 0) {
+            if (pObj->nActorId == nActorId && pObj->n134 != 0) {
                 Kernel_PostPairToObject(pObj, a, b, 1);
             }
         }
     }
 }
 
-// Stores (a, b) on every object with an id (n134 not 0) whose byte n147 (set from its definition's
-// n18) is nKey; no 126 test. The actor byte-code's opcode 57.
-void Kernel_PostPairByKey147(int nKey, int a, int b) {
+// Stores (a, b) on every object with an id (n134 not 0) whose nGroup (set from its definition's
+// nGroup) is nGroup; no 126 test. The actor byte-code's opcode 57.
+void Kernel_PostPairByGroup(int nGroup, int a, int b) {
     DynObj* pObj;
 
     for (pObj = gKernelFirstObject; pObj != NULL; pObj = pObj->pNext) {
-        if (pObj->n147 == nKey && pObj->n134 != 0) {
+        if (pObj->nGroup == nGroup && pObj->n134 != 0) {
             Kernel_PostPairToObject(pObj, a, b, 1);
         }
     }
 }
 
-// Stores (a, b) on every object with an id (n134 not 0) whose byte n148 is nKey. The actor
-// byte-code's opcode 58.
-void Kernel_PostPairByKey148(int nKey, int a, int b) {
+// Stores (a, b) on every object with an id (n134 not 0) whose DynObj.nKey is nKey (every object's
+// is 0). The actor byte-code's opcode 58.
+void Kernel_PostPairByKey(int nKey, int a, int b) {
     DynObj* pObj;
 
     for (pObj = gKernelFirstObject; pObj != NULL; pObj = pObj->pNext) {
-        if (pObj->n148 == nKey && pObj->n134 != 0) {
+        if (pObj->nKey == nKey && pObj->n134 != 0) {
             Kernel_PostPairToObject(pObj, a, b, 1);
         }
     }
 }
 
-// Asks the first object whose actor id n140 is nKey for its value nWhat (message 9); 0 when there
+// Asks the first object whose nActorId is nKey for its value nWhat (message 9); 0 when there
 // is none.
 int Kernel_QueryActorById(int nKey, uptr nWhat) {
     DynObj* pObj;
 
     for (pObj = gKernelFirstObject; pObj != NULL; pObj = pObj->pNext) {
-        if (pObj->n140 == nKey) {
+        if (pObj->nActorId == nKey) {
             return pObj->pfnHandler(9, pObj, (void*)nWhat, NULL);
         }
     }
@@ -379,61 +379,61 @@ void Kernel_InitOnStartup(void) {
 void Kernel_CloseOnShutdown(void) {
 }
 
-// Type 0's message 2: sets the object up from its definition (its flags, n147 and n14E too); a
-// model's size is taken from its first level of detail.
+// Type 0's DYNOBJ_MSG_INIT: sets the object up from its definition (its flags, nGroup and nUnread2
+// too); a model's size is taken from its first level of detail.
 void Kernel_InitObjectFromDef(DynObj* pObj, DynObjSetup* pSetup) {
     int nFlags = 0;
-    DynObjNames* pNames;
+    DynObjScripts* pScripts;
     DynObjDef* pDef;
     DynObjModelRef* pModel;
 
-    pObj->n168 = 0;
-    pObj->a138[0].b0 = 0;
-    pObj->a138[1].b0 = 0;
-    pObj->a138[2].b0 = 0;
-    pObj->a138[3].b0 = 0;
-    pNames = pSetup->pC;
+    pObj->nUnread4 = 0;
+    pObj->aPairs[0].nFirst = 0;
+    pObj->aPairs[1].nFirst = 0;
+    pObj->aPairs[2].nFirst = 0;
+    pObj->aPairs[3].nFirst = 0;
+    pScripts = pSetup->pScripts;
     pDef = pSetup->pDef;
-    if (pNames != NULL) {
-        pObj->p15C = pNames->p28;
-        pObj->p160 = pNames->p2C;
-        pObj->p164 = pNames->p30;
+    if (pScripts != NULL) {
+        pObj->pHitScript = pScripts->pHitScript;
+        pObj->pReleaseScript = pScripts->pReleaseScript;
+        pObj->pUnreadScript = pScripts->pUnreadScript;
     } else {
-        pObj->p160 = NULL;
-        pObj->p15C = NULL;
-        pObj->p164 = NULL;
+        pObj->pReleaseScript = NULL;
+        pObj->pHitScript = NULL;
+        pObj->pUnreadScript = NULL;
     }
-    pObj->n148 = 0;
-    pObj->n140 = pDef->n0;
-    pObj->n147 = pDef->n18;
-    pObj->n146 = pDef->n4;
-    pObj->n150 = 0;
-    pObj->n14C = 0;
-    pObj->n14E = pDef->n1A;
-    pObj->n144 = 0;
-    pObj->n142 = 0;
-    pObj->uFlags = pDef->u14;
-    pObj->uFlags &= ~0x01000000;
-    if (pObj->uFlags & 4) {
-        pObj->uFlags |= 0x04000000;
+    pObj->nKey = 0;
+    pObj->nActorId = pDef->nActorId;
+    pObj->nGroup = pDef->nGroup;
+    pObj->nType = pDef->nType;
+    pObj->nUnread3 = 0;
+    pObj->nUnread1 = 0;
+    pObj->nUnread2 = pDef->nUnread;
+    pObj->nPoints = 0;
+    pObj->nHitAmount = 0;
+    pObj->uFlags = pDef->uFlags;
+    pObj->uFlags &= ~DYNOBJ_UNREAD_1000000;
+    if (pObj->uFlags & DYNOBJ_INACTIVE) {
+        pObj->uFlags |= DYNOBJ_REMOVED;
     }
-    if (pObj->uFlags & 0x400) {
-        pObj->uFlags |= 0x02000000;
+    if (pObj->uFlags & DYNOBJ_NO_ZWRITE) {
+        pObj->uFlags |= DYNOBJ_UNREAD_2000000;
     }
     if (pSetup->pModel != NULL) {
         pModel = pSetup->pModel->aEntries[0].u.pRef;
     } else {
         pModel = NULL;
     }
-    if (pObj->uFlags & 0x80) {
-        nFlags |= 0x11;
+    if (pObj->uFlags & DYNOBJ_TOBJECT_FLAGS) {
+        nFlags |= TOBJECT_UNREAD_1 | TOBJECT_UNREAD_10;
     }
-    if (pObj->uFlags & 0x200) {
-        nFlags |= 0x40;
+    if (pObj->uFlags & DYNOBJ_HIDE_WITH_FLAG_OUT) {
+        nFlags |= TOBJECT_UNREAD_40;
     }
     if (pModel != NULL) {
-        pModel->p4->fRadius = pModel->p4->apLod[0]->pInfo->f64;
-        Object_Init(&pObj->obj, pModel->p4, nFlags);
+        pModel->pModel->fRadius = pModel->pModel->apLod[0]->pInfo->f64;
+        Object_Init(&pObj->obj, pModel->pModel, nFlags);
         Vec3Copy(pObj->obj.pModel->apLod[0]->pInfo->v58, pObj->obj.pModel->v2C);
     } else {
         Object_Init(&pObj->obj, NULL, nFlags);
@@ -449,5 +449,5 @@ void Kernel_InitObjectFromDef(DynObj* pObj, DynObjSetup* pSetup) {
     pObj->aRot[1] = 0.0f;
     pObj->aRot[2] = 0.0f;
     pObj->aRot[3] = 1.0f;
-    pObj->f158 = 0.0f;
+    pObj->fValue = 0.0f;
 }
