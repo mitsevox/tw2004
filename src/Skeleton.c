@@ -145,7 +145,7 @@ f32 SKEL_ItterateIKChain(CharModel* pModel, IKChain* pChain, f32* pTarget, int n
             SKEL_Vec3Sub(vEnd, pModel->pPoses[nBone].v10, vToEnd);
             SKEL_Vec3Sub(pTarget, pModel->pPoses[nBone].v10, vToTarget);
             fLen = Math_Sqrtf(LLMath_LengthSquared3(vToEnd) * LLMath_LengthSquared3(vToTarget));
-            fCos = Vec3_Dot(vToEnd, vToTarget) / fLen;
+            fCos = LLMath_DotProduct3(vToEnd, vToTarget) / fLen;
             if (fCos > 1.0f || fCos < -1.0f) {
                 fAngle = 0.0f;
             } else {

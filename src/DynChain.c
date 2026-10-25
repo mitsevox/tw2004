@@ -313,7 +313,7 @@ void fn_80114540(CharModel* pModel, DynChain* pChain, f32 fDelta) {
 
     // Drop the part of its offset along the matrix's y axis.
     fn_801164D4(vHang, pChain->pLinks->v04, vDiff);
-    Vec3_Scale(Vec3_Dot(vDiff, vUp), vUp, vMove);
+    Vec3_Scale(LLMath_DotProduct3(vDiff, vUp), vUp, vMove);
     fn_801164F8(vMove, pChain->pLinks->v04, pChain->pLinks->v04);
     fn_801164D4(pChain->pLinks->v04, pModel->pMatrices[pChain->nBone][3], vTo);
     LLMath_Normalize3(vTo, vTo);
@@ -326,7 +326,7 @@ void fn_80114540(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         LLMath_Normalize3(vTo, vTo);
         LLMath_Normalize3(vWas, vWas);
         vec4flt_CrossProduct(vTo, vWas, vAxis);
-        fAngle = acosf(Vec3_Dot(vTo, vWas));
+        fAngle = acosf(LLMath_DotProduct3(vTo, vWas));
         if (fAngle > 0.00001f) {
             LLMath_Normalize3(vAxis, vAxis);
             vAxis[0] *= fAngle;
@@ -433,7 +433,7 @@ void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         vPoint[1] = vPos[1];
         vPoint[2] = vPos[2];
         fn_801164D4(vTop, vPoint, vOff);
-        fDot = Vec3_Dot(vOff, vZ);
+        fDot = LLMath_DotProduct3(vOff, vZ);
         if (fDot < 0.0f) {
             vPos[0] += vZ[0] * fDot;
             vPos[1] += vZ[1] * fDot;
@@ -476,7 +476,7 @@ void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 fDelta) {
                                  (vWas[1] - vBone[1]) * (vWas[1] - vBone[1]) +
                                  (vWas[2] - vBone[2]) * (vWas[2] - vBone[2])) > 0.001f) {
                 vec4flt_CrossProduct(vWas, vBone, vAxis);
-                fAngle = acosf(Vec3_Dot(vBone, vWas));
+                fAngle = acosf(LLMath_DotProduct3(vBone, vWas));
                 if (fabs(fAngle) > 0.01f) {
                     if (0.0f != vAxis[0] || 0.0f != vAxis[1] || 0.0f != vAxis[2]) {
                         LLMath_Normalize3(vAxis, vAxis);
@@ -596,7 +596,7 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     LLMath_mat44fltMultiply(pModel->pMatrices[0], (Vec4*)lbl_80193DE8[pChain->n10], (Vec4*)vFace);
     vFace[1] = 0.0f;
     vWind[1] = 0.0f;
-    fFacing = Vec3_Dot(vFace, vWind);
+    fFacing = LLMath_DotProduct3(vFace, vWind);
     fFacing = (1.0f + fFacing) / 2.0f;
     fFacing *= fFaceAmt;
     fSpeedA = (1.0f - lbl_802824F8->f7C) * fFacing + lbl_802824F8->f7C;

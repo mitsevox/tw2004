@@ -64,13 +64,7 @@ LAYOUT_ASSERT(SD_SShaderTypeData_Grass_Static, 0x378);
 extern SD_SShaderTypeData_Grass_Static SD_gGrassTypeData;
 extern SD_SShaderTypeData_Grass_Static* SD_gpGrassTypeData;
 
-// A grass data chunk as Grass_LoadNetworkData is given it: n2 0x30-byte entries follow the header, then the
-// data (GrassChunkData).
-typedef struct GrassChunk {
-    s16 unk0;
-    s16 n2;                     // 0x2
-} GrassChunk;
-
+// The data after the last node of a grass network (Grass_LoadNetworkData).
 typedef struct GrassChunkData {
     s32 n0;                     // 0x0
     f32 f4;                     // 0x4
@@ -137,7 +131,7 @@ typedef struct GrassManager {
     s32          n1C;           // 0x1C  the chunks added (Grass_LoadNetworkData); cleared when the grass is
                                 //       freed
     struct GrassChunkData* a20[10];   // 0x20  each chunk's data, byte-swapped in place
-    struct GrassChunk*     a48[10];   // 0x48  the chunks
+    struct TNetwork*       a48[10];   // 0x48  the grass networks
     void*        pCamera;       // 0x70  the grass's render camera, made from the three below
                                 //       (Grass_CreateTopCamera)
     CamLens*     pLens;         // 0x74  a flat lens, 20 x 20

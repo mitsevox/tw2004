@@ -323,7 +323,7 @@ The fixes that come up most often. Each points to its full entry below.
   Character_PlaceFeetOnGround 3 -> 0 (an `fH` local), UISApi fn_80168FC8 7 -> 0.
 - **[verified] The opposite also happens: route subexpressions through EXISTING multiply-assigned
   locals**; fresh single-assignment locals are copied back into the expression and change nothing.
-  TerrainData Network_LineIntersection 4 -> 0; Ball Physics_HandleCollision 92 -> 31 aligned diffs.
+  UNetwork Network_LineIntersection 4 -> 0; Ball Physics_HandleCollision 92 -> 31 aligned diffs.
 - **[observed] Ball Physics_HandleCollision keeps one register per float variable for the whole
   function**, which `#pragma opt_lifetimes off` reproduces (171 -> 22 aligned); not kept (objdiff
   lower), a lead for the plain-C shape.
@@ -794,7 +794,7 @@ The fixes that come up most often. Each points to its full entry below.
 - **[verified] `!(a ^ b)`** gives the original's `xor.` where `a == b` gives `cmpw` (u8 field vs int
   parameter; Glows fn_800985FC).
 - **[verified] Float tests: `if (f)` / `!f` put the value first in `fcmpu`**; `f != 0.0f` and `0.0f != f`
-  both put the zero first (GoTerrain Ter_CourseLoadCallback, TerrainData Network_DownloadDataPNB, GoPostFx fn_80039358). A float
+  both put the zero first (GoTerrain Ter_CourseLoadCallback, UNetwork Network_DownloadDataPNB, GoPostFx fn_80039358). A float
   `!(x < c)` gives a plain `blt` where `x >= c` gives `cror` (GoCamCont CameraController_PostEvent).
 - **[verified] `b = b != 0;`** before a test reproduces `clrlwi; neg; or; srwi.` (char Character_PreRenderAll).
 - **[verified] A local pointer to the array element flips `cmpw` operands** where swapping the `==`

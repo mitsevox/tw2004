@@ -235,8 +235,8 @@ f32  Misc_RandFuncf(eRandomType type);  // a float in [0, 1)
 
 f32  Math_Sqrtf(f32 x);                // square root (Skeleton.c); x itself when x <= 0
 f32  Math_Tan(f32 x);                  // tan, as a float (GoRenderCtx_Gc.c)
-void LLMath_AddScale3(f32* pA, f32* pB, f32 f, f32* pOut);   // out = a + f x b
-f32  Vec3_Dot(f32* pA, f32* pB);     // dot product
+void LLMath_AddScale3(f32* A, f32* B, f32 Bmul, f32* dest);   // dest = A + Bmul x B (x, y, z)
+f32  LLMath_DotProduct3(f32* A, f32* B);   // the dot product of x, y, z
 void LLMath_Interpolate(f32* pA, f32* pB, f32 fT, f32* pOut);    // out = a + (b - a) x fT (four floats)
 double pow(double x, double y);         // 0x8015F824 (MSL)
 f32  powf(f32 x, f32 y);                // 0x8002C8D0 (Golfer.c): pow rounded to a float

@@ -173,7 +173,7 @@ void SitDev_SetBallHitTime(struct Ball* pBall);
 // SitDevFile.c
 void SitDev_LoadScripts(TStreamData* pObject);  // the 'sscr' stream handler
 // SitDevCommentaryZones.c
-void SitDev_NetworkLoadCallback(u8* netPtr);        // the loader for commentary-zone networks
+void SitDev_NetworkLoadCallback(TNetwork* netPtr);        // the loader for commentary-zone networks
 u32  SitDev_GetCommentaryZones(f32* location);
 
 void SitDev_vInitBeforeHole(void);

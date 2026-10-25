@@ -12,7 +12,7 @@
 #include "frontend/fe.h"
 
 void AI_TargetsClear(void);
-void AI_TargetsLoad(u8* pChunk);
+void AI_TargetsLoad(TNetwork* netPtr);
 void fn_8002C8B4(void);
 
 // ---- the aim point table --------------------------------------------------------------------------
@@ -28,7 +28,7 @@ u8       gAITargetsLoaded;              // 0x80281D40
 
 void AI_TargetsInit(void) {
     gAITargetsLoaded = 0;
-    Network_RegisterLoadNetworkCallback(0, AI_TargetsLoad);
+    Network_RegisterLoadNetworkCallback(NETWORK_TYPE_AI_TARGETS, AI_TargetsLoad);
     AI_TargetsClear();
 }
 
@@ -47,17 +47,14 @@ void fn_8002BC6C(void) {
     fn_8002C8B4();
 }
 
-void AI_TargetsLoad(u8* pChunk) {
+void AI_TargetsLoad(TNetwork* netPtr) {
     int          i, k;
     AITargetDef* pDef;
     u8*          pReq;
 
     gNumAITargets = 0;
-    // port: the course's AI targets are big-endian and read in place: AITargetDef is laid over the
-    //       chunk (and written to), and gAITargets points into it; a little-endian port converts
-    //       the chunk's AITargetDefs before this loop (the count at +2 is read with BES16).
-    pDef = (AITargetDef*)(pChunk + 4);
-    for (i = 0; i < BES16(pChunk + 2); pDef++, i++) {
+    pDef = (AITargetDef*)netPtr->aNodes;
+    for (i = 0; i < BES16(&netPtr->nNumNodes); pDef++, i++) {
         gAITargets[i].pDef = pDef;
         // A point that links to itself links to nothing.
         for (k = 0; k < NUM_AI_LINKS; k++) {
@@ -68,7 +65,7 @@ void AI_TargetsLoad(u8* pChunk) {
         gNumAITargets++;
     }
     pReq = (u8*)pDef;
-    for (i = 0; i < BES16(pChunk + 2); i++, pReq += 8) {
+    for (i = 0; i < BES16(&netPtr->nNumNodes); i++, pReq += 8) {
         gAITargets[i].nTeeSet   = pReq[0];
         gAITargets[i].nPinSet   = pReq[1];
         gAITargets[i].nSkillReq = pReq[2];

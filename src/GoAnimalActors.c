@@ -17,7 +17,6 @@ AnimalStep gAnimalPoseSteps[6] = {
     { 1, 0, 0, 0.0f, 0.5f },
 };
 
-void UObject_ComposeRotation(f32 (*pMtx)[4]);
 void ActAnimal_SetWorldMatrix(DynObjAnimal* pAnimal, f32 f);
 f32  Ter_GetTimeInCycle(u32 n, f32 fPeriod);                   // GoTerrain.c
 int  ActAnimal_GetMeshFlags(UObjMesh* pMesh, int i);
@@ -112,7 +111,7 @@ void ActAnimal_SetWorldMatrix(DynObjAnimal* pAnimal, f32 fDt) {
         vGround[2] = pAnimal->base.obj.mObjToWorld[3][2];
         vGround[3] = 1.0f;
         fGround = Ter_GetSupportingGroundHeight(pCourse, vGround);
-        if (-65536.125f != fGround) {
+        if (TER_NO_GROUND != fGround) {
             pAnimal->base.obj.mObjToWorld[3][1] = fGround;
         }
     }
@@ -167,7 +166,7 @@ void ActAnimal_SetWorldMatrix(DynObjAnimal* pAnimal, f32 fDt) {
         }
         mat44flt_EulerAngles(fA, fB, fC, pAnimal->base.obj.mRotation);
     }
-    UObject_ComposeRotation(pAnimal->base.obj.mRotation);
+    Object_UpdateO2WComposed33(&pAnimal->base.obj);
 }
 
 // Divides f16C and f174 by the length of the animal's route (once round its points).
@@ -271,7 +270,7 @@ void ActAnimal_Init(DynObjAnimal* pAnimal, DynObjSetup* pSetup) {
             vPos[3] = 1.0f;
             if (pCourse != NULL) {
                 fGround = Ter_GetSupportingGroundHeight(pCourse, vPos);
-                if (fGround != -65536.125f) {
+                if (fGround != TER_NO_GROUND) {
                     if (fY - fGround < 0.5f && pAnimal->f198 != -999.0f) {
                         pAnimal->b1BD = 1;
                     } else {
@@ -292,7 +291,7 @@ void ActAnimal_Init(DynObjAnimal* pAnimal, DynObjSetup* pSetup) {
     mat44flt_EulerAngles(pDef->aAngles[1] * (PI / 180.0f), pDef->aAngles[0] * (PI / 180.0f),
                          pDef->aAngles[2] * (PI / 180.0f), pAnimal->base.obj.mRotation);
     LLMath_IdentifyMat(pAnimal->base.obj.mScale);
-    UObject_ComposeRotation(pAnimal->base.obj.mRotation);
+    Object_UpdateO2WComposed33(&pAnimal->base.obj);
     if (pAnimal->pRoute != NULL) {
         ActAnimal_SetWorldMatrix(pAnimal, 0.0f);
     } else {

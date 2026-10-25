@@ -22,7 +22,6 @@ MemPoolPtr gKernelLargeObjectPool;         // 528-byte nodes
 
 DynObj* Kernel_CreateObject(DynObjSetup* pSetup);
 void fn_8000E830(DynObj* pObj);
-void UObject_ComposeRotation(f32 (*pMtx)[4]);
 
 void Gaud_ActorDownloadCallback(TStreamData* pObject, int n);
 void PlayNow_LoadBallSpot(void* pObj);
@@ -441,7 +440,7 @@ void Kernel_InitObjectFromDef(DynObj* pObj, DynObjSetup* pSetup) {
     }
     LLMath_IdentifyMat(pObj->obj.mRotation);
     LLMath_IdentifyMat(pObj->obj.mScale);
-    UObject_ComposeRotation(pObj->obj.mRotation);
+    Object_UpdateO2WComposed33(&pObj->obj);
     pObj->obj.mObjToWorld[3][0] = pDef->aPos[0];
     pObj->obj.mObjToWorld[3][1] = pDef->aPos[1];
     pObj->obj.mObjToWorld[3][2] = pDef->aPos[2];
