@@ -29,7 +29,7 @@ The stream container
 | `SDAT` payload | `Stream_ParseBufs` | the object's own format (below) | copied unchanged |
 | `Rdat` payload | `UStream_Decompress` | piece size: big-endian u32, read with `BE32` (include/endian.h); command words read a byte at a time, order-free | no |
 | `SONO` sound (`shdr` / `samp`) | `Stream_ParseBufs` | header fields big-endian, through `StreamChunk`; sample data handed to the audio code as-is | yes: `StreamChunk` |
-| `SWVR`, `MPG2`, `DSPM`/`VAGM`/`XADP` | `Stream_ParseBufs` | passed on to the movie/audio code (asm, not checked); the `SWVR` test on a read buffer uses `BE32`, the `RPNS` base value too | asm |
+| `SWVR`, `MPG2`, `DSPM`/`VAGM`/`XADP` | `Stream_ParseBufs` | passed on to the movie and audio code (LLVideo.c, hlaudmovie.c, both C; their reads not checked here); the `SWVR` test on a read buffer uses `BE32`. The `RPNS` base (gRPNSBase) is the kept object's data address, not a value read from the stream | not checked |
 
 Objects delivered by UStream
 ----------------------------

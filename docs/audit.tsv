@@ -202,7 +202,7 @@ UMemPool.c	done	db5f2ece	claude-review
 UObject.c	open		
 UObject3D.c	open		
 URes.c	done	e845bd03	claude-review
-UStream.c	open		
+UStream.c	done	93ca1961	claude-review
 Wind.c	open		
 ai_brain.c	open		
 animblender.c	open		
