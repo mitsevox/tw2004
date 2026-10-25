@@ -385,8 +385,8 @@ void GM_PlayerAddStroke(int nPlayer) {
 }
 
 // After a shot: out of bounds (GM_IsBallOOB, or no surface under the ball) or a drop (a surface
-// without u34 bit 0, or any surface inside the free-drop network) stops the ball, and the camera
-// gets shot kind 6. Out of bounds, or a drop on a surface with u34 bit 1, costs a stroke: the
+// without uFlags bit 0, or any surface inside the free-drop network) stops the ball, and the camera
+// gets shot kind 6. Out of bounds, or a drop on a surface with uFlags bit 1, costs a stroke: the
 // penalty mark (bPenaltyShot) is set, nOBCount counts penalties in a row (a CPU gets 25 points of
 // attributes per level, and concedes after three), the stroke is added (and reported to a PGA TOUR
 // event) and message 0xD (water, surface class 7/16) or 2 is shown; 1 is returned, but 0 once the
@@ -395,13 +395,13 @@ void GM_PlayerAddStroke(int nPlayer) {
 u8 GM_CheckForBallOOB(int nPlayer) {
     Ball*        pBall = &gPlayers[nPlayer].ball;
     u8           bOut  = GM_IsBallOOB(nPlayer, pBall);
-    SurfaceType* pSurf = Ter_GetSupportingWorldMaterial(gPlayers[nPlayer].ball.pCourse, pBall->vPos);
+    TGD_MaterialInfo* pSurf = Ter_GetSupportingWorldMaterial(gPlayers[nPlayer].ball.pCourse, pBall->vPos);
     u8           bDrop;
 
     if (pSurf == NULL) {
         bOut  = 1;
         bDrop = 0;
-    } else if ((pSurf->u34 & 1) && !Ter_PointInFreeDropNetwork(pBall->vPos)) {
+    } else if ((pSurf->uFlags & 1) && !Ter_PointInFreeDropNetwork(pBall->vPos)) {
         bDrop = 0;
     } else {
         bDrop = 1;
@@ -409,7 +409,7 @@ u8 GM_CheckForBallOOB(int nPlayer) {
     gPlayers[nPlayer].bPenaltyShot = 0;
     if (bOut || bDrop) {
         gPlayers[nPlayer].ball.nState = 0;
-        if (bOut || (bDrop && (pSurf->u34 & 2))) {
+        if (bOut || (bDrop && (pSurf->uFlags & 2))) {
             gPlayers[nPlayer].bPenaltyShot = 1;
             gPlayers[nPlayer].nOBCount++;
             gPlayers[nPlayer].nStrokes[gpGame->nCurHole]++;
@@ -678,7 +678,7 @@ int GM_DoPreshotAnimation(int nPlayer) {
 // Whether the golfer plays a reaction after the shot. Never when GM_IsValidPostShotGameType says
 // no, on course 18's 10th within 40 yards of the tee, or for character group 11 when the ball
 // started on surface 45. Where the animation would leave the golfer: never with no ground there,
-// out of bounds, on a surface without u34 bit 0, in water (class 7/16), or on a slope steeper than
+// out of bounds, on a surface without uFlags bit 0, in water (class 7/16), or on a slope steeper than
 // 0.1 with the ground more than 0.2 below the ball. With session flags 0x4000 and 0x8000 both set:
 // only when holed, from surface 16, or for outcomes 1 and 2. Then: with bPlanReady only for outcome
 // 2; always when GameEffects_IsGameBreakerOn says so or animation 9 is playing; with a scripted
@@ -691,13 +691,13 @@ int GM_ShowPostShotAnimation(int nPlayer) {
     f32          vNormB[4];
     f32          vFlat[4];
     f32          vTee[4];
-    SurfaceType* pSurfA;
-    SurfaceType* pSurfB;
+    TGD_MaterialInfo* pSurfA;
+    TGD_MaterialInfo* pSurfB;
     f32          fHighA;
     f32          fHighB;
     int          nResult;
-    CourseInfo*  pCourse;
-    SurfaceType* pSurf;
+    TGD_TerrainInfo*  pCourse;
+    TGD_MaterialInfo* pSurf;
     f32          fHigh;
     f32          fLen;
     f32          fSlope;
@@ -749,7 +749,7 @@ int GM_ShowPostShotAnimation(int nPlayer) {
         } else {
             fSlope = 0.0f;
         }
-        if (!Ter_PointInOOBNetwork(vPos) || (pSurf != NULL && !(pSurf->u34 & 1)) || pSurf->nClass == 7 ||
+        if (!Ter_PointInOOBNetwork(vPos) || (pSurf != NULL && !(pSurf->uFlags & 1)) || pSurf->nClass == 7 ||
             pSurf->nClass == 16 || (fabsf(fSlope) > 0.1f && fRise > 0.2f)) {
             return 0;
         }
@@ -816,7 +816,7 @@ void GM_FlyByMode_Init(void) {
 // the mode says so (b27E) and no scorecard is up, the next golfer is set up once everyone waits
 // (GM_SetupGolfer_IfAllWaiting). The frame count is kept in n12C.
 void GM_Update(void) {
-    if (gSession.nGameType == 6) {
+    if (gSession.nGameType == GAMESTATE_IG_PLAY_HOLE) {
         gpGame->pfnUpdate();
         if ((GUI_IsEndGameUiShowing() && GUI_IsPauseMenuOpen()) || GUI_GetUIMessageQued()) {
             GUI_CheckMessageQue();
@@ -949,7 +949,7 @@ void GM_GolferConcede_Hole(int nPlayer) {
 void GM_MovePlayerToBall(int nPlayer) {
     f32         fLow;
     f32         fHigh;
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     f32         f;
     Vec3Copy(gPlayers[nPlayer].ball.vPos, gPlayers[nPlayer].vBall);
     LLMath_CopyVec(gPlayers[nPlayer].ball.vPos, gPlayers[nPlayer].vPreShot);

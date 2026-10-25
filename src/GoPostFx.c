@@ -37,7 +37,7 @@ void RC_ApplyViewport(void* pCamera);            // Skin.c
 // clears every effect.
 void fn_80037DD8(void) {
     lbl_80281D80 = NULL;
-    if (gSession.nGameType >= 4 && gSession.nGameType <= 8) {
+    if (gSession.nGameType >= GAMESTATE_IG_SETUP && gSession.nGameType <= GAMESTATE_IG_SHUTDOWN) {
         lbl_80281D80 = Circular_MemAllocFunc(GXGetTexBufferSize(256, 224, 6, 0, 0), MEMTYPE_LOW, 0x20,
                                              "GoPostFx.c", 119);
     }
@@ -54,7 +54,7 @@ void fn_80037E50(void) {
         lbl_801D5020[i].b0 = 0;
         lbl_801D5010[i] = 0.0f;
     }
-    if (gSession.nGameType >= 4 && gSession.nGameType <= 8) {
+    if (gSession.nGameType >= GAMESTATE_IG_SETUP && gSession.nGameType <= GAMESTATE_IG_SHUTDOWN) {
         fn_8002A528(&lbl_801D4FB0[0], 256, 224, lbl_80281D80, NULL, 6, 0, 0, 0);
         fn_8002A528(&lbl_801D4FB0[1], 256, 224, lbl_80281D80, NULL, 6, 0, 0, 0);
     }

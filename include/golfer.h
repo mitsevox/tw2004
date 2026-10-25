@@ -542,6 +542,23 @@ LAYOUT_ASSERT(CourseRecord, 0x320);
 
 #define NUM_COURSE_RECORDS 21   // 0xF00..0x50A0 of the session
 
+// The game's outer state (Session.nGameType): GoEntry.c's loop runs one step for it and moves it
+// on. Not the round's game mode (gpGame->nMode, GM_ModeType_t).
+typedef enum GAME_MODE_e {
+    GAMESTATE_BOOT = 0,         // decides what follows the boot
+    GAMESTATE_STARTUP = 1,      // the start-up screens
+    GAMESTATE_FE_RUN = 3,       // the front end (the menus)
+    GAMESTATE_IG_SETUP = 4,     // starts a round (GO_vInitIG)
+    GAMESTATE_IG_LOAD_HOLE = 5, // loads a hole
+    GAMESTATE_IG_PLAY_HOLE = 6, // plays it (the frame loop)
+    GAMESTATE_IG_EXIT_HOLE = 7, // after the frame loop: the next hole, or the round's end
+    GAMESTATE_IG_SHUTDOWN = 8,  // shuts the round down
+    GAMESTATE_ERROR = 9,        // an error: the loop only prints a message
+    GAMESTATE_FE_SETUP = 10,    // starts the front end (GO_vInitFE)
+    GAMESTATE_RESET = 12,       // resets the console
+    GAMESTATE_QUIT = 13         // leaves the loop
+} GAME_MODE_e;
+
 typedef struct Session {
     u32  uFlags;                // 0x000  bit 1: use the alternate attribute block everywhere;
                                 //        bit 9: every club in the bag; 0x4000 the demo set-up
@@ -549,7 +566,7 @@ typedef struct Session {
                                 //        controller 9, every attribute 105, no earnings, clear
                                 //        weather (fn_8006F650), caddie tips off; many tests want
                                 //        0x8000 with it
-    s32  nGameType;             // 0x004  4 gets a second view
+    s32  nGameType;             // 0x004  the game's outer state (GAME_MODE_e)
     u8   bDemo;                 // 0x008  the game the menus start is the demo (set by
                                 //        FE_MessageTable.c GM_vStartDemo; DEMO_Start runs as the
                                 //        menus fade out): no GameBreakers, hole contests, EASBio
@@ -685,7 +702,8 @@ typedef struct GameState {
     s32  nPlayoffHoles;         // 0x0D8  playoff holes started
     s32  nCurrentRound;         // 0x0DC  the tour event's current round, from 0 (GameModeDriverPGATour)
     s32  nE0;                   // 0x0E0  the event's round count (1 outside a tour event)
-    s32  nPinSet[18];           // 0x0E4  per hole: which of its four pin positions (CourseInfo.pin) is used
+    s32  nPinSet[18];           // 0x0E4  per hole: which of its four pin positions (TGD_TerrainInfo.pin)
+                                //        is used
     s32  n12C;                  // 0x12C
     f32* pPinPos;               // 0x130  the current hole's pin (GoTerrainCollision.c sets it);
                                 //        speed golf measures the ball's distance to it
@@ -914,9 +932,6 @@ extern f32          gClubPowerStep[CLUB_MAX_e];      // 0x801875E8  reach gained
 GM_ModeType_t GM_GetModeType(void);    // FETextureMgr.c: gpGame->nMode
 int  Golfer_FindById(int nId);          // the gGolferTable row with that nModelID, -1 none
 void fn_8002EBA4(u8* pObj, u8 nValue);  // set byte 7 of the options (a7[0]) and apply it (Golfer.c)
-int  GM_GetCurrentHolePar(void);
-s32  GM_GetCurrentHoleTeeDistance(int nTee);             // CourseData.c: the current hole's value for tee set
-                                                         // nTee
 int  Lessons_GetShotKind(void);                 // shot kind override, 8 = none
 int  Lessons_GetClub(int nPlayer);          // club override, 26 = none
 int  Game_GetCurHoleNum(void);

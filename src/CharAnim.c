@@ -62,7 +62,7 @@ void CharacterState_ResetMorphState(Character* pChar, u8 bReset) {
         SKABlendData_Init(&pNode, 1, 1, SKABlender_BlendLinear, 1);
         SKABlender_SetBlender(pNode, SKABlender_BlendLinear, 0.5f);
     }
-    if (gSession.nGameType == 3 && pChar->pSliderDefs != NULL) {
+    if (gSession.nGameType == GAMESTATE_FE_RUN && pChar->pSliderDefs != NULL) {
         CharSlider_UpdateCharacterBasedOnSliderValues(pChar->pSliderDefs, pChar->pModel, pChar->pSkin, 26,
                                                       FE_GetCurrentProfile()->choices.a9B4,
                     &pChar->morphBlend);
@@ -154,7 +154,7 @@ void CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKA
     f32 vNormal[4];
     Clip* pClip;
     char* pName;
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     f32 fDelay;
 
     if (pChar->nStyle == -1) return;
@@ -302,7 +302,7 @@ void CharacterState_AddMorphBlendData(Character* pChar, MtaLib* pLib, u8 bReset,
     }
     CharacterState_SetTransition(&pChar->morphAnim, nTransitionState, fTransitionTime);
     pChar->pMorphLib = pLib;
-    if (gSession.nGameType == 3 && pChar->pSliderDefs != NULL) {
+    if (gSession.nGameType == GAMESTATE_FE_RUN && pChar->pSliderDefs != NULL) {
         CharSlider_UpdateCharacterBasedOnSliderValues(pChar->pSliderDefs, pChar->pModel, pChar->pSkin, 26,
                                                       FE_GetCurrentProfile()->choices.a9B4,
                     &pChar->morphBlend);
@@ -364,7 +364,7 @@ s32 CharacterState_UpdateFidgetState(Character* pChar) {
     int nClub;
 
     nState = 2;
-    if (gSession.nGameType != 6) return 2;
+    if (gSession.nGameType != GAMESTATE_IG_PLAY_HOLE) return 2;
     switch (pChar->nCurState) {
     case 5:
         if (pChar->nAmbientFidgets > 0) {
@@ -596,7 +596,7 @@ void CharacterState_UpdateSKAState(Character* pChar) {
         bEnableIK = 1;
         bTransitionIK = 1;
         CharacterState_SetTransition(&pChar->morphAnim, 0, 0.0f);
-        if (gSession.nGameType == 6) {
+        if (gSession.nGameType == GAMESTATE_IG_PLAY_HOLE) {
             pChar->nMorphCurState = 0;
             pChar->nMorphTargetState = 0;
             fn_800957B0(pChar, 1);
@@ -740,7 +740,7 @@ void CharacterState_UpdateMorphState(Character* pChar) {
     switch (pChar->nMorphTargetState) {
     case 5:
         CharacterState_SetTransition(&pChar->morphAnim, 0, 0.0f);
-        if (gSession.nGameType == 6) {
+        if (gSession.nGameType == GAMESTATE_IG_PLAY_HOLE) {
             EVENT_Trigger(pChar->nPlayer, 0x2A, NULL, -1);
             pChar->nMorphCurState = 5;
             return;

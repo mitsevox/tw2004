@@ -100,7 +100,6 @@ int   GameAnalysis_CountHoleScoresOrBetter(int nPlayer, int nToPar);
 int   GameAnalysis_CountHolesOverPar(int nPlayer);
 int   GameAnalysis_CountStreakHoleScores(int nPlayer, int nToPar);
 int   GameAnalysis_CountTotalPutts(int nPlayer);
-int   GM_CurrentCourseTotalPar4andPar5Holes(void);                                // CourseData.c
 u8    GM_Earnings_CheckEagleEveryPar5(int nPlayer, u8 bPreview);
 u8    GM_Earnings_CheckWinAllTournaments(int nPlayer, u8 bPreview);
 u8    GM_Earnings_CheckFirstTournamentWin(int nPlayer, u8 bPreview);
@@ -663,7 +662,7 @@ void GM_Earnings_PayRoundGoals(int nPlayer, u8 bRoundOver) {
     }
 }
 
-// The bit of ShotGoal.uLies and PuttGoal.uLies for a surface class (SurfaceType.nClass; the goal
+// The bit of ShotGoal.uLies and PuttGoal.uLies for a surface class (TGD_MaterialInfo.nClass; the goal
 // checkers pass GameAnalysis_GetInitialStartingLie, the surface the shot left): class 1 bit 0, 2
 // (fairway) bit 1, 5 (rough) bit 2, 6 (sand) bit 3, 3 (green) bit 4; any other class bit 6.
 s32 Earnings_GetSurfaceClassBit(u32 n) {
@@ -1623,7 +1622,7 @@ f32 GM_Earnings_GetCourseModifier(void) {
     case 9:
         fMult = gEarningsTable.aMult[EARN_MULT_COURSE +11];
         break;
-    case 22:
+    case COURSE_TIGERS_DREAM_18:
         fMult = gEarningsTable.aMult[EARN_MULT_COURSE +12];
         break;
     case 7:
@@ -2357,7 +2356,7 @@ void GM_RecordIndividualShotStats(int nPlayer) {
     int nLie;
     int nStrokes;
     int nProfile;
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
     int nPutt;
 
     if (!gpGame->b27B) return;

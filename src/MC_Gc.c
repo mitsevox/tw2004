@@ -1051,7 +1051,7 @@ void fn_8009EF98(void) {
     if (lbl_80281FE8 != NULL) {
         lbl_80281FC0 = MC_BUFFER_SIZE + 0x20;
         GoARAM_WaitTransfer(GoARAM_CopyToAram(lbl_80281FE8, lbl_80281FC4, lbl_80281FC0));
-        if (gSession.nGameType == 6) {
+        if (gSession.nGameType == GAMESTATE_IG_PLAY_HOLE) {
             Skalib_ReclaimBankMemory(0);
             Skalib_ReclaimBankMemory(1);
         } else {
@@ -1071,7 +1071,7 @@ void fn_8009EF98(void) {
 // contents go to ARAM meanwhile) and copy the first image back from ARAM.
 void fn_8009F02C(void) {
     if (lbl_80281FE8 == NULL) {
-        if (gSession.nGameType == 6) {
+        if (gSession.nGameType == GAMESTATE_IG_PLAY_HOLE) {
             lbl_80281FE8 = lbl_80281FEC = lbl_80281FE4 = (SaveImage*)Skalib_LendBankMemory(0);
             lbl_80281FDC = lbl_80281FE0 = lbl_80281FD8 = (SaveImage*)Skalib_LendBankMemory(1);
         } else {

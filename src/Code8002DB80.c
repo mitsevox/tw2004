@@ -309,7 +309,7 @@ void Player_SetGolfer(int nPlayer, int nGolfer, int nController, u32 uBag, int b
         }
         p->nView[0] = 0;
         ViewController_SetActivePlayerNumber(p->nView[0], nPlayer);
-        if (gSession.nGameType == 4) {
+        if (gSession.nGameType == GAMESTATE_IG_SETUP) {
             int nView;
             if (!ViewController_IsActive(2)) {
                 ViewController_Init(2, 0.0f, 0.0f, 1.0f, 1.0f);

@@ -41,7 +41,10 @@ extern f32   lbl_802814AC;      // how far the shadow's ground mesh is lifted (f
 extern f32   lbl_802814B0;      // how far the flat shadow is lifted (fn_800B2DB0)
 extern s32   lbl_80282158;      // the most strips and vertices a shadow mesh has used
 extern s32   lbl_8028215C;      //   (fn_800B2FB0)
-// The shadow's ground mesh, made by fn_800B251C_ShadowInit (0x200 strips, 0x800 vertices):
+#define SHADOW_NUM_STRIPS 0x200 // strips in the shadow's ground mesh: the ground strips it asks for
+#define SHADOW_NUM_VERTS  0x800 // vertices in the shadow's ground mesh
+// The shadow's ground mesh, made by fn_800B251C_ShadowInit (SHADOW_NUM_STRIPS strips,
+// SHADOW_NUM_VERTS vertices):
 extern TrailDraw* lbl_80282160; // the strips
 extern s16*  lbl_80282164;      // the vertex indices
 extern f32*  lbl_80282168;      // the texture coordinates, two a vertex

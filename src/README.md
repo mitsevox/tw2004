@@ -23,8 +23,8 @@ and MetroTRK are built from public decomps in `extern/` (the `progress_category=
 | Loading anything from disc | `UStream.c` (the chunked `.hog`/`.gcb` streamer; `docs/game/formats/ctrl-container.md`), handlers registered per chunk type, file lists in `StreamManager.c` |
 | Shared headers | `include/engine.h` (services), `include/game.h` (round, modes), `include/golfer.h` (players, golfers, `GameState`), `include/character.h`, `include/camera.h` |
 
-`gSession.nGameType` (the outer loop in `GoEntry.c`): 0 boot decision, 1 start-up screens,
-10 start the front end, 3 front end, 4 start a round (`GO_vInitIG`), 5 load a hole (`GoHoleLoader.c`),
+`gSession.nGameType` (the outer loop in `GoEntry.c`; `GAME_MODE_e` in `include/golfer.h`): 0 boot
+decision, 1 start-up screens, 10 start the front end, 3 front end, 4 start a round (`GO_vInitIG`), 5 load a hole (`GoHoleLoader.c`),
 6 play (the frame loop), 7 after the frame loop ends (back to 5 when another hole load is asked
 for, else 8), 8 shut the round down, 12 reset the console, 13 leave, 9 an error. Each type's
 step is a call into `gomainloop.c` (`GO_vInitFE`, `GO_vInitIG`, `fn_8006D8E8`...).
@@ -243,8 +243,8 @@ all arriving as stream chunks when a hole loads.
 | GoAnimalActors.c | T6 | the animals on the course |
 | GoDynObjTypes.c | ours | dynamic object types 6 and 9 |
 | GoTerrainCollision.c | T6 | the ground as collision data: drops, heights, normals, surfaces; the ball against ground, pin and objects |
-| TerrainGround.c | ours | the triangle, height and surface type under a point |
-| CourseData.c | ours | the course table (`'CRI '`: 18 holes' par, wind, tees) and built rounds (`'CMPS'`) |
+| TerrainGround.c | ours | the ground strips under the golfer's shadow; the supporting triangle, its height and surface under a point |
+| CourseInfo.c | EA | the course table (`'CRI '`: 18 holes' par, wind, tees) and the compilation courses (`'CMPS'`) |
 
 Also here by subject: `GoTerrain.c` (drawing it), `GoGrass.c`, `GoHoleLoader.c` (the hole loader).
 

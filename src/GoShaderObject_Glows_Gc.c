@@ -215,7 +215,7 @@ void fn_800985FC(GlowQueue* pQueue, f32 (*pMtx)[4], int bOnTop) {
     Vec4 v;
 
     RC_spGetCurrentRenderCtx();
-    GXSetClipMode(0);
+    GXSetClipMode(GX_CLIP_ENABLE);
     GXSetChanCtrl(4, 0, 0, 1, 0, 0, 2);
     GXSetNumTevStages(1);
     GXSetTevColorIn(0, 2, 4, 10, 15);

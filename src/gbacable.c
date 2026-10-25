@@ -807,14 +807,14 @@ void Gba_MarkUnlocksGranted(void) {
     gGbaUnlocksGranted = 1;
 }
 
-// The Game Boy Advance link's unlocks in the current profile: the last course (aCourseUnlocked[22])
-// and rewards 0-17. Sets gGbaRewardsUnlocked, which nothing reads. GM_vGbaGrantUnlocks calls it
+// The Game Boy Advance link's unlocks in the current profile: Tiger's Dream 18 and rewards 0-17.
+// Sets gGbaRewardsUnlocked, which nothing reads. GM_vGbaGrantUnlocks calls it
 // once per profile.
 void Gba_UnlockProfileRewards(void) {
     SaveProfile* pProfile = FE_GetCurrentProfile();
 
-    // the last course and the first 18 rewards
-    pProfile->aCourseUnlocked[22] = 1;
+    // Tiger's Dream 18 and the first 18 rewards
+    pProfile->aCourseUnlocked[COURSE_TIGERS_DREAM_18] = 1;
     pProfile->aRewardUnlocked[0] = 1;
     pProfile->aRewardUnlocked[1] = 1;
     pProfile->aRewardUnlocked[2] = 1;

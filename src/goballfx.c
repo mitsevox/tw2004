@@ -14,7 +14,7 @@ void SD_FreeShaderObject(void* pMesh);
 void SD_DrawShaderObject(u8* pMesh);
 
 // GoTerrainCollision.c
-f32 Ter_GetSupportingWorldHeight(CourseInfo* pCourse, f32* pPos);
+f32 Ter_GetSupportingWorldHeight(TGD_TerrainInfo* pCourse, f32* pPos);
 
 // .bss and .sbss in reverse address order (CodeWarrior lays them out last-defined-first).
 f32       lbl_801D95C8[5][12];
@@ -107,7 +107,7 @@ void BFX_vRender(Ball* pBall, int nPlayer) {
         lbl_801D94D8[nPlayer][6] = 1.0f;
         lbl_801D94D8[nPlayer][7] = 1.0f;
         RenderState_SetDrawFlags(0x70);
-        RenderState_SetClipMode(0);
+        RenderState_SetClipMode(GX_CLIP_ENABLE);
         RenderState_Flush();
         desc.n0 = 4;
         desc.nVerts = 4;

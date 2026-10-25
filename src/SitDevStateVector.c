@@ -324,7 +324,7 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
     }
 }
 
-// Correct the surface class of where a ball lies (SurfaceType.nClass) for the scripts: outside the
+// Correct the surface class of where a ball lies (TGD_MaterialInfo.nClass) for the scripts: outside the
 // course outline, or on ground a ball may not stay on, is 19 (not playable) unless it is water; a
 // ball that must be dropped counts as water (7); surface 151 is 21; class 18 (green) reads as 12.
 void modifyFinalLie(s32* pClass, int nSurface, Ball* pBall, Player* pPlayer) {
@@ -332,8 +332,8 @@ void modifyFinalLie(s32* pClass, int nSurface, Ball* pBall, Player* pPlayer) {
     u8 bNoLie;
     bWater = nSurface >= 0 && nSurface < NUM_SURFACE_TYPES &&
              (gSurfaceTypes[nSurface].nClass == 7 || gSurfaceTypes[nSurface].nClass == 16);
-    bNoLie = nSurface >= 0 && nSurface < NUM_SURFACE_TYPES && !(gSurfaceTypes[nSurface].u34 & 1) &&
-             (gSurfaceTypes[nSurface].u34 & 2);
+    bNoLie = nSurface >= 0 && nSurface < NUM_SURFACE_TYPES && !(gSurfaceTypes[nSurface].uFlags & 1) &&
+             (gSurfaceTypes[nSurface].uFlags & 2);
     if ((!Ter_PointInOOBNetwork(pBall->vPos) && !bWater) || (bNoLie && !bWater)) {
         *pClass = 19;
     }

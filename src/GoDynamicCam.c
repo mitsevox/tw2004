@@ -468,7 +468,7 @@ void DynamicCam_ProcessScript(CamShot* link, int ePlayerID, CameraScriptSettings
     f32 origToNewPos[4];
     f32 vTeeOffset[4];
     f32 origToNewPosNormalized[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-    CourseInfo* pTerrainGameData;
+    TGD_TerrainInfo* pTerrainGameData;
     int nPinSet;
     f32 fActualGroundHeight;
     f32 minTerrainHeight;
@@ -552,7 +552,7 @@ void DynamicCam_ProcessScript(CamShot* link, int ePlayerID, CameraScriptSettings
         } else {
             fActualGroundHeight = settings->fGroundHeight;
         }
-    } else if (gSession.nGameType == 3) {
+    } else if (gSession.nGameType == GAMESTATE_FE_RUN) {
         fActualGroundHeight = link->fMinHeight;
         position[1] = fActualGroundHeight;
     } else {
@@ -1086,7 +1086,7 @@ static void DynamicCam_GetLocation(CameraTracking_e tracking, int ePlayerID, f32
     CameraTracking_e otherTracking;
     int nPin;
     int nTee;
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
 
     if (tracking == link->nFromPoint) {
         otherTracking = link->nToPoint;
@@ -1248,7 +1248,7 @@ static void DynamicCam_GetLocation(CameraTracking_e tracking, int ePlayerID, f32
 CameraSequence_t* DynamicCam_ChooseSequence(int ePlayerID, int startLie, int endLie, int state,
                                             u8 allowGenericShotTypes, f32 shotDist) {
     int possibleScripts[DYNAMICCAM_MAX_POSSIBLE];
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     CameraSequence_t* pSeq;
     int i;
     int scriptsFound;
@@ -1339,7 +1339,7 @@ CameraSequence_t* DynamicCam_ChooseSequence(int ePlayerID, int startLie, int end
 // first default sequence with choices, then looks for CAMSTATE_SWING again.
 CameraSequence_t* DynamicCam_ChoosePreFlightSequence(int ePlayerID, int startLie, int state) {
     int possibleScripts[DYNAMICCAM_MAX_POSSIBLE];
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     int i;
     int scriptsFound;
     int currentScript;
@@ -1758,7 +1758,7 @@ static u8 DynamicCam_MatchPlayer(CamShot* script) {
     CrAPGolfer* pGolfer;
     int nGolferId;
 
-    if (gSession.nGameType != 3) return 1;
+    if (gSession.nGameType != GAMESTATE_FE_RUN) return 1;
     pGolfer = gpCrAPState->pShown;
     if (pGolfer != NULL && pGolfer->pChar != NULL) {
         nGolferId = pGolfer->nGolferId;
@@ -1813,7 +1813,7 @@ static void DynamicCam_AddHeightOffset(f32* position, CameraScriptSettings_t* se
     f32 oldToNewBall[4];
     int iBallUpdatesThisFrame;
     int nPin;
-    CourseInfo* pTerrainGameData;
+    TGD_TerrainInfo* pTerrainGameData;
     int i;
     f32 minHeight;
     f32 fHeight;
@@ -1956,7 +1956,7 @@ static void DynamicCam_ClampBallVelocity(f32* ballVelocity, f32* camPos, f32* ba
 void DynamicCam_GetSmoothBallLocation(CameraScriptSettings_t* settings, CamShot* script, int ePlayerID,
                                       f32* position, u8 set) {
     u8 ballInCup = 0;
-    CourseInfo* pCourse = Ter_GetTGD();
+    TGD_TerrainInfo* pCourse = Ter_GetTGD();
     int nPin = Game_CurrentPinSet();
 
     if ((gPlayers[ePlayerID].ball.nSurface == 98 || gPlayers[ePlayerID].ball.nSurface == 105

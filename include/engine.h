@@ -234,6 +234,7 @@ f32  Misc_RandFuncg(eRandomType type);
 f32  Misc_RandFuncf(eRandomType type);  // a float in [0, 1)
 
 f32  Math_Sqrtf(f32 x);                // square root (Skeleton.c); x itself when x <= 0
+f32  Math_Tan(f32 x);                  // tan, as a float (GoRenderCtx_Gc.c)
 void LLMath_AddScale3(f32* pA, f32* pB, f32 f, f32* pOut);   // out = a + f x b
 f32  Vec3_Dot(f32* pA, f32* pB);     // dot product
 void LLMath_Interpolate(f32* pA, f32* pB, f32 fT, f32* pOut);    // out = a + (b - a) x fT (four floats)
@@ -952,7 +953,7 @@ struct UObjArraySet;
 typedef struct UObjPartFuncs {
     void (*p0)(struct UObjMeshPart* pPart, void* pArg);    // 0x0  sets the part up (fn_8000827C)
     void (*p4)(struct UObjMeshPart* pPart);                // 0x4  fn_80008248, when not NULL
-    void (*p8)(struct UObjMeshPart* pPart);                // 0x8  fn_800082CC
+    void (*p8)(struct UObjMeshPart* pPart);                // 0x8  draws the part (ObjPart_Draw)
 } UObjPartFuncs;
 
 // A mode's array-set functions (HookRow.set; code_800080D0.c calls them for a dynobj.h
@@ -982,6 +983,9 @@ typedef struct ModuleHooks {
     ShaderObjectHooks shader;     // 0x34  its shader objects' hooks
 } ModuleHooks;
 LAYOUT_ASSERT(ModuleHooks, 0x44);
+
+// GoTerrain.c: hands pData to row nRow's pfn8.
+void SD_SetShaderTypeParameters(int nRow, void* pData);
 
 extern ModuleHooks lbl_80188E88[20];
 extern u8 lbl_801893D8[20];         // per row: its pfn0/pfn4 run outside game types 4..8 too

@@ -1,6 +1,6 @@
 // GoTerrainCollision.c (TW06's goterraincollision.c; TW07 splits it into GoTerrainCollision.c,
 // GoTerrainCollision_Headgate.c and GoTerrainUtils.c): the course's ground as collision data
-// (CourseInfo, TW06's TGD_TerrainInfo): the free-drop and out-of-bounds networks, the drop
+// (TGD_TerrainInfo): the free-drop and out-of-bounds networks, the drop
 // checks, the ambient light, heights, normals and surfaces under a point, and the ball's collision
 // tests against the ground, the pin and the course objects. The ground is triangle strips found
 // through a grid; each triangle's surface is a row of gSurfaceTypes. It ends with small helpers
@@ -50,34 +50,39 @@ static inline int Ter_GridCell(f32 fCells) {
     return (int)Ter_Floor(fCells);
 }
 
-f32   Ter_GetHighestGroundTriangle(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef,
+f32   Ter_GetHighestGroundTriangle(TGD_TerrainInfo* pCourse, f32* pPos, TGD_Cell** ppCell,
+                                   TGD_PolygonReference** ppRef,
                                    f32 (**ppTri)[3],
                   s32* pTri);
-void  Ter_ComputeHighestPointInEveryTriangle(CourseInfo* pCourse);
-f32   Ter_CalcLowestPlayableWorldHeight(CourseInfo* pCourse);
-f32   Ter_GetLowestGroundTriangle(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef,
+void  Ter_ComputeHighestPointInEveryTriangle(TGD_TerrainInfo* pCourse);
+f32   Ter_CalcLowestPlayableWorldHeight(TGD_TerrainInfo* pCourse);
+f32   Ter_GetLowestGroundTriangle(TGD_TerrainInfo* pCourse, f32* pPos, TGD_Cell** ppCell,
+                                  TGD_PolygonReference** ppRef,
                                   f32 (**ppTri)[3],
                   s32* pTri);
-f32   Ter_GetCoveringGroundTriangle(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef,
+f32   Ter_GetCoveringGroundTriangle(TGD_TerrainInfo* pCourse, f32* pPos, TGD_Cell** ppCell,
+                                    TGD_PolygonReference** ppRef,
                                     f32 (**ppTri)[3],
                   s32* pTri);
-void  Ter_GetSupportingAndCoveringGroundTriangles(CourseInfo* pCourse, f32* pPos, TerPolyRef** ppRefLow,
+void  Ter_GetSupportingAndCoveringGroundTriangles(TGD_TerrainInfo* pCourse, f32* pPos,
+                                                  TGD_PolygonReference** ppRefLow,
                                                   f32* pLow, f32 (**ppTriLow)[3],
-                  TerPolyRef** ppRefHigh, f32* pHigh, f32 (**ppTriHigh)[3]);
-u8    Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
-                                  SurfaceType** ppSurface, TerObject** ppObj);
-u8    Ter_CheckForWorldCollisionOneGrid(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir,
+                  TGD_PolygonReference** ppRefHigh, f32* pHigh, f32 (**ppTriHigh)[3]);
+u8    Ter_CheckForGroundCollision(TGD_TerrainInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
+                                  TGD_MaterialInfo** ppSurface, TerObject** ppObj);
+u8    Ter_CheckForWorldCollisionOneGrid(TGD_TerrainInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo,
+                                        f32* pDir,
                                         f32 fMax, f32* pHit,
-                  f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj, u8* pbFlags);
-u8    Ter_CheckForSolidWorldCollisionOneGrid(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo,
+                  f32* pNormal, TGD_MaterialInfo** ppSurface, TerObject** ppObj, u8* pbFlags);
+u8    Ter_CheckForSolidWorldCollisionOneGrid(TGD_TerrainInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo,
                                              f32* pDir, f32 fMax, f32* pHit,
-                  f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj);
-u8    Ter_CheckForGroundCollisionOneGrid(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo,
+                  f32* pNormal, TGD_MaterialInfo** ppSurface, TerObject** ppObj);
+u8    Ter_CheckForGroundCollisionOneGrid(TGD_TerrainInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo,
                                          f32* pDir, f32 fMax, f32* pHit,
-                  f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj);
-u8    Ter_CheckForObjectCollisionOneGrid(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo,
+                  f32* pNormal, TGD_MaterialInfo** ppSurface, TerObject** ppObj);
+u8    Ter_CheckForObjectCollisionOneGrid(TGD_TerrainInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo,
                                          f32* pDir, f32 fMax, f32* pHit,
-                  f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj);
+                  f32* pNormal, TGD_MaterialInfo** ppSurface, TerObject** ppObj);
 u8    Ter_LineSphereIntersection(f32* pFrom, f32* pDir, f32 fRange, f32* pCentre, f32 fRadius);
 int   TerCollision_GetMeshFlags(UObjMesh* pModel, int n);
 
@@ -146,7 +151,7 @@ void Ter_Init(void) {
 // its offsets become pointers; strips flagged for one of the four pin positions (flags 1, 2, 4, 8)
 // are 3D cup geometry, and each pin goes at the centre top of its geometry's bounds; then the
 // triangles' high and low corners and the course floor.
-void Ter_InitTGD(CourseInfo* pCourse) {
+void Ter_InitTGD(TGD_TerrainInfo* pCourse) {
     u32 i;
     int k;
     int j;
@@ -154,9 +159,9 @@ void Ter_InitTGD(CourseInfo* pCourse) {
     int nPinSet;
     f32 (*pVert)[3];
 
-    // port: the course data is big-endian and read in place through CourseInfo, TerCell,
-    //       TerPolyRef, TerObject and the vertex list: a little-endian port converts it here,
-    //       before the offsets are turned into pointers (docs/game/formats/byte-order.md)
+    // port: the course data is big-endian and read in place through TGD_TerrainInfo, TGD_Cell,
+    //       TGD_PolygonReference, TerObject and the vertex list: a little-endian port converts it
+    //       here, before the offsets are turned into pointers (docs/game/formats/byte-order.md)
     TER_RELOCATE(pCourse, pVerts);
     TER_RELOCATE(pCourse, pTriFlags);
     TER_RELOCATE(pCourse, pLight);
@@ -188,7 +193,7 @@ void Ter_InitTGD(CourseInfo* pCourse) {
     for (i = 0; i < pCourse->nPolyRefs; i++) {
         nBit = 1;
         for (k = 0; k < NUM_CUP_POSITIONS; k++) {
-            if (nBit == (pCourse->pPolyRefs[i].u4 & 0xF)) {
+            if (nBit == (pCourse->pPolyRefs[i].uFlags & POLYREF_PIN_POSITIONS)) {
                 gTerUse3DCupGeometry = 1;
                 pVert = &pCourse->pVerts[TER_FIRST_VERTEX(&pCourse->pPolyRefs[i])];
                 for (j = 0; j < pCourse->pPolyRefs[i].nTris + 2; j++) {
@@ -301,9 +306,9 @@ u8 Ter_CollisionWithOOBNetwork(f32* pFrom, f32* pTo, f32* pHit) {
 // from the brightness byte of the triangle's vertex: the ground covering the point when it is
 // less than a quarter of a yard above it, else the ground under it, else the lowest ground. 1
 // (full light) with no ground, or on an object.
-f32 Ter_GetAmbientLight(CourseInfo* pCourse, f32* pPos) {
-    TerCell* pCell;
-    TerPolyRef* pRef;
+f32 Ter_GetAmbientLight(TGD_TerrainInfo* pCourse, f32* pPos) {
+    TGD_Cell* pCell;
+    TGD_PolygonReference* pRef;
     f32 (*pTri)[3];
     s32 nTri;
     f32 fHeight;
@@ -315,7 +320,7 @@ f32 Ter_GetAmbientLight(CourseInfo* pCourse, f32* pPos) {
             fHeight = Ter_GetLowestGroundTriangle(pCourse, pPos, &pCell, &pRef, &pTri, &nTri);
         }
     }
-    if (fHeight != TER_NO_GROUND && pRef->n2 == 0) {
+    if (fHeight != TER_NO_GROUND && pRef->nObject == 0) {
         return (pCourse->pLight + TER_FIRST_VERTEX(pRef))[nTri] / 255.0f;
     }
     return 1.0f;
@@ -345,9 +350,9 @@ static inline f32 fn_8004B89C_Read(f32 f) {
 u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bHazards, f32 fStep, u8 bSlope,
                                        f32 fMaxSlope) {
     int j;
-    TerCell* pCell;
+    TGD_Cell* pCell;
     f32 aHeight[5];
-    TerPolyRef* apRef[5];
+    TGD_PolygonReference* apRef[5];
     f32 vPos[4];
     u8 abFreeDrop[5];
     f32 fA;
@@ -358,7 +363,7 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bH
     f32 fC2;
     u8 bFirst;
     int n;
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     f32 fMinX;
     f32 fMaxX;
     f32 fMinZ;
@@ -381,7 +386,7 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bH
     u8 bObstructed;
     int nCorner;
     int nInner;
-    TerPolyRef* pRef;
+    TGD_PolygonReference* pRef;
     u16* pObjRef;
     f32 (*pVert)[3];
     u8* pFlags;
@@ -430,9 +435,9 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bH
                     }
                     pObjRef++;
                 }
-                pRef = &pCourse->pPolyRefs[pCell->uRefs >> 12];
-                for (n = (pCell->uRefs & 0xFFF) - 1; n >= 0; n--) {
-                    if (pRef->n2 != 0) {
+                pRef = &pCourse->pPolyRefs[pCell->uRefs >> CELL_REFS_FIRST_SHIFT];
+                for (n = (pCell->uRefs & CELL_REFS_COUNT_MASK) - 1; n >= 0; n--) {
+                    if (pRef->nObject != 0) {
                         pRef++;
                     } else {
                         pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
@@ -442,9 +447,9 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bH
                             if (bFirst) {
                                 abFreeDrop[0] = Ter_PointInFreeDropNetwork(pPos);
                             }
-                            if ((uFlags & 7)
-                                && (fTop > pVert[(uFlags >> 6) & 3][1]
-                                    || aHeight[0] < pVert[(uFlags >> 4) & 3][1])
+                            if ((uFlags & TER_TRI_KICK_MASK)
+                                && (fTop > pVert[TER_TRI_LOWEST_CORNER(uFlags)][1]
+                                    || aHeight[0] < pVert[TER_TRI_HIGHEST_CORNER(uFlags)][1])
                                 && Ter_PointInTriangleXZpY(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
                                 Ter_GetBarycentricCoords(pVert, pPos, &fA, &fB, &fC);
                                 fHeight = fA * pVert[0][1] + fB * pVert[1][1] + fC * pVert[2][1];
@@ -461,9 +466,9 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bH
                                     if (bFirst) {
                                         abFreeDrop[k] = Ter_PointInFreeDropNetwork(vPos);
                                     }
-                                    if ((uFlags & 7)
-                                        && (fTop > pVert[(uFlags >> 6) & 3][1]
-                                            || aHeight[k] < pVert[(uFlags >> 4) & 3][1])
+                                    if ((uFlags & TER_TRI_KICK_MASK)
+                                        && (fTop > pVert[TER_TRI_LOWEST_CORNER(uFlags)][1]
+                                            || aHeight[k] < pVert[TER_TRI_HIGHEST_CORNER(uFlags)][1])
                                         && Ter_PointInTriangleXZpY(pVert[0], pVert[1], pVert[2], vPos[0],
                                                 vPos[2])) {
                                         Ter_GetBarycentricCoords(pVert, vPos, &fA2, &fB2, &fC2);
@@ -496,10 +501,10 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bH
     }
     if (bObstructed) return 1;
     if (bHazards) {
-        if ((apRef[0] != NULL && !(gSurfaceTypes[apRef[0]->nSurface].u34 & 1)) || abFreeDrop[0]) return 1;
+        if ((apRef[0] != NULL && !(gSurfaceTypes[apRef[0]->nSurface].uFlags & 1)) || abFreeDrop[0]) return 1;
         for (k = 1; k < 5; k++) {
             if (abFreeDrop[k] || apRef[k] == NULL
-                || (apRef[k] != NULL && !(gSurfaceTypes[apRef[k]->nSurface].u34 & 1)
+                || (apRef[k] != NULL && !(gSurfaceTypes[apRef[k]->nSurface].uFlags & 1)
                     && gSurfaceTypes[apRef[k]->nSurface].nClass != 8)) {
                 return 1;
             }
@@ -525,10 +530,10 @@ u8 Ter_SearchForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut) {
     f32 fAngle;
     f32 vPos[4];
     f32 vDir[4];
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
     u8 bDrop;
     u8 bPreferredLie;
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     f32 fDist;
     f32 fDropDist;
     f32 fRadius;
@@ -539,7 +544,7 @@ u8 Ter_SearchForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut) {
     f32 fCos;
     int nRing;
     Player* p;
-    SurfaceType* pGround;
+    TGD_MaterialInfo* pGround;
 
     p = &gPlayers[nPlayer];
     pCourse = Ter_GetTGD();
@@ -613,11 +618,12 @@ done:
 // bOnDropSurface, on ground that allows a drop (surface flag 1, not surface class 10) that is no
 // steeper than 30 degrees and clear of objects and hazards. *pbPreferred says the surface there is
 // a preferred one (always, when bOnDropSurface). Returns the ground height (0 when bOnDropSurface).
-f32 Ter_CheckForDropLocation(CourseInfo* pCourse, f32* pPos, u8 bOnDropSurface, u8* pbDrop, u8* pbPreferred,
-                             SurfaceType** ppSurface) {
+f32 Ter_CheckForDropLocation(TGD_TerrainInfo* pCourse, f32* pPos, u8 bOnDropSurface, u8* pbDrop,
+                             u8* pbPreferred,
+                             TGD_MaterialInfo** ppSurface) {
     f32 vPos[4];
     f32 vNormal[4];
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
     f32 fHeight;
     u8 bOk;
 
@@ -630,7 +636,7 @@ f32 Ter_CheckForDropLocation(CourseInfo* pCourse, f32* pPos, u8 bOnDropSurface, 
         if (ppSurface != NULL) {
             *ppSurface = pSurface;
         }
-        bOk = fHeight != TER_NO_GROUND && pSurface != NULL && (pSurface->u34 & 1)
+        bOk = fHeight != TER_NO_GROUND && pSurface != NULL && (pSurface->uFlags & 1)
               && pSurface->nClass != 10 && fabsf(vNormal[1]) > 0.86603f
               && Ter_PointInOOBNetwork(vPos) && !Ter_PointInFreeDropNetwork(vPos)
               // fake match: bOnDropSurface is always 0 here, but the original tests it again
@@ -657,7 +663,7 @@ f32 Ter_CheckForDropLocation(CourseInfo* pCourse, f32* pPos, u8 bOnDropSurface, 
     return fHeight;
 }
 
-// TW06: bool Ter_LieIsPreferred(u32). Whether a surface class (SurfaceType.nClass, which TW06 calls
+// TW06: bool Ter_LieIsPreferred(u32). Whether a surface class (TGD_MaterialInfo.nClass, which TW06 calls
 // the lie ID; not a Lie_t) is a preferred place for a drop: classes 1 to 4, the ones Physics_SetLie
 // turns into the fairway (1, 2), green (3) and fringe (4) lies.
 u8 Ter_LieIsPreferred(u32 nClass) {
@@ -680,12 +686,12 @@ u8 Ter_IsValidDropSurface(s32 nSurface) {
 }
 
 // The height of the lowest vertex of any ground triangle whose surface is not class 19; the
-// course keeps it as CourseInfo.fFloor.
-f32 Ter_CalcLowestPlayableWorldHeight(CourseInfo* pCourse) {
+// course keeps it as TGD_TerrainInfo.fFloor.
+f32 Ter_CalcLowestPlayableWorldHeight(TGD_TerrainInfo* pCourse) {
     f32 fLowest = 1000000.0f;
     u32 i;
     int k;
-    TerPolyRef* pRef = pCourse->pPolyRefs;
+    TGD_PolygonReference* pRef = pCourse->pPolyRefs;
 
     for (i = 0; i < pCourse->nPolyRefs; i++) {
         if (pRef->nSurface < NUM_SURFACE_TYPES && gSurfaceTypes[pRef->nSurface].nClass == 19) {
@@ -696,8 +702,9 @@ f32 Ter_CalcLowestPlayableWorldHeight(CourseInfo* pCourse) {
 
             // a vertex is part of the triangles ending at it and at the next two vertices
             for (k = 0; k < pRef->nTris + 2; k++) {
-                if ((k <= pRef->nTris + 1 && (pFlags[0] & 7)) || (k <= pRef->nTris && (pFlags[1] & 7))
-                    || (k <= pRef->nTris - 1 && (pFlags[2] & 7))) {
+                if ((k <= pRef->nTris + 1 && (pFlags[0] & TER_TRI_KICK_MASK))
+                    || (k <= pRef->nTris && (pFlags[1] & TER_TRI_KICK_MASK))
+                    || (k <= pRef->nTris - 1 && (pFlags[2] & TER_TRI_KICK_MASK))) {
                     if (pVert[1] < fLowest) {
                         fLowest = pVert[1];
                     }
@@ -716,15 +723,16 @@ f32 Ter_CalcLowestPlayableWorldHeight(CourseInfo* pCourse) {
 // ground strips count (not objects), and only those in use: a strip flagged as the cup geometry of
 // some pin positions (bits 1, 2, 4, 8) is skipped unless the current one is among them, and one
 // with 0x10 in split screen.
-f32 Ter_GetHighestGroundTriangle(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef,
+f32 Ter_GetHighestGroundTriangle(TGD_TerrainInfo* pCourse, f32* pPos, TGD_Cell** ppCell,
+                                 TGD_PolygonReference** ppRef,
                                  f32 (**ppTri)[3],
                 s32* pTri) {
     u32 uPinSet = 1 << Game_CurrentPinSet();
     f32 fBest = TER_NO_GROUND;
     int nX = (int)Ter_Floor((pPos[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
     int nZ = (int)Ter_Floor((pPos[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
-    TerCell* pCell;
-    TerPolyRef* pRef;
+    TGD_Cell* pCell;
+    TGD_PolygonReference* pRef;
     f32 (*pVert)[3];
     u8* pFlags;
     int i;
@@ -736,18 +744,19 @@ f32 Ter_GetHighestGroundTriangle(CourseInfo* pCourse, f32* pPos, TerCell** ppCel
 
     if (nX >= 0 && nX < pCourse->nGridWidth && nZ >= 0 && nZ < pCourse->nGridLength) {
         pCell = &pCourse->pGrid[nX + nZ * pCourse->nGridWidth];
-        pRef = &pCourse->pPolyRefs[pCell->uRefs >> 12];
-        for (i = (pCell->uRefs & 0xFFF) - 1; i >= 0; i--) {
-            if (pRef->n2 != 0) {
+        pRef = &pCourse->pPolyRefs[pCell->uRefs >> CELL_REFS_FIRST_SHIFT];
+        for (i = (pCell->uRefs & CELL_REFS_COUNT_MASK) - 1; i >= 0; i--) {
+            if (pRef->nObject != 0) {
                 pRef++;
-            } else if (pRef->u4 != 0
-                       && (!(pRef->u4 & uPinSet) || ((pRef->u4 & 0x10) && gSession.nSplitScreen))) {
+            } else if (pRef->uFlags != 0
+                       && (!(pRef->uFlags & uPinSet)
+                           || ((pRef->uFlags & POLYREF_NOT_IN_SPLIT_SCREEN) && gSession.nSplitScreen))) {
                 pRef++;
             } else {
                 pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
                 pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
                 for (j = pRef->nTris - 1; j >= 0; j--) {
-                    if ((pFlags[2] & 7) && fBest < pVert[(pFlags[2] >> 4) & 3][1]
+                    if ((pFlags[2] & TER_TRI_KICK_MASK) && fBest < pVert[TER_TRI_HIGHEST_CORNER(pFlags[2])][1]
                         && Ter_PointInTriangleXZpY(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
                         Ter_GetBarycentricCoords(pVert, pPos, &fA, &fB, &fC);
                         fHeight = fA * pVert[0][1] + fB * pVert[1][1] + fC * pVert[2][1];
@@ -772,15 +781,16 @@ f32 Ter_GetHighestGroundTriangle(CourseInfo* pCourse, f32* pPos, TerCell** ppCel
 
 // The lowest ground triangle under a point (x, z), with the same outputs and strip rules as
 // Ter_GetHighestGroundTriangle; TER_NO_GROUND when there is none.
-f32 Ter_GetLowestGroundTriangle(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef,
+f32 Ter_GetLowestGroundTriangle(TGD_TerrainInfo* pCourse, f32* pPos, TGD_Cell** ppCell,
+                                TGD_PolygonReference** ppRef,
                                 f32 (**ppTri)[3],
                 s32* pTri) {
     u32 uPinSet = 1 << Game_CurrentPinSet();
     f32 fBest = 50000.0f;
     int nX = (int)Ter_Floor((pPos[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
     int nZ = (int)Ter_Floor((pPos[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
-    TerCell* pCell;
-    TerPolyRef* pRef;
+    TGD_Cell* pCell;
+    TGD_PolygonReference* pRef;
     f32 (*pVert)[3];
     u8* pFlags;
     int i;
@@ -792,18 +802,19 @@ f32 Ter_GetLowestGroundTriangle(CourseInfo* pCourse, f32* pPos, TerCell** ppCell
 
     if (nX >= 0 && nX < pCourse->nGridWidth && nZ >= 0 && nZ < pCourse->nGridLength) {
         pCell = &pCourse->pGrid[nX + nZ * pCourse->nGridWidth];
-        pRef = &pCourse->pPolyRefs[pCell->uRefs >> 12];
-        for (i = (pCell->uRefs & 0xFFF) - 1; i >= 0; i--) {
-            if (pRef->n2 != 0) {
+        pRef = &pCourse->pPolyRefs[pCell->uRefs >> CELL_REFS_FIRST_SHIFT];
+        for (i = (pCell->uRefs & CELL_REFS_COUNT_MASK) - 1; i >= 0; i--) {
+            if (pRef->nObject != 0) {
                 pRef++;
-            } else if (pRef->u4 != 0
-                       && (!(pRef->u4 & uPinSet) || ((pRef->u4 & 0x10) && gSession.nSplitScreen))) {
+            } else if (pRef->uFlags != 0
+                       && (!(pRef->uFlags & uPinSet)
+                           || ((pRef->uFlags & POLYREF_NOT_IN_SPLIT_SCREEN) && gSession.nSplitScreen))) {
                 pRef++;
             } else {
                 pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
                 pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
                 for (j = pRef->nTris - 1; j >= 0; j--) {
-                    if ((pFlags[2] & 7) && fBest > pVert[(pFlags[2] >> 6) & 3][1]
+                    if ((pFlags[2] & TER_TRI_KICK_MASK) && fBest > pVert[TER_TRI_LOWEST_CORNER(pFlags[2])][1]
                         && Ter_PointInTriangleXZpY(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
                         Ter_GetBarycentricCoords(pVert, pPos, &fA, &fB, &fC);
                         fHeight = fA * pVert[0][1] + fB * pVert[1][1] + fC * pVert[2][1];
@@ -830,14 +841,15 @@ f32 Ter_GetLowestGroundTriangle(CourseInfo* pCourse, f32* pPos, TerCell** ppCell
 // The supporting triangle of the world under a point: the highest one at or below its height,
 // object triangles included (so a ball on a bridge is on the bridge). Returns its height there,
 // with the grid cell, strip and vertices; TER_NO_GROUND when there is none.
-f32 Ter_GetSupportingWorldTriangle(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef,
+f32 Ter_GetSupportingWorldTriangle(TGD_TerrainInfo* pCourse, f32* pPos, TGD_Cell** ppCell,
+                                   TGD_PolygonReference** ppRef,
                                    f32 (**ppTri)[3]) {
     u32 uPinSet = 1 << Game_CurrentPinSet();
     f32 fBest = TER_NO_GROUND;
     int nX = (int)Ter_Floor((pPos[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
     int nZ = (int)Ter_Floor((pPos[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
-    TerCell* pCell;
-    TerPolyRef* pRef;
+    TGD_Cell* pCell;
+    TGD_PolygonReference* pRef;
     f32 (*pVert)[3];
     u8* pFlags;
     int i;
@@ -850,17 +862,19 @@ f32 Ter_GetSupportingWorldTriangle(CourseInfo* pCourse, f32* pPos, TerCell** ppC
     if (nX >= 0 && nX < pCourse->nGridWidth && nZ >= 0 && nZ < pCourse->nGridLength) {
         pCell = &pCourse->pGrid[nX + nZ * pCourse->nGridWidth];
         if ((f32)pCell->nMinHeight > pPos[1]) return TER_NO_GROUND;
-        pRef = &pCourse->pPolyRefs[pCell->uRefs >> 12];
-        for (i = (pCell->uRefs & 0xFFF) - 1; i >= 0; i--) {
-            if (pRef->u4 != 0 && (!(pRef->u4 & uPinSet) || ((pRef->u4 & 0x10) && gSession.nSplitScreen))) {
+        pRef = &pCourse->pPolyRefs[pCell->uRefs >> CELL_REFS_FIRST_SHIFT];
+        for (i = (pCell->uRefs & CELL_REFS_COUNT_MASK) - 1; i >= 0; i--) {
+            if (pRef->uFlags != 0
+                && (!(pRef->uFlags & uPinSet)
+                    || ((pRef->uFlags & POLYREF_NOT_IN_SPLIT_SCREEN) && gSession.nSplitScreen))) {
                 pRef++;
             } else {
                 pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
                 pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
                 for (j = pRef->nTris - 1; j >= 0; j--) {
-                    if ((pFlags[2] & 7)
-                        && (pPos[1] > pVert[(pFlags[2] >> 6) & 3][1]
-                            || fBest < pVert[(pFlags[2] >> 4) & 3][1])
+                    if ((pFlags[2] & TER_TRI_KICK_MASK)
+                        && (pPos[1] > pVert[TER_TRI_LOWEST_CORNER(pFlags[2])][1]
+                            || fBest < pVert[TER_TRI_HIGHEST_CORNER(pFlags[2])][1])
                         && Ter_PointInTriangleXZpY(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
                         Ter_GetBarycentricCoords(pVert, pPos, &fA, &fB, &fC);
                         fHeight = fA * pVert[0][1] + fB * pVert[1][1] + fC * pVert[2][1];
@@ -885,15 +899,16 @@ f32 Ter_GetSupportingWorldTriangle(CourseInfo* pCourse, f32* pPos, TerCell** ppC
 // The covering ground triangle over a point: the lowest ground triangle at or above its height.
 // Returns its height there, with the grid cell, strip, vertices and the triangle's number in the
 // strip; TER_NO_GROUND when there is none.
-f32 Ter_GetCoveringGroundTriangle(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef,
+f32 Ter_GetCoveringGroundTriangle(TGD_TerrainInfo* pCourse, f32* pPos, TGD_Cell** ppCell,
+                                  TGD_PolygonReference** ppRef,
                                   f32 (**ppTri)[3],
                 s32* pTri) {
     u32 uPinSet = 1 << Game_CurrentPinSet();
     f32 fBest = 65536.0f;
     int nX = (int)Ter_Floor((pPos[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
     int nZ = (int)Ter_Floor((pPos[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
-    TerCell* pCell;
-    TerPolyRef* pRef;
+    TGD_Cell* pCell;
+    TGD_PolygonReference* pRef;
     f32 (*pVert)[3];
     u8* pFlags;
     int i;
@@ -906,20 +921,21 @@ f32 Ter_GetCoveringGroundTriangle(CourseInfo* pCourse, f32* pPos, TerCell** ppCe
     if (nX >= 0 && nX < pCourse->nGridWidth && nZ >= 0 && nZ < pCourse->nGridLength) {
         pCell = &pCourse->pGrid[nX + nZ * pCourse->nGridWidth];
         if ((f32)pCell->nMaxHeight < pPos[1]) return TER_NO_GROUND;
-        pRef = &pCourse->pPolyRefs[pCell->uRefs >> 12];
-        for (i = (pCell->uRefs & 0xFFF) - 1; i >= 0; i--) {
-            if (pRef->n2 != 0) {
+        pRef = &pCourse->pPolyRefs[pCell->uRefs >> CELL_REFS_FIRST_SHIFT];
+        for (i = (pCell->uRefs & CELL_REFS_COUNT_MASK) - 1; i >= 0; i--) {
+            if (pRef->nObject != 0) {
                 pRef++;
-            } else if (pRef->u4 != 0
-                       && (!(pRef->u4 & uPinSet) || ((pRef->u4 & 0x10) && gSession.nSplitScreen))) {
+            } else if (pRef->uFlags != 0
+                       && (!(pRef->uFlags & uPinSet)
+                           || ((pRef->uFlags & POLYREF_NOT_IN_SPLIT_SCREEN) && gSession.nSplitScreen))) {
                 pRef++;
             } else {
                 pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
                 pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
                 for (j = pRef->nTris - 1; j >= 0; j--) {
-                    if ((pFlags[2] & 7)
-                        && (fBest > pVert[(pFlags[2] >> 6) & 3][1]
-                            || pPos[1] < pVert[(pFlags[2] >> 4) & 3][1])
+                    if ((pFlags[2] & TER_TRI_KICK_MASK)
+                        && (fBest > pVert[TER_TRI_LOWEST_CORNER(pFlags[2])][1]
+                            || pPos[1] < pVert[TER_TRI_HIGHEST_CORNER(pFlags[2])][1])
                         && Ter_PointInTriangleXZpY(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
                         Ter_GetBarycentricCoords(pVert, pPos, &fA, &fB, &fC);
                         fHeight = fA * pVert[0][1] + fB * pVert[1][1] + fC * pVert[2][1];
@@ -947,16 +963,17 @@ f32 Ter_GetCoveringGroundTriangle(CourseInfo* pCourse, f32* pPos, TerCell** ppCe
 // their heights (TER_NO_GROUND for none), strips and vertices. TW06:
 // void Ter_GetSupportingAndCoveringGroundTriangles(TGD_TerrainInfo*, f32*, TGD_PolygonReference**, f32*,
 // f32***, TGD_PolygonReference**, f32*, f32***), the same parameters.
-void Ter_GetSupportingAndCoveringGroundTriangles(CourseInfo* pCourse, f32* pPos, TerPolyRef** ppRefLow,
+void Ter_GetSupportingAndCoveringGroundTriangles(TGD_TerrainInfo* pCourse, f32* pPos,
+                                                 TGD_PolygonReference** ppRefLow,
                                                  f32* pLow, f32 (**ppTriLow)[3],
-                 TerPolyRef** ppRefHigh, f32* pHigh, f32 (**ppTriHigh)[3]) {
+                 TGD_PolygonReference** ppRefHigh, f32* pHigh, f32 (**ppTriHigh)[3]) {
     u32 uPinSet = 1 << Game_CurrentPinSet();
     f32 fHigh = 65536.0f;
     f32 fLow = -65536.0f;
     int nX = (int)Ter_Floor((pPos[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
     int nZ = (int)Ter_Floor((pPos[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
-    TerCell* pCell;
-    TerPolyRef* pRef;
+    TGD_Cell* pCell;
+    TGD_PolygonReference* pRef;
     f32 (*pVert)[3];
     u8* pFlags;
     int i;
@@ -968,19 +985,21 @@ void Ter_GetSupportingAndCoveringGroundTriangles(CourseInfo* pCourse, f32* pPos,
 
     if (nX >= 0 && nX < pCourse->nGridWidth && nZ >= 0 && nZ < pCourse->nGridLength) {
         pCell = &pCourse->pGrid[nX + nZ * pCourse->nGridWidth];
-        pRef = &pCourse->pPolyRefs[pCell->uRefs >> 12];
-        for (i = (pCell->uRefs & 0xFFF) - 1; i >= 0; i--) {
-            if (pRef->n2 != 0) {
+        pRef = &pCourse->pPolyRefs[pCell->uRefs >> CELL_REFS_FIRST_SHIFT];
+        for (i = (pCell->uRefs & CELL_REFS_COUNT_MASK) - 1; i >= 0; i--) {
+            if (pRef->nObject != 0) {
                 pRef++;
-            } else if (pRef->u4 != 0
-                       && (!(pRef->u4 & uPinSet) || ((pRef->u4 & 0x10) && gSession.nSplitScreen))) {
+            } else if (pRef->uFlags != 0
+                       && (!(pRef->uFlags & uPinSet)
+                           || ((pRef->uFlags & POLYREF_NOT_IN_SPLIT_SCREEN) && gSession.nSplitScreen))) {
                 pRef++;
             } else {
                 pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
                 pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
                 for (j = pRef->nTris - 1; j >= 0; j--) {
-                    if ((pFlags[2] & 7)
-                        && (fHigh > pVert[(pFlags[2] >> 6) & 3][1] || fLow < pVert[(pFlags[2] >> 4) & 3][1])
+                    if ((pFlags[2] & TER_TRI_KICK_MASK)
+                        && (fHigh > pVert[TER_TRI_LOWEST_CORNER(pFlags[2])][1] || fLow
+                            < pVert[TER_TRI_HIGHEST_CORNER(pFlags[2])][1])
                         && Ter_PointInTriangleXZpY(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
                         Ter_GetBarycentricCoords(pVert, pPos, &fA, &fB, &fC);
                         fHeight = fA * pVert[0][1] + fB * pVert[1][1] + fC * pVert[2][1];
@@ -1011,9 +1030,9 @@ void Ter_GetSupportingAndCoveringGroundTriangles(CourseInfo* pCourse, f32* pPos,
 
 // The height of the highest ground triangle under a point (x, z), whatever the point's own height
 // (Ter_GetHighestGroundTriangle); TER_NO_GROUND when there is none.
-f32 Ter_GetHighestGroundHeight(CourseInfo* pCourse, f32* pPos) {
-    TerCell* pCell;
-    TerPolyRef* pRef;
+f32 Ter_GetHighestGroundHeight(TGD_TerrainInfo* pCourse, f32* pPos) {
+    TGD_Cell* pCell;
+    TGD_PolygonReference* pRef;
     f32 (*pTri)[3];
     s32 nTri;
 
@@ -1022,9 +1041,9 @@ f32 Ter_GetHighestGroundHeight(CourseInfo* pCourse, f32* pPos) {
 
 // The height of the lowest ground triangle under a point (x, z), whatever the point's own height
 // (Ter_GetLowestGroundTriangle); TER_NO_GROUND when there is none.
-f32 Ter_GetLowestGroundHeight(CourseInfo* pCourse, f32* pPos) {
-    TerCell* pCell;
-    TerPolyRef* pRef;
+f32 Ter_GetLowestGroundHeight(TGD_TerrainInfo* pCourse, f32* pPos) {
+    TGD_Cell* pCell;
+    TGD_PolygonReference* pRef;
     f32 (*pTri)[3];
     s32 nTri;
 
@@ -1033,9 +1052,9 @@ f32 Ter_GetLowestGroundHeight(CourseInfo* pCourse, f32* pPos) {
 
 // The height of the supporting ground under a point: the highest ground triangle at or below it
 // (Ter_GetSupportingGroundTriangle); TER_NO_GROUND when there is none.
-f32 Ter_GetSupportingGroundHeight(CourseInfo* pCourse, f32* pPos) {
-    TerCell* pCell;
-    TerPolyRef* pRef;
+f32 Ter_GetSupportingGroundHeight(TGD_TerrainInfo* pCourse, f32* pPos) {
+    TGD_Cell* pCell;
+    TGD_PolygonReference* pRef;
     f32 (*pTri)[3];
     s32 nTri;
 
@@ -1044,14 +1063,14 @@ f32 Ter_GetSupportingGroundHeight(CourseInfo* pCourse, f32* pPos) {
 
 // The height of the ground covering a point (Ter_GetCoveringGroundTriangle) and, when there is one,
 // that triangle's normal turned to face up; TER_NO_GROUND (pNormal untouched) when there is none.
-f32 Ter_GetCoveringGroundHeightAndNormal(CourseInfo* pCourse, f32* pPos, f32* pNormal) {
+f32 Ter_GetCoveringGroundHeightAndNormal(TGD_TerrainInfo* pCourse, f32* pPos, f32* pNormal) {
     f32 vA[4];
     f32 vB[4];
     f32 vC[4];
     f32 vAB[4];
     f32 vBC[4];
-    TerCell* pCell;
-    TerPolyRef* pRef;
+    TGD_Cell* pCell;
+    TGD_PolygonReference* pRef;
     f32 (*pTri)[3];
     s32 nTri;
     f32 fHeight;
@@ -1075,14 +1094,14 @@ f32 Ter_GetCoveringGroundHeightAndNormal(CourseInfo* pCourse, f32* pPos, f32* pN
 
 // TW06: bool Ter_GetSupportingGroundNormal(TGD_TerrainInfo*, f32*, f32*). The upward normal of the
 // ground under a point; 0 when there is none.
-u8 Ter_GetSupportingGroundNormal(CourseInfo* pCourse, f32* pPos, f32* pNormal) {
+u8 Ter_GetSupportingGroundNormal(TGD_TerrainInfo* pCourse, f32* pPos, f32* pNormal) {
     f32 vA[4];
     f32 vB[4];
     f32 vC[4];
     f32 vAB[4];
     f32 vBC[4];
-    TerCell* pCell;
-    TerPolyRef* pRef;
+    TGD_Cell* pCell;
+    TGD_PolygonReference* pRef;
     f32 (*pTri)[3];
     s32 nTri;
 
@@ -1104,9 +1123,9 @@ u8 Ter_GetSupportingGroundNormal(CourseInfo* pCourse, f32* pPos, f32* pNormal) {
 
 // The height of whatever supports a point, object triangles included
 // (Ter_GetSupportingWorldTriangle); TER_NO_GROUND when there is none.
-f32 Ter_GetSupportingWorldHeight(CourseInfo* pCourse, f32* pPos) {
-    TerCell* pCell;
-    TerPolyRef* pRef;
+f32 Ter_GetSupportingWorldHeight(TGD_TerrainInfo* pCourse, f32* pPos) {
+    TGD_Cell* pCell;
+    TGD_PolygonReference* pRef;
     f32 (*pTri)[3];
 
     return Ter_GetSupportingWorldTriangle(pCourse, pPos, &pCell, &pRef, &pTri);
@@ -1114,9 +1133,9 @@ f32 Ter_GetSupportingWorldHeight(CourseInfo* pCourse, f32* pPos) {
 
 // TW06: TGD_MaterialInfo* Ter_GetSupportingWorldMaterial(TGD_TerrainInfo*, f32*). The surface
 // under a point, objects included; NULL when there is none.
-SurfaceType* Ter_GetSupportingWorldMaterial(CourseInfo* pCourse, f32* pPos) {
-    TerCell* pCell;
-    TerPolyRef* pRef;
+TGD_MaterialInfo* Ter_GetSupportingWorldMaterial(TGD_TerrainInfo* pCourse, f32* pPos) {
+    TGD_Cell* pCell;
+    TGD_PolygonReference* pRef;
     f32 (*pTri)[3];
 
     if (Ter_GetSupportingWorldTriangle(pCourse, pPos, &pCell, &pRef, &pTri) != TER_NO_GROUND) {
@@ -1128,14 +1147,15 @@ SurfaceType* Ter_GetSupportingWorldMaterial(CourseInfo* pCourse, f32* pPos) {
 // TW06: f32 Ter_GetSupportingGroundData(const TGD_TerrainInfo*, const f32*, TGD_MaterialInfo**, f32*).
 // The ground height under a point, with the surface there and the triangle's upward normal; with
 // nothing under the point, TER_NO_GROUND and no surface.
-f32 Ter_GetSupportingGroundData(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurface, f32* pNormal) {
+f32 Ter_GetSupportingGroundData(TGD_TerrainInfo* pCourse, f32* pPos, TGD_MaterialInfo** ppSurface,
+                                f32* pNormal) {
     f32 vA[4];
     f32 vB[4];
     f32 vC[4];
     f32 vAB[4];
     f32 vBC[4];
-    TerCell* pCell;
-    TerPolyRef* pRef;
+    TGD_Cell* pCell;
+    TGD_PolygonReference* pRef;
     f32 (*pTri)[3];
     s32 nTri;
     f32 fHeight;
@@ -1161,9 +1181,9 @@ f32 Ter_GetSupportingGroundData(CourseInfo* pCourse, f32* pPos, SurfaceType** pp
 
 // TW06: void Ter_GetEnclosingGroundHeight(TGD_TerrainInfo*, f32*, f32*, f32*). The heights of the
 // ground just below and just above a point (TER_NO_GROUND for none).
-void Ter_GetEnclosingGroundHeight(CourseInfo* pCourse, f32* pPos, f32* pLow, f32* pHigh) {
-    TerPolyRef* pRefLow;
-    TerPolyRef* pRefHigh;
+void Ter_GetEnclosingGroundHeight(TGD_TerrainInfo* pCourse, f32* pPos, f32* pLow, f32* pHigh) {
+    TGD_PolygonReference* pRefLow;
+    TGD_PolygonReference* pRefHigh;
     f32 (*pTriLow)[3];
     f32 (*pTriHigh)[3];
 
@@ -1174,8 +1194,9 @@ void Ter_GetEnclosingGroundHeight(CourseInfo* pCourse, f32* pPos, f32* pLow, f32
 // TW06: void Ter_GetEnclosingGroundData(TGD_TerrainInfo*, f32*, f32*, TGD_MaterialInfo**, f32*, f32*,
 // TGD_MaterialInfo**, f32*). The ground just below and just above a point: heights,
 // surfaces and upward normals (TER_NO_GROUND and NULL for none).
-void Ter_GetEnclosingGroundData(CourseInfo* pCourse, f32* pPos, f32* pLow, SurfaceType** ppSurfaceLow,
-                                f32* pNormalLow, f32* pHigh, SurfaceType** ppSurfaceHigh, f32* pNormalHigh) {
+void Ter_GetEnclosingGroundData(TGD_TerrainInfo* pCourse, f32* pPos, f32* pLow,
+                                TGD_MaterialInfo** ppSurfaceLow, f32* pNormalLow, f32* pHigh,
+                                TGD_MaterialInfo** ppSurfaceHigh, f32* pNormalHigh) {
     f32 vA[4];
     f32 vB[4];
     f32 vC[4];
@@ -1183,8 +1204,8 @@ void Ter_GetEnclosingGroundData(CourseInfo* pCourse, f32* pPos, f32* pLow, Surfa
     f32 vBC[4];
     f32 vAB2[4];
     f32 vBC2[4];
-    TerPolyRef* pRefLow;
-    TerPolyRef* pRefHigh;
+    TGD_PolygonReference* pRefLow;
+    TGD_PolygonReference* pRefHigh;
     f32 (*pTriLow)[3];
     f32 (*pTriHigh)[3];
 
@@ -1225,14 +1246,15 @@ void Ter_GetEnclosingGroundData(CourseInfo* pCourse, f32* pPos, f32* pLow, Surfa
 // TW06: f32 Ter_GetSupportingWorldData(TGD_TerrainInfo*, f32*, TGD_MaterialInfo**, f32*). The
 // height of whatever supports a point (objects included), with its surface and upward normal;
 // TER_NO_GROUND and no surface when there is none.
-f32 Ter_GetSupportingWorldData(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurface, f32* pNormal) {
+f32 Ter_GetSupportingWorldData(TGD_TerrainInfo* pCourse, f32* pPos, TGD_MaterialInfo** ppSurface,
+                               f32* pNormal) {
     f32 vA[4];
     f32 vB[4];
     f32 vC[4];
     f32 vAB[4];
     f32 vBC[4];
-    TerCell* pCell;
-    TerPolyRef* pRef;
+    TGD_Cell* pCell;
+    TGD_PolygonReference* pRef;
     f32 (*pTri)[3];
     f32 fHeight;
 
@@ -1258,13 +1280,14 @@ f32 Ter_GetSupportingWorldData(CourseInfo* pCourse, f32* pPos, SurfaceType** ppS
 // TW06: u32 Ter_GetTerrainLayers(TGD_TerrainInfo*, f32*, TGD_MaterialInfo**, f32*, u32). Every
 // ground triangle over or under a point (x, z), up to nMax: their heights and surfaces, in the
 // order found. Returns how many.
-u32 Ter_GetTerrainLayers(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurfaces, f32* pHeights, u32 nMax) {
+u32 Ter_GetTerrainLayers(TGD_TerrainInfo* pCourse, f32* pPos, TGD_MaterialInfo** ppSurfaces, f32* pHeights,
+                         u32 nMax) {
     u32 uPinSet = 1 << Game_CurrentPinSet();
     u32 nFound = 0;
     int nX = (int)Ter_Floor((pPos[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
     int nZ = (int)Ter_Floor((pPos[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
-    TerCell* pCell;
-    TerPolyRef* pRef;
+    TGD_Cell* pCell;
+    TGD_PolygonReference* pRef;
     f32 (*pVert)[3];
     u8* pFlags;
     int i;
@@ -1275,18 +1298,19 @@ u32 Ter_GetTerrainLayers(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurface
 
     if (nX >= 0 && nX < pCourse->nGridWidth && nZ >= 0 && nZ < pCourse->nGridLength) {
         pCell = &pCourse->pGrid[nX + nZ * pCourse->nGridWidth];
-        pRef = &pCourse->pPolyRefs[pCell->uRefs >> 12];
-        for (i = (pCell->uRefs & 0xFFF) - 1; i >= 0; i--) {
-            if (pRef->n2 != 0) {
+        pRef = &pCourse->pPolyRefs[pCell->uRefs >> CELL_REFS_FIRST_SHIFT];
+        for (i = (pCell->uRefs & CELL_REFS_COUNT_MASK) - 1; i >= 0; i--) {
+            if (pRef->nObject != 0) {
                 pRef++;
-            } else if (pRef->u4 != 0
-                       && (!(pRef->u4 & uPinSet) || ((pRef->u4 & 0x10) && gSession.nSplitScreen))) {
+            } else if (pRef->uFlags != 0
+                       && (!(pRef->uFlags & uPinSet)
+                           || ((pRef->uFlags & POLYREF_NOT_IN_SPLIT_SCREEN) && gSession.nSplitScreen))) {
                 pRef++;
             } else {
                 pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
                 pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
                 for (j = pRef->nTris - 1; j >= 0; j--) {
-                    if ((pFlags[2] & 7)
+                    if ((pFlags[2] & TER_TRI_KICK_MASK)
                         && Ter_PointInTriangleXZpY(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
                         Ter_GetBarycentricCoords(pVert, pPos, &fA, &fB, &fC);
                         pHeights[nFound] = fA * pVert[0][1] + fB * pVert[1][1] + fC * pVert[2][1];
@@ -1307,10 +1331,10 @@ u32 Ter_GetTerrainLayers(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurface
 
 // Mark in gTerObjectMarks the objects of grid cell (nX, nZ) that the line from pFrom along pDir
 // passes within fRange of (entry 0 is always marked).
-void Ter_MarkObjectsNearLine(CourseInfo* pCourse, f32* pFrom, f32* pDir, int nX, int nZ, f32 fRange) {
+void Ter_MarkObjectsNearLine(TGD_TerrainInfo* pCourse, f32* pFrom, f32* pDir, int nX, int nZ, f32 fRange) {
     int i;
     u16* pRefs;
-    TerCell* pCell;
+    TGD_Cell* pCell;
     TerObject* pObj;
 
     gTerObjectMarks[0] = 1;
@@ -1354,8 +1378,9 @@ u8 Ter_LineSphereIntersection(f32* pFrom, f32* pDir, f32 fRange, f32* pCentre, f
 // flagstick of the current hole: a vertical cylinder of one inch radius, 2 yards tall, at the pin.
 // Not for nobody's ball, nor when the player's view has the flagstick out (bFlagOut). On
 // a hit: the point, the stick's outward normal and surface 90 (the cup).
-u8 Ter_CheckForPinCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
-                            SurfaceType** ppSurface, TerObject** ppObj) {
+u8 Ter_CheckForPinCollision(TGD_TerrainInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit,
+                            f32* pNormal,
+                            TGD_MaterialInfo** ppSurface, TerObject** ppObj) {
     f32 vDelta[4];
     f32 vFlat[4];
     f32 vFrom[4];
@@ -1427,8 +1452,9 @@ u8 Ter_CheckForPinCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* p
 // hits: the pin, the ground or an object. Walks the grid cells the line crosses, testing each
 // cell's triangles (Ter_CheckForWorldCollisionOneGrid) and keeping the hit nearest pFrom. The
 // normal is turned to face the line.
-u8 Ter_CheckForWorldCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
-               SurfaceType** ppSurface, TerObject** ppObj, u8* pbFlags) {
+u8 Ter_CheckForWorldCollision(TGD_TerrainInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit,
+                              f32* pNormal,
+               TGD_MaterialInfo** ppSurface, TerObject** ppObj, u8* pbFlags) {
     int nEndX;
     int nEndZ;
     f32 vHit[4];
@@ -1440,7 +1466,7 @@ u8 Ter_CheckForWorldCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32*
     f32 vDelta[2];
     f32 vStart[2];
     f32 vEdge[2];
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
     TerObject* pObj;
     f32 fBest = 1000000.0f;
     int nMajor;
@@ -1560,16 +1586,17 @@ u8 Ter_CheckForWorldCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32*
 // for the cell's height test): the point, normal, surface, the object it belongs to (NULL for the
 // ground) and, when pbFlags is given, the triangle's flag bits. Only the objects marked in
 // gTerObjectMarks are tested.
-u8 Ter_CheckForWorldCollisionOneGrid(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir,
+u8 Ter_CheckForWorldCollisionOneGrid(TGD_TerrainInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo,
+                                     f32* pDir,
                                      f32 fMax, f32* pHit,
-               f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj, u8* pbFlags) {
+               f32* pNormal, TGD_MaterialInfo** ppSurface, TerObject** ppObj, u8* pbFlags) {
     f32 vHit[4];
     f32 vNormal[4];
     f32 fT;
     u8 bHit = 0;
     u32 uPinSet = 1 << Game_CurrentPinSet();
-    TerCell* pCell;
-    TerPolyRef* pRef;
+    TGD_Cell* pCell;
+    TGD_PolygonReference* pRef;
     f32 (*pVert)[3];
     u8* pFlags;
     int i;
@@ -1588,27 +1615,29 @@ u8 Ter_CheckForWorldCollisionOneGrid(CourseInfo* pCourse, int nX, int nZ, f32* p
             fLow = pTo[1];
         }
         if (fLow > (f32)pCell->nMaxHeight || fHigh < (f32)pCell->nMinHeight) return 0;
-        pRef = &pCourse->pPolyRefs[pCell->uRefs >> 12];
-        for (i = (pCell->uRefs & 0xFFF) - 1; i >= 0; i--) {
-            if (pRef->u4 != 0 && (!(pRef->u4 & uPinSet) || ((pRef->u4 & 0x10) && gSession.nSplitScreen))) {
+        pRef = &pCourse->pPolyRefs[pCell->uRefs >> CELL_REFS_FIRST_SHIFT];
+        for (i = (pCell->uRefs & CELL_REFS_COUNT_MASK) - 1; i >= 0; i--) {
+            if (pRef->uFlags != 0
+                && (!(pRef->uFlags & uPinSet)
+                    || ((pRef->uFlags & POLYREF_NOT_IN_SPLIT_SCREEN) && gSession.nSplitScreen))) {
                 pRef++;
-            } else if (gTerObjectMarks[pRef->n2] == 0) {
+            } else if (gTerObjectMarks[pRef->nObject] == 0) {
                 pRef++;
             } else {
                 pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
                 pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
                 for (j = pRef->nTris - 1; j >= 0; j--) {
-                    if ((pFlags[2] & 7)
+                    if ((pFlags[2] & TER_TRI_KICK_MASK)
                         && Ter_LineTriangleIntersection(pFrom, pDir, fMax, pVert, &fT, vHit, vNormal)) {
                         fMax = fT;
                         LLMath_CopyVec(vHit, pHit);
                         LLMath_CopyVec(vNormal, pNormal);
                         if (pbFlags != NULL) {
-                            *pbFlags = pFlags[2] & 7;
+                            *pbFlags = pFlags[2] & TER_TRI_KICK_MASK;
                         }
                         *ppSurface = &gSurfaceTypes[pRef->nSurface];
-                        if (pRef->n2 != 0) {
-                            *ppObj = &pCourse->pObjects[pRef->n2];
+                        if (pRef->nObject != 0) {
+                            *ppObj = &pCourse->pObjects[pRef->nObject];
                         } else {
                             *ppObj = NULL;
                         }
@@ -1628,9 +1657,9 @@ u8 Ter_CheckForWorldCollisionOneGrid(CourseInfo* pCourse, int nX, int nZ, f32* p
 // TW06: bool Ter_CheckForSolidWorldCollision(...), the same parameters without the flags. As
 // Ter_CheckForWorldCollision, but a ball passes through branches and leaves
 // (Ter_CheckForSolidWorldCollisionOneGrid).
-u8 Ter_CheckForSolidWorldCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit,
+u8 Ter_CheckForSolidWorldCollision(TGD_TerrainInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit,
                                    f32* pNormal,
-               SurfaceType** ppSurface, TerObject** ppObj) {
+               TGD_MaterialInfo** ppSurface, TerObject** ppObj) {
     int nEndX;
     int nEndZ;
     f32 vHit[4];
@@ -1642,7 +1671,7 @@ u8 Ter_CheckForSolidWorldCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom,
     f32 vDelta[2];
     f32 vStart[2];
     f32 vEdge[2];
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
     TerObject* pObj;
     f32 fBest = 1000000.0f;
     int nMajor;
@@ -1759,16 +1788,16 @@ u8 Ter_CheckForSolidWorldCollision(CourseInfo* pCourse, int nPlayer, f32* pFrom,
 // TW06: bool Ter_CheckForSolidWorldCollisionOneGrid(...), the same parameters without the flags.
 // As Ter_CheckForWorldCollisionOneGrid, but surfaces with a negative bounce (branches and leaves,
 // which a ball passes through) do not count.
-u8 Ter_CheckForSolidWorldCollisionOneGrid(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo,
+u8 Ter_CheckForSolidWorldCollisionOneGrid(TGD_TerrainInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo,
                                           f32* pDir, f32 fMax, f32* pHit,
-               f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj) {
+               f32* pNormal, TGD_MaterialInfo** ppSurface, TerObject** ppObj) {
     f32 vHit[4];
     f32 vNormal[4];
     f32 fT;
     u8 bHit = 0;
     u32 uPinSet = 1 << Game_CurrentPinSet();
-    TerCell* pCell;
-    TerPolyRef* pRef;
+    TGD_Cell* pCell;
+    TGD_PolygonReference* pRef;
     f32 (*pVert)[3];
     u8* pFlags;
     int i;
@@ -1787,11 +1816,13 @@ u8 Ter_CheckForSolidWorldCollisionOneGrid(CourseInfo* pCourse, int nX, int nZ, f
             fLow = pTo[1];
         }
         if (fLow > (f32)pCell->nMaxHeight || fHigh < (f32)pCell->nMinHeight) return 0;
-        pRef = &pCourse->pPolyRefs[pCell->uRefs >> 12];
-        for (i = (pCell->uRefs & 0xFFF) - 1; i >= 0; i--) {
-            if (pRef->u4 != 0 && (!(pRef->u4 & uPinSet) || ((pRef->u4 & 0x10) && gSession.nSplitScreen))) {
+        pRef = &pCourse->pPolyRefs[pCell->uRefs >> CELL_REFS_FIRST_SHIFT];
+        for (i = (pCell->uRefs & CELL_REFS_COUNT_MASK) - 1; i >= 0; i--) {
+            if (pRef->uFlags != 0
+                && (!(pRef->uFlags & uPinSet)
+                    || ((pRef->uFlags & POLYREF_NOT_IN_SPLIT_SCREEN) && gSession.nSplitScreen))) {
                 pRef++;
-            } else if (gTerObjectMarks[pRef->n2] == 0) {
+            } else if (gTerObjectMarks[pRef->nObject] == 0) {
                 pRef++;
             } else if (gSurfaceTypes[pRef->nSurface].f0C < 0.0f) {
                 pRef++;
@@ -1799,14 +1830,14 @@ u8 Ter_CheckForSolidWorldCollisionOneGrid(CourseInfo* pCourse, int nX, int nZ, f
                 pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
                 pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
                 for (j = pRef->nTris - 1; j >= 0; j--) {
-                    if ((pFlags[2] & 7)
+                    if ((pFlags[2] & TER_TRI_KICK_MASK)
                         && Ter_LineTriangleIntersection(pFrom, pDir, fMax, pVert, &fT, vHit, vNormal)) {
                         fMax = fT;
                         LLMath_CopyVec(vHit, pHit);
                         LLMath_CopyVec(vNormal, pNormal);
                         *ppSurface = &gSurfaceTypes[pRef->nSurface];
-                        if (pRef->n2 != 0) {
-                            *ppObj = &pCourse->pObjects[pRef->n2];
+                        if (pRef->nObject != 0) {
+                            *ppObj = &pCourse->pObjects[pRef->nObject];
                         } else {
                             *ppObj = NULL;
                         }
@@ -1825,8 +1856,8 @@ u8 Ter_CheckForSolidWorldCollisionOneGrid(CourseInfo* pCourse, int nX, int nZ, f
 // TW06: bool Ter_CheckForGroundCollision(TGD_TerrainInfo*, f32*, f32*, f32[4]*, f32[4]*,
 // TGD_MaterialInfo**, TGD_ObjectInstanceInfo**). The first ground the line from pFrom to pTo hits
 // (Ter_CheckForGroundCollisionOneGrid per cell); no pin and no objects.
-u8 Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
-                               SurfaceType** ppSurface, TerObject** ppObj) {
+u8 Ter_CheckForGroundCollision(TGD_TerrainInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
+                               TGD_MaterialInfo** ppSurface, TerObject** ppObj) {
     int nEndX;
     int nEndZ;
     f32 vHit[4];
@@ -1838,7 +1869,7 @@ u8 Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* p
     f32 vDelta[2];
     f32 vStart[2];
     f32 vEdge[2];
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
     TerObject* pObj;
     f32 fBest = 1000000.0f;
     int nMajor;
@@ -1950,16 +1981,17 @@ u8 Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* p
 
 // TW06: bool Ter_CheckForGroundCollisionOneGrid(...). As Ter_CheckForSolidWorldCollisionOneGrid,
 // the ground only (no objects).
-u8 Ter_CheckForGroundCollisionOneGrid(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir,
+u8 Ter_CheckForGroundCollisionOneGrid(TGD_TerrainInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo,
+                                      f32* pDir,
                                       f32 fMax, f32* pHit,
-               f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj) {
+               f32* pNormal, TGD_MaterialInfo** ppSurface, TerObject** ppObj) {
     f32 vHit[4];
     f32 vNormal[4];
     f32 fT;
     u8 bHit = 0;
     u32 uPinSet = 1 << Game_CurrentPinSet();
-    TerCell* pCell;
-    TerPolyRef* pRef;
+    TGD_Cell* pCell;
+    TGD_PolygonReference* pRef;
     f32 (*pVert)[3];
     u8* pFlags;
     int i;
@@ -1978,25 +2010,26 @@ u8 Ter_CheckForGroundCollisionOneGrid(CourseInfo* pCourse, int nX, int nZ, f32* 
             fLow = pTo[1];
         }
         if (fLow > (f32)pCell->nMaxHeight || fHigh < (f32)pCell->nMinHeight) return 0;
-        pRef = &pCourse->pPolyRefs[pCell->uRefs >> 12];
-        for (i = (pCell->uRefs & 0xFFF) - 1; i >= 0; i--) {
-            if (pRef->n2 != 0) {
+        pRef = &pCourse->pPolyRefs[pCell->uRefs >> CELL_REFS_FIRST_SHIFT];
+        for (i = (pCell->uRefs & CELL_REFS_COUNT_MASK) - 1; i >= 0; i--) {
+            if (pRef->nObject != 0) {
                 pRef++;
-            } else if (pRef->u4 != 0
-                       && (!(pRef->u4 & uPinSet) || ((pRef->u4 & 0x10) && gSession.nSplitScreen))) {
+            } else if (pRef->uFlags != 0
+                       && (!(pRef->uFlags & uPinSet)
+                           || ((pRef->uFlags & POLYREF_NOT_IN_SPLIT_SCREEN) && gSession.nSplitScreen))) {
                 pRef++;
             } else {
                 pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
                 pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
                 for (j = pRef->nTris - 1; j >= 0; j--) {
-                    if ((pFlags[2] & 7)
+                    if ((pFlags[2] & TER_TRI_KICK_MASK)
                         && Ter_LineTriangleIntersection(pFrom, pDir, fMax, pVert, &fT, vHit, vNormal)) {
                         fMax = fT;
                         LLMath_CopyVec(vHit, pHit);
                         LLMath_CopyVec(vNormal, pNormal);
                         *ppSurface = &gSurfaceTypes[pRef->nSurface];
-                        if (pRef->n2 != 0) {
-                            *ppObj = &pCourse->pObjects[pRef->n2];
+                        if (pRef->nObject != 0) {
+                            *ppObj = &pCourse->pObjects[pRef->nObject];
                         } else {
                             *ppObj = NULL;
                         }
@@ -2014,8 +2047,8 @@ u8 Ter_CheckForGroundCollisionOneGrid(CourseInfo* pCourse, int nX, int nZ, f32* 
 }
 // TW06: bool Ter_CheckForObjectCollision(...), the same parameters. The first object the line hits
 // (Ter_CheckForObjectCollisionOneGrid per cell).
-u8 Ter_CheckForObjectCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
-                               SurfaceType** ppSurface,
+u8 Ter_CheckForObjectCollision(TGD_TerrainInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
+                               TGD_MaterialInfo** ppSurface,
                TerObject** ppObj) {
     int nEndX;
     int nEndZ;
@@ -2028,7 +2061,7 @@ u8 Ter_CheckForObjectCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* p
     f32 vDelta[2];
     f32 vStart[2];
     f32 vEdge[2];
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
     TerObject* pObj;
     f32 fBest = 1000000.0f;
     int nMajor;
@@ -2140,16 +2173,17 @@ u8 Ter_CheckForObjectCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* p
 
 // TW06: bool Ter_CheckForObjectCollisionOneGrid(...). As Ter_CheckForSolidWorldCollisionOneGrid,
 // objects only, plus ground whose surface has flag 0x80.
-u8 Ter_CheckForObjectCollisionOneGrid(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir,
+u8 Ter_CheckForObjectCollisionOneGrid(TGD_TerrainInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo,
+                                      f32* pDir,
                                       f32 fMax, f32* pHit,
-               f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj) {
+               f32* pNormal, TGD_MaterialInfo** ppSurface, TerObject** ppObj) {
     f32 vHit[4];
     f32 vNormal[4];
     f32 fT;
     u8 bHit = 0;
     u32 uPinSet = 1 << Game_CurrentPinSet();
-    TerCell* pCell;
-    TerPolyRef* pRef;
+    TGD_Cell* pCell;
+    TGD_PolygonReference* pRef;
     f32 (*pVert)[3];
     u8* pFlags;
     int i;
@@ -2168,25 +2202,26 @@ u8 Ter_CheckForObjectCollisionOneGrid(CourseInfo* pCourse, int nX, int nZ, f32* 
             fLow = pTo[1];
         }
         if (fLow > (f32)pCell->nMaxHeight || fHigh < (f32)pCell->nMinHeight) return 0;
-        pRef = &pCourse->pPolyRefs[pCell->uRefs >> 12];
-        for (i = (pCell->uRefs & 0xFFF) - 1; i >= 0; i--) {
-            if (pRef->n2 == 0 && !(gSurfaceTypes[pRef->nSurface].u34 & 0x80)) {
+        pRef = &pCourse->pPolyRefs[pCell->uRefs >> CELL_REFS_FIRST_SHIFT];
+        for (i = (pCell->uRefs & CELL_REFS_COUNT_MASK) - 1; i >= 0; i--) {
+            if (pRef->nObject == 0 && !(gSurfaceTypes[pRef->nSurface].uFlags & 0x80)) {
                 pRef++;
-            } else if (pRef->u4 != 0
-                       && (!(pRef->u4 & uPinSet) || ((pRef->u4 & 0x10) && gSession.nSplitScreen))) {
+            } else if (pRef->uFlags != 0
+                       && (!(pRef->uFlags & uPinSet)
+                           || ((pRef->uFlags & POLYREF_NOT_IN_SPLIT_SCREEN) && gSession.nSplitScreen))) {
                 pRef++;
             } else {
                 pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
                 pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
                 for (j = pRef->nTris - 1; j >= 0; j--) {
-                    if ((pFlags[2] & 7)
+                    if ((pFlags[2] & TER_TRI_KICK_MASK)
                         && Ter_LineTriangleIntersection(pFrom, pDir, fMax, pVert, &fT, vHit, vNormal)) {
                         fMax = fT;
                         LLMath_CopyVec(vHit, pHit);
                         LLMath_CopyVec(vNormal, pNormal);
                         *ppSurface = &gSurfaceTypes[pRef->nSurface];
-                        if (pRef->n2 != 0) {
-                            *ppObj = &pCourse->pObjects[pRef->n2];
+                        if (pRef->nObject != 0) {
+                            *ppObj = &pCourse->pObjects[pRef->nObject];
                         } else {
                             *ppObj = NULL;
                         }
@@ -2205,13 +2240,13 @@ u8 Ter_CheckForObjectCollisionOneGrid(CourseInfo* pCourse, int nX, int nZ, f32* 
 // Mark the highest and lowest corner of every ground triangle whose flags are not 0 in those
 // flags (bits 4-5 and 6-7), using bit 3 to do each triangle once, then clear bit 3 again. TW06 has
 // the two halves as Ter_ComputeHighestPointInEveryTriangle and Ter_ClearVertexProcessedBit.
-void Ter_ComputeHighestPointInEveryTriangle(CourseInfo* pCourse) {
+void Ter_ComputeHighestPointInEveryTriangle(TGD_TerrainInfo* pCourse) {
     u8 uFlags;
     f32 (*pVert)[3];
     u32 i;
     u32 j;
     u8* pFlags;
-    TerPolyRef* pRef;
+    TGD_PolygonReference* pRef;
     u8 nHigh;
     u8 nLow;
 
@@ -2223,7 +2258,7 @@ void Ter_ComputeHighestPointInEveryTriangle(CourseInfo* pCourse) {
         j = pRef->nTris;
         while (j != 0) {
             uFlags = pFlags[2];
-            if (!(uFlags & 8) && uFlags != 0) {
+            if (!(uFlags & TER_TRI_DONE) && uFlags != 0) {
                 if (pVert[0][1] > pVert[1][1]) {
                     if (pVert[0][1] > pVert[2][1]) {
                         nHigh = 0;
@@ -2246,7 +2281,8 @@ void Ter_ComputeHighestPointInEveryTriangle(CourseInfo* pCourse) {
                 } else {
                     nLow = 2;
                 }
-                pFlags[2] = uFlags | (nHigh << 4) | (nLow << 6) | 8;
+                pFlags[2] = uFlags | (nHigh << TER_TRI_HIGHEST_SHIFT) | (nLow << TER_TRI_LOWEST_SHIFT)
+                        | TER_TRI_DONE;
             }
             j--;
             pFlags++;
@@ -2264,7 +2300,7 @@ void Ter_ComputeHighestPointInEveryTriangle(CourseInfo* pCourse) {
         pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
         j = pRef->nTris;
         while (j != 0) {
-            pFlags[2] &= 0xF7;
+            pFlags[2] &= (u8)~TER_TRI_DONE;
             j--;
             pFlags++;
             pVert++;
@@ -2389,11 +2425,11 @@ int TerCollision_GetMeshFlags(UObjMesh* pModel, int n) {
 
 // TW06: s32 MaterialTypes::getMaterialID(const TGD_MaterialInfo*). A surface's row in
 // gSurfaceTypes, or -1.
-s32 MaterialTypes_getMaterialID(SurfaceType* pSurface) {
+s32 MaterialTypes_getMaterialID(TGD_MaterialInfo* pSurface) {
     s32 n;
 
     if (pSurface == NULL) return -1;
-    n = ((u8*)pSurface - (u8*)gSurfaceTypes) / sizeof(SurfaceType);
+    n = ((u8*)pSurface - (u8*)gSurfaceTypes) / sizeof(TGD_MaterialInfo);
     if (n < 0 || n >= NUM_SURFACE_TYPES) return -1;
     return n;
 }

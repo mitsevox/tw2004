@@ -1,7 +1,7 @@
 // gomainloop.c (TW06's gomainloop.c, golf/mainloop/gomainloop.c; GO_vInitIG): the game's main
 // loop: starting up and shutting down every system, the frame update and the render passes.
-// gSession.nGameType picks the loop's work: 1 the start-up screens, 3 the front end, 6 a round,
-// 13 leaving the game.
+// gSession.nGameType picks the loop's work: the start-up screens, the front end, a round, or
+// leaving the game (GAME_MODE_e).
 
 #include "game.h"
 #include "psmgr.h"
@@ -204,7 +204,6 @@ void SitDev_ThrowBallHitDelayedEvent(void);
 void BreakLine_InitModule(void);
 void BreakLine_CloseModule(void);
 void AnimStream_Update(void);
-u8   GM_GetCurrentHoleSplitScreenLowDetail(void);
 void GameEffects_InitGameEffectSettings(void);
 f32  GameEffects_AdjustTimeRate(f32 fFrameTime);
 void GameEffects_RenderGameBreakerEffects(void);
@@ -339,7 +338,7 @@ void fn_8006C63C(void) {
 void fn_8006C69C(void) {
     fn_8006DC40(lbl_80281B88 & 1);
     fn_800162A4(lbl_80281B88 & 1);
-    if (gSession.nGameType != 1) {
+    if (gSession.nGameType != GAMESTATE_STARTUP) {
         CharacterRender_SetCurrentBuffer(lbl_80281B88 & 1);
     }
 }
@@ -460,7 +459,8 @@ void fn_8006C8EC(int nView) {
     RC_vSetCurrentRenderCtx(ViewController_GetRenderContext(nView));
     fn_8006DC78();
     RC_ApplyCurrentViewport();
-    if (nView < 2 && !CameraController_bDontClearFrameBuffer() && gSession.nGameType == 6) {
+    if (nView < 2 && !CameraController_bDontClearFrameBuffer() && gSession.nGameType
+        == GAMESTATE_IG_PLAY_HOLE) {
         fn_8006DC4C(3);
         return;
     }
@@ -736,33 +736,34 @@ void fn_8006CFC8(void) {
 static u8 GO_bMainLoopDone(void) {
     u8 bDone = 0;
 
-    if (gSession.nGameType == 6 && (gSession.bEndLoop || gSession.nC == 2)) {
+    if (gSession.nGameType == GAMESTATE_IG_PLAY_HOLE && (gSession.bEndLoop || gSession.nC == 2)) {
         bDone = 1;
         gSession.bEndLoop = 0;
-    } else if (gSession.nGameType == 6 && fn_8006DC34()) {
+    } else if (gSession.nGameType == GAMESTATE_IG_PLAY_HOLE && fn_8006DC34()) {
         bDone = 1;
-    } else if (gSession.nGameType == 6 && !gSession.bDemo && (gSession.uFlags & 0x4000)) {
+    } else if (gSession.nGameType == GAMESTATE_IG_PLAY_HOLE && !gSession.bDemo
+               && (gSession.uFlags & 0x4000)) {
         if (Input_AnyPadPressed(0)) {
             fn_8009A16C();
         }
         if (fn_8009A180()) {
             bDone = 1;
         }
-    } else if (gSession.nGameType == 6 && gSession.bDemo) {
+    } else if (gSession.nGameType == GAMESTATE_IG_PLAY_HOLE && gSession.bDemo) {
         if (Input_AnyPadPressed(0)) {
             bDone = 1;
         }
         if ((gSession.uFlags & 0x4000) && fn_8009A180()) {
             bDone = 1;
         }
-    } else if (gSession.nGameType == 3) {
+    } else if (gSession.nGameType == GAMESTATE_FE_RUN) {
         if (gSession.nC == 2) {
             bDone = 1;
         }
         if (UI_IsClosed()) {
             bDone = 1;
         }
-    } else if (gSession.nGameType == 1 && (gSession.bEndLoop || gSession.nC == 2)) {
+    } else if (gSession.nGameType == GAMESTATE_STARTUP && (gSession.bEndLoop || gSession.nC == 2)) {
         fn_800BA74C(1);
         bDone = 1;
         gSession.bEndLoop = 0;
@@ -1008,7 +1009,7 @@ void fn_8006D8E8(void) {
     while (!GO_bMainLoopDone()) {
         fn_80110390();
         DiscError_WaitForDrive();
-        if (gSession.nGameType == 6) {
+        if (gSession.nGameType == GAMESTATE_IG_PLAY_HOLE) {
             Character_ResetTimeScalesOnCombo();
         }
         fn_8006C69C();
@@ -1022,15 +1023,15 @@ void fn_8006D8E8(void) {
         }
         TI_sReadCounter(TI_COUNTER_REALTIME);
         Input_vUpdate();
-        if (gSession.nGameType == 6) {
+        if (gSession.nGameType == GAMESTATE_IG_PLAY_HOLE) {
             GM_CheckControllerPulled();
         }
         UI_SendPendingMessages();
         gSession.fFrameTime = GameEffects_AdjustTimeRate(gSession.fFrameTime);
-        if (gSession.nGameType != 1 && GolfCamera_IsFreezeTimeActive()) {
+        if (gSession.nGameType != GAMESTATE_STARTUP && GolfCamera_IsFreezeTimeActive()) {
             gSession.fFrameTime = 0.0f;
         }
-        if (gSession.nGameType != 1) {
+        if (gSession.nGameType != GAMESTATE_STARTUP) {
             gSession.n20 += (u32)(16.0f * (FRAME_RATE * gSession.fFrameTime));
             uLast = uNow;
             gSession.nFrameCount = (u32)gSession.n20 >> 4;
@@ -1042,18 +1043,18 @@ void fn_8006D8E8(void) {
         }
         fn_800080D0();
         Gaud_Cycle();
-        if (gSession.nGameType != 1) {
+        if (gSession.nGameType != GAMESTATE_STARTUP) {
             fn_80095550();
         }
-        if (gSession.nGameType == 6) {
+        if (gSession.nGameType == GAMESTATE_IG_PLAY_HOLE) {
             CharacterTex_TextureLoader();
         }
-        if (gSession.nGameType == 1) {
+        if (gSession.nGameType == GAMESTATE_STARTUP) {
             Startup_Update();
         } else {
             STATEMAIN_Update();
         }
-        if (gSession.nGameType != 1) {
+        if (gSession.nGameType != GAMESTATE_STARTUP) {
             GM_Update();
         }
         AnimStream_Update();
@@ -1062,28 +1063,28 @@ void fn_8006D8E8(void) {
         fn_8006C968();
         fn_8006DC78();
         RC_ApplyCurrentViewport();
-        if (gSession.nGameType != 3) {
+        if (gSession.nGameType != GAMESTATE_FE_RUN) {
             lbl_80281E50 = 0;
         }
         switch (gSession.nGameType) {
-        case 3:
+        case GAMESTATE_FE_RUN:
             fn_8006D838();
             fn_80124C10();
             lbl_80281E50 = 1;
             break;
-        case 6:
+        case GAMESTATE_IG_PLAY_HOLE:
             fn_8006D27C();
             SitDev_ThrowBallHitDelayedEvent();
             SitDev_ProcessEventQueue();
             break;
-        case 1:
+        case GAMESTATE_STARTUP:
             fn_8006D7E8();
             break;
         }
         fn_80008380();
         fn_80006FE8();
-        if (gSession.nGameType != 1) {
-            if (gSession.nGameType != 3) {
+        if (gSession.nGameType != GAMESTATE_STARTUP) {
+            if (gSession.nGameType != GAMESTATE_FE_RUN) {
                 Character_UpdateClothesIG();
             } else {
                 Character_UpdateClothesFE();
@@ -1095,11 +1096,11 @@ void fn_8006D8E8(void) {
         Pict_AfterFree();
         fn_80007260();
         Gaud_Monitor();
-        if (!gSession.nSplitScreen && gSession.nGameType != 1) {
+        if (!gSession.nSplitScreen && gSession.nGameType != GAMESTATE_STARTUP) {
             fn_8006E0F8();
         }
         fn_800083A0();
-        if (gSession.nGameType == 13) {
+        if (gSession.nGameType == GAMESTATE_QUIT) {
             if (gSession.uFlags & 0x1000) {
                 Gaud_ExitFE();
                 fn_8010BF68();
@@ -1111,11 +1112,11 @@ void fn_8006D8E8(void) {
 
 // The frame of the current game type.
 void fn_8006DBD4(void) {
-    if (gSession.nGameType == 1) {
+    if (gSession.nGameType == GAMESTATE_STARTUP) {
         fn_8006D7E8();
         return;
     }
-    if (gSession.nGameType == 6) {
+    if (gSession.nGameType == GAMESTATE_IG_PLAY_HOLE) {
         fn_8006D27C();
         return;
     }

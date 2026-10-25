@@ -191,7 +191,7 @@ void CameraController_Idle(View* pView, int nPlayer) {
         }
         break;
     }
-    if (gPlayers[nPlayer].pChar != NULL && gSession.nGameType != 3) {
+    if (gPlayers[nPlayer].pChar != NULL && gSession.nGameType != GAMESTATE_FE_RUN) {
         for (i = 0; i <= 9; i++) {
             if (Character_IsTagSet(gPlayers[nPlayer].pChar, i + 5)
                 && fn_80062BB0(gPlayers[nPlayer].pChar, i + 5)) {
@@ -573,7 +573,7 @@ void CameraController_PostEvent(View* pView, int nKind, int nPlayer) {
     f32* pAt = CameraController_GetCameraLookPoint(pView);
     f32 vNormal[4];
     f32 vGrey[4] = {0.1f, 0.1f, 0.1f, 0.5f};
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
     CamShot* pShot;
     int nAsked;
 

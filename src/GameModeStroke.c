@@ -63,7 +63,7 @@ s32 GameModeStroke_GetHonors(int nPlayer) {
     int nHigh;
     int n;
     int k;
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     int nPinSet;
     f32 fBest;
     int nBest;

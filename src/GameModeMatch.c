@@ -89,7 +89,7 @@ int GameModeMatch_GetTeeHonors(int nPlayer) {
 // and nobody left to play, 5.
 s32 GameModeMatch_GetHonors(int nPlayer) {
     int i;
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     int nPinSet;
     f32 fBest;
     int nBest;

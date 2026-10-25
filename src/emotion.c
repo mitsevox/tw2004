@@ -405,7 +405,7 @@ void fn_8006B6D0(int nPlayer) {
 
 // Reaction 2: from the surface class under the ball.
 void fn_8006B6F0(int nPlayer) {
-    SurfaceType* pSurface = Ter_GetSupportingGroundMaterial(Ter_GetTGD(), gPlayers[nPlayer].ball.vPos);
+    TGD_MaterialInfo* pSurface = Ter_GetSupportingGroundMaterial(Ter_GetTGD(), gPlayers[nPlayer].ball.vPos);
 
     if (pSurface == NULL) {
         lbl_801D5F78[nPlayer].n0 = 4;
@@ -544,7 +544,7 @@ u8 fn_8006BAD8(int nPlayer, s32* pOut) {
 void fn_8006BB5C(int nPlayer) {
     PlayerEmotion* pEmotion = &lbl_801D5F78[nPlayer];
     Ball* pBall = &gPlayers[nPlayer].ball;
-    CourseInfo* pCourse = Ter_GetTGD();
+    TGD_TerrainInfo* pCourse = Ter_GetTGD();
     f32 vToPin[4];
     f32 aBands[4] = {0.5f, 2.0f, 4.5f, 9.3f};
     f32 vVel[4];

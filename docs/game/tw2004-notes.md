@@ -76,8 +76,8 @@ Culling and the widescreen fix
 `fn_80007D74` is the sphere-against-view-frustum test every drawable goes through, course scenery
 included. It returns 1 (fully visible), 2 (outside), 4 (touching a side) or 8 (touching the near
 limit), with a separate path for a flat, non-perspective camera that only answers 2 or 4. Its
-callers only ask "was it 2?"; `fn_80007B2C` retries a 4 or 8 against a second, looser set of
-planes.
+callers only ask "was it 2?"; `LLObj_GetMeshClipMethod` retries a 4 or 8 against a second, looser
+set of planes.
 
 `RC_vUpdateRenderCtxScreenMatricesAndInfo` builds the planes whenever the view changes: the
 tangent of half the field of view and its reciprocal at `cam+0x224`/`0x228`, the half-extents of

@@ -609,7 +609,7 @@ f32 GameAnalysis_GetEstimatedDistanceToPin(int nPlayer) {
     return GameAnalysis_GetPositionDistanceToPin(gPlayers[nPlayer].ballBefore.vPos);
 }
 
-// The class (SurfaceType.nClass) of the surface under Player.ballBefore (the look-ahead ball), -1
+// The class (TGD_MaterialInfo.nClass) of the surface under Player.ballBefore (the look-ahead ball), -1
 // when it has none.
 int GameAnalysis_GetEstimatedLie(int nPlayer) {
     int nSurface = gPlayers[nPlayer].ballBefore.nSurface;
@@ -631,7 +631,7 @@ f32 GameAnalysis_GetCurrentBallFlightDistance(int nPlayer) {
 // A point's distance from the current pin along the ground; 0 with no hole loaded.
 f32 GameAnalysis_GetPositionDistanceToPin(f32* pPos) {
     f32 vDiff[3];
-    CourseInfo* pCourse = Ter_GetTGD();
+    TGD_TerrainInfo* pCourse = Ter_GetTGD();
     int nPin;
     if (pCourse == NULL) return 0.0f;
     nPin = Game_CurrentPinSet();
@@ -788,7 +788,7 @@ u8 GameAnalysis_LastHoleWasTied(void) {
     return 0;
 }
 
-// The class (SurfaceType.nClass) of the surface the shot started from (Ball.nStartSurface), 0 when
+// The class (TGD_MaterialInfo.nClass) of the surface the shot started from (Ball.nStartSurface), 0 when
 // it has none or is out of range.
 u32 GameAnalysis_GetInitialStartingLie(int nPlayer) {
     if (gPlayers[nPlayer].ball.nStartSurface < 0 ||
@@ -802,7 +802,7 @@ u32 GameAnalysis_GetInitialStartingLie(int nPlayer) {
 // under par or better (bUnder: more than three); without bAnyLie, the ball must also be on the
 // green or in the cup and two under par (bUnder: more).
 u8 GameAnalysis_CurrentShotGIR(int nPlayer, u8 bUnder, u8 bAnyLie) {
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
     int nPar;
     int nStrokes;
     int nLie;

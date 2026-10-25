@@ -57,7 +57,7 @@ u8 PasswordManager_TestPassword(char* szCode) {
             lbl_80281DF4->aCourseUnlocked[i] = 1;
         }
         lbl_80281DF4->aCourseUnlocked[21] = 1;
-        lbl_80281DF4->aCourseUnlocked[22] = 1;
+        lbl_80281DF4->aCourseUnlocked[COURSE_TIGERS_DREAM_18] = 1;
         for (i = 0; i < 18; i++) {
             lbl_80281DF4->aRewardUnlocked[i] = 1;
         }
@@ -70,7 +70,7 @@ u8 PasswordManager_TestPassword(char* szCode) {
             lbl_80281DF4->aCourseUnlocked[i] = 1;
         }
         lbl_80281DF4->aCourseUnlocked[21] = 1;
-        lbl_80281DF4->aCourseUnlocked[22] = 1;
+        lbl_80281DF4->aCourseUnlocked[COURSE_TIGERS_DREAM_18] = 1;
         for (i = 0; i < 18; i++) {
             lbl_80281DF4->aRewardUnlocked[i] = 1;
         }
@@ -179,12 +179,12 @@ void PasswordManager_SetDefaults(void) {
         lbl_80281DF4->aCourseUnlocked[i] = 1;
     }
     lbl_80281DF4->aCourseUnlocked[21] = 1;
-    lbl_80281DF4->aCourseUnlocked[22] = 1;
+    lbl_80281DF4->aCourseUnlocked[COURSE_TIGERS_DREAM_18] = 1;
     for (i = 0; i < 6; i++) {
         lbl_80281DF4->aCourseUnlocked[gStartLockedCourses[i]] = 0;
     }
     lbl_80281DF4->aCourseUnlocked[21] = 1;
-    lbl_80281DF4->aCourseUnlocked[22] = 1;
+    lbl_80281DF4->aCourseUnlocked[COURSE_TIGERS_DREAM_18] = 1;
     for (i = 0; i < 18; i++) {
         lbl_80281DF4->aRewardUnlocked[i] = 0;
     }
@@ -285,7 +285,7 @@ void SaveProfile_InitNew(SaveProfile* pProfile) {
 
     memset(pProfile, 0, sizeof(SaveProfile));
     pProfile->bActive = 0;
-    if (gSession.nGameType == 3) {
+    if (gSession.nGameType == GAMESTATE_FE_RUN) {
         sprintf(pProfile->szName, "User %d", gpFEProfile->nSlot + 1);
     } else {
         strcpy(pProfile->szName, "NoName");
@@ -306,12 +306,12 @@ void SaveProfile_InitNew(SaveProfile* pProfile) {
         pProfile->aCourseUnlocked[i] = 1;
     }
     pProfile->aCourseUnlocked[21] = 1;
-    pProfile->aCourseUnlocked[22] = 1;
+    pProfile->aCourseUnlocked[COURSE_TIGERS_DREAM_18] = 1;
     for (i = 0; i < 6; i++) {
         pProfile->aCourseUnlocked[gStartLockedCourses[i]] = 0;
     }
     pProfile->aCourseUnlocked[21] = 1;
-    pProfile->aCourseUnlocked[22] = 1;
+    pProfile->aCourseUnlocked[COURSE_TIGERS_DREAM_18] = 1;
     for (i = 0; i < 18; i++) {
         pProfile->aRewardUnlocked[i] = 0;
     }

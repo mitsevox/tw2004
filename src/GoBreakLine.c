@@ -46,7 +46,7 @@ void BreakLine_CloseModule(void) {
 
 // Sets the line up for a hole: its settings, a mesh per view, the "brkline" texture and the pin.
 void BreakLine_InitForHole(void) {
-    CourseInfo* pCourse = Ter_GetTGD();
+    TGD_TerrainInfo* pCourse = Ter_GetTGD();
     int nPin = Game_CurrentPinSet();
     s32 desc[2];
     u64 uHash;
@@ -139,7 +139,7 @@ void BreakLine_Render(int nView) {
         DS_vEnableZBufferUpdate(0);
         RenderState_SetBankTexture(gpBreakLine->pBank, gpBreakLine->pTex);
         RenderState_SetDrawFlags(0x70);
-        RenderState_SetClipMode(0);
+        RenderState_SetClipMode(GX_CLIP_ENABLE);
         RenderState_Flush();
         fDist = LLMath_DistanceBetween3(gpBreakLine->aBall[nView].vPos, gpBreakLine->vPin);
         if (gpBreakLine->abA91C[nView]) {
@@ -319,7 +319,7 @@ void BreakLine_Reset(int nView) {
 void BreakLine_GetCaddyTipInfo(int nView, f32* pLong, f32* pSide) {
     int nPlayer = ViewController_GetActivePlayerNumber(nView);
     int nPin = Game_CurrentPinSet();
-    CourseInfo* pCourse = Ter_GetTGD();
+    TGD_TerrainInfo* pCourse = Ter_GetTGD();
     s8 nTip;
     f32 vTip[4];
     f32 vPin[4];

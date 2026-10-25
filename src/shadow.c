@@ -145,8 +145,8 @@ void fn_800B251C_ShadowInit(u8 bHigh) {
     p->n4E4 = 0;
     p->f4E8 = 0.0f;
     p->n4EC = 1;
-    aDesc[0] = 0x800;
-    aDesc[1] = 0x200;
+    aDesc[0] = SHADOW_NUM_VERTS;
+    aDesc[1] = SHADOW_NUM_STRIPS;
     for (i = 0; i < 2; i++) {
         SD_InitShaderObject(p->aMesh[i], 0, aDesc);
     }
@@ -240,7 +240,7 @@ void fn_800B28D4(Character* pChar, int nView, u8 bFlat) {
     f32         fHigh;
     Shadow*     p = lbl_802814A8;
     void*       pOldCamera;
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     f32         fMinX;
     f32         fMinZ;
     f32         fMaxX;
@@ -420,7 +420,7 @@ void fn_800B2DB0(f32* pCentre, f32 (*pQuad)[4], f32 fHalfX, f32 fHalfZ) {
     RenderState_SetDrawFlags(0x70);
     fn_8002A608(&p->tex);
     RenderState_SetCameraMatrices();
-    RenderState_SetClipMode(0);
+    RenderState_SetClipMode(GX_CLIP_ENABLE);
     DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
     DS_vSetZBufferMode(DS_COMPARE_ALWAYS);
     DS_vEnableZBufferUpdate(0);
@@ -444,14 +444,14 @@ void fn_800B2DB0(f32* pCentre, f32 (*pQuad)[4], f32 fHalfX, f32 fHalfZ) {
 // bFlat is set fn_800B2DB0 draws it as a flat quad; otherwise the ground strips under the square
 // become a mesh, each vertex lifted by lbl_802814AC, mapped onto the texture across the square.
 void fn_800B2FB0(Character* pChar, int nView, u8 bFlat) {
-    TerPolyRef    aList[0x200];
+    TGD_PolygonReference aList[SHADOW_NUM_STRIPS];
     f32           aQuad[4][4];
     TrailMeshDesc desc;
     f32           vCentre[4];
     Shadow*       p = lbl_802814A8;
     f32           fHalfX = p->f424;
     f32           fHalfZ = p->f428;
-    CourseInfo*   pCourse;
+    TGD_TerrainInfo*   pCourse;
     f32           fScaleX;
     f32           fScaleZ;
     f32           fRight;
@@ -462,7 +462,7 @@ void fn_800B2FB0(Character* pChar, int nView, u8 bFlat) {
     int           n;
     int           nCount;
     int           i;
-    TerPolyRef*   pRef;
+    TGD_PolygonReference*   pRef;
     int           j;
     int           nVerts;
     int           nStrips;
@@ -508,13 +508,14 @@ void fn_800B2FB0(Character* pChar, int nView, u8 bFlat) {
     if (pCourse == NULL) {
         return;
     }
-    nList = Ter_GetGroundPolyList(pCourse, aQuad[0], aQuad[1], aQuad[2], aQuad[3], aList, 0x200, 0x60);
+    nList = Ter_GetGroundPolyList(pCourse, aQuad[0], aQuad[1], aQuad[2], aQuad[3], aList, SHADOW_NUM_STRIPS,
+                                  MATERIAL_NO_SHADOW);
     RC_vSetCurrentRenderCtxTransformationMatrix(NULL);
     RC_vUpdateCurrentRenderCtxTransformationMatrices();
     RenderState_SetViewport(RC_spGetCurrentRenderCtx());
     RenderState_SetDrawFlags(0x70);
     RenderState_SetCameraMatrices();
-    RenderState_SetClipMode(0);
+    RenderState_SetClipMode(GX_CLIP_ENABLE);
     DS_vSetZBufferMode(DS_COMPARE_LEQUAL);
     RenderState_SetBlendFactors(4, 5);
     DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
@@ -531,7 +532,7 @@ void fn_800B2FB0(Character* pChar, int nView, u8 bFlat) {
     for (i = 0; i < nList; i++) {
         pRef = &aList[i];
         nCount = pRef->nTris + 2;
-        if (nVerts + nCount > 0x800 || nStrips >= 0x200) {
+        if (nVerts + nCount > SHADOW_NUM_VERTS || nStrips >= SHADOW_NUM_STRIPS) {
             continue;
         }
         for (j = 0; j < nCount; j++) {

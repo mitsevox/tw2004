@@ -3,7 +3,7 @@
 // zones), which arrive as 'Cnet' stream objects and are handed to the systems that registered for
 // their type (Network_RegisterLoadNetworkCallback). Also the outline tests (point inside,
 // wn_PnPoly; segment and ray crossings) and, at the end, code of other units: the course data's
-// getter (TW07's GoTerrain_TGD.c), a UObject matrix product and two vector helpers. The file
+// getter (TW07's GoTerrain_TGD.c), a TObject matrix product and two vector helpers. The file
 // starts where the texture code's .bss ends, padded to 0x801A2A00, and its constants start the
 // .sdata2 block after urandom.c's.
 
@@ -36,7 +36,7 @@ static f32 TerrainData_StrippedFn(f32 x) {
 // nodes stored at height 0 on the ground with it.
 f32 Network_GetNodeGroundHeight(const f32* pPos) {
     f32 v[4];
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     f32 fHeight;
 
     v[0] = pPos[0];
@@ -318,13 +318,13 @@ u8 Network_RayNetworkDoesIntersect(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNo
 }
 
 // TW06: Ter_TerrainGameDataMgr::GetTGD.
-CourseInfo* Ter_GetTGD(void) {
+TGD_TerrainInfo* Ter_GetTGD(void) {
     return gTerRenderer.pCourse;
 }
 
-// An object's combined rotation: rows 0..2 of its third matrix (UObject.m80) become its second
-// matrix's rows (m40) times its first (m0), 3x3 parts only (LLMath_mat44fltMultiplyList33); the
-// position row m80[3] is left alone. pMtx is the object's m0.
+// An object's combined rotation: rows 0..2 of its TObject.mObjToWorld become its mScale's rows
+// times its mRotation, 3x3 parts only (LLMath_mat44fltMultiplyList33); the position row
+// mObjToWorld[3] is left alone. pMtx is the object's mRotation.
 void UObject_ComposeRotation(f32 (*pMtx)[4]) {
     LLMath_mat44fltMultiplyList33(pMtx + 4, pMtx, pMtx + 8, 3);
 }

@@ -122,7 +122,7 @@ f32   Character_ComputeMaxVisableDistance(Character* pChar, int bSplitScreen);
 f32   Character_ComputeMaxVisableShadowDistance(Character* pChar, int bSplitScreen);
 void  Character_KeepClubOutOfGround(Character* pChar);
 void  Character_IKLegsToGround(Character* pChar, u8 bRightLeg, u8 bLeftLeg);
-void  Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, int nHip, int nKnee,
+void  Character_IKLegToGround(Character* pChar, TGD_TerrainInfo* pCourse, int nLeg, int nHip, int nKnee,
                               int nAnkle, int nToe, int nAnklePoint, int nToePoint);
 void  Character_CalculateClipPoints(Character* pChar);
 void  Character_SetupForShot(Character* pChar);
@@ -391,9 +391,9 @@ f32 Character_GetTerrainHeightAndNormal(Character* pChar, f32* pPos, f32** ppNor
     f32 vPos[4];
     f32 fSupportingHeight;
     f32 fCoveringHeight;
-    SurfaceType* pSupportingSurface;
-    SurfaceType* pCoveringSurface;
-    CourseInfo* pCourse;
+    TGD_MaterialInfo* pSupportingSurface;
+    TGD_MaterialInfo* pCoveringSurface;
+    TGD_TerrainInfo* pCourse;
 
     if (pChar != NULL) {
         if ((pCourse = Ter_GetTGD()) != NULL) {
@@ -482,7 +482,7 @@ void Character_UpdateTestPoints(Character* pChar) {
 void Character_KeepClubOutOfGround(Character* pChar) {
     f32 vNormal[4];
     f32 (*pMtx)[4];
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     f32 fHeight;
     f32 fUnder;
     f32 fDot;
@@ -752,7 +752,7 @@ static inline f32* fn_800187CC_Read(f32* p) { return p; }
 // with it) and vAvgGroundNormal set to the average ground normal; any other character stands on the ground
 // under its root bone (the ground below it, if the one found is more than 1 above).
 void Character_PlaceFeetOnGround(Character* pChar) {
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     f32 fLowest;
     f32 fY;
     f32 fDelta;
@@ -761,8 +761,8 @@ void Character_PlaceFeetOnGround(Character* pChar) {
     f32 fH;
     f32 fSupportingHeight;
     f32 fCoveringHeight;
-    SurfaceType* pSupportingSurface;
-    SurfaceType* pCoveringSurface;
+    TGD_MaterialInfo* pSupportingSurface;
+    TGD_MaterialInfo* pCoveringSurface;
     f32 vSupportingNormal[4];
     f32 vCoveringNormal[4];
 
@@ -820,7 +820,7 @@ void Character_PlaceFeetOnGround(Character* pChar) {
 // ankle 0x39, toe 0x3A), with bLeftLeg the left (0x44-0x48); the bones they move are then
 // transformed again.
 void Character_IKLegsToGround(Character* pChar, u8 bRightLeg, u8 bLeftLeg) {
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     u32 auBits[4];
 
     if (pChar == NULL) {
@@ -861,7 +861,7 @@ void Character_IKLegsToGround(Character* pChar, u8 bRightLeg, u8 bLeftLeg) {
 // points) so its foot stands on the ground: the knee and hip are turned so the ankle reaches the
 // ground height under the ankle point, then the ankle is tilted towards the ground's slope, more
 // the deeper the foot sat.
-void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, int nHip, int nKnee,
+void Character_IKLegToGround(Character* pChar, TGD_TerrainInfo* pCourse, int nLeg, int nHip, int nKnee,
                              int nAnkle, int nToe, int nAnklePoint, int nToePoint) {
     f32 vOld[4];
     f32 vAnkle[4];
@@ -1048,7 +1048,7 @@ void Character_SetPosition(Character* pChar, f32* pPos, u8 bPlace) {
 // half a turn more in game type 3 (a front-end type; TW07 asks GM_IsFrontEnd here).
 void Character_SetOrientation(Character* pChar, f32 fAngle) {
     if (pChar != NULL) {
-        if (gSession.nGameType == 3 && Character_IsLeftHanded(pChar)) {
+        if (gSession.nGameType == GAMESTATE_FE_RUN && Character_IsLeftHanded(pChar)) {
             fAngle += PI;
         }
         Quat_EulerAngles(0.0f, fAngle, 0.0f, pChar->pModel->pBones->q0C);
@@ -1145,7 +1145,7 @@ Character* Character_Create(void) {
     pChar->apDynTex[0] = NULL;
     pChar->aDynTexSlot[1] = -1;
     pChar->apDynTex[1] = NULL;
-    if (gSession.nGameType == 10 || gSession.nGameType == 3) {
+    if (gSession.nGameType == GAMESTATE_FE_SETUP || gSession.nGameType == GAMESTATE_FE_RUN) {
         pChar->nDynTex = 2;
     } else {
         pChar->nDynTex = 1;
@@ -1244,7 +1244,7 @@ void Character_LoadTextures(Character* pChar, Skin** apSkins, int nSkins) {
     } else {
         pChar->n5C = 0;
     }
-    bAll = gSession.nGameType == 10 || gSession.nGameType == 3;
+    bAll = gSession.nGameType == GAMESTATE_FE_SETUP || gSession.nGameType == GAMESTATE_FE_RUN;
     nTex = nTexBytes / (int)sizeof(TexEntry);
     nPal = nPalBytes / (int)sizeof(TexPalette);
     if (bAll) {
@@ -1518,7 +1518,7 @@ void Character_EndLoadTexturesCallbackIG(Character* pChar) {
 void CharacterTex_Init(void) {
     int i;
 
-    if (gSession.nGameType == 10 || gSession.nGameType == 3) {
+    if (gSession.nGameType == GAMESTATE_FE_SETUP || gSession.nGameType == GAMESTATE_FE_RUN) {
         gCharDynTexPool.nEntries = 2;
     } else {
         gCharDynTexPool.nEntries = 2;
@@ -1812,7 +1812,7 @@ Character* Character_CreateFromMem(u8* pData, int nUnused, int nSet, int nId, u8
     BYTESWAP_SWAPDATA(&pData, (u8*)&f13C, 4, 4);
     BYTESWAP_SWAPDATA(&pData, (u8*)&f12C, 4, 4);
     BYTESWAP_SWAPDATA(&pData, (u8*)&f130, 4, 4);
-    if (gSession.nGameType == 3) {
+    if (gSession.nGameType == GAMESTATE_FE_RUN) {
         ClipBank_Restore(pChar->nSlot);
     }
     pData += 0xC;
@@ -1830,7 +1830,8 @@ Character* Character_CreateFromMem(u8* pData, int nUnused, int nSet, int nId, u8
         pChar->pSkin = SKN_Create(pData, bLook);
         pChar->pSkin->f10D8 = fSkin;
         pChar->pSkin->f10DC = 1.0f;
-        if (gSession.nGameType != 10 && gSession.nGameType != 3 && Character_IsGolfer(pChar)) {
+        if (gSession.nGameType != GAMESTATE_FE_SETUP && gSession.nGameType != GAMESTATE_FE_RUN
+            && Character_IsGolfer(pChar)) {
             SKN_FreeRenderData(pChar->pSkin);
         }
     }
@@ -1855,7 +1856,7 @@ Character* Character_CreateFromMem(u8* pData, int nUnused, int nSet, int nId, u8
     // its model
     BYTESWAP_SWAPDATA(&pData, (u8*)&nSize, 4, 4);
     pData += 0xC;
-    if (bGolfer && gSession.nGameType != 10 && gSession.nGameType != 3) {
+    if (bGolfer && gSession.nGameType != GAMESTATE_FE_SETUP && gSession.nGameType != GAMESTATE_FE_RUN) {
         if (gSession.nSplitScreen) {
             pDefs = &gCharModelDefsSplit;
         } else {
@@ -2204,7 +2205,7 @@ void Character_RenderAll(u32 uFlags) {
 void Character_UpdateAll(f32 fTime) {
     int i;
 
-    if (gSession.nGameType != 6 || !GUI_IsPauseMenuOpen()) {
+    if (gSession.nGameType != GAMESTATE_IG_PLAY_HOLE || !GUI_IsPauseMenuOpen()) {
         for (i = 0; i < gNumCharacters; i++) {
             Character_UpdateAnimation(gCharacters[i], 0, fTime);
         }
@@ -2355,7 +2356,7 @@ void Character_Free(Character* pChar) {
             CharSlider_Free(pChar->pSliderDefs);
         }
         Circular_MemFreeFunc(pChar);
-        if (gSession.nGameType == 3) {
+        if (gSession.nGameType == GAMESTATE_FE_RUN) {
             ClipBank_Release(nSlot);
         }
     }
@@ -2944,7 +2945,7 @@ void SkeletalObject_UnregisterStreamClient(void) {
 void Character_SetClubsAndClothes(Character* pChar, int nSlot) {
     char szName[32];            // the size is not known
 
-    if (gSession.nGameType == 3) {
+    if (gSession.nGameType == GAMESTATE_FE_RUN) {
         if (pChar->nGolferId == 7 || pChar->nGolferId == 29) {
             Character_SetClubStatesForCharacter(pChar, nSlot, &FE_GetCurrentProfile()->choices);
         } else {
@@ -3171,7 +3172,8 @@ void Character_ApplyCrAPSettings(Character* pChar, SkinChoices* pChoices) {
     CharSlider_UpdateCharacterBasedOnSliderValues(pChar->pSliderDefs, pChar->pModel, pChar->pSkin, 26,
                                                   pChoices->a9B4,
                 &pChar->morphBlend);
-    if (gSession.nGameType != 3 || gpCrAPState->nScreenKind == 1 || gpCrAPState->nScreenKind == 4) {
+    if (gSession.nGameType != GAMESTATE_FE_RUN || gpCrAPState->nScreenKind == 1 || gpCrAPState->nScreenKind
+        == 4) {
         if (pChoices->bLeftHanded == 0) {
             Character_SetLeftHanded(pChar, 0);
         } else {
@@ -3256,7 +3258,7 @@ void Character_SetClubStatesForCharacter(Character* pChar, int nSlot, SkinChoice
     u64 uVariant;
 
     if (pChar == NULL || pChar->pClubSet == NULL) return;
-    if (gSession.nGameType == 3 && !FE_GetClubStatesAllowed()) {
+    if (gSession.nGameType == GAMESTATE_FE_RUN && !FE_GetClubStatesAllowed()) {
         FE_SetClubStatesAllowed(1);
         return;
     }

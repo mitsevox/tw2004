@@ -251,7 +251,7 @@ void fn_80114540(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     f32 fDrag;
     f32 fAngle;
 
-    if (gSession.nGameType == 3) {
+    if (gSession.nGameType == GAMESTATE_FE_RUN) {
         return;
     }
     fScale = pModel->f12C;
@@ -549,7 +549,7 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     int i;
 
     fFaceAmt = pModel->f134;
-    if (gSession.nGameType == 3) {
+    if (gSession.nGameType == GAMESTATE_FE_RUN) {
         return;
     }
     BitArray_ClearArray(auBits, 128);
@@ -749,7 +749,7 @@ void fn_80115B2C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     int nRef;
     int i;
 
-    if (gSession.nGameType == 3) {
+    if (gSession.nGameType == GAMESTATE_FE_RUN) {
         return;
     }
     fStrength = fn_80116468();

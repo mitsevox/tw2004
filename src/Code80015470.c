@@ -85,7 +85,7 @@ void DS_vInitModule(void) {
     p->nConstantAlpha = 0xFF;
     p->bConstantAlpha = 0;
     p->uDrawFlags = 0x70;
-    p->nClipMode = 0;
+    p->nClipMode = GX_CLIP_ENABLE;
     p->nFogType = 2;
     p->fFogStart = 100.0f;
     p->fFogEnd = 2048.0f;

@@ -277,12 +277,6 @@ void  Gaud_RestartMusic(void);
 u8    GolfCamera_IsPostShotCamDone(View* pView);
 u8    GolfCamera_IsCameraTrackingPlayer(View* pView);
 void  BreakLine_GetCaddyTipInfo(int nView, f32* pLong, f32* pSide); // GoBreakLine.c
-s32   GM_GetHoleIndexHandicap(int nHole);
-s32   GM_GetCurrentCourseTotalYardage(int nTeeSet);
-s32   GM_GetCurrentCourseFront9Yardage(int nTeeSet);
-s32   GM_GetCurrentCourseBack9Yardage(int nTeeSet);
-s32   GM_GetCurrentCourseFront9Par(void);
-s32   GM_GetCurrentCourseBack9Par(void);
 f32   GM_Earnings_GetCourseModifier(void);
 char* HoleContest_GetPlaceName(int nPlayer);
 s32   HoleContest_GetPlaceDistance(int nPlayer);
@@ -589,7 +583,7 @@ void IG_InitGameMessages(void) {
 u8 IG_IsControllerInPlay(int nController) {
     int i;
 
-    if (gSession.nGameType != 6) {
+    if (gSession.nGameType != GAMESTATE_IG_PLAY_HOLE) {
         return 1;
     }
     for (i = 0; i < gSession.nNumPlayers; i++) {
@@ -1080,7 +1074,7 @@ void GM_vGetLiePercentage(MsgArg* pArgs, MsgArg* pResult) {
                   gSurfaceTypes[gPlayers[pArgs[0].i].ball.nSurface].f00);
 }
 
-// Message 35: hole pArgs[0]'s rating (GM_GetHoleIndexHandicap: the course table's nRating for that hole).
+// Message 35: hole pArgs[0]'s rating: its handicap (stroke index) in the course table.
 void GM_vGetHoleRating(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = GM_GetHoleIndexHandicap(pArgs[0].i);
 }
@@ -1920,7 +1914,7 @@ void GM_vIsDemoSetup(MsgArg* pArgs, MsgArg* pResult) {
 // Whether the round (game type 6) is paused for a pulled controller (gSession.nPaused 2, or 3,
 // which nothing in this build sets) (command 120).
 void GM_vIsPausedForController(MsgArg* pArgs, MsgArg* pResult) {
-    if (gSession.nGameType == 6 && (gSession.nPaused == 2 || gSession.nPaused == 3)) {
+    if (gSession.nGameType == GAMESTATE_IG_PLAY_HOLE && (gSession.nPaused == 2 || gSession.nPaused == 3)) {
         pResult->i = 1;
         return;
     }

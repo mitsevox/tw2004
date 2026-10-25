@@ -65,7 +65,7 @@ f32  CameraScript_GetSmoothTimeParam(CameraScriptSettings_t* pScript);   // the 
 f32  Camera_GetLensFovScale(CamLens* pLens);       // char.c: the lens's fB0
 u8   GameEffects_IsDoubleTimeOn(void);
 u8   CamScript_IngoreCameraCollisionSurface(int n);
-u8   CamScript_PlayableSurface(SurfaceType* pSurface);
+u8   CamScript_PlayableSurface(TGD_MaterialInfo* pSurface);
 void fn_800386F0(int n, f32* pVec);
 f32  CamScript_GetFlybyCamRate(CamShot* pShot, f32 fA, f32 fB, f32 fTime);
 u8   Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bHazards, f32 fStep,
@@ -73,8 +73,8 @@ u8   Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 
 void CamScript_PickArcDirection(CameraScriptSettings_t* pScript, f32* pSub, int nPlayer, f32* pPrev,
                                 f32 fTime);
 u8   GameEffects_SimulateBall(int nPlayer);          // GameEffects.c: the ball is simulated from its position
-u8   Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
-                                 SurfaceType** ppSurface, TerObject** ppObj);
+u8   Ter_CheckForGroundCollision(TGD_TerrainInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
+                                 TGD_MaterialInfo** ppSurface, TerObject** ppObj);
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0f (0x802830A8), before the constants CamScript_RunScript uses first; its body is unknown.
@@ -513,7 +513,7 @@ void CamScript_RunFlybyCamera(int nPlayer, f32* pCam, f32* pSub, CameraScriptSet
 // floor. Not on the first frame (CameraScript_SnapToScript) of a shot of bDynamic 1.
 void CamScript_SmoothTerrainHeight(CameraScriptSettings_t* pScript, f32* pCam, u8 b, int nPlayer,
                                    f32 fMaxStep) {
-    CourseInfo* pCourse = Ter_GetTGD();
+    TGD_TerrainInfo* pCourse = Ter_GetTGD();
     f32 fGround;
     f32 fRate;
     f32 fStep;
@@ -1271,7 +1271,7 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
     f32 fY;
     f32 fLen;
     f32 fStep;
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     int nPin;
     int nTee;
 
@@ -1842,10 +1842,10 @@ void CameraScript_UpdateLandingEstimate(CameraScriptSettings_t* pScript, int nPl
     f32 vLand[4];
     f32 vUp[4];
     f32 vTarget[4];
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
     TerObject* pObj;
     Ball* pBall;
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     f32 fRise;
     f32 fDist;
     f32 fReach;
@@ -2326,7 +2326,7 @@ u8 CameraScript_DontUpdateCameraDuringSlowMo(CameraScriptSettings_t* pScript, in
 u8 CamScript_CheckObstructedCamera(f32* pCam, int nPlayer) {
     f32 vDiff[4];
     int nPin = Game_CurrentPinSet();
-    CourseInfo* pCourse = Ter_GetTGD();
+    TGD_TerrainInfo* pCourse = Ter_GetTGD();
     u8 bBlocked;
     f32 fDist;
 
@@ -2403,7 +2403,7 @@ void CamScript_GetCameraOnFairwayPos(CameraScriptSettings_t* pScript, f32* pOut,
     f32 vThird[4];
     f32 vDiff[4];
     u8 bFound = 0;
-    CourseInfo* pCourse = Ter_GetTGD();
+    TGD_TerrainInfo* pCourse = Ter_GetTGD();
     f32* pPin;
     int nPin;
     f32 fBall;
@@ -2533,7 +2533,7 @@ void CamScript_CheckFlagCollision(CameraScriptSettings_t* pScript, f32* pCam, f3
                                   CamShot* pSaved, f32* pPrev) {
     f32 vDiff[4];
     int nPin = Game_CurrentPinSet();
-    CourseInfo* pCourse = Ter_GetTGD();
+    TGD_TerrainInfo* pCourse = Ter_GetTGD();
     f32 fDist;
     f32 fAbove;
 
@@ -2659,7 +2659,7 @@ void CamScript_UpdateFairwayCam(CameraScriptSettings_t* pScript, f32* pCam, f32*
 // The AI target point nearest pPos (AI_NearestTarget) into pOut; the hole's current pin when there
 // is none. Nothing without a course.
 void CamScript_GetNearestAIPoint(f32* pPos, f32* pOut) {
-    CourseInfo* pCourse = Ter_GetTGD();
+    TGD_TerrainInfo* pCourse = Ter_GetTGD();
 
     if (pCourse != NULL && AI_NearestTarget(pPos, pOut) < 0) {
         int nPin = Game_CurrentPinSet();
@@ -2674,13 +2674,13 @@ void CamScript_GetNearestAIPoint(f32* pPos, f32* pOut) {
 // more than the tuning's fPlayableHeadroom above it; a layer under another kind of surface (water,
 // say) starts a region whose top counts unless a standing surface is found below it. Surface 149
 // and, on course 7's hole 2, anything above 10 are passed over; there a region's lower standing surface wins.
-f32 CamScript_GuessBestPlayableHeight(f32* pPos, SurfaceType** ppSurface) {
+f32 CamScript_GuessBestPlayableHeight(f32* pPos, TGD_MaterialInfo** ppSurface) {
     f32 vPos[4];
-    SurfaceType* aSurfaces[20];
+    TGD_MaterialInfo* aSurfaces[20];
     f32 aHeights[20];
     u8 bRegion = 0;
     int nLower = -1;
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     u32 nHeights;
     u32 i;
     int nIdx;
@@ -2722,7 +2722,7 @@ f32 CamScript_GuessBestPlayableHeight(f32* pPos, SurfaceType** ppSurface) {
             }
             // fake match: the row number from the addresses as unsigned integers; pointer
             // subtraction (or the u8* spelling) swaps two registers
-            if ((int)(((uptr)aSurfaces[nIdx] - (uptr)gSurfaceTypes) / sizeof(SurfaceType)) != 149
+            if ((int)(((uptr)aSurfaces[nIdx] - (uptr)gSurfaceTypes) / sizeof(TGD_MaterialInfo)) != 149
                 && !(Game_GetCourse() == 7 && Game_GetCurHoleNum() == 2 && fBest > 10.0f)) {
                 if (CamScript_PlayableSurface(aSurfaces[nIdx])) {
                     if (!bRegion && fLast - aHeights[nIdx] > gpCamTuning->fPlayableHeadroom) {
@@ -2760,7 +2760,7 @@ f32 CamScript_GuessBestPlayableHeight(f32* pPos, SurfaceType** ppSurface) {
 }
 
 // The surface is ground the camera stands on: classes 1..12 but 9 and 10, and 18.
-u8 CamScript_PlayableSurface(SurfaceType* pSurface) {
+u8 CamScript_PlayableSurface(TGD_MaterialInfo* pSurface) {
     u32 nClass;
 
     if (pSurface == NULL) {
@@ -2825,10 +2825,10 @@ u8 CamScript_KeepAboveGround(int nPlayer, f32* pNew, f32* pOld, u8 bCheckPath, u
                              u8* pbRaised, f32 fClearance) {
     f32 vHit[4];
     f32 vNormal[4];
-    SurfaceType* aSurfaces[20];
+    TGD_MaterialInfo* aSurfaces[20];
     f32 aHeights[20];
     TerObject* pObj;
-    CourseInfo* pCourse = Ter_GetTGD();
+    TGD_TerrainInfo* pCourse = Ter_GetTGD();
     u8 bCrossed = 0;
     u32 nHeights;
     u8 bHit;
@@ -2857,7 +2857,7 @@ u8 CamScript_KeepAboveGround(int nPlayer, f32* pNew, f32* pOld, u8 bCheckPath, u
     if (bCheckPath) {
         bHit = Ter_CheckForGroundCollision(pCourse, pOld, pNew, vHit, vNormal, aSurfaces, &pObj);
         if (bHit) {
-            nSurface = ((u8*)aSurfaces[0] - (u8*)gSurfaceTypes) / sizeof(SurfaceType);
+            nSurface = ((u8*)aSurfaces[0] - (u8*)gSurfaceTypes) / sizeof(TGD_MaterialInfo);
         }
         if (bHit && !CamScript_IngoreCameraCollisionSurface(nSurface)) {
             bCrossed = 1;
@@ -2938,7 +2938,7 @@ f32 CamScript_EstimateBallFlightPercent(int nPlayer, CameraScriptSettings_t* pSc
 // (0 at the start, 1 at the pin); 0 without a hole loaded. The script is not read
 // (CamScript_LerpPercentToPinCameras passes it, as it does to CamScript_EstimateBallFlightPercent).
 f32 CamScript_GetBallToPinPercent(int nPlayer, CameraScriptSettings_t* pScript) {
-    CourseInfo* pCourse = Ter_GetTGD();
+    TGD_TerrainInfo* pCourse = Ter_GetTGD();
     f32* pPin;
     f32 vStart[4];
     f32 vBall[4];
@@ -2963,7 +2963,7 @@ f32 CamScript_GetBallToPinPercent(int nPlayer, CameraScriptSettings_t* pScript) 
 // copy of the script is cut to it and run one frame, and the ground is tested from that camera to
 // 1 above Player.vBall.
 u8 CameraScript_WillGolferBeOccludedInThisView(int nPlayer, CamShot* pShot, CameraScriptSettings_t* pScript) {
-    CourseInfo* pCourse = Ter_GetTGD();
+    TGD_TerrainInfo* pCourse = Ter_GetTGD();
     CameraScriptSettings_t script;
     CamShot shot;
     CamShot shotSaved;
@@ -2973,7 +2973,7 @@ u8 CameraScript_WillGolferBeOccludedInThisView(int nPlayer, CamShot* pShot, Came
     f32 vSub[4] = {0.0f, 0.0f, 0.0f, 0.0f};
     f32 vGolfer[4];
     TerObject* pObj;
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
 
     if (pCourse == NULL) return 0;
     Mem_cpy(&shot, pShot, sizeof(CamShot));
@@ -3021,7 +3021,7 @@ u8 CamScript_SkipLookBackCam(CameraScriptSettings_t* pScript, CamShot* pShot, in
 // Whether the player's camera offsets are mirrored for a left-handed golfer
 // (Character_IsLeftHanded); never on the CrAP screen (game type 3). pShot is not read.
 u8 CameraScript_FlipCameraForLefty(int nPlayer, CamShot* pShot) {
-    if (gSession.nGameType == 3) {
+    if (gSession.nGameType == GAMESTATE_FE_RUN) {
         return 0;
     }
     return Character_IsLeftHanded(gPlayers[nPlayer].pChar) != 0;

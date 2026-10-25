@@ -109,7 +109,7 @@ void SKALIB_InitModule(void) {
             gLibSlots[i].overlays[j].pWork     = NULL;
         }
     }
-    if (gSession.nGameType == 3 || gSession.nGameType == 10) {
+    if (gSession.nGameType == GAMESTATE_FE_RUN || gSession.nGameType == GAMESTATE_FE_SETUP) {
         lbl_80281D18 = 0;
     }
     // four players

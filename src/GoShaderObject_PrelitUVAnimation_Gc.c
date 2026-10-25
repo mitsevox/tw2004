@@ -412,7 +412,8 @@ void fn_80071914(void) {
     int i;
 
     for (i = 0; i < 20; i++) {
-        if ((pSession->nGameType >= 4 && pSession->nGameType <= 8) || pbRows[i] != 0) {
+        if ((pSession->nGameType >= GAMESTATE_IG_SETUP && pSession->nGameType <= GAMESTATE_IG_SHUTDOWN)
+            || pbRows[i] != 0) {
             fn_80071A54(i);
         }
     }
@@ -425,7 +426,8 @@ void fn_80071994(void) {
     int i;
 
     for (i = 0; i < 20; i++) {
-        if ((pSession->nGameType >= 4 && pSession->nGameType <= 8) || pbRows[i] != 0) {
+        if ((pSession->nGameType >= GAMESTATE_IG_SETUP && pSession->nGameType <= GAMESTATE_IG_SHUTDOWN)
+            || pbRows[i] != 0) {
             fn_80071A90(i);
         }
     }

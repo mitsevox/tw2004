@@ -12,7 +12,7 @@ void   DynObj_Vec3Add(f32* pA, f32* pB, f32* pOut);
 void   DynObj_Vec3Sub(f32* pA, f32* pB, f32* pOut);
 
 // Whether the ball can hit the object; every object can.
-u32 DynObj_CanBallHit(UObject* pObj, f32* pPos) {
+u32 DynObj_CanBallHit(TObject* pObj, f32* pPos) {
     return 1;
 }
 
@@ -21,7 +21,7 @@ u32 DynObj_CanBallHit(UObject* pObj, f32* pPos) {
 void DynObj_GetBoundingSphere(DynObj* pObj, f32* pCenter, f32* pRadius) {
     UObjMesh* pMesh = pObj->obj.pModel->apLod[0];
     if (pCenter != NULL) {
-        DynObj_Vec3Add(pObj->obj.m80[3], pMesh->pInfo->v58, pCenter);
+        DynObj_Vec3Add(pObj->obj.mObjToWorld[3], pMesh->pInfo->v58, pCenter);
     }
     if (pRadius != NULL) {
         *pRadius = pMesh->pInfo->f64;
