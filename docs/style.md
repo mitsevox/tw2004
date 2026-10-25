@@ -204,7 +204,11 @@ says what shows they belong to this file. Proof is one of these: the data they u
 that points at them) sits in this file's data, in the same order as the other files; or a related
 EA build (`reference/`) keeps them in the same file. When a function at an end
 uses no data and nothing else settles it, it stays where it is, and the commit message says so and
-what was checked. A boundary moves only with proof.
+what was checked. A boundary between two named files moves only with proof. An `unsorted/`
+scrap is the exception, as it cannot stay where it is: with no proof it goes to the neighbour the
+best evidence favours, the commit message gives the evidence for and against, and `src/README.md`
+marks that boundary unverified ([`audit-process.md`](audit-process.md), "Folds and other code
+moves").
 
 Progress lives in [`audit.tsv`](audit.tsv), one row per game source file: `open`, or `done` with
 the commit that holds the pass and the reviewer who passed it. The author of a pass leaves the
@@ -220,8 +224,9 @@ reviewer marks its row done along with the file's row. A file up to about 1,000 
 `whole-file review`. The writer and the reviewer of a chunk read the whole file first and change
 or grade only their chunk; the file stays `open` between chunks. The whole-file review is a fresh
 reviewer reading the whole file (its header, both ends, names across its functions, every comment),
-and only it marks the file done. A `fold` proves which file an `unsorted/` scrap belongs to and
-folds it in. A pass that renames, splits or merges a file updates the plan in the same commit.
+and only it marks the file done. A `fold` puts an `unsorted/` scrap into the file it belongs to,
+with proof or by best evidence (above). A pass that renames, splits or merges a file updates the
+plan in the same commit.
 `audit.py --check` fails when the plan and `audit.tsv` disagree.
 
 Each item below fails a file. "Becomes" is the fix.
@@ -268,7 +273,7 @@ Structure
 |---|---|
 | **D1.** Another file's prototype declared in a `.c` file; a non-static prototype for a function only this file calls; a call through a cast of the function | One prototype, in the owning header; `static`; a definition that takes what the callers pass |
 | **D2.** Raw pointer arithmetic (`*(s32*)((u8*)p + 0x10)`) | Struct fields |
-| **D3.** A file that isn't one EA source file (`CodeXXXXXXXX.c`, `unsorted/sweep_*`), a boundary moved without proof or an end the pass didn't check, or our name on a file whose EA name is known | Its functions in the EA file they belong to, under EA's name; the proof of each boundary goes in the commit message ("Every pass checks the file's two ends"). "Nothing else claims these functions" is not a proof |
+| **D3.** A file that isn't one EA source file (`CodeXXXXXXXX.c`, `unsorted/sweep_*`), a boundary moved without proof (an `unsorted/` scrap folded by best evidence and marked unverified is not one) or an end the pass didn't check, or our name on a file whose EA name is known | Its functions in the EA file they belong to, under EA's name; the proof of each boundary goes in the commit message ("Every pass checks the file's two ends"). "Nothing else claims these functions" is not a proof |
 | **D4.** Undefined behaviour the compiler can see, not listed in the bug register | Fixed, or listed when EA wrote it |
 
 Not failures
