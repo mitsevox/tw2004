@@ -726,12 +726,9 @@ BootCourse.c:
 	.sdata2     start:0x80283E70 end:0x80283E78
 
 SunFlr_Gc.c:
-	.text       start:0x8009A250 end:0x8009A844
+	.text       start:0x8009A250 end:0x8009A928
 	.data       start:0x80189DA8 end:0x80189E78
 	.sdata2     start:0x80283E78 end:0x80283E90
-
-unsorted/sweep_8009A844.c:
-	.text       start:0x8009A844 end:0x8009A928
 
 Code8009A928.c:
 	.text       start:0x8009A928 end:0x8009AA28

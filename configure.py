@@ -1141,7 +1141,6 @@ config.libs = [
             Object(Matching, "GoDynObjBase.c"),
             Object(Matching, "ShaderRow0.c"),
 
-            Object(Matching, "unsorted/sweep_8009A844.c"),
             Object(Matching, "Main.c"),
             # Built optimized for size: under -O4,p the copy and fill loops are unrolled and the
             # four functions take 0xF94 bytes, against EA's 0x5C0.
