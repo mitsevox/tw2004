@@ -126,8 +126,6 @@ void fn_800711A4(StaticShaderObject* pObj) {
     if (pObj->anim.b8 != 0) {
         GXSetArray(9, pObj->pArrays->apPos[0], 12);
     }
-    // port: fn_80070168 (DynamicRenderingBuffer.c) is defined without parameters but hands r3 and
-    //       r4 on to GXCallDisplayList
     ((void (*)(void*, u32))fn_80070168)(pObj->anim.p4, pObj->anim.n0);
 }
 
@@ -272,8 +270,6 @@ void fn_800715D0(StaticShaderObject* pObj) {
     if (pObj->anim.b8 != 0) {
         GXSetArray(9, pObj->pArrays->apPos[0], 12);
     }
-    // port: fn_80070168 (DynamicRenderingBuffer.c) is defined without parameters but hands r3 and
-    //       r4 on to GXCallDisplayList
     ((void (*)(void*, u32))fn_80070168)(pObj->anim.p4, pObj->anim.n0);
 }
 
@@ -297,8 +293,6 @@ void fn_80071680(StaticShaderObject* pObj) {
     if (pObj->anim.b8 != 0) {
         GXSetArray(9, pObj->pArrays->apPos[0], 12);
     }
-    // port: fn_80070168 (DynamicRenderingBuffer.c) is defined without parameters but hands r3 and
-    //       r4 on to GXCallDisplayList
     ((void (*)(void*, u32))fn_80070168)(pObj->anim.p4, pObj->anim.n0);
 }
 

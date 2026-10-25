@@ -259,8 +259,6 @@ void fn_80070BD0(StaticShaderObject* pObj) {
     if (pObj->anim.b8 != 0) {
         GXSetArray(9, pObj->pArrays->apPos[0], 12);
     }
-    // port: fn_80070168 (above) is defined without parameters but hands r3 and r4 on to
-    //       GXCallDisplayList
     ((void (*)(void*, u32))fn_80070168)(pObj->anim.p4, pObj->anim.n0);
 }
 
@@ -333,7 +331,5 @@ void fn_80070DF4(StaticShaderObject* pObj) {
         (u32)gSession.nFrameCount > fn_80097694(pAnim->nIndex)) {
         fn_800976A8(pAnim, lbl_80281E70);
     }
-    // port: fn_80070168 (above) is defined without parameters but hands r3 and r4 on to
-    //       GXCallDisplayList
     ((void (*)(void*, u32))fn_80070168)(pAnim->p4, pAnim->n0);
 }
