@@ -27,7 +27,7 @@ void fn_80037AB8(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst) {
 
     if (pSkin->pModel != NULL && !(pSkin->pModel->u30 & 0x8000)) {
         pSkin->pModel->u30 |= 0x8000;
-        for (i = 1; i < pSkin->pModel->n14; i++) {
+        for (i = 1; i < pSkin->pModel->nBones; i++) {
             nBone = i;
             if (i >= nFirst) {
                 nBone = i + nSkip;
@@ -39,7 +39,7 @@ void fn_80037AB8(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst) {
             Quat_Multiply(pSkin->pModel->p34[i].q0, pParent->q0, aQuat);
             Quat_Copy(aQuat, pSkin->pModel->p34[i].q0);
         }
-        for (i = 0; i < pSkin->pModel->n14; i++) {
+        for (i = 0; i < pSkin->pModel->nBones; i++) {
             Quat_QuatToMatrix(pSkin->pModel->p34[i].q0, aMtx);
             Vec4_CopyPoint(pSkin->pModel->p34[i].v10, aMtx[3]);
             LLMath_InvertNormalized(aMtx, pSkin->pWorld2Bone[i]);
