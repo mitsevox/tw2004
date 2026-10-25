@@ -2,9 +2,8 @@
 // SunFlr_Gc.c's functions (fn_8009A250-fn_8009A754) from its own state (lbl_802813B8) and tables,
 // and the glow queue's add (fn_8009B260). Its extent so far is the functions that use its data: the .sdata
 // 0x802813B8-0x802813C0, the .sdata2 0x80283E90-0x80283EC0 and the .data 0x80189E78-0x8018C6C8
-// (fn_8009AA28-SF_vUpdateSunFlare, and fn_8009B260 between them and fn_8009B314). Where it starts after
-// SunFlr_Gc.c (0x8009A844 at the earliest) is not proven, and fn_8009B314 is still in a sweep file
-// with the next file's first function.
+// (fn_8009AA28-SF_vUpdateSunFlare, fn_8009B260 and fn_8009B314, the last). Where it starts after
+// SunFlr_Gc.c (0x8009A844 at the earliest) is not proven.
 
 #include "glows.h"
 #include "camera.h"
@@ -216,3 +215,11 @@ void fn_8009B260(f32* pPos, u32 uColorA, u32 uColorB, u8 n25, u8 n24, u8 n26, f3
         pGlow->n25 = n25;
     }
 }
+
+// ---- sweep code (not yet cleaned up) ----
+
+void fn_8009B314(u8 v) {
+    lbl_802813B8->b1BF0 = v;
+}
+
+// ---- end of sweep code ----

@@ -184,16 +184,16 @@ void DynObj_InitForHole(void) {
     Character* pFlag;
 
     if (gpDynObjState->pTeo10000 == NULL) {
-        gpDynObjState->pTeo10000 = Object_Create(((DynObjModelRef*)Resources_Get('TEO ', 10000))->p4);
-        gpDynObjState->pTeo10000->uFlags |= 1;
-        gpDynObjState->pTeo10000->uFlags |= 0x10;
+        gpDynObjState->pTeo10000 = Object_Create(((DynObjModelRef*)Resources_Get('TEO ', 10000))->pModel);
+        gpDynObjState->pTeo10000->uFlags |= TOBJECT_UNREAD_1;
+        gpDynObjState->pTeo10000->uFlags |= TOBJECT_UNREAD_10;
     }
     for (i = 0; i < 4; i++) {
         if (gpDynObjState->apTeo10030[i] == NULL) {
             nId = i + 10030;
             if (Resources_IsIDRefAlreadyThere('TEO ', nId)) {
                 gpDynObjState->apTeo10030[i] =
-                    Object_Create(((DynObjModelRef*)Resources_Get('TEO ', nId))->p4);
+                    Object_Create(((DynObjModelRef*)Resources_Get('TEO ', nId))->pModel);
             }
         }
     }
@@ -202,7 +202,7 @@ void DynObj_InitForHole(void) {
             nId = i + 10040;
             if (Resources_IsIDRefAlreadyThere('TEO ', nId)) {
                 gpDynObjState->apTeo10040[i] =
-                    Object_Create(((DynObjModelRef*)Resources_Get('TEO ', nId))->p4);
+                    Object_Create(((DynObjModelRef*)Resources_Get('TEO ', nId))->pModel);
             }
         }
     }
@@ -212,7 +212,7 @@ void DynObj_InitForHole(void) {
                 nId = i + 10006;
                 if (Resources_IsIDRefAlreadyThere('TEO ', nId)) {
                     gpDynObjState->apTeo10006[i] =
-                        Object_Create(((DynObjModelRef*)Resources_Get('TEO ', nId))->p4);
+                        Object_Create(((DynObjModelRef*)Resources_Get('TEO ', nId))->pModel);
                 }
             }
         }
@@ -221,7 +221,7 @@ void DynObj_InitForHole(void) {
                 nId = i + 10020;
                 if (Resources_IsIDRefAlreadyThere('TEO ', nId)) {
                     gpDynObjState->apTeo10020[i] =
-                        Object_Create(((DynObjModelRef*)Resources_Get('TEO ', nId))->p4);
+                        Object_Create(((DynObjModelRef*)Resources_Get('TEO ', nId))->pModel);
                 }
             }
         }
@@ -296,20 +296,19 @@ void DynObj_DeInitForHole(void) {
     }
 }
 
-// The per-frame update: message 6 to every object, with the frame time, then each player's flying
-// divot (DynObj_UpdateDivot) and tee (DynObj_UpdateTee).
+// The per-frame update: DYNOBJ_MSG_UPDATE to every object, with the frame time, then each player's
+// flying divot (DynObj_UpdateDivot) and tee (DynObj_UpdateTee).
 void DynObj_UpdateDynamicObjects(void) {
     int i;
 
-    // port: the frame time goes through the message's pointer argument as its bits
-    Kernel_BroadcastMessage(6, *(void**)&gSession.fFrameTime, NULL);
+    Kernel_BroadcastMessage(DYNOBJ_MSG_UPDATE, *(void**)&gSession.fFrameTime, NULL);
     for (i = 0; i < gSession.nNumPlayers; i++) {
         DynObj_UpdateDivot(i);
         DynObj_UpdateTee(i);
     }
 }
 
-// Draws every object (message 3) for view nView, and in the target games
+// Draws every object (DYNOBJ_MSG_DRAW) for view nView, and in the target games
 // (GM_Currently_SkillZoneMode) the targets' 'TEO ' models.
 void DynObj_RenderDynamicObjects(int nView) {
     RenderState_SetBlendFactors(4, 5);
@@ -319,7 +318,7 @@ void DynObj_RenderDynamicObjects(int nView) {
     LF_UseCurrentFogSettings();
     LF_UpdateFog();
     RenderState_Flush();
-    Kernel_BroadcastMessage(3, NULL, NULL);
+    Kernel_BroadcastMessage(DYNOBJ_MSG_DRAW, NULL, NULL);
     if (GM_Currently_SkillZoneMode()) {
         DynObj_DrawTargetModels(nView);
         DynObj_DrawTargetOverlays(nView);
@@ -450,20 +449,19 @@ void DynObj_PitchMarkAdd(f32* pPos, int nPlayer) {
     if (TER_NO_GROUND != fGround && pSurface->nClass == 3 && fGround - pPos[1] < 0.02f &&
         (f32)Math_Sqrt(LLMath_LengthSquared3(gPlayers[nPlayer].ball.vVel)) >= 10.0f) {
         if (gpDynObjState->apPitchMark[gpDynObjState->nNextPitchMark] == NULL) {
-            // EA bug: def.n1A is never set, and type 0's setup copies it to DynObj.n14E
-            def.n0 = 0;
-            def.n4 = 0;
+            def.nActorId = 0;
+            def.nType = 0;
             def.aPos[0] = pPos[0];
             def.aPos[1] = pPos[1];
             def.aPos[2] = pPos[2];
-            def.u14 = 0x200;
-            def.n18 = 0;
+            def.uFlags = DYNOBJ_HIDE_WITH_FLAG_OUT;
+            def.nGroup = 0;
             setup.pDef = &def;
             setup.pModel = &model;
             model.aEntries[0].uType = 'TEO ';
             setup.pModel->aEntries[0].u.pRef = (DynObjModelRef*)Resources_Get('TEO ', 10005);
-            setup.pfnHandler = DynObj_GetTypeHandler(setup.pDef->n4);
-            setup.pC = NULL;
+            setup.pfnHandler = DynObj_GetTypeHandler(setup.pDef->nType);
+            setup.pScripts = NULL;
             nId = Kernel_CreateObjectId(&setup);
             if (nId != -2) {
                 gpDynObjState->apPitchMark[gpDynObjState->nNextPitchMark] = Kernel_FindObjectById(nId);
@@ -479,7 +477,7 @@ void DynObj_PitchMarkAdd(f32* pPos, int nPlayer) {
 }
 
 // Puts the player's divot hole ('TEO ' 10001) on the ground at pPos, turned to the player's aim;
-// the first time it is made (a type 0 object, flags 0xC00).
+// the first time it is made (a type 0 object, DYNOBJ_NO_ZWRITE and DYNOBJ_NO_ALPHA_TEST).
 void DynObj_ShotDivotHoleAdd(f32* pPos, int nPlayer) {
     f32 mTurn[4][4];
     f32 mObj[4][4];
@@ -498,21 +496,20 @@ void DynObj_ShotDivotHoleAdd(f32* pPos, int nPlayer) {
     vPos[3] = 1.0f;
     fGround = Ter_GetSupportingGroundData(Ter_GetTGD(), vPos, &pSurface, vNormal);
     if (gpDynObjState->apDivotHole[nPlayer] == NULL) {
-        // EA bug: def.n1A is never set, and type 0's setup copies it to DynObj.n14E
         vPos[1] = 0.01f + fGround;
-        def.n0 = 0;
-        def.n4 = 0;
+        def.nActorId = 0;
+        def.nType = 0;
         def.aPos[0] = vPos[0];
         def.aPos[1] = vPos[1];
         def.aPos[2] = vPos[2];
-        def.u14 = 0xC00;
-        def.n18 = 0;
+        def.uFlags = DYNOBJ_NO_ZWRITE | DYNOBJ_NO_ALPHA_TEST;
+        def.nGroup = 0;
         setup.pDef = &def;
         setup.pModel = &model;
         model.aEntries[0].uType = 'TEO ';
         setup.pModel->aEntries[0].u.pRef = (DynObjModelRef*)Resources_Get('TEO ', 10001);
-        setup.pfnHandler = DynObj_GetTypeHandler(setup.pDef->n4);
-        setup.pC = NULL;
+        setup.pfnHandler = DynObj_GetTypeHandler(setup.pDef->nType);
+        setup.pScripts = NULL;
         nId = Kernel_CreateObjectId(&setup);
         if (nId != -2) {
             gpDynObjState->apDivotHole[nPlayer] = Kernel_FindObjectById(nId);
@@ -826,7 +823,7 @@ f32 DynObj_GetBallPixels(int nPlayer) {
 }
 
 // Puts the player's divot ('TEO ' 10002) at pPos, facing against the aim, to be thrown by
-// DynObj_UpdateDivot; the first time it is made (a type 0 object, flag 0x200).
+// DynObj_UpdateDivot; the first time it is made (a type 0 object, DYNOBJ_HIDE_WITH_FLAG_OUT).
 void DynObj_DivotAdd(f32* pPos, int nPlayer) {
     DynObjDef def;
     DynObjSetup setup;
@@ -842,20 +839,19 @@ void DynObj_DivotAdd(f32* pPos, int nPlayer) {
     pB->bF5 = 1;
     pB->b0 = 1;
     if (!pB->bF4) {
-        // EA bug: def.n1A is never set, and type 0's setup copies it to DynObj.n14E
-        def.n0 = 0;
-        def.n4 = 0;
+        def.nActorId = 0;
+        def.nType = 0;
         def.aPos[0] = pB->v20[0];
         def.aPos[1] = pB->v20[1];
         def.aPos[2] = pB->v20[2];
-        def.u14 = 0x200;
-        def.n18 = 0;
+        def.uFlags = DYNOBJ_HIDE_WITH_FLAG_OUT;
+        def.nGroup = 0;
         setup.pDef = &def;
         setup.pModel = &model;
         model.aEntries[0].uType = 'TEO ';
         setup.pModel->aEntries[0].u.pRef = (DynObjModelRef*)Resources_Get('TEO ', 10002);
-        setup.pfnHandler = DynObj_GetTypeHandler(setup.pDef->n4);
-        setup.pC = NULL;
+        setup.pfnHandler = DynObj_GetTypeHandler(setup.pDef->nType);
+        setup.pScripts = NULL;
         nId = Kernel_CreateObjectId(&setup);
         if (nId != -2) {
             pB->pF0 = Kernel_FindObjectById(nId);
@@ -968,20 +964,19 @@ void DynObj_TeeAdd(f32* pPos, int nPlayer, u8 bReset) {
     pA->b0 = 1;
     pA->b70 = 0;
     if (!pA->bF8) {
-        // EA bug: def.n1A is never set, and type 0's setup copies it to DynObj.n14E
-        def.n0 = 0;
-        def.n4 = 0;
+        def.nActorId = 0;
+        def.nType = 0;
         def.aPos[0] = pA->v20[0];
         def.aPos[1] = pA->v20[1];
         def.aPos[2] = pA->v20[2];
-        def.u14 = 0;
-        def.n18 = 0;
+        def.uFlags = 0;
+        def.nGroup = 0;
         setup.pDef = &def;
         setup.pModel = &model;
         model.aEntries[0].uType = 'TEO ';
         setup.pModel->aEntries[0].u.pRef = (DynObjModelRef*)Resources_Get('TEO ', 10004);
-        setup.pfnHandler = DynObj_GetTypeHandler(setup.pDef->n4);
-        setup.pC = NULL;
+        setup.pfnHandler = DynObj_GetTypeHandler(setup.pDef->nType);
+        setup.pScripts = NULL;
         nId = Kernel_CreateObjectId(&setup);
         if (nId != -2) {
             pA->pF4 = Kernel_FindObjectById(nId);

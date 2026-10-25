@@ -609,7 +609,7 @@ u8 GameModeSkillZoneTimed_HoleFinished(int nPlayer, u8 bCheck) {
     return 1;
 }
 
-// The ball hit a bonus object (pfnCollisionActor, with its id, Ball.n140): the bullseye ball effect
+// The ball hit a bonus object (pfnCollisionActor, with its id, DynObj.nActorId): the bullseye ball effect
 // plays and the bonus multiplier (gTimedBonusMultiplier) goes up by 2 plus the object's index
 // (GameModeSkillZoneBase_GetBonusIndex), so by 2 to 6.
 void GameModeSkillZoneTimed_CollisionActor(int nPlayer, int nId) {
