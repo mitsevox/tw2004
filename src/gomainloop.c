@@ -113,8 +113,6 @@ void Physics_InitModule(void);
 void Physics_CloseModule(void);
 void Wind_vInitModule(void);
 void Wind_vCloseModule(void);
-void fn_800563C4(void);
-void fn_80056454(void);
 void SW_vInitModule(void);
 void SW_vCloseModule(void);
 void SW_vUIUpdateBlurBuffer(int nPlayer);
@@ -354,7 +352,7 @@ void fn_8006C720(void) {
     FE_vOpenONCE();
     CA_vInitOnce();
     Physics_InitOnce();
-    fn_800563C4();
+    UserManager_OpenOnce();
     STATEMAIN_OpenONCE();
     GOLFERSTATE_OpenONCE();
     GM_vInitModuleONCE();
@@ -369,7 +367,7 @@ void fn_8006C770(void) {
     STATEMAIN_CloseONCE();
     GOLFERSTATE_CloseONCE();
     CA_vCloseOnce();
-    fn_80056454();
+    UserManager_CloseOnce();
     fn_8002E25C();
     FE_LogoDesign_CloseOnce();
 }

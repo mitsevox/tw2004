@@ -170,8 +170,8 @@ typedef struct TourWin {
 // PgaSponsorship, TW06 GM_PgaTour_SponsorshipSlot_t). Slot i is signed once the game progress
 // reaches its level (FE_PGATourMessages.c PGASponsor_SignNext), with a sponsor picked at random; each worn
 // Create-A-Player asset of that sponsor then pays the slot's bonus cash
-// (FE_CrAP_CollectSponsorshipItems). lbl_80281DF0 is one more, outside the profiles: the sponsor
-// a new profile starts with (user.c clears it; the profile setup at 0x80057D64 copies it into
+// (FE_CrAP_CollectSponsorshipItems). gStartingSponsor is one more, outside the profiles: the sponsor
+// a new profile starts with (UserManager_OpenOnce clears it; SaveProfile_InitNew copies it into
 // slot 0).
 typedef struct SponsorSlot {
     u8   bSigned;               // 0x0  the slot is signed
@@ -401,6 +401,8 @@ typedef struct SaveProfile {
 } SaveProfile;
 LAYOUT_ASSERT(SaveProfile, 0x10600);
 
+#define SAVE_NUM_SLOTS 5        // gpSaveData's profiles, one per player slot
+
 // The session's record tables as the save file keeps them: a copy of gSession from aCourseRecord
 // to recC (0xF00..0x5B2C, the same layout). The replay recorder (Replay.c) keeps one too.
 typedef struct SaveRecords {
@@ -411,9 +413,10 @@ typedef struct SaveRecords {
 } SaveRecords;
 LAYOUT_ASSERT(SaveRecords, 0x4C2C);
 
-extern SaveProfile* gpSaveData;
-extern SaveProfile* lbl_80281DF4;       // unlocks that hold for every profile (the cheat codes set them)
-extern SponsorSlot lbl_80281DF0;        // a new profile's first sponsor (see SponsorSlot)
+extern SaveProfile* gpSaveData;         // the save profiles, SAVE_NUM_SLOTS of them (PlayerNumber_t)
+extern SaveProfile* gpPasswordUnlocks;  // unlocks that hold for every profile: the starting ones
+                                        // (PasswordManager_SetDefaults) and the cheat codes'
+extern SponsorSlot gStartingSponsor;    // a new profile's first sponsor (see SponsorSlot)
 extern u32 gPasswordEnteredBits[8];     // the cheat codes entered, one bit each (0..6;
                                         // PasswordManager_IsPasswordEntered);
                                         // FE_CrAP_IsItemLocked's lock kind 6 tests bits 1..5
@@ -422,6 +425,10 @@ extern u32 gSponsorPasswordBits[16];    // the sponsors' cheat codes entered, on
                                         // PasswordManager_IsSponsorshipPasswordEntered)
 extern s32 gStartLockedGolfers[14];     // the golfers GM_GetGameProgress counts as unlockable
 extern s32 gStartLockedCourses[6];      // the courses GM_GetGameProgress counts as unlockable
+
+// user.c: the save profiles' memory, allocated at start-up and freed once the game's outer loop ends
+void UserManager_OpenOnce(void);
+void UserManager_CloseOnce(void);
 
 // The password manager (0x80056480-0x80057F18; TW06's passwordmanager.cpp)
 void PasswordManager_SetDefaults(void);
@@ -456,8 +463,8 @@ void FE_CrAP_AddCustomAnimation(SaveProfile* pProfile, int nKind, char* pName);
 void FE_CrAP_RemoveCustomAnimation(SaveProfile* pProfile, int nKind, char* pName);
 // pName is in list nKind (0..2)
 u8   FE_CrAP_IsCustomAnimationSelected(SaveProfile* pProfile, int nKind, char* pName);
-void FE_SetStartingSponsor(s16 n);            // sign lbl_80281DF0 with sponsor n
-int  FE_GetStartingSponsor(void);             // lbl_80281DF0's sponsor (callers take it without extsh)
+void FE_SetStartingSponsor(s16 n);            // sign gStartingSponsor with sponsor n
+int  FE_GetStartingSponsor(void);             // gStartingSponsor's sponsor (callers take it without extsh)
 
 // 0x800588F4: par-5 eagle record i: kind 0 whether that hole is eagled (a5004/a10578), kind 1 the
 // eagle's date (a504C/a1057C); -1 for another kind.
