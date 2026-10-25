@@ -3,10 +3,6 @@
 Local progress dashboard for the tw2004 decompilation.
 
     python tools/dashboard/server.py [--port 8420] [--host 0.0.0.0]
-    python tools/dashboard/server.py --export site/ [--history history.json] [--sha SHA]
-
---export writes the static copy CI publishes on GitHub Pages (index.html reading progress.json;
-report.json numbers only) and exits.
 
 Serves one page and /api/progress. Reads build/GW4E69/report.json (written by every `ninja`
 run), config/GW4E69/symbols.txt, build/dashboard_history.json (written by the post-commit hook,
@@ -453,41 +449,6 @@ load();setInterval(()=>{if(!document.activeElement||document.activeElement.id!==
 </script></body></html>'''
 
 
-STATIC_FOOTER = ('<footer>Built by CI from <code>build/GW4E69/report.json</code> (objdiff) on every push to main. '
-                 'Only progress numbers are published. <a href="history.json">history.json</a></footer>')
-
-
-def export(out_dir, history_path, sha):
-    """The static site for GitHub Pages: index.html (reads progress.json, no "in flight" panel)
-    and progress.json + history.json, all from report.json, symbols.txt and the history file."""
-    rep = parse_report(REPORT) if os.path.exists(REPORT) else None
-    if not rep:
-        raise SystemExit('export: no %s; run ninja first' % REPORT)
-    try:
-        history = json.load(open(history_path)) if history_path else parse_history(HISTORY)
-    except (OSError, ValueError):
-        history = []
-    data = {
-        'now': time.time(),
-        'branch': 'main' + (' @ ' + sha[:7] if sha else ''),
-        'report': {k: v for k, v in rep.items() if not k.startswith('_')},
-        'symbols': parse_symbols(SYMBOLS),
-        'history': history,
-    }
-    page = PAGE
-    for old, new in (("const API='/api/progress',REFRESH=20000;",
-                      "const API='progress.json',REFRESH=300000;"),
-                     (re.search(r'<footer>.*?</footer>', PAGE, re.S).group(0), STATIC_FOOTER)):
-        assert old in page, old
-        page = page.replace(old, new)
-    os.makedirs(out_dir, exist_ok=True)
-    open(os.path.join(out_dir, 'index.html'), 'w', encoding='utf-8').write(page)
-    json.dump(data, open(os.path.join(out_dir, 'progress.json'), 'w'), separators=(',', ':'))
-    json.dump(history, open(os.path.join(out_dir, 'history.json'), 'w'), indent=0)
-    open(os.path.join(out_dir, '.nojekyll'), 'w').close()
-    print('exported %s: index.html, progress.json, history.json (%d records)' % (out_dir, len(history)))
-
-
 class H(BaseHTTPRequestHandler):
     def log_message(self, *a):
         pass
@@ -517,14 +478,7 @@ if __name__ == '__main__':
     ap = argparse.ArgumentParser()
     ap.add_argument('--host', default='0.0.0.0')
     ap.add_argument('--port', type=int, default=8420)
-    ap.add_argument('--export', metavar='DIR', help='write the static site (GitHub Pages) to DIR and exit')
-    ap.add_argument('--history', metavar='FILE', help='with --export: the history to publish '
-                    '(default build/dashboard_history.json)')
-    ap.add_argument('--sha', default='', help='with --export: the commit the report is for')
     a = ap.parse_args()
-    if a.export:
-        export(a.export, a.history, a.sha)
-        raise SystemExit(0)
     srv = ThreadingHTTPServer((a.host, a.port), H)
     print(f'tw2004 dashboard on http://{a.host}:{a.port}/  (root {ROOT})', flush=True)
     srv.serve_forever()

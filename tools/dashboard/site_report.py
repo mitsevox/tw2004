@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-The shared portfolio site's report (mitsevox.github.io, report-v1): the same objdiff numbers the
-progress page shows, in the site's public input format.
+The shared portfolio site's report (mitsevox.github.io/games/tw2004/, report-v1): objdiff's
+numbers in the site's public input format.
 
     python tools/dashboard/site_report.py <report.json> <history.json> <out> <sha> <tree>
                                           <run_id> <attempt> <workflow_blob>
@@ -11,7 +11,7 @@ tools/package_report.py turns into the uploaded package. Code is measured by fun
 code totals leave out the padding between functions), data by section. Functions count as named
 unless they still carry an fn_XXXXXXXX address name; EA game files count as exact once
 docs/audit.tsv marks them done (the audit checks each file's boundaries). The timeline is the
-progress page's history.json: rows CI wrote with full report.json numbers are inherited as they
+progress history (history.json on pages-history): rows CI wrote with full report.json numbers are inherited as they
 are, older rows (backfill_history.py rebuilds of old commits, before totals were recorded) get the
 report's current totals and are marked reconstructed. Only report.json numbers are written.
 """
