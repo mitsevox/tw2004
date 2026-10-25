@@ -206,7 +206,7 @@ Wind.c	open
 ai_brain.c	open		
 animblender.c	open		
 char.c	open		
-char_skin.c	open		
+char_skin.c	done	57a8c291	claude-review
 char_tex_manager.c	open		
 emotion.c	open		
 event.c	open		
