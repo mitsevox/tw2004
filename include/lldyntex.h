@@ -74,13 +74,13 @@ void  fn_8010A6A8(struct DynTex* pSrc, struct DynTex* pDst);   // char.c: from t
 DynTexJob* fn_8010B8EC(void);           // a free job, or NULL
 void  fn_8010B930(DynTexJob* pJob);     // queue it
 
-// A texture of a dynamic texture set (DynTex.p0; 0x20 bytes): its name hash and the bytes of each
+// A texture of a dynamic texture set (DynTex.p0; 0x20 bytes): its name and the bytes of each
 // of its pixel blocks (up to four) and of its palette.
 typedef struct DynTexEntry {
-    u64   uId;                  // 0x00  its name hash (char_tex_manager.c; 0: dropped, fn_8010AD50)
+    u64   uId;                  // 0x00  its name, a SKA_PackName code (0: dropped, fn_8010AD50)
     s32   n8;                   // 0x08  pixel blocks in aC
-    u32   aC[4];                // 0x0C  each block's bytes (fn_8010B1D4 copies them)
-    u32   n1C;                  // 0x1C  the palette's bytes (fn_8010B2A8)
+    u32   aC[4];                // 0x0C  each block's bytes (DynTex_UpdateTexturePixels copies them)
+    u32   n1C;                  // 0x1C  the palette's bytes (DynTex_UpdateTexturePalette)
 } DynTexEntry;
 LAYOUT_ASSERT(DynTexEntry, 0x20);
 
@@ -172,10 +172,11 @@ DynTex* fn_8010A520(int nC, int nSize, int n2, int n3, int n4);
 DynTexHeader* fn_8010A780(DynTex* pTex);    // its header (SkinPart.c looks textures up in it)
 void  fn_8010ADA4(DynTex* pTex);
 void  fn_8010BCFC(u64 uId, void* p, s32 n);   // a texture a skin uses (DynTexUse)
-s32   fn_8010AD10(DynTex* pTex);        // how many textures it has
-u64   fn_8010AD18(DynTex* pTex, int nTex);  // a texture's name hash (0 out of range)
+s32   DynTex_GetNumTextures(DynTex* pTex); // how many textures it has
+u64   DynTex_GetTexIDByIndex(DynTex* pTex, int nTex); // a texture's name code (0 out of range)
 void  fn_8010AD50(DynTex* pTex, u64 uId);   // drop the textures named uId
-void  fn_8010B1D4(DynTex* pTex, int nTex, u8* pPixels, void* p, s32 n);  // new pixels
-void  fn_8010B2A8(DynTex* pTex, int nTex, s16* pPalette);                // a new palette
+void  DynTex_UpdateTexturePixels(DynTex* pTex, int nTex, u8* pPixels, void* pMtx, s32 nMode); // new pixels
+void  DynTex_UpdateTexturePalette(DynTex* pTex, int nTex, s16* pPalette, void* pMtx,
+                                  s32 nMode);  // a new palette
 
 #endif

@@ -194,6 +194,7 @@ typedef struct LogoRecord {
     u8   nShape;                // 0x1021  LOGO_SQUARE or LOGO_RECT
 } LogoRecord;
 LAYOUT_ASSERT(LogoRecord, 0x1022);
+#define SAVE_NUM_LOGOS 5        // SkinChoices.aLogo: a profile's user logos
 
 // A part's (or a set's) choice: its variant and that variant's option. For a set, the variant is
 // an entry of its p7C run and the option one of that entry's p8C run.
@@ -230,7 +231,7 @@ typedef struct SkinChoices {
                                 //        FE_CrAP_InitCrAPInfo clears
                                 //        the profile's 0x5500..0xB634 (FE_CrAP_ResetSliders)
     u8   unk9CE[2];
-    LogoRecord aLogo[5];        // 0x9D0  the user logos ("_usrtextr0".."_usrtextr4")
+    LogoRecord aLogo[SAVE_NUM_LOGOS];   // 0x9D0  the user logos (textures "_usrtextr0".."_usrtextr4")
     u8   nGender;               // 0x5A7A  (the profile's 0xAF7A) the created golfer's gender
                                 //         (GM_vSetCrAPGolferInfo, which makes it the database's
                                 //         current one); read back signed

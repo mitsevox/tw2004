@@ -34,7 +34,7 @@ void FE_CrAP_InitCrAPInfo(SaveProfile* pProfile) {
     memset(pProfile->choices.aSets, -1, sizeof(pProfile->choices.aSets));
     FE_CrAP_ResetSliders(pProfile);
     UserInfo_InitCrAPItemBitArrays(pProfile);
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < SAVE_NUM_LOGOS; i++) {
         strcpy(pProfile->choices.aLogo[i].szName, gszNoLogoName);
     }
 }
@@ -68,7 +68,7 @@ void UserInfo_InitCrAPItemBitArrays(SaveProfile* pProfile) {
             }
         }
         FE_CrAP_SetCurrentGender(nOffered);
-        for (i = 0; i < 5; i++) {
+        for (i = 0; i < SAVE_NUM_LOGOS; i++) {
             pProfile->choices.aLogo[i].bSaved = 0;
         }
         for (i = 0; i < 53; i++) {
