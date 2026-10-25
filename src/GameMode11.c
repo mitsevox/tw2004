@@ -345,7 +345,7 @@ void Lessons_NextLesson(void) {
 void Lessons_PlaceBall(void) {
     int n = gLessonNum - 1;
     f32 fHeight;
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     if (-1.0f == gLessons[n].vPos[0] && -1.0f == gLessons[n].vPos[1] &&
         -1.0f == gLessons[n].vPos[2]) {
         pCourse = Ter_GetTGD();

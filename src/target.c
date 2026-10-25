@@ -582,12 +582,12 @@ void fn_800691B0(int nPlayer) {
 // a ball (not water, 7 and 16, or the cup, 12) and flat enough (the normal's y above cos 30);
 // then class 1 always, else a valid drop surface or a spot with no object or hazard near it.
 u8 PlaceBall_IsValidDropLocation(f32* pPos) {
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
     f32          vNormal[4];
 
     Ter_GetSupportingGroundData(Ter_GetTGD(), pPos, &pSurface, vNormal);
     if (Ter_PointInOOBNetwork(pPos) && !Ter_PointInFreeDropNetwork(pPos) && pSurface != NULL
-        && (pSurface->u34 & 1) && pSurface->nClass != 7 && pSurface->nClass != 16 && pSurface->nClass != 12
+        && (pSurface->uFlags & 1) && pSurface->nClass != 7 && pSurface->nClass != 16 && pSurface->nClass != 12
         && fabsf(vNormal[1]) > 0.86603f) {
         if (pSurface->nClass == 1 || Ter_IsValidDropSurface(pSurface - gSurfaceTypes)
             || !Ter_CheckObjectAndHazardObstruction(pPos, 1.5f, 0, 1, 2.0f, 1, 0.577f)) {
@@ -646,7 +646,7 @@ TNetwork* PlaceBall_GetPlaceBallNetwork(void) {
 // inside, the cursor stops. Then flags whether the ball can be placed there. Returns 0 only when
 // the cursor was stopped.
 u8 PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed) {
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
     f32          vPos[3];
     f32          fTicks;
     f32          fStep;

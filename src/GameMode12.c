@@ -179,7 +179,7 @@ s32 GameMode12_CountSurfaceHits(int nPlayer, s32 nSurface) {
 // gSurfaceTypes is kept for GameMode12_BallLanded (-1 for none). Returns the extra hit effect to
 // play, which is always 0 (none); it still looks the surface up as if a scoring surface had one.
 s32 GameMode12_BallHitSurface(int nPlayer) {
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
     s32 nHits;
     s32 nPoints;
     s32 nMeter;

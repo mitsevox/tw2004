@@ -122,7 +122,7 @@ f32   Character_ComputeMaxVisableDistance(Character* pChar, int bSplitScreen);
 f32   Character_ComputeMaxVisableShadowDistance(Character* pChar, int bSplitScreen);
 void  Character_KeepClubOutOfGround(Character* pChar);
 void  Character_IKLegsToGround(Character* pChar, u8 bRightLeg, u8 bLeftLeg);
-void  Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, int nHip, int nKnee,
+void  Character_IKLegToGround(Character* pChar, TGD_TerrainInfo* pCourse, int nLeg, int nHip, int nKnee,
                               int nAnkle, int nToe, int nAnklePoint, int nToePoint);
 void  Character_CalculateClipPoints(Character* pChar);
 void  Character_SetupForShot(Character* pChar);
@@ -391,9 +391,9 @@ f32 Character_GetTerrainHeightAndNormal(Character* pChar, f32* pPos, f32** ppNor
     f32 vPos[4];
     f32 fSupportingHeight;
     f32 fCoveringHeight;
-    SurfaceType* pSupportingSurface;
-    SurfaceType* pCoveringSurface;
-    CourseInfo* pCourse;
+    TGD_MaterialInfo* pSupportingSurface;
+    TGD_MaterialInfo* pCoveringSurface;
+    TGD_TerrainInfo* pCourse;
 
     if (pChar != NULL) {
         if ((pCourse = Ter_GetTGD()) != NULL) {
@@ -482,7 +482,7 @@ void Character_UpdateTestPoints(Character* pChar) {
 void Character_KeepClubOutOfGround(Character* pChar) {
     f32 vNormal[4];
     f32 (*pMtx)[4];
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     f32 fHeight;
     f32 fUnder;
     f32 fDot;
@@ -752,7 +752,7 @@ static inline f32* fn_800187CC_Read(f32* p) { return p; }
 // with it) and vAvgGroundNormal set to the average ground normal; any other character stands on the ground
 // under its root bone (the ground below it, if the one found is more than 1 above).
 void Character_PlaceFeetOnGround(Character* pChar) {
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     f32 fLowest;
     f32 fY;
     f32 fDelta;
@@ -761,8 +761,8 @@ void Character_PlaceFeetOnGround(Character* pChar) {
     f32 fH;
     f32 fSupportingHeight;
     f32 fCoveringHeight;
-    SurfaceType* pSupportingSurface;
-    SurfaceType* pCoveringSurface;
+    TGD_MaterialInfo* pSupportingSurface;
+    TGD_MaterialInfo* pCoveringSurface;
     f32 vSupportingNormal[4];
     f32 vCoveringNormal[4];
 
@@ -820,7 +820,7 @@ void Character_PlaceFeetOnGround(Character* pChar) {
 // ankle 0x39, toe 0x3A), with bLeftLeg the left (0x44-0x48); the bones they move are then
 // transformed again.
 void Character_IKLegsToGround(Character* pChar, u8 bRightLeg, u8 bLeftLeg) {
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     u32 auBits[4];
 
     if (pChar == NULL) {
@@ -861,7 +861,7 @@ void Character_IKLegsToGround(Character* pChar, u8 bRightLeg, u8 bLeftLeg) {
 // points) so its foot stands on the ground: the knee and hip are turned so the ankle reaches the
 // ground height under the ankle point, then the ankle is tilted towards the ground's slope, more
 // the deeper the foot sat.
-void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, int nHip, int nKnee,
+void Character_IKLegToGround(Character* pChar, TGD_TerrainInfo* pCourse, int nLeg, int nHip, int nKnee,
                              int nAnkle, int nToe, int nAnklePoint, int nToePoint) {
     f32 vOld[4];
     f32 vAnkle[4];

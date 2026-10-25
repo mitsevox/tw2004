@@ -204,7 +204,6 @@ void SitDev_ThrowBallHitDelayedEvent(void);
 void BreakLine_InitModule(void);
 void BreakLine_CloseModule(void);
 void AnimStream_Update(void);
-u8   GM_GetCurrentHoleSplitScreenLowDetail(void);
 void GameEffects_InitGameEffectSettings(void);
 f32  GameEffects_AdjustTimeRate(f32 fFrameTime);
 void GameEffects_RenderGameBreakerEffects(void);

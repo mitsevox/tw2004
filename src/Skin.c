@@ -26,7 +26,6 @@ void  fn_80016978(f32 fLeft, f32 fTop, f32 fWidth, f32 fHeight);   // Code800161
 void  fn_8006E7A4(LightGroup* pGroup);                   // GoLighting.c: load the group's lights
 void  fn_8006EADC(TObject* pObj);                        // GoLighting.c: light the object
 void  fn_8006ED70(void);                                 // GoLighting.c: lighting off
-f32   Ter_GetAmbientLight(CourseInfo* pCourse, f32* pPos);       // GoTerrainCollision.c: the ground's light
 void  SD_SetShaderTypeParameters(int nRow, void* pData); // GoTerrain.c: calls row nRow's pfn8
 void  fn_801127A0(void* pDesc);                          // hwsMaterial_Gc.c
 HwsMemBlock* fn_801128C8(SkinDesc* pDesc, s32 nSize);         // hwsOverride_Gc.c

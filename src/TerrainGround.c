@@ -1,16 +1,11 @@
-// TerrainGround.c (our name; TW07 has these three in GoTerrainUtils.c and
-// GoTerrainCollision_Headgate.c): the ground on the course's terrain grid: the ground strips under
-// a quad (for the shadows), the supporting triangle under a point and its height, and the surface
-// type there. Split out of AnimStream's extent: its own .sdata2 block (0x80284460-0x80284478) and
-// its callers (GoTerrainCollision, Golfer, emotion, GameEffects) show it is terrain code, not
-// animation streaming.
+// TerrainGround.c: the ground of the current hole's terrain grid: the ground strips under a quad,
+// which the golfer's shadow is drawn on, and the supporting ground triangle under a point, with its
+// height and its surface.
 
 #include "golfer.h"
 #include "game.h"
 #include "engine.h"
 #include "endian.h"
-
-#define TER_DONE 8   // pTriFlags bit 3: the triangle is already in the list being built
 
 // Widens the x/z box (fMinX..fMaxX, fMinZ..fMaxZ) to take in a point.
 #define TER_GROW_BOX(p)          \
@@ -27,14 +22,15 @@
         fMaxX = (p)[0];          \
     }
 
-// The ground strips under a quad (four points, x and z), for the shadows: fills pList with runs
-// of their triangles and returns how many, at most nMax - 1 (once full, the last entry is
-// overwritten). The same strips as the lookups below count, less those whose surface has a flag
-// in uSkip; each triangle goes in once even when it lies in several cells (its done bit is set
-// while collecting and cleared again at the end).
-int Ter_GetGroundPolyList(CourseInfo* pCourse, f32* pA, f32* pB, f32* pC, f32* pD, TerPolyRef* pList,
-                          int nMax,
-                u32 uSkip) {
+// The ground strips of the grid cells under a quad (the x/z box around its four points): fills
+// pReturnResult with runs of their triangles (first vertex, triangle count, surface) and returns
+// how many, at most iListSize - 1 (once the list is full, the last entry is overwritten). Object
+// strips, the cup ground of other pin positions (and in split screen, cup ground marked
+// POLYREF_NOT_IN_SPLIT_SCREEN) and strips whose surface has a flag in uiIgnoreFlags are left out.
+// A strip listed in several cells goes in once: its triangles' TER_TRI_DONE bits are set while
+// collecting and cleared after.
+int Ter_GetGroundPolyList(TGD_TerrainInfo* pTerrainData, f32* p1, f32* p2, f32* p3, f32* p4,
+                          TGD_PolygonReference* pReturnResult, int iListSize, u32 uiIgnoreFlags) {
     f32 fMinZ = 10000.0f;
     f32 fMaxZ = -10000.0f;
     f32 fMinX = fMinZ;
@@ -46,92 +42,95 @@ int Ter_GetGroundPolyList(CourseInfo* pCourse, f32* pA, f32* pB, f32* pC, f32* p
     int nZ1;
     int nX;
     int nZ;
-    u32 uPinSet;
-    TerPolyRef* pRef;
-    f32 (*pVert)[3];
-    u8* pFlags;
+    u32 uPlacementMask;
+    TGD_PolygonReference* pPolyRef;
+    f32 (*pVertexData)[3];
+    u8* pDrawKickData;
     u32 uRefs;
     int i;
     int j;
     u8 nRun;
 
-    uPinSet = 1 << Game_CurrentPinSet();
-    TER_GROW_BOX(pA);
-    TER_GROW_BOX(pB);
-    TER_GROW_BOX(pC);
-    TER_GROW_BOX(pD);
+    uPlacementMask = 1 << Game_CurrentPinSet();
+    TER_GROW_BOX(p1);
+    TER_GROW_BOX(p2);
+    TER_GROW_BOX(p3);
+    TER_GROW_BOX(p4);
 
-    nX0 = (int)Math_Floor((fMinX - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
-    nZ0 = (int)Math_Floor((fMinZ - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
-    nX1 = (int)Math_Floor((fMaxX - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
-    nZ1 = (int)Math_Floor((fMaxZ - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+    nX0 = (int)Math_Floor((fMinX - pTerrainData->fGridOrigin[0]) / pTerrainData->fGridCellSize[0]);
+    nZ0 = (int)Math_Floor((fMinZ - pTerrainData->fGridOrigin[1]) / pTerrainData->fGridCellSize[1]);
+    nX1 = (int)Math_Floor((fMaxX - pTerrainData->fGridOrigin[0]) / pTerrainData->fGridCellSize[0]);
+    nZ1 = (int)Math_Floor((fMaxZ - pTerrainData->fGridOrigin[1]) / pTerrainData->fGridCellSize[1]);
 
     for (nX = nX0; nX <= nX1; nX++) {
         for (nZ = nZ0; nZ <= nZ1; nZ++) {
-            if (nX >= 0 && nX < pCourse->nGridWidth && nZ >= 0 && nZ < pCourse->nGridLength) {
-                uRefs = pCourse->pGrid[nX + nZ * pCourse->nGridWidth].uRefs;
-                pRef = &pCourse->pPolyRefs[uRefs >> 12];
-                for (i = (uRefs & 0xFFF) - 1; i >= 0; i--) {
-                    if (pRef->n2 != 0) {
-                        pRef++;
-                    } else if (pRef->u4 != 0
-                               && (!(pRef->u4 & uPinSet) || ((pRef->u4 & 0x10) && gSession.nSplitScreen))) {
-                        pRef++;
-                    } else if (uSkip & gSurfaceTypes[pRef->nSurface].u34) {
-                        pRef++;
+            if (nX >= 0 && nX < pTerrainData->nGridWidth && nZ >= 0 && nZ < pTerrainData->nGridLength) {
+                uRefs = pTerrainData->pGrid[nX + nZ * pTerrainData->nGridWidth].uRefs;
+                pPolyRef = &pTerrainData->pPolyRefs[uRefs >> CELL_REFS_FIRST_SHIFT];
+                for (i = (uRefs & CELL_REFS_COUNT_MASK) - 1; i >= 0; i--) {
+                    if (pPolyRef->nObject != 0) {
+                        pPolyRef++;
+                    } else if (pPolyRef->uFlags != 0
+                               && (!(pPolyRef->uFlags & uPlacementMask)
+                                   || ((pPolyRef->uFlags & POLYREF_NOT_IN_SPLIT_SCREEN)
+                                       && gSession.nSplitScreen))) {
+                        pPolyRef++;
+                    } else if (uiIgnoreFlags & gSurfaceTypes[pPolyRef->nSurface].uFlags) {
+                        pPolyRef++;
                     } else {
                         nRun = 0;
-                        pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
-                        pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
-                        for (j = pRef->nTris - 1; j >= 0; j--) {
-                            if (!(pFlags[2] & TER_DONE)) {
+                        pDrawKickData = pTerrainData->pTriFlags + TER_FIRST_VERTEX(pPolyRef);
+                        pVertexData = &pTerrainData->pVerts[TER_FIRST_VERTEX(pPolyRef)];
+                        for (j = pPolyRef->nTris - 1; j >= 0; j--) {
+                            if (!(pDrawKickData[2] & TER_TRI_DONE)) {
                                 // a run starts: where its first triangle is and what it is made of
                                 if (nRun == 0) {
-                                    pList[nCount].nVertex = pVert - pCourse->pVerts;
-                                    pList[nCount].nVertexHi = (pVert - pCourse->pVerts) >> 16;
-                                    pList[nCount].nSurface = pRef->nSurface;
+                                    pReturnResult[nCount].nVertex = pVertexData - pTerrainData->pVerts;
+                                    pReturnResult[nCount].nVertexHi =
+                                        (pVertexData - pTerrainData->pVerts) >> 16;
+                                    pReturnResult[nCount].nSurface = pPolyRef->nSurface;
                                 }
                                 nRun++;
-                                pFlags[2] |= TER_DONE;
+                                pDrawKickData[2] |= TER_TRI_DONE;
                             } else if (nRun != 0) {
-                                pList[nCount].nTris = nRun;
-                                if (nCount < nMax - 1) {
+                                pReturnResult[nCount].nTris = nRun;
+                                if (nCount < iListSize - 1) {
                                     nCount++;
                                 }
                                 nRun = 0;
                             }
-                            pVert++;
-                            pFlags++;
+                            pVertexData++;
+                            pDrawKickData++;
                         }
                         if (nRun != 0) {
-                            pList[nCount].nTris = nRun;
-                            if (nCount < nMax - 1) {
+                            pReturnResult[nCount].nTris = nRun;
+                            if (nCount < iListSize - 1) {
                                 nCount++;
                             }
                         }
-                        pRef++;
+                        pPolyRef++;
                     }
                 }
             }
         }
     }
 
-    // clear the done bits again
+    // clear the done bits again, on every ground strip of the cells
     for (nX = nX0; nX <= nX1; nX++) {
         for (nZ = nZ0; nZ <= nZ1; nZ++) {
-            if (nX >= 0 && nX < pCourse->nGridWidth && nZ >= 0 && nZ < pCourse->nGridLength) {
-                uRefs = pCourse->pGrid[nX + nZ * pCourse->nGridWidth].uRefs;
-                pRef = &pCourse->pPolyRefs[uRefs >> 12];
-                for (i = (uRefs & 0xFFF) - 1; i >= 0; i--) {
-                    if (pRef->n2 != 0) {
-                        pRef++;
+            if (nX >= 0 && nX < pTerrainData->nGridWidth && nZ >= 0 && nZ < pTerrainData->nGridLength) {
+                uRefs = pTerrainData->pGrid[nX + nZ * pTerrainData->nGridWidth].uRefs;
+                pPolyRef = &pTerrainData->pPolyRefs[uRefs >> CELL_REFS_FIRST_SHIFT];
+                for (i = (uRefs & CELL_REFS_COUNT_MASK) - 1; i >= 0; i--) {
+                    if (pPolyRef->nObject != 0) {
+                        pPolyRef++;
                     } else {
-                        pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
-                        for (j = pRef->nTris - 1; j >= 0; j--) {
-                            pFlags[2] &= 0xF7;   // ~TER_DONE as a byte
-                            pFlags++;
+                        pDrawKickData = pTerrainData->pTriFlags + TER_FIRST_VERTEX(pPolyRef);
+                        for (j = pPolyRef->nTris - 1; j >= 0; j--) {
+                            pDrawKickData[2] &= (u8)~TER_TRI_DONE;
+                            pDrawKickData++;
                         }
-                        pRef++;
+                        pPolyRef++;
                     }
                 }
             }
@@ -140,77 +139,84 @@ int Ter_GetGroundPolyList(CourseInfo* pCourse, f32* pA, f32* pB, f32* pC, f32* p
     return nCount;
 }
 
-// The supporting ground triangle under a point: the highest one at or below it. Its height
-// there, the grid cell, the strip, the triangle's vertices and its number in the strip;
-// TER_NO_GROUND when there is none. The strips that count are those of Ter_GetHighestGroundTriangle.
-f32 Ter_GetSupportingGroundTriangle(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** ppRef, f32 (**ppTri)[3],
-                s32* pTri) {
-    u32 uPinSet = 1 << Game_CurrentPinSet();
-    f32 fBest = TER_NO_GROUND;
-    int nX = (int)Math_Floor((pPos[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
-    int nZ = (int)Math_Floor((pPos[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
-    TerCell* pCell;
-    TerPolyRef* pRef;
-    f32 (*pVert)[3];
-    u8* pFlags;
-    int i;
+// The supporting ground triangle under a point: the highest one at or below it, among the ground
+// strips of its cell that Ter_GetGroundPolyList would take, whatever their surface. Returns its
+// height there and gives its cell, its strip, its first vertex and that vertex's number in the
+// strip; TER_NO_GROUND when the point is off the grid, below the whole cell or above no triangle.
+f32 Ter_GetSupportingGroundTriangle(TGD_TerrainInfo* pTerrainData, f32* location, TGD_Cell** pCellResult,
+                                    TGD_PolygonReference** pPolyRefResult, f32 (**pTriangleVertices)[3],
+                                    s32* iFirstVertexIndex) {
+    u32 iCurrentPlacementMask = 1 << Game_CurrentPinSet();
+    f32 fHighestPoint = TER_NO_GROUND;
+    int gx = (int)Math_Floor((location[0] - pTerrainData->fGridOrigin[0]) / pTerrainData->fGridCellSize[0]);
+    int gy = (int)Math_Floor((location[2] - pTerrainData->fGridOrigin[1]) / pTerrainData->fGridCellSize[1]);
+    TGD_Cell* pCell;
+    TGD_PolygonReference* pPolyRef;
+    f32 (*pVertexData)[3];
+    u8* pDrawKickData;
     int j;
+    int k;
     f32 fA;
     f32 fB;
     f32 fC;
     f32 fHeight;
 
-    if (nX >= 0 && nX < pCourse->nGridWidth && nZ >= 0 && nZ < pCourse->nGridLength) {
-        pCell = &pCourse->pGrid[nX + nZ * pCourse->nGridWidth];
-        // the whole cell is above the point
-        if (pCell->nMinHeight > pPos[1]) {
+    if (gx >= 0 && gx < pTerrainData->nGridWidth && gy >= 0 && gy < pTerrainData->nGridLength) {
+        pCell = &pTerrainData->pGrid[gx + gy * pTerrainData->nGridWidth];
+        if (pCell->nMinHeight > location[1]) {
             return TER_NO_GROUND;
         }
-        pRef = &pCourse->pPolyRefs[pCell->uRefs >> 12];
-        for (i = (pCell->uRefs & 0xFFF) - 1; i >= 0; i--) {
-            if (pRef->n2 != 0) {
-                pRef++;
-            } else if (pRef->u4 != 0
-                       && (!(pRef->u4 & uPinSet) || ((pRef->u4 & 0x10) && gSession.nSplitScreen))) {
-                pRef++;
+        pPolyRef = &pTerrainData->pPolyRefs[pCell->uRefs >> CELL_REFS_FIRST_SHIFT];
+        for (j = (pCell->uRefs & CELL_REFS_COUNT_MASK) - 1; j >= 0; j--) {
+            if (pPolyRef->nObject != 0) {
+                pPolyRef++;
+            } else if (pPolyRef->uFlags != 0
+                       && (!(pPolyRef->uFlags & iCurrentPlacementMask)
+                           || ((pPolyRef->uFlags & POLYREF_NOT_IN_SPLIT_SCREEN) && gSession.nSplitScreen))) {
+                pPolyRef++;
             } else {
-                pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
-                pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
-                for (j = pRef->nTris - 1; j >= 0; j--) {
-                    if ((pFlags[2] & 7)
-                        && (pPos[1] > pVert[(pFlags[2] >> 6) & 3][1]
-                            || fBest < pVert[(pFlags[2] >> 4) & 3][1])
-                        && Ter_PointInTriangleXZpY(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
-                        Ter_GetBarycentricCoords(pVert, pPos, &fA, &fB, &fC);
-                        fHeight = fA * pVert[0][1] + fB * pVert[1][1] + fC * pVert[2][1];
-                        if (fHeight > fBest && fHeight <= pPos[1]) {
-                            *ppCell = pCell;
-                            fBest = fHeight;
-                            *ppRef = pRef;
-                            *ppTri = pVert;
-                            *pTri = pRef->nTris - j - 1;
+                pVertexData = &pTerrainData->pVerts[TER_FIRST_VERTEX(pPolyRef)];
+                pDrawKickData = pTerrainData->pTriFlags + TER_FIRST_VERTEX(pPolyRef);
+                for (k = pPolyRef->nTris - 1; k >= 0; k--) {
+                    // the corner test passes a triangle over only when its lowest corner is at or
+                    // above the point and its highest no higher than the best so far
+                    if ((pDrawKickData[2] & TER_TRI_KICK_MASK)
+                        && (location[1] > pVertexData[TER_TRI_LOWEST_CORNER(pDrawKickData[2])][1]
+                            || fHighestPoint < pVertexData[TER_TRI_HIGHEST_CORNER(pDrawKickData[2])][1])
+                        && Ter_PointInTriangleXZpY(pVertexData[0], pVertexData[1], pVertexData[2],
+                                                   location[0], location[2])) {
+                        Ter_GetBarycentricCoords(pVertexData, location, &fA, &fB, &fC);
+                        fHeight = fA * pVertexData[0][1] + fB * pVertexData[1][1] + fC * pVertexData[2][1];
+                        if (fHeight > fHighestPoint && fHeight <= location[1]) {
+                            *pCellResult = pCell;
+                            fHighestPoint = fHeight;
+                            *pPolyRefResult = pPolyRef;
+                            *pTriangleVertices = pVertexData;
+                            *iFirstVertexIndex = pPolyRef->nTris - k - 1;
                         }
                     }
-                    pVert++;
-                    pFlags++;
+                    pVertexData++;
+                    pDrawKickData++;
                 }
-                pRef++;
+                pPolyRef++;
             }
         }
-        return fBest;
+        return fHighestPoint;
     }
     return TER_NO_GROUND;
 }
 
-// The surface type under a point (its supporting triangle's), NULL when there is no ground.
-SurfaceType* Ter_GetSupportingGroundMaterial(CourseInfo* pCourse, f32* pPos) {
-    TerCell* pCell;
-    TerPolyRef* pRef;
-    f32 (*pTri)[3];
-    s32 nTri;
+// The surface of the supporting ground triangle under a point; NULL when there is none.
+TGD_MaterialInfo* Ter_GetSupportingGroundMaterial(TGD_TerrainInfo* pTerrainData, f32* location) {
+    TGD_Cell* pCell;
+    TGD_PolygonReference* pPolyRef;
+    f32 (*pTriangleVertices)[3];
+    s32 iFirstVertexIndex;
 
-    if (Ter_GetSupportingGroundTriangle(pCourse, pPos, &pCell, &pRef, &pTri, &nTri) != TER_NO_GROUND) {
-        return &gSurfaceTypes[pRef->nSurface];
+    if (Ter_GetSupportingGroundTriangle(pTerrainData, location, &pCell, &pPolyRef, &pTriangleVertices,
+                                        &iFirstVertexIndex)
+        != TER_NO_GROUND) {
+        return &gSurfaceTypes[pPolyRef->nSurface];
     }
     return NULL;
 }

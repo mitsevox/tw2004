@@ -158,7 +158,7 @@ void GameModeAlternateShot_SetupNextGolfer(void) {
 s32 GameModeAlternateShot_GetHonors(int nPlayer) {
     s32 aOrder[4] = {0, 1, 2, 3};  // the tee order before anyone has won a hole
     int nBest;
-    CourseInfo* pCourse;
+    TGD_TerrainInfo* pCourse;
     int w;
     int t;
     int i;

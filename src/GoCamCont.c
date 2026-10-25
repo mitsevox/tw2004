@@ -573,7 +573,7 @@ void CameraController_PostEvent(View* pView, int nKind, int nPlayer) {
     f32* pAt = CameraController_GetCameraLookPoint(pView);
     f32 vNormal[4];
     f32 vGrey[4] = {0.1f, 0.1f, 0.1f, 0.5f};
-    SurfaceType* pSurface;
+    TGD_MaterialInfo* pSurface;
     CamShot* pShot;
     int nAsked;
 

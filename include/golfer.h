@@ -702,7 +702,8 @@ typedef struct GameState {
     s32  nPlayoffHoles;         // 0x0D8  playoff holes started
     s32  nCurrentRound;         // 0x0DC  the tour event's current round, from 0 (GameModeDriverPGATour)
     s32  nE0;                   // 0x0E0  the event's round count (1 outside a tour event)
-    s32  nPinSet[18];           // 0x0E4  per hole: which of its four pin positions (CourseInfo.pin) is used
+    s32  nPinSet[18];           // 0x0E4  per hole: which of its four pin positions (TGD_TerrainInfo.pin)
+                                //        is used
     s32  n12C;                  // 0x12C
     f32* pPinPos;               // 0x130  the current hole's pin (GoTerrainCollision.c sets it);
                                 //        speed golf measures the ball's distance to it
@@ -931,9 +932,6 @@ extern f32          gClubPowerStep[CLUB_MAX_e];      // 0x801875E8  reach gained
 GM_ModeType_t GM_GetModeType(void);    // FETextureMgr.c: gpGame->nMode
 int  Golfer_FindById(int nId);          // the gGolferTable row with that nModelID, -1 none
 void fn_8002EBA4(u8* pObj, u8 nValue);  // set byte 7 of the options (a7[0]) and apply it (Golfer.c)
-int  GM_GetCurrentHolePar(void);
-s32  GM_GetCurrentHoleTeeDistance(int nTee);             // CourseData.c: the current hole's value for tee set
-                                                         // nTee
 int  Lessons_GetShotKind(void);                 // shot kind override, 8 = none
 int  Lessons_GetClub(int nPlayer);          // club override, 26 = none
 int  Game_GetCurHoleNum(void);

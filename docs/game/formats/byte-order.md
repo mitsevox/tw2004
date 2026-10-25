@@ -51,7 +51,7 @@ Objects delivered by UStream
 | `stat` | Golfer_OnStatsLoaded | Golfer.c | swapped: Golfer_TableByteSwap > BYTESWAP_SWAPDATA | yes: copied over `gGolferTable[34]` (`GolferRecord`); only 0x98..0x140 of each record is swapped, in 8-byte units; the u32 at 0x90 is not. A |
 | `rcrd` | Session_OnRecordsLoaded | Golfer.c | none seen | yes: copied straight over `gSession.aCourseRecord`, big-endian |
 | `ter ` | Ter_HoleDataLoadCallback | GoTerrain.c | none seen | asm |
-| `tgd ` | Ter_CourseLoadCallback | GoTerrain.c | none seen | yes: the course's collision data; `Ter_InitTGD` (Ter_InitTGD, GoTerrainCollision.c) lays `CourseInfo` (ball.h) over it and turns its offsets into pointers in place (`TER_RELOCATE`, 32-bit); `TerCell`, `TerPolyRef`, `TerObject` and the vertex list are read in place |
+| `tgd ` | Ter_CourseLoadCallback | GoTerrain.c | none seen | yes: the course's collision data; `Ter_InitTGD` (Ter_InitTGD, GoTerrainCollision.c) lays `TGD_TerrainInfo` (ball.h) over it and turns its offsets into pointers in place (`TER_RELOCATE`, 32-bit); `TGD_Cell`, `TGD_PolygonReference`, `TerObject` and the vertex list are read in place |
 | `tLOD` | Ter_LODLoadCallback | GoTerrain.c | none seen | asm |
 | `CAMS` | DynamicCam_LoadCAMSfromStream | GoDynamicCam.c | swapped: BYTESWAP_SWAPDATA | little-endian on disc |
 | `CAMV` (2) | DynamicCam_LoadCAMVfromStream, DynamicCam_LoadCAMVfromStreamFE | GoDynamicCam.c | swapped: DynamicCam_CopyScriptData > ByteSwap_Records | little-endian on disc |
@@ -71,7 +71,7 @@ Objects delivered by UStream
 | `TEO ` | FE_CrAPBall_LoadTEO | sweep | none seen | asm (a second `TEO ` handler) |
 | `BALF` | FE_CrAPBall_LoadBALF | sweep | none seen | asm |
 | `TRAX`, `TRXT` | UI_vEATraxLoadfromStream, UI_vEATraxLoadLogoFromStream | sweep | none seen | asm |
-| `CRI `, `CMPS` | GM_CourseInfo_LoadCRIfromStream, GM_CourseInfo_LoadCMPSfromStream | sweep | none seen | asm |
+| `CRI `, `CMPS` | GM_CourseInfo_LoadCRIfromStream, GM_CourseInfo_LoadCMPSfromStream | CourseInfo.c | none seen | yes: copied over `gCourseInfo` (`CourseData[21]`) and `gCompilationCourses` (`GM_CompilationCourseData_t[7]`), include/game.h |
 | `ERN ` | EarningsInfo_LoadERNFromStream | Earnings.c | none seen | yes: copied over the prize table `lbl_80200538` (`EarningsTable`, include/game/earnings.h) |
 | `PLY ` | PlayNow_LoadPLYFromStream | PlayNowMode.c | none seen | yes: copied over `gPlayNowChallenges` (`Challenge[83]`, include/game/modes/challenge.h) |
 | `PLYs` | PlayNow_LoadPLYsFromStream | PlayNowMode.c | none seen | bytes: a string block, copied |

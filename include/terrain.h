@@ -10,7 +10,7 @@
 #include "game_types.h"
 #include "platform.h"
 
-struct CourseInfo;
+struct TGD_TerrainInfo;
 struct TStreamData;
 struct UObjMesh;                    // dynobj.h: the hole data is a tree of them
                                     // (Ter_GetMeshNext..Ter_GetHoleModelRoot)
@@ -108,7 +108,7 @@ LAYOUT_ASSERT(Ter_LODPlane, 8);
 typedef struct TerPosData {
     u8   unk0[0x10];
     f32  vPos[3];               // 0x10
-    u8   nIndex;                // 0x1C  its row of CourseInfo.tee or CourseInfo.pin
+    u8   nIndex;                // 0x1C  its row of TGD_TerrainInfo.tee or TGD_TerrainInfo.pin
 } TerPosData;
 
 // What Ter_BeginRender hands to row 4 of the table SD_SetShaderTypeParameters calls through: four
@@ -132,7 +132,7 @@ typedef struct TerLODData {
 typedef struct Ter_TerrainRendererMgr {
     void*        pCurrentHoleData;              // 0x000  made from the 'ter ' chunk's data (fn_800073B4)
     struct TStreamData* pCurrentHoleDataStreamData;     // 0x004  the 'ter ' chunk
-    struct CourseInfo* pCourse;                 // 0x008  NULL until loaded
+    struct TGD_TerrainInfo* pCourse;                 // 0x008  NULL until loaded
     struct TStreamData* pCourseStreamData;      // 0x00C  the chunk pCourse came in
     Ter_PatchReference*  pPatchList;            // 0x010  iTotalPatches of them
     Ter_PatchReference*  pPostDrawTerrainList;  // 0x014  iTotalPostDrawTerrainPatches of them

@@ -7,7 +7,7 @@
 
 #include "materialtypes.h"
 
-const SurfaceType gSurfaceTypes[NUM_SURFACE_TYPES] = {
+const TGD_MaterialInfo gSurfaceTypes[NUM_SURFACE_TYPES] = {
     {1.0f, 0.0f, 1.0f, 0.69f, 0.8f, 0.9f, 0.9f, 0.375f, 0.07f, 600.0f, 0.0f, 8, 16, 0x8, 6, 0, 0},  // 0
     {1.0f, 0.0f, 1.0f, 0.69f, 0.72f, 0.7f, 0.7f, 0.375f, 0.1f, 500.0f, 0.0f, 10, 16, 0x9, 0, 0, 0},
     {1.0f, 0.0f, 1.0f, 0.72f, 0.72f, 0.7f, 0.7f, 0.375f, 0.1f, 500.0f, 0.0f, 10, 16, 0x9, 6, 0, 0},

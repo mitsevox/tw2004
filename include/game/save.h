@@ -9,6 +9,19 @@
 
 #include "golfer.h"
 
+// Course numbers (gCourseNames, game.h, has their names). 0..20 are the courses of the course table
+// (gCourseInfo); the numbers after them are rounds whose 18 holes come from those courses.
+typedef enum GM_CourseType_t {
+    COURSE_TIGERS_DREAM_18 = 22,    // "Tiger's Dream 18": row 0 of the compilation table
+    COURSE_RANDOM_18 = 23,          // "Random 18": holes drawn at random (GM_BuildRandom18)
+    COURSE_COMPILATION_1 = 24,      // "Compilation 1" .. "Compilation 6": rows 1..6 of the
+    COURSE_COMPILATION_2 = 25,      // compilation table
+    COURSE_COMPILATION_3 = 26,
+    COURSE_COMPILATION_4 = 27,
+    COURSE_COMPILATION_5 = 28,
+    COURSE_COMPILATION_6 = 29
+} GM_CourseType_t;
+
 // An award in a save profile: whether it is won, and when.
 typedef struct Award {
     u8   bWon;                  // 0x0

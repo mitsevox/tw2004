@@ -34,7 +34,7 @@ Common/Checksum/ChecksumCRC32.c	done	d5543081	claude-review
 Common/Crypt/CryptXOR.c	done	44db6e97	claude-review
 Common/SharedFileIO/SharedFileIO.c	open		
 Common/TagFile/TagFile.c	open		
-CourseData.c	open		
+CourseInfo.c	done	1e497408	claude-review
 DepthField.c	open		
 DiscCheck.c	open		
 DiscError.c	open		
@@ -180,7 +180,7 @@ StreamManager.c	done	7511d865	claude-review
 SunFlr_Gc.c	open		
 Swing.c	open		
 TerrainData.c	open		
-TerrainGround.c	open		
+TerrainGround.c	done	ff3496ef	claude-review
 TibExt.c	open		
 UAudContainers.c	done	b5058d88	claude-review
 UAudMem.c	open		
