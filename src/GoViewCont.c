@@ -188,7 +188,7 @@ void VM_vSetViewportRect(VM_SViewport* spViewport_p, f32 fLeft_p, f32 fTop_p, f3
 static void Camera_SetCameraYawPitchRollAndPosition(CamLens* spCamera_p, f32* xCameraPosition_p,
                                                     f32* yawPitchRoll_p) {
     CA_vSetDefaultScalingVectors(spCamera_p);
-    mat44flt_EulerAngles(spCamera_p->mViewToWorld, yawPitchRoll_p[1], yawPitchRoll_p[0], yawPitchRoll_p[2]);
+    mat44flt_EulerAngles(yawPitchRoll_p[1], yawPitchRoll_p[0], yawPitchRoll_p[2], spCamera_p->mViewToWorld);
     spCamera_p->mViewToWorld[3][0] = xCameraPosition_p[0];
     spCamera_p->mViewToWorld[3][1] = xCameraPosition_p[1];
     spCamera_p->mViewToWorld[3][2] = xCameraPosition_p[2];

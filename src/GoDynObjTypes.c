@@ -6,7 +6,6 @@
 
 #include "dynobj.h"
 
-void LLMath_IdentifyMat(f32 (*pMtx)[4]);                                           // identity
 void UObject_ComposeRotation(f32 (*pMtx)[4]);
 
 // Type 6's message 2: sets the object up from its definition as type 0 does, but with no flags (so

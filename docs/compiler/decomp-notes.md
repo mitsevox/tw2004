@@ -383,7 +383,7 @@ The fixes that come up most often. Each points to its full entry below.
   first; for arguments, `f(g(), h())` calls `h()` first. To call in source order, use a temporary.
   CourseData GM_GetTotalPar, sweep_800D3208 (99.87 -> 100).
 - **[verified] Split long arithmetic into statements to keep EA's grouping.** `(a + b - 1)` is regrouped
-  as `a + (b - 1)`; `u = a + b; u = (u - 1) & ~(a - 1);` keeps it (UMemPool fn_8000AFA0 84.0 -> 98.9). A
+  as `a + (b - 1)`; `u = a + b; u = (u - 1) & ~(a - 1);` keeps it (UMemPool CreateMemPool 84.0 -> 98.9). A
   `+`/`-` chain of divisions gets reordered the same way (EASBStorage fn_801288DC 96.7 -> 100, five
   statements). `d - (d/365)*365` is `d % 365`.
 - **[verified] A ternary loads its else-value first.** `(u > m) ? m : u` -> `(u <= m) ? u : m` when the
@@ -510,7 +510,7 @@ The fixes that come up most often. Each points to its full entry below.
   GameMode26_ScoreShot, GameMode22 GameMode22_ScoreShot 91.4 -> 94.1). `PLAYER(i)->` instead of `gPlayers[i].` fixed both
   twins' loops (GameMode26_ClearPlayerStats, GameMode22_ClearPlayerStats, about 73 -> 100).
 - **[verified] Pointer plus integer always puts the pointer first in `add`**; adding as integers
-  (`(u8*)(n + (uptr)p)`) flips it (UMemPool fn_8000AFA0).
+  (`(u8*)(n + (uptr)p)`) flips it (UMemPool CreateMemPool).
 - **[verified] `&a[i]` indexing matches where hand-walked pointers don't** (fe_movies UIPoly_Draw,
   ActAnimal_SetWorldMatrix, SitDevFile SitDev_InvokeAction 74.7 -> 98.8).
 - **[verified] `p = arr; p += n;` instead of `&arr[n]`** keeps the element address, not the index
@@ -996,7 +996,7 @@ The fixes that come up most often. Each points to its full entry below.
   into the "wrong" FPR number: the original declared `f32 fInv = 1.0f / 128.0f;` at the top.
 - **[verified] `x * (1.0f / 512.0f)` puts the constant first in `fmuls`; `x / 512.0f` puts x first**
   (uiText UIText_Draw 97.0 -> 98.7).
-- **[verified] A shared product kept in a local sets the `fmadds` operand order** (UMemPool mat44flt_EulerAngles).
+- **[verified] A shared product kept in a local sets the `fmadds` operand order** (UMatFlt mat44flt_EulerAngles).
 - **[verified] Angles: write `x / 180.0f * PI`, not `DEG(x)`.** MWCC rounds some `DEG()` products one bit
   off EA's constants (175, -17, -5 degrees); objdiff masks it, constcheck catches it (GoLighting
   fn_8006EDC0).

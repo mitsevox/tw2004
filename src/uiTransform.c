@@ -15,9 +15,6 @@ UITransformStack* gpUITransformStack;   // the stack (UITransform_Init)
 f32  Math_Tan(f32 x);                // tan
 
 // 4x4 matrix helpers (the engine's; declared here until their own files are written).
-void LLMath_IdentifyMat(f32 m[4][4]);                                          // identity
-void LLMath_CopyMat44(f32 src[4][4], f32 dst[4][4]);                         // copy 4 rows
-void LLMath_CopyMat34(f32 src[4][4], f32 dst[4][4]);                         // copy 3 rows
 
 void UITransform_Translate(UITransform* p, f32 x, f32 y, f32 z);
 void UITransform_Scale(UITransform* p, f32 x, f32 y, f32 z);

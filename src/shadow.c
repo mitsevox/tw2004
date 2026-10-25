@@ -24,9 +24,6 @@ void CharacterRender_RenderSetup(void); // GoTerrain.c
 void SKN_DrawCharacter(Character* pChar, u32 uFlags);
 u8   Character_IsGolfer(Character* pChar);
 void RC_vSetCurrentRenderCtx(void* pCamera);        // makes it the current render camera
-void LLMath_IdentifyMat(f32 (*pMtx)[4]);       // identity
-void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: copy a 4x4 matrix
-void LLMath_InvertNormalized(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: inverts a rotation+translation
 f32  Math_Tan(f32 x);                // tan, as a float
 void fn_800B2470(void);
 void fn_800B281C(void);

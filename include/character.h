@@ -386,11 +386,11 @@ void MtaLib_Unregister(void);                 // mtalib.c
 
 // animblender.c's pools (AnimBlender_InitModule creates them, AnimBlender_CloseModule destroys them): blend tree nodes by
 // type (0x34, 0x2C and 0x20 bytes), then pose buffers of format 0 (0x1040) and format 1 (0x114C).
-extern UMemPool* gSKAChannelPool;
-extern UMemPool* gSKABlenderPool;
-extern UMemPool* gSKABlendDataPool;
-extern UMemPool* gSkelPosePool;
-extern UMemPool* gMorphPosePool;
+extern MemPoolPtr gSKAChannelPool;
+extern MemPoolPtr gSKABlenderPool;
+extern MemPoolPtr gSKABlendDataPool;
+extern MemPoolPtr gSkelPosePool;
+extern MemPoolPtr gMorphPosePool;
 // animblender.c: unmark morph nMorph in the three blocks of pNode's format 1 pose buffer, and its
 // sources'.
 void SKABlender_ClearMorph(SKABlendNode* pNode, s32 nMorph);

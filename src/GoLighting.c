@@ -19,10 +19,7 @@ void    fn_8006ED70(void);
 GoLight* fn_8006EFB8(void);
 void    fn_8006F080(GoLight* pLight);
 
-void LLMath_MultiplyVec(f32* pA, f32* pB, f32* pOut);     // pOut = pA * pB, element by element
 void vec4flt_Zero(f32* pVec);                        // sets a vector to gVec4Zero
-void LLMath_IdentifyMat(f32 (*pMtx)[4]);                   // identity
-void LLMath_InvertNormalized(f32 (*pSrc)[4], f32 (*pDst)[4]);  // UMemPool.c: inverts a rotation+translation
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0f (0x80283900), before the white below and the 128.0f and 0.0f fn_8006E2A4 uses first; its

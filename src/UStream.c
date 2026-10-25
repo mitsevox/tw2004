@@ -36,7 +36,7 @@ static CDBuf* gpFreeList;         // released buffers, not yet back in the free 
 static CDBuf* gpCurList;          // the buffers being parsed
 static CDBuf* gpUsedList;         // parsed buffers the movie player still holds chunks of
 static ParseInProg gFill;         // the object being filled and how far
-static UMemPool* gpNodePool;      // the TStreamQueue nodes of gpDoneList
+static MemPoolPtr gpNodePool;     // the TStreamQueue nodes of gpDoneList
 static TStreamQueue* gpDoneList;  // objects the parser finished, oldest first
 static void* gpBufferMemory;      // the USTREAM_NUM_BUFFERS buffers (UStream_AllocBuffers)
 static int  gnCurStream;          // the stream being read; -1: none
