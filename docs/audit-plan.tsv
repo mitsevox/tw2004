@@ -252,7 +252,7 @@ order	area	file	task	scope	state
 249	Movies	maddeca.c	pass	the whole file	open
 250	Movies	madidct.c	pass	the whole file	open
 251	Movies	LLVideo.c	pass	the whole file	open
-252	Movies	LLPictInt.c	pass	the whole file	open
+252	Movies	LLPictInt.c	pass	the whole file	done
 253	Movies	LLPict_Gc.c	pass	the whole file	open
 254	Movies	rcmp_mad_codec.c	pass	the whole file	open
 255	Movies	maddec.c	pass	the whole file	open
