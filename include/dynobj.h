@@ -1,28 +1,46 @@
 // dynobj.h (our name): the course's dynamic objects (GoDynObj.c) and their types. Each type has
-// a message handler, found by the type number (DynObj_GetTypeHandler): message 1 asks the size of the
-// type's object, 2 sets one up from its definition, 3 runs Object_Draw on its object part (when
-// it has a model), 6 is the per-frame update. Only what the code reads so far.
+// a message handler, found by the type number (DynObj_GetTypeHandler), that answers the messages
+// sent to the type's objects (DynObjMessage).
 
 #ifndef DYNOBJ_H
 #define DYNOBJ_H
 
 #include "engine.h"
 
-// A type's message handler: nMsg, the object (NULL for message 1) and two message arguments
+// A type's message handler: nMsg, the object (NULL for DYNOBJ_MSG_SIZE) and two message arguments
 // (UKernel.c passes 0 for the second when a message has one).
 typedef int (*DynObjHandler)(int nMsg, struct DynObj* pObj, void* pArg, void* pArg2);
+
+// The messages a type's handler takes (nMsg).
+typedef enum DynObjMessage {
+    DYNOBJ_MSG_SIZE = 1,        // answers the size of the type's object (Kernel_CreateObject)
+    DYNOBJ_MSG_INIT = 2,        // sets the object up; pArg is its DynObjSetup (Kernel_CreateObject)
+    DYNOBJ_MSG_DRAW = 3,        // draws it (DynObj_RenderDynamicObjects, through
+                                // Kernel_BroadcastMessage)
+    DYNOBJ_MSG_UPDATE = 6       // the per-frame update; pArg holds the frame time's bits
+                                // (DynObj_UpdateDynamicObjects, through Kernel_BroadcastMessage)
+} DynObjMessage;
+
+// Object types (DynObjDef.nType).
+typedef enum DynObjType {
+    DYNOBJ_TYPE_PIN = 6,        // a pin position: Kernel_DownloadActors hands the actor to
+                                // Ter_PinLoadCallback, which always answers 0, so no object of
+                                // this type is made
+    DYNOBJ_TYPE_SOUND = 9       // a sound: Kernel_DownloadActors hands the actor to
+                                // Gaud_ActorDownloadCallback, so no object of this type is made
+} DynObjType;
 
 // An object's definition in the course data: its 'tACT' chunk from the chunk's id on
 // (Kernel_DownloadActors; TChunkR).
 typedef struct DynObjDef {
-    s32  n0;                    // 0x00  the chunk's id -> DynObj.n140
-    u8   n4;                    // 0x04  its type (DynObj_GetTypeHandler) -> DynObj.n146
+    s32  nActorId;              // 0x00  the chunk's id -> DynObj.nActorId
+    u8   nType;                 // 0x04  its type (DynObj_GetTypeHandler) -> DynObj.nType
     u8   unk5[3];
     f32  aPos[3];               // 0x08  where it stands
-    u32  u14;                   // 0x14  -> DynObj.uFlags (type 0)
-    u8   n18;                   // 0x18  -> DynObj.n147 (type 0)
+    u32  uFlags;                // 0x14  -> DynObj.uFlags (Kernel_InitObjectFromDef)
+    u8   nGroup;                // 0x18  -> DynObj.nGroup (Kernel_InitObjectFromDef)
     u8   unk19;
-    s16  n1A;                   // 0x1A  -> DynObj.n14E
+    s16  nUnread;               // 0x1A  -> DynObj.nUnread2
 } DynObjDef;
 LAYOUT_ASSERT(DynObjDef, 0x1C);     // GoDynObj.c builds one on the stack: 0x1C bytes there
 
@@ -47,7 +65,7 @@ typedef struct DynObjAnimalDef {
 typedef struct DynObjModelRef {
     u8*  pData;                 // 0x00  TStreamData.pData; an animal's route follows a 12-byte
                                 //       header in it (ActAnimal_Init)
-    struct UObjModel* p4;       // 0x04  goes to Object_Init
+    struct UObjModel* pModel;   // 0x04  TStreamData.uHandlerData: goes to Object_Init
 } DynObjModelRef;
 
 // One stream object an object's 'aRSL' chunk names, found by UKernel.c's Kernel_DownloadActors.
@@ -66,27 +84,30 @@ typedef struct DynObjModel {
     DynObjModelEntry aEntries[1]; // 0x4  nEntries of them (as many as the chunk holds)
 } DynObjModel;
 
-// The byte-code scripts an object runs with RPN_RunScript (DynObjSetup.pC).
-typedef struct DynObjNames {
+// The byte-code scripts an object runs with RPN_RunScript (DynObjSetup.pScripts): a view of the
+// actor's TStreamData, whose aScriptRefs Stream_Progress made pointers.
+typedef struct DynObjScripts {
     u8   unk0[0x28];
-    u8*  p28;                   // 0x28  -> DynObj.p15C
-    u8*  p2C;                   // 0x2C  -> DynObj.p160
-    u8*  p30;                   // 0x30  -> DynObj.p164
-} DynObjNames;
+    u8*  pHitScript;            // 0x28  -> DynObj.pHitScript
+    u8*  pReleaseScript;        // 0x2C  -> DynObj.pReleaseScript
+    u8*  pUnreadScript;         // 0x30  -> DynObj.pUnreadScript
+} DynObjScripts;
 
-// What a type's message 2 gets (Kernel_CreateObject asks its handler for the object's size first).
+// What a type's DYNOBJ_MSG_INIT gets (Kernel_CreateObject asks its handler for the object's size
+// first).
 typedef struct DynObjSetup {
     DynObjHandler pfnHandler;   // 0x00
     DynObjModel* pModel;        // 0x04
     DynObjDef* pDef;            // 0x08
-    DynObjNames* pC;            // 0x0C
+    DynObjScripts* pScripts;    // 0x0C  NULL: no scripts
 } DynObjSetup;
 
-// Two bytes UKernel.c's Kernel_PostPairToObject records on an object (DynObj.a138), or in
-// gKernelOverflowSlots when the object's four are taken.
+// The two values (a, b) of UKernel.c's Kernel_PostPairToObject, recorded on an object
+// (DynObj.aPairs) or in gKernelOverflowSlots when the object's four are taken. Nothing reads them
+// back but the test for a free pair.
 typedef struct DynObjPair {
-    u8   b0;                    // 0x0
-    u8   b1;                    // 0x1
+    u8   nFirst;                // 0x0  a; 0: the pair is free
+    u8   nSecond;               // 0x1  b
 } DynObjPair;
 
 // The header of a UObjMesh's data (UObjMesh.pInfo).
@@ -267,7 +288,12 @@ typedef struct TObjectS {
 } TObject;
 LAYOUT_ASSERT(TObject, 0x118);
 
-#define TOBJECT_HAS_LODS 0x4    // TObject.uFlags: the model's four levels of detail are not all the same
+// TObject.uFlags.
+#define TOBJECT_UNREAD_1  0x01  // } set by a dynamic object's setup (DYNOBJ_TOBJECT_FLAGS) and on
+#define TOBJECT_UNREAD_10 0x10  // }   GoDynObj.c's 'TEO ' 10000; nothing reads them
+#define TOBJECT_HAS_LODS  0x04  // the model's four levels of detail are not all the same
+#define TOBJECT_UNREAD_40 0x40  // set by a dynamic object's setup (DYNOBJ_HIDE_WITH_FLAG_OUT); nothing
+                                // reads it
 
 // A dynamic object (0x16C bytes for type 0; a type may add fields after it).
 typedef struct DynObj {
@@ -279,25 +305,54 @@ typedef struct DynObj {
     s32  n134;                  // 0x134  its id (Kernel_FindObjectById finds it by this); 0 once
                                 //        Kernel_ReleaseObject ran, then Kernel_SweepDeadObjects's sweeps set
                                 //        -1 and free it
-    DynObjPair a138[4];         // 0x138  pairs Kernel_PostPairToObject records (b0 == 0: free)
-    u16  n140;                  // 0x140
-    s16  n142;                  // 0x142
-    s16  n144;                  // 0x144
-    u8   n146;                  // 0x146
-    u8   n147;                  // 0x147
-    u8   n148;                  // 0x148
+    DynObjPair aPairs[4];       // 0x138  pairs Kernel_PostPairToObject records (nFirst == 0: free)
+    u16  nActorId;              // 0x140  its actor chunk's id (DynObjDef.nActorId): the byte-code
+                                //        addresses objects by it (Kernel_PostPairByActorId,
+                                //        Kernel_QueryActorById), and a ball that hits it passes it
+                                //        to the game mode (HitObject.nActorId)
+    s16  nHitAmount;            // 0x142  0 at setup, and nothing changes it; read only by message
+                                //        8, which nothing sends
+    s16  nPoints;               // 0x144  0 at setup, and nothing changes it (messages 8 and 10,
+                                //        which would, are never sent); message 9 answers it for
+                                //        value 0
+    u8   nType;                 // 0x146  its type (DynObjDef.nType); message 9 answers it for value 6
+    u8   nGroup;                // 0x147  from its definition (Kernel_InitObjectFromDef; 0 for types
+                                //        6 and 9): opcode 57 posts a pair to every object of a
+                                //        group (Kernel_PostPairByGroup); message 9 answers it for
+                                //        value 7
+    u8   nKey;                  // 0x148  0 at setup, and nothing changes it: opcode 58 posts a pair
+                                //        to every object with a key (Kernel_PostPairByKey); message
+                                //        9 answers it for value 8
     u8   unk149[3];
-    s16  n14C;                  // 0x14C
-    s16  n14E;                  // 0x14E
-    s32  n150;                  // 0x150
-    u32  uFlags;                // 0x154
-    f32  f158;                  // 0x158
-    u8*  p15C;                  // 0x15C  } scripts run by RPN_RunScript (p15C when n144 drops,
-    u8*  p160;                  // 0x160  }  p160 by Kernel_ReleaseObject)
-    u8*  p164;                  // 0x164  }
-    s32  n168;                  // 0x168
+    s16  nUnread1;              // 0x14C  0 at setup; nothing reads it
+    s16  nUnread2;              // 0x14E  DynObjDef.nUnread (-1 for type 6); nothing reads it
+    s32  nUnread3;              // 0x150  0 at setup; nothing reads it
+    u32  uFlags;                // 0x154  DYNOBJ_*; from its definition (Kernel_InitObjectFromDef; 0
+                                //        for types 6 and 9)
+    f32  fValue;                // 0x158  0 at setup, and nothing changes it; message 9 answers it
+                                //        for value 4
+    u8*  pHitScript;            // 0x15C  } its byte-code scripts (RPN_RunScript), from its actor's
+    u8*  pReleaseScript;        // 0x160  }   stream object: pReleaseScript runs when
+    u8*  pUnreadScript;         // 0x164  }   Kernel_ReleaseObject gives it up. pHitScript is run
+                                //        }   only by messages 8 and 10, which nothing sends;
+                                //        }   nothing reads pUnreadScript
+    s32  nUnread4;              // 0x168  0 at setup; nothing reads it
 } DynObj;
 LAYOUT_ASSERT(DynObj, 0x16C);
+
+// DynObj.uFlags. The low bits come from the object's definition, the high bits are its state.
+#define DYNOBJ_INACTIVE           0x00000004 // set up with DYNOBJ_REMOVED
+#define DYNOBJ_TOBJECT_FLAGS      0x00000080 // its TObject gets TOBJECT_UNREAD_1 | TOBJECT_UNREAD_10
+// When DynObjBase_MessageHandler draws the object, the next three change how it is drawn.
+#define DYNOBJ_HIDE_WITH_FLAG_OUT 0x00000200 // not drawn while the flagstick is out; its TObject
+                                             // also gets TOBJECT_UNREAD_40 at setup
+#define DYNOBJ_NO_ZWRITE          0x00000400 // drawn without z-buffer writes; also sets
+                                             // DYNOBJ_UNREAD_2000000 at setup
+#define DYNOBJ_NO_ALPHA_TEST      0x00000800 // drawn without the alpha test
+#define DYNOBJ_UNREAD_1000000     0x01000000 // cleared at setup; nothing else touches it
+#define DYNOBJ_UNREAD_2000000     0x02000000 // set at setup with DYNOBJ_NO_ZWRITE; nothing reads it
+#define DYNOBJ_REMOVED            0x04000000 // set at setup with DYNOBJ_INACTIVE (message 4, which
+                                             // nothing sends, would set it too)
 
 // Type 2 (GoDynObjBase.c): an object that turns at a steady speed.
 typedef struct DynObjTurning {
@@ -479,11 +534,13 @@ void Kernel_AppendObject(DynObj* pObj);                             // adds it a
 s32  Kernel_CreateObjectId(DynObjSetup* pSetup);                      // a new object's id, -2 when none
 void Kernel_SweepDeadObjects(void);                                     // sweeps out the objects given up
 void Kernel_ReleaseObject(DynObj* pObj);
-void Kernel_InitObjectFromDef(DynObj* pObj, DynObjSetup* pSetup);    // type 0's message 2
-void Kernel_PostPairByActorId(int nKey, int a, int b);   // records (a, b) on every object whose n140 is nKey
-void Kernel_PostPairByKey147(int nKey, int a, int b);   // ... whose n147 is nKey
-void Kernel_PostPairByKey148(int nKey, int a, int b);   // ... whose n148 is nKey
-int  Kernel_QueryActorById(int nKey, uptr nWhat);     // asks the first object whose n140 is nKey (message 9)
+void Kernel_InitObjectFromDef(DynObj* pObj, DynObjSetup* pSetup);    // type 0's DYNOBJ_MSG_INIT
+void Kernel_PostPairByActorId(int nActorId, int a, int b);   // records (a, b) on every object with
+                                                             // this nActorId
+void Kernel_PostPairByGroup(int nGroup, int a, int b);  // ... with this nGroup
+void Kernel_PostPairByKey(int nKey, int a, int b);      // ... with this nKey
+int  Kernel_QueryActorById(int nKey, uptr nWhat);     // asks the first object whose nActorId is nKey
+                                                      // (message 9)
 void Kernel_BroadcastMessage(int nMsg, void* pArg, void* pArg2);     // sends nMsg to every object with id > 0
 
 // UObject.c. A dynamic object passes its object part (&DynObj.obj).
@@ -503,9 +560,9 @@ void Object_UpdateO2WComposed33(TObject* pObject);
 int  DynObjBase_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2);
 DynObjHandler DynObj_GetTypeHandler(int nType);
 
-// GoDynObjTypes.c: the handlers of types 6 and 9.
-int  DynObjType6_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2);
-int  DynObjType9_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2);
+// GoDynObjTypes.c: the handlers of DYNOBJ_TYPE_PIN and DYNOBJ_TYPE_SOUND.
+int  DynObjPin_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2);
+int  DynObjSound_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2);
 
 // GoAnimalActors.c: type 11's handler (the animals).
 int  ActAnimal_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2);

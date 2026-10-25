@@ -1176,7 +1176,6 @@ config.libs = [
             Object(Matching, "SitDev.c"),
             Object(Matching, "unsorted/sweep_8009554C.c"),
             Object(Matching, "char_skin.c"),
-            Object(Matching, "unsorted/sweep_8009B314.c"),
             Object(Matching, "Code8009B340.c"),
             Object(Matching, "unsorted/sweep_801338E0.c", progress_category="sdk"),  # Metrowerks runtime / MetroTRK, not EA code
             Object(Matching, "unsorted/sweep_80155F40.c"),
