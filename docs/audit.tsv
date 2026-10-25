@@ -20,8 +20,6 @@ Code80037AB8.c	open
 Code8006F608.c	open		
 Code80070EC4.c	open		
 Code80090940.c	open		
-Code80095564.c	open		
-Code8009A928.c	open		
 Code8009AA28.c	open		
 Code8009B340.c	open		
 Code800B1AA8.c	open		
@@ -88,6 +86,7 @@ GameMode_Skins.c	open
 GameRound.c	open		
 GameUI.c	open		
 GameUICommands.c	open		
+GlowMgr.c	done	a9daa694	claude-review
 GoARAM.c	done	77c51d42	claude-review
 GoAnimalActors.c	open		
 GoBreakLine.c	open		
@@ -97,7 +96,7 @@ GoCamera.c	open
 GoComicCam.c	open		
 GoDynObj.c	open		
 GoDynObjBase.c	open		
-GoDynObjTypes.c	open		
+GoDynObjTypes.c	done	98a66a7c	claude-review
 GoDynamicCam.c	done	62ac5a6d	claude-review
 GoEntry.c	open		
 GoFog.c	open		
@@ -138,7 +137,7 @@ LLInput_Gc.c	done	5bf26c73	claude-review
 LLMath_Gc.c	done	626ba02e	claude-review
 LLMem_Gc.c	done	4e15bbc0	claude-review
 LLObj_Gc.c	open		
-LLPictInt.c	open		
+LLPictInt.c	done	24e66173	claude-review
 LLPict_Gc.c	open		
 LLRTClock.c	done	2ffe6987	claude-review
 LLRTClock_Gc.c	done	2ffe6987	claude-review
@@ -183,7 +182,7 @@ Swing.c	open
 TerrainGround.c	done	ff3496ef	claude-review
 TibExt.c	open		
 UAudContainers.c	done	b5058d88	claude-review
-UAudMem.c	open		
+UAudMem.c	done	c6fbaff8	claude-review
 UAudMemStack.c	done	6d2534bd	claude-review
 UAudVector.c	done	58556d0e	claude-review
 UByteSwap.c	done	f6808074	claude-review
@@ -208,6 +207,7 @@ Wind.c	open
 ai_brain.c	open		
 animblender.c	open		
 char.c	open		
+char_skin.c	done	57a8c291	claude-review
 char_tex_manager.c	open		
 emotion.c	open		
 event.c	open		
@@ -258,6 +258,5 @@ unsorted/sweep_80070168.c	open
 unsorted/sweep_8009554C.c	open		
 unsorted/sweep_800977CC.c	open		
 unsorted/sweep_8009A844.c	open		
-unsorted/sweep_8009B314.c	open		
 urandom.c	done	9f000176	claude-review
 user.c	done	d1383be8	claude-review

@@ -918,11 +918,11 @@ void SkinPart_ApplyVariantLink(Skin* pSkin, int nPart, int nVariant, int nLink) 
 }
 
 // Starts drawing the skin's parts for view nView (Skin.c: then SkinPart_DrawPart for each part and
-// SkinPart_EndDraw): once the skin is loaded (uFlags & 2) and has a description, flushes the render
-// state with clipping on and the camera's matrices, resets the skin renderer (hwsRender_Gc.c) and
-// hands it the description and the view's mesh overrides (a10A0[nView]).
+// SkinPart_EndDraw): once the skin has its render data (SKIN_HAS_RENDER_DATA) and a description,
+// flushes the render state with clipping on and the camera's matrices, resets the skin renderer
+// (hwsRender_Gc.c) and hands it the description and the view's mesh overrides (a10A0[nView]).
 void SkinPart_BeginDraw(Skin* pSkin, int nView) {
-    if (pSkin->pModel->pDesc != NULL && (pSkin->uFlags & 2)) {
+    if (pSkin->pModel->pDesc != NULL && (pSkin->uFlags & SKIN_HAS_RENDER_DATA)) {
         RenderState_SetClipMode(GX_CLIP_DISABLE);
         RenderState_SetCameraMatrices();
         RenderState_Flush();
@@ -940,7 +940,7 @@ void SkinPart_DrawPart(Skin* pSkin, int nPart) {
     s32 nVariant;
     s32 nOption;
 
-    if (pSkin->uFlags & 2) {
+    if (pSkin->uFlags & SKIN_HAS_RENDER_DATA) {
         nVariant = SkinPart_GetPartVariant(pSkin, nPart, 0);
         nOption = SkinPart_GetPartOption(pSkin, nPart, 0);
         if (nVariant != -1) {
@@ -951,7 +951,7 @@ void SkinPart_DrawPart(Skin* pSkin, int nPart) {
 
 // Ends drawing a loaded skin's parts (SkinPart_BeginDraw): hwsRender_Gc.c's end step (fn_8011389C).
 void SkinPart_EndDraw(Skin* pSkin) {
-    if (pSkin->pModel->pDesc != NULL && (pSkin->uFlags & 2)) {
+    if (pSkin->pModel->pDesc != NULL && (pSkin->uFlags & SKIN_HAS_RENDER_DATA)) {
         fn_8011389C();
     }
 }

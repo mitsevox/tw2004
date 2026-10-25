@@ -162,10 +162,9 @@ files in [Characters](#characters).
 | GoObjShadow.c | ours | object shadows drawn with the "shadow" texture (called from GoDynObj.c) |
 | SunFlr_Gc.c | EA | the sun flare's GameCube part: depth around the sun, how much is visible |
 | unsorted/sweep_8009A844.c | ph | a screen-rectangle point to frame-buffer units (next to the sun flare) |
-| Code8009A928.c | ph | the glows' frame hooks for gomainloop.c |
-| Code8009AA28.c | ph | the sun flare's set-up and per-view update; the glow queue's add |
-| unsorted/sweep_8009B314.c | ph | a sun-flare state setter and a node free *(unverified which file)* |
-| Code8009B340.c | ph | a list of fading glow nodes |
+| GlowMgr.c | T7 | the glows' set-up, shut-down, per-view update and drawing, for gomainloop.c |
+| Code8009AA28.c | ph | the sun flare's set-up and per-view update; the glow queue's add *(last function's file unverified)* |
+| Code8009B340.c | ph | a list of fading glow nodes *(first function's file unverified)* |
 | GoGreenGrid.c | EA | the grid drawn over the putting green |
 | shadow.c | EA | the golfer's shadow, drawn into a 256x256 texture with its own camera |
 | Code800BA940.c | ph | the glows around each view's ball |
@@ -235,7 +234,7 @@ all arriving as stream chunks when a hole loads.
 | UKernel.c | EA | the kernel's list of the course's dynamic objects |
 | GoDynObjBase.c | ours | dynamic object type 0 and the types' table; type 2 turns at a steady speed |
 | GoAnimalActors.c | T6 | the animals on the course |
-| GoDynObjTypes.c | ours | dynamic object types 6 and 9 |
+| GoDynObjTypes.c | ours | the handlers of dynamic object types 6 (pin) and 9 (sound), which no object reaches |
 | GoTerrainCollision.c | T6 | the ground as collision data: drops, heights, normals, surfaces; the ball against ground, pin and objects |
 | TerrainGround.c | ours | the ground strips under the golfer's shadow; the supporting triangle, its height and surface under a point |
 | CourseInfo.c | EA | the course table (`'CRI '`: 18 holes' par, wind, tees) and the compilation courses (`'CMPS'`) |
@@ -293,7 +292,7 @@ choice, and the golfer's streamed textures and clothes.
 | Code80037AB8.c | ph | split off Skin.c: bone inverse matrices, morph weights from a pose, frees description bits |
 | animblender.c | T6 *(name unproven)* | blend trees (`SKABlendNode`) and the animation player (`TSKATime`) |
 | CharAnim.c | ours (TW06: `char_state.c`) | the golfer's animation state: clip-group blends, idle and emotion updates, queued state changes |
-| Code80095564.c | ph | with a single view, frees every golfer's body skin |
+| char_skin.c | T03 | in a single view, which golfer's body skin has its render data |
 | AnimStream.c | EA | clip streaming for groups 1 and 5 (turned off in every case); base-40 name codes |
 | SkinPart.c | EA | a skin's parts (e.g. the glove), variants, options and sets |
 | CharSliders.c | EA | body sliders: definitions, bone and morph-target blending |

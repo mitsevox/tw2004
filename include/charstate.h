@@ -256,9 +256,9 @@ typedef struct SkinModel {
     s32  n08;                   // 0x08  its size with all its arrays once burnt (SkinBurn_PackModel)
     s32  n0C;                   // 0x0C  entries in p3C
     u8   unk10[4];
-    s32  n14;                   // 0x14  how many matrices Skin.pSkinMtx holds
-                                //       (Character_SetPreferedPos); also the 0x20-byte
-                                //       entries in p34
+    s32  nBones;                // 0x14  its bones: the bone poses in p34, the default world-to-bone
+                                //       matrices (Skin.pWorld2Bone), and the first of Skin.pSkinMtx,
+                                //       the skinning matrices handed to the character's model
     s16  n18;                   // 0x18  } -1 in a model SKN_FixupModel makes up
     s16  n1A;                   // 0x1A  }
     s16  n1C;                   // 0x1C  }
@@ -269,7 +269,8 @@ typedef struct SkinModel {
     s32  n2C;                   // 0x2C  }
     u32  u30;                   // 0x30  0x40000002 both set: already byte-swapped (SKN_Create);
                                 //       0x80000000: offsets made pointers (SKN_FixupModel)
-    BonePose* p34;              // 0x34  n14 of them; handed to the character's model (SKEL_SetSkinBonePoses)
+    BonePose* p34;              // 0x34  nBones of them; handed to the character's model
+                                //       (SKEL_SetSkinBonePoses)
     void* p38;                  // 0x38  one 0x50-byte block
     void* p3C;                  // 0x3C  n0C 0x50-byte blocks
     s32  n40;                   // 0x40  bits in Skin.aMeshBits; also the entries in p44
@@ -349,13 +350,16 @@ typedef struct Skin {
                                 //         (SkinPart_MarkOption)
     u32  uFlags;                // 0x10D4  1: the choices changed (Character_CopySkinChoices1To0 and
                                 //         the choosers set it; SkinPart_UpdateMarks redoes the bits and
-                                //         clears it); 2: loaded (SKN_AllocRenderData sets it, SKN_FreeRenderData
-                                //         clears it)
+                                //         clears it); SKIN_HAS_RENDER_DATA
     f32  f10D8;                 // 0x10D8  } from the CHR object's header, and 1
     f32  f10DC;                 // 0x10DC  }   (Character_CreateFromMem); not read
     u8   unk10E0[4];
 } Skin;
 LAYOUT_ASSERT(Skin, 0x10E4);    // SKN_Create allocates and clears one
+
+// Skin.uFlags bits.
+#define SKIN_HAS_RENDER_DATA  2     // it has what posing and drawing it needs: SKN_AllocRenderData
+                                    // sets it, SKN_FreeRenderData clears it
 
 // hwsOverride_Gc.c (our names): a block of memory handed out in pieces (fn_80112938), sized for
 // a SkinDesc's meshes of flag 0x100000 (fn_80112848).

@@ -17,9 +17,7 @@ void fn_800BA940(void);
 void fn_800BAA4C(void);
 void fn_800BAA50(int nPlayer);
 void fn_800BAB80(int nPlayer);
-void ColGlow_ResetCurrentList(void);                 // Code8009A928.c: empty the glow queue
 void fn_8006DEA8(void);                 // gomainloop.c
-void ColGlow_RenderAllGlowInCurrentList(void);                 // GoShaderObject_Glows_Gc.c: draw the queued glows
 void fn_8006DF28(void);                 // gomainloop.c
 
 // The size fT of the way from the start size to the largest.
@@ -63,7 +61,7 @@ void fn_800BAA50(int nPlayer) {
     int i;
 
     Camera_GetLens(RC_spGetCurrentRenderCtx());
-    if (gSession.nPaused == 0 && lbl_80281F80 != NULL) {
+    if (gSession.nPaused == 0 && gpCurrentGlowList != NULL) {
         nView = gPlayers[nPlayer].nView[0];
         ColGlow_ResetCurrentList();
         for (i = 0; i < 2; i++) {
