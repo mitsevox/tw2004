@@ -191,7 +191,7 @@ engine.h `ModuleHooks`). Particles, rain and the ball's effects sit here too.
 | PsBallFx.c | EA | the ball's particle effects and sand trail |
 | GoShaderObject_Rain_Gc.c | EA | rain streaks and splashes |
 | GoShaderObject_Grass_Gc.c | ours (after TW06) | the grass shader object: grass shells over the terrain |
-| ShaderRow19.c | ours | row 19's hooks (row 0's code, line strips) |
+| GoShaderObject_PrelitTexturedLine_Gc.c | ours (after TW06) | row 19's hooks: row 0's, but a fill with no draw list is a line strip (the green's grid) |
 
 ### Cameras
 
