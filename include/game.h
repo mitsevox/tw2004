@@ -332,8 +332,16 @@ void HoleContest_InitForHole(void);
 void HoleContest_PlayerTookShot(int nPlayer);
 void HoleContest_PayWinner(void);                 // pay the contest's winner
 
-// GameEffects.c: slow motion, the GameBreaker (letterbox), the heartbeat rumble. The effects
-// state (0x58 bytes):
+// GameEffects.c: slow motion, the GameBreaker (letterbox), the heartbeat rumble.
+
+// How the GameBreaker that is up started (GameEffects.nGBType).
+typedef enum GameBreakerType_e {
+    GB_SCRIPTED = 0,            // before the shot, by a situation script or a target game (GB_START:
+                                // GameEffects_ScriptedGameBreakerTrigger, ..._TargetGameBreakerTrigger)
+    GB_PREDICTED = 1            // while the ball flies (GameEffects_InFlightGameBreakerTrigger)
+} GameBreakerType_e;
+
+// The effects state (0x58 bytes):
 typedef struct GameEffects {
     u8   bSlowMo;               // 0x00  super slow motion is on
     u8   unk1[3];
@@ -347,9 +355,11 @@ typedef struct GameEffects {
     u8   bHalfTime;             // 0x11  half speed: half the ticks, the slow frames counted in n28
     u8   bGameBreaker;          // 0x12  the letterbox is up
     u8   unk13;
-    s32  nGBType;               // 0x14  0 scripted, 1 predicted
+    s32  nGBType;               // 0x14  how it started (GameBreakerType_e)
     u8   bClosing;              // 0x18  the letterbox is closing
-    u8   b19;                   // 0x19
+    u8   bBallHit;              // 0x19  a scripted GameBreaker's ball has been hit
+                                //       (GameEffects_ScriptedGameBreakerBallHitTrigger): its letterbox
+                                //       is drawn from then on (GameEffects_RenderScriptedGB)
     u8   unk1A[2];
     f32  fGBTime;               // 0x1C  seconds the letterbox has been opening (or left closing)
     u8   unk20[4];
@@ -401,7 +411,7 @@ void GameEffects_SetSuperSlowMo(u8 bOn, int nPlayer, f32 fRate);
 f32  GameEffects_FieldOfViewChange(void);                 // the GameBreaker's field-of-view change
 u8   GameEffects_IsSlowDownSwingOn(int nPlayer);         // super slow motion is on (nPlayer unused)
 void GameEffects_Pause(int a);                // pause or resume a GameBreaker
-u8   GameEffects_IsLetterboxOn(void);               // GoDynamicCam.c: the letterbox is up (predicted, or b19)
+u8   GameEffects_IsLetterboxOn(void);               // GoDynamicCam.c: the letterbox is up
 
 // GameMode.c
 void GameEffects_SendMessage50(void);

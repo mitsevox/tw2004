@@ -1596,7 +1596,7 @@ void CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* pShot
 }
 
 // The look-at point following the ball in flight, one step per ball update this frame: the aim
-// moves from the script's v70 towards the ball (DynamicCam_GetSmoothBallLocation) at its
+// moves from the script's vLastBallPos towards the ball (DynamicCam_GetSmoothBallLocation) at its
 // CameraScript_GetBallHeightWithMaxHeight height, raised by the shot's fLookUpOffset and moved
 // fLookSideOffset sideways; during a fairway fix (bFairwayFix) a steep look down (more than 1 in 5)
 // is limited, as in CamScript_GetLookAtPoint. pOut eases towards the aim by a share that grows with
@@ -1627,9 +1627,9 @@ void CameraScript_LagBallFlight(int nPlayer, f32* pOut, f32* pCam, CamShot* pSho
     if (nUpdates == 0) return;
     DynamicCam_GetSmoothBallLocation(pScript, pShot, nPlayer, vBall, 0);
     for (i = 0; i < nUpdates; i++) {
-        Vec3_Sub(vBall, pScript->v70, vStep);
+        Vec3_Sub(vBall, pScript->vLastBallPos, vStep);
         Vec3_Scale((f32)(i + 1) / (f32)nUpdates, vStep, vStep);
-        Vec3_Add(pScript->v70, vStep, vAim);
+        Vec3_Add(pScript->vLastBallPos, vStep, vAim);
         vAim[1] = CameraScript_GetBallHeightWithMaxHeight(nPlayer, pScript, vAim, pCam, pShot);
         CameraScript_OffsetLookVector(vAim, pCam, pShot->fLookUpOffset, pShot->fLookSideOffset);
         if (pScript->bFairwayFix) {
@@ -2989,8 +2989,8 @@ u8 CameraScript_WillGolferBeOccludedInThisView(int nPlayer, CamShot* pShot, Came
     return Ter_CheckForGroundCollision(pCourse, vCam, vGolfer, vHit, vNormal, &pSurface, &pObj) != 0;
 }
 
-// Whether a shot that looks back at the golfer (pShot of CamScript_DoesScriptTrackGolfer's look-at
-// kinds 1..7) must be passed over for the player (1); 0 for any other shot and without a club (25).
+// Whether a shot that looks back at the golfer (CamScript_DoesScriptTrackGolfer: the ball's spot or
+// one of his points) must be passed over for the player (1); 0 for any other shot and without a club (25).
 // Passed over for a CPU player, when the current shot does not follow the ball
 // (CamScript_DoesScriptTrackBall), in double time, when the ball is coming down below 5, has
 // bLanded set or has collided, or is within 40 of the pin (GameAnalysis_GetCurrentDistanceToPin).

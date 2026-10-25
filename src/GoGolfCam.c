@@ -1476,7 +1476,7 @@ void GolfCamera_ProcessPreShotCamera(View* pView, int nPlayer) {
 // without club 2 (alternate 5) can replace. A shot that would hide the golfer is swapped for one
 // from sequence 0x1C, split screen skips to the chain's last shot, and golfer animation 11 takes
 // the paired sequence or camera. It starts as a cut unless the view comes from camera 0 with a
-// sequence that allows a blend (nPlayerType 0).
+// sequence that allows a blend (nPlayerType CAMPLAYER_HUMAN).
 void GolfCamera_InitSwingCamera(View* pView, int nPlayer) {
     int nA;
     f32 f1;
@@ -1618,7 +1618,7 @@ void GolfCamera_InitSwingCamera(View* pView, int nPlayer) {
             }
             nA = CAMINTERP_CUT;
         }
-        if (pView->nCurCamera != 0 || pOldSeq == NULL || pOldSeq->nPlayerType) {
+        if (pView->nCurCamera != 0 || pOldSeq == NULL || pOldSeq->nPlayerType != CAMPLAYER_HUMAN) {
             nA = CAMINTERP_CUT;
             f1 = 0.0f;
         }
@@ -1980,9 +1980,10 @@ void GolfCamera_InitBallFlightCamera(View* pView, int nPlayer) {
     } else {
         pView->p74 = DynamicCam_ChooseSequence(nPlayer, nLie, nClass, CAMSTATE_BALL_FLIGHT, 1, fDist);
     }
-    if (gPlayers[nPlayer].nShotKind == 5 && (pView->p74 == NULL || pView->p74->nShotType != 6)) {
+    if (gPlayers[nPlayer].nShotKind == SHOT_TYPE_FLOP_e
+        && (pView->p74 == NULL || pView->p74->nShotType != CAMSHOT_FLOP)) {
         pSeq = DynamicCam_ChooseSequence(nPlayer, nLie, nClass, CAMSTATE_BALL_FLIGHT, 0, fDist);
-        if (pSeq != NULL && pSeq->nShotType == 6) {
+        if (pSeq != NULL && pSeq->nShotType == CAMSHOT_FLOP) {
             pView->p74 = pSeq;
         }
     }
@@ -2016,7 +2017,7 @@ void GolfCamera_InitBallFlightCamera(View* pView, int nPlayer) {
             pView->script.pShot = &pView->shot19C;
             pView->script.fCamTime = 0.0f;
             if (pView->p74 != NULL) {
-                pView->script.pShot->fLength = pView->p74->f38;
+                pView->script.pShot->fLength = pView->p74->fLength;
             } else {
                 pView->script.pShot->fLength = 1.0f;
             }
@@ -2544,8 +2545,8 @@ void GolfCamera_ProcessFECamera(View* pView, int nPlayer) {
     pSub = CameraController_GetCameraLookPoint(pView);
     pShot = NULL;
     // The original compares script.n114 and n0, both ints, as floats.
-    if (gpCrAPState->pB4 != NULL && gpCrAPState->pB4->bLoaded
-        && (pView->script.n110 != gpCrAPState->pB4->nGolferId || (f32)pView->script.n114
+    if (gpCrAPState->pShown != NULL && gpCrAPState->pShown->bLoaded
+        && (pView->script.n110 != gpCrAPState->pShown->nGolferId || (f32)pView->script.n114
             != gpCrAPState->nScreenKind)) {
         switch (gpCrAPState->nScreenKind) {
         case 0:
@@ -2555,7 +2556,7 @@ void GolfCamera_ProcessFECamera(View* pView, int nPlayer) {
             }
             break;
         case 1:
-            if (Character_IsLeftHanded(gpCrAPState->pB4->pChar)) {
+            if (Character_IsLeftHanded(gpCrAPState->pShown->pChar)) {
                 pShot = DynamicCam_ChooseScript(0, 0x38, pView->p80);
                 if (pShot == NULL) {
                     pShot = DynamicCam_ChooseScript(0, 0x38, NULL);
@@ -2593,10 +2594,10 @@ void GolfCamera_ProcessFECamera(View* pView, int nPlayer) {
         CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, CAMINTERP_CUT, 0.0f,
                                        100.0f, CAMEVENT_NONE, 0.0f);
         pView->p80 = pShot;
-        pView->script.n110 = gpCrAPState->pB4->nGolferId;
+        pView->script.n110 = gpCrAPState->pShown->nGolferId;
     }
-    // EA bug: with no golfer (pB4 NULL) this reads bLoaded through the NULL pointer.
-    if (gpCrAPState->pB4->bLoaded) {
+    // EA bug: with no golfer (pShown NULL) this reads bLoaded through the NULL pointer.
+    if (gpCrAPState->pShown->bLoaded) {
         CamScript_RunFEScript(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, FRAME_TIME);
     }
 }
@@ -2617,8 +2618,8 @@ void GolfCamera_SwitchCrAPCamera(View* pView, char* szName, int nShot, u8 bBlend
     pShot = NULL;
     if (szName != NULL) {
         pShot = DynamicCam_ChooseScriptByName(szName);
-        if (pShot == NULL && gpCrAPState->pB4 != NULL && gpCrAPState->pB4->pChar != NULL
-            && gpCrAPState->pB4->pChar->nSlot == 1) {
+        if (pShot == NULL && gpCrAPState->pShown != NULL && gpCrAPState->pShown->pChar != NULL
+            && gpCrAPState->pShown->pChar->nSlot == 1) {
             c = szName[0];
             szName[0] = 'f';
             pShot = DynamicCam_ChooseScriptByName(szName);
@@ -2652,18 +2653,18 @@ void GolfCamera_SwitchCrAPCamera(View* pView, char* szName, int nShot, u8 bBlend
                                            CAMEVENT_NONE, 0.0f);
         }
     }
-    // EA bug: pB4 may be NULL (tested above for the 'f' names), but it is read here without a test.
-    pView->script.n110 = gpCrAPState->pB4->nGolferId;
+    // EA bug: pShown may be NULL (tested above for the 'f' names), but it is read here without a test.
+    pView->script.n110 = gpCrAPState->pShown->nGolferId;
     pView->script.n114 = gpCrAPState->nScreenKind;
-    if (gpCrAPState->pB4->bLoaded) {
+    if (gpCrAPState->pShown->bLoaded) {
         CamScript_RunFEScript(0, pCam, pSub, &pView->script, &pView->shot19C, 0, FRAME_TIME);
     }
 }
 
-// Camera 24, the golfer bone camera (nothing in this build switches to it): shot kind 10 started
-// from its beginning (CameraController_StartScriptOfKind).
+// Camera 24, the golfer bone camera (nothing in this build switches to it): a
+// CAMSTATE_ANY_SECOND_VIEW shot started from its beginning (CameraController_StartScriptOfKind).
 void GolfCamera_InitGolferBoneCamera(View* pView, int nPlayer) {
-    CameraController_StartScriptOfKind(pView, nPlayer, 10);
+    CameraController_StartScriptOfKind(pView, nPlayer, CAMSTATE_ANY_SECOND_VIEW);
 }
 
 // Camera 24's tick: the camera 0.5 out along the golfer's bone 10's z axis and 0.1 up its y axis,
@@ -3268,7 +3269,7 @@ void GolfCamera_CreateMatrixCamera(View* pView, f32* pFrom, f32* pTo, int nPlaye
     }
     pView->script.fCamTime = 0.00001f;
     if (pView->p74 != NULL) {
-        pView->script.pNextShot->fLength = pView->p74->f38;
+        pView->script.pNextShot->fLength = pView->p74->fLength;
     } else {
         pView->script.pNextShot->fLength = 0.5f;
     }
@@ -3302,7 +3303,7 @@ f32 GolfCamera_UpdateMatrixCamera(View* pView, f32* pCam, f32* pSub, int nPlayer
             pView->script.fInterpTime = gpCamTuning->fReturnBlendTime;
             pView->script.nInterpType = CAMINTERP_CUT;
             if (pView->p74 != NULL) {
-                pView->script.pNextShot->fLength = pView->p74->f38 - gpCamTuning->fReturnBlendTime;
+                pView->script.pNextShot->fLength = pView->p74->fLength - gpCamTuning->fReturnBlendTime;
             } else {
                 pView->script.pNextShot->fLength = gpCamTuning->fReturnBlendTime;
             }
@@ -3408,7 +3409,7 @@ void GolfCamera_CreateSuperZoomCamera(View* pView, f32* pFrom, f32* pTo, int nPl
     pView->script.nInterpType = 1;
     pView->script.fCamTime = 0.0f;
     if (pView->p74 != NULL) {
-        pView->script.pNextShot->fLength = pView->p74->f38;
+        pView->script.pNextShot->fLength = pView->p74->fLength;
     } else {
         pView->script.pNextShot->fLength = 0.5f;
     }
@@ -3454,7 +3455,7 @@ f32 GolfCamera_UpdateSuperZoomCamera(View* pView, f32* pCam, f32* pSub, int nPla
             pView->script.fInterpTime = gpCamTuning->fReturnBlendTime;
             pView->script.nInterpType = CAMINTERP_CUT;
             if (pView->p74 != NULL) {
-                pView->script.pNextShot->fLength = pView->p74->f38 - gpCamTuning->fReturnBlendTime;
+                pView->script.pNextShot->fLength = pView->p74->fLength - gpCamTuning->fReturnBlendTime;
             } else {
                 pView->script.pNextShot->fLength = gpCamTuning->fReturnBlendTime;
             }
@@ -4061,8 +4062,8 @@ void GolfCamera_ForcePreShotEnding(View* pView) {
     pView->script.n114 = 1;
 }
 
-// Does the next shot (else the current one) follow the golfer: its move kind nLookAtKind is one of 1..7
-// (CamScript_DoesScriptTrackGolfer)? 0 with neither.
+// Does the next shot (else the current one) look at the golfer: its nLookAtKind the ball's spot or
+// one of his points (CamScript_DoesScriptTrackGolfer)? 0 with neither.
 u8 GolfCamera_IsCameraTrackingPlayer(View* pView) {
     if (pView->script.pNextShot != NULL) {
         return CamScript_DoesScriptTrackGolfer(pView->script.pNextShot) != 0;
@@ -4290,10 +4291,10 @@ f32 GolfCam_GetBlendTagTime(Character* pChar, u64 uEvent) {
 }
 
 // GameEffects.h's inline (TW07), out of line here: a GameBreaker is on and it is a predicted one
-// (nGBType 1). The ball-flight camera asks.
+// (GB_PREDICTED). The ball-flight camera asks.
 u8 GameEffects_IsPredictedGameBreakerOn(void) {
     int bOn = 0;
-    if (gGameEffects.bGameBreaker && gGameEffects.nGBType == 1) {
+    if (gGameEffects.bGameBreaker && gGameEffects.nGBType == GB_PREDICTED) {
         bOn = 1;
     }
     return bOn;

@@ -183,13 +183,13 @@ void FE_CrAPBall_Render(u8 bTarget) {
     f32 mScale[4][4];
     f32 (*mBone)[4];
 
-    if (Character_IsHoldingBall(gpCrAPState->pB4->pChar)) {
+    if (Character_IsHoldingBall(gpCrAPState->pShown->pChar)) {
         vPos[0] = gfCrAPBallOffsetX;
         vPos[1] = gfCrAPBallOffsetY;
         vPos[2] = gfCrAPBallOffsetZ;
         vPos[3] = 1.0f;
-        Character_GetBonePos(gpCrAPState->pB4->pChar, 0x54, vPos);
-        mBone = Character_GetBoneMatrix(gpCrAPState->pB4->pChar, 0x54);
+        Character_GetBonePos(gpCrAPState->pShown->pChar, 0x54, vPos);
+        mBone = Character_GetBoneMatrix(gpCrAPState->pShown->pChar, 0x54);
         LLMath_IdentifyMat(mScale);
         mScale[0][0] = gfCrAPBallScaleX;
         mScale[1][1] = gfCrAPBallScaleY;

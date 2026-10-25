@@ -5,7 +5,7 @@ order	area	file	task	scope	state
 4	Cameras	GoStaticCam.c	pass	the whole file	done
 5	Cameras	GoDynamicCam.c	chunk 1/3	DynamicCam_RegisterStreamClients .. DynamicCam_TrackPercent	done
 6	Cameras	GoDynamicCam.c	chunk 2/3	DynamicCam_TrackOffset .. DynamicCam_MatchSeqClub	done
-7	Cameras	GoDynamicCam.c	chunk 3/3	DynamicCam_MatchHeightDiff .. GameEffects_IsLetterboxOn	open
+7	Cameras	GoDynamicCam.c	chunk 3/3	DynamicCam_MatchHeightDiff .. GameEffects_IsLetterboxOn	done
 8	Cameras	GoDynamicCam.c	whole-file review	the whole file	open
 9	Cameras	GoComicCam.c	pass	the whole file	open
 10	Cameras	GoCamCont.c	pass	the whole file	open

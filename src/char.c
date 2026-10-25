@@ -2978,7 +2978,7 @@ void Character_RequestClothesUpdateFE(int n) {
 }
 
 // Each frame in the create-a-player mode (game type 3): for every flag
-// Character_RequestClothesUpdateFE set, once the shown golfer (gpCrAPState->pB4) is ready
+// Character_RequestClothesUpdateFE set, once the shown golfer (gpCrAPState->pShown) is ready
 // (bLoaded), the menu golfer's state machine is not in state 4 and nothing holds it
 // (FE_IsTextureSwapDone), the flag is cleared and the running state aborted for state 4, which
 // dresses the shown golfer again and swaps its textures (FE_StreamFunc_SwapTexturesInit).
@@ -2986,7 +2986,7 @@ void Character_UpdateClothesFE(void) {
     int i;
 
     for (i = 0; i < 5; i++) {
-        if (gSession.aD2D[i] && gpCrAPState->pB4 != NULL && gpCrAPState->pB4->bLoaded &&
+        if (gSession.aD2D[i] && gpCrAPState->pShown != NULL && gpCrAPState->pShown->bLoaded &&
             FE_StreamGetCurrentState() != 4 && FE_IsTextureSwapDone()) {
             gSession.aD2D[i] = 0;
             FE_StreamInterruptState();
