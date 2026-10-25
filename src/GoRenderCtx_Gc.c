@@ -8,8 +8,7 @@
 // legacy/ll/LLInput.c has Input_vSelectControlSet, Input_uiMap, Input_AnyPadPressed and
 // Input_vStopAllVibration in this order and with these signatures (two it has between them are
 // not in this build), and gauInputButtonMap starts a new 8-aligned block after this file's
-// "GoRenderCtx_Gc.c" string (its fake match note). TW07's RC_vInitModule and RC_vCloseModule
-// sit just before this file, in unsorted/sweep_800136F4.c.
+// "GoRenderCtx_Gc.c" string (its fake match note).
 
 #include "game_types.h"
 #include "engine.h"
@@ -36,6 +35,21 @@ void* gapCurrentRenderCtx[2];   // [0]: the current render context (RC_vSetCurre
 // This file's .sdata (camera.h). Points at gapCurrentRenderCtx[0]: RC_vSetCurrentRenderCtx and
 // RC_spGetCurrentRenderCtx go through it.
 void** gppCurrentRenderCtx = gapCurrentRenderCtx;
+
+// ---- sweep code (not yet cleaned up) ----
+
+void RC_vSetCurrentRenderCtx(s32 v);
+void fn_800136F4(void);
+void fn_80013718(void);
+
+void fn_800136F4(void) {
+    RC_vSetCurrentRenderCtx(0);
+}
+
+void fn_80013718(void) {
+}
+
+// ---- end of sweep code ----
 
 // Makes a render context (0x234 bytes, TW07's RC_SRenderCtx) from a lens (TW07's CA_SCamera), a
 // frame buffer and a screen rectangle: the identity model matrix, the default clear values, and the
@@ -71,7 +85,6 @@ static f32 GoRenderCtx_Gc_StrippedFn(f32 x) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void RC_vSetCurrentRenderCtx(s32 v);
 void RC_vUpdateRenderCtxScreenMatricesAndInfo(Camera* pCamera);   // not decompiled yet
 void RC_vStoreRenderCtxTransformationMatrix(u8* arg0, f32 (*arg1)[4]);
 f32 VM_fGetViewportHeightRatio(VM_SViewport* pViewport);

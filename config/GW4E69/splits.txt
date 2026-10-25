@@ -11,20 +11,8 @@ Sections:
 	.sdata2     type:rodata align:32
 	.sbss2      type:bss align:32
 
-unsorted/sweep_80005520.c:
-	.text       start:0x80005520 end:0x80005580
-
-unsorted/sweep_80005580.c:
-	.text       start:0x80005580 end:0x80005590
-
-unsorted/sweep_80005590.c:
-	.text       start:0x80005590 end:0x800055D4
-
-unsorted/sweep_800055D4.c:
-	.text       start:0x800055D4 end:0x800055D8
-
-unsorted/sweep_800055D8.c:
-	.text       start:0x800055D8 end:0x80005628
+Main.c:
+	.text       start:0x80005520 end:0x80005628
 
 LLMem_Gc.c:
 	.text       start:0x80005628 end:0x80005BE8
@@ -151,11 +139,8 @@ LLInput_Gc.c:
 	.text       start:0x80012FA0 end:0x800136F4
 	.bss        start:0x801A36A0 end:0x801A3728
 
-unsorted/sweep_800136F4.c:
-	.text       start:0x800136F4 end:0x8001371C
-
 GoRenderCtx_Gc.c:
-	.text       start:0x8001371C end:0x800143B8
+	.text       start:0x800136F4 end:0x800143B8
 	.data       start:0x80186AD8 end:0x80186BD8
 	.sdata      start:0x80280DF0 end:0x80280DF8
 	.sbss       start:0x80281C90 end:0x80281CA0
@@ -715,23 +700,8 @@ unsorted/sweep_8009554C.c:
 Code80095564.c:
 	.text       start:0x80095564 end:0x80095744
 
-unsorted/sweep_80095744.c:
-	.text       start:0x80095744 end:0x80095780
-
-unsorted/sweep_80095780.c:
-	.text       start:0x80095780 end:0x80095798
-
-unsorted/sweep_80095798.c:
-	.text       start:0x80095798 end:0x800957B0
-
-unsorted/sweep_800957B0.c:
-	.text       start:0x800957B0 end:0x800957D8
-
-unsorted/sweep_800957D8.c:
-	.text       start:0x800957D8 end:0x800957FC
-
 CharAnim.c:
-	.text       start:0x800957FC end:0x80097208
+	.text       start:0x80095744 end:0x80097208
 	.rodata     start:0x80183A70 end:0x80183A98
 	.data       start:0x80189CE8 end:0x80189D30
 	.bss        start:0x801D9908 end:0x801D99D0
@@ -752,11 +722,8 @@ GoCamTuningVars.c:
 	.sbss       start:0x80281F78 end:0x80281F80
 	.sdata2     start:0x80283D28 end:0x80283DF8
 
-unsorted/sweep_80097EC4.c:
-	.text       start:0x80097EC4 end:0x80097F44
-
 GoShaderObject_Glows_Gc.c:
-	.text       start:0x80097F44 end:0x80098A98
+	.text       start:0x80097EC4 end:0x80098A98
 	.data       start:0x80189D78 end:0x80189D98
 	.bss        start:0x801D99D0 end:0x801DB878
 	.sbss       start:0x80281F80 end:0x80281F88
@@ -1336,7 +1303,7 @@ LadderedMode.c:
 	.sdata      start:0x802816E0 end:0x802816E8
 	.sbss       start:0x80282430 end:0x80282458
 
-Code80193188.c:
+SitDevSignedValues.c:
 	.data       start:0x80193188 end:0x801931E0
 
 uiArc.c:
