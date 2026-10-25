@@ -16,6 +16,24 @@ void fn_80070168(void);                                 // calls a display list 
 // This file's .sbss (glows.h).
 GlowQueue* lbl_80281F80;
 
+// ---- sweep code (not yet cleaned up) ----
+
+void fn_800988A0(s32 p0, s32 p1, s32 p2, s32 p3);
+void fn_800988B8(f32 farg0, f32 farg1, f32 farg2);
+void fn_800988CC(s32 p0);
+
+// Two vertices at pPos, each after a byte (3, then 0): white, then transparent black.
+void fn_80097EC4(f32* pPos) {
+    fn_800988CC(3);
+    fn_800988B8(pPos[0], pPos[1], pPos[2]);
+    fn_800988A0(255, 255, 255, 255);
+    fn_800988CC(0);
+    fn_800988B8(pPos[0], pPos[1], pPos[2]);
+    fn_800988A0(0, 0, 0, 0);
+}
+
+// ---- end of sweep code ----
+
 // Starts glow nGlow's display list, with room for nVerts vertices of 32 bytes and 1 KB more.
 GlowList* _StartGlowStrip(int nGlow, int nVerts) {
     u32 uSize;
@@ -264,9 +282,6 @@ void fn_80098844(void);
 void fn_80098848(void);
 void fn_8009884C(u8* p0);
 void fn_80098884(u8* p0, u8* p1);
-void fn_800988A0(s32 p0, s32 p1, s32 p2, s32 p3);
-void fn_800988B8(f32 farg0, f32 farg1, f32 farg2);
-void fn_800988CC(s32 p0);
 // .bss in reverse address order (CodeWarrior lays it out last-defined-first)
 GlowQueue lbl_801D9A68[1];
 u8 lbl_801D9A40[0x28];

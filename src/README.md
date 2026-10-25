@@ -143,7 +143,6 @@ files in [Characters](#characters).
 | LLFont.c | EA | the font renderer (`'sfn '` fonts) |
 | UFont.c | EA | the text layer over LLFont.c: six font slots, queued or immediate text |
 | RenderAccessors.c | ours | a viewport's rectangle, a render context's viewport; the depth and alpha test setters and the flush that hands them to GX *(unverified which file)* |
-| unsorted/sweep_800136F4.c | ph | two tiny functions next to GoRenderCtx_Gc.c *(unverified which file)* |
 | GoRenderCtx_Gc.c | EA | the render camera (lens, frame buffer, screen rectangle, matrices) and screen state |
 | Code80015470.c | ph | the renderer's state cache and the buffer pool |
 | Code80016198.c | ph | the 2D view: viewport, screen size, vertex output |
@@ -195,7 +194,6 @@ engine.h `ModuleHooks`). Particles, rain and the ball's effects sit here too.
 | unsorted/sweep_8009554C.c | ph | six empty functions (GoEntry.c, gomainloop.c and char.c call them) |
 | GoShaderObjectCommon_MorphAnimManager_Gc.c | EA | the list of morph animations |
 | unsorted/sweep_800977CC.c | ph | frees a buffer at +0xC0 *(unverified which file)* |
-| unsorted/sweep_80097EC4.c | ph | emits two vertices *(unverified which file; sits before the glows)* |
 | GoShaderObject_Glows_Gc.c | EA | the glows' shapes and drawing |
 | UFstPart.c | EA | particle emitters |
 | PsMgr.c | EA | weather particle effects (only the rain on GameCube) |
@@ -526,7 +524,6 @@ Small sweep files whose file and subsystem are not known:
 | File | What it is |
 |---|---|
 | unsorted/sweep_8003944C.c | a function returning 0, between GoPostFx.c and GoDynamicCam.c |
-| unsorted/sweep_80095744.c, sweep_80095780.c, sweep_80095798.c, sweep_800957B0.c, sweep_800957D8.c | setters and getters of an object's +0x18..+0x2C fields, between Code80095564.c and CharAnim.c |
 
 In the SDK and runtime address range, not EA code: `unsorted/sweep_801338E0.c` (EXI2 / debugger
 stubs), `sweep_801654D0.c`, `sweep_801654F4.c`, `sweep_80165524.c` (Metrowerks critical sections;

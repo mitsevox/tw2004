@@ -291,7 +291,7 @@ order	area	file	task	scope	state
 287	Shader objects and effects	unsorted/sweep_80070168.c	fold	prove its file and fold it in	open
 288	Shader objects and effects	unsorted/sweep_8009554C.c	fold	prove its file and fold it in	open
 289	Shader objects and effects	unsorted/sweep_8006FF2C.c	fold	prove its file and fold it in	open
-290	Shader objects and effects	unsorted/sweep_80097EC4.c	fold	prove its file and fold it in	open
+290	Shader objects and effects	unsorted/sweep_80097EC4.c	fold	prove its file and fold it in	done
 291	Rendering	GoViewport.c	pass	the whole file	done
 292	Rendering	GoFrameBuf.c	pass	the whole file	done
 293	Rendering	GoRenderSurface.c	pass	the whole file	open
@@ -332,7 +332,7 @@ order	area	file	task	scope	state
 328	Rendering	GoGrass.c	pass	the whole file	open
 329	Rendering	unsorted/sweep_8009B314.c	fold	prove its file and fold it in	open
 330	Rendering	unsorted/code_800080D0.c	fold	prove its file and fold it in	open
-331	Rendering	unsorted/sweep_800136F4.c	fold	prove its file and fold it in	open
+331	Rendering	unsorted/sweep_800136F4.c	fold	prove its file and fold it in	done
 332	Rendering	unsorted/code_800082F8.c	fold	prove its file and fold it in	open
 333	Rendering	unsorted/sweep_8009A844.c	fold	prove its file and fold it in	open
 334	EA UI Studio library	UIStudio.c	pass	the whole file	open
@@ -387,8 +387,8 @@ order	area	file	task	scope	state
 383	Front end and UI	FE_MessageTable.c	whole-file review	the whole file	open
 384	Front end and UI	uiProcessInterface.c	pass	the whole file	open
 385	Unplaced	unsorted/sweep_8003944C.c	fold	prove its file and fold it in	open
-386	Unplaced	unsorted/sweep_80095780.c	fold	prove its file and fold it in	open
-387	Unplaced	unsorted/sweep_80095798.c	fold	prove its file and fold it in	open
-388	Unplaced	unsorted/sweep_800957B0.c	fold	prove its file and fold it in	open
-389	Unplaced	unsorted/sweep_80095744.c	fold	prove its file and fold it in	open
-390	Unplaced	unsorted/sweep_800957D8.c	fold	prove its file and fold it in	open
+386	Unplaced	unsorted/sweep_80095780.c	fold	prove its file and fold it in	done
+387	Unplaced	unsorted/sweep_80095798.c	fold	prove its file and fold it in	done
+388	Unplaced	unsorted/sweep_800957B0.c	fold	prove its file and fold it in	done
+389	Unplaced	unsorted/sweep_80095744.c	fold	prove its file and fold it in	done
+390	Unplaced	unsorted/sweep_800957D8.c	fold	prove its file and fold it in	done
