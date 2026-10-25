@@ -162,7 +162,6 @@ void  SKN_InitTris(void);
 void  SKN_FreeTris(void);
 void  SKN_InitModule(int n);
 void  SKN_CloseModule(void);
-void  sApplyUserLogos(void* pChar, void* pModel, SkinChoices* pChoices);   // char_tex_manager.c
 void  fn_8010BA2C(void* p);
 void  FE_StreamInterruptState(void);               // FEgolferanim.c
 void  FE_StreamSetNextState(int nNext);           // FEgolferanim.c

@@ -210,7 +210,7 @@ LogoRecord* FE_LogoDesign_GetCurrentLogo(void) {
 
 // The logo palette (CLUT): 256 colours of 16 bits (see FE_LogoDesign_GetClutEntry).
 // char_tex_manager.c gives it to the golfer's five user logo textures
-// (CharacterTex_GetUserLogoPalette).
+// (sGetUserLogoPalettePtr).
 s16* FE_LogoDesign_GetClut(void) {
     return gpLogoClut;
 }

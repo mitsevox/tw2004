@@ -95,11 +95,6 @@ void SD_vShaderObject_Grass_Type_SetParameters(void* pParams);
 void SD_vShaderObject_Grass_Static_Init(SD_SShaderObject_Static* pObject, GrassBufferDesc* pDesc);
 void SD_vShaderObject_Grass_Static_Close(SD_SShaderObject_Static* pObject);
 void SD_vShaderObject_Grass_Static_Render(SD_SShaderObject_Static* pObject);
-// ShaderRow19.c
-void fn_801247C0(DynRenderObject* pObj, const DynRenderSize* pSize);
-void fn_80124814(DynRenderObject* pObj);
-void fn_80124838(DynRenderObject* pObj);
-void fn_801248B8(DynRenderObject* pObj, DynRenderFill* pFill, u8 bRestart);
 
 s32 lbl_80281E80;
 s32* lbl_802811F8 = &lbl_80281E80;
@@ -625,10 +620,10 @@ ModuleHooks lbl_80188E88[20] = {
         { NULL },
         { 0 },
         {
-            (void (*)(ShaderObject*, const void*))fn_801247C0,
-            (void (*)(ShaderObject*))fn_80124814,
-            (void (*)(ShaderObject*))fn_80124838,
-            (void (*)(ShaderObject*, const void*, int))fn_801248B8,
+            (void (*)(ShaderObject*, const void*))SD_vShaderObject_PrelitTexturedLine_Dynamic_Init,
+            (void (*)(ShaderObject*))SD_vShaderObject_PrelitTexturedLine_Dynamic_Close,
+            (void (*)(ShaderObject*))SD_vShaderObject_PrelitTexturedLine_Dynamic_Render,
+            (void (*)(ShaderObject*, const void*, int))SD_vShaderObject_PrelitTexturedLine_Dynamic_Refresh,
         },
     },
 };

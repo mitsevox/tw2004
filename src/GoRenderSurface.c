@@ -14,7 +14,7 @@ void fn_8002F32C(s32 nSurface);
 s32  fn_8002F480(s32 nSurface);
 
 // Clears every slot and makes surface 0, the screen.
-void fn_8002F1D4(void) {
+void RenderSurface_InitOnce(void) {
     int i;
 
     for (i = 0; i < 5; i++) {
