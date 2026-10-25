@@ -15,7 +15,7 @@
 // the stream buffer, its tag word replaced by that buffer. A piece of the movie spans nMore + 1
 // chunks in a row.
 typedef struct VideoChunk {
-    UStreamBuffer* pBuffer;             // 0x00  the buffer it sits in (in use while it is queued)
+    CDBuf* pBuffer;                     // 0x00  the buffer it sits in (in use while it is queued)
     u32  uLength;                       // 0x04  header included
     u8   unk8[4];
     int  nSlot;                         // 0x0C  the slot of the movie it belongs to

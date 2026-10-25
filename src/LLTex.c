@@ -551,7 +551,7 @@ void fn_8000F0EC(TexBank* pBank, TexEntry* pTex) {
     GXSetTevAlphaOp(nStage, 0, 0, 1, 1, 0);
 }
 
-TexBank* TX_spDownloadData(UStreamObject* pObject, TexBank* pBank, int n) {
+TexBank* TX_spDownloadData(TStreamData* pObject, TexBank* pBank, int n) {
     return TX_spParseTextureGroupFromStream(pObject->pData, pBank, n);
 }
 

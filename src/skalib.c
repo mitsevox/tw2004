@@ -33,7 +33,7 @@ void  AnimLib_FreeCopies(void);
 void  ClipBank_FreeAram(void);
 
 // This file's .bss (character.h), in reverse address order as the compiler lays it out.
-UStreamObject* gClipBankFiles[3];
+TStreamData* gClipBankFiles[3];
 u32            gClipBankAramSizes[3];
 u32            gClipBankAram[3];
 LibSlot        gLibSlots[3];
@@ -64,7 +64,7 @@ s32            gWalkClub;
 s32            gWalkStyle;
 s32            gWalkGroup;
 u8             gSacReloading;
-UStreamObject* gClipBankRestoreFile;
+TStreamData* gClipBankRestoreFile;
 u32            gClipBankBudget;
 u8             gSlotsDoubleBuffered;
 
@@ -2168,7 +2168,7 @@ ClipBank* ClipBank_Load(u8* pFile, u32 uAlign) {
 // yet: keeps a pristine copy of the file (for AnimLib_ReloadSlot), sets it up (AnimLib_Load against
 // the slot's bank) and files it as the slot's bank library when its clips are in the bank, else as
 // the slot's own library that overlays are merged over. Any other object is freed.
-void AnimLib_OnLoaded(UStreamObject* pFile) {
+void AnimLib_OnLoaded(TStreamData* pFile) {
     u8       bFree = 1;
     u32      nSlot = pFile->uId;
     AnimLib* pLib;
@@ -2195,7 +2195,7 @@ void ClipBank_Stash(int nSlot);
 
 // The 'BNK ' stream chunk handler (Skalib_Register): the clip bank file of slot uId goes to ARAM
 // (ClipBank_Stash) until a character needs it (ClipBank_Restore).
-void ClipBank_OnLoaded(UStreamObject* pFile) {
+void ClipBank_OnLoaded(TStreamData* pFile) {
     u32 nSlot = pFile->uId;
     gClipBankFiles[nSlot] = pFile;
     ClipBank_Stash(nSlot);
@@ -2203,7 +2203,7 @@ void ClipBank_OnLoaded(UStreamObject* pFile) {
 
 // Makes a clip bank file the bank of slot uId (ClipBank_Load), the bank owning the file; when the
 // slot is out of range or already has a bank the file is freed instead.
-void ClipBank_Install(UStreamObject* pFile) {
+void ClipBank_Install(TStreamData* pFile) {
     u8  bFree = 1;
     u32 nSlot = pFile->uId;
 

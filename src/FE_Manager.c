@@ -49,7 +49,7 @@ void FE_Manager_FreeStreamMemory(void);
 void FE_CharBios_RegisterStreamClients(void);
 void FE_Manager_RegisterStreamClients(void);
 void FE_CharBios_UnRegisterStreamClients(void);
-void FE_CharBios_LoadBIOfromStream(UStreamObject* pObject);
+void FE_CharBios_LoadBIOfromStream(TStreamData* pObject);
 void FE_MakeMoviePathWithSubDir(char* pName, char* pDir, char* pPath);
 void FE_MakeBioMoviePath(char* pName, char* pPath);
 void FE_movieFade(void);
@@ -153,7 +153,7 @@ void FE_CharBios_UnRegisterStreamClients(void) {
 
 // The 'BIO ' stream object's handler: copies its data (the golfers' bios, FEBio records) into a new
 // block, gpFEBios, and frees the object.
-void FE_CharBios_LoadBIOfromStream(UStreamObject* pObject) {
+void FE_CharBios_LoadBIOfromStream(TStreamData* pObject) {
     gpFEBios = Circular_MemAllocFunc(pObject->uSize, MEMTYPE_LOW, 32, "FE_Manager.c", 285);
     Mem_cpy(gpFEBios, pObject->pData, pObject->uSize);
     Circular_MemFreeFunc(pObject);

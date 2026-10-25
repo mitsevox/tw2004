@@ -71,7 +71,7 @@ void Grass_CreateTopTexture(void);
 void Grass_CreateTopCamera(void);
 void Grass_AimTopCamera(void);
 s32 Grass_AllocBuffers(void);
-void Grass_LoadStreamFile(UStreamObject* pObject);
+void Grass_LoadStreamFile(TStreamData* pObject);
 int  Grass_CompareFarthestFirst(f32** ppA, f32** ppB);
 void Grass_AddFreeBuffer(GrassBuffer* pBuffer);
 GrassBuffer* Grass_TakeFreeBuffer(s32 nSize);
@@ -208,7 +208,7 @@ void Grass_LoadNetworkData(GrassChunk* pChunk) {
 
 // The 'gras' stream handler: the hole's grass file is loaded. Its header gives the grid (defaults
 // when its version is not 100); the records' two offsets become addresses.
-void Grass_LoadStreamFile(UStreamObject* pObject) {
+void Grass_LoadStreamFile(TStreamData* pObject) {
     u8* pCur;
     u8* pBase;
     s32 nSkip;

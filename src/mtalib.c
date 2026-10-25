@@ -262,7 +262,7 @@ MalBank* MtaLib_LoadBank(u8* pData) {
 }
 
 // The 'MAL ' stream handler: the object's id is the bank slot; a slot already filled is kept.
-void MtaLib_OnLoaded(UStreamObject* pObject) {
+void MtaLib_OnLoaded(TStreamData* pObject) {
     u32 uSlot;
 
     uSlot = pObject->uId;

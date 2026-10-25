@@ -394,8 +394,8 @@ typedef struct CrAPRecord {
 LAYOUT_ASSERT(CrAPRecord, 0x2C);
 
 extern CrAPDB* lbl_80282460;
-extern UStreamObject* lbl_80282464;  // the 'CR_A' object (the assets), kept until freed
-extern UStreamObject* lbl_80282468;  // the 'CR_S' object (their names)
+extern TStreamData* lbl_80282464;    // the 'CR_A' object (the assets), kept until freed
+extern TStreamData* lbl_80282468;    // the 'CR_S' object (their names)
 extern s32 lbl_8028246C;             // how many records lbl_80282470 holds (FE_CrAP_CollectSponsorshipItems)
 // 64 records (FE_CrAP_GetSponsorshipItemInfo); freed by FE_CrAP_CloseModule
 extern CrAPRecord* lbl_80282470;

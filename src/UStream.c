@@ -28,29 +28,29 @@
 
 static char             gSWVRName[0x14];                        // 0x801A3424
 static UStreamHandler   gHandlers[USTREAM_MAX_HANDLERS];        // 0x801A3124
-static UStreamBuffer*   gReadyRing[USTREAM_NUM_BUFFERS];        // 0x801A30DC
-static UStreamBuffer*   gFreeRing[USTREAM_NUM_BUFFERS];         // 0x801A3094
-static UStream          gStreams[USTREAM_MAX_STREAMS];          // 0x801A2AD4
+static CDBuf*   gReadyRing[USTREAM_NUM_BUFFERS];                // 0x801A30DC
+static CDBuf*   gFreeRing[USTREAM_NUM_BUFFERS];                 // 0x801A3094
+static StrmCB          gStreams[USTREAM_MAX_STREAMS];          // 0x801A2AD4
 static UStreamSound     gSoundHeader;                           // 0x801A2AC0 (SONO state)
 
 static uptr gRPNSBase;            // 0x80281C5C  data address of the last RPNS object
-static UStreamBuffer* volatile gpReadBuffer;  // 0x80281C58  buffer of the read in flight
+static CDBuf* volatile gpReadBuffer;          // 0x80281C58  buffer of the read in flight
 static volatile s8 gReadyRingHead;       // 0x80281C57
 static volatile s8 gFreeRingTail;        // 0x80281C56
 static s8   gReadyRingTail;       // 0x80281C55
 static s8   gFreeRingHead;        // 0x80281C54
-static UStreamBuffer* gpFreeList; // 0x80281C50  released buffers not yet back in the ring
-static UStreamBuffer* gpCurList;  // 0x80281C4C  buffers being parsed
-static UStreamBuffer* gpUsedList; // 0x80281C48  parsed buffers that objects still reference
-static UStreamFill gFill;         // 0x80281C40  object being filled and how far
+static CDBuf* gpFreeList;         // 0x80281C50  released buffers not yet back in the ring
+static CDBuf* gpCurList;          // 0x80281C4C  buffers being parsed
+static CDBuf* gpUsedList;         // 0x80281C48  parsed buffers that objects still reference
+static ParseInProg gFill;         // 0x80281C40  object being filled and how far
 static UMemPool* gpNodePool;      // 0x80281C3C
-static UStreamNode* gpDoneList;   // 0x80281C38  objects finished by the parser
+static TStreamQueue* gpDoneList;  // 0x80281C38  objects finished by the parser
 static void* gpBufferMemory;      // 0x80281C34
 static int  gnCurStream;          // 0x80281C30  -1 = none
 static int  gnNumStreams;         // 0x80281C2C
 static volatile s8 gbReadPending;        // 0x80281C28
-static UStreamObject* gpQueueHead;   // 0x80281C24
-static UStreamObject* gpQueueTail;   // 0x80281C20
+static TStreamData* gpQueueHead;     // 0x80281C24
+static TStreamData* gpQueueTail;     // 0x80281C20
 static int  gnReadErrors;         // 0x80281C1C
 static u8   gbAutoRead;           // 0x80281C19  keep reading after each completed read
 static s8   gbPaused;             // 0x80281C18
@@ -61,7 +61,7 @@ int gnNumHandlers = -1;           // 0x80280DB8 (.sdata): -1 until UStream_Init
 
 void  LLVideo_HandleChunk(void* pChunk);                             // MPG2
 void  Mov_SendSoundBlock(MovieSoundBlock* pBlock);                  // DSPM / VAGM / XADP
-void  fn_8000E708(UStreamParams* p);
+void  fn_8000E708(StreamFileList* p);
 
 static void UStream_ReadDone(int nBytes, int nError);
 static void UStream_StartRead(void);
@@ -73,8 +73,8 @@ int UStream_Close(int nStream);
 // ---- buffers ------------------------------------------------------------------------------
 
 // Give a parsed buffer back: append it to the released list (the ring is refilled later).
-static void UStream_ReleaseBuffer(UStreamBuffer* pBuffer) {
-    UStreamBuffer* p;
+static void UStream_ReleaseBuffer(CDBuf* pBuffer) {
+    CDBuf* p;
     if (gnCurStream == -1) return;
     pBuffer->nRefs = 0;
     if (gpFreeList == NULL) {
@@ -87,8 +87,8 @@ static void UStream_ReleaseBuffer(UStreamBuffer* pBuffer) {
 
 // Start the next asynchronous read into a free buffer.
 static void UStream_StartRead(void) {
-    UStreamBuffer* pBuffer;
-    UStream* pStream;
+    CDBuf* pBuffer;
+    StrmCB* pStream;
     if (gbPaused) return;
     if (gnCurStream == -1) return;
     pStream = &gStreams[gnCurStream];
@@ -116,7 +116,7 @@ static void UStream_StartRead(void) {
 // Async read completion. Checks the read, advances the file position, queues the buffer in
 // the ready ring, and starts the next read if reading is continuous.
 static void UStream_ReadDone(int nBytes, int nError) {
-    UStream* pStream;
+    StrmCB* pStream;
     int nStatus;
     u8 bDropped;
     if (gnCurStream == -1) return;
@@ -180,11 +180,11 @@ void UStream_SetAutoRead(u8 bAuto) {
 }
 
 // Object allocation from an SHDR chunk: header + a 'Csac' chunk's extra bytes + 0x80-aligned data.
-static int UStream_BeginObject(UStreamFill* pFill, UStreamChunk* pChunk) {
+static int UStream_BeginObject(ParseInProg* pFill, StreamChunk* pChunk) {
     u32 uExtra;
     int nWanted;
     u32 uPad;
-    UStreamObject* pObject;
+    TStreamData* pObject;
     if (pChunk->uType == TAG('C', 's', 'a', 'c')) {
         nWanted = 1;
         uExtra = ((pChunk->nScriptLen + pChunk->n38 + 3) & ~3) + 8;
@@ -213,9 +213,9 @@ static int UStream_BeginObject(UStreamFill* pFill, UStreamChunk* pChunk) {
         if (pChunk->uType == TAG('t', 'x', 'f', '2')) {
             pChunk->uFlags = MEMTYPE_HIGH;
         }
-        uPad = (uExtra + sizeof(UStreamObject)) & 0x7F;
+        uPad = (uExtra + sizeof(TStreamData)) & 0x7F;
         uPad = uPad ? 0x80 - uPad : 0;
-        pObject = Circular_MemAllocFunc(sizeof(UStreamObject) + uExtra + uPad + pChunk->uSize, pChunk->uFlags,
+        pObject = Circular_MemAllocFunc(sizeof(TStreamData) + uExtra + uPad + pChunk->uSize, pChunk->uFlags,
                                         0x80, "UStream.c", 732);
         pFill->pObject = pObject;
         pObject->nUnk14 = 0;
@@ -233,8 +233,8 @@ static int UStream_BeginObject(UStreamFill* pFill, UStreamChunk* pChunk) {
 // Finished parsing the current list head: move it to the used list while objects still reference
 // it, else release it.
 static void UStream_RetireCurrentBuffer(void) {
-    UStreamBuffer* pBuffer;
-    UStreamBuffer* p;
+    CDBuf* pBuffer;
+    CDBuf* p;
     if (gnCurStream == -1) return;
     pBuffer = gpCurList;
     gpCurList = pBuffer->pNext;
@@ -253,9 +253,9 @@ static void UStream_RetireCurrentBuffer(void) {
 }
 
 // An object is complete: put it on the done list for UStream_Update to deliver.
-static void UStream_FinishObject(UStreamObject* pObject) {
-    UStreamNode* pNode;
-    UStreamNode* p;
+static void UStream_FinishObject(TStreamData* pObject) {
+    TStreamQueue* pNode;
+    TStreamQueue* p;
     if (gnCurStream == -1) return;
     pNode = AllocPoolMem(gpNodePool);
     if (pNode == NULL) return;
@@ -271,13 +271,13 @@ static void UStream_FinishObject(UStreamObject* pObject) {
 
 // Recycle released buffers into the free ring, kick a read, and (with bTakeReady) move ready
 // buffers onto the current list. Returns the current list head.
-static UStreamBuffer* UStream_PumpBuffers(u8 bTakeReady) {
-    UStream* pStream;
+static CDBuf* UStream_PumpBuffers(u8 bTakeReady) {
+    StrmCB* pStream;
     if (gnCurStream == -1) return NULL;
     pStream = &gStreams[gnCurStream];
     if (!pStream->bEOF) {
         while (gpFreeList != NULL) {
-            UStreamBuffer* p = gpFreeList;
+            CDBuf* p = gpFreeList;
             gpFreeList = p->pNext;
             p->pNext = NULL;
             gFreeRing[gFreeRingHead] = p;
@@ -290,9 +290,9 @@ static UStreamBuffer* UStream_PumpBuffers(u8 bTakeReady) {
         }
     }
     if (bTakeReady) {
-        UStreamBuffer* p;
+        CDBuf* p;
         while ((p = gReadyRing[gReadyRingTail]) != NULL) {
-            UStreamBuffer* q;
+            CDBuf* q;
             gReadyRing[gReadyRingTail] = NULL;
             if (++gReadyRingTail == USTREAM_NUM_BUFFERS) {
                 gReadyRingTail = 0;
@@ -462,7 +462,7 @@ u8* UStream_Copy(u8* pDst, const u8* pSrc, u32 uCount) {
 }
 
 // A buffer's data was handed to an object: count the reference.
-void UStream_AddBufferRef(UStreamBuffer** ppList) {
+void UStream_AddBufferRef(CDBuf** ppList) {
     if (gnCurStream == -1) return;
     (*ppList)->nRefs++;
 }
@@ -473,20 +473,20 @@ static void UStream_NullCallback(u32 n) {
 // Walk the chunks of the current buffers. SHOC chunks build objects, SONO chunks build sound
 // objects (through the audio module), the stream / movie tags go to their players.
 static void Stream_ParseBufs(void) {
-    UStreamChunk* pChunk;
-    UStreamBuffer* pBuffer;
+    StreamChunk* pChunk;
+    CDBuf* pBuffer;
     u32 uLen;
     u32 uTag;
     u32 uCopy;
-    UStreamFill* pFill;
+    ParseInProg* pFill;
     if (UStream_PumpBuffers(1) == NULL) return;
     if (gnCurStream == -1) return;
     while ((pBuffer = gpCurList) != NULL) {
         // fake match: a volatile signed read of uPos makes the loop top load it again, as the original does
         while (*(volatile s32*)&pBuffer->uPos < USTREAM_BUFFER_SIZE) {
             // fake match: indexing data through a u8* (not the array) adds uPos to pBuffer before the 0x40
-            pChunk = (UStreamChunk*)&((u8*)pBuffer->data)[pBuffer->uPos];
-            // port: the chunk header is big-endian and read through UStreamChunk (and copied into
+            pChunk = (StreamChunk*)&((u8*)pBuffer->data)[pBuffer->uPos];
+            // port: the chunk header is big-endian and read through StreamChunk (and copied into
             //       the object by UStream_BeginObject): a little-endian port converts its 0x40
             //       bytes here
             uTag = pChunk->uTag;
@@ -613,7 +613,7 @@ static void Stream_ParseBufs(void) {
             case TAG('M', 'P', 'G', '2'):
                 pBuffer->nRefs++;
                 // port: the movie player gets its buffer through the chunk's first word (a 32-bit pointer)
-                *(UStreamBuffer**)pChunk = pBuffer;
+                *(CDBuf**)pChunk = pBuffer;
                 LLVideo_HandleChunk(pChunk);
                 break;
             case TAG('C', 'T', 'R', 'L'):
@@ -634,7 +634,7 @@ static void fn_8000D9A4(void) {
 }
 
 // Open the stream's current file and tell the owner.
-static void UStream_OpenFile(UStream* pStream) {
+static void UStream_OpenFile(StrmCB* pStream) {
     int i;
     pStream->hFile = File_Open(pStream->params.aszName[pStream->nFileIndex]);
     pStream->nFileSize = File_GetLength(pStream->hFile);
@@ -648,7 +648,7 @@ static void UStream_OpenFile(UStream* pStream) {
 }
 
 // Close the current file, tell the owner, and open the next one.
-static void UStream_NextFile(UStream* pStream) {
+static void UStream_NextFile(StrmCB* pStream) {
     int i;
     File_Close(pStream->hFile);
     i = pStream->nFileIndex;
@@ -660,10 +660,10 @@ static void UStream_NextFile(UStream* pStream) {
 }
 
 // Parse what has arrived and return the next finished object, or NULL.
-static UStreamObject* UStream_NextObject(u8 bParse) {
-    UStream* pStream;
-    UStreamNode* pNode;
-    UStreamObject* pObject;
+static TStreamData* UStream_NextObject(u8 bParse) {
+    StrmCB* pStream;
+    TStreamQueue* pNode;
+    TStreamData* pObject;
     if (bParse) {
         Stream_ParseBufs();
     }
@@ -690,10 +690,10 @@ static UStreamObject* UStream_NextObject(u8 bParse) {
 // The per-frame call: pull finished objects, rebase their references, and deliver each to the
 // handler registered for its type. Returns 0 when the stream has nothing left to do.
 u8 UStream_Update(void) {
-    UStreamObject* pObject;
+    TStreamData* pObject;
     int i;
-    UStreamObject* pNext;
-    UStream* pStream;
+    TStreamData* pNext;
+    StrmCB* pStream;
     DiscError_WaitForDrive();
     for (pObject = UStream_NextObject(1); pObject != NULL; pObject = UStream_NextObject(0)) {
         pObject->pPrev = NULL;
@@ -711,7 +711,7 @@ u8 UStream_Update(void) {
     if (pObject == NULL) {
         if (gnCurStream == -1) return 0;
         pStream = &gStreams[gnCurStream];
-        (void)*(volatile UStream*)pStream;   // fake match: sequence pointer evaluation before Gaud_Cycle
+        (void)*(volatile StrmCB*)pStream;   // fake match: sequence pointer evaluation before Gaud_Cycle
         Gaud_Cycle();
         if (pStream->bEOF &&!gbReadPending && gReadyRing[gReadyRingTail] == NULL && gpCurList == NULL
             && gpUsedList == NULL) {
@@ -746,7 +746,7 @@ u8 UStream_Update(void) {
             break;
         case TAG('R', 'P', 'N', 'S'):
             if (Resources_IsAlreadyThere(pObject)) {
-                UStreamObject* pOld = Resources_Get(pObject->uType, pObject->uId);
+                TStreamData* pOld = Resources_Get(pObject->uType, pObject->uId);
                 if (pOld != NULL) {
                     if (pObject->uSize == pOld->uSize
                         && Mem_compare(pObject->pData, pOld->pData, pObject->uSize) == 0) {
@@ -778,9 +778,9 @@ u8 UStream_Update(void) {
 }
 
 // An object is done with its source buffer: drop the reference and recycle drained buffers.
-void UStream_ReleaseObjectBuffer(UStreamBuffer** ppBuffer) {
-    UStreamBuffer* p;
-    UStreamBuffer* pPrev;
+void UStream_ReleaseObjectBuffer(CDBuf** ppBuffer) {
+    CDBuf* p;
+    CDBuf* pPrev;
     if (gnCurStream == -1) return;
     (*ppBuffer)->nRefs--;
     pPrev = gpUsedList;
@@ -805,7 +805,7 @@ void UStream_ReleaseObjectBuffer(UStreamBuffer** ppBuffer) {
 // Stop the current stream at the end of what has been read. Returns whether a read is still
 // pending (0 when no stream is open).
 int UStream_Stop(void) {
-    UStream* pStream;
+    StrmCB* pStream;
     if (gnCurStream < 0) return 0;
     pStream = &gStreams[gnCurStream];
     pStream->bEOF = 1;
@@ -815,7 +815,7 @@ int UStream_Stop(void) {
 // Shut the loader down: no handlers, the current stream closed once no read is pending, the node
 // pool deleted.
 void UStream_CloseAll(void) {
-    UStream* pStream;
+    StrmCB* pStream;
     int hFile;
     gnNumHandlers = -1;
     if (gnNumStreams > 0) {
@@ -864,9 +864,9 @@ int UStream_Close(int nStream) {
 }
 
 // Open a stream from a parameter block. Returns the stream index or a negative error.
-int Stream_OpenStreamFiles(const UStreamParams* pParams) {
+int Stream_OpenStreamFiles(const StreamFileList* pParams) {
     int nStream;
-    UStream* pStream;
+    StrmCB* pStream;
     if (gbReadPending) return -0x68;
     if (gReadyRing[gReadyRingTail] != NULL) return -0x69;
     if (gpCurList != NULL) return -0x67;
@@ -881,7 +881,7 @@ int Stream_OpenStreamFiles(const UStreamParams* pParams) {
     pStream->nChunkBudget = -1;
     pStream->nUnkC = -2;
     pStream->nFileIndex = 0;
-    Mem_cpy(&pStream->params, pParams, sizeof(UStreamParams));
+    Mem_cpy(&pStream->params, pParams, sizeof(StreamFileList));
     UStream_OpenFile(pStream);
     gnCurStream = nStream;
     gnNumStreams++;
@@ -890,7 +890,7 @@ int Stream_OpenStreamFiles(const UStreamParams* pParams) {
 
 // Open a single file by name.
 int Stream_OpenStreamFile(const char* pName) {
-    UStreamParams params;
+    StreamFileList params;
     memset(&params, 0, sizeof(params));
     fn_8000E708(&params);
     params.nNumFiles = 1;
@@ -899,7 +899,7 @@ int Stream_OpenStreamFile(const char* pName) {
 }
 
 // Register (or reference again) the handler for an object type.
-int Stream_RegisterLoadChunkCallback(int nType, void (*pfnHandler)(UStreamObject*)) {
+int Stream_RegisterLoadChunkCallback(int nType, void (*pfnHandler)(TStreamData*)) {
     int i;
     int n = gnNumHandlers;
     if (n >= USTREAM_MAX_HANDLERS) return 0;
@@ -938,7 +938,7 @@ int Stream_UnregisterLoadChunkCallback(int nType) {
 
 // One-time allocation of the 18 read buffers.
 void UStream_AllocBuffers(void) {
-    gpBufferMemory = Mem_AllocFunc(USTREAM_NUM_BUFFERS * sizeof(UStreamBuffer), 0x40, 1);
+    gpBufferMemory = Mem_AllocFunc(USTREAM_NUM_BUFFERS * sizeof(CDBuf), 0x40, 1);
     gbAutoRead = 0;
 }
 
@@ -952,8 +952,8 @@ void UStream_FreeBuffers(void) {
 // Reset all state: rings, lists, the buffer free list, the node pool and the handler table.
 void UStream_Init(void) {
     s32 i;
-    UStreamBuffer* p;
-    UStreamBuffer* pPrev;
+    CDBuf* p;
+    CDBuf* pPrev;
     s32 n;
     gbReadPending = 0;
     gpReadBuffer = NULL;
@@ -972,7 +972,7 @@ void UStream_Init(void) {
     }
     gpNodePool = NULL;
     pPrev = NULL;
-    p = (UStreamBuffer*)gpBufferMemory;
+    p = (CDBuf*)gpBufferMemory;
     n = USTREAM_NUM_BUFFERS;
     do {
         p->pNext = pPrev;
@@ -995,7 +995,7 @@ void UStream_Init(void) {
 }
 
 // Clears the per-file callbacks of a stream's open parameters.
-void fn_8000E708(UStreamParams* p) {
+void fn_8000E708(StreamFileList* p) {
     int i;
 
     for (i = 0; i < USTREAM_MAX_FILES; i++) {
@@ -1008,7 +1008,7 @@ void fn_8000E708(UStreamParams* p) {
 
 // Copies a delivered object's data into pDst (at most uMax bytes) and frees the object. Returns
 // the number of bytes copied.
-u32 Stream_StreamLoadFixedSize(UStreamObject* pObject, u32 uMax, void* pDst) {
+u32 Stream_StreamLoadFixedSize(TStreamData* pObject, u32 uMax, void* pDst) {
     void* pData;
     u32 uSize;
 
@@ -1024,7 +1024,7 @@ u32 Stream_StreamLoadFixedSize(UStreamObject* pObject, u32 uMax, void* pDst) {
 }
 
 // An object's data and its size.
-u32 fn_8000E81C(UStreamObject* pObject, void** ppData) {
+u32 fn_8000E81C(TStreamData* pObject, void** ppData) {
     u32 uSize;
 
     uSize = pObject->uSize;

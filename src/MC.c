@@ -1068,7 +1068,7 @@ void MC_CleanGameString(char* szText) {
 
 // The 'eagm' handler: build the 'eagm' list from the object's text, then free the object. The text
 // is a list of entries, each a quoted line with the entry's name followed by its names, one a line.
-void MC_LoadEAGameListfromStream(UStreamObject* pObject) {
+void MC_LoadEAGameListfromStream(TStreamData* pObject) {
     char* p;
     int i;
     int j;

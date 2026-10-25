@@ -80,7 +80,7 @@ void  CharacterTex_Close(void);
 void  CharacterTex_ReleasePoolEntries(Character* pChar);
 void  CharacterTex_PreHoleInit(void);
 void  CharacterTex_StartStreamingPlayers(int nPlayer);
-void  Character_LoadSacFromStream(UStreamObject* pObject);
+void  Character_LoadSacFromStream(TStreamData* pObject);
 void  Character_RegisterSacStreamClient(void);
 void  Character_UnregisterSacStreamClient(void);
 Character* Character_CreateFromMem(u8* pData, int nUnused, int nSet, int nId, u8 bLook,
@@ -109,11 +109,11 @@ void  Character_PlaceFeetOnGround(Character* pChar);
 void  SKEL_TransformBones(CharModel* pModel, u32* auBits);
 void  fn_800B28D4(Character* pChar, int a, int b);
 void  fn_800B2FB0(Character* pChar, int a, int b);
-void  Character_ClubStreamCallbackIG(UStreamObject* pObject);
-void  Character_ClubStreamCallbackFE(UStreamObject* pObject);
-void  Character_GolferStreamCallbackIG(UStreamObject* pObject);
-void  Character_GolferStreamCallbackFE(UStreamObject* pObject);
-void  SkeletalObject_StreamCallback(UStreamObject* pObject);
+void  Character_ClubStreamCallbackIG(TStreamData* pObject);
+void  Character_ClubStreamCallbackFE(TStreamData* pObject);
+void  Character_GolferStreamCallbackIG(TStreamData* pObject);
+void  Character_GolferStreamCallbackFE(TStreamData* pObject);
+void  SkeletalObject_StreamCallback(TStreamData* pObject);
 void  Character_ResetBlenders(Character* pChar);
 void  SitDev_SetupClubCondition(int nValue);         // SitDevStateVector.c
 void  Character_GetBonePos_FromIndex(Character* pChar, int nBone, f32* pPos);
@@ -1673,7 +1673,7 @@ void CharacterTex_WaitEndOfTextureLoader(void) {
 // The 'SAC ' handler: an animation library merged over the one of the slot the object's id names.
 // port: the overlay library is little-endian on disc and AnimLib_MergeOverlay swaps it
 //       (SKA_SwapClip > BYTESWAP_SWAPDATA): a little-endian port does not swap there.
-void Character_LoadSacFromStream(UStreamObject* pObject) {
+void Character_LoadSacFromStream(TStreamData* pObject) {
     AnimLib_MergeOverlay(pObject->pData, pObject->uId);
     Circular_MemFreeFunc(pObject);
 }
@@ -2737,7 +2737,7 @@ void Character_SetupForShot(Character* pChar) {
 // The in-game 'CLB ' (club models) stream handler: unless a club skin set is loaded already
 // (gClubSkinSets[0]), makes one from the object (Character_CreateClubSkinSet), and in split screen a
 // second one for the second view (gClubSkinSets[1], else NULL). The object is freed either way.
-void Character_ClubStreamCallbackIG(UStreamObject* pObject) {
+void Character_ClubStreamCallbackIG(TStreamData* pObject) {
     if (gClubSkinSets[0] == NULL) {
         if (gSession.nSplitScreen) {
             gClubSkinSets[0] = Character_CreateClubSkinSet(pObject->pData);
@@ -2751,7 +2751,7 @@ void Character_ClubStreamCallbackIG(UStreamObject* pObject) {
 }
 
 // The front end's 'CLB ' stream handler: as Character_ClubStreamCallbackIG, with one set only.
-void Character_ClubStreamCallbackFE(UStreamObject* pObject) {
+void Character_ClubStreamCallbackFE(TStreamData* pObject) {
     if (gClubSkinSets[0] == NULL) {
         gClubSkinSets[0] = Character_CreateClubSkinSet(pObject->pData);
         gClubSkinSets[1] = NULL;
@@ -2778,7 +2778,7 @@ void Character_UnregisterClubStreamClient(void) {
 // group meanwhile (fn_800106AC, fn_800106B8). A golfer with a body skin is dressed
 // (Character_SetClubsAndClothes), its seven skins (the body, then the club set's six) listed and
 // their textures loaded. The object is freed.
-void Character_GolferStreamCallbackIG(UStreamObject* pObject) {
+void Character_GolferStreamCallbackIG(TStreamData* pObject) {
     u32 uModel = pObject->uId;
     int i;
     int nSet;
@@ -2828,8 +2828,8 @@ void Character_RegisterGolferStreamClientIG(void) {
 // 29 (Character_ApplyCrAPSettings), set to club class 5 (the wedges) and its first clip. When it
 // is still the golfer the menu wants (pLoadingGolfer->nGolferId is n8C), its body and six club skins are
 // listed on it (created golfers with one texture pool entry get two) and it takes its pool entries.
-void Character_GolferStreamCallbackFE(UStreamObject* pObject) {
-    UStreamObject* pCopy;
+void Character_GolferStreamCallbackFE(TStreamData* pObject) {
+    TStreamData* pCopy;
     Character* pChar;
     Clip* pClip;
 
@@ -2922,7 +2922,7 @@ void SkeletalObject_ClipTestAll(void) {
 // object's id.
 // port: the skeleton is little-endian on disc and Character_CreateFromMem swaps it
 //       (BYTESWAP_SWAPDATA): a little-endian port does not swap there.
-void SkeletalObject_StreamCallback(UStreamObject* pObject) {
+void SkeletalObject_StreamCallback(TStreamData* pObject) {
     Character* pChar =
         Character_Add(Character_CreateFromMem(pObject->pData, 0, 0, pObject->uId, 0, NULL));
     pChar->nPlayer = 1000;

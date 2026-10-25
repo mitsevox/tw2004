@@ -57,8 +57,8 @@ int  GameMode4_GetEventHoles(int nEvent);
 int  GameMode4_GetEventKind(int nEvent);
 int  GameMode4_GetCurrentEvent(void);
 u8   GameMode4_IsEventOpen(int nProfile, int nEvent);
-void GameMode4_LoadTCMFromStream(UStreamObject* pObject);
-void GameMode4_LoadTCMSFromStream(UStreamObject* pObject);
+void GameMode4_LoadTCMFromStream(TStreamData* pObject);
+void GameMode4_LoadTCMSFromStream(TStreamData* pObject);
 void GameMode4_EndGame(void);
 void GameMode4_QueueRegionFinalMessage(void);
 void GameMode4_WinEvent(void);
@@ -194,7 +194,7 @@ void GameMode4_UnregisterStreamClients(void) {
 }
 
 // The 'TCM ' chunk: the 25 events, copied over gLadderEvents.
-void GameMode4_LoadTCMFromStream(UStreamObject* pObject) {
+void GameMode4_LoadTCMFromStream(TStreamData* pObject) {
     // port: the 'TCM ' object is copied straight into the ladder events (LadderEvent[25]); it is
     //       big-endian on disc, so a little-endian port converts it field by field here
     //       (docs/game/formats/byte-order.md)
@@ -203,7 +203,7 @@ void GameMode4_LoadTCMFromStream(UStreamObject* pObject) {
 
 // The 'TCMS' chunk: the events' names, copied into a new 16-byte-aligned block (Mem_AllocFunc) that
 // gLadderNames keeps with its size. A NULL object is ignored.
-void GameMode4_LoadTCMSFromStream(UStreamObject* pObject) {
+void GameMode4_LoadTCMSFromStream(TStreamData* pObject) {
     if (pObject) {
         gLadderNames.uSize = pObject->uSize;
         gLadderNames.pText = Mem_AllocFunc(gLadderNames.uSize, 0x10, 1);

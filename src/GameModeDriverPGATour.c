@@ -35,10 +35,10 @@ s32 gPgaSavedWind;              // the options' nWind from before a tour round (
 
 void UI_GetMoneyString(s32 nMoney, char* pDst);     // uiProcessInterface.c: money as text
 
-void GameModeDriverPGATour_LoadPGAcFromStream(UStreamObject* pObject);
-void GameModeDriverPGATour_LoadPGAtFromStream(UStreamObject* pObject);
-void GameModeDriverPGATour_LoadPGApFromStream(UStreamObject* pObject);
-void GameModeDriverPGATour_Locale_PgaTourMode_LoadPGAnFromStream(UStreamObject* pObject);
+void GameModeDriverPGATour_LoadPGAcFromStream(TStreamData* pObject);
+void GameModeDriverPGATour_LoadPGAtFromStream(TStreamData* pObject);
+void GameModeDriverPGATour_LoadPGApFromStream(TStreamData* pObject);
+void GameModeDriverPGATour_Locale_PgaTourMode_LoadPGAnFromStream(TStreamData* pObject);
 void GameModeDriverPGATour_Shutdown(void);
 void GameModeDriverPGATour_StartGamePreData(void);
 void GameModeDriverPGATour_EndGame(void);
@@ -114,7 +114,7 @@ void GameModeDriverPGATour_UnregisterStreamClients(void) {
 }
 
 // The 'PGAc' loader: the season's 31 tournaments (gPgaData.aTournament).
-void GameModeDriverPGATour_LoadPGAcFromStream(UStreamObject* pObject) {
+void GameModeDriverPGATour_LoadPGAcFromStream(TStreamData* pObject) {
     // port: the 'PGAc' object is copied straight into gPgaData.aTournament (Tournament[31]); it is
     //       big-endian on disc, so a little-endian port converts it field by field here
     //       (docs/game/formats/byte-order.md)
@@ -122,7 +122,7 @@ void GameModeDriverPGATour_LoadPGAcFromStream(UStreamObject* pObject) {
 }
 
 // The 'PGAt' loader: the 31 tournament formats (gPgaData.aTourEvent: rounds, courses, pins, tees).
-void GameModeDriverPGATour_LoadPGAtFromStream(UStreamObject* pObject) {
+void GameModeDriverPGATour_LoadPGAtFromStream(TStreamData* pObject) {
     // port: the 'PGAt' object is copied straight into gPgaData.aTourEvent (TourEvent[31]); it is
     //       big-endian on disc, so a little-endian port converts it field by field here
     //       (docs/game/formats/byte-order.md)
@@ -130,7 +130,7 @@ void GameModeDriverPGATour_LoadPGAtFromStream(UStreamObject* pObject) {
 }
 
 // The 'PGAp' loader: 11 sponsorship offers (gPgaData.aSponsorship).
-void GameModeDriverPGATour_LoadPGApFromStream(UStreamObject* pObject) {
+void GameModeDriverPGATour_LoadPGApFromStream(TStreamData* pObject) {
     // port: the 'PGAp' object is copied straight into gPgaData.aSponsorship (PgaSponsorship[11]);
     //       it is big-endian on disc, so a little-endian port converts it field by field here
     //       (docs/game/formats/byte-order.md)
@@ -140,7 +140,7 @@ void GameModeDriverPGATour_LoadPGApFromStream(UStreamObject* pObject) {
 // The 'PGAn' loader: the tournament names block (Tournament.nName are offsets into it) is copied
 // into a new 16-byte aligned block, gPgaData.pNames, and the stream object freed. An empty object
 // leaves pNames as it was.
-void GameModeDriverPGATour_Locale_PgaTourMode_LoadPGAnFromStream(UStreamObject* pObject) {
+void GameModeDriverPGATour_Locale_PgaTourMode_LoadPGAnFromStream(TStreamData* pObject) {
     void* pData;
     u32 nSize = fn_8000E81C(pObject, &pData);
     if (nSize) {

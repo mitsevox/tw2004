@@ -15,7 +15,7 @@ s32 EASBio_WaitForAsyncProcessToComplete(void);
 s32 fn_80125520(u8 b);
 s32 fn_801258E8(void);
 u8 fn_801257A0(void);
-void fn_80124B10(UStreamObject* pObject);
+void fn_80124B10(TStreamData* pObject);
 
 // This game's name and its "games played" label (16-bit characters) for the Bio library.
 char lbl_80195308[28] = "Tiger Woods PGA TOUR\xAE 2004";
@@ -91,7 +91,7 @@ s32 EASBio_WaitForAsyncProcessToComplete(void) {
 }
 
 // Copies the 'EASI' icon into the manager's buffer.
-void fn_80124B10(UStreamObject* pObject) {
+void fn_80124B10(TStreamData* pObject) {
     Mem_cpy(lbl_80281988->pIcon, pObject->pData, pObject->uSize);
     Circular_MemFreeFunc(pObject);
 }

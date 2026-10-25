@@ -32,8 +32,8 @@ f32 gfCrAPBallScaleY = 1.0f;    // } the ball's scale on each axis
 f32 gfCrAPBallScaleZ = 1.0f;    // }
 char gszCrAPBallLogoTex[] = "logoea";   // the texture FE_CrAPBall_SetLogo copies a ball logo over
 
-void FE_CrAPBall_LoadBALF(UStreamObject* pObject);
-void FE_CrAPBall_LoadTEO(UStreamObject* pObject);
+void FE_CrAPBall_LoadBALF(TStreamData* pObject);
+void FE_CrAPBall_LoadTEO(TStreamData* pObject);
 void LLMath_CopyMat44(f32 (*pSrc)[4], f32 (*pDst)[4]);
 void LLMath_IdentifyMat(f32 (*pMtx)[4]);                   // identity
 void UObject_ComposeRotation(f32 (*pMtx)[4]);
@@ -53,20 +53,20 @@ void FE_CrAPBall_UnRegisterStreamClients(void) {
 
 // The 'BALF' load handler: the object is a texture bank of ball logos, kept for
 // FE_CrAPBall_SetLogo; the stream object itself is freed.
-void FE_CrAPBall_LoadBALF(UStreamObject* pObject) {
+void FE_CrAPBall_LoadBALF(TStreamData* pObject) {
     gpCrAPBallLogoBank = TX_spDownloadData(pObject, NULL, 0);
     Circular_MemFreeFunc(pObject);
 }
 
 // ---- sweep code (not yet cleaned up) ----
 
-void FE_CrAPBall_FreeTEO(UStreamObject* pObject);
+void FE_CrAPBall_FreeTEO(TStreamData* pObject);
 
 // The 'TEO ' load handler: unless an object of the same type and id is listed already, the object's
 // model is built from its data (fn_80045D80) and kept in the object (word 4), with
 // FE_CrAPBall_FreeTEO as its free function, and the object is listed (Resources_Add) for
 // FE_CrAPBall_MakeObjects to find.
-void FE_CrAPBall_LoadTEO(UStreamObject* pObject) {
+void FE_CrAPBall_LoadTEO(TStreamData* pObject) {
     if (Resources_IsAlreadyThere(pObject) == 0) {
         (*(UObjModel**)((u8*)(pObject) + 4)) = fn_80045D80(pObject->pData);
         pObject->pfnFree = FE_CrAPBall_FreeTEO;
@@ -76,7 +76,7 @@ void FE_CrAPBall_LoadTEO(UStreamObject* pObject) {
 
 // Frees the model FE_CrAPBall_LoadTEO built for a 'TEO ' object (pObject: the object): its root
 // (fn_800075CC), then the model.
-void FE_CrAPBall_FreeTEO(UStreamObject* pObject) {
+void FE_CrAPBall_FreeTEO(TStreamData* pObject) {
     void* pModel;
 
     pModel = (*(void**)((u8*)(pObject) + 4));
@@ -125,9 +125,9 @@ void FE_CrAPBall_Free(void) {
 }
 
 // The three objects, made from their 'TEO ' models once those have streamed in.
-// port: a 'TEO ' object's UStreamObject.uUnk4 holds its model (FE_CrAPBall_LoadTEO stores it there).
+// port: a 'TEO ' object's TStreamData.uUnk4 holds its model (FE_CrAPBall_LoadTEO stores it there).
 void FE_CrAPBall_MakeObjects(void) {
-    UStreamObject* pObject;
+    TStreamData* pObject;
 
     if (gpCrAPBallTeo10000 == NULL) {
         pObject = Resources_Get('TEO ', 10000);

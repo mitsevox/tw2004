@@ -48,7 +48,7 @@ void   Startup_SendCardFullMsg(void);
 void   Startup_SendSaveDamagedMsg(void);
 void   Startup_UpdateCardStatuses(void);
 u8     Startup_AreAllSlotsEmpty(void);
-void   Startup_LoadLegalPicture(UStreamObject* pObject);
+void   Startup_LoadLegalPicture(TStreamData* pObject);
 
 // port: the GameCube's audio and ARAM libraries and their set-up.
 void   AIInit(u8* pStack);
@@ -1303,7 +1303,7 @@ void startup_UnregisterStreamClients(void) {
 // uiProcessPolygon.c UI_PlayStartUpMovies shows the first after the start-up movies and frees it)
 // and free each object. A copy's size is rounded up to 128 bytes (a size already a multiple of 128
 // gets 128 more).
-void Startup_LoadLegalPicture(UStreamObject* pObject) {
+void Startup_LoadLegalPicture(TStreamData* pObject) {
     s32 nPad = 128 - (s32)pObject->uSize % 128;
     if (gnLegalPictures == 0) {
         gLegalPictureSize = pObject->uSize + nPad;

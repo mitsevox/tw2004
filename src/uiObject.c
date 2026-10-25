@@ -113,7 +113,7 @@ void UI_Obj_CloseModule(void) {
 }
 
 // Make the spin display's model from its 'TEO ' model object (id 10003), unless it is made already.
-// port: a 'TEO ' object's UStreamObject.uUnk4 holds its model (see Code800B9944.c FE_CrAPBall_MakeObjects).
+// port: a 'TEO ' object's TStreamData.uUnk4 holds its model (see Code800B9944.c FE_CrAPBall_MakeObjects).
 void UI_Obj_InitForRender(void) {
     if (gpUIObjModel == NULL) {
         gpUIObjModel = Object_Create((UObjModel*)Resources_Get('TEO ', 10003)->uUnk4);
