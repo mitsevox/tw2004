@@ -1151,9 +1151,7 @@ config.libs = [
             Object(Matching, "unsorted/sweep_800957D8.c"),
 
             Object(Matching, "unsorted/sweep_8009A844.c"),
-            Object(Matching, "unsorted/sweep_80005520.c"),
-            Object(Matching, "unsorted/sweep_80005590.c"),
-            Object(Matching, "unsorted/sweep_800055D8.c"),
+            Object(Matching, "Main.c"),
             # Built optimized for size: under -O4,p the copy and fill loops are unrolled and the
             # four functions take 0xF94 bytes, against EA's 0x5C0.
             Object(Matching, "LLMem_Gc.c", extra_cflags=["-O4,s"]),
@@ -1165,9 +1163,7 @@ config.libs = [
             Object(Matching, "hlaudvoice.c"),
             Object(Matching, "AudLock.c"),
             Object(Matching, "unsorted/sweep_801654F4.c", progress_category="sdk"),  # Metrowerks runtime / MetroTRK, not EA code
-            Object(Matching, "unsorted/sweep_80005580.c"),
 
-            Object(Matching, "unsorted/sweep_800055D4.c"),
             Object(Matching, "GxUtil.c"),
             Object(Matching, "unsorted/sweep_8003944C.c"),
             Object(Matching, "unsorted/sweep_80070168.c"),
