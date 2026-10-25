@@ -14,7 +14,7 @@ and MetroTRK are built from public decomps in `extern/` (the `progress_category=
 
 | To see | Read |
 |---|---|
-| The entry point | `main()` in `unsorted/sweep_800055D8.c`: boot list (`sweep_80005520.c`), `GoEntry.c`'s loop, shutdown list (`sweep_80005590.c`) |
+| The entry point | `main()` in `Main.c`: the boot list, `GoEntry.c`'s loop, the shutdown list |
 | The game's state machine | `GoEntry.c` `fn_800083A4`: a switch on `gSession.nGameType` (table below) |
 | One frame | `gomainloop.c`: `fn_8006D8E8` is the frame loop, `fn_8006DBD4` picks the game type's frame, `fn_8006D27C` draws a round's frame, `fn_8006DDA8` runs every module's hooks |
 | A shot, start to finish | `gomainloop.c` calls `STATEMAIN_Update` (`statemain.c`) each frame, which runs `GOLFERSTATE_Update` (`StateGolfer.c`): each player's golfer state (`stateFunc.c`, `STATEFUNC_*`). `STATEFUNC_Swing*` drives `Swing.c`, which launches the ball with `Physics_ShotImpact` (`Ball.c`); `GM_BallHit` and `GM_Update` (`GameMode.c`) keep the round's turns and strokes |
@@ -90,11 +90,7 @@ The outer loop moves between start-up screens, the front end and rounds (`gSessi
 
 | File | Name | What it is |
 |---|---|---|
-| unsorted/sweep_80005520.c | ph | the boot-time init list `main` calls first (memory, ARAM, streamer buffers, session...) |
-| unsorted/sweep_80005580.c | ph | one boot-time setter (clears `*lbl_80281510`) |
-| unsorted/sweep_80005590.c | ph | the shutdown list `main` calls last |
-| unsorted/sweep_800055D4.c | ph | an empty function the shutdown list calls |
-| unsorted/sweep_800055D8.c | ph | `main()` |
+| Main.c | T7 | `main()`, with the boot-time init list it calls first and the shutdown list it calls last |
 | GoEntry.c | EA | the outer loop over `gSession.nGameType` |
 | Code8002EE1C.c | ph | the session (`Session_Init`, players, golfers, options) |
 | gomainloop.c | T6 | the main loop: every system's start-up and shut-down, the frame update, the render passes |
@@ -147,7 +143,6 @@ files in [Characters](#characters).
 | LLFont.c | EA | the font renderer (`'sfn '` fonts) |
 | UFont.c | EA | the text layer over LLFont.c: six font slots, queued or immediate text |
 | RenderAccessors.c | ours | a viewport's rectangle, a render context's viewport; the depth and alpha test setters and the flush that hands them to GX *(unverified which file)* |
-| unsorted/sweep_800136F4.c | ph | two tiny functions next to GoRenderCtx_Gc.c *(unverified which file)* |
 | GoRenderCtx_Gc.c | EA | the render camera (lens, frame buffer, screen rectangle, matrices) and screen state |
 | Code80015470.c | ph | the renderer's state cache and the buffer pool |
 | Code80016198.c | ph | the 2D view: viewport, screen size, vertex output |
@@ -199,7 +194,6 @@ engine.h `ModuleHooks`). Particles, rain and the ball's effects sit here too.
 | unsorted/sweep_8009554C.c | ph | six empty functions (GoEntry.c, gomainloop.c and char.c call them) |
 | GoShaderObjectCommon_MorphAnimManager_Gc.c | EA | the list of morph animations |
 | unsorted/sweep_800977CC.c | ph | frees a buffer at +0xC0 *(unverified which file)* |
-| unsorted/sweep_80097EC4.c | ph | emits two vertices *(unverified which file; sits before the glows)* |
 | GoShaderObject_Glows_Gc.c | EA | the glows' shapes and drawing |
 | UFstPart.c | EA | particle emitters |
 | PsMgr.c | EA | weather particle effects (only the rain on GameCube) |
@@ -401,7 +395,7 @@ lines, sounds and music. The SitDev files sit together at 0x800BB0A8-0x800BD894.
 | SitDevCommentaryZones.c | T6/T7 | the hole's commentary zones and the zone test |
 | SitDevStateVector.c | T6/T7 | the values the scripts test (golfer, shot, ball, hole) |
 | SitDevTrigger.c | T6/T7 | running a script entry's actions (commentary, sounds, music) |
-| Code80193188.c | ph | data only: a per-value flag table SitDevStateVector.c reads (TW07's `SitDevSharedTables.c` probably) |
+| SitDevSignedValues.c | ours | data only: which state values the scripts compare as signed |
 
 ### Front end and UI
 
@@ -530,7 +524,6 @@ Small sweep files whose file and subsystem are not known:
 | File | What it is |
 |---|---|
 | unsorted/sweep_8003944C.c | a function returning 0, between GoPostFx.c and GoDynamicCam.c |
-| unsorted/sweep_80095744.c, sweep_80095780.c, sweep_80095798.c, sweep_800957B0.c, sweep_800957D8.c | setters and getters of an object's +0x18..+0x2C fields, between Code80095564.c and CharAnim.c |
 
 In the SDK and runtime address range, not EA code: `unsorted/sweep_801338E0.c` (EXI2 / debugger
 stubs), `sweep_801654D0.c`, `sweep_801654F4.c`, `sweep_80165524.c` (Metrowerks critical sections;

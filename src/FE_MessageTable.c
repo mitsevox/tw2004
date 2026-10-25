@@ -2245,7 +2245,7 @@ void GM_vFEMessage77_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 78: whether golfer pArgs[1] can be picked: 1 when it is unlocked (in any of the
-// five save profiles, loaded or not, or by a cheat code in lbl_80281DF4) or is a created golfer
+// five save profiles, loaded or not, or by a cheat code in gpPasswordUnlocks) or is a created golfer
 // (FIRST_CREATED_GOLFER on), 0 when it is locked, -1 when its gGolferTable record's bAvailable is
 // -1 (not in the game); always 1 while GM_vSetAllGolfersPickable's flag (gpFEProfile->bAllGolfersPickable) is
 // set. pArgs[0] is not read. It also sets uiProcessPolygon.c's gFELockedGolferShade to 0 (answer
@@ -2261,12 +2261,12 @@ void GM_vIsGolferUnlocked(MsgArg* pArgs, MsgArg* pResult) {
         if (pArgs[1].i >= FIRST_CREATED_GOLFER) {
             pResult->i = 1;
         }
-        for (i = 0; i < 5; i++) {
+        for (i = 0; i < SAVE_NUM_SLOTS; i++) {
             if (gpSaveData[i].aGolferUnlocked[pArgs[1].i] != 0) {
                 pResult->i = 1;
             }
         }
-        if (lbl_80281DF4->aGolferUnlocked[pArgs[1].i] != 0) {
+        if (gpPasswordUnlocks->aGolferUnlocked[pArgs[1].i] != 0) {
             pResult->i = 1;
         }
     } else {
@@ -2280,7 +2280,7 @@ void GM_vIsGolferUnlocked(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 79: whether course pArgs[1] can be picked: 1 when a loaded save profile
-// (bActive) or a cheat code (lbl_80281DF4) has unlocked it, and always for Random 18, else 0.
+// (bActive) or a cheat code (gpPasswordUnlocks) has unlocked it, and always for Random 18, else 0.
 // pArgs[0] is not read. For Random 18 (course 23) the tests read aCourseUnlocked[23], one past its
 // 23 entries; the answer is already 1 then.
 void GM_vIsCourseUnlockedOnAnyProfile(MsgArg* pArgs, MsgArg* pResult) {
@@ -2290,12 +2290,12 @@ void GM_vIsCourseUnlockedOnAnyProfile(MsgArg* pArgs, MsgArg* pResult) {
     if (pArgs[1].i == COURSE_RANDOM_18) {
         pResult->i = 1;
     }
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < SAVE_NUM_SLOTS; i++) {
         if (gpSaveData[i].aCourseUnlocked[pArgs[1].i] != 0 && gpSaveData[i].bActive != 0) {
             pResult->i = 1;
         }
     }
-    if (lbl_80281DF4->aCourseUnlocked[pArgs[1].i] != 0) {
+    if (gpPasswordUnlocks->aCourseUnlocked[pArgs[1].i] != 0) {
         pResult->i = 1;
     }
 }
@@ -3558,7 +3558,7 @@ void GM_vIsProfileChanged(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 185: the most rewards (of the first 18, aRewardUnlocked) any of the five save
-// profiles has unlocked, or the cheat codes' unlocks (lbl_80281DF4) have, if that is more.
+// profiles has unlocked, or the cheat codes' unlocks (gpPasswordUnlocks) have, if that is more.
 void GM_vGetMostRewardsUnlocked(MsgArg* pArgs, MsgArg* pResult) {
     int i;
     int j;
@@ -3566,7 +3566,7 @@ void GM_vGetMostRewardsUnlocked(MsgArg* pArgs, MsgArg* pResult) {
     int nMax;
 
     nMax = 0;
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < SAVE_NUM_SLOTS; i++) {
         nCount = 0;
         for (j = 0; j < 18; j++) {
             if (gpSaveData[i].aRewardUnlocked[j] != 0) {
@@ -3579,7 +3579,7 @@ void GM_vGetMostRewardsUnlocked(MsgArg* pArgs, MsgArg* pResult) {
     }
     nCount = 0;
     for (j = 0; j < 18; j++) {
-        if (lbl_80281DF4->aRewardUnlocked[j] != 0) {
+        if (gpPasswordUnlocks->aRewardUnlocked[j] != 0) {
             nCount++;
         }
     }
@@ -3757,10 +3757,10 @@ void GM_vMCCheckCard(MsgArg* pArgs, MsgArg* pResult) {
 
 // Front-end message 202: whether golfer pArgs[1] can be picked without any profile's unlocks: -1
 // when the golfer is not available at all (gGolferTable's bAvailable is -1), else 1 when he is a
-// created golfer, one of the 16 golfers of gStartUnlockedGolfers or unlocked by a cheat code (lbl_80281DF4),
-// 0 when locked. gFELockedGolferShade is set to 0.2 for a locked golfer, else 0. Message 78 makes the same
-// test with the save profiles' unlocks instead of the list (and answers 1 for any golfer while
-// gpFEProfile->bAllGolfersPickable is set).
+// created golfer, one of the 16 golfers of gStartUnlockedGolfers or unlocked by a cheat code
+// (gpPasswordUnlocks), 0 when locked. gFELockedGolferShade is set to 0.2 for a locked golfer,
+// else 0. Message 78 makes the same test with the save profiles' unlocks instead of the list (and
+// answers 1 for any golfer while gpFEProfile->bAllGolfersPickable is set).
 void GM_vIsGolferUnlockedByDefault(MsgArg* pArgs, MsgArg* pResult) {
     int i;
 
@@ -3774,7 +3774,7 @@ void GM_vIsGolferUnlockedByDefault(MsgArg* pArgs, MsgArg* pResult) {
                 pResult->i = 1;
             }
         }
-        if (lbl_80281DF4->aGolferUnlocked[pArgs[1].i] != 0) {
+        if (gpPasswordUnlocks->aGolferUnlocked[pArgs[1].i] != 0) {
             pResult->i = 1;
         }
     } else {
@@ -3832,20 +3832,20 @@ void GM_vPlayCredits(MsgArg* pArgs, MsgArg* pResult) {
 void GM_vFEMessage206_Empty(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Front-end message 207: 1 when save slot pArgs[0]'s profile or a cheat code (lbl_80281DF4) has
+// Front-end message 207: 1 when save slot pArgs[0]'s profile or a cheat code (gpPasswordUnlocks) has
 // unlocked course pArgs[1], else 0.
 void GM_vIsCourseUnlocked(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
     if (gpSaveData[pArgs[0].i].aCourseUnlocked[pArgs[1].i] != 0) {
         pResult->i = 1;
     }
-    if (lbl_80281DF4->aCourseUnlocked[pArgs[1].i] != 0) {
+    if (gpPasswordUnlocks->aCourseUnlocked[pArgs[1].i] != 0) {
         pResult->i = 1;
     }
 }
 
 // Front-end message 208: how far the rewards go for save slot pArgs[0]: the number (1..18) of the
-// last reward its profile or a cheat code (lbl_80281DF4) has unlocked, 0 for none. Earlier rewards
+// last reward its profile or a cheat code (gpPasswordUnlocks) has unlocked, 0 for none. Earlier rewards
 // that are still locked are not counted.
 void GM_vGetHighestRewardUnlocked(MsgArg* pArgs, MsgArg* pResult) {
     int i;
@@ -3857,7 +3857,7 @@ void GM_vGetHighestRewardUnlocked(MsgArg* pArgs, MsgArg* pResult) {
         }
     }
     for (i = 0; i < 18; i++) {
-        if (lbl_80281DF4->aRewardUnlocked[i] != 0 && i + 1 > n) {
+        if (gpPasswordUnlocks->aRewardUnlocked[i] != 0 && i + 1 > n) {
             n = i + 1;
         }
     }
@@ -4002,7 +4002,7 @@ void GM_vFEMessage227_Return0(MsgArg* pArgs, MsgArg* pResult) {
 
 // Front-end message 228: fills entry pArgs[2] of save slot pArgs[0]'s custom round pArgs[1] with a
 // random hole: a random course from a list of 20 (course 0 twice, so twice as likely; no 4, 7, 21
-// or 22) among those this profile or a cheat code (lbl_80281DF4) has unlocked, and a random hole
+// or 22) among those this profile or a cheat code (gpPasswordUnlocks) has unlocked, and a random hole
 // number 0..17, both drawn again while the round already holds that course and hole (the entry
 // being filled counts too).
 void GM_vSetRandomCustomRoundHole(MsgArg* pArgs, MsgArg* pResult) {
@@ -4019,7 +4019,7 @@ void GM_vSetRandomCustomRoundHole(MsgArg* pArgs, MsgArg* pResult) {
 
     for (i = 0; i < 20; i++) {
         if (gpSaveData[nSlot].aCourseUnlocked[aCourses[i]] ||
-            lbl_80281DF4->aCourseUnlocked[aCourses[i]]) {
+            gpPasswordUnlocks->aCourseUnlocked[aCourses[i]]) {
             nUnlocked++;
         }
     }
@@ -4028,7 +4028,7 @@ retry:
     nFound = 0;
     for (i = 0; i < 20; i++) {
         if ((gpSaveData[nSlot].aCourseUnlocked[aCourses[i]] ||
-             lbl_80281DF4->aCourseUnlocked[aCourses[i]]) &&
+             gpPasswordUnlocks->aCourseUnlocked[aCourses[i]]) &&
             ++nFound == nPick) {
             nCourse = aCourses[i];
             break;
@@ -5131,7 +5131,7 @@ void GM_vSetEATraxOptions(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Front-end message 321: whether choice pArgs[0] can be picked: 1 always; 2 once a loaded profile
-// or a cheat code (lbl_80281DF4) has course unlock 21, 3 the same for course unlock 22
+// or a cheat code (gpPasswordUnlocks) has course unlock 21, 3 the same for course unlock 22
 // (GM_Earnings_CheckUnlockCourses buys them with prices 23 and 21; the "ALLTHETRACKS" code sets
 // both); any other choice 0.
 void GM_vIsCourseChoiceUnlocked(MsgArg* pArgs, MsgArg* pResult) {
@@ -5139,7 +5139,7 @@ void GM_vIsCourseChoiceUnlocked(MsgArg* pArgs, MsgArg* pResult) {
     int b = 0;
     int i;
 
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < SAVE_NUM_SLOTS; i++) {
         switch (nChoice) {
         case 1:
             b = 1;
@@ -5148,7 +5148,7 @@ void GM_vIsCourseChoiceUnlocked(MsgArg* pArgs, MsgArg* pResult) {
             if (gpSaveData[i].bActive != 0 && gpSaveData[i].aCourseUnlocked[21] != 0) {
                 b = 1;
             }
-            if (lbl_80281DF4->aCourseUnlocked[21] != 0) {
+            if (gpPasswordUnlocks->aCourseUnlocked[21] != 0) {
                 b = 1;
             }
             break;
@@ -5156,7 +5156,7 @@ void GM_vIsCourseChoiceUnlocked(MsgArg* pArgs, MsgArg* pResult) {
             if (gpSaveData[i].bActive != 0 && gpSaveData[i].aCourseUnlocked[COURSE_TIGERS_DREAM_18] != 0) {
                 b = 1;
             }
-            if (lbl_80281DF4->aCourseUnlocked[COURSE_TIGERS_DREAM_18] != 0) {
+            if (gpPasswordUnlocks->aCourseUnlocked[COURSE_TIGERS_DREAM_18] != 0) {
                 b = 1;
             }
             break;

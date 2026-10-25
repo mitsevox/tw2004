@@ -44,6 +44,53 @@ static f32 CharAnim_StrippedFn(f32 x) {
     return x + 1.0f;
 }
 
+// ---- sweep code (not yet cleaned up) ----
+
+void fn_80095744(Character* arg0, int arg1);
+int fn_80095780(Character* arg0);
+int fn_80095798(Character* arg0);
+void fn_800957B0(Character* arg0, int arg1);
+void fn_800957D8(Character* arg0);
+
+void fn_80095744(Character* arg0, int arg1) {
+    if ((arg0 != NULL) && (arg1 != 0xD) && (arg1 != (s32) (*(s32*)((u8*)(arg0) + 0x1C)))) {
+        (*(s32*)((u8*)(arg0) + 0x1C)) = arg1;
+        (*(s32*)((u8*)(arg0) + 0x18)) = (s32) ((*(s32*)((u8*)(arg0) + 0x18)) | 1);
+        (*(s32*)((u8*)(arg0) + 0x168)) = (s32) ((*(s32*)((u8*)(arg0) + 0x168)) & 0xFFFFFFFC);
+    }
+}
+
+int fn_80095780(Character* arg0) {
+    if (arg0 == NULL) {
+        return -1;
+    }
+    return (*(s32*)((u8*)(arg0) + 0x20));
+}
+
+int fn_80095798(Character* arg0) {
+    if (arg0 == NULL) {
+        return -1;
+    }
+    return (*(s32*)((u8*)(arg0) + 0x1C));
+}
+
+void fn_800957B0(Character* arg0, int arg1) {
+    if ((arg0 != NULL) && (arg1 != (s32) (*(s32*)((u8*)(arg0) + 0x2C)))) {
+        (*(s32*)((u8*)(arg0) + 0x2C)) = arg1;
+        (*(s32*)((u8*)(arg0) + 0x28)) = (s32) ((*(s32*)((u8*)(arg0) + 0x28)) | 1);
+    }
+}
+
+void fn_800957D8(Character* arg0) {
+    if (arg0 != NULL) {
+        (*(s32*)((u8*)(arg0) + 0x20)) = 0;
+        (*(s32*)((u8*)(arg0) + 0x1C)) = 0;
+        (*(s32*)((u8*)(arg0) + 0x18)) = (s32) ((*(s32*)((u8*)(arg0) + 0x18)) & 0xFFFFFFFE);
+    }
+}
+
+// ---- end of sweep code ----
+
 // Stop the morph animations (the second player, morphAnim, and its tree morphBlend): its current
 // and target states, its waiting change and its queued transition are cleared. With bReset the tree
 // is given back and set up again as an empty blend node. In the menus (game type 3) the created
