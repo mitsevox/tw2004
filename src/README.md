@@ -235,7 +235,7 @@ all arriving as stream chunks when a hole loads.
 
 | File | Name | What it is |
 |---|---|---|
-| TerrainData.c | ours | the hole's networks (free-drop areas, out of bounds, situation zones) from `'Cnet'` objects; outline tests |
+| UNetwork.c | T7 | the hole's networks (out of bounds, free-drop areas, commentary zones, the AI's aim points, the grass) from `'Cnet'` objects, handed to the loader registered for their type; outline tests |
 | GoDynObj.c | EA | the course's own objects around the dynamic objects: `'TEO '`/`'BALL'` handlers, per-player objects, drawing |
 | UObject.c | EA | a drawable object: three matrices, a model with up to four LODs |
 | UKernel.c | EA | the kernel's list of the course's dynamic objects |

@@ -452,7 +452,7 @@ void fn_800A3348(Ball* pBall, int nPlayer) {
             gPlayers[nPlayer].b30E = 1;
         }
         Ter_GetSupportingWorldData(Ter_GetTGD(), vPos, &pGround, vNormal);
-        fDot = Vec3_Dot(gPlayers[nPlayer].ball.vVel, vNormal);
+        fDot = LLMath_DotProduct3(gPlayers[nPlayer].ball.vVel, vNormal);
         if (fDot < 0.0f) {
             fDot *= -1.0f;
         }
@@ -515,7 +515,7 @@ void fn_800A34C0(int nTrail, Ball* pBall, f32* pDir) {
         fGap = 0.0f;
     }
     if (fGap <= 0.1f) {
-        fDot = Vec3_Dot(pDir, lbl_80281408->a64[nTrail]);
+        fDot = LLMath_DotProduct3(pDir, lbl_80281408->a64[nTrail]);
     } else {
         fDot = 1.0f;
     }
