@@ -46,7 +46,7 @@ void  Circular_ClearMemorySizeRecorder(void);
 void  Circular_StartMemorySizeRecorder(void);
 void  Circular_StopMemorySizeRecorder(void);
 s32   Circular_GetCurrentMemorySizeRecorder(void);
-// The main-memory heap (GoShaderObject_Particle_Gc.c): fn_80095108 makes it from the arena.
+// The main-memory heap (GoShaderObject_Particle_Gc.c): Mem_InitOnce makes it from the arena.
 // Mem_AllocFunc returns a block aligned to nAlign (0: 16) that remembers the heap block and its
 // own padding just before and after it (it does not read n).
 typedef struct HeapBlockHead {
@@ -54,7 +54,7 @@ typedef struct HeapBlockHead {
     u32   uSize;                // 0x4  what was asked for
 } HeapBlockHead;
 
-void  fn_80095108(void);
+void  Mem_InitOnce(void);
 void* Mem_AllocFunc(u32 uSize, u16 nAlign, int n);
 void  Mem_FreeFunc(void* p);            // frees what Mem_AllocFunc allocated
 
@@ -625,9 +625,11 @@ extern void* lbl_80281BA4[2];           // LLDisp_Gc.c: two image buffers (Depth
                                         //       FEgolferanim.c make textures of them)
 extern s32* gpInterruptsOffDepth;      // the interrupts-off depth that LLDisp_Gc.c's
                                         //       Displ_DisableInterrupts and Displ_RestoreInterrupts
-                                        //       count (fn_80005580 clears it)
+                                        //       count (Main.c's start-up clears it)
 void Displ_RestoreInterrupts(void);     // LLDisp_Gc.c: leave one level; interrupts back on at the last
 void Displ_DisableInterrupts(void);     // LLDisp_Gc.c: interrupts off, counting the levels
+s32  Displ_OpenOnce(void);              // LLDisp_Gc.c: start the display; returns 0
+s32  Displ_CloseOnce(void);             // LLDisp_Gc.c: does nothing; returns 0
 
 // LLDisp_Gc.c's frame sync (lbl_801A2350, our name): the FIFO break points the GPU is stopped at,
 // so the CPU knows when a frame's commands have been drawn.
@@ -1089,6 +1091,14 @@ void SD_vShaderObject_PrelitTextured_Dynamic_Render(DynRenderObject* pObj);
 void SD_vShaderObject_PrelitTextured_Dynamic_Refresh(DynRenderObject* pObj, DynRenderFill* pFill,
                                                      u8 bRestart);
 
+// GoShaderObject_PrelitTexturedLine_Gc.c: row 19's shader-object hooks, row 0's mesh drawn as
+// lines.
+void SD_vShaderObject_PrelitTexturedLine_Dynamic_Init(DynRenderObject* pObj, const DynRenderSize* pSize);
+void SD_vShaderObject_PrelitTexturedLine_Dynamic_Close(DynRenderObject* pObj);
+void SD_vShaderObject_PrelitTexturedLine_Dynamic_Render(DynRenderObject* pObj);
+void SD_vShaderObject_PrelitTexturedLine_Dynamic_Refresh(DynRenderObject* pObj, DynRenderFill* pFill,
+                                                         u8 bRestart);
+
 // A scrolling texture animation (GoShaderObjectCommon_TexAnimManager_Gc.c; our names, after
 // fn_80074BE0's). Each frame its texture matrix is moved by the fraction of fU and fV times the
 // clock, snapped to fScale steps of fInv.
@@ -1151,6 +1161,7 @@ extern RenderSurface lbl_801D3950[5];
 extern s32 lbl_80281D50;        // the surface fn_8002F38C selected last
 
 // GoRenderSurface.c
+void RenderSurface_InitOnce(void);      // start-up: every slot cleared, surface 0 made for the screen
 int  fn_8002F260(s32 n0, s32 nWidth, s32 nHeight, s32 nKind, s32 n20, s32 nSurface);   // 0: no memory
 void fn_8002F38C(s32 nSurface, s32 nC, s32 n10, s32 n14, u32 uFlags, s32 n18);
 s32  fn_8002F454(s32 nSurface);     // the surface's buffer size, 0 if the slot is free
@@ -1598,6 +1609,7 @@ void Input_vStopAllVibration(void);                     // GoRenderCtx_Gc.c: eve
 // ---- events, sound, effects ------------------------------------------------------------------
 
 void Aud_ExitSession(s32 n);                // GameAudio.c
+int  Gaud_InitOnce(void);              // GameAudio.c: start-up, through Gaud_ReInit; returns 1
 void Gaud_Cycle(void);                 // GameAudio.c: once a frame, the emitters and the queued sound
 u8   DiscError_WaitForDrive(void);      // Code800B7210.c: show the disc-error screen while the drive
                                         // reports a problem; 1: it was shown

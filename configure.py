@@ -1136,7 +1136,7 @@ config.libs = [
             Object(Matching, "LadderMap.c"),
             Object(Matching, "TibExt.c"),
             Object(Matching, "gbacable.c"),
-            Object(Matching, "ShaderRow19.c"),
+            Object(Matching, "GoShaderObject_PrelitTexturedLine_Gc.c"),
             Object(Matching, "EASportsBio.c"),
             Object(Matching, "GameMode22.c"),
             Object(Matching, "SkinBurn.c"),

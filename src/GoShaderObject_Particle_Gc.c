@@ -1,6 +1,6 @@
 // GoShaderObject_Particle_Gc.c (EA's name, from its asserts; also in EA's 2002 source tree): the
 // particle shader's buffers and drawing, and at its end the game's main-memory heap (made from the
-// OS arena by fn_80095108) and a clock with five stopwatches that the main loop, golfer, UI and
+// OS arena by Mem_InitOnce) and a clock with five stopwatches that the main loop, golfer, UI and
 // audio code time things with. The heap and the stopwatches are this file's by their data: its
 // .sdata (0x802813A8-0x802813B8) and .sbss (0x80281F58-0x80281F70). Where it ends between
 // 0x8009554C and char_state.c is not proven.
@@ -12,7 +12,7 @@
 #include "psmgr.h"
 #include "unsorted/cull.h"
 
-// The main-memory heap's globals (fn_80095108, Mem_AllocFunc), defined last-address-first.
+// The main-memory heap's globals (Mem_InitOnce, Mem_AllocFunc), defined last-address-first.
 s32 lbl_80281F68;                       // the heap's size
 int lbl_80281F64;                       // the heap
 u8* lbl_80281F60;                       // the end of the last block allocated
@@ -480,7 +480,7 @@ void fn_800950F4(f32 x, f32 y, f32 z) {
 
 // Makes the main-memory heap from the arena: all of it but the top 4 MB when there is more than
 // 24 MB, else all but the top 16 KB (the arena then starts at the heap's end).
-void fn_80095108(void) {
+void Mem_InitOnce(void) {
     u8* pLo;
     u8* pHi;
     u8* pEnd;

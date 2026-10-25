@@ -1453,7 +1453,7 @@ gbacable.c:
 	.sdata      start:0x80281980 end:0x80281988
 	.sbss       start:0x80282518 end:0x80282568
 
-ShaderRow19.c:
+GoShaderObject_PrelitTexturedLine_Gc.c:
 	.text       start:0x801247C0 end:0x801249A8
 
 EASportsBio.c:

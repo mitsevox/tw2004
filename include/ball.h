@@ -53,16 +53,17 @@ LAYOUT_ASSERT(TGD_Cell, 0xC);
 #define CELL_REFS_FIRST_SHIFT 12      // TGD_Cell.uRefs: the first strip's row, above the count
 #define CELL_REFS_COUNT_MASK  0xFFF   // TGD_Cell.uRefs: how many strips
 
-// A course object (0x24 bytes): a tree, a building, the pin. TW06: TGD_ObjectInstanceInfo (0x28
-// bytes, the same up to 0x24).
-typedef struct TerObject {
-    f32  vCentre[3];            // 0x00  TW06: fBoundingSphereOrigin
-    f32  fRadius;               // 0x0C  TW06: fBoundingSphereRadius
+// A course object (0x24 bytes), such as a tree or a building: its strips in the course data name
+// it (TGD_PolygonReference.nObject).
+typedef struct TGD_ObjectInstanceInfo {
+    f32  vCentre[3];            // 0x00  the centre of a sphere around the object
+    f32  fRadius;               // 0x0C  that sphere's radius (Ter_MarkObjectsNearLine)
     f32  vBase[3];              // 0x10  the centre of the object's base
     f32  fBaseRadius;           // 0x1C  the base's radius
     u16  nPatch;                // 0x20  the patch holding its model (Ter_GetObjectListModel)
     u16  nObjList;              // 0x22  its model's object list in that patch
-} TerObject;
+} TGD_ObjectInstanceInfo;
+LAYOUT_ASSERT(TGD_ObjectInstanceInfo, 0x24);
 
 // One of a hole's lights as the course data stores it (TW07: TGD_LightDesc).
 typedef struct TGD_LightDesc {
@@ -121,7 +122,7 @@ typedef struct TGD_TerrainInfo {
     struct CourseGlowBlock* pGlow;  // 0x3C  what the glows get (Ter_CourseLoadCallback)
     u8*    pUnread;             // 0x40  made a pointer (Ter_InitTGD), never read
     TGD_FoggingData* pRainFog;  // 0x44  the fog of light set 2 when rain starts (fn_800A27FC)
-    TerObject* pObjects;        // 0x48  the course objects
+    TGD_ObjectInstanceInfo* pObjects;   // 0x48  the course objects
     TGD_PolygonReference* pPolyRefs;   // 0x4C  the strips, listed cell by cell (TGD_Cell.uRefs)
     u16*   pObjRefs;            // 0x50  per cell, the objects in it (indices)
     u8     unk54[0x60 - 0x54];
@@ -185,13 +186,13 @@ typedef struct Ball {
     f32  fLieModifier;          // 0x70  the random lie quality (Physics_SetLie: up to +- the surface's
                                 //       f04, less with LUCK), added to its f00 at launch. TW06:
                                 //       lieModifier (next after lieAngle)
-    s32  nSurface;              // 0x74  surface type under the ball (90 = the cup)
+    s32  nSurface;              // 0x74  surface type under the ball (a row of gSurfaceTypes)
     s32  nStartSurface;         // 0x78  surface at the start of the shot. TW06: initialSurfaceID
     TGD_TerrainInfo* pCourse;        // 0x7C  TW06: pTerrainData (TGD_TerrainInfo*)
     s32  nCollideCount;         // 0x80  TW06: collideCount
     s32  nSolidCollideCount;    // 0x84  TW06: solidCollideCount
     TGD_MaterialInfo* pHitSurface;   // 0x88  what it last hit. TW06: pLastCollisionSurface
-    TerObject* pHitObject;      // 0x8C  the object it last hit. TW06: pLastCollisionObject
+    TGD_ObjectInstanceInfo* pHitObject;   // 0x8C  the object it last hit. TW06: pLastCollisionObject
     HitObject* pHitActor;       // 0x90  the world object it last hit (Physics_CheckDynObjCollisions). TW06:
                                 //       pLastCollisionActor
     s32  nPlayer;               // 0x94  -1 when nobody's. TW06: playerID
@@ -328,7 +329,7 @@ f32  Ter_GetSupportingGroundTriangle(TGD_TerrainInfo* pTerrainData, f32* locatio
 // The surface of that triangle; NULL when there is none
 TGD_MaterialInfo* Ter_GetSupportingGroundMaterial(TGD_TerrainInfo* pTerrainData, f32* location);
 
-// GoTerrainCollision (TW06's goterraincollision.c; types from its definitions)
+// GoTerrainCollision.c: the course's ground as collision data
 void Ter_Init(void);                            // registers the outline loaders (a round starts)
 void Ter_InitTGD(TGD_TerrainInfo* pTerrainData);     // readies a loaded course's data
 u8   Ter_Use3DCupGeometry(void);               // the cup is real geometry the ball drops into
@@ -346,44 +347,57 @@ u8   Ter_SearchForDropLocation(int PlayerID, u8 bUsePreferredLies, u8 bRevertToT
 f32  Ter_CheckForDropLocation(TGD_TerrainInfo* pTerrainData, f32* location, u8 networksOnly,
                               u8* pbIsAcceptable, u8* pbIsPreferred, TGD_MaterialInfo** pDropMaterial);
 u8   Ter_IsValidDropSurface(s32 surfaceID);    // a green or cup surface type
-u8   Ter_GetSupportingGroundNormal(TGD_TerrainInfo* pCourse, f32* pPos, f32* pNormal);   // 0 with no ground
+// the supporting ground's upward normal; 0 with no ground
+u8   Ter_GetSupportingGroundNormal(TGD_TerrainInfo* pTerrainData, f32* location, f32* normal);
 u8   Ter_PointInTriangleXZpY(f32* pA, f32* pB, f32* pC, f32 fX, f32 fZ);   // (x, z) lies inside the triangle
 // a point's weights in a triangle
 void Ter_GetBarycentricCoords(f32 (*pTri)[3], f32* pPos, f32* pA, f32* pB, f32* pC);
-f32  Ter_GetHighestGroundHeight(TGD_TerrainInfo* pCourse, f32* pPos);   // ground height, -65536.1 if none
-f32  Ter_GetLowestGroundHeight(TGD_TerrainInfo* pCourse, f32* pPos);   // ground height (GoTerrainCollision.c)
+// the highest ground over or under (x, z); TER_NO_GROUND if none
+f32  Ter_GetHighestGroundHeight(TGD_TerrainInfo* pTerrainData, f32* location);
+// the lowest ground over or under (x, z); TER_NO_GROUND if none
+f32  Ter_GetLowestGroundHeight(TGD_TerrainInfo* pTerrainData, f32* location);
 // the ground's light at a point, 0..1
 f32  Ter_GetAmbientLight(TGD_TerrainInfo* pTerrainData, f32* position);
-// Every ground height under and over pPos (up to nMax), with its surface; returns how many.
-u32  Ter_GetTerrainLayers(TGD_TerrainInfo* pCourse, f32* pPos, TGD_MaterialInfo** ppSurfaces, f32* pHeights,
-                          u32 nMax);
-// ground height, -60000 and below if none
-f32  Ter_GetSupportingGroundHeight(TGD_TerrainInfo* pCourse, f32* pPos);
-// covering ground height and normal
-f32  Ter_GetCoveringGroundHeightAndNormal(TGD_TerrainInfo* pCourse, f32* pPos, f32* pNormal);
-// the surface under a point
-TGD_MaterialInfo* Ter_GetSupportingWorldMaterial(TGD_TerrainInfo* pCourse, f32* pPos);
-f32  Ter_GetSupportingGroundData(TGD_TerrainInfo* pCourse, f32* pPos, TGD_MaterialInfo** ppSurface,
-                                 f32* pNormal);
-// The same with objects included (TW06: Ter_GetSupportingWorldData); GoTerrainCollision.c.
-f32  Ter_GetSupportingWorldData(TGD_TerrainInfo* pCourse, f32* pPos, TGD_MaterialInfo** ppSurface,
-                                f32* pNormal);
-void Ter_GetEnclosingGroundHeight(TGD_TerrainInfo* pCourse, f32* pPos, f32* pLow, f32* pHigh);
-void Ter_GetEnclosingGroundData(TGD_TerrainInfo* pCourse, f32* pPos, f32* pLow,
-                                TGD_MaterialInfo** ppSurfaceLow, f32* pNormalLow, f32* pHigh,
-                                TGD_MaterialInfo** ppSurfaceHigh, f32* pNormalHigh);
-u8   Ter_CheckForPinCollision(TGD_TerrainInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit,
-                              f32* pNormal,
-                              TGD_MaterialInfo** ppSurface, TerObject** ppObj);
-// the first thing a line hits
-u8   Ter_CheckForWorldCollision(TGD_TerrainInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit,
-                                f32* pNormal, TGD_MaterialInfo** ppSurface, TerObject** ppObj, u8* pbFlags);
+// Every ground height over or under (x, z) (up to iMaxResults), with its surface; returns how many.
+u32  Ter_GetTerrainLayers(TGD_TerrainInfo* pTerrainData, f32* location, TGD_MaterialInfo** pSurfaceInfoList,
+                          f32* pHeightList, u32 iMaxResults);
+// the supporting ground's height; TER_NO_GROUND if none
+f32  Ter_GetSupportingGroundHeight(TGD_TerrainInfo* pTerrainData, f32* location);
+// the covering ground's height and upward normal
+f32  Ter_GetCoveringGroundHeightAndNormal(TGD_TerrainInfo* pTerrainData, f32* location, f32* normal);
+// the height of whatever supports a point, objects included
+f32  Ter_GetSupportingWorldHeight(TGD_TerrainInfo* pTerrainData, f32* location);
+// the surface of whatever supports a point, objects included
+TGD_MaterialInfo* Ter_GetSupportingWorldMaterial(TGD_TerrainInfo* pTerrainData, f32* location);
+// the supporting ground's height, surface and upward normal
+f32  Ter_GetSupportingGroundData(TGD_TerrainInfo* pTerrainData, f32* location,
+                                 TGD_MaterialInfo** pSurfaceInfo, f32* normal);
+// The same with objects included.
+f32  Ter_GetSupportingWorldData(TGD_TerrainInfo* pTerrainData, f32* location, TGD_MaterialInfo** pSurfaceInfo,
+                                f32* normal);
+// the heights of the ground just below and just above a point
+void Ter_GetEnclosingGroundHeight(TGD_TerrainInfo* pTerrainData, f32* location, f32* fSupportingGroundHeight,
+                                  f32* fCoveringGroundHeight);
+// The same with their surfaces and upward normals.
+void Ter_GetEnclosingGroundData(TGD_TerrainInfo* pTerrainData, f32* location, f32* fSupportingGroundHeight,
+                                TGD_MaterialInfo** pSupportingSurfaceInfo, f32* supportingNormal,
+                                f32* fCoveringGroundHeight, TGD_MaterialInfo** pCoveringSurfaceInfo,
+                                f32* coveringNormal);
+// whether a segment runs into the flagstick
+u8   Ter_CheckForPinCollision(TGD_TerrainInfo* pTerrainData, int playerID, f32* fPoint0, f32* fPoint1,
+                              f32* pCollisionPoint, f32* pSurfaceNormal, TGD_MaterialInfo** pSurfaceInfo,
+                              TGD_ObjectInstanceInfo** pSurfaceObject);
+// the first thing a segment hits: the flagstick, the ground or an object
+u8   Ter_CheckForWorldCollision(TGD_TerrainInfo* pTerrainData, int playerID, f32* fPoint0, f32* fPoint1,
+                                f32* pCollisionPoint, f32* pSurfaceNormal, TGD_MaterialInfo** pSurfaceInfo,
+                                TGD_ObjectInstanceInfo** pSurfaceObject, u8* pDrawKick);
+// the same, through branches and leaves
 u8   Ter_CheckForSolidWorldCollision(TGD_TerrainInfo* pCourse, int nPlayer, f32* pFrom, f32* pTo, f32* pHit,
-                                     f32* pNormal,
-                 TGD_MaterialInfo** ppSurface, TerObject** ppObj);   // the same, through branches and leaves
+                                     f32* pNormal, TGD_MaterialInfo** ppSurface,
+                                     TGD_ObjectInstanceInfo** ppObj);
 u8   Ter_CheckForObjectCollision(TGD_TerrainInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
                                  TGD_MaterialInfo** ppSurface,
-                 TerObject** ppObj);   // the first object a line hits
+                                 TGD_ObjectInstanceInfo** ppObj);   // the first object a line hits
 s32  MaterialTypes_getMaterialID(TGD_MaterialInfo* pSurface);   // a surface's row in gSurfaceTypes, or -1
 
 // ---- the ball (Ball.c) ----------------------------------------------------------------------
