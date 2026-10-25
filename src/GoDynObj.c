@@ -76,7 +76,6 @@ void DynObj_DrawGolfBalls(u8* pState);
 f32  DynObj_GetBallPixels(int nPlayer);
 void DynObj_UpdateDivot(int nPlayer);
 void DynObj_UpdateTee(int nPlayer);
-int  fn_8001005C(TexBank* pBank, u64 uHash);       // LLTex.c: the texture's index, or 0x80000000
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -108,17 +107,18 @@ void DynObj_LoadBallLogos(UStreamObject* pObject) {
     int i;
     int nLogo;
 
-    pBank = fn_8000FB88(pObject, NULL, -2);
+    pBank = TX_spDownloadData(pObject, NULL, -2);
     for (i = 0; i < gSession.nNumPlayers; i++) {
         if ((s8)gSession.aProfile[i].nOutfit >= 0) {
             SKA_PackName(&uLogo, gGolfBallLogoTextureNames[(s8)gSession.aProfile[i].nOutfit]);
             SKA_PackName(&uSlot, gGolfBallLogoSlotNames[i]);
             fn_800102DC(uSlot, &pSlotBank, &pSlot);
-            nLogo = fn_8001005C(pBank, uLogo);
-            pLogo = &pBank->p8[nLogo];
+            nLogo = TX_uiFindTextureIndexFromID(pBank, uLogo);
+            pLogo = &pBank->pTextures[nLogo];
             // EA bug: this loop counts with the player loop's i
             while (i < pLogo->n41) {
-                Mem_cpy(pSlotBank->p18 + pSlot->aMips[0].uPixels, pBank->p18 + pLogo->aMips[0].uPixels,
+                Mem_cpy(pSlotBank->pPixels + pSlot->aMips[0].uPixels, pBank->pPixels
+                        + pLogo->aMips[0].uPixels,
                         pLogo->aMips[0].nC * 16);
                 i++;
             }
@@ -234,7 +234,8 @@ void DynObj_InitForHole(void) {
     pFlag = SkeletalObject_FindObject(100);
     if (pFlag != NULL) {
         Character_SetPosition(pFlag, &Ter_GetTGD()->pin[Game_CurrentPinSet()].x, 1);
-        if (Game_GetMode() != 6 && Game_GetMode() != 7 && Game_GetMode() != 8) {
+        if (GM_GetModeType() != GM_SpeedGolfMatch_mode && GM_GetModeType() != GM_SpeedGolfPoints_mode
+            && GM_GetModeType() != GM_SpeedGolf_mode) {
             pFlag->uCharFlags |= 2;
         }
         if (GM_Currently_SkillZoneMode()) {
@@ -333,7 +334,7 @@ void DynObj_RenderDynamicObjects(int nView) {
 // 0 in game mode 21 (alternate shot) while the player is in state 19 and the partner (gAltShotPartner)
 // is not; else 1.
 u8 DynObj_bAltShotDrawBall(int nPlayer) {
-    if (Game_GetMode() == 21 && (s8)GOLFERSTATE_GetCurrentState(nPlayer) == GS_WAIT &&
+    if (GM_GetModeType() == GM_AlternateShot_mode && (s8)GOLFERSTATE_GetCurrentState(nPlayer) == GS_WAIT &&
         (s8)GOLFERSTATE_GetCurrentState(gAltShotPartner[nPlayer]) != GS_WAIT) {
         return 0;
     }

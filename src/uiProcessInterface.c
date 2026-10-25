@@ -64,7 +64,6 @@ void FO_vSetCurrentAddMode(s32 nMode);
 void fn_80012C54_SetWordWrap(s32 v);
 void UFont_ResetContext(void);
 void UI_SetTextLineSpacing(f32 fSpacing);
-int  fn_8001005C(TexBank* pBank, u64 uHash);       // LLTex.c: the texture's index, or 0x80000000
 TexEntry* fn_800107E4(TexBank* pBank, int nTex);  // LLTexGrp.c
 void UI_ReportUISError(s32 nLevel, const char* szFile, s32 nLine, const char* szMsg);
 void UI_ScreenDrawDebug(u16 uGroup, u16 uScreen, s32 n);
@@ -309,7 +308,8 @@ void UI_ReadControllers(void) {
         gUIState.nFramesNoPad++;
     }
     if (gUIState.nNumPluggedIn > 0 && gSession.nGameType == 3 &&
-        ((Game_GetMode() != 7 && Game_GetMode() != 0x1A) || gUIState.nNumPluggedIn >= 2 ||
+        ((GM_GetModeType() != GM_SpeedGolfPoints_mode && GM_GetModeType() != GM_LongDriveRace_mode)
+         || gUIState.nNumPluggedIn >= 2 ||
          gFEState.aCPU[0] || gFEState.aCPU[1])) {
         if (gSavedCrAPHidden != -1) {
             gpCrAPState->bHidden = gSavedCrAPHidden;
@@ -319,8 +319,8 @@ void UI_ReadControllers(void) {
         UISProcessHint(gpFrontEnd->pHandler, 0x2D, 1, aArgs);
         gUIState.bButtonsBlocked = 0;
     }
-    if (((Game_GetMode() == 7 && !gFEState.aCPU[0] && !gFEState.aCPU[1]) ||
-         Game_GetMode() == 0x1A) &&
+    if (((GM_GetModeType() == GM_SpeedGolfPoints_mode && !gFEState.aCPU[0] && !gFEState.aCPU[1]) ||
+         GM_GetModeType() == GM_LongDriveRace_mode) &&
         gUIState.nNumPluggedIn < 2 && gSession.nGameType == 3) {
         if (gSavedCrAPHidden == -1) {
             gSavedCrAPHidden = gpCrAPState->bHidden;
@@ -436,7 +436,7 @@ void UI_ResolveFileEntries(FrontEnd* pFE) {
             szName = pEntry->szC;
             if (pEntry->u0 == 1) {
                 if (gSession.nGameType != 3) {
-                    uHash = fn_8000BEE4(szName);
+                    uHash = FEtm_PackName(szName);
                     nBank = UI_GetTextureBankIndex(szName);
                     if (nBank != -1) {
                         pEntry->p4 = UI_FindTexture(gpFrontEnd->p8->ap4[nBank], uHash);
@@ -554,7 +554,7 @@ void UI_CloseInterface(FrontEnd* pFE) {
     if (gSession.nGameType == 1 && gSession.nC == 0) {
         UI_PlayStartUpMovies();
     } else if (gSession.nGameType == 3) {
-        for (i = 0; i < UI_NUM_TXF2_BANKS; i++) {
+        for (i = 0; i < FETM_NUM_BANKS; i++) {
             if (gUITxf2BankMarkOnExit[i] != 0) {
                 gUITxf2BankState[i].b0 = 1;
                 gUITxf2BankState[i].b1 = 0;
@@ -647,11 +647,11 @@ void UI_ExitFade(void) {
             if (gSession.bDemo != 0) {
                 DEMO_Start();
             }
-            if (Game_GetMode() == 0x17) {
+            if (GM_GetModeType() == GM_PgaTour_mode) {
                 FE_PlayPGATourMovie();
-            } else if (Game_GetMode() == 0x18) {
+            } else if (GM_GetModeType() == GM_Realtime_mode) {
                 FE_PlayRTEMovie();
-            } else if (Game_GetMode() == 4) {
+            } else if (GM_GetModeType() == GM_Laddered_mode) {
                 FE_PlayLadderMovie();
             }
         } else {
@@ -744,7 +744,7 @@ void UI_SetTextLineSpacing(f32 fSpacing) {
 // which fn_800107E4's 32-bit multiply by the entry size wraps to the bank's first texture.
 // port: on 64 bits that index points far outside the bank.
 TexEntry* UI_FindTexture(TexBank* pBank, u64 uHash) {
-    int nTex = fn_8001005C(pBank, uHash);
+    int nTex = TX_uiFindTextureIndexFromID(pBank, uHash);
 
     return fn_800107E4(pBank, nTex);
 }

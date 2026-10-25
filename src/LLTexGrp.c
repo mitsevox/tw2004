@@ -8,7 +8,6 @@ static TexGrpList lbl_801A3458;
 static TexGrpList* lbl_80280DD8 = &lbl_801A3458;
 
 void fn_80010028(TexBank* pBank);                  // LLTex.c: free a bank
-int  fn_8001005C(TexBank* pBank, u64 uHash);       // LLTex.c: the texture's index, or 0x80000000
 
 int  fn_800106F0(TexBank* pBank);
 void fn_800106B8(u8 b);
@@ -58,7 +57,7 @@ void fn_80010180(UStreamObject* pObject) {
             }
         }
         if (!bSkip) {
-            nSlot = fn_800106F0(fn_8000FB88(pObject, NULL, nC));
+            nSlot = fn_800106F0(TX_spDownloadData(pObject, NULL, nC));
             if (pRec != NULL) {
                 pRec->nSlot = nSlot;
                 fn_800106D8(nSlot, pRec->n8);
@@ -85,19 +84,19 @@ int fn_800102DC(u64 uHash, TexBank** ppBank, TexEntry** ppTex) {
     TexGrpSlot* aSlots;
     int i;
 
-    nTex = 0x80000000;
+    nTex = TX_NO_TEXTURE_INDEX;
     i = 0;
     aSlots = lbl_80280DD8->pSlots;
     for (pSlot = aSlots; i < lbl_80280DD8->nNumSlots; pSlot++, i++) {
         if (pSlot->pBank == NULL) continue;
         if (lbl_80280DD8->b14 && lbl_80280DD8->n10 != pSlot->n8) continue;
-        nTex = fn_8001005C(pSlot->pBank, uHash);
-        if (nTex != 0x80000000) break;
+        nTex = TX_uiFindTextureIndexFromID(pSlot->pBank, uHash);
+        if (nTex != TX_NO_TEXTURE_INDEX) break;
     }
-    if (nTex == 0x80000000) {
+    if (nTex == TX_NO_TEXTURE_INDEX) {
         *ppBank = NULL;
         *ppTex = NULL;
-        return 0x80000000;
+        return TX_NO_TEXTURE_INDEX;
     }
     *ppBank = aSlots[i].pBank;
     *ppTex = fn_800107E4(*ppBank, nTex);
@@ -219,9 +218,9 @@ int fn_80010760(u32 uId, int nAfter) {
 }
 
 int fn_800107C0(UStreamObject* pObject, TexBank* pBank, int n) {
-    return fn_800106F0(fn_8000FB88(pObject, pBank, n));
+    return fn_800106F0(TX_spDownloadData(pObject, pBank, n));
 }
 
 TexEntry* fn_800107E4(TexBank* pBank, int nTex) {
-    return &pBank->p8[nTex];
+    return &pBank->pTextures[nTex];
 }

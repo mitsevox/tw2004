@@ -176,7 +176,7 @@ u8 SitDev_InvokeAction(SitDevAction* pAction, int nPlayer, u8 nEvent) {
 // while a GameBreaker is up, except script file 2. Commentary actions (kinds 1 and 2) during a
 // replay, in modes 6 to 8, when GM_Currently_SkillZoneMode says so, and in mode 11.
 u8 SitDev_SuppressAction(SitDevAction* pAction, int nFile, int nPlayer, u8 nEvent) {
-    int nMode = Game_GetMode();
+    int nMode = GM_GetModeType();
     if (nFile == 22 || nFile == 21) {
         if (gpGame->bCustomRound || gpGame->bRandom18 || gpGame->bDream18 || gpGame->nRegionalRound) return 1;
         if (PlayNow_IsChallengeRunning()) {
@@ -186,9 +186,10 @@ u8 SitDev_SuppressAction(SitDevAction* pAction, int nFile, int nPlayer, u8 nEven
     }
     if (gGameEffects.bGameBreaker && (nEvent == 20 || nEvent == 31) && nFile != 2) return 1;
     if (pAction->nKind != 1 && pAction->nKind != 2) return 0;
-    if (gSession.bReplay || (u32)(nMode - 6) <= 2 || GM_Currently_SkillZoneMode()) return 1;
-    if (!PlayNow_IsChallengeRunning() && nMode != 11) return 0;
-    if (nMode == 11) return 1;
+    if (gSession.bReplay || (u32)(nMode - GM_SpeedGolfMatch_mode) <= 2
+        || GM_Currently_SkillZoneMode()) return 1;
+    if (!PlayNow_IsChallengeRunning() && nMode != GM_Lessons_mode) return 0;
+    if (nMode == GM_Lessons_mode) return 1;
     return 0;
 }
 
@@ -271,7 +272,7 @@ void SitDev_ClearGroupFlags(void) {
 // (gGameEffects.nPostGBNegLine; GameEffects_EndGameBreaker plays it), unless one is kept already;
 // not in mode 11.
 void GameEffects_SetPostGBNegativeCommentary(int nSound) {
-    if (Game_GetMode() != 11 && !gGameEffects.bPostGBNegLine) {
+    if (GM_GetModeType() != GM_Lessons_mode && !gGameEffects.bPostGBNegLine) {
         gGameEffects.nPostGBNegLine = nSound;
         gGameEffects.bPostGBNegLine = 1;
     }
@@ -288,7 +289,7 @@ void GameEffects_SetPostGBCrowdLevel(u8 nCrowdLevel) {
 // predicted one, or a scripted one the shot achieved; GameEffects_EndGameBreaker plays it), unless
 // one is kept already; not in mode 11.
 void GameEffects_SetPostGBCommentary(u16 uSound) {
-    if (Game_GetMode() != 11 && !gGameEffects.bPostGBLine) {
+    if (GM_GetModeType() != GM_Lessons_mode && !gGameEffects.bPostGBLine) {
         gGameEffects.nPostGBLine = uSound;
         gGameEffects.bPostGBLine = 1;
     }

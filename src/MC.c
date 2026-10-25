@@ -89,7 +89,7 @@ void MC_MergeRecords(SaveRecords* pRecords) {
     int j3;
     int k3;
 
-    nMode = Game_GetMode();
+    nMode = GM_GetModeType();
     nHoleNum = gpGame->nCurHoleNum;
     nCourse = Game_GetCourse();
     for (i = 0; i < NUM_COURSE_RECORDS; i++) {
@@ -111,7 +111,7 @@ void MC_MergeRecords(SaveRecords* pRecords) {
     // pRecords->recC[nHole3][j3][k3]. Written with indexes (as the first loop), the frontend's
     // pointer temps take their registers before the counters, and each k loop starts li, add
     // (EA: add, li; the copy into the walked pointer makes that block scheduled).
-    gpGame->nMode = 16;
+    gpGame->nMode = GM_SkillZoneTarget_mode;
     for (nHole = 0; nHole < 3; nHole++) {
         gpGame->nCurHoleNum = nHole;
         pHole = (SaveRecords*)((RecordEntry*)pRecords + (u32)nHole * 15);
@@ -127,7 +127,7 @@ void MC_MergeRecords(SaveRecords* pRecords) {
             }
         }
     }
-    gpGame->nMode = 22;
+    gpGame->nMode = GM_LongDrive_mode;
     for (nHole3 = 0; nHole3 < 5; nHole3++) {
         gpGame->nCurHoleNum = nHole3;
         pHole3 = (SaveRecords*)((RecordEntry*)pRecords + (u32)nHole3 * 10);

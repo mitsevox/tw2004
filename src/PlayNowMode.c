@@ -513,10 +513,10 @@ u8 PlayNow_GameFinished(u8 bCheck) {
                 }
                 gCurChallenge = i;
                 if (GM_Currently_RealtimeMode()) {
-                    GM_SetModeType(24);
+                    GM_SetModeType(GM_Realtime_mode);
                     GameModeDriverRTE_StartNextChallenge();
                 } else {
-                    GM_SetModeType(5);
+                    GM_SetModeType(GM_PlayNow_mode);
                     PlayNow_StartChallenge();
                 }
                 gpGame->b134 = 1;
@@ -902,7 +902,7 @@ int PlayNow_GetMedal(void) {
 
 // Whether the game mode is 8, speed golf (a UI command asks).
 u8 PlayNow_IsSpeedGolf(void) {
-    return Game_GetMode() == 8;
+    return GM_GetModeType() == GM_SpeedGolf_mode;
 }
 
 // The mark for medal k as the UI shows it, counted from the lowest (k 0 is aMedal[2], 2 the best,
@@ -919,7 +919,7 @@ s32 PlayNow_GetMedalMark(int k) {
         }
     }
     nTarget = PlayNow_GetGroupTarget(gCurChallenge);
-    if ((gChallengeList[gCurChallenge].nTargetKind == 7 && Game_GetMode() == 0) ||
+    if ((gChallengeList[gCurChallenge].nTargetKind == 7 && GM_GetModeType() == GM_Stroke_mode) ||
         gChallengeList[gCurChallenge].nTargetKind == 1) {
         nTarget = 0;
     }
@@ -950,7 +950,7 @@ s32 PlayNow_GetMedalMark(int k) {
 // The pause menu opens during a challenge (GUI_OpenPauseMenu): in speed golf (mode 8), game message
 // 18 for player 0 (PlayNow_SendMessage18).
 void PlayNow_OnPause(void) {
-    if (Game_GetMode() == 8) {
+    if (GM_GetModeType() == GM_SpeedGolf_mode) {
         PlayNow_SendMessage18(0);
     }
 }
@@ -968,13 +968,13 @@ int PlayNow_GetScoreToTarget(void) {
     int i;
     int k;
     int h;
-    if (Game_GetMode() == 1) {
+    if (GM_GetModeType() == GM_Match_mode) {
         if (gpGame->bInPlayoff) {
             return 0;
         }
         return gPlayers[0].nHolesWon - gPlayers[1].nHolesWon;
     }
-    if (Game_GetMode() == 8) {
+    if (GM_GetModeType() == GM_SpeedGolf_mode) {
         nScore = 0;
         for (h = 0; h < 18; h++) {
             if (gpGame->bHoleSelected[h]) {
@@ -983,8 +983,8 @@ int PlayNow_GetScoreToTarget(void) {
         }
         return nScore;
     }
-    i = Game_GetMode();     // i is the mode here, a challenge index below
-    if (i == 2) {
+    i = GM_GetModeType();   // i is the mode here, a challenge index below
+    if (i == GM_Skins_mode) {
         return gpGame->nPlayoffHoles;
     }
     if (GM_Currently_SkillZoneMode()) {
@@ -999,7 +999,7 @@ int PlayNow_GetScoreToTarget(void) {
     }
     k = 0;
     nScore = gChallengeList[gCurChallenge].nTargetKind != 1 ? gPlayNowGroupStrokes : 0;
-    if (Game_GetMode() == 0 && gChallengeList[gCurChallenge].nTargetKind == 7) {
+    if (GM_GetModeType() == GM_Stroke_mode && gChallengeList[gCurChallenge].nTargetKind == 7) {
         if (GUI_ScoreCardUp()) {
             k = 1;
         }
@@ -1044,8 +1044,8 @@ int PlayNow_GetChallengeTarget(int i) {
     int nHole = gChallengeList[i].nHole - 1;
     int k;               // a loop counter, and in case 7 the current hole once it is over
     int h;
-    h = Game_GetMode();     // h is the mode here, a hole number below
-    if (h == 0) {
+    h = GM_GetModeType();   // h is the mode here, a hole number below
+    if (h == GM_Stroke_mode) {
         switch (gChallengeList[i].nTargetKind) {
         case 1:
             nTarget = gChallengeList[i].nTargetBase;
@@ -1295,7 +1295,7 @@ void PlayNow_SetCalendarFlag(u8 bOn) {
 }
 
 // The flag the calendar screen sets (PlayNow_SetCalendarFlag; FE message 695 reads it). While it is
-// set the loading screen uses file 2 (LoadData.c), the hole contests change (GameHoleContests.c:
+// set the loading screen uses file 2 (FEtm_StreamLoadScreen), the hole contests change (GameHoleContests.c:
 // the round counts as having none, but the long drive and closest to the pin are on holes 18 and 17
 // outside a playoff), a match-play challenge's playoff decides medal 1 or 2 (PlayNow_GetMedal), and
 // a best medal earns award 0x1C, a trophy ball PlayNow_EndGame pays.

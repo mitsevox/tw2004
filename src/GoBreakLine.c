@@ -69,7 +69,7 @@ void BreakLine_InitForHole(void) {
     if (gSession.nSplitScreen) {
         SD_InitShaderObject(gpBreakLine->aMesh[1], 5, desc);
     }
-    uHash = fn_8000BEE4("brkline");
+    uHash = FEtm_PackName("brkline");
     fn_800102DC(uHash, &gpBreakLine->pBank, &gpBreakLine->pTex);
     LLMath_CopyVec(&pCourse->pin[nPin].x, gpBreakLine->vPin);
     gpBreakLine->abSkip[0] = 1;

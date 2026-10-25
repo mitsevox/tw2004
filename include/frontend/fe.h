@@ -193,7 +193,7 @@ LAYOUT_ASSERT(UIDelayedHint, 0xC);
 
 extern UIDelayedHint gUIDelayedHint;
 
-// The state of one 'txf2' texture bank (gUITxf2BankState, one per bank of lbl_801A26DC; our name).
+// The state of one 'txf2' texture bank (gUITxf2BankState, one per bank of gFEtmBanks; our name).
 typedef struct UITxf2BankState {
     u8  b0;                     // 0x0  set (and b1 cleared) at the menus' shutdown for the banks
                                 //      gUITxf2BankMarkOnExit marks; cleared by FE_InitManager;
@@ -205,11 +205,10 @@ typedef struct UITxf2BankState {
 } UITxf2BankState;
 LAYOUT_ASSERT(UITxf2BankState, 0x8);
 
-#define UI_NUM_TXF2_BANKS 200
-extern UITxf2BankState gUITxf2BankState[UI_NUM_TXF2_BANKS];
+extern UITxf2BankState gUITxf2BankState[FETM_NUM_BANKS];
 // One word per gUITxf2BankState entry: nonzero sets that entry's b0 (and clears its b1) when the front
 // end is shut down in game type 3 (uiProcessInterface.c UI_CloseInterface).
-extern u32 gUITxf2BankMarkOnExit[UI_NUM_TXF2_BANKS];
+extern u32 gUITxf2BankMarkOnExit[FETM_NUM_BANKS];
 
 // The profile being worked on in the menus (gpFEProfile points to it; 0x11708 bytes, allocated
 // and cleared by FE_InitManager).
@@ -505,7 +504,7 @@ void FE_MakeCameoMoviePath(char* pName, char* pPath);   // "data/movies/cameos/<
 // A movie's skip test for LLVideo.c's LLVideo_PlayFile (whose arguments it ignores): any button.
 u8   FE_IsMovieSkipPressed(struct Video* pVideo, int nArg);
 
-// uiProcessPolygon.c: the texture bank loaded from LoadData.c's 'txf2' copy
+// uiProcessPolygon.c: the texture bank loaded from FETextureMgr.c's 'txf2' copy
 // (UI_LoadLoadingBarTexture), its slot and its first texture.
 struct TexEntry* UI_GetTexBankFirstTexture(struct TexBank* pBank);   // a bank's first texture
 extern int gUILoadingBarBankSlot;                // the bank's slot

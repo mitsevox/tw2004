@@ -115,7 +115,7 @@ void UIArc_Draw(UIArc* pArc, s32 a, s32 b) {
         pName = pEntry->szC;    // fake match: EA takes the name's address before the flag tests
         if (pEntry->u0 & 1) {
             if (gSession.nGameType == 3) {
-                pBank = lbl_801A26DC[pArc->n0 + pArc->u8];
+                pBank = gFEtmBanks[pArc->n0 + pArc->u8];
                 RenderState_SetBankTexture(pBank, UI_GetTexBankFirstTexture(pBank));
             } else {
                 nBank = UI_GetTextureBankIndex(pName);

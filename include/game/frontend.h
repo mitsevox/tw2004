@@ -101,7 +101,7 @@ extern s8 gSavedCrAPHidden;         // CrAPState.bHidden put aside while UI_Read
 #define UI_NUM_LOADED 5
 typedef struct UILoaded {
     s32   nCount;               // 0x0  how many ap4 holds
-    void* ap4[UI_NUM_LOADED];   // 0x4  from fn_8000FB88 (UI_StreamLoadTextures)
+    void* ap4[UI_NUM_LOADED];   // 0x4  from TX_spDownloadData (UI_StreamLoadTextures)
 } UILoaded;
 LAYOUT_ASSERT(UILoaded, 0x18);
 

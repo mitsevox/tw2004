@@ -21,7 +21,6 @@ void  fn_8011387C(void);
 void  fn_8011389C(void);
 void  fn_801138CC(SkinDesc* pDesc);
 void  fn_801138D8(void* p);
-int   fn_8001005C(TexBank* pBank, u64 uHash);   // LLTex.c: the texture's index, or 0x80000000
 
 void  SkinPart_ChooseBodyPartVariant(Character* pChar, int nPart, int nVariant);
 void  SkinPart_Init(void);
@@ -1311,7 +1310,7 @@ void SkinPart_QueueMissingTextures(Skin** apSkins, int nSkins, DynTex* pTex, u64
     pBank = (TexBank*)fn_8010A780(pTex);
     for (i = 0; i < nList; i++) {
         uId = SkinPart_TexListGetId(i, pList, nList);
-        if (uId != 0 && fn_8001005C(pBank, uId) == -0x80000000) {
+        if (uId != 0 && TX_uiFindTextureIndexFromID(pBank, uId) == TX_NO_TEXTURE_INDEX) {
             nMode = SkinPart_TexListGetRecolorMode(i, pList, nList);
             fn_8010BCFC(uId, SkinPart_TexListGetRecolor(i, pList, nList), nMode);
         }

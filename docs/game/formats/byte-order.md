@@ -36,8 +36,8 @@ Objects delivered by UStream
 
 | Tag | Handler | Unit | Swap | Overlay / notes |
 |---|---|---|---|---|
-| `txf2` | fn_8000BCA0 | asm | none seen | asm |
-| `load` | fn_8000BA94 | asm | none seen | asm |
+| `txf2` | FEtm_vStreamCallback | asm | none seen | asm |
+| `load` | FEtm_vLoadScreenStreamCallback | asm | none seen | asm |
 | `Cnet` | Network_DownloadDataPNB | asm | none seen | asm; dispatches the course's sub-chunks to the loaders registered with `Network_RegisterLoadNetworkCallback` (below) |
 | `txf ` | fn_80010180 | asm | none seen | asm; `TXG ` texture groups, [formats/txg-textures.md](formats/txg-textures.md) |
 | `sfn ` | fn_800125BC | sweep | none seen | asm |

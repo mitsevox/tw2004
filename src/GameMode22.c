@@ -819,7 +819,7 @@ u8 GameMode22_GetWinner(s32* pnWinner) {
 
 // Whether game mode 22 is being played (GUI_IsPostShotUIAnimating asks).
 u8 GameMode22_IsActive(void) {
-    return Game_GetMode() == 22;
+    return GM_GetModeType() == GM_LongDrive_mode;
 }
 
 // Whether a winner is decided and the 120-frame winner countdown (nWinnerFrames) is still running;

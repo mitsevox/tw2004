@@ -181,7 +181,7 @@ int GameEffects_BallUpdatesThisFrame(int nPlayer) {
     if (GameEffects_IsHalfTimeOn() && gSession.fFrameTime < FRAME_TIME) {
         return GameEffects_StartOfSlowMoFrame() != 0;
     }
-    if (Game_GetMode() == 26) {
+    if (GM_GetModeType() == GM_LongDriveRace_mode) {
         if (gSession.fFrameTime <= FRAME_TIME) {
             return 2;
         }
@@ -244,12 +244,12 @@ void GameEffects_TargetGameBreakerTrigger(int nPlayer) {
             return;
         }
         if (gGameEffects.bGameBreaker != 1) {
-            if (Game_GetMode() == 14) {
+            if (GM_GetModeType() == GM_SkillZoneCapture_mode) {
                 if (GameModeSkillZoneCapture_GetTotalTargetsHit(nPlayer) == 4) {
                     bStart = 1;
                     nReason = 17;
                 }
-            } else if (Game_GetMode() == 15) {
+            } else if (GM_GetModeType() == GM_SkillZoneHorse_mode) {
                 n = 0;
                 for (i = 0; i < gNumPlayersSetUp; i++) {
                     if (i != nPlayer && gPlayers[i].nHorseLetters < 5) {
@@ -260,12 +260,13 @@ void GameEffects_TargetGameBreakerTrigger(int nPlayer) {
                     bStart = 1;
                     nReason = 22;
                 }
-            } else if (Game_GetMode() == 17) {
+            } else if (GM_GetModeType() == GM_SkillZoneTargetToTarget_mode) {
                 if (GameModeSkillZoneBase_CountGreensHit(nPlayer) == 39) {
                     bStart = 1;
                     nReason = 23;
                 }
-            } else if ((Game_GetMode() == 16 || Game_GetMode() == 16) &&
+            } else if ((GM_GetModeType() == GM_SkillZoneTarget_mode || GM_GetModeType()
+                        == GM_SkillZoneTarget_mode) &&
                        GameModeSkillZoneBase_CountGreensHit(nPlayer) == 39 &&
                        gPlayers[nPlayer].nTargetHits[GE_CurrentTarget(nPlayer)] == 0) {
                 bStart = 1;

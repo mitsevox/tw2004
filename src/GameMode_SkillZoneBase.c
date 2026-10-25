@@ -138,7 +138,7 @@ int GameModeSkillZoneBase_GetGreenTargetted(int nPlayer) {
 // The HUD clock ran out (UI command GM_vTimerOut, in a target mode): mode 13's
 // GameModeSkillZoneTimed_TimerOut; the other target modes have no timer.
 void GameModeSkillZoneBase_TimerOut(void) {
-    if (Game_GetMode() == 0xD) {
+    if (GM_GetModeType() == GM_SkillZoneTimed_mode) {
         GameModeSkillZoneTimed_TimerOut();
     }
 }
@@ -147,10 +147,10 @@ void GameModeSkillZoneBase_TimerOut(void) {
 // shot (GameModeSkillZoneCapture_ShotClockOut, GameModeSkillZoneHorse_ShotClockOut); the other
 // target modes do nothing.
 void GameModeSkillZoneBase_ShotClockOut(void) {
-    if (Game_GetMode() == 0xE) {
+    if (GM_GetModeType() == GM_SkillZoneCapture_mode) {
         GameModeSkillZoneCapture_ShotClockOut();
     }
-    if (Game_GetMode() == 0xF) {
+    if (GM_GetModeType() == GM_SkillZoneHorse_mode) {
         GameModeSkillZoneHorse_ShotClockOut();
     }
 }
@@ -286,11 +286,11 @@ void GameModeSkillZoneBase_SetupBonusBall(int nPlayer) {
 // Whether SetupBonusBall skips the multiplier roll for this shot: in mode 16 when 20 shots have
 // been taken (Player.nBalls), in mode 17 at 5, in the other modes before the first shot.
 u8 GameModeSkillZoneBase_FirstShot(int nPlayer) {
-    if (Game_GetMode() == 0x10) {
+    if (GM_GetModeType() == GM_SkillZoneTarget_mode) {
         if (gPlayers[nPlayer].nBalls == 20) {
             return 1;
         }
-    } else if (Game_GetMode() == 0x11) {
+    } else if (GM_GetModeType() == GM_SkillZoneTargetToTarget_mode) {
         if (gPlayers[nPlayer].nBalls == 5) {
             return 1;
         }
@@ -303,16 +303,16 @@ u8 GameModeSkillZoneBase_FirstShot(int nPlayer) {
 // The points the last shot earned, for the HUD (UI command GM_vGetTargetShotInfo, case 4): the getter of mode
 // 13, 14, 16 or 17 (which ignore the player), else 0.
 s32 GameModeSkillZoneBase_GetShotEarned(s32 nPlayer) {
-    if (Game_GetMode() == 0xD) {
+    if (GM_GetModeType() == GM_SkillZoneTimed_mode) {
         return GameModeSkillZoneTimed_GetShotEarned(nPlayer);
     }
-    if (Game_GetMode() == 0xE) {
+    if (GM_GetModeType() == GM_SkillZoneCapture_mode) {
         return GameModeSkillZoneCapture_GetShotEarned(nPlayer);
     }
-    if (Game_GetMode() == 0x10) {
+    if (GM_GetModeType() == GM_SkillZoneTarget_mode) {
         return GameModeSkillZoneTarget_GetShotEarned(nPlayer);
     }
-    if (Game_GetMode() == 0x11) {
+    if (GM_GetModeType() == GM_SkillZoneTargetToTarget_mode) {
         return GameModeSkillZoneTargetToTarget_GetShotEarned(nPlayer);
     }
     return 0;
@@ -321,7 +321,7 @@ s32 GameModeSkillZoneBase_GetShotEarned(s32 nPlayer) {
 // The seconds the last shot added, for the HUD (UI command GM_vGetTargetShotInfo, case 5): mode 13's only,
 // else 0.
 s32 GameModeSkillZoneBase_GetTimeEarned(s32 nPlayer) {
-    if (Game_GetMode() == 0xD) {
+    if (GM_GetModeType() == GM_SkillZoneTimed_mode) {
         return GameModeSkillZoneTimed_GetTimeEarned(nPlayer);
     }
     return 0;
@@ -330,10 +330,10 @@ s32 GameModeSkillZoneBase_GetTimeEarned(s32 nPlayer) {
 // The bonus multiplier for the HUD (UI command GM_vGetTargetShotInfo, case 7): mode 13's or mode 16's, else
 // 0.
 s32 GameModeSkillZoneBase_GetDriveMultiplier(s32 nPlayer) {
-    if (Game_GetMode() == 0xD) {
+    if (GM_GetModeType() == GM_SkillZoneTimed_mode) {
         return GameModeSkillZoneTimed_GetDriveMultiplier(nPlayer);
     }
-    if (Game_GetMode() == 0x10) {
+    if (GM_GetModeType() == GM_SkillZoneTarget_mode) {
         return GameModeSkillZoneTarget_GetDriveMultiplier(nPlayer);
     }
     return 0;
@@ -342,7 +342,7 @@ s32 GameModeSkillZoneBase_GetDriveMultiplier(s32 nPlayer) {
 // The balls the last shot earned, for the HUD (UI command GM_vGetTargetShotInfo, case 6): mode 17's only,
 // else 0.
 s32 GameModeSkillZoneBase_GetExtraBallsEarned(s32 nPlayer) {
-    if (Game_GetMode() == 0x11) {
+    if (GM_GetModeType() == GM_SkillZoneTargetToTarget_mode) {
         return GameModeSkillZoneTargetToTarget_GetExtraBallsEarned(nPlayer);
     }
     return 0;
@@ -354,13 +354,13 @@ s32 GameModeSkillZoneBase_GetHitAllTargetsBonus(void) {
     int i;
     for (i = 0; i < 20; i++) {
         if (gEarningsTable.aMini[i].nId == 999) {
-            if (Game_GetMode() == 0xD) {
+            if (GM_GetModeType() == GM_SkillZoneTimed_mode) {
                 return gEarningsTable.aMini[i].n4;
             }
-            if (Game_GetMode() == 0x10) {
+            if (GM_GetModeType() == GM_SkillZoneTarget_mode) {
                 return gEarningsTable.aMini[i].n8;
             }
-            if (Game_GetMode() == 0x11) {
+            if (GM_GetModeType() == GM_SkillZoneTargetToTarget_mode) {
                 return gEarningsTable.aMini[i].nC;
             }
         }

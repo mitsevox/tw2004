@@ -443,9 +443,9 @@ void STATEFUNC_ShotSetupUpdate(int nPlayer) {
         gPlayers[nPlayer].fThinkTime += gSession.fFrameTime;
         bDone = AI_RehearseShot(nPlayer, NULL, 0, CPU_TOLERANCE);
         fMin  = 1.0f;
-        switch (Game_GetMode()) {
-        case 6:
-        case 7:
+        switch (GM_GetModeType()) {
+        case GM_SpeedGolfMatch_mode:
+        case GM_SpeedGolfPoints_mode:
             if (SpeedGolfPoints_HoleFinished(0, 0)) return;
             if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] <= 0) {
                 fMax = 1.5f;
@@ -453,7 +453,7 @@ void STATEFUNC_ShotSetupUpdate(int nPlayer) {
                 fMax = 3.5f;
             }
             break;
-        case 11:
+        case GM_Lessons_mode:
             fMin = 3.0f;
             fMax = 4.0f;
             break;
@@ -491,7 +491,7 @@ void STATEFUNC_SwingInit(int nPlayer) {
     Ball* pOwnBall;
     int   i;
 
-    if (pV->nCurCamera == 0 && Player_IsCPU(nPlayer) && Game_GetMode() != 11) {
+    if (pV->nCurCamera == 0 && Player_IsCPU(nPlayer) && GM_GetModeType() != GM_Lessons_mode) {
         fn_800957D8(gPlayers[nPlayer].pChar);
     }
     fn_80095744(gPlayers[nPlayer].pChar, 5);
@@ -1367,7 +1367,8 @@ void STATEFUNC_InTheHoleUpdate(int nPlayer) {
         GOLFERSTATE_Switch(GS_FADE_TO_REMOVE_BALL, nPlayer);
         return;
     }
-    if (fn_80095780(gPlayers[nPlayer].pChar) == 9 && pV->nCurCamera != 0x10 && Game_GetMode() != 11 &&
+    if (fn_80095780(gPlayers[nPlayer].pChar) == 9 && pV->nCurCamera != 0x10 && GM_GetModeType()
+        != GM_Lessons_mode &&
         !SKABlender_IsNotSingleSKA(&gPlayers[nPlayer].pChar->blend)) {
         CameraController_SetCameraMode(pV, 0x10, nPlayer, gPlayers[nPlayer].nView[0]);
     }
@@ -1437,7 +1438,8 @@ void STATEFUNC_ShowYardageUpdate(int nPlayer) {
         lbl_80281E13 = 0;
     }
     vOffset = lbl_80183620;
-    if (fn_80095780(gPlayers[nPlayer].pChar) == 9 && pV->nCurCamera != 0xF && Game_GetMode() != 11 &&
+    if (fn_80095780(gPlayers[nPlayer].pChar) == 9 && pV->nCurCamera != 0xF && GM_GetModeType()
+        != GM_Lessons_mode &&
         !SKABlender_IsNotSingleSKA(&gPlayers[nPlayer].pChar->blend)) {
         CameraController_SetCameraMode(pV, 0xF, nPlayer, gPlayers[nPlayer].nView[0]);
     }

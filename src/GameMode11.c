@@ -237,7 +237,7 @@ void Lessons_Shutdown(void) {
 
 // Is a lesson running (mode 11)?
 u8 Lessons_IsRunning(void) {
-    return Game_GetMode() == 11;
+    return GM_GetModeType() == GM_Lessons_mode;
 }
 
 // The front end ends the current wait (UI command GM_vLessonStopWaiting), in mode 11 only: a step waiting for
@@ -382,7 +382,7 @@ void Lessons_PlaceBall(void) {
 // The shape the lesson sets, 7 (any) outside mode 11.
 int Lessons_GetShape(int nPlayer) {
     int n = gLessonNum - 1;
-    if (Game_GetMode() != 11) {
+    if (GM_GetModeType() != GM_Lessons_mode) {
         return 7;
     }
     return gLessons[n].nShape;
@@ -391,7 +391,7 @@ int Lessons_GetShape(int nPlayer) {
 // The club the lesson sets, 26 (any) outside mode 11.
 int Lessons_GetClub(int nPlayer) {
     int n = gLessonNum - 1;
-    if (Game_GetMode() != 11) {
+    if (GM_GetModeType() != GM_Lessons_mode) {
         return 26;
     }
     return gLessons[n].nClub;
@@ -400,7 +400,7 @@ int Lessons_GetClub(int nPlayer) {
 // The shot kind the lesson sets, 8 (any) outside mode 11.
 int Lessons_GetShotKind(void) {
     int n = gLessonNum - 1;
-    if (Game_GetMode() != 11) {
+    if (GM_GetModeType() != GM_Lessons_mode) {
         return 8;
     }
     return gLessons[n].nShotKind;
@@ -901,7 +901,7 @@ void Lessons_Update(void) {
 // demonstration (step 5) of the tee-shot lessons 1, 8, 9 and 10, which is cut short at event 28
 // (Lessons_OnEvent); always otherwise.
 u8 Lessons_AllowFlightCamera(void) {
-    if (Game_GetMode() == 11 && gLessonStep == 5 &&
+    if (GM_GetModeType() == GM_Lessons_mode && gLessonStep == 5 &&
         (gLessonNum == 1 || gLessonNum == 10 || gLessonNum == 8 || gLessonNum == 9)) {
         return 0;
     }
@@ -1123,7 +1123,7 @@ u8 Lessons_IsLucky(int nPlayer) {
     if (gLessonNum == 7 && gPlayers[0].nController != CONTROLLER_CPU) {
         return 0;
     }
-    if (Game_GetMode() == 11 && gLessonNum != 5 && gLessonNum != 11 && gLessonNum != 8 &&
+    if (GM_GetModeType() == GM_Lessons_mode && gLessonNum != 5 && gLessonNum != 11 && gLessonNum != 8 &&
         gLessonNum != 9 && gPlayers[nPlayer].nController == CONTROLLER_CPU) {
         return 1;
     }
@@ -1133,7 +1133,7 @@ u8 Lessons_IsLucky(int nPlayer) {
 // Whether a CPU's shot may get spin from its aim error (AI_ApplyError): in mode 11 only in lesson
 // 11 (the spin lesson); always outside it.
 u8 Lessons_AllowCPUSpin(void) {
-    if (Game_GetMode() == 11 && gLessonNum != 11) {
+    if (GM_GetModeType() == GM_Lessons_mode && gLessonNum != 11) {
         return 0;
     }
     return 1;

@@ -551,7 +551,7 @@ void fn_8000F0EC(TexBank* pBank, TexEntry* pTex) {
     GXSetTevAlphaOp(nStage, 0, 0, 1, 1, 0);
 }
 
-TexBank* fn_8000FB88(UStreamObject* pObject, TexBank* pBank, int n) {
+TexBank* TX_spDownloadData(UStreamObject* pObject, TexBank* pBank, int n) {
     return TX_spParseTextureGroupFromStream(pObject->pData, pBank, n);
 }
 
@@ -592,7 +592,7 @@ TexBank* TX_spParseTextureGroupFromStream(u8* p, TexBank* pInto, int n) {
     // the bank's first 8 bytes (its counts n2 and n4) as the data has them
     *(TexBankHeader*)pBank = *pHead;
     pTables = (u8*)(pInto + 1);
-    pBank->p8 = (TexEntry*)pTables;
+    pBank->pTextures = (TexEntry*)pTables;
     pTables += pBank->n2 * sizeof(TexEntry);
     pBank->pC = (TexPalette*)pTables;
     pTables += pBank->n4 * sizeof(TexPalette);
@@ -601,18 +601,18 @@ TexBank* TX_spParseTextureGroupFromStream(u8* p, TexBank* pInto, int n) {
     pBank->p14 = (TexGXTlut*)pTables;
 
     pSection = ((TexSection*)p)++;
-    Mem_cpy(pBank->p8, p, pBank->n2 * sizeof(TexEntry));
+    Mem_cpy(pBank->pTextures, p, pBank->n2 * sizeof(TexEntry));
     p += pSection->nSize;
     pSection = ((TexSection*)p)++;
     Mem_cpy(pBank->pC, p, pBank->n4 * sizeof(TexPalette));
     p += pSection->nSize;
     pPixels = ((TexSection*)p)++;
     if (n != -2) {
-        pBank->p18 = Circular_MemAllocFunc(pPixels->nSize, MEMTYPE_LOW, 0x20, "LLTex.c", 0x77A);
+        pBank->pPixels = Circular_MemAllocFunc(pPixels->nSize, MEMTYPE_LOW, 0x20, "LLTex.c", 0x77A);
         pBank->n1C = pPixels->nSize;
-        Mem_cpy(pBank->p18, p, pPixels->nSize);
+        Mem_cpy(pBank->pPixels, p, pPixels->nSize);
     } else {
-        pBank->p18 = p;
+        pBank->pPixels = p;
     }
     pBank->n28 = n;
     pBank->b2C = 0;
@@ -623,17 +623,17 @@ TexBank* TX_spParseTextureGroupFromStream(u8* p, TexBank* pInto, int n) {
     }
 
     for (i = 0; i < pBank->n2; i++) {
-        pTex = &pBank->p8[i];
+        pTex = &pBank->pTextures[i];
         for (j = 0; j < pTex->n41; j++) {
             pTex->aMips[j].n8 += (s16)pBank->n28;
         }
         if (n != -2) {
             if (pTex->nPalette == -1) {
-                GXInitTexObj((GXTexObj*)&pBank->p10[pTex->n3E], pBank->p18 + pTex->aMips[0].uPixels,
+                GXInitTexObj((GXTexObj*)&pBank->p10[pTex->n3E], pBank->pPixels + pTex->aMips[0].uPixels,
                              pTex->nWidth, pTex->nHeight, pTex->b40, (pTex->b46 & 1) ? 0 : 1,
                              (pTex->b46 & 2) ? 0 : 1, pTex->n41 > 1 ? 1 : 0);
             } else {
-                GXInitTexObjCI((GXTexObj*)&pBank->p10[pTex->n3E], pBank->p18 + pTex->aMips[0].uPixels,
+                GXInitTexObjCI((GXTexObj*)&pBank->p10[pTex->n3E], pBank->pPixels + pTex->aMips[0].uPixels,
                                pTex->nWidth, pTex->nHeight, pTex->b40, (pTex->b46 & 1) ? 0 : 1,
                                (pTex->b46 & 2) ? 0 : 1, 0, 0);
             }
@@ -676,38 +676,38 @@ TexBank* TX_spParseTextureGroupFromStream(u8* p, TexBank* pInto, int n) {
 }
 
 // Frees a bank's pixel and palette data, unless they are not its own.
-void fn_8000FFAC(TexBank* pBank) {
-    if (pBank->p18 != NULL && pBank->b2D != 1) {
-        Circular_MemFreeFunc(pBank->p18);
-        pBank->p18 = NULL;
+void TX_vFreeTextureDataInTextureGroup(TexBank* pBank) {
+    if (pBank->pPixels != NULL && pBank->b2D != 1) {
+        Circular_MemFreeFunc(pBank->pPixels);
+        pBank->pPixels = NULL;
     }
-    if (pBank->p20 != NULL && pBank->p20 != pBank->p18 && pBank->b2D != 1) {
+    if (pBank->p20 != NULL && pBank->p20 != pBank->pPixels && pBank->b2D != 1) {
         Circular_MemFreeFunc(pBank->p20);
         pBank->p20 = NULL;
     }
 }
 
 void fn_80010028(TexBank* pBank) {
-    fn_8000FFAC(pBank);
+    TX_vFreeTextureDataInTextureGroup(pBank);
     Circular_MemFreeFunc(pBank);
 }
 
-// The index of the bank's texture with this name hash, or 0x80000000.
-int fn_8001005C(TexBank* pBank, u64 uHash) {
+// The index of the bank's texture with this packed name, or TX_NO_TEXTURE_INDEX.
+int TX_uiFindTextureIndexFromID(TexBank* pBank, u64 uHash) {
     u32 i;
     u64 uEntryHash;
 
     for (i = 0; i < pBank->n2; i++) {
-        uEntryHash = pBank->p8[i].u0;
+        uEntryHash = pBank->pTextures[i].u0;
         if (uEntryHash == uHash) return i;
     }
-    return 0x80000000;
+    return TX_NO_TEXTURE_INDEX;
 }
 
 void fn_800100B0(TexBank* pBank, TexEntry* p8, TexPalette* pC, void* p10, void* p14, int nNumTex,
                  int nNumPalettes) {
     Mem_set(pBank, 0, sizeof(TexBank));
-    pBank->p8 = p8;
+    pBank->pTextures = p8;
     pBank->pC = pC;
     pBank->p10 = p10;
     pBank->p14 = p14;

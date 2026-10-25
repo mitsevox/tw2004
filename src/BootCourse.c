@@ -34,7 +34,7 @@ void DEMO_Start(void) {
     gSession.bReplay = 0;
     gSession.nPaused = 0;
     gSession.nNumPlayers = 2;
-    GM_SetModeType(0);
+    GM_SetModeType(GM_Stroke_mode);
     gSession.nController[0] = 9;
     gSession.nGolfer[0] = lbl_80183AB8[lbl_80281F90];
     gSession.nTeeSet[0] = 2;

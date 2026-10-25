@@ -165,7 +165,7 @@ u32 SitDev_ChooseRandomResponseNoRepeat(u16* pList, int nCount, int nLeft, u32 n
 // in game mode 23 and is 1 in any other mode.
 int SitDev_GetPGARank(int nPlayer) {
     int nRank;
-    if (Game_GetMode() == 23) {
+    if (GM_GetModeType() == GM_PgaTour_mode) {
         nRank = GM_PgaTourSim_GetScoreRankFromEntrantID(nPlayer, 0);
     } else {
         nRank = 1;

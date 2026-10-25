@@ -750,7 +750,7 @@ u8 SpeedGolf_OnBallAtRest(int nPlayer) {
         GOLFERSTATE_Switch(GS_PRE_SHOT, nPlayer);
         return 0;
     }
-    if (Game_GetMode() != 7) {
+    if (GM_GetModeType() != GM_SpeedGolfPoints_mode) {
         GM_PlayerAddStroke(nPlayer);
         if (GM_CheckForBallOOB(nPlayer)) {
             pSurf = Ter_GetSupportingWorldMaterial(gPlayers[nPlayer].ball.pCourse,
@@ -1115,7 +1115,7 @@ void SpeedGolf_RunUpdate(int nPlayer) {
     f32 fHigh;
     Ball* pBall;
     f32* pTarget;
-    if (Game_GetMode() == 7) {
+    if (GM_GetModeType() == GM_SpeedGolfPoints_mode) {
 
         if (!(gPlayers[nPlayer].uC48 & 1) && !(gPlayers[nOther].uC48 & 1)) {
             SpeedGolf_TradeEventPoints(nPlayer, 0);
@@ -1131,14 +1131,15 @@ void SpeedGolf_RunUpdate(int nPlayer) {
     if (gPlayers[nPlayer].ball.nState == 0) {
     } else if (gPlayers[nPlayer].ball.nState == 1 || gPlayers[nPlayer].ball.nState == 5) {
         if (!SpeedGolf_OnBallAtRest(nPlayer)) {
-            if (Game_GetMode() == 7 && (s8)GOLFERSTATE_GetCurrentState(nOther) == GS_SPEED_GOLF_HOLE_OVER) {
+            if (GM_GetModeType() == GM_SpeedGolfPoints_mode && (s8)GOLFERSTATE_GetCurrentState(nOther)
+                == GS_SPEED_GOLF_HOLE_OVER) {
                 GOLFERSTATE_Set(GS_SPEED_GOLF_HOLE_OVER, (u8)nPlayer);
             }
             return;
         }
         nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
         if (gPlayers[nPlayer].ball.nLie == LIE_INCUP_e) {
-            if (Game_GetMode() == 7) {
+            if (GM_GetModeType() == GM_SpeedGolfPoints_mode) {
                 SpeedGolfPoints_ScoreHoledShotLength(nPlayer, nOther);
                 nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
                 if (gPlayers[nPlayer].nSGFlags & 8) {
@@ -1225,7 +1226,7 @@ void SpeedGolf_RunUpdate(int nPlayer) {
                 Mem_cpy(&p->ballBefore, pBall, sizeof(Ball));
                 nPar = GM_GetCurrentHolePar();
                 if (gPlayers[nPlayer].ball.nLie == LIE_GREEN_e) {
-                    if (Game_GetMode() == 7) {
+                    if (GM_GetModeType() == GM_SpeedGolfPoints_mode) {
                         fDist = SpeedGolf_GroundDistance(p->vPreShot, pBall->vPos);
                         if (SpeedGolf_GroundDistance(pBall->vPos, gpGame->pPinPos) <= lbl_80284708[0] && fDist
                             >= 20.0f) {
@@ -1283,7 +1284,7 @@ void SpeedGolf_RunUpdate(int nPlayer) {
                             }
                         }
                     }
-                } else if (Game_GetMode() == 7 &&
+                } else if (GM_GetModeType() == GM_SpeedGolfPoints_mode &&
                            (gPlayers[nPlayer].ball.nLie == 6 || gPlayers[nPlayer].ball.nLie == 7 ||
                             gPlayers[nPlayer].ball.nLie == 8)) {
 
@@ -1296,7 +1297,8 @@ void SpeedGolf_RunUpdate(int nPlayer) {
                 }
             }
         }
-        if (Game_GetMode() == 7 && (s8)GOLFERSTATE_GetCurrentState(nOther) == GS_SPEED_GOLF_HOLE_OVER) {
+        if (GM_GetModeType() == GM_SpeedGolfPoints_mode && (s8)GOLFERSTATE_GetCurrentState(nOther)
+            == GS_SPEED_GOLF_HOLE_OVER) {
             if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_SPEED_GOLF_HOLE_OVER) {
                 GOLFERSTATE_Set(GS_SPEED_GOLF_HOLE_OVER, (u8)nPlayer);
             }
@@ -1391,7 +1393,7 @@ void SpeedGolf_RunUpdate(int nPlayer) {
                 SpeedGolf_ShowBallDirection(gPlayers[nPlayer].nUISlot, 0);
                 SpeedGolf_ShowRunTip(gPlayers[nPlayer].nUISlot, 0);
                 SpeedGolf_ShowStopBallPrompt(gPlayers[nPlayer].nUISlot, 0);
-                if (gSpeedGolfCanSwitchToShot || Game_GetMode() != 7) {
+                if (gSpeedGolfCanSwitchToShot || GM_GetModeType() != GM_SpeedGolfPoints_mode) {
                     GOLFERSTATE_Switch(GS_PRE_SHOT, nPlayer);
                     gSpeedGolfCanSwitchToShot = 0;
                 } else {
@@ -1456,7 +1458,7 @@ void SpeedGolf_UpdatePlayers(void) {
     int k;
     CourseInfo* pHole;
     if (gSession.nPaused == 0) {
-        if (Game_GetMode() == 7) {
+        if (GM_GetModeType() == GM_SpeedGolfPoints_mode) {
             i = PLR_1_e;
             nOther = PLR_2_e;
             if ((gPlayers[i].nSGFlags & 0x6000) || (gPlayers[nOther].nSGFlags & 0x6000)) {
@@ -1520,7 +1522,7 @@ void SpeedGolf_UpdatePlayers(void) {
                 nOther = PLR_1_e;
                 i = PLR_2_e;
             }
-        } else if (Game_GetMode() == 8) {
+        } else if (GM_GetModeType() == GM_SpeedGolf_mode) {
             i = PLR_1_e;
             if ((Input_ReadControlPad(gPlayers[i].nController) & Input_uiMap(0x25, 0))
                 && !SpeedGolf_IsStartXYHeld(i) &&
@@ -1574,7 +1576,7 @@ void SpeedGolf_HoleOverInit(int nPlayer) {
     SpeedGolf_ShowRunTip(gPlayers[nPlayer].nUISlot, 0);
     SpeedGolf_ShowStopBallPrompt(gPlayers[nPlayer].nUISlot, 0);
     SpeedGolf_ShowPoints(gPlayers[nPlayer].nUISlot, gPlayers[nPlayer].nSGPoints, 1);
-    if (Game_GetMode() == 7) {
+    if (GM_GetModeType() == GM_SpeedGolfPoints_mode) {
         gPlayers[nPlayer].nSGFlags |= 0x2000000;
         gPlayers[nPlayer].nC54 = 239;
         if (nHole != SpeedGolf_GetFirstSelectedHole()) {
@@ -1683,7 +1685,7 @@ void SpeedGolf_HoleOverExit(int nPlayer) {
 // Whether the golfer is running to the ball (nSGFlags bit 0), in modes 7 and 8 only (0 in mode 6
 // and every other mode). The main loop asks it.
 s32 SpeedGolf_IsRunning(int nPlayer) {
-    if (Game_GetMode() == 7 || Game_GetMode() == 8) {
+    if (GM_GetModeType() == GM_SpeedGolfPoints_mode || GM_GetModeType() == GM_SpeedGolf_mode) {
         return gPlayers[nPlayer].nSGFlags & 1;
     }
     return 0;
@@ -1697,7 +1699,7 @@ s32 SpeedGolf_IsRunning(int nPlayer) {
 s32 SpeedGolf_GetHoleScore(int nPlayer, int nHole, s32* pWon) {
     int nCur = Game_CurHoleIndex();
     int nGain;
-    if (Game_GetMode() == 8) {
+    if (GM_GetModeType() == GM_SpeedGolf_mode) {
         *pWon = 0;
     } else if (nHole == Game_CurHoleIndex() && !SpeedGolfPoints_HoleFinished(nPlayer, 1)) {
         *pWon = 0;
@@ -1825,7 +1827,7 @@ s32 SpeedGolf_GetWinner(s32* pMoney) {
         *pMoney = 0;
         return -1;
     }
-    if (Game_GetMode() == 8) {
+    if (GM_GetModeType() == GM_SpeedGolf_mode) {
         n = 0;
         for (h = 0; h < nHole; h++) {
             if (gpGame->bHoleSelected[h]) {

@@ -30,7 +30,6 @@ u8   fn_8010BF3C(void);
 u8   fn_8010BFE0(void);
 void fn_80007254(void);                 // LLDisp_Gc.c
 int  fn_800106F0(TexBank* pBank);       // LLTexGrp.c
-int  fn_8001005C(TexBank* pBank, u64 uHash);       // LLTex.c: the texture's index, or 0x80000000
 TexEntry* fn_800107E4(TexBank* pBank, int nTex);  // LLTexGrp.c
 s32  fn_8010BC94(const void* pA, const void* pB);
 s32  fn_8010B5F8(DynTexObj* pObj);
@@ -707,9 +706,9 @@ s32 fn_8010BC94(const void* pA, const void* pB) {
 // unknown name is only turned into text.
 void fn_8010BCFC(u64 uId, void* p, s32 n) {
     char szName[16];            // the size is not known (SKA_UnpackName writes the name)
-    int nTex = fn_8001005C(*lbl_80282488->p8, uId);
+    int nTex = TX_uiFindTextureIndexFromID(*lbl_80282488->p8, uId);
 
-    if (nTex != (int)0x80000000) {
+    if (nTex != (int)TX_NO_TEXTURE_INDEX) {
         lbl_80282488->aUses[lbl_80282488->n96C].pTex = fn_800107E4(*lbl_80282488->p8, nTex);
     } else {
         SKA_UnpackName(&uId, szName);

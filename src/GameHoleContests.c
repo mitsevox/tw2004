@@ -65,7 +65,8 @@ u8 HoleContest_RoundHasContests(void) {
     if (gSession.bDemo != 0) return 0;
     if (PlayNow_IsChallengeRunning()) return 0;
     if (PlayNow_GetCalendarFlag()) return 0;
-    if (Game_GetMode() == 0 || Game_GetMode() == 1 || Game_GetMode() == 2) {
+    if (GM_GetModeType() == GM_Stroke_mode || GM_GetModeType() == GM_Match_mode || GM_GetModeType()
+        == GM_Skins_mode) {
         return 1;
     }
     return 0;

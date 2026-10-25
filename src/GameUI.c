@@ -272,7 +272,7 @@ void GUI_PauseMenuClosed(void) {
             EASBio_SetGamePlayState(1);
         }
         fn_8009EF98();
-        if (gSession.bReplay && Game_GetMode() != 11 && Game_GetMode() != 10) {
+        if (gSession.bReplay && GM_GetModeType() != GM_Lessons_mode && GM_GetModeType() != GM_Replay_mode) {
             fn_80062CE0(1);
         }
         if (GM_Currently_SkillZoneMode() && !lbl_80282282) {
@@ -288,7 +288,7 @@ void GUI_PauseMenuClosed(void) {
             Gaud_OnScoreCard(0, 0);
             EVENT_Trigger(0, 0x46, 0, -1);
             gpGame->pfnScorecardClosed();
-            if (Game_GetMode() == 12) {
+            if (GM_GetModeType() == GM_StrokePoints_mode) {
                 for (i = 0; i < 5; i++) {
                     GM_ClearPlayerHoleData(i, Game_CurHoleIndex());
                 }
@@ -322,7 +322,7 @@ u8 GUI_IsPauseMenuOpen(void) {
 // lessons).
 void GUI_StartPostShotUI(int nMsg, int nPlayer, f32 f) {
     int nWho;
-    if (Game_GetMode() != 11) {
+    if (GM_GetModeType() != GM_Lessons_mode) {
         nWho = nPlayer + 1;
         GameMsg_Send3(5, 2, &nMsg, &f, &nWho);
         lbl_802822DB = 1;
@@ -610,7 +610,7 @@ void GUI_BetweenHolesScorecard(u8 bHuman) {
             lbl_802822C4 = 1;
         }
     } else {
-        if (Game_GetMode() != 7) {
+        if (GM_GetModeType() != GM_SpeedGolfPoints_mode) {
             Gaud_OnScoreCard(1, 0);
         }
         lbl_80282281 = 1;
@@ -645,12 +645,13 @@ void GUI_EndOfGameScorecard(u8 bHuman) {
             lbl_802822C2 = 1;
         }
     } else {
-        if (Game_GetMode() != 7) {
+        if (GM_GetModeType() != GM_SpeedGolfPoints_mode) {
             Gaud_OnScoreCard(1, 0);
         }
         lbl_80282282 = 1;
         GameEffects_ResetGameEffectSettings();
-        if ((Game_GetMode() == 26 || Game_GetMode() == 22) && gSession.nSplitScreen) {
+        if ((GM_GetModeType() == GM_LongDriveRace_mode || GM_GetModeType() == GM_LongDrive_mode)
+            && gSession.nSplitScreen) {
             f32 v[4] = {0.0f, 0.0f, 0.0f, 1.0f};
             CameraController_FadeIn(ViewController_GetCameraControl(gPlayers[0].nView[0]), 0.0f, v);
             CameraController_FadeIn(ViewController_GetCameraControl(gPlayers[1].nView[0]), 0.0f, v);

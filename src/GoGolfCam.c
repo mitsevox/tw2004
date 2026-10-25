@@ -3098,7 +3098,8 @@ int GolfCamera_LimitPositionChange(f32* pFrom, f32* pTo, f32* pOut, f32 fMax) {
 CamShot* GolfCamera_GetAlternateSwingCamera(int nFirst, int nPlayer) {
     int i;
     CamShot* pShot;
-    if (Game_GetMode() != 6 && Game_GetMode() != 7 && Game_GetMode() != 8) {
+    if (GM_GetModeType() != GM_SpeedGolfMatch_mode && GM_GetModeType() != GM_SpeedGolfPoints_mode
+        && GM_GetModeType() != GM_SpeedGolf_mode) {
         for (i = nFirst; i <= 5; i++) {
             pShot = DynamicCam_ChooseScript(nPlayer, i + (CAMSTATE_ALT_SWING_1 - 1), NULL);
             if (pShot != NULL) {

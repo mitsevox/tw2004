@@ -30,7 +30,7 @@ TexBank*  lbl_80281F50;         // and its bank
 void BS_vInit(void) {
     s32 desc[2];
     int i;
-    fn_800102DC(fn_8000BEE4("shadow"), &lbl_80281F50, &lbl_80281F54);
+    fn_800102DC(FEtm_PackName("shadow"), &lbl_80281F50, &lbl_80281F54);
     desc[0] = 4;
     desc[1] = 1;
     for (i = 0; i < NUM_SHADOW_MESHES; i++) {

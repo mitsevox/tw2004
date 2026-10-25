@@ -247,7 +247,7 @@ void GameMode4_StartEvent(void) {
     if (gLadderEvents[nEvent].n1C == 0) {
         if (gLadderEvents[nEvent].nChallenge != 0) {
             gSession.nNumPlayers = 1;
-            GM_SetModeType(5);
+            GM_SetModeType(GM_PlayNow_mode);
             PlayNow_SelectChallenge(gLadderEvents[nEvent].nChallenge - 1);
             PlayNow_StartChallenge();
             gLadderChallengeShutdown = gpGame->pfnShutdown;

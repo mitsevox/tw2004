@@ -105,7 +105,7 @@ every golfer (the "105%" string on the attribute screen is that cap).
 **The accessor.** `Golfer_GetAttribute(pPlayer, k, mode)` (`0x8002E15C`) returns for attribute k:
 
     mode 0  base:  block B[k] if (pPlayer->field_A08 == 9 && golfer index < 30 &&
-                                  (Game_GetMode() == 4 || debug bit)) else block A[k];
+                                  (GM_GetModeType() == GM_Laddered_mode || debug bit)) else block A[k];
                    plus Golfer_TierBonus(tier[k])
     mode 1  modifiers only: the byte at pPlayer+0x148+k
     mode 2  both (the screen's "attributes / modifiers / total")

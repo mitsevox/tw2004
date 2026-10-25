@@ -111,7 +111,7 @@ void fn_800083A4(void) {
                 if (gSession.uFlags & 0x4000) {
                     GameMode26_StartEvent();
                 }
-                fn_8000BAE0();
+                FEtm_StreamLoadScreen();
                 UI_ShowLoadingScreen();
             }
             fn_8006CB2C();

@@ -5,7 +5,6 @@
 #include "engine.h"
 #include "charstate.h"
 
-int  fn_8001005C(TexBank* pBank, u64 uHash);       // LLTex.c: the texture's index, or 0x80000000
 TexEntry* fn_800107E4(TexBank* pBank, int nTex);  // LLTexGrp.c
 
 // Set up a material from its entry: its texture (none with flag 1), found by the entry's name in
@@ -19,8 +18,8 @@ void fn_80112614(SkinDesc14* pEntry, SkinDesc18* pMaterial, TexBank* pBank) {
         if (pBank == NULL) {
             fn_800102DC(pEntry->uId, &pBank, &pTex);
         } else {
-            nTex = fn_8001005C(pBank, pEntry->uId);
-            if (nTex != 0x80000000) {
+            nTex = TX_uiFindTextureIndexFromID(pBank, pEntry->uId);
+            if (nTex != TX_NO_TEXTURE_INDEX) {
                 pTex = fn_800107E4(pBank, nTex);
             }
         }

@@ -27,7 +27,7 @@ void AI_SetShotModifiers(int nPlayer) {
     Player* p = &gPlayers[nPlayer];
     int     nPar, nHole, nStrokes;
     s8      nLevel;
-    if (Game_GetMode() == 11) {
+    if (GM_GetModeType() == GM_Lessons_mode) {
         p->attrMod[ATTR_POWER]         = 0;
         p->attrMod[ATTR_IQ]            = 0;
         p->attrMod[ATTR_AGGRESSION]    = 0;
@@ -70,7 +70,7 @@ void AI_SetShotModifiers(int nPlayer) {
         p->attrMod[ATTR_PUTTING]       = 10;
         p->attrMod[ATTR_RECOVERY]      = 10;
         p->attrMod[ATTR_LUCK]          = 10;
-    } else if (Game_GetMode() == 4) {
+    } else if (GM_GetModeType() == GM_Laddered_mode) {
         int nLead = gPlayers[1].nHolesWon - gPlayers[0].nHolesWon;
         p->attrMod[ATTR_POWER] = Misc_RandFunc(RANDOM_GAME) % 10 - 5;
         if (nLead > 0) {

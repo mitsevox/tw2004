@@ -268,10 +268,10 @@ f32  LLMath_DistanceBetween3(f32* A, f32* B);         // distance between two po
 
 // ---- textures --------------------------------------------------------------------------------
 
-// A texture in a bank (0x50 bytes; the bank's p8 is an array of them). Only what the game code reads.
+// A texture in a bank (0x50 bytes; the bank's pTextures is an array of them). Only what the game code reads.
 // One level of a texture (12 bytes; char.c Character_SwapTexEntries byte-swaps four of them).
 typedef struct TexMip {
-    u32  uPixels;               // 0x0  where its pixels start in the bank's p18
+    u32  uPixels;               // 0x0  where its pixels start in the bank's pPixels
     s16  nC;                    // 0x4  its size in 16-byte units (DynObj_LoadBallLogos, FE_CrAPBall_SetLogo
                                 //      copy nC * 16)
     u8   unk6[0x8 - 0x6];
@@ -280,7 +280,8 @@ typedef struct TexMip {
 } TexMip;
 
 typedef struct TexEntry {
-    u64  u0;                    // 0x00  its name's hash (fn_8000BEE4; fn_8001005C finds a texture by it)
+    u64  u0;                    // 0x00  its name, packed (FEtm_PackName; TX_uiFindTextureIndexFromID
+                                //       finds a texture by it)
     TexMip aMips[4];            // 0x08  its levels (n41 of them are used)
     u16  nWidth;                // 0x38  (GXInitTexObj in TX_spParseTextureGroupFromStream)
     u16  nHeight;               // 0x3A
@@ -336,23 +337,23 @@ typedef struct TexBankHeader {
 } TexBankHeader;
 LAYOUT_ASSERT(TexBankHeader, 0x8);
 
-// A loaded texture bank (0x30 bytes, followed by its tables; up to 200, listed at lbl_801A26DC).
+// A loaded texture bank (0x30 bytes, followed by its tables).
 typedef struct TexBank {
     u8   unk0[2];
-    s16  n2;                    // 0x02  how many textures p8 holds
+    s16  n2;                    // 0x02  how many textures pTextures holds
     s16  n4;                    // 0x04  how many rows pC holds
     u8   unk6[2];
-    TexEntry*   p8;             // 0x08  its textures
+    TexEntry*   pTextures;      // 0x08  its textures
     TexPalette* pC;             // 0x0C  its palettes
     TexGXObj* p10;              // 0x10  the textures' GX objects, by TexEntry.n3E
     TexGXTlut* p14;             // 0x14  the textures' GX palette objects, by TexEntry.n3E
-    u8*  p18;                   // 0x18  the pixel data
+    u8*  pPixels;               // 0x18  the pixel data
     s32  n1C;                   // 0x1C  the size of the pixel data, when the bank has its own copy
     u8*  p20;                   // 0x20  the palette data
     s32  n24;                   // 0x24  the size of one palette (FE_LogoDesign copies this much)
     int  n28;                   // 0x28  the load argument; added to every level's n8 and palette's n6
     u8   b2C;                   // 0x2C  (cleared on load)
-    u8   b2D;                   // 0x2D  1: p18 and p20 are not the bank's own (never freed)
+    u8   b2D;                   // 0x2D  1: pPixels and p20 are not the bank's own (never freed)
     u8   unk2E[2];
 } TexBank;
 LAYOUT_ASSERT(TexBank, 0x30);
@@ -402,41 +403,46 @@ struct DynObj;
 // script asks for values or sends messages (NULL for a stream object's scripts).
 int  fn_8000EA1C(u8* pCode, int nArg, int nPush, struct DynObj* pObj);
 
-u64  fn_8000BEE4(char* pName);          // a name's 64-bit hash
-// Find a loaded texture by its name's hash: its bank and entry (both NULL if none).
+// Find a loaded texture by its packed name: its bank and entry (both NULL if none).
 int  fn_800102DC(u64 uHash, TexBank** ppBank, TexEntry** ppTex);
 // Makes a texture bank from a 'txf ' stream object's data (LLTex.c), in pBank or, when it is NULL,
 // a new allocation.
-TexBank* fn_8000FB88(struct UStreamObject* pObject, TexBank* pBank, int n);
-void fn_8000FFAC(TexBank* pBank);       // LLTex.c: free a bank's pixel and palette data
+TexBank* TX_spDownloadData(struct UStreamObject* pObject, TexBank* pBank, int n);
+void TX_vFreeTextureDataInTextureGroup(TexBank* pBank); // LLTex.c: free a bank's pixel and palette data
+// LLTex.c: the index of the bank's texture with this packed name, or TX_NO_TEXTURE_INDEX.
+int  TX_uiFindTextureIndexFromID(TexBank* pBank, u64 uHash);
+#define TX_NO_TEXTURE_INDEX 0x80000000
 void fn_8000F0EC(TexBank* pBank, TexEntry* pTex);   // LLTex.c: set up the texture's TEV stages
 
-// The texture banks from 'txf2' stream objects (LoadData.c): a bank per object id (modulo
-// 100000), searched by name with fn_8000BDF8.
-#define NUM_TXF2_BANKS 200
-#define TXF2_KEPT_SIZE 0x8000           // how much of the id-10000 'txf2' object's data is kept
-extern TexBank* lbl_801A26DC[NUM_TXF2_BANKS];
-void fn_8000B884(void);                 // clear the banks
-void fn_8000B8F4(void);                 // free the banks
-void fn_8000B984(void);                 // allocate the buffers of the 'load' and 'txf2' objects
-void FEtm_vRegisterStreamClients(void);        // register the 'txf2' handler
-void FEtm_vUnregisterStreamClients(void);      // unregister it
-void fn_8000BAE0(void);                 // load the loading-screen stream file of the current mode/course
-u8   fn_8000BD80(char* pName, u8** ppPixels);   // a texture's pixels by name; 0 if none
-// Find a texture by name: its bank's index, or -1 (bank and entry NULL).
-int  fn_8000BDF8(char* pName, TexBank** ppBank, TexEntry** ppTex);
+// FETextureMgr.c: the front end's texture banks, one per 'txf2' stream object, each in the slot of
+// its object's id (modulo 100000) and found by a texture's name; the loading bar's 'txf2' object;
+// the loading screen's picture, from the 'load' object.
+#define FETM_NUM_BANKS 200
+#define FETM_LOADING_BAR_ID 10000               // the 'txf2' object kept for the loading bar
+#define FETM_LOADING_BAR_DATA_SIZE 0x8000       // how much of its data is kept
+#define FETM_LOAD_SCREEN_DATA_SIZE 147700       // the loading screen's data buffer
+extern TexBank* gFEtmBanks[FETM_NUM_BANKS];
+void FEtm_InitFETextureMgr(void);
+void FEtm_CloseFETextureMgr(void);
+void FEtm_AllocBuffers(void);
+void FEtm_vRegisterStreamClients(void);
+void FEtm_vUnregisterStreamClients(void);
+void FEtm_StreamLoadScreen(void);
+u8   FEtm_GetTexturePixels(char* pName, u8** ppPixels);
+int  FEtm_FindTexture(char* pName, TexBank** ppBank, TexEntry** ppTex);
+u64  FEtm_PackName(char* pName);
 
-// What LoadData.c keeps of the 'load' stream object (uiProcessPolygon.c shows it): its data is copied
-// into the buffer at lbl_80281C04.
+// What FETextureMgr.c keeps of the 'load' stream object: the size of its data, which is copied into
+// gpFEtmLoadScreenData (uiProcessPolygon.c decodes the picture from the two).
 typedef struct LoadObjInfo {
     u8   unk0[0x1C];
     u32  uSize;                 // 0x1C  the data's size
     u8   unk20[4];
 } LoadObjInfo;
 LAYOUT_ASSERT(LoadObjInfo, 0x24);
-extern LoadObjInfo lbl_801A25F0;
-extern u8* lbl_80281C04;                // the 'load' object's data (147700 bytes)
-extern struct UStreamObject* lbl_80281C0C;   // LoadData.c: a copy of the 'txf2' object with id 10000
+extern LoadObjInfo gFEtmLoadScreenInfo;
+extern u8* gpFEtmLoadScreenData;
+extern struct UStreamObject* gpFEtmLoadingBarObject;
 
 // LLTex.c: points at a flag byte RenderState_SetConstantAlphaActive (Code80015470.c) sets; while
 // it is set, the shader objects' untextured stage takes its alpha from the constant colour, not
@@ -459,7 +465,7 @@ typedef struct TexGrpRec {
     u8   unk1[3];
     u32  uId;                   // 0x04  the object id (modulo 100000) it is for
     int  n8;                    // 0x08  goes to the slot's n8
-    int  nC;                    // 0x0C  passed on to fn_8000FB88
+    int  nC;                    // 0x0C  passed on to TX_spDownloadData
     int  nSlot;                 // 0x10  the slot the bank went into
     u8   bUsed;                 // 0x14  set once an object took it
     u8   unk15[3];
@@ -1199,8 +1205,8 @@ void PostFx_SetBlur(u8 b, int nView, f32 f4, f32 f8);   // sets (b) or clears vi
 
 // ---- the file streamer (UStream.c) -----------------------------------------------------------
 
-// An object built from SHOC chunks. The header is 0x34 bytes (LoadData.c copies one with
-// Mem_cpy(p, pObject, 0x34); URes.c's divider gResDivider is one), then the rest of the
+// An object built from SHOC chunks. The header is 0x34 bytes (FETextureMgr.c copies one, the
+// loading bar's; URes.c's divider gResDivider is one), then the rest of the
 // copied chunk header (chunk+0x30 onward: a word, the name's length at 0x38, the name at 0x40)
 // and, 0x80-aligned, the data.
 typedef struct UStreamObject {

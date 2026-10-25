@@ -427,7 +427,8 @@ typedef enum CamSeqPlayerType {
 } CamSeqPlayerType;
 
 // The game modes and screens a camera sequence is for (CameraSequence_t.nModeType;
-// DynamicCam_ModeType). The game modes are Game_GetMode's: 9 practice, 11 the lessons.
+// DynamicCam_ModeType). The game modes are GM_GetModeType's: GM_Practice_mode and
+// GM_Lessons_mode.
 typedef enum CameraGameModeTypes_e {
     CAMGAMEMODE_SINGLE_VIEW = 0,    // one view, outside practice, the lessons and the skill zone
                                     // (GM_Currently_SkillZoneMode)

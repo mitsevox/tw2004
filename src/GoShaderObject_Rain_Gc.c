@@ -125,7 +125,7 @@ void SD_vShaderObject_Rain_Dynamic_Init(RainObject* pRain, f32* pStrength) {
                                               "GoShaderObject_Rain_Gc.c", 292);
         memset(pData->apB[i], 0, RAIN_BUF_B_SIZE);
     }
-    uSplash = fn_8000BEE4("splash");
+    uSplash = FEtm_PackName("splash");
     fn_800102DC(uSplash, &lbl_802814B8->pBank, &lbl_802814B8->pTex);
 }
 

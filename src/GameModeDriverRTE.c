@@ -129,7 +129,7 @@ void GameModeDriverRTE_StartEvent(void) {
     if (gRTEs.aEvent[gRTESelectedEvent].bOff == 0) {
         if (gRTEs.aEvent[gRTESelectedEvent].nChallenge != 0) {
             gSession.nNumPlayers = 1;
-            GM_SetModeType(5);
+            GM_SetModeType(GM_PlayNow_mode);
             PlayNow_SetChallengeList(gRTEs.aChallenge, 111);
             PlayNow_SelectChallenge(gRTEs.aEvent[gRTESelectedEvent].nChallenge - 1);
             PlayNow_StartChallenge();

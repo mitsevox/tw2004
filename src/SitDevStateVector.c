@@ -153,7 +153,7 @@ void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
     case 24:
     case 26:
     case 30:
-        nMode = Game_GetMode();
+        nMode = GM_GetModeType();
         // fake match: the (int) casts of the next two values re-mask them
         _SetStateVecAndCondition(pValues, 1, (int)nMode, pSetBits);
         _SetStateVecAndCondition(pValues, 54, (int)SitDev_TranslateGameMode(nMode), pSetBits);

@@ -89,11 +89,11 @@ void UI_Obj_InitModule(void) {
         gUIObjSettings[i].a0[8] = 0.02f;
         gUIObjSettings[i].a0[9] = 0.0f;
     }
-    uName = fn_8000BEE4("toball");
+    uName = FEtm_PackName("toball");
     fn_800102DC(uName, &gpUIObjTexBank, &gpUIObjBaseTexture);
-    uName = fn_8000BEE4("toball");
+    uName = FEtm_PackName("toball");
     fn_800102DC(uName, &gpUIObjTexBank, &gpUIObjBoostTexture);
-    uName = fn_8000BEE4("ring");
+    uName = FEtm_PackName("ring");
     fn_800102DC(uName, &gpUIObjTexBank, &gpUIObjRingTexture);
     fn_8006E5A8(&gUIObjLights, 1);
     gUIObjLights.apLight[0]->nType = 1;

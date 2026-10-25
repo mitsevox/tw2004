@@ -477,7 +477,7 @@ void GM_Earnings_PayShotGoals(int nPlayer) {
     int i;
     int nKind;
 
-    if (Game_GetMode() == 10) return;
+    if (GM_GetModeType() == GM_Replay_mode) return;
     if (Game_GetMulliganRule() != GM_MULLIGANS_NONE) return;
     gpGame->pfnCheckShotAwards(nPlayer);
     nProfile = gPlayers[nPlayer].nIndex;
@@ -535,7 +535,7 @@ void GM_Earnings_PayHoledGoals(int nPlayer) {
     int nKind;
     int i;
 
-    if (Game_GetMode() == 10) return;
+    if (GM_GetModeType() == GM_Replay_mode) return;
     if (Game_GetMulliganRule() != GM_MULLIGANS_NONE) return;
     nProfile = gPlayers[nPlayer].nIndex;
     if (gpSaveData[nProfile].bActive == 0) return;
@@ -745,9 +745,9 @@ void GM_Earnings_CheckShotGoals(int nPlayer, Ball* pBall, u8 bPreview) {
 
     for (i = 0; i < NUM_SHOT_GOALS; i++) {
         if (!gEarningsTable.aShotGoal[i].bEnabled) continue;
-        if (!Earnings_TestBit(gEarningsTable.aShotGoal[i].uModes, Game_GetMode())) continue;
+        if (!Earnings_TestBit(gEarningsTable.aShotGoal[i].uModes, GM_GetModeType())) continue;
         if (PlayNow_IsChallengeRunning() && !GameMode4_IsEventRunning()
-            && !Earnings_TestBit(gEarningsTable.aShotGoal[i].uModes, 5)) continue;
+            && !Earnings_TestBit(gEarningsTable.aShotGoal[i].uModes, GM_PlayNow_mode)) continue;
         if (!Earnings_TestBit(gEarningsTable.aShotGoal[i].uPars, 0) && GM_GetCurrentHolePar() == 3) continue;
         if (!Earnings_TestBit(gEarningsTable.aShotGoal[i].uPars, 1) && GM_GetCurrentHolePar() == 4) continue;
         if (!Earnings_TestBit(gEarningsTable.aShotGoal[i].uPars, 2) && GM_GetCurrentHolePar() == 5) continue;
@@ -910,9 +910,9 @@ void GM_Earnings_CheckPuttGoals(int nPlayer, u8 bPreview) {
 
     for (i = 0; i < NUM_PUTT_GOALS; i++) {
         if (!gEarningsTable.aPuttGoal[i].bEnabled) continue;
-        if (!Earnings_TestBit(gEarningsTable.aPuttGoal[i].uModes, Game_GetMode())) continue;
+        if (!Earnings_TestBit(gEarningsTable.aPuttGoal[i].uModes, GM_GetModeType())) continue;
         if (PlayNow_IsChallengeRunning() && !GameMode4_IsEventRunning()
-            && !Earnings_TestBit(gEarningsTable.aPuttGoal[i].uModes, 5)) continue;
+            && !Earnings_TestBit(gEarningsTable.aPuttGoal[i].uModes, GM_PlayNow_mode)) continue;
         if (!Earnings_TestBit(gEarningsTable.aPuttGoal[i].uPars, 0) && GM_GetCurrentHolePar() == 3) continue;
         if (!Earnings_TestBit(gEarningsTable.aPuttGoal[i].uPars, 1) && GM_GetCurrentHolePar() == 4) continue;
         if (!Earnings_TestBit(gEarningsTable.aPuttGoal[i].uPars, 2) && GM_GetCurrentHolePar() == 5) continue;
@@ -1093,9 +1093,9 @@ void GM_Earnings_CheckHoleGoals(int nPlayer, u8 bPreview, u8 bRoundOver) {
         if (gEarningsTable.aHoleGoal[i].bEachHole && bRoundOver) continue;
         if (!gEarningsTable.aHoleGoal[i].bEachHole && !bRoundOver) continue;
         if (!gEarningsTable.aHoleGoal[i].bEnabled) continue;
-        if (!Earnings_TestBit(gEarningsTable.aHoleGoal[i].uModes, Game_GetMode())) continue;
+        if (!Earnings_TestBit(gEarningsTable.aHoleGoal[i].uModes, GM_GetModeType())) continue;
         if (PlayNow_IsChallengeRunning() && !GameMode4_IsEventRunning()
-            && !Earnings_TestBit(gEarningsTable.aHoleGoal[i].uModes, 5)) continue;
+            && !Earnings_TestBit(gEarningsTable.aHoleGoal[i].uModes, GM_PlayNow_mode)) continue;
         if (!gEarningsTable.aHoleGoal[i].b19 && bMore) continue;
         if (gEarningsTable.aHoleGoal[i].aToPar[0] != 0 &&
             gEarningsTable.aHoleGoal[i].aToPar[0]
@@ -1463,7 +1463,7 @@ u8 GM_Earnings_CheckWinAllTournaments(int nPlayer, u8 bPreview) {
             n++;
         }
     }
-    if (Game_GetMode() == 23 && n == 30 && GameAnalysis_IsPuttForWin(nPlayer)) return 1;
+    if (GM_GetModeType() == GM_PgaTour_mode && n == 30 && GameAnalysis_IsPuttForWin(nPlayer)) return 1;
     return 0;
 }
 
@@ -1488,7 +1488,7 @@ u8 GM_Earnings_CheckFirstTournamentWin(int nPlayer, u8 bPreview) {
         }
         return bAny;
     }
-    if (Game_GetMode() == 23 && GameAnalysis_IsPuttForWin(nPlayer)) return 1;
+    if (GM_GetModeType() == GM_PgaTour_mode && GameAnalysis_IsPuttForWin(nPlayer)) return 1;
     return 0;
 }
 
@@ -1793,8 +1793,9 @@ int HighScoreRecords_GetEndOfShotRecord(int nPlayer, Ball* pBall, int a, u8 bCou
     gNumRecordHits = 0;
     if (gSession.uFlags & 0x4000) return 0;
     if (Player_IsCPU(nPlayer)) return 0;
-    if (Game_GetMode() == 12 || GM_Currently_SkillZoneMode() || Game_GetMode() == 22 || Game_GetMode()
-        == 26) return 0;
+    if (GM_GetModeType() == GM_StrokePoints_mode || GM_Currently_SkillZoneMode() || GM_GetModeType()
+        == GM_LongDrive_mode || GM_GetModeType()
+        == GM_LongDriveRace_mode) return 0;
     if (gpGame->bRandom18) return 0;
     if (Game_GetMulliganRule() != GM_MULLIGANS_NONE) return 0;
     nProfile = gPlayers[nPlayer].nIndex;
@@ -1849,8 +1850,9 @@ int HighScoreRecords_GetEndOfHoleRecord(int nPlayer, Ball* pBall, int a, u8 bCou
     gNumRecordHits = 0;
     if (gSession.uFlags & 0x4000) return 0;
     if (Player_IsCPU(nPlayer)) return 0;
-    if (Game_GetMode() == 12 || GM_Currently_SkillZoneMode() || Game_GetMode() == 22 || Game_GetMode()
-        == 26) return 0;
+    if (GM_GetModeType() == GM_StrokePoints_mode || GM_Currently_SkillZoneMode() || GM_GetModeType()
+        == GM_LongDrive_mode || GM_GetModeType()
+        == GM_LongDriveRace_mode) return 0;
     if (gpGame->bRandom18) return 0;
     if (Game_GetMulliganRule() != GM_MULLIGANS_NONE) return 0;
     nProfile = gPlayers[nPlayer].nIndex;
@@ -1902,7 +1904,7 @@ int HighScoreRecords_GetEndOfGameRecord(int nPlayer, int bSave, u8 bCountStroke,
     gNumRecordHits = 0;
     if (gSession.uFlags & 0x4000) return 0;
     if (Player_IsCPU(nPlayer)) return 0;
-    if (Game_GetMode() == 12) return 0;
+    if (GM_GetModeType() == GM_StrokePoints_mode) return 0;
     if (Game_GetMulliganRule() != GM_MULLIGANS_NONE) return 0;
     nProfile = gPlayers[nPlayer].nIndex;
     if (gpSaveData[nProfile].bActive == 0) return 0;
@@ -1911,7 +1913,7 @@ int HighScoreRecords_GetEndOfGameRecord(int nPlayer, int bSave, u8 bCountStroke,
     } else {
         strcpy(szName, gpSaveData[nProfile].szName);
     }
-    if (Game_GetMode() == 22) {
+    if (GM_GetModeType() == GM_LongDrive_mode) {
         if (HighScoreRecords_CheckRecordGameSetting(9)) {
             nResult = HighScoreRecords_CheckRecord(9, gPlayers[nPlayer].nDriveScore, bSave, szName, nPlayer);
             if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
@@ -2089,11 +2091,11 @@ u8 HighScoreRecords_IsEqualOrBetter(int nKind, int nValue, int nRecord) {
 // other mode 3 (none).
 s32 HighScoreRecords_GetSkillZoneRecordType(s32 n) {
     switch (n) {
-    case 16:
+    case GM_SkillZoneTarget_mode:
         return 0;
-    case 17:
+    case GM_SkillZoneTargetToTarget_mode:
         return 1;
-    case 13:
+    case GM_SkillZoneTimed_mode:
         return 2;
     default:
         return 3;
@@ -2188,7 +2190,7 @@ int HighScoreRecords_CheckRecord(int nKind, int nValue, int bSave, const char* s
             }
         }
     } else if (nKind == 8) {
-        n = HighScoreRecords_GetSkillZoneRecordType(Game_GetMode());
+        n = HighScoreRecords_GetSkillZoneRecordType(GM_GetModeType());
         if (n != 3) {
             pLast = &gSession.recB[Game_GetCurHoleNum()][n][4];
             if (HighScoreRecords_IsEqualOrBetter(nKind, nValue, pLast->nValue)) {
@@ -2300,7 +2302,7 @@ void GM_ClearGameBonusStats(int nPlayer) {
 // (1, 2) nothing more, kind 8 a skill-zone mode, kind 9 game mode 22 (the long-drive contest). Any
 // other kind counts.
 u8 HighScoreRecords_CheckRecordGameSetting(int nKind) {
-    if (Game_GetMode() == 9 || Game_GetMode() == 11) return 0;
+    if (GM_GetModeType() == GM_Practice_mode || GM_GetModeType() == GM_Lessons_mode) return 0;
     if (Game_GetMulliganRule() != GM_MULLIGANS_NONE) return 0;
     switch (nKind) {
     case 0:
@@ -2331,7 +2333,7 @@ u8 HighScoreRecords_CheckRecordGameSetting(int nKind) {
         if (PlayNow_IsChallengeRunning() || !GM_Currently_SkillZoneMode()) return 0;
         return 1;
     case 9:
-        if (PlayNow_IsChallengeRunning() || Game_GetMode() != 22) return 0;
+        if (PlayNow_IsChallengeRunning() || GM_GetModeType() != GM_LongDrive_mode) return 0;
         return 1;
     }
     return 1;

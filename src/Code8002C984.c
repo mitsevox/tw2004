@@ -37,7 +37,9 @@ f32 gClubPowerStep[CLUB_MAX_e] = {          // 0x801875E8
 // bag: a CPU golfer in sand never takes a wood, and any golfer only clubs it carries.
 u8 Club_UsableForKind(int nPlayer, int nClub, int nKind) {
     Player* p = &gPlayers[nPlayer];
-    if (Game_GetMode() == 13 || Game_GetMode() == 14 || Game_GetMode() == 16 || Game_GetMode() == 17) {
+    if (GM_GetModeType() == GM_SkillZoneTimed_mode || GM_GetModeType() == GM_SkillZoneCapture_mode
+        || GM_GetModeType() == GM_SkillZoneTarget_mode || GM_GetModeType()
+        == GM_SkillZoneTargetToTarget_mode) {
         return gClubKindTable[nKind][nClub];
     }
     if (Controller_IsCPU(p->nController)) {
@@ -239,7 +241,8 @@ int AI_ClubForShot(int nPlayer, int nKind, u8 bUnderOnly, f32 fDist) {
         }
     } else {
         nClub = AI_FirstUsableClub(nPlayer, nKind);
-        if (Game_GetMode() == 6 || Game_GetMode() == 7 || Game_GetMode() == 8 ||
+        if (GM_GetModeType() == GM_SpeedGolfMatch_mode || GM_GetModeType() == GM_SpeedGolfPoints_mode
+            || GM_GetModeType() == GM_SpeedGolf_mode ||
             Controller_IsCPU(p->nController)) {
             fDist /= Physics_GetLiePowerPercentage(&p->ball);
         }

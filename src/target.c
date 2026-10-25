@@ -51,9 +51,9 @@ void TARGET_Init(void) {
 
     Network_RegisterLoadNetworkCallback(3, fn_8006A7A8);
     lbl_80281E30 = NULL;
-    textureID = fn_8000BEE4("tball");
+    textureID = FEtm_PackName("tball");
     fn_800102DC(textureID, &lbl_80281E3C, &lbl_80281E40);
-    textureID = fn_8000BEE4("shadow");
+    textureID = FEtm_PackName("shadow");
     fn_800102DC(textureID, &lbl_80281E34, &lbl_80281E38);
     for (i = 0; i < 5; i++) {
         lbl_801D5BF0[i].f0 = 0.01f;
@@ -662,7 +662,7 @@ u8 PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed) {
     f32          fHeading;
     u8           bMoved;
 
-    if (Game_GetMode() != 9) {
+    if (GM_GetModeType() != GM_Practice_mode) {
         pSurface = Ter_GetSupportingWorldMaterial(gPlayers[nPlayer].ball.pCourse,
                                                   gPlayers[nPlayer].vPlacement);
         switch (pSurface != NULL ? pSurface->nClass : 0) {
