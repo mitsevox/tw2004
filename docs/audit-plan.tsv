@@ -264,11 +264,12 @@ order	area	file	task	scope	state
 261	Boot and game flow	gomainloop.c	chunk 1/2	gomainloop_StrippedFn .. GO_vInitIG	open
 262	Boot and game flow	gomainloop.c	chunk 2/2	fn_8006CDC4 .. TI_fConvertTimeDifToSeconds	open
 263	Boot and game flow	gomainloop.c	whole-file review	the whole file	open
-264	Boot and game flow	unsorted/sweep_80005580.c	fold	prove its file and fold it in	open
-265	Boot and game flow	unsorted/sweep_800055D4.c	fold	prove its file and fold it in	open
-266	Boot and game flow	unsorted/sweep_80005590.c	fold	prove its file and fold it in	open
-267	Boot and game flow	unsorted/sweep_80005520.c	fold	prove its file and fold it in	open
-268	Boot and game flow	unsorted/sweep_800055D8.c	fold	prove its file and fold it in	open
+264	Boot and game flow	unsorted/sweep_80005580.c	fold	prove its file and fold it in	done
+265	Boot and game flow	unsorted/sweep_800055D4.c	fold	prove its file and fold it in	done
+266	Boot and game flow	unsorted/sweep_80005590.c	fold	prove its file and fold it in	done
+267	Boot and game flow	unsorted/sweep_80005520.c	fold	prove its file and fold it in	done
+268	Boot and game flow	unsorted/sweep_800055D8.c	fold	prove its file and fold it in	done
+268	Boot and game flow	Main.c	pass	the whole file	open
 269	Shader objects and effects	GoShaderObjectCommon_TexAnimManager_Gc.c	pass	the whole file	open
 270	Shader objects and effects	GoShaderObjectCommon_MorphAnimManager_Gc.c	pass	the whole file	open
 271	Shader objects and effects	UFstPart.c	pass	the whole file	open
