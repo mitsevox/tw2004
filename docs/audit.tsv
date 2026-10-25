@@ -132,7 +132,7 @@ HLAudMaster.c	done	b381299d	claude-review
 HoleScore.c	open		
 LLDisp_Gc.c	open		
 LLDynTex.c	open		
-LLFileIO_Gc.c	open		
+LLFileIO_Gc.c	done	10f64b46	claude-review
 LLFont.c	open		
 LLInput_Gc.c	done	5bf26c73	claude-review
 LLMath_Gc.c	done	626ba02e	claude-review
