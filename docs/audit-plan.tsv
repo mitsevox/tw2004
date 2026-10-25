@@ -111,7 +111,7 @@ order	area	file	task	scope	state
 108	Golfers	stateFunc.c	whole-file review	the whole file	open
 109	Characters	hwsMaterial_Gc.c	pass	the whole file	done
 110	Characters	hwsOverride_Gc.c	pass	the whole file	open
-111	Characters	char_tex_manager.c	pass	the whole file	open
+111	Characters	char_tex_manager.c	pass	the whole file	done
 112	Characters	mtalib.c	pass	the whole file	open
 113	Characters	char_skin.c	pass	the whole file	done
 114	Characters	ska_shared.c	pass	the whole file	open

@@ -431,7 +431,7 @@ void sTurnOnLogo(s16 nPart, int b, int i) {
     SKA_PackName(&uSetId, lbl_801937C8[b]);
     nSet = SkinPart_FindSet(pSkin, uSetId);
     SkinPart_ChooseSet(pSkin, nSet, i, 0);
-    if (i > 0 && i <= 5) {
+    if (i > 0 && i <= SAVE_NUM_LOGOS) {
         sprintf(szLogo, "%s%d", "userlogo", nLogo);
         if (pProfile->choices.aLogo[nLogo].nShape == LOGO_SQUARE) {
             strcpy(szShape, "square");
