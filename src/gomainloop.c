@@ -24,13 +24,9 @@ u8          lbl_80281E50;
 
 // The other systems' start-up, shut-down and per-frame calls, from their files (most are not
 // decompiled yet; the types are from the calls here).
-void fn_80007254(void);
-void fn_80007260(void);
 void fn_800080D0(void);
 void fn_800080D4(void);
 void fn_800081C4(void);
-void fn_80008380(void);
-void fn_800083A0(void);
 void fn_8000F060(void);
 void fn_8000F0E8(void);
 void fn_800103C0(void);
@@ -322,7 +318,7 @@ void fn_8006C63C(void) {
     if (!lbl_80281B8E) {
         lbl_80281B8E = OSGetResetButtonState();
     }
-    fn_80007254();
+    Displ_WaitFrameEmpty();
 }
 
 // Hands the frame parity (lbl_80281B88 & 1) to fn_8006DC40 and fn_800162A4 (both empty) and,
@@ -756,7 +752,7 @@ static u8 GO_bMainLoopDone(void) {
             bDone = 1;
         }
     } else if (gSession.nGameType == GAMESTATE_STARTUP && (gSession.bEndLoop || gSession.nC == 2)) {
-        fn_800BA74C(1);
+        ScreenClear_DarkenScreen(1);
         bDone = 1;
         gSession.bEndLoop = 0;
     }
@@ -1005,7 +1001,7 @@ void fn_8006D8E8(void) {
             Character_ResetTimeScalesOnCombo();
         }
         fn_8006C69C();
-        fn_80006EDC();
+        Displ_FrameStart();
         uNow = TI_sReadCounter(TI_COUNTER_GAME);
         // fake match: the double step gives the original's frsp (EA's gomainloop.c saw a double
         // return; every other file saw the float TI_fConvertTimeDifToSeconds returns).
@@ -1073,8 +1069,8 @@ void fn_8006D8E8(void) {
             fn_8006D7E8();
             break;
         }
-        fn_80008380();
-        fn_80006FE8();
+        DL_vWaitForEndOfDrawing();
+        Displ_FrameEnd();
         if (gSession.nGameType != GAMESTATE_STARTUP) {
             if (gSession.nGameType != GAMESTATE_FE_RUN) {
                 Character_UpdateClothesIG();
@@ -1086,12 +1082,12 @@ void fn_8006D8E8(void) {
         }
         UI_FreeMarkedEntryPictures();
         Pict_AfterFree();
-        fn_80007260();
+        Displ_EndFrameEmpty();
         Gaud_Monitor();
         if (!gSession.nSplitScreen && gSession.nGameType != GAMESTATE_STARTUP) {
             fn_8006E0F8();
         }
-        fn_800083A0();
+        LLObj_FrameEmpty();
         if (gSession.nGameType == GAMESTATE_QUIT) {
             if (gSession.uFlags & 0x1000) {
                 Gaud_ExitFE();

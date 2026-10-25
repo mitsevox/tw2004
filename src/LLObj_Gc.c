@@ -420,11 +420,12 @@ float fn_80008368(Camera* cam) { return cam->unk1F8; }
 CamLens* Camera_GetLens(Camera* cam) { return cam->unk10; }
 int fn_80008378(CamLens* sub) { return sub->nType; }
 
-void fn_80008380(void) {
+// Waits until the GPU has drawn up to the last break point.
+void DL_vWaitForEndOfDrawing(void) {
     fn_800070DC();
 }
 
-void fn_800083A0(void) {
+void LLObj_FrameEmpty(void) {
 }
 
 // ---- end of sweep code ----

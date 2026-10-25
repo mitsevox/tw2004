@@ -35,11 +35,9 @@ f32* gpUIPolyColourMul;                 // } UIPoly_Draw for UIPoly_TintVertex
 struct TexEntry* gpUILoadingBarTexture; // } the loading bar's texture and its bank
 struct TexBank*  gpUILoadingBarBank;    // } (UI_LoadLoadingBarTexture)
 
-void fn_80008380(void);
 void LLMath_Add(f32* pA, f32* pB, f32* pOut);
 void UI_DrawFullScreenPicture(LLPict* pPict, f32 fAlpha);    // draws the picture at that alpha
 void UI_ShowPictureFadingIn(LLPict* pPict, int nFrames, f32 fStep);
-void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
 void UIPoly_Draw(FEQuad* pQuad);
 void UIPoly_UnpackVertex(FEVertex* pVtx, f32* pPos, f32* pUV, f32* pColour, f32* pScale, f32* pAdd);
 void UI_LoadEntryPicture(s16 nTable, s16 nEntry);
@@ -47,10 +45,6 @@ void UI_ReleaseEntryPicture(s16 nTable, s16 nEntry);
 f32* UITransform_GetViewParams(void); // uiTransform.c
 void UI_GetPictureUVScale(f32* pOut, LLPict* pPict);
 void UI_InitForHole(void);
-void fn_80006EDC();
-void fn_80006FE8();
-void fn_80007254();
-void fn_800083A0();
 void UI_DrawLoadingBarTile(int nPoint);
 void UI_ShowLoadingBarTile(s32 nTile);
 void UI_FadeInLoadingScreen(int nFrames);
@@ -265,7 +259,7 @@ void UI_ClearFirstMenuDraw(void) {
 }
 
 // When a screen unloads (message -3 of the polygon and arc elements): if UI file entry (nTable,
-// nEntry) is a picture entry (flag 2 set, flag 1 clear), wait for the GPU (fn_80008380) and mark
+// nEntry) is a picture entry (flag 2 set, flag 1 clear), wait for the GPU (DL_vWaitForEndOfDrawing) and mark
 // its picture to be freed (UI_MarkEntryPictureForFree; UI_FreeMarkedEntryPictures frees it on the
 // next frame).
 void UI_ReleaseEntryPicture(s16 nTable, s16 nEntry) {
@@ -274,7 +268,7 @@ void UI_ReleaseEntryPicture(s16 nTable, s16 nEntry) {
     if (nTable == -1) return;
     uFlags = gpFrontEnd->pFile->p8->apTables[nTable]->apEntries[nEntry]->u0;
     if (!(uFlags & 1) && (uFlags & 2)) {
-        fn_80008380();
+        DL_vWaitForEndOfDrawing();
         UI_MarkEntryPictureForFree(nEntry);
     }
 }
@@ -479,7 +473,7 @@ void UI_DrawLoadingScreenAndProgressBar(UI_LoadScreen_state state) {
             return;
         }
     }
-    fn_80006EDC();
+    Displ_FrameStart();
     UI_DrawFullScreenPicture(gUILoadingScreen.pPicture, 1.0f);
     if (gUILoadingScreen.nLastTile >= 0) {
         for (i = 0; i <= gUILoadingScreen.nLastTile; i++) {
@@ -487,11 +481,11 @@ void UI_DrawLoadingScreenAndProgressBar(UI_LoadScreen_state state) {
             UI_DrawLoadingBarTile(i);
         }
     }
-    fn_80006FE8();
-    fn_800083A0();
-    fn_80007254();
+    Displ_FrameEnd();
+    LLObj_FrameEmpty();
+    Displ_WaitFrameEmpty();
     Gaud_Cycle();
-    fn_80008380();
+    DL_vWaitForEndOfDrawing();
     if (gUILoadingScreen.fElapsed > gUILoadingScreen.fNextTile || gUILoadingScreen.nLastTile == -1) {
         if (gUILoadingScreen.fElapsed > gUILoadingScreen.fNextTile) {
             gUILoadingScreen.fNextTile += gUILoadingScreen.fTileSecs;
@@ -516,11 +510,11 @@ void UI_DrawLoadingScreenAndProgressBar(UI_LoadScreen_state state) {
 // Draw loading-bar tile nTile in a frame of its own (start the frame, draw the tile, end the frame,
 // step the audio).
 void UI_ShowLoadingBarTile(s32 nTile) {
-    fn_80006EDC();
+    Displ_FrameStart();
     UI_DrawLoadingBarTile(nTile);
-    fn_80006FE8();
-    fn_80007254();
-    fn_800083A0();
+    Displ_FrameEnd();
+    Displ_WaitFrameEmpty();
+    LLObj_FrameEmpty();
     Gaud_Cycle();
 }
 
@@ -532,7 +526,7 @@ void UI_DrawLoadingBarTile(int nPoint) {
     f32 afXY[8];
     f32 afUV[8];
 
-    fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
+    RenderView_SetViewport(0.0f, 0.0f, 1.0f, 1.0f);
     RenderState_SetBlendFactors(4, 5);
     DS_vSetAlphaTestMode(0, DS_COMPARE_GEQUAL, 0x80);
     DS_vSetZBufferMode(DS_COMPARE_ALWAYS);
@@ -581,21 +575,21 @@ void UI_ShowLoadingScreen(void) {
 }
 
 // Decode the loading screen's picture from the 'load' object's data, show it for nFrames frames
-// fading in over 30 (UI_ShowPictureFadingIn), wait for the GPU (fn_80008380), then free it.
+// fading in over 30 (UI_ShowPictureFadingIn), wait for the GPU (DL_vWaitForEndOfDrawing), then free it.
 void UI_FadeInLoadingScreen(int nFrames) {
     LLPict* pPict;
 
     pPict = Pict_CreateFromMemory(gpFEtmLoadScreenData, gFEtmLoadScreenInfo.uSize);
     UI_ShowPictureFadingIn(pPict, nFrames, 1.0f / 30.0f);
-    fn_80008380();
+    DL_vWaitForEndOfDrawing();
     Pict_Free(pPict);
     Pict_AfterFree();
 }
 
 // The demo's screen between holes (GoEntry.c calls it in the demo where it otherwise calls
 // UI_ShowLoadingScreen): the picture of entry 0 of the UI file's picture table, shown for 30 frames
-// fading in, then freed. The 600 calls to fn_80007254 after it do nothing (it is empty in this
-// build). Then the texture is unbound.
+// fading in, then freed. The 600 calls to Displ_WaitFrameEmpty after it do nothing (it is
+// empty). Then the texture is unbound.
 void UI_ShowDemoLoadingScreen(void) {
     int i = 0;
     LLPict* pPict;
@@ -608,12 +602,12 @@ void UI_ShowDemoLoadingScreen(void) {
     pPict = (LLPict*)pEntry->p8;
     RenderState_SetPicture(pPict);
     UI_ShowPictureFadingIn(pPict, 30, 1.0f / 30.0f);
-    fn_80008380();
+    DL_vWaitForEndOfDrawing();
     Pict_Free((LLPict*)pEntry->p8);
     pEntry->p8 = NULL;
     Pict_AfterFree();
     for (; i < 600; i++) {
-        fn_80007254();
+        Displ_WaitFrameEmpty();
     }
     RenderState_SetBankTexture(0, 0);
     RenderState_Flush();
@@ -642,7 +636,7 @@ void UI_PlayStartUpMovies(void) {
     }
     pPict = Pict_CreateFromMemory(gpLegalPicture, gLegalPictureSize);
     UI_ShowPictureFadingIn(pPict, 180, 1.0f / 30.0f);
-    fn_80008380();
+    DL_vWaitForEndOfDrawing();
     Pict_Free(pPict);
     Circular_MemFreeFunc(gpLegalPicture);
     gpLegalPicture = NULL;
@@ -655,15 +649,15 @@ void UI_ShowPictureFadingIn(LLPict* pPict, int nFrames, f32 fStep) {
     int i;
 
     for (i = 0; i < nFrames; i++) {
-        fn_80006EDC();
+        Displ_FrameStart();
         fAlpha += fStep;
         if (fAlpha > 1.0f) {
             fAlpha = 1.0f;
         }
         UI_DrawFullScreenPicture(pPict, fAlpha);
-        fn_80006FE8();
-        fn_80007254();
-        fn_800083A0();
+        Displ_FrameEnd();
+        Displ_WaitFrameEmpty();
+        LLObj_FrameEmpty();
         Gaud_Cycle();
         DiscError_WaitForDrive();
     }
@@ -709,7 +703,7 @@ void UI_FreeTxf2BankPixels(void) {
 
     for (i = 0; i < FETM_NUM_BANKS; i++) {
         if (gUITxf2BankState[i].nFreeBeforeMovie > 0) {
-            fn_80008380();
+            DL_vWaitForEndOfDrawing();
             TX_vFreeTextureDataInTextureGroup(gFEtmBanks[i]);
         }
     }
