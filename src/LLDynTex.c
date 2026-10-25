@@ -270,13 +270,14 @@ void fn_8010A930(DynTexObj* pObj, u8* pBuf, f32 (*pMtx)[3], s32 nMode) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-s32 fn_8010AD10(DynTex* pTex) {
+s32 DynTex_GetNumTextures(DynTex* pTex) {
     return pTex->n8;
 }
 
 // ---- end of sweep code ----
 
-u64 fn_8010AD18(DynTex* pTex, int nTex) {
+// The name of texture nTex (DynTexEntry.uId), or 0 when nTex is out of range.
+u64 DynTex_GetTexIDByIndex(DynTex* pTex, int nTex) {
     if (nTex >= 0 && nTex < pTex->n8) {
         return pTex->p0[nTex].uId;
     }
@@ -413,8 +414,8 @@ s32 fn_8010B0C0(DynTexObj* pObj, DynTexPalette* pPal, DynTexEntry* pEntry) {
 }
 
 // New pixels for texture nTex (pPixels holds its blocks back to back), each block flushed to the
-// GPU; p and n are handed to fn_8010A930 when p is set.
-void fn_8010B1D4(DynTex* pTex, int nTex, u8* pPixels, void* p, s32 n) {
+// GPU; pMtx and nMode are handed to fn_8010A930 when pMtx is set.
+void DynTex_UpdateTexturePixels(DynTex* pTex, int nTex, u8* pPixels, void* pMtx, s32 nMode) {
     DynTexEntry* pEntry = &pTex->p0[nTex];
     DynTexObj* pObj = &pTex->p4->p8[nTex];
     s32 nBase = pObj->aBlocks[0].nOffset;
@@ -425,16 +426,17 @@ void fn_8010B1D4(DynTex* pTex, int nTex, u8* pPixels, void* p, s32 n) {
             memcpy(pTex->p18 + pObj->aBlocks[i].nOffset,
                    pPixels + (pObj->aBlocks[i].nOffset - nBase), pEntry->aC[i]);
         }
-        if (p != NULL) {
-            fn_8010A930(pObj, pTex->p18, p, n);
+        if (pMtx != NULL) {
+            fn_8010A930(pObj, pTex->p18, pMtx, nMode);
         }
         DCFlushRange(pTex->p18 + pObj->aBlocks[i].nOffset, pEntry->aC[i]);
         GXInvalidateTexAll();
     }
 }
 
-// A new palette for texture nTex.
-void fn_8010B2A8(DynTex* pTex, int nTex, s16* pPalette) {
+// A new palette for texture nTex (copied from pPalette when given), flushed to the GPU. pMtx and
+// nMode, as DynTex_UpdateTexturePixels takes them, are not read.
+void DynTex_UpdateTexturePalette(DynTex* pTex, int nTex, s16* pPalette, void* pMtx, s32 nMode) {
     DynTexEntry* pEntry = &pTex->p0[nTex];
     DynTexPalette* pPal = &pTex->p4->pC[nTex];
 
@@ -835,15 +837,13 @@ u8 fn_8010BFE0(void) {
             if (lbl_80282488->n980 == 1) {
                 // The last texture is all in: flush it (and its palette) to the GPU.
                 if (lbl_80282488->n978 != 0 && lbl_80282488->n970 > 0) {
-                    fn_8010B1D4(pTex, lbl_80282488->aUses[lbl_80282488->n970 - 1].nC, NULL,
-                                lbl_80282488->aUses[lbl_80282488->n970 - 1].p4,
-                                lbl_80282488->aUses[lbl_80282488->n970 - 1].n8);
+                    DynTex_UpdateTexturePixels(pTex, lbl_80282488->aUses[lbl_80282488->n970 - 1].nC,
+                                               NULL, lbl_80282488->aUses[lbl_80282488->n970 - 1].p4,
+                                               lbl_80282488->aUses[lbl_80282488->n970 - 1].n8);
                     if (pTex->p0[lbl_80282488->aUses[lbl_80282488->n970 - 1].nC].n1C != 0) {
-                        // port: EA passes two arguments fn_8010B2A8 ignores
-                        ((void (*)(DynTex*, int, s16*, void*, s32))fn_8010B2A8)(
-                            pTex, lbl_80282488->aUses[lbl_80282488->n970 - 1].nC, NULL,
-                            lbl_80282488->aUses[lbl_80282488->n970 - 1].p4,
-                            lbl_80282488->aUses[lbl_80282488->n970 - 1].n8);
+                        DynTex_UpdateTexturePalette(pTex, lbl_80282488->aUses[lbl_80282488->n970 - 1].nC,
+                                                    NULL, lbl_80282488->aUses[lbl_80282488->n970 - 1].p4,
+                                                    lbl_80282488->aUses[lbl_80282488->n970 - 1].n8);
                     }
                 }
                 if (lbl_80282488->n970 == lbl_80282488->n96C) {

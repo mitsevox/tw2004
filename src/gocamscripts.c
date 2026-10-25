@@ -72,7 +72,7 @@ void CamScript_PickArcDirection(CameraScriptSettings_t* pScript, f32* pSub, int 
                                 f32 fTime);
 u8   GameEffects_SimulateBall(int nPlayer);          // GameEffects.c: the ball is simulated from its position
 u8   Ter_CheckForGroundCollision(TGD_TerrainInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
-                                 TGD_MaterialInfo** ppSurface, TerObject** ppObj);
+                                 TGD_MaterialInfo** ppSurface, TGD_ObjectInstanceInfo** ppObj);
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0f (0x802830A8), before the constants CamScript_RunScript uses first; its body is unknown.
@@ -1841,7 +1841,7 @@ void CameraScript_UpdateLandingEstimate(CameraScriptSettings_t* pScript, int nPl
     f32 vUp[4];
     f32 vTarget[4];
     TGD_MaterialInfo* pSurface;
-    TerObject* pObj;
+    TGD_ObjectInstanceInfo* pObj;
     Ball* pBall;
     TGD_TerrainInfo* pCourse;
     f32 fRise;
@@ -2826,7 +2826,7 @@ u8 CamScript_KeepAboveGround(int nPlayer, f32* pNew, f32* pOld, u8 bCheckPath, u
     f32 vNormal[4];
     TGD_MaterialInfo* aSurfaces[20];
     f32 aHeights[20];
-    TerObject* pObj;
+    TGD_ObjectInstanceInfo* pObj;
     TGD_TerrainInfo* pCourse = Ter_GetTGD();
     u8 bCrossed = 0;
     u32 nHeights;
@@ -2971,7 +2971,7 @@ u8 CameraScript_WillGolferBeOccludedInThisView(int nPlayer, CamShot* pShot, Came
     f32 vCam[4] = {0.0f, 0.0f, 0.0f, 0.0f};
     f32 vSub[4] = {0.0f, 0.0f, 0.0f, 0.0f};
     f32 vGolfer[4];
-    TerObject* pObj;
+    TGD_ObjectInstanceInfo* pObj;
     TGD_MaterialInfo* pSurface;
 
     if (pCourse == NULL) return 0;

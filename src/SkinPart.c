@@ -1279,9 +1279,9 @@ void SkinPart_DropUnusedTextures(Skin** apSkins, int nSkins, DynTex* pTex) {
 
     if (pTex == NULL) return;
     nList = SkinPart_ListChosenTextures(apSkins, nSkins, &pList, NULL, 0, 2);
-    n = fn_8010AD10(pTex);
+    n = DynTex_GetNumTextures(pTex);
     for (i = 0; i < n; i++) {
-        uId = fn_8010AD18(pTex, i);
+        uId = DynTex_GetTexIDByIndex(pTex, i);
         if (uId != 0 && !SkinPart_TexListHas(uId, pList, nList)) {
             fn_8010AD50(pTex, uId);
         }

@@ -85,4 +85,9 @@ LAYOUT_ASSERT(TGD_MaterialInfo, 0x44);
 
 #define NUM_SURFACE_TYPES 156   // rows in gSurfaceTypes
 
+// The flagstick's row of gSurfaceTypes: the surface Ter_CheckForPinCollision gives a ball that hits
+// the stick. A hit on it fires the flagstick's event (EVENT_CollisionPin), and a ball in the air
+// that hits it loses its spin (Physics_CheckTerrainCollisions).
+#define SURFACE_FLAGSTICK 90
+
 #endif

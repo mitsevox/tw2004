@@ -500,7 +500,7 @@ void EVENT_CollisionTree(int nPlayer, int nEvent, void* pData, int nArg) {
     Collision(nPlayer, nEvent, pData, nArg);
 }
 
-// Event 38 (Ball.c: the ball hits surface 90, the flagstick): Collision.
+// Event 38 (Ball.c: the ball hits the flagstick, SURFACE_FLAGSTICK): Collision.
 void EVENT_CollisionPin(int nPlayer, int nEvent, void* pData, int nArg) {
     Collision(nPlayer, nEvent, pData, nArg);
 }
