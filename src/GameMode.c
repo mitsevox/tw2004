@@ -389,7 +389,7 @@ void GM_PlayerAddStroke(int nPlayer) {
 // gets shot kind 6. Out of bounds, or a drop on a surface with uFlags bit 1, costs a stroke: the
 // penalty mark (bPenaltyShot) is set, nOBCount counts penalties in a row (a CPU gets 25 points of
 // attributes per level, and concedes after three), the stroke is added (and reported to a PGA TOUR
-// event) and message 0xD (water, surface class 7/16) or 2 is shown; 1 is returned, but 0 once the
+// event) and message 0xD (water) or 2 is shown; 1 is returned, but 0 once the
 // mode's 10-stroke limit is reached (modes 7 and 8 return 1 straight after the stroke). A free drop
 // returns 0; a shot with neither resets nOBCount and returns 0.
 u8 GM_CheckForBallOOB(int nPlayer) {
@@ -401,7 +401,7 @@ u8 GM_CheckForBallOOB(int nPlayer) {
     if (pSurf == NULL) {
         bOut  = 1;
         bDrop = 0;
-    } else if ((pSurf->uFlags & 1) && !Ter_PointInFreeDropNetwork(pBall->vPos)) {
+    } else if ((pSurf->uFlags & MATERIAL_BALL_CAN_LIE) && !Ter_PointInFreeDropNetwork(pBall->vPos)) {
         bDrop = 0;
     } else {
         bDrop = 1;
@@ -428,7 +428,8 @@ u8 GM_CheckForBallOOB(int nPlayer) {
                 }
                 return 0;
             }
-            if (pSurf != NULL && (pSurf->nClass == 7 || pSurf->nClass == 16)) {
+            if (pSurf != NULL
+                && (pSurf->nClass == SURFCLASS_WATER_e || pSurf->nClass == SURFCLASS_WATER_OOB_e)) {
                 GUI_StartPostShotUI(0xD, nPlayer, 0.0f);
             } else {
                 GUI_StartPostShotUI(2, nPlayer, 0.0f);
@@ -480,7 +481,7 @@ void GM_ShowYardage(int nPlayer) {
 
 // With the mode's obstruction relief on (bBumpObstructions), a ball off the tee that rests against
 // an object or hazard (within 1.5, Ter_CheckObjectAndHazardObstruction) is dropped at a legal point
-// nearby, or else put back where it was before the shot (vPreShot) and, when vA44 matches vBall in
+// nearby, or else put back where it was before the shot (vPreShot) and, when vTeePos matches vBall in
 // x and z, set up there again (Physics_InitBall).
 void GM_BumpBallForObstructions(int nPlayer) {
     int n;                      // fake match: a copy of nPlayer for the register order (permuter)
@@ -498,8 +499,8 @@ void GM_BumpBallForObstructions(int nPlayer) {
                     return;
                 }
                 Physics_DropBall(pBall, gPlayers[nPlayer].vPreShot);
-                if (gPlayers[n].vA44[0] == gPlayers[n].vBall[0] &&
-                    gPlayers[n].vA44[2] == gPlayers[n].vBall[2]) {
+                if (gPlayers[n].vTeePos[0] == gPlayers[n].vBall[0] &&
+                    gPlayers[n].vTeePos[2] == gPlayers[n].vBall[2]) {
                     Physics_InitBall(pBall, gPlayers[nPlayer].vPreShot, n);
                 }
             }
@@ -678,7 +679,7 @@ int GM_DoPreshotAnimation(int nPlayer) {
 // Whether the golfer plays a reaction after the shot. Never when GM_IsValidPostShotGameType says
 // no, on course 18's 10th within 40 yards of the tee, or for character group 11 when the ball
 // started on surface 45. Where the animation would leave the golfer: never with no ground there,
-// out of bounds, on a surface without uFlags bit 0, in water (class 7/16), or on a slope steeper than
+// out of bounds, on a surface without uFlags bit 0, in water, or on a slope steeper than
 // 0.1 with the ground more than 0.2 below the ball. With session flags 0x4000 and 0x8000 both set:
 // only when holed, from surface 16, or for outcomes 1 and 2. Then: with bPlanReady only for outcome
 // 2; always when GameEffects_IsGameBreakerOn says so or animation 9 is playing; with a scripted
@@ -749,8 +750,9 @@ int GM_ShowPostShotAnimation(int nPlayer) {
         } else {
             fSlope = 0.0f;
         }
-        if (!Ter_PointInOOBNetwork(vPos) || (pSurf != NULL && !(pSurf->uFlags & 1)) || pSurf->nClass == 7 ||
-            pSurf->nClass == 16 || (fabsf(fSlope) > 0.1f && fRise > 0.2f)) {
+        if (!Ter_PointInOOBNetwork(vPos) || (pSurf != NULL && !(pSurf->uFlags & MATERIAL_BALL_CAN_LIE))
+            || pSurf->nClass == SURFCLASS_WATER_e ||
+            pSurf->nClass == SURFCLASS_WATER_OOB_e || (fabsf(fSlope) > 0.1f && fRise > 0.2f)) {
             return 0;
         }
     }
@@ -862,7 +864,7 @@ f32 GM_GetGolferDistanceToPin(int nPlayer) {
 
 // A ball that must be dropped (b30E), or one in bounds (Ter_PointInOOBNetwork) after a shot with no
 // penalty, is dropped at a legal point nearby when there is one. Otherwise (out of bounds, or after
-// a penalty) it goes back where it was before the shot (vPreShot) and, when vA44 matches vBall in x
+// a penalty) it goes back where it was before the shot (vPreShot) and, when vTeePos matches vBall in x
 // and z, is set up there again (Physics_InitBall).
 void GM_ReplaceOOBBall(int nPlayer) {
     f32   v[4];
@@ -877,15 +879,15 @@ void GM_ReplaceOOBBall(int nPlayer) {
     pBall = &gPlayers[nPlayer].ball;
     pPre  = gPlayers[nPlayer].vPreShot;
     Physics_DropBall(pBall, pPre);
-    if (gPlayers[nPlayer].vA44[0] == gPlayers[nPlayer].vBall[0] &&
-        gPlayers[nPlayer].vA44[2] == gPlayers[nPlayer].vBall[2]) {
+    if (gPlayers[nPlayer].vTeePos[0] == gPlayers[nPlayer].vBall[0] &&
+        gPlayers[nPlayer].vTeePos[2] == gPlayers[nPlayer].vBall[2]) {
         Physics_InitBall(pBall, pPre, nPlayer);
     }
 }
 
 // A ball in a lateral water hazard (GameMode8 calls it when the penalty was water, surface class
 // 7): dropped at a legal point nearby when there is one, otherwise put back where it was before the
-// shot and, when vA44 matches vBall in x and z, set up there again. GM_ReplaceOOBBall without its
+// shot and, when vTeePos matches vBall in x and z, set up there again. GM_ReplaceOOBBall without its
 // in-bounds test.
 void GM_ReplaceLateralHazardBall(int nPlayer) {
     f32   v[4];
@@ -898,8 +900,8 @@ void GM_ReplaceLateralHazardBall(int nPlayer) {
     pBall = &gPlayers[nPlayer].ball;
     pPre  = gPlayers[nPlayer].vPreShot;
     Physics_DropBall(pBall, pPre);
-    if (gPlayers[nPlayer].vA44[0] == gPlayers[nPlayer].vBall[0] &&
-        gPlayers[nPlayer].vA44[2] == gPlayers[nPlayer].vBall[2]) {
+    if (gPlayers[nPlayer].vTeePos[0] == gPlayers[nPlayer].vBall[0] &&
+        gPlayers[nPlayer].vTeePos[2] == gPlayers[nPlayer].vBall[2]) {
         Physics_InitBall(pBall, pPre, nPlayer);
     }
 }
@@ -1151,7 +1153,7 @@ int GM_ChooseRemoveBallState(int nPlayer) {
         return 0;
     }
     if (gPlayers[nPlayer].ball.nStartSurface < 0 || gPlayers[nPlayer].ball.nStartSurface >= 156 ||
-        gSurfaceTypes[gPlayers[nPlayer].ball.nStartSurface].nClass != 3) {
+        gSurfaceTypes[gPlayers[nPlayer].ball.nStartSurface].nClass != SURFCLASS_GREEN_e) {
         return 0;
     }
     if (gPlayers[nPlayer].uFlags & 1) {

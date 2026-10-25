@@ -142,6 +142,8 @@ typedef struct UObjMeshInfo {
                                     // sway, a crowd's or an animal's pose blend)
 #define UOBJMESH_F0_POSES      0x02 // with UOBJMESH_F0_ANIMATED, by poses: a child mesh is drawn in
                                     // its place (the crowd)
+#define UOBJMESH_F0_NO_FADE    0x40 // a course object that stays solid near the camera instead of
+                                    // fading (GoTerrain.c Ter_BuildObjectDrawLists)
 // UObjMeshInfo.aFlags[2] of an object's mesh (a terrain patch's ground uses the byte otherwise).
 #define UOBJMESH_F2_POSE_KIND0 0x01 // } with UOBJMESH_F0_ANIMATED, the other two kinds of poses
 #define UOBJMESH_F2_POSE_KIND1 0x02 // }   (an animal's kinds 0 and 1): a child mesh is drawn too
@@ -519,7 +521,7 @@ extern MemPoolPtr gKernelLargeObjectPool;
 void fn_800075CC(UObjModelRoot* pRoot);    // frees a model fn_800073B4 made
 
 // GoDynObj.c
-void DynObj_PitchMarkAdd(f32* pPos, int nPlayer);  // a fast ball landing on the green (class 3)
+void DynObj_PitchMarkAdd(f32* pPos, int nPlayer);  // a fast ball landing on SURFCLASS_GREEN_e
                                                    // leaves a pitch mark ('TEO ' 10005)
 void DynObj_ShotDivotHoleAdd(f32* pPos, int nPlayer);  // put the player's divot hole ('TEO ' 10001) at pPos
 void DynObj_DivotAdd(f32* pPos, int nPlayer);  // put the player's divot ('TEO ' 10002) at pPos

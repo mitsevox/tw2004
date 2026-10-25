@@ -1991,7 +1991,7 @@ void STATEFUNC_PlaceBallInit(int nPlayer) {
 }
 
 // State 22 every frame. Button 35 with the "ball can be placed" flag: the ball is dropped at the
-// placement point (a class-1 surface gets Physics_InitBall too), vBall follows it, and it is state
+// placement point (the tee box gets Physics_InitBall too), vBall follows it, and it is state
 // 1 (pre-shot). Otherwise the cursor moves, buttons 26..29 fire events 0x16..0x19, and button 25
 // off the tee takes a mulligan (if allowed).
 void STATEFUNC_PlaceBallUpdate(int nPlayer) {
@@ -2001,7 +2001,7 @@ void STATEFUNC_PlaceBallUpdate(int nPlayer) {
         if (p->uFlagsEF0 & 1) {
             pBall = &p->ball;
             if (Physics_DropBall(pBall, p->vPlacement)) {
-                if (gSurfaceTypes[gPlayers[nPlayer].ball.nSurface].nClass == 1) {
+                if (gSurfaceTypes[gPlayers[nPlayer].ball.nSurface].nClass == SURFCLASS_TEE_e) {
                     Physics_InitBall(pBall, pBall->vPos, nPlayer);
                 }
                 LLMath_CopyVec(pBall->vPos, p->vBall);

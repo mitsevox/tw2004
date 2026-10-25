@@ -136,7 +136,7 @@ void GameModeReplay_SetupNextGolfer(void) {
     LLMath_CopyVec(gReplayData.player.vTarget, gPlayers[0].vTarget);
     LLMath_CopyVec(gReplayData.player.vTargetCopy, gPlayers[0].vTargetCopy);
     LLMath_CopyVec(gReplayData.player.vTarget2, gPlayers[0].vTarget2);
-    LLMath_CopyVec(gReplayData.player.vA44, gPlayers[0].vA44);
+    LLMath_CopyVec(gReplayData.player.vTeePos, gPlayers[0].vTeePos);
     gPlayers[0].nStrokes[Game_CurHoleIndex()] = gReplayData.nStrokes;
     gPlayers[0].fDistance = gReplayData.player.fDistance;
     gPlayers[0].fDistance2 = gReplayData.player.fDistance2;

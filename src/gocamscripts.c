@@ -68,8 +68,6 @@ u8   CamScript_IngoreCameraCollisionSurface(int n);
 u8   CamScript_PlayableSurface(TGD_MaterialInfo* pSurface);
 void fn_800386F0(int n, f32* pVec);
 f32  CamScript_GetFlybyCamRate(CamShot* pShot, f32 fA, f32 fB, f32 fTime);
-u8   Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bHazards, f32 fStep,
-                                         u8 bSlope, f32 fMaxSlope);   // GoTerrainCollision.c
 void CamScript_PickArcDirection(CameraScriptSettings_t* pScript, f32* pSub, int nPlayer, f32* pPrev,
                                 f32 fTime);
 u8   GameEffects_SimulateBall(int nPlayer);          // GameEffects.c: the ball is simulated from its position
@@ -2759,7 +2757,8 @@ f32 CamScript_GuessBestPlayableHeight(f32* pPos, TGD_MaterialInfo** ppSurface) {
     return fTop;
 }
 
-// The surface is ground the camera stands on: classes 1..12 but 9 and 10, and 18.
+// The surface is ground the camera stands on: SURFCLASS_TEE_e to SURFCLASS_CUP_e but
+// SURFCLASS_OFF_LIMITS_e and SURFCLASS_OTHER_e, and SURFCLASS_CUP_GREEN_e.
 u8 CamScript_PlayableSurface(TGD_MaterialInfo* pSurface) {
     u32 nClass;
 
@@ -2767,16 +2766,16 @@ u8 CamScript_PlayableSurface(TGD_MaterialInfo* pSurface) {
         return 0;
     }
     nClass = pSurface->nClass;
-    if (nClass == 10) {
+    if (nClass == SURFCLASS_OTHER_e) {
         return 0;
     }
-    if (nClass == 9) {
+    if (nClass == SURFCLASS_OFF_LIMITS_e) {
         return 0;
     }
-    if (nClass >= 1 && nClass <= 12) {
+    if (nClass >= SURFCLASS_TEE_e && nClass <= SURFCLASS_CUP_e) {
         return 1;
     }
-    if (nClass == 18) {
+    if (nClass == SURFCLASS_CUP_GREEN_e) {
         return 1;
     }
     return 0;

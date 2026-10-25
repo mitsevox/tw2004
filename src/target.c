@@ -579,17 +579,19 @@ void fn_800691B0(int nPlayer) {
 }
 
 // Whether a ball may be placed at pPos: in bounds, not in a free-drop area, on ground that takes
-// a ball (not water, 7 and 16, or the cup, 12) and flat enough (the normal's y above cos 30);
-// then class 1 always, else a valid drop surface or a spot with no object or hazard near it.
+// a ball (not SURFCLASS_WATER_e, SURFCLASS_WATER_OOB_e or SURFCLASS_CUP_e) and flat enough (the
+// normal's y above cos 30); then the tee box always, else a valid drop surface or a spot with no
+// object or hazard near it.
 u8 PlaceBall_IsValidDropLocation(f32* pPos) {
     TGD_MaterialInfo* pSurface;
     f32          vNormal[4];
 
     Ter_GetSupportingGroundData(Ter_GetTGD(), pPos, &pSurface, vNormal);
     if (Ter_PointInOOBNetwork(pPos) && !Ter_PointInFreeDropNetwork(pPos) && pSurface != NULL
-        && (pSurface->uFlags & 1) && pSurface->nClass != 7 && pSurface->nClass != 16 && pSurface->nClass != 12
+        && (pSurface->uFlags & MATERIAL_BALL_CAN_LIE) && pSurface->nClass != SURFCLASS_WATER_e
+        && pSurface->nClass != SURFCLASS_WATER_OOB_e && pSurface->nClass != SURFCLASS_CUP_e
         && fabsf(vNormal[1]) > 0.86603f) {
-        if (pSurface->nClass == 1 || Ter_IsValidDropSurface(pSurface - gSurfaceTypes)
+        if (pSurface->nClass == SURFCLASS_TEE_e || Ter_IsValidDropSurface(pSurface - gSurfaceTypes)
             || !Ter_CheckObjectAndHazardObstruction(pPos, 1.5f, 0, 1, 2.0f, 1, 0.577f)) {
             return 1;
         }
@@ -665,32 +667,32 @@ u8 PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed) {
     if (GM_GetModeType() != GM_Practice_mode) {
         pSurface = Ter_GetSupportingWorldMaterial(gPlayers[nPlayer].ball.pCourse,
                                                   gPlayers[nPlayer].vPlacement);
-        switch (pSurface != NULL ? pSurface->nClass : 0) {
-        case 1:
-        case 2:
-        case 3:
-        case 4:
+        switch (pSurface != NULL ? pSurface->nClass : SURFCLASS_NONE_e) {
+        case SURFCLASS_TEE_e:
+        case SURFCLASS_FAIRWAY_e:
+        case SURFCLASS_GREEN_e:
+        case SURFCLASS_FRINGE_e:
             fGround = 1.0f;
             break;
-        case 5:
-        case 20:
+        case SURFCLASS_ROUGH_e:
+        case SURFCLASS_SAND_KEEPS_ROW_e:
             fGround = 0.85f;
             break;
-        case 11:
+        case SURFCLASS_THICK_ROUGH_e:
             fGround = 0.7f;
             break;
-        case 6:
+        case SURFCLASS_SAND_e:
             fGround = 0.5f;
             break;
-        case 7:
-        case 15:
-        case 16:
+        case SURFCLASS_WATER_e:
+        case SURFCLASS_HIDES_BALL_e:
+        case SURFCLASS_WATER_OOB_e:
             fGround = 0.5f;
             break;
-        case 8:
+        case SURFCLASS_CARTPATH_e:
             fGround = 1.2f;
             break;
-        case 19:
+        case SURFCLASS_NOT_PLAYABLE_e:
             if (pSurface->f20 <= 0.9f) {
                 fGround = 1.0f;
             } else if (pSurface->f20 <= 1.0f) {
@@ -978,7 +980,7 @@ void PlaceBall_RenderBallTarget(int nPlayer) {
         fn_8006A988(vPos, gPlayers[nPlayer].ball.vPos, vBallDir);
         fBallDist = Math_Sqrt(vBallDir[0] * vBallDir[0] + vBallDir[2] * vBallDir[2]);
     } else {
-        fn_8006A988(vPos, gPlayers[nPlayer].vA44, vTeeDir);
+        fn_8006A988(vPos, gPlayers[nPlayer].vTeePos, vTeeDir);
         fTeeDist = Math_Sqrt(vTeeDir[0] * vTeeDir[0] + vTeeDir[2] * vTeeDir[2]);
     }
     fn_8006A988(vPos, gpGame->pPinPos, vHoleDir);

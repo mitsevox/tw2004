@@ -58,10 +58,10 @@ LAYOUT_ASSERT(TGD_Cell, 0xC);
 typedef struct TerObject {
     f32  vCentre[3];            // 0x00  TW06: fBoundingSphereOrigin
     f32  fRadius;               // 0x0C  TW06: fBoundingSphereRadius
-    f32  vBase[3];              // 0x10  TW06: fBoundingCylinderBase
-    f32  fBaseRadius;           // 0x1C  TW06: fBoundingCylinderRadius
-    u16  nPatch;                // 0x20  TW06: uiPatchNum
-    u16  nObjList;              // 0x22  TW06: uiObjectListNum
+    f32  vBase[3];              // 0x10  the centre of the object's base
+    f32  fBaseRadius;           // 0x1C  the base's radius
+    u16  nPatch;                // 0x20  the patch holding its model (Ter_GetObjectListModel)
+    u16  nObjList;              // 0x22  its model's object list in that patch
 } TerObject;
 
 // One of a hole's lights as the course data stores it (TW07: TGD_LightDesc).
@@ -80,7 +80,7 @@ typedef struct TGD_LightingData {
     TGD_LightDesc aLight[5];    // 0x10
 } TGD_LightingData;
 
-// The optional block at TGD_TerrainInfo.p3C: what Ter_CourseLoadCallback hands the glows (glows.h)
+// The optional block at TGD_TerrainInfo.pGlow: what Ter_CourseLoadCallback hands the glows (glows.h)
 // when a hole is loaded; without it the glows get 0.8, 0.8, 0.4 / 0, 150, -400 / 1.
 typedef struct CourseGlowBlock {
     f32  v0[3];                 // 0x00  to SF_vSetSunPosition (GlowState.v4), and gSession.f5B3C..f5B44
@@ -116,14 +116,14 @@ typedef struct TGD_TerrainInfo {
     u8*    pLight;              // 0x30  per vertex: the light on the ground there, 0..255
                                 //       (Ter_GetAmbientLight)
     TGD_Cell* pGrid;            // 0x34  nGridWidth x nGridLength cells, row by row
-    TGD_FoggingData* p38;      // 0x38  four optional blocks (NULL when absent); TW06 has its fog, sun,
-    struct CourseGlowBlock* p3C;    // 0x3C    sky and lighting data in the same place. fn_800A27FC uses
-    u8*    p40;                 // 0x40    p38 without a test, p44 only when it is set
-    TGD_FoggingData* p44;      // 0x44
-    TerObject* pObjects;        // 0x48  the course objects. TW06: pObjectInstanceTable (0x54)
+    TGD_FoggingData* pFog;      // 0x38  four optional blocks, NULL when absent. The hole's fog
+                                //       (light sets 0 to 2; fn_800A27FC uses it without a test)
+    struct CourseGlowBlock* pGlow;  // 0x3C  what the glows get (Ter_CourseLoadCallback)
+    u8*    pUnread;             // 0x40  made a pointer (Ter_InitTGD), never read
+    TGD_FoggingData* pRainFog;  // 0x44  the fog of light set 2 when rain starts (fn_800A27FC)
+    TerObject* pObjects;        // 0x48  the course objects
     TGD_PolygonReference* pPolyRefs;   // 0x4C  the strips, listed cell by cell (TGD_Cell.uRefs)
-    u16*   pObjRefs;            // 0x50  per cell, the objects in it (indices). TW06: pObjectReferenceList
-                                //       (0x5C)
+    u16*   pObjRefs;            // 0x50  per cell, the objects in it (indices)
     u8     unk54[0x60 - 0x54];
     f32    v60[3];              // 0x60  the hole's own gSession.f5B3C..f5B44 when not all 0
                                 //       (Ter_CourseLoadCallback)
@@ -160,7 +160,7 @@ typedef struct Ball {
     // Field names in the comments after "TW06:" are from Tiger Woods PGA Tour 06's PhysicsBall_t
     // (0xCC bytes; see include/physics.h). TW06 added terrainHeight at 0x58, so from there on its
     // offsets are 4 higher, and it folded the u8 flags at 0x98 into one bit field.
-    f32  vPos[3];               // 0x00  TW06: location
+    f32  vPos[3];               // 0x00  where the ball is
     u8   unkC[4];
     f32  vPrev[3];              // 0x10  position last step. TW06: lastLocation
     u8   unk1C[4];
@@ -168,7 +168,7 @@ typedef struct Ball {
     f32  f2C;                   // 0x2C
     f32  vSpin[3];              // 0x30  TW06: angularVelocity
     f32  f3C;                   // 0x3C
-    f32  vStart[3];             // 0x40  where the shot started. TW06: initialShotPosition
+    f32  vStart[3];             // 0x40  where the shot started
     u8   unk4C[4];
     f32  fSpeed;                // 0x50  TW06: speed
     f32  fHeight;               // 0x54  height above the ground when dropped. TW06: altitude
@@ -185,7 +185,7 @@ typedef struct Ball {
     f32  fLieModifier;          // 0x70  the random lie quality (Physics_SetLie: up to +- the surface's
                                 //       f04, less with LUCK), added to its f00 at launch. TW06:
                                 //       lieModifier (next after lieAngle)
-    s32  nSurface;              // 0x74  surface type under the ball (90 = the cup). TW06: surfaceID
+    s32  nSurface;              // 0x74  surface type under the ball (90 = the cup)
     s32  nStartSurface;         // 0x78  surface at the start of the shot. TW06: initialSurfaceID
     TGD_TerrainInfo* pCourse;        // 0x7C  TW06: pTerrainData (TGD_TerrainInfo*)
     s32  nCollideCount;         // 0x80  TW06: collideCount
@@ -202,7 +202,8 @@ typedef struct Ball {
                                 //       set). TW06: PBF_HitTopArc
     u8   bSpinApplied;          // 0x9B  the spin-stick input went into the spin at that bounce
                                 //       (event 0x1F); 1 from the start for a putt
-    u8   bGotFirstSandPos;      // 0x9C  landed in sand (class 6) this shot. TW06: PBF_GotFirstSandPos
+    u8   bGotFirstSandPos;      // 0x9C  landed in sand (SURFCLASS_SAND_e) this shot.
+                                //       TW06: PBF_GotFirstSandPos
     u8   unk9D[0xA0 - 0x9D];
     f32  vFirstSandPos[3];      // 0xA0  where it first landed in sand. TW06: firstSandPosition
     f32  fAC;                   // 0xAC  ticks spent with no ground under a rolling ball
@@ -307,9 +308,6 @@ u8   Network_LineNetworkIntersection(f32* start, f32* end, TNetwork* network, s3
 u8   Network_RayNetworkDoesIntersect(f32* start, f32* end, TNetwork* network, s32 n);
 TGD_TerrainInfo* Ter_GetTGD(void);          // the current hole's terrain data, NULL until loaded
 
-// GoTerrainCollision.c
-s32  Ter_iNumOOBNetworksLoaded(void);
-
 // target.c: placing the ball (TW06's PlaceBall_* functions, names not proven here)
 u8   PlaceBall_IsValidDropLocation(f32* pPos);            // a ball may be placed here. TW06:
                                                           // PlaceBall_IsValidDropLocation?
@@ -331,24 +329,31 @@ f32  Ter_GetSupportingGroundTriangle(TGD_TerrainInfo* pTerrainData, f32* locatio
 TGD_MaterialInfo* Ter_GetSupportingGroundMaterial(TGD_TerrainInfo* pTerrainData, f32* location);
 
 // GoTerrainCollision (TW06's goterraincollision.c; types from its definitions)
-void Ter_InitTGD(TGD_TerrainInfo* pCourse);          // TW06: Ter_InitTGD, readies a loaded course's data
+void Ter_Init(void);                            // registers the outline loaders (a round starts)
+void Ter_InitTGD(TGD_TerrainInfo* pTerrainData);     // readies a loaded course's data
 u8   Ter_Use3DCupGeometry(void);               // the cup is real geometry the ball drops into
-u8   Ter_PointInFreeDropNetwork(f32* pPos);    // inside a free-drop area
-u8   Ter_PointInOOBNetwork(f32* pPos);         // inside the in-bounds outlines (always, with none loaded)
-u8   Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bHazards, f32 fStep, u8 bSlope,
-                                         f32 fMaxSlope);
-u8   Ter_SearchForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut);   // where to drop the ball
-f32  Ter_CheckForDropLocation(TGD_TerrainInfo* pCourse, f32* pPos, u8 bOnDropSurface, u8* pbDrop,
-                              u8* pbPreferred,
-                              TGD_MaterialInfo** ppSurface);   // whether a ball could be dropped at a point
-u8   Ter_IsValidDropSurface(s32 nSurface);
+s32  Ter_iNumOOBNetworksLoaded(void);
+u8   Ter_PointInFreeDropNetwork(f32* location);    // inside a free-drop area
+u8   Ter_PointInOOBNetwork(f32* location);     // inside the in-bounds outlines (always, with none loaded)
+// The segment crosses an in-bounds outline (at intersect).
+u8   Ter_CollisionWithOOBNetwork(f32* start, f32* end, f32* intersect);
+// Something spoils the spot for a ball: an object near it, or (as asked) its lie or slope.
+u8   Ter_CheckObjectAndHazardObstruction(f32* position, f32 obstructionDistance, u8 bOnlyCheckNonFadingObjects,
+                                         u8 bCheckLie, f32 hazardDistance, u8 bCheckHeight, f32 fMaxSlope);
+// Where to drop the player's ball; 0 when that is where the shot started, or (bRevertToTee) near the tee.
+u8   Ter_SearchForDropLocation(int PlayerID, u8 bUsePreferredLies, u8 bRevertToTee, f32* dropPosition);
+// Whether a ball could be dropped at a point (and with a preferred lie); returns the ground's height.
+f32  Ter_CheckForDropLocation(TGD_TerrainInfo* pTerrainData, f32* location, u8 networksOnly,
+                              u8* pbIsAcceptable, u8* pbIsPreferred, TGD_MaterialInfo** pDropMaterial);
+u8   Ter_IsValidDropSurface(s32 surfaceID);    // a green or cup surface type
 u8   Ter_GetSupportingGroundNormal(TGD_TerrainInfo* pCourse, f32* pPos, f32* pNormal);   // 0 with no ground
 u8   Ter_PointInTriangleXZpY(f32* pA, f32* pB, f32* pC, f32 fX, f32 fZ);   // (x, z) lies inside the triangle
 // a point's weights in a triangle
 void Ter_GetBarycentricCoords(f32 (*pTri)[3], f32* pPos, f32* pA, f32* pB, f32* pC);
 f32  Ter_GetHighestGroundHeight(TGD_TerrainInfo* pCourse, f32* pPos);   // ground height, -65536.1 if none
 f32  Ter_GetLowestGroundHeight(TGD_TerrainInfo* pCourse, f32* pPos);   // ground height (GoTerrainCollision.c)
-f32  Ter_GetAmbientLight(TGD_TerrainInfo* pCourse, f32* pPos);   // the ground's light at a point, 0..1
+// the ground's light at a point, 0..1
+f32  Ter_GetAmbientLight(TGD_TerrainInfo* pTerrainData, f32* position);
 // Every ground height under and over pPos (up to nMax), with its surface; returns how many.
 u32  Ter_GetTerrainLayers(TGD_TerrainInfo* pCourse, f32* pPos, TGD_MaterialInfo** ppSurfaces, f32* pHeights,
                           u32 nMax);

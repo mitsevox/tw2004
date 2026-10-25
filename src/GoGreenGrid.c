@@ -174,23 +174,25 @@ u8 GR_ShouldDrawGrid(int nPlayer) {
     return GR_PlayerIsTargetingGreen(nPlayer);
 }
 
-// Whether the ground under the player's target (Player.nSurface) is of class 3 (green), 4 (fringe),
-// 12 (the cup) or 18 (green).
+// Whether the ground under the player's target (Player.nSurface) is the green, the fringe, the cup
+// or the green at the cup.
 u8 GR_PlayerIsTargetingGreen(int nPlayer) {
     int bOn = 0;
     int nSurface;
     nSurface = gPlayers[nPlayer].nSurface;
     // EA bug: only the first test checks for no surface (-1); the others read the row before
     // gSurfaceTypes.
-    if ((nSurface >= 0 && gSurfaceTypes[nSurface].nClass == 3) || gSurfaceTypes[nSurface].nClass == 4
-        || gSurfaceTypes[nSurface].nClass == 12 || gSurfaceTypes[nSurface].nClass == 18) {
+    if ((nSurface >= 0 && gSurfaceTypes[nSurface].nClass == SURFCLASS_GREEN_e)
+        || gSurfaceTypes[nSurface].nClass == SURFCLASS_FRINGE_e
+        || gSurfaceTypes[nSurface].nClass == SURFCLASS_CUP_e
+        || gSurfaceTypes[nSurface].nClass == SURFCLASS_CUP_GREEN_e) {
         bOn = 1;
     }
     return bOn;
 }
 
 // Samples the ground height under up to four more of the view's grid points (a frame's share),
-// first laying the grid out again if the player's target has moved. Points on ground of class 12
+// first laying the grid out again if the player's target has moved. Points on SURFCLASS_CUP_e ground
 // are lifted by a ninth.
 void GR_UpdateGreenGrid(int nView) {
     int n;
@@ -233,7 +235,7 @@ void GR_UpdateGreenGrid(int nView) {
         vPoint[3] = 1.0f;
         gpGreenGrid->apHeight[nView][n] =
             Ter_GetSupportingGroundData(pCourse, vPoint, &pSurface, vNormal);
-        if (pSurface != NULL && pSurface->nClass == 12) {
+        if (pSurface != NULL && pSurface->nClass == SURFCLASS_CUP_e) {
             gpGreenGrid->apHeight[nView][n] += 1.0f / 9.0f;
         }
         nSteps++;

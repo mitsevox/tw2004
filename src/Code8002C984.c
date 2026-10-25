@@ -123,7 +123,7 @@ f32 Shot_AimAngle(int nPlayer) {
 
 // ---- ground probes ------------------------------------------------------------------------------
 
-// Is the ground fDist from the ball toward the pin of class 3 (the green)? True when the ball is
+// Is the ground fDist from the ball toward the pin the green (SURFCLASS_GREEN_e)? True when the ball is
 // on the pin. The CPU putts when the green starts within 1.5 and may chip when within 5.
 u8 AI_GreenTowardPin(int nPlayer, f32 fDist) {
     u8          bGreen  = 0;
@@ -147,7 +147,7 @@ u8 AI_GreenTowardPin(int nPlayer, f32 fDist) {
     if (fHeight != TER_NO_GROUND) {
         vDir[1]  = 10.0f + fHeight;
         pSurface = Ter_GetSupportingGroundMaterial(pCourse, vDir);
-        if (pSurface->nClass == 3) {
+        if (pSurface->nClass == SURFCLASS_GREEN_e) {
             bGreen = 1;
         }
     }

@@ -387,14 +387,14 @@ typedef enum CameraClubType_e {
 // the ball's lies (DynamicCam_BallLieToCameraLie) and the surface classes
 // (DynamicCam_MaterialToCameraLie) fall into these.
 typedef enum CameraLie_e {
-    CAMLIE_NONE = 0,            // surface class 0, or one past 19
-    CAMLIE_TEE = 1,             // the tee (a ball on it, or surface class 1 under a ball on LIE_TEE_e)
+    CAMLIE_NONE = 0,            // SURFCLASS_NONE_e, or a class past SURFCLASS_NOT_PLAYABLE_e
+    CAMLIE_TEE = 1,             // the tee (a ball on it, or SURFCLASS_TEE_e under a ball on LIE_TEE_e)
     CAMLIE_FAIRWAY = 2,         // the fairway and the fringe
     CAMLIE_ROUGH = 3,           // the roughs, the cart path, trees and the other surface classes
     CAMLIE_SAND = 4,            // the bunkers
     CAMLIE_WATER = 5,           // water, ice and snow
     CAMLIE_GREEN = 6,           // the green and the cup
-    CAMLIE_OUT_OF_BOUNDS = 7    // out of bounds, and surface class 19 (not playable)
+    CAMLIE_OUT_OF_BOUNDS = 7    // out of bounds, and SURFCLASS_NOT_PLAYABLE_e
 } CameraLie_e;
 
 // The shots a camera sequence is for (CameraSequence_t.nShotType; DynamicCam_MatchSeqShot), by the
@@ -1122,7 +1122,7 @@ CamShot* DynamicCam_ChooseScriptByName(char* camName);
 CamShot* DynamicCam_ChooseScriptInSequence(CameraSequence_t* sequence, CameraEvent_e event, int* interp,
                                            f32* time, f32* speed, int* timeTrigger, f32* timeTriggerTime,
                                            int playerID);
-// startLie is the ball's lie (Lie_t), endLie a surface class (TGD_MaterialInfo.nClass).
+// startLie is the ball's lie (Lie_t), endLie a surface class (SurfaceClass_t).
 CameraSequence_t* DynamicCam_ChooseSequence(int ePlayerID, int startLie, int endLie, int state,
                                             u8 allowGenericShotTypes, f32 shotDist);
 CameraSequence_t* DynamicCam_ChoosePreFlightSequence(int ePlayerID, int startLie, int state);

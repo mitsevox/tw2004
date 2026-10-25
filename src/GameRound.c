@@ -957,7 +957,7 @@ s32 GM_GetSecondHonors(void) {
 }
 
 // Puts every set-up player's ball on their tee set's tee at the start of a hole (and on a restart):
-// lie 0, the physics ball reset, the before-shot copy (ballBefore) and the vBall/vA44 positions at
+// lie 0, the physics ball reset, the before-shot copy (ballBefore) and the vBall/vTeePos positions at
 // the tee, the golfer waiting (GS_WAIT) and the low-IQ penalty cleared.
 void GM_InitBallsToTee(void) {
     TGD_TerrainInfo* pCourse = Ter_GetTGD();
@@ -967,7 +967,7 @@ void GM_InitBallsToTee(void) {
         Physics_InitBall(&gPlayers[i].ball, &pCourse->tee[gSession.nTeeSet[i]].x, i);
         Mem_cpy(&gPlayers[i].ballBefore, &gPlayers[i].ball, sizeof(Ball));
         LLMath_CopyVec(&pCourse->tee[gSession.nTeeSet[i]].x, gPlayers[i].vBall);
-        LLMath_CopyVec(&pCourse->tee[gSession.nTeeSet[i]].x, gPlayers[i].vA44);
+        LLMath_CopyVec(&pCourse->tee[gSession.nTeeSet[i]].x, gPlayers[i].vTeePos);
         GOLFERSTATE_Set(GS_WAIT, (u8)i);
         gPlayers[i].bPenaltyShot = 0;
     }

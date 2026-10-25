@@ -296,7 +296,7 @@ typedef struct Player {
                                 //        replay
     u8   bHitPin;               // 0x30D  the shot hit the flagstick (event 38, Collision)
     u8   b30E;                  // 0x30E  a replaced ball must be dropped (GM_ReplaceOOBBall)
-    u8   bBunkerThisShot;       // 0x30F  the ball touched a bunker (surface class 6, PsBallFx.c)
+    u8   bBunkerThisShot;       // 0x30F  the ball touched a bunker (SURFCLASS_SAND_e, PsBallFx.c)
     u8   bBunkerThisHole;       // 0x310  set from bBunkerThisShot after a shot
                                 //        (GM_RecordBonusShotStats), cleared by GM_ClearHoleBonusStats;
                                 //        the tour's bunker stats
@@ -334,7 +334,8 @@ typedef struct Player {
     f32  vTarget[4];            // 0xA14
     f32  vTargetCopy[4];        // 0xA24  copy of the planned target. Probably TW06's originalTargetPos
     f32  vTarget2[4];           // 0xA34  copy of the chosen aim point
-    f32  vA44[4];               // 0xA44  compared with the ball position (GM_BumpBallForObstructions)
+    f32  vTeePos[4];            // 0xA44  the player's tee on the current hole: the hole's tee of the
+                                //        player's tee set (GM_InitBallsToTee; speed golf's re-tees)
     f32  fDistance;             // 0xA54  to the target. TW06: targetDistance
     f32  fDistance2;            // 0xA58
     f32  fA5C;                  // 0xA5C  } placing the ball (state 22): how fast the spot moves along x and
@@ -383,7 +384,7 @@ typedef struct Player {
     s32  nSGPoints;             // 0xC44  speed golf mode 7: 3000 at the start of a round; 0 loses
                                 //        (the winner gets 6000)
     u64  uC48;                  // 0xC48  speed golf: the events' flags (SGEvent), 64 bits
-    f32  fDriveLength;          // 0xC50  speed golf: the tee shot's length from the tee (vA44),
+    f32  fDriveLength;          // 0xC50  speed golf: the tee shot's length from the tee (vTeePos),
                                 //        then the replay's longer drive
     s32  nC54;                  // 0xC54  a frame countdown (speed golf's run to the ball)
     s32  nUISlot;               // 0xC58  the player's slot in the front end's in-round messages;

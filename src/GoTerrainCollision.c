@@ -16,46 +16,40 @@
 
 #define AXIS3(n) ((n) == 0 ? 0 : 2)    // grid axis 0 (x) or 1 (z) as an index into a 3D vector
 #define PIN_RADIUS_SQ 0.00077160494f   // the flagstick's radius squared: (1 inch)^2 in square yards
-// port: the course file keeps each list's offset from its start in the pointer field itself, and
-//       loading turns it into the pointer in place; with 64-bit pointers the file needs its own
-//       layout.
-#define TER_RELOCATE(pCourse, field) ((pCourse)->field = (void*)((u8*)(pCourse) + BE32(&(pCourse)->field)))
+#define TER_NUM_CHECK_POINTS 5         // Ter_CheckObjectAndHazardObstruction: the spot and its four corners
+// The course data keeps each list's offset from its own start in the pointer field, big-endian;
+// Ter_InitTGD turns it into the pointer in place.
+#define TER_RELOCATE(pTerrainData, field) \
+    ((pTerrainData)->field = (void*)((u8*)(pTerrainData) + BE32(&(pTerrainData)->field)))
 
-// .bss and .sbss in reverse address order (CodeWarrior lays them out backwards).
 u8        gTerObjectMarks[MAX_OBJECTS];         // 1: a course object near the line being tested
                                                   // (Ter_MarkObjectsNearLine; entry 0 always 1)
-TNetwork* gTerOOBNetworks[MAX_OOB_NETWORKS];      // the hole's out-of-bounds outlines
+TNetwork* gTerOOBNetworks[MAX_OOB_NETWORKS];      // the hole's in-bounds outlines
 TNetwork* gTerFreeDropNetworks[MAX_FREE_DROP_NETWORKS];    // the hole's free-drop outlines
 TerBox    gTerCupGeometryBounds[NUM_CUP_POSITIONS];        // per pin position: its cup geometry's box
 s32       gTerNumOOBNetworks;                     // outlines in gTerOOBNetworks
 s32       gTerNumFreeDropNetworks;                // outlines in gTerFreeDropNetworks
 u8        gTerUse3DCupGeometry;                   // 1: the course has cup geometry (Ter_InitTGD)
 
-void  Ter_FreeDropNetworkLoadCallback(TNetwork* pNet);
-u8    Ter_LieIsPreferred(u32 nClass);
-void  Ter_OOBNetworkLoadCallback(TNetwork* pNet);
+static void Ter_FreeDropNetworkLoadCallback(TNetwork* netPtr);
+static u8   Ter_LieIsPreferred(u32 lieID);
+static void Ter_OOBNetworkLoadCallback(TNetwork* netPtr);
 void  Ter_Subtract3(f32* pA, f32* pB, f32* pOut);           // a - b (paired-single assembly)
 void  Ter_Negate3(f32* pSrc, f32* pDst);                  // negate (paired-single assembly)
 void  Ter_Negate(f32* pSrc, f32* pDst);                  // negate, four floats (paired-single assembly)
 
-// Every floor in this file goes through an inline (probably EA's wrapper around floorf):
-// Ter_GetTerrainLayers matches only that way, and every other function matches either way.
 static inline f32 Ter_Floor(f32 x) {
     return Math_Floor(x);
 }
 
-// The grid cell a coordinate falls in (it may be outside the grid). The four line walkers go
-// through this helper; the point lookups write the cast out (each matches only its own way).
+// The grid cell a coordinate falls in along one axis, given as cells from the grid's corner (the
+// cell may be outside the grid).
 static inline int Ter_GridCell(f32 fCells) {
     return (int)Ter_Floor(fCells);
 }
 
-f32   Ter_GetHighestGroundTriangle(TGD_TerrainInfo* pCourse, f32* pPos, TGD_Cell** ppCell,
-                                   TGD_PolygonReference** ppRef,
-                                   f32 (**ppTri)[3],
-                  s32* pTri);
 void  Ter_ComputeHighestPointInEveryTriangle(TGD_TerrainInfo* pCourse);
-f32   Ter_CalcLowestPlayableWorldHeight(TGD_TerrainInfo* pCourse);
+static f32 Ter_CalcLowestPlayableWorldHeight(TGD_TerrainInfo* pTerrainData);
 f32   Ter_GetLowestGroundTriangle(TGD_TerrainInfo* pCourse, f32* pPos, TGD_Cell** ppCell,
                                   TGD_PolygonReference** ppRef,
                                   f32 (**ppTri)[3],
@@ -86,17 +80,16 @@ u8    Ter_CheckForObjectCollisionOneGrid(TGD_TerrainInfo* pCourse, int nX, int n
 u8    Ter_LineSphereIntersection(f32* pFrom, f32* pDir, f32 fRange, f32* pCentre, f32 fRadius);
 int   TerCollision_GetMeshFlags(UObjMesh* pModel, int n);
 
-// fake match: stands in for a function the original linker stripped. The file's pool starts with
-// 1.0f (0x80283288), before the constants Ter_LineTriangleIntersection uses first; its body is unknown.
+// fake match: never called, puts 1.0f first in the constant pool
 static f32 GoTerrainCollision_StrippedFn(f32 x) {
     return x + 1.0f;
 }
 
-// TW06: bool Ter_LineTriangleIntersection(f32*, f32*, f32, f32**, f32*, f32[4]*, f32[4]*). Where the
-// line from pFrom along pDir meets a triangle, as a fraction t of pDir (0 < t < fMax): t, the point
-// and the triangle's normal. A line along the triangle's plane never meets it.
-u8 Ter_LineTriangleIntersection(f32* pFrom, f32* pDir, f32 fMax, f32 (*pTri)[3], f32* pT, f32* pHit,
-                                f32* pNormal) {
+// Where the line from pFrom along pDir meets the triangle pTri, as a multiple t of pDir with
+// 0 < t < fMax: t, the point and the triangle's unit normal. A line (nearly) parallel to the
+// triangle's plane never meets it.
+static u8 Ter_LineTriangleIntersection(f32* pFrom, f32* pDir, f32 fMax, f32 (*pTri)[3], f32* pT,
+                                       f32* pHit, f32* pNormal) {
     f32 vP[4];
     f32 vQ[4];
     f32 vS[4];
@@ -137,10 +130,9 @@ u8 Ter_LineTriangleIntersection(f32* pFrom, f32* pDir, f32 fMax, f32 (*pTri)[3],
     return 1;
 }
 
-// TW07's Ter_Init (the first function of GoTerrainCollision.c there): register the loaders for the
-// out-of-bounds (NETWORK_TYPE_OUT_OF_BOUNDS) and free-drop (NETWORK_TYPE_FREE_DROP) networks and
-// forget the old ones.
-// Called when the game's systems start.
+// Registers the loaders of the hole's in-bounds (NETWORK_TYPE_OUT_OF_BOUNDS) and free-drop
+// (NETWORK_TYPE_FREE_DROP) outlines and forgets the old ones. Called when a round starts
+// (GO_vInitIG).
 void Ter_Init(void) {
     Network_RegisterLoadNetworkCallback(NETWORK_TYPE_OUT_OF_BOUNDS, Ter_OOBNetworkLoadCallback);
     Network_RegisterLoadNetworkCallback(NETWORK_TYPE_FREE_DROP, Ter_FreeDropNetworkLoadCallback);
@@ -148,11 +140,13 @@ void Ter_Init(void) {
     gTerNumFreeDropNetworks = 0;
 }
 
-// TW06: void Ter_InitTGD(TGD_TerrainInfo*). Get a course's collision data ready once it is loaded:
-// its offsets become pointers; strips flagged for one of the four pin positions (flags 1, 2, 4, 8)
-// are 3D cup geometry, and each pin goes at the centre top of its geometry's bounds; then the
-// triangles' high and low corners and the course floor.
-void Ter_InitTGD(TGD_TerrainInfo* pCourse) {
+// Readies a hole's course data once it is loaded (Ter_CourseLoadCallback, with
+// gTerRenderer.pCourse): its offsets become pointers. A strip for exactly one pin position (one
+// bit of POLYREF_PIN_POSITIONS) is part of that position's 3D cup geometry; when the course has
+// any, each pin position's pin goes to the centre top of its geometry's box (the hole's pin set
+// is set to each position in turn, then put back). The hole's outlines are forgotten, the
+// triangles' highest and lowest corners marked and the course floor (fFloor) worked out.
+void Ter_InitTGD(TGD_TerrainInfo* pTerrainData) {
     u32 i;
     int k;
     int j;
@@ -160,27 +154,24 @@ void Ter_InitTGD(TGD_TerrainInfo* pCourse) {
     int nPinSet;
     f32 (*pVert)[3];
 
-    // port: the course data is big-endian and read in place through TGD_TerrainInfo, TGD_Cell,
-    //       TGD_PolygonReference, TerObject and the vertex list: a little-endian port converts it
-    //       here, before the offsets are turned into pointers (docs/game/formats/byte-order.md)
-    TER_RELOCATE(pCourse, pVerts);
-    TER_RELOCATE(pCourse, pTriFlags);
-    TER_RELOCATE(pCourse, pLight);
-    TER_RELOCATE(pCourse, pGrid);
-    TER_RELOCATE(pCourse, pObjects);
-    TER_RELOCATE(pCourse, pPolyRefs);
-    TER_RELOCATE(pCourse, pObjRefs);
-    if (pCourse->p38 != NULL) {
-        TER_RELOCATE(pCourse, p38);
+    TER_RELOCATE(pTerrainData, pVerts);
+    TER_RELOCATE(pTerrainData, pTriFlags);
+    TER_RELOCATE(pTerrainData, pLight);
+    TER_RELOCATE(pTerrainData, pGrid);
+    TER_RELOCATE(pTerrainData, pObjects);
+    TER_RELOCATE(pTerrainData, pPolyRefs);
+    TER_RELOCATE(pTerrainData, pObjRefs);
+    if (pTerrainData->pFog != NULL) {
+        TER_RELOCATE(pTerrainData, pFog);
     }
-    if (pCourse->p44 != NULL) {
-        TER_RELOCATE(pCourse, p44);
+    if (pTerrainData->pRainFog != NULL) {
+        TER_RELOCATE(pTerrainData, pRainFog);
     }
-    if (pCourse->p3C != NULL) {
-        TER_RELOCATE(pCourse, p3C);
+    if (pTerrainData->pGlow != NULL) {
+        TER_RELOCATE(pTerrainData, pGlow);
     }
-    if (pCourse->p40 != NULL) {
-        TER_RELOCATE(pCourse, p40);
+    if (pTerrainData->pUnread != NULL) {
+        TER_RELOCATE(pTerrainData, pUnread);
     }
     gTerUse3DCupGeometry = 0;
     for (k = 0; k < NUM_CUP_POSITIONS; k++) {
@@ -191,13 +182,13 @@ void Ter_InitTGD(TGD_TerrainInfo* pCourse) {
         gTerCupGeometryBounds[k].vMax[1] = -1000000.0f;
         gTerCupGeometryBounds[k].vMax[2] = -1000000.0f;
     }
-    for (i = 0; i < pCourse->nPolyRefs; i++) {
+    for (i = 0; i < pTerrainData->nPolyRefs; i++) {
         nBit = 1;
         for (k = 0; k < NUM_CUP_POSITIONS; k++) {
-            if (nBit == (pCourse->pPolyRefs[i].uFlags & POLYREF_PIN_POSITIONS)) {
+            if (nBit == (pTerrainData->pPolyRefs[i].uFlags & POLYREF_PIN_POSITIONS)) {
                 gTerUse3DCupGeometry = 1;
-                pVert = &pCourse->pVerts[TER_FIRST_VERTEX(&pCourse->pPolyRefs[i])];
-                for (j = 0; j < pCourse->pPolyRefs[i].nTris + 2; j++) {
+                pVert = &pTerrainData->pVerts[TER_FIRST_VERTEX(&pTerrainData->pPolyRefs[i])];
+                for (j = 0; j < pTerrainData->pPolyRefs[i].nTris + 2; j++) {
                     if (pVert[0][0] < gTerCupGeometryBounds[k].vMin[0]) {
                         gTerCupGeometryBounds[k].vMin[0] = pVert[0][0];
                     }
@@ -242,120 +233,124 @@ void Ter_InitTGD(TGD_TerrainInfo* pCourse) {
     gTerRenderer.pCourse->fFloor = Ter_CalcLowestPlayableWorldHeight(gTerRenderer.pCourse);
 }
 
-// TW06: bool Ter_Use3DCupGeometry(void). Whether the cup is real geometry the ball drops into;
-// without it, GameRound.c holes a ball that stops within half a yard of the pin.
+// Whether the cup is real geometry the ball drops into; without it, GM_CheckForBallInHole counts
+// a ball within half a yard of the pin as holed.
 u8 Ter_Use3DCupGeometry(void) {
     return gTerUse3DCupGeometry;
 }
 
-// The free-drop networks' load callback (Ter_Init registers it): adds a loaded free-drop outline to the
-// hole's list. No check against MAX_FREE_DROP_NETWORKS.
-void Ter_FreeDropNetworkLoadCallback(TNetwork* pNet) {
-    gTerFreeDropNetworks[gTerNumFreeDropNetworks] = pNet;
+// The free-drop outlines' loader (Ter_Init registers it): adds a loaded outline to the hole's
+// list, with no check against MAX_FREE_DROP_NETWORKS.
+static void Ter_FreeDropNetworkLoadCallback(TNetwork* netPtr) {
+    gTerFreeDropNetworks[gTerNumFreeDropNetworks] = netPtr;
     gTerNumFreeDropNetworks++;
 }
 
-// TW06: bool Ter_PointInFreeDropNetwork(f32*). Whether a point is inside a free-drop area.
-u8 Ter_PointInFreeDropNetwork(f32* pPos) {
+// Whether a point (x, z) is inside one of the hole's free-drop areas.
+u8 Ter_PointInFreeDropNetwork(f32* location) {
     int i;
 
     if (gTerNumFreeDropNetworks == 0) return 0;
     for (i = 0; i < gTerNumFreeDropNetworks; i++) {
-        if (wn_PnPoly(pPos, gTerFreeDropNetworks[i], gTerFreeDropNetworks[i]->nNumNodes)) return 1;
+        if (wn_PnPoly(location, gTerFreeDropNetworks[i], gTerFreeDropNetworks[i]->nNumNodes)) return 1;
     }
     return 0;
 }
 
-// The out-of-bounds networks' load callback (Ter_Init registers it): adds a loaded out-of-bounds outline to
-// the hole's list. No check against MAX_OOB_NETWORKS.
-void Ter_OOBNetworkLoadCallback(TNetwork* pNet) {
-    gTerOOBNetworks[gTerNumOOBNetworks] = pNet;
+// The in-bounds outlines' loader (Ter_Init registers it): adds a loaded outline to the hole's
+// list, with no check against MAX_OOB_NETWORKS.
+static void Ter_OOBNetworkLoadCallback(TNetwork* netPtr) {
+    gTerOOBNetworks[gTerNumOOBNetworks] = netPtr;
     gTerNumOOBNetworks++;
 }
 
-// TW06: s32 Ter_iNumOOBNetworksLoaded(void).
+// How many in-bounds outlines the hole has.
 s32 Ter_iNumOOBNetworksLoaded(void) {
     return gTerNumOOBNetworks;
 }
 
-// TW06: bool Ter_PointInOOBNetwork(f32*). Whether a point is inside one of the outlines; a course
-// with none loaded has no out of bounds, so every point is inside.
-u8 Ter_PointInOOBNetwork(f32* pPos) {
+// Whether a point (x, z) is in bounds: inside one of the hole's in-bounds outlines. A hole with
+// none has no out of bounds, so every point is in.
+u8 Ter_PointInOOBNetwork(f32* location) {
     int i;
 
     if (gTerNumOOBNetworks == 0) return 1;
     for (i = 0; i < gTerNumOOBNetworks; i++) {
-        if (wn_PnPoly(pPos, gTerOOBNetworks[i], gTerOOBNetworks[i]->nNumNodes)) return 1;
+        if (wn_PnPoly(location, gTerOOBNetworks[i], gTerOOBNetworks[i]->nNumNodes)) return 1;
     }
     return 0;
 }
 
-// TW06: bool Ter_CollisionWithOOBNetwork(const f32*, const f32*, f32*). Whether the segment from
-// pFrom to pTo crosses one of the outlines, and where.
-u8 Ter_CollisionWithOOBNetwork(f32* pFrom, f32* pTo, f32* pHit) {
+// Whether the segment from start to end crosses one of the hole's in-bounds outlines (x, z);
+// intersect gets the crossing nearest start on the first outline, in load order, that it crosses.
+u8 Ter_CollisionWithOOBNetwork(f32* start, f32* end, f32* intersect) {
     int i;
 
     if (gTerNumOOBNetworks == 0) return 0;
     for (i = 0; i < gTerNumOOBNetworks; i++) {
-        if (Network_LineNetworkIntersection(pFrom, pTo, gTerOOBNetworks[i], gTerOOBNetworks[i]->nNumNodes,
-                                            pHit)) return 1;
+        if (Network_LineNetworkIntersection(start, end, gTerOOBNetworks[i], gTerOOBNetworks[i]->nNumNodes,
+                                            intersect)) return 1;
     }
     return 0;
 }
 
-// TW06: f32 Ter_GetAmbientLight(TGD_TerrainInfo*, f32*). The light on the ground at a point, 0..1,
-// from the brightness byte of the triangle's vertex: the ground covering the point when it is
-// less than a quarter of a yard above it, else the ground under it, else the lowest ground. 1
-// (full light) with no ground, or on an object.
-f32 Ter_GetAmbientLight(TGD_TerrainInfo* pCourse, f32* pPos) {
+// The light on the ground at a point, 0..1: the light byte of the first vertex of the triangle
+// found (TGD_TerrainInfo.pLight). The ground covering the point counts when it is at most a
+// quarter of a yard above it, else the ground under it, else the lowest ground. 1 (full light)
+// with no ground under or over the point.
+f32 Ter_GetAmbientLight(TGD_TerrainInfo* pTerrainData, f32* position) {
     TGD_Cell* pCell;
-    TGD_PolygonReference* pRef;
-    f32 (*pTri)[3];
-    s32 nTri;
+    TGD_PolygonReference* pPolyRef;
+    f32 (*pVertexData)[3];
+    s32 iFirstVertexIndex;
     f32 fHeight;
 
-    fHeight = Ter_GetCoveringGroundTriangle(pCourse, pPos, &pCell, &pRef, &pTri, &nTri);
-    if (fHeight == TER_NO_GROUND || fHeight > pPos[1] + 0.25f) {
-        fHeight = Ter_GetSupportingGroundTriangle(pCourse, pPos, &pCell, &pRef, &pTri, &nTri);
+    fHeight = Ter_GetCoveringGroundTriangle(pTerrainData, position, &pCell, &pPolyRef, &pVertexData,
+                                            &iFirstVertexIndex);
+    if (fHeight == TER_NO_GROUND || fHeight > position[1] + 0.25f) {
+        fHeight = Ter_GetSupportingGroundTriangle(pTerrainData, position, &pCell, &pPolyRef, &pVertexData,
+                                                  &iFirstVertexIndex);
         if (fHeight == TER_NO_GROUND) {
-            fHeight = Ter_GetLowestGroundTriangle(pCourse, pPos, &pCell, &pRef, &pTri, &nTri);
+            fHeight = Ter_GetLowestGroundTriangle(pTerrainData, position, &pCell, &pPolyRef, &pVertexData,
+                                                  &iFirstVertexIndex);
         }
     }
-    if (fHeight != TER_NO_GROUND && pRef->nObject == 0) {
-        return (pCourse->pLight + TER_FIRST_VERTEX(pRef))[nTri] / 255.0f;
+    if (fHeight != TER_NO_GROUND && pPolyRef->nObject == 0) {
+        return (pTerrainData->pLight + TER_FIRST_VERTEX(pPolyRef))[iFirstVertexIndex] / 255.0f;
     }
     return 1.0f;
 }
 
-// fake match: the first grid column goes through an inline with a local; written out, the compiler
-// moves the conversion into the column loop instead of storing the start before it as EA does.
-// It calls Math_Floor itself: through Ter_Floor the registers drift further.
-static inline int fn_8004B89C_Calc(f32 fCells) {
+// fake match: the first column through an inline with a local, so its start is stored before the loop
+static inline int Ter_FloorToInt(f32 fCells) {
     int n = (int)Math_Floor(fCells);
     return n;
 }
 
-// fake match: an identity read; gives EA's register choices around fWide.
-static inline f32 fn_8004B89C_Read(f32 f) {
+// fake match: an identity, for the registers around fWide
+static inline f32 Ter_Identity(f32 f) {
     return f;
 }
 
-// TW06: bool Ter_CheckObjectAndHazardObstruction(f32*, f32, bool, bool, f32, bool, f32). Whether
-// something spoils a spot for a ball. Checked at the spot and at four corners fStep away in x and
-// z, against the highest ground at most 2 x fStep above the spot: an object (with bModels, only
-// one whose model has flag 0x40) standing within fRadius of the spot, or within fRadius + 0.5 when
-// the object is over 4 yards wide, unless the spot is on surface class 2, 3 or 6; with bHazards,
-// no ground or a free-drop area at any of the five points, ground without surface flag 1 at the
-// spot, or at a corner ground that has neither flag 1 nor class 8; with bSlope, a corner more
-// than fStep x fMaxSlope above or below the spot.
-u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bHazards, f32 fStep, u8 bSlope,
-                                       f32 fMaxSlope) {
+// Whether something spoils a spot for a ball. The ground is looked up at the spot and at the
+// four corners hazardDistance away in x and z: the highest ground at most 2 x hazardDistance
+// above the spot. The spot is spoilt by a course object of the grid cells around it whose base
+// is within obstructionDistance of it (obstructionDistance + 0.5 when the base's radius is over
+// 4 yards; with bOnlyCheckNonFadingObjects, only an object whose model has UOBJMESH_F0_NO_FADE),
+// unless the ground at the spot is the fairway, the green or sand (SURFCLASS_FAIRWAY_e,
+// SURFCLASS_GREEN_e, SURFCLASS_SAND_e). With bCheckLie it is spoilt by a free-drop area at any of
+// the five points (looked up once the cells show any ground), ground at the spot without
+// MATERIAL_BALL_CAN_LIE, or at a corner no ground or ground with neither MATERIAL_BALL_CAN_LIE
+// nor SURFCLASS_CARTPATH_e; with bCheckHeight, by a corner's ground more than
+// hazardDistance x fMaxSlope above or below the spot's.
+u8 Ter_CheckObjectAndHazardObstruction(f32* position, f32 obstructionDistance, u8 bOnlyCheckNonFadingObjects,
+                                       u8 bCheckLie, f32 hazardDistance, u8 bCheckHeight, f32 fMaxSlope) {
     int j;
     TGD_Cell* pCell;
-    f32 aHeight[5];
-    TGD_PolygonReference* apRef[5];
+    f32 aHeight[TER_NUM_CHECK_POINTS];
+    TGD_PolygonReference* apRef[TER_NUM_CHECK_POINTS];
     f32 vPos[4];
-    u8 abFreeDrop[5];
+    u8 abFreeDrop[TER_NUM_CHECK_POINTS];
     f32 fA;
     f32 fB;
     f32 fC;
@@ -363,8 +358,8 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bH
     f32 fB2;
     f32 fC2;
     u8 bFirst;
-    int n;
-    TGD_TerrainInfo* pCourse;
+    int nRef;
+    TGD_TerrainInfo* pTerrainData;
     f32 fMinX;
     f32 fMaxX;
     f32 fMinZ;
@@ -385,8 +380,8 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bH
     int i;
     int k;
     u8 bObstructed;
-    int nCorner;
-    int nInner;
+    int nSideX;
+    int nSideZ;
     TGD_PolygonReference* pRef;
     u16* pObjRef;
     f32 (*pVert)[3];
@@ -396,38 +391,39 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bH
 
     bObstructed = 0;
     bFirst = 1;
-    pCourse = Ter_GetTGD();
-    if (pCourse == NULL) return 0;
-    for (i = 0; i < 5; i++) {
+    pTerrainData = Ter_GetTGD();
+    if (pTerrainData == NULL) return 0;
+    for (i = 0; i < TER_NUM_CHECK_POINTS; i++) {
         aHeight[i] = -50000.0f;
         abFreeDrop[i] = 0;
         apRef[i] = NULL;
     }
-    fMinX = pPos[0] - (fRadius <= fStep ? fStep : fRadius);
-    fMaxX = pPos[0] + (fRadius <= fStep ? fStep : fRadius);
-    fMinZ = pPos[2] - (fRadius <= fStep ? fStep : fRadius);
-    fMaxZ = pPos[2] + (fRadius <= fStep ? fStep : fRadius);
-    fTop = pPos[1] + 2.0f * fStep;
-    nMinX = fn_8004B89C_Calc((fMinX - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
-    nMinZ = (int)Ter_Floor((fMinZ - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
-    nMaxX = (int)Ter_Floor((fMaxX - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
-    nMaxZ = (int)Ter_Floor((fMaxZ - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
-    fWide = fn_8004B89C_Read(0.5f + fRadius);
+    fMinX = position[0] - (obstructionDistance <= hazardDistance ? hazardDistance : obstructionDistance);
+    fMaxX = position[0] + (obstructionDistance <= hazardDistance ? hazardDistance : obstructionDistance);
+    fMinZ = position[2] - (obstructionDistance <= hazardDistance ? hazardDistance : obstructionDistance);
+    fMaxZ = position[2] + (obstructionDistance <= hazardDistance ? hazardDistance : obstructionDistance);
+    fTop = position[1] + 2.0f * hazardDistance;
+    nMinX = Ter_FloorToInt((fMinX - pTerrainData->fGridOrigin[0]) / pTerrainData->fGridCellSize[0]);
+    nMinZ = (int)Ter_Floor((fMinZ - pTerrainData->fGridOrigin[1]) / pTerrainData->fGridCellSize[1]);
+    nMaxX = (int)Ter_Floor((fMaxX - pTerrainData->fGridOrigin[0]) / pTerrainData->fGridCellSize[0]);
+    nMaxZ = (int)Ter_Floor((fMaxZ - pTerrainData->fGridOrigin[1]) / pTerrainData->fGridCellSize[1]);
+    fWide = Ter_Identity(0.5f + obstructionDistance);
     for (nX = nMinX; nX <= nMaxX; nX++) {
         for (nZ = nMinZ; nZ <= nMaxZ; nZ++) {
-            if (nX >= 0 && nX < pCourse->nGridWidth && nZ >= 0 && nZ < pCourse->nGridLength) {
-                pCell = &pCourse->pGrid[nX + nZ * pCourse->nGridWidth];
-                pObjRef = &pCourse->pObjRefs[pCell->nObjRefOffset];
+            if (nX >= 0 && nX < pTerrainData->nGridWidth && nZ >= 0 && nZ < pTerrainData->nGridLength) {
+                pCell = &pTerrainData->pGrid[nX + nZ * pTerrainData->nGridWidth];
+                pObjRef = &pTerrainData->pObjRefs[pCell->nObjRefOffset];
                 for (i = pCell->nObjRefs - 1; i >= 0; i--) {
-                    fDx = pCourse->pObjects[*pObjRef].vBase[0] - pPos[0];
-                    fDz = pCourse->pObjects[*pObjRef].vBase[2] - pPos[2];
-                    fObjRadius = pCourse->pObjects[*pObjRef].fBaseRadius;
+                    fDx = pTerrainData->pObjects[*pObjRef].vBase[0] - position[0];
+                    fDz = pTerrainData->pObjects[*pObjRef].vBase[2] - position[2];
+                    fObjRadius = pTerrainData->pObjects[*pObjRef].fBaseRadius;
                     fDist = (f32)Math_Sqrt(fDx * fDx + fDz * fDz) - fObjRadius;
-                    if (fDist < fRadius || (fObjRadius > 4.0f && fDist < fWide)) {
-                        if (bModels) {
-                            pModel = Ter_GetObjectListModel(pCourse->pObjects[*pObjRef].nPatch,
-                                                 pCourse->pObjects[*pObjRef].nObjList);
-                            if (pModel != NULL && (TerCollision_GetMeshFlags(pModel, 0) & 0x40)) {
+                    if (fDist < obstructionDistance || (fObjRadius > 4.0f && fDist < fWide)) {
+                        if (bOnlyCheckNonFadingObjects) {
+                            pModel = Ter_GetObjectListModel(pTerrainData->pObjects[*pObjRef].nPatch,
+                                                 pTerrainData->pObjects[*pObjRef].nObjList);
+                            if (pModel != NULL
+                                && (TerCollision_GetMeshFlags(pModel, 0) & UOBJMESH_F0_NO_FADE)) {
                                 bObstructed = 1;
                             }
                         } else {
@@ -436,23 +432,24 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bH
                     }
                     pObjRef++;
                 }
-                pRef = &pCourse->pPolyRefs[pCell->uRefs >> CELL_REFS_FIRST_SHIFT];
-                for (n = (pCell->uRefs & CELL_REFS_COUNT_MASK) - 1; n >= 0; n--) {
+                pRef = &pTerrainData->pPolyRefs[pCell->uRefs >> CELL_REFS_FIRST_SHIFT];
+                for (nRef = (pCell->uRefs & CELL_REFS_COUNT_MASK) - 1; nRef >= 0; nRef--) {
                     if (pRef->nObject != 0) {
                         pRef++;
                     } else {
-                        pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
-                        pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
+                        pVert = &pTerrainData->pVerts[TER_FIRST_VERTEX(pRef)];
+                        pFlags = pTerrainData->pTriFlags + TER_FIRST_VERTEX(pRef);
                         for (j = pRef->nTris - 1; j >= 0; j--) {
                             uFlags = pFlags[2];
                             if (bFirst) {
-                                abFreeDrop[0] = Ter_PointInFreeDropNetwork(pPos);
+                                abFreeDrop[0] = Ter_PointInFreeDropNetwork(position);
                             }
                             if ((uFlags & TER_TRI_KICK_MASK)
                                 && (fTop > pVert[TER_TRI_LOWEST_CORNER(uFlags)][1]
                                     || aHeight[0] < pVert[TER_TRI_HIGHEST_CORNER(uFlags)][1])
-                                && Ter_PointInTriangleXZpY(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
-                                Ter_GetBarycentricCoords(pVert, pPos, &fA, &fB, &fC);
+                                && Ter_PointInTriangleXZpY(pVert[0], pVert[1], pVert[2], position[0],
+                                                           position[2])) {
+                                Ter_GetBarycentricCoords(pVert, position, &fA, &fB, &fC);
                                 fHeight = fA * pVert[0][1] + fB * pVert[1][1] + fC * pVert[2][1];
                                 if (fHeight > aHeight[0] && fHeight <= fTop) {
                                     aHeight[0] = fHeight;
@@ -460,10 +457,10 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bH
                                 }
                             }
                             k = 1;
-                            vPos[0] = pPos[0] - fStep;
-                            for (nCorner = 0; nCorner < 2; nCorner++) {
-                                vPos[2] = pPos[2] - fStep;
-                                for (nInner = 0; nInner < 2; nInner++) {
+                            vPos[0] = position[0] - hazardDistance;
+                            for (nSideX = 0; nSideX < 2; nSideX++) {
+                                vPos[2] = position[2] - hazardDistance;
+                                for (nSideZ = 0; nSideZ < 2; nSideZ++) {
                                     if (bFirst) {
                                         abFreeDrop[k] = Ter_PointInFreeDropNetwork(vPos);
                                     }
@@ -479,10 +476,10 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bH
                                             apRef[k] = pRef;
                                         }
                                     }
-                                    vPos[2] += 2.0f * fStep;
+                                    vPos[2] += 2.0f * hazardDistance;
                                     k++;
                                 }
-                                vPos[0] += 2.0f * fStep;
+                                vPos[0] += 2.0f * hazardDistance;
                             }
                             bFirst = 0;
                             pVert++;
@@ -495,287 +492,304 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bH
         }
     }
     if (apRef[0] != NULL) {
-        if (gSurfaceTypes[apRef[0]->nSurface].nClass == 3 || gSurfaceTypes[apRef[0]->nSurface].nClass == 2
-            || gSurfaceTypes[apRef[0]->nSurface].nClass == 6) {
+        if (gSurfaceTypes[apRef[0]->nSurface].nClass == SURFCLASS_GREEN_e
+            || gSurfaceTypes[apRef[0]->nSurface].nClass == SURFCLASS_FAIRWAY_e
+            || gSurfaceTypes[apRef[0]->nSurface].nClass == SURFCLASS_SAND_e) {
             bObstructed = 0;
         }
     }
     if (bObstructed) return 1;
-    if (bHazards) {
-        if ((apRef[0] != NULL && !(gSurfaceTypes[apRef[0]->nSurface].uFlags & 1)) || abFreeDrop[0]) return 1;
-        for (k = 1; k < 5; k++) {
+    if (bCheckLie) {
+        if ((apRef[0] != NULL && !(gSurfaceTypes[apRef[0]->nSurface].uFlags & MATERIAL_BALL_CAN_LIE))
+            || abFreeDrop[0]) {
+            return 1;
+        }
+        for (k = 1; k < TER_NUM_CHECK_POINTS; k++) {
             if (abFreeDrop[k] || apRef[k] == NULL
-                || (apRef[k] != NULL && !(gSurfaceTypes[apRef[k]->nSurface].uFlags & 1)
-                    && gSurfaceTypes[apRef[k]->nSurface].nClass != 8)) {
+                || (apRef[k] != NULL && !(gSurfaceTypes[apRef[k]->nSurface].uFlags & MATERIAL_BALL_CAN_LIE)
+                    && gSurfaceTypes[apRef[k]->nSurface].nClass != SURFCLASS_CARTPATH_e)) {
                 return 1;
             }
         }
     }
-    if (bSlope) {
-        for (k = 1; k < 5; k++) {
-            if (apRef[k] != NULL && fabsf(aHeight[k] - aHeight[0]) > fStep * fMaxSlope) return 1;
+    if (bCheckHeight) {
+        for (k = 1; k < TER_NUM_CHECK_POINTS; k++) {
+            if (apRef[k] != NULL && fabsf(aHeight[k] - aHeight[0]) > hazardDistance * fMaxSlope) return 1;
         }
     }
     return 0;
 }
 
-// TW06: bool Ter_SearchForDropLocation(s32, bool, bool, f32*), with the ring search that TW06 split
-// out as Ter_SearchAreaForDropLocation written inline. Where a player's ball is to be
-// dropped (pOut): the last good drop spot (gBallDropSpot), or with bPreferred the last spot with a
-// preferred lie (gBallPreferredLieSpot) when that is not the shot's own start and is less than 10 yards
-// further away. If the spot is over 3 yards off, or (not preferred) on another class of surface
-// than the ball, search rings of 1 to 4 yards around the ball, every 45 degrees starting towards
-// the pin, for a drop on the same class, else the nearest. Returns 0 when the spot is where the
-// shot started, or (with bCheck, while vBall is still at vA44) within 50 yards of vA44.
-u8 Ter_SearchForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut) {
-    f32 fAngle;
-    f32 vPos[4];
-    f32 vDir[4];
-    TGD_MaterialInfo* pSurface;
-    u8 bDrop;
-    u8 bPreferredLie;
-    TGD_TerrainInfo* pCourse;
-    f32 fDist;
-    f32 fDropDist;
-    f32 fRadius;
-    f32 fDist2;
+// Where a player's ball is to be dropped (dropPosition): the last spot where it could have been
+// dropped (gBallDropSpot) or, with bUsePreferredLies, the last such spot with a preferred lie
+// (gBallPreferredLieSpot) when that is not where the shot started and is less than 10 yards
+// further from the ball. bUsePreferredLies is dropped for a ball that went further from the
+// shot's start than the pin is. When the spot is over 3 yards from the ball, or (without
+// bUsePreferredLies) on ground of another surface class than the ball's, rings 1 to 4 yards
+// around the ball are searched, 8 points a ring (only the first of them from SURFCLASS_WATER_e),
+// for a drop (a preferred one with bUsePreferredLies) on the ball's surface class, else the
+// nearest. Returns 0 when the spot is where the shot started (x, z), or, with bRevertToTee and the
+// shot played from the tee (vBall at vTeePos), when it is within 50 yards of the tee.
+u8 Ter_SearchForDropLocation(int PlayerID, u8 bUsePreferredLies, u8 bRevertToTee, f32* dropPosition) {
+    f32 angle;
+    f32 testPosition[4];
+    f32 delta[4];
+    TGD_MaterialInfo* pDropMaterial;
+    u8 bIsAcceptable;
+    u8 bIsPreferred;
+    TGD_TerrainInfo* pTerrainData;
+    f32 fPinDistSq;
+    f32 fPreferredDropDistance;
+    f32 fAcceptableDropDistance;
+    f32 distanceFromBall;
+    f32 dropPositionDistance;
     f32 fTurn;
-    f32 fSin;
-    f32 fHeading;
-    f32 fCos;
+    f32 tempSin;
+    f32 angleToCup;
+    f32 tempCos;
     int nRing;
-    Player* p;
-    TGD_MaterialInfo* pGround;
+    Player* pPlayer;
+    TGD_MaterialInfo* pNormalDropLocationMaterial;
 
-    p = &gPlayers[nPlayer];
-    pCourse = Ter_GetTGD();
-    fDist = LLMath_SquareDistanceBetween3(&pCourse->pin[Game_CurrentPinSet()].x, p->ball.vStart);
-    if (LLMath_SquareDistanceBetween3(p->ball.vPos, p->ball.vStart) > fDist) {
-        bPreferred = 0;                 // past the pin
+    pPlayer = &gPlayers[PlayerID];
+    pTerrainData = Ter_GetTGD();
+    fPinDistSq = LLMath_SquareDistanceBetween3(&pTerrainData->pin[Game_CurrentPinSet()].x,
+                                               pPlayer->ball.vStart);
+    if (LLMath_SquareDistanceBetween3(pPlayer->ball.vPos, pPlayer->ball.vStart) > fPinDistSq) {
+        bUsePreferredLies = 0;
     }
-    if (bPreferred) {
-        fDist = LLMath_DistanceBetween3(gBallPreferredLieSpot[nPlayer], p->ball.vPos);
-        fDropDist = LLMath_DistanceBetween3(gBallDropSpot[nPlayer], p->ball.vPos);
-        if ((p->ball.vStart[0] != gBallPreferredLieSpot[nPlayer][0] || p->ball.vStart[1]
-             != gBallPreferredLieSpot[nPlayer][1]
-             || p->ball.vStart[2] != gBallPreferredLieSpot[nPlayer][2])
-            && fDist - fDropDist < 10.0f) {
-            LLMath_CopyVec(gBallPreferredLieSpot[nPlayer], pOut);
+    if (bUsePreferredLies) {
+        fPreferredDropDistance =
+            LLMath_DistanceBetween3(gBallPreferredLieSpot[PlayerID], pPlayer->ball.vPos);
+        fAcceptableDropDistance = LLMath_DistanceBetween3(gBallDropSpot[PlayerID], pPlayer->ball.vPos);
+        if ((pPlayer->ball.vStart[0] != gBallPreferredLieSpot[PlayerID][0]
+             || pPlayer->ball.vStart[1] != gBallPreferredLieSpot[PlayerID][1]
+             || pPlayer->ball.vStart[2] != gBallPreferredLieSpot[PlayerID][2])
+            && fPreferredDropDistance - fAcceptableDropDistance < 10.0f) {
+            LLMath_CopyVec(gBallPreferredLieSpot[PlayerID], dropPosition);
         } else {
-            LLMath_CopyVec(gBallDropSpot[nPlayer], pOut);
+            LLMath_CopyVec(gBallDropSpot[PlayerID], dropPosition);
         }
     } else {
-        LLMath_CopyVec(gBallDropSpot[nPlayer], pOut);
+        LLMath_CopyVec(gBallDropSpot[PlayerID], dropPosition);
     }
-    vPos[0] = pOut[0];
-    vPos[1] = 1000000.0f;
-    vPos[2] = pOut[2];
-    vPos[3] = 1.0f;
-    pGround = Ter_GetSupportingGroundMaterial(pCourse, vPos);
-    fDist2 = LLMath_SquareDistanceBetween3(pOut, p->ball.vPos);
-    if (fDist2 > 9.0f
-        || (!bPreferred && pGround->nClass != gSurfaceTypes[p->ball.nSurface].nClass)) {
-        Ter_Subtract3(&pCourse->pin[Game_CurrentPinSet()].x, p->ball.vPos, vDir);
-        LLMath_Normalize3(vDir, vDir);
-        fHeading = atan2f(vDir[0], vDir[2]);
-        fRadius = 1.0f;
+    testPosition[0] = dropPosition[0];
+    testPosition[1] = 1000000.0f;
+    testPosition[2] = dropPosition[2];
+    testPosition[3] = 1.0f;
+    pNormalDropLocationMaterial = Ter_GetSupportingGroundMaterial(pTerrainData, testPosition);
+    dropPositionDistance = LLMath_SquareDistanceBetween3(dropPosition, pPlayer->ball.vPos);
+    if (dropPositionDistance > 9.0f
+        || (!bUsePreferredLies
+            && pNormalDropLocationMaterial->nClass != gSurfaceTypes[pPlayer->ball.nSurface].nClass)) {
+        Ter_Subtract3(&pTerrainData->pin[Game_CurrentPinSet()].x, pPlayer->ball.vPos, delta);
+        LLMath_Normalize3(delta, delta);
+        angleToCup = atan2f(delta[0], delta[2]);
+        distanceFromBall = 1.0f;
         for (nRing = 0; nRing < 4; nRing++) {
             for (fTurn = 0.0f; fTurn <= 6.265732f; fTurn += 0.7853982f) {
-                fAngle = fHeading + fTurn;
-                fSin = sinf(fAngle);
-                fCos = cosf(fAngle);
-                vPos[0] = fCos * fRadius + p->ball.vPos[0];
-                vPos[2] = fSin * fRadius + p->ball.vPos[2];
-                // from water, only straight towards the pin
-                if (gSurfaceTypes[p->ball.nSurface].nClass == 7 && fTurn > 0.0f) continue;
-                vPos[1] = p->ball.vPos[1] + 2.0f * fRadius;
-                vPos[1] = Ter_CheckForDropLocation(pCourse, vPos, 0, &bDrop, &bPreferredLie, &pSurface);
-                if ((bPreferred && bPreferredLie) || (!bPreferred && bDrop)) {
-                    if (pSurface->nClass == gSurfaceTypes[p->ball.nSurface].nClass) {
-                        LLMath_CopyVec(vPos, pOut);
-                        goto done;  // fake match: the original branches straight to the end, past the
-                                    // ring loop's compare, which a break (and a flag) would keep
+                angle = angleToCup + fTurn;
+                tempSin = sinf(angle);
+                tempCos = cosf(angle);
+                testPosition[0] = tempCos * distanceFromBall + pPlayer->ball.vPos[0];
+                testPosition[2] = tempSin * distanceFromBall + pPlayer->ball.vPos[2];
+                if (gSurfaceTypes[pPlayer->ball.nSurface].nClass == SURFCLASS_WATER_e
+                    && fTurn > 0.0f) continue;
+                testPosition[1] = pPlayer->ball.vPos[1] + 2.0f * distanceFromBall;
+                testPosition[1] = Ter_CheckForDropLocation(pTerrainData, testPosition, 0, &bIsAcceptable,
+                                                           &bIsPreferred, &pDropMaterial);
+                if ((bUsePreferredLies && bIsPreferred) || (!bUsePreferredLies && bIsAcceptable)) {
+                    if (pDropMaterial->nClass == gSurfaceTypes[pPlayer->ball.nSurface].nClass) {
+                        LLMath_CopyVec(testPosition, dropPosition);
+                        goto done;
                     }
-                    if (fRadius < fDist2) {     // EA bug: a distance against a squared one
-                        LLMath_CopyVec(vPos, pOut);
-                        fDist2 = fRadius;
+                    if (distanceFromBall < dropPositionDistance) {
+                        LLMath_CopyVec(testPosition, dropPosition);
+                        dropPositionDistance = distanceFromBall;
                     }
                 }
             }
-            fRadius += 1.0f;
+            distanceFromBall += 1.0f;
         }
     }
 done:
-    if (p->ball.vStart[0] == pOut[0] && p->ball.vStart[2] == pOut[2]) return 0;
-    if (bCheck && p->vA44[0] == p->vBall[0] && p->vA44[2] == p->vBall[2]
-        && LLMath_SquareDistanceBetween3(pOut, p->vA44) < 2500.0f) {
+    if (pPlayer->ball.vStart[0] == dropPosition[0] && pPlayer->ball.vStart[2] == dropPosition[2]) return 0;
+    if (bRevertToTee && pPlayer->vTeePos[0] == pPlayer->vBall[0] && pPlayer->vTeePos[2] == pPlayer->vBall[2]
+        && LLMath_SquareDistanceBetween3(dropPosition, pPlayer->vTeePos) < 2500.0f) {
         return 0;
     }
     return 1;
 }
 
-// TW06: f32 Ter_CheckForDropLocation(TGD_TerrainInfo*, f32*, bool, bool*, bool*, TGD_MaterialInfo**).
-// Whether a ball could be dropped at a point: in bounds and outside the free-drop areas, and, unless
-// bOnDropSurface, on ground that allows a drop (surface flag 1, not surface class 10) that is no
-// steeper than 30 degrees and clear of objects and hazards. *pbPreferred says the surface there is
-// a preferred one (always, when bOnDropSurface). Returns the ground height (0 when bOnDropSurface).
-f32 Ter_CheckForDropLocation(TGD_TerrainInfo* pCourse, f32* pPos, u8 bOnDropSurface, u8* pbDrop,
-                             u8* pbPreferred,
-                             TGD_MaterialInfo** ppSurface) {
-    f32 vPos[4];
-    f32 vNormal[4];
-    TGD_MaterialInfo* pSurface;
-    f32 fHeight;
-    u8 bOk;
+// Whether a ball could be dropped at a location (*pbIsAcceptable): in bounds and outside the
+// free-drop areas and, unless networksOnly, on ground (the highest at or below the location)
+// with MATERIAL_BALL_CAN_LIE, not SURFCLASS_OTHER_e, no steeper than 30 degrees and clear of
+// objects and hazards (Ter_CheckObjectAndHazardObstruction). *pbIsPreferred: acceptable and,
+// unless networksOnly, a preferred surface class (Ter_LieIsPreferred). *pDropMaterial, when
+// given, gets that ground's surface (NULL with networksOnly). Returns the ground's height (0 with
+// networksOnly).
+f32 Ter_CheckForDropLocation(TGD_TerrainInfo* pTerrainData, f32* location, u8 networksOnly,
+                             u8* pbIsAcceptable, u8* pbIsPreferred, TGD_MaterialInfo** pDropMaterial) {
+    f32 testPosition[4];
+    f32 normal[4];
+    TGD_MaterialInfo* pMaterialInfo;
+    f32 fTerrainHeight;
+    u8 acceptable;
 
-    vPos[0] = pPos[0];
-    vPos[1] = pPos[1];
-    vPos[2] = pPos[2];
-    vPos[3] = 1.0f;
-    if (!bOnDropSurface) {
-        fHeight = Ter_GetSupportingGroundData(pCourse, vPos, &pSurface, vNormal);
-        if (ppSurface != NULL) {
-            *ppSurface = pSurface;
+    testPosition[0] = location[0];
+    testPosition[1] = location[1];
+    testPosition[2] = location[2];
+    testPosition[3] = 1.0f;
+    if (!networksOnly) {
+        fTerrainHeight = Ter_GetSupportingGroundData(pTerrainData, testPosition, &pMaterialInfo, normal);
+        if (pDropMaterial != NULL) {
+            *pDropMaterial = pMaterialInfo;
         }
-        bOk = fHeight != TER_NO_GROUND && pSurface != NULL && (pSurface->uFlags & 1)
-              && pSurface->nClass != 10 && fabsf(vNormal[1]) > 0.86603f
-              && Ter_PointInOOBNetwork(vPos) && !Ter_PointInFreeDropNetwork(vPos)
-              // fake match: bOnDropSurface is always 0 here, but the original tests it again
-              && (bOnDropSurface || !Ter_CheckObjectAndHazardObstruction(vPos, 1.5f, 0, 1, 2.0f, 1, 0.577f));
+        acceptable = fTerrainHeight != TER_NO_GROUND && pMaterialInfo != NULL
+                     && (pMaterialInfo->uFlags & MATERIAL_BALL_CAN_LIE)
+                     && pMaterialInfo->nClass != SURFCLASS_OTHER_e
+                     && fabsf(normal[1]) > 0.86603f && Ter_PointInOOBNetwork(testPosition)
+                     && !Ter_PointInFreeDropNetwork(testPosition)
+                     && (networksOnly
+                         || !Ter_CheckObjectAndHazardObstruction(testPosition, 1.5f, 0, 1, 2.0f, 1, 0.577f));
     } else {
-        fHeight = 0.0f;
-        if (ppSurface != NULL) {
-            *ppSurface = NULL;
+        fTerrainHeight = 0.0f;
+        if (pDropMaterial != NULL) {
+            *pDropMaterial = NULL;
         }
-        bOk = Ter_PointInOOBNetwork(vPos) && !Ter_PointInFreeDropNetwork(vPos);
+        acceptable = Ter_PointInOOBNetwork(testPosition) && !Ter_PointInFreeDropNetwork(testPosition);
     }
-    vPos[1] = fHeight;              // fake match: never read again, but the original stores it
-    if (bOk) {
-        *pbDrop = 1;
-        if (bOnDropSurface || Ter_LieIsPreferred(pSurface->nClass)) {
-            *pbPreferred = 1;
+    testPosition[1] = fTerrainHeight;
+    if (acceptable) {
+        *pbIsAcceptable = 1;
+        if (networksOnly || Ter_LieIsPreferred(pMaterialInfo->nClass)) {
+            *pbIsPreferred = 1;
         } else {
-            *pbPreferred = 0;
+            *pbIsPreferred = 0;
         }
     } else {
-        *pbDrop = 0;
-        *pbPreferred = 0;
+        *pbIsAcceptable = 0;
+        *pbIsPreferred = 0;
     }
-    return fHeight;
+    return fTerrainHeight;
 }
 
-// TW06: bool Ter_LieIsPreferred(u32). Whether a surface class (TGD_MaterialInfo.nClass, which TW06 calls
-// the lie ID; not a Lie_t) is a preferred place for a drop: classes 1 to 4, the ones Physics_SetLie
-// turns into the fairway (1, 2), green (3) and fringe (4) lies.
-u8 Ter_LieIsPreferred(u32 nClass) {
-    if (nClass == 1 || nClass == 2 || nClass == 3 || nClass == 4) {
+// Whether a surface class (TGD_MaterialInfo.nClass) is a preferred lie for a drop: the tee box,
+// the fairway, the green or the fringe, the classes Physics_SetLie makes the fairway, green and
+// fringe lies.
+static u8 Ter_LieIsPreferred(u32 lieID) {
+    if (lieID == SURFCLASS_TEE_e || lieID == SURFCLASS_FAIRWAY_e || lieID == SURFCLASS_GREEN_e
+        || lieID == SURFCLASS_FRINGE_e) {
         return 1;
     }
     return 0;
 }
 
-// TW06: bool Ter_IsValidDropSurface(s32). Whether a surface type (a row of gSurfaceTypes) is of
-// surface class 3 (green), 12 (the cup) or 18 (green by the cup): Physics_Simulate records a ball
-// there as a drop spot without the ground checks.
-u8 Ter_IsValidDropSurface(s32 nSurface) {
+// Whether a surface type (a row of gSurfaceTypes) is the green, the cup or the green at the cup
+// (SURFCLASS_GREEN_e, SURFCLASS_CUP_e, SURFCLASS_CUP_GREEN_e). Physics_Simulate checks a ball on
+// one only against the outlines (Ter_CheckForDropLocation's networksOnly).
+u8 Ter_IsValidDropSurface(s32 surfaceID) {
     u32 nClass;
 
-    if (nSurface < 0 || nSurface >= NUM_SURFACE_TYPES) return 0;
-    nClass = gSurfaceTypes[nSurface].nClass;
-    if (nClass == 3 || nClass == 12 || nClass == 18) return 1;
+    if (surfaceID < 0 || surfaceID >= NUM_SURFACE_TYPES) return 0;
+    nClass = gSurfaceTypes[surfaceID].nClass;
+    if (nClass == SURFCLASS_GREEN_e || nClass == SURFCLASS_CUP_e || nClass == SURFCLASS_CUP_GREEN_e) return 1;
     return 0;
 }
 
-// The height of the lowest vertex of any ground triangle whose surface is not class 19; the
-// course keeps it as TGD_TerrainInfo.fFloor.
-f32 Ter_CalcLowestPlayableWorldHeight(TGD_TerrainInfo* pCourse) {
-    f32 fLowest = 1000000.0f;
+// The height of the lowest vertex of any triangle (TER_TRI_KICK_MASK set; the objects' too) whose
+// strip's surface is not SURFCLASS_NOT_PLAYABLE_e; the course keeps it as TGD_TerrainInfo.fFloor.
+static f32 Ter_CalcLowestPlayableWorldHeight(TGD_TerrainInfo* pTerrainData) {
+    f32 fLowestHeight = 1000000.0f;
     u32 i;
     int k;
-    TGD_PolygonReference* pRef = pCourse->pPolyRefs;
+    TGD_PolygonReference* pPolyRef = pTerrainData->pPolyRefs;
 
-    for (i = 0; i < pCourse->nPolyRefs; i++) {
-        if (pRef->nSurface < NUM_SURFACE_TYPES && gSurfaceTypes[pRef->nSurface].nClass == 19) {
-            pRef++;
+    for (i = 0; i < pTerrainData->nPolyRefs; i++) {
+        if (pPolyRef->nSurface < NUM_SURFACE_TYPES
+            && gSurfaceTypes[pPolyRef->nSurface].nClass == SURFCLASS_NOT_PLAYABLE_e) {
+            pPolyRef++;
         } else {
-            f32* pVert = pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
-            u8* pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
+            f32* pVertexData = pTerrainData->pVerts[TER_FIRST_VERTEX(pPolyRef)];
+            u8* pDrawKickData = pTerrainData->pTriFlags + TER_FIRST_VERTEX(pPolyRef);
 
             // a vertex is part of the triangles ending at it and at the next two vertices
-            for (k = 0; k < pRef->nTris + 2; k++) {
-                if ((k <= pRef->nTris + 1 && (pFlags[0] & TER_TRI_KICK_MASK))
-                    || (k <= pRef->nTris && (pFlags[1] & TER_TRI_KICK_MASK))
-                    || (k <= pRef->nTris - 1 && (pFlags[2] & TER_TRI_KICK_MASK))) {
-                    if (pVert[1] < fLowest) {
-                        fLowest = pVert[1];
+            for (k = 0; k < pPolyRef->nTris + 2; k++) {
+                if ((k <= pPolyRef->nTris + 1 && (pDrawKickData[0] & TER_TRI_KICK_MASK))
+                    || (k <= pPolyRef->nTris && (pDrawKickData[1] & TER_TRI_KICK_MASK))
+                    || (k <= pPolyRef->nTris - 1 && (pDrawKickData[2] & TER_TRI_KICK_MASK))) {
+                    if (pVertexData[1] < fLowestHeight) {
+                        fLowestHeight = pVertexData[1];
                     }
                 }
-                pVert += 3;
-                pFlags++;
+                pVertexData += 3;
+                pDrawKickData++;
             }
-            pRef++;
+            pPolyRef++;
         }
     }
-    return fLowest;
+    return fLowestHeight;
 }
 
-// The highest ground triangle under a point (x, z): its height there, the grid cell, the strip,
-// the triangle's vertices and its number in the strip; TER_NO_GROUND when there is none. Only
-// ground strips count (not objects), and only those in use: a strip flagged as the cup geometry of
-// some pin positions (bits 1, 2, 4, 8) is skipped unless the current one is among them, and one
-// with 0x10 in split screen.
-f32 Ter_GetHighestGroundTriangle(TGD_TerrainInfo* pCourse, f32* pPos, TGD_Cell** ppCell,
-                                 TGD_PolygonReference** ppRef,
-                                 f32 (**ppTri)[3],
-                s32* pTri) {
-    u32 uPinSet = 1 << Game_CurrentPinSet();
-    f32 fBest = TER_NO_GROUND;
-    int nX = (int)Ter_Floor((pPos[0] - pCourse->fGridOrigin[0]) / pCourse->fGridCellSize[0]);
-    int nZ = (int)Ter_Floor((pPos[2] - pCourse->fGridOrigin[1]) / pCourse->fGridCellSize[1]);
+// The highest ground triangle over or under a point (x, z), whatever the point's height: its
+// height there, the grid cell, the strip, the triangle's first vertex and that vertex's number in
+// the strip; TER_NO_GROUND when there is none. Object strips are left out, and so is a strip with
+// uFlags set that does not name the current pin position (POLYREF_PIN_POSITIONS), or that has
+// POLYREF_NOT_IN_SPLIT_SCREEN while the screen is split.
+static f32 Ter_GetHighestGroundTriangle(TGD_TerrainInfo* pTerrainData, f32* location, TGD_Cell** pCellResult,
+                                        TGD_PolygonReference** pPolyRefResult, f32 (**pTriangleVertices)[3],
+                                        s32* iFirstVertexIndex) {
+    u32 iCurrentPlacementMask = 1 << Game_CurrentPinSet();
+    f32 fHighestPoint = TER_NO_GROUND;
+    int gx = (int)Ter_Floor((location[0] - pTerrainData->fGridOrigin[0]) / pTerrainData->fGridCellSize[0]);
+    int gy = (int)Ter_Floor((location[2] - pTerrainData->fGridOrigin[1]) / pTerrainData->fGridCellSize[1]);
     TGD_Cell* pCell;
-    TGD_PolygonReference* pRef;
-    f32 (*pVert)[3];
-    u8* pFlags;
-    int i;
+    TGD_PolygonReference* pPolyRef;
+    f32 (*pVertexData)[3];
+    u8* pDrawKickData;
     int j;
+    int k;
     f32 fA;
     f32 fB;
     f32 fC;
     f32 fHeight;
 
-    if (nX >= 0 && nX < pCourse->nGridWidth && nZ >= 0 && nZ < pCourse->nGridLength) {
-        pCell = &pCourse->pGrid[nX + nZ * pCourse->nGridWidth];
-        pRef = &pCourse->pPolyRefs[pCell->uRefs >> CELL_REFS_FIRST_SHIFT];
-        for (i = (pCell->uRefs & CELL_REFS_COUNT_MASK) - 1; i >= 0; i--) {
-            if (pRef->nObject != 0) {
-                pRef++;
-            } else if (pRef->uFlags != 0
-                       && (!(pRef->uFlags & uPinSet)
-                           || ((pRef->uFlags & POLYREF_NOT_IN_SPLIT_SCREEN) && gSession.nSplitScreen))) {
-                pRef++;
+    if (gx >= 0 && gx < pTerrainData->nGridWidth && gy >= 0 && gy < pTerrainData->nGridLength) {
+        pCell = &pTerrainData->pGrid[gx + gy * pTerrainData->nGridWidth];
+        pPolyRef = &pTerrainData->pPolyRefs[pCell->uRefs >> CELL_REFS_FIRST_SHIFT];
+        for (j = (pCell->uRefs & CELL_REFS_COUNT_MASK) - 1; j >= 0; j--) {
+            if (pPolyRef->nObject != 0) {
+                pPolyRef++;
+            } else if (pPolyRef->uFlags != 0
+                       && (!(pPolyRef->uFlags & iCurrentPlacementMask)
+                           || ((pPolyRef->uFlags & POLYREF_NOT_IN_SPLIT_SCREEN) && gSession.nSplitScreen))) {
+                pPolyRef++;
             } else {
-                pVert = &pCourse->pVerts[TER_FIRST_VERTEX(pRef)];
-                pFlags = pCourse->pTriFlags + TER_FIRST_VERTEX(pRef);
-                for (j = pRef->nTris - 1; j >= 0; j--) {
-                    if ((pFlags[2] & TER_TRI_KICK_MASK) && fBest < pVert[TER_TRI_HIGHEST_CORNER(pFlags[2])][1]
-                        && Ter_PointInTriangleXZpY(pVert[0], pVert[1], pVert[2], pPos[0], pPos[2])) {
-                        Ter_GetBarycentricCoords(pVert, pPos, &fA, &fB, &fC);
-                        fHeight = fA * pVert[0][1] + fB * pVert[1][1] + fC * pVert[2][1];
-                        if (fHeight > fBest) {
-                            *ppCell = pCell;
-                            fBest = fHeight;
-                            *ppRef = pRef;
-                            *ppTri = pVert;
-                            *pTri = pRef->nTris - j - 1;
+                pVertexData = &pTerrainData->pVerts[TER_FIRST_VERTEX(pPolyRef)];
+                pDrawKickData = pTerrainData->pTriFlags + TER_FIRST_VERTEX(pPolyRef);
+                for (k = pPolyRef->nTris - 1; k >= 0; k--) {
+                    // a triangle whose highest corner is no higher than the best so far is passed over
+                    if ((pDrawKickData[2] & TER_TRI_KICK_MASK)
+                        && fHighestPoint < pVertexData[TER_TRI_HIGHEST_CORNER(pDrawKickData[2])][1]
+                        && Ter_PointInTriangleXZpY(pVertexData[0], pVertexData[1], pVertexData[2],
+                                                   location[0], location[2])) {
+                        Ter_GetBarycentricCoords(pVertexData, location, &fA, &fB, &fC);
+                        fHeight = fA * pVertexData[0][1] + fB * pVertexData[1][1] + fC * pVertexData[2][1];
+                        if (fHeight > fHighestPoint) {
+                            *pCellResult = pCell;
+                            fHighestPoint = fHeight;
+                            *pPolyRefResult = pPolyRef;
+                            *pTriangleVertices = pVertexData;
+                            *iFirstVertexIndex = pPolyRef->nTris - k - 1;
                         }
                     }
-                    pVert++;
-                    pFlags++;
+                    pVertexData++;
+                    pDrawKickData++;
                 }
-                pRef++;
+                pPolyRef++;
             }
         }
-        return fBest;
+        return fHighestPoint;
     }
     return TER_NO_GROUND;
 }
@@ -2419,7 +2433,7 @@ u8 Ter_PointInTriangleXZpY(f32* pA, f32* pB, f32* pC, f32 fX, f32 fZ) {
 
 // A flag byte of a course object's model (GoTerrain.c's Ter_GetMeshFlags reads the same bytes).
 // Ter_CheckObjectAndHazardObstruction finds the model with Ter_GetObjectListModel (from the object's nPatch
-// and nObjList) and tests bit 0x40 of byte n = 0.
+// and nObjList) and tests UOBJMESH_F0_NO_FADE in byte n = 0.
 int TerCollision_GetMeshFlags(UObjMesh* pModel, int n) {
     return pModel->pInfo->aFlags[n];
 }

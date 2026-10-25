@@ -347,8 +347,8 @@ static f32 GoDynObj_StrippedFn(f32 x) {
     return x;
 }
 
-// Whether nPlayer's ball is drawn: on lie 16 not when its surface is unknown or of class 7, 15 or
-// 16 (7 and 16: water) or it is over 0.5 up; not on lies 0, 9 or 12 while the player is in state
+// Whether nPlayer's ball is drawn: on lie 16 not when its surface is unknown, water or
+// SURFCLASS_HIDES_BALL_e, or it is over 0.5 up; not on lies 0, 9 or 12 while the player is in state
 // 19, not when DynObj_bAltShotDrawBall says no, and not in state 18 when the camera clips this
 // golfer.
 u8 DynObj_bDrawBall(int nPlayer) {
@@ -360,7 +360,8 @@ u8 DynObj_bDrawBall(int nPlayer) {
             return 0;
         }
         nClass = gSurfaceTypes[gPlayers[nPlayer].ball.nSurface].nClass;
-        if (nClass == 7 || nClass == 15 || nClass == 16) {
+        if (nClass == SURFCLASS_WATER_e || nClass == SURFCLASS_HIDES_BALL_e
+            || nClass == SURFCLASS_WATER_OOB_e) {
             return 0;
         }
         if (gPlayers[nPlayer].ball.fHeight > 0.5f) {
@@ -429,7 +430,7 @@ void DynObj_RenderBalls(int nView) {
     }
 }
 
-// A ball landing on the green (surface class 3) at 10 or more leaves a pitch mark ('TEO ' 10005
+// A ball landing on the green (SURFCLASS_GREEN_e) at 10 or more leaves a pitch mark ('TEO ' 10005
 // object) at pPos: ten are used in turn.
 void DynObj_PitchMarkAdd(f32* pPos, int nPlayer) {
     DynObjDef def;
@@ -446,7 +447,7 @@ void DynObj_PitchMarkAdd(f32* pPos, int nPlayer) {
     vPos[2] = pPos[2];
     vPos[3] = 1.0f;
     fGround = Ter_GetSupportingGroundData(Ter_GetTGD(), vPos, &pSurface, vNormal);
-    if (TER_NO_GROUND != fGround && pSurface->nClass == 3 && fGround - pPos[1] < 0.02f &&
+    if (TER_NO_GROUND != fGround && pSurface->nClass == SURFCLASS_GREEN_e && fGround - pPos[1] < 0.02f &&
         (f32)Math_Sqrt(LLMath_LengthSquared3(gPlayers[nPlayer].ball.vVel)) >= 10.0f) {
         if (gpDynObjState->apPitchMark[gpDynObjState->nNextPitchMark] == NULL) {
             def.nActorId = 0;

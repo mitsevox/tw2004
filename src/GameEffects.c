@@ -301,7 +301,8 @@ void GameEffects_ScriptedGameBreakerBallHitTrigger(int nPlayer) {
         GameEffects_SetHalfTime(0, nPlayer);
         GameEffects_SetDoubleTime(0, nPlayer);
         pView = ViewController_GetCameraControl(gPlayers[nPlayer].nView[0]);
-        pView->p74 = DynamicCam_ChooseSequence(nPlayer, nLie, 3, CAMSTATE_GAMEBREAKER_HIT, 1, fDist);
+        pView->p74 = DynamicCam_ChooseSequence(nPlayer, nLie, SURFCLASS_GREEN_e, CAMSTATE_GAMEBREAKER_HIT, 1,
+                                               fDist);
         gGameEffects.bBallHit = 1;
         if (gGameEffects.f24 > 0.8f) {
             gGameEffects.f24 = 0.8f;
@@ -410,7 +411,7 @@ void GameEffects_InFlightGameBreakerTrigger(int nPlayer) {
             if (gPlayers[nPlayer].ballBefore.nSurface >= 0) {
                 nClass = gSurfaceTypes[gPlayers[nPlayer].ballBefore.nSurface].nClass;
             } else {
-                nClass = 10;
+                nClass = SURFCLASS_OTHER_e;
             }
             gGameEffects.bClosing = 0;
             gGameEffects.bGameBreaker = 1;
