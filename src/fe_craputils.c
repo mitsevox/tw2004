@@ -298,16 +298,16 @@ u8 FE_CrAP_IsCustomAnimationSelected(SaveProfile* pProfile, int nKind, char* pNa
     return 0;
 }
 
-// Signs sponsor n (a Create-A-Player asset's n2C) into lbl_80281DF0, the sponsorship a new profile
+// Signs sponsor n (a Create-A-Player asset's n2C) into gStartingSponsor, the sponsorship a new profile
 // starts with; the profile setup (PasswordManager.c) copies it into the profile's first slot.
 // Called by PGASponsor_PickStartingSponsor.
 void FE_SetStartingSponsor(s16 n) {
-    lbl_80281DF0.bSigned = 1;
-    lbl_80281DF0.nSponsor = n;
+    gStartingSponsor.bSigned = 1;
+    gStartingSponsor.nSponsor = n;
 }
 
 int FE_GetStartingSponsor(void) {
-    return lbl_80281DF0.nSponsor;
+    return gStartingSponsor.nSponsor;
 }
 
 // Par-5 eagle record i (GM_ConvertCourseAndHoleToPar5EagleIndex, 0..74) of the profile: kind 0
