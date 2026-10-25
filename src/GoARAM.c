@@ -1,32 +1,26 @@
-// GoARAM.c (EA's name, from its asserts): the audio RAM (ARAM): its set-up (GoARAM_Init), its heap
-// and the queue of DMA transfers between main memory and ARAM (the state at gARAMState). The
-// front end, the memory card and the animation code keep data here while it is not needed.
+// GoARAM.c: the auxiliary RAM (ARAM): its set-up, its heap and the queue of DMA transfers between
+// main memory and ARAM. The sound engine, the front end, the memory card and the animation code
+// keep data there.
 
 #include "core/goaram.h"
 #include "core/startup.h"
 
-void       fn_800B5D08(ARAMHeap* pHeap);
-void       GoARAM_HeapPutBlockRecord(ARAMHeap* pHeap, ARAMBlock* pBlock);
-ARAMBlock* GoARAM_HeapTakeBlockRecord(ARAMHeap* pHeap);
-ARAMBlock* GoARAM_HeapMergeFreeBlock(ARAMHeap* pHeap, ARAMBlock* pHead, ARAMBlock* pBlock);
-void       GoARAM_BlockInsertAfter(ARAMBlock* pAt, ARAMBlock* pBlock);
-void       GoARAM_BlockInsertBefore(ARAMBlock* pAt, ARAMBlock* pBlock);
-void       GoARAM_BlockUnlink(ARAMBlock* pBlock);
-ARAMBlock* GoARAM_BlockRemove(ARAMBlock* pHead, ARAMBlock* pBlock);
-ARAMBlock* GoARAM_BlockInsertSorted(ARAMBlock* pHead, ARAMBlock* pBlock);
-void       fn_800B6188(ARAMHeap* pHeap);
-void       GoARAM_HandleTransferDone(ARQRequest* pRequest);
-void       GoARAM_ReleaseTransfer(ARAMTransfer* pTransfer);
-void       GoARAM_Init(void);
-void       GoARAM_Shutdown(void);
-void       fn_800B655C(void);
-void       fn_800B6560(void);
-s32        GoARAM_GetTransferState(ARAMTransfer* pTransfer);
-void       fn_80007328(void);
-void       fn_80007368(void);
-
 ARAMState gARAMState;
 ARAMState* gpARAMState = &gARAMState;
+
+static void       GoARAM_HeapClose(ARAMHeap* pHeap);
+static void       GoARAM_HeapPutBlockRecord(ARAMHeap* pHeap, ARAMBlock* pBlock);
+static ARAMBlock* GoARAM_HeapTakeBlockRecord(ARAMHeap* pHeap);
+static ARAMBlock* GoARAM_HeapMergeFreeBlock(ARAMHeap* pHeap, ARAMBlock* pHead, ARAMBlock* pBlock);
+static void       GoARAM_BlockInsertAfter(ARAMBlock* pAt, ARAMBlock* pBlock);
+static void       GoARAM_BlockInsertBefore(ARAMBlock* pAt, ARAMBlock* pBlock);
+static void       GoARAM_BlockUnlink(ARAMBlock* pBlock);
+static ARAMBlock* GoARAM_BlockRemove(ARAMBlock* pHead, ARAMBlock* pBlock);
+static ARAMBlock* GoARAM_BlockInsertSorted(ARAMBlock* pHead, ARAMBlock* pBlock);
+static void       GoARAM_HeapWalk(ARAMHeap* pHeap);
+static void       GoARAM_HandleTransferDone(ARQRequest* pRequest);
+static void       GoARAM_ReleaseTransfer(ARAMTransfer* pTransfer);
+static ARAMTransferState GoARAM_GetTransferState(ARAMTransfer* pTransfer);
 
 // Sets up a heap of uSize bytes at ARAM address uBase, with nBlocks block records after pHeap:
 // one record holds the whole heap as free, the others go to the spare list.
@@ -34,7 +28,7 @@ ARAMHeap* GoARAM_HeapInit(u32 uSize, u32 uBase, u32 nBlocks, ARAMHeap* pHeap) {
     ARAMBlock* pBlock;
     u32 i;
 
-    pHeap->p20 = NULL;
+    pHeap->pCircularMem = NULL;
     pHeap->pBlocks = (ARAMBlock*)(pHeap + 1);
     pHeap->uBase = uBase;
     pHeap->uFree = uSize;
@@ -53,9 +47,10 @@ ARAMHeap* GoARAM_HeapInit(u32 uSize, u32 uBase, u32 nBlocks, ARAMHeap* pHeap) {
     return pHeap;
 }
 
-void fn_800B5D08(ARAMHeap* pHeap) {
-    if (pHeap->p20 != NULL) {
-        Circular_MemFreeFunc(pHeap->p20);
+// Frees the heap's block of the game's heap, if it has one; nothing in this build gives it one.
+static void GoARAM_HeapClose(ARAMHeap* pHeap) {
+    if (pHeap->pCircularMem != NULL) {
+        Circular_MemFreeFunc(pHeap->pCircularMem);
     }
 }
 
@@ -83,7 +78,7 @@ u32 GoARAM_HeapAlloc(ARAMHeap* pHeap, u32 uSize, u32 uAlign) {
     uPad = (uAlign - (pBest->uOffset + uBase) % uAlign) % uAlign;
     uNeed = uSize + uPad;
     if (pBest->uSize < uNeed) {
-        fn_800B6188(pHeap);
+        GoARAM_HeapWalk(pHeap);
     }
     if (pBest->uSize == uNeed) {
         pHeap->pFree = GoARAM_BlockRemove(pHeap->pFree, pBest);
@@ -123,12 +118,12 @@ void GoARAM_HeapFree(ARAMHeap* pHeap, u32 uAram) {
 }
 
 // Puts a block record back in the spare list.
-void GoARAM_HeapPutBlockRecord(ARAMHeap* pHeap, ARAMBlock* pBlock) {
+static void GoARAM_HeapPutBlockRecord(ARAMHeap* pHeap, ARAMBlock* pBlock) {
     GoARAM_BlockInsertAfter(pHeap->pSpare, pBlock);
 }
 
 // Takes a record from the spare list.
-ARAMBlock* GoARAM_HeapTakeBlockRecord(ARAMHeap* pHeap) {
+static ARAMBlock* GoARAM_HeapTakeBlockRecord(ARAMHeap* pHeap) {
     ARAMBlock* pBlock = pHeap->pSpare;
 
     pHeap->pSpare = pHeap->pSpare->pNext;
@@ -137,7 +132,7 @@ ARAMBlock* GoARAM_HeapTakeBlockRecord(ARAMHeap* pHeap) {
 }
 
 // Merges the free block pBlock with the free blocks either side of it when they touch.
-ARAMBlock* GoARAM_HeapMergeFreeBlock(ARAMHeap* pHeap, ARAMBlock* pHead, ARAMBlock* pBlock) {
+static ARAMBlock* GoARAM_HeapMergeFreeBlock(ARAMHeap* pHeap, ARAMBlock* pHead, ARAMBlock* pBlock) {
     ARAMBlock* pPrev = pBlock->pPrev;
     ARAMBlock* pNext;
     int i;
@@ -157,7 +152,7 @@ ARAMBlock* GoARAM_HeapMergeFreeBlock(ARAMHeap* pHeap, ARAMBlock* pHead, ARAMBloc
 }
 
 // Links pBlock in after pAt.
-void GoARAM_BlockInsertAfter(ARAMBlock* pAt, ARAMBlock* pBlock) {
+static void GoARAM_BlockInsertAfter(ARAMBlock* pAt, ARAMBlock* pBlock) {
     if (pAt != NULL) {
         pBlock->pNext = pAt->pNext;
         pBlock->pPrev = pAt;
@@ -169,7 +164,7 @@ void GoARAM_BlockInsertAfter(ARAMBlock* pAt, ARAMBlock* pBlock) {
 }
 
 // Links pBlock in before pAt.
-void GoARAM_BlockInsertBefore(ARAMBlock* pAt, ARAMBlock* pBlock) {
+static void GoARAM_BlockInsertBefore(ARAMBlock* pAt, ARAMBlock* pBlock) {
     if (pAt != NULL) {
         pBlock->pNext = pAt;
         pBlock->pPrev = pAt->pPrev;
@@ -181,7 +176,7 @@ void GoARAM_BlockInsertBefore(ARAMBlock* pAt, ARAMBlock* pBlock) {
 }
 
 // Unlinks pBlock, leaving it a list of its own.
-void GoARAM_BlockUnlink(ARAMBlock* pBlock) {
+static void GoARAM_BlockUnlink(ARAMBlock* pBlock) {
     pBlock->pPrev->pNext = pBlock->pNext;
     pBlock->pNext->pPrev = pBlock->pPrev;
     pBlock->pPrev = pBlock;
@@ -189,7 +184,7 @@ void GoARAM_BlockUnlink(ARAMBlock* pBlock) {
 }
 
 // Removes pBlock from the list at pHead and returns the list's new head (NULL once it is empty).
-ARAMBlock* GoARAM_BlockRemove(ARAMBlock* pHead, ARAMBlock* pBlock) {
+static ARAMBlock* GoARAM_BlockRemove(ARAMBlock* pHead, ARAMBlock* pBlock) {
     if (pBlock == pBlock->pNext) return NULL;
     if (pBlock == pHead) {
         pHead = pBlock->pNext;
@@ -202,7 +197,7 @@ ARAMBlock* GoARAM_BlockRemove(ARAMBlock* pHead, ARAMBlock* pBlock) {
 }
 
 // Adds pBlock to the list at pHead, keeping it sorted by offset, and returns the new head.
-ARAMBlock* GoARAM_BlockInsertSorted(ARAMBlock* pHead, ARAMBlock* pBlock) {
+static ARAMBlock* GoARAM_BlockInsertSorted(ARAMBlock* pHead, ARAMBlock* pBlock) {
     ARAMBlock* pAt;
 
     if (pHead == NULL) return pBlock;
@@ -221,8 +216,9 @@ ARAMBlock* GoARAM_BlockInsertSorted(ARAMBlock* pHead, ARAMBlock* pBlock) {
     return pHead;
 }
 
-// Walks both lists and does nothing with them: whatever it checked or printed is compiled out.
-void fn_800B6188(ARAMHeap* pHeap) {
+// Called when no free block is big enough: walks the used list, then the free list, and does
+// nothing else.
+static void GoARAM_HeapWalk(ARAMHeap* pHeap) {
     ARAMBlock* pHead;
     ARAMBlock* pBlock;
 
@@ -238,23 +234,24 @@ void fn_800B6188(ARAMHeap* pHeap) {
     } while (pBlock != pHead);
 }
 
-// The ARQ library calls this when a transfer's DMA is done.
-void GoARAM_HandleTransferDone(ARQRequest* pRequest) {
+// The ARQ library calls this when a transfer's DMA is done: the transfer's pfnDone runs, then the
+// transfer is given back or marked done.
+static void GoARAM_HandleTransferDone(ARQRequest* pRequest) {
     ARAMTransfer* pTransfer = (ARAMTransfer*)pRequest;
 
     if (pTransfer->pfnDone != NULL) {
         pTransfer->pfnDone(pTransfer->uOwner);
     }
-    if (pTransfer->uFlags & 1) {
+    if (pTransfer->uFlags & ARAM_TRANSFER_RELEASE_WHEN_DONE) {
         GoARAM_ReleaseTransfer(pTransfer);
         return;
     }
-    pTransfer->nState = 2;
+    pTransfer->nState = ARAM_TRANSFER_DONE;
 }
 
 // Moves a transfer from the queued list back to the unused list.
-void GoARAM_ReleaseTransfer(ARAMTransfer* pTransfer) {
-    pTransfer->nState = 0;
+static void GoARAM_ReleaseTransfer(ARAMTransfer* pTransfer) {
+    pTransfer->nState = ARAM_TRANSFER_UNUSED;
     if (pTransfer == pTransfer->pNext) {
         gpARAMState->pQueued = NULL;
     } else {
@@ -279,8 +276,9 @@ void GoARAM_ReleaseTransfer(ARAMTransfer* pTransfer) {
     gpARAMState->nUnused++;
 }
 
-// Sets up the ARAM: the heap over all of it and ARAM_NUM_TRANSFERS unused transfers.
-void GoARAM_Init(void) {
+// Sets up the ARAM at boot: the heap over all of it past what the ARAM library keeps, and
+// ARAM_NUM_TRANSFERS unused transfers (from the system heap, else from the game's heap).
+void GoARAM_InitOnce(void) {
     ARAMTransfer* pTransfer;
     u32 uBase;
     u32 uEnd;
@@ -291,15 +289,15 @@ void GoARAM_Init(void) {
     uEnd = ARGetSize();
     gpARAMState->pHeapMem = Mem_AllocFunc(sizeof(ARAMHeap) + ARAM_NUM_BLOCKS * sizeof(ARAMBlock), 16, 1);
     gpARAMState->pHeap = GoARAM_HeapInit(uEnd - uBase, uBase, ARAM_NUM_BLOCKS, gpARAMState->pHeapMem);
-    gpARAMState->p8 = Mem_AllocFunc(ARAM_NUM_TRANSFERS * sizeof(ARAMTransfer), 16, 1);
+    gpARAMState->pTransfersMem = Mem_AllocFunc(ARAM_NUM_TRANSFERS * sizeof(ARAMTransfer), 16, 1);
     gpARAMState->nTransfers = ARAM_NUM_TRANSFERS;
-    if (gpARAMState->p8 == NULL) {
-        gpARAMState->p18 = Circular_MemAllocFunc(ARAM_NUM_TRANSFERS * sizeof(ARAMTransfer), MEMTYPE_LOW, 16,
-                                                 "GoARAM.c", 192);
-        gpARAMState->pTransfers = gpARAMState->p18;
+    if (gpARAMState->pTransfersMem == NULL) {
+        gpARAMState->pTransfersCircular = Circular_MemAllocFunc(ARAM_NUM_TRANSFERS * sizeof(ARAMTransfer),
+                                                                MEMTYPE_LOW, 16, "GoARAM.c", 192);
+        gpARAMState->pTransfers = gpARAMState->pTransfersCircular;
     } else {
-        gpARAMState->p18 = NULL;
-        gpARAMState->pTransfers = gpARAMState->p8;
+        gpARAMState->pTransfersCircular = NULL;
+        gpARAMState->pTransfers = gpARAMState->pTransfersMem;
     }
     gpARAMState->pQueued = NULL;
     gpARAMState->pUnused = NULL;
@@ -322,23 +320,27 @@ void GoARAM_Init(void) {
     gpARAMState->nQueued = 0;
 }
 
-void GoARAM_Shutdown(void) {
-    if (gpARAMState->p18 != NULL) {
-        Circular_MemFreeFunc(gpARAMState->p18);
-        gpARAMState->p18 = NULL;
+// Frees the transfers, then the heap: its block of the game's heap (GoARAM_HeapClose), then its
+// header and block records.
+void GoARAM_CloseOnce(void) {
+    if (gpARAMState->pTransfersCircular != NULL) {
+        Circular_MemFreeFunc(gpARAMState->pTransfersCircular);
+        gpARAMState->pTransfersCircular = NULL;
     }
-    Mem_FreeFunc(gpARAMState->p8);
-    gpARAMState->p8 = NULL;
-    fn_800B5D08(gpARAMState->pHeap);
+    Mem_FreeFunc(gpARAMState->pTransfersMem);
+    gpARAMState->pTransfersMem = NULL;
+    GoARAM_HeapClose(gpARAMState->pHeap);
     gpARAMState->pHeap = NULL;
     Mem_FreeFunc(gpARAMState->pHeapMem);
     gpARAMState->pHeapMem = NULL;
 }
 
-void fn_800B655C(void) {
+// Empty in this build: the main loop's start-up list for the systems each game mode needs calls it.
+void GoARAM_InitModule(void) {
 }
 
-void fn_800B6560(void) {
+// Empty in this build: the matching shut-down list calls it.
+void GoARAM_CloseModule(void) {
 }
 
 // Hands out uSize bytes of ARAM, 32-byte aligned, and returns their address.
@@ -350,13 +352,14 @@ void GoARAM_Free(u32 uAram) {
     GoARAM_HeapFree(gpARAMState->pHeap, uAram);
 }
 
-// Queues a DMA of uLength bytes from uSource to uDest (nType as ARQRequest.type) and returns its
-// transfer. pfnDone(uOwner) is called when it is done.
+// Queues a DMA of uLength bytes from uSource to uDest (nType an ARQ_TYPE_*, uPriority an
+// ARQ_PRIORITY_*) and returns its transfer, with interrupts off while it moves the transfer to
+// the queued list. pfnDone(uOwner) is called when it is done; uFlags are ARAM_TRANSFER_* bits.
 ARAMTransfer* GoARAM_QueueTransfer(u32 uSource, u32 uDest, u32 uLength, int nType, u32 uPriority,
-                          void (*pfnDone)(u32 uOwner), u32 uOwner, u8 uFlags) {
+                                   void (*pfnDone)(u32 uOwner), u32 uOwner, u8 uFlags) {
     ARAMTransfer* pTransfer;
 
-    fn_80007368();
+    Displ_DisableInterrupts();
     pTransfer = gpARAMState->pUnused;
     if (pTransfer == pTransfer->pNext) {
         gpARAMState->pUnused = NULL;
@@ -380,19 +383,21 @@ ARAMTransfer* GoARAM_QueueTransfer(u32 uSource, u32 uDest, u32 uLength, int nTyp
     }
     gpARAMState->pQueued = pTransfer;
     gpARAMState->nQueued++;
-    fn_80007328();
+    Displ_RestoreInterrupts();
     pTransfer->pfnDone = pfnDone;
     pTransfer->uOwner = uOwner;
     pTransfer->uFlags = uFlags;
     pTransfer->nType = nType;
-    pTransfer->uMain = (nType == 0) ? uSource : uDest;
+    pTransfer->uMain = (nType == ARQ_TYPE_MRAM_TO_ARAM) ? uSource : uDest;
     pTransfer->uLength = uLength;
-    pTransfer->nState = 1;
-    ARQPostRequest(&pTransfer->request, uOwner, nType, uPriority, uSource, uDest, uLength, GoARAM_HandleTransferDone);
+    pTransfer->nState = ARAM_TRANSFER_QUEUED;
+    ARQPostRequest(&pTransfer->request, uOwner, nType, uPriority, uSource, uDest, uLength,
+                   GoARAM_HandleTransferDone);
     return pTransfer;
 }
 
-// Cancels the queued transfers of uOwner that allow it (flag 2) and returns how many.
+// Takes back every transfer of uOwner still in the queued list that is ARAM_TRANSFER_CANCELLABLE,
+// its request taken off the ARQ queue, and returns how many.
 int GoARAM_CancelTransfers(u32 uOwner) {
     ARAMTransfer* pTransfer;
     ARAMTransfer* pNext;
@@ -400,53 +405,56 @@ int GoARAM_CancelTransfers(u32 uOwner) {
     int i;
     int nCancelled = 0;
 
-    fn_80007368();
+    Displ_DisableInterrupts();
     i = 0;
     pTransfer = gpARAMState->pQueued;
     nQueued = gpARAMState->nQueued;
     for (; i < nQueued; i++) {
         pNext = pTransfer->pNext;
-        if ((pTransfer->uFlags & 2) && pTransfer->uOwner == uOwner) {
+        if ((pTransfer->uFlags & ARAM_TRANSFER_CANCELLABLE) && pTransfer->uOwner == uOwner) {
             ARQRemoveRequest(&pTransfer->request);
             GoARAM_ReleaseTransfer(pTransfer);
             nCancelled++;
         }
         pTransfer = pNext;
     }
-    fn_80007328();
+    Displ_RestoreInterrupts();
     return nCancelled;
 }
 
-s32 GoARAM_GetTransferState(ARAMTransfer* pTransfer) {
-    s32 nState;
+// Reads a transfer's state with interrupts off.
+static ARAMTransferState GoARAM_GetTransferState(ARAMTransfer* pTransfer) {
+    ARAMTransferState nState;
 
-    fn_80007368();
+    Displ_DisableInterrupts();
     nState = pTransfer->nState;
-    fn_80007328();
+    Displ_RestoreInterrupts();
     return nState;
 }
 
-// Waits for a transfer to finish, then gives it back.
+// Waits for a transfer's DMA to be done, drops the CPU cache over what came into main memory, then
+// gives the transfer back.
 void GoARAM_WaitTransfer(ARAMTransfer* pTransfer) {
     do {
-    } while (GoARAM_GetTransferState(pTransfer) != 2);
-    // port: the main-memory address is kept as a u32, as the ARQ library takes it
+    } while (GoARAM_GetTransferState(pTransfer) != ARAM_TRANSFER_DONE);
     AudDma_CacheAfterTransfer((void*)pTransfer->uMain, pTransfer->uLength, pTransfer->nType);
-    fn_80007368();
+    Displ_DisableInterrupts();
     GoARAM_ReleaseTransfer(pTransfer);
-    fn_80007328();
+    Displ_RestoreInterrupts();
 }
 
-// Starts copying uSize bytes from pSrc to ARAM address uAram; GoARAM_WaitTransfer waits for it.
+// Starts copying uSize bytes from pSrc to ARAM address uAram, the CPU cache written back first;
+// GoARAM_WaitTransfer waits for it.
 ARAMTransfer* GoARAM_CopyToAram(void* pSrc, u32 uAram, u32 uSize) {
-    AudDma_CacheBeforeTransfer(pSrc, uSize, 0);
-    // port: the ARQ library takes addresses as u32
-    return GoARAM_QueueTransfer((u32)pSrc, uAram, uSize, 0, 1, NULL, 0, 0);
+    AudDma_CacheBeforeTransfer(pSrc, uSize, ARQ_TYPE_MRAM_TO_ARAM);
+    return GoARAM_QueueTransfer((u32)pSrc, uAram, uSize, ARQ_TYPE_MRAM_TO_ARAM, ARQ_PRIORITY_HIGH,
+                                NULL, 0, 0);
 }
 
-// Starts copying uSize bytes from ARAM address uAram to pDst; GoARAM_WaitTransfer waits for it.
+// Starts copying uSize bytes from ARAM address uAram to pDst, the CPU cache over pDst dropped
+// first; GoARAM_WaitTransfer waits for it.
 ARAMTransfer* GoARAM_CopyFromAram(void* pDst, u32 uAram, u32 uSize) {
-    AudDma_CacheBeforeTransfer(pDst, uSize, 1);
-    // port: the ARQ library takes addresses as u32
-    return GoARAM_QueueTransfer(uAram, (u32)pDst, uSize, 1, 1, NULL, 0, 0);
+    AudDma_CacheBeforeTransfer(pDst, uSize, ARQ_TYPE_ARAM_TO_MRAM);
+    return GoARAM_QueueTransfer(uAram, (u32)pDst, uSize, ARQ_TYPE_ARAM_TO_MRAM, ARQ_PRIORITY_HIGH,
+                                NULL, 0, 0);
 }
