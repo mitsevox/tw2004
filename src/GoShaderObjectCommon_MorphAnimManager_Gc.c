@@ -106,7 +106,7 @@ void fn_800975FC(MorphAnim* pAnim) {
 }
 
 // Free an animation's data.
-void fn_80097624(MorphAnim* pAnim) {
+void MorphAnim_Free(MorphAnim* pAnim) {
     if (pAnim->nFrames != 0) {
         Circular_MemFreeFunc(pAnim->p10);
         Circular_MemFreeFunc(pAnim->p14);
@@ -118,18 +118,18 @@ void fn_80097624(MorphAnim* pAnim) {
     }
 }
 
-s32 fn_80097688(void) {
+s32 MorphAnim_GetCount(void) {
     return lbl_80281F70->nCount;
 }
 
 // The frame slot nIndex's animation was last brought up to date in.
-u32 fn_80097694(u8 nIndex) {
+u32 MorphAnim_GetLastUpdateFrame(u8 nIndex) {
     return lbl_80281F70->au8[nIndex];
 }
 
 // Move each recorded vertex to its position plus its morph offset scaled by fC * fWeight (the
 // offsets are s8s in 127ths), and stamp the animation's slot with this frame.
-void fn_800976A8(MorphAnim* pAnim, f32 fWeight) {
+void MorphAnim_Update(MorphAnim* pAnim, f32 fWeight) {
     int i = pAnim->nFrames - 1;
     f32 fScale = (1.0f / 127.0f) * (pAnim->fC * fWeight);
     // EA bug: zero frames and the final decrements form out-of-range pointers; neither is dereferenced.

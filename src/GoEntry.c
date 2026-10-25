@@ -24,7 +24,6 @@ void fn_8006CEFC(void);
 void fn_8006CFC8(void);
 void fn_8006D8E8(void);
 void GO_vInitIG(void);
-void fn_80008380(void);
 void SkinBurn_CheckSignatureFile(void);
 void SaveProfile_SetupDummy(void);
 void UI_OnFrontEndStart(void);
@@ -223,7 +222,7 @@ void MA_vMain(s32 iArgc_p, char** chppArgv_p) {
             printf("%s (%ld), Unknown mode.\n", "GoEntry.c", 818L);
             break;
         }
-        fn_80008380();
+        DL_vWaitForEndOfDrawing();
     } while (!bQuit);
     fn_8006C770();
 }

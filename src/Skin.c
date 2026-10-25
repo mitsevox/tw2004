@@ -21,8 +21,6 @@
 #include "terrain.h"
 #include "game.h"
 
-void  fn_80008380(void);                                  // wait for the GPU (fn_800070DC)
-void  fn_80016978(f32 fLeft, f32 fTop, f32 fWidth, f32 fHeight);   // Code80016198.c: the viewport
 void  fn_8006E7A4(LightGroup* pGroup);                   // GoLighting.c: load the group's lights
 void  fn_8006EADC(TObject* pObj);                        // GoLighting.c: light the object
 void  fn_8006ED70(void);                                 // GoLighting.c: lighting off
@@ -387,13 +385,13 @@ void RC_ApplyCurrentViewport(void) {
     RC_ApplyViewport(RC_spGetCurrentRenderCtx());
 }
 
-// Hands the render context's viewport (left, top, width, height) to fn_80016978, which makes it the
-// current one.
+// Hands the render context's viewport (left, top, width, height) to RenderView_SetViewport, which
+// makes it the current one.
 void RC_ApplyViewport(void* pCamera) {
     VM_SViewport* pRect;
 
     pRect = RC_spGetRenderCtxViewport(pCamera);
-    fn_80016978(VM_fGetViewportLeft(pRect), VM_fGetViewportTop(pRect), VM_fGetViewportWidth(pRect),
+    RenderView_SetViewport(VM_fGetViewportLeft(pRect), VM_fGetViewportTop(pRect), VM_fGetViewportWidth(pRect),
                 VM_fGetViewportHeight(pRect));
 }
 
@@ -1015,7 +1013,7 @@ s32 SKN_FreeRenderData(Skin* pSkin) {
     if (!(pSkin->uFlags & SKIN_HAS_RENDER_DATA)) {
         return 0;
     }
-    fn_80008380();
+    DL_vWaitForEndOfDrawing();
     pModel = pSkin->pModel;
     if (pModel != NULL && pModel->pDesc != NULL) {
         fn_80112910(pSkin->p1090);

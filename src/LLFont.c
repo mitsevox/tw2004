@@ -251,8 +251,8 @@ void fn_800111D8(void) {
     f32 mView[3][4];
 
     GXClearVtxDesc();
-    GXSetVtxDesc(9, 1);
-    GXSetVtxAttrFmt(7, 9, 0, 4, 0);
+    GXSetVtxDesc(GX_VA_POS, 1);
+    GXSetVtxAttrFmt(7, GX_VA_POS, 0, 4, 0);
     GXSetVtxDesc(11, 1);
     GXSetVtxAttrFmt(7, 11, 1, 5, 0);
     GXSetVtxDesc(13, 1);

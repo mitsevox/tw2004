@@ -138,16 +138,16 @@ void fn_801102AC(void) {
     id.nDiskNumber = nDisc;
     lbl_802824D4 = nDisc;
     DVDChangeDiskAsync(&block, &id, (DVDCBCallback)fn_80110234);
-    fn_80006FE8();
+    Displ_FrameEnd();
     Aud_ExitSession(1);
     do {
         nStatus = DVDGetDriveStatus();
-        fn_80006EDC();
+        Displ_FrameStart();
         if (gSession.nGameType == GAMESTATE_IG_PLAY_HOLE) {
             GUI_ShowToggleFullScreenUI(0);
         }
         fn_8006DBD4();
-        fn_80006FE8();
+        Displ_FrameEnd();
         DiscError_WaitForDrive();
     } while (nStatus != 0);
 }

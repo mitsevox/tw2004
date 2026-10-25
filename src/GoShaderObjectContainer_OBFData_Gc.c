@@ -5,6 +5,7 @@
 #include "ball.h"
 #include "psmgr.h"
 #include "obfdata.h"
+#include "shaderdata.h"
 #include "core/startup.h"
 
 // Copies pChunk's data into a new 32-byte aligned buffer (flushed for the graphics chip) and keeps
@@ -44,10 +45,8 @@ void fn_8006FCDC(OBFData* pData, OBFChunk* pChunk) {
 
 void fn_8006FDCC(void);
 void fn_8006FDD0(void);
-void fn_80074DA8();
-void fn_8007524C();
-void fn_8006FED4(u8* p0, s32 p1);
-void fn_8006FF08(u8* p0);
+void fn_8006FED4(StaticShaderObject* pObj, ShaderCmds* pCmds);
+void fn_8006FF08(StaticShaderObject* pObj);
 
 void fn_8006FDCC(void) {
 }
@@ -89,26 +88,25 @@ void fn_8006FE44(OBFData* pData) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_8006FED4(u8* p0, s32 p1) {
-    fn_80074DA8(*(s32*)(p0 + 0x24), *(s32*)(p0 + 0x0), (p0 + 0x4), p1);
+void fn_8006FED4(StaticShaderObject* pObj, ShaderCmds* pCmds) {
+    ShaderData_BuildDisplayList(pObj->pArrays, pObj->eType, &pObj->anim, pCmds);
 }
 
-void fn_8006FF08(u8* p0) {
-    fn_8007524C((p0 + 0x4));
+void fn_8006FF08(StaticShaderObject* pObj) {
+    ShaderData_CloseDisplayList(&pObj->anim);
 }
 
 // ---- end of sweep code ----
 
 // ---- sweep code (not yet cleaned up) ----
 
-s32 fn_80070168(s32, s32);
-void fn_8006FF2C(void* arg0);
+void fn_8006FF2C(StaticShaderObject* pObj);
 
-void fn_8006FF2C(void* arg0) {
-    if ((u8) (*(u8*)((u8*)(arg0) + 0xC)) != 0) {
-        GXSetArray(9, (void*)*(*(s32**)((u8*)(arg0) + 0x24)), 0xC);
+void fn_8006FF2C(StaticShaderObject* pObj) {
+    if (pObj->anim.bNoPosArray != 0) {
+        GXSetArray(GX_VA_POS, pObj->pArrays->apPos[0], 12);
     }
-    fn_80070168((*(s32*)((u8*)(arg0) + 8)), (*(s32*)((u8*)(arg0) + 4)));
+    SD_CallDisplayList(pObj->anim.pList, pObj->anim.nListSize);
 }
 
 // ---- end of sweep code ----

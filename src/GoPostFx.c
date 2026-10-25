@@ -27,7 +27,6 @@ void fn_80038A6C(int nField, void* pCamera);
 void fn_800390CC(int nField, RenderCamera* pCamera);
 void Gaud_CameraShake(u8 nPlayer, u8 bLimit);      // GameAudio.c
 void fn_80016948(void);
-void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
 void fn_800169AC(void);                     // apply lbl_80280E08's viewport
 void RenderState_SetRenderSurface(int a, int nWidth, int nHeight, int nField, int b, int c);
 void fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY);
@@ -579,7 +578,7 @@ void fn_800390CC(int nField, RenderCamera* pCamera) {
     fn_8002A608(nField ? &lbl_801D4FB0[1] : &lbl_801D4FB0[0]);
     RenderState_SetRenderSurface(1, 256, 224, 0, 1, 1);
     fn_80016B54(256, 128, 1.0f, 1.0f);
-    fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
+    RenderView_SetViewport(0.0f, 0.0f, 1.0f, 1.0f);
     fn_800169AC();
     RenderView_MakeQuad(aXY, NULL, fX, fY, fRight, 2.0f * fBottom);
     aUV[0] = aXY[0];

@@ -256,7 +256,7 @@ order	area	file	task	scope	state
 253	Movies	LLPict_Gc.c	pass	the whole file	open
 254	Movies	rcmp_mad_codec.c	pass	the whole file	open
 255	Movies	maddec.c	pass	the whole file	open
-256	Boot and game flow	ScreenClear.c	pass	the whole file	open
+256	Boot and game flow	ScreenClear.c	pass	the whole file	done
 257	Boot and game flow	GoHoleLoader.c	pass	the whole file	open
 258	Boot and game flow	Code8002EE1C.c	pass	the whole file	open
 259	Boot and game flow	BootCourse.c	pass	the whole file	open
@@ -285,7 +285,8 @@ order	area	file	task	scope	state
 281	Shader objects and effects	GoShaderObject_Glows_Gc.c	pass	the whole file	open
 282	Shader objects and effects	GoShaderObjectCommon_ShaderObjectsData_Gc.c	pass	the whole file	open
 283	Shader objects and effects	DynamicRenderingBuffer.c	pass	the whole file	open
-284	Shader objects and effects	Code80070EC4.c	pass	the whole file	open
+284	Shader objects and effects	GoShaderObject_PrelitRGBAUVAnimation_Gc.c	pass	the whole file	done
+284	Shader objects and effects	GoShaderObject_PrelitTexturedMorph_Gc.c	pass	the whole file	done
 285	Shader objects and effects	GoShaderObject_PrelitUVAnimation_Gc.c	pass	the whole file	open
 286	Shader objects and effects	unsorted/sweep_800977CC.c	fold	prove its file and fold it in	done
 287	Shader objects and effects	unsorted/sweep_80070168.c	fold	prove its file and fold it in	done

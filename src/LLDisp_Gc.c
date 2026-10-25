@@ -53,9 +53,7 @@ void fn_80006EC8(void);
 void fn_80007160(void);
 void fn_80007264(f32* pGamma);
 void fn_800070DC(void);
-void fn_80007254(void);
 u8   fn_80007258(void);
-void fn_80007260(void);
 
 // Resets the console with OSResetSystem's arguments, unless a memory card is busy. With
 // bOnRelease, only once the reset button has been pressed and let go again.
@@ -213,9 +211,9 @@ void fn_80006EC8(void) {
     lbl_801A2350.bBreak = 1;
 }
 
-// Starts a frame (the flag fn_80006FE8 checks) and sets the viewport to the whole frame, jittered
+// Starts a frame (the flag Displ_FrameEnd checks) and sets the viewport to the whole frame, jittered
 // for the field in field rendering.
-void fn_80006EDC(void) {
+void Displ_FrameStart(void) {
     lbl_80281B8C = 1;
     if (lbl_801A2464.field_rendering) {
         GXSetViewportJitter(0.0f, 0.0f, lbl_801A2464.fbWidth, lbl_801A2464.efbHeight, 0.0f, 1.0f,
@@ -229,7 +227,7 @@ void fn_80006EDC(void) {
 
 // Ends the frame: waits for the last one to be drawn, sets a break point at the end of this one's
 // commands and copies the frame into the current image buffer.
-void fn_80006FE8(void) {
+void Displ_FrameEnd(void) {
     void* pRead;
     void* pWrite;
 
@@ -313,14 +311,14 @@ s32 Displ_CloseOnce(void) {
     return 0;
 }
 
-void fn_80007254(void) {
+void Displ_WaitFrameEmpty(void) {
 }
 
 u8 fn_80007258(void) {
     return lbl_80281B8C;
 }
 
-void fn_80007260(void) {
+void Displ_EndFrameEmpty(void) {
 }
 
 // Picks the frame copy's gamma from the average of three values: 1.0 below 1.7, 1.7 up to 2.2,

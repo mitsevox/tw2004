@@ -28,7 +28,6 @@ s32  fn_8010B338(DynTex* pTex, DynTexObj* pObj, DynTexPalette* pPal, u8* pPixels
 DynTexJob* fn_8010B960(void);
 u8   fn_8010BF3C(void);
 u8   fn_8010BFE0(void);
-void fn_80007254(void);                 // LLDisp_Gc.c
 int  fn_800106F0(TexBank* pBank);       // LLTexGrp.c
 s32  fn_8010BC94(const void* pA, const void* pB);
 s32  fn_8010B5F8(DynTexObj* pObj);
@@ -767,7 +766,7 @@ void fn_8010BF68(void) {
     while (!fn_8010BF3C()) {
         DiscError_WaitForDrive();
         fn_8010BFE0();
-        fn_80007254();
+        Displ_WaitFrameEmpty();
     }
 }
 
