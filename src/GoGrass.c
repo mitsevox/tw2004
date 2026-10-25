@@ -506,7 +506,7 @@ void GrassRender_vBuildAndUploadOneTimeData(void) {
     f32 fX;
     f32 fZ;
 
-    fn_800102DC(uHash, &gpGrassMgr->pBank, &gpGrassMgr->pTex);
+    TG_iFindTextureGroupAndTexture(uHash, &gpGrassMgr->pBank, &gpGrassMgr->pTex);
     fn_800738DC(gpGrassMgr->pBank, gpGrassMgr->pTex, 1);
     GXLoadTexObj(&gGrassTopTexObj, 2);
     GXSetNumTexGens(2);

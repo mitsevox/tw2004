@@ -109,7 +109,7 @@ order	area	file	task	scope	state
 106	Golfers	stateFunc.c	chunk 2/3	STATEFUNC_ReplaySwingExit .. STATEFUNC_FadeToTapInInit	open
 107	Golfers	stateFunc.c	chunk 3/3	STATEFUNC_FadeToTapInUpdate .. fn_80062E20	open
 108	Golfers	stateFunc.c	whole-file review	the whole file	open
-109	Characters	hwsMaterial_Gc.c	pass	the whole file	open
+109	Characters	hwsMaterial_Gc.c	pass	the whole file	done
 110	Characters	hwsOverride_Gc.c	pass	the whole file	open
 111	Characters	char_tex_manager.c	pass	the whole file	open
 112	Characters	mtalib.c	pass	the whole file	open

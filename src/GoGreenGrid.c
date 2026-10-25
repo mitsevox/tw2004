@@ -81,7 +81,7 @@ void GR_vInit(void) {
     gpGreenGrid->anColor[2] = 0x40;
     gpGreenGrid->anColor[3] = 0x41;
     gpGreenGrid->nCols = 4;
-    fn_800102DC(FEtm_PackName("gridpt"), &gpGreenGridTexBank, &gpGreenGridTex);
+    TG_iFindTextureGroupAndTexture(FEtm_PackName("gridpt"), &gpGreenGridTexBank, &gpGreenGridTex);
 }
 
 // The grid's per-hole set-up, called in the per-hole list just before BreakLine_InitForHole; empty

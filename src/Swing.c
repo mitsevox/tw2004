@@ -808,11 +808,11 @@ u8 SW_vStateCancelSwing(int nPlayer) {
 void SW_vUIInit(int nPlayer) {
     u64 uHash;
     uHash = FEtm_PackName("clubback");
-    fn_800102DC(uHash, &gpSwing->pBank, &gpSwing->pClubBack);
+    TG_iFindTextureGroupAndTexture(uHash, &gpSwing->pBank, &gpSwing->pClubBack);
     uHash = FEtm_PackName("clubdown");
-    fn_800102DC(uHash, &gpSwing->pBank, &gpSwing->pClubDown);
+    TG_iFindTextureGroupAndTexture(uHash, &gpSwing->pBank, &gpSwing->pClubDown);
     uHash = FEtm_PackName("tball");
-    fn_800102DC(uHash, &gpSwing->pBank, &gpSwing->pTBall);
+    TG_iFindTextureGroupAndTexture(uHash, &gpSwing->pBank, &gpSwing->pTBall);
 }
 
 // Empty a player's club trail history (nNumInBlurQueue = 0).

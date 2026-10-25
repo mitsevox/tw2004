@@ -346,6 +346,17 @@ COUNTED = {'long-line', 'trailing-space', 'tab', 'crlf', 'final-newline', 'heade
            'compile-error'}
 
 
+def finding_keys(rule, msg):
+    """The keys of one finding (finding_key); a placeholder-name finding has one per placeholder
+    on its line, so renaming one placeholder on a line that keeps others adds nothing new."""
+    if rule == 'placeholder-name':
+        rx = dict(CHECKS)[rule]
+        found = [m.group(0) for m in rx.finditer(msg)]
+        if found:
+            return [(rule, t) for t in found]
+    return [finding_key(rule, msg)]
+
+
 def finding_key(rule, msg):
     """What identifies a finding in two versions of a file, apart from its line number: for a
     pattern rule the text it matched (a placeholder name, a register), else the message. For the
@@ -379,17 +390,18 @@ def new_hits(f, hits, changed, rev, old, protos):
         with tempfile.TemporaryDirectory() as tmp:
             p = pathlib.Path(tmp) / f.name           # same name: compiler messages are matched by it
             p.write_bytes(base_text(rev, old))
-            budget.update(finding_key(r, m) for _, r, m in lint(p, protos, as_path=f))
+            for _, r, m in lint(p, protos, as_path=f):
+                budget.update(finding_keys(r, m))
     for ln, r, m in hits:
         if ln not in changed and r != 'compile-error':
-            budget[finding_key(r, m)] -= 1
+            budget.subtract(finding_keys(r, m))
     out = []
     for h in hits:
         # a compile error counts wherever it is: an edit anywhere can cause it
         if h[0] in changed or h[1] == 'compile-error':
-            k = finding_key(h[1], h[2])
-            if budget[k] > 0:
-                budget[k] -= 1
+            ks = finding_keys(h[1], h[2])
+            if all(budget[k] > 0 for k in ks):
+                budget.subtract(ks)
             else:
                 out.append(h)
     return out
