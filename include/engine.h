@@ -1237,9 +1237,11 @@ typedef struct TStreamData {
                                   //       'TEO ' model, a 'Cact' object's kernel id)
     void (*pfnFree)(struct TStreamData* pObject);     // 0x08  its handler's clean-up, which
                                   //       Resources_Del calls before it frees the object
-    struct TStreamData* pPrev;    // 0x0C  finished-object queue; resource list: toward the tail
-    struct TStreamData* pNext;    // 0x10  resource list: toward the head
-    int   nReserved;              // 0x14  cleared when the object is made; nothing reads it
+    struct TStreamData* pPrev;    // 0x0C  finished-object queue: toward the newest; resource list:
+                                  //       toward the tail
+    struct TStreamData* pNext;    // 0x10  finished-object queue: toward the oldest; resource list:
+                                  //       toward the head
+    int   nUnread;                // 0x14  cleared when the object is made; nothing reads it
     u32   uFlags;                 // 0x18  where its block came from (a TTypeAcces; MEMTYPE_HIGH
                                   //       for txf / Cpyr / Cact / txf2)
     u32   uType;                  // 0x1C  e.g. 'ter '

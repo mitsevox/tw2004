@@ -1,6 +1,7 @@
 // ustream.h: the stream loader's own types and calls (UStream.c). The objects it delivers
 // (TStreamData) and the calls their handlers make (register, unregister, load) are in engine.h;
-// the rest are declared here. The file format is described in docs/game/formats/ctrl-container.md.
+// the rest are declared here, with the stream manager's file lists and calls (StreamManager.c).
+// The file format is described in docs/game/formats/ctrl-container.md.
 
 #ifndef USTREAM_H
 #define USTREAM_H
@@ -19,7 +20,8 @@
                                         // header; any other id is a bank (Ses_AllocBankHdr)
 
 // myAsyncReadCallback's verdict on a read other than 0 (kept)
-#define USTREAM_READ_FAILED   5         // an error, or short of a buffer before the file's end
+#define USTREAM_READ_FAILED   5         // an error, or short of a buffer: never produced, as the
+                                        // reader always reports a full buffer and no error
 #define USTREAM_READ_STALE    0xDEAD    // read from a position the stream has since left
 
 // Stream_OpenStreamFiles's answers when it cannot open a stream
@@ -75,6 +77,7 @@ typedef struct CDBufS {
     u8   pad[0x30];
     u8   aData[USTREAM_BUFFER_SIZE];
 } CDBuf;
+LAYOUT_ASSERT(CDBuf, 0x6040);
 
 // What UStream calls when it opens a stream's file and when it is done with it, with that file's
 // apOpenedArg / apClosedArg.
@@ -179,7 +182,7 @@ typedef struct StrmCBS {
     int   hFile;             // 0x00  -1 when nothing is open
     int   nFileSize;         // 0x04
     int   nFilePos;          // 0x08  next read offset
-    int   nReserved;         // 0x0C  -2 at open; nothing reads it
+    int   nUnread;           // 0x0C  -2 at open; nothing reads it
     u8    bEOF;              // 0x10  the file is read to its end (or reading was stopped)
     u8    bEndAtSWVR;        // 0x11  a buffer starting with an SWVR chunk ends the reading; set
                              //       whenever a file is open
@@ -190,6 +193,7 @@ typedef struct StrmCBS {
     StreamFileList params;   // 0x1C
     u8    pad2A0[0x40];
 } StrmCB;
+LAYOUT_ASSERT(StrmCB, 0x2E0);
 
 // A handler table entry (gHandlers, Stream_RegisterLoadChunkCallback).
 typedef struct {
@@ -210,7 +214,8 @@ typedef struct ParseInProgS {
     u32 uPos;
 } ParseInProg;
 
-// The calls the movie player (LLVideo.c) makes on the loader's buffers.
+// Running the loader (the stream manager, the front end and the movie player call it), and the
+// calls the movie player (LLVideo.c) makes on the loader's buffers.
 u8   Stream_Progress(void);             // runs the loader once; 0 when nothing is left to read
 void UStream_AddBufferRef(CDBuf** ppBuffer);                // a chunk of the buffer is kept
 void UStream_SetAutoRead(u8 bAuto);     // set while a movie plays: each read starts the next

@@ -387,7 +387,7 @@ The fixes that come up most often. Each points to its full entry below.
   `+`/`-` chain of divisions gets reordered the same way (EASBStorage fn_801288DC 96.7 -> 100, five
   statements). `d - (d/365)*365` is `d % 365`.
 - **[verified] A ternary loads its else-value first.** `(u > m) ? m : u` -> `(u <= m) ? u : m` when the
-  original is `mr r0,m; bgt; mr r0,u` (UStream fn_8000E790 99.57 -> 100).
+  original is `mr r0,m; bgt; mr r0,u` (UStream Stream_StreamLoadFixedSize 99.57 -> 100).
 - **[verified] A call or global load on the right of a comparison is evaluated first**: write
   `f(n) + 1 < rec`, not `rec > f(n) + 1`, when the original calls first (HoleScore GameAnalysis_IsShotForRecord 78.7 ->
   98.8).

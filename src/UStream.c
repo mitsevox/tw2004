@@ -25,7 +25,7 @@ static CDBuf*           gFreeRing[USTREAM_NUM_BUFFERS];         // waiting for a
 static StrmCB           gStreams[USTREAM_MAX_STREAMS];
 static UStreamSound     gCurSound;                              // the SONO sound being loaded
 
-static uptr gRPNSBase;            // the data of the last 'RPNS' object delivered: later objects'
+static uptr gRPNSBase;            // the data of the last 'RPNS' object kept: later objects'
                                   // script offsets are from it
 static CDBuf* volatile gpReadBuffer;    // the buffer of the read in flight
 static volatile s8 gReadyRingHead;      // where the next read buffer goes
@@ -39,12 +39,12 @@ static ParseInProg gFill;         // the object being filled and how far
 static MemPoolPtr gpNodePool;     // the TStreamQueue nodes of gpDoneList
 static TStreamQueue* gpDoneList;  // objects the parser finished, oldest first
 static void* gpBufferMemory;      // the USTREAM_NUM_BUFFERS buffers (Stream_InitOnce)
-static int  gnCurStream;          // the stream being read; -1: none
+static int  gnCurStream;          // the stream being read; -1: none (0 until a stream first closes)
 static int  gnNumStreams;         // streams open
 static volatile s8 gbReadPending; // a read is in flight
 static TStreamData* gpQueueHead;  // the oldest object waiting to be handed over
 static TStreamData* gpQueueTail;  // the newest
-static int  gnReadErrors;         // failed reads in a row; nothing tests it
+static int  gnReadErrors;         // a stale read since the last read started; nothing tests it
 static u8   gbAutoRead;           // each completed read starts the next (UStream_SetAutoRead)
 static s8   gbPaused;             // no read starts while set; nothing sets it
 
@@ -53,7 +53,7 @@ static int gnNumHandlers = -1;    // entries of gHandlers in use; -1 before Stre
 
 static void myAsyncReadCallback(int bytesRead, int error);
 static void _readBufAsync(void);
-static u8* UStream_Fill(u8* pDst, u32 value, u32 uCount);
+static u8* UStream_Fill(u8* pDst, u32 uValue, u32 uCount);
 static u8* UStream_Copy(u8* pDst, const u8* pSrc, u32 uCount);
 static void UStream_Decompress(const void* pSrc, void* pDst, u32 uSize);
 static void Stream_ClearFileCallbacks(StreamFileList* streamFileList);
@@ -75,7 +75,8 @@ static void addToFreeList(CDBuf* cdp) {
 }
 
 // Starts reading the current stream's next 24 KiB into the next free buffer, unless there is none,
-// the file is read to its end or not open. A read that cannot start gives the buffer back.
+// the file is read to its end or not open. File_ReadAsync always answers 0, so the branch that
+// gives the buffer back when a read cannot start never runs.
 static void _readBufAsync(void) {
     CDBuf* freeBuf;
     StrmCB* gs;
@@ -103,11 +104,12 @@ static void _readBufAsync(void) {
     }
 }
 
-// A read finished (the DVD callback). A full buffer, or a short one that ends the file, moves the
-// file position on and goes in the ready ring; a failed read, or one from a position the stream
-// has since left, gives the buffer back. A buffer that starts with an SWVR chunk (a stream's
-// name) ends the reading and is given back too. With gbAutoRead set, the next read starts at
-// once.
+// A read finished (the file reader's callback, which always reports a full USTREAM_BUFFER_SIZE and
+// no error, so the USTREAM_READ_FAILED verdicts never happen). A read from a position the stream
+// has since left gives the buffer back; any other moves the file position on and goes in the
+// ready ring, and one that ends exactly at the file's size marks the file read to its end. A
+// buffer that starts with an SWVR chunk (a stream's name) ends the reading and is given back
+// instead. With gbAutoRead set, the next read starts at once.
 static void myAsyncReadCallback(int bytesRead, int error) {
     StrmCB* gs;
     int nStatus;
@@ -216,7 +218,7 @@ static int loadStreamChunk(ParseInProg* curParseInfo, StreamChunk* cp) {
         curParseStreamData = Circular_MemAllocFunc(sizeof(TStreamData) + uExtra + uPad + cp->uSize,
                                                    cp->uFlags, USTREAM_DATA_ALIGN, "UStream.c", 732);
         curParseInfo->pObject = curParseStreamData;
-        curParseStreamData->nReserved = 0;
+        curParseStreamData->nUnread = 0;
         curParseInfo->uPos = 0;
         Mem_cpy(&curParseStreamData->uFlags, &cp->uFlags, uExtra + USTREAM_SHDR_KEPT_SIZE);
         curParseStreamData->pData = (u8*)(curParseStreamData + 1) + uExtra + uPad;
@@ -350,26 +352,26 @@ static void Stream_RemoveExtensionInStreamName(char* s) {
 //                       copy, read backwards from dst - d + 2
 static void UStream_Decompress(const void* pSrc, void* pDst, u32 uSize) {
     u8* pEnd;
-    u8* d = (u8*)pDst;
-    const u8* s = (const u8*)pSrc;
+    u8* pOut = (u8*)pDst;
+    const u8* pIn = (const u8*)pSrc;
     s32 nLen;
-    pEnd = d + uSize;
+    pEnd = pOut + uSize;
     do {
         u32 uCode;
-        uCode = s[0] << 8 | s[1];
-        s += 2;
+        uCode = pIn[0] << 8 | pIn[1];
+        pIn += 2;
         if ((uCode & 0x8800) != 0x8800) {
             u32 uDist = uCode & 0xFFF;
             const u8* pFrom;
             nLen = (uCode >> 12) & 7;
             if (nLen == 7) {
-                nLen += *s++;
+                nLen += *pIn++;
             }
             nLen += 3;
-            pFrom = d - uDist;
+            pFrom = pOut - uDist;
             if ((uCode & 0x8000) == 0) {
-                UStream_Copy(d, pFrom, nLen);
-                d += nLen;
+                UStream_Copy(pOut, pFrom, nLen);
+                pOut += nLen;
             } else {
                 // Mirrored copy: the reference is read backwards, so a run of bytes comes
                 // out reversed. Eight at a time through temporaries, then the remainder.
@@ -377,16 +379,17 @@ static void UStream_Decompress(const void* pSrc, void* pDst, u32 uSize) {
                 pFrom += 2;
                 if (nLen >= 8) {
                     for (nBlocks = nLen / 8; nBlocks > 0; nBlocks--) {
-                        u8 t7 = pFrom[-7], t6 = pFrom[-6], t5 = pFrom[-5], t4 = pFrom[-4];
-                        u8 t3 = pFrom[-3], t2 = pFrom[-2], t1 = pFrom[-1], t0 = pFrom[0];
-                        d[0] = t0; d[1] = t1; d[2] = t2; d[3] = t3;
-                        d[4] = t4; d[5] = t5; d[6] = t6; d[7] = t7;
-                        d += 8; pFrom -= 8;
+                        u8 uByte7 = pFrom[-7], uByte6 = pFrom[-6], uByte5 = pFrom[-5];
+                        u8 uByte4 = pFrom[-4], uByte3 = pFrom[-3], uByte2 = pFrom[-2];
+                        u8 uByte1 = pFrom[-1], uByte0 = pFrom[0];
+                        pOut[0] = uByte0; pOut[1] = uByte1; pOut[2] = uByte2; pOut[3] = uByte3;
+                        pOut[4] = uByte4; pOut[5] = uByte5; pOut[6] = uByte6; pOut[7] = uByte7;
+                        pOut += 8; pFrom -= 8;
                     }
                 }
                 nBlocks = nLen & 7;
                 while (nBlocks > 0) {
-                    *d++ = *pFrom--;
+                    *pOut++ = *pFrom--;
                     nBlocks--;
                 }
             }
@@ -395,25 +398,25 @@ static void UStream_Decompress(const void* pSrc, void* pDst, u32 uSize) {
             if (nLen == 0) {
                 nLen = uCode & 0x7FF;
                 while (nLen > 0) {
-                    *d++ = *s++;
+                    *pOut++ = *pIn++;
                     nLen--;
                 }
             } else {
                 u32 uDist = nLen | ((uCode >> 5) & 0x38);
                 u32 uCount = uCode & 0xFF;
-                UStream_Fill(d, d[-(int)uDist], uCount + 3);
-                d += uCount + 3;
+                UStream_Fill(pOut, pOut[-(int)uDist], uCount + 3);
+                pOut += uCount + 3;
             }
         }
-    } while (d < pEnd);
+    } while (pOut < pEnd);
 }
 
-// Sets uCount bytes at pDst to value's low byte; returns pDst.
-static u8* UStream_Fill(u8* pDst, u32 value, u32 uCount) {
-    u8 v = (u8)value;
-    u8* p = pDst;
+// Sets uCount bytes at pDst to uValue's low byte; returns pDst.
+static u8* UStream_Fill(u8* pDst, u32 uValue, u32 uCount) {
+    u8 uByte = (u8)uValue;
+    u8* pOut = pDst;
     while (uCount--) {
-        *p++ = v;
+        *pOut++ = uByte;
     }
     return pDst;
 }
@@ -427,37 +430,41 @@ static u8* UStream_Copy(u8* pDst, const u8* pSrc, u32 uCount) {
         uCount--;
     }
     if ((((uptr)pDst | (uptr)pSrc) & 1) == 0) {
-        s16* d = (s16*)pDst;
-        const s16* s = (const s16*)pSrc;
+        s16* pDstHalf = (s16*)pDst;
+        const s16* pSrcHalf = (const s16*)pSrc;
         u32 uOdd = uCount & 1;
         uCount >>= 1;
         while (uCount > 7) {
             {
-                s16 t0 = s[0], t1 = s[1], t2 = s[2], t3 = s[3], t4 = s[4], t5 = s[5], t6 = s[6], t7 = s[7];
-                d[0] = t0; d[1] = t1; d[2] = t2; d[3] = t3; d[4] = t4; d[5] = t5; d[6] = t6; d[7] = t7;
-                d += 8; s += 8;
+                s16 nHalf0 = pSrcHalf[0], nHalf1 = pSrcHalf[1], nHalf2 = pSrcHalf[2];
+                s16 nHalf3 = pSrcHalf[3], nHalf4 = pSrcHalf[4], nHalf5 = pSrcHalf[5];
+                s16 nHalf6 = pSrcHalf[6], nHalf7 = pSrcHalf[7];
+                pDstHalf[0] = nHalf0; pDstHalf[1] = nHalf1; pDstHalf[2] = nHalf2; pDstHalf[3] = nHalf3;
+                pDstHalf[4] = nHalf4; pDstHalf[5] = nHalf5; pDstHalf[6] = nHalf6; pDstHalf[7] = nHalf7;
+                pDstHalf += 8; pSrcHalf += 8;
             }
             uCount -= 8;
         }
         while (uCount--) {
-            *d++ = *s++;
+            *pDstHalf++ = *pSrcHalf++;
         }
         if (uOdd) {
-            *(u8*)d = *(const u8*)s;
+            *(u8*)pDstHalf = *(const u8*)pSrcHalf;
         }
     } else {
-        u8* d = pDst;
+        u8* pOut = pDst;
         while (uCount > 7) {
             {
-                u8 t0 = pSrc[0], t1 = pSrc[1], t2 = pSrc[2], t3 = pSrc[3];
-                u8 t4 = pSrc[4], t5 = pSrc[5], t6 = pSrc[6], t7 = pSrc[7];
-                d[0] = t0; d[1] = t1; d[2] = t2; d[3] = t3; d[4] = t4; d[5] = t5; d[6] = t6; d[7] = t7;
-                d += 8; pSrc += 8;
+                u8 uByte0 = pSrc[0], uByte1 = pSrc[1], uByte2 = pSrc[2], uByte3 = pSrc[3];
+                u8 uByte4 = pSrc[4], uByte5 = pSrc[5], uByte6 = pSrc[6], uByte7 = pSrc[7];
+                pOut[0] = uByte0; pOut[1] = uByte1; pOut[2] = uByte2; pOut[3] = uByte3;
+                pOut[4] = uByte4; pOut[5] = uByte5; pOut[6] = uByte6; pOut[7] = uByte7;
+                pOut += 8; pSrc += 8;
             }
             uCount -= 8;
         }
         while (uCount--) {
-            *d++ = *pSrc++;
+            *pOut++ = *pSrc++;
         }
     }
     return pDst;
@@ -795,26 +802,26 @@ u8 Stream_Progress(void) {
 // reference fewer. Every buffer on the used list that no chunk holds any more goes back to the
 // released list.
 void UStream_ReleaseBufferRef(CDBuf** ppBuffer) {
-    CDBuf* cdp;
-    CDBuf* walkp;
+    CDBuf* pBuf;
+    CDBuf* pPrevBuf;
     if (gnCurStream == -1) return;
     (*ppBuffer)->nRefs--;
-    walkp = gpUsedList;
-    if (walkp == NULL) return;
-    while ((cdp = walkp->pNext) != NULL) {
-        if (cdp->nRefs == 0) {
-            walkp->pNext = cdp->pNext;
-            cdp->pNext = NULL;
-            addToFreeList(cdp);
+    pPrevBuf = gpUsedList;
+    if (pPrevBuf == NULL) return;
+    while ((pBuf = pPrevBuf->pNext) != NULL) {
+        if (pBuf->nRefs == 0) {
+            pPrevBuf->pNext = pBuf->pNext;
+            pBuf->pNext = NULL;
+            addToFreeList(pBuf);
         } else {
-            walkp = cdp;
+            pPrevBuf = pBuf;
         }
     }
     if (gpUsedList->nRefs == 0) {
-        cdp = gpUsedList;
-        gpUsedList = cdp->pNext;
-        cdp->pNext = NULL;
-        addToFreeList(cdp);
+        pBuf = gpUsedList;
+        gpUsedList = pBuf->pNext;
+        pBuf->pNext = NULL;
+        addToFreeList(pBuf);
     }
 }
 
@@ -835,8 +842,8 @@ int Stream_StopLoading(void) {
 // Stream_InitModule). With a stream open, the current stream's file is marked closed, so that a
 // read still in flight is dropped when it finishes; once none is, the stream is closed through
 // Stream_CloseStreamFile (with its file handle back for the File_Close), which can refuse, and
-// its file is marked closed again. Then the node pool is
-// deleted (not when streams are counted open with none current: it returns first).
+// its file is marked closed again. Then the node pool is deleted (not when streams are counted
+// open with none current: it returns first).
 void Stream_CloseModule(void) {
     StrmCB* gs;
     int saveFD;
@@ -864,9 +871,10 @@ void Stream_CloseModule(void) {
 
 // Closes stream whichFile (an index Stream_OpenStreamFiles returned): its file closed, the object
 // being filled freed, the stream before it made current, and its current file's apfnClosed
-// called. Refused (-1) with no current stream, for an index below the current stream's or above
-// the number open, while a read is in flight, when the File_Close fails, and, for any stream but
-// the first, while buffers are being parsed or the movie player holds some. Returns whichFile.
+// called. Refused (-1) with no current stream (gnCurStream -1), for an index below the current
+// stream's or above the number open, while a read is in flight, and, for any stream but the
+// first, while buffers are being parsed or the movie player holds some. (File_Close always
+// answers 0, so the refusal on its failure never happens.) Returns whichFile.
 int Stream_CloseStreamFile(int whichFile) {
     int i;
     if (gnCurStream == -1) return -1;
@@ -908,7 +916,7 @@ int Stream_OpenStreamFiles(const StreamFileList* streamFileList) {
     }
     gs = &gStreams[ourIndex];
     gs->nReadBudget = -1;
-    gs->nReserved = -2;
+    gs->nUnread = -2;
     gs->nFileIndex = 0;
     Mem_cpy(&gs->params, streamFileList, sizeof(StreamFileList));
     Stream_OpenFileForStreaming(gs);
