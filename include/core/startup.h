@@ -167,6 +167,8 @@ typedef struct MovieSoundBlock {
 
 #define ARAM_HEAP_SIZE 0x3FC000
 #define ARAM_ZERO_SIZE 0x400            // the silent block at the start of the heap (AudAram_InitModule)
+#define ARAM_HEAP_NUM_BLOCKS 32         // block records in the heap
+#define ARAM_STREAM_BUFFERS_SIZE 0x7F000    // the eight 0xFE00-byte stream buffers, one block of the heap
 
 // DMA nLen bytes from main memory to ARAM; pfnDone(n) is called when it is done. Returns 1.
 int AudDma_ToAram(u32 uAram, void* pSrc, int nLen, void (*pfnDone)(u32 n), int n);
@@ -174,7 +176,7 @@ int AudDma_ToAram(u32 uAram, void* pSrc, int nLen, void (*pfnDone)(u32 n), int n
 void HwVoice_SetStreamDecoder(u16 nVoice, StreamChunk* pChunk, u32 uSize, int nBuffer);
 // Cancel the ARAM transfers queued for pOwner.
 void AudDma_CancelOwner(void* pOwner);
-// The CPU cache work around a DMA of uLen bytes at p (nDir as ARQRequest.type); GoARAM.c uses them too.
+// The CPU cache work around a DMA of uLen bytes at p (nDir an ARQ_TYPE_*); GoARAM.c uses them too.
 void AudDma_CacheAfterTransfer(void* p, u32 uLen, int nDir);
 void AudDma_CacheBeforeTransfer(void* p, u32 uLen, int nDir);
 

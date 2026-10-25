@@ -128,7 +128,7 @@ KEEP_UNUSED u32 lbl_80282114;
 
 // The sound's ARAM heap (AudAram_InitModule).
 u8     gbAudAramZeroDone;       // set when the silent block's DMA is done
-void*  gpAudAramHeapRecords;    // the heap's bookkeeping: its ARAMHeap and 32 ARAMBlock records
+void*  gpAudAramHeapRecords;    // the heap's bookkeeping: its ARAMHeap and its ARAMBlock records
 u32    gAudAramStreamBuffers;   // the ARAM address of the eight 0xFE00-byte stream buffers
 void*  gpAudAramZeroBuffer;     // the zeroes DMA'd into the silent block, freed once it is done
 u32    gAudAramZeroBlock;       // the silent block's ARAM address
@@ -678,37 +678,38 @@ void AudDma_ExitSession(void) {
 // when it is done (NULL: no call), and n is also the transfer's owner for AudDma_CancelOwner.
 // Returns 1.
 int AudDma_ToAram(u32 uAram, void* pSrc, int nLen, void (*pfnDone)(u32 n), int n) {
-    AudDma_CacheBeforeTransfer(pSrc, nLen, 0);
-    GoARAM_QueueTransfer((u32)pSrc, uAram, nLen, 0, 1, pfnDone, n, 3);  // port: the ARQ library takes addresses as u32
-    AudDma_CacheAfterTransfer(pSrc, nLen, 0);
+    AudDma_CacheBeforeTransfer(pSrc, nLen, ARQ_TYPE_MRAM_TO_ARAM);
+    GoARAM_QueueTransfer((u32)pSrc, uAram, nLen, ARQ_TYPE_MRAM_TO_ARAM, ARQ_PRIORITY_HIGH, pfnDone, n,
+                         ARAM_TRANSFER_RELEASE_WHEN_DONE | ARAM_TRANSFER_CANCELLABLE);
+    AudDma_CacheAfterTransfer(pSrc, nLen, ARQ_TYPE_MRAM_TO_ARAM);
     return 1;
 }
 
 // Cancel the queued ARAM transfers whose owner is pOwner (AudDma_ToAram's n).
 void AudDma_CancelOwner(void* pOwner) {
-    GoARAM_CancelTransfers((u32)pOwner);  // port: the ARQ library keeps owners as u32
+    GoARAM_CancelTransfers((u32)pOwner);
 }
 
-// After a DMA between main memory and ARAM: when the data came into main memory (nDir 1), drop
-// the CPU cache over it so the CPU reads the new bytes.
+// After a DMA between main memory and ARAM: when the data came into main memory, drop the CPU
+// cache over it so the CPU reads the new bytes.
 void AudDma_CacheAfterTransfer(void* p, u32 uLen, int nDir) {
     switch (nDir) {
-    case 0:
+    case ARQ_TYPE_MRAM_TO_ARAM:
         break;
-    case 1:
+    case ARQ_TYPE_ARAM_TO_MRAM:
         DCInvalidateRange(p, uLen);
         break;
     }
 }
 
-// Before a DMA: going out (nDir 0), write the cache back so the DMA sees the data; coming in,
-// drop the cache over the destination.
+// Before a DMA: going out, write the cache back so the DMA sees the data; coming in, drop the
+// cache over the destination.
 void AudDma_CacheBeforeTransfer(void* p, u32 uLen, int nDir) {
     switch (nDir) {
-    case 0:
+    case ARQ_TYPE_MRAM_TO_ARAM:
         DCStoreRange(p, uLen);
         break;
-    case 1:
+    case ARQ_TYPE_ARAM_TO_MRAM:
         DCInvalidateRange(p, uLen);
         break;
     }
@@ -724,13 +725,13 @@ void AudAram_ZeroBlockDone(u32 n) {
 // then the eight 0xFE00-byte stream buffers (AudAram_AllocStreamBuffer). Returns 1.
 u8 AudAram_InitModule(void) {
     gAudAramBase = GoARAM_Alloc(ARAM_HEAP_SIZE);
-    gpAudAramHeapRecords = AudMem_Alloc(sizeof(ARAMHeap) + 32 * sizeof(ARAMBlock));
-    gpAudAramHeap = GoARAM_HeapInit(ARAM_HEAP_SIZE, gAudAramBase, 32, gpAudAramHeapRecords);
+    gpAudAramHeapRecords = AudMem_Alloc(sizeof(ARAMHeap) + ARAM_HEAP_NUM_BLOCKS * sizeof(ARAMBlock));
+    gpAudAramHeap = GoARAM_HeapInit(ARAM_HEAP_SIZE, gAudAramBase, ARAM_HEAP_NUM_BLOCKS, gpAudAramHeapRecords);
     gAudAramZeroBlock = GoARAM_HeapAlloc(gpAudAramHeap, ARAM_ZERO_SIZE, 32);
     gpAudAramZeroBuffer = Mem_AllocFunc(ARAM_ZERO_SIZE, 32, 1);
     Mem_set(gpAudAramZeroBuffer, 0, ARAM_ZERO_SIZE);
     AudDma_ToAram(gAudAramZeroBlock, gpAudAramZeroBuffer, ARAM_ZERO_SIZE, AudAram_ZeroBlockDone, 0);
-    gAudAramStreamBuffers = GoARAM_HeapAlloc(gpAudAramHeap, 0x7F000, 32);
+    gAudAramStreamBuffers = GoARAM_HeapAlloc(gpAudAramHeap, ARAM_STREAM_BUFFERS_SIZE, 32);
     return 1;
 }
 
@@ -768,7 +769,8 @@ void AudAram_Free(u32 uAddr) {
 u32 AudAram_AllocStreamBuffer(void) {
     u32 uAddr;
     u32 uBit = 1;
-    for (uAddr = gAudAramStreamBuffers; uAddr < gAudAramStreamBuffers + 0x7F000; uAddr += 0xFE00) {
+    for (uAddr = gAudAramStreamBuffers; uAddr < gAudAramStreamBuffers + ARAM_STREAM_BUFFERS_SIZE;
+         uAddr += 0xFE00) {
         if (!(gAudAramStreamBufferMask & uBit)) {
             gAudAramStreamBufferMask |= uBit;
             gnAudAramStreamBuffersUsed++;

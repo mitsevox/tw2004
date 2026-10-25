@@ -29,17 +29,23 @@ typedef struct CameraEventTrigger_t {
 } CameraEventTrigger_t;
 LAYOUT_ASSERT(CameraEventTrigger_t, 0x48);
 
+// What an anim pair gives when its pChanceSeq is not taken (CameraAnimPairs_t.nKind).
+typedef enum CamAnimPairKind {
+    CAMPAIR_SHOT = 13,          // its shot, pShot
+    CAMPAIR_RANDOM_SEQUENCE = 14    // one of its pRandomSeq1..3 at random
+} CamAnimPairKind;
+
 // An anim pair (0x28 bytes; DynamicCamManager_t.pAnimPairs): a golfer animation's name and the shot
 // or sequences shown for it (DynamicCamSearchForPairedSequence). The file holds an index for each
 // pointer, negative for none.
 typedef struct CameraAnimPairs_t {
     char szName[0x10];          // 0x00  the animation's name (matched with case ignored)
-    CamShot* pShot;             // 0x10  nKind 13: the pair gives this shot
-    CameraSequence_t* pRandomSeq1;  // 0x14  } nKind 14: the pair gives one of these three at random
-    CameraSequence_t* pRandomSeq2;  // 0x18  } (pRandomSeq3 when the one picked is missing)
+    CamShot* pShot;             // 0x10  CAMPAIR_SHOT: the pair gives this shot
+    CameraSequence_t* pRandomSeq1;  // 0x14  } CAMPAIR_RANDOM_SEQUENCE: the pair gives one of these three
+    CameraSequence_t* pRandomSeq2;  // 0x18  } at random (pRandomSeq3 when the one picked is missing)
     CameraSequence_t* pRandomSeq3;  // 0x1C  }
     CameraSequence_t* pChanceSeq;   // 0x20  tried first: given 39 times in 100 when it has shot choices
-    u8   nKind;                 // 0x24  13 or 14
+    u8   nKind;                 // 0x24  what it gives otherwise (CamAnimPairKind; any other: nothing)
     u8   unk25[3];
 } CameraAnimPairs_t;
 LAYOUT_ASSERT(CameraAnimPairs_t, 0x28);
@@ -62,7 +68,6 @@ typedef struct DynamicCamManager_t {
 LAYOUT_ASSERT(DynamicCamManager_t, 0x28);
 
 extern DynamicCamManager_t* gpDynCam;
-extern s32 gMaterialToCamLies[20];            // DynamicCam_MaterialToCameraLie's table
-extern s32 gBallLieToCamLies[17];            // DynamicCam_BallLieToCameraLie's table
+extern CameraLie_e gBallLieToCamLies[17];   // DynamicCam_BallLieToCameraLie's table
 
 #endif

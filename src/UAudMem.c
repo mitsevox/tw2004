@@ -42,11 +42,11 @@ void AudMem_Free(void* p) {
     AudMemStack_FreeTop(&gAudMemStack, p);
 }
 
-// Empty in this build: the boot list fn_80005520 calls it just before GoARAM_Init.
+// Empty in this build: the boot list fn_80005520 calls it just before GoARAM_InitOnce.
 void AudMem_InitOnce(void) {
 }
 
-// Empty in this build: the shut-down list fn_80005590 calls it just after GoARAM_Shutdown.
+// Empty in this build: the shut-down list fn_80005590 calls it just after GoARAM_CloseOnce.
 void AudMem_CloseOnce(void) {
 }
 

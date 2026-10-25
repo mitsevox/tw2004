@@ -42,8 +42,6 @@ void AISetStreamVolLeft(u8 uVol);
 void AISetStreamVolRight(u8 uVol);
 void fn_80006A98(void);
 void fn_80006B4C(void);
-void fn_80007328(void);
-void fn_80007368(void);
 void fn_800073A8(void);
 void fn_800392D0(void);
 
@@ -243,10 +241,10 @@ void fn_80006FE8(void) {
         GXSetDrawDone();
         GXFlush();
         GXGetFifoPtrs(GXGetCPUFifo(), &pRead, &pWrite);
-        fn_80007368();
+        Displ_DisableInterrupts();
         lbl_801A2350.bBusy = 1;
         GXEnableBreakPt(pWrite);
-        fn_80007328();
+        Displ_RestoreInterrupts();
         fn_800392D0();
         GXSetZMode(1, 3, 1);
         GXSetAlphaUpdate(1);
@@ -358,8 +356,8 @@ u8 fn_80007320(void) {
     return lbl_80281BAC;
 }
 
-// Leaves one level of fn_80007368: interrupts come back on when the last level is left.
-void fn_80007328(void) {
+// Leaves one level of Displ_DisableInterrupts: interrupts come back on when the last level is left.
+void Displ_RestoreInterrupts(void) {
     *gpInterruptsOffDepth -= 1;
     if (*gpInterruptsOffDepth == 0) {
         OSEnableInterrupts();
@@ -367,7 +365,7 @@ void fn_80007328(void) {
 }
 
 // Turns interrupts off, counting the levels so that calls can nest.
-void fn_80007368(void) {
+void Displ_DisableInterrupts(void) {
     if (*gpInterruptsOffDepth == 0) {
         OSDisableInterrupts();
     }
