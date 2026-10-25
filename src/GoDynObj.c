@@ -107,7 +107,7 @@ void DynObj_LoadBallLogos(TStreamData* pObject) {
         if ((s8)gSession.aProfile[i].nOutfit >= 0) {
             SKA_PackName(&uLogo, gGolfBallLogoTextureNames[(s8)gSession.aProfile[i].nOutfit]);
             SKA_PackName(&uSlot, gGolfBallLogoSlotNames[i]);
-            fn_800102DC(uSlot, &pSlotBank, &pSlot);
+            TG_iFindTextureGroupAndTexture(uSlot, &pSlotBank, &pSlot);
             nLogo = TX_uiFindTextureIndexFromID(pBank, uLogo);
             pLogo = &pBank->pTextures[nLogo];
             // EA bug: this loop counts with the player loop's i

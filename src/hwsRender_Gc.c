@@ -174,10 +174,10 @@ void fn_80112DD8(s32 nEntry) {
         for (i = 0; i < nMeshes; i++) {
             anFirst[i] = pFirst[i];
         }
-        if (pDesc->p18 == NULL) {
+        if (pDesc->pMaterials == NULL) {
             return;
         }
-        pTex = pDesc->p18[pMaterials[nPass]].pTex;
+        pTex = pDesc->pMaterials[pMaterials[nPass]].pTex;
         if (pTex == NULL) {
             // No texture: the vertex colour alone.
             GXSetNumTexGens(0);
@@ -188,7 +188,7 @@ void fn_80112DD8(s32 nEntry) {
             GXSetTevAlphaIn(0, 7, 7, 7, 5);
             GXSetTevAlphaOp(0, 0, 0, 1, 1, 0);
         } else if (nPass <= 0 || (pTex->b47 & 1) || pTex->b40 == 9) {
-            fn_800738DC(pDesc->p18[pMaterials[nPass]].pBank, pTex, 1);
+            fn_800738DC(pDesc->pMaterials[pMaterials[nPass]].pBank, pTex, 1);
             GXSetBlendMode(0, 0, 0, 0);
             if ((pTex->b47 & 1) || nPass > 0) {
                 GXSetTevColorIn(1, 15, 15, 15, 0);
@@ -199,7 +199,7 @@ void fn_80112DD8(s32 nEntry) {
                 GXSetAlphaCompare(7, 0, 0, 7, 0x7F);
                 GXSetZCompLoc(1);
             }
-            pUV = pDesc->p18[pMaterials[nPass]].uvC.a;
+            pUV = pDesc->pMaterials[pMaterials[nPass]].uvScaleOffset.a;
             PSMTXIdentity(lbl_80223C14);
             if (nPass > 0) {
                 PSMTXScale(mScale, pUV[0], pUV[1], 1.0f);

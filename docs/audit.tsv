@@ -227,7 +227,7 @@ hlaudtrackseq.c	open
 hlaudtrackstm.c	open		
 hlaudvoice.c	open		
 hwsBurn.c	open		
-hwsMaterial_Gc.c	open		
+hwsMaterial_Gc.c	done	0ce52f5f	claude-review
 hwsOverride_Gc.c	open		
 hwsRender_Gc.c	open		
 maddec.c	open		

@@ -300,12 +300,12 @@ void SkinBurn_BurnModel(Skin* pSkin, HwsBurn* pBurn) {
 }
 
 // The callback SkinBurn_BurnSkin hands the burn (hwsBurn.c calls it on each material entry):
-// patches the entry for copy 0's chosen sets (SkinPart_ApplySetsToMaterialEntry), then clears flag
-// 2 and n16, so the burnt entry keeps the texture scale and offset it got and no longer looks one
-// up in SkinDesc.pB8.
+// patches the entry for copy 0's chosen sets (SkinPart_ApplySetsToMaterialEntry), then clears
+// SKINDESC14_UV_FROM_SETS and n16, so the burnt entry keeps the texture scale and offset it got and
+// no longer looks one up in SkinDesc.pB8.
 void SkinBurn_BakeMaterialEntry(Skin* pSkin, SkinDesc14* pEntry) {
     SkinPart_ApplySetsToMaterialEntry(pSkin, pEntry, NULL, NULL, 0);
-    pEntry->u08 &= ~2;
+    pEntry->uFlags &= ~SKINDESC14_UV_FROM_SETS;
     pEntry->n16 = 0;
 }
 

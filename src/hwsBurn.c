@@ -33,7 +33,7 @@ HwsBurn* HwsBurn_Create(SkinDesc* pDesc) {
     pBurn->n20 = pDesc->nMeshes;
     pBurn->n34 = pDesc->n40;
     pBurn->n4C = pDesc->n38;
-    pBurn->n60 = pDesc->n10;
+    pBurn->n60 = pDesc->nMaterials;
     pBurn->n70 = pDesc->n88;
     if (pBurn->nParts != 0) {
         pBurn->aVariant = Circular_MemAllocFunc(pBurn->nParts * 4, MEMTYPE_HIGH, 16, "hwsBurn.c", 61);
@@ -138,7 +138,7 @@ void HwsBurn_Destroy(HwsBurn* pBurn) {
     Circular_MemFreeFunc(pBurn);
 }
 
-// Sets the callback the burn runs with pSkin on each material entry (SkinDesc.p14) it copies
+// Sets the callback the burn runs with pSkin on each material entry (SkinDesc.pMaterialEntries) it copies
 // (SkinBurn_BurnSkin passes SkinBurn_BakeMaterialEntry).
 void HwsBurn_SetMaterialCallback(HwsBurn* pBurn, void (*pfn)(Skin* pSkin, SkinDesc14* pEntry), Skin* pSkin) {
     pBurn->pfn68 = pfn;
@@ -547,13 +547,13 @@ s32* HwsBurn_CopyOptionEntries(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAli
     return aCopy;
 }
 
-// Copies the description's material entries (SkinDesc.p14) into a64 and runs the burn's callback
+// Copies the description's material entries (SkinDesc.pMaterialEntries) into a64 and runs the burn's callback
 // (HwsBurn_SetMaterialCallback) with its skin on each.
 void HwsBurn_PrepareMaterials(HwsBurn* pBurn) {
     int i;
     int n = pBurn->n60;
 
-    memcpy(pBurn->a64, pBurn->pDesc->p14, n * sizeof(SkinDesc14));
+    memcpy(pBurn->a64, pBurn->pDesc->pMaterialEntries, n * sizeof(SkinDesc14));
     for (i = 0; i < n; i++) {
         if (pBurn->pfn68 != NULL) {
             pBurn->pfn68(pBurn->pSkin, &pBurn->a64[i]);
@@ -661,7 +661,7 @@ SkinDesc* HwsBurn_BuildDesc(HwsBurn* pBurn) {
     nBytes += HwsBurn_ListSetOptions(pBurn, 16);
     // port: HwsBurn_AlignedSize only tests its pointer for NULL; EA passes the local's address.
     nBytes += HwsBurn_AlignedSize(&pDesc, 1, sizeof(SkinDesc), 16);
-    nBytes += HwsBurn_AlignedSize(pDesc->p14, pBurn->n60, sizeof(SkinDesc14), 16);
+    nBytes += HwsBurn_AlignedSize(pDesc->pMaterialEntries, pBurn->n60, sizeof(SkinDesc14), 16);
     nBytes += HwsBurn_AlignedSize(pDesc->p20, pDesc->n1C, 4, 16);
     nBytes += HwsBurn_AlignedSize(pDesc->p28, pDesc->n24, sizeof(SkinDesc28), 16);
     nBytes += HwsBurn_AlignedSize(pDesc->p44, pBurn->n38, sizeof(SkinDesc44), 16);
@@ -697,7 +697,7 @@ SkinDesc* HwsBurn_BuildDesc(HwsBurn* pBurn) {
     pOut->p34 = HwsBurn_CopyMeshes(pBurn, pBlock, &nOffset, 16);
     pOut->p3C = HwsBurn_CopyMeshRefs(pBurn, pBlock, &nOffset, 16);
     pOut->p6C = HwsBurn_CopyOptionEntries(pBurn, pBlock, &nOffset, 16);
-    pOut->p14 = HwsBurn_CopyMaterials(pBurn, pBlock, &nOffset, 16);
+    pOut->pMaterialEntries = HwsBurn_CopyMaterials(pBurn, pBlock, &nOffset, 16);
     pOut->p8C = HwsBurn_CopySetOptions(pBurn, pBlock, &nOffset, 16);
     pOut->p20 = HwsBurn_CopyAligned(pBlock, &nOffset, pDesc->p20, pDesc->n1C * 4, 16);
     pOut->pParts = HwsBurn_CopyAligned(pBlock, &nOffset, pDesc->pParts, pDesc->nParts * sizeof(SkinPartDef),
