@@ -383,7 +383,7 @@ LAYOUT_ASSERT(TexBank, 0x30);
 // LLTex.c: the items lbl_80281C60 lists (a count, then that many item pointers), which
 // fn_8000E884 steps by message. The type names are ours.
 typedef struct LLTexItemDef {
-    s32  n0;                    // 0x00  its id: a DynObj's n140 (fn_8000E830), fn_8000E948's id
+    s32  n0;                    // 0x00  its id: a DynObj's nActorId (fn_8000E830), fn_8000E948's id
     u8   unk4[0x18 - 0x4];
     u8   n18;                   // 0x18  fn_8000E9A8's id
 } LLTexItemDef;
@@ -1255,7 +1255,7 @@ typedef struct TStreamData {
     u32   uSize;                  // 0x24  the data's (unpacked) size
     u32   aScriptRefs[3];         // 0x28  three byte-code scripts (RPN_RunScript), offsets
                                   //       into the last 'RPNS' object's data until Stream_Progress
-                                  //       makes them pointers (DynObjNames reads them so)
+                                  //       makes them pointers (DynObjScripts reads them so)
 } TStreamData;
 LAYOUT_ASSERT(TStreamData, 0x34);
 

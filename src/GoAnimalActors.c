@@ -236,7 +236,7 @@ void ActAnimal_Init(DynObjAnimal* pAnimal, DynObjSetup* pSetup) {
         pRef = NULL;
     }
     if (pRef != NULL) {
-        pMesh = ActAnimal_GetRootMesh(pRef->p4->p10);
+        pMesh = ActAnimal_GetRootMesh(pRef->pModel->p10);
         pMesh = ActAnimal_GetMeshAlternative(pMesh, 0);
         pMesh = ActAnimal_GetMeshAlternative(pMesh, 0);
         nBitsA = ActAnimal_GetMeshFlags(pMesh, 0);
@@ -462,15 +462,15 @@ void ActAnimal_Update(DynObjAnimal* pAnimal, void* pArg) {
 // (DynObjBase_MessageHandler).
 int ActAnimal_MessageHandler(int nMsg, DynObj* pObj, void* pArg, void* pArg2) {
     switch (nMsg) {
-    case 1:
+    case DYNOBJ_MSG_SIZE:
         return sizeof(DynObjAnimal);
-    case 2:
+    case DYNOBJ_MSG_INIT:
         ActAnimal_Init((DynObjAnimal*)pObj, pArg);
         return 0;
-    case 6:
+    case DYNOBJ_MSG_UPDATE:
         ActAnimal_Update((DynObjAnimal*)pObj, pArg);
         return 0;
-    case 3:
+    case DYNOBJ_MSG_DRAW:
         if (pObj->obj.pModel != NULL) {
             pObj->obj.nMeshChild = ((DynObjAnimal*)pObj)->n1AC;
             pObj->obj.fShaderParam = ((DynObjAnimal*)pObj)->f1B4;
