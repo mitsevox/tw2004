@@ -1052,7 +1052,7 @@ config.libs = [
             Object(Matching, "HoleScore.c"),
             Object(Matching, "CaddieTips.c"),
             Object(Matching, "Calendar.c"),
-            Object(Matching, "CourseData.c"),
+            Object(Matching, "CourseInfo.c"),
             Object(Matching, "Earnings.c"),
             Object(Matching, "GameHoleContests.c"),
             Object(Matching, "GameMode.c"),

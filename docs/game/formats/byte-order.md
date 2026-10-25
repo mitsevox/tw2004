@@ -71,7 +71,7 @@ Objects delivered by UStream
 | `TEO ` | FE_CrAPBall_LoadTEO | sweep | none seen | asm (a second `TEO ` handler) |
 | `BALF` | FE_CrAPBall_LoadBALF | sweep | none seen | asm |
 | `TRAX`, `TRXT` | UI_vEATraxLoadfromStream, UI_vEATraxLoadLogoFromStream | sweep | none seen | asm |
-| `CRI `, `CMPS` | GM_CourseInfo_LoadCRIfromStream, GM_CourseInfo_LoadCMPSfromStream | sweep | none seen | asm |
+| `CRI `, `CMPS` | GM_CourseInfo_LoadCRIfromStream, GM_CourseInfo_LoadCMPSfromStream | CourseInfo.c | none seen | yes: copied over `gCourseInfo` (`CourseData[21]`) and `gCompilationCourses` (`GM_CompilationCourseData_t[7]`), include/game.h |
 | `ERN ` | EarningsInfo_LoadERNFromStream | Earnings.c | none seen | yes: copied over the prize table `lbl_80200538` (`EarningsTable`, include/game/earnings.h) |
 | `PLY ` | PlayNow_LoadPLYFromStream | PlayNowMode.c | none seen | yes: copied over `gPlayNowChallenges` (`Challenge[83]`, include/game/modes/challenge.h) |
 | `PLYs` | PlayNow_LoadPLYsFromStream | PlayNowMode.c | none seen | bytes: a string block, copied |

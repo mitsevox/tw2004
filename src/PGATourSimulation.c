@@ -757,9 +757,9 @@ s32 GM_PgaTourSim_GetTotalScoreFromEntrantID(int nPlayer, int nEntrant, u8 b) {
 // The entrant's score to par so far: GM_PgaTourSim_GetTotalScoreFromEntrantID's strokes less the
 // par of each round played (the course of that round from the tournament's course list; in game
 // type 3 before the first round, all four) and of the counted holes of the current round (b as
-// there). A built round (course 22) and courses 24 to 29 take each hole's course and hole number
-// from the round's hole list. The tournament is the current one, or the season's last once the
-// season is over (nEvent -1).
+// there). The compilation courses (Tiger's Dream 18 and Compilation 1..6: courses 22 and 24..29)
+// take each hole's course and hole number from the compilation table. The tournament is the
+// current one, or the season's last once the season is over (nEvent -1).
 int GM_PgaTourSim_GetRelativeScoreFromEntrantID(int nPlayer, int nEntrant, u8 b) {
     s32 aCourses[4];
     s32 nEvent;
@@ -787,11 +787,12 @@ int GM_PgaTourSim_GetRelativeScoreFromEntrantID(int nPlayer, int nEntrant, u8 b)
         if (gpSaveData[nPlayer].tour.nRound < 4) {
             nHoles = GetLastHoleToScore(nPlayer, nEntrant, b);
             for (i = 0; i < nHoles; i++) {
-                if (aCourses[gpSaveData[nPlayer].tour.nRound] == 22) {
-                    nCourse = GM_CourseInfo_GetCompilationCourse(22, i);
-                    nPar = GM_GetHolePar(nCourse, GM_CourseInfo_GetCompilationHole(22, i) - 1);
-                } else if (aCourses[gpSaveData[nPlayer].tour.nRound] >= 24
-                           && aCourses[gpSaveData[nPlayer].tour.nRound] < 30) {
+                if (aCourses[gpSaveData[nPlayer].tour.nRound] == COURSE_TIGERS_DREAM_18) {
+                    nCourse = GM_CourseInfo_GetCompilationCourse(COURSE_TIGERS_DREAM_18, i);
+                    nPar = GM_GetHolePar(nCourse,
+                                       GM_CourseInfo_GetCompilationHole(COURSE_TIGERS_DREAM_18, i) - 1);
+                } else if (aCourses[gpSaveData[nPlayer].tour.nRound] >= COURSE_COMPILATION_1
+                           && aCourses[gpSaveData[nPlayer].tour.nRound] < NUM_COURSES) {
                     nCourse = GM_CourseInfo_GetCompilationCourse(aCourses[gpSaveData[nPlayer].tour.nRound],
                             i);
                     nPar = GM_GetHolePar(nCourse,

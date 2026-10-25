@@ -170,15 +170,15 @@ u8 UserInfo_IsCourseSlot21Unlocked(int nProfile) {
     return gpSaveData[nProfile].aCourseUnlocked[21] != 0;
 }
 
-// Unlocks course slot 22 for save profile nProfile (aCourseUnlocked[22]; the course picker's choice
+// Unlocks Tiger's Dream 18 (course 22) for save profile nProfile (the course picker's choice
 // 3, GM_vIsCourseChoiceUnlocked), with no event. GM_Earnings_CheckUnlockCourses buys it with price
 // 21.
 void UserInfo_UnlockCourseSlot22(int nProfile) {
-    gpSaveData[nProfile].aCourseUnlocked[22] = 1;
+    gpSaveData[nProfile].aCourseUnlocked[COURSE_TIGERS_DREAM_18] = 1;
 }
 
 u8 UserInfo_IsCourseSlot22Unlocked(int nProfile) {
-    return gpSaveData[nProfile].aCourseUnlocked[22] != 0;
+    return gpSaveData[nProfile].aCourseUnlocked[COURSE_TIGERS_DREAM_18] != 0;
 }
 
 // The number of the 25 ladder events save profile nProfile has won (aLadderAward[].bWon).
